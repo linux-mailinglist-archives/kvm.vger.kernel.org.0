@@ -1,46 +1,46 @@
-Return-Path: <kvm+bounces-50243-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50244-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27D9CAE26B1
-	for <lists+kvm@lfdr.de>; Sat, 21 Jun 2025 02:46:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F791AE26CA
+	for <lists+kvm@lfdr.de>; Sat, 21 Jun 2025 03:07:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 076357ABE83
-	for <lists+kvm@lfdr.de>; Sat, 21 Jun 2025 00:44:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BFD674A6636
+	for <lists+kvm@lfdr.de>; Sat, 21 Jun 2025 01:07:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C16618E1A;
-	Sat, 21 Jun 2025 00:45:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9318319BBC;
+	Sat, 21 Jun 2025 01:07:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vCuYaekT"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lcs+3a2Z"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 526C27482
-	for <kvm@vger.kernel.org>; Sat, 21 Jun 2025 00:45:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4C85182D2
+	for <kvm@vger.kernel.org>; Sat, 21 Jun 2025 01:07:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750466753; cv=none; b=rvbwa5FGHHFeUIIgUnA9iQfak6nEvl8KfNUViN/K5gj11movY2a6toFNRLZisENQyMhEIrytMAoSy6EPr1uZA93sver0z6wFlGlWeJRPFLBf61d2kQ1jUyP3iw4Bq964rDkjPfWasp8aSZSDzlhM7VFX8iHRat7Ko7JrcVTExbg=
+	t=1750468032; cv=none; b=Y3gB0PnGJgy0o523Fjx/GFpKMqNv0EWnYQJG6BW3I9mt1aiZrzRj19YNPEIOd93X59IdJKiQuP9EHLqBM1t2WJeeFnJTltKxWhYY+in5WjyqLRN6RCLZ2qkqIg19szokMHGFvJ7dM5wzi+UZL1Df7I3qPtAwYlZGWgnM0x5A+y4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750466753; c=relaxed/simple;
-	bh=gZwTwTPyqRpkCFq9WA1MOuL8c25/H11PvOt+lNRUy0c=;
+	s=arc-20240116; t=1750468032; c=relaxed/simple;
+	bh=pzLOXtwqX+R5ZkDJnNjc7FQ6HyDYUogvPcm4PoBIA2Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mU1gVW1SAHLkpV0NECzM8va9R6QrnDxjTYn4mBdDQGs7MqGdhbzeGp2sOQ4Nt5h6PxEXkfJHTqgUwehgbZvtoBXEHGxnnT4fynN3wk8PuU2s6RgBQVRjeb9DrR9EFaFV3Ibb2TshukAQljYeOqMUaS40UaSrJH9O+Zm80lOs940=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vCuYaekT; arc=none smtp.client-ip=91.218.175.177
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q2sYVPx0JBQWwlI/baK5OrYumWm0k/N2A1lEH1tsI0AaOCjnLotqh+H1B+q+Rqh/bRvM7nWcvqJvSdygLPwr416uKctReqbt9Fcgb94TWQGL6yTgXBP7wFMY01cXQgz3fswMjWwjLh+ocNkb7dEnsa1EEKX3E/WfV8q63UtKK28=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lcs+3a2Z; arc=none smtp.client-ip=95.215.58.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Fri, 20 Jun 2025 17:45:31 -0700
+Date: Fri, 20 Jun 2025 18:06:50 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1750466738;
+	t=1750468018;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Kpi3z/hNG1omr0pyfwgE93KYt7IiamCkriHdc1+ZtYI=;
-	b=vCuYaekTWBlPi19QjJ6BkAuNfYaHJHZpoZH6fyYfCKbSeZ3TbNq0iuiNshL0PH0BNKBq6s
-	FXYMCBwxw/y1EmA2UzvuntJoB0IpgIMBryhmTdlEx+Raib3BifedgKp08j9RSP940/ctKF
-	dS8wOC5a5WYT+OkVB0l8XRSb9/GZTFM=
+	bh=x9bGMpSO4WqiAydjTYI1BvmIFHA6ViKMaNDWLEKT1C0=;
+	b=lcs+3a2ZLhflGQHKJ+gTgO7tBN917ZPbJW/VqGm5qDtkba9vGMlVsl2g4UsIib1GPpDr4G
+	Qz0ka4yuqWFfIVF8ZG1dVxusdCKjloC/kN1XPEVs7C6tPFt7GQ6bMeuvijVPunIWZecPoH
+	tkaZ/VVRFsn3eo+FUkZ0KJuGDM0AJ7I=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Colton Lewis <coltonlewis@google.com>
@@ -56,10 +56,11 @@ Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
 	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v2 03/23] arm64: cpufeature: Add cpucap for PMICNTR
-Message-ID: <aFYAq7GcSx4pTK9Y@linux.dev>
+Subject: Re: [PATCH v2 07/23] perf: arm_pmuv3: Introduce method to partition
+ the PMU
+Message-ID: <aFYFqrYRsmCi6oii@linux.dev>
 References: <20250620221326.1261128-1-coltonlewis@google.com>
- <20250620221326.1261128-4-coltonlewis@google.com>
+ <20250620221326.1261128-8-coltonlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -68,56 +69,140 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250620221326.1261128-4-coltonlewis@google.com>
+In-Reply-To: <20250620221326.1261128-8-coltonlewis@google.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Fri, Jun 20, 2025 at 10:13:03PM +0000, Colton Lewis wrote:
-> Add a cpucap for FEAT_PMUv3_PMICNTR, meaning there is a dedicated
-> instruction counter as well as the cycle counter.
+On Fri, Jun 20, 2025 at 10:13:07PM +0000, Colton Lewis wrote:
+> For PMUv3, the register field MDCR_EL2.HPMN partitiones the PMU
+> counters into two ranges where counters 0..HPMN-1 are accessible by
+> EL1 and, if allowed, EL0 while counters HPMN..N are only accessible by
+> EL2.
+> 
+> Create module parameters partition_pmu and reserved_guest_counters to
+> reserve a number of counters for the guest. These numbers are set at
+> boot because the perf subsystem assumes the number of counters will
+> not change after the PMU is probed.
+> 
+> Introduce the function armv8pmu_partition() to modify the PMU driver's
+> cntr_mask of available counters to exclude the counters being reserved
+> for the guest and record reserved_guest_counters as the maximum
+> allowable value for HPMN.
+> 
+> Due to the difficulty this feature would create for the driver running
+> at EL1 on the host, partitioning is only allowed in VHE mode. Working
+> on nVHE mode would require a hypercall for every counter access in the
+> driver because the counters reserved for the host by HPMN are only
+> accessible to EL2.
 > 
 > Signed-off-by: Colton Lewis <coltonlewis@google.com>
+> ---
+>  arch/arm/include/asm/arm_pmuv3.h   | 10 ++++
+>  arch/arm64/include/asm/arm_pmuv3.h |  5 ++
+>  drivers/perf/arm_pmuv3.c           | 95 +++++++++++++++++++++++++++++-
+>  include/linux/perf/arm_pmu.h       |  1 +
+>  4 files changed, 109 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm/include/asm/arm_pmuv3.h b/arch/arm/include/asm/arm_pmuv3.h
+> index 2ec0e5e83fc9..9dc43242538c 100644
+> --- a/arch/arm/include/asm/arm_pmuv3.h
+> +++ b/arch/arm/include/asm/arm_pmuv3.h
+> @@ -228,6 +228,11 @@ static inline bool kvm_set_pmuserenr(u64 val)
+>  
+>  static inline void kvm_vcpu_pmu_resync_el0(void) {}
+>  
+> +static inline bool has_vhe(void)
+> +{
+> +	return false;
+> +}
+> +
 
-I don't see this capability being used in this series.
+This has nothing to do with PMUv3, I'm a bit surprised to see you're
+touching 32-bit ARM. Can you just gate the whole partitioning thing on
+arm64?
+
+> +static bool partition_pmu __read_mostly;
+> +static u8 reserved_guest_counters __read_mostly;
+> +
+> +module_param(partition_pmu, bool, 0);
+> +MODULE_PARM_DESC(partition_pmu,
+> +		 "Partition the PMU into host and guest VM counters [y/n]");
+> +
+> +module_param(reserved_guest_counters, byte, 0);
+> +MODULE_PARM_DESC(reserved_guest_counters,
+> +		 "How many counters to reserve for guest VMs [0-$NR_COUNTERS]");
+> +
+
+This is confusing and not what we discussed offline.
+
+Please use a single parameter that describes the number of counters used
+by the *host*. This affects the *host* PMU driver, KVM can discover (and
+use) the leftovers.
+
+If the single module parameter goes unspecified the user did not ask for
+PMU partitioning.
+
+> +/**
+> + * armv8pmu_reservation_is_valid() - Determine if reservation is allowed
+> + * @guest_counters: Number of host counters to reserve
+> + *
+> + * Determine if the number of host counters in the argument is
+> + * allowed. It is allowed if it will produce a valid value for
+> + * register field MDCR_EL2.HPMN.
+> + *
+> + * Return: True if reservation allowed, false otherwise
+> + */
+> +static bool armv8pmu_reservation_is_valid(u8 guest_counters)
+> +{
+> +	return guest_counters <= armv8pmu_pmcr_n_read();
+> +}
+> +
+> +/**
+> + * armv8pmu_partition_supported() - Determine if partitioning is possible
+> + *
+> + * Partitioning is only supported in VHE mode (with PMUv3, assumed
+> + * since we are in the PMUv3 driver)
+> + *
+> + * Return: True if partitioning is possible, false otherwise
+> + */
+> +static bool armv8pmu_partition_supported(void)
+> +{
+> +	return has_vhe();
+> +}
+> +
+> +/**
+> + * armv8pmu_partition() - Partition the PMU
+> + * @pmu: Pointer to pmu being partitioned
+> + * @guest_counters: Number of host counters to reserve
+> + *
+> + * Partition the given PMU by taking a number of host counters to
+> + * reserve and, if it is a valid reservation, recording the
+> + * corresponding HPMN value in the hpmn field of the PMU and clearing
+> + * the guest-reserved counters from the counter mask.
+> + *
+> + * Passing 0 for @guest_counters has the effect of disabling partitioning.
+> + *
+> + * Return: 0 on success, -ERROR otherwise
+> + */
+> +static int armv8pmu_partition(struct arm_pmu *pmu, u8 guest_counters)
+> +{
+> +	u8 nr_counters;
+> +	u8 hpmn;
+> +
+> +	if (!armv8pmu_reservation_is_valid(guest_counters))
+> +		return -EINVAL;
+> +
+> +	nr_counters = armv8pmu_pmcr_n_read();
+> +	hpmn = guest_counters;
+> +
+> +	pmu->hpmn_max = hpmn;
+
+I'm not sure the host driver needs this for anything, KVM just needs to
+know what's potentially in use by the host.
+
+> +	/* Inform host driver of available counters */
+
+... said the driver to itself :)
 
 Thanks,
 Oliver
-
-> ---
->  arch/arm64/kernel/cpufeature.c | 7 +++++++
->  arch/arm64/tools/cpucaps       | 1 +
->  2 files changed, 8 insertions(+)
-> 
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index 278294fdc97d..85dea9714928 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -2904,6 +2904,13 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
->  		.matches = has_cpuid_feature,
->  		ARM64_CPUID_FIELDS(ID_AA64DFR0_EL1, HPMN0, IMP)
->  	},
-> +	{
-> +		.desc = "PMU Dedicated Instruction Counter",
-> +		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-> +		.capability = ARM64_HAS_PMICNTR,
-> +		.matches = has_cpuid_feature,
-> +		ARM64_CPUID_FIELDS(ID_AA64DFR1_EL1, PMICNTR, IMP)
-> +	},
->  #ifdef CONFIG_ARM64_SME
->  	{
->  		.desc = "Scalable Matrix Extension",
-> diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
-> index 5b196ba21629..6dd72fcdd612 100644
-> --- a/arch/arm64/tools/cpucaps
-> +++ b/arch/arm64/tools/cpucaps
-> @@ -47,6 +47,7 @@ HAS_LSE_ATOMICS
->  HAS_MOPS
->  HAS_NESTED_VIRT
->  HAS_PAN
-> +HAS_PMICNTR
->  HAS_PMUV3
->  HAS_S1PIE
->  HAS_S1POE
-> -- 
-> 2.50.0.714.g196bf9f422-goog
-> 
 
