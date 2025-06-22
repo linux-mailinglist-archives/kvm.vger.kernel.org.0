@@ -1,128 +1,254 @@
-Return-Path: <kvm+bounces-50256-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50257-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B836BAE2F4D
-	for <lists+kvm@lfdr.de>; Sun, 22 Jun 2025 12:12:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 61DD9AE2FCB
+	for <lists+kvm@lfdr.de>; Sun, 22 Jun 2025 14:19:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD3913ACBCD
-	for <lists+kvm@lfdr.de>; Sun, 22 Jun 2025 10:11:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 660183B38CC
+	for <lists+kvm@lfdr.de>; Sun, 22 Jun 2025 12:19:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E46431D5142;
-	Sun, 22 Jun 2025 10:12:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A38E1E0DE8;
+	Sun, 22 Jun 2025 12:19:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="T+ig0bEd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JlFxlw1D"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C3521B0402
-	for <kvm@vger.kernel.org>; Sun, 22 Jun 2025 10:12:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50BD481E;
+	Sun, 22 Jun 2025 12:19:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750587123; cv=none; b=AJf1smYJzCpQckE7jIuQwGKmvqD1Kjgr0SfCk0snY+NSihh0Juew5I2tDAtZD9lFY6QZJg+RSRQSVKUIgXqMUFHlNj5aq4mQS909FZsTKwI+ncwf6cAaPOLvHIRRWfTJP5GDFV/i2E+0+or7xLD9NghcacTv49hrUMbwJZPEn1Q=
+	t=1750594758; cv=none; b=A/IzpK4cCYf7UAr1m+5+etxCEo9KYHNe1BkWYSNXupSjoCX5gnAky96DsfC/PvfTvfLR526pt9Cua48FA59YBKXrglH0lOpjJZlnwQkr1tD7G2DD3ONRWZEfyhckWCdrP7YTLr2ACTgVFHGCz/75beFlBzPn47j9gA3SqMgeP4c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750587123; c=relaxed/simple;
-	bh=U8KbW8H1OPS3k6Kxz+b5VWjIpb6jrU+NjTsn2OmpZ9Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qlTfQAa/euyaY/F9a7cCHcex3sB0klsAID8Ls1Ojk+9U8EXekdkFxU/NQwxyBZNR+LJmCkZafj0CcjjAyyt/DZUSSjWNCnoWOICdBAG65FKqc4WpZKiLmAgL+prSoY6A9xsiFFfI8TlwAu2zo026IUqooQNV2LHz+qFQv0YGtUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=T+ig0bEd; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2360ff7ac1bso21896965ad.3
-        for <kvm@vger.kernel.org>; Sun, 22 Jun 2025 03:12:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1750587120; x=1751191920; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mhd7Psksfo9MLj/RnU9tn25T95OkdzIn/rvFvguRfxI=;
-        b=T+ig0bEdY6Tbzg3DaGYcQetGJ5zfsIj/anjO7ZoM8Yb/tLb1+C3Hc8IniRmxK1uxBT
-         A3f4YU5G/mu3E+Fc7dFurgHCqyWAM8QRck9Y+IapCLeujyHqu4O8y3CLDRW8tEIxV6Im
-         2ra6xdqDICnJxcnnQGezEVLWZPEJuXQIIamlmt60wtnxOLXuSaUmw6PbquZHY2OtMpnr
-         svFXa6r5OkWcTZQTZQa80ZzwXKuyn8BSarOeDDyCx3erXGMzAGYuXSXgU+ew/O96E4GH
-         BjtTWOAAdHF7dN/0ZmIMLhvGAfiKVgLsOZBCwcT6iEuFQ51RzQGGXt0TJfzWvaCumcAo
-         MGYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750587120; x=1751191920;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mhd7Psksfo9MLj/RnU9tn25T95OkdzIn/rvFvguRfxI=;
-        b=iG2YomoSFb043cRmcjzDZbdjvV3bLoWb85S95eOX7b/QagLzOUN8Xh3UrS/aN3i0Mn
-         Efi1rjKzkyxpUkjwGGnydI4HlV7uoMyqCSUf61YudvpD492o3TUiVJpvIUxyZvpcxUsY
-         uWlF9amvCj9apEhbmofFvuclECWSRYT1N02ruOAYYcurpBKEwYOjfB5e9XpwzqlTw4Di
-         Wnc4syRWebWqRBcUtueX3LS+czXH6jyRYzpbUtK9iG+MKADxxTz7RnVv076k4M032cjQ
-         ubRmosrQswaLhu5TNLoco+v99eZdP9YDM6YwWlnFuvgeKsACUxREp7AdY/Fid3sDf2lE
-         jjCg==
-X-Forwarded-Encrypted: i=1; AJvYcCU0bD4vWrmmy8Kld6A0e2PF8rcVax11XbFWmJ/w9RgdEkRu0YG4dLga95XgPI7OuVv6zQA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw7cCjqZ0BgAcwsqTZslk/pvolJsFKqEo3x7XEQAMEUt1pXFNMa
-	a2Aq1GfserLnKgtGEcrNGH1GqFG+asXtoj2PH7QfA18rvNLPqydDYanMZqVTx8D0WVsBQTPlZvq
-	wJRvF4Yw+W4CNsDgrpJ0SuBKTq0ZRmCBhVkewR3yhJw==
-X-Gm-Gg: ASbGncuh010dlzZmEK1ZclDczJA3x057rBMwIkkDiGCmXzN1Ilfy3GuFEmbYeBXrzFo
-	davd4YEUXnCOPYkcXC6+SbzR5jhw+wUV4+oY7j5eSCj1ZTYuVBJ42Kffme41XJWlTvnvMa33NWU
-	Gg8ORLhJEuUKzsHJRxvr5aVWuUrDtBlm0p9oJKXyaYnd0Hz/vSD5elC1lN
-X-Google-Smtp-Source: AGHT+IGsWzTP6/gbvQ/CA0ejRIYXVE3ACO/w0NVroX/xY0eGzRwP6PYHlp4erxCJ+zZG6ZfDl+/adXC35SQaJWcaE8g=
-X-Received: by 2002:a17:902:c405:b0:235:e8da:8d6 with SMTP id
- d9443c01a7336-237d97c3b5bmr151787145ad.2.1750587120557; Sun, 22 Jun 2025
- 03:12:00 -0700 (PDT)
+	s=arc-20240116; t=1750594758; c=relaxed/simple;
+	bh=i/+4q+ps+2ON5ZvTxo7NwhX8KcLqLmTVZsBvXPkV188=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Fr65GFuGHBlUgdjpI2CdQfX4MNl2+/H8ZGHNNasD64k/MOV+7W1UEwLhP3+5VpabLuwaT03FCAXja93enl88cUKRlpCTjUYgM1xbGAJX7GksllAR4vVt0VMeEjaySEXscuVOSGzYWXB4JGqLLQ0qZ2MutQceHDyhG9eNCkjRiKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JlFxlw1D; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CDCEC4CEE3;
+	Sun, 22 Jun 2025 12:19:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750594756;
+	bh=i/+4q+ps+2ON5ZvTxo7NwhX8KcLqLmTVZsBvXPkV188=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=JlFxlw1DQHE5od6lTucH/vBois+LfVVElISjoGePhXtFkTFVlBRhCibiDG3N13KXk
+	 J9liLVTEtNHLMY8aV/gksxDrThlUO1YdzDZULk466Q2GlrDx7F6jm+3qs3lRAYIYTl
+	 dIKmmytUEGznE8pjPhSrveLCywUf8H6fhskhPbImBmr3xEE8DYkOuikLNSewqAr52R
+	 pBqRZXgjAW+8HOksko2dnyEkrIAVvMC90j8gM86lQgyJEai5KsgMTDrFnbxXd8ezUv
+	 lu44PW1vbZvTmPRZjCSPxfwg7kofFncSoDP25a7oXfBciprE92uQZ/gqjeKl7ZRntL
+	 XHI+t73lPLr7w==
+Received: from [213.123.58.114] (helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1uTJfG-008xmc-4O;
+	Sun, 22 Jun 2025 13:19:14 +0100
+Date: Sun, 22 Jun 2025 13:19:13 +0100
+Message-ID: <87a560ezpa.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Sascha Bischoff <Sascha.Bischoff@arm.com>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	nd <nd@arm.com>,
+	Joey Gouly <Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"will@kernel.org" <will@kernel.org>,
+	"tglx@linutronix.de" <tglx@linutronix.de>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	Timothy Hayes <Timothy.Hayes@arm.com>
+Subject: Re: [PATCH 4/5] KVM: arm64: gic-v5: Support GICv3 compat
+In-Reply-To: <aFXClKQRG3KNAD2y@linux.dev>
+References: <20250620160741.3513940-1-sascha.bischoff@arm.com>
+	<20250620160741.3513940-5-sascha.bischoff@arm.com>
+	<aFXClKQRG3KNAD2y@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250620091720.85633-1-luxu.kernel@bytedance.com> <DARCHDIZG7IP.2VTEVNMVX8R1E@ventanamicro.com>
-In-Reply-To: <DARCHDIZG7IP.2VTEVNMVX8R1E@ventanamicro.com>
-From: Xu Lu <luxu.kernel@bytedance.com>
-Date: Sun, 22 Jun 2025 18:11:49 +0800
-X-Gm-Features: AX0GCFsb818yKyl7dINvhKYBkJJnEFckaB0ZfIHP1lNH7P09XFDmloWPadWx7s8
-Message-ID: <CAPYmKFvcnDJWXAUEX8oY6seQrgwKiZjDqrJ_R2rJ4kWq7RQUSg@mail.gmail.com>
-Subject: Re: [External] Re: [PATCH] RISC-V: KVM: Delegate illegal instruction fault
-To: =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@ventanamicro.com>
-Cc: anup@brainfault.org, atish.patra@linux.dev, paul.walmsley@sifive.com, 
-	palmer@dabbelt.com, aou@eecs.berkeley.edu, alex@ghiti.fr, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, 
-	linux-riscv <linux-riscv-bounces@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 213.123.58.114
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, nd@arm.com, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, will@kernel.org, tglx@linutronix.de, lpieralisi@kernel.org, Timothy.Hayes@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Radim,
-
-On Fri, Jun 20, 2025 at 8:04=E2=80=AFPM Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcma=
-r@ventanamicro.com> wrote:
+On Fri, 20 Jun 2025 21:20:36 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> Hi Sascha,
+> 
+> Thank you for posting this. Very excited to see the GICv5 enablement get
+> started.
+> 
+> On Fri, Jun 20, 2025 at 04:07:51PM +0000, Sascha Bischoff wrote:
+> > Add support for GICv3 compat mode (FEAT_GCIE_LEGACY) which allows a
+> > GICv5 host to run GICv3-based VMs. This change enables the
+> > VHE/nVHE/hVHE/protected modes, but does not support nested
+> > virtualization.
+> 
+> Can't we just load the shadow state into the compat VGICv3? I'm worried
+> this has sharp edges on the UAPI side as well as users wanting to
+> migrate VMs to new hardware.
 >
-> 2025-06-20T17:17:20+08:00, Xu Lu <luxu.kernel@bytedance.com>:
-> > Delegate illegal instruction fault to VS mode in default to avoid such
-> > exceptions being trapped to HS and redirected back to VS.
-> >
-> > Signed-off-by: Xu Lu <luxu.kernel@bytedance.com>
+> The guest hypervisor should only see GICv3-only or GICv5-only, we can
+> pretend FEAT_GCIE_LEGACY never existed :)
+
+That's exactly what this does. And the only reason NV isn't supported
+yet is the current BET0 spec makes ICC_SRE_EL2 UNDEF at EL1 with NV,
+which breaks NV in a spectacular way.
+
+This will be addressed in a future revision of the architecture, and
+no HW will actually be built with this defect. As such, there is no
+UAPI to break.
+
+> 
+> > Co-authored-by: Timothy Hayes <timothy.hayes@arm.com>
+> > Signed-off-by: Timothy Hayes <timothy.hayes@arm.com>
+> > Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 > > ---
-> > diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm=
-/kvm_host.h
-> > @@ -48,6 +48,7 @@
-> > +                                      BIT(EXC_INST_ILLEGAL)    | \
->
-> You should also remove the dead code in kvm_riscv_vcpu_exit.
+> >  arch/arm64/include/asm/kvm_asm.h   |  2 ++
+> >  arch/arm64/include/asm/kvm_hyp.h   |  2 ++
+> >  arch/arm64/kvm/Makefile            |  3 +-
+> >  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 12 +++++++
+> >  arch/arm64/kvm/hyp/vgic-v3-sr.c    | 51 +++++++++++++++++++++++++-----
+> >  arch/arm64/kvm/sys_regs.c          | 10 +++++-
+> >  arch/arm64/kvm/vgic/vgic-init.c    |  6 ++--
+> >  arch/arm64/kvm/vgic/vgic-v3.c      |  6 ++++
+> >  arch/arm64/kvm/vgic/vgic-v5.c      | 14 ++++++++
+> >  arch/arm64/kvm/vgic/vgic.h         |  2 ++
+> >  include/kvm/arm_vgic.h             |  9 +++++-
+> >  11 files changed, 104 insertions(+), 13 deletions(-)
+> >  create mode 100644 arch/arm64/kvm/vgic/vgic-v5.c
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> > index bec227f9500a..ad1ef0460fd6 100644
+> > --- a/arch/arm64/include/asm/kvm_asm.h
+> > +++ b/arch/arm64/include/asm/kvm_asm.h
+> > @@ -81,6 +81,8 @@ enum __kvm_host_smccc_func {
+> >  	__KVM_HOST_SMCCC_FUNC___kvm_timer_set_cntvoff,
+> >  	__KVM_HOST_SMCCC_FUNC___vgic_v3_save_vmcr_aprs,
+> >  	__KVM_HOST_SMCCC_FUNC___vgic_v3_restore_vmcr_aprs,
+> > +	__KVM_HOST_SMCCC_FUNC___vgic_v3_compat_mode_enable,
+> > +	__KVM_HOST_SMCCC_FUNC___vgic_v3_compat_mode_disable,
+> >  	__KVM_HOST_SMCCC_FUNC___pkvm_init_vm,
+> >  	__KVM_HOST_SMCCC_FUNC___pkvm_init_vcpu,
+> >  	__KVM_HOST_SMCCC_FUNC___pkvm_teardown_vm,
+> > diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+> > index e6be1f5d0967..9c8adc5186ec 100644
+> > --- a/arch/arm64/include/asm/kvm_hyp.h
+> > +++ b/arch/arm64/include/asm/kvm_hyp.h
+> > @@ -85,6 +85,8 @@ void __vgic_v3_deactivate_traps(struct vgic_v3_cpu_if *cpu_if);
+> >  void __vgic_v3_save_vmcr_aprs(struct vgic_v3_cpu_if *cpu_if);
+> >  void __vgic_v3_restore_vmcr_aprs(struct vgic_v3_cpu_if *cpu_if);
+> >  int __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu);
+> > +void __vgic_v3_compat_mode_enable(void);
+> > +void __vgic_v3_compat_mode_disable(void);
+> >  
+> >  #ifdef __KVM_NVHE_HYPERVISOR__
+> >  void __timer_enable_traps(struct kvm_vcpu *vcpu);
+> > diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+> > index 7c329e01c557..3ebc0570345c 100644
+> > --- a/arch/arm64/kvm/Makefile
+> > +++ b/arch/arm64/kvm/Makefile
+> > @@ -23,7 +23,8 @@ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
+> >  	 vgic/vgic-v3.o vgic/vgic-v4.o \
+> >  	 vgic/vgic-mmio.o vgic/vgic-mmio-v2.o \
+> >  	 vgic/vgic-mmio-v3.o vgic/vgic-kvm-device.o \
+> > -	 vgic/vgic-its.o vgic/vgic-debug.o vgic/vgic-v3-nested.o
+> > +	 vgic/vgic-its.o vgic/vgic-debug.o vgic/vgic-v3-nested.o \
+> > +	 vgic/vgic-v5.o
+> >  
+> >  kvm-$(CONFIG_HW_PERF_EVENTS)  += pmu-emul.o pmu.o
+> >  kvm-$(CONFIG_ARM64_PTR_AUTH)  += pauth.o
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> > index e9198e56e784..61af55df60a9 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> > @@ -475,6 +475,16 @@ static void handle___vgic_v3_restore_vmcr_aprs(struct kvm_cpu_context *host_ctxt
+> >  	__vgic_v3_restore_vmcr_aprs(kern_hyp_va(cpu_if));
+> >  }
+> >  
+> > +static void handle___vgic_v3_compat_mode_enable(struct kvm_cpu_context *host_ctxt)
+> > +{
+> > +	__vgic_v3_compat_mode_enable();
+> > +}
+> > +
+> > +static void handle___vgic_v3_compat_mode_disable(struct kvm_cpu_context *host_ctxt)
+> > +{
+> > +	__vgic_v3_compat_mode_disable();
+> > +}
+> > +
+> >  static void handle___pkvm_init(struct kvm_cpu_context *host_ctxt)
+> >  {
+> >  	DECLARE_REG(phys_addr_t, phys, host_ctxt, 1);
+> > @@ -603,6 +613,8 @@ static const hcall_t host_hcall[] = {
+> >  	HANDLE_FUNC(__kvm_timer_set_cntvoff),
+> >  	HANDLE_FUNC(__vgic_v3_save_vmcr_aprs),
+> >  	HANDLE_FUNC(__vgic_v3_restore_vmcr_aprs),
+> > +	HANDLE_FUNC(__vgic_v3_compat_mode_enable),
+> > +	HANDLE_FUNC(__vgic_v3_compat_mode_disable),
+> >  	HANDLE_FUNC(__pkvm_init_vm),
+> >  	HANDLE_FUNC(__pkvm_init_vcpu),
+> >  	HANDLE_FUNC(__pkvm_teardown_vm),
+> > diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+> > index f162b0df5cae..b03b5f012226 100644
+> > --- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
+> > +++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+> > @@ -257,6 +257,18 @@ void __vgic_v3_restore_state(struct vgic_v3_cpu_if *cpu_if)
+> >  	}
+> >  }
+> >  
+> > +void __vgic_v3_compat_mode_enable(void)
+> > +{
+> > +	sysreg_clear_set_s(SYS_ICH_VCTLR_EL2, 0, ICH_VCTLR_EL2_V3);
+> > +	isb();
+> > +}
+> > +
+> > +void __vgic_v3_compat_mode_disable(void)
+> > +{
+> > +	sysreg_clear_set_s(SYS_ICH_VCTLR_EL2, ICH_VCTLR_EL2_V3, 0);
+> > +	isb();
+> > +}
+> > +
+> 
+> It isn't clear to me what these ISBs are synchonizing against. AFAICT,
+> the whole compat thing is always visible and we can restore the rest of
+> the VGICv3 context before guaranteeing the enable bit has been observed.
 
-I only want to delegate it by default. And KVM may still want to
-delegate different exceptions for different VMs like what it does for
-EXC_BREAKPOINT. So maybe it is better to reserve these codes?
+No, some registers have a behaviour that is dependent on the status of
+the V3 bit (ICH_VMCR_EL2 being one), so that synchronisation is
+absolutely needed before accessing this register.
 
->
-> And why not delegate the others as well?
-> (EXC_LOAD_MISALIGNED, EXC_STORE_MISALIGNED, EXC_LOAD_ACCESS,
->  EXC_STORE_ACCESS, and EXC_INST_ACCESS.)
+The disabling is probably the wrong way around though, and I'd expect
+the clearing of V3 to have an ISB *before* the write to the sysreg,
 
-Thanks for the reminder. I will have a test and resend the patch if it work=
-s.
+> Can we consolidate this into a single hyp call along with
+> __vgic_v3_*_vmcr_aprs()?
 
->
-> Thanks.
+I agree that we should be able to move this to be driven by
+load/put entirely.
 
-Best Regards,
-Xu Lu
+But we first need to fix the whole WFI sequencing first, because this
+is a bit of a train wreck at the moment (entering the WFI emulation
+results in *two* "put" sequences on the vgic, and exiting WFI results
+in two loads).
+
+Thanks,
+
+	M.
+
+-- 
+Jazz isn't dead. It just smells funny.
 
