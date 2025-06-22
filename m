@@ -1,79 +1,115 @@
-Return-Path: <kvm+bounces-50264-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50265-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C721EAE31D2
-	for <lists+kvm@lfdr.de>; Sun, 22 Jun 2025 21:55:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AD7FAE32C0
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 00:16:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5C103AF824
-	for <lists+kvm@lfdr.de>; Sun, 22 Jun 2025 19:54:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 876EB16EB93
+	for <lists+kvm@lfdr.de>; Sun, 22 Jun 2025 22:16:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CB521FA85A;
-	Sun, 22 Jun 2025 19:55:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F01B21D3EC;
+	Sun, 22 Jun 2025 22:16:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XeuMDS6r"
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="UnkMEMVn"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B193D163;
-	Sun, 22 Jun 2025 19:55:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EF3A28EA;
+	Sun, 22 Jun 2025 22:16:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750622114; cv=none; b=OqTqJEuCBncNWPbP8ox/QK9Mnxx2pvS4md/d/b1mmgBRuhGy5d2vr2qltFibD0KX6TwKdvzP+4oI1aKfOEtPuz6SwohkI8M39yU4kG2/2gdOp8EUqbR6Z3hniZqKIQTcgKO1dBe5ENRksHERw4X+tfSkpZDroidNGtzzfxNO9t8=
+	t=1750630588; cv=none; b=cW+r/YBNqFlEa4GI52fZOgJIHSs2SJyhTraJzxFw3MxOf+lzXB7ZjcGwHt6TW6kjUJzLix6ZGmAzufUMSlx98g7QD8cY7G86eUArxqfq2LTeAQPOZt5Hpn5ZNvh8n7dKLRHmA6syxUrDPZPT5LZeJZz1x3DX+MvYbskhCOb0Zec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750622114; c=relaxed/simple;
-	bh=bDTCzQiDM3TrIueTN/wC8gyKnuT1wEe8+J9kDycX33Q=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=ukbgOfDA420m/LF7i07pCQOjDAkG4YMq97tCBHKzyFK9QMaFGRjTA8cv+YV2wjE28q8lkwOHlSRnhR2MAwRCxSC5vLJPbrWvACj90+Tdw2gXNYP30xfWwr9Etf3UZrIH85XK2LLWD+qVO58peSveaOUhXy3uIa0Er5ThzVSDPZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XeuMDS6r; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91099C4CEE3;
-	Sun, 22 Jun 2025 19:55:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750622114;
-	bh=bDTCzQiDM3TrIueTN/wC8gyKnuT1wEe8+J9kDycX33Q=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=XeuMDS6r4GsJSlhS6CZkzDri4MlmzALmEfRexZ4N/selHI0HVkA2AAxnuLB3jYPgp
-	 E0iin5ArWyhPCQdBbimDYNb/Y753Y1t1Ncz8s2bDL52DvbasfWvgtuTig27Nebg1ED
-	 MuLOIB6mFHLjy52Mg/kFBEsTNwiX+rRkzNyww6ouKjySIPn7z8B9PhjlUOJkJnNyg3
-	 FzlFfguSypTbWkXFufOoLjnB7BxvgVJQa+CY4dS4rTTSDSOvQ3Cc+S/j63dKTbN6QO
-	 Yvnm3mdUgwV7VQJc3YXT4oR7ANIM6oPGpVCiA3FJM4cqUg9lWBPc3YwuU5x8zwqTW1
-	 oWonLxdgIB2rA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E2039FEB77;
-	Sun, 22 Jun 2025 19:55:43 +0000 (UTC)
-Subject: Re: [GIT PULL] KVM fixes for Linux 6.16-rc3
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20250622073328.201148-1-pbonzini@redhat.com>
-References: <20250622073328.201148-1-pbonzini@redhat.com>
-X-PR-Tracked-List-Id: <kvm.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20250622073328.201148-1-pbonzini@redhat.com>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-X-PR-Tracked-Commit-Id: 25e8b1dd4883e6c251c3db5b347f3c8ae4ade921
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: e669e322c52c49c161e46492963e64319fbb53a8
-Message-Id: <175062214185.2132065.3237496525781193982.pr-tracker-bot@kernel.org>
-Date: Sun, 22 Jun 2025 19:55:41 +0000
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: torvalds@linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+	s=arc-20240116; t=1750630588; c=relaxed/simple;
+	bh=tLByNlqUAJAlwrRiurqr1Tlca7v3+MRaflGdBfGFrh4=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=kyRb8nnsfkV6FZuKbU8vwyWuWS/indVAvljQeJhjgMm1PV2j/qWThaFenVgqzVS6U/zocgQ0ZgLwkFLxk2w4az4pvcBjjGgKgAqeGgyM3D9tT7ymjrQ7QfnHu4HRKtABPOKlYzJLls2r9vwaMSMBCXBHMF/PSDgzT9ENdvsykrI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=UnkMEMVn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38383C4CEE3;
+	Sun, 22 Jun 2025 22:16:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
+	s=korg; t=1750630588;
+	bh=tLByNlqUAJAlwrRiurqr1Tlca7v3+MRaflGdBfGFrh4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=UnkMEMVnPEVFZ/TxLkdkQxWUL8j100frOJstemv+j6qBeTRD2ky7OBir7vvHPnDxU
+	 ymtWmkFNLPhS+5J1oheVqlqb2kITNwDebPJCYbA4HxBEXkTU7RxEQh56IlEPOJv9I4
+	 EVWc61+GmVWxZEQpnxD95rkcfhnT2nbXjczFwLXE=
+Date: Sun, 22 Jun 2025 15:16:25 -0700
+From: Andrew Morton <akpm@linux-foundation.org>
+To: Shivank Garg <shivankg@amd.com>
+Cc: Matthew Wilcox <willy@infradead.org>, seanjc@google.com,
+ david@redhat.com, vbabka@suse.cz, shuah@kernel.org, pbonzini@redhat.com,
+ brauner@kernel.org, viro@zeniv.linux.org.uk, ackerleytng@google.com,
+ paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com, pvorel@suse.cz,
+ bfoster@redhat.com, tabba@google.com, vannapurve@google.com,
+ chao.gao@intel.com, bharata@amd.com, nikunj@amd.com, michael.day@amd.com,
+ yan.y.zhao@intel.com, Neeraj.Upadhyay@amd.com, thomas.lendacky@amd.com,
+ michael.roth@amd.com, aik@amd.com, jgg@nvidia.com, kalyazin@amazon.com,
+ peterx@redhat.com, jack@suse.cz, rppt@kernel.org, hch@infradead.org,
+ cgzones@googlemail.com, ira.weiny@intel.com, rientjes@google.com,
+ roypat@amazon.co.uk, ziy@nvidia.com, matthew.brost@intel.com,
+ joshua.hahnjy@gmail.com, rakie.kim@sk.com, byungchul@sk.com,
+ gourry@gourry.net, kent.overstreet@linux.dev, ying.huang@linux.alibaba.com,
+ apopple@nvidia.com, chao.p.peng@intel.com, amit@infradead.org,
+ ddutile@redhat.com, dan.j.williams@intel.com, ashish.kalra@amd.com,
+ gshan@redhat.com, jgowans@amazon.com, pankaj.gupta@amd.com,
+ papaluri@amd.com, yuzhao@google.com, suzuki.poulose@arm.com,
+ quic_eberman@quicinc.com, aneeshkumar.kizhakeveetil@arm.com,
+ linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+ linux-kernel@vger.kernel.org, linux-security-module@vger.kernel.org,
+ kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-coco@lists.linux.dev
+Subject: Re: [PATCH 2/2] filemap: Add __filemap_get_folio_mpol()
+Message-Id: <20250622151625.fb5d23362c2c3d1af22878d2@linux-foundation.org>
+In-Reply-To: <d1d7feed-c450-4b88-ab73-a673f4029433@amd.com>
+References: <20250618112935.7629-4-shivankg@amd.com>
+	<20250620143502.3055777-2-willy@infradead.org>
+	<aFWR-2WAQ283SZvg@casper.infradead.org>
+	<20250622114322.c6c35800e01e4cc4007a0f89@linux-foundation.org>
+	<d1d7feed-c450-4b88-ab73-a673f4029433@amd.com>
+X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-The pull request you sent on Sun, 22 Jun 2025 03:33:28 -0400:
+On Mon, 23 Jun 2025 00:32:05 +0530 Shivank Garg <shivankg@amd.com> wrote:
 
-> https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+> > -EXPORT_SYMBOL(__filemap_get_folio);
+> > +EXPORT_SYMBOL(__filemap_get_folio_mpol);
+> >  
+> >  static inline struct folio *find_get_entry(struct xa_state *xas, pgoff_t max,
+> >  		xa_mark_t mark)
+> > _
+> > 
+> 
+> Hi Andrew,
+> 
+> Thank you for addressing this.
+> 
+> If you don’t mind me asking,
+> I was curious why we used EXPORT_SYMBOL instead of EXPORT_SYMBOL_GPL here.
+> I had previously received feedback recommending the use of EXPORT_SYMBOL_GPL
+> to better align with the kernel’s licensing philosophy, which made sense to me.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/e669e322c52c49c161e46492963e64319fbb53a8
+Making this _GPL would effectively switch __filemap_get_folio() from
+non-GPL to GPL.  Leaving it at non-GPL is less disruptive and Matthew's
+patch did not have the intention of changing licensing.
 
-Thank you!
+Also,
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+hp2:/usr/src/25> grep "EXPORT_SYMBOL(" mm/filemap.c|wc -l
+48
+hp2:/usr/src/25> grep "EXPORT_SYMBOL_GPL(" mm/filemap.c|wc -l 
+9
+
+
 
