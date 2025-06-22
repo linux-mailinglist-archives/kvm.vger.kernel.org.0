@@ -1,326 +1,124 @@
-Return-Path: <kvm+bounces-50251-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50252-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 719EDAE29A6
-	for <lists+kvm@lfdr.de>; Sat, 21 Jun 2025 16:57:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E95B6AE2D9A
+	for <lists+kvm@lfdr.de>; Sun, 22 Jun 2025 02:34:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C2F82189B4F8
-	for <lists+kvm@lfdr.de>; Sat, 21 Jun 2025 14:57:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D258D7A4078
+	for <lists+kvm@lfdr.de>; Sun, 22 Jun 2025 00:33:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1A2C20E708;
-	Sat, 21 Jun 2025 14:57:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA508E555;
+	Sun, 22 Jun 2025 00:34:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="avEzWE8R"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FO7Eg/uh"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76F1D191F92;
-	Sat, 21 Jun 2025 14:57:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 869E8372
+	for <kvm@vger.kernel.org>; Sun, 22 Jun 2025 00:34:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750517830; cv=none; b=ag+ihMK5Rq+YnhpvzECQDjq4zloz4xEau1O+y5sArOPn4GBqGg3BP7N8PIVEZD6Uu/ZJOunxVW4fJ0StXVlEd6kG0PzwoybqXZSL0nvtAUNEI+gjYIBEEwjk5JUxJXVg8KxZS9V1GH6AMW3SUyUXMbKHLaN/6w/wCq/+ISclZx4=
+	t=1750552454; cv=none; b=m756MsrcwCU1TTAZSDwWrUk0Joj7xmzEKXIXpQ2CLDuyKlO/KT+dP4oGiXlvbWo6fklNscOEwyz4pd3cTZFCFSP39m4TiMXlxhiDAmGs3zM6i6mQBxFfWzr8Gj+GE9wp6nAb+aYsbPNBWebZ4rKQ6TVhppA6cKZjWUHS1mtNYcI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750517830; c=relaxed/simple;
-	bh=X3vV+eJu0dvr53qzXk4iuxmihuUGtVvgs8eqeDhJh9o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F248+gEPQKpGiV2L+DqW9i9KD+yZvmi3h+UfpsApBM3kX+TE9MqwjMdxJ2QDp9GSeb5mkJmZBJMzAmOfkDw3dm/ECc54lN98+MmvbaVJLZiJNyJyxx3bgsUdx52Tq0fosXyrrEBq9+cbng7c1Bj1abcavE+7ZosMmO2EjQ0FTgs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=avEzWE8R; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750517828; x=1782053828;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=X3vV+eJu0dvr53qzXk4iuxmihuUGtVvgs8eqeDhJh9o=;
-  b=avEzWE8RhpejSpMIpCWpVkjD0JbKnxovumBr1tjd7BYDDjfU6RmyNo9m
-   PdBlIjpJit0BF+IHGVFTiOs9aOq+kXPK7v+XIBILwrP7QZ+NDIPtoiOJ8
-   CQWLUjPFQFoyRfTd3bn1Wmet87vdy1Q2Ui5UrQa0C9s454ADmpJ41a0vl
-   N5+/ig3kiI6PzHXZgZQCPkZy0JNV0EuA8xr77dPS5HbMQhRmYIQbfn/zn
-   u2jU11k/MJiIDPCx2UHGE+RwccqIIXY611uyidrP9twzDZL8N0qeeSE+h
-   cs2+B2KdivzR24zElJKdR7Ax8q60ugvvZ5r92X8g6kv5NvY0MiTobU7rh
-   g==;
-X-CSE-ConnectionGUID: ZhV+KK3qSZCHtUlYC7brAg==
-X-CSE-MsgGUID: Cz8jn5/CRsejbLnxeGQ8QA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11470"; a="52697053"
-X-IronPort-AV: E=Sophos;i="6.16,254,1744095600"; 
-   d="scan'208";a="52697053"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jun 2025 07:57:07 -0700
-X-CSE-ConnectionGUID: /ElNxIjAQAOkdsx+BhBW4w==
-X-CSE-MsgGUID: YjlOm5efQmS2CH7jY5cacw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,254,1744095600"; 
-   d="scan'208";a="155720770"
-Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
-  by orviesa004.jf.intel.com with ESMTP; 21 Jun 2025 07:57:03 -0700
-Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uSzeN-000MgQ-2S;
-	Sat, 21 Jun 2025 14:56:59 +0000
-Date: Sat, 21 Jun 2025 22:56:09 +0800
-From: kernel test robot <lkp@intel.com>
-To: Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Russell King <linux@armlinux.org.uk>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Shuah Khan <skhan@linuxfoundation.org>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Colton Lewis <coltonlewis@google.com>
-Subject: Re: [PATCH v2 05/23] KVM: arm64: Cleanup PMU includes
-Message-ID: <202506212205.NmAR3sAH-lkp@intel.com>
-References: <20250620221326.1261128-6-coltonlewis@google.com>
+	s=arc-20240116; t=1750552454; c=relaxed/simple;
+	bh=aPyh81pynyJbX89epEkTHFUNWVXuDCkrr1wM57ftFH0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fEFSje+nx7MqsdEUiAECZV2UoQ+U8nAHyvNd+HbmTezIog27MjnQJQfgFKRD1w6KHCaAMyRQoMOPp2+KGYYp/OX0eIDM8NpVqg3DwKz2qywM0xHtg5UpuIT6rYqExk5r389WbyX7pNsEIBmM4RDFuvwZWObsSNGOsElS3vU7g/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=FO7Eg/uh; arc=none smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-7426c44e014so2642998b3a.3
+        for <kvm@vger.kernel.org>; Sat, 21 Jun 2025 17:34:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1750552452; x=1751157252; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=HQKq9VPzQu2m/paj8efF0ht9BTQlnBGHLNhyyPz0tU0=;
+        b=FO7Eg/uheqOH4pHuizZWzJYtFknjHO62lc8s1qZPnIArPGtdrCPBMNIfv9p1f3Aj1/
+         KM+oZQtnbLB6DYB2ZRubW+5Cevh+xQ0z0ZAL0J8tDjubruPhkEMTyy+Ue1nfklMa3PeS
+         PfUDEtFtwVLQjJV2b32QasEm0bqJ/Jh72ma9uRA0EsdaCeYIdSn99g+CwzaYeVrhcGt7
+         XWljgpztb/iGrmClyvGXhXVaWiA1rlmXc8gvPNjZk2KBJSu6M9RylYjKfW2TRQOojz++
+         yDvCRFtOjeddIyBaF2pi8o2pgcctFWe9vDtvGGAspvbu59W7jPMNiHUGo2/rnoicLuFz
+         vp5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750552452; x=1751157252;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HQKq9VPzQu2m/paj8efF0ht9BTQlnBGHLNhyyPz0tU0=;
+        b=Q5yM8vNvLUBE3/XfgW39YxgHUltA0gOIAp7Bf3F14b7jlAM6Sq+maRVWvLhHn7+jtG
+         7R1UNLoyJhBuQSaqT0LjZQo+35Df9CihKFNXBbHAKuctKDp3gcKe5Tx+k6UCWok8u4Mv
+         4s4R89vcMIrtz1B8zrepDG4NaB/O1kQjU7peyLB33BKnhoQAlSTn8A5sFzBjaAgdlvJN
+         xXbSVWRsNSaIsr6SAZ6+uim0uuosdnEiQRJjbgJAqJFwAXus7H4m9wAu5lDcDuzHBLp4
+         Os4DNE40UwJoqmIKDuQfiOE9EpJyPvLABd1ZqZAnKXdH7IzF3AIDeudVmfqovSKhd9+Z
+         SqIQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUs30RnT+3bCSDq7kIL+5zKaPPuhWEbmFekXwVd4LhDwlWtgMlLPzQGq6yUaozVHvvxq9I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwiUryvztGirdN6iOtc/s50RGLT3PLe7IjNBCPl5R0TMA7rCZyO
+	LpzYKqvIYpJmXs+fxUinctGEJMDeLJ4DLgsl2itt+vC+W1HflEXx+dW8B0nAydebaIQ=
+X-Gm-Gg: ASbGncsZbK8AxjHbzo21HQhTRGPClfzQTy74fQd2zm/6YGSGHGtuSTbPay75i6i18th
+	ejaZ2ruYFp3QOK1L3kJ8hDqPYoIKpa964RLq1GwEcn6OIZ2FZ2AaDJ2km1+/TavSzbKjdZjeqf+
+	BdgD73GQqJwdKAttvvJPFskwag0uEi5p729eoWJWcnA8qEstZt9Z33K8rV7b9tv8dJcNOjKqVaM
+	Rmkpz5qWxwZVAUqPl1OddTumMGwA9DLedv/ndpE9+kVZC8HZbYRW6Nw6C1kG/HAigX99Cxbfaq3
+	fdrXfIsDuAxzuIGkGckxVI2Lx5OHrExAruEfJKAZf63xPsp1EnnerlXMLMll51pupCOGZweYlg6
+	AK0ax342hXvACY4jOqREM9h+nWh2Z
+X-Google-Smtp-Source: AGHT+IE9ZIuXLJEu7AWPd+Sc/mHQkW/SCq5II3XmQewc9+ZNt/tbdvyhY7AYKtITLwaLNN8urQV2zw==
+X-Received: by 2002:a05:6a00:22c4:b0:749:112:c172 with SMTP id d2e1a72fcca58-7490d691208mr10318918b3a.16.1750552451700;
+        Sat, 21 Jun 2025 17:34:11 -0700 (PDT)
+Received: from [192.168.0.4] (174-21-67-243.tukw.qwest.net. [174.21.67.243])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7490a64c203sm4946969b3a.112.2025.06.21.17.34.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 21 Jun 2025 17:34:11 -0700 (PDT)
+Message-ID: <9105ea2d-1f18-4977-8ca0-dcbe6c89b166@linaro.org>
+Date: Sat, 21 Jun 2025 17:34:09 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250620221326.1261128-6-coltonlewis@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 22/26] hw/arm/sbsa-ref: Tidy up use of RAMLIMIT_GB
+ definition
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ qemu-devel@nongnu.org
+Cc: Leif Lindholm <leif.lindholm@oss.qualcomm.com>,
+ Radoslaw Biernacki <rad@semihalf.com>, Alexander Graf <agraf@csgraf.de>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>,
+ Phil Dennis-Jordan <phil@philjordan.eu>, =?UTF-8?Q?Alex_Benn=C3=A9e?=
+ <alex.bennee@linaro.org>, Bernhard Beschow <shentey@gmail.com>,
+ Cleber Rosa <crosa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ Cameron Esfahani <dirty@apple.com>, kvm@vger.kernel.org,
+ qemu-arm@nongnu.org, Eric Auger <eric.auger@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Roman Bolshakov <rbolshakov@ddn.com>,
+ John Snow <jsnow@redhat.com>
+References: <20250620130709.31073-1-philmd@linaro.org>
+ <20250620130709.31073-23-philmd@linaro.org>
+Content-Language: en-US
+From: Richard Henderson <richard.henderson@linaro.org>
+In-Reply-To: <20250620130709.31073-23-philmd@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi Colton,
+On 6/20/25 06:07, Philippe Mathieu-Daudé wrote:
+> Define RAMLIMIT_BYTES using the TiB definition and display
+> the error parsed with size_to_str():
+> 
+>    $ qemu-system-aarch64-unsigned -M sbsa-ref -m 9T
+>    qemu-system-aarch64-unsigned: sbsa-ref: cannot model more than 8 TiB of RAM
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+> ---
+>   hw/arm/sbsa-ref.c | 8 +++++---
+>   1 file changed, 5 insertions(+), 3 deletions(-)
 
-kernel test robot noticed the following build errors:
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-[auto build test ERROR on 79150772457f4d45e38b842d786240c36bb1f97f]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Colton-Lewis/arm64-cpufeature-Add-cpucap-for-HPMN0/20250621-102220
-base:   79150772457f4d45e38b842d786240c36bb1f97f
-patch link:    https://lore.kernel.org/r/20250620221326.1261128-6-coltonlewis%40google.com
-patch subject: [PATCH v2 05/23] KVM: arm64: Cleanup PMU includes
-config: arm64-randconfig-004-20250621 (https://download.01.org/0day-ci/archive/20250621/202506212205.NmAR3sAH-lkp@intel.com/config)
-compiler: aarch64-linux-gcc (GCC) 10.5.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250621/202506212205.NmAR3sAH-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202506212205.NmAR3sAH-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   drivers/perf/arm_pmuv3.c:143:41: note: in expansion of macro 'ARMV8_IMPDEF_PERFCTR_L1D_CACHE_REFILL_RD'
-     143 |  [C(L1D)][C(OP_READ)][C(RESULT_MISS)] = ARMV8_IMPDEF_PERFCTR_L1D_CACHE_REFILL_RD,
-         |                                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmuv3.h:123:45: warning: initialized field overwritten [-Woverride-init]
-     123 | #define ARMV8_IMPDEF_PERFCTR_L1D_CACHE_WR   0x0041
-         |                                             ^~~~~~
-   drivers/perf/arm_pmuv3.c:144:44: note: in expansion of macro 'ARMV8_IMPDEF_PERFCTR_L1D_CACHE_WR'
-     144 |  [C(L1D)][C(OP_WRITE)][C(RESULT_ACCESS)] = ARMV8_IMPDEF_PERFCTR_L1D_CACHE_WR,
-         |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmuv3.h:123:45: note: (near initialization for 'armv8_vulcan_perf_cache_map[0][1][0]')
-     123 | #define ARMV8_IMPDEF_PERFCTR_L1D_CACHE_WR   0x0041
-         |                                             ^~~~~~
-   drivers/perf/arm_pmuv3.c:144:44: note: in expansion of macro 'ARMV8_IMPDEF_PERFCTR_L1D_CACHE_WR'
-     144 |  [C(L1D)][C(OP_WRITE)][C(RESULT_ACCESS)] = ARMV8_IMPDEF_PERFCTR_L1D_CACHE_WR,
-         |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmuv3.h:125:51: warning: initialized field overwritten [-Woverride-init]
-     125 | #define ARMV8_IMPDEF_PERFCTR_L1D_CACHE_REFILL_WR  0x0043
-         |                                                   ^~~~~~
-   drivers/perf/arm_pmuv3.c:145:42: note: in expansion of macro 'ARMV8_IMPDEF_PERFCTR_L1D_CACHE_REFILL_WR'
-     145 |  [C(L1D)][C(OP_WRITE)][C(RESULT_MISS)] = ARMV8_IMPDEF_PERFCTR_L1D_CACHE_REFILL_WR,
-         |                                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmuv3.h:125:51: note: (near initialization for 'armv8_vulcan_perf_cache_map[0][1][1]')
-     125 | #define ARMV8_IMPDEF_PERFCTR_L1D_CACHE_REFILL_WR  0x0043
-         |                                                   ^~~~~~
-   drivers/perf/arm_pmuv3.c:145:42: note: in expansion of macro 'ARMV8_IMPDEF_PERFCTR_L1D_CACHE_REFILL_WR'
-     145 |  [C(L1D)][C(OP_WRITE)][C(RESULT_MISS)] = ARMV8_IMPDEF_PERFCTR_L1D_CACHE_REFILL_WR,
-         |                                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmuv3.h:134:44: warning: initialized field overwritten [-Woverride-init]
-     134 | #define ARMV8_IMPDEF_PERFCTR_L1D_TLB_RD    0x004E
-         |                                            ^~~~~~
-   drivers/perf/arm_pmuv3.c:147:44: note: in expansion of macro 'ARMV8_IMPDEF_PERFCTR_L1D_TLB_RD'
-     147 |  [C(DTLB)][C(OP_READ)][C(RESULT_ACCESS)] = ARMV8_IMPDEF_PERFCTR_L1D_TLB_RD,
-         |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmuv3.h:134:44: note: (near initialization for 'armv8_vulcan_perf_cache_map[3][0][0]')
-     134 | #define ARMV8_IMPDEF_PERFCTR_L1D_TLB_RD    0x004E
-         |                                            ^~~~~~
-   drivers/perf/arm_pmuv3.c:147:44: note: in expansion of macro 'ARMV8_IMPDEF_PERFCTR_L1D_TLB_RD'
-     147 |  [C(DTLB)][C(OP_READ)][C(RESULT_ACCESS)] = ARMV8_IMPDEF_PERFCTR_L1D_TLB_RD,
-         |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmuv3.h:135:44: warning: initialized field overwritten [-Woverride-init]
-     135 | #define ARMV8_IMPDEF_PERFCTR_L1D_TLB_WR    0x004F
-         |                                            ^~~~~~
-   drivers/perf/arm_pmuv3.c:148:45: note: in expansion of macro 'ARMV8_IMPDEF_PERFCTR_L1D_TLB_WR'
-     148 |  [C(DTLB)][C(OP_WRITE)][C(RESULT_ACCESS)] = ARMV8_IMPDEF_PERFCTR_L1D_TLB_WR,
-         |                                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmuv3.h:135:44: note: (near initialization for 'armv8_vulcan_perf_cache_map[3][1][0]')
-     135 | #define ARMV8_IMPDEF_PERFCTR_L1D_TLB_WR    0x004F
-         |                                            ^~~~~~
-   drivers/perf/arm_pmuv3.c:148:45: note: in expansion of macro 'ARMV8_IMPDEF_PERFCTR_L1D_TLB_WR'
-     148 |  [C(DTLB)][C(OP_WRITE)][C(RESULT_ACCESS)] = ARMV8_IMPDEF_PERFCTR_L1D_TLB_WR,
-         |                                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmuv3.h:132:50: warning: initialized field overwritten [-Woverride-init]
-     132 | #define ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_RD   0x004C
-         |                                                  ^~~~~~
-   drivers/perf/arm_pmuv3.c:149:42: note: in expansion of macro 'ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_RD'
-     149 |  [C(DTLB)][C(OP_READ)][C(RESULT_MISS)] = ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_RD,
-         |                                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmuv3.h:132:50: note: (near initialization for 'armv8_vulcan_perf_cache_map[3][0][1]')
-     132 | #define ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_RD   0x004C
-         |                                                  ^~~~~~
-   drivers/perf/arm_pmuv3.c:149:42: note: in expansion of macro 'ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_RD'
-     149 |  [C(DTLB)][C(OP_READ)][C(RESULT_MISS)] = ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_RD,
-         |                                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmuv3.h:133:50: warning: initialized field overwritten [-Woverride-init]
-     133 | #define ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_WR   0x004D
-         |                                                  ^~~~~~
-   drivers/perf/arm_pmuv3.c:150:43: note: in expansion of macro 'ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_WR'
-     150 |  [C(DTLB)][C(OP_WRITE)][C(RESULT_MISS)] = ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_WR,
-         |                                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmuv3.h:133:50: note: (near initialization for 'armv8_vulcan_perf_cache_map[3][1][1]')
-     133 | #define ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_WR   0x004D
-         |                                                  ^~~~~~
-   drivers/perf/arm_pmuv3.c:150:43: note: in expansion of macro 'ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_WR'
-     150 |  [C(DTLB)][C(OP_WRITE)][C(RESULT_MISS)] = ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_WR,
-         |                                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmuv3.h:149:46: warning: initialized field overwritten [-Woverride-init]
-     149 | #define ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_RD   0x0060
-         |                                              ^~~~~~
-   drivers/perf/arm_pmuv3.c:152:44: note: in expansion of macro 'ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_RD'
-     152 |  [C(NODE)][C(OP_READ)][C(RESULT_ACCESS)] = ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_RD,
-         |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmuv3.h:149:46: note: (near initialization for 'armv8_vulcan_perf_cache_map[6][0][0]')
-     149 | #define ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_RD   0x0060
-         |                                              ^~~~~~
-   drivers/perf/arm_pmuv3.c:152:44: note: in expansion of macro 'ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_RD'
-     152 |  [C(NODE)][C(OP_READ)][C(RESULT_ACCESS)] = ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_RD,
-         |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmuv3.h:150:46: warning: initialized field overwritten [-Woverride-init]
-     150 | #define ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_WR   0x0061
-         |                                              ^~~~~~
-   drivers/perf/arm_pmuv3.c:153:45: note: in expansion of macro 'ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_WR'
-     153 |  [C(NODE)][C(OP_WRITE)][C(RESULT_ACCESS)] = ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_WR,
-         |                                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmuv3.h:150:46: note: (near initialization for 'armv8_vulcan_perf_cache_map[6][1][0]')
-     150 | #define ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_WR   0x0061
-         |                                              ^~~~~~
-   drivers/perf/arm_pmuv3.c:153:45: note: in expansion of macro 'ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_WR'
-     153 |  [C(NODE)][C(OP_WRITE)][C(RESULT_ACCESS)] = ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_WR,
-         |                                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/perf/arm_pmuv3.c: In function 'armv8pmu_enable_event_counter':
->> drivers/perf/arm_pmuv3.c:680:2: error: implicit declaration of function 'kvm_set_pmu_events' [-Werror=implicit-function-declaration]
-     680 |  kvm_set_pmu_events(mask, attr);
-         |  ^~~~~~~~~~~~~~~~~~
-   drivers/perf/arm_pmuv3.c: In function 'armv8pmu_disable_event_counter':
->> drivers/perf/arm_pmuv3.c:702:2: error: implicit declaration of function 'kvm_clr_pmu_events' [-Werror=implicit-function-declaration]
-     702 |  kvm_clr_pmu_events(mask);
-         |  ^~~~~~~~~~~~~~~~~~
-   drivers/perf/arm_pmuv3.c: In function 'update_pmuserenr':
->> drivers/perf/arm_pmuv3.c:757:6: error: implicit declaration of function 'kvm_set_pmuserenr' [-Werror=implicit-function-declaration]
-     757 |  if (kvm_set_pmuserenr(val))
-         |      ^~~~~~~~~~~~~~~~~
-   cc1: some warnings being treated as errors
-
-
-vim +/kvm_set_pmu_events +680 drivers/perf/arm_pmuv3.c
-
-030896885ade0a arch/arm64/kernel/perf_event.c Will Deacon       2012-03-05  674  
-9343c790e6de7e drivers/perf/arm_pmuv3.c       James Clark       2023-12-11  675  static void armv8pmu_enable_event_counter(struct perf_event *event)
-c13207905340d8 arch/arm64/kernel/perf_event.c Suzuki K Poulose  2018-07-10  676  {
-d1947bc4bc63e5 arch/arm64/kernel/perf_event.c Andrew Murray     2019-04-09  677  	struct perf_event_attr *attr = &event->attr;
-a4a6e2078d85a9 drivers/perf/arm_pmuv3.c       Rob Herring (Arm  2024-07-31  678) 	u64 mask = armv8pmu_event_cnten_mask(event);
-d1947bc4bc63e5 arch/arm64/kernel/perf_event.c Andrew Murray     2019-04-09  679  
-29227d6ea1572b arch/arm64/kernel/perf_event.c Robin Murphy      2020-03-17 @680  	kvm_set_pmu_events(mask, attr);
-d1947bc4bc63e5 arch/arm64/kernel/perf_event.c Andrew Murray     2019-04-09  681  
-d1947bc4bc63e5 arch/arm64/kernel/perf_event.c Andrew Murray     2019-04-09  682  	/* We rely on the hypervisor switch code to enable guest counters */
-29227d6ea1572b arch/arm64/kernel/perf_event.c Robin Murphy      2020-03-17  683  	if (!kvm_pmu_counter_deferred(attr))
-29227d6ea1572b arch/arm64/kernel/perf_event.c Robin Murphy      2020-03-17  684  		armv8pmu_enable_counter(mask);
-c13207905340d8 arch/arm64/kernel/perf_event.c Suzuki K Poulose  2018-07-10  685  }
-c13207905340d8 arch/arm64/kernel/perf_event.c Suzuki K Poulose  2018-07-10  686  
-a4a6e2078d85a9 drivers/perf/arm_pmuv3.c       Rob Herring (Arm  2024-07-31  687) static void armv8pmu_disable_counter(u64 mask)
-030896885ade0a arch/arm64/kernel/perf_event.c Will Deacon       2012-03-05  688  {
-df29ddf4f04b00 drivers/perf/arm_pmuv3.c       Marc Zyngier      2023-03-17  689  	write_pmcntenclr(mask);
-0fdf1bb75953a6 arch/arm64/kernel/perf_event.c Mark Rutland      2020-09-24  690  	/*
-0fdf1bb75953a6 arch/arm64/kernel/perf_event.c Mark Rutland      2020-09-24  691  	 * Make sure the effects of disabling the counter are visible before we
-0fdf1bb75953a6 arch/arm64/kernel/perf_event.c Mark Rutland      2020-09-24  692  	 * start configuring the event.
-0fdf1bb75953a6 arch/arm64/kernel/perf_event.c Mark Rutland      2020-09-24  693  	 */
-0fdf1bb75953a6 arch/arm64/kernel/perf_event.c Mark Rutland      2020-09-24  694  	isb();
-030896885ade0a arch/arm64/kernel/perf_event.c Will Deacon       2012-03-05  695  }
-030896885ade0a arch/arm64/kernel/perf_event.c Will Deacon       2012-03-05  696  
-9343c790e6de7e drivers/perf/arm_pmuv3.c       James Clark       2023-12-11  697  static void armv8pmu_disable_event_counter(struct perf_event *event)
-c13207905340d8 arch/arm64/kernel/perf_event.c Suzuki K Poulose  2018-07-10  698  {
-d1947bc4bc63e5 arch/arm64/kernel/perf_event.c Andrew Murray     2019-04-09  699  	struct perf_event_attr *attr = &event->attr;
-a4a6e2078d85a9 drivers/perf/arm_pmuv3.c       Rob Herring (Arm  2024-07-31  700) 	u64 mask = armv8pmu_event_cnten_mask(event);
-d1947bc4bc63e5 arch/arm64/kernel/perf_event.c Andrew Murray     2019-04-09  701  
-29227d6ea1572b arch/arm64/kernel/perf_event.c Robin Murphy      2020-03-17 @702  	kvm_clr_pmu_events(mask);
-d1947bc4bc63e5 arch/arm64/kernel/perf_event.c Andrew Murray     2019-04-09  703  
-d1947bc4bc63e5 arch/arm64/kernel/perf_event.c Andrew Murray     2019-04-09  704  	/* We rely on the hypervisor switch code to disable guest counters */
-29227d6ea1572b arch/arm64/kernel/perf_event.c Robin Murphy      2020-03-17  705  	if (!kvm_pmu_counter_deferred(attr))
-29227d6ea1572b arch/arm64/kernel/perf_event.c Robin Murphy      2020-03-17  706  		armv8pmu_disable_counter(mask);
-d1947bc4bc63e5 arch/arm64/kernel/perf_event.c Andrew Murray     2019-04-09  707  }
-c13207905340d8 arch/arm64/kernel/perf_event.c Suzuki K Poulose  2018-07-10  708  
-a4a6e2078d85a9 drivers/perf/arm_pmuv3.c       Rob Herring (Arm  2024-07-31  709) static void armv8pmu_enable_intens(u64 mask)
-030896885ade0a arch/arm64/kernel/perf_event.c Will Deacon       2012-03-05  710  {
-df29ddf4f04b00 drivers/perf/arm_pmuv3.c       Marc Zyngier      2023-03-17  711  	write_pmintenset(mask);
-030896885ade0a arch/arm64/kernel/perf_event.c Will Deacon       2012-03-05  712  }
-030896885ade0a arch/arm64/kernel/perf_event.c Will Deacon       2012-03-05  713  
-9343c790e6de7e drivers/perf/arm_pmuv3.c       James Clark       2023-12-11  714  static void armv8pmu_enable_event_irq(struct perf_event *event)
-c13207905340d8 arch/arm64/kernel/perf_event.c Suzuki K Poulose  2018-07-10  715  {
-bf5ffc8c80e0cf drivers/perf/arm_pmuv3.c       Rob Herring (Arm  2024-07-31  716) 	armv8pmu_enable_intens(BIT(event->hw.idx));
-c13207905340d8 arch/arm64/kernel/perf_event.c Suzuki K Poulose  2018-07-10  717  }
-c13207905340d8 arch/arm64/kernel/perf_event.c Suzuki K Poulose  2018-07-10  718  
-a4a6e2078d85a9 drivers/perf/arm_pmuv3.c       Rob Herring (Arm  2024-07-31  719) static void armv8pmu_disable_intens(u64 mask)
-030896885ade0a arch/arm64/kernel/perf_event.c Will Deacon       2012-03-05  720  {
-df29ddf4f04b00 drivers/perf/arm_pmuv3.c       Marc Zyngier      2023-03-17  721  	write_pmintenclr(mask);
-030896885ade0a arch/arm64/kernel/perf_event.c Will Deacon       2012-03-05  722  	isb();
-030896885ade0a arch/arm64/kernel/perf_event.c Will Deacon       2012-03-05  723  	/* Clear the overflow flag in case an interrupt is pending. */
-df29ddf4f04b00 drivers/perf/arm_pmuv3.c       Marc Zyngier      2023-03-17  724  	write_pmovsclr(mask);
-030896885ade0a arch/arm64/kernel/perf_event.c Will Deacon       2012-03-05  725  	isb();
-030896885ade0a arch/arm64/kernel/perf_event.c Will Deacon       2012-03-05  726  }
-030896885ade0a arch/arm64/kernel/perf_event.c Will Deacon       2012-03-05  727  
-9343c790e6de7e drivers/perf/arm_pmuv3.c       James Clark       2023-12-11  728  static void armv8pmu_disable_event_irq(struct perf_event *event)
-c13207905340d8 arch/arm64/kernel/perf_event.c Suzuki K Poulose  2018-07-10  729  {
-bf5ffc8c80e0cf drivers/perf/arm_pmuv3.c       Rob Herring (Arm  2024-07-31  730) 	armv8pmu_disable_intens(BIT(event->hw.idx));
-c13207905340d8 arch/arm64/kernel/perf_event.c Suzuki K Poulose  2018-07-10  731  }
-c13207905340d8 arch/arm64/kernel/perf_event.c Suzuki K Poulose  2018-07-10  732  
-a4a6e2078d85a9 drivers/perf/arm_pmuv3.c       Rob Herring (Arm  2024-07-31  733) static u64 armv8pmu_getreset_flags(void)
-030896885ade0a arch/arm64/kernel/perf_event.c Will Deacon       2012-03-05  734  {
-a4a6e2078d85a9 drivers/perf/arm_pmuv3.c       Rob Herring (Arm  2024-07-31  735) 	u64 value;
-030896885ade0a arch/arm64/kernel/perf_event.c Will Deacon       2012-03-05  736  
-030896885ade0a arch/arm64/kernel/perf_event.c Will Deacon       2012-03-05  737  	/* Read */
-df29ddf4f04b00 drivers/perf/arm_pmuv3.c       Marc Zyngier      2023-03-17  738  	value = read_pmovsclr();
-030896885ade0a arch/arm64/kernel/perf_event.c Will Deacon       2012-03-05  739  
-030896885ade0a arch/arm64/kernel/perf_event.c Will Deacon       2012-03-05  740  	/* Write to clear flags */
-d30f09b6d7de5d drivers/perf/arm_pmuv3.c       James Clark       2023-12-11  741  	value &= ARMV8_PMU_OVERFLOWED_MASK;
-df29ddf4f04b00 drivers/perf/arm_pmuv3.c       Marc Zyngier      2023-03-17  742  	write_pmovsclr(value);
-030896885ade0a arch/arm64/kernel/perf_event.c Will Deacon       2012-03-05  743  
-030896885ade0a arch/arm64/kernel/perf_event.c Will Deacon       2012-03-05  744  	return value;
-030896885ade0a arch/arm64/kernel/perf_event.c Will Deacon       2012-03-05  745  }
-030896885ade0a arch/arm64/kernel/perf_event.c Will Deacon       2012-03-05  746  
-0c2f9acf6ae741 drivers/perf/arm_pmuv3.c       Reiji Watanabe    2023-06-02  747  static void update_pmuserenr(u64 val)
-0c2f9acf6ae741 drivers/perf/arm_pmuv3.c       Reiji Watanabe    2023-06-02  748  {
-0c2f9acf6ae741 drivers/perf/arm_pmuv3.c       Reiji Watanabe    2023-06-02  749  	lockdep_assert_irqs_disabled();
-0c2f9acf6ae741 drivers/perf/arm_pmuv3.c       Reiji Watanabe    2023-06-02  750  
-0c2f9acf6ae741 drivers/perf/arm_pmuv3.c       Reiji Watanabe    2023-06-02  751  	/*
-0c2f9acf6ae741 drivers/perf/arm_pmuv3.c       Reiji Watanabe    2023-06-02  752  	 * The current PMUSERENR_EL0 value might be the value for the guest.
-0c2f9acf6ae741 drivers/perf/arm_pmuv3.c       Reiji Watanabe    2023-06-02  753  	 * If that's the case, have KVM keep tracking of the register value
-0c2f9acf6ae741 drivers/perf/arm_pmuv3.c       Reiji Watanabe    2023-06-02  754  	 * for the host EL0 so that KVM can restore it before returning to
-0c2f9acf6ae741 drivers/perf/arm_pmuv3.c       Reiji Watanabe    2023-06-02  755  	 * the host EL0. Otherwise, update the register now.
-0c2f9acf6ae741 drivers/perf/arm_pmuv3.c       Reiji Watanabe    2023-06-02  756  	 */
-0c2f9acf6ae741 drivers/perf/arm_pmuv3.c       Reiji Watanabe    2023-06-02 @757  	if (kvm_set_pmuserenr(val))
-0c2f9acf6ae741 drivers/perf/arm_pmuv3.c       Reiji Watanabe    2023-06-02  758  		return;
-0c2f9acf6ae741 drivers/perf/arm_pmuv3.c       Reiji Watanabe    2023-06-02  759  
-0c2f9acf6ae741 drivers/perf/arm_pmuv3.c       Reiji Watanabe    2023-06-02  760  	write_pmuserenr(val);
-0c2f9acf6ae741 drivers/perf/arm_pmuv3.c       Reiji Watanabe    2023-06-02  761  }
-0c2f9acf6ae741 drivers/perf/arm_pmuv3.c       Reiji Watanabe    2023-06-02  762  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+r~
 
