@@ -1,124 +1,132 @@
-Return-Path: <kvm+bounces-50252-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50253-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E95B6AE2D9A
-	for <lists+kvm@lfdr.de>; Sun, 22 Jun 2025 02:34:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54CF7AE2E9A
+	for <lists+kvm@lfdr.de>; Sun, 22 Jun 2025 08:06:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D258D7A4078
-	for <lists+kvm@lfdr.de>; Sun, 22 Jun 2025 00:33:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B3F6A1895EEC
+	for <lists+kvm@lfdr.de>; Sun, 22 Jun 2025 06:06:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA508E555;
-	Sun, 22 Jun 2025 00:34:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29B4C191F84;
+	Sun, 22 Jun 2025 06:03:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FO7Eg/uh"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="L8wdi/Dj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 869E8372
-	for <kvm@vger.kernel.org>; Sun, 22 Jun 2025 00:34:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C61718FDBD;
+	Sun, 22 Jun 2025 06:03:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750552454; cv=none; b=m756MsrcwCU1TTAZSDwWrUk0Joj7xmzEKXIXpQ2CLDuyKlO/KT+dP4oGiXlvbWo6fklNscOEwyz4pd3cTZFCFSP39m4TiMXlxhiDAmGs3zM6i6mQBxFfWzr8Gj+GE9wp6nAb+aYsbPNBWebZ4rKQ6TVhppA6cKZjWUHS1mtNYcI=
+	t=1750572200; cv=none; b=JLgCLqQm3rzpc9620KM3LQ8bbJg+9BhuLgk3EPT4aSZrVhNcPEeKFoN5bPrSGgdb56H9QVDi6I0Ib+ysvt3Zf3XNn62xBkFRm+CrhoD9oIwkRXou2mTXNzxdNC3Mhz0QJ02Jd6JPG+h8T8jjTCgXKSJ5i+BEHNYTj8PYmO3UABk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750552454; c=relaxed/simple;
-	bh=aPyh81pynyJbX89epEkTHFUNWVXuDCkrr1wM57ftFH0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fEFSje+nx7MqsdEUiAECZV2UoQ+U8nAHyvNd+HbmTezIog27MjnQJQfgFKRD1w6KHCaAMyRQoMOPp2+KGYYp/OX0eIDM8NpVqg3DwKz2qywM0xHtg5UpuIT6rYqExk5r389WbyX7pNsEIBmM4RDFuvwZWObsSNGOsElS3vU7g/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=FO7Eg/uh; arc=none smtp.client-ip=209.85.210.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-7426c44e014so2642998b3a.3
-        for <kvm@vger.kernel.org>; Sat, 21 Jun 2025 17:34:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1750552452; x=1751157252; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=HQKq9VPzQu2m/paj8efF0ht9BTQlnBGHLNhyyPz0tU0=;
-        b=FO7Eg/uheqOH4pHuizZWzJYtFknjHO62lc8s1qZPnIArPGtdrCPBMNIfv9p1f3Aj1/
-         KM+oZQtnbLB6DYB2ZRubW+5Cevh+xQ0z0ZAL0J8tDjubruPhkEMTyy+Ue1nfklMa3PeS
-         PfUDEtFtwVLQjJV2b32QasEm0bqJ/Jh72ma9uRA0EsdaCeYIdSn99g+CwzaYeVrhcGt7
-         XWljgpztb/iGrmClyvGXhXVaWiA1rlmXc8gvPNjZk2KBJSu6M9RylYjKfW2TRQOojz++
-         yDvCRFtOjeddIyBaF2pi8o2pgcctFWe9vDtvGGAspvbu59W7jPMNiHUGo2/rnoicLuFz
-         vp5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750552452; x=1751157252;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HQKq9VPzQu2m/paj8efF0ht9BTQlnBGHLNhyyPz0tU0=;
-        b=Q5yM8vNvLUBE3/XfgW39YxgHUltA0gOIAp7Bf3F14b7jlAM6Sq+maRVWvLhHn7+jtG
-         7R1UNLoyJhBuQSaqT0LjZQo+35Df9CihKFNXBbHAKuctKDp3gcKe5Tx+k6UCWok8u4Mv
-         4s4R89vcMIrtz1B8zrepDG4NaB/O1kQjU7peyLB33BKnhoQAlSTn8A5sFzBjaAgdlvJN
-         xXbSVWRsNSaIsr6SAZ6+uim0uuosdnEiQRJjbgJAqJFwAXus7H4m9wAu5lDcDuzHBLp4
-         Os4DNE40UwJoqmIKDuQfiOE9EpJyPvLABd1ZqZAnKXdH7IzF3AIDeudVmfqovSKhd9+Z
-         SqIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUs30RnT+3bCSDq7kIL+5zKaPPuhWEbmFekXwVd4LhDwlWtgMlLPzQGq6yUaozVHvvxq9I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwiUryvztGirdN6iOtc/s50RGLT3PLe7IjNBCPl5R0TMA7rCZyO
-	LpzYKqvIYpJmXs+fxUinctGEJMDeLJ4DLgsl2itt+vC+W1HflEXx+dW8B0nAydebaIQ=
-X-Gm-Gg: ASbGncsZbK8AxjHbzo21HQhTRGPClfzQTy74fQd2zm/6YGSGHGtuSTbPay75i6i18th
-	ejaZ2ruYFp3QOK1L3kJ8hDqPYoIKpa964RLq1GwEcn6OIZ2FZ2AaDJ2km1+/TavSzbKjdZjeqf+
-	BdgD73GQqJwdKAttvvJPFskwag0uEi5p729eoWJWcnA8qEstZt9Z33K8rV7b9tv8dJcNOjKqVaM
-	Rmkpz5qWxwZVAUqPl1OddTumMGwA9DLedv/ndpE9+kVZC8HZbYRW6Nw6C1kG/HAigX99Cxbfaq3
-	fdrXfIsDuAxzuIGkGckxVI2Lx5OHrExAruEfJKAZf63xPsp1EnnerlXMLMll51pupCOGZweYlg6
-	AK0ax342hXvACY4jOqREM9h+nWh2Z
-X-Google-Smtp-Source: AGHT+IE9ZIuXLJEu7AWPd+Sc/mHQkW/SCq5II3XmQewc9+ZNt/tbdvyhY7AYKtITLwaLNN8urQV2zw==
-X-Received: by 2002:a05:6a00:22c4:b0:749:112:c172 with SMTP id d2e1a72fcca58-7490d691208mr10318918b3a.16.1750552451700;
-        Sat, 21 Jun 2025 17:34:11 -0700 (PDT)
-Received: from [192.168.0.4] (174-21-67-243.tukw.qwest.net. [174.21.67.243])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7490a64c203sm4946969b3a.112.2025.06.21.17.34.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 21 Jun 2025 17:34:11 -0700 (PDT)
-Message-ID: <9105ea2d-1f18-4977-8ca0-dcbe6c89b166@linaro.org>
-Date: Sat, 21 Jun 2025 17:34:09 -0700
+	s=arc-20240116; t=1750572200; c=relaxed/simple;
+	bh=6Q8FrnkdsmldV9GcNFIT4wN8l3RVnI5WN8GsaLdbscs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I3hMv/CAqC8P3Cq1R2jKf3iGSnJ4R3NFOoWk3tdNQP2RYowsr8QeGAoEEbtYt0MDSuGYPMDONvzfbpdjhDXNeadDx+g6NheaDglqX/mvyHtNfcsdaNfgDL6GNXc06DYboW7LK4PR2v99o+KsO3GwaVppl4faInOWhWmbMCreshE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=L8wdi/Dj; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1750572198; x=1782108198;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=6Q8FrnkdsmldV9GcNFIT4wN8l3RVnI5WN8GsaLdbscs=;
+  b=L8wdi/DjgBkqsUn6VOoMUpREt3Ueq5Xaa97I4q9kIfo7H6zgy5qFsRVF
+   3A80sxjmBVgAAkY4ZzV2Wx11uqohPQANJ5StaRXfXGqZX7ycGLTE2nTVr
+   wb7/usA9SAJKMxQZ0cbtLfkOwfmnpqEAlQaIQvZc56H5kTzxrYSt+n7gv
+   N6fuV59hOiM12mdQUcz7rXyd6sZiDlST0oiSyQ13UVPQsD5fsgSytpuiX
+   ZEPvIuTsU9unMTEhtmSrlEcdhqOZXxUoz3v8pJAFx1+febSv93NrzmFXU
+   WOxkhA2lrU2ZETnX0blqkjNBSWjJlLXriPvqoDd7RVgAfN8s9DmYfokld
+   Q==;
+X-CSE-ConnectionGUID: eGRT+8zxRl2DmD9s3zO9Mg==
+X-CSE-MsgGUID: J0E5uukVQeqNrmxXAX4grQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11470"; a="63473344"
+X-IronPort-AV: E=Sophos;i="6.16,255,1744095600"; 
+   d="scan'208";a="63473344"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jun 2025 23:03:16 -0700
+X-CSE-ConnectionGUID: YCSARsZ5RWG/zST+8dcpBQ==
+X-CSE-MsgGUID: 3MdxRylsSUqbPeP8nS9RvA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,255,1744095600"; 
+   d="scan'208";a="150871451"
+Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
+  by fmviesa007.fm.intel.com with ESMTP; 21 Jun 2025 23:03:10 -0700
+Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uTDnI-000N5q-1P;
+	Sun, 22 Jun 2025 06:03:08 +0000
+Date: Sun, 22 Jun 2025 14:02:35 +0800
+From: kernel test robot <lkp@intel.com>
+To: Mario Limonciello <superm1@kernel.org>,
+	Bjorn Helgaas <helgaas@kernel.org>
+Cc: oe-kbuild-all@lists.linux.dev, Alex Deucher <alexander.deucher@amd.com>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Lukas Wunner <lukas@wunner.de>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Lu Baolu <baolu.lu@linux.intel.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+	dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
+	"(open list:INTEL IOMMU (VT-d))" <iommu@lists.linux.dev>,
+	linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+	linux-sound@vger.kernel.org, Daniel Dadap <ddadap@nvidia.com>,
+	Mario Limonciello <mario.limonciello@amd.com>
+Subject: Re: [PATCH v3 6/7] PCI/VGA: Move check for firmware default out of
+ VGA arbiter
+Message-ID: <202506221312.49Fy1aNA-lkp@intel.com>
+References: <20250620024943.3415685-7-superm1@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 22/26] hw/arm/sbsa-ref: Tidy up use of RAMLIMIT_GB
- definition
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
- qemu-devel@nongnu.org
-Cc: Leif Lindholm <leif.lindholm@oss.qualcomm.com>,
- Radoslaw Biernacki <rad@semihalf.com>, Alexander Graf <agraf@csgraf.de>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>,
- Phil Dennis-Jordan <phil@philjordan.eu>, =?UTF-8?Q?Alex_Benn=C3=A9e?=
- <alex.bennee@linaro.org>, Bernhard Beschow <shentey@gmail.com>,
- Cleber Rosa <crosa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- Cameron Esfahani <dirty@apple.com>, kvm@vger.kernel.org,
- qemu-arm@nongnu.org, Eric Auger <eric.auger@redhat.com>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Roman Bolshakov <rbolshakov@ddn.com>,
- John Snow <jsnow@redhat.com>
-References: <20250620130709.31073-1-philmd@linaro.org>
- <20250620130709.31073-23-philmd@linaro.org>
-Content-Language: en-US
-From: Richard Henderson <richard.henderson@linaro.org>
-In-Reply-To: <20250620130709.31073-23-philmd@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250620024943.3415685-7-superm1@kernel.org>
 
-On 6/20/25 06:07, Philippe Mathieu-Daudé wrote:
-> Define RAMLIMIT_BYTES using the TiB definition and display
-> the error parsed with size_to_str():
-> 
->    $ qemu-system-aarch64-unsigned -M sbsa-ref -m 9T
->    qemu-system-aarch64-unsigned: sbsa-ref: cannot model more than 8 TiB of RAM
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-> ---
->   hw/arm/sbsa-ref.c | 8 +++++---
->   1 file changed, 5 insertions(+), 3 deletions(-)
+Hi Mario,
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+kernel test robot noticed the following build errors:
 
-r~
+[auto build test ERROR on pci/next]
+[also build test ERROR on pci/for-linus tiwai-sound/for-next tiwai-sound/for-linus awilliam-vfio/next awilliam-vfio/for-linus tip/x86/core linus/master v6.16-rc2 next-20250620]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Mario-Limonciello/PCI-Add-helper-for-checking-if-a-PCI-device-is-a-display-controller/20250620-105220
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/pci/pci.git next
+patch link:    https://lore.kernel.org/r/20250620024943.3415685-7-superm1%40kernel.org
+patch subject: [PATCH v3 6/7] PCI/VGA: Move check for firmware default out of VGA arbiter
+config: sparc-defconfig (https://download.01.org/0day-ci/archive/20250622/202506221312.49Fy1aNA-lkp@intel.com/config)
+compiler: sparc-linux-gcc (GCC) 15.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250622/202506221312.49Fy1aNA-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202506221312.49Fy1aNA-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   sparc-linux-ld: drivers/pci/vgaarb.o: in function `vga_arbiter_add_pci_device':
+>> vgaarb.c:(.text+0x14ec): undefined reference to `video_is_primary_device'
+>> sparc-linux-ld: vgaarb.c:(.text+0x174c): undefined reference to `video_is_primary_device'
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
