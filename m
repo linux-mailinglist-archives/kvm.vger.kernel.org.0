@@ -1,150 +1,180 @@
-Return-Path: <kvm+bounces-50366-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50367-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 431EFAE4736
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 16:45:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5B20AE473C
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 16:45:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C7A9176281
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 14:38:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 490967A7ED8
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 14:44:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFA0D264608;
-	Mon, 23 Jun 2025 14:37:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Niq4LtXj"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF4EF26B09D;
+	Mon, 23 Jun 2025 14:45:32 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B2AF260591;
-	Mon, 23 Jun 2025 14:37:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC29B26A1A3;
+	Mon, 23 Jun 2025 14:45:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750689463; cv=none; b=fgKsg7CGQniOhDq3ZB0Nht0gDQJ1JhIkYhF83ebRsfOi1OdNtXi+eGl1X+9RYBIP/rUA542FERd0BPv75AeV2L4RXyWhaOmSq2vKFqXbXYsoVnWuNr3But5dnJRyN10ZmItPrdIPltMK2A34R6MB8NEwc1t96AguOKw12CDkwHs=
+	t=1750689932; cv=none; b=HYODQWJuJLlEjbsfuzanMsghsfCeAlQJzzJu5pMeDE6qI2ioq01ngt5TCeKWZZY1TYMIdFCT+QVvtkgX6JDNEwGsg7IXLZB/Dehe0gZfXYvekBU07Tk9saVxEPxKFHzLfSNxiflAGXW3ikeyvpJXzdUl25drA8a6Q+97VpTlm1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750689463; c=relaxed/simple;
-	bh=LkXLA8jsAZ04YeCznvkOb8RamvDKLqS/ZHmbnRhwhQk=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=r+kos3sD83ZrpdtsNugNPtm3XfUaaH+9h3Y8GTuso92TpYOQlYCzCC6nmyY2YjzoFc8qlzMLF8vWnYhd+jWOUXy73HIrHxNZgEMJ0Ixu40aEEVdZWVJWZOjZGBczjXCb0brIfwiJJxFeeLFmopR2jmrMMVfuVtt6YJ1SRRwtERc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Niq4LtXj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2F0AC4CEEA;
-	Mon, 23 Jun 2025 14:37:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750689462;
-	bh=LkXLA8jsAZ04YeCznvkOb8RamvDKLqS/ZHmbnRhwhQk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Niq4LtXjHbHUjFfDP3moHzC6rmL9DvzHA9l14hHgXw1W3QEyGBfVqs4grTOUCBiVM
-	 AFXW1j6vnMOeJl/W9lOAUkyGixW4NYRu8oKnb8+EVrKsaStr0qz5Uebsi+S7E7Dxt0
-	 s9YycwCBlWTosGNlGb85BxP4KA5RZLgYxrbbxcrwDq1OcnTV3zjyz7cD9y6+huKxXJ
-	 MYdqaavAgh4uPBQdTd7hTKcPJVcd926U4u6deLBtVlgpZj6k0jaYF+1pjzg3d4mpOg
-	 5uJ/jxAgD8WcfqSCQXT2F3N/vbIslu8c8yRJfOUCH/U0HBDAzfa/wrd/W//cgjT8mL
-	 9xEtBkweg+MhA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1uTiIm-009EAI-8S;
-	Mon, 23 Jun 2025 15:37:40 +0100
-Date: Mon, 23 Jun 2025 15:37:39 +0100
-Message-ID: <865xgmcymk.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Raghavendra Rao Ananta <rananta@google.com>,
-	Mingwei Zhang <mizhang@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH v3 3/4] KVM: arm64: Introduce attribute to control GICD_TYPER2.nASSGIcap
-In-Reply-To: <aFkdofSolis53JgO@linux.dev>
-References: <20250613155239.2029059-1-rananta@google.com>
-	<20250613155239.2029059-4-rananta@google.com>
-	<87frftfpg7.wl-maz@kernel.org>
-	<aFkTDmj9u1ERnvHO@linux.dev>
-	<868qliddzt.wl-maz@kernel.org>
-	<aFkdofSolis53JgO@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1750689932; c=relaxed/simple;
+	bh=EOh6xUIdqtrD2kFL8Xhl74TcdV1yYDlyoO202wzp364=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bn/w76GSVVKa0r2JKbZX1nDRPpOvT76tKbfGyDIjDd78P4LGC3Ejb4sAhC4PI1uCNo7XdT8RKxOjZ8RXW6RV0++Ti9jtvKxTSZBikKv3F/Y+wvip/X1KKxP7qjN1yE262n+iNchNCr0DzLlxC6CLy7jLMZkhcRliP7Vv/kS9Gzk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DCD5B113E;
+	Mon, 23 Jun 2025 07:45:10 -0700 (PDT)
+Received: from [10.57.29.183] (unknown [10.57.29.183])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5D6493F66E;
+	Mon, 23 Jun 2025 07:45:23 -0700 (PDT)
+Message-ID: <6c0e7cce-fb63-4f08-9907-9a58e0326bd3@arm.com>
+Date: Mon, 23 Jun 2025 15:45:21 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, rananta@google.com, mizhang@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v9 07/43] arm64: RME: ioctls to create and configure
+ realms
+To: zhuangyiwei <zhuangyiwei@huawei.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
+ zhouguangwei5@huawei.com, wangyuan46@huawei.com
+References: <20250611104844.245235-1-steven.price@arm.com>
+ <20250611104844.245235-8-steven.price@arm.com>
+ <b3b709c2-a154-4b1a-b6bd-7075e6a57fd2@huawei.com>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <b3b709c2-a154-4b1a-b6bd-7075e6a57fd2@huawei.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Mon, 23 Jun 2025 10:25:53 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+On 23/06/2025 14:17, zhuangyiwei wrote:
+> Hi Steven
 > 
-> On Mon, Jun 23, 2025 at 10:05:42AM +0100, Marc Zyngier wrote:
-> > On Mon, 23 Jun 2025 09:40:46 +0100,
-> > Oliver Upton <oliver.upton@linux.dev> wrote:
-> > > 
-> > > On Sat, Jun 21, 2025 at 09:50:48AM +0100, Marc Zyngier wrote:
-> > > > On Fri, 13 Jun 2025 16:52:37 +0100, Raghavendra Rao Ananta <rananta@google.com> wrote:
-> > > > > @@ -683,8 +714,14 @@ static int vgic_v3_has_attr(struct kvm_device *dev,
-> > > > >  			return 0;
-> > > > >  		case KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES:
-> > > > >  			return 0;
-> > > > > +		default:
-> > > > > +			return -ENXIO;
-> > > > >  		}
-> > > > > +	case KVM_DEV_ARM_VGIC_GRP_FEATURES:
-> > > > > +		return attr->attr != KVM_DEV_ARM_VGIC_FEATURE_nASSGIcap ?
-> > > > > +		       -ENXIO : 0;
-> > > > 
-> > > > Do we really want to advertise KVM_DEV_ARM_VGIC_FEATURE_nASSGIcap even
-> > > > when we don't have GICv4.1? This seems rather odd. My take on this API
-> > > > is that this should report whether the feature is configurable, making
-> > > > it backward compatible with older versions of KVM.
-> > > 
-> > > So this was because of me, as I wanted nASSGIcap to behave exactly like
-> > > the ID registers. I do think exposing the capability unconditionally is
-> > > useful, as otherwise there's no way to definitively say whether or not
-> > > the underlying platform supports GICv4.1.
-> > > 
-> > > KVM_HAS_DEVICE_ATTR can't be used alone for probing since old kernels
-> > > use GICv4.1 but don't expose the attribute.
-> > > 
-> > > Does that make sense?
-> > 
-> > My own reasoning is that if we expose the capability, userspace is
-> > able to use it and rely on it to take effect (VPE allocation error
-> > notwithstanding). This is not the case with this approach, and that's
-> > at odds with the other attributes.
-> > 
-> > But taking a step back: if we want to control the nASSGIcap bit, why
-> > don't we allow writing to GICD_TYPER2 from userspace? This does
-> > matches your view that we treat it as an ID register (GICD_TYPER2
-> > matches this definition if you squint hard enough). It also avoids
-> > adding new UAPI with unusual semantics.
+> On 2025/6/11 18:48, Steven Price wrote:
+>> Add the KVM_CAP_ARM_RME_CREATE_RD ioctl to create a realm. This involves
+>> delegating pages to the RMM to hold the Realm Descriptor (RD) and for
+>> the base level of the Realm Translation Tables (RTT). A VMID also need
+>> to be picked, since the RMM has a separate VMID address space a
+>> dedicated allocator is added for this purpose.
+>>
+>> KVM_CAP_ARM_RME_CONFIG_REALM is provided to allow configuring the realm
+>> before it is created. Configuration options can be classified as:
+>>
+>>   1. Parameters specific to the Realm stage2 (e.g. IPA Size, vmid, stage2
+>>      entry level, entry level RTTs, number of RTTs in start level, LPA2)
+>>      Most of these are not measured by RMM and comes from KVM book
+>>      keeping.
+>>
+>>   2. Parameters controlling "Arm Architecture features for the VM". (e.g.
+>>      SVE VL, PMU counters, number of HW BRPs/WPs), configured by the VMM
+>>      using the "user ID register write" mechanism. These will be
+>>      supported in the later patches.
+>>
+>>   3. Parameters are not part of the core Arm architecture but defined
+>>      by the RMM spec (e.g. Hash algorithm for measurement,
+>>      Personalisation value). These are programmed via
+>>      KVM_CAP_ARM_RME_CONFIG_REALM.
+>>
+>> For the IPA size there is the possibility that the RMM supports a
+>> different size to the IPA size supported by KVM for normal guests. At
+>> the moment the 'normal limit' is exposed by KVM_CAP_ARM_VM_IPA_SIZE and
+>> the IPA size is configured by the bottom bits of vm_type in
+>> KVM_CREATE_VM. This means that it isn't easy for the VMM to discover
+>> what IPA sizes are supported for Realm guests. Since the IPA is part of
+>> the measurement of the realm guest the current expectation is that the
+>> VMM will be required to pick the IPA size demanded by attestation and
+>> therefore simply failing if this isn't available is fine. An option
+>> would be to expose a new capability ioctl to obtain the RMM's maximum
+>> IPA size if this is needed in the future.
+>>
+>> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> Reviewed-by: Gavin Shan <gshan@redhat.com>
+[...]
+>> +static int realm_create_rd(struct kvm *kvm)
+>> +{
+>> +    struct realm *realm = &kvm->arch.realm;
+>> +    struct realm_params *params = realm->params;
+>> +    void *rd = NULL;
+>> +    phys_addr_t rd_phys, params_phys;
+>> +    size_t pgd_size = kvm_pgtable_stage2_pgd_size(kvm->arch.mmu.vtcr);
+>> +    int i, r;
+>> +    int rtt_num_start;
+>> +
+>> +    realm->ia_bits = VTCR_EL2_IPA(kvm->arch.mmu.vtcr);
+>> +    rtt_num_start = realm_num_root_rtts(realm);
+>> +
+>> +    if (WARN_ON(realm->rd || !realm->params))
+>> +        return -EEXIST;
+>> +
+>> +    if (pgd_size / RMM_PAGE_SIZE < rtt_num_start)
+>> +        return -EINVAL;
+>> +
+>> +    rd = (void *)__get_free_page(GFP_KERNEL);
+>> +    if (!rd)
+>> +        return -ENOMEM;
+>> +
+>> +    rd_phys = virt_to_phys(rd);
+>> +    if (rmi_granule_delegate(rd_phys)) {
+>> +        r = -ENXIO;
+>> +        goto free_rd;
+>> +    }
+>> +
+>> +    for (i = 0; i < pgd_size; i += RMM_PAGE_SIZE) {
+>> +        phys_addr_t pgd_phys = kvm->arch.mmu.pgd_phys + i;
+>> +
+>> +        if (rmi_granule_delegate(pgd_phys)) {
+>> +            r = -ENXIO;
+>> +            goto out_undelegate_tables;
+>> +        }
+>> +    }
+>> +
+>> +    params->s2sz = VTCR_EL2_IPA(kvm->arch.mmu.vtcr);
+>> +    params->rtt_level_start = get_start_level(realm);
+>> +    params->rtt_num_start = rtt_num_start;
+>> +    params->rtt_base = kvm->arch.mmu.pgd_phys;
+>> +    params->vmid = realm->vmid;
+>> +
+>> +    params_phys = virt_to_phys(params);
+>> +
+>> +    if (rmi_realm_create(rd_phys, params_phys)) {
+>> +        r = -ENXIO;
+>> +        goto out_undelegate_tables;
+>> +    }
+>> +
+>> +    if (WARN_ON(rmi_rec_aux_count(rd_phys, &realm->num_aux))) {
+>> +        WARN_ON(rmi_realm_destroy(rd_phys));
 > 
-> This approach would bring its own set of complications. At least right
-> now we allocate vPEs at vgic_init() but prevent register accesses prior
-> to initialization. If we want to bake this thing into GICD_TYPER2
-> directly we either need to relax this register to be accessed before
-> init or defer the vPE allocation later on.
+> Since r has not been initialized, "goto out_undelegate_tables" leads to
 > 
-> I'm worried that the latter approach is gonna be a mess, and the
-> attribute was done to avoid a one-off accessor in the VGIC state. But if
-> you'd like to see it done that way then that's OK with me.
+> return unknown value.
 
-I'm not convinced we need to change much. For example, we already
-allow userspace writes to GICD_IIDR to set the version of the
-emulation prior to vgic_init(). It doesn't feel like allowing TYPER2
-writes to occur in a similar spot require anything invasive.
+Good spot! That should have a "r = -ENXIO" line in there.
 
-Thanks,
+Thanks for the review,
+Steve
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
 
