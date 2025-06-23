@@ -1,160 +1,328 @@
-Return-Path: <kvm+bounces-50298-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50299-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73235AE3C5E
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 12:30:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D18AAE3CE5
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 12:41:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 930E33A3DC3
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 10:30:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7445A188AE33
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 10:40:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D56423C503;
-	Mon, 23 Jun 2025 10:30:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8438A24679C;
+	Mon, 23 Jun 2025 10:32:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="RUMaKSb4"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="DWuTGUox";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="5EnSzw8w";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="aEUTumPZ";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="1d3IAIYP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDD1A22DF86
-	for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 10:30:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0AC623C4FD
+	for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 10:32:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750674613; cv=none; b=QUVbEqDQ6fax66B2qdTB+GoMLlpTK9YW1g8KoDoOCiGo0ig8mTEdVVLFKHwVAJfyBijlM2wB+Gqg59nn9605ZqDrEi5TIMgZdf7jNfL03EtvxZZ9TnrTPMHCZ93pWALynzUXGLYmMozDYaHHPOUroQ/+oJdfI0VDPugRV3P67bo=
+	t=1750674759; cv=none; b=GDa8MDyXtgUS6r+DAsZzJ2BP5NMiLhqtuAfWfnGSIml1OlwusGu+1DaPfpDGNtcXW9TjDhnpHiOa6vAH96ekzzAjiHgn+ObstroJSIsfB0aO0FlO9Sz6OazDYRRxBxUlVTmGcLNQN8VNSKmNU4NFZP1VeJUhoW1rSQJAmfX+L2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750674613; c=relaxed/simple;
-	bh=15q1L8C4ZgBW7rR9Tk0j0vLXF86Ag6TO7eVagqgQQ0Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eMGj+q3XoUWeAIKEFOxrZUwzuV3IZ8TmhjWQuGyV/Nqeu5zPMYEvm7G0RQ3J0RDlAzos56+MEiBTHD87GoQ8fdtNulsEnGFffAUbWgK8s4PITK+nsPQLawhpPy7hY23Q7FiywqIZ7kXFxFaHERBJQ0Hb2bWOoY773SMW39vXInQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=RUMaKSb4; arc=none smtp.client-ip=209.85.215.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-b31befde0a0so2431236a12.0
-        for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 03:30:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1750674611; x=1751279411; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=S2Xh6Dpoc9NJla9DLdZ/WLUd9H1GHAIOhYhI+2Em4eg=;
-        b=RUMaKSb4NPfcCoqRmbjrw7DoNO7P3hcwf/eU+8PiSTHvM2yRCo450Af5dQe8qVtbu1
-         unpqKnRykrdoQL3p8X7j1iTGmzD8q/LF6zmAwE7ftuCe5mBXmaHEdVtYoeSg78V40QEm
-         16CrARRWNZE0CaRbtlwKrMXaQRmM1tq7S0ad1rvPOTA/k1JkbK04y406/NFcj0fY6Bqd
-         h78dJhTthOpk522xDMoEpfAfA3Th7k7F50hqpqM1PxNbxZDlOHx2KlT/EEFLTDlyP0sO
-         SvA5vYzLrfIgi1TN9PD3b2ILlHyeh9oElYhcq1O/ES3Yi+y7JBd4w1THVTIc39xXfNrK
-         uhEw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750674611; x=1751279411;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=S2Xh6Dpoc9NJla9DLdZ/WLUd9H1GHAIOhYhI+2Em4eg=;
-        b=L9A6d+zN000pQRT6XC/bI18+dOdRNoZd+6KdCj+gj38HwY5Hmuyglyip/y0NIu2z/o
-         3ycVO8JUfTfXx9D7P4MkMufaNWPhRC1GcovjqQ/xv6tXUu4S68UiDfhNi62KgdZPUPhK
-         3T3dKKoqzDri/Q6N3AqZ+EpBF6Bk5odIArwhzP1Y0t8bNm7bWp3la73B7e9ZupayGJS8
-         c+3Od8yVipvhXzCjcPYIKpVWONaKhBrCK7CyD2vgctKxXO5Ykojq+Qh0WU2rzMXdxOD/
-         VcG5DJzysXZzNRzEEcXjQzHS2Un7e6reifxpxzN2GhVc5sJ+OukLTgwxC8lUIWUkTKuy
-         hMpA==
-X-Forwarded-Encrypted: i=1; AJvYcCXCMkwZTGGmnMV43Db0PeAJfvHYV7Vr9kg+o050xVFSBWxE/bbvw4y/aHO+GR0SdsTfGfg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzwXREuJCMLEBoKz2vjtJOOQX9F0z56jIP/U3wpJZ1t6OOUjbLZ
-	1IW3erTTczVZ1/4Z+GW1ZD6enz5803Q3quCwcaCBlVMMWnaBXkP1lHKgd6nEnSSmYpelVrnJWi8
-	Ic6EdC7uUn3TgD6aD+CkpClAgp94u+BdKi2z4zmP4qA==
-X-Gm-Gg: ASbGncuWNu2zQUj5Yna2zveXDXkog4bSUPVMdNyh9CqMpoS9Yj9/HCwzNnBMiibzbeV
-	iE0EEGvfLw1DImMVOnxZk2AzJ4kNLxDFMKMNtYt5f/kanhzRFTHR40aITa4OyOSw44B4s6Lui+3
-	Ho8TZs+Sz2lMftBGScPI+xhgKD+Bl0F8DTprlQ8D4ARpI57XVEOsFkFW9E
-X-Google-Smtp-Source: AGHT+IHUUgFd5CAVoui8WeB8d4VDjaMayhZu3ZI45zZpLWDJx7B3fRr4MhP36Fw+gyvFSnnTysBzyBVcg3Vlfp8B2jA=
-X-Received: by 2002:a17:90b:5690:b0:312:f0d0:bc4 with SMTP id
- 98e67ed59e1d1-3159d626112mr16340875a91.5.1750674610724; Mon, 23 Jun 2025
- 03:30:10 -0700 (PDT)
+	s=arc-20240116; t=1750674759; c=relaxed/simple;
+	bh=9oSuEk3IgnVNmP7ulXoqkKnU3sa4UTt2fu+2AkxOc24=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PGJ/IsALT+vbMXp534CmhAk14IlOvBzFCTLXdIl6vk8+ANPHocrFRNbSmimeV079pVyiVowRk0sCP13F2sbNNJl4MwJLs0rPZKuAhkZ0kr0SBKqWwTreRkO9jv7CgGbd53wFpG3+kC+5Xsy2D5Uoan2+2Z21lO5l5xb6Cs7tyA4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=DWuTGUox; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=5EnSzw8w; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=aEUTumPZ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=1d3IAIYP; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id E2C902118C;
+	Mon, 23 Jun 2025 10:32:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1750674755; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=f57r8d/AFiQ0XBsDFZ4dPmeKn9vTf3pQy900Pa2KyZo=;
+	b=DWuTGUoxaCrGB4ZzU8OD98g63BObGagpz2yRyFKqYQOBbSYf+gvwYGHdxWCnNYg8/HeAC2
+	14Tnsp2aMVykJAJcMnbNQiuP/timY5SUYV/ZZ9aqLHXxmmu/AYtO10zCeAvcaUBa6mxygY
+	eNVXnRUhIIy3JjP5kdCICZKC9yhL92s=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1750674755;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=f57r8d/AFiQ0XBsDFZ4dPmeKn9vTf3pQy900Pa2KyZo=;
+	b=5EnSzw8wW+4ABx4NP8f91gPOhBS/DemsYa7TwJaBkybyOrpsbpwiZlZ291qRHHgi+jLzqK
+	XSEuDRszI4pXaIDA==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=aEUTumPZ;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=1d3IAIYP
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1750674754; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=f57r8d/AFiQ0XBsDFZ4dPmeKn9vTf3pQy900Pa2KyZo=;
+	b=aEUTumPZKSt45CYPNpsNLtj5HQKHXcfc+MD861zKiQ7uibwzJ/WqxKfAw9FVoONs+MMMmX
+	LAQnmIfrCLDgs2ZwEHNdmAGe6OsYzl4+KHbmm9fj8TDnCye2/RDk+0qj5Xt4oe6DgvdY/8
+	ULzIit79RjELC1C6itUfnncdhm19ISA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1750674754;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=f57r8d/AFiQ0XBsDFZ4dPmeKn9vTf3pQy900Pa2KyZo=;
+	b=1d3IAIYP5Bkf0+uLOX30Yp1klInmsj0i4vatB4KCMS/Tj9gG0JB8s5PtlwqIjnDXMB/UZ7
+	taq5vTZRAmPej/CA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 472D913485;
+	Mon, 23 Jun 2025 10:32:34 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id O/73D0ItWWgjIAAAD6G6ig
+	(envelope-from <tzimmermann@suse.de>); Mon, 23 Jun 2025 10:32:34 +0000
+Message-ID: <f9bd6fb1-ca21-4a23-9548-8d9b42f3c9b6@suse.de>
+Date: Mon, 23 Jun 2025 12:32:33 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250620091720.85633-1-luxu.kernel@bytedance.com>
- <DARCHDIZG7IP.2VTEVNMVX8R1E@ventanamicro.com> <CAPYmKFvcnDJWXAUEX8oY6seQrgwKiZjDqrJ_R2rJ4kWq7RQUSg@mail.gmail.com>
- <DATTT5U64J4L.3UTDRVT2YP7GT@ventanamicro.com>
-In-Reply-To: <DATTT5U64J4L.3UTDRVT2YP7GT@ventanamicro.com>
-From: Xu Lu <luxu.kernel@bytedance.com>
-Date: Mon, 23 Jun 2025 18:29:59 +0800
-X-Gm-Features: AX0GCFtfoIOnfs7J2STs_OR-jY-38t6kH55fmz7DcsUlJBJ7-TA3sUK7F3GCaB8
-Message-ID: <CAPYmKFtyJ-6N8ArP04QJNMFC3ScRnvp_9rijufQEnJRz4UrBQQ@mail.gmail.com>
-Subject: Re: [External] Re: [PATCH] RISC-V: KVM: Delegate illegal instruction fault
-To: =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@ventanamicro.com>
-Cc: anup@brainfault.org, atish.patra@linux.dev, paul.walmsley@sifive.com, 
-	palmer@dabbelt.com, aou@eecs.berkeley.edu, alex@ghiti.fr, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, 
-	linux-riscv <linux-riscv-bounces@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 7/7] fbcon: Make a symlink to the device selected as
+ primary
+To: Mario Limonciello <superm1@kernel.org>,
+ Bjorn Helgaas <bhelgaas@google.com>
+Cc: Alex Deucher <alexander.deucher@amd.com>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+ Lukas Wunner <lukas@wunner.de>,
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Maxime Ripard <mripard@kernel.org>, David Woodhouse <dwmw2@infradead.org>,
+ Lu Baolu <baolu.lu@linux.intel.com>, Joerg Roedel <joro@8bytes.org>,
+ Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+ "open list:DRM DRIVERS" <dri-devel@lists.freedesktop.org>,
+ open list <linux-kernel@vger.kernel.org>,
+ "open list:INTEL IOMMU (VT-d)" <iommu@lists.linux.dev>,
+ "open list:PCI SUBSYSTEM" <linux-pci@vger.kernel.org>,
+ "open list:VFIO DRIVER" <kvm@vger.kernel.org>,
+ "open list:SOUND" <linux-sound@vger.kernel.org>,
+ Daniel Dadap <ddadap@nvidia.com>,
+ Mario Limonciello <mario.limonciello@amd.com>
+References: <20250620024943.3415685-1-superm1@kernel.org>
+ <20250620024943.3415685-8-superm1@kernel.org>
+ <a22ecd33-460d-41bf-920c-529645d173e3@suse.de>
+ <b3462e88-e24a-43d9-8437-b6d378a3b5d3@kernel.org>
+Content-Language: en-US
+From: Thomas Zimmermann <tzimmermann@suse.de>
+Autocrypt: addr=tzimmermann@suse.de; keydata=
+ xsBNBFs50uABCADEHPidWt974CaxBVbrIBwqcq/WURinJ3+2WlIrKWspiP83vfZKaXhFYsdg
+ XH47fDVbPPj+d6tQrw5lPQCyqjwrCPYnq3WlIBnGPJ4/jreTL6V+qfKRDlGLWFjZcsrPJGE0
+ BeB5BbqP5erN1qylK9i3gPoQjXGhpBpQYwRrEyQyjuvk+Ev0K1Jc5tVDeJAuau3TGNgah4Yc
+ hdHm3bkPjz9EErV85RwvImQ1dptvx6s7xzwXTgGAsaYZsL8WCwDaTuqFa1d1jjlaxg6+tZsB
+ 9GluwvIhSezPgnEmimZDkGnZRRSFiGP8yjqTjjWuf0bSj5rUnTGiyLyRZRNGcXmu6hjlABEB
+ AAHNJ1Rob21hcyBaaW1tZXJtYW5uIDx0emltbWVybWFubkBzdXNlLmRlPsLAjgQTAQgAOAIb
+ AwULCQgHAgYVCgkICwIEFgIDAQIeAQIXgBYhBHIX+6yM6c9jRKFo5WgNwR1TC3ojBQJftODH
+ AAoJEGgNwR1TC3ojx1wH/0hKGWugiqDgLNXLRD/4TfHBEKmxIrmfu9Z5t7vwUKfwhFL6hqvo
+ lXPJJKQpQ2z8+X2vZm/slsLn7J1yjrOsoJhKABDi+3QWWSGkaGwRJAdPVVyJMfJRNNNIKwVb
+ U6B1BkX2XDKDGffF4TxlOpSQzdtNI/9gleOoUA8+jy8knnDYzjBNOZqLG2FuTdicBXblz0Mf
+ vg41gd9kCwYXDnD91rJU8tzylXv03E75NCaTxTM+FBXPmsAVYQ4GYhhgFt8S2UWMoaaABLDe
+ 7l5FdnLdDEcbmd8uLU2CaG4W2cLrUaI4jz2XbkcPQkqTQ3EB67hYkjiEE6Zy3ggOitiQGcqp
+ j//OwE0EWznS4AEIAMYmP4M/V+T5RY5at/g7rUdNsLhWv1APYrh9RQefODYHrNRHUE9eosYb
+ T6XMryR9hT8XlGOYRwKWwiQBoWSDiTMo/Xi29jUnn4BXfI2px2DTXwc22LKtLAgTRjP+qbU6
+ 3Y0xnQN29UGDbYgyyK51DW3H0If2a3JNsheAAK+Xc9baj0LGIc8T9uiEWHBnCH+RdhgATnWW
+ GKdDegUR5BkDfDg5O/FISymJBHx2Dyoklv5g4BzkgqTqwmaYzsl8UxZKvbaxq0zbehDda8lv
+ hFXodNFMAgTLJlLuDYOGLK2AwbrS3Sp0AEbkpdJBb44qVlGm5bApZouHeJ/+n+7r12+lqdsA
+ EQEAAcLAdgQYAQgAIAIbDBYhBHIX+6yM6c9jRKFo5WgNwR1TC3ojBQJftOH6AAoJEGgNwR1T
+ C3ojVSkIALpAPkIJPQoURPb1VWjh34l0HlglmYHvZszJWTXYwavHR8+k6Baa6H7ufXNQtThR
+ yIxJrQLW6rV5lm7TjhffEhxVCn37+cg0zZ3j7zIsSS0rx/aMwi6VhFJA5hfn3T0TtrijKP4A
+ SAQO9xD1Zk9/61JWk8OysuIh7MXkl0fxbRKWE93XeQBhIJHQfnc+YBLprdnxR446Sh8Wn/2D
+ Ya8cavuWf2zrB6cZurs048xe0UbSW5AOSo4V9M0jzYI4nZqTmPxYyXbm30Kvmz0rYVRaitYJ
+ 4kyYYMhuULvrJDMjZRvaNe52tkKAvMevcGdt38H4KSVXAylqyQOW5zvPc4/sq9c=
+In-Reply-To: <b3462e88-e24a-43d9-8437-b6d378a3b5d3@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Rspamd-Queue-Id: E2C902118C
+X-Rspamd-Action: no action
+X-Spam-Flag: NO
+X-Spamd-Result: default: False [-4.51 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	TO_DN_ALL(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	ARC_NA(0.00)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCPT_COUNT_TWELVE(0.00)[25];
+	MIME_TRACE(0.00)[0:+];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FREEMAIL_CC(0.00)[amd.com,gmail.com,ffwll.ch,wunner.de,linux.intel.com,kernel.org,infradead.org,8bytes.org,arm.com,redhat.com,perex.cz,suse.com,lists.freedesktop.org,vger.kernel.org,lists.linux.dev,nvidia.com];
+	RCVD_TLS_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	DKIM_TRACE(0.00)[suse.de:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.de:dkim,suse.de:mid]
+X-Spam-Score: -4.51
+X-Spam-Level: 
 
-Hi Radim,
+Hi
 
-On Mon, Jun 23, 2025 at 6:04=E2=80=AFPM Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcma=
-r@ventanamicro.com> wrote:
+Am 20.06.25 um 17:56 schrieb Mario Limonciello:
+> On 6/20/25 3:47 AM, Thomas Zimmermann wrote:
+>> Hi
+>>
+>> Am 20.06.25 um 04:49 schrieb Mario Limonciello:
+>>> From: Mario Limonciello <mario.limonciello@amd.com>
+>>>
+>>> Knowing which device is the primary device can be useful for userspace
+>>> to make decisions on which device to start a display server.
+>>>
+>>> Create a link to that device called 'primary_device'.
+>>>
+>>> Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
+>>> ---
+>>>   drivers/video/fbdev/core/fbcon.c | 10 +++++++++-
+>>>   1 file changed, 9 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/drivers/video/fbdev/core/fbcon.c b/drivers/video/fbdev/ 
+>>> core/fbcon.c
+>>> index 2df48037688d1..46f21570723e5 100644
+>>> --- a/drivers/video/fbdev/core/fbcon.c
+>>> +++ b/drivers/video/fbdev/core/fbcon.c
+>>
+>> You cannot rely on this, as fbcon might be disabled entirely.
 >
-> 2025-06-22T18:11:49+08:00, Xu Lu <luxu.kernel@bytedance.com>:
-> > Hi Radim,
-> >
-> > On Fri, Jun 20, 2025 at 8:04=E2=80=AFPM Radim Kr=C4=8Dm=C3=A1=C5=99 <rk=
-rcmar@ventanamicro.com> wrote:
-> >>
-> >> 2025-06-20T17:17:20+08:00, Xu Lu <luxu.kernel@bytedance.com>:
-> >> > Delegate illegal instruction fault to VS mode in default to avoid su=
-ch
-> >> > exceptions being trapped to HS and redirected back to VS.
-> >> >
-> >> > Signed-off-by: Xu Lu <luxu.kernel@bytedance.com>
-> >> > ---
-> >> > diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/=
-asm/kvm_host.h
-> >> > @@ -48,6 +48,7 @@
-> >> > +                                      BIT(EXC_INST_ILLEGAL)    | \
-> >>
-> >> You should also remove the dead code in kvm_riscv_vcpu_exit.
-> >
-> > I only want to delegate it by default. And KVM may still want to
-> > delegate different exceptions for different VMs like what it does for
-> > EXC_BREAKPOINT.
->
-> (I think we could easily reintroduce the code if KVM wants to do that in
->  the future.  I also think that it's bad that this patch is doing an
->  observable change without userspace involvement -- the counting of KVM
->  SBI PMU events, but others will probably disagree with me on this.)
->
-> >                 So maybe it is better to reserve these codes?
->
-> Possibly, the current is acceptable if you have considered the
-> implications on PMU events.
+> So the other idea I had was to have a new file boot_console.
 
-So maybe it comes back to our discussion on the difference between vs
-insn fault and illegal insn fault again~ In my personal opinion, it
-seems to be a waste of CPU resources to trap illegal instruction to
-HS-mode hypervisor, which does nothing but redirect it back to VS-mode
-guest kernel. I think it is OK (and maybe it should) to record 0
-illegal instruction exits in KVM PMU. If someone wants illegal insn to
-trigger an vcpu exit, then an ioctl can be provided to remove the
-delegation like what KVM_SET_GUEST_DEBUG does.
+'console' already has a meaning, so I'd prefer boot_display. Apart from 
+naming, this is a good idea.
 
 >
-> >> And why not delegate the others as well?
-> >> (EXC_LOAD_MISALIGNED, EXC_STORE_MISALIGNED, EXC_LOAD_ACCESS,
-> >>  EXC_STORE_ACCESS, and EXC_INST_ACCESS.)
-> >
-> > Thanks for the reminder. I will have a test and resend the patch if it =
-works.
+> How would you feel about this instead (or even in addition to the 
+> symlink)?
+
+We likely won't need the symlink then.
+
+Best regards
+Thomas
+
 >
-> The misaligned exceptions are already being worked on, so don't waste
-> your time on them, sorry.
+> diff --git a/drivers/pci/pci-sysfs.c b/drivers/pci/pci-sysfs.c
+> index 268c69daa4d5..8535950b4c0f 100644
+> --- a/drivers/pci/pci-sysfs.c
+> +++ b/drivers/pci/pci-sysfs.c
+> @@ -30,6 +30,7 @@
+>  #include <linux/msi.h>
+>  #include <linux/of.h>
+>  #include <linux/aperture.h>
+> +#include <asm/video.h>
+>  #include "pci.h"
+>
+>  #ifndef ARCH_PCI_DEV_GROUPS
+> @@ -679,6 +680,13 @@ const struct attribute_group *pcibus_groups[] = {
+>         NULL,
+>  };
+>
+> +static ssize_t boot_console_show(struct device *dev, struct 
+> device_attribute *attr,
+> +                                char *buf)
+> +{
+> +       return sysfs_emit(buf, "%u\n", video_is_primary_device(dev));
+> +}
+> +static DEVICE_ATTR_RO(boot_console);
+> +
+>  static ssize_t boot_vga_show(struct device *dev, struct 
+> device_attribute *attr,
+>                              char *buf)
+>  {
+> @@ -1698,6 +1706,7 @@ late_initcall(pci_sysfs_init);
+>
+>  static struct attribute *pci_dev_dev_attrs[] = {
+>         &dev_attr_boot_vga.attr,
+> +       &dev_attr_boot_console.attr,
+>         NULL,
+>  };
+>
+> @@ -1710,6 +1719,9 @@ static umode_t pci_dev_attrs_are_visible(struct 
+> kobject *kobj,
+>         if (a == &dev_attr_boot_vga.attr && pci_is_vga(pdev))
+>                 return a->mode;
+>
+> +       if (a == &dev_attr_boot_console.attr && pci_is_display(pdev))
+> +               return a->mode;
+> +
+>         return 0;
+>  }
+>
+>
+>>
+>> Best regards
+>> Thomas
+>>
+>>> @@ -2934,7 +2934,7 @@ static void fbcon_select_primary(struct 
+>>> fb_info *info)
+>>>   {
+>>>       if (!map_override && primary_device == -1 &&
+>>>           video_is_primary_device(info->device)) {
+>>> -        int i;
+>>> +        int i, r;
+>>>           printk(KERN_INFO "fbcon: %s (fb%i) is primary device\n",
+>>>                  info->fix.id, info->node);
+>>> @@ -2949,6 +2949,10 @@ static void fbcon_select_primary(struct 
+>>> fb_info *info)
+>>>                      first_fb_vc + 1, last_fb_vc + 1);
+>>>               info_idx = primary_device;
+>>>           }
+>>> +        r = sysfs_create_link(&fbcon_device->kobj, 
+>>> &info->device->kobj,
+>>> +                      "primary_device");
+>>> +        if (r)
+>>> +            pr_err("fbcon: Failed to link to primary device: %d\n", 
+>>> r);
+>>>       }
+>>>   }
+>>> @@ -3376,6 +3380,10 @@ void __init fb_console_init(void)
+>>>   void __exit fb_console_exit(void)
+>>>   {
+>>> +#ifdef CONFIG_FRAMEBUFFER_CONSOLE_DETECT_PRIMARY
+>>> +    if (primary_device != -1)
+>>> +        sysfs_remove_link(&fbcon_device->kobj, "primary_device");
+>>> +#endif
+>>>   #ifdef CONFIG_FRAMEBUFFER_CONSOLE_DEFERRED_TAKEOVER
+>>>       console_lock();
+>>>       if (deferred_takeover)
+>>
+>
 
-Thanks for the reminder too. I did not consider this before. I will
-leave the MISALIGNED faults alone.
+-- 
+--
+Thomas Zimmermann
+Graphics Driver Developer
+SUSE Software Solutions Germany GmbH
+Frankenstrasse 146, 90461 Nuernberg, Germany
+GF: Ivo Totev, Andrew Myers, Andrew McDonald, Boudien Moerman
+HRB 36809 (AG Nuernberg)
 
-Best Regards,
-
-Xu Lu
 
