@@ -1,78 +1,78 @@
-Return-Path: <kvm+bounces-50319-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50320-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA2E5AE3FEA
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 14:25:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 859B0AE4003
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 14:27:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F21E116C254
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 12:20:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 338DE3BC424
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 12:20:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F19FA244698;
-	Mon, 23 Jun 2025 12:19:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B05AB246BAA;
+	Mon, 23 Jun 2025 12:19:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FaLbu3ZH"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PzmtgcZq"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70D432441B4
-	for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 12:19:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A82C6246791
+	for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 12:19:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750681172; cv=none; b=efjyk2uV++FrVdf2DMwM459a90gkj+HhNcVbENgBY+MRaWSmrwSCHGLzUybhPdarotbXVMchLOy7MjaKQFqkb4f/G1gxwyyB9ckWmmAqr4/zMaRg0W0gviyTuvyY9HRitpEOckow6NabT+aOYt4Os9IUmmNRwIjfgE1nHqd3uKY=
+	t=1750681181; cv=none; b=ON973nZPd8uz54SKDaY4d67pPEKcr+RlqLKQdWjZX4FB2HpiihDX8RJbAK/gpan3X++WssgKRteuYEZvOTQVIJ3KtMgjWEJPlopzqJ+YH5z3wN39BEqPWJ7tB0xYsEbwyxrfVCMP2uy29ZIoMzgWIAzNb2d3vLjG04/4cHyaJak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750681172; c=relaxed/simple;
-	bh=f8NvzMqKx8UHnEdJOyorF06BZHlOzCa768Ga0ywIB7o=;
+	s=arc-20240116; t=1750681181; c=relaxed/simple;
+	bh=HxNunKVv87y+lC/++/jjCIzc9tbwNcMQQoHP/47rfTY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RW3WDdPKbbIiIzAhWWXk4cVIfIWKUiK8A/Ft7F6zQqBG95hJH7pny4gczn4LyTGKWvvUQtZm5iEx8ewY99v0kmwScGf3pcxPKtKc0AyvHjtDzq/PgNZN1BbbxUmGHk9fWFyePO4+yx+6vPUq8dKEcGOS8lJEiVDmA8n8bnEtj40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=FaLbu3ZH; arc=none smtp.client-ip=209.85.221.45
+	 MIME-Version:Content-Type; b=hezN+MCrtN5UAuHBGfbcvAMwxTAYkrUWvRrnWuhe/26ZprEkAymvxp5U5JahoopjtSIjr9nahVitXHOS/q6Di0sPYW3RY7EMo52b7eccBM6WF7iCLlRNT1fIKM24Fmv6aiXeny4eamldvOQwK4068Hbpfgmov/mCqNJ1kP7W54M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=PzmtgcZq; arc=none smtp.client-ip=209.85.221.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-3a57ae5cb17so2272094f8f.0
-        for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 05:19:30 -0700 (PDT)
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-3a522224582so1926341f8f.3
+        for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 05:19:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1750681169; x=1751285969; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1750681174; x=1751285974; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=qyHQEfn6inWyZRMUVI/8b1HegzN318xDx/IKxFDD3c0=;
-        b=FaLbu3ZHgbCbd70kdwr5QiS9OXj4hEVBplvcgqtCxjjKVlOQPfC+P503TzWGtYiX2m
-         M4fsBDwiEp30294oNMT6bKN0CvQ34FsmoWOTEzDGa7QCB+cXbERA3XaQhELTVnqy4QC0
-         OvEn1VWW1s0tBDuaVapmVUAkyQHKSe1HBw84maCJrwIWPzF7fu80YOcWG+sZd/NSTJps
-         KYfNZQN1zP8pvboogKVH/FbkdatCJ+FOR3rSEcobNTEvtdE0EOIp/FtExgcLLbMyiR1j
-         8aiaeb3W++7Vi4srTVyYhyePc52LFCGfs0S3goM0o6uJITBtHOwMw7PJ0mehFj9qPdtw
-         Td/w==
+        bh=MgoMlu6luU8uPkDpvUPvEjZTODhHkmT/W4wpYdZo59E=;
+        b=PzmtgcZqWOWb4/P4v1ylQUu15qkl0l9W2nYB2kHzXpC1MQsMD9gGWywzSrbS4ec5Z2
+         839Y4HCE0/sR3T7jy+FtbIlzavS1Mo8zHAD20CXvzj1GTlK09h2xEG455R85Ld2yilCs
+         nwcTPUWtbXzvchGEF5+kVg1UDesmfJhUUjj55Ky9vKCYM1T3osbDslhRmeNCILkJ/PwL
+         ZaxRbnfyUfo9u0dJ25hAELjifQxp9kAmMMFmbQ6PlD/y5zsCaeeIpf/5Tmsu2GbunEeu
+         Vr1tJRlkPeJrOvy8tLj2L36cgbRDD9S7LD09hqN8Lpdn7OIc/VMEkGvIQo+L//78KLJC
+         I5Pg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750681169; x=1751285969;
+        d=1e100.net; s=20230601; t=1750681174; x=1751285974;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=qyHQEfn6inWyZRMUVI/8b1HegzN318xDx/IKxFDD3c0=;
-        b=jaRy+TwrHEhZGLDRgZNLa3JqwoSdIG12L7bFieNOj61ZbvTVv0LbKhEGsShqC72Mnh
-         mUpd3kE0Vn8u7srkVQ7BbtutLgG5tvG70kq7wnFXNeDOSJgi7dk9LUYfRS8LV3BdcYKP
-         ckS82+bDaBQe2tzQoM95gmcfBHQscbX1AhMP9b2O8k5Uh0zkb6fqyI1Qq+VmZRLpgMSl
-         hUQ3/E/x+demcJIntCW6rjx97b3b/lZDYSssgTWjoLtDQ+C9tYyErCy0AEEqicm5PI7s
-         /mTkA8KVlGulJ2dtryJmv8WnaOnkIPTnaDNXTn2xVeTJg7RsLAYmsTZZEg1BNbS7dE3y
-         hfVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW78wEcU/EOTCGhAkRR1cUYvDuyNww8kRkWJ8qAEcL0D+Ay/tQWG76329bsabD+qKssgdc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzdOKsZ6ys7QMuYV85REoTDzXozn9eHNc4Y71zY+M12DFdRbPLW
-	nRuO3ULElouDL7Kw3D8dAVw/jgXrQtOx/DZzoakgoRu4QakK8l4E9x9sajHNzJTQ5ao=
-X-Gm-Gg: ASbGncscw63mzSNI96awX6MVfdct/gjVEpYzU86ATVbWcFfvGx17vxkkHEa4PCYRJru
-	7RK34B+I9FP0JHOeHRz2RxWTl0L8pmR12h3XZ6vXK1TbfKRjdQHbx5aj9ni2yZqvQih3tW/PIfj
-	9JSYS3XoWiwtNiVH5Tf+M8XABDkwvBFhcjc7weepmcd52ssXY6+v2YCUeSfU/FNPMSqsmUDKkyv
-	u0b/FdDm+2Rk1nln6D5AGt24dqTtK6MExbYCfaF5nAx9QGl5SYzTEa/415UF0gHK464mnVtY2Jx
-	5r1yZthKHp+yvUof4+BcsmWxQN9gj1Bf7nG59MWOhB6xRkuf1V2tJTLaYd1a/tWbhrta5zgNkpe
-	mdknSL48U5OKDbtGbcjTwR85Hp4Nxv+Jok7td
-X-Google-Smtp-Source: AGHT+IG0jiUUTmeqAWUri6/ZJ6x4DVSBOfaEpfSa25gPf14UgQYKRFy2gTrbK23eOovRBdpzASNZQQ==
-X-Received: by 2002:a05:6000:1a8f:b0:3a5:2d42:aa17 with SMTP id ffacd0b85a97d-3a6d12d53e2mr9880614f8f.31.1750681168848;
-        Mon, 23 Jun 2025 05:19:28 -0700 (PDT)
+        bh=MgoMlu6luU8uPkDpvUPvEjZTODhHkmT/W4wpYdZo59E=;
+        b=vU/Jdw7A1Y8P87gar5AuiRZ2Dzx9WRXHxfQvtUF1zGpY7mHNSe2KuQl4ICT52AoXz1
+         pvrlPS9DLSiVFxArVHBDsonYUoBhALBpGqAGOKS3sDUKmXnnRlpgEx6No7/9lWX3A84I
+         hpu/+Qyn5cf4MB2JIbHLevIG+Bu4HPKxyvJc/VHs5JTltHq5l14zdY3co2LeqLZNzhGS
+         BrRnqXUBb0JEdm+lVC7ndqc0/UcnudsTv/GAEOF09h2d9/zneXI/KOxZAA7ifxmJ9eBu
+         +QsY7r1LE1TMMXcQxA9JYdX9nFxvdySQScNzHS/3Genrr5GHz2B0oZPRzkqgtIIuI2zK
+         yzsQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW47Rzon3nCpdYb9BYzpBR60wLUQYehADTrh0k2et4oIffls6/Q0HE8c6JW0c2buXOIapo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwoXyhuGmQDWEU9roQSCCr2gvsBnwOKJ03A5cdkCLnGsHZEOlNg
+	7noybyvqrpgPvmjwM70xaOI+CAGqFc5q6SnNW0lr6tDR4qUVMitcwf4NQ2GwM1jIKgE=
+X-Gm-Gg: ASbGnctm34kRsgoAqrZHsYZYCV7ZW/lxqHaZ+5sulaFRmQwDvEYHbhsz6v2E10kOmuE
+	JXgt7HtP2Rgi0Ldy0ZK/pI+3J7xgy/U+bEw24znBc2UCiK5Q0b2yJlig21ZZHXwkkEx+YLd/r1l
+	3dka/rXr83Pa6PBQAnKRLySEqQlb9xipF4R31sbmWaBJ/mIhjlQ4FrApzXVRvJEoYQ54zae9e/Y
+	0dS9JgnFfONoF8CA8Vk+ONmmVdl1zfJuAyBZX7s+icqy1duuPqmU9QSntG0e5XXM2bvJbM6+sS7
+	5wG02BIQbGq0O3XCS2C+28T5qi4wwMi6mU1XLkA6fozq8BRsZR4K+8OadkWnkTwi4DFro38s8B7
+	Hs1L//sNNO9YaG6M7q9vq6EPVinRnZsKIYgqo
+X-Google-Smtp-Source: AGHT+IH5nN0Buqju33OA312k0qD0vKiMOH8kEulBGzTvtfmPtg2jIEiKfCSnA60Z3UW/VHNqpVWLLw==
+X-Received: by 2002:a5d:584c:0:b0:3a4:e6bb:2d32 with SMTP id ffacd0b85a97d-3a6d12a2416mr9606493f8f.22.1750681173855;
+        Mon, 23 Jun 2025 05:19:33 -0700 (PDT)
 Received: from localhost.localdomain (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-453646fd7aasm108552565e9.20.2025.06.23.05.19.27
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a6d0f1054bsm9217868f8f.9.2025.06.23.05.19.32
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 23 Jun 2025 05:19:28 -0700 (PDT)
+        Mon, 23 Jun 2025 05:19:33 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Leif Lindholm <leif.lindholm@oss.qualcomm.com>,
@@ -94,10 +94,11 @@ Cc: Leif Lindholm <leif.lindholm@oss.qualcomm.com>,
 	Radoslaw Biernacki <rad@semihalf.com>,
 	Phil Dennis-Jordan <phil@philjordan.eu>,
 	Richard Henderson <richard.henderson@linaro.org>,
-	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH v3 08/26] target/arm/hvf: Log $pc in hvf_unknown_hvc() trace event
-Date: Mon, 23 Jun 2025 14:18:27 +0200
-Message-ID: <20250623121845.7214-9-philmd@linaro.org>
+	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	qemu-stable@nongnu.org
+Subject: [PATCH v3 09/26] target/arm: Correct KVM & HVF dtb_compatible value
+Date: Mon, 23 Jun 2025 14:18:28 +0200
+Message-ID: <20250623121845.7214-10-philmd@linaro.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250623121845.7214-1-philmd@linaro.org>
 References: <20250623121845.7214-1-philmd@linaro.org>
@@ -110,52 +111,48 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Tracing $PC for unknown HVC instructions to not have to
-look at the disassembled flow of instructions.
+Linux kernel knows how to parse "arm,armv8", not "arm,arm-v8".
 
+See arch/arm64/boot/dts/foundation-v8.dts:
+
+  https://github.com/torvalds/linux/commit/90556ca1ebdd
+
+Cc: qemu-stable@nongnu.org
+Fixes: 26861c7ce06 ("target-arm: Add minimal KVM AArch64 support")
+Fixes: 585df85efea ("hvf: arm: Implement -cpu host")
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/hvf/hvf.c        | 4 ++--
- target/arm/hvf/trace-events | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ target/arm/hvf/hvf.c | 2 +-
+ target/arm/kvm.c     | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/target/arm/hvf/hvf.c b/target/arm/hvf/hvf.c
-index cc5bbc155d2..d4c58516e8b 100644
+index d4c58516e8b..bf59b17dcb9 100644
 --- a/target/arm/hvf/hvf.c
 +++ b/target/arm/hvf/hvf.c
-@@ -2071,12 +2071,12 @@ int hvf_vcpu_exec(CPUState *cpu)
-         cpu_synchronize_state(cpu);
-         if (arm_cpu->psci_conduit == QEMU_PSCI_CONDUIT_HVC) {
-             if (!hvf_handle_psci_call(cpu)) {
--                trace_hvf_unknown_hvc(env->xregs[0]);
-+                trace_hvf_unknown_hvc(env->pc, env->xregs[0]);
-                 /* SMCCC 1.3 section 5.2 says every unknown SMCCC call returns -1 */
-                 env->xregs[0] = -1;
-             }
-         } else {
--            trace_hvf_unknown_hvc(env->xregs[0]);
-+            trace_hvf_unknown_hvc(env->pc, env->xregs[0]);
-             hvf_raise_exception(cpu, EXCP_UDEF, syn_uncategorized());
-         }
-         break;
-diff --git a/target/arm/hvf/trace-events b/target/arm/hvf/trace-events
-index a4870e0a5c4..b49746f28d1 100644
---- a/target/arm/hvf/trace-events
-+++ b/target/arm/hvf/trace-events
-@@ -5,10 +5,10 @@ hvf_inject_irq(void) "injecting IRQ"
- hvf_data_abort(uint64_t pc, uint64_t va, uint64_t pa, bool isv, bool iswrite, bool s1ptw, uint32_t len, uint32_t srt) "data abort: [pc=0x%"PRIx64" va=0x%016"PRIx64" pa=0x%016"PRIx64" isv=%d iswrite=%d s1ptw=%d len=%d srt=%d]"
- hvf_sysreg_read(uint32_t reg, uint32_t op0, uint32_t op1, uint32_t crn, uint32_t crm, uint32_t op2, uint64_t val) "sysreg read 0x%08x (op0=%d op1=%d crn=%d crm=%d op2=%d) = 0x%016"PRIx64
- hvf_sysreg_write(uint32_t reg, uint32_t op0, uint32_t op1, uint32_t crn, uint32_t crm, uint32_t op2, uint64_t val) "sysreg write 0x%08x (op0=%d op1=%d crn=%d crm=%d op2=%d, val=0x%016"PRIx64")"
--hvf_unknown_hvc(uint64_t x0) "unknown HVC! 0x%016"PRIx64
-+hvf_unknown_hvc(uint64_t pc, uint64_t x0) "pc=0x%"PRIx64" unknown HVC! 0x%016"PRIx64
- hvf_unknown_smc(uint64_t x0) "unknown SMC! 0x%016"PRIx64
- hvf_exit(uint64_t syndrome, uint32_t ec, uint64_t pc) "exit: 0x%"PRIx64" [ec=0x%x pc=0x%"PRIx64"]"
--hvf_psci_call(uint64_t x0, uint64_t x1, uint64_t x2, uint64_t x3, uint32_t cpuid) "PSCI Call x0=0x%016"PRIx64" x1=0x%016"PRIx64" x2=0x%016"PRIx64" x3=0x%016"PRIx64" cpu=0x%x"
-+hvf_psci_call(uint64_t x0, uint64_t x1, uint64_t x2, uint64_t x3, uint32_t cpuid) "PSCI Call x0=0x%016"PRIx64" x1=0x%016"PRIx64" x2=0x%016"PRIx64" x3=0x%016"PRIx64" cpuid=0x%x"
- hvf_vgic_write(const char *name, uint64_t val) "vgic write to %s [val=0x%016"PRIx64"]"
- hvf_vgic_read(const char *name, uint64_t val) "vgic read from %s [val=0x%016"PRIx64"]"
- hvf_illegal_guest_state(void) "HV_ILLEGAL_GUEST_STATE"
+@@ -879,7 +879,7 @@ static bool hvf_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+     hv_vcpu_exit_t *exit;
+     int i;
+ 
+-    ahcf->dtb_compatible = "arm,arm-v8";
++    ahcf->dtb_compatible = "arm,armv8";
+     ahcf->features = (1ULL << ARM_FEATURE_V8) |
+                      (1ULL << ARM_FEATURE_NEON) |
+                      (1ULL << ARM_FEATURE_AARCH64) |
+diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+index 74fda8b8090..9a1b031556a 100644
+--- a/target/arm/kvm.c
++++ b/target/arm/kvm.c
+@@ -266,7 +266,7 @@ static bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+     }
+ 
+     ahcf->target = init.target;
+-    ahcf->dtb_compatible = "arm,arm-v8";
++    ahcf->dtb_compatible = "arm,armv8";
+ 
+     err = read_sys_reg64(fdarray[2], &ahcf->isar.id_aa64pfr0,
+                          ARM64_SYS_REG(3, 0, 0, 4, 0));
 -- 
 2.49.0
 
