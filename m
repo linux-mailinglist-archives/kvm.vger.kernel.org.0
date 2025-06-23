@@ -1,193 +1,265 @@
-Return-Path: <kvm+bounces-50409-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50410-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 082B9AE4D64
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 21:12:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F32D2AE4D8C
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 21:22:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 181563A203D
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 19:12:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D2EF23A2471
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 19:22:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0B962D4B7B;
-	Mon, 23 Jun 2025 19:12:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1357F2D323F;
+	Mon, 23 Jun 2025 19:22:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="fBWcktR8"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mqEumHpz"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02CE92727FD;
-	Mon, 23 Jun 2025 19:12:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FEF01078F
+	for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 19:22:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750705950; cv=none; b=YkrIibZDRVZKmBl79SY+Y19kAl2fjEyBZU2TLxONR9Zld3q1vFJAT08Txxt7JOSakEKulC3dXrAcaAknOG/e8J+OkbM/fxJ2nFhBsbtcxno7JOxCgh+HgvHedTKfdPYLQzJ4365nPVRHIiWDM8LNzb8DMCQetgt1vmB3FnNAVmU=
+	t=1750706559; cv=none; b=WBTuGL0fqHn6PzNNrzfCuLRNZOBqik88dNNJa7oHCOCdrjuRDfJxjIYgnVxoFfNd5GFqnwljjIjcP8eSwbByV0kCI8Nxz+TxxGakXyIOXEZOP1eM4WENotwCiwRhs0Y4s7N+Oe2WKgFlMyWK10a3JW5yr0vokKVoUxnPkaQwGK4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750705950; c=relaxed/simple;
-	bh=RdggrAt2yYgHrCd62EHlXKceXTIAXB4Ir7vZpqfo490=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mWfIOEIjHgtGRnPZjd/w6SiEvwC2va08e0r4B8S5Zq159HCEH3+qyD8HVBXPypuLNx4+XV2TSF2O5exVJg5f3GO1x8MVBEOxhj8K6SzTuEtpuP2lO2jo0Xn26YF7Di7NhfEq7Yrj1PqqzwU03POAma7m5eU8v9VP539T6dsjvHc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=fBWcktR8; arc=none smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55NGXxxi001720;
-	Mon, 23 Jun 2025 19:12:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=corp-2025-04-25; bh=y98GQGHSKG5hc43qPhCGbhubyGowZ
-	oek17bECxnnf40=; b=fBWcktR88KCuUdEcYAowh6PWNVi1A70oitpF7oz0kERyD
-	s4KZtEe5fS6FroFsdaVdkzh2eMoHWEPKyDoWvrLnVJmNcTGuKF5Z7C+amPsuw2gY
-	8ZSZJliZJj8ILHD27Xnkiuxmf8vN2SqSK4B8rzbMWa5GuXc13xn1rMr0IEOHhXjm
-	4d7ze9jUiZRgNILjUNpb1b7IrltJX1L03ML25m0D2GdoZrxYnqO4x5KOqU7LVz6K
-	dotiH6Bk8X+SlB28B5aehk6Qq1DDd55N54FEA7ufpLbctOQO0bdVJBrB18GEaUxt
-	rzzLKHxTlaM3Rypa6K3jBm2uGcTQFjyijNELPRWNg==
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 47ds7uugf7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 23 Jun 2025 19:12:24 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 55NIjeET038894;
-	Mon, 23 Jun 2025 19:12:22 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 47ehr3qwvr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 23 Jun 2025 19:12:22 +0000
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 55NJBsPM037652;
-	Mon, 23 Jun 2025 19:12:22 GMT
-Received: from ca-dev110.us.oracle.com (ca-dev110.us.oracle.com [10.129.136.45])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 47ehr3qwvb-1;
-	Mon, 23 Jun 2025 19:12:22 +0000
-From: Alok Tiwari <alok.a.tiwari@oracle.com>
-To: pbonzini@redhat.com, corbet@lwn.net, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org
-Cc: alok.a.tiwari@oracle.com, linux-kernel@vger.kernel.org
-Subject: [PATCH next] Documentation: KVM: fix reference for kvm_ppc_resize_hpt and various typos
-Date: Mon, 23 Jun 2025 12:11:47 -0700
-Message-ID: <20250623191152.44118-1-alok.a.tiwari@oracle.com>
-X-Mailer: git-send-email 2.46.0
+	s=arc-20240116; t=1750706559; c=relaxed/simple;
+	bh=8sfjrM8xdtDx8xihK4hO86kfCv6rfj6jYTGptLagxzM=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=FVmtDWio3xGOPchgN36PTIwUZgHgsa1BJCRLCqvtJrTFvq5AII1hNtIACwNmAFgV+ADOdUmriGl0QNJ2kwhw3h31JFm/4dr7ymAqdW2Mrrk5LZVpWTDTI/Z7vqj32Q0JgjDzc+5FzyjU8KZ+QO850SLgWQsW0pUV244H1TjYTaI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mqEumHpz; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b2fdba7f818so5152115a12.2
+        for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 12:22:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1750706556; x=1751311356; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=mH1izpCgKOdRs0luEnasPZfMbo2anYXefmEsOxYxfQI=;
+        b=mqEumHpzoOj+ZwQpYVeZ8ROSgG1vRLia39lxfC/b/SJ/9lppYGHzswONhL1lqZ6S6w
+         Zh/orO30V0YqdIZpV0mQXxQSfhVjxYA2bc11leQK+fpc4nSlhfHgMgFMOetkDmN9sj/d
+         wmP7oPZ6GECUp/Ft7w4DCai+drwYYElqwcC4ohTceiQtK0xGLLirG6yiwFXMBrP82WbQ
+         SYC381+gnxqn+FogChZ25KxcRTpNZiBha6CAswmFAKGX1vmi9cp+GK0Y0CuHtrs8Kot1
+         FYjcPzCfgkHUDLD6rJ/67EqycPrTnJ8wJEHV3B/lBUHsa9rPqfGTIjbowDVEfkQ/1WnQ
+         Y5lQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750706556; x=1751311356;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mH1izpCgKOdRs0luEnasPZfMbo2anYXefmEsOxYxfQI=;
+        b=UujUWFvdVNloyb5vw6UELTXSbBOyHOq5w0MSXKl0pB8Pd1WHhK+0XElbC4aOt/vynb
+         b4ps+KkWMud59YPH6n5+r+HLgAP22M1Gd+JLo7T2C4SIOu94mCklSSckPYo0VYEqBlb9
+         l2gR7ulgXz3kmDm504wW8zhzzcXzj36mijEAQ+Ej/o3ELFaw30o6MeSrXLB90DsRiepe
+         5nRH2i4wg0Zb8fyMGNA1Y8mFLQA0LdIjAtOBQPMep91wBBIk+qwi4FrZp3RSzko82YY/
+         EDUBca/ECWTH67YIl65NO4nTHOoSd0zlxmQ5+LgYVqmeRCczVWqAknK/Xr+xkczx3ZYe
+         dYyg==
+X-Forwarded-Encrypted: i=1; AJvYcCXoqMRO2J+SEoZVDdmVVLe/vKM1aGLArXQVr0Hngh6cLyBgcYYkrW2NmCOH1g5p9NZBOj4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwaVWqNb8PW1IeMQ0LmKsQbS6d0aF+V37a23qfkmJqjp5RCil+7
+	x7KEhm87e8ysxQtx5gqqc9q2S3u8GuUZesmxA1d12D4KybVrQk3wLJyjBFCazoZ99CtETWLbjkQ
+	e0SPSFw==
+X-Google-Smtp-Source: AGHT+IH7I9v6zHc4cbTrZUDYu8elviPUdSP6+QeYRx4dISPv8ZdbFyj5Ye/636EGB3YXaNdeSrOpFVWoN8I=
+X-Received: from pjboe18.prod.google.com ([2002:a17:90b:3952:b0:312:f88d:25f6])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2e87:b0:313:1769:eb49
+ with SMTP id 98e67ed59e1d1-3159d63cf11mr22012299a91.8.1750706555935; Mon, 23
+ Jun 2025 12:22:35 -0700 (PDT)
+Date: Mon, 23 Jun 2025 12:22:34 -0700
+In-Reply-To: <e255fa3ee192b136eeef7e9a63e8d1506d5e85a8.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
- definitions=2025-06-23_05,2025-06-23_07,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 bulkscore=0 mlxscore=0
- adultscore=0 mlxlogscore=999 suspectscore=0 malwarescore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2505160000
- definitions=main-2506230123
-X-Proofpoint-GUID: Wb1bCTVf9O-FdttwSNE3QwfcLxufiVJy
-X-Authority-Analysis: v=2.4 cv=CeII5Krl c=1 sm=1 tr=0 ts=6859a718 b=1 cx=c_pps a=zPCbziy225d3KhSqZt3L1A==:117 a=zPCbziy225d3KhSqZt3L1A==:17 a=6IFa9wvqVegA:10 a=yPCof4ZbAAAA:8 a=zi7eKOD_ebcX24jqmWgA:9 cc=ntf awl=host:13206
-X-Proofpoint-ORIG-GUID: Wb1bCTVf9O-FdttwSNE3QwfcLxufiVJy
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjIzMDEyMyBTYWx0ZWRfX+OYpCfb891dj gmFNOkYZk4Mpntjg6yFrXqwhTmCt9voEZcI9YYkfRqfBJIyyCjEQeQso59aER7hwG03cjYeo1qm oSHXifj2FvSW/yIsvlYuLlsW+Fxdu73x84dE5w/jpCjo+WGAgIuaSzokFaDDkU1HqNxFt1dagU/
- f/7XOGuCdf9oGg/HE7FY25eTiTBwy8Akdh4FncX4fLb+k46kQ6Ru+WpwDCIEWIJ8u9a22U7ZBkG xbGLYtDwGuZJJQz82wHWnWAksRkMNsf61wgCkObqGfiF7b1OoUukD9rbc4yw/KJWsp8mxBwqCmF A1upSey9zSTpALroxxkuHwJv01Xsx/IhWVtR53EtY1vF7uewbf+xNbn1/XYVYo4APAgjpLXuNTJ
- 9eIomI9Vx3qRZB2hljzdwBrgpXgFZ3Yeu3TnTBo/lI5kRgLv1DgEmebpIbmJ48iXJ/yUsjDS
+Mime-Version: 1.0
+References: <20250326193619.3714986-1-yosry.ahmed@linux.dev>
+ <20250326193619.3714986-13-yosry.ahmed@linux.dev> <e255fa3ee192b136eeef7e9a63e8d1506d5e85a8.camel@redhat.com>
+Message-ID: <aFmpeqtEbVmTl5N-@google.com>
+Subject: Re: [RFC PATCH 12/24] KVM: x86: hyper-v: Pass is_guest_mode to kvm_hv_vcpu_purge_flush_tlb()
+From: Sean Christopherson <seanjc@google.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Cc: Yosry Ahmed <yosry.ahmed@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Jim Mattson <jmattson@google.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
+	Rik van Riel <riel@surriel.com>, Tom Lendacky <thomas.lendacky@amd.com>, x86@kernel.org, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-Fix the incorrect reference to struct kvm_reinject_control and replace
-it with the correct struct kvm_ppc_resize_hpt in the documentation of
-the HPT resize ioctl.
+On Thu, Apr 03, 2025, Maxim Levitsky wrote:
+> On Wed, 2025-03-26 at 19:36 +0000, Yosry Ahmed wrote:
+> > Instead of calling is_guest_mode() inside kvm_hv_vcpu_purge_flush_tlb()
+> > pass the value from the caller. Future changes will pass different
+> > values than is_guest_mode(vcpu).
+> > 
+> > No functional change intended.
+> > 
+> > Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
+> > ---
+> >  arch/x86/kvm/hyperv.h  | 8 +++++---
+> >  arch/x86/kvm/svm/svm.c | 2 +-
+> >  arch/x86/kvm/x86.c     | 2 +-
+> >  3 files changed, 7 insertions(+), 5 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/hyperv.h b/arch/x86/kvm/hyperv.h
+> > index 913bfc96959cb..be715deaeb003 100644
+> > --- a/arch/x86/kvm/hyperv.h
+> > +++ b/arch/x86/kvm/hyperv.h
+> > @@ -203,14 +203,15 @@ static inline struct kvm_vcpu_hv_tlb_flush_fifo *kvm_hv_get_tlb_flush_fifo(struc
+> >  	return &hv_vcpu->tlb_flush_fifo[i];
+> >  }
+> >  
+> > -static inline void kvm_hv_vcpu_purge_flush_tlb(struct kvm_vcpu *vcpu)
+> > +static inline void kvm_hv_vcpu_purge_flush_tlb(struct kvm_vcpu *vcpu,
+> > +					       bool is_guest_mode)
 
-Also correct several minor typos throughout api.rst, including grammar
-issues, capitalization (e.g., "SError"), and punctuation fixes.
+NAK, passing around is_guest_mode is going to cause problems.  All it takes is
+one snippet of code that operates on the current vCPU state for KVM to end up
+with bugs.  It's unfortunate that kvm_hv_get_tlb_flush_fifo() takes in an
+@is_guest_mode param, but that's "necessary" due to the cross-vCPU nature of
+the usage.  For this case, there is no such requirement/restriction.
 
-Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+I also think that being super explicit isn't a bad thing, even if it means we
+might end up with duplicate code.  I.e. having this
+
+	vmcb_set_flush_asid(svm->vmcb01.ptr);
+	if (svm->nested.vmcb02.ptr)
+		vmcb_set_flush_asid(svm->nested.vmcb02.ptr);
+
+in svm_flush_tlb_all() is a net positive IMO, because it explicitly reads "flush
+vmcb01's ASID, and vmcb02's ASID if vmcb02 is valid".  Whereas this
+
+        svm_flush_tlb_asid(vcpu, false);
+        svm_flush_tlb_asid(vcpu, true);
+
+isn't anywhere near as explicit.  I can make a good guess as to what true/false
+are specifying, but many readers will need to go at least a layer or two deeper
+to understand what's going on.  More importantly, it's not at all clear in
+svm_flush_tlb_asid() that the vmcb can/should only be NULL in the is_guest_mode=true
+case.
+
+        if (vmcb)
+                vmcb_set_flush_asid(vmcb);
+
+And it's even actively dangerous, in that a bug where a vmcb is unexpectedly NULL
+could lead to a missed TLB flush.  I.e. we *want* a NULL pointer #GP in a case
+like this, so that the host yells loudly (even if it means panicking), versus
+silently doing nothing and potentially corrupting guest data.  In practice, I can't
+imagine such a bug ever being truly silent, e.g. KVM is all but guaranteed to
+consume the NULL vmcb sooner than later.  But I still don't like creating such a
+possibility.
+
+> >  {
+> >  	struct kvm_vcpu_hv_tlb_flush_fifo *tlb_flush_fifo;
+> >  
+> >  	if (!to_hv_vcpu(vcpu) || !kvm_check_request(KVM_REQ_HV_TLB_FLUSH, vcpu))
+
+Case in point, kvm_check_request() is destructive (the name sucks, but it is what
+it is), i.e. KVM_REQ_HV_TLB_FLUSH will be cleared, and so only the first of the
+calls to svm_flush_tlb_asid() and thus kvm_hv_vcpu_purge_flush_tlb() will actually
+do anything.  This particular bug is functionally benign (KVM will over-flush),
+but it's still a bug.
+
+Somewhat of a side topic, I think we should rename kvm_hv_vcpu_purge_flush_tlb()
+to something like kvm_hv_purge_tlb_flush_fifo().  I initially read the first one
+as "purge *and* flush TLBs", whereas the function is actually "purge the TLB
+flush FIFO".
+
+Completely untested, but I think we should shoot for something like this, over
+2 or 3 patches.
+
 ---
- Documentation/virt/kvm/api.rst | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+ arch/x86/kvm/hyperv.h     | 14 +++++++++++++-
+ arch/x86/kvm/svm/nested.c |  1 -
+ arch/x86/kvm/svm/svm.c    | 17 ++++++++---------
+ 3 files changed, 21 insertions(+), 11 deletions(-)
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index f0d961436d0f..04ac699e7885 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -88,7 +88,7 @@ the VM is shut down.
- =============
+diff --git a/arch/x86/kvm/hyperv.h b/arch/x86/kvm/hyperv.h
+index 913bfc96959c..f2c17459dd8b 100644
+--- a/arch/x86/kvm/hyperv.h
++++ b/arch/x86/kvm/hyperv.h
+@@ -203,7 +203,7 @@ static inline struct kvm_vcpu_hv_tlb_flush_fifo *kvm_hv_get_tlb_flush_fifo(struc
+ 	return &hv_vcpu->tlb_flush_fifo[i];
+ }
  
- As of Linux 2.6.22, the KVM ABI has been stabilized: no backward
--incompatible change are allowed.  However, there is an extension
-+incompatible changes are allowed.  However, there is an extension
- facility that allows backward-compatible extensions to the API to be
- queried and used.
+-static inline void kvm_hv_vcpu_purge_flush_tlb(struct kvm_vcpu *vcpu)
++static inline void kvm_hv_purge_tlb_flush_fifo(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_vcpu_hv_tlb_flush_fifo *tlb_flush_fifo;
  
-@@ -1198,7 +1198,7 @@ pending until the guest takes the exception by unmasking PSTATE.A.
+@@ -215,6 +215,18 @@ static inline void kvm_hv_vcpu_purge_flush_tlb(struct kvm_vcpu *vcpu)
+ 	kfifo_reset_out(&tlb_flush_fifo->entries);
+ }
  
- Running the VCPU may cause it to take a pending SError, or make an access that
- causes an SError to become pending. The event's description is only valid while
--the VPCU is not running.
-+the VCPU is not running.
++static inline void kvm_hv_purge_tlb_flush_fifo(struct kvm_vcpu *vcpu)
++{
++	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
++	int i;
++
++	if (!hv_vcpu || !kvm_check_request(KVM_REQ_HV_TLB_FLUSH, vcpu))
++		return;
++
++	for (i = 0; i < ARRAY_SIZE(hv_vcpu->tlb_flush_fifo); i++)
++		kfifo_reset_out(&hv_vcpu->tlb_flush_fifo[i]->entries);
++}
++
+ static inline bool guest_hv_cpuid_has_l2_tlb_flush(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
+diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+index b6c27b34f8e5..7e9156f27a96 100644
+--- a/arch/x86/kvm/svm/nested.c
++++ b/arch/x86/kvm/svm/nested.c
+@@ -491,7 +491,6 @@ static void nested_svm_entry_tlb_flush(struct kvm_vcpu *vcpu)
+ 	 * TODO: optimize unconditional TLB flush/MMU sync.  A partial list of
+ 	 * things to fix before this can be conditional:
+ 	 *
+-	 *  - Flush TLBs for both L1 and L2 remote TLB flush
+ 	 *  - Honor L1's request to flush an ASID on nested VMRUN
+ 	 *  - Sync nested NPT MMU on VMRUN that flushes L2's ASID[*]
+ 	 *  - Don't crush a pending TLB flush in vmcb02 on nested VMRUN
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 371593c4b629..f7be29733c9d 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -4163,15 +4163,8 @@ static void svm_flush_tlb_asid(struct kvm_vcpu *vcpu)
+ 	 * A TLB flush for the current ASID flushes both "host" and "guest" TLB
+ 	 * entries, and thus is a superset of Hyper-V's fine grained flushing.
+ 	 */
+-	kvm_hv_vcpu_purge_flush_tlb(vcpu);
++	kvm_hv_purge_tlb_flush_fifo(vcpu);
  
- This API provides a way to read and write the pending 'event' state that is not
- visible to the guest. To save, restore or migrate a VCPU the struct representing
-@@ -1293,7 +1293,7 @@ ARM64:
- User space may need to inject several types of events to the guest.
+-	/*
+-	 * Flush only the current ASID even if the TLB flush was invoked via
+-	 * kvm_flush_remote_tlbs().  Although flushing remote TLBs requires all
+-	 * ASIDs to be flushed, KVM uses a single ASID for L1 and L2, and
+-	 * unconditionally does a TLB flush on both nested VM-Enter and nested
+-	 * VM-Exit (via kvm_mmu_reset_context()).
+-	 */
+ 	vmcb_set_flush_asid(svm->vmcb);
+ }
  
- Set the pending SError exception state for this VCPU. It is not possible to
--'cancel' an Serror that has been made pending.
-+'cancel' an SError that has been made pending.
+@@ -4193,6 +4186,8 @@ static void svm_flush_tlb_current(struct kvm_vcpu *vcpu)
  
- If the guest performed an access to I/O memory which could not be handled by
- userspace, for example because of missing instruction syndrome decode
-@@ -1832,7 +1832,7 @@ emulate them efficiently. The fields in each entry are defined as follows:
-          the values returned by the cpuid instruction for
-          this function/index combination
+ static void svm_flush_tlb_all(struct kvm_vcpu *vcpu)
+ {
++	struct vcpu_svm *svm = to_svm(vcpu);
++
+ 	/*
+ 	 * When running on Hyper-V with EnlightenedNptTlb enabled, remote TLB
+ 	 * flushes should be routed to hv_flush_remote_tlbs() without requesting
+@@ -4203,7 +4198,11 @@ static void svm_flush_tlb_all(struct kvm_vcpu *vcpu)
+ 	if (WARN_ON_ONCE(svm_hv_is_enlightened_tlb_enabled(vcpu)))
+ 		hv_flush_remote_tlbs(vcpu->kvm);
  
--x2APIC (CPUID leaf 1, ecx[21) and TSC deadline timer (CPUID leaf 1, ecx[24])
-+x2APIC (CPUID leaf 1, ecx[21]) and TSC deadline timer (CPUID leaf 1, ecx[24])
- may be returned as true, but they depend on KVM_CREATE_IRQCHIP for in-kernel
- emulation of the local APIC.  TSC deadline timer support is also reported via::
+-	svm_flush_tlb_asid(vcpu);
++	kvm_hv_vcpu_purge_flush_tlb_all(vcpu);
++
++	vmcb_set_flush_asid(svm->vmcb01.ptr);
++	if (svm->nested.vmcb02.ptr)
++		vmcb_set_flush_asid(svm->nested.vmcb02.ptr);
+ }
  
-@@ -3215,8 +3215,8 @@ default-sized hash table (16 MB).
- 
- If this ioctl is called when a hash table has already been allocated,
- with a different order from the existing hash table, the existing hash
--table will be freed and a new one allocated.  If this is ioctl is
--called when a hash table has already been allocated of the same order
-+table will be freed and a new one allocated. If this ioctl is called
-+when a hash table has already been allocated of the same order
- as specified, the kernel will clear out the existing hash table (zero
- all HPTEs).  In either case, if the guest is using the virtualized
- real-mode area (VRMA) facility, the kernel will re-create the VMRA
-@@ -4427,7 +4427,7 @@ base 2 of the page size in the bottom 6 bits.
- :Returns: 0 on successful completion,
- 	 >0 if a new HPT is being prepared, the value is an estimated
-          number of milliseconds until preparation is complete,
--         -EFAULT if struct kvm_reinject_control cannot be read,
-+         -EFAULT if struct kvm_ppc_resize_hpt cannot be read,
- 	 -EINVAL if the supplied shift or flags are invalid,
- 	 -ENOMEM if unable to allocate the new HPT,
- 
-@@ -4481,7 +4481,7 @@ ones will monitor preparation until it completes or fails.
- :Returns: 0 on successful completion,
-          -EFAULT if struct kvm_reinject_control cannot be read,
- 	 -EINVAL if the supplied shift or flags are invalid,
--	 -ENXIO is there is no pending HPT, or the pending HPT doesn't
-+	 -ENXIO if there is no pending HPT, or the pending HPT doesn't
-          have the requested size,
- 	 -EBUSY if the pending HPT is not fully prepared,
- 	 -ENOSPC if there was a hash collision when moving existing
-@@ -8884,7 +8884,7 @@ This capability indicates that KVM supports steal time accounting.
- When steal time accounting is supported it may be enabled with
- architecture-specific interfaces.  This capability and the architecture-
- specific interfaces must be consistent, i.e. if one says the feature
--is supported, than the other should as well and vice versa.  For arm64
-+is supported, then the other should as well and vice versa.  For arm64
- see Documentation/virt/kvm/devices/vcpu.rst "KVM_ARM_VCPU_PVTIME_CTRL".
- For x86 see Documentation/virt/kvm/x86/msr.rst "MSR_KVM_STEAL_TIME".
- 
-@@ -8924,7 +8924,7 @@ KVM_EXIT_X86_WRMSR exit notifications.
- 
- :Architectures: x86
- 
--This capability indicates that KVM supports that accesses to user defined MSRs
-+This capability indicates that KVM supports accesses to user defined MSRs
- may be rejected. With this capability exposed, KVM exports new VM ioctl
- KVM_X86_SET_MSR_FILTER which user space can call to specify bitmaps of MSR
- ranges that KVM should deny access to.
--- 
-2.46.0
+ static void svm_flush_tlb_gva(struct kvm_vcpu *vcpu, gva_t gva)
 
+base-commit: ba550af5af66a83ad055519b2271f6a21f28cb1b
+--
 
