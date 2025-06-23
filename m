@@ -1,78 +1,78 @@
-Return-Path: <kvm+bounces-50316-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50317-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C24A2AE3FDD
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 14:24:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E25D5AE3FE7
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 14:25:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 73852169CE4
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 12:19:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8CAFA169DB4
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 12:20:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89E1C1F4604;
-	Mon, 23 Jun 2025 12:19:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F216024A056;
+	Mon, 23 Jun 2025 12:19:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jbnq3S+9"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jjcGzoxp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 159BF1C5D62
-	for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 12:19:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 666942472B1
+	for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 12:19:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750681156; cv=none; b=ZddkuWSt9P1CktRX1wddslmmJyxn3yXCTvQXJLoKDtVwu3AG7NMNS5z4MEuFdLYqfVkxcgPAqUKKjgcwlkN/F8p9c88Oo1HBvizKwu2Fowmv8Gcu56zS+N73xFqnxYzJbvGWWBlro9z3y+4nZw+HaRdmOZrpbNoNlkXfCurDXVA=
+	t=1750681162; cv=none; b=hQm7dsEprKkUvYjevESAARpi0oBwUeGs01/jXFNJIIPzLI5N0hKMbD3NKzNwuC8BaJn7AZ13zU4PN379vxdMxPzgciQs/brlNOkSUKPi7rw7+I1PDsvWMZWDirEo1mMagnjLw1HG4jmMyhwHuXALPPRYdKjSL7dUqmiUAaxWKio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750681156; c=relaxed/simple;
-	bh=PZbL1xzCr7ASQ1pq5zWuY38koMk1pDr2cTIvzh/4/bk=;
+	s=arc-20240116; t=1750681162; c=relaxed/simple;
+	bh=s8AYUJVhitMgriSi44XbBBxGZLmELZPQQnl/IAtiIRc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=a7xEtvY5WMxQw4P3R6lvmmBm9noA6wgCVfOSBPXf1mzWM5e4CwAtOWCo5SQEF197GfD/ecPoTKp9ryoFqtloRMSCtNPx6UEzafLfwyU97cTnQV6MXEwx5H91IYbjxt52UCGRAXJmZpqqMWQLfjNnn23yxPPqjS4wsv6W+8uyT0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=jbnq3S+9; arc=none smtp.client-ip=209.85.128.50
+	 MIME-Version:Content-Type; b=bWyDEKv+0Z1YziBrsatvfss+cXUD7Yb8dULmYjHqyH755i95d94l+aYt3uEPaa/FAcZgKm4Qcjo+r/T5Jm3tRMPT7jESUWotMMarZ7ydlW290hGuKXRwKE1KY1kGucPKFztWoLsQezdk4xGV1X8CtwxlxUpmVhXcZ8Jf9h/eya8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=jjcGzoxp; arc=none smtp.client-ip=209.85.128.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-45310223677so31047765e9.0
-        for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 05:19:14 -0700 (PDT)
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-451d6ade159so30792675e9.1
+        for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 05:19:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1750681153; x=1751285953; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1750681159; x=1751285959; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=iPGemtR2ZdzEfUCvxZ4Y78uZrjiue5vwaeOrBHsS2Jw=;
-        b=jbnq3S+9VPEiUGlcvnbLMmTLNDnih0uU8gO4glL2xPmboWueYvxyfKcW/lMXvluyCQ
-         Y6D3cDq4R2ML549dUW6Tg93Z4K4gSpGfvsVCu/FEpujEJ91+CdbjprhQLwWdQiEEAjPN
-         sC6aH1Og7fvKFGP7RXaNveCtmb/jzJclnxtPce/dUQpCQGZerrK2PaW8mJVSKsGmdoPH
-         LFmVZvdohET4TKEmgfM74ZzzS9dBcd2dtpbulv2sg35GeiKzC7NBX0ZPrFrSYZrXkSsy
-         4ZWQs6ijpHZxhz/yQXX+8eEa03DksMZRFsvM2o0RD2SKEr1VxLfSJaaDzngfPLU6zjoE
-         C+zA==
+        bh=FtS7m+vqlh7Qr+Y7luF/PvAhAhpP9RBj3It7GX3FL/4=;
+        b=jjcGzoxpgxDPUSO6vRV1pkIajXfcmoXbB5WvP8KYshnJ0mX54L2LX6ZD7oC+z8olQ8
+         F2Gve52UwLGr2gmJigrFsTapmnn6ZFu0SHXgXNr0wUZdd19d4N4jTSiEPOsC3M3O6bM8
+         EXKPhd+WAgh+iXVWfLMt7lTtgehmn/ZRYGnnMje6Y08OhjoAV2wPAhChfMOe23yS5wXr
+         1G93ZDPqcoCj36nAYMgK1iDphHZXsczFVVq4cLKyVHVbDK5XkmPbcKoHp0h3DljvK3Nj
+         sUdvTPYHEXR8pFKKlDrqQ2L870MocSp3rdIUwiJVI7WiuLKE0fyE+ohbhR1pOP7SvW/n
+         7urA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750681153; x=1751285953;
+        d=1e100.net; s=20230601; t=1750681159; x=1751285959;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=iPGemtR2ZdzEfUCvxZ4Y78uZrjiue5vwaeOrBHsS2Jw=;
-        b=CRED3ONw6XOh08xiNMjOQxQ+tQaLnxaDT9ZczaRThjq3UfLcVgvRux+m2lqKwUoyFH
-         AbXRcAzQEdCIAdU1WlGk9mek2yGWXspFuB2IDTUFf+HayL3pitjLyHHO57dNhZsNqh6e
-         Vk/3sPOu7oh+x89Wq9LOZv/XoV9DeRw8JOobEj1ZDijf84mM+9hcubuLRxObiyQf6wNQ
-         5Qc9ERHkhdD7mP8nLOd8LXTPZv3AMgqCxPmntpX06Uvq4QkJXAIv6KP3HsxOwL0Is0sA
-         hji6t7IliRShauxRzD3hiu7eMx9Re64VI0VadBYWAtf3ajh7CrLB25Sh5fMvUM7x3qRh
-         nLWw==
-X-Forwarded-Encrypted: i=1; AJvYcCXHLl07DWw8fY78GwA3TAd+m1Zc5M+Y7pUs584r1DNCTztvHvrPac1+UuUZBJHnAYzlw1g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwOX/voU4gu9WskQDZ+vAncsT72CXe1ZZel/IQKlCHNS9u9tKzr
-	emF2LxmagEELqG4fag2cfWgtCQix+DhCzq0HhHAb75qtnOKLdswM1qFdyp3jVCYDdRQ=
-X-Gm-Gg: ASbGncsKwNZO03GR8e3VUGe9lJ9AxCiEH2P+j6bHeIAKGdOgwVDyq+XZGuFQtVmD4iS
-	0WeROdDbNPpeKJ98f/z7QEzlKDFBaez9ezNk80tgByP2FwsH4CqW92xZK4XpCenXVyZR2ozmbSh
-	6uhDZU4ky0BrUS3DVV702A6vD3DXM/721Nl8Htj/p8qq6SBqLwZsCZvvPjrBS3II5iogkIynKas
-	t9vodAndt1BiNLeXeyyhsWUsTXdA2RVtJiFnITmEwC8bb/BPrUewOeP0w/rVFlHZQK/7TVHbL8G
-	6hS/Va04tLUftf0XsxDzer+VEL5X9U4eRtbOnLtxhEwKW/63glaxFQUi+XChSDS7pp6hwqdlvp4
-	ABGH3/zCCy65b2UymE8a9j3aI1Ym7UrpjgUNZ
-X-Google-Smtp-Source: AGHT+IFc5MQF2NU8xSghyO4Yhud3yuPLg4Ae8wD9rvl4pDNx1QI2WiEDWAGMHEB+0CpNqwj6XAaSXQ==
-X-Received: by 2002:a05:600c:34c4:b0:450:30e4:bdf6 with SMTP id 5b1f17b1804b1-453659dccb8mr105349215e9.19.1750681153473;
-        Mon, 23 Jun 2025 05:19:13 -0700 (PDT)
+        bh=FtS7m+vqlh7Qr+Y7luF/PvAhAhpP9RBj3It7GX3FL/4=;
+        b=kLykvEUeZW0Ki8DwwJXFdBIeSLr+JRDzMn3ID50WhlwCjrcenv0fhoBhjEAiRx3KMg
+         mqTZaa+TxpW6jDFuqAfiERFZygQ3VUOyfwF7SmXB2VD5hJ1h+bxE49IxQJYZY/nP3l1R
+         JICn8PZvWBxu6K6OO5/4oGMFRletlOS8nZ0u5TALU1dJGk+z3qlD+WvlZAnATFOjJAXh
+         mBdH5/J3XCnA94IcoB7eWyZYJR7HTkPs+LqbJs1dJLx5E7u/mrZYJ0SQCyjlKBKimp47
+         MbpVJwz9y1nvWwE1b/1Qb7bOAE0RL8eSIgRiyymWKQPPUS2RIJtdCMZn8QB2eSC8wRm5
+         Ya2w==
+X-Forwarded-Encrypted: i=1; AJvYcCViV2L3N05TdGJT/M2CS6+a3OG105SEgb3Y2d0tjAfLKZKm9wtktGFWK2W/rdj72PU6BFc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxU2y4UZVK96hMBM99nWA+yKHUw0BMzxY2WsTCyb80VtaFO9p1b
+	m+L/vGzBsMK5wpeyL2m/g2urcVAxNi0h+vT8qSMrn+JZwylHhe4A7bAaGeies+Qv4rE=
+X-Gm-Gg: ASbGncu49nZyTzt8K4tAQmHzQ4Kafgqa2xrV8qMjigKZVmML4j+zQWxjqeahq93G7eY
+	hqkkCDYHDE1UPcMh5UgQTPESQ/zwxQhhNRjnYrkkeKX4cFznAf8RvxZ1/LGQNwCDRkRjQIHNewW
+	og3olTnmjaar3iKupdiT96UhIU3xdmY0WfumjffHk35mh252//43IRQcc/47RbRuNEjNq6YcNm1
+	00AA0LdBP4qDsjUqkSapjQTu1XBfCuHo0hjSBHXqvdmxAwO39ga2kNFjUNPOcwJCnLVhgkpTDZ0
+	aKz1gl/9FO2hskWOLAqAQoGFjBUDDwm4YiIuEC+mDfVS52xng8R2UHqVuhV4f0tCXAieuIy2ex2
+	DhYHFa9oKcFwffAZO5128QPMuN4PVJ6bdRqfr
+X-Google-Smtp-Source: AGHT+IFl2eAC2wXLNGcTcgz9pBye6T6IVeM4BN03TDgb6Vv2/UKfmtbrc+hijHKDuuTiPnREIJvcsA==
+X-Received: by 2002:a05:600c:314f:b0:43d:8ea:8d7a with SMTP id 5b1f17b1804b1-453656c313fmr101273355e9.28.1750681158702;
+        Mon, 23 Jun 2025 05:19:18 -0700 (PDT)
 Received: from localhost.localdomain (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a6d0f1d87fsm9323283f8f.45.2025.06.23.05.19.12
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4536fefd2b4sm51673585e9.36.2025.06.23.05.19.17
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 23 Jun 2025 05:19:13 -0700 (PDT)
+        Mon, 23 Jun 2025 05:19:18 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Leif Lindholm <leif.lindholm@oss.qualcomm.com>,
@@ -95,9 +95,9 @@ Cc: Leif Lindholm <leif.lindholm@oss.qualcomm.com>,
 	Phil Dennis-Jordan <phil@philjordan.eu>,
 	Richard Henderson <richard.henderson@linaro.org>,
 	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH v3 05/26] target/arm/hvf: Directly re-lock BQL after hv_vcpu_run()
-Date: Mon, 23 Jun 2025 14:18:24 +0200
-Message-ID: <20250623121845.7214-6-philmd@linaro.org>
+Subject: [PATCH v3 06/26] target/arm/hvf: Trace hv_vcpu_run() failures
+Date: Mon, 23 Jun 2025 14:18:25 +0200
+Message-ID: <20250623121845.7214-7-philmd@linaro.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250623121845.7214-1-philmd@linaro.org>
 References: <20250623121845.7214-1-philmd@linaro.org>
@@ -110,37 +110,45 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Keep bql_unlock() / bql_lock() close.
+Allow distinguishing HV_ILLEGAL_GUEST_STATE in trace events.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-Acked-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/hvf/hvf.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ target/arm/hvf/hvf.c        | 10 +++++++++-
+ target/arm/hvf/trace-events |  1 +
+ 2 files changed, 10 insertions(+), 1 deletion(-)
 
 diff --git a/target/arm/hvf/hvf.c b/target/arm/hvf/hvf.c
-index c1ed8b510db..ef76dcd28de 100644
+index ef76dcd28de..cc5bbc155d2 100644
 --- a/target/arm/hvf/hvf.c
 +++ b/target/arm/hvf/hvf.c
-@@ -1914,7 +1914,9 @@ int hvf_vcpu_exec(CPUState *cpu)
-     flush_cpu_state(cpu);
- 
+@@ -1916,7 +1916,15 @@ int hvf_vcpu_exec(CPUState *cpu)
      bql_unlock();
--    assert_hvf_ok(hv_vcpu_run(cpu->accel->fd));
-+    r = hv_vcpu_run(cpu->accel->fd);
-+    bql_lock();
-+    assert_hvf_ok(r);
+     r = hv_vcpu_run(cpu->accel->fd);
+     bql_lock();
+-    assert_hvf_ok(r);
++    switch (r) {
++    case HV_SUCCESS:
++        break;
++    case HV_ILLEGAL_GUEST_STATE:
++        trace_hvf_illegal_guest_state();
++        /* fall through */
++    default:
++        g_assert_not_reached();
++    }
  
      /* handle VMEXIT */
      uint64_t exit_reason = hvf_exit->reason;
-@@ -1922,7 +1924,6 @@ int hvf_vcpu_exec(CPUState *cpu)
-     uint32_t ec = syn_get_ec(syndrome);
- 
-     ret = 0;
--    bql_lock();
-     switch (exit_reason) {
-     case HV_EXIT_REASON_EXCEPTION:
-         /* This is the main one, handle below. */
+diff --git a/target/arm/hvf/trace-events b/target/arm/hvf/trace-events
+index 4fbbe4b45ec..a4870e0a5c4 100644
+--- a/target/arm/hvf/trace-events
++++ b/target/arm/hvf/trace-events
+@@ -11,3 +11,4 @@ hvf_exit(uint64_t syndrome, uint32_t ec, uint64_t pc) "exit: 0x%"PRIx64" [ec=0x%
+ hvf_psci_call(uint64_t x0, uint64_t x1, uint64_t x2, uint64_t x3, uint32_t cpuid) "PSCI Call x0=0x%016"PRIx64" x1=0x%016"PRIx64" x2=0x%016"PRIx64" x3=0x%016"PRIx64" cpu=0x%x"
+ hvf_vgic_write(const char *name, uint64_t val) "vgic write to %s [val=0x%016"PRIx64"]"
+ hvf_vgic_read(const char *name, uint64_t val) "vgic read from %s [val=0x%016"PRIx64"]"
++hvf_illegal_guest_state(void) "HV_ILLEGAL_GUEST_STATE"
 -- 
 2.49.0
 
