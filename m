@@ -1,80 +1,87 @@
-Return-Path: <kvm+bounces-50339-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50340-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6D86AE4094
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 14:38:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95598AE4184
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 15:03:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E84F3166A75
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 12:36:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B30C3A225B
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 13:01:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3995248F64;
-	Mon, 23 Jun 2025 12:35:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08B00230BC2;
+	Mon, 23 Jun 2025 13:01:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="r7QXQo0U"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TwlqAR9s"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2167C2475C8
-	for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 12:35:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5938D30E84D
+	for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 13:01:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750682147; cv=none; b=Tiqdv/eT0nXk3MMHreu77JM/nbwE3iRfGP+iDztcri/6IHIghSHnlao1cGg7nqJtyXg3enr8AKtD1S/ZlUsRofSaMN/Ag8ugX3JnlhdHTQiXNVw/Q1Tfmv+63Ne5t6dQrzyOdXnnU6FBcSi5XXPgaLxR1hjwq3k5hDwM2ojuRBs=
+	t=1750683714; cv=none; b=mFJ6M1OKmizyPrHoN+i3a3X6xeBlGzn6ELvMXAXSIujDmqPBiYfgZHlxt2wiu+Mbv8+SUuZVES4j1gWLqTgDh1C/WI8FcbvKiFZq1jamNRVh7qLj2Y4xO/o1bv8PizkRZ2I6P326CQTv3F3mIUD6iRCl3TwEhbcJra3gAXLMkTA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750682147; c=relaxed/simple;
-	bh=/lBuAUZ14QRJ06R4lWguq0BNnee6uvtTYgiN12pGz2g=;
+	s=arc-20240116; t=1750683714; c=relaxed/simple;
+	bh=GBJwZ2gncR37FxBpWiGDPUgB1p0hhBvAXpZwR1E3EAU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZGsaxRdjg2HAImP0KeySmVK6/clNCRn8aWuGtkC0TM3I+fddJJe//9MzQ7cab1UkPwFi8/iZe5EJQXx/wHvjgW6HYZ22AjylGgvuhMC+kweTaX7UKa8nz8bTCpD9Wsvq7OS3joJ0tqLzrZB6SdeNo36sLsUy5lRfcjuHm0RBe3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=r7QXQo0U; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-236192f8770so28306555ad.0
-        for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 05:35:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1750682143; x=1751286943; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=P2J6CJVh9SDJQfR/08bZkzuItlJ/LKWv0StLwptfBoc=;
-        b=r7QXQo0UHQb03C+1ENvwAm1zRI9dffYzXHOZNSKbkC9f7lA0U5JAIaLfzrsDc1Y1YM
-         HW6saxChfCxq9vvmM9fuIybM+3dy0Ff5BQiZdUCGlcNk5L240XWVTm5+85WGbSojFpke
-         BjD8w4nUxQMFw2ucUGch/WiwNUQgZnhzw1KaMzryyZibvgJtikz93kt34m61aKElKXaY
-         OqxEG7wr3KXbQJ86E2pg3+agAUa6PxFoTOTCPPwstGgYK6RP9NLZcblLtdmY6dnLgW8a
-         H+x6EVidGzLzx3oQNLySkRnlTXOi6NxVnavUnG72ZmsIjSO7MN8Zl9CzH+n3tZzzG+wy
-         NvRw==
+	 In-Reply-To:Content-Type; b=QiP+rsfGxXX9kEHrK4GPogSsErwgKZeoycvCtmOyiSQVAoGgFBRB0/0dEXHHi6EKGdd9VGc/KdRbH+c9HhvyNOvkXNGwIQrllif7OP8Ta0JPLvnRH7LBkCBn0uZ6yOMk6orPeKORzWOmHw6TvhGaFclIsSEZo9e824bngCXYTGs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TwlqAR9s; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1750683711;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=JH5umFS36US7IDsZT2yyveGcuseLmnIc9KBJy2RGDsk=;
+	b=TwlqAR9som06MZDcdtOxrlnG/aLhzyaVMxpYVjJwPZKMJ+vqDUbbMc9eOn96MkcPJxFibb
+	VbpNpUcPr+QQR8U4l5HtQpIpLQDfqhK6fboeurZ2dGaNKwtU+8FK+dA/6Ppzwr4MW8xObz
+	E2ydmDZa4U38xeXCWv+CpuaQVA761yI=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-318-r7z7kp5NNJ6_kSLYZxFDnQ-1; Mon, 23 Jun 2025 09:01:50 -0400
+X-MC-Unique: r7z7kp5NNJ6_kSLYZxFDnQ-1
+X-Mimecast-MFC-AGG-ID: r7z7kp5NNJ6_kSLYZxFDnQ_1750683709
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-45311704cdbso28260155e9.1
+        for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 06:01:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750682143; x=1751286943;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=P2J6CJVh9SDJQfR/08bZkzuItlJ/LKWv0StLwptfBoc=;
-        b=hXVu4/tltQVtD1dESk5mqYwitB84YOpQkz/fyK2/XAfk5/6Ti/VPZ7mc4g2wseTyfD
-         6347zppC8/Dbqvjd8d2xsu0Ulzm00I7yUTAn0I2OrwtqQ/EY89Uiu5HYCxTTRhNYEZRT
-         dWYdgkydztEO0YX1G62Vs4jXL3RIZCspQklUmkq7fbp6FHcIFcdiXTsxYramQoHVVPG5
-         JFZmfHjj+63/RD20ctoyaXVLKehmaydwruZ7TSczEXrX7xSYpW06d+3dKgTJvTGxl/XA
-         pgaDUWrBv21o3Q8GU7VoAwiTaw1jXkt9AhyPzn6GbiiV1EloE8g44mHKEWEtRAiFqQkc
-         La0Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWNqJwbzZOHAdVZnBsQ9W/CFa1sNqpthpeeyQ5n+Y1X4Koh5k0+00VAikR5DD8NoMdXfqY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7w3r49tfxiCp3fx86kJT0bPa41VZ8QlQHBujmy1LMm+KmNJ+K
-	yyLrqmAWexXbpeQpFP1VLFicePUMwjrrchFZIDRoAIAZSaO4Wto8rFZNr7kXQgHXfMo=
-X-Gm-Gg: ASbGncujfOG3fD3a2hcW3Vz76dItviscQK/NRfs4qNBUr3oFw5TgZYT8pnzEf0gUsh4
-	B2yI9uoK6u0YVe/LUgSNLfBGtWl+liTzgTxE3RHfhU+g/8Om1Xs31YaV2vVqWkQxPS+D9Z1zrLn
-	9//cZrplAFc6VfpSbp6t9kF9QQPku9ytXKOnwjHHsbJzDa5DtbVp5g/u4OX3E9phcrgyu6nQXHk
-	jQBGpg9da370z+4lekJ88cgP8jl0Ruro7p9rWk80glme32bjzsZdaH+AEtJrQ2MFjvT5VNhFxBg
-	uGgvdb5+js0j4IUPvA0zFj3aWX5vKwpdx7nmkAnZmvT4uXGNa+iOOcAo1K8/mezPYSoXhEx1NFU
-	Rq8xtjgwpjymipjYmaY/t9ZdVboNqGlo=
-X-Google-Smtp-Source: AGHT+IFhVMOOzfJS+ZMgN2t/2S1KtBErjLzrLACr83Lp9bfsIO8qJQHyS7OUG+hyXIaKHaCPahxILg==
-X-Received: by 2002:a17:902:e88f:b0:231:c89f:4e94 with SMTP id d9443c01a7336-237db0d6afbmr183457395ad.21.1750682143178;
-        Mon, 23 Jun 2025 05:35:43 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:e17:9700:16d2:7456:6634:9626? ([2a01:e0a:e17:9700:16d2:7456:6634:9626])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-237d87182b2sm83217035ad.231.2025.06.23.05.35.35
+        d=1e100.net; s=20230601; t=1750683709; x=1751288509;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=JH5umFS36US7IDsZT2yyveGcuseLmnIc9KBJy2RGDsk=;
+        b=Oo23/kwZ1IQVC4mSjIbLjwL0MGXHpfIOADTKNQacRSLMIPgGIldBw7TXmDv9DdgHFc
+         KEgE8WXr1nlHG9waawpZbU88qf7vt78irg+eRoWdliLrW+ZZXjyttRAB/B64kXO1vU9E
+         O2UKTQ3urQyocQya4d3p1WpC4MjgC65V7g7Z9fdR1Op2TJob8uUHVOFdry3cVLl6EaFg
+         zKXupus9Ah/BLzfEPjASM2D1ZABNQbVVaJ/bEU7oK297fbLg5R7/924AvTNDB3Dip5bf
+         V55FJYiCpCCJS3CfdbNFRbK/Yerk6Tw6978KWLA4C+bh9TQPhRjopfYoVRJEL3BKSlph
+         KWOQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV0Li2neRuqOXpmG15yFuq2Q9oTPWZmIDqAOsah2MTt3TMXPVkkeWS/E8QLQoQWaCsH1Y0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxpVZ8Ag3NWonTdHFVMWGtsbvmBF1aSLne/9oMNm79ucR/bHj1k
+	wJ4MsDSQAn7bz5chT1pZXQmdwDbvRzq/cne9ak+QoJ1PL1Lb1ez01qsqqbodq42yekK+nMP4bBO
+	FMHNMm9O1TnQHwzVg5+SSsbwEBFe9/phSSR0JUEP8fj2jMQJeF5S5hQ==
+X-Gm-Gg: ASbGncv008IFGPb9Wz+fPTj6dmobEyotOe7XBF3KCAbSogXLO0RqMT25Us35ZtN2biD
+	oTUdxhJkeV9/wZVgUxyiAsA7L+XERKj/MdazSl2YMCtBQvkCSmpdYX3vijkY1lPMELVmmyfBDf6
+	fKVWRIpJApz09PYGsV+6Dnab3Dn2hK8Cr25oHJ1g6tL7nMSL3ca2aZv7EO9IS88yTEkTB/ovvrL
+	iFN7gltZTUgE07JPxAlacbhCGyRfISlmttjFC0dL14ePhUvKaRoaFTJYmGGtLhGr7dGEbllcX01
+	2ilyod26faxacXB9SNjMD7zPulzlHm5LmXr3T/Op4Ds6d0jSOTf5BiWLQQF+Y1A=
+X-Received: by 2002:a05:600c:6994:b0:453:dda:a52e with SMTP id 5b1f17b1804b1-453659d762cmr95488495e9.33.1750683708552;
+        Mon, 23 Jun 2025 06:01:48 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF4LNS7iB5vBtQ6zs4YvFzVlcbYjrW33VP4WFNfO45dGrtWDPfaFa8IJ6jz55xc+W6h2c8R/Q==
+X-Received: by 2002:a05:600c:6994:b0:453:dda:a52e with SMTP id 5b1f17b1804b1-453659d762cmr95487845e9.33.1750683708001;
+        Mon, 23 Jun 2025 06:01:48 -0700 (PDT)
+Received: from [192.168.0.7] (ltea-047-064-114-166.pools.arcor-ip.net. [47.64.114.166])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4536c77b980sm68667655e9.23.2025.06.23.06.01.41
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Jun 2025 05:35:42 -0700 (PDT)
-Message-ID: <4f47fae6-f516-4b6f-931e-92ee7c406314@rivosinc.com>
-Date: Mon, 23 Jun 2025 14:35:32 +0200
+        Mon, 23 Jun 2025 06:01:43 -0700 (PDT)
+Message-ID: <0107a85c-3335-478a-9414-55cfdd2f763b@redhat.com>
+Date: Mon, 23 Jun 2025 15:01:40 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,127 +89,112 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [External] Re: [PATCH] RISC-V: KVM: Delegate illegal instruction
- fault
-To: Xu Lu <luxu.kernel@bytedance.com>
-Cc: =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@ventanamicro.com>,
- anup@brainfault.org, atish.patra@linux.dev, paul.walmsley@sifive.com,
- palmer@dabbelt.com, aou@eecs.berkeley.edu, alex@ghiti.fr,
- kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
- linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
- linux-riscv <linux-riscv-bounces@lists.infradead.org>
-References: <20250620091720.85633-1-luxu.kernel@bytedance.com>
- <DARCHDIZG7IP.2VTEVNMVX8R1E@ventanamicro.com>
- <1d9ad2a8-6ab5-4f5e-b514-4a902392e074@rivosinc.com>
- <CAPYmKFs7tmMg4VQX=5YFhSzDGxodiBxv+v1SoqwTHvE1Khsr_A@mail.gmail.com>
+Subject: Re: [PATCH v3 26/26] tests/functional: Expand Aarch64 SMMU tests to
+ run on HVF accelerator
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ qemu-devel@nongnu.org
+Cc: Leif Lindholm <leif.lindholm@oss.qualcomm.com>, qemu-arm@nongnu.org,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ Roman Bolshakov <rbolshakov@ddn.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Alexander Graf <agraf@csgraf.de>, Bernhard Beschow <shentey@gmail.com>,
+ John Snow <jsnow@redhat.com>, =?UTF-8?Q?Marc-Andr=C3=A9_Lureau?=
+ <marcandre.lureau@redhat.com>, kvm@vger.kernel.org,
+ Eric Auger <eric.auger@redhat.com>, Peter Maydell
+ <peter.maydell@linaro.org>, Cameron Esfahani <dirty@apple.com>,
+ Cleber Rosa <crosa@redhat.com>, Radoslaw Biernacki <rad@semihalf.com>,
+ Phil Dennis-Jordan <phil@philjordan.eu>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+References: <20250623121845.7214-1-philmd@linaro.org>
+ <20250623121845.7214-27-philmd@linaro.org>
+From: Thomas Huth <thuth@redhat.com>
 Content-Language: en-US
-From: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
-In-Reply-To: <CAPYmKFs7tmMg4VQX=5YFhSzDGxodiBxv+v1SoqwTHvE1Khsr_A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Autocrypt: addr=thuth@redhat.com; keydata=
+ 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
+In-Reply-To: <20250623121845.7214-27-philmd@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-
-
-On 23/06/2025 14:12, Xu Lu wrote:
-> Hi Clément,
+On 23/06/2025 14.18, Philippe Mathieu-Daudé wrote:
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+> ---
+>   tests/functional/test_aarch64_smmu.py | 12 +++++++++---
+>   1 file changed, 9 insertions(+), 3 deletions(-)
 > 
-> On Mon, Jun 23, 2025 at 4:05 PM Clément Léger <cleger@rivosinc.com> wrote:
->>
->>
->>
->> On 20/06/2025 14:04, Radim Krčmář wrote:
->>> 2025-06-20T17:17:20+08:00, Xu Lu <luxu.kernel@bytedance.com>:
->>>> Delegate illegal instruction fault to VS mode in default to avoid such
->>>> exceptions being trapped to HS and redirected back to VS.
->>>>
->>>> Signed-off-by: Xu Lu <luxu.kernel@bytedance.com>
->>>> ---
->>>> diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
->>>> @@ -48,6 +48,7 @@
->>>> +                                     BIT(EXC_INST_ILLEGAL)    | \
->>>
->>> You should also remove the dead code in kvm_riscv_vcpu_exit.
->>>
->>> And why not delegate the others as well?
->>> (EXC_LOAD_MISALIGNED, EXC_STORE_MISALIGNED, EXC_LOAD_ACCESS,
->>>  EXC_STORE_ACCESS, and EXC_INST_ACCESS.)
->>
->> Currently, OpenSBI does not delegate misaligned exception by default and
->> handles misaligned access by itself, this is (partially) why we added
->> the FWFT SBI extension to request such delegation. Since some supervisor
->> software expect that default, they do not have code to handle misaligned
->> accesses emulation. So they should not be delegated by default.
-> 
-> It doesn't matter whether these exceptions are delegated in medeleg.
+> diff --git a/tests/functional/test_aarch64_smmu.py b/tests/functional/test_aarch64_smmu.py
+> index c65d0f28178..e0f4a922176 100755
+> --- a/tests/functional/test_aarch64_smmu.py
+> +++ b/tests/functional/test_aarch64_smmu.py
+> @@ -17,7 +17,7 @@
+>   
+>   from qemu_test import LinuxKernelTest, Asset, exec_command_and_wait_for_pattern
+>   from qemu_test import BUILD_DIR
+> -from qemu.utils import kvm_available
+> +from qemu.utils import kvm_available, hvf_available
+>   
+>   
+>   class SMMU(LinuxKernelTest):
+> @@ -45,11 +45,17 @@ def set_up_boot(self, path):
+>           self.vm.add_args('-device', 'virtio-net,netdev=n1' + self.IOMMU_ADDON)
+>   
+>       def common_vm_setup(self, kernel, initrd, disk):
+> -        self.require_accelerator("kvm")
+> +        if hvf_available(self.qemu_bin):
+> +            accel = "hvf"
+> +        elif kvm_available(self.qemu_bin):
+> +            accel = "kvm"
+> +        else:
+> +            self.skipTest("Neither HVF nor KVM accelerator is available")
+> +        self.require_accelerator(accel)
+>           self.require_netdev('user')
+>           self.set_machine("virt")
+>           self.vm.add_args('-m', '1G')
+> -        self.vm.add_args("-accel", "kvm")
+> +        self.vm.add_args("-accel", accel)
+>           self.vm.add_args("-cpu", "host")
+>           self.vm.add_args("-machine", "iommu=smmuv3")
+>           self.vm.add_args("-d", "guest_errors")
 
-Not sure to totally understand, but if the exceptions are not delegated
-in medeleg, they won't be delegated to VS-mode even though hedeleg bit
-is set right ? The spec says:
-
-A synchronous trap that has been delegated to HS-mode (using medeleg)
-is further delegated to VS-mode if V=1 before the trap and the
-corresponding hedeleg bit is set.
-
-
-
-> KVM in HS-mode does not handle illegal instruction or misaligned
-> access and only redirects them back to VS-mode. Delegating such
-> exceptions in hedeleg helps save CPU usage even when they are not
-> delegated in medeleg: opensbi will check whether these exceptions are
-> delegated to VS-mode and redirect them to VS-mode if possible. There
-> seems to be no conflicts with SSE implementation. Please correct me if
-> I missed anything.
-
-AFAIU, this means that since medeleg bit for misaligned accesses were
-not delegated up to the introduction of the FWFT extension, VS-mode
-generated misaligned accesses were handled by OpenSBI right ? Now that
-we are requesting openSBI to delegate misaligned accesses, HS-mode
-handles it's own misaligned accesses through the trap handler. With that
-configuration, if VS-mode generate a misaligned access, it will end up
-being redirected to VS-mode and won't be handle by HS-mode.
-
-To summarize, prior to FWFT, medeleg wasn't delegating misaligned
-accesses to S-mode:
-
-- VS-mode misaligned access -> trap to M-mode -> OpenSBI handle it ->
-Back to VS-mode, misaligned access fixed up by OpenSBI
-
-Now that Linux uses SBI FWFT to delegates misaligned accesses (without
-hedeleg being set for misaligned delegation, but that doesn't really
-matter, the outcome is the same):
-
-- VS-mode misaligned access -> trap to HS-mode -> redirection to
-VS-mode, needs to handle the misaligned access by itself
-
-
-This means that previously, misaligned access were silently fixed up by
-OpenSBI for VS-mode and now that FWFT is used for delegation, this isn't
-true anymore. So, old kernel or sueprvisor software that  included code
-to handle misaligned accesses will crash. Did I missed something ?
-
-Note: this is not directly related to your series but my introduction of
-FWFT !
-
-Thanks,
-
-Clément
-
-> 
-> Best Regards,
-> Xu Lu
-> 
->>
->> Thanks,
->>
->> Clément
->>
->>>
->>> Thanks.
->>>
->>> _______________________________________________
->>> linux-riscv mailing list
->>> linux-riscv@lists.infradead.org
->>> http://lists.infradead.org/mailman/listinfo/linux-riscv
->>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
 
