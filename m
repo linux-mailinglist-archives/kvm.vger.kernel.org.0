@@ -1,182 +1,315 @@
-Return-Path: <kvm+bounces-50282-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50283-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BF19AE3803
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 10:12:10 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C1A2AE3824
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 10:16:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E4373AC8D8
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 08:11:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4E5A27A1C17
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 08:15:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52EB6214801;
-	Mon, 23 Jun 2025 08:11:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8C8121CA02;
+	Mon, 23 Jun 2025 08:15:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gLAnU5vO"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="SVKr2+ZJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1E9C20B21F
-	for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 08:11:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC6B721765E;
+	Mon, 23 Jun 2025 08:15:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750666296; cv=none; b=WTMVVvkCu/ZC41wF67hmS3dSdAm0rbrIT0vN9jR9qI3RAnpVjRXRZWjfGC9ZFMIQ0LAia9lWGxLHhkkrt0mWNqqWUHUZhOJ8Kv7MFi3t0cBh+dFuFoTlgbeOakamLo4gT5dh5234y5NvPFhe+24ZZYljhPoZoY1d1dgx02oGtu0=
+	t=1750666546; cv=none; b=SxJLtz+QMd5p2FYbeXWoq8gTJiuuMaXPkidwSlEHCEjxTcFaOnMnpBel3TtedMOXnX2oXIPwOejAKIaCe5K05/DrjFH6qDzUqyEmH9PL8JjN5qGE+J74UwqZd0Kqymita179yBgbhueEBa2yZ37yje95xefhR4AQz6VhoXnp08w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750666296; c=relaxed/simple;
-	bh=aC8+uxDmWIrzSevxm/X2hVTLaOC6Eel/5GpTc4HwRvs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=r1AT/7gfZlIAu8TMhtMuLaXj6GwCOnxMZjb9YM5BqbZMLMXJgP9L1BJfpkeo4GAbrRCUAjGcDrnAeqaF0faLPJErRKvHJzatsaph/Nj9OtVRdvP11OJVROy5liAPhaAq/KQAQhk3WgV+5vjNNANMbUKqY2fDp3qrFuM9vGr1Jeo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gLAnU5vO; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750666293;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=+4kwDZoN4WuZV3NRgPforPSd1oPFe1fZw2u/4KSFCas=;
-	b=gLAnU5vOUDfz8K+y8QB7zVpuP8qoNdJyXqaLQgCna+mQ0XhFmGvRKefBw4KUH5g90PcnCa
-	zmS0oRC/FHPzQGtrKCjWQ449XjnYHMMBZYV1b+0g6kJ2NmmbP58bAKOOV3uj7HerVO1Gqf
-	eB87w94GDrZOzTtPUtlRnVmstoxpgkQ=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-283-6kTx_oXgMjejgPP0RWNwFg-1; Mon, 23 Jun 2025 04:11:31 -0400
-X-MC-Unique: 6kTx_oXgMjejgPP0RWNwFg-1
-X-Mimecast-MFC-AGG-ID: 6kTx_oXgMjejgPP0RWNwFg_1750666290
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43eed325461so23335755e9.3
-        for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 01:11:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750666290; x=1751271090;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+4kwDZoN4WuZV3NRgPforPSd1oPFe1fZw2u/4KSFCas=;
-        b=vYIAak1lhkghMVmSz0iZd2D3T32DjREMpRlr7l1BBvrUjURhvrSxs/HwolSDaKkX/j
-         ElXU0J7jThEZdFMzfLBl3QM/KLw8Zv3emcC64AYS0st1Tz1UlNLzFR1o5YSSH1nfFDHM
-         OFunJ0SNrmg4DAYeZYu/W1GQWja3kWGNsh0MG5gO7vmEIYzvzRYqu27a2k6rxBO5271S
-         eSZ7xxVKVPUhGGyXQuWGGpCMNmK2e2zOBQbdQn8lQS47lHUgVZF2JxwmO9cd412f884h
-         FIWU8/a+fneSTW3Dl1XvARdDxq/dHZFuar72fJhy6o6BcR/T4V6JkxNnWn680SMWaULn
-         Zcwg==
-X-Forwarded-Encrypted: i=1; AJvYcCVSznoSeJKAAYcMYg8M9rfIw5XtR9eApYh8W0YW8VELFfExHIwVsUJJeMG9xbeHxLKhNsI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxSu6FyvjnBG6o3+/SbmK4q3Qvy5laNhtoEuO2NAgHFP12VW8aN
-	bZ0K7k+Z2pIB2rwFHRp2mXDMxZ3CSGtTCfT1hmLV7PcpU6F2NZLGy+ne8P/x3Yp96A/2GRfOq2B
-	DIE1vkLXvYA8GF26X74zV/vixuRVHB+LOW+InxmpE90Dax1a4BiGS4w==
-X-Gm-Gg: ASbGncs5FZXzGTCWlUqB/7fFoVcd3hfQfuEOg2Mln3RxYepN/Tqq09sUy79RDkuF6PV
-	wppqanzmYgXizl142XSLunR6Ms0KtgjkIpXmrVIXvAxThcFCPsRzcTHMEgbV4VUZ8276ejxB6Tw
-	teFj3oCkWSxXpJ/bbxblZSlRCDtA346+boFwO8xwjBa/nCEJmrE7BV/yYb4czW0yy+cRPsHbAC0
-	GZtbiwy87BqqaJToth9xNzitatGDoCL3JuqaADACOxEXEPIQiIY7seMY9pS5it1RxzJVTA4ZnKP
-	IUROL/s/9XdRnHfoqP1KbnILWxFJj4rIzdx25AHCxWhmpu7z2N3B1VjXqqG7rFo=
-X-Received: by 2002:a05:600c:8b16:b0:450:d07e:ee14 with SMTP id 5b1f17b1804b1-453659ec1abmr113476335e9.17.1750666290161;
-        Mon, 23 Jun 2025 01:11:30 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFHSYgSB4RkTnj610mYZpPuQtR08xMN75sCP8xsdfL+ouLLJm/LeU7UknZje+KpOoeMWPUthQ==
-X-Received: by 2002:a05:600c:8b16:b0:450:d07e:ee14 with SMTP id 5b1f17b1804b1-453659ec1abmr113475855e9.17.1750666289717;
-        Mon, 23 Jun 2025 01:11:29 -0700 (PDT)
-Received: from [192.168.0.7] (ltea-047-064-114-166.pools.arcor-ip.net. [47.64.114.166])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45364708658sm103184065e9.39.2025.06.23.01.11.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Jun 2025 01:11:29 -0700 (PDT)
-Message-ID: <497fc7b1-dfd2-49ad-938c-47fca1153590@redhat.com>
-Date: Mon, 23 Jun 2025 10:11:24 +0200
+	s=arc-20240116; t=1750666546; c=relaxed/simple;
+	bh=oWaLno2jghHGxOOM1bpwiZyNygJib3Fz8auzEnje6PA=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=aB8IioWxWID3nhLrLgOGpxYH3zkx71r/xlQJgZQvRuzExHDrk3ZPeStrCwly/FXVraUL9SVzAX0XqCT0GQKreQ9mixxih8KJPByL6sx/IDfNXjaQDC4jV/PJ4v2GijBJN7yL+V+fKzpLk+aWnPL4ysYI9bf4rksyFKuqcb5DHoo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=SVKr2+ZJ; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [127.0.0.1] (c-76-133-66-138.hsd1.ca.comcast.net [76.133.66.138])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 55N8EZ2k849578
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Mon, 23 Jun 2025 01:14:36 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 55N8EZ2k849578
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025062101; t=1750666477;
+	bh=AoKIdPnx8xVTIRqp1qpXyfALh7/bYlMAwvrF4K2eNhU=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+	b=SVKr2+ZJQMI9qgqsVaJ5r/kYrXDtr6uUTxeYHwZwRdfmPlF7BGXQWyO7Y5EY62FOh
+	 IjZe3OI4dr4KpIPPK5AoSGh9MUqNxkWkHsT1qF8P7HsOfYpArv6ZbzEiJddJLSe7hI
+	 crGeeQCz4kq/2ODxsEoP1TWN4tP+PJowi+oSnFozGybGhzJEROFRTppdCsc1lItJ3P
+	 TAfQUK2Kznl8lUBglCwgkcQzzYEnxETkpX+Nv4HKkrhIZWNVLiQPB7NUO9xYMa98Ey
+	 tflngl5O0zdpviLjb9oWi9UpGPXp7R8DcwxJzarLzvQBywmytdwf/uQjWGUsEqVZUr
+	 xD4MybPFCkJBQ==
+Date: Mon, 23 Jun 2025 01:14:35 -0700
+From: "H. Peter Anvin" <hpa@zytor.com>
+To: Ethan Zhao <haifeng.zhao@linux.intel.com>,
+        "Xin Li (Intel)" <xin@zytor.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, stable@vger.kernel.org
+CC: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, seanjc@google.com,
+        pbonzini@redhat.com, peterz@infradead.org, sohil.mehta@intel.com,
+        brgerst@gmail.com, tony.luck@intel.com, fenghuay@nvidia.com
+Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v4_1/2=5D_x86/traps=3A_Initialize_D?=
+ =?US-ASCII?Q?R6_by_writing_its_architectural_reset_value?=
+User-Agent: K-9 Mail for Android
+In-Reply-To: <4018038c-8c96-49e0-b6b7-f54e0f52a65f@linux.intel.com>
+References: <20250620231504.2676902-1-xin@zytor.com> <20250620231504.2676902-2-xin@zytor.com> <4018038c-8c96-49e0-b6b7-f54e0f52a65f@linux.intel.com>
+Message-ID: <7C732492-F1F9-403B-A722-9EA563795B1B@zytor.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 23/26] tests/functional: Restrict nexted Aarch64 Xen
- test to TCG
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
- qemu-devel@nongnu.org
-Cc: Leif Lindholm <leif.lindholm@oss.qualcomm.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Radoslaw Biernacki <rad@semihalf.com>, Alexander Graf <agraf@csgraf.de>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>,
- Phil Dennis-Jordan <phil@philjordan.eu>, =?UTF-8?Q?Alex_Benn=C3=A9e?=
- <alex.bennee@linaro.org>, Bernhard Beschow <shentey@gmail.com>,
- Cleber Rosa <crosa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- Cameron Esfahani <dirty@apple.com>, kvm@vger.kernel.org,
- qemu-arm@nongnu.org, Eric Auger <eric.auger@redhat.com>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- Roman Bolshakov <rbolshakov@ddn.com>, John Snow <jsnow@redhat.com>
-References: <20250620130709.31073-1-philmd@linaro.org>
- <20250620130709.31073-24-philmd@linaro.org>
-From: Thomas Huth <thuth@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=thuth@redhat.com; keydata=
- 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
-In-Reply-To: <20250620130709.31073-24-philmd@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 20/06/2025 15.07, Philippe Mathieu-Daudé wrote:
-> On macOS this test fails:
-> 
->    qemu-system-aarch64: mach-virt: HVF does not support providing Virtualization extensions to the guest CPU
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-> ---
->   tests/functional/test_aarch64_xen.py | 1 +
->   1 file changed, 1 insertion(+)
-> 
-> diff --git a/tests/functional/test_aarch64_xen.py b/tests/functional/test_aarch64_xen.py
-> index 339904221b0..261d796540d 100755
-> --- a/tests/functional/test_aarch64_xen.py
-> +++ b/tests/functional/test_aarch64_xen.py
-> @@ -33,6 +33,7 @@ def launch_xen(self, xen_path):
->           """
->           Launch Xen with a dom0 guest kernel
->           """
-> +        self.require_accelerator("tcg") # virtualization=on
+On June 22, 2025 11:49:11 PM PDT, Ethan Zhao <haifeng=2Ezhao@linux=2Eintel=
+=2Ecom> wrote:
+>
+>=E5=9C=A8 2025/6/21 7:15, Xin Li (Intel) =E5=86=99=E9=81=93:
+>> Initialize DR6 by writing its architectural reset value to avoid
+>> incorrectly zeroing DR6 to clear DR6=2EBLD at boot time, which leads
+>> to a false bus lock detected warning=2E
+>>=20
+>> The Intel SDM says:
+>>=20
+>>    1) Certain debug exceptions may clear bits 0-3 of DR6=2E
+>>=20
+>>    2) BLD induced #DB clears DR6=2EBLD and any other debug exception
+>>       doesn't modify DR6=2EBLD=2E
+>>=20
+>>    3) RTM induced #DB clears DR6=2ERTM and any other debug exception
+>>       sets DR6=2ERTM=2E
+>>=20
+>>    To avoid confusion in identifying debug exceptions, debug handlers
+>>    should set DR6=2EBLD and DR6=2ERTM, and clear other DR6 bits before
+>>    returning=2E
+>>=20
+>> The DR6 architectural reset value 0xFFFF0FF0, already defined as
+>> macro DR6_RESERVED, satisfies these requirements, so just use it to
+>> reinitialize DR6 whenever needed=2E
+>>=20
+>> Since clear_all_debug_regs() no longer zeros all debug registers,
+>> rename it to initialize_debug_regs() to better reflect its current
+>> behavior=2E
+>>=20
+>> Since debug_read_clear_dr6() no longer clears DR6, rename it to
+>> debug_read_reset_dr6() to better reflect its current behavior=2E
+>>=20
+>> Reported-by: Sohil Mehta <sohil=2Emehta@intel=2Ecom>
+>> Link: https://lore=2Ekernel=2Eorg/lkml/06e68373-a92b-472e-8fd9-ba548119=
+770c@intel=2Ecom/
+>> Fixes: ebb1064e7c2e9 ("x86/traps: Handle #DB for bus lock")
+>> Suggested-by: H=2E Peter Anvin (Intel) <hpa@zytor=2Ecom>
+>> Tested-by: Sohil Mehta <sohil=2Emehta@intel=2Ecom>
+>> Reviewed-by: H=2E Peter Anvin (Intel) <hpa@zytor=2Ecom>
+>> Reviewed-by: Sohil Mehta <sohil=2Emehta@intel=2Ecom>
+>> Acked-by: Peter Zijlstra (Intel) <peterz@infradead=2Eorg>
+>> Signed-off-by: Xin Li (Intel) <xin@zytor=2Ecom>
+>> Cc: stable@vger=2Ekernel=2Eorg
+>> ---
+>>=20
+>> Changes in v3:
+>> *) Polish initialize_debug_regs() (PeterZ)=2E
+>> *) Rewrite the comment for DR6_RESERVED definition (Sohil and Sean)=2E
+>> *) Collect TB, RB, AB (PeterZ and Sohil)=2E
+>>=20
+>> Changes in v2:
+>> *) Use debug register index 6 rather than DR_STATUS (PeterZ and Sean)=
+=2E
+>> *) Move this patch the first of the patch set to ease backporting=2E
+>> ---
+>>   arch/x86/include/uapi/asm/debugreg=2Eh | 21 ++++++++++++++++-
+>>   arch/x86/kernel/cpu/common=2Ec         | 24 ++++++++------------
+>>   arch/x86/kernel/traps=2Ec              | 34 +++++++++++++++++--------=
+---
+>>   3 files changed, 51 insertions(+), 28 deletions(-)
+>>=20
+>> diff --git a/arch/x86/include/uapi/asm/debugreg=2Eh b/arch/x86/include/=
+uapi/asm/debugreg=2Eh
+>> index 0007ba077c0c=2E=2E41da492dfb01 100644
+>> --- a/arch/x86/include/uapi/asm/debugreg=2Eh
+>> +++ b/arch/x86/include/uapi/asm/debugreg=2Eh
+>> @@ -15,7 +15,26 @@
+>>      which debugging register was responsible for the trap=2E  The othe=
+r bits
+>>      are either reserved or not of interest to us=2E */
+>>   -/* Define reserved bits in DR6 which are always set to 1 */
+>> +/*
+>> + * Define bits in DR6 which are set to 1 by default=2E
+>> + *
+>> + * This is also the DR6 architectural value following Power-up, Reset =
+or INIT=2E
+>> + *
+>> + * Note, with the introduction of Bus Lock Detection (BLD) and Restric=
+ted
+>> + * Transactional Memory (RTM), the DR6 register has been modified:
+>> + *
+>> + * 1) BLD flag (bit 11) is no longer reserved to 1 if the CPU supports
+>> + *    Bus Lock Detection=2E  The assertion of a bus lock could clear i=
+t=2E
+>> + *
+>> + * 2) RTM flag (bit 16) is no longer reserved to 1 if the CPU supports
+>> + *    restricted transactional memory=2E  #DB occurred inside an RTM r=
+egion
+>> + *    could clear it=2E
+>> + *
+>> + * Apparently, DR6=2EBLD and DR6=2ERTM are active low bits=2E
+>> + *
+>> + * As a result, DR6_RESERVED is an incorrect name now, but it is kept =
+for
+>> + * compatibility=2E
+>> + */
+>>   #define DR6_RESERVED	(0xFFFF0FF0)
+>>     #define DR_TRAP0	(0x1)		/* db0 */
+>> diff --git a/arch/x86/kernel/cpu/common=2Ec b/arch/x86/kernel/cpu/commo=
+n=2Ec
+>> index 8feb8fd2957a=2E=2E0f6c280a94f0 100644
+>> --- a/arch/x86/kernel/cpu/common=2Ec
+>> +++ b/arch/x86/kernel/cpu/common=2Ec
+>> @@ -2243,20 +2243,16 @@ EXPORT_PER_CPU_SYMBOL(__stack_chk_guard);
+>>   #endif
+>>   #endif
+>>   -/*
+>> - * Clear all 6 debug registers:
+>> - */
+>> -static void clear_all_debug_regs(void)
+>> +static void initialize_debug_regs(void)
+>>   {
+>> -	int i;
+>> -
+>> -	for (i =3D 0; i < 8; i++) {
+>> -		/* Ignore db4, db5 */
+>> -		if ((i =3D=3D 4) || (i =3D=3D 5))
+>> -			continue;
+>> -
+>> -		set_debugreg(0, i);
+>> -	}
+>> +	/* Control register first -- to make sure everything is disabled=2E *=
+/
+>
+>In the Figure 19-1=2E Debug Registers of SDM section 19=2E2 DEBUG REGISTE=
+RS,
+>
+>bit 10, 12, 14, 15 of DR7 are marked as gray (Reversed) and their value a=
+re filled as
+>
+>1, 0, 0,0 ; should we clear them all here ?=C2=A0 I didn't find any other=
+ description in the
+>
+>SDM about the result if they are cleaned=2E of course, this patch doesn't=
+ change
+>
+>the behaviour of original DR7 initialization code, no justification neede=
+d,
+>
+>just out of curiosity=2E
+>
+>
+>Thanks,
+>
+>Ethan
+>
+>> +	set_debugreg(0, 7);
+>> +	set_debugreg(DR6_RESERVED, 6);
+>> +	/* dr5 and dr4 don't exist */
+>> +	set_debugreg(0, 3);
+>> +	set_debugreg(0, 2);
+>> +	set_debugreg(0, 1);
+>> +	set_debugreg(0, 0);
+>>   }
+>>     #ifdef CONFIG_KGDB
+>> @@ -2417,7 +2413,7 @@ void cpu_init(void)
+>>     	load_mm_ldt(&init_mm);
+>>   -	clear_all_debug_regs();
+>> +	initialize_debug_regs();
+>>   	dbg_restore_debug_regs();
+>>     	doublefault_init_cpu_tss();
+>> diff --git a/arch/x86/kernel/traps=2Ec b/arch/x86/kernel/traps=2Ec
+>> index c5c897a86418=2E=2E36354b470590 100644
+>> --- a/arch/x86/kernel/traps=2Ec
+>> +++ b/arch/x86/kernel/traps=2Ec
+>> @@ -1022,24 +1022,32 @@ static bool is_sysenter_singlestep(struct pt_re=
+gs *regs)
+>>   #endif
+>>   }
+>>   -static __always_inline unsigned long debug_read_clear_dr6(void)
+>> +static __always_inline unsigned long debug_read_reset_dr6(void)
+>>   {
+>>   	unsigned long dr6;
+>>   +	get_debugreg(dr6, 6);
+>> +	dr6 ^=3D DR6_RESERVED; /* Flip to positive polarity */
+>> +
+>>   	/*
+>>   	 * The Intel SDM says:
+>>   	 *
+>> -	 *   Certain debug exceptions may clear bits 0-3=2E The remaining
+>> -	 *   contents of the DR6 register are never cleared by the
+>> -	 *   processor=2E To avoid confusion in identifying debug
+>> -	 *   exceptions, debug handlers should clear the register before
+>> -	 *   returning to the interrupted task=2E
+>> +	 *   Certain debug exceptions may clear bits 0-3 of DR6=2E
+>> +	 *
+>> +	 *   BLD induced #DB clears DR6=2EBLD and any other debug
+>> +	 *   exception doesn't modify DR6=2EBLD=2E
+>>   	 *
+>> -	 * Keep it simple: clear DR6 immediately=2E
+>> +	 *   RTM induced #DB clears DR6=2ERTM and any other debug
+>> +	 *   exception sets DR6=2ERTM=2E
+>> +	 *
+>> +	 *   To avoid confusion in identifying debug exceptions,
+>> +	 *   debug handlers should set DR6=2EBLD and DR6=2ERTM, and
+>> +	 *   clear other DR6 bits before returning=2E
+>> +	 *
+>> +	 * Keep it simple: write DR6 with its architectural reset
+>> +	 * value 0xFFFF0FF0, defined as DR6_RESERVED, immediately=2E
+>>   	 */
+>> -	get_debugreg(dr6, 6);
+>>   	set_debugreg(DR6_RESERVED, 6);
+>> -	dr6 ^=3D DR6_RESERVED; /* Flip to positive polarity */
+>>     	return dr6;
+>>   }
+>> @@ -1239,13 +1247,13 @@ static noinstr void exc_debug_user(struct pt_re=
+gs *regs, unsigned long dr6)
+>>   /* IST stack entry */
+>>   DEFINE_IDTENTRY_DEBUG(exc_debug)
+>>   {
+>> -	exc_debug_kernel(regs, debug_read_clear_dr6());
+>> +	exc_debug_kernel(regs, debug_read_reset_dr6());
+>>   }
+>>     /* User entry, runs on regular task stack */
+>>   DEFINE_IDTENTRY_DEBUG_USER(exc_debug)
+>>   {
+>> -	exc_debug_user(regs, debug_read_clear_dr6());
+>> +	exc_debug_user(regs, debug_read_reset_dr6());
+>>   }
+>>     #ifdef CONFIG_X86_FRED
+>> @@ -1264,7 +1272,7 @@ DEFINE_FREDENTRY_DEBUG(exc_debug)
+>>   {
+>>   	/*
+>>   	 * FRED #DB stores DR6 on the stack in the format which
+>> -	 * debug_read_clear_dr6() returns for the IDT entry points=2E
+>> +	 * debug_read_reset_dr6() returns for the IDT entry points=2E
+>>   	 */
+>>   	unsigned long dr6 =3D fred_event_data(regs);
+>>   @@ -1279,7 +1287,7 @@ DEFINE_FREDENTRY_DEBUG(exc_debug)
+>>   /* 32 bit does not have separate entry points=2E */
+>>   DEFINE_IDTENTRY_RAW(exc_debug)
+>>   {
+>> -	unsigned long dr6 =3D debug_read_clear_dr6();
+>> +	unsigned long dr6 =3D debug_read_reset_dr6();
+>>     	if (user_mode(regs))
+>>   		exc_debug_user(regs, dr6);
+>
 
-What about kvm (or xen) as accelerator? Would that work?
-
-  Thomas
-
+We should, but it isn't a manifest bug so is slightly less urgent=2E
 
