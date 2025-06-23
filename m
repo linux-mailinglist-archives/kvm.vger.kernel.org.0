@@ -1,80 +1,80 @@
-Return-Path: <kvm+bounces-50307-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50308-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83FC9AE3EA1
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 13:54:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52C1FAE3EC8
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 13:59:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 211E51768B6
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 11:54:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 57F4A172300
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 11:59:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 623CA242D6A;
-	Mon, 23 Jun 2025 11:54:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 442B3241122;
+	Mon, 23 Jun 2025 11:59:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vfRhXIUx"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IHS8nH0F"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB68023E359
-	for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 11:54:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F109238C07
+	for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 11:59:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750679675; cv=none; b=H5cmOeh1EqFqzl+/jcD1N7Conbl4SgmEM6yeIL1FbVAa/Ad2DMiaxLVps/AoRJU6i9ngavqAmWITIpdvYZR4x9ELldvCrWc7+mfaDcndw5bgfEXgocu2esHeVQDlHfb9L8hmVrubcoSCxWbRUkPNuMZ0gSc7JInH54xXQoDsBTI=
+	t=1750679968; cv=none; b=WtKjq93T1K68UhabnzeHFeifUi+R5MiBFbDZlOHZorz7mhvtbVsiAc+SVflK8sj2nlTLaPA9r3tOzB/ZRim3TBvFYqP9RX8UQsmlTJ4YwsYznpjju1irCJimKgXVRi2UsN182ZDpq3pWov5rNcH9n7BYZuDpB03ymL3oI4CJlFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750679675; c=relaxed/simple;
-	bh=OjsRFdcBNhVX7OIMd901Wx90KcuEHGL8ijgRyvPbohU=;
+	s=arc-20240116; t=1750679968; c=relaxed/simple;
+	bh=2cdzibxcH5zCGeUFBxOzji3nLbVgfoA2vvEd6g2e4/o=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=d8G36deGLfhpjqhBz/30BK47FfZajjqqloBaPp6qPztDB1XQtp+dBiERHMVrXPYrHmle41xV5aUuPmdbNAX0BH/jaRtIHw/VRI/1YJXcjOl7t4XsIzOgATsSfC585wnPnBou3o0OSOMrOIw/iSR8jh/WsLt5mBcn0CypMZBqv7Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=vfRhXIUx; arc=none smtp.client-ip=209.85.221.42
+	 In-Reply-To:Content-Type; b=drWRhH07lELCWldk/EPa4BYSGW0Cu7ep7YINL0E/he3v7b29RX/cQD1hcrM820yhXqsz6wiQtjoN5hFLhmpxpNCqBWPfHPTHbmEcyXwrrWaGGGIzsMs0l0SojM+4eIsBMX5Hh3JsiD4cv3EHi5WljPVSIYr8DFJzID98EkVjtgU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=IHS8nH0F; arc=none smtp.client-ip=209.85.221.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-3a50fc819f2so3230688f8f.2
-        for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 04:54:33 -0700 (PDT)
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-3a4fd1ba177so2599891f8f.0
+        for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 04:59:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1750679672; x=1751284472; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1750679965; x=1751284765; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=mA1bPn5/VKcYzEd4AJcMgbdM29kFbTpL6cqkZBp0IqU=;
-        b=vfRhXIUxQdf6aABKFEkO/yJyOdmhOjRPw828hKhG4V9zlDk3mQRaNQG+TY8o8tU/yy
-         bpdbA8xYBE2Rmwz65VzFL82CsXZh2SGBRsjpiRdCLLS2nwn/WklonzjVGk2DsevGObPV
-         ebWS4O0PGgSv2eGPwnyYS1LCNw77vXcemNlTqRc4n+KdqaETqqXapYYAjeUaZP4ypjO1
-         RJv/6ppnSsxszqiKpXZdEGc2yIrUx6QEdY8xWoDcPcMaa9mphL2lH7bT8Fj+X+jn8px5
-         iOg6Jf5pN7eJGv1rnqh0dQAi5loE5+luYBeJImmU0q7VYYsVmeu0DU5TC1gTwkzF0rEp
-         PYuw==
+        bh=ZNl0GNUoL+pUzh6aZuBV7rBwC2JelgKVfHJY1PQe040=;
+        b=IHS8nH0FXjmafV5fT6Xbfecwd5FjiYJz4uBuyV2GHGn7k4DbqPC1vYkmG/jhzDRMbS
+         t3oX4bmvgEm6188w0ZNyzGwR45BAtLKm2o8A6kDtgIfAaBggXlaQKRMVzvQ21yMzcM/4
+         +iCcwICvlYk3ACcId6oeKmkYMsuep9mcW8m4tu1oHl9pV3PoghyaI73XuF3CCkAguU3U
+         s5iYTA2gKTy5InzppcJt64CvR6+8QWP+l7dt3vXmR3kdfTSmJ+KJjsyKyiGTsRrk2Uun
+         H6ggTE1SrH+Tc75BBgCcyuu1LfMqhrLwHlWe9QLwSGvCon+meoTj6ZH/ZIJjMa9RyUbJ
+         47ww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750679672; x=1751284472;
+        d=1e100.net; s=20230601; t=1750679965; x=1751284765;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mA1bPn5/VKcYzEd4AJcMgbdM29kFbTpL6cqkZBp0IqU=;
-        b=ZVHUsRW7TbeX6yM67Ngk91v2nsAclKXjVzbCTMCi2TYwJpLVeDcji1z2QNxQfjSrY6
-         eA8eRlJYTUJT3lRiibT70nLbODDYR3N0De8KoEZUjqz0B8llWZbH+st+ftrxImT4p+x8
-         L5STacaa3ez3vHQ1je5URjPB2ntXddEArU6g82Q+OZzcgKaR7KE1DQi4DnrqdAEzhCK2
-         u0VnB+mJkp02hqkKuvN4nAbVPmtsWjlM6Ba6nU6YWHLP2ZN2I9ZugeSK7XroaCBmjIsU
-         oIbXcPsVx7Y8qSZ5y5bUuIshdhpBMzaGvDyc7wOziWaMyPO44TmqmYHzClfQk+IOjEyz
-         0aLw==
-X-Forwarded-Encrypted: i=1; AJvYcCXbKsoQsvN4/KwcH18UxEwcRn3fjpJv9bWHbRlKLHFaSi//KzJsp5MYOP/HUe+2f/GCqGo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz9m88Y29ORQbNcjx7MHkqmh5mE3ge/43O0JR7EHB6W4+vSCIiP
-	jGvezXoJuXnpmwH15IvQwWmgFu4ic9mJTNHb54Zi583ILAg68OoMx8Wqzyc1+yV6cKQ=
-X-Gm-Gg: ASbGnctNAhrFYoPJuCoJ6/1pebdNOiazNRfMCsVgxjtfrftaGaI6qWKT2pBz6gHKhkg
-	imKQwPezrqxNeR4R/uUlC3rLduJ5OOfpGIOHpzwn78GiQ8V33rXnMz97my2QetLcHlSpdGGhlVm
-	SccowdO+e6dvLH8krQ8dp4hkVxO3/bts5k+OiUHXapdCZiOiobjCSjPN4WAhpzqgoSTR75MrZNT
-	ZM+OSVNK0cVlVubi7RSSQ8q1LJpsr0cCrTgSkzcxYSShZQX33GJOpUyqn+v3ml6VQpUpRd50mZc
-	hzxNGQGUphPRsHoNEUMou/NTThFzFUc2OvOr5ulQnWVNjIHwuW96sNPznD1M9u5hCJbX6utTjZM
-	aMYVpgCTTOufBdAgbuEyDLrCEY1dNLg==
-X-Google-Smtp-Source: AGHT+IECw1gIHOR0QOBsHa/SDc+jBWm8t+IURqICdiK8HE4kWpV03x7yosYd71lVv5bIijrW7Li9TQ==
-X-Received: by 2002:adf:9c8c:0:b0:3a4:f7af:db9c with SMTP id ffacd0b85a97d-3a6d1318226mr9569094f8f.59.1750679672219;
-        Mon, 23 Jun 2025 04:54:32 -0700 (PDT)
+        bh=ZNl0GNUoL+pUzh6aZuBV7rBwC2JelgKVfHJY1PQe040=;
+        b=UMR9mBzQ8AeIImB1tqxVdL1RAOzSo2tDd1jUKXIXU3JJAwW2BGYVhleCpBzRoaY1XW
+         +MVoDWyOfeiCZgamkojvGfVJ706yczr03rq3knttK+1zp+KsJifBPwRid+tZtqIzmx/E
+         zWgeXaV7oDYO51JLcmcVv+I8iRaAiCa0boELrWF5j5MK5n6jmCBY8rLPFYBU2xoFuq0g
+         Hth/U4im+k+IwzIC+EIizgfyJTiaBfWzfvruUXAwPEVnWaggfewIRnnWwUD/XfGlOw2P
+         ryBXME6k3/rJbK/qSW30HaQhPhJRH9tyMnEHiDKSecf//gUfa3yq9nirw7rIvvo1FlBi
+         x7sA==
+X-Forwarded-Encrypted: i=1; AJvYcCVpahTPQdM5/26C1wSDfXEirgcHLWjrpw5BEp2ZG7ReYYlNRhtu5A0PYgWOCjY971sMpaI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyYN9QkMWHC5VZG5IJ42KpAjk8tUCj64BXUHobqSopNu8zT3TPn
+	ZyzcLlTGfflNhzpx7un/Jpsi3TrKzOU7OBSeobSmbZmapwuTPbOaJ4KxC2bsvkk4sMY=
+X-Gm-Gg: ASbGnctaTgR3vOzn5ydLcEwM8m2QFfHPvUGkHuQiKF8JwHRuN2mLHGEekSQAo2Ay8Pc
+	zQ5CRjVLdFRHKO4mgrY/68Q6knk5celD08BxScVgZebF5rZnGBfmBiB/CjDJNpl1LfFUeAzy7bx
+	HlaII6XRRgNME6qwnS3lL6Bo2fWPPx+xiUULcZfl/hueW4VzuSIMwc0ICqlzmBvYGISlY4HspX6
+	V/XAspL07dFhCGyCIVN8c18zPCTnI4yE5m5CbT3VE0NdE5sHg5sgxTBSXz4212y2Y/tQ9QwOBPR
+	EV51DiFdLrGW9ZZicXICzLFb5nk2wbgnd0mfI0fDqYjFD76Pbh3D4+CxpGJzXYWw3gIha029uFC
+	eoYmb4N+Acbjm+eTG2zGw75VOO0IpGG2sNYXzj+6o
+X-Google-Smtp-Source: AGHT+IHOxtkdXSM3EMBB+rtXAYT6HLDRhKe1XTMmCY2e3R+6NO7I2w8zqwom52rHbrwAtgyuUqWVsQ==
+X-Received: by 2002:a05:6000:2010:b0:3a3:598f:5a97 with SMTP id ffacd0b85a97d-3a6d2799df4mr8969438f8f.9.1750679964791;
+        Mon, 23 Jun 2025 04:59:24 -0700 (PDT)
 Received: from [192.168.69.167] (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a6d0f19b30sm9469755f8f.37.2025.06.23.04.54.30
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a6d128cf7asm9177773f8f.100.2025.06.23.04.59.23
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Jun 2025 04:54:31 -0700 (PDT)
-Message-ID: <76730787-f153-474d-859f-0f51ede79e93@linaro.org>
-Date: Mon, 23 Jun 2025 13:54:30 +0200
+        Mon, 23 Jun 2025 04:59:24 -0700 (PDT)
+Message-ID: <be71c7cc-a5ba-4ba5-b697-60814b712eea@linaro.org>
+Date: Mon, 23 Jun 2025 13:59:22 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,9 +82,11 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 24/26] tests/functional: Require TCG to run Aarch64
- imx8mp-evk test
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Subject: Re: [PATCH v2 23/26] tests/functional: Restrict nexted Aarch64 Xen
+ test to TCG
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
+ "open list:X86 Xen CPUs" <xen-devel@lists.xenproject.org>,
+ David Woodhouse <dwmw2@infradead.org>
 Cc: Leif Lindholm <leif.lindholm@oss.qualcomm.com>,
  Richard Henderson <richard.henderson@linaro.org>,
  Radoslaw Biernacki <rad@semihalf.com>, Alexander Graf <agraf@csgraf.de>,
@@ -98,35 +100,44 @@ Cc: Leif Lindholm <leif.lindholm@oss.qualcomm.com>,
  =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
  Roman Bolshakov <rbolshakov@ddn.com>, John Snow <jsnow@redhat.com>
 References: <20250620130709.31073-1-philmd@linaro.org>
- <20250620130709.31073-25-philmd@linaro.org>
- <3896c4a8-8b25-45e0-978c-1539648ab4cc@redhat.com>
+ <20250620130709.31073-24-philmd@linaro.org>
+ <497fc7b1-dfd2-49ad-938c-47fca1153590@redhat.com>
 Content-Language: en-US
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-In-Reply-To: <3896c4a8-8b25-45e0-978c-1539648ab4cc@redhat.com>
+In-Reply-To: <497fc7b1-dfd2-49ad-938c-47fca1153590@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 23/6/25 10:19, Thomas Huth wrote:
+On 23/6/25 10:11, Thomas Huth wrote:
 > On 20/06/2025 15.07, Philippe Mathieu-Daudé wrote:
->> The imx8mp-evk machine is only built when TCG is available.
-> 
-> The rationale here sounds wrong. If the machine is only built with TCG, 
-> then the set_machine() should be good enough to check whether it's 
-> available.
-> So I'd rather say:
-> 
-> "The imx8mp-evk machine can only run with the TCG accelerator".
-
-Yes, you are correct.
-> 
-> With that update:
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-
-Thanks :)
-
+>> On macOS this test fails:
+>>
+>>    qemu-system-aarch64: mach-virt: HVF does not support providing 
+>> Virtualization extensions to the guest CPU
+>>
 >> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 >> ---
->>   tests/functional/test_aarch64_imx8mp_evk.py | 1 +
+>>   tests/functional/test_aarch64_xen.py | 1 +
 >>   1 file changed, 1 insertion(+)
+>>
+>> diff --git a/tests/functional/test_aarch64_xen.py b/tests/functional/ 
+>> test_aarch64_xen.py
+>> index 339904221b0..261d796540d 100755
+>> --- a/tests/functional/test_aarch64_xen.py
+>> +++ b/tests/functional/test_aarch64_xen.py
+>> @@ -33,6 +33,7 @@ def launch_xen(self, xen_path):
+>>           """
+>>           Launch Xen with a dom0 guest kernel
+>>           """
+>> +        self.require_accelerator("tcg") # virtualization=on
+> 
+> What about kvm (or xen) as accelerator? Would that work?
 
+IIUC this tests boots a nested Xen guest running at Aarch64 EL2,
+and at this point we can only run EL2/EL3 on TCG. HVF and KVM
+can not for now (we are working on it).
+
+I don't know if Xen can accelerate EL2, it would need support for
+such hardware (like the Apple Silicon M4). Cc'ing Xen folks to
+figure it out.
 
