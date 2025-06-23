@@ -1,79 +1,78 @@
-Return-Path: <kvm+bounces-50324-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50325-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B7A0AE3FEF
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 14:26:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 166E9AE3FF8
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 14:26:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF0AF1785B0
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 12:20:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EA6F7189AD43
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 12:21:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAE5124887F;
-	Mon, 23 Jun 2025 12:19:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81623248895;
+	Mon, 23 Jun 2025 12:20:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="a5qK/vx3"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HGBjd6bx"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DEDB238C16
-	for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 12:19:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3828238C16
+	for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 12:20:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750681197; cv=none; b=Bkxl48q0BCloPAXyJeGnOJuh88/RHgQjsvLYZEkb0FOKpo4OXkIUqTepp/lvlXtS3ylCwxaRp1me7Z0yNYLJU0wiyv6v5DrS8yda5+UXkW11me1oSQ7G3IjeWnNQ+NFwTTiU7RqbUDbhMV2dWt8OwdcxZumXvxU3fu0y2r0Eq7E=
+	t=1750681202; cv=none; b=K2UopqoyxN/8FEQSnm3xqBJNX3FVffZwLlw7b30pjpys7l+cDCaKO544Jz9LoK5PztanT094whIY5dg2095LHB37dT0olj0PqVTzkOBv5SN09VwFkJjEVj2y1G9ZnIXFkznfY50F69aJlcSWbDzospFQ58UZ5y47l2gj5FP/01U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750681197; c=relaxed/simple;
-	bh=aACazlTnjjVuqSSrK+aqVnhw4rNg9Hx0k526/7OHNqI=;
+	s=arc-20240116; t=1750681202; c=relaxed/simple;
+	bh=yyqnUEjDD9oZh/wgQPdGXi51drE5gp9Y0ysKeHS5SgY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nAbAAF+hNxC1T9Puw4sRnUC6Yz4XtMVMkXGYnR09/BJIMAKcx+QKvukS373pE+1/cr9PflJRlVVTA0c3SOsUAJI/FbvaGOrvjteJQAZ9MZ4k0WoRN+6IaLLyrNOIdM3j5o543yCD61EU3s0ciz8J5ZjUgFmeK7EhLUoRlv6PGNA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=a5qK/vx3; arc=none smtp.client-ip=209.85.221.53
+	 MIME-Version:Content-Type; b=DSqjyw1W4nrTAbz1UiIEG3HTpjSDm1Unoa3lcPzOcsTU72LR6iUMeYfAWUB7ltiReaOuhJ65IpvcoiMVzfVZ9EfSDq3wLe4JtNwVr+0s5YlviFr/0vemZNUyFpWhBu+GoO68gqUzwJUxFnF4c7Mal49EV4LYse3cGxfwgwkkBr0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=HGBjd6bx; arc=none smtp.client-ip=209.85.128.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3a588da60dfso2485946f8f.1
-        for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 05:19:55 -0700 (PDT)
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-442fda876a6so37083875e9.0
+        for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 05:20:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1750681194; x=1751285994; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1750681199; x=1751285999; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=n9TcP7uZ8sj3k25ApWupc8E4+ydRbD8zQYT0ugNh7kc=;
-        b=a5qK/vx3It1eGuUOPmDN5kOXyYCyiwFUi0oqEecqp5Od1+m2UOYU1szFElN3kWqbu6
-         87DUWA8Lm+1q3o1JwRRTs0KKsGAvb1cvR0OOBQNZEzjOqbNPx6/dhXgYyPeHQx3ZADOS
-         Ag4PJXMqo3erYnXcYdMKwdaIhNBR0n1Nb+Iy2fWgktUrAy7Dm7214TjQgnTN5/9ZZyIq
-         vdMDEIpee8fhf9bQGwJwBzZqueJcf3PEho/kCmXDJqSGFS7NIUor5cHp4XaBS6m9phaK
-         Jx0683XhqhsGf9fOmPfCvxhjOIYf/4Rid5M7caODuBJljRD7Pm3bUqgC77/G+lhg5nYQ
-         lPdQ==
+        bh=FOQFF5IHVggEpZxvhH4Dg2y5NDppFE2+idPk4kXeUTw=;
+        b=HGBjd6bx3X1PmCDOaNamWArAVK8qpaxPtEW8Qw9yb+1IRidNW00jHWH2NmBD9KfoIq
+         kHsZ3gCHjd08HujvRR1Bxv42WNJ14N8/hsBQ6sf2dpsKafwihVh9AnfWg3e5nceydYP0
+         uTepzvqBcL7sTf144RlXtSwaI+afDEltKvScVImpJpvS1Lr1wbyVhbNBKLsm+kQ4LtF+
+         eXXUeI27y8mVYcPVPGk/LKKLR350WcG8BTOryxoDzdg4hmzsdltFMwNajFkHsFnI7VGu
+         W0G+Wor3FKld+FpygO4ee8VPo8Hhhv4gKpirr+O2kG6MN6zVoi7yNlnb7z0+ZXZSSqJa
+         dkiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750681194; x=1751285994;
+        d=1e100.net; s=20230601; t=1750681199; x=1751285999;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=n9TcP7uZ8sj3k25ApWupc8E4+ydRbD8zQYT0ugNh7kc=;
-        b=JhK8BtgJ5SMi+f3Fp4ys1cTg4DuQKlwWJMJMI+KpSPlCovb7Go4ydYQqTkp3k3RYa6
-         XrNHumA6DtSiymS3zFM0OgABOxvAl5pkRLH0DiIMH2m8RgBHjvV5v9iyaBV4SgmGgeng
-         qjBsQTf8Inlq/eL5s7j3XlvKsKjs7jPh0r3jkOUKkh4JbiHc+QCbTT/kMOPYDvbiQ2b9
-         BIqJ4YOuRCBJVqj2WSBUv0ld8QWJ6Cqfoswkkbf6c+22q8/tdrsxDCvP6pZry6EFeS0M
-         cT4oa/QLWMj9UuMHpeaTzW7K/4ZcBjCZbaMvLyz/BLazjwmmNeEWnAL1UbplP/NJxoHo
-         RIWw==
-X-Forwarded-Encrypted: i=1; AJvYcCUZPgxccuuZUTyrirbWI2SqCZwWK55zQSQWWkvPYbeZNZ0nmdYLuseH9S5n6O4uYEu01nk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw+78/Zzolf26o3b/lMcTnMVe3V0ganVPtTDae2Aeq0aSSNibvH
-	AT2rmjsFJqn9RLlSTfy9zukwASzyjMNbTEKyboIoGfrWQC8KxLOSgwheJQfivDMJfameFl0oII1
-	bZKyN
-X-Gm-Gg: ASbGncsfvynjOmmkk4ziHymELBXTJA2JWrERPLlB7wvjw/frIdZj6W8c/4AH5dmrELV
-	GNs8LwusP8pLW+jVTHxs+YvtN+TOGa8nhWlGsNH927GVz1PPRThv8B+SG6fht4kywzx0Xswh2KL
-	iYv+1VTSrgPrEGrpPEVd/U9xVHy5TdSFeISjQggwMa18+Ltv4EkN2tEK/LIPR7W2QWPtrrIJLdQ
-	JKzGEUf43QINqAmVMXkxcpcLtgtvU54BgtfZ5hCD6XA16FQ8KLKrIvsWSR2q2/b8UTYfdXh/yw3
-	sKYmGGMBWGykTy+aEnFnQcly7uAHLm1MWYkqpSugQKfLyttaz1ToRBJQGkXKRGPfLWPqt1OT4+8
-	Ht7OifMJddjSMOXTt+jCZbWYZHoCn76TuqYWt
-X-Google-Smtp-Source: AGHT+IEHiq/SjlZG6KJQYhM0dN6HzIW1qJU45zGcdqrFfg265NhL0FAhAnfqOQcq/6jydwJBpJn65g==
-X-Received: by 2002:adf:e187:0:b0:3a4:f723:3e73 with SMTP id ffacd0b85a97d-3a6d129ccdbmr8492187f8f.16.1750681194323;
-        Mon, 23 Jun 2025 05:19:54 -0700 (PDT)
+        bh=FOQFF5IHVggEpZxvhH4Dg2y5NDppFE2+idPk4kXeUTw=;
+        b=bp9UcuKfuEjam4r8/IOhhV5Z/xl6AAPsaXNFl0jAAZlNKwpW6CDF6u1GRY3FS3uhka
+         V0lD9TYHzkRUnBdnq1KLxjFz09LjgvC1G9rjwhWBiauN5PREL+ZOC8Pw96tgvBFcWgIM
+         FIBVW+OepmXvTUwYleYaVvWyBecw/ovcssGtreu6MonW2mH5vQuYUcW4u5ucTF23CKNG
+         qC7mXyN3Nu8x3NM5/fLgmWxPdMyyAdBteAetBeHhRwgpMIB49UGNaN5SaZkdMGj2yMzs
+         KltG0fcqBoHNJ/BFc59l8yXl/q9J18M9w6yKJebFYxBu5d4wBfO8bFvPb7+u09q45IVo
+         8kcw==
+X-Forwarded-Encrypted: i=1; AJvYcCXTdpuyio+gByMrSCBvzePabIWD+6R7fq73jHWgbfKCTQsIOjF/wZneo/CwkFr6qmmfITQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwPYF+3sFv4l0HOXHDzogf6S0ALrNGfKKLEUhkigbUJkx6QtniE
+	XwVqMaJQUZqtwvr4GmwVDMK2t0I4IQ0knHWo8lzg9PGdssB4app9Ax3PSjTuHfK4zzQ=
+X-Gm-Gg: ASbGnctlx6vTeeRLGyBibAA6YujDmSsqIwdH+qUP21AjddGAJoHfRF0C1rmj7ewcJR8
+	9OMPFSpxMxNwdU7MOcYzzeTuU52rAsyeUhEF/0rtt11ZYE9GaljtQxo3lVvrnIDpLajk3KC/suL
+	FTOAXd7wD52C4SWkMma7l54EWx7pQAwLLww5QwQFhCZW33iSx1QApBk45LCnOuR1U4vN07AcVf+
+	C8boucbGTXWWSJkyi1wAE34wSFL/SGeeQ4TDNCmHJgfYHBqQOkJMlTBvEuezMevFpodJZOhGb+R
+	/La0ohMiJMeVjrm9IsildW/WfuZlGfZHpmmfAnlj0h85NXMWAake9MFi3yZWZzDiKs1w8E6F2y/
+	xYALfip4Qk9MhU/UwFZSLLFdS644Z8+T0TMjC
+X-Google-Smtp-Source: AGHT+IFwQfth961QDPwmcQSOPunexZxZtRH6B1UX0+3skNQVMIAOIVx+CTDwFZCmfuogwrFQqEjVTQ==
+X-Received: by 2002:a05:600c:1c28:b0:442:ccf0:41e6 with SMTP id 5b1f17b1804b1-453656c2172mr118658905e9.3.1750681199364;
+        Mon, 23 Jun 2025 05:19:59 -0700 (PDT)
 Received: from localhost.localdomain (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a6d0f10385sm9537215f8f.17.2025.06.23.05.19.52
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4535e983a4bsm143750295e9.13.2025.06.23.05.19.58
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 23 Jun 2025 05:19:53 -0700 (PDT)
+        Mon, 23 Jun 2025 05:19:58 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Leif Lindholm <leif.lindholm@oss.qualcomm.com>,
@@ -96,9 +95,9 @@ Cc: Leif Lindholm <leif.lindholm@oss.qualcomm.com>,
 	Phil Dennis-Jordan <phil@philjordan.eu>,
 	Richard Henderson <richard.henderson@linaro.org>,
 	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH v3 13/26] target/arm: Create GTimers *after* features finalized / accel realized
-Date: Mon, 23 Jun 2025 14:18:32 +0200
-Message-ID: <20250623121845.7214-14-philmd@linaro.org>
+Subject: [PATCH v3 14/26] accel: Keep reference to AccelOpsClass in AccelClass
+Date: Mon, 23 Jun 2025 14:18:33 +0200
+Message-ID: <20250623121845.7214-15-philmd@linaro.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250623121845.7214-1-philmd@linaro.org>
 References: <20250623121845.7214-1-philmd@linaro.org>
@@ -111,106 +110,97 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Call generic (including accelerator) cpu_realize() handlers
-*before* setting @gt_cntfrq_hz default
+Allow dereferencing AccelOpsClass outside of accel/accel-system.c.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- target/arm/cpu.c | 65 ++++++++++++++++++++++++------------------------
- 1 file changed, 33 insertions(+), 32 deletions(-)
+ include/qemu/accel.h       | 3 +++
+ include/system/accel-ops.h | 3 ++-
+ accel/accel-common.c       | 1 +
+ accel/accel-system.c       | 3 ++-
+ accel/tcg/tcg-accel-ops.c  | 4 +++-
+ 5 files changed, 11 insertions(+), 3 deletions(-)
 
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index e5b70f5de81..ab5fbd9b40b 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -1985,26 +1985,6 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
-         return;
-     }
+diff --git a/include/qemu/accel.h b/include/qemu/accel.h
+index fbd3d897fef..9dea3145429 100644
+--- a/include/qemu/accel.h
++++ b/include/qemu/accel.h
+@@ -37,6 +37,9 @@ typedef struct AccelClass {
+     /*< public >*/
  
--    if (!cpu->gt_cntfrq_hz) {
--        /*
--         * 0 means "the board didn't set a value, use the default". (We also
--         * get here for the CONFIG_USER_ONLY case.)
--         * ARMv8.6 and later CPUs architecturally must use a 1GHz timer; before
--         * that it was an IMPDEF choice, and QEMU initially picked 62.5MHz,
--         * which gives a 16ns tick period.
--         *
--         * We will use the back-compat value:
--         *  - for QEMU CPU types added before we standardized on 1GHz
--         *  - for versioned machine types with a version of 9.0 or earlier
--         */
--        if (arm_feature(env, ARM_FEATURE_BACKCOMPAT_CNTFRQ) ||
--            cpu->backcompat_cntfrq) {
--            cpu->gt_cntfrq_hz = GTIMER_BACKCOMPAT_HZ;
--        } else {
--            cpu->gt_cntfrq_hz = GTIMER_DEFAULT_HZ;
--        }
--    }
--
- #ifndef CONFIG_USER_ONLY
-     /* The NVIC and M-profile CPU are two halves of a single piece of
-      * hardware; trying to use one without the other is a command line
-@@ -2051,7 +2031,40 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
-             return;
-         }
-     }
-+#endif
- 
-+    cpu_exec_realizefn(cs, &local_err);
-+    if (local_err != NULL) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
+     const char *name;
++    /* Cached by accel_init_ops_interfaces() when created */
++    AccelOpsClass *ops;
 +
-+    arm_cpu_finalize_features(cpu, &local_err);
-+    if (local_err != NULL) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+
-+#ifndef CONFIG_USER_ONLY
-+    if (!cpu->gt_cntfrq_hz) {
-+        /*
-+         * 0 means "the board didn't set a value, use the default". (We also
-+         * get here for the CONFIG_USER_ONLY case.)
-+         * ARMv8.6 and later CPUs architecturally must use a 1GHz timer; before
-+         * that it was an IMPDEF choice, and QEMU initially picked 62.5MHz,
-+         * which gives a 16ns tick period.
-+         *
-+         * We will use the back-compat value:
-+         *  - for QEMU CPU types added before we standardized on 1GHz
-+         *  - for versioned machine types with a version of 9.0 or earlier
-+         */
-+        if (arm_feature(env, ARM_FEATURE_BACKCOMPAT_CNTFRQ) ||
-+            cpu->backcompat_cntfrq) {
-+            cpu->gt_cntfrq_hz = GTIMER_BACKCOMPAT_HZ;
-+        } else {
-+            cpu->gt_cntfrq_hz = GTIMER_DEFAULT_HZ;
-+        }
-+    }
-     {
-         uint64_t scale = gt_cntfrq_period_ns(cpu);
+     int (*init_machine)(MachineState *ms);
+     bool (*cpu_common_realize)(CPUState *cpu, Error **errp);
+     void (*cpu_common_unrealize)(CPUState *cpu);
+diff --git a/include/system/accel-ops.h b/include/system/accel-ops.h
+index 4c99d25aeff..44b37592d02 100644
+--- a/include/system/accel-ops.h
++++ b/include/system/accel-ops.h
+@@ -10,6 +10,7 @@
+ #ifndef ACCEL_OPS_H
+ #define ACCEL_OPS_H
  
-@@ -2072,18 +2085,6 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
++#include "qemu/accel.h"
+ #include "exec/vaddr.h"
+ #include "qom/object.h"
+ 
+@@ -31,7 +32,7 @@ struct AccelOpsClass {
+     /*< public >*/
+ 
+     /* initialization function called when accel is chosen */
+-    void (*ops_init)(AccelOpsClass *ops);
++    void (*ops_init)(AccelClass *ac);
+ 
+     bool (*cpus_are_resettable)(void);
+     void (*cpu_reset_hold)(CPUState *cpu);
+diff --git a/accel/accel-common.c b/accel/accel-common.c
+index 4894b98d64a..56d88940f92 100644
+--- a/accel/accel-common.c
++++ b/accel/accel-common.c
+@@ -10,6 +10,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu/accel.h"
+ #include "qemu/target-info.h"
++#include "system/accel-ops.h"
+ #include "accel/accel-cpu.h"
+ #include "accel-internal.h"
+ 
+diff --git a/accel/accel-system.c b/accel/accel-system.c
+index a0f562ae9ff..64bc991b1ce 100644
+--- a/accel/accel-system.c
++++ b/accel/accel-system.c
+@@ -85,8 +85,9 @@ void accel_init_ops_interfaces(AccelClass *ac)
+      * non-NULL create_vcpu_thread operation.
+      */
+     ops = ACCEL_OPS_CLASS(oc);
++    ac->ops = ops;
+     if (ops->ops_init) {
+-        ops->ops_init(ops);
++        ops->ops_init(ac);
      }
- #endif
+     cpus_register_accel(ops);
+ }
+diff --git a/accel/tcg/tcg-accel-ops.c b/accel/tcg/tcg-accel-ops.c
+index b24d6a75625..da2e22a7dff 100644
+--- a/accel/tcg/tcg-accel-ops.c
++++ b/accel/tcg/tcg-accel-ops.c
+@@ -198,8 +198,10 @@ static inline void tcg_remove_all_breakpoints(CPUState *cpu)
+     cpu_watchpoint_remove_all(cpu, BP_GDB);
+ }
  
--    cpu_exec_realizefn(cs, &local_err);
--    if (local_err != NULL) {
--        error_propagate(errp, local_err);
--        return;
--    }
--
--    arm_cpu_finalize_features(cpu, &local_err);
--    if (local_err != NULL) {
--        error_propagate(errp, local_err);
--        return;
--    }
--
- #ifdef CONFIG_USER_ONLY
-     /*
-      * User mode relies on IC IVAU instructions to catch modification of
+-static void tcg_accel_ops_init(AccelOpsClass *ops)
++static void tcg_accel_ops_init(AccelClass *ac)
+ {
++    AccelOpsClass *ops = ac->ops;
++
+     if (qemu_tcg_mttcg_enabled()) {
+         ops->create_vcpu_thread = mttcg_start_vcpu_thread;
+         ops->kick_vcpu_thread = mttcg_kick_vcpu_thread;
 -- 
 2.49.0
 
