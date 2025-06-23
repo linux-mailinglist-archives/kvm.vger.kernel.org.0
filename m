@@ -1,78 +1,78 @@
-Return-Path: <kvm+bounces-50332-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50333-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2D46AE3FFF
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 14:26:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CEF5AAE3FAE
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 14:21:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B209178E39
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 12:21:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B01477A872E
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 12:20:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09E44246BB9;
-	Mon, 23 Jun 2025 12:20:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C22D247281;
+	Mon, 23 Jun 2025 12:20:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oYnyNiCM"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="m0BXxNt1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 886BB242D97
-	for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 12:20:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2966242D97
+	for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 12:20:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750681239; cv=none; b=ld5Jomwb+yoMXg4i57zQDeoMQETVZEqxVX8100thUJO+PcmPoLcfLw8JYd0gDY0LCF03QHHDoxm69o2IhSZZySu1TtyMrY2wrCGiK+lPuBNvFs21rqVkQ5/LB+Qv7razuI3OcJWeetDVJvnQRm5rW7fudHoavviu3CwoTz8gv4A=
+	t=1750681243; cv=none; b=C+xsn+uG+lA5P46E9Qavel0L7YSg7dj60f7xWoahkF/AHCcjEH1ANuDcTXdO1RRHzTjLYq5shI9rLcey3B8RLRJCZQoJxmeDl8EN9Qe/a0r3XPWBgOy7dU9fqAlo6rMVfEj/qbAcMhvZxU5XGeKTyym2KMDY08BUjckF26lD+ws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750681239; c=relaxed/simple;
-	bh=BH5TW8NKSCUDEXocBuKe5C1XkYtpy0XxhVDuA1K39pA=;
+	s=arc-20240116; t=1750681243; c=relaxed/simple;
+	bh=wFGVYk9hCFdiLB9APrF/fWfFoJa+dJ445YCpZGa29fI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LOCpyNDiGVs46NxQ6bromiifl7FT3IRszgiGYNMxvMkld0LugEW64Y+qEIyMu5mwlJcURxvE5C3ha6RWLO7xmRtaVCm3gxf0FNzML20HGMb0AFPDPReGxnp/sy2FT6vvvrDsvqh4/VdPib/8XQWoVmNDR1y9Q3CydzqQBPbHg+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=oYnyNiCM; arc=none smtp.client-ip=209.85.221.48
+	 MIME-Version:Content-Type; b=iWDYJGo5QCD+vzbM6eYt1zo2lxjaShE0chxax4SManSFlt3qzE25ZcuiHViKCHHBKKlvcD8me6tYeDUuOd38hoLOJn8YfluX56Y6MVOltQXBsgcGDNwKP6no567oas7MLfh+pQ3KT5FvPj1yU2g2LNzd0FLl41bzH3Nab28btWU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=m0BXxNt1; arc=none smtp.client-ip=209.85.221.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-3a50fc7ac4dso2235345f8f.0
-        for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 05:20:36 -0700 (PDT)
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-3a4fea34e07so2015135f8f.1
+        for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 05:20:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1750681235; x=1751286035; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1750681240; x=1751286040; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=X1avEvgULJGN3+NnzgbjknnR4xz+wRJgrCM6KmdqT58=;
-        b=oYnyNiCMP0NWOV4JmMD642J/pCcLEzoyL/V1BWnmkXbnnF4Nly+g44uJLi7X14zyg0
-         Vda1RelfdzK92UckQdEwnNoYm0En+zpT8kT78oOmZrFrbtpGqTxq5HdGTnJh08kUoIVw
-         jf/fjjiXR8PuM32VO4aFi7CZbvc3BhyU0Oshc4pJrpzptIeDdjbbfs450lrRmFBJLTun
-         wbSgDuVAc6YyLgWxvxamOjD9XxaUoul5jpm/VdXUkjf2J0fcSV6g1yDPxGf0kcCEv1gp
-         N6rlsXD0uVejFHUGoC7WiulTPoJOmF+hM1lVSdw1D7vWc9XNLw3NvofWN96+bx7CfHKq
-         HCwg==
+        bh=xtQNZzACUXAAbylIZWuCAJaOBU6QlQnouJAN5jXvi6I=;
+        b=m0BXxNt1a3eUqkBiNwzhnBhIdGDLJbOIUHxujZ2pQeOzU6BALE6hn/0wbVP0YEVLI0
+         77GOlXNjoPNBXIAvapcHExEAzgfeOADrieO9GfK/N4XUF1XOq+HaxuEHMg2w/WURxWZB
+         LTp9WV4gp67dbU6tUONtH47yJCPj2JLJBQEngidIn7oVm2b9kiuL6w2AnSGgamYowGOj
+         T5g9m43ft8bu4IthgCJJQQGhjIRn+eKFPoloHCmrYK+lsGuQH8eL28GRNXy8tDwFCzMi
+         /Fu+Rysu5WLwHctlaEpoc5hVsAWTNhHACfj7hdx3jzf4D308IHcMYwpSo6HzlmRNEynB
+         BXpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750681235; x=1751286035;
+        d=1e100.net; s=20230601; t=1750681240; x=1751286040;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=X1avEvgULJGN3+NnzgbjknnR4xz+wRJgrCM6KmdqT58=;
-        b=LNLZCA0hF9igzSKoqgh/+cNMM9DYZ07Pe+bm3gt9MJ/PlXIUBfhgxXHga+zyJP948n
-         KdxQPrPEy8otSy1oOoPcj+4f6PYNzFjtUQxrJxzKwxOclxH9VdplqwlaCwI+j8XhNf2e
-         lmJFIiIWzs5AWFcUSbvv335MmaMnb3R7MjcVdoTjn6D81qVrbTOxKeBjAxhkAYZ13PI6
-         dx8Gp0VXqk3VaB2Xynk4ZED20ByKMWFq+y9ZEJTyJGy2eCqdvOlHCQH16+HHtWvlIDi+
-         9/zn9DJq+jy3RlyDLBj3DVbYpeAALX/AfypjORvjNEOxgQDEHuMTFb6d5BokyMGmiP2Q
-         TsZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXmagfuvrwG+pHoN6Eh1YZoA6c5ZCFS4S5mMeNji1A129OG7lDOHgJvcZ7bFgupKcXbxHQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8ev3pYF1hjAXozvXlHExxU6VEGJHD1YFG/6HiPxmWCWJg4Ucf
-	O5W8/EyboxhAlEwFV8U/foA9eGSYxOmxFBwHO5PR2vFas6qIOxxZgmjvulyvNG8Cw6s=
-X-Gm-Gg: ASbGncsiqyG43QQ6gzYS8j9v/j6BOtwtbkrCKNniGoTEyXiWZBMe7xvSkDqRwkRns6N
-	1RzwHoXDXjsmblMcUxQQhX+HHCRu+D4CdzvlTh8H7IVIsJ/GU3BYC+TE70PGj/DETHGK2pAVPWf
-	EgpZ/yK4xqM2+lDzkeAsiNM+qbFTOXg8Miukw0Q3YMcEl6oe427799QIXk79O3NO34/PRweTG3K
-	QIRj8G/V8aswwlijwYHC2P8zKgydQE6HXDjGdVIiWh+WFqN/gKkTN136Xb7AsEM1iGCQ6UoXQwT
-	NW8I4y8MwNsy82MjrEMPIo/a43Y1KWFBxqxgC5y116Sutn4rKIkJd8Mre/vR061sJrZkyVIDAaJ
-	RaSJXp6/H0skKlVHnWPAu2I+dKHpqYzu1zBaV
-X-Google-Smtp-Source: AGHT+IGfmWKuPWWupTZ/ZnEeVOjJmb/p1NM+3sPwfupLNJuwEpOvWNKETdLlJnkiht7JLvtuJ9EAAg==
-X-Received: by 2002:a05:6000:40c9:b0:3a4:e2d8:75e2 with SMTP id ffacd0b85a97d-3a6d132fbfamr8548741f8f.50.1750681234897;
-        Mon, 23 Jun 2025 05:20:34 -0700 (PDT)
+        bh=xtQNZzACUXAAbylIZWuCAJaOBU6QlQnouJAN5jXvi6I=;
+        b=XTXT5q1fgefw1GOy6Hm+dtMCs+sk9aiUdyw8adjlfl93AiO1Y/9FBurT/tQEN7EVAp
+         ima8LucmKsvNcZdjTi4rUwYktbCH1Omvk8RkQrXz7SezTMnu2dOA293GzDK2/Rh9bK7+
+         4sj8v9AUfKBeuVcS32dtEQpZNG4OmYQCKty7X4VBPgEx+6RjtSpgM6HbQrIm6qeRGfq6
+         uWobwK8CpFMDx2ylkARMkhj/b3armrEpR33scOugbiyWixkJtLQTpVN6cUXRFrB4MCOZ
+         ZRDh8ME8eiswbt8Au4ZgFZrr33Qp1EV2tOdbeyiD3gyWMxjgOAkbwanmCtutwFA2Qc7N
+         ZvCA==
+X-Forwarded-Encrypted: i=1; AJvYcCUGBQDqQQf6mcc1ebZ/WNDxvOatNYDxMEfa9tGaJezyFSt2vMmN1+LFLNLRthAQzAFfc8s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzU3Kqxt34N7cF2Waf1mKdepczQCEHbqGgy1Axln1U3M4krOKOc
+	JA9YW0smTIb8Kx2Eg/kT9UmFgkuOAgR5JhKpTXWa5kr+eZk2cbnAk9S8ddzJHbSidhY=
+X-Gm-Gg: ASbGncss2JJNdiLXdE3+2uiSX8h9+8mVCDO4KcBSsc538HBCyBL8ooCjUG/n8IT/Kso
+	3lytk0CVM0aQUr2Jt7ZhIAnhNg1NAApKMKVyzR1SXqqIer3yRUglMNQ4uBPZmJadSaoxyjoQJnT
+	9TGbEpDzUpXcjmWMplTV9Wy7/niLQpqshya++9Zeu3AY+xj2zqrkpZE+tSqAg/GlVnnkJVCUoXP
+	pQVWVUTXnv4DCVjl56RhZLG13CIHdJWU3FAQhulMSwpJrS1yh0BjOQQtP21EqZ3gvj9sjHeumJk
+	6Mh+RL/nXDdY/hTNnbUwsEl+CRUO+AJkMur7EGdH02Vgs+B3NaQX/FtrB2EDw8yF30mytxlzlI7
+	IuuJ76IXD6fy6vMp3XVb+TdouKiga/GAJgv58
+X-Google-Smtp-Source: AGHT+IGloUAr04yva76gXPckxz6WSYPWq4wDXpDI9HHEpLc89a3rsZ2d9KIpm2RuC3BaoxLIlkYNIg==
+X-Received: by 2002:a05:6000:230e:b0:3a4:ef48:23db with SMTP id ffacd0b85a97d-3a6d12f9af7mr10894746f8f.59.1750681239899;
+        Mon, 23 Jun 2025 05:20:39 -0700 (PDT)
 Received: from localhost.localdomain (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a6d0f18a29sm9449877f8f.36.2025.06.23.05.20.33
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a6d0f104f6sm9656927f8f.12.2025.06.23.05.20.38
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 23 Jun 2025 05:20:34 -0700 (PDT)
+        Mon, 23 Jun 2025 05:20:39 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Leif Lindholm <leif.lindholm@oss.qualcomm.com>,
@@ -95,9 +95,9 @@ Cc: Leif Lindholm <leif.lindholm@oss.qualcomm.com>,
 	Phil Dennis-Jordan <phil@philjordan.eu>,
 	Richard Henderson <richard.henderson@linaro.org>,
 	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH v3 21/26] hw/arm/sbsa-ref: Tidy up use of RAMLIMIT_GB definition
-Date: Mon, 23 Jun 2025 14:18:40 +0200
-Message-ID: <20250623121845.7214-22-philmd@linaro.org>
+Subject: [PATCH v3 22/26] tests/functional: Set sbsa-ref machine type in each test function
+Date: Mon, 23 Jun 2025 14:18:41 +0200
+Message-ID: <20250623121845.7214-23-philmd@linaro.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250623121845.7214-1-philmd@linaro.org>
 References: <20250623121845.7214-1-philmd@linaro.org>
@@ -110,51 +110,73 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Define RAMLIMIT_BYTES using the TiB definition and display
-the error parsed with size_to_str():
-
-  $ qemu-system-aarch64-unsigned -M sbsa-ref -m 9T
-  qemu-system-aarch64-unsigned: sbsa-ref: cannot model more than 8 TiB of RAM
+fetch_firmware() is only about fetching firmware.
+Set the machine type and its default console in
+test_sbsaref_edk2_firmware().
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Leif Lindholm <leif.lindholm@oss.qualcomm.com>
 ---
- hw/arm/sbsa-ref.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ tests/functional/test_aarch64_sbsaref.py         | 5 +++--
+ tests/functional/test_aarch64_sbsaref_alpine.py  | 3 ++-
+ tests/functional/test_aarch64_sbsaref_freebsd.py | 3 ++-
+ 3 files changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/hw/arm/sbsa-ref.c b/hw/arm/sbsa-ref.c
-index deae5cf9861..15c1ff4b140 100644
---- a/hw/arm/sbsa-ref.c
-+++ b/hw/arm/sbsa-ref.c
-@@ -19,6 +19,7 @@
-  */
+diff --git a/tests/functional/test_aarch64_sbsaref.py b/tests/functional/test_aarch64_sbsaref.py
+index e6a55aecfac..d3402f5080a 100755
+--- a/tests/functional/test_aarch64_sbsaref.py
++++ b/tests/functional/test_aarch64_sbsaref.py
+@@ -40,8 +40,6 @@ def fetch_firmware(test):
+         with open(path, "ab+") as fd:
+             fd.truncate(256 << 20)  # Expand volumes to 256MiB
  
- #include "qemu/osdep.h"
-+#include "qemu/cutils.h"
- #include "qemu/datadir.h"
- #include "qapi/error.h"
- #include "qemu/error-report.h"
-@@ -53,8 +54,7 @@
- #include "target/arm/cpu-qom.h"
- #include "target/arm/gtimer.h"
+-    test.set_machine('sbsa-ref')
+-    test.vm.set_console()
+     test.vm.add_args(
+         "-drive", f"if=pflash,file={fs0_path},format=raw",
+         "-drive", f"if=pflash,file={fs1_path},format=raw",
+@@ -68,8 +66,11 @@ class Aarch64SbsarefMachine(QemuSystemTest):
  
--#define RAMLIMIT_GB 8192
--#define RAMLIMIT_BYTES (RAMLIMIT_GB * GiB)
-+#define RAMLIMIT_BYTES (8 * TiB)
+     def test_sbsaref_edk2_firmware(self):
  
- #define NUM_IRQS        256
- #define NUM_SMMU_IRQS   4
-@@ -756,7 +756,9 @@ static void sbsa_ref_init(MachineState *machine)
-     sms->smp_cpus = smp_cpus;
- 
-     if (machine->ram_size > sbsa_ref_memmap[SBSA_MEM].size) {
--        error_report("sbsa-ref: cannot model more than %dGB RAM", RAMLIMIT_GB);
-+        char *size_str = size_to_str(RAMLIMIT_BYTES);
++        self.set_machine('sbsa-ref')
 +
-+        error_report("sbsa-ref: cannot model more than %s of RAM", size_str);
-         exit(1);
-     }
+         fetch_firmware(self)
  
++        self.vm.set_console()
+         self.vm.add_args('-cpu', 'cortex-a57')
+         self.vm.launch()
+ 
+diff --git a/tests/functional/test_aarch64_sbsaref_alpine.py b/tests/functional/test_aarch64_sbsaref_alpine.py
+index 6108ec65a54..87769993831 100755
+--- a/tests/functional/test_aarch64_sbsaref_alpine.py
++++ b/tests/functional/test_aarch64_sbsaref_alpine.py
+@@ -26,8 +26,9 @@ class Aarch64SbsarefAlpine(QemuSystemTest):
+     # We only boot a whole OS for the current top level CPU and GIC
+     # Other test profiles should use more minimal boots
+     def boot_alpine_linux(self, cpu=None):
+-        fetch_firmware(self)
++        self.set_machine('sbsa-ref')
+ 
++        fetch_firmware(self)
+         iso_path = self.ASSET_ALPINE_ISO.fetch()
+ 
+         self.vm.set_console()
+diff --git a/tests/functional/test_aarch64_sbsaref_freebsd.py b/tests/functional/test_aarch64_sbsaref_freebsd.py
+index 26dfc5878bb..3cddc082f3b 100755
+--- a/tests/functional/test_aarch64_sbsaref_freebsd.py
++++ b/tests/functional/test_aarch64_sbsaref_freebsd.py
+@@ -26,8 +26,9 @@ class Aarch64SbsarefFreeBSD(QemuSystemTest):
+     # We only boot a whole OS for the current top level CPU and GIC
+     # Other test profiles should use more minimal boots
+     def boot_freebsd14(self, cpu=None):
+-        fetch_firmware(self)
++        self.set_machine('sbsa-ref')
+ 
++        fetch_firmware(self)
+         img_path = self.ASSET_FREEBSD_ISO.fetch()
+ 
+         self.vm.set_console()
 -- 
 2.49.0
 
