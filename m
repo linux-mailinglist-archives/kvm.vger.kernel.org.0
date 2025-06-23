@@ -1,126 +1,159 @@
-Return-Path: <kvm+bounces-50378-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50379-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47172AE48F7
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 17:42:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF6E2AE4909
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 17:44:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95DEA3AC286
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 15:40:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4810C1762E4
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 15:44:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A09C727C17F;
-	Mon, 23 Jun 2025 15:39:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A9F828DEF0;
+	Mon, 23 Jun 2025 15:44:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ESr4kiMi"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="HkP3qsNN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 393D629B768
-	for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 15:39:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9749A277004;
+	Mon, 23 Jun 2025 15:44:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750693186; cv=none; b=US4cN+2oaATMEPUk2el53PUjZ/ZZIxxQPAK2RAlvyXtezx9+L0iwoqtX9YyHS0Sgz0d29UHcB0kS4eRuE/aWeqDCEXITWGG7o8XbqaxZFoqadvLKf5x1D4Bsnp6uUIoHTsdQh0SNSCXa3jZzL7xJG8383dhMauzCPiK+gUn96qM=
+	t=1750693479; cv=none; b=sCNjhqqgx5fXk+aEfLHbZmCbhfUzRLxgfUBvt2l3aVTjJUDB0jwplhC9ACONCV9RwE4TbzF7iP7RnZWW21/EzafRk3CI9vKty+OTdJ0Y9/z+X80myYRESyGiwmy4vvtupz/exBWWDJ66CtjQXiy3wyt24Bwc9q0r6Ory2vvFcJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750693186; c=relaxed/simple;
-	bh=hzweejx2tV391E/xHsALnrKjfTLLQ1qXqDpwudaH8wY=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=NrQEAWzZmnK9nLDOgL6FFoeT9kyQEddZ2jSCset4HZxmDpIAGCdWm0GIzCR+zPXefmSiu15QLfIxwOXqErOo2cb1erF2dhVsMnqg1devoiBPQDC77dCRvin+cV/ehu/m/GgYttJqRiiZ1pz1kC9/umEEOsy2z0ePH+LAg8BStbo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ESr4kiMi; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7491814d6f2so2800200b3a.3
-        for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 08:39:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750693183; x=1751297983; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mohC5VFo2Khyq7uJVLtUEQiLH3jaozZVPkYc2uzJvvA=;
-        b=ESr4kiMifBbwCFUjQmmN6/s/2xF3LHDxBNye0yGKEE42uI1wxSgzgXukjKxeNEIS2w
-         u6idNOj3CErYWfNyKPx42xIj2BrafdNq8QgCzqDorQ34ICZk/Pbpu1sLIakqy/IBIcwS
-         gJlLrX731SmHqRxaawl0MEGS8C89SNrtqFPSO/pLa7c730lH8Km2Nsy60EhDNBiOPdJe
-         gKksP/RzW+KKyowTT9IIJEy80fTK3rwfPxX06Zt2XrTo2VUErKHMa8712Vb10CBmyodA
-         Kf2F9v/qSDhA0YW5JaByzMDhmFggTfDFqTDbHRvq9G2V+THs//ApWgZFy6xVKMPVFVBR
-         ubuA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750693183; x=1751297983;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mohC5VFo2Khyq7uJVLtUEQiLH3jaozZVPkYc2uzJvvA=;
-        b=dytqmSZdovIoMV0jEdxRHNDTqZXFGQllUhlR7Rxqqis5qN3skFeVzKwQlZtHRlUyQF
-         bY0kbDTBS8E1QZB1iJxV0yUVwi1vUIKHzm2TuJ1Zz71OXQgIWUUUzEHtS+GuTsZErslM
-         MsYSvI2Ge74oFF7bOmdyPMG+vL/x6wPKFlSX4fQopwvr9VGbhTLFOK1DolQZfJIMHNU2
-         CPM7hm58FbLXzhhCkNnT+eXE/d2AFkR6QTiTucelkLxfzzunmOYnfFHcDromR8uZr5Gn
-         APevv0TX60EvjJK4zZENVRkNF++Fo+lxe0nw69gOXYZ8K+a+x9bRvPfo9d9M0mJhJ6fm
-         t/EQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUB0HOnz95jVBKiTr9iEDtOJIaw1s89FpqX4qlVX0BFqHhCOpMdgj6p4Z0UzILJ94iDEJw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzwHq2FT60pxJlr2clr6J8Mr4HPKcscyIBF6tdOisPNBZzav7jM
-	+7Ery3QA8WYFBcejf8Cz244PASiQ6IgSyo/Q3lfoh1tzNkrzkVLIZs1VR9FT8KKnJSmxwJ/Uo+M
-	BkhE7iQ==
-X-Google-Smtp-Source: AGHT+IEtzfUGiXMebcgTMM/d+ycTT8KreG0zM+7jUxln2kINdcl11Cpifn/EmOu0VDMQqH0ZnY2khiJd4sw=
-X-Received: from pfblm18.prod.google.com ([2002:a05:6a00:3c92:b0:748:f16c:14c5])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:1a8c:b0:749:9c2:e154
- with SMTP id d2e1a72fcca58-7490d4788d9mr18371573b3a.4.1750693183347; Mon, 23
- Jun 2025 08:39:43 -0700 (PDT)
-Date: Mon, 23 Jun 2025 08:39:41 -0700
-In-Reply-To: <1713a225-44e0-4018-bf5f-64ffd7746167@zytor.com>
+	s=arc-20240116; t=1750693479; c=relaxed/simple;
+	bh=z6uWI1cuaie6yf/MtpZ0mP75H9G/PCflk8KuC0hKgJU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LREGHo89d08xfGTkd6OLOl3KZFXJYH/AdDxcR0jBMQJF6UiXD9FiGcx7vfziNYD1H29mwdWAZiRVUTgo3triL/P4ilcIwiN1Q/V+NYTl2FTQGPaNKqf01tuU500KrpXltQ6BJAzWVvfSuHM2Kdd6cP9vbxxQuNjC5NEtxEt1o/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=HkP3qsNN; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 0428640E01A0;
+	Mon, 23 Jun 2025 15:44:34 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id omm5Wp-Yq0vh; Mon, 23 Jun 2025 15:44:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1750693469; bh=wkp2duUgrbyHfHewe7CWhV6ocxmAcIGEYojd8cQElpo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=HkP3qsNNiJJ+XYR1A5c/QlkUtdLVxxhFc+aWvHh4CZOQl82P6ET11X2ldr4GVjq1J
+	 amx3yHCjgGarLNglQY5sbxuj18TEwaOKByX0/Fv1DEKBJlFpJlR7xXKXHDa0ndg+kD
+	 YxSEfD3kkgFKTnOz907L0OBsKkEsofL5WBXpsMtyAdCNWiHp1K4/KVJLKHVQr73thD
+	 zT7MycV+9igUBBNBR27W9ep0DLgYevdR45Feui+oKwPASluTc4MJxY26JtlJilfswK
+	 Ywui0rTsgN5X0N84HIC+aM+Vhs4I1ExmEnQzGrF4f4KFu8Q7pMJdcTJ/hJpLgYDmiR
+	 A1whvZj1hzEdGy7ihNLqfdfv5y5WL7taIedwUomsdfxtdJOf8DR8kMQgKw3EjxBvyU
+	 +l1ad0o3ve0TP7ot/QNk4OVfk4dymv0RACGdYEIqX5ESZXkoJAkPLub/aQZksmW6wJ
+	 pIB6tyE86co+3/ne0kIgJhdox2YU3xMkf9NKii+dBTpGX22HVc8Swkzj3/xUZgAxXM
+	 Q0uJfsnbZz3+e7gl2AlPDRFcBhNrTs1S0NJhoY8LCvKzXnuWt4KY6DrnDi8iHl76Ys
+	 jws/O0SLKY3+PIdfYQ7BiZlYuJbdrY6Yb6UWcU5ANwA3zWIU3+bAWQFaMadA70N/rT
+	 gP1HkJXYX7+nAT4LuYRkC+zY=
+Received: from zn.tnic (p57969c58.dip0.t-ipconnect.de [87.150.156.88])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 080B240E00CE;
+	Mon, 23 Jun 2025 15:44:18 +0000 (UTC)
+Date: Mon, 23 Jun 2025 17:44:12 +0200
+From: Borislav Petkov <bp@alien8.de>
+To: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, linux-coco@lists.linux.dev,
+	kvm@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	"open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 1/2] x86/sev/vc: fix efi runtime instruction emulation
+Message-ID: <20250623154412.GHaFl2TJL0iGvy30JY@fat_crate.local>
+References: <20250602105050.1535272-1-kraxel@redhat.com>
+ <20250602105050.1535272-2-kraxel@redhat.com>
+ <6b4b8924-c0a7-58ab-f282-93d019cd0b96@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250612214849.3950094-1-sohil.mehta@intel.com>
- <20250612214849.3950094-3-sohil.mehta@intel.com> <7525af7f-a817-47d5-91f7-d7702380c85f@zytor.com>
- <3281866f-2593-464d-a77e-5893b5e7014f@intel.com> <36374100-0587-47f1-9319-6333f6dfe4db@zytor.com>
- <39987c98-1f63-4a47-b15e-8c78f632da4e@intel.com> <7acedeba-9c90-403c-8985-0247981bf2b5@zytor.com>
- <aFXsPVIKi6wFUB6x@google.com> <1713a225-44e0-4018-bf5f-64ffd7746167@zytor.com>
-Message-ID: <aFl1PcnVuYuELvRQ@google.com>
-Subject: Re: [PATCH v7 02/10] x86/fred: Pass event data to the NMI entry point
- from KVM
-From: Sean Christopherson <seanjc@google.com>
-To: "H. Peter Anvin" <hpa@zytor.com>
-Cc: Sohil Mehta <sohil.mehta@intel.com>, Xin Li <xin@zytor.com>, x86@kernel.org, 
-	linux-kernel@vger.kernel.org, Andy Lutomirski <luto@kernel.org>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, Peter Zijlstra <peterz@infradead.org>, 
-	Adrian Hunter <adrian.hunter@intel.com>, Kan Liang <kan.liang@linux.intel.com>, 
-	Tony Luck <tony.luck@intel.com>, Zhang Rui <rui.zhang@intel.com>, 
-	Steven Rostedt <rostedt@goodmis.org>, Andrew Cooper <andrew.cooper3@citrix.com>, 
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Jacob Pan <jacob.pan@linux.microsoft.com>, 
-	Andi Kleen <ak@linux.intel.com>, Kai Huang <kai.huang@intel.com>, 
-	Sandipan Das <sandipan.das@amd.com>, linux-perf-users@vger.kernel.org, 
-	linux-edac@vger.kernel.org, kvm@vger.kernel.org, linux-pm@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <6b4b8924-c0a7-58ab-f282-93d019cd0b96@amd.com>
 
-On Fri, Jun 20, 2025, H. Peter Anvin wrote:
-> On 2025-06-20 16:18, Sean Christopherson wrote:
-> > > 
-> > > So I was thinking about this, and wonder: how expensive is it to get the
-> > > event data exit information out of VMX? If it is not very expensive, it
-> > > would arguably be a good thing to future-proof by fetching that information,
-> > > even if it is currently always zero.
-> > 
-> > It's trivially easy to do in KVM, and the cost of the VMREAD should be less than
-> > 20 cycles.  So quite cheap in the grand scheme.  If VMREAD is more costly than
-> > that, then we have bigger problems :-)
-> > 
-> 
-> LOL. Since it is up to you, Paulo, etc. to decide how to do the tradeoffs
-> formaintainability, debuggability and performance in KVM I am guessing this
-> is a vote in favor? (You can always take it out if it is a performance
-> problem, until such time that the kernel itself starts consuming this
-> information for reasons currently unknown.)
+I have this now:
 
-Unless you can pinky swear that vmcs.EXIT_QUALIFICATION will provide event data
-for IRQ exits, then I'd prefer to pass '0' unconditionally.  '0' will always be
-safe, if potentially suboptimal.  But passing what could in theory be something
-other than FRED-formatted event data could lead to buggy behavior.  Per the FRED
-spec, Revision 7.0, exit-qualification doesn't hold event data for IRQ exits.
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 2 Jun 2025 12:50:48 +0200
+Subject: [PATCH] x86/sev: Fix EFI runtime instruction emulation
 
-  For some events for which event data is defined (see Section 5.2.1), the event
-  data is saved in the exit-qualification field. (This is done for #DB, #PF, and NMI.)
+In case efi_mm is active use the userspace instruction decoder which
+supports fetching instructions from active_mm.  This is needed to make
+instruction emulation work for EFI runtime code, so it can use CPUID and
+RDMSR.
+
+EFI runtime code uses the CPUID instruction to gather information about
+the environment it is running in, such as SEV being enabled or not, and
+choose (if needed) the SEV code path for ioport access.
+
+EFI runtime code uses the RDMSR instruction to get the location of the
+CAA page (see SVSM spec, section 4.2 - "Post Boot").
+
+The big picture behind this is that the kernel needs to be able to
+properly handle #VC exceptions that come from EFI runtime services.
+Since EFI runtime services have a special page table mapping for the EFI
+virtual address space, the efi_mm context must be used when decoding
+instructions during #VC handling.
+
+  [ bp: Massage and extend commit message with more backstory, add
+    clarifying comment from Tom. ]
+
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Signed-off-by: Borislav Petkov (AMD) <bp@alien8.de>
+Link: https://lore.kernel.org/20250602105050.1535272-2-kraxel@redhat.com
+---
+ arch/x86/coco/sev/vc-handle.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/coco/sev/vc-handle.c b/arch/x86/coco/sev/vc-handle.c
+index 0989d98da130..e498a8965939 100644
+--- a/arch/x86/coco/sev/vc-handle.c
++++ b/arch/x86/coco/sev/vc-handle.c
+@@ -17,6 +17,7 @@
+ #include <linux/mm.h>
+ #include <linux/io.h>
+ #include <linux/psp-sev.h>
++#include <linux/efi.h>
+ #include <uapi/linux/sev-guest.h>
+ 
+ #include <asm/init.h>
+@@ -178,9 +179,14 @@ static enum es_result __vc_decode_kern_insn(struct es_em_ctxt *ctxt)
+ 		return ES_OK;
+ }
+ 
++/*
++ * User instruction decoding is also required for the EFI runtime. Even though
++ * EFI runtime is running in kernel mode, it uses special EFI virtual address
++ * mappings that require the use of efi_mm to properly address and decode.
++ */
+ static enum es_result vc_decode_insn(struct es_em_ctxt *ctxt)
+ {
+-	if (user_mode(ctxt->regs))
++	if (user_mode(ctxt->regs) || current->active_mm == &efi_mm)
+ 		return __vc_decode_user_insn(ctxt);
+ 	else
+ 		return __vc_decode_kern_insn(ctxt);
+-- 
+2.43.0
+
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
