@@ -1,82 +1,82 @@
-Return-Path: <kvm+bounces-50413-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50414-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54E1FAE4E22
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 22:28:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CB56AE4E24
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 22:29:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F3CC9189B32A
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 20:29:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1F7A1189C718
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 20:30:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B1DE2D543B;
-	Mon, 23 Jun 2025 20:28:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C83162D5438;
+	Mon, 23 Jun 2025 20:29:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="fY8i9KPF"
+	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="Ik3UXai9"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4CF21FCFEF
-	for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 20:28:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9153822F77F
+	for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 20:29:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750710518; cv=none; b=ObdGV+d1HzkMfbGwiE0vTYokth3KNDTuLZgCmzHNqnyGEGNsIvYOCPZxXgQdvSoVGUI8FAaMqd9198BE8c1pFsr/NKQe2PKaJAbUF4oP/iHF6RqpYKcNIOgjhpDxuTZkWQFz7c+/KwhMWa28O4GZ8hzItn//aIGsxzdmRNBUUVc=
+	t=1750710587; cv=none; b=GwgMAdZTQy+u82CajhsntjUkbFnA0+posrVDb0xyXVYg1+H40zjySGc0GCVLSD45UHienz9jiXh7zMLJC7f2HdgoHU9ZGywudREOT5lPqSPlFo+pks4V6rZ80EmAfQULnnmek6aDfdCRj+S9FBvcxIHBaBYIZcWZVrws3GdH1Lg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750710518; c=relaxed/simple;
-	bh=yvn5m/fc6jZqcP4SKANHRgL9UqFxUsYwY/MKu8XQkCo=;
+	s=arc-20240116; t=1750710587; c=relaxed/simple;
+	bh=MUTbeSlMElSRYbL7xBsyJJMC9HYGdeNhwGY4pzloeDw=;
 	h=Message-ID:Date:MIME-Version:From:Subject:References:To:Cc:
-	 In-Reply-To:Content-Type; b=gihdTOL33mnjdtABblstQfdfeLg/dyiVLof6OLV7qr4QRXRXjgL2RBLLdGPjh6X0LJUgqVuPk2nIKbOuP9J/V08Ezg58i+8gMQEQ4V6Y0SZtMmGsNKj+9ZlzedyD0+h3TbirRphD2UfSHdJ/6t4ljEnmbba90FkgCB0HMVyoo6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=fY8i9KPF; arc=none smtp.client-ip=209.85.210.176
+	 In-Reply-To:Content-Type; b=KTUmne+NzLCC9gG/0sk/f/C2mpC9v1XAJ4cFGvSdJvfm1GX6j5Ya2hLl5iDlUUIHVSOFUfA0WQydvc40P/J+ABQEu3Q6UpPtEUBO89k7ZHH45cQAgVYTNNXcU3Hwz3IG3oRlRHPFnFU6IymCWzQAQnIkRf4PT2kXtpgxIVAsXlM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=Ik3UXai9; arc=none smtp.client-ip=209.85.214.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensrcsec.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-748fe69a7baso4290332b3a.3
-        for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 13:28:35 -0700 (PDT)
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-235a3dd4f0dso31753615ad.0
+        for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 13:29:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=grsecurity.net; s=grsec; t=1750710515; x=1751315315; darn=vger.kernel.org;
+        d=grsecurity.net; s=grsec; t=1750710585; x=1751315385; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:cc:to:reply-to
          :content-language:references:subject:from:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=9lG2fYK+FG/7B4Hz41OrfpLpcja5dQtRjIqgFo6jHfc=;
-        b=fY8i9KPFuq9OA8K2K+dIQ0ER2fzkhT+2AqTF1drqMinhVW26Jn/uCp0tbtccXF49Nr
-         Qamc9DLx3f7LFtlUsHjbAFD0x2rEJcs/tjc0hqdVneQJfrkGv05cukRqTRuVXE7niaNc
-         ExBaFng4RfFHefU+SfvrPkGVp4cRKaxI3uf7q2pkuy229ZOmnrGQtAZrjHJrg7A3sgu4
-         30/Koe4nwCbAddgNlqClXh+A9JAXsfssMuQKhLeBOs1yNntOZCblDHZBBKVCEVc1gT0O
-         Dj8A1x0lKeL7PLu0PjMZP1DgUiP5ZgG64q5v3M2VP1BSljed36mIJyBE0PLP7F5xqxXr
-         0RJA==
+        bh=uspidLfgJvUSMKS6dpb2FfJ1dJx24s+/Cz+Y3SmG7mI=;
+        b=Ik3UXai9+fw9oBtJC2dCrr4vRulyKzeTsJW03lFucchywSOokvh0yF4dC28u1cMs5i
+         6Yf+NsJIgPhPtIg1MxwiZAtWvcm0VBAwUHkbWnoJUvxnujs7iwy9cbtCuN8tsHg2GBiW
+         CSYpUWsJLeGeTpp0SYTlMxL7p3YApAwaojRGCecaYL3nFjXs3RWLVkxgfNBfMlyVQv9h
+         WNoWGatr/O4uOZzBC4Yitv8bV7Ck5UZxPZ85CvOYFVWI0EC0nkG1x++rTH1f2sERJrW6
+         L2sK1nS/p/jbg8lGOJ0im7/7imh6rQwLpy+NYgN5LWovZB8iZ2eE5Kew/8aZUHF9GDZ/
+         DxGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750710515; x=1751315315;
+        d=1e100.net; s=20230601; t=1750710585; x=1751315385;
         h=content-transfer-encoding:in-reply-to:autocrypt:cc:to:reply-to
          :content-language:references:subject:from:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9lG2fYK+FG/7B4Hz41OrfpLpcja5dQtRjIqgFo6jHfc=;
-        b=GqcUrie1AoBQ2ee/pdM8YbQjf1GxuFFvNL82OtXelKP3gdOVGLJkTRjZNl0dq+lCie
-         /PXyedsRTisVUbqe0LaVdsG8E6Q6b/3wG8MTQHB5pnx+3zBPvCFsoFBlCBQ80qu0Z0cW
-         slQqQ24415y5EcG8kly5Uxb38CWi+g4NtOdy74PHI61YHGuaiCApQGgvdih8pxp+25ij
-         w499+yjiB7r1BhzHaYG0HXqRW49W7vjyZxvfTkvYstfPgsALqMwIbcBCx/6XdAUu1V0M
-         Ep1tY9XXcft8ZuFFYA01exBg7GakI9PbJbKY63KjNU0oqUA7k7BTTOOxxC/ewStLKx2+
-         7ebQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXZPBAmYJtI4zFFgqW5cmmm4nvcNrDKRKFwWs4wKXboB9yPqEFnoXgEkVFDCZ7wbhpkb68=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxPdn48VEHDF8cVcHBwn0V29nFIfxXgFQH6mq/GbsGyGqW5DYNN
-	9WYnnWjLF8gIlnibQi6aZD3UqXNJ08GJ8XDLty0A51B+oGYDGkwg8m8kYsn+GNQZVIg=
-X-Gm-Gg: ASbGncv/pEWGy/bAllWGLPiq+1d5g8vktCwWdHKpx326cyHhrT4kpa4TPcN1Phck3lj
-	Q3NmYqVWpRl9xTQisCTAgM6Bvrzuz3kFTTy/MNdDTYD95lpMEyqBdt8ihO/faErGraFrno6mdD0
-	o+5OvbPF+y0eh3VHXTCy2urNGhwQcbCbDVaxZwKdPFX4TKETKbjVFEWvFGmmGA/UNlnowG1uJTM
-	Fd+rw8fg4AjDwN4BCzAMjkAWFzIIlKTVb5LjIb4zl5zodXN9CfoGDG7meePlpznIzfcQelXTwnV
-	M+9FD8ByOW4evFLc3dTJsLyaqkCBiUqQeKNld90+qZNAtToIgxfNgVdvPGMqb/mYjivqJBRs0Uq
-	m3+4cWgWbSTsRH2GJ4Vv4BLa7l+idYkFzr8L+nFd2svT6Y60V+JJbPAq8Rlh4YGyl8xOyKJJxu2
-	eb7BZNWOpt30XVrCOkqZ4=
-X-Google-Smtp-Source: AGHT+IHbWOO4NSbrGwdEC76GQPstv/OQjR/CDJ1ZM3WMxgwIO/uDHwHLpHbyfzVTCuq8c71lwTTooQ==
-X-Received: by 2002:a05:6a00:4f8c:b0:748:f406:b09 with SMTP id d2e1a72fcca58-7490d6d2ea7mr19547214b3a.23.1750710514925;
-        Mon, 23 Jun 2025 13:28:34 -0700 (PDT)
+        bh=uspidLfgJvUSMKS6dpb2FfJ1dJx24s+/Cz+Y3SmG7mI=;
+        b=Roqx9bKKPpERLmtlL/RN0WjOgFk2ezi34zkiue2arNfcjOEQVzW3LDqfVQXtMeANQ4
+         AaZiPIVaiG57QRvVHJOpUB08C93s7fyYzJn2hOyfVEoKbH6T+XKil1qQ+LFUgzNUl3ar
+         8T9u8+YBWGeCBH7gXiFIQTniZ8SY5nJ/Ogw+VekTIq8bHtrFhSxWttCg/kL0V9TsDaKh
+         aGbBQmDI0e2il4BRm+sHp+StHuzvGKTtjhrvlhoiBg9hJczsFYORVZ/6Lje2jh0mBpcu
+         vXXaC4OU66V6bX2L3XinAD3SCyrTRLsxZSuWvL1eyrPMzQG1jtRyDcN4TY81wuedoq5f
+         WlWA==
+X-Forwarded-Encrypted: i=1; AJvYcCVPMgXX68mDAs100h0daMxhJU/9gvITJHC2Mx9yHIJfFu/BAKGnUvwpWUKNJLLSe0iJXlY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx/OdrwQDGJ/hr61MbmNOlHNQnu9mUqBqVVSvNVqyoHMX2yv4h8
+	W0idZ8P2PtAtT0HOVMnWdSPlXRcJdjyXQoxoLETQ7aKI0IDVxG8uYnkezCVnPShfeRg=
+X-Gm-Gg: ASbGncvuZcS1KUeHkFQQAi7nZ8B7BoNo38RH+j9O0Ew5nBiikrJiCFpQwciZpUs5eDG
+	4aSOKxE8SFHevMja7TlFKDAN6feFcZnHAvu+yLOuWMlRWsId8LIZfLwYsuHMAAcoXd0raZkcS/2
+	RBw5hpLyoaWEtHKeI/rS1r6tFNhgvJHrP4HdqLl1YqZKWQ6dBBlk5ZpuPwVZOyOrkuy8QznBkvZ
+	1LBTyqay1EUYTHfhDN8CPjYa12oo3qHUE//4EekyltpHi+RvNXEpeahCskH/lMBkJiVUsrHcI4B
+	mg8vrIgqmioWJqvFnBXJctNpbTbe8PQFnqPSEdJ4u+rqlhSL8IakfF5xMIL9D182QFiyvUufVx8
+	lUPW1flKFrqE67uEc+9sqDBrKR1fNa0vpNtsHcJXFroY61M1nKP3JRg3itCSKPphlGeH9sDrLUl
+	efm++XBLnmCeIydpITG/M=
+X-Google-Smtp-Source: AGHT+IH46xuxqoQ4c5WdFOaIpGG0nJe7BFSQ8BH9zshg2/l6yRiyFeILDOhbIVZfCczDgJe85/w6QQ==
+X-Received: by 2002:a17:903:11c4:b0:235:f45f:ed49 with SMTP id d9443c01a7336-237d986fc49mr239299325ad.33.1750710584842;
+        Mon, 23 Jun 2025 13:29:44 -0700 (PDT)
 Received: from ?IPV6:2003:fa:af22:cf00:2208:a86d:dff:5ae9? (p200300faaf22cf002208a86d0dff5ae9.dip0.t-ipconnect.de. [2003:fa:af22:cf00:2208:a86d:dff:5ae9])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-749c882cdc4sm5608b3a.84.2025.06.23.13.28.33
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-237d866b664sm89176675ad.169.2025.06.23.13.29.43
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Jun 2025 13:28:34 -0700 (PDT)
-Message-ID: <335d4b2c-1b37-4026-95d1-12c6875ac58e@grsecurity.net>
-Date: Mon, 23 Jun 2025 22:28:32 +0200
+        Mon, 23 Jun 2025 13:29:44 -0700 (PDT)
+Message-ID: <8b2eb284-efb7-42d2-aaea-e9568e23f594@grsecurity.net>
+Date: Mon, 23 Jun 2025 22:29:41 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -85,9 +85,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 From: Mathias Krause <minipli@grsecurity.net>
-Subject: [kvm-unit-tests PATCH 1/8] x86: Avoid top-most page for vmalloc on
- x86-64
-References: <d6f116b2-1c42-4fde-831b-b23fa6791e74@grsecurity.net>
+Subject: [kvm-unit-tests PATCH 6/8] x86/cet: Simplify IBT test
+References: <e53b66b9-6b32-4834-a34e-17c307c19a82@grsecurity.net>
 Content-Language: en-US, de-DE
 Reply-To: Mathias Krause <minipli@grsecurity.net>
 To: Chao Gao <chao.gao@intel.com>
@@ -127,43 +126,46 @@ Autocrypt: addr=minipli@grsecurity.net; keydata=
  zz3lozuC5nsm1nIbY62mR25Kikx7N6uL7TAZQWazURzVRe1xq2MqcF+18JTDdjzn53PEbg7L
  VeNDGqQ5lJk+rATW2VAy8zasP2/aqCPmSjlCogC6vgCot9mj+lmMkRUxspxCHDEms13K41tH
  RzDVkdgPJkL/NFTKZHo5foFXNi89kA==
-In-Reply-To: <d6f116b2-1c42-4fde-831b-b23fa6791e74@grsecurity.net>
+In-Reply-To: <e53b66b9-6b32-4834-a34e-17c307c19a82@grsecurity.net>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 [resend with kvm@ on cc]
 
-On 23.06.25 06:50, Chao Gao wrote:
-> On Fri, Jun 20, 2025 at 05:39:05PM +0200, Mathias Krause wrote:
->> The x86-64 implementation of setup_mmu() doesn't initialize 'vfree_top'
->> and leaves it at its zero-value. This isn't wrong per se, however, it
->> leads to odd configurations when the first vmalloc/vmap page gets
->> allocated. It'll be the very last page in the virtual address space --
->> which is an interesting corner case -- but its boundary will probably
->> wrap. It does so for CET's shadow stack, at least, which loads the
->> shadow stack pointer with the base address of the mapped page plus its
->> size, i.e. 0xffffffff_fffff000 + 4096, which wraps to 0x0.
->>
->> The CPU seems to handle such configurations just fine. However, it feels
->> odd to set the shadow stack pointer to "NULL".
+On 23.06.25 07:32, Chao Gao wrote:
+> On Fri, Jun 20, 2025 at 05:39:10PM +0200, Mathias Krause wrote:
+>> static uint64_t cet_ibt_func(void)
+>> {
+>> +	unsigned long tmp;
+>> 	/*
+>> 	 * In below assembly code, the first instruction at label 2 is not
+>> 	 * endbr64, it'll trigger #CP with error code 0x3, and the execution
+>> 	 * is terminated when HW detects the violation.
+>> 	 */
+>> 	printf("No endbr64 instruction at jmp target, this triggers #CP...\n");
+>> -	asm volatile ("movq $2, %rcx\n"
+>> -		      "dec %rcx\n"
+>> -		      "leaq 2f(%rip), %rax\n"
+>> -		      "jmp *%rax \n"
+>> -		      "2:\n"
+>> -		      "dec %rcx\n");
+>> +	asm volatile ("leaq 2f(%%rip), %0\n\t"
+>> +		      "jmpq *%0\n\t"
+>> +		      "2:"
+>> +		      : "=r"(tmp));
 > 
-> Not sure if adjusting this is necessary. As a unit test, exercising this corner
-> case might be beneficial. But I don't have a strong opinion. So,
-
-Yeah, I have ambivalent opinions about it too (testing the corner case).
-However, the under-/overflowing aspect of it feels like a bug to me.
-
-> Reviewed-by: Chao Gao <chao.gao@intel.com>
+> @tmp isn't needed. We can still use "rax" and list it as clobbered. 
 > 
->>
->> To avoid the wrapping, ignore the top most page by initializing
->> 'vfree_top' to just one page below.
-> 
-> Nit: this makes the comment in test_lam_sup() stale, specifically "KUT
-> initializes vfree_top to 0 for X86_64". So, that comment needs an update.
 
-Ahh, good catch! I'll fix that one in the next version.
+I still prefer letting the compiler choose a fitting register. This also
+makes it easier to enable this code to be 32-bit ready. So 'tmp' may
+seem unnecessary, but it's a vehicle to allow the compiler to choose an
+unused register. RAX needs to be set to zero, after all.
 
 Thanks,
 Mathias
+
+>> 	return 0;
+>> }
+>>
 
