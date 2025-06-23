@@ -1,78 +1,78 @@
-Return-Path: <kvm+bounces-50325-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50326-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 166E9AE3FF8
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 14:26:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B42F3AE4005
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 14:27:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EA6F7189AD43
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 12:21:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6CD853BD765
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 12:20:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81623248895;
-	Mon, 23 Jun 2025 12:20:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3855248F5A;
+	Mon, 23 Jun 2025 12:20:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HGBjd6bx"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="STsvWzdX"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3828238C16
-	for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 12:20:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D6FB1957FF
+	for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 12:20:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750681202; cv=none; b=K2UopqoyxN/8FEQSnm3xqBJNX3FVffZwLlw7b30pjpys7l+cDCaKO544Jz9LoK5PztanT094whIY5dg2095LHB37dT0olj0PqVTzkOBv5SN09VwFkJjEVj2y1G9ZnIXFkznfY50F69aJlcSWbDzospFQ58UZ5y47l2gj5FP/01U=
+	t=1750681207; cv=none; b=Q9hJA0mNz/qYzt3pek755n/fMGl3BBH+D5x75/RxEdSVhSr4dNZeadbJG/Fgtewn7KWJ216/dSpMNp8DtZRhDGhE4MNtSwpcRZdJ9MUb8UMRYs5+PEat7f77gADtIgv4/4vNIR2ATgthobCeO7z5XsGSalhWizP+3nF9PNmuuW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750681202; c=relaxed/simple;
-	bh=yyqnUEjDD9oZh/wgQPdGXi51drE5gp9Y0ysKeHS5SgY=;
+	s=arc-20240116; t=1750681207; c=relaxed/simple;
+	bh=OQk9QRusfHQEt++YC0RplGJPmlYhjJLC4+HrPr+sP0o=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DSqjyw1W4nrTAbz1UiIEG3HTpjSDm1Unoa3lcPzOcsTU72LR6iUMeYfAWUB7ltiReaOuhJ65IpvcoiMVzfVZ9EfSDq3wLe4JtNwVr+0s5YlviFr/0vemZNUyFpWhBu+GoO68gqUzwJUxFnF4c7Mal49EV4LYse3cGxfwgwkkBr0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=HGBjd6bx; arc=none smtp.client-ip=209.85.128.41
+	 MIME-Version:Content-Type; b=qcCMDqvewQKQWZuZJ+Mr/lSjxxqfj5CKbDcERf1fUad/O83yGoKXYHv1scvZIAaQJVpeSQ2MhoXFjgXf3QWNa6tnF1JtaMj9/uJxofChqM8kQgTHzTAJ01hZzsvX3XwzY2+7ax6FdTqeoS0e4c4G3ovNzlljcXpiy0B8NY8oy3w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=STsvWzdX; arc=none smtp.client-ip=209.85.128.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-442fda876a6so37083875e9.0
-        for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 05:20:00 -0700 (PDT)
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-450d668c2a1so31401055e9.0
+        for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 05:20:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1750681199; x=1751285999; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1750681204; x=1751286004; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=FOQFF5IHVggEpZxvhH4Dg2y5NDppFE2+idPk4kXeUTw=;
-        b=HGBjd6bx3X1PmCDOaNamWArAVK8qpaxPtEW8Qw9yb+1IRidNW00jHWH2NmBD9KfoIq
-         kHsZ3gCHjd08HujvRR1Bxv42WNJ14N8/hsBQ6sf2dpsKafwihVh9AnfWg3e5nceydYP0
-         uTepzvqBcL7sTf144RlXtSwaI+afDEltKvScVImpJpvS1Lr1wbyVhbNBKLsm+kQ4LtF+
-         eXXUeI27y8mVYcPVPGk/LKKLR350WcG8BTOryxoDzdg4hmzsdltFMwNajFkHsFnI7VGu
-         W0G+Wor3FKld+FpygO4ee8VPo8Hhhv4gKpirr+O2kG6MN6zVoi7yNlnb7z0+ZXZSSqJa
-         dkiw==
+        bh=Y/J3/dM6yL9EpwD8nNu/ZbysHMLeoDjMiAJQk/DeNw0=;
+        b=STsvWzdXi0grqnaqa5xneo2SYo6Zz49zftnBVciQUCGrp06LFAS7Ko4aguAMZxsK4X
+         sHCC0RcsPyx+KV6fklbMLVbYQiIK1FnX7mz1ibNZv1BUAXPCAaANiZG6CWOWuyt3FYv4
+         Y+hD7nQsMFpMU8GjX/sDYiRapoYWMRsIDV6SIHM5v6P5cwvdVBCT8dIzJQ4mpeHU6Ic7
+         k6R8uZjSLlkN1EA7e8XU4wwhPfqrh62Opoy5sXGAKkreHES1EQYlsEf09AbxogRr/qil
+         LrwA28VxkOgdw0Mj7BsowFG2IlFueB4FamdkLej04B0AjOpYxJmpyH6JoZY9D+nWS9ns
+         nTsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750681199; x=1751285999;
+        d=1e100.net; s=20230601; t=1750681204; x=1751286004;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=FOQFF5IHVggEpZxvhH4Dg2y5NDppFE2+idPk4kXeUTw=;
-        b=bp9UcuKfuEjam4r8/IOhhV5Z/xl6AAPsaXNFl0jAAZlNKwpW6CDF6u1GRY3FS3uhka
-         V0lD9TYHzkRUnBdnq1KLxjFz09LjgvC1G9rjwhWBiauN5PREL+ZOC8Pw96tgvBFcWgIM
-         FIBVW+OepmXvTUwYleYaVvWyBecw/ovcssGtreu6MonW2mH5vQuYUcW4u5ucTF23CKNG
-         qC7mXyN3Nu8x3NM5/fLgmWxPdMyyAdBteAetBeHhRwgpMIB49UGNaN5SaZkdMGj2yMzs
-         KltG0fcqBoHNJ/BFc59l8yXl/q9J18M9w6yKJebFYxBu5d4wBfO8bFvPb7+u09q45IVo
-         8kcw==
-X-Forwarded-Encrypted: i=1; AJvYcCXTdpuyio+gByMrSCBvzePabIWD+6R7fq73jHWgbfKCTQsIOjF/wZneo/CwkFr6qmmfITQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwPYF+3sFv4l0HOXHDzogf6S0ALrNGfKKLEUhkigbUJkx6QtniE
-	XwVqMaJQUZqtwvr4GmwVDMK2t0I4IQ0knHWo8lzg9PGdssB4app9Ax3PSjTuHfK4zzQ=
-X-Gm-Gg: ASbGnctlx6vTeeRLGyBibAA6YujDmSsqIwdH+qUP21AjddGAJoHfRF0C1rmj7ewcJR8
-	9OMPFSpxMxNwdU7MOcYzzeTuU52rAsyeUhEF/0rtt11ZYE9GaljtQxo3lVvrnIDpLajk3KC/suL
-	FTOAXd7wD52C4SWkMma7l54EWx7pQAwLLww5QwQFhCZW33iSx1QApBk45LCnOuR1U4vN07AcVf+
-	C8boucbGTXWWSJkyi1wAE34wSFL/SGeeQ4TDNCmHJgfYHBqQOkJMlTBvEuezMevFpodJZOhGb+R
-	/La0ohMiJMeVjrm9IsildW/WfuZlGfZHpmmfAnlj0h85NXMWAake9MFi3yZWZzDiKs1w8E6F2y/
-	xYALfip4Qk9MhU/UwFZSLLFdS644Z8+T0TMjC
-X-Google-Smtp-Source: AGHT+IFwQfth961QDPwmcQSOPunexZxZtRH6B1UX0+3skNQVMIAOIVx+CTDwFZCmfuogwrFQqEjVTQ==
-X-Received: by 2002:a05:600c:1c28:b0:442:ccf0:41e6 with SMTP id 5b1f17b1804b1-453656c2172mr118658905e9.3.1750681199364;
-        Mon, 23 Jun 2025 05:19:59 -0700 (PDT)
+        bh=Y/J3/dM6yL9EpwD8nNu/ZbysHMLeoDjMiAJQk/DeNw0=;
+        b=PEPiDaWtpOobUCALGTtXJ9qddItbeF/q/0ghKlnTzq8+AJf9V0Uf1yXKxAXYiYHE4N
+         rxzIpuieBYY+0Cnj9mRZ4c+65jQlw5m0LkhnfMBs81QD/Gf2ldz/h/1YiZ+soBtbtQax
+         +Do4roaTJdfVlvqcaZpNm3BwarxhTweXcamgXszJdlp864jJ1kJ1lmI126eeVuH27Ufj
+         birox/dSnebYUFdlBe1vkm65o8HpvEim05uKasbQ/5c7bBIFqmx0NNu5Miukteh0rygP
+         9JwMJsKf3HJ2y0hD4JoKe8vfA/iG0rBQhQ2E/rqPtjDlcX3HV530d4oyPziMU2gqFLxi
+         hpBQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVX4Z4kRhavAqqcbLdHITbT//bgQIHIxHTI5PADlHB62M505UMMX88J/LKA3Z9Gnzubxp8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxDly35E4ntUGvoRALiqa8MFfcheV1R21lynbPq69a9Tnp6Pk5B
+	hE4SPIDAyRlY7Jzq5M54GbvajrOeRwtlI3PzSGoP+VlbgzqAhfdXbBeFS1RNgBIAGro=
+X-Gm-Gg: ASbGncu78WKd1pSyUnMX1Pmd96Q2kBQb2Z9tSYPUGmio1j1c+dt+9ekVb3yhE55TD9f
+	YU5IweBpjht9UQSySqsChKul46+tbaiWnSM47ErXtrtt5U3A7nvtkLkftwXii0wQq53KLBW4Kf9
+	LSgtB4mcDruYv15qCfg642MHf6oXAA17Ydoz957MEx3LUguxa3d1xMo3G2e6JWWY3jEoIWkPfw3
+	5hryr8cyggOdwooOPGNWZddI7jERvv8wHbnXaWuDGatMfgDOOZ/peCYFLNgk865xZQbmJG7OJNs
+	ST61L+eYHSFEFDCJ6/nSSkPNm95rhH64zmcbYNl7kqhzvrKMhx6kPyAsCXLr+E1i/x2peOHGmgS
+	0qLeywowwJWw4j4Jug2LXVmWvEPwtxJj771HT
+X-Google-Smtp-Source: AGHT+IEDBLzyvotQDHdgeUadRfrLThtjSEX8cwJuz2mnLVjDK+hMLUAuzhTdSt0x3jQyPiQhQl7KNg==
+X-Received: by 2002:a05:600c:1d27:b0:453:10c1:cb21 with SMTP id 5b1f17b1804b1-45365e3dffamr107598715e9.8.1750681204506;
+        Mon, 23 Jun 2025 05:20:04 -0700 (PDT)
 Received: from localhost.localdomain (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4535e983a4bsm143750295e9.13.2025.06.23.05.19.58
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-453646cb5a8sm111194065e9.7.2025.06.23.05.20.03
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 23 Jun 2025 05:19:58 -0700 (PDT)
+        Mon, 23 Jun 2025 05:20:04 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Leif Lindholm <leif.lindholm@oss.qualcomm.com>,
@@ -95,9 +95,9 @@ Cc: Leif Lindholm <leif.lindholm@oss.qualcomm.com>,
 	Phil Dennis-Jordan <phil@philjordan.eu>,
 	Richard Henderson <richard.henderson@linaro.org>,
 	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH v3 14/26] accel: Keep reference to AccelOpsClass in AccelClass
-Date: Mon, 23 Jun 2025 14:18:33 +0200
-Message-ID: <20250623121845.7214-15-philmd@linaro.org>
+Subject: [PATCH v3 15/26] accel: Introduce AccelOpsClass::cpu_target_realize() hook
+Date: Mon, 23 Jun 2025 14:18:34 +0200
+Message-ID: <20250623121845.7214-16-philmd@linaro.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250623121845.7214-1-philmd@linaro.org>
 References: <20250623121845.7214-1-philmd@linaro.org>
@@ -110,97 +110,41 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Allow dereferencing AccelOpsClass outside of accel/accel-system.c.
+Allow accelerators to set vCPU properties before its realization.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- include/qemu/accel.h       | 3 +++
- include/system/accel-ops.h | 3 ++-
- accel/accel-common.c       | 1 +
- accel/accel-system.c       | 3 ++-
- accel/tcg/tcg-accel-ops.c  | 4 +++-
- 5 files changed, 11 insertions(+), 3 deletions(-)
+ include/system/accel-ops.h | 1 +
+ accel/accel-common.c       | 3 +++
+ 2 files changed, 4 insertions(+)
 
-diff --git a/include/qemu/accel.h b/include/qemu/accel.h
-index fbd3d897fef..9dea3145429 100644
---- a/include/qemu/accel.h
-+++ b/include/qemu/accel.h
-@@ -37,6 +37,9 @@ typedef struct AccelClass {
-     /*< public >*/
- 
-     const char *name;
-+    /* Cached by accel_init_ops_interfaces() when created */
-+    AccelOpsClass *ops;
-+
-     int (*init_machine)(MachineState *ms);
-     bool (*cpu_common_realize)(CPUState *cpu, Error **errp);
-     void (*cpu_common_unrealize)(CPUState *cpu);
 diff --git a/include/system/accel-ops.h b/include/system/accel-ops.h
-index 4c99d25aeff..44b37592d02 100644
+index 44b37592d02..a863fe59388 100644
 --- a/include/system/accel-ops.h
 +++ b/include/system/accel-ops.h
-@@ -10,6 +10,7 @@
- #ifndef ACCEL_OPS_H
- #define ACCEL_OPS_H
- 
-+#include "qemu/accel.h"
- #include "exec/vaddr.h"
- #include "qom/object.h"
- 
-@@ -31,7 +32,7 @@ struct AccelOpsClass {
-     /*< public >*/
- 
-     /* initialization function called when accel is chosen */
--    void (*ops_init)(AccelOpsClass *ops);
-+    void (*ops_init)(AccelClass *ac);
+@@ -35,6 +35,7 @@ struct AccelOpsClass {
+     void (*ops_init)(AccelClass *ac);
  
      bool (*cpus_are_resettable)(void);
++    bool (*cpu_target_realize)(CPUState *cpu, Error **errp);
      void (*cpu_reset_hold)(CPUState *cpu);
+ 
+     void (*create_vcpu_thread)(CPUState *cpu); /* MANDATORY NON-NULL */
 diff --git a/accel/accel-common.c b/accel/accel-common.c
-index 4894b98d64a..56d88940f92 100644
+index 56d88940f92..55d21b63a48 100644
 --- a/accel/accel-common.c
 +++ b/accel/accel-common.c
-@@ -10,6 +10,7 @@
- #include "qemu/osdep.h"
- #include "qemu/accel.h"
- #include "qemu/target-info.h"
-+#include "system/accel-ops.h"
- #include "accel/accel-cpu.h"
- #include "accel-internal.h"
- 
-diff --git a/accel/accel-system.c b/accel/accel-system.c
-index a0f562ae9ff..64bc991b1ce 100644
---- a/accel/accel-system.c
-+++ b/accel/accel-system.c
-@@ -85,8 +85,9 @@ void accel_init_ops_interfaces(AccelClass *ac)
-      * non-NULL create_vcpu_thread operation.
-      */
-     ops = ACCEL_OPS_CLASS(oc);
-+    ac->ops = ops;
-     if (ops->ops_init) {
--        ops->ops_init(ops);
-+        ops->ops_init(ac);
+@@ -105,6 +105,9 @@ bool accel_cpu_common_realize(CPUState *cpu, Error **errp)
+     if (acc->cpu_common_realize && !acc->cpu_common_realize(cpu, errp)) {
+         return false;
      }
-     cpus_register_accel(ops);
- }
-diff --git a/accel/tcg/tcg-accel-ops.c b/accel/tcg/tcg-accel-ops.c
-index b24d6a75625..da2e22a7dff 100644
---- a/accel/tcg/tcg-accel-ops.c
-+++ b/accel/tcg/tcg-accel-ops.c
-@@ -198,8 +198,10 @@ static inline void tcg_remove_all_breakpoints(CPUState *cpu)
-     cpu_watchpoint_remove_all(cpu, BP_GDB);
- }
++    if (acc->ops->cpu_target_realize && !acc->ops->cpu_target_realize(cpu, errp)) {
++        return false;
++    }
  
--static void tcg_accel_ops_init(AccelOpsClass *ops)
-+static void tcg_accel_ops_init(AccelClass *ac)
- {
-+    AccelOpsClass *ops = ac->ops;
-+
-     if (qemu_tcg_mttcg_enabled()) {
-         ops->create_vcpu_thread = mttcg_start_vcpu_thread;
-         ops->kick_vcpu_thread = mttcg_kick_vcpu_thread;
+     return true;
+ }
 -- 
 2.49.0
 
