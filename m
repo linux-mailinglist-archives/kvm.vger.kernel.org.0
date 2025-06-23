@@ -1,261 +1,324 @@
-Return-Path: <kvm+bounces-50387-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50388-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9A48AE4B0F
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 18:35:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DD24BAE4B1F
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 18:39:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 133CC1669A9
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 16:35:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C230169545
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 16:39:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0F7529A9FE;
-	Mon, 23 Jun 2025 16:35:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAA7829C32C;
+	Mon, 23 Jun 2025 16:38:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="ZqNao/kX"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="DeAvAroR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF7CD26D4C3;
-	Mon, 23 Jun 2025 16:35:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3BF9246BCD;
+	Mon, 23 Jun 2025 16:38:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750696524; cv=none; b=YKys2+ddu9DB4tz90QOyolY59XHU67Fnq/e3unrmbiX0A3v/VpZVKJq9mmSPw61P1DofO6HsNuHzSkCdv7cRBPn2ZwfsZ9C1sD6FabTjtE3i1jmmvl5dQ2asF+1RvOeQ4elNCnLU9+EwdtSLaVXUlQTTjm0trQenM7iFJGUuU2c=
+	t=1750696735; cv=none; b=GrRVucCiT2C+9CMuGeVyPg997V6EMgV5E8z2KKQ5v0lSx6qw2GM50gkno4EYIfB+K5kAM48ucZ3jLqV98OprzSl9/Nab+UWtmHw5OwGUwRWLRLpftFdxc7hofkO6FC60QJ2lmvEmDO2hiyzJKabfZrC+SGk181Gkqy81mHEAokk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750696524; c=relaxed/simple;
-	bh=Ve+SpKyRBls5/n1FP5Nes9FcvfturoeCFj7ZqH+eynQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mH4bdIe06tb81Z3nJexiJAmMSFHF3YhQ8/doED0pAXouwGfT0GXZHsNvxK5phuESkfNWjauOGdTGigdvxL/biuv6+egoz9qVlbA9vZVIEVWdrYkKObS13ZixsufveI8lkNoNfUb6fSVb8CLAXqWIFSRdYTk4Osdqu7BkJanCaIs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=ZqNao/kX; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [192.168.7.202] ([71.202.166.45])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 55NGYaHH1005381
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Mon, 23 Jun 2025 09:34:36 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 55NGYaHH1005381
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025062101; t=1750696477;
-	bh=pJ4n1VEcTP7nUT8MFJdFAr79IrfN7vjnPZUzVxTm0Gs=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ZqNao/kXH0QhsZEIKDxhQRs9nGqZsXOX3O1PQqTydeuF32axKfiWw/YcrZkrEjVt/
-	 tDapUNCaVI5Vfi2UuLtdj+C7sULRXA5EuQUpkiNjaNa80KSs6NAGviEkYlc08oi6HV
-	 jSLszTK4xHQf9+kWq2iPQU16ohCdkQv5+Usrm6h3oWNrgfv4EaegzXAJlBZqEduk94
-	 Ciw/9T5RAiWbwR3sa4w5Hk7KmxHXOwdmhTAmqVml/J24QD1eAl22MY02cPC7HoEOeu
-	 swhQoIhYcUrZxtWvkiXK4Z/+BTHjWmh39FzFhfJsVabhuZn0/+5x/dKBV1YGUIP2D4
-	 hgvB5sGMg5n/A==
-Message-ID: <b170c705-c2a8-44ac-a77d-0c3c73ebed0a@zytor.com>
-Date: Mon, 23 Jun 2025 09:34:35 -0700
+	s=arc-20240116; t=1750696735; c=relaxed/simple;
+	bh=gevdFq1xRrwPJ5Hf5ON4vbO7LUOLz1CD+kgUCJd+b4U=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=bta53HFzhoP3ChjhBreWO6YRumtQMaNybu0uykSJzhDN9KjauLyb38Gx5tXhwIfCKURNmJVd/+VL35FLDhjwqEL/XS0M4tpWbSAX3z3nlubPugqhtLhSFDOMEGCWESwSa4HPlcf9dXfQ6EWbJPqHcHr9zuw6ycV+mp2UP/HPiRs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=DeAvAroR; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+	In-Reply-To:Date:To:From:Subject:Message-ID:Sender:Reply-To:Cc:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=ISEgUz1Ma4kDoDIXA+iw932nmvcNDPWKUXymSLJ53/I=; b=DeAvAroRgUlnTlLnAXqzYYurCq
+	ULE8oUUf7dKlCyYvZ4hRYaH8O40Ko3w/GJ31Y9tFZevSLd/Wgf2DC9mne3n5uLa/g3JbVDKvu5bTg
+	NvS2ZAlh5RnzM7/F6V1duuPo67mk88gjyIwAHKtsFa+LUOy/xMvw0MfjpAuKwiJXuwCzNhMkc5DiG
+	iu5d1tIMwfG5x/aK1MIPtKEJlyKM7Bf1z0hPB4J71s2xxFcynKdbG8tr7NS1nW0H1NdwsaHlWh1cv
+	4ORY/oeaTUGGEXIrV4naallt0p5XFX0dh4lnJukD428a/mK739FUxRHi0KGh5sAT9vK55J/grskQp
+	uyutwvlQ==;
+Received: from [54.239.6.189] (helo=edge-cache-144.e-fra50.amazon.com)
+	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uTkC0-000000041IQ-0oCh;
+	Mon, 23 Jun 2025 16:38:48 +0000
+Message-ID: <c142f447c59861f3c94b0fea7f055f4ff201fa98.camel@infradead.org>
+Subject: Re: [RFC PATCH 2/2] KVM: arm64: vgic-its: Unmap all vPEs on shutdown
+From: David Woodhouse <dwmw2@infradead.org>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+ Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas
+ <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Paolo Bonzini
+ <pbonzini@redhat.com>, Sebastian Ott <sebott@redhat.com>, Andre Przywara
+ <andre.przywara@arm.com>, Thorsten Blum <thorsten.blum@linux.dev>, Shameer
+ Kolothum <shameerali.kolothum.thodi@huawei.com>,
+ linux-arm-kernel@lists.infradead.org,  kvmarm@lists.linux.dev,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Date: Mon, 23 Jun 2025 18:38:46 +0200
+In-Reply-To: <20250623132714.965474-2-dwmw2@infradead.org>
+References: <20250623132714.965474-1-dwmw2@infradead.org>
+	 <20250623132714.965474-2-dwmw2@infradead.org>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+	boundary="=-/dxTOkkvRolpaTs5bH+A"
+User-Agent: Evolution 3.52.3-0ubuntu1 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 1/2] x86/traps: Initialize DR6 by writing its
- architectural reset value
-To: Ethan Zhao <haifeng.zhao@linux.intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, stable@vger.kernel.org
-Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        seanjc@google.com, pbonzini@redhat.com, peterz@infradead.org,
-        sohil.mehta@intel.com, brgerst@gmail.com, tony.luck@intel.com,
-        fenghuay@nvidia.com
-References: <20250620231504.2676902-1-xin@zytor.com>
- <20250620231504.2676902-2-xin@zytor.com>
- <4018038c-8c96-49e0-b6b7-f54e0f52a65f@linux.intel.com>
-Content-Language: en-US
-From: Xin Li <xin@zytor.com>
-Autocrypt: addr=xin@zytor.com; keydata=
- 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
- l75w1xInsg==
-In-Reply-To: <4018038c-8c96-49e0-b6b7-f54e0f52a65f@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
-On 6/22/2025 11:49 PM, Ethan Zhao wrote:
-> 
-> 在 2025/6/21 7:15, Xin Li (Intel) 写道:
->> Initialize DR6 by writing its architectural reset value to avoid
->> incorrectly zeroing DR6 to clear DR6.BLD at boot time, which leads
->> to a false bus lock detected warning.
->>
->> The Intel SDM says:
->>
->>    1) Certain debug exceptions may clear bits 0-3 of DR6.
->>
->>    2) BLD induced #DB clears DR6.BLD and any other debug exception
->>       doesn't modify DR6.BLD.
->>
->>    3) RTM induced #DB clears DR6.RTM and any other debug exception
->>       sets DR6.RTM.
->>
->>    To avoid confusion in identifying debug exceptions, debug handlers
->>    should set DR6.BLD and DR6.RTM, and clear other DR6 bits before
->>    returning.
->>
->> The DR6 architectural reset value 0xFFFF0FF0, already defined as
->> macro DR6_RESERVED, satisfies these requirements, so just use it to
->> reinitialize DR6 whenever needed.
->>
->> Since clear_all_debug_regs() no longer zeros all debug registers,
->> rename it to initialize_debug_regs() to better reflect its current
->> behavior.
->>
->> Since debug_read_clear_dr6() no longer clears DR6, rename it to
->> debug_read_reset_dr6() to better reflect its current behavior.
->>
->> Reported-by: Sohil Mehta <sohil.mehta@intel.com>
->> Link: https://lore.kernel.org/lkml/06e68373-a92b-472e-8fd9- 
->> ba548119770c@intel.com/
->> Fixes: ebb1064e7c2e9 ("x86/traps: Handle #DB for bus lock")
->> Suggested-by: H. Peter Anvin (Intel) <hpa@zytor.com>
->> Tested-by: Sohil Mehta <sohil.mehta@intel.com>
->> Reviewed-by: H. Peter Anvin (Intel) <hpa@zytor.com>
->> Reviewed-by: Sohil Mehta <sohil.mehta@intel.com>
->> Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
->> Signed-off-by: Xin Li (Intel) <xin@zytor.com>
->> Cc: stable@vger.kernel.org
->> ---
->>
->> Changes in v3:
->> *) Polish initialize_debug_regs() (PeterZ).
->> *) Rewrite the comment for DR6_RESERVED definition (Sohil and Sean).
->> *) Collect TB, RB, AB (PeterZ and Sohil).
->>
->> Changes in v2:
->> *) Use debug register index 6 rather than DR_STATUS (PeterZ and Sean).
->> *) Move this patch the first of the patch set to ease backporting.
->> ---
->>   arch/x86/include/uapi/asm/debugreg.h | 21 ++++++++++++++++-
->>   arch/x86/kernel/cpu/common.c         | 24 ++++++++------------
->>   arch/x86/kernel/traps.c              | 34 +++++++++++++++++-----------
->>   3 files changed, 51 insertions(+), 28 deletions(-)
->>
->> diff --git a/arch/x86/include/uapi/asm/debugreg.h b/arch/x86/include/ 
->> uapi/asm/debugreg.h
->> index 0007ba077c0c..41da492dfb01 100644
->> --- a/arch/x86/include/uapi/asm/debugreg.h
->> +++ b/arch/x86/include/uapi/asm/debugreg.h
->> @@ -15,7 +15,26 @@
->>      which debugging register was responsible for the trap.  The other 
->> bits
->>      are either reserved or not of interest to us. */
->> -/* Define reserved bits in DR6 which are always set to 1 */
->> +/*
->> + * Define bits in DR6 which are set to 1 by default.
->> + *
->> + * This is also the DR6 architectural value following Power-up, Reset 
->> or INIT.
->> + *
->> + * Note, with the introduction of Bus Lock Detection (BLD) and 
->> Restricted
->> + * Transactional Memory (RTM), the DR6 register has been modified:
->> + *
->> + * 1) BLD flag (bit 11) is no longer reserved to 1 if the CPU supports
->> + *    Bus Lock Detection.  The assertion of a bus lock could clear it.
->> + *
->> + * 2) RTM flag (bit 16) is no longer reserved to 1 if the CPU supports
->> + *    restricted transactional memory.  #DB occurred inside an RTM 
->> region
->> + *    could clear it.
->> + *
->> + * Apparently, DR6.BLD and DR6.RTM are active low bits.
->> + *
->> + * As a result, DR6_RESERVED is an incorrect name now, but it is kept 
->> for
->> + * compatibility.
->> + */
->>   #define DR6_RESERVED    (0xFFFF0FF0)
->>   #define DR_TRAP0    (0x1)        /* db0 */
->> diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
->> index 8feb8fd2957a..0f6c280a94f0 100644
->> --- a/arch/x86/kernel/cpu/common.c
->> +++ b/arch/x86/kernel/cpu/common.c
->> @@ -2243,20 +2243,16 @@ EXPORT_PER_CPU_SYMBOL(__stack_chk_guard);
->>   #endif
->>   #endif
->> -/*
->> - * Clear all 6 debug registers:
->> - */
->> -static void clear_all_debug_regs(void)
->> +static void initialize_debug_regs(void)
->>   {
->> -    int i;
->> -
->> -    for (i = 0; i < 8; i++) {
->> -        /* Ignore db4, db5 */
->> -        if ((i == 4) || (i == 5))
->> -            continue;
->> -
->> -        set_debugreg(0, i);
->> -    }
->> +    /* Control register first -- to make sure everything is disabled. */
-> 
-> In the Figure 19-1. Debug Registers of SDM section 19.2 DEBUG REGISTERS,
-> 
-> bit 10, 12, 14, 15 of DR7 are marked as gray (Reversed) and their value 
-> are filled as
-> 
-> 1, 0, 0,0 ; should we clear them all here ?  I didn't find any other 
-> description in the
-> 
-> SDM about the result if they are cleaned. of course, this patch doesn't 
-> change
-> 
-> the behaviour of original DR7 initialization code, no justification needed,
-> 
-> just out of curiosity.
 
-This patch is NOT intended to make any actual change to DR7
-initialization.
+--=-/dxTOkkvRolpaTs5bH+A
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Please take a look at the second patch of this patch set.
+On Mon, 2025-06-23 at 14:27 +0100, David Woodhouse wrote:
+> From: David Woodhouse <dwmw@amazon.co.uk>
+>=20
+> We observed systems going dark on kexec, due to corruption of the new
+> kernel's text (and sometimes the initrd). This was eventually determined
+> to be caused by the vLPI pending tables used by the GIC in the previous
+> kernel, which were not being quiesced properly.
 
-Thanks!
-     Xin
+FWIW this is a previous hack we attempted which *didn't* work. (For
+illustration only; ignore the syscore .kexec hook. We addressed that
+differently in the end with
+https://lore.kernel.org/kexec/20231213064004.2419447-1-jgowans@amazon.com/ =
+)
 
-> 
->> +    set_debugreg(0, 7);
->> +    set_debugreg(DR6_RESERVED, 6);
->> +    /* dr5 and dr4 don't exist */
->> +    set_debugreg(0, 3);
->> +    set_debugreg(0, 2);
->> +    set_debugreg(0, 1);
->> +    set_debugreg(0, 0);
+At the point where the its_kexec() hook in this patch has completed, we
+poisoned the (ex-) vLPI pending tables and then scanned for corruption
+in them. We saw the same characteristic pattern of corruption which had
+been breaking the next kernel after kexec: 32 bytes copied from offset
+0 to offset 32 in a page, followed by bytes 0, 1, 32, 33, 34, 35 being
+zeroed.
+
+Adding a few milliseconds of sleep before the poisoning was enough to
+make the problem go away. As is the patch which calls unmap_all_vpes()
+=E2=88=80 kvm.
+
+Of course, if the GIC were behind an IOMMU as all DMA-capable devices
+should be, this might never have happened...
+
+diff --git a/drivers/irqchip/irq-gic-common.h b/drivers/irqchip/irq-gic-com=
+mon.h
+index f407cce9ecaa..a4fde376d214 100644
+--- a/drivers/irqchip/irq-gic-common.h
++++ b/drivers/irqchip/irq-gic-common.h
+@@ -19,6 +19,12 @@ struct gic_quirk {
+ 	u32 mask;
+ };
+=20
++struct redist_region {
++	void __iomem		*redist_base;
++	phys_addr_t		phys_base;
++	bool			single_redist;
++};
++
+ int gic_configure_irq(unsigned int irq, unsigned int type,
+                        void __iomem *base, void (*sync_access)(void));
+ void gic_dist_config(void __iomem *base, int gic_irqs,
+@@ -33,4 +39,6 @@ void gic_enable_of_quirks(const struct device_node *np,
+ #define RDIST_FLAGS_RD_TABLES_PREALLOCATED     (1 << 1)
+ #define RDIST_FLAGS_FORCE_NON_SHAREABLE        (1 << 2)
+=20
++int gic_iterate_rdists(int (*fn)(struct redist_region *, void __iomem *));
++
+ #endif /* _IRQ_GIC_COMMON_H */
+diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-=
+its.c
+index 638f7eb033ad..d106b6ccca8b 100644
+--- a/drivers/irqchip/irq-gic-v3-its.c
++++ b/drivers/irqchip/irq-gic-v3-its.c
+@@ -4902,6 +4902,51 @@ static void its_enable_quirks(struct its_node *its)
+ 				     its_quirks, its);
+ }
+=20
++static int disable_vpes(struct redist_region *region, void __iomem *ptr)
++{
++	u64 typer;
++	u64 val;
++
++	typer =3D gic_read_typer(ptr + GICR_TYPER);
++
++	if (!((typer & GICR_TYPER_VLPIS) && (typer & GICR_TYPER_RVPEID)))
++		return 1;
++
++	/* Deactivate any present vPE */
++	its_clear_vpend_valid(ptr + SZ_128K, 0, GICR_VPENDBASER_PendingLast);
++
++	/* Mark the VPE table as invalid */
++	val =3D gicr_read_vpropbaser(ptr + SZ_128K + GICR_VPROPBASER);
++	val &=3D ~GICR_VPROPBASER_4_1_VALID;
++	gicr_write_vpropbaser(val, ptr + SZ_128K + GICR_VPROPBASER);
++
++	/* Disable next redistributor */
++	return 1;
++}
++
++static int its_kexec(void)
++{
++	int err =3D 0, err_return =3D 0;
++	struct its_node *its;
++
++	raw_spin_lock(&its_lock);
++
++	list_for_each_entry(its, &its_nodes, entry) {
++		err =3D its_force_quiescent(its->base);
++		if (err) {
++			pr_err("ITS@%pa: failed to quiesce: %d\n",
++			       &its->phys_base, err);
++			err_return =3D -EBUSY;
++		}
++	}
++
++	gic_iterate_rdists(disable_vpes);
++
++	raw_spin_unlock(&its_lock);
++
++	return err_return;
++}
++
+ static int its_save_disable(void)
+ {
+ 	struct its_node *its;
+@@ -5001,6 +5046,7 @@ static void its_restore_enable(void)
+ static struct syscore_ops its_syscore_ops =3D {
+ 	.suspend =3D its_save_disable,
+ 	.resume =3D its_restore_enable,
++	.kexec =3D its_kexec,
+ };
+=20
+ static void __init __iomem *its_map_one(struct resource *res, int *err)
+diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
+index 50143de1791d..2014c5a75a6e 100644
+--- a/drivers/irqchip/irq-gic-v3.c
++++ b/drivers/irqchip/irq-gic-v3.c
+@@ -46,12 +46,6 @@
+=20
+ #define GIC_IRQ_TYPE_PARTITION	(GIC_IRQ_TYPE_LPI + 1)
+=20
+-struct redist_region {
+-	void __iomem		*redist_base;
+-	phys_addr_t		phys_base;
+-	bool			single_redist;
+-};
+-
+ struct gic_chip_data {
+ 	struct fwnode_handle	*fwnode;
+ 	phys_addr_t		dist_phys_base;
+@@ -968,7 +962,7 @@ static void __init gic_dist_init(void)
+ 		gic_write_irouter(affinity, base + GICD_IROUTERnE + i * 8);
+ }
+=20
+-static int gic_iterate_rdists(int (*fn)(struct redist_region *, void __iom=
+em *))
++int gic_iterate_rdists(int (*fn)(struct redist_region *, void __iomem *))
+ {
+ 	int ret =3D -ENODEV;
+ 	int i;
+
+
+--=-/dxTOkkvRolpaTs5bH+A
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
+ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
+AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
+BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
+MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
+a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
+jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
+GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
+aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
+nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
+8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
+HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
+IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
+KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
+BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
+QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
+QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
+ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
+/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
+uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
+xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
+W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
+c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
+VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
+NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
+DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
+sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
+w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
+i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
+kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
+0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
+ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
+blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
+hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
+VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
+HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
+ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
+AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
+cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
+cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
+AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
+aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
+hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
+iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
+8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
+JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
+xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
+EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
+B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
+MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
+KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
+Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
+nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
+WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
+W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
+nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
+g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
+9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
+9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
+sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
+a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
+ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
+AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
+dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
+Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
+Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
+MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
+YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
+4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
+6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
+QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
+nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
+MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
+VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
+ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDYyMzE2Mzg0
+NlowLwYJKoZIhvcNAQkEMSIEIBD5uGKXDuvccbiamtTp0MIQGOPO/lLsMh/Bt2dhmpeiMGQGCSsG
+AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
+cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
+VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
+cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIAzMCj0sCJ6UDc
+vEPBvA1zwRUma/rjGPpaWEt+f5jBVKBgGWqYEVwjtu+yjtpaU2KC5rT9lnf5yGBC10Mav6P350sB
+a9WUHY/iXK66AWl84E67KGmCvbvsmCz2dH7VNGDSrzx8OTMh2ME7LOj8a0SE6MeNJmruk4CHhQPG
+KF1zvUV6A7Iu6hyZBoLDIYHMOP0g3/Is7jouxMxJJYBT5a60q4vIL1RuFcSxVfhqoaBjYYwaW45c
+f+bD/IqmufJlKDjKEF84IGt0LvsoGcrGPKmgMkEKsfqmSqu3uJj97UZuIW6AYw8uBDYluWAZ5KjA
+4YlW+y2rdi8dMqSUTm6ZPvLwM9qxbge+fcHvLpqF76VDJ+z/wlQ13rSCkCSDy7o7jhFgOORriWid
+iFuzC/vd/yZ0ED8WvtbmRAE/DjJWlup1eb+mpnsL44mhdmhw26n0VRY5tNSYnrQVlqIlHiVMEAhK
+XCw3Vt3i0Ry6xjG3CQQhjomKxLa8zgeMwtsQEwMX9B3ij0Rw+RFT2iAg0z57b0/pfdbpAOvVsr+H
+G4atmqxWDiUvrKhH4E1YLClZpRNBZ+LtRTqsZwAYQRKSLNSDXk9HPdmcgH9P1Ge7+x1RmXqP+WHv
+jTyPNrRi/V6KEBT9LLsQxnE39dEkfQVBttrxdfz2QIcsdZKmHrkjK5G7AoLtRpMAAAAAAAA=
+
+
+--=-/dxTOkkvRolpaTs5bH+A--
 
