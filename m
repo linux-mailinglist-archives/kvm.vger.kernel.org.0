@@ -1,78 +1,78 @@
-Return-Path: <kvm+bounces-50317-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50318-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E25D5AE3FE7
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 14:25:22 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 844C4AE3FA0
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 14:20:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8CAFA169DB4
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 12:20:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DEBC27A1EE1
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 12:19:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F216024A056;
-	Mon, 23 Jun 2025 12:19:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 393C22459D2;
+	Mon, 23 Jun 2025 12:19:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jjcGzoxp"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bGu4wlvD"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 666942472B1
-	for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 12:19:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A2BA2441B4
+	for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 12:19:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750681162; cv=none; b=hQm7dsEprKkUvYjevESAARpi0oBwUeGs01/jXFNJIIPzLI5N0hKMbD3NKzNwuC8BaJn7AZ13zU4PN379vxdMxPzgciQs/brlNOkSUKPi7rw7+I1PDsvWMZWDirEo1mMagnjLw1HG4jmMyhwHuXALPPRYdKjSL7dUqmiUAaxWKio=
+	t=1750681167; cv=none; b=NOd5fvpAjmn46UKk+uQt+3q6mzsLLoQeRnXjmjcCJjYGMp1dzPCYJtJNL2sun9SqciOHKjh8NJwHAoY5uGH4hvJBzixkEu9MEUBiPPc5PIcTe4h0XsdEUPEl9quySBp6U9uHD8GsvXJ7vUxiG6+g8XIZlAhBZzmhGOok0lsZH+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750681162; c=relaxed/simple;
-	bh=s8AYUJVhitMgriSi44XbBBxGZLmELZPQQnl/IAtiIRc=;
+	s=arc-20240116; t=1750681167; c=relaxed/simple;
+	bh=3VukFEdhlsNLMFcSNZ8ZFWCjR5FibiT23CL7CmiaqQI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bWyDEKv+0Z1YziBrsatvfss+cXUD7Yb8dULmYjHqyH755i95d94l+aYt3uEPaa/FAcZgKm4Qcjo+r/T5Jm3tRMPT7jESUWotMMarZ7ydlW290hGuKXRwKE1KY1kGucPKFztWoLsQezdk4xGV1X8CtwxlxUpmVhXcZ8Jf9h/eya8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=jjcGzoxp; arc=none smtp.client-ip=209.85.128.44
+	 MIME-Version:Content-Type; b=CZNrx2YxgdbU31PLHnk02c+Vmlu2ogYi9nw9IQzlgqS6K8RiZ9fPBrXQ8fmw4wS/NWM7CHti+fJ91r/WocvgZ0D37cNb+4X5G2NvhVQUPD5nOkjtHBNZFGlbrO2INwoeXwSr9wFTZGjJnshZFQI+9tjK3ZW8kHPPr4NUMZfWU4U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=bGu4wlvD; arc=none smtp.client-ip=209.85.221.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-451d6ade159so30792675e9.1
-        for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 05:19:20 -0700 (PDT)
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-3a50fc7ac4dso2234487f8f.0
+        for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 05:19:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1750681159; x=1751285959; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1750681164; x=1751285964; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=FtS7m+vqlh7Qr+Y7luF/PvAhAhpP9RBj3It7GX3FL/4=;
-        b=jjcGzoxpgxDPUSO6vRV1pkIajXfcmoXbB5WvP8KYshnJ0mX54L2LX6ZD7oC+z8olQ8
-         F2Gve52UwLGr2gmJigrFsTapmnn6ZFu0SHXgXNr0wUZdd19d4N4jTSiEPOsC3M3O6bM8
-         EXKPhd+WAgh+iXVWfLMt7lTtgehmn/ZRYGnnMje6Y08OhjoAV2wPAhChfMOe23yS5wXr
-         1G93ZDPqcoCj36nAYMgK1iDphHZXsczFVVq4cLKyVHVbDK5XkmPbcKoHp0h3DljvK3Nj
-         sUdvTPYHEXR8pFKKlDrqQ2L870MocSp3rdIUwiJVI7WiuLKE0fyE+ohbhR1pOP7SvW/n
-         7urA==
+        bh=GyiBFk3PHsFTGgxQWIJAhORaZcy53iNw0vUcB4RUUDE=;
+        b=bGu4wlvD8BoWUyZK51wHxYiLRb41/HyYRBr22UQQuaKkVZm1Zp7byiISOFtjoQRPa+
+         hhKssSA+QIIWcizghKZqLe30ZudNfB3MITS8sXuxouNLwXSoLXLOP1eAELbVX733GNh3
+         bUS1q8x1ywY8ii3sczdj8lTsoD/G/LGQiGz0RpKiUjm2KLdGL2g6wjmYF3yMlcqZCIp8
+         CsyIdF0xBly5snNVOX+pJfu4iquL0XqTBObHc7b7cl1eP9Q9vFqU0ncU/Q/xgei0QbzM
+         12vq6eZhQN7sVc5BnaJH0hvzEuz6F4f5cPKELhhclVLDtwoIDuUHKawn5EjC3giaOxLG
+         94ow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750681159; x=1751285959;
+        d=1e100.net; s=20230601; t=1750681164; x=1751285964;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=FtS7m+vqlh7Qr+Y7luF/PvAhAhpP9RBj3It7GX3FL/4=;
-        b=kLykvEUeZW0Ki8DwwJXFdBIeSLr+JRDzMn3ID50WhlwCjrcenv0fhoBhjEAiRx3KMg
-         mqTZaa+TxpW6jDFuqAfiERFZygQ3VUOyfwF7SmXB2VD5hJ1h+bxE49IxQJYZY/nP3l1R
-         JICn8PZvWBxu6K6OO5/4oGMFRletlOS8nZ0u5TALU1dJGk+z3qlD+WvlZAnATFOjJAXh
-         mBdH5/J3XCnA94IcoB7eWyZYJR7HTkPs+LqbJs1dJLx5E7u/mrZYJ0SQCyjlKBKimp47
-         MbpVJwz9y1nvWwE1b/1Qb7bOAE0RL8eSIgRiyymWKQPPUS2RIJtdCMZn8QB2eSC8wRm5
-         Ya2w==
-X-Forwarded-Encrypted: i=1; AJvYcCViV2L3N05TdGJT/M2CS6+a3OG105SEgb3Y2d0tjAfLKZKm9wtktGFWK2W/rdj72PU6BFc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxU2y4UZVK96hMBM99nWA+yKHUw0BMzxY2WsTCyb80VtaFO9p1b
-	m+L/vGzBsMK5wpeyL2m/g2urcVAxNi0h+vT8qSMrn+JZwylHhe4A7bAaGeies+Qv4rE=
-X-Gm-Gg: ASbGncu49nZyTzt8K4tAQmHzQ4Kafgqa2xrV8qMjigKZVmML4j+zQWxjqeahq93G7eY
-	hqkkCDYHDE1UPcMh5UgQTPESQ/zwxQhhNRjnYrkkeKX4cFznAf8RvxZ1/LGQNwCDRkRjQIHNewW
-	og3olTnmjaar3iKupdiT96UhIU3xdmY0WfumjffHk35mh252//43IRQcc/47RbRuNEjNq6YcNm1
-	00AA0LdBP4qDsjUqkSapjQTu1XBfCuHo0hjSBHXqvdmxAwO39ga2kNFjUNPOcwJCnLVhgkpTDZ0
-	aKz1gl/9FO2hskWOLAqAQoGFjBUDDwm4YiIuEC+mDfVS52xng8R2UHqVuhV4f0tCXAieuIy2ex2
-	DhYHFa9oKcFwffAZO5128QPMuN4PVJ6bdRqfr
-X-Google-Smtp-Source: AGHT+IFl2eAC2wXLNGcTcgz9pBye6T6IVeM4BN03TDgb6Vv2/UKfmtbrc+hijHKDuuTiPnREIJvcsA==
-X-Received: by 2002:a05:600c:314f:b0:43d:8ea:8d7a with SMTP id 5b1f17b1804b1-453656c313fmr101273355e9.28.1750681158702;
-        Mon, 23 Jun 2025 05:19:18 -0700 (PDT)
+        bh=GyiBFk3PHsFTGgxQWIJAhORaZcy53iNw0vUcB4RUUDE=;
+        b=Q0QeQU/hqRb1sYnd4mOf+I86LzPbsJjx//YW0yqBggZa1QC/Se98t28y69sCZ3ByHO
+         GFZ2PRz7aqJYelQMdDOS+f2YuLIwV9AVcVjflI4564puVuy8l+g772xIerIlWZlpWCmd
+         bXj1Egqqd8pdKI6mPJtl/f7iD1gG97JF2mi281cSdlTiDkaXI3w1GWu2hSbb9rIIHZEq
+         JVuoIw00X6u8Rkgx0sM/zDgEul9jGs2TGvFJodMTCvGhmyYGVMYb9GqOC+4cYkJhpCSU
+         2b8PRf09xQ8MswwE158f29DAL5lz8iN9pGy8k3ItwpeckHcL84YtqUw8Ri+52tqBqq98
+         11bg==
+X-Forwarded-Encrypted: i=1; AJvYcCWdW+mUewdMXXzzlNfTYaWhYboWNez8JMpjX08y1tTJcWgWZnrxppplOpHNpZQ5dRxmZ58=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzeAbxtsiuVTtzeUcraC0p3+QS9YAbHuA2HrKUdFVaHsNq+I8Sw
+	0XxXgfVwDndYmvjh/nkGgCrPmCVec4My5Gj1EBSNkS2Uh+cmjU+CMx8gkCfGbYCEmvk=
+X-Gm-Gg: ASbGncsZlXNSoP3NH8fcydsM5wnvuZeqtRELjf057uVCMv64OFjRWbSlKtXECODPUaL
+	YEkVni0oH2TPNT0X1gdY98MyPIy0e5OJErUiwMJGQpn+Y83ZWJUHlTqINOunuMvgzQ+WejRbeuB
+	QDf9V4VddxgufjMHnClyjo/5ZVZdmFo7Hs+agKH9FccCFSRN+GGAK+Cba2ktrRpJCzAoCTH7AqV
+	vUHo8RtAvElm50kaTQWqhZWo1i5sRA9X+XjgG4G3eyfW3YPir0oK4JkF9Pt5qmbjqsjUb/yk3qL
+	JwaqLQWoubAJixvf4ZoszIr+L/86QKqv3icDM+P70yQYvHTGuAGRbIvYmvg1Xrf3Pqb1F2+idqN
+	S7jrgKCwlrH5DXkgL+zuKFjq4OKO9hQi/brxW
+X-Google-Smtp-Source: AGHT+IE/ShLC0BNfarjCGNMSpPGAS0rfS+vL7cCj12GXMkaCbIYQsstL056tugsSAblfUqd+SodRWA==
+X-Received: by 2002:a05:6000:38e:b0:3a4:fc37:70e4 with SMTP id ffacd0b85a97d-3a6d1331ec7mr9866453f8f.58.1750681163851;
+        Mon, 23 Jun 2025 05:19:23 -0700 (PDT)
 Received: from localhost.localdomain (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4536fefd2b4sm51673585e9.36.2025.06.23.05.19.17
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4535eada7adsm144615895e9.35.2025.06.23.05.19.22
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 23 Jun 2025 05:19:18 -0700 (PDT)
+        Mon, 23 Jun 2025 05:19:23 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Leif Lindholm <leif.lindholm@oss.qualcomm.com>,
@@ -95,9 +95,9 @@ Cc: Leif Lindholm <leif.lindholm@oss.qualcomm.com>,
 	Phil Dennis-Jordan <phil@philjordan.eu>,
 	Richard Henderson <richard.henderson@linaro.org>,
 	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH v3 06/26] target/arm/hvf: Trace hv_vcpu_run() failures
-Date: Mon, 23 Jun 2025 14:18:25 +0200
-Message-ID: <20250623121845.7214-7-philmd@linaro.org>
+Subject: [PATCH v3 07/26] accel/hvf: Trace VM memory mapping
+Date: Mon, 23 Jun 2025 14:18:26 +0200
+Message-ID: <20250623121845.7214-8-philmd@linaro.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250623121845.7214-1-philmd@linaro.org>
 References: <20250623121845.7214-1-philmd@linaro.org>
@@ -110,45 +110,83 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Allow distinguishing HV_ILLEGAL_GUEST_STATE in trace events.
+Trace memory mapped / unmapped in the guest.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/hvf/hvf.c        | 10 +++++++++-
- target/arm/hvf/trace-events |  1 +
- 2 files changed, 10 insertions(+), 1 deletion(-)
+ meson.build               | 1 +
+ accel/hvf/trace.h         | 2 ++
+ accel/hvf/hvf-accel-ops.c | 6 ++++++
+ accel/hvf/trace-events    | 7 +++++++
+ 4 files changed, 16 insertions(+)
+ create mode 100644 accel/hvf/trace.h
+ create mode 100644 accel/hvf/trace-events
 
-diff --git a/target/arm/hvf/hvf.c b/target/arm/hvf/hvf.c
-index ef76dcd28de..cc5bbc155d2 100644
---- a/target/arm/hvf/hvf.c
-+++ b/target/arm/hvf/hvf.c
-@@ -1916,7 +1916,15 @@ int hvf_vcpu_exec(CPUState *cpu)
-     bql_unlock();
-     r = hv_vcpu_run(cpu->accel->fd);
-     bql_lock();
--    assert_hvf_ok(r);
-+    switch (r) {
-+    case HV_SUCCESS:
-+        break;
-+    case HV_ILLEGAL_GUEST_STATE:
-+        trace_hvf_illegal_guest_state();
-+        /* fall through */
-+    default:
-+        g_assert_not_reached();
-+    }
+diff --git a/meson.build b/meson.build
+index 34729c2a3dd..5004678a26b 100644
+--- a/meson.build
++++ b/meson.build
+@@ -3633,6 +3633,7 @@ if have_block
+ endif
+ if have_system
+   trace_events_subdirs += [
++    'accel/hvf',
+     'accel/kvm',
+     'audio',
+     'backends',
+diff --git a/accel/hvf/trace.h b/accel/hvf/trace.h
+new file mode 100644
+index 00000000000..83a1883343a
+--- /dev/null
++++ b/accel/hvf/trace.h
+@@ -0,0 +1,2 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++#include "trace/trace-accel_hvf.h"
+diff --git a/accel/hvf/hvf-accel-ops.c b/accel/hvf/hvf-accel-ops.c
+index d60446b85b8..b38977207d2 100644
+--- a/accel/hvf/hvf-accel-ops.c
++++ b/accel/hvf/hvf-accel-ops.c
+@@ -59,6 +59,7 @@
+ #include "system/hvf_int.h"
+ #include "system/runstate.h"
+ #include "qemu/guest-random.h"
++#include "trace.h"
  
-     /* handle VMEXIT */
-     uint64_t exit_reason = hvf_exit->reason;
-diff --git a/target/arm/hvf/trace-events b/target/arm/hvf/trace-events
-index 4fbbe4b45ec..a4870e0a5c4 100644
---- a/target/arm/hvf/trace-events
-+++ b/target/arm/hvf/trace-events
-@@ -11,3 +11,4 @@ hvf_exit(uint64_t syndrome, uint32_t ec, uint64_t pc) "exit: 0x%"PRIx64" [ec=0x%
- hvf_psci_call(uint64_t x0, uint64_t x1, uint64_t x2, uint64_t x3, uint32_t cpuid) "PSCI Call x0=0x%016"PRIx64" x1=0x%016"PRIx64" x2=0x%016"PRIx64" x3=0x%016"PRIx64" cpu=0x%x"
- hvf_vgic_write(const char *name, uint64_t val) "vgic write to %s [val=0x%016"PRIx64"]"
- hvf_vgic_read(const char *name, uint64_t val) "vgic read from %s [val=0x%016"PRIx64"]"
-+hvf_illegal_guest_state(void) "HV_ILLEGAL_GUEST_STATE"
+ HVFState *hvf_state;
+ 
+@@ -97,6 +98,7 @@ static int do_hvf_set_memory(hvf_slot *slot, hv_memory_flags_t flags)
+     if (macslot->present) {
+         if (macslot->size != slot->size) {
+             macslot->present = 0;
++            trace_hvf_vm_unmap(macslot->gpa_start, macslot->size);
+             ret = hv_vm_unmap(macslot->gpa_start, macslot->size);
+             assert_hvf_ok(ret);
+         }
+@@ -109,6 +111,10 @@ static int do_hvf_set_memory(hvf_slot *slot, hv_memory_flags_t flags)
+     macslot->present = 1;
+     macslot->gpa_start = slot->start;
+     macslot->size = slot->size;
++    trace_hvf_vm_map(slot->start, slot->size, slot->mem, flags,
++                     flags & HV_MEMORY_READ ?  'R' : '-',
++                     flags & HV_MEMORY_WRITE ? 'W' : '-',
++                     flags & HV_MEMORY_EXEC ?  'E' : '-');
+     ret = hv_vm_map(slot->mem, slot->start, slot->size, flags);
+     assert_hvf_ok(ret);
+     return 0;
+diff --git a/accel/hvf/trace-events b/accel/hvf/trace-events
+new file mode 100644
+index 00000000000..2fd3e127c74
+--- /dev/null
++++ b/accel/hvf/trace-events
+@@ -0,0 +1,7 @@
++# SPDX-License-Identifier: GPL-2.0-or-later
++#
++# See docs/devel/tracing.rst for syntax documentation.
++
++# hvf-accel-ops.c
++hvf_vm_map(uint64_t paddr, uint64_t size, void *vaddr, uint8_t flags, const char r, const char w, const char e) "paddr:0x%016"PRIx64" size:0x%08"PRIx64" vaddr:%p flags:0x%02x/%c%c%c"
++hvf_vm_unmap(uint64_t paddr, uint64_t size) "paddr:0x%016"PRIx64" size:0x%08"PRIx64
 -- 
 2.49.0
 
