@@ -1,171 +1,208 @@
-Return-Path: <kvm+bounces-50414-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50415-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CB56AE4E24
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 22:29:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C586AE4E2F
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 22:36:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1F7A1189C718
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 20:30:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA4E217C280
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 20:36:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C83162D5438;
-	Mon, 23 Jun 2025 20:29:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EFEB2D5431;
+	Mon, 23 Jun 2025 20:36:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="Ik3UXai9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rMeKTjxj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9153822F77F
-	for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 20:29:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B31F2AEE4
+	for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 20:36:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750710587; cv=none; b=GwgMAdZTQy+u82CajhsntjUkbFnA0+posrVDb0xyXVYg1+H40zjySGc0GCVLSD45UHienz9jiXh7zMLJC7f2HdgoHU9ZGywudREOT5lPqSPlFo+pks4V6rZ80EmAfQULnnmek6aDfdCRj+S9FBvcxIHBaBYIZcWZVrws3GdH1Lg=
+	t=1750711007; cv=none; b=NNMkTpeLKjazx9W7MOava7daQbt7HU5msuxpefanI1s29TBOG8F+BjOY1BaqA14csTxvZiEcZrK1AJUi6O8zY/+poWxLh1nxXw05qNVihkDPvsgI2Pd36lm6KhtpR9OeLdUrdC4bHe5plhj/72GVRLEHx8Tar6t+S/niAqX4KxU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750710587; c=relaxed/simple;
-	bh=MUTbeSlMElSRYbL7xBsyJJMC9HYGdeNhwGY4pzloeDw=;
-	h=Message-ID:Date:MIME-Version:From:Subject:References:To:Cc:
-	 In-Reply-To:Content-Type; b=KTUmne+NzLCC9gG/0sk/f/C2mpC9v1XAJ4cFGvSdJvfm1GX6j5Ya2hLl5iDlUUIHVSOFUfA0WQydvc40P/J+ABQEu3Q6UpPtEUBO89k7ZHH45cQAgVYTNNXcU3Hwz3IG3oRlRHPFnFU6IymCWzQAQnIkRf4PT2kXtpgxIVAsXlM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=Ik3UXai9; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensrcsec.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-235a3dd4f0dso31753615ad.0
-        for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 13:29:45 -0700 (PDT)
+	s=arc-20240116; t=1750711007; c=relaxed/simple;
+	bh=HvLY83A0qe5joWnPbr4N3y4EkbLCpe6dw2k3DnI081c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mz93kYySkb80nJYKEqz41g0iAS8N7EF6Pf5KYy5Mi8FTR3SME4AqaFRgqyqiQ0+nem2JXeBrMPSgBo0YMZhgJ3p5Yxu4oQPtEImhYRbigwDnaCdrPBIDQDZNTEdWrLntcGiDGZtJQ70/C4nQuT73tY8NwdCwkIxhjpmJk5JDack=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rMeKTjxj; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-235e389599fso68125ad.0
+        for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 13:36:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=grsecurity.net; s=grsec; t=1750710585; x=1751315385; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:cc:to:reply-to
-         :content-language:references:subject:from:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=uspidLfgJvUSMKS6dpb2FfJ1dJx24s+/Cz+Y3SmG7mI=;
-        b=Ik3UXai9+fw9oBtJC2dCrr4vRulyKzeTsJW03lFucchywSOokvh0yF4dC28u1cMs5i
-         6Yf+NsJIgPhPtIg1MxwiZAtWvcm0VBAwUHkbWnoJUvxnujs7iwy9cbtCuN8tsHg2GBiW
-         CSYpUWsJLeGeTpp0SYTlMxL7p3YApAwaojRGCecaYL3nFjXs3RWLVkxgfNBfMlyVQv9h
-         WNoWGatr/O4uOZzBC4Yitv8bV7Ck5UZxPZ85CvOYFVWI0EC0nkG1x++rTH1f2sERJrW6
-         L2sK1nS/p/jbg8lGOJ0im7/7imh6rQwLpy+NYgN5LWovZB8iZ2eE5Kew/8aZUHF9GDZ/
-         DxGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750710585; x=1751315385;
-        h=content-transfer-encoding:in-reply-to:autocrypt:cc:to:reply-to
-         :content-language:references:subject:from:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1750711006; x=1751315806; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=uspidLfgJvUSMKS6dpb2FfJ1dJx24s+/Cz+Y3SmG7mI=;
-        b=Roqx9bKKPpERLmtlL/RN0WjOgFk2ezi34zkiue2arNfcjOEQVzW3LDqfVQXtMeANQ4
-         AaZiPIVaiG57QRvVHJOpUB08C93s7fyYzJn2hOyfVEoKbH6T+XKil1qQ+LFUgzNUl3ar
-         8T9u8+YBWGeCBH7gXiFIQTniZ8SY5nJ/Ogw+VekTIq8bHtrFhSxWttCg/kL0V9TsDaKh
-         aGbBQmDI0e2il4BRm+sHp+StHuzvGKTtjhrvlhoiBg9hJczsFYORVZ/6Lje2jh0mBpcu
-         vXXaC4OU66V6bX2L3XinAD3SCyrTRLsxZSuWvL1eyrPMzQG1jtRyDcN4TY81wuedoq5f
-         WlWA==
-X-Forwarded-Encrypted: i=1; AJvYcCVPMgXX68mDAs100h0daMxhJU/9gvITJHC2Mx9yHIJfFu/BAKGnUvwpWUKNJLLSe0iJXlY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx/OdrwQDGJ/hr61MbmNOlHNQnu9mUqBqVVSvNVqyoHMX2yv4h8
-	W0idZ8P2PtAtT0HOVMnWdSPlXRcJdjyXQoxoLETQ7aKI0IDVxG8uYnkezCVnPShfeRg=
-X-Gm-Gg: ASbGncvuZcS1KUeHkFQQAi7nZ8B7BoNo38RH+j9O0Ew5nBiikrJiCFpQwciZpUs5eDG
-	4aSOKxE8SFHevMja7TlFKDAN6feFcZnHAvu+yLOuWMlRWsId8LIZfLwYsuHMAAcoXd0raZkcS/2
-	RBw5hpLyoaWEtHKeI/rS1r6tFNhgvJHrP4HdqLl1YqZKWQ6dBBlk5ZpuPwVZOyOrkuy8QznBkvZ
-	1LBTyqay1EUYTHfhDN8CPjYa12oo3qHUE//4EekyltpHi+RvNXEpeahCskH/lMBkJiVUsrHcI4B
-	mg8vrIgqmioWJqvFnBXJctNpbTbe8PQFnqPSEdJ4u+rqlhSL8IakfF5xMIL9D182QFiyvUufVx8
-	lUPW1flKFrqE67uEc+9sqDBrKR1fNa0vpNtsHcJXFroY61M1nKP3JRg3itCSKPphlGeH9sDrLUl
-	efm++XBLnmCeIydpITG/M=
-X-Google-Smtp-Source: AGHT+IH46xuxqoQ4c5WdFOaIpGG0nJe7BFSQ8BH9zshg2/l6yRiyFeILDOhbIVZfCczDgJe85/w6QQ==
-X-Received: by 2002:a17:903:11c4:b0:235:f45f:ed49 with SMTP id d9443c01a7336-237d986fc49mr239299325ad.33.1750710584842;
-        Mon, 23 Jun 2025 13:29:44 -0700 (PDT)
-Received: from ?IPV6:2003:fa:af22:cf00:2208:a86d:dff:5ae9? (p200300faaf22cf002208a86d0dff5ae9.dip0.t-ipconnect.de. [2003:fa:af22:cf00:2208:a86d:dff:5ae9])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-237d866b664sm89176675ad.169.2025.06.23.13.29.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Jun 2025 13:29:44 -0700 (PDT)
-Message-ID: <8b2eb284-efb7-42d2-aaea-e9568e23f594@grsecurity.net>
-Date: Mon, 23 Jun 2025 22:29:41 +0200
+        bh=UbQ3OJyLytdAQvqvTvM3nBOhCRNYc/c7ff3q42dC1M8=;
+        b=rMeKTjxjZtiQyAbCYuWDFPx+H6tatdMVxnLp7gtdVx2rrRO342OrdHlJ5PHmC/kCSd
+         MsR45CZuAFvf7l2hQ3ixm3n5E9F3Hy3BnlnfIx8j6fWOs+rHgWJvyXaqIq/HV6M+XUdt
+         GVqg53wS5qcoJqwHfwgDITHFZnIYEI9qgg4c1EqoNtLefFlTvfkCTRka+sqW5IiziklQ
+         R/MIbK6sV/H3PGy9eimGBNylaCuN/Flh7bL21JFmaNul+n6BqdpGN/6l5BjGKURL1982
+         Ky+KIi3CMJrXbaAGkOp3/peBc52feBYLNggffYUI9k9hUdPwaj10mI1GV9LCaIiP+2q8
+         Kiwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750711006; x=1751315806;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=UbQ3OJyLytdAQvqvTvM3nBOhCRNYc/c7ff3q42dC1M8=;
+        b=CpewTk+ls9/rv5ZGvVc+EDOFhOTVT+aeoSr2h4YFHnlbnfbTLhMNyLEBYtJCBRRK/E
+         eOU4Vb8Q/toUYFlzp6EjOuJ44TMzA9uUtPmsUDk3ym0HLHPtTbBOClYVimmy+3OjjVQZ
+         OgkOmqZBushoAls477dwIXzK7eJA+lbvihT+LSfosK9m9VtIbr2eqhHub8tKjrjF8nc5
+         3d/P2x8oNSIprx9Fp4dsN2dfjnNa9PqmtuJ+bcex1SUbsMlKn/eH2hcf2bbfj0rq9CAL
+         I+V+NTjyp+/X27Ilqf8bTTMj6pyRP8zmNm5GYW4HvxB+Hzya43Sr9priZgi0XqjVVpYR
+         3NGA==
+X-Forwarded-Encrypted: i=1; AJvYcCVF42SK4/weYaLQe1OkyA4E5FmBlHE2xUtecAt7864mjKxwbRQLyyLVwAxJVK2eU7S+8oI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz5fHno6nE2gdkHq/GA3sXxV9ObNbbu/05vSLLm++Ql5djAemkq
+	bLlv2IsUse5fB+zgrDDzkCJwfVWvpTVJLqDRY+1wPXjvT7KFDqJSJ3kObQ8kv3ek4J3rZdXIFcb
+	/f5mvwc/3nNtyK02WOqY5Nh9Hi4B84mkOaRSbRabb
+X-Gm-Gg: ASbGncv28rpzZnDzVsy3u4ewsp5Sa2lSykv+uz46VbxUO4hhXOG2H571uxyXZq51K6q
+	P+yPhUq7TBbfOBziAesbaJch24Jf9bnuVB4IwUHwJZs+yZDSJvXebt2GshGgmtiL4HhTjpa9Bmc
+	Bf1Ri+FicrYYeoAo8kJFv9kq1ZLQ/kVTr0WMrmoSCKa7O05GSNgID0HBnzvAaZTlX/2o+kt3zE
+X-Google-Smtp-Source: AGHT+IEw/f0sozGMlA0bFf5Ae+FpgBqfFjEvBMC5i7acuqIBfYfgSwOKrUE5w5RQz7upwTZYtyssRpazzKVHriZo2zg=
+X-Received: by 2002:a17:902:ea0c:b0:215:65f3:27ef with SMTP id
+ d9443c01a7336-23802a59e4cmr758025ad.12.1750711005265; Mon, 23 Jun 2025
+ 13:36:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Mathias Krause <minipli@grsecurity.net>
-Subject: [kvm-unit-tests PATCH 6/8] x86/cet: Simplify IBT test
-References: <e53b66b9-6b32-4834-a34e-17c307c19a82@grsecurity.net>
-Content-Language: en-US, de-DE
-Reply-To: Mathias Krause <minipli@grsecurity.net>
-To: Chao Gao <chao.gao@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org
-Autocrypt: addr=minipli@grsecurity.net; keydata=
- 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
- RzDVkdgPJkL/NFTKZHo5foFXNi89kA==
-In-Reply-To: <e53b66b9-6b32-4834-a34e-17c307c19a82@grsecurity.net>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20250611095158.19398-1-adrian.hunter@intel.com>
+ <20250611095158.19398-2-adrian.hunter@intel.com> <CAGtprH_cpbPLvW2rSc2o7BsYWYZKNR6QAEsA4X-X77=2A7s=yg@mail.gmail.com>
+ <e86aa631-bedd-44b4-b95a-9e941d14b059@intel.com> <CAGtprH_PwNkZUUx5+SoZcCmXAqcgfFkzprfNRH8HY3wcOm+1eg@mail.gmail.com>
+ <0df27aaf-51be-4003-b8a7-8e623075709e@intel.com> <aFNa7L74tjztduT-@google.com>
+ <4b6918e4-adba-48b2-931c-4d428a2775fc@intel.com> <aFVvDh7tTTXhX13f@google.com>
+ <CAGtprH-an308biSmM=c=W2FS2XeOWM9CxB3vWu9D=LD__baWUQ@mail.gmail.com>
+In-Reply-To: <CAGtprH-an308biSmM=c=W2FS2XeOWM9CxB3vWu9D=LD__baWUQ@mail.gmail.com>
+From: Vishal Annapurve <vannapurve@google.com>
+Date: Mon, 23 Jun 2025 13:36:33 -0700
+X-Gm-Features: AX0GCFsiFjiHgPiU9WIyS_dwzjn4ukQVIKAEqhgBTJmMGmJbqgX93HxUOnpzMsg
+Message-ID: <CAGtprH_9uq-FHHQ=APwgVCe+=_o=yrfCS9snAJfhcg3fr7Qs-g@mail.gmail.com>
+Subject: Re: [PATCH V4 1/1] KVM: TDX: Add sub-ioctl KVM_TDX_TERMINATE_VM
+To: Sean Christopherson <seanjc@google.com>
+Cc: Adrian Hunter <adrian.hunter@intel.com>, pbonzini@redhat.com, kvm@vger.kernel.org, 
+	rick.p.edgecombe@intel.com, kirill.shutemov@linux.intel.com, 
+	kai.huang@intel.com, reinette.chatre@intel.com, xiaoyao.li@intel.com, 
+	tony.lindgren@linux.intel.com, binbin.wu@linux.intel.com, 
+	isaku.yamahata@intel.com, linux-kernel@vger.kernel.org, yan.y.zhao@intel.com, 
+	chao.gao@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-[resend with kvm@ on cc]
+On Fri, Jun 20, 2025 at 9:14=E2=80=AFAM Vishal Annapurve <vannapurve@google=
+.com> wrote:
+>
+> On Fri, Jun 20, 2025 at 7:24=E2=80=AFAM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> >
+> > On Thu, Jun 19, 2025, Adrian Hunter wrote:
+> > > On 19/06/2025 03:33, Sean Christopherson wrote:
+> > > > On Wed, Jun 18, 2025, Adrian Hunter wrote:
+> > > >> On 18/06/2025 09:00, Vishal Annapurve wrote:
+> > > >>> On Tue, Jun 17, 2025 at 10:50=E2=80=AFPM Adrian Hunter <adrian.hu=
+nter@intel.com> wrote:
+> > > >>>>> Ability to clean up memslots from userspace without closing
+> > > >>>>> VM/guest_memfd handles is useful to keep reusing the same guest=
+_memfds
+> > > >>>>> for the next boot iteration of the VM in case of reboot.
+> > > >>>>
+> > > >>>> TD lifecycle does not include reboot.  In other words, reboot is
+> > > >>>> done by shutting down the TD and then starting again with a new =
+TD.
+> > > >>>>
+> > > >>>> AFAIK it is not currently possible to shut down without closing
+> > > >>>> guest_memfds since the guest_memfd holds a reference (users_coun=
+t)
+> > > >>>> to struct kvm, and destruction begins when users_count hits zero=
+.
+> > > >>>>
+> > > >>>
+> > > >>> gmem link support[1] allows associating existing guest_memfds wit=
+h new
+> > > >>> VM instances.
+> > > >>>
+> > > >>> Breakdown of the userspace VMM flow:
+> > > >>> 1) Create a new VM instance before closing guest_memfd files.
+> > > >>> 2) Link existing guest_memfd files with the new VM instance. -> T=
+his
+> > > >>> creates new set of files backed by the same inode but associated =
+with
+> > > >>> the new VM instance.
+> > > >>
+> > > >> So what about:
+> > > >>
+> > > >> 2.5) Call KVM_TDX_TERMINATE_VM IOCTL
+> > > >>
+> > > >> Memory reclaimed after KVM_TDX_TERMINATE_VM will be done efficient=
+ly,
+> > > >> so avoid causing it to be reclaimed earlier.
+> > > >
+> > > > The problem is that setting kvm->vm_dead will prevent (3) from succ=
+eeding.  If
+> > > > kvm->vm_dead is set, KVM will reject all vCPU, VM, and device (not =
+/dev/kvm the
+> > > > device, but rather devices bound to the VM) ioctls.
+> > >
+> > > (3) is "Close the older guest memfd handles -> results in older VM in=
+stance cleanup."
+> > >
+> > > close() is not an IOCTL, so I do not understand.
+> >
+> > Sorry, I misread that as "Close the older guest memfd handles by deleti=
+ng the
+> > memslots".
+> >
+> > > > I intended that behavior, e.g. to guard against userspace blowing u=
+p KVM because
+> > > > the hkid was released, I just didn't consider the memslots angle.
+> > >
+> > > The patch was tested with QEMU which AFAICT does not touch  memslots =
+when
+> > > shutting down.  Is there a reason to?
+> >
+> > In this case, the VMM process is not shutting down.  To emulate a reboo=
+t, the
+> > VMM destroys the VM, but reuses the guest_memfd files for the "new" VM.=
+  Because
+> > guest_memfd takes a reference to "struct kvm", through memslot bindings=
+, memslots
+>
+> guest_memfd takes a reference on the "struct kvm" only on
+> creation/linking, currently memslot binding doesn't add additional
+> references.
+>
+> Adrian's suggestion makes sense and it should be functional but I am
+> running into some issues which likely need to be resolved on the
+> userspace side. I will keep this thread updated.
+>
+> Currently testing this reboot flow:
+> 1) Issue KVM_TDX_TERMINATE_VM on the old VM.
+> 2) Close the VM fd.
+> 3) Create a new VM fd.
+> 4) Link the old guest_memfd handles to the new VM fd.
+> 5) Close the old guest_memfd handles.
+> 6) Register memslots on the new VM using the linked guest_memfd handles.
+>
 
-On 23.06.25 07:32, Chao Gao wrote:
-> On Fri, Jun 20, 2025 at 05:39:10PM +0200, Mathias Krause wrote:
->> static uint64_t cet_ibt_func(void)
->> {
->> +	unsigned long tmp;
->> 	/*
->> 	 * In below assembly code, the first instruction at label 2 is not
->> 	 * endbr64, it'll trigger #CP with error code 0x3, and the execution
->> 	 * is terminated when HW detects the violation.
->> 	 */
->> 	printf("No endbr64 instruction at jmp target, this triggers #CP...\n");
->> -	asm volatile ("movq $2, %rcx\n"
->> -		      "dec %rcx\n"
->> -		      "leaq 2f(%rip), %rax\n"
->> -		      "jmp *%rax \n"
->> -		      "2:\n"
->> -		      "dec %rcx\n");
->> +	asm volatile ("leaq 2f(%%rip), %0\n\t"
->> +		      "jmpq *%0\n\t"
->> +		      "2:"
->> +		      : "=r"(tmp));
-> 
-> @tmp isn't needed. We can still use "rax" and list it as clobbered. 
-> 
+Apparently mmap takes a refcount on backing files.
 
-I still prefer letting the compiler choose a fitting register. This also
-makes it easier to enable this code to be 32-bit ready. So 'tmp' may
-seem unnecessary, but it's a vehicle to allow the compiler to choose an
-unused register. RAX needs to be set to zero, after all.
+So basically I had to modify the reboot flow as:
+1) Issue KVM_TDX_TERMINATE_VM on the old VM.
+2) Close the VM fd.
+3) Create a new VM fd.
+4) Link the old guest_memfd handles to the new VM fd.
+5) Unmap the VMAs backed by the guest memfd
+6) Close the old guest_memfd handles. -> Results in VM destruction
+7) Setup new VMAs backed by linked guest_memfd handles.
+8) Register memslots on the new VM using the linked guest_memfd handles.
 
-Thanks,
-Mathias
-
->> 	return 0;
->> }
->>
+I think the issue simply is that we have tied guest_memfd lifecycle
+with VM lifecycle and that discussion is out of scope for this patch.
 
