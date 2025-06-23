@@ -1,96 +1,96 @@
-Return-Path: <kvm+bounces-50299-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50300-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D18AAE3CE5
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 12:41:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC7DBAE3D32
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 12:48:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7445A188AE33
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 10:40:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D18B177720
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 10:45:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8438A24679C;
-	Mon, 23 Jun 2025 10:32:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A43AF23F403;
+	Mon, 23 Jun 2025 10:43:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="DWuTGUox";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="5EnSzw8w";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="aEUTumPZ";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="1d3IAIYP"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="MUS4PFbC";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Q81jO2Ch";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="CU/YVp2B";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="RDKN760Z"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0AC623C4FD
-	for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 10:32:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71A2A238C21
+	for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 10:43:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750674759; cv=none; b=GDa8MDyXtgUS6r+DAsZzJ2BP5NMiLhqtuAfWfnGSIml1OlwusGu+1DaPfpDGNtcXW9TjDhnpHiOa6vAH96ekzzAjiHgn+ObstroJSIsfB0aO0FlO9Sz6OazDYRRxBxUlVTmGcLNQN8VNSKmNU4NFZP1VeJUhoW1rSQJAmfX+L2Y=
+	t=1750675424; cv=none; b=r3TrmwMeiAgV+glAqL1D3lNZv/PO0OifqdS+w5gwepZQHMDbrG0+NpnBkA4iDtthnUv/+jNSMELCp4KMCUOHZ3Oh5f3qDJN1ZE0QG4UOIyLXmjjytE7wI2nqUXZCGrPoV47304NaKpGBen+J+MBvEhDKggjI9bkgg1RGzWV7jyY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750674759; c=relaxed/simple;
-	bh=9oSuEk3IgnVNmP7ulXoqkKnU3sa4UTt2fu+2AkxOc24=;
+	s=arc-20240116; t=1750675424; c=relaxed/simple;
+	bh=wklbJ3x1v6boMcX3stFgarvRIlgVkJ0zAL5YoL51FRw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PGJ/IsALT+vbMXp534CmhAk14IlOvBzFCTLXdIl6vk8+ANPHocrFRNbSmimeV079pVyiVowRk0sCP13F2sbNNJl4MwJLs0rPZKuAhkZ0kr0SBKqWwTreRkO9jv7CgGbd53wFpG3+kC+5Xsy2D5Uoan2+2Z21lO5l5xb6Cs7tyA4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=DWuTGUox; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=5EnSzw8w; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=aEUTumPZ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=1d3IAIYP; arc=none smtp.client-ip=195.135.223.130
+	 In-Reply-To:Content-Type; b=AR6rPvC12k9NrRtUB/Av2PGK7M3sh0NssjThpxzL3S0Vuc7E/BEbZd9c7UHVtts6OBYV52v4JKosscO7H1HrkEHMHO82YJw6KeUYVekgfGTBuu20KKiljat/L6j86k5oXZJQmzVUxbePs7ao0VGcklIV9vttTAYRJgTO6SwFMZg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=MUS4PFbC; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Q81jO2Ch; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=CU/YVp2B; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=RDKN760Z; arc=none smtp.client-ip=195.135.223.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id E2C902118C;
-	Mon, 23 Jun 2025 10:32:34 +0000 (UTC)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id B42B11F391;
+	Mon, 23 Jun 2025 10:43:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1750674755; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1750675415; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=f57r8d/AFiQ0XBsDFZ4dPmeKn9vTf3pQy900Pa2KyZo=;
-	b=DWuTGUoxaCrGB4ZzU8OD98g63BObGagpz2yRyFKqYQOBbSYf+gvwYGHdxWCnNYg8/HeAC2
-	14Tnsp2aMVykJAJcMnbNQiuP/timY5SUYV/ZZ9aqLHXxmmu/AYtO10zCeAvcaUBa6mxygY
-	eNVXnRUhIIy3JjP5kdCICZKC9yhL92s=
+	bh=hJMVqToV4tLMkLNlQMBXD9bmFg9OFmFifeF6nVqlMz8=;
+	b=MUS4PFbCnKh2JnsMV39MeWdMf9ct43236K0lEaf/n5Z1N9Jxzb3IRHebIew+MN08I2VWdk
+	QFAP4RW3l5jnZQTRk8WE8F4esEoq9XZdWHwR5GR3MXIHPd/H+V6ljmweAYU4iU3ptEudib
+	nOMgqEACYQ2pE//itKRM6XdKbzIjyto=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1750674755;
+	s=susede2_ed25519; t=1750675415;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=f57r8d/AFiQ0XBsDFZ4dPmeKn9vTf3pQy900Pa2KyZo=;
-	b=5EnSzw8wW+4ABx4NP8f91gPOhBS/DemsYa7TwJaBkybyOrpsbpwiZlZ291qRHHgi+jLzqK
-	XSEuDRszI4pXaIDA==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=aEUTumPZ;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=1d3IAIYP
+	bh=hJMVqToV4tLMkLNlQMBXD9bmFg9OFmFifeF6nVqlMz8=;
+	b=Q81jO2ChM5BTlp6YtSEtyCKHHggf+6f7stnAg/BAsuX3R38W0AWFrSCJXcdQiV+fC/eZMX
+	ZslKPqDSXBrTsPBg==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b="CU/YVp2B";
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=RDKN760Z
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1750674754; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1750675413; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=f57r8d/AFiQ0XBsDFZ4dPmeKn9vTf3pQy900Pa2KyZo=;
-	b=aEUTumPZKSt45CYPNpsNLtj5HQKHXcfc+MD861zKiQ7uibwzJ/WqxKfAw9FVoONs+MMMmX
-	LAQnmIfrCLDgs2ZwEHNdmAGe6OsYzl4+KHbmm9fj8TDnCye2/RDk+0qj5Xt4oe6DgvdY/8
-	ULzIit79RjELC1C6itUfnncdhm19ISA=
+	bh=hJMVqToV4tLMkLNlQMBXD9bmFg9OFmFifeF6nVqlMz8=;
+	b=CU/YVp2B11qXT+UYvPVDAPg0hrQtpiek/kRlqfiac7bEH8xrZO+YzLSMKC5sHS60Vc9c0J
+	0lWDZyzXPcr54+KN2v62pJi8vJ4/xqCS/NtjMfENaOnZTvkzeZP8/DS+KYsM08vDPSm/ZU
+	XLiXb8v8Wm2yJIcAR5Om0y6yhZvTGn8=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1750674754;
+	s=susede2_ed25519; t=1750675413;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=f57r8d/AFiQ0XBsDFZ4dPmeKn9vTf3pQy900Pa2KyZo=;
-	b=1d3IAIYP5Bkf0+uLOX30Yp1klInmsj0i4vatB4KCMS/Tj9gG0JB8s5PtlwqIjnDXMB/UZ7
-	taq5vTZRAmPej/CA==
+	bh=hJMVqToV4tLMkLNlQMBXD9bmFg9OFmFifeF6nVqlMz8=;
+	b=RDKN760ZF68yEirnNZvlvyYkW+lHbZwUm9KQhSSyc2qgHq6C1s6Se59X0HnpWIGJsMgn/i
+	6VgAbOFxopUWy2AA==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 472D913485;
-	Mon, 23 Jun 2025 10:32:34 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 1BE1A13485;
+	Mon, 23 Jun 2025 10:43:33 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id O/73D0ItWWgjIAAAD6G6ig
-	(envelope-from <tzimmermann@suse.de>); Mon, 23 Jun 2025 10:32:34 +0000
-Message-ID: <f9bd6fb1-ca21-4a23-9548-8d9b42f3c9b6@suse.de>
-Date: Mon, 23 Jun 2025 12:32:33 +0200
+	id egqWBdUvWWgWIwAAD6G6ig
+	(envelope-from <tzimmermann@suse.de>); Mon, 23 Jun 2025 10:43:33 +0000
+Message-ID: <511b7382-d4b7-4d87-9695-f621c0a60b4e@suse.de>
+Date: Mon, 23 Jun 2025 12:43:32 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -98,8 +98,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 7/7] fbcon: Make a symlink to the device selected as
- primary
+Subject: Re: [PATCH v3 6/7] PCI/VGA: Move check for firmware default out of
+ VGA arbiter
 To: Mario Limonciello <superm1@kernel.org>,
  Bjorn Helgaas <bhelgaas@google.com>
 Cc: Alex Deucher <alexander.deucher@amd.com>,
@@ -121,9 +121,9 @@ Cc: Alex Deucher <alexander.deucher@amd.com>,
  Daniel Dadap <ddadap@nvidia.com>,
  Mario Limonciello <mario.limonciello@amd.com>
 References: <20250620024943.3415685-1-superm1@kernel.org>
- <20250620024943.3415685-8-superm1@kernel.org>
- <a22ecd33-460d-41bf-920c-529645d173e3@suse.de>
- <b3462e88-e24a-43d9-8437-b6d378a3b5d3@kernel.org>
+ <20250620024943.3415685-7-superm1@kernel.org>
+ <704d2a80-79bb-4247-a2aa-25bd3eb9a7e5@suse.de>
+ <fa3bfed9-8a6f-4001-bd4a-d4d237b001d3@kernel.org>
 Content-Language: en-US
 From: Thomas Zimmermann <tzimmermann@suse.de>
 Autocrypt: addr=tzimmermann@suse.de; keydata=
@@ -150,18 +150,14 @@ Autocrypt: addr=tzimmermann@suse.de; keydata=
  SAQO9xD1Zk9/61JWk8OysuIh7MXkl0fxbRKWE93XeQBhIJHQfnc+YBLprdnxR446Sh8Wn/2D
  Ya8cavuWf2zrB6cZurs048xe0UbSW5AOSo4V9M0jzYI4nZqTmPxYyXbm30Kvmz0rYVRaitYJ
  4kyYYMhuULvrJDMjZRvaNe52tkKAvMevcGdt38H4KSVXAylqyQOW5zvPc4/sq9c=
-In-Reply-To: <b3462e88-e24a-43d9-8437-b6d378a3b5d3@kernel.org>
+In-Reply-To: <fa3bfed9-8a6f-4001-bd4a-d4d237b001d3@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Queue-Id: E2C902118C
-X-Rspamd-Action: no action
-X-Spam-Flag: NO
 X-Spamd-Result: default: False [-4.51 / 50.00];
 	BAYES_HAM(-3.00)[100.00%];
 	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	MIME_GOOD(-0.10)[text/plain];
 	MX_GOOD(-0.01)[];
 	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
@@ -183,54 +179,146 @@ X-Spamd-Result: default: False [-4.51 / 50.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
 	DKIM_TRACE(0.00)[suse.de:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.de:dkim,suse.de:mid]
-X-Spam-Score: -4.51
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:url,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.de:dkim,suse.de:mid,suse.de:email]
 X-Spam-Level: 
+X-Spam-Flag: NO
+X-Rspamd-Queue-Id: B42B11F391
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spam-Score: -4.51
 
 Hi
 
-Am 20.06.25 um 17:56 schrieb Mario Limonciello:
-> On 6/20/25 3:47 AM, Thomas Zimmermann wrote:
+Am 21.06.25 um 00:17 schrieb Mario Limonciello:
+> On 6/20/2025 3:45 AM, Thomas Zimmermann wrote:
 >> Hi
 >>
 >> Am 20.06.25 um 04:49 schrieb Mario Limonciello:
 >>> From: Mario Limonciello <mario.limonciello@amd.com>
 >>>
->>> Knowing which device is the primary device can be useful for userspace
->>> to make decisions on which device to start a display server.
+>>> The x86 specific check for whether a framebuffer belongs to a device
+>>> works for display devices as well as VGA devices.  Callers to
+>>> video_is_primary_device() can benefit from checking non-VGA display
+>>> devices.
 >>>
->>> Create a link to that device called 'primary_device'.
+>>> Move the x86 specific check into x86 specific code, and adjust VGA
+>>> arbiter to call that code as well. This allows fbcon to find the
+>>> right PCI device on systems that don't have VGA devices.
 >>>
+>>> Suggested-by: Thomas Zimmermann <tzimmermann@suse.de>
 >>> Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
 >>> ---
->>>   drivers/video/fbdev/core/fbcon.c | 10 +++++++++-
->>>   1 file changed, 9 insertions(+), 1 deletion(-)
+>>>   arch/x86/video/video-common.c | 28 +++++++++++++++++++++++++++
+>>>   drivers/pci/vgaarb.c          | 36 
+>>> ++---------------------------------
+>>>   2 files changed, 30 insertions(+), 34 deletions(-)
 >>>
->>> diff --git a/drivers/video/fbdev/core/fbcon.c b/drivers/video/fbdev/ 
->>> core/fbcon.c
->>> index 2df48037688d1..46f21570723e5 100644
->>> --- a/drivers/video/fbdev/core/fbcon.c
->>> +++ b/drivers/video/fbdev/core/fbcon.c
+>>> diff --git a/arch/x86/video/video-common.c b/arch/x86/video/video- 
+>>> common.c
+>>> index 81fc97a2a837a..718116e35e450 100644
+>>> --- a/arch/x86/video/video-common.c
+>>> +++ b/arch/x86/video/video-common.c
+>>> @@ -9,6 +9,7 @@
+>>>   #include <linux/module.h>
+>>>   #include <linux/pci.h>
+>>> +#include <linux/screen_info.h>
+>>>   #include <linux/vgaarb.h>
+>>>   #include <asm/video.h>
+>>> @@ -27,13 +28,40 @@ EXPORT_SYMBOL(pgprot_framebuffer);
+>>>   bool video_is_primary_device(struct device *dev)
 >>
->> You cannot rely on this, as fbcon might be disabled entirely.
+>> I'm not sure I understand this patch. video_is_primary_device() 
+>> already exists for 3 architectures, including x86. [1] Adding it here 
+>> should produce an error. (?)
 >
-> So the other idea I had was to have a new file boot_console.
+> I wasn't adding a new implementation of it, I was augmenting the x86 
+> implementation.
 
-'console' already has a meaning, so I'd prefer boot_display. Apart from 
-naming, this is a good idea.
+Indeed. Apologies, I must have somehow misread the patch. So this is 
+essentially doing what I proposed.
 
 >
-> How would you feel about this instead (or even in addition to the 
-> symlink)?
+> But I guess based on your below point it just needs to call 
+> screen_info_pci_dev().
 
-We likely won't need the symlink then.
+Yeah, the helper already does everything necessary.
+
+
+>>
+>> [1] https://elixir.bootlin.com/linux/v6.15.2/A/ident/ 
+>> video_is_primary_device
+>>
+>> The code on x86 is
+>>
+>> bool <https://elixir.bootlin.com/linux/v6.15.2/C/ident/ 
+>> bool>video_is_primary_device 
+>> <https://elixir.bootlin.com/linux/v6.15.2/ 
+>> C/ident/video_is_primary_device>(structdevice <https:// 
+>> elixir.bootlin.com/linux/v6.15.2/C/ident/device>*dev) { structpci_dev 
+>> <https://elixir.bootlin.com/linux/v6.15.2/C/ident/pci_dev>*pdev; if(! 
+>> dev_is_pci <https://elixir.bootlin.com/linux/v6.15.2/C/ident/ 
+>> dev_is_pci>(dev)) returnfalse 
+>> <https://elixir.bootlin.com/linux/v6.15.2/ C/ident/false>; 
+>> pdev=to_pci_dev <https://elixir.bootlin.com/linux/ 
+>> v6.15.2/C/ident/to_pci_dev>(dev); return(pdev==vga_default_device 
+>> <https://elixir.bootlin.com/linux/v6.15.2/C/ident/vga_default_device>()); 
+>> }
+>>
+>> I was thinking about extending it to test for additional properties, 
+>> like this
+>>
+>> bool <https://elixir.bootlin.com/linux/v6.15.2/C/ident/ 
+>> bool>video_is_primary_device 
+>> <https://elixir.bootlin.com/linux/v6.15.2/ 
+>> C/ident/video_is_primary_device>(structdevice <https:// 
+>> elixir.bootlin.com/linux/v6.15.2/C/ident/device>*dev) { structpci_dev 
+>> <https://elixir.bootlin.com/linux/v6.15.2/C/ident/pci_dev>*pdev; if(! 
+>> dev_is_pci <https://elixir.bootlin.com/linux/v6.15.2/C/ident/ 
+>> dev_is_pci>(dev)) returnfalse 
+>> <https://elixir.bootlin.com/linux/v6.15.2/ C/ident/false>; 
+>> pdev=to_pci_dev <https://elixir.bootlin.com/linux/ 
+>> v6.15.2/C/ident/to_pci_dev>(dev); if(pdev==vga_default_device 
+>> <https:// 
+>> elixir.bootlin.com/linux/v6.15.2/C/ident/vga_default_device>()) 
+>> return true for_each_pci_dev() { // test if display and could be 
+>> primary. } return false; // nothing found }
+>>
+>
+> The above looks like some bad copy / paste.  Could you clarify?
+
+Oh, well. I really messed up my reply. :D
+
+What I meant is what you already implemented, but with the existing helper:
+
+bool video_is_primary_device(dev)
+{
+     if (dev == vga_default_device())
+       return true
+
+     if (dev == screen_info_pci_device())
+       return true
+
+     return false
+}
+
+
+One thing to keep in minds is that video_is_primary_device() currently 
+returns false by default. IDK if that's a problem for user space, but 
+user space should at least pick a reasonable fallback in that case.
 
 Best regards
 Thomas
 
+
+>
+>>
+>> This would then be called from per-device sysfs code that export a 
+>> property similar to boot_vga (such as boot_display).
+>
+> Here's the other idea I had in mind.
 >
 > diff --git a/drivers/pci/pci-sysfs.c b/drivers/pci/pci-sysfs.c
-> index 268c69daa4d5..8535950b4c0f 100644
+> index 268c69daa4d57..8535950b4c0f3 100644
 > --- a/drivers/pci/pci-sysfs.c
 > +++ b/drivers/pci/pci-sysfs.c
 > @@ -30,6 +30,7 @@
@@ -278,41 +366,136 @@ Thomas
 >
 >
 >>
+>>
+>> The issue is currently just an x86 problem, but I can imagine 
+>> something similar happening on ARM. There we'd have to go through the 
+>> DT tree to figure out the primary device. That's a problem for a 
+>> later patch set, but we should keep this in mind.
+>
+> I think that the sysfs file idea above would work for any arch.
+>
+>>
+>>>   {
+>>> +    u64 base = screen_info.lfb_base;
+>>> +    u64 size = screen_info.lfb_size;
+>>>       struct pci_dev *pdev;
+>>> +    struct resource *r;
+>>> +    u64 limit;
+>>>       if (!dev_is_pci(dev))
+>>>           return false;
+>>>       pdev = to_pci_dev(dev);
+>>> +    if (!pci_is_display(pdev))
+>>> +        return false;
+>>> +
+>>> +    /* Select the device owning the boot framebuffer if there is 
+>>> one */
+>>> +    if (screen_info.capabilities & VIDEO_CAPABILITY_64BIT_BASE)
+>>> +        base |= (u64)screen_info.ext_lfb_base << 32;
+>>> +
+>>> +    limit = base + size;
+>>> +
+>>> +    /* Does firmware framebuffer belong to us? */
+>>> +    pci_dev_for_each_resource(pdev, r) {
+>>> +        if (resource_type(r) != IORESOURCE_MEM)
+>>> +            continue;
+>>> +
+>>> +        if (!r->start || !r->end)
+>>> +            continue;
+>>> +
+>>> +        if (base < r->start || limit >= r->end)
+>>> +            continue;
+>>> +
+>>> +        return true;
+>>> +    }
+>>> +
+>>
+>> You can drop all this code and call screen_info_pci_dev() instead. I 
+>> simply never got to update vgaarb to use it.
+>
+> 👍
+>
+>>
+>> [2] https://elixir.bootlin.com/linux/v6.15.2/source/drivers/video/ 
+>> screen_info_pci.c#L109
+>>
+>>>       return (pdev == vga_default_device());
+>>>   }
+>>>   EXPORT_SYMBOL(video_is_primary_device);
+>>> diff --git a/drivers/pci/vgaarb.c b/drivers/pci/vgaarb.c
+>>> index 78748e8d2dbae..15ab58c70b016 100644
+>>> --- a/drivers/pci/vgaarb.c
+>>> +++ b/drivers/pci/vgaarb.c
+>>> @@ -26,12 +26,12 @@
+>>>   #include <linux/poll.h>
+>>>   #include <linux/miscdevice.h>
+>>>   #include <linux/slab.h>
+>>> -#include <linux/screen_info.h>
+>>>   #include <linux/vt.h>
+>>>   #include <linux/console.h>
+>>>   #include <linux/acpi.h>
+>>>   #include <linux/uaccess.h>
+>>>   #include <linux/vgaarb.h>
+>>> +#include <asm/video.h>
+>>>   static void vga_arbiter_notify_clients(void);
+>>> @@ -554,38 +554,6 @@ void vga_put(struct pci_dev *pdev, unsigned int 
+>>> rsrc)
+>>>   }
+>>>   EXPORT_SYMBOL(vga_put);
+>>> -static bool vga_is_firmware_default(struct pci_dev *pdev)
+>>> -{
+>>> -#if defined(CONFIG_X86)
+>>> -    u64 base = screen_info.lfb_base;
+>>> -    u64 size = screen_info.lfb_size;
+>>> -    struct resource *r;
+>>> -    u64 limit;
+>>> -
+>>> -    /* Select the device owning the boot framebuffer if there is 
+>>> one */
+>>> -
+>>> -    if (screen_info.capabilities & VIDEO_CAPABILITY_64BIT_BASE)
+>>> -        base |= (u64)screen_info.ext_lfb_base << 32;
+>>> -
+>>> -    limit = base + size;
+>>> -
+>>> -    /* Does firmware framebuffer belong to us? */
+>>> -    pci_dev_for_each_resource(pdev, r) {
+>>> -        if (resource_type(r) != IORESOURCE_MEM)
+>>> -            continue;
+>>> -
+>>> -        if (!r->start || !r->end)
+>>> -            continue;
+>>> -
+>>> -        if (base < r->start || limit >= r->end)
+>>> -            continue;
+>>> -
+>>> -        return true;
+>>> -    }
+>>> -#endif
+>>> -    return false;
+>>> -}
+>>> -
+>>>   static bool vga_arb_integrated_gpu(struct device *dev)
+>>>   {
+>>>   #if defined(CONFIG_ACPI)
+>>> @@ -623,7 +591,7 @@ static bool vga_is_boot_device(struct vga_device 
+>>> *vgadev)
+>>>       if (boot_vga && boot_vga->is_firmware_default)
+>>>           return false;
+>>> -    if (vga_is_firmware_default(pdev)) {
+>>> +    if (video_is_primary_device(&pdev->dev)) {
+>>
+>> Maybe not change this because you don't want to end up with non-VGA 
+>> devices here.
+>
+> 👍
+>
+>>
 >> Best regards
 >> Thomas
 >>
->>> @@ -2934,7 +2934,7 @@ static void fbcon_select_primary(struct 
->>> fb_info *info)
->>>   {
->>>       if (!map_override && primary_device == -1 &&
->>>           video_is_primary_device(info->device)) {
->>> -        int i;
->>> +        int i, r;
->>>           printk(KERN_INFO "fbcon: %s (fb%i) is primary device\n",
->>>                  info->fix.id, info->node);
->>> @@ -2949,6 +2949,10 @@ static void fbcon_select_primary(struct 
->>> fb_info *info)
->>>                      first_fb_vc + 1, last_fb_vc + 1);
->>>               info_idx = primary_device;
->>>           }
->>> +        r = sysfs_create_link(&fbcon_device->kobj, 
->>> &info->device->kobj,
->>> +                      "primary_device");
->>> +        if (r)
->>> +            pr_err("fbcon: Failed to link to primary device: %d\n", 
->>> r);
+>>>           vgadev->is_firmware_default = true;
+>>>           return true;
 >>>       }
->>>   }
->>> @@ -3376,6 +3380,10 @@ void __init fb_console_init(void)
->>>   void __exit fb_console_exit(void)
->>>   {
->>> +#ifdef CONFIG_FRAMEBUFFER_CONSOLE_DETECT_PRIMARY
->>> +    if (primary_device != -1)
->>> +        sysfs_remove_link(&fbcon_device->kobj, "primary_device");
->>> +#endif
->>>   #ifdef CONFIG_FRAMEBUFFER_CONSOLE_DEFERRED_TAKEOVER
->>>       console_lock();
->>>       if (deferred_takeover)
 >>
 >
 
