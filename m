@@ -1,214 +1,169 @@
-Return-Path: <kvm+bounces-50412-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50413-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4AD0AE4E16
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 22:22:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 54E1FAE4E22
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 22:28:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8AE6F189E873
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 20:23:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F3CC9189B32A
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 20:29:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FC002D543B;
-	Mon, 23 Jun 2025 20:22:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B1DE2D543B;
+	Mon, 23 Jun 2025 20:28:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WIZpVVKn"
+	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="fY8i9KPF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EAB41F5617
-	for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 20:22:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4CF21FCFEF
+	for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 20:28:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750710169; cv=none; b=NmbLUS5DqDg0HCXfCygx3PrrkCLi4TIa94XGzSxmpJmI6QT2bmMIiklcnZu0CfUvYHyIWEyp1aT16QHEncN1054eTdtPIVOLNTH5XsiaEUPj56yCtNmlEjqnmKlyqdKkaCw+LX5byNm/RIsOIFtXlQSi+7o6YNJGKY3AL1p28mE=
+	t=1750710518; cv=none; b=ObdGV+d1HzkMfbGwiE0vTYokth3KNDTuLZgCmzHNqnyGEGNsIvYOCPZxXgQdvSoVGUI8FAaMqd9198BE8c1pFsr/NKQe2PKaJAbUF4oP/iHF6RqpYKcNIOgjhpDxuTZkWQFz7c+/KwhMWa28O4GZ8hzItn//aIGsxzdmRNBUUVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750710169; c=relaxed/simple;
-	bh=QbK2F7d7TS1UuL/vOQNI0dCt+1mtnyHhpwoJxf5gAL8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=h8wbzF3eED42OykXDDLiUEjI048nO06VYt43taIQMR0WbfDsSpL3AgB5gj8AvoPqeu6PTflBEDFisY+dPJyQzK8bMa1Yp6eJLofzo/a159xRuTW+G3LO4P7QjMCuyNLXb5I4QCrMfvPXygDqEdvHwRyWCm7trOWcmfaNTTM795k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WIZpVVKn; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-237f270513bso11705ad.1
-        for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 13:22:47 -0700 (PDT)
+	s=arc-20240116; t=1750710518; c=relaxed/simple;
+	bh=yvn5m/fc6jZqcP4SKANHRgL9UqFxUsYwY/MKu8XQkCo=;
+	h=Message-ID:Date:MIME-Version:From:Subject:References:To:Cc:
+	 In-Reply-To:Content-Type; b=gihdTOL33mnjdtABblstQfdfeLg/dyiVLof6OLV7qr4QRXRXjgL2RBLLdGPjh6X0LJUgqVuPk2nIKbOuP9J/V08Ezg58i+8gMQEQ4V6Y0SZtMmGsNKj+9ZlzedyD0+h3TbirRphD2UfSHdJ/6t4ljEnmbba90FkgCB0HMVyoo6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=fY8i9KPF; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensrcsec.com
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-748fe69a7baso4290332b3a.3
+        for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 13:28:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750710167; x=1751314967; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=q3mqaLb4lMwuk5Dxo08DB8mhksK7Q2tt9b+1KHSKaiQ=;
-        b=WIZpVVKnZ8HAvT+ZalpaxGhMlKuoGvZiBEeflR1h/pvMr8sgFsCeG9p+h4TcUCoHZI
-         mualSvACkU5EbWnNj3/4tYByUsImzlfMCvUMv44L2MK7szulLyySv+v0cYGxixtY4AOI
-         7jlcfQBeQ9lXhd6jxDCSHaCN/8QF9oaco9OnkpIBwlibCPiunjwxEBP4jOJOP2xtbzbV
-         jw47rRnh0MTv6bWPdsDx1eNZgE1cEvcdj8OcpCx7l4lmyd6RYB8rkmRmdVSlQBLFW9Fi
-         U4dqDohgT2zW8xKUtaE+MVwKL7K0S9HCqGpGrjsSh4bYOyA8d+M8aP9PVQmbtGK2hwYr
-         uRqQ==
+        d=grsecurity.net; s=grsec; t=1750710515; x=1751315315; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:cc:to:reply-to
+         :content-language:references:subject:from:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=9lG2fYK+FG/7B4Hz41OrfpLpcja5dQtRjIqgFo6jHfc=;
+        b=fY8i9KPFuq9OA8K2K+dIQ0ER2fzkhT+2AqTF1drqMinhVW26Jn/uCp0tbtccXF49Nr
+         Qamc9DLx3f7LFtlUsHjbAFD0x2rEJcs/tjc0hqdVneQJfrkGv05cukRqTRuVXE7niaNc
+         ExBaFng4RfFHefU+SfvrPkGVp4cRKaxI3uf7q2pkuy229ZOmnrGQtAZrjHJrg7A3sgu4
+         30/Koe4nwCbAddgNlqClXh+A9JAXsfssMuQKhLeBOs1yNntOZCblDHZBBKVCEVc1gT0O
+         Dj8A1x0lKeL7PLu0PjMZP1DgUiP5ZgG64q5v3M2VP1BSljed36mIJyBE0PLP7F5xqxXr
+         0RJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750710167; x=1751314967;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=q3mqaLb4lMwuk5Dxo08DB8mhksK7Q2tt9b+1KHSKaiQ=;
-        b=FCbN2L9XlZWtMpNAp7LUfR0wKoU6pnEETSwSAO1rat/tY9t95ib79cFJB/pKjaRxy5
-         aDbycOZIqtGtx7oFJZynAZ4RjewkTqHOL6JW1mudIqttVyOEKJZJpSqjaWmCL6/z4Jbo
-         L9IJHV0N0xUI1bfdSpRoQ63EUUYRDU6Mscel03TfzQrO/EzpO4Mp5/QWtvu9cz1IWVG1
-         1KOmhEsZHyXo44xKoCY6IRBXrX40HTvxWTBZuNWex3ApHRhLC0plhz6yCqFPOria+kVB
-         BoLQmU6B/eNGWE0qZlJGyuYImexIz3Y4wewUCrvlrcdGJTygvvxal+qC/9Vp6+kfjKJs
-         QZxA==
-X-Forwarded-Encrypted: i=1; AJvYcCXxIiWNJfybUo6bt9PddRrXwVJpIyB0DKav6XOQFJbmOlUokLK6DShW/dG6SxErHDin7eY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzbPeR1RM/1YJv0m7t8ZpzPnK0+KxalSTzpc/26oyItRpYFeuDs
-	l6lmEPcindAMkLuQlbgupfJFlgk2REwCI8vQIjZXrgxHui1nCOobU069MHcQTQiBLjZvBJIFBqK
-	GhyYOhkt7lfYFRHkt0cV3DiVhDXAbZKpuDLJyd0+v
-X-Gm-Gg: ASbGncuv7TbiS+DoHTWY//KuysP5GwMoM2MaRZGFbptA209vvqpHBxavoetPxYX8Ive
-	31D7WurRiO/BvdnuWyR15VRN2aOlt1G5ljGBFXHwJhufWp6MyTaRW9J36ZdnEa2cT151kGMfpMh
-	/rUk5gul2aGFzE3WflBbV7Zhh39NMzwT6+PorZdpvsUwuLXwrs6MD+nmS8NPPKAdGcUAvEeHWK
-X-Google-Smtp-Source: AGHT+IGDQj8ItVReLWtVU9OwwwoVsN7EIusky6EKmAOOeb5Xtm0p72rl+/LEHWyktm+n2x1XXnSPnZddVkmB1AZY4To=
-X-Received: by 2002:a17:902:e5c1:b0:236:9402:a610 with SMTP id
- d9443c01a7336-23802bfd45cmr798555ad.22.1750710166944; Mon, 23 Jun 2025
- 13:22:46 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1750710515; x=1751315315;
+        h=content-transfer-encoding:in-reply-to:autocrypt:cc:to:reply-to
+         :content-language:references:subject:from:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9lG2fYK+FG/7B4Hz41OrfpLpcja5dQtRjIqgFo6jHfc=;
+        b=GqcUrie1AoBQ2ee/pdM8YbQjf1GxuFFvNL82OtXelKP3gdOVGLJkTRjZNl0dq+lCie
+         /PXyedsRTisVUbqe0LaVdsG8E6Q6b/3wG8MTQHB5pnx+3zBPvCFsoFBlCBQ80qu0Z0cW
+         slQqQ24415y5EcG8kly5Uxb38CWi+g4NtOdy74PHI61YHGuaiCApQGgvdih8pxp+25ij
+         w499+yjiB7r1BhzHaYG0HXqRW49W7vjyZxvfTkvYstfPgsALqMwIbcBCx/6XdAUu1V0M
+         Ep1tY9XXcft8ZuFFYA01exBg7GakI9PbJbKY63KjNU0oqUA7k7BTTOOxxC/ewStLKx2+
+         7ebQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXZPBAmYJtI4zFFgqW5cmmm4nvcNrDKRKFwWs4wKXboB9yPqEFnoXgEkVFDCZ7wbhpkb68=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxPdn48VEHDF8cVcHBwn0V29nFIfxXgFQH6mq/GbsGyGqW5DYNN
+	9WYnnWjLF8gIlnibQi6aZD3UqXNJ08GJ8XDLty0A51B+oGYDGkwg8m8kYsn+GNQZVIg=
+X-Gm-Gg: ASbGncv/pEWGy/bAllWGLPiq+1d5g8vktCwWdHKpx326cyHhrT4kpa4TPcN1Phck3lj
+	Q3NmYqVWpRl9xTQisCTAgM6Bvrzuz3kFTTy/MNdDTYD95lpMEyqBdt8ihO/faErGraFrno6mdD0
+	o+5OvbPF+y0eh3VHXTCy2urNGhwQcbCbDVaxZwKdPFX4TKETKbjVFEWvFGmmGA/UNlnowG1uJTM
+	Fd+rw8fg4AjDwN4BCzAMjkAWFzIIlKTVb5LjIb4zl5zodXN9CfoGDG7meePlpznIzfcQelXTwnV
+	M+9FD8ByOW4evFLc3dTJsLyaqkCBiUqQeKNld90+qZNAtToIgxfNgVdvPGMqb/mYjivqJBRs0Uq
+	m3+4cWgWbSTsRH2GJ4Vv4BLa7l+idYkFzr8L+nFd2svT6Y60V+JJbPAq8Rlh4YGyl8xOyKJJxu2
+	eb7BZNWOpt30XVrCOkqZ4=
+X-Google-Smtp-Source: AGHT+IHbWOO4NSbrGwdEC76GQPstv/OQjR/CDJ1ZM3WMxgwIO/uDHwHLpHbyfzVTCuq8c71lwTTooQ==
+X-Received: by 2002:a05:6a00:4f8c:b0:748:f406:b09 with SMTP id d2e1a72fcca58-7490d6d2ea7mr19547214b3a.23.1750710514925;
+        Mon, 23 Jun 2025 13:28:34 -0700 (PDT)
+Received: from ?IPV6:2003:fa:af22:cf00:2208:a86d:dff:5ae9? (p200300faaf22cf002208a86d0dff5ae9.dip0.t-ipconnect.de. [2003:fa:af22:cf00:2208:a86d:dff:5ae9])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-749c882cdc4sm5608b3a.84.2025.06.23.13.28.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 23 Jun 2025 13:28:34 -0700 (PDT)
+Message-ID: <335d4b2c-1b37-4026-95d1-12c6875ac58e@grsecurity.net>
+Date: Mon, 23 Jun 2025 22:28:32 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250611095158.19398-1-adrian.hunter@intel.com>
- <20250611095158.19398-2-adrian.hunter@intel.com> <CAGtprH_cpbPLvW2rSc2o7BsYWYZKNR6QAEsA4X-X77=2A7s=yg@mail.gmail.com>
- <e86aa631-bedd-44b4-b95a-9e941d14b059@intel.com> <CAGtprH_PwNkZUUx5+SoZcCmXAqcgfFkzprfNRH8HY3wcOm+1eg@mail.gmail.com>
- <0df27aaf-51be-4003-b8a7-8e623075709e@intel.com> <aFNa7L74tjztduT-@google.com>
- <4b6918e4-adba-48b2-931c-4d428a2775fc@intel.com> <aFVvDh7tTTXhX13f@google.com>
- <1cbf706a7daa837bb755188cf42869c5424f4a18.camel@intel.com>
- <CAGtprH8+iz1GqgPhH3g8jGA3yqjJXUF7qu6W6TOhv0stsa5Ohg@mail.gmail.com>
- <1989278031344a14f14b2096bb018652ad6df8c2.camel@intel.com>
- <CAGtprH9RXM8RGj_GtxjHMQcWcvUPa_FJWXOu7LTQ00C7N5pxiQ@mail.gmail.com> <2c04ba99e403a277c3d6b9ce0d6a3cb9f808caef.camel@intel.com>
-In-Reply-To: <2c04ba99e403a277c3d6b9ce0d6a3cb9f808caef.camel@intel.com>
-From: Vishal Annapurve <vannapurve@google.com>
-Date: Mon, 23 Jun 2025 13:22:35 -0700
-X-Gm-Features: AX0GCFuvLPdD-PxtX8yRCsTXOPv54UJMeVan4R2OC26g-1YzmB_aFLIRUp58JpM
-Message-ID: <CAGtprH-rUuk=9shX9bsP4K=UPVvG1cUJCiXBfW07mZ1cjtkcQw@mail.gmail.com>
-Subject: Re: [PATCH V4 1/1] KVM: TDX: Add sub-ioctl KVM_TDX_TERMINATE_VM
-To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-Cc: "Gao, Chao" <chao.gao@intel.com>, "seanjc@google.com" <seanjc@google.com>, 
-	"Huang, Kai" <kai.huang@intel.com>, 
-	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, "Chatre, Reinette" <reinette.chatre@intel.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Hunter, Adrian" <adrian.hunter@intel.com>, 
-	"Li, Xiaoyao" <xiaoyao.li@intel.com>, 
-	"tony.lindgren@linux.intel.com" <tony.lindgren@linux.intel.com>, 
-	"kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>, 
-	"Yamahata, Isaku" <isaku.yamahata@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"Zhao, Yan Y" <yan.y.zhao@intel.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+From: Mathias Krause <minipli@grsecurity.net>
+Subject: [kvm-unit-tests PATCH 1/8] x86: Avoid top-most page for vmalloc on
+ x86-64
+References: <d6f116b2-1c42-4fde-831b-b23fa6791e74@grsecurity.net>
+Content-Language: en-US, de-DE
+Reply-To: Mathias Krause <minipli@grsecurity.net>
+To: Chao Gao <chao.gao@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org
+Autocrypt: addr=minipli@grsecurity.net; keydata=
+ xsDNBF4u6F8BDAC1kCIyATzlCiDBMrbHoxLywJSUJT9pTbH9MIQIUW8K1m2Ney7a0MTKWQXp
+ 64/YTQNzekOmta1eZFQ3jqv+iSzfPR/xrDrOKSPrw710nVLC8WL993DrCfG9tm4z3faBPHjp
+ zfXBIOuVxObXqhFGvH12vUAAgbPvCp9wwynS1QD6RNUNjnnAxh3SNMxLJbMofyyq5bWK/FVX
+ 897HLrg9bs12d9b48DkzAQYxcRUNfL9VZlKq1fRbMY9jAhXTV6lcgKxGEJAVqXqOxN8DgZdU
+ aj7sMH8GKf3zqYLDvndTDgqqmQe/RF/hAYO+pg7yY1UXpXRlVWcWP7swp8OnfwcJ+PiuNc7E
+ gyK2QEY3z5luqFfyQ7308bsawvQcFjiwg+0aPgWawJ422WG8bILV5ylC8y6xqYUeSKv/KTM1
+ 4zq2vq3Wow63Cd/qyWo6S4IVaEdfdGKVkUFn6FihJD/GxnDJkYJThwBYJpFAqJLj7FtDEiFz
+ LXAkv0VBedKwHeBaOAVH6QEAEQEAAc0nTWF0aGlhcyBLcmF1c2UgPG1pbmlwbGlAZ3JzZWN1
+ cml0eS5uZXQ+wsERBBMBCgA7AhsDBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAFiEEd7J359B9
+ wKgGsB94J4hPxYYBGYYFAmBbH/cCGQEACgkQJ4hPxYYBGYaX/gv/WYhaehD88XjpEO+yC6x7
+ bNWQbk7ea+m82fU2x/x6A9L4DN/BXIxqlONzk3ehvW3wt1hcHeF43q1M/z6IthtxSRi059RO
+ SarzX3xfXC1pc5YMgCozgE0VRkxH4KXcijLyFFjanXe0HzlnmpIJB6zTT2jgI70q0FvbRpgc
+ rs3VKSFb+yud17KSSN/ir1W2LZPK6er6actK03L92A+jaw+F8fJ9kJZfhWDbXNtEE0+94bMa
+ cdDWTaZfy6XJviO3ymVe3vBnSDakVE0HwLyIKvfAEok+YzuSYm1Nbd2T0UxgSUZHYlrUUH0y
+ tVxjEFyA+iJRSdm0rbAvzpwau5FOgxRQDa9GXH6ie6/ke2EuZc3STNS6EBciJm1qJ7xb2DTf
+ SNyOiWdvop+eQZoznJJte931pxkRaGwV+JXDM10jGTfyV7KT9751xdn6b6QjQANTgNnGP3qs
+ TO5oU3KukRHgDcivzp6CWb0X/WtKy0Y/54bTJvI0e5KsAz/0iwH19IB0vpYLzsDNBF4u6F8B
+ DADwcu4TPgD5aRHLuyGtNUdhP9fqhXxUBA7MMeQIY1kLYshkleBpuOpgTO/ikkQiFdg13yIv
+ q69q/feicsjaveIEe7hUI9lbWcB9HKgVXW3SCLXBMjhCGCNLsWQsw26gRxDy62UXRCTCT3iR
+ qHP82dxPdNwXuOFG7IzoGBMm3vZbBeKn0pYYWz2MbTeyRHn+ZubNHqM0cv5gh0FWsQxrg1ss
+ pnhcd+qgoynfuWAhrPD2YtNB7s1Vyfk3OzmL7DkSDI4+SzS56cnl9Q4mmnsVh9eyae74pv5w
+ kJXy3grazD1lLp+Fq60Iilc09FtWKOg/2JlGD6ZreSnECLrawMPTnHQZEIBHx/VLsoyCFMmO
+ 5P6gU0a9sQWG3F2MLwjnQ5yDPS4IRvLB0aCu+zRfx6mz1zYbcVToVxQqWsz2HTqlP2ZE5cdy
+ BGrQZUkKkNH7oQYXAQyZh42WJo6UFesaRAPc3KCOCFAsDXz19cc9l6uvHnSo/OAazf/RKtTE
+ 0xGB6mQN34UAEQEAAcLA9gQYAQoAIAIbDBYhBHeyd+fQfcCoBrAfeCeIT8WGARmGBQJeORkW
+ AAoJECeIT8WGARmGXtgL/jM4NXaPxaIptPG6XnVWxhAocjk4GyoUx14nhqxHmFi84DmHUpMz
+ 8P0AEACQ8eJb3MwfkGIiauoBLGMX2NroXcBQTi8gwT/4u4Gsmtv6P27Isn0hrY7hu7AfgvnK
+ owfBV796EQo4i26ZgfSPng6w7hzCR+6V2ypdzdW8xXZlvA1D+gLHr1VGFA/ZCXvVcN1lQvIo
+ S9yXo17bgy+/Xxi2YZGXf9AZ9C+g/EvPgmKrUPuKi7ATNqloBaN7S2UBJH6nhv618bsPgPqR
+ SV11brVF8s5yMiG67WsogYl/gC2XCj5qDVjQhs1uGgSc9LLVdiKHaTMuft5gSR9hS5sMb/cL
+ zz3lozuC5nsm1nIbY62mR25Kikx7N6uL7TAZQWazURzVRe1xq2MqcF+18JTDdjzn53PEbg7L
+ VeNDGqQ5lJk+rATW2VAy8zasP2/aqCPmSjlCogC6vgCot9mj+lmMkRUxspxCHDEms13K41tH
+ RzDVkdgPJkL/NFTKZHo5foFXNi89kA==
+In-Reply-To: <d6f116b2-1c42-4fde-831b-b23fa6791e74@grsecurity.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jun 23, 2025 at 9:23=E2=80=AFAM Edgecombe, Rick P
-<rick.p.edgecombe@intel.com> wrote:
->
-> On Fri, 2025-06-20 at 20:00 -0700, Vishal Annapurve wrote:
-> > Can you provide enough information to evaluate how the whole problem is=
- being
-> > > solved? (it sounds like you have the full solution implemented?)
-> > >
-> > > The problem seems to be that rebuilding a whole TD for reboot is too =
-slow. Does
-> > > the S-EPT survive if the VM is destroyed? If not, how does keeping th=
-e pages in
-> > > guestmemfd help with re-faulting? If the S-EPT is preserved, then wha=
-t happens
-> > > when the new guest re-accepts it?
-> >
-> > SEPT entries don't survive reboots.
-> >
-> > The faulting-in I was referring to is just allocation of memory pages
-> > for guest_memfd offsets.
-> >
-> > >
-> > > >
-> > > > >
-> > > > > The series Vishal linked has some kind of SEV state transfer thin=
-g. How is
-> > > > > it
-> > > > > intended to work for TDX?
-> > > >
-> > > > The series[1] unblocks intrahost-migration [2] and reboot usecases.
-> > > >
-> > > > [1] https://lore.kernel.org/lkml/cover.1747368092.git.afranji@googl=
-e.com/#t
-> > > > [2] https://lore.kernel.org/lkml/cover.1749672978.git.afranji@googl=
-e.com/#t
-> > >
-> > > The question was: how was this reboot optimization intended to work f=
-or TDX? Are
-> > > you saying that it works via intra-host migration? Like some state is=
- migrated
-> > > to the new TD to start it up?
-> >
-> > Reboot optimization is not specific to TDX, it's basically just about
-> > trying to reuse the same physical memory for the next boot. No state
-> > is preserved here except the mapping of guest_memfd offsets to
-> > physical memory pages.
->
-> Hmm, it doesn't sound like much work, especially at the 1GB level. I wond=
-er if
-> it has something to do with the cost of zeroing the pages. If they went t=
-o a
-> global allocator and back, they would need to be zeroed to make sure data=
- is not
-> leaked to another userspace process. But if it stays with the fd, this co=
-uld be
-> skipped?
+[resend with kvm@ on cc]
 
-A simple question I ask to myself is that if a certain memory specific
-optimization/feature is enabled for non-confidential VMs, why it can't
-be enabled for Confidential VMs. I think as long as we cleanly
-separate memory management from RMP/SEPT management for CVMs, there
-should ideally be no major issues with enabling such optimizations for
-Confidential VMs.
+On 23.06.25 06:50, Chao Gao wrote:
+> On Fri, Jun 20, 2025 at 05:39:05PM +0200, Mathias Krause wrote:
+>> The x86-64 implementation of setup_mmu() doesn't initialize 'vfree_top'
+>> and leaves it at its zero-value. This isn't wrong per se, however, it
+>> leads to odd configurations when the first vmalloc/vmap page gets
+>> allocated. It'll be the very last page in the virtual address space --
+>> which is an interesting corner case -- but its boundary will probably
+>> wrap. It does so for CET's shadow stack, at least, which loads the
+>> shadow stack pointer with the base address of the mapped page plus its
+>> size, i.e. 0xffffffff_fffff000 + 4096, which wraps to 0x0.
+>>
+>> The CPU seems to handle such configurations just fine. However, it feels
+>> odd to set the shadow stack pointer to "NULL".
+> 
+> Not sure if adjusting this is necessary. As a unit test, exercising this corner
+> case might be beneficial. But I don't have a strong opinion. So,
 
-Just memory allocation without zeroing, even with hugepages takes time
-for large VM shapes and I don't really see a valid reason for the
-userspace VMM to repeat the freeing and allocation cycles.
+Yeah, I have ambivalent opinions about it too (testing the corner case).
+However, the under-/overflowing aspect of it feels like a bug to me.
 
-> For TDX though, hmm, we may not actually need to zero the private pages b=
-ecause
-> of the transition to keyid 0. It would be beneficial to have the differen=
-t VMs
-> types work the same. But, under this speculation of the real benefit, the=
-re may
-> be other ways to get the same benefits that are worth considering when we=
- hit
-> frictions like this. To do that kind of consideration though, everyone ne=
-eds to
-> understand what the real goal is.
->
-> In general I think we really need to fully evaluate these optimizations a=
-s part
-> of the upstreaming process. We have already seen two post-base series TDX
-> optimizations that didn't stand up under scrutiny. It turned out the exis=
-ting
-> TDX page promotion implementation wasn't actually getting used much if at=
- all.
-> Also, the parallel TD reclaim thing turned out to be misguided once we lo=
-oked
+> Reviewed-by: Chao Gao <chao.gao@intel.com>
+> 
+>>
+>> To avoid the wrapping, ignore the top most page by initializing
+>> 'vfree_top' to just one page below.
+> 
+> Nit: this makes the comment in test_lam_sup() stale, specifically "KUT
+> initializes vfree_top to 0 for X86_64". So, that comment needs an update.
 
-For a ~700G guest memory, guest shutdown times:
-1) Parallel TD reclaim + hugepage EPT mappings  : 30 secs
-2) TD shutdown with KVM_TDX_TERMINATE_VM + hugepage EPT mappings: 2 mins
-3) Without any optimization: ~ 30-40 mins
+Ahh, good catch! I'll fix that one in the next version.
 
-KVM_TDX_TERMINATE_VM for now is a very good start and is much simpler
-to upstream.
-
-> into the root cause. So if we blindly incorporate optimizations based on =
-vague
-> or promised justification, it seems likely we will end up maintaining som=
-e
-> amount of complex code with no purpose. Then it will be difficult to prov=
-e later
-> that it is not needed, and just remain a burden.
->
-> So can we please start explaining more of the "why" for this stuff so we =
-can get
-> to the best upstream solution?
+Thanks,
+Mathias
 
