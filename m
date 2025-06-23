@@ -1,78 +1,79 @@
-Return-Path: <kvm+bounces-50323-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50324-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B274EAE3FF2
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 14:26:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B7A0AE3FEF
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 14:26:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B8BBD189AAEE
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 12:21:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF0AF1785B0
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 12:20:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54D962475C8;
-	Mon, 23 Jun 2025 12:19:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAE5124887F;
+	Mon, 23 Jun 2025 12:19:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BhLAgm0V"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="a5qK/vx3"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C44E023D2BF
-	for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 12:19:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DEDB238C16
+	for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 12:19:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750681192; cv=none; b=Y1Rkxfa8KQoB8kqeW1imAgJzzhIBrv6UoizBz3Lwo3O+z8SxnAyoAPSsPDZmxWY5npULgwI1QK6SSGwTwLrPd/AGU64ISs7I7sZLUZuQSOMzTi+oPtyxPKj2XVzEenMBcl1xcRoO2Yuh2und2L5ydBtNuY14UpQEbUCprkE3Kwk=
+	t=1750681197; cv=none; b=Bkxl48q0BCloPAXyJeGnOJuh88/RHgQjsvLYZEkb0FOKpo4OXkIUqTepp/lvlXtS3ylCwxaRp1me7Z0yNYLJU0wiyv6v5DrS8yda5+UXkW11me1oSQ7G3IjeWnNQ+NFwTTiU7RqbUDbhMV2dWt8OwdcxZumXvxU3fu0y2r0Eq7E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750681192; c=relaxed/simple;
-	bh=FQHY1qz4XsXm0Rl3aIb6rLi3Nuv1xWtajQO3g+IgjzY=;
+	s=arc-20240116; t=1750681197; c=relaxed/simple;
+	bh=aACazlTnjjVuqSSrK+aqVnhw4rNg9Hx0k526/7OHNqI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oa0h0lX94EFfX91Rhi+J1cIKppqPOM9627NVCVG5T1tSZCh+LK0NOOVstjD1+txi4MEydeC13aUH2b06PXLLYRAz88nMAavQs3+M4MG/nIYmB27PeUoYiZg4TxSWSyrjt2nhakOzlFtOsZ0Li3426rc3e2Z/t1rpTLuzJjmEJjo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=BhLAgm0V; arc=none smtp.client-ip=209.85.128.48
+	 MIME-Version:Content-Type; b=nAbAAF+hNxC1T9Puw4sRnUC6Yz4XtMVMkXGYnR09/BJIMAKcx+QKvukS373pE+1/cr9PflJRlVVTA0c3SOsUAJI/FbvaGOrvjteJQAZ9MZ4k0WoRN+6IaLLyrNOIdM3j5o543yCD61EU3s0ciz8J5ZjUgFmeK7EhLUoRlv6PGNA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=a5qK/vx3; arc=none smtp.client-ip=209.85.221.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-450cb2ddd46so24183285e9.2
-        for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 05:19:50 -0700 (PDT)
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3a588da60dfso2485946f8f.1
+        for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 05:19:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1750681189; x=1751285989; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1750681194; x=1751285994; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=MZYDDWvDMspPzhkKxydUFPlizzWHJdNmtQlGNWnBP18=;
-        b=BhLAgm0V5TOTt5SbCqomhW13TwrYr1Qt5HSAS6TpHrKWn1+oiSRwUauk56TWMz4RMP
-         klIaKgOK8dtXL8wzGrOK+cF4U/z2rSvk7j5Vsq99aHG9VSB9uNP1V2CmaVy4i4z9kDt9
-         mfiOJu+VAwWQets0Ta+uUwS6DPTqZQbv3KJnf0L+SolWDQq2TVCXZ2MIOM0jxRe7RkmV
-         KIHPinpDPOEW8mFlH7DLq+02B0pSkePTd0k4gQI0BBGWeIYCsAK33U9SuNAfazD4M8G3
-         V8LCy9ZwyRCeXi6h/U64ulkAZoZZmtSbrnNUsp85T8gRdfYiOUCp7jCTPy1KmPGV+L+j
-         3e0g==
+        bh=n9TcP7uZ8sj3k25ApWupc8E4+ydRbD8zQYT0ugNh7kc=;
+        b=a5qK/vx3It1eGuUOPmDN5kOXyYCyiwFUi0oqEecqp5Od1+m2UOYU1szFElN3kWqbu6
+         87DUWA8Lm+1q3o1JwRRTs0KKsGAvb1cvR0OOBQNZEzjOqbNPx6/dhXgYyPeHQx3ZADOS
+         Ag4PJXMqo3erYnXcYdMKwdaIhNBR0n1Nb+Iy2fWgktUrAy7Dm7214TjQgnTN5/9ZZyIq
+         vdMDEIpee8fhf9bQGwJwBzZqueJcf3PEho/kCmXDJqSGFS7NIUor5cHp4XaBS6m9phaK
+         Jx0683XhqhsGf9fOmPfCvxhjOIYf/4Rid5M7caODuBJljRD7Pm3bUqgC77/G+lhg5nYQ
+         lPdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750681189; x=1751285989;
+        d=1e100.net; s=20230601; t=1750681194; x=1751285994;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=MZYDDWvDMspPzhkKxydUFPlizzWHJdNmtQlGNWnBP18=;
-        b=ohy0b+yDWxWBqiKA0idK5/92+KVpjPOLMUkvrX1ln/D4cOYly+qYUkAKLgCQAX2M3v
-         DFdy5Zf6GBVHa0GQzaYekVw/eB1g2e03b7+1cyavAibQ39Xn+j8LSvEZOESWXkaMEJ75
-         nhn14oQtRdW6eE6/d2uLiANzB3ZS9X68ksabT9ILGZWhFUS+zUXk9qf1F6SbZfMJ23tE
-         CZtNtHi/TebbWLCWwKivuYSJYnYs0ahcJQYOj+DEfUdkmWD5eM42MzFvuf15KjnZG25T
-         Hdh9Ks8HE8B86v75fiqafJLFseRQ97DmToOJVt3A1Ir2uDJTzBACFWDRdWjxPHC5ximA
-         yAsg==
-X-Forwarded-Encrypted: i=1; AJvYcCW0p3r56DUQmXFJKJqClhlj1iBk1ea1xOZipMiZJ9w01ugxgVFgZ65WvW8cL72wnRaF9Kk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzMEqNj6RkHb+tfCR8n2htLPDOBjTq1qRk8xUZP6AmWNPI3kN5y
-	VHurQF4jFGjxGVjCz0+UpMzofy1ifdaqWfeeRCGeDN8/Lu5d9K79FaUnPUzvGMZ/uC0=
-X-Gm-Gg: ASbGncujf377HK0WcQXk+sr0s7Mzee8ZYU6MAhtRCdnroAO5RXAZFMB6Vf+L/k/UTYH
-	stkQ6sTuy4lANJjWwaBTg7JQvS10IBmApDo2GPCLBk6Y3eux1+51F1Me6IFeTg/N4BxGc4I6BQ5
-	8tny441jc4RBDOvM2xJiGUaMinmOOYkg7Kna/kTklQD4m70sViuaVuZJ+PAJsAF+YgZEvf11t83
-	ac0jSnCbvxvSbbaoD6j71YFg2UnNMCWXaclHK+GuT4H9Xsqwc4xyXhmSTHl+4AarpiMR+47CYja
-	DD/VL2d0AWclVaJd/+wFa0dDxTImyvbbPCzdXHix1HIlAII9aUZHOzDxhfXGxozJbyrJ6uILTy1
-	S1zdlep3qSFeJrve+7jXucsC/HKefWqLrg6Vm
-X-Google-Smtp-Source: AGHT+IGt+hN6QhdH8hKFCVkO4jTWulC9IJ1I0tIA0BlYCZoOOrf5ORdSOfgPjNgKAX8CHSeqYE/nlA==
-X-Received: by 2002:a05:600c:1d14:b0:43c:e7ae:4bcf with SMTP id 5b1f17b1804b1-4536b4be314mr77860915e9.0.1750681189099;
-        Mon, 23 Jun 2025 05:19:49 -0700 (PDT)
+        bh=n9TcP7uZ8sj3k25ApWupc8E4+ydRbD8zQYT0ugNh7kc=;
+        b=JhK8BtgJ5SMi+f3Fp4ys1cTg4DuQKlwWJMJMI+KpSPlCovb7Go4ydYQqTkp3k3RYa6
+         XrNHumA6DtSiymS3zFM0OgABOxvAl5pkRLH0DiIMH2m8RgBHjvV5v9iyaBV4SgmGgeng
+         qjBsQTf8Inlq/eL5s7j3XlvKsKjs7jPh0r3jkOUKkh4JbiHc+QCbTT/kMOPYDvbiQ2b9
+         BIqJ4YOuRCBJVqj2WSBUv0ld8QWJ6Cqfoswkkbf6c+22q8/tdrsxDCvP6pZry6EFeS0M
+         cT4oa/QLWMj9UuMHpeaTzW7K/4ZcBjCZbaMvLyz/BLazjwmmNeEWnAL1UbplP/NJxoHo
+         RIWw==
+X-Forwarded-Encrypted: i=1; AJvYcCUZPgxccuuZUTyrirbWI2SqCZwWK55zQSQWWkvPYbeZNZ0nmdYLuseH9S5n6O4uYEu01nk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw+78/Zzolf26o3b/lMcTnMVe3V0ganVPtTDae2Aeq0aSSNibvH
+	AT2rmjsFJqn9RLlSTfy9zukwASzyjMNbTEKyboIoGfrWQC8KxLOSgwheJQfivDMJfameFl0oII1
+	bZKyN
+X-Gm-Gg: ASbGncsfvynjOmmkk4ziHymELBXTJA2JWrERPLlB7wvjw/frIdZj6W8c/4AH5dmrELV
+	GNs8LwusP8pLW+jVTHxs+YvtN+TOGa8nhWlGsNH927GVz1PPRThv8B+SG6fht4kywzx0Xswh2KL
+	iYv+1VTSrgPrEGrpPEVd/U9xVHy5TdSFeISjQggwMa18+Ltv4EkN2tEK/LIPR7W2QWPtrrIJLdQ
+	JKzGEUf43QINqAmVMXkxcpcLtgtvU54BgtfZ5hCD6XA16FQ8KLKrIvsWSR2q2/b8UTYfdXh/yw3
+	sKYmGGMBWGykTy+aEnFnQcly7uAHLm1MWYkqpSugQKfLyttaz1ToRBJQGkXKRGPfLWPqt1OT4+8
+	Ht7OifMJddjSMOXTt+jCZbWYZHoCn76TuqYWt
+X-Google-Smtp-Source: AGHT+IEHiq/SjlZG6KJQYhM0dN6HzIW1qJU45zGcdqrFfg265NhL0FAhAnfqOQcq/6jydwJBpJn65g==
+X-Received: by 2002:adf:e187:0:b0:3a4:f723:3e73 with SMTP id ffacd0b85a97d-3a6d129ccdbmr8492187f8f.16.1750681194323;
+        Mon, 23 Jun 2025 05:19:54 -0700 (PDT)
 Received: from localhost.localdomain (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-453646cb57fsm110694655e9.1.2025.06.23.05.19.47
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a6d0f10385sm9537215f8f.17.2025.06.23.05.19.52
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 23 Jun 2025 05:19:48 -0700 (PDT)
+        Mon, 23 Jun 2025 05:19:53 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Leif Lindholm <leif.lindholm@oss.qualcomm.com>,
@@ -95,9 +96,9 @@ Cc: Leif Lindholm <leif.lindholm@oss.qualcomm.com>,
 	Phil Dennis-Jordan <phil@philjordan.eu>,
 	Richard Henderson <richard.henderson@linaro.org>,
 	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH v3 12/26] target/arm: Restrict system register properties to system binary
-Date: Mon, 23 Jun 2025 14:18:31 +0200
-Message-ID: <20250623121845.7214-13-philmd@linaro.org>
+Subject: [PATCH v3 13/26] target/arm: Create GTimers *after* features finalized / accel realized
+Date: Mon, 23 Jun 2025 14:18:32 +0200
+Message-ID: <20250623121845.7214-14-philmd@linaro.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250623121845.7214-1-philmd@linaro.org>
 References: <20250623121845.7214-1-philmd@linaro.org>
@@ -110,111 +111,106 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Do not expose the following system-specific properties on user-mode
-binaries:
-
- - psci-conduit
- - cntfrq (ARM_FEATURE_GENERIC_TIMER)
- - rvbar (ARM_FEATURE_V8)
- - has-mpu (ARM_FEATURE_PMSA)
- - pmsav7-dregion (ARM_FEATURE_PMSA)
- - reset-cbar (ARM_FEATURE_CBAR)
- - reset-hivecs (ARM_FEATURE_M)
- - init-nsvtor (ARM_FEATURE_M)
- - init-svtor (ARM_FEATURE_M_SECURITY)
- - idau (ARM_FEATURE_M_SECURITY)
+Call generic (including accelerator) cpu_realize() handlers
+*before* setting @gt_cntfrq_hz default
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/cpu.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ target/arm/cpu.c | 65 ++++++++++++++++++++++++------------------------
+ 1 file changed, 33 insertions(+), 32 deletions(-)
 
 diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index eb0639de719..e5b70f5de81 100644
+index e5b70f5de81..ab5fbd9b40b 100644
 --- a/target/arm/cpu.c
 +++ b/target/arm/cpu.c
-@@ -1500,6 +1500,7 @@ static void arm_cpu_initfn(Object *obj)
-  * 0 means "unset, use the default value". That default might vary depending
-  * on the CPU type, and is set in the realize fn.
-  */
-+#ifndef CONFIG_USER_ONLY
- static const Property arm_cpu_gt_cntfrq_property =
-             DEFINE_PROP_UINT64("cntfrq", ARMCPU, gt_cntfrq_hz, 0);
- 
-@@ -1509,7 +1510,6 @@ static const Property arm_cpu_reset_cbar_property =
- static const Property arm_cpu_reset_hivecs_property =
-             DEFINE_PROP_BOOL("reset-hivecs", ARMCPU, reset_hivecs, false);
- 
--#ifndef CONFIG_USER_ONLY
- static const Property arm_cpu_has_el2_property =
-             DEFINE_PROP_BOOL("has_el2", ARMCPU, has_el2, true);
- 
-@@ -1532,6 +1532,7 @@ static const Property arm_cpu_has_neon_property =
- static const Property arm_cpu_has_dsp_property =
-             DEFINE_PROP_BOOL("dsp", ARMCPU, has_dsp, true);
- 
-+#ifndef CONFIG_USER_ONLY
- static const Property arm_cpu_has_mpu_property =
-             DEFINE_PROP_BOOL("has-mpu", ARMCPU, has_mpu, true);
- 
-@@ -1544,6 +1545,7 @@ static const Property arm_cpu_pmsav7_dregion_property =
-             DEFINE_PROP_UNSIGNED_NODEFAULT("pmsav7-dregion", ARMCPU,
-                                            pmsav7_dregion,
-                                            qdev_prop_uint32, uint32_t);
-+#endif
- 
- static bool arm_get_pmu(Object *obj, Error **errp)
- {
-@@ -1731,6 +1733,7 @@ static void arm_cpu_post_init(Object *obj)
-                                         "Set on/off to enable/disable aarch64 "
-                                         "execution state ");
-     }
-+#ifndef CONFIG_USER_ONLY
-     if (arm_feature(&cpu->env, ARM_FEATURE_CBAR) ||
-         arm_feature(&cpu->env, ARM_FEATURE_CBAR_RO)) {
-         qdev_property_add_static(DEVICE(obj), &arm_cpu_reset_cbar_property);
-@@ -1746,7 +1749,6 @@ static void arm_cpu_post_init(Object *obj)
-                                        OBJ_PROP_FLAG_READWRITE);
+@@ -1985,26 +1985,6 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+         return;
      }
  
--#ifndef CONFIG_USER_ONLY
-     if (arm_feature(&cpu->env, ARM_FEATURE_EL3)) {
-         /* Add the has_el3 state CPU property only if EL3 is allowed.  This will
-          * prevent "has_el3" from existing on CPUs which cannot support EL3.
-@@ -1818,6 +1820,7 @@ static void arm_cpu_post_init(Object *obj)
-         qdev_property_add_static(DEVICE(obj), &arm_cpu_has_dsp_property);
-     }
- 
-+#ifndef CONFIG_USER_ONLY
-     if (arm_feature(&cpu->env, ARM_FEATURE_PMSA)) {
-         qdev_property_add_static(DEVICE(obj), &arm_cpu_has_mpu_property);
-         if (arm_feature(&cpu->env, ARM_FEATURE_V7)) {
-@@ -1854,8 +1857,6 @@ static void arm_cpu_post_init(Object *obj)
-                                    &cpu->psci_conduit,
-                                    OBJ_PROP_FLAG_READWRITE);
- 
--    qdev_property_add_static(DEVICE(obj), &arm_cpu_cfgend_property);
+-    if (!cpu->gt_cntfrq_hz) {
+-        /*
+-         * 0 means "the board didn't set a value, use the default". (We also
+-         * get here for the CONFIG_USER_ONLY case.)
+-         * ARMv8.6 and later CPUs architecturally must use a 1GHz timer; before
+-         * that it was an IMPDEF choice, and QEMU initially picked 62.5MHz,
+-         * which gives a 16ns tick period.
+-         *
+-         * We will use the back-compat value:
+-         *  - for QEMU CPU types added before we standardized on 1GHz
+-         *  - for versioned machine types with a version of 9.0 or earlier
+-         */
+-        if (arm_feature(env, ARM_FEATURE_BACKCOMPAT_CNTFRQ) ||
+-            cpu->backcompat_cntfrq) {
+-            cpu->gt_cntfrq_hz = GTIMER_BACKCOMPAT_HZ;
+-        } else {
+-            cpu->gt_cntfrq_hz = GTIMER_DEFAULT_HZ;
+-        }
+-    }
 -
-     if (arm_feature(&cpu->env, ARM_FEATURE_GENERIC_TIMER)) {
-         qdev_property_add_static(DEVICE(cpu), &arm_cpu_gt_cntfrq_property);
-     }
-@@ -1864,7 +1865,6 @@ static void arm_cpu_post_init(Object *obj)
-         kvm_arm_add_vcpu_properties(cpu);
-     }
- 
--#ifndef CONFIG_USER_ONLY
-     if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64) &&
-         cpu_isar_feature(aa64_mte, cpu)) {
-         object_property_add_link(obj, "tag-memory",
-@@ -1882,6 +1882,7 @@ static void arm_cpu_post_init(Object *obj)
+ #ifndef CONFIG_USER_ONLY
+     /* The NVIC and M-profile CPU are two halves of a single piece of
+      * hardware; trying to use one without the other is a command line
+@@ -2051,7 +2031,40 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+             return;
          }
      }
- #endif
-+    qdev_property_add_static(DEVICE(obj), &arm_cpu_cfgend_property);
- }
++#endif
  
- static void arm_cpu_finalizefn(Object *obj)
++    cpu_exec_realizefn(cs, &local_err);
++    if (local_err != NULL) {
++        error_propagate(errp, local_err);
++        return;
++    }
++
++    arm_cpu_finalize_features(cpu, &local_err);
++    if (local_err != NULL) {
++        error_propagate(errp, local_err);
++        return;
++    }
++
++#ifndef CONFIG_USER_ONLY
++    if (!cpu->gt_cntfrq_hz) {
++        /*
++         * 0 means "the board didn't set a value, use the default". (We also
++         * get here for the CONFIG_USER_ONLY case.)
++         * ARMv8.6 and later CPUs architecturally must use a 1GHz timer; before
++         * that it was an IMPDEF choice, and QEMU initially picked 62.5MHz,
++         * which gives a 16ns tick period.
++         *
++         * We will use the back-compat value:
++         *  - for QEMU CPU types added before we standardized on 1GHz
++         *  - for versioned machine types with a version of 9.0 or earlier
++         */
++        if (arm_feature(env, ARM_FEATURE_BACKCOMPAT_CNTFRQ) ||
++            cpu->backcompat_cntfrq) {
++            cpu->gt_cntfrq_hz = GTIMER_BACKCOMPAT_HZ;
++        } else {
++            cpu->gt_cntfrq_hz = GTIMER_DEFAULT_HZ;
++        }
++    }
+     {
+         uint64_t scale = gt_cntfrq_period_ns(cpu);
+ 
+@@ -2072,18 +2085,6 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+     }
+ #endif
+ 
+-    cpu_exec_realizefn(cs, &local_err);
+-    if (local_err != NULL) {
+-        error_propagate(errp, local_err);
+-        return;
+-    }
+-
+-    arm_cpu_finalize_features(cpu, &local_err);
+-    if (local_err != NULL) {
+-        error_propagate(errp, local_err);
+-        return;
+-    }
+-
+ #ifdef CONFIG_USER_ONLY
+     /*
+      * User mode relies on IC IVAU instructions to catch modification of
 -- 
 2.49.0
 
