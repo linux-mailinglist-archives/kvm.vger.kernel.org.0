@@ -1,135 +1,190 @@
-Return-Path: <kvm+bounces-50383-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50384-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59ABAAE4ACD
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 18:27:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34B26AE4AC6
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 18:27:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B15811B64BF9
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 16:20:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BC9AF4A1672
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 16:25:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D1352DECDF;
-	Mon, 23 Jun 2025 16:10:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F0B32D3220;
+	Mon, 23 Jun 2025 16:18:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="SZ1GzJXM"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ok3fQtyN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 317F72DCC03;
-	Mon, 23 Jun 2025 16:10:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D05E22BE7C0
+	for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 16:18:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750695049; cv=none; b=ZxZrmRGBTNKRlMrcD3yooNoVP7v3KY9d2WXx04jRH+nKQjxlN2CrkOFCuUKzwBsA7wKpeefIrmvjDlLvuZOPB+DtJ2oTFKbVDCXz62DfB0CQ4sI61+UVRKJ9BUnReT3LHjwWGvMblJ+vYAe8gbb2VD95C7+J7T8L+Q93R9/NSNg=
+	t=1750695530; cv=none; b=KhR1QZ8Uhf141hbokZ42SrPprrziZb/Yv7YiCKiRgqZJc0geJ3lncezwPFXh/iYGaWqS8ki+XOD/o0hFpCagRntRdQl1piGL68Y/7j33OqoKmY1CRbJof9RuW1tGqQYauhKgtmIfOtvs8+VBk382nE4TNx9FO4GjVu/f0m8sLHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750695049; c=relaxed/simple;
-	bh=dS7QgYeAznkgEhzk7h32qFFNi0yjzq3+ztoyxkZ//XI=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=KkmOfsxEnX+zFY7ozqQrENFPOunPNJqiRc8LWmzk/ciN22YZcPLKSoqwKX1L6c8aROL8bnf8lcSC6FO/OKgWtTnIyqdqEyRpk/k6pLcFukzIMdywTm4sTIE55X0nqlxUFlGmWXIv5nF2Xra5rIig7KV0xBQgkUGZX868LZDEMe8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=SZ1GzJXM; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [127.0.0.1] (c-76-133-66-138.hsd1.ca.comcast.net [76.133.66.138])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 55NGA7TK995696
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Mon, 23 Jun 2025 09:10:08 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 55NGA7TK995696
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025062101; t=1750695009;
-	bh=5OyKvEljcKH+TeDJlGA4fkMB6CCrF6QEZCXe4uNmwAs=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=SZ1GzJXMbd0V6nYkSdQZSdPQcNAKb5MOvCof6U/mOuVB+0QaDBj59VWf5L9cRdgqT
-	 itNQlfH2W269PbEwmkNbvulkUpxD/UUYAf21tFgjmxP08jvyuS59WLfrXO0m+c+x4l
-	 WGgqQOEmbV8yWjnJbwQmrkLJWBOUzH7/BPGJMQ4Y68rNvdHRoftSH09vAnFWX9ThT1
-	 b2fq5G5sXTvRlAM00Jmft2M0hQci085Nr0JAd9nUZ6EHm2uxF9g9YYRyZy+Y40PHfc
-	 dnNB/soxXQbG5F09Aq5J3cTLdmikLWRCSI3dwlJg8OoNQMHVTDWjdoHBDNBYN8PW30
-	 mT6yD9MhrJm5w==
-Date: Mon, 23 Jun 2025 09:10:07 -0700
-From: "H. Peter Anvin" <hpa@zytor.com>
-To: Sean Christopherson <seanjc@google.com>
-CC: Sohil Mehta <sohil.mehta@intel.com>, Xin Li <xin@zytor.com>,
-        x86@kernel.org, linux-kernel@vger.kernel.org,
-        Andy Lutomirski <luto@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Kan Liang <kan.liang@linux.intel.com>, Tony Luck <tony.luck@intel.com>,
-        Zhang Rui <rui.zhang@intel.com>, Steven Rostedt <rostedt@goodmis.org>,
-        Andrew Cooper <andrew.cooper3@citrix.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Jacob Pan <jacob.pan@linux.microsoft.com>,
-        Andi Kleen <ak@linux.intel.com>, Kai Huang <kai.huang@intel.com>,
-        Sandipan Das <sandipan.das@amd.com>, linux-perf-users@vger.kernel.org,
-        linux-edac@vger.kernel.org, kvm@vger.kernel.org,
-        linux-pm@vger.kernel.org, linux-trace-kernel@vger.kernel.org
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v7_02/10=5D_x86/fred=3A_Pass_eve?=
- =?US-ASCII?Q?nt_data_to_the_NMI_entry_point_from_KVM?=
-User-Agent: K-9 Mail for Android
-In-Reply-To: <aFl1PcnVuYuELvRQ@google.com>
-References: <20250612214849.3950094-1-sohil.mehta@intel.com> <20250612214849.3950094-3-sohil.mehta@intel.com> <7525af7f-a817-47d5-91f7-d7702380c85f@zytor.com> <3281866f-2593-464d-a77e-5893b5e7014f@intel.com> <36374100-0587-47f1-9319-6333f6dfe4db@zytor.com> <39987c98-1f63-4a47-b15e-8c78f632da4e@intel.com> <7acedeba-9c90-403c-8985-0247981bf2b5@zytor.com> <aFXsPVIKi6wFUB6x@google.com> <1713a225-44e0-4018-bf5f-64ffd7746167@zytor.com> <aFl1PcnVuYuELvRQ@google.com>
-Message-ID: <D00BE3D4-C710-4304-85D3-B2A091E08035@zytor.com>
+	s=arc-20240116; t=1750695530; c=relaxed/simple;
+	bh=EDHaxySB1XyXigRSYjSRI7C2L41azpKZfXI/ttcEEo0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=ms39OcxTr/UC6YSqrhIb4Ibb5NCbydDLtPBcqJbmz+PL4w5jpZw7mkWhsxjApgHga91aCtsfOUlDbmZU7NoVQPe3tcegF+q+CgWqBvLZhDlkNoK5bWVikxVMyKvdneSg+U6h2MovJCxlkLwxF5qFyC6gROHl8WdERmCDUFnlRx4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ok3fQtyN; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b2c36951518so5571830a12.2
+        for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 09:18:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1750695527; x=1751300327; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=OOkpzMlhlXRiMCNdOIvauV/qFub0T/UowmpNSsYnBL4=;
+        b=ok3fQtyNSBcUqCubl+Lz2K0WlkXRHfvXkDzsv/rGPc7b1ghBZc+p2/IYP5cwxthWEF
+         rn9Nx0bpDO/K7E5va/IkUeW7tpTJQRbe8DqDFP82HxyTTPe3V7zV1t4l1fRs7My5LtUZ
+         /N9Nb91DUny3N/8MFK1qTU2RDH/8yUB5FgZpPcNRA9KKcfenjfcGv5MLYK/uyv/4KHOe
+         uZBvN7FLoX6qDzVaWmrIv9G2J+CnrEA1/EoVwApG8Yiu7ECmgLE+Dozn58L9acBrfRgv
+         H2zfUsJvp12C6RwZraUq4sT2GdVHQ/tNTT8Jz52AIWTtUtdQvQ9iSQvYzGczv+DFnr7I
+         rerg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750695527; x=1751300327;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OOkpzMlhlXRiMCNdOIvauV/qFub0T/UowmpNSsYnBL4=;
+        b=XR2oZfbVVqCIJVVZbjkHkE3YRtcs2B2o7lFB4LBCf1KmH5mL3HkFFki2GQDQG+0HW9
+         4L8jiC0sABsMyUHbs4dWA0hVguXoUzs/dy7n0hb6ZE//PhFb/bDzmhGg1/oOs+Ak8oFc
+         NhkPYsk2deSVlYs+E99E84iBVWfsSH49Cmzqmsn5RutYTjxDwP8Syny8xICqaSoPnAJP
+         uvL+JJSzN6Kc2qNURddz7l/URq3P2s98Lr24EojVLlihBAahEchHL0OttRkZLdRFWQQ+
+         +oCSaH6AtkSYACgy7Dg11Sd0bQgbgvXZqZEGd3J6s4Q2y9EGep2gDpVVKGj562lDXM1B
+         CWNg==
+X-Forwarded-Encrypted: i=1; AJvYcCUKwdeqyd/X0DsmrgRFlHFKhgkYamc8PJnYiZYA66gtD3lfsPsyBT0tkgMlVqpa7hcq3p4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YycA/dZrFaoUFF96LaoEJAVzOA2oe9vjsQBSMGQlyn4zAnFmoA1
+	iYcK2+fcj6NfjAi/SnqjFPQ2NTKG3a9BaUrO+yGMLLuu/DzfGSgXT61zkpirGesb2F16zqq6lbl
+	5ru8srg==
+X-Google-Smtp-Source: AGHT+IENQipggL2SOcRyFklB3/6faa8uHHLu36CbWgSZEypv6kRSEUBRnwpSzpoNeCEIYgBhsThVyFLxqUA=
+X-Received: from pfug19.prod.google.com ([2002:a05:6a00:793:b0:749:8f7:e14e])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:c992:b0:21f:5c9d:498e
+ with SMTP id adf61e73a8af0-22026d32fe2mr19839452637.7.1750695527173; Mon, 23
+ Jun 2025 09:18:47 -0700 (PDT)
+Date: Mon, 23 Jun 2025 09:18:45 -0700
+In-Reply-To: <pxtvegopzsyhn7lelksclxiiee7tumppu76553rax7octqpy7i@giclgo667htf>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20250611224604.313496-2-seanjc@google.com> <20250611224604.313496-22-seanjc@google.com>
+ <pxtvegopzsyhn7lelksclxiiee7tumppu76553rax7octqpy7i@giclgo667htf>
+Message-ID: <aFl-ZYyf9guxSkHE@google.com>
+Subject: Re: [PATCH v3 20/62] KVM: SVM: Add a comment to explain why
+ avic_vcpu_blocking() ignores IRQ blocking
+From: Sean Christopherson <seanjc@google.com>
+To: Naveen N Rao <naveen@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Joerg Roedel <joro@8bytes.org>, 
+	David Woodhouse <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, iommu@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	Sairaj Kodilkar <sarunkod@amd.com>, Vasant Hegde <vasant.hegde@amd.com>, 
+	Maxim Levitsky <mlevitsk@redhat.com>, Joao Martins <joao.m.martins@oracle.com>, 
+	Francesco Lavra <francescolavra.fl@gmail.com>, David Matlack <dmatlack@google.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On June 23, 2025 8:39:41 AM PDT, Sean Christopherson <seanjc@google=2Ecom> =
-wrote:
->On Fri, Jun 20, 2025, H=2E Peter Anvin wrote:
->> On 2025-06-20 16:18, Sean Christopherson wrote:
->> > >=20
->> > > So I was thinking about this, and wonder: how expensive is it to ge=
-t the
->> > > event data exit information out of VMX? If it is not very expensive=
-, it
->> > > would arguably be a good thing to future-proof by fetching that inf=
-ormation,
->> > > even if it is currently always zero=2E
->> >=20
->> > It's trivially easy to do in KVM, and the cost of the VMREAD should b=
-e less than
->> > 20 cycles=2E  So quite cheap in the grand scheme=2E  If VMREAD is mor=
-e costly than
->> > that, then we have bigger problems :-)
->> >=20
->>=20
->> LOL=2E Since it is up to you, Paulo, etc=2E to decide how to do the tra=
-deoffs
->> formaintainability, debuggability and performance in KVM I am guessing =
-this
->> is a vote in favor? (You can always take it out if it is a performance
->> problem, until such time that the kernel itself starts consuming this
->> information for reasons currently unknown=2E)
->
->Unless you can pinky swear that vmcs=2EEXIT_QUALIFICATION will provide ev=
-ent data
->for IRQ exits, then I'd prefer to pass '0' unconditionally=2E  '0' will a=
-lways be
->safe, if potentially suboptimal=2E  But passing what could in theory be s=
-omething
->other than FRED-formatted event data could lead to buggy behavior=2E  Per=
- the FRED
->spec, Revision 7=2E0, exit-qualification doesn't hold event data for IRQ =
-exits=2E
->
->  For some events for which event data is defined (see Section 5=2E2=2E1)=
-, the event
->  data is saved in the exit-qualification field=2E (This is done for #DB,=
- #PF, and NMI=2E)
+On Mon, Jun 23, 2025, Naveen N Rao wrote:
+> On Wed, Jun 11, 2025 at 03:45:23PM -0700, Sean Christopherson wrote:
+> > Add a comment to explain why KVM clears IsRunning when putting a vCPU,
+> > even though leaving IsRunning=1 would be ok from a functional perspective.
+> > Per Maxim's experiments, a misbehaving VM could spam the AVIC doorbell so
+> > fast as to induce a 50%+ loss in performance.
+> > 
+> > Link: https://lore.kernel.org/all/8d7e0d0391df4efc7cb28557297eb2ec9904f1e5.camel@redhat.com
+> > Cc: Maxim Levitsky <mlevitsk@redhat.com>
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >  arch/x86/kvm/svm/avic.c | 31 ++++++++++++++++++-------------
+> >  1 file changed, 18 insertions(+), 13 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+> > index bf8b59556373..3cf929ac117f 100644
+> > --- a/arch/x86/kvm/svm/avic.c
+> > +++ b/arch/x86/kvm/svm/avic.c
+> > @@ -1121,19 +1121,24 @@ void avic_vcpu_blocking(struct kvm_vcpu *vcpu)
+> >  	if (!kvm_vcpu_apicv_active(vcpu))
+> >  		return;
+> >  
+> > -       /*
+> > -        * Unload the AVIC when the vCPU is about to block, _before_
+> > -        * the vCPU actually blocks.
+> > -        *
+> > -        * Any IRQs that arrive before IsRunning=0 will not cause an
+> > -        * incomplete IPI vmexit on the source, therefore vIRR will also
+> > -        * be checked by kvm_vcpu_check_block() before blocking.  The
+> > -        * memory barrier implicit in set_current_state orders writing
+> > -        * IsRunning=0 before reading the vIRR.  The processor needs a
+> > -        * matching memory barrier on interrupt delivery between writing
+> > -        * IRR and reading IsRunning; the lack of this barrier might be
+> > -        * the cause of errata #1235).
+> > -        */
+> > +	/*
+> > +	 * Unload the AVIC when the vCPU is about to block, _before_ the vCPU
+> > +	 * actually blocks.
+> > +	 *
+> > +	 * Note, any IRQs that arrive before IsRunning=0 will not cause an
+> > +	 * incomplete IPI vmexit on the source; kvm_vcpu_check_block() handles
+> > +	 * this by checking vIRR one last time before blocking.  The memory
+> > +	 * barrier implicit in set_current_state orders writing IsRunning=0
+> > +	 * before reading the vIRR.  The processor needs a matching memory
+> > +	 * barrier on interrupt delivery between writing IRR and reading
+> > +	 * IsRunning; the lack of this barrier might be the cause of errata #1235).
+> > +	 *
+> > +	 * Clear IsRunning=0 even if guest IRQs are disabled, i.e. even if KVM
+> > +	 * doesn't need to detect events for scheduling purposes.  The doorbell
+> 
+> Nit: just IsRunning (you can drop the =0 part).
 
-I agree, let's stick to that for now, since this is a kernel internal inte=
-rface and nothing consumes it=2E After all, it will save a handful of cycle=
-s=2E
+Hmm, not really.  It could be:
 
-I will still check into the "pinky swear", though=2E
+	/* Note, any IRQs that arrive while IsRunning is set will not cause an
+
+or
+
+	/* Note, any IRQs that arrive while IsRunning=1 will not cause an
+
+but that's just regurgitating the spec.  The slightly more interesting scenario
+that's being described here is what will happen if an IRQ arrives _just_ before
+the below code toggle IsRunning from 1 => 0.
+
+> Trying to understand the significance of IRQs being disabled here. Is 
+> that a path KVM tries to optimize?
+
+Yep.  KVM doesn't need a notification for the undelivered (virtual) IRQ, because
+it won't be handled by the vCPU until the vCPU enables IRQs, and thus it's not a
+valid wake event for the vCPU.
+
+So, *if* spurious doorbells didn't affect performance or functionality, then
+ideally KVM would leave IsRunning=1, e.g. so that the IOMMU doesn't need to
+generate GA log events, and so that other vCPUs aren't forced to VM-Exit when
+sending an IPI.  Unfortunately, spurious doorbells are quite intrusive, and so
+KVM "needs" to clear IsRunning.
+
+> Theoretically, it looks like we want to clear IsRunning regardless of whether
+> the vCPU is blocked so as to prevent the guest from spamming the host with
+> AVIC doorbells -- compared to always keeping IsRunning set so as to speed up
+> VM entry/exit.
+
+Yep, exactly.
+
+> > +	 * used to signal running vCPUs cannot be blocked, i.e. will perturb the
+> > +	 * CPU and cause noisy neighbor problems if the VM is sending interrupts
+> > +	 * to the vCPU while it's scheduled out.
+> > +	 */
+> >  	avic_vcpu_put(vcpu);
+> >  }
+> 
+> Otherwise, this LGTM.
+> Acked-by: Naveen N Rao (AMD) <naveen@kernel.org>
+> 
+> 
+> Thanks,
+> Naveen
+> 
 
