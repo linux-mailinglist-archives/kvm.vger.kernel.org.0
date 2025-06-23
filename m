@@ -1,98 +1,136 @@
-Return-Path: <kvm+bounces-50287-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50288-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3EDCAE38A5
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 10:41:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C60EBAE38EA
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 10:49:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E2341693E9
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 08:41:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82FA816E1ED
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 08:49:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24D3422F769;
-	Mon, 23 Jun 2025 08:41:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vXhgy8BI"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB0B622FDFF;
+	Mon, 23 Jun 2025 08:49:00 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4085822E3F0
-	for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 08:41:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EAB322DFB5;
+	Mon, 23 Jun 2025 08:48:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750668079; cv=none; b=XvcRPfaswK5nHWqZOTNNDAR173/ZdNKh/pml90CsFLTJ8OmUwg4Pyrf9u672FsKmPJ1ZzzScriKH5UzOxx5sBbFTJ/GNu8qrHykB1FaZPKzGomstSU5L7dPgrboa1q1uXSxjf3GpLKTk0OCEYTWGACXVAL0tRVWAEyNKxof2v4w=
+	t=1750668540; cv=none; b=CLLTYQc+aMnh/1/BPN26171JDT8JXll93vwqE0sLm1nIRt87WbhCw/YBsyCyayttHb+56zYwr8k4u80jHplSS85dD0VCEGOpRsQspC5wc5PbcwmGMlkgk5LzqZLOxeHEgL7ZgidoQuui9Z9xUACNJ4USUrk6ari2fYUD3ChIqV8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750668079; c=relaxed/simple;
-	bh=dK2/nk5Dk95inlWUhVxlyOVlxm1wOh6kKl2zKSksdrE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eGaDqSj7118WBbcfuRvOmKNxVuRyFA6PdjX0uYFXd3tg7lA+nGI+sRI0wSItMxzqY/791jh9WDTum0uRNx1y8qGBh7s6V4FAC8dTsVYpJ2kOUeZA1aQSaf0dmyd12otcgqTRUSoLzsY9AtXPR7mRLMmGSZSK3fwmjWJzhONUxzw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vXhgy8BI; arc=none smtp.client-ip=91.218.175.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Mon, 23 Jun 2025 01:40:46 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1750668060;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=r16EnTRqICp2s4o/VmEbqOJZDlq1jQbD4/5SrPKHiGk=;
-	b=vXhgy8BI2eQT3nYZFNPvge0v3pNI+5OHueB5YbHaYwCW+TT9AQHY0yJHWTYeBTTKK+bXVc
-	oi5EsbsszqVgdBVJtFUje6uy4RYpnmR43FqwM9HnWzxpkObe9VzrsPqZmevtpEJmO2Wy/Y
-	zdyKSvNt+gzmZ8O3Ny3eRiR0q/supVI=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Raghavendra Rao Ananta <rananta@google.com>,
-	Mingwei Zhang <mizhang@google.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v3 3/4] KVM: arm64: Introduce attribute to control
- GICD_TYPER2.nASSGIcap
-Message-ID: <aFkTDmj9u1ERnvHO@linux.dev>
-References: <20250613155239.2029059-1-rananta@google.com>
- <20250613155239.2029059-4-rananta@google.com>
- <87frftfpg7.wl-maz@kernel.org>
+	s=arc-20240116; t=1750668540; c=relaxed/simple;
+	bh=C9SOOGoa6Xk+PFkOm1w1yIEgDP8716caW/HXobeuvNA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gZ6zttBAmkTonmebhcsqsWE6c4lwKChF3sp41OuYmY8De19Ox82x84IXtrTSyf27FRGYlcGeGJprIK2G7rUT3udm4A6+q832ritJlkX+8Qv7uuRE/6M3rCVM3ayWSMI5JsPydpNHyjZrhRtm2wmlxy3EMDSBZmKsKtt1X1pYAzI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ghiti.fr; spf=pass smtp.mailfrom=ghiti.fr; arc=none smtp.client-ip=217.70.183.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ghiti.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ghiti.fr
+Received: by mail.gandi.net (Postfix) with ESMTPSA id A60C943210;
+	Mon, 23 Jun 2025 08:48:44 +0000 (UTC)
+Message-ID: <1ebde39e-f5b4-4f8c-a0df-f53cce67f4ef@ghiti.fr>
+Date: Mon, 23 Jun 2025 10:48:43 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87frftfpg7.wl-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 0/3] Move duplicated instructions macros into
+ asm/insn.h
+To: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>,
+ Alexandre Ghiti <alexghiti@rivosinc.com>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Anup Patel <anup@brainfault.org>, Atish Patra <atish.patra@linux.dev>
+Cc: linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ Andrew Jones <ajones@ventanamicro.com>
+References: <20250620-dev-alex-insn_duplicate_v5_manual-v5-0-d865dc9ad180@rivosinc.com>
+ <c12729a1-5046-4821-b5fe-5fea72af76c8@rivosinc.com>
+Content-Language: en-US
+From: Alexandre Ghiti <alex@ghiti.fr>
+In-Reply-To: <c12729a1-5046-4821-b5fe-5fea72af76c8@rivosinc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddvgdduieehjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepkfffgggfuffvvehfhfgjtgfgsehtkeertddtvdejnecuhfhrohhmpeetlhgvgigrnhgurhgvucfihhhithhiuceorghlvgigsehghhhithhirdhfrheqnecuggftrfgrthhtvghrnhepudffueegvddtgeeluefhueetteeugeeffeekhfehffdvudfhgedvheduudekffegnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghdpihhnfhhrrgguvggrugdrohhrghenucfkphepvddttddumeekiedumeeffeekvdemvghfledtmedvieeijeemvgejvgdtmeehudeltdemfhgvtdehnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvddttddumeekiedumeeffeekvdemvghfledtmedvieeijeemvgejvgdtmeehudeltdemfhgvtdehpdhhvghloheplgfkrfggieemvddttddumeekiedumeeffeekvdemvghfledtmedvieeijeemvgejvgdtmeehudeltdemfhgvtdehngdpmhgrihhlfhhrohhmpegrlhgvgiesghhhihhtihdrfhhrpdhnsggprhgtphhtthhopedufedprhgtphhtthhopegtlhgvghgvrhesrhhivhhoshhinhgtrdgtohhmpdhrtghpthhtoheprghlvgigghhhihhtihesrhhivhhoshhinhgtr
+ dgtohhmpdhrtghpthhtohepphgruhhlrdifrghlmhhslhgvhiesshhifhhivhgvrdgtohhmpdhrtghpthhtohepphgrlhhmvghrsegurggssggvlhhtrdgtohhmpdhrtghpthhtoheprghouhesvggvtghsrdgsvghrkhgvlhgvhidrvgguuhdprhgtphhtthhopegrnhhuphessghrrghinhhfrghulhhtrdhorhhgpdhrtghpthhtoheprghtihhshhdrphgrthhrrgeslhhinhhugidruggvvhdprhgtphhtthhopehlihhnuhigqdhrihhstghvsehlihhsthhsrdhinhhfrhgruggvrggurdhorhhg
+X-GND-Sasl: alex@ghiti.fr
 
-On Sat, Jun 21, 2025 at 09:50:48AM +0100, Marc Zyngier wrote:
-> On Fri, 13 Jun 2025 16:52:37 +0100, Raghavendra Rao Ananta <rananta@google.com> wrote:
-> > @@ -683,8 +714,14 @@ static int vgic_v3_has_attr(struct kvm_device *dev,
-> >  			return 0;
-> >  		case KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES:
-> >  			return 0;
-> > +		default:
-> > +			return -ENXIO;
-> >  		}
-> > +	case KVM_DEV_ARM_VGIC_GRP_FEATURES:
-> > +		return attr->attr != KVM_DEV_ARM_VGIC_FEATURE_nASSGIcap ?
-> > +		       -ENXIO : 0;
-> 
-> Do we really want to advertise KVM_DEV_ARM_VGIC_FEATURE_nASSGIcap even
-> when we don't have GICv4.1? This seems rather odd. My take on this API
-> is that this should report whether the feature is configurable, making
-> it backward compatible with older versions of KVM.
 
-So this was because of me, as I wanted nASSGIcap to behave exactly like
-the ID registers. I do think exposing the capability unconditionally is
-useful, as otherwise there's no way to definitively say whether or not
-the underlying platform supports GICv4.1.
+On 6/23/25 10:07, Clément Léger wrote:
+>
+> On 20/06/2025 22:21, Alexandre Ghiti wrote:
+>> The instructions parsing macros were duplicated and one of them had different
+>> implementations, which is error prone.
+>>
+>> So let's consolidate those macros in asm/insn.h.
+>>
+>> v1: https://lore.kernel.org/linux-riscv/20250422082545.450453-1-alexghiti@rivosinc.com/
+>> v2: https://lore.kernel.org/linux-riscv/20250508082215.88658-1-alexghiti@rivosinc.com/
+>> v3: https://lore.kernel.org/linux-riscv/20250508125202.108613-1-alexghiti@rivosinc.com/
+>> v4: https://lore.kernel.org/linux-riscv/20250516140805.282770-1-alexghiti@rivosinc.com/
+>>
+>> Changes in v5:
+>> - Rebase on top of 6.16-rc1
+>>
+>> Changes in v4:
+>> - Rebase on top of for-next (on top of 6.15-rc6)
+>>
+>> Changes in v3:
+>> - Fix patch 2 which caused build failures (linux riscv bot), but the
+>>    patchset is exactly the same as v2
+>>
+>> Changes in v2:
+>> - Rebase on top of 6.15-rc5
+>> - Add RB tags
+>> - Define RV_X() using RV_X_mask() (Clément)
+>> - Remove unused defines (Clément)
+>> - Fix tabulations (Drew)
+>>
+>> Signed-off-by: Alexandre Ghiti <alexghiti@rivosinc.com>
+>> ---
+>> Alexandre Ghiti (3):
+>>        riscv: Fix typo EXRACT -> EXTRACT
+>>        riscv: Strengthen duplicate and inconsistent definition of RV_X()
+>>        riscv: Move all duplicate insn parsing macros into asm/insn.h
+>>
+>>   arch/riscv/include/asm/insn.h          | 206 +++++++++++++++++++++++++++++----
+>>   arch/riscv/kernel/machine_kexec_file.c |   2 +-
+>>   arch/riscv/kernel/traps_misaligned.c   | 144 +----------------------
+>>   arch/riscv/kernel/vector.c             |   2 +-
+>>   arch/riscv/kvm/vcpu_insn.c             | 128 +-------------------
+>>   5 files changed, 188 insertions(+), 294 deletions(-)
+>> ---
+>> base-commit: 731e998c429974cb141a049c1347a9cab444e44c
+>> change-id: 20250620-dev-alex-insn_duplicate_v5_manual-2c23191c30fb
+>>
+>> Best regards,
+> Hi Alex,
+>
+> I already gave my Reviewed-by for the last two commits of this series in V4.
 
-KVM_HAS_DEVICE_ATTR can't be used alone for probing since old kernels
-use GICv4.1 but don't expose the attribute.
 
-Does that make sense?
+Sorry, I'll add them when I merge this patchset.
 
 Thanks,
-Oliver
+
+Alex
+
+
+> Thanks,
+>
+> Clément
+>
+> _______________________________________________
+> linux-riscv mailing list
+> linux-riscv@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-riscv
 
