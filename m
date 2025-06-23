@@ -1,237 +1,140 @@
-Return-Path: <kvm+bounces-50418-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50419-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC78CAE4E71
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 23:03:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A03AAE51F9
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 23:39:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 98B55189ED7D
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 21:03:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 319464A4D59
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 21:39:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74F81217668;
-	Mon, 23 Jun 2025 21:02:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F02372236E5;
+	Mon, 23 Jun 2025 21:39:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fb.com header.i=@fb.com header.b="j/xaq6Ko"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tpGaODKZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C110B219E0
-	for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 21:02:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA44E22256B
+	for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 21:39:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750712577; cv=none; b=Q33gTfsPOtkq4kRiSJg4Gf6smw7c0RI4i6KWb7Gnuy0CKIACD+fFd3/T1yZJIZ74cLBc4XWATeeRzYC2xP7tv/zJ7GyFOfog94hrG77Yw8u8a3kmc3ywSi2AZVRsdlhCd+aqgol3yP5H8zkZGfyDdD5EBVIGU+UYk0pCWFjLq6s=
+	t=1750714752; cv=none; b=QKE6DZxVImtGss7xgQD9oING88TxCgYq1ntB+9zJmepXHIjYj+4Y28n6rIQ5UkeQDiFtP1shDl6C0ffqHXaszsGjVUF07cMiYgiCzjCGi6k7e6Jnp4jBQG31jr0kAqULK3y6TpnPMp3NV9nSEE1oTAJqxU9foMPjMi7DqHL+gEs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750712577; c=relaxed/simple;
-	bh=qD/5fpltwi6CQhE4d+QAwzwB+oI1n5lWT7vYOJxetns=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=KviGfpTIwZvl5NegVdukPd/6/E/46G/7+Fo58prc9+lUlPtBkQJ0rUGfQtTAHI0pMnNbFk2LLKYCW73UL1+u7ZvSgSTeaFu4DHRtol3a0Ip5tD+eHE2QgWyflHKxJG+6A4q+50seD7wFD4jr2HmRRy7Lr0uI+WlCVoy3X5YYexE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (1024-bit key) header.d=fb.com header.i=@fb.com header.b=j/xaq6Ko; arc=none smtp.client-ip=67.231.145.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0044012.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55NKCBBq008218
-	for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 14:02:55 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=cc
-	:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=facebook; bh=VqRePG2wZ9PVe0RngXgpc/S
-	8eiBKJ0SeAsNlBmXPwQ4=; b=j/xaq6KosX/nfD65O9N5RWo117zAFkn99KZ5zs5
-	z/wKWqwYKKmN0v4KzCIDKHskkij/rAlp2udTg384e7JNPGb0ym7qRAgA9+hcUqSu
-	p9iEbwKFoh0weQYR5nFJjbIujODNzKefYBcjsHsKtEL2f3ZEjnwDl5VEKmFR/LnK
-	wrac=
-Received: from maileast.thefacebook.com ([163.114.135.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 47dtf0pafb-2
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 14:02:54 -0700 (PDT)
-Received: from twshared45213.02.ash8.facebook.com (2620:10d:c0a8:1c::1b) by
- mail.thefacebook.com (2620:10d:c0a9:6f::8fd4) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1748.24; Mon, 23 Jun 2025 21:02:52 +0000
-Received: by devgpu004.nha5.facebook.com (Postfix, from userid 199522)
-	id 1B5BE115CA8; Mon, 23 Jun 2025 14:02:39 -0700 (PDT)
-From: Alex Mastro <amastro@fb.com>
-Date: Mon, 23 Jun 2025 14:02:38 -0700
-Subject: [PATCH] vfio/pci: print vfio-device name to fdinfo
+	s=arc-20240116; t=1750714752; c=relaxed/simple;
+	bh=eXldYpUZaeRaLaz31ERRjXhLWMEa7FVZz4U7H8GVh/k=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=iLk168eKrMSGxS0PJLWO+JbvwSUmsDt2Ueu8agOfUuUIP9bE0KnuxKnqRvBvoQTO7JMV2161QeJ01NT+uX6Sn2vYHSBCOoeb/IGaMCaBecJHYXbofdPdeKpQofR6imWKuhzURXO6kU05GDA7VMsvTRti+OA3uizgJ7e/r5knRFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tpGaODKZ; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-313ff01d2a6so4251702a91.3
+        for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 14:39:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1750714750; x=1751319550; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hdZ9ggIqKXdhrqZObdqtyNtpTDp5cCQfn7e8zo3QPWM=;
+        b=tpGaODKZdjnKnlGLE4MvDOuThJ7/a/RC4MMnDh3hru+sRs21+iXPPYmf8Wc/SVRA6q
+         l7NkR9fyUciSNxCiW6wqZENG6LBIB0YjlXdL4hXn4PKolVlaeLKwOoEwDB8rHUw4H462
+         HcWhl6MHmmSHV6ECtv8Og7UjkEXH3ho5zd8CyvidY1UBgPdGuhao2wKmC6Kn1dPTOY2U
+         aSIjT7DD5dJr/bct2jitMnRK8E8fZgT9dNkMISIbj43eSdrIwEyBFr5fVadh+FTlM/PN
+         o7Ua4Ur7CKaX4kGTLYPKxoFy/HTOHftAYogoc3u3jaJlFZB9xchw26nkHNFcFSlSDvXo
+         9k4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750714750; x=1751319550;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=hdZ9ggIqKXdhrqZObdqtyNtpTDp5cCQfn7e8zo3QPWM=;
+        b=l76KK5a14xtO577/Z6m/hE2TjHZLf34i/MrfYaiJbBfe3CbWxUrKiiuW/XJsmdOgih
+         ngnCg7BNWdJ11T2bFrRVhVWkAdM6ZeypEb1yEJ9ANykMs+lY6t412VsoDq7fgIBW4t7g
+         c8Ci9yhZgoYIAd8i+TPcMXArQrAYV6p9oYFyFBtNhz1Hjwu5dB2a/R5mrqooght8zqU4
+         P8Ci+fqbqxInDccyuU9x/xhVm9gFybAQgosvMv56R0NsWvyVVBiv6kB9fFlSJuJtrCUE
+         4kwN5BQAX06V0+sYrM037OGetZpJjehKitAgr3K6w6/Prv80PZ/t5jvBbhGm0VhvlSsC
+         tMTw==
+X-Forwarded-Encrypted: i=1; AJvYcCVRRKdMNOO/WT+khQIU1Dh5NjcnDBoOnNl/5TIbrYqdu0sGJ5HxIGUD+R8mkDT1J2/U4aE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YztkpGTNKnqUqLFjFTFmKFpLxWeBps0z6VqVmnmnX6bclir1MQy
+	G+47QjCqGeuho0dHzb8DkRgnmM+rL2Bv0/LyMB/3lkfqT9UbM6ignhoqMJK+/VA/0tJoVTAgkA1
+	lpnNyBQ==
+X-Google-Smtp-Source: AGHT+IEzqG3n0y5161u/luLAcfmwBwwuJeMdqAPyrG33houtRrHG/50JvM0fIgasBypzcMbezmSvflzf63c=
+X-Received: from pjbta6.prod.google.com ([2002:a17:90b:4ec6:b0:312:e5dd:9248])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1c09:b0:311:e8cc:4256
+ with SMTP id 98e67ed59e1d1-3159d8cf694mr16970566a91.22.1750714750031; Mon, 23
+ Jun 2025 14:39:10 -0700 (PDT)
+Date: Mon, 23 Jun 2025 14:39:02 -0700
+In-Reply-To: <CAGtprH_9uq-FHHQ=APwgVCe+=_o=yrfCS9snAJfhcg3fr7Qs-g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+References: <20250611095158.19398-2-adrian.hunter@intel.com>
+ <CAGtprH_cpbPLvW2rSc2o7BsYWYZKNR6QAEsA4X-X77=2A7s=yg@mail.gmail.com>
+ <e86aa631-bedd-44b4-b95a-9e941d14b059@intel.com> <CAGtprH_PwNkZUUx5+SoZcCmXAqcgfFkzprfNRH8HY3wcOm+1eg@mail.gmail.com>
+ <0df27aaf-51be-4003-b8a7-8e623075709e@intel.com> <aFNa7L74tjztduT-@google.com>
+ <4b6918e4-adba-48b2-931c-4d428a2775fc@intel.com> <aFVvDh7tTTXhX13f@google.com>
+ <CAGtprH-an308biSmM=c=W2FS2XeOWM9CxB3vWu9D=LD__baWUQ@mail.gmail.com> <CAGtprH_9uq-FHHQ=APwgVCe+=_o=yrfCS9snAJfhcg3fr7Qs-g@mail.gmail.com>
+Message-ID: <aFnJdn0nHSrRoOnJ@google.com>
+Subject: Re: [PATCH V4 1/1] KVM: TDX: Add sub-ioctl KVM_TDX_TERMINATE_VM
+From: Sean Christopherson <seanjc@google.com>
+To: Vishal Annapurve <vannapurve@google.com>
+Cc: Adrian Hunter <adrian.hunter@intel.com>, pbonzini@redhat.com, kvm@vger.kernel.org, 
+	rick.p.edgecombe@intel.com, kirill.shutemov@linux.intel.com, 
+	kai.huang@intel.com, reinette.chatre@intel.com, xiaoyao.li@intel.com, 
+	tony.lindgren@linux.intel.com, binbin.wu@linux.intel.com, 
+	isaku.yamahata@intel.com, linux-kernel@vger.kernel.org, yan.y.zhao@intel.com, 
+	chao.gao@intel.com
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-ID: <20250623-vfio-fdinfo-v1-1-c9cec65a2922@fb.com>
-X-B4-Tracking: v=1; b=H4sIAO3AWWgC/x3MQQqAIBBA0avIrBPUUqmrRAvJsWajoSCBePek5
- Vv836BgJiywsQYZKxVKcUBODM7bxQs5+WFQQmlh1MxroMSDpxgSt8ai1U4uq3EwiidjoPe/7Uf
- vH7TMoNRdAAAA
-To: Alex Williamson <alex.williamson@redhat.com>
-CC: <peterx@redhat.com>, <kbusch@kernel.org>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
-        Alex Mastro
-	<amastro@fb.com>
-X-Mailer: b4 0.13.0
-X-FB-Internal: Safe
-X-Authority-Analysis: v=2.4 cv=RvnFLDmK c=1 sm=1 tr=0 ts=6859c0fe cx=c_pps a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17 a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10 a=NEAV23lmAAAA:8 a=FOH2dFAWAAAA:8 a=_mezBqhOHE8Xc2ruhwAA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjIzMDE0MCBTYWx0ZWRfX6G8cc0kEaxBg xgw7ttscV0qeqqQiK/g5+G7Y+V6swMRvGEHoW49miFbf3lvGK/+fvxkK7Sxis9+XcT414SOpNAK KRqGTICYldRpNiwYPtx2BrjtgdMZBHF0ttKkim2X/N4U/6gAHiBgmjDDWIIwk165O9P9J8kDShO
- RKtlpOAkzZnKua0No9oFNI9YmtVdKaGOChWeqwEf3cw4X4LfZc8pDSf6WBTCBepg62ctRCXaIFj 6Z6vl/qjinvqnstz9m0lzPmaEqSH18z76Etox+NshzsWTgmjMcUqMdGBwT1c2OkP3QMP/ktwmMy WWEGAe1vX66GXLcC8Ma/0gtINkiu+LDXy2i9YWvQdRCo/zM1IXFqQJIcs6iqFzUfm1c06sR6kjZ
- 04uTJVIaM5dQBuGUMr9OUzzOxbFwzX9q9iBaCFkqhQENYLnRQ32uRjJQu7pLWB2VxvaH1eCs
-X-Proofpoint-GUID: 0oJEPTYqVrJLf5Sed0rJAy7qMlqBzygB
-X-Proofpoint-ORIG-GUID: 0oJEPTYqVrJLf5Sed0rJAy7qMlqBzygB
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
- definitions=2025-06-23_07,2025-06-23_07,2025-03-28_01
+Content-Transfer-Encoding: quoted-printable
 
-Print the PCI device name to a vfio device's fdinfo. This enables tools
-to query which device is associated with a given vfio device fd. It's
-inspired by eventfd's printing of "eventfd-id" (fs/eventfd.c), which
-lsof uses to format the NAME column (e.g. "[eventfd:7278]").
+On Mon, Jun 23, 2025, Vishal Annapurve wrote:
+> On Fri, Jun 20, 2025 at 9:14=E2=80=AFAM Vishal Annapurve <vannapurve@goog=
+le.com> wrote:
+> > Adrian's suggestion makes sense and it should be functional but I am
+> > running into some issues which likely need to be resolved on the
+> > userspace side. I will keep this thread updated.
+> >
+> > Currently testing this reboot flow:
+> > 1) Issue KVM_TDX_TERMINATE_VM on the old VM.
+> > 2) Close the VM fd.
+> > 3) Create a new VM fd.
+> > 4) Link the old guest_memfd handles to the new VM fd.
+> > 5) Close the old guest_memfd handles.
+> > 6) Register memslots on the new VM using the linked guest_memfd handles=
+.
+> >
+>=20
+> Apparently mmap takes a refcount on backing files.
 
-This results in output like below:
+Heh, yep.
 
-$ cat /proc/"$process_using_vfio"/fdinfo/"$vfio_device_fd" | grep vfio
-vfio-device-name: 0000:c6:00.0
+> So basically I had to modify the reboot flow as:
+> 1) Issue KVM_TDX_TERMINATE_VM on the old VM.
+> 2) Close the VM fd.
+> 3) Create a new VM fd.
+> 4) Link the old guest_memfd handles to the new VM fd.
+> 5) Unmap the VMAs backed by the guest memfd
+> 6) Close the old guest_memfd handles. -> Results in VM destruction
+> 7) Setup new VMAs backed by linked guest_memfd handles.
+> 8) Register memslots on the new VM using the linked guest_memfd handles.
+>=20
+> I think the issue simply is that we have tied guest_memfd lifecycle
+> with VM lifecycle and that discussion is out of scope for this patch.
 
-Signed-off-by: Alex Mastro <amastro@fb.com>
----
-Hello, this is my first patch submission to vfio, and linux. We would
-like our tools to be able to query the PCI device name for a given
-vfio-device fd by inspecting a process's open file descriptors. It is
-inspired by eventfd's id printing, which is nicely formatted by lsof in
-the NAME column.
+I wouldn't say it's entirely out of scope.  E.g. if there's a blocking prob=
+lem
+_in the kernel_ that prevents utilizing KVM_TDX_TERMINATE_VM, then we defin=
+itely
+want to sort that out before adding support for KVM_TDX_TERMINATE_VM.
 
-I am not sure to what extent this should be generalized, so I opted
-to put as little policy as possible into vfio_main.c, and have each
-vfio_device_fops implement what it means to show_fdinfo. The only
-implementer is vfio_pci_ops in this change.
-
-Alternatively, if we wanted to normalize show_fdinfo formatting, this
-could instead hoist the print formatting up into vfio_main.c, and call
-an optional vfio_device_ops->instance_name() to get the name. I opted
-not to do this here due to unfamiliarity with other vfio drivers, but am
-open to changing it.
-
-I noticed that other vfio_device_fops are guarded by checks on
-vfio_device_file.access_granted. From what I can tell, that shouldn't
-be required here, since a vfio pci device is guaranteed to be
-able to print its name (due to existence of vfio_device.pdev) after
-vfio_device_ops.init() construction.
-
-This change rooted on the for-linus branch of linux-vfio [1].
-
-[1] https://github.com/awilliam/linux-vfio
----
- drivers/vfio/pci/vfio_pci.c | 14 ++++++++++++++
- drivers/vfio/vfio_main.c    | 15 +++++++++++++++
- include/linux/vfio.h        |  2 ++
- 3 files changed, 31 insertions(+)
-
-diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-index 5ba39f7623bb..b682766127ab 100644
---- a/drivers/vfio/pci/vfio_pci.c
-+++ b/drivers/vfio/pci/vfio_pci.c
-@@ -21,6 +21,7 @@
- #include <linux/mutex.h>
- #include <linux/notifier.h>
- #include <linux/pm_runtime.h>
-+#include <linux/seq_file.h>
- #include <linux/slab.h>
- #include <linux/types.h>
- #include <linux/uaccess.h>
-@@ -125,6 +126,16 @@ static int vfio_pci_open_device(struct vfio_device *core_vdev)
- 	return 0;
- }
- 
-+#ifdef CONFIG_PROC_FS
-+static void vfio_pci_core_show_fdinfo(struct vfio_device *core_vdev, struct seq_file *m)
-+{
-+	struct vfio_pci_core_device *vdev =
-+		container_of(core_vdev, struct vfio_pci_core_device, vdev);
-+
-+	seq_printf(m, "vfio-device-name: %s\n", pci_name(vdev->pdev));
-+}
-+#endif
-+
- static const struct vfio_device_ops vfio_pci_ops = {
- 	.name		= "vfio-pci",
- 	.init		= vfio_pci_core_init_dev,
-@@ -138,6 +149,9 @@ static const struct vfio_device_ops vfio_pci_ops = {
- 	.mmap		= vfio_pci_core_mmap,
- 	.request	= vfio_pci_core_request,
- 	.match		= vfio_pci_core_match,
-+#ifdef CONFIG_PROC_FS
-+	.show_fdinfo	= vfio_pci_core_show_fdinfo,
-+#endif
- 	.bind_iommufd	= vfio_iommufd_physical_bind,
- 	.unbind_iommufd	= vfio_iommufd_physical_unbind,
- 	.attach_ioas	= vfio_iommufd_physical_attach_ioas,
-diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-index 1fd261efc582..e02504247da8 100644
---- a/drivers/vfio/vfio_main.c
-+++ b/drivers/vfio/vfio_main.c
-@@ -28,6 +28,7 @@
- #include <linux/pseudo_fs.h>
- #include <linux/rwsem.h>
- #include <linux/sched.h>
-+#include <linux/seq_file.h>
- #include <linux/slab.h>
- #include <linux/stat.h>
- #include <linux/string.h>
-@@ -1354,6 +1355,17 @@ static int vfio_device_fops_mmap(struct file *filep, struct vm_area_struct *vma)
- 	return device->ops->mmap(device, vma);
- }
- 
-+#ifdef CONFIG_PROC_FS
-+static void vfio_device_show_fdinfo(struct seq_file *m, struct file *filep)
-+{
-+	struct vfio_device_file *df = filep->private_data;
-+	struct vfio_device *device = df->device;
-+
-+	if (device->ops->show_fdinfo)
-+		device->ops->show_fdinfo(device, m);
-+}
-+#endif
-+
- const struct file_operations vfio_device_fops = {
- 	.owner		= THIS_MODULE,
- 	.open		= vfio_device_fops_cdev_open,
-@@ -1363,6 +1375,9 @@ const struct file_operations vfio_device_fops = {
- 	.unlocked_ioctl	= vfio_device_fops_unl_ioctl,
- 	.compat_ioctl	= compat_ptr_ioctl,
- 	.mmap		= vfio_device_fops_mmap,
-+#ifdef CONFIG_PROC_FS
-+	.show_fdinfo	= vfio_device_show_fdinfo,
-+#endif
- };
- 
- static struct vfio_device *vfio_device_from_file(struct file *file)
-diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-index 707b00772ce1..54076045a44f 100644
---- a/include/linux/vfio.h
-+++ b/include/linux/vfio.h
-@@ -16,6 +16,7 @@
- #include <linux/cdev.h>
- #include <uapi/linux/vfio.h>
- #include <linux/iova_bitmap.h>
-+#include <linux/seq_file.h>
- 
- struct kvm;
- struct iommufd_ctx;
-@@ -135,6 +136,7 @@ struct vfio_device_ops {
- 	void	(*dma_unmap)(struct vfio_device *vdev, u64 iova, u64 length);
- 	int	(*device_feature)(struct vfio_device *device, u32 flags,
- 				  void __user *arg, size_t argsz);
-+	void	(*show_fdinfo)(struct vfio_device *device, struct seq_file *m);
- };
- 
- #if IS_ENABLED(CONFIG_IOMMUFD)
-
----
-base-commit: c1d9dac0db168198b6f63f460665256dedad9b6e
-change-id: 20250623-vfio-fdinfo-767e75a1496a
-
-Best regards,
--- 
-Alex Mastro <amastro@fb.com>
-
+But IIUC, the hiccups you've encountered essentially fall into the category=
+ of
+"working as intended", albeit with a lot of not-so-obvious behaviors and de=
+pendencies.
 
