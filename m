@@ -1,87 +1,87 @@
-Return-Path: <kvm+bounces-50285-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50286-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8093FAE3840
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 10:20:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AB26AE384B
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 10:23:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F1B007A5139
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 08:19:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A58C716C999
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 08:23:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E49EF202C2D;
-	Mon, 23 Jun 2025 08:20:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35201214801;
+	Mon, 23 Jun 2025 08:23:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kwc6EZSL"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JU6TYrnt"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C01D4409
-	for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 08:20:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55FE54409
+	for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 08:23:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750666836; cv=none; b=mBVttJYrgXvTddBLdKQipjbe2jY+DfO2Nv9FKK99P4DMXGeSK7HVHrM23567cDHxx018SfN3s0Lm6x+fFUHfciQndyDv2AbX1gpEW1FqU0R37Jr0CuWI2zjt6JfHPvTa+mDj/fgJOzxbuuJgD0DZtmPR54wVlDnUhQyGUaO7UH0=
+	t=1750666991; cv=none; b=pgsUga/rcdzsNMMUzk4EjcYi1kbck5hKsc2kHDCEUxIgRnSB85k0KjfvOkNblGKfWymJOUqCbpxKFIGEGyw3p06cXjduo098AtOZGy+sI9KxFXqaX8CRaCn649zf8AuaF3bgvw+5JnYkdVzFv2T80KqTu14QscBdrXIAnhVmi4U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750666836; c=relaxed/simple;
-	bh=ybIQBuRKjztW0dg5lpn26Cr7A345Ra2hdS9hgESoka0=;
+	s=arc-20240116; t=1750666991; c=relaxed/simple;
+	bh=jT7EZ3gDEKm3ENw0dG2OzNexLEilhwcyMf/7tzRn1/4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IKuhGvHVyqrjYYNuy4E7pmFsNar9M8dee9zuQuQF1e4hNhwexVXWpWbFmj5UJlWngkxvE6tRJaBq5nTPl8vIegr49ZDXDFSh27/8Uc3WzKtX0IVFPyleO7sYznte4fxHaJ3/msgzwQ8ryhtfpQZJ1biF/DKci0W6epPiW/dASlE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Kwc6EZSL; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=XN+a4Rm/63yf4LknVldoPUigGNBA4PtZxpS1/XKiMQ65wcDTyECNrX6qmfaBaaEcE5jE4zL75ZjQvRFNnaO200bXCo9bgrgaky3K+Pv/enJxDMBbQbX2kiHmOkoFvPjNz3s81GCnThedaQbodVOrUhSuj5IApcRnulzX9Z8O2LE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JU6TYrnt; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750666833;
+	s=mimecast20190719; t=1750666988;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=GBbPkcJ+cqTlKtkPkEOBLY6Eme/Qi2QlGOOm0lPBfy8=;
-	b=Kwc6EZSLstVWJBktjFq1NWyXYoLOX0WiAk9r7IaQJSC9VX55asxGr+1uQEm+nBYeO2WWLo
-	uz8zdpngNKlHpzDMUjori4kZpxUWYuvqaF3WdYLbHwj+eo08h4nvtUBWkwOYpyy/uVEUcx
-	u9hwdTaK7cIIMVGvTEsXrAae69xGBY4=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=hdcp9RwtfZi8FMSc5dPMRPQIL7xDdgS875H69vG9FfM=;
+	b=JU6TYrntJXHFy2qNwuuUhSEYcaL1y6Oak6QTSh/UzNyjGj6jXr24WjG9MzKJkdnCcEh6J7
+	y3g/hhKTyzcEWWb8x7YxIPHTo+5nUopkk/S3/QJ6sYnkTpqZPbX27hmowSCFBKv5jFqAyX
+	bVO89nOSIvtVMRUXs66ccbaOBfyBdH8=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-85-IyrJzRPBO2Wtpe2UhEaHGg-1; Mon, 23 Jun 2025 04:20:31 -0400
-X-MC-Unique: IyrJzRPBO2Wtpe2UhEaHGg-1
-X-Mimecast-MFC-AGG-ID: IyrJzRPBO2Wtpe2UhEaHGg_1750666830
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3a3696a0d3aso1654579f8f.2
-        for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 01:20:31 -0700 (PDT)
+ us-mta-529-_fgTCg7lNCKC6E9m9M07MA-1; Mon, 23 Jun 2025 04:23:06 -0400
+X-MC-Unique: _fgTCg7lNCKC6E9m9M07MA-1
+X-Mimecast-MFC-AGG-ID: _fgTCg7lNCKC6E9m9M07MA_1750666985
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3a6d1394b07so1496641f8f.3
+        for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 01:23:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750666830; x=1751271630;
+        d=1e100.net; s=20230601; t=1750666985; x=1751271785;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=GBbPkcJ+cqTlKtkPkEOBLY6Eme/Qi2QlGOOm0lPBfy8=;
-        b=mYmxV5PUwJTXvUewI88XCE8JHZkDCDkGcWiRs9VScqieGaPBZRwzF4If6fAT8aNys8
-         7T7Zx31mclAL+vMH3WXFDBM01PDsioy+I32C3PX2kdrghB/vbudIp9ZsabS1RbIBr/VB
-         8UCKMb/l2OIOgkzV4bn36JseUTwh7gbqaSsoI+cX277GixGhAnYz1JUCuaWwObImXH8/
-         Fpm0btVlKS5R5ipxKc3UYvvdt+JCAljOmzE3LOAxm4FfWN1rDB0Bpb2fxdyNh1u+Zhey
-         ze2ItjfFRD+7duYvU32TrY4wLuRYFoWp6g2eGMbN1yLfefQLBFTcUdjm4X7I2VRn0gEi
-         4cRw==
-X-Forwarded-Encrypted: i=1; AJvYcCX6HFo6WpVLKwl61ermRFid+DzUKBvaC4oSjXGseHXpS8j7y7UFvSWxoqulCQ7USYsvO0I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzlJQHtNjww3gpa/8iOzeAtLRFmegt7pnRiYa/sqYPLlbbqlOf6
-	B+DGhHjJ9vkNE2JTyaX2BnYu8xaUZJMJZxO6G+sKbrgzqijLvk/zQ5Gb1eFBuBcW/W3ry21xHSf
-	nlXWSjCP9qkC+73Cx81byzHKvWJ/8rMDRt7oZOL6IpM1IrBRNZptdlA==
-X-Gm-Gg: ASbGnctJKyauvIDRrVWvrnkVZd2dP1rvHR82Ni+z8WpiNmSx5xZ98qJqQLFswtHC+5h
-	dbSYlHgSweD8HckxMNdngMmatnpVS5aQVmhR8t00ETOUZsxPWAL2JG5+5u2lZzPg8pFcjAvcQ65
-	ObBtP/qu41lyO4mYUXZkCA7BJhZzXznQzZTsnHEpeJY+k7Tz5VgWCtfoRJiZLEMTgwLUEZODO4D
-	HQEZR9jyYC29el0Yx4fEoGXYXdvvV1tGtV0DsBuptLieI/IDgd5caFq2NWOK6jwwluooXEA2i+8
-	lg+gnbvzwemkvcI3t+3lcL5g8h9AuEwDsSspqBseSm/i2ruGtwdVBefTgW90+K4=
-X-Received: by 2002:a05:6000:4605:b0:3a4:f6b7:8b07 with SMTP id ffacd0b85a97d-3a6d12e39famr8683852f8f.48.1750666830074;
-        Mon, 23 Jun 2025 01:20:30 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG/Uj5nWePqNYKo9LSNAcTJLy/FnRdV1bFqZ8no0/cHAlOiRtvPb7HGQmp5kR7f9BItTqveRw==
-X-Received: by 2002:a05:6000:4605:b0:3a4:f6b7:8b07 with SMTP id ffacd0b85a97d-3a6d12e39famr8683830f8f.48.1750666829696;
-        Mon, 23 Jun 2025 01:20:29 -0700 (PDT)
+        bh=hdcp9RwtfZi8FMSc5dPMRPQIL7xDdgS875H69vG9FfM=;
+        b=IlCjXWIB/XoLibZNZkuELlKdHFpV5+FVztSq55bLlJ5TEiMXOSWIZgedsO0VrlGrNV
+         9/1Xq8mrdDAVqF0gnB1CrKgB/TlDhYxY+o7cABLVvOuku4Kxk7CU0dmSPoGgywVareZT
+         jVtcAtdMatN5l5gucDwFy+4WiXzurw5fEP8yAhYRQQgl2UJNIBsi20NSAPP6qnnV/LRs
+         sydvN+kKBD2RvG/x4BvDSDngueDA/izQ4YHoGQ3PyxTT2p2oJDoztNgaufROpQWxIp8I
+         R/6LOe1+R01AJ2R7iKFo8T53P/Q5bCZ9bNeW+kZT+7cIY6hVlfV5tcq1+yz+l0qwSV9h
+         YV8Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWffYKlVtvolQubOnpZRfY17oLhVea/DlDN4/E+dnOhpStmJNHDoHSvHoiPeMeONvwkaDU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyMjuIvbf/tibTuy2LvKsd3hXUdO63FZ0Vs5ayvNw3+BI72387C
+	JC/WqrsEWYAnlN7oGz5ejVQzPDmJt1zVNh69yrsFr5Usx40stMiQDdBEmsZEiI1xlAevIO7wzjD
+	D2RnwUeJEOhWad8bwdwbJSVLWYBJhZiOAzY9ajfHJR0dNpgUWyQepLQ==
+X-Gm-Gg: ASbGncsa7dUGCeHjR690E2+jGqW1esCWiM340TCOmrGUIuuWPEgZtulk7VdDu0ytTx7
+	iAreEO19JNWbPiEEIDveg0zKMoKhzncVSRBqGfsP71C+eawnLBy7Xx40n/bkhZhtPMG3sr6OP/1
+	5L42Et34TTNZJ2v9kggP6Wt6oOL2snTN+5JMgfjF58pRWELQNNAMLYkviIsIvdqLOu5DBAj/IQU
+	2ZUq4ztogo6B/x98cvvy8qSWzqEm8eEJ3BP0kOadVh27J6ipkgbdRkR9v+8CBTFlyCBZvjLc7Rq
+	TsHc68hZZaO9+0jOCBJKtyj1zKOG56wxFO2EBPP/aQUrs314lDDeODVVaqGGmN4=
+X-Received: by 2002:a05:6000:2111:b0:3a4:f6d6:2d68 with SMTP id ffacd0b85a97d-3a6d1314667mr7319754f8f.56.1750666985456;
+        Mon, 23 Jun 2025 01:23:05 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHuFdh/3OHmpcX1gjUBEaKfgix1OYvNvXrCo2m+GurC+ynCyYQRv3aqbi+XZ8/v4Jo85Eu9bA==
+X-Received: by 2002:a05:6000:2111:b0:3a4:f6d6:2d68 with SMTP id ffacd0b85a97d-3a6d1314667mr7319723f8f.56.1750666984983;
+        Mon, 23 Jun 2025 01:23:04 -0700 (PDT)
 Received: from [192.168.0.7] (ltea-047-064-114-166.pools.arcor-ip.net. [47.64.114.166])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-453647f29bdsm101598745e9.18.2025.06.23.01.20.28
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-453770470b3sm17430525e9.30.2025.06.23.01.23.03
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Jun 2025 01:20:29 -0700 (PDT)
-Message-ID: <5ce9667b-3e88-4882-9e70-f5511f9cbe07@redhat.com>
-Date: Mon, 23 Jun 2025 10:20:27 +0200
+        Mon, 23 Jun 2025 01:23:04 -0700 (PDT)
+Message-ID: <c8d2da2b-f44b-46ab-baca-de8b9a4c25e5@redhat.com>
+Date: Mon, 23 Jun 2025 10:23:02 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -89,7 +89,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 25/26] tests/functional: Add hvf_available() helper
+Subject: Re: [PATCH v2 26/26] tests/functional: Expand Aarch64 SMMU tests to
+ run on HVF accelerator
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
  qemu-devel@nongnu.org
 Cc: Leif Lindholm <leif.lindholm@oss.qualcomm.com>,
@@ -105,7 +106,7 @@ Cc: Leif Lindholm <leif.lindholm@oss.qualcomm.com>,
  =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
  Roman Bolshakov <rbolshakov@ddn.com>, John Snow <jsnow@redhat.com>
 References: <20250620130709.31073-1-philmd@linaro.org>
- <20250620130709.31073-26-philmd@linaro.org>
+ <20250620130709.31073-27-philmd@linaro.org>
 From: Thomas Huth <thuth@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -150,72 +151,61 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20250620130709.31073-26-philmd@linaro.org>
+In-Reply-To: <20250620130709.31073-27-philmd@linaro.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
 On 20/06/2025 15.07, Philippe Mathieu-Daudé wrote:
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 > ---
->   python/qemu/utils/__init__.py          | 2 +-
->   python/qemu/utils/accel.py             | 8 ++++++++
->   tests/functional/qemu_test/testcase.py | 6 ++++--
->   3 files changed, 13 insertions(+), 3 deletions(-)
+>   tests/functional/test_aarch64_smmu.py | 9 +++++++--
+>   1 file changed, 7 insertions(+), 2 deletions(-)
 > 
-> diff --git a/python/qemu/utils/__init__.py b/python/qemu/utils/__init__.py
-> index 017cfdcda75..d2fe5db223c 100644
-> --- a/python/qemu/utils/__init__.py
-> +++ b/python/qemu/utils/__init__.py
-> @@ -23,7 +23,7 @@
->   from typing import Optional
+> diff --git a/tests/functional/test_aarch64_smmu.py b/tests/functional/test_aarch64_smmu.py
+> index c65d0f28178..59b62a55a9e 100755
+> --- a/tests/functional/test_aarch64_smmu.py
+> +++ b/tests/functional/test_aarch64_smmu.py
+> @@ -22,6 +22,7 @@
 >   
->   # pylint: disable=import-error
-> -from .accel import kvm_available, list_accel, tcg_available
-> +from .accel import hvf_available, kvm_available, list_accel, tcg_available
+>   class SMMU(LinuxKernelTest):
 >   
+> +    accel = 'kvm'
+>       default_kernel_params = ('earlyprintk=pl011,0x9000000 no_timer_check '
+>                                'printk.time=1 rd_NO_PLYMOUTH net.ifnames=0 '
+>                                'console=ttyAMA0 rd.rescue')
+> @@ -45,11 +46,11 @@ def set_up_boot(self, path):
+>           self.vm.add_args('-device', 'virtio-net,netdev=n1' + self.IOMMU_ADDON)
 >   
->   __all__ = (
-> diff --git a/python/qemu/utils/accel.py b/python/qemu/utils/accel.py
-> index 386ff640ca8..376d1e30005 100644
-> --- a/python/qemu/utils/accel.py
-> +++ b/python/qemu/utils/accel.py
-> @@ -82,3 +82,11 @@ def tcg_available(qemu_bin: str) -> bool:
->       @param qemu_bin (str): path to the QEMU binary
->       """
->       return 'tcg' in list_accel(qemu_bin)
-> +
-> +def hvf_available(qemu_bin: str) -> bool:
-> +    """
-> +    Check if HVF is available.
-> +
-> +    @param qemu_bin (str): path to the QEMU binary
-> +    """
-> +    return 'hvf' in list_accel(qemu_bin)
-> diff --git a/tests/functional/qemu_test/testcase.py b/tests/functional/qemu_test/testcase.py
-> index 50c401b8c3c..2082c6fce43 100644
-> --- a/tests/functional/qemu_test/testcase.py
-> +++ b/tests/functional/qemu_test/testcase.py
-> @@ -23,7 +23,7 @@
->   import uuid
->   
->   from qemu.machine import QEMUMachine
-> -from qemu.utils import kvm_available, tcg_available
-> +from qemu.utils import hvf_available, kvm_available, tcg_available
->   
->   from .archive import archive_extract
->   from .asset import Asset
-> @@ -317,7 +317,9 @@ def require_accelerator(self, accelerator):
->           :type accelerator: str
->           """
->           checker = {'tcg': tcg_available,
-> -                   'kvm': kvm_available}.get(accelerator)
-> +                   'kvm': kvm_available,
-> +                   'hvf': hvf_available,
-> +                  }.get(accelerator)
->           if checker is None:
->               self.skipTest("Don't know how to check for the presence "
->                             "of accelerator %s" % accelerator)
+>       def common_vm_setup(self, kernel, initrd, disk):
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Wouldn't it be more straight-forward to do something like this here:
+
+	if hvf_available():
+		accel = "hvf"
+	else:
+		accel = "kvm"
+
+... IMHO that's nicer than duplicating the test classes below.
+
+  Thomas
+
+
+> -        self.require_accelerator("kvm")
+> +        self.require_accelerator(self.accel)
+>           self.require_netdev('user')
+>           self.set_machine("virt")
+>           self.vm.add_args('-m', '1G')
+> -        self.vm.add_args("-accel", "kvm")
+> +        self.vm.add_args("-accel", self.accel)
+>           self.vm.add_args("-cpu", "host")
+>           self.vm.add_args("-machine", "iommu=smmuv3")
+>           self.vm.add_args("-d", "guest_errors")
+> @@ -201,5 +202,9 @@ def test_smmu_ril_nostrict(self):
+>           self.run_and_check(self.F33_FILENAME, self.F33_HSUM)
+>   
+>   
+> +class SMMU_HVF(SMMU):
+> +    accel = 'hvf'
+
 
 
