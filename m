@@ -1,78 +1,78 @@
-Return-Path: <kvm+bounces-50330-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50331-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EF8BAE3FFC
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 14:26:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA878AE3FFA
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 14:26:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 11F1517722C
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 12:21:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 15BD5178D41
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 12:21:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D01D32459D4;
-	Mon, 23 Jun 2025 12:20:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEF34246BAC;
+	Mon, 23 Jun 2025 12:20:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jbrOCLC9"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Iu54AJWv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B857244678
-	for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 12:20:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75D2B244678
+	for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 12:20:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750681228; cv=none; b=M+un9pDaC8chcyIG1/nVJ3TRxkflZDgE0DNN2QvYiQdoq2Xt8o5GsOjSsAMbz34iQ5Pwf/31b4iSnHHvI4WrJKYK68FfkCOI1dwodQIGSN1Y2aclxoKaflXjx+kFefZohKuf3LgQR8dNusGHo6pQ4L4Pm1DtEIb0wnvFGsNh/g0=
+	t=1750681233; cv=none; b=f6e24wlhY9HS/Pn9VFW9f80EDPoSaGIYEOjwHAelG3yvkZWxr/Gtt66eILYUwtCf0KqPjIw5kRydO0QgRJroIPwdjU/+bmzpcvT2+oTuz3XJM43eH/E/1Yy49Y4m4mPEP7wA9HLUllATEOHCcPpLOQHLhoTRmOyyRgvtQmxeWRo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750681228; c=relaxed/simple;
-	bh=azX8GAyIJEKy8HRPNAKoeinWDh25+oBDKSQcGmjkIi8=;
+	s=arc-20240116; t=1750681233; c=relaxed/simple;
+	bh=4ZM/UY4cGysfRCsTRUsZUIIg3oE8uirnVQ8HQLcBkLw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jxnv8YAEs83oewHADDZ44pCK41ZV7qL+SmYaYGdjUra7YgPPtHnL9+bs2BSD+c32UQO7+vJIiDfD260akHoyhwi3mHUaAIlMF3eEc/lV+oxxBL8ZaLBshhASNZX9CFUMeNIJKak2vOuW6SKL0yLqS8autWjmV8t9/sk6mlpZXU4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=jbrOCLC9; arc=none smtp.client-ip=209.85.128.47
+	 MIME-Version:Content-Type; b=PU2xR/CTtEha1jbfjx/Va6I1Z83r/xpGb+qVzYdDWtADJzDduVzcnn4kMZCqfjaFaLgbC+uPNwJNLcnkSGaulryo4ngVnN3cYfN7yte2PIGCrA74c7BYZMIuJTUFjLcP3sp8bbtNQ4gDWPF5Uu4CMH4umYLNIDB+BQ6/8LEG0YQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Iu54AJWv; arc=none smtp.client-ip=209.85.221.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-453426170b6so30286975e9.1
-        for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 05:20:26 -0700 (PDT)
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-3a5123c1533so2047931f8f.2
+        for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 05:20:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1750681225; x=1751286025; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1750681230; x=1751286030; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=jKb7+45W8wr+DNWypSxWBKVEj0bAIAzVgg/1Er2vy8s=;
-        b=jbrOCLC9F6e2NB6wBOSTfy5Oqawt5zQd1jHi2V86JpBk2RZOBkHEEE7xB+9S9Kf7PS
-         QPS+5yKTJvWe87aEbCVdITWV0t7E2/E4KvOGpBpyU64t2zAO/nuSjkeKvJbN9WnG8+Qx
-         K93VKEWP5rWjM6stLOpfx22mQrfRwxIQB3HV7he+YBPMiCkPsQ6CR/asy8bLZfq5Uf8x
-         Z/N352oXitX/M1OhZyyucz9TyjDhL4GM26ZjNa0kjYUZBhSCRjU6spZ3u6bt8X26bqXl
-         QdOVQ4DGGKQR6wE0IhwzKKBHWbNV7qEcbt9nkSuGf8Nd8e5+QD7dHGOEAQ1P+Wbd5tzF
-         9MJA==
+        bh=fvGV0OwfNAMYe1Mulybvoaq3k7G7T7tR2QdHLx3eR4k=;
+        b=Iu54AJWvT/fdSoAByQIs5kaKILQzlMy8hdR0T0+H5txkMwIKlGjLVi+ZDezcvbwcix
+         TgokNmGh6Fc6aEkGVzGj25W79AOZH8whYA/jsplS/9VKlzMHrVYGYxl2GVJLhRYPeVZB
+         5JltM7sDZERTXHcD0jryd2Q/5o2Cr0JRGfWIniQ/oU3Lvwv7P8zBXfAhN5WR9gbPacO7
+         pHkwJn2V8jd7D/QFGiEu/Xs51RTNymR1NTqZzf6f5Nov9rrmJrxfZoA+/Y3WdH1QcvXQ
+         lUDv7tOmQTjXNrPj9P/p5pwN9GYPFBxuetSHr8BlQXHrr99lr7xSJ13yPCLdM8Qbckns
+         Vmtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750681225; x=1751286025;
+        d=1e100.net; s=20230601; t=1750681230; x=1751286030;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=jKb7+45W8wr+DNWypSxWBKVEj0bAIAzVgg/1Er2vy8s=;
-        b=nIiE920UDxwBFSE0TnsC0B+FxB+SHjUuXfC1xvsoMK9/Ag93R5MDS2FlNP5A1JRStT
-         LKSBuaqbquWdYIgi5q1sc5SnlfP9D4DmdorSAak9x/Gyxg2MU83zQAKNtVhMiDtqCCzk
-         eIEDptW7Mav0J7JCWxyqwCtDxweNZYTHdALNizR6UKd8r8llQW9TYEiIROZWLBiT+Q2Q
-         AE0WIb9oTZnTRH64DBS6GfpQxPKOWqIzbrFKKUNuCFdjQBSlJ7NPddL9pNTU5i5E73yw
-         1U8G+GNrFKLie7i+J1Ys719mE5OfCvTHcQwFK5k38fkCKVpJz5UMF7XhVW/4SKG1Q84L
-         B7xg==
-X-Forwarded-Encrypted: i=1; AJvYcCUEBt0fzD8HuPTR2h8zqoiLSiBxI7POsb1adJfWyALmhtynq0NMX2aKJDtoYiggQCvSd8s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxX14e0uYcimfA1XfwrYAd/pe2LkhfExNXXXyNm/1M+wWX3P2R/
-	aMjL/yIRNJj1TMdkLh4yRYnq+diF90o3noqzIl2cWXwsJXdy06R+DNbfEn0QToxjg7o=
-X-Gm-Gg: ASbGncvw+n1K8adgcEu01AOGqHy07snkGEgPU5ax3mYMesIYvQYtd5Y2T5+O30CnnaC
-	6HcGl/vvwzy7lDpY5IYBWQXUTtM7+m4fqjeCXrq/IkLQ32QX2lGZ2b3hWdY7RYILupIBoRTk2/D
-	SBscTYEyzBS551X5nJ6xdGX6l6EmxSuwZnSVag2KyWkPBr+gTMmRAb++649rMAVs8ASstI+VkGj
-	HFJI8Oo4Ej7apSvyE5eympWv1BNMFO9/0B/MNMngpLg5wwzL9y04O4Wfrk/VBqYt3M3Wd6MlO92
-	yLznJvGNhA+3MajV34/sR2DG7kFKJg6SXJ+FCe9CUnqXcZG+ivPv3DU2Hdsqhc30NfYMmAO0gk7
-	0xv0ifdJVnoFIK4Z5k63HkFv9U3eKDpmGcs/mtI1Z5rOHnZw=
-X-Google-Smtp-Source: AGHT+IFKeCPKvJTY1oRMd774pzSdTPhl9ZbHhi8QfaLesPsg0MuI5svGt7VJgysSnyjP9cXdhnmSyw==
-X-Received: by 2002:a05:600c:848e:b0:450:d79d:3b16 with SMTP id 5b1f17b1804b1-4537a7e5111mr3528625e9.14.1750681224860;
-        Mon, 23 Jun 2025 05:20:24 -0700 (PDT)
+        bh=fvGV0OwfNAMYe1Mulybvoaq3k7G7T7tR2QdHLx3eR4k=;
+        b=ViFc+ntzOFvoAP7rz707uhmV2tUUMEioiEcBqz7XJOh12lMpmUuQiQtGbFuEdCwbDY
+         WvUUWsQsu2e0UWkAbVRfj7sJ6aMB388jr9cPHgNGnxU6CxrJx7rARKOHomWQjoDNnnLG
+         uvwDlCS5olh379ITqa51zbER6khKUz5V9dJbSBi7P9SOLtr1lZgMDrTqDjb1y5NDKDYQ
+         NQ1D+2vafBrUTYGwoED6djfxT2NGR1osb4npbYV5CB/YagrO1dMAfm9AXiqENGGhmyQv
+         jw27FTWCjPOV896xeS8tS1VpnbPobeLSzGv1rfqAHKGpy8PjGIiGOfjyDRTJuSxWv57p
+         v16A==
+X-Forwarded-Encrypted: i=1; AJvYcCWQQCNG42ukwnmQpLy51YUzNUy5MDtrQmfr38sNX340FPQxhtRQ8SqyToTX02Ri4NA15U8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy/tpZwZ/VCzlPINaEuuqtTFJ6vc1gv7aCj4+ePUgQUvY+pEBrD
+	yKBOPWVhVHBEDHd0HQ5SDtEUsBiytXJuY2rJBi/ewc/m25rAjP44xMDHTu+01c2H/ms=
+X-Gm-Gg: ASbGncszon3OGNDOWikj83QVAh3M0amOrRQ8hUBBQWrVXz2AWukjK2pAMpF9FRHXZ+2
+	VgTjCqMVmjhyWWYohRReVjxB6qMurOMIgmm1DDjzaPoaabEYPcXjxkOkvGdtwUuQJ/gxU3jY4H+
+	4loXBdemlx6cO62reNe5LmXdH3b0Hc2fYOrt/BA782cV+iEdX2ieIZ/Ysjb7P4QXwJHonxNEu1k
+	SrTd6NRO7p2FHopGQdMJy0X6m6DnZH+CFMNNTsQHvXdtq6b8IabUIwmF6pmwRCmZTsfCXKLCepL
+	zQS2/T+ilS2kp9FqOBnYiI0tF/5SUOsFFf/pC/Yy+uP/JgFZ/kJ88UpVgDS5k7m5xfGKQRve974
+	U/k6hzMlKXrkR3+ywQxNCyrRuWLPMWHuYv4ZJ
+X-Google-Smtp-Source: AGHT+IFHvPu69hvLV8v46JK3gDouHS/oh+Msk1ox8QgY0quFrYsKcRStqL+fYhN7WRhsh7mvIZOwqg==
+X-Received: by 2002:a05:6000:3c5:b0:3a5:2208:41e3 with SMTP id ffacd0b85a97d-3a6d11910bdmr10782043f8f.4.1750681229837;
+        Mon, 23 Jun 2025 05:20:29 -0700 (PDT)
 Received: from localhost.localdomain (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a6d0f189cdsm9446171f8f.35.2025.06.23.05.20.23
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a6d0f19b30sm9525253f8f.37.2025.06.23.05.20.28
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 23 Jun 2025 05:20:24 -0700 (PDT)
+        Mon, 23 Jun 2025 05:20:29 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Leif Lindholm <leif.lindholm@oss.qualcomm.com>,
@@ -95,9 +95,9 @@ Cc: Leif Lindholm <leif.lindholm@oss.qualcomm.com>,
 	Phil Dennis-Jordan <phil@philjordan.eu>,
 	Richard Henderson <richard.henderson@linaro.org>,
 	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH v3 19/26] hw/arm/virt: Only require TCG || QTest to use virtualization extension
-Date: Mon, 23 Jun 2025 14:18:38 +0200
-Message-ID: <20250623121845.7214-20-philmd@linaro.org>
+Subject: [PATCH v3 20/26] hw/arm/virt: Rename cpu_post_init() -> post_cpus_gic_realized()
+Date: Mon, 23 Jun 2025 14:18:39 +0200
+Message-ID: <20250623121845.7214-21-philmd@linaro.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250623121845.7214-1-philmd@linaro.org>
 References: <20250623121845.7214-1-philmd@linaro.org>
@@ -110,29 +110,39 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-We can not start in EL2 / EL3 with anything but TCG (or QTest);
-whether KVM or HVF are used is not relevant.
+QDev uses _post_init() during instance creation, before being
+realized. Since here both vCPUs and GIC are REALIZED, rename
+as virt_post_cpus_gic_realized() for clarity.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- hw/arm/virt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/arm/virt.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index b49d8579161..a9099570faa 100644
+index a9099570faa..da453768cce 100644
 --- a/hw/arm/virt.c
 +++ b/hw/arm/virt.c
-@@ -2210,7 +2210,7 @@ static void machvirt_init(MachineState *machine)
-         exit(1);
-     }
+@@ -2032,7 +2032,8 @@ static void finalize_gic_version(VirtMachineState *vms)
+  * virt_cpu_post_init() must be called after the CPUs have
+  * been realized and the GIC has been created.
+  */
+-static void virt_cpu_post_init(VirtMachineState *vms, MemoryRegion *sysmem)
++static void virt_post_cpus_gic_realized(VirtMachineState *vms,
++                                        MemoryRegion *sysmem)
+ {
+     int max_cpus = MACHINE(vms)->smp.max_cpus;
+     bool aarch64, pmu, steal_time;
+@@ -2349,7 +2350,7 @@ static void machvirt_init(MachineState *machine)
  
--    if (vms->virt && (kvm_enabled() || hvf_enabled())) {
-+    if (vms->virt && !tcg_enabled() && !qtest_enabled()) {
-         error_report("mach-virt: %s does not support providing "
-                      "Virtualization extensions to the guest CPU",
-                      current_accel_name());
+     create_gic(vms, sysmem);
+ 
+-    virt_cpu_post_init(vms, sysmem);
++    virt_post_cpus_gic_realized(vms, sysmem);
+ 
+     fdt_add_pmu_nodes(vms);
+ 
 -- 
 2.49.0
 
