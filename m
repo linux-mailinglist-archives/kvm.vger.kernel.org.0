@@ -1,139 +1,152 @@
-Return-Path: <kvm+bounces-50431-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50432-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DF22AE5800
-	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 01:25:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADD00AE5810
+	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 01:35:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D4DD3ACAD9
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 23:24:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 40B1516AFDD
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 23:35:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABB6B22FF2E;
-	Mon, 23 Jun 2025 23:24:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7A6522D785;
+	Mon, 23 Jun 2025 23:35:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nYNGAoRv"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HDipr21A"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70A4A22D4DC;
-	Mon, 23 Jun 2025 23:24:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ECC5227EB9
+	for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 23:35:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750721095; cv=none; b=uuhKYuB5h+SNwUI69CCp/2UL6MwYSw5aQN6B4pwfL1havqGctyRkKj9aVFNKL+afGcW3D1b3/xUVhw5yKbKb27yfAeRFBotr7xYRHkbBo51GgpNAM4SNe9Be/Cq66V+eLR9564nsBd9nqIQL8Q/OxDVBIHXE5lAJ6+kWlFTmAt0=
+	t=1750721740; cv=none; b=kLNu/mr7O7YTTbkYc8aMpSj3RVD33aMw50NxwjDedaPSp2widmZbAVb9WF0iVZpbC9vRDJDoH1dq0ScQllnZ4+r/3hBiZi8Vkx/cRRtOKgvV0RCS7szIjCUX+e8aXYjrJDuIgj5Azk6kMjHjdbKq4wB01tLuoJIsAn62f+I/2KE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750721095; c=relaxed/simple;
-	bh=8qgbLQ7qTvAb/GTxYPRBx94Z3b+S9plKbOpM4rzHMf8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K5HT1N9BF3z8Yebnsr6/uW88aEq24daeXCg6QA4PXwqiW5rApW19atFDycxcEG8RGa4kOTcaMKtKUXUn104aaSxAJ+dECIyZ0aMBy3QMb93NG3Kbyn4KzMg4K6aCyaKG5PvEp2irVzNRFQ4Qj4ZWiGNSkxrQH1lapsoNCvSEhfk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nYNGAoRv; arc=none smtp.client-ip=209.85.210.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-7481600130eso5946074b3a.3;
-        Mon, 23 Jun 2025 16:24:54 -0700 (PDT)
+	s=arc-20240116; t=1750721740; c=relaxed/simple;
+	bh=m1HKbq78Us6LvTsFYq7f5GyQZbgKEbFCUsF2gE7tF5k=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=aFo705fwuTH7rQe0//0aWiH51UKUdrmp7ihI4rFwiwPq/5ji8laIfTlFzsj7m7SjiTd1GSyUINQaPdWisFEamYA9y5WlQQ8/dSvpw6iY5L1BPIlP88JtXkMpPj5hhoqn43UD+q7/yy9cQ/RkkClyV7FB2BWQk2TbhQNq25RQXLc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HDipr21A; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-237f270513bso41675ad.1
+        for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 16:35:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750721094; x=1751325894; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5UhlJRkcy1fQgV/xmNfPka5yd3k5ils4rtbj0nHi1h0=;
-        b=nYNGAoRvjdv4ENPULqDFNKDkQd/w9shq9zY+XsNkzo1EeOUjaKDY+oNXmLL6CqdhDW
-         55D5y5BkvQ4M2aawxI2c8yZQr4SPOZEVQOkpS4CgHNDr1hbPQKaRIRwdyzZu/BUbtS9T
-         NxnTgmXYFxjGk2PROarw8kWC3N83GXbz3/H7PUUUuSOf7oEhMlWvtJY8NvYyucKL4SJ3
-         px9CLeJQm8tO58E2y1UTd0wsrEgx4PD2qN4R/0nGjGJMIjSrvkQNPjQSz0MqL6DaKSnA
-         bFjlFVe/bD/tdV5FB5UFifsBKagifJwN0wFXYrGerk2nsiWyhxpPJcYfooBuMJNjfcy5
-         vF7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750721094; x=1751325894;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1750721739; x=1751326539; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=5UhlJRkcy1fQgV/xmNfPka5yd3k5ils4rtbj0nHi1h0=;
-        b=eZK3aHPLDuempig+UTizBhyxf2Urwa2RYsbPHMGoHNVy96KwE8xgG8NbeE9ywG/tlB
-         bfCbRlyQLuwvUOIbwMT//s8CbWqBKe8KUK5a0KvIQ/HhONSNsjSrW8I4ZKqJZwq6+nFI
-         luEFn+3XIhD9EWWtjqoiUGvZ15D6KwGn/uoc3Xw8HBU51mYY/lPV3RQ57ylrb94oiC9r
-         EbENIGhQJBkSsjCrzJkVUIvaWucTfZ6/MSfOnOXIYDwnmI7CmDprMEegFTJimc93TYIT
-         zv6GM2USmJyT7uApfMkrnTeVDgHg0fYodhQR8mh5nIjOjyZ83IKQGzwmEGMOoCxTj0Be
-         GzSA==
-X-Forwarded-Encrypted: i=1; AJvYcCUfaV/wbH7pzBxEVwBzUUaJG56Mk47o17npDJ3jHxW/CCkIIJdug+MMiGNCvbOlArm+GFgOp+i7yXQ8@vger.kernel.org, AJvYcCWHqsP61X8ASKBM848RVrl8V8RfYXlhSjeqXExOyAQekoJTv6Nl/R/EwQegG1YebfasGpc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyBUCU7nPHP4sRiZa7FX/oZzi4yuMj8yAENslpve/X82aa7BR4T
-	4PfAxtii0mkCBXTGWzKWSq2LrTXXFy6Sz4iu79m9Rf9rrr4nJV77w0HM
-X-Gm-Gg: ASbGncupVo37cuV+k39gwNmM8a7Kl7XpR1jpoOwa2jp7bdhYrd6glLCQZrps6e14sbR
-	8H5/8yF9T9FNF7fpZmCB2HU3+5UezM3hvDu7Pc0fWaoq+75n1r54YHCO+CEXv1ek9fDppx/mpeN
-	eUTOY04cSB9BDdQ/xNFnCycB7DSi9TwxW08zPnMhhDRk8ik4cvkz+ga/AniNa6jq1DwpymL1tFZ
-	/fWKEKaBAbi0gh1uUwrcYbHul5wqqxBCyrWzXCQ3/GBGvQ87G+srQY29MprFTMm1EuTCmGv6/tS
-	hAAkR8CDMvBROk0Hk6e9u5+SfWXZo0EJsY3JsQZVtWDfxXuXZXpOY7kvg8UtqQ==
-X-Google-Smtp-Source: AGHT+IF0UlsKhZrI6D4LpGFSuxUWm1FaOQcOFePtbW4nu3FgN8WvHCSVaL83gjJNjdEIzStaNgN0sQ==
-X-Received: by 2002:a05:6a00:198e:b0:748:2ff7:5e22 with SMTP id d2e1a72fcca58-7490d6bc974mr16621539b3a.10.1750721093469;
-        Mon, 23 Jun 2025 16:24:53 -0700 (PDT)
-Received: from archie.me ([103.124.138.155])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-749c8859b2esm237493b3a.136.2025.06.23.16.24.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Jun 2025 16:24:52 -0700 (PDT)
-Received: by archie.me (Postfix, from userid 1000)
-	id 33E5F4208F51; Tue, 24 Jun 2025 06:24:50 +0700 (WIB)
-Date: Tue, 24 Jun 2025 06:24:49 +0700
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Alok Tiwari <alok.a.tiwari@oracle.com>, pbonzini@redhat.com,
-	corbet@lwn.net, kvm@vger.kernel.org, linux-doc@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Subject: Re: [PATCH next] Documentation: KVM: fix reference for
- kvm_ppc_resize_hpt and various typos
-Message-ID: <aFniQYHCyi4BKVcs@archie.me>
-References: <20250623191152.44118-1-alok.a.tiwari@oracle.com>
+        bh=iJZykzRp9XmGyR+bnKu4AsjxXNvJ484o746cN0kGIOw=;
+        b=HDipr21A5OiM5dG3t/ElumqU3x0U5We13tG2lNXxvfXvvibRm0E3v04ilyrng9bDMf
+         fYQbffjTFdOfdfx8ivQx/yCtmQxOb4q6l5zTL6NZXqnoW95GK0HXTYcDcjWpioBtVPnJ
+         HllmrQBxvgxNGii8siXP/cAMiNoHxxIvSSk/w27rhqD6L5qyKvYjWd4JdIb7VXBqsIKx
+         fxIkB5OizHyfhVdd382VAhn+qk35qw4CVS81d+6vlANtvAsOJO1WVTy+30m5o3Wn9QOP
+         KZQWdS0YUo1nwnfA2Qx9agkY6w6Tm7ppuXwC48pOy6kMtZp8b9DlMkowXltUdXQRzAne
+         hRzg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750721739; x=1751326539;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=iJZykzRp9XmGyR+bnKu4AsjxXNvJ484o746cN0kGIOw=;
+        b=ap/pQZ9BKXBI4wu2zYMpv7TC+l+dapm5qttxaEQ91WJfqllQRMXA+ArLStxTLFK5eu
+         5rEJaZtHJCZnD88yGjOYew1kz6yInkE66FzxBCdsdfEvR4IC449QF6vso/ylenKrukMI
+         U+nZ0KqmsieAotl2FRC2jZ9eaVZQ5zNB3tQYOVasU5RO3dC1LO1qTJcrgrH1/OI9Mgv5
+         H5Sr2YWgVH0O2ND+ontK+/RIcxESkhPS7zhDf6XOMbyeNp2czLhEHLGr5ZxqTvjyn7Xu
+         xSXqSQY5Z5WZiOfN16m1a3tz2qMjOX0/mR56ST5MEssN9+2NecVVOCA3moQyJB6mSP4l
+         QiXQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVeg/oix7E2w9CCynzSHux2eIyYhohQkwbHlrvrJF2sy04tvyiuOK1th0yAIkTQCIYsQvY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJvuoaCmFRM/I6FkhRa4fw4qFgS3NgjYXz3DyA8ag2AMrhIk9f
+	3QZ1vj+aH7UNiUGgDwXwt7y+SlgzLDZvtxcgiD9iQch6jTkqsZWvrwQyRzv+XUqm8TZr1EcsDFz
+	qd7/wYdX1n4s16MnA7URJ2yp8cJ9p2PxN/nTIgkgi
+X-Gm-Gg: ASbGncsjKivow1GUBQfKHVPtKmVONgtiMPvbhjiAqAtaCcPWO9Np8+qTWABELIbrnKN
+	42owJLpaohwLrDbbpaR/gujNJjb9kQhPqhY2V8PXt4Jq84zALurq6WWJqySuOZiOwnuC/tXGWCf
+	/CMdjJTxIufJO9SDx/vtmqxwT4sqCv37Vw4ye17FPTdwe7z+mPD/OLxQoTBUTM2bmns6Q9g/+f
+X-Google-Smtp-Source: AGHT+IHHi7AieERcNnwiCtwAQr+c1gSn7f18Q5q/KjVn16GYv8KAYNJTic+iEGQjgx2v132Il9E3nwVRKB4urQHS71M=
+X-Received: by 2002:a17:903:350f:b0:223:2630:6b86 with SMTP id
+ d9443c01a7336-23803ec11aemr328645ad.7.1750721738376; Mon, 23 Jun 2025
+ 16:35:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="XtjlFmCOPnxas8r7"
-Content-Disposition: inline
-In-Reply-To: <20250623191152.44118-1-alok.a.tiwari@oracle.com>
-
-
---XtjlFmCOPnxas8r7
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+References: <20250611095158.19398-2-adrian.hunter@intel.com>
+ <CAGtprH_cpbPLvW2rSc2o7BsYWYZKNR6QAEsA4X-X77=2A7s=yg@mail.gmail.com>
+ <e86aa631-bedd-44b4-b95a-9e941d14b059@intel.com> <CAGtprH_PwNkZUUx5+SoZcCmXAqcgfFkzprfNRH8HY3wcOm+1eg@mail.gmail.com>
+ <0df27aaf-51be-4003-b8a7-8e623075709e@intel.com> <aFNa7L74tjztduT-@google.com>
+ <4b6918e4-adba-48b2-931c-4d428a2775fc@intel.com> <aFVvDh7tTTXhX13f@google.com>
+ <CAGtprH-an308biSmM=c=W2FS2XeOWM9CxB3vWu9D=LD__baWUQ@mail.gmail.com>
+ <CAGtprH_9uq-FHHQ=APwgVCe+=_o=yrfCS9snAJfhcg3fr7Qs-g@mail.gmail.com> <aFnJdn0nHSrRoOnJ@google.com>
+In-Reply-To: <aFnJdn0nHSrRoOnJ@google.com>
+From: Vishal Annapurve <vannapurve@google.com>
+Date: Mon, 23 Jun 2025 16:35:24 -0700
+X-Gm-Features: AX0GCFsjOjS73cim-nFdh51zPwjCo36e2glhCmQoTmB3B2V_KD4zts3ihFF816g
+Message-ID: <CAGtprH-THz=odJ=yGKbr_exdy8_00FUGPir1g7pWOv6Ckt+h+g@mail.gmail.com>
+Subject: Re: [PATCH V4 1/1] KVM: TDX: Add sub-ioctl KVM_TDX_TERMINATE_VM
+To: Sean Christopherson <seanjc@google.com>
+Cc: Adrian Hunter <adrian.hunter@intel.com>, pbonzini@redhat.com, kvm@vger.kernel.org, 
+	rick.p.edgecombe@intel.com, kirill.shutemov@linux.intel.com, 
+	kai.huang@intel.com, reinette.chatre@intel.com, xiaoyao.li@intel.com, 
+	tony.lindgren@linux.intel.com, binbin.wu@linux.intel.com, 
+	isaku.yamahata@intel.com, linux-kernel@vger.kernel.org, yan.y.zhao@intel.com, 
+	chao.gao@intel.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jun 23, 2025 at 12:11:47PM -0700, Alok Tiwari wrote:
->  If this ioctl is called when a hash table has already been allocated,
->  with a different order from the existing hash table, the existing hash
-> -table will be freed and a new one allocated.  If this is ioctl is
-> -called when a hash table has already been allocated of the same order
-> +table will be freed and a new one allocated. If this ioctl is called
-> +when a hash table has already been allocated of the same order
+On Mon, Jun 23, 2025 at 2:39=E2=80=AFPM Sean Christopherson <seanjc@google.=
+com> wrote:
+>
+> On Mon, Jun 23, 2025, Vishal Annapurve wrote:
+> > On Fri, Jun 20, 2025 at 9:14=E2=80=AFAM Vishal Annapurve <vannapurve@go=
+ogle.com> wrote:
+> > > Adrian's suggestion makes sense and it should be functional but I am
+> > > running into some issues which likely need to be resolved on the
+> > > userspace side. I will keep this thread updated.
+> > >
+> > > Currently testing this reboot flow:
+> > > 1) Issue KVM_TDX_TERMINATE_VM on the old VM.
+> > > 2) Close the VM fd.
+> > > 3) Create a new VM fd.
+> > > 4) Link the old guest_memfd handles to the new VM fd.
+> > > 5) Close the old guest_memfd handles.
+> > > 6) Register memslots on the new VM using the linked guest_memfd handl=
+es.
+> > >
+> >
+> > Apparently mmap takes a refcount on backing files.
+>
+> Heh, yep.
+>
+> > So basically I had to modify the reboot flow as:
+> > 1) Issue KVM_TDX_TERMINATE_VM on the old VM.
+> > 2) Close the VM fd.
+> > 3) Create a new VM fd.
+> > 4) Link the old guest_memfd handles to the new VM fd.
+> > 5) Unmap the VMAs backed by the guest memfd
+> > 6) Close the old guest_memfd handles. -> Results in VM destruction
+> > 7) Setup new VMAs backed by linked guest_memfd handles.
+> > 8) Register memslots on the new VM using the linked guest_memfd handles=
+.
+> >
+> > I think the issue simply is that we have tied guest_memfd lifecycle
+> > with VM lifecycle and that discussion is out of scope for this patch.
+>
+> I wouldn't say it's entirely out of scope.  E.g. if there's a blocking pr=
+oblem
+> _in the kernel_ that prevents utilizing KVM_TDX_TERMINATE_VM, then we def=
+initely
+> want to sort that out before adding support for KVM_TDX_TERMINATE_VM.
+>
+> But IIUC, the hiccups you've encountered essentially fall into the catego=
+ry of
+> "working as intended", albeit with a lot of not-so-obvious behaviors and =
+dependencies.
 
-Two spaces between sentences (just to be consistent), please.
-
-> -This capability indicates that KVM supports that accesses to user define=
-d MSRs
-> +This capability indicates that KVM supports accesses to user defined MSRs
->  may be rejected. With this capability exposed, KVM exports new VM ioctl
->  KVM_X86_SET_MSR_FILTER which user space can call to specify bitmaps of M=
-SR
->  ranges that KVM should deny access to.
-
-Do you mean accesses to user defined MSRs *that* may be rejected?
-
-Thanks.
-
---=20
-An old man doll... just what I always wanted! - Clara
-
---XtjlFmCOPnxas8r7
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCaFniPQAKCRD2uYlJVVFO
-o6syAP9bLREJNiTUEKAB3y4rpACbB8WjTQAlFiFDer9s6MHmlgD/SaMBEIuHG//c
-TKwApe/fvRN549jI2BMy4jVryOyhzAQ=
-=bKgb
------END PGP SIGNATURE-----
-
---XtjlFmCOPnxas8r7--
+Yes, that's correct. The "issue" I referred to above is just extra
+steps that need to be taken by userspace VMM and is still in the
+"working as intended" category.
 
