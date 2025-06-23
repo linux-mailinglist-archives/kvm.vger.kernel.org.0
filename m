@@ -1,168 +1,118 @@
-Return-Path: <kvm+bounces-50302-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50303-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFCE3AE3D89
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 12:58:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BE16AE3DE0
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 13:27:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 50CAD164A6B
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 10:58:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2A3A6172246
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 11:27:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1306523D288;
-	Mon, 23 Jun 2025 10:58:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12AA923F294;
+	Mon, 23 Jun 2025 11:26:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RgkiEuOu"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="C2KTII+t"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B72B1A08AF
-	for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 10:58:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A7F1231C8D;
+	Mon, 23 Jun 2025 11:26:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750676325; cv=none; b=pZT7bwR9hZMEMj52tPfp/OH3XDLkkmowziCPCEexkf242LG+OZ4d+rlToBIDOG5Pn03EBE6fYsanKS33MNqC5lx+LNAFcp43idgNmroN08cmPBAJLr1/HAj/tRhzsc4WOBskGWKWG6TqDu3JsXHSeT9AEwi6c6tAnznx73FoDz8=
+	t=1750678011; cv=none; b=Gdji8NrYXoZXDwXCvtS98wqDtEUCsiLOs7/UReQ77uGzJzlCndPcVTF9UCsW3CAzN+6Wmm82mNBBmcoouwtrbzd7vkwJ1kJcCBVZnP/zX3a6HxE6W1F84R/KG2//N2zM61TiWmW1Usn1ZLmUfcULU+BbCUr7qhHxSZNDfwU9zkw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750676325; c=relaxed/simple;
-	bh=7z/LoiUZ4ckAuHWelqzbV13t1/gO/DQPymPaZ9atChc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=B26CRk6nyGjXjimo6yXrWiKIlpU8rJOCKafI8JES7tVC3P+IgEE2r9dvU/L3bgRmZyUC1vgazax1DOxTDB7eq/jy9WVya1/I8+xrVveBkEsOgvWgaoFkupkaGIFnYtsZKKgAYxw2CboyrRo7K1yVTGLE6R+S3V1eysDs8s/a2bY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RgkiEuOu; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750676322;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OcWuVqlYqc8Fv7LscejW/AotfZkWXZJQvOx/NWErPRU=;
-	b=RgkiEuOufHyxnyEAjj4zHA0RkJbD935Wd0e7LLDvEtYmyXcAJyHfyRoYG+c4J2Be2vWqDV
-	HpMpH/KsPDSRnfB0CUTKMNo07ymRLUjNu9ZirCg/LrrPx45p1yqLyjCbLQca/03zXOuP/c
-	MgpXHulzOSnLU0kJDs9xPh9cI5pEvKI=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-400-Bv7cgnTPP5y9S3Gg3XMrjA-1; Mon, 23 Jun 2025 06:58:41 -0400
-X-MC-Unique: Bv7cgnTPP5y9S3Gg3XMrjA-1
-X-Mimecast-MFC-AGG-ID: Bv7cgnTPP5y9S3Gg3XMrjA_1750676320
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3a4ff581df3so1942076f8f.1
-        for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 03:58:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750676320; x=1751281120;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OcWuVqlYqc8Fv7LscejW/AotfZkWXZJQvOx/NWErPRU=;
-        b=i8ZaT4xBPFWr+db9xB/0w9OLi94RoU+GvED2EnYJX5+ECUqFSk3yHlffAhmgs+QDBP
-         wR+yeUrH6bIwZG2VuGm3jATOI/RVqYDQ/NgfTLhBRoXzpplc1mKpa16qqqPKQEh+hZja
-         7iVrhQKmC41DOXyJ8HJsCheJQr1F2vTnKb01H8G/M9qKsBJrC2/Ko2FWdA37xqm0aTz5
-         ecNOeW8KAOKq2z4hZuIU/RRtzJ6fsOLaYoN7ak7HWxcAt2imWbqJ320peu3mNh347ipJ
-         1m+AQ9zFyJvx6cQMCYxUeVT+Vg9X6o8dOjbGZ7FQue1uWazYPlSQhyW3cSxIqt4evBYW
-         kCzw==
-X-Forwarded-Encrypted: i=1; AJvYcCW8sDVbdTtoiBOOyaMAVQa+d1GWZaSSOFYM5OkHI7oZ1P2AVLV7F85slodsmryDNYOCR+0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzFee6PHnz/rmqz8NE1aqqwWMQAhdz/2Gztyi/G149OpdvbYtUO
-	urj8jlYSyZvb19DChWOVfHQFqCfYZxZE/B0UShfzPKH/Upnuj/BcG7z1gSfcGBXpxgdpyf6onfx
-	z5gWFF7GlXD/tLqIsSQEMa3OHU78+Yq5LcTtmK1Y12SQ/Rr+9W7TXOw==
-X-Gm-Gg: ASbGncvML8HG1w2Dd+DCxySgs7bgM1cT6cTXAibX8jQHKXUPPTVeKv2w+qIszFHUuCg
-	/OZaV23CfLIToYCdtw8OoK2jGvm2YxIso23ArycB1HRC+HHd00R5EXtRPUVV10tbjeeNeb0EJHh
-	Szfh8bwQdjPgHZcM7N+BgSxtLXNxbEP9iqax5LKC9p98mdMcaWZaEgmqix7LzTSDHLjQQRdbQJf
-	1sFJ+jbSWtkayfn4EnAfErca+mnGNdyelmrnpsEbsliGwKNdQkY8ku+yE3mQpeQbBwrZZ9FW67n
-	p4U5D8JjjnNV66nmOpGJuhDzjX1wdwHIY3sHrQu6ymmkp+DA8vY=
-X-Received: by 2002:a05:6000:18ae:b0:3a5:1388:9a55 with SMTP id ffacd0b85a97d-3a6d27866c8mr8793337f8f.5.1750676319667;
-        Mon, 23 Jun 2025 03:58:39 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEuACVKe9HFC6qufVqz8o3XpVCa/QxvhucENHMrVNmqYzlGVMUG4A86okn7ed0TQ1m9XLYpDg==
-X-Received: by 2002:a05:6000:18ae:b0:3a5:1388:9a55 with SMTP id ffacd0b85a97d-3a6d27866c8mr8793314f8f.5.1750676319238;
-        Mon, 23 Jun 2025 03:58:39 -0700 (PDT)
-Received: from [192.168.0.115] (146-241-49-103.dyn.eolo.it. [146.241.49.103])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45366181aebsm58339325e9.3.2025.06.23.03.58.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Jun 2025 03:58:38 -0700 (PDT)
-Message-ID: <61d10c9b-4f1b-46f6-9a52-1de9aa193a7b@redhat.com>
-Date: Mon, 23 Jun 2025 12:58:36 +0200
+	s=arc-20240116; t=1750678011; c=relaxed/simple;
+	bh=AFKyudrR7+szYWjXjrL9H5jQwyzAn4iMDd/27Hht0Hw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KOC/UXIPf9eZclFTKH8z7PeL5ASlaWuswt8wRWFXcpweF0bgiPeGKOjx7bXVZ5vwi14kVZnchObVEyFqXTTEZ+3ftptdUbw6FnvFqPHGAYJAT6yS/sbneHaKfLqL2gwEnkucr4Np41KcHDKwa7U6xgyjps1PRaNdkcD5coxIhRA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=C2KTII+t; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id A08BB40E01FC;
+	Mon, 23 Jun 2025 11:26:46 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id O1-0Nqdl9xpc; Mon, 23 Jun 2025 11:26:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1750678001; bh=b8YW3wQQJsx2YWUhHESzkkFpIy/unRLxkCns1tBbzj8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=C2KTII+t5MujHsZ93m7d+MPYpXKuVuKvwYVMea5vJV70q9v48dwSLwUy3m4Y4tQRe
+	 bGc+xBYoN7ORB7HAXP6d5LAY3FAvTkWECoZkxZtQfJg+TCGJQsqF3Y8a5E9zfO8n/B
+	 FjZQWzv8Bd3DKoLexqcCG4GAUwh0mUAARsrFrNO+I9mY8jQqkznvupVwZAQbHIem2w
+	 7WXoCg3inwEGORZ3T+OAFucZXShJMKnkTTdqENJoGHI5ay0xvza8FHoanXXa/jynvy
+	 HOojC6jl/v2rXJkd/wHwtba3Uge690+R25laGv586oeZsABk7X8oMAbvjZBMnwOZr3
+	 jKHyjm6x6mAr6ggmMcwFB5KyDt9RloVV4N3E+d/wSoKZlzn+5WhWa8Jw46sIVoXSii
+	 V4/L7zLZcVONjCRWpCbtEdYxZkUvZmQe9tcVgmevA8/dft1Ue18gH0dYCyfDZlu6Je
+	 P8INwZ86NTFna/2j3/Mlktyt1mpUMjWAu8M6yCQ1m8JXofvcMyLsjYDr3cRsglWHlE
+	 CpVvJJXdWG482S56rwJU281hj0BHoCergidzChMQS7qEmQjVHn5R2Ktt54eX/b7o9H
+	 z15CaYKR/1qutHlFfGHbO5yyO+lHtjI6xGq2hS04kEslK5qAD4lVzc9m1zgEgvH5EE
+	 PrPw2TmfaY6D/dyHVggwZsG4=
+Received: from zn.tnic (p57969c58.dip0.t-ipconnect.de [87.150.156.88])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 5868840E00CE;
+	Mon, 23 Jun 2025 11:26:19 +0000 (UTC)
+Date: Mon, 23 Jun 2025 13:26:12 +0200
+From: Borislav Petkov <bp@alien8.de>
+To: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
+Cc: linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+	dave.hansen@linux.intel.com, Thomas.Lendacky@amd.com,
+	nikunj@amd.com, Santosh.Shukla@amd.com, Vasant.Hegde@amd.com,
+	Suravee.Suthikulpanit@amd.com, David.Kaplan@amd.com, x86@kernel.org,
+	hpa@zytor.com, peterz@infradead.org, seanjc@google.com,
+	pbonzini@redhat.com, kvm@vger.kernel.org,
+	kirill.shutemov@linux.intel.com, huibo.wang@amd.com,
+	naveen.rao@amd.com, francescolavra.fl@gmail.com,
+	tiala@microsoft.com
+Subject: Re: [RFC PATCH v7 01/37] KVM: lapic: Remove
+ __apic_test_and_{set|clear}_vector()
+Message-ID: <20250623112612.GEaFk51EOLBBvZWWJm@fat_crate.local>
+References: <20250610175424.209796-1-Neeraj.Upadhyay@amd.com>
+ <20250610175424.209796-2-Neeraj.Upadhyay@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 net-next 4/9] vhost-net: allow configuring extended
- features
-To: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, Willem de Bruijn
- <willemdebruijn.kernel@gmail.com>, Jason Wang <jasowang@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, Yuri Benditovich <yuri.benditovich@daynix.com>,
- Akihiko Odaki <akihiko.odaki@daynix.com>, Jonathan Corbet <corbet@lwn.net>,
- kvm@vger.kernel.org
-References: <cover.1750436464.git.pabeni@redhat.com>
- <e195567cf1f705143477f6eee7b528ee15918873.1750436464.git.pabeni@redhat.com>
- <20250622160221.GH71935@horms.kernel.org>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250622160221.GH71935@horms.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250610175424.209796-2-Neeraj.Upadhyay@amd.com>
 
-
-
-On 6/22/25 6:02 PM, Simon Horman wrote:
-> On Fri, Jun 20, 2025 at 07:39:48PM +0200, Paolo Abeni wrote:
->> Use the extended feature type for 'acked_features' and implement
->> two new ioctls operation allowing the user-space to set/query an
->> unbounded amount of features.
->>
->> The actual number of processed features is limited by VIRTIO_FEATURES_MAX
->> and attempts to set features above such limit fail with
->> EOPNOTSUPP.
->>
->> Note that: the legacy ioctls implicitly truncate the negotiated
->> features to the lower 64 bits range and the 'acked_backend_features'
->> field don't need conversion, as the only negotiated feature there
->> is in the low 64 bit range.
->>
->> Acked-by: Jason Wang <jasowang@redhat.com>
->> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+On Tue, Jun 10, 2025 at 11:23:48PM +0530, Neeraj Upadhyay wrote:
+> Remove __apic_test_and_set_vector() and __apic_test_and_clear_vector(),
+> because the _only_ register that's safe to modify with a non-atomic
+> operation is ISR, because KVM isn't running the vCPU, i.e. hardware can't
+> service an IRQ or process an EOI for the relevant (virtual) APIC.
 > 
-> ...
+> No functional change intended.
 > 
->> +	case VHOST_GET_FEATURES_ARRAY:
->> +		if (get_user(count, featurep))
->> +			return -EFAULT;
->> +
->> +		/* Copy the net features, up to the user-provided buffer size */
->> +		argp += sizeof(u64);
->> +		copied = min(count, VIRTIO_FEATURES_DWORDS);
->> +		if (copy_to_user(argp, vhost_net_features,
->> +				 copied * sizeof(u64)))
->> +			return -EFAULT;
->> +
->> +		/* Zero the trailing space provided by user-space, if any */
->> +		if (clear_user(argp, (count - copied) * sizeof(u64)))
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> [Neeraj: Add "inline" for apic_vector_to_isr()]
+> Signed-off-by: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
+> ---
+> Changes since v6:
 > 
-> Hi Paolo,
+>  - New change.
 > 
-> Smatch warns to "check for integer overflow 'count'" on the line above.
-> 
-> Perhaps it is wrong. Or my analyais is. But it seems to me that an overflow
-> could occur if count is very large, say such that (count - copied) is more
-> than 2^64 / 8.  As then (count - copied) * sizeof(u64) would overflow 64
-> bits.
-> 
-> By the same reasoning this could overflow 32 bits on systems where an
-> unsigned long, type type of the 2nd parameter of clear_user, is 32 bits.
+>  arch/x86/kvm/lapic.c | 19 +++++++------------
+>  1 file changed, 7 insertions(+), 12 deletions(-)
 
-I think you and smatch are right. I'll use size_mul() in the next
-iteration. I'll wait a little more before posting it to possibly allow
-for more reviews.
+FWIW: LGTM.
 
-Thanks,
+:-)
 
-Paolo
+-- 
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
 
