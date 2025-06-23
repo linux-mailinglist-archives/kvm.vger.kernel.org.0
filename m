@@ -1,68 +1,66 @@
-Return-Path: <kvm+bounces-50388-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50389-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD24BAE4B1F
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 18:39:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5508CAE4B6A
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 18:51:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C230169545
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 16:39:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A7C0A189ADBB
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 16:45:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAA7829C32C;
-	Mon, 23 Jun 2025 16:38:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6283257ACA;
+	Mon, 23 Jun 2025 16:44:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="DeAvAroR"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="UzMl5v4n"
 X-Original-To: kvm@vger.kernel.org
 Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3BF9246BCD;
-	Mon, 23 Jun 2025 16:38:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5047A2882A9;
+	Mon, 23 Jun 2025 16:44:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750696735; cv=none; b=GrRVucCiT2C+9CMuGeVyPg997V6EMgV5E8z2KKQ5v0lSx6qw2GM50gkno4EYIfB+K5kAM48ucZ3jLqV98OprzSl9/Nab+UWtmHw5OwGUwRWLRLpftFdxc7hofkO6FC60QJ2lmvEmDO2hiyzJKabfZrC+SGk181Gkqy81mHEAokk=
+	t=1750697072; cv=none; b=IjWubmMkRBxr9KQnAYTlcgwPFR/V13g5hsVQ1yVThrekzWPXw1xn8typkkciwIFGJNOUcQPTg8JdtVYMpHQvCLX60xh0IYapXZH07hdmUE+pHt8Zn1KKLz4qP1tksrbxPXv8jj1oibaS0cSbIdoSKVL5B8YKQ1YBfp+0salmVAo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750696735; c=relaxed/simple;
-	bh=gevdFq1xRrwPJ5Hf5ON4vbO7LUOLz1CD+kgUCJd+b4U=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=bta53HFzhoP3ChjhBreWO6YRumtQMaNybu0uykSJzhDN9KjauLyb38Gx5tXhwIfCKURNmJVd/+VL35FLDhjwqEL/XS0M4tpWbSAX3z3nlubPugqhtLhSFDOMEGCWESwSa4HPlcf9dXfQ6EWbJPqHcHr9zuw6ycV+mp2UP/HPiRs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=DeAvAroR; arc=none smtp.client-ip=90.155.50.34
+	s=arc-20240116; t=1750697072; c=relaxed/simple;
+	bh=Emiq1FV1ttr+CBNmWAmNnJ/s86V/e3girU5btU4QwPQ=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=dchZGYft+s/lYOtHJep0UupoOvPLRLo1Pb2FTn3GeIQz2I6hPzKQu9vu8ZMcWUWdUvU56CZrz5FKWzDWJhoUDH4jy4QdIJdp1wan7XY1IZebbqaYKGDZNP4QTsbRS/nuwej3YnBSCUlqqmP7bKd17mDsj4pWA/3YvfvVDvuf0zA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=UzMl5v4n; arc=none smtp.client-ip=90.155.50.34
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:To:From:Subject:Message-ID:Sender:Reply-To:Cc:
+	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=ISEgUz1Ma4kDoDIXA+iw932nmvcNDPWKUXymSLJ53/I=; b=DeAvAroRgUlnTlLnAXqzYYurCq
-	ULE8oUUf7dKlCyYvZ4hRYaH8O40Ko3w/GJ31Y9tFZevSLd/Wgf2DC9mne3n5uLa/g3JbVDKvu5bTg
-	NvS2ZAlh5RnzM7/F6V1duuPo67mk88gjyIwAHKtsFa+LUOy/xMvw0MfjpAuKwiJXuwCzNhMkc5DiG
-	iu5d1tIMwfG5x/aK1MIPtKEJlyKM7Bf1z0hPB4J71s2xxFcynKdbG8tr7NS1nW0H1NdwsaHlWh1cv
-	4ORY/oeaTUGGEXIrV4naallt0p5XFX0dh4lnJukD428a/mK739FUxRHi0KGh5sAT9vK55J/grskQp
-	uyutwvlQ==;
+	bh=Emiq1FV1ttr+CBNmWAmNnJ/s86V/e3girU5btU4QwPQ=; b=UzMl5v4nndQiWGcH2Bx6PJaF7I
+	VZvQxcSDg0o0f8vqZ046n310EJ51F93F5fdG1CizxKYWqSgtzQF/T/KrCBqIKnFdkZcqxBYXfhqon
+	AhHABBkMIijxRdTruKXXWjVbd9+aO0I9VCRfNT0WxuO/Sl44iNwo/ZuRbvf58pBdhh7V1oWLq1fW4
+	8oSy14zR6B754oZT4lYCNU8eduEdQIFifKL97YuS1ngVP39InKA3i7lmGW43RSD7IJP7mQw8F+WfB
+	EZI3leGwAbz2wGgDPF8hP9hPhBaViDDgTJfO1deu0cRuql/CiI6/mOheBqWVwoSWjC6fFypX5lbRD
+	yQD1Jy0g==;
 Received: from [54.239.6.189] (helo=edge-cache-144.e-fra50.amazon.com)
 	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uTkC0-000000041IQ-0oCh;
-	Mon, 23 Jun 2025 16:38:48 +0000
-Message-ID: <c142f447c59861f3c94b0fea7f055f4ff201fa98.camel@infradead.org>
-Subject: Re: [RFC PATCH 2/2] KVM: arm64: vgic-its: Unmap all vPEs on shutdown
+	id 1uTkHU-0000000425N-08Yt;
+	Mon, 23 Jun 2025 16:44:28 +0000
+Message-ID: <7cc618b80681e8e1402c73886505f6247c810db8.camel@infradead.org>
+Subject: Re: KVM: x86/xen: Allow 'out of range' event channel ports in IRQ
+ routing table.
 From: David Woodhouse <dwmw2@infradead.org>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
- Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
- Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas
- <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Paolo Bonzini
- <pbonzini@redhat.com>, Sebastian Ott <sebott@redhat.com>, Andre Przywara
- <andre.przywara@arm.com>, Thorsten Blum <thorsten.blum@linux.dev>, Shameer
- Kolothum <shameerali.kolothum.thodi@huawei.com>,
- linux-arm-kernel@lists.infradead.org,  kvmarm@lists.linux.dev,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Date: Mon, 23 Jun 2025 18:38:46 +0200
-In-Reply-To: <20250623132714.965474-2-dwmw2@infradead.org>
-References: <20250623132714.965474-1-dwmw2@infradead.org>
-	 <20250623132714.965474-2-dwmw2@infradead.org>
+To: paul@xen.org, kvm@vger.kernel.org, Sean Christopherson
+ <seanjc@google.com>,  "Orlov, Ivan" <iorlov@amazon.co.uk>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner
+ <tglx@linutronix.de>,  Ingo Molnar <mingo@redhat.com>, Borislav Petkov
+ <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,  x86@kernel.org,
+ "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
+Date: Mon, 23 Jun 2025 18:44:26 +0200
+In-Reply-To: <7fedbeac-300f-48a3-9860-e05b6d286cd1@xen.org>
+References: <e489252745ac4b53f1f7f50570b03fb416aa2065.camel@infradead.org>
+	 <7fedbeac-300f-48a3-9860-e05b6d286cd1@xen.org>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-/dxTOkkvRolpaTs5bH+A"
+	boundary="=-CCM+5jMfWnH/MfFJSdvZ"
 User-Agent: Evolution 3.52.3-0ubuntu1 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -73,158 +71,44 @@ MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
 
---=-/dxTOkkvRolpaTs5bH+A
+--=-CCM+5jMfWnH/MfFJSdvZ
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, 2025-06-23 at 14:27 +0100, David Woodhouse wrote:
-> From: David Woodhouse <dwmw@amazon.co.uk>
+On Mon, 2025-05-12 at 10:29 +0100, Paul Durrant wrote:
+> On 08/05/2025 21:30, David Woodhouse wrote:
+> > From: David Woodhouse <dwmw@amazon.co.uk>
+> >=20
+> > To avoid imposing an ordering constraint on userspace, allow 'invalid'
+> > event channel targets to be configured in the IRQ routing table.
+> >=20
+> > This is the same as accepting interrupts targeted at vCPUs which don't
+> > exist yet, which is already the case for both Xen event channels *and*
+> > for MSIs (which don't do any filtering of permitted APIC ID targets at
+> > all).
+> >=20
+> > If userspace actually *triggers* an IRQ with an invalid target, that
+> > will fail cleanly, as kvm_xen_set_evtchn_fast() also does the same rang=
+e
+> > check.
+> >=20
+> > If KVM enforced that the IRQ target must be valid at the time it is
+> > *configured*, that would force userspace to create all vCPUs and do
+> > various other parts of setup (in this case, setting the Xen long_mode)
+> > before restoring the IRQ table.
+> >=20
+> > Cc: stable@vger.kernel.org
+> > Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+> > ---
+> > =C2=A0 arch/x86/kvm/xen.c | 14 ++++++++++++--
+> > =C2=A0 1 file changed, 12 insertions(+), 2 deletions(-)
+> >=20
 >=20
-> We observed systems going dark on kexec, due to corruption of the new
-> kernel's text (and sometimes the initrd). This was eventually determined
-> to be caused by the vLPI pending tables used by the GIC in the previous
-> kernel, which were not being quiesced properly.
+> Reviewed-by: Paul Durrant <paul@xen.org>
 
-FWIW this is a previous hack we attempted which *didn't* work. (For
-illustration only; ignore the syscore .kexec hook. We addressed that
-differently in the end with
-https://lore.kernel.org/kexec/20231213064004.2419447-1-jgowans@amazon.com/ =
-)
+Ping?
 
-At the point where the its_kexec() hook in this patch has completed, we
-poisoned the (ex-) vLPI pending tables and then scanned for corruption
-in them. We saw the same characteristic pattern of corruption which had
-been breaking the next kernel after kexec: 32 bytes copied from offset
-0 to offset 32 in a page, followed by bytes 0, 1, 32, 33, 34, 35 being
-zeroed.
-
-Adding a few milliseconds of sleep before the poisoning was enough to
-make the problem go away. As is the patch which calls unmap_all_vpes()
-=E2=88=80 kvm.
-
-Of course, if the GIC were behind an IOMMU as all DMA-capable devices
-should be, this might never have happened...
-
-diff --git a/drivers/irqchip/irq-gic-common.h b/drivers/irqchip/irq-gic-com=
-mon.h
-index f407cce9ecaa..a4fde376d214 100644
---- a/drivers/irqchip/irq-gic-common.h
-+++ b/drivers/irqchip/irq-gic-common.h
-@@ -19,6 +19,12 @@ struct gic_quirk {
- 	u32 mask;
- };
-=20
-+struct redist_region {
-+	void __iomem		*redist_base;
-+	phys_addr_t		phys_base;
-+	bool			single_redist;
-+};
-+
- int gic_configure_irq(unsigned int irq, unsigned int type,
-                        void __iomem *base, void (*sync_access)(void));
- void gic_dist_config(void __iomem *base, int gic_irqs,
-@@ -33,4 +39,6 @@ void gic_enable_of_quirks(const struct device_node *np,
- #define RDIST_FLAGS_RD_TABLES_PREALLOCATED     (1 << 1)
- #define RDIST_FLAGS_FORCE_NON_SHAREABLE        (1 << 2)
-=20
-+int gic_iterate_rdists(int (*fn)(struct redist_region *, void __iomem *));
-+
- #endif /* _IRQ_GIC_COMMON_H */
-diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-=
-its.c
-index 638f7eb033ad..d106b6ccca8b 100644
---- a/drivers/irqchip/irq-gic-v3-its.c
-+++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -4902,6 +4902,51 @@ static void its_enable_quirks(struct its_node *its)
- 				     its_quirks, its);
- }
-=20
-+static int disable_vpes(struct redist_region *region, void __iomem *ptr)
-+{
-+	u64 typer;
-+	u64 val;
-+
-+	typer =3D gic_read_typer(ptr + GICR_TYPER);
-+
-+	if (!((typer & GICR_TYPER_VLPIS) && (typer & GICR_TYPER_RVPEID)))
-+		return 1;
-+
-+	/* Deactivate any present vPE */
-+	its_clear_vpend_valid(ptr + SZ_128K, 0, GICR_VPENDBASER_PendingLast);
-+
-+	/* Mark the VPE table as invalid */
-+	val =3D gicr_read_vpropbaser(ptr + SZ_128K + GICR_VPROPBASER);
-+	val &=3D ~GICR_VPROPBASER_4_1_VALID;
-+	gicr_write_vpropbaser(val, ptr + SZ_128K + GICR_VPROPBASER);
-+
-+	/* Disable next redistributor */
-+	return 1;
-+}
-+
-+static int its_kexec(void)
-+{
-+	int err =3D 0, err_return =3D 0;
-+	struct its_node *its;
-+
-+	raw_spin_lock(&its_lock);
-+
-+	list_for_each_entry(its, &its_nodes, entry) {
-+		err =3D its_force_quiescent(its->base);
-+		if (err) {
-+			pr_err("ITS@%pa: failed to quiesce: %d\n",
-+			       &its->phys_base, err);
-+			err_return =3D -EBUSY;
-+		}
-+	}
-+
-+	gic_iterate_rdists(disable_vpes);
-+
-+	raw_spin_unlock(&its_lock);
-+
-+	return err_return;
-+}
-+
- static int its_save_disable(void)
- {
- 	struct its_node *its;
-@@ -5001,6 +5046,7 @@ static void its_restore_enable(void)
- static struct syscore_ops its_syscore_ops =3D {
- 	.suspend =3D its_save_disable,
- 	.resume =3D its_restore_enable,
-+	.kexec =3D its_kexec,
- };
-=20
- static void __init __iomem *its_map_one(struct resource *res, int *err)
-diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
-index 50143de1791d..2014c5a75a6e 100644
---- a/drivers/irqchip/irq-gic-v3.c
-+++ b/drivers/irqchip/irq-gic-v3.c
-@@ -46,12 +46,6 @@
-=20
- #define GIC_IRQ_TYPE_PARTITION	(GIC_IRQ_TYPE_LPI + 1)
-=20
--struct redist_region {
--	void __iomem		*redist_base;
--	phys_addr_t		phys_base;
--	bool			single_redist;
--};
--
- struct gic_chip_data {
- 	struct fwnode_handle	*fwnode;
- 	phys_addr_t		dist_phys_base;
-@@ -968,7 +962,7 @@ static void __init gic_dist_init(void)
- 		gic_write_irouter(affinity, base + GICD_IROUTERnE + i * 8);
- }
-=20
--static int gic_iterate_rdists(int (*fn)(struct redist_region *, void __iom=
-em *))
-+int gic_iterate_rdists(int (*fn)(struct redist_region *, void __iomem *))
- {
- 	int ret =3D -ENODEV;
- 	int i;
-
-
---=-/dxTOkkvRolpaTs5bH+A
+--=-CCM+5jMfWnH/MfFJSdvZ
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -303,22 +187,22 @@ QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
 nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
 MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
 VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
-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
+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
-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
+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
 
 
---=-/dxTOkkvRolpaTs5bH+A--
+--=-CCM+5jMfWnH/MfFJSdvZ--
 
