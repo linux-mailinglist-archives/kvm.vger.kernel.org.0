@@ -1,175 +1,135 @@
-Return-Path: <kvm+bounces-50382-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50383-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF422AE49D6
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 18:09:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59ABAAE4ACD
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 18:27:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 339F01886EE1
-	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 16:04:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B15811B64BF9
+	for <lists+kvm@lfdr.de>; Mon, 23 Jun 2025 16:20:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1A9C28ECD1;
-	Mon, 23 Jun 2025 16:04:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D1352DECDF;
+	Mon, 23 Jun 2025 16:10:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="SZ1GzJXM"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D394746BF;
-	Mon, 23 Jun 2025 16:04:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 317F72DCC03;
+	Mon, 23 Jun 2025 16:10:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750694659; cv=none; b=V9xA0dhfeb1AHM1wFMtf2loqWfwekgubABRQptVlU35Kmf6KjmcCT9zLu+3F+3zCcjkvE9tke4msOGJtb8H9ca1frSx4KoFWsEUtwaXwuqQoVUpir1GatOM0mdNCG8n4GJgQ+wgDbiEIlFnyH1dTGlfSsrNxrO/GqQZ+AeaGkjY=
+	t=1750695049; cv=none; b=ZxZrmRGBTNKRlMrcD3yooNoVP7v3KY9d2WXx04jRH+nKQjxlN2CrkOFCuUKzwBsA7wKpeefIrmvjDlLvuZOPB+DtJ2oTFKbVDCXz62DfB0CQ4sI61+UVRKJ9BUnReT3LHjwWGvMblJ+vYAe8gbb2VD95C7+J7T8L+Q93R9/NSNg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750694659; c=relaxed/simple;
-	bh=LrKGy4WBpoQHJ3dVz+8gr7LXnPo+a03MXlgQE5KvJug=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=n0jfhif0y9dJduUYKQ09SL2HkTcKsszRF9tzLbM8Um/KbfkHvQLJfKVw/35NhqmI1OoOvH8pqqPR/hquIFPdtoEdA3HbqTP3CGQ/7AN/q8MviBdFk4eyAptpzWv6xrCZcsDXXKV4SfADVrg+JqZSb7Sq4knmFPbaWzCjzqGx4VE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 107A7113E;
-	Mon, 23 Jun 2025 09:03:58 -0700 (PDT)
-Received: from [10.57.29.183] (unknown [10.57.29.183])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AA5B23F66E;
-	Mon, 23 Jun 2025 09:04:11 -0700 (PDT)
-Message-ID: <69e0107f-6c40-4ea1-ac69-51ad8aa78dff@arm.com>
-Date: Mon, 23 Jun 2025 17:04:09 +0100
+	s=arc-20240116; t=1750695049; c=relaxed/simple;
+	bh=dS7QgYeAznkgEhzk7h32qFFNi0yjzq3+ztoyxkZ//XI=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=KkmOfsxEnX+zFY7ozqQrENFPOunPNJqiRc8LWmzk/ciN22YZcPLKSoqwKX1L6c8aROL8bnf8lcSC6FO/OKgWtTnIyqdqEyRpk/k6pLcFukzIMdywTm4sTIE55X0nqlxUFlGmWXIv5nF2Xra5rIig7KV0xBQgkUGZX868LZDEMe8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=SZ1GzJXM; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [127.0.0.1] (c-76-133-66-138.hsd1.ca.comcast.net [76.133.66.138])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 55NGA7TK995696
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Mon, 23 Jun 2025 09:10:08 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 55NGA7TK995696
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025062101; t=1750695009;
+	bh=5OyKvEljcKH+TeDJlGA4fkMB6CCrF6QEZCXe4uNmwAs=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+	b=SZ1GzJXMbd0V6nYkSdQZSdPQcNAKb5MOvCof6U/mOuVB+0QaDBj59VWf5L9cRdgqT
+	 itNQlfH2W269PbEwmkNbvulkUpxD/UUYAf21tFgjmxP08jvyuS59WLfrXO0m+c+x4l
+	 WGgqQOEmbV8yWjnJbwQmrkLJWBOUzH7/BPGJMQ4Y68rNvdHRoftSH09vAnFWX9ThT1
+	 b2fq5G5sXTvRlAM00Jmft2M0hQci085Nr0JAd9nUZ6EHm2uxF9g9YYRyZy+Y40PHfc
+	 dnNB/soxXQbG5F09Aq5J3cTLdmikLWRCSI3dwlJg8OoNQMHVTDWjdoHBDNBYN8PW30
+	 mT6yD9MhrJm5w==
+Date: Mon, 23 Jun 2025 09:10:07 -0700
+From: "H. Peter Anvin" <hpa@zytor.com>
+To: Sean Christopherson <seanjc@google.com>
+CC: Sohil Mehta <sohil.mehta@intel.com>, Xin Li <xin@zytor.com>,
+        x86@kernel.org, linux-kernel@vger.kernel.org,
+        Andy Lutomirski <luto@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Kan Liang <kan.liang@linux.intel.com>, Tony Luck <tony.luck@intel.com>,
+        Zhang Rui <rui.zhang@intel.com>, Steven Rostedt <rostedt@goodmis.org>,
+        Andrew Cooper <andrew.cooper3@citrix.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Jacob Pan <jacob.pan@linux.microsoft.com>,
+        Andi Kleen <ak@linux.intel.com>, Kai Huang <kai.huang@intel.com>,
+        Sandipan Das <sandipan.das@amd.com>, linux-perf-users@vger.kernel.org,
+        linux-edac@vger.kernel.org, kvm@vger.kernel.org,
+        linux-pm@vger.kernel.org, linux-trace-kernel@vger.kernel.org
+Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v7_02/10=5D_x86/fred=3A_Pass_eve?=
+ =?US-ASCII?Q?nt_data_to_the_NMI_entry_point_from_KVM?=
+User-Agent: K-9 Mail for Android
+In-Reply-To: <aFl1PcnVuYuELvRQ@google.com>
+References: <20250612214849.3950094-1-sohil.mehta@intel.com> <20250612214849.3950094-3-sohil.mehta@intel.com> <7525af7f-a817-47d5-91f7-d7702380c85f@zytor.com> <3281866f-2593-464d-a77e-5893b5e7014f@intel.com> <36374100-0587-47f1-9319-6333f6dfe4db@zytor.com> <39987c98-1f63-4a47-b15e-8c78f632da4e@intel.com> <7acedeba-9c90-403c-8985-0247981bf2b5@zytor.com> <aFXsPVIKi6wFUB6x@google.com> <1713a225-44e0-4018-bf5f-64ffd7746167@zytor.com> <aFl1PcnVuYuELvRQ@google.com>
+Message-ID: <D00BE3D4-C710-4304-85D3-B2A091E08035@zytor.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 20/43] arm64: RME: Runtime faulting of memory
-To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
- Emi Kisanuki <fj0570is@fujitsu.com>
-References: <20250611104844.245235-1-steven.price@arm.com>
- <20250611104844.245235-21-steven.price@arm.com>
- <e75dfc47-5b74-4898-91c0-fed9880f9727@redhat.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <e75dfc47-5b74-4898-91c0-fed9880f9727@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 16/06/2025 12:55, Gavin Shan wrote:
-> Hi Steven,
-> 
-> On 6/11/25 8:48 PM, Steven Price wrote:
->> At runtime if the realm guest accesses memory which hasn't yet been
->> mapped then KVM needs to either populate the region or fault the guest.
->>
->> For memory in the lower (protected) region of IPA a fresh page is
->> provided to the RMM which will zero the contents. For memory in the
->> upper (shared) region of IPA, the memory from the memslot is mapped
->> into the realm VM non secure.
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->>   arch/arm64/include/asm/kvm_emulate.h |  10 ++
->>   arch/arm64/include/asm/kvm_rme.h     |  10 ++
->>   arch/arm64/kvm/mmu.c                 | 133 ++++++++++++++++++++-
->>   arch/arm64/kvm/rme.c                 | 165 +++++++++++++++++++++++++++
->>   4 files changed, 312 insertions(+), 6 deletions(-)
->>
-> 
-> [...]
-> 
->> @@ -1078,6 +1091,9 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
->>       if (kvm_is_realm(kvm) &&
->>           (kvm_realm_state(kvm) != REALM_STATE_DEAD &&
->>            kvm_realm_state(kvm) != REALM_STATE_NONE)) {
->> +        struct realm *realm = &kvm->arch.realm;
->> +
->> +        kvm_stage2_unmap_range(mmu, 0, BIT(realm->ia_bits - 1), false);
->>           write_unlock(&kvm->mmu_lock);
->>           kvm_realm_destroy_rtts(kvm, pgt->ia_bits);
->>   
-> 
-> I'm giving it a try before taking time to review, @may_block needs to be
-> true.
-> I don't see there is anything why not to do so :)
+On June 23, 2025 8:39:41 AM PDT, Sean Christopherson <seanjc@google=2Ecom> =
+wrote:
+>On Fri, Jun 20, 2025, H=2E Peter Anvin wrote:
+>> On 2025-06-20 16:18, Sean Christopherson wrote:
+>> > >=20
+>> > > So I was thinking about this, and wonder: how expensive is it to ge=
+t the
+>> > > event data exit information out of VMX? If it is not very expensive=
+, it
+>> > > would arguably be a good thing to future-proof by fetching that inf=
+ormation,
+>> > > even if it is currently always zero=2E
+>> >=20
+>> > It's trivially easy to do in KVM, and the cost of the VMREAD should b=
+e less than
+>> > 20 cycles=2E  So quite cheap in the grand scheme=2E  If VMREAD is mor=
+e costly than
+>> > that, then we have bigger problems :-)
+>> >=20
+>>=20
+>> LOL=2E Since it is up to you, Paulo, etc=2E to decide how to do the tra=
+deoffs
+>> formaintainability, debuggability and performance in KVM I am guessing =
+this
+>> is a vote in favor? (You can always take it out if it is a performance
+>> problem, until such time that the kernel itself starts consuming this
+>> information for reasons currently unknown=2E)
+>
+>Unless you can pinky swear that vmcs=2EEXIT_QUALIFICATION will provide ev=
+ent data
+>for IRQ exits, then I'd prefer to pass '0' unconditionally=2E  '0' will a=
+lways be
+>safe, if potentially suboptimal=2E  But passing what could in theory be s=
+omething
+>other than FRED-formatted event data could lead to buggy behavior=2E  Per=
+ the FRED
+>spec, Revision 7=2E0, exit-qualification doesn't hold event data for IRQ =
+exits=2E
+>
+>  For some events for which event data is defined (see Section 5=2E2=2E1)=
+, the event
+>  data is saved in the exit-qualification field=2E (This is done for #DB,=
+ #PF, and NMI=2E)
 
-You are right - I've no idea why I passed false to may_block. Thanks for
-the report.
+I agree, let's stick to that for now, since this is a kernel internal inte=
+rface and nothing consumes it=2E After all, it will save a handful of cycle=
+s=2E
 
-Thanks,
-Steve
-
->   kvm_stage2_unmap_range(mmu, 0, BIT(realm->ia_bits - 1), true);
-> 
-> Otherwise, there is RCU stall when the VM is destroyed.
-> 
-> [12730.399825] rcu: INFO: rcu_preempt self-detected stall on CPU
-> [12730.401922] rcu:     5-....: (5165 ticks this GP)
-> idle=3544/1/0x4000000000000000 softirq=41673/46605 fqs=2625
-> [12730.404598] rcu:     (t=5251 jiffies g=61757 q=36 ncpus=8)
-> [12730.406771] CPU: 5 UID: 0 PID: 170 Comm: qemu-system-aar Not tainted
-> 6.16.0-rc1-gavin-gfbc56042a9cf #36 PREEMPT
-> [12730.407918] Hardware name: QEMU QEMU Virtual Machine, BIOS unknown
-> 02/02/2022
-> [12730.408796] pstate: 61402009 (nZCv daif +PAN -UAO -TCO +DIT -SSBS
-> BTYPE=--)
-> [12730.409515] pc : realm_unmap_private_range+0x1b4/0x310
-> [12730.410825] lr : realm_unmap_private_range+0x98/0x310
-> [12730.411377] sp : ffff8000808f3920
-> [12730.411777] x29: ffff8000808f3920 x28: 0000000104d29000 x27:
-> 000000004229b000
-> [12730.413410] x26: 0000000000000000 x25: ffffb8c82d23f000 x24:
-> 00007fffffffffff
-> [12730.414292] x23: 000000004229c000 x22: 0001000000000000 x21:
-> ffff80008019deb8
-> [12730.415229] x20: 0000000101b3f000 x19: 000000004229b000 x18:
-> ffff8000808f3bd0
-> [12730.416119] x17: 0000000000000001 x16: ffffffffffffffff x15:
-> 0000ffff91cc5000
-> [12730.417004] x14: ffffb8c82cfccb48 x13: 0000ffff4b1fffff x12:
-> 0000000000000000
-> [12730.417876] x11: 0000000038e38e39 x10: 0000000000000004 x9 :
-> ffffb8c82c39a030
-> [12730.418863] x8 : ffff80008019deb8 x7 : 0000010000000000 x6 :
-> 0000000000000000
-> [12730.419738] x5 : 0000000038e38e39 x4 : ffff0000c0d80000 x3 :
-> 0000000000000000
-> [12730.420609] x2 : 000000004229c000 x1 : 0000000104d2a000 x0 :
-> 0000000000000000
-> [12730.421602] Call trace:
-> [12730.422209]  realm_unmap_private_range+0x1b4/0x310 (P)
-> [12730.423096]  kvm_realm_unmap_range+0xbc/0xe0
-> [12730.423657]  __unmap_stage2_range+0x74/0xa8
-> [12730.424198]  kvm_free_stage2_pgd+0xc8/0x120
-> [12730.424746]  kvm_uninit_stage2_mmu+0x24/0x48
-> [12730.425284]  kvm_arch_flush_shadow_all+0x74/0x98
-> [12730.425849]  kvm_mmu_notifier_release+0x38/0xa0
-> [12730.426409]  __mmu_notifier_release+0x80/0x1f0
-> [12730.427031]  exit_mmap+0x3d8/0x438
-> [12730.427526]  __mmput+0x38/0x160
-> [12730.428000]  mmput+0x58/0x78
-> [12730.428463]  do_exit+0x210/0x9d8
-> [12730.428945]  do_group_exit+0x3c/0xa0
-> [12730.429458]  get_signal+0x8d4/0x9c0
-> [12730.429954]  do_signal+0x98/0x400
-> [12730.430455]  do_notify_resume+0xec/0x1a0
-> [12730.431030]  el0_svc+0xe8/0x130
-> [12730.431536]  el0t_64_sync_handler+0x10c/0x138
-> [12730.432085]  el0t_64_sync+0x1ac/0x1b0
-> 
-> Thanks,
-> Gavin
-> 
-
+I will still check into the "pinky swear", though=2E
 
