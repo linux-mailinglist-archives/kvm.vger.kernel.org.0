@@ -1,137 +1,203 @@
-Return-Path: <kvm+bounces-50487-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50488-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7456FAE656F
-	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 14:50:54 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC10EAE65C2
+	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 15:02:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E43813AA670
-	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 12:50:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 101DC7AF181
+	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 13:01:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BEB2299920;
-	Tue, 24 Jun 2025 12:50:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9E392BEC29;
+	Tue, 24 Jun 2025 13:02:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="aoRIx3fg"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 005D21DFFC;
-	Tue, 24 Jun 2025 12:50:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8797A28D8FA;
+	Tue, 24 Jun 2025 13:02:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750769445; cv=none; b=oE9eEVfnRAuoDAtWlcXRP3nWlUeRvKBB63AA0qP0gJZpZrMLBm6qSeBlzvgy0pee07iNfLWIREjYnjd/u8ib0I4IQhc5nXYdmqszaDMIWQPMHMP84jYc0lFCF3smfP+UXBpO8uUfoU8yBj5dxZhg3CIRq1t+r1B3rkPZXhQeh+E=
+	t=1750770142; cv=none; b=L65Ip0GxyP8G9J03a0GhSct9LrKn92L1BorYjxkASI/RH6EVQXcvsiI+1Mrzfxfm7J6Oqkvxz3lFFq/27j7TCdFzfCue8wtdMLT3LlwCAhl8Vya/tDVDWIwyOh8XHWTUUuL6ozNOaiZKIWBZKrRalkhRamPxAGj/ZdURGi6grq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750769445; c=relaxed/simple;
-	bh=GyodmIXznG8GSgL/Ai3LAgH/nDuaIi0hljP1HBMPTe4=;
+	s=arc-20240116; t=1750770142; c=relaxed/simple;
+	bh=5b48PxvdWOCAFOl31cdiOUwXzDYiUBixnJcaU6ejEl8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=di3X5Z+Ufu3AIldNgj+3U5n0oE4uWtLt5GfLjBco8uxWJopUJPkDeWwagkCDJ6GUMKr8zbeGZQ2JBKM5OXdHnxzdZStMwNFl0ZNGVk+kFHbhdsN28uG6t7joYtM/nr+wIQC5PxHGMr738c5FU/alN00U5fNKksxUU02EQGH8Si4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 25A03106F;
-	Tue, 24 Jun 2025 05:50:23 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8D7073F66E;
-	Tue, 24 Jun 2025 05:50:37 -0700 (PDT)
-Date: Tue, 24 Jun 2025 13:50:32 +0100
-From: Joey Gouly <joey.gouly@arm.com>
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
-	Emi Kisanuki <fj0570is@fujitsu.com>
-Subject: Re: [PATCH v9 28/43] arm64: RME: Allow checking SVE on VM instance
-Message-ID: <20250624125032.GA111675@e124191.cambridge.arm.com>
-References: <20250611104844.245235-1-steven.price@arm.com>
- <20250611104844.245235-29-steven.price@arm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZnLJpX80LIqk231BKWSkegTj7lQuv1lZ4XoBWfQOTCdkLjcBg7rY4VzXOWrwTfodNYfIyT2oExBjOFY5qt2K9cSfPmxBEIJN8XYK2husn7hQ1ydBWHRtp5ikbGwzSV3qINUJxxc4tD7vOwfp3V0CJzRb7i4JnEFtSkHZwL4DmFE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=aoRIx3fg; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 931CA40E00DE;
+	Tue, 24 Jun 2025 13:02:16 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id ZiMvgR5epIuE; Tue, 24 Jun 2025 13:02:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1750770130; bh=qZPkqHa+agmymJRsvd0GsTVbCxTMUMcr+mpRiXqakQg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=aoRIx3fgKpgg/GXMI6/W9Hmd+BznlUx7ue5dYy0C0q2SvNAtIaPD633WybKPu1esh
+	 CB4zK0IXhrCFI42TRpXxXZee9zy5YrYn/czVpJm/lfzQXt0BghfZW/A8OOLcBOoxOn
+	 AuM7hd/fnVpLOzPYjVn7al3q1nJkMhem6mcb5XEGMI8rb9COkmd2CZQ36x5L+2XcCA
+	 Bq60m/6vlL7kW+1qeZp//k2l5yA7Kfgf3ayaxIBgOBvdOjM8mY0HuNeqL0GZ73kAkn
+	 3cvJJTdI+zjbsvNcAj/MC/zrRtujxnsDSrM3leMhXLlioP7jqFIyZWgA67r7D0AA5I
+	 RSCPAVpbq8kkxjPbmqvSY2uZvCgmq+FfD6GbFc/dYkryFDIoRpsdPyZ97athk/yYcU
+	 yYyi9WbcDlMpJMyibmTGWqVWPjnnAVJIwfUUDVV+fN45xOqQVsV6Gz15EvrUW5qX7K
+	 2HP0Hg/q6+Gd8W6XbE4D1A/zQgqed3bKac6Qpm9/mo6KsnwQq144QF5+3w749UeExg
+	 LwLh1Rl2jX/BGkF5P09ZsZP+X3bqlgDDV92zH+3OzdHLRpLmyUXljRGhuuIkXmot4f
+	 sXdhEXm6mc6sCrH7yCMjffSB2mtEq41jL3H2KE/TSk4wek7rrzUBrZwvBnd9I/YZ1J
+	 4/O0QIDBdQD9HEkRCv7Y85KU=
+Received: from zn.tnic (p57969c58.dip0.t-ipconnect.de [87.150.156.88])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 4743240E019C;
+	Tue, 24 Jun 2025 13:01:59 +0000 (UTC)
+Date: Tue, 24 Jun 2025 15:01:58 +0200
+From: Borislav Petkov <bp@alien8.de>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: linux-coco@lists.linux.dev, kvm@vger.kernel.org,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+	"H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+	"open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <linux-kernel@vger.kernel.org>,
+	"open list:EXTENSIBLE FIRMWARE INTERFACE (EFI)" <linux-efi@vger.kernel.org>
+Subject: Re: [PATCH v2 2/2] x86/sev: let sev_es_efi_map_ghcbs map the caa
+ pages too
+Message-ID: <20250624130158.GIaFqhxjE8-lQqq7mt@fat_crate.local>
+References: <20250602105050.1535272-1-kraxel@redhat.com>
+ <20250602105050.1535272-3-kraxel@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250611104844.245235-29-steven.price@arm.com>
+In-Reply-To: <20250602105050.1535272-3-kraxel@redhat.com>
 
-On Wed, Jun 11, 2025 at 11:48:25AM +0100, Steven Price wrote:
-> From: Suzuki K Poulose <suzuki.poulose@arm.com>
-> 
-> Given we have different types of VMs supported, check the
-> support for SVE for the given instance of the VM to accurately
-> report the status.
-> 
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
+I got this now:
 
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+---
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 2 Jun 2025 12:50:49 +0200
+Subject: [PATCH] x86/sev: Let sev_es_efi_map_ghcbs() map the caa pages too
 
-> ---
->  arch/arm64/include/asm/kvm_rme.h | 2 ++
->  arch/arm64/kvm/arm.c             | 5 ++++-
->  arch/arm64/kvm/rme.c             | 5 +++++
->  3 files changed, 11 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/asm/kvm_rme.h
-> index 2d7d7233c525..af5150c084ce 100644
-> --- a/arch/arm64/include/asm/kvm_rme.h
-> +++ b/arch/arm64/include/asm/kvm_rme.h
-> @@ -94,6 +94,8 @@ void kvm_init_rme(void);
->  u32 kvm_realm_ipa_limit(void);
->  u32 kvm_realm_vgic_nr_lr(void);
->  
-> +bool kvm_rme_supports_sve(void);
-> +
->  int kvm_realm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap);
->  int kvm_init_realm_vm(struct kvm *kvm);
->  void kvm_destroy_realm(struct kvm *kvm);
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 4eb229b6c315..d1ef12fe6176 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -426,7 +426,10 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  		r = get_kvm_ipa_limit();
->  		break;
->  	case KVM_CAP_ARM_SVE:
-> -		r = system_supports_sve();
-> +		if (kvm_is_realm(kvm))
-> +			r = kvm_rme_supports_sve();
-> +		else
-> +			r = system_supports_sve();
->  		break;
->  	case KVM_CAP_ARM_PTRAUTH_ADDRESS:
->  	case KVM_CAP_ARM_PTRAUTH_GENERIC:
-> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
-> index 5f1fdefc0364..6bd21223a8be 100644
-> --- a/arch/arm64/kvm/rme.c
-> +++ b/arch/arm64/kvm/rme.c
-> @@ -38,6 +38,11 @@ static bool rme_has_feature(unsigned long feature)
->  	return !!u64_get_bits(rmm_feat_reg0, feature);
->  }
->  
-> +bool kvm_rme_supports_sve(void)
-> +{
-> +	return rme_has_feature(RMI_FEATURE_REGISTER_0_SVE_EN);
-> +}
-> +
->  static int rmi_check_version(void)
->  {
->  	struct arm_smccc_res res;
-> -- 
-> 2.43.0
-> 
+OVMF EFI firmware needs access to the CAA page to do SVSM protocol calls. For
+example, when the SVSM implements an EFI variable store, such calls will be
+necessary.
+
+So add that to sev_es_efi_map_ghcbs() and also rename the function to reflect
+the additional job it is doing now.
+
+  [ bp: Massage. ]
+
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Signed-off-by: Borislav Petkov (AMD) <bp@alien8.de>
+Link: https://lore.kernel.org/20250602105050.1535272-3-kraxel@redhat.com
+---
+ arch/x86/coco/sev/core.c       | 15 +++++++++++++--
+ arch/x86/include/asm/sev.h     |  4 ++--
+ arch/x86/platform/efi/efi_64.c |  4 ++--
+ 3 files changed, 17 insertions(+), 6 deletions(-)
+
+diff --git a/arch/x86/coco/sev/core.c b/arch/x86/coco/sev/core.c
+index 8375ca7fbd8a..6af3e94ba0ee 100644
+--- a/arch/x86/coco/sev/core.c
++++ b/arch/x86/coco/sev/core.c
+@@ -1045,11 +1045,13 @@ int __init sev_es_setup_ap_jump_table(struct real_mode_header *rmh)
+  * This is needed by the OVMF UEFI firmware which will use whatever it finds in
+  * the GHCB MSR as its GHCB to talk to the hypervisor. So make sure the per-cpu
+  * runtime GHCBs used by the kernel are also mapped in the EFI page-table.
++ *
++ * When running under SVSM the CCA page is needed too, so map it as well.
+  */
+-int __init sev_es_efi_map_ghcbs(pgd_t *pgd)
++int __init sev_es_efi_map_ghcbs_caas(pgd_t *pgd)
+ {
++	unsigned long address, pflags, pflags_enc;
+ 	struct sev_es_runtime_data *data;
+-	unsigned long address, pflags;
+ 	int cpu;
+ 	u64 pfn;
+ 
+@@ -1057,6 +1059,7 @@ int __init sev_es_efi_map_ghcbs(pgd_t *pgd)
+ 		return 0;
+ 
+ 	pflags = _PAGE_NX | _PAGE_RW;
++	pflags_enc = cc_mkenc(pflags);
+ 
+ 	for_each_possible_cpu(cpu) {
+ 		data = per_cpu(runtime_data, cpu);
+@@ -1066,6 +1069,14 @@ int __init sev_es_efi_map_ghcbs(pgd_t *pgd)
+ 
+ 		if (kernel_map_pages_in_pgd(pgd, pfn, address, 1, pflags))
+ 			return 1;
++
++		address = per_cpu(svsm_caa_pa, cpu);
++		if (!address)
++			return 1;
++
++		pfn = address >> PAGE_SHIFT;
++		if (kernel_map_pages_in_pgd(pgd, pfn, address, 1, pflags_enc))
++			return 1;
+ 	}
+ 
+ 	return 0;
+diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
+index fbb616fcbfb8..5b809f0ef207 100644
+--- a/arch/x86/include/asm/sev.h
++++ b/arch/x86/include/asm/sev.h
+@@ -446,7 +446,7 @@ static __always_inline void sev_es_nmi_complete(void)
+ 	    cc_platform_has(CC_ATTR_GUEST_STATE_ENCRYPT))
+ 		__sev_es_nmi_complete();
+ }
+-extern int __init sev_es_efi_map_ghcbs(pgd_t *pgd);
++extern int __init sev_es_efi_map_ghcbs_caas(pgd_t *pgd);
+ extern void sev_enable(struct boot_params *bp);
+ 
+ /*
+@@ -554,7 +554,7 @@ static inline void sev_es_ist_enter(struct pt_regs *regs) { }
+ static inline void sev_es_ist_exit(void) { }
+ static inline int sev_es_setup_ap_jump_table(struct real_mode_header *rmh) { return 0; }
+ static inline void sev_es_nmi_complete(void) { }
+-static inline int sev_es_efi_map_ghcbs(pgd_t *pgd) { return 0; }
++static inline int sev_es_efi_map_ghcbs_caas(pgd_t *pgd) { return 0; }
+ static inline void sev_enable(struct boot_params *bp) { }
+ static inline int pvalidate(unsigned long vaddr, bool rmp_psize, bool validate) { return 0; }
+ static inline int rmpadjust(unsigned long vaddr, bool rmp_psize, unsigned long attrs) { return 0; }
+diff --git a/arch/x86/platform/efi/efi_64.c b/arch/x86/platform/efi/efi_64.c
+index e7e8f77f77f8..97e8032db45d 100644
+--- a/arch/x86/platform/efi/efi_64.c
++++ b/arch/x86/platform/efi/efi_64.c
+@@ -216,8 +216,8 @@ int __init efi_setup_page_tables(unsigned long pa_memmap, unsigned num_pages)
+ 	 * When SEV-ES is active, the GHCB as set by the kernel will be used
+ 	 * by firmware. Create a 1:1 unencrypted mapping for each GHCB.
+ 	 */
+-	if (sev_es_efi_map_ghcbs(pgd)) {
+-		pr_err("Failed to create 1:1 mapping for the GHCBs!\n");
++	if (sev_es_efi_map_ghcbs_caas(pgd)) {
++		pr_err("Failed to create 1:1 mapping for the GHCBs and CAAs!\n");
+ 		return 1;
+ 	}
+ 
+-- 
+2.43.0
+
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
