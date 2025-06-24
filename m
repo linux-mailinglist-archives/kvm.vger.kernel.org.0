@@ -1,198 +1,178 @@
-Return-Path: <kvm+bounces-50451-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50452-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D7D0AE5D56
-	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 09:03:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD2F0AE5D63
+	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 09:05:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 513A81B61CF6
-	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 07:03:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 775F44A0BA5
+	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 07:05:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3EC625393A;
-	Tue, 24 Jun 2025 07:03:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C9B0372;
+	Tue, 24 Jun 2025 07:05:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YdCNEjXQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BD24227E8F;
-	Tue, 24 Jun 2025 07:03:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5867220A5D8
+	for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 07:05:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750748590; cv=none; b=HW9XjA1Jvw8FMkwKqNFMbhN+bp8aXFO0f9fPs2n5kiApiQRC1E97xO2AGaCLc7kKeBk2Uv0d5oQ58okZzD7VE+nZN/1Mr75blMXRq/0kN9BhePD1h9DKy15y4kn6MBLLAv88xctNsChr6RHS7WkSHiQkZCvA2tdiee+5QItpSAw=
+	t=1750748724; cv=none; b=EBnOvvEa1tbd+GmV8jofRp9gpP5uI2T9fNFcQx4jbuurnj4YHAirZuX+L3uRMTiYOZgy0RmMWfjoeCH53nWpPaM63cxUmNnEJY4tlHpa6xxekYHAttmocwRPxhj4cRv9K7lf6hCWBOKtNtvrwvAGAlpKv9mBk6781+LsM8FL6aY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750748590; c=relaxed/simple;
-	bh=F5wbZ0hJ0JoYIWdMRRqSqMD0TydLNMWlujeCLdfcppU=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=rqoI2G77VI+rH0TqjIQ0YAEDzmVu5T7vl4BH+UFk3rUsx39Vw/r2rp7Aep/IWoYHh9KQEezQcVJfFQ53vZfgU+aRzLlPlumQ2yn13fapWksIpXcUPG4A3/AV/F/qj9tX39SZZ0wE+xENhiqYeixqtoYT9o3Eongro0eR70v6rVY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4bRG990pWsz6DB68;
-	Tue, 24 Jun 2025 15:02:21 +0800 (CST)
-Received: from frapeml100007.china.huawei.com (unknown [7.182.85.133])
-	by mail.maildlp.com (Postfix) with ESMTPS id E90FC1404A6;
-	Tue, 24 Jun 2025 15:03:04 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (7.182.85.71) by
- frapeml100007.china.huawei.com (7.182.85.133) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 24 Jun 2025 09:03:04 +0200
-Received: from frapeml500008.china.huawei.com ([7.182.85.71]) by
- frapeml500008.china.huawei.com ([7.182.85.71]) with mapi id 15.01.2507.039;
- Tue, 24 Jun 2025 09:03:04 +0200
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: liulongfang <liulongfang@huawei.com>, "alex.williamson@redhat.com"
-	<alex.williamson@redhat.com>, "jgg@nvidia.com" <jgg@nvidia.com>, "Jonathan
- Cameron" <jonathan.cameron@huawei.com>
-CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linuxarm@openeuler.org" <linuxarm@openeuler.org>
-Subject: RE: [PATCH v4 1/3] migration: update BAR space size
-Thread-Topic: [PATCH v4 1/3] migration: update BAR space size
-Thread-Index: AQHb2dGm67ktikNh8k6km+yGJfGW1bQR963A
-Date: Tue, 24 Jun 2025 07:03:04 +0000
-Message-ID: <3ec5ffdee2f64c74a82093c06612f59b@huawei.com>
-References: <20250610063251.27526-1-liulongfang@huawei.com>
- <20250610063251.27526-2-liulongfang@huawei.com>
-In-Reply-To: <20250610063251.27526-2-liulongfang@huawei.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1750748724; c=relaxed/simple;
+	bh=uCj01wXJRSXVsrZB3o811ZhTorLLjK4lSt9J6v1K598=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mr7pfE708T00+ULE5V0kpamYuBD5lqFGEzC8Ve1NwAjtzSuRtX38zNWp+w7CiPXOQrUgJxkHXnTc9WlpWLWAlTJbS/vpeXWLf+0RQgfhtX49JWKO17Iibfm3D2H7E3JsoZAzoNaR+NC66e/qHSYKBUPf+Y+zPd4l7finCFXc1AQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YdCNEjXQ; arc=none smtp.client-ip=95.215.58.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Tue, 24 Jun 2025 00:05:07 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1750748720;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Rvl+LfkUxz42F+u2AhuU0DC7MpN+KcVkghfyXMKrAJU=;
+	b=YdCNEjXQf9Nhf5KzU5i8ggHBOyIXgK50+X3MqptwbGqKbrP84GlAPmVg79d0ScGVzHNWqI
+	9KAlGO56nfnuIB3W0BcRK3X5GneOcZB9c6cWMPJsMsmV7O7M5uCWupxxC81piynZV/OZ4M
+	jVC45rQOrDmJbnTY2tgEni5IU6Cvt4M=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Colton Lewis <coltonlewis@google.com>
+Cc: kvm@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net,
+	linux@armlinux.org.uk, catalin.marinas@arm.com, will@kernel.org,
+	maz@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, mark.rutland@arm.com, shuah@kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v2 07/23] perf: arm_pmuv3: Introduce method to partition
+ the PMU
+Message-ID: <aFpOI7cWTOAIjNjV@linux.dev>
+References: <aFYFqrYRsmCi6oii@linux.dev>
+ <gsntpleu9uvx.fsf@coltonlewis-kvm.c.googlers.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <gsntpleu9uvx.fsf@coltonlewis-kvm.c.googlers.com>
+X-Migadu-Flow: FLOW_OUT
 
+On Mon, Jun 23, 2025 at 06:26:42PM +0000, Colton Lewis wrote:
+> Oliver Upton <oliver.upton@linux.dev> writes:
+> 
+> > On Fri, Jun 20, 2025 at 10:13:07PM +0000, Colton Lewis wrote:
+> > > For PMUv3, the register field MDCR_EL2.HPMN partitiones the PMU
+> > > counters into two ranges where counters 0..HPMN-1 are accessible by
+> > > EL1 and, if allowed, EL0 while counters HPMN..N are only accessible by
+> > > EL2.
+> 
+> > > Create module parameters partition_pmu and reserved_guest_counters to
+> > > reserve a number of counters for the guest. These numbers are set at
+> > > boot because the perf subsystem assumes the number of counters will
+> > > not change after the PMU is probed.
+> 
+> > > Introduce the function armv8pmu_partition() to modify the PMU driver's
+> > > cntr_mask of available counters to exclude the counters being reserved
+> > > for the guest and record reserved_guest_counters as the maximum
+> > > allowable value for HPMN.
+> 
+> > > Due to the difficulty this feature would create for the driver running
+> > > at EL1 on the host, partitioning is only allowed in VHE mode. Working
+> > > on nVHE mode would require a hypercall for every counter access in the
+> > > driver because the counters reserved for the host by HPMN are only
+> > > accessible to EL2.
+> 
+> > > Signed-off-by: Colton Lewis <coltonlewis@google.com>
+> > > ---
+> > >   arch/arm/include/asm/arm_pmuv3.h   | 10 ++++
+> > >   arch/arm64/include/asm/arm_pmuv3.h |  5 ++
+> > >   drivers/perf/arm_pmuv3.c           | 95 +++++++++++++++++++++++++++++-
+> > >   include/linux/perf/arm_pmu.h       |  1 +
+> > >   4 files changed, 109 insertions(+), 2 deletions(-)
+> 
+> > > diff --git a/arch/arm/include/asm/arm_pmuv3.h
+> > > b/arch/arm/include/asm/arm_pmuv3.h
+> > > index 2ec0e5e83fc9..9dc43242538c 100644
+> > > --- a/arch/arm/include/asm/arm_pmuv3.h
+> > > +++ b/arch/arm/include/asm/arm_pmuv3.h
+> > > @@ -228,6 +228,11 @@ static inline bool kvm_set_pmuserenr(u64 val)
+> 
+> > >   static inline void kvm_vcpu_pmu_resync_el0(void) {}
+> 
+> > > +static inline bool has_vhe(void)
+> > > +{
+> > > +	return false;
+> > > +}
+> > > +
+> 
+> > This has nothing to do with PMUv3, I'm a bit surprised to see you're
+> > touching 32-bit ARM. Can you just gate the whole partitioning thing on
+> > arm64?
+> 
+> The PMUv3 driver also has to compile on 32-bit ARM.
 
+Quite aware.
 
-> -----Original Message-----
-> From: liulongfang <liulongfang@huawei.com>
-> Sent: Tuesday, June 10, 2025 7:33 AM
-> To: alex.williamson@redhat.com; jgg@nvidia.com; Shameerali Kolothum
-> Thodi <shameerali.kolothum.thodi@huawei.com>; Jonathan Cameron
-> <jonathan.cameron@huawei.com>
-> Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
-> linuxarm@openeuler.org; liulongfang <liulongfang@huawei.com>
-> Subject: [PATCH v4 1/3] migration: update BAR space size
->=20
-> On the new hardware platform, the live migration configuration region
-> is moved from VF to PF. The VF's own configuration space is
-> restored to the complete 64KB, and there is no need to divide the
-> size of the BAR configuration space equally.
->=20
-> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
-> ---
->  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 36 ++++++++++++++-----
->  1 file changed, 27 insertions(+), 9 deletions(-)
->=20
-> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> index 2149f49aeec7..b16115f590fd 100644
-> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> @@ -1250,6 +1250,28 @@ static struct hisi_qm *hisi_acc_get_pf_qm(struct
-> pci_dev *pdev)
->  	return !IS_ERR(pf_qm) ? pf_qm : NULL;
->  }
->=20
-> +static size_t hisi_acc_get_resource_len(struct vfio_pci_core_device *vde=
-v,
-> +					unsigned int index)
-> +{
-> +	struct hisi_acc_vf_core_device *hisi_acc_vdev =3D
-> +			hisi_acc_drvdata(vdev->pdev);
-> +
-> +	/*
-> +	 * On the old HW_V3 device, the ACC VF device BAR2
-> +	 * region encompasses both functional register space
-> +	 * and migration control register space.
-> +	 * only the functional region should be report to Guest.
-> +	 *
-> +	 * On the new HW device, the migration control register
-> +	 * has been moved to the PF device BAR2 region.
-> +	 * The VF device BAR2 is entirely functional register space.
-> +	 */
-> +	if (hisi_acc_vdev->pf_qm->ver =3D=3D QM_HW_V3)
-> +		return (pci_resource_len(vdev->pdev, index) >> 1);
-> +
-> +	return pci_resource_len(vdev->pdev, index);
-> +}
-> +
->  static int hisi_acc_pci_rw_access_check(struct vfio_device *core_vdev,
->  					size_t count, loff_t *ppos,
->  					size_t *new_count)
-> @@ -1260,8 +1282,9 @@ static int hisi_acc_pci_rw_access_check(struct
-> vfio_device *core_vdev,
->=20
->  	if (index =3D=3D VFIO_PCI_BAR2_REGION_INDEX) {
->  		loff_t pos =3D *ppos & VFIO_PCI_OFFSET_MASK;
-> -		resource_size_t end =3D pci_resource_len(vdev->pdev, index) /
-> 2;
-> +		resource_size_t end;
->=20
-> +		end =3D hisi_acc_get_resource_len(vdev, index);
->  		/* Check if access is for migration control region */
->  		if (pos >=3D end)
->  			return -EINVAL;
-> @@ -1282,8 +1305,9 @@ static int hisi_acc_vfio_pci_mmap(struct
-> vfio_device *core_vdev,
->  	index =3D vma->vm_pgoff >> (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT);
->  	if (index =3D=3D VFIO_PCI_BAR2_REGION_INDEX) {
->  		u64 req_len, pgoff, req_start;
-> -		resource_size_t end =3D pci_resource_len(vdev->pdev, index) /
-> 2;
-> +		resource_size_t end;
->=20
-> +		end =3D PAGE_ALIGN(hisi_acc_get_resource_len(vdev, index));
+> My first series had the partitioning code in arch/arm64 but you asked me
+> to move it to the PMUv3 driver.
+> 
+> How are you suggesting I square those two requirements?
 
-I think I have commented on this before. The above PAGE_ALIGN will change t=
-he=20
-behavior on HW_V3 with 64K PAGE_SIZE kernel. The end will become 64K which
-is not what we want on HW_V3. Could you please check that again.
+You should try to structure your predicates in such a way that the
+partitioning stuff all resolves to false for 32 bit arm, generally. That
+way we can avoid stubbing out silly things like has_vhe() which doesn't
+make sense in the context of 32 bit.
+
+> > > +static bool partition_pmu __read_mostly;
+> > > +static u8 reserved_guest_counters __read_mostly;
+> > > +
+> > > +module_param(partition_pmu, bool, 0);
+> > > +MODULE_PARM_DESC(partition_pmu,
+> > > +		 "Partition the PMU into host and guest VM counters [y/n]");
+> > > +
+> > > +module_param(reserved_guest_counters, byte, 0);
+> > > +MODULE_PARM_DESC(reserved_guest_counters,
+> > > +		 "How many counters to reserve for guest VMs [0-$NR_COUNTERS]");
+> > > +
+> 
+> > This is confusing and not what we discussed offline.
+> 
+> > Please use a single parameter that describes the number of counters used
+> > by the *host*. This affects the *host* PMU driver, KVM can discover (and
+> > use) the leftovers.
+> 
+> > If the single module parameter goes unspecified the user did not ask for
+> > PMU partitioning.
+> 
+> I understand what we discussed offline, but I had a dilemma.
+> 
+> If we do a single module parameter for number of counters used by the
+> host, then it defaults to 0 if unset and there is no way to distinguish
+> between no partitioning and a request for partitioning reserving 0
+> counters to the host which I also thought you requested. Would you be
+> happy leaving no way to specify that?
+
+You can make the command line use a signed integer for storage and a
+reset value of -1.
+
+-1 would imply default behavior (no partitioning) and a non-negative
+value would imply partitioning.
+
+> In any case, I think the usage is more self explainatory if
+> partitition=[y/n] is a separate bit.
+
+What would be the user's intent of "partition_pmu=n reserved_guest_counters=$X"?
 
 Thanks,
-Shameer
-
->  		req_len =3D vma->vm_end - vma->vm_start;
->  		pgoff =3D vma->vm_pgoff &
->  			((1U << (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT)) - 1);
-> @@ -1330,7 +1354,6 @@ static long hisi_acc_vfio_pci_ioctl(struct
-> vfio_device *core_vdev, unsigned int
->  	if (cmd =3D=3D VFIO_DEVICE_GET_REGION_INFO) {
->  		struct vfio_pci_core_device *vdev =3D
->  			container_of(core_vdev, struct vfio_pci_core_device,
-> vdev);
-> -		struct pci_dev *pdev =3D vdev->pdev;
->  		struct vfio_region_info info;
->  		unsigned long minsz;
->=20
-> @@ -1345,12 +1368,7 @@ static long hisi_acc_vfio_pci_ioctl(struct
-> vfio_device *core_vdev, unsigned int
->  		if (info.index =3D=3D VFIO_PCI_BAR2_REGION_INDEX) {
->  			info.offset =3D
-> VFIO_PCI_INDEX_TO_OFFSET(info.index);
->=20
-> -			/*
-> -			 * ACC VF dev BAR2 region consists of both
-> functional
-> -			 * register space and migration control register
-> space.
-> -			 * Report only the functional region to Guest.
-> -			 */
-> -			info.size =3D pci_resource_len(pdev, info.index) / 2;
-> +			info.size =3D hisi_acc_get_resource_len(vdev,
-> info.index);
->=20
->  			info.flags =3D VFIO_REGION_INFO_FLAG_READ |
->  					VFIO_REGION_INFO_FLAG_WRITE |
-> --
-> 2.24.0
-
+Oliver
 
