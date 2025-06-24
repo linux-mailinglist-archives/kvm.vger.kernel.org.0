@@ -1,153 +1,160 @@
-Return-Path: <kvm+bounces-50571-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50572-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95E4BAE70F6
-	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 22:37:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2432BAE70FF
+	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 22:45:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 20EB33AA194
-	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 20:37:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4EC251BC02C7
+	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 20:45:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CCE82EA47E;
-	Tue, 24 Jun 2025 20:37:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99B592EACF2;
+	Tue, 24 Jun 2025 20:45:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OZPDxSLW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DdnrfDP1"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C08723FB1B
-	for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 20:37:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D4193FB1B;
+	Tue, 24 Jun 2025 20:45:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750797456; cv=none; b=uDE5ME3QeA/MDBCm/y52HXYQUczqkbleChQIYOuDBFQrXP2vhvgFC1OyhxpsTeicJL7UNgQnmZuNrDJPB+j2ALiew/ovGy4Lw8pBcGBo7cQaDc5aQKznXOwh9wJKQ83Xy3pUyj+YwnMF8yl2S/FjHND1XHn1UpzACoPDcH+82pA=
+	t=1750797900; cv=none; b=pYs7gQ2Tm8aeOj96e48umWuRX4mFE/VSiFmEWiGzT8Iht7/BBGTn8I9Br5ey1VPb04sIzk6R8hY7Ubc8LQEoSYB6P8deGctavrvMqT1jA1YQ4Iio5Nu/ieAitFfjEIioPsihj6eSV+3PH9RmN+9LVZdia+KYbuv6QEG09iwfPtg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750797456; c=relaxed/simple;
-	bh=0Xmn1uuMhDiiBO05TyWDJfrX1cm44KxsQolkC8UP5n8=;
+	s=arc-20240116; t=1750797900; c=relaxed/simple;
+	bh=AoFPMCIxkttPg56+0un4riAb99bPvrJcXHuKXirc4kE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Sdk29j5S1lwcvHRxA2YgQJYqpYdI/nDFI2cxtLFFqk/0XAtBtIdS4M+cZ54FvAWTxYFeJcqBEJZUkUCH65s13It64HQ5S+1iGR5D3kBP4uSDeMAJVkeIjFy5VAx2T4vl3e+XXczAGOSk2feNzlSSZMkHaUJCFrzGVyJhmcfLDxY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OZPDxSLW; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750797453;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6yxMqBKwP1JxoQEpLOHCxLcmo0QA6v2itUNxKEqsozo=;
-	b=OZPDxSLWoLJwPZry3vWA0gEFyxd9IENV45ktIAARuOZAZ3ZisrQaHsPa5jlcOQIVAif7UT
-	4bWq8kLmygfcHFAXNi1aa1dvqp8EmgRT79rfhhf0Trfr0vveNyK0VPL4sVfl3iTaHi0Dnz
-	ZKGcexauImovXb9fIvKBiHIzkHP46ww=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-31-W7f3bsTtMsG3w9sVdkVmqg-1; Tue, 24 Jun 2025 16:37:32 -0400
-X-MC-Unique: W7f3bsTtMsG3w9sVdkVmqg-1
-X-Mimecast-MFC-AGG-ID: W7f3bsTtMsG3w9sVdkVmqg_1750797452
-Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-7c5e2a31f75so200108385a.1
-        for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 13:37:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750797452; x=1751402252;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6yxMqBKwP1JxoQEpLOHCxLcmo0QA6v2itUNxKEqsozo=;
-        b=PZchRLKS+KAWJ24mA703u02++mxhr+1lNqe0brKzOqOKDE+smvM3lzcdQAjhle8opT
-         ZVbIamdvVI5cX+6ZCmSbtZ8Aq+XS/5kiJbDYCAN/hcX2co5CmGDmzzDIxmWb5Kmx/Mio
-         p/mykhMmYBy9pwZq9e49pXbmdNrryGs7P59grxUtSWkeYiI91oQw+zhHuFK925RPnRmM
-         uLVR5B1FuBWb/o/9ZOLU3+gnHq/X6U8y3Pb2iBQKn5ZFoqb0/J8brqVQt0pKsrqlMy7S
-         dbb4K7Jic/bxm7sq4InCt3BDWpW453Nn35xXCXlG6QKgvHGPlS5sjd4hXBAlpXO1qc+o
-         jiRQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXZybjjfhdOtnku4/UC+o8XIdHh3O1rpmZFPCbi7R4+9BDKUM05z6rCEQxonV7LyIB0NTM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxKAAcN/Jf/6OKJXULFEEDQtj1IgA6P70JbDsuVaQZsB+WbvCee
-	W1Yjx/4NcxvPP+CMz/erMlxvbL5cYRbuY38wdQMLVvsVBLt42eqqwRBZ4AlmBz8H2gq76kF3fp7
-	6ej+orWk99di+5J0fgB1DT26Fm9WUqLUswlduBO1K0hNSKJ/7fEEf5yz73jcHLw==
-X-Gm-Gg: ASbGncsgjeQiLfUgy+Kg4sUWIv//jRNhoQU/F3aDGk0H5cYa9FrVcnFP8E+MskB1OXn
-	0e59yPMI79eilHnJQ52FeXusxF8YSFXOmIteikQfVgwAABBukLuBpMQ82K2jQdAibl+FJa5pQsm
-	1YaKg66jahft6BHbG8czt8pUeCZ56x1x2lqHrLi98N1U9SonJIA/BrLu81/aW5TVudneXiUL6qs
-	1JP65dz3nRVxCMEHBLUop5J2oeXp+Z8+Q9l+3FMqMeU8AZwUT05k/EBbWBCK9gKP1Ol4izIxOMx
-	Lt4LOVYPcoYeIw==
-X-Received: by 2002:a05:620a:4245:b0:7d4:2868:89ea with SMTP id af79cd13be357-7d4296ca006mr71567585a.4.1750797451598;
-        Tue, 24 Jun 2025 13:37:31 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFJhrZbzSf4nFQrc7HvgOH4lF63QunCi8blfM0+NnlfUmmge32P6rWG9OyIu4U5ZJRiNzQrZw==
-X-Received: by 2002:a05:620a:4245:b0:7d4:2868:89ea with SMTP id af79cd13be357-7d4296ca006mr71563085a.4.1750797451009;
-        Tue, 24 Jun 2025 13:37:31 -0700 (PDT)
-Received: from x1.local ([85.131.185.92])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6fd09576766sm60648376d6.81.2025.06.24.13.37.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Jun 2025 13:37:30 -0700 (PDT)
-Date: Tue, 24 Jun 2025 16:37:26 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: "Liam R. Howlett" <Liam.Howlett@oracle.com>,
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	kvm@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Zi Yan <ziy@nvidia.com>, Alex Mastro <amastro@fb.com>,
-	David Hildenbrand <david@redhat.com>,
-	Nico Pache <npache@redhat.com>
-Subject: Re: [PATCH 5/5] vfio-pci: Best-effort huge pfnmaps with !MAP_FIXED
- mappings
-Message-ID: <aFsMhnejq4fq6L8N@x1.local>
-References: <20250616230011.GS1174925@nvidia.com>
- <aFHWbX_LTjcRveVm@x1.local>
- <20250617231807.GD1575786@nvidia.com>
- <aFH76GjnWfeHI5fA@x1.local>
- <aFLvodROFN9QwvPp@x1.local>
- <20250618174641.GB1629589@nvidia.com>
- <aFMQZru7l2aKVsZm@x1.local>
- <20250619135852.GC1643312@nvidia.com>
- <aFQkxg08fs7jwXnJ@x1.local>
- <20250619184041.GA10191@nvidia.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=E8n4FQ+PTIjAD6taOMYxbl3zSjqh8jLajEoMHKfzWML4uTm3UG9fNFN2mGeMft8eUlZavbF526uO41CiZ+qLm5OBUgbZZIIKp79UxjIR6+As1ZwXCXWyy9Rf54Ea135nMxAg1an4e455TdN6IsYHYO/CWukWs4MxXBPNuF4SEK8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DdnrfDP1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96D80C4CEE3;
+	Tue, 24 Jun 2025 20:44:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750797900;
+	bh=AoFPMCIxkttPg56+0un4riAb99bPvrJcXHuKXirc4kE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=DdnrfDP1H9mNBSpD5Y2HOlveUi/wqHGE06OJbvGfgz9LAgedeeFvamygl27k74DLg
+	 z3wshVBWK9q1KHtT53hcQNy9dVSFLbDWB+b+9NhOzwT0OUGYBC7oCWwGP66REdulcR
+	 ExUvcH/dJKv6VUs1oqrteB9roCwoHyjNFixHjaKU0GQxtk+tEWDi7zPhYYlHYGwpRV
+	 AH5Qtf0XvLBOODaXlYkMBtEnvZHCbEpwgTE9Ypyt8oY/tYQ86nWLr99rpX+B/BdOVD
+	 m6cOd7LPHkd71mK4yhsI+SD46i8WHOe2lEHsrccjP1jJXfvEbmhSnBUZog9qwAK75k
+	 p0hUTMnVqPt5Q==
+Date: Tue, 24 Jun 2025 23:44:56 +0300
+From: Jarkko Sakkinen <jarkko@kernel.org>
+To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	"David S . Miller" <davem@davemloft.net>,
+	Andreas Larsson <andreas@gaisler.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	"H . Peter Anvin" <hpa@zytor.com>,
+	Andy Lutomirski <luto@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+	Kees Cook <kees@kernel.org>, Peter Xu <peterx@redhat.com>,
+	David Hildenbrand <david@redhat.com>, Zi Yan <ziy@nvidia.com>,
+	Baolin Wang <baolin.wang@linux.alibaba.com>,
+	"Liam R . Howlett" <Liam.Howlett@oracle.com>,
+	Nico Pache <npache@redhat.com>, Ryan Roberts <ryan.roberts@arm.com>,
+	Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>,
+	Xu Xin <xu.xin16@zte.com.cn>,
+	Chengming Zhou <chengming.zhou@linux.dev>,
+	Hugh Dickins <hughd@google.com>, Vlastimil Babka <vbabka@suse.cz>,
+	Mike Rapoport <rppt@kernel.org>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Michal Hocko <mhocko@suse.com>, Rik van Riel <riel@surriel.com>,
+	Harry Yoo <harry.yoo@oracle.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Matthew Wilcox <willy@infradead.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>, John Hubbard <jhubbard@nvidia.com>,
+	Muchun Song <muchun.song@linux.dev>,
+	Oscar Salvador <osalvador@suse.de>, Jann Horn <jannh@google.com>,
+	Pedro Falcato <pfalcato@suse.de>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Qi Zheng <zhengqi.arch@bytedance.com>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+	sparclinux@vger.kernel.org, linux-sgx@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	nvdimm@lists.linux.dev, linux-trace-kernel@vger.kernel.org
+Subject: Re: [PATCH 3/3] mm: update architecture and driver code to use
+ vm_flags_t
+Message-ID: <aFsOSL8hht-ZojTC@kernel.org>
+References: <cover.1750274467.git.lorenzo.stoakes@oracle.com>
+ <b6eb1894abc5555ece80bb08af5c022ef780c8bc.1750274467.git.lorenzo.stoakes@oracle.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250619184041.GA10191@nvidia.com>
+In-Reply-To: <b6eb1894abc5555ece80bb08af5c022ef780c8bc.1750274467.git.lorenzo.stoakes@oracle.com>
 
-On Thu, Jun 19, 2025 at 03:40:41PM -0300, Jason Gunthorpe wrote:
-> Even with this new version you have to decide to return PUD_SIZE or
-> bar_size in pci and your same reasoning that PUD_SIZE make sense
-> applies (though I would probably return bar_size and just let the core
-> code cap it to PUD_SIZE)
+On Wed, Jun 18, 2025 at 08:42:54PM +0100, Lorenzo Stoakes wrote:
+> --- a/arch/x86/kernel/cpu/sgx/encl.c
+> +++ b/arch/x86/kernel/cpu/sgx/encl.c
+> @@ -279,7 +279,7 @@ static struct sgx_encl_page *__sgx_encl_load_page(struct sgx_encl *encl,
+>  
+>  static struct sgx_encl_page *sgx_encl_load_page_in_vma(struct sgx_encl *encl,
+>  						       unsigned long addr,
+> -						       unsigned long vm_flags)
+> +						       vm_flags_t vm_flags)
+>  {
+>  	unsigned long vm_prot_bits = vm_flags & VM_ACCESS_FLAGS;
+>  	struct sgx_encl_page *entry;
+> @@ -520,9 +520,9 @@ static void sgx_vma_open(struct vm_area_struct *vma)
+>   * Return: 0 on success, -EACCES otherwise
+>   */
+>  int sgx_encl_may_map(struct sgx_encl *encl, unsigned long start,
+> -		     unsigned long end, unsigned long vm_flags)
+> +		     unsigned long end, vm_flags_t vm_flags)
+>  {
+> -	unsigned long vm_prot_bits = vm_flags & VM_ACCESS_FLAGS;
+> +	vm_flags_t vm_prot_bits = vm_flags & VM_ACCESS_FLAGS;
+>  	struct sgx_encl_page *page;
+>  	unsigned long count = 0;
+>  	int ret = 0;
+> @@ -605,7 +605,7 @@ static int sgx_encl_debug_write(struct sgx_encl *encl, struct sgx_encl_page *pag
+>   */
+>  static struct sgx_encl_page *sgx_encl_reserve_page(struct sgx_encl *encl,
+>  						   unsigned long addr,
+> -						   unsigned long vm_flags)
+> +						   vm_flags_t vm_flags)
+>  {
+>  	struct sgx_encl_page *entry;
+>  
+> diff --git a/arch/x86/kernel/cpu/sgx/encl.h b/arch/x86/kernel/cpu/sgx/encl.h
+> index f94ff14c9486..8ff47f6652b9 100644
+> --- a/arch/x86/kernel/cpu/sgx/encl.h
+> +++ b/arch/x86/kernel/cpu/sgx/encl.h
+> @@ -101,7 +101,7 @@ static inline int sgx_encl_find(struct mm_struct *mm, unsigned long addr,
+>  }
+>  
+>  int sgx_encl_may_map(struct sgx_encl *encl, unsigned long start,
+> -		     unsigned long end, unsigned long vm_flags);
+> +		     unsigned long end, vm_flags_t vm_flags);
+>  
+>  bool current_is_ksgxd(void);
+>  void sgx_encl_release(struct kref *ref);
+ 
+Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
 
-Yes.
-
-Today I went back to look at this, I was trying to introduce this for
-file_operations:
-
-	int (*get_mapping_order)(struct file *, unsigned long, size_t);
-
-It looks almost good, except that it so far has no way to return the
-physical address for further calculation on the alignment.
-
-For THP, VA is always calculated against pgoff not physical address on the
-alignment.  I think it's OK for THP, because every 2M THP folio will be
-naturally 2M aligned on the physical address, so it fits when e.g. pgoff=0
-in the calculation of thp_get_unmapped_area_vmflags().
-
-Logically it should even also work for vfio-pci, as long as VFIO keeps
-using the lower 40 bits of the device_fd to represent the bar offset,
-meanwhile it'll also require PCIe spec asking the PCI bars to be mapped
-aligned with bar sizes.
-
-But from an API POV, get_mapping_order() logically should return something
-for further calculation of the alignment to get the VA.  pgoff here may not
-always be the right thing to use to align to the VA: after all, pgtable
-mapping is about VA -> PA, the only reasonable and reliable way is to align
-VA to the PA to be mappped, and as an API we shouldn't assume pgoff is
-always aligned to PA address space.
-
-Any thoughts?
-
--- 
-Peter Xu
-
+BR, Jarkko
 
