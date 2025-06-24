@@ -1,141 +1,200 @@
-Return-Path: <kvm+bounces-50446-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50447-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDB9DAE5A88
-	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 05:35:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2ABB1AE5B76
+	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 06:17:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 70F714A63CB
-	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 03:35:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E9AC3B72BD
+	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 04:16:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78ED918CC15;
-	Tue, 24 Jun 2025 03:35:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B18D0226D1D;
+	Tue, 24 Jun 2025 04:16:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="VSP3bsz6"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="IOL4zxnU"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A1791552FA
-	for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 03:35:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8116F21B9F6;
+	Tue, 24 Jun 2025 04:16:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750736115; cv=none; b=GM5EYwWY4au7EG1s0Sy4vUQbUorQl4dV/Qp0qfxc68Q8iR86NMnlY4boPlF12DOvmCDypkOv6PJBDyOVNQNb1CXb5KBHmOrYJWzAwFhOYWP1bSMezQnOl0+zwlG7PuVlNJTU6bT+s9z8VuefHZ+6HjkJqUR+Ui8mlorcJzoqkuo=
+	t=1750738583; cv=none; b=EbIgIrY0Nc7zqbgYdAfNI0ZZWlC7tK6gMv4l5bDfzxbxX2bw8FqlB5TLTQByF8an0VQRG5kG7kkLKZNnpUlgg5n1Vc9LHYflsTWaXpITBAazcih6B9Ph0Jy810/s0W/btYyVvIJJGzK1J/TE3Jetyue3VGOYoM5bQPbyO+8k5kg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750736115; c=relaxed/simple;
-	bh=hhB7/K8S9WHkb0fZNu77e7zogyDJCakoXoJ2r6mokSE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uxMrjwtMtrK9CVT/Cb3eymNkdJ4muJAeIk8MZN9X75zPkOgKaPAhHpA37oCB+bSgHBwy+CXkJbPJt2QHdH+Eea7Sn+FlgGtOLCnvVN1BPv0hI+koL/K1KmsfsFlODdZZF30Mt23EYowYc4sYvjQH258c7L9ebRBLBWOat0id/XU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=VSP3bsz6; arc=none smtp.client-ip=95.215.58.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <b2d54872-1f09-41cb-9c58-1224bdb40793@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1750736112;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hZuOLpZ68g5i7iHvT9FAlUSft9dBr5Tjt7zYFAkD4lc=;
-	b=VSP3bsz6NiMLFUIi/hf0SKIpFZtYOxrYazmTwVLoy7kNHJnwmuITH/RXsI5ce2gUmt98sm
-	MbWxufR4ZbZcP6ULYOknO1Qns3aRyWRZvVDFdtM0p7oJ0IW6fiSg94x+b4uOuo82wk6j8g
-	yHiZD5sqxyzHYs4yueDjfRBNs18WdJM=
-Date: Mon, 23 Jun 2025 20:35:04 -0700
+	s=arc-20240116; t=1750738583; c=relaxed/simple;
+	bh=5G65DW5QVEJiCP6BevqgcMH4BJprL0i7tiSazmp4+XU=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=TxqnssdI9dhQ2FRis+EHfFp4Hm3bJrZos2lz1w9aOektwHqqzg5iL2cA6lUkk3ZviLHjZj9fooZrWi9KqCQw1t6qsgx0a2cOIFtii83e7v7nFq3lGhurxhsz7wmQUoefRl+qB6Iho25uDiNdBWh4QTLJ4gBUtsc/C5RXbccjtCI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=IOL4zxnU; arc=none smtp.client-ip=115.124.30.99
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1750738571; h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
+	bh=rax2iaNWOHCKSTHeRONdpsloXVAQJACyDqlDlmBHKYA=;
+	b=IOL4zxnUhxUMIfdtwOPU4ubp9N+hGmb4m52ei0x5WEB8nWp4ESIgh4FpP/qRvd+Gf9WxzgGyBn/T2Rfemf9tsCa+MQBD4fHFyUR3LTmz8LYh6XtqtMf8unx5DFn0ZALwXJCkFcNuvC+1mn1d2l/idKvXWY/enCK4rSeZOI9ZjBY=
+Received: from DESKTOP-5N7EMDA(mailfrom:ying.huang@linux.alibaba.com fp:SMTPD_---0Wef2ct8_1750738566 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Tue, 24 Jun 2025 12:16:08 +0800
+From: "Huang, Ying" <ying.huang@linux.alibaba.com>
+To: Shivank Garg <shivankg@amd.com>
+Cc: <seanjc@google.com>,  <david@redhat.com>,  <vbabka@suse.cz>,
+  <willy@infradead.org>,  <akpm@linux-foundation.org>,  <shuah@kernel.org>,
+  <pbonzini@redhat.com>,  <brauner@kernel.org>,  <viro@zeniv.linux.org.uk>,
+  <ackerleytng@google.com>,  <paul@paul-moore.com>,  <jmorris@namei.org>,
+  <serge@hallyn.com>,  <pvorel@suse.cz>,  <bfoster@redhat.com>,
+  <tabba@google.com>,  <vannapurve@google.com>,  <chao.gao@intel.com>,
+  <bharata@amd.com>,  <nikunj@amd.com>,  <michael.day@amd.com>,
+  <yan.y.zhao@intel.com>,  <Neeraj.Upadhyay@amd.com>,
+  <thomas.lendacky@amd.com>,  <michael.roth@amd.com>,  <aik@amd.com>,
+  <jgg@nvidia.com>,  <kalyazin@amazon.com>,  <peterx@redhat.com>,
+  <jack@suse.cz>,  <rppt@kernel.org>,  <hch@infradead.org>,
+  <cgzones@googlemail.com>,  <ira.weiny@intel.com>,  <rientjes@google.com>,
+  <roypat@amazon.co.uk>,  <ziy@nvidia.com>,  <matthew.brost@intel.com>,
+  <joshua.hahnjy@gmail.com>,  <rakie.kim@sk.com>,  <byungchul@sk.com>,
+  <gourry@gourry.net>,  <kent.overstreet@linux.dev>,  <apopple@nvidia.com>,
+  <chao.p.peng@intel.com>,  <amit@infradead.org>,  <ddutile@redhat.com>,
+  <dan.j.williams@intel.com>,  <ashish.kalra@amd.com>,  <gshan@redhat.com>,
+  <jgowans@amazon.com>,  <pankaj.gupta@amd.com>,  <papaluri@amd.com>,
+  <yuzhao@google.com>,  <suzuki.poulose@arm.com>,
+  <quic_eberman@quicinc.com>,  <aneeshkumar.kizhakeveetil@arm.com>,
+  <linux-fsdevel@vger.kernel.org>,  <linux-mm@kvack.org>,
+  <linux-kernel@vger.kernel.org>,  <linux-security-module@vger.kernel.org>,
+  <kvm@vger.kernel.org>,  <linux-kselftest@vger.kernel.org>,
+  <linux-coco@lists.linux.dev>
+Subject: Re: [RFC PATCH v8 5/7] KVM: guest_memfd: Add slab-allocated inode
+ cache
+In-Reply-To: <20250618112935.7629-6-shivankg@amd.com> (Shivank Garg's message
+	of "Wed, 18 Jun 2025 11:29:33 +0000")
+References: <20250618112935.7629-1-shivankg@amd.com>
+	<20250618112935.7629-6-shivankg@amd.com>
+Date: Tue, 24 Jun 2025 12:16:06 +0800
+Message-ID: <87ecv9ojuh.fsf@DESKTOP-5N7EMDA>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v3 02/12] RISC-V: KVM: Drop the return value of
- kvm_riscv_vcpu_aia_init()
-To: Anup Patel <apatel@ventanamicro.com>
-Cc: Palmer Dabbelt <palmer@dabbelt.com>,
- Paul Walmsley <paul.walmsley@sifive.com>, Alexandre Ghiti <alex@ghiti.fr>,
- Andrew Jones <ajones@ventanamicro.com>, Anup Patel <anup@brainfault.org>,
- kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
- linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
- Nutty Liu <liujingqi@lanxincomputing.com>
-References: <20250618113532.471448-1-apatel@ventanamicro.com>
- <20250618113532.471448-3-apatel@ventanamicro.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Atish Patra <atish.patra@linux.dev>
-In-Reply-To: <20250618113532.471448-3-apatel@ventanamicro.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=ascii
 
+Shivank Garg <shivankg@amd.com> writes:
 
-On 6/18/25 4:35 AM, Anup Patel wrote:
-> The kvm_riscv_vcpu_aia_init() does not return any failure so drop
-> the return value which is always zero.
+> Add dedicated inode structure (kvm_gmem_inode_info) and slab-allocated
+> inode cache for guest memory backing, similar to how shmem handles inodes.
 >
-> Reviewed-by: Nutty Liu<liujingqi@lanxincomputing.com>
-> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
+> This adds the necessary allocation/destruction functions and prepares
+> for upcoming guest_memfd NUMA policy support changes.
+>
+> Signed-off-by: Shivank Garg <shivankg@amd.com>
 > ---
->   arch/riscv/include/asm/kvm_aia.h | 2 +-
->   arch/riscv/kvm/aia_device.c      | 6 ++----
->   arch/riscv/kvm/vcpu.c            | 4 +---
->   3 files changed, 4 insertions(+), 8 deletions(-)
+>  virt/kvm/guest_memfd.c | 51 ++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 51 insertions(+)
 >
-> diff --git a/arch/riscv/include/asm/kvm_aia.h b/arch/riscv/include/asm/kvm_aia.h
-> index 3b643b9efc07..0a0f12496f00 100644
-> --- a/arch/riscv/include/asm/kvm_aia.h
-> +++ b/arch/riscv/include/asm/kvm_aia.h
-> @@ -147,7 +147,7 @@ int kvm_riscv_vcpu_aia_rmw_ireg(struct kvm_vcpu *vcpu, unsigned int csr_num,
->   
->   int kvm_riscv_vcpu_aia_update(struct kvm_vcpu *vcpu);
->   void kvm_riscv_vcpu_aia_reset(struct kvm_vcpu *vcpu);
-> -int kvm_riscv_vcpu_aia_init(struct kvm_vcpu *vcpu);
-> +void kvm_riscv_vcpu_aia_init(struct kvm_vcpu *vcpu);
->   void kvm_riscv_vcpu_aia_deinit(struct kvm_vcpu *vcpu);
->   
->   int kvm_riscv_aia_inject_msi_by_id(struct kvm *kvm, u32 hart_index,
-> diff --git a/arch/riscv/kvm/aia_device.c b/arch/riscv/kvm/aia_device.c
-> index 806c41931cde..b195a93add1c 100644
-> --- a/arch/riscv/kvm/aia_device.c
-> +++ b/arch/riscv/kvm/aia_device.c
-> @@ -509,12 +509,12 @@ void kvm_riscv_vcpu_aia_reset(struct kvm_vcpu *vcpu)
->   	kvm_riscv_vcpu_aia_imsic_reset(vcpu);
->   }
->   
-> -int kvm_riscv_vcpu_aia_init(struct kvm_vcpu *vcpu)
-> +void kvm_riscv_vcpu_aia_init(struct kvm_vcpu *vcpu)
->   {
->   	struct kvm_vcpu_aia *vaia = &vcpu->arch.aia_context;
->   
->   	if (!kvm_riscv_aia_available())
-> -		return 0;
-> +		return;
->   
->   	/*
->   	 * We don't do any memory allocations over here because these
-> @@ -526,8 +526,6 @@ int kvm_riscv_vcpu_aia_init(struct kvm_vcpu *vcpu)
->   	/* Initialize default values in AIA vcpu context */
->   	vaia->imsic_addr = KVM_RISCV_AIA_UNDEF_ADDR;
->   	vaia->hart_index = vcpu->vcpu_idx;
-> -
-> -	return 0;
->   }
->   
->   void kvm_riscv_vcpu_aia_deinit(struct kvm_vcpu *vcpu)
-> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-> index b467dc1f4c7f..f9fb3dbbe0c3 100644
-> --- a/arch/riscv/kvm/vcpu.c
-> +++ b/arch/riscv/kvm/vcpu.c
-> @@ -159,9 +159,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->   	kvm_riscv_vcpu_pmu_init(vcpu);
->   
->   	/* Setup VCPU AIA */
-> -	rc = kvm_riscv_vcpu_aia_init(vcpu);
-> -	if (rc)
-> -		return rc;
-> +	kvm_riscv_vcpu_aia_init(vcpu);
->   
->   	/*
->   	 * Setup SBI extensions
-Reviewed-by: Atish Patra <atishp@rivosinc.com>
+> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+> index 159df462d193..5a1ce6f5e287 100644
+> --- a/virt/kvm/guest_memfd.c
+> +++ b/virt/kvm/guest_memfd.c
+> @@ -17,6 +17,15 @@ struct kvm_gmem {
+>  	struct list_head entry;
+>  };
+>  
+> +struct kvm_gmem_inode_info {
+> +	struct inode vfs_inode;
+> +};
+> +
+> +static inline struct kvm_gmem_inode_info *KVM_GMEM_I(struct inode *inode)
+> +{
+> +	return container_of(inode, struct kvm_gmem_inode_info, vfs_inode);
+> +}
+> +
+>  /**
+>   * folio_file_pfn - like folio_file_page, but return a pfn.
+>   * @folio: The folio which contains this index.
+> @@ -392,8 +401,33 @@ static struct file_operations kvm_gmem_fops = {
+>  	.fallocate	= kvm_gmem_fallocate,
+>  };
+>  
+> +static struct kmem_cache *kvm_gmem_inode_cachep;
+> +
+> +static struct inode *kvm_gmem_alloc_inode(struct super_block *sb)
+> +{
+> +	struct kvm_gmem_inode_info *info;
+> +
+> +	info = alloc_inode_sb(sb, kvm_gmem_inode_cachep, GFP_KERNEL);
+> +	if (!info)
+> +		return NULL;
+> +
+> +	return &info->vfs_inode;
+> +}
+> +
+> +static void kvm_gmem_destroy_inode(struct inode *inode)
+> +{
+> +}
+> +
+> +static void kvm_gmem_free_inode(struct inode *inode)
+> +{
+> +	kmem_cache_free(kvm_gmem_inode_cachep, KVM_GMEM_I(inode));
+> +}
+> +
+>  static const struct super_operations kvm_gmem_super_operations = {
+>  	.statfs		= simple_statfs,
+> +	.alloc_inode	= kvm_gmem_alloc_inode,
+> +	.destroy_inode	= kvm_gmem_destroy_inode,
+> +	.free_inode	= kvm_gmem_free_inode,
+>  };
+>  
+>  static int kvm_gmem_init_fs_context(struct fs_context *fc)
+> @@ -426,10 +460,26 @@ static int kvm_gmem_init_mount(void)
+>  	return 0;
+>  }
+>  
+> +static void kvm_gmem_init_inode(void *foo)
+> +{
+> +	struct kvm_gmem_inode_info *info = foo;
+> +
+> +	inode_init_once(&info->vfs_inode);
+> +}
+> +
+> +static void kvm_gmem_init_inodecache(void)
+> +{
+> +	kvm_gmem_inode_cachep = kmem_cache_create("kvm_gmem_inode_cache",
+> +						  sizeof(struct kvm_gmem_inode_info),
+> +						  0, SLAB_ACCOUNT,
+> +						  kvm_gmem_init_inode);
+
+Check the return value?
+
+And, I'm not a big fan of (logically) one line function encapsulation.
+
+> +}
+> +
+>  int kvm_gmem_init(struct module *module)
+>  {
+>  	kvm_gmem_fops.owner = module;
+>  
+> +	kvm_gmem_init_inodecache();
+>  	return kvm_gmem_init_mount();
+
+kmem_cache_destroy(kvm_gmem_inode_cachep) if kvm_gmem_init_mount()
+return with error?
+
+>  }
+>  
+> @@ -437,6 +487,7 @@ void kvm_gmem_exit(void)
+>  {
+>  	kern_unmount(kvm_gmem_mnt);
+>  	kvm_gmem_mnt = NULL;
+> +	kmem_cache_destroy(kvm_gmem_inode_cachep);
+>  }
+>  
+>  static int kvm_gmem_migrate_folio(struct address_space *mapping,
+
+---
+Best Regards,
+Huang, Ying
 
