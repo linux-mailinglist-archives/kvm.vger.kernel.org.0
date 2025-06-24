@@ -1,159 +1,268 @@
-Return-Path: <kvm+bounces-50468-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50469-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C51A2AE5FA8
-	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 10:42:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8ED2AE6039
+	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 11:07:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 129A24A1FDD
-	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 08:41:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 46AE24C18FC
+	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 09:07:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1BE926A1C1;
-	Tue, 24 Jun 2025 08:41:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8462E27AC3C;
+	Tue, 24 Jun 2025 09:06:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ozbY9Al3"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="xi/QlwlW";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Y9LCmN9J";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="E5mo4GVk";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="oREfj0fF"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05CAB26A0BF
-	for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 08:41:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A904927A445
+	for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 09:06:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750754503; cv=none; b=lVx3yu4PCx+9lWFROa5MmMcs0KB774z8M+O/Xvdie2AT8kJFogs3H6z3WWf5Ss5F8m03NCjgS+nvDlBb+0dgy1GLtxDXxrjpFsN2cU1P3199DGq4Kr1s6KNPNFuz2nhpFvd5k5s0HEprPdndHcg3FhlGj2a9SaXJG2O6XWbigZU=
+	t=1750756007; cv=none; b=kh7UL0gE34faywm/qqQ7/ll+1fe1Dh4ZfnWQbbyrk17i7HozSkHHNZzOUZ+LvVLU/OVmMintuGkTvS8EJH1Oh+8dSabGg3m0trDAinRzzK41iPTVFnG+8SSGgGXRFuhhrx3NemUgouyBBadli0gguZl3066GnNRxgIi9+FxMd6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750754503; c=relaxed/simple;
-	bh=EQ6k/3us5mFyIyxxisVZ0vu9nUJSxMmC5Dr/rmAZ8o0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g9c1t7gClAvKLAj+bKIsC/8Jf7AfvNWuFFioSbIu3E3d2JMTAt3GLsmyi7OrrYSzxFKJgZGzTxrZA9q1iRTe8flKBjavJDylr49GVw+jcJr6HN5fYydT6ZL+MBROy/wrl6ck0hTISmjRKN8bxto/aLcbdBXGvjvGPo//xhtUEpA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ozbY9Al3; arc=none smtp.client-ip=91.218.175.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Tue, 24 Jun 2025 10:41:37 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1750754500;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	s=arc-20240116; t=1750756007; c=relaxed/simple;
+	bh=oxW2aAAfKBhOjlWbxlJ/FAtpZq04AOHQ+xCrx3SgYHY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NjPLPxenXSRBCioFTcFCeVnCiW6asafP8Gr368UKKOSZyGhRCXPql3hJKG5c5VDfpsuP8IOWzKJ4RoEOZDAXKL6EViqTgYmJ59rJ9llu4+G54AAIX0p4PdQ6QP9hpOL7KX8yCWPDZwDmYQiDpClcXUknZ01frKLd8koFbAv9c3Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=xi/QlwlW; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Y9LCmN9J; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=E5mo4GVk; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=oREfj0fF; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id D7A7A21174;
+	Tue, 24 Jun 2025 09:06:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1750756003; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WZJk1co4OhHhKxG5ybsrLzoSEb0nCOo3fmKlGka1MHg=;
-	b=ozbY9Al3iiJNs8m0qlPPplG13XOr4UHQAfIKaSCfF1xOj8JPwCLLaO8AOD8naHiyLY9uKX
-	Nbf6eienajX9v67L1aP6XLVTmrJS8LaLQ0jG+nuvFNgLE8DdeNy0lJo2py48bG97y6k8OO
-	xCks1cKu0aXWQQ75KyehYEvqtW2byNU=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Jesse Taube <jesse@rivosinc.com>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	linux-kselftest@vger.kernel.org, =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>, 
-	Charlie Jenkins <charlie@rivosinc.com>, James Raphael Tiovalen <jamestiotio@gmail.com>, 
-	Sean Christopherson <seanjc@google.com>, Cade Richard <cade.richard@gmail.com>
-Subject: Re: [kvm-unit-tests PATCH] riscv: lib: sbi_shutdown add exit code.
-Message-ID: <20250624-9f7044f67c5054d0a948b94a@orel>
-References: <20250620155051.68377-1-jesse@rivosinc.com>
- <20250623-c4c3115e6402176024bac6ea@orel>
- <CALSpo=YQun4owTSkCULpgSu386nHK4q8kuU--oif4Wtw2S_V1w@mail.gmail.com>
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=9lICjNkiewMZFMzrpHfU5ovumYbwTZRme9bMEyMsD/M=;
+	b=xi/QlwlWq8NLVSwyspSzkPKvKMA6Uvj8/W9IFdzSFQMZ+ayNwxoQ7cp2wwdex97PvJgFlo
+	x2f/4oVPrxX02VMjazKS8ra2I9oaBaKqNmT3rxbP2v97idRqli2arNKpl/rNn7z5z2COdO
+	7+ljTlARtsgKwvd1zlhYhRoTz1XsnuM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1750756003;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=9lICjNkiewMZFMzrpHfU5ovumYbwTZRme9bMEyMsD/M=;
+	b=Y9LCmN9JTWkqSIjoqHkEfxTSRml/p11vY01knXb//RDebqmAaD1GQiHEbhGpors9cm5R2y
+	CTBVZa09ODuiO0Bw==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=E5mo4GVk;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=oREfj0fF
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1750756002; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=9lICjNkiewMZFMzrpHfU5ovumYbwTZRme9bMEyMsD/M=;
+	b=E5mo4GVk3aRBGPmQF64SGv7r/9Z7BrhMxT4Br3ozs8DXcDb//Oxu3nHGSXqq7o7Mb7CLZo
+	IMLqC5HhH2wB7OabuAKDxSBbULfeVUwIiW40R1/IDWT12tchJxMWR5KfDDB9oIDWVupYrc
+	wnYgtTWRX1PCzt/kDQ6JBbhPNcnau4c=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1750756002;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=9lICjNkiewMZFMzrpHfU5ovumYbwTZRme9bMEyMsD/M=;
+	b=oREfj0fFjtCcmySuYyx4a2eVlsi9oKqRPyLTW1pAnJyz47RDYq0CXOXEI70b1LsSzPwU5h
+	OgkxMNrQ9mrgSXBQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 35F1213A24;
+	Tue, 24 Jun 2025 09:06:42 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id gHhlC6JqWmhnFgAAD6G6ig
+	(envelope-from <tzimmermann@suse.de>); Tue, 24 Jun 2025 09:06:42 +0000
+Message-ID: <6dedf895-1681-4fe3-8ca4-68fd05070ef2@suse.de>
+Date: Tue, 24 Jun 2025 11:06:41 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CALSpo=YQun4owTSkCULpgSu386nHK4q8kuU--oif4Wtw2S_V1w@mail.gmail.com>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 6/8] Fix access to video_is_primary_device() when
+ compiled without CONFIG_VIDEO
+To: Mario Limonciello <superm1@kernel.org>,
+ Bjorn Helgaas <bhelgaas@google.com>
+Cc: Alex Deucher <alexander.deucher@amd.com>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+ Lukas Wunner <lukas@wunner.de>,
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Maxime Ripard <mripard@kernel.org>, David Woodhouse <dwmw2@infradead.org>,
+ Lu Baolu <baolu.lu@linux.intel.com>, Joerg Roedel <joro@8bytes.org>,
+ Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+ "open list:DRM DRIVERS" <dri-devel@lists.freedesktop.org>,
+ open list <linux-kernel@vger.kernel.org>,
+ "open list:INTEL IOMMU (VT-d)" <iommu@lists.linux.dev>,
+ "open list:PCI SUBSYSTEM" <linux-pci@vger.kernel.org>,
+ "open list:VFIO DRIVER" <kvm@vger.kernel.org>,
+ "open list:SOUND" <linux-sound@vger.kernel.org>,
+ Daniel Dadap <ddadap@nvidia.com>,
+ Mario Limonciello <mario.limonciello@amd.com>,
+ kernel test robot <lkp@intel.com>
+References: <20250623184757.3774786-1-superm1@kernel.org>
+ <20250623184757.3774786-7-superm1@kernel.org>
+Content-Language: en-US
+From: Thomas Zimmermann <tzimmermann@suse.de>
+Autocrypt: addr=tzimmermann@suse.de; keydata=
+ xsBNBFs50uABCADEHPidWt974CaxBVbrIBwqcq/WURinJ3+2WlIrKWspiP83vfZKaXhFYsdg
+ XH47fDVbPPj+d6tQrw5lPQCyqjwrCPYnq3WlIBnGPJ4/jreTL6V+qfKRDlGLWFjZcsrPJGE0
+ BeB5BbqP5erN1qylK9i3gPoQjXGhpBpQYwRrEyQyjuvk+Ev0K1Jc5tVDeJAuau3TGNgah4Yc
+ hdHm3bkPjz9EErV85RwvImQ1dptvx6s7xzwXTgGAsaYZsL8WCwDaTuqFa1d1jjlaxg6+tZsB
+ 9GluwvIhSezPgnEmimZDkGnZRRSFiGP8yjqTjjWuf0bSj5rUnTGiyLyRZRNGcXmu6hjlABEB
+ AAHNJ1Rob21hcyBaaW1tZXJtYW5uIDx0emltbWVybWFubkBzdXNlLmRlPsLAjgQTAQgAOAIb
+ AwULCQgHAgYVCgkICwIEFgIDAQIeAQIXgBYhBHIX+6yM6c9jRKFo5WgNwR1TC3ojBQJftODH
+ AAoJEGgNwR1TC3ojx1wH/0hKGWugiqDgLNXLRD/4TfHBEKmxIrmfu9Z5t7vwUKfwhFL6hqvo
+ lXPJJKQpQ2z8+X2vZm/slsLn7J1yjrOsoJhKABDi+3QWWSGkaGwRJAdPVVyJMfJRNNNIKwVb
+ U6B1BkX2XDKDGffF4TxlOpSQzdtNI/9gleOoUA8+jy8knnDYzjBNOZqLG2FuTdicBXblz0Mf
+ vg41gd9kCwYXDnD91rJU8tzylXv03E75NCaTxTM+FBXPmsAVYQ4GYhhgFt8S2UWMoaaABLDe
+ 7l5FdnLdDEcbmd8uLU2CaG4W2cLrUaI4jz2XbkcPQkqTQ3EB67hYkjiEE6Zy3ggOitiQGcqp
+ j//OwE0EWznS4AEIAMYmP4M/V+T5RY5at/g7rUdNsLhWv1APYrh9RQefODYHrNRHUE9eosYb
+ T6XMryR9hT8XlGOYRwKWwiQBoWSDiTMo/Xi29jUnn4BXfI2px2DTXwc22LKtLAgTRjP+qbU6
+ 3Y0xnQN29UGDbYgyyK51DW3H0If2a3JNsheAAK+Xc9baj0LGIc8T9uiEWHBnCH+RdhgATnWW
+ GKdDegUR5BkDfDg5O/FISymJBHx2Dyoklv5g4BzkgqTqwmaYzsl8UxZKvbaxq0zbehDda8lv
+ hFXodNFMAgTLJlLuDYOGLK2AwbrS3Sp0AEbkpdJBb44qVlGm5bApZouHeJ/+n+7r12+lqdsA
+ EQEAAcLAdgQYAQgAIAIbDBYhBHIX+6yM6c9jRKFo5WgNwR1TC3ojBQJftOH6AAoJEGgNwR1T
+ C3ojVSkIALpAPkIJPQoURPb1VWjh34l0HlglmYHvZszJWTXYwavHR8+k6Baa6H7ufXNQtThR
+ yIxJrQLW6rV5lm7TjhffEhxVCn37+cg0zZ3j7zIsSS0rx/aMwi6VhFJA5hfn3T0TtrijKP4A
+ SAQO9xD1Zk9/61JWk8OysuIh7MXkl0fxbRKWE93XeQBhIJHQfnc+YBLprdnxR446Sh8Wn/2D
+ Ya8cavuWf2zrB6cZurs048xe0UbSW5AOSo4V9M0jzYI4nZqTmPxYyXbm30Kvmz0rYVRaitYJ
+ 4kyYYMhuULvrJDMjZRvaNe52tkKAvMevcGdt38H4KSVXAylqyQOW5zvPc4/sq9c=
+In-Reply-To: <20250623184757.3774786-7-superm1@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-4.51 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	TO_DN_ALL(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	ARC_NA(0.00)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCPT_COUNT_TWELVE(0.00)[26];
+	MIME_TRACE(0.00)[0:+];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FREEMAIL_CC(0.00)[amd.com,gmail.com,ffwll.ch,wunner.de,linux.intel.com,kernel.org,infradead.org,8bytes.org,arm.com,redhat.com,perex.cz,suse.com,lists.freedesktop.org,vger.kernel.org,lists.linux.dev,nvidia.com,intel.com];
+	RCVD_TLS_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_RATELIMIT(0.00)[to_ip_from(RLqbkuqg11osc55coksncbnarj)];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.de:dkim,suse.de:mid,suse.de:email,intel.com:email]
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Rspamd-Queue-Id: D7A7A21174
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spam-Score: -4.51
 
-On Mon, Jun 23, 2025 at 03:46:31PM -0700, Jesse Taube wrote:
-> On Mon, Jun 23, 2025 at 10:01 AM Andrew Jones <andrew.jones@linux.dev> wrote:
-> >
-> > On Fri, Jun 20, 2025 at 08:50:51AM -0700, Jesse Taube wrote:
-> > > When exiting it may be useful for the sbi implementation to know the
-> > > exit code.
-> > > Add exit code to sbi_shutdown, and use it in exit().
-> > >
-> > > Signed-off-by: Jesse Taube <jesse@rivosinc.com>
-> > > ---
-> > >  lib/riscv/asm/sbi.h | 2 +-
-> > >  lib/riscv/io.c      | 2 +-
-> > >  lib/riscv/sbi.c     | 4 ++--
-> > >  3 files changed, 4 insertions(+), 4 deletions(-)
-> > >
-> > > diff --git a/lib/riscv/asm/sbi.h b/lib/riscv/asm/sbi.h
-> > > index a5738a5c..de11c109 100644
-> > > --- a/lib/riscv/asm/sbi.h
-> > > +++ b/lib/riscv/asm/sbi.h
-> > > @@ -250,7 +250,7 @@ struct sbiret sbi_ecall(int ext, int fid, unsigned long arg0,
-> > >                       unsigned long arg3, unsigned long arg4,
-> > >                       unsigned long arg5);
-> > >
-> > > -void sbi_shutdown(void);
-> > > +void sbi_shutdown(unsigned int code);
-> > >  struct sbiret sbi_hart_start(unsigned long hartid, unsigned long entry, unsigned long sp);
-> > >  struct sbiret sbi_hart_stop(void);
-> > >  struct sbiret sbi_hart_get_status(unsigned long hartid);
-> > > diff --git a/lib/riscv/io.c b/lib/riscv/io.c
-> > > index fb40adb7..02231268 100644
-> > > --- a/lib/riscv/io.c
-> > > +++ b/lib/riscv/io.c
-> > > @@ -150,7 +150,7 @@ void halt(int code);
-> > >  void exit(int code)
-> > >  {
-> > >       printf("\nEXIT: STATUS=%d\n", ((code) << 1) | 1);
-> > > -     sbi_shutdown();
-> > > +     sbi_shutdown(code & 1);
-> > >       halt(code);
-> > >       __builtin_unreachable();
-> > >  }
-> > > diff --git a/lib/riscv/sbi.c b/lib/riscv/sbi.c
-> > > index 2959378f..9dd11e9d 100644
-> > > --- a/lib/riscv/sbi.c
-> > > +++ b/lib/riscv/sbi.c
-> > > @@ -107,9 +107,9 @@ struct sbiret sbi_sse_inject(unsigned long event_id, unsigned long hart_id)
-> > >       return sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_INJECT, event_id, hart_id, 0, 0, 0, 0);
-> > >  }
-> > >
-> > > -void sbi_shutdown(void)
-> > > +void sbi_shutdown(unsigned int code)
-> > >  {
-> > > -     sbi_ecall(SBI_EXT_SRST, 0, 0, 0, 0, 0, 0, 0);
-> > > +     sbi_ecall(SBI_EXT_SRST, 0, 0, code, 0, 0, 0, 0);
-> >
-> > We can't do this because a kvm-unit-tests exit code is not an
-> > SRST::reset_reason[1]. This could result in the SBI implementation
-> > returning an error, or doing something else, rather than shutting
-> > down.
-> 
-> Yes that's why there is:
-> +sbi_shutdown(code & 1);
 
-Ah, I overlooked that.
 
-> Admittedly it should probably be:
-> +sbi_shutdown(!!code);
+Am 23.06.25 um 20:47 schrieb Mario Limonciello:
+> From: Mario Limonciello <mario.limonciello@amd.com>
+>
+> When compiled without CONFIG_VIDEO the architecture specific
+> implementations of video_is_primary_device() include prototypes and
+> assume that video-common.c will be linked. Guard against this so that the
+> fallback inline implementation that returns false will be used when
+> compiled without CONFIG_VIDEO.
+>
+> Reported-by: kernel test robot <lkp@intel.com>
+> Closes: https://lore.kernel.org/oe-kbuild-all/202506221312.49Fy1aNA-lkp@intel.com/
+> Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
 
-Indeed, it would only work now because bit 0 is set in the abort
-exit code.
+Acked-by: Thomas Zimmermann <tzimmermann@suse.de>
 
-> 
-> >
-> > If this is a custom kvm-unit-tests-specific SBI implementation, then
-> > we could pass in a reset_reason in the 0xE0000000 - 0xEFFFFFFF range.
-> 
-> That still doesn't guarantee it to succeed.
-> In the exit function we can add a fallback like `sbi_shutdown(0);`,
-> but reason code 1 (System failure) should always work.
-> If anyone wants to use it for SBI specific codes, that's fine,
-> but I only added it for the No reason and System failure exit codes.
+> ---
+> v4:
+>   * new patch
+> ---
+>   arch/parisc/include/asm/video.h | 2 +-
+>   arch/sparc/include/asm/video.h  | 2 ++
+>   arch/x86/include/asm/video.h    | 2 ++
+>   3 files changed, 5 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/parisc/include/asm/video.h b/arch/parisc/include/asm/video.h
+> index c5dff3223194a..a9d50ebd6e769 100644
+> --- a/arch/parisc/include/asm/video.h
+> +++ b/arch/parisc/include/asm/video.h
+> @@ -6,7 +6,7 @@
+>   
+>   struct device;
+>   
+> -#if defined(CONFIG_STI_CORE)
+> +#if defined(CONFIG_STI_CORE) && defined(CONFIG_VIDEO)
+>   bool video_is_primary_device(struct device *dev);
+>   #define video_is_primary_device video_is_primary_device
+>   #endif
+> diff --git a/arch/sparc/include/asm/video.h b/arch/sparc/include/asm/video.h
+> index a6f48f52db584..773717b6d4914 100644
+> --- a/arch/sparc/include/asm/video.h
+> +++ b/arch/sparc/include/asm/video.h
+> @@ -19,8 +19,10 @@ static inline pgprot_t pgprot_framebuffer(pgprot_t prot,
+>   #define pgprot_framebuffer pgprot_framebuffer
+>   #endif
+>   
+> +#ifdef CONFIG_VIDEO
+>   bool video_is_primary_device(struct device *dev);
+>   #define video_is_primary_device video_is_primary_device
+> +#endif
+>   
+>   static inline void fb_memcpy_fromio(void *to, const volatile void __iomem *from, size_t n)
+>   {
+> diff --git a/arch/x86/include/asm/video.h b/arch/x86/include/asm/video.h
+> index 0950c9535fae9..08ec328203ef8 100644
+> --- a/arch/x86/include/asm/video.h
+> +++ b/arch/x86/include/asm/video.h
+> @@ -13,8 +13,10 @@ pgprot_t pgprot_framebuffer(pgprot_t prot,
+>   			    unsigned long offset);
+>   #define pgprot_framebuffer pgprot_framebuffer
+>   
+> +#ifdef CONFIG_VIDEO
+>   bool video_is_primary_device(struct device *dev);
+>   #define video_is_primary_device video_is_primary_device
+> +#endif
+>   
+>   #include <asm-generic/video.h>
+>   
 
-Yup, I see now that the intention is just to say success/failure, not
-pass down the actual exit code. The commit message says exit code,
-though, which is why I didn't read the patch closely.
+-- 
+--
+Thomas Zimmermann
+Graphics Driver Developer
+SUSE Software Solutions Germany GmbH
+Frankenstrasse 146, 90461 Nuernberg, Germany
+GF: Ivo Totev, Andrew Myers, Andrew McDonald, Boudien Moerman
+HRB 36809 (AG Nuernberg)
 
-Please send a v2 with the !! change and a change to the commit message.
-
-Thanks,
-drew
 
