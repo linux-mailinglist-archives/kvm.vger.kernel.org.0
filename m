@@ -1,198 +1,235 @@
-Return-Path: <kvm+bounces-50498-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50502-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F6F8AE67EA
-	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 16:12:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9261BAE67F4
+	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 16:13:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 723731894F6B
-	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 14:10:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 94D563ACB93
+	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 14:11:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59CC42D1925;
-	Tue, 24 Jun 2025 14:10:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7318E2D320E;
+	Tue, 24 Jun 2025 14:10:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="Xi27Plsy"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NUrPa04b"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6F9F296147
-	for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 14:10:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 965A2231855
+	for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 14:10:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750774210; cv=none; b=jXHGnAbzhMQ+ZI4CiGtSfH2OTnR+BlwgWpNkfRwdg2vqc5J3gUi42P7TLEb8L3d60ZUvdYKyfqk2tx1RV55tPHTzVsYJEqgeu908XLsTfXrjeoahFDx5mTTBCkmnLdATpSHRgYUo79/OuNcHwnK7czUv0QnBysWQNVhChdIk3w0=
+	t=1750774254; cv=none; b=Xtw2qXwilZSgTXM3u4DKaJ1qXT/OmSLLr0GVDDYPK12IwR8Ijg+9GkAUGR02tiWfd/dQ+YnYWkNok9o1P0KXUH7DC2vTKhgDTCSSOML89vJkn26ZRGswlCHGfSGFxKqLYUDjVBC84P0jG6LIxg/pW80NbVz6DNW9BYBtBdbYAOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750774210; c=relaxed/simple;
-	bh=qj/CWqHLyhMEEnGdAVi2FKgDX7NQhEFCDAoqdAeRp2o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T7IlbxcRN1b7PuuOB1Zq640D2bjNJf6IMntBZqnmvqiBWs+qdFti3bShMQlXIiRKnyr5cSGnBBNi9PsrThbqY/BXFOp0VbVNzzzvo20k7Y+vKkqFkUSLfUsGUCt7DnFOlIUhvKfeOUuN0DdqHbVj1Qi21r1fpIn1W3YZ6iHD4a8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=Xi27Plsy; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-450cfb79177so3088135e9.0
-        for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 07:10:08 -0700 (PDT)
+	s=arc-20240116; t=1750774254; c=relaxed/simple;
+	bh=R6OWWnQ7Ism47qN12eO+TDSgprr7hgpEagXqOhThZVg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=W4qjBxuxGUxlI9IaNMZ+XJZGqoQT4tixtYTpVUAcLHW7eJN6fyhAIdeC7JljCll4AUcI/MBhxjk9Bmcfpx95UkIt6YNFkFaHMjNqVrTu7Xq47ac4y+TL6rdBpC/bWtBP3ULGqbdxCH0pKcBXVdYlEKLwjiIygC50YxAJLEKRttY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NUrPa04b; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2357c61cda7so121725ad.1
+        for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 07:10:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1750774207; x=1751379007; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MQ7CvyZIlkZs87gjY0NM1qz59baVwPwR/W8k37uo164=;
-        b=Xi27PlsyZzSlZ1Hm5UeBtd4XfHF2eUXlrtvOhE/GTof2j8pvV7qU+ulra0manN8uhx
-         SxgEXA1rUtksBTYFws/XJZxJ77ccb0I5fFvOxi7DJLciG6036XIpeYiO0FoSc3W04W6j
-         BgXwyal62Tkb2ouuNDFpJAh2omVWlBw2iLk/7qa/fna46KUZm1t5l0UqvUsPuSL2Gzrf
-         ltiTPj4uRrkL3DABeWm7whb2Sztia4kDmPPZwj6/sbnQbv6cU/2qcJ4QXoRz/Qc/fC5R
-         QgzEfVymKOklYE1rPbn9ynPS7g7Xg6ID6NnCLAuC7oM7q69Wei256jJuOe6Ugr5OEZMB
-         UUAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750774207; x=1751379007;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1750774252; x=1751379052; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=MQ7CvyZIlkZs87gjY0NM1qz59baVwPwR/W8k37uo164=;
-        b=a9tnNtptiZw6Ek2ImGW1se+dg9iZsAnztFm2EhfQjQhCE9vtvQnJpq0XJVn2vBacf0
-         qLgFZWix/lhmqErq6uvjbd71GLdC4Ra8iPyuvUx3G7TE3yn9YQYgs+Gh0yY+XfWPc1mM
-         gr+tJbZ+801RDXbnZUiWx70ZyDsrYPOKHCAmPJnR0ZjqIyug069/Od/8UVTe6CSxEzP1
-         l1QuHozsVFBQt25YI/BJVXVe5AWuOM1YtwOlAqYQU4F7OBU3rtJoUIIFtG9WCqAf0/5t
-         k5KMVYXTjsgHh9giwUrvGrlJmQlU4SE3Z0Cs4kcKB26HRPM60JNwfiHnW2Ga1UT/KdEh
-         MP1A==
-X-Forwarded-Encrypted: i=1; AJvYcCWbuyzKj4ubDroMX0zG2jMpJXOBV+x4atu85C3bLiIeFXAOYoS20NS2cn5pCFoUlv6Mook=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx3IsGd6F31JuJaThTu0zkuOXrN9ZPwDYqZNzogKz3tBDJs40Zt
-	N6gH7gyh9fUyCmhSQ7mXtYPJ1IGGj5LNhSWJyAMtC1GyjxcOAHUEFlnVmnaUveE8N8E=
-X-Gm-Gg: ASbGncuvYx9h+iJDv6R8BAMAhrKp41XHv2MsZFwMAvimQjB+8//+07embwO++F/ZilM
-	G8LLMZ+T3dikVP719cHF8ZTJKGC2hn8D0nCw/PeN0x37a4/jdSxp+oe4rqxpy+dRuLW4MGsMS6Z
-	OtZvDFRKevQD3v9V1tsgCErEDGJYMUCLe9pAifqlxu+X0N3SGBDYoKAjbNY8vaIIBevyuYVkc1y
-	jZAC3165b6R3MtigdW2wnHxp5GhhjsJ6PMSU1TMnd7ELUn7rhysFPGXwMcn8zlplbctsZz/LMaj
-	+9CNqNuVXu9eCp2lXbL4KxvkSey571D5kqBYPhOdx1ikhlxJHQ==
-X-Google-Smtp-Source: AGHT+IEJeX4diRkZ29kEnrmPsfhU9TcNr2AZ9X1Thlmc1YkCR6UEhFhLrNxHaOV0+h9u10fRDQFJlw==
-X-Received: by 2002:a05:600c:3b24:b0:453:c39:d0a7 with SMTP id 5b1f17b1804b1-453653cf416mr150568745e9.5.1750774206936;
-        Tue, 24 Jun 2025 07:10:06 -0700 (PDT)
-Received: from localhost ([2a02:8308:a00c:e200::5485])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a6e81106b8sm2090841f8f.91.2025.06.24.07.10.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Jun 2025 07:10:05 -0700 (PDT)
-Date: Tue, 24 Jun 2025 16:10:04 +0200
-From: Andrew Jones <ajones@ventanamicro.com>
-To: zhouquan@iscas.ac.cn
-Cc: anup@brainfault.org, atishp@atishpatra.org, paul.walmsley@sifive.com, 
-	palmer@dabbelt.com, linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
-Subject: Re: [PATCH 2/2] KVM: riscv: selftests: Add common supported test
- cases
-Message-ID: <20250624-d7b4b9ba702fcaf2f42695b1@orel>
-References: <cover.1749810735.git.zhouquan@iscas.ac.cn>
- <7e8f1272337e8d03851fd3bb7f6fc739e604309e.1749810736.git.zhouquan@iscas.ac.cn>
+        bh=SPXG9NMXD6nYMUFeG+o56gXIEmWIJJ0n8imu3rUl/a8=;
+        b=NUrPa04bJW5wf6OUbZGfVQNZAcNA6z0HsETw61Vv1IyqPlcqpmFJkSFrGR8pLQuN3M
+         VnSp5BhE8+ZHHzS4+YPdJLgO9FL4tzrmu6bIHdI3yvzU5VHQmp5y31NOLu/ipzqPAIbk
+         tCNyc2ctYL/5a+9fv+eykaUYqV8BCH5yGe3NF8K2iNY5RpBTIWD+p8ZWD4YJCefJyFyB
+         Ujd5F4hyUpoi1is+YykEP6tpSsEuSTOyai5PDVMgsf2vFwpStoFbSg8r8+KcryJNY76n
+         8h6pRz9vVg4+NDMGpIXqzPDj7iH7dXBQVKHQ2b5lNhHjawaijksvAHUd+1YcoI2hToXh
+         E1vA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750774252; x=1751379052;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SPXG9NMXD6nYMUFeG+o56gXIEmWIJJ0n8imu3rUl/a8=;
+        b=BcqEYvQyip258/dgwGVp55gjR/Qvw+xfBjqhUIx+ZjNNRmSIWKMPcy2fnZVP3lztT2
+         s9FP6srx1BStQeiANF3agpzVB4L6t+OEkWke9pduRj++MZmyFXEr/tbppEvxv59c2KON
+         JGtGvsh5rmuKg5hRIxhgc5uKP6zKzsQencW8GOlYdI8Vv6u/+2YbN/pAvtBRJ+HwZzDB
+         9w/3B+I6/ajido/Ci4BTzNyQH1641UXiUWOlJgXnOypVHLU2v8pXbHL56S4Vm9JYgdne
+         vSvMBPqNymwiTjxUsVOftPAYumsGtBK9V4kgWItWLLEFxIiItncZqJjjFPimm0KClIBr
+         o9IQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVoqGEz1/jI+CE6NUcDLeFAeAGM/0RaD5yRBOyfz8n8gQWZaINJ5yxJiNwS2ELLopnBJWE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yze6bqFXpJI9mXYufzis3HyEJAevMTj11Wj7N9E7o3C549LRSpI
+	LbHdyGK3RQMam6wZKcrlC5YDziOeZkBY1/1bxr25ty/di1JyNaRdhMcbV7KU4cvhrySg70ZBoqF
+	P3NC1uMfjgKtzfw5GYPXkLy5ryEgqZC96I1h4zEDK
+X-Gm-Gg: ASbGncuRyJlS7DkIPihPn0hZkWkqP5F6Na08YPy9aSjaGDgXGAYY4sFKLz1V/Jo6wTL
+	SM5oveIhh5VJlLAlrk9O6IXcVDzcFEiMESvNclSMCin9BTEe3Ag+jCKq6WF97Ztx49hCVgR4VIV
+	a1RfyFF0J4ehemJvTzZnrE4LtHM7KejFj9ttKAz6jS5+yCk6iFG35ICCg9K3Ti++ssimZcL7Aln
+	1Vm
+X-Google-Smtp-Source: AGHT+IHm+0I51ZMCSpB9nsIXuoBv9SIjg9zSCmS8/Wkboc9UHu1UJHMZwYpWKTst/fkr9jbiULJlSRshQWeZUERJRQM=
+X-Received: by 2002:a17:902:e80c:b0:234:afcf:d9e2 with SMTP id
+ d9443c01a7336-23803f4d9a2mr2639155ad.17.1750774250932; Tue, 24 Jun 2025
+ 07:10:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7e8f1272337e8d03851fd3bb7f6fc739e604309e.1749810736.git.zhouquan@iscas.ac.cn>
+References: <cover.1747264138.git.ackerleytng@google.com> <d3832fd95a03aad562705872cbda5b3d248ca321.1747264138.git.ackerleytng@google.com>
+ <CA+EHjTxtHOgichL=UvAzczoqS1608RSUNn5HbmBw2NceO941ng@mail.gmail.com>
+ <CAGtprH8eR_S50xDnnMLHNCuXrN2Lv_0mBRzA_pcTtNbnVvdv2A@mail.gmail.com>
+ <CA+EHjTwjKVkw2_AK0Y0-eth1dVW7ZW2Sk=73LL9NeQYAPpxPiw@mail.gmail.com>
+ <CAGtprH_Evyc7tLhDB0t0fN+BUx5qeqWq8A2yZ5-ijbJ5UJ5f-g@mail.gmail.com>
+ <9502503f-e0c2-489e-99b0-94146f9b6f85@amd.com> <20250624130811.GB72557@ziepe.ca>
+In-Reply-To: <20250624130811.GB72557@ziepe.ca>
+From: Vishal Annapurve <vannapurve@google.com>
+Date: Tue, 24 Jun 2025 07:10:38 -0700
+X-Gm-Features: AX0GCFsRD1vv1pnJnJAHQ3_lVm2iqeW9vp-TueZFlNIyuARuSWfPMw0I71gJhzE
+Message-ID: <CAGtprH_qh8sEY3s-JucW3n1Wvoq7jdVZDDokvG5HzPf0HV2=pg@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 04/51] KVM: guest_memfd: Introduce
+ KVM_GMEM_CONVERT_SHARED/PRIVATE ioctls
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Alexey Kardashevskiy <aik@amd.com>, Fuad Tabba <tabba@google.com>, Ackerley Tng <ackerleytng@google.com>, 
+	kvm@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
+	x86@kernel.org, linux-fsdevel@vger.kernel.org, ajones@ventanamicro.com, 
+	akpm@linux-foundation.org, amoorthy@google.com, anthony.yznaga@oracle.com, 
+	anup@brainfault.org, aou@eecs.berkeley.edu, bfoster@redhat.com, 
+	binbin.wu@linux.intel.com, brauner@kernel.org, catalin.marinas@arm.com, 
+	chao.p.peng@intel.com, chenhuacai@kernel.org, dave.hansen@intel.com, 
+	david@redhat.com, dmatlack@google.com, dwmw@amazon.co.uk, 
+	erdemaktas@google.com, fan.du@intel.com, fvdl@google.com, graf@amazon.com, 
+	haibo1.xu@intel.com, hch@infradead.org, hughd@google.com, ira.weiny@intel.com, 
+	isaku.yamahata@intel.com, jack@suse.cz, james.morse@arm.com, 
+	jarkko@kernel.org, jgowans@amazon.com, jhubbard@nvidia.com, jroedel@suse.de, 
+	jthoughton@google.com, jun.miao@intel.com, kai.huang@intel.com, 
+	keirf@google.com, kent.overstreet@linux.dev, kirill.shutemov@intel.com, 
+	liam.merwick@oracle.com, maciej.wieczor-retman@intel.com, 
+	mail@maciej.szmigiero.name, maz@kernel.org, mic@digikod.net, 
+	michael.roth@amd.com, mpe@ellerman.id.au, muchun.song@linux.dev, 
+	nikunj@amd.com, nsaenz@amazon.es, oliver.upton@linux.dev, palmer@dabbelt.com, 
+	pankaj.gupta@amd.com, paul.walmsley@sifive.com, pbonzini@redhat.com, 
+	pdurrant@amazon.co.uk, peterx@redhat.com, pgonda@google.com, pvorel@suse.cz, 
+	qperret@google.com, quic_cvanscha@quicinc.com, quic_eberman@quicinc.com, 
+	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com, richard.weiyang@gmail.com, 
+	rick.p.edgecombe@intel.com, rientjes@google.com, roypat@amazon.co.uk, 
+	rppt@kernel.org, seanjc@google.com, shuah@kernel.org, steven.price@arm.com, 
+	steven.sistare@oracle.com, suzuki.poulose@arm.com, thomas.lendacky@amd.com, 
+	usama.arif@bytedance.com, vbabka@suse.cz, viro@zeniv.linux.org.uk, 
+	vkuznets@redhat.com, wei.w.wang@intel.com, will@kernel.org, 
+	willy@infradead.org, xiaoyao.li@intel.com, yan.y.zhao@intel.com, 
+	yilun.xu@intel.com, yuzenghui@huawei.com, zhiquan1.li@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jun 13, 2025 at 07:30:13PM +0800, zhouquan@iscas.ac.cn wrote:
-> From: Quan Zhou <zhouquan@iscas.ac.cn>
-> 
-> Some common KVM test cases are supported on riscv now as following:
-> 
->     access_tracking_perf_test
->     demand_paging_test
->     dirty_log_perf_test
->     dirty_log_test
->     guest_print_test
->     kvm_binary_stats_test
->     kvm_create_max_vcpus
->     kvm_page_table_test
->     memslot_modification_stress_test
->     memslot_perf_test
->     rseq_test
->     set_memory_region_test
+On Tue, Jun 24, 2025 at 6:08=E2=80=AFAM Jason Gunthorpe <jgg@ziepe.ca> wrot=
+e:
+>
+> On Tue, Jun 24, 2025 at 06:23:54PM +1000, Alexey Kardashevskiy wrote:
+>
+> > Now, I am rebasing my RFC on top of this patchset and it fails in
+> > kvm_gmem_has_safe_refcount() as IOMMU holds references to all these
+> > folios in my RFC.
+> >
+> > So what is the expected sequence here? The userspace unmaps a DMA
+> > page and maps it back right away, all from the userspace? The end
+> > result will be the exactly same which seems useless. And IOMMU TLB
 
-Half this list is already build for riscv since they're common. See
-TEST_GEN_PROGS_COMMON. If the other half can be built and run then
-please send a separate patch, not something tacked onto this series,
-since they're all unrelated to the series.
+ As Jason described, ideally IOMMU just like KVM, should just:
+1) Directly rely on guest_memfd for pinning -> no page refcounts taken
+by IOMMU stack
+2) Directly query pfns from guest_memfd for both shared/private ranges
+3) Implement an invalidation callback that guest_memfd can invoke on
+conversions.
 
-> 
-> Add missing headers for tests and fix RISCV_FENCE redefinition
-> in `rseq-riscv.h` by using the existing macro from <asm/fence.h>.
-> 
-> Signed-off-by: Quan Zhou <zhouquan@iscas.ac.cn>
-> ---
->  tools/testing/selftests/kvm/Makefile.kvm             | 12 ++++++++++++
->  .../testing/selftests/kvm/include/riscv/processor.h  |  2 ++
->  tools/testing/selftests/rseq/rseq-riscv.h            |  3 +--
->  3 files changed, 15 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-> index 38b95998e1e6..565e191e99c8 100644
-> --- a/tools/testing/selftests/kvm/Makefile.kvm
-> +++ b/tools/testing/selftests/kvm/Makefile.kvm
-> @@ -197,6 +197,18 @@ TEST_GEN_PROGS_riscv += arch_timer
->  TEST_GEN_PROGS_riscv += coalesced_io_test
->  TEST_GEN_PROGS_riscv += get-reg-list
->  TEST_GEN_PROGS_riscv += steal_time
-> +TEST_GEN_PROGS_riscv += access_tracking_perf_test
-> +TEST_GEN_PROGS_riscv += demand_paging_test
-> +TEST_GEN_PROGS_riscv += dirty_log_perf_test
-> +TEST_GEN_PROGS_riscv += dirty_log_test
-> +TEST_GEN_PROGS_riscv += guest_print_test
-> +TEST_GEN_PROGS_riscv += kvm_binary_stats_test
-> +TEST_GEN_PROGS_riscv += kvm_create_max_vcpus
-> +TEST_GEN_PROGS_riscv += kvm_page_table_test
-> +TEST_GEN_PROGS_riscv += memslot_modification_stress_test
-> +TEST_GEN_PROGS_riscv += memslot_perf_test
-> +TEST_GEN_PROGS_riscv += rseq_test
-> +TEST_GEN_PROGS_riscv += set_memory_region_test
->  
->  TEST_GEN_PROGS_loongarch += coalesced_io_test
->  TEST_GEN_PROGS_loongarch += demand_paging_test
-> diff --git a/tools/testing/selftests/kvm/include/riscv/processor.h b/tools/testing/selftests/kvm/include/riscv/processor.h
-> index 162f303d9daa..4cf5ae11760f 100644
-> --- a/tools/testing/selftests/kvm/include/riscv/processor.h
-> +++ b/tools/testing/selftests/kvm/include/riscv/processor.h
-> @@ -9,7 +9,9 @@
->  
->  #include <linux/stringify.h>
->  #include <asm/csr.h>
-> +#include <asm/vdso/processor.h>
->  #include "kvm_util.h"
-> +#include "ucall_common.h"
+Current flow:
+Private to Shared conversion via kvm_gmem_convert_range() -
+    1) guest_memfd invokes kvm_gmem_invalidate_begin() for the ranges
+on each bound memslot overlapping with the range
+         -> KVM has the concept of invalidation_begin() and end(),
+which effectively ensures that between these function calls, no new
+EPT/NPT entries can be added for the range.
+     2) guest_memfd invokes kvm_gmem_convert_should_proceed() which
+actually unmaps the KVM SEPT/NPT entries.
+     3) guest_memfd invokes kvm_gmem_execute_work() which updates the
+shareability and then splits the folios if needed
 
-These should be included directly from the tests that need them.
+Shared to private conversion via kvm_gmem_convert_range() -
+    1) guest_memfd invokes kvm_gmem_invalidate_begin() for the ranges
+on each bound memslot overlapping with the range
+     2) guest_memfd invokes kvm_gmem_convert_should_proceed() which
+actually unmaps the host mappings which will unmap the KVM non-seucure
+EPT/NPT entries.
+     3) guest_memfd invokes kvm_gmem_execute_work() which updates the
+shareability and then merges the folios if needed.
 
->  
->  #define INSN_OPCODE_MASK	0x007c
->  #define INSN_OPCODE_SHIFT	2
-> diff --git a/tools/testing/selftests/rseq/rseq-riscv.h b/tools/testing/selftests/rseq/rseq-riscv.h
-> index 67d544aaa9a3..06c840e81c8b 100644
-> --- a/tools/testing/selftests/rseq/rseq-riscv.h
-> +++ b/tools/testing/selftests/rseq/rseq-riscv.h
-> @@ -8,6 +8,7 @@
->   * exception when executed in all modes.
->   */
->  #include <endian.h>
-> +#include <asm/fence.h>
->  
->  #if defined(__BYTE_ORDER) ? (__BYTE_ORDER == __LITTLE_ENDIAN) : defined(__LITTLE_ENDIAN)
->  #define RSEQ_SIG   0xf1401073  /* csrr mhartid, x0 */
-> @@ -24,8 +25,6 @@
->  #define REG_L	__REG_SEL("ld ", "lw ")
->  #define REG_S	__REG_SEL("sd ", "sw ")
->  
-> -#define RISCV_FENCE(p, s) \
-> -	__asm__ __volatile__ ("fence " #p "," #s : : : "memory")
->  #define rseq_smp_mb()	RISCV_FENCE(rw, rw)
->  #define rseq_smp_rmb()	RISCV_FENCE(r, r)
->  #define rseq_smp_wmb()	RISCV_FENCE(w, w)
-> -- 
-> 2.34.1
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D
 
-tools/testing/selftests/rseq isn't under KVM's purview, so this should be
-a separate patch CC'ing the appropriate people and lists.
+For IOMMU, could something like below work?
 
-Thanks,
-drew
+* A new UAPI to bind IOMMU FDs with guest_memfd ranges
+* VFIO_DMA_MAP/UNMAP operations modified to directly fetch pfns from
+guest_memfd ranges using kvm_gmem_get_pfn()
+    -> kvm invokes kvm_gmem_is_private() to check for the range
+shareability, IOMMU could use the same or we could add an API in gmem
+that takes in access type and checks the shareability before returning
+the pfn.
+* IOMMU stack exposes an invalidation callback that can be invoked by
+guest_memfd.
+
+Private to Shared conversion via kvm_gmem_convert_range() -
+    1) guest_memfd invokes kvm_gmem_invalidate_begin() for the ranges
+on each bound memslot overlapping with the range
+     2) guest_memfd invokes kvm_gmem_convert_should_proceed() which
+actually unmaps the KVM SEPT/NPT entries.
+           -> guest_memfd invokes IOMMU invalidation callback to zap
+the secure IOMMU entries.
+     3) guest_memfd invokes kvm_gmem_execute_work() which updates the
+shareability and then splits the folios if needed
+     4) Userspace invokes IOMMU map operation to map the ranges in
+non-secure IOMMU.
+
+Shared to private conversion via kvm_gmem_convert_range() -
+    1) guest_memfd invokes kvm_gmem_invalidate_begin() for the ranges
+on each bound memslot overlapping with the range
+     2) guest_memfd invokes kvm_gmem_convert_should_proceed() which
+actually unmaps the host mappings which will unmap the KVM non-seucure
+EPT/NPT entries.
+         -> guest_memfd invokes IOMMU invalidation callback to zap the
+non-secure IOMMU entries.
+     3) guest_memfd invokes kvm_gmem_execute_work() which updates the
+shareability and then merges the folios if needed.
+     4) Userspace invokes IOMMU map operation to map the ranges in secure I=
+OMMU.
+
+There should be a way to block external IOMMU pagetable updates while
+guest_memfd is performing conversion e.g. something like
+kvm_invalidate_begin()/end().
+
+> > is going to be flushed on a page conversion anyway (the RMPUPDATE
+> > instruction does that). All this is about AMD's x86 though.
+>
+> The iommu should not be using the VMA to manage the mapping. It should
+
++1.
+
+> be directly linked to the guestmemfd in some way that does not disturb
+> its operations. I imagine there would be some kind of invalidation
+> callback directly to the iommu.
+>
+> Presumably that invalidation call back can include a reason for the
+> invalidation (addr change, shared/private conversion, etc)
+>
+> I'm not sure how we will figure out which case is which but guestmemfd
+> should allow the iommu to plug in either invalidation scheme..
+>
+> Probably invalidation should be a global to the FD thing, I imagine
+> that once invalidation is established the iommu will not be
+> incrementing page refcounts.
+
++1.
+
+>
+> Jason
 
