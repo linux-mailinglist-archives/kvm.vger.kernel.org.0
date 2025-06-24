@@ -1,211 +1,121 @@
-Return-Path: <kvm+bounces-50519-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50520-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89911AE6C73
-	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 18:32:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D268AE6C8D
+	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 18:37:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9737E1BC82F7
-	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 16:32:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A77784A2C60
+	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 16:37:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 709BA2E2F12;
-	Tue, 24 Jun 2025 16:32:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7877821B9FD;
+	Tue, 24 Jun 2025 16:37:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xvPOu6Yq"
+	dkim=pass (1024-bit key) header.d=fb.com header.i=@fb.com header.b="TsKdgwUm"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E381218ABA
-	for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 16:32:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00F0B2E2EEF
+	for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 16:37:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750782725; cv=none; b=NGnvtzprsT3+ScMAMjFIkhxngG7H9EbU4dcJ/8OV5/wg1VY+F/To5vIUor4nvrEp26q2Z4jYzqjW97kxi5E/xfSj5dMqMHhznZnPjnYOyXZEhNM1UFXyyHD7VBjgD71UECpS9ocv9ue/GPArGOsMSMKdmx2zPwhYvO4+9RVFwfM=
+	t=1750783059; cv=none; b=atOIbLdAC9nxCHPoE2xzuGy9jMZ5RcceB4m4bA9hbx3/AHrPWZbP2SkqP2w04pU0TNtz2hWMCqMXGqHW/14u5ix1vEO0xhh32y7imowYhychXWh2gXiAST+fI1t5Z2yXraG/7x9tyyP+KKb0ddFJVW5WXi3VtRafDo8ubD2yUn0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750782725; c=relaxed/simple;
-	bh=olUyBWxDQPtIHZXCrj2D5nX3VCAezpOoJNhDp42CoSw=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=FHHYZE9F1ZCV4EEkKl6dGGw37Fuvsfymr5lm5PIu7fH/aF2vTA1M0G1wxRjlh0q3noZWvylzhZQtR/dVpBer45ddHvvcGEs5thHVCPOWrP72amGAk7OET/4bixR7Ryst9EZbPYIiKZ6PpRwz5JJKScieU56+FHuIwTdlhDXzGYU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xvPOu6Yq; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b2eeff19115so970501a12.0
-        for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 09:32:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750782723; x=1751387523; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XsS+ElmraQqT2Fu4rLd2/fa1KgRzuoHdf4Xkll7wCgE=;
-        b=xvPOu6Yq0qfmEirTPIub+feLaP0bKw0C/EHwdQydB8CvJzHyuuzCmCFqPVzk4uGoeV
-         y5HuIk8c9Nxpzo8CQcV67pO8+Ucgoyab2wyMRtqY/djPf0cJ0Y8QcSSItdZ/9skcmIhZ
-         pctY9I4K7ZrjCZ7p7EDpMGjgD5sXkDbzyboAiwbhDBl0cK39zTj3hjosM0gmFZWhfhxh
-         BBQQrRVrFsrSdXfKpwaeRQ7xKfePbhT1ySP2GUIYW62Oipc3TCgkWhWOOeQ26brNq9vW
-         DGTCGsJ0Kcdmp4xnfls12O9JhmfUoYSws2O97Dn89US58+qMBfWmgL7EAve4wAaeOlCA
-         LLlw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750782723; x=1751387523;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XsS+ElmraQqT2Fu4rLd2/fa1KgRzuoHdf4Xkll7wCgE=;
-        b=ap1N5cNPILnmVaY/tJGm2jovc5pCYQsDA/1AKvcrlQQHMEUxCpti/2dohm+5p4HXJ4
-         p8PLX7B22qqjxdG6NQ4VgntSujUuOq3VzzpMBgTJrH0x+iZExq5BHtk8SefBo0hUJ9AN
-         a+/XxPWc90OEYZZpAUYMh02D3BwIEAylr9DjxcI28vOxEs/lvgBFY4bWyPVzv3jqm2oH
-         u7HaN+8POnxFXouaHrWnN09gNknkH9hUdLYIctR6SWTVraKA++wu0P4OWCrgoiYWNKSo
-         qCgM17xz7i0qU3vE0qeEU7eK4wW85zw3GlnpYrJ41SMX6EUzxGcGROoGtZD4dL4ORj07
-         XPcg==
-X-Forwarded-Encrypted: i=1; AJvYcCXP4418e5w1D44Xt62DU4FcCjLjZj6eYFOPzjAeKGPuSk57CasQlM9WWFF/zYAP02CQsoc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwFFz3RNjVDxTTxabnp3v++49s0yvIgGGV6+Euin7ZuF0meI0sy
-	wqMhWY268328LHT4Tdvxk7UnrZSNPNeMrB7zJnbud+ulj7ISzQBUawuzynFAP+c9n5eJuvL2zVI
-	oJMSYyA==
-X-Google-Smtp-Source: AGHT+IEGQw4P+7gI/qlyHfyN7lsnbcl2WppeAde2ZamzUdLwVr0mYJgpyGapX/fOe6J7uhawtLrxthKo/zo=
-X-Received: from pgho22.prod.google.com ([2002:a63:fb16:0:b0:b2c:4226:67db])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:1589:b0:21f:4631:811c
- with SMTP id adf61e73a8af0-22026ec726cmr22498760637.19.1750782723360; Tue, 24
- Jun 2025 09:32:03 -0700 (PDT)
-Date: Tue, 24 Jun 2025 09:32:01 -0700
-In-Reply-To: <20250328171205.2029296-15-xin@zytor.com>
+	s=arc-20240116; t=1750783059; c=relaxed/simple;
+	bh=BNWhmaavD5+X77lm7PY0bRLx040883qzUEvAvWvBb2U=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CRo59MEcGJb5TRwSf/1tkt13bo1MAGZXHTPsEFg/OnS8SvNELzLOTlmaonilUmsl5wwyxsaQcJekIeT9whaMYgMuKoH3uxW4z5yBnIHy8ULJ7vN09Xmx4bjTlgDilLonVU2tHQKP6mdgqIhhG58/Q6tX7WA1/rXVH3iYstbbU7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (1024-bit key) header.d=fb.com header.i=@fb.com header.b=TsKdgwUm; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
+	by m0001303.ppops.net (8.18.1.2/8.18.1.2) with ESMTP id 55OEC9nq021605
+	for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 09:37:35 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=facebook; bh=H
+	5lsDphYvNXaLxsu+qjlWiXiejojiHg4KrTrvEEeeGk=; b=TsKdgwUm2MlFBQBl6
+	ZpkdvRJQQzMk/sXb5qXTJGsPDZJ2tzp89fH48zE5s+lVfgUcMjoYQKOa858J7xRK
+	zbpMQmN/yYSrFC34Of9fhiStceQi4gnd355y/YA1L2rNh/7Ppnm++8+5t4+ZCYz6
+	VNajYk8QurxevEYKFd/LEYmpXw=
+Received: from maileast.thefacebook.com ([163.114.135.16])
+	by m0001303.ppops.net (PPS) with ESMTPS id 47dre7d90c-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 09:37:35 -0700 (PDT)
+Received: from twshared7571.34.frc3.facebook.com (2620:10d:c0a8:1b::8e35) by
+ mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.1748.24; Tue, 24 Jun 2025 16:37:34 +0000
+Received: by devgpu004.nha5.facebook.com (Postfix, from userid 199522)
+	id 68A05197B1B; Tue, 24 Jun 2025 09:37:30 -0700 (PDT)
+From: Alex Mastro <amastro@fb.com>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+CC: Alex Mastro <amastro@fb.com>,
+        Alex Williamson
+	<alex.williamson@redhat.com>, <peterx@redhat.com>,
+        <kbusch@kernel.org>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] vfio/pci: print vfio-device name to fdinfo
+Date: Tue, 24 Jun 2025 09:35:58 -0700
+Message-ID: <20250624163559.2984626-1-amastro@fb.com>
+X-Mailer: git-send-email 2.47.1
+In-Reply-To: <20250624005605.GA72557@ziepe.ca>
+References:
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250328171205.2029296-1-xin@zytor.com> <20250328171205.2029296-15-xin@zytor.com>
-Message-ID: <aFrTAT-xTLmlwO5V@google.com>
-Subject: Re: [PATCH v4 14/19] KVM: VMX: Dump FRED context in dump_vmcs()
-From: Sean Christopherson <seanjc@google.com>
-To: "Xin Li (Intel)" <xin@zytor.com>
-Cc: pbonzini@redhat.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, corbet@lwn.net, tglx@linutronix.de, 
-	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, 
-	hpa@zytor.com, andrew.cooper3@citrix.com, luto@kernel.org, 
-	peterz@infradead.org, chao.gao@intel.com, xin3.li@intel.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-GUID: imFoL79VJrEkspPZq2e7uiGPc-_E_kwU
+X-Authority-Analysis: v=2.4 cv=Vbv3PEp9 c=1 sm=1 tr=0 ts=685ad44f cx=c_pps a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17 a=6IFa9wvqVegA:10 a=9jRdOu3wAAAA:8 a=oIC1ugqSzqvTnn3gIawA:9 a=ZE6KLimJVUuLrTuGpvhn:22
+X-Proofpoint-ORIG-GUID: imFoL79VJrEkspPZq2e7uiGPc-_E_kwU
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjI0MDEzOCBTYWx0ZWRfX2HQfsvi5I4fX /WTFIBwKNeoEmw3F1Xx/TwlwYn10fI0pWIUmZTPnICWk5wtqSAkK09cI2qlPJRvLt2BWj+lsm61 j/s7UL+bZKuYL3x02Cpo3V/8OSszK7CNYe/HRyLuYRH5dndnF/3I7+PGteuRJyteDvVij7qSLJG
+ Ehi5LvseL7N75vLHJTf3uH1HK4RuKofG1hZJrEzr4eGD8pNBCnZMMPyxRYu0pk/EhjIi07n+m47 VMij6UAMrc7e/HIELljxdZ+S67k6QYhKxSlOFJO/l6qc9GATuqI4eJqHiXZGfn0wSoXrO6SzBQS RcNm9hyRSh8ypYQNNBjFqYE0CX3f86nXVaEP/cDxQs3TOGdSsQzxcrPjeozo8pdNrLfLw0q6oNY
+ Dm3gp9zRhQwTf9AsDlPg8XY448b2e/RdzRAudFcL9LX1Ox2fVnHrS02/wZEDr2bEiw8zK0k9
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
+ definitions=2025-06-24_06,2025-06-23_07,2025-03-28_01
 
-On Fri, Mar 28, 2025, Xin Li (Intel) wrote:
-> From: Xin Li <xin3.li@intel.com>
-> 
-> Add FRED related VMCS fields to dump_vmcs() to dump FRED context.
-> 
-> Signed-off-by: Xin Li <xin3.li@intel.com>
-> Signed-off-by: Xin Li (Intel) <xin@zytor.com>
-> Tested-by: Shan Kang <shan.kang@intel.com>
-> ---
-> 
-> Change in v3:
-> * Use (vmentry_ctrl & VM_ENTRY_LOAD_IA32_FRED) instead of is_fred_enabled()
->   (Chao Gao).
-> 
-> Changes in v2:
-> * Use kvm_cpu_cap_has() instead of cpu_feature_enabled() (Chao Gao).
-> * Dump guest FRED states only if guest has FRED enabled (Nikolay Borisov).
-> ---
->  arch/x86/kvm/vmx/vmx.c | 40 +++++++++++++++++++++++++++++++++-------
->  1 file changed, 33 insertions(+), 7 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index c76015e1e3f8..03855d6690b2 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -6462,7 +6462,7 @@ void dump_vmcs(struct kvm_vcpu *vcpu)
->  	struct vcpu_vmx *vmx = to_vmx(vcpu);
->  	u32 vmentry_ctl, vmexit_ctl;
->  	u32 cpu_based_exec_ctrl, pin_based_exec_ctrl, secondary_exec_control;
-> -	u64 tertiary_exec_control;
-> +	u64 tertiary_exec_control, secondary_vmexit_ctl;
->  	unsigned long cr4;
->  	int efer_slot;
->  
-> @@ -6473,6 +6473,8 @@ void dump_vmcs(struct kvm_vcpu *vcpu)
->  
->  	vmentry_ctl = vmcs_read32(VM_ENTRY_CONTROLS);
->  	vmexit_ctl = vmcs_read32(VM_EXIT_CONTROLS);
-> +	secondary_vmexit_ctl = cpu_has_secondary_vmexit_ctrls() ?
-> +			       vmcs_read64(SECONDARY_VM_EXIT_CONTROLS) : 0;
->  	cpu_based_exec_ctrl = vmcs_read32(CPU_BASED_VM_EXEC_CONTROL);
->  	pin_based_exec_ctrl = vmcs_read32(PIN_BASED_VM_EXEC_CONTROL);
->  	cr4 = vmcs_readl(GUEST_CR4);
-> @@ -6519,6 +6521,16 @@ void dump_vmcs(struct kvm_vcpu *vcpu)
->  	vmx_dump_sel("LDTR:", GUEST_LDTR_SELECTOR);
->  	vmx_dump_dtsel("IDTR:", GUEST_IDTR_LIMIT);
->  	vmx_dump_sel("TR:  ", GUEST_TR_SELECTOR);
-> +	if (vmentry_ctl & VM_ENTRY_LOAD_IA32_FRED)
-> +		pr_err("FRED guest: config=0x%016llx, stack_levels=0x%016llx\n"
-> +		       "RSP0=0x%016llx, RSP1=0x%016llx\n"
-> +		       "RSP2=0x%016llx, RSP3=0x%016llx\n",
-> +		       vmcs_read64(GUEST_IA32_FRED_CONFIG),
-> +		       vmcs_read64(GUEST_IA32_FRED_STKLVLS),
-> +		       __rdmsr(MSR_IA32_FRED_RSP0),
+On Mon, 23 Jun 2025 21:56:05 -0300 Jason Gunthorpe <jgg@ziepe.ca> wrote:
+> For the legacy route this effectively gives you the iommu group.
 
-There is no guarantee the vCPU's FRED_RSP is loaded in hardware at this point.
-I think you need to use vmx_read_guest_fred_rsp0().
+This is true, but
+- There could be multiple devices per group, and I can't see a good way t=
+o
+  determine exactly which one is in use. (we happen to have one device pe=
+r
+  group, so this particular concern is somewhat moot for us)
+- In our use case, we vend the vfio device fd via SCM_RIGHTS to other pro=
+cesses
+  which did not open the group fd. We keep track of this internally, but =
+it's an
+  imperfect solution, and we'd like a more fundamental way to query the k=
+ernel
+  for this.
 
-> +		       vmcs_read64(GUEST_IA32_FRED_RSP1),
-> +		       vmcs_read64(GUEST_IA32_FRED_RSP2),
-> +		       vmcs_read64(GUEST_IA32_FRED_RSP3));
->  	efer_slot = vmx_find_loadstore_msr_slot(&vmx->msr_autoload.guest, MSR_EFER);
->  	if (vmentry_ctl & VM_ENTRY_LOAD_IA32_EFER)
->  		pr_err("EFER= 0x%016llx\n", vmcs_read64(GUEST_IA32_EFER));
-> @@ -6566,6 +6578,16 @@ void dump_vmcs(struct kvm_vcpu *vcpu)
->  	       vmcs_readl(HOST_TR_BASE));
->  	pr_err("GDTBase=%016lx IDTBase=%016lx\n",
->  	       vmcs_readl(HOST_GDTR_BASE), vmcs_readl(HOST_IDTR_BASE));
-> +	if (vmexit_ctl & SECONDARY_VM_EXIT_LOAD_IA32_FRED)
-> +		pr_err("FRED host: config=0x%016llx, stack_levels=0x%016llx\n"
-> +		       "RSP0=0x%016lx, RSP1=0x%016llx\n"
-> +		       "RSP2=0x%016llx, RSP3=0x%016llx\n",
-> +		       vmcs_read64(HOST_IA32_FRED_CONFIG),
-> +		       vmcs_read64(HOST_IA32_FRED_STKLVLS),
-> +		       (unsigned long)task_stack_page(current) + THREAD_SIZE,
+> For the new route this will give you the struct device.
+>=20
+> The userspace can deduce more information, like the actual PCI BDF, by
+> mapping the name through sysfs.
 
-Maybe add a helper in arch/x86/include/asm/fred.h to generate the desired RSP0?
-Not sure it's worth doing that just for this code.
+In the vfio cdev case, <pci sysfs path>/vfio-dev/X tells you the
+/dev/vfio/devices/X mapping, but is there a straightforward way to map in=
+ the
+opposite direction?
 
-> +		       vmcs_read64(HOST_IA32_FRED_RSP1),
-> +		       vmcs_read64(HOST_IA32_FRED_RSP2),
-> +		       vmcs_read64(HOST_IA32_FRED_RSP3));
->  	pr_err("CR0=%016lx CR3=%016lx CR4=%016lx\n",
->  	       vmcs_readl(HOST_CR0), vmcs_readl(HOST_CR3),
->  	       vmcs_readl(HOST_CR4));
-> @@ -6587,25 +6609,29 @@ void dump_vmcs(struct kvm_vcpu *vcpu)
->  	pr_err("*** Control State ***\n");
->  	pr_err("CPUBased=0x%08x SecondaryExec=0x%08x TertiaryExec=0x%016llx\n",
->  	       cpu_based_exec_ctrl, secondary_exec_control, tertiary_exec_control);
-> -	pr_err("PinBased=0x%08x EntryControls=%08x ExitControls=%08x\n",
-> -	       pin_based_exec_ctrl, vmentry_ctl, vmexit_ctl);
-> +	pr_err("PinBased=0x%08x EntryControls=0x%08x\n",
-> +	       pin_based_exec_ctrl, vmentry_ctl);
-> +	pr_err("ExitControls=0x%08x SecondaryExitControls=0x%016llx\n",
-> +	       vmexit_ctl, secondary_vmexit_ctl);
->  	pr_err("ExceptionBitmap=%08x PFECmask=%08x PFECmatch=%08x\n",
->  	       vmcs_read32(EXCEPTION_BITMAP),
->  	       vmcs_read32(PAGE_FAULT_ERROR_CODE_MASK),
->  	       vmcs_read32(PAGE_FAULT_ERROR_CODE_MATCH));
-> -	pr_err("VMEntry: intr_info=%08x errcode=%08x ilen=%08x\n",
-> +	pr_err("VMEntry: intr_info=%08x errcode=%08x ilen=%08x event_data=%016llx\n",
->  	       vmcs_read32(VM_ENTRY_INTR_INFO_FIELD),
->  	       vmcs_read32(VM_ENTRY_EXCEPTION_ERROR_CODE),
-> -	       vmcs_read32(VM_ENTRY_INSTRUCTION_LEN));
-> +	       vmcs_read32(VM_ENTRY_INSTRUCTION_LEN),
-> +	       kvm_cpu_cap_has(X86_FEATURE_FRED) ? vmcs_read64(INJECTED_EVENT_DATA) : 0);
->  	pr_err("VMExit: intr_info=%08x errcode=%08x ilen=%08x\n",
->  	       vmcs_read32(VM_EXIT_INTR_INFO),
->  	       vmcs_read32(VM_EXIT_INTR_ERROR_CODE),
->  	       vmcs_read32(VM_EXIT_INSTRUCTION_LEN));
->  	pr_err("        reason=%08x qualification=%016lx\n",
->  	       vmcs_read32(VM_EXIT_REASON), vmcs_readl(EXIT_QUALIFICATION));
-> -	pr_err("IDTVectoring: info=%08x errcode=%08x\n",
-> +	pr_err("IDTVectoring: info=%08x errcode=%08x event_data=%016llx\n",
->  	       vmcs_read32(IDT_VECTORING_INFO_FIELD),
-> -	       vmcs_read32(IDT_VECTORING_ERROR_CODE));
-> +	       vmcs_read32(IDT_VECTORING_ERROR_CODE),
-> +	       kvm_cpu_cap_has(X86_FEATURE_FRED) ? vmcs_read64(ORIGINAL_EVENT_DATA) : 0);
->  	pr_err("TSC Offset = 0x%016llx\n", vmcs_read64(TSC_OFFSET));
->  	if (secondary_exec_control & SECONDARY_EXEC_TSC_SCALING)
->  		pr_err("TSC Multiplier = 0x%016llx\n",
-> -- 
-> 2.48.1
-> 
+I'm open to other approaches to solving the issue, but making an additive=
+ change
+to fdinfo seemed innocuous enough, and hopefully unlikely to be incompati=
+ble
+with future direction of this subsystem.
+
+Thanks,
+Alex
 
