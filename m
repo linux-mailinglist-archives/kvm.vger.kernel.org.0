@@ -1,122 +1,194 @@
-Return-Path: <kvm+bounces-50480-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50481-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BB42AE624D
-	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 12:23:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74EA1AE625C
+	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 12:26:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 289383A31CE
-	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 10:23:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F407016999D
+	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 10:26:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C508B28ECE2;
-	Tue, 24 Jun 2025 10:22:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EFC4283FF4;
+	Tue, 24 Jun 2025 10:26:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OZH/e3B8"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fxr/CiJ1"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 720A4281356
-	for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 10:22:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22EAD25DB13
+	for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 10:26:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750760533; cv=none; b=HcW2+fnrtCfXvnel9giDOzs4aM5Bqm9dP/V0OBgOIgDcTXFVcIHWmJ7PocuHKQqElptwxuFVlQlBQ73Nh7IVHy7+/MfP+EziuCK6SRAYzIU8f4x3gRJGbmPAu5Fb59WuJDCxO4eIoHcKZwfbTagP5IfPrlWDJ50k7QTlOEksz7E=
+	t=1750760783; cv=none; b=IGj5zeiT2BFknWSlrPx26ZHTSbIz0sPrQ7WKuA9w4ZinGTpGBupY++xhyZchzjTMPFQSmNRBkRtWq6xC1FAED1CLW33RFt66CyEJp01ITdeqRbrWOWr5l4YpFukS4k8uMy3YwdMrh4U1CuYbrNtQrWJ41UD+IhytqTCCYo4QzBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750760533; c=relaxed/simple;
-	bh=EAplqW2ugJAkvDa+aOJIODUp0iAnSPiEybzJg50wrII=;
+	s=arc-20240116; t=1750760783; c=relaxed/simple;
+	bh=nn4SuqpphmFRlZUcHn3smREQdX+2aWW06JOZrPoskiM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=psPzBOoh6SdGcVc++O/QmalbA8ElH4qMmv2QJGxXrwIyFY7m/byGbhH18vpS5yqvQFZDqybi0AnpG91KqYdU7Rwh2WMrBVzDdo5sldU56Nd9vmU2A2WItZAtHX+qEsrJLmyHr0xdoRutyxs1z/1MWPlstvsWAb5gBRXDm2l3uSA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OZH/e3B8; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750760530;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LBSg8EY7sp1BX+AXcNCVD/E1en0mg8rYiqbGQhd2mHE=;
-	b=OZH/e3B8jD/NDnWCNQVONEXGbmYO6p9dOnUYwmkmaLJ0XXT7NaGgFbnvxrSpy4FEvweRre
-	m+S2qf5mVjy9GTF2mbQNtmfC+c5ttmh1x/bQVkOwWNmWtyVKzrN/WOjeWv8F4e+HR2e0yz
-	hDtw4IY3btBv/PIcuvCN8Hd9n49u/lc=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-692-OmRNSvngNPKEgOH4qWMkTA-1; Tue, 24 Jun 2025 06:22:08 -0400
-X-MC-Unique: OmRNSvngNPKEgOH4qWMkTA-1
-X-Mimecast-MFC-AGG-ID: OmRNSvngNPKEgOH4qWMkTA_1750760527
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-ade6db50b9cso30106166b.1
-        for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 03:22:08 -0700 (PDT)
+	 To:Cc:Content-Type; b=I9kJRORZCfHdYrizqlnuJunfh/JfnemSOn4E/5wC/hxgjLnZxsHSBLNit2YAeaJJ5Gdzww0dKwNLlPJ0X+95bZwKnRymzTYtTL0QEmmEdQjLvbmCjoNAHvrqM3PSspds/BXVONfh+fShJoaApuBmUDVGlG1OZCu5OcjvF7jBYZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fxr/CiJ1; arc=none smtp.client-ip=209.85.160.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-4a5ac8fae12so374201cf.0
+        for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 03:26:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1750760781; x=1751365581; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=uaKxjTr2Dy9UkQ7LbzgGPeXHUMCK6nT4emjWQgyE2Gc=;
+        b=fxr/CiJ1UY8W+xXx21zxvYzxOyD3lqxHtnUGdNXN1X340n0Sj2ifmmceTIhFy1FDvd
+         OxTL9xQNBOItwsvdsdmqSqRyLp9EIyZH7QnUbYxanoCHLGiHwGyRRDlbaP8LCPey+8mO
+         VWgI6MPbt0PZOla3OOZTFI3hd0Gd4vCGbe3vsZmDZTIDP/79yjBaVcwSuExhHtfFBz+L
+         4POyEBzswOJLDootpZ0pi+Nve5SVUjS1JlAPtjl8XJqsZ0Pt3RqwlQp9FULxFZJ/L/CX
+         KRcnGmaCdwLTZ/PbRECRtYKcSdNdfKToYChsqDa1OO/CWttW0No8zGNElDF2DUSalE3q
+         k0cA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750760527; x=1751365327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LBSg8EY7sp1BX+AXcNCVD/E1en0mg8rYiqbGQhd2mHE=;
-        b=J2oYszkwMjmADr2tWQMMttl7NHH+nbuxR9ODdOuGEgsC/rP9kyBRkP4+Rg92apuQ0v
-         cODEzmHtx0bxNakexAxubXpOxjmUvNMjlc97f8yHYZGW62TgyHddwk0+qLvGB3aMvOIZ
-         GaG7AarghD4xHuKLNzSfoO5gibIRmR+SIx74mHEJym1zJ5IKp1EH1QBXzCJv+1ZOXjMD
-         /0sWs/BFBlqJ8iqt15WYeUolGxbUlMnE48IJijGRiEeBYGAZ7j2ev6Lx9yGThz9Pkjvb
-         8gOm27/mQquWha+ZdtI1PiTK8qVuoCwt0Lu5yxl5ruYGNW8Xa7onlUxJudCVnNSvnL/b
-         UkZg==
-X-Forwarded-Encrypted: i=1; AJvYcCVMyy1eCP84IOvOzQYbLaOerWVJKCP9+4On9n0tZjIsad2+WJ+wZelWdSnlc7tUI94qS6E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwBkrsNUwX7C2hgf6R+yG99jlRJ8jFCXGVFPN3fx0JV/U//m+h9
-	HBRlYIZp6RIMHyavgJeJyaBJlaBwlq3j7QmQPCCneq0+k3WtvPusGTHtG8a8DJ8knAoYR0QIq4F
-	mFyfhi4pVrG5lYJp2m2goggig8GKki2V6i2qKxOUimw9IashrPTH/i8ED1AcuGaJtLTUN6XzmM+
-	zeqm9NC0YXxSmcQseHiMOY5R09Aleb
-X-Gm-Gg: ASbGncvDgvs5xq4biTrar44D6CQ5g05Hhch5SNS5fX1XKkgpCosKgvLZUszw0s86xav
-	HGHBzZxmKyVIc91UmAnachgpLweEK0oPtx8eR/YJROzfC2spN/5ZlV7ub0d1iYFl0auP6r+B+ZO
-	EXZRqV
-X-Received: by 2002:a17:906:8924:b0:ae0:ad5c:4185 with SMTP id a640c23a62f3a-ae0ad5c4bb6mr127042566b.57.1750760525933;
-        Tue, 24 Jun 2025 03:22:05 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFK7idR9ddwSthjp78IPlVH980PF43V9ofMCipwNRyRw+Vq3cABVYLahb6LovHNST8gpasNwDNrhBfNArPnPZc=
-X-Received: by 2002:a17:906:8924:b0:ae0:ad5c:4185 with SMTP id
- a640c23a62f3a-ae0ad5c4bb6mr127039766b.57.1750760525506; Tue, 24 Jun 2025
- 03:22:05 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1750760781; x=1751365581;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=uaKxjTr2Dy9UkQ7LbzgGPeXHUMCK6nT4emjWQgyE2Gc=;
+        b=t6LfFR0CxL+5Km/U+QHDbAr2R/UU7C2PH6SzfBd+pI2Hf1zN0xqCsz4F37Eeb5gbSV
+         mo4UfcNBLUi+IG2FN+ymsDOgS4/sAA3iiIRiD9eeN8Kp57ivFAfDbtqtfgb3JW+JN+eo
+         c6hhV/eGvPpFBcGW4+WmRzlzN9RdogNdRDH2otxDQyyvnWPP9JAEx1xHNavsYzacI5vV
+         M9ai6tRrTuVXjSC/OgdQ/zxuKRVr1MXJoGhHgjVWa9TRTLJq9wGMpk6duXOJOZP/rwUu
+         FRSG7mPSLL/L9cUtTGJx2onn8inH71Ng5jKHAe4f0CfuiRfEOBur3eDYkXUmcm3tHBbb
+         46/g==
+X-Forwarded-Encrypted: i=1; AJvYcCWsQ+GtxWEgje43WX0txvQzLUFKbMltVaO7Kv8hUjZt7se1EvKSqGGH3QTSQBjDyinsjU4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyKhbje4zzjQ8IEn+zhMJ1uHISDhVXuuQNPyh/f2tRwjVQ7R6md
+	tv4KqYgtBlnbU8frKPrvw+XZBNPzZMMbPLg02TwHuESEquAkq2o98BZit6NLL5RFQiCDGQR0VR5
+	OizUyOT8BcllRRImu6Z0M9Y1fdtwMm3ZQTo8krYeO
+X-Gm-Gg: ASbGncul85XUP9+X9KZIa0O2zvPF/v1GKFLsFpQ+zTwhP6xkrjHSjHC5YeswSi/HByw
+	Dph8NGj6nOwX9hzUHBFgpLXZyw0SAw/ceIXft99BGInhpEDnKLL9CBfBllb3pH04gDF4FGxHMCO
+	sin05XUMLxemDOexLCQaPfN8jBKV5qUIG0HS1wj4PxIkCNgwilXDD8s3S/Wxh2Ndt/7+P431BF
+X-Google-Smtp-Source: AGHT+IG7dvHk9kjVfPdNY3CE09+ALlTOMcwHOWFBP9WRHrrMEvmf41kIS7uFXbaypXOKaIBbz/ZGTrFP7IhVhX4+5X4=
+X-Received: by 2002:ac8:5ac2:0:b0:4a6:f9d2:b538 with SMTP id
+ d75a77b69052e-4a7af677e68mr3881551cf.28.1750760780317; Tue, 24 Jun 2025
+ 03:26:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250617001838.114457-1-linux@treblig.org> <CAJaqyWfD1xy+Y=fn1x8uXTMQuq8ewVV9MsttzCxLACJJZg2A2Q@mail.gmail.com>
-In-Reply-To: <CAJaqyWfD1xy+Y=fn1x8uXTMQuq8ewVV9MsttzCxLACJJZg2A2Q@mail.gmail.com>
-From: Lei Yang <leiyang@redhat.com>
-Date: Tue, 24 Jun 2025 18:21:28 +0800
-X-Gm-Features: Ac12FXzfQeWK8ouZps9YTtPNR42ROlRbSB3jIfmuYcflJDxiz6fBrlpSiur_mHY
-Message-ID: <CAPpAL=xgBK3qqNdaiR=OwbiMaA_5VpouE4YfaEyYghkHxJ0CtQ@mail.gmail.com>
-Subject: Re: [PATCH v2 0/2] vringh small unused functions
-To: Eugenio Perez Martin <eperezma@redhat.com>
-Cc: linux@treblig.org, mst@redhat.com, horms@kernel.org, jasowang@redhat.com, 
-	xuanzhuo@linux.alibaba.com, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
+References: <20250611133330.1514028-1-tabba@google.com> <80e062dd-2445-45a6-ba4a-8f5fe3286909@redhat.com>
+ <CA+EHjTx2MUq98=j=5J+GwSJ1gd7ax-RrpS8WhEJg4Lk9_USUmA@mail.gmail.com> <372bbfa5-1869-4bf2-9c16-0b828cdb86f5@redhat.com>
+In-Reply-To: <372bbfa5-1869-4bf2-9c16-0b828cdb86f5@redhat.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Tue, 24 Jun 2025 11:25:43 +0100
+X-Gm-Features: Ac12FXzp2QR2bGdUaTCduQbIoXQgEK3ZRaRgh2VOnlt_lf7nCklaqTOJp7VscJk
+Message-ID: <CA+EHjTyxwdu5YhtZRcwb-iR7aaEq1beV+4VWSsv7-X2tDVBkrA@mail.gmail.com>
+Subject: Re: [PATCH v12 00/18] KVM: Mapping guest_memfd backed memory at the
+ host for software protected VMs
+To: David Hildenbrand <david@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-mm@kvack.org, kvmarm@lists.linux.dev, pbonzini@redhat.com, 
+	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
+	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
+	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
+	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, 
+	dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net, 
+	vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com, 
+	mail@maciej.szmigiero.name, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
+	ira.weiny@intel.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Tested this series of patches with virtio-net regression tests,
-everything works fine.
+Hi David,
 
-Tested-by: Lei Yang <leiyang@redhat.com>
-
-On Tue, Jun 17, 2025 at 8:31=E2=80=AFPM Eugenio Perez Martin
-<eperezma@redhat.com> wrote:
+On Tue, 24 Jun 2025 at 11:16, David Hildenbrand <david@redhat.com> wrote:
 >
-> On Tue, Jun 17, 2025 at 2:18=E2=80=AFAM <linux@treblig.org> wrote:
-> >
-> > From: "Dr. David Alan Gilbert" <linux@treblig.org>
-> >
+> On 24.06.25 12:02, Fuad Tabba wrote:
 > > Hi,
-> >   The following pair of patches remove a bunch of small functions
-> > that have been unused for a long time.
 > >
+> > Before I respin this, I thought I'd outline the planned changes for
+> > V13, especially since it involves a lot of repainting. I hope that
+> > by presenting this first, we could reduce the number of times I'll
+> > need to respin it.
+> >
+> > In struct kvm_arch: add bool supports_gmem instead of renaming
+> > has_private_mem
+> >
+> > The guest_memfd flag GUEST_MEMFD_FLAG_SUPPORT_SHARED should be
+> > called GUEST_MEMFD_FLAG_MMAP
+> >
+> > The memslot internal flag KVM_MEMSLOT_SUPPORTS_GMEM_SHARED should be
+> > called KVM_MEMSLOT_SUPPORTS_GMEM_MMAP
+> >
+> > kvm_arch_supports_gmem_shared_mem() should be called
+> > kvm_arch_supports_gmem_mmap()
+> >
+> > kvm_gmem_memslot_supports_shared() should be called
+> > kvm_gmem_memslot_supports_mmap()
+> >
+> > kvm_gmem_fault_shared(struct vm_fault *vmf) should be called
+> > kvm_gmem_fault_user_mapping(struct vm_fault *vmf)
+> >
+> > The capability KVM_CAP_GMEM_SHARED_MEM should be called
+> > KVM_CAP_GMEM_MMAP
+> >
+> > The Kconfig CONFIG_KVM_GMEM_SHARED_MEM should be called
+> > CONFIG_KVM_GMEM_SUPPORTS_MMAP
 >
-> Acked-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
+> Works for me.
 >
-> Thanks!
+> >
+> > Also, what (unless you disagree) will stay the same as V12:
+> >
+> > Rename CONFIG_KVM_PRIVATE_MEM to CONFIG_KVM_GMEM: Since private
+> > implies gmem, and we will have additional flags for MMAP support
 >
+> Agreed.
 >
+> >
+> > Rename CONFIG_KVM_GENERIC_PRIVATE_MEM to
+> > CONFIG_KVM_GENERIC_GMEM_POPULATE
+>
+> Agreed.
+>
+> >
+> > Rename  kvm_slot_can_be_private() to kvm_slot_has_gmem(): since
+> > private does imply that it has gmem
+>
+> Right. It's a little more tricky in reality at least with this series:
+> without in-place conversion, not all gmem can have private memory. But
+> the places that check kvm_slot_can_be_private() likely only care about
+> if this memslot is backed by gmem.
 
+Exactly. Reading the code, all the places that check
+kvm_slot_can_be_private() are really checking whether the slot has
+gmem. After this series, if a caller is interested in finding out
+whether a slot can be private could achieve the same effect by
+checking that a gmem slot doesn't support mmap (i.e.,
+kvm_slot_has_gmem() && kvm_arch_supports_gmem_mmap() ). If that
+happens, we can reintroduce kvm_slot_can_be_private() as such.
+
+Otherwise, I could keep it and already define it as so. What do you think?
+
+> Sean also raised a "kvm_is_memslot_gmem_only()", how did you end up
+> calling that?
+
+Good point, I'd missed that. Isn't it true that
+kvm_is_memslot_gmem_only() is synonymous (at least for now) with
+kvm_gmem_memslot_supports_mmap()?
+Thanks,
+/fuad
+
+> --
+> Cheers,
+>
+> David / dhildenb
+>
 
