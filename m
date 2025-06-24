@@ -1,80 +1,80 @@
-Return-Path: <kvm+bounces-50518-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50519-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B02B3AE6C67
-	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 18:27:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89911AE6C73
+	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 18:32:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 754795A51BB
-	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 16:27:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9737E1BC82F7
+	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 16:32:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20FF82E2F16;
-	Tue, 24 Jun 2025 16:27:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 709BA2E2F12;
+	Tue, 24 Jun 2025 16:32:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UgYA6gHt"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xvPOu6Yq"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94C9F2E2F05
-	for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 16:27:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E381218ABA
+	for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 16:32:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750782440; cv=none; b=bxwhgYsrUsLXbxle0JBdXJ/2biLrmw3ISJj9tw3VJ1rVfCHddNNyXscqRwD/Jic6NftoB5jV0g8Eu+Pygsj4yelrdqOgB2Bso6I9QVPXtRRZFRiP5tfB75svetNhYnLXHCRDBmzWQByI6NrqgLuOk6knDLsR9aQ8ySx1BdwRQ/I=
+	t=1750782725; cv=none; b=NGnvtzprsT3+ScMAMjFIkhxngG7H9EbU4dcJ/8OV5/wg1VY+F/To5vIUor4nvrEp26q2Z4jYzqjW97kxi5E/xfSj5dMqMHhznZnPjnYOyXZEhNM1UFXyyHD7VBjgD71UECpS9ocv9ue/GPArGOsMSMKdmx2zPwhYvO4+9RVFwfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750782440; c=relaxed/simple;
-	bh=/a7bnevcq/hUsrT2G8I/opotGB7bYgVoeR0Zj6Jliig=;
+	s=arc-20240116; t=1750782725; c=relaxed/simple;
+	bh=olUyBWxDQPtIHZXCrj2D5nX3VCAezpOoJNhDp42CoSw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=TM+4Zv9vPyk7zblDCqv3I2ANR/n/QTBj+SfD7+jnddvq5wSHvx/9PWMNFFGJTnn6dkDWyBFopG/BfvRWarRhBw5ZZV7PdwFHaiZC1MakQMiOzHYvMo4A0nx2xXtZA6Rkw3V+DPIlUh8xylWCtoP/GrjFEJ8+nhN+OUbcCK+HKCY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UgYA6gHt; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=FHHYZE9F1ZCV4EEkKl6dGGw37Fuvsfymr5lm5PIu7fH/aF2vTA1M0G1wxRjlh0q3noZWvylzhZQtR/dVpBer45ddHvvcGEs5thHVCPOWrP72amGAk7OET/4bixR7Ryst9EZbPYIiKZ6PpRwz5JJKScieU56+FHuIwTdlhDXzGYU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xvPOu6Yq; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-234b133b428so5016075ad.3
-        for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 09:27:18 -0700 (PDT)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b2eeff19115so970501a12.0
+        for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 09:32:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750782438; x=1751387238; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1750782723; x=1751387523; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3XU9PZOS8h3qM8j/vYtr6Tu7O46DilgXxn9Be95y+uI=;
-        b=UgYA6gHtgJ/5BcJrVh3FNY4ECZ/iX8v3Kcf+cWcGRv0o8F222hlEWS8Kq7vKXtrimM
-         9SIL1RPaDcK4IN+CY218eReV9EcMMKf3hPaQJey90wCj+TUvwkpU/bvC4jn3ntrIeobf
-         DfCkIqz3veKiEote527YdYI9/AhtayYJ55+OsXSJlYahWx0vru+DFcIEu0IB2SGAlNXQ
-         e1FIY5bKXHNS2rerO8KW65dp6ltQ+uYY0LpHDgR5b9yMrxtqjMX/x7JFX8kQM2pmZ6DT
-         oPkK0zOG2yHzO1JKbyVlGiG6YAJarZN6HtzR7qQ/vk76zqxJYRGaJr7h2b3pDz1wATUC
-         bYfw==
+        bh=XsS+ElmraQqT2Fu4rLd2/fa1KgRzuoHdf4Xkll7wCgE=;
+        b=xvPOu6Yq0qfmEirTPIub+feLaP0bKw0C/EHwdQydB8CvJzHyuuzCmCFqPVzk4uGoeV
+         y5HuIk8c9Nxpzo8CQcV67pO8+Ucgoyab2wyMRtqY/djPf0cJ0Y8QcSSItdZ/9skcmIhZ
+         pctY9I4K7ZrjCZ7p7EDpMGjgD5sXkDbzyboAiwbhDBl0cK39zTj3hjosM0gmFZWhfhxh
+         BBQQrRVrFsrSdXfKpwaeRQ7xKfePbhT1ySP2GUIYW62Oipc3TCgkWhWOOeQ26brNq9vW
+         DGTCGsJ0Kcdmp4xnfls12O9JhmfUoYSws2O97Dn89US58+qMBfWmgL7EAve4wAaeOlCA
+         LLlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750782438; x=1751387238;
+        d=1e100.net; s=20230601; t=1750782723; x=1751387523;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3XU9PZOS8h3qM8j/vYtr6Tu7O46DilgXxn9Be95y+uI=;
-        b=bPgAFDwf6NVBVExiO+Tn1R8Pqo5V3HczArjHfFEdU0OuGV9JUBfjeDR1EQcuEbeuuw
-         3h9jwve6hZUaIVWlxjdv7Y+9aRSIdqvAOCeBj/uyFuu+5Jv59i5z91RaXfaznrvPgCTB
-         ghLVey7lEwY9fT+dWQcXCDz+XfGbNpGLn5wrjJBpV1aGJxSM7PPK1W8tiLAYUXVvNpvq
-         2ekhVONLEtrYIS0s0q5BWazW045eaoUtgD1e5dWLzQbM4OGerplAXgH+PCNnFxQYbLuD
-         gsXfz2HDe6c1wPFOtD6AJiQrmxnLJuUwV6sV9qhSIe7ESW2gg+aOHlnC6DXIK2iwlYns
-         HsOA==
-X-Forwarded-Encrypted: i=1; AJvYcCVAO0Z0cC3gdd4Mc206RsDfFHajb99izma21WoUw/zaNgvpUcfeqzpAcPHBORt2xUpQFmA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz/+Wdu34kdt4UNCpX/c58L0CIqoUoN6Qs1f68fZX7RlDROsk5M
-	/NF4is4RpmE4nc3fRCuq6vHZsanUM7IGcRAPdG5M5oiTsdKBsaGGhBdtPnjQghhIw5JsA35hYpa
-	odqQ/xg==
-X-Google-Smtp-Source: AGHT+IFV0P3ZB/DP8ghmvs2Dp/i/ZHiBdp7WzvPKc/jhvZS3BGK8g6s0wf/z7wxYbHC1JNe2QocFSvwlZlk=
-X-Received: from plbg10.prod.google.com ([2002:a17:902:d1ca:b0:235:160a:76e])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:da86:b0:235:e8da:8d1
- with SMTP id d9443c01a7336-2381ddd1cb6mr4789835ad.8.1750782437942; Tue, 24
- Jun 2025 09:27:17 -0700 (PDT)
-Date: Tue, 24 Jun 2025 09:27:16 -0700
-In-Reply-To: <20250328171205.2029296-9-xin@zytor.com>
+        bh=XsS+ElmraQqT2Fu4rLd2/fa1KgRzuoHdf4Xkll7wCgE=;
+        b=ap1N5cNPILnmVaY/tJGm2jovc5pCYQsDA/1AKvcrlQQHMEUxCpti/2dohm+5p4HXJ4
+         p8PLX7B22qqjxdG6NQ4VgntSujUuOq3VzzpMBgTJrH0x+iZExq5BHtk8SefBo0hUJ9AN
+         a+/XxPWc90OEYZZpAUYMh02D3BwIEAylr9DjxcI28vOxEs/lvgBFY4bWyPVzv3jqm2oH
+         u7HaN+8POnxFXouaHrWnN09gNknkH9hUdLYIctR6SWTVraKA++wu0P4OWCrgoiYWNKSo
+         qCgM17xz7i0qU3vE0qeEU7eK4wW85zw3GlnpYrJ41SMX6EUzxGcGROoGtZD4dL4ORj07
+         XPcg==
+X-Forwarded-Encrypted: i=1; AJvYcCXP4418e5w1D44Xt62DU4FcCjLjZj6eYFOPzjAeKGPuSk57CasQlM9WWFF/zYAP02CQsoc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwFFz3RNjVDxTTxabnp3v++49s0yvIgGGV6+Euin7ZuF0meI0sy
+	wqMhWY268328LHT4Tdvxk7UnrZSNPNeMrB7zJnbud+ulj7ISzQBUawuzynFAP+c9n5eJuvL2zVI
+	oJMSYyA==
+X-Google-Smtp-Source: AGHT+IEGQw4P+7gI/qlyHfyN7lsnbcl2WppeAde2ZamzUdLwVr0mYJgpyGapX/fOe6J7uhawtLrxthKo/zo=
+X-Received: from pgho22.prod.google.com ([2002:a63:fb16:0:b0:b2c:4226:67db])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:1589:b0:21f:4631:811c
+ with SMTP id adf61e73a8af0-22026ec726cmr22498760637.19.1750782723360; Tue, 24
+ Jun 2025 09:32:03 -0700 (PDT)
+Date: Tue, 24 Jun 2025 09:32:01 -0700
+In-Reply-To: <20250328171205.2029296-15-xin@zytor.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250328171205.2029296-1-xin@zytor.com> <20250328171205.2029296-9-xin@zytor.com>
-Message-ID: <aFrR5Nk1Ge3_ApWy@google.com>
-Subject: Re: [PATCH v4 08/19] KVM: VMX: Add support for FRED context save/restore
+References: <20250328171205.2029296-1-xin@zytor.com> <20250328171205.2029296-15-xin@zytor.com>
+Message-ID: <aFrTAT-xTLmlwO5V@google.com>
+Subject: Re: [PATCH v4 14/19] KVM: VMX: Dump FRED context in dump_vmcs()
 From: Sean Christopherson <seanjc@google.com>
 To: "Xin Li (Intel)" <xin@zytor.com>
 Cc: pbonzini@redhat.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
@@ -87,272 +87,124 @@ Content-Type: text/plain; charset="us-ascii"
 On Fri, Mar 28, 2025, Xin Li (Intel) wrote:
 > From: Xin Li <xin3.li@intel.com>
 > 
-> Handle FRED MSR access requests, allowing FRED context to be set/get
-> from both host and guest.
-> 
-> During VM save/restore and live migration, FRED context needs to be
-> saved/restored, which requires FRED MSRs to be accessed from userspace,
-> e.g., Qemu.
-> 
-> Note, handling of MSR_IA32_FRED_SSP0, i.e., MSR_IA32_PL0_SSP, is not
-> added yet, which is done in the KVM CET patch set.
+> Add FRED related VMCS fields to dump_vmcs() to dump FRED context.
 > 
 > Signed-off-by: Xin Li <xin3.li@intel.com>
 > Signed-off-by: Xin Li (Intel) <xin@zytor.com>
 > Tested-by: Shan Kang <shan.kang@intel.com>
 > ---
 > 
-> Changes since v2:
-> * Add a helper to convert FRED MSR index to VMCS field encoding to
->   make the code more compact (Chao Gao).
-> * Get rid of the "host_initiated" check because userspace has to set
->   CPUID before MSRs (Chao Gao & Sean Christopherson).
-> * Address a few cleanup comments (Sean Christopherson).
+> Change in v3:
+> * Use (vmentry_ctrl & VM_ENTRY_LOAD_IA32_FRED) instead of is_fred_enabled()
+>   (Chao Gao).
 > 
-> Changes since v1:
+> Changes in v2:
 > * Use kvm_cpu_cap_has() instead of cpu_feature_enabled() (Chao Gao).
-> * Fail host requested FRED MSRs access if KVM cannot virtualize FRED
->   (Chao Gao).
-> * Handle the case FRED MSRs are valid but KVM cannot virtualize FRED
->   (Chao Gao).
-> * Add sanity checks when writing to FRED MSRs.
+> * Dump guest FRED states only if guest has FRED enabled (Nikolay Borisov).
 > ---
->  arch/x86/kvm/vmx/vmx.c | 48 ++++++++++++++++++++++++++++++++++++++++++
->  arch/x86/kvm/x86.c     | 28 ++++++++++++++++++++++++
->  2 files changed, 76 insertions(+)
+>  arch/x86/kvm/vmx/vmx.c | 40 +++++++++++++++++++++++++++++++++-------
+>  1 file changed, 33 insertions(+), 7 deletions(-)
 > 
 > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 1fd32aa255f9..ae9712624413 100644
+> index c76015e1e3f8..03855d6690b2 100644
 > --- a/arch/x86/kvm/vmx/vmx.c
 > +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -1426,6 +1426,24 @@ static void vmx_write_guest_kernel_gs_base(struct vcpu_vmx *vmx, u64 data)
->  	preempt_enable();
->  	vmx->msr_guest_kernel_gs_base = data;
->  }
-> +
-> +static u64 vmx_read_guest_fred_rsp0(struct vcpu_vmx *vmx)
-> +{
-> +	preempt_disable();
-> +	if (vmx->guest_state_loaded)
-> +		vmx->msr_guest_fred_rsp0 = read_msr(MSR_IA32_FRED_RSP0);
-> +	preempt_enable();
-> +	return vmx->msr_guest_fred_rsp0;
-> +}
-> +
-> +static void vmx_write_guest_fred_rsp0(struct vcpu_vmx *vmx, u64 data)
-> +{
-> +	preempt_disable();
-> +	if (vmx->guest_state_loaded)
-> +		wrmsrns(MSR_IA32_FRED_RSP0, data);
-> +	preempt_enable();
-> +	vmx->msr_guest_fred_rsp0 = data;
-> +}
->  #endif
-
-Maybe add helpers to deal with the preemption stuff?  Oh, never mind, FRED
-uses WRMSRNS.  Hmm, actually, can't these all be non-serializing?  KVM is
-progating *guest* values to hardware, so a VM-Enter is guaranteed before the
-CPU value can be consumed.
-
-#ifdef CONFIG_X86_64
-static u64 vmx_read_guest_host_msr(struct vcpu_vmx *vmx, u32 msr, u64 *cache)
-{
-	preempt_disable();
-	if (vmx->guest_state_loaded)
-		*cache = read_msr(msr);
-	preempt_enable();
-	return *cache;
-}
-
-static u64 vmx_write_guest_host_msr(struct vcpu_vmx *vmx, u32 msr, u64 data,
-				    u64 *cache)
-{
-	preempt_disable();
-	if (vmx->guest_state_loaded)
-		wrmsrns(MSR_KERNEL_GS_BASE, data);
-	preempt_enable();
-	*cache = data;
-}
-
-static u64 vmx_read_guest_kernel_gs_base(struct vcpu_vmx *vmx)
-{
-	return vmx_read_guest_host_msr(vmx, MSR_KERNEL_GS_BASE,
-				       &vmx->msr_guest_kernel_gs_base);
-}
-
-static void vmx_write_guest_kernel_gs_base(struct vcpu_vmx *vmx, u64 data)
-{
-	vmx_write_guest_host_msr(vmx, MSR_KERNEL_GS_BASE, data,
-				 &vmx->msr_guest_kernel_gs_base);
-}
-
-static u64 vmx_read_guest_fred_rsp0(struct vcpu_vmx *vmx)
-{
-	return vmx_read_guest_host_msr(vmx, MSR_IA32_FRED_RSP0,
-				       &vmx->msr_guest_fred_rsp0);
-}
-
-static void vmx_write_guest_fred_rsp0(struct vcpu_vmx *vmx, u64 data)
-{
-	return vmx_write_guest_host_msr(vmx, MSR_IA32_FRED_RSP0, data,
-				        &vmx->msr_guest_fred_rsp0);
-}
-#endif
-
->  static void grow_ple_window(struct kvm_vcpu *vcpu)
-> @@ -2039,6 +2057,24 @@ int vmx_get_feature_msr(u32 msr, u64 *data)
->  	}
->  }
+> @@ -6462,7 +6462,7 @@ void dump_vmcs(struct kvm_vcpu *vcpu)
+>  	struct vcpu_vmx *vmx = to_vmx(vcpu);
+>  	u32 vmentry_ctl, vmexit_ctl;
+>  	u32 cpu_based_exec_ctrl, pin_based_exec_ctrl, secondary_exec_control;
+> -	u64 tertiary_exec_control;
+> +	u64 tertiary_exec_control, secondary_vmexit_ctl;
+>  	unsigned long cr4;
+>  	int efer_slot;
 >  
-> +#ifdef CONFIG_X86_64
-> +static u32 fred_msr_vmcs_fields[] = {
-
-This should be const.
-
-> +	GUEST_IA32_FRED_RSP1,
-> +	GUEST_IA32_FRED_RSP2,
-> +	GUEST_IA32_FRED_RSP3,
-> +	GUEST_IA32_FRED_STKLVLS,
-> +	GUEST_IA32_FRED_SSP1,
-> +	GUEST_IA32_FRED_SSP2,
-> +	GUEST_IA32_FRED_SSP3,
-> +	GUEST_IA32_FRED_CONFIG,
-> +};
-
-I think it also makes sense to add a static_assert() here, more so to help
-readers follow along than anything else.
-
-static_assert(MSR_IA32_FRED_CONFIG - MSR_IA32_FRED_RSP1 ==
-	      ARRAY_SIZE(fred_msr_vmcs_fields) - 1);
-
-> +
-> +static u32 fred_msr_to_vmcs(u32 msr)
-> +{
-> +	return fred_msr_vmcs_fields[msr - MSR_IA32_FRED_RSP1];
-> +}
-> +#endif
-> +
->  /*
->   * Reads an msr value (of 'msr_info->index') into 'msr_info->data'.
->   * Returns 0 on success, non-0 otherwise.
-> @@ -2061,6 +2097,12 @@ int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  	case MSR_KERNEL_GS_BASE:
->  		msr_info->data = vmx_read_guest_kernel_gs_base(vmx);
->  		break;
-> +	case MSR_IA32_FRED_RSP0:
-> +		msr_info->data = vmx_read_guest_fred_rsp0(vmx);
-> +		break;
-> +	case MSR_IA32_FRED_RSP1 ... MSR_IA32_FRED_CONFIG:
-> +		msr_info->data = vmcs_read64(fred_msr_to_vmcs(msr_info->index));
-> +		break;
->  #endif
->  	case MSR_EFER:
->  		return kvm_get_msr_common(vcpu, msr_info);
-> @@ -2268,6 +2310,12 @@ int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  			vmx_update_exception_bitmap(vcpu);
->  		}
->  		break;
-> +	case MSR_IA32_FRED_RSP0:
-> +		vmx_write_guest_fred_rsp0(vmx, data);
-> +		break;
-> +	case MSR_IA32_FRED_RSP1 ... MSR_IA32_FRED_CONFIG:
-> +		vmcs_write64(fred_msr_to_vmcs(msr_index), data);
-> +		break;
->  #endif
->  	case MSR_IA32_SYSENTER_CS:
->  		if (is_guest_mode(vcpu))
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index c841817a914a..007577143337 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -318,6 +318,9 @@ static const u32 msrs_to_save_base[] = {
->  	MSR_STAR,
->  #ifdef CONFIG_X86_64
->  	MSR_CSTAR, MSR_KERNEL_GS_BASE, MSR_SYSCALL_MASK, MSR_LSTAR,
-> +	MSR_IA32_FRED_RSP0, MSR_IA32_FRED_RSP1, MSR_IA32_FRED_RSP2,
-> +	MSR_IA32_FRED_RSP3, MSR_IA32_FRED_STKLVLS, MSR_IA32_FRED_SSP1,
-> +	MSR_IA32_FRED_SSP2, MSR_IA32_FRED_SSP3, MSR_IA32_FRED_CONFIG,
->  #endif
->  	MSR_IA32_TSC, MSR_IA32_CR_PAT, MSR_VM_HSAVE_PA,
->  	MSR_IA32_FEAT_CTL, MSR_IA32_BNDCFGS, MSR_TSC_AUX,
-> @@ -1849,6 +1852,23 @@ static int __kvm_set_msr(struct kvm_vcpu *vcpu, u32 index, u64 data,
+> @@ -6473,6 +6473,8 @@ void dump_vmcs(struct kvm_vcpu *vcpu)
 >  
->  		data = (u32)data;
->  		break;
-> +	case MSR_IA32_FRED_RSP0 ... MSR_IA32_FRED_CONFIG:
-> +		if (!guest_cpu_cap_has(vcpu, X86_FEATURE_FRED))
-> +			return 1;
+>  	vmentry_ctl = vmcs_read32(VM_ENTRY_CONTROLS);
+>  	vmexit_ctl = vmcs_read32(VM_EXIT_CONTROLS);
+> +	secondary_vmexit_ctl = cpu_has_secondary_vmexit_ctrls() ?
+> +			       vmcs_read64(SECONDARY_VM_EXIT_CONTROLS) : 0;
+>  	cpu_based_exec_ctrl = vmcs_read32(CPU_BASED_VM_EXEC_CONTROL);
+>  	pin_based_exec_ctrl = vmcs_read32(PIN_BASED_VM_EXEC_CONTROL);
+>  	cr4 = vmcs_readl(GUEST_CR4);
+> @@ -6519,6 +6521,16 @@ void dump_vmcs(struct kvm_vcpu *vcpu)
+>  	vmx_dump_sel("LDTR:", GUEST_LDTR_SELECTOR);
+>  	vmx_dump_dtsel("IDTR:", GUEST_IDTR_LIMIT);
+>  	vmx_dump_sel("TR:  ", GUEST_TR_SELECTOR);
+> +	if (vmentry_ctl & VM_ENTRY_LOAD_IA32_FRED)
+> +		pr_err("FRED guest: config=0x%016llx, stack_levels=0x%016llx\n"
+> +		       "RSP0=0x%016llx, RSP1=0x%016llx\n"
+> +		       "RSP2=0x%016llx, RSP3=0x%016llx\n",
+> +		       vmcs_read64(GUEST_IA32_FRED_CONFIG),
+> +		       vmcs_read64(GUEST_IA32_FRED_STKLVLS),
+> +		       __rdmsr(MSR_IA32_FRED_RSP0),
 
-Yeesh, this is a bit of a no-win situation.  Having to re-check the MSR index is
-no fun, but the amount of overlap between MSRs is significant, i.e. I see why you
-bundled everything together.  Ugh, and MSR_IA32_FRED_STKLVLS is buried smack dab
-in the middle of everything.
+There is no guarantee the vCPU's FRED_RSP is loaded in hardware at this point.
+I think you need to use vmx_read_guest_fred_rsp0().
 
-> +
-> +		/* Bit 11, bits 5:4, and bit 2 of the IA32_FRED_CONFIG must be zero */
+> +		       vmcs_read64(GUEST_IA32_FRED_RSP1),
+> +		       vmcs_read64(GUEST_IA32_FRED_RSP2),
+> +		       vmcs_read64(GUEST_IA32_FRED_RSP3));
+>  	efer_slot = vmx_find_loadstore_msr_slot(&vmx->msr_autoload.guest, MSR_EFER);
+>  	if (vmentry_ctl & VM_ENTRY_LOAD_IA32_EFER)
+>  		pr_err("EFER= 0x%016llx\n", vmcs_read64(GUEST_IA32_EFER));
+> @@ -6566,6 +6578,16 @@ void dump_vmcs(struct kvm_vcpu *vcpu)
+>  	       vmcs_readl(HOST_TR_BASE));
+>  	pr_err("GDTBase=%016lx IDTBase=%016lx\n",
+>  	       vmcs_readl(HOST_GDTR_BASE), vmcs_readl(HOST_IDTR_BASE));
+> +	if (vmexit_ctl & SECONDARY_VM_EXIT_LOAD_IA32_FRED)
+> +		pr_err("FRED host: config=0x%016llx, stack_levels=0x%016llx\n"
+> +		       "RSP0=0x%016lx, RSP1=0x%016llx\n"
+> +		       "RSP2=0x%016llx, RSP3=0x%016llx\n",
+> +		       vmcs_read64(HOST_IA32_FRED_CONFIG),
+> +		       vmcs_read64(HOST_IA32_FRED_STKLVLS),
+> +		       (unsigned long)task_stack_page(current) + THREAD_SIZE,
 
-Eh, the comment isn't helping much.  If we want to add more documentation, add
-#defines.  But I think we can documented the reserved behavior while also tidying
-up the code a bit.
+Maybe add a helper in arch/x86/include/asm/fred.h to generate the desired RSP0?
+Not sure it's worth doing that just for this code.
 
-After much fiddling, how about this?
-
-	case MSR_IA32_FRED_STKLVLS:
-		if (!guest_cpu_cap_has(vcpu, X86_FEATURE_FRED))
-			return 1;
-		break;			
-
-	case MSR_IA32_FRED_RSP0 ... MSR_IA32_FRED_RSP3:
-	case MSR_IA32_FRED_SSP1 ... MSR_IA32_FRED_CONFIG: {
-		u64 reserved_bits;
-
-		if (!guest_cpu_cap_has(vcpu, X86_FEATURE_FRED))
-			return 1;
-
-		if (is_noncanonical_msr_address(data, vcpu))
-			return 1;
-
-		switch (index) {
-		case MSR_IA32_FRED_CONFIG:
-			reserved_bits = BIT_ULL(11) | GENMASK_ULL(5, 4) | BIT_ULL(2);
-			break;
-		case MSR_IA32_FRED_RSP0 ... MSR_IA32_FRED_RSP3:
-			reserved_bits = GENMASK_ULL(5, 0);
-			break;
-		case MSR_IA32_FRED_SSP1 ... MSR_IA32_FRED_SSP3:
-			reserved_bits = GENMASK_ULL(2, 0);
-			break;
-		default:
-			WARN_ON_ONCE(1);
-			return 1;
-		}
-		if (data & reserved_bits)
-			return 1;
-		break;
-	}
-
-> @@ -1893,6 +1913,10 @@ int __kvm_get_msr(struct kvm_vcpu *vcpu, u32 index, u64 *data,
->  		    !guest_cpu_cap_has(vcpu, X86_FEATURE_RDPID))
->  			return 1;
->  		break;
-> +	case MSR_IA32_FRED_RSP0 ... MSR_IA32_FRED_CONFIG:
-> +		if (!guest_cpu_cap_has(vcpu, X86_FEATURE_FRED))
-> +			return 1;
-> +		break;
->  	}
->  
->  	msr.index = index;
-> @@ -7455,6 +7479,10 @@ static void kvm_probe_msr_to_save(u32 msr_index)
->  		if (!(kvm_get_arch_capabilities() & ARCH_CAP_TSX_CTRL_MSR))
->  			return;
->  		break;
-> +	case MSR_IA32_FRED_RSP0 ... MSR_IA32_FRED_CONFIG:
-> +		if (!kvm_cpu_cap_has(X86_FEATURE_FRED))
-> +			return;
-> +		break;
->  	default:
->  		break;
->  	}
+> +		       vmcs_read64(HOST_IA32_FRED_RSP1),
+> +		       vmcs_read64(HOST_IA32_FRED_RSP2),
+> +		       vmcs_read64(HOST_IA32_FRED_RSP3));
+>  	pr_err("CR0=%016lx CR3=%016lx CR4=%016lx\n",
+>  	       vmcs_readl(HOST_CR0), vmcs_readl(HOST_CR3),
+>  	       vmcs_readl(HOST_CR4));
+> @@ -6587,25 +6609,29 @@ void dump_vmcs(struct kvm_vcpu *vcpu)
+>  	pr_err("*** Control State ***\n");
+>  	pr_err("CPUBased=0x%08x SecondaryExec=0x%08x TertiaryExec=0x%016llx\n",
+>  	       cpu_based_exec_ctrl, secondary_exec_control, tertiary_exec_control);
+> -	pr_err("PinBased=0x%08x EntryControls=%08x ExitControls=%08x\n",
+> -	       pin_based_exec_ctrl, vmentry_ctl, vmexit_ctl);
+> +	pr_err("PinBased=0x%08x EntryControls=0x%08x\n",
+> +	       pin_based_exec_ctrl, vmentry_ctl);
+> +	pr_err("ExitControls=0x%08x SecondaryExitControls=0x%016llx\n",
+> +	       vmexit_ctl, secondary_vmexit_ctl);
+>  	pr_err("ExceptionBitmap=%08x PFECmask=%08x PFECmatch=%08x\n",
+>  	       vmcs_read32(EXCEPTION_BITMAP),
+>  	       vmcs_read32(PAGE_FAULT_ERROR_CODE_MASK),
+>  	       vmcs_read32(PAGE_FAULT_ERROR_CODE_MATCH));
+> -	pr_err("VMEntry: intr_info=%08x errcode=%08x ilen=%08x\n",
+> +	pr_err("VMEntry: intr_info=%08x errcode=%08x ilen=%08x event_data=%016llx\n",
+>  	       vmcs_read32(VM_ENTRY_INTR_INFO_FIELD),
+>  	       vmcs_read32(VM_ENTRY_EXCEPTION_ERROR_CODE),
+> -	       vmcs_read32(VM_ENTRY_INSTRUCTION_LEN));
+> +	       vmcs_read32(VM_ENTRY_INSTRUCTION_LEN),
+> +	       kvm_cpu_cap_has(X86_FEATURE_FRED) ? vmcs_read64(INJECTED_EVENT_DATA) : 0);
+>  	pr_err("VMExit: intr_info=%08x errcode=%08x ilen=%08x\n",
+>  	       vmcs_read32(VM_EXIT_INTR_INFO),
+>  	       vmcs_read32(VM_EXIT_INTR_ERROR_CODE),
+>  	       vmcs_read32(VM_EXIT_INSTRUCTION_LEN));
+>  	pr_err("        reason=%08x qualification=%016lx\n",
+>  	       vmcs_read32(VM_EXIT_REASON), vmcs_readl(EXIT_QUALIFICATION));
+> -	pr_err("IDTVectoring: info=%08x errcode=%08x\n",
+> +	pr_err("IDTVectoring: info=%08x errcode=%08x event_data=%016llx\n",
+>  	       vmcs_read32(IDT_VECTORING_INFO_FIELD),
+> -	       vmcs_read32(IDT_VECTORING_ERROR_CODE));
+> +	       vmcs_read32(IDT_VECTORING_ERROR_CODE),
+> +	       kvm_cpu_cap_has(X86_FEATURE_FRED) ? vmcs_read64(ORIGINAL_EVENT_DATA) : 0);
+>  	pr_err("TSC Offset = 0x%016llx\n", vmcs_read64(TSC_OFFSET));
+>  	if (secondary_exec_control & SECONDARY_EXEC_TSC_SCALING)
+>  		pr_err("TSC Multiplier = 0x%016llx\n",
 > -- 
 > 2.48.1
 > 
