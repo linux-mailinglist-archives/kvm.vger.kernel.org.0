@@ -1,359 +1,181 @@
-Return-Path: <kvm+bounces-50433-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50434-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECD3EAE58AA
-	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 02:38:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C4E4AE58D8
+	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 02:50:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 034863BEDC2
-	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 00:38:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B68981B60876
+	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 00:51:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 516F7158535;
-	Tue, 24 Jun 2025 00:38:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C805179A3;
+	Tue, 24 Jun 2025 00:50:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TCnTzvh/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GHfVHSvn"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7CF835948
-	for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 00:38:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B31E718D649
+	for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 00:50:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750725507; cv=none; b=bzbUVP9wol4AZnREqNiBtuNqaINpnEgEfw+MZQ4IC3PH5SuwclkVhDVYxaNCykqqtamebNFGFBzJlOyRC3vQboM8Ri4G0MaCUKXGqmwvflKKDoY+CHfMIvRx61X2VqJupIqWCF+YoHLZx1RkVjd/42jQjgnjlsAF7QALEgpqeKY=
+	t=1750726219; cv=none; b=ci0mZpsss3IDoXZWFQdtqCQ/6m5hE0D64nsPgDDFPOs+ATvjlQAuDlWFHLUYNMEJEELR9f/N1WhubREAKpBqdgy8SkDRnLNcDcQojJJmHUGC/jPqruaEucFXo16OtiB9p0TyrtjPgop6PL8C5qUcMxMkZr9pJLRjKPx5JChPkd8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750725507; c=relaxed/simple;
-	bh=NiQRuIcHsQ0Cgvtb3vovHjrFy7PBOudeCtb9v3hkTEA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ZEMGxISFiLI8dxrQij5NkB9jft9vK0QOVx5YYpcHmPyyfWYM97Jz6ZvgndCgz6RydTmwa2OiKONlrTVQ3BoJcxcqUciyObVTsyZEK5UDamFDj6nLObalLRzOx9ohUbUPCJ+kSangBzKBFvgrqt3q+mkvyL8ys7g/tas4q+o7gh0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TCnTzvh/; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-313fb0ec33bso4733013a91.2
-        for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 17:38:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750725505; x=1751330305; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=eAlXIseVh19piNu6gk6mEwFZ2IjANsPe2ugycEc3BFc=;
-        b=TCnTzvh/3VHxh1TLQOsXGhwlFaclPYPnLkaLqhWI9DO4MS7SylQq69i+zowPBGySK1
-         IiJ54TsT3vmJVbWYKUXyA/FQB5vFOcQY6S6157P/N8W6XOVmNChDhJyf2beFytnOYpRm
-         Ss9vJlNcmix1q/oFnScSmEYm0h0hmlyststnoggSOS+4OBKyu1q4fNhWVVWbDw5Y5hJc
-         Q2yluKh27urqzDTaWzcMXi+3RBjgXh/FzUv1E5Hya3p7SPxubJzW81MgsDLYIbUKpjch
-         pwldTS2YXCr4fdSN3Ein0eRedq8rAr1+dcRCv4fvEHaHP1xUGksUOZ2srB6c400VaBOZ
-         p2Bg==
+	s=arc-20240116; t=1750726219; c=relaxed/simple;
+	bh=/auqGXR0o1/P/foYc6AgZw0KxuJdncmvKGkmkIKxkSQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Y6Y2a9Tc/4SJ8tfQCWHlY7VR6sJqVcTnUmarTLioq0B6pFYe3r2CA82dJ1i+aKmsFJVJYy8afwd7Q85cSfwtNsAuymWAx/VTJyXTCxe90EA5PqFG1G39dl5klgG7oHrHWDXMXijHFFNGK3Ca0Z18x3WC4YKLYyxB8NEOCw4mlDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GHfVHSvn; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1750726215;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/auqGXR0o1/P/foYc6AgZw0KxuJdncmvKGkmkIKxkSQ=;
+	b=GHfVHSvnad0VCgHh9KzTYexk/VrqsJ9Kt5kXnvQ5GYxJ33H8HfhGKVPv/c9e4enwg6RDop
+	CIBwfclTPqCUVXpK+5ygUNM+YFPUTjP7PLlZ89K5p0lY7hzjzULfJ8k2Ockel/fnTWmJgw
+	y1xKPG76QokV7u1ziWQZ+JZQsJX1lGY=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-320-Hrul56ZcOAmbnw6Gr2M0YQ-1; Mon, 23 Jun 2025 20:50:12 -0400
+X-MC-Unique: Hrul56ZcOAmbnw6Gr2M0YQ-1
+X-Mimecast-MFC-AGG-ID: Hrul56ZcOAmbnw6Gr2M0YQ_1750726211
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-313c3915345so7421099a91.3
+        for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 17:50:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750725505; x=1751330305;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eAlXIseVh19piNu6gk6mEwFZ2IjANsPe2ugycEc3BFc=;
-        b=joBMBPwJ/1hJjN4TwqUYHiUanb7LqUQfl4/nJsa5CAttrvkIFYhTOmlQR7TWcGymWj
-         QJu/dx885GFV4vGXY84XHP1PA07Qai8jU8Kt9E2DJUYBJbQ+lwjgl5Eh6Uz51UrZZPJA
-         EmuifvFHVVsJs04Y/e0w1A8gzwoO1HwSqtVPjH52mNU8Z6MJEX0V31DsdI/d7WTMdaio
-         fZ5HuPG5MoLCIimo6YZ7GmSeimDdfi5YMfzAf92f0SAgmb+kNXEfwdIIZQWPCwSOpi7B
-         1Yh1x6Pw2e+UNWvYpLOFz/G0hpbxxA75fuEVxmFH6P3m1HEee2ShJ9qOEZmBP1118Oul
-         RtyA==
-X-Gm-Message-State: AOJu0Yysq9oJefrsHiPzldzVk0fbMzdh4PHwKsY4TAwAHv30eWt61HPC
-	NR8E6YpsWcI04/V3eGEvsI/+oGjnNnUVaD3rF/1NuXv55wk7nQz/Ky+y0YhlmPR+VwUQm4NSLid
-	7u3qyfg==
-X-Google-Smtp-Source: AGHT+IHHRf87rQwnQulOsm3e/FzPSQBtizfZ6M0H4DR+wWAWS91/f1ukDkOeZDacaT2Hyk/M5EpK972/7Sc=
-X-Received: from pjboi14.prod.google.com ([2002:a17:90b:3a0e:b0:2ff:6132:8710])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3802:b0:312:e8ed:758
- with SMTP id 98e67ed59e1d1-3159d64cb4cmr23739595a91.13.1750725505137; Mon, 23
- Jun 2025 17:38:25 -0700 (PDT)
-Date: Mon, 23 Jun 2025 17:38:23 -0700
-In-Reply-To: <f4c832aef2f1bfb0eae314380171ece4693a67b2.1740036492.git.naveen@kernel.org>
+        d=1e100.net; s=20230601; t=1750726211; x=1751331011;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/auqGXR0o1/P/foYc6AgZw0KxuJdncmvKGkmkIKxkSQ=;
+        b=X1PjxfVhKSEBOHcAl3TBevQ4e0hP0TZxKSJM0Q+/ATnG11d/SMs3lksBlvUY8JN+6N
+         yypp9FE6hHeY94ShMH03coa/mpZ86IEArsIOi8NcbIOUj4qZal8qDB6JqhE19orC8HD7
+         zWSEh1aWUd9Z+fhHDw5rq5UkHBzTINvow7FSahWxTG7oEO8CVTI/2N0B/bI0b4RxmHTV
+         4dwa46EM3dz5Nx+ODMBbBmM+a/kJCuSYPdcNQQ0ykUwTxBIkCLiTbSv5E0FsW+uf1fy6
+         W5yvaSFNYwcGCOgzXwcAsBJHBmEYN+nsl2AWbXwlGZQy1ya8kVTF0ArGMZ25Lqal9AQK
+         9yMQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX/ofV2g/Rp0xG1MeH+jhWP2E/bR0al2wRuBi9q0n8QYMh8m93qh3wMBqLXInXezQyB0EI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzOjnZEQCsHJtsZDbwQRDdAVOn0YjYCfLxDn3Bn0EJTqwzDGmqX
+	BcpToizN2J8ylkUzxx6jjCau1SdQvOl5r9yQeEa4xArhheNiCRh9tiH8Q19dB9ElUzxbDrksq2u
+	2F3U8HTlVVqkDpLreTHf6HQq/VKIDcynJWG58xybjbrkf2NxEI7r1H7ht+uM2YuDWPEhxEMbb0e
+	PsLmWcNd+FP30z4s2T6SsTxLMruIyj
+X-Gm-Gg: ASbGnct0cd32PgvdzlBOU1F4S/jPYzmF0imIgVx6ZnMhxR8m9GFPA9qdyx4VhEMOaiF
+	JdweQ834rN6d17TBb07JrznVct/1Yls2w/kHLohLpFBqG4AEoTWOSAYODoG8kwrIzbHQL+90lQF
+	uTCS/T
+X-Received: by 2002:a17:90a:d888:b0:313:f883:5d36 with SMTP id 98e67ed59e1d1-3159d61b385mr20481155a91.1.1750726211537;
+        Mon, 23 Jun 2025 17:50:11 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH2mZ6TFzZC61NvgUQr50RK9GKr+Zt2TEe1NWxDOMMJSfnof6RsI9yY3mdeAsIKTHaPT/FkDTx1NOWeRFhiZ3M=
+X-Received: by 2002:a17:90a:d888:b0:313:f883:5d36 with SMTP id
+ 98e67ed59e1d1-3159d61b385mr20481119a91.1.1750726211082; Mon, 23 Jun 2025
+ 17:50:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <cover.1740036492.git.naveen@kernel.org> <f4c832aef2f1bfb0eae314380171ece4693a67b2.1740036492.git.naveen@kernel.org>
-Message-ID: <aFnzf4SQqc9a2KcK@google.com>
-Subject: Re: [PATCH v3 2/2] KVM: SVM: Limit AVIC physical max index based on
- configured max_vcpu_ids
-From: Sean Christopherson <seanjc@google.com>
-To: "Naveen N Rao (AMD)" <naveen@kernel.org>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>, Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>, 
-	Vasant Hegde <vasant.hegde@amd.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20250530-rss-v12-0-95d8b348de91@daynix.com> <20250530-rss-v12-1-95d8b348de91@daynix.com>
+ <CACGkMEufffSj1GQMqwf598__-JgNtXRpyvsLtjSbr3angLmJXg@mail.gmail.com>
+ <95cb2640-570d-4f51-8775-af5248c6bc5a@daynix.com> <CACGkMEu6fZaErFEu7_UFsykXRL7Z+CwmkcxmvJHC+eN_j0pQvg@mail.gmail.com>
+ <4eaa7aaa-f677-4a31-bcc2-badcb5e2b9f6@daynix.com> <CACGkMEu3QH+VdHqQEePYz_z+_bNYswpA-KNxzz0edEOSSkJtWw@mail.gmail.com>
+ <75ef190e-49fc-48aa-abf2-579ea31e4d15@daynix.com> <CACGkMEu2n-O0UtVEmcPkELcg9gpML=m5W=qYPjeEjp3ba73Eiw@mail.gmail.com>
+ <760e9154-3440-464f-9b82-5a0c66f482ee@daynix.com> <CACGkMEtCr65RFB0jeprX3iQ3ke997AWF0FGH6JW_zuJOLqS5uw@mail.gmail.com>
+ <CAOEp5OcybMttzRam+RKQHv4KA-zLnxGrL+UApc5KrAG+op9LKg@mail.gmail.com>
+ <CACGkMEsfxXtHce2HeYwYxmhB0e5cOjn17qM6zFEt75bQhbtrDw@mail.gmail.com> <CAOEp5Oet1P2EWTwLJnMYY4CVAzDWgdM8wbvV3+BH6aY0kE+O8g@mail.gmail.com>
+In-Reply-To: <CAOEp5Oet1P2EWTwLJnMYY4CVAzDWgdM8wbvV3+BH6aY0kE+O8g@mail.gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Tue, 24 Jun 2025 08:49:58 +0800
+X-Gm-Features: AX0GCFuyvFlQ7RhA5QlpqKcUbeYXfBe9mHMJd9IBrNPZibzgOsK55WFol474x3I
+Message-ID: <CACGkMEuPsCNuNZbPsAj2d-tqz0RrJGAyPQAjt1nFbJdgtiKsGg@mail.gmail.com>
+Subject: Re: [PATCH net-next v12 01/10] virtio_net: Add functions for hashing
+To: Yuri Benditovich <yuri.benditovich@daynix.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, kvm@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org, 
+	Andrew Melnychenko <andrew@daynix.com>, Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com, 
+	Lei Yang <leiyang@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 20, 2025, Naveen N Rao (AMD) wrote:
-> KVM allows VMMs to specify the maximum possible APIC ID for a virtual
-> machine through KVM_CAP_MAX_VCPU_ID capability so as to limit data
-> structures related to APIC/x2APIC. Utilize the same to set the AVIC
-> physical max index in the VMCB, similar to VMX. This helps hardware
-> limit the number of entries to be scanned in the physical APIC ID table
-> speeding up IPI broadcasts for virtual machines with smaller number of
-> vcpus.
-> 
-> The minimum allocation required for the Physical APIC ID table is one 4k
-> page supporting up to 512 entries. With AVIC support for 4096 vcpus
-> though, it is sufficient to only allocate memory to accommodate the
-> AVIC physical max index that will be programmed into the VMCB. Limit
-> memory allocated for the Physical APIC ID table accordingly.
+On Mon, Jun 23, 2025 at 10:28=E2=80=AFPM Yuri Benditovich
+<yuri.benditovich@daynix.com> wrote:
+>
+> On Mon, Jun 23, 2025 at 11:07=E2=80=AFAM Jason Wang <jasowang@redhat.com>=
+ wrote:
+> >
+> > On Mon, Jun 23, 2025 at 1:40=E2=80=AFAM Yuri Benditovich
+> > <yuri.benditovich@daynix.com> wrote:
+> > >
+> > > > Yuri, can you help to clarify this?
+> > >
+> > > I see here several questions:
+> > > 1. Whether it is ok for the device not to indicate support for XXX_EX=
+ hash type?
+> > > - I think, yes (strictly speaking, it was better to test that before
+> > > submitting the patches )
+> > > 2. Is it possible that the guest will enable some XXX_EX hash type if
+> > > the device does not indicate that it is supported?
+> > > - No (I think this is part of the spec)
+> >
+> > There's another question, is the device allowed to fallback to
+> > VIRTIO_NET_HASH_TYPE_IPv6 if it fails to parse extensions?
+> MSFT expectations for that are at
+> https://learn.microsoft.com/en-us/windows-hardware/drivers/network/rss-ha=
+shing-types
+> If I read them correctly, the answer is "no"
 
-Can you flip the order of the patches?  This seems like an easy "win" for
-performance, and so I can see people wanting to backport this to random kernels
-even if they don't care about running 4k vCPUs.
+Ok, so I guess it implies the implementation should be ready to deal
+with arbitrary length of ipv6 options.
 
-Speaking of which, is there a measurable performance win?
+> BTW, my personal opinion is that placing all these things with hash
+> calculations into kernel instead of ebpf does not make too much sense.
 
-> Signed-off-by: Naveen N Rao (AMD) <naveen@kernel.org>
-> ---
->  arch/x86/kvm/svm/avic.c | 53 ++++++++++++++++++++++++++++++-----------
->  arch/x86/kvm/svm/svm.c  |  6 +++++
->  arch/x86/kvm/svm/svm.h  |  1 +
->  3 files changed, 46 insertions(+), 14 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-> index 1fb322d2ac18..dac4a6648919 100644
-> --- a/arch/x86/kvm/svm/avic.c
-> +++ b/arch/x86/kvm/svm/avic.c
-> @@ -85,6 +85,17 @@ struct amd_svm_iommu_ir {
->  	void *data;		/* Storing pointer to struct amd_ir_data */
->  };
->  
-> +static inline u32 avic_get_max_physical_id(struct kvm *kvm, bool is_x2apic)
+If I remember correctly, we tried to enable it via eBPF, but failed
+due to the rejection of eBPF maintainers.
 
-Formletter incoming...
+Maybe we can revisit the idea. But anyhow the hardcoded logic might
+still be useful as eBPF is not guaranteed to work in all cases.
 
-Do not use "inline" for functions that are visible only to the local compilation
-unit.  "inline" is just a hint, and modern compilers are smart enough to inline
-functions when appropriate without a hint.
+Thanks
 
-A longer explanation/rant here: https://lore.kernel.org/all/ZAdfX+S323JVWNZC@google.com
+>
+> >
+> > > 3. What to do if we migrate between systems with different
+> > > capabilities of hash support/reporting/whatever
+> > > - IMO, at this moment such case should be excluded and only mechanism
+> > > we have for that is the compatible machine version
+> > > - in some future the change of device capabilities can be communicate=
+d
+> > > to the driver and _probably_ the driver might be able to communicate
+> > > the change of device capabilities to the OS
+> >
+> > Are you suggesting implementing all hash types? Note that Akihiko
+> > raises the issue that in the actual implementation there should be a
+> > limitation of the maximum number of options. If such a limitation is
+> > different between src and dst, the difference could be noticed by the
+> > guest.
+> >
+> > > 4. Does it make sense to have fine configuration of hash types mask
+> > > via command-line?
+> > > - IMO, no. This would require the user to have too much knowledge
+> > > about RSS internals
+> > >
+> > > Please let me know if I missed something.
+> > >
+> >
+> > Thanks
+> >
+>
 
-> +{
-> +	u32 avic_max_physical_id = is_x2apic ? x2avic_max_physical_id : AVIC_MAX_PHYSICAL_ID;
-
-Don't use a super long local variable.  For a helper like this, it's unnecessary,
-e.g. if the reader can't understand what arch_max or max_id is, then spelling it
-out entirely probably won't help them.
-
-And practically, there's a danger to using long names like this: you're much more
-likely to unintentionally "shadow" a global variable.  Functionally, it won't be
-a problem, but it can create confusion.  E.g. if we ever added a global
-avic_max_physical_id, then this code would get rather confusing.
-
-> +
-> +	/*
-> +	 * Assume vcpu_id is the same as APIC ID. Per KVM_CAP_MAX_VCPU_ID, max_vcpu_ids
-> +	 * represents the max APIC ID for this vm, rather than the max vcpus.
-> +	 */
-> +	return min(kvm->arch.max_vcpu_ids - 1, avic_max_physical_id);
-> +}
-> +
->  static void avic_activate_vmcb(struct vcpu_svm *svm)
->  {
->  	struct vmcb *vmcb = svm->vmcb01.ptr;
-> @@ -103,7 +114,7 @@ static void avic_activate_vmcb(struct vcpu_svm *svm)
->  	 */
->  	if (x2avic_enabled && apic_x2apic_mode(svm->vcpu.arch.apic)) {
->  		vmcb->control.int_ctl |= X2APIC_MODE_MASK;
-> -		vmcb->control.avic_physical_id |= x2avic_max_physical_id;
-> +		vmcb->control.avic_physical_id |= avic_get_max_physical_id(svm->vcpu.kvm, true);
-
-Don't pass hardcoded booleans when it is at all possible to do something else.
-For this case, I would either do:
-
-  static u32 avic_get_max_physical_id(struct kvm_vcpu *vcpu)
-  {
-	u32 arch_max;
-	
-	if (x2avic_enabled && apic_x2apic_mode(vcpu->arch.apic))
-		arch_max = x2avic_max_physical_id;
-	else
-		arch_max = AVIC_MAX_PHYSICAL_ID;
-
-	return min(kvm->arch.max_vcpu_ids - 1, arch_max);
-  }
-
-  static void avic_activate_vmcb(struct vcpu_svm *svm)
-  {
-	struct vmcb *vmcb = svm->vmcb01.ptr;
-	struct kvm_vcpu *vcpu = &svm->vcpu;
-
-	vmcb->control.int_ctl &= ~(AVIC_ENABLE_MASK | X2APIC_MODE_MASK);
-
-	vmcb->control.avic_physical_id &= ~AVIC_PHYSICAL_MAX_INDEX_MASK;
-	vmcb->control.avic_physical_id |= avic_get_max_physical_id(vcpu);
-
-	vmcb->control.int_ctl |= AVIC_ENABLE_MASK;
-
-	/*
-	 * Note: KVM supports hybrid-AVIC mode, where KVM emulates x2APIC MSR
-	 * accesses, while interrupt injection to a running vCPU can be
-	 * achieved using AVIC doorbell.  KVM disables the APIC access page
-	 * (deletes the memslot) if any vCPU has x2APIC enabled, thus enabling
-	 * AVIC in hybrid mode activates only the doorbell mechanism.
-	 */
-	if (x2avic_enabled && apic_x2apic_mode(vcpu->arch.apic)) {
-		vmcb->control.int_ctl |= X2APIC_MODE_MASK;
-		/* Disabling MSR intercept for x2APIC registers */
-		svm_set_x2apic_msr_interception(svm, false);
-	} else {
-		/*
-		 * Flush the TLB, the guest may have inserted a non-APIC
-		 * mapping into the TLB while AVIC was disabled.
-		 */
-		kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
-
-		/* Enabling MSR intercept for x2APIC registers */
-		svm_set_x2apic_msr_interception(svm, true);
-	}
-  }
-
-or
-
-
-  static u32 avic_get_max_physical_id(struct kvm_vcpu *vcpu, u32 arch_max)
-  {
-	return min(kvm->arch.max_vcpu_ids - 1, arch_max);
-  }
-
-  static void avic_activate_vmcb(struct vcpu_svm *svm)
-  {
-	struct vmcb *vmcb = svm->vmcb01.ptr;
-	struct kvm_vcpu *vcpu = &svm->vcpu;
-	u32 max_id;
-
-	vmcb->control.int_ctl &= ~(AVIC_ENABLE_MASK | X2APIC_MODE_MASK);
-	vmcb->control.int_ctl |= AVIC_ENABLE_MASK;
-
-	/*
-	 * Note: KVM supports hybrid-AVIC mode, where KVM emulates x2APIC MSR
-	 * accesses, while interrupt injection to a running vCPU can be
-	 * achieved using AVIC doorbell.  KVM disables the APIC access page
-	 * (deletes the memslot) if any vCPU has x2APIC enabled, thus enabling
-	 * AVIC in hybrid mode activates only the doorbell mechanism.
-	 */
-	if (x2avic_enabled && apic_x2apic_mode(vcpu->arch.apic)) {
-		vmcb->control.int_ctl |= X2APIC_MODE_MASK;
-		max_id = avic_get_max_physical_id(vcpu, x2avic_max_physical_id);
-
-		/* Disabling MSR intercept for x2APIC registers */
-		svm_set_x2apic_msr_interception(svm, false);
-	} else {
-		max_id = avic_get_max_physical_id(vcpu, AVIC_MAX_PHYSICAL_ID);
-		/*
-		 * Flush the TLB, the guest may have inserted a non-APIC
-		 * mapping into the TLB while AVIC was disabled.
-		 */
-		kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
-
-		/* Enabling MSR intercept for x2APIC registers */
-		svm_set_x2apic_msr_interception(svm, true);
-	}
-
-	vmcb->control.avic_physical_id &= ~AVIC_PHYSICAL_MAX_INDEX_MASK;
-	vmcb->control.avic_physical_id |= max_id;
-  }
-
-
-I don't think I have a preference between the two?
-
->  		/* Disabling MSR intercept for x2APIC registers */
->  		svm_set_x2apic_msr_interception(svm, false);
->  	} else {
-> @@ -114,7 +125,7 @@ static void avic_activate_vmcb(struct vcpu_svm *svm)
->  		kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, &svm->vcpu);
->  
->  		/* For xAVIC and hybrid-xAVIC modes */
-> -		vmcb->control.avic_physical_id |= AVIC_MAX_PHYSICAL_ID;
-> +		vmcb->control.avic_physical_id |= avic_get_max_physical_id(svm->vcpu.kvm, false);
->  		/* Enabling MSR intercept for x2APIC registers */
->  		svm_set_x2apic_msr_interception(svm, true);
->  	}
-> @@ -174,6 +185,12 @@ int avic_ga_log_notifier(u32 ga_tag)
->  	return 0;
->  }
->  
-> +static inline int avic_get_physical_id_table_order(struct kvm *kvm)
-
-Heh, we got there eventually ;-)
-
-> +{
-> +	/* Limit to the maximum physical ID supported in x2avic mode */
-> +	return get_order((avic_get_max_physical_id(kvm, true) + 1) * sizeof(u64));
-> +}
-> +
->  void avic_vm_destroy(struct kvm *kvm)
->  {
->  	unsigned long flags;
-> @@ -186,7 +203,7 @@ void avic_vm_destroy(struct kvm *kvm)
->  		__free_page(kvm_svm->avic_logical_id_table_page);
->  	if (kvm_svm->avic_physical_id_table_page)
->  		__free_pages(kvm_svm->avic_physical_id_table_page,
-> -			     get_order(sizeof(u64) * (x2avic_max_physical_id + 1)));
-> +			     avic_get_physical_id_table_order(kvm));
->  
->  	spin_lock_irqsave(&svm_vm_data_hash_lock, flags);
->  	hash_del(&kvm_svm->hnode);
-> @@ -199,22 +216,12 @@ int avic_vm_init(struct kvm *kvm)
->  	int err = -ENOMEM;
->  	struct kvm_svm *kvm_svm = to_kvm_svm(kvm);
->  	struct kvm_svm *k2;
-> -	struct page *p_page;
->  	struct page *l_page;
-> -	u32 vm_id, entries;
-> +	u32 vm_id;
->  
->  	if (!enable_apicv)
->  		return 0;
->  
-> -	/* Allocating physical APIC ID table */
-> -	entries = x2avic_max_physical_id + 1;
-> -	p_page = alloc_pages(GFP_KERNEL_ACCOUNT | __GFP_ZERO,
-> -			     get_order(sizeof(u64) * entries));
-> -	if (!p_page)
-> -		goto free_avic;
-> -
-> -	kvm_svm->avic_physical_id_table_page = p_page;
-> -
->  	/* Allocating logical APIC ID table (4KB) */
->  	l_page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
->  	if (!l_page)
-> @@ -265,6 +272,24 @@ void avic_init_vmcb(struct vcpu_svm *svm, struct vmcb *vmcb)
->  		avic_deactivate_vmcb(svm);
->  }
->  
-> +int avic_alloc_physical_id_table(struct kvm *kvm)
-> +{
-> +	struct kvm_svm *kvm_svm = to_kvm_svm(kvm);
-> +	struct page *p_page;
-> +
-> +	if (kvm_svm->avic_physical_id_table_page || !enable_apicv || !irqchip_in_kernel(kvm))
-> +		return 0;
-> +
-> +	p_page = alloc_pages(GFP_KERNEL_ACCOUNT | __GFP_ZERO,
-> +			     avic_get_physical_id_table_order(kvm));
-> +	if (!p_page)
-> +		return -ENOMEM;
-> +
-> +	kvm_svm->avic_physical_id_table_page = p_page;
-> +
-> +	return 0;
-> +}
-> +
->  static u64 *avic_get_physical_id_entry(struct kvm_vcpu *vcpu,
->  				       unsigned int index)
->  {
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index b8aa0f36850f..3cb23298cdc3 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -1423,6 +1423,11 @@ void svm_switch_vmcb(struct vcpu_svm *svm, struct kvm_vmcb_info *target_vmcb)
->  	svm->vmcb = target_vmcb->ptr;
->  }
->  
-> +static int svm_vcpu_precreate(struct kvm *kvm)
-> +{
-> +	return avic_alloc_physical_id_table(kvm);
-
-Why is allocation being moved to svm_vcpu_precreate()?
 
