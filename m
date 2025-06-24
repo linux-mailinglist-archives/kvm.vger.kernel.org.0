@@ -1,236 +1,297 @@
-Return-Path: <kvm+bounces-50438-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50439-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 048FCAE58FA
-	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 03:09:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CADB1AE590F
+	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 03:19:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 817044A4293
-	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 01:09:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0BD33AC7A9
+	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 01:19:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18845192598;
-	Tue, 24 Jun 2025 01:08:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19C3B194A67;
+	Tue, 24 Jun 2025 01:19:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="r5Dcc6Yg"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="W1uUZ08c"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2ED8323D
-	for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 01:08:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E99835966;
+	Tue, 24 Jun 2025 01:19:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750727338; cv=none; b=OHCgXAls7h9ca+JN8SYuWQp/WnfAd5hVKymM944mW2tZ1Z5UKaeWsZ7WCEfdUKFe4x7Tg+fIZCOl2Q/FmCrbaFVZyw5g7RCjUJZfbJq/5IasFrHIkEiXzaqZx+owrO3nXsHdJ7Qsq0D64o11rdCVlpRWAgqin8ciNjYrBW9kQz4=
+	t=1750727981; cv=none; b=rUog64Zoah/r1tSVQMWnL85fyjXjafqF47S4bB/fqbBcrphM3JUWrQq9aiuxbeGP/swCsRYY/aE/XTYT9PrNsmiuKwNX+j764TlVg9OYkXHvDrs+E51oQUXgWV5IvsVtGFLeNYI0Ty21fXz94GSGoI3tHVsQSIn7AR+OkAWlp2g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750727338; c=relaxed/simple;
-	bh=eMWw5ndDbEfv1KodSgKvCMSmFJsOwgM3lU98zojLdNc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=sHL6kd2jvSQl/cs+5wxd98JIvQfVEx/UKBidqoPbZMdxtjzh6AnqJxJ3d8lAdLcWL+IP6dWAJXmYe4VRYFdD2V6EnQJcSP3Exv2b7LoFHVzRcepbALWRuMEj3cyHkF97OlEvsHN2UC5RTs6bjW4oyfV5JUhzUK70XtArOgzFg64=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=r5Dcc6Yg; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2349fe994a9so36895705ad.1
-        for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 18:08:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750727336; x=1751332136; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xJ1lEgrEzsoYiZqICzDazvRV6mMCnWUn1uxHW03+Hc0=;
-        b=r5Dcc6YgSJ5lofGjUV71HeXIAc3oT4VaiVR8j6UOs/coBevWihWMp38aGWdFmGL2hH
-         4sImx+CgEF3iFgzpTgZ2KZw0zJS/+fcOAE++Qhdcyjpyk305XuqYzFjtGEx9On74ikx/
-         SRq5cqYWmbA0nhoIfh/7SRzQEwU2AUfklQIcyg0F5YNAkebFCC2GblpbY4UGpk92VGQv
-         szoBdWYW3+Tb4e4celpWIpdBkSdgFk1ENlks50F3sI7qGd+MB3aAK42vyvW83A3bHHLc
-         i9CqJ/xbUrwgC7+OtSF5740AECZgKsD1BbF2XWSgrRCIMdowGe4KmRnBROIIW1dJz4fz
-         fW4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750727336; x=1751332136;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xJ1lEgrEzsoYiZqICzDazvRV6mMCnWUn1uxHW03+Hc0=;
-        b=sscIARZwcmKymFCDNOnifugxgWGDojSbcqjlHHzImF6JL86YLzSzEpano2nrjxpBQm
-         NsrzHnzBaTJDLaM+E3IhMc+0HOmLQlobHGeC9l3ganRKWPFJ6XlS908iUxdBZCTdMahP
-         rvdBo01ZxGzbemkmy2tt7X4UHO8p4szdX68T3yxyE6YuGlEb3NhB2BED8DxHMNMSykbD
-         HKlMu25G2YWEiSWaINwbmTYQLakwUk5DHYZTehl1RLsprb9Xoa4ohJkReCaJVrWcwmn1
-         D0Af3qasuEIFErKzVI732dEGBn3IgeR/J7WVqazK9vdZhKUmj4yZsPV+unTOH6tTLKg0
-         4aEA==
-X-Forwarded-Encrypted: i=1; AJvYcCWB7NAt9PXoA+zUOc1vaii/9PcYHlngOkyLaQ0QoyuCQ2PGwAyg/17WdyOiFJUgVsKAVJI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwOfAqvPALcFMlk46NWjTADNPanIzzfvK/tp5A/WNQty+sRv/q9
-	qsKXNBGiMMdcxm74FNlh69fh2HILG9a8f9mVsZd61Y/wqS0+8CLAKtnKCc0LtwSzdh9IFOaB/IB
-	3b92FLQ==
-X-Google-Smtp-Source: AGHT+IEHgG5RCDlHOHYvIT1InI/X9679DE6zAj9fXBZdlryoSXwTtJsa10m//EULIFNlj4a8kg5hHySHPSw=
-X-Received: from plap2.prod.google.com ([2002:a17:902:f082:b0:223:690d:fd84])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ea0c:b0:235:e71e:a37b
- with SMTP id d9443c01a7336-237d99bcf92mr232624445ad.34.1750727336094; Mon, 23
- Jun 2025 18:08:56 -0700 (PDT)
-Date: Mon, 23 Jun 2025 18:08:54 -0700
-In-Reply-To: <20250326194423.3717668-3-yosry.ahmed@linux.dev>
+	s=arc-20240116; t=1750727981; c=relaxed/simple;
+	bh=rSwFW4cbF6WMVzBS2fGOzZoqDKr6H1Izrpq6aj+cSd8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UnslYIfLVL6EBmNwIQ7Y+j6lP6cEh7IYUFOAFWdqE9uI3msA0y/zuSW7vRaNZSb3R/kkAfvti3xDNzSan0Dp/T5b3CWqmdylyfORAOzrGOVrTN/o8hwVAN48/3OwTOsMbw8cD8vCIY1BWVg0ihbOvyIjHeoapKhXALXrleDS3Zw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=W1uUZ08c; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1750727980; x=1782263980;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=rSwFW4cbF6WMVzBS2fGOzZoqDKr6H1Izrpq6aj+cSd8=;
+  b=W1uUZ08cX9mfMNQjRarURFLQc1BmdfHQshEm3OeVeDZYeUm/3C643e2D
+   UKjfZB21bWuxEXiLoqbqtfAOKCPoixkcVGJF7nn2sgIovqjrM+j0OI68R
+   O/cNJEuQkH9Feugqxh6de1P6itBm5ny3DecE4vS9ifxw/KNrfzmvHBSrn
+   w9/bWH0evpDgjx0FoiNlpU3Os3dFygpwijdzG4fFfmweT93lk/jyGLRTM
+   3qwEeehotMqaqaxdSV3gaUU3k6DdrjWQHVhQOPqEBcvaDI4Mwk11MOjuF
+   K4V7b5FAKuCT3lr6w/WgcqzFQRDyZyjMXpA0lYGVNYayr1CNjUmvn4OjR
+   w==;
+X-CSE-ConnectionGUID: MpWvgihLRwaqWxZSZdfiFA==
+X-CSE-MsgGUID: AzravT3aTZeDQvqYc6nVIg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11473"; a="52823428"
+X-IronPort-AV: E=Sophos;i="6.16,260,1744095600"; 
+   d="scan'208";a="52823428"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2025 18:19:39 -0700
+X-CSE-ConnectionGUID: c3yvsP+eS0iesj8Q/ibaOw==
+X-CSE-MsgGUID: R9LgCwYGQ2WO3bzJ26egoQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,260,1744095600"; 
+   d="scan'208";a="151915905"
+Received: from unknown (HELO [10.238.128.162]) ([10.238.128.162])
+  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2025 18:19:34 -0700
+Message-ID: <8437bad1-bdae-4922-bf4c-9303872fab57@linux.intel.com>
+Date: Tue, 24 Jun 2025 09:19:31 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250326193619.3714986-1-yosry.ahmed@linux.dev>
- <20250326194423.3717668-1-yosry.ahmed@linux.dev> <20250326194423.3717668-3-yosry.ahmed@linux.dev>
-Message-ID: <aFn6pqLr6pShBfaU@google.com>
-Subject: Re: [RFC PATCH 22/24] KVM: nSVM: Handle INVLPGA interception correctly
-From: Sean Christopherson <seanjc@google.com>
-To: Yosry Ahmed <yosry.ahmed@linux.dev>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jim Mattson <jmattson@google.com>, 
-	Maxim Levitsky <mlevitsk@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
-	Rik van Riel <riel@surriel.com>, Tom Lendacky <thomas.lendacky@amd.com>, x86@kernel.org, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 1/2] x86/traps: Initialize DR6 by writing its
+ architectural reset value
+To: Xin Li <xin@zytor.com>, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, stable@vger.kernel.org
+Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+ seanjc@google.com, pbonzini@redhat.com, peterz@infradead.org,
+ sohil.mehta@intel.com, brgerst@gmail.com, tony.luck@intel.com,
+ fenghuay@nvidia.com
+References: <20250620231504.2676902-1-xin@zytor.com>
+ <20250620231504.2676902-2-xin@zytor.com>
+ <4018038c-8c96-49e0-b6b7-f54e0f52a65f@linux.intel.com>
+ <b170c705-c2a8-44ac-a77d-0c3c73ebed0a@zytor.com>
+From: Ethan Zhao <haifeng.zhao@linux.intel.com>
+Autocrypt: addr=haifeng.zhao@linux.intel.com; keydata=
+ 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
+ 8TCx1OJHpvWFmL4Deq8=
+In-Reply-To: <b170c705-c2a8-44ac-a77d-0c3c73ebed0a@zytor.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Mar 26, 2025, Yosry Ahmed wrote:
-> Currently, INVPLGA interception handles it like INVLPG, which flushes
-> L1's TLB translations for the address. It was implemented in this way
-> because L1 and L2 shared an ASID. Now, L1 and L2 have separate ASIDs. It
-> is still harmless to flush L1's translations, but it's only correct
-> because all translations are flushed on nested transitions anyway.
-> 
-> In preparation for stopping unconditional flushes on nested transitions,
-> handle INVPLGA interception properly. If L1 specified zero as the ASID,
-> this is equivalent to INVLPG, so handle it as such. Otherwise, use
-> INVPLGA to flush the translations of the appropriate ASID tracked by
-> KVM, if any. Sync the shadow MMU as well, as L1 invalidated L2's
-> mappings.
-> 
-> Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
-> ---
->  arch/x86/include/asm/kvm_host.h |  2 ++
->  arch/x86/kvm/mmu/mmu.c          |  5 +++--
->  arch/x86/kvm/svm/svm.c          | 36 +++++++++++++++++++++++++++++++--
->  3 files changed, 39 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index d881e7d276b12..a158d324168a0 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -2237,6 +2237,8 @@ int kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 error_code,
->  		       void *insn, int insn_len);
->  void kvm_mmu_print_sptes(struct kvm_vcpu *vcpu, gpa_t gpa, const char *msg);
->  void kvm_mmu_invlpg(struct kvm_vcpu *vcpu, gva_t gva);
-> +void __kvm_mmu_invalidate_addr(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
-> +			       u64 addr, unsigned long roots, bool gva_flush);
->  void kvm_mmu_invalidate_addr(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
->  			     u64 addr, unsigned long roots);
->  void kvm_mmu_invpcid_gva(struct kvm_vcpu *vcpu, gva_t gva, unsigned long pcid);
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index e2b1994f12753..d3baa12df84e7 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -6355,8 +6355,8 @@ static void kvm_mmu_invalidate_addr_in_root(struct kvm_vcpu *vcpu,
->  	write_unlock(&vcpu->kvm->mmu_lock);
->  }
->  
-> -static void __kvm_mmu_invalidate_addr(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
-> -				      u64 addr, unsigned long roots, bool gva_flush)
-> +void __kvm_mmu_invalidate_addr(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
-> +			       u64 addr, unsigned long roots, bool gva_flush)
 
-I don't love passing a boolean to avoid a flush.  I especially don't like it in
-this case because vmx_flush_tlb_gva() has similar logic.  Unfortunately, I don't
-see a better option at this point. :-/
+在 2025/6/24 0:34, Xin Li 写道:
+> On 6/22/2025 11:49 PM, Ethan Zhao wrote:
+>>
+>> 在 2025/6/21 7:15, Xin Li (Intel) 写道:
+>>> Initialize DR6 by writing its architectural reset value to avoid
+>>> incorrectly zeroing DR6 to clear DR6.BLD at boot time, which leads
+>>> to a false bus lock detected warning.
+>>>
+>>> The Intel SDM says:
+>>>
+>>>    1) Certain debug exceptions may clear bits 0-3 of DR6.
+>>>
+>>>    2) BLD induced #DB clears DR6.BLD and any other debug exception
+>>>       doesn't modify DR6.BLD.
+>>>
+>>>    3) RTM induced #DB clears DR6.RTM and any other debug exception
+>>>       sets DR6.RTM.
+>>>
+>>>    To avoid confusion in identifying debug exceptions, debug handlers
+>>>    should set DR6.BLD and DR6.RTM, and clear other DR6 bits before
+>>>    returning.
+>>>
+>>> The DR6 architectural reset value 0xFFFF0FF0, already defined as
+>>> macro DR6_RESERVED, satisfies these requirements, so just use it to
+>>> reinitialize DR6 whenever needed.
+>>>
+>>> Since clear_all_debug_regs() no longer zeros all debug registers,
+>>> rename it to initialize_debug_regs() to better reflect its current
+>>> behavior.
+>>>
+>>> Since debug_read_clear_dr6() no longer clears DR6, rename it to
+>>> debug_read_reset_dr6() to better reflect its current behavior.
+>>>
+>>> Reported-by: Sohil Mehta <sohil.mehta@intel.com>
+>>> Link: https://lore.kernel.org/lkml/06e68373-a92b-472e-8fd9- 
+>>> ba548119770c@intel.com/
+>>> Fixes: ebb1064e7c2e9 ("x86/traps: Handle #DB for bus lock")
+>>> Suggested-by: H. Peter Anvin (Intel) <hpa@zytor.com>
+>>> Tested-by: Sohil Mehta <sohil.mehta@intel.com>
+>>> Reviewed-by: H. Peter Anvin (Intel) <hpa@zytor.com>
+>>> Reviewed-by: Sohil Mehta <sohil.mehta@intel.com>
+>>> Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+>>> Signed-off-by: Xin Li (Intel) <xin@zytor.com>
+>>> Cc: stable@vger.kernel.org
+>>> ---
+>>>
+>>> Changes in v3:
+>>> *) Polish initialize_debug_regs() (PeterZ).
+>>> *) Rewrite the comment for DR6_RESERVED definition (Sohil and Sean).
+>>> *) Collect TB, RB, AB (PeterZ and Sohil).
+>>>
+>>> Changes in v2:
+>>> *) Use debug register index 6 rather than DR_STATUS (PeterZ and Sean).
+>>> *) Move this patch the first of the patch set to ease backporting.
+>>> ---
+>>>   arch/x86/include/uapi/asm/debugreg.h | 21 ++++++++++++++++-
+>>>   arch/x86/kernel/cpu/common.c         | 24 ++++++++------------
+>>>   arch/x86/kernel/traps.c              | 34 
+>>> +++++++++++++++++-----------
+>>>   3 files changed, 51 insertions(+), 28 deletions(-)
+>>>
+>>> diff --git a/arch/x86/include/uapi/asm/debugreg.h 
+>>> b/arch/x86/include/ uapi/asm/debugreg.h
+>>> index 0007ba077c0c..41da492dfb01 100644
+>>> --- a/arch/x86/include/uapi/asm/debugreg.h
+>>> +++ b/arch/x86/include/uapi/asm/debugreg.h
+>>> @@ -15,7 +15,26 @@
+>>>      which debugging register was responsible for the trap. The 
+>>> other bits
+>>>      are either reserved or not of interest to us. */
+>>> -/* Define reserved bits in DR6 which are always set to 1 */
+>>> +/*
+>>> + * Define bits in DR6 which are set to 1 by default.
+>>> + *
+>>> + * This is also the DR6 architectural value following Power-up, 
+>>> Reset or INIT.
+>>> + *
+>>> + * Note, with the introduction of Bus Lock Detection (BLD) and 
+>>> Restricted
+>>> + * Transactional Memory (RTM), the DR6 register has been modified:
+>>> + *
+>>> + * 1) BLD flag (bit 11) is no longer reserved to 1 if the CPU supports
+>>> + *    Bus Lock Detection.  The assertion of a bus lock could clear it.
+>>> + *
+>>> + * 2) RTM flag (bit 16) is no longer reserved to 1 if the CPU supports
+>>> + *    restricted transactional memory.  #DB occurred inside an RTM 
+>>> region
+>>> + *    could clear it.
+>>> + *
+>>> + * Apparently, DR6.BLD and DR6.RTM are active low bits.
+>>> + *
+>>> + * As a result, DR6_RESERVED is an incorrect name now, but it is 
+>>> kept for
+>>> + * compatibility.
+>>> + */
+>>>   #define DR6_RESERVED    (0xFFFF0FF0)
+>>>   #define DR_TRAP0    (0x1)        /* db0 */
+>>> diff --git a/arch/x86/kernel/cpu/common.c 
+>>> b/arch/x86/kernel/cpu/common.c
+>>> index 8feb8fd2957a..0f6c280a94f0 100644
+>>> --- a/arch/x86/kernel/cpu/common.c
+>>> +++ b/arch/x86/kernel/cpu/common.c
+>>> @@ -2243,20 +2243,16 @@ EXPORT_PER_CPU_SYMBOL(__stack_chk_guard);
+>>>   #endif
+>>>   #endif
+>>> -/*
+>>> - * Clear all 6 debug registers:
+>>> - */
+>>> -static void clear_all_debug_regs(void)
+>>> +static void initialize_debug_regs(void)
+>>>   {
+>>> -    int i;
+>>> -
+>>> -    for (i = 0; i < 8; i++) {
+>>> -        /* Ignore db4, db5 */
+>>> -        if ((i == 4) || (i == 5))
+>>> -            continue;
+>>> -
+>>> -        set_debugreg(0, i);
+>>> -    }
+>>> +    /* Control register first -- to make sure everything is 
+>>> disabled. */
+>>
+>> In the Figure 19-1. Debug Registers of SDM section 19.2 DEBUG REGISTERS,
+>>
+>> bit 10, 12, 14, 15 of DR7 are marked as gray (Reversed) and their 
+>> value are filled as
+>>
+>> 1, 0, 0,0 ; should we clear them all here ?  I didn't find any other 
+>> description in the
+>>
+>> SDM about the result if they are cleaned. of course, this patch 
+>> doesn't change
+>>
+>> the behaviour of original DR7 initialization code, no justification 
+>> needed,
+>>
+>> just out of curiosity.
+>
+> This patch is NOT intended to make any actual change to DR7
+> initialization.
+>
+So far it is okay,  I am just curious why these registers were cleared 
+to zero
 
-If we do keep the param, it needs to be something like @flush_gva, because I
-read @gva_flush as "this is a gva flush", and got all kinds of confused when
-reading the code.
+but the git log history and SDM doesn't give too much consistent clue.
 
->  {
->  	int i;
->  
-> @@ -6382,6 +6382,7 @@ static void __kvm_mmu_invalidate_addr(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu
->  			kvm_mmu_invalidate_addr_in_root(vcpu, mmu, addr, mmu->prev_roots[i].hpa);
->  	}
->  }
-> +EXPORT_SYMBOL_GPL(__kvm_mmu_invalidate_addr);
->  
->  void kvm_mmu_invalidate_addr(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
->  			     u64 addr, unsigned long roots)
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 3649707c61d3e..4b95fd6b501e6 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -2505,6 +2505,7 @@ static int clgi_interception(struct kvm_vcpu *vcpu)
->  
->  static int invlpga_interception(struct kvm_vcpu *vcpu)
->  {
-> +	struct vcpu_svm *svm = to_svm(vcpu);
->  	gva_t gva = kvm_rax_read(vcpu);
->  	u32 asid = kvm_rcx_read(vcpu);
->  
-> @@ -2514,8 +2515,39 @@ static int invlpga_interception(struct kvm_vcpu *vcpu)
->  
->  	trace_kvm_invlpga(to_svm(vcpu)->vmcb->save.rip, asid, gva);
->  
-> -	/* Let's treat INVLPGA the same as INVLPG (can be optimized!) */
-> -	kvm_mmu_invlpg(vcpu, gva);
+That is 16 years old code.
 
-This code needs to do a noncanonical check (assuming we can't figure out a way
-to shoehorn this into kvm_mmu_invlpg()).  Consuming gva here for the asid != 0
-case might be "fine", because INVLPGA won't fault, but it's still a bug, e.g. I
-don't know what will happen when KVM tries to synchronize MMUs.
+> Please take a look at the second patch of this patch set.
 
-Another reason I don't love the @flush_gva param :-/
+Looking.
 
-> +	/*
-> +	 * APM is silent about using INVLPGA to flush the host ASID (i.e. 0).
-> +	 * Do the logical thing and handle it like INVLPG.
-> +	 */
-> +	if (asid == 0) {
 
-	if (!asid)
+Thanks,
 
-> +		kvm_mmu_invlpg(vcpu, gva);
-> +		return kvm_skip_emulated_instruction(vcpu);
-> +	}
-> +
-> +	/*
-> +	 * Check if L1 specified the L2 ASID we are currently tracking. If it
-> +	 * isn't, do nothing as we have to handle the TLB flush when switching
-> +	 * to the new ASID anyway.
-> +	 */
+Ethan
 
-Please avoid pronoouns.  And try not to allude to behavior; the above doesn't
-actually say what happens when switching to a new ASID, only that "we have to
-handle the TLB flush".  E.g.
+>
+> Thanks!
+>     Xin
+>
+>>
+>>> +    set_debugreg(0, 7);
+>>> +    set_debugreg(DR6_RESERVED, 6);
+>>> +    /* dr5 and dr4 don't exist */
+>>> +    set_debugreg(0, 3);
+>>> +    set_debugreg(0, 2);
+>>> +    set_debugreg(0, 1);
+>>> +    set_debugreg(0, 0);
 
-	/*
-	 * Flush hardware TLB entries only if L1 is flushing KVM's currently
-	 * tracked L2 ASID.  KVM does a full TLB flush when L1 runs a VMCB with
-	 * a different L2 ASID.
-	 */
- 
-> +	if (asid == svm->nested.last_asid)
-> +		invlpga(gva, svm_nested_asid(vcpu->kvm));
-> +
-> +	/*
-> +	 * If NPT is disabled, sync the shadow page tables as L1 is invalidating
-> +	 * mappings for L2. Sync all roots as ASIDs are not tracked in the MMU
-> +	 * role.
-> +	 *
-> +	 * As we are not flushing the current context, skip the gva flush from
-> +	 * __kvm_mmu_invalidate_addr(), it would flush the wrong ASID anyway.
-> +	 * The correct TLB flush was done above (if needed).
-> +	 *
-> +	 * This always operates on root_mmu because L1 and L2 share an MMU when
-> +	 * NPT is disabled. This can be optimized by invalidating guest roots
-> +	 * only.
+-- 
+"firm, enduring, strong, and long-lived"
 
-Heh, I had a comment typed up about only need to sync guest roots, and then I
-read this literal comment. :-)
-
-> +	 */
-> +	if (!npt_enabled)
-> +		__kvm_mmu_invalidate_addr(vcpu, &vcpu->arch.root_mmu, gva,
-> +					  KVM_MMU_ROOTS_ALL, false);
->  
->  	return kvm_skip_emulated_instruction(vcpu);
->  }
-> -- 
-> 2.49.0.395.g12beb8f557-goog
-> 
 
