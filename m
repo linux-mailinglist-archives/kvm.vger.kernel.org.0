@@ -1,183 +1,186 @@
-Return-Path: <kvm+bounces-50496-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50497-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E60BAE66F2
-	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 15:48:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBE0AAE67CD
+	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 16:07:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D07D319202E2
-	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 13:48:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 03BC617CA64
+	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 14:06:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A8D618E34A;
-	Tue, 24 Jun 2025 13:47:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 859592D1900;
+	Tue, 24 Jun 2025 14:05:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="Xq1039Am"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hhr4Jl20"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4D34291C1A
-	for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 13:47:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1260F27C179
+	for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 14:05:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750772850; cv=none; b=cWilTZoPqRwMwvslmRTVn/scbLGsDTA5rYS3xPBxEzl83WItIzyrxshBbtphqbSpmt2uSxayTDCj5/GdQsS0WHzcjGFFTTdL7imPdko3ks7EkA3o8C/opXNkNU+KlqPEvSgBjfXURC4+vv85bA0fBOP+Cx0StBKfikXuiHm7cAI=
+	t=1750773953; cv=none; b=UYrozZB1YmChV3/8wA1/mN4L3fLw1Yj+OCQ3ffun+NB1O1L4g9GOcAtMC3Pmt1FMYrzoAXYW3WaqjZ2PoYIC9Jt4WrCMneQAG4FXeSQEefcsrbCscGRZhE49e9XucH+6cBjU9kbxzITQ9UdY1RVm3RvHvJ8OFNIvW6o0H6O/Neg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750772850; c=relaxed/simple;
-	bh=FPqOE17+APKrELMb456PcHqUROKib4uvVIedL0A/K7Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CI/c0SkIuqTvZA2XbsG3408PlhL1mUK8Y4C2kBPYV3U4KeyrzHHPwiIz/Tb+EP9eaxt9Tt2/MDeqINUf9I7Jx90Ruaz2CcCdGPnANbVVcRPyarysL2+i5SXqckA3iPPNOHle/rdadDMFD6AgKnjgF7Ly5n24K4cO9a65QuTrveg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=Xq1039Am; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-3a507e88b0aso4530116f8f.1
-        for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 06:47:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1750772847; x=1751377647; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ycq0kX3Vn1ZpP7yxI/jdDggIlJCstgVkDpgaYIcdwgY=;
-        b=Xq1039AmgKM/kRcKJpfQ+M+EFxzjmDkRzQMPsUNm7yPox9qqQPD3Im3dKZM04UGQDg
-         C1zj9a4aRodqr5W7zjqczr7f5arr2EI/V0oWfhezuoW2mH6NF9K9TWCEUSMOPaxQ5Jz1
-         3kKgq7t7mpn8TcCBzXwS0KniE01VAj7OuAl7MBhw6Ug00DlPWsIUwF3BENyif5X4Csrt
-         fFiN8muVCFpktfDzicjbZnFOzmEgnf+47ZOMjY91OeplRnpLrr9WksTl7j6lrfNGTXhX
-         fTjpCuDt6ioLbCy/vba/iFFPpsFhZnljIPtPtoTozTqj4X2Qfg0PADUmkGxyThxSGlR+
-         ajxg==
+	s=arc-20240116; t=1750773953; c=relaxed/simple;
+	bh=ShTqc7z0FpK2/U8YVqk2gMmafxHT4PEfEtsONZW/Zjs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sQ5NuLOaUlihmr6yr9mByjILbbmRqYoRA2PRXzFETdgMtdt1Dwe/2MlxlLkSBLXvwUFwinyhbB70nBoHkQAkKBSxZZKMEao2poCVICigU9znec2twlGT3otg72KLIs+A0epTwqJiP1RRfdWiy9EbqpB3dkMZAZRgfLx90eVP3Mw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hhr4Jl20; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1750773951;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=D+TKbeGRcKoBZxXH6jFI/Y3rhb44odXuWUwrtNDdL2o=;
+	b=hhr4Jl20Npy3QnyPdb8t3exYHPyyyFJlAWiI9vsTPAhPetHw7sMi8Ng03ovtGWJ/M6iTKd
+	gw6yKhHtWxJxcjg3+D/G1KyPtLWfGNx5vHieiZrco8yAPh5158keadVBqL1U5cuGlop8PE
+	gaSakWC99tLEDGRKdhzo27NZlgkJJRo=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-655-Uc6lp7XtO-q-0iV72qyRPg-1; Tue, 24 Jun 2025 10:05:49 -0400
+X-MC-Unique: Uc6lp7XtO-q-0iV72qyRPg-1
+X-Mimecast-MFC-AGG-ID: Uc6lp7XtO-q-0iV72qyRPg_1750773948
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3a50816cc58so246264f8f.3
+        for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 07:05:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750772847; x=1751377647;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ycq0kX3Vn1ZpP7yxI/jdDggIlJCstgVkDpgaYIcdwgY=;
-        b=UjhgBKla/RRw+4NWei/1arkVaiClDJPtVWztGwjun6x6WSDigpUUAKhwH+ynvOAsGL
-         q0kQlKiImTwSp77z6Xyi+FLqQcj0Qvx8ZlJMRQXHy4YwrbYQgPqMQroqOWvcZfRPAtt7
-         n5iGdZ/h047mqO/jLwoNC1Sy/rJV2zop9NqxQ3BQ1YBy1bBgmgIITl6XFmaxkDYUXtzX
-         RC/Z7uPyyTWc4CTCFO1+I+l18uQn7A+VgUoffA6yBtsMXA438n2ogTtBfczEk6CFuCvE
-         Nv2x+H4Qn8mFeOyyo1kbZM0sscNOaTdGluGYdbaMnrkgj2MD86Xx21zcgIsMze5kf3wc
-         0e9g==
-X-Forwarded-Encrypted: i=1; AJvYcCW1SwDFndlSFAiSp4euuwOyRp+pSSx76Odd21EC/I71xeRxwI3nq70tbnqBOqFIAztEEqs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxZjfwyJI+zBmqIBIjnwrmxoM8nqFqG0kwvUGkEfHb0Ktt1jfmQ
-	ODji+DmQY5n9b/kGwa7mUm5KyVm6A16sZIkwRvvb5IxXW4OU+DuIRsxj/XQD5w3RJgA=
-X-Gm-Gg: ASbGncuCphLUQWn1k35XX81N9Xxs3lyutA/lYB2CyOkZGgj7eWJhQYi8rFudn80cK7R
-	1OZGrqL8TmrT+2kml4TK5Si+HfzcHe0JPFvIyCotq2qKuuWIx3MaTnRM1+aYtG9pfA9eHmJkmq/
-	eps8A6DuTlr482wZUhykILsnL4BUdIjF4DVGV1JTcLkrftYneymO+HbWjQl0spbGa7HGbPhSt4/
-	dyA400zWKbfBzQ6NIHh1IeuORyp7W2jrW6Gi4m9j+7dM2mWwKs1XyaJJWsFpnek0Kyyi7VjUbpG
-	0FjR1Xv32+vGW0RXjwf6OEPm9YsIfbL5LmE4GMmhD6h8JXa04w==
-X-Google-Smtp-Source: AGHT+IHb76B6ik9Yt3pkD/SAdLPqXg65db3i1R0WxXLtr/BPlZTDKztKX7BSnwY0vPSiL+IcBDUqLw==
-X-Received: by 2002:a05:6000:2211:b0:3a4:ed62:c7e1 with SMTP id ffacd0b85a97d-3a6d12c455cmr12967179f8f.12.1750772847157;
-        Tue, 24 Jun 2025 06:47:27 -0700 (PDT)
-Received: from localhost ([2a02:8308:a00c:e200::5485])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a6e80f259dsm2035419f8f.50.2025.06.24.06.47.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Jun 2025 06:47:26 -0700 (PDT)
-Date: Tue, 24 Jun 2025 15:47:26 +0200
-From: Andrew Jones <ajones@ventanamicro.com>
-To: zhouquan@iscas.ac.cn
-Cc: anup@brainfault.org, atishp@atishpatra.org, paul.walmsley@sifive.com, 
-	palmer@dabbelt.com, linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
-Subject: Re: [PATCH 5/5] KVM: riscv: selftests: Add bfloat16 extension to
- get-reg-list test
-Message-ID: <20250624-044127e80c3700d93f114280@orel>
-References: <cover.1750164414.git.zhouquan@iscas.ac.cn>
- <65752029ed1ae331a9ac867a6fef2e63a797569e.1750164414.git.zhouquan@iscas.ac.cn>
+        d=1e100.net; s=20230601; t=1750773948; x=1751378748;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=D+TKbeGRcKoBZxXH6jFI/Y3rhb44odXuWUwrtNDdL2o=;
+        b=jlgrB/PGSJpmrIQtfeOLbEVraKw6+39tE1gdE+juC1y73sioxravNf8tB2hL9R8Z2F
+         dNIfa1lx/olYimwjLxYm3vsT+hdktOoYtxF/YRGJXnmsc1EePotTv3a49x6FacuaY8um
+         RY+XmIejAW5UvOOyXjY7830v9jKoUZPKhSmoxpZS2IfePMAv7Mpmdu8iGOIc+owuQ3yT
+         sViZ+u/KBYpMbBf+cfFV06nVhAS26Caoh6GXgalN7PGeMtRd3fDvBokorEHnbud855c0
+         Y2HKZ5qIw6vjoc4cbmIYmev1sd3JaMsVRRjyPBxRumLucrROjAf7EpyHTR1vv/N5ll5U
+         Y5PA==
+X-Forwarded-Encrypted: i=1; AJvYcCUlkDkT0Qh7j2ZtoX4Fg43mTTPp/Df/iG2EXPOUi6vU8MSiUKTBR+qM+K3OWvajX/7XUBA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxaMR6RlIcJja1cSXR98ENsSdd7xcEPCsQ84jxA2xc+a4Q9iCE4
+	60FbovTmmPGxyjYLzNd4Hrve7XbctvxbzDnvH4s2rM+Mk9UrSCxVTztEU2L6gacmewQmKKGhdTK
+	LEIl9BqV94/LJmpB0z1luoHKpbcp3em1VijxoOoJSzOwID5TiW5gT0A==
+X-Gm-Gg: ASbGncuKpKTqyGDX5J9AXaCnSJQ5FnZPfduQQ/9kLpmtEs12+lG1VstO5XVK/ZiRmn5
+	njy9sy1Z1uuX4wgSbVArfDZVN7lIWoK8iTQZq1P8JSkOJOC+q6VJ0EesXe0JsesZRnavCPwDMD6
+	Agu8A6dzDpH/4W9K4uP0R3s8kIgsbkHsTHYodNK3qQxDfqV0NnXIZKkDQzPZ4idIltb/bWN+Ywt
+	7Z5PVVxPj+/QKq+iiqDjK3LVx5uYB0BOX0ivSIVWvqCsR9qwDSpPC/EK2Lqvhu7ctHSOX0FSJAp
+	8T8houh5vUtGvDWdrm++JrnUfbRG5Q==
+X-Received: by 2002:a05:6000:144e:b0:3a4:f520:8bfc with SMTP id ffacd0b85a97d-3a6d1322c05mr14142475f8f.36.1750773945773;
+        Tue, 24 Jun 2025 07:05:45 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IErDuslqfWPmZ/xGGypV3ktOS9Nn3dYluWljaHpFoweUHaB+FTxcneVu21gRhwulUWipnA3OA==
+X-Received: by 2002:a05:6000:144e:b0:3a4:f520:8bfc with SMTP id ffacd0b85a97d-3a6d1322c05mr14142006f8f.36.1750773940575;
+        Tue, 24 Jun 2025 07:05:40 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2445:d510::f39? ([2a0d:3344:2445:d510::f39])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a6e8106a69sm2015375f8f.79.2025.06.24.07.05.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 24 Jun 2025 07:05:40 -0700 (PDT)
+Message-ID: <6ebf5a0a-f13a-43c4-8e42-ba4743e7e417@redhat.com>
+Date: Tue, 24 Jun 2025 16:05:38 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <65752029ed1ae331a9ac867a6fef2e63a797569e.1750164414.git.zhouquan@iscas.ac.cn>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/2] vhost-net: reduce one userspace copy when
+ building XDP buff
+To: Jason Wang <jasowang@redhat.com>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: mst@redhat.com, eperezma@redhat.com, kvm@vger.kernel.org,
+ virtualization@lists.linux.dev, netdev@vger.kernel.org, davem@davemloft.net,
+ andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org
+References: <20250612083213.2704-1-jasowang@redhat.com>
+ <20250612083213.2704-2-jasowang@redhat.com>
+ <684b89de38e3_dcc452944e@willemb.c.googlers.com.notmuch>
+ <CACGkMEsKTLfD1nz-CQdn5+ZmxyWdVDwhBOAcB9fO4TUcwzuLPA@mail.gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <CACGkMEsKTLfD1nz-CQdn5+ZmxyWdVDwhBOAcB9fO4TUcwzuLPA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jun 17, 2025 at 09:10:50PM +0800, zhouquan@iscas.ac.cn wrote:
-> From: Quan Zhou <zhouquan@iscas.ac.cn>
+On 6/16/25 5:01 AM, Jason Wang wrote:
+> On Fri, Jun 13, 2025 at 10:16 AM Willem de Bruijn
+> <willemdebruijn.kernel@gmail.com> wrote:
+>>
+>> Jason Wang wrote:
+>>> We used to do twice copy_from_iter() to copy virtio-net and packet
+>>> separately. This introduce overheads for userspace access hardening as
+>>> well as SMAP (for x86 it's stac/clac). So this patch tries to use one
+>>> copy_from_iter() to copy them once and move the virtio-net header
+>>> afterwards to reduce overheads.
+>>>
+>>> Testpmd + vhost_net shows 10% improvement from 5.45Mpps to 6.0Mpps.
+>>>
+>>> Signed-off-by: Jason Wang <jasowang@redhat.com>
+>>
+>> Acked-by: Willem de Bruijn <willemb@google.com>
+>>
+>>> ---
+>>>  drivers/vhost/net.c | 13 ++++---------
+>>>  1 file changed, 4 insertions(+), 9 deletions(-)
+>>>
+>>> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+>>> index 777eb6193985..2845e0a473ea 100644
+>>> --- a/drivers/vhost/net.c
+>>> +++ b/drivers/vhost/net.c
+>>> @@ -690,13 +690,13 @@ static int vhost_net_build_xdp(struct vhost_net_virtqueue *nvq,
+>>>       if (unlikely(!buf))
+>>>               return -ENOMEM;
+>>>
+>>> -     copied = copy_from_iter(buf, sock_hlen, from);
+>>> -     if (copied != sock_hlen) {
+>>> +     copied = copy_from_iter(buf + pad - sock_hlen, len, from);
+>>> +     if (copied != len) {
+>>>               ret = -EFAULT;
+>>>               goto err;
+>>>       }
+>>>
+>>> -     gso = buf;
+>>> +     gso = buf + pad - sock_hlen;
+>>>
+>>>       if (!sock_hlen)
+>>>               memset(buf, 0, pad);
+>>> @@ -715,12 +715,7 @@ static int vhost_net_build_xdp(struct vhost_net_virtqueue *nvq,
+>>>               }
+>>>       }
+>>>
+>>> -     len -= sock_hlen;
+>>> -     copied = copy_from_iter(buf + pad, len, from);
+>>> -     if (copied != len) {
+>>> -             ret = -EFAULT;
+>>> -             goto err;
+>>> -     }
+>>> +     memcpy(buf, buf + pad - sock_hlen, sock_hlen);
+>>
+>> It's not trivial to see that the dst and src do not overlap, and does
+>> does not need memmove.
+>>
+>> Minimal pad that I can find is 32B and and maximal sock_hlen is 12B.
+>>
+>> So this is safe. But not obviously so. Unfortunately, these offsets
+>> are not all known at compile time, so a BUILD_BUG_ON is not possible.
 > 
-> The KVM RISC-V allows Zfbfmin/Zvfbfmin/Zvfbfwma extensions for Guest/VM
-> so add them to get-reg-list test.
+> We had this:
 > 
-> Signed-off-by: Quan Zhou <zhouquan@iscas.ac.cn>
-> ---
->  tools/testing/selftests/kvm/riscv/get-reg-list.c | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
+> int pad = SKB_DATA_ALIGN(VHOST_NET_RX_PAD + headroom + nvq->sock_hlen);
+> int sock_hlen = nvq->sock_hlen;
 > 
-> diff --git a/tools/testing/selftests/kvm/riscv/get-reg-list.c b/tools/testing/selftests/kvm/riscv/get-reg-list.c
-> index ebdc34b58bad..e5a07e000b66 100644
-> --- a/tools/testing/selftests/kvm/riscv/get-reg-list.c
-> +++ b/tools/testing/selftests/kvm/riscv/get-reg-list.c
-> @@ -80,6 +80,7 @@ bool filter_reg(__u64 reg)
->  	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZCF:
->  	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZCMOP:
->  	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZFA:
-> +	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZFBFMIN:
->  	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZFH:
->  	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZFHMIN:
->  	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZICBOM:
-> @@ -104,6 +105,8 @@ bool filter_reg(__u64 reg)
->  	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZTSO:
->  	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZVBB:
->  	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZVBC:
-> +	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZVFBFMIN:
-> +	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZVFBFWMA:
->  	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZVFH:
->  	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZVFHMIN:
->  	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZVKB:
-> @@ -535,6 +538,7 @@ static const char *isa_ext_single_id_to_str(__u64 reg_off)
->  		KVM_ISA_EXT_ARR(ZCF),
->  		KVM_ISA_EXT_ARR(ZCMOP),
->  		KVM_ISA_EXT_ARR(ZFA),
-> +		KVM_ISA_EXT_ARR(ZFBFMIN),
->  		KVM_ISA_EXT_ARR(ZFH),
->  		KVM_ISA_EXT_ARR(ZFHMIN),
->  		KVM_ISA_EXT_ARR(ZICBOM),
-> @@ -559,6 +563,8 @@ static const char *isa_ext_single_id_to_str(__u64 reg_off)
->  		KVM_ISA_EXT_ARR(ZTSO),
->  		KVM_ISA_EXT_ARR(ZVBB),
->  		KVM_ISA_EXT_ARR(ZVBC),
-> +		KVM_ISA_EXT_ARR(ZVFBFMIN),
-> +		KVM_ISA_EXT_ARR(ZVFBFWMA),
->  		KVM_ISA_EXT_ARR(ZVFH),
->  		KVM_ISA_EXT_ARR(ZVFHMIN),
->  		KVM_ISA_EXT_ARR(ZVKB),
-> @@ -1138,6 +1144,7 @@ KVM_ISA_EXT_SIMPLE_CONFIG(zcd, ZCD);
->  KVM_ISA_EXT_SIMPLE_CONFIG(zcf, ZCF);
->  KVM_ISA_EXT_SIMPLE_CONFIG(zcmop, ZCMOP);
->  KVM_ISA_EXT_SIMPLE_CONFIG(zfa, ZFA);
-> +KVM_ISA_EXT_SIMPLE_CONFIG(zfbfmin, ZFBFMIN);
->  KVM_ISA_EXT_SIMPLE_CONFIG(zfh, ZFH);
->  KVM_ISA_EXT_SIMPLE_CONFIG(zfhmin, ZFHMIN);
->  KVM_ISA_EXT_SUBLIST_CONFIG(zicbom, ZICBOM);
-> @@ -1162,6 +1169,8 @@ KVM_ISA_EXT_SIMPLE_CONFIG(zkt, ZKT);
->  KVM_ISA_EXT_SIMPLE_CONFIG(ztso, ZTSO);
->  KVM_ISA_EXT_SIMPLE_CONFIG(zvbb, ZVBB);
->  KVM_ISA_EXT_SIMPLE_CONFIG(zvbc, ZVBC);
-> +KVM_ISA_EXT_SIMPLE_CONFIG(zvfbfmin, ZVFBFMIN);
-> +KVM_ISA_EXT_SIMPLE_CONFIG(zvfbfwma, ZVFBFWMA);
->  KVM_ISA_EXT_SIMPLE_CONFIG(zvfh, ZVFH);
->  KVM_ISA_EXT_SIMPLE_CONFIG(zvfhmin, ZVFHMIN);
->  KVM_ISA_EXT_SIMPLE_CONFIG(zvkb, ZVKB);
-> @@ -1213,6 +1222,7 @@ struct vcpu_reg_list *vcpu_configs[] = {
->  	&config_zcf,
->  	&config_zcmop,
->  	&config_zfa,
-> +	&config_zfbfmin,
->  	&config_zfh,
->  	&config_zfhmin,
->  	&config_zicbom,
-> @@ -1237,6 +1247,8 @@ struct vcpu_reg_list *vcpu_configs[] = {
->  	&config_ztso,
->  	&config_zvbb,
->  	&config_zvbc,
-> +	&config_zvfbfmin,
-> +	&config_zvfbfwma,
->  	&config_zvfh,
->  	&config_zvfhmin,
->  	&config_zvkb,
-> -- 
-> 2.34.1
->
+> So pad - sock_len is guaranteed to be greater than zero.
+> 
+> If this is not obvious, I can add a comment in the next version.
 
-Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+The relevant initializations are not visible in the patch itself, so I
+think either a comment in the code or in the commit message would be useful.
+
+Thanks,
+
+Paolo
+
 
