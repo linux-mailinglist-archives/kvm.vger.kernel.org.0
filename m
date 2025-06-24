@@ -1,105 +1,136 @@
-Return-Path: <kvm+bounces-50541-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50542-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 108ABAE6FD5
-	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 21:41:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CD144AE6FD9
+	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 21:41:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D3A6B7A9082
-	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 19:39:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6A39F7A9DC1
+	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 19:40:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80FE32E92AC;
-	Tue, 24 Jun 2025 19:40:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16B5A2EA47F;
+	Tue, 24 Jun 2025 19:41:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mrJCkeyY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TWTZxLCs"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 289102E6D23
-	for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 19:40:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D26482E6123
+	for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 19:41:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750794056; cv=none; b=moGa+UO+UKgdMVOiax+SKFsSrOXNCSKdhQgA12IhW4VpFtC44m9Fysk8+6M2P7iFYWwsZc8CqFt4TmEzpSV6l8FClxB1wbJ9E4/FQXH3b/lEVthKPZSlz7CJGsQ0Vp4vqQwXg9NZq0axQ+CwI/Z4xRXS3bc9ifixyvZdHGT8tJ0=
+	t=1750794062; cv=none; b=uZg0WEetS+xU477xUcZ0CC/kFi/hKv3TULZzTivd0aZZiwA93uYaYVpt0mfQ+IaZwplD3vT61YTEM2x1nQpl4Sr1rotFMF5cQp3pZL4FACMnu1iziwFf5o6NTz64Hs+wX2kNNWLu699gN4w7aYLMtlMrobQ4ZOHxQGbmzcMfMgw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750794056; c=relaxed/simple;
-	bh=QI51cwFq/YB5nOA5i5mKEQvmSHJYx7qPfrbiMFxEcIA=;
+	s=arc-20240116; t=1750794062; c=relaxed/simple;
+	bh=icvH8uPyPSF7ZE5bbcFFzEf2UOQHavXp0OG5yV/ZSlo=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=t8GRkr0nX0e4UAeFOteYq00axSsa9WuoQPQXWtD6UG2nVXT6g3vfmwX5fAiZiL5gLe5OndnB+/lDxhj3YXI2tzypVbwt4KRhQc5ZSdFhv4mImLtoHz/msrk02QPWCBLVuT2jC6J/28gxTMg+NXoWSoWapOuclzca+CweoCiVmTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mrJCkeyY; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=SFnZ/2ZJB0rXfOtLrbbEgmd2p4ZNm/39KrjTn9ndD5gavfPb7/PyoZt6O8IRpg8fYN+nL7dNogKnON2hHyiDouDvci0MJZI+wGB4xyJywKqIKNoVlZOrf5h0VCPSAZJdlN8vHnEE+dWGk7uad1ZQmth3BSiNQhEdHGRqrMpiB/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TWTZxLCs; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b3183193374so4077207a12.1
-        for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 12:40:53 -0700 (PDT)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-31366819969so796619a91.0
+        for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 12:41:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750794053; x=1751398853; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1750794060; x=1751398860; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/vmX1c5Xt9887t/Wl5FntHs+0LsgfmpqsHqfvT5xmBc=;
-        b=mrJCkeyYItwiHcOjidBNfbJrQXQIkXh9Dap/jT7mHXF/F/owWM3j3ROGSNdJ45Q/mU
-         SUoNZ0RH5xNvxkesH6OCW/Gh7TE/XZQhPlI4+qZkW6tmZR61Uab4XyG/hCFgK8uSF7vL
-         S+PFistXIgIqFCoYWqkpbDvNIGTSyd4eGR5/sUmZdz4d4zEebTqiR7qj2VnvE7fkhjTq
-         39AOhoi53Tw4zBn0JSrJINmys5tGonG/Hh1Z00UfSe4VkFb9GkhDzdS12NlJforYvfmw
-         7xK+qOlYRAtGh0lP+sqETxTya528H6fHKwVTzwQ/QPY9ar/DFJ7QBJzDi8GLTgy2D7eq
-         8HyQ==
+        bh=iY0Zi0HY18tOkeHCc+HXpmSScBiit195K0qDvBCbCao=;
+        b=TWTZxLCspjLRlioDLG0R8h3YqzCLJY8ljXz4+Qt0OPOSRaUOngey81zRGB3SAuiBFt
+         fEJMahqPap8fX396N4gCSKl6Oe+RkmyN199RXrOZJCn4xfcG8YhSGfRKKNVVqZTVx0yX
+         ukeyfvMlZTCMJBtW72gn5y0pWyYgAXrAY/L7UJH0mjNiulU5Q4GrL7rSjNUbXBTLotKj
+         9NNHgtJgaZc295zI2Hxqh52C7HRcdyjVT8sdAvHhJXsr6CA1/28E5HMIPirm/sh61ge6
+         oq7uPRahWOg4wTGT4aD7lDVmmSTrRy6BwWbTJlciBuxwUr9quzbY+sFi8fASBtXLJfqj
+         Rt+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750794053; x=1751398853;
+        d=1e100.net; s=20230601; t=1750794060; x=1751398860;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/vmX1c5Xt9887t/Wl5FntHs+0LsgfmpqsHqfvT5xmBc=;
-        b=qY61NonEMk9tVu7ggsYiPw2qxYRYNMqzSkqCnXwI5W8JF3wzhJ4QYChr2UuWJCOjFy
-         ygKg7zCRqVKhSPeabht5c4NOx5HOEu3CBwOQTZa4PVIv5/UEXwRjdTh0+XeNNwQBxc5g
-         JZ2uA+FTqrS5Xo1L707upKhcPek2dfVdR2kbpG83tTdsxOTN3qLKbm0Vi1tfQ32QSm44
-         06cmRSOFbbx2aQsXCeHXG21Nsk5gtp8q7xzjKQF3Y68Dqu1PZmd7AhQGLlxenL7eGRBa
-         /eGry/1h6ehzhYPmv49rQfJZaQEjLvKl86Al2qSnWXRjAI3jgcJk/ayPWCxXOm/qwpHx
-         NaOw==
-X-Gm-Message-State: AOJu0YxtarnIts77B+QC6BRDrTRgtbGwD22OhSrtVbQ+xAtcbwHUSPP+
-	39sJpy/mRSB1UEmCC1mX26ua8d/94FLzJ0xri/UHSuoJOyskpvlPs8Uo20/3doYpddQ6eHAKsa3
-	ZUMuuCg==
-X-Google-Smtp-Source: AGHT+IEsEvO7d4CyVEj9g3vK+CPWlFNWO9cdjFglM/v2PD0Hi4/XwEOS0vLx5GXBYOLCXHETDH28pGATLhs=
-X-Received: from pfjt8.prod.google.com ([2002:a05:6a00:21c8:b0:748:f54a:54d8])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:1589:b0:21a:bdd2:c2f7
- with SMTP id adf61e73a8af0-2207f330579mr342217637.29.1750794053454; Tue, 24
- Jun 2025 12:40:53 -0700 (PDT)
-Date: Tue, 24 Jun 2025 12:38:20 -0700
-In-Reply-To: <20250602224459.41505-1-seanjc@google.com>
+        bh=iY0Zi0HY18tOkeHCc+HXpmSScBiit195K0qDvBCbCao=;
+        b=vOLHQnYjH1GYzZlhqepsIsZ0i6IF6wXl1mCSwUWF4s47kAgN8wmxTkY7ULtvkAp7+C
+         vlh+cIPHqvTKeo440EGzznsAupjeT7PUpWFJchLUmW29GQ3/FGCEEXChxC1FSVXcYqsH
+         ZB6HnTSd2sv5JRq5c3tTBw7oJurfvM2NHG/rgtVYUiYM+3wcLF0Cw3VTwqz4WAJDHKJA
+         yhvAshfmcn2EEMmA8h7dbyV7zdvArbGhVsckpBsHCdQ2fOKCYiMxrMs6GzKNP17fLFZT
+         IfXrDz2ddXHByQ7jx9qKjiI81u99JjL+RmYujjzTpivbxCA4FHE9qrqCmKkt9gQuSqFM
+         tu4g==
+X-Gm-Message-State: AOJu0YxyA2mdq2/fWRBwokQi30t2+d/3T94V+uqwewMUxyni1H5Y8ysc
+	GJaXGXGCtn7GxCboGOdWcUxVZOzrFtETn453EqucEAu4ASvMxPWBhv8g5lSwxJ5NielxveLvNYo
+	k0LKHlg==
+X-Google-Smtp-Source: AGHT+IF4MLhn1oAFS9q8ZwixKJZ6SXdYDCWlaLgz8n+cUS01Jkrs//aXxvoL7Qsb+teLAlUXpA9LXNHFuS8=
+X-Received: from pjbov12.prod.google.com ([2002:a17:90b:258c:b0:312:e914:4548])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3d8c:b0:2ff:58c7:a71f
+ with SMTP id 98e67ed59e1d1-315f26b85c7mr109165a91.32.1750794060247; Tue, 24
+ Jun 2025 12:41:00 -0700 (PDT)
+Date: Tue, 24 Jun 2025 12:38:22 -0700
+In-Reply-To: <20250611213557.294358-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250602224459.41505-1-seanjc@google.com>
+References: <20250611213557.294358-1-seanjc@google.com>
 X-Mailer: git-send-email 2.50.0.714.g196bf9f422-goog
-Message-ID: <175079269575.517785.12142408340158295471.b4-ty@google.com>
-Subject: Re: [PATCH 0/2] KVM: SVM: Fix a NULL VMSA deref with MOVE_ENC_CONTEXT
+Message-ID: <175079365968.522970.130090674504357227.b4-ty@google.com>
+Subject: Re: [PATCH v2 00/18] KVM: x86: Add I/O APIC kconfig, delete irq_comm.c
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Vitaly Kuznetsov <vkuznets@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Alexander Potapenko <glider@google.com>, James Houghton <jthoughton@google.com>, 
-	Peter Gonda <pgonda@google.com>, Tom Lendacky <thomas.lendacky@amd.com>
+	Kai Huang <kai.huang@intel.com>
 Content-Type: text/plain; charset="utf-8"
 
-On Mon, 02 Jun 2025 15:44:57 -0700, Sean Christopherson wrote:
-> Fix a NULL VMSA deref bug (which is probably the tip of the iceberg with
-> respect to what all can go wrong) due to a race between KVM_CREATE_VCPU and
-> KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM, where a non-SEV-ES vCPU can be created in
-> an SEV-ES VM.
+On Wed, 11 Jun 2025 14:35:39 -0700, Sean Christopherson wrote:
+> Add CONFIG_KVM_IOAPIC to allow disabling support for KVM's I/O APIC (and PIC
+> and PIT) emulation, and delete irq_comm.c by moving its contents to other
+> files.
 > 
-> Found by running syzkaller on a bare metal SEV-ES host.  C repro below.
+> Vitaly and Kai, I didn't apply your review/ack to the Hyper-V patch, as I ended
+> up keeping the helper as kvm_hv_synic_set_irq() to fix the tracepoint
+> inconsistency and the bad changelog.
 > 
 > [...]
 
-Applied to kvm-x86 fixes.  Paolo's "Queued, thanks!" seems to have been
-premature (though Paolo's mail saved me; I completely forgot about swapping
-EINVAL to EBUSY).
+Applied to kvm-x86 irqs, thanks!
 
-[1/2] KVM: SVM: Reject SEV{-ES} intra host migration if vCPU creation is in-flight
-      https://github.com/kvm-x86/linux/commit/ecf371f8b02d
-[2/2] KVM: SVM: Initialize vmsa_pa in VMCB to INVALID_PAGE if VMSA page is NULL
-      https://github.com/kvm-x86/linux/commit/48f15f62418
+[01/18] KVM: x86: Trigger I/O APIC route rescan in kvm_arch_irq_routing_update()
+        https://github.com/kvm-x86/linux/commit/e295d2e7fbe6
+[02/18] KVM: x86: Drop superfluous kvm_set_pic_irq() => kvm_pic_set_irq() wrapper
+        https://github.com/kvm-x86/linux/commit/8a33b1f246ce
+[03/18] KVM: x86: Drop superfluous kvm_set_ioapic_irq() => kvm_ioapic_set_irq() wrapper
+        https://github.com/kvm-x86/linux/commit/05dc9eab3f00
+[04/18] KVM: x86: Drop superfluous kvm_hv_set_sint() => kvm_hv_synic_set_irq() wrapper
+        https://github.com/kvm-x86/linux/commit/20218e69e85b
+[05/18] KVM: x86: Move PIT ioctl helpers to i8254.c
+        https://github.com/kvm-x86/linux/commit/00b5ebf8db7c
+[06/18] KVM: x86: Move KVM_{GET,SET}_IRQCHIP ioctl helpers to irq.c
+        https://github.com/kvm-x86/linux/commit/b771b1616ff8
+[07/18] KVM: x86: Rename irqchip_kernel() to irqchip_full()
+        https://github.com/kvm-x86/linux/commit/c5a701955e2d
+[08/18] KVM: x86: Move kvm_setup_default_irq_routing() into irq.c
+        https://github.com/kvm-x86/linux/commit/df35135680fa
+[09/18] KVM: x86: Move kvm_{request,free}_irq_source_id() to i8254.c (PIT)
+        https://github.com/kvm-x86/linux/commit/77a74b8ff41a
+[10/18] KVM: x86: Hardcode the PIT IRQ source ID to '2'
+        https://github.com/kvm-x86/linux/commit/61423c413a74
+[11/18] KVM: x86: Don't clear PIT's IRQ line status when destroying PIT
+        https://github.com/kvm-x86/linux/commit/2c31aa747d78
+[12/18] KVM: x86: Explicitly check for in-kernel PIC when getting ExtINT
+        https://github.com/kvm-x86/linux/commit/cd9140ad8312
+[13/18] KVM: Move x86-only tracepoints to x86's trace.h
+        https://github.com/kvm-x86/linux/commit/2c938850d9d1
+[14/18] KVM: x86: Add CONFIG_KVM_IOAPIC to allow disabling in-kernel I/O APIC
+        https://github.com/kvm-x86/linux/commit/628a27731e3f
+[15/18] KVM: Squash two CONFIG_HAVE_KVM_IRQCHIP #ifdefs into one
+        https://github.com/kvm-x86/linux/commit/141db6cd79e2
+[16/18] KVM: selftests: Fall back to split IRQ chip if full in-kernel chip is unsupported
+        https://github.com/kvm-x86/linux/commit/8fd2a6d43a10
+[17/18] KVM: x86: Move IRQ mask notifier infrastructure to I/O APIC emulation
+        https://github.com/kvm-x86/linux/commit/37b1761fe895
+[18/18] KVM: x86: Fold irq_comm.c into irq.c
+        https://github.com/kvm-x86/linux/commit/e76c274513f2
 
 --
 https://github.com/kvm-x86/kvm-unit-tests/tree/next
