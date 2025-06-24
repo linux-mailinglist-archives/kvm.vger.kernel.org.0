@@ -1,94 +1,137 @@
-Return-Path: <kvm+bounces-50524-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50525-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F11BAE6D46
-	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 19:06:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABC5CAE6DCD
+	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 19:44:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7CE5C18951C0
-	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 17:07:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 66EBE1BC6586
+	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 17:44:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABAB52E1729;
-	Tue, 24 Jun 2025 17:06:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAD502E613D;
+	Tue, 24 Jun 2025 17:44:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qr1RvsdH"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="oRoaf3Pe"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8489022D4C3
-	for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 17:06:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E9942222D2;
+	Tue, 24 Jun 2025 17:44:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750784805; cv=none; b=HJhkzu++sIrz40bmUmUx8u2+Xxcc8w5wKZelEkRX0LlMSWtdT08/9EiUrv8dZj14oVC46BAuCQnQaBvh5QEvdAMTmnxeWCR0ynPovrbw8x/Al8PkG71KGgI24EiZpFuygvnRvQQ+w8Dnqzl1B6BxYsMT92sRAY9HHSdpfD6+1bw=
+	t=1750787069; cv=none; b=g370sOzLqlbvtxii+gWTZ67ps2kouPfQDS2VE+CLB+bKI0q5UuEvO8xRpkDZDaR0U04AMZ927Gn5QILUNHD57w+wCfIdQbDo+z1bt/1znP5d6ppB0jDDPNMOmWoxuPHUm3Z2mMcfRx2Wz1CGMB6kFR0XTKINDRNf+/th61VmInw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750784805; c=relaxed/simple;
-	bh=El96RS2GoB+xf+x5xkRmmKhAycZmnaHN2uzD4493RT8=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=TSjtXhV7AvGpqW730xmAV5oIli7AIzy6bUdBNLAw7IUyTJ/6zZJc57MCf/sTYPEaB/F3tlVS8cCPpVyCbWRlpeIy9URyhc9GjUXjrCxoXp4I7GH/IJAJBSZxXe+KkP+33pPRy6STSaTHZgrroAFEIyee/hZDSh+gmoMYIaSk+Jc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qr1RvsdH; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-31366819969so699457a91.0
-        for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 10:06:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750784804; x=1751389604; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3Fj3ia1xYcZY5Hv5rbn8TPDKNjSzgo+utgMvYqBwh94=;
-        b=qr1RvsdHys8bD6enK9LV1CLvZkESbZ+H5V1Rmf08jNW6fx8qVmVEN9/5fltZQzOfyv
-         Acnu3EHojahxOi00XI3SCNZOGLUqfcSjxlXRN1nPGvRoklAUxf6JlITItqNZP61fEFm2
-         S6DulUrj3P49OdiKoQn4oj7RxVchQA9fC6xmdvxq/8ltPSfYSB7IT4grf9KADqvIZOQO
-         P+aqDNZzpma0RIkUShr6lxlVExxIoW3l5ghyC1TRyvBMxVbJ+y7j78JoNltMipyMIfPK
-         Tou0FY5OhMhN4HZzgg4roIdfb4r9DIFZnl3ojZddhQ3+1lIt4vQSvg92EuN9QCgL23uc
-         lWXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750784804; x=1751389604;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3Fj3ia1xYcZY5Hv5rbn8TPDKNjSzgo+utgMvYqBwh94=;
-        b=iW/OiKDiYtkS1bWEzwpVeZCfsYweT19BaVvudN44KQUg1RS5gzSjtIdXXQO+7JVbDz
-         whZuMqfSHQFsDSc8dHi+Vvln0/OwzY48jBfRe1ciBdEuWTRylR511eo8Viz4swOc5AhF
-         u2V8o0aqr7okvI/rshHC4K9MVsKKvVbD7lhoPWRGvwRqunPKPkYOu+EpuEPWdwJDZPkB
-         qJACzBBqOFqdzv66Wjuv1iXOO69v+BTXs3oRKmkhiAICY9r7JN4vtMnoQVYUypXqTlkW
-         Kuco+ffg5y0s0YjG/PiOYRxknkICvRl6kdG2JkbSihqdIYYMX/bs7HXZJScJ4R3GglAJ
-         np/Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVi5XAeANdCX1cwkuIxaX5dm2VzgfH4z/DwpDRxCEKIXkYHoAFbfiVHWzoJdK3E+YNnXJ0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YysKogQ0dTwO9sp7qVeNzufBX+mqE5K/2Ip0gNSkL1L7PYKvUZ8
-	8yKi4JfAa50Fh7r4i8qruEZvRuHvQNY/3Q8Ar5W5PqmKIy26z6BKa7mMYdAJDw5WuwuCL14R/ka
-	HvNGlsw==
-X-Google-Smtp-Source: AGHT+IG91rtujOF1URlp+uwPQ5xYFcxtfL51NMrhKNtKVdmuwx1+g9oU1lsxSZXSOfImxql2jLw2G1l0m9U=
-X-Received: from pjbqc8.prod.google.com ([2002:a17:90b:2888:b0:312:1af5:98c9])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1b47:b0:301:9f62:a944
- with SMTP id 98e67ed59e1d1-315eddb82cbmr578213a91.33.1750784803871; Tue, 24
- Jun 2025 10:06:43 -0700 (PDT)
-Date: Tue, 24 Jun 2025 10:06:42 -0700
-In-Reply-To: <d243d203-7514-4541-9ea2-1200f7116cc1@zytor.com>
+	s=arc-20240116; t=1750787069; c=relaxed/simple;
+	bh=cHaQbfhGoVHgzh7OltXize9WQGcFfqfH4wv73lVFTiw=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=gGsxkLz/ZXrDBpzn8S+Oc0J5Asb/dngustrJ1hSgLXT12weLhErQ9kRF2mZ8LxBa0+J6a7dmbAQ6IAH9ZatmWPGgM9yZTCSVA3ZK8BWeFlVgSysT8MFV6aFgEeuyjAEeTxfbJOPrXGuz+bZ6eEM2pMamvKpUbY5M5evydMDo42E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=oRoaf3Pe; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [192.168.7.202] ([71.202.166.45])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 55OHhRBh1444571
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Tue, 24 Jun 2025 10:43:27 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 55OHhRBh1444571
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025062101; t=1750787010;
+	bh=a1n2uboJJ+hHVcRLq9lXyXmrDm82X6mYpb+la8WbKqs=;
+	h=Date:From:Subject:To:Cc:References:In-Reply-To:From;
+	b=oRoaf3Pe6ywPDh5w20TjpU0uhqq4MnKTZMjTI5zPE9nY0Fsy8eGmvSCNGzK+UVxft
+	 9p59NU/V4PF/A86nYQtFHl+NaaglHjxcMr7V1uJa4tNeL5YdoS7JGH8q/FJDZOuZqT
+	 W8UxS5eX23tC9Tdo4BCOJ+Slz11rIKB59jkpdotDas0u1wm+f8S6OALiU4ZDmnadsz
+	 IFeaAjRxEguVEcSMijOfS4QWMd+22mk6NIl/yqnFSy2OL13APJYqyYGK5hpn3CohJb
+	 34E5p18/cnqS58HSyV9py5xDswl29q8uCHe+Si1eQ12y89bUBXKRv41LTLAo/j3Axe
+	 ao3Rvqp0/2rfQ==
+Message-ID: <80ba45cf-2679-471b-ae3d-986697089b75@zytor.com>
+Date: Tue, 24 Jun 2025 10:43:26 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250328171205.2029296-1-xin@zytor.com> <d243d203-7514-4541-9ea2-1200f7116cc1@zytor.com>
-Message-ID: <aFrbIgouGiZWf51O@google.com>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+From: Xin Li <xin@zytor.com>
 Subject: Re: [PATCH v4 00/19] Enable FRED with KVM VMX
-From: Sean Christopherson <seanjc@google.com>
-To: Xin Li <xin@zytor.com>
-Cc: pbonzini@redhat.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, corbet@lwn.net, tglx@linutronix.de, 
-	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, 
-	hpa@zytor.com, andrew.cooper3@citrix.com, luto@kernel.org, 
-	peterz@infradead.org, chao.gao@intel.com, xin3.li@intel.com
-Content-Type: text/plain; charset="us-ascii"
+To: Sean Christopherson <seanjc@google.com>
+Cc: pbonzini@redhat.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, corbet@lwn.net, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        x86@kernel.org, hpa@zytor.com, andrew.cooper3@citrix.com,
+        luto@kernel.org, peterz@infradead.org, chao.gao@intel.com,
+        xin3.li@intel.com
+References: <20250328171205.2029296-1-xin@zytor.com>
+ <d243d203-7514-4541-9ea2-1200f7116cc1@zytor.com>
+ <aFrbIgouGiZWf51O@google.com>
+Content-Language: en-US
+Autocrypt: addr=xin@zytor.com; keydata=
+ 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
+ l75w1xInsg==
+In-Reply-To: <aFrbIgouGiZWf51O@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Fri, Mar 28, 2025, Xin Li wrote:
-> Any chance we could merge FRED ahead of CET?
+On 6/24/2025 10:06 AM, Sean Christopherson wrote:
+> On Fri, Mar 28, 2025, Xin Li wrote:
+>> Any chance we could merge FRED ahead of CET?
+> 
+> Probably not?  CET exists is publicly available CPUs.  AFAIK, FRED does not.
 
-Probably not?  CET exists is publicly available CPUs.  AFAIK, FRED does not.
-And CET is (/knock wood) hopefully pretty much ready?  FWIW, I'd really like to
-get both CET and FRED virtualization landed by 6.18, i.e. in time for the next
-LTS.
+Better not, as you said it creates extra effort because FRED does lean a
+bit on CET.
+
+I was a bit worried that CET would take longer time than expected...
+
+> And CET is (/knock wood) hopefully pretty much ready?  FWIW, I'd really like to
+
+That is also my reading on CET.
+
+> get both CET and FRED virtualization landed by 6.18, i.e. in time for the next
+> LTS.
+
+I love the plan!
+
+FRED is my top priority.  I’ll address all your comments, rebase onto
+kvm-x86/next (you have not updated yet :) ), and send out v5 at an
+appropriate time.
+
+Thanks!
+      Xin
+
 
