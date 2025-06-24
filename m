@@ -1,83 +1,60 @@
-Return-Path: <kvm+bounces-50450-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50455-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8471DAE5D52
-	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 09:01:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D16D5AE5DAD
+	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 09:29:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8FBB03B304D
-	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 07:01:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC3AB1771B2
+	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 07:28:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CB29239567;
-	Tue, 24 Jun 2025 07:01:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5A882550BA;
+	Tue, 24 Jun 2025 07:28:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KtOZA0h+"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="DqFTQJCz"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9705422258C
-	for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 07:01:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C60821B9F6
+	for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 07:28:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750748499; cv=none; b=Qkk8Qx/rWToOcQROld4fpRLPnO7gBfygMx9AkpOxi01T56xkKZM2mucbdGS/adfxahZb0poUVRn5GKsxKKqOpsKR14e5kpaRYJeyHWvzyupfWOm96EiBRJHyc3HlcQ2nMIrjpy0OcGu5J/32Rp+4dQN/VOXYcGLQYiOcPtLfkPE=
+	t=1750750111; cv=none; b=McepwgmWluuO8bOWa0RImUUVNYwVFM50eiCFrx+OzT1eM2vS5ZL1tp1qqvVDwlbBSHkM1kBRglKtJ7UmgvWCVY7Xs8xG8b7OdWE4LAlqOIY3deg2nel90gbZeg+1GWnEFohJl4+KopR6typwVjNdHOLlAvjjUUm5JF+pFbex+Qc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750748499; c=relaxed/simple;
-	bh=HCIpBO8RVhB6SPtV/1F7eCuEBsj1EdkXSwTS7kOxR+M=;
+	s=arc-20240116; t=1750750111; c=relaxed/simple;
+	bh=E0MHYIBtJb1pjGFFLLtjW6ldijZKZX8x+CorPvQl3vU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VAXWLoRbzjNKMHxyVj9gXmJ5Jtdml76aFXVl172XkL+ArAqBKWlrrdI9cJfruPrv7lwtlBkA5CTJl2JTZ7duLix2s9Oe6CnPQpcI7E64xBoE9kPYWkLtHW7LrR00wUqKp1PVQGkgT3JNG+Q8uJQDea+mfI2Aiz8azSxjdsWLQQ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KtOZA0h+; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750748498; x=1782284498;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=HCIpBO8RVhB6SPtV/1F7eCuEBsj1EdkXSwTS7kOxR+M=;
-  b=KtOZA0h+PkwvlBfSUYAe/BDh0v7IE1zSdzRe5Tx1OCCTvhLYR0949KE/
-   a4nRISCRISLq2eWbvvB0ZFeVqFOpXluSN8pzNWE/oWpDTYbnOlXrr0bsb
-   w2Tp3NpjbW2xdo/Kk4XZ5tKgHPmipFhkfpodGiyXa8/FJ3K+aS3fW9cb0
-   LbGWcFYUKrE6+aCPRO5TXP+35lUVJsGAHVlQOB7K/7CSO7A5KR9gqZ+10
-   CGS/kjghTmJjtkq8RWH9ZpRSnAHvL8JIND6eqfOeSOAbDcBjsAiNK85Ql
-   pg2lEu9zeUxQbmRNTNeebWoKOJRjD7IspA6v97zxF+ZSRPD4j1ij7joW6
-   w==;
-X-CSE-ConnectionGUID: uMizukM7RaKOyK9e+D26EA==
-X-CSE-MsgGUID: N2ExMaK3T3a0h5lWfNMVZw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11473"; a="70398456"
-X-IronPort-AV: E=Sophos;i="6.16,261,1744095600"; 
-   d="scan'208";a="70398456"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jun 2025 00:01:35 -0700
-X-CSE-ConnectionGUID: kM+CfAgQS9C3FHusfWzYkw==
-X-CSE-MsgGUID: EGW2vSRiRPihw7mhTeAC1Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,261,1744095600"; 
-   d="scan'208";a="152533837"
-Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.39])
-  by fmviesa010.fm.intel.com with ESMTP; 24 Jun 2025 00:01:10 -0700
-Date: Tue, 24 Jun 2025 15:22:31 +0800
-From: Zhao Liu <zhao1.liu@intel.com>
-To: Ewan Hai <ewanhai-oc@zhaoxin.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
-	Igor Mammedov <imammedo@redhat.com>,
-	Babu Moger <babu.moger@amd.com>, Xiaoyao Li <xiaoyao.li@intel.com>,
-	Tejus GK <tejus.gk@nutanix.com>, Jason Zeng <jason.zeng@intel.com>,
-	Manish Mishra <manish.mishra@nutanix.com>,
-	Tao Su <tao1.su@intel.com>, qemu-devel@nongnu.org,
-	kvm@vger.kernel.org
-Subject: Re: [RFC 01/10] i386/cpu: Mark CPUID[0x80000005] as reserved for
- Intel
-Message-ID: <aFpSN+zEgJl72V46@intel.com>
-References: <20250423114702.1529340-1-zhao1.liu@intel.com>
- <20250423114702.1529340-2-zhao1.liu@intel.com>
- <fa16f7a8-4917-4731-9d9f-7d4c10977168@zhaoxin.com>
- <aDWCxhsCMavTTzkE@intel.com>
- <3318af5c-8a46-4901-91f2-0b2707e0a573@zhaoxin.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=kYqLL6v4vP8WBxzbKR4NdlV1TahixE5YAqNbadiQZ1Au6gl+LihdqdpCyRibv95YiHcH/JoYy3VEtCuZpAOJ+bBw9MvXd3rAwPBcwOqmOEoZlefYmeIEMOYXwlFdM04zfruJMFEn/cBZpeL7O4wjEAYFCQhId345LHh39LkxQtE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=DqFTQJCz; arc=none smtp.client-ip=91.218.175.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Tue, 24 Jun 2025 00:28:05 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1750750096;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Lc032N2dP+96gZo5C4cwrU+RJ37ABZ5fu4zPpJwktik=;
+	b=DqFTQJCzyv7ZW1hvEieX7Tv1cH2uTdFq+CU5nxIqcXQzUMK7fJNSfc1ljHoatbsDfahyJy
+	A/drSdnfKA4r++oWZYI67rUXxdDdMTS78irjNs8L0Ja5xCl/c9X+xBvTINGbvVjcqLLx4a
+	JKirWyEfgoAsJNKWk2g5AXAJMBIikM8=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Colton Lewis <coltonlewis@google.com>
+Cc: kvm@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net,
+	linux@armlinux.org.uk, catalin.marinas@arm.com, will@kernel.org,
+	maz@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, mark.rutland@arm.com, shuah@kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v2 01/23] arm64: cpufeature: Add cpucap for HPMN0
+Message-ID: <aFpThZIE2PxjVAVw@linux.dev>
+References: <aFYAXjzICzgmSyLI@linux.dev>
+ <gsntqzza9uxp.fsf@coltonlewis-kvm.c.googlers.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -86,94 +63,68 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3318af5c-8a46-4901-91f2-0b2707e0a573@zhaoxin.com>
+In-Reply-To: <gsntqzza9uxp.fsf@coltonlewis-kvm.c.googlers.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, May 27, 2025 at 05:56:07PM +0800, Ewan Hai wrote:
-> Date: Tue, 27 May 2025 17:56:07 +0800
-> From: Ewan Hai <ewanhai-oc@zhaoxin.com>
-> Subject: Re: [RFC 01/10] i386/cpu: Mark CPUID[0x80000005] as reserved for
->  Intel
+On Mon, Jun 23, 2025 at 06:25:38PM +0000, Colton Lewis wrote:
+> Oliver Upton <oliver.upton@linux.dev> writes:
 > 
+> > On Fri, Jun 20, 2025 at 10:13:01PM +0000, Colton Lewis wrote:
+> > > Add a capability for FEAT_HPMN0, whether MDCR_EL2.HPMN can specify 0
+> > > counters reserved for the guest.
 > 
+> > > This required changing HPMN0 to an UnsignedEnum in tools/sysreg
+> > > because otherwise not all the appropriate macros are generated to add
+> > > it to arm64_cpu_capabilities_arm64_features.
 > 
-> On 5/27/25 5:15 PM, Zhao Liu wrote:
-> > 
-> > > On 4/23/25 7:46 PM, Zhao Liu wrote:
-> > > > 
-> > > > Per SDM, 0x80000005 leaf is reserved for Intel CPU, and its current
-> > > > "assert" check blocks adding new cache model for non-AMD CPUs.
-> > > > 
-> > > > Therefore, check the vendor and encode this leaf as all-0 for Intel
-> > > > CPU. And since Zhaoxin mostly follows Intel behavior, apply the vendor
-> > > > check for Zhaoxin as well.
-> > > > 
-> > > > Note, for !vendor_cpuid_only case, non-AMD CPU would get the wrong
-> > > > information, i.e., get AMD's cache model for Intel or Zhaoxin CPUs.
-> > > > For this case, there is no need to tweak for non-AMD CPUs, because
-> > > > vendor_cpuid_only has been turned on by default since PC machine v6.1.
-> > > > 
-> > > > Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
-> > > > ---
-> > > >    target/i386/cpu.c | 16 ++++++++++++++--
-> > > >    1 file changed, 14 insertions(+), 2 deletions(-)
-> > > > 
-> > > > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> > > > index 1b64ceaaba46..8fdafa8aedaf 100644
-> [snip]>>> +
-> > > >            *eax = (L1_DTLB_2M_ASSOC << 24) | (L1_DTLB_2M_ENTRIES << 16) |
-> > > >                   (L1_ITLB_2M_ASSOC <<  8) | (L1_ITLB_2M_ENTRIES);
-> > > >            *ebx = (L1_DTLB_4K_ASSOC << 24) | (L1_DTLB_4K_ENTRIES << 16) |
-> > > 
-> > > I've reviewed the cache-related CPUID path and noticed an oddity: every AMD
-> > > vCPU model still reports identical hard-coded values for the L1 ITLB and L1
-> > > DTLB fields in leaf 0x8000_0005. Your patch fixes this for Intel(and
-> > > Zhaoxin), but all AMD models continue to receive the same constants in
-> > > EAX/EBX.
-> > 
-> > Yes, TLB info is hardcoded here. Previously, Babu and Eduardo cleaned up
-> > the cache info but didn't cover TLB [*]. I guess one reason would there
-> > are very few use cases related to TLB's info, and people are more
-> > concerned about the cache itself.
-> > 
-> > [*]: https://lore.kernel.org/qemu-devel/20180510204148.11687-2-babu.moger@amd.com/
+> > > Signed-off-by: Colton Lewis <coltonlewis@google.com>
+> > > ---
+> > >   arch/arm64/kernel/cpufeature.c | 8 ++++++++
+> > >   arch/arm64/tools/cpucaps       | 1 +
+> > >   arch/arm64/tools/sysreg        | 6 +++---
+> > >   3 files changed, 12 insertions(+), 3 deletions(-)
 > 
-> Understood. Keeping the L1 I/D-TLB fields hard-coded for every vCPU model is
-> acceptable.
+> > > diff --git a/arch/arm64/kernel/cpufeature.c
+> > > b/arch/arm64/kernel/cpufeature.c
+> > > index b34044e20128..278294fdc97d 100644
+> > > --- a/arch/arm64/kernel/cpufeature.c
+> > > +++ b/arch/arm64/kernel/cpufeature.c
+> > > @@ -548,6 +548,7 @@ static const struct arm64_ftr_bits ftr_id_mmfr0[] = {
+> > >   };
 > 
-> > > Do you know the reason for this choice? Is the guest expected to ignore
-> > > those L1 TLB numbers? If so, I'll prepare a patch that adjusts only the
-> > > Zhaoxin defaults in leaf 0x8000_0005 like below, matching real YongFeng
-> > > behaviour in ecx and edx, but keep eax and ebx following AMD's behaviour.
-> > 
-> > This way is fine for me.
-> > 
+> > >   static const struct arm64_ftr_bits ftr_id_aa64dfr0[] = {
+> > > +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE,
+> > > ID_AA64DFR0_EL1_HPMN0_SHIFT, 4, 0),
+> > >   	S_ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE,
+> > > ID_AA64DFR0_EL1_DoubleLock_SHIFT, 4, 0),
+> > >   	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE,
+> > > ID_AA64DFR0_EL1_PMSVer_SHIFT, 4, 0),
+> > >   	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE,
+> > > ID_AA64DFR0_EL1_CTX_CMPs_SHIFT, 4, 0),
+> > > @@ -2896,6 +2897,13 @@ static const struct arm64_cpu_capabilities
+> > > arm64_features[] = {
+> > >   		.matches = has_cpuid_feature,
+> > >   		ARM64_CPUID_FIELDS(ID_AA64MMFR0_EL1, FGT, FGT2)
+> > >   	},
+> > > +	{
+> > > +		.desc = "Allow MDCR_EL2.HPMN = 0",
 > 
-> Thanks for confirming. I'll post the YongFeng cache-info series once your
-> refactor lands.
+> > This feedback still stands...
+> 
+> > 		.desc = "HPMN0",
+> 
+> > [*] https://lore.kernel.org/kvm/aD4ijUaSGm9b2g5H@linux.dev/
+> 
+> Sorry for ignoring your previous feedback. I looked at the other .desc
+> fields and they had more descriptive English, so I think this one should
+> be more than "FEAT_HPMN0" for consistency.
+> 
+> If you insist I'll change it.
 
-Hi Ewan,
-
-By this patch:
-
-https://lore.kernel.org/qemu-devel/20250620092734.1576677-14-zhao1.liu@intel.com/
-
-I fixed the 0x80000005 leaf for Intel and Zhaoxin based on your feedback
-by the way.
-
-It looks like the unified cache_info would be very compatible with
-various vendor needs and corner cases. So I'll respin this series based
-on that cache_info series.
-
-Before sending the patch, I was thinking that maybe I could help you
-rebase and include your Yongfeng cache model patch you added into my v2
-series, or you could rebase and send it yourself afterward. Which way do
-you like?
-
-And for TLB, we can wait and see what maintainers think. Maybe it is
-possible, considering that the cache also transitioned from hardcoding
-to a cache model (since commit 7e3482f82480).
+I'm not exactly sold on the merits of using descriptive names for the
+capabilities, as the architecture extension names are exact terms that
+can be related back to documentation.
 
 Thanks,
-Zhao
-
+Oliver
 
