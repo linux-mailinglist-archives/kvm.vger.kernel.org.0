@@ -1,96 +1,95 @@
-Return-Path: <kvm+bounces-50469-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50470-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8ED2AE6039
-	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 11:07:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B11CAE60B7
+	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 11:21:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 46AE24C18FC
-	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 09:07:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 173273A3861
+	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 09:21:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8462E27AC3C;
-	Tue, 24 Jun 2025 09:06:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C53F27B4E4;
+	Tue, 24 Jun 2025 09:21:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="xi/QlwlW";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Y9LCmN9J";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="E5mo4GVk";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="oREfj0fF"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="MSed/gOg";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="FGlHU6cT";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="MSed/gOg";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="FGlHU6cT"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A904927A445
-	for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 09:06:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B936823E347
+	for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 09:21:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750756007; cv=none; b=kh7UL0gE34faywm/qqQ7/ll+1fe1Dh4ZfnWQbbyrk17i7HozSkHHNZzOUZ+LvVLU/OVmMintuGkTvS8EJH1Oh+8dSabGg3m0trDAinRzzK41iPTVFnG+8SSGgGXRFuhhrx3NemUgouyBBadli0gguZl3066GnNRxgIi9+FxMd6I=
+	t=1750756888; cv=none; b=X7+w2mlXNS+cn5zDR8YRj5LtXis3SciwIl8kb3drDQspX+DqqLf8VIr9uPhV12F4U6F5T462JVVc8mt+/mjeIRJgmD0LEHuc0FedngHvZAjHxBgQ60yMCmwfjx/43mHp9/rEO3OXg6ZFiYO7+4GwVtT66mP+vonv9VJz/4O/jAE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750756007; c=relaxed/simple;
-	bh=oxW2aAAfKBhOjlWbxlJ/FAtpZq04AOHQ+xCrx3SgYHY=;
+	s=arc-20240116; t=1750756888; c=relaxed/simple;
+	bh=1VmIHrEJi7+TgM2h1vNk30KZb3WSLgma3zwXqeBdNN8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NjPLPxenXSRBCioFTcFCeVnCiW6asafP8Gr368UKKOSZyGhRCXPql3hJKG5c5VDfpsuP8IOWzKJ4RoEOZDAXKL6EViqTgYmJ59rJ9llu4+G54AAIX0p4PdQ6QP9hpOL7KX8yCWPDZwDmYQiDpClcXUknZ01frKLd8koFbAv9c3Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=xi/QlwlW; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Y9LCmN9J; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=E5mo4GVk; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=oREfj0fF; arc=none smtp.client-ip=195.135.223.130
+	 In-Reply-To:Content-Type; b=fg++bNkgyBesuC9+rpfEDRoa2rY/to9PcwjasFz4eDu30gs/3ntdUgZL1y5zVNEgl1oAjKv9v6MSnndm0vZ9DdmxIAmO0NsG5vIR2IGZu0+ad4YxmOxI2AuEGUF6OYYy11tIzCNSxRmC0qGcOBc56JhuuW+NZUdObMKvSQQvhC0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=MSed/gOg; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=FGlHU6cT; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=MSed/gOg; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=FGlHU6cT; arc=none smtp.client-ip=195.135.223.130
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id D7A7A21174;
-	Tue, 24 Jun 2025 09:06:42 +0000 (UTC)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 1A1E821186;
+	Tue, 24 Jun 2025 09:21:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1750756003; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1750756885; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=9lICjNkiewMZFMzrpHfU5ovumYbwTZRme9bMEyMsD/M=;
-	b=xi/QlwlWq8NLVSwyspSzkPKvKMA6Uvj8/W9IFdzSFQMZ+ayNwxoQ7cp2wwdex97PvJgFlo
-	x2f/4oVPrxX02VMjazKS8ra2I9oaBaKqNmT3rxbP2v97idRqli2arNKpl/rNn7z5z2COdO
-	7+ljTlARtsgKwvd1zlhYhRoTz1XsnuM=
+	bh=VXfbAXcdsqOmp2mop/iwlMbChu1Cr1eVbF/0uqm/7eM=;
+	b=MSed/gOgqnQMvyfCjYnczvc3IIOJRm+lQ4iB8eDpuvw1Vtq4mmd4zG8FMyXqbx01sGnrtq
+	ta3DPWmRpinGmbl2+JT+z2p1e5Q/iZFa0FoSS67jw8QXEUTrBTCQZIjLaFKFbqxOzJTqMb
+	nYG3v3cNgFwIjYb4Mq+33qblClEHaCg=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1750756003;
+	s=susede2_ed25519; t=1750756885;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=9lICjNkiewMZFMzrpHfU5ovumYbwTZRme9bMEyMsD/M=;
-	b=Y9LCmN9JTWkqSIjoqHkEfxTSRml/p11vY01knXb//RDebqmAaD1GQiHEbhGpors9cm5R2y
-	CTBVZa09ODuiO0Bw==
+	bh=VXfbAXcdsqOmp2mop/iwlMbChu1Cr1eVbF/0uqm/7eM=;
+	b=FGlHU6cT4cAUQ1HfmA3Mhak0dB8Oqk72snpqC3eeFTOY87QFb3LFWnBxyasdPwxoBW8OJT
+	BykEH6NUv5bteDBA==
 Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=E5mo4GVk;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=oREfj0fF
+	none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1750756002; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1750756885; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=9lICjNkiewMZFMzrpHfU5ovumYbwTZRme9bMEyMsD/M=;
-	b=E5mo4GVk3aRBGPmQF64SGv7r/9Z7BrhMxT4Br3ozs8DXcDb//Oxu3nHGSXqq7o7Mb7CLZo
-	IMLqC5HhH2wB7OabuAKDxSBbULfeVUwIiW40R1/IDWT12tchJxMWR5KfDDB9oIDWVupYrc
-	wnYgtTWRX1PCzt/kDQ6JBbhPNcnau4c=
+	bh=VXfbAXcdsqOmp2mop/iwlMbChu1Cr1eVbF/0uqm/7eM=;
+	b=MSed/gOgqnQMvyfCjYnczvc3IIOJRm+lQ4iB8eDpuvw1Vtq4mmd4zG8FMyXqbx01sGnrtq
+	ta3DPWmRpinGmbl2+JT+z2p1e5Q/iZFa0FoSS67jw8QXEUTrBTCQZIjLaFKFbqxOzJTqMb
+	nYG3v3cNgFwIjYb4Mq+33qblClEHaCg=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1750756002;
+	s=susede2_ed25519; t=1750756885;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=9lICjNkiewMZFMzrpHfU5ovumYbwTZRme9bMEyMsD/M=;
-	b=oREfj0fFjtCcmySuYyx4a2eVlsi9oKqRPyLTW1pAnJyz47RDYq0CXOXEI70b1LsSzPwU5h
-	OgkxMNrQ9mrgSXBQ==
+	bh=VXfbAXcdsqOmp2mop/iwlMbChu1Cr1eVbF/0uqm/7eM=;
+	b=FGlHU6cT4cAUQ1HfmA3Mhak0dB8Oqk72snpqC3eeFTOY87QFb3LFWnBxyasdPwxoBW8OJT
+	BykEH6NUv5bteDBA==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 35F1213A24;
-	Tue, 24 Jun 2025 09:06:42 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 773B113751;
+	Tue, 24 Jun 2025 09:21:24 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id gHhlC6JqWmhnFgAAD6G6ig
-	(envelope-from <tzimmermann@suse.de>); Tue, 24 Jun 2025 09:06:42 +0000
-Message-ID: <6dedf895-1681-4fe3-8ca4-68fd05070ef2@suse.de>
-Date: Tue, 24 Jun 2025 11:06:41 +0200
+	id Iqi5GxRuWmg2GwAAD6G6ig
+	(envelope-from <tzimmermann@suse.de>); Tue, 24 Jun 2025 09:21:24 +0000
+Message-ID: <f0e70269-b55e-4ac8-b052-da092a177eda@suse.de>
+Date: Tue, 24 Jun 2025 11:21:23 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -98,8 +97,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 6/8] Fix access to video_is_primary_device() when
- compiled without CONFIG_VIDEO
+Subject: Re: [PATCH v4 7/8] PCI/VGA: Move check for firmware default out of
+ VGA arbiter
 To: Mario Limonciello <superm1@kernel.org>,
  Bjorn Helgaas <bhelgaas@google.com>
 Cc: Alex Deucher <alexander.deucher@amd.com>,
@@ -119,10 +118,9 @@ Cc: Alex Deucher <alexander.deucher@amd.com>,
  "open list:VFIO DRIVER" <kvm@vger.kernel.org>,
  "open list:SOUND" <linux-sound@vger.kernel.org>,
  Daniel Dadap <ddadap@nvidia.com>,
- Mario Limonciello <mario.limonciello@amd.com>,
- kernel test robot <lkp@intel.com>
+ Mario Limonciello <mario.limonciello@amd.com>
 References: <20250623184757.3774786-1-superm1@kernel.org>
- <20250623184757.3774786-7-superm1@kernel.org>
+ <20250623184757.3774786-8-superm1@kernel.org>
 Content-Language: en-US
 From: Thomas Zimmermann <tzimmermann@suse.de>
 Autocrypt: addr=tzimmermann@suse.de; keydata=
@@ -149,112 +147,171 @@ Autocrypt: addr=tzimmermann@suse.de; keydata=
  SAQO9xD1Zk9/61JWk8OysuIh7MXkl0fxbRKWE93XeQBhIJHQfnc+YBLprdnxR446Sh8Wn/2D
  Ya8cavuWf2zrB6cZurs048xe0UbSW5AOSo4V9M0jzYI4nZqTmPxYyXbm30Kvmz0rYVRaitYJ
  4kyYYMhuULvrJDMjZRvaNe52tkKAvMevcGdt38H4KSVXAylqyQOW5zvPc4/sq9c=
-In-Reply-To: <20250623184757.3774786-7-superm1@kernel.org>
+In-Reply-To: <20250623184757.3774786-8-superm1@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-4.51 / 50.00];
+X-Spam-Flag: NO
+X-Spam-Score: -4.30
+X-Spamd-Result: default: False [-4.30 / 50.00];
 	BAYES_HAM(-3.00)[100.00%];
 	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	NEURAL_HAM_SHORT(-0.20)[-1.000];
 	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
 	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	TO_DN_ALL(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	ARC_NA(0.00)[];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCPT_COUNT_TWELVE(0.00)[26];
 	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	TO_DN_ALL(0.00)[];
 	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FREEMAIL_CC(0.00)[amd.com,gmail.com,ffwll.ch,wunner.de,linux.intel.com,kernel.org,infradead.org,8bytes.org,arm.com,redhat.com,perex.cz,suse.com,lists.freedesktop.org,vger.kernel.org,lists.linux.dev,nvidia.com,intel.com];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
 	RCVD_TLS_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
+	RCPT_COUNT_TWELVE(0.00)[25];
 	FROM_EQ_ENVFROM(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_RATELIMIT(0.00)[to_ip_from(RLqbkuqg11osc55coksncbnarj)];
+	FREEMAIL_CC(0.00)[amd.com,gmail.com,ffwll.ch,wunner.de,linux.intel.com,kernel.org,infradead.org,8bytes.org,arm.com,redhat.com,perex.cz,suse.com,lists.freedesktop.org,vger.kernel.org,lists.linux.dev,nvidia.com];
+	RCVD_COUNT_TWO(0.00)[2];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.de:dkim,suse.de:mid,suse.de:email,intel.com:email]
+	MID_RHS_MATCH_FROM(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:email,suse.de:mid,suse.de:email]
 X-Spam-Level: 
-X-Spam-Flag: NO
-X-Rspamd-Queue-Id: D7A7A21174
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spam-Score: -4.51
 
 
 
 Am 23.06.25 um 20:47 schrieb Mario Limonciello:
 > From: Mario Limonciello <mario.limonciello@amd.com>
 >
-> When compiled without CONFIG_VIDEO the architecture specific
-> implementations of video_is_primary_device() include prototypes and
-> assume that video-common.c will be linked. Guard against this so that the
-> fallback inline implementation that returns false will be used when
-> compiled without CONFIG_VIDEO.
+> The x86 specific check for whether a framebuffer belongs to a device
+> works for display devices as well as VGA devices.  Callers to
+> video_is_primary_device() can benefit from checking non-VGA display
+> devices.
 >
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202506221312.49Fy1aNA-lkp@intel.com/
+> Move the x86 specific check into x86 specific code, and adjust VGA
+> arbiter to call that code as well. This allows fbcon to find the
+> right PCI device on systems that don't have VGA devices.
+>
+> Suggested-by: Thomas Zimmermann <tzimmermann@suse.de>
 > Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
-
-Acked-by: Thomas Zimmermann <tzimmermann@suse.de>
-
 > ---
 > v4:
->   * new patch
+>   * use helper
 > ---
->   arch/parisc/include/asm/video.h | 2 +-
->   arch/sparc/include/asm/video.h  | 2 ++
->   arch/x86/include/asm/video.h    | 2 ++
->   3 files changed, 5 insertions(+), 1 deletion(-)
+>   arch/x86/video/video-common.c | 13 ++++++++++++-
+>   drivers/pci/vgaarb.c          | 36 ++---------------------------------
+>   2 files changed, 14 insertions(+), 35 deletions(-)
 >
-> diff --git a/arch/parisc/include/asm/video.h b/arch/parisc/include/asm/video.h
-> index c5dff3223194a..a9d50ebd6e769 100644
-> --- a/arch/parisc/include/asm/video.h
-> +++ b/arch/parisc/include/asm/video.h
-> @@ -6,7 +6,7 @@
+> diff --git a/arch/x86/video/video-common.c b/arch/x86/video/video-common.c
+> index 81fc97a2a837a..917568e4d7fb1 100644
+> --- a/arch/x86/video/video-common.c
+> +++ b/arch/x86/video/video-common.c
+> @@ -9,6 +9,7 @@
 >   
->   struct device;
+>   #include <linux/module.h>
+>   #include <linux/pci.h>
+> +#include <linux/screen_info.h>
+>   #include <linux/vgaarb.h>
 >   
-> -#if defined(CONFIG_STI_CORE)
-> +#if defined(CONFIG_STI_CORE) && defined(CONFIG_VIDEO)
->   bool video_is_primary_device(struct device *dev);
->   #define video_is_primary_device video_is_primary_device
->   #endif
-> diff --git a/arch/sparc/include/asm/video.h b/arch/sparc/include/asm/video.h
-> index a6f48f52db584..773717b6d4914 100644
-> --- a/arch/sparc/include/asm/video.h
-> +++ b/arch/sparc/include/asm/video.h
-> @@ -19,8 +19,10 @@ static inline pgprot_t pgprot_framebuffer(pgprot_t prot,
->   #define pgprot_framebuffer pgprot_framebuffer
->   #endif
+>   #include <asm/video.h>
+> @@ -27,6 +28,7 @@ EXPORT_SYMBOL(pgprot_framebuffer);
 >   
-> +#ifdef CONFIG_VIDEO
->   bool video_is_primary_device(struct device *dev);
->   #define video_is_primary_device video_is_primary_device
-> +#endif
->   
->   static inline void fb_memcpy_fromio(void *to, const volatile void __iomem *from, size_t n)
+>   bool video_is_primary_device(struct device *dev)
 >   {
-> diff --git a/arch/x86/include/asm/video.h b/arch/x86/include/asm/video.h
-> index 0950c9535fae9..08ec328203ef8 100644
-> --- a/arch/x86/include/asm/video.h
-> +++ b/arch/x86/include/asm/video.h
-> @@ -13,8 +13,10 @@ pgprot_t pgprot_framebuffer(pgprot_t prot,
->   			    unsigned long offset);
->   #define pgprot_framebuffer pgprot_framebuffer
+> +	struct screen_info *si = &screen_info;
+>   	struct pci_dev *pdev;
 >   
-> +#ifdef CONFIG_VIDEO
->   bool video_is_primary_device(struct device *dev);
->   #define video_is_primary_device video_is_primary_device
-> +#endif
+>   	if (!dev_is_pci(dev))
+> @@ -34,7 +36,16 @@ bool video_is_primary_device(struct device *dev)
 >   
->   #include <asm-generic/video.h>
+>   	pdev = to_pci_dev(dev);
 >   
+> -	return (pdev == vga_default_device());
+> +	if (!pci_is_display(pdev))
+> +		return false;
+> +
+> +	if (pdev == vga_default_device())
+> +		return true;
+> +
+> +	if (pdev == screen_info_pci_dev(si))
+> +		return true;
+> +
+> +	return false;
+>   }
+>   EXPORT_SYMBOL(video_is_primary_device);
+>   
+> diff --git a/drivers/pci/vgaarb.c b/drivers/pci/vgaarb.c
+> index 78748e8d2dbae..15ab58c70b016 100644
+> --- a/drivers/pci/vgaarb.c
+> +++ b/drivers/pci/vgaarb.c
+> @@ -26,12 +26,12 @@
+>   #include <linux/poll.h>
+>   #include <linux/miscdevice.h>
+>   #include <linux/slab.h>
+> -#include <linux/screen_info.h>
+>   #include <linux/vt.h>
+>   #include <linux/console.h>
+>   #include <linux/acpi.h>
+>   #include <linux/uaccess.h>
+>   #include <linux/vgaarb.h>
+> +#include <asm/video.h>
+>   
+>   static void vga_arbiter_notify_clients(void);
+>   
+> @@ -554,38 +554,6 @@ void vga_put(struct pci_dev *pdev, unsigned int rsrc)
+>   }
+>   EXPORT_SYMBOL(vga_put);
+>   
+> -static bool vga_is_firmware_default(struct pci_dev *pdev)
+> -{
+> -#if defined(CONFIG_X86)
+> -	u64 base = screen_info.lfb_base;
+> -	u64 size = screen_info.lfb_size;
+> -	struct resource *r;
+> -	u64 limit;
+> -
+> -	/* Select the device owning the boot framebuffer if there is one */
+> -
+> -	if (screen_info.capabilities & VIDEO_CAPABILITY_64BIT_BASE)
+> -		base |= (u64)screen_info.ext_lfb_base << 32;
+> -
+> -	limit = base + size;
+> -
+> -	/* Does firmware framebuffer belong to us? */
+> -	pci_dev_for_each_resource(pdev, r) {
+> -		if (resource_type(r) != IORESOURCE_MEM)
+> -			continue;
+> -
+> -		if (!r->start || !r->end)
+> -			continue;
+> -
+> -		if (base < r->start || limit >= r->end)
+> -			continue;
+> -
+> -		return true;
+> -	}
+> -#endif
+> -	return false;
+> -}
+> -
+>   static bool vga_arb_integrated_gpu(struct device *dev)
+>   {
+>   #if defined(CONFIG_ACPI)
+> @@ -623,7 +591,7 @@ static bool vga_is_boot_device(struct vga_device *vgadev)
+>   	if (boot_vga && boot_vga->is_firmware_default)
+>   		return false;
+>   
+> -	if (vga_is_firmware_default(pdev)) {
+> +	if (video_is_primary_device(&pdev->dev)) {
+
+Doesn't this generate a cyclic dependency between vgaarb and video? I 
+find this call cycle hard to reason about because 
+vgaarb_default_device() depends on the results of these boot-device 
+tests. Maybe keep vga_is_firmware_default() and just replace its content 
+with a call to screen_info_pci_dev().
+Best regards
+Thomas
+
+>   		vgadev->is_firmware_default = true;
+>   		return true;
+>   	}
 
 -- 
 --
