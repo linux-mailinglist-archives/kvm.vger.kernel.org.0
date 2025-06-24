@@ -1,107 +1,105 @@
-Return-Path: <kvm+bounces-50540-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50541-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0456DAE6FD2
-	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 21:39:07 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 108ABAE6FD5
+	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 21:41:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2493817B8AD
-	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 19:39:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D3A6B7A9082
+	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 19:39:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 021C82E88AE;
-	Tue, 24 Jun 2025 19:38:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80FE32E92AC;
+	Tue, 24 Jun 2025 19:40:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iLhfIo/l"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mrJCkeyY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE86629A9C3
-	for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 19:38:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 289102E6D23
+	for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 19:40:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750793931; cv=none; b=Zqpe2tsH1EApsODU/RKR0VkPmkagTC8s/wvyxTxY5iV2BeGzk6GiNHyYN+ERSwkRlARwrxn81MqIkyALHOAGGYTqryS1RKvavHuvRWwCvxNZ8W1UvCAIy7Eht3F2N1TT6cZrScoeWK0LxbEyCfn//pLd9tUbKwUIBfaGvNVnXZA=
+	t=1750794056; cv=none; b=moGa+UO+UKgdMVOiax+SKFsSrOXNCSKdhQgA12IhW4VpFtC44m9Fysk8+6M2P7iFYWwsZc8CqFt4TmEzpSV6l8FClxB1wbJ9E4/FQXH3b/lEVthKPZSlz7CJGsQ0Vp4vqQwXg9NZq0axQ+CwI/Z4xRXS3bc9ifixyvZdHGT8tJ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750793931; c=relaxed/simple;
-	bh=XbP//jD/tK4JeJDluoh2Rv7JMyutjDChfHqYPbay6KE=;
+	s=arc-20240116; t=1750794056; c=relaxed/simple;
+	bh=QI51cwFq/YB5nOA5i5mKEQvmSHJYx7qPfrbiMFxEcIA=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=YxdXIQx7BUbUnbwsGa4SV/wwUp/saZ7NQuId101xABjol/Ov8dpDyEDZZtjDdPc19Uqyig2uyl43z2iNmo+vJEbfxwPI/FS/jby2SN1EOWKHShu3LhnXWGbO1f1oBTi7HwLUMTwgJZhO75Az5zVYuMoTGTzJbTfhOVoqhFtbeOE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iLhfIo/l; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=t8GRkr0nX0e4UAeFOteYq00axSsa9WuoQPQXWtD6UG2nVXT6g3vfmwX5fAiZiL5gLe5OndnB+/lDxhj3YXI2tzypVbwt4KRhQc5ZSdFhv4mImLtoHz/msrk02QPWCBLVuT2jC6J/28gxTMg+NXoWSoWapOuclzca+CweoCiVmTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mrJCkeyY; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b115fb801bcso994124a12.3
-        for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 12:38:47 -0700 (PDT)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b3183193374so4077207a12.1
+        for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 12:40:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750793927; x=1751398727; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1750794053; x=1751398853; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=KiSQctGpgu05ltgD74EvROeYrI7fKmX8SK3XsjWu9Y8=;
-        b=iLhfIo/ljt5V2SUKvdCdfP8IbB9Utf2xlA/M+0sJJRW/z8Gl3rFpisQf6/o9/SDPE6
-         sqY6c0hYYO42HjllB8A/JCk1f7dOor5chBEnk/TL66iTmJkD4KkkrPous0BQlIC2sWX8
-         GDEO88PeyvZM7S3hiuwDQ7Jp+69XqmUa6ce2BGps1TWhiMm597m6hN+sZnEeErwpDdxu
-         E3eld2ltDU5a3ZUJu3Ia7pza1ZXtncGpDxmd1wOEYyJyDBEAisPB3AEfD9j43zQ2Vuaz
-         cl9M04hoHopR9qWY+uhbOCPIjn5jADawoGjNzKDiY28A39jWI0DWG3Jsl/b7MlpSUhk3
-         bDqg==
+        bh=/vmX1c5Xt9887t/Wl5FntHs+0LsgfmpqsHqfvT5xmBc=;
+        b=mrJCkeyYItwiHcOjidBNfbJrQXQIkXh9Dap/jT7mHXF/F/owWM3j3ROGSNdJ45Q/mU
+         SUoNZ0RH5xNvxkesH6OCW/Gh7TE/XZQhPlI4+qZkW6tmZR61Uab4XyG/hCFgK8uSF7vL
+         S+PFistXIgIqFCoYWqkpbDvNIGTSyd4eGR5/sUmZdz4d4zEebTqiR7qj2VnvE7fkhjTq
+         39AOhoi53Tw4zBn0JSrJINmys5tGonG/Hh1Z00UfSe4VkFb9GkhDzdS12NlJforYvfmw
+         7xK+qOlYRAtGh0lP+sqETxTya528H6fHKwVTzwQ/QPY9ar/DFJ7QBJzDi8GLTgy2D7eq
+         8HyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750793927; x=1751398727;
+        d=1e100.net; s=20230601; t=1750794053; x=1751398853;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KiSQctGpgu05ltgD74EvROeYrI7fKmX8SK3XsjWu9Y8=;
-        b=dUhXgrWBl6ShaG5dCO3SFll7YDb+YxJrj1fdq86jSTKnuQRWk2pMnFVdVndyNL8kau
-         MnYL8/UOOP4Y3B94Zd7vBpVYInhiJ22rGxzOU52TZXfBDKT+dl52PfU/utx4h91vrejs
-         SVjKIzrHzuJL4qW6OMYOTR/6DyXHxH/FW507U2Hg2ppjyuNABiUVnwCuVWMkYb1yXysL
-         LfCQS34PhPOMJZ8TqhmoCGM35Y6hh4OWxNIqnngzb5Oh+XBrJyLD0S238B/7S53wrSXo
-         jjy8rSx+MBjH6DcXBubDZpv8ZXqmjEwFqkeFZSAmXOl9la0k5Dr/ngbX/XXqkE3lI2a7
-         2NiA==
-X-Forwarded-Encrypted: i=1; AJvYcCUgs8n+DGd6l2mZVZM86TVr51ZhKsf5Nnw3H7WQ/SzjVJ0SiaaBjENFlzHUB00WPQbDmCU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy5HJNcPrE/AFuZIyTy2APlY1oiaIjbBH2YPa8fyN8Qs81axptJ
-	jBLp5PkMeTxZYb+oaUVZ1m0/r85eozFG/HADUxg33/dHBTatv0Ra2TMa7m6vqGoK1g6euDyDjHP
-	s62gJnw==
-X-Google-Smtp-Source: AGHT+IFvLoRineByrtkXpx8W2INpckk4B00tWPHC2RXq4u8h/utilw6VW0msAMNx/qrytgz/7U/tpn4IcFo=
-X-Received: from pffk22.prod.google.com ([2002:aa7:88d6:0:b0:748:34d:6d4f])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:4325:b0:21f:4631:811c
- with SMTP id adf61e73a8af0-2207f25de31mr285848637.19.1750793926883; Tue, 24
- Jun 2025 12:38:46 -0700 (PDT)
-Date: Tue, 24 Jun 2025 12:38:18 -0700
-In-Reply-To: <20250609091121.2497429-1-liam.merwick@oracle.com>
+        bh=/vmX1c5Xt9887t/Wl5FntHs+0LsgfmpqsHqfvT5xmBc=;
+        b=qY61NonEMk9tVu7ggsYiPw2qxYRYNMqzSkqCnXwI5W8JF3wzhJ4QYChr2UuWJCOjFy
+         ygKg7zCRqVKhSPeabht5c4NOx5HOEu3CBwOQTZa4PVIv5/UEXwRjdTh0+XeNNwQBxc5g
+         JZ2uA+FTqrS5Xo1L707upKhcPek2dfVdR2kbpG83tTdsxOTN3qLKbm0Vi1tfQ32QSm44
+         06cmRSOFbbx2aQsXCeHXG21Nsk5gtp8q7xzjKQF3Y68Dqu1PZmd7AhQGLlxenL7eGRBa
+         /eGry/1h6ehzhYPmv49rQfJZaQEjLvKl86Al2qSnWXRjAI3jgcJk/ayPWCxXOm/qwpHx
+         NaOw==
+X-Gm-Message-State: AOJu0YxtarnIts77B+QC6BRDrTRgtbGwD22OhSrtVbQ+xAtcbwHUSPP+
+	39sJpy/mRSB1UEmCC1mX26ua8d/94FLzJ0xri/UHSuoJOyskpvlPs8Uo20/3doYpddQ6eHAKsa3
+	ZUMuuCg==
+X-Google-Smtp-Source: AGHT+IEsEvO7d4CyVEj9g3vK+CPWlFNWO9cdjFglM/v2PD0Hi4/XwEOS0vLx5GXBYOLCXHETDH28pGATLhs=
+X-Received: from pfjt8.prod.google.com ([2002:a05:6a00:21c8:b0:748:f54a:54d8])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:1589:b0:21a:bdd2:c2f7
+ with SMTP id adf61e73a8af0-2207f330579mr342217637.29.1750794053454; Tue, 24
+ Jun 2025 12:40:53 -0700 (PDT)
+Date: Tue, 24 Jun 2025 12:38:20 -0700
+In-Reply-To: <20250602224459.41505-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250609091121.2497429-1-liam.merwick@oracle.com>
+References: <20250602224459.41505-1-seanjc@google.com>
 X-Mailer: git-send-email 2.50.0.714.g196bf9f422-goog
-Message-ID: <175079184957.513348.16096363492105624253.b4-ty@google.com>
-Subject: Re: [PATCH v2 0/3] SEV-SNP fix for cpu soft lockup on 1TB+ guests
+Message-ID: <175079269575.517785.12142408340158295471.b4-ty@google.com>
+Subject: Re: [PATCH 0/2] KVM: SVM: Fix a NULL VMSA deref with MOVE_ENC_CONTEXT
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, 
-	Liam Merwick <liam.merwick@oracle.com>
-Cc: pbonzini@redhat.com, thomas.lendacky@amd.com, michael.roth@amd.com, 
-	tabba@google.com, ackerleytng@google.com
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Alexander Potapenko <glider@google.com>, James Houghton <jthoughton@google.com>, 
+	Peter Gonda <pgonda@google.com>, Tom Lendacky <thomas.lendacky@amd.com>
 Content-Type: text/plain; charset="utf-8"
 
-On Mon, 09 Jun 2025 09:11:18 +0000, Liam Merwick wrote:
-> When creating SEV-SNP guests with a large amount of memory (940GB or greater)
-> the host experiences a soft cpu lockup while setting the per-page memory
-> attributes on the whole range of memory in the guest.
+On Mon, 02 Jun 2025 15:44:57 -0700, Sean Christopherson wrote:
+> Fix a NULL VMSA deref bug (which is probably the tip of the iceberg with
+> respect to what all can go wrong) due to a race between KVM_CREATE_VCPU and
+> KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM, where a non-SEV-ES vCPU can be created in
+> an SEV-ES VM.
 > 
-> The underlying issue is that the implementation of setting the
-> memory attributes using an Xarray implementation is a time-consuming
-> operation (e.g. a 1.9TB guest takes over 30 seconds to set the attributes)
+> Found by running syzkaller on a bare metal SEV-ES host.  C repro below.
 > 
 > [...]
 
-Applied patch 1 to kvm-x86 fixes, and the others to 'kvm-x86 generic'.  Thanks!
+Applied to kvm-x86 fixes.  Paolo's "Queued, thanks!" seems to have been
+premature (though Paolo's mail saved me; I completely forgot about swapping
+EINVAL to EBUSY).
 
-[1/3] KVM: Allow CPU to reschedule while setting per-page memory attributes
-      https://github.com/kvm-x86/linux/commit/47bb584237cc
-[2/3] KVM: Add trace_kvm_vm_set_mem_attributes()
-      https://github.com/kvm-x86/linux/commit/741e595f02fe
-[3/3] KVM: fix typo in kvm_vm_set_mem_attributes() comment
-      https://github.com/kvm-x86/linux/commit/aa006b2e5159
+[1/2] KVM: SVM: Reject SEV{-ES} intra host migration if vCPU creation is in-flight
+      https://github.com/kvm-x86/linux/commit/ecf371f8b02d
+[2/2] KVM: SVM: Initialize vmsa_pa in VMCB to INVALID_PAGE if VMSA page is NULL
+      https://github.com/kvm-x86/linux/commit/48f15f62418
 
 --
 https://github.com/kvm-x86/kvm-unit-tests/tree/next
