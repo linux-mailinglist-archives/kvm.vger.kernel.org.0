@@ -1,181 +1,132 @@
-Return-Path: <kvm+bounces-50434-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50435-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C4E4AE58D8
-	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 02:50:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DF04AE58DA
+	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 02:56:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B68981B60876
-	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 00:51:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 630381B66E61
+	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 00:56:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C805179A3;
-	Tue, 24 Jun 2025 00:50:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D0B7158218;
+	Tue, 24 Jun 2025 00:56:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GHfVHSvn"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="WJhg3xAw"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B31E718D649
-	for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 00:50:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD0B72F2A
+	for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 00:56:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750726219; cv=none; b=ci0mZpsss3IDoXZWFQdtqCQ/6m5hE0D64nsPgDDFPOs+ATvjlQAuDlWFHLUYNMEJEELR9f/N1WhubREAKpBqdgy8SkDRnLNcDcQojJJmHUGC/jPqruaEucFXo16OtiB9p0TyrtjPgop6PL8C5qUcMxMkZr9pJLRjKPx5JChPkd8=
+	t=1750726569; cv=none; b=lwpVpDur1GufVqWvwvDZsVgRoV8erof2dReeqOlCnKRCLXVh0B7/VMS3cdDekoS/fIKAyTZFp30frjQxYTpq4vpzm2zZXqPEN3oqdkhKuogS4miXUhhCtrow446FK+qnP7TGLDKg6Vp632/fHxL70kHeGtVowhKkCtT8mdMspP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750726219; c=relaxed/simple;
-	bh=/auqGXR0o1/P/foYc6AgZw0KxuJdncmvKGkmkIKxkSQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Y6Y2a9Tc/4SJ8tfQCWHlY7VR6sJqVcTnUmarTLioq0B6pFYe3r2CA82dJ1i+aKmsFJVJYy8afwd7Q85cSfwtNsAuymWAx/VTJyXTCxe90EA5PqFG1G39dl5klgG7oHrHWDXMXijHFFNGK3Ca0Z18x3WC4YKLYyxB8NEOCw4mlDk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GHfVHSvn; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750726215;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/auqGXR0o1/P/foYc6AgZw0KxuJdncmvKGkmkIKxkSQ=;
-	b=GHfVHSvnad0VCgHh9KzTYexk/VrqsJ9Kt5kXnvQ5GYxJ33H8HfhGKVPv/c9e4enwg6RDop
-	CIBwfclTPqCUVXpK+5ygUNM+YFPUTjP7PLlZ89K5p0lY7hzjzULfJ8k2Ockel/fnTWmJgw
-	y1xKPG76QokV7u1ziWQZ+JZQsJX1lGY=
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
- [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-320-Hrul56ZcOAmbnw6Gr2M0YQ-1; Mon, 23 Jun 2025 20:50:12 -0400
-X-MC-Unique: Hrul56ZcOAmbnw6Gr2M0YQ-1
-X-Mimecast-MFC-AGG-ID: Hrul56ZcOAmbnw6Gr2M0YQ_1750726211
-Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-313c3915345so7421099a91.3
-        for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 17:50:12 -0700 (PDT)
+	s=arc-20240116; t=1750726569; c=relaxed/simple;
+	bh=7O+ajiUDfZzafBBNiM6e5tJhCUr430Qh1/kaNQGaM+c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=drrPAy4ku7NJnRb9XPTCsHkg/EXfznlhAa/FiIiwebCdnwcTwUz8X6WFTktsrZRvdyRxejqddgAtPsLArG3lZj8oopY2COYVUW/kUz8o1ytHoOGxTiEOCD38BBf95aeV8tQWIkwOWJzv9TJ9GwJUooXCW/xvy4dIbuzceeW934w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=WJhg3xAw; arc=none smtp.client-ip=209.85.222.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-7d38d562a55so629778085a.2
+        for <kvm@vger.kernel.org>; Mon, 23 Jun 2025 17:56:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1750726566; x=1751331366; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=u8pDtojTuV6LFOjfDU1WAEP2YMGFUVnVXeIZSV015Tk=;
+        b=WJhg3xAwDnEtmpOKHPAQl9ExlKfP22au9D1+PsZVs5aOzR6wChf5v4eCZjsIToE9Ab
+         ScpGHEceuSn6Gtjm0iv3fsHGTgJPjZDj7w7o73tH9DSMR7vfI5tjKgIu2JosoX/n8ZkP
+         eUZxpj87u0uyoPuA6IAVDHr9WE9krzPT4LrZz0FuNbRhlkJI0FABQyoNk1w7K5d8iu7U
+         v16dPOpMYTrdsozdToA5QzFCfuUt1r5nRX6a2LoYbTaZRAV0PUSeGGlPa2C0hLdh1vSf
+         aLv99SUSDpOy+4NiBi5LgC3h/Vg+IO12vlPNBK1hLy/f3C1wpGuJQv7dxo5qPqTDrJOW
+         SG0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750726211; x=1751331011;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/auqGXR0o1/P/foYc6AgZw0KxuJdncmvKGkmkIKxkSQ=;
-        b=X1PjxfVhKSEBOHcAl3TBevQ4e0hP0TZxKSJM0Q+/ATnG11d/SMs3lksBlvUY8JN+6N
-         yypp9FE6hHeY94ShMH03coa/mpZ86IEArsIOi8NcbIOUj4qZal8qDB6JqhE19orC8HD7
-         zWSEh1aWUd9Z+fhHDw5rq5UkHBzTINvow7FSahWxTG7oEO8CVTI/2N0B/bI0b4RxmHTV
-         4dwa46EM3dz5Nx+ODMBbBmM+a/kJCuSYPdcNQQ0ykUwTxBIkCLiTbSv5E0FsW+uf1fy6
-         W5yvaSFNYwcGCOgzXwcAsBJHBmEYN+nsl2AWbXwlGZQy1ya8kVTF0ArGMZ25Lqal9AQK
-         9yMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX/ofV2g/Rp0xG1MeH+jhWP2E/bR0al2wRuBi9q0n8QYMh8m93qh3wMBqLXInXezQyB0EI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzOjnZEQCsHJtsZDbwQRDdAVOn0YjYCfLxDn3Bn0EJTqwzDGmqX
-	BcpToizN2J8ylkUzxx6jjCau1SdQvOl5r9yQeEa4xArhheNiCRh9tiH8Q19dB9ElUzxbDrksq2u
-	2F3U8HTlVVqkDpLreTHf6HQq/VKIDcynJWG58xybjbrkf2NxEI7r1H7ht+uM2YuDWPEhxEMbb0e
-	PsLmWcNd+FP30z4s2T6SsTxLMruIyj
-X-Gm-Gg: ASbGnct0cd32PgvdzlBOU1F4S/jPYzmF0imIgVx6ZnMhxR8m9GFPA9qdyx4VhEMOaiF
-	JdweQ834rN6d17TBb07JrznVct/1Yls2w/kHLohLpFBqG4AEoTWOSAYODoG8kwrIzbHQL+90lQF
-	uTCS/T
-X-Received: by 2002:a17:90a:d888:b0:313:f883:5d36 with SMTP id 98e67ed59e1d1-3159d61b385mr20481155a91.1.1750726211537;
-        Mon, 23 Jun 2025 17:50:11 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH2mZ6TFzZC61NvgUQr50RK9GKr+Zt2TEe1NWxDOMMJSfnof6RsI9yY3mdeAsIKTHaPT/FkDTx1NOWeRFhiZ3M=
-X-Received: by 2002:a17:90a:d888:b0:313:f883:5d36 with SMTP id
- 98e67ed59e1d1-3159d61b385mr20481119a91.1.1750726211082; Mon, 23 Jun 2025
- 17:50:11 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1750726566; x=1751331366;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=u8pDtojTuV6LFOjfDU1WAEP2YMGFUVnVXeIZSV015Tk=;
+        b=V7yIGIBDBwr3G5Brc/67yrLVSVBTxM2o/kc/X0BO/mPMNQv8ORxhoee2rO24fpwd/Q
+         eBpAmNJeJbc/ZPQ3XTJwW2MGnfY48DTWF9kG4Yl1V7AJ+XuuWuBtIm/HiJ9+mJCfIeuw
+         mNS7hyBNORdo87N78Aw4nWSOZ3Rls5LPytsFMMeivlSzE6/kL0l4Ri/xE5b1Lp8K2Tgf
+         ri2Gity5Q5O8k4Y8Ri6O21ymDG8xNIOJuJtLK6JYpqToUaXH2hLEsMs3ieCgoSy8HqTz
+         wYg6cvKsjNnZi50+UrWGc31AOgGP3kRoyancm22fXxtFmKt6i/C4oDe9jkIdKgti4/K6
+         +FPg==
+X-Forwarded-Encrypted: i=1; AJvYcCXfoRoLP/oMSRErmUY6sVaFLuIK2JAlYtjh0nxnCzCYA0sOFqHH2gamJHFcHWv17StlfT8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyL3+DGAM75YYq9JOc72fGvdla0vFu7AJAlAkCnEE2h1+TXQcSU
+	YFguo0xtx+mqXALmEtOayoWKJZmeijVB+qlqCjydywX6qoSMKslW7MSVOH2LKEBlWDm9tIIS209
+	UJUjd
+X-Gm-Gg: ASbGnctX+LlH56VYiJiP67dpzWTG4JnDfdRpJk8KG9/BlPqGw4hJA7Y6gfdd2Ichxd5
+	24sT/qzJI8NyTg6JKqJWh5j5FsJUOGS6KoBR2FDbrBO+4wIGlQ8VUKR+hFtq8R4Gd01S8i+vvSD
+	eoaemqfM8aF/wztyKNNSe6KS70JQ5r4LiVJu/HJIJ616ZXyxdHxBGDEd9PS+gDTNCpnPwW7ScLt
+	Ft+6cAQ4yKHv0emOF4CGah+wkniy8rVoVL59NIwt166nGKnkddPx174EZ8j7SmjuliePTt7BAfr
+	UnaVX6DHE/fatLjOZh37asSsdVKEzewiK8eEC0zQbZx9wMvGhMGjeFzjwgew06gSNVhb3BstheX
+	/HulQp14OEpn+rA1ygAp3u2BJm5f/lOcXW4cOwg==
+X-Google-Smtp-Source: AGHT+IGX6hq2GvuJ1K/s8jNlp2hlgIbEh4pTewUT8bxyCxJMmW0ogtWNidvI1vHbIFzO1aMASc52bQ==
+X-Received: by 2002:a05:620a:3183:b0:7d2:2822:3f79 with SMTP id af79cd13be357-7d3f98dfd21mr1951957585a.13.1750726566656;
+        Mon, 23 Jun 2025 17:56:06 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-167-56-70.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.167.56.70])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6fd093e087bsm51501256d6.20.2025.06.23.17.56.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Jun 2025 17:56:06 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1uTrxF-00000000aHE-1Uw0;
+	Mon, 23 Jun 2025 21:56:05 -0300
+Date: Mon, 23 Jun 2025 21:56:05 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Alex Mastro <amastro@fb.com>, peterx@redhat.com, kbusch@kernel.org,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] vfio/pci: print vfio-device name to fdinfo
+Message-ID: <20250624005605.GA72557@ziepe.ca>
+References: <20250623-vfio-fdinfo-v1-1-c9cec65a2922@fb.com>
+ <20250623161831.12109402.alex.williamson@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250530-rss-v12-0-95d8b348de91@daynix.com> <20250530-rss-v12-1-95d8b348de91@daynix.com>
- <CACGkMEufffSj1GQMqwf598__-JgNtXRpyvsLtjSbr3angLmJXg@mail.gmail.com>
- <95cb2640-570d-4f51-8775-af5248c6bc5a@daynix.com> <CACGkMEu6fZaErFEu7_UFsykXRL7Z+CwmkcxmvJHC+eN_j0pQvg@mail.gmail.com>
- <4eaa7aaa-f677-4a31-bcc2-badcb5e2b9f6@daynix.com> <CACGkMEu3QH+VdHqQEePYz_z+_bNYswpA-KNxzz0edEOSSkJtWw@mail.gmail.com>
- <75ef190e-49fc-48aa-abf2-579ea31e4d15@daynix.com> <CACGkMEu2n-O0UtVEmcPkELcg9gpML=m5W=qYPjeEjp3ba73Eiw@mail.gmail.com>
- <760e9154-3440-464f-9b82-5a0c66f482ee@daynix.com> <CACGkMEtCr65RFB0jeprX3iQ3ke997AWF0FGH6JW_zuJOLqS5uw@mail.gmail.com>
- <CAOEp5OcybMttzRam+RKQHv4KA-zLnxGrL+UApc5KrAG+op9LKg@mail.gmail.com>
- <CACGkMEsfxXtHce2HeYwYxmhB0e5cOjn17qM6zFEt75bQhbtrDw@mail.gmail.com> <CAOEp5Oet1P2EWTwLJnMYY4CVAzDWgdM8wbvV3+BH6aY0kE+O8g@mail.gmail.com>
-In-Reply-To: <CAOEp5Oet1P2EWTwLJnMYY4CVAzDWgdM8wbvV3+BH6aY0kE+O8g@mail.gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Tue, 24 Jun 2025 08:49:58 +0800
-X-Gm-Features: AX0GCFuyvFlQ7RhA5QlpqKcUbeYXfBe9mHMJd9IBrNPZibzgOsK55WFol474x3I
-Message-ID: <CACGkMEuPsCNuNZbPsAj2d-tqz0RrJGAyPQAjt1nFbJdgtiKsGg@mail.gmail.com>
-Subject: Re: [PATCH net-next v12 01/10] virtio_net: Add functions for hashing
-To: Yuri Benditovich <yuri.benditovich@daynix.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org, 
-	Andrew Melnychenko <andrew@daynix.com>, Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com, 
-	Lei Yang <leiyang@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250623161831.12109402.alex.williamson@redhat.com>
 
-On Mon, Jun 23, 2025 at 10:28=E2=80=AFPM Yuri Benditovich
-<yuri.benditovich@daynix.com> wrote:
->
-> On Mon, Jun 23, 2025 at 11:07=E2=80=AFAM Jason Wang <jasowang@redhat.com>=
- wrote:
-> >
-> > On Mon, Jun 23, 2025 at 1:40=E2=80=AFAM Yuri Benditovich
-> > <yuri.benditovich@daynix.com> wrote:
-> > >
-> > > > Yuri, can you help to clarify this?
-> > >
-> > > I see here several questions:
-> > > 1. Whether it is ok for the device not to indicate support for XXX_EX=
- hash type?
-> > > - I think, yes (strictly speaking, it was better to test that before
-> > > submitting the patches )
-> > > 2. Is it possible that the guest will enable some XXX_EX hash type if
-> > > the device does not indicate that it is supported?
-> > > - No (I think this is part of the spec)
-> >
-> > There's another question, is the device allowed to fallback to
-> > VIRTIO_NET_HASH_TYPE_IPv6 if it fails to parse extensions?
-> MSFT expectations for that are at
-> https://learn.microsoft.com/en-us/windows-hardware/drivers/network/rss-ha=
-shing-types
-> If I read them correctly, the answer is "no"
+On Mon, Jun 23, 2025 at 04:18:31PM -0600, Alex Williamson wrote:
+> > Alternatively, if we wanted to normalize show_fdinfo formatting, this
+> > could instead hoist the print formatting up into vfio_main.c, and call
+> > an optional vfio_device_ops->instance_name() to get the name. I opted
+> > not to do this here due to unfamiliarity with other vfio drivers, but am
+> > open to changing it.
+> 
+> TBH, I don't think we need a callback, just use dev_name() in
+> vfio_main.
 
-Ok, so I guess it implies the implementation should be ready to deal
-with arbitrary length of ipv6 options.
+IMHO this should really be the name of /dev/vfio/XX file and not
+something made up like event fd uses.
 
-> BTW, my personal opinion is that placing all these things with hash
-> calculations into kernel instead of ebpf does not make too much sense.
+The file was opened via /dev/vfio/XX, that is what lsof should report..
 
-If I remember correctly, we tried to enable it via eBPF, but failed
-due to the rejection of eBPF maintainers.
+For the legacy route this effectively gives you the iommu group.
 
-Maybe we can revisit the idea. But anyhow the hardcoded logic might
-still be useful as eBPF is not guaranteed to work in all cases.
+For the new route this will give you the struct device.
 
-Thanks
+The userspace can deduce more information, like the actual PCI BDF, by
+mapping the name through sysfs.
 
->
-> >
-> > > 3. What to do if we migrate between systems with different
-> > > capabilities of hash support/reporting/whatever
-> > > - IMO, at this moment such case should be excluded and only mechanism
-> > > we have for that is the compatible machine version
-> > > - in some future the change of device capabilities can be communicate=
-d
-> > > to the driver and _probably_ the driver might be able to communicate
-> > > the change of device capabilities to the OS
-> >
-> > Are you suggesting implementing all hash types? Note that Akihiko
-> > raises the issue that in the actual implementation there should be a
-> > limitation of the maximum number of options. If such a limitation is
-> > different between src and dst, the difference could be noticed by the
-> > guest.
-> >
-> > > 4. Does it make sense to have fine configuration of hash types mask
-> > > via command-line?
-> > > - IMO, no. This would require the user to have too much knowledge
-> > > about RSS internals
-> > >
-> > > Please let me know if I missed something.
-> > >
-> >
-> > Thanks
-> >
->
+I would have guessed this is already happening automatically as part
+of the cdev mechanism? Maybe we broken it when we changed the inode to
+use unmap mapping range?
 
+> The group interface always requires the name, in some cases
+> it can require further information, but we seem to have forgotten that
+> in the cdev interface anyway :-\
+
+?
+
+Jason
 
