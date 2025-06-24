@@ -1,111 +1,93 @@
-Return-Path: <kvm+bounces-50554-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50555-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B49FAE702D
-	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 21:51:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35B50AE7038
+	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 21:57:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 887517A8E11
-	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 19:47:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A896B17C12A
+	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 19:57:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 554C62E8E0B;
-	Tue, 24 Jun 2025 19:48:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB5E92E7F3C;
+	Tue, 24 Jun 2025 19:57:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iXvrgX7L"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zyDortGZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20A0823BD00
-	for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 19:48:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D22F26CE11
+	for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 19:57:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750794503; cv=none; b=NU0OAP8C6yk0ZTpFvt6WYKgWuH/bZTZ8wc+nSyxwJCMWwrbV4A9/PqPIMlTyVIFVTHGouJtRn4+irDczoxTi6E8TRwOQ73fL/6yc39vpn+wzpCK2bZ8K9amOfhdiXzHfcQv0JFwneMgAuW7btOqEQYD6uTEwYXEkQrXY5s9wtmQ=
+	t=1750795037; cv=none; b=ADbSC9nwtGpyfLwN2oLYUwWuFOV+uXaiVyhrdmzIb3FOWbMbb6aVCnhYI2nt9H1dqJPCzVSP2Si7CUejh7eV45Vo/XP8qQMU8Nw6xApcQXpqqCQai87fdlyK93NOXN+nro567vrLHUo7Ir6j+mChE0KLvkVEDU0ieBksGyHbTHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750794503; c=relaxed/simple;
-	bh=6GotpNDPl6kXY95Qph8BUp0563LHJJPy0THk60BPwCo=;
+	s=arc-20240116; t=1750795037; c=relaxed/simple;
+	bh=c/xR1210WNkMjaEddRyUd3VIYNyGW7UT6fUIt9VWbHc=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=RUzdVF4QIGyQxifnaWHaNYQflYfRtmNAHss9rLbRmmlYkULSqEnqRFn+T38kG+YNWA33xC9unmknTaJfJF3s86euYz6j7z/n38g8mGslbWTgil/JGQEZo8wSUdcLSEUHT1gMwV1k1Cu3glkttS559vCtKJ5xo5BSRZvQghTQUaQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iXvrgX7L; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=PMEIJRSeItllh9hzPok5Y0c5jUmrR3CFhvfG7Kd8s7/iN5ZEIVttNnvqIJuDhG4SoV+pipcssopsFV2be6mJZs/CtZ7h84nIJlT5uVJmTTU2j5QN4tPEw51ombOUkyl63hpcWeYFWIJs7eg7gkASPowig03CVyIDBoWRZ8F5nv0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zyDortGZ; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b1ffc678adfso570173a12.0
-        for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 12:48:19 -0700 (PDT)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-236725af87fso10751615ad.3
+        for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 12:57:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750794499; x=1751399299; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1750795036; x=1751399836; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=FqfSnFWDbYX+XfGG95qXGIQa/IUf7HyXIBVSL1oPA5M=;
-        b=iXvrgX7LxlZuCfOu6RsvjymC6y4ezqYcyHZ81rwVKLStC2Ro8uPEVwWWkIX7c+gWTO
-         eqRhZNf8Knn8byVswwz5LGlRnIC3AjJr57bV2cU++oKAnjd45aHzGa1cxFQga6a1buoP
-         twrArYcw/uh6Gq/ftakiPhMGWM1xj6HoeF01/V5ayaJ+wB7Fw9LNR0+sg7OKouYtOnId
-         +8OI/jxHuZYDxbo9UbdWTmnP6tsvu+D9KRA6w7lIoCrhNWERPhyU3BdvcezCpKcIn68e
-         EHLALC9xux6llqkftURcyKGJIkXsZLJxEN3s1x6ih42ZjCRdCYEPuWSRPPlQqxgekj7i
-         ZVvQ==
+        bh=BENYVyjj2zucOOe4fuLRvkzQyNfHSRq657VEghHqQ9U=;
+        b=zyDortGZ3sJQvCsVrr4z/nBzJ/l4HfYNOVE1n4BrNa4VDHL1elXxOXFTxZ2lPIZYQs
+         MY4/zZqBmE5mEpbgJiGIClAvxJ9S+faLNchXsIYRvSYXt5qkG7eeBGVkxSDAckJfClCk
+         ydPyzY92SmfySe9HB5AsFcIKvfgOjU2Iubrvt/pBwYT118JXy5u/yfZv68yqojqvuPfd
+         DiqDTDt1M1otE0omTGv7YeV2rL8xP5PZ/mLrpXnjT3ensuhq3cH+Mc0gjYPTqtbb6EUU
+         nDjZ9Hhc3JaVcH7Abv9FgHAkUp6BxQ9LLN98Ewm6LkH/eRVLxnKRlou6R/4IdcXfEfNL
+         AD8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750794499; x=1751399299;
+        d=1e100.net; s=20230601; t=1750795036; x=1751399836;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FqfSnFWDbYX+XfGG95qXGIQa/IUf7HyXIBVSL1oPA5M=;
-        b=UZia32RVuhH7LPPuBooJzdbkO0xlV9FWgtpaV1NKKK/6VXbJBL80sWnaWULtGRVyFD
-         +oKmdAUMZ4HaLl41cUVfm3TNSENhtRwdj7XqSNOrQwoWNzYUOP5MG46gqQJv+F15SUmv
-         p3G/crahbq4I8sJXjj6w0qUYX+VNSH2rg4uO1WM1k/F2/QItqF1XEGHgUXYxWHMR3e7G
-         JpPS1S6aRit/hyAx1L7UQdDWApHQ2gQErS/1mGVk7gJRNKw51iXNzQlpoEkv8yWsJ8+o
-         XqGixpTllIVYwYToFGenPgQDUdWTXDRdNqymL4CjqRTLmOeAtIghfLscVLozh2+n/w0G
-         PZtA==
-X-Forwarded-Encrypted: i=1; AJvYcCVwXxeKzMT/9/QmaLaxFDu19n8H3otLsoqejEngJMoXczh1LEwYV4HZsGNH1DwVf9vGtE0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxP5oyyNcGyoQTBOWD4ZITMmQjlVb9b4sbeaBjLqgCreuuiAF0C
-	Diq9MCZitcUk/U5vGX83KqE7Xg/Q7solCivubY77MWQ2z4wkNHTBdeocCh7lhFnLZTZTV4GtLce
-	L2pBN7w==
-X-Google-Smtp-Source: AGHT+IGpxI8leluMl7D0SzRSyFZPnLIXhC1vo2SBZLbYA6FIywV5P5SjIY/uT1NfQ4kDXoXw/tVSxEHwr2k=
-X-Received: from plle12.prod.google.com ([2002:a17:903:166c:b0:234:ddd7:5c24])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ec91:b0:235:779:ede0
- with SMTP id d9443c01a7336-2382405cae0mr10401765ad.35.1750794499470; Tue, 24
- Jun 2025 12:48:19 -0700 (PDT)
-Date: Tue, 24 Jun 2025 12:48:17 -0700
-In-Reply-To: <aDcHfuAbPMrhI9As@google.com>
+        bh=BENYVyjj2zucOOe4fuLRvkzQyNfHSRq657VEghHqQ9U=;
+        b=ZoiY/QDYWcKC9Dk4wlj0fWH8GKpf4Jf4kKsfLUuUxRRcyDrHxaBuDK0vEtTTNXQJIQ
+         AzEhh7z51+iNOCWXWjePbIaUfhZAckbbIGGCePh/rP8Nc8aRy2kPjyLZR2TBoqMrYrbh
+         T90ZpAfWWBDHNnYDqH427xCeTxj6KAtnEZRHL1X+yO+kir396HlmnSbvAJS0fwSKjCmp
+         i1kFPDB5o1B27Ec3NhvuzLqdUlGga27dXECAhcnuFj426Ad1XamKNIXVmhU28h2BOcRT
+         fikBwjUSvS51x3ZnxKEGuoZfXATOAQvZshfp0u0r6AtqqtujlbTqD5zoh+j/w2nxKJqf
+         cvEA==
+X-Forwarded-Encrypted: i=1; AJvYcCVE4k7+ICvlWsMKu99tZ8eVVbelG8i5Tj7v4zCImZivGXsBmbOUGsrTVXOicYeqvuC0uJA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyvXvhvGg1UosmjsDd70ES9lXKOIeKNp5ur+oG5VrDizyTCNlMt
+	hfehholh8qo9zoGFMED2fQyMJ5mC8bzS+QgfyBoSVJO96OQK+YhKF9g6nTOQPt8F6eEs06lM803
+	xTjsPqQ==
+X-Google-Smtp-Source: AGHT+IFVpnsXXGmHpzDvt07TImcej4CtxG1K5AUbuX4pJYUSHacGai39W7FIKq2088irF9CIPs9QCTN8XOs=
+X-Received: from plbix22.prod.google.com ([2002:a17:902:f816:b0:234:46ed:43f1])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:2bcc:b0:235:5a9:976f
+ with SMTP id d9443c01a7336-23824030ccdmr12589825ad.24.1750795035894; Tue, 24
+ Jun 2025 12:57:15 -0700 (PDT)
+Date: Tue, 24 Jun 2025 19:57:14 +0000
+In-Reply-To: <diqzv7pdq5lc.fsf@ackerleytng-ctop.c.googlers.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250523001138.3182794-1-seanjc@google.com> <20250523001138.3182794-3-seanjc@google.com>
- <7cc5cd92-1854-4e0e-93b7-e4eee5991334@intel.com> <aDcHfuAbPMrhI9As@google.com>
-Message-ID: <aFsBAXAbRQTPY45m@google.com>
-Subject: Re: [PATCH v4 2/4] KVM: x86/mmu: Dynamically allocate shadow MMU's
- hashed page list
+References: <20250602172317.10601-1-shivankg@amd.com> <diqzv7pdq5lc.fsf@ackerleytng-ctop.c.googlers.com>
+Message-ID: <aFsDGvK98BRXOu1h@google.com>
+Subject: Re: [PATCH] KVM: guest_memfd: Remove redundant kvm_gmem_getattr implementation
 From: Sean Christopherson <seanjc@google.com>
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Vipin Sharma <vipinsh@google.com>, James Houghton <jthoughton@google.com>
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: Shivank Garg <shivankg@amd.com>, pbonzini@redhat.com, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, bharata@amd.com, tabba@google.com
 Content-Type: text/plain; charset="us-ascii"
 
-On Wed, May 28, 2025, Sean Christopherson wrote:
-> On Wed, May 28, 2025, Xiaoyao Li wrote:
-> > On 5/23/2025 8:11 AM, Sean Christopherson wrote:
-> > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > > index cbc84c6abc2e..41da2cb1e3f1 100644
-> > > --- a/arch/x86/kvm/mmu/mmu.c
-> > > +++ b/arch/x86/kvm/mmu/mmu.c
-> > > @@ -3882,6 +3882,18 @@ static int mmu_alloc_direct_roots(struct kvm_vcpu *vcpu)
-> > >   	return r;
-> > >   }
-> > > +static int kvm_mmu_alloc_page_hash(struct kvm *kvm)
-> > > +{
-> > > +	typeof(kvm->arch.mmu_page_hash) h;
-> > 
-> > Out of curiousity, it is uncommon in KVM to use typeof() given that we know
-> > what the type actually is. Is there some specific reason?
+On Mon, Jun 02, 2025, Ackerley Tng wrote:
 > 
-> I'm pretty sure it's a leftover from various experiments.  IIRC, I was trying to
-> do something odd and was having a hard time getting the type right :-)
-> 
-> I'll drop the typeof() in favor of "struct hlist_head *", using typeof here isn't
-> justified and IMO makes the code a bit harder to read.
+> Reviewed-By: Ackerley Tng <ackerleytng@google.com>
 
-Gah, I forgot to switch to address this when applying.  I'll fixup the commit
-and force push; it'll only affect this series (hooray for topic branches).
+Ackerley,
+
+FYI, your mail doesn't appear to have made it to the lists, e.g. isn't available
+on lore.  I don't see anything obviously wrong (though that means almost nothing).
+Hopefully it's just a one-off glitch?
 
