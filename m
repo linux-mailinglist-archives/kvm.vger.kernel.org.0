@@ -1,136 +1,122 @@
-Return-Path: <kvm+bounces-50542-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50543-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD144AE6FD9
-	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 21:41:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBB48AE6FDA
+	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 21:41:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6A39F7A9DC1
-	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 19:40:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 30BD417BC97
+	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 19:41:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16B5A2EA47F;
-	Tue, 24 Jun 2025 19:41:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D5FF2E8885;
+	Tue, 24 Jun 2025 19:41:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TWTZxLCs"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="J61/Gy9q"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D26482E6123
-	for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 19:41:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5F232E8893
+	for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 19:41:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750794062; cv=none; b=uZg0WEetS+xU477xUcZ0CC/kFi/hKv3TULZzTivd0aZZiwA93uYaYVpt0mfQ+IaZwplD3vT61YTEM2x1nQpl4Sr1rotFMF5cQp3pZL4FACMnu1iziwFf5o6NTz64Hs+wX2kNNWLu699gN4w7aYLMtlMrobQ4ZOHxQGbmzcMfMgw=
+	t=1750794071; cv=none; b=o01HksuIateClnKcdeAvN1mdkg0/aS7M+ECFxhE+Wfb3jbIU179sfKOSBPesYO2ZJLaddUaTZsR/z1fXT5Ru2U7DTVrcIyEcIWy1Ls5OsZwpzCU2QIx6TepODcKiXn7DMPKJCNgOnfy5ZTmRbvrJxo+bmrKlVukw2vnomtsdLdk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750794062; c=relaxed/simple;
-	bh=icvH8uPyPSF7ZE5bbcFFzEf2UOQHavXp0OG5yV/ZSlo=;
+	s=arc-20240116; t=1750794071; c=relaxed/simple;
+	bh=XKWkUMZVzA+dBYCVPpvxIgaKdkXs4N/J7Rl8dOvJVz8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=SFnZ/2ZJB0rXfOtLrbbEgmd2p4ZNm/39KrjTn9ndD5gavfPb7/PyoZt6O8IRpg8fYN+nL7dNogKnON2hHyiDouDvci0MJZI+wGB4xyJywKqIKNoVlZOrf5h0VCPSAZJdlN8vHnEE+dWGk7uad1ZQmth3BSiNQhEdHGRqrMpiB/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TWTZxLCs; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=F7CHct22XoLCV+wU+at/5m/dabX8YK4B53O/Go31V4r7sv6jJXB9C3aV7OGW1bss1rVJQGIegfEUPdFaH9nVR9xxIfUwKFLwloWIJxxPy+Fu37zt7eVUOjTRF1gzmfR41y4qEkg/RDOi+LmMIRc20aw6eJb5jWrRZGYK7wYjosw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=J61/Gy9q; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-31366819969so796619a91.0
-        for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 12:41:00 -0700 (PDT)
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-74943a7cd9aso3355539b3a.3
+        for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 12:41:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750794060; x=1751398860; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1750794069; x=1751398869; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=iY0Zi0HY18tOkeHCc+HXpmSScBiit195K0qDvBCbCao=;
-        b=TWTZxLCspjLRlioDLG0R8h3YqzCLJY8ljXz4+Qt0OPOSRaUOngey81zRGB3SAuiBFt
-         fEJMahqPap8fX396N4gCSKl6Oe+RkmyN199RXrOZJCn4xfcG8YhSGfRKKNVVqZTVx0yX
-         ukeyfvMlZTCMJBtW72gn5y0pWyYgAXrAY/L7UJH0mjNiulU5Q4GrL7rSjNUbXBTLotKj
-         9NNHgtJgaZc295zI2Hxqh52C7HRcdyjVT8sdAvHhJXsr6CA1/28E5HMIPirm/sh61ge6
-         oq7uPRahWOg4wTGT4aD7lDVmmSTrRy6BwWbTJlciBuxwUr9quzbY+sFi8fASBtXLJfqj
-         Rt+g==
+        bh=rXiP320Rk+IeNYwcDV4nPbIgqWo0YYn3LIURX0sKo4U=;
+        b=J61/Gy9qKuFITkCnkJfsUCdOtb0wez6ao33eCNrOz3QA9deST3Wz58EDgCZUTX8VOf
+         U/b9+2KRemW9fd0nYGbmMNAMY1mpj0xZcATPfpLFVljeK8i2jssYF0JodpnE5oOuX265
+         LG+QC/xu6KuCswec+Sy1+PFWYqh1npHeU9MSj36VqxciCkLg4IwxHTpnzavufuHPgzGj
+         VgnoveuemnXc2U55F8TdV8LDcWT2U6cEen+wj6/RH0NPr18wD6oQMNLCfxB3d8HWiYiV
+         OajE37G2c+qouOZOtnx3GW1Sl3AsOWT7R/u2mqfvb//CQ9qELWT6c4CvjGMf0IXMqAUL
+         XYWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750794060; x=1751398860;
+        d=1e100.net; s=20230601; t=1750794069; x=1751398869;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iY0Zi0HY18tOkeHCc+HXpmSScBiit195K0qDvBCbCao=;
-        b=vOLHQnYjH1GYzZlhqepsIsZ0i6IF6wXl1mCSwUWF4s47kAgN8wmxTkY7ULtvkAp7+C
-         vlh+cIPHqvTKeo440EGzznsAupjeT7PUpWFJchLUmW29GQ3/FGCEEXChxC1FSVXcYqsH
-         ZB6HnTSd2sv5JRq5c3tTBw7oJurfvM2NHG/rgtVYUiYM+3wcLF0Cw3VTwqz4WAJDHKJA
-         yhvAshfmcn2EEMmA8h7dbyV7zdvArbGhVsckpBsHCdQ2fOKCYiMxrMs6GzKNP17fLFZT
-         IfXrDz2ddXHByQ7jx9qKjiI81u99JjL+RmYujjzTpivbxCA4FHE9qrqCmKkt9gQuSqFM
-         tu4g==
-X-Gm-Message-State: AOJu0YxyA2mdq2/fWRBwokQi30t2+d/3T94V+uqwewMUxyni1H5Y8ysc
-	GJaXGXGCtn7GxCboGOdWcUxVZOzrFtETn453EqucEAu4ASvMxPWBhv8g5lSwxJ5NielxveLvNYo
-	k0LKHlg==
-X-Google-Smtp-Source: AGHT+IF4MLhn1oAFS9q8ZwixKJZ6SXdYDCWlaLgz8n+cUS01Jkrs//aXxvoL7Qsb+teLAlUXpA9LXNHFuS8=
-X-Received: from pjbov12.prod.google.com ([2002:a17:90b:258c:b0:312:e914:4548])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3d8c:b0:2ff:58c7:a71f
- with SMTP id 98e67ed59e1d1-315f26b85c7mr109165a91.32.1750794060247; Tue, 24
- Jun 2025 12:41:00 -0700 (PDT)
-Date: Tue, 24 Jun 2025 12:38:22 -0700
-In-Reply-To: <20250611213557.294358-1-seanjc@google.com>
+        bh=rXiP320Rk+IeNYwcDV4nPbIgqWo0YYn3LIURX0sKo4U=;
+        b=EYGDrmu1ogFKAVHsrvih9mNty7MoccBlwnF6BA7fM4gptZWbRSDG/STnQ4Z9JHmk64
+         0LuEpKJlDtewMznqu3bynPFVDrgTHbR4ZDfXXPtKNRMjM1uF09cawD4ZiP3cKpxmZDH4
+         V80nccqhivVVnfQhUDGgP5D/98hJlvRA/AQ7KRmZX6LmpZn0DTR+r/ioEcuZHDuql8h3
+         rPavDkofgWTXCfW2ClFpxqt2jgfDmkTa2TZeTmHOYIbz0pbyBts8NmA80c6lAyEPH4bY
+         yMLZFVzCkrZeMxWuMt70cN7EP6IZNn4+/zarzoei9s8Zbx5OG8dgceB2jwY9tJeyL+SL
+         BPAw==
+X-Gm-Message-State: AOJu0YysmF3p57s+Uj623COWTtRUJ6E4XNaaKHhXMTBAhqPCA2FqtWQV
+	c0S8u8fo7CQKk2sjSbu93D89jToDNoOXGgoOqCyKYyI39wkBwlYyu0pqZ6rGsxrT3Qx8+QVGJ4W
+	mwnC4iQ==
+X-Google-Smtp-Source: AGHT+IF4iAyO0/jtdeTd/8bHHz1AfSHJa1kRLTY1ZYhbBi7eks2S0+pU5J68NpHqGCPbGgybwZERsmzdGEo=
+X-Received: from pfx28.prod.google.com ([2002:a05:6a00:a45c:b0:747:a9de:9998])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:1ac6:b0:740:aa33:c6f8
+ with SMTP id d2e1a72fcca58-74ad448fdfcmr481317b3a.7.1750794068977; Tue, 24
+ Jun 2025 12:41:08 -0700 (PDT)
+Date: Tue, 24 Jun 2025 12:38:24 -0700
+In-Reply-To: <20250516230734.2564775-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250611213557.294358-1-seanjc@google.com>
+References: <20250516230734.2564775-1-seanjc@google.com>
 X-Mailer: git-send-email 2.50.0.714.g196bf9f422-goog
-Message-ID: <175079365968.522970.130090674504357227.b4-ty@google.com>
-Subject: Re: [PATCH v2 00/18] KVM: x86: Add I/O APIC kconfig, delete irq_comm.c
+Message-ID: <175079266935.516926.16732685121513755333.b4-ty@google.com>
+Subject: Re: [PATCH v2 0/8] irqbypass: Cleanups and a perf improvement
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Kai Huang <kai.huang@intel.com>
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Alex Williamson <alex.williamson@redhat.com>
+Cc: kvm@vger.kernel.org, virtualization@lists.linux.dev, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Kevin Tian <kevin.tian@intel.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	David Matlack <dmatlack@google.com>, Like Xu <like.xu.linux@gmail.com>, 
+	Binbin Wu <binbin.wu@linux.intel.com>, Yong He <alexyonghe@tencent.com>
 Content-Type: text/plain; charset="utf-8"
 
-On Wed, 11 Jun 2025 14:35:39 -0700, Sean Christopherson wrote:
-> Add CONFIG_KVM_IOAPIC to allow disabling support for KVM's I/O APIC (and PIC
-> and PIT) emulation, and delete irq_comm.c by moving its contents to other
-> files.
+On Fri, 16 May 2025 16:07:26 -0700, Sean Christopherson wrote:
+> The two primary goals of this series are to make the irqbypass concept
+> easier to understand, and to address the terrible performance that can
+> result from using a list to track connections.
 > 
-> Vitaly and Kai, I didn't apply your review/ack to the Hyper-V patch, as I ended
-> up keeping the helper as kvm_hv_synic_set_irq() to fix the tracepoint
-> inconsistency and the bad changelog.
+> For the first goal, track the producer/consumer "tokens" as eventfd context
+> pointers instead of opaque "void *".  Supporting arbitrary token types was
+> dead infrastructure when it was added 10 years ago, and nothing has changed
+> since.  Taking an opaque token makes a very simple concept (device signals
+> eventfd; KVM listens to eventfd) unnecessarily difficult to understand.
 > 
 > [...]
 
 Applied to kvm-x86 irqs, thanks!
 
-[01/18] KVM: x86: Trigger I/O APIC route rescan in kvm_arch_irq_routing_update()
-        https://github.com/kvm-x86/linux/commit/e295d2e7fbe6
-[02/18] KVM: x86: Drop superfluous kvm_set_pic_irq() => kvm_pic_set_irq() wrapper
-        https://github.com/kvm-x86/linux/commit/8a33b1f246ce
-[03/18] KVM: x86: Drop superfluous kvm_set_ioapic_irq() => kvm_ioapic_set_irq() wrapper
-        https://github.com/kvm-x86/linux/commit/05dc9eab3f00
-[04/18] KVM: x86: Drop superfluous kvm_hv_set_sint() => kvm_hv_synic_set_irq() wrapper
-        https://github.com/kvm-x86/linux/commit/20218e69e85b
-[05/18] KVM: x86: Move PIT ioctl helpers to i8254.c
-        https://github.com/kvm-x86/linux/commit/00b5ebf8db7c
-[06/18] KVM: x86: Move KVM_{GET,SET}_IRQCHIP ioctl helpers to irq.c
-        https://github.com/kvm-x86/linux/commit/b771b1616ff8
-[07/18] KVM: x86: Rename irqchip_kernel() to irqchip_full()
-        https://github.com/kvm-x86/linux/commit/c5a701955e2d
-[08/18] KVM: x86: Move kvm_setup_default_irq_routing() into irq.c
-        https://github.com/kvm-x86/linux/commit/df35135680fa
-[09/18] KVM: x86: Move kvm_{request,free}_irq_source_id() to i8254.c (PIT)
-        https://github.com/kvm-x86/linux/commit/77a74b8ff41a
-[10/18] KVM: x86: Hardcode the PIT IRQ source ID to '2'
-        https://github.com/kvm-x86/linux/commit/61423c413a74
-[11/18] KVM: x86: Don't clear PIT's IRQ line status when destroying PIT
-        https://github.com/kvm-x86/linux/commit/2c31aa747d78
-[12/18] KVM: x86: Explicitly check for in-kernel PIC when getting ExtINT
-        https://github.com/kvm-x86/linux/commit/cd9140ad8312
-[13/18] KVM: Move x86-only tracepoints to x86's trace.h
-        https://github.com/kvm-x86/linux/commit/2c938850d9d1
-[14/18] KVM: x86: Add CONFIG_KVM_IOAPIC to allow disabling in-kernel I/O APIC
-        https://github.com/kvm-x86/linux/commit/628a27731e3f
-[15/18] KVM: Squash two CONFIG_HAVE_KVM_IRQCHIP #ifdefs into one
-        https://github.com/kvm-x86/linux/commit/141db6cd79e2
-[16/18] KVM: selftests: Fall back to split IRQ chip if full in-kernel chip is unsupported
-        https://github.com/kvm-x86/linux/commit/8fd2a6d43a10
-[17/18] KVM: x86: Move IRQ mask notifier infrastructure to I/O APIC emulation
-        https://github.com/kvm-x86/linux/commit/37b1761fe895
-[18/18] KVM: x86: Fold irq_comm.c into irq.c
-        https://github.com/kvm-x86/linux/commit/e76c274513f2
+[1/8] irqbypass: Drop pointless and misleading THIS_MODULE get/put
+      https://github.com/kvm-x86/linux/commit/fa079a0616ed
+[2/8] irqbypass: Drop superfluous might_sleep() annotations
+      https://github.com/kvm-x86/linux/commit/07fbc83c0152
+[3/8] irqbypass: Take ownership of producer/consumer token tracking
+      https://github.com/kvm-x86/linux/commit/2b521d86ee80
+[4/8] irqbypass: Explicitly track producer and consumer bindings
+      https://github.com/kvm-x86/linux/commit/add57f493e08
+[5/8] irqbypass: Use paired consumer/producer to disconnect during unregister
+      https://github.com/kvm-x86/linux/commit/5d7dbdce388b
+[6/8] irqbypass: Use guard(mutex) in lieu of manual lock+unlock
+      https://github.com/kvm-x86/linux/commit/46a4bfd0ae48
+[7/8] irqbypass: Use xarray to track producers and consumers
+      https://github.com/kvm-x86/linux/commit/8394b32faecd
+[8/8] irqbypass: Require producers to pass in Linux IRQ number during registration
+      https://github.com/kvm-x86/linux/commit/23b54381cee2
 
 --
 https://github.com/kvm-x86/kvm-unit-tests/tree/next
