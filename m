@@ -1,82 +1,96 @@
-Return-Path: <kvm+bounces-50533-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50534-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE652AE6EC2
-	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 20:40:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D1C7AE6EF5
+	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 20:55:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E314F7A4EE1
-	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 18:39:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18B113BBCF6
+	for <lists+kvm@lfdr.de>; Tue, 24 Jun 2025 18:54:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 708652E6D31;
-	Tue, 24 Jun 2025 18:40:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33EA02E975B;
+	Tue, 24 Jun 2025 18:54:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="DfcWTi+A"
+	dkim=pass (1024-bit key) header.d=fb.com header.i=@fb.com header.b="EGIvJZMB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17FB83074B5;
-	Tue, 24 Jun 2025 18:40:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BF2E2E7623
+	for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 18:54:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750790445; cv=none; b=ocMCRxXQQYIacp6gQ4O9NVeQK9i7J/rAGFH0E7tsPdGXJ7tHSXdJmwI/J/mAR6WbKQJfyy9j/pmiOAAObSHiRDbP+vkYGM3qN3d1rP4bgr2DMwfKk1nsXPT+s6CaV/TI4W+gqGB4A6VqvcOYK9yG2QRL6m1UFjrA7B/2f8h8M8o=
+	t=1750791282; cv=none; b=cFRfJJihwQ7JOL2z/w1LMUC+nGcWTCOIHpYRnBTPFQs+36Dkvj9CoI/Kgfa66g4fXX8PIkDogJY7LaG9IbNUa5tzwMGkKzGk0Vpod5pqDGHRb+aGJcrU4iCaP4NJoQ+tndyGvi0VEXUSTxWOgamozSY3uHZkc/HNM6j2oex0feM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750790445; c=relaxed/simple;
-	bh=RaKMVenHpXTiijDnnUSu51b+dkVcQ43L2EZ2DjqU9Vs=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=GNHHcG6YovS3ZBaT76zreql1d7638SNf1WXcbJWKWDSTz05N/ggwz7bBp0YZEPTLJTI3DFXqJAUgKZRl+8Vw2sbfgFQ2UfoDtC8omHW6Zb6jV2HgFsTok7Fe/4G2pMRFa7o8mWr0n8xTeJZpQMd5OIB0c9O9gdasMDoWL2p4xoY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=DfcWTi+A; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [127.0.0.1] (c-76-133-66-138.hsd1.ca.comcast.net [76.133.66.138])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 55OIeEuG1461582
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Tue, 24 Jun 2025 11:40:15 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 55OIeEuG1461582
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025062101; t=1750790415;
-	bh=RaKMVenHpXTiijDnnUSu51b+dkVcQ43L2EZ2DjqU9Vs=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=DfcWTi+A+bEdns70+O8m6NIOIC9aZTxHpMPbc+vZcjxm2GiPzbI9XGHSQtkfFz0hv
-	 2pcL0LTI/Qc8PeRRop9P0n5NY/WvgcZhmxs7SgFGAMdg7joM8uZAYeB5yMJfTbeery
-	 Ujgkj4ahzeU+UTlRJs5JZKlCXj+4gn5kJ3fzmkuVUR7+nEYvuqmDJ66zMEzTZIgTJN
-	 NqnqVn1ZI9fG47BNbCwZne3Tz9obMlO3TsQrCkM1bZoIcxQ+ArTVRPApiuyCdsWo8w
-	 s1TfWMvmOgFp5xVhVQ8gIDKXhsFyyEdCO1HcfpTIHTFGrcjsXXZqeUhLAvKlYdxFcq
-	 DZLNok8pN77IQ==
-Date: Tue, 24 Jun 2025 11:40:13 -0700
-From: "H. Peter Anvin" <hpa@zytor.com>
-To: Xin Li <xin@zytor.com>, Sean Christopherson <seanjc@google.com>
-CC: pbonzini@redhat.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, corbet@lwn.net, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        x86@kernel.org, andrew.cooper3@citrix.com, luto@kernel.org,
-        peterz@infradead.org, chao.gao@intel.com, xin3.li@intel.com
-Subject: Re: [PATCH v4 00/19] Enable FRED with KVM VMX
-User-Agent: K-9 Mail for Android
-In-Reply-To: <72cc4e30-1678-49be-8d36-b18287c26966@zytor.com>
-References: <20250328171205.2029296-1-xin@zytor.com> <d243d203-7514-4541-9ea2-1200f7116cc1@zytor.com> <aFrbIgouGiZWf51O@google.com> <80ba45cf-2679-471b-ae3d-986697089b75@zytor.com> <D379AE34-58DE-4082-B0DF-1D1AE463D19A@zytor.com> <72cc4e30-1678-49be-8d36-b18287c26966@zytor.com>
-Message-ID: <E56DFF0F-8BB8-4E19-805B-B40344E6C750@zytor.com>
+	s=arc-20240116; t=1750791282; c=relaxed/simple;
+	bh=c/y3xXMbDdtlBwDY0/y4GK/bkN2xFaQdAi2da5gKUyQ=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jKZh2a9ruf+/HSOY+mbvpNuiLjfIZaRPPhdjt1ndCL/u+ZLFlVQy/KisZCKDcYdFSTVb7+LNdCP1fuKLzncGtYaOuZ44tRLaxTZnDlnE3N8vO+BckUmY4p5UG/w+FZDf4uHshI9DUHhR98GuV8EfgItGsBDBoUzv25ir/Omq5nk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (1024-bit key) header.d=fb.com header.i=@fb.com header.b=EGIvJZMB; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0109331.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55OICG0G031915
+	for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 11:54:39 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=facebook; bh=c
+	/y3xXMbDdtlBwDY0/y4GK/bkN2xFaQdAi2da5gKUyQ=; b=EGIvJZMBV8GTDF/lP
+	H85JjHyaFPqpyh5GNV1W06BKyo1f0m8tNt5R1A0BTsWjkZ7dmBXsNMSpDKVCYxC/
+	2JVK3+vieOlwD18/6CopplOeJugElWAqqwd0il9KT1xt2RdPE6aWI6RaquOqUDZB
+	TlNOhRVLA85/SQuWuN7qA/yufc=
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 47fxnp9vtx-9
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 11:54:39 -0700 (PDT)
+Received: from twshared21625.15.frc2.facebook.com (2620:10d:c085:208::f) by
+ mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.1748.24; Tue, 24 Jun 2025 18:54:36 +0000
+Received: by devgpu004.nha5.facebook.com (Postfix, from userid 199522)
+	id 8DE441AD75B; Tue, 24 Jun 2025 11:54:26 -0700 (PDT)
+From: Alex Mastro <amastro@fb.com>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+CC: Alex Mastro <amastro@fb.com>,
+        Alex Williamson
+	<alex.williamson@redhat.com>, <peterx@redhat.com>,
+        <kbusch@kernel.org>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] vfio/pci: print vfio-device name to fdinfo
+Date: Tue, 24 Jun 2025 11:53:25 -0700
+Message-ID: <20250624185327.1250843-1-amastro@fb.com>
+X-Mailer: git-send-email 2.47.1
+In-Reply-To: <20250624181616.GE72557@ziepe.ca>
+References:
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
 Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: YNphcLuuQAxdQ6nVh2crShZDYH0mOgvu
+X-Authority-Analysis: v=2.4 cv=evDfzppX c=1 sm=1 tr=0 ts=685af46f cx=c_pps a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17 a=6IFa9wvqVegA:10 a=9jRdOu3wAAAA:8 a=y_P49Qpdh_UukDKHNdIA:9 a=ZE6KLimJVUuLrTuGpvhn:22
+X-Proofpoint-GUID: YNphcLuuQAxdQ6nVh2crShZDYH0mOgvu
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjI0MDE1NSBTYWx0ZWRfXyg7igDSE4kOH qCcEC5PO1LqMoOIXOwDqsYM0EiNtCCt2h9iqq+Gtzt3tp+Zakhh4DbHQ/eCb/5mdhbJF5fhGkqZ uVfo2ywAp/d4jOdqi/gt+9GSFrxpOcl7oxR8b3Wf43miEoC4W9eRZfMdzWgMWjSfZQbYW2Zy2VX
+ PrD2gEzt0AQATxrgDVNLQub0OGJWeWJr0Y7eIPHwfiGQRnGwe0BzXoBaI4D0NljAFCf3AFW0yVz fnjn+8RkcmpE/oSBAPp0hIA6q0ueIBLj4dt+y6RHUaQ21+xICtJ/uKDKrG+E8oKHvWFPKW9uvqS 9uycm8waRNu0JMJRRaog0lL7Mxjs/mZH9iX3+8mHktAw4/F9ljQ5AeoJXOh4mOpS/fqJpLPQ+gf
+ tMygt0uVR+AgZbH51aviVk05T7LKlWrm0eZ7/Q44uV+hDBk12RdDdjH76wbUpggWOTKFEe0T
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
+ definitions=2025-06-24_06,2025-06-23_07,2025-03-28_01
 
-On June 24, 2025 11:02:41 AM PDT, Xin Li <xin@zytor=2Ecom> wrote:
->On 6/24/2025 10:47 AM, H=2E Peter Anvin wrote:
->> FRED doesn't lean on CET=2E=2E=2E one could argue it leans on LASS, at =
-least to a small extent, though=2E
->
->Probably I used a wrong verb "lean", "overlap" is better=2E
+On Tue, 24 Jun 2025 15:16:16 -0300 Jason Gunthorpe <jgg@ziepe.ca> wrote:
+> There will be a symlink under /sys/class/vfio-xx/XX pointing to the
+> <pci sysfs path>/vfio-dev/X directory
+>=20
+> And another symlink under /sys/dev/char/XX:XX doing the same.
 
-I would personally say to the extent there is overlap it is the opposite d=
-irection (FRED helps enable kCET, but uCET is pretty much orthogonal=2E)
+Got it, thanks. The issue does seem solved for the vfio cdev case, then.
+
+Alex
+
 
