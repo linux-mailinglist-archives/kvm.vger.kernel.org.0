@@ -1,38 +1,38 @@
-Return-Path: <kvm+bounces-50723-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50724-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 787E7AE88BF
-	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 17:50:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21266AE88B7
+	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 17:50:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2FFF9189A88B
-	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 15:49:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 710064A61FF
+	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 15:49:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B73F32BD03E;
-	Wed, 25 Jun 2025 15:49:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BB142BD03F;
+	Wed, 25 Jun 2025 15:49:16 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C0A5269AFB;
-	Wed, 25 Jun 2025 15:49:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A32E713A3F7;
+	Wed, 25 Jun 2025 15:49:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750866552; cv=none; b=hIPIJ0CxVEmmGC4mj4zjAs3YPnqJ4wknxQtce3X0AVOTNu0jPN9+rH5fhwLWPVouqmMx+1FRL7GAdOuhs/TbXi0xzwqZynPHPZnlsw4tDdHaE6RI3G69Nfqd0uwFQsbxQUOsiVTqqA++g2LGAsBCyKQnUMGA7zKStaWH1l9ew0I=
+	t=1750866556; cv=none; b=Nf09touLO6HTBs8G7AhVJSV6qo1g340p2ayge0XY20dNNAnjvDFdhxD9W7p9hT7aV6EKfRGQ7DMeQQ5I8b4ZongjGTIa7GlDqMiAUwQA6BGBpAhsULGE6epriNIaPRRpsAV5yjW2HsIFzWqlmOl7aZyZvIpklbhNncSbWtrOUlA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750866552; c=relaxed/simple;
-	bh=dJUT46NbgoVxJI1KGwmICwjwM5Y+z6bKgrozaq4JnqM=;
+	s=arc-20240116; t=1750866556; c=relaxed/simple;
+	bh=bcQaTvOtcZh7GcMecpjcZf821VrF/hpyzVHC9Yz0q90=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Kb0MCgYMPNPjH6X9Kc/5sO8xeHTTMmwNDahDmZTvL2ARmBlKBcXo2CCF2CnjU1BqQJZgRzJ7H9SSyEPK0+a3C5fzboWV3lQyZ5WAhLedSvX68P1EMLzoc9Ebax52ncHWT9veYZKg67gOxk7BymX6tCvENb2djmjyWmSfcP43co4=
+	 MIME-Version; b=Vopmgshf/qc28ZrQv4VwiDh4pJgrQ3g9qd+UTEsxWThV7/bEr/cMP7Qba69WALlGJ3//XHBD7vGb06bz8OyYCRafSgYG/I3NM6VAzbsHgCJYZx838pGpuqX2IdbVefBuBSbgZhx3Meby+Vr5NjN7ZdEY+Db1MjIapAPgCDF4h0I=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4245A22E6;
-	Wed, 25 Jun 2025 08:48:51 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0FF2720E3;
+	Wed, 25 Jun 2025 08:48:56 -0700 (PDT)
 Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 118DB3F58B;
-	Wed, 25 Jun 2025 08:49:04 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D09AD3F58B;
+	Wed, 25 Jun 2025 08:49:09 -0700 (PDT)
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: andrew.jones@linux.dev,
 	eric.auger@redhat.com,
@@ -57,9 +57,9 @@ Cc: kvm@vger.kernel.org,
 	joey.gouly@arm.com,
 	andre.przywara@arm.com,
 	shahuang@redhat.com
-Subject: [kvm-unit-tests PATCH v4 09/13] scripts: Detect kvmtool failure in premature_failure()
-Date: Wed, 25 Jun 2025 16:48:09 +0100
-Message-ID: <20250625154813.27254-10-alexandru.elisei@arm.com>
+Subject: [kvm-unit-tests PATCH v4 10/13] scripts: Do not probe for maximum number of VCPUs when using kvmtool
+Date: Wed, 25 Jun 2025 16:48:10 +0100
+Message-ID: <20250625154813.27254-11-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.50.0
 In-Reply-To: <20250625154813.27254-1-alexandru.elisei@arm.com>
 References: <20250625154813.27254-1-alexandru.elisei@arm.com>
@@ -71,12 +71,14 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-kvm-unit-tests assumes that if the VMM is able to get to where it tries to
-load the kernel, then the VMM and the configuration parameters will also
-work for running the test. All of this is done in premature_failure().
+The --probe-maxsmp parameter updates MAX_SMP with the maximum number of
+VCPUs that the host supports. Qemu will exit with an error when creating a
+virtual machine if the number of VCPUs is exceeded.
 
-Teach premature_failure() about the kvmtool's error message when it fails
-to load the dummy kernel.
+kvmtool behaves differently: it will automatically limit the number of
+VCPUs to the what KVM supports, which is exactly what --probe-maxsmp wants
+to achieve. When doing --probe-maxsmp with kvmtool, print a message
+explaining why it's redundant and don't do anything else.
 
 Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
 Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
@@ -85,105 +87,122 @@ Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 
 Changes v3->v4:
 
-* Use vmm_parse_premature_failure() in
-scripts/runtime.bash::premature_failure().
-* Do not source scripts/vmm.bash in scripts/runtime.bash to avoid errors in
-the standalone tests.
+* Use vmmm_probe_maxsmp() instead of indexing vmm_optname in run_tests.sh.
 
- scripts/mkstandalone.sh |  1 +
- scripts/runtime.bash    |  6 +-----
- scripts/vmm.bash        | 28 ++++++++++++++++++++++++++++
- 3 files changed, 30 insertions(+), 5 deletions(-)
+ run_tests.sh         |  3 ++-
+ scripts/runtime.bash | 16 ----------------
+ scripts/vmm.bash     | 30 ++++++++++++++++++++++++++++++
+ 3 files changed, 32 insertions(+), 17 deletions(-)
 
-diff --git a/scripts/mkstandalone.sh b/scripts/mkstandalone.sh
-index 9c5768563757..ebf425564af5 100755
---- a/scripts/mkstandalone.sh
-+++ b/scripts/mkstandalone.sh
-@@ -81,6 +81,7 @@ generate_test ()
- 	echo "RUNTIME_log_stdout () { cat >&\$stdout; }"
- 	echo "RUNTIME_log_stderr () { cat >&2; }"
+diff --git a/run_tests.sh b/run_tests.sh
+index 150a06a91064..4cfc3cd9e4cf 100755
+--- a/run_tests.sh
++++ b/run_tests.sh
+@@ -10,6 +10,7 @@ if [ ! -f config.mak ]; then
+ fi
+ source config.mak
+ source scripts/common.bash
++source scripts/vmm.bash
  
-+	cat scripts/vmm.bash
- 	cat scripts/runtime.bash
- 
- 	echo "run ${args[*]}"
+ function usage()
+ {
+@@ -90,7 +91,7 @@ while [ $# -gt 0 ]; do
+             list_tests="yes"
+             ;;
+         --probe-maxsmp)
+-            probe_maxsmp
++            vmm_probe_maxsmp $RUNTIME_arch_run
+             ;;
+         --)
+             ;;
 diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-index 86d8a2cd8528..5839ca5ca665 100644
+index 5839ca5ca665..766d1d28fb75 100644
 --- a/scripts/runtime.bash
 +++ b/scripts/runtime.bash
-@@ -19,11 +19,7 @@ premature_failure()
+@@ -207,19 +207,3 @@ function run()
  
-     log="$(eval "$(get_cmdline _NO_FILE_4Uhere_)" 2>&1)"
- 
--    echo "$log" | grep "_NO_FILE_4Uhere_" |
--        grep -q -e "[Cc]ould not \(load\|open\) kernel" \
--                -e "error loading" \
--                -e "failed to load" &&
--        return 1
-+    vmm_parse_premature_failure "$log" || return 1
- 
-     RUNTIME_log_stderr <<< "$log"
- 
+     return $ret
+ }
+-
+-#
+-# Probe for MAX_SMP, in case it's less than the number of host cpus.
+-#
+-function probe_maxsmp()
+-{
+-	local smp
+-
+-	if smp=$($RUNTIME_arch_run _NO_FILE_4Uhere_ -smp $MAX_SMP |& grep 'SMP CPUs'); then
+-		smp=${smp##* }
+-		smp=${smp/\(}
+-		smp=${smp/\)}
+-		echo "Restricting MAX_SMP from ($MAX_SMP) to the max supported ($smp)" >&2
+-		MAX_SMP=$smp
+-	fi
+-}
 diff --git a/scripts/vmm.bash b/scripts/vmm.bash
-index 368690d62473..44954a711cad 100644
+index 44954a711cad..724c96f9e665 100644
 --- a/scripts/vmm.bash
 +++ b/scripts/vmm.bash
-@@ -79,6 +79,18 @@ function qemu_fixup_return_code()
- 	echo $ret
+@@ -91,6 +91,23 @@ function qemu_parse_premature_failure()
+ 	return 0
  }
  
-+function qemu_parse_premature_failure()
++#
++# Probe for MAX_SMP, in case it's less than the number of host cpus.
++#
++function qemu_probe_maxsmp()
 +{
-+	local log=$*
++	local runtime_arch_run="$1"
++	local smp
 +
-+	echo "$log" | grep "_NO_FILE_4Uhere_" |
-+		grep -q -e "[Cc]ould not \(load\|open\) kernel" \
-+			-e "error loading" \
-+			-e "failed to load" &&
-+		return 1
-+	return 0
++	if smp=$($runtime_arch_run _NO_FILE_4Uhere_ -smp $MAX_SMP |& grep 'SMP CPUs'); then
++		smp=${smp##* }
++		smp=${smp/\(}
++		smp=${smp/\)}
++		echo "Restricting MAX_SMP from ($MAX_SMP) to the max supported ($smp)" >&2
++		MAX_SMP=$smp
++	fi
 +}
 +
  function kvmtool_fixup_return_code()
  {
  	local ret=$1
-@@ -91,18 +103,29 @@ function kvmtool_fixup_return_code()
- 	echo $ret
+@@ -112,6 +129,12 @@ function kvmtool_parse_premature_failure()
+ 	return 0
  }
  
-+function kvmtool_parse_premature_failure()
++function kvmtool_probe_maxsmp()
 +{
-+	local log=$*
-+
-+	echo "$log" | grep "Fatal: Unable to open kernel _NO_FILE_4Uhere_" &&
-+		return 1
-+	return 0
++	echo "kvmtool automatically limits the number of VCPUs to maximum supported"
++	echo "The 'smp' test parameter won't be modified"
 +}
 +
  declare -A vmm_optname=(
  	[qemu,args]='-append'
  	[qemu,default_opts]=''
- 	[qemu,fixup_return_code]=qemu_fixup_return_code
+@@ -119,6 +142,7 @@ declare -A vmm_optname=(
  	[qemu,initrd]='-initrd'
  	[qemu,nr_cpus]='-smp'
-+	[qemu,parse_premature_failure]=qemu_parse_premature_failure
+ 	[qemu,parse_premature_failure]=qemu_parse_premature_failure
++	[qemu,probe_maxsmp]=qemu_probe_maxsmp
  
  	[kvmtool,args]='--params'
  	[kvmtool,default_opts]="$KVMTOOL_DEFAULT_OPTS"
- 	[kvmtool,fixup_return_code]=kvmtool_fixup_return_code
+@@ -126,6 +150,7 @@ declare -A vmm_optname=(
  	[kvmtool,initrd]='--initrd'
  	[kvmtool,nr_cpus]='--cpus'
-+	[kvmtool,parse_premature_failure]=kvmtool_parse_premature_failure
+ 	[kvmtool,parse_premature_failure]=kvmtool_parse_premature_failure
++	[kvmtool,probe_maxsmp]=kvmtool_probe_maxsmp
  )
  
  function vmm_optname_args()
-@@ -130,6 +153,11 @@ function vmm_optname_nr_cpus()
- 	echo ${vmm_optname[$(vmm_get_target),nr_cpus]}
+@@ -158,6 +183,11 @@ function vmm_parse_premature_failure()
+ 	${vmm_optname[$(vmm_get_target),parse_premature_failure]} "$@"
  }
  
-+function vmm_parse_premature_failure()
++function vmm_probe_maxsmp()
 +{
-+	${vmm_optname[$(vmm_get_target),parse_premature_failure]} "$@"
++	${vmm_optname[$(vmm_get_target),probe_maxsmp]} "$1"
 +}
 +
  function vmm_get_target()
