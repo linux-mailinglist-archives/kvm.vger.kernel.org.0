@@ -1,83 +1,86 @@
-Return-Path: <kvm+bounces-50680-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50681-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B01EAE8363
-	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 14:57:08 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBE0EAE837D
+	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 14:59:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C033A4A6BD7
-	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 12:56:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 636F47B707F
+	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 12:57:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 657662620C6;
-	Wed, 25 Jun 2025 12:53:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 009EF261393;
+	Wed, 25 Jun 2025 12:59:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OxtAGA5L"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YgD2rISE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23F282620C8
-	for <kvm@vger.kernel.org>; Wed, 25 Jun 2025 12:53:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C32E425DAE3
+	for <kvm@vger.kernel.org>; Wed, 25 Jun 2025 12:59:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750856009; cv=none; b=g24B9u1NTvQZG326wRLL+MYQ/1FqKqUUqXDUP4wf9Jetzsa+lQzOhVFwtYfBBTaHoXExjBi7S8OaqDHtqq5QTdNQmT8/XKXMqASQmTgfI+k4oUwI7XOAnzKdrVqhM4B8W0dULfmy8SspRFQmLH4gNeXDN4FFtkWkvZn34+2aqgA=
+	t=1750856348; cv=none; b=DI+oOBtjDRCia8RrPAXgSR8a/LXrQXUuolGQCELvIZkr867uckvKXUo9sT/WRMAQXcVmrhzS9FT68u0Vz9lhVvzTR0yKq74md3J4YNkBTTDpxW48L2JrLABp1danBj/iZ0rKJMUAhwGPh2vua5mvxXEuVjtLVs6CMaVlAeDZkQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750856009; c=relaxed/simple;
-	bh=LyYQDcnXmGsVu73bpfzmTVDLBrEXLKs1lCcXT5WkdYU=;
+	s=arc-20240116; t=1750856348; c=relaxed/simple;
+	bh=omSb4qtffp8wKfjxeF+cs4XkxHLiftOc0485WaPmKr4=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ErfXmfHTdH1PGaGrZKAx0k+b2LXa3zZPepVKZgFmXk7KcnjB6sug5b8e90MUMrrrnm/oLyaUkHv7vIwP77EUDTwBtFSyu+B1SkR5zMhUngiIEOxYKqFOomFaeo7Fm+mINiV5dxpHcZh5XncZVtpUR0zloVsiyAy01oiC/QtBjlc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OxtAGA5L; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=U38gA/IrM5cyp3PVd2VBheyRzH8aYyZ8rSRtAZUVhKvGndENk1qQNxBlZpmXkUu3wWuQeYeEh2apdZEUwTJfUd10eY+C1p5K7+Ojz555wYrlUQBbs1UIzWEpUq5SvNy1CnizEPgog4S45ii6Jw2MYQ5Z2sKgwMF/dLO1qnm3ZAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YgD2rISE; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2356ce55d33so25785745ad.0
-        for <kvm@vger.kernel.org>; Wed, 25 Jun 2025 05:53:27 -0700 (PDT)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b2fa1a84566so4168459a12.1
+        for <kvm@vger.kernel.org>; Wed, 25 Jun 2025 05:59:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750856007; x=1751460807; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1750856346; x=1751461146; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Qm9UdCmx0AUjdXCDjy0dtaSU1yfF/6cv13NPsG0xoPg=;
-        b=OxtAGA5LpfPL2vRuPmjdvZ7zVnn59HhhsUiL8FIsXqJRLO9Cc5nrrTiy6F4g92OxJa
-         zVPdPo0f1m5O4Ix5vHfhg2brORVyqSNuRdtOd0zFMedqOpFo+yLRuVZIkUPKZSgpFLUX
-         9aUQs75xPjeBX+95fV1qwEYZ0KuuieKZ/m1u0pecY419oQM+rdi65CQlA9XtvLiuyGkU
-         H5Wtf9iLyjxLK9ZwPw8PFQAgIqOUqJjUowa9iFHaMcyfDFqrUo9KyEe7FojwSetAxYPX
-         HRXxKA7vxeFSiFIJPQtfvM+z8BnT1eBVidaKnHYwBs72SVHVJEQbzaDYSXHOTOTSmRl0
-         9Q7Q==
+        bh=qxIJ4aQC+IjPoRxmkOWSPu5mR2v1UrY8osqVxd/rWGo=;
+        b=YgD2rISEmIjCkeWL/GZXsDdayMEREwYQ72YwmK8Q7XiBgVMKgtr1mKgNy/agb5bljK
+         1bPr8VlnBGqZ3DtaHo3CB9JSTzgrfia6iZWyP0ssZ9+VFW04VKYN1z11Tu8mdnWTryZ3
+         cu7JgJX42jDoQoAGaOVcp/6Vc6/mcwh2lCNC1b+RD5ifEMeqR6+zVW5ShTCH6fzDrk9U
+         1LafOplOV0jW+STFin7QukSMGb/W9HCwRt900K+DpsAucaBDkmV77m+WegZmHvcAbMug
+         k/K1XjdTH0TI5GAh7gaZMEk0HR1eHW63xpxicPOm8aO9ot3lMI0vTOlN/7/ymsHSP9yM
+         M4VQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750856007; x=1751460807;
+        d=1e100.net; s=20230601; t=1750856346; x=1751461146;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Qm9UdCmx0AUjdXCDjy0dtaSU1yfF/6cv13NPsG0xoPg=;
-        b=vgU2eEwwNP/5CUzZvZhzog7RF0a9dzcMv+I0JunWOml4WSLqp6Ok5XzIJhwuACv9pg
-         fedE/WR7EtjvX8JlnCOqRDlH+w+Kp0oUx+sdwPLGHNmmytDOYQmXsuidWm0h6yMu6NJ9
-         mezSnFrIsKqKkRrU54mnJgEhyNFXozhkG6OP0GAtYa6sgFO69I3FGNebGLHEgAnBMR0H
-         o3NFpqGcbUVynElw+hFDPr6fHrfOS75OzU6qYjLD9YaiTZvhBguaycei9nGS/wKHai5Q
-         743pGkRVLcSraP1Q94X/YBuP3CZEMyGOgrOnVgO2yS7vQwrZW/55ujdrdUZITX3+yOiN
-         Qx9w==
-X-Forwarded-Encrypted: i=1; AJvYcCXGuIoHZrcrI1X162p/GnUCSVlUWmQ8JIImAjeEsQWbxZzluouT7exakTcsN+N/K70Kpgw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwalBBn1XOVVGnpVa3TDvfweMsjmuxFV2LAEXPyNw45SvvM4Lgx
-	oq3v7Wi6zI28KV4xK7bCgp8PomzkKxclGDn/wojLorbfMi0DsnJzuOlj9VY6D2Doi3nmCj4Fy3R
-	O/SBSgg==
-X-Google-Smtp-Source: AGHT+IFkzNNA6kVoA+2D6FAE4AOHOnEwMQn/97TNwefolAE17lsZ+t6y3XTUeyFLF/Yx7w++6g2MSRnkPqg=
-X-Received: from plbmv13.prod.google.com ([2002:a17:903:b8d:b0:235:54f:4f12])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:2bcc:b0:235:5a9:976f
- with SMTP id d9443c01a7336-23824030ccdmr68655075ad.24.1750856007263; Wed, 25
- Jun 2025 05:53:27 -0700 (PDT)
-Date: Wed, 25 Jun 2025 05:53:25 -0700
-In-Reply-To: <20250610175424.209796-2-Neeraj.Upadhyay@amd.com>
+        bh=qxIJ4aQC+IjPoRxmkOWSPu5mR2v1UrY8osqVxd/rWGo=;
+        b=RhD+tUglGiRtB/kCgcnAmSrGGB/u4cg7beYzQTGsXmvKcviCtgvwd/HlfXFdIcU0oJ
+         ra1jauanIPmI9ShP7MjN+rL9ORFtI5O0IGS8IKviWDujZ/vKDO3CSU884xPUwK29o4d8
+         UZ2/FYcwWgCoXwTkqAuVzW+iEEtzOmuJ4NR5OQte+ZUGfrvWBjLlr+amN4ezDe+7LH/0
+         ifT71wFZsAyy50SgL+E2eWCu03PEsQ06qnJtNbh2Y2RZOog8WIbjXyXmFHjjy7REI33C
+         nhL2DKXhRAcLO1gGlEjEM+wERegSM5Ysx47Uc55ROQq3+dObWLFXXj0YzFkcJgLETZVr
+         R5kg==
+X-Forwarded-Encrypted: i=1; AJvYcCU8+bkw9yfDMCVLNzHIB2zvUCx1WkgF5yFW1lczu/1IGWehIAtxmpuGmjn3+/kb4ssJ/30=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz99/HWJA1sQ/NdlYtPOCXgbfcDK8Esn3OuvSeQR+CMCEolFg+X
+	Srt2XXUHrz7vEP58cqO8cIRyKrwsnwuh/aAB5mZc8/zxt/Ifzlp4l7YMgKI4YA6OPfZ0iVrFeR4
+	JPiOxsw==
+X-Google-Smtp-Source: AGHT+IEhIwcr6ikR86NXDpgfcAQublPKVJCRuEFifK28YdTxbvKmmfgddvnr2t043GixUvzzZ12CrvVkj/A=
+X-Received: from pjj15.prod.google.com ([2002:a17:90b:554f:b0:311:eb65:e269])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2f0c:b0:315:9ac2:8700
+ with SMTP id 98e67ed59e1d1-315f269caabmr4382059a91.24.1750856346092; Wed, 25
+ Jun 2025 05:59:06 -0700 (PDT)
+Date: Wed, 25 Jun 2025 05:59:04 -0700
+In-Reply-To: <24675ed2-e3ae-4473-9d8e-acd378da220c@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250610175424.209796-1-Neeraj.Upadhyay@amd.com> <20250610175424.209796-2-Neeraj.Upadhyay@amd.com>
-Message-ID: <aFvxRctwWEtRde08@google.com>
-Subject: Re: [RFC PATCH v7 01/37] KVM: lapic: Remove __apic_test_and_{set|clear}_vector()
+References: <20250610175424.209796-1-Neeraj.Upadhyay@amd.com>
+ <20250610175424.209796-4-Neeraj.Upadhyay@amd.com> <20250623114910.GGaFk_NqzGmR81fG8f@fat_crate.local>
+ <24675ed2-e3ae-4473-9d8e-acd378da220c@amd.com>
+Message-ID: <aFvymAS-pXMwkmjX@google.com>
+Subject: Re: [RFC PATCH v7 03/37] x86/apic: KVM: Deduplicate APIC vector =>
+ register+bit math
 From: Sean Christopherson <seanjc@google.com>
 To: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
-Cc: linux-kernel@vger.kernel.org, bp@alien8.de, tglx@linutronix.de, 
+Cc: Borislav Petkov <bp@alien8.de>, linux-kernel@vger.kernel.org, tglx@linutronix.de, 
 	mingo@redhat.com, dave.hansen@linux.intel.com, Thomas.Lendacky@amd.com, 
 	nikunj@amd.com, Santosh.Shukla@amd.com, Vasant.Hegde@amd.com, 
 	Suravee.Suthikulpanit@amd.com, David.Kaplan@amd.com, x86@kernel.org, 
@@ -86,95 +89,37 @@ Cc: linux-kernel@vger.kernel.org, bp@alien8.de, tglx@linutronix.de,
 	francescolavra.fl@gmail.com, tiala@microsoft.com
 Content-Type: text/plain; charset="us-ascii"
 
-"KVM: x86:" for the scope.  That goes for all of the relevant shortlogs.
-
-And for this one in particular, maybe something like:
-
-  KVM: x86: Open code setting/clearing of bits in the ISR
-
-because seeing "Remove" in the shortlog reads like it's a straight deletion of
-code.
-
-On Tue, Jun 10, 2025, Neeraj Upadhyay wrote:
-> Remove __apic_test_and_set_vector() and __apic_test_and_clear_vector(),
-> because the _only_ register that's safe to modify with a non-atomic
-> operation is ISR, because KVM isn't running the vCPU, i.e. hardware can't
-> service an IRQ or process an EOI for the relevant (virtual) APIC.
+On Wed, Jun 25, 2025, Neeraj Upadhyay wrote:
 > 
-> No functional change intended.
 > 
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> [Neeraj: Add "inline" for apic_vector_to_isr()]
-> Signed-off-by: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
-> ---
-> Changes since v6:
+> On 6/23/2025 5:19 PM, Borislav Petkov wrote:
+> > On Tue, Jun 10, 2025 at 11:23:50PM +0530, Neeraj Upadhyay wrote:
+> >> diff --git a/arch/x86/include/asm/apic.h b/arch/x86/include/asm/apic.h
+> >> index 23d86c9750b9..c84d4e86fe4e 100644
+> >> --- a/arch/x86/include/asm/apic.h
+> >> +++ b/arch/x86/include/asm/apic.h
+> >> @@ -488,11 +488,14 @@ static inline void apic_setup_apic_calls(void) { }
+> >>  
+> >>  extern void apic_ack_irq(struct irq_data *data);
+> >>  
+> >> +#define APIC_VECTOR_TO_BIT_NUMBER(v) ((unsigned int)(v) % 32)
+> >> +#define APIC_VECTOR_TO_REG_OFFSET(v) ((unsigned int)(v) / 32 * 0x10)
+> > 
+> > Dunno - I'd probably shorten those macro names:
+> > 
+> > APIC_VEC_TO_BITNUM()
+> > APIC_VEC_TO_REGOFF()
+> > 
+> > because this way of shortening those words is very common and is still very
+> > readable, even if not fully written out...
+> > 
 > 
->  - New change.
-> 
->  arch/x86/kvm/lapic.c | 19 +++++++------------
->  1 file changed, 7 insertions(+), 12 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 73418dc0ebb2..11e57f351ce5 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -125,16 +125,6 @@ bool kvm_apic_pending_eoi(struct kvm_vcpu *vcpu, int vector)
->  		apic_test_vector(vector, apic->regs + APIC_IRR);
->  }
->  
-> -static inline int __apic_test_and_set_vector(int vec, void *bitmap)
-> -{
-> -	return __test_and_set_bit(VEC_POS(vec), (bitmap) + REG_POS(vec));
-> -}
-> -
-> -static inline int __apic_test_and_clear_vector(int vec, void *bitmap)
-> -{
-> -	return __test_and_clear_bit(VEC_POS(vec), (bitmap) + REG_POS(vec));
-> -}
-> -
->  __read_mostly DEFINE_STATIC_KEY_FALSE(kvm_has_noapic_vcpu);
->  EXPORT_SYMBOL_GPL(kvm_has_noapic_vcpu);
->  
-> @@ -744,9 +734,14 @@ void kvm_apic_clear_irr(struct kvm_vcpu *vcpu, int vec)
->  }
->  EXPORT_SYMBOL_GPL(kvm_apic_clear_irr);
->  
-> +static inline void *apic_vector_to_isr(int vec, struct kvm_lapic *apic)
+> Sounds good to me. Will change this in next version (will also wait for Sean's
+> comment on this).
 
-<formletter>
-
-Do not use "inline" for functions that are visible only to the local compilation
-unit.  "inline" is just a hint, and modern compilers are smart enough to inline
-functions when appropriate without a hint.
-
-A longer explanation/rant here: https://lore.kernel.org/all/ZAdfX+S323JVWNZC@google.com
-
-</formletter>
-
-Ignoring the existing code below, there's lots of crusty old code in KVM (that
-isn't "bad" per se, i.e. isn't worth fixing unless a prime opportunity arises).
-
-> +{
-> +	return apic->regs + APIC_ISR + REG_POS(vec);
-> +}
-> +
->  static inline void apic_set_isr(int vec, struct kvm_lapic *apic)
->  {
-> -	if (__apic_test_and_set_vector(vec, apic->regs + APIC_ISR))
-> +	if (__test_and_set_bit(VEC_POS(vec), apic_vector_to_isr(vec, apic)))
->  		return;
->  
->  	/*
-> @@ -789,7 +784,7 @@ static inline int apic_find_highest_isr(struct kvm_lapic *apic)
->  
->  static inline void apic_clear_isr(int vec, struct kvm_lapic *apic)
->  {
-> -	if (!__apic_test_and_clear_vector(vec, apic->regs + APIC_ISR))
-> +	if (!__test_and_clear_bit(VEC_POS(vec), apic_vector_to_isr(vec, apic)))
->  		return;
->  
->  	/*
-> -- 
-> 2.34.1
-> 
+My vote is for the long names.  I find REG_OFFSET in particular to be much more
+self-documenting.  My brain gets there eventually with REGOFF, but I just don't
+see the point in shortening the names.  The only uses where line lengths get a
+bit too long are apic_set_isr() and apic_clear_isr(), and the lines are still
+quite long with the shorter names.
 
