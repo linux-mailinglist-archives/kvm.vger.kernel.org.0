@@ -1,140 +1,213 @@
-Return-Path: <kvm+bounces-50605-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50608-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75157AE74D5
-	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 04:30:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 116B1AE7510
+	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 05:04:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6CE13189BD9A
-	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 02:30:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EDF041921ABE
+	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 03:04:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 149561B042E;
-	Wed, 25 Jun 2025 02:29:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="FaEtC4PR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EEDB1CEAD6;
+	Wed, 25 Jun 2025 03:03:52 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx1.zhaoxin.com (MX1.ZHAOXIN.COM [210.0.225.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58C8E156F45
-	for <kvm@vger.kernel.org>; Wed, 25 Jun 2025 02:29:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87035156237
+	for <kvm@vger.kernel.org>; Wed, 25 Jun 2025 03:03:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.0.225.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750818592; cv=none; b=ITahdfFhiUU4Fv6yBq7HMMRrDV0e/Zthi7gxW4VR6eLnXjw8Ofsd8Sf7DCF0mIEY4K8+NjthmMZna2X6GIZbn4Z/sk0fFTC38TylQ46CooNh9haBsJkhsqkyGiXkRSUOaKosz2BW0VAK31dwNk817Z3aa2fYBSZuxZg0g/vhd20=
+	t=1750820632; cv=none; b=trlTfMwoclTkva895DDdxRSyNVsLf6E9ziePTJmkRARdYsCKEWjOnUudWrs2RCuAY7775IP9V49/bd3fKXrF7bx/AjfgHG+opfYygumkhR8IBctq9M4MQuGV9/Bv1LrLkcaLWPXGEup695f0Par7WwJc5Pjy1Jn3Ll2ZAIYfKKk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750818592; c=relaxed/simple;
-	bh=Ackd6oL4QEZhNsdWFDsaCVzCrTRV/Pf/z7DouQ0Gs5M=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PYz0a3XgsPFXtTzDL6mMrSn8vplruZP++fBwCBzlHZeq/TwIBS8i5Z/w8sBDgF7Ec/pkKvHGoMVJALp2lWVPeTVAUOrSkuZINv9+3/QQVEfaPva7A6jeAX4d78+K5IDG3JN5n19SotTP/b9tV7Pqs1chep6TlrkIsFJ4iN7nIPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=FaEtC4PR; arc=none smtp.client-ip=209.85.210.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-7490702fc7cso554622b3a.1
-        for <kvm@vger.kernel.org>; Tue, 24 Jun 2025 19:29:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1750818590; x=1751423390; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xRoBVr301Z32U1U+wNWEV8kI1I28cFbSqrPbaNR/5yE=;
-        b=FaEtC4PR0e/+kCEZrQqIngn7iPIeonQIqX4lHfs8Ia4lG4Fl4FJKylBFFHvynwJ26q
-         rrNZVbzMpcdkCTlMPFo/HlbEF36fytlifbMBut6luG0v0MW5dqFZr4hObsfLPN3Uoiyq
-         BpPJfm1LGX8eiyVZPM5i5VsoPuq2mKMDRNVZHSsIZAvFwUW0WAnI6ypPSv/j9C6NmkhO
-         jk7zMZaltA3c9AEVAn/eEHfsjfuYPIPJEUi7p769DohOEh/xkESlYyufb3qGwUp+Kiy4
-         fERTIZZcwJAlbaA6PElj4VjT58nS1cZE6+6iQq2VC+DXIwMUqQy+cZZr7rPg+RAv/z2r
-         H/5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750818590; x=1751423390;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xRoBVr301Z32U1U+wNWEV8kI1I28cFbSqrPbaNR/5yE=;
-        b=iaNKG0zOaxWTth3qmzlo6lm1FQtSIPVGe5z6Y1mwm5PlVjK4ECv8C4BkYWQ1nyndyj
-         /DLOxwNBlH0wmhpS/1J28Db8OXsLQY85f918DH1hkvNK+OTsdKWvUMJbJPGdZexAP/Hk
-         QataTFAAGflwLoPlVgXRJvC5kk3hru2d+Xfr1fhLm1eCCju3J2vn+b6wLZIbZ8WJxdm0
-         pxCqEx3xs3b5HJqWKfRjgv8YzgGEcMYC+VgJ5d1dfczBxq25FYi/H14FAZuWTbJ/n3Of
-         /h39M5AjZ4+yayks6+xitYtQTSowT3RjqyuDQ79smCmqtoaTwlFuEAhBDhp834VviNJO
-         ZNPw==
-X-Forwarded-Encrypted: i=1; AJvYcCXb/eF6PjwFqp3tem6bPgofkh/4gBrimIs3vl9EopmT6ErHAhmsckC6s9fDGLQ/lfFGA18=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwMTM/WD8VOuqKPuyMN/M5nqb0Ckis6AeNaThFZg60ny3ffOT5I
-	wBu0dZa0NxZq0D0VwsD3K+KAWIo7rqBRBfIoJSR9WoCjlOSF7EW8PjcU+n9WImzgyS0=
-X-Gm-Gg: ASbGnctSF5mjeGoRbbVhOdsmAP/gaOjiKpswxxzaJzNTJujfzJcK705IV3MA2Vv8cUF
-	bt9WvNUeTQE1Swvru4atM4kasbTeso/rkD6tlUtJ+hEqNx/hm4/LkLGoG/MCgS6LNp0rUvTWpGz
-	jTCgtegf0UHVHf+6z6rHTy8H1lSAV/qlP2YtW7JZgGo+V5rBNoFx7aZfTyECKGTgfpiUtdUva3G
-	e2CVAMxzOmbaNDQO/k6bOZq0YMVZtDjHOvo9TgvzYxoXz6rnjjTYRFCNvTnTaBFQydOWzMOz9qZ
-	H7H4OtftPM4yRaklOpUcYy60UBdLf+oPDV6OG8jYdbAHBH1uoEvPV7tNv6X9xP22lYzbezJNpAG
-	zx4auuSkzT6Td
-X-Google-Smtp-Source: AGHT+IGDhzovgW8mfz1TgwEtDPLzMaEOkE7E5An9/EYwotB65YMux34Z99Rx+rpB+eyQKTmSPq1Cmg==
-X-Received: by 2002:a05:6a00:2290:b0:736:5e28:cfba with SMTP id d2e1a72fcca58-74ad44d861dmr2057195b3a.18.1750818589640;
-        Tue, 24 Jun 2025 19:29:49 -0700 (PDT)
-Received: from localhost.localdomain ([203.208.189.7])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-749b5e08caesm3190947b3a.4.2025.06.24.19.29.46
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 24 Jun 2025 19:29:49 -0700 (PDT)
-From: lizhe.67@bytedance.com
-To: lkp@intel.com
-Cc: alex.williamson@redhat.com,
-	david@redhat.com,
-	jgg@ziepe.ca,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	lizhe.67@bytedance.com,
-	oe-kbuild-all@lists.linux.dev,
-	peterx@redhat.com
-Subject: Re: [PATCH v5 1/3] vfio/type1: batch vfio_find_vpfn() in function vfio_unpin_pages_remote()
-Date: Wed, 25 Jun 2025 10:29:42 +0800
-Message-ID: <20250625022942.76489-1-lizhe.67@bytedance.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <202506250037.VfdBAPP3-lkp@intel.com>
-References: <202506250037.VfdBAPP3-lkp@intel.com>
+	s=arc-20240116; t=1750820632; c=relaxed/simple;
+	bh=c9bMypMKu/DycRDbwVgf6ZNuY6g65WZq+uB5eJo+YIs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=sPa/wjA4QWvvhpCF1FZJnQlq/e3Equa+38f6es1RRzWjIaLYbH842zEu0Ur+T7CO3EI+1RBSYqWkuBdZ9+i5WI4s6owNPJb/OPmO5+d/jSVC58zkpwTF7UQLjyEBiTSdpj50Wos6Q0nIeyAKUtomEYcnNE2/KOVVEplrsoDmt3k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com; spf=pass smtp.mailfrom=zhaoxin.com; arc=none smtp.client-ip=210.0.225.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zhaoxin.com
+X-ASG-Debug-ID: 1750820580-086e2327834ede0001-HEqcsx
+Received: from ZXSHMBX3.zhaoxin.com (ZXSHMBX3.zhaoxin.com [10.28.252.165]) by mx1.zhaoxin.com with ESMTP id RqpEFWejASXYs45n (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO); Wed, 25 Jun 2025 11:03:00 +0800 (CST)
+X-Barracuda-Envelope-From: EwanHai-oc@zhaoxin.com
+X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.165
+Received: from ZXSHMBX1.zhaoxin.com (10.28.252.163) by ZXSHMBX3.zhaoxin.com
+ (10.28.252.165) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.44; Wed, 25 Jun
+ 2025 11:03:00 +0800
+Received: from ZXSHMBX1.zhaoxin.com ([::1]) by ZXSHMBX1.zhaoxin.com
+ ([fe80::2c07:394e:4919:4dc1%7]) with mapi id 15.01.2507.044; Wed, 25 Jun 2025
+ 11:03:00 +0800
+X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.165
+Received: from [192.168.31.91] (10.28.66.62) by zxbjmbx1.zhaoxin.com
+ (10.29.252.163) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.44; Wed, 25 Jun
+ 2025 10:54:05 +0800
+Message-ID: <ccaafc02-dd20-4593-9298-791fbd597580@zhaoxin.com>
+Date: Wed, 25 Jun 2025 10:54:02 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC 01/10] i386/cpu: Mark CPUID[0x80000005] as reserved for
+ Intel
+To: Zhao Liu <zhao1.liu@intel.com>
+X-ASG-Orig-Subj: Re: [RFC 01/10] i386/cpu: Mark CPUID[0x80000005] as reserved for
+ Intel
+CC: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti
+	<mtosatti@redhat.com>, =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?=
+	<berrange@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Babu Moger
+	<babu.moger@amd.com>, Xiaoyao Li <xiaoyao.li@intel.com>, Tejus GK
+	<tejus.gk@nutanix.com>, Jason Zeng <jason.zeng@intel.com>, Manish Mishra
+	<manish.mishra@nutanix.com>, Tao Su <tao1.su@intel.com>,
+	<qemu-devel@nongnu.org>, <kvm@vger.kernel.org>, <cobechen@zhaoxin.com>,
+	<Frankzhu@zhaoxin.com>, <Runaguo@zhaoxin.com>, <yeeli@zhaoxin.com>,
+	<Xanderchen@zhaoxin.com>, <MaryFeng@zhaoxin.com>
+References: <20250423114702.1529340-1-zhao1.liu@intel.com>
+ <20250423114702.1529340-2-zhao1.liu@intel.com>
+ <fa16f7a8-4917-4731-9d9f-7d4c10977168@zhaoxin.com>
+ <aDWCxhsCMavTTzkE@intel.com>
+ <3318af5c-8a46-4901-91f2-0b2707e0a573@zhaoxin.com>
+ <aFpSN+zEgJl72V46@intel.com>
+ <8bab0159-54d3-4f48-aadf-23491171018d@zhaoxin.com>
+ <aFtnEOlRthXGbC05@intel.com>
+From: Ewan Hai <ewanhai-oc@zhaoxin.com>
+In-Reply-To: <aFtnEOlRthXGbC05@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: ZXSHCAS1.zhaoxin.com (10.28.252.161) To
+ zxbjmbx1.zhaoxin.com (10.29.252.163)
+X-Moderation-Data: 6/25/2025 11:02:59 AM
+X-Barracuda-Connect: ZXSHMBX3.zhaoxin.com[10.28.252.165]
+X-Barracuda-Start-Time: 1750820580
+X-Barracuda-Encrypted: ECDHE-RSA-AES128-GCM-SHA256
+X-Barracuda-URL: https://10.28.252.35:4443/cgi-mod/mark.cgi
+X-Virus-Scanned: by bsmtpd at zhaoxin.com
+X-Barracuda-Scan-Msg-Size: 4546
+X-Barracuda-BRTS-Status: 1
+X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
+X-Barracuda-Spam-Score: -1.62
+X-Barracuda-Spam-Status: No, SCORE=-1.62 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=9.0 tests=BSF_SC0_SA085b
+X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.143355
+	Rule breakdown below
+	 pts rule name              description
+	---- ---------------------- --------------------------------------------------
+	0.40 BSF_SC0_SA085b         Custom Rule SA085b
 
-On Wed, 25 Jun 2025 00:23:03 +0800,
-kernel test robot <lkp@intel.com> wrote:
 
-> kernel test robot noticed the following build errors:
-> 
-> [auto build test ERROR on awilliam-vfio/next]
-> [also build test ERROR on awilliam-vfio/for-linus linus/master v6.16-rc3 next-20250624]
-> [If your patch is applied to the wrong git tree, kindly drop us a note.
-> And when submitting patch, we suggest to use '--base' as documented in
-> https://git-scm.com/docs/git-format-patch#_base_tree_information]
-> 
-> url:    https://github.com/intel-lab-lkp/linux/commits/lizhe-67-bytedance-com/vfio-type1-batch-vfio_find_vpfn-in-function-vfio_unpin_pages_remote/20250620-112605
-> base:   https://github.com/awilliam/linux-vfio.git next
-> patch link:    https://lore.kernel.org/r/20250620032344.13382-2-lizhe.67%40bytedance.com
-> patch subject: [PATCH v5 1/3] vfio/type1: batch vfio_find_vpfn() in function vfio_unpin_pages_remote()
-> config: x86_64-rhel-9.4 (https://download.01.org/0day-ci/archive/20250625/202506250037.VfdBAPP3-lkp@intel.com/config)
-> compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250625/202506250037.VfdBAPP3-lkp@intel.com/reproduce)
-> 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202506250037.VfdBAPP3-lkp@intel.com/
-> 
-> All errors (new ones prefixed by >>):
-> 
->    drivers/vfio/vfio_iommu_type1.c: In function 'vfio_unpin_pages_remote':
-> >> drivers/vfio/vfio_iommu_type1.c:738:37: error: implicit declaration of function 'vpfn_pages'; did you mean 'vma_pages'? [-Werror=implicit-function-declaration]
->      738 |         long unlocked = 0, locked = vpfn_pages(dma, iova, npage);
->          |                                     ^~~~~~~~~~
->          |                                     vma_pages
->    cc1: some warnings being treated as errors
 
-Perhaps we need to compile with this patch[1] included to avoid build
-errors.
+On 6/25/25 11:03 AM, Zhao Liu wrote:
+> 
+> 
+> On Tue, Jun 24, 2025 at 07:04:02PM +0800, Ewan Hai wrote:
+>> Date: Tue, 24 Jun 2025 19:04:02 +0800
+>> From: Ewan Hai <ewanhai-oc@zhaoxin.com>
+>> Subject: Re: [RFC 01/10] i386/cpu: Mark CPUID[0x80000005] as reserved for
+>>   Intel
+>>
+>>
+>>
+>> On 6/24/25 3:22 PM, Zhao Liu wrote:
+>>>
+>>> On Tue, May 27, 2025 at 05:56:07PM +0800, Ewan Hai wrote:
+>>>> Date: Tue, 27 May 2025 17:56:07 +0800
+>>>> From: Ewan Hai <ewanhai-oc@zhaoxin.com>
+>>>> Subject: Re: [RFC 01/10] i386/cpu: Mark CPUID[0x80000005] as reserved for
+>>>>    Intel
+>>>>
+>>>>
+>>>>
+>>>> On 5/27/25 5:15 PM, Zhao Liu wrote:
+>>>>>
+>>>>>> On 4/23/25 7:46 PM, Zhao Liu wrote:
+>>>>>>>
+>>>>>>> Per SDM, 0x80000005 leaf is reserved for Intel CPU, and its current
+>>>>>>> "assert" check blocks adding new cache model for non-AMD CPUs.
+>>>>>>>
+>>>>>>> Therefore, check the vendor and encode this leaf as all-0 for Intel
+>>>>>>> CPU. And since Zhaoxin mostly follows Intel behavior, apply the vendor
+>>>>>>> check for Zhaoxin as well.
+>>>>>>>
+>>>>>>> Note, for !vendor_cpuid_only case, non-AMD CPU would get the wrong
+>>>>>>> information, i.e., get AMD's cache model for Intel or Zhaoxin CPUs.
+>>>>>>> For this case, there is no need to tweak for non-AMD CPUs, because
+>>>>>>> vendor_cpuid_only has been turned on by default since PC machine v6.1.
+>>>>>>>
+>>>>>>> Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
+>>>>>>> ---
+>>>>>>>      target/i386/cpu.c | 16 ++++++++++++++--
+>>>>>>>      1 file changed, 14 insertions(+), 2 deletions(-)
+>>>>>>>
+>>>>>>> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+>>>>>>> index 1b64ceaaba46..8fdafa8aedaf 100644
+>>>> [snip]>>> +
+>>>>>>>              *eax = (L1_DTLB_2M_ASSOC << 24) | (L1_DTLB_2M_ENTRIES << 16) |
+>>>>>>>                     (L1_ITLB_2M_ASSOC <<  8) | (L1_ITLB_2M_ENTRIES);
+>>>>>>>              *ebx = (L1_DTLB_4K_ASSOC << 24) | (L1_DTLB_4K_ENTRIES << 16) |
+>>>>>>
+>>>>>> I've reviewed the cache-related CPUID path and noticed an oddity: every AMD
+>>>>>> vCPU model still reports identical hard-coded values for the L1 ITLB and L1
+>>>>>> DTLB fields in leaf 0x8000_0005. Your patch fixes this for Intel(and
+>>>>>> Zhaoxin), but all AMD models continue to receive the same constants in
+>>>>>> EAX/EBX.
+>>>>>
+>>>>> Yes, TLB info is hardcoded here. Previously, Babu and Eduardo cleaned up
+>>>>> the cache info but didn't cover TLB [*]. I guess one reason would there
+>>>>> are very few use cases related to TLB's info, and people are more
+>>>>> concerned about the cache itself.
+>>>>>
+>>>>> [*]: https://lore.kernel.org/qemu-devel/20180510204148.11687-2-babu.moger@amd.com/
+>>>>
+>>>> Understood. Keeping the L1 I/D-TLB fields hard-coded for every vCPU model is
+>>>> acceptable.
+>>>>
+>>>>>> Do you know the reason for this choice? Is the guest expected to ignore
+>>>>>> those L1 TLB numbers? If so, I'll prepare a patch that adjusts only the
+>>>>>> Zhaoxin defaults in leaf 0x8000_0005 like below, matching real YongFeng
+>>>>>> behaviour in ecx and edx, but keep eax and ebx following AMD's behaviour.
+>>>>>
+>>>>> This way is fine for me.
+>>>>>
+>>>>
+>>>> Thanks for confirming. I'll post the YongFeng cache-info series once your
+>>>> refactor lands.
+>>>
+>>> Hi Ewan,
+>>>
+>>> By this patch:
+>>>
+>>> https://lore.kernel.org/qemu-devel/20250620092734.1576677-14-zhao1.liu@intel.com/
+>>>
+>>> I fixed the 0x80000005 leaf for Intel and Zhaoxin based on your feedback
+>>> by the way.
+>>>
+>>> It looks like the unified cache_info would be very compatible with
+>>> various vendor needs and corner cases. So I'll respin this series based
+>>> on that cache_info series.
+>>>
+>>> Before sending the patch, I was thinking that maybe I could help you
+>>> rebase and include your Yongfeng cache model patch you added into my v2
+>>> series, or you could rebase and send it yourself afterward. Which way do
+>>> you like?
+>>
+>> It would be great if you could include the Yongfeng cache-model patch in
+>> your v2 series. Let me know if you need any more information about the
+>> Yongfeng cache model. After you submit v2, I can review the Zhaoxin parts
+>> and make any necessary code changes if needed.
+>>
+>> And thanks again for taking Zhaoxin into account.
+> 
+> Welcome; it's something I can easily help with. If possible, when v2 is
+> out, hope you could help test it on your platform to ensure everything
+> is fine. :-) And I've verified it myself through TCG.
+> 
+There's no problem!> Thanks,
+> Zhao
+> 
 
-Thanks,
-Zhe
-
-[1]: https://lore.kernel.org/all/20250529064947.38433-1-lizhe.67@bytedance.com/
 
