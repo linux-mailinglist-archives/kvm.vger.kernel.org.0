@@ -1,104 +1,133 @@
-Return-Path: <kvm+bounces-50763-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50764-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60973AE9112
-	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 00:27:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C04BEAE9113
+	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 00:27:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C8881189D980
-	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 22:28:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C07505A72A6
+	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 22:27:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D92B2F3C14;
-	Wed, 25 Jun 2025 22:27:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF9832F3C19;
+	Wed, 25 Jun 2025 22:27:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RAe6HYud"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WUBRMx0C"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 088FD2F3C11
-	for <kvm@vger.kernel.org>; Wed, 25 Jun 2025 22:27:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC0C12F3636
+	for <kvm@vger.kernel.org>; Wed, 25 Jun 2025 22:27:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750890437; cv=none; b=mzXf7z6Z8hPnQJzW98/lQbEXAJ/ctDJJGgfeaC3ZfUNIquHJ9Z+i2YC3vrkUuCoNsnvaVII7gUGFrWUdVQ19a/qFhNZNWpX35aEev0hdSPb7EuZlG5JK6C6uBxftIxnMpUIvnyNkeS3O1wxXfAERNJgHaCyNhTB8InPDnZ/HGZY=
+	t=1750890444; cv=none; b=tg8ISALashvtsftTV9PnNjwNjBQb4cjNFH14Tp8R8RmEAXBGQghcyx942xnQwomE+T9BmGJfcSPA0Elyt5TAcVun+A6qg9z0siw10PfB8NZ0yhWn0kV64LuNa3IMrw/MtvKw5xDRPUYHe+kZDqXGE7wpVbBXgYkuVBp8ZRzMZv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750890437; c=relaxed/simple;
-	bh=SJTTshElcz4YKEFpktu6YHhF9M5xQBdck5cNqKIQSnA=;
+	s=arc-20240116; t=1750890444; c=relaxed/simple;
+	bh=DFEscZ5b9vsxNrK8XTNMnFYFNxl79YOdvWMgo8lbEa8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=MrQUqeh04QdVVAoijgozJ8ZeNRgtzzv75i5X0+Bbd/LQaUQf3rvsLfIJm0mW341Aui5PQJkhDMnjNUBgwIemQES/di1KZrgKbl2vCFKjOVIaZDVQZh0nA86JGt5SjbDnR8c8b6u1v74sVdCUQIcEAC4LKptbFUl1UR15uMnhRg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RAe6HYud; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=OvC8X/5EfIMqKlYVVg5RqUMdZqYotmuFZhaQvWKKTXtGBxQoOU9uRIASqc3DY1INmjZDHHvupzvIKX1ixne2DGhf+AALbzn5YPgoX0V7NKCTFRdYwVcA5J8O1Ne4M0rtskbHyuKZFWfjpLZ5Lz5kDnXu3+VXM/Es8fVOxcUutWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WUBRMx0C; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-311ef4fb5fdso243152a91.1
-        for <kvm@vger.kernel.org>; Wed, 25 Jun 2025 15:27:15 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-315af0857f2so231462a91.0
+        for <kvm@vger.kernel.org>; Wed, 25 Jun 2025 15:27:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750890435; x=1751495235; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1750890442; x=1751495242; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CpUqVVV7KfIPY82047Vzd+2D5AAvwzq4x0iVdv/BQVk=;
-        b=RAe6HYudpjoroAcO3SSb141TcO4xDaJik8AmWYPPcd6Hb/gD1c5Jw0AVxrqf77hewy
-         zfTEsNDAz/IZkSOsgnTPE57RFjioVVu+aLPwLTUIfrEKEVT5eNTWCFzoMF5lFUrvaUEc
-         wDfBIUG1/7x6KHxwwLSJDtdBphNwCJrPczQLqL+87HKpGXa62PqOlppzNumFUSK0/nFs
-         okKNDg2hVNpKI0wS63uZuvOwAn1M0PUgwNdBZ/dOGtRHVhUxmCZTe371/V/7sY3F3W1G
-         pEV5mMdSbhaXf9jH2KFGS4i66kIiXT5sxI/GURPUYVRqxdOJOTZ5jmbEzYfHhRx0AWkN
-         qkIw==
+        bh=OD2pD4+R4381Kg2MOknGhXekAxM4/TBUIlZk8fC9cWk=;
+        b=WUBRMx0C0FvnNavGDK7154EL+5MXirXfw3i+uEw2o/G6dfWeylm3irydjyvzVLVhCF
+         f6DcpRD4+sr0cwcZXHp44bNDAIohDbCXceFKa19YRiSLwUxcbjXDWQNi9k+9/kQUq1ex
+         FKNPoeac9FuvmrRfwXd7FG7E7M8FKBIYO//NxRh9mgs5cxM42uuUhTH7jrPQ8MXJzJ84
+         YBEWUE1kF0Z+3R2XsHAY7xhYQv9vi6/iqTqaEouhKtrN/xnptQslM7b5vx8NrfXujwTK
+         MVmjT2dIwtk2192dPODia0sMIeTgi314uUmFYRAr1k9Wh9MZmqGPkSswgN0OGlv7jhoe
+         XFJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750890435; x=1751495235;
+        d=1e100.net; s=20230601; t=1750890442; x=1751495242;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CpUqVVV7KfIPY82047Vzd+2D5AAvwzq4x0iVdv/BQVk=;
-        b=pvbP8ATElcjQILIb8ANfoAQlANfPQiPkjFm0q57rEWh1hixsIOA5jQ0NatFH5yzgY4
-         Xradk94GWyzyiksXwAGKoid6e/VFCFPUVRG+1H81gL4E705VaDtPOREdn1c0/9NhtSVH
-         GckkC9Bu+KNKwinW6jLuvy/BhzHYjR5Xf8nCNFS7Sx9Zro82gPHUCCWfVqYy4KeBZO6q
-         GIuf/8evNPhLuhZuDslTng8TgCSk5uuX7fqYfzltnNk9Lfo7a2DgRtm3jRGjKHldbO2W
-         LfqLpSuU/tdg9gEdsU+J5wk8E8b5DvXKYiu2+cwowXR3rlcM1mxpBxiFUiDXyAZ/X0Qf
-         7tJw==
-X-Gm-Message-State: AOJu0YwIOlEmvvZ5lJti8Q1kw/UAAkXe1uzI/vRJ8HPpVvt4Jbv8jN+V
-	N8ZltuLbrzTjKPvRJxYwW7/iXcRflU8MF9aD3IgjX1Otce7H/+0DV4UAzuNK+yvlKMXbj/pGPLF
-	ZJQV68g==
-X-Google-Smtp-Source: AGHT+IFvrZ9N/TZME96MEzMk+n6bW8N5EzYdhXmn0e0MFvOMMQqxHorY8wmklg1KPF6/co5YwpN4iAotXuo=
-X-Received: from pjbtd5.prod.google.com ([2002:a17:90b:5445:b0:313:551:ac2])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:520f:b0:2fa:157e:c790
- with SMTP id 98e67ed59e1d1-315f25d69c7mr6873542a91.5.1750890435355; Wed, 25
- Jun 2025 15:27:15 -0700 (PDT)
-Date: Wed, 25 Jun 2025 15:25:41 -0700
-In-Reply-To: <20250605192643.533502-1-seanjc@google.com>
+        bh=OD2pD4+R4381Kg2MOknGhXekAxM4/TBUIlZk8fC9cWk=;
+        b=XN/13DFzWNTeQb8mILRh7sk80fjgj1sANX9W6qqQsAKcf5JNtdV0kxsUh2DvFEnPZM
+         iFabWByq5+twKpO1Av6htiofctRkqELX5smtuKlYmuWa7E7co1oJtmpYv8L1zUHSjis/
+         NpO07IZpODGgyFjcYYSjP8BWmsHQJISTCzL3t/dMIvk04BH0M3+7fRGT/bM1hon89Svj
+         0yzDM/dYuCbecvTfbiPI6BDsMG16nXDiAQtECBn13wCDEaapRY+TD1hZpQ5Y9i96Mj9A
+         IFuuiVxPw+otX4XcAGO3vYHdWlXsPQKtgLx4/KgxNfz+qrX+1iqNH+6SoXrFPLuG3/Py
+         rNNQ==
+X-Gm-Message-State: AOJu0YzQCVWI6wl8dbhLypd3oIviVDtXX9p6qZKOWqMR8vr3MNMN5/oK
+	vnsbsahbxsRtC9Ql6fi4n5dYVXYZZwJZx6FVPw8FwZ5gycjomKtcbpzhwA5+BpuAa8l+skODJLP
+	uUudk0Q==
+X-Google-Smtp-Source: AGHT+IFv6ztYjM5qJiX+FWDfTjscgh8hEQKISCm6JCRJkJrxAmKYZqkYmlVBTV8VVdIyT9z4CM7vgNmdYhQ=
+X-Received: from pjbsz14.prod.google.com ([2002:a17:90b:2d4e:b0:2fc:2c9c:880])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3ec6:b0:312:639:a058
+ with SMTP id 98e67ed59e1d1-315f2689f26mr6385028a91.27.1750890441959; Wed, 25
+ Jun 2025 15:27:21 -0700 (PDT)
+Date: Wed, 25 Jun 2025 15:25:43 -0700
+In-Reply-To: <20250610195415.115404-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250605192643.533502-1-seanjc@google.com>
+References: <20250610195415.115404-1-seanjc@google.com>
 X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Message-ID: <175088941700.719432.8505387164025679036.b4-ty@google.com>
-Subject: Re: [kvm-unit-tests PATCH 0/3] x86/msr: Add SPEC_CTRL coverage
+Message-ID: <175088945967.720021.14480054455090190643.b4-ty@google.com>
+Subject: Re: [kvm-unit-tests PATCH v2 00/14] x86: Add CPUID properties, clean
+ up related code
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, Chao Gao <chao.gao@intel.com>
+Cc: kvm@vger.kernel.org, Dapeng Mi <dapeng1.mi@linux.intel.com>, 
+	Liam Merwick <liam.merwick@oracle.com>
 Content-Type: text/plain; charset="utf-8"
 
-On Thu, 05 Jun 2025 12:26:40 -0700, Sean Christopherson wrote:
-> Add test coverage for SPEC_CTRL, which detects the bug pointed by Chao[1]
-> when running on hosts with V_SPEC_CTRL.
+On Tue, 10 Jun 2025 12:54:01 -0700, Sean Christopherson wrote:
+> Copy KVM selftests' X86_PROPERTY_* infrastructure (multi-bit CPUID
+> fields), and use the properties to clean up various warts.  The SEV code
+> is particular makes things much harder than they need to be.
 > 
-> Note, this applies on top of the X86_FEATURE_XXX cleanup[2].
+> Note, this applies on kvm-x86 next.
 > 
-> [1] https://lore.kernel.org/all/aEE4BEHAHdhNTGoG@intel.com
-> [2] https://lore.kernel.org/all/20250529221929.3807680-1-seanjc@google.com
+> v2:
+>  - Avoid tabs immediatedly after #defines. [Dapeng]
+>  - Sqaush the arch events vs. GP counters fixes into one patch. [Dapeng]
+>  - Mask available arch events based on enumerate bit vector width. [Dapeng]
+>  - Add a missing space in a printf argument. [Liam]
+>  - Collect reviews. [Dapeng, Liam]
 > 
 > [...]
 
-Applied to kvm-x86 next, with X86_FEATURE_STIBP gating STIBP (thanks Chao!).
+Applied to kvm-x86 next, thanks!
 
-[1/3] x86/msr: Treat PRED_CMD as support if CPU has SBPB
-      https://github.com/kvm-x86/kvm-unit-tests/commit/5cd94b1b09aa
-[2/3] x86/msr: Add a testcase to verify SPEC_CTRL exists (or not) as expected
-      https://github.com/kvm-x86/kvm-unit-tests/commit/70445405573d
-[3/3] x86/msr: Add an "msr64" test configuration to validate negative cases
-      https://github.com/kvm-x86/kvm-unit-tests/commit/55c6fc875a60
+[01/14] x86: Encode X86_FEATURE_* definitions using a structure
+        https://github.com/kvm-x86/kvm-unit-tests/commit/361f623cb12e
+[02/14] x86: Add X86_PROPERTY_* framework to retrieve CPUID values
+        https://github.com/kvm-x86/kvm-unit-tests/commit/77ea6ad194b2
+[03/14] x86: Use X86_PROPERTY_MAX_VIRT_ADDR in is_canonical()
+        https://github.com/kvm-x86/kvm-unit-tests/commit/9a3266bf023e
+[04/14] x86: Implement get_supported_xcr0() using X86_PROPERTY_SUPPORTED_XCR0_{LO,HI}
+        https://github.com/kvm-x86/kvm-unit-tests/commit/587db1e85faa
+[05/14] x86: Add and use X86_PROPERTY_INTEL_PT_NR_RANGES
+        https://github.com/kvm-x86/kvm-unit-tests/commit/25e295a5bb8f
+[06/14] x86/pmu: Mark all arch events as available on AMD, and rename fields
+        https://github.com/kvm-x86/kvm-unit-tests/commit/6c9e1907ecaa
+[07/14] x86/pmu: Mark Intel architectural event available iff X <= CPUID.0xA.EAX[31:24]
+        https://github.com/kvm-x86/kvm-unit-tests/commit/92dc5f7ab459
+[08/14] x86/pmu: Use X86_PROPERTY_PMU_* macros to retrieve PMU information
+        https://github.com/kvm-x86/kvm-unit-tests/commit/215e67c112bc
+[09/14] x86/sev: Use VC_VECTOR from processor.h
+        https://github.com/kvm-x86/kvm-unit-tests/commit/5d80d64dc482
+[10/14] x86/sev: Skip the AMD SEV test if SEV is unsupported/disabled
+        https://github.com/kvm-x86/kvm-unit-tests/commit/031a0b02be0a
+[11/14] x86/sev: Define and use X86_FEATURE_* flags for CPUID 0x8000001F
+        https://github.com/kvm-x86/kvm-unit-tests/commit/b643ae6207da
+[12/14] x86/sev: Use X86_PROPERTY_SEV_C_BIT to get the AMD SEV C-bit location
+        https://github.com/kvm-x86/kvm-unit-tests/commit/38147316d147
+[13/14] x86/sev: Use amd_sev_es_enabled() to detect if SEV-ES is enabled
+        https://github.com/kvm-x86/kvm-unit-tests/commit/8f6aee89b941
+[14/14] x86: Move SEV MSR definitions to msr.h
+        https://github.com/kvm-x86/kvm-unit-tests/commit/cebc6ef778a7
 
 --
 https://github.com/kvm-x86/kvm-unit-tests/tree/next
