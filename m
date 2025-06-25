@@ -1,150 +1,114 @@
-Return-Path: <kvm+bounces-50744-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50745-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35132AE8BFC
-	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 20:06:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20D34AE8C59
+	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 20:29:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 83E8A4A4EA0
-	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 18:06:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6FEF84A4C75
+	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 18:29:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E78232D5C99;
-	Wed, 25 Jun 2025 18:06:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 198E92D8794;
+	Wed, 25 Jun 2025 18:29:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Z4cTvdXP"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SK1ZSpjl"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDDE228C87D;
-	Wed, 25 Jun 2025 18:06:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D699D25FA0F
+	for <kvm@vger.kernel.org>; Wed, 25 Jun 2025 18:29:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750874780; cv=none; b=qe9euby48mV8+Bie+vC+SiMfUsrMqQI1q23dmwSNRcieDtL4hK+J++ZNVTWN3U+NQ63d3LyUw/vKjQED/G022jjnLEnQpJz2VDdgTmoosrYo5oczwaIJumlpBLXaT1YEFq+mMgN78Nc7AOQXuOM1hcCAqcE91hwzMJ7+I7NS2Ng=
+	t=1750876167; cv=none; b=nJQjYZ7xTDK+2urGyyObwEbR9GBUka22+6E/h/dLzyKCuNih0Z85tXUVRuxp/76BewFQKRyfSru7T3oOzPjcm4/aJxOC5t45HMVLAGFkvhHyB3CjLZK8Y80lymrMueVU4w/87YL8MngLBDdIXpvv/zS7X2kTT42In0efRaDjTpM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750874780; c=relaxed/simple;
-	bh=57TV/0cm68AKOGsdQMvjSH9dG+6SjsHff+gvbD5Q3bY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AeKShd10urp7F5UVG18iPBN6k7AhZQHK5QYIEk5qhbsSzu3eCHXqa13i7UK3i7TVR0q4urRKwQ9pI/ACI7t7Dtwe1+a5jQ7K1UD5p7rdei2GtZzdFSqnPOSfIcYcX5GTXCV4WJ22yVCfOecW4XoA39GwErV2lhhTvnCZ8/3aWv0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Z4cTvdXP; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750874779; x=1782410779;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=57TV/0cm68AKOGsdQMvjSH9dG+6SjsHff+gvbD5Q3bY=;
-  b=Z4cTvdXPdZB3HvH3+jrvQUVkT4Czt/7kCTXWLMcxUaas41FFb2BVTNJh
-   6cVPbGvpyNXwnRgPNe6bNcEO9IjTkT47A6FGleFu9QMMeST8peO/G4s/v
-   6A1vrDdX06HzO7pc4h9j3cY1+0VJHHOwFNbSDsoBR6rNzK+x6IjHtdx3f
-   nZnItWAzxZ911TUiVqamVzljwTkTUtzUDPeosNFwk+mRc4mSlkbZ/OQLW
-   sS07bJuVrzijTmcAMwy7RcGrPXiQrc8bapLVM359qGu+ZGisjTBxUt+aF
-   iw7ngpXkNC5bRRmD60IIBR72SX+8Eyl2TyVlMjXFRbshPfl8oa2PxUOS4
-   A==;
-X-CSE-ConnectionGUID: rTwkgATiSuy7ncGAboUHuw==
-X-CSE-MsgGUID: /eXimZDtTHOpauKekAOZKQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11475"; a="64215365"
-X-IronPort-AV: E=Sophos;i="6.16,265,1744095600"; 
-   d="scan'208";a="64215365"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2025 11:06:18 -0700
-X-CSE-ConnectionGUID: Yy1+5wX+Q9OvjvZbAbQxlg==
-X-CSE-MsgGUID: N33EmClCTDK64va82lX10A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,265,1744095600"; 
-   d="scan'208";a="151807781"
-Received: from dwoodwor-mobl2.amr.corp.intel.com (HELO [10.125.108.244]) ([10.125.108.244])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2025 11:06:18 -0700
-Message-ID: <c3f77974-f1d6-4a22-bd1d-2678427a9fb1@intel.com>
-Date: Wed, 25 Jun 2025 11:06:16 -0700
+	s=arc-20240116; t=1750876167; c=relaxed/simple;
+	bh=TmQfvKIRFHUQRm9d3k3nPg6QQeGONuWlQrMorEs6wjw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=f/xhtFfpDUgoXJ+jK4nseH8dD/NC/OdLOBLm/rAyArB929ICPn+augikwov1vGRosc7TXCSHreu6y6v1VzKoHE0kcCg3Ig9vdph5G6e2qDqFgNoZe7UUNH9p49cAmwzG4851iDfNWFlINjjcumWpw/5PXkij1Rw4Cgq3L22kIew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SK1ZSpjl; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7425efba1a3so200063b3a.0
+        for <kvm@vger.kernel.org>; Wed, 25 Jun 2025 11:29:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1750876165; x=1751480965; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=RyisTqyO/JOPc+5y7ScQVEK2p20o+XhWHrp4F91o7kc=;
+        b=SK1ZSpjljhMH1mtbdDPbiymGuT787boBWTwH6/9hBEwESe9IHPx2+cm4VtCYUbFGde
+         /Ii4sF7gRpPNz7YIUYqZ106z5ZZKk7C6ubj/XjTXCaBclGkpUAo7x+tr+KGJ0JHQu2D0
+         hGhOyIzFdGYzurYPjBE1TzISZRKqI8v/XhaLYhffWFuaPXevlxtJR7vMe6iUydNbdeFh
+         /dUO/ML4c0jePwBhLJrw9kAUKWmQGOSjX0ADVLqAeLxa/+zELY4r288VKV0xIKguRB6p
+         3gZKEYHW/Hh9fmAAwY+43ss34DGHwo8BPH0B95x1Yzg8wl5mdepGJOOLkwllRFsxnKTc
+         Sbcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750876165; x=1751480965;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=RyisTqyO/JOPc+5y7ScQVEK2p20o+XhWHrp4F91o7kc=;
+        b=SP69gcM7jeHjd7d/uRHm815G13t90gcGVY08XRifyzTH8lt6dbeT5rTt8ur1u8BgCE
+         +FENdP/+XrtCWbPKWGYzpCbVtaFkIiMjNwv6dKfg2PzEkhKpNb1vuyXiQl3YFWQUUL36
+         fwSxF49WzGB3P99zat2/ydZO5cQwNtu2jyIuU7mDKHgX0TW65XekhWkBj12TkEABYtkX
+         a6vXJTHjxcRfA8FC76Uee1HTDJN5is66UxwfwnKg2ibX8MZ1ELvnoNXu32fpgYw59twa
+         zABVZiL4EHkCN1licGcXi1Z4UQEo1mkZuX5A5M9wUwZmKNVTkchjoUhQcOZr6SdswyYO
+         KbGw==
+X-Forwarded-Encrypted: i=1; AJvYcCUQlE0HBt+dfOubDvHiEJ+vTyT+DejGcJ7yHX+fh7qcXmC/ryXMuci+Tkw8kSFaJWW2Fxw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzK8y2O8cmF1eCBTnK5d58N7VPEDNS1jAdI5czUwWlBGUxlFBCd
+	T5fTM6cVOVGANegzlNTU01/Ziy2sYoHlKW8ji+v5Ds9AJHG8yBIWIsCX+mvD4YZXIFbYFeXmk73
+	VttCD5A==
+X-Google-Smtp-Source: AGHT+IHO1EEsIJL+9m2YBDHY3A29o1rYIS4ZxaqkzVMPXpsMIhuoThR9fcO3LwPKLXAf4C7bLXu6Jb7838M=
+X-Received: from pfop2.prod.google.com ([2002:a05:6a00:b42:b0:749:30b5:c67e])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:9195:b0:736:4c3d:2cba
+ with SMTP id d2e1a72fcca58-74ae40c2799mr696433b3a.9.1750876165145; Wed, 25
+ Jun 2025 11:29:25 -0700 (PDT)
+Date: Wed, 25 Jun 2025 11:29:15 -0700
+In-Reply-To: <2dc165c7-e3fd-48f6-bcfb-c2119fc94a54@zytor.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv2 02/12] x86/virt/tdx: Allocate page bitmap for Dynamic
- PAMT
-To: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
- pbonzini@redhat.com, seanjc@google.com, dave.hansen@linux.intel.com
-Cc: rick.p.edgecombe@intel.com, isaku.yamahata@intel.com,
- kai.huang@intel.com, yan.y.zhao@intel.com, chao.gao@intel.com,
- tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, kvm@vger.kernel.org,
- x86@kernel.org, linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org
-References: <20250609191340.2051741-1-kirill.shutemov@linux.intel.com>
- <20250609191340.2051741-3-kirill.shutemov@linux.intel.com>
-From: Dave Hansen <dave.hansen@intel.com>
-Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <20250609191340.2051741-3-kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20250328171205.2029296-1-xin@zytor.com> <20250328171205.2029296-16-xin@zytor.com>
+ <aFrUg4BB-MXuYi3L@google.com> <2dc165c7-e3fd-48f6-bcfb-c2119fc94a54@zytor.com>
+Message-ID: <aFw_-8aDtO4wat8M@google.com>
+Subject: Re: [PATCH v4 15/19] KVM: x86: Allow FRED/LKGS to be advertised to guests
+From: Sean Christopherson <seanjc@google.com>
+To: Xin Li <xin@zytor.com>
+Cc: pbonzini@redhat.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, corbet@lwn.net, tglx@linutronix.de, 
+	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, 
+	hpa@zytor.com, andrew.cooper3@citrix.com, luto@kernel.org, 
+	peterz@infradead.org, chao.gao@intel.com, xin3.li@intel.com
+Content-Type: text/plain; charset="us-ascii"
 
->  /*
->   * Locate a NUMA node which should hold the allocation of the @tdmr
->   * PAMT.  This node will have some memory covered by the TDMR.  The
-> @@ -522,7 +534,16 @@ static int tdmr_set_up_pamt(struct tdmr_info *tdmr,
->  	 * and the total PAMT size.
->  	 */
->  	tdmr_pamt_size = 0;
-> -	for (pgsz = TDX_PS_4K; pgsz < TDX_PS_NR; pgsz++) {
-> +	pgsz = TDX_PS_4K;
-> +
-> +	/* With Dynamic PAMT, PAMT_4K is replaced with a bitmap */
-> +	if (tdx_supports_dynamic_pamt(&tdx_sysinfo)) {
-> +		pamt_size[pgsz] = tdmr_get_pamt_bitmap_sz(tdmr);
-> +		tdmr_pamt_size += pamt_size[pgsz];
-> +		pgsz++;
-> +	}
+On Wed, Jun 25, 2025, Xin Li wrote:
+> On 6/24/2025 9:38 AM, Sean Christopherson wrote:
+> > > ---
+> > >   arch/x86/kvm/cpuid.c | 2 ++
+> > >   1 file changed, 2 insertions(+)
+> > > 
+> > > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> > > index 5e4d4934c0d3..8f290273aee1 100644
+> > > --- a/arch/x86/kvm/cpuid.c
+> > > +++ b/arch/x86/kvm/cpuid.c
+> > > @@ -992,6 +992,8 @@ void kvm_set_cpu_caps(void)
+> > >   		F(FZRM),
+> > >   		F(FSRS),
+> > >   		F(FSRC),
+> > > +		F(FRED),
+> > > +		F(LKGS),
+> > 
+> > These need to be X86_64_F, no?
+> 
+> Yes.  Both LKGS and FRED are 64-bit only features.
+> 
+> However I assume KVM is 64-bit only now, so X86_64_F is essentially F,
+> right?
 
-This is the wrong place to do this.
-
-Hide it in tdmr_get_pamt_sz(). Don't inject it in the main code flow
-here and complicate the for loop.
+Nope, KVM still supports 32-bit builds.  There are plans/efforts to kill off 32-bit
+KVM x86, but we're not quite there yet.
 
