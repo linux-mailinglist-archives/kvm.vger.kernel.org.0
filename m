@@ -1,193 +1,100 @@
-Return-Path: <kvm+bounces-50754-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50755-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C42E6AE906A
-	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 23:47:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06066AE9104
+	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 00:25:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B62E14A7C42
-	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 21:47:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DF295189D6C3
+	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 22:26:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 517B41FDA92;
-	Wed, 25 Jun 2025 21:47:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 384432F3C05;
+	Wed, 25 Jun 2025 22:25:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="el0VK2bj"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lXOLxEJB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0625F2147FB
-	for <kvm@vger.kernel.org>; Wed, 25 Jun 2025 21:47:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20E1335280
+	for <kvm@vger.kernel.org>; Wed, 25 Jun 2025 22:25:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750888030; cv=none; b=jwQ6c6AcYkyJwhn3NJxz65Lo3W38y8ucJ9TCRQTnN8ftGSpxhiTKLZrYEVEgHXxOWGqs6Am6mM8YZF8GtHIdlh/ul6XS92jtyY1ka6zt4kcw9qo68YkZHFpkgMu80CEXeE+VmlXPAoJ6DyOBpHRd1XbnR1t8/YG3HzTPlTZM4cU=
+	t=1750890350; cv=none; b=AP8FsDkg8p7+TNkg3pyVwYncXifGbsVn8TysyOniSslJPN6b8DlebA4N0H+2YG4oGdUbwlgvvVjAOuvQbfkhgrXc/Jguf1XG+S8bKUUrnDZXGwE5tCPh4V0SnaRhz4G0YWuyAqVejecZdxjQv53Zauz7jxBGOGWlHR7AlXym7sI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750888030; c=relaxed/simple;
-	bh=JAsyW8eZE863eaSb5j9l0uHjRmiL/MJIXmfT/tJtisw=;
+	s=arc-20240116; t=1750890350; c=relaxed/simple;
+	bh=ZcdoOQwxU3CyDjJeNeZEEN1pVlwH2SOB9r0ExNTnb5I=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=byH0UXQxFWyhV0zp91VuhlM+wbEC0pUxZyUkMbqT5OzxRKawOm1tO7qHTpgQF8rWfZOhCUBppDJYgWXGn/lrgavHg3YbysxNAKs2U84M7VgGwblQyTxF6qSMq37Pm+AgBXmQzeDFM3lGdqSwyzY2gcy6Ew9LyAOWZcjVrrfSvGo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=el0VK2bj; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=imy5lX6e45CBK9I9xzrmnDEP5rV9KcYRvfXzUIhdg/Q0+AtV+FWkGBjyQGWIPRe/13u18tZyvwWR6yjP7EEeYrYmsB7Is0Z+f1wLDYaM5419Kw2NUepWtfrmghsIfnXG73hqc5E0EUyKDkB+bc81pHlMcF7uV95GKLr67kmmV3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lXOLxEJB; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b2c00e965d0so158064a12.2
-        for <kvm@vger.kernel.org>; Wed, 25 Jun 2025 14:47:08 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2382607509fso1944435ad.3
+        for <kvm@vger.kernel.org>; Wed, 25 Jun 2025 15:25:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750888028; x=1751492828; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1750890348; x=1751495148; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JaElZIlxs13I2jfOVX0lSC6FgKZKsuNp0z88behp5kM=;
-        b=el0VK2bj+ngoUg+5WGO8P95KuLjyYa6RLAz5AxRxya4CaHjcwnB6+UgKaAGXvw2Ou8
-         uBLanXIouFmcfVmPRN1FhzTYy+sHkHT6bfj/ZGihXw6mBLPFgx3gSwVfxrxePuzfCLdg
-         /kyUDTQ9GeNRQ7xUZGcbp43cpZh28lgJ+TpHOmct8XOL9v8LrRJr+aE5j0gWCVcbQniz
-         c0xeJzF72hs/Nh2p4DnY2w+O+7U0QvvtJzPTIZ1kmxILMAE52yI5oEhgqJyIgSBWIpTQ
-         C8eCBGTLQ1cL6xvJ6EWN51VwwDrqgX7kRjp5/vctD/WT1dQ106NfDe0OQAiogwX3ygCS
-         MHqw==
+        bh=5pLNzxxeBjc6JUZX/DPJvwEcneL7Rpxq1mf//0ev+Ok=;
+        b=lXOLxEJBQryHT4LNVSZsuTyaiDf91QoP7vGZvMbYfeHOMXWxuOpcFqUIU58e6rCf4A
+         N6SZF9gqfNH7t5hXBo7peWtQ9ss7pYxWx33jghYig9U4a3YnS95uM+wEbbiRHGjNLQw4
+         pJcYVBk9Xw6860dWIoONga/Fwui265U2UeD/3lkWAJ4rdKMUzYzO/NAOBxiZFPqM65xe
+         2FYUTpj9LCyKXlQHME8JscnCyJwhFcMzcYagdQi6e2ssHYjU3mFUXAxmXWpnEhNsMhlP
+         1RPGJe+ebpKOArgfu7J1hbv6ko2X3rFQ64gTIQQRWIhQUXyw/54RGgtSNBQl3YphYJ7O
+         PpkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750888028; x=1751492828;
+        d=1e100.net; s=20230601; t=1750890348; x=1751495148;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JaElZIlxs13I2jfOVX0lSC6FgKZKsuNp0z88behp5kM=;
-        b=sPTlTwwmR1pHnvmJH96kmlW83WCUUaaZ5Q8stZKnYp2/TVaEN96or/oazJEJnF89VE
-         iuhjoMSSZJeadKw5q2B9h25dwndu/1l0EOpHt7/xw+BGkFKE1icQtiwShx/iSUQZ6Drr
-         b2KumkiNg6LAm+M+F5y0T/bnFZiei5hDe1bFtk45N2u6PKDPb7Snx0Ni3BVUZ6VuL9SV
-         LREv9GXRR6F9NG5aJRYDOsCe3x4e5aP+PnQVs8E4nRcmmIZ0Z0eTeuo6ex+kqNG+SL6E
-         EiqLoLpLtekMIHdDZCxeqrSSgEtpvgp4x0xPIpbFGTX0apkJDRaixd79600p2+4nlL4j
-         sA+A==
-X-Forwarded-Encrypted: i=1; AJvYcCVoChY/3EscXjw+Y2+cTkTGg/w2ZlPmOBItC7xCmESxdYx6YiY8fcD3K18Yd8fCr+QrNxU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyldRSDUHufa+ODt3ChggzU9U1grPXkp8QT5iG6MenyL5FOz+z9
-	15vuP67GLQ4o4GczdvS+pX4cGiCDQNvYVhWSMb4w1h/aWrwOVw7OeBXcAeCJElqSPB5xDx9gPgC
-	3A+q6TTF3Zu1Sqh4EryjzbRoxBA==
-X-Google-Smtp-Source: AGHT+IHaFOtDsXjNCK8tDRGRC6rpZnF1ravk4aYWxE7y5fg1ChEv8b8QXDGShjJ5f1IXZEq0lP4YBKq+9E7DssxT5w==
-X-Received: from pjm6.prod.google.com ([2002:a17:90b:2fc6:b0:312:e266:f849])
- (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:5388:b0:312:e1ec:de44 with SMTP id 98e67ed59e1d1-315f268f485mr5936687a91.27.1750888028344;
- Wed, 25 Jun 2025 14:47:08 -0700 (PDT)
-Date: Wed, 25 Jun 2025 14:47:06 -0700
-In-Reply-To: <20250611133330.1514028-9-tabba@google.com>
+        bh=5pLNzxxeBjc6JUZX/DPJvwEcneL7Rpxq1mf//0ev+Ok=;
+        b=ZCNVxeb4yYZqGJXvRizet3lAje87T61EBKO91MYut03QUGHM0T9OGIPGav3r0PtR1D
+         Pb58sE1t3vDw4iWcaJu49rQzHmEE53b08q9CWuhlN1smACfrudhXokAGBKcpnJecOBux
+         ExNTcoQrcN9paW9ez1FXkjxg/53po0QPSKOYg9iN81RyrWjaT6+0wCm2f8n8n+8/daQV
+         clAL2bwVz5UzrDPfDsdQZ15QalCvbp6G0Qt2giyKBfj3egMxkPOycO040IM1UHD6yjx+
+         JJQoGZlAq1+RhxdxxWRQNSDk6dtft6s1/tholElLYT/yu5BUU8L9/rz2nuwMkpzzYs6u
+         OuAA==
+X-Forwarded-Encrypted: i=1; AJvYcCVz9aOPPnTr725db41pgndKphKxc07rpwA+8iAb/rzWlnokITjAm6q/aMCegCx4zC4xZMc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YysoIro6hsVHXjXNdao5HoVP+bBadF3numK0kQCPi2NmrbhGyra
+	z/t3D1ME1LtCNUISfetKqB4wsq5/U/Is9zri5NMHOomxtsoNQsibdR7vu2R4wdrTst75H0JI1Lm
+	HB9i4BQ==
+X-Google-Smtp-Source: AGHT+IGuZn7pr623L+iySvz0JPQq0RwUo97Ncwcpf9CRRSz7v1+SZ3zC/cCqj+R0ROv4T2ZbAMIBF8HWc+8=
+X-Received: from pjm11.prod.google.com ([2002:a17:90b:2fcb:b0:312:ea08:fa64])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:2ecd:b0:235:2e0:ab8
+ with SMTP id d9443c01a7336-23823f879c7mr59561265ad.6.1750890348479; Wed, 25
+ Jun 2025 15:25:48 -0700 (PDT)
+Date: Wed, 25 Jun 2025 15:25:23 -0700
+In-Reply-To: <20250625014829.82289-1-binbin.wu@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250611133330.1514028-1-tabba@google.com> <20250611133330.1514028-9-tabba@google.com>
-Message-ID: <diqzv7ojjxyd.fsf@ackerleytng-ctop.c.googlers.com>
-Subject: Re: [PATCH v12 08/18] KVM: guest_memfd: Allow host to map guest_memfd pages
-From: Ackerley Tng <ackerleytng@google.com>
-To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-mm@kvack.org, kvmarm@lists.linux.dev
-Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
-	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
-	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
-	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
-	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
-	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
-	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
-	vannapurve@google.com, mail@maciej.szmigiero.name, david@redhat.com, 
-	michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com, 
-	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com, 
-	suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com, 
-	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, 
-	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
-	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, 
-	oliver.upton@linux.dev, maz@kernel.org, will@kernel.org, qperret@google.com, 
-	keirf@google.com, roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, 
-	jgg@nvidia.com, rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, 
-	hughd@google.com, jthoughton@google.com, peterx@redhat.com, 
-	pankaj.gupta@amd.com, ira.weiny@intel.com, tabba@google.com
-Content-Type: text/plain; charset="UTF-8"
+References: <20250625014829.82289-1-binbin.wu@linux.intel.com>
+X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
+Message-ID: <175088967862.721202.10079126901672236105.b4-ty@google.com>
+Subject: Re: [PATCH] Documentation: KVM: Fix unexpected unindent warnings
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, pbonzini@redhat.com, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Binbin Wu <binbin.wu@linux.intel.com>
+Cc: sfr@canb.auug.org.au, rick.p.edgecombe@intel.com, kai.huang@intel.com, 
+	adrian.hunter@intel.com, reinette.chatre@intel.com, xiaoyao.li@intel.com, 
+	tony.lindgren@intel.com, isaku.yamahata@intel.com, yan.y.zhao@intel.com
+Content-Type: text/plain; charset="utf-8"
 
-Fuad Tabba <tabba@google.com> writes:
+On Wed, 25 Jun 2025 09:48:29 +0800, Binbin Wu wrote:
+> Add proper indentations to bullet list items to resolve the warning:
+> "Bullet list ends without a blank line; unexpected unindent."
+> 
+> Closes:https://lore.kernel.org/kvm/20250623162110.6e2f4241@canb.auug.org.au/
 
-> This patch enables support for shared memory in guest_memfd, including
-> mapping that memory from host userspace.
->
-> This functionality is gated by the KVM_GMEM_SHARED_MEM Kconfig option,
-> and enabled for a given instance by the GUEST_MEMFD_FLAG_SUPPORT_SHARED
-> flag at creation time.
->
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> Acked-by: David Hildenbrand <david@redhat.com>
-> Co-developed-by: Ackerley Tng <ackerleytng@google.com>
-> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
-> Signed-off-by: Fuad Tabba <tabba@google.com>
-> ---
->  include/linux/kvm_host.h | 13 +++++++
->  include/uapi/linux/kvm.h |  1 +
->  virt/kvm/Kconfig         |  4 +++
->  virt/kvm/guest_memfd.c   | 73 ++++++++++++++++++++++++++++++++++++++++
->  4 files changed, 91 insertions(+)
->
-> [...]
->
+Applied to kvm-x86 fixes, thanks!
 
-Just want to call out here that I believe HWpoison handling (and
-kvm_gmem_error_folio()) remains correct after this patch. Would still
-appreciate a review of the following!
+[1/1] Documentation: KVM: Fix unexpected unindent warnings
+      https://github.com/kvm-x86/linux/commit/0c84b534047d
 
-> +static vm_fault_t kvm_gmem_fault_shared(struct vm_fault *vmf)
-> +{
-> +	struct inode *inode = file_inode(vmf->vma->vm_file);
-> +	struct folio *folio;
-> +	vm_fault_t ret = VM_FAULT_LOCKED;
-> +
-> +	if (((loff_t)vmf->pgoff << PAGE_SHIFT) >= i_size_read(inode))
-> +		return VM_FAULT_SIGBUS;
-> +
-> +	folio = kvm_gmem_get_folio(inode, vmf->pgoff);
-> +	if (IS_ERR(folio)) {
-> +		int err = PTR_ERR(folio);
-> +
-> +		if (err == -EAGAIN)
-> +			return VM_FAULT_RETRY;
-> +
-> +		return vmf_error(err);
-> +	}
-> +
-> +	if (WARN_ON_ONCE(folio_test_large(folio))) {
-> +		ret = VM_FAULT_SIGBUS;
-> +		goto out_folio;
-> +	}
-> +
-> +	if (!folio_test_uptodate(folio)) {
-> +		clear_highpage(folio_page(folio, 0));
-> +		kvm_gmem_mark_prepared(folio);
-> +	}
-> +
-> +	vmf->page = folio_file_page(folio, vmf->pgoff);
-> +
-> +out_folio:
-> +	if (ret != VM_FAULT_LOCKED) {
-> +		folio_unlock(folio);
-> +		folio_put(folio);
-> +	}
-> +
-> +	return ret;
-> +}
-> +
-> [...]
-
-This ->fault() callback does not explicitly check for
-folio_test_hwpoison(), but up the call tree, __do_fault() checks for
-HWpoison.
-
-If the folio is clean, the folio is removed from the filemap. Fault is
-eventually retried and (hopefully) another non-HWpoison folio will be
-faulted in.
-
-If the folio is dirty, userspace gets a SIGBUS.
-
-kvm_gmem_error_folio() calls kvm_gmem_invalidate_begin(), which only
-unmaps KVM_FILTER_PRIVATE, but IIUC that's okay since after mmap is
-introduced,
-
-* non-Coco VMs will always zap KVM_DIRECT_ROOTS anyway so the HWpoison
-  folio is still zapped from guest page tables
-    * Unmapping from host userspace page tables is handled in
-      memory_failure(), so the next access will lead to a fault, which
-      is handled using a SIGBUS in __do_fault()
-* Coco VMs can only use guest_memfd for private pages, so there's no
-  change there since private pages still get zapped.
+--
+https://github.com/kvm-x86/kvm-unit-tests/tree/next
 
