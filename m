@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-50749-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50750-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78007AE8F16
-	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 22:02:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8766DAE8F32
+	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 22:09:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 09ABF1898309
-	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 20:03:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7308D189EF64
+	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 20:09:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EDD72DAFBC;
-	Wed, 25 Jun 2025 20:02:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C17C72DA761;
+	Wed, 25 Jun 2025 20:09:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gLrpY2m8"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jNauB1Do"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA4D42066DE;
-	Wed, 25 Jun 2025 20:02:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95A401FE47B;
+	Wed, 25 Jun 2025 20:09:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750881762; cv=none; b=cenGYl3pnUqkUnEHuRlDxk98Mu2+iUC9C1p5USXlZuQ7+ypJj9ia++51CWhQdsdPj663ivE56iIEYjB2A4Kgu52s3j1OFnb7z5MHhEvmYNsSY2/YLGyvXxFMbdIEsgHEhiwt6CDRTStlG0hu9jL1pKc188eQM2pqOOX/QVmnWvA=
+	t=1750882148; cv=none; b=E9fJNEadGYoPCHrzXWOGLOLyEZYfccjlYcL6Q2TAk83Nu3G6UIIwlga6xoij4GssTfXCjHzEGD6WpHnqmy7GLDG5D8N2dBHA/avyt9jofr6pv99Anx+Tf9Y8JJ7WZTlVNFsBnRYxWlXIoZ8P4VPKBD14J6GGaDJQOvNJjH0W8+4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750881762; c=relaxed/simple;
-	bh=43wNCcyAb8e54VAM2GwpB9zj2+lN8oliu10hUpHh+JU=;
+	s=arc-20240116; t=1750882148; c=relaxed/simple;
+	bh=yCQMyv1rM/wdIbMx8xZFRx+DIuzMkvTWKdxqeBf4UyA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=a+lhtBbSyK+SxTxfzGqNnXN5cBdKRx7L5kvSnkg2NVXfqaYQjKeqjYje5wmN5edj4lV9SbgiIfY/4SBYRcbhtP0k3AH0aG9EeLR4v88I5FamkIT7bFofPks+HuvLXs45XGWI29tXRd/T9unSAOD2rI4yuxqr9US40BM3tbQcNNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gLrpY2m8; arc=none smtp.client-ip=192.198.163.10
+	 In-Reply-To:Content-Type; b=NFXkDiaG+vMoG4qEFJGjzH9Q9ebxluEk6C2tpD1NE58GmzSzjJLci0JWSnOHbjvLWOPi8B/k4eiaowBQNO/pcSGbuLTDJw0gzpymnVX7tW2Bt2VZPzxhf8fCKGrr3NwN/4tzSSz4LgKuP78hufj+en+tpkz3E10aq4PMO51c+kY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jNauB1Do; arc=none smtp.client-ip=192.198.163.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750881761; x=1782417761;
+  t=1750882147; x=1782418147;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=43wNCcyAb8e54VAM2GwpB9zj2+lN8oliu10hUpHh+JU=;
-  b=gLrpY2m8YSYhuFf3PwM78v9fNVdRyKae67qKm6M2VBJW6WiTdqX5yUue
-   Wn0yyYZycaIMgS8AxVo2urtLgUTZfF7Inc5oYYBQwve1mMTFu/G1Bjjio
-   EqOB+Rupewps6Hqdbke3L7hTVVEXDNoqHeM02/RUvEZ1hPudp608FEwOP
-   V1KfHNRaN003fwbt8B6JOwRreyn9QTT9jVwRmrx1JUUN0vOm6VNFtlWnA
-   0IYDzp2ckZoPWkx7yIn/V/hXw94k0Vcr4/VyOLJGwu+heCNHD46tTIl+S
-   AZKL2Xl9j6F4GPvLB5XDo8fL2rqJEFjX5r5eZFddAjIXAgQ4hFXaB9Ql/
-   Q==;
-X-CSE-ConnectionGUID: S2Urh4ipT+ygz6o0CZpFFw==
-X-CSE-MsgGUID: D4ddN9p3QbK8z0nnX2+X/Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11475"; a="64520423"
+  bh=yCQMyv1rM/wdIbMx8xZFRx+DIuzMkvTWKdxqeBf4UyA=;
+  b=jNauB1DoF4u0q0+il1+Rl3tkPBjDLbu2oYeGOokmh9pkLYu1P9oiBshv
+   RHuk4GmXxN5dHj3jApGTGLxy/RPBEVGvhnvlUkDKDUl06BwLdQM5VZK6W
+   EmskkJT/GI+hnd7yol0Ov+972oX1RwmshOTcYCPJa89h8D60pj/7Dum9M
+   PfiFxtIkLACy++m89MWIbHvxYcVpdf4XoCKsAH22pRTILwB/F1duUpNzw
+   pXPMgVmAiemwwjD3l3fj72l7yjITMeTH3kzGSCM9m8mqlqGhNvQX2tXqX
+   kauUwWxEQWwfIsU2ve1NIbcpG+mykMmVL8nCcWRynRXJedpOm3sfltXJE
+   A==;
+X-CSE-ConnectionGUID: Y/UruGtXQnOQ4uJpDXrkEw==
+X-CSE-MsgGUID: TvewSh9+RFGqxOSIu8zgJQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11475"; a="55792093"
 X-IronPort-AV: E=Sophos;i="6.16,265,1744095600"; 
-   d="scan'208";a="64520423"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2025 13:02:40 -0700
-X-CSE-ConnectionGUID: +bPP6+oXToWrLF/e5liXMA==
-X-CSE-MsgGUID: Gve64YEVQ1mAoZ9IjDbYiQ==
+   d="scan'208";a="55792093"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2025 13:09:06 -0700
+X-CSE-ConnectionGUID: +xAXj1vcQKS8Y549GIYwsQ==
+X-CSE-MsgGUID: bxxKTzrhRNmC2Sa5iuQI7g==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,265,1744095600"; 
-   d="scan'208";a="183340922"
+   d="scan'208";a="156703049"
 Received: from dwoodwor-mobl2.amr.corp.intel.com (HELO [10.125.108.244]) ([10.125.108.244])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2025 13:02:39 -0700
-Message-ID: <fd9ebb1c-8a5a-44c5-869b-810bb5e7436c@intel.com>
-Date: Wed, 25 Jun 2025 13:02:38 -0700
+  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2025 13:09:05 -0700
+Message-ID: <a49c523c-0c9e-47c6-ae2a-c84ff19f6717@intel.com>
+Date: Wed, 25 Jun 2025 13:09:05 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -68,14 +68,16 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCHv2 04/12] x86/virt/tdx: Add tdx_alloc/free_page() helpers
-To: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
- pbonzini@redhat.com, seanjc@google.com, dave.hansen@linux.intel.com
-Cc: rick.p.edgecombe@intel.com, isaku.yamahata@intel.com,
- kai.huang@intel.com, yan.y.zhao@intel.com, chao.gao@intel.com,
- tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, kvm@vger.kernel.org,
- x86@kernel.org, linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org
+To: Chao Gao <chao.gao@intel.com>,
+ "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Cc: pbonzini@redhat.com, seanjc@google.com, dave.hansen@linux.intel.com,
+ rick.p.edgecombe@intel.com, isaku.yamahata@intel.com, kai.huang@intel.com,
+ yan.y.zhao@intel.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+ kvm@vger.kernel.org, x86@kernel.org, linux-coco@lists.linux.dev,
+ linux-kernel@vger.kernel.org
 References: <20250609191340.2051741-1-kirill.shutemov@linux.intel.com>
  <20250609191340.2051741-5-kirill.shutemov@linux.intel.com>
+ <aEeaJH1KqZ38tgKi@intel.com>
 From: Dave Hansen <dave.hansen@intel.com>
 Content-Language: en-US
 Autocrypt: addr=dave.hansen@intel.com; keydata=
@@ -121,98 +123,48 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
  MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
  hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
  vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
-In-Reply-To: <20250609191340.2051741-5-kirill.shutemov@linux.intel.com>
+In-Reply-To: <aEeaJH1KqZ38tgKi@intel.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 6/9/25 12:13, Kirill A. Shutemov wrote:
->  arch/x86/include/asm/tdx.h       |   3 +
->  arch/x86/include/asm/tdx_errno.h |   6 +
->  arch/x86/virt/vmx/tdx/tdx.c      | 205 +++++++++++++++++++++++++++++++
->  arch/x86/virt/vmx/tdx/tdx.h      |   2 +
->  4 files changed, 216 insertions(+)
+On 6/9/25 19:36, Chao Gao wrote:
+>> +static int tdx_alloc_pamt_pages(struct list_head *pamt_pages)
+>> +{
+>> +	for (int i = 0; i < tdx_nr_pamt_pages(); i++) {
+>> +		struct page *page = alloc_page(GFP_KERNEL);
+>> +		if (!page)
+>> +			goto fail;
+> 
+> this goto isn't needed. it is used only once. so we can just free the pages and
+> return -ENOMEM here.
 
-Please go through this whole series and add appropriate comments and
-explanations.
+<shrug>
 
-There are 4 lines of comments in the 216 lines of new code.
+There's no rule saying that gotos need to be used more than once. It's
+idiomatic kernel C to use a goto as an error landing site. In fact, I
+*prefer* this because it lets me read the main, non-error-case flow
+through the function. Then, at my leisure, I can review the error handling.
 
-I'll give some examples:
+This is also, IMNHO, less error-prone to someone adding code and doing a
+plain return without freeing the pages.
 
-> +static int tdx_nr_pamt_pages(void)
+Third, the goto keeps the indentation down.
 
-Despite the naming this function does not return the number of TDX
-PAMT pages. It returns the number of pages needed for each *dynamic*
-PAMT granule.
+So, the suggestion here is well intended, but I think it's flawed in
+multiple ways. If you write your code this way (free of one-use gotos),
+I won't complain too much. But if you suggest other folks get rid of the
+gotos, I'm not super happy.
 
-The naming is not consistent with something used only for dynamic PAMT
-support. This kind of comment would help, but is not a replacement for
-good naming:
+So, Kirill, do it whatever way you want.
 
-/*
- * How many pages are needed for the TDX
- * dynamic page metadata for a 2M region?
- */
+But, Chao, please don't keep suggesting things like this at least in
+junk I've got to merge.
 
-Oh, and what the heck is with the tdx_supports_dynamic_pamt() check?
-Isn't it illegal to call these functions without dynamic PAMT in
-place? Wouldn't the TDH_PHYMEM_PAMT_ADD blow up if you hand it 0's
-in args.rdx?
+>> +	if (tdx_hpa_range_not_free(err))
+>> +		return 1;
+> 
+> I think this needs a comment for the return values 0/1/-EIO above the function.
 
-> +static int tdx_nr_pamt_pages(void)
-> +{
-> +	if (!tdx_supports_dynamic_pamt(&tdx_sysinfo))
-> +		return 0;
-> +
-> +	return tdx_sysinfo.tdmr.pamt_4k_entry_size * PTRS_PER_PTE / PAGE_SIZE;
-> +}
-> +
-> +static u64 tdh_phymem_pamt_add(unsigned long hpa,
-> +			       struct list_head *pamt_pages)
-> +{
-> +	struct tdx_module_args args = {
-> +		.rcx = hpa,
-> +	};
-> +	struct page *page;
-> +	u64 *p;
-> +
-> +	WARN_ON_ONCE(!IS_ALIGNED(hpa & PAGE_MASK, PMD_SIZE));
-> +
-> +	p = &args.rdx;
-> +	list_for_each_entry(page, pamt_pages, lru) {
-> +		*p = page_to_phys(page);
-> +		p++;
-> +	}
-
-This is sheer voodoo. Voodoo on its own is OK. But uncommented voodoo
-is not.
-
-Imagine what would happen if, for instance, someone got confused and did:
-
-	tdx_alloc_pamt_pages(&pamd_pages);
-	tdx_alloc_pamt_pages(&pamd_pages);
-	tdx_alloc_pamt_pages(&pamd_pages);
-
-It would *work* because the allocation function would just merrily
-shove lots of pages on the list. But when it's consumed you'd run off
-the end of the data structure in this function far, far away from the
-bug site.
-
-The least you can do here is comment what's going on. Because treating
-a structure like an array is obtuse at best.
-
-Even better would be to have a check to ensure that the pointer magic
-doesn't run off the end of the struct:
-
-	if (p - &args.rcx >= sizeof(args)/sizeof(u64)) {
-		WARN_ON_ONCE(1);
-		break;
-	}
-
-or some other pointer voodoo.
-
-> +
-> +	return seamcall(TDH_PHYMEM_PAMT_ADD, &args);
-> +}
-
+You and I are in full agreement that this series is gloriously
+unencumbered by comments at this point.
 
