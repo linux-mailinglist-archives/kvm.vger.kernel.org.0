@@ -1,175 +1,219 @@
-Return-Path: <kvm+bounces-50615-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50616-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CBACAE76F9
-	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 08:31:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F8DCAE7729
+	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 08:34:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 66F5117A4E1
-	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 06:31:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6679D1BC100F
+	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 06:35:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB6421E22E9;
-	Wed, 25 Jun 2025 06:31:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A6C01FAC4B;
+	Wed, 25 Jun 2025 06:33:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kNkVBHV7"
+	dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="fqOFkK9n"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9624018A6C4;
-	Wed, 25 Jun 2025 06:31:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90D2C1F8755;
+	Wed, 25 Jun 2025 06:33:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750833072; cv=none; b=eSJ4ucWVzTxnmXCuYZR7IjTZ3suPDX2xxf7xxNITMIqtQzXhkVITHaGzIlkngrScy8hRAysxQ0KxhBYFVwQzwIQbip8QMbA+x/YDuH7u1FdpalyNpWTXPKT/RHQAqikX9c1vxq9GEL1d9Tm/7bHUt6mArAl4AFzHkHtuiAInmQo=
+	t=1750833218; cv=none; b=FghMB3HfBTjkt3PWFlGdkVdzkJQ5kaKmUVwTsgaoaHITPl2QO7EkGqvgKV4i3rtD3zOR/BdNIU2tOmXmqLBJe/YnJZalSjr01HeEe2BR7GmEOXgrAYs60iDcYIQi4m9ZGjaYmcbvzvtKLAeUMDI+hM8JkBegt6TbTGSuO6sTiLM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750833072; c=relaxed/simple;
-	bh=VWMmEK86o9waci3EB3HNOVJe90ev8J87isxmtuJcslU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ui6Ujfpgx9qEpNK9s3avh8lkgTreXASePLc2eShZb4RLRbUh+c13VPM5yKxDQmNyEjPKS/eCeAPoW7MdHo/nVsbHNlWnilW0YVrDFgLzxcdgJqmFdKMjlE93l9v0Je/Unqx/Vy8kl78EovrxhEsaxt41TkrDMOPBlyXgwMZ3gQg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kNkVBHV7; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2352400344aso16349825ad.2;
-        Tue, 24 Jun 2025 23:31:10 -0700 (PDT)
+	s=arc-20240116; t=1750833218; c=relaxed/simple;
+	bh=RMqAKar/qsoF0HBR+956qoiEnTuyBiK0mhtIN2pC9LE=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=XDnA7J7kw4U8nAEicryB+hzW2V3ck5Fb3ifxhJaIQmitgTuM+K1ygZAl6Rgg/8puYqRLR82VXacnnPA7ZEJ/NQQogrwt4IAHwrj0tikggzclTGR+ssv0GOSOyrhJ1VrfDyKisbm2HtwgLNvUAzbQqFcZ4BRRbJKFEYyFJm5MCVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=fqOFkK9n; arc=none smtp.client-ip=99.78.197.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750833070; x=1751437870; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=L/z9ngd8zFRAIK74RWBIMljq6rrIA5Qki7ArcxDVjgg=;
-        b=kNkVBHV73Kt3/IUIgGGbo7HOexZW9d2U2hLWENFAVSUcYudsKwk8Oeb2odW0ueai3J
-         IBPHKnewwiFmEstSWLPNlY+ULF/PDFoP/qzB9FOaJEAKjWgJGG+b4hzRdEp51+E1uf30
-         cRgEt5C4S3FT+UMjy3eR4tRhcoEKEKV0LwlI4tjPB4jMIM3srgR8hw2v115D5DeyZ+5u
-         JOj3ypfKWInp2QKoJHnQiJaw9/YcrXKKMo/y6C4gPkd+tX0a7e5vu4i+auD1WkX4uis2
-         V5vhhdoKVz117edtQF7HSz+LtLwNnjm5T/xSO/OFGx2P+4LmPyiMtJqqIJrFmvwExL6I
-         4zRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750833070; x=1751437870;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=L/z9ngd8zFRAIK74RWBIMljq6rrIA5Qki7ArcxDVjgg=;
-        b=ZovHEgsqnqzPHfKdKLjX6oUOeGV8gDS8rsz/VF2Y81Fjpax5jNyjW7LhgR31N+ntEs
-         lJpAb/sk4FKeqvQLgV5880Au7vhy/umauSglMHOigf+7tb47Vegwn60jMmTn1Q9VTb00
-         V0+21oNMJ9dHA1Nmpqjb6ackmmnSIcZVz2R72DjLw8FcofxtYDJlIX56d5rBd05s9iKL
-         4+98MEu0ytwHn8n9UUHvuiIsnEVcpIrA7PDSXQ/rtiPzWQ0E/wik26akNsFAbTLRfVEZ
-         sA9FWb/AkmoIecAaTZgJd4Cz/ufVE/mS/sWfifw4mOWNNe3Anh9maRZJNzb3Ty20D0KS
-         h48g==
-X-Forwarded-Encrypted: i=1; AJvYcCUd0KLWPvXBhszuVLDYlYdRxRGVw7zxBAcRq7DM8ZXp2UVcTZuUp45WlxpJWNkP4HYiIFI=@vger.kernel.org, AJvYcCWq5zvKqMs7eSPmOWamNLSFddN5JsBqpgr4EkoRJDiQt/1r7QdcysWJ4u4wJggtvbZh+DkN+KznvhCpNRHy@vger.kernel.org
-X-Gm-Message-State: AOJu0YwL5CzuOZH0zKzZwnNufwBLG5e2yvU4qKZlaxS172ctOhH7/ASj
-	usUImKQYN2MvV8Q1+r9hSNOKWCTvaWE1nKwEdVeGMKGeCpzHYMYnjT7II04vSQ==
-X-Gm-Gg: ASbGncuJkBgGKEC7gJib0CXr5PH2/mSTpM+IDybBuqAqahv4hicNfmDjInlwUJoqZaL
-	cmMOQnnBFFX73uTZZECUV0WUgZbOrSQ677a7aQfo9drNMhhrigFEowO/OQAknKOM2F1VzL2uhzn
-	YJoaIUTMHcf4VjaQw+YVCvBHgS1TUDSSiNjSvHgJOdK7aJ7LCvZwWv4LOLrDBsp8PSvnHBB3Ter
-	DB7LtbpBFMLrPlEsjJObKI7BKjDPxs0uJxzZBMgNCSk4lxCeHoJhHKTFtTsjhDSKj2NBOioKXvx
-	/AFaKOqmnrKMJaEOdBbWuys2BJtSgTVfSvf6H1RGFSMUvlpVenMJfNWBt4B+vg==
-X-Google-Smtp-Source: AGHT+IG244W/fN34/CD8bjiYs1J85Uc0mGYhzQ6XAiQJSMUMCZ12AC0ZO1+fbYsH+GVD3vutgE3G+w==
-X-Received: by 2002:a17:902:ec90:b0:235:e8da:8d6 with SMTP id d9443c01a7336-2382454566fmr34479815ad.2.1750833068214;
-        Tue, 24 Jun 2025 23:31:08 -0700 (PDT)
-Received: from archie.me ([103.124.138.155])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-237d86d563fsm126520685ad.207.2025.06.24.23.31.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Jun 2025 23:31:07 -0700 (PDT)
-Received: by archie.me (Postfix, from userid 1000)
-	id 7C7DF4207D12; Wed, 25 Jun 2025 13:31:02 +0700 (WIB)
-Date: Wed, 25 Jun 2025 13:31:02 +0700
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Binbin Wu <binbin.wu@linux.intel.com>, pbonzini@redhat.com,
-	seanjc@google.com, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: sfr@canb.auug.org.au, rick.p.edgecombe@intel.com, kai.huang@intel.com,
-	adrian.hunter@intel.com, reinette.chatre@intel.com,
-	xiaoyao.li@intel.com, tony.lindgren@intel.com,
-	isaku.yamahata@intel.com, yan.y.zhao@intel.com
-Subject: Re: [PATCH] Documentation: KVM: Fix unexpected unindent warnings
-Message-ID: <aFuXpoxMLa2Qj_S9@archie.me>
-References: <20250625014829.82289-1-binbin.wu@linux.intel.com>
+  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
+  s=amazoncorp2; t=1750833217; x=1782369217;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=gEnofzmJb8uW1A9eqx0GnHV9D0Z+YeKzOjQZvrEpJsI=;
+  b=fqOFkK9nAAM0CRfEbmgMRWWR3dR8/cxymgTsltwviIcJAM7ONeoWokPm
+   RLfDcjXA9SGrnV/uG9afJ6rDrDgoRIZQK9c4NipffmI7LZnRJh65XVNtr
+   bOJjDnF4sgDRKzMJzdfHUL467HCbUsNgS2tbDt/xu41tr184to8rRnVCl
+   5PruEIuzNw/QH2s3YwpCs3ebsfrCbiucJPWdNNtcCH49+oVbnBEi3l6Oq
+   aORLgT9G7VAAlgS8bkEqhS6BV6dW39cYPYRxNOozbtTyWY1sAxtQUlDAd
+   88jVtQh9NsbDgvsDZZSXamrkzlm7CJlrBKpmVV7PwgIJrH+/Pq0vdREnD
+   w==;
+X-IronPort-AV: E=Sophos;i="6.16,264,1744070400"; 
+   d="scan'208";a="419636510"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2025 06:33:34 +0000
+Received: from EX19MTAEUC001.ant.amazon.com [10.0.43.254:43950]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.47.53:2525] with esmtp (Farcaster)
+ id 9c25cafc-d2d9-4c9e-8525-84daf9e38da7; Wed, 25 Jun 2025 06:33:32 +0000 (UTC)
+X-Farcaster-Flow-ID: 9c25cafc-d2d9-4c9e-8525-84daf9e38da7
+Received: from EX19D015EUB004.ant.amazon.com (10.252.51.13) by
+ EX19MTAEUC001.ant.amazon.com (10.252.51.155) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Wed, 25 Jun 2025 06:33:31 +0000
+Received: from EX19D015EUB004.ant.amazon.com (10.252.51.13) by
+ EX19D015EUB004.ant.amazon.com (10.252.51.13) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Wed, 25 Jun 2025 06:33:31 +0000
+Received: from EX19D015EUB004.ant.amazon.com ([fe80::2dc9:7aa9:9cd3:fc8a]) by
+ EX19D015EUB004.ant.amazon.com ([fe80::2dc9:7aa9:9cd3:fc8a%3]) with mapi id
+ 15.02.1544.014; Wed, 25 Jun 2025 06:33:31 +0000
+From: "Roy, Patrick" <roypat@amazon.co.uk>
+To: "ackerleytng@google.com" <ackerleytng@google.com>, Sean Christopherson
+	<seanjc@google.com>, Fuad Tabba <tabba@google.com>
+CC: "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	"amoorthy@google.com" <amoorthy@google.com>, "anup@brainfault.org"
+	<anup@brainfault.org>, "aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>,
+	"brauner@kernel.org" <brauner@kernel.org>, "catalin.marinas@arm.com"
+	<catalin.marinas@arm.com>, "chao.p.peng@linux.intel.com"
+	<chao.p.peng@linux.intel.com>, "chenhuacai@kernel.org"
+	<chenhuacai@kernel.org>, "david@redhat.com" <david@redhat.com>,
+	"dmatlack@google.com" <dmatlack@google.com>, "fvdl@google.com"
+	<fvdl@google.com>, "hch@infradead.org" <hch@infradead.org>,
+	"hughd@google.com" <hughd@google.com>, "ira.weiny@intel.com"
+	<ira.weiny@intel.com>, "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+	"isaku.yamahata@intel.com" <isaku.yamahata@intel.com>, "james.morse@arm.com"
+	<james.morse@arm.com>, "jarkko@kernel.org" <jarkko@kernel.org>,
+	"jgg@nvidia.com" <jgg@nvidia.com>, "jhubbard@nvidia.com"
+	<jhubbard@nvidia.com>, "jthoughton@google.com" <jthoughton@google.com>,
+	"keirf@google.com" <keirf@google.com>, "kirill.shutemov@linux.intel.com"
+	<kirill.shutemov@linux.intel.com>, "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>, "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"liam.merwick@oracle.com" <liam.merwick@oracle.com>,
+	"linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>, "mail@maciej.szmigiero.name"
+	<mail@maciej.szmigiero.name>, "maz@kernel.org" <maz@kernel.org>,
+	"mic@digikod.net" <mic@digikod.net>, "michael.roth@amd.com"
+	<michael.roth@amd.com>, "mpe@ellerman.id.au" <mpe@ellerman.id.au>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, "palmer@dabbelt.com"
+	<palmer@dabbelt.com>, "pankaj.gupta@amd.com" <pankaj.gupta@amd.com>,
+	"paul.walmsley@sifive.com" <paul.walmsley@sifive.com>, "pbonzini@redhat.com"
+	<pbonzini@redhat.com>, "peterx@redhat.com" <peterx@redhat.com>,
+	"qperret@google.com" <qperret@google.com>, "quic_cvanscha@quicinc.com"
+	<quic_cvanscha@quicinc.com>, "quic_eberman@quicinc.com"
+	<quic_eberman@quicinc.com>, "quic_mnalajal@quicinc.com"
+	<quic_mnalajal@quicinc.com>, "quic_pderrin@quicinc.com"
+	<quic_pderrin@quicinc.com>, "quic_pheragu@quicinc.com"
+	<quic_pheragu@quicinc.com>, "quic_svaddagi@quicinc.com"
+	<quic_svaddagi@quicinc.com>, "quic_tsoni@quicinc.com"
+	<quic_tsoni@quicinc.com>, "rientjes@google.com" <rientjes@google.com>, "Roy,
+ Patrick" <roypat@amazon.co.uk>, "shuah@kernel.org" <shuah@kernel.org>,
+	"steven.price@arm.com" <steven.price@arm.com>, "suzuki.poulose@arm.com"
+	<suzuki.poulose@arm.com>, "vannapurve@google.com" <vannapurve@google.com>,
+	"vbabka@suse.cz" <vbabka@suse.cz>, "viro@zeniv.linux.org.uk"
+	<viro@zeniv.linux.org.uk>, "wei.w.wang@intel.com" <wei.w.wang@intel.com>,
+	"will@kernel.org" <will@kernel.org>, "willy@infradead.org"
+	<willy@infradead.org>, "xiaoyao.li@intel.com" <xiaoyao.li@intel.com>,
+	"yilun.xu@intel.com" <yilun.xu@intel.com>, "yuzenghui@huawei.com"
+	<yuzenghui@huawei.com>
+Subject: Re: [PATCH v12 04/18] KVM: x86: Rename kvm->arch.has_private_mem to
+ kvm->arch.supports_gmem
+Thread-Topic: [PATCH v12 04/18] KVM: x86: Rename kvm->arch.has_private_mem to
+ kvm->arch.supports_gmem
+Thread-Index: AQHb5ZsRh+1QiHl0MkWMiF4y2LWD7A==
+Date: Wed, 25 Jun 2025 06:33:31 +0000
+Message-ID: <20250625063328.28063-1-roypat@amazon.co.uk>
+References: <diqzh604lv6n.fsf@ackerleytng-ctop.c.googlers.com>
+In-Reply-To: <diqzh604lv6n.fsf@ackerleytng-ctop.c.googlers.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="KyriZ8LMcR1w2jqJ"
-Content-Disposition: inline
-In-Reply-To: <20250625014829.82289-1-binbin.wu@linux.intel.com>
 
-
---KyriZ8LMcR1w2jqJ
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Jun 25, 2025 at 09:48:29AM +0800, Binbin Wu wrote:
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.=
-rst
-> index 9abf93ee5f65..a7dbe08dc376 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -7210,21 +7210,21 @@ number from register R11.  The remaining field of=
- the union provide the
->  inputs and outputs of the TDVMCALL.  Currently the following values of
->  ``nr`` are defined:
-> =20
-> -* ``TDVMCALL_GET_QUOTE``: the guest has requested to generate a TD-Quote
-> -signed by a service hosting TD-Quoting Enclave operating on the host.
-> -Parameters and return value are in the ``get_quote`` field of the union.
-> -The ``gpa`` field and ``size`` specify the guest physical address
-> -(without the shared bit set) and the size of a shared-memory buffer, in
-> -which the TDX guest passes a TD Report.  The ``ret`` field represents
-> -the return value of the GetQuote request.  When the request has been
-> -queued successfully, the TDX guest can poll the status field in the
-> -shared-memory area to check whether the Quote generation is completed or
-> -not. When completed, the generated Quote is returned via the same buffer.
-> -
-> -* ``TDVMCALL_GET_TD_VM_CALL_INFO``: the guest has requested the support
-> -status of TDVMCALLs.  The output values for the given leaf should be
-> -placed in fields from ``r11`` to ``r14`` of the ``get_tdvmcall_info``
-> -field of the union.
-> + * ``TDVMCALL_GET_QUOTE``: the guest has requested to generate a TD-Quote
-> +   signed by a service hosting TD-Quoting Enclave operating on the host.
-> +   Parameters and return value are in the ``get_quote`` field of the uni=
-on.
-> +   The ``gpa`` field and ``size`` specify the guest physical address
-> +   (without the shared bit set) and the size of a shared-memory buffer, =
-in
-> +   which the TDX guest passes a TD Report.  The ``ret`` field represents
-> +   the return value of the GetQuote request.  When the request has been
-> +   queued successfully, the TDX guest can poll the status field in the
-> +   shared-memory area to check whether the Quote generation is completed=
- or
-> +   not. When completed, the generated Quote is returned via the same buf=
-fer.
-> +
-> + * ``TDVMCALL_GET_TD_VM_CALL_INFO``: the guest has requested the support
-> +   status of TDVMCALLs.  The output values for the given leaf should be
-> +   placed in fields from ``r11`` to ``r14`` of the ``get_tdvmcall_info``
-> +   field of the union.
-> =20
->  KVM may add support for more values in the future that may cause a users=
-pace
->  exit, even without calls to ``KVM_ENABLE_CAP`` or similar.  In this case,
->=20
-
-LGTM, thanks!
-
-Reviewed-by: Bagas Sanjaya <bagasdotme@gmail.com>
-
---=20
-An old man doll... just what I always wanted! - Clara
-
---KyriZ8LMcR1w2jqJ
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCaFuXnwAKCRD2uYlJVVFO
-o/ZcAQDEmscUf690FtG11NjUGtksSU/l4/aDjLtqVkkjrjdEIwEAtPaKvUZIB0N0
-HiF6q3sjcMH9qCYR7TsgaW2yKKT1UQ4=
-=+B1+
------END PGP SIGNATURE-----
-
---KyriZ8LMcR1w2jqJ--
+=0A=
+Hi Ackerley!=0A=
+=0A=
+On Tue, 2025-06-24 at 21:51 +0100, Ackerley Tng wrote:> Sean Christopherson=
+ <seanjc@google.com> writes:=0A=
+> =0A=
+=0A=
+[...]=0A=
+=0A=
+>> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_=
+host.h=0A=
+>> index 3d69da6d2d9e..4bc50c1e21bd 100644=0A=
+>> --- a/arch/x86/include/asm/kvm_host.h=0A=
+>> +++ b/arch/x86/include/asm/kvm_host.h=0A=
+>> @@ -1341,7 +1341,7 @@ struct kvm_arch {=0A=
+>>       unsigned int indirect_shadow_pages;=0A=
+>>       u8 mmu_valid_gen;=0A=
+>>       u8 vm_type;=0A=
+>> -     bool has_private_mem;=0A=
+>> +     bool supports_gmem;=0A=
+>>       bool has_protected_state;=0A=
+>>       bool pre_fault_allowed;=0A=
+>>       struct hlist_head mmu_page_hash[KVM_NUM_MMU_PAGES];=0A=
+>> @@ -2270,7 +2270,7 @@ void kvm_configure_mmu(bool enable_tdp, int tdp_fo=
+rced_root_level,=0A=
+>>=0A=
+>>=0A=
+>>  #ifdef CONFIG_KVM_GMEM=0A=
+>> -#define kvm_arch_supports_gmem(kvm) ((kvm)->arch.has_private_mem)=0A=
+>> +#define kvm_arch_supports_gmem(kvm) ((kvm)->arch.supports_gmem)=0A=
+>>  #else=0A=
+>>  #define kvm_arch_supports_gmem(kvm) false=0A=
+>>  #endif=0A=
+>> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c=0A=
+>> index e7ecf089780a..c4e10797610c 100644=0A=
+>> --- a/arch/x86/kvm/mmu/mmu.c=0A=
+>> +++ b/arch/x86/kvm/mmu/mmu.c=0A=
+>> @@ -3488,7 +3488,7 @@ static bool page_fault_can_be_fast(struct kvm *kvm=
+, struct kvm_page_fault *fault=0A=
+>>        * on RET_PF_SPURIOUS until the update completes, or an actual spu=
+rious=0A=
+>>        * case might go down the slow path. Either case will resolve itse=
+lf.=0A=
+>>        */=0A=
+>> -     if (kvm->arch.has_private_mem &&=0A=
+>> +     if (kvm->arch.supports_gmem &&=0A=
+>>           fault->is_private !=3D kvm_mem_is_private(kvm, fault->gfn))=0A=
+>>               return false;=0A=
+>>=0A=
+> =0A=
+> This check should remain as a check on has_private_mem.=0A=
+> =0A=
+> If the VM supports private memory, skip fast page faults on fault type=0A=
+> and KVM memory privacy status mismatches.=0A=
+=0A=
+...=0A=
+ =0A=
+> Patrick, Nikita, am I right that for KVM_X86_DEFAULT_VM to work with=0A=
+> mmap-able guest_memfd, the usage in page_fault_can_be_fast() need not be=
+=0A=
+> updated, and that patch 10/18 in this series will be sufficient?=0A=
+ =0A=
+Yeah, since KVM_X86_DEFAULT_VM does not and won't ever (?) support private=
+=0A=
+memory in guest_memfd (e.g. it always has to be used in all-shared mode) fr=
+om=0A=
+my understanding, the fault->is_private !=3D kvm_mem_is_private(kvm, fault-=
+>gfn))=0A=
+check should never succeed anyway. kvm_mem_is_private() will always return=
+=0A=
+false, and fault->is_private should always be false, too (unless the guest =
+does=0A=
+something it should not be doing, and even then the worst case is that we w=
+on't=0A=
+be handling this weirdness "fast").=0A=
+=0A=
+In my testing with earlier iterations of this series where=0A=
+page_fault_can_be_fast() was untouched I also never saw any problems relate=
+d to=0A=
+page faults on x86.=0A=
+=0A=
+Best, =0A=
+Patrick=0A=
 
