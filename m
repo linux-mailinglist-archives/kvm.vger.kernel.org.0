@@ -1,176 +1,165 @@
-Return-Path: <kvm+bounces-50623-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50625-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF53EAE788D
-	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 09:31:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4739DAE78CD
+	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 09:38:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 232E1179A2C
-	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 07:31:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE7F81BC5E12
+	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 07:38:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAC9B208961;
-	Wed, 25 Jun 2025 07:31:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8566C2135D7;
+	Wed, 25 Jun 2025 07:35:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=lanxincomputing-com.20200927.dkim.feishu.cn header.i=@lanxincomputing-com.20200927.dkim.feishu.cn header.b="4GaTykie"
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sg-3-19.ptr.tlmpb.com (sg-3-19.ptr.tlmpb.com [101.45.255.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E18316E863;
-	Wed, 25 Jun 2025 07:31:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA1DA210F59
+	for <kvm@vger.kernel.org>; Wed, 25 Jun 2025 07:35:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=101.45.255.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750836680; cv=none; b=eYxQyeuyM5lMxdqjbsIu/vtbpqNG5SCKbdSaCIV7TGL5xjQstPE5BDdiwEawlvNi+85z4cRwKr2kEUkvg6e4a7IP1wuEjhp106UiKmZhUQrlBU3XkxFdQtBx4LTg4K21XKJW5bXF01GJJ/AlatFztf/N+9tz7cHksRZX78FCsto=
+	t=1750836938; cv=none; b=lw6Uu5/oh4HjxTwNaRZhwpv3BTJG/78AKaF4X1rn1FqafBmh0deSIKLf1vvYmHdYBx8L9C5TQ+X1GD51isF1XtVDnTU6vR4YYdGmrjsoWdbBknbzSBjlNQ+DqubZaA8xM+SP7+QPrXhuB0svMPSNFNk0BWeXP6rJCFFxXrQDJZY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750836680; c=relaxed/simple;
-	bh=wZKM+fYh50WO5mrYfbUL+DCmiFuOWt42YqhN3P0fFkM=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=k8ZBELejSq/37F810gEIBb/ke14VPSur9Q/J7LcOLrjN7Cdmi15oboXbH1z3kxI9vGP4hbsygrIdA/9eHnsewNxX5zmXU4YWglUBzOqa25WmHoqtyVcpg2ynvY53qFbwnHgpFAW3BL1q1ra8V3kO/vLFcuEyg1y8om4tX5ytRS0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.163])
-	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4bRtk85HJbz1QBnj;
-	Wed, 25 Jun 2025 15:29:36 +0800 (CST)
-Received: from dggpemf500015.china.huawei.com (unknown [7.185.36.143])
-	by mail.maildlp.com (Postfix) with ESMTPS id 97CD9180042;
-	Wed, 25 Jun 2025 15:31:14 +0800 (CST)
-Received: from [10.67.121.110] (10.67.121.110) by
- dggpemf500015.china.huawei.com (7.185.36.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 25 Jun 2025 15:31:13 +0800
-Subject: Re: [PATCH v4 2/3] migration: qm updates BAR configuration
-To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>, "jgg@nvidia.com"
-	<jgg@nvidia.com>, Jonathan Cameron <jonathan.cameron@huawei.com>
-CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linuxarm@openeuler.org" <linuxarm@openeuler.org>
-References: <20250610063251.27526-1-liulongfang@huawei.com>
- <20250610063251.27526-3-liulongfang@huawei.com>
- <191c54da8764416c904c6ca8f120b155@huawei.com>
-From: liulongfang <liulongfang@huawei.com>
-Message-ID: <0c5a1f58-644d-4612-24c7-c218fce1138b@huawei.com>
-Date: Wed, 25 Jun 2025 15:31:13 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	s=arc-20240116; t=1750836938; c=relaxed/simple;
+	bh=a3DMDdHA6v6pJEswAP0XuoxOFgG+epMDo8MP/gCuqCc=;
+	h=From:To:Cc:Mime-Version:Content-Type:Date:Message-Id:Subject:
+	 In-Reply-To:References; b=SrawG6/5E9Ja+it90qTaksPtTnABFd4r+Zd5BaSEzuhf7EcqsyT64DxKEXK6HtkXRluSAV3Usv4FVuMQa796bT1khvLHmMvIewm0Q/q5kYfAAPZPWYZz6IUhqB1zjSQ+PrK1hB98H+gc77Rmvy3HBjNtLxvbWB+iQZ8QHZu4t7E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lanxincomputing.com; spf=pass smtp.mailfrom=lanxincomputing.com; dkim=pass (2048-bit key) header.d=lanxincomputing-com.20200927.dkim.feishu.cn header.i=@lanxincomputing-com.20200927.dkim.feishu.cn header.b=4GaTykie; arc=none smtp.client-ip=101.45.255.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lanxincomputing.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lanxincomputing.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=s1; d=lanxincomputing-com.20200927.dkim.feishu.cn; t=1750836927;
+  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
+ reply-to:content-type:mime-version:in-reply-to:message-id;
+ bh=CEUqe5ahfZFpVFJnOYxZcTEDjpo1QaA063NLvGo/wqE=;
+ b=4GaTykiebG8UNFNWxzI0CcLswfHuuePdzu31ndQJtrBNXMy4B8WQCqIc1vbDAFofS1GWU2
+ z0PFgNdpMRTiW/vq+GgDbtpziDRA4Yr0XL6636HYF2aswHkKBSCqJUJr8DKcRK4YfjgGgL
+ 0t5IJn7BhFQGkXNfis1NlC03x/U9XU3Unpik1KgFlh9fupDoOHSjSBMv4DLrmHxYxfICvw
+ dMfkj6u+8RHBb5T6G+Ua9Bw8cyMOfGCIYvUtrA9csuGzL3Y0o+rbMd/P8opCQSBdMsiJh/
+ SMoyjYsHio0+TevQ4HTJ7DBzs9pXIi7V5GGqglbpPMS5L/zw8wOXT2L0ctkf8w==
+From: "Nutty Liu" <liujingqi@lanxincomputing.com>
+Content-Language: en-US
+To: "Anup Patel" <apatel@ventanamicro.com>, 
+	"Atish Patra" <atish.patra@linux.dev>
+Cc: "Palmer Dabbelt" <palmer@dabbelt.com>, 
+	"Paul Walmsley" <paul.walmsley@sifive.com>, 
+	"Alexandre Ghiti" <alex@ghiti.fr>, 
+	"Andrew Jones" <ajones@ventanamicro.com>, 
+	"Anup Patel" <anup@brainfault.org>, <kvm@vger.kernel.org>, 
+	<kvm-riscv@lists.infradead.org>, <linux-riscv@lists.infradead.org>, 
+	<linux-kernel@vger.kernel.org>, "Atish Patra" <atishp@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <191c54da8764416c904c6ca8f120b155@huawei.com>
-Content-Type: text/plain; charset="gbk"
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla Thunderbird
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
- dggpemf500015.china.huawei.com (7.185.36.143)
+Date: Wed, 25 Jun 2025 15:35:23 +0800
+Message-Id: <794a81fa-41d5-4b1e-816f-6d63b883f935@lanxincomputing.com>
+X-Original-From: Nutty Liu <liujingqi@lanxincomputing.com>
+Subject: Re: [PATCH v3 04/12] RISC-V: KVM: Replace KVM_REQ_HFENCE_GVMA_VMID_ALL with KVM_REQ_TLB_FLUSH
+X-Lms-Return-Path: <lba+2685ba6bd+3a517f+vger.kernel.org+liujingqi@lanxincomputing.com>
+In-Reply-To: <20250618113532.471448-5-apatel@ventanamicro.com>
+Received: from [127.0.0.1] ([139.226.59.215]) by smtp.feishu.cn with ESMTPS; Wed, 25 Jun 2025 15:35:24 +0800
+References: <20250618113532.471448-1-apatel@ventanamicro.com> <20250618113532.471448-5-apatel@ventanamicro.com>
 
-On 2025/6/24 15:06, Shameerali Kolothum Thodi wrote:
-> 
-> 
->> -----Original Message-----
->> From: liulongfang <liulongfang@huawei.com>
->> Sent: Tuesday, June 10, 2025 7:33 AM
->> To: alex.williamson@redhat.com; jgg@nvidia.com; Shameerali Kolothum
->> Thodi <shameerali.kolothum.thodi@huawei.com>; Jonathan Cameron
->> <jonathan.cameron@huawei.com>
->> Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
->> linuxarm@openeuler.org; liulongfang <liulongfang@huawei.com>
->> Subject: [PATCH v4 2/3] migration: qm updates BAR configuration
->>
->> On the new hardware platform, the configuration region for the
->> live migration function of the accelerator device is no longer
->> placed in the VF, but is instead placed in the PF.
->>
->> Therefore, the configuration region of the live migration function
->> needs to be opened when the QM driver is loaded. When the QM driver
->> is uninstalled, the driver needs to clear this configuration.
->>
->> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
->> ---
->>  drivers/crypto/hisilicon/qm.c | 29 +++++++++++++++++++++++++++++
->>  1 file changed, 29 insertions(+)
->>
->> diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
->> index d3f5d108b898..0a8888304e15 100644
->> --- a/drivers/crypto/hisilicon/qm.c
->> +++ b/drivers/crypto/hisilicon/qm.c
->> @@ -242,6 +242,9 @@
->>  #define QM_QOS_MAX_CIR_U		6
->>  #define QM_AUTOSUSPEND_DELAY		3000
->>
->> +#define QM_MIG_REGION_SEL		0x100198
->> +#define QM_MIG_REGION_EN		0x1
->> +
->>   /* abnormal status value for stopping queue */
->>  #define QM_STOP_QUEUE_FAIL		1
->>  #define	QM_DUMP_SQC_FAIL		3
->> @@ -3004,11 +3007,36 @@ static void qm_put_pci_res(struct hisi_qm *qm)
->>  	pci_release_mem_regions(pdev);
->>  }
->>
->> +static void hisi_mig_region_clear(struct hisi_qm *qm)
->> +{
->> +	u32 val;
->> +
->> +	/* Clear migration region set of PF */
->> +	if (qm->fun_type == QM_HW_PF && qm->ver > QM_HW_V3) {
-> 
-> Is this going to be same for all future hardware's like OM_HW_V5, OM_HW_V6 etc?
-> Otherwise it is better you make it specific to OM_HW_V4. I think
-> the above checking  is repeated throughout this series and there is no guarantee
-> that future hardware will have the same changes only. So better make it specific.
+On 6/18/2025 7:35 PM, Anup Patel wrote:
+> The KVM_REQ_HFENCE_GVMA_VMID_ALL is same as KVM_REQ_TLB_FLUSH so
+> to avoid confusion let's replace KVM_REQ_HFENCE_GVMA_VMID_ALL with
+> KVM_REQ_TLB_FLUSH. Also, rename kvm_riscv_hfence_gvma_vmid_all_process()
+> to kvm_riscv_tlb_flush_process().
 >
+> Reviewed-by: Atish Patra <atishp@rivosinc.com>
+> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
+> ---
+>   arch/riscv/include/asm/kvm_host.h | 4 ++--
+>   arch/riscv/kvm/tlb.c              | 8 ++++----
+>   arch/riscv/kvm/vcpu.c             | 8 ++------
+>   3 files changed, 8 insertions(+), 12 deletions(-)
+>
+> diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
+> index 8aa705ac75a5..ff1f76d6f177 100644
+> --- a/arch/riscv/include/asm/kvm_host.h
+> +++ b/arch/riscv/include/asm/kvm_host.h
+> @@ -37,7 +37,6 @@
+>   #define KVM_REQ_UPDATE_HGATP		KVM_ARCH_REQ(2)
+>   #define KVM_REQ_FENCE_I			\
+>   	KVM_ARCH_REQ_FLAGS(3, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+> -#define KVM_REQ_HFENCE_GVMA_VMID_ALL	KVM_REQ_TLB_FLUSH
+>   #define KVM_REQ_HFENCE_VVMA_ALL		\
+>   	KVM_ARCH_REQ_FLAGS(4, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+>   #define KVM_REQ_HFENCE			\
+> @@ -331,8 +330,9 @@ void kvm_riscv_local_hfence_vvma_gva(unsigned long vmid,
+>   				     unsigned long order);
+>   void kvm_riscv_local_hfence_vvma_all(unsigned long vmid);
+>   
+> +void kvm_riscv_tlb_flush_process(struct kvm_vcpu *vcpu);
+> +
+>   void kvm_riscv_fence_i_process(struct kvm_vcpu *vcpu);
+> -void kvm_riscv_hfence_gvma_vmid_all_process(struct kvm_vcpu *vcpu);
+>   void kvm_riscv_hfence_vvma_all_process(struct kvm_vcpu *vcpu);
+>   void kvm_riscv_hfence_process(struct kvm_vcpu *vcpu);
+>   
+> diff --git a/arch/riscv/kvm/tlb.c b/arch/riscv/kvm/tlb.c
+> index b3461bfd9756..da98ca801d31 100644
+> --- a/arch/riscv/kvm/tlb.c
+> +++ b/arch/riscv/kvm/tlb.c
+> @@ -162,7 +162,7 @@ void kvm_riscv_fence_i_process(struct kvm_vcpu *vcpu)
+>   	local_flush_icache_all();
+>   }
+>   
+> -void kvm_riscv_hfence_gvma_vmid_all_process(struct kvm_vcpu *vcpu)
+> +void kvm_riscv_tlb_flush_process(struct kvm_vcpu *vcpu)
+>   {
+>   	struct kvm_vmid *v = &vcpu->kvm->arch.vmid;
+>   	unsigned long vmid = READ_ONCE(v->vmid);
+> @@ -342,14 +342,14 @@ void kvm_riscv_hfence_gvma_vmid_gpa(struct kvm *kvm,
+>   	data.size = gpsz;
+>   	data.order = order;
+>   	make_xfence_request(kvm, hbase, hmask, KVM_REQ_HFENCE,
+> -			    KVM_REQ_HFENCE_GVMA_VMID_ALL, &data);
+> +			    KVM_REQ_TLB_FLUSH, &data);
+>   }
+>   
+>   void kvm_riscv_hfence_gvma_vmid_all(struct kvm *kvm,
+>   				    unsigned long hbase, unsigned long hmask)
+>   {
+> -	make_xfence_request(kvm, hbase, hmask, KVM_REQ_HFENCE_GVMA_VMID_ALL,
+> -			    KVM_REQ_HFENCE_GVMA_VMID_ALL, NULL);
+> +	make_xfence_request(kvm, hbase, hmask, KVM_REQ_TLB_FLUSH,
+> +			    KVM_REQ_TLB_FLUSH, NULL);
+>   }
+>   
+>   void kvm_riscv_hfence_vvma_asid_gva(struct kvm *kvm,
+> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+> index a2dd4161e5a4..6eb11c913b13 100644
+> --- a/arch/riscv/kvm/vcpu.c
+> +++ b/arch/riscv/kvm/vcpu.c
+> @@ -721,12 +721,8 @@ static void kvm_riscv_check_vcpu_requests(struct kvm_vcpu *vcpu)
+>   		if (kvm_check_request(KVM_REQ_FENCE_I, vcpu))
+>   			kvm_riscv_fence_i_process(vcpu);
+>   
+> -		/*
+> -		 * The generic KVM_REQ_TLB_FLUSH is same as
+> -		 * KVM_REQ_HFENCE_GVMA_VMID_ALL
+> -		 */
+> -		if (kvm_check_request(KVM_REQ_HFENCE_GVMA_VMID_ALL, vcpu))
+> -			kvm_riscv_hfence_gvma_vmid_all_process(vcpu);
+> +		if (kvm_check_request(KVM_REQ_TLB_FLUSH, vcpu))
+> +			kvm_riscv_tlb_flush_process(vcpu);
+>   
+>   		if (kvm_check_request(KVM_REQ_HFENCE_VVMA_ALL, vcpu))
+>   			kvm_riscv_hfence_vvma_all_process(vcpu);
 
-We confirmed with hardware team that the subsequent implementations will continue
-to use this approach.
+Reviewed-by: Nutty Liu <liujingqi@lanxincomputing.com>
 
-Thanks.
-Longfang.
-
-> Thanks,
-> Shameer
-> 
-> 
->> +		val = readl(qm->io_base + QM_MIG_REGION_SEL);
->> +		val &= ~BIT(0);
->> +		writel(val, qm->io_base + QM_MIG_REGION_SEL);
->> +	}
->> +}
->> +
->> +static void hisi_mig_region_enable(struct hisi_qm *qm)
->> +{
->> +	u32 val;
->> +
->> +	/* Select migration region of PF */
->> +	if (qm->fun_type == QM_HW_PF && qm->ver > QM_HW_V3) {
->> +		val = readl(qm->io_base + QM_MIG_REGION_SEL);
->> +		val |= QM_MIG_REGION_EN;
->> +		writel(val, qm->io_base + QM_MIG_REGION_SEL);
->> +	}
->> +}
->> +
->>  static void hisi_qm_pci_uninit(struct hisi_qm *qm)
->>  {
->>  	struct pci_dev *pdev = qm->pdev;
->>
->>  	pci_free_irq_vectors(pdev);
->> +	hisi_mig_region_clear(qm);
->>  	qm_put_pci_res(qm);
->>  	pci_disable_device(pdev);
->>  }
->> @@ -5630,6 +5658,7 @@ int hisi_qm_init(struct hisi_qm *qm)
->>  		goto err_free_qm_memory;
->>
->>  	qm_cmd_init(qm);
->> +	hisi_mig_region_enable(qm);
->>
->>  	return 0;
->>
->> --
->> 2.24.0
-> 
-> .
-> 
+Thanks,
+Nutty
 
