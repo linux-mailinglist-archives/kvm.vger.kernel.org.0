@@ -1,207 +1,139 @@
-Return-Path: <kvm+bounces-50701-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50702-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49B4AAE8688
-	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 16:31:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56CC0AE8692
+	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 16:34:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF1DA3A4E2B
-	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 14:31:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E4902188E2D4
+	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 14:34:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D221262FF1;
-	Wed, 25 Jun 2025 14:31:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE0F9268C55;
+	Wed, 25 Jun 2025 14:33:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="gRb5MY1h"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FLZcWRah"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-vk1-f176.google.com (mail-vk1-f176.google.com [209.85.221.176])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E40E24A06F
-	for <kvm@vger.kernel.org>; Wed, 25 Jun 2025 14:31:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9484F25FA07
+	for <kvm@vger.kernel.org>; Wed, 25 Jun 2025 14:33:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750861901; cv=none; b=X49fm6+VwqUpHslm5UQD/S5JYgKcvomRpSeDzG4j+l9+5JCz15uZAj2S4cbXiXsye72fDUy61PioMxOqkt4+/Cj9UQ4DaIN3DUxc2itbYTzPNu1prjqVW5uxxvTO5UVDzkEEYZP1z7Jh3xEFV/sZH66JBHNdKp3vf/0AinEDCWI=
+	t=1750862036; cv=none; b=mVpvKgKnNSKaYYxxkzAfTDPGIrXQ3P3oj17lRKSyQXQ4O1fK/UZ3Qju1wkrGsrOyV7szNGorjvDhs6viI3U1j7s8Is1IYbIch27aVPBjsSMWgGdIpGAxBvgsPRwHXFvCOi4tPXT1g3q0GiUrvXt1GekxG2dO2LaW8QY2Kq+vy8k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750861901; c=relaxed/simple;
-	bh=3I+gVkx1zcSeZSI2kzpQRJ2nZN33b8k+5p4GFpApePc=;
+	s=arc-20240116; t=1750862036; c=relaxed/simple;
+	bh=k/9Jmpcevuw9DPLUN7lxWq/HVRKdkSC2nfzszYCDb30=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ws3WWsReWlbx6Z07O61vSYP7fQ5UK8ow6p0G/3QTLNQKkSDTy5xiathi/I8bOJMqiN/FV+s0fEqxdISEzbGcrHjWQBt+dZyCH1TZn2Xaf/4AfeBeRrUyrM4Mv9R6MAEXw7o4WKWKiemUkeCurlp23OrXa/jWi/00NAiS0681x/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=gRb5MY1h; arc=none smtp.client-ip=209.85.221.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-vk1-f176.google.com with SMTP id 71dfb90a1353d-52b2290e290so3652199e0c.1
-        for <kvm@vger.kernel.org>; Wed, 25 Jun 2025 07:31:39 -0700 (PDT)
+	 To:Cc:Content-Type; b=nKT/hi1GcyHPqKL0V+t3KKCA7iLK0SZF9mXEcDmLGxrUCNhZScMe0csAxL1MfJyDG/Csn80FG3B9SmVYxyZ1lCkoKMKu1UCtjE8DOaRscoPx6KywB7RByYYXLGZN6wWPtw8s8Fpq8Cc/Jejc6kY8tGjUMMgyXcc+OAu6KmuTk1c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FLZcWRah; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-237f270513bso147085ad.1
+        for <kvm@vger.kernel.org>; Wed, 25 Jun 2025 07:33:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1750861898; x=1751466698; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1750862034; x=1751466834; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=rNEFN1NKG+swatDYQI6HrjoJU0jdsCu1bPMlAu48h0g=;
-        b=gRb5MY1hNyX9AbKuC0qHV+NKna/hNqkA4jrhDwFkSbvhk5ynG61QJ3CLDA3+txtppi
-         h7NzWAgRvCzeDFogDB3qURrBkyoZAS5sXNDeUrMWYr145rw9pgvAEJ0ZvFCyEM3k+mhl
-         w3ntA65gSTsLSl1Bbh/JkIsMENjAIxYTqaXq6pOFzK0s7hFxgkcSVVqMTos96yutNgB/
-         cbRIspBcAl0l0IE+bvCUycOBIX7awXqCO52WNy50+a5gjt//tU4yA2eULrp3nTVHW2AW
-         CcOT7UByeSimGZivC1cmlOnr/ZFn7n6w9xUKIQx1eERO2jYxtx8y1So/hAkmg86oM6b1
-         ZlIw==
+        bh=BdV48kTp/uRROljNRCynqJ7h0+dKwD9pZid+7Ju9vko=;
+        b=FLZcWRahed/cn0x/habzbVuKXmZ8smUrK0DytAimjUAB29yqxoUhuNkSZSeo7lmqoO
+         P53EXbq32TNb2FE/dcII/rv8m5wlWMUqK/9UMvfB/jhN3slPF0Akw6gbHqS6li+F6bIU
+         3cwRdkH2PtAu/6OoQFOGDxODEZF/m0r/52USX1JlXUxkmyZFMusihN9lYR9d0+7O9V1i
+         3doBljxT0RCG9PjDTIppWmVZkGOkx0ute/e1XSaIj36DfYx/RsVuc7uUCAw0Y4TLhr7D
+         drAAsgAc7j3YLJEDQQmsE0w6dGyUatd16vZrjNUdbhXAw1Ph1Cgy7gGu1V49qb56hPNl
+         KlCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750861898; x=1751466698;
+        d=1e100.net; s=20230601; t=1750862034; x=1751466834;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=rNEFN1NKG+swatDYQI6HrjoJU0jdsCu1bPMlAu48h0g=;
-        b=gyRvfi5P9uWSe8kpvIMNyVyOLz3Haaqst0G4HmV0woH2CzgJnHfHBYCfibKzHBOr3J
-         70JLg2zz7h8XCBjEDjkP8rl65E0fRcYxCa8n9XtA4dWNlc6+wEjHO/QI3ydmN/DTpU7N
-         5WNWemlS6hiFCQUb3ewDZCR7B95EKjqmWgwT8UnVkUL1EfMpUfihnxeuyxuM++ixUS32
-         4m9Uhm9jpVpZp+58hE2G/+sJgH4Ulco0O+/jVEemUiGZbSOXW9Kj6QM0z+l05+EwkIO8
-         laXWiEiMJ7rT8X03N2KGePi7FPNfhkUy8q6v3bcT5SyQzdGYZUylpJreMEjVlEDNTXAI
-         80mw==
-X-Gm-Message-State: AOJu0YwlBe8IKUv235MzN1oWJZ8Dsa8pc88YRSOXtyg4/hYT3vcHlT9N
-	PqDVDS/qGQZYpZQ0r9cvhaawsBqPMGfOQ80LhN5ARcVhq1r1rB+Xh3KTVPLmaGr7GcaVrY05Xde
-	sCGFRtn6sxy7euRagLo9T76ciB17f0njwYgfxNrBhJA==
-X-Gm-Gg: ASbGncuUfDBVNId3auww0tcwNfyAWT26utJeriZStNG3qxWv2tkYfnleYJ/6epTOUSa
-	kDlyJ5MmiI3a6Q/uJTTV2uM7EOYl2g5uVomk283Y7UbBTI3IyxsLa/NRpZrh09LB5tfoOpvjS31
-	v4P7Bv9J3gXN297Us7qAnN24g5fJG52XRfUDvCGcEBetz2
-X-Google-Smtp-Source: AGHT+IFKZk8yDb57dXdu1goU1780yjICESJYQ6+NBRPRFD400b1dsKCn0S2Grq/YbRlUVTvVl3LuPip1M1XE7G/Op0c=
-X-Received: by 2002:a05:6122:438b:b0:52a:79fd:34bd with SMTP id
- 71dfb90a1353d-532ef3d28c7mr2189962e0c.4.1750861898326; Wed, 25 Jun 2025
- 07:31:38 -0700 (PDT)
+        bh=BdV48kTp/uRROljNRCynqJ7h0+dKwD9pZid+7Ju9vko=;
+        b=qPGvpFw6T2eH+N4II98lY6NaCUK0RHjIs7AycjXL5SZWJ1dYhqAIXF56KYzr9q7+24
+         B4vonRYSHyXEsmaS4kw3KBVIlrt4Q+kPbW99NOjRAJtxfxrRv0ostZ1Z4N8e3Ugm8LYl
+         JDfIbnWPMHXuHZSgKs/n/VRwe19mqN0izb7OYXYKCx3NBozY4xbTsA9sJ/N8BxhTtJeW
+         gggsCYWWzcb+kuuY30WWXIEqfThh4DX7dqwCS2n5FELk/ds0jCTQpsujgkwySk1TLhtA
+         CLi8ixNGkdK4ELTjI7Ln+3PAIPN7uU4Dzgyjqed9cN/BSNSR9Rxq6eBz9SsdKfZKOTUD
+         b/nw==
+X-Forwarded-Encrypted: i=1; AJvYcCWOny0G+ZAtosWrjWraYXe4Whziutfy6O+JzFpD7B1plGwWbc3dogxOy70MDdkeVgRoSbs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzxhQkoLQ8KECPz/YbHi61/W1v9P6pkH3TMcFe8S2WzBz+aabx2
+	c3EbPHYMjouc7+yztzbWqEXqdD30FfAa25t0asmkW0xa1g+0ASFk7vWHEI/WbjVGFMDjyVSeGXk
+	NxuFxvIlW1RkONQiIDWcduiM+9qPEKztWS13WRYyN
+X-Gm-Gg: ASbGnctcraj4gtNVfgjrRJBK2C2bIdFT5jzSxz+uW+eUTN+agEU/80y8Gf7rLbA1uxP
+	YVX1Ur/hQKpMqBB5k7mZ2qYnlJVnlozGlbSNRw96xbGkPmVrLaeQy5IRJDUC5w47JFeT3hOdK2k
+	jJIBZjJaWh//076xLW/P1at1WjsL7yWQrBLPJa6V9ViDXlVsqV9wAKlODCyKST6eQm3mDqg6vXr
+	wrW
+X-Google-Smtp-Source: AGHT+IHOl4ROtzPHTK+wA3RxqSQB0nXvE1X3o8JvmI/Y5HuW89eI98s0XYuUXqOg4//IZvRW47fajZljsA5Du+i3Zig=
+X-Received: by 2002:a17:903:178b:b0:235:f298:cbbb with SMTP id
+ d9443c01a7336-23827442ec7mr2061555ad.26.1750862033549; Wed, 25 Jun 2025
+ 07:33:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250624192317.278437-1-jesse@rivosinc.com> <20250625-fc81fec2cf6d7ee195c0eb6c@orel>
-In-Reply-To: <20250625-fc81fec2cf6d7ee195c0eb6c@orel>
-From: Jesse Taube <jesse@rivosinc.com>
-Date: Wed, 25 Jun 2025 07:31:27 -0700
-X-Gm-Features: Ac12FXyDu2tWflqx0iVeOG6H8MMrg5H_8TMwkiqA4xvmkjqXYVxH_T-zC7snMds
-Message-ID: <CALSpo=ZsEEQeoYz2dby9B4zgbFcxCzmjN9SH8Jch4Avvm14Cog@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH v2] riscv: lib: sbi_shutdown add pass/fail
- exit code.
-To: Andrew Jones <andrew.jones@linux.dev>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	linux-kselftest@vger.kernel.org, =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>, 
-	Charlie Jenkins <charlie@rivosinc.com>, James Raphael Tiovalen <jamestiotio@gmail.com>, 
-	Sean Christopherson <seanjc@google.com>, Cade Richard <cade.richard@gmail.com>
+References: <20250618120806.113884-1-adrian.hunter@intel.com>
+ <20250618120806.113884-3-adrian.hunter@intel.com> <68938275-3f6a-46fc-9b38-2c916fdec3d6@intel.com>
+In-Reply-To: <68938275-3f6a-46fc-9b38-2c916fdec3d6@intel.com>
+From: Vishal Annapurve <vannapurve@google.com>
+Date: Wed, 25 Jun 2025 07:33:41 -0700
+X-Gm-Features: AX0GCFtcX4EHPJezVuR03z_zvYB0b1sB8iUGWdlclbBZyL1LJyYQEWzO3JG3LhQ
+Message-ID: <CAGtprH_cVwWhfXFkM-=rVzQZ0CpY_zcnkF=q5x1n_9Bzm1xKfw@mail.gmail.com>
+Subject: Re: [PATCH 2/2] KVM: TDX: Do not clear poisoned pages
+To: Dave Hansen <dave.hansen@intel.com>
+Cc: Adrian Hunter <adrian.hunter@intel.com>, Tony Luck <tony.luck@intel.com>, pbonzini@redhat.com, 
+	seanjc@google.com, Borislav Petkov <bp@alien8.de>, Thomas Gleixner <tglx@linutronix.de>, 
+	Ingo Molnar <mingo@redhat.com>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	H Peter Anvin <hpa@zytor.com>, linux-edac@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, rick.p.edgecombe@intel.com, 
+	kirill.shutemov@linux.intel.com, kai.huang@intel.com, 
+	reinette.chatre@intel.com, xiaoyao.li@intel.com, 
+	tony.lindgren@linux.intel.com, binbin.wu@linux.intel.com, 
+	isaku.yamahata@intel.com, yan.y.zhao@intel.com, chao.gao@intel.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jun 25, 2025 at 1:33=E2=80=AFAM Andrew Jones <andrew.jones@linux.de=
-v> wrote:
+On Wed, Jun 18, 2025 at 7:58=E2=80=AFAM Dave Hansen <dave.hansen@intel.com>=
+ wrote:
 >
-> On Tue, Jun 24, 2025 at 12:23:17PM -0700, Jesse Taube wrote:
-> > When exiting it may be useful for the sbi implementation to know if
-> > kvm-unit-tests passed or failed.
-> > Add exit code to sbi_shutdown, and use it in exit() to pass
-> > success/failure (0/1) to sbi.
+> On 6/18/25 05:08, Adrian Hunter wrote:
+> > --- a/arch/x86/kvm/vmx/tdx.c
+> > +++ b/arch/x86/kvm/vmx/tdx.c
+> > @@ -282,10 +282,10 @@ static void tdx_clear_page(struct page *page)
+> >       void *dest =3D page_to_virt(page);
+> >       unsigned long i;
 > >
-> > Signed-off-by: Jesse Taube <jesse@rivosinc.com>
-> > ---
-> >  lib/riscv/asm/sbi.h | 2 +-
-> >  lib/riscv/io.c      | 2 +-
-> >  lib/riscv/sbi.c     | 4 ++--
-> >  3 files changed, 4 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/lib/riscv/asm/sbi.h b/lib/riscv/asm/sbi.h
-> > index a5738a5c..de11c109 100644
-> > --- a/lib/riscv/asm/sbi.h
-> > +++ b/lib/riscv/asm/sbi.h
-> > @@ -250,7 +250,7 @@ struct sbiret sbi_ecall(int ext, int fid, unsigned =
-long arg0,
-> >                       unsigned long arg3, unsigned long arg4,
-> >                       unsigned long arg5);
-> >
-> > -void sbi_shutdown(void);
-> > +void sbi_shutdown(unsigned int code);
-> >  struct sbiret sbi_hart_start(unsigned long hartid, unsigned long entry=
-, unsigned long sp);
-> >  struct sbiret sbi_hart_stop(void);
-> >  struct sbiret sbi_hart_get_status(unsigned long hartid);
-> > diff --git a/lib/riscv/io.c b/lib/riscv/io.c
-> > index fb40adb7..0bde25d4 100644
-> > --- a/lib/riscv/io.c
-> > +++ b/lib/riscv/io.c
-> > @@ -150,7 +150,7 @@ void halt(int code);
-> >  void exit(int code)
-> >  {
-> >       printf("\nEXIT: STATUS=3D%d\n", ((code) << 1) | 1);
-> > -     sbi_shutdown();
-> > +     sbi_shutdown(!!code);
-> >       halt(code);
-> >       __builtin_unreachable();
-> >  }
-> > diff --git a/lib/riscv/sbi.c b/lib/riscv/sbi.c
-> > index 2959378f..9dd11e9d 100644
-> > --- a/lib/riscv/sbi.c
-> > +++ b/lib/riscv/sbi.c
-> > @@ -107,9 +107,9 @@ struct sbiret sbi_sse_inject(unsigned long event_id=
-, unsigned long hart_id)
-> >       return sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_INJECT, event_id, hart_=
-id, 0, 0, 0, 0);
-> >  }
-> >
-> > -void sbi_shutdown(void)
-> > +void sbi_shutdown(unsigned int code)
-> >  {
-> > -     sbi_ecall(SBI_EXT_SRST, 0, 0, 0, 0, 0, 0, 0);
-> > +     sbi_ecall(SBI_EXT_SRST, 0, 0, code, 0, 0, 0, 0);
-> >       puts("SBI shutdown failed!\n");
-> >  }
-> >
-> > --
-> > 2.43.0
-> >
->
-> I enhanced the commit message, changed the parameter to a boolean, and
-> applied to riscv/sbi
->
-> https://gitlab.com/jones-drew/kvm-unit-tests/-/commits/riscv/sbi
->
-> but I'm having some second thoughts on it. It looks like opensbi and the
-> two KVM VMMs I looked at (QEMU and kvmtool) all currently ignore this
-> parameter and we don't know what they might choose to do if they stop
-> ignoring it.
+> > -     /*
+> > -      * The page could have been poisoned.  MOVDIR64B also clears
+> > -      * the poison bit so the kernel can safely use the page again.
+> > -      */
+> > +     /* Machine check handler may have poisoned the page */
+> > +     if (PageHWPoison(page))
+> > +             return;
 
-For the default syscon QEMU doesn't ignore it and exits with the exit
-code given.
-https://gitlab.com/qemu-project/qemu/-/blob/master/hw/misc/sifive_test.c?re=
-f_type=3Dheads#L44
+IIUC, even if movdir64b stores contents on hwpoisoned pages, it's not
+going to cause any trouble.
 
-Both RustSBI and BBL implement the sifive_test device correctly and
-provide an exit code,
-OpenSBI ignores it, though it is trivial to add it.
-https://github.com/rustsbi/rustsbi/blob/main/prototyper/prototyper/src/plat=
-form/reset.rs#L21
-https://github.com/riscv-software-src/riscv-pk/blob/master/machine/finisher=
-.c#L15
-
-> For example, they could choose to hang, rather than complete
-> the shutdown when they see a "system failure" reason. It may make sense
-> to indicate system failure if the test aborts, since, in those cases,
-> something unexpected with the testing occurred. However, successfully
-> running tests which find and report failures isn't unexpected, so it
-> shouldn't raise an alarm to the SBI implementation in those cases.
->
-> Do you already have a usecase for this in mind?
-
-Yes making CI easier, as the exit code is passed to QEMU rather than
-having to parse the text.
-
-> If so, we could make
-> the behavior optional to enable that use case and use cases like it
-> but we'd keep that behavior off by default to avoid problems with SBI
-> implementations that do things with the "system failure" information we'd
-> rather they not do.
-
-Sure, do you want it to be a configure flag like  --console?
-
-Thanks,
-Jesse Taube
+This check should be (unlikely(PageHWPoison(page)) and even better
+probably should be omitted altogether if there are no side effects of
+direct store to hwpoisoned pages.
 
 >
-> Thanks,
-> drew
+> I think the old comment needs to stay in some form.
+>
+> There are two kinds of poisons here: One from an integrity mismatch and
+> the other because the hardware decided the memory is bad. MOVDIR64B
+> clears the integrity one, but not the hardware one obviously.
+
+To ensure I understand correctly, Am I correct in saying: movdir64b
+clearing the integrity poison is just hardware clearing the poison
+bit, software will still treat that page as poisoned?
+
+>
+> Could we make that clear in the comment, please?
+>
+>
 
