@@ -1,344 +1,200 @@
-Return-Path: <kvm+bounces-50747-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50748-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7DC7AE8EAA
-	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 21:28:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0592EAE8EAC
+	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 21:28:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C216F4A6B0C
-	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 19:28:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80B1B3A4E69
+	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 19:28:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DD942DCC1C;
-	Wed, 25 Jun 2025 19:26:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F5502DFA4C;
+	Wed, 25 Jun 2025 19:26:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fpy5a7Ld"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HHU3qV6n"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E5E72DBF66;
-	Wed, 25 Jun 2025 19:26:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A4862DFA47
+	for <kvm@vger.kernel.org>; Wed, 25 Jun 2025 19:26:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750879574; cv=none; b=RJ38P7xZIM15iinlcGQ06yj6CdN9J05w3cL1sbENYQuVA9dh3ihSFqhUPAE1F0xjwWvzd14Fcm3wJhjAPwcvlNseWYJKI1gGaKr3SEDgzV9+oD1zVhwMX/BTXw5W4LskI55O40NXqo88dsouQi2glwHID6TvL9g+j74t1IWlR08=
+	t=1750879614; cv=none; b=MsW4qyLriN2DCjjBaZT0VqkJNNiHOk1ktXRSp3Ii/4If/T7l9nrZKfbKUjQLTesV7T+p/iRTNEGfiSMwtnlOW9NMoVFTvXXZ6n0VF2X+xmb3i+MQLG/G2/xYxjt+KJYfoBnkiQuF4MKDae16TzVotuM1l5jskkdMVljTI2hqSXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750879574; c=relaxed/simple;
-	bh=STCW0Ble9JAfnjY2ffDHzXPQLbDsHhsDIG/HFSdoeUc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UOQQQ1GP62b5VQ/kQafuHzP8OML0YrEfCNwVWU52hoxuG4HcJJaLAA5U5az7SpUJzbDKDx2jmTlhsI7ZUZ1InKp3DMYWajF6Aw9iio4gTOzKcNrogKnCXjEQWXgUEBcQqmKSbWEUOsUR9gXS47QTL+aoVfOWtrTJg6QtDKC1mBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fpy5a7Ld; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750879572; x=1782415572;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=STCW0Ble9JAfnjY2ffDHzXPQLbDsHhsDIG/HFSdoeUc=;
-  b=fpy5a7Ld7d8ef2VksH/dHQdmwYCTPlE7S3bysINeqWgN+6A2O9BIZPU9
-   AFgKjRx/8sWLaRpAvyiHO8kvc6hIxdmZzdSKXav7II3jcSSIPFmQQDuqB
-   mlcRWPPRRTjmsYUMbJdsDzVAHYv+Mz2xwOLnFrZpowzSU43652xz4memT
-   bZtI/mgr/fnJjjNcHzPoEGgl4HMiKz+i9TBO8xWYOfANIKpvdHYUb1OHp
-   PGhQD15WQAyonwr5TwRgRgd31+H74v3JlAXAWj5xHlBL0kXGkZYP2WzLn
-   X3KiUuN/0sHoa5GL07mIhf1k3Fsyzwul4MN5nTEMg0E6Ztn4XB4Ql/1cn
-   A==;
-X-CSE-ConnectionGUID: ox0n6paUTrKzqsi46NVDDw==
-X-CSE-MsgGUID: ZVB8/MUcQ3y7RU/+srQI2A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11475"; a="64598523"
-X-IronPort-AV: E=Sophos;i="6.16,265,1744095600"; 
-   d="scan'208";a="64598523"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2025 12:26:11 -0700
-X-CSE-ConnectionGUID: mpA8a4WkQNWjvzIc+WzlxQ==
-X-CSE-MsgGUID: GClNW5waSSaWcZVRiVVU7A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,265,1744095600"; 
-   d="scan'208";a="152430668"
-Received: from dwoodwor-mobl2.amr.corp.intel.com (HELO [10.125.108.244]) ([10.125.108.244])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2025 12:26:10 -0700
-Message-ID: <fb5addcb-1cfc-45be-978c-e7cee4126b38@intel.com>
-Date: Wed, 25 Jun 2025 12:26:09 -0700
+	s=arc-20240116; t=1750879614; c=relaxed/simple;
+	bh=lzwFHTmArGTFfMnHS2pC4PiDBDDb1yR51vxeS8GWDfg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=G6F2bNUBdn11nAdCMV0SJj1OwIj5gL4XmZ4FcTaRqdB0NeoQSpVWYD2dmgNuGTG5/+QDE2iizuepugTdHZWfUORsu2pDRpq7gNe0LUCcPaxz+IZ7EPCJAg+HKI0KKHIL+XU9ebgzM9kVJJ3IP34iRjEsnPCJ/v41bk9wHgDMMLk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HHU3qV6n; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1750879611;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TGfYjsrv3CHWJsl4ZYRpnVjuHZ4AXKNVmUWtYP9RsHQ=;
+	b=HHU3qV6n8sCh+ymZh3CnoipRNVKbRFst0b6G885+LJCQSvdgd93P7JPVU8EUwpjc1DlqYn
+	JaapW7TqvprL8CtDz2ZVSjAUlvgGQx2ml6Qbl0wH6MngERgsgnwbtXkFp6K942whLUPtCi
+	K6Go5QA/dhbyMdtn5j+FyM9YhA5NI94=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-115-wHm4tbqnOGaO4YW6weVMHA-1; Wed, 25 Jun 2025 15:26:49 -0400
+X-MC-Unique: wHm4tbqnOGaO4YW6weVMHA-1
+X-Mimecast-MFC-AGG-ID: wHm4tbqnOGaO4YW6weVMHA_1750879609
+Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-4a6fb9bbbc9so8226401cf.0
+        for <kvm@vger.kernel.org>; Wed, 25 Jun 2025 12:26:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750879608; x=1751484408;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TGfYjsrv3CHWJsl4ZYRpnVjuHZ4AXKNVmUWtYP9RsHQ=;
+        b=nZN4o8VLL45cLQ+/RWbF5Rc03OH+Z8oJxqPrCO3gN9lNhOAtU8J9v8s1rliKcxvO0m
+         drps2ScD5rfjz0COP/x4Ql9j794ewxON0W2Yyga40WUwD5WyVAefzj1EJ0BDSsfMo3jw
+         NH8nN4+evTTc6F8mOY4eZ8h02zqzVKJ90nEvWOFOriq3orShrhKCNNAF0j19UGZYTivU
+         WGMlmCsGJ3C5etoFrf8YXCY0FFKvt5Gcszq+MO/t3WQh3YiZGGK40iiyFUglN4W18qow
+         d1Et14Mp1ZPzwq62FqvvY84wp3iZtKwAid+VTP566PrhqbCGuEntPpe7d9MJxzZKYrF0
+         EFmw==
+X-Forwarded-Encrypted: i=1; AJvYcCXnndrdBDSjOycxKIjiBpEDBw7FBqzlaYOt7ft/VfhPk9g7iRvPtUcHPIQFcnvg/6yfAbo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwSi5zSjUBbhqGQFQeFJw6i/ltjG+ShJATCLnPucYvTesVEDNkk
+	e9v2st9u1IRNvG48zEQblo3ABR3y6bI03CPw3oS2vlUt6hDglcQiw2MSNzW+e3ZBF1GsUug5Jwl
+	X7ZRYx/XIm/QfLvbto0mPPDrJ9l40kOmXmCJ4zYtlDUypm6dIDImVRjHpg8yfCA==
+X-Gm-Gg: ASbGncuAomPLYiHQZsBTQCgb8uAKvGm+P98KERq7XM0ZbPorWkzxSZWIZUeLJeWG1E1
+	0TFb1tB7BCgrpkzuO32Ssg+4oeGxzRFJuhv30NAfdIAFu5I1Td3MCXhlL3Dp27JmDYvtGUKYZwz
+	EZSobZwiRTXiZbFLfcNyOTDmG5kQdfWcdTogyzzoVGoVMGbV6lvWD6FtpsH7q4AYggTZe5hnzar
+	8SfHP5EMboE53AwRQN9bJYiXNJumoWSYt9/yVDBSTw0k1vgndN8Hb8xq79OE1/cjteBbcGu0jDZ
+	jEF+GbGg/32Owg==
+X-Received: by 2002:a05:622a:d0c:b0:4a7:693a:6ae8 with SMTP id d75a77b69052e-4a7c0987d78mr76648541cf.52.1750879608518;
+        Wed, 25 Jun 2025 12:26:48 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE2/4t5r9VjiW5td+72Yce2Xj+4z6Ttju+rlhn9lvRECNav3t/dX5xvs86OsGTFFXZgQqVrUA==
+X-Received: by 2002:a05:622a:d0c:b0:4a7:693a:6ae8 with SMTP id d75a77b69052e-4a7c0987d78mr76648091cf.52.1750879608097;
+        Wed, 25 Jun 2025 12:26:48 -0700 (PDT)
+Received: from x1.local ([85.131.185.92])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4a779d4f7d9sm62877581cf.6.2025.06.25.12.26.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Jun 2025 12:26:47 -0700 (PDT)
+Date: Wed, 25 Jun 2025 15:26:44 -0400
+From: Peter Xu <peterx@redhat.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	kvm@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Zi Yan <ziy@nvidia.com>, Alex Mastro <amastro@fb.com>,
+	David Hildenbrand <david@redhat.com>,
+	Nico Pache <npache@redhat.com>
+Subject: Re: [PATCH 5/5] vfio-pci: Best-effort huge pfnmaps with !MAP_FIXED
+ mappings
+Message-ID: <aFxNdDpIlx0fZoIN@x1.local>
+References: <aFMQZru7l2aKVsZm@x1.local>
+ <20250619135852.GC1643312@nvidia.com>
+ <aFQkxg08fs7jwXnJ@x1.local>
+ <20250619184041.GA10191@nvidia.com>
+ <aFsMhnejq4fq6L8N@x1.local>
+ <20250624234032.GC167785@nvidia.com>
+ <aFtHbXFO1ZpAsnV8@x1.local>
+ <20250625130711.GH167785@nvidia.com>
+ <aFwt6wjuDzbWM4_C@x1.local>
+ <20250625184154.GI167785@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv2 03/12] x86/virt/tdx: Allocate reference counters for
- PAMT memory
-To: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
- pbonzini@redhat.com, seanjc@google.com, dave.hansen@linux.intel.com
-Cc: rick.p.edgecombe@intel.com, isaku.yamahata@intel.com,
- kai.huang@intel.com, yan.y.zhao@intel.com, chao.gao@intel.com,
- tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, kvm@vger.kernel.org,
- x86@kernel.org, linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org
-References: <20250609191340.2051741-1-kirill.shutemov@linux.intel.com>
- <20250609191340.2051741-4-kirill.shutemov@linux.intel.com>
-From: Dave Hansen <dave.hansen@intel.com>
-Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <20250609191340.2051741-4-kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250625184154.GI167785@nvidia.com>
 
-On 6/9/25 12:13, Kirill A. Shutemov wrote:
-> The PAMT memory holds metadata for TDX-protected memory. With Dynamic
-> PAMT, PAMT_4K is allocated on demand. The kernel supplies the TDX module
-> with a page pair that covers 2M of host physical memory.
+On Wed, Jun 25, 2025 at 03:41:54PM -0300, Jason Gunthorpe wrote:
+> On Wed, Jun 25, 2025 at 01:12:11PM -0400, Peter Xu wrote:
 > 
-> The kernel must provide this page pair before using pages from the range
-> for TDX. If this is not done, any SEAMCALL that attempts to use the
-> memory will fail.
+> > After I read the two use cases, I mostly agree.  Just one trivial thing to
+> > mention, it may not be direct map but vmap() (see io_region_init_ptr()).
 > 
-> Allocate reference counters for every 2M range to track PAMT memory
-> usage. This is necessary to accurately determine when PAMT memory needs
-> to be allocated and when it can be freed.
+> If it is vmapped then this is all silly, you should vmap and mmmap
+> using the same cache colouring and, AFAIK, pgoff is how this works for
+> purely userspace.
 > 
-> This allocation will consume 2MiB for every 1TiB of physical memory.
+> Once vmap'd it should determine the cache colour and set the pgoff
+> properly, then everything should already work no?
 
-... and yes, this is another boot-time allocation that seems to be
-counter to the goal of reducing the boot-time TDX memory footprint.
+I don't yet see how to set the pgoff.  Here pgoff is passed from the
+userspace, which follows io_uring's definition (per io_uring_mmap).
 
-Please mention the 0.4%=>0.0004% overhead here in addition to the cover
-letter. It's important.
+For example, in parisc one could map the complete queue with
+pgoff=IORING_OFF_CQ_RING (0x8000000), but then the VA alignment needs to be
+adjusted to the vmap() returned for complete queue's io_mapped_region.ptr.
 
-> Tracking PAMT memory usage on the kernel side duplicates what TDX module
-> does.  It is possible to avoid this by lazily allocating PAMT memory on
-> SEAMCALL failure and freeing it based on hints provided by the TDX
-> module when the last user of PAMT memory is no longer present.
 > 
-> However, this approach complicates serialization.
+> > It already does, see (io_uring_get_unmapped_area(), of parisc):
+> > 
+> > 	/*
+> > 	 * Do not allow to map to user-provided address to avoid breaking the
+> > 	 * aliasing rules. Userspace is not able to guess the offset address of
+> > 	 * kernel kmalloc()ed memory area.
+> > 	 */
+> > 	if (addr)
+> > 		return -EINVAL;
+> > 
+> > I do not know whoever would use MAP_FIXED but with addr=0.  So failing
+> > addr!=0 should literally stop almost all MAP_FIXED already.
 > 
-> The TDX module takes locks when dealing with PAMT: a shared lock on any
-> SEAMCALL that uses explicit HPA and an exclusive lock on PAMT.ADD and
-> PAMT.REMOVE. Any SEAMCALL that uses explicit HPA as an operand may fail
-> if it races with PAMT.ADD/REMOVE.
+> Maybe but also it is not right to not check MAP_FIXED directly.. And
+> addr is supposed to be a hint for non-fixed mode so it is weird to
+> -EINVAL when you can ignore the hint??
+
+I agree on both points here.
+
 > 
-> Since PAMT is a global resource, to prevent failure the kernel would
-> need global locking (per-TD is not sufficient). Or, it has to retry on
-> TDX_OPERATOR_BUSY.
+> > Going back to the topic of this series - I think the new API would work for
+> > io_uring and parisc too if I can return phys_pgoff, here what parisc would
+> > need is:
 > 
-> Both options are not ideal, and tracking PAMT usage on the kernel side
-> seems like a reasonable alternative.
+> The best solution is to fix the selection of normal pgoff so it has
+> consistent colouring of user VMAs and kernel vmaps. Either compute a
+> pgoff that matches the vmap (hopefully easy if it is not uABI) or
+> teach the kernel vmap how to respect a "pgoff" to set the cache
+> colouring just like the user VMA's do (AFIACR).
+> 
+> But I think this is getting maybe too big and I'd just introduce the
+> new API and not try to convert this hard stuff. The above explanation
+> how it could be fixed should be enough??
 
-Just a nit on changelog formatting: It would be ideal if you could make
-it totally clear that you are transitioning from "what this patch does"
-to "alternate considered designs".
+I never planned to do it myself.  However if I'm going to sign-off and
+propose an API, I want to be crystal clear of the goal of the API, and
+feasibility of the goal even if I'm not going to work on it..
 
-> --- a/arch/x86/virt/vmx/tdx/tdx.c
-> +++ b/arch/x86/virt/vmx/tdx/tdx.c
-> @@ -29,6 +29,7 @@
->  #include <linux/acpi.h>
->  #include <linux/suspend.h>
->  #include <linux/idr.h>
-> +#include <linux/vmalloc.h>
->  #include <asm/page.h>
->  #include <asm/special_insns.h>
->  #include <asm/msr-index.h>
-> @@ -50,6 +51,8 @@ static DEFINE_PER_CPU(bool, tdx_lp_initialized);
->  
->  static struct tdmr_info_list tdx_tdmr_list;
->  
-> +static atomic_t *pamt_refcounts;
+We don't want to introduce something then found it won't work even for some
+MMU use cases, and start maintaining both, or revert back. I wished we
+could have sticked with the get_unmapped_area() as of now and leave the API
+for later.
 
-Comments, please. How big is this? When is it allocated?
+So if we want the new API to be proposed here, and make VFIO use it first
+(while consider it to be applicable to all existing MMU users at least,
+which I checked all of them so far now), I'd think this proper:
 
-In this case, it's even sparse, right? That's *SUPER* unusual for a
-kernel data structure.
+    int (*mmap_va_hint)(struct file *file, unsigned long *pgoff, size_t len);
 
->  static enum tdx_module_status_t tdx_module_status;
->  static DEFINE_MUTEX(tdx_module_lock);
->  
-> @@ -182,6 +185,102 @@ int tdx_cpu_enable(void)
->  }
->  EXPORT_SYMBOL_GPL(tdx_cpu_enable);
->  
-> +static atomic_t *tdx_get_pamt_refcount(unsigned long hpa)
-> +{
-> +	return &pamt_refcounts[hpa / PMD_SIZE];
-> +}
+The changes comparing to previous:
 
-"get refcount" usually means "get a reference". This is looking up the
-location of the refcount.
+    (1) merged pgoff and *phys_pgoff parameters into one unsigned long, so
+    the hook can adjust the pgoff for the va allocator to be used.  The
+    adjustment will not be visible to future mmap() when VMA is created.
 
-I think this needs a better name.
+    (2) I renamed it to mmap_va_hint(), because *pgoff will be able to be
+    updated, so it's not only about ordering, but "order" and "pgoff
+    adjustment" hints that the core mm will use when calculating the VA.
 
-> +static int pamt_refcount_populate(pte_t *pte, unsigned long addr, void *data)
-> +{
+Does it look ok to you?
 
-This is getting to be severely under-commented.
+-- 
+Peter Xu
 
-I also got this far into the patch and I'd forgotten about the sparse
-allocation and was scratching my head about what pte's have to do with
-dynamically allocating part of the PAMT.
-
-That point to a pretty severe deficit in the cover letter, changelogs
-and comments leading up to this point.
-
-> +	unsigned long vaddr;
-> +	pte_t entry;
-> +
-> +	if (!pte_none(ptep_get(pte)))
-> +		return 0;
-
-This ^ is an optimization, right? Could it be comment appropriately, please?
-
-> +	vaddr = __get_free_page(GFP_KERNEL | __GFP_ZERO);
-> +	if (!vaddr)
-> +		return -ENOMEM;
-> +
-> +	entry = pfn_pte(PFN_DOWN(__pa(vaddr)), PAGE_KERNEL);
-> +
-> +	spin_lock(&init_mm.page_table_lock);
-> +	if (pte_none(ptep_get(pte)))
-> +		set_pte_at(&init_mm, addr, pte, entry);
-> +	else
-> +		free_page(vaddr);
-> +	spin_unlock(&init_mm.page_table_lock);
-> +
-> +	return 0;
-> +}
-> +
-> +static int pamt_refcount_depopulate(pte_t *pte, unsigned long addr,
-> +				    void *data)
-> +{
-> +	unsigned long vaddr;
-> +
-> +	vaddr = (unsigned long)__va(PFN_PHYS(pte_pfn(ptep_get(pte))));
-
-Gah, we really need a kpte_to_vaddr() helper here. This is really ugly.
-How many of these are in the tree?
-
-> +	spin_lock(&init_mm.page_table_lock);
-> +	if (!pte_none(ptep_get(pte))) {
-
-Is there really a case where this gets called on unpopulated ptes? How?
-
-> +		pte_clear(&init_mm, addr, pte);
-> +		free_page(vaddr);
-> +	}
-> +	spin_unlock(&init_mm.page_table_lock);
-> +
-> +	return 0;
-> +}
-> +
-> +static int alloc_pamt_refcount(unsigned long start_pfn, unsigned long end_pfn)
-> +{
-> +	unsigned long start, end;
-> +
-> +	start = (unsigned long)tdx_get_pamt_refcount(PFN_PHYS(start_pfn));
-> +	end = (unsigned long)tdx_get_pamt_refcount(PFN_PHYS(end_pfn + 1));
-> +	start = round_down(start, PAGE_SIZE);
-> +	end = round_up(end, PAGE_SIZE);
-> +
-
-Please try to vertically align these:
-
-	start = (...)tdx_get_pamt_refcount(PFN_PHYS(start_pfn));
-	end   = (...)tdx_get_pamt_refcount(PFN_PHYS(end_pfn + 1));
-	start = round_down(start, PAGE_SIZE);
-	end   = round_up(    end, PAGE_SIZE);
-
-> +	return apply_to_page_range(&init_mm, start, end - start,
-> +				   pamt_refcount_populate, NULL);
-> +}
-
-But, I've staring at these for maybe 5 minutes. I think I've made sense
-of it.
-
-alloc_pamt_refcount() is taking a relatively arbitrary range of pfns.
-Those PFNs come from memory map and NUMA layout so they don't have any
-real alignment guarantees.
-
-This code translates the memory range into a range of virtual addresses
-in the *virtual* refcount table. That table is sparse and might not be
-allocated. It is populated 4k at a time and since the start/end_pfn
-don't have any alignment guarantees, there's no telling onto which page
-they map into the refcount table. This has to be conservative and round
-'start' down and 'end' up. This might overlap with previous refcount
-table populations.
-
-Is that all correct?
-
-That seems ... medium to high complexity to me. Is there some reason
-none of it is documented or commented? Like, I think it's not been
-mentioned a single time anywhere.
-
-> +static int init_pamt_metadata(void)
-> +{
-> +	size_t size = max_pfn / PTRS_PER_PTE * sizeof(*pamt_refcounts);
-> +	struct vm_struct *area;
-> +
-> +	if (!tdx_supports_dynamic_pamt(&tdx_sysinfo))
-> +		return 0;
-> +
-> +	/*
-> +	 * Reserve vmalloc range for PAMT reference counters. It covers all
-> +	 * physical address space up to max_pfn. It is going to be populated
-> +	 * from init_tdmr() only for present memory that available for TDX use.
-> +	 */
-> +	area = get_vm_area(size, VM_IOREMAP);
-> +	if (!area)
-> +		return -ENOMEM;
-> +
-> +	pamt_refcounts = area->addr;
-> +	return 0;
-> +}
-Finally, we get to a description of what's actually going on. But, still
-nothing has told me why this is necessary directly.
-
-If it were me, I'd probably split this up into two patches. The first
-would just do:
-
-	area = vmalloc(size);
-
-The second would do all the fancy sparse population.
-
-But either way, I've hit a wall on this. This is too impenetrable as it
-stands to review further. I'll eagerly await a more approachable v3.
 
