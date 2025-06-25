@@ -1,228 +1,124 @@
-Return-Path: <kvm+bounces-50685-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50686-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A6BCAE84C9
-	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 15:33:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4714BAE851F
+	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 15:48:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8BD163AFCDD
-	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 13:32:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DF89E189B5D7
+	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 13:48:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0DAD263F28;
-	Wed, 25 Jun 2025 13:32:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 446472641D8;
+	Wed, 25 Jun 2025 13:47:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S5hvVNwl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4v3nLrua"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37D6E2638BF
-	for <kvm@vger.kernel.org>; Wed, 25 Jun 2025 13:32:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 878B745945
+	for <kvm@vger.kernel.org>; Wed, 25 Jun 2025 13:47:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750858359; cv=none; b=iAoy1TGuAegKXEjOr7UvkYmo7PQfwdyLUtbssvF3LyrUBWlm1CyGA7s88uuqhJnTJ5NAuXq2B4UoIFbLLWS5nU/BDOvbpehGRgZ9J5leuegOspcDWK03vDuq1a8NzLC8ZJ3+dhWUK6O2ERQbnWkR0cqmX6rJ75EeL6Yzj2k7/lM=
+	t=1750859277; cv=none; b=JgUPFwEYzRTTFCp0FIl2m+eGhiRNzLe35KMro/0SG+GSL3gBCiFdakPNfYrBIXwDs3R+OINv44Cj4ZxFb5fmk5IFVO3Q1mZmggoks89PXEIINy/4I8WV0wJJoltf8t5D8GkYFz+WKZI4SKvZiuG3frakQ1XMFisdDO2Ih4wPPDQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750858359; c=relaxed/simple;
-	bh=tgyI93DqO+iceJu24PzG+d1oFJs9Iucz7h4dqyH8ohU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u0QeSTDDQopSBUQ1B5sGxg5l8cZz2vz7tcTc4PZxnp6p92gvZH5e85UY9L+wk/z1KB1fJ+eiJ1sUyFaTxoheqKB/70AQ2JPF4Rh6FdOO/h05CzBXwfN4gHfIaM8M7ITv/0Wt7tuTJfJIH6Bnu6KNFSUy8AySPhLocZn9XKFOXek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S5hvVNwl; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750858355;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/Fwu8mDntzdWYt27Qd6IJlpVfWUrdOeVJ2HfrSFGosU=;
-	b=S5hvVNwlWm+uVsQPZb8cPTJssQFE8vI1mG0ZtS+uy7P/Er1FJ6cqzMTmQW/SWcSCMEAGgj
-	q1od6g0oCn5zjaStDbXsDnlJA1Ffe9ooj6c18H8CWU/QNQ368vRvGBa5bKVP/q5wBzyt6a
-	vmRDP2LBoe0exbzE5m/pBHgM4e3smL0=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-562-z_I1_9RtNXu6e1vRUt_xgg-1; Wed, 25 Jun 2025 09:32:27 -0400
-X-MC-Unique: z_I1_9RtNXu6e1vRUt_xgg-1
-X-Mimecast-MFC-AGG-ID: z_I1_9RtNXu6e1vRUt_xgg_1750858340
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-450db029f2aso7172405e9.3
-        for <kvm@vger.kernel.org>; Wed, 25 Jun 2025 06:32:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750858339; x=1751463139;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+	s=arc-20240116; t=1750859277; c=relaxed/simple;
+	bh=VGtVJi5CoDux4I3VQLDQbQlUaY8C6zsXK6vGNWYjQe4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OLf1ejtbwevxQCfdV3/mAosyBgHHaWZwJKr6qn6/DQ85T6CU/Xy8n6NBmetN4ecXGkZzHJD8NIIj5WAflOApBEveLo6g44Wm5TY/4fqo1ao2pNyeqrCNDMjgcly0nFpZVTs2hT8JC2gl10pCDf2c7tcpA0jEkj4o8VcKdufahEM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4v3nLrua; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-237f270513bso139005ad.1
+        for <kvm@vger.kernel.org>; Wed, 25 Jun 2025 06:47:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1750859274; x=1751464074; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/Fwu8mDntzdWYt27Qd6IJlpVfWUrdOeVJ2HfrSFGosU=;
-        b=pYNhhwaO4qC267qILSazUPMhDe8kKM/Y6gkjEMechnkkBrPNPpYmpNBZi6xc7//Ym1
-         Dr/7ALqryjkHGzyHJJKrqv99z9J+VW4cTfME0Zi9D3zqWHE6suDTQsL/H00mrayl66XY
-         emhOLGy8Grj4Dsys0zRsi3oBXWsJJpJ0EQ1xgNNvXlqZRKrqySma7CGpRSlAOBRaH3n8
-         2FNfKHbvuqYJauWqOZdqP6zWgAOEKPDCUharOkwgFhGefjj8rGZD7uGb4Hlsl3mvdB9K
-         Mzu/dy93pqTuTC2fgkEw1Mj7FgUzcOcSEowv0ftuee8fDtQlzNa+QWl4cjWx0Eih0Wj8
-         gTUg==
-X-Forwarded-Encrypted: i=1; AJvYcCVKCn8+UAbjF7EwLIgNruNDN6711l9mfx7QpeFshywBZr+nqfryVBDs6ML1TTNcD+rB6Os=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwZrPEHjyqhT1+3Vq4HHU5mLvq4YKdseoRrzvh41AjvMuhSes8L
-	pIUqcGKzwHSHPC5HmWM6b1qs3Wwackg0QnrWzuwa6wtBr14E7orjFck0GBNiwanvjh9LRLdK3Y4
-	/HQYgPSOQ2a7bnH8GM3efA380qOARa29LEp7Ifjmxr6ArYr+YftGFGQ==
-X-Gm-Gg: ASbGncve0KvyaWfF63Qw/dJ7yfaRmB1mE3Zrag6+zkgJ8YD27LjTNyc3EMy7oMEIAFF
-	Ybr9xWMqhsooTatjHZUjldFrqGnUYDNMSarkb7eyqTOIKDpcgRN6f9+cBjlFbj/WwsavUkev38W
-	ktZgiNTQUsVI2UwjFi9+TFFmIjaF8sfStRWRkAkYN0OQnRC/ACjT+v8UO1fThCF2JOw/oln9Ff1
-	L4u4GhLQJOQx0KiCAXWiGr/z+NiCW5R2NwYEX9OmQkGVC0MeakZzWHSH1ioyRWZuwZm/cLDeTc5
-	diUH7bo/5C4nhtIf1VYAgzpFbA06
-X-Received: by 2002:a05:600c:3b95:b0:43c:fe15:41dd with SMTP id 5b1f17b1804b1-453879e27acmr3103885e9.6.1750858338497;
-        Wed, 25 Jun 2025 06:32:18 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEY//pCRPoC2EFYGzFZ4umPjaocK1G0vDEhyvr5hVoQgUAHwK1E7Yy9rAocwNi9NP80rjw6AQ==
-X-Received: by 2002:a05:600c:3b95:b0:43c:fe15:41dd with SMTP id 5b1f17b1804b1-453879e27acmr3101355e9.6.1750858336283;
-        Wed, 25 Jun 2025 06:32:16 -0700 (PDT)
-Received: from sgarzare-redhat ([193.207.218.117])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a6e80f2a4csm4708245f8f.65.2025.06.25.06.32.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Jun 2025 06:32:15 -0700 (PDT)
-Date: Wed, 25 Jun 2025 15:32:03 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Dexuan Cui <decui@microsoft.com>
-Cc: Xuewei Niu <niuxuewei97@gmail.com>, KY Srinivasan <kys@microsoft.com>, 
-	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
-	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>, 
-	"pabeni@redhat.com" <pabeni@redhat.com>, "jasowang@redhat.com" <jasowang@redhat.com>, 
-	"xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>, "davem@davemloft.net" <davem@davemloft.net>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "stefanha@redhat.com" <stefanha@redhat.com>, 
-	"leonardi@redhat.com" <leonardi@redhat.com>, 
-	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "fupan.lfp@antgroup.com" <fupan.lfp@antgroup.com>, 
-	Xuewei Niu <niuxuewei.nxw@antgroup.com>
-Subject: Re: [EXTERNAL] Re: [PATCH net-next v3 1/3] vsock: Add support for
- SIOCINQ ioctl
-Message-ID: <wgyxcpcsnpsta65q4n7pekw2hbedrbzqgtevkzqaqkjrqfjlyo@6jod5pw75lyf>
-References: <20250617045347.1233128-1-niuxuewei.nxw@antgroup.com>
- <20250617045347.1233128-2-niuxuewei.nxw@antgroup.com>
- <y465uw5phymt3gbgdxsxlopeyhcbbherjri6b6etl64qhsc4ud@vc2c45mo5zxw>
- <BL1PR21MB31158AE6980AF18E769A4E65BF7BA@BL1PR21MB3115.namprd21.prod.outlook.com>
+        bh=VGtVJi5CoDux4I3VQLDQbQlUaY8C6zsXK6vGNWYjQe4=;
+        b=4v3nLruaC3KrZnxUtYbX68lg1BDHdpHLRZWwCvM7GmHPFpfvwuEIDSRPCJLWNIQCwF
+         zIcS9jnwC/OqOWZEbM5lzpPYaA79nHHoZ6CvYpDrToSzC5W5JcpaJBK0FzLGd52+onUx
+         KYALv0U+M03ywnETuK6rR8tGm0LcURnZ7PGZqzBufduebbQ6bRqNbNzJVvXWBQAwUVwx
+         aP5ICcNCW7I5ATTrJXe/T/ega/UDkqqrw7hL0/orgx6L33tyfh6EDf/3j7d+E50w9xMO
+         fy0lAHZuulHeTZ3FwSEBX5192ThzJbZWrUr9A2zQAWqD+aXDRVNNZYTzAf4kI5ng18Tw
+         wylA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750859274; x=1751464074;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VGtVJi5CoDux4I3VQLDQbQlUaY8C6zsXK6vGNWYjQe4=;
+        b=eYpheY4bi9apKXnRthrr6n7lCwluPYxduAg0iejWJZ78aaaXN9TPcVWKej6fiKhCY0
+         26GqW8PDYik2J2Nn9g8dTjcmX3sKrpQX5XDenA5k7SEM5gY0p0qSUYzvb0u5qNCD0sBO
+         DgNyxEaQusvH10viO9nSoIp7LaZKlRx+M/HwFGUdG6lar932ykvrpux11Q9vVhl6yMk3
+         xQ6uOdm3IPAGeVZ6ULv7j+iwYhf+1QqptdGaZmMi/cmRXxFfszrn6TXXrbNAbLDQcet9
+         Pw3rFQvZe/QTVC1ZJV6wgR0WwACSoN1jj8hWOmQZIogfmt5+Y0jjf5cWrwv9LSrLnIsC
+         J3dg==
+X-Forwarded-Encrypted: i=1; AJvYcCXjDNKcDAhmvegtjK1Cyhr3fstXu6b36avf56fZtm8v/j2E36AxN4Uh4Z8BMS8xIi8tdB8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwfYt8rcbcqt5VMwflj9p8ia3sxfXWJMbjTFDq8gBn7UFXWAklB
+	4Za6PCyzyFojfmR0+DfYuJX2gTrU5fwEdZ7W44CNMuVB+1ViIazFlqf/E+f0+PgA7X5bhcQlpvS
+	zhvSNc5o1MY4tjBf3Kv62Dk/9HWtYN4qAn5IVOEQY
+X-Gm-Gg: ASbGnctOG6780j/7X+riSVsE6lycbqaz0SxCE6d5T3Q7zzaJNQ+yA+gOAOp5rHqLdsc
+	O0zOZtMp/7RttzYfS5QoPn+VDuGQtx/6mW/V55ujf4H69MmMmtfgqYV64HQvkPHXUdqUs3ahpKI
+	Ld9q5vVLmiYXtfjgfaDdzh+vl8jBRdXq/q8ZJ09xTBEkWzfweyD/KIefuBc1XGdskUS5GaZgktm
+	joy
+X-Google-Smtp-Source: AGHT+IFih6i6FHqdKlHiTqYQtuxauWYxR8hxnuVmkAsDP91INYFX6UC1hP2vKvdQJGH9NxCC36goGVBUnX4d54Og02g=
+X-Received: by 2002:a17:902:ffc7:b0:231:e069:6195 with SMTP id
+ d9443c01a7336-23828dd6ba0mr1711135ad.23.1750859273323; Wed, 25 Jun 2025
+ 06:47:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <BL1PR21MB31158AE6980AF18E769A4E65BF7BA@BL1PR21MB3115.namprd21.prod.outlook.com>
+References: <aEt/ohRVsdjKuqFp@yzhao56-desk.sh.intel.com> <cbee132077fd59f181d1fc19670b72a51f2d9fa1.camel@intel.com>
+ <aEyj_5WoC-01SPsV@google.com> <4312a9a24f187b3e2d3f2bf76b2de6c8e8d3cf91.camel@intel.com>
+ <aE+L/1YYdTU2z36K@yzhao56-desk.sh.intel.com> <ffb401e800363862c5dd90664993e8e234c7361b.camel@intel.com>
+ <aFC8YThVdrIyAsuS@yzhao56-desk.sh.intel.com> <aFIIsSwv5Si+rG3Z@yzhao56-desk.sh.intel.com>
+ <aFWM5P03NtP1FWsD@google.com> <7312b64e94134117f7f1ef95d4ccea7a56ef0402.camel@intel.com>
+ <aFp2iPsShmw3rYYs@yzhao56-desk.sh.intel.com> <a6ffe23fb97e64109f512fa43e9f6405236ed40a.camel@intel.com>
+In-Reply-To: <a6ffe23fb97e64109f512fa43e9f6405236ed40a.camel@intel.com>
+From: Vishal Annapurve <vannapurve@google.com>
+Date: Wed, 25 Jun 2025 06:47:40 -0700
+X-Gm-Features: AX0GCFu06PURghEvWwSxtC_cBelfR-tPSLcItrLKKSKf9WyCjshcXbUMHj0Z9IE
+Message-ID: <CAGtprH_1nMC_z+ut3H6Hjjjb9J=sg=h-H10L9PVK+x=Vw2SM0w@mail.gmail.com>
+Subject: Re: [RFC PATCH 09/21] KVM: TDX: Enable 2MB mapping size after TD is RUNNABLE
+To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
+Cc: "Zhao, Yan Y" <yan.y.zhao@intel.com>, 
+	"quic_eberman@quicinc.com" <quic_eberman@quicinc.com>, "Li, Xiaoyao" <xiaoyao.li@intel.com>, 
+	"Huang, Kai" <kai.huang@intel.com>, "Du, Fan" <fan.du@intel.com>, 
+	"Hansen, Dave" <dave.hansen@intel.com>, "david@redhat.com" <david@redhat.com>, 
+	"thomas.lendacky@amd.com" <thomas.lendacky@amd.com>, "vbabka@suse.cz" <vbabka@suse.cz>, 
+	"Li, Zhiquan1" <zhiquan1.li@intel.com>, "Shutemov, Kirill" <kirill.shutemov@intel.com>, 
+	"michael.roth@amd.com" <michael.roth@amd.com>, "seanjc@google.com" <seanjc@google.com>, 
+	"Weiny, Ira" <ira.weiny@intel.com>, "Peng, Chao P" <chao.p.peng@intel.com>, 
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, "Yamahata, Isaku" <isaku.yamahata@intel.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, 
+	"ackerleytng@google.com" <ackerleytng@google.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"tabba@google.com" <tabba@google.com>, "jroedel@suse.de" <jroedel@suse.de>, "Miao, Jun" <jun.miao@intel.com>, 
+	"pgonda@google.com" <pgonda@google.com>, "x86@kernel.org" <x86@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jun 25, 2025 at 08:03:00AM +0000, Dexuan Cui wrote:
->> From: Stefano Garzarella <sgarzare@redhat.com>
->> Sent: Tuesday, June 17, 2025 7:39 AM
->>  ...
->> Now looks better to me, I just checked transports: vmci and virtio/vhost
->> returns what we want, but for hyperv we have:
->>
->> 	static s64 hvs_stream_has_data(struct vsock_sock *vsk)
->> 	{
->> 		struct hvsock *hvs = vsk->trans;
->> 		s64 ret;
->>
->> 		if (hvs->recv_data_len > 0)
->> 			return 1;
->>
->> @Hyper-v maintainers: do you know why we don't return `recv_data_len`?
->
->Sorry for the late response!  This is the complete code of the function:
->
->static s64 hvs_stream_has_data(struct vsock_sock *vsk)
->{
->        struct hvsock *hvs = vsk->trans;
->        s64 ret;
->
->        if (hvs->recv_data_len > 0)
->                return 1;
->
->        switch (hvs_channel_readable_payload(hvs->chan)) {
->        case 1:
->                ret = 1;
->                break;
->        case 0:
->                vsk->peer_shutdown |= SEND_SHUTDOWN;
->                ret = 0;
->                break;
->        default: /* -1 */
->                ret = 0;
->                break;
->        }
->
->        return ret;
->}
->
->If (hvs->recv_data_len > 0), I think we can return hvs->recv_data_len here.
->
->If hvs->recv_data_len is 0, and hvs_channel_readable_payload(hvs->chan)
->returns 1, we should not return hvs->recv_data_len (which is 0 here), 
->and it's
->not very easy to find how many bytes of payload in total is available right now:
->each host-to-guest "packet" in the VMBus channel ringbuffer has a header
->(which is not part of the payload data) and a trailing padding field, and we
->would have to iterate on all the "packets" (or at least the next
->"packet"?) to find the exact bytes of pending payload. Please see
->hvs_stream_dequeue() for details.
->
->Ideally hvs_stream_has_data() should return the exact length of pending
->readable payload, but when the hv_sock code was written in 2017,
->vsock_stream_has_data() -> ... -> hvs_stream_has_data() basically only needs
->to know whether there is any data or not, i.e. it's kind of a boolean variable, so
->hvs_stream_has_data() was written to return 1 or 0 for simplicity. :-)
-
-Yeah, I see, thanks for the details! :-)
-
->
->I can post the patch below (not tested yet) to fix hvs_stream_has_data() by
->returning the payload length of the next single "packet".  Does it look good
->to you?
-
-Yep, LGTM! Can be a best effort IMO.
-
-Maybe when you have it tested, post it here as proper patch, and Xuewei 
-can include it in the next version of this series (of course with you as 
-author, etc.). In this way will be easy to test/merge, since they are 
-related.
-
-@Xuewei @Dexuan Is it okay for you?
-
-Thanks,
-Stefano
-
->
->--- a/net/vmw_vsock/hyperv_transport.c
->+++ b/net/vmw_vsock/hyperv_transport.c
->@@ -694,15 +694,25 @@ static ssize_t hvs_stream_enqueue(struct vsock_sock *vsk, struct msghdr *msg,
-> static s64 hvs_stream_has_data(struct vsock_sock *vsk)
-> {
->        struct hvsock *hvs = vsk->trans;
->+       bool need_refill = !hvs->recv_desc;
->        s64 ret;
->
->        if (hvs->recv_data_len > 0)
->-               return 1;
->+               return hvs->recv_data_len;
->
->        switch (hvs_channel_readable_payload(hvs->chan)) {
->        case 1:
->-               ret = 1;
->-               break;
->+               if (!need_refill)
->+                       return -EIO;
->+
->+               hvs->recv_desc = hv_pkt_iter_first(hvs->chan);
->+               if (!hvs->recv_desc)
->+                       return -ENOBUFS;
->+
->+               ret = hvs_update_recv_data(hvs);
->+               if (ret)
->+                       return ret;
->+               return hvs->recv_data_len;
->        case 0:
->                vsk->peer_shutdown |= SEND_SHUTDOWN;
->                ret = 0;
->
->Thanks,
->Dexuan
+On Tue, Jun 24, 2025 at 11:36=E2=80=AFAM Edgecombe, Rick P
+<rick.p.edgecombe@intel.com> wrote:
+> ...
+> For leaving the option open to promote the GFNs in the future, a GHCI int=
+erface
+> or similar could be defined for the guest to say "I don't care about page=
+ size
+> anymore for this gfn". So it won't close it off forever.
 >
 
+I think it's in the host's interest to get the pages mapped at large
+page granularity whenever possible. Even if guest doesn't buy-in into
+the "future" GHCI interface, there should be some ABI between TDX
+module and host VMM to allow promotion probably as soon as all the
+ranges within a hugepage get accepted but are still mapped at 4K
+granularity.
 
