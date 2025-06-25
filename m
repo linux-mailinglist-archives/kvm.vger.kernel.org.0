@@ -1,92 +1,84 @@
-Return-Path: <kvm+bounces-50642-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50644-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3704AE7DCB
-	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 11:46:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 472DEAE804A
+	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 12:55:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 401184A29D9
-	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 09:45:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC0271889B83
+	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 10:55:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57FC62C08A5;
-	Wed, 25 Jun 2025 09:39:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C4272D5436;
+	Wed, 25 Jun 2025 10:52:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UIiGv3X1"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GMrhQOFE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B050A29A303;
-	Wed, 25 Jun 2025 09:39:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A538D29E103;
+	Wed, 25 Jun 2025 10:52:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750844366; cv=none; b=ojVZW7egchYuiU4dpBHWxS1uVNBKqEVXEQaG6ANcLBG36ia/GZa11rZcqNqi7/tR5FuHkjAkUZQLI6Bn0GB7ygq8kRWRdmDFzVkQzE9wSzkCPOA8jaAQKU8700y7vmGPksESJEchM11sIXXAgDJcqEfHrJ1TRY0wCGHLufrM3tY=
+	t=1750848768; cv=none; b=tUmmPW9Af3Y4nsI0DE0OWFAaIAMb1YzlocvP5dWi8D4CwAOL9kfpn+b5Jkbb/yo+8VCO29HNdp6pMAK3hq5C7IdvQg4b9g/93uX9VHaAXY3CGuv+1lZCu6qteSNryy4xRZFybu212CItO38+HIkIURWGsFdy0DiW7Ps2iFDLoR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750844366; c=relaxed/simple;
-	bh=wsM2YbD+M0xXuq6ZAwS4w4/eJ5LnAfTL+ORhH1xoJ+Q=;
+	s=arc-20240116; t=1750848768; c=relaxed/simple;
+	bh=L2E1mHlLHz7wbD1s3c/UvvxtaaMR/FMov2jR+AourPo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=itOPafxRWVd6wRKL3rM5nzJ4cqkvJahUehEvoCK7QIGT7YLo3gXUQSLU29CrEG9iDrfxK+r2VGRh3dCCD7ewN3OCq4ytWr+wukQ03loEomyhhemvuIKxrNTEED29JlQWEwrsiv/PL5DMJ0kPUVlUfeAL4r74vVt1rlubbII1fXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UIiGv3X1; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=WyWG24r8zGL5xgOI3insY8DwF7JT2+fw9WcbYrZzb5VawzhDPcrne9Bxq/Dgb3kcXKYSIVjFL//daVhbs21Kzkb228Km+oW9sk+E0sTt8iV66Ue3hieSMcQmhuU/uJIQ3eIXgEgIoVZP5uxNDkEnPwGNUC8r9Lt2Cf/G7EwmLJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GMrhQOFE; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750844364; x=1782380364;
+  t=1750848767; x=1782384767;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=wsM2YbD+M0xXuq6ZAwS4w4/eJ5LnAfTL+ORhH1xoJ+Q=;
-  b=UIiGv3X1IswA68W5hOY6ktto4m1D5sRKjrcweHy6G0KMBOCr0tTnyZ+k
-   Lqy6bjfDN7aM9uWKHIcezttZ5ontMJP77PzMpojz8vDBIV3oYJL2kRpmj
-   HX5BDoM1CgE1K/4PxgMfIdcRAiQ+B2wKjS5+UmOQc/12GOLKrj3524mnx
-   QcKb24X+yeJqwCRb+S2dgmYNS5zrsqyCSgp+N8BExuJxA9ejZVu5HZKUp
-   tjEjfu7+ZSNgU5mJck4vWItWIPgCZ3aQffcuurAXiy/HhN6W0Zi2ZXRLO
-   PgsPHYEFiU/SJ/x1AumBFNPx+M3MyQNBn8KRdLW5blshHPDZs6riuywhT
-   A==;
-X-CSE-ConnectionGUID: RdDEEVQ2Q4icNfq7s4LX6Q==
-X-CSE-MsgGUID: Ua0aXaRSRZmG0FO3ZVc+mw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11474"; a="40726608"
+  bh=L2E1mHlLHz7wbD1s3c/UvvxtaaMR/FMov2jR+AourPo=;
+  b=GMrhQOFEicb8altn3mGUaVAKKDR3cfJzVgoVw6yzlus8ZefB483/x00d
+   xvAPLdpyq+/JJjOZzo90gXrwycnXSoN/WPLs1IC1GPZK68Ttj2zeTATF0
+   XaHa4d+rtfvleBdBgIxcsdYT3ML9Sf2noszZ2J9V8yqMZO9mclOt8FLWO
+   DMmM4QGWYcne2MUhc42OwEpxQB2c/zi5J6jxy0vr5uEZ/HjC2xTov0kzY
+   xbF2HmdBoJ3JHrSn8mxLxhyQACt1b5I/qcBDRi1pGa6/xA4XoHwaEg5V9
+   gH8tl77RYg1oCwv79C9no8eUxf1duNM4/39EhpoXtGh4v802rSY6r6RFc
+   Q==;
+X-CSE-ConnectionGUID: HrwcsdjPTb26dsXhRyQu7g==
+X-CSE-MsgGUID: rLNn5fx2Q/WY2HpLjGyWIg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11474"; a="64172256"
 X-IronPort-AV: E=Sophos;i="6.16,264,1744095600"; 
-   d="scan'208";a="40726608"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2025 02:39:23 -0700
-X-CSE-ConnectionGUID: rE6PHxq3SY6amVbIO6+R9Q==
-X-CSE-MsgGUID: UXE3rrreQwWkT/nXb7LPYg==
+   d="scan'208";a="64172256"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2025 03:52:46 -0700
+X-CSE-ConnectionGUID: WvY+25yWSNy9ZVBI9nCQAQ==
+X-CSE-MsgGUID: Srouzp+WTZKyngVqfHLDdA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,264,1744095600"; 
-   d="scan'208";a="151584247"
-Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
-  by orviesa010.jf.intel.com with ESMTP; 25 Jun 2025 02:39:18 -0700
-Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uUMb5-000SyA-2S;
-	Wed, 25 Jun 2025 09:39:15 +0000
-Date: Wed, 25 Jun 2025 17:38:18 +0800
-From: kernel test robot <lkp@intel.com>
-To: Mario Limonciello <superm1@kernel.org>,
-	Bjorn Helgaas <helgaas@kernel.org>
-Cc: oe-kbuild-all@lists.linux.dev, Alex Deucher <alexander.deucher@amd.com>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Lukas Wunner <lukas@wunner.de>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Lu Baolu <baolu.lu@linux.intel.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
-	"(open list:INTEL IOMMU (VT-d))" <iommu@lists.linux.dev>,
-	linux-pci@vger.kernel.org, kvm@vger.kernel.org,
-	linux-sound@vger.kernel.org, Daniel Dadap <ddadap@nvidia.com>,
-	Mario Limonciello <mario.limonciello@amd.com>
-Subject: Re: [PATCH v5 7/9] PCI/VGA: Replace vga_is_firmware_default() with a
- screen info check
-Message-ID: <202506251749.fPKnHMH5-lkp@intel.com>
-References: <20250624203042.1102346-8-superm1@kernel.org>
+   d="scan'208";a="183073412"
+Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
+  by fmviesa001.fm.intel.com with ESMTP; 25 Jun 2025 03:52:40 -0700
+Date: Wed, 25 Jun 2025 18:45:03 +0800
+From: Xu Yilun <yilun.xu@linux.intel.com>
+To: Alexey Kardashevskiy <aik@amd.com>
+Cc: kvm@vger.kernel.org, sumit.semwal@linaro.org, christian.koenig@amd.com,
+	pbonzini@redhat.com, seanjc@google.com, alex.williamson@redhat.com,
+	jgg@nvidia.com, dan.j.williams@intel.com,
+	linux-coco@lists.linux.dev, dri-devel@lists.freedesktop.org,
+	linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
+	vivek.kasireddy@intel.com, yilun.xu@intel.com,
+	linux-kernel@vger.kernel.org, lukas@wunner.de, yan.y.zhao@intel.com,
+	daniel.vetter@ffwll.ch, leon@kernel.org, baolu.lu@linux.intel.com,
+	zhenzhong.duan@intel.com, tao1.su@intel.com,
+	linux-pci@vger.kernel.org, zhiw@nvidia.com, simona.vetter@ffwll.ch,
+	shameerali.kolothum.thodi@huawei.com, aneesh.kumar@kernel.org,
+	iommu@lists.linux.dev, kevin.tian@intel.com
+Subject: Re: [RFC PATCH 00/30] Host side (KVM/VFIO/IOMMUFD) support for TDISP
+ using TSM
+Message-ID: <aFvTL6MUkVZrPoBS@yilunxu-OptiPlex-7050>
+References: <20250529053513.1592088-1-yilun.xu@linux.intel.com>
+ <e886855f-25cc-4274-9f11-fe0e5b025284@amd.com>
+ <f5958bda-838a-4ed6-84c6-fef62cd0b28f@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -95,38 +87,24 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250624203042.1102346-8-superm1@kernel.org>
+In-Reply-To: <f5958bda-838a-4ed6-84c6-fef62cd0b28f@amd.com>
 
-Hi Mario,
+On Sat, Jun 21, 2025 at 11:07:24AM +1000, Alexey Kardashevskiy wrote:
+> 
+> 
+> On 11/6/25 11:55, Alexey Kardashevskiy wrote:
+> > Hi,
+> > 
+> > Is there a QEMU tree using this somewhere?
+> 
+> Ping? Thanks,
 
-kernel test robot noticed the following build errors:
+Sorry for late. I've finally got a public tree.
 
-[auto build test ERROR on pci/next]
-[also build test ERROR on pci/for-linus tiwai-sound/for-next tiwai-sound/for-linus tip/x86/core linus/master v6.16-rc3 next-20250625]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+https://github.com/yiliu1765/qemu/tree/zhenzhong/devsec_tsm
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Mario-Limonciello/PCI-Add-helper-for-checking-if-a-PCI-device-is-a-display-controller/20250625-043200
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/pci/pci.git next
-patch link:    https://lore.kernel.org/r/20250624203042.1102346-8-superm1%40kernel.org
-patch subject: [PATCH v5 7/9] PCI/VGA: Replace vga_is_firmware_default() with a screen info check
-config: x86_64-defconfig (https://download.01.org/0day-ci/archive/20250625/202506251749.fPKnHMH5-lkp@intel.com/config)
-compiler: gcc-11 (Debian 11.3.0-12) 11.3.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250625/202506251749.fPKnHMH5-lkp@intel.com/reproduce)
+Again, I think the changes are far from good, just work for enabling.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202506251749.fPKnHMH5-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   ld: vmlinux.o: in function `vga_arbiter_add_pci_device':
->> vgaarb.c:(.text+0x5f8f90): undefined reference to `screen_info_pci_dev'
->> ld: vgaarb.c:(.text+0x5f91f8): undefined reference to `screen_info_pci_dev'
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Thanks,
+Yilun
 
