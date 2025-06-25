@@ -1,106 +1,180 @@
-Return-Path: <kvm+bounces-50679-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50680-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B0F4AE82E8
-	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 14:41:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B01EAE8363
+	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 14:57:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 10BA84A46F7
-	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 12:41:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C033A4A6BD7
+	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 12:56:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CEAA25F985;
-	Wed, 25 Jun 2025 12:40:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 657662620C6;
+	Wed, 25 Jun 2025 12:53:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="APH1KeW1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OxtAGA5L"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3807125F7B7;
-	Wed, 25 Jun 2025 12:40:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23F282620C8
+	for <kvm@vger.kernel.org>; Wed, 25 Jun 2025 12:53:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750855247; cv=none; b=u6zCZBBu+uptu4kPCt73hoEjn5Pkx5AuACKiOtRUTTN7bs7Nd9Ux2VI0CojiRvqO/uNif7buOUYMYDh84ssGfOfcgNguC+LSVj96a50A2QD4XFvrFtVE95aJ3XXmyyXh1yLkovWGmzf7HYNbfq6ApGuoJqy1ywZzcFwXCbxDva4=
+	t=1750856009; cv=none; b=g24B9u1NTvQZG326wRLL+MYQ/1FqKqUUqXDUP4wf9Jetzsa+lQzOhVFwtYfBBTaHoXExjBi7S8OaqDHtqq5QTdNQmT8/XKXMqASQmTgfI+k4oUwI7XOAnzKdrVqhM4B8W0dULfmy8SspRFQmLH4gNeXDN4FFtkWkvZn34+2aqgA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750855247; c=relaxed/simple;
-	bh=3piVdJ5Rpoay1vw4fI4wqae5TWO4qrTJb4cY0WDEBlw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KSBQmBc4+VFfuhuwvo9x1ccag77Ehms0WmV0FNb3xSbfDdev0/Y5XOvM6VkewQWYDieqDlBFtMbtRgnNKMbvpHMDhyJZbX0pJlTodcGVpYdSN9OplTY05l8nongukEMIb/Meor4gAu39V0cwezse18zj+Xgv0m5H0L168t2r8lw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=APH1KeW1; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 7E7A440E019C;
-	Wed, 25 Jun 2025 12:40:36 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id 4Sglr0zU2P5r; Wed, 25 Jun 2025 12:40:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1750855233; bh=Qu0uqHS6hS+NYYsyy4KTtifG0A6XpwmdiXwgTehuKT0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=APH1KeW1XE225jC7yQvxkqrpLTXdlfBPvQGqhrUXh0IGjNbB7HohLrhXgaIcj5ph/
-	 AiFGR1OIKJyL+jYlP73gBurq1OmR/9xCHkfnwEnnNU/utjSoYTkccpc0vDBUpD2i8C
-	 GRlT0uw+17R4AKuqwIJs2daPAMavYTdGVRMXciI36Ae3nPAWxXEPubBW9+vI8SgBJf
-	 C8dNYDjBS9mzSVzi9vuItH00H2UDeubMKwdDgkVAnmUBhfixXbQAQMmi5gLMHSWMEx
-	 pcNJ0gCVlE45qW6ly5YOhGiLHZydFEoiEG7TfqiGbi+BAhsOUglks+iASLgsJmkjg0
-	 aW0j2V945zMiVn4RytCUk/V40ojvI4xIqp0JzLdOcpcbOGTYvKaieUJDJmvs1zZbU1
-	 9kI/PLd2cz7sT/Ez7LuU9PqMUOECQohWng5GK+WHG7G7NURCFKdh+Dd9om3aG2W5WP
-	 1SnpHy+0HhGIgiezHeZNhSHO1hDNKNqC/qcNq17tzysgYNIv0uj60pTD9Qem7UsjMb
-	 Z2Eebte5Peo+VtgdVi77LMBA49RIr0htzv6H9IYYS4ri6kIV+35D7G/u7b1AzneLZl
-	 7TxrbYHt1zLvgR4mne3L7zFHjs+KTj4E0viZzqKPkWNHDy277SEUMXQsOrlEjAIOEm
-	 95/mgwy/Cq9vBQ7udgdSG3Es=
-Received: from zn.tnic (p57969c58.dip0.t-ipconnect.de [87.150.156.88])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id E3F6A40E00CE;
-	Wed, 25 Jun 2025 12:40:21 +0000 (UTC)
-Date: Wed, 25 Jun 2025 14:40:16 +0200
-From: Borislav Petkov <bp@alien8.de>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: linux-coco@lists.linux.dev, kvm@vger.kernel.org,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-	"H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-	"open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <linux-kernel@vger.kernel.org>,
-	"open list:EXTENSIBLE FIRMWARE INTERFACE (EFI)" <linux-efi@vger.kernel.org>
-Subject: Re: [PATCH v2 2/2] x86/sev: let sev_es_efi_map_ghcbs map the caa
- pages too
-Message-ID: <20250625124016.GCaFvuMA9oApInTVyI@fat_crate.local>
-References: <20250602105050.1535272-1-kraxel@redhat.com>
- <20250602105050.1535272-3-kraxel@redhat.com>
- <20250624130158.GIaFqhxjE8-lQqq7mt@fat_crate.local>
- <rite3te5udzekwbbujmga5kyyjjm5gfphhqoxlhtsncgckq6rm@7m7owl5jgubz>
+	s=arc-20240116; t=1750856009; c=relaxed/simple;
+	bh=LyYQDcnXmGsVu73bpfzmTVDLBrEXLKs1lCcXT5WkdYU=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=ErfXmfHTdH1PGaGrZKAx0k+b2LXa3zZPepVKZgFmXk7KcnjB6sug5b8e90MUMrrrnm/oLyaUkHv7vIwP77EUDTwBtFSyu+B1SkR5zMhUngiIEOxYKqFOomFaeo7Fm+mINiV5dxpHcZh5XncZVtpUR0zloVsiyAy01oiC/QtBjlc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OxtAGA5L; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2356ce55d33so25785745ad.0
+        for <kvm@vger.kernel.org>; Wed, 25 Jun 2025 05:53:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1750856007; x=1751460807; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Qm9UdCmx0AUjdXCDjy0dtaSU1yfF/6cv13NPsG0xoPg=;
+        b=OxtAGA5LpfPL2vRuPmjdvZ7zVnn59HhhsUiL8FIsXqJRLO9Cc5nrrTiy6F4g92OxJa
+         zVPdPo0f1m5O4Ix5vHfhg2brORVyqSNuRdtOd0zFMedqOpFo+yLRuVZIkUPKZSgpFLUX
+         9aUQs75xPjeBX+95fV1qwEYZ0KuuieKZ/m1u0pecY419oQM+rdi65CQlA9XtvLiuyGkU
+         H5Wtf9iLyjxLK9ZwPw8PFQAgIqOUqJjUowa9iFHaMcyfDFqrUo9KyEe7FojwSetAxYPX
+         HRXxKA7vxeFSiFIJPQtfvM+z8BnT1eBVidaKnHYwBs72SVHVJEQbzaDYSXHOTOTSmRl0
+         9Q7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750856007; x=1751460807;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Qm9UdCmx0AUjdXCDjy0dtaSU1yfF/6cv13NPsG0xoPg=;
+        b=vgU2eEwwNP/5CUzZvZhzog7RF0a9dzcMv+I0JunWOml4WSLqp6Ok5XzIJhwuACv9pg
+         fedE/WR7EtjvX8JlnCOqRDlH+w+Kp0oUx+sdwPLGHNmmytDOYQmXsuidWm0h6yMu6NJ9
+         mezSnFrIsKqKkRrU54mnJgEhyNFXozhkG6OP0GAtYa6sgFO69I3FGNebGLHEgAnBMR0H
+         o3NFpqGcbUVynElw+hFDPr6fHrfOS75OzU6qYjLD9YaiTZvhBguaycei9nGS/wKHai5Q
+         743pGkRVLcSraP1Q94X/YBuP3CZEMyGOgrOnVgO2yS7vQwrZW/55ujdrdUZITX3+yOiN
+         Qx9w==
+X-Forwarded-Encrypted: i=1; AJvYcCXGuIoHZrcrI1X162p/GnUCSVlUWmQ8JIImAjeEsQWbxZzluouT7exakTcsN+N/K70Kpgw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwalBBn1XOVVGnpVa3TDvfweMsjmuxFV2LAEXPyNw45SvvM4Lgx
+	oq3v7Wi6zI28KV4xK7bCgp8PomzkKxclGDn/wojLorbfMi0DsnJzuOlj9VY6D2Doi3nmCj4Fy3R
+	O/SBSgg==
+X-Google-Smtp-Source: AGHT+IFkzNNA6kVoA+2D6FAE4AOHOnEwMQn/97TNwefolAE17lsZ+t6y3XTUeyFLF/Yx7w++6g2MSRnkPqg=
+X-Received: from plbmv13.prod.google.com ([2002:a17:903:b8d:b0:235:54f:4f12])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:2bcc:b0:235:5a9:976f
+ with SMTP id d9443c01a7336-23824030ccdmr68655075ad.24.1750856007263; Wed, 25
+ Jun 2025 05:53:27 -0700 (PDT)
+Date: Wed, 25 Jun 2025 05:53:25 -0700
+In-Reply-To: <20250610175424.209796-2-Neeraj.Upadhyay@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <rite3te5udzekwbbujmga5kyyjjm5gfphhqoxlhtsncgckq6rm@7m7owl5jgubz>
+Mime-Version: 1.0
+References: <20250610175424.209796-1-Neeraj.Upadhyay@amd.com> <20250610175424.209796-2-Neeraj.Upadhyay@amd.com>
+Message-ID: <aFvxRctwWEtRde08@google.com>
+Subject: Re: [RFC PATCH v7 01/37] KVM: lapic: Remove __apic_test_and_{set|clear}_vector()
+From: Sean Christopherson <seanjc@google.com>
+To: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
+Cc: linux-kernel@vger.kernel.org, bp@alien8.de, tglx@linutronix.de, 
+	mingo@redhat.com, dave.hansen@linux.intel.com, Thomas.Lendacky@amd.com, 
+	nikunj@amd.com, Santosh.Shukla@amd.com, Vasant.Hegde@amd.com, 
+	Suravee.Suthikulpanit@amd.com, David.Kaplan@amd.com, x86@kernel.org, 
+	hpa@zytor.com, peterz@infradead.org, pbonzini@redhat.com, kvm@vger.kernel.org, 
+	kirill.shutemov@linux.intel.com, huibo.wang@amd.com, naveen.rao@amd.com, 
+	francescolavra.fl@gmail.com, tiala@microsoft.com
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Jun 25, 2025 at 01:52:58PM +0200, Gerd Hoffmann wrote:
-> The kernel allocates the caa page(s) only when running under svsm, see
-> alloc_runtime_data(), so this is not correct.  I think we either have to
-> return to the original behavior of only doing something in case address
-> is not NULL
+"KVM: x86:" for the scope.  That goes for all of the relevant shortlogs.
 
-Yes, we're doing something only when the address is not NULL.
+And for this one in particular, maybe something like:
 
-Or maybe I'm missing what you're trying to tell me...
+  KVM: x86: Open code setting/clearing of bits in the ISR
 
--- 
-Regards/Gruss,
-    Boris.
+because seeing "Remove" in the shortlog reads like it's a straight deletion of
+code.
 
-https://people.kernel.org/tglx/notes-about-netiquette
+On Tue, Jun 10, 2025, Neeraj Upadhyay wrote:
+> Remove __apic_test_and_set_vector() and __apic_test_and_clear_vector(),
+> because the _only_ register that's safe to modify with a non-atomic
+> operation is ISR, because KVM isn't running the vCPU, i.e. hardware can't
+> service an IRQ or process an EOI for the relevant (virtual) APIC.
+> 
+> No functional change intended.
+> 
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> [Neeraj: Add "inline" for apic_vector_to_isr()]
+> Signed-off-by: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
+> ---
+> Changes since v6:
+> 
+>  - New change.
+> 
+>  arch/x86/kvm/lapic.c | 19 +++++++------------
+>  1 file changed, 7 insertions(+), 12 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index 73418dc0ebb2..11e57f351ce5 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -125,16 +125,6 @@ bool kvm_apic_pending_eoi(struct kvm_vcpu *vcpu, int vector)
+>  		apic_test_vector(vector, apic->regs + APIC_IRR);
+>  }
+>  
+> -static inline int __apic_test_and_set_vector(int vec, void *bitmap)
+> -{
+> -	return __test_and_set_bit(VEC_POS(vec), (bitmap) + REG_POS(vec));
+> -}
+> -
+> -static inline int __apic_test_and_clear_vector(int vec, void *bitmap)
+> -{
+> -	return __test_and_clear_bit(VEC_POS(vec), (bitmap) + REG_POS(vec));
+> -}
+> -
+>  __read_mostly DEFINE_STATIC_KEY_FALSE(kvm_has_noapic_vcpu);
+>  EXPORT_SYMBOL_GPL(kvm_has_noapic_vcpu);
+>  
+> @@ -744,9 +734,14 @@ void kvm_apic_clear_irr(struct kvm_vcpu *vcpu, int vec)
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_apic_clear_irr);
+>  
+> +static inline void *apic_vector_to_isr(int vec, struct kvm_lapic *apic)
+
+<formletter>
+
+Do not use "inline" for functions that are visible only to the local compilation
+unit.  "inline" is just a hint, and modern compilers are smart enough to inline
+functions when appropriate without a hint.
+
+A longer explanation/rant here: https://lore.kernel.org/all/ZAdfX+S323JVWNZC@google.com
+
+</formletter>
+
+Ignoring the existing code below, there's lots of crusty old code in KVM (that
+isn't "bad" per se, i.e. isn't worth fixing unless a prime opportunity arises).
+
+> +{
+> +	return apic->regs + APIC_ISR + REG_POS(vec);
+> +}
+> +
+>  static inline void apic_set_isr(int vec, struct kvm_lapic *apic)
+>  {
+> -	if (__apic_test_and_set_vector(vec, apic->regs + APIC_ISR))
+> +	if (__test_and_set_bit(VEC_POS(vec), apic_vector_to_isr(vec, apic)))
+>  		return;
+>  
+>  	/*
+> @@ -789,7 +784,7 @@ static inline int apic_find_highest_isr(struct kvm_lapic *apic)
+>  
+>  static inline void apic_clear_isr(int vec, struct kvm_lapic *apic)
+>  {
+> -	if (!__apic_test_and_clear_vector(vec, apic->regs + APIC_ISR))
+> +	if (!__test_and_clear_bit(VEC_POS(vec), apic_vector_to_isr(vec, apic)))
+>  		return;
+>  
+>  	/*
+> -- 
+> 2.34.1
+> 
 
