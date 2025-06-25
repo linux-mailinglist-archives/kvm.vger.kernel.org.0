@@ -1,139 +1,183 @@
-Return-Path: <kvm+bounces-50702-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50703-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56CC0AE8692
-	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 16:34:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 87CE4AE86EE
+	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 16:46:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E4902188E2D4
-	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 14:34:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 13700189E291
+	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 14:46:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE0F9268C55;
-	Wed, 25 Jun 2025 14:33:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9580826981E;
+	Wed, 25 Jun 2025 14:46:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FLZcWRah"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ovGoKcYh"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9484F25FA07
-	for <kvm@vger.kernel.org>; Wed, 25 Jun 2025 14:33:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 532831D5CFB
+	for <kvm@vger.kernel.org>; Wed, 25 Jun 2025 14:46:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750862036; cv=none; b=mVpvKgKnNSKaYYxxkzAfTDPGIrXQ3P3oj17lRKSyQXQ4O1fK/UZ3Qju1wkrGsrOyV7szNGorjvDhs6viI3U1j7s8Is1IYbIch27aVPBjsSMWgGdIpGAxBvgsPRwHXFvCOi4tPXT1g3q0GiUrvXt1GekxG2dO2LaW8QY2Kq+vy8k=
+	t=1750862762; cv=none; b=rRnG4f17UynPN9Gy2+u535m81XAVacOv0kX6kgJ0LeCjoDU6QBXqTA3dU9SlcncJlEVfUZv8K/SRf6bp4FR3AMudG2inmor+No+/IzTv7+C26Yg1x9bd2yMuG8RKtz2p9k3GHZP6Y6dUZY9Sa6uwNlii6vsHhjbzGhtbJmIfNhg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750862036; c=relaxed/simple;
-	bh=k/9Jmpcevuw9DPLUN7lxWq/HVRKdkSC2nfzszYCDb30=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nKT/hi1GcyHPqKL0V+t3KKCA7iLK0SZF9mXEcDmLGxrUCNhZScMe0csAxL1MfJyDG/Csn80FG3B9SmVYxyZ1lCkoKMKu1UCtjE8DOaRscoPx6KywB7RByYYXLGZN6wWPtw8s8Fpq8Cc/Jejc6kY8tGjUMMgyXcc+OAu6KmuTk1c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FLZcWRah; arc=none smtp.client-ip=209.85.214.172
+	s=arc-20240116; t=1750862762; c=relaxed/simple;
+	bh=yoF0KokkjotdOYrXmuA3qqpgQr4ybWAWolZ/EmYbBWI=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=exnZAackHnLkXvOEGu7aVccu8SYbXTFKJQAaDUQcdfTEAVk4Brlx39Rv2GKXBoM+kPpyoF9fSuiugypd74WOZD82KAqfX69WFqQI6u2PeiED7ohmejrqybkAhrToBXZHcOBvqepD1mLUFKO37fWaulpKpYk2Mw+0toelf0jJMJQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ovGoKcYh; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-237f270513bso147085ad.1
-        for <kvm@vger.kernel.org>; Wed, 25 Jun 2025 07:33:54 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b34b810fdcaso405767a12.0
+        for <kvm@vger.kernel.org>; Wed, 25 Jun 2025 07:46:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750862034; x=1751466834; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BdV48kTp/uRROljNRCynqJ7h0+dKwD9pZid+7Ju9vko=;
-        b=FLZcWRahed/cn0x/habzbVuKXmZ8smUrK0DytAimjUAB29yqxoUhuNkSZSeo7lmqoO
-         P53EXbq32TNb2FE/dcII/rv8m5wlWMUqK/9UMvfB/jhN3slPF0Akw6gbHqS6li+F6bIU
-         3cwRdkH2PtAu/6OoQFOGDxODEZF/m0r/52USX1JlXUxkmyZFMusihN9lYR9d0+7O9V1i
-         3doBljxT0RCG9PjDTIppWmVZkGOkx0ute/e1XSaIj36DfYx/RsVuc7uUCAw0Y4TLhr7D
-         drAAsgAc7j3YLJEDQQmsE0w6dGyUatd16vZrjNUdbhXAw1Ph1Cgy7gGu1V49qb56hPNl
-         KlCg==
+        d=google.com; s=20230601; t=1750862760; x=1751467560; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8ICU5+XCoFVfw+pvlSIRLwAfwbdwsLkDlJRvVC647Yk=;
+        b=ovGoKcYhVYWFXj6R9Wp0vvL3VaKBY2II7n+qcC/oNDHOkKQr+96+9gXzcLjbYBxDWl
+         fST3y22pA8hEbfxe8EJklJDLvkl76y8MRvyD/rRtrYbaVvmn1jc+KlAj60msg6nydvqr
+         AO8DoRtb94XAs0X4qDEyFcstuYTk1ovoNIIseuawIUhPGad8Zj6kvHnZdDPE+cPEKwRq
+         9vqx5YtV5C3kMazKMpUr57tjZfbMUOO+bzacnoA/Tm0nSEfHdF8FaLgp5R/3AX4jyUvl
+         oGyj66FEyKzr1DCuNT84SrSzznZUNwOJPY+1p5Dbl1EqBH1GeUGgbLVplakUOZfMGH4A
+         z9Og==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750862034; x=1751466834;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BdV48kTp/uRROljNRCynqJ7h0+dKwD9pZid+7Ju9vko=;
-        b=qPGvpFw6T2eH+N4II98lY6NaCUK0RHjIs7AycjXL5SZWJ1dYhqAIXF56KYzr9q7+24
-         B4vonRYSHyXEsmaS4kw3KBVIlrt4Q+kPbW99NOjRAJtxfxrRv0ostZ1Z4N8e3Ugm8LYl
-         JDfIbnWPMHXuHZSgKs/n/VRwe19mqN0izb7OYXYKCx3NBozY4xbTsA9sJ/N8BxhTtJeW
-         gggsCYWWzcb+kuuY30WWXIEqfThh4DX7dqwCS2n5FELk/ds0jCTQpsujgkwySk1TLhtA
-         CLi8ixNGkdK4ELTjI7Ln+3PAIPN7uU4Dzgyjqed9cN/BSNSR9Rxq6eBz9SsdKfZKOTUD
-         b/nw==
-X-Forwarded-Encrypted: i=1; AJvYcCWOny0G+ZAtosWrjWraYXe4Whziutfy6O+JzFpD7B1plGwWbc3dogxOy70MDdkeVgRoSbs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzxhQkoLQ8KECPz/YbHi61/W1v9P6pkH3TMcFe8S2WzBz+aabx2
-	c3EbPHYMjouc7+yztzbWqEXqdD30FfAa25t0asmkW0xa1g+0ASFk7vWHEI/WbjVGFMDjyVSeGXk
-	NxuFxvIlW1RkONQiIDWcduiM+9qPEKztWS13WRYyN
-X-Gm-Gg: ASbGnctcraj4gtNVfgjrRJBK2C2bIdFT5jzSxz+uW+eUTN+agEU/80y8Gf7rLbA1uxP
-	YVX1Ur/hQKpMqBB5k7mZ2qYnlJVnlozGlbSNRw96xbGkPmVrLaeQy5IRJDUC5w47JFeT3hOdK2k
-	jJIBZjJaWh//076xLW/P1at1WjsL7yWQrBLPJa6V9ViDXlVsqV9wAKlODCyKST6eQm3mDqg6vXr
-	wrW
-X-Google-Smtp-Source: AGHT+IHOl4ROtzPHTK+wA3RxqSQB0nXvE1X3o8JvmI/Y5HuW89eI98s0XYuUXqOg4//IZvRW47fajZljsA5Du+i3Zig=
-X-Received: by 2002:a17:903:178b:b0:235:f298:cbbb with SMTP id
- d9443c01a7336-23827442ec7mr2061555ad.26.1750862033549; Wed, 25 Jun 2025
- 07:33:53 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1750862760; x=1751467560;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8ICU5+XCoFVfw+pvlSIRLwAfwbdwsLkDlJRvVC647Yk=;
+        b=Kq6UJeBoXG/htmWEWKW0waAbMeZ2jddjFO4YBBSdS9oTFRLW8XKvP+fz5uLdMvzIgw
+         Cp2EGT3on7cI14jEJXBX2gXPfve/AEJvZpOGtxa8/1cP2DzYiboAa6CSbOVqcsd1TSKc
+         Aa9XMRnnI/9bZ9zh2ZZOnUVGevwhrJUPu+0G3bH3s7bOXPlTLE/HLuxoREGuMAzgvFtn
+         5WGW+k6phPLaU72UeGy9eExGWT8pp5HmgSVPaEangHi51IfQTNgpx9b7R26dH+UXyQaw
+         +ocIA0tpXksTxsiUxPQg7tjdF44mxvTW5JZpx+iWFp2iJvOi6LHsRW5gIGfPrDaMRpip
+         wvEw==
+X-Forwarded-Encrypted: i=1; AJvYcCXgzaLqQYw+N8bHOzdJh6megqs6wYRSTpmaTGGew5OvExohTNwZv9c945kZMergoJ0hltI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy/OsWSxgYcsKI24K3mUsUCEuaS/tJgvmI0haOqTM6Fn7HZ1MBY
+	Yw2Wl2O1afYL4LVpvT0c7gcd6FyycO0KrCyOv4/P9AILH9GlqY8AeSmj3Dz260+A+jLYtxvYvt4
+	/4a4YSg==
+X-Google-Smtp-Source: AGHT+IFDMtdXk5SSPSuJ3EMb+V+kr/F+ajAZV1NFxOvALvKGnoBD5whHEelbGvIw9+H52XqJQYE63qTRlc0=
+X-Received: from pjbqd16.prod.google.com ([2002:a17:90b:3cd0:b0:311:485b:d057])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1d91:b0:311:abba:53c0
+ with SMTP id 98e67ed59e1d1-315f26137f1mr5585885a91.9.1750862760589; Wed, 25
+ Jun 2025 07:46:00 -0700 (PDT)
+Date: Wed, 25 Jun 2025 07:45:59 -0700
+In-Reply-To: <20250514064941.51609-1-liuyuntao12@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250618120806.113884-1-adrian.hunter@intel.com>
- <20250618120806.113884-3-adrian.hunter@intel.com> <68938275-3f6a-46fc-9b38-2c916fdec3d6@intel.com>
-In-Reply-To: <68938275-3f6a-46fc-9b38-2c916fdec3d6@intel.com>
-From: Vishal Annapurve <vannapurve@google.com>
-Date: Wed, 25 Jun 2025 07:33:41 -0700
-X-Gm-Features: AX0GCFtcX4EHPJezVuR03z_zvYB0b1sB8iUGWdlclbBZyL1LJyYQEWzO3JG3LhQ
-Message-ID: <CAGtprH_cVwWhfXFkM-=rVzQZ0CpY_zcnkF=q5x1n_9Bzm1xKfw@mail.gmail.com>
-Subject: Re: [PATCH 2/2] KVM: TDX: Do not clear poisoned pages
-To: Dave Hansen <dave.hansen@intel.com>
-Cc: Adrian Hunter <adrian.hunter@intel.com>, Tony Luck <tony.luck@intel.com>, pbonzini@redhat.com, 
-	seanjc@google.com, Borislav Petkov <bp@alien8.de>, Thomas Gleixner <tglx@linutronix.de>, 
-	Ingo Molnar <mingo@redhat.com>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	H Peter Anvin <hpa@zytor.com>, linux-edac@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org, rick.p.edgecombe@intel.com, 
-	kirill.shutemov@linux.intel.com, kai.huang@intel.com, 
-	reinette.chatre@intel.com, xiaoyao.li@intel.com, 
-	tony.lindgren@linux.intel.com, binbin.wu@linux.intel.com, 
-	isaku.yamahata@intel.com, yan.y.zhao@intel.com, chao.gao@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20250514064941.51609-1-liuyuntao12@huawei.com>
+Message-ID: <aFwLpyDYOsHUtCn-@google.com>
+Subject: Re: [PATCH] kvm: x86: fix infinite loop in kvm_guest_time_update when
+ tsc is 0
+From: Sean Christopherson <seanjc@google.com>
+To: Yuntao Liu <liuyuntao12@huawei.com>
+Cc: x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	bpf@vger.kernel.org, pbonzini@redhat.com, tglx@linutronix.de, 
+	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Jun 18, 2025 at 7:58=E2=80=AFAM Dave Hansen <dave.hansen@intel.com>=
- wrote:
->
-> On 6/18/25 05:08, Adrian Hunter wrote:
-> > --- a/arch/x86/kvm/vmx/tdx.c
-> > +++ b/arch/x86/kvm/vmx/tdx.c
-> > @@ -282,10 +282,10 @@ static void tdx_clear_page(struct page *page)
-> >       void *dest =3D page_to_virt(page);
-> >       unsigned long i;
-> >
-> > -     /*
-> > -      * The page could have been poisoned.  MOVDIR64B also clears
-> > -      * the poison bit so the kernel can safely use the page again.
-> > -      */
-> > +     /* Machine check handler may have poisoned the page */
-> > +     if (PageHWPoison(page))
-> > +             return;
+On Wed, May 14, 2025, Yuntao Liu wrote:
+> Call Trace:
+>  <TASK>
+>  kvm_get_time_scale arch/x86/kvm/x86.c:2458 [inline]
+>  kvm_guest_time_update+0x926/0xb00 arch/x86/kvm/x86.c:3268
+>  vcpu_enter_guest.constprop.0+0x1e70/0x3cf0 arch/x86/kvm/x86.c:10678
+>  vcpu_run+0x129/0x8d0 arch/x86/kvm/x86.c:11126
+>  kvm_arch_vcpu_ioctl_run+0x37a/0x13d0 arch/x86/kvm/x86.c:11352
+>  kvm_vcpu_ioctl+0x56b/0xe60 virt/kvm/kvm_main.c:4188
+>  vfs_ioctl fs/ioctl.c:51 [inline]
+>  __do_sys_ioctl fs/ioctl.c:871 [inline]
+>  __se_sys_ioctl+0x12d/0x190 fs/ioctl.c:857
+>  do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+>  do_syscall_64+0x59/0x110 arch/x86/entry/common.c:81
+>  entry_SYSCALL_64_after_hwframe+0x78/0xe2
+> 
+> ioctl$KVM_SET_TSC_KHZ(r2, 0xaea2, 0x1)
+> user_tsc_khz = 0x1
+> 	|
+> kvm_set_tsc_khz(struct kvm_vcpu *vcpu, u32 user_tsc_khz)
+> 	|
+> 	ioctl$KVM_RUN(r2, 0xae80, 0x0)
+> 		|
+> 		...
+> 	kvm_guest_time_update(struct kvm_vcpu *v)
+> 		|
+> 		if (kvm_caps.has_tsc_control)
+> 			tgt_tsc_khz = kvm_scale_tsc(tgt_tsc_khz,
+> 					    v->arch.l1_tsc_scaling_ratio);
+> 			|
+> 			kvm_scale_tsc(u64 tsc, u64 ratio)
+> 			|
+> 			__scale_tsc(u64 ratio, u64 tsc)
+> 			ratio=122380531, tsc=2299998, N=48
+> 			ratio*tsc >> N = 0.999... -> 0
+> 			|
+> 		kvm_get_time_scale
+> 
+> In function __scale_tsc, it uses fixed point number to calculate
+> tsc, therefore, a certain degree of precision is lost, the actual tsc
+> value of 0.999... would be 0. In function kvm_get_time_scale
+> tps32=tps64=base_hz=0, would lead second while_loop infinite. when
+> CONFIG_PREEMPT is n, it causes a soft lockup issue.
+> 
+> Fixes: 35181e86df97 ("KVM: x86: Add a common TSC scaling function")
+> Signed-off-by: Yuntao Liu <liuyuntao12@huawei.com>
+> ---
+>  arch/x86/kvm/x86.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 1fa5d89f8d27..3e9d6f368eed 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -2605,10 +2605,14 @@ static void kvm_track_tsc_matching(struct kvm_vcpu *vcpu)
+>   * point number (mult + frac * 2^(-N)).
+>   *
+>   * N equals to kvm_caps.tsc_scaling_ratio_frac_bits.
+> + *
+> + * return 1 if _tsc is 0.
+>   */
+>  static inline u64 __scale_tsc(u64 ratio, u64 tsc)
+>  {
+> -	return mul_u64_u64_shr(tsc, ratio, kvm_caps.tsc_scaling_ratio_frac_bits);
+> +	u64 _tsc = mul_u64_u64_shr(tsc, ratio, kvm_caps.tsc_scaling_ratio_frac_bits);
+> +
+> +	return  !_tsc ? 1 : _tsc;
 
-IIUC, even if movdir64b stores contents on hwpoisoned pages, it's not
-going to cause any trouble.
+This can be
 
-This check should be (unlikely(PageHWPoison(page)) and even better
-probably should be omitted altogether if there are no side effects of
-direct store to hwpoisoned pages.
+	return _tsc ? : 1;
 
->
-> I think the old comment needs to stay in some form.
->
-> There are two kinds of poisons here: One from an integrity mismatch and
-> the other because the hardware decided the memory is bad. MOVDIR64B
-> clears the integrity one, but not the hardware one obviously.
+However, I'm 99% certain this only affects kvm_guest_time_update(), because it's
+the only code that scales a TSC *frequency*, versus scaling a TSC value.  Hmm,
+kvm_x86_vendor_init() also scales a frequency, but the multiplier and shift are
+KVM controlled, so that calculation can never be '0.
 
-To ensure I understand correctly, Am I correct in saying: movdir64b
-clearing the integrity poison is just hardware clearing the poison
-bit, software will still treat that page as poisoned?
+So I think just this for a fix?  Because in all other cases, a result of '0' is
+totally fine, and arguably even more correct, e.g. when used in adjust_tsc_offset_host().
 
->
-> Could we make that clear in the comment, please?
->
->
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index b58a74c1722d..de51dbd85a58 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3258,9 +3258,11 @@ int kvm_guest_time_update(struct kvm_vcpu *v)
+ 
+        /* With all the info we got, fill in the values */
+ 
+-       if (kvm_caps.has_tsc_control)
++       if (kvm_caps.has_tsc_control) {
+                tgt_tsc_khz = kvm_scale_tsc(tgt_tsc_khz,
+                                            v->arch.l1_tsc_scaling_ratio);
++               tgt_tsc_khz = tgt_tsc_khz ? : 1;
++       }
+ 
+        if (unlikely(vcpu->hw_tsc_khz != tgt_tsc_khz)) {
+                kvm_get_time_scale(NSEC_PER_SEC, tgt_tsc_khz * 1000LL,
 
