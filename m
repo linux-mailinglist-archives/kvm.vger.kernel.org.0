@@ -1,215 +1,344 @@
-Return-Path: <kvm+bounces-50746-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50747-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90429AE8CDF
-	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 20:44:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7DC7AE8EAA
+	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 21:28:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D3516188D8FD
-	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 18:44:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C216F4A6B0C
+	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 19:28:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1221B2E62D2;
-	Wed, 25 Jun 2025 18:42:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DD942DCC1C;
+	Wed, 25 Jun 2025 19:26:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="e/WXQNxs"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fpy5a7Ld"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2078.outbound.protection.outlook.com [40.107.96.78])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFF112DAFB0;
-	Wed, 25 Jun 2025 18:41:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.96.78
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750876921; cv=fail; b=kfzNa9oUP5Qa+7uL76h43/oGfDaEsEELOh+S6lJk80/TSINi3Kk6W032+0/wcsoz3OlfYPtkL5aa6YxDCbkCdbljfo0JxP41pKaXfcBUFxePg/j/XayGLg2MS0kzzZefr1Nc/+ybDJQiOJ9EUIJntKVa0eCIE7SMgVQmMOlr3PE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750876921; c=relaxed/simple;
-	bh=IlXnoN4qoLAI6IuhEZEBJF9b20xozvsk5Xpt+klJoj8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=nKnsBZtsr1IM/KcMHgwVKhtZ254i0h+u2JwxGAeeIN72+U/+TFic1ULpr2Cm15mvqsJXB5EURRxfw+V0IB89Uw33gg2dLg0Hv0VMHkzv9UBvB1I7eb19Lga0YjLBu3q/71apCOnxRhMq68Cts5oCtezNMUH6uit3wcQ1xZqnuLw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=e/WXQNxs; arc=fail smtp.client-ip=40.107.96.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=WSVAkUN18zh+ELs2XBHCGEAuDy9B4xURuVJ2Onepd415/p3CiTbsrSkF27l25y1E5qwKHWgTSKEdDNP1fVuxsTBuWZb1nhLfroupMjMEzMMuY1n1dvwItD3RiIQuLQZwqRSyA7pCLfT7lZs5bGosvX04dBBsmPCHCzBx61X9Rf3m5tGfzqc4Ii3H2lLiMuZsrQP6WysvDnRRZsCTRH2gfvB8iGlzkRK3zwrDBffk2XpQiTOwPJuARRFVw2ILQ89cp7koXwxR4TO4mVPd2rFSjayZLPl4paDHZbxzOU7fo5mTJs4UwpPWFYJ2lwG838+zN5BQLJY3Wx2GXBx/+yrEqA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=WpyoHBT7ypVueAGtEuJR8/NwjIilTpVVwKMjKKlidMs=;
- b=eXMZBuV8r5G8WbmVow33U7ZBqRL692NEs1cz/aDUdNnNcxHaSD2qyw8CVokkiUXfT0iagUJfP3A3vt6D99pbTSI+hCRh9amfRVNv4p6aLJl4niYw4StEKyxanKWpG0UE4An8ZJMTVFUO80bCp81bNZafebiqoVslAYsB/B6KyuR5QdktU+4MF6YGxOIJKMK7oLksNudquOfOIGTKGeNx4owcBNf4p6rivl9Ij7RnW1t4eM8wg/we/Cf+eFw7XHvFgJsiKXbvuGtAzn5+WQ/c0gK9m9h8vXg0vryeoDS1ZtyMYJxopj+mTVBMFFcci0VzraQ6eI1mCjz5o+vIyueEHw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WpyoHBT7ypVueAGtEuJR8/NwjIilTpVVwKMjKKlidMs=;
- b=e/WXQNxsETaodgDyYwiWG0deaUKW8JkQyxNfEBqVQenoqnXVMswjzlEH1WBeA136NFJEYYTUB6y523mewp2H1wC2WYy9hlHdSMPhGGo4CsftupgeM5VdzI0JI0uFJwRdRGvWh7L/ULjiI4hVFOB5y/H43Thtae0HLU8Y3xFqj8WNGs+KGPecVOBrcG1Mqq7fmKOSwLZoPDgMxJ9JoyRy7PkEFLJe6i/gSKuy2k2J87wqVBo+zru5cwcgP5iLGBOHvAp3Ei9Xw7attUd3pAHO+PG/ZYIYRhQDLe7ursdBF5iYTqZXJEJhp4d5jPHggiUyZgep5+wfotQkpvE1pdjvGQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
- by SA1PR12MB6894.namprd12.prod.outlook.com (2603:10b6:806:24d::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8880.17; Wed, 25 Jun
- 2025 18:41:57 +0000
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732%7]) with mapi id 15.20.8835.027; Wed, 25 Jun 2025
- 18:41:56 +0000
-Date: Wed, 25 Jun 2025 15:41:54 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Peter Xu <peterx@redhat.com>
-Cc: "Liam R. Howlett" <Liam.Howlett@oracle.com>,
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	kvm@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Zi Yan <ziy@nvidia.com>, Alex Mastro <amastro@fb.com>,
-	David Hildenbrand <david@redhat.com>,
-	Nico Pache <npache@redhat.com>
-Subject: Re: [PATCH 5/5] vfio-pci: Best-effort huge pfnmaps with !MAP_FIXED
- mappings
-Message-ID: <20250625184154.GI167785@nvidia.com>
-References: <20250618174641.GB1629589@nvidia.com>
- <aFMQZru7l2aKVsZm@x1.local>
- <20250619135852.GC1643312@nvidia.com>
- <aFQkxg08fs7jwXnJ@x1.local>
- <20250619184041.GA10191@nvidia.com>
- <aFsMhnejq4fq6L8N@x1.local>
- <20250624234032.GC167785@nvidia.com>
- <aFtHbXFO1ZpAsnV8@x1.local>
- <20250625130711.GH167785@nvidia.com>
- <aFwt6wjuDzbWM4_C@x1.local>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aFwt6wjuDzbWM4_C@x1.local>
-X-ClientProxiedBy: MN2PR20CA0019.namprd20.prod.outlook.com
- (2603:10b6:208:e8::32) To CH3PR12MB8659.namprd12.prod.outlook.com
- (2603:10b6:610:17c::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E5E72DBF66;
+	Wed, 25 Jun 2025 19:26:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750879574; cv=none; b=RJ38P7xZIM15iinlcGQ06yj6CdN9J05w3cL1sbENYQuVA9dh3ihSFqhUPAE1F0xjwWvzd14Fcm3wJhjAPwcvlNseWYJKI1gGaKr3SEDgzV9+oD1zVhwMX/BTXw5W4LskI55O40NXqo88dsouQi2glwHID6TvL9g+j74t1IWlR08=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750879574; c=relaxed/simple;
+	bh=STCW0Ble9JAfnjY2ffDHzXPQLbDsHhsDIG/HFSdoeUc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UOQQQ1GP62b5VQ/kQafuHzP8OML0YrEfCNwVWU52hoxuG4HcJJaLAA5U5az7SpUJzbDKDx2jmTlhsI7ZUZ1InKp3DMYWajF6Aw9iio4gTOzKcNrogKnCXjEQWXgUEBcQqmKSbWEUOsUR9gXS47QTL+aoVfOWtrTJg6QtDKC1mBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fpy5a7Ld; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1750879572; x=1782415572;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=STCW0Ble9JAfnjY2ffDHzXPQLbDsHhsDIG/HFSdoeUc=;
+  b=fpy5a7Ld7d8ef2VksH/dHQdmwYCTPlE7S3bysINeqWgN+6A2O9BIZPU9
+   AFgKjRx/8sWLaRpAvyiHO8kvc6hIxdmZzdSKXav7II3jcSSIPFmQQDuqB
+   mlcRWPPRRTjmsYUMbJdsDzVAHYv+Mz2xwOLnFrZpowzSU43652xz4memT
+   bZtI/mgr/fnJjjNcHzPoEGgl4HMiKz+i9TBO8xWYOfANIKpvdHYUb1OHp
+   PGhQD15WQAyonwr5TwRgRgd31+H74v3JlAXAWj5xHlBL0kXGkZYP2WzLn
+   X3KiUuN/0sHoa5GL07mIhf1k3Fsyzwul4MN5nTEMg0E6Ztn4XB4Ql/1cn
+   A==;
+X-CSE-ConnectionGUID: ox0n6paUTrKzqsi46NVDDw==
+X-CSE-MsgGUID: ZVB8/MUcQ3y7RU/+srQI2A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11475"; a="64598523"
+X-IronPort-AV: E=Sophos;i="6.16,265,1744095600"; 
+   d="scan'208";a="64598523"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2025 12:26:11 -0700
+X-CSE-ConnectionGUID: mpA8a4WkQNWjvzIc+WzlxQ==
+X-CSE-MsgGUID: GClNW5waSSaWcZVRiVVU7A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,265,1744095600"; 
+   d="scan'208";a="152430668"
+Received: from dwoodwor-mobl2.amr.corp.intel.com (HELO [10.125.108.244]) ([10.125.108.244])
+  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2025 12:26:10 -0700
+Message-ID: <fb5addcb-1cfc-45be-978c-e7cee4126b38@intel.com>
+Date: Wed, 25 Jun 2025 12:26:09 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|SA1PR12MB6894:EE_
-X-MS-Office365-Filtering-Correlation-Id: d1ef8696-83b8-4741-d15d-08ddb417f613
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?bOMnjbxMP7WhJXQziWUDbhgCDk/rq+Nl+IkURe4o+2U0p8A4Y5iItV8ddcPs?=
- =?us-ascii?Q?NfDAooEmlrKG5KdwnEU9flHIHV7m8CIpuc26UtF2atFbsRM95wuBiapeHK5b?=
- =?us-ascii?Q?zj96sICkW/DjwuHNGKWCzL4/o5hJyuurWzepLx+2U3S1fmc74puBlpEmi2Zi?=
- =?us-ascii?Q?3BRTwEJ05tu6R0eh6/HE76jQc7ncU1n4GF39fCDvoUzV18TAHDPa/fy+w0JF?=
- =?us-ascii?Q?i029F/a/rpZ78UZLBZEdUflAeKbTcOCp6j3HMM8HtiKfz56qvZMP0K2GXOxc?=
- =?us-ascii?Q?VNV6CxCwLoA6n8rAELGXSM/iQRtyA/iOf8zw32LeoDCGFF2jLS+IT8ChZGMO?=
- =?us-ascii?Q?tF0xHG46VAZnCQOsqj7XXcSUTTJ25davOYnJYhZHKpRNMBtAmWh6JziRgL3K?=
- =?us-ascii?Q?LQsnyQofs2vRMy5emMiWAck3lI+9R+R0jwJ1gsGcURx2z5L+vH/N2h4lG45F?=
- =?us-ascii?Q?9MpP/D3Q9dJeSDxlSTGrjJxvR3+u5Cd/tFXWlAAS0ZegJ3wOSihh/TtsGrYD?=
- =?us-ascii?Q?8Vojd6LGd+07/I0lY2NPZXloYs/Moc/ES1rrD/KI/yJbIoZILWoAgk/sO7JS?=
- =?us-ascii?Q?q5YsjvHCrsMJXXmhyiMT1cCx+NTy8UA6gGlOtsvmZq44G657J+6PrC5Biilw?=
- =?us-ascii?Q?IgLs52Ary/BfBrHnbpPUWMNCKI1TOsJ7TQgHXIrdBBiFpS9lDyBjtLjci0H7?=
- =?us-ascii?Q?QGKvx0ZqscO5OJCMJ0hpsXN7qHyahnqbuRWtIVrFqoUEDmNoEGOuDdQiOs+v?=
- =?us-ascii?Q?laayWmS4Ifn1a5nmpgVZ1QdkdQsXfYgAYGqmPssw/4e4xtPRkDnBk8UPWynv?=
- =?us-ascii?Q?JOaM/cUtNNSUJo23ihFrQqj7LByuPMxElR1XeMzyJnXnj2NT94/PtKNaSWQh?=
- =?us-ascii?Q?6Xt9I/Vlcavirn0aBAXqFiEKIS+dcn5uCdwuCOhK0PgWBwf+oiuF8GdPh88t?=
- =?us-ascii?Q?cJMGohnE2V3ttucDKcPyQU0zm4GwaL7XL7WF8mYV/ZNByAUeV+Eueiwe6l6g?=
- =?us-ascii?Q?aAcIo0OFvA4UM5fBgkN/ETGMvbewEBb4RkHm25TNh6P/v5TLCNmaQ1svMnkf?=
- =?us-ascii?Q?eyHnnf9hHebkIbdubJ6Jet8C0a9Kmcdfc0gs0kWbkLiDpq5jZRbOE8pYVsom?=
- =?us-ascii?Q?yrsegXue54DBF6zbEYKp+UL9qo6pHJK0fnDU0V1u6mZHE8CmZLZq5XyzShgd?=
- =?us-ascii?Q?E9DeZ5Xd9MegyeRJ/jnwJ+UiKAqTdh+1ltVp9vnjKXNvoVNEmpOlNv1vWEOf?=
- =?us-ascii?Q?wqobhxCvAfUPiOIn/saHNFDgumrKBeEG6k7tlvsRAPjoAWiCL9N50I0aT32+?=
- =?us-ascii?Q?yuUy8N22v0d5cSWFGQY2efWcrkpFb8qEmA5eSIZvdfcGEz/s69Vy9DxE5swh?=
- =?us-ascii?Q?fbyLkDZMT7yiA8ov4gR5YoQa1i8X4aLICKX+rWeUsGOZueXBf/tIAzdNSp3Q?=
- =?us-ascii?Q?x3O9ffvl15g=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?VMUXPk+4EHcwatUlv2IfSr4M2uZXPoSDwGRJs4VekfxZ1eRZEEvuvj1x6Q0/?=
- =?us-ascii?Q?t7d03H8lzZp5hv827cDFaMEA/SpQKj4NNK3OuKkJwRx6t+SNNwrd6zwhKYiP?=
- =?us-ascii?Q?c9uLI/qJrjlKI2irXwLFCQFfi6HdnKSEIJMrhPfppWVcOpFEhlR4nllCEaHv?=
- =?us-ascii?Q?wkCHMLwTdmgWw+cUeiRG56PVf6U8at73skZfDxOoujLa6rNmPRyQeZqUmHwE?=
- =?us-ascii?Q?d8CyJRQtVLPpBA2X/fWIhNTEoGPyO0K9wlD71FQsJ6NHXqKGgKD5DbBDLrgW?=
- =?us-ascii?Q?vhZhkk47NI9Z742FnX/Ln8+54tL0j9CWJCYLEI94AgmMg7hSzm9t98fsCVwx?=
- =?us-ascii?Q?uRQ3fHH4BdRQddV+j0gzyqykTV2oVldUbJPC8cyx1jTUg4yQO6Mg4z1vZL/b?=
- =?us-ascii?Q?G40MkVtt5tSr+JW/HJtJ+XJLLioIH/5IShBW9r6TrmV1NrKSCLLbEuLLKTht?=
- =?us-ascii?Q?QAqCT/mxR+uwrMeGAergRwLZcJJeSDx0e8cH3cNTwlIC5Frd3UvGfzDKyk1j?=
- =?us-ascii?Q?Ud13BDelRI6bLN1WX3nzF8EkNWd1pGWFkSf0OomrE/1ztovlmUercZxNwcat?=
- =?us-ascii?Q?6l9dV5mPDpeKkVPtX32eadNJMz5jxOmgZpHQ1OKX/wFTelbMHsJZc2ZZjnxE?=
- =?us-ascii?Q?qp4PkiN06/1U5mJB8enDKISDub9JVvQ/Qfcv+uk9IUFOCz6osfkewT5Eamsx?=
- =?us-ascii?Q?zOKdadZnaaL7TApRoft+paUAal5swcH83E4nmURdXvlZzhuC7WL41Jv6+9YW?=
- =?us-ascii?Q?X2il116gbwF62+3DaodEJzJ/rHffBvrK7chaJFamvDkUa8R7peG/lJK23hhi?=
- =?us-ascii?Q?nzKtQoNHG6shxHeXjRiXPMCjsJvkEfd88cfc6c8v/IWSza3D99kCUL8BHaM8?=
- =?us-ascii?Q?pUsQ7+1ZuPMcWy3CoB1VNFg2sCPGrXR2EM7//6hVeKCUxGDD8Db/dbLj9Okd?=
- =?us-ascii?Q?slDXxOwM2ppsR97NclZ/rp9ldDLOrvmuWAqfdJ82Nn536TQmIg4qw++tje37?=
- =?us-ascii?Q?fpYgWfc4PdHJy14Q+BnrtQo+Lk2ykPTDooAL1Gk8kziCMMhnx9wCzKNZ1nWQ?=
- =?us-ascii?Q?MMo28BDi+OJetm6yPlYCHzlHzvUVLPl9vO/d37nFuI2urS7Nir8jAXx4SEko?=
- =?us-ascii?Q?zKFzXvYRXMSAsS3PDNChSslgamYRuUm5+JrmxZsKmyKskn47pxLb54HujFaB?=
- =?us-ascii?Q?HDE6GlbcwFLvF7hwhmQ3c/4Ugb417LB24rhOoH8LZkGMBlqCU3amG+9WtbVc?=
- =?us-ascii?Q?G8/JGB6Pjw2UlYUXkJbL2NgjbA7mKm81t9VDnoD1QJwmDQ/ImunWXGq4X1Fk?=
- =?us-ascii?Q?kQInwasZMQL+xIMo+rCsVpFX5/MUWKU82RL8XoyEgR72qgAIOQZe4lvlx+fl?=
- =?us-ascii?Q?SRc+0mnc8n/rJspCSCUblmU+iUKfMmjwCdhVvgCQ2bUUsupXitUhNLWj/LR9?=
- =?us-ascii?Q?DooslSvRpVpSPAkvA03jFs0Rd0HdvBJXR5PsJsvvJJ9EfkvKGf1Ww4MuSzCE?=
- =?us-ascii?Q?ZjFKaSkqZbpwqEKr+U+u3x1Fv8JzRXD1tfttgXrySX+wS+aZsePg0kOubR58?=
- =?us-ascii?Q?omummgctbpiV7ifb+O+WnKezY66Hi+Xn8PmaLsrd?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d1ef8696-83b8-4741-d15d-08ddb417f613
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jun 2025 18:41:56.6368
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 0f8dgDmPjYekoTPtjjN6FAhrY2jpiPfOGxrcq12CSqM8lPtMFkDa1mSb1m4/szk/
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB6894
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHv2 03/12] x86/virt/tdx: Allocate reference counters for
+ PAMT memory
+To: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+ pbonzini@redhat.com, seanjc@google.com, dave.hansen@linux.intel.com
+Cc: rick.p.edgecombe@intel.com, isaku.yamahata@intel.com,
+ kai.huang@intel.com, yan.y.zhao@intel.com, chao.gao@intel.com,
+ tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, kvm@vger.kernel.org,
+ x86@kernel.org, linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <20250609191340.2051741-1-kirill.shutemov@linux.intel.com>
+ <20250609191340.2051741-4-kirill.shutemov@linux.intel.com>
+From: Dave Hansen <dave.hansen@intel.com>
+Content-Language: en-US
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <20250609191340.2051741-4-kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jun 25, 2025 at 01:12:11PM -0400, Peter Xu wrote:
-
-> After I read the two use cases, I mostly agree.  Just one trivial thing to
-> mention, it may not be direct map but vmap() (see io_region_init_ptr()).
-
-If it is vmapped then this is all silly, you should vmap and mmmap
-using the same cache colouring and, AFAIK, pgoff is how this works for
-purely userspace.
-
-Once vmap'd it should determine the cache colour and set the pgoff
-properly, then everything should already work no?
-
-> It already does, see (io_uring_get_unmapped_area(), of parisc):
+On 6/9/25 12:13, Kirill A. Shutemov wrote:
+> The PAMT memory holds metadata for TDX-protected memory. With Dynamic
+> PAMT, PAMT_4K is allocated on demand. The kernel supplies the TDX module
+> with a page pair that covers 2M of host physical memory.
 > 
-> 	/*
-> 	 * Do not allow to map to user-provided address to avoid breaking the
-> 	 * aliasing rules. Userspace is not able to guess the offset address of
-> 	 * kernel kmalloc()ed memory area.
-> 	 */
-> 	if (addr)
-> 		return -EINVAL;
+> The kernel must provide this page pair before using pages from the range
+> for TDX. If this is not done, any SEAMCALL that attempts to use the
+> memory will fail.
 > 
-> I do not know whoever would use MAP_FIXED but with addr=0.  So failing
-> addr!=0 should literally stop almost all MAP_FIXED already.
+> Allocate reference counters for every 2M range to track PAMT memory
+> usage. This is necessary to accurately determine when PAMT memory needs
+> to be allocated and when it can be freed.
+> 
+> This allocation will consume 2MiB for every 1TiB of physical memory.
 
-Maybe but also it is not right to not check MAP_FIXED directly.. And
-addr is supposed to be a hint for non-fixed mode so it is weird to
--EINVAL when you can ignore the hint??
+... and yes, this is another boot-time allocation that seems to be
+counter to the goal of reducing the boot-time TDX memory footprint.
 
-> Going back to the topic of this series - I think the new API would work for
-> io_uring and parisc too if I can return phys_pgoff, here what parisc would
-> need is:
+Please mention the 0.4%=>0.0004% overhead here in addition to the cover
+letter. It's important.
 
-The best solution is to fix the selection of normal pgoff so it has
-consistent colouring of user VMAs and kernel vmaps. Either compute a
-pgoff that matches the vmap (hopefully easy if it is not uABI) or
-teach the kernel vmap how to respect a "pgoff" to set the cache
-colouring just like the user VMA's do (AFIACR).
+> Tracking PAMT memory usage on the kernel side duplicates what TDX module
+> does.  It is possible to avoid this by lazily allocating PAMT memory on
+> SEAMCALL failure and freeing it based on hints provided by the TDX
+> module when the last user of PAMT memory is no longer present.
+> 
+> However, this approach complicates serialization.
+> 
+> The TDX module takes locks when dealing with PAMT: a shared lock on any
+> SEAMCALL that uses explicit HPA and an exclusive lock on PAMT.ADD and
+> PAMT.REMOVE. Any SEAMCALL that uses explicit HPA as an operand may fail
+> if it races with PAMT.ADD/REMOVE.
+> 
+> Since PAMT is a global resource, to prevent failure the kernel would
+> need global locking (per-TD is not sufficient). Or, it has to retry on
+> TDX_OPERATOR_BUSY.
+> 
+> Both options are not ideal, and tracking PAMT usage on the kernel side
+> seems like a reasonable alternative.
 
-But I think this is getting maybe too big and I'd just introduce the
-new API and not try to convert this hard stuff. The above explanation
-how it could be fixed should be enough??
+Just a nit on changelog formatting: It would be ideal if you could make
+it totally clear that you are transitioning from "what this patch does"
+to "alternate considered designs".
 
-Jason
+> --- a/arch/x86/virt/vmx/tdx/tdx.c
+> +++ b/arch/x86/virt/vmx/tdx/tdx.c
+> @@ -29,6 +29,7 @@
+>  #include <linux/acpi.h>
+>  #include <linux/suspend.h>
+>  #include <linux/idr.h>
+> +#include <linux/vmalloc.h>
+>  #include <asm/page.h>
+>  #include <asm/special_insns.h>
+>  #include <asm/msr-index.h>
+> @@ -50,6 +51,8 @@ static DEFINE_PER_CPU(bool, tdx_lp_initialized);
+>  
+>  static struct tdmr_info_list tdx_tdmr_list;
+>  
+> +static atomic_t *pamt_refcounts;
+
+Comments, please. How big is this? When is it allocated?
+
+In this case, it's even sparse, right? That's *SUPER* unusual for a
+kernel data structure.
+
+>  static enum tdx_module_status_t tdx_module_status;
+>  static DEFINE_MUTEX(tdx_module_lock);
+>  
+> @@ -182,6 +185,102 @@ int tdx_cpu_enable(void)
+>  }
+>  EXPORT_SYMBOL_GPL(tdx_cpu_enable);
+>  
+> +static atomic_t *tdx_get_pamt_refcount(unsigned long hpa)
+> +{
+> +	return &pamt_refcounts[hpa / PMD_SIZE];
+> +}
+
+"get refcount" usually means "get a reference". This is looking up the
+location of the refcount.
+
+I think this needs a better name.
+
+> +static int pamt_refcount_populate(pte_t *pte, unsigned long addr, void *data)
+> +{
+
+This is getting to be severely under-commented.
+
+I also got this far into the patch and I'd forgotten about the sparse
+allocation and was scratching my head about what pte's have to do with
+dynamically allocating part of the PAMT.
+
+That point to a pretty severe deficit in the cover letter, changelogs
+and comments leading up to this point.
+
+> +	unsigned long vaddr;
+> +	pte_t entry;
+> +
+> +	if (!pte_none(ptep_get(pte)))
+> +		return 0;
+
+This ^ is an optimization, right? Could it be comment appropriately, please?
+
+> +	vaddr = __get_free_page(GFP_KERNEL | __GFP_ZERO);
+> +	if (!vaddr)
+> +		return -ENOMEM;
+> +
+> +	entry = pfn_pte(PFN_DOWN(__pa(vaddr)), PAGE_KERNEL);
+> +
+> +	spin_lock(&init_mm.page_table_lock);
+> +	if (pte_none(ptep_get(pte)))
+> +		set_pte_at(&init_mm, addr, pte, entry);
+> +	else
+> +		free_page(vaddr);
+> +	spin_unlock(&init_mm.page_table_lock);
+> +
+> +	return 0;
+> +}
+> +
+> +static int pamt_refcount_depopulate(pte_t *pte, unsigned long addr,
+> +				    void *data)
+> +{
+> +	unsigned long vaddr;
+> +
+> +	vaddr = (unsigned long)__va(PFN_PHYS(pte_pfn(ptep_get(pte))));
+
+Gah, we really need a kpte_to_vaddr() helper here. This is really ugly.
+How many of these are in the tree?
+
+> +	spin_lock(&init_mm.page_table_lock);
+> +	if (!pte_none(ptep_get(pte))) {
+
+Is there really a case where this gets called on unpopulated ptes? How?
+
+> +		pte_clear(&init_mm, addr, pte);
+> +		free_page(vaddr);
+> +	}
+> +	spin_unlock(&init_mm.page_table_lock);
+> +
+> +	return 0;
+> +}
+> +
+> +static int alloc_pamt_refcount(unsigned long start_pfn, unsigned long end_pfn)
+> +{
+> +	unsigned long start, end;
+> +
+> +	start = (unsigned long)tdx_get_pamt_refcount(PFN_PHYS(start_pfn));
+> +	end = (unsigned long)tdx_get_pamt_refcount(PFN_PHYS(end_pfn + 1));
+> +	start = round_down(start, PAGE_SIZE);
+> +	end = round_up(end, PAGE_SIZE);
+> +
+
+Please try to vertically align these:
+
+	start = (...)tdx_get_pamt_refcount(PFN_PHYS(start_pfn));
+	end   = (...)tdx_get_pamt_refcount(PFN_PHYS(end_pfn + 1));
+	start = round_down(start, PAGE_SIZE);
+	end   = round_up(    end, PAGE_SIZE);
+
+> +	return apply_to_page_range(&init_mm, start, end - start,
+> +				   pamt_refcount_populate, NULL);
+> +}
+
+But, I've staring at these for maybe 5 minutes. I think I've made sense
+of it.
+
+alloc_pamt_refcount() is taking a relatively arbitrary range of pfns.
+Those PFNs come from memory map and NUMA layout so they don't have any
+real alignment guarantees.
+
+This code translates the memory range into a range of virtual addresses
+in the *virtual* refcount table. That table is sparse and might not be
+allocated. It is populated 4k at a time and since the start/end_pfn
+don't have any alignment guarantees, there's no telling onto which page
+they map into the refcount table. This has to be conservative and round
+'start' down and 'end' up. This might overlap with previous refcount
+table populations.
+
+Is that all correct?
+
+That seems ... medium to high complexity to me. Is there some reason
+none of it is documented or commented? Like, I think it's not been
+mentioned a single time anywhere.
+
+> +static int init_pamt_metadata(void)
+> +{
+> +	size_t size = max_pfn / PTRS_PER_PTE * sizeof(*pamt_refcounts);
+> +	struct vm_struct *area;
+> +
+> +	if (!tdx_supports_dynamic_pamt(&tdx_sysinfo))
+> +		return 0;
+> +
+> +	/*
+> +	 * Reserve vmalloc range for PAMT reference counters. It covers all
+> +	 * physical address space up to max_pfn. It is going to be populated
+> +	 * from init_tdmr() only for present memory that available for TDX use.
+> +	 */
+> +	area = get_vm_area(size, VM_IOREMAP);
+> +	if (!area)
+> +		return -ENOMEM;
+> +
+> +	pamt_refcounts = area->addr;
+> +	return 0;
+> +}
+Finally, we get to a description of what's actually going on. But, still
+nothing has told me why this is necessary directly.
+
+If it were me, I'd probably split this up into two patches. The first
+would just do:
+
+	area = vmalloc(size);
+
+The second would do all the fancy sparse population.
+
+But either way, I've hit a wall on this. This is too impenetrable as it
+stands to review further. I'll eagerly await a more approachable v3.
 
