@@ -1,122 +1,146 @@
-Return-Path: <kvm+bounces-50732-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50733-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E978AE89C4
-	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 18:28:52 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A981AE89DB
+	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 18:31:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D8E1176ABB
-	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 16:28:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4E3287AFB5F
+	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 16:30:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 255D62C325C;
-	Wed, 25 Jun 2025 16:28:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92CD82D5C8F;
+	Wed, 25 Jun 2025 16:31:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YJ4yL4EO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iMFv0L0I"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 440842797B1;
-	Wed, 25 Jun 2025 16:28:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5F112D320B;
+	Wed, 25 Jun 2025 16:31:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750868916; cv=none; b=a57m/F7J1ELWzIErE0CpkLcwFvO4UftXSx7AyalQ8+A7G5e942auBFE7Yf0sTrztxwP+OblE9mKZDHXgtmCa/UaHZijUNFqnn6Qaig0kuWJuhX32WOlusZztbc7pV6gXs7YEMY9olUHuKrQsLNVURUCpEUFIDup2pLtN14acoDU=
+	t=1750869083; cv=none; b=i9J27iDxUHXUO+cSD1bUNOxB/GeG2WPp/fiektO9TIrhdbXS+rhO8oFfp193zWi0oGGMEC6EOQyAug1LGT7nUbjc+iAarLFBLHUMMOG+3kru2KkW3135oBr0baSHhf9I3Ak1ZpHfJEpejCyvzmnAQpy7E0WpTnqEup2UZoNAV9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750868916; c=relaxed/simple;
-	bh=Gtn2/RJXk3N8rLfOkqro/QRdn5WC9y7iQgSI+nXfE4Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fUQ5bFi/3cW5A7CY6XlZX3GfOqu0v5TUe4zGi31ZGlMOKLQ96tBBaAT4uJdp3GMNbsR7R9UaRXFuU++jfwLbTutSVjo9/QWDOqBDdQ7WflNwVtAiXbXmESf03dk8OHSsp4qJgQNVXM86D1mM5bCfnDLm5Yd4Rkip4l0UpByz+h0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YJ4yL4EO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DAD7C4CEEA;
-	Wed, 25 Jun 2025 16:28:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750868915;
-	bh=Gtn2/RJXk3N8rLfOkqro/QRdn5WC9y7iQgSI+nXfE4Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YJ4yL4EObsN4SG0w35Sknhmux2/v59i5yLNqBmajQXXjvs72JfQBAlNptH/Vrnixo
-	 jA8wwNq0kFTB03a9nSe/szugrDqvBjEH+4sIMUtzTeJZ6dNiesDauYiGIEq+7LPN5n
-	 srgIdsgIqeUIvBvOorqGubJHot+rAMjwT3L4dXIrUaiBBmRY53NcePHjTDs115K/8A
-	 mN1irGM8kqVt9/NcvYwpidFuN6wzzEdC3UXpi4byhcPHrls+yXc6xeglKYQPIhgoO4
-	 XOdt1KM/fpf6dvkmdvy9k0PGUPMa80fCP3IDFejd4hIfJcjntvk2sPk9q/ezSkcryX
-	 y4q9QnZyAC3QA==
-Date: Wed, 25 Jun 2025 10:28:29 -0600
-From: Manivannan Sadhasivam <mani@kernel.org>
-To: Alexey Kardashevskiy <aik@amd.com>
-Cc: linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Bjorn Helgaas <bhelgaas@google.com>, David Woodhouse <dwmw@amazon.co.uk>, 
-	Kai-Heng Feng <kai.heng.feng@canonical.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Sean Christopherson <seanjc@google.com>, Santosh Shukla <santosh.shukla@amd.com>, 
-	"Nikunj A. Dadhania" <nikunj@amd.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [RFC PATCH] PCI: Add quirk to always map ivshmem as write-back
-Message-ID: <opdpelyb26bzp723lyxljjb2dmxgunkcjlvpkxgbrxaxhoycv6@eigu7etse3g7>
-References: <20250612082233.3008318-1-aik@amd.com>
- <52f0d07a-b1a0-432c-8f6f-8c9bf59c1843@amd.com>
- <930fc54c-a88c-49b3-a1a7-6ad9228d84ac@amd.com>
+	s=arc-20240116; t=1750869083; c=relaxed/simple;
+	bh=cfvm2yMxR62gBPP9HqBHZX62gz5cZmnXqherGhd85YA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gX6/povck7e1SGMdJtG4kauqRQobMOyC2rgGqd687H0PWG8Y63pmEIor2hpyvbItogxWWpcfOceAJX9aVpxtLSjgpTyNUAbqQMKKS/XfMtRU62hAKL4IcW5gtvEMypGYTcxwaiEUsV3EM/PAEAe4b/MPan+k982Z4G4SLEaox94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iMFv0L0I; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1750869082; x=1782405082;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=cfvm2yMxR62gBPP9HqBHZX62gz5cZmnXqherGhd85YA=;
+  b=iMFv0L0IFTn+YcM7ND1wcji+FBwEeRmTR7Nw8GLhx6H+QJRG5UHk8NAi
+   ShPeSMpM0Nday/PlM3nceyrlrmtzSXTVgS1ENr9MD52tx6hF9GW42rtLF
+   m14oUHZy2pPb3x6hnkxK1vga/LSbQVVj0qeGTsINTJdDHUlG4kJOCRN2n
+   q/z+bkWHSaNOsjul/+uKmgkOZ9R3UgqGQFGAg8PU7/zmYPenRkymKybit
+   3gP8/l/cJk5WVqeseqOZUptC3In3n7sXQZTOXepAd6JzLeBbzPdLDI1xR
+   nZ8YpcIQLC4ZmYyECgmvxjXx2LV1LUxDmnX7HO9Dbm0M4b3JrTxlOVRaC
+   g==;
+X-CSE-ConnectionGUID: JjPJ1tubRFSmWObcH5Zohw==
+X-CSE-MsgGUID: QEuF2nK0RJaoC6wmaiQwdw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11475"; a="70580805"
+X-IronPort-AV: E=Sophos;i="6.16,265,1744095600"; 
+   d="scan'208";a="70580805"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2025 09:31:20 -0700
+X-CSE-ConnectionGUID: o0pkp8ApTlC+GM81HtbAKA==
+X-CSE-MsgGUID: yP6spNRbSGa8nOaHtHdVYg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,265,1744095600"; 
+   d="scan'208";a="156659456"
+Received: from dwoodwor-mobl2.amr.corp.intel.com (HELO [10.125.108.244]) ([10.125.108.244])
+  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2025 09:31:19 -0700
+Message-ID: <8f05cd1c-74cf-4370-a39c-8e06cdf2c921@intel.com>
+Date: Wed, 25 Jun 2025 09:31:18 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <930fc54c-a88c-49b3-a1a7-6ad9228d84ac@amd.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/2] KVM: TDX: Do not clear poisoned pages
+To: Adrian Hunter <adrian.hunter@intel.com>,
+ Vishal Annapurve <vannapurve@google.com>
+Cc: Tony Luck <tony.luck@intel.com>, pbonzini@redhat.com, seanjc@google.com,
+ Borislav Petkov <bp@alien8.de>, Thomas Gleixner <tglx@linutronix.de>,
+ Ingo Molnar <mingo@redhat.com>, Dave Hansen <dave.hansen@linux.intel.com>,
+ x86@kernel.org, H Peter Anvin <hpa@zytor.com>, linux-edac@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ rick.p.edgecombe@intel.com, kirill.shutemov@linux.intel.com,
+ kai.huang@intel.com, reinette.chatre@intel.com, xiaoyao.li@intel.com,
+ tony.lindgren@linux.intel.com, binbin.wu@linux.intel.com,
+ isaku.yamahata@intel.com, yan.y.zhao@intel.com, chao.gao@intel.com
+References: <20250618120806.113884-1-adrian.hunter@intel.com>
+ <20250618120806.113884-3-adrian.hunter@intel.com>
+ <68938275-3f6a-46fc-9b38-2c916fdec3d6@intel.com>
+ <CAGtprH_cVwWhfXFkM-=rVzQZ0CpY_zcnkF=q5x1n_9Bzm1xKfw@mail.gmail.com>
+ <bc492cb2-1d30-4a30-9eb9-d48b09cd29a9@intel.com>
+From: Dave Hansen <dave.hansen@intel.com>
+Content-Language: en-US
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <bc492cb2-1d30-4a30-9eb9-d48b09cd29a9@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jun 24, 2025 at 11:42:47AM +1000, Alexey Kardashevskiy wrote:
-> Ping? Thanks,
-> 
-> 
-> On 12/6/25 18:27, Alexey Kardashevskiy wrote:
-> > Wrong email for Nikunj :) And I missed the KVM ml. Sorry for the noise.
-> > 
-> > 
-> > On 12/6/25 18:22, Alexey Kardashevskiy wrote:
-> > > QEMU Inter-VM Shared Memory (ivshmem) is designed to share a memory
-> > > region between guest and host. The host creates a file, passes it to QEMU
-> > > which it presents to the guest via PCI BAR#2. The guest userspace
-> > > can map /sys/bus/pci/devices/0000:01:02.3/resource2(_wc) to use the region
-> > > without having the guest driver for the device at all.
-> > > 
-> > > The problem with this, since it is a PCI resource, the PCI sysfs
-> > > reasonably enforces:
-> > > - no caching when mapped via "resourceN" (PTE::PCD on x86) or
-> > > - write-through when mapped via "resourceN_wc" (PTE::PWT on x86).
-> > > 
-> > > As the result, the host writes are seen by the guest immediately
-> > > (as the region is just a mapped file) but it takes quite some time for
-> > > the host to see non-cached guest writes.
-> > > 
-> > > Add a quirk to always map ivshmem's BAR2 as cacheable (==write-back) as
-> > > ivshmem is backed by RAM anyway.
-> > > (Re)use already defined but not used IORESOURCE_CACHEABLE flag.
-> > > 
+On 6/25/25 09:25, Adrian Hunter wrote:
+>> IIUC, even if movdir64b stores contents on hwpoisoned pages, it's not
+>> going to cause any trouble.
+> No.  PageHWPoison(page) means the page should not be touched.  It must
+> be freed back to the allocator where it will never be allocated again.
 
-It just makes me nervous to change the sematics of the sysfs attribute, even if
-the user knows what it is expecting. Now the "resourceN_wc" essentially becomes
-"resourceN_wb", which goes against the rule of sysfs I'm afraid.
+What's the end-user-visible effect if the page is touched in this
+specific function in this specific way (with movdir64b)?
 
-> > > This does not affect other ways of mapping a PCI BAR, a driver can use
-> > > memremap() for this functionality.
-> > > 
-> > > Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
-> > > ---
-> > > 
-> > > What is this IORESOURCE_CACHEABLE for actually?
-> > > 
-> > > Anyway, the alternatives are:
-> > > 
-> > > 1. add a new node in sysfs - "resourceN_wb" - for mapping as writeback
-> > > but this requires changing existing (and likely old) userspace tools;
-> > > 
-
-I guess this would the cleanest approach. The old tools can continue to suffer
-from the performance issue and the new tools can work more faster.
-
-- Mani
-
--- 
-மணிவண்ணன் சதாசிவம்
+In other words, what does this patch do for end users?
 
