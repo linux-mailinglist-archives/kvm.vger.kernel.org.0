@@ -1,54 +1,65 @@
-Return-Path: <kvm+bounces-50740-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50741-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FB81AE8B9D
-	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 19:39:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92EF3AE8BDF
+	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 19:59:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B41181885F09
-	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 17:39:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D48067AC8E4
+	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 17:57:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4C172D23B8;
-	Wed, 25 Jun 2025 17:38:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAFF52D540D;
+	Wed, 25 Jun 2025 17:58:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="S6U3o4De"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mlhI3COp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 628CF1459FA;
-	Wed, 25 Jun 2025 17:38:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A00002C3769;
+	Wed, 25 Jun 2025 17:58:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750873128; cv=none; b=h/c7iWjigzCmA9/ximfuwckLLx9ABg30DNFlhS7f0PI56Bnbu+Wo9WwWfFYduJcFNQgWpiY7rAYUYQTe2ZlHOUItkDC8BCrIBwaOaDmhoObkvtr/NgstEG6LZB+JStPbf4bB4MwJPEjI0NDP8sHzYep2Txlgsbzi0wmsNCTdAgw=
+	t=1750874321; cv=none; b=RFJjkSXSgq/Ulf9GqHjAgxJCxcWLdO/TkFIotdsQ/L9tAbqIbrbrLcgYsd5rwLWyR72KpssZS+ZDS+gnJWwo/0ND5LNu4966btYLNOrhKmjyV9AXKtd9IluNRl0uOeeBw/b6QDgIA3DOEKY9G3Ugxb7cK+KWfm3m5gwCl97w83M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750873128; c=relaxed/simple;
-	bh=w3u6IO0pbfeGjgbOpb/8vxunTnTNqJNmxIiEocEKWkY=;
+	s=arc-20240116; t=1750874321; c=relaxed/simple;
+	bh=kQt94XdjAsFzpqHD6EPEwy5RJgq8z2InM6E7BxZmPw4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nREWHd4kfCoP4FrptQ+igtEH407mr2HrHJHsADYzxUF8spwV6qfGpYHeObSTB3Vy8uuf2xZ7uGIWONSMcBb563kK9EE6OkBQIJJ+PyYvGMD+RHsQkQ7K2XxSuRWupmejh4m4kqNWakOPedNGvTChWLH8UVYXT1kPi6NywMAq3bM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=S6U3o4De; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [192.168.7.202] ([71.202.166.45])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 55PHcE701870028
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Wed, 25 Jun 2025 10:38:15 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 55PHcE701870028
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025062101; t=1750873096;
-	bh=t2dKVmN1aRJoALT/qUHCBcvFg5zdwPI3fklJD/xTsYg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=S6U3o4De/qG8KchwQqrJ2F0MVQB7XD2VZ3tne4NYrKKCiOTvReBUnO5AriyiM6sPp
-	 6lbtoO0SUfmkTD4u8SF2zUySfir1s7L/07zFLU59/xeYUFGMRg2OGmg8lXYVMWNIOL
-	 JDBcA+NlKIv9vi+9joKH4ilcv1v3Ue5NRS0XzI1h+bAg0Ifr21hrcYUK3/6nQhW5wD
-	 mf035TNGWwQKJ3e66c5VSzf8eb4e7pSDN8dymcbHuZ1HWcoQCk62dHRdi8yt6n/Ya5
-	 o7zY3ZrLeW/9D9FoBkaPzkiGAuPOB4zOUzDXI57YQBeXU0yzstIsW/jhWIN838my37
-	 Uh8GcPXrNk0bA==
-Message-ID: <4459df49-7c02-4fa8-ae69-279d2b64fb2d@zytor.com>
-Date: Wed, 25 Jun 2025 10:38:13 -0700
+	 In-Reply-To:Content-Type; b=nyvc3VI9itRDzJeXCnMx4f9ZMNnHOfeZEzsHWxRnVqZdYA70VK3Tm7cig1PwR18wr8wrnh7GTuA/fwKJrgevVN2W7kLnV127gb91nuRPObtbpR3kfNCBixPtwKpXaq/SRZ7lVbwl5LEuSHMUWLrOuBv51fgP5KDpNN4usrVRgSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mlhI3COp; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1750874320; x=1782410320;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=kQt94XdjAsFzpqHD6EPEwy5RJgq8z2InM6E7BxZmPw4=;
+  b=mlhI3COpbEbCqCbfS+t5zupiWpruxTFvgzP1XlpbFjxNNtARc3UisFrX
+   G0vID3gDrO//UwBffUuKTFij1vaMLgxiPzuQgH4nv6op1SQb64icjmaKs
+   TKl/Qd3V7ZjlN5c3yezFMBBS7Ef/8mk8glMcfQCWAminIzekrlHFE8TcS
+   jKygq0HR/xo+3ke84D8DjN7q/9Y6p9mdulW8XQZjrMrGd603LZV5zN+pb
+   3k8agTgRV5nH1bB94zQP4rP0oD4CgVqL8zxqYJnQkROXLpel8hnC2WpFR
+   o3s7O/iyxd+n0d+dZb/HTn2Btf/AoLpG/4oHJFiEzTSv++Kc+1gWuLojG
+   Q==;
+X-CSE-ConnectionGUID: pcFJBElJTkqS44Tgs9XG0w==
+X-CSE-MsgGUID: 3tjg/fr2TSS8szbiI8T6Bw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11475"; a="56958554"
+X-IronPort-AV: E=Sophos;i="6.16,265,1744095600"; 
+   d="scan'208";a="56958554"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2025 10:58:39 -0700
+X-CSE-ConnectionGUID: RKCJYQmmQBa6HBh2KfiTJw==
+X-CSE-MsgGUID: iF/DXXFLT0CqL1zdRKU0lQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,265,1744095600"; 
+   d="scan'208";a="157785700"
+Received: from dwoodwor-mobl2.amr.corp.intel.com (HELO [10.125.108.244]) ([10.125.108.244])
+  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2025 10:58:38 -0700
+Message-ID: <5cfb2e09-7ecb-4144-9122-c11152b18b5e@intel.com>
+Date: Wed, 25 Jun 2025 10:58:37 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -56,107 +67,111 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 14/19] KVM: VMX: Dump FRED context in dump_vmcs()
-To: Sean Christopherson <seanjc@google.com>
-Cc: pbonzini@redhat.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, corbet@lwn.net, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        x86@kernel.org, hpa@zytor.com, andrew.cooper3@citrix.com,
-        luto@kernel.org, peterz@infradead.org, chao.gao@intel.com,
-        xin3.li@intel.com
-References: <20250328171205.2029296-1-xin@zytor.com>
- <20250328171205.2029296-15-xin@zytor.com> <aFrTAT-xTLmlwO5V@google.com>
+Subject: Re: [PATCHv2 01/12] x86/tdx: Consolidate TDX error handling
+To: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+ pbonzini@redhat.com, seanjc@google.com, dave.hansen@linux.intel.com
+Cc: rick.p.edgecombe@intel.com, isaku.yamahata@intel.com,
+ kai.huang@intel.com, yan.y.zhao@intel.com, chao.gao@intel.com,
+ tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, kvm@vger.kernel.org,
+ x86@kernel.org, linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <20250609191340.2051741-1-kirill.shutemov@linux.intel.com>
+ <20250609191340.2051741-2-kirill.shutemov@linux.intel.com>
+From: Dave Hansen <dave.hansen@intel.com>
 Content-Language: en-US
-From: Xin Li <xin@zytor.com>
-Autocrypt: addr=xin@zytor.com; keydata=
- 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
- l75w1xInsg==
-In-Reply-To: <aFrTAT-xTLmlwO5V@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <20250609191340.2051741-2-kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 6/24/2025 9:32 AM, Sean Christopherson wrote:
->> @@ -6519,6 +6521,16 @@ void dump_vmcs(struct kvm_vcpu *vcpu)
->>   	vmx_dump_sel("LDTR:", GUEST_LDTR_SELECTOR);
->>   	vmx_dump_dtsel("IDTR:", GUEST_IDTR_LIMIT);
->>   	vmx_dump_sel("TR:  ", GUEST_TR_SELECTOR);
->> +	if (vmentry_ctl & VM_ENTRY_LOAD_IA32_FRED)
->> +		pr_err("FRED guest: config=0x%016llx, stack_levels=0x%016llx\n"
->> +		       "RSP0=0x%016llx, RSP1=0x%016llx\n"
->> +		       "RSP2=0x%016llx, RSP3=0x%016llx\n",
->> +		       vmcs_read64(GUEST_IA32_FRED_CONFIG),
->> +		       vmcs_read64(GUEST_IA32_FRED_STKLVLS),
->> +		       __rdmsr(MSR_IA32_FRED_RSP0),
+On 6/9/25 12:13, Kirill A. Shutemov wrote:
+> Move all (host, kvm, guest) code related to TDX error handling into
+> <asm/tdx_errno.h>.
 > 
-> There is no guarantee the vCPU's FRED_RSP is loaded in hardware at this point.
-> I think you need to use vmx_read_guest_fred_rsp0().
+> Add inline functions to check errors.
 
-Good catch.
+I really prefer that code moves and introduction of new things be done
+_separately_.
 
-> 
->> +		       vmcs_read64(GUEST_IA32_FRED_RSP1),
->> +		       vmcs_read64(GUEST_IA32_FRED_RSP2),
->> +		       vmcs_read64(GUEST_IA32_FRED_RSP3));
->>   	efer_slot = vmx_find_loadstore_msr_slot(&vmx->msr_autoload.guest, MSR_EFER);
->>   	if (vmentry_ctl & VM_ENTRY_LOAD_IA32_EFER)
->>   		pr_err("EFER= 0x%016llx\n", vmcs_read64(GUEST_IA32_EFER));
->> @@ -6566,6 +6578,16 @@ void dump_vmcs(struct kvm_vcpu *vcpu)
->>   	       vmcs_readl(HOST_TR_BASE));
->>   	pr_err("GDTBase=%016lx IDTBase=%016lx\n",
->>   	       vmcs_readl(HOST_GDTR_BASE), vmcs_readl(HOST_IDTR_BASE));
->> +	if (vmexit_ctl & SECONDARY_VM_EXIT_LOAD_IA32_FRED)
->> +		pr_err("FRED host: config=0x%016llx, stack_levels=0x%016llx\n"
->> +		       "RSP0=0x%016lx, RSP1=0x%016llx\n"
->> +		       "RSP2=0x%016llx, RSP3=0x%016llx\n",
->> +		       vmcs_read64(HOST_IA32_FRED_CONFIG),
->> +		       vmcs_read64(HOST_IA32_FRED_STKLVLS),
->> +		       (unsigned long)task_stack_page(current) + THREAD_SIZE,
-> 
-> Maybe add a helper in arch/x86/include/asm/fred.h to generate the desired RSP0?
-> Not sure it's worth doing that just for this code.
+It's a lot easier to check for errors in the move when it's the on
 
-It's not just one usage.  I checked with:
+...
+>  	ret = __tdcall(TDG_MR_REPORT, &args);
+>  	if (ret) {
+> -		if (TDCALL_RETURN_CODE(ret) == TDCALL_INVALID_OPERAND)
+> +		if (tdx_operand_invalid(ret))
+>  			return -EINVAL;
+>  		return -EIO;
+>  	}
 
-     git grep -w task_stack_page | grep THREAD_SIZE | wc -l
+That said, the resulting code here is a lot nicer that what you started
+with.
 
-And get 25.
+...
+> -/*
+> - * TDX module SEAMCALL leaf function error codes
+> - */
+> -#define TDX_SUCCESS		0ULL
+> -#define TDX_RND_NO_ENTROPY	0x8000020300000000ULL
 
-However it is used in other architectures, so I'll work it in parallel.
-I.e., likely I won't change it in the next iteration.
+Kai, you were responsible for this nugget. What do you think of this patch?
 
-Thanks!
-     Xin
 
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -202,12 +202,6 @@ static DEFINE_MUTEX(tdx_lock);
+>  
+>  static atomic_t nr_configured_hkid;
+>  
+> -static bool tdx_operand_busy(u64 err)
+> -{
+> -	return (err & TDX_SEAMCALL_STATUS_MASK) == TDX_OPERAND_BUSY;
+> -}
+> -
+> -
+
+Isaku, this one was yours (along with the whitespace damage). What do
+you think of this patch?
 
 
