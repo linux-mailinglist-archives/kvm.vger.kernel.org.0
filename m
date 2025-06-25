@@ -1,184 +1,189 @@
-Return-Path: <kvm+bounces-50713-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50714-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92A76AE8895
-	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 17:48:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47A12AE8899
+	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 17:48:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5DA92681BC0
-	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 15:47:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2F1857A8644
+	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 15:47:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4845528F935;
-	Wed, 25 Jun 2025 15:47:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FCWvxbic"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 965FD29B771;
+	Wed, 25 Jun 2025 15:48:30 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4B6826C3B2
-	for <kvm@vger.kernel.org>; Wed, 25 Jun 2025 15:47:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38217289371;
+	Wed, 25 Jun 2025 15:48:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750866473; cv=none; b=dGzs0Vzuwaaa2QhAmMw3yhD2uI33AfdAhw4fZ9JZXqoQ+laM4E9cVcyNQYjmILHS+jS9enIe08H+wALoTR0JwYf318MOfdTerm2jwgJNWZzK2RDd/nSyjOp+BiHXntEVoAZOucsUISl4CwrMxwaVBrVMO5ufetO6jZzLZZc+CPk=
+	t=1750866510; cv=none; b=L7m/lNcW7Q9CUC3jop0FY8DpzP8Qqv+hIE7EG7rtOBYdzfafO/zQTmyBQFljY4RV3MPCNE2d+BddNPgPzmAsD37hmgGlRxbmc5oC5GW7vwaoJdVRexbxArIoC/mkzpWtvkL4QXBwQxDs+VjJ7IA3NsfODbSc9QCwHfzCypFTEk0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750866473; c=relaxed/simple;
-	bh=jXjH/8Tl1bNiN/PonxA0L7KYXD+DLe36+I4z2jMEyNw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fyA9cbwp4mzdq6ulv7cxRHDIaab3KTgRa5OfCrQNz7ebv+eDFG4VkFShUB2rxX6nqERtAelNMJdvC7HoxQr059y0n8Y3r3yJqZqbbKBYo+CJEDHpiFvV6BgGQMxXwBeZNkD7Di9YeWX2jBWQwzI0k6Kq2wi5djNC0ODtau+2eBc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FCWvxbic; arc=none smtp.client-ip=91.218.175.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Wed, 25 Jun 2025 17:47:33 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1750866457;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qVs0TQ6LDv86rPHaG+xh8Q0xxxW4Qg4t45LzYEhUjQQ=;
-	b=FCWvxbicUcT2NwvTSs2RCWF+oIGoyAmdVAqTku4ck1SSFx2tLFoDWuxhCfXcoHN6VfCfM0
-	OMaA/keFB/bQQ+Z9wLeTiHaaITt5/0ryYsuZ6CoRDR44IUxAF2gtR0PiEx/3oJ+xNnqiW9
-	FBIlv5zO+Tkv5q3f11Jhsp2JTQ2vlWw=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Jesse Taube <jesse@rivosinc.com>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	linux-kselftest@vger.kernel.org, =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>, 
-	Charlie Jenkins <charlie@rivosinc.com>, James Raphael Tiovalen <jamestiotio@gmail.com>, 
-	Sean Christopherson <seanjc@google.com>, Cade Richard <cade.richard@gmail.com>
-Subject: Re: [kvm-unit-tests PATCH v2] riscv: lib: sbi_shutdown add pass/fail
- exit code.
-Message-ID: <20250625-9b8a7fd71ce4924eca101cb1@orel>
-References: <20250624192317.278437-1-jesse@rivosinc.com>
- <20250625-fc81fec2cf6d7ee195c0eb6c@orel>
- <CALSpo=ZsEEQeoYz2dby9B4zgbFcxCzmjN9SH8Jch4Avvm14Cog@mail.gmail.com>
+	s=arc-20240116; t=1750866510; c=relaxed/simple;
+	bh=J7yxmU37C6Pa1hm6zaVN5jrh/95KXnt35sXkoN3UtVQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jde2RWEcyZbGIYdKUGVU5z3V2oR8XsLwPLdBUmb48aRU8i+icEar8aWpZCkAxPoZOxnnLcgXLm4yL0KdbLlKrC85GRCfyMLbaoSCWvYkCmxVF13VDNKDmCQR9HoqgODopOuct6ENXhcBuD5+rZXICjNcAcbEFV2YFhODAgitG54=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6DC711A2D;
+	Wed, 25 Jun 2025 08:48:07 -0700 (PDT)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 346E33F58B;
+	Wed, 25 Jun 2025 08:48:21 -0700 (PDT)
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: andrew.jones@linux.dev,
+	eric.auger@redhat.com,
+	lvivier@redhat.com,
+	thuth@redhat.com,
+	frankja@linux.ibm.com,
+	imbrenda@linux.ibm.com,
+	nrb@linux.ibm.com,
+	david@redhat.com,
+	pbonzini@redhat.com
+Cc: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linuxppc-dev@lists.ozlabs.org,
+	kvm-riscv@lists.infradead.org,
+	linux-s390@vger.kernel.org,
+	will@kernel.org,
+	julien.thierry.kdev@gmail.com,
+	maz@kernel.org,
+	oliver.upton@linux.dev,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	joey.gouly@arm.com,
+	andre.przywara@arm.com,
+	shahuang@redhat.com
+Subject: [kvm-unit-tests PATCH v4 00/13] arm/arm64: Add kvmtool to the runner script
+Date: Wed, 25 Jun 2025 16:48:00 +0100
+Message-ID: <20250625154813.27254-1-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.50.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CALSpo=ZsEEQeoYz2dby9B4zgbFcxCzmjN9SH8Jch4Avvm14Cog@mail.gmail.com>
-X-Migadu-Flow: FLOW_OUT
 
-On Wed, Jun 25, 2025 at 07:31:27AM -0700, Jesse Taube wrote:
-> On Wed, Jun 25, 2025 at 1:33 AM Andrew Jones <andrew.jones@linux.dev> wrote:
-> >
-> > On Tue, Jun 24, 2025 at 12:23:17PM -0700, Jesse Taube wrote:
-> > > When exiting it may be useful for the sbi implementation to know if
-> > > kvm-unit-tests passed or failed.
-> > > Add exit code to sbi_shutdown, and use it in exit() to pass
-> > > success/failure (0/1) to sbi.
-> > >
-> > > Signed-off-by: Jesse Taube <jesse@rivosinc.com>
-> > > ---
-> > >  lib/riscv/asm/sbi.h | 2 +-
-> > >  lib/riscv/io.c      | 2 +-
-> > >  lib/riscv/sbi.c     | 4 ++--
-> > >  3 files changed, 4 insertions(+), 4 deletions(-)
-> > >
-> > > diff --git a/lib/riscv/asm/sbi.h b/lib/riscv/asm/sbi.h
-> > > index a5738a5c..de11c109 100644
-> > > --- a/lib/riscv/asm/sbi.h
-> > > +++ b/lib/riscv/asm/sbi.h
-> > > @@ -250,7 +250,7 @@ struct sbiret sbi_ecall(int ext, int fid, unsigned long arg0,
-> > >                       unsigned long arg3, unsigned long arg4,
-> > >                       unsigned long arg5);
-> > >
-> > > -void sbi_shutdown(void);
-> > > +void sbi_shutdown(unsigned int code);
-> > >  struct sbiret sbi_hart_start(unsigned long hartid, unsigned long entry, unsigned long sp);
-> > >  struct sbiret sbi_hart_stop(void);
-> > >  struct sbiret sbi_hart_get_status(unsigned long hartid);
-> > > diff --git a/lib/riscv/io.c b/lib/riscv/io.c
-> > > index fb40adb7..0bde25d4 100644
-> > > --- a/lib/riscv/io.c
-> > > +++ b/lib/riscv/io.c
-> > > @@ -150,7 +150,7 @@ void halt(int code);
-> > >  void exit(int code)
-> > >  {
-> > >       printf("\nEXIT: STATUS=%d\n", ((code) << 1) | 1);
-> > > -     sbi_shutdown();
-> > > +     sbi_shutdown(!!code);
-> > >       halt(code);
-> > >       __builtin_unreachable();
-> > >  }
-> > > diff --git a/lib/riscv/sbi.c b/lib/riscv/sbi.c
-> > > index 2959378f..9dd11e9d 100644
-> > > --- a/lib/riscv/sbi.c
-> > > +++ b/lib/riscv/sbi.c
-> > > @@ -107,9 +107,9 @@ struct sbiret sbi_sse_inject(unsigned long event_id, unsigned long hart_id)
-> > >       return sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_INJECT, event_id, hart_id, 0, 0, 0, 0);
-> > >  }
-> > >
-> > > -void sbi_shutdown(void)
-> > > +void sbi_shutdown(unsigned int code)
-> > >  {
-> > > -     sbi_ecall(SBI_EXT_SRST, 0, 0, 0, 0, 0, 0, 0);
-> > > +     sbi_ecall(SBI_EXT_SRST, 0, 0, code, 0, 0, 0, 0);
-> > >       puts("SBI shutdown failed!\n");
-> > >  }
-> > >
-> > > --
-> > > 2.43.0
-> > >
-> >
-> > I enhanced the commit message, changed the parameter to a boolean, and
-> > applied to riscv/sbi
-> >
-> > https://gitlab.com/jones-drew/kvm-unit-tests/-/commits/riscv/sbi
-> >
-> > but I'm having some second thoughts on it. It looks like opensbi and the
-> > two KVM VMMs I looked at (QEMU and kvmtool) all currently ignore this
-> > parameter and we don't know what they might choose to do if they stop
-> > ignoring it.
-> 
-> For the default syscon QEMU doesn't ignore it and exits with the exit
-> code given.
-> https://gitlab.com/qemu-project/qemu/-/blob/master/hw/misc/sifive_test.c?ref_type=heads#L44
-> 
-> Both RustSBI and BBL implement the sifive_test device correctly and
-> provide an exit code,
-> OpenSBI ignores it, though it is trivial to add it.
-> https://github.com/rustsbi/rustsbi/blob/main/prototyper/prototyper/src/platform/reset.rs#L21
-> https://github.com/riscv-software-src/riscv-pk/blob/master/machine/finisher.c#L15
-> 
-> > For example, they could choose to hang, rather than complete
-> > the shutdown when they see a "system failure" reason. It may make sense
-> > to indicate system failure if the test aborts, since, in those cases,
-> > something unexpected with the testing occurred. However, successfully
-> > running tests which find and report failures isn't unexpected, so it
-> > shouldn't raise an alarm to the SBI implementation in those cases.
-> >
-> > Do you already have a usecase for this in mind?
-> 
-> Yes making CI easier, as the exit code is passed to QEMU rather than
-> having to parse the text.
+v3 can be found here [1]. Based on top of the series that add qemu_params and
+test_args [2].
 
-OK
+To goal is to allow the user to do:
 
-> 
-> > If so, we could make
-> > the behavior optional to enable that use case and use cases like it
-> > but we'd keep that behavior off by default to avoid problems with SBI
-> > implementations that do things with the "system failure" information we'd
-> > rather they not do.
-> 
-> Sure, do you want it to be a configure flag like  --console?
+$ ./configure --target=kvmtool
+$ make clean && make
+$ ./run_tests.sh
 
-Yeah. I'd prefer to have configurable behavior controlled by environment
-variables, in order to allow the same binaries to run on multiple targets,
-but something like this will need to know what to do before variables are
-initialized. Hmm, maybe we can do both. A configure flag to set the
-default and an environment variable allowing it to be overridden. It
-should be possible to do that for the console as well.
+to run all the tests automatically with kvmtool.
 
-Thanks,
-drew
+Reasons to use kvmtool:
+
+* kvmtool is smaller and a lot easier to modify compared to qemu, which
+means developers may prefer it when adding or prototyping new features to
+KVM, and being able to run all the tests reliably and automatically is very
+useful.
+
+* kvmtool is faster to run the tests (a couple of times faster on
+my rockpro64), making for a quick turnaround. But do keep in mind that not
+all tests work on kvmtool because of missing features compared to qemu.
+
+* kvmtool does things differently than qemu: different memory layout,
+different uart, PMU emulation is disabled by default, etc. This makes it a
+good testing vehicule for kvm-unit-tests itself.
+
+Changes v3->v4
+--------------
+
+Overview of the changes:
+
+* Gathered Reviewed-by tags - thanks for the review!
+
+* Sent patches #1 ("scripts: unittests.cfg: Rename 'extra_params' to
+'qemu_params'") and #2 ("scripts: Add 'test_args' test definition parameter")
+as a separate series.
+
+* Fixed the typos reported during the review.
+
+* Ran shellcheck on the patches, this resulted in minor changes.
+
+* Dropped patch "configure: Export TARGET unconditionally" - now the functions
+in vmm.bash will check if TARGET is set, instead of having the other scripts use
+$TARGET to directly index the vmm_opts array.
+
+* Direct reads of $TARGET have been replaced with vmm_get_target(), to account
+for the fact that most architectures don't configure $TARGET (only arm and
+arm64 do that).
+
+* Renamed check_vmm_supported() to vmm_check_supported() to match the
+function names introduced in subsequent patches.
+
+* Renamed vmm_opts->vmm_optname to match the new function names.
+
+* Reordered the key-value pairs from vmm_optname in alphabetical order.
+
+* Use the "," separator for the composite keys of the associative array instead
+of ":" (don't remember why I originally settled on ":", but it was a really poor
+choice).
+
+* Dropped the Reviewed-by tags from Drew and Shaoqin Huang from patch #6
+("scripts: Use an associative array for qemu argument names") - the review is
+much appreciated, but the way the vmm_opts array (now renamed to vmm_optname) is
+created, and used, has changed, and since the patch is about introducing the
+associative array, I thought it would be useful to have another round of review.
+
+* Use functions instead of indexing vmm_opts (now vmm_optname) directly.
+
+* Fixed standalone test generation by removing 'source vmm.bash' from
+scripts/arch-run.bash, $arch/run and scripts/runtime, and having
+scripts/mkstandalone.sh::generate_test() copy it directly in the final test
+script. Didn't catch that during the previous iterations because I was
+running the standalone tests from the top level source directory, and
+"source scripts/vmm.bash" happened to work.
+
+More details in the changelog for the modified patches.
+
+[1] https://lore.kernel.org/kvm/20250507151256.167769-1-alexandru.elisei@arm.com/
+[2] https://lore.kernel.org/kvm/20250625154354.27015-1-alexandru.elisei@arm.com/
+
+Alexandru Elisei (13):
+  run_tests.sh: Document --probe-maxsmp argument
+  scripts: Document environment variables
+  scripts: Refuse to run the tests if not configured for qemu
+  scripts: Use an associative array for qemu argument names
+  scripts: Add 'kvmtool_params' to test definition
+  scripts: Add support for kvmtool
+  scripts: Add default arguments for kvmtool
+  scripts: Add KVMTOOL environment variable for kvmtool binary path
+  scripts: Detect kvmtool failure in premature_failure()
+  scripts: Do not probe for maximum number of VCPUs when using kvmtool
+  scripts/mkstandalone: Export $TARGET
+  scripts: Add 'disabled_if' test definition parameter for kvmtool to
+    use
+  scripts: Enable kvmtool
+
+ README.md               |  18 +++-
+ arm/efi/run             |   8 ++
+ arm/run                 | 161 ++++++++++++++++-----------
+ arm/unittests.cfg       |  31 ++++++
+ configure               |   1 -
+ docs/unittests.txt      |  26 ++++-
+ powerpc/run             |   5 +-
+ riscv/run               |   5 +-
+ run_tests.sh            |  35 +++---
+ s390x/run               |   3 +-
+ scripts/arch-run.bash   | 112 +++++++------------
+ scripts/common.bash     |  30 ++++--
+ scripts/mkstandalone.sh |   8 +-
+ scripts/runtime.bash    |  35 ++----
+ scripts/vmm.bash        | 234 ++++++++++++++++++++++++++++++++++++++++
+ x86/run                 |   5 +-
+ 16 files changed, 525 insertions(+), 192 deletions(-)
+ create mode 100644 scripts/vmm.bash
+
+-- 
+2.50.0
+
 
