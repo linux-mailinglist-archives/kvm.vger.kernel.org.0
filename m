@@ -1,217 +1,599 @@
-Return-Path: <kvm+bounces-50601-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50602-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 183F7AE743F
-	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 03:21:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5A55AE7466
+	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 03:46:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8BF3D7A799E
-	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 01:20:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25947179440
+	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 01:46:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB0C115DBC1;
-	Wed, 25 Jun 2025 01:21:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3129D161302;
+	Wed, 25 Jun 2025 01:46:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="njTWnWPw"
+	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="L/my3A85"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2073.outbound.protection.outlook.com [40.107.237.73])
+Received: from esa8.fujitsucc.c3s2.iphmx.com (esa8.fujitsucc.c3s2.iphmx.com [68.232.159.88])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E51528E0F;
-	Wed, 25 Jun 2025 01:21:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A02311E87B;
+	Wed, 25 Jun 2025 01:46:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.159.88
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750814480; cv=fail; b=fhySvfNl67B1ArSJDFMTCwmKKl9HcH76QaKzBdfePdxbDrTHzOuNFKy46H7Zwu9evH4Gl8OROkIup02G8wa55kBBArMBEIE3L2J6ZGBacr5oAXztMq1FEgT8kbEg2pyFjDgZQhFLODoBlAu/U02xrwfCUtVTFk0PtyirZWJltC8=
+	t=1750815977; cv=fail; b=e91ZxQyxl89eROsbPMJtQVMx5JKUhVHvUEC0hhRFPiSq8QVwpquYPlbAvG7IUXeUMQkpTmhS6cxiU8YrhYN0i4n6EGrOcuXJo6mP5tw7V4FpeSkoy25Txmh+7r1Z+cOHzhnhpnkJy/WNpTEVYQJmUh3ZavzveOi9PlFQCYk5LjY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750814480; c=relaxed/simple;
-	bh=ZOlSD9YsrdjoceKZnwW7LhIRusb6//n0tPbQLrsWOVo=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=ummCL9JInyFVKoXLDRfM1MYsfmr6yLfvID+UwL+bpzdw2S/nqD3y8mnuELAZzfGUwhMz8sbtZO1/SWiFI71Az783rnbxaOfu3PWwiMqP+GBOeMsBCvhORJNkcVk6aZOFVtV2bQ5hyN7EOJKLnGnGWFjca1ff+a14+d0N0YTY7u4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=njTWnWPw; arc=fail smtp.client-ip=40.107.237.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	s=arc-20240116; t=1750815977; c=relaxed/simple;
+	bh=KjeidXAse7Sj2Vqh2Wd/rt9k39DQvkiThSvQ9Pk3Ups=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=H5CfIVsKNWCdZkWLzkCZHDTY+MlhAwQWVt2CCXbXSfsBcq8kjazOeoihxPZyqb2Q+ftOUi7PlMV9Hbw2e0ym1TYTnImmT5hLrpwEWcKUnnWEUnjRwaMREN52+ccF/kPUaiPnCItjDwlLKYhLuTdBTvKcSZw9eLzQUb/pItxT23w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=L/my3A85; arc=fail smtp.client-ip=68.232.159.88
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj1;
+  t=1750815974; x=1782351974;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=KjeidXAse7Sj2Vqh2Wd/rt9k39DQvkiThSvQ9Pk3Ups=;
+  b=L/my3A85kkXbLuyJPVN+yPAHDzgy+1MVHyRkkd1W4rxco+qM9rJZHvtI
+   ljYDId49WtcQxyUVd3M7mGBugUQQzKH/tfXd0eMXvkHAqZGBAqYIOke9s
+   UHDfb3vpFVUsdoutECgSndapg4okxzjvaRxYoJTOPlRe72vOMaya1NgsT
+   GP+p5TWbCpVprVMGOqc0o8bhpF1wa7gBDVeioq3biNElYcMXM/GrIbP6H
+   7WkSAO9A9P6evcFYvKqoNqhwZvh1OfiOsldNGNtyBe7S8gnwJEKKmTuF0
+   z/UaN+eHJWMBtSZfyet6i0u2ix/w/JzwUb1NVaK2BJkiKAhODisSGXy/R
+   Q==;
+X-CSE-ConnectionGUID: kMyvWnW0SE6K8JJmvW5Yag==
+X-CSE-MsgGUID: kyMPb5XfSCK8wr1sgaD0kw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11474"; a="159615434"
+X-IronPort-AV: E=Sophos;i="6.16,263,1744038000"; 
+   d="scan'208";a="159615434"
+Received: from mail-japanwestazon11010015.outbound.protection.outlook.com (HELO OS0P286CU011.outbound.protection.outlook.com) ([52.101.228.15])
+  by ob1.fujitsucc.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2025 10:46:01 +0900
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=CqeWzS6Yg8k0pUxUZ6CBqbGu4ZsbVIm2gd/utTmqPS4s6fw9AoxvaSrTu28NuAMqdZFwPTqiKcSZ4KRCHT6vMttLKCbKhbL+GSJC8gOKNVQG/mxOCiJYpaozF0h7kRdqa/pqCXzYPD7c3FbtNMkqMhqrM1EHW4eMkePzjWmK5vtLtx6eHEpvPIPQWKnVFnuVrSnr/1aEetk0LeZqfef1PB+PgcQYOSuXNm5ymLKOf89FM5cYBV7hcIQgcDjQWYy+9oh+G7WVr8rKqM71Myx/tjX/6F8i4I8KpQSyVKx5CmYfcKXEBq1OJyhMahqvxmoOvzzXRQu3vKxOntq5Z0cQpw==
+ b=QCnDQY/uWlNmkgcQTeG6bIJ0CHeXzrUP6P2Szbv9E7BvCs6BpucSW9fJFsVm+1LwLFza08kRW4AU2I8Ycam5nXYl2fxAWTLjcUAaYgf83BXdy0hgU1h0K5PbGxQtTWkiI1ucA1NAyJvkf97Tcz5piFXzjRhh5gY/3nqe6esLHbk3XdkoPQB2jP56jXPQon1RpQnruJP0O1hldp++6meROqYYWFSGD8FvmXzSh0JiEuAZZUMhRCqIkFUP/N5TN6zZiMRQxtd5YNJXtdscf/awnmcTQQyDXND1YNmK5bULvwOcZCfWmQyVKrWI+GLozRFlXxXiuTJhX2axpjoRApblJA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/GtiQIaX9SwCwGKFNgeM2USS7tBx40Mv7xGaLJZbD4I=;
- b=eME9yREJS4A+durgr4fRNtXqB3Mny7V4jnqtQ4iB1V8hP7To7z8Dj0SbL92bKO9k9Wb7D16+2CRiemPunVe99txHNQBDjL+TBOT1Dq4JUyiKpiPPGZDVAglFElIucluPMXclo5l6JVmwLdfqO4X5bozVFPjZiqQBtKHvMNJguPXLL2uF0o0oLMtdLiL+0SmT1XaD9D13qyYfkWlfPEmPCnj8KjhINLHHmk5L1kmkS6tJhG5SgwpdmGVROXokZ9k4Gfjlrc21xrFSGPBRl1P9M96eK2Ak5A/dzdMwVkhfFYsIfOC/lLh1J19fI/baafSBtkOY0vBBbuyJABBPutH3nA==
+ bh=yNA5QwNZxWdwPZQPifN0sOLqJ3+ZZ5BVPihV5lF0NJs=;
+ b=clTM9SxFAztorKAPvkhFSWYgCYpjW3PMyrl/fafZIEpEGMbmenez/reC8UC+fD+qO4yJ5UmEJvfprUnndWdlBZhCnCdytKD1sOJSuIPWqRvFNBwmdEOz95qvVk8435aG/4x9/AHpG+uMLHBXjPZ23GYQG57IEd25fPXE9jNQfBTzNYZe3bhcxxFbNLpTkGl8UpHBhH72BfX5zedIRBG+NO1pRKI0k6PwNP68AQ0fWVJmDjBHIxmmoyOi9J1AVNtBuQfs2eAVONXBloxGSJ72CjrrCTHOVjv2ryJJoHuR6BHBIVHrOv+5RzraLQ9osOgDTBdPGcq4koakaOfKTPOPxQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/GtiQIaX9SwCwGKFNgeM2USS7tBx40Mv7xGaLJZbD4I=;
- b=njTWnWPwzxbHhRX6i05g0FT9un8v50BWF/ID4HZQ0M1QqeFx07hJSsVBluKs1dNRL7Abf9KnBLLVXAyfaFvz4+wKo4yVllw+Q12O958/aUbyc/k5SxAgCmpBKyMv4txBr49sqO67qW/9/7lIGwjNKb3ipq9tT4rZcjDdxXSRMZ4=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS0PR12MB6608.namprd12.prod.outlook.com (2603:10b6:8:d0::10) by
- MW4PR12MB7287.namprd12.prod.outlook.com (2603:10b6:303:22c::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8857.28; Wed, 25 Jun 2025 01:21:15 +0000
-Received: from DS0PR12MB6608.namprd12.prod.outlook.com
- ([fe80::b71d:8902:9ab3:f627]) by DS0PR12MB6608.namprd12.prod.outlook.com
- ([fe80::b71d:8902:9ab3:f627%7]) with mapi id 15.20.8857.022; Wed, 25 Jun 2025
- 01:21:15 +0000
-Message-ID: <24675ed2-e3ae-4473-9d8e-acd378da220c@amd.com>
-Date: Wed, 25 Jun 2025 06:51:05 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v7 03/37] x86/apic: KVM: Deduplicate APIC vector =>
- register+bit math
-To: Borislav Petkov <bp@alien8.de>
-Cc: linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
- dave.hansen@linux.intel.com, Thomas.Lendacky@amd.com, nikunj@amd.com,
- Santosh.Shukla@amd.com, Vasant.Hegde@amd.com, Suravee.Suthikulpanit@amd.com,
- David.Kaplan@amd.com, x86@kernel.org, hpa@zytor.com, peterz@infradead.org,
- seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org,
- kirill.shutemov@linux.intel.com, huibo.wang@amd.com, naveen.rao@amd.com,
- francescolavra.fl@gmail.com, tiala@microsoft.com
-References: <20250610175424.209796-1-Neeraj.Upadhyay@amd.com>
- <20250610175424.209796-4-Neeraj.Upadhyay@amd.com>
- <20250623114910.GGaFk_NqzGmR81fG8f@fat_crate.local>
-Content-Language: en-US
-From: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
-In-Reply-To: <20250623114910.GGaFk_NqzGmR81fG8f@fat_crate.local>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SG2PR02CA0133.apcprd02.prod.outlook.com
- (2603:1096:4:188::18) To DS0PR12MB6608.namprd12.prod.outlook.com
- (2603:10b6:8:d0::10)
+ smtp.mailfrom=fujitsu.com; dmarc=pass action=none header.from=fujitsu.com;
+ dkim=pass header.d=fujitsu.com; arc=none
+Received: from TYXPR01MB1886.jpnprd01.prod.outlook.com (2603:1096:403:12::19)
+ by OSCPR01MB12688.jpnprd01.prod.outlook.com (2603:1096:604:340::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8857.27; Wed, 25 Jun
+ 2025 01:45:58 +0000
+Received: from TYXPR01MB1886.jpnprd01.prod.outlook.com
+ ([fe80::c110:9520:20ab:e325]) by TYXPR01MB1886.jpnprd01.prod.outlook.com
+ ([fe80::c110:9520:20ab:e325%5]) with mapi id 15.20.8857.026; Wed, 25 Jun 2025
+ 01:45:57 +0000
+From: "Emi Kisanuki (Fujitsu)" <fj0570is@fujitsu.com>
+To: 'Steven Price' <steven.price@arm.com>, "'kvm@vger.kernel.org'"
+	<kvm@vger.kernel.org>, "'kvmarm@lists.linux.dev'" <kvmarm@lists.linux.dev>
+CC: 'Catalin Marinas' <catalin.marinas@arm.com>, 'Marc Zyngier'
+	<maz@kernel.org>, 'Will Deacon' <will@kernel.org>, 'James Morse'
+	<james.morse@arm.com>, 'Oliver Upton' <oliver.upton@linux.dev>, 'Suzuki K
+ Poulose' <suzuki.poulose@arm.com>, 'Zenghui Yu' <yuzenghui@huawei.com>,
+	"'linux-arm-kernel@lists.infradead.org'"
+	<linux-arm-kernel@lists.infradead.org>, "'linux-kernel@vger.kernel.org'"
+	<linux-kernel@vger.kernel.org>, 'Joey Gouly' <joey.gouly@arm.com>, 'Alexandru
+ Elisei' <alexandru.elisei@arm.com>, 'Christoffer Dall'
+	<christoffer.dall@arm.com>, 'Fuad Tabba' <tabba@google.com>,
+	"'linux-coco@lists.linux.dev'" <linux-coco@lists.linux.dev>, 'Ganapatrao
+ Kulkarni' <gankulkarni@os.amperecomputing.com>, 'Gavin Shan'
+	<gshan@redhat.com>, 'Shanker Donthineni' <sdonthineni@nvidia.com>, 'Alper
+ Gun' <alpergun@google.com>, "'Aneesh Kumar K . V'" <aneesh.kumar@kernel.org>
+Subject: RE: [PATCH v9 16/43] arm64: RME: Handle realm enter/exit
+Thread-Topic: [PATCH v9 16/43] arm64: RME: Handle realm enter/exit
+Thread-Index: AQHb2r6YT7eP93r6y0iehVFFNbA4eLQTLm+S
+Date: Wed, 25 Jun 2025 01:45:57 +0000
+Message-ID:
+ <TYXPR01MB1886B05D8257CE01B15EF6D3C37BA@TYXPR01MB1886.jpnprd01.prod.outlook.com>
+References: <20250611104844.245235-1-steven.price@arm.com>
+ <20250611104844.245235-17-steven.price@arm.com>
+In-Reply-To: <20250611104844.245235-17-steven.price@arm.com>
+Accept-Language: ja-JP, en-US
+Content-Language: ja-JP
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+ MSIP_Label_1e92ef73-0ad1-40c5-ad55-46de3396802f_ActionId=8cb4c2d3-b633-4804-a708-05f466c6ac80;MSIP_Label_1e92ef73-0ad1-40c5-ad55-46de3396802f_ContentBits=0;MSIP_Label_1e92ef73-0ad1-40c5-ad55-46de3396802f_Enabled=true;MSIP_Label_1e92ef73-0ad1-40c5-ad55-46de3396802f_Method=Privileged;MSIP_Label_1e92ef73-0ad1-40c5-ad55-46de3396802f_Name=FUJITSU-PUBLIC?;MSIP_Label_1e92ef73-0ad1-40c5-ad55-46de3396802f_SetDate=2025-06-25T01:36:40Z;MSIP_Label_1e92ef73-0ad1-40c5-ad55-46de3396802f_SiteId=a19f121d-81e1-4858-a9d8-736e267fd4c7;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=fujitsu.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: TYXPR01MB1886:EE_|OSCPR01MB12688:EE_
+x-ms-office365-filtering-correlation-id: 9017339f-2c1b-4807-b29a-08ddb38a07fc
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|7416014|366016|376014|1800799024|1580799027|38070700018;
+x-microsoft-antispam-message-info:
+ =?iso-2022-jp?B?ZzczcXZBNTI3MjhBUnB3cUxzMmF1RkhYeDA2eTRzSGtTZzdrVWczTnRL?=
+ =?iso-2022-jp?B?VkExLy9LQWkxNnpMZUROVVZDUkVWQm9sWTJHYnIzK2RkR0Y0RHZtVnd1?=
+ =?iso-2022-jp?B?RjhSRkJhNTBRREgraXFnTGpocWlvMU5mUTJtaVpUM2MyOGZnQnNTZnpr?=
+ =?iso-2022-jp?B?M1ZlK1VsajUvU251L01GRVZIeGV0eHY5NnJhMWgyYWlVT3l5d2Y5STIy?=
+ =?iso-2022-jp?B?SEg4WUViN0REMkFsMXZxUjROSVQ0UGhxMGNDQm9YTU5YS1VZRWo3MG5I?=
+ =?iso-2022-jp?B?dEFXS1ZpYjlUTnNZVXFJZUlFM21NVzRGZkF4VUZ3WkJNQmZHOGszb0JN?=
+ =?iso-2022-jp?B?a3p3ZnZ3WTJnMFdOOEZ1RTdFZlFVVk1TOTVZc1BTb0NOZGVxOXlGdVBJ?=
+ =?iso-2022-jp?B?RXMrQkpzbTB4aWF0UGFSRzh5bW5tdmxRZUNtZzZvNTVGVzUxNU1kMFpu?=
+ =?iso-2022-jp?B?SlF5a0NOK1Z3Qk0yaDBua3Fid2dWSDE2L1JmWUx3Mno0dGNIQUhqL3lF?=
+ =?iso-2022-jp?B?Sk9oZnZxRWdTYko0QkZEb1BzWS9OSVZzd003R3FGZEN6bXJjT3dqcE1G?=
+ =?iso-2022-jp?B?blVwM3Flb0JhdEMvRlhFMHJBL3phQ1JxMEdrZDQvZ0dzSTJ0WHhZbXVU?=
+ =?iso-2022-jp?B?NUhVMmd5a2daRXZXalE1YUk0V3FBNDNUK05WcjdkNVJscGNHOXYzZEtw?=
+ =?iso-2022-jp?B?T2V4c1lMRFRmK1lOVWF3eUROZGh2M3BLTFNqMjdZMERDbEhrcGxuQlBN?=
+ =?iso-2022-jp?B?Z2sxcFpnaEl0dnZqSEZkTE80Q3R3dWtWei9wb0xueVk0TTJNeEt0VFc2?=
+ =?iso-2022-jp?B?NitpWDZESEhFNEx5M2VMV243Uk4wci9IOHZFWmYwaGp6QjNMbFEvbE5M?=
+ =?iso-2022-jp?B?QXRxNjdMMzFoVEZISks0d01EVE1Qb1V5RnMzU0I2eEZROG9lYnNnaDFG?=
+ =?iso-2022-jp?B?bkRoMkhTY3VybWN4M0duSm9aQmZGdkYzUDJMQmRHVkRUNHBmMjdLTG10?=
+ =?iso-2022-jp?B?V2hXNHV3WGtBM0hTQzJ2TytOczhnc0RuVmtYYXhXVHZEbVdoNWFib1BF?=
+ =?iso-2022-jp?B?RjcyZ2N0Ky83dHNKWXZOT05qQ2J1dWlPUnd6MmUxV3lycjNQN0NoVFcr?=
+ =?iso-2022-jp?B?cllFRXp4cnN1WXU3V3BaMnQ2dEtwZFYvNktVeUVYWWNCR3pNcFVBUGJh?=
+ =?iso-2022-jp?B?YmhsdUZseHFQSG1vTXdxaHlHYXZ5SDNBQkJxSWFhcGtTSUdBVmlSd3Z4?=
+ =?iso-2022-jp?B?dW9Wd2Zld2dYam1kRlBBZlBkZFJZdFJlUnlTd1F6S2w3V25LejQxeGlV?=
+ =?iso-2022-jp?B?cmU0bGdLYzVJSkhGNS9JZEw2ekdPNWJZcmJmbVlvYnNCVktDT0pFaHVD?=
+ =?iso-2022-jp?B?VDVpem1LRU5TcU1kczlkTmo5eitWMy9NNzFIM1pEL3hHMFNNTi81R0NV?=
+ =?iso-2022-jp?B?MVhBUU10c0RHV0djZ3Y0QXNWWTJRSkZEVGZTUDF2QmxMbTNpYjFBN1Ir?=
+ =?iso-2022-jp?B?OXh0UE0xbGFTdXFuRXBlNG1vWml3NHBmbVhjVm1oWWtydHo4QkRJbmQy?=
+ =?iso-2022-jp?B?MURoMUlIa0ZpVFhaSzArbTVGZ1RTL2IydWVqUXhtZWtHNTlTWDZnVFY0?=
+ =?iso-2022-jp?B?dVR4Wk5EQk1lNUpXRXE0Rkxrb2ZVTHZ6VURxVUt4ZC82OVRBVkRaeUNN?=
+ =?iso-2022-jp?B?dlNNNnhjTkVyWm9UZnpIb2JPbnByNzlCVVF5b3JpOFRkS1RrTW9va25o?=
+ =?iso-2022-jp?B?YUc4RTVJMlgxOW9pVVR0Qk4xTjdQSW9DaitQU1Exb0lOdWNoMzJZQ3JY?=
+ =?iso-2022-jp?B?V0JFclVOTzk0VVN6c0JwckFlcEVPa3BGdGVPVVgyY25RUGo1NHR3Kzhy?=
+ =?iso-2022-jp?B?QWhNOWJrMlRZSlVnNE1wNUNnekU1eXhGWi84TjFVNktScTFZM21BV2o2?=
+ =?iso-2022-jp?B?WTR5TTc1TlppRTN3QURRczFTYmtsYVJrT2tiTXJYS3k4anJMMExhd0RY?=
+ =?iso-2022-jp?B?WktrQVZWTFRtWXQxczA3UFV5Z0JIb0N1RngweithWUdqbHUxUDhtTjBZ?=
+ =?iso-2022-jp?B?UkdvRnJkNDhvb2Z2OCtVTXlUajRFenZCOG5PVDZzdFlaR1c0UmxITnhn?=
+ =?iso-2022-jp?B?dXpuSlhyQThYWE91RzFGbmlUTEF6cndBSFpwRGh3SzJkNERQTkt6a04w?=
+ =?iso-2022-jp?B?aHFrVzhhb1dOV0JNdkdMUngvM21lNm5a?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:ja;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TYXPR01MB1886.jpnprd01.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(366016)(376014)(1800799024)(1580799027)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?iso-2022-jp?B?aVNOOE9mN0RmRWhOWDdLSHJVWkpVZm9udGRNdXo0cEJtVVVTQUZRTjNI?=
+ =?iso-2022-jp?B?aDdpakpzQjBKalZLK2pmdEtRUVVTUFJxUW9uaDlSTVBaOTBLK2RXWDI3?=
+ =?iso-2022-jp?B?N1dCaDlzdlBtSGFDQzdzYkQ1ZXdaaTVLVEFTbTlubmlWVkxvb0ZtYkVi?=
+ =?iso-2022-jp?B?TFR3aEl6WlRFZDFOYzV4MEx2L0NTSlArMjZXcG5mVzZXR0s2VFV6dnVD?=
+ =?iso-2022-jp?B?VGVqYXVaczVLQ2thUHJ6RjJsWUhkWFBCUlJaTUhlVDd0M0tMWXhqalN3?=
+ =?iso-2022-jp?B?dmhjelptMnFrTUZURzhHKytqdVBFVTM3bGRnZTJaNjRha2RXaEF2R0U5?=
+ =?iso-2022-jp?B?MTA0TzdVaWFaVGxrRCtuMHlmQU1kLzJyWUJ4cW9uUGZwUFN4U1dKOTNr?=
+ =?iso-2022-jp?B?WURCTGZGVGhkZ2xJTUdkekxGc3U1R0xxRkRzdmxwZzNMamtXWkxTckJo?=
+ =?iso-2022-jp?B?d3dQY3ZLVmU3bEYzTHpzeFM5a3R0Qmt5bWlFczlISDcvc3d0dk9naTNj?=
+ =?iso-2022-jp?B?K0NTeVNtSXJoNGp4bExmS2dxcFpTVC84TWgwMHJIZ3pRS1A1M29JMFhV?=
+ =?iso-2022-jp?B?Snk4b3FvZ3YvendSRzg4SGN4cnVYZnhxMzdhaHBwOXRBaml3aGo3UXNM?=
+ =?iso-2022-jp?B?c0Y2Z3pDVGYrbXZCVzFuWi9qcys4WHh4L3pYOWhyWGRpQ2tZOXZFbCtS?=
+ =?iso-2022-jp?B?NC93VTFGbEpWV3RLUWZJQU5qZVNFa3VJdjFXbGJYcDFlVjJUQUg5QVBY?=
+ =?iso-2022-jp?B?Q0hrQkh5aExTbzRKTzRobWlvOVdCZW4zNklMamtTUmFxNXdQSlVtUjZy?=
+ =?iso-2022-jp?B?QXI4K01JMTU5dFVaS293SVNaWG1oUlFzWXBGZUJOZm1zWGxFQkhtcVBl?=
+ =?iso-2022-jp?B?cEZsbS9PZmU0MFpJbVRXc1owS0FiWjErMDVmWDZEcVRPRGNZWTY1cjVM?=
+ =?iso-2022-jp?B?UWhIRmhxQXVFelpZNkpUSEVZM0pWWERxK2xFWFczVFpOU2kveEkwc0JO?=
+ =?iso-2022-jp?B?eE5GWk9qeW1XQTRTWVNHMEFsTklOSGNwTjQ5OUdSeC9CZ20xVTRhR1lH?=
+ =?iso-2022-jp?B?UGlBb0pibUFEWVhCUWU1eUE3WUJjSjNFSXNvR2JqSHJQRGNVb1FzaU1K?=
+ =?iso-2022-jp?B?NnlVUTBhaDl0ckJKTytmT3haWmIxM1dIelhIWDVIWkdBTmE5cUdMN1pJ?=
+ =?iso-2022-jp?B?amRRaFlzREsxY0RaQ25MbVdXZFl3cjNuUCsyWUhDZUk3OEpMbHMzeG1k?=
+ =?iso-2022-jp?B?RGZkdXBWd2R5cGhHN09TMHlrcTJJR0tUNzlFbU9SN3lTLzJIL1JmMldm?=
+ =?iso-2022-jp?B?M1R1VitlMENnZlk0WHpSVFZhWUhjWkExYitZbWtMWC9HaUZoN1hIaU1q?=
+ =?iso-2022-jp?B?VWZqM084UlRVRTVpdHhNKy9mYlhqT2dydnFxQ3pnU0ZVc2tnOUxCaEtz?=
+ =?iso-2022-jp?B?Rjk0QmpPUW54NGlZZkdTbnZVendyL3lFNmNzeFBWTVMyMmtvTjI4WlVI?=
+ =?iso-2022-jp?B?MlJEUGRLSzNWSHJDanQwaFE1TEZFQ1hLb0oyNnl2NWx5N2xvLzlGa0Ur?=
+ =?iso-2022-jp?B?L3FNTWp2TkxRNnlXSkZDWTk0NEFobzBobGQzbFdCWDB0MVBHQ1R2bHFT?=
+ =?iso-2022-jp?B?VnNCSG5pM0Q1bXZqTUxtNk9ORjBuVEtGQmRTSm1RQStjQmgxaXFOejNG?=
+ =?iso-2022-jp?B?b2FsVjRNN2xnalR2dnJhbTg5T0JjQ2VtSk5JcHgvOC9pcHc2cEhTNDhj?=
+ =?iso-2022-jp?B?VDdGOC9VV1kvSVAyaEc1K0p6R3Ava29GL1dZY3Jtb1dlZ3VJTDFuc3Bi?=
+ =?iso-2022-jp?B?amxWL1grbkxibmFWeDd4L1dDTFcweE1pWW5vNDRRaVdwNWxZUXNmbVp6?=
+ =?iso-2022-jp?B?Ky9zQkFMR01tTE5tb2hYblN6MDJERDM5WjNpTWt3MHJtZThFSUhhQWdm?=
+ =?iso-2022-jp?B?cEZZSDEzSnh0Z1ozRzRnL09adGdHZUVJdFNaMWY1clUzT1ZCQ0dRNkxP?=
+ =?iso-2022-jp?B?STFVclBVd0JqL1QwODk1Q2NvajZ2SUtFb2pzdVlVTzJlQWJ1d2RJOXRk?=
+ =?iso-2022-jp?B?RGtyV1dzd2tNQ21YanJzMDFLOFhVb2dIWGpIZWwvQ09NdjJ0TkdaaUxw?=
+ =?iso-2022-jp?B?VkVuT0JPNitwOGdKQjc5YnBLdFlhS3FDclNSOHZQeVErYzU1aUlwcTZk?=
+ =?iso-2022-jp?B?b0t4c0pkL1U3bUdTSWxCekliVFpVbU5sc2RpSm5lQ2I0K3Rqdi91SUdi?=
+ =?iso-2022-jp?B?WFpNOE9UT3g3OUNDWEZpVDBzS2kvZXhiT2xJa0Jub3JXdXA5Q2dOeUNS?=
+ =?iso-2022-jp?B?c0NIcjRVNWRZdzlMRVptajhNRzlROVJuL3c9PQ==?=
+Content-Type: text/plain; charset="iso-2022-jp"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR12MB6608:EE_|MW4PR12MB7287:EE_
-X-MS-Office365-Filtering-Correlation-Id: 76ac7a55-a6c8-47aa-aaea-08ddb3869424
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?VnYwdjBlVFhIWlNEZ0h5UCs2Tkk2SjNvTlpZb3JuMFV6NWdpV3ZlWlZjSGli?=
- =?utf-8?B?cHVLcXdISndnVmFXM2YxTGtWd1U3K2NJaVh2RGJvNjBBcm9penNrR29tSUhB?=
- =?utf-8?B?YXdsQ2xIcUl4YTRDM1JMdCtxZ2poZFhSb1Z3M1plUENEdW15M0IrRGozSkdE?=
- =?utf-8?B?dEMwdzRoTDdMOFlQWlA1cXlHUXVZYis0bUc4amhSUXB2bklCMUtzVWZ3NXd1?=
- =?utf-8?B?Yjhqcmd3bWJ5b3I5ZEcxWHRHQ3JXdzJWQUFVdDJjckR0L3JQenhzZlVSV3Nt?=
- =?utf-8?B?MUV4Sk5ZaUJKSmFkV2l6ckFxbnVWSFhUU3pCSENveUFwZGFPNTk0SnBKU2Jw?=
- =?utf-8?B?VHQzZ0l2RndrQkF1ZlhPeXVWaHZOaHNOdVVuRlpHWDVHU2ZsN0FWdTZYa0Nk?=
- =?utf-8?B?VmZudWhuUXhtTDVCL2J3aXd6ZFQzU09kanJ3YVljRC92ODQzZlEvK1ppNmJB?=
- =?utf-8?B?N0hjM1pUQWxyZ3h1RE5CdEFrK0Rjb295RGUraEd0ZmV3QStCQWZCVXRHRzFt?=
- =?utf-8?B?RnpuTkhpK3JBQXhLVG9LcmlZSVJ5dW4zVzRVRC9FZE9iSTNBRit3TTdCM3Nj?=
- =?utf-8?B?Z2VsN09PMXBHZkpVYndzTGJEc2VIbnovb1AvQWprMW0vNlpLUXRZME50YVRU?=
- =?utf-8?B?S3MyMDFtdkRYQkI1TzE5aHp0MmtyVDVUYmFLcGtiZWp3ZkcvWFhtOUp2RXRZ?=
- =?utf-8?B?WGVjYXBSOFpiTkRDa25CVjcwRnY5N1h5ejB0cHZ1N29EZzBYMFBFa01vUUx6?=
- =?utf-8?B?UmhBYjdib1Y3NWhUbFc5aFcvSXRlRjhxcHp6Rkk2S3A2aHhIdE8wWTZVMWRN?=
- =?utf-8?B?UFh5R1FFeUx1Zlk0bDJRR2Z4V2czOWJzRGFHNGZXaDMzRml5Y1ZuL0lzck9i?=
- =?utf-8?B?U3NNZG5UaUk1bmthbDdzUUZRc2d2Ulk1K1F2NGwxR2JZSjNVTEZ6L0NscTJ3?=
- =?utf-8?B?UU1kY09pZ3JjdGcxM3gvRVY5VEpKTXJYajJwY0h3KzhUaVZ2eWtObWhVczFm?=
- =?utf-8?B?SlZZNU8xZmRmcXJhbXBvMWVIRFlJY3FNNWRzdWlYbnh3ZTdMZVNRN3JmRzdZ?=
- =?utf-8?B?R1MrbDJRdFhXaXp5Qyt6c0FoUzNneXBwb2s2a2MvTTc3dzV5SXVxM09EVVc2?=
- =?utf-8?B?QkJJY1MwVGtyWnJoYS9kbnlOY1JzaEpad3c1UnFJMkxHaVBLeEMrY3h0M0NT?=
- =?utf-8?B?b2FnQkxacG1HWUg1OHVmWG40ZjNicm9aejZKc0lXMzRsazQrSTNHZ0dNMDZm?=
- =?utf-8?B?YXYwMUFnVUphTzdtSTlaRUhsOEE3TzJCSXZwTUlRWUpBVUlwczhxTG5mUUc2?=
- =?utf-8?B?byttZUZKMm5QNzl5RlZRT3JwV2pRUnQwMXpHZDBaejBqTnl2OFJuRUt3VTJC?=
- =?utf-8?B?a0pUaTRLbzZrR20rUkU1aHZZZU9TVWErS1FQWWJKQTFSQU9nYTYzTzgyaHJQ?=
- =?utf-8?B?Q3IxdmF3eDRkTk1ZVVYySjJ2T1kxcUVNWGFOMjdXZ1VPMDhKTnNRMk9VWTRu?=
- =?utf-8?B?T0wxdldSdGpaNlVZZmNXc2J6QzI5STFWMS9oVk5sOFJhS2lLb1pOV21oRVFE?=
- =?utf-8?B?ZWgxL0MrakpZWVJsOXIvV3lXMERSekE3SGE0R0d0M3FyQUNFUkZ0RUtNdHl3?=
- =?utf-8?B?RFA4aU9CYUl3M1pJeTBUNVlvOUd6MDhPRVhUUUg3ajM3ZkVNNFdGRFZZWkRm?=
- =?utf-8?B?MUN1dDdHT1UzMGY1djRoalJDd1l2SHE3bnRaaUJFWWhyZmlxckhteVlOOWF1?=
- =?utf-8?B?SzlJejZuYzVoVnd5T09YVXdlVWowaktrUVZIcUc5QXBEaXBEek1jOUpWYWlR?=
- =?utf-8?B?RWpUOWlTL0R3OTdycUtUMlpSOEZXS1F0QnNGdjhveVBhTmxzU3VYUGxkL0Q0?=
- =?utf-8?B?Y1JqeXg4NExMZmI2MGxTVlA1T1p1VlpvNWgvVDN2VHNCcUorRm1YaHR0YUVa?=
- =?utf-8?Q?YZ6CnPx5uQM=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6608.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?ZTEyTWk0czMyT1l2Z0wwMmZXQnNrdVVMSGhxMUxNZ2NrVEd5czFKaHlhL29p?=
- =?utf-8?B?Yk9wUm1PeVdBWEtEUzFRRU9xajQxTXhieEpCL3l3Q2FrMHJMMDFGL2FNc01z?=
- =?utf-8?B?VnZyYkZVZ3g1aVFGU2dlVnQ5Z1lUR2JVVnRlT2xxd2ZnMkorajk2QjUwOHRH?=
- =?utf-8?B?VW1VOVB6WndlRjErWFR1NEZNRU1TWk5XK0JmREFPYWxObFR6L2RJMjlCRk9h?=
- =?utf-8?B?UUgrREZyNGZ5ejU4SXpVK0szaytsSnp2b2s2eGJYdXBVbndiVDJOeXA4dHFS?=
- =?utf-8?B?S3kvY0dNRlZDVURUc0NveUxad0l3SUduRWI4ZUM0MTYxRmZHQTVSS2hJOTBt?=
- =?utf-8?B?MlV5K3VWWnFaZmZ1SXppakwxL2RUNDQrVWpWVFM3emtrcklScjJhNWhMVkxn?=
- =?utf-8?B?bVJmWWw0R0s3cHNhWUNMQ1hGTkRQaytpdG96SlByeENQaXllZnRGZTJSSlJ6?=
- =?utf-8?B?Q1l2elJDRlE4dExOalZuVUlKNEVuTUthYjNrS3JMUTE4SmZwYVc0cG1rOFEw?=
- =?utf-8?B?V2FBZWtISTRmVnFTUzIxZGY3eXBwZkNIWWVSRHFGbUdESjh0bEpSbDAvRUVr?=
- =?utf-8?B?UVFLdjhGZ1V1U3ZZS3c1Qk1sZUJsVkpVTHJRZDdsYVNneW9OWnRhVXQxQXFr?=
- =?utf-8?B?YUdEU0hnZllXYXhOSXZWaFdrSVRMZ2o2bThrRGVyT2xRQUxpMUQrcTRCV1lP?=
- =?utf-8?B?eGVEdHpteXNmbTNDSmhmOW5hOXRmL3Q2emdqRlFiN1ZQQW1JcGZpbm12RFJr?=
- =?utf-8?B?aVhBVDlNTUVLdVRCOGpVK0l4RHprT1R0N3RPakZQWWhoU1BqT0h1QmxnWkNs?=
- =?utf-8?B?RGZicWd0NW5qOGw0dlJSR0VBWVFuZjdtdWN2VTVydXpjMUg3d0dYKzIzWCsy?=
- =?utf-8?B?R2lWTjhRbUhycjYvNXpVcnN2aU1TdmlyeWhBWUFFTWplcWtTdXVubHZLTjg3?=
- =?utf-8?B?MVk3TGpibzFaUXJ1ckc2Rm5Wb3NGQ2YySVNXWHBaNi9nMzhONkF0OTEveUIv?=
- =?utf-8?B?bmUvYWo0Kzlrd3VJWGJGTWgyeUpzN0IxMGZlR3N6V042UndXNTdzaXhRODAv?=
- =?utf-8?B?WkIvaS8xT21qS3FVYzZrNmd1QkpSTjhGbWJPVHBKS1FGWWF4Z1JEbDVtV09s?=
- =?utf-8?B?ZnpGUE0vQzJIOHpZaE05RDE3Wm1yMFB6b1ptNkx1Z0VhSVJkdWRuSVlJejQv?=
- =?utf-8?B?WGU4M0JSRHdUUE9GMU9ld0xZa0t0Z3NvdFZZbEp6bDVsVExzdnBlRC9Pd1BL?=
- =?utf-8?B?YUl0Y0FxdVRvV3VJaWg2Tm1qOTFNOEZCek5JTTM5a1ZYNWovMldWd1Z3amg1?=
- =?utf-8?B?M1FMak8yUnptbGNnQklYVDIvNCtEWEdhWXU4VE14ZStQem5kU0NmT3Ntd2VP?=
- =?utf-8?B?YWRROFZnMmd6Rk0wN25tYTdyMS9EWDZVQjVjbDZFR1B0UGgwcGpjczF3Tjhs?=
- =?utf-8?B?TWJ6c2dPRTRTbjh1cWp3cjIzcE5LRkpTWS8ySWFXY1FSaks5MENHOXZLUHJy?=
- =?utf-8?B?M3VXM3NHZnluNXZEZlZDMTVtb2k1U2RzTXIwNW1PbmRVUmk1eFdkU3ovaDNk?=
- =?utf-8?B?bjJ0aXM0U2tzNkI0dXVRTkVnY0taWmxlTUM5Q0ZmSDlYQXpybVI0US9TcmZP?=
- =?utf-8?B?SXEvMklhSnpqY0VTamc4TEN1cjYyb1B5TG82bDFwOHZiVnQyc0J5STlZdVpm?=
- =?utf-8?B?SW1RZ04xMk9raTIvbHdqclQ0bkt3Uko2V0RCc3NFR0hCWnNmWitMK1lzOTU1?=
- =?utf-8?B?OGNYRzBkVXZLTTJtdHpwWG95aUZjMDVRa0VocDdMNTdTOVBPWHJpbXlhTUtu?=
- =?utf-8?B?U3JacStzaWVtOTJlWWd4MUlURHpubUV5RmN0L1grR2NjK290VS81Rm50aEtI?=
- =?utf-8?B?dExlRm1TQkRtc3llaXNFV3lZVlRoT2R3TEkyTjQxMTA1aVlFYXB4VWppVmRK?=
- =?utf-8?B?K05JTEU5dzd6MDRlMTlNcXR5bG5pQXYxUVVpRnlrd1EvcU1qbWltWXNLTnJl?=
- =?utf-8?B?b0pmTitmU0s0VFlDSExpdEZVYkt0TUxYV0ZjWEJiR3V2T3RCUG5HdWJlMFNl?=
- =?utf-8?B?azgybWh1SWFRN0dwR0szZHJVU0o3RksxejNvU3ZudVNRajhnbmxrSDArSklK?=
- =?utf-8?Q?Y5QUHRoVJvX1rBk6cztF0+pdR?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 76ac7a55-a6c8-47aa-aaea-08ddb3869424
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6608.namprd12.prod.outlook.com
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	NzBQC7eidAVC+uFv//ORLsHkCoqsnuoqKputkytCpNEkJIEYtycq6s1XcelQ91ObV6EDZWOwCllLA2Fitbh7g2I4e6+00JKLdXFpaq2m5BEaGTP9OKNy73vZ1USKdsZ48KGhZ36aP5RLAbk/X6fGdc5Yvny/WKiMzcWCxKKvijaAkFTVl71Lde8+8ISArWS7f12fMIbkY0u35qmos2YqKpSzzSKo5Ldj6Hw0w7Dom+29nKWIKr6igsFiy/uEvhrmQ/AUA2+cKTZDYBFnw331HCoeRz56Si1fUdu57Ec/Y87phAdp/sbsx4HWe5GApTSKnyRzajBBeQ+8ig56KGc8ceiVORR4HiQbGjeHSl0Yw7+hiVafNYRMJeWrfwxxNaPMbeVp6TPFxefwc8FKKiD0vkB3+rfEjptK6bKxyBivfhBQCvl4RoZry49N1BnUBEMTsJ55zTQuy1oxy1dmx/nQMP+bRAq3ma6xBPwPpWkRIuIe3mB4dxansgqG7L1WljGbkJAihMGgx+WbdTUZBxOt4TGmwISfjfFjT1liMaq17Wr7igLXR+GcNvDlJlKyEy2O6RDciKkw0Y6U9BT+wycw7FZI+FHVslSDtA/Ip0SxcAx7Nab8j4O5ncwkX5UzvbbD
+X-OriginatorOrg: fujitsu.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jun 2025 01:21:15.0220
+X-MS-Exchange-CrossTenant-AuthSource: TYXPR01MB1886.jpnprd01.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9017339f-2c1b-4807-b29a-08ddb38a07fc
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Jun 2025 01:45:57.7079
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: nzVdtvW+zNbIWYDUcB7gN0jNcqq7r9PxP7bURhy2B7be0PRfKkZJKbKk8mQwTsho+G5SUWHG8g6Y8txFo54aiw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7287
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: a19f121d-81e1-4858-a9d8-736e267fd4c7
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: S4MeG1bqJE0OY5ke/tOtDzODr0VxXDbAmshaAZPsOXqLHRv3wjFEGb6DeSqpuXGQFy4XPfpz3d7Pq2efKdD3bU3Jxd8MkQNqHBEjbCPfeW8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: OSCPR01MB12688
 
+> Entering a realm is done using a SMC call to the RMM. On exit the exit-co=
+des
+> need to be handled slightly differently to the normal KVM path so define =
+our own
+> functions for realm enter/exit and hook them in if the guest is a realm g=
+uest.
+>=20
+> Signed-off-by: Steven Price <steven.price@arm.com>
 
+I confirmed that the kvm-unit-tests execution does not output any error mes=
+sages.
+Reviewd-by: Emi Kisanuki <fj0570is@fujitsu.com>
 
-On 6/23/2025 5:19 PM, Borislav Petkov wrote:
-> On Tue, Jun 10, 2025 at 11:23:50PM +0530, Neeraj Upadhyay wrote:
->> diff --git a/arch/x86/include/asm/apic.h b/arch/x86/include/asm/apic.h
->> index 23d86c9750b9..c84d4e86fe4e 100644
->> --- a/arch/x86/include/asm/apic.h
->> +++ b/arch/x86/include/asm/apic.h
->> @@ -488,11 +488,14 @@ static inline void apic_setup_apic_calls(void) { }
->>  
->>  extern void apic_ack_irq(struct irq_data *data);
->>  
->> +#define APIC_VECTOR_TO_BIT_NUMBER(v) ((unsigned int)(v) % 32)
->> +#define APIC_VECTOR_TO_REG_OFFSET(v) ((unsigned int)(v) / 32 * 0x10)
-> 
-> Dunno - I'd probably shorten those macro names:
-> 
-> APIC_VEC_TO_BITNUM()
-> APIC_VEC_TO_REGOFF()
-> 
-> because this way of shortening those words is very common and is still very
-> readable, even if not fully written out...
-> 
-
-Sounds good to me. Will change this in next version (will also wait for Sean's
-comment on this).
-
-> LGTM regardless.
-> 
-
-Thanks!
-
-- Neeraj
-
-> Thx.
-> 
-
+> ---
+> Changes since v8:
+>  * Introduce kvm_rec_pre_enter() called before entering an atomic
+>    section to handle operations that might require memory allocation
+>    (specifically completing a RIPAS change introduced in a later patch).
+>  * Updates to align with upstream changes to hpfar_el2 which now (ab)uses
+>    HPFAR_EL2_NS as a valid flag.
+>  * Fix exit reason when racing with PSCI shutdown to return
+>    KVM_EXIT_SHUTDOWN rather than KVM_EXIT_UNKNOWN.
+> Changes since v7:
+>  * A return of 0 from kvm_handle_sys_reg() doesn't mean the register has
+>    been read (although that can never happen in the current code). Tidy
+>    up the condition to handle any future refactoring.
+> Changes since v6:
+>  * Use vcpu_err() rather than pr_err/kvm_err when there is an associated
+>    vcpu to the error.
+>  * Return -EFAULT for KVM_EXIT_MEMORY_FAULT as per the documentation
+> for
+>    this exit type.
+>  * Split code handling a RIPAS change triggered by the guest to the
+>    following patch.
+> Changes since v5:
+>  * For a RIPAS_CHANGE request from the guest perform the actual RIPAS
+>    change on next entry rather than immediately on the exit. This allows
+>    the VMM to 'reject' a RIPAS change by refusing to continue
+>    scheduling.
+> Changes since v4:
+>  * Rename handle_rme_exit() to handle_rec_exit()
+>  * Move the loop to copy registers into the REC enter structure from the
+>    to rec_exit_handlers callbacks to kvm_rec_enter(). This fixes a bug
+>    where the handler exits to user space and user space wants to modify
+>    the GPRS.
+>  * Some code rearrangement in rec_exit_ripas_change().
+> Changes since v2:
+>  * realm_set_ipa_state() now provides an output parameter for the
+>    top_iap that was changed. Use this to signal the VMM with the correct
+>    range that has been transitioned.
+>  * Adapt to previous patch changes.
+> ---
+>  arch/arm64/include/asm/kvm_rme.h |   4 +
+>  arch/arm64/kvm/Makefile          |   2 +-
+>  arch/arm64/kvm/arm.c             |  22 +++-
+>  arch/arm64/kvm/rme-exit.c        | 178
+> +++++++++++++++++++++++++++++++
+>  arch/arm64/kvm/rme.c             |  38 +++++++
+>  5 files changed, 239 insertions(+), 5 deletions(-)  create mode 100644
+> arch/arm64/kvm/rme-exit.c
+>=20
+> diff --git a/arch/arm64/include/asm/kvm_rme.h
+> b/arch/arm64/include/asm/kvm_rme.h
+> index 8e21a10db5f2..321970779669 100644
+> --- a/arch/arm64/include/asm/kvm_rme.h
+> +++ b/arch/arm64/include/asm/kvm_rme.h
+> @@ -101,6 +101,10 @@ void kvm_realm_destroy_rtts(struct kvm *kvm, u32
+> ia_bits);  int kvm_create_rec(struct kvm_vcpu *vcpu);  void
+> kvm_destroy_rec(struct kvm_vcpu *vcpu);
+>=20
+> +int kvm_rec_enter(struct kvm_vcpu *vcpu); int kvm_rec_pre_enter(struct
+> +kvm_vcpu *vcpu); int handle_rec_exit(struct kvm_vcpu *vcpu, int
+> +rec_run_status);
+> +
+>  void kvm_realm_unmap_range(struct kvm *kvm,
+>  			   unsigned long ipa,
+>  			   unsigned long size,
+> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile index
+> 18e46c902825..863f401a36b2 100644
+> --- a/arch/arm64/kvm/Makefile
+> +++ b/arch/arm64/kvm/Makefile
+> @@ -24,7 +24,7 @@ kvm-y +=3D arm.o mmu.o mmio.o psci.o hypercalls.o pvtim=
+e.o
+> \
+>  	 vgic/vgic-mmio.o vgic/vgic-mmio-v2.o \
+>  	 vgic/vgic-mmio-v3.o vgic/vgic-kvm-device.o \
+>  	 vgic/vgic-its.o vgic/vgic-debug.o vgic/vgic-v3-nested.o \
+> -	 rme.o
+> +	 rme.o rme-exit.o
+>=20
+>  kvm-$(CONFIG_HW_PERF_EVENTS)  +=3D pmu-emul.o pmu.o
+>  kvm-$(CONFIG_ARM64_PTR_AUTH)  +=3D pauth.o diff --git
+> a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c index
+> 6a5c9be4af2d..ba2f6e0c923c 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -1228,6 +1228,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>  		if (ret > 0)
+>  			ret =3D check_vcpu_requests(vcpu);
+>=20
+> +		if (ret > 0 && vcpu_is_rec(vcpu))
+> +			ret =3D kvm_rec_pre_enter(vcpu);
+> +
+>  		/*
+>  		 * Preparing the interrupts to be injected also
+>  		 * involves poking the GIC, which must be done in a @@ -1273,7
+> +1276,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>  		trace_kvm_entry(*vcpu_pc(vcpu));
+>  		guest_timing_enter_irqoff();
+>=20
+> -		ret =3D kvm_arm_vcpu_enter_exit(vcpu);
+> +		if (vcpu_is_rec(vcpu))
+> +			ret =3D kvm_rec_enter(vcpu);
+> +		else
+> +			ret =3D kvm_arm_vcpu_enter_exit(vcpu);
+>=20
+>  		vcpu->mode =3D OUTSIDE_GUEST_MODE;
+>  		vcpu->stat.exits++;
+> @@ -1331,8 +1337,13 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>=20
+>  		trace_kvm_exit(ret, kvm_vcpu_trap_get_class(vcpu),
+> *vcpu_pc(vcpu));
+>=20
+> -		/* Exit types that need handling before we can be preempted */
+> -		handle_exit_early(vcpu, ret);
+> +		if (!vcpu_is_rec(vcpu)) {
+> +			/*
+> +			 * Exit types that need handling before we can be
+> +			 * preempted
+> +			 */
+> +			handle_exit_early(vcpu, ret);
+> +		}
+>=20
+>  		preempt_enable();
+>=20
+> @@ -1355,7 +1366,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>  			ret =3D ARM_EXCEPTION_IL;
+>  		}
+>=20
+> -		ret =3D handle_exit(vcpu, ret);
+> +		if (vcpu_is_rec(vcpu))
+> +			ret =3D handle_rec_exit(vcpu, ret);
+> +		else
+> +			ret =3D handle_exit(vcpu, ret);
+>  	}
+>=20
+>  	/* Tell userspace about in-kernel device output levels */ diff --git
+> a/arch/arm64/kvm/rme-exit.c b/arch/arm64/kvm/rme-exit.c new file mode
+> 100644 index 000000000000..aa937272afc0
+> --- /dev/null
+> +++ b/arch/arm64/kvm/rme-exit.c
+> @@ -0,0 +1,178 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (C) 2023 ARM Ltd.
+> + */
+> +
+> +#include <linux/kvm_host.h>
+> +#include <kvm/arm_hypercalls.h>
+> +#include <kvm/arm_psci.h>
+> +
+> +#include <asm/rmi_smc.h>
+> +#include <asm/kvm_emulate.h>
+> +#include <asm/kvm_rme.h>
+> +#include <asm/kvm_mmu.h>
+> +
+> +typedef int (*exit_handler_fn)(struct kvm_vcpu *vcpu);
+> +
+> +static int rec_exit_reason_notimpl(struct kvm_vcpu *vcpu) {
+> +	struct realm_rec *rec =3D &vcpu->arch.rec;
+> +
+> +	vcpu_err(vcpu, "Unhandled exit reason from realm (ESR: %#llx)\n",
+> +		 rec->run->exit.esr);
+> +	return -ENXIO;
+> +}
+> +
+> +static int rec_exit_sync_dabt(struct kvm_vcpu *vcpu) {
+> +	return kvm_handle_guest_abort(vcpu);
+> +}
+> +
+> +static int rec_exit_sync_iabt(struct kvm_vcpu *vcpu) {
+> +	struct realm_rec *rec =3D &vcpu->arch.rec;
+> +
+> +	vcpu_err(vcpu, "Unhandled instruction abort (ESR: %#llx).\n",
+> +		 rec->run->exit.esr);
+> +	return -ENXIO;
+> +}
+> +
+> +static int rec_exit_sys_reg(struct kvm_vcpu *vcpu) {
+> +	struct realm_rec *rec =3D &vcpu->arch.rec;
+> +	unsigned long esr =3D kvm_vcpu_get_esr(vcpu);
+> +	int rt =3D kvm_vcpu_sys_get_rt(vcpu);
+> +	bool is_write =3D !(esr & 1);
+> +	int ret;
+> +
+> +	if (is_write)
+> +		vcpu_set_reg(vcpu, rt, rec->run->exit.gprs[0]);
+> +
+> +	ret =3D kvm_handle_sys_reg(vcpu);
+> +	if (!is_write)
+> +		rec->run->enter.gprs[0] =3D vcpu_get_reg(vcpu, rt);
+> +
+> +	return ret;
+> +}
+> +
+> +static exit_handler_fn rec_exit_handlers[] =3D {
+> +	[0 ... ESR_ELx_EC_MAX]	=3D rec_exit_reason_notimpl,
+> +	[ESR_ELx_EC_SYS64]	=3D rec_exit_sys_reg,
+> +	[ESR_ELx_EC_DABT_LOW]	=3D rec_exit_sync_dabt,
+> +	[ESR_ELx_EC_IABT_LOW]	=3D rec_exit_sync_iabt
+> +};
+> +
+> +static int rec_exit_psci(struct kvm_vcpu *vcpu) {
+> +	struct realm_rec *rec =3D &vcpu->arch.rec;
+> +	int i;
+> +
+> +	for (i =3D 0; i < REC_RUN_GPRS; i++)
+> +		vcpu_set_reg(vcpu, i, rec->run->exit.gprs[i]);
+> +
+> +	return kvm_smccc_call_handler(vcpu);
+> +}
+> +
+> +static int rec_exit_ripas_change(struct kvm_vcpu *vcpu) {
+> +	struct kvm *kvm =3D vcpu->kvm;
+> +	struct realm *realm =3D &kvm->arch.realm;
+> +	struct realm_rec *rec =3D &vcpu->arch.rec;
+> +	unsigned long base =3D rec->run->exit.ripas_base;
+> +	unsigned long top =3D rec->run->exit.ripas_top;
+> +	unsigned long ripas =3D rec->run->exit.ripas_value;
+> +
+> +	if (!kvm_realm_is_private_address(realm, base) ||
+> +	    !kvm_realm_is_private_address(realm, top - 1)) {
+> +		vcpu_err(vcpu, "Invalid RIPAS_CHANGE for %#lx - %#lx,
+> ripas: %#lx\n",
+> +			 base, top, ripas);
+> +		/* Set RMI_REJECT bit */
+> +		rec->run->enter.flags =3D
+> REC_ENTER_FLAG_RIPAS_RESPONSE;
+> +		return -EINVAL;
+> +	}
+> +
+> +	/* Exit to VMM, the actual RIPAS change is done on next entry */
+> +	kvm_prepare_memory_fault_exit(vcpu, base, top - base, false, false,
+> +				      ripas =3D=3D RMI_RAM);
+> +
+> +	/*
+> +	 * KVM_EXIT_MEMORY_FAULT requires an return code of -EFAULT, see
+> the
+> +	 * API documentation
+> +	 */
+> +	return -EFAULT;
+> +}
+> +
+> +static void update_arch_timer_irq_lines(struct kvm_vcpu *vcpu) {
+> +	struct realm_rec *rec =3D &vcpu->arch.rec;
+> +
+> +	__vcpu_sys_reg(vcpu, CNTV_CTL_EL0) =3D rec->run->exit.cntv_ctl;
+> +	__vcpu_sys_reg(vcpu, CNTV_CVAL_EL0) =3D rec->run->exit.cntv_cval;
+> +	__vcpu_sys_reg(vcpu, CNTP_CTL_EL0) =3D rec->run->exit.cntp_ctl;
+> +	__vcpu_sys_reg(vcpu, CNTP_CVAL_EL0) =3D rec->run->exit.cntp_cval;
+> +
+> +	kvm_realm_timers_update(vcpu);
+> +}
+> +
+> +/*
+> + * Return > 0 to return to guest, < 0 on error, 0 (and set exit_reason)
+> +on
+> + * proper exit to userspace.
+> + */
+> +int handle_rec_exit(struct kvm_vcpu *vcpu, int rec_run_ret) {
+> +	struct realm_rec *rec =3D &vcpu->arch.rec;
+> +	u8 esr_ec =3D ESR_ELx_EC(rec->run->exit.esr);
+> +	unsigned long status, index;
+> +
+> +	status =3D RMI_RETURN_STATUS(rec_run_ret);
+> +	index =3D RMI_RETURN_INDEX(rec_run_ret);
+> +
+> +	/*
+> +	 * If a PSCI_SYSTEM_OFF request raced with a vcpu executing, we
+> might
+> +	 * see the following status code and index indicating an attempt to run
+> +	 * a REC when the RD state is SYSTEM_OFF.  In this case, we just need
+> to
+> +	 * return to user space which can deal with the system event or will tr=
+y
+> +	 * to run the KVM VCPU again, at which point we will no longer attempt
+> +	 * to enter the Realm because we will have a sleep request pending on
+> +	 * the VCPU as a result of KVM's PSCI handling.
+> +	 */
+> +	if (status =3D=3D RMI_ERROR_REALM && index =3D=3D 1) {
+> +		vcpu->run->exit_reason =3D KVM_EXIT_SHUTDOWN;
+> +		return 0;
+> +	}
+> +
+> +	if (rec_run_ret)
+> +		return -ENXIO;
+> +
+> +	vcpu->arch.fault.esr_el2 =3D rec->run->exit.esr;
+> +	vcpu->arch.fault.far_el2 =3D rec->run->exit.far;
+> +	/* HPFAR_EL2 is only valid for RMI_EXIT_SYNC */
+> +	vcpu->arch.fault.hpfar_el2 =3D 0;
+> +
+> +	update_arch_timer_irq_lines(vcpu);
+> +
+> +	/* Reset the emulation flags for the next run of the REC */
+> +	rec->run->enter.flags =3D 0;
+> +
+> +	switch (rec->run->exit.exit_reason) {
+> +	case RMI_EXIT_SYNC:
+> +		/*
+> +		 * HPFAR_EL2_NS is hijacked to indicate a valid HPFAR value,
+> +		 * see __get_fault_info()
+> +		 */
+> +		vcpu->arch.fault.hpfar_el2 =3D rec->run->exit.hpfar |
+> HPFAR_EL2_NS;
+> +		return rec_exit_handlers[esr_ec](vcpu);
+> +	case RMI_EXIT_IRQ:
+> +	case RMI_EXIT_FIQ:
+> +		return 1;
+> +	case RMI_EXIT_PSCI:
+> +		return rec_exit_psci(vcpu);
+> +	case RMI_EXIT_RIPAS_CHANGE:
+> +		return rec_exit_ripas_change(vcpu);
+> +	}
+> +
+> +	kvm_pr_unimpl("Unsupported exit reason: %u\n",
+> +		      rec->run->exit.exit_reason);
+> +	vcpu->run->exit_reason =3D KVM_EXIT_INTERNAL_ERROR;
+> +	return 0;
+> +}
+> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c index
+> fe75c41d6ac3..b13db573f64b 100644
+> --- a/arch/arm64/kvm/rme.c
+> +++ b/arch/arm64/kvm/rme.c
+> @@ -936,6 +936,44 @@ void kvm_destroy_realm(struct kvm *kvm)
+>  	kvm_free_stage2_pgd(&kvm->arch.mmu);
+>  }
+>=20
+> +/*
+> + * kvm_rec_pre_enter - Complete operations before entering a REC
+> + *
+> + * Some operations require work to be completed before entering a
+> +realm. That
+> + * work may require memory allocation so cannot be done in the
+> +kvm_rec_enter()
+> + * call.
+> + *
+> + * Return: 1 if we should enter the guest
+> + *	   0 if we should exit to userspace
+> + *	   < 0 if we should exit to userspace, where the return value indicat=
+es
+> + *	   an error
+> + */
+> +int kvm_rec_pre_enter(struct kvm_vcpu *vcpu) {
+> +	struct realm_rec *rec =3D &vcpu->arch.rec;
+> +
+> +	if (kvm_realm_state(vcpu->kvm) !=3D REALM_STATE_ACTIVE)
+> +		return -EINVAL;
+> +
+> +	switch (rec->run->exit.exit_reason) {
+> +	case RMI_EXIT_HOST_CALL:
+> +	case RMI_EXIT_PSCI:
+> +		for (int i =3D 0; i < REC_RUN_GPRS; i++)
+> +			rec->run->enter.gprs[i] =3D vcpu_get_reg(vcpu, i);
+> +		break;
+> +	}
+> +
+> +	return 1;
+> +}
+> +
+> +int kvm_rec_enter(struct kvm_vcpu *vcpu) {
+> +	struct realm_rec *rec =3D &vcpu->arch.rec;
+> +
+> +	return rmi_rec_enter(virt_to_phys(rec->rec_page),
+> +			     virt_to_phys(rec->run));
+> +}
+> +
+>  static void free_rec_aux(struct page **aux_pages,
+>  			 unsigned int num_aux)
+>  {
+> --
+> 2.43.0
 
