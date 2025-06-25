@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-50741-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50742-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92EF3AE8BDF
-	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 19:59:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84258AE8BE9
+	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 20:02:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D48067AC8E4
-	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 17:57:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ED4757AEA2A
+	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 18:00:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAFF52D540D;
-	Wed, 25 Jun 2025 17:58:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37B862D5C6D;
+	Wed, 25 Jun 2025 18:01:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mlhI3COp"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kzpRA+T5"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A00002C3769;
-	Wed, 25 Jun 2025 17:58:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1BA01DDA3E;
+	Wed, 25 Jun 2025 18:01:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750874321; cv=none; b=RFJjkSXSgq/Ulf9GqHjAgxJCxcWLdO/TkFIotdsQ/L9tAbqIbrbrLcgYsd5rwLWyR72KpssZS+ZDS+gnJWwo/0ND5LNu4966btYLNOrhKmjyV9AXKtd9IluNRl0uOeeBw/b6QDgIA3DOEKY9G3Ugxb7cK+KWfm3m5gwCl97w83M=
+	t=1750874515; cv=none; b=POj7T3RF0L4VuTrJ8ObwnzflTMJtM7ga3xlW6WTg/dax0A248TjWqyQ0LG+EVJ/vE86OOI72I86EijohDoCV9asTvm+Dj71h8N1REjXCg4mshnhsh1F4N6H1kTIQB3EudH6/OFH+dCXky+Hi/p7aNzVU4HYG4UokkGM5WP7FJRI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750874321; c=relaxed/simple;
-	bh=kQt94XdjAsFzpqHD6EPEwy5RJgq8z2InM6E7BxZmPw4=;
+	s=arc-20240116; t=1750874515; c=relaxed/simple;
+	bh=9zt9kSH4ydaeYpW47pmNj8ouiqsks2pwtnnh3nCsl3Q=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nyvc3VI9itRDzJeXCnMx4f9ZMNnHOfeZEzsHWxRnVqZdYA70VK3Tm7cig1PwR18wr8wrnh7GTuA/fwKJrgevVN2W7kLnV127gb91nuRPObtbpR3kfNCBixPtwKpXaq/SRZ7lVbwl5LEuSHMUWLrOuBv51fgP5KDpNN4usrVRgSw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mlhI3COp; arc=none smtp.client-ip=192.198.163.12
+	 In-Reply-To:Content-Type; b=bv/00Q5IS+9vNWUG22fh6Kl9lthBEi7DTIvu7fgsub4eukDKUBQbp5Se+04SRcQDyvME3P7PutWY1mbYUGw8oXAEbfZvgfLJ+v2hh/eQqeoXW6Q7tn/p/GddewQ9pZ734O8YFnvIhlNXtRIpv2OpJld2vvj7T5lGHbZZsGkklmQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kzpRA+T5; arc=none smtp.client-ip=192.198.163.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750874320; x=1782410320;
+  t=1750874514; x=1782410514;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=kQt94XdjAsFzpqHD6EPEwy5RJgq8z2InM6E7BxZmPw4=;
-  b=mlhI3COpbEbCqCbfS+t5zupiWpruxTFvgzP1XlpbFjxNNtARc3UisFrX
-   G0vID3gDrO//UwBffUuKTFij1vaMLgxiPzuQgH4nv6op1SQb64icjmaKs
-   TKl/Qd3V7ZjlN5c3yezFMBBS7Ef/8mk8glMcfQCWAminIzekrlHFE8TcS
-   jKygq0HR/xo+3ke84D8DjN7q/9Y6p9mdulW8XQZjrMrGd603LZV5zN+pb
-   3k8agTgRV5nH1bB94zQP4rP0oD4CgVqL8zxqYJnQkROXLpel8hnC2WpFR
-   o3s7O/iyxd+n0d+dZb/HTn2Btf/AoLpG/4oHJFiEzTSv++Kc+1gWuLojG
+  bh=9zt9kSH4ydaeYpW47pmNj8ouiqsks2pwtnnh3nCsl3Q=;
+  b=kzpRA+T5lz37LJgVu7WxLAGU02sMllm9VxzgkmZkZO4JShHKHTb1Buig
+   o6vXG0zcK5L1b/PE6OZeVmBPOq0l6GetwmIM05hL7Sno99rpiB6f8Vdlg
+   sroc6PZJ6JIQmPnyjz1QmReVtGSmJvYgI5ats/enXfX9iFPnukuA4oeQH
+   iNS90xKDyq8S9UTkX4oNy77jums+COQ9t+K2Cm54e7qOrDmWEm2xBqrCA
+   L0ja7U5KyJN6+IfZnl0U98XrL6rsg5+QTE7TT5m1QGo96ASxoqSRP3vZA
+   6c/90wOQtyFBGI+fN+2Li1Nn8W2AIg4iDNexXSqY6lRz5R0hVGdcW+kXm
    Q==;
-X-CSE-ConnectionGUID: pcFJBElJTkqS44Tgs9XG0w==
-X-CSE-MsgGUID: 3tjg/fr2TSS8szbiI8T6Bw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11475"; a="56958554"
+X-CSE-ConnectionGUID: HHB05st/RumNzyE4c9Mltg==
+X-CSE-MsgGUID: 6f8pSK76Ttev8ey0WvPJKg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11475"; a="53296393"
 X-IronPort-AV: E=Sophos;i="6.16,265,1744095600"; 
-   d="scan'208";a="56958554"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2025 10:58:39 -0700
-X-CSE-ConnectionGUID: RKCJYQmmQBa6HBh2KfiTJw==
-X-CSE-MsgGUID: iF/DXXFLT0CqL1zdRKU0lQ==
+   d="scan'208";a="53296393"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2025 11:01:53 -0700
+X-CSE-ConnectionGUID: CHMemTsbRn67OS14w2k8PQ==
+X-CSE-MsgGUID: GEVg6mkGQyKBBOnAMhZIqw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,265,1744095600"; 
-   d="scan'208";a="157785700"
+   d="scan'208";a="189472348"
 Received: from dwoodwor-mobl2.amr.corp.intel.com (HELO [10.125.108.244]) ([10.125.108.244])
-  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2025 10:58:38 -0700
-Message-ID: <5cfb2e09-7ecb-4144-9122-c11152b18b5e@intel.com>
-Date: Wed, 25 Jun 2025 10:58:37 -0700
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2025 11:01:53 -0700
+Message-ID: <a1c95555-aa68-4c54-b411-7ae259636921@intel.com>
+Date: Wed, 25 Jun 2025 11:01:52 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,15 +67,15 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv2 01/12] x86/tdx: Consolidate TDX error handling
-To: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
- pbonzini@redhat.com, seanjc@google.com, dave.hansen@linux.intel.com
-Cc: rick.p.edgecombe@intel.com, isaku.yamahata@intel.com,
- kai.huang@intel.com, yan.y.zhao@intel.com, chao.gao@intel.com,
- tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, kvm@vger.kernel.org,
- x86@kernel.org, linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org
-References: <20250609191340.2051741-1-kirill.shutemov@linux.intel.com>
- <20250609191340.2051741-2-kirill.shutemov@linux.intel.com>
+Subject: Re: [PATCHv2.1 04/12] x86/virt/tdx: Add tdx_alloc/free_page() helpers
+To: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, chao.gao@intel.com
+Cc: bp@alien8.de, dave.hansen@linux.intel.com, isaku.yamahata@intel.com,
+ kai.huang@intel.com, kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+ linux-kernel@vger.kernel.org, mingo@redhat.com, pbonzini@redhat.com,
+ rick.p.edgecombe@intel.com, seanjc@google.com, tglx@linutronix.de,
+ x86@kernel.org, yan.y.zhao@intel.com
+References: <aEeaJH1KqZ38tgKi@intel.com>
+ <20250610145116.2502206-1-kirill.shutemov@linux.intel.com>
 From: Dave Hansen <dave.hansen@intel.com>
 Content-Language: en-US
 Autocrypt: addr=dave.hansen@intel.com; keydata=
@@ -121,57 +121,21 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
  MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
  hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
  vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
-In-Reply-To: <20250609191340.2051741-2-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20250610145116.2502206-1-kirill.shutemov@linux.intel.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 6/9/25 12:13, Kirill A. Shutemov wrote:
-> Move all (host, kvm, guest) code related to TDX error handling into
-> <asm/tdx_errno.h>.
-> 
-> Add inline functions to check errors.
+Kirill (and anybody else reading this),
 
-I really prefer that code moves and introduction of new things be done
-_separately_.
+Please stop doing these vXXX.1 patches. b4 can't deal with them. I don't
+know if it's _supposed_ to be able to, but I'm not sure I even want
+Konstantin spending time on making b4 handle this kind of thing. I
+honestly don't want to make my scripts deal with them either.
 
-It's a lot easier to check for errors in the move when it's the on
+It's one thing to post a whole new series 2 hours after the old one.
+It's a very different thing to resend a series in the 2 *weeks* since
+you updated it.
 
-...
->  	ret = __tdcall(TDG_MR_REPORT, &args);
->  	if (ret) {
-> -		if (TDCALL_RETURN_CODE(ret) == TDCALL_INVALID_OPERAND)
-> +		if (tdx_operand_invalid(ret))
->  			return -EINVAL;
->  		return -EIO;
->  	}
-
-That said, the resulting code here is a lot nicer that what you started
-with.
-
-...
-> -/*
-> - * TDX module SEAMCALL leaf function error codes
-> - */
-> -#define TDX_SUCCESS		0ULL
-> -#define TDX_RND_NO_ENTROPY	0x8000020300000000ULL
-
-Kai, you were responsible for this nugget. What do you think of this patch?
-
-
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -202,12 +202,6 @@ static DEFINE_MUTEX(tdx_lock);
->  
->  static atomic_t nr_configured_hkid;
->  
-> -static bool tdx_operand_busy(u64 err)
-> -{
-> -	return (err & TDX_SEAMCALL_STATUS_MASK) == TDX_OPERAND_BUSY;
-> -}
-> -
-> -
-
-Isaku, this one was yours (along with the whitespace damage). What do
-you think of this patch?
-
+I'd much rather you resend the series than just leave these tangles for
+the maintainers to unwind.
 
