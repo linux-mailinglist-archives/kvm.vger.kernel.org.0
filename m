@@ -1,280 +1,296 @@
-Return-Path: <kvm+bounces-50738-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50739-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7862AE8B4B
-	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 19:12:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92A91AE8B67
+	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 19:19:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 082C9161D35
-	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 17:12:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41A3E3BA72A
+	for <lists+kvm@lfdr.de>; Wed, 25 Jun 2025 17:18:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E5882C1587;
-	Wed, 25 Jun 2025 17:12:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCE1029ACED;
+	Wed, 25 Jun 2025 17:19:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DbRXq8ol"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="JPAq5RtF"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35E7328643E
-	for <kvm@vger.kernel.org>; Wed, 25 Jun 2025 17:12:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA0FB3074AC;
+	Wed, 25 Jun 2025 17:19:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750871543; cv=none; b=fZUNHMuP3jYUfItAW9SPiCSK/vNPp9+Ack8jN92V9JWinDf6hfClJY1i1WDOV0Hi4RXVasFHh0u7BGb9tkWGLXy3rSWeL6p9RSlWnDCIYE7zfknMiqu8KnFHepR+n5QauRMLhOxpRyoDLaCCPOHeyyAkcDY1QJ7Xt4sHGgQqB44=
+	t=1750871946; cv=none; b=kYPyuceldvmvTSPS162sxCDiQOHeIQ1Cdcg75U8D1jlAyMqIqVbF46iZLORnU7ddVwpg+7xDeya9Y52oBlwnIEZsYvFiQ04e/QaFVX7tTVmQS0yS7x4ymJGbxVm9kvHEaIBrZRZ7tQdiBakmSz1LrUQ2yq7xCinPkXeWlyNYEkI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750871543; c=relaxed/simple;
-	bh=pqkIDhr4yYMMYnY/+fSGhDZ1uE7lj3oqlLUoR8xcxtw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k2Yf2Y0Gey6Zi468A3T1RuQrseh8UnzAw/+IDOk8I4zkzFLEBbyH2SXljczBvT3f+fVF83BZkRoXK6Eu/NfzrihlhIVkl0G3zUUsqAKEALCS8Q8fKifuXisudoJqz6lJJbhwoskKalnhy+0tNFwkP9ndiJpnitVPUkAPCpBzVBc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DbRXq8ol; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750871540;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SpMWnzwEQrz5g7Z8QpxeuZOo0PQWHqBUbD3/9JCskzM=;
-	b=DbRXq8olfJCtGagUeXb2A1q8aNR+v9r1gYYT7buHmA8s3E5f5F4Rh43nS/Ua+FQnRrU0lj
-	TxWsoB7AKdvO6mZxixqZi6Y25dNquaXaBOJrDpfMcXbYJaV5NGN9i3zXnEZuxydgq9c5ew
-	XNx0SPjQ7uGyfYISXmcoaE7yPYCuHqE=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-157-p8AjlfznNVKiWCfEF3pNvQ-1; Wed, 25 Jun 2025 13:12:17 -0400
-X-MC-Unique: p8AjlfznNVKiWCfEF3pNvQ-1
-X-Mimecast-MFC-AGG-ID: p8AjlfznNVKiWCfEF3pNvQ_1750871537
-Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-7c5e2872e57so12898285a.0
-        for <kvm@vger.kernel.org>; Wed, 25 Jun 2025 10:12:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750871537; x=1751476337;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SpMWnzwEQrz5g7Z8QpxeuZOo0PQWHqBUbD3/9JCskzM=;
-        b=BFoHO07cbCVpWy8DAHiuuFlL4YTeCTl5dxBbMe+7p9ku78AD2w5R3EH1n5G+SZhjru
-         YHR0bYa2SYpDeKo9hRXs4oLlrV6oyFl9tvFdjn72e87OgvrYqGqz5sJmOxHDwkbgPbKN
-         0zcRbhpkvtiqA0ws4OmCn5K1AMbIhgezGzp6dQ26LmErIrY6gnIqBwjzsg1rZQpR0yBo
-         D/QKkFjathcRFGuDAaFPKK2SZ7drUFB0Ef+YGgc/YnBi7MJNHp8dWC+p0XIgxyHD7Z7k
-         1KMj8QeGXTXirx3rKwiolbnW7FaQHHyXHSdQM2Z5BBZtP3c3PyprhtD5F6OCPmFPak2V
-         QwYw==
-X-Forwarded-Encrypted: i=1; AJvYcCXgDu4GPIxMQSS/Mb+6Z6WXZQv1GyiUzbnQc9MGcdTcc6pCtVGQSvD1A88EnQwDZJTVJ1o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxI8ITEqVbbEfapnDOEH/eGw5tCdpQCk20avJV/E8hbwpvN/KW2
-	F/5cuWa0BOL4w0WZv/yeFo3ChDPJebp1WmpbjZaKqfWiH0mAQDUHZg4nADR5ytjGj0nMPaKJ8+o
-	nShrzw/qwzdKJiWjmVKrvHArY8f0qMe9T1ZRbPfBjAP3BoyxiFZuqzA==
-X-Gm-Gg: ASbGncsxe9bACYdNMb++paZDLwy0GgvPxyMVFMkZoM7ZJTLR1FoWzsTdS7hiE/YfDvc
-	et/flXIvfteINp9L5W8o4lFoNA5khtwVF28BWqmDylNaBBgEvLEhZooLaFQpup7NWusEkNKgaHf
-	q67UNHukmnQiklNllg+xf6jnRDPSek7nR+rf/AKzIJwSQRwWTOwICmywyiQVGOGIP98C5uJXCPA
-	cotPPDQqphaOt3a5yGTEXzIcdKWMp5ZaFiF68B0i6U3idv2aPFznTVfd0U/Oc7+x7tf6ZIYL+Ei
-	rYIs3m6ItQKkPQ==
-X-Received: by 2002:a05:620a:4893:b0:7cc:aedc:d0c1 with SMTP id af79cd13be357-7d429679b10mr490568685a.5.1750871536970;
-        Wed, 25 Jun 2025 10:12:16 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHyrt+UA8j4eJN5Kl/iuZzYbNEyvfMEcAUbDYG7hfuDyGNjFN3bqqLY7ZZU1ZAyKHWHlsX1Fg==
-X-Received: by 2002:a05:620a:4893:b0:7cc:aedc:d0c1 with SMTP id af79cd13be357-7d429679b10mr490563685a.5.1750871536438;
-        Wed, 25 Jun 2025 10:12:16 -0700 (PDT)
-Received: from x1.local ([85.131.185.92])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7d41d5ffcfcsm259507785a.68.2025.06.25.10.12.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Jun 2025 10:12:15 -0700 (PDT)
-Date: Wed, 25 Jun 2025 13:12:11 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: "Liam R. Howlett" <Liam.Howlett@oracle.com>,
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	kvm@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Zi Yan <ziy@nvidia.com>, Alex Mastro <amastro@fb.com>,
-	David Hildenbrand <david@redhat.com>,
-	Nico Pache <npache@redhat.com>
-Subject: Re: [PATCH 5/5] vfio-pci: Best-effort huge pfnmaps with !MAP_FIXED
- mappings
-Message-ID: <aFwt6wjuDzbWM4_C@x1.local>
-References: <aFLvodROFN9QwvPp@x1.local>
- <20250618174641.GB1629589@nvidia.com>
- <aFMQZru7l2aKVsZm@x1.local>
- <20250619135852.GC1643312@nvidia.com>
- <aFQkxg08fs7jwXnJ@x1.local>
- <20250619184041.GA10191@nvidia.com>
- <aFsMhnejq4fq6L8N@x1.local>
- <20250624234032.GC167785@nvidia.com>
- <aFtHbXFO1ZpAsnV8@x1.local>
- <20250625130711.GH167785@nvidia.com>
+	s=arc-20240116; t=1750871946; c=relaxed/simple;
+	bh=JDycdRDjOullquM1c2r5tzpdD0MiNHYGnWvVTdBdKAc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KHA8vH2LXkLH3MskjtGtfWt/zvD+r0sLQqV4HgQEgCaqXl9/o1O+gMNykSlcLG2QtQytYLhMvn8/EE01JBlu7gSkku5dNupSkJeyXuqV0GJqDmBNTC7qJlqyYiKF4anIwqwmvuAyyMR7q3EPrauooqux1bH+G7CB0lSQcN0mPes=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=JPAq5RtF; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [192.168.7.202] ([71.202.166.45])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 55PHIPTD1863931
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Wed, 25 Jun 2025 10:18:25 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 55PHIPTD1863931
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025062101; t=1750871906;
+	bh=loidXCrBBthki92bM6ro87FQwyhzKevoE90+bNNgOBQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=JPAq5RtFxBeXG8Wn9bwzFn9GsxId4+Ccfdh/nbT5OabOtOdb3B/T3rv9orZKwOlh1
+	 jipZoiAczn+aoR8lf5jfTWOIYcGwuWwtQVGOpBvjn4takqq68YnCDBvYFdAZ1kDWcK
+	 zXyj3JPtAIe1g0KcJO1eSwW78lmipWpKziaSP4u3ZxM+N+I7i+paVRKcfYKh1bWEvM
+	 oWpvMX9imQ9OhXE864ziwv9Y3uTNRvBQv/yDWI4iXV4rowrBZa3W/dP1uW6EOPQlGp
+	 wMT1T+YYn/PjjVVBzj/Hw+N54deMtVRAjGbls/Q+2+x9++NqVLfvNeRXJJuwON03U8
+	 +3r2vYsMB/qIw==
+Message-ID: <858a3c30-08ab-4b9b-b74c-a3917a247841@zytor.com>
+Date: Wed, 25 Jun 2025 10:18:24 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250625130711.GH167785@nvidia.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 08/19] KVM: VMX: Add support for FRED context
+ save/restore
+To: Sean Christopherson <seanjc@google.com>
+Cc: pbonzini@redhat.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, corbet@lwn.net, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        x86@kernel.org, hpa@zytor.com, andrew.cooper3@citrix.com,
+        luto@kernel.org, peterz@infradead.org, chao.gao@intel.com,
+        xin3.li@intel.com
+References: <20250328171205.2029296-1-xin@zytor.com>
+ <20250328171205.2029296-9-xin@zytor.com> <aFrR5Nk1Ge3_ApWy@google.com>
+Content-Language: en-US
+From: Xin Li <xin@zytor.com>
+Autocrypt: addr=xin@zytor.com; keydata=
+ xsDNBGUPz1cBDACS/9yOJGojBFPxFt0OfTWuMl0uSgpwk37uRrFPTTLw4BaxhlFL0bjs6q+0
+ 2OfG34R+a0ZCuj5c9vggUMoOLdDyA7yPVAJU0OX6lqpg6z/kyQg3t4jvajG6aCgwSDx5Kzg5
+ Rj3AXl8k2wb0jdqRB4RvaOPFiHNGgXCs5Pkux/qr0laeFIpzMKMootGa4kfURgPhRzUaM1vy
+ bsMsL8vpJtGUmitrSqe5dVNBH00whLtPFM7IbzKURPUOkRRiusFAsw0a1ztCgoFczq6VfAVu
+ raTye0L/VXwZd+aGi401V2tLsAHxxckRi9p3mc0jExPc60joK+aZPy6amwSCy5kAJ/AboYtY
+ VmKIGKx1yx8POy6m+1lZ8C0q9b8eJ8kWPAR78PgT37FQWKYS1uAroG2wLdK7FiIEpPhCD+zH
+ wlslo2ETbdKjrLIPNehQCOWrT32k8vFNEMLP5G/mmjfNj5sEf3IOKgMTMVl9AFjsINLHcxEQ
+ 6T8nGbX/n3msP6A36FDfdSEAEQEAAc0WWGluIExpIDx4aW5Aenl0b3IuY29tPsLBDQQTAQgA
+ NxYhBIUq/WFSDTiOvUIqv2u9DlcdrjdRBQJlD89XBQkFo5qAAhsDBAsJCAcFFQgJCgsFFgID
+ AQAACgkQa70OVx2uN1HUpgv/cM2fsFCQodLArMTX5nt9yqAWgA5t1srri6EgS8W3F+3Kitge
+ tYTBKu6j5BXuXaX3vyfCm+zajDJN77JHuYnpcKKr13VcZi1Swv6Jx1u0II8DOmoDYLb1Q2ZW
+ v83W55fOWJ2g72x/UjVJBQ0sVjAngazU3ckc0TeNQlkcpSVGa/qBIHLfZraWtdrNAQT4A1fa
+ sWGuJrChBFhtKbYXbUCu9AoYmmbQnsx2EWoJy3h7OjtfFapJbPZql+no5AJ3Mk9eE5oWyLH+
+ QWqtOeJM7kKvn/dBudokFSNhDUw06e7EoVPSJyUIMbYtUO7g2+Atu44G/EPP0yV0J4lRO6EA
+ wYRXff7+I1jIWEHpj5EFVYO6SmBg7zF2illHEW31JAPtdDLDHYcZDfS41caEKOQIPsdzQkaQ
+ oW2hchcjcMPAfyhhRzUpVHLPxLCetP8vrVhTvnaZUo0xaVYb3+wjP+D5j/3+hwblu2agPsaE
+ vgVbZ8Fx3TUxUPCAdr/p73DGg57oHjgezsDNBGUPz1gBDAD4Mg7hMFRQqlzotcNSxatlAQNL
+ MadLfUTFz8wUUa21LPLrHBkUwm8RujehJrzcVbPYwPXIO0uyL/F///CogMNx7Iwo6by43KOy
+ g89wVFhyy237EY76j1lVfLzcMYmjBoTH95fJC/lVb5Whxil6KjSN/R/y3jfG1dPXfwAuZ/4N
+ cMoOslWkfZKJeEut5aZTRepKKF54T5r49H9F7OFLyxrC/uI9UDttWqMxcWyCkHh0v1Di8176
+ jjYRNTrGEfYfGxSp+3jYL3PoNceIMkqM9haXjjGl0W1B4BidK1LVYBNov0rTEzyr0a1riUrp
+ Qk+6z/LHxCM9lFFXnqH7KWeToTOPQebD2B/Ah5CZlft41i8L6LOF/LCuDBuYlu/fI2nuCc8d
+ m4wwtkou1Y/kIwbEsE/6RQwRXUZhzO6llfoN96Fczr/RwvPIK5SVMixqWq4QGFAyK0m/1ap4
+ bhIRrdCLVQcgU4glo17vqfEaRcTW5SgX+pGs4KIPPBE5J/ABD6pBnUUAEQEAAcLA/AQYAQgA
+ JhYhBIUq/WFSDTiOvUIqv2u9DlcdrjdRBQJlD89ZBQkFo5qAAhsMAAoJEGu9DlcdrjdR4C0L
+ /RcjolEjoZW8VsyxWtXazQPnaRvzZ4vhmGOsCPr2BPtMlSwDzTlri8BBG1/3t/DNK4JLuwEj
+ OAIE3fkkm+UG4Kjud6aNeraDI52DRVCSx6xff3bjmJsJJMb12mWglN6LjdF6K+PE+OTJUh2F
+ dOhslN5C2kgl0dvUuevwMgQF3IljLmi/6APKYJHjkJpu1E6luZec/lRbetHuNFtbh3xgFIJx
+ 2RpgVDP4xB3f8r0I+y6ua+p7fgOjDLyoFjubRGed0Be45JJQEn7A3CSb6Xu7NYobnxfkwAGZ
+ Q81a2XtvNS7Aj6NWVoOQB5KbM4yosO5+Me1V1SkX2jlnn26JPEvbV3KRFcwV5RnDxm4OQTSk
+ PYbAkjBbm+tuJ/Sm+5Yp5T/BnKz21FoCS8uvTiziHj2H7Cuekn6F8EYhegONm+RVg3vikOpn
+ gao85i4HwQTK9/D1wgJIQkdwWXVMZ6q/OALaBp82vQ2U9sjTyFXgDjglgh00VRAHP7u1Rcu4
+ l75w1xInsg==
+In-Reply-To: <aFrR5Nk1Ge3_ApWy@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jun 25, 2025 at 10:07:11AM -0300, Jason Gunthorpe wrote:
-> On Tue, Jun 24, 2025 at 08:48:45PM -0400, Peter Xu wrote:
-> > > My feeling, and the reason I used the phrase "pgoff aligned address",
-> > > is that the owner of the file should already ensure that for the large
-> > > PTEs/folios:
-> > >  pgoff % 2**order == 0
-> > >  physical % 2**order == 0
-> > 
-> > IMHO there shouldn't really be any hard requirement in mm that pgoff and
-> > physical address space need to be aligned.. but I confess I don't have an
-> > example driver that didn't do that in the linux tree.
+On 6/24/2025 9:27 AM, Sean Christopherson wrote:
+>> +
+>> +static u64 vmx_read_guest_fred_rsp0(struct vcpu_vmx *vmx)
+>> +{
+>> +	preempt_disable();
+>> +	if (vmx->guest_state_loaded)
+>> +		vmx->msr_guest_fred_rsp0 = read_msr(MSR_IA32_FRED_RSP0);
+>> +	preempt_enable();
+>> +	return vmx->msr_guest_fred_rsp0;
+>> +}
+>> +
+>> +static void vmx_write_guest_fred_rsp0(struct vcpu_vmx *vmx, u64 data)
+>> +{
+>> +	preempt_disable();
+>> +	if (vmx->guest_state_loaded)
+>> +		wrmsrns(MSR_IA32_FRED_RSP0, data);
+>> +	preempt_enable();
+>> +	vmx->msr_guest_fred_rsp0 = data;
+>> +}
+>>   #endif
 > 
-> Well, maybe, but right now there does seem to be for
-> THP/hugetlbfs/etc. It is a nice simple solution that exposes the
-> alignment requirements to userspace if it wants to use MAP_FIXED.
-> 
-> > > To me this just keeps thing simpler. I guess if someone comes up with
-> > > a case where they really can't get a pgoff alignment and really need a
-> > > high order mapping then maybe we can add a new return field of some
-> > > kind (pgoff adjustment?) but that is so weird I'd leave it to the
-> > > future person to come and justfiy it.
-> > 
-> > When looking more, I also found some special cased get_unmapped_area() that
-> > may not be trivially converted into the new API even for CONFIG_MMU, namely:
-> > 
-> > - io_uring_get_unmapped_area
-> > - arena_get_unmapped_area (from bpf_map->ops->map_get_unmapped_area)
-> > 
-> > I'll need to have some closer look tomorrow.  If any of them cannot be 100%
-> > safely converted to the new API, I'd also think we should not introduce the
-> > new API, but reuse get_unmapped_area() until we know a way out.
-> 
-> Oh yuk. It is trying to avoid the dcache flush on some kernel paths
-> for virtually tagged cache systems.
-> 
-> Arguably this fixup should not be in io_uring, but conveying the right
-> information to the core code, and requesting a special flush
-> avoidance mapping is not so easy.
+> Maybe add helpers to deal with the preemption stuff?  Oh, never mind, FRED
 
-IIUC it still makes sense to be with io_uring, because only io_uring
-subsystem knows what to align against.  I don't yet understand how generic
-mm can do this, after all generic mm doesn't know the address that io_uring
-is using (from io_region_get_ptr()).
+This is a good idea.
+
+Do you want to upstream the following patch?
+
+So I can rebase this patch on top of it in the next iteration.
+
+> uses WRMSRNS.  Hmm, actually, can't these all be non-serializing?  KVM is
+> progating *guest* values to hardware, so a VM-Enter is guaranteed before the
+> CPU value can be consumed.
+
+I see your point.  It seems that only a new MSR write instruction could
+achieve this: consistently performing a non-serializing write to a MSR
+with the assumption that the target is a guest MSR.  So software needs
+to explicitly specify the type, host or guest, of the target MSR to the CPU.
+
+(WRMSRNS writes to an MSR in either a serializing or non-serializing
+manner, only based on its index.)
 
 > 
-> But again I suspect the pgoff is the right solution.
+> #ifdef CONFIG_X86_64
+> static u64 vmx_read_guest_host_msr(struct vcpu_vmx *vmx, u32 msr, u64 *cache)
+> {
+> 	preempt_disable();
+> 	if (vmx->guest_state_loaded)
+> 		*cache = read_msr(msr);
+> 	preempt_enable();
+> 	return *cache;
+> }
 > 
-> IIRC this is handled by forcing a few low virtual address bits to
-> always match across all user mappings (the colour) via the pgoff. This
-> way the userspace always uses the same cache tag and doesn't become
-> cache incoherent. ie:
+> static u64 vmx_write_guest_host_msr(struct vcpu_vmx *vmx, u32 msr, u64 data,
+> 				    u64 *cache)
+> {
+> 	preempt_disable();
+> 	if (vmx->guest_state_loaded)
+> 		wrmsrns(MSR_KERNEL_GS_BASE, data);
+> 	preempt_enable();
+> 	*cache = data;
+> }
 > 
->    user_addr % PAGE_SIZE*N == pgoff % PAGE_SIZE*N
+> static u64 vmx_read_guest_kernel_gs_base(struct vcpu_vmx *vmx)
+> {
+> 	return vmx_read_guest_host_msr(vmx, MSR_KERNEL_GS_BASE,
+> 				       &vmx->msr_guest_kernel_gs_base);
+> }
 > 
-> The issue is now the kernel is using the direct map and we can't force
-
-After I read the two use cases, I mostly agree.  Just one trivial thing to
-mention, it may not be direct map but vmap() (see io_region_init_ptr()).
-
-> a random jumble of pages to have the right colours to match
-> userspace. So the kernel has all those dcache flushes sprinkled about
-> before it touches user mapped memory through the direct map as the
-> kernel will use a different colour and cache tag.
+> static void vmx_write_guest_kernel_gs_base(struct vcpu_vmx *vmx, u64 data)
+> {
+> 	vmx_write_guest_host_msr(vmx, MSR_KERNEL_GS_BASE, data,
+> 				 &vmx->msr_guest_kernel_gs_base);
+> }
 > 
-> So.. if iouring selects a pgoff that automatically gives the right
-> colour for the userspace mapping to also match the kernel mapping's
-> colour then things should just work.
+> static u64 vmx_read_guest_fred_rsp0(struct vcpu_vmx *vmx)
+> {
+> 	return vmx_read_guest_host_msr(vmx, MSR_IA32_FRED_RSP0,
+> 				       &vmx->msr_guest_fred_rsp0);
+> }
 > 
-> Frankly I'm shocked that someone invested time in trying to make this
-> work - the commit log says it was for parisc and only 2 years ago :(
+> static void vmx_write_guest_fred_rsp0(struct vcpu_vmx *vmx, u64 data)
+> {
+> 	return vmx_write_guest_host_msr(vmx, MSR_IA32_FRED_RSP0, data,
+> 				        &vmx->msr_guest_fred_rsp0);
+> }
+> #endif
 > 
-> d808459b2e31 ("io_uring: Adjust mapping wrt architecture aliasing requirements")
+>> +#ifdef CONFIG_X86_64
+>> +static u32 fred_msr_vmcs_fields[] = {
 > 
-> I thought such physically tagged cache systems were long ago dead and
-> buried..
+> This should be const.
 
-Yeah.. internet says parisc stopped shipping since 2005.  Obviously
-there're still people running io_uring on parisc systems, more or less.
-This change seems to be required to make io_uring work on parisc or any
-vipt.
+Will add.
 
 > 
-> Shouldn't this entirely reject MAP_FIXED too?
+>> +	GUEST_IA32_FRED_RSP1,
+>> +	GUEST_IA32_FRED_RSP2,
+>> +	GUEST_IA32_FRED_RSP3,
+>> +	GUEST_IA32_FRED_STKLVLS,
+>> +	GUEST_IA32_FRED_SSP1,
+>> +	GUEST_IA32_FRED_SSP2,
+>> +	GUEST_IA32_FRED_SSP3,
+>> +	GUEST_IA32_FRED_CONFIG,
+>> +};
+> 
+> I think it also makes sense to add a static_assert() here, more so to help
+> readers follow along than anything else.
+> 
+> static_assert(MSR_IA32_FRED_CONFIG - MSR_IA32_FRED_RSP1 ==
+> 	      ARRAY_SIZE(fred_msr_vmcs_fields) - 1);
 
-It already does, see (io_uring_get_unmapped_area(), of parisc):
+Good idea!
 
-	/*
-	 * Do not allow to map to user-provided address to avoid breaking the
-	 * aliasing rules. Userspace is not able to guess the offset address of
-	 * kernel kmalloc()ed memory area.
-	 */
-	if (addr)
-		return -EINVAL;
+I tried to make fred_msr_to_vmcs() fail at build time, but couldn’t get
+it to work.
 
-I do not know whoever would use MAP_FIXED but with addr=0.  So failing
-addr!=0 should literally stop almost all MAP_FIXED already.
+> 
+>> +
+>> +static u32 fred_msr_to_vmcs(u32 msr)
+>> +{
+>> +	return fred_msr_vmcs_fields[msr - MSR_IA32_FRED_RSP1];
+>> +}
+>> +#endif
+>> +
+>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>> @@ -1849,6 +1852,23 @@ static int __kvm_set_msr(struct kvm_vcpu *vcpu, u32 index, u64 data,
+>>   
+>>   		data = (u32)data;
+>>   		break;
+>> +	case MSR_IA32_FRED_RSP0 ... MSR_IA32_FRED_CONFIG:
+>> +		if (!guest_cpu_cap_has(vcpu, X86_FEATURE_FRED))
+>> +			return 1;
+> 
+> Yeesh, this is a bit of a no-win situation.  Having to re-check the MSR index is
+> no fun, but the amount of overlap between MSRs is significant, i.e. I see why you
+> bundled everything together.  Ugh, and MSR_IA32_FRED_STKLVLS is buried smack dab
+> in the middle of everything.
+> 
+>> +
+>> +		/* Bit 11, bits 5:4, and bit 2 of the IA32_FRED_CONFIG must be zero */
+> 
+> Eh, the comment isn't helping much.  If we want to add more documentation, add
+> #defines.  But I think we can documented the reserved behavior while also tidying
+> up the code a bit.
+> 
+> After much fiddling, how about this?
+> 
+> 	case MSR_IA32_FRED_STKLVLS:
+> 		if (!guest_cpu_cap_has(vcpu, X86_FEATURE_FRED))
+> 			return 1;
+> 		break;			
+> 
+> 	case MSR_IA32_FRED_RSP0 ... MSR_IA32_FRED_RSP3:
+> 	case MSR_IA32_FRED_SSP1 ... MSR_IA32_FRED_CONFIG: {
+> 		u64 reserved_bits;
+> 
+> 		if (!guest_cpu_cap_has(vcpu, X86_FEATURE_FRED))
+> 			return 1;
+> 
+> 		if (is_noncanonical_msr_address(data, vcpu))
+> 			return 1;
+> 
+> 		switch (index) {
+> 		case MSR_IA32_FRED_CONFIG:
+> 			reserved_bits = BIT_ULL(11) | GENMASK_ULL(5, 4) | BIT_ULL(2);
+> 			break;
+> 		case MSR_IA32_FRED_RSP0 ... MSR_IA32_FRED_RSP3:
+> 			reserved_bits = GENMASK_ULL(5, 0);
+> 			break;
+> 		case MSR_IA32_FRED_SSP1 ... MSR_IA32_FRED_SSP3:
+> 			reserved_bits = GENMASK_ULL(2, 0);
+> 			break;
+> 		default:
+> 			WARN_ON_ONCE(1);
+> 			return 1;
+> 		}
+> 		if (data & reserved_bits)
+> 			return 1;
+> 		break;
+> 	}
+> 
 
-Side topic, but... logically speaking this should really be fine when
-!SHM_COLOUR.  This commit should break MAP_FIXED for everyone on io_uring,
-but I guess nobody really use MAP_FIXED for io_uring fds..
+Easier to read, I will use it :)
 
-It's also utterly confusing to set addr=ptr for parisc, fundamentally addr
-here must be a kernel va not user va, so it'll (AFAIU) 100% fail later with
-STACK_SIZE checks..  IMHO we should really change this to:
-
-diff --git a/io_uring/memmap.c b/io_uring/memmap.c
-index 725dc0bec24c..1225a9393dc5 100644
---- a/io_uring/memmap.c
-+++ b/io_uring/memmap.c
-@@ -380,12 +380,10 @@ unsigned long io_uring_get_unmapped_area(struct file *filp, unsigned long addr,
-         */
-        filp = NULL;
-        flags |= MAP_SHARED;
--       pgoff = 0;      /* has been translated to ptr above */
- #ifdef SHM_COLOUR
--       addr = (uintptr_t) ptr;
--       pgoff = addr >> PAGE_SHIFT;
-+       pgoff = (uintptr_t)ptr >> PAGE_SHIFT;
- #else
--       addr = 0UL;
-+       pgoff = 0;      /* has been translated to ptr above */
- #endif
-        return mm_get_unmapped_area(current->mm, filp, addr, len, pgoff, flags);
- }
-
-And avoid the confusing "addr=ptr" setup.  This might be too off-topic,
-though.
-
-Then I also looked at the other bpf arena use case, which doubled the len
-when requesting VA and does proper round ups for 4G:
-
-arena_get_unmapped_area():
-	ret = mm_get_unmapped_area(current->mm, filp, addr, len * 2, 0, flags);
-        ...
-	return round_up(ret, SZ_4G);
-
-AFAIU, this is buggy.. at least we should check "round_up(ret, SZ_4G)"
-still falls into the (ret, ret+2*len) region... or AFAIU we can return some
-address that might be used by other VMAs already..
-
-But in general that smells like a similar alignment issue, IIUC.  So might
-be applicable for the new API.
-
-Going back to the topic of this series - I think the new API would work for
-io_uring and parisc too if I can return phys_pgoff, here what parisc would
-need is:
-
-#ifdef SHM_COLOUR
-        *phys_pgoff = io_region_get_ptr(..) >> PAGE_SHIFT;
-#else
-        *phys_pgoff = pgoff;
-#endif
-
-Here *phys_pgoff (or a rename) would be required to fetch the kernel VA (no
-matter direct mapping or vmap()) offset, to avoid aliasing issue.
-
-Should I go and introduce the API with *phys_pgoff returned together, then?
-I'll still need to scratch my head on how to properly define it, but it at
-least will also get vfio use case decouple with spec dependency.
-
-Thanks,
-
--- 
-Peter Xu
-
+Thanks!
+     Xin
 
