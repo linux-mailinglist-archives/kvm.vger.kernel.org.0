@@ -1,133 +1,111 @@
-Return-Path: <kvm+bounces-50851-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50852-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3E4DAEA2FE
-	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 17:51:55 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBF55AEA319
+	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 17:59:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1309F4A8205
-	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 15:51:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9C9AE7B4255
+	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 15:57:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C2A32ECD16;
-	Thu, 26 Jun 2025 15:51:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08B2B2ED163;
+	Thu, 26 Jun 2025 15:58:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0TlJG0G2"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zxI8NzZn"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 295DD2EBBB8
-	for <kvm@vger.kernel.org>; Thu, 26 Jun 2025 15:51:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCCD62ECEA5
+	for <kvm@vger.kernel.org>; Thu, 26 Jun 2025 15:58:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750953105; cv=none; b=bzOZn7JRvErKfv8+w+kttn+s7N0my2BanzqlNx+l6+8S43iucza5H6QXHUWQsi7kDhbna09QJa0GzJn4QBOwg9W4k3MFJEgFDCsOjF8LW3b48H4VnZkNfU1kh+8h7b5p2n6ODXQOVHp/W99eRLcbsrA4P6DibkfAjSZx9I7phxo=
+	t=1750953530; cv=none; b=UgSVXX3YWnEKftsol/odWTz/lshFkGxcMmaoc7aomSe/9CCZN/kJK0eQw57cIprzDur4+58m75WkYpuCS/PJp7+RYr0EOyNy74vsXmM+UPcyW4Paa1qgaJWVUoWNRxIlxVqJicTs3p8G+7yLU3eZ4hKT5lFaqxM/LrlPTh6qnOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750953105; c=relaxed/simple;
-	bh=qXV8ywuWUNO49dqW9kDZJmUe/jHnv66YbBB23QyjjcQ=;
+	s=arc-20240116; t=1750953530; c=relaxed/simple;
+	bh=el/AG+soar+8I0TkRmmfkfbYJbFh89tUJ6cdwZ/nYww=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=RSWLFJgAwwdF1Zw9h4vD0du3ZkHKUOvojhqMT0c8PL1vuRJjSiZ7QDmwsKfnW4ydwGXUlwg96t5e3IOH6W/24bRQ4vG4Q20wEsZmpr46fqp5P1DrsmJlxlm0t8TtAck+ZDZF9bCJtAAl8p7tvojdUtz+9bxu9nhVk7xcRUbv6Ak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0TlJG0G2; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=j31tqqKd+b0CxBSA8kJqh+tW6Qe4xj9NxtcvpPc3E5xJ+rVp/4QBWWkF9e10tlrFjmMnIXaE5hhPGQbvDRlp55Qz25Im33H4zXjVQMjyHwYHaD5o9vOQY1NfrOyFN8rQktkbY2p2iKGndOGxfel+gjiKoR5BOCrUwSkEZ/DD9pM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zxI8NzZn; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3138e65efe2so1123538a91.1
-        for <kvm@vger.kernel.org>; Thu, 26 Jun 2025 08:51:43 -0700 (PDT)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3138e64b3f1so1335879a91.3
+        for <kvm@vger.kernel.org>; Thu, 26 Jun 2025 08:58:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750953103; x=1751557903; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1750953528; x=1751558328; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6XW/EqCp3j1f6URWJ4aPoUkrvR+g0bF0hMVqo50f2oY=;
-        b=0TlJG0G2Ulbt9WcYt+XBbiMec6yqrNNuUDH1ht3jWjzYS48U+nQ0A9JJT+kCd5GtJP
-         qOMxVMEZvol2zU6B9h9SWtid971GM1XuCozTgkRC2KToxHV8WkoswBOQTLxi9Bn8IFTu
-         AWd2YQwWsiagm37Es5aJ0mJV0tCnvoeppKyUctKZmHLfqkRsuvVzqZfrU8PytTB+qPS+
-         nFANq6jrccPylwpDxHLPQyc25T7VaGGvmYJ5UDZVkKJRbcKTTIqfNZYmYj4jQ/hf1Wep
-         Mfzw/eWruFsm2cD/uIBoRMFZNNgABTGsc3teBTRojpmCKYOodQ3MhOqd5d7H+VpCaH41
-         qL9Q==
+        bh=S/uf9wxm2c0Qk14PYx/6WTgRiWmVdUxxJWQlP8qvxog=;
+        b=zxI8NzZnGmfEfLhQnnjqAHkZi3Nr4rFE5qdZSyaFUGVxYAFHlwxBX0WLkqHLDaQ9vZ
+         GegpeKQC+jg298Jjhshtsbs5vlWW6zSJy30ikRri+OR7bbqtweHtn1yF8lgEIjsTNFaf
+         06U2F3SVYcTLTecKodYX6LcIiOdKCYSUVSyLBsUzzUYKr98AX0QQQnsevwBj5NKZZyUR
+         nvtVPytXiyabSt84Vww+0WsXO7RCmr0WQ48YHdXyZSgsMcNWz9B+rgl0sfiG4bn0Tbyz
+         IrB4AymM2cHUqeXJmE9DNB+255vEPRiXuCf8x2Yy/0SMUYmSfAXM/P78en3TyO8xushg
+         SwNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750953103; x=1751557903;
+        d=1e100.net; s=20230601; t=1750953528; x=1751558328;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6XW/EqCp3j1f6URWJ4aPoUkrvR+g0bF0hMVqo50f2oY=;
-        b=hELb96tmORguJ3VCX8KkUEQzSD0ggp/FtOv1N/yDPTWINOGqtogFEAbOLAxhTd9Zil
-         LqeMIcYaRFs7jYr02We4ff46sFopiRINlYtNlOqVPmS7NgeSdZRt7xvcegl1NJnD1rB+
-         SEycXdkj7sjy6TZQYwq8slRt0RTYIgQQDpTfo1CqDNV9FuU104LzgNjFVPtn2UahfLI/
-         kUPOChr8EkNkdPhAmtzfWC3X+X3Mz/qvjjqnsrPE3jpmIvYHR3AFgMztdKaUoyTKSHR9
-         dj156q9Y5hXO8JN/jSD2u2aTY5eQ17uNT4VfAO3qBduiVsuJ5KERM5aWvmTxqQkTThRa
-         hbCg==
-X-Forwarded-Encrypted: i=1; AJvYcCUDm46xb2Ze94Lp+7THg4my9lnYB0FQijYWxZHGgRZp3ZKB732+3qar3juALXUGCcqYiyU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxLXz9vI4jBibRcg7XGPwmmgX3Qxk/l7mL5PpZ/JMmJ2aMQ8vVD
-	FloSfqJNs+MWQL20RcGDkDZ09o/M7qTrqd8iukzrwBErtmPDd/oSsA+q/K/FfHIO8yakbsZpJ01
-	a14mn3Q==
-X-Google-Smtp-Source: AGHT+IHC4Drqm7qwalhYbpaZ/EdYOOM+E4RS7ozoWgmrUjHrOdSo3e5wVygc5jxLIu3LTaQIMJLPkowy/94=
-X-Received: from pjbso15.prod.google.com ([2002:a17:90b:1f8f:b0:313:274d:3007])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5210:b0:312:e9bd:5d37
- with SMTP id 98e67ed59e1d1-315f2613846mr10091013a91.6.1750953103423; Thu, 26
- Jun 2025 08:51:43 -0700 (PDT)
-Date: Thu, 26 Jun 2025 08:51:41 -0700
-In-Reply-To: <3e55fd58-1d1c-437a-9e0a-72ac92facbb5@intel.com>
+        bh=S/uf9wxm2c0Qk14PYx/6WTgRiWmVdUxxJWQlP8qvxog=;
+        b=GSDIvByrI2elWhifRX66xu3hCKUEbg01+IFwYSrpbn2yFbsMUeahmNkmt9UtoYjLS5
+         OtZqaw/X9Z5dOQZ0RZFH6jjBxPzUWlSGSHUCgmEmVhxSOtJvKg1wpDpPmn4C5ys4e384
+         pIWHkORhv6Mbop65Ct2bssoxfhCBl7YvHZ2vVV/g8e6WOv/1heWhppa67q78dzznWNFA
+         q0ExegjwMDmheuwGXSn7miML5og0qlz75RgH5NgHF0wImhQsOY2tp4GFI389HXQ3XRyL
+         DI9AdfsUiR6MxzZTu8Gxu1zRDSV3E57Ghn207X6hVhSTxkSoL/YrZ01aTgkw8Gh79ZK+
+         7ong==
+X-Gm-Message-State: AOJu0YwknHvvU3jkqlgJqkPcgD9VF4bmNGYPBnvZLmbbhdp25ZWVwQj0
+	w81OyCI53i7yUjGBf5uTN8LHogymp8zsuv5cwJeXL10YJzclgzUilogMNX/ko93dJuwc1CzR4xD
+	PNOa0Kg==
+X-Google-Smtp-Source: AGHT+IH50WR3atcLhwQ0vlBEx5F+Lmgv4Ol+UjK2rPEhZgeL6Il1fIW2Is6Y4r3eWAeV+oa9gEEziLGMYo4=
+X-Received: from pjbsv14.prod.google.com ([2002:a17:90b:538e:b0:312:fb53:41c0])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2642:b0:311:ffe8:20e2
+ with SMTP id 98e67ed59e1d1-315f25edc7fmr10523268a91.4.1750953528194; Thu, 26
+ Jun 2025 08:58:48 -0700 (PDT)
+Date: Thu, 26 Jun 2025 08:58:46 -0700
+In-Reply-To: <175088949072.720373.4112758062004721516.b4-ty@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250609191340.2051741-1-kirill.shutemov@linux.intel.com>
- <20250609191340.2051741-2-kirill.shutemov@linux.intel.com>
- <5cfb2e09-7ecb-4144-9122-c11152b18b5e@intel.com> <d897ab70d48be4508a8a9086de1ff3953041e063.camel@intel.com>
- <aFxpuRLYA2L6Qfsi@google.com> <vgk3ql5kcpmpsoxfw25hjcw4knyugszdaeqnzur6xl4qll73xy@xi7ttxlxot2r>
- <3e55fd58-1d1c-437a-9e0a-72ac92facbb5@intel.com>
-Message-ID: <aF1sjdV2UDEbAK2h@google.com>
-Subject: Re: [PATCHv2 01/12] x86/tdx: Consolidate TDX error handling
+References: <20250611095158.19398-1-adrian.hunter@intel.com> <175088949072.720373.4112758062004721516.b4-ty@google.com>
+Message-ID: <aF1uNonhK1rQ8ViZ@google.com>
+Subject: Re: [PATCH V4 0/1] KVM: TDX: Decrease TDX VM shutdown time
 From: Sean Christopherson <seanjc@google.com>
-To: Dave Hansen <dave.hansen@intel.com>
-Cc: "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>, 
-	Rick P Edgecombe <rick.p.edgecombe@intel.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, Chao Gao <chao.gao@intel.com>, 
-	"bp@alien8.de" <bp@alien8.de>, Kai Huang <kai.huang@intel.com>, "x86@kernel.org" <x86@kernel.org>, 
-	"mingo@redhat.com" <mingo@redhat.com>, Yan Y Zhao <yan.y.zhao@intel.com>, 
-	"tglx@linutronix.de" <tglx@linutronix.de>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: pbonzini@redhat.com, Adrian Hunter <adrian.hunter@intel.com>
+Cc: kvm@vger.kernel.org, rick.p.edgecombe@intel.com, 
+	kirill.shutemov@linux.intel.com, kai.huang@intel.com, 
+	reinette.chatre@intel.com, xiaoyao.li@intel.com, 
+	tony.lindgren@linux.intel.com, binbin.wu@linux.intel.com, 
+	isaku.yamahata@intel.com, linux-kernel@vger.kernel.org, yan.y.zhao@intel.com, 
+	chao.gao@intel.com
 Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Jun 26, 2025, Dave Hansen wrote:
-> On 6/26/25 02:25, kirill.shutemov@linux.intel.com wrote:
-> >> Can we turn them into macros that make it super obvious they are checking if the
-> >> error code *is* xyz?  E.g.
-> >>
-> >> #define IS_TDX_ERR_OPERAND_BUSY
-> >> #define IS_TDX_ERR_OPERAND_INVALID
-> >> #define IS_TDX_ERR_NO_ENTROPY
-> >> #define IS_TDX_ERR_SW_ERROR
-> >>>> As is, it's not at all clear that things like tdx_success() are
-> >> simply checks, as opposed to commands.
-> > I remember Dave explicitly asked for inline functions over macros
-> > where possible.
+On Wed, Jun 25, 2025, Sean Christopherson wrote:
+> On Wed, 11 Jun 2025 12:51:57 +0300, Adrian Hunter wrote:
+> > Changes in V4:
 > > 
-> > Can we keep them as functions, but give the naming scheme you
-> > proposing (but lowercase)?
-
-I don't care about function versus macro, but I'd prefer uppercase.  As Linus
-pointed out[*], upper vs. lower case is about the usage and semantics as much as
-it's about whether or not the thingie is literally a macro vs. function.
-
-[*] https://lore.kernel.org/all/CAHk-=whGWM50Qq3Dgha8ByU7t_dqvrCk3JFBSw2+X0KUAWuT1g@mail.gmail.com
-
-> Macros versus function isn't super important. I think Sean was asking if
-> we could do:
+> > 	Drop TDX_FLUSHVP_NOT_DONE change.  It will be done separately.
+> > 	Use KVM_BUG_ON() instead of WARN_ON().
+> > 	Correct kvm_trylock_all_vcpus() return value.
+> > 
+> > Changes in V3:
+> > 	Refer:
+> >             https://lore.kernel.org/r/aAL4dT1pWG5dDDeo@google.com
+> > 
+> > [...]
 > 
-> 	if (err == IS_TDX_ERR_OPERAND_BUSY)
-> 		...
+> Applied to kvm-x86 vmx, thanks!
 > 
-> instead of:
-> 
-> 	if (tdx_operand_busy(err))
-> 		...
+> [1/1] KVM: TDX: Add sub-ioctl KVM_TDX_TERMINATE_VM
+>       https://github.com/kvm-x86/linux/commit/111a7311a016
 
-No, I was thinking:
+Fixed up to address a docs goof[*], new hash:
 
-	if (IS_TDX_ERR_OPERAND_BUSY(err))
+      https://github.com/kvm-x86/linux/commit/e4775f57ad51
 
-e.g. to so that it looks like IS_ERR(), which is a familiar pattern.
+[*] https://lore.kernel.org/all/20250626171004.7a1a024b@canb.auug.org.au
 
