@@ -1,155 +1,135 @@
-Return-Path: <kvm+bounces-50817-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50818-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8B65AE994F
-	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 10:59:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5123AE99EA
+	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 11:26:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9046C189C02C
-	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 08:59:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B1F357A630E
+	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 09:24:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81793298982;
-	Thu, 26 Jun 2025 08:59:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 382252BEFF2;
+	Thu, 26 Jun 2025 09:25:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iJhUcXn6"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Hg205bmN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E55B24A33;
-	Thu, 26 Jun 2025 08:59:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2952E18C332;
+	Thu, 26 Jun 2025 09:25:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750928350; cv=none; b=CLZy//o9T+Man48Tb860FLRRSObbiTHcwR3m4sXk+HQpnxzv3h0O2Z3XrJaJff/aga1r/AEoEPz47XA13my+fxswQcxkcCTklfRNWwtr3R7nP7oALM479lD+gHvI77rBkbZy4RkxdaxhQnBpjhlQOziFmsJUs5zsKsrxkuD9itg=
+	t=1750929939; cv=none; b=ST2IXytfz+jWLQ2CpQSOymz5OYQa/No+EpEwBlpVCfnw69eBCJVryPqvB1mKPpJWUfK87WvnpnVrle1TDWo44qu+RzmC6hKWgqIx2liSGWK5t5LI7ZBcAKvbiUlE9qyZHv/LhhcVgWmF2DfLtSMvX2IX8SxlPv22jyBwGESdnVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750928350; c=relaxed/simple;
-	bh=vz8yrG7TsUr+PK7JlGaU9k8zdE+Zt3hQF4t9uML7Scs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ror/VajWSG0VGTlTtbl3IkvhcBKeXz7lOopNKkgM7dQhZaBa+NFAQk/zSaXWkpqoe/qlu8qnXSGDf6YNNqwKf7tYXhteo2SvtAb981B+M6tAjrp5USJuwE2TaJoy/3BvFTgf2Z9nHxmmYaaahHElHvFPqdQPhBoa4JEnriWso50=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iJhUcXn6; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1750929939; c=relaxed/simple;
+	bh=xVxhsp9WJPwQPCXZFwvJKu5uUvkY6LGeigTfbmZtgn0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RSKs2m/FkruP7YQcLNPeRYjajS+5OmpqpwZDDKJsIJCnN+sfCB1WFnD44q419a4G/R2QaflM1qZgQR+CXPCzQok80QoFOqyVSnhtwZZVmZ014tqM92VAcCMLrAXWN7/YaKGaaEa7b0llHncPGXKQvr/ZpYJKNhKtMziZsDhWpF4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Hg205bmN; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750928348; x=1782464348;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=vz8yrG7TsUr+PK7JlGaU9k8zdE+Zt3hQF4t9uML7Scs=;
-  b=iJhUcXn6nGwDWEBHZTIjWu0ece+aBVTNpIDw5Q5K0UTu0jxeWp6HEgtf
-   6I1iOY2xfsEvWLK/e40jTKz5Wgq5+Bm7sgza0uHlqBEpS828sgw1nciDc
-   mZXCnrFYT/omJRfIv10rpRIeLJ88QHQgiDCS0NmJtN8XvSRZb+zDkW0fh
-   E7UvPgrHoUC1SbH7/q18IiYi8wQgU9LbdJxU+O8CKxXeyAqYjMPx0tcz2
-   hHmAjyEwi/O4YdZbIjFNO9crcMREAtwFGWgOPhwnbIsnTWwf9OXCkhDUo
-   J9eYAlWQv4Rks6bLz6E5WdpwkMYIXEpcYfJ6hJVV6Vj60EyTTvC2VgOAd
-   A==;
-X-CSE-ConnectionGUID: BuUJ1mjNRVCXsxW93Fn34w==
-X-CSE-MsgGUID: X73oQGbSTF2/vMbPt60n6A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11475"; a="64649966"
+  t=1750929937; x=1782465937;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=xVxhsp9WJPwQPCXZFwvJKu5uUvkY6LGeigTfbmZtgn0=;
+  b=Hg205bmN7kdu7OJtFny9cVHrS/NlKUu/A2E6bp1hyQef3FlKq9FzSaqD
+   iqHut4QvS7U5meYNJ6NHfnIUfyRj5RLwavFMqWQiARqIALs+qSuYJV6iH
+   z/kCHju5gsm5/IysDJscCOpXFOoN4zXee8vw+DQUygJ1PAM9grlcR3e5c
+   xAE+oO+2Ut7O1cHGPxlu0hoXtesurA26Lq8R6Qr2Ybq2aTqWYEPlHkKOo
+   FKEkK5isSgSV7B+qjQIZEJAZxR/rI71EPd9G+PH0PX0o7f8Bn2kPpOMbm
+   RfOmQi5b/iTuc5BZwpFbJxe6GxIqN48DFoAKM4cSzlU2B/Rlh6c0n/b6l
+   g==;
+X-CSE-ConnectionGUID: smBY5ltDStW6sE8zSi/iQg==
+X-CSE-MsgGUID: +//fv9XRQ9Sm65w8FoGnvQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11475"; a="52942027"
 X-IronPort-AV: E=Sophos;i="6.16,267,1744095600"; 
-   d="scan'208";a="64649966"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2025 01:59:08 -0700
-X-CSE-ConnectionGUID: PSt5q9rgRv23Z+qWHnxY4g==
-X-CSE-MsgGUID: 1ZRIWUhETUuNPdnq4pMsGA==
+   d="scan'208";a="52942027"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2025 02:25:37 -0700
+X-CSE-ConnectionGUID: LBzYSVR0SY+K2h1P+OlghQ==
+X-CSE-MsgGUID: eNqeFQRPSR2gVgy1xtUziw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,267,1744095600"; 
-   d="scan'208";a="152632462"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2025 01:59:05 -0700
-Message-ID: <bc7aea45-f254-4cbc-8dc0-5435417d8577@intel.com>
-Date: Thu, 26 Jun 2025 16:59:00 +0800
+   d="scan'208";a="152980614"
+Received: from black.fi.intel.com ([10.237.72.28])
+  by fmviesa008.fm.intel.com with ESMTP; 26 Jun 2025 02:25:33 -0700
+Received: by black.fi.intel.com (Postfix, from userid 1000)
+	id 9586721E; Thu, 26 Jun 2025 12:25:31 +0300 (EEST)
+Date: Thu, 26 Jun 2025 12:25:31 +0300
+From: "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Rick P Edgecombe <rick.p.edgecombe@intel.com>, 
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, Dave Hansen <dave.hansen@intel.com>, 
+	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, Chao Gao <chao.gao@intel.com>, "bp@alien8.de" <bp@alien8.de>, 
+	Kai Huang <kai.huang@intel.com>, "x86@kernel.org" <x86@kernel.org>, 
+	"mingo@redhat.com" <mingo@redhat.com>, Yan Y Zhao <yan.y.zhao@intel.com>, 
+	"tglx@linutronix.de" <tglx@linutronix.de>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCHv2 01/12] x86/tdx: Consolidate TDX error handling
+Message-ID: <vgk3ql5kcpmpsoxfw25hjcw4knyugszdaeqnzur6xl4qll73xy@xi7ttxlxot2r>
+References: <20250609191340.2051741-1-kirill.shutemov@linux.intel.com>
+ <20250609191340.2051741-2-kirill.shutemov@linux.intel.com>
+ <5cfb2e09-7ecb-4144-9122-c11152b18b5e@intel.com>
+ <d897ab70d48be4508a8a9086de1ff3953041e063.camel@intel.com>
+ <aFxpuRLYA2L6Qfsi@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 2/5] KVM: x86: Provide a capability to disable
- APERF/MPERF read intercepts
-To: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
- Jim Mattson <jmattson@google.com>
-References: <20250626001225.744268-1-seanjc@google.com>
- <20250626001225.744268-3-seanjc@google.com>
-Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20250626001225.744268-3-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aFxpuRLYA2L6Qfsi@google.com>
 
-On 6/26/2025 8:12 AM, Sean Christopherson wrote:
-> From: Jim Mattson <jmattson@google.com>
+On Wed, Jun 25, 2025 at 02:27:21PM -0700, Sean Christopherson wrote:
+> On Wed, Jun 25, 2025, Rick P Edgecombe wrote:
+> > On Wed, 2025-06-25 at 10:58 -0700, Dave Hansen wrote:
+> > > > --- a/arch/x86/kvm/vmx/tdx.c
+> > > > +++ b/arch/x86/kvm/vmx/tdx.c
+> > > > @@ -202,12 +202,6 @@ static DEFINE_MUTEX(tdx_lock);
+> > > >   
+> > > >   static atomic_t nr_configured_hkid;
+> > > >   
+> > > > -static bool tdx_operand_busy(u64 err)
+> > > > -{
+> > > > -	return (err & TDX_SEAMCALL_STATUS_MASK) == TDX_OPERAND_BUSY;
+> > > > -}
+> > > > -
+> > > > -
+> > > 
+> > > Isaku, this one was yours (along with the whitespace damage). What do
+> > > you think of this patch?
+> > 
+> > I think this actually got added by Paolo, suggested by Binbin. I like these
+> > added helpers a lot. KVM code is often open coded for bitwise stuff, but since
+> > Paolo added tdx_operand_busy(), I like the idea of following the pattern more
+> > broadly. I'm on the fence about tdx_status() though.
 > 
-> Allow a guest to read the physical IA32_APERF and IA32_MPERF MSRs
-> without interception.
+> Can we turn them into macros that make it super obvious they are checking if the
+> error code *is* xyz?  E.g.
 > 
-> The IA32_APERF and IA32_MPERF MSRs are not virtualized. Writes are not
-> handled at all. The MSR values are not zeroed on vCPU creation, saved
-> on suspend, or restored on resume. No accommodation is made for
-> processor migration or for sharing a logical processor with other
-> tasks. No adjustments are made for non-unit TSC multipliers. The MSRs
-> do not account for time the same way as the comparable PMU events,
-> whether the PMU is virtualized by the traditional emulation method or
-> the new mediated pass-through approach.
+> #define IS_TDX_ERR_OPERAND_BUSY
+> #define IS_TDX_ERR_OPERAND_INVALID
+> #define IS_TDX_ERR_NO_ENTROPY
+> #define IS_TDX_ERR_SW_ERROR
 > 
-> Nonetheless, in a properly constrained environment, this capability
-> can be combined with a guest CPUID table that advertises support for
-> CPUID.6:ECX.APERFMPERF[bit 0] to induce a Linux guest to report the
-> effective physical CPU frequency in /proc/cpuinfo. Moreover, there is
-> no performance cost for this capability.
-> 
-> Signed-off-by: Jim Mattson <jmattson@google.com>
-> Link: https://lore.kernel.org/r/20250530185239.2335185-3-jmattson@google.com
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->   Documentation/virt/kvm/api.rst | 23 +++++++++++++++++++++++
->   arch/x86/kvm/svm/nested.c      |  4 +++-
->   arch/x86/kvm/svm/svm.c         |  5 +++++
->   arch/x86/kvm/vmx/nested.c      |  6 ++++++
->   arch/x86/kvm/vmx/vmx.c         |  4 ++++
->   arch/x86/kvm/x86.c             |  6 +++++-
->   arch/x86/kvm/x86.h             |  5 +++++
->   include/uapi/linux/kvm.h       |  1 +
->   tools/include/uapi/linux/kvm.h |  1 +
->   9 files changed, 53 insertions(+), 2 deletions(-)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 43ed57e048a8..27ced3ee2b53 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -7844,6 +7844,7 @@ Valid bits in args[0] are::
->     #define KVM_X86_DISABLE_EXITS_HLT              (1 << 1)
->     #define KVM_X86_DISABLE_EXITS_PAUSE            (1 << 2)
->     #define KVM_X86_DISABLE_EXITS_CSTATE           (1 << 3)
-> +  #define KVM_X86_DISABLE_EXITS_APERFMPERF       (1 << 4)
->   
->   Enabling this capability on a VM provides userspace with a way to no
->   longer intercept some instructions for improved latency in some
-> @@ -7854,6 +7855,28 @@ all such vmexits.
->   
->   Do not enable KVM_FEATURE_PV_UNHALT if you disable HLT exits.
->   
-> +Virtualizing the ``IA32_APERF`` and ``IA32_MPERF`` MSRs requires more
-> +than just disabling APERF/MPERF exits. While both Intel and AMD
-> +document strict usage conditions for these MSRs--emphasizing that only
-> +the ratio of their deltas over a time interval (T0 to T1) is
-> +architecturally defined--simply passing through the MSRs can still
-> +produce an incorrect ratio.
-> +
-> +This erroneous ratio can occur if, between T0 and T1:
-> +
-> +1. The vCPU thread migrates between logical processors.
-> +2. Live migration or suspend/resume operations take place.
-> +3. Another task shares the vCPU's logical processor.
-> +4. C-states lower thean C0 are emulated (e.g., via HLT interception).
+> As is, it's not at all clear that things like tdx_success() are simply checks,
+> as opposed to commands.
 
-s/thean/than/
+I remember Dave explicitly asked for inline functions over macros where
+possible.
 
-Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+Can we keep them as functions, but give the naming scheme you proposing
+(but lowercase)?
+
+-- 
+  Kiryl Shutsemau / Kirill A. Shutemov
 
