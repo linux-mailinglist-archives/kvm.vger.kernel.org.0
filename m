@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-50881-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50882-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F97BAEA7BB
-	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 22:06:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9063FAEA7BF
+	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 22:06:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E1AEB7A87EE
-	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 20:05:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 689221C45633
+	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 20:06:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5722B2F235D;
-	Thu, 26 Jun 2025 20:05:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 846D52F2730;
+	Thu, 26 Jun 2025 20:05:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZbCbXG1t"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oIRE3E7c"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f201.google.com (mail-il1-f201.google.com [209.85.166.201])
+Received: from mail-oi1-f202.google.com (mail-oi1-f202.google.com [209.85.167.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4804B2F0C5F
-	for <kvm@vger.kernel.org>; Thu, 26 Jun 2025 20:05:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 652612F0E57
+	for <kvm@vger.kernel.org>; Thu, 26 Jun 2025 20:05:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750968355; cv=none; b=ZR5qwLuzrAAyCmGURtD49Euj9a0y+kSMTWX6INoeIjJrpvWOkF7/hjQC62Y84AND8EaA6D0oQzj0avHbzgCWiuCL48ugU6zlRHNCPP4LDTEIdL41KW3yli0KYz/gARLLIOpy1JfCbsA+a1HU1rWZIOkx3tGYaNOsrW9cQbjLfy4=
+	t=1750968356; cv=none; b=gyl7HMxYfwAllfhJX+AtdA6vUNFyiFxCb2u/KuIP6a+QLrtCx01+rADI6aWpNNqLhgqE29J4z18rp3CkLJjT4KWybY5RakGJeYWG4em9/xw6g+iKAz4N4afAGzSOm9RFD9vQUdt+9qESkkbKxIe2NYqx3VuGLXDQYyS2ET+PApg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750968355; c=relaxed/simple;
-	bh=9apEKUIdLeyPsikl7KFCLmT2RywguEX6MjbxXJr0f/0=;
+	s=arc-20240116; t=1750968356; c=relaxed/simple;
+	bh=T2AAAwNCvFAm9YUhWYISU/OAnWzXdQk+10RnZrJqatc=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=TqWUdrttjZItN4g21n7L0uuyA1C8v0nphaAMQtWAmTn4zN1K1Lo8FqmOnap3gmWYiRBuCLofRljPKdXhtu4FLpNJ71DknQCftmqteObKqGGmGOA+/JDYQ2WUkn/Fmc//jh9OtKt7RTmMpj7HAaBZadcAafiFqAIBfBVIUTBPnLs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZbCbXG1t; arc=none smtp.client-ip=209.85.166.201
+	 To:Cc:Content-Type; b=B3Kc6KSIoVfxuOWd7GZSOZWNrFWIIaSiGRZyLmFE9cjskRXtbt/5a+Q8LFysQLmojQjK3IoBThxvLvNXEj4n3aeiJG88HSzHBrq95+2WPuBjArlYR/18Qmy7DgX7YIk6TsYXFZ/j9YcilirH3Xn0FcKy2ZarHKoaCdQ5MdRN1rw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oIRE3E7c; arc=none smtp.client-ip=209.85.167.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
-Received: by mail-il1-f201.google.com with SMTP id e9e14a558f8ab-3ddc0a6d4bdso17347035ab.0
-        for <kvm@vger.kernel.org>; Thu, 26 Jun 2025 13:05:53 -0700 (PDT)
+Received: by mail-oi1-f202.google.com with SMTP id 5614622812f47-4033c872b60so1480438b6e.2
+        for <kvm@vger.kernel.org>; Thu, 26 Jun 2025 13:05:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750968352; x=1751573152; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1750968353; x=1751573153; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=iaFai0kpA9G7yidHpU/KUU/hEAHmvPP5GvS91zDpLpc=;
-        b=ZbCbXG1t93on6ZRGgXaE1OAzhkNHfwrfyR37dvqdzvdzI7ccihsvwMmZ/AWwHHSgms
-         EsLy7Ao4mb/qbFBbAn3Ql9abr+SYBGHV921xTu+tWSBY5JEx59DZFi+mQV+RQKGVqfxO
-         b92fs2RhJirHmqwdubzWz+411Pj1dcCft5Mp5U+0G2iTsg/KgfTNY29cG09UFQXfaJLn
-         o/GdUaGKD7aofJjTcZMyRH3oTT76gztpnZnhbwe6lP5Wn8ASZlIxyznUnCpwJ+FHoL/b
-         g4o5fGgxdNmWmHVn01mTBxNqKqJZMt4rsrW57k09+n7FRTxYpJkxNbzA13aK5pje/oex
-         x6rw==
+        bh=EHt9BrBIYqZp5kZ5sjlL9mrhswYvvwFRhl772iB1+XY=;
+        b=oIRE3E7c3Net0Zrc38DGPcJR5uot6iNbrChMN9jOLEjSbQ7+lPcoLwaGiEHlieHL5q
+         GI6t+qbp22yc02kprAzzTLCeCnL0NDN5l7cErzEHnSecjLMsRRMg7qDQ4kdceU/0aLwD
+         d9gAos2CxaYeYiCNAUZw4/uL5GIqPBOFlYJKrQQP6Haiw8PJQS1u4b/rT60E93vRMfHL
+         8IjF2PAX05JSzfvbVyf3TDst/7ir1SJg/mD9QxvDcqVG4FpzTIlf7LTUmRdKeviWdcE9
+         EmWjeAAmvXedHn44R2MEvZXGeTNK49eN3J8nG5P8c9G/+lyviSi2EZCHJznjuMeggbUa
+         9bjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750968352; x=1751573152;
+        d=1e100.net; s=20230601; t=1750968353; x=1751573153;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iaFai0kpA9G7yidHpU/KUU/hEAHmvPP5GvS91zDpLpc=;
-        b=bRw/AAer1uvlRgimub6vnCYfjsZVHpOfGsPzvBg1JZcZRNQ2E4zr3AMrPyF+OLgx7q
-         LaGzDre3nYnquO0+apInL4AKUFcXfLBnqN5fwheDDb9Qr/mXv5Hv/lSLdx6P6xn6EXQl
-         oO4maXzZ1cudp+XG1AGRVoLxd46Jdy4JJzXxXQ0vyMQntQjazqIlUlkyrKFI7yttAo42
-         FUZdNcttqrhETqRUxD+aQTds5Z2d9ygT3j9tEYGViqxWrAoFRnZlU9DOaIGNAOgCrKcj
-         W7yIb2o8mqGkYudULH1gEB2MC2D1AJ2TwbFkvDtZOmw9aFtqvKc9oNNp87BKs6vNyIPM
-         TH1A==
-X-Gm-Message-State: AOJu0Yz/OPEL4uvosv6fzZIBQJsPoWItR6kYvvBXNHN6KifhLRFZbwm/
-	0xxwPh9n/y6fYP5/YvEDhAVbfDJxxBvqSA1Mo8wy4HVQ28lXRVYMDPovwdTYpI5LcUzphtb8VJe
-	I3ISifx+pkjSeCTFD0IFWid5q5ZhVnNL66sObyWUFp1dfb07kAiCqdGleSBkOLMiy74ZeN+I+Z5
-	u9UmP7dt1vLrz2fcKHHIdxsASOhSGWS8hwSrvWh6Wovq+rPB2NZZizDx+zoUA=
-X-Google-Smtp-Source: AGHT+IH29/gNXm3nZ2B2ojHCYilqtMfkqWLjy1qqrKLeh9n7wKnCz/XYXSUrRH/F4j6Tl4Qhzhb+cR95L/p7I4Y1iQ==
-X-Received: from ilbdh3.prod.google.com ([2002:a05:6e02:1f03:b0:3dd:b580:4100])
+        bh=EHt9BrBIYqZp5kZ5sjlL9mrhswYvvwFRhl772iB1+XY=;
+        b=WBV+LqO0O3/Rsp4nB5Zm7RDEojNQYY+vso2DX6q8i0zotefxiou+R+njYUlKGlQV3d
+         Xi+3j/jjWh7AfbbaKPEempTRSddjZHq1mZJuPXVywK3QvPgZipTqnFm/QI9JewWzOgEb
+         rprxtntfsfGeVBZ1pPHhNrVY8KnZOOdtyZyxjJ9QZxbWxKxpjnyB0tAhx9tRjQcjdErN
+         5ikX7e3t/LSG+x9D38qR96XKOtZnHLHLTthDWXqZHlOPuEXIGgOPK7J2V64s7azthdZd
+         ZojeAtyVU6sL/aH35J+kuQ7j0RZulG+ZX2Zxf+krB8gBWbUALeba8+7jSLx54A253MBs
+         6PiQ==
+X-Gm-Message-State: AOJu0YxpkVNR8kxivFiD1Zi/RZ1W7qW1LMy0gRZqr4P8+km1VHnJPRU0
+	p0gRfuoQqQHKLS2lYp1ul6EOOXQhEkQMjMcw08HGRelLYXsejaNLt2als+lZT03Vs0WiFGy1fWO
+	WI8B51ys0HOD9n7TOY9iYKznJtajGmJSZtYkWCwGAbzoICg+7/e/2n4t4ynczpeFWiwwvX2lcyT
+	0ezJL7hhJZRTVCLxTIyKrV1Dp5pEH1LXwEBPFeCqUPvDKdwP8kjCFH15/tjkc=
+X-Google-Smtp-Source: AGHT+IFlRtE1eWK/FMjUnULxroCH+ZQKYqxRY5qaFdZ+f+SoiV9KEwtPmc0HwZMn2/GT2thgfmq4kS9LjJKIm6e5aQ==
+X-Received: from oibcj14.prod.google.com ([2002:a05:6808:1b8e:b0:40a:c2da:1f99])
  (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a92:c245:0:b0:3df:4159:8fe5 with SMTP id e9e14a558f8ab-3df4ab55b4bmr13423615ab.4.1750968352377;
- Thu, 26 Jun 2025 13:05:52 -0700 (PDT)
-Date: Thu, 26 Jun 2025 20:04:37 +0000
+ 2002:a05:6808:6a87:b0:409:59d:2fb with SMTP id 5614622812f47-40b33c77bfdmr516313b6e.11.1750968353579;
+ Thu, 26 Jun 2025 13:05:53 -0700 (PDT)
+Date: Thu, 26 Jun 2025 20:04:38 +0000
 In-Reply-To: <20250626200459.1153955-1-coltonlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250626200459.1153955-1-coltonlewis@google.com>
 X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Message-ID: <20250626200459.1153955-2-coltonlewis@google.com>
-Subject: [PATCH v3 01/22] arm64: cpufeature: Add cpucap for HPMN0
+Message-ID: <20250626200459.1153955-3-coltonlewis@google.com>
+Subject: [PATCH v3 02/22] arm64: Generate sign macro for sysreg Enums
 From: Colton Lewis <coltonlewis@google.com>
 To: kvm@vger.kernel.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
@@ -89,75 +89,27 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
 	linux-kselftest@vger.kernel.org, Colton Lewis <coltonlewis@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Add a capability for FEAT_HPMN0, whether MDCR_EL2.HPMN can specify 0
-counters reserved for the guest.
-
-This required changing HPMN0 to an UnsignedEnum in tools/sysreg
-because otherwise not all the appropriate macros are generated to add
-it to arm64_cpu_capabilities_arm64_features.
+There's no reason Enums shouldn't be equivalent to UnsignedEnums and
+explicitly specify they are unsigned. This will avoid the annoyance I
+had with HPMN0.
 
 Signed-off-by: Colton Lewis <coltonlewis@google.com>
 ---
- arch/arm64/kernel/cpufeature.c | 8 ++++++++
- arch/arm64/tools/cpucaps       | 1 +
- arch/arm64/tools/sysreg        | 6 +++---
- 3 files changed, 12 insertions(+), 3 deletions(-)
+ arch/arm64/tools/gen-sysreg.awk | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index b34044e20128..73a7dac4b6f6 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -548,6 +548,7 @@ static const struct arm64_ftr_bits ftr_id_mmfr0[] = {
- };
+diff --git a/arch/arm64/tools/gen-sysreg.awk b/arch/arm64/tools/gen-sysreg.awk
+index f2a1732cb1f6..fa21a632d9b7 100755
+--- a/arch/arm64/tools/gen-sysreg.awk
++++ b/arch/arm64/tools/gen-sysreg.awk
+@@ -308,6 +308,7 @@ $1 == "Enum" && (block_current() == "Sysreg" || block_current() == "SysregFields
+ 	parse_bitdef(reg, field, $2)
  
- static const struct arm64_ftr_bits ftr_id_aa64dfr0[] = {
-+	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64DFR0_EL1_HPMN0_SHIFT, 4, 0),
- 	S_ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64DFR0_EL1_DoubleLock_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64DFR0_EL1_PMSVer_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64DFR0_EL1_CTX_CMPs_SHIFT, 4, 0),
-@@ -2896,6 +2897,13 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 		.matches = has_cpuid_feature,
- 		ARM64_CPUID_FIELDS(ID_AA64MMFR0_EL1, FGT, FGT2)
- 	},
-+	{
-+		.desc = "FEAT_HPMN0",
-+		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-+		.capability = ARM64_HAS_HPMN0,
-+		.matches = has_cpuid_feature,
-+		ARM64_CPUID_FIELDS(ID_AA64DFR0_EL1, HPMN0, IMP)
-+	},
- #ifdef CONFIG_ARM64_SME
- 	{
- 		.desc = "Scalable Matrix Extension",
-diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
-index 10effd4cff6b..5b196ba21629 100644
---- a/arch/arm64/tools/cpucaps
-+++ b/arch/arm64/tools/cpucaps
-@@ -39,6 +39,7 @@ HAS_GIC_CPUIF_SYSREGS
- HAS_GIC_PRIO_MASKING
- HAS_GIC_PRIO_RELAXED_SYNC
- HAS_HCR_NV1
-+HAS_HPMN0
- HAS_HCX
- HAS_LDAPR
- HAS_LPA2
-diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index 8a8cf6874298..d29742481754 100644
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -1531,9 +1531,9 @@ EndEnum
- EndSysreg
+ 	define_field(reg, field, msb, lsb)
++	define_field_sign(reg, field, "false")
  
- Sysreg	ID_AA64DFR0_EL1	3	0	0	5	0
--Enum	63:60	HPMN0
--	0b0000	UNPREDICTABLE
--	0b0001	DEF
-+UnsignedEnum	63:60	HPMN0
-+	0b0000	NI
-+	0b0001	IMP
- EndEnum
- UnsignedEnum	59:56	ExtTrcBuff
- 	0b0000	NI
+ 	next
+ }
 -- 
 2.50.0.727.gbf7dc18ff4-goog
 
