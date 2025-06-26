@@ -1,118 +1,176 @@
-Return-Path: <kvm+bounces-50836-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50837-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CF02AE9F5C
-	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 15:49:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A764AE9FBC
+	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 16:02:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4DBC45A2F3D
-	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 13:49:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F3C81175DC1
+	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 14:02:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADF852E6133;
-	Thu, 26 Jun 2025 13:49:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4CF32E7645;
+	Thu, 26 Jun 2025 14:02:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tum.de header.i=@tum.de header.b="jEZ9FNYI"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZJKSdpxA"
 X-Original-To: kvm@vger.kernel.org
-Received: from postout2.mail.lrz.de (postout2.mail.lrz.de [129.187.255.138])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62F212E762B;
-	Thu, 26 Jun 2025 13:49:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.187.255.138
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 956F828B3EE
+	for <kvm@vger.kernel.org>; Thu, 26 Jun 2025 14:02:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750945753; cv=none; b=lAAIMbwkR0eoVTgk6Rv8o9dtPNdOshpfsMOA/Ttkg1AmSqWazkMdSwCMqgxMl/QBxetmxw3Lrjh8AG+k5F2wwvGXToAV0EsOPesWXBTCF8vs5/ym9IP5AbVmrqOsAbs7X2p3zJz2TKnvP2o0k6AYWQqoYtOgHRPxrfh8thLqriI=
+	t=1750946524; cv=none; b=VB6XWxEn5v7SI63tA25FrYEqomoiG7NjAzfh/rOP/2xcsAY9XGaUUCWbBnuz9iBmJ/1c+D1d9gGOKgLaFIxKJz9mkIU6MKqsvu9aUdu3WX2eSXayMHkooO5RGyGasRufh9kvwPKcuTuHCDNIhPtG7xp1FgI8RdPGAHlC+WApg0o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750945753; c=relaxed/simple;
-	bh=9ETa/aMCfVnorl4nBQFB5QCxuCy0bZmquwrSjwaYyjw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Y2aTVK8jwUn5ZJfbkeVUaKzvy5oUTsTk3o5GGQhAcg/ReIFg+L0uftaTxCY+Zcbpj27Iv4Pxr5QpGpwZn95mfvL6b2NF26n/USObKwOpe2hbpdFNB2AGiYFvB0EI7c3EXSIJoWNzPKuj0ElG+ICcHJ+Zq4lu9VWStiaMZMkcQdE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tum.de; spf=pass smtp.mailfrom=tum.de; dkim=pass (2048-bit key) header.d=tum.de header.i=@tum.de header.b=jEZ9FNYI; arc=none smtp.client-ip=129.187.255.138
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tum.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tum.de
-Received: from lxmhs52.srv.lrz.de (localhost [127.0.0.1])
-	by postout2.mail.lrz.de (Postfix) with ESMTP id 4bSg5X3Kg3zyTW;
-	Thu, 26 Jun 2025 15:49:04 +0200 (CEST)
-Authentication-Results: postout.lrz.de (amavis); dkim=pass (2048-bit key)
- reason="pass (just generated, assumed good)" header.d=tum.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tum.de; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=tu-postout21; t=1750945743; bh=Vb0qfFuOWjHfY85Vsrj1qe50SGMWpv
-	uFukEEzkrwbjs=; b=jEZ9FNYIQaR4FmC1BeBaDukV2FkAwkzNuwJK2y0e9k6S4c
-	eWKr6WGJdicdljqHFiH+IybG3EBpX2U4WHMeJFBwJwYDC8Be5HUkQQT6u7SGuIZM
-	kP6Hs/PDHTNhROt1rGSUULiAcMr4mQA+fYJdRID55DDVoZl3V8MM4kGqTsqWNH0g
-	m3ivgNmaCOr4Wdm5HmgLUHqT3B8F5ZxbpIXa0cRTtt9t2R5jhcfPhuQdr+DxfnYA
-	fkgRL7KQC1zHvMxpyNAwGWu4MbvOzd5JUFlGKYvi4byD2ByOYaX2bX8Id4R6zUt+
-	7P+MRoe3MstEHtCN34vYpWLpOLL6US0zCPEpy1DQ==
-X-Virus-Scanned: by amavisd-new at lrz.de in lxmhs52.srv.lrz.de
-X-Spam-Flag: NO
-X-Spam-Score: -2.868
-X-Spam-Level:
-Received: from postout2.mail.lrz.de ([127.0.0.1])
- by lxmhs52.srv.lrz.de (lxmhs52.srv.lrz.de [127.0.0.1]) (amavis, port 20024)
- with LMTP id 774kSpfJgTYp; Thu, 26 Jun 2025 15:49:03 +0200 (CEST)
-Received: from [IPV6:2a02:2455:1858:e00::6d26] (unknown [IPv6:2a02:2455:1858:e00::6d26])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by postout2.mail.lrz.de (Postfix) with ESMTPSA id 4bSg5W2QzNzyTJ;
-	Thu, 26 Jun 2025 15:49:03 +0200 (CEST)
-Message-ID: <15fa8a27-958f-42d2-ac1f-0fce248cfc1f@tum.de>
-Date: Thu, 26 Jun 2025 15:49:02 +0200
+	s=arc-20240116; t=1750946524; c=relaxed/simple;
+	bh=h0XSD/BWdf0Qvtb5azjopNJatE0mUQK8ebE7L+3nV2Q=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=MAltYCwWMwBus/Hz/F8MkO+jfTcz43eDn9+Gxq5vlWuP+P24SFgWtL36tKzDcHeB8syIvSzOt30motdrPioRCaDEWAHN81T5qRUSA1izxG2esYt+KpAcTrFhx/Z2oEBwsNjct/Ostp52p70NNtkGfnLcA8JiLZ7IhwlUaCnMjk0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZJKSdpxA; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-748f3d4c7e7so936102b3a.3
+        for <kvm@vger.kernel.org>; Thu, 26 Jun 2025 07:02:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1750946522; x=1751551322; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=fMo1zXBi4ABASxAn7/TUa/oHB3Dd2INFCXK5oGhevGw=;
+        b=ZJKSdpxAxCpw9IBq2uuL4pV7rhGG4Hbe0Q63aiZkCpjQ6XJeN4kHx+WECc1e+5HjGt
+         D/0uCj93VOfBRYqOLtww3P1iZndIswXk9sm/SNbQZGO5XV0TSkcjU+PP3gO/wF0dxK/e
+         cJiksiAPqmzpnU9J7psr/ivn0kSQg17S6eBiV1CIfvaaPUaNqU8YsnZ5VFZjFeQr0eJg
+         99bfFmj+ORHGtOuSrsp7nksGXMq14gFiVefOO5l0FkC8QSSfEJIRd+jWXuAJfcw8FSWr
+         oLAc5R/1egZdhcjV6tKCDOte+HkuT46wfVpVe7gavLhTEsl9nHCIzcPgsbY1uLQJwZXB
+         lXMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750946522; x=1751551322;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fMo1zXBi4ABASxAn7/TUa/oHB3Dd2INFCXK5oGhevGw=;
+        b=erR79Vb3hGBS4oFip28Uk2cNMsIz5xH09E9PIWNyTVHOixz7jaUdP81TMaV2oZM1+j
+         PR5eUSabTyZCX0lSzaAal3JA2E3u0pjm7Pq4LpX7teJ/WqLdb5S2uhIqM4XQOKTnnoTf
+         ywyoZkcXqMIXzBL+MxbUpeXzmcz90Jee97AeMwiP49APxhbnpj4YIOePla3ROWOc1DbO
+         7Ugj51kdQq5VSMOqDsqQY2BVwKs3Aablk00zIB3drqqOOikOwsfn3RHvC3AVFro4EcKw
+         NT0vrGVjZ2nt3i5QSMuzy/YLGm60PXO0hNr15GeDbL+AvXWPrvP7ga0K9TrHI3S/Xe5c
+         kyOg==
+X-Forwarded-Encrypted: i=1; AJvYcCXEP7sFtnpoen3/kkfrGZK7u5CKxKVZqm36+MTnlxmEIPzEwUjkGM8m89cz2oTHmIc85Pg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwCZbk16gTALJak2/K9XsBAUp0RjBmksEDdWWH3dlL/5qvQjtF8
+	VXz/M+neP9fNrkQKtdQe8N3HKGw/8UbrXjnGjoeX7gl3dKl+0ci4OtyDYdtLEmoZ2sCZn+MO+bp
+	//C7wVA==
+X-Google-Smtp-Source: AGHT+IE0OwgFZSmj4Dy27VJpNnAoCNiBcct4nDUkJRChXD5EOM0LPAX9MmgV2AVIdkZFX/GLYU25c0jZ5wI=
+X-Received: from pgbdm12.prod.google.com ([2002:a05:6a02:d8c:b0:b31:be7c:3c6b])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:43a4:b0:1f3:418d:91b5
+ with SMTP id adf61e73a8af0-2207f28b435mr12186153637.24.1750946521935; Thu, 26
+ Jun 2025 07:02:01 -0700 (PDT)
+Date: Thu, 26 Jun 2025 07:02:00 -0700
+In-Reply-To: <20250626125720.3132623-1-alexandre.chartre@oracle.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] x86/hyper-v: Filter non-canonical addresses passed via
- HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST(_EX)
-To: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: Vitaly Kuznetsov <vkuznets@redhat.com>, pbonzini@redhat.com
-References: <c090efb3-ef82-499f-a5e0-360fc8420fb7@tum.de>
- <175088956523.720749.10160134537876951534.b4-ty@google.com>
-Content-Language: en-US
-From: Manuel Andreas <manuel.andreas@tum.de>
-Autocrypt: addr=manuel.andreas@tum.de; keydata=
- xjMEY9Zx/RYJKwYBBAHaRw8BAQdALWzRzW9a74DX4l6i8VzXGvv72Vz0qfvj9s7bjBD905nN
- Jk1hbnVlbCBBbmRyZWFzIDxtYW51ZWwuYW5kcmVhc0B0dW0uZGU+wokEExYIADEWIQQuSfNX
- 11QV6exAUmOqZGwY4LuingUCY9Zx/QIbAwQLCQgHBRUICQoLBRYCAwEAAAoJEKpkbBjgu6Ke
- McQBAPyP530S365I50I5rM2XjH5Hr9YcUQATD5dusZJMDgejAP9T/wUurwQSuRfm1rK8cNcf
- w4wP3+PLvL+J+kuVku93CM44BGPWcf0SCisGAQQBl1UBBQEBB0AmCAf31tLBD5tvtdZ0XX1B
- yGLUAxhgmFskGyPhY8wOKQMBCAfCeAQYFggAIBYhBC5J81fXVBXp7EBSY6pkbBjgu6KeBQJj
- 1nH9AhsMAAoJEKpkbBjgu6Kej6YA/RvJdXMjsD5csifolLw53KX0/ElM22SvaGym1+KiiVND
- AQDy+y+bCXI+J713/AwLBsDxTEXmP7Cp49ZqbAu83NnpBQ==
-In-Reply-To: <175088956523.720749.10160134537876951534.b4-ty@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20250626125720.3132623-1-alexandre.chartre@oracle.com>
+Message-ID: <aF1S2EIJWN47zLDG@google.com>
+Subject: Re: [PATCH] kvm/x86: ARCH_CAPABILITIES should not be advertised on AMD
+From: Sean Christopherson <seanjc@google.com>
+To: Alexandre Chartre <alexandre.chartre@oracle.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, pbonzini@redhat.com, 
+	xiaoyao.li@intel.com, x86@kernel.org, konrad.wilk@oracle.com, 
+	boris.ostrovsky@oracle.com, Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On 6/26/25 12:25 AM, Sean Christopherson wrote:
-> On Wed, 25 Jun 2025 15:53:19 +0200, Manuel Andreas wrote:
->> In KVM guests with Hyper-V hypercalls enabled, the hypercalls
->> HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST and HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST_EX
->> allow a guest to request invalidation of portions of a virtual TLB.
->> For this, the hypercall parameter includes a list of GVAs that are supposed
->> to be invalidated.
->>
->> However, when non-canonical GVAs are passed, there is currently no
->> filtering in place and they are eventually passed to checked invocations of
->> INVVPID on Intel / INVLPGA on AMD.
->> While the AMD variant (INVLPGA) will silently ignore the non-canonical
->> address and perform a no-op, the Intel variant (INVVPID) will fail and end
->> up in invvpid_error, where a WARN_ONCE is triggered:
->>
->> [...]
-> 
-> Applied to kvm-x86 fixes, with a massaged changelog, e.g. to call out that
-> "real" Hyper-V behaves this way.  Thanks!
-> 
-> [1/1] x86/hyper-v: Filter non-canonical addresses passed via HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST(_EX)
->        https://github.com/kvm-x86/linux/commit/fa787ac07b3c
++Jim
 
-Thanks for the quick approval and Vitaly for the Hyper-V testing!
+For the scope, "KVM: x86:"
+
+On Thu, Jun 26, 2025, Alexandre Chartre wrote:
+> KVM emulates the ARCH_CAPABILITIES on x86 for both vmx and svm.
+> However the IA32_ARCH_CAPABILITIES MSR is an Intel-specific MSR
+> so it makes no sense to emulate it on AMD.
+> 
+> The AMD documentation specifies that this MSR is not defined on
+> the AMD architecture. So emulating this MSR on AMD can even cause
+> issues (like Windows BSOD) as the guest OS might not expect this
+> MSR to exist on such architecture.
+> 
+> Signed-off-by: Alexandre Chartre <alexandre.chartre@oracle.com>
+> ---
+> 
+> A similar patch was submitted some years ago but it looks like it felt
+> through the cracks:
+> https://lore.kernel.org/kvm/20190307093143.77182-1-xiaoyao.li@linux.intel.com/
+
+It didn't fall through the cracks, we deliberately elected to emulate the MSR in
+common code so that KVM's advertised CPUID support would match KVM's emulation.
+
+  On Thu, 2019-03-07 at 19:15 +0100, Paolo Bonzini wrote:
+  > On 07/03/19 18:37, Sean Christopherson wrote:
+  > > On Thu, Mar 07, 2019 at 05:31:43PM +0800, Xiaoyao Li wrote:
+  > > > At present, we report F(ARCH_CAPABILITIES) for x86 arch(both vmx and svm)
+  > > > unconditionally, but we only emulate this MSR in vmx. It will cause #GP
+  > > > while guest kernel rdmsr(MSR_IA32_ARCH_CAPABILITIES) in an AMD host.
+  > > > 
+  > > > Since MSR IA32_ARCH_CAPABILITIES is an intel-specific MSR, it makes no
+  > > > sense to emulate it in svm. Thus this patch chooses to only emulate it
+  > > > for vmx, and moves the related handling to vmx related files.
+  > > 
+  > > What about emulating the MSR on an AMD host for testing purpsoes?  It
+  > > might be a useful way for someone without Intel hardware to test spectre
+  > > related flows.
+  > > 
+  > > In other words, an alternative to restricting emulation of the MSR to
+  > > Intel CPUS would be to move MSR_IA32_ARCH_CAPABILITIES handling into
+  > > kvm_{get,set}_msr_common().  Guest access to MSR_IA32_ARCH_CAPABILITIES
+  > > is gated by X86_FEATURE_ARCH_CAPABILITIES in the guest's CPUID, e.g.
+  > > RDMSR will naturally #GP fault if userspace passes through the host's
+  > > CPUID on a non-Intel system.
+  > 
+  > This is also better because it wouldn't change the guest ABI for AMD
+  > processors.  Dropping CPUID flags is generally not a good idea.
+  > 
+  > Paolo
+
+I don't necessarily disagree about emulating ARCH_CAPABILITIES being pointless,
+but Paolo's point about not changing ABI for existing setups still stands.  This
+has been KVM's behavior for 6 years (since commit 0cf9135b773b ("KVM: x86: Emulate
+MSR_IA32_ARCH_CAPABILITIES on AMD hosts"); 7 years, if we go back to when KVM
+enumerated support without emulating the MSR (commit 1eaafe91a0df ("kvm: x86:
+IA32_ARCH_CAPABILITIES is always supported").
+
+And it's not like KVM is forcing userspace to enumerate support for
+ARCH_CAPABILITIES, e.g. QEMU's named AMD configs don't enumerate support.  So
+while I completely agree KVM's behavior is odd and annoying for userspace to deal
+with, this is probably something that should be addressed in userspace.
+
+> I am resurecting this change because some recent Windows updates (like OS Build
+> 26100.4351) crashes on AMD KVM guests (BSOD with Stop code: UNSUPPORTED PROCESSOR)
+> just because the ARCH_CAPABILITIES is available.
+> 
+> ---
+>  arch/x86/kvm/svm/svm.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index ab9b947dbf4f..600d2029156e 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -5469,6 +5469,9 @@ static __init void svm_set_cpu_caps(void)
+>  
+>  	/* Don't advertise Bus Lock Detect to guest if SVM support is absent */
+>  	kvm_cpu_cap_clear(X86_FEATURE_BUS_LOCK_DETECT);
+> +
+> +	/* Don't advertise ARCH_CAPABILITIES on AMD */
+> +	kvm_cpu_cap_clear(X86_FEATURE_ARCH_CAPABILITIES);
+
+Strictly speaking, I think we'd want to update svm_has_emulated_msr() as well.
+
+>  }
+>  
+>  static __init int svm_hardware_setup(void)
+> -- 
+> 2.43.5
+> 
 
