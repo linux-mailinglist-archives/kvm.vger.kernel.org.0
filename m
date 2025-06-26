@@ -1,153 +1,112 @@
-Return-Path: <kvm+bounces-50841-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50840-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49CB2AEA1F9
-	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 17:08:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 622DAAEA214
+	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 17:13:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B58347BA912
-	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 15:06:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF4956A263D
+	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 15:06:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18BBC2EE613;
-	Thu, 26 Jun 2025 15:00:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA9B82EBBBC;
+	Thu, 26 Jun 2025 14:58:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jY6WFcOd"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Hdcm05Qg"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4083B274FED;
-	Thu, 26 Jun 2025 15:00:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 393FD2EACE3
+	for <kvm@vger.kernel.org>; Thu, 26 Jun 2025 14:58:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750950020; cv=none; b=ddyGLdgX3kqmRZzsA3Z3JG4maTucAhjcOS3JHaqCdJtNPgkCDH1SYdmMew5ya6bnOCpHM3N/X//AkcTX5Dowp9xEk3Lom3UyCqLmi4ged1Zo1VNbcXZah+FRdgkMyO6ZwbBKLJPsyVqloIEr/npbNT8kYDmml5leK0y59FET6zs=
+	t=1750949925; cv=none; b=pfPTVCs+58gtHb9ZK/tEJs/tM8kdv6OlYsmWJMTeo9NQEyyxuHB7I9weU8V+yH8K1aGRI4dd8tizKp8Vt9ls7lc/r9XhrOYxJG5KsO43mSSNv26rZYZDqsyAtL5DfTIDgJMNccPgsTOY+4GOJDJDt3DSdvgKQUjqHyG++IdkTTU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750950020; c=relaxed/simple;
-	bh=NCW1/aOIcerxFsXM9RKk0cIz5hyj78/lxy0fK07wt7U=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DKwpARzI708w2fMw469If5hQZ1BhqoDUgmLAZdjUXxnE0NVoRtVqkWsI/pvzFZxEHQkP/BpsaEVPWt54GKHcNiO7iK8ja+8/DX3eA4V3za7hQJEjfpkdT1j1QX4Pf1ltwOpdFam0ZQa9WaHZLKAfTnxGFdrcZbldIerPmzZMP6g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jY6WFcOd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6497BC4CEEB;
-	Thu, 26 Jun 2025 15:00:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750950019;
-	bh=NCW1/aOIcerxFsXM9RKk0cIz5hyj78/lxy0fK07wt7U=;
-	h=From:To:Cc:Subject:Date:From;
-	b=jY6WFcOd1SGKGpGDrERjXC29gPUIPrTazpGKNCvI1U2hS6aC6UCUWA4CHC4AUp/K0
-	 cb/rAlF5yM0g7vlYXFrQfkrVnTz0ZfuKZH5eUcnTisj1nTuDU4ZNq8jM8K7UrFc+D8
-	 omjNMO0uJTdIJzDNPshyXS3AwgYRhXSGAYUSctH+0ncoS5EIsmcED122FfdUd4rf2u
-	 KN2QZTQghyPHBhwVcfTKWU4JLRgzXgM8wHbU6jySSpe7x/elurMAd474kJziO/rPp1
-	 6weQwqZwzYO7ApU/aGQaHb/24sRQxNHeqgMvDzGOLTq4LBsjFSqpQ1YOmpdKs84I1S
-	 MPtVLzhyi//9w==
-From: "Naveen N Rao (AMD)" <naveen@kernel.org>
-To: Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Maxim Levitsky <mlevitsk@redhat.com>
-Cc: <kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>,
-	Vasant Hegde <vasant.hegde@amd.com>,
-	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-Subject: [EARLY RFC] KVM: SVM: Enable AVIC by default from Zen 4
-Date: Thu, 26 Jun 2025 20:21:22 +0530
-Message-ID: <20250626145122.2228258-1-naveen@kernel.org>
-X-Mailer: git-send-email 2.49.0
+	s=arc-20240116; t=1750949925; c=relaxed/simple;
+	bh=vaZ/wVKOO9ojZRN/4yT7HwIlbkw23fQlbABMb7bbVK4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PSTth/4RAk8A9FmunIvBbB5dsHCnQhIHuKxj5tfSOodX/kH2UBQc7up2KqEyZAPiBDS9X+tuAEHNIq5NkN135crnTRtAultDBCo5hf6WLgowYWUs3AS+gJb1ZCHEmpKP2+S8VqSYW6x27Yf3JMHI3UksfBx2AUYGvWvaLU9EedI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Hdcm05Qg; arc=none smtp.client-ip=95.215.58.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Thu, 26 Jun 2025 16:58:27 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1750949911;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vOuqCH7ZkoqL6Tmn+B/nDaPgtnCP16MSLY5lnskHQ2I=;
+	b=Hdcm05Qg5nhxSkz6prIahnkUcmTzr4XBzlqKZwTKI+O0waJiu8QBcOqtbuiiz7N3zgVQTI
+	aT89w1gTaPPCYyF2OYUY7oikqbtLehQyk8wEXK6m4nhEacEyITBn1wp8BWDeLgZ2Y+f5cN
+	ZieXTzWrL6MSbpDr3Cw5IfxXCLqc7GE=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: kvm@vger.kernel.org, lvivier@redhat.com, thuth@redhat.com, 
+	frankja@linux.ibm.com, imbrenda@linux.ibm.com, nrb@linux.ibm.com, pbonzini@redhat.com, 
+	eric.auger@redhat.com, kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, david@redhat.com, linux-s390@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH 0/2] scripts: extra_params rework
+Message-ID: <20250626-b638cf6a9cc5fa8b21da8418@orel>
+References: <20250625154354.27015-1-alexandru.elisei@arm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250625154354.27015-1-alexandru.elisei@arm.com>
+X-Migadu-Flow: FLOW_OUT
 
-This is early RFC to understand if there are any concerns with enabling
-AVIC by default from Zen 4. There are a few issues related to irq window
-inhibits (*) that will need to be addressed before we can enable AVIC,
-but I wanted to understand if there are other issues that I may not be
-aware of. I will split up the changes and turn this into a proper patch
-series once there is agreement on how to proceed.
+On Wed, Jun 25, 2025 at 04:43:52PM +0100, Alexandru Elisei wrote:
+> This series was split from the series that adds support to use kvmtool when
+> using the scripts to run the tests [1]. kvmtool will be supported only for arm
+> and arm64, as they are the only architectures that compile the tests to run with
+> kvmtool.
+> 
+> The justification for these changes is to be able to introduce
+> kvmtool_params for kvmtool specific command line options, and to make a
+> clear distinction between the qemu options and the kvmtool options. This is
+> why qemu_params was added as a replacement for extra_params. extra_params
+> was kept for compatibility purposes for user's custom test definitions.
+> 
+> To avoid duplication of the arguments that are passed to a test's main()
+> function, test_args has been split from qemu_params. The same test_args
+> will be used by both qemu and kvmtool.
+> 
+> [1] https://lore.kernel.org/kvm/20250507151256.167769-1-alexandru.elisei@arm.com/
+> 
+> Alexandru Elisei (2):
+>   scripts: unittests.cfg: Rename 'extra_params' to 'qemu_params'
+>   scripts: Add 'test_args' test definition parameter
+> 
+>  arm/unittests.cfg     |  94 ++++++++++++++----------
+>  docs/unittests.txt    |  30 +++++---
+>  powerpc/unittests.cfg |  21 +++---
+>  riscv/unittests.cfg   |   2 +-
+>  s390x/unittests.cfg   |  53 +++++++-------
+>  scripts/common.bash   |  16 +++--
+>  scripts/runtime.bash  |  24 ++++---
+>  x86/unittests.cfg     | 164 ++++++++++++++++++++++++------------------
+>  8 files changed, 237 insertions(+), 167 deletions(-)
+> 
+> 
+> base-commit: 507612326c9417b6330b91f7931678a4c6866395
+> -- 
+> 2.50.0
+>
 
-AVIC (and x2AVIC) is fully functional since Zen 4, and has so far been
-working well in our tests across various workloads. So, enable AVIC by
-default from Zen 4.
+This is already reviewed by me, but in order to encourage other arch
+maintainers to also ack, then I'll state
 
-CPUs prior to Zen 4 are affected by hardware errata related to AVIC and
-workaround for those (erratum #1235) is only just landing upstream. So,
-it is unlikely that anyone was using AVIC on those CPUs. Start requiring
-users on those CPUs to pass force_avic=1 to explicitly enable AVIC going
-forward. This helps convey that AVIC isn't fully enabled (so users are
-aware of what they are signing up for), while allowing us to make
-kvm_amd module parameter 'avic' as an alias for 'enable_apicv'
-simplifying the code.  The only downside is that force_avic taints the
-kernel, but if this is otherwise agreeable, the taint can be restricted
-to the AVIC feature bit not being enabled.
+ACK for arm and riscv
 
-Finally, stop complaining that x2AVIC CPUID feature bit is present
-without basic AVIC feature bit, since that looks to be the way AVIC is
-being disabled on certain systems and enabling AVIC by default will
-start printing this warning on systems that have AVIC disabled.
+again.
 
-(*) http://lkml.kernel.org/r/Z6JoInXNntIoHLQ8@google.com
-
-Signed-off-by: Naveen N Rao (AMD) <naveen@kernel.org>
----
- arch/x86/kvm/svm/avic.c | 11 +++++------
- arch/x86/kvm/svm/svm.c  | 10 +++-------
- 2 files changed, 8 insertions(+), 13 deletions(-)
-
-diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-index a34c5c3b164e..bf7f91f41a6e 100644
---- a/arch/x86/kvm/svm/avic.c
-+++ b/arch/x86/kvm/svm/avic.c
-@@ -1101,12 +1101,11 @@ bool avic_hardware_setup(void)
- 	if (!npt_enabled)
- 		return false;
- 
--	/* AVIC is a prerequisite for x2AVIC. */
--	if (!boot_cpu_has(X86_FEATURE_AVIC) && !force_avic) {
--		if (boot_cpu_has(X86_FEATURE_X2AVIC)) {
--			pr_warn(FW_BUG "Cannot support x2AVIC due to AVIC is disabled");
--			pr_warn(FW_BUG "Try enable AVIC using force_avic option");
--		}
-+	if (!boot_cpu_has(X86_FEATURE_AVIC) && !force_avic)
-+		return false;
-+
-+	if (!force_avic && (boot_cpu_data.x86 < 0x19 || boot_cpu_has(X86_FEATURE_ZEN3))) {
-+		pr_warn("AVIC disabled due to hardware errata. Use force_avic=1 if you really want to enable AVIC.\n");
- 		return false;
- 	}
- 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index ab11d1d0ec51..9b5356e74384 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -158,12 +158,7 @@ module_param(lbrv, int, 0444);
- static int tsc_scaling = true;
- module_param(tsc_scaling, int, 0444);
- 
--/*
-- * enable / disable AVIC.  Because the defaults differ for APICv
-- * support between VMX and SVM we cannot use module_param_named.
-- */
--static bool avic;
--module_param(avic, bool, 0444);
-+module_param_named(avic, enable_apicv, bool, 0444);
- module_param(enable_ipiv, bool, 0444);
- 
- module_param(enable_device_posted_irqs, bool, 0444);
-@@ -5404,7 +5399,8 @@ static __init int svm_hardware_setup(void)
- 			goto err;
- 	}
- 
--	enable_apicv = avic = avic && avic_hardware_setup();
-+	if (enable_apicv)
-+		enable_apicv = avic_hardware_setup();
- 
- 	if (!enable_apicv) {
- 		enable_ipiv = false;
-
-base-commit: 7ee45fdd644b138e7a213c6936474161b28d0e1a
--- 
-2.49.0
-
+Thanks,
+drew
 
