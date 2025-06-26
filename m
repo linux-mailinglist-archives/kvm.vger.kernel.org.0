@@ -1,64 +1,64 @@
-Return-Path: <kvm+bounces-50832-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50833-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B85E5AE9CB5
-	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 13:40:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E56DAE9CB9
+	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 13:41:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3BC701C27354
-	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 11:41:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE65C16A7F3
+	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 11:41:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2926F275AF6;
-	Thu, 26 Jun 2025 11:40:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D23AA277030;
+	Thu, 26 Jun 2025 11:40:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gpNlFNUS"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OkOarzrp"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B41C7275112
-	for <kvm@vger.kernel.org>; Thu, 26 Jun 2025 11:40:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B927275B15
+	for <kvm@vger.kernel.org>; Thu, 26 Jun 2025 11:40:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750938028; cv=none; b=vDj3uxTiwpSliAvfCAZS9ntlhg2SBlh24ZoUgjIgB09dzDaeBKryTpFIeYSCvWRFR8xVpic6RhaTdFCLgEd/r39Z9l/vvWZLxRWgIIHeDKx3MHotHAPseFHilHWvz7Ccs4JXIHEkse2W98DZUU1ZF0DMimHnmZ4hbFXmd2Z1QVE=
+	t=1750938032; cv=none; b=Kjbun7/ckTJWIxqD/eETzeS0b1g0868TAxhtLZP7S6lQ6k4aTNITmMyhl6phpDeTKMmHneNZXYsiFe/iU9rVPUPHgp7AmgD+HKbTZ+hq8Lq1+eFPiv2N+7ij/DMo8Jn2RCN0VTQS+hx3Oxc+O2OjANJTAe1Iro6HjqthBCEYHyI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750938028; c=relaxed/simple;
-	bh=tk5jvXgkGUQmLq3N1J+1o3Y+WenHHrJn+2FmTp/OOIY=;
+	s=arc-20240116; t=1750938032; c=relaxed/simple;
+	bh=gF7Dll6taOeDsbH4ksRfAoJl5VhEo+av+s5fHVt7tJo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cO13zAlVH+1GhpSIj7/1mgu05eW3MpCRJaBx3KjPYP2I3BzfRrR4dstfCiqyminlMpw9M/fYkvdgrFUyY+HRkYEmgcgGRdJBL7OWK4OSxjeIr1lxsbiy+ET/v+IDvUcgzilbQDdwZcOy8+yWyDr9pnDJJL2rfMMfxIdgZsNcR8w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gpNlFNUS; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=sO57/LtZ87b/iTpkciXQ3a3/ItgrCNynHPx2vnhsuGU1+M0i3TqOpSacebXBQvtKPIxJoF5vQB5gPVCTWcuNNZVlNDc7DQn/N8czzYnLNJ2W8IlQSGEeFqq3dMG278To/WTHRkMqY6tR/9S2ISmP4ymauJYEHpHaRsx3WefRLxk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OkOarzrp; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750938025;
+	s=mimecast20190719; t=1750938029;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=0A7ZioTln4LPh22RUCIFeccixapHl/G2T0iIAftPGS0=;
-	b=gpNlFNUSUGTK++3OhNQiKAoejUdRaXJ7dWtMOStwj9f0gl9o3PY8nSbxQvwM0OnTBeOHxd
-	MT+bS2VAkpzGehzEo2NriKXEA8ZBDtNzHJYmdQE2eN/8XDMXJtW+t/Lsoj/VOAMzazh5tz
-	59R57VB8NWvnZ4xI5e3/CQBqGRB4H7s=
+	bh=JNkDX/QAcHMyJfzVyRcdpNBLgVVHagtHqZ1jRyb0YuQ=;
+	b=OkOarzrpNaV8R4s9eliqZmb1hHupuWQ3Ocy3Nrxv31J+1HTWrhJx4mUUuF075b2cJwisUm
+	aRAvVMQYlbDrtago5NL/oVz2GPVQT1JF7xMpmY8KaVdP/eLvUoleziUdy7yKWydG/WLi9Y
+	Mnv1jt95Tk5yj7dVvqpCOCMQ0ske1bU=
 Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-157-xS1XLl4ONjCv1ZRol4yNmQ-1; Thu,
- 26 Jun 2025 07:40:22 -0400
-X-MC-Unique: xS1XLl4ONjCv1ZRol4yNmQ-1
-X-Mimecast-MFC-AGG-ID: xS1XLl4ONjCv1ZRol4yNmQ_1750938021
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-686-AWXqvFvjNfGXPPfo_GJD0w-1; Thu,
+ 26 Jun 2025 07:40:24 -0400
+X-MC-Unique: AWXqvFvjNfGXPPfo_GJD0w-1
+X-Mimecast-MFC-AGG-ID: AWXqvFvjNfGXPPfo_GJD0w_1750938022
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 19A8C1800290;
-	Thu, 26 Jun 2025 11:40:21 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 83F6E1800268;
+	Thu, 26 Jun 2025 11:40:22 +0000 (UTC)
 Received: from sirius.home.kraxel.org (unknown [10.44.32.244])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4E1A230002C0;
-	Thu, 26 Jun 2025 11:40:20 +0000 (UTC)
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7A5FD19560B3;
+	Thu, 26 Jun 2025 11:40:21 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-	id 5099B180078E; Thu, 26 Jun 2025 13:40:15 +0200 (CEST)
+	id A4C77180090C; Thu, 26 Jun 2025 13:40:15 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: linux-coco@lists.linux.dev,
 	kvm@vger.kernel.org
@@ -69,10 +69,12 @@ Cc: Gerd Hoffmann <kraxel@redhat.com>,
 	Dave Hansen <dave.hansen@linux.intel.com>,
 	x86@kernel.org (maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
 	"H. Peter Anvin" <hpa@zytor.com>,
-	linux-kernel@vger.kernel.org (open list:X86 ARCHITECTURE (32-BIT AND 64-BIT))
-Subject: [PATCH v4 2/3] x86/sev: fix error handling in sev_es_efi_map_ghcbs_caas()
-Date: Thu, 26 Jun 2025 13:40:12 +0200
-Message-ID: <20250626114014.373748-3-kraxel@redhat.com>
+	Ard Biesheuvel <ardb@kernel.org>,
+	linux-kernel@vger.kernel.org (open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
+	linux-efi@vger.kernel.org (open list:EXTENSIBLE FIRMWARE INTERFACE (EFI))
+Subject: [PATCH v4 3/3] x86/sev: Let sev_es_efi_map_ghcbs() map the caa pages too
+Date: Thu, 26 Jun 2025 13:40:13 +0200
+Message-ID: <20250626114014.373748-4-kraxel@redhat.com>
 In-Reply-To: <20250626114014.373748-1-kraxel@redhat.com>
 References: <20250626114014.373748-1-kraxel@redhat.com>
 Precedence: bulk
@@ -82,40 +84,104 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Pass up error codes from kernel_map_pages_in_pgd() instead of
-returning '1' on failure.
+OVMF EFI firmware needs access to the CAA page to do SVSM protocol calls. For
+example, when the SVSM implements an EFI variable store, such calls will be
+necessary.
+
+So add that to sev_es_efi_map_ghcbs() and also rename the function to reflect
+the additional job it is doing now.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- arch/x86/coco/sev/core.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ arch/x86/include/asm/sev.h     |  4 ++--
+ arch/x86/coco/sev/core.c       | 17 +++++++++++++++--
+ arch/x86/platform/efi/efi_64.c |  4 ++--
+ 3 files changed, 19 insertions(+), 6 deletions(-)
 
+diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
+index 58e028d42e41..6e0ef192f23b 100644
+--- a/arch/x86/include/asm/sev.h
++++ b/arch/x86/include/asm/sev.h
+@@ -445,7 +445,7 @@ static __always_inline void sev_es_nmi_complete(void)
+ 	    cc_platform_has(CC_ATTR_GUEST_STATE_ENCRYPT))
+ 		__sev_es_nmi_complete();
+ }
+-extern int __init sev_es_efi_map_ghcbs(pgd_t *pgd);
++extern int __init sev_es_efi_map_ghcbs_caas(pgd_t *pgd);
+ extern void sev_enable(struct boot_params *bp);
+ 
+ /*
+@@ -556,7 +556,7 @@ static inline void sev_es_ist_enter(struct pt_regs *regs) { }
+ static inline void sev_es_ist_exit(void) { }
+ static inline int sev_es_setup_ap_jump_table(struct real_mode_header *rmh) { return 0; }
+ static inline void sev_es_nmi_complete(void) { }
+-static inline int sev_es_efi_map_ghcbs(pgd_t *pgd) { return 0; }
++static inline int sev_es_efi_map_ghcbs_caas(pgd_t *pgd) { return 0; }
+ static inline void sev_enable(struct boot_params *bp) { }
+ static inline int pvalidate(unsigned long vaddr, bool rmp_psize, bool validate) { return 0; }
+ static inline int rmpadjust(unsigned long vaddr, bool rmp_psize, unsigned long attrs) { return 0; }
 diff --git a/arch/x86/coco/sev/core.c b/arch/x86/coco/sev/core.c
-index b6db4e0b936b..3de8c3d2b55d 100644
+index 3de8c3d2b55d..26b96e19f5e1 100644
 --- a/arch/x86/coco/sev/core.c
 +++ b/arch/x86/coco/sev/core.c
-@@ -1050,6 +1050,7 @@ int __init sev_es_efi_map_ghcbs(pgd_t *pgd)
+@@ -1045,11 +1045,13 @@ int __init sev_es_setup_ap_jump_table(struct real_mode_header *rmh)
+  * This is needed by the OVMF UEFI firmware which will use whatever it finds in
+  * the GHCB MSR as its GHCB to talk to the hypervisor. So make sure the per-cpu
+  * runtime GHCBs used by the kernel are also mapped in the EFI page-table.
++ *
++ * When running under SVSM the CCA page is needed too, so map it as well.
+  */
+-int __init sev_es_efi_map_ghcbs(pgd_t *pgd)
++int __init sev_es_efi_map_ghcbs_caas(pgd_t *pgd)
  {
  	struct sev_es_runtime_data *data;
- 	unsigned long address, pflags;
-+	int retval;
+-	unsigned long address, pflags;
++	unsigned long address, pflags, pflags_enc;
+ 	int retval;
  	int cpu;
  	u64 pfn;
+@@ -1058,6 +1060,7 @@ int __init sev_es_efi_map_ghcbs(pgd_t *pgd)
+ 		return 0;
  
-@@ -1064,8 +1065,9 @@ int __init sev_es_efi_map_ghcbs(pgd_t *pgd)
- 		address = __pa(&data->ghcb_page);
- 		pfn = address >> PAGE_SHIFT;
+ 	pflags = _PAGE_NX | _PAGE_RW;
++	pflags_enc = cc_mkenc(pflags);
  
--		if (kernel_map_pages_in_pgd(pgd, pfn, address, 1, pflags))
--			return 1;
-+		retval = kernel_map_pages_in_pgd(pgd, pfn, address, 1, pflags);
-+		if (retval != 0)
-+			return retval;
+ 	for_each_possible_cpu(cpu) {
+ 		data = per_cpu(runtime_data, cpu);
+@@ -1068,6 +1071,16 @@ int __init sev_es_efi_map_ghcbs(pgd_t *pgd)
+ 		retval = kernel_map_pages_in_pgd(pgd, pfn, address, 1, pflags);
+ 		if (retval != 0)
+ 			return retval;
++
++		if (snp_vmpl) {
++			address = per_cpu(svsm_caa_pa, cpu);
++			if (!address)
++				return 1;
++
++			pfn = address >> PAGE_SHIFT;
++			if (kernel_map_pages_in_pgd(pgd, pfn, address, 1, pflags_enc))
++				return 1;
++		}
  	}
  
  	return 0;
+diff --git a/arch/x86/platform/efi/efi_64.c b/arch/x86/platform/efi/efi_64.c
+index e7e8f77f77f8..97e8032db45d 100644
+--- a/arch/x86/platform/efi/efi_64.c
++++ b/arch/x86/platform/efi/efi_64.c
+@@ -216,8 +216,8 @@ int __init efi_setup_page_tables(unsigned long pa_memmap, unsigned num_pages)
+ 	 * When SEV-ES is active, the GHCB as set by the kernel will be used
+ 	 * by firmware. Create a 1:1 unencrypted mapping for each GHCB.
+ 	 */
+-	if (sev_es_efi_map_ghcbs(pgd)) {
+-		pr_err("Failed to create 1:1 mapping for the GHCBs!\n");
++	if (sev_es_efi_map_ghcbs_caas(pgd)) {
++		pr_err("Failed to create 1:1 mapping for the GHCBs and CAAs!\n");
+ 		return 1;
+ 	}
+ 
 -- 
 2.50.0
 
