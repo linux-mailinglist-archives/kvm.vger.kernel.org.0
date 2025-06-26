@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-50882-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50883-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9063FAEA7BF
-	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 22:06:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24655AEA7C5
+	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 22:07:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 689221C45633
-	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 20:06:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F03C67AD600
+	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 20:05:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 846D52F2730;
-	Thu, 26 Jun 2025 20:05:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F4902F3649;
+	Thu, 26 Jun 2025 20:06:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oIRE3E7c"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uA30aR6o"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oi1-f202.google.com (mail-oi1-f202.google.com [209.85.167.202])
+Received: from mail-oa1-f74.google.com (mail-oa1-f74.google.com [209.85.160.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 652612F0E57
-	for <kvm@vger.kernel.org>; Thu, 26 Jun 2025 20:05:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E9312F2341
+	for <kvm@vger.kernel.org>; Thu, 26 Jun 2025 20:05:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750968356; cv=none; b=gyl7HMxYfwAllfhJX+AtdA6vUNFyiFxCb2u/KuIP6a+QLrtCx01+rADI6aWpNNqLhgqE29J4z18rp3CkLJjT4KWybY5RakGJeYWG4em9/xw6g+iKAz4N4afAGzSOm9RFD9vQUdt+9qESkkbKxIe2NYqx3VuGLXDQYyS2ET+PApg=
+	t=1750968358; cv=none; b=b6vmejNtJ64L0ZLB//7Hkwz2/XpwHB529yAPZANeCTUI0fsF7Gh8afGhM0/tme7j5XUKeGRWv5BCuo1txBSuUBKTywRV9o3lqBKDNbG5g8yZrKzRQvI2z0MNaLg7lL/EVqrfRjv0cTLl0L4upUJw7zKiWmpA+xYQAHea9rbwnh8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750968356; c=relaxed/simple;
-	bh=T2AAAwNCvFAm9YUhWYISU/OAnWzXdQk+10RnZrJqatc=;
+	s=arc-20240116; t=1750968358; c=relaxed/simple;
+	bh=bO4sw7/hINJdmJB2o7i6RovRyFWviPuCwq5wxaiI8Bs=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=B3Kc6KSIoVfxuOWd7GZSOZWNrFWIIaSiGRZyLmFE9cjskRXtbt/5a+Q8LFysQLmojQjK3IoBThxvLvNXEj4n3aeiJG88HSzHBrq95+2WPuBjArlYR/18Qmy7DgX7YIk6TsYXFZ/j9YcilirH3Xn0FcKy2ZarHKoaCdQ5MdRN1rw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oIRE3E7c; arc=none smtp.client-ip=209.85.167.202
+	 To:Cc:Content-Type; b=X2z6e/wX/Xs1KnTgbx9eMdxHg4qWry01TwAilUq6wmOeWhqTQ+E8USQCwjjQ3kL1C1fsZLAXDx6TOHehtWS66sb6hkyqawXMjIRsWYteFsSwLUPZqhZ4FW5zdlF4XhX15ZMpsZIEGEVmlmxuFr5ZvGrZ0HG/8YZRYtqyAD/JzVE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uA30aR6o; arc=none smtp.client-ip=209.85.160.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
-Received: by mail-oi1-f202.google.com with SMTP id 5614622812f47-4033c872b60so1480438b6e.2
-        for <kvm@vger.kernel.org>; Thu, 26 Jun 2025 13:05:54 -0700 (PDT)
+Received: by mail-oa1-f74.google.com with SMTP id 586e51a60fabf-2eb585690dcso1062057fac.2
+        for <kvm@vger.kernel.org>; Thu, 26 Jun 2025 13:05:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750968353; x=1751573153; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1750968355; x=1751573155; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EHt9BrBIYqZp5kZ5sjlL9mrhswYvvwFRhl772iB1+XY=;
-        b=oIRE3E7c3Net0Zrc38DGPcJR5uot6iNbrChMN9jOLEjSbQ7+lPcoLwaGiEHlieHL5q
-         GI6t+qbp22yc02kprAzzTLCeCnL0NDN5l7cErzEHnSecjLMsRRMg7qDQ4kdceU/0aLwD
-         d9gAos2CxaYeYiCNAUZw4/uL5GIqPBOFlYJKrQQP6Haiw8PJQS1u4b/rT60E93vRMfHL
-         8IjF2PAX05JSzfvbVyf3TDst/7ir1SJg/mD9QxvDcqVG4FpzTIlf7LTUmRdKeviWdcE9
-         EmWjeAAmvXedHn44R2MEvZXGeTNK49eN3J8nG5P8c9G/+lyviSi2EZCHJznjuMeggbUa
-         9bjw==
+        bh=zPJCCS28P/ht0GkmQnG+3GK0DAvT59T6hS3LwMCctEw=;
+        b=uA30aR6oR2954HYTfYQXRlZ9wSLECWkJcxPAMzuDhZX9Y7SnOvdyn2Qwx23mcMrtc7
+         va0uaFC4HOee3koJunfQpLs0vibX8CFz2mZR/lru52ZcQXMDflDaw3ga2G73FCTzUB/F
+         eKyEhO/Sc+tomQMz1OvSrpQeWBxYBEzJgs71gxIAHTF8FwbOnFfD4x8UvKu2JJtEEjcc
+         06jQx/mdhl/lg6LycCNrMJi+gy5fw7BF2MWtEyY0NGyWR5tUXEoXI+04UxzJsWnrMM+E
+         +P5lMMu5VUIMfLHzqvLE2bxxi72vIkngI2Nz6C3/3fOyMtBXqGsL9gRTUKgxUXsQtuxQ
+         g4oA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750968353; x=1751573153;
+        d=1e100.net; s=20230601; t=1750968355; x=1751573155;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EHt9BrBIYqZp5kZ5sjlL9mrhswYvvwFRhl772iB1+XY=;
-        b=WBV+LqO0O3/Rsp4nB5Zm7RDEojNQYY+vso2DX6q8i0zotefxiou+R+njYUlKGlQV3d
-         Xi+3j/jjWh7AfbbaKPEempTRSddjZHq1mZJuPXVywK3QvPgZipTqnFm/QI9JewWzOgEb
-         rprxtntfsfGeVBZ1pPHhNrVY8KnZOOdtyZyxjJ9QZxbWxKxpjnyB0tAhx9tRjQcjdErN
-         5ikX7e3t/LSG+x9D38qR96XKOtZnHLHLTthDWXqZHlOPuEXIGgOPK7J2V64s7azthdZd
-         ZojeAtyVU6sL/aH35J+kuQ7j0RZulG+ZX2Zxf+krB8gBWbUALeba8+7jSLx54A253MBs
-         6PiQ==
-X-Gm-Message-State: AOJu0YxpkVNR8kxivFiD1Zi/RZ1W7qW1LMy0gRZqr4P8+km1VHnJPRU0
-	p0gRfuoQqQHKLS2lYp1ul6EOOXQhEkQMjMcw08HGRelLYXsejaNLt2als+lZT03Vs0WiFGy1fWO
-	WI8B51ys0HOD9n7TOY9iYKznJtajGmJSZtYkWCwGAbzoICg+7/e/2n4t4ynczpeFWiwwvX2lcyT
-	0ezJL7hhJZRTVCLxTIyKrV1Dp5pEH1LXwEBPFeCqUPvDKdwP8kjCFH15/tjkc=
-X-Google-Smtp-Source: AGHT+IFlRtE1eWK/FMjUnULxroCH+ZQKYqxRY5qaFdZ+f+SoiV9KEwtPmc0HwZMn2/GT2thgfmq4kS9LjJKIm6e5aQ==
-X-Received: from oibcj14.prod.google.com ([2002:a05:6808:1b8e:b0:40a:c2da:1f99])
+        bh=zPJCCS28P/ht0GkmQnG+3GK0DAvT59T6hS3LwMCctEw=;
+        b=BLSjJcGi95wTgSUE05g5f5yS7QTSggPkc74mZEab8GJcBRnU6Zzk+HLjubV6P+MDTw
+         vfrjmeoPUianNki9JFWNzw5woyR0ElldjIpVvfrFp7iUrl4xX5yVxbatPAy4uPCO1c3Z
+         fgGm6aNMafF4Kdz5HOB6aydfUqBgL2PSy0RRGQiyqVvnPz+5kJIIMefzG0gAE5T49IRG
+         8ZDVbqrNHIGLiNi4fhyujKQf20w6whpRbj/7xGb6DZ7KvlP2gq1wBqgbd0ZXJ+0axXyV
+         bJCKZonWod77IxFDshyuqY+z70B2mdeGVpXTtJ6E3C7FrKRDUuGSvObP7gdXqtOMP+Uk
+         P+Tg==
+X-Gm-Message-State: AOJu0Yy+bhugeuIRoRKkmaZQwLdmgRsaitbRvMY5iVdvLX84AcYIiIoG
+	z31HTr5q3od3sW0Zmm0/GcF43E6RQm6WMbzgTikuzQzuv+l2PAng2ZEdCQ3OqsUjOvLHGD3MGEu
+	nK82esPG5OaViIzourP2Xg8QcJBVwe84/5BaPmOmQOQS3Or6OGIsOZs49GufKC9i8nhzn2XpbzE
+	41fRxUL/cKP56CbSAsh6Y3pIiSw7fAKeWcHpQvQlHEyO9Pr0rHt6F0ckOVIPk=
+X-Google-Smtp-Source: AGHT+IEAValjLvIQUTTrl0WGiv7qDA/VK+W0m1ZQUDRoDH/VSaq0CR37ZF/2z6Fxf5GRvTFbBupf/JJhqDdR5wa1WQ==
+X-Received: from oabxc6.prod.google.com ([2002:a05:6870:ce06:b0:2e8:ed52:15c9])
  (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6808:6a87:b0:409:59d:2fb with SMTP id 5614622812f47-40b33c77bfdmr516313b6e.11.1750968353579;
- Thu, 26 Jun 2025 13:05:53 -0700 (PDT)
-Date: Thu, 26 Jun 2025 20:04:38 +0000
+ 2002:a05:6870:7050:10b0:2ef:eddd:690d with SMTP id 586e51a60fabf-2efeddd6bf1mr119143fac.24.1750968354720;
+ Thu, 26 Jun 2025 13:05:54 -0700 (PDT)
+Date: Thu, 26 Jun 2025 20:04:39 +0000
 In-Reply-To: <20250626200459.1153955-1-coltonlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250626200459.1153955-1-coltonlewis@google.com>
 X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Message-ID: <20250626200459.1153955-3-coltonlewis@google.com>
-Subject: [PATCH v3 02/22] arm64: Generate sign macro for sysreg Enums
+Message-ID: <20250626200459.1153955-4-coltonlewis@google.com>
+Subject: [PATCH v3 03/22] KVM: arm64: Define PMI{CNTR,FILTR}_EL0 as undef_access
 From: Colton Lewis <coltonlewis@google.com>
 To: kvm@vger.kernel.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
@@ -89,27 +89,28 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
 	linux-kselftest@vger.kernel.org, Colton Lewis <coltonlewis@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-There's no reason Enums shouldn't be equivalent to UnsignedEnums and
-explicitly specify they are unsigned. This will avoid the annoyance I
-had with HPMN0.
+Because KVM isn't fully prepared to support these yet even though the
+host PMUv3 driver does, define them as undef_access for now.
 
 Signed-off-by: Colton Lewis <coltonlewis@google.com>
 ---
- arch/arm64/tools/gen-sysreg.awk | 1 +
- 1 file changed, 1 insertion(+)
+ arch/arm64/kvm/sys_regs.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/arch/arm64/tools/gen-sysreg.awk b/arch/arm64/tools/gen-sysreg.awk
-index f2a1732cb1f6..fa21a632d9b7 100755
---- a/arch/arm64/tools/gen-sysreg.awk
-+++ b/arch/arm64/tools/gen-sysreg.awk
-@@ -308,6 +308,7 @@ $1 == "Enum" && (block_current() == "Sysreg" || block_current() == "SysregFields
- 	parse_bitdef(reg, field, $2)
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 76c2f0da821f..99fdbe174202 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -3092,6 +3092,9 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ SYS_DESC(SYS_SVCR), undef_access, reset_val, SVCR, 0, .visibility = sme_visibility  },
+ 	{ SYS_DESC(SYS_FPMR), undef_access, reset_val, FPMR, 0, .visibility = fp8_visibility },
  
- 	define_field(reg, field, msb, lsb)
-+	define_field_sign(reg, field, "false")
- 
- 	next
- }
++	{ SYS_DESC(SYS_PMICNTR_EL0), undef_access },
++	{ SYS_DESC(SYS_PMICFILTR_EL0), undef_access },
++
+ 	{ PMU_SYS_REG(PMCR_EL0), .access = access_pmcr, .reset = reset_pmcr,
+ 	  .reg = PMCR_EL0, .get_user = get_pmcr, .set_user = set_pmcr },
+ 	{ PMU_SYS_REG(PMCNTENSET_EL0),
 -- 
 2.50.0.727.gbf7dc18ff4-goog
 
