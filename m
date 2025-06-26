@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-50812-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50813-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEF36AE9807
-	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 10:21:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76BFAAE982C
+	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 10:24:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D06F176332
-	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 08:19:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C49581C432B2
+	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 08:21:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0CE725F996;
-	Thu, 26 Jun 2025 08:19:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B48762701C7;
+	Thu, 26 Jun 2025 08:21:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JHAtd2Ro"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GVFekQ6f"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2F711FF7B4;
-	Thu, 26 Jun 2025 08:19:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D61C52356C0;
+	Thu, 26 Jun 2025 08:21:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750925952; cv=none; b=Lwt0PvPapl7CX+9uIEgb14b5uy7A8xasDICXbj2VppTGzuR+/YqNt7IyubvR1vV3uayIiJlzWc+bBnLOL6gp/a4V+bJXD+RNi5H8y2Y/ojiQ/f08VyN9IY3ZQA6/VTyxKeMEne96at1y3i0/Kx1C7DRaMxsYpwYHUaI2jFt5te0=
+	t=1750926079; cv=none; b=mnqtx0y6nBPdNupfIBACbYxSBmKNBpRiKoQDvQOdpId9aBctv1imXG+utSauoUiSb09jcoukEn7aeU1aypNZmnEtfR9lxn+MlzBUl1PT5pYKTe4NWHlwb9rBU0UEhyc+UAhyu63xAZitp/G3Tdis+PfJYAu+13LbwVSOo/FLSIg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750925952; c=relaxed/simple;
-	bh=agZj/wzaMpG6bvF18cvXlY4v555Y3BqcKQTQxhyrWhE=;
+	s=arc-20240116; t=1750926079; c=relaxed/simple;
+	bh=mS2rnH3fTEDroz6sbYHUy5zTCOw1PaG3HCJiJL66aVc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MWPEF/xpO2ws4gJrn6nC9YL33DzDWe1GjJ/5tAI6St/2LSLHRSck9z7nROgFX0cNQAgYSqSP2qjBpyt5i3XJ81q9fnH0VrlQk0QkMMg/JAqIB7ClRqiQZL1h/Dc1ZmIY9Wuar3AqYwo86G29/ooCLOHkPC1xdKTLSlqe3ihKkoU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JHAtd2Ro; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32322C4CEEB;
-	Thu, 26 Jun 2025 08:19:09 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=EsnRm268kqN1aGzoCz5KKJKonI7Z+wmYqhDMKXLbuv38L+9j3dGvj1FYLYcfwWSjL2a8llXpUsMStDKbnFW2s/W9WmZbTReStQ4uqszG4uYoDN0NqPoyp/3dMtvJnELacsid5xovHGsoIqRlQuevIvZT6jV5nyFbR5NyommLgSc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GVFekQ6f; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F93AC4CEEB;
+	Thu, 26 Jun 2025 08:21:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750925951;
-	bh=agZj/wzaMpG6bvF18cvXlY4v555Y3BqcKQTQxhyrWhE=;
+	s=k20201202; t=1750926079;
+	bh=mS2rnH3fTEDroz6sbYHUy5zTCOw1PaG3HCJiJL66aVc=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JHAtd2RowB8YUj61KdTZX0EkkfQeqM1sQjQiU4ebRUsQTxFnsAtvwmSnDVNOKt3Lj
-	 dZv41Y0aTFp+blxCjjjciIAfJTKsQP8atdMyF50ceEgJymd9Pt2Vwv3h/ZsWHqdv77
-	 9oHdmNyvr+g3lRPE+tAJ+Uiei6mQ1ZTGltFj5nC18Di9/5zaGQLzlOUqKhW355+jSZ
-	 3cudfWUHngbills5+n/2rOKx4Dfh9tdjvS820U27v+Mye/XZsNh/sKyFkcb0PHbjaX
-	 C7Zx2maWxH0nhD12jbl/oyoiKbJSQQ2zldEOPcyG1A/meONM7Uczvd6NuXowBPzuup
-	 9c/+RORnADZXw==
-Date: Thu, 26 Jun 2025 10:19:06 +0200
+	b=GVFekQ6fGGRKvBKRNsCKK583D6A4cf6LjZ/xjYdaItUFnpA582ppkz2/t01OkedVy
+	 tVdFBeAQztmQVF8mPZf0gCA7u6opaErBo20kT0U7jqIq/XloOVLX7gcraZYP/0Jvfk
+	 WN0kqb8tc9LmceFmCTmvKi+xA86EOlePwQHMiIXveQsMI2ZkJuZszm4leFofSj1SE7
+	 FGi3Cg96HpNGuHle8as1DK2ACot4PzZ6i93DRK1YZX0038nuBhCeNaStOdtxKnBWqs
+	 Cs0r4fzPkrPpzJlBKYDxC3T3Boeo+flJc85jq8h/9Ir2IuvSOj1sErud6wwjrnbPK2
+	 GcyMCr/PZz8yg==
+Date: Thu, 26 Jun 2025 10:21:15 +0200
 From: Ingo Molnar <mingo@kernel.org>
 To: Gerd Hoffmann <kraxel@redhat.com>
 Cc: linux-coco@lists.linux.dev, kvm@vger.kernel.org,
@@ -49,14 +49,12 @@ Cc: linux-coco@lists.linux.dev, kvm@vger.kernel.org,
 	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
 	Dave Hansen <dave.hansen@linux.intel.com>,
 	"maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-	"H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-	"open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <linux-kernel@vger.kernel.org>,
-	"open list:EXTENSIBLE FIRMWARE INTERFACE (EFI)" <linux-efi@vger.kernel.org>
-Subject: Re: [PATCH v3 2/2] x86/sev: Let sev_es_efi_map_ghcbs() map the caa
- pages too
-Message-ID: <aF0CemSo0go8-Bru@gmail.com>
+	"H. Peter Anvin" <hpa@zytor.com>,
+	"open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v3 1/2] x86/sev/vc: fix efi runtime instruction emulation
+Message-ID: <aF0C-wVwXWxFjgud@gmail.com>
 References: <20250626074236.307848-1-kraxel@redhat.com>
- <20250626074236.307848-3-kraxel@redhat.com>
+ <20250626074236.307848-2-kraxel@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -65,108 +63,65 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250626074236.307848-3-kraxel@redhat.com>
+In-Reply-To: <20250626074236.307848-2-kraxel@redhat.com>
 
 
 * Gerd Hoffmann <kraxel@redhat.com> wrote:
 
-> OVMF EFI firmware needs access to the CAA page to do SVSM protocol calls. For
-> example, when the SVSM implements an EFI variable store, such calls will be
-> necessary.
+> In case efi_mm is active go use the userspace instruction decoder which
+> supports fetching instructions from active_mm.  This is needed to make
+> instruction emulation work for EFI runtime code, so it can use cpuid
+> and rdmsr.
 > 
-> So add that to sev_es_efi_map_ghcbs() and also rename the function to reflect
-> the additional job it is doing now.
+> EFI runtime code uses the cpuid instruction to gather information about
+> the environment it is running in, such as SEV being enabled or not, and
+> choose (if needed) the SEV code path for ioport access.
+> 
+> EFI runtime code uses the rdmsr instruction to get the location of the
+> CAA page (see SVSM spec, section 4.2 - "Post Boot").
+> 
+> The big picture behind this is that the kernel needs to be able to
+> properly handle #VC exceptions that come from EFI runtime services.
+> Since EFI runtime services have a special page table mapping for the EFI
+> virtual address space, the efi_mm context must be used when decoding
+> instructions during #VC handling.
 > 
 > Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 > ---
->  arch/x86/include/asm/sev.h     |  4 ++--
->  arch/x86/coco/sev/core.c       | 20 ++++++++++++++++++--
->  arch/x86/platform/efi/efi_64.c |  4 ++--
->  3 files changed, 22 insertions(+), 6 deletions(-)
+>  arch/x86/coco/sev/vc-handle.c | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
-> index 58e028d42e41..6e0ef192f23b 100644
-> --- a/arch/x86/include/asm/sev.h
-> +++ b/arch/x86/include/asm/sev.h
-> @@ -445,7 +445,7 @@ static __always_inline void sev_es_nmi_complete(void)
->  	    cc_platform_has(CC_ATTR_GUEST_STATE_ENCRYPT))
->  		__sev_es_nmi_complete();
+> diff --git a/arch/x86/coco/sev/vc-handle.c b/arch/x86/coco/sev/vc-handle.c
+> index 0989d98da130..e498a8965939 100644
+> --- a/arch/x86/coco/sev/vc-handle.c
+> +++ b/arch/x86/coco/sev/vc-handle.c
+> @@ -17,6 +17,7 @@
+>  #include <linux/mm.h>
+>  #include <linux/io.h>
+>  #include <linux/psp-sev.h>
+> +#include <linux/efi.h>
+>  #include <uapi/linux/sev-guest.h>
+>  
+>  #include <asm/init.h>
+> @@ -178,9 +179,14 @@ static enum es_result __vc_decode_kern_insn(struct es_em_ctxt *ctxt)
+>  		return ES_OK;
 >  }
-> -extern int __init sev_es_efi_map_ghcbs(pgd_t *pgd);
-> +extern int __init sev_es_efi_map_ghcbs_caas(pgd_t *pgd);
->  extern void sev_enable(struct boot_params *bp);
 >  
->  /*
-> @@ -556,7 +556,7 @@ static inline void sev_es_ist_enter(struct pt_regs *regs) { }
->  static inline void sev_es_ist_exit(void) { }
->  static inline int sev_es_setup_ap_jump_table(struct real_mode_header *rmh) { return 0; }
->  static inline void sev_es_nmi_complete(void) { }
-> -static inline int sev_es_efi_map_ghcbs(pgd_t *pgd) { return 0; }
-> +static inline int sev_es_efi_map_ghcbs_caas(pgd_t *pgd) { return 0; }
->  static inline void sev_enable(struct boot_params *bp) { }
->  static inline int pvalidate(unsigned long vaddr, bool rmp_psize, bool validate) { return 0; }
->  static inline int rmpadjust(unsigned long vaddr, bool rmp_psize, unsigned long attrs) { return 0; }
-> diff --git a/arch/x86/coco/sev/core.c b/arch/x86/coco/sev/core.c
-> index b6db4e0b936b..b52318d806b6 100644
-> --- a/arch/x86/coco/sev/core.c
-> +++ b/arch/x86/coco/sev/core.c
-> @@ -1045,11 +1045,13 @@ int __init sev_es_setup_ap_jump_table(struct real_mode_header *rmh)
->   * This is needed by the OVMF UEFI firmware which will use whatever it finds in
->   * the GHCB MSR as its GHCB to talk to the hypervisor. So make sure the per-cpu
->   * runtime GHCBs used by the kernel are also mapped in the EFI page-table.
-> + *
-> + * When running under SVSM the CCA page is needed too, so map it as well.
->   */
-> -int __init sev_es_efi_map_ghcbs(pgd_t *pgd)
-> +int __init sev_es_efi_map_ghcbs_caas(pgd_t *pgd)
+> +/*
+> + * User instruction decoding is also required for the EFI runtime. Even though
+> + * EFI runtime is running in kernel mode, it uses special EFI virtual address
+
+s/Even though EFI runtime
+ /Even though the EFI runtime
+
+> + * mappings that require the use of efi_mm to properly address and decode.
+> + */
+>  static enum es_result vc_decode_insn(struct es_em_ctxt *ctxt)
 >  {
->  	struct sev_es_runtime_data *data;
-> -	unsigned long address, pflags;
-> +	unsigned long address, pflags, pflags_enc;
->  	int cpu;
->  	u64 pfn;
->  
-> @@ -1057,6 +1059,7 @@ int __init sev_es_efi_map_ghcbs(pgd_t *pgd)
->  		return 0;
->  
->  	pflags = _PAGE_NX | _PAGE_RW;
-> +	pflags_enc = cc_mkenc(pflags);
->  
->  	for_each_possible_cpu(cpu) {
->  		data = per_cpu(runtime_data, cpu);
-> @@ -1068,6 +1071,19 @@ int __init sev_es_efi_map_ghcbs(pgd_t *pgd)
->  			return 1;
->  	}
->  
-> +	if (!snp_vmpl)
-> +		return 0;
-> +
-> +	for_each_possible_cpu(cpu) {
+> -	if (user_mode(ctxt->regs))
+> +	if (user_mode(ctxt->regs) || current->active_mm == &efi_mm)
 
-
-So while it's only run-once __init code, still there's no good reason 
-to have *two* all-CPUs loops in the same function.
-
-> +		address = per_cpu(svsm_caa_pa, cpu);
-> +		if (!address)
-> +			return 1;
-
-Yeah, so could we please use sensible & standard error return values 
-such as -EINVAL? This is a pre-existing problem in this function, so it 
-should be done in a separate, preparatory patch. (And yeah, the error 
-codes of efi_setup_page_tables() are kinda lame too, but there's no 
-reason to repeat that mistake in the SEV code.)
-
-> +
-> +		pfn = address >> PAGE_SHIFT;
-> +		if (kernel_map_pages_in_pgd(pgd, pfn, address, 1, pflags_enc))
-> +			return 1;
-
-
-Ditto - for consistency this should just pass through the error code 
-that kernel_map_pages_in_pgd() gives.
-
-No objections to the added functionality/fix aspect.
+Instead of open-coding that condition, we have mm_is_efi() for that.
 
 Thanks,
 
