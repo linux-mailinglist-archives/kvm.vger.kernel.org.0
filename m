@@ -1,178 +1,206 @@
-Return-Path: <kvm+bounces-50917-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50918-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08657AEA9B2
-	for <lists+kvm@lfdr.de>; Fri, 27 Jun 2025 00:33:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0887CAEA9CD
+	for <lists+kvm@lfdr.de>; Fri, 27 Jun 2025 00:44:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6BD754A3A26
-	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 22:33:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C25E172A24
+	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 22:44:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E86826E14D;
-	Thu, 26 Jun 2025 22:33:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4D1327147C;
+	Thu, 26 Jun 2025 22:43:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="in2RGG48"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iUZdMufG"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01B012F1FC9;
-	Thu, 26 Jun 2025 22:33:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5341926E709
+	for <kvm@vger.kernel.org>; Thu, 26 Jun 2025 22:43:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750977194; cv=none; b=JCLjgWkVqiTIEMVVdtmu7QRcc/tKqeCcTdZgXlyahZbRn0l8pwtc4J8Qjxcng7bjlxNARFRPyp/119BsD5j/xwMnNk27odyWQSkTV2CpfH8uzbYftF7yFlwuTVODDVkFKKeMkMJWoJBn6uCnEU47em7fZZ7kdoeEgXF9c4Bn/oQ=
+	t=1750977822; cv=none; b=tvfPlBnSXF/IgCDcE1smZq8ROYZQHfeTzSH7FLYpHwfMR40VdUyHjIdrFMPA9Lbcal9XcBJrsJliOOYijRB7V8PAIgyF25hjJIuOjvaLnyWZuLr3rdkcBhVxI4LUPoTinJhbff9TxTvSU62U10cDk2YeZJaucIfbEPeo3wduSOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750977194; c=relaxed/simple;
-	bh=P3BYywIXEQsOhVlcz6dgYcI3443NAtbrw9VtNiSE+9w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uy2J6Ft+D75/cepNgzYIz62vKGW8BpmfcXJp61yFo9uqtC6SN/uzCDBOZ2LazYiPt3z6oyujGSC8jDcgEZZ6tuEWwE//Wtt0RsFpEDU+YCPJJKkouYXpfo0f550+50fn0g4ZxIVXq9q4JaQ6Sx3vN69wlI/bMcZplBvoCt+8IRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=in2RGG48; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750977193; x=1782513193;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=P3BYywIXEQsOhVlcz6dgYcI3443NAtbrw9VtNiSE+9w=;
-  b=in2RGG48UotQBJBhq9cpIFk4UiABjLNdfHlFsxDqVp7bsBX/BKS613GF
-   xcAQYApXOpoS2/h2jJm42boEF6pnwmMi+Hk6CWDKyEAv1hFDlWzNTHm8L
-   e1/kZU+mwf92xd8DGHHciPQHE99E+F86NhPA+QU2DjQmXcdFLLuvgw++/
-   0ygQQz620NDs4pmPcV7yVO0pZYWYf+/9V/MG9Cam7z3sdQ6RmcZ9gdLPe
-   YhYBEAUGuGWP70zEV8ARYiFkJFqm7bvTImNO/njZOSu4RzRS3HBbr8w4U
-   7HeyfNki2GojUhkVtHQJCzCAtK9BFSEkvyMpGmdlp9UYhcp+3Oib/BnHu
-   A==;
-X-CSE-ConnectionGUID: FxbJfzuQQxOcLqTBGrjqlQ==
-X-CSE-MsgGUID: T/FQdD7SQnyXm4mQYF1csw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11476"; a="52519542"
-X-IronPort-AV: E=Sophos;i="6.16,268,1744095600"; 
-   d="scan'208";a="52519542"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2025 15:33:12 -0700
-X-CSE-ConnectionGUID: 2YrduJMoTOm3og1aSVyK4A==
-X-CSE-MsgGUID: PKzka5DvQv2VTCcjFUDAEA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,268,1744095600"; 
-   d="scan'208";a="157202618"
-Received: from aschofie-mobl2.amr.corp.intel.com (HELO [10.125.109.42]) ([10.125.109.42])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2025 15:33:12 -0700
-Message-ID: <b439abd6-9fd9-4f51-82e2-c8b1304e7cca@intel.com>
-Date: Thu, 26 Jun 2025 15:33:11 -0700
+	s=arc-20240116; t=1750977822; c=relaxed/simple;
+	bh=SAOGsbHcFwt1RIPCltcbSOYs2IVPDVh8pHbL4j2k0RY=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=CaDERaxvBXvhidsqVpRFAhOaiQmzbmHG+PH55MHwca3+KeyrkZLQDNGXO+xJVDCB1hDQ+Ed2c0R72ndAZmB3C68XR675HR4WnnDQROVBi90MlQL9t5CMTlogv9detkUgg2UxEzVLcQSMsxX4syDfLMGLInCd+roxfh8/GwOmy3k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iUZdMufG; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-7489ac848f3so2391954b3a.1
+        for <kvm@vger.kernel.org>; Thu, 26 Jun 2025 15:43:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1750977821; x=1751582621; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=D+aNfx32rCA8ptyZuXuy/RXxrC6yFTb63LaStdM2TSw=;
+        b=iUZdMufG+YuYoMJgk8LSoEa432xOuOPORY8MIBKuroWu848KKSXGhk0mNWXcEjULeF
+         pzRcrI04hyKKY4RYsMmFDsaB6Dy/TlX5zzF6BztGB/er8nLgzvrLMNCzsUjGYPtrQmxe
+         mMRmJZyHL3Ka8ioqmQqwp3TY+X45mErD9hUJ1Ws/Yb9kFmuSi1YEGkatFE/4Kdmq+kLy
+         BIN8127YUoPQRsU8B8tf/QXi8lkrPSqSJVpnePqIrp52+YLs9jf50LJe6nMuSx8HLSAU
+         zsPtEL5g4ZU5Z9I54r1wX80tKW3EpT3qm5uBRXnDEMCluVr0qeI5bfrfXjAOXSyOdY51
+         AocQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750977821; x=1751582621;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=D+aNfx32rCA8ptyZuXuy/RXxrC6yFTb63LaStdM2TSw=;
+        b=VJD7ezUCDUmaMv1jLbeZQNgfjAFFhjoaCoOB5hfUzMkpc+EPKY/xSwGNssH7WtMB4P
+         OGUrYnxftn9AqPPXrRkh3QndQ79UJquXgrqLqzIfaM2abghOYexUWikYiowIeVR/6Yh4
+         4NPFDtKm/58wP+cUJP618LdmAsPuyFQ+fl4mjlqAb0GPkmqYGKddbCCEtDtIJxoFZ0Tv
+         TfkLCkoW55zj2LkG8DZs347135e9X6sfws1mOex3UhstHsF9cKY9A+Hr3lt9QIb2LHK+
+         Jgu8ELxNAXm8IRRBvhD5Hre7JclxeSQZr/Qi2MSxrxvHATnhQjGgrFeNqc8sg7ZQxK8j
+         y2+A==
+X-Gm-Message-State: AOJu0YyM/J4noRD5RXpgEJxqxZ6FRHJIrSHcthRZmmnRCkgQhcxcewwq
+	Pd3LNlb0D+y79syndubggLCqHiz539RNzZpG4sP/UFxIRDOyEXzIKpfVv3k4sJ33vgsxolpzRUL
+	3K2t8hw==
+X-Google-Smtp-Source: AGHT+IF+I3hj6sD+7mRVKugWfwkI8uGSKayYGM8ET1hZ//75fEERgX12/UwIpz5Ec/SzX4PUw0wWAN3iqZU=
+X-Received: from pgcy10.prod.google.com ([2002:a63:7d0a:0:b0:b31:c667:9fce])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:6d8f:b0:216:1ea0:a51a
+ with SMTP id adf61e73a8af0-220a16ca805mr1016548637.38.1750977820750; Thu, 26
+ Jun 2025 15:43:40 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Thu, 26 Jun 2025 15:43:36 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] KVM: TDX: Do not clear poisoned pages
-To: "Huang, Kai" <kai.huang@intel.com>, "Luck, Tony" <tony.luck@intel.com>,
- "Hunter, Adrian" <adrian.hunter@intel.com>,
- "Annapurve, Vishal" <vannapurve@google.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "Li, Xiaoyao" <xiaoyao.li@intel.com>, "Zhao, Yan Y" <yan.y.zhao@intel.com>,
- "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
- "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
- "mingo@redhat.com" <mingo@redhat.com>, "seanjc@google.com"
- <seanjc@google.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "tglx@linutronix.de" <tglx@linutronix.de>,
- "Yamahata, Isaku" <isaku.yamahata@intel.com>,
- "tony.lindgren@linux.intel.com" <tony.lindgren@linux.intel.com>,
- "binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>,
- "linux-edac@vger.kernel.org" <linux-edac@vger.kernel.org>,
- "hpa@zytor.com" <hpa@zytor.com>, "Chatre, Reinette"
- <reinette.chatre@intel.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>, "bp@alien8.de"
- <bp@alien8.de>, "Gao, Chao" <chao.gao@intel.com>,
- "x86@kernel.org" <x86@kernel.org>
-References: <20250618120806.113884-1-adrian.hunter@intel.com>
- <20250618120806.113884-3-adrian.hunter@intel.com>
- <68938275-3f6a-46fc-9b38-2c916fdec3d6@intel.com>
- <CAGtprH_cVwWhfXFkM-=rVzQZ0CpY_zcnkF=q5x1n_9Bzm1xKfw@mail.gmail.com>
- <bc492cb2-1d30-4a30-9eb9-d48b09cd29a9@intel.com>
- <c315604761ad760fc29bebdb007fac239a1b45f9.camel@intel.com>
- <91df7051-2405-4609-9e86-2bbc02829644@intel.com>
- <8c24d9b9c888eed972e8ee75fa9d31cc7fd72a73.camel@intel.com>
- <DS7PR11MB6077ED08B85A000014BDAE00FC7AA@DS7PR11MB6077.namprd11.prod.outlook.com>
- <f51e62543aa765da3b4f4ed19aa13340881fbc89.camel@intel.com>
-From: Dave Hansen <dave.hansen@intel.com>
-Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <f51e62543aa765da3b4f4ed19aa13340881fbc89.camel@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
+Message-ID: <20250626224336.867412-1-seanjc@google.com>
+Subject: [kvm-unit-tests GIT PULL] x86: Fixes, cleanups, and new testcases
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 6/26/25 15:20, Huang, Kai wrote:
-> But IMHO we may should just have a simple policy that when a page is marked
-> as poisoned, it should never be touched again.  It's only one page anyway
-> (for one TD) so losing that doesn't seem bad to me.  If we want to clear the
-> poisoned page, then perhaps we should mark that page to be not-poisoned
-> again.
+Please pull a self-centered set of KUT changes.
 
-The simplest policy is to do nothing.
+The following changes since commit 507612326c9417b6330b91f7931678a4c6866395:
 
-The kernel only has 29 places that check PageHWPoison(). I'd guess that
-roughly half of those are the memory-failure.c infrastructure and
-bare-minimum code to handle poison, like not allowing pages to go back
-into the allocator.
+  travis.yml: Remove the aarch64 job (2025-06-05 10:07:07 +0200)
 
-There are something like 5,000 lines of code in the kernel that deal
-with a literal 'struct page'. 29 checks for ~5,000 sites is pretty
-minuscule. We obviously don't have a policy that every place that uses
-'struct page' needs to check for poison. We also don't even have a
-policy where writes to or reads from a page check for poison.
+are available in the Git repository at:
 
-Why is this TDX code so special that PageHWPoison() needs to be checked.
-For instance:
+  https://github.com/kvm-x86/kvm-unit-tests.git tags/kvm-x86-2025.06.26
 
-$ grep -r PageHWPoison arch/x86/
-arch/x86/kernel/cpu/mce/core.c:	SetPageHWPoison(p);
-arch/x86/kernel/cpu/mce/core.c:	SetPageHWPoison(p);
+for you to fetch changes up to 525bdb5d65d51a367341f471eb1bcd505d73c51f:
 
-In other words, this would be the *ONLY* arch/x86 site. Why?
+  x86/pmu: Verify all available GP counters in check_counters_many() (2025-06-25 14:20:34 -0700)
+
+----------------------------------------------------------------
+x86 fixes, cleanups, and new test coverage
+
+ - Ensure APIC is xAPIC mode for APIC MMIO tests.
+
+ - Expand the I/O APIC routing reconfiguration vs. EOI interception testcase
+   to validate multiple in-flight interrupts.
+
+ - Fix a variety of minor PMU/PEBS bugs and warts.
+
+ - Fix the nSVM MSR interception test to actually detect failures, and expand
+   its coverage to validate more scenarios.
+
+ - Add X86_PROPERTY_xxx macros (stolen from KVM selftests) and use them to
+   clean up related code.
+
+ - Add testcases for MSR_SPEC_CTRL, and an msr64 config to validate negative
+   testcases (i.e. when MSRs aren't supposed to exist).
+
+ - Disable PIT re-injection for all tests so that (x2)AVIC isn't inhibited due
+   to enabling in-kernel PIT emulation.
+
+ - Play nice with QEMU builds that disable VNX support.
+
+----------------------------------------------------------------
+Dapeng Mi (2):
+      x86/pmu_pebs: Initalize and enable PMU interrupt (PMI_VECTOR)
+      x86/pmu: Verify all available GP counters in check_counters_many()
+
+Sean Christopherson (41):
+      x86: apic: Move helpers for querying APIC state to library code
+      x86: nSVM: Ensure APIC MMIO tests run with APIC in xAPIC mode
+      x86: ioapic: Expand routing reconfiguration => EOI interception testcase
+      runtime: Skip tests if the target "kernel" file doesn't exist
+      x86/pks: Actually skip the PKS test if PKS isn't support
+      x86/pmu: Explicitly zero PERF_GLOBAL_CTRL at start of PMU test
+      x86/run: Specify "-vnc none" for QEMU if and only if QEMU supports VNC
+      lib: Add and use static_assert() convenience wrappers
+      x86: Call setup_idt() from start{32,64}(), not from smp_init()
+      x86: Drop protection against setup_idt() being called multiple times
+      x86: Move call to load_idt() out of setup_tr_and_percpu macro
+      x86: Load IDT on BSP as part of setup_idt()
+      x86: Cache availability of forced emulation during setup_idt()
+      nVMX: Force emulation of LGDT/LIDT in iff FEP is available
+      x86: nSVM: Actually report missed MSR intercepts as failures
+      x86: nSVM: Test MSRs just outside the ranges of the MSR Permissions Map
+      x86: nSVM: Clean up variable types and names in test_msr_intercept()
+      x86: Expand the suite of bitops to cover all set/clear operations
+      x86: nVMX: Use set_bit() instead of test_and_set_bit() when return is ignored
+      x86: nSVM: Set MSRPM bit on-demand when testing interception
+      x86: nSVM: Verify disabling {RD,WR}MSR interception behaves as expected
+      x86: nSVM: Verify L1 and L2 see same MSR value when interception is disabled
+      x86: Disable PIT re-injection for all tests to play nice with (x2)AVIC
+      x86: Delete split IRQ chip variants of apic and ioapic tests
+      x86: Encode X86_FEATURE_* definitions using a structure
+      x86: Add X86_PROPERTY_* framework to retrieve CPUID values
+      x86: Use X86_PROPERTY_MAX_VIRT_ADDR in is_canonical()
+      x86: Implement get_supported_xcr0() using X86_PROPERTY_SUPPORTED_XCR0_{LO,HI}
+      x86: Add and use X86_PROPERTY_INTEL_PT_NR_RANGES
+      x86/pmu: Mark all arch events as available on AMD, and rename fields
+      x86/pmu: Mark Intel architectural event available iff X <= CPUID.0xA.EAX[31:24]
+      x86/pmu: Use X86_PROPERTY_PMU_* macros to retrieve PMU information
+      x86/sev: Use VC_VECTOR from processor.h
+      x86/sev: Skip the AMD SEV test if SEV is unsupported/disabled
+      x86/sev: Define and use X86_FEATURE_* flags for CPUID 0x8000001F
+      x86/sev: Use X86_PROPERTY_SEV_C_BIT to get the AMD SEV C-bit location
+      x86/sev: Use amd_sev_es_enabled() to detect if SEV-ES is enabled
+      x86: Move SEV MSR definitions to msr.h
+      x86/msr: Treat PRED_CMD as support if CPU has SBPB
+      x86/msr: Add a testcase to verify SPEC_CTRL exists (or not) as expected
+      x86/msr: Add an "msr64" test configuration to validate negative cases
+
+ lib/riscv/asm/isa.h      |   4 +-
+ lib/s390x/asm/arch_def.h |   6 +-
+ lib/s390x/fault.c        |   3 +-
+ lib/util.h               |   3 +
+ lib/x86/amd_sev.c        |  48 ++-----
+ lib/x86/amd_sev.h        |  29 -----
+ lib/x86/apic.h           |  21 +++
+ lib/x86/asm/bitops.h     |  86 +++++++++++-
+ lib/x86/desc.c           |  29 ++++-
+ lib/x86/desc.h           |  14 +-
+ lib/x86/msr.h            |  14 +-
+ lib/x86/pmu.c            |  25 ++--
+ lib/x86/pmu.h            |   8 +-
+ lib/x86/processor.h      | 332 +++++++++++++++++++++++++++++++++--------------
+ lib/x86/setup.c          |   1 -
+ lib/x86/smp.c            |   1 -
+ scripts/runtime.bash     |   5 +
+ x86/access.c             |   2 +-
+ x86/amd_sev.c            |  63 ++-------
+ x86/apic.c               |  20 ---
+ x86/cstart.S             |   3 +-
+ x86/cstart64.S           |   2 +-
+ x86/emulator.c           |  11 +-
+ x86/emulator64.c         |   2 +-
+ x86/ioapic.c             |  52 +++++++-
+ x86/la57.c               |   4 +-
+ x86/lam.c                |   6 +-
+ x86/msr.c                |  36 ++++-
+ x86/pks.c                |   2 +-
+ x86/pmu.c                |  37 ++++--
+ x86/pmu_pebs.c           |   3 +
+ x86/run                  |  15 ++-
+ x86/svm_npt.c            |  27 ++++
+ x86/svm_tests.c          | 240 ++++++++++++++++++++++++++--------
+ x86/unittests.cfg        |  30 ++---
+ x86/vmx_tests.c          |  11 +-
+ x86/xsave.c              |  11 +-
+ 37 files changed, 792 insertions(+), 414 deletions(-)
 
