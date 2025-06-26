@@ -1,194 +1,365 @@
-Return-Path: <kvm+bounces-50838-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50839-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7DD9AEA14C
-	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 16:52:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E281AEA1AC
+	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 17:00:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C4556A01A4
-	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 14:47:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C86555A6E4D
+	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 14:54:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70E9D2EB5BD;
-	Thu, 26 Jun 2025 14:46:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ED6D2F365F;
+	Thu, 26 Jun 2025 14:49:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="knBMKVpk"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DK9hezrp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C7B42EACFE;
-	Thu, 26 Jun 2025 14:46:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D2342EB5C2
+	for <kvm@vger.kernel.org>; Thu, 26 Jun 2025 14:49:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750949218; cv=none; b=NZyQGCTk9qZY5LxC/yf8cyxAZJTtpOP8mGK5BtHBSW57m5D/KshEISkXyhc8CQD6yLxnLgklfDjAEJtNkYVuzhXeRyWKiy4sXVcmYJW9Et94ckQ6ek1mWxEWXWL5Q/ojUcdIBe+PFxS5fPU4RUYX9bswJBB4TWGGA4ISu1HD6P4=
+	t=1750949363; cv=none; b=IejKzo6o6XFgs4XEtatzfxZEm6/aZgEmOprnfcU05ZYmop7gGQdn4J1+FaQtrWltlhUhuvMo+gsuuACkUuNSd6f5WmiAF2gTQgNkgoMkuqGn2tQim1gJUC5F3qTewMCFgOEY8HthttsC7zpeeWg2HW33/Qo8QEJ4mZxtSMq760A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750949218; c=relaxed/simple;
-	bh=wuNLjw7eRkBNUxbK+tbcIm3Smq+1f+s5sxGIuvTbvyc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bzYOyrCjvguM2lPy+fUkxheSefIQS4okx9HAbh71er5/Ht0AVqI2uy+MFoTdt7QVNcOUJeQpqqcvfMAuCyYNuzY7CVih6o2bPr+TBGWHYhl3DvYUQp4pAjvzmwhRNb104MbiD0Bubf7njEeudaHoHh6BlUhCKPZhK51OqLPUqv4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=knBMKVpk; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750949217; x=1782485217;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=wuNLjw7eRkBNUxbK+tbcIm3Smq+1f+s5sxGIuvTbvyc=;
-  b=knBMKVpkTy9WpwcAFs8hkfGwn0TPziWsb0HbKhpV+mr0Rc2HpkNEZgDI
-   SOFf98dDub0X0aAUkj3sUp3wPgGG7JjkuCsSauoCXq08lECjP+ghm+xOj
-   ee0Gtf8P3T6AdIovwM0CwculYFtGLgrc477E5lGHmySnNrMR97/6ypE5s
-   nPFYn6j+CR3l6tLfAMPL0+jUAXWZ99zx7Mx2ObBkXKHIz3k8QBZQtWPzw
-   6T37WAiYCoLsJR7q4Oc65YL1guki2J8an/uJzqXgSvEvOt6VEjry/n+nU
-   OtPID/jD05lAv1FhG7GLMziDMuBlCWzZlDCGsKQ684N87bQGaR+Ku3IAF
-   Q==;
-X-CSE-ConnectionGUID: ZJMuvWbDSNyC9P/QB0fTmw==
-X-CSE-MsgGUID: 1rbQYLVbRFqb6Qqxx86uwA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11475"; a="53380637"
-X-IronPort-AV: E=Sophos;i="6.16,267,1744095600"; 
-   d="scan'208";a="53380637"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2025 07:46:56 -0700
-X-CSE-ConnectionGUID: 8+rRqYoXR/yClCRd1+gTtQ==
-X-CSE-MsgGUID: DzhWelVySNmH0eJh8vyXAw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,267,1744095600"; 
-   d="scan'208";a="151959823"
-Received: from spandruv-desk1.amr.corp.intel.com (HELO [10.125.109.24]) ([10.125.109.24])
-  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2025 07:46:57 -0700
-Message-ID: <3e55fd58-1d1c-437a-9e0a-72ac92facbb5@intel.com>
-Date: Thu, 26 Jun 2025 07:46:55 -0700
+	s=arc-20240116; t=1750949363; c=relaxed/simple;
+	bh=7I0KkfMozSmWmOJFqIYPWGWMo0l1yuJq2E+dyh3oxN4=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Er9QpvRWOwCHdmO799TLlD0Cq5KDvTGrTZi2qKXNQhmFHwTCbxgf6SaRO2eTimFon4k5sZbYYMUZAcuUumDZUn1RLBnnbG8DRoS1x1glqf4F6FctDZ1F0xGliO5BGq1TOfaSl/ts0ai0Ueq8wKejSZpi1fzQ5oFTVkxkkEPC1To=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DK9hezrp; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b115fb801bcso1160542a12.3
+        for <kvm@vger.kernel.org>; Thu, 26 Jun 2025 07:49:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1750949360; x=1751554160; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=w8Q2VXXKCy8uCDy91bAW48HYprxI/+gEXH10G1t7AxI=;
+        b=DK9hezrpNTO96nC1qSIptNDqz1p8JOcArWcYm1iTPLerkkGHtnilq2/ddVyhzYa8En
+         S2xYHEyevTpYqKefjLTdZMI/CcaXbOj/VG9qZUYcvLzTtJbCWcKokzRQjMEn4nWuncMz
+         PQuCcN3gfWm+38b2ILY5rwnw0GB6hqtiVzB4xxMOIk+ydKxkQtaXIL6pu3Uu+omfcQlL
+         qXalSVnx7hv56yFk6+S1HFIYgJcSx5536L1tMDuVhPk/LZLrCHTonZYMUt27cESxR8Tf
+         zLz7m3Z+FtNYTNFgzJw8egoWzTh2eQJwDz4gg55ONR4NFNFumIxRKFJTKGzd+MHU/RmX
+         9pWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750949360; x=1751554160;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=w8Q2VXXKCy8uCDy91bAW48HYprxI/+gEXH10G1t7AxI=;
+        b=wjQXV43ySd3Dn9VF+AGNj84L0D2XubVqZwTgxtBVBPKTB9WpkACkpB33oqgN1gObqR
+         ryZDFoyNrP89VXTfkDnY/r2mW+yvzplAudAEXNAED0cytRiwF3Ytzda2LPzSpDt7hYJp
+         pobU1vYJl97Srvsjmc4DwIFzTvFqeoJQuIV5Nh0taG5eywsGm0by1liLCgZinefBAlc0
+         Td5kYAfIibLZG08zybiW4hjyzKyvDN8ZEBx9L+ySQvz4/bMEV7CkIVEyismj27dZYCpo
+         3tD0jVamXtpPNmAWZL1JvnMLrRXlT2oSK0a+H4Rm5OumndwmYz+ohbXZW9wvP2KBhM3q
+         0S1w==
+X-Forwarded-Encrypted: i=1; AJvYcCU8UTIvIHdXyKbkBPspm14Ge9aSWS7Q07wMkRXLTuaLeg80Ji0YuHs3uCj5Uvr9o8J9dAM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzw2XSukEqLkgyJ0uSAPmr5Uz18WAmqVcsUkGveCGIOkMv2P/Ra
+	4LPh+BKbBTIJjA9dG+tiSlERXXC+Fjm5qFqaLbn9Y8KnWVDuAfxCFmoiiwHItuOoybspKtywC8q
+	OwXpAXQ==
+X-Google-Smtp-Source: AGHT+IFS8+wZ4+y5mkFJRyDOuVy9lAQaFYGrh6js0FtXmr+9KAl1rBk6sjWRGmK0T9FMrSujnNEMnAiy/Ig=
+X-Received: from pfbbd20.prod.google.com ([2002:a05:6a00:2794:b0:746:fd4c:1fcf])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:2453:b0:220:25c4:1881
+ with SMTP id adf61e73a8af0-2207f2a6676mr12560996637.39.1750949360434; Thu, 26
+ Jun 2025 07:49:20 -0700 (PDT)
+Date: Thu, 26 Jun 2025 07:49:18 -0700
+In-Reply-To: <20250612141637.131314-1-minipli@grsecurity.net>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv2 01/12] x86/tdx: Consolidate TDX error handling
-To: "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
- Sean Christopherson <seanjc@google.com>
-Cc: Rick P Edgecombe <rick.p.edgecombe@intel.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
- Chao Gao <chao.gao@intel.com>, "bp@alien8.de" <bp@alien8.de>,
- Kai Huang <kai.huang@intel.com>, "x86@kernel.org" <x86@kernel.org>,
- "mingo@redhat.com" <mingo@redhat.com>, Yan Y Zhao <yan.y.zhao@intel.com>,
- "tglx@linutronix.de" <tglx@linutronix.de>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
- Isaku Yamahata <isaku.yamahata@intel.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20250609191340.2051741-1-kirill.shutemov@linux.intel.com>
- <20250609191340.2051741-2-kirill.shutemov@linux.intel.com>
- <5cfb2e09-7ecb-4144-9122-c11152b18b5e@intel.com>
- <d897ab70d48be4508a8a9086de1ff3953041e063.camel@intel.com>
- <aFxpuRLYA2L6Qfsi@google.com>
- <vgk3ql5kcpmpsoxfw25hjcw4knyugszdaeqnzur6xl4qll73xy@xi7ttxlxot2r>
-From: Dave Hansen <dave.hansen@intel.com>
-Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <vgk3ql5kcpmpsoxfw25hjcw4knyugszdaeqnzur6xl4qll73xy@xi7ttxlxot2r>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20250612141637.131314-1-minipli@grsecurity.net>
+Message-ID: <aF1d7rh_vbr8cr7j@google.com>
+Subject: Re: [kvm-unit-tests PATCH] x86/emulator64: Extend non-canonical
+ memory access tests with CR2 coverage
+From: Sean Christopherson <seanjc@google.com>
+To: Mathias Krause <minipli@grsecurity.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Content-Type: multipart/mixed; charset="UTF-8"; boundary="KMqhKOFQerfDU/yy"
 
-On 6/26/25 02:25, kirill.shutemov@linux.intel.com wrote:
->> Can we turn them into macros that make it super obvious they are checking if the
->> error code *is* xyz?  E.g.
->>
->> #define IS_TDX_ERR_OPERAND_BUSY
->> #define IS_TDX_ERR_OPERAND_INVALID
->> #define IS_TDX_ERR_NO_ENTROPY
->> #define IS_TDX_ERR_SW_ERROR
->>>> As is, it's not at all clear that things like tdx_success() are
->> simply checks, as opposed to commands.
-> I remember Dave explicitly asked for inline functions over macros
-> where possible.
+
+--KMqhKOFQerfDU/yy
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+On Thu, Jun 12, 2025, Mathias Krause wrote:
+> Extend the non-canonical memory access tests to verify CR2 stays
+> unchanged.
 > 
-> Can we keep them as functions, but give the naming scheme you
-> proposing (but lowercase)?
+> There's currently a bug in QEMU/TCG that breaks that assumption.
+> 
+> Link: https://gitlab.com/qemu-project/qemu/-/issues/928
+> Signed-off-by: Mathias Krause <minipli@grsecurity.net>
+> ---
+>  x86/emulator64.c | 26 ++++++++++++++++++++++++++
+>  1 file changed, 26 insertions(+)
+> 
+> diff --git a/x86/emulator64.c b/x86/emulator64.c
+> index 5d1bb0f06d4f..abef2bda29f1 100644
+> --- a/x86/emulator64.c
+> +++ b/x86/emulator64.c
+> @@ -325,16 +325,39 @@ static void test_mmx_movq_mf(uint64_t *mem)
+>  	report(exception_vector() == MF_VECTOR, "movq mmx generates #MF");
+>  }
+>  
+> +#define CR2_REF_VALUE	0xdecafbadUL
+> +
+> +static void setup_cr2(void)
+> +{
+> +	write_cr2(CR2_REF_VALUE);
+> +}
+> +
+> +static void check_cr2(void)
+> +{
+> +	unsigned long cr2 = read_cr2();
+> +
+> +	if (cr2 == CR2_REF_VALUE) {
+> +		report(true, "CR2 unchanged");
+> +	} else {
+> +		report(false, "CR2 changed from %#lx to %#lx", CR2_REF_VALUE, cr2);
+> +		setup_cr2();
 
-Macros versus function isn't super important. I think Sean was asking if
-we could do:
+Writing CR2 isn't expensive in the grand scheme, so rather than conditionally
+re-write CR2, I think it makes sense to write CR2 at the start of every testcase,
+and then just do "report(cr2 == CR2_REF_VALUE".
 
-	if (err == IS_TDX_ERR_OPERAND_BUSY)
-		...
+> +	}
+> +}
+> +
+>  static void test_jmp_noncanonical(uint64_t *mem)
+>  {
+> +	setup_cr2();
+>  	*mem = NONCANONICAL;
+>  	asm volatile (ASM_TRY("1f") "jmp *%0; 1:" : : "m"(*mem));
+>  	report(exception_vector() == GP_VECTOR,
+>  	       "jump to non-canonical address");
+> +	check_cr2();
+>  }
+>  
+>  static void test_reg_noncanonical(void)
+>  {
+> +	setup_cr2();
+> +
+>  	/* RAX based, should #GP(0) */
+>  	asm volatile(ASM_TRY("1f") "orq $0, (%[noncanonical]); 1:"
+>  		     : : [noncanonical]"a"(NONCANONICAL));
+> @@ -342,6 +365,7 @@ static void test_reg_noncanonical(void)
+>  	       "non-canonical memory access, should %s(0), got %s(%u)",
+>  	       exception_mnemonic(GP_VECTOR),
+>  	       exception_mnemonic(exception_vector()), exception_error_code());
+> +	check_cr2();
 
-instead of:
+And then rather than add more copy+paste, what if we add a macro to handle the
+checks?  Then the CR2 validation can slot in nicely (and maybe someday the macro
+could be used outside of the x86/emulator64.c).
 
-	if (tdx_operand_busy(err))
-		...
+Attached patches yield:	
 
-We can do that, bu we first need to know that the whole bottom of the
-return code register is empty. Unfortunately, a quick grep of the TDX
-module source shows a bunch of these:
+#define CR2_REF_VALUE	0xdecafbadUL
 
->     return_val = api_error_with_operand_id(TDX_OPERAND_BUSY, OPERAND_ID_MIGSC);
+#define ASM_TRY_NONCANONICAL(insn, inputs, access, ex_vector)			\
+do {										\
+	unsigned int vector, ec;						\
+										\
+	write_cr2(CR2_REF_VALUE);						\
+										\
+	asm volatile(ASM_TRY("1f") insn "; 1:" :: inputs);			\
+										\
+	vector = exception_vector();						\
+	ec = exception_error_code();						\
+										\
+	report(vector == ex_vector && !ec,					\
+	      "non-canonical " access ", should %s(0), got %s(%u)",		\
+	      exception_mnemonic(ex_vector), exception_mnemonic(vector), ec);	\
+										\
+	if (vector != PF_VECTOR) {						\
+		unsigned long cr2  = read_cr2();				\
+										\
+		report(cr2 == CR2_REF_VALUE,					\
+		       "Wanted CR2 '0x%lx', got '0x%lx", CR2_REF_VALUE, cr2);	\
+	}									\
+} while (0)
 
-I'll refrain from casting judgement on why the TDX module needs such
-fancy, fine-grained error codes and our little hobby kernel over here
-mostly gets by on a couple errno's ... but I digress.
-
-Those fancy pants error codes are why we need:
-
-static inline u64 tdx_status(u64 err)
+static void test_jmp_noncanonical(uint64_t *mem)
 {
-	return err & TDX_STATUS_MASK;
+	*mem = NONCANONICAL;
+
+	ASM_TRY_NONCANONICAL("jmp *%0", "m"(*mem), "jmp", GP_VECTOR);
 }
 
-and can't just check the err directly. We need to mask out the fancy
-pants bits first.
+static void test_reg_noncanonical(void)
+{
+	/* RAX based, should #GP(0) */
+	ASM_TRY_NONCANONICAL("orq $0, (%[nc])", [nc]"a"(NONCANONICAL),
+			     "memory access", GP_VECTOR);
 
-To get to what Sean is asking for, we'd have to do the tdx_status()
-masking in the low-level SEAMCALL helpers and have them all return a
-masked error code. Or maybe just bite the bullet and mostly move over to
-errno's.
+	/* RSP based, should #SS(0) */
+	ASM_TRY_NONCANONICAL("orq $0, (%%rsp,%[nc],1)", [nc]"r"(NONCANONICAL),
+			     "rsp-based access", SS_VECTOR);
 
-That wouldn't be horrible. For errno's or a masked TDX-format err,
-callers could always go digging in tdx_module_args if they need the bits
-that got masked out. But it would take some work.
+	/* RBP based, should #SS(0) */
+	ASM_TRY_NONCANONICAL("orq $0, (%%rbp,%[nc],1)", [nc]"r"(NONCANONICAL),
+			     "rbp-based access", SS_VECTOR);
+}
+
+--KMqhKOFQerfDU/yy
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0001-x86-emulator64-Add-macro-to-test-emulation-of-non-ca.patch"
+
+From 0a7ee3543ef899ea36614ddff56c306dd63c341c Mon Sep 17 00:00:00 2001
+From: Sean Christopherson <seanjc@google.com>
+Date: Thu, 26 Jun 2025 07:39:43 -0700
+Subject: [PATCH 1/2] x86/emulator64: Add macro to test emulation of
+ non-canonical accesses
+
+Add a macro to "try" and check a non-canonical access.  In addition to
+de-duplicating the checking logic, this will allow extending the logic to
+verify that CR2 isn't incorrectly modified, e.g. on #GP/#SS.
+
+No functional change intended (ignoring the newly added check on the error
+code for the JMP case).
+
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ x86/emulator64.c | 43 ++++++++++++++++++++++---------------------
+ 1 file changed, 22 insertions(+), 21 deletions(-)
+
+diff --git a/x86/emulator64.c b/x86/emulator64.c
+index 138903af..21df3b0a 100644
+--- a/x86/emulator64.c
++++ b/x86/emulator64.c
+@@ -325,39 +325,40 @@ static void test_mmx_movq_mf(uint64_t *mem)
+ 	report(exception_vector() == MF_VECTOR, "movq mmx generates #MF");
+ }
+ 
++#define ASM_TRY_NONCANONICAL(insn, inputs, access, ex_vector)			\
++do {										\
++	unsigned int vector, ec;						\
++										\
++	asm volatile(ASM_TRY("1f") insn "; 1:" :: inputs);			\
++										\
++	vector = exception_vector();						\
++	ec = exception_error_code();						\
++										\
++	report(vector == ex_vector && !ec,					\
++	      "non-canonical " access ", should %s(0), got %s(%u)",		\
++	      exception_mnemonic(ex_vector), exception_mnemonic(vector), ec);	\
++} while (0)
++
+ static void test_jmp_noncanonical(uint64_t *mem)
+ {
+ 	*mem = NONCANONICAL;
+-	asm volatile (ASM_TRY("1f") "jmp *%0; 1:" : : "m"(*mem));
+-	report(exception_vector() == GP_VECTOR,
+-	       "jump to non-canonical address");
++
++	ASM_TRY_NONCANONICAL("jmp *%0", "m"(*mem), "jmp", GP_VECTOR);
+ }
+ 
+ static void test_reg_noncanonical(void)
+ {
+ 	/* RAX based, should #GP(0) */
+-	asm volatile(ASM_TRY("1f") "orq $0, (%[noncanonical]); 1:"
+-		     : : [noncanonical]"a"(NONCANONICAL));
+-	report(exception_vector() == GP_VECTOR && exception_error_code() == 0,
+-	       "non-canonical memory access, should %s(0), got %s(%u)",
+-	       exception_mnemonic(GP_VECTOR),
+-	       exception_mnemonic(exception_vector()), exception_error_code());
++	ASM_TRY_NONCANONICAL("orq $0, (%[nc])", [nc]"a"(NONCANONICAL),
++			     "memory access", GP_VECTOR);
+ 
+ 	/* RSP based, should #SS(0) */
+-	asm volatile(ASM_TRY("1f") "orq $0, (%%rsp,%[noncanonical],1); 1:"
+-		     : : [noncanonical]"r"(NONCANONICAL));
+-	report(exception_vector() == SS_VECTOR && exception_error_code() == 0,
+-	       "non-canonical rsp-based access, should %s(0), got %s(%u)",
+-	       exception_mnemonic(SS_VECTOR),
+-	       exception_mnemonic(exception_vector()), exception_error_code());
++	ASM_TRY_NONCANONICAL("orq $0, (%%rsp,%[nc],1)", [nc]"r"(NONCANONICAL),
++			     "rsp-based access", SS_VECTOR);
+ 
+ 	/* RBP based, should #SS(0) */
+-	asm volatile(ASM_TRY("1f") "orq $0, (%%rbp,%[noncanonical],1); 1:"
+-		     : : [noncanonical]"r"(NONCANONICAL));
+-	report(exception_vector() == SS_VECTOR && exception_error_code() == 0,
+-	       "non-canonical rbp-based access, should %s(0), got %s(%u)",
+-	       exception_mnemonic(SS_VECTOR),
+-	       exception_mnemonic(exception_vector()), exception_error_code());
++	ASM_TRY_NONCANONICAL("orq $0, (%%rbp,%[nc],1)", [nc]"r"(NONCANONICAL),
++			     "rbp-based access", SS_VECTOR);
+ }
+ 
+ static void test_movabs(uint64_t *mem)
+
+base-commit: 525bdb5d65d51a367341f471eb1bcd505d73c51f
+-- 
+2.50.0.727.gbf7dc18ff4-goog
+
+
+--KMqhKOFQerfDU/yy
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0002-x86-emulator64-Extend-non-canonical-memory-access-te.patch"
+
+From efb11a007a0e041ef029753b0b98abe071008334 Mon Sep 17 00:00:00 2001
+From: Mathias Krause <minipli@grsecurity.net>
+Date: Thu, 26 Jun 2025 07:42:51 -0700
+Subject: [PATCH 2/2] x86/emulator64: Extend non-canonical memory access tests
+ with CR2 coverage
+
+Extend the non-canonical memory access tests to verify CR2 stays
+unchanged.
+
+There's currently a bug in QEMU/TCG that breaks that assumption.
+
+Link: https://gitlab.com/qemu-project/qemu/-/issues/928
+Signed-off-by: Mathias Krause <minipli@grsecurity.net>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ x86/emulator64.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/x86/emulator64.c b/x86/emulator64.c
+index 21df3b0a..6a85122f 100644
+--- a/x86/emulator64.c
++++ b/x86/emulator64.c
+@@ -325,10 +325,14 @@ static void test_mmx_movq_mf(uint64_t *mem)
+ 	report(exception_vector() == MF_VECTOR, "movq mmx generates #MF");
+ }
+ 
++#define CR2_REF_VALUE	0xdecafbadUL
++
+ #define ASM_TRY_NONCANONICAL(insn, inputs, access, ex_vector)			\
+ do {										\
+ 	unsigned int vector, ec;						\
+ 										\
++	write_cr2(CR2_REF_VALUE);						\
++										\
+ 	asm volatile(ASM_TRY("1f") insn "; 1:" :: inputs);			\
+ 										\
+ 	vector = exception_vector();						\
+@@ -337,6 +341,13 @@ do {										\
+ 	report(vector == ex_vector && !ec,					\
+ 	      "non-canonical " access ", should %s(0), got %s(%u)",		\
+ 	      exception_mnemonic(ex_vector), exception_mnemonic(vector), ec);	\
++										\
++	if (vector != PF_VECTOR) {						\
++		unsigned long cr2  = read_cr2();				\
++										\
++		report(cr2 == CR2_REF_VALUE,					\
++		       "Wanted CR2 '0x%lx', got '0x%lx", CR2_REF_VALUE, cr2);	\
++	}									\
+ } while (0)
+ 
+ static void test_jmp_noncanonical(uint64_t *mem)
+-- 
+2.50.0.727.gbf7dc18ff4-goog
+
+
+--KMqhKOFQerfDU/yy--
 
