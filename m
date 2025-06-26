@@ -1,86 +1,91 @@
-Return-Path: <kvm+bounces-50793-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50795-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00138AE96DA
-	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 09:35:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 92ED4AE96DD
+	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 09:35:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9758B3B1F8E
-	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 07:34:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CEB4A3B7A6A
+	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 07:34:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F06523BCF3;
-	Thu, 26 Jun 2025 07:35:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B00252586EA;
+	Thu, 26 Jun 2025 07:35:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="M4J4w3vt"
+	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="kngJ9mEN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B76092264B3
-	for <kvm@vger.kernel.org>; Thu, 26 Jun 2025 07:35:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35D6A23B634
+	for <kvm@vger.kernel.org>; Thu, 26 Jun 2025 07:35:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750923306; cv=none; b=TwtHUOeKYiEa8UIsVuVHBuwdlsRQN/cgUKQz/1Wxw6pw0Gi3Vwgx9Sk0DE11eugSwP4Fqi9IGiC7mzJd9cNDG8ifnkjWAtDdpAr9jaCb+9qcQ/GCmUWcQ4mOB/9UPqOHkMInoh+j52CQXlSj5mdUjrhxQBeO9yIiB3vgD91v9cc=
+	t=1750923308; cv=none; b=sfbEt60tC+2iKqBiPhJlEHPm/7uu2npunzqME4hHY14Zr2UKVi17RMYKMRHFBAP9aLNC2FslTflwV65SNuy5F0y348KqjarCrHX48ci4DL3EFdiDpjxI3ZP/rfQOx2KM6DQ3RmwGbAsMz+eOKQHOsHUkdCa9W6/0VqlSj+6fLWc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750923306; c=relaxed/simple;
-	bh=j6Opc35X7leVU0nN3C3XsQlOnL1x7ewbkhtYcLhuFgU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cvRx1nR3d+5Z2u3dTzkdbQuhoetDH0Oq32xifeZIMtTLJENXzAeDPQPRxhcuW4VWKYcg97nyWa+FY08hxWkLjxH42E6oL40jEPiWMhfZcxMbQ4WOcHsn8WjZZYW05wAVzeNcEoJVwUc0J/Hh/5nLCjaiKFMYikvddn97ufmDobo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=M4J4w3vt; arc=none smtp.client-ip=209.85.128.45
+	s=arc-20240116; t=1750923308; c=relaxed/simple;
+	bh=V0t40/cDarifkRk2kNKvj8xTlqukAfLR+XcsTBAmKOc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=JsglrNioy0BI109z/vn30ZRONCauXjuMXNBIONryuUmcIWPDj4uGUtZ9OCFyPCB8mscQs/cedl/tpukYj9oF3r6P2eg2I8QC6Yym70xKGCpa2xlwi+sM4fm2+Pm9n/IBam52EJJwflvGRM5vodJgXWdvaCRqM4DDErNzzB/in8I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=kngJ9mEN; arc=none smtp.client-ip=209.85.221.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensrcsec.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4531e146a24so2943835e9.0
-        for <kvm@vger.kernel.org>; Thu, 26 Jun 2025 00:35:04 -0700 (PDT)
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-3a6d77b43c9so610902f8f.3
+        for <kvm@vger.kernel.org>; Thu, 26 Jun 2025 00:35:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=grsecurity.net; s=grsec; t=1750923303; x=1751528103; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ii+zWZS3RNOqzq3CZGEODgqk1meUnRXZz1gnHNAPn40=;
-        b=M4J4w3vtaEXLT3Lx8wCXc0ULGWYiD8dLN3gfPKQfhl2TBg71cr1ntWK3hui1IF63S7
-         PQ0Ro6IF6EZXk63zlFjQc1AqlSjvvEK452eS3Xb//cyFh47WLywBVGnw5DvVqSyt6jjb
-         B0zJ35vCxri7YExHtAayNwWetmiIAH6VU1eBk2CvVT1glrGWoNBQZNTchAIKd9hw/4K9
-         9FaAeyGjCsKN2L9Zcscbk+lfeVhWQaz76oicr1fGqTrO6uvk0BHF9KgzqiL0qZibrXDR
-         SOvMdA0a44BYHwHBIXBg6lBqUCjuU61gfsjXgKJllwTUdOJ4VWk4nzaw/9J7uQ9tkGUL
-         Uscw==
+        d=grsecurity.net; s=grsec; t=1750923304; x=1751528104; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=F/uuUvpHNAh5eceFxSujhVaziUUgi2G09SfMmIp8+2c=;
+        b=kngJ9mENRfTcDWqK4udcpiDhc0TK9s0ItOdMTRQ5zrBRDxyr8DUoFH+JKExcoPwcn+
+         /okJlyAzlApJAH+8E8cteiUxJRadVcwhvywHRut11+VuWVaXJwc8u1ZwgPdMe+5XmCkz
+         kjlbvnCQmSse3VNw5JSSMTIkntVMbUuyi0Lmz2Vx1pv41PXWjxEwifiL3d+6REp52lXX
+         4ui6TPTrkxbS7CFkJUCWH5f8+WHfTv3WuZo7DBQ7/fPTTdVsm58XwP2i1vNfgagasoR8
+         eX/EfPqY/z4WThdAmEB5rFwwENMdlJG+yOrSACMSCSPKvC9Ea392A1Jtj+U1UNT/vs1Z
+         aqYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750923303; x=1751528103;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ii+zWZS3RNOqzq3CZGEODgqk1meUnRXZz1gnHNAPn40=;
-        b=O61y8JV5x2diYmwtq8xzHfvepCOSnTD9OYzirxWJMQ/c/NmNVQISdlgWp48ah3wNNu
-         4Sfsxt5B/MY9ztDFC+NC6GI9DKRbVbdwhDPWvToGynDd1w4ejA+FE1pyK7D3eLsRXY7A
-         i4gzIdRzixnUtojZ0WhpoqOWPQeOHk/6e7ASdAVZKTTvmnfDDeE5KNp7dNS/bVH/czFz
-         cLRQTFLzneOLrjvCtHhqFjBBbvp9BqxEGXS42CVsdFEzj+UOD+7u/TWwOszsgyIFIaBp
-         uC9uUjyf/8nfqF+TPd6B2N76P8+SIPubLW2ey4lmzBiUe5rDL/vQIvC7oOBZTp+lfeB6
-         PNaQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWn8Zd23/nvuB3WLo/XffjcNT/j9e9Qs5z58+G+GMceg53oLRFX0qhfuEjNUCIoeT4nBc4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz17o7FDFkLyR7NO3uN23X1X1zhEZ4Sa+qBqlmLO59l7Mr56YrI
-	61F5x7GDT61+YiH4P4JLxu2O8mIYvU2SJkBN7d1czwq9LZk8XaR/tCof3O151og/5qM=
-X-Gm-Gg: ASbGncsi/c8pYG836xeSxcs0XhhgNzHUIiQnqu1yXS5GdRfa5Kiv4/XKc3SqMSnw7T4
-	WSa3A7VfQf14wUDINEtYU2nW5HnqxQi+UmM0i8lpHFNBpY/m20kUFndPwPij2lzNznfXkz8pwfY
-	GKdOb+b+s8M8TAt+y3+pzbZdpACx18XVoXbY5giIGuXjPFgDyvTebanC8j49ph+x7R7Z9jwOveF
-	+C3Bu3Mqpouz/tFe8scbW4+9/2wxFgSfojM8oz8LYScnIMcK7H1AShOPpfVHWEXatXrAIM5YSQw
-	EESx2lv+WiTD+R9VIgxoLQ66+1VnlH+pN8GDMqt+v288Tv5bl9j9977q8H6GWAeZ82vwta/Gwgv
-	H4y5PrRG7JPwsBP7XzP58o4UwX5mu+JVL3N0t42Zq10ZLyicgtmZ0Erg=
-X-Google-Smtp-Source: AGHT+IHIdelXM/juBeZdBT2mpMG9IEAeg6WqVFuLaLCqevoOdj7pu44PT6QaSAm6TwE764TKwiDEHw==
-X-Received: by 2002:a05:600c:348f:b0:450:cabd:160 with SMTP id 5b1f17b1804b1-4538b24401fmr9526295e9.3.1750923302924;
-        Thu, 26 Jun 2025 00:35:02 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1750923304; x=1751528104;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=F/uuUvpHNAh5eceFxSujhVaziUUgi2G09SfMmIp8+2c=;
+        b=rj1SoqHJ3VZzWGsvR0Uqq0GeDt4ixlhE3ru7r1OSdX3Qh858tK6fmQPi41rdJVLBFR
+         RByBcv1prHnykztTE8HAHqYEoFVuV4nsjjahsxkv7tbLcm/OMbhpUG4j+yo/z96ytm46
+         +zL+KQociSV1mqXyeOZ8hh9DRIEz9BxyLC4mkTITdYKFu1I/0lVTu8o6yh9DdHYgFewR
+         VCaFUbiM1wyXutTOZJVp1O5JMSDeioDdkDLMXZ+H69YE5OOReI5kKfy/7E0EN8IbCPI6
+         0WSqJysWZjQFwcCVyGWzPLLh8hlBGSgsQRMVuseN55nySfAygXsPM8fctL/pdTwnRz8B
+         UjfA==
+X-Forwarded-Encrypted: i=1; AJvYcCVrclHEupSKdjFozLSAOEdpCz3epUl98XCpP5wpKjJlkP5Ty4CenHteft2qZyeggmXTx0I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxvVoGyZU4qk7s+OkgcvbkN3ALx44w39ReyV+PN26WGUNNt6Tfc
+	u3wJft3oHHDjcnSf/ffGEz/NpejGW2lmXC6DV5mc2gmLQPPpyJ665DbL5UznAu23cWs=
+X-Gm-Gg: ASbGncsJfKuNtl/Pvc6MG+OPD5P7O4kxY2rNlvlx9/DULTsNdkSVNckOUz4hlVwbKKP
+	IPWPpy1ngsCDPIjqXkunZ78+rw84N/4B/QbpEkz6YZSwNqHUMgPjFSn28UcnpXjl+t0yIwAwYa/
+	ObUBW3OLY3BzIJ9yRkR7YgMVkaak2U5VGCICLKPzx3S2GjQ9lQUX+pslU/wq/bs3z45yXRyNdTV
+	YemMpghmVjCb488TDB0lXrD/V92HQSufkQKHFVsojZpPB0pKNHYmvza93kVezci2+rjeT77qbAp
+	+CgPIM2//HMO7kdcOtT7jPrao66WSaEBAU+IPeBzW4VO9dwzmnegWu8NSEcNEj3RnEYlmF5YJyC
+	w4h9JR/R3FHA7ge1qkbwN3LPx/QCiErqZrPPc0iBBlumYCHakcVF7cVM=
+X-Google-Smtp-Source: AGHT+IH3HYX1US0UcqGP9fmbnL/NFruUf1VpoJ8DZk4odvZXBFjMICzZc2sI/P3s8TfkF+VbmMsDdg==
+X-Received: by 2002:a05:6000:178e:b0:3a5:3e47:8af5 with SMTP id ffacd0b85a97d-3a6ed637801mr5372513f8f.27.1750923303730;
+        Thu, 26 Jun 2025 00:35:03 -0700 (PDT)
 Received: from nuc.fritz.box (p200300faaf22cf00fd30bd6f0b166cc4.dip0.t-ipconnect.de. [2003:fa:af22:cf00:fd30:bd6f:b16:6cc4])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a6e80f259dsm6692451f8f.50.2025.06.26.00.35.02
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a6e80f259dsm6692451f8f.50.2025.06.26.00.35.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Jun 2025 00:35:02 -0700 (PDT)
+        Thu, 26 Jun 2025 00:35:03 -0700 (PDT)
 From: Mathias Krause <minipli@grsecurity.net>
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Sean Christopherson <seanjc@google.com>,
 	Chao Gao <chao.gao@intel.com>,
 	kvm@vger.kernel.org,
-	Mathias Krause <minipli@grsecurity.net>
-Subject: [kvm-unit-tests PATCH v2 00/13] Improve CET tests
-Date: Thu, 26 Jun 2025 09:34:46 +0200
-Message-ID: <20250626073459.12990-1-minipli@grsecurity.net>
+	Mathias Krause <minipli@grsecurity.net>,
+	Yang Weijiang <weijiang.yang@intel.com>
+Subject: [kvm-unit-tests PATCH v2 01/13] x86: cet: Pass virtual addresses to invlpg
+Date: Thu, 26 Jun 2025 09:34:47 +0200
+Message-ID: <20250626073459.12990-2-minipli@grsecurity.net>
 X-Mailer: git-send-email 2.47.2
+In-Reply-To: <20250626073459.12990-1-minipli@grsecurity.net>
+References: <20250626073459.12990-1-minipli@grsecurity.net>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -89,49 +94,37 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi,
+From: Yang Weijiang <weijiang.yang@intel.com>
 
-this is a v2 of [1] and [2]. It's merging the two series as well as
-integrating feedback and minor fixes.
+Correct the parameter passed to invlpg.
 
-[1] https://lore.kernel.org/kvm/20250513072250.568180-1-chao.gao@intel.com/
-[2] https://lore.kernel.org/kvm/20250620153912.214600-1-minipli@grsecurity.net/
+The invlpg instruction should take a virtual address instead of a physical
+address when flushing TLBs. Using shstk_phys results in TLBs associated
+with the virtual address (shstk_virt) not being flushed, and the virtual
+address may not be treated as a shadow stack address if there is a stale
+TLB. So, subsequent shadow stack accesses to shstk_virt may cause a #PF,
+which terminates the test unexpectedly.
 
-Please apply!
+Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+Signed-off-by: Chao Gao <chao.gao@intel.com>
+Signed-off-by: Mathias Krause <minipli@grsecurity.net>
+---
+ x86/cet.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thanks,
-Mathias
-
-
-Chao Gao (7):
-  x86: cet: Remove unnecessary memory zeroing for shadow stack
-  x86: cet: Directly check for #CP exception in run_in_user()
-  x86: cet: Validate #CP error code
-  x86: cet: Use report_skip()
-  x86: cet: Drop unnecessary casting
-  x86: cet: Validate writing unaligned values to SSP MSR causes #GP
-  x86: cet: Validate CET states during VMX transitions
-
-Mathias Krause (5):
-  x86: cet: Make shadow stack less fragile
-  x86: cet: Simplify IBT test
-  x86: cet: Use symbolic values for the #CP error codes
-  x86: cet: Test far returns too
-  x86: Avoid top-most page for vmalloc on x86-64
-
-Yang Weijiang (1):
-  x86: cet: Pass virtual addresses to invlpg
-
- lib/x86/msr.h      |   1 +
- lib/x86/usermode.c |   4 ++
- lib/x86/vm.c       |   2 +
- x86/vmx.h          |   8 +++-
- x86/cet.c          | 110 ++++++++++++++++++++++++++-------------------
- x86/lam.c          |  10 ++---
- x86/vmx_tests.c    |  81 +++++++++++++++++++++++++++++++++
- x86/unittests.cfg  |   7 +++
- 8 files changed, 171 insertions(+), 52 deletions(-)
-
+diff --git a/x86/cet.c b/x86/cet.c
+index 42d2b1fc043f..51a54a509a47 100644
+--- a/x86/cet.c
++++ b/x86/cet.c
+@@ -100,7 +100,7 @@ int main(int ac, char **av)
+ 	*ptep |= PT_DIRTY_MASK;
+ 
+ 	/* Flush the paging cache. */
+-	invlpg((void *)shstk_phys);
++	invlpg((void *)shstk_virt);
+ 
+ 	/* Enable shadow-stack protection */
+ 	wrmsr(MSR_IA32_U_CET, ENABLE_SHSTK_BIT);
 -- 
 2.47.2
 
