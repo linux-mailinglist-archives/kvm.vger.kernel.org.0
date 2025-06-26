@@ -1,158 +1,142 @@
-Return-Path: <kvm+bounces-50806-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50807-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49D87AE96E8
-	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 09:36:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35306AE96FD
+	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 09:41:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A7D717B60EC
-	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 07:34:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6576E179161
+	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 07:41:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B50A225EFB7;
-	Thu, 26 Jun 2025 07:35:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD249243946;
+	Thu, 26 Jun 2025 07:40:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="l2h925tK"
+	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="KQK1Ap9a"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 486EB25D546
-	for <kvm@vger.kernel.org>; Thu, 26 Jun 2025 07:35:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85A8723BCEE
+	for <kvm@vger.kernel.org>; Thu, 26 Jun 2025 07:40:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750923317; cv=none; b=YiJ4TTncSrYse7KYNbPZkHw+VW5+89a+WSY6FYmAYZ7xHCZdhIpYr+xLyuARD9hLFRMLTXOdR7DxKPojAQRN6SwYL0pc6miSLRu8rB1UK/9KLp/8Dv7yPwFi8b9D+JzaKnno8x6oOrcMMNEFQbkHOyiDaY7qtxOy9KY+5ZpoBsI=
+	t=1750923656; cv=none; b=qExaKXeOxMqsMIp8+diQ14+7Op5/3C5+PeovRDRzAyAh/FlwVoYegea13q6zYy1CAkb/fdyVcMXzfK4AHexVbUSx7Sw2Vtf2L+Qmv/axc3VtfT0XoRDLt1+xSlv6OetbwbIOvuekMmAVYnslkWQhumNqa7TrYaxjLAiOx/RPWRg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750923317; c=relaxed/simple;
-	bh=2OB+04msUxf+YuX/WMJXSqKlVIWXpY6QC3RWqMbf8AY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OHeC1SPUY/8+jSAn1glsq4q9Y1m7+0AoAV1uwm+cu95vIEwdyqq4n6P/cHzsgWPo5UIHEJAev7oS8jczTJXH4nlBulvy4Uth9d1wu9US2xMiVLzyAfQiaacVmfJFWb+0fJ+kpISAfkPEFZSPHxxFfhMf4UGDFZFfar/yg+ZvBbA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=l2h925tK; arc=none smtp.client-ip=209.85.221.45
+	s=arc-20240116; t=1750923656; c=relaxed/simple;
+	bh=JBElSZFFS+TgZq2EE7QPWtr+DJP4QLhhEpMEba0lDBg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XZhxyUU0orv0h6RIpXJIVgS6dvkWcQ5TSgcEnM3mABSXUEOIfPnDpSONRNcueroTl/F00WLn+g2OP3S5hNIP3wL2hXeOH2ATbb4JVR4XIuwZi46I3V/HoO8OGXAUFvcQkU5Y4AvZe4CPq0g8r3FsIA5wP3cVqOnjlGuf4hJ/sDc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=KQK1Ap9a; arc=none smtp.client-ip=209.85.221.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensrcsec.com
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-3a57c8e247cso498656f8f.1
-        for <kvm@vger.kernel.org>; Thu, 26 Jun 2025 00:35:15 -0700 (PDT)
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-3a50956e5d3so507782f8f.1
+        for <kvm@vger.kernel.org>; Thu, 26 Jun 2025 00:40:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=grsecurity.net; s=grsec; t=1750923314; x=1751528114; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TN6EDtpGAooBh3mWIUxQOQde4ZcWTOZTfXFRnvyNUEM=;
-        b=l2h925tKP+v9ir8v08KJGD4DIJZoGCKktSB0DiUM3KYmIN0w8dCM0bdSO/fzNOaaKM
-         L3RCO22AYyzymMmiCcD75m8b6/XgYNY2uUDKlI6Wd8RxDbMHJgLFyjdIBhmlputUKfn/
-         N7Mw2+hmweMae5htqlfqP5NdnMtJj5G91hDAc44SYX797YJiopKgrpe0DVS6RtMPOfzh
-         Qne1MKIDkwhZnFjXZ0etShVnwqv9kV5xDgU1iHQexMzXo/oYaDE6xFM1gO+MVF2dcjnS
-         PfwmLDjzhIttqNBWhpyWyPLlBThiMoj3uLJx7uW4X3JW5dh/MDZmKcH9tPraX/8XA1He
-         iDLQ==
+        d=grsecurity.net; s=grsec; t=1750923653; x=1751528453; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=JBElSZFFS+TgZq2EE7QPWtr+DJP4QLhhEpMEba0lDBg=;
+        b=KQK1Ap9ajyTAfQvyqkaoVV5jrKLKaPXE1/7Pfi+kJsLFMZiziGZSCgoDh+CUpiLoE1
+         kHpUrdBL8AXKRBKE3u6T4cBU9J8RAnh4Ost1MG56CU22nyg6+wwuAymOHJH9/y+p/IAp
+         FacJrVPEj+9fDuUdpS9I2KGUczME6RcD9JbQkWbudSjei1IbjOSZ0i956D5CzwtvqeVT
+         504hHX+d9jcQgg9mmaSnD37I7Ve90DwVcIlKu/XwwdXGXuZf2kfCXiP6dUbe24ZDpSrB
+         1aYXvmYJl0DJLj+EpmTQjirJ2e7M0reRA+4oQbjhJ+lGHoJmNEAZw5N0MzTDjEEhRa4o
+         D74w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750923314; x=1751528114;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TN6EDtpGAooBh3mWIUxQOQde4ZcWTOZTfXFRnvyNUEM=;
-        b=gO4K8MhkYxlc4WqiVI6/QgNixg7L3tWWgaf3KHu/TembD+XZaOlk/bMIs3jtgG8w4z
-         JUnyCpPjm/m7GokpEvk9p8gs24ZNqR2XTVR7B9q1qN6LVXyiDbxfAXAH6bzasakbDion
-         7OZFs0NqxlZwZ0pcaVf/TwHxOCQ0s301uANCTKDt/90hZJFUX3DRiwSqRK47xgYmDUQk
-         n2Q7uzJjdfte8Ltc+Vk641HTS8rtJDwhC5GqFeOzQHLldGLsEWnSbf8LKueLQI134ZIB
-         GaUt9whVMPQM27luM2cLua9nvkvpEeyF3gKi3IP18peFu0IxEROggeT1Qp4JJTdrVRw0
-         qssg==
-X-Forwarded-Encrypted: i=1; AJvYcCXv1aoHrlyyhYwyJTzn32TJ/K+gUS0ohbCBnTMYGyerqB9BzPwKF2UWY2mBkcAHDZWAcvM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw3gELvwe4zGCWRCxtiN5k6VhA7eMpo6/KD54QAk4mglHjDvWHN
-	zzjOVL1gF/E7w2+UX0yC9ZpVTkJr6SnIB4qBA1hgWTex+jAPiDtJ0KJpxHifhUTdX1E=
-X-Gm-Gg: ASbGncslZphy6Muc8ILuHj8DGhmarTlMoUpICP5aavordMz4irSo/eh0zZhYDtlQrCU
-	F36lCSU7GxWRHkMxp7mopyDybslXcywiC1jQ9NZzLFrncM+nw9CwRyqp4XGH56LEk046wCEQWpU
-	HugiUanS8inYZG3Nu2edPlEtSGkMnIsqzumw1r5DzUGmMvk91y2DtXWVGhBEl/YsVVwoHHH53Db
-	RByOzB5T3Bb2on3R76XtW6g52Whr421I9BeNKoyr1TbgfwFl87Fb7qGuH9VtqM+Ila3q4PcDrGz
-	zmaTqS6TZIshFp+9Ss/UIogzpQ9W4uggsdQKL7Pe67kGnuwYMRerpNQVB93VzOF3gN76XDXG2qI
-	uSLZ5ldnqLsvlLJD1jh/MxdY2M2t1mvS1FZKdxDbUBvRZbAAzJy0cb4A=
-X-Google-Smtp-Source: AGHT+IFX1IRWIqqIFOoK/JNpGVs4ynolijLEuwcrjDtZngF94z7bTA0HM9y0jwT9HR9xmHEs3Xn7ng==
-X-Received: by 2002:a05:6000:26ca:b0:3a5:2694:d75f with SMTP id ffacd0b85a97d-3a6ed651c5dmr4848875f8f.52.1750923313630;
-        Thu, 26 Jun 2025 00:35:13 -0700 (PDT)
-Received: from nuc.fritz.box (p200300faaf22cf00fd30bd6f0b166cc4.dip0.t-ipconnect.de. [2003:fa:af22:cf00:fd30:bd6f:b16:6cc4])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a6e80f259dsm6692451f8f.50.2025.06.26.00.35.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Jun 2025 00:35:13 -0700 (PDT)
-From: Mathias Krause <minipli@grsecurity.net>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Sean Christopherson <seanjc@google.com>,
-	Chao Gao <chao.gao@intel.com>,
-	kvm@vger.kernel.org,
-	Mathias Krause <minipli@grsecurity.net>
-Subject: [kvm-unit-tests PATCH v2 13/13] x86: Avoid top-most page for vmalloc on x86-64
-Date: Thu, 26 Jun 2025 09:34:59 +0200
-Message-ID: <20250626073459.12990-14-minipli@grsecurity.net>
-X-Mailer: git-send-email 2.47.2
-In-Reply-To: <20250626073459.12990-1-minipli@grsecurity.net>
-References: <20250626073459.12990-1-minipli@grsecurity.net>
+        d=1e100.net; s=20230601; t=1750923653; x=1751528453;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JBElSZFFS+TgZq2EE7QPWtr+DJP4QLhhEpMEba0lDBg=;
+        b=PrBadnceV22mLNHhRgAcXzrxwewwDlbduV7vwh1jsPG5kk6nK/Hw9hYDCCSne3/zGc
+         DGQmbwG+DHzIjx1IwYp6gdA8/LhYEunmnyuL+xjQmXv0EyawhaUkfFixA/Yo8ik5vmPG
+         +qSVmW4R8qIg4I3oZrW0f0RP+KF8BagH/2U/7+XhG0R8sxlv5RkD6cNJXZALkMoJ8Zv7
+         LRIWyelz6mhcQwRGm+J6sTnQnjJ3GJudpDGRjunGoZ0oL3PT6thj8NOOKrNufRaABACx
+         ScuAKG5WfAnoPR2vjE+iRrLh+gWJDcpTOfk1UrN/nt4WQ8yQXQECZtAiAuilRLNltJea
+         GpbQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXBC2Tu7sAdd+S1vYX860BxfX4jDrjNWBK0cIVHL2CSc2t37Oxh/He9r9LPNO6ubb/t/lw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx23JUBXX7PN3K5JQbcdHegfcvv3oI84IFNRzlbQGv/XGLBWS7D
+	QpIatmMEd9efduJPyuV9M2Jdso8ek+N2KHJgM8T11j2cnJejJFQyPSIRFOLfF5kF/lY=
+X-Gm-Gg: ASbGncs0RqBKyGO92nVxeb5e1lBjRi5akVbqaYJDNeh1XkSRgVYt2nEScqLRNtARsND
+	JFUOI5lsu4ta6GA9PZ4rmw3RSpPIrluE7RDjRys7o+SVQuP5xf63vI71AxtJSPfjiLl2BDiQHxY
+	UWG6cYzxVeah8ubOHyzfmztMn/SejJYs9XW/W+KTZKHsWwSkcnzorly9tpl0LoZhyWWTmyYw+8/
+	NVnzk2QF/w3n7vDh/9HF3Xv9vqmcdEmIpnvzBclXCmB16xXWU6S9kFEcMVLIFiJAQ/6jS/v1MK8
+	NBHbBNd6kVYp18FlOhWnJy1ZFzYXqQDTWRubI6RnVq7jyWeq0imnwOMFfQDVQpOKx+trpK7HqSF
+	Iny8h1QhdKbzkecILKCrKduFABeEY3ok6msOHdQ==
+X-Google-Smtp-Source: AGHT+IEeYBdQbEUKPFxwdB/1N4Qy+osWIPj7BOey3vbChl9yUWirYssw9JxIFJ3CQIGcWecWDAN08g==
+X-Received: by 2002:a05:6000:22c8:b0:3a4:e4ee:4c7b with SMTP id ffacd0b85a97d-3a6ed5dbb24mr4859748f8f.15.1750923652724;
+        Thu, 26 Jun 2025 00:40:52 -0700 (PDT)
+Received: from [192.168.24.113] (pd9ed7163.dip0.t-ipconnect.de. [217.237.113.99])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a6e80f2b8fsm6646712f8f.59.2025.06.26.00.40.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 26 Jun 2025 00:40:52 -0700 (PDT)
+Message-ID: <9bc8e86a-8fdc-4d3d-9435-e6508c4c1791@grsecurity.net>
+Date: Thu, 26 Jun 2025 09:40:51 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests PATCH v1 0/8] Improve CET tests
+To: Chao Gao <chao.gao@intel.com>, kvm@vger.kernel.org
+Cc: pbonzini@redhat.com, seanjc@google.com
+References: <20250513072250.568180-1-chao.gao@intel.com>
+Content-Language: en-US, de-DE
+From: Mathias Krause <minipli@grsecurity.net>
+Autocrypt: addr=minipli@grsecurity.net; keydata=
+ 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
+ RzDVkdgPJkL/NFTKZHo5foFXNi89kA==
+In-Reply-To: <20250513072250.568180-1-chao.gao@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-The x86-64 implementation if setup_mmu() doesn't initialize 'vfree_top'
-and leaves it at its zero-value. This isn't wrong per se, however, it
-leads to odd configurations when the first vmalloc/vmap page gets
-allocated. It'll be the very last page in the virtual address space --
-which is an interesting corner case -- but its boundary will probably
-wrap. It does so, for CET's shadow stack, at least, which loads the
-shadow stack pointer with the base address of the mapped page plus its
-size, i.e. 0xffffffff_fffff000 + 4096, which wraps to 0x0.
+On 13.05.25 09:22, Chao Gao wrote:
+> [...]
 
-The CPU seems to handle such configurations just fine. However, it feels
-odd to set the shadow stack pointer to "NULL".
+I just send a v2 merging this series with mine[1] as:
 
-To avoid the wrapping, ignore the top most page by initializing
-'vfree_top' to just one page below.
+https://lore.kernel.org/kvm/20250626073459.12990-1-minipli@grsecurity.net/
 
-Reviewed-by: Chao Gao <chao.gao@intel.com>
-Signed-off-by: Mathias Krause <minipli@grsecurity.net>
----
-v2:
-- change comment in x86/lam.c too
+Thanks,
+Mathias
 
- lib/x86/vm.c |  2 ++
- x86/lam.c    | 10 +++++-----
- 2 files changed, 7 insertions(+), 5 deletions(-)
-
-diff --git a/lib/x86/vm.c b/lib/x86/vm.c
-index 90f73fbb2dfd..27e7bb4004ef 100644
---- a/lib/x86/vm.c
-+++ b/lib/x86/vm.c
-@@ -191,6 +191,8 @@ void *setup_mmu(phys_addr_t end_of_memory, void *opt_mask)
-         end_of_memory = (1ul << 32);  /* map mmio 1:1 */
- 
-     setup_mmu_range(cr3, 0, end_of_memory);
-+    /* skip the last page for out-of-bound and wrap-around reasons */
-+    init_alloc_vpage((void *)(~(PAGE_SIZE - 1)));
- #else
-     setup_mmu_range(cr3, 0, (2ul << 30));
-     setup_mmu_range(cr3, 3ul << 30, (1ul << 30));
-diff --git a/x86/lam.c b/x86/lam.c
-index 1af6c5fdd80a..87efc5dd4a72 100644
---- a/x86/lam.c
-+++ b/x86/lam.c
-@@ -197,11 +197,11 @@ static void test_lam_sup(void)
- 	int vector;
- 
- 	/*
--	 * KUT initializes vfree_top to 0 for X86_64, and each virtual address
--	 * allocation decreases the size from vfree_top. It's guaranteed that
--	 * the return value of alloc_vpage() is considered as kernel mode
--	 * address and canonical since only a small amount of virtual address
--	 * range is allocated in this test.
-+	 * KUT initializes vfree_top to -PAGE_SIZE for X86_64, and each virtual
-+	 * address allocation decreases the size from vfree_top. It's
-+	 * guaranteed that the return value of alloc_vpage() is considered as
-+	 * kernel mode address and canonical since only a small amount of
-+	 * virtual address range is allocated in this test.
- 	 */
- 	vaddr = alloc_vpage();
- 	vaddr_mmio = alloc_vpage();
--- 
-2.47.2
-
+[1]
+https://lore.kernel.org/kvm/20250620153912.214600-1-minipli@grsecurity.net/
 
