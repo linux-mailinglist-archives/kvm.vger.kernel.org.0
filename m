@@ -1,308 +1,232 @@
-Return-Path: <kvm+bounces-50788-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50789-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5898AE94FB
-	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 06:54:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A996EAE9506
+	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 07:02:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 10E664A3D65
-	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 04:54:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AF4677B206E
+	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 05:01:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 878502185A6;
-	Thu, 26 Jun 2025 04:54:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3834218AAA;
+	Thu, 26 Jun 2025 05:02:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QCEKlDuv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bcpcWR5M"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 651DD1A5BB7
-	for <kvm@vger.kernel.org>; Thu, 26 Jun 2025 04:54:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F3ED2F1FF6;
+	Thu, 26 Jun 2025 05:02:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750913682; cv=none; b=b764BYiZB08uqQYq5A6JMGbJDDdskFCElVN7azAX+ciknUDEBQkB9QqdEDgSvajV57slVMjezgd0v996m5Hnh3tcRLlFC2VqHTPibHocLFGH6Z6MMc04GxAH3EoN6pofHDHURcbpWxSp+wYux9Pr+Bf4xCanSFSPYhQfx/3alGY=
+	t=1750914155; cv=none; b=f7/hRX9QOkuf1+/efGZF0AUSEqvPsUumb0W0/8NnmwDqJbq+dE5Gfdrn59SIPMACHfpz+6IfJp506yncXGyveS/h0hPnr5NozpQVvFLmSa2vDqkIdD01dhbAcNtQkAjtO+1GZ0hTWgikIXQyRWp/9ZZebdEWUuJsWhHur15gZM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750913682; c=relaxed/simple;
-	bh=haqwDtha2Z89HrEjT+bEVAxDlitwpo9nqhMB2zttZeo=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=ec0q3yYI1KdOSTmPUeugC9O1sX9/l2UgEtrk5tbgWJvHWsRYfr7/1ZD+0nW3FgXEF2lrOEPoDkwFnPXA6PxjWDGd/+rRlzVnLiGQecV5R+taGK1eg1DU/8wJjgzcSimOv9xzVNWWbZ+vqAK2gOpXhgynOdgWggTDtbezxtny/U8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QCEKlDuv; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750913679;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ux55LTzZu+8r8VvC9MmnRWtiQyH3i5QT3q5f9MnpL9Q=;
-	b=QCEKlDuvXGyNaNBT+npxGJZv655Q3d01PwriL68trCtdsyabbiwJ5x0DA1PORQ58G4g+U3
-	Hr04rroPhsxeylYJzYRLAESCULnPsdJ/j1lzL2xPVdh7awLBNEUWpHS8vX/y3qc3sx33ta
-	jlGUEMlt/SCOGi1+DkYKejikNoDAVzQ=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-29-bzK0JSyXOEeHtuAvfZED4w-1; Thu,
- 26 Jun 2025 00:54:34 -0400
-X-MC-Unique: bzK0JSyXOEeHtuAvfZED4w-1
-X-Mimecast-MFC-AGG-ID: bzK0JSyXOEeHtuAvfZED4w_1750913670
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4886119560B2;
-	Thu, 26 Jun 2025 04:54:27 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.45.242.10])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6CE3F30001A1;
-	Thu, 26 Jun 2025 04:54:21 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id B9BE521E6A27; Thu, 26 Jun 2025 06:54:18 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-devel@nongnu.org,  Joel Stanley <joel@jms.id.au>,  Yi Liu
- <yi.l.liu@intel.com>,  Alex =?utf-8?Q?Benn=C3=A9e?=
- <alex.bennee@linaro.org>,  Helge Deller
- <deller@gmx.de>,  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,  Andrew
- Jeffery <andrew@codeconstruct.com.au>,  Fabiano Rosas <farosas@suse.de>,
-  Alexander Bulekov <alxndr@bu.edu>,  Darren Kenny
- <darren.kenny@oracle.com>,  Leif Lindholm
- <leif.lindholm@oss.qualcomm.com>,  =?utf-8?Q?C=C3=A9dric?= Le Goater
- <clg@kaod.org>,  Ed
- Maste <emaste@freebsd.org>,  Gerd Hoffmann <kraxel@redhat.com>,  Warner
- Losh <imp@bsdimp.com>,  Kevin Wolf <kwolf@redhat.com>,  Tyrone Ting
- <kfting@nuvoton.com>,  Eric Blake <eblake@redhat.com>,  Palmer Dabbelt
- <palmer@dabbelt.com>,  Yoshinori Sato <ysato@users.sourceforge.jp>,  Troy
- Lee <leetroy@gmail.com>,  Halil Pasic <pasic@linux.ibm.com>,  Akihiko
- Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>,  Michael Roth
- <michael.roth@amd.com>,  Laurent Vivier <laurent@vivier.eu>,  Ani Sinha
- <anisinha@redhat.com>,  Weiwei Li <liwei1518@gmail.com>,  Eric Farman
- <farman@linux.ibm.com>,  Steven Lee <steven_lee@aspeedtech.com>,  Brian
- Cain <brian.cain@oss.qualcomm.com>,  Li-Wen Hsu <lwhsu@freebsd.org>,
-  Jamin Lin <jamin_lin@aspeedtech.com>,  qemu-s390x@nongnu.org,  Vladimir
- Sementsov-Ogievskiy <vsementsov@yandex-team.ru>,  qemu-block@nongnu.org,
-  Bernhard Beschow <shentey@gmail.com>,  =?utf-8?Q?Cl=C3=A9ment?=
- Mathieu--Drif
- <clement.mathieu--drif@eviden.com>,  Maksim Davydov
- <davydov-max@yandex-team.ru>,  Niek Linnenbank <nieklinnenbank@gmail.com>,
-  =?utf-8?Q?Herv=C3=A9?= Poussineau <hpoussin@reactos.org>,  Christian
- Borntraeger
- <borntraeger@linux.ibm.com>,  Paul Durrant <paul@xen.org>,  Manos
- Pitsidianakis <manos.pitsidianakis@linaro.org>,  Jagannathan Raman
- <jag.raman@oracle.com>,  Igor Mitsyanko <i.mitsyanko@gmail.com>,  Max
- Filippov <jcmvbkbc@gmail.com>,  Pierrick Bouvier
- <pierrick.bouvier@linaro.org>,  "Michael S. Tsirkin" <mst@redhat.com>,
-  Anton Johansson <anjo@rev.ng>,  Peter Maydell <peter.maydell@linaro.org>,
-  Cleber Rosa <crosa@redhat.com>,  Eric Auger <eric.auger@redhat.com>,
-  Yanan Wang <wangyanan55@huawei.com>,  qemu-arm@nongnu.org,  Hao Wu
- <wuhaotsh@google.com>,  Mads Ynddal <mads@ynddal.dk>,  Sriram Yagnaraman
- <sriram.yagnaraman@ericsson.com>,  qemu-riscv@nongnu.org,  Paolo Bonzini
- <pbonzini@redhat.com>,  Jason Wang <jasowang@redhat.com>,  Nicholas Piggin
- <npiggin@gmail.com>,  Michael Rolnik <mrolnik@gmail.com>,  Zhao Liu
- <zhao1.liu@intel.com>,  Alessandro Di Federico <ale@rev.ng>,  Thomas Huth
- <thuth@redhat.com>,  Antony Pavlov <antonynpavlov@gmail.com>,  Jiaxun Yang
- <jiaxun.yang@flygoat.com>,  Hanna Reitz <hreitz@redhat.com>,  Ilya
- Leoshkevich <iii@linux.ibm.com>,  Marcelo Tosatti <mtosatti@redhat.com>,
-  Nina Schoetterl-Glausch <nsg@linux.ibm.com>,  Daniel Henrique Barboza
- <danielhb413@gmail.com>,  Qiuhao Li <Qiuhao.Li@outlook.com>,  Hyman Huang
- <yong.huang@smartx.com>,  Daniel P. =?utf-8?Q?Berrang=C3=A9?=
- <berrange@redhat.com>,
-  Magnus Damm <magnus.damm@gmail.com>,  qemu-rust@nongnu.org,  Bandan Das
- <bsd@redhat.com>,  Strahinja Jankovic <strahinja.p.jankovic@gmail.com>,
-  Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,  Philippe =?utf-8?Q?Ma?=
- =?utf-8?Q?thieu-Daud=C3=A9?=
- <philmd@linaro.org>,  kvm@vger.kernel.org,  Fam Zheng <fam@euphon.net>,
-  Jia Liu <proljc@gmail.com>,  =?utf-8?Q?Marc-Andr=C3=A9?= Lureau
- <marcandre.lureau@redhat.com>,  Alistair Francis <alistair@alistair23.me>,
-  Subbaraya Sundeep <sundeep.lkml@gmail.com>,  Kyle Evans
- <kevans@freebsd.org>,  Song Gao <gaosong@loongson.cn>,  Alexandre Iooss
- <erdnaxe@crans.org>,  Aurelien Jarno <aurelien@aurel32.net>,  Liu Zhiwei
- <zhiwei_liu@linux.alibaba.com>,  Peter Xu <peterx@redhat.com>,  Stefan
- Hajnoczi <stefanha@redhat.com>,  BALATON Zoltan <balaton@eik.bme.hu>,
-  Elena Ufimtseva <elena.ufimtseva@oracle.com>,  "Edgar E. Iglesias"
- <edgar.iglesias@gmail.com>,  =?utf-8?B?RnLDqWTDqXJpYw==?= Barrat
- <fbarrat@linux.ibm.com>,
-  qemu-ppc@nongnu.org,  Radoslaw Biernacki <rad@semihalf.com>,  Beniamino
- Galvani <b.galvani@gmail.com>,  David Hildenbrand <david@redhat.com>,
-  Richard Henderson <richard.henderson@linaro.org>,  David Woodhouse
- <dwmw2@infradead.org>,  Eduardo Habkost <eduardo@habkost.net>,  Ahmed
- Karaman <ahmedkhaledkaraman@gmail.com>,  Huacai Chen
- <chenhuacai@kernel.org>,  Mahmoud Mandour <ma.mandourr@gmail.com>,  Harsh
- Prateek Bora <harshpb@linux.ibm.com>
-Subject: Re: [PATCH v2 06/12] python: upgrade to python3.9+ syntax
-In-Reply-To: <CAFn=p-YPN6MWZiETi7XWkyYVPpe7uew49CwjEdAsMmW=ZPOx5A@mail.gmail.com>
-	(John Snow's message of "Wed, 25 Jun 2025 13:35:24 -0400")
-References: <20250612205451.1177751-1-jsnow@redhat.com>
-	<20250612205451.1177751-7-jsnow@redhat.com>
-	<87cyatmw40.fsf@pond.sub.org>
-	<CAFn=p-YPN6MWZiETi7XWkyYVPpe7uew49CwjEdAsMmW=ZPOx5A@mail.gmail.com>
-Date: Thu, 26 Jun 2025 06:54:18 +0200
-Message-ID: <87cyar14sl.fsf@pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1750914155; c=relaxed/simple;
+	bh=NH4j2FqqJw6bDqDteI6k4MIVpp4cPtz23hroizXPlvg=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=PCbe2tKSE5DQevg3LzqdhKAdfBLVtesSnEjcO7dSLHBPTPp4kXbEW+daNke1RDVx7xVRzANHBpLwz5kgoD+HSFe5KCzG92MCpLVZpBd6FpTZ1qWxQ8pL4bOH2xdK1mKr2WmjOVcm6aM1UA87Ay9oRMOqcr80vNMqDRYFI11beYE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bcpcWR5M; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-7424ccbef4eso673579b3a.2;
+        Wed, 25 Jun 2025 22:02:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750914153; x=1751518953; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pAbqyCTcegVpKrpjqoB86gZ0JnTtn6KDYt9zM32bdZE=;
+        b=bcpcWR5M3AbwF3cSEch97CJTX+bv9Idx/fahmsQMiMUPiOWPIiNAqLhydxW0eqPXAB
+         Jk3KrtI1fHjmklEMzcb6cOW7sr2Vq5wVeNnOIkZYn01Bb+3j6xxzilFtD7raA9UNeW6R
+         Tj4ByjicGgUd2/nk6IHAnTKFgPAqccK4EYVY+Ghclp1XjuZY1MmvKBMfTdu7+oxYeJ7s
+         AiyCRWELRD1jpAbaoYoMWopDrbcgb561dic5yMAA8n/NwgU1pMRkL8QbJFwm5mM/Fl22
+         EJf2bf3sW/hIp4pYlKE4cTWEjwtaMn2H1xM8OEYAabfXfVgfAQozJYZUF6UM1bjbubDB
+         W4+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750914153; x=1751518953;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pAbqyCTcegVpKrpjqoB86gZ0JnTtn6KDYt9zM32bdZE=;
+        b=Tot2/1cxsPgQJVuaSkq9Ar1WjEZWl5bFmZTbzSXFQah+sOlowRixebXXbldsUlRznN
+         Cl3yvoyyJHWrOom2Bw6cc/tLiMkRqmhhxWYk+LA1T6DzXlboo8dzDfCTIAXUeFK2draq
+         1gTUbBcLrUvFo8DwrQftSjC7ebE26lYogF5XxPC2ZAYsErNf6I+BpP5m0rf7BypgWsjf
+         MmO4xmN4TMeuBiMflMVMaTUVAtUStPCiURaMABe+rl+kCC3wQaG/kwGsKB7E7JRHbiYN
+         GjylCnEHCBx911P3krB8wv9/1Qdy+/MotmZNgwTdJQZs6nemIYIVMMc/TCt/2C3ziBs9
+         qj1w==
+X-Forwarded-Encrypted: i=1; AJvYcCUDTMroJWp3XTDeYH/dyEYV1zmEBYjyiMGuaxJlHcEC4ApS9g8nbW/YeSxxjs+W6Hl5gT1s9iEK@vger.kernel.org, AJvYcCUhWlZxPqY5+QfuFNrL2KQHrtacYZibe/BvKztwNRJGi/bIODkV0GbJ60Oxhg3zn774G0jNf/xK+IsLG4eL@vger.kernel.org, AJvYcCWBc+Lc0zpMMtO7WhtgTDbqwxt/J6CRsgizCHIoYEVJjldihy72p4H5n1pl2qGTtrkfJzICZ6WbE2LNxBYc@vger.kernel.org, AJvYcCWrUy3fYqkfNP/9XAkjFYjfJ6lybQZGGtKSXqYZxeQe5F5x1oiD4Dbw6daWQtiGQiCwaR4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQh9UfwXUscZ5QAah/XFMaeHlp0tONeOGhosGBNOY9IgB6ZtTK
+	r2QqCwLou3JufIYh529j7p6zbWgQ9zk4pZ6gwcVYy8/Pk4byugkgkaJS
+X-Gm-Gg: ASbGncvkk+RBb0biR2kkSqcDvtAJ0Wg/2McPmCTODubMmKFBy4P8O90Hj29vfHEYA8S
+	m5/f4Xt/C0YBMfa1V1gZrRgotYpFMjKBbaAlmUXy5uxBL92Y9seR+FwhQtP0lrHR+anO3cZo5Tw
+	vV8kyZrBTNEqfJzLdAm05bFyd/3HF4VVjC4vJxBiE+D2I5+M88CeTIqAKIt1MnoiRuofkYMFJIW
+	eSu3yRoCQOQHjoyeEUNwQoQcatRAIBTSmCuqHmWg/hT6Jj7YVjMfcaHJGftqgl1NX/KgGcEfIm6
+	3ng8RbDGfKGSEB/t5sAF+GZoWh4cT1xkQwa7yaQypkzSWQ1RCI7lqlyh8cPhurFHyQrHKTCKTMJ
+	JGSBIfRzv
+X-Google-Smtp-Source: AGHT+IGX8J1VxZS2sFcA0G08BiW/FQ1pEDJzIhrYph3nSUl3wWFtXA7FYdmCcKqPVRcKXEU4f7ucWw==
+X-Received: by 2002:a05:6300:4041:b0:220:3ab2:b50e with SMTP id adf61e73a8af0-2207f154d7cmr9460458637.6.1750914152614;
+        Wed, 25 Jun 2025 22:02:32 -0700 (PDT)
+Received: from devant.antgroup-inc.local ([47.89.83.0])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-749b5e211d1sm5842808b3a.44.2025.06.25.22.02.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Jun 2025 22:02:32 -0700 (PDT)
+From: Xuewei Niu <niuxuewei97@gmail.com>
+X-Google-Original-From: Xuewei Niu <niuxuewei.nxw@antgroup.com>
+To: sgarzare@redhat.com
+Cc: davem@davemloft.net,
+	decui@microsoft.com,
+	fupan.lfp@antgroup.com,
+	haiyangz@microsoft.com,
+	jasowang@redhat.com,
+	kvm@vger.kernel.org,
+	kys@microsoft.com,
+	leonardi@redhat.com,
+	linux-hyperv@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	mst@redhat.com,
+	netdev@vger.kernel.org,
+	niuxuewei.nxw@antgroup.com,
+	niuxuewei97@gmail.com,
+	pabeni@redhat.com,
+	stefanha@redhat.com,
+	virtualization@lists.linux.dev,
+	wei.liu@kernel.org,
+	xuanzhuo@linux.alibaba.com
+Subject: Re: [PATCH net-next v3 1/3] vsock: Add support for SIOCINQ ioctl
+Date: Thu, 26 Jun 2025 13:02:19 +0800
+Message-Id: <20250626050219.1847316-1-niuxuewei.nxw@antgroup.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <wgyxcpcsnpsta65q4n7pekw2hbedrbzqgtevkzqaqkjrqfjlyo@6jod5pw75lyf>
+References: <wgyxcpcsnpsta65q4n7pekw2hbedrbzqgtevkzqaqkjrqfjlyo@6jod5pw75lyf>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Transfer-Encoding: 8bit
 
-John Snow <jsnow@redhat.com> writes:
+> On Wed, Jun 25, 2025 at 08:03:00AM +0000, Dexuan Cui wrote:
+> >> From: Stefano Garzarella <sgarzare@redhat.com>
+> >> Sent: Tuesday, June 17, 2025 7:39 AM
+> >>  ...
+> >> Now looks better to me, I just checked transports: vmci and virtio/vhost
+> >> returns what we want, but for hyperv we have:
+> >>
+> >> 	static s64 hvs_stream_has_data(struct vsock_sock *vsk)
+> >> 	{
+> >> 		struct hvsock *hvs = vsk->trans;
+> >> 		s64 ret;
+> >>
+> >> 		if (hvs->recv_data_len > 0)
+> >> 			return 1;
+> >>
+> >> @Hyper-v maintainers: do you know why we don't return `recv_data_len`?
+> >
+> >Sorry for the late response!  This is the complete code of the function:
+> >
+> >static s64 hvs_stream_has_data(struct vsock_sock *vsk)
+> >{
+> >        struct hvsock *hvs = vsk->trans;
+> >        s64 ret;
+> >
+> >        if (hvs->recv_data_len > 0)
+> >                return 1;
+> >
+> >        switch (hvs_channel_readable_payload(hvs->chan)) {
+> >        case 1:
+> >                ret = 1;
+> >                break;
+> >        case 0:
+> >                vsk->peer_shutdown |= SEND_SHUTDOWN;
+> >                ret = 0;
+> >                break;
+> >        default: /* -1 */
+> >                ret = 0;
+> >                break;
+> >        }
+> >
+> >        return ret;
+> >}
+> >
+> >If (hvs->recv_data_len > 0), I think we can return hvs->recv_data_len here.
+> >
+> >If hvs->recv_data_len is 0, and hvs_channel_readable_payload(hvs->chan)
+> >returns 1, we should not return hvs->recv_data_len (which is 0 here), 
+> >and it's
+> >not very easy to find how many bytes of payload in total is available right now:
+> >each host-to-guest "packet" in the VMBus channel ringbuffer has a header
+> >(which is not part of the payload data) and a trailing padding field, and we
+> >would have to iterate on all the "packets" (or at least the next
+> >"packet"?) to find the exact bytes of pending payload. Please see
+> >hvs_stream_dequeue() for details.
+> >
+> >Ideally hvs_stream_has_data() should return the exact length of pending
+> >readable payload, but when the hv_sock code was written in 2017,
+> >vsock_stream_has_data() -> ... -> hvs_stream_has_data() basically only needs
+> >to know whether there is any data or not, i.e. it's kind of a boolean variable, so
+> >hvs_stream_has_data() was written to return 1 or 0 for simplicity. :-)
+> 
+> Yeah, I see, thanks for the details! :-)
+> 
+> >
+> >I can post the patch below (not tested yet) to fix hvs_stream_has_data() by
+> >returning the payload length of the next single "packet".  Does it look good
+> >to you?
+> 
+> Yep, LGTM! Can be a best effort IMO.
+> 
+> Maybe when you have it tested, post it here as proper patch, and Xuewei 
+> can include it in the next version of this series (of course with you as 
+> author, etc.). In this way will be easy to test/merge, since they are 
+> related.
+> 
+> @Xuewei @Dexuan Is it okay for you?
 
-> On Tue, Jun 24, 2025 at 3:34=E2=80=AFAM Markus Armbruster <armbru@redhat.=
-com> wrote:
->
->> John Snow <jsnow@redhat.com> writes:
->>
->> > This patch is fully automated, using pymagic, isort and autoflake.
->> >
->> > Create a script named pymagic.sh:
->> >
->> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D
->> >
->> > pyupgrade --exit-zero-even-if-changed --keep-percent-format \
->> >           --py39-plus "$@"
->> >
->> > autoflake -i "$@"
->> >
->> > isort --settings-file python/setup.cfg \
->> >       -p compat -p qapidoc_legacy -p iotests -o qemu "$@"
->> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D
->> >
->> > Then, from qemu.git root:
->> >
->> >> find . -type f -name '*.py' | xargs pymagic
->> >> git grep --name-only "#!/usr/bin/env python" | xargs pymagic
->> >
->> > This changes a lot of old Pythonisms, but in particular it upgrades the
->> > old Python type hint paradigm to the new 3.9+ paradigm wherein you no
->> > longer need to import List, Dict, Tuple, Set, etc from the Typing modu=
-le
->> > and instead directly subscript the built-in types list, dict, tuple,
->> > set, etc. The old-style annotations are deprecated as of 3.9 and are
->> > eligible for removal starting in Python 3.14, though the exact date of
->> > their removal is not yet known.
->> >
->> > pyupgrade updates the imports and type hint paradigms (as well as
->> > updating other old 'isms, such as removing the unicode string
->> > prefix). autoflake in turn then removes any unused import statements,
->> > possibly left behind by pyupgrade. Lastly, isort fixes the import order
->> > and formatting to the standard we use in qemu.git/python and
->> > scripts/qapi in particular.
->> >
->> > Signed-off-by: John Snow <jsnow@redhat.com>
->>
->> [...]
->>
->> >  448 files changed, 1959 insertions(+), 1631 deletions(-)
->>
->> *=C3=84chz*
->>
->
-> Gesundheit.
->
->
->>
->> I hate it when people ask me to split up my mechanical patches...
->>
->> One split is by subsystem / maintainer.  I've done this a few times, and
->> it's quite a bother.  Questionable use of your time if you ask me.
->>
->
-> I'd prefer not to unless it is requested of me specifically. I don't think
-> most maintainers really care about the nuances of Python and as long as
-> their stuff continues to work they're not going to mind much.
->
-> Or, to be frank: I don't think this series would ever garner enough review
-> and attention to warrant the labor it'd take to tailor it to such a revie=
-w.
-> It's mechanical, it's boring, it should be fine.
->
-> I switched from a manual patch series to a tool-driven one specifically to
-> make it more mindless and less interesting, and going through and splitti=
-ng
-> it back out is ... eh. I would prefer not to.
->
->
->>
->> There's another split here...  Your pymagic.sh runs three tools.  If you
->> commit after each one, the patch splits into three.
->>
->
-> I use all three because each one alone isn't sufficient to then pass the
-> static analysis checks, they each do a little bit of damage that another
-> tool corrects afterwards.
->
-> pyupgrade works to modernize syntax, but leaves impotent import statements
-> hanging.
+Yeah, sounds good to me!
 
-Import statements it made impotent, I presume.
+Thanks,
+Xuewei
 
-> autoflake removes those impotent imports.
-> isort fixes the import statement ordering and formatting to our standard.
-
-Out of curiosity: what messes up ordering and formatting?
-
-> (And then I do some manual fixups to fix the linting tests where things
-> were auto-formatted suboptimally.)
->
-> I can still split it out for review purposes, like I did here with some
-> manual fixups appended to the end.
->
-> Just, for merge, they'll be combined by necessity as a result of our
-> no-regressions-for-bisect rule.
-
-I see.
-
->> I understand you pass --py39-plus to pyupgrade to get the type hints
->> modernized.  If you run it without --py39-plus for all the miscellaneous
->> upgrades, commit, then run it with --py39-plus for just the type hint
->> upgrades, commit, the last patch splits again.
->>
->
-> I can try it! I actually didn't try running it without py39-plus at all, =
-so
-> I don't know what that'll do. but no harm in an experiment.
->
->
->>
->> Thoughts?
->
->
-> First and foremost I just thought it'd be good to get this mechanical
-> change squared away in one giant patch so we could add this one singular
-> horrible mega-commit into the git blame "ignored commits" list to minimize
-> the impact of the "flag day".
-
-Point.
-
-Still, it's awfully hard to see what the horrible mega-commit does.
-
-A patch that does one thing entirely mechanically is fine even when it's
-huge.  Understanding the one thing is easy.  I can usually develop
-confidence in the patch.
-
-A patch that does many things mechanically can be problematic.  If it's
-small enough, I can just review them like any other patch.  If it's way
-too big for that, we have to rely on appeal to authority, i.e. the
-tool(s) that generated the patch.  Certainly not nothing, but it gives
-me an uneasy feeling.
-
-This is why I'm keen to see the type hint upgrade split off.  I expect
-the type hint part to do one thing entirely mechanically (fine), and I
-hope the other part will be small enough to let me build confidence in
-it.
-
-> This upgrade will have to happen "eventually" but it needn't be "right
-> now", but I figured it'd be good to get it out of the way... or put anoth=
-er
-> way, "better my mess than someone else's".
-
-I'd prefer upgrade now rather than later for the Python code I maintain.
-
+> Thanks,
+> Stefano
+> 
+> >
+> >--- a/net/vmw_vsock/hyperv_transport.c
+> >+++ b/net/vmw_vsock/hyperv_transport.c
+> >@@ -694,15 +694,25 @@ static ssize_t hvs_stream_enqueue(struct vsock_sock *vsk, struct msghdr *msg,
+> > static s64 hvs_stream_has_data(struct vsock_sock *vsk)
+> > {
+> >        struct hvsock *hvs = vsk->trans;
+> >+       bool need_refill = !hvs->recv_desc;
+> >        s64 ret;
+> >
+> >        if (hvs->recv_data_len > 0)
+> >-               return 1;
+> >+               return hvs->recv_data_len;
+> >
+> >        switch (hvs_channel_readable_payload(hvs->chan)) {
+> >        case 1:
+> >-               ret = 1;
+> >-               break;
+> >+               if (!need_refill)
+> >+                       return -EIO;
+> >+
+> >+               hvs->recv_desc = hv_pkt_iter_first(hvs->chan);
+> >+               if (!hvs->recv_desc)
+> >+                       return -ENOBUFS;
+> >+
+> >+               ret = hvs_update_recv_data(hvs);
+> >+               if (ret)
+> >+                       return ret;
+> >+               return hvs->recv_data_len;
+> >        case 0:
+> >                vsk->peer_shutdown |= SEND_SHUTDOWN;
+> >                ret = 0;
+> >
+> >Thanks,
+> >Dexuan
 
