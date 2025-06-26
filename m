@@ -1,87 +1,87 @@
-Return-Path: <kvm+bounces-50802-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50803-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96C10AE96E3
-	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 09:35:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B85D3AE96E4
+	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 09:36:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5FE6B17021D
-	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 07:35:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E6211886DE7
+	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 07:36:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D16C123F271;
-	Thu, 26 Jun 2025 07:35:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1CEF243946;
+	Thu, 26 Jun 2025 07:35:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="kw0KCONi"
+	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="IC4datT7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 561EA24E4AF
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 255CD23BCF3
 	for <kvm@vger.kernel.org>; Thu, 26 Jun 2025 07:35:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750923314; cv=none; b=ikh5GzMDQUrTLpY7qWHvTnwifgT0xOLX5ffS1KGo0xdeJeuE2EXwPKnwseq+wb2/tZUeB2g1izzJpfZ7JHG2+AKtPzDCqNKi6ZHesZuoNZTltE/d0usN+jBR9I+jvz7WhPGXAiUPJ008H+Un4e/NGACEJXddRiHcg1hiSBSaD+U=
+	t=1750923314; cv=none; b=DinXe8xLP7FfioopBPOmH+b/qzsBf3lbvvMjcyyI3ckbqnFwdk0ZSOEYwiPFdId6wzK/GwDlzjws5uxi/ohh66zdXH/1wPY2r5kjZOJ2AoS2bAvN76kR0viQgI3LPoP7xCWHJSpoaIWp2QqkcDnbmutR0XkgU9Wqy2egnLl/8gM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1750923314; c=relaxed/simple;
-	bh=0dyOy2xA3w/Q/C9jQnjXZc/TiHPUdzldB5Va5d8VZOw=;
+	bh=3R7JpG0GYfpl3JbHPDZ1dVSrrMpDHUlfMMTPyeJ/SZM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Mjn1a8yY3cmPY9ixWS67wHnZ+Aog5b33de90d1f9tziCN/oFiEZVQfBllkJNLE6lNfpYB7omDjMmTf2gnoZ8HK3OFHcWvTDPdr0duHmJNVeOV9nnhWFqQXwDB/FdgyoI5dT0micwO3Cnnqf9hEIpR8b3Dn1mmLhqrw+jOHMOGAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=kw0KCONi; arc=none smtp.client-ip=209.85.221.43
+	 MIME-Version; b=mZwDCvseZ4/OZU92xE7mc+ZqrUfFa55zNMpn1cgkhyLVfcpcNf4+4OLB4UqsZ4i3fReu1lYwemrWZ4di97MQweRfpv7fWy8N0gMtrHjCkTuQINk8wCCyRRK/pE/awzqiTJvWuM7KFH9FE8Vw3cK2PHyqvT6svpGWcTPUzxjRmAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=IC4datT7; arc=none smtp.client-ip=209.85.221.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensrcsec.com
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-3a50fc819f2so475295f8f.2
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3a548a73ff2so610635f8f.0
         for <kvm@vger.kernel.org>; Thu, 26 Jun 2025 00:35:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=grsecurity.net; s=grsec; t=1750923310; x=1751528110; darn=vger.kernel.org;
+        d=grsecurity.net; s=grsec; t=1750923311; x=1751528111; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=u5j3F0Ab7GiM9m9UzgeiJowbOw4ZjpXnE2U/hoR5lSA=;
-        b=kw0KCONixx5EiYzge6iVAV/LjmmHmj5bXPfqVMUjVKb7ESMRNPK6s1CoV2GmD/VE1r
-         GhU0HFBB25FDoirb2ob3vmvGa7ALnxn84Xj75mCgukWp53Ihb83g67cYwvTmMDFv1dtz
-         rlh9cnIX2YrqABHCvkj0VOHripAWWPxi9FPgmnRQz8tAD1ruoTsXbin1+aDeDim+Jl2P
-         VFP9IYQUZO33GAx0efypsMU5TVQZrUt86QpZaTDrEL2+hnxGJfkWBlkiqLvxju4NM9cf
-         Bi0RVdTQBwuS2xn9oim9CehgxjsiXYVOKPvIVPk3P/TZzxPO9otVDDXRQzM+vuUxO0Vl
-         CwAw==
+        bh=OxQzFsA49Ug+RvAX3tV+Ew75+aF26HLquVzficC/lo4=;
+        b=IC4datT78yrzO2HgNJ2vLucyLEORuKOLUlQwTV0TD0aKn3gHh7Yil8wSpwYnwPeo29
+         pIbY5uuPq55Hijt+RuS0hreTzy29ypjs0UN+gQeWgGgP5L0OyIfOmdYljh5WeQXf9/74
+         S6vURIz7MDLe3ir1yBzaKNQJLbrBQ+SIOH627fz4+VqadJP/p+j1DZkCJfm3ypEYafFV
+         FYtXhoTq8fRATfl9QJJ2odDo13OpRBU7+YsezHE/LGKDOfzGUuiyu3CIQiV1InwNEuR+
+         G2gmZgoiJGlyHFGLzVq9+L8iVqIoGVpb/tbzzgZv/S9Rx1nTpWg2ie/k/cT+NH0cWNDs
+         2l+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750923310; x=1751528110;
+        d=1e100.net; s=20230601; t=1750923311; x=1751528111;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=u5j3F0Ab7GiM9m9UzgeiJowbOw4ZjpXnE2U/hoR5lSA=;
-        b=UyS0KxXsi3CGNTdZCxJPKgwKc76z0eUfqNRDAN8fpuks9aaQL/hmyWc5Sn5W2Q6DyD
-         Db6d8dyh11ruhn3eN1JyYkcbI4ih1cu44OqAJkgrlfdkIP80KnZugY+3FGCcjN6NsWWU
-         CpALbxjxJUjqnM3fsNEH6Ds1e6VAGfw6EU1ROTpTinBkFqswKgxCP8sAbDvyrJekOlrq
-         YalDkMfzB9v/gY4avK0oEaeTdBxgK3c88FS7YpFVIE16KNRj/HuUn71yrj9KoZl5Gue2
-         rUJGNli9hxe1Q0wgbIVbBHoAqQb5Eed5T2ZmF/FerZfCZU3sgoUuN3XmJ78R7lNygkid
-         B6ig==
-X-Forwarded-Encrypted: i=1; AJvYcCWQzP91OUfBg4GO3GmKuEahAN436N41NmkiBtDxihkgps87zKh7QDqU1jhvvHjwZvOWW8A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwvvmlRSkaDCDShOGOLsa/DhKdYsMDq+mFLVL0bFd9JE9rDENP1
-	ujb9E0zOHbgx/mSXOUs6impurAUL3/glSudx897rfNC5S/iLm8jTTqbtpo9PGYVcwGg=
-X-Gm-Gg: ASbGnct512/u48bpIwkrfYmq4UJ9BYehERBnzrUwFy9CK2OEDwWy5pX7Ls0qxUKpPaV
-	Zz2HTr7IzEU4XnB39uhDaizBIyO6Nr8QSZ0A9xYOhfnT4epUJT2n9oCE13PgwPgBo2t2CGOZTgT
-	mKEXTsCFneruE6JA5sO8MHAn5AnrUawWAl1qigjtpKpQkcQQRGrVZ21Vu0G8KuaMcRoa5Ek8p10
-	lHSkTRJVDtH1xyhh/HKuOwtQVlmhc6a7XHiCXTSd+n7fAfoSQ7b1yLm8km6bgzUGBnQjulf+JVf
-	jhEtc3VOb/EUMJhw3F92OD3EMfgvWsQ+jxPpSb0L65qUdh9eXHzwJqsNc5AXg/ivdicWVoNd4hl
-	x7TgKZVN6t4ohrjOQ8DFt7S76PuN91gXG/uygb/BvoeuJqYGKzctbslE=
-X-Google-Smtp-Source: AGHT+IHDFC99TBB1hL4iYwCSkUNdxA/zOZ4abUommfvaEVNy+dI4LQicwyVij6YJE+tw2OCcxsp2lw==
-X-Received: by 2002:a05:6000:4610:b0:3a4:eeb5:58c0 with SMTP id ffacd0b85a97d-3a6ed5dbcbbmr4621806f8f.20.1750923310571;
-        Thu, 26 Jun 2025 00:35:10 -0700 (PDT)
+        bh=OxQzFsA49Ug+RvAX3tV+Ew75+aF26HLquVzficC/lo4=;
+        b=T52aGo8w1HC0a53Y8Qv3Jpqbkz/rrrPgfVfWlHPlE4n+M0HKHHkb/eE2iPTi0X67Px
+         9rMI1/DEuyZPtL3XAwBdCwfRuIfNsVMFxFUTMdV9bBI6/4OsIdKsNnCgNsUA60PYjkcX
+         yMak2gnwjE7M/kQYAPz6rOZgui+AplnBj5NYEVg5OZe/sEIsuPxAor7QBb/BzxQyIg2/
+         bnq1SH8F8KA3FqSlBz8z7f2KufcIhej3unz7tHgXVGpylznp00RsrVjhCWb8kx7TdwE8
+         CgvR6/HgS0oZu+CK+l1kyySv5+nYTKyt09eluJzbGffwnVbbu27ZLOFjRCjZLqkMgfAu
+         KcWQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV/R/y/CJPcOWTeaYw2AxMLe1c0MY/irdzw9B4/gGqQ3D9kYC7nIFCDbZkvKbFWhMOTZ2Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YziBjoW0dLM+wBHhMoMr+d9TVLJQ/vrS5oz37Wt2scXJsnNR1/Y
+	JD6dqtMrAur3YJANzfA/jw5p7rrvsA5qdHz0us5UshToKURaeuhvThyJ1lRaO6KfSFM=
+X-Gm-Gg: ASbGncv+al6+D2eWjpUhlTZPoB8EntbpRlZnaRSqktyqqssx8vmkX7EzL96oanna8rC
+	zMz5I98ec0n9AEjhmMEaDLLlU9lD3GboLCDSuH9yVUy0QY9xXwwlvbQJNUUvHwpb7jSpFpyDf+b
+	oGzDES60iT7AlEOShUIS8Na4B4HDH034Un+PK86o1BaBi1JvWs242fIQBlwhqKIxNo/mnZwWdyr
+	I8v6I0auAAtoM66JqKg+iG8cShJNg2eAURVXq7jVvNwsWT+OcQMDOnygRv8egQWlR3/3XdgmgPq
+	PdhXIzukvTsoMMk2xaGrVLmo78J5zwHWQMBXaBxfJC1nz+T8cewsM3Wx0qyoRzGpCPPeNi5TNj6
+	fcsgX368CIXMu9LTtL0Z0qEu8Tv+LZ33kw/UqUY6W537GIIjm5rsQCS0=
+X-Google-Smtp-Source: AGHT+IGvQDRAtxKgSDaZv9DSlqs2NWX4U2xiT06X7ggYESub9XCnyfUr29n6f7p2kpVUK94iIj9SwA==
+X-Received: by 2002:a5d:5f84:0:b0:3a5:8abe:a264 with SMTP id ffacd0b85a97d-3a6ed637b6emr4263722f8f.37.1750923311317;
+        Thu, 26 Jun 2025 00:35:11 -0700 (PDT)
 Received: from nuc.fritz.box (p200300faaf22cf00fd30bd6f0b166cc4.dip0.t-ipconnect.de. [2003:fa:af22:cf00:fd30:bd6f:b16:6cc4])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a6e80f259dsm6692451f8f.50.2025.06.26.00.35.09
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a6e80f259dsm6692451f8f.50.2025.06.26.00.35.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Jun 2025 00:35:10 -0700 (PDT)
+        Thu, 26 Jun 2025 00:35:11 -0700 (PDT)
 From: Mathias Krause <minipli@grsecurity.net>
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Sean Christopherson <seanjc@google.com>,
 	Chao Gao <chao.gao@intel.com>,
 	kvm@vger.kernel.org,
 	Mathias Krause <minipli@grsecurity.net>
-Subject: [kvm-unit-tests PATCH v2 09/13] x86: cet: Make shadow stack less fragile
-Date: Thu, 26 Jun 2025 09:34:55 +0200
-Message-ID: <20250626073459.12990-10-minipli@grsecurity.net>
+Subject: [kvm-unit-tests PATCH v2 10/13] x86: cet: Simplify IBT test
+Date: Thu, 26 Jun 2025 09:34:56 +0200
+Message-ID: <20250626073459.12990-11-minipli@grsecurity.net>
 X-Mailer: git-send-email 2.47.2
 In-Reply-To: <20250626073459.12990-1-minipli@grsecurity.net>
 References: <20250626073459.12990-1-minipli@grsecurity.net>
@@ -93,52 +93,46 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The CET shadow stack test has certain assumptions about the code, namely
-that it was compiled with frame pointers enabled and the return address
-won't be 0xdeaddead.
+The inline assembly of cet_ibt_func() does unnecessary things and
+doesn't mention the clobbered registers.
 
-Make the code less fragile by actually lifting these assumptions to (1)
-explicitly mention the dependency to the frame pointer by making us of
-__builtin_frame_address(0) and (2) modify the return address by toggling
-bits instead of writing a fixed value. Also ensure that write will
-actually be generated by the compiler by making it a 'volatile' write.
+Fix that by reducing the code to what's needed (an indirect jump to a
+target lacking the ENDBR instruction) and passing and output register
+variable for it.
 
 Signed-off-by: Mathias Krause <minipli@grsecurity.net>
 ---
- x86/cet.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ x86/cet.c | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
 
 diff --git a/x86/cet.c b/x86/cet.c
-index 72af7526df69..50546c5eee05 100644
+index 50546c5eee05..dfc2484cba5d 100644
 --- a/x86/cet.c
 +++ b/x86/cet.c
-@@ -10,14 +10,14 @@
+@@ -33,18 +33,17 @@ static uint64_t cet_shstk_func(void)
  
- static uint64_t cet_shstk_func(void)
+ static uint64_t cet_ibt_func(void)
  {
--	unsigned long *ret_addr, *ssp;
-+	unsigned long *ret_addr = __builtin_frame_address(0) + sizeof(void *);
-+	unsigned long *ssp;
- 
- 	/* rdsspq %rax */
- 	asm volatile (".byte 0xf3, 0x48, 0x0f, 0x1e, 0xc8" : "=a"(ssp));
- 
--	asm("movq %%rbp,%0" : "=r"(ret_addr));
- 	printf("The return-address in shadow-stack = 0x%lx, in normal stack = 0x%lx\n",
--	       *ssp, *(ret_addr + 1));
-+	       *ssp, *ret_addr);
- 
++	unsigned long tmp;
  	/*
- 	 * In below line, it modifies the return address, it'll trigger #CP
-@@ -26,7 +26,7 @@ static uint64_t cet_shstk_func(void)
- 	 * when HW detects the violation.
+ 	 * In below assembly code, the first instruction at label 2 is not
+ 	 * endbr64, it'll trigger #CP with error code 0x3, and the execution
+ 	 * is terminated when HW detects the violation.
  	 */
- 	printf("Try to temper the return-address, this causes #CP on returning...\n");
--	*(ret_addr + 1) = 0xdeaddead;
-+	*(volatile unsigned long *)ret_addr ^= 0xdeaddead;
- 
+ 	printf("No endbr64 instruction at jmp target, this triggers #CP...\n");
+-	asm volatile ("movq $2, %rcx\n"
+-		      "dec %rcx\n"
+-		      "leaq 2f(%rip), %rax\n"
+-		      "jmp *%rax \n"
+-		      "2:\n"
+-		      "dec %rcx\n");
++	asm volatile ("leaq 2f(%%rip), %0\n\t"
++		      "jmpq *%0\n\t"
++		      "2:"
++		      : "=r"(tmp));
  	return 0;
  }
+ 
 -- 
 2.47.2
 
