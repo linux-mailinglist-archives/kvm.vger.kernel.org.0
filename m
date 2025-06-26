@@ -1,124 +1,189 @@
-Return-Path: <kvm+bounces-50919-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50920-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EF46AEAA24
-	for <lists+kvm@lfdr.de>; Fri, 27 Jun 2025 00:57:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF06CAEAA77
+	for <lists+kvm@lfdr.de>; Fri, 27 Jun 2025 01:20:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C9BD1885C31
-	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 22:57:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E6DE44E1B26
+	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 23:20:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43F862236F8;
-	Thu, 26 Jun 2025 22:56:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2C082264A3;
+	Thu, 26 Jun 2025 23:19:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Iu0Ov7WS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Gicah5AB"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83F13C8EB
-	for <kvm@vger.kernel.org>; Thu, 26 Jun 2025 22:56:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C92FA1EE032
+	for <kvm@vger.kernel.org>; Thu, 26 Jun 2025 23:19:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750978612; cv=none; b=Zxho28xhpoFrumayLP7e70o1n8ylI0Nfb/T7knSQfAr3YeAbdg9+bZzhkuTo/8V+kv5KYkjqOPD7dDf4tkbrnv8AsHp/QuNVULbetzXRk+ZC+ciUQwCF9mddIxoTdSb74JRqgO/ifdMqH3rEqg3iKzD0+r+d0jz7yp3j8x6tkKg=
+	t=1750979995; cv=none; b=Gq+az1SfwQzhLAglXpGYXo5CCWXvpAGc1tC9mbw6ITucBpbs2b8xat1UdmnaBB2s/SKLz7hzPG9Rqf8qbjLkxA1mXtJMfHmjJkDGjfQCT75GlFMTTFzLdVKedtKN4DK9W7XJDp5g2sFzdUPUzErh1rTHADq/8gzeqWh1IdEJo0Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750978612; c=relaxed/simple;
-	bh=ysf4zQ41GnVnvndPLOiQrVwKU2gDIWWpmDH4O7TNIOo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=O+ykjIcB/JbLL20du54202zguPjaU/hvv3NdoC0sJTHOmcjcIHE7MgQOib/fJDkvWT+s1dnX9NdWl/BlFC0eZjuTGd2syVcka/MLQh6AkP0uzaE+FFcWoZIBBU7ocnCwU4Af20/6ua42hSzKvLj4KRWObxRDalheZA8dmZr3CMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Iu0Ov7WS; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750978609;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=MqMr2wjxNnHvbD2oPRJuftKLIiWTSEkuNNb46CNYz/w=;
-	b=Iu0Ov7WSGrhxBRenOmmEfgyKel9GfNs7qbw7/odV111XLBLiymyIL9qDfDbJHuy2JCfbZG
-	u/x317/d19KnQgwcrjvafObb7AyefhnSofCo7J/XpSH/v+4gVD82Ur4UbeHGS2c7FFqElh
-	SX/9mCbxxLkgI60XfgjfXogqCC8Lnyg=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-522-n2Yde0x-MiqW-Xp0bwcZkQ-1; Thu,
- 26 Jun 2025 18:56:47 -0400
-X-MC-Unique: n2Yde0x-MiqW-Xp0bwcZkQ-1
-X-Mimecast-MFC-AGG-ID: n2Yde0x-MiqW-Xp0bwcZkQ_1750978604
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0A2FF1801210;
-	Thu, 26 Jun 2025 22:56:33 +0000 (UTC)
-Received: from omen.home.shazbot.org (unknown [10.22.88.94])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id F1D281800EC8;
-	Thu, 26 Jun 2025 22:56:30 +0000 (UTC)
-From: Alex Williamson <alex.williamson@redhat.com>
-To: alex.williamson@redhat.com,
-	kvm@vger.kernel.org
-Cc: aaronlewis@google.com,
-	jgg@nvidia.com,
-	bhelgaas@google.com,
-	dmatlack@google.com,
-	vipinsh@google.com,
-	seanjc@google.com,
-	jrhilke@google.com,
-	kevin.tian@intel.com
-Subject: [PATCH] vfio/pci: Separate SR-IOV VF dev_set
-Date: Thu, 26 Jun 2025 16:56:18 -0600
-Message-ID: <20250626225623.1180952-1-alex.williamson@redhat.com>
+	s=arc-20240116; t=1750979995; c=relaxed/simple;
+	bh=8oJqu7vh1nKhO7zqxOlFH5GbqzDZRsYHZ4hsK1zb2tg=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=nsvR+QopHR4WTnSCwjZAv80NxhmPEb1881tF+/INW1778K+JMoJ0NDLvElJCE8CAGj/LP/tUEYBlbshnZkDS+3Yyn0iuVcm3JLLU7nAMcULWT0NjB7IPT8xumXbkjLpjb/mKzu77uWkgnkTLHQHYBsm6ZrGaJUq1P0JnLPM4ltY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Gicah5AB; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-31327b2f8e4so1365113a91.1
+        for <kvm@vger.kernel.org>; Thu, 26 Jun 2025 16:19:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1750979993; x=1751584793; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=VCztHCMZgaWSxSkof1MA9Ntkv2jeWGBUS2MVA37PA/U=;
+        b=Gicah5ABAxTBUp0LIHvfnd2EnJsn6GAiMFV9qMQ8h7VY9C8idNZ7c97iypSM9KB+0Q
+         zcT7MIrInHLBXIybW9vkngQUWXqu3c+FITNtplx4c3LhtbZ6eO/icT5QxuGVY34EscO3
+         OmSnBR39i5loHGDltXbhE6tgBmQi1W66mMdB3oGTlAD/enZ8bIjXLnk1g4QUUF+6ZDIQ
+         Do6wkfv8l2iYa5Qk78sK88EpMsxKS6tkC3frxJzcv4QTWT1dvv/H6Abk8NghOyyuLaiE
+         4FEs4pfpAYvkMOuO2PpQcPp9QZFfERdDw/rER9HfuLyODrYVhFELJ/HZDOcAK09GfOsI
+         KL4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750979993; x=1751584793;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VCztHCMZgaWSxSkof1MA9Ntkv2jeWGBUS2MVA37PA/U=;
+        b=t6rkZV/UgFU+t3W3ekZkY5QTKZsKUWUEYXbKlfX+c8d57KnGQrZOVpoigrhPHgq566
+         PDjAtqDk8kYiCMRmzijeqHGKKPVzkfoe3fg5RnrzmNOD6NiUpy2N5zgH+W45NAZgGPbn
+         VWDC4zVaqWtXP9tGRvyYYIVDhlUFoVTaPCaMP6OlDBRnE2+VSsDCFdGcaAwcYorz/4Ao
+         4BeCRfAoIwnI4TKR4B/SmXA/HX+kiGcHwQCIr76j5zfBoyiBaOCqzHq7dvztNPhKhKB8
+         vU8Ig2hRfKunFFt3q5NtWPfGwDM6LiF+Ik+vatD6vtlGYCjBgzKHozDEpqE7Z/80/pe3
+         h0Zg==
+X-Gm-Message-State: AOJu0Yx5IB8BdIgJjLp5lMrtxvbvIkS8Gaf3ctd51bh1CN3W7LAfiis0
+	zk2KRTWZgx2ILWChh+9nraoJQq1Vzq0TzYIDa/9vTMQmIeZyj/JdJ3lINIjwHBoQXD8AE4O8fGJ
+	z1yEmhJpwwBgM5rofJMNI40O3aalqTjNKM2sDhcYdpxD24+ShXUtWqY1OwaPb5Kfku7GcSqnFdf
+	RgcXsc3uye4MuTwhjOcxycnoeIRufntVfh2hGV/pIGtcZU3wvNBuqgFyFHV8s=
+X-Google-Smtp-Source: AGHT+IFPZByzyXdjiwV8jKmY40Cj3sanVuekYnCn7YFFgb7gotLW0eqU5EvmJr9Dd5Hb/clw6m1dn9YOJk/nOy9NWw==
+X-Received: from pjbpv13.prod.google.com ([2002:a17:90b:3c8d:b0:312:1af5:98c9])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:5108:b0:313:283e:e881 with SMTP id 98e67ed59e1d1-318c922f2c7mr1105843a91.11.1750979992473;
+ Thu, 26 Jun 2025 16:19:52 -0700 (PDT)
+Date: Thu, 26 Jun 2025 16:19:51 -0700
+In-Reply-To: <cover.1747264138.git.ackerleytng@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+Mime-Version: 1.0
+References: <cover.1747264138.git.ackerleytng@google.com>
+Message-ID: <diqzh602jdk8.fsf@ackerleytng-ctop.c.googlers.com>
+Subject: Re: [RFC PATCH v2 00/51] 1G page support for guest_memfd
+From: Ackerley Tng <ackerleytng@google.com>
+To: kvm@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
+	x86@kernel.org, linux-fsdevel@vger.kernel.org
+Cc: aik@amd.com, ajones@ventanamicro.com, akpm@linux-foundation.org, 
+	amoorthy@google.com, anthony.yznaga@oracle.com, anup@brainfault.org, 
+	aou@eecs.berkeley.edu, bfoster@redhat.com, binbin.wu@linux.intel.com, 
+	brauner@kernel.org, catalin.marinas@arm.com, chao.p.peng@intel.com, 
+	chenhuacai@kernel.org, dave.hansen@intel.com, david@redhat.com, 
+	dmatlack@google.com, dwmw@amazon.co.uk, erdemaktas@google.com, 
+	fan.du@intel.com, fvdl@google.com, graf@amazon.com, haibo1.xu@intel.com, 
+	hch@infradead.org, hughd@google.com, ira.weiny@intel.com, 
+	isaku.yamahata@intel.com, jack@suse.cz, james.morse@arm.com, 
+	jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, jhubbard@nvidia.com, 
+	jroedel@suse.de, jthoughton@google.com, jun.miao@intel.com, 
+	kai.huang@intel.com, keirf@google.com, kent.overstreet@linux.dev, 
+	kirill.shutemov@intel.com, liam.merwick@oracle.com, 
+	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, maz@kernel.org, 
+	mic@digikod.net, michael.roth@amd.com, mpe@ellerman.id.au, 
+	muchun.song@linux.dev, nikunj@amd.com, nsaenz@amazon.es, 
+	oliver.upton@linux.dev, palmer@dabbelt.com, pankaj.gupta@amd.com, 
+	paul.walmsley@sifive.com, pbonzini@redhat.com, pdurrant@amazon.co.uk, 
+	peterx@redhat.com, pgonda@google.com, pvorel@suse.cz, qperret@google.com, 
+	quic_cvanscha@quicinc.com, quic_eberman@quicinc.com, 
+	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com, richard.weiyang@gmail.com, 
+	rick.p.edgecombe@intel.com, rientjes@google.com, roypat@amazon.co.uk, 
+	rppt@kernel.org, seanjc@google.com, shuah@kernel.org, steven.price@arm.com, 
+	steven.sistare@oracle.com, suzuki.poulose@arm.com, tabba@google.com, 
+	thomas.lendacky@amd.com, usama.arif@bytedance.com, vannapurve@google.com, 
+	vbabka@suse.cz, viro@zeniv.linux.org.uk, vkuznets@redhat.com, 
+	wei.w.wang@intel.com, will@kernel.org, willy@infradead.org, 
+	xiaoyao.li@intel.com, yan.y.zhao@intel.com, yilun.xu@intel.com, 
+	yuzenghui@huawei.com, zhiquan1.li@intel.com
+Content-Type: text/plain; charset="UTF-8"
 
-In the below noted Fixes commit we introduced a reflck mutex to allow
-better scaling between devices for open and close.  The reflck was
-based on the hot reset granularity, device level for root bus devices
-which cannot support hot reset or bus/slot reset otherwise.  Overlooked
-in this were SR-IOV VFs, where there's also no bus reset option, but
-the default for a non-root-bus, non-slot-based device is bus level
-reflck granularity.
+Ackerley Tng <ackerleytng@google.com> writes:
 
-The reflck mutex has since become the dev_set mutex and is our defacto
-serialization for various operations and ioctls.  It still seems to be
-the case though that sets of vfio-pci devices really only need
-serialization relative to hot resets affecting the entire set, which
-is not relevant to SR-IOV VFs.  As described in the Closes link below,
-this serialization contributes to startup latency when multiple VFs
-sharing the same "bus" are opened concurrently.
+> Hello,
+>
+> This patchset builds upon discussion at LPC 2024 and many guest_memfd
+> upstream calls to provide 1G page support for guest_memfd by taking
+> pages from HugeTLB.
+>
+> [...]
 
-Mark the device itself as the basis of the dev_set for SR-IOV VFs.
+At the guest_memfd upstream call today (2025-06-26), we talked about
+when to merge folios with respect to conversions.
 
-Reported-by: Aaron Lewis <aaronlewis@google.com>
-Closes: https://lore.kernel.org/all/20250626180424.632628-1-aaronlewis@google.com
-Tested-by: Aaron Lewis <aaronlewis@google.com>
-Fixes: e309df5b0c9e ("vfio/pci: Parallelize device open and release")
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
----
- drivers/vfio/pci/vfio_pci_core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Just want to call out that in this RFCv2, we managed to get conversions
+working with merges happening as soon as possible.
 
-diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-index 6328c3a05bcd..261a6dc5a5fc 100644
---- a/drivers/vfio/pci/vfio_pci_core.c
-+++ b/drivers/vfio/pci/vfio_pci_core.c
-@@ -2149,7 +2149,7 @@ int vfio_pci_core_register_device(struct vfio_pci_core_device *vdev)
- 		return -EBUSY;
- 	}
- 
--	if (pci_is_root_bus(pdev->bus)) {
-+	if (pci_is_root_bus(pdev->bus) || pdev->is_virtfn) {
- 		ret = vfio_assign_device_set(&vdev->vdev, vdev);
- 	} else if (!pci_probe_reset_slot(pdev->slot)) {
- 		ret = vfio_assign_device_set(&vdev->vdev, pdev->slot);
--- 
-2.49.0
+"As soon as possible" means merges happen as long as shareability is all
+private (or all meaningless) within an aligned hugepage range. We try to
+merge after every conversion request and on truncation. On truncation,
+shareability becomes meaningless.
 
+On explicit truncation (e.g. fallocate(PUNCH_HOLE)), truncation can fail
+if there are unexpected refcounts (because we can't merge with
+unexpected refcounts). Explicit truncation will succeed only if
+refcounts are expected, and merge is performed before finally removing
+from filemap.
+
+On truncation caused by file close or inode release, guest_memfd may not
+hold the last refcount on the folio. Only in this case, we defer merging
+to the folio_put() callback, and because the callback can be called from
+atomic context, the merge is further deferred to be performed by a
+kernel worker.
+
+Deferment of merging is already minimized so that most of the
+restructuring is synchronous with some userspace-initiated action
+(conversion or explicit truncation). The only deferred merge is when the
+file is closed, and in that case there's no way to reject/fail this file
+close.
+
+(There are possible optimizations here - Yan suggested [1] checking if
+the folio_put() was called from interrupt context - I have not tried
+implementing that yet)
+
+
+I did propose an explicit guest_memfd merge ioctl, but since RFCv2
+works, I was thinking to to have the merge ioctl be a separate
+optimization/project/patch series if it turns out that merging
+as-soon-as-possible is an inefficient strategy, or if some VM use cases
+prefer to have an explicit merge ioctl.
+
+
+During the call, Michael also brought up that SNP adds some constraints
+with respect to guest accepting pages/levels.
+
+Could you please expand on that? Suppose for an SNP guest,
+
+1. Guest accepted a page at 2M level
+2. Guest converts a 4K sub page to shared
+3. guest_memfd requests unmapping of the guest-requested 4K range
+   (the rest of the 2M remains mapped into stage 2 page tables)
+4. guest_memfd splits the huge page to 4K pages (the 4K is set to
+   SHAREABILITY_ALL, the rest of the 2M is still SHAREABILITY_GUEST)
+
+Can the SNP guest continue to use the rest of the 2M page or must it
+re-accept all the pages at 4K?
+
+And for the reverse:
+
+1. Guest accepted a 2M range at 4K
+2. guest_memfd merges the full 2M range to a single 2M page
+
+Must the SNP guest re-accept at 2M for the guest to continue
+functioning, or will the SNP guest continue to work (just with poorer
+performance than if the memory was accepted at 2M)?
+
+[1] https://lore.kernel.org/all/aDfT35EsYP%2FByf7Z@yzhao56-desk.sh.intel.com/
 
