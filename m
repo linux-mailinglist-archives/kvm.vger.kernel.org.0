@@ -1,129 +1,212 @@
-Return-Path: <kvm+bounces-50843-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50844-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EA68AEA281
-	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 17:30:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C25DDAEA26C
+	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 17:26:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F77A1885831
-	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 15:21:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 213F53B08DD
+	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 15:25:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE8982EBB84;
-	Thu, 26 Jun 2025 15:20:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 263AF2EBB82;
+	Thu, 26 Jun 2025 15:25:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y5Jli4GU"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vWWiHDwj"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22FBD28934F;
-	Thu, 26 Jun 2025 15:20:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 100D12ECD1B
+	for <kvm@vger.kernel.org>; Thu, 26 Jun 2025 15:25:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750951234; cv=none; b=U5PPGq7YJaYr7v0mwR8pcZMuqZpmp2Dj4QxMiiLaWn+OJC35HAZXkqHNlKqvZ+eHWkFK5RmzxTEk+Bg829s0RvAPtNnMe2Vu6QIouD6WcMDOdRPBumaycQirpwtwKCq8FOZQC20IQs2Phrs5wVWsvHEavGYsZRVku/xo6EyP4KE=
+	t=1750951542; cv=none; b=qEO+amByUo57Xn48zP99sixqhqrCm+j0v8tcUTh6MYZb5H7cPYHDv+JcAVFIa7w2PQ2i7zAoZW4XXFaUFgAMXCV6gBkL15c02868tBVJNK0lh0oLG0A10g1qXe3NMbq/1linVIe+P5bGETQE7j4usBwYnjq29Qqwh75ocTlkxgg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750951234; c=relaxed/simple;
-	bh=Dds48T+13Rl1lPltLORehbpwNU4/j51XA94K8+avE5w=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=tcZKEaQ142Z07iFwuEXq8t1W/cYpG7V6OJwssDmJDp9C+GWtsjeTl/7vXeWK4Qq1MtJryMQtx3pYkCxe7qdCKAd06Nk0AA8y1BTbRHj3fudOU6DEf3iNA/CLLESQHUSrbuVLXWjhk78qXR6/VlgfyKL6EYMVJhyze3z4E9tF8p0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y5Jli4GU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9637C4CEEB;
-	Thu, 26 Jun 2025 15:20:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750951234;
-	bh=Dds48T+13Rl1lPltLORehbpwNU4/j51XA94K8+avE5w=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Y5Jli4GUKuhTeHTX8HNMlcQxc3urmUV61Hch6xuZ20Lxj54j7rVARi41Wa7fBanQj
-	 EKV+c01kX7Z19580K+dqEimfUHxhE3EUY475Y+3PY7pz+v7p7515q4T5Aw92CjzkT8
-	 cG/U3lUDtVCwBCSiWD3QFjDxfKyAFnAUUwUTRH5DX/9YU9p7Z7zl9S+CyaJMigY5vA
-	 Bzgz135J1cN9K4zkdP1xNUa0n2G90c5x3+QYev66JFV8J19iBFZRC+FcnGHAjxiUdH
-	 jwcVzVIJcueW2BC6b6zRJ6rnW2+JVPDx0YYCedwR+xpLdSRghZ3nFDEe8/14sRRbST
-	 J580m0nbOuamg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1uUoOt-00AGoI-H6;
-	Thu, 26 Jun 2025 16:20:31 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Mostafa Saleh <smostafa@google.com>,
-	Quentin Perret <qperret@google.com>,
-	Wei-Lin Chang <r09922117@csie.ntu.edu.tw>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org
-Subject: [GIT PULL] KVM/arm64 fixes for 6.16, take #4
-Date: Thu, 26 Jun 2025 16:20:23 +0100
-Message-Id: <20250626152023.192347-1-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1750951542; c=relaxed/simple;
+	bh=7g4qPMdEKrmEkGXzk/uNBiz2xsUrcubWQmfBldxxQ+A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XIZxO7DkaY83UjAbyAnjMYccFl93Y3SxXAjrgR/JX85HHsz24/MgffSHKVLf2TZHqMYOicUBSJMDYPDBOrvkEhEDJ6IuXz0mp2xLByJa3bCXwVg4O12zUSu1vvs9VNFT+2QUEDCFmeABCj+3A71sIihMejKb1xsqZZ9tniC2te0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vWWiHDwj; arc=none smtp.client-ip=91.218.175.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Thu, 26 Jun 2025 17:25:24 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1750951527;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yMeirCEvb93+6eKpc7HB6gbXZIpqW2Hi3+BGISmVpIs=;
+	b=vWWiHDwjdsnVxah//VOE06mn+L789ERAyxJwwodV56NBj7UU4/YpmcD1M2GXm2fk1fEz+c
+	RE+pf5Ngacj1OI2IB9rFXUFyD830hpC72TGw65II7dNFETzAGJbHVR2KYTBX0Hdw2T6JcQ
+	IYGWh/VdELSLLRDiG1kJohVZrlF6uxc=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: eric.auger@redhat.com, lvivier@redhat.com, thuth@redhat.com, 
+	frankja@linux.ibm.com, imbrenda@linux.ibm.com, nrb@linux.ibm.com, david@redhat.com, 
+	pbonzini@redhat.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org, 
+	will@kernel.org, julien.thierry.kdev@gmail.com, maz@kernel.org, 
+	oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, joey.gouly@arm.com, 
+	andre.przywara@arm.com, shahuang@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v4 03/13] scripts: Refuse to run the tests
+ if not configured for qemu
+Message-ID: <20250626-e99cee57aaa67223c2e09f31@orel>
+References: <20250625154813.27254-1-alexandru.elisei@arm.com>
+ <20250625154813.27254-4-alexandru.elisei@arm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, smostafa@google.com, qperret@google.com, r09922117@csie.ntu.edu.tw, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250625154813.27254-4-alexandru.elisei@arm.com>
+X-Migadu-Flow: FLOW_OUT
 
-Paolo,
+On Wed, Jun 25, 2025 at 04:48:03PM +0100, Alexandru Elisei wrote:
+> Arm and arm64 support running the tests under kvmtool. kvmtool has a
+> different command line syntax for configuring and running a virtual
+> machine, and the automated scripts know only how to use qemu.
+> 
+> One issue with that is even though the tests have been configured for
+> kvmtool (with ./configure --target=kvmtool), the scripts will use qemu to
+> run the tests, and without looking at the logs there is no indication that
+> the tests haven't been run with kvmtool, as configured.
+> 
+> Another issue is that kvmtool uses a different address for the UART and
+> when running the tests with qemu via the scripts, this warning is
+> displayed:
+> 
+> WARNING: early print support may not work. Found uart at 0x9000000, but early base is 0x1000000.
+> 
+> which might trip up an unsuspected user.
+> 
+> There are four different ways to run a test using the test infrastructure:
+> with run_tests.sh, by invoking arm/run or arm/efi/run with the correct
+> parameters (only the arm directory is mentioned here because the tests can
+> be configured for kvmtool only on arm and arm64), and by creating
+> standalone tests.
+> 
+> run_tests.sh ends up executing either arm/run or arm/efi/run, so add a
+> check to these two scripts for the test target, and refuse to run the test
+> if kvm-unit-tests has been configured for kvmtool.
+> 
+> mkstandalone.sh also executes arm/run or arm/efi run, but the usual use
+> case for standalone tests is to compile them on one machine, and then to
+> run them on a different machine. This two step process can be time
+> consuming, so save the user time (and frustration!) and add a check
+> directly to mkstandalone.sh.
+> 
+> Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+> 
+> Changes v3->v4:
+> 
+> * Renamed check_vmm_supported() to vmm_check_supported().
+> * Added function vmm_get_target().
+> * Added Reviewed-by from Shaoqin.
+> * Fixed typo s/execuing/executing (Drew).
+> 
+>  arm/efi/run             |  3 +++
+>  arm/run                 |  4 ++++
+>  scripts/mkstandalone.sh |  6 +++++-
+>  scripts/vmm.bash        | 25 +++++++++++++++++++++++++
+>  4 files changed, 37 insertions(+), 1 deletion(-)
+>  create mode 100644 scripts/vmm.bash
+> 
+> diff --git a/arm/efi/run b/arm/efi/run
+> index 8f41fc02df31..38800e8bfa13 100755
+> --- a/arm/efi/run
+> +++ b/arm/efi/run
+> @@ -11,6 +11,9 @@ if [ ! -f config.mak ]; then
+>  fi
+>  source config.mak
+>  source scripts/arch-run.bash
+> +source scripts/vmm.bash
+> +
+> +vmm_check_supported
+>  
+>  if [ -f /usr/share/qemu-efi-aarch64/QEMU_EFI.fd ]; then
+>  	DEFAULT_UEFI=/usr/share/qemu-efi-aarch64/QEMU_EFI.fd
+> diff --git a/arm/run b/arm/run
+> index ef58558231b7..edf0c1dd1b41 100755
+> --- a/arm/run
+> +++ b/arm/run
+> @@ -7,7 +7,11 @@ if [ -z "$KUT_STANDALONE" ]; then
+>  	fi
+>  	source config.mak
+>  	source scripts/arch-run.bash
+> +	source scripts/vmm.bash
+>  fi
+> +
+> +vmm_check_supported
+> +
+>  qemu_cpu="$TARGET_CPU"
+>  
+>  if [ "$QEMU" ] && [ -z "$ACCEL" ] &&
+> diff --git a/scripts/mkstandalone.sh b/scripts/mkstandalone.sh
+> index c4ba81f18935..9c5768563757 100755
+> --- a/scripts/mkstandalone.sh
+> +++ b/scripts/mkstandalone.sh
+> @@ -6,6 +6,9 @@ if [ ! -f config.mak ]; then
+>  fi
+>  source config.mak
+>  source scripts/common.bash
+> +source scripts/vmm.bash
+> +
+> +vmm_check_supported
+>  
+>  temp_file ()
+>  {
+> @@ -71,7 +74,8 @@ generate_test ()
+>  	args[3]='$bin'
+>  
+>  	(echo "#!/usr/bin/env bash"
+> -	 cat scripts/arch-run.bash "$TEST_DIR/run") | temp_file RUNTIME_arch_run
+> +	 cat scripts/vmm.bash scripts/arch-run.bash "$TEST_DIR/run") \
+> +		| temp_file RUNTIME_arch_run
+>  
+>  	echo "exec {stdout}>&1"
+>  	echo "RUNTIME_log_stdout () { cat >&\$stdout; }"
+> diff --git a/scripts/vmm.bash b/scripts/vmm.bash
+> new file mode 100644
+> index 000000000000..8365c1424a3f
+> --- /dev/null
+> +++ b/scripts/vmm.bash
+> @@ -0,0 +1,25 @@
+> +function vmm_get_target()
+> +{
+> +	if [[ -z "$TARGET" ]]; then
+> +		echo "qemu"
+> +	else
+> +		echo "$TARGET"
+> +	fi
+> +}
+> +
+> +function vmm_check_supported()
+> +{
+> +	# We're not interested in the return code for vmm_get_target().
+> +	# shellcheck disable=SC2155
+> +	local target=$(vmm_get_target)
+> +
+> +	case "$target" in
+> +	qemu)
+> +		return 0
+> +		;;
+> +	*)
+> +		echo "$0 does not support target '$target'"
+> +		exit 2
+> +		;;
+> +	esac
+> +}
+> -- 
+> 2.50.0
+>
 
-Another week, another set of fixes. Nothing major this time: allow
-pKVM to fail to initialise without taking the host down, make sure we
-are not mapping too much in the host S2 (another pKVM special), and a
-brown-paper-bag quality bug fix on the nested GICv3 emulation.
-
-Please pull,
-
-	M.
-
-The following changes since commit 04c5355b2a94ff3191ce63ab035fb7f04d036869:
-
-  KVM: arm64: VHE: Centralize ISBs when returning to host (2025-06-19 13:34:59 +0100)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.16-4
-
-for you to fetch changes up to 0e02219f9cf4f0c0aa3dbf3c820e6612bf3f0c8c:
-
-  KVM: arm64: Don't free hyp pages with pKVM on GICv2 (2025-06-26 11:39:15 +0100)
-
-----------------------------------------------------------------
-KVM/arm64 fixes for 6.16, take #4
-
-- Gracefully fail initialising pKVM if the interrupt controller isn't
-  GICv3
-
-- Also gracefully fail initialising pKVM if the carveout allocation
-  fails
-
-- Fix the computing of the minimum MMIO range required for the host on
-  stage-2 fault
-
-- Fix the generation of the GICv3 Maintenance Interrupt in nested mode
-
-----------------------------------------------------------------
-Mostafa Saleh (1):
-      KVM: arm64: Fix error path in init_hyp_mode()
-
-Quentin Perret (2):
-      KVM: arm64: Adjust range correctly during host stage-2 faults
-      KVM: arm64: Don't free hyp pages with pKVM on GICv2
-
-Wei-Lin Chang (1):
-      KVM: arm64: nv: Fix MI line level calculation in vgic_v3_nested_update_mi()
-
- arch/arm64/kvm/arm.c                  | 12 ++++++++++--
- arch/arm64/kvm/hyp/nvhe/mem_protect.c | 20 ++++++++++++--------
- arch/arm64/kvm/vgic/vgic-v3-nested.c  |  4 +---
- 3 files changed, 23 insertions(+), 13 deletions(-)
+Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
 
