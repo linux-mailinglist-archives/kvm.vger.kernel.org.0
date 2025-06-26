@@ -1,46 +1,46 @@
-Return-Path: <kvm+bounces-50844-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50845-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C25DDAEA26C
-	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 17:26:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4731FAEA2B2
+	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 17:34:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 213F53B08DD
-	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 15:25:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 82F06188B260
+	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 15:30:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 263AF2EBB82;
-	Thu, 26 Jun 2025 15:25:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FEA12EBDE2;
+	Thu, 26 Jun 2025 15:29:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vWWiHDwj"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="U45XfFqA"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 100D12ECD1B
-	for <kvm@vger.kernel.org>; Thu, 26 Jun 2025 15:25:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E99EA35975
+	for <kvm@vger.kernel.org>; Thu, 26 Jun 2025 15:29:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750951542; cv=none; b=qEO+amByUo57Xn48zP99sixqhqrCm+j0v8tcUTh6MYZb5H7cPYHDv+JcAVFIa7w2PQ2i7zAoZW4XXFaUFgAMXCV6gBkL15c02868tBVJNK0lh0oLG0A10g1qXe3NMbq/1linVIe+P5bGETQE7j4usBwYnjq29Qqwh75ocTlkxgg=
+	t=1750951782; cv=none; b=bYYitOfDbE0H+5uNgitDePnHJGsNs2OqMCDqpLpGykFMUrBh5AF1ouiJ1mom6Yk/CVRXBMiXQHse7mwe6vSsL8wl4ezAcM+vK1h3MBmu/gZxTHHoV7JqRCZM99riYEpg7RjqU7kWjbzzkdkTUhiP2gelXxoKze7yQilnArU/ht0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750951542; c=relaxed/simple;
-	bh=7g4qPMdEKrmEkGXzk/uNBiz2xsUrcubWQmfBldxxQ+A=;
+	s=arc-20240116; t=1750951782; c=relaxed/simple;
+	bh=PlhIbg0CrqBxUdRfXHwXe7RPphROJFXda3eZtMsfFrY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XIZxO7DkaY83UjAbyAnjMYccFl93Y3SxXAjrgR/JX85HHsz24/MgffSHKVLf2TZHqMYOicUBSJMDYPDBOrvkEhEDJ6IuXz0mp2xLByJa3bCXwVg4O12zUSu1vvs9VNFT+2QUEDCFmeABCj+3A71sIihMejKb1xsqZZ9tniC2te0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vWWiHDwj; arc=none smtp.client-ip=91.218.175.181
+	 Content-Type:Content-Disposition:In-Reply-To; b=hF+5wJo03uIEceEim19Jtlms6ONCsw4wcojcExOwNf/w6lIpefe7Y0sxrFRultVSEX3xsL3+xdmiT5nt6vwEIQTjgVQtVXgTQ21y8tziZKMshcddyrYyekZ9EvqBgWX0vDU1K8UkUBYkOUAdKDXL3oUJaKSGlfXlcBhM6QohmaE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=U45XfFqA; arc=none smtp.client-ip=95.215.58.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Thu, 26 Jun 2025 17:25:24 +0200
+Date: Thu, 26 Jun 2025 17:29:21 +0200
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1750951527;
+	t=1750951769;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=yMeirCEvb93+6eKpc7HB6gbXZIpqW2Hi3+BGISmVpIs=;
-	b=vWWiHDwjdsnVxah//VOE06mn+L789ERAyxJwwodV56NBj7UU4/YpmcD1M2GXm2fk1fEz+c
-	RE+pf5Ngacj1OI2IB9rFXUFyD830hpC72TGw65II7dNFETzAGJbHVR2KYTBX0Hdw2T6JcQ
-	IYGWh/VdELSLLRDiG1kJohVZrlF6uxc=
+	bh=B7njsQqS9+YDhVOAJu3gcu6bWM9s+UemRcmSG7r3Qvs=;
+	b=U45XfFqA2ERqttsJj+PAHPpQC2ZDqBxFOMZkRVL0AKADe70nTLxOPuIU65WzUbbUkfsd+b
+	5F4Vl+NzEJJXuyUPzkvbfiUTJcyprTFO9NS8GCkwKwzbJoV8XZN2iwQViQVZoVEXuKzyna
+	Yg50+iFSUL3/OH0CegRsxadieDifpF4=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Andrew Jones <andrew.jones@linux.dev>
 To: Alexandru Elisei <alexandru.elisei@arm.com>
@@ -51,11 +51,11 @@ Cc: eric.auger@redhat.com, lvivier@redhat.com, thuth@redhat.com,
 	will@kernel.org, julien.thierry.kdev@gmail.com, maz@kernel.org, 
 	oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, joey.gouly@arm.com, 
 	andre.przywara@arm.com, shahuang@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v4 03/13] scripts: Refuse to run the tests
- if not configured for qemu
-Message-ID: <20250626-e99cee57aaa67223c2e09f31@orel>
+Subject: Re: [kvm-unit-tests PATCH v4 04/13] scripts: Use an associative
+ array for qemu argument names
+Message-ID: <20250626-5cba2905b81b7a5b3a016bfa@orel>
 References: <20250625154813.27254-1-alexandru.elisei@arm.com>
- <20250625154813.27254-4-alexandru.elisei@arm.com>
+ <20250625154813.27254-5-alexandru.elisei@arm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -64,146 +64,119 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250625154813.27254-4-alexandru.elisei@arm.com>
+In-Reply-To: <20250625154813.27254-5-alexandru.elisei@arm.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Wed, Jun 25, 2025 at 04:48:03PM +0100, Alexandru Elisei wrote:
-> Arm and arm64 support running the tests under kvmtool. kvmtool has a
-> different command line syntax for configuring and running a virtual
-> machine, and the automated scripts know only how to use qemu.
+On Wed, Jun 25, 2025 at 04:48:04PM +0100, Alexandru Elisei wrote:
+> Move away from hardcoded qemu arguments and use instead an associative
+> array to get the needed arguments. This paves the way for adding kvmtool
+> support to the scripts, which has a different syntax for the same VM
+> configuration parameters.
 > 
-> One issue with that is even though the tests have been configured for
-> kvmtool (with ./configure --target=kvmtool), the scripts will use qemu to
-> run the tests, and without looking at the logs there is no indication that
-> the tests haven't been run with kvmtool, as configured.
-> 
-> Another issue is that kvmtool uses a different address for the UART and
-> when running the tests with qemu via the scripts, this warning is
-> displayed:
-> 
-> WARNING: early print support may not work. Found uart at 0x9000000, but early base is 0x1000000.
-> 
-> which might trip up an unsuspected user.
-> 
-> There are four different ways to run a test using the test infrastructure:
-> with run_tests.sh, by invoking arm/run or arm/efi/run with the correct
-> parameters (only the arm directory is mentioned here because the tests can
-> be configured for kvmtool only on arm and arm64), and by creating
-> standalone tests.
-> 
-> run_tests.sh ends up executing either arm/run or arm/efi/run, so add a
-> check to these two scripts for the test target, and refuse to run the test
-> if kvm-unit-tests has been configured for kvmtool.
-> 
-> mkstandalone.sh also executes arm/run or arm/efi run, but the usual use
-> case for standalone tests is to compile them on one machine, and then to
-> run them on a different machine. This two step process can be time
-> consuming, so save the user time (and frustration!) and add a check
-> directly to mkstandalone.sh.
-> 
-> Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
+> Suggested-by: Andrew Jones <andrew.jones@linux.dev>
 > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 > ---
 > 
 > Changes v3->v4:
 > 
-> * Renamed check_vmm_supported() to vmm_check_supported().
-> * Added function vmm_get_target().
-> * Added Reviewed-by from Shaoqin.
-> * Fixed typo s/execuing/executing (Drew).
+> * Renamed vmm_opts to vmm_optname.
+> * Dropped entries for 'kernel' and 'initrd' in vmm_optname because they weren't
+> used in this patch.
+> * Use vmm_optname_nr_cpus() and vmm_optname_args() instead of directly indexing
+> into vmm_optname.
+> * Dropped the check for empty $test_args in scripts/runtime.bash::run() by
+> having $test_args already contain --append if not empty in
+> scripts/common.bash::for_each_unittest().
 > 
->  arm/efi/run             |  3 +++
->  arm/run                 |  4 ++++
->  scripts/mkstandalone.sh |  6 +++++-
->  scripts/vmm.bash        | 25 +++++++++++++++++++++++++
->  4 files changed, 37 insertions(+), 1 deletion(-)
->  create mode 100644 scripts/vmm.bash
+>  scripts/common.bash  | 11 ++++++++---
+>  scripts/runtime.bash |  7 +------
+>  scripts/vmm.bash     | 15 +++++++++++++++
+>  3 files changed, 24 insertions(+), 9 deletions(-)
 > 
-> diff --git a/arm/efi/run b/arm/efi/run
-> index 8f41fc02df31..38800e8bfa13 100755
-> --- a/arm/efi/run
-> +++ b/arm/efi/run
-> @@ -11,6 +11,9 @@ if [ ! -f config.mak ]; then
->  fi
+> diff --git a/scripts/common.bash b/scripts/common.bash
+> index 9deb87d4050d..ae127bd4e208 100644
+> --- a/scripts/common.bash
+> +++ b/scripts/common.bash
+> @@ -1,4 +1,5 @@
 >  source config.mak
->  source scripts/arch-run.bash
 > +source scripts/vmm.bash
-> +
-> +vmm_check_supported
 >  
->  if [ -f /usr/share/qemu-efi-aarch64/QEMU_EFI.fd ]; then
->  	DEFAULT_UEFI=/usr/share/qemu-efi-aarch64/QEMU_EFI.fd
-> diff --git a/arm/run b/arm/run
-> index ef58558231b7..edf0c1dd1b41 100755
-> --- a/arm/run
-> +++ b/arm/run
-> @@ -7,7 +7,11 @@ if [ -z "$KUT_STANDALONE" ]; then
->  	fi
->  	source config.mak
->  	source scripts/arch-run.bash
-> +	source scripts/vmm.bash
->  fi
-> +
-> +vmm_check_supported
-> +
->  qemu_cpu="$TARGET_CPU"
->  
->  if [ "$QEMU" ] && [ -z "$ACCEL" ] &&
-> diff --git a/scripts/mkstandalone.sh b/scripts/mkstandalone.sh
-> index c4ba81f18935..9c5768563757 100755
-> --- a/scripts/mkstandalone.sh
-> +++ b/scripts/mkstandalone.sh
-> @@ -6,6 +6,9 @@ if [ ! -f config.mak ]; then
->  fi
->  source config.mak
->  source scripts/common.bash
-> +source scripts/vmm.bash
-> +
-> +vmm_check_supported
->  
->  temp_file ()
+>  function for_each_unittest()
 >  {
-> @@ -71,7 +74,8 @@ generate_test ()
->  	args[3]='$bin'
+> @@ -26,8 +27,12 @@ function for_each_unittest()
+>  				$(arch_cmd) "$cmd" "$testname" "$groups" "$smp" "$kernel" "$test_args" "$opts" "$arch" "$machine" "$check" "$accel" "$timeout"
+>  			fi
+>  			testname=$rematch
+> -			smp=1
+> +			smp="$(vmm_optname_nr_cpus) 1"
+>  			kernel=""
+> +			# Intentionally don't use -append if test_args is empty
+> +			# because qemu interprets the first word after
+> +			# -append as a kernel parameter instead of a command
+> +			# line option.
+>  			test_args=""
+>  			opts=""
+>  			groups=""
+> @@ -39,9 +44,9 @@ function for_each_unittest()
+>  		elif [[ $line =~ ^file\ *=\ *(.*)$ ]]; then
+>  			kernel=$TEST_DIR/${BASH_REMATCH[1]}
+>  		elif [[ $line =~ ^smp\ *=\ *(.*)$ ]]; then
+> -			smp=${BASH_REMATCH[1]}
+> +			smp="$(vmm_optname_nr_cpus) ${BASH_REMATCH[1]}"
+>  		elif [[ $line =~ ^test_args\ *=\ *(.*)$ ]]; then
+> -			test_args=${BASH_REMATCH[1]}
+> +			test_args="$(vmm_optname_args) ${BASH_REMATCH[1]}"
+>  		elif [[ $line =~ ^(extra_params|qemu_params)\ *=\ *'"""'(.*)$ ]]; then
+>  			opts=${BASH_REMATCH[2]}$'\n'
+>  			while read -r -u $fd; do
+> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
+> index bc17b89f4ff5..86d8a2cd8528 100644
+> --- a/scripts/runtime.bash
+> +++ b/scripts/runtime.bash
+> @@ -34,7 +34,7 @@ premature_failure()
+>  get_cmdline()
+>  {
+>      local kernel=$1
+> -    echo "TESTNAME=$testname TIMEOUT=$timeout MACHINE=$machine ACCEL=$accel $RUNTIME_arch_run $kernel -smp $smp $opts"
+> +    echo "TESTNAME=$testname TIMEOUT=$timeout MACHINE=$machine ACCEL=$accel $RUNTIME_arch_run $kernel $smp $test_args $opts"
+>  }
 >  
->  	(echo "#!/usr/bin/env bash"
-> -	 cat scripts/arch-run.bash "$TEST_DIR/run") | temp_file RUNTIME_arch_run
-> +	 cat scripts/vmm.bash scripts/arch-run.bash "$TEST_DIR/run") \
-> +		| temp_file RUNTIME_arch_run
+>  skip_nodefault()
+> @@ -88,11 +88,6 @@ function run()
+>      local accel="${10}"
+>      local timeout="${11:-$TIMEOUT}" # unittests.cfg overrides the default
 >  
->  	echo "exec {stdout}>&1"
->  	echo "RUNTIME_log_stdout () { cat >&\$stdout; }"
+> -    # If $test_args is empty, qemu will interpret the first option after -append
+> -    # as a test argument instead of a qemu option, so make sure that doesn't
+> -    # happen.
+> -    [ -n "$test_args" ] && opts="-append $test_args $opts"
+> -
+>      if [ "${CONFIG_EFI}" == "y" ]; then
+>          kernel=${kernel/%.flat/.efi}
+>      fi
 > diff --git a/scripts/vmm.bash b/scripts/vmm.bash
-> new file mode 100644
-> index 000000000000..8365c1424a3f
-> --- /dev/null
+> index 8365c1424a3f..7629b2b9146e 100644
+> --- a/scripts/vmm.bash
 > +++ b/scripts/vmm.bash
-> @@ -0,0 +1,25 @@
-> +function vmm_get_target()
+> @@ -1,3 +1,18 @@
+> +declare -A vmm_optname=(
+> +	[qemu,args]='-append'
+> +	[qemu,nr_cpus]='-smp'
+> +)
+> +
+> +function vmm_optname_args()
 > +{
-> +	if [[ -z "$TARGET" ]]; then
-> +		echo "qemu"
-> +	else
-> +		echo "$TARGET"
-> +	fi
+> +	echo ${vmm_optname[$(vmm_get_target),args]}
 > +}
 > +
-> +function vmm_check_supported()
+> +function vmm_optname_nr_cpus()
 > +{
-> +	# We're not interested in the return code for vmm_get_target().
-> +	# shellcheck disable=SC2155
-> +	local target=$(vmm_get_target)
-> +
-> +	case "$target" in
-> +	qemu)
-> +		return 0
-> +		;;
-> +	*)
-> +		echo "$0 does not support target '$target'"
-> +		exit 2
-> +		;;
-> +	esac
+> +	echo ${vmm_optname[$(vmm_get_target),nr_cpus]}
 > +}
+> +
+>  function vmm_get_target()
+>  {
+>  	if [[ -z "$TARGET" ]]; then
 > -- 
 > 2.50.0
 >
