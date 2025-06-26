@@ -1,231 +1,113 @@
-Return-Path: <kvm+bounces-50849-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50850-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80238AEA2E6
-	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 17:43:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E01EAEA2EC
+	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 17:45:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D3A73BE17F
-	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 15:43:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC8F55619AE
+	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 15:44:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 792D42EBDD9;
-	Thu, 26 Jun 2025 15:43:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 070452ECD18;
+	Thu, 26 Jun 2025 15:45:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pUawa05C"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TCUlvzF5"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE12D18DB1F
-	for <kvm@vger.kernel.org>; Thu, 26 Jun 2025 15:43:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E043E2E610B
+	for <kvm@vger.kernel.org>; Thu, 26 Jun 2025 15:44:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750952632; cv=none; b=op8pnbSmEBtUed5tnK3GFG1lwYiGiyMWGwOBZ+TjFdDSlnneH8/9XI+IN2MO1tFltC70axd0Kq0mdPruFRwos/vZIbDO8bgsfAIRCGvTBBkSec7lnQ6EboJgHMOWT9Zsl2ElClojPuahVli8spJsDnH3Pcr3KviUJ1sGXPXvqrg=
+	t=1750952700; cv=none; b=Kh19VpueCMATqVeP3ly2WgeU1zYBeiVMO2t7UMu0OBP1URcecC5XH+Qm9jJ/AMsWYweacPO4M9CTulygauqVSlyp2SqOHSl77XMVdKF7eQXvnB4lS4l1+y89usH93EfzuteildN88rIZiE4in0aCQ1vgltjJNQJWDDe1wOMmYg0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750952632; c=relaxed/simple;
-	bh=xd655tyHKCf4nE82bapEt+6mY1oOnmHgPj/8CJdBns0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VeoKL5+KWaJAkiLGlbeJ8kmnligXFUzHB7/L1NzTU8nGKdoDJ9oPcoS6WdX98JXdrsPF9aEsBfMLHkC8N9IPTpEMBlAAyv6PW60MOU00HcS/POV06SEW4LR87t8MaPPC7RbEhtPsK8TTZj8ZhiZvxWANrd5P9UIHXkwUN9ykNEY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pUawa05C; arc=none smtp.client-ip=91.218.175.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Thu, 26 Jun 2025 17:43:44 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1750952627;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YqF99bj8Q8kofbXVGew8HAlAeKaELqV+g5gmPlCqwnE=;
-	b=pUawa05C00EvjdazdL/LLkZ7I3VgwstMotbdAXlvMcBFRk+BAzQb2kDGvVUU7iR7Wo/bg9
-	dHnPEtJco90ywk4SiMLZLYrqBXi2BYPTswxqWZWpuYagiYUfdozf9cXcEZi65KUV2XIySy
-	KjYRVYGNzKznmO7vpX2VkB7ilVfSB2Q=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: eric.auger@redhat.com, lvivier@redhat.com, thuth@redhat.com, 
-	frankja@linux.ibm.com, imbrenda@linux.ibm.com, nrb@linux.ibm.com, david@redhat.com, 
-	pbonzini@redhat.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org, 
-	will@kernel.org, julien.thierry.kdev@gmail.com, maz@kernel.org, 
-	oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, joey.gouly@arm.com, 
-	andre.przywara@arm.com, shahuang@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v4 07/13] scripts: Add default arguments
- for kvmtool
-Message-ID: <20250626-620bfc4816a1b6089932b946@orel>
-References: <20250625154813.27254-1-alexandru.elisei@arm.com>
- <20250625154813.27254-8-alexandru.elisei@arm.com>
+	s=arc-20240116; t=1750952700; c=relaxed/simple;
+	bh=UPzg+1cFWaa5IEQs97XqQsfv0UsC67UYlsGsjUZbIk8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=fd92xAmiaI/SauALbNmBF/rjxA8ZQQzoVPrTXIE17N+EayhgrXRPMuBC07zhU8qZT8gcSp+MHOekYT4pVlq9fXw8+wo0sQGLEDJt/JYherlA4Lk6Y8L9rJ3MZtQQ72TR7UgzkquLFtJGLNPBPBzYPoDw1R5mZJlCZqx7W48pGNg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TCUlvzF5; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-748cf01de06so2418750b3a.3
+        for <kvm@vger.kernel.org>; Thu, 26 Jun 2025 08:44:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1750952698; x=1751557498; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=dJ4boTNcjSB3GkKZvOY11od0wh/pgsj65dFh/E1J50o=;
+        b=TCUlvzF5YaH7CclCZhhRKMICnHzLRiK6jfTS2LZmtunIDabaUg+ScxVzxmI0aPCNdn
+         zCcBD2W7m0uSWqGxWsnqJ8gZxlokUUmR/Rn+3jiHxAVNmoXCihkhei4KQX9eEYzbkVMa
+         UXZJZ4dEw8IisHwWSm1ZlFEZPg4aqfmqw1jHXmXN0NXZS6zFAKz8GOrYMxt6mDZT4+ac
+         sRh1ZD6Vle3ubcR1Fh7HdcrIm9v0o+ycU0dSi/cDGKuyvmImbLujQbo7YZE/jrAHmKZI
+         r/XZzYiBxiXvoGk7bWH6x63ZOu+Rn2wAJborsQ5b0yPdNUB0q5MPu4K7462++FjibDf7
+         XV0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750952698; x=1751557498;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=dJ4boTNcjSB3GkKZvOY11od0wh/pgsj65dFh/E1J50o=;
+        b=U81qVY0m253jz7bcpjfGcV0LiXpl/NYRf+iDGpsDvb8YvBj8iSxEujm1VKncMZLCly
+         nvwHHPwZfObR+jK7dkM8lPNIAmUXgLfLzsj3DxDLqaEKzdceZUkvrl/2Ibg3ylVta+KA
+         WB2r+lSO50W+/eG7bH2KS9F0DYfyky0ykih8lugNZuAEWL6oIcwJuFGhBt8zD5lTWD8w
+         Zc65lMhXYve+G/i2/gpcGvMHLlmx4Hl4yap1nMwu6g+ROhkht3YTya+zcubgN7pk29Mx
+         /0JI4x49JTjhcS81KZuPYUNMeQLnBH8M9h9cTAKLV0yVcEafuuJs3URx5WJbFaSF8enO
+         JIVA==
+X-Forwarded-Encrypted: i=1; AJvYcCVXzMTIwgdENuAGoZhEr99OCgD5Rf25KQUceqV0UlcF6RpPkRPmkEn7/UteGGyVu6ja3nI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywlz+ViALHio3BX2VqnxOjgv8aCD0I1Mf/bjVEKPqOLd+mixAvD
+	PbhYKE280LV1oZnNV0IhrmxGnQ4+oaWx2N/Pyvl2jb85PmXxNlq8hygoGcAVe307XVZ7USKnEfA
+	9cc4r7g==
+X-Google-Smtp-Source: AGHT+IHv9FW8lQLGwlaBHFwpp23GrtZ0oFp1gQDu2z4AW0WZkFqQPeNOaoDhABPtQe6lbaeqNZ0KNtiyS1M=
+X-Received: from pfbde3.prod.google.com ([2002:a05:6a00:4683:b0:748:e276:8454])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:b54:b0:748:eb38:8830
+ with SMTP id d2e1a72fcca58-74ad45900cdmr10200651b3a.13.1750952698238; Thu, 26
+ Jun 2025 08:44:58 -0700 (PDT)
+Date: Thu, 26 Jun 2025 08:44:56 -0700
+In-Reply-To: <aF1ntuyr8gHleCwA@char.us.oracle.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250625154813.27254-8-alexandru.elisei@arm.com>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+References: <20250626125720.3132623-1-alexandre.chartre@oracle.com>
+ <aF1S2EIJWN47zLDG@google.com> <aF1ntuyr8gHleCwA@char.us.oracle.com>
+Message-ID: <aF1q-O_1FnNDLzWK@google.com>
+Subject: Re: [PATCH] kvm/x86: ARCH_CAPABILITIES should not be advertised on AMD
+From: Sean Christopherson <seanjc@google.com>
+To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Cc: Alexandre Chartre <alexandre.chartre@oracle.com>, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, pbonzini@redhat.com, xiaoyao.li@intel.com, 
+	x86@kernel.org, boris.ostrovsky@oracle.com, Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Jun 25, 2025 at 04:48:07PM +0100, Alexandru Elisei wrote:
-> kvmtool, unless told otherwise, will do its best to make sure that a kernel
-> successfully boots in a virtual machine. It does things like automatically
-> creating a rootfs and adding extra parameters to the kernel command line.
-> This is actively harmful to kvm-unit-tests, because some tests parse the
-> kernel command line and they will fail if they encounter the options added
-> by kvmtool.
+On Thu, Jun 26, 2025, Konrad Rzeszutek Wilk wrote:
+> On Thu, Jun 26, 2025 at 07:02:00AM -0700, Sean Christopherson wrote:
+> > And it's not like KVM is forcing userspace to enumerate support for
+> > ARCH_CAPABILITIES, e.g. QEMU's named AMD configs don't enumerate support.  So
+> > while I completely agree KVM's behavior is odd and annoying for userspace to deal
+> > with, this is probably something that should be addressed in userspace.
 > 
-> Fortunately for us, kvmtool commit 5613ae26b998 ("Add --nodefaults command
-> line argument") addded the --nodefaults kvmtool parameter which disables
-> all the implicit virtual machine configuration that cannot be disabled by
-> using other parameters, like modifying the kernel command line. So always
-> use --nodefaults to allow a test to run.
-> 
-> kvmtool can also be too verbose when running a virtual machine, and this is
-> controlled by several parameters. Add those to the default kvmtool command
-> line to reduce this verbosity to a minimum.
-> 
-> Before:
-> 
-> $ vm run arm/selftest.flat --cpus 2 --mem 256 --params "setup smp=2 mem=256"
-> Info: # lkvm run -k arm/selftest.flat -m 256 -c 2 --name guest-5035
-> Unknown subtest
-> 
-> EXIT: STATUS=127
-> Warning: KVM compatibility warning.
->     virtio-9p device was not detected.
->     While you have requested a virtio-9p device, the guest kernel did not initialize it.
->     Please make sure that the guest kernel was compiled with CONFIG_NET_9P_VIRTIO=y enabled in .config.
-> Warning: KVM compatibility warning.
->     virtio-net device was not detected.
->     While you have requested a virtio-net device, the guest kernel did not initialize it.
->     Please make sure that the guest kernel was compiled with CONFIG_VIRTIO_NET=y enabled in .config.
-> Info: KVM session ended normally.
-> 
-> After:
-> 
-> $ vm run arm/selftest.flat --nodefaults --network mode=none --loglevel=warning --cpus 2 --mem 256 --params "setup smp=2 mem=256"
-> PASS: selftest: setup: smp: number of CPUs matches expectation
-> INFO: selftest: setup: smp: found 2 CPUs
-> PASS: selftest: setup: mem: memory size matches expectation
-> INFO: selftest: setup: mem: found 256 MB
-> SUMMARY: 2 tests
-> 
-> EXIT: STATUS=1
-> 
-> Note that KVMTOOL_DEFAULT_OPTS can be overwritten by an environment
-> variable with the same name, but it's not documented in the help string for
-> run_tests.sh. This has been done on purpose, since overwritting
-> KVMTOOL_DEFAULT_OPTS should only be necessary for debugging or development
-> purposes.
-> 
-> Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
-> Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
-> 
-> Changes v3->v4:
-> 
-> * Use vmm_default_opts() instead of indexing into vmm_optname
-> * Reworded the help test for --nodefaults as per Shaoqin's suggestion.
-> 
->  scripts/common.bash |  6 +++---
->  scripts/vmm.bash    | 18 ++++++++++++++++++
->  2 files changed, 21 insertions(+), 3 deletions(-)
-> 
-> diff --git a/scripts/common.bash b/scripts/common.bash
-> index 7c1b89f1b3c2..d5d3101c8089 100644
-> --- a/scripts/common.bash
-> +++ b/scripts/common.bash
-> @@ -37,7 +37,7 @@ function for_each_unittest()
->  			# -append as a kernel parameter instead of a command
->  			# line option.
->  			test_args=""
-> -			opts=""
-> +			opts="$(vmm_default_opts)"
->  			groups=""
->  			arch=""
->  			machine=""
-> @@ -51,7 +51,7 @@ function for_each_unittest()
->  		elif [[ $line =~ ^test_args\ *=\ *(.*)$ ]]; then
->  			test_args="$(vmm_optname_args) ${BASH_REMATCH[1]}"
->  		elif [[ $line =~ ^$params_name\ *=\ *'"""'(.*)$ ]]; then
-> -			opts=${BASH_REMATCH[1]}$'\n'
-> +			opts="$(vmm_defaults_opts) ${BASH_REMATCH[1]}$'\n'"
+> If you do -cpu host we tack this on all the time.
 
-Could be opts+=" ${BASH_REMATCH[1]}$'\n'", right?
+Yes, I know.
 
->  			while read -r -u $fd; do
->  				#escape backslash newline, but not double backslash
->  				if [[ $opts =~ [^\\]*(\\*)$'\n'$ ]]; then
-> @@ -67,7 +67,7 @@ function for_each_unittest()
->  				fi
->  			done
->  		elif [[ $line =~ ^$params_name\ *=\ *(.*)$ ]]; then
-> -			opts=${BASH_REMATCH[1]}
-> +			opts="$(vmm_default_opts) ${BASH_REMATCH[1]}"
+> Or you saying we should have QEMU disable this for AMD CPUs all the time?
 
-Same comment.
+Maybe not _all_ the time.  But yes, I'm suggesting that QEMU clear ARCH_CAPABILITIES
+when running on AMD.
 
-Not a big deal either way, though, so my r-b stands.
+> Which in effect is the same thing as doing this patch.. but just moving
+> it to QEMU, kvm-tool, Google Cloud user-space thingie, AWS cloud thingie.
 
-Thanks,
-drew
+I don't think kvm-tool supports Windows, and I highly doubt any cloud provider
+is doing the equivalent of QEMU's `-cpu host`.  I.e. I suspect QEMU is the only
+VMM that's actually affected by this.
 
->  		elif [[ $line =~ ^groups\ *=\ *(.*)$ ]]; then
->  			groups=${BASH_REMATCH[1]}
->  		elif [[ $line =~ ^arch\ *=\ *(.*)$ ]]; then
-> diff --git a/scripts/vmm.bash b/scripts/vmm.bash
-> index 0dd3f971ecdf..368690d62473 100644
-> --- a/scripts/vmm.bash
-> +++ b/scripts/vmm.bash
-> @@ -1,3 +1,14 @@
-> +# The following parameters are enabled by default when running a test with
-> +# kvmtool:
-> +# --nodefaults: suppress VM configuration that cannot be disabled (like
-> +#               modifying the supplied kernel command line). Otherwise tests
-> +#               that use the command line will fail without this parameter.
-> +# --network mode=none: do not create a network device. kvmtool tries to help the
-> +#               user by automatically create one, and then prints a warning
-> +#               when the VM terminates if the device hasn't been initialized.
-> +# --loglevel=warning: reduce verbosity
-> +: "${KVMTOOL_DEFAULT_OPTS:="--nodefaults --network mode=none --loglevel=warning"}"
-> +
->  ##############################################################################
->  # qemu_fixup_return_code translates the ambiguous exit status in Table1 to that
->  # in Table2.  Table3 simply documents the complete status table.
-> @@ -82,11 +93,13 @@ function kvmtool_fixup_return_code()
->  
->  declare -A vmm_optname=(
->  	[qemu,args]='-append'
-> +	[qemu,default_opts]=''
->  	[qemu,fixup_return_code]=qemu_fixup_return_code
->  	[qemu,initrd]='-initrd'
->  	[qemu,nr_cpus]='-smp'
->  
->  	[kvmtool,args]='--params'
-> +	[kvmtool,default_opts]="$KVMTOOL_DEFAULT_OPTS"
->  	[kvmtool,fixup_return_code]=kvmtool_fixup_return_code
->  	[kvmtool,initrd]='--initrd'
->  	[kvmtool,nr_cpus]='--cpus'
-> @@ -97,6 +110,11 @@ function vmm_optname_args()
->  	echo ${vmm_optname[$(vmm_get_target),args]}
->  }
->  
-> +function vmm_default_opts()
-> +{
-> +	echo ${vmm_optname[$(vmm_get_target),default_opts]}
-> +}
-> +
->  function vmm_fixup_return_code()
->  {
->  	${vmm_optname[$(vmm_get_target),fixup_return_code]} "$@"
-> -- 
-> 2.50.0
-> 
-> 
-> -- 
-> kvm-riscv mailing list
-> kvm-riscv@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/kvm-riscv
+> That is a lot more complexity than doing it in the kernel.
+
+I have a hard time believing it'd be more complex.  More code, probably.  But
+this isn't all that complex.
 
