@@ -1,56 +1,94 @@
-Return-Path: <kvm+bounces-50840-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50842-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 622DAAEA214
-	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 17:13:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A0E1AEA253
+	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 17:21:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF4956A263D
-	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 15:06:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C0E1168E55
+	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 15:16:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA9B82EBBBC;
-	Thu, 26 Jun 2025 14:58:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74F662EBB8B;
+	Thu, 26 Jun 2025 15:16:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Hdcm05Qg"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kPpnDvKy"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 393FD2EACE3
-	for <kvm@vger.kernel.org>; Thu, 26 Jun 2025 14:58:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CD372EB5C0;
+	Thu, 26 Jun 2025 15:16:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750949925; cv=none; b=pfPTVCs+58gtHb9ZK/tEJs/tM8kdv6OlYsmWJMTeo9NQEyyxuHB7I9weU8V+yH8K1aGRI4dd8tizKp8Vt9ls7lc/r9XhrOYxJG5KsO43mSSNv26rZYZDqsyAtL5DfTIDgJMNccPgsTOY+4GOJDJDt3DSdvgKQUjqHyG++IdkTTU=
+	t=1750950983; cv=none; b=gCXjbyFib2ViJIy1KsyaU8EEuj/JU11m/+dcBKUsAauZcQ7kY8+3zsQe4N0WP5c7QmRrtBlGRJ/rJ8B/V/H3HM9rbFulX6RTw7GuBoAKlqXNd57wTVYLHSiEPOX+A7CIkdonvBG2y7sy2r0u5ibGz/32VEBtoNesorov1gWMyqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750949925; c=relaxed/simple;
-	bh=vaZ/wVKOO9ojZRN/4yT7HwIlbkw23fQlbABMb7bbVK4=;
+	s=arc-20240116; t=1750950983; c=relaxed/simple;
+	bh=lqI8pD0+c/MWdmXxoqGaSXV4hXF1azOl9AOSOyUxWwg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PSTth/4RAk8A9FmunIvBbB5dsHCnQhIHuKxj5tfSOodX/kH2UBQc7up2KqEyZAPiBDS9X+tuAEHNIq5NkN135crnTRtAultDBCo5hf6WLgowYWUs3AS+gJb1ZCHEmpKP2+S8VqSYW6x27Yf3JMHI3UksfBx2AUYGvWvaLU9EedI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Hdcm05Qg; arc=none smtp.client-ip=95.215.58.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Thu, 26 Jun 2025 16:58:27 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1750949911;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vOuqCH7ZkoqL6Tmn+B/nDaPgtnCP16MSLY5lnskHQ2I=;
-	b=Hdcm05Qg5nhxSkz6prIahnkUcmTzr4XBzlqKZwTKI+O0waJiu8QBcOqtbuiiz7N3zgVQTI
-	aT89w1gTaPPCYyF2OYUY7oikqbtLehQyk8wEXK6m4nhEacEyITBn1wp8BWDeLgZ2Y+f5cN
-	ZieXTzWrL6MSbpDr3Cw5IfxXCLqc7GE=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: kvm@vger.kernel.org, lvivier@redhat.com, thuth@redhat.com, 
-	frankja@linux.ibm.com, imbrenda@linux.ibm.com, nrb@linux.ibm.com, pbonzini@redhat.com, 
-	eric.auger@redhat.com, kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, 
-	kvm-riscv@lists.infradead.org, david@redhat.com, linux-s390@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH 0/2] scripts: extra_params rework
-Message-ID: <20250626-b638cf6a9cc5fa8b21da8418@orel>
-References: <20250625154354.27015-1-alexandru.elisei@arm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=nvbDxY3PNtABnV3gTDtIxz5HSJ2rwdFLI7n9NLn5krtXSHS0Je/Zkc5qkogr7TT/+snMbALPktKON6rHNV0lMTKlYudFThEFQeYRofCGJOAnlJeKUfhko2tIVTG0lilUPBchPD8drvl7RZwOO55GOWquWfcwB5a8zVNJGrW1DSM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kPpnDvKy; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1750950982; x=1782486982;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=lqI8pD0+c/MWdmXxoqGaSXV4hXF1azOl9AOSOyUxWwg=;
+  b=kPpnDvKyO9H6K4RShJo0OPc0AeLSJ5vH92ADSn+58ieNRFHggD1ylvw3
+   dO27ZvfMhGg2t+8kV/1TGiDTCz2Wl9u9RMdN1eg+6+BQanXusqcKblaCZ
+   CvReZcFpVDHJc6knkRAuoIvGNQZYv1xrTFFBw43WfTdOHyhOHLxlT+ffz
+   GEfIWAyLXhb/Ruwsw5uMrouqq9UJBIAHgY8LH7Edgx5pifrO23CV5z207
+   YgGbW2H7tK9YjvReQt0WZDzxo4WXRk1QKd2eN/xhXUxsKrvinR/0CNxEn
+   Y5w58fcFdfJYgyujpUNA+eK8pyT++EiIUI6R3eLsb0IU+WFQ2v9Y6HAKo
+   w==;
+X-CSE-ConnectionGUID: QowX8NwpQkCmJ9w3gz371w==
+X-CSE-MsgGUID: LGkTOnJbTWq0lnZWI1pAIg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11476"; a="63941012"
+X-IronPort-AV: E=Sophos;i="6.16,267,1744095600"; 
+   d="scan'208";a="63941012"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2025 08:16:21 -0700
+X-CSE-ConnectionGUID: SCa4oxn5S2S4n7Q6JQlhBw==
+X-CSE-MsgGUID: KJHAXsf4QcObKmd0B9hfMg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,267,1744095600"; 
+   d="scan'208";a="152299473"
+Received: from black.fi.intel.com ([10.237.72.28])
+  by orviesa009.jf.intel.com with ESMTP; 26 Jun 2025 08:16:15 -0700
+Received: by black.fi.intel.com (Postfix, from userid 1000)
+	id 3D25C2E2; Thu, 26 Jun 2025 18:16:14 +0300 (EEST)
+Date: Thu, 26 Jun 2025 18:16:14 +0300
+From: "Shutemov, Kirill" <kirill.shutemov@intel.com>
+To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
+Cc: "ackerleytng@google.com" <ackerleytng@google.com>, 
+	"Zhao, Yan Y" <yan.y.zhao@intel.com>, "quic_eberman@quicinc.com" <quic_eberman@quicinc.com>, 
+	"Li, Xiaoyao" <xiaoyao.li@intel.com>, "Du, Fan" <fan.du@intel.com>, 
+	"Hansen, Dave" <dave.hansen@intel.com>, "david@redhat.com" <david@redhat.com>, 
+	"thomas.lendacky@amd.com" <thomas.lendacky@amd.com>, "tabba@google.com" <tabba@google.com>, 
+	"vbabka@suse.cz" <vbabka@suse.cz>, "michael.roth@amd.com" <michael.roth@amd.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "seanjc@google.com" <seanjc@google.com>, 
+	"Peng, Chao P" <chao.p.peng@intel.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
+	"Yamahata, Isaku" <isaku.yamahata@intel.com>, "binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, 
+	"Weiny, Ira" <ira.weiny@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"Annapurve, Vishal" <vannapurve@google.com>, "jroedel@suse.de" <jroedel@suse.de>, 
+	"Miao, Jun" <jun.miao@intel.com>, "Li, Zhiquan1" <zhiquan1.li@intel.com>, 
+	"pgonda@google.com" <pgonda@google.com>, "x86@kernel.org" <x86@kernel.org>
+Subject: Re: [RFC PATCH 08/21] KVM: TDX: Increase/decrease folio ref for huge
+ pages
+Message-ID: <zlxgzuoqwrbuf54wfqycnuxzxz2yduqtsjinr5uq4ss7iuk2rt@qaaolzwsy6ki>
+References: <aFIGFesluhuh2xAS@yzhao56-desk.sh.intel.com>
+ <0072a5c0cf289b3ba4d209c9c36f54728041e12d.camel@intel.com>
+ <aFkeBtuNBN1RrDAJ@yzhao56-desk.sh.intel.com>
+ <draft-diqzh606mcz0.fsf@ackerleytng-ctop.c.googlers.com>
+ <diqzy0tikran.fsf@ackerleytng-ctop.c.googlers.com>
+ <c69ed125c25cd3b7f7400ed3ef9206cd56ebe3c9.camel@intel.com>
+ <diqz34bolnta.fsf@ackerleytng-ctop.c.googlers.com>
+ <a3cace55ee878fefc50c68bb2b1fa38851a67dd8.camel@intel.com>
+ <diqzms9vju5j.fsf@ackerleytng-ctop.c.googlers.com>
+ <447bae3b7f5f2439b0cb4eb77976d9be843f689b.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -59,54 +97,39 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250625154354.27015-1-alexandru.elisei@arm.com>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <447bae3b7f5f2439b0cb4eb77976d9be843f689b.camel@intel.com>
 
-On Wed, Jun 25, 2025 at 04:43:52PM +0100, Alexandru Elisei wrote:
-> This series was split from the series that adds support to use kvmtool when
-> using the scripts to run the tests [1]. kvmtool will be supported only for arm
-> and arm64, as they are the only architectures that compile the tests to run with
-> kvmtool.
+On Thu, Jun 26, 2025 at 02:19:36AM +0300, Edgecombe, Rick P wrote:
+> On Wed, 2025-06-25 at 16:09 -0700, Ackerley Tng wrote:
+> > > I do think that these threads have gone on far too long. It's probably about
+> > > time to move forward with something even if it's just to have something to
+> > > discuss that doesn't require footnoting so many lore links. So how about we
+> > > move
+> > > forward with option e as a next step. Does that sound good Yan?
+> > > 
+> > 
+> > Please see my reply to Yan, I'm hoping y'all will agree to something
+> > between option f/g instead.
 > 
-> The justification for these changes is to be able to introduce
-> kvmtool_params for kvmtool specific command line options, and to make a
-> clear distinction between the qemu options and the kvmtool options. This is
-> why qemu_params was added as a replacement for extra_params. extra_params
-> was kept for compatibility purposes for user's custom test definitions.
-> 
-> To avoid duplication of the arguments that are passed to a test's main()
-> function, test_args has been split from qemu_params. The same test_args
-> will be used by both qemu and kvmtool.
-> 
-> [1] https://lore.kernel.org/kvm/20250507151256.167769-1-alexandru.elisei@arm.com/
-> 
-> Alexandru Elisei (2):
->   scripts: unittests.cfg: Rename 'extra_params' to 'qemu_params'
->   scripts: Add 'test_args' test definition parameter
-> 
->  arm/unittests.cfg     |  94 ++++++++++++++----------
->  docs/unittests.txt    |  30 +++++---
->  powerpc/unittests.cfg |  21 +++---
->  riscv/unittests.cfg   |   2 +-
->  s390x/unittests.cfg   |  53 +++++++-------
->  scripts/common.bash   |  16 +++--
->  scripts/runtime.bash  |  24 ++++---
->  x86/unittests.cfg     | 164 ++++++++++++++++++++++++------------------
->  8 files changed, 237 insertions(+), 167 deletions(-)
-> 
-> 
-> base-commit: 507612326c9417b6330b91f7931678a4c6866395
-> -- 
-> 2.50.0
->
+> I'm not sure about the HWPoison approach, but I'm not totally against it. My
+> bias is that all the MM concepts are tightly interlinked. If may fit perfectly,
+> but every new use needs to be checked for how fits in with the other MM users of
+> it. Every time I've decided a page flag was the perfect solution to my problem,
+> I got informed otherwise. Let me try to flag Kirill to this discussion. He might
+> have some insights.
 
-This is already reviewed by me, but in order to encourage other arch
-maintainers to also ack, then I'll state
+We chatted with Rick about this.
 
-ACK for arm and riscv
+If I understand correctly, we are discussing the situation where the TDX
+module failed to return a page to the kernel.
 
-again.
+I think it is reasonable to use HWPoison for this case. We cannot
+guarantee that we will read back whatever we write to the page. TDX module
+has creative ways to corrupt it. 
 
-Thanks,
-drew
+The memory is no longer functioning as memory. It matches the definition
+of HWPoison quite closely.
+
+-- 
+  Kiryl Shutsemau / Kirill A. Shutemov
 
