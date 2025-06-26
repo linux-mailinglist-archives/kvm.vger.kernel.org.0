@@ -1,134 +1,113 @@
-Return-Path: <kvm+bounces-50818-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50819-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5123AE99EA
-	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 11:26:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E636AE99ED
+	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 11:26:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B1F357A630E
-	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 09:24:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB0CC3AFD6B
+	for <lists+kvm@lfdr.de>; Thu, 26 Jun 2025 09:26:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 382252BEFF2;
-	Thu, 26 Jun 2025 09:25:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95B862BEFFD;
+	Thu, 26 Jun 2025 09:26:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Hg205bmN"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZRBT229D"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2952E18C332;
-	Thu, 26 Jun 2025 09:25:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5998929C35F;
+	Thu, 26 Jun 2025 09:26:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750929939; cv=none; b=ST2IXytfz+jWLQ2CpQSOymz5OYQa/No+EpEwBlpVCfnw69eBCJVryPqvB1mKPpJWUfK87WvnpnVrle1TDWo44qu+RzmC6hKWgqIx2liSGWK5t5LI7ZBcAKvbiUlE9qyZHv/LhhcVgWmF2DfLtSMvX2IX8SxlPv22jyBwGESdnVQ=
+	t=1750929962; cv=none; b=gUnZKxbIGDCp/2wiRS0B2Ld11POKUvhWAaQomxwYhy4nCvxGUXLmkdzt3PvviT2KdqayzXqS5zKULC281BKi1lqn8nXJTgvCq44EwyOsmsVxH9YjDxVqCoVHtcvLit3yTLHcrRMRSD9ccq1l+hOBFe2ifU2xL9NmGuvThewnakc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750929939; c=relaxed/simple;
-	bh=xVxhsp9WJPwQPCXZFwvJKu5uUvkY6LGeigTfbmZtgn0=;
+	s=arc-20240116; t=1750929962; c=relaxed/simple;
+	bh=A/CEx477K3LlyVUW20pN2gjB1RVa27uz7N3H7Xae94g=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RSKs2m/FkruP7YQcLNPeRYjajS+5OmpqpwZDDKJsIJCnN+sfCB1WFnD44q419a4G/R2QaflM1qZgQR+CXPCzQok80QoFOqyVSnhtwZZVmZ014tqM92VAcCMLrAXWN7/YaKGaaEa7b0llHncPGXKQvr/ZpYJKNhKtMziZsDhWpF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Hg205bmN; arc=none smtp.client-ip=198.175.65.20
+	 Content-Type:Content-Disposition:In-Reply-To; b=YW/ThyBUOWHgIVGeic0i0S3Saz2REDoTRZ4v1mIMFkujxLXCpTyI56+MDHftnZx8frRXATJ3/nqO5poV/khUr1gwn4eDbkpI3RsqUoAc+rspdcRTDLyu6kq1H/j3UAy9oFUjGYZw/zogA+WjUgx1JrCYRYRdY1gP8iri5fJ2LOk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZRBT229D; arc=none smtp.client-ip=198.175.65.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750929937; x=1782465937;
+  t=1750929961; x=1782465961;
   h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=xVxhsp9WJPwQPCXZFwvJKu5uUvkY6LGeigTfbmZtgn0=;
-  b=Hg205bmN7kdu7OJtFny9cVHrS/NlKUu/A2E6bp1hyQef3FlKq9FzSaqD
-   iqHut4QvS7U5meYNJ6NHfnIUfyRj5RLwavFMqWQiARqIALs+qSuYJV6iH
-   z/kCHju5gsm5/IysDJscCOpXFOoN4zXee8vw+DQUygJ1PAM9grlcR3e5c
-   xAE+oO+2Ut7O1cHGPxlu0hoXtesurA26Lq8R6Qr2Ybq2aTqWYEPlHkKOo
-   FKEkK5isSgSV7B+qjQIZEJAZxR/rI71EPd9G+PH0PX0o7f8Bn2kPpOMbm
-   RfOmQi5b/iTuc5BZwpFbJxe6GxIqN48DFoAKM4cSzlU2B/Rlh6c0n/b6l
-   g==;
-X-CSE-ConnectionGUID: smBY5ltDStW6sE8zSi/iQg==
-X-CSE-MsgGUID: +//fv9XRQ9Sm65w8FoGnvQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11475"; a="52942027"
+   mime-version:in-reply-to;
+  bh=A/CEx477K3LlyVUW20pN2gjB1RVa27uz7N3H7Xae94g=;
+  b=ZRBT229DhSXkPoLOdWlSK4HLI2cxwsCAlkMoxW2yHTyWWb8NtOxWGbTN
+   A4F5Sn45KE8zq4AnI1OsZJks+Bd+NUAHp50+sJJNBf5qh31/aqsaTu2ui
+   Oyf/DFcHT/Zpez1OFvPxkkNB+KZhODNb6u1QaggdEaHi5qN2OFf+OMXJa
+   46PUKpeyMqaZcr14yO+MgyOWKDONLERo7xBs2X87y4a6ljRAs14vi3iUG
+   KAguOBFrrYJpZ2SNp++ytJ3V8tGXKZWapOE5qxG+YHEg1/LSobkgRHjG/
+   R2c5ojp5Yx3frstRiheKf+ErP9sfMDiL9LG8R8CD0dOCb4rceprFNExpC
+   Q==;
+X-CSE-ConnectionGUID: 6QnXSmtLT+OJNCUIhDDavQ==
+X-CSE-MsgGUID: zRwLBmV6Sq2gyjdWgIEqUw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11475"; a="70648820"
 X-IronPort-AV: E=Sophos;i="6.16,267,1744095600"; 
-   d="scan'208";a="52942027"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2025 02:25:37 -0700
-X-CSE-ConnectionGUID: LBzYSVR0SY+K2h1P+OlghQ==
-X-CSE-MsgGUID: eNqeFQRPSR2gVgy1xtUziw==
+   d="scan'208";a="70648820"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2025 02:26:01 -0700
+X-CSE-ConnectionGUID: ceBA2M4yQme6XKoN5U9fSw==
+X-CSE-MsgGUID: n20N+WilQXeThZKjmSdySQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,267,1744095600"; 
-   d="scan'208";a="152980614"
+   d="scan'208";a="156500523"
 Received: from black.fi.intel.com ([10.237.72.28])
-  by fmviesa008.fm.intel.com with ESMTP; 26 Jun 2025 02:25:33 -0700
+  by fmviesa003.fm.intel.com with ESMTP; 26 Jun 2025 02:25:57 -0700
 Received: by black.fi.intel.com (Postfix, from userid 1000)
-	id 9586721E; Thu, 26 Jun 2025 12:25:31 +0300 (EEST)
-Date: Thu, 26 Jun 2025 12:25:31 +0300
-From: "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Rick P Edgecombe <rick.p.edgecombe@intel.com>, 
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, Dave Hansen <dave.hansen@intel.com>, 
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, Chao Gao <chao.gao@intel.com>, "bp@alien8.de" <bp@alien8.de>, 
-	Kai Huang <kai.huang@intel.com>, "x86@kernel.org" <x86@kernel.org>, 
-	"mingo@redhat.com" <mingo@redhat.com>, Yan Y Zhao <yan.y.zhao@intel.com>, 
-	"tglx@linutronix.de" <tglx@linutronix.de>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCHv2 01/12] x86/tdx: Consolidate TDX error handling
-Message-ID: <vgk3ql5kcpmpsoxfw25hjcw4knyugszdaeqnzur6xl4qll73xy@xi7ttxlxot2r>
+	id D5B2121E; Thu, 26 Jun 2025 12:25:55 +0300 (EEST)
+Date: Thu, 26 Jun 2025 12:25:55 +0300
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: Dave Hansen <dave.hansen@intel.com>
+Cc: pbonzini@redhat.com, seanjc@google.com, dave.hansen@linux.intel.com, 
+	rick.p.edgecombe@intel.com, isaku.yamahata@intel.com, kai.huang@intel.com, 
+	yan.y.zhao@intel.com, chao.gao@intel.com, tglx@linutronix.de, mingo@redhat.com, 
+	bp@alien8.de, kvm@vger.kernel.org, x86@kernel.org, linux-coco@lists.linux.dev, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCHv2 02/12] x86/virt/tdx: Allocate page bitmap for Dynamic
+ PAMT
+Message-ID: <x2cuthbn54u2bqxr7sr2pt2zalvuhd3kpovrgzx42xp23wq6mw@pnvgcxs5zm45>
 References: <20250609191340.2051741-1-kirill.shutemov@linux.intel.com>
- <20250609191340.2051741-2-kirill.shutemov@linux.intel.com>
- <5cfb2e09-7ecb-4144-9122-c11152b18b5e@intel.com>
- <d897ab70d48be4508a8a9086de1ff3953041e063.camel@intel.com>
- <aFxpuRLYA2L6Qfsi@google.com>
+ <20250609191340.2051741-3-kirill.shutemov@linux.intel.com>
+ <c3f77974-f1d6-4a22-bd1d-2678427a9fb1@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <aFxpuRLYA2L6Qfsi@google.com>
+In-Reply-To: <c3f77974-f1d6-4a22-bd1d-2678427a9fb1@intel.com>
 
-On Wed, Jun 25, 2025 at 02:27:21PM -0700, Sean Christopherson wrote:
-> On Wed, Jun 25, 2025, Rick P Edgecombe wrote:
-> > On Wed, 2025-06-25 at 10:58 -0700, Dave Hansen wrote:
-> > > > --- a/arch/x86/kvm/vmx/tdx.c
-> > > > +++ b/arch/x86/kvm/vmx/tdx.c
-> > > > @@ -202,12 +202,6 @@ static DEFINE_MUTEX(tdx_lock);
-> > > >   
-> > > >   static atomic_t nr_configured_hkid;
-> > > >   
-> > > > -static bool tdx_operand_busy(u64 err)
-> > > > -{
-> > > > -	return (err & TDX_SEAMCALL_STATUS_MASK) == TDX_OPERAND_BUSY;
-> > > > -}
-> > > > -
-> > > > -
-> > > 
-> > > Isaku, this one was yours (along with the whitespace damage). What do
-> > > you think of this patch?
-> > 
-> > I think this actually got added by Paolo, suggested by Binbin. I like these
-> > added helpers a lot. KVM code is often open coded for bitwise stuff, but since
-> > Paolo added tdx_operand_busy(), I like the idea of following the pattern more
-> > broadly. I'm on the fence about tdx_status() though.
+On Wed, Jun 25, 2025 at 11:06:16AM -0700, Dave Hansen wrote:
+> >  /*
+> >   * Locate a NUMA node which should hold the allocation of the @tdmr
+> >   * PAMT.  This node will have some memory covered by the TDMR.  The
+> > @@ -522,7 +534,16 @@ static int tdmr_set_up_pamt(struct tdmr_info *tdmr,
+> >  	 * and the total PAMT size.
+> >  	 */
+> >  	tdmr_pamt_size = 0;
+> > -	for (pgsz = TDX_PS_4K; pgsz < TDX_PS_NR; pgsz++) {
+> > +	pgsz = TDX_PS_4K;
+> > +
+> > +	/* With Dynamic PAMT, PAMT_4K is replaced with a bitmap */
+> > +	if (tdx_supports_dynamic_pamt(&tdx_sysinfo)) {
+> > +		pamt_size[pgsz] = tdmr_get_pamt_bitmap_sz(tdmr);
+> > +		tdmr_pamt_size += pamt_size[pgsz];
+> > +		pgsz++;
+> > +	}
 > 
-> Can we turn them into macros that make it super obvious they are checking if the
-> error code *is* xyz?  E.g.
+> This is the wrong place to do this.
 > 
-> #define IS_TDX_ERR_OPERAND_BUSY
-> #define IS_TDX_ERR_OPERAND_INVALID
-> #define IS_TDX_ERR_NO_ENTROPY
-> #define IS_TDX_ERR_SW_ERROR
-> 
-> As is, it's not at all clear that things like tdx_success() are simply checks,
-> as opposed to commands.
+> Hide it in tdmr_get_pamt_sz(). Don't inject it in the main code flow
+> here and complicate the for loop.
 
-I remember Dave explicitly asked for inline functions over macros where
-possible.
-
-Can we keep them as functions, but give the naming scheme you proposing
-(but lowercase)?
+Okay, makes sense.
 
 -- 
   Kiryl Shutsemau / Kirill A. Shutemov
