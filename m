@@ -1,177 +1,140 @@
-Return-Path: <kvm+bounces-50984-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50985-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77FD0AEB68B
-	for <lists+kvm@lfdr.de>; Fri, 27 Jun 2025 13:35:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C2CFAEB6B6
+	for <lists+kvm@lfdr.de>; Fri, 27 Jun 2025 13:42:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7CB09189A9B1
-	for <lists+kvm@lfdr.de>; Fri, 27 Jun 2025 11:36:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A4EDD564031
+	for <lists+kvm@lfdr.de>; Fri, 27 Jun 2025 11:42:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9D822BCF5D;
-	Fri, 27 Jun 2025 11:35:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE0372BEC32;
+	Fri, 27 Jun 2025 11:42:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eiEIn019"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XMVLX+DQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A06AF293C67;
-	Fri, 27 Jun 2025 11:35:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9160229E0E0;
+	Fri, 27 Jun 2025 11:42:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751024137; cv=none; b=q8I22aVhRyUdjZ/TwUGPh8wkzZ1ntO3Tw/Lpa23Oj9OtrjKuYkMJVBNrzdAWzt61Tlfuf9mOGxzcXtB5+Igt5CHZbMfp6m/qsEuWvVXUY6Nj2zze3zYVGaNAymwPjXuq/AqbCJmMktop3WWfIHz46VqfJnEEcM1MSi5PN++OSXo=
+	t=1751024562; cv=none; b=tixeSUO0ciuOaL6RBXzS8ubWgsy2jGKjDDEFQ3GM1qdhmK+aX4CnEKJLQrtuJglzTXr37cHjJVsURR+ImpJNQ7h6FEH4dpDnSNsgc4tcniQ0eP/vRK7lUSonXlKMKujZ1LzVRTdtSuxx9A9l2i/r+jXENtbN+F8KN8d2rBnGjvw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751024137; c=relaxed/simple;
-	bh=eXvK7190AFJgHbf6OzHmasFyFsoUL6SVhDPs+jciPZg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XnIT8Y+tm2hH3wlA5UAwww+HjH+p4t5g+22Wt6t+ciBIunhmvMVdF6EE0fZ58/XskjRiNNbjwbodDpYF6/97RX00GSULf39Tl4cLIqHf84244F0Nlokz9ui1tCi99AMESo5YwfOBDTqsaeJzpDs9pmO6a+MZe/o2u9imGsS4284=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eiEIn019; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1751024135; x=1782560135;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=eXvK7190AFJgHbf6OzHmasFyFsoUL6SVhDPs+jciPZg=;
-  b=eiEIn01967K6AffU/nKAEsOIaedithXWaIgdsT1sGzAal6054SQYPcbx
-   d4vezMcq6sIO2hMQqAK2o/+ac88GFCuXuHNwdh7SDduGaPnJEFjvAapdE
-   fLpIXZcAP1rGUpDMkHHYAo1eVMi+e07io3GsznarkHfppBmslYgvTUB6R
-   1SsguddpkBg1DfrtZsaxdRt3YEW7MhTULqdC3XUAIxDh8tuyEHo2lKhhH
-   XGAqmaFggYBlZsPZ422E7nB3qOil7Gf/ZwkBH4O0X0VHeVWcy44fOX5ac
-   8oYovPhqrmlfoaSK7vqEiFEtSbVYv914ZtBR80RDks6hTZfD/apxtIVj8
-   A==;
-X-CSE-ConnectionGUID: I8t/gfRdRDe+A9XUnlEedg==
-X-CSE-MsgGUID: ok/V4+y0Rxe8F0ik14rsJQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11476"; a="64393550"
-X-IronPort-AV: E=Sophos;i="6.16,270,1744095600"; 
-   d="scan'208";a="64393550"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2025 04:35:35 -0700
-X-CSE-ConnectionGUID: KYNGm1WHQTqPlkR0ucTwBA==
-X-CSE-MsgGUID: jaMngmLTSFaOD7MhI+c4jQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,270,1744095600"; 
-   d="scan'208";a="152526268"
-Received: from black.fi.intel.com ([10.237.72.28])
-  by orviesa009.jf.intel.com with ESMTP; 27 Jun 2025 04:35:31 -0700
-Received: by black.fi.intel.com (Postfix, from userid 1000)
-	id 34F686A; Fri, 27 Jun 2025 14:35:30 +0300 (EEST)
-Date: Fri, 27 Jun 2025 14:35:30 +0300
-From: "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>
-To: "Huang, Kai" <kai.huang@intel.com>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, 
-	"seanjc@google.com" <seanjc@google.com>, "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, 
-	"Gao, Chao" <chao.gao@intel.com>, "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>, 
-	"bp@alien8.de" <bp@alien8.de>, "x86@kernel.org" <x86@kernel.org>, 
-	"mingo@redhat.com" <mingo@redhat.com>, "Zhao, Yan Y" <yan.y.zhao@intel.com>, 
-	"tglx@linutronix.de" <tglx@linutronix.de>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>, "Yamahata, Isaku" <isaku.yamahata@intel.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCHv2 03/12] x86/virt/tdx: Allocate reference counters for
- PAMT memory
-Message-ID: <c6i6lttkkeupbyfwy42byin7ccxh6rwznvgwsyjmvzeb5rbblv@ge3agfvfyn4e>
-References: <20250609191340.2051741-1-kirill.shutemov@linux.intel.com>
- <20250609191340.2051741-4-kirill.shutemov@linux.intel.com>
- <104abe744282dba34456d467e4730058ec2e7d99.camel@intel.com>
+	s=arc-20240116; t=1751024562; c=relaxed/simple;
+	bh=iVuGRVgsqGxyCMlQcTQPYJM2XPrRXIKXOv3tNp4GTIA=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=Gf3mIO3Wd85yFZc6h5z702mZ3z0TNAI9edtPCqtILE5smBJejAhpkXheyRctFht7A0QMMcnCm8G8yy5QY7/JRVcPH+fn1E0tHGOk6/KrbLVJ9ehwHXbhztTpM617ZXAY9KWJzVKXvs1HEytYojEpwFDZtZFMsgPjYqQ/8Bnj2+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XMVLX+DQ; arc=none smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-747ef5996edso1721526b3a.0;
+        Fri, 27 Jun 2025 04:42:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751024561; x=1751629361; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=r9YtTg1t58ZELtcEG/y0IgZZ/473yKqIjgodQWzu/94=;
+        b=XMVLX+DQDs6QPOJ+qYp4+5dYavPvCuKFl/gZlt/Sbvie6yAnay8xTbvpa5aXMoBgYS
+         CqX4VUWxqMngET0UukJYaQepWO3zkxMyWB5Vmf7P2BZajYH/HiashHrmp2WI0De3D4sx
+         PpEGRTvCRkDAuvSqxHYmhfJPEyfc4W8spzVBa3JVUmKhovh4VezLOzMFkHQMFZ2Bf26w
+         0Fmcle1qz5gghXLgJvi+hS5ofYSah9PeYJqjXFZFURplngTzsYTyintTkLJ3f2P1wS0l
+         jQdnqsxACucPZl17mA4gYMle7W8nBmrhNgIAE3bWK0NMucCRl5Iws4ktW+lau6N+irZ8
+         rb5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751024561; x=1751629361;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=r9YtTg1t58ZELtcEG/y0IgZZ/473yKqIjgodQWzu/94=;
+        b=U5b9fg4e8hcaNAighQpZSLHWDLhzfIhCK0+MKmSBBQQ2FRSJ0HfsiNWn/jIeWti/+K
+         0+t4iX3fqjCzRU7LD6fGs9EUk69WnJMwnEIwU9RBrkrPGxLaYIc22VklnCmbcKEVRKPb
+         e7YkDLNMMkMzVbsgx6oXm1sKmSnHoGbBGBkLFlFOwQYAtbkNKyJZvPrg05Sh4HzPN3Kj
+         1pT0zwPOhmCwXo8wmlNpR1xvekCYj1HRwrhBrn4v2VAoxKV+u5fYEC/C/SVcs4iIcf0Q
+         7cd5mt9cInSdSD2tp4eOXj6QAMKQLevvUtH8wMLYFo17zhLgcgO+ev1lGM7/gR2NR5/L
+         ZZ9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUpHvgt4hxZos9T9oKKDOOqxx1ym4bUcTviUpeBlI6flTSIMA5xZhUBD4dsesd3MG03xYTPYNBb@vger.kernel.org, AJvYcCVMWGJftPHhqXeae5H2IfNl3whk2OBHRibTq+lmF02pZJRHDm5LMf8Mp5RPd0qLz7uDnAKdTImqK/3ZBlbA@vger.kernel.org, AJvYcCWUHgo8HrH7vpheR/5v/IXHDUJ7dRLoBnsah6grpe/cNu+T8sxlJxYdQEVXByMQZThTSYE=@vger.kernel.org, AJvYcCXLGVrZbT02qHNmrjnFhtOfOOgPdi55SzlWhphy/SWRhMNCpHxtkpypcEPIyXn+KVma7BjiCDMz7+FFWoew@vger.kernel.org
+X-Gm-Message-State: AOJu0YztAvwl5RYow6Aq3eRt0aLW+tUCNmSp2kvUfTKCGwxLDLfXWvrE
+	GP9LBqyMTAimw9JbAF74IHCLYISRx+ZR720SMYjBPGxq4rVpmD0LVtdx
+X-Gm-Gg: ASbGncvkH5t1dv7meMNxogL+JXEq/vKHBXLDHs+OQkzy3z0RYGLuGVkIkmu15oZj7Zz
+	rijYsQBlZs0HhVBA78McprJ7KsNy8pFhneciRnllauImddyWHv3oY3kMZ2AE1DuxO1N1wnS+Cn3
+	ClyHrsreUXiKrrZyt7inH4wme/7US0SvAj19LXmkGC2nFpXyVI5dw6jRffkfgvSySKW4nz5G+wn
+	45HBxvdSVgtGfJL50MdilIt5gb6AYweAbolOgNgjJqDEko91Wosr3244kZpV1nS/9grjtZRPHce
+	8FPTemLfWcERV+2cv1vhyqEF4Sd2jI/DnQ4lG++O7F+mZHYJ3owzc6RnnP8IV7JJdCHCxVrWD8u
+	75KGMRQe8
+X-Google-Smtp-Source: AGHT+IG3MYN2lSqPm1Q2L10kPTc5dlCvyMRnUX5hH47bSaJ12kP6xa/9UdmlnUhiVnL19oXKhjcflg==
+X-Received: by 2002:a05:6a20:748f:b0:215:f656:6632 with SMTP id adf61e73a8af0-220a180a309mr4517364637.29.1751024560724;
+        Fri, 27 Jun 2025 04:42:40 -0700 (PDT)
+Received: from devant.antgroup-inc.local ([47.89.83.0])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74af5421c59sm2083067b3a.48.2025.06.27.04.42.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 27 Jun 2025 04:42:40 -0700 (PDT)
+From: Xuewei Niu <niuxuewei97@gmail.com>
+X-Google-Original-From: Xuewei Niu <niuxuewei.nxw@antgroup.com>
+To: decui@microsoft.com
+Cc: davem@davemloft.net,
+	fupan.lfp@antgroup.com,
+	haiyangz@microsoft.com,
+	jasowang@redhat.com,
+	kvm@vger.kernel.org,
+	kys@microsoft.com,
+	leonardi@redhat.com,
+	linux-hyperv@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	mst@redhat.com,
+	netdev@vger.kernel.org,
+	niuxuewei.nxw@antgroup.com,
+	niuxuewei97@gmail.com,
+	pabeni@redhat.com,
+	sgarzare@redhat.com,
+	stefanha@redhat.com,
+	virtualization@lists.linux.dev,
+	wei.liu@kernel.org,
+	xuanzhuo@linux.alibaba.com
+Subject: Re: [PATCH net-next v3 1/3] vsock: Add support for SIOCINQ ioctl
+Date: Fri, 27 Jun 2025 19:42:29 +0800
+Message-Id: <20250627114229.96566-1-niuxuewei.nxw@antgroup.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <BL1PR21MB3115D30477067C46F5AC86C3BF45A@BL1PR21MB3115.namprd21.prod.outlook.com>
+References: <BL1PR21MB3115D30477067C46F5AC86C3BF45A@BL1PR21MB3115.namprd21.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <104abe744282dba34456d467e4730058ec2e7d99.camel@intel.com>
 
-On Thu, Jun 26, 2025 at 12:53:29AM +0000, Huang, Kai wrote:
+> > From: Xuewei Niu <niuxuewei97@gmail.com>
+> > Sent: Wednesday, June 25, 2025 10:02 PM
+> > > ...
+> > > Maybe when you have it tested, post it here as proper patch, and Xuewei
+> > > can include it in the next version of this series (of course with you as
+> > > author, etc.). In this way will be easy to test/merge, since they are
+> > > related.
+> > >
+> > > @Xuewei @Dexuan Is it okay for you?
+> > 
+> > Yeah, sounds good to me!
+> > 
+> > Thanks,
+> > Xuewei
 > 
-> > +static int init_pamt_metadata(void)
-> > +{
-> > +	size_t size = max_pfn / PTRS_PER_PTE * sizeof(*pamt_refcounts);
-> > +	struct vm_struct *area;
-> > +
-> > +	if (!tdx_supports_dynamic_pamt(&tdx_sysinfo))
-> > +		return 0;
-> > +
-> > +	/*
-> > +	 * Reserve vmalloc range for PAMT reference counters. It covers all
-> > +	 * physical address space up to max_pfn. It is going to be populated
-> > +	 * from init_tdmr() only for present memory that available for TDX use.
-> 		^
-> 		build_tdx_memlist()
-
-Ack.
-
+> Hi Xuewei, Stefano, I posted the patch here:
+> https://lore.kernel.org/virtualization/1751013889-4951-1-git-send-email-decui@microsoft.com/T/#u
 > 
-> > +	 */
-> > +	area = get_vm_area(size, VM_IOREMAP);
-> 
-> I am not sure why VM_IOREMAP is used? 
+> Xuewei, please help to re-post this patch with the next version of your patchset.
+> Feel free to add your Signed-off-by, if you need. 
 
-It follows vmap_pfn() pattern as usage is similar.
+I'll update my patchset and send it out. Thanks for your work!
 
-It seems the flag allows vread_iter() to work correct on sparse mappings.
+Thanks,
+Xuewei
 
-> > +	if (!area)
-> > +		return -ENOMEM;
-> > +
-> > +	pamt_refcounts = area->addr;
-> > +	return 0;
-> > +}
-> > +
-> > +static void free_pamt_metadata(void)
-> > +{
-> > +	size_t size = max_pfn / PTRS_PER_PTE * sizeof(*pamt_refcounts);
-> > +
-> > +	if (!tdx_supports_dynamic_pamt(&tdx_sysinfo))
-> > +		return;
-> > +
-> > +	size = round_up(size, PAGE_SIZE);
-> > +	apply_to_existing_page_range(&init_mm,
-> > +				     (unsigned long)pamt_refcounts,
-> > +				     size, pamt_refcount_depopulate,
-> > +				     NULL);
-> > +	vfree(pamt_refcounts);
-> > +	pamt_refcounts = NULL;
-> > +}
-> > +
-> >  /*
-> >   * Add a memory region as a TDX memory block.  The caller must make sure
-> >   * all memory regions are added in address ascending order and don't
-> > @@ -248,6 +347,10 @@ static int build_tdx_memlist(struct list_head *tmb_list)
-> >  		ret = add_tdx_memblock(tmb_list, start_pfn, end_pfn, nid);
-> >  		if (ret)
-> >  			goto err;
-> > +
-> > +		ret = alloc_pamt_refcount(start_pfn, end_pfn);
-> > +		if (ret)
-> > +			goto err;
-> 
-> So this would goto the error path, which only calls free_tdx_memlist(),
-> which frees all existing TDX memory blocks that have already created.
-> 
-> Logically, it would be great to also free PAMT refcount pages too, but they
-> all can be freed at free_pamt_metadata() eventually, so it's OK.
-> 
-> But I think it would still be helpful to put a comment before
-> free_tdx_memlist() in the error path to call out.  Something like:
-> 
-> err:
-> 	/*
-> 	 * This only frees all TDX memory blocks that have been created.
-> 	 * All PAMT refcount pages will be freed when init_tdx_module() 
-> 	 * calls free_pamt_metadata() eventually.
-> 	 */
-> 	free_tdx_memlist(tmb_list);
-> 	return ret;
-
-Okay.
-
--- 
-  Kiryl Shutsemau / Kirill A. Shutemov
+> Thanks,
+> Dexuan
 
