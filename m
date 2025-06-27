@@ -1,108 +1,132 @@
-Return-Path: <kvm+bounces-50935-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50936-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 341C3AEACCF
-	for <lists+kvm@lfdr.de>; Fri, 27 Jun 2025 04:23:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52DF4AEADD5
+	for <lists+kvm@lfdr.de>; Fri, 27 Jun 2025 06:31:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 04ED53B42B1
-	for <lists+kvm@lfdr.de>; Fri, 27 Jun 2025 02:23:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B20704A39AF
+	for <lists+kvm@lfdr.de>; Fri, 27 Jun 2025 04:31:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01CB2191F89;
-	Fri, 27 Jun 2025 02:23:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7DEA1D63DF;
+	Fri, 27 Jun 2025 04:31:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="f4Dr3Kah"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HwNMc6br"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19C171419A9
-	for <kvm@vger.kernel.org>; Fri, 27 Jun 2025 02:23:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C96B32F1FE2;
+	Fri, 27 Jun 2025 04:31:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750991002; cv=none; b=uoqwv701rjpMnc3/KCWP+vUOa+fkUT9X4PTMdF3uEM4Bq+VgqYhJt3u5s7ZMmhXFvjfY6nokuk9/ERx6ayomnQh/8ZBi6VahaETQm1qjySKT2Uwsb65v4RJ2gj5yhcybfSfiIXag1/656EwzNqRnDukJy0XamjehESjlVFBAJ88=
+	t=1750998675; cv=none; b=InII+qAfocEQZwtJVpc6dZXA1A9ZuzZa313XMsGSB0d3fPIrhse/c1yL8EwclMY/XLiVLt5y96lZ8nrWaQs4mkUayE7o+C26MJPM6iG33PiSJ7Qw0ASCXUXEY86bcqmc1fNwW2xbZPBz92B0GMQia0TDB4SWL6djfq7/mTElOnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750991002; c=relaxed/simple;
-	bh=khoZeGPwgU5Hra3XCMmdt3c5kfTHgJq0dsqQgxHsB5o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qbcTuAosWy1Um+2PXXV+ZcvCLhJxOWershsm/7uL/es8tOZsng3Fy3NU38scYjs/6+1MAjmdEV3Kv3Pt+m8jXH+p7O7XwFns1kQ7Zo3/Pyq5GHzUNFQ03ofnbK3vhGUApwmBiErvAhj+F26yYRkZu02Ml1o3k/26bLo49o6OsaQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=f4Dr3Kah; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750991000; x=1782527000;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=khoZeGPwgU5Hra3XCMmdt3c5kfTHgJq0dsqQgxHsB5o=;
-  b=f4Dr3Kah/rKipDUNU/eGtLla8/k8IeHsGSgN1HEypknjnl1EtKHRscLY
-   dLXZfp0e4b+cvoC1RY2eIi+z/3EKSF1RPO1nGFa0cRQd3E40oW2zudW8q
-   KUmaMa11ZjX1yluCeFLvy3h1V79gIGrwnppCZ/RTlc0PqhI5/QI6TWZwd
-   zJ/ubJTPqb7lRpe4IoG6wDz38ZJgukyXi5SHSa1e3nBSr7c43QFMSXg8U
-   nkmTFGt8xm4ieXde0tZACoEL/rqsT53gzUJ6/HNx9YbkRmtL2IQYRqUAV
-   5wztOVJnOp1qaWkxThs7a8+vt+cEHHYP7R+c0XsY+uMvJROC/jnWPBD4w
-   Q==;
-X-CSE-ConnectionGUID: mf8vXNv/SgWw1K/H+Pgm4Q==
-X-CSE-MsgGUID: irE2TmC6RLK3wrznTneHIg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11476"; a="63560026"
-X-IronPort-AV: E=Sophos;i="6.16,269,1744095600"; 
-   d="scan'208";a="63560026"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2025 19:23:19 -0700
-X-CSE-ConnectionGUID: GuD71LP5TS6Kmux6WRhQIA==
-X-CSE-MsgGUID: Nym2nvKITvO+CD4KyKSRmQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,269,1744095600"; 
-   d="scan'208";a="183575212"
-Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.39])
-  by fmviesa001.fm.intel.com with ESMTP; 26 Jun 2025 19:23:15 -0700
-Date: Fri, 27 Jun 2025 10:44:38 +0800
-From: Zhao Liu <zhao1.liu@intel.com>
-To: Ewan Hai <ewanhai-oc@zhaoxin.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	"Michael S . Tsirkin" <mst@redhat.com>,
-	Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
-	Igor Mammedov <imammedo@redhat.com>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Eduardo Habkost <eduardo@habkost.net>,
-	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
-	Babu Moger <babu.moger@amd.com>, Pu Wen <puwen@hygon.cn>,
-	Tao Su <tao1.su@intel.com>, Yi Lai <yi1.lai@intel.com>,
-	Dapeng Mi <dapeng1.mi@intel.com>, qemu-devel@nongnu.org,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH 05/16] i386/cpu: Consolidate CPUID 0x4 leaf
-Message-ID: <aF4FlifQciTFxNpv@intel.com>
-References: <20250620092734.1576677-1-zhao1.liu@intel.com>
- <20250620092734.1576677-6-zhao1.liu@intel.com>
- <fe3c59c0-446c-4e93-9a8b-32c5314df401@zhaoxin.com>
+	s=arc-20240116; t=1750998675; c=relaxed/simple;
+	bh=0M8ENBUgJpYWdqDPptXBiIAcVDOQpN779919of1Ylao=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bWrf/WRsD+qcttGiuJHxfnc7G1judx+Jweu6Y6MiFwDjo20txTqo/JE7ogcRBV7ItR7GKaYIMlM9LA6S5kLaYj8Qalc4NFoWg+ZRhG2eZNBdB12XIZIj16zdJkMFjdjDJcHD/0FMDZSkluwAqHQI78yPleizdIqM8m5t3RkXzCg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HwNMc6br; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A804C4CEE3;
+	Fri, 27 Jun 2025 04:31:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750998675;
+	bh=0M8ENBUgJpYWdqDPptXBiIAcVDOQpN779919of1Ylao=;
+	h=From:To:Cc:Subject:Date:From;
+	b=HwNMc6br/86SWTAf2Al9i/DC7sIhdMgBlr/piYuh5A7ga2cP+v2QumzvTssRb8ZJN
+	 o0woLJRiKrqiM+dXvzwt/+gfXV4ku2aXwAzfLvY62rxlWrjCuJ2lH+FJeWkne3rpHn
+	 H7JveObRMVtBrdcP/NbYAE15jX0kO0/PBcnzf6v69O0zSi2x1ozaObNMgcdWTAHyHD
+	 6+Es8DoRDoqWzQk7lcSIVHTIrCV7wyz4slJR1ZeslyFbsBeMaihJUbYVeIj/AVA1BP
+	 Tz2Uiz/wEzjjs4q7V/uBCbOpZgsUtCl3/Ik/kcf/pfRhPXGvzE1kCn9mR47gIwz70o
+	 87JfFd+kufeKQ==
+From: Mario Limonciello <superm1@kernel.org>
+To: Bjorn Helgaas <bhelgaas@google.com>
+Cc: Alex Deucher <alexander.deucher@amd.com>,
+	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+	David Airlie <airlied@gmail.com>,
+	Simona Vetter <simona@ffwll.ch>,
+	Lukas Wunner <lukas@wunner.de>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Lu Baolu <baolu.lu@linux.intel.com>,
+	Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Jaroslav Kysela <perex@perex.cz>,
+	Takashi Iwai <tiwai@suse.com>,
+	dri-devel@lists.freedesktop.org (open list:DRM DRIVERS),
+	linux-kernel@vger.kernel.org (open list),
+	iommu@lists.linux.dev (open list:INTEL IOMMU (VT-d)),
+	linux-pci@vger.kernel.org (open list:PCI SUBSYSTEM),
+	kvm@vger.kernel.org (open list:VFIO DRIVER),
+	linux-sound@vger.kernel.org (open list:SOUND),
+	Daniel Dadap <ddadap@nvidia.com>,
+	Mario Limonciello <mario.limonciello@amd.com>
+Subject: [PATCH v6 0/9] Adjust fbcon console device detection
+Date: Thu, 26 Jun 2025 23:30:59 -0500
+Message-ID: <20250627043108.3141206-1-superm1@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fe3c59c0-446c-4e93-9a8b-32c5314df401@zhaoxin.com>
+Content-Transfer-Encoding: 8bit
 
-> > +/* Encode cache info for CPUID[4] */
-> 
-> Maybe this should be /* Encode cache info for CPUID[2] */ ?
-> I'm not sure.
+From: Mario Limonciello <mario.limonciello@amd.com>
 
-Yep, you're right! The following function is used to encode CPUID[2]
-as its name indicates.
+This series started out as changes to VGA arbiter to try to handle a case
+of a system with 2 GPUs that are not VGA devices [1].  This was discussed
+but decided not to overload the VGA arbiter for non VGA devices.
 
-> > +static void encode_cache_cpuid2(X86CPU *cpu,
-> > +                                uint32_t *eax, uint32_t *ebx,
-> > +                                uint32_t *ecx, uint32_t *edx)
-> > +{
+Instead move the x86 specific detection of framebuffer resources into x86
+specific code that the fbcon can use to properly identify the primary
+device. This code is still called from the VGA arbiter, and the logic does
+not change there. To avoid regression default to VGA arbiter and only fall
+back to looking up with x86 specific detection method.
 
-Thanks,
-Zhao
+In order for userspace to also be able to discover which device was the
+primary video display device create a new sysfs file 'boot_display'.
+
+A matching userspace implementation for this file is available here:
+https://gitlab.freedesktop.org/xorg/lib/libpciaccess/-/merge_requests/39
+https://gitlab.freedesktop.org/xorg/xserver/-/merge_requests/2038
+
+It is suggested that this series merge entirely through the PCI tree.
+
+Mario Limonciello (9):
+  PCI: Add helper for checking if a PCI device is a display controller
+  vfio/pci: Use pci_is_display()
+  vga_switcheroo: Use pci_is_display()
+  iommu/vt-d: Use pci_is_display()
+  ALSA: hda: Use pci_is_display()
+  Fix access to video_is_primary_device() when compiled without
+    CONFIG_VIDEO
+  PCI/VGA: Replace vga_is_firmware_default() with a screen info check
+  fbcon: Use screen info to find primary device
+  PCI: Add a new 'boot_display' attribute
+
+ Documentation/ABI/testing/sysfs-bus-pci |  8 +++++
+ arch/parisc/include/asm/video.h         |  2 +-
+ arch/sparc/include/asm/video.h          |  2 ++
+ arch/x86/include/asm/video.h            |  2 ++
+ arch/x86/video/video-common.c           | 13 ++++++-
+ drivers/gpu/vga/vga_switcheroo.c        |  2 +-
+ drivers/iommu/intel/iommu.c             |  2 +-
+ drivers/pci/pci-sysfs.c                 | 46 +++++++++++++++++++++++++
+ drivers/pci/vgaarb.c                    | 31 +++--------------
+ drivers/vfio/pci/vfio_pci_igd.c         |  3 +-
+ include/linux/pci.h                     | 15 ++++++++
+ sound/hda/hdac_i915.c                   |  2 +-
+ sound/pci/hda/hda_intel.c               |  4 +--
+ 13 files changed, 97 insertions(+), 35 deletions(-)
+
+-- 
+2.43.0
 
 
