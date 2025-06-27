@@ -1,46 +1,46 @@
-Return-Path: <kvm+bounces-50937-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50938-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 484DFAEADE3
-	for <lists+kvm@lfdr.de>; Fri, 27 Jun 2025 06:32:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D984FAEADE4
+	for <lists+kvm@lfdr.de>; Fri, 27 Jun 2025 06:32:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D304D3A8792
-	for <lists+kvm@lfdr.de>; Fri, 27 Jun 2025 04:31:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F1F2F1C2165B
+	for <lists+kvm@lfdr.de>; Fri, 27 Jun 2025 04:32:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 151951DF244;
-	Fri, 27 Jun 2025 04:31:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFB711E572F;
+	Fri, 27 Jun 2025 04:31:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qTTHnN9c"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QUvTTjCG"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F51B2F1FE2;
-	Fri, 27 Jun 2025 04:31:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA56D1E0DBA;
+	Fri, 27 Jun 2025 04:31:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750998679; cv=none; b=Aqmy0bF+DTAZbAvY6aYibJxHkad1h2P1sVLTmDeeyEFaTP/4o+cW0MaFz2wr+aXvpFMkMJ92fzb+D6N84g0OD5Ck5vRKP0JFIXWQKasD3/7HdP1ZsUs7HWF2NEO58Xp/1lVl7KwlzntJLStGWphVd/QOFY7nh75eOoTRTWK/NTc=
+	t=1750998681; cv=none; b=buxkp6C2KdomiNk7z6O2ORoligi8vUe6OEyYNAjQeK2ezrC2F93pQR4/8Uey3KVjaGjcarSvVo9x4c4OziwelXCkDfTLbmwWE2zVt8bRi2tqJ2Jy6KDcesjZte5vYJvdK2SIXrj6yJfOrhrrDz7nu1U+bmVdzpQzXgzlu2DXO7U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750998679; c=relaxed/simple;
-	bh=cHj3h7hBxwKQAm75Z7A1SPHl3XQrv92gk4AeXACN+L4=;
+	s=arc-20240116; t=1750998681; c=relaxed/simple;
+	bh=ZUEaBNdA8Lm5/HmaCro4bOIyTqXr2dVXogleY25ibLU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=stHWkm+yuRAHfXH3ev95Ra4RegP0T8z7cT/ZBr6m9Fwelw5kOPr9fogt8a1Ve19ByRCEUjlOIgFg+AG420SF33cVdRqD7gut+pKyD7crinVe8dfZDW1rPTgyd2oqyGOG2dfVa1nNh/kw4cnUgaI0TmVJa7Rl3jIviVUBN0s5Y1c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qTTHnN9c; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B72AC4CEEB;
-	Fri, 27 Jun 2025 04:31:15 +0000 (UTC)
+	 MIME-Version; b=Lpf9IgPzxCbZt/1QZ7ObBqWRH0CnbFmplLUZ79j51AiQ3B56qL3eIWzHm+dVCKlhGCIrBitONtyAcrYeIVxrq4xeIA0tXpULdLAQP8XhBIhCOLS5Q5tqXhyH0VvTEOY2l029rn1EJ+lv09BlG87CKRZXMET3B2qkR1JTQpUm0PQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QUvTTjCG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F09FAC4CEE3;
+	Fri, 27 Jun 2025 04:31:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750998677;
-	bh=cHj3h7hBxwKQAm75Z7A1SPHl3XQrv92gk4AeXACN+L4=;
+	s=k20201202; t=1750998680;
+	bh=ZUEaBNdA8Lm5/HmaCro4bOIyTqXr2dVXogleY25ibLU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=qTTHnN9chrw/j4mMWfd8t2CBL1YUO4G9jliAghuWR2BzwFfvN56oPigNfcjSeH8WK
-	 CWIax6JRBF7elZwp8Q7E856rwen/L9iZI4tUjcy8HKAaDQ9N/uBcs1lyJjmwD/lZ8O
-	 NJvmxqEUp9ZDEkm29vvTojbKGa1HuKNITe+T8DFXivtvl9AEyfspYaHI6DBbNLDj5z
-	 Ow94RzT+U7hdw49tV/091hir179IcnYQLPKq0AsyFOpq7FMKcRnFOlHl5Cj+lYnuN7
-	 toSXPE+fSXWoDr2VP2Y27r97jb2nUwtM5h8QNcXrFLpi4xcaVgDnBqdgP8ajOuQs61
-	 VfGKrQrMuvPIQ==
+	b=QUvTTjCGiyKuGvLJSfWCMsHnpmiYAIrCP9VPpBdOEJNMty1Vo7M0suxGFn+C9eUrl
+	 eGT4h3W/xn6pvlXv56LLXbRhk35cGzZcP46f2bqWmTRJBv6xT1VwhMCn8F2eO6fp7I
+	 thdIttX2sj70vGxc2SAo/CSPuVkUCm0j+lRmnkhiFzhOpNR+XBnGK9LbXe24KuqaAB
+	 iOLKcADTy4ULjQCAEqY9n3ODjezJucL7biN+SC9dSw7hdoNj5lm/AOLpteFsvNGUro
+	 yUYgtXFlVJdkZgx7WzyR6HUy1y1mggEwCVXaoZUYxjLWk7WcV+7XiRosdDW1o3FdHm
+	 wi16/qarUSQIg==
 From: Mario Limonciello <superm1@kernel.org>
 To: Bjorn Helgaas <bhelgaas@google.com>
 Cc: Alex Deucher <alexander.deucher@amd.com>,
@@ -67,10 +67,11 @@ Cc: Alex Deucher <alexander.deucher@amd.com>,
 	linux-sound@vger.kernel.org (open list:SOUND),
 	Daniel Dadap <ddadap@nvidia.com>,
 	Mario Limonciello <mario.limonciello@amd.com>,
-	Simona Vetter <simona.vetter@ffwll.ch>
-Subject: [PATCH v6 1/9] PCI: Add helper for checking if a PCI device is a display controller
-Date: Thu, 26 Jun 2025 23:31:00 -0500
-Message-ID: <20250627043108.3141206-2-superm1@kernel.org>
+	Simona Vetter <simona.vetter@ffwll.ch>,
+	Bjorn Helgaas <helgaas@kernel.org>
+Subject: [PATCH v6 2/9] vfio/pci: Use pci_is_display()
+Date: Thu, 26 Jun 2025 23:31:01 -0500
+Message-ID: <20250627043108.3141206-3-superm1@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250627043108.3141206-1-superm1@kernel.org>
 References: <20250627043108.3141206-1-superm1@kernel.org>
@@ -84,44 +85,31 @@ Content-Transfer-Encoding: 8bit
 
 From: Mario Limonciello <mario.limonciello@amd.com>
 
-Several places in the kernel do class shifting to match whether a
-PCI device is display class.  Introduce a helper for those places to
-use.
+The inline pci_is_display() helper does the same thing.  Use it.
 
-Acked-by: Bjorn Helgaas <bhelgaas@google.com>
+Acked-by: Alex Williamson <alex.williamson@redhat.com>
 Reviewed-by: Daniel Dadap <ddadap@nvidia.com>
 Reviewed-by: Simona Vetter <simona.vetter@ffwll.ch>
+Suggested-by: Bjorn Helgaas <helgaas@kernel.org>
 Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
 ---
- include/linux/pci.h | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ drivers/vfio/pci/vfio_pci_igd.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/include/linux/pci.h b/include/linux/pci.h
-index 05e68f35f3923..e77754e43c629 100644
---- a/include/linux/pci.h
-+++ b/include/linux/pci.h
-@@ -744,6 +744,21 @@ static inline bool pci_is_vga(struct pci_dev *pdev)
- 	return false;
+diff --git a/drivers/vfio/pci/vfio_pci_igd.c b/drivers/vfio/pci/vfio_pci_igd.c
+index ef490a4545f48..988b6919c2c31 100644
+--- a/drivers/vfio/pci/vfio_pci_igd.c
++++ b/drivers/vfio/pci/vfio_pci_igd.c
+@@ -437,8 +437,7 @@ static int vfio_pci_igd_cfg_init(struct vfio_pci_core_device *vdev)
+ 
+ bool vfio_pci_is_intel_display(struct pci_dev *pdev)
+ {
+-	return (pdev->vendor == PCI_VENDOR_ID_INTEL) &&
+-	       ((pdev->class >> 16) == PCI_BASE_CLASS_DISPLAY);
++	return (pdev->vendor == PCI_VENDOR_ID_INTEL) && pci_is_display(pdev);
  }
  
-+/**
-+ * pci_is_display - Check if a PCI device is a display controller
-+ * @pdev: Pointer to the PCI device structure
-+ *
-+ * This function determines whether the given PCI device corresponds
-+ * to a display controller. Display controllers are typically used
-+ * for graphical output and are identified based on their class code.
-+ *
-+ * Return: true if the PCI device is a display controller, false otherwise.
-+ */
-+static inline bool pci_is_display(struct pci_dev *pdev)
-+{
-+	return (pdev->class >> 16) == PCI_BASE_CLASS_DISPLAY;
-+}
-+
- #define for_each_pci_bridge(dev, bus)				\
- 	list_for_each_entry(dev, &bus->devices, bus_list)	\
- 		if (!pci_is_bridge(dev)) {} else
+ int vfio_pci_igd_init(struct vfio_pci_core_device *vdev)
 -- 
 2.43.0
 
