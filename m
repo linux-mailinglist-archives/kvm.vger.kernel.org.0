@@ -1,48 +1,52 @@
-Return-Path: <kvm+bounces-50962-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50966-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34247AEB204
-	for <lists+kvm@lfdr.de>; Fri, 27 Jun 2025 11:06:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E469EAEB20F
+	for <lists+kvm@lfdr.de>; Fri, 27 Jun 2025 11:07:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 834613AA54E
-	for <lists+kvm@lfdr.de>; Fri, 27 Jun 2025 09:05:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3512C5615AA
+	for <lists+kvm@lfdr.de>; Fri, 27 Jun 2025 09:07:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F24302957C1;
-	Fri, 27 Jun 2025 09:05:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 821DE299A84;
+	Fri, 27 Jun 2025 09:05:20 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74101293C5F;
-	Fri, 27 Jun 2025 09:05:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA7082980C2;
+	Fri, 27 Jun 2025 09:05:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751015116; cv=none; b=rAKJ1no3WYhKlaVe8vbb/MaSOleZaAi8AVYvMaZmwbvaj9wM34UOqyfxBULg641hjixKpdgYfmARQn+i9FE04L3Qr2TQn66DoKt+GX/fHz9rxX55fEyjKpigVRnXahwKNTYR4VUAPahquGjtsJbRmBLP/wEei5nBt6668IHJKF8=
+	t=1751015119; cv=none; b=BmzG+eCTaX8vbc0tBX3dt22QzzdGoYB2taW9NHruDE1jeLv5m5Q9cRn3a8KbMgAGK2kqFMEi8HFl1wn7Cwrh+qcqHISzNVdAU/la+N7pU3jMsNzseYC0d91o5CHPq03pu+/jMWOpgLed02uDjHzhVy3siiIdLq26CFaJ1Urd4Ao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751015116; c=relaxed/simple;
-	bh=G6D8VhvAz8OaikcjLILwf6y5ICJUOgJt9byBOEzD1jI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=k2CAxHOaJDqUJNSp/xzllpWWmVfXeiAUerDtKqvAd0OSU66rH1YvUU0p4DWBtBCcG/u16WoovpsO+rja/MRaWkrBgcN+OZbFADl0AsvPp8yZQoBAMa4CBjSs3sTJf0Cm3l2HD8MSImVps18daH25YaM2vfGxauLn1Ad1kkc0PQU=
+	s=arc-20240116; t=1751015119; c=relaxed/simple;
+	bh=JYTWJ4bzufmG4/W3c+dyWMhzf9Zd60/BveoZVPfRXoo=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=NCIzXunqrsfwYgOIry9uhF4WOYsrFx/2Gon3pyrRC5JCUGs09yuhVnUqf4iDGDz39T6ySNEHaboddCIosgI5gbMXsMf6ykoWXgJ9b0qqOdKM/DA/ogqt6L+CzCZUx2xKfR6quLYYzfQqLdHhdOPWRuPl8N8UQqQhaagrBpZKjTE=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
 Received: from loongson.cn (unknown [10.2.5.213])
-	by gateway (Coremail) with SMTP id _____8DxC3LFXl5oQjIeAQ--.995S3;
-	Fri, 27 Jun 2025 17:05:09 +0800 (CST)
+	by gateway (Coremail) with SMTP id _____8BxJHDIXl5oRzIeAQ--.25960S3;
+	Fri, 27 Jun 2025 17:05:12 +0800 (CST)
 Received: from localhost.localdomain (unknown [10.2.5.213])
-	by front1 (Coremail) with SMTP id qMiowJCxM+TEXl5ovCsAAA--.1247S2;
-	Fri, 27 Jun 2025 17:05:08 +0800 (CST)
+	by front1 (Coremail) with SMTP id qMiowJCxM+TEXl5ovCsAAA--.1247S3;
+	Fri, 27 Jun 2025 17:05:11 +0800 (CST)
 From: Bibo Mao <maobibo@loongson.cn>
 To: Tianrui Zhao <zhaotianrui@loongson.cn>,
 	Huacai Chen <chenhuacai@kernel.org>,
 	Xianglai Li <lixianglai@loongson.cn>
 Cc: kvm@vger.kernel.org,
 	loongarch@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v4 0/6] LoongArch: KVM: Fixes with eiointc emulation
-Date: Fri, 27 Jun 2025 17:05:01 +0800
-Message-Id: <20250627090507.808319-1-maobibo@loongson.cn>
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH v4 1/6] LoongArch: KVM: Fix interrupt route update with eiointc
+Date: Fri, 27 Jun 2025 17:05:02 +0800
+Message-Id: <20250627090507.808319-2-maobibo@loongson.cn>
 X-Mailer: git-send-email 2.39.3
+In-Reply-To: <20250627090507.808319-1-maobibo@loongson.cn>
+References: <20250627090507.808319-1-maobibo@loongson.cn>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -50,57 +54,86 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowJCxM+TEXl5ovCsAAA--.1247S2
+X-CM-TRANSID:qMiowJCxM+TEXl5ovCsAAA--.1247S3
 X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
 X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
 	ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
 	nUUI43ZEXa7xR_UUUUUUUUU==
 
-This series fix five issues about kernel eiointc emulation list as
-follows:
-  1. The first patch fixes type forced assignment issue.
-  2. The second patch fixes interrupt route with physical cpu.
-  3. The third patch disables update property num_cpu and feature
-  4. The fourth patch adds validation check about num_cpu from user
-     space.
-  5. Overflow with array index when emulate register EIOINTC_ENABLE
-     writing operation.
-  6. The sixth patch adds address alignment check
-  
+With function eiointc_update_sw_coremap(), there is forced assignment
+like val = *(u64 *)pvalue. Parameter pvalue may be pointer to char type
+or others, there is problem with forced assignment with u64 type.
+
+Here the detailed value is passed rather address pointer.
+
+Cc: stable@vger.kernel.org
+Fixes: 3956a52bc05b ("LoongArch: KVM: Add EIOINTC read and write functions")
+Signed-off-by: Bibo Mao <maobibo@loongson.cn>
 ---
-v3 ... v4:
-  1. Remove patch about enhancement and only keep bugfix relative
-     patches.
-  2. Remove INTC indication in the patch title.
-  3. With access size, keep default case unchanged besides 1/2/4/8 since
-     here all patches are bugfix
-  4. Firstly check return value of copy_from_user() with error path,
-     keep the same order with old patch in patch 4.
+ arch/loongarch/kvm/intc/eiointc.c | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
 
-v2 ... v3:
-  1. Add prefix INTC: in title of every patch.
-  2. Fix array index overflow when emulate register EIOINTC_ENABLE
-     writing operation.
-  3. Add address alignment check with eiointc register access operation.
-
-v1 ... v2:
-  1. Add extra fix in patch 3 and patch 4, add num_cpu validation check
-  2. Name of stat information keeps unchanged, only move it from VM stat
-     to vCPU stat.
----
-Bibo Mao (6):
-  LoongArch: KVM: Fix interrupt route update with eiointc
-  LoongArch: KVM: Check interrupt route from physical cpu
-  LoongArch: KVM: Disable update property num_cpu and feature
-  LoongArch: KVM: Check validation of num_cpu from user space
-  LoongArch: KVM: Avoid overflow with array index
-  LoongArch: KVM: Add address alignment check
-
- arch/loongarch/kvm/intc/eiointc.c | 96 ++++++++++++++++++++++---------
- 1 file changed, 68 insertions(+), 28 deletions(-)
-
-
-base-commit: f02769e7f272d6f42b9767f066c5a99afd2338f3
+diff --git a/arch/loongarch/kvm/intc/eiointc.c b/arch/loongarch/kvm/intc/eiointc.c
+index f39929d7bf8a..d2c521b0e923 100644
+--- a/arch/loongarch/kvm/intc/eiointc.c
++++ b/arch/loongarch/kvm/intc/eiointc.c
+@@ -66,10 +66,9 @@ static void eiointc_update_irq(struct loongarch_eiointc *s, int irq, int level)
+ }
+ 
+ static inline void eiointc_update_sw_coremap(struct loongarch_eiointc *s,
+-					int irq, void *pvalue, u32 len, bool notify)
++					int irq, u64 val, u32 len, bool notify)
+ {
+ 	int i, cpu;
+-	u64 val = *(u64 *)pvalue;
+ 
+ 	for (i = 0; i < len; i++) {
+ 		cpu = val & 0xff;
+@@ -398,7 +397,7 @@ static int loongarch_eiointc_writeb(struct kvm_vcpu *vcpu,
+ 		irq = offset - EIOINTC_COREMAP_START;
+ 		index = irq;
+ 		s->coremap.reg_u8[index] = data;
+-		eiointc_update_sw_coremap(s, irq, (void *)&data, sizeof(data), true);
++		eiointc_update_sw_coremap(s, irq, data, sizeof(data), true);
+ 		break;
+ 	default:
+ 		ret = -EINVAL;
+@@ -484,7 +483,7 @@ static int loongarch_eiointc_writew(struct kvm_vcpu *vcpu,
+ 		irq = offset - EIOINTC_COREMAP_START;
+ 		index = irq >> 1;
+ 		s->coremap.reg_u16[index] = data;
+-		eiointc_update_sw_coremap(s, irq, (void *)&data, sizeof(data), true);
++		eiointc_update_sw_coremap(s, irq, data, sizeof(data), true);
+ 		break;
+ 	default:
+ 		ret = -EINVAL;
+@@ -570,7 +569,7 @@ static int loongarch_eiointc_writel(struct kvm_vcpu *vcpu,
+ 		irq = offset - EIOINTC_COREMAP_START;
+ 		index = irq >> 2;
+ 		s->coremap.reg_u32[index] = data;
+-		eiointc_update_sw_coremap(s, irq, (void *)&data, sizeof(data), true);
++		eiointc_update_sw_coremap(s, irq, data, sizeof(data), true);
+ 		break;
+ 	default:
+ 		ret = -EINVAL;
+@@ -656,7 +655,7 @@ static int loongarch_eiointc_writeq(struct kvm_vcpu *vcpu,
+ 		irq = offset - EIOINTC_COREMAP_START;
+ 		index = irq >> 3;
+ 		s->coremap.reg_u64[index] = data;
+-		eiointc_update_sw_coremap(s, irq, (void *)&data, sizeof(data), true);
++		eiointc_update_sw_coremap(s, irq, data, sizeof(data), true);
+ 		break;
+ 	default:
+ 		ret = -EINVAL;
+@@ -809,7 +808,7 @@ static int kvm_eiointc_ctrl_access(struct kvm_device *dev,
+ 		for (i = 0; i < (EIOINTC_IRQS / 4); i++) {
+ 			start_irq = i * 4;
+ 			eiointc_update_sw_coremap(s, start_irq,
+-					(void *)&s->coremap.reg_u32[i], sizeof(u32), false);
++					s->coremap.reg_u32[i], sizeof(u32), false);
+ 		}
+ 		break;
+ 	default:
 -- 
 2.39.3
 
