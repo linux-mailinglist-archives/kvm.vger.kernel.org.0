@@ -1,65 +1,82 @@
-Return-Path: <kvm+bounces-50999-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51000-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88A5EAEB96A
-	for <lists+kvm@lfdr.de>; Fri, 27 Jun 2025 16:03:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF010AEB9ED
+	for <lists+kvm@lfdr.de>; Fri, 27 Jun 2025 16:34:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0BFBB1C460A9
-	for <lists+kvm@lfdr.de>; Fri, 27 Jun 2025 14:03:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 979B44A467B
+	for <lists+kvm@lfdr.de>; Fri, 27 Jun 2025 14:34:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C4122DAFD1;
-	Fri, 27 Jun 2025 14:03:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42B9827F00F;
+	Fri, 27 Jun 2025 14:34:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TMeGpZ5d"
+	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="HMbSWjGp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C9A7294A15;
-	Fri, 27 Jun 2025 14:03:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 865DFFBF6
+	for <kvm@vger.kernel.org>; Fri, 27 Jun 2025 14:33:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751032996; cv=none; b=MphCfnhuTTFgbPJHrBA8Wruc8HvloH+20OuDFjvHePm6lQ2gQv7dEQRMpEUP9+12WV2ZnXPUNbAi9P5K0Dmjer5bK7iq43uje2oX/24ZX1c1Oss33DNn2Sr2b3mfvpn/bwCVnrlw/2LBxkHDNL0ECsaMkxs26QuvrAx5ZzGRNpc=
+	t=1751034840; cv=none; b=ctZJDOFnqVuO4ilpdX9DwZpTjvXYCZmN9mNLpRytE+pmJcglBYhG3vqG1bK9x7A7ROaPsBfFIjQ8fBk2TsXw8+JvTLsjHnSjbMWz/M7yKLFXuzBq9xc/ZnNupk+z38rqTR/MpqJcIC34ah0kZF8T37RcWsLmhXa8RoOVG5uy+BM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751032996; c=relaxed/simple;
-	bh=Lg+DHUMrbZqxxeR7eqQH/bVmM1+NysYnrKeCoVBx4VA=;
+	s=arc-20240116; t=1751034840; c=relaxed/simple;
+	bh=XgcJ41XYavjWsjGb300vbAa5J5pjmsXQAtOO3kle7qk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hh+TD2LIClpEzoNwwHTwQESbv3OWYnjW/OY4qLzo+dpmcJVlb6Lc6fzUXbhku8Z4WBaZBRnvitJwvmnyrCSFkkV6CSzLxSnFrkNwNjAILHvcfoZp9SDMWtFVsGkucYg380WU87m1EUOlcMn+3cBJP3l/pCyvafHB/0s8l/nkLqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TMeGpZ5d; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1751032994; x=1782568994;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=Lg+DHUMrbZqxxeR7eqQH/bVmM1+NysYnrKeCoVBx4VA=;
-  b=TMeGpZ5dicF8Tgmj0pOz4x6m+hpppJlRbeKQF9f7l2q3rDeiF9w7BZt6
-   AcnMOcyHlZrGFf5tlajR/GYbSyU1l8k337ocWsNs6PhZZx+Y+/wia2EA7
-   69+2G7LOgXvGRnmz5IU/aCBwFl9uzBRDYMArKnN+NSbWoYMNPCYWtywT8
-   uPJvZHo//zq/N7C2FtYW4iTifn2nq1bS+LtFElaPpFzhmdDXTRNcYjEE6
-   RqLTDz803Yt3fZxT5Kt5eUnyR4VNopVQuEJ7aJe8DHCV7QGJ4Li3ZlzXh
-   Q5HAsVE4uvObsswv8pobnQDbOoYI9LB7F1XemQXOgTdK1rS2om8H8as8w
-   Q==;
-X-CSE-ConnectionGUID: y8IYFF9CRpaZVvTbMMLAsg==
-X-CSE-MsgGUID: UYtfnenKQSmLfwOUivAjSw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11477"; a="70916712"
-X-IronPort-AV: E=Sophos;i="6.16,270,1744095600"; 
-   d="scan'208";a="70916712"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2025 07:03:13 -0700
-X-CSE-ConnectionGUID: mrk7EwNkSJ6z8qiTWCv4yw==
-X-CSE-MsgGUID: PK6FeGPkSY+LahJw6un/pg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,270,1744095600"; 
-   d="scan'208";a="152336360"
-Received: from spandruv-desk1.amr.corp.intel.com (HELO [10.125.109.66]) ([10.125.109.66])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2025 07:03:14 -0700
-Message-ID: <bb0077bc-9dd2-46a6-a130-a2cea5e5628e@intel.com>
-Date: Fri, 27 Jun 2025 07:03:12 -0700
+	 In-Reply-To:Content-Type; b=Ou/N/64ZFEXnd7uvJ3TRIQ4RzfQl3QuwQ3AfRBcnzrCFob1W0dhraHi72lJn32+C8PRYiedcLkYX0dogQM/uM1Guco0XY1hgvCr3RGvjmDTHwWm53tL7kmBVeL7telp3noMLB1/kKQlD8dSz1AB34ePcVXxypsoQ4/odfVCzJN8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=HMbSWjGp; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensrcsec.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-453643020bdso20092815e9.1
+        for <kvm@vger.kernel.org>; Fri, 27 Jun 2025 07:33:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=grsecurity.net; s=grsec; t=1751034837; x=1751639637; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=x1OPm9epTrnIhQkbrq5MoRnftJ5u+5HolTF6/9Sc+9o=;
+        b=HMbSWjGpcrWxmdX7BiMZVmJ1NybX1SDl+2XiwJktPwPGlRFx/7k6oCIAMRTr9GhNVM
+         pXFoLzaHKRGS+7uVHCQ0/RRtBaHR64HuFzndL6FdLNz0mmO2mErsExBGRqbb+k63C4fr
+         7HNtpke2R3BmJAyNRte8DrTBCikYBUDsTvPmVVu/A5Qiqt1aY7B6A8BWVd0xpeTzhFft
+         w/2+z6w3K1l7UsaHhEgJZyr/Jhsr79FSCEMSMEbPsxnvNMiqJIJ55si5x0UE5c3YftNV
+         lVoMa7Z7//Ed+GKnOILvq7V30XD3bkmtovMS5Ly9tLRL8K179cxXruQLOGs51UWAD4q3
+         edtw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751034837; x=1751639637;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=x1OPm9epTrnIhQkbrq5MoRnftJ5u+5HolTF6/9Sc+9o=;
+        b=w2rv33vI/Dseur20r6QFhe177pQL3IexUCmhYVEkkBGleMckal42b/ttLBhiY/wnWt
+         sNwCFAdXdpPqNJFs6NvX6SlwdhULJCRE0v2wR6r4rWqOX15mu2SHYsqqylz+utCdjD7d
+         j8hVl2n8WlM9eyMX4lOb7NbLtR3p1fIC7Dp6640TBMI5TsmH5tveZwSsspHAMuTn2giJ
+         49IsYb5BugHs9b1HMGokvBaJo3y1mGPGyrWPYukvh5V1tLmdxFl9GpzA0OZz4aVxy16i
+         mEDv15GfH5AVEoJSCe2jfVAVKezykXLEYHcplkz0D9ZL5q18PD0YgdhPNGWcxeuZo1vT
+         thlA==
+X-Forwarded-Encrypted: i=1; AJvYcCV45byWmrdJfzvj8HdJNCxaHFbhV73pBulI+RLDb6wNHr5VV7w9GmzKmRBGYR8zwFMLH+8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyDBaTX6XrXk8QF18/qWYRLD3wj2VGXM46/BDeIb85LSMVMMjMn
+	6OBGNWWeAF6DAABhwc1mTUh0bWgpzzWLULu8pA5RFY8yx3vEI8E/pmU2peVGNwjXKF4=
+X-Gm-Gg: ASbGncv/QqRPojBpvKn123gvFLrDp6ILM4qmr9r9HDzJNdIXC9huz1mNi0c9urUYuxr
+	Y0vmJ1oqaoujjupJy+xlkI243HfgPiB0aAj1ElhLkimPRI96+oVpwryyMJ/cUrgR6Apx3DXxPQx
+	+6mBIyaU+8/qHycVxoYc9U6tzM+/EQlcGWCw0GRw/NtpXgRAjlChmoFpp4dkEQuC2xLSXDL4jJt
+	1gcbKzGZ58IMuTF8Q7Nnq4Wao5onRaBpZb8kTpV/kXag7vBWaXr3RNBb/7Qm//CPIlq/dxSFn7l
+	EoPJH2+lGjHuY9B5dGWYmkux7+tHdoAAOusRd0KPx0n2JvBNJ8GmAdFMKiDgUjtcHu33J5RFf20
+	LVEiNaGh1yU9KMynu7pwnPnyVNvSFLrOwxixX5KP2mk8ft9D0AJXnBSBXotI2a829BZ1dxFGoES
+	oI7TO+uoxDIjUtVMJYWAI=
+X-Google-Smtp-Source: AGHT+IFJgWJ1g3DOTefsZb3iG5PRWs9VYFywk9GsgBP5LmudEQzyNdRV/M6amlrvMvB2S6Rrh9DldA==
+X-Received: by 2002:a05:600c:5028:b0:43d:172:50b1 with SMTP id 5b1f17b1804b1-4538ee859f9mr35608205e9.29.1751034836632;
+        Fri, 27 Jun 2025 07:33:56 -0700 (PDT)
+Received: from ?IPV6:2003:fa:af22:cf00:2208:a86d:dff:5ae9? (p200300faaf22cf002208a86d0dff5ae9.dip0.t-ipconnect.de. [2003:fa:af22:cf00:2208:a86d:dff:5ae9])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a88c7e6f23sm2952315f8f.11.2025.06.27.07.33.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 27 Jun 2025 07:33:56 -0700 (PDT)
+Message-ID: <8fce2f73-3b4f-4451-b4c7-733fa245b7fa@grsecurity.net>
+Date: Fri, 27 Jun 2025 16:33:55 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,143 +84,183 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv2 03/12] x86/virt/tdx: Allocate reference counters for
- PAMT memory
-To: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Cc: pbonzini@redhat.com, seanjc@google.com, dave.hansen@linux.intel.com,
- rick.p.edgecombe@intel.com, isaku.yamahata@intel.com, kai.huang@intel.com,
- yan.y.zhao@intel.com, chao.gao@intel.com, tglx@linutronix.de,
- mingo@redhat.com, bp@alien8.de, kvm@vger.kernel.org, x86@kernel.org,
- linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org
-References: <20250609191340.2051741-1-kirill.shutemov@linux.intel.com>
- <20250609191340.2051741-4-kirill.shutemov@linux.intel.com>
- <fb5addcb-1cfc-45be-978c-e7cee4126b38@intel.com>
- <pihazgqmsx4ltuvi2imgwsgvjsg2jsnxjnrdpxblwe2vc24opf@glsj2t3xosvb>
-From: Dave Hansen <dave.hansen@intel.com>
-Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <pihazgqmsx4ltuvi2imgwsgvjsg2jsnxjnrdpxblwe2vc24opf@glsj2t3xosvb>
+Subject: Re: [kvm-unit-tests PATCH] x86/emulator64: Extend non-canonical
+ memory access tests with CR2 coverage
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+References: <20250612141637.131314-1-minipli@grsecurity.net>
+ <aF1d7rh_vbr8cr7j@google.com>
+Content-Language: en-US, de-DE
+From: Mathias Krause <minipli@grsecurity.net>
+Autocrypt: addr=minipli@grsecurity.net; keydata=
+ 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
+ RzDVkdgPJkL/NFTKZHo5foFXNi89kA==
+In-Reply-To: <aF1d7rh_vbr8cr7j@google.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 6/27/25 04:27, Kirill A. Shutemov wrote:
-> On Wed, Jun 25, 2025 at 12:26:09PM -0700, Dave Hansen wrote:
->>> +static atomic_t *tdx_get_pamt_refcount(unsigned long hpa)
->>> +{
->>> +	return &pamt_refcounts[hpa / PMD_SIZE];
->>> +}
+On 26.06.25 16:49, Sean Christopherson wrote:
+> On Thu, Jun 12, 2025, Mathias Krause wrote:
+>> Extend the non-canonical memory access tests to verify CR2 stays
+>> unchanged.
 >>
->> "get refcount" usually means "get a reference". This is looking up the
->> location of the refcount.
+>> There's currently a bug in QEMU/TCG that breaks that assumption.
 >>
->> I think this needs a better name.
-> 
-> tdx_get_pamt_ref_ptr()?
-
-How about:
-
-	tdx_find_pamt_refcount()
-
->>> +	unsigned long vaddr;
->>> +	pte_t entry;
->>> +
->>> +	if (!pte_none(ptep_get(pte)))
->>> +		return 0;
+>> Link: https://gitlab.com/qemu-project/qemu/-/issues/928
+>> Signed-off-by: Mathias Krause <minipli@grsecurity.net>
+>> ---
+>>  x86/emulator64.c | 26 ++++++++++++++++++++++++++
+>>  1 file changed, 26 insertions(+)
 >>
->> This ^ is an optimization, right? Could it be comment appropriately, please?
+>> diff --git a/x86/emulator64.c b/x86/emulator64.c
+>> index 5d1bb0f06d4f..abef2bda29f1 100644
+>> --- a/x86/emulator64.c
+>> +++ b/x86/emulator64.c
+>> @@ -325,16 +325,39 @@ static void test_mmx_movq_mf(uint64_t *mem)
+>>  	report(exception_vector() == MF_VECTOR, "movq mmx generates #MF");
+>>  }
+>>  
+>> +#define CR2_REF_VALUE	0xdecafbadUL
+>> +
+>> +static void setup_cr2(void)
+>> +{
+>> +	write_cr2(CR2_REF_VALUE);
+>> +}
+>> +
+>> +static void check_cr2(void)
+>> +{
+>> +	unsigned long cr2 = read_cr2();
+>> +
+>> +	if (cr2 == CR2_REF_VALUE) {
+>> +		report(true, "CR2 unchanged");
+>> +	} else {
+>> +		report(false, "CR2 changed from %#lx to %#lx", CR2_REF_VALUE, cr2);
+>> +		setup_cr2();
 > 
-> Not optimization.
-> 
-> Calls of apply_to_page_range() can overlap by one page due to
-> round_up()/round_down() in alloc_pamt_refcount(). We don't need to
-> populate these pages again if they are already populated.
-> 
-> Will add a comment.
+> Writing CR2 isn't expensive in the grand scheme, so rather than conditionally
+> re-write CR2, I think it makes sense to write CR2 at the start of every testcase,
+> and then just do "report(cr2 == CR2_REF_VALUE".
 
-But don't you check it again under the lock?
+Probably makes sense.
 
->>> +	vaddr = __get_free_page(GFP_KERNEL | __GFP_ZERO);
->>> +	if (!vaddr)
->>> +		return -ENOMEM;
->>> +
->>> +	entry = pfn_pte(PFN_DOWN(__pa(vaddr)), PAGE_KERNEL);
->>> +
->>> +	spin_lock(&init_mm.page_table_lock);
->>> +	if (pte_none(ptep_get(pte)))
+> 
+>> +	}
+>> +}
+>> +
+>>  static void test_jmp_noncanonical(uint64_t *mem)
+>>  {
+>> +	setup_cr2();
+>>  	*mem = NONCANONICAL;
+>>  	asm volatile (ASM_TRY("1f") "jmp *%0; 1:" : : "m"(*mem));
+>>  	report(exception_vector() == GP_VECTOR,
+>>  	       "jump to non-canonical address");
+>> +	check_cr2();
+>>  }
+>>  
+>>  static void test_reg_noncanonical(void)
+>>  {
+>> +	setup_cr2();
+>> +
+>>  	/* RAX based, should #GP(0) */
+>>  	asm volatile(ASM_TRY("1f") "orq $0, (%[noncanonical]); 1:"
+>>  		     : : [noncanonical]"a"(NONCANONICAL));
+>> @@ -342,6 +365,7 @@ static void test_reg_noncanonical(void)
+>>  	       "non-canonical memory access, should %s(0), got %s(%u)",
+>>  	       exception_mnemonic(GP_VECTOR),
+>>  	       exception_mnemonic(exception_vector()), exception_error_code());
+>> +	check_cr2();
+> 
+> And then rather than add more copy+paste, what if we add a macro to handle the
+> checks?  Then the CR2 validation can slot in nicely (and maybe someday the macro
+> could be used outside of the x86/emulator64.c).
+> 
+> Attached patches yield:	
+> 
+> #define CR2_REF_VALUE	0xdecafbadUL
+> 
+> #define ASM_TRY_NONCANONICAL(insn, inputs, access, ex_vector)			\
+> do {										\
+> 	unsigned int vector, ec;						\
+> 										\
+> 	write_cr2(CR2_REF_VALUE);						\
+> 										\
+> 	asm volatile(ASM_TRY("1f") insn "; 1:" :: inputs);			\
+> 										\
+> 	vector = exception_vector();						\
+> 	ec = exception_error_code();						\
+> 										\
+> 	report(vector == ex_vector && !ec,					\
+> 	      "non-canonical " access ", should %s(0), got %s(%u)",		\
+> 	      exception_mnemonic(ex_vector), exception_mnemonic(vector), ec);	\
+> 										\
+> 	if (vector != PF_VECTOR) {						\
+> 		unsigned long cr2  = read_cr2();				\
+> 										\
+> 		report(cr2 == CR2_REF_VALUE,					\
+> 		       "Wanted CR2 '0x%lx', got '0x%lx", CR2_REF_VALUE, cr2);	\
+> 	}									\
+> } while (0)
+> 
+> static void test_jmp_noncanonical(uint64_t *mem)
+> {
+> 	*mem = NONCANONICAL;
+> 
+> 	ASM_TRY_NONCANONICAL("jmp *%0", "m"(*mem), "jmp", GP_VECTOR);
+> }
+> 
+> static void test_reg_noncanonical(void)
+> {
+> 	/* RAX based, should #GP(0) */
+> 	ASM_TRY_NONCANONICAL("orq $0, (%[nc])", [nc]"a"(NONCANONICAL),
+> 			     "memory access", GP_VECTOR);
+> 
+> 	/* RSP based, should #SS(0) */
+> 	ASM_TRY_NONCANONICAL("orq $0, (%%rsp,%[nc],1)", [nc]"r"(NONCANONICAL),
+> 			     "rsp-based access", SS_VECTOR);
+> 
+> 	/* RBP based, should #SS(0) */
+> 	ASM_TRY_NONCANONICAL("orq $0, (%%rbp,%[nc],1)", [nc]"r"(NONCANONICAL),
+> 			     "rbp-based access", SS_VECTOR);
+> }
 
-Right there ^
+Yeah, looks much nicer indeed!
 
->>> +		set_pte_at(&init_mm, addr, pte, entry);
->>> +	else
->>> +		free_page(vaddr);
->>> +	spin_unlock(&init_mm.page_table_lock);
->>> +
->>> +	return 0;
->>> +}
->>> +
->>> +static int pamt_refcount_depopulate(pte_t *pte, unsigned long addr,
->>> +				    void *data)
->>> +{
->>> +	unsigned long vaddr;
->>> +
->>> +	vaddr = (unsigned long)__va(PFN_PHYS(pte_pfn(ptep_get(pte))));
->>
->> Gah, we really need a kpte_to_vaddr() helper here. This is really ugly.
->> How many of these are in the tree?
-> 
-> I only found such chain in KASAN code.
-> 
-> What about this?
-> 
->       pte_t entry = ptep_get(pte);
->       struct page *page = pte_page(entry);
-> 
-> and use __free_page(page) instead free_page(vaddr)?
-> 
-> The similar thing can be don on allocation side.
+Both patches:
 
-That does look better.
+Reviewed-by: Mathias Krause <minipli@grsecurity.net>
+Tested-by: Mathias Krause <minipli@grsecurity.net>
 
+Thanks a lot,
+Mathias
 
