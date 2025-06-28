@@ -1,180 +1,151 @@
-Return-Path: <kvm+bounces-51043-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51044-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96DA7AEC73A
-	for <lists+kvm@lfdr.de>; Sat, 28 Jun 2025 14:51:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB1D2AEC7C2
+	for <lists+kvm@lfdr.de>; Sat, 28 Jun 2025 16:40:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE6D34A0CA4
-	for <lists+kvm@lfdr.de>; Sat, 28 Jun 2025 12:50:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 289333A6778
+	for <lists+kvm@lfdr.de>; Sat, 28 Jun 2025 14:40:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12577248F68;
-	Sat, 28 Jun 2025 12:50:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDCDA248F47;
+	Sat, 28 Jun 2025 14:40:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="a5N9NNm3"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TKRFoCeg"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27E3B2F1FF1;
-	Sat, 28 Jun 2025 12:50:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8511E13B5AE;
+	Sat, 28 Jun 2025 14:40:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751115045; cv=none; b=llSAoHxp1mgUPxkRl6pbJp9PtWeGzdr2K1Q/LTWmMDDf/xc90DnL20So4qQbe0agTxNDBmOShEI37kBF3OiSg7KyGpASpPV5lLHpyNMioKrvaQOfKZF9EOOxseP1zmYwEPRP7ejAyuWrk5AYahu3RTV/L64KY97dmgJXjfdGKXE=
+	t=1751121636; cv=none; b=nNTfdTckHbKvtv3TNWco0LxZq9KMkw7FN+UMt0PDbiUqpBfY5PO+ufz9s8kCMh0KNTc9l6DTlaK6iul30vYbF4QP5NUn3PuAF2rto5vsRqRXI0zTREuKXZAK90ZHDGHY8fdEZlkl5sKkjDGvLsgDr0/jqQ3bYBS9I1yPoySFnW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751115045; c=relaxed/simple;
-	bh=+JmxlUms8ba1ram7kTy8gjDP915eQ8RojEt9nzFQck8=;
+	s=arc-20240116; t=1751121636; c=relaxed/simple;
+	bh=/Lu5LTfcFXkeWsxjRBcxgn1uQUXHqbZ5PSxmsunseSs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L8JgbQr8EhnFNiURYmIaMPg1/xNmBh5Ta4GRosghI1qE2MB5aok2ZvaZUmMirXqbVHB9OUKzRXueAaGwdhev9rMLtPA3E3KD8V9gPCi799bGhQwN7TKL+MEd7hkZKyVnrX43fHivxwyQIojX/U43sMb36eS692Glqq5F1Yak1n4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=a5N9NNm3; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id BC4A340E0198;
-	Sat, 28 Jun 2025 12:50:32 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id Tb8WqKgMt53u; Sat, 28 Jun 2025 12:50:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1751115028; bh=eLc46ItctJeCFTOqG/1cEMrFtQ/BEN7LI1Y39fPMwsU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=a5N9NNm3jrjATCZFMuROj51umNu2AEsdwEzaywbxkJLZz1j0600Fs4hN46K7L+bo8
-	 eP95aLWHTpEDBQg6ypa8dKw9dQKpYxDi+focSMxeU5I6QnQbDuL626SrTqS/+S83Vu
-	 KfyXuqleLGYsQyjQKb6Rt2TgFqBesuZgGAHYr3qPOmzU+grURFPqRapq/EWSbGeqsa
-	 w0Yiz6IxmjAULk3/rPrWvPEm6c5L1c2th9ghfbSEctF5lpReDCO6yz/xIuTYBZB2oy
-	 wkIuWh5vBRY1FDvWUdpQiLUkMSlEp7Zu6pXmGlK10f5exX/rr1KeLiVc4UzqMlQ0JJ
-	 dc/Vcu5hCX245GU6muztrfvkdVAwsbyWVcKLHi3xjE+auG1Ovm38PTiUZNKPB9Pvz6
-	 pw/WIVrIfKbjGwLRe6kADVkUPkl28ZWWyUtDl323W+B/5rX2zxSsixoU/+OiFK7qoA
-	 X8IL2A9V5mBUzUjaQ6qVIAweLxSvyZg+tPk6UqLmblcYDyB3SFEd9gKoeHbXvURVlz
-	 9rpMcxTlasdsRby125USTE64eLigcXQQXzXszb1knqlG7fAYIRegmfqcUhRQRseCeI
-	 1JGgXXyASIQWmN9aXvazFXc+RtAo+kuzyZT/X6d+Af/+JlSSzfVK38G0sDUt9yX345
-	 dT/xF7Z2NKppW7LpRJJW6/gU=
-Received: from zn.tnic (p57969c58.dip0.t-ipconnect.de [87.150.156.88])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 0F81440E00DC;
-	Sat, 28 Jun 2025 12:50:08 +0000 (UTC)
-Date: Sat, 28 Jun 2025 14:50:01 +0200
-From: Borislav Petkov <bp@alien8.de>
-To: Kai Huang <kai.huang@intel.com>
-Cc: dave.hansen@intel.com, tglx@linutronix.de, peterz@infradead.org,
-	mingo@redhat.com, hpa@zytor.com, thomas.lendacky@amd.com,
-	x86@kernel.org, kirill.shutemov@linux.intel.com,
-	rick.p.edgecombe@intel.com, linux-kernel@vger.kernel.org,
-	pbonzini@redhat.com, seanjc@google.com, kvm@vger.kernel.org,
-	reinette.chatre@intel.com, isaku.yamahata@intel.com,
-	dan.j.williams@intel.com, ashish.kalra@amd.com,
-	nik.borisov@suse.com, sagis@google.com
-Subject: Re: [PATCH v3 1/6] x86/sme: Use percpu boolean to control wbinvd
- during kexec
-Message-ID: <20250628125001.GDaF_k-e2KTo4QlKjl@fat_crate.local>
-References: <cover.1750934177.git.kai.huang@intel.com>
- <b963fcd60abe26c7ec5dc20b42f1a2ebbcc72397.1750934177.git.kai.huang@intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=uwqN47StjIfBSF+e2ERv2t2PZiECXQG6U8hkYHH9OKYF1+RPkpTEeZYdfer1jCb2wzZPnSSiFe+rF2h8hiMWhuyGVF1+B+5VtLBrzKmFL50F+A1YzmJH5UDB6SZ/EQY/nsRooLCq9ItdyPs8UJV93NVBlSyRdwLjfOhDyCe9+2o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TKRFoCeg; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1751121634; x=1782657634;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=/Lu5LTfcFXkeWsxjRBcxgn1uQUXHqbZ5PSxmsunseSs=;
+  b=TKRFoCegmOh+79B6+vQN6v4iyFmAW5BBTi1VDqP/EYftz+mn/HaLdjMk
+   3Esc8/I4Ar1fsGUeRvvqA4l8a2f7DCLLlbYGP9UGi/CEge8bw5J+nfT2f
+   XlTI1pP/pM1gCO3BI2BHt5hiOkhQnhPsRZca8Hbx3O4XYTZguHx5Rqwel
+   uxQb7EYwspdcH5dsij2JzqlNk0GanNNqJwXJ9rhd2rVjW/KDgka2wDgOJ
+   iL3YjgoxypzCmdT1+WCmchxGQ5mfV5NtepocoYGos0bbp7/U5IW588KnP
+   GCEnTYRxGMbEkIjpXPYxNul4ZXGKpqysME/ds26GMXD4S9GzZQdrDaUb7
+   A==;
+X-CSE-ConnectionGUID: /bSVtjH4RBuNoy6xSo3AzA==
+X-CSE-MsgGUID: 557hxzOlTFSu4klzasNL9A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11478"; a="57189741"
+X-IronPort-AV: E=Sophos;i="6.16,273,1744095600"; 
+   d="scan'208";a="57189741"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2025 07:40:32 -0700
+X-CSE-ConnectionGUID: j1rXOS1xRES1LHHDv8h1yw==
+X-CSE-MsgGUID: bzHqMp1BQXeH9Myq/cxsjw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,273,1744095600"; 
+   d="scan'208";a="176727413"
+Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
+  by fmviesa002.fm.intel.com with ESMTP; 28 Jun 2025 07:40:27 -0700
+Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uVWjB-000X7V-05;
+	Sat, 28 Jun 2025 14:40:25 +0000
+Date: Sat, 28 Jun 2025 22:39:55 +0800
+From: kernel test robot <lkp@intel.com>
+To: Mario Limonciello <superm1@kernel.org>,
+	Bjorn Helgaas <helgaas@kernel.org>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Alex Deucher <alexander.deucher@amd.com>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Lukas Wunner <lukas@wunner.de>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Lu Baolu <baolu.lu@linux.intel.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+	dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
+	"(open list:INTEL IOMMU (VT-d))" <iommu@lists.linux.dev>,
+	linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+	linux-sound@vger.kernel.org, Daniel Dadap <ddadap@nvidia.com>,
+	Mario Limonciello <mario.limonciello@amd.com>
+Subject: Re: [PATCH v6 9/9] PCI: Add a new 'boot_display' attribute
+Message-ID: <202506282240.aqA0j5M3-lkp@intel.com>
+References: <20250627043108.3141206-10-superm1@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b963fcd60abe26c7ec5dc20b42f1a2ebbcc72397.1750934177.git.kai.huang@intel.com>
+In-Reply-To: <20250627043108.3141206-10-superm1@kernel.org>
 
-On Thu, Jun 26, 2025 at 10:48:47PM +1200, Kai Huang wrote:
+Hi Mario,
 
-...
+kernel test robot noticed the following build warnings:
 
-> Doing WBINVD in stop_this_cpu() could potentially increase the chance to
-> trigger the above "race" despite it's still rare to happen.
+[auto build test WARNING on pci/next]
+[also build test WARNING on pci/for-linus tiwai-sound/for-next tiwai-sound/for-linus tip/x86/core linus/master v6.16-rc3 next-20250627]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Oh the amount of text... 
+url:    https://github.com/intel-lab-lkp/linux/commits/Mario-Limonciello/PCI-Add-helper-for-checking-if-a-PCI-device-is-a-display-controller/20250627-123349
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/pci/pci.git next
+patch link:    https://lore.kernel.org/r/20250627043108.3141206-10-superm1%40kernel.org
+patch subject: [PATCH v6 9/9] PCI: Add a new 'boot_display' attribute
+config: powerpc-bluestone_defconfig (https://download.01.org/0day-ci/archive/20250628/202506282240.aqA0j5M3-lkp@intel.com/config)
+compiler: clang version 21.0.0git (https://github.com/llvm/llvm-project e04c938cc08a90ae60440ce22d072ebc69d67ee8)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250628/202506282240.aqA0j5M3-lkp@intel.com/reproduce)
 
-Please run it and all your comments through AI to simplify formulations etc.
-It is a lot to read.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202506282240.aqA0j5M3-lkp@intel.com/
 
-> Signed-off-by: Kai Huang <kai.huang@intel.com>
-> ---
->  arch/x86/include/asm/kexec.h         |  2 +-
->  arch/x86/include/asm/processor.h     |  2 ++
->  arch/x86/kernel/cpu/amd.c            | 16 ++++++++++++++++
->  arch/x86/kernel/machine_kexec_64.c   | 15 ++++++++++-----
->  arch/x86/kernel/process.c            | 16 +++-------------
->  arch/x86/kernel/relocate_kernel_64.S | 15 +++++++++++----
->  6 files changed, 43 insertions(+), 23 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/kexec.h b/arch/x86/include/asm/kexec.h
-> index f2ad77929d6e..d7e93522b93d 100644
-> --- a/arch/x86/include/asm/kexec.h
-> +++ b/arch/x86/include/asm/kexec.h
-> @@ -122,7 +122,7 @@ relocate_kernel_fn(unsigned long indirection_page,
->  		   unsigned long pa_control_page,
->  		   unsigned long start_address,
->  		   unsigned int preserve_context,
-> -		   unsigned int host_mem_enc_active);
-> +		   unsigned int cache_incoherent);
+All warnings (new ones prefixed by >>):
 
-So preserve_context and cache_incoherent are both a *single* bit of
-information. And we use two u32s for that?!?!
+>> drivers/pci/pci-sysfs.c:688:8: warning: unused variable 'dev_attr_boot_display' [-Wunused-variable]
+     688 | static DEVICE_ATTR_RO(boot_display);
+         |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/device.h:199:26: note: expanded from macro 'DEVICE_ATTR_RO'
+     199 |         struct device_attribute dev_attr_##_name = __ATTR_RO(_name)
+         |                                 ^~~~~~~~~~~~~~~~
+   <scratch space>:54:1: note: expanded from here
+      54 | dev_attr_boot_display
+         | ^~~~~~~~~~~~~~~~~~~~~
+   1 warning generated.
 
-How about flags please?
 
->  #endif
->  extern relocate_kernel_fn relocate_kernel;
->  #define ARCH_HAS_KIMAGE_ARCH
-> diff --git a/arch/x86/include/asm/processor.h b/arch/x86/include/asm/processor.h
-> index bde58f6510ac..a24c7805acdb 100644
-> --- a/arch/x86/include/asm/processor.h
-> +++ b/arch/x86/include/asm/processor.h
-> @@ -731,6 +731,8 @@ void __noreturn stop_this_cpu(void *dummy);
->  void microcode_check(struct cpuinfo_x86 *prev_info);
->  void store_cpu_caps(struct cpuinfo_x86 *info);
->  
+vim +/dev_attr_boot_display +688 drivers/pci/pci-sysfs.c
 
-So much text above - not a single comment here explaining what this var is
-for.
-
-> +DECLARE_PER_CPU(bool, cache_state_incoherent);
-> +
->  enum l1tf_mitigations {
->  	L1TF_MITIGATION_OFF,
->  	L1TF_MITIGATION_AUTO,
-> diff --git a/arch/x86/kernel/cpu/amd.c b/arch/x86/kernel/cpu/amd.c
-> index f18f540db58c..4c7fde344216 100644
-> --- a/arch/x86/kernel/cpu/amd.c
-> +++ b/arch/x86/kernel/cpu/amd.c
-> @@ -503,6 +503,22 @@ static void early_detect_mem_encrypt(struct cpuinfo_x86 *c)
->  {
->  	u64 msr;
->  
-> +	/*
-> +	 * Mark using wbinvd is needed during kexec on processors that
-
-For all text: write insns in caps pls - WBINVD.
-
-> +	 * support SME. This provides support for performing a successful
-> +	 * kexec when going from SME inactive to SME active (or vice-versa).
-> +	 *
-> +	 * The cache must be cleared so that if there are entries with the
-> +	 * same physical address, both with and without the encryption bit,
-> +	 * they don't race each other when flushed and potentially end up
-> +	 * with the wrong entry being committed to memory.
-> +	 *
-> +	 * Test the CPUID bit directly because the machine might've cleared
-> +	 * X86_FEATURE_SME due to cmdline options.
-
-Where?
-
-That same function does the clearing later...
+   682	
+   683	static ssize_t boot_display_show(struct device *dev, struct device_attribute *attr,
+   684					 char *buf)
+   685	{
+   686		return sysfs_emit(buf, "1\n");
+   687	}
+ > 688	static DEVICE_ATTR_RO(boot_display);
+   689	
 
 -- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
