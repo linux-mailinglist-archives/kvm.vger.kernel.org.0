@@ -1,206 +1,126 @@
-Return-Path: <kvm+bounces-51050-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51051-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 173F2AECF90
-	for <lists+kvm@lfdr.de>; Sun, 29 Jun 2025 20:28:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04848AED0FE
+	for <lists+kvm@lfdr.de>; Sun, 29 Jun 2025 22:26:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E61DB7A2430
-	for <lists+kvm@lfdr.de>; Sun, 29 Jun 2025 18:27:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 385B93AFD14
+	for <lists+kvm@lfdr.de>; Sun, 29 Jun 2025 20:25:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B6D0238C0F;
-	Sun, 29 Jun 2025 18:28:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAF6F239591;
+	Sun, 29 Jun 2025 20:22:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JxXS9YGg"
+	dkim=pass (2048-bit key) header.d=mind.be header.i=@mind.be header.b="B8VtBxJ6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0920063B9
-	for <kvm@vger.kernel.org>; Sun, 29 Jun 2025 18:28:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4322D23C519
+	for <kvm@vger.kernel.org>; Sun, 29 Jun 2025 20:22:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751221718; cv=none; b=ez+YmepkADjczWHfN0BM50YpJOUhFIIXrpL7fPUOqeF/+XxgJA1HRMsnocUPXI3/SAE+Z7daIX6uCee3elKqCyLzjsLcPixuDIxDkCqxkj2n3f/Cdm9j/+ug3XXDhMqZJm/4Ihfn6fwyxnXVSzK8i9fXfkExrYCBAK3z5JTGQZw=
+	t=1751228547; cv=none; b=rfeCs7vw8Mep7kjoBmLLmRyVoD+QFU+MjyF8J8yj3qy7ypoAMwvq+hnuK/bQLbjCQF+RLEPJs3qXIhD01A+gE6aeDhih3BF1zilmtcOwDzhEM2jqp09qRKvfnE4MS5AoBsVjS942/aM0tanB9yt0QeZ8ZxFMaYwRuAUOt5anZgQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751221718; c=relaxed/simple;
-	bh=l0ew/rNxvpqXTq4nv93IRDOxuX6/hTc/lyPn4AugHqM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TdqtivC7gIjd7q+le8PzPEKIPRJLht8i29l52m4E69PwBXx+xKva1QpaEoQuXOwhJekDl1HqCBW1e062UXeJBqHNBWQKj20thHnul/oJv6KD80inPvqjuIgDShdIaWIV6U1/zTd/buKg2fmEHXqvDtYsEWsSJzBybnLjjHtC/yY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JxXS9YGg; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2357c61cda7so145855ad.1
-        for <kvm@vger.kernel.org>; Sun, 29 Jun 2025 11:28:36 -0700 (PDT)
+	s=arc-20240116; t=1751228547; c=relaxed/simple;
+	bh=OJqmNM7B0zztOupdOTvcppG3308y1Ai4wgi97D/Skwg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=WcYz1zGFaxOAwDsvMYW4VTsbICjeHz21/oESKh5XgjLY7UNj0VIzAXMDCO4ieuCsPI6tyfkQy9G34WVzW0dI1KLC0zxw90h3wQAnRfPdQNadMg5U4pOBw4hFnP1vT4mwBP5XJAqZAR1nfcTOCFRUOvy4KxswkRwql6NmTNRz+Jw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mind.be; spf=pass smtp.mailfrom=essensium.com; dkim=pass (2048-bit key) header.d=mind.be header.i=@mind.be header.b=B8VtBxJ6; arc=none smtp.client-ip=209.85.221.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mind.be
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=essensium.com
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-3a52874d593so1206682f8f.0
+        for <kvm@vger.kernel.org>; Sun, 29 Jun 2025 13:22:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1751221716; x=1751826516; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=W1l9JIPjHLpLWpV87RrF/MILzYtSbQffXmt07qUOMzw=;
-        b=JxXS9YGgSAu4i7johcgfPrXRvZyZs6EHCky5iiUutCuFIJcPBMjn/wnBGQgwTMM5f2
-         a/WBG68xvgkrSNPuZL1rVdfq2MNNPJNH5Oqbpt30t9fLMMWzr4JkZpKJmHCGRB/A/LoD
-         LgS+G/cu+rDOy2KHgA6yS7gZ7BP1t3s0dPl/TQQBL6CUaZYpw6/m4ablT6D4O/caVcYw
-         OXYmJsVn/i+4ZDsKFJcwyXu/xqPogfy9ugbX43LyAvWZIFrk2vmph8CW3wW5BMBk4Hdj
-         nrAgVWsdkxP+xIFWsnICSnq4F/aQWttDL+Zup3va2TVkuw65Q1xOXmUHXqPGT33Ffwxz
-         ZJ7Q==
+        d=mind.be; s=google; t=1751228542; x=1751833342; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=qzJUEEyMsY77uKBTreXuiyIBY5zWQZVNm+Qz257gMKU=;
+        b=B8VtBxJ62M7zlx6TRqqbyuTDxPeGI3p/wRN8QBr3RM8gorsT7ae+T5V+udWABBScfT
+         P6m7Y3hl+zK5OoEEZlEftDcTHCtbowTRwpWIrWOEEZG02CKTvuIawn/zSGM7UcMe0+6U
+         qKRMA5Auda5UqX5jlwoKJXi9a8IqMRtG76MlA9fYFQoySDHnnvDDeSI9MBs2C0FLWo5Y
+         7UXaGew3n//+dSwVtRytYq+V3OwOCxlxqQKMeoGNraf1EEIfCd+cxQlBGnUg2g2N+P6p
+         MTtjl2ZLWbmxJUnmcrNICG/ARvWHp90j/f345DVtUal94Nj3LjNeGFnuEDGT67sPhhGd
+         SDIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751221716; x=1751826516;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=W1l9JIPjHLpLWpV87RrF/MILzYtSbQffXmt07qUOMzw=;
-        b=BnCmp5iy2yUhrW5R0TCVPkK3+whWMoEwqBTyDRxO1ml7FYTPU+m91q2+fo4xVX16oS
-         +VjgVgpjGmnlmgjJzpuDyIq++RXfwXvG8L9R67bZWssrrh1kQlFrGgH5aA/M/1h+hG5+
-         kR73kMox3ur2nLr/kiie3cXUf87vSzEnrQX5yDrFe7E56Px1W91Hdhw42vxQJ6KbfX+/
-         TPL+/EOPg4XDrMu0NvzC1gylUbpWa5UN2rdMyGvHvzVCNRAq3+LwaukCsoN6bjL+qbZA
-         JVatXbacaAJSQ//NEJTMFDCBxCm2a+wNkz3D71wL3BfHwqmcGSxqrhpq2veiHwDjJoY9
-         Gxug==
-X-Forwarded-Encrypted: i=1; AJvYcCUuueO8FgXR7haT5CS0mO24roj7/F8JXJZSItRDQhpPrCiW7s/OtG+oiGARXQcud5KiBDA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxkIS4FpJubISIXO5YhOEsUWdyZ8RYqt1pi6YDdL8kNz3WV58bC
-	wKR9KFQgpw5iLUIzQrLCZrPlH3io0zSnZ01wLMMRkcxBnvvkTLIFyH4ef/9cRVzva4HQmNJhBCd
-	sQYmnJKZTgZGNDMlHlpMRAKBfQuCJRiu86eEDmtKR
-X-Gm-Gg: ASbGncuOpekldnmA36UDyx5v5EDNlZMAaqcqNrlDRPJDSr/IBR/RwPD5N33bfMAbwUw
-	hJrqgoNJ9yWMMNdJZujQ8d2Lx+nwcBowp8sc1Y96eHef5CJdIMfJSPHtd3IdJ12NZdwQH8fSL35
-	hCm4KhjfPTlOGMI3C7nsmJib+/tnCKTlx90RFpmCZ1ZyfOiL013FxivVsgvI1/KbaG6guM8EUwa
-	QME
-X-Google-Smtp-Source: AGHT+IHdVA75hLFFAdHVzvO4EeTa+FUWamKY84vMMfGu7CzFa8alTxmn/cBaHHTKvAmeb6d7cowOhMdsvEuUdRooiZc=
-X-Received: by 2002:a17:902:e84a:b0:234:bca7:2934 with SMTP id
- d9443c01a7336-23ae8e8bdffmr3053245ad.6.1751221715515; Sun, 29 Jun 2025
- 11:28:35 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1751228542; x=1751833342;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qzJUEEyMsY77uKBTreXuiyIBY5zWQZVNm+Qz257gMKU=;
+        b=ASRO1o4lkg98eX6ylaSKWDuoU18x0g5lAeXBm83OMwbLK4VeNizrOuuc0XY1zy1+Cm
+         w6t7aS2/i5hTjERkQuG+tHy0XE3OSQzYCanHzmu6JcoLwh91a+3ibrs2Gx/UFQ0bFg5b
+         yS71ad38TOAyicdvOZVSDEtmm2V4X7DEGneB0DEP97wNJy/UT/JyUKy+pGd0BGAowG+2
+         alD7Iw91JKiRYCB044a3oJQq5I6J95kv4x2oGqe59kuIA/k2dPZe0kSnja5VMloXf+65
+         1xDNf0USh9nhs68nricYnJxdloa43Uiehqn1np93e5rWU9P/7fmbs/IsekpOXM91S7kx
+         Wt0Q==
+X-Gm-Message-State: AOJu0YxqIzTUK4DwlFunJGMxk1mBVcAm3Ac/kPAf2LY5U8HCzzmOds4N
+	vFKIVa7ympB0vANLALROE3thgZ//dHj25jW/EnFRagXw4SdW2KR6406GBd9pjxfqWhvXx04YuIm
+	kfCiV
+X-Gm-Gg: ASbGnctEwYxUkpnojsQgr6onOb1oZqFv9tiJxMUTih489Z0OtVRrL+5Alb3Rw/WDwUP
+	xn+WDtICWCCiBH8l6ishlxYM+TU5MhaSoz7W+gEDUtrS54iVLvVenqaE0IGpULRU3/kS/Mhc13J
+	e3aJDu7ZcAHkTgqrDlzYsV/O1D0a+PVyRAg4fJP0CPnTmU4OI51QZHES5xW9veoctArJkUpjygq
+	IuEaZzZt4ZEhksB9JyQHKjzm8wt2R7d1twrhX+uKRdi4+AMJg0krIpi5Z8IKuGi+74nptKzX+2E
+	n8UsTU7TUGVfoJAjz9ihZvqKUTLb1RSkRj94QsngO/w4tg2lh/fZNkh++sgNrEarBtHGgPDwlac
+	l4PpstXCXc4BRNpbAyxl2
+X-Google-Smtp-Source: AGHT+IGKTp7zELSfQ2JlpzY0sjDT0OV3kApCVgORic+kkTeZKca/kODK76rZho0QVrSUziZOViJBkA==
+X-Received: by 2002:a05:6000:40cf:b0:3a5:2ef8:34f0 with SMTP id ffacd0b85a97d-3a8f5d43529mr8772514f8f.22.1751228542293;
+        Sun, 29 Jun 2025 13:22:22 -0700 (PDT)
+Received: from arch (94.105.118.175.dyn.edpnet.net. [94.105.118.175])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a88c7e76e1sm8716360f8f.16.2025.06.29.13.22.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 29 Jun 2025 13:22:21 -0700 (PDT)
+From: Thomas Perale <thomas.perale@mind.be>
+To: kvm@vger.kernel.org
+Cc: thomas.perale@mind.be
+Subject: [PATCH kvmtool] vfio: include libgen.h (for musl compatibility)
+Date: Sun, 29 Jun 2025 22:22:21 +0200
+Message-ID: <20250629202221.893360-1-thomas.perale@mind.be>
+X-Mailer: git-send-email 2.50.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1747264138.git.ackerleytng@google.com> <aFPGlAGEPzxlxM5g@yzhao56-desk.sh.intel.com>
- <d15bfdc8-e309-4041-b4c7-e8c3cdf78b26@intel.com>
-In-Reply-To: <d15bfdc8-e309-4041-b4c7-e8c3cdf78b26@intel.com>
-From: Vishal Annapurve <vannapurve@google.com>
-Date: Sun, 29 Jun 2025 11:28:22 -0700
-X-Gm-Features: Ac12FXwYsllFJOo6Hodgf2pKamvDOx3QsF86HEiXlTZ2qWaN29U0KjYTlrTOQmg
-Message-ID: <CAGtprH-Kzn2kOGZ4JuNtUT53Hugw64M-_XMmhz_gCiDS6BAFtQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 00/51] 1G page support for guest_memfd
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: Yan Zhao <yan.y.zhao@intel.com>, Ackerley Tng <ackerleytng@google.com>, kvm@vger.kernel.org, 
-	linux-mm@kvack.org, linux-kernel@vger.kernel.org, x86@kernel.org, 
-	linux-fsdevel@vger.kernel.org, aik@amd.com, ajones@ventanamicro.com, 
-	akpm@linux-foundation.org, amoorthy@google.com, anthony.yznaga@oracle.com, 
-	anup@brainfault.org, aou@eecs.berkeley.edu, bfoster@redhat.com, 
-	binbin.wu@linux.intel.com, brauner@kernel.org, catalin.marinas@arm.com, 
-	chao.p.peng@intel.com, chenhuacai@kernel.org, dave.hansen@intel.com, 
-	david@redhat.com, dmatlack@google.com, dwmw@amazon.co.uk, 
-	erdemaktas@google.com, fan.du@intel.com, fvdl@google.com, graf@amazon.com, 
-	haibo1.xu@intel.com, hch@infradead.org, hughd@google.com, ira.weiny@intel.com, 
-	isaku.yamahata@intel.com, jack@suse.cz, james.morse@arm.com, 
-	jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, jhubbard@nvidia.com, 
-	jroedel@suse.de, jthoughton@google.com, jun.miao@intel.com, 
-	kai.huang@intel.com, keirf@google.com, kent.overstreet@linux.dev, 
-	kirill.shutemov@intel.com, liam.merwick@oracle.com, 
-	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, maz@kernel.org, 
-	mic@digikod.net, michael.roth@amd.com, mpe@ellerman.id.au, 
-	muchun.song@linux.dev, nikunj@amd.com, nsaenz@amazon.es, 
-	oliver.upton@linux.dev, palmer@dabbelt.com, pankaj.gupta@amd.com, 
-	paul.walmsley@sifive.com, pbonzini@redhat.com, pdurrant@amazon.co.uk, 
-	peterx@redhat.com, pgonda@google.com, pvorel@suse.cz, qperret@google.com, 
-	quic_cvanscha@quicinc.com, quic_eberman@quicinc.com, 
-	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com, richard.weiyang@gmail.com, 
-	rick.p.edgecombe@intel.com, rientjes@google.com, roypat@amazon.co.uk, 
-	rppt@kernel.org, seanjc@google.com, shuah@kernel.org, steven.price@arm.com, 
-	steven.sistare@oracle.com, suzuki.poulose@arm.com, tabba@google.com, 
-	thomas.lendacky@amd.com, usama.arif@bytedance.com, vbabka@suse.cz, 
-	viro@zeniv.linux.org.uk, vkuznets@redhat.com, wei.w.wang@intel.com, 
-	will@kernel.org, willy@infradead.org, yilun.xu@intel.com, 
-	yuzenghui@huawei.com, zhiquan1.li@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jun 19, 2025 at 1:59=E2=80=AFAM Xiaoyao Li <xiaoyao.li@intel.com> w=
-rote:
->
-> On 6/19/2025 4:13 PM, Yan Zhao wrote:
-> > On Wed, May 14, 2025 at 04:41:39PM -0700, Ackerley Tng wrote:
-> >> Hello,
-> >>
-> >> This patchset builds upon discussion at LPC 2024 and many guest_memfd
-> >> upstream calls to provide 1G page support for guest_memfd by taking
-> >> pages from HugeTLB.
-> >>
-> >> This patchset is based on Linux v6.15-rc6, and requires the mmap suppo=
-rt
-> >> for guest_memfd patchset (Thanks Fuad!) [1].
-> >>
-> >> For ease of testing, this series is also available, stitched together,
-> >> at https://github.com/googleprodkernel/linux-cc/tree/gmem-1g-page-supp=
-ort-rfc-v2
-> >
-> > Just to record a found issue -- not one that must be fixed.
-> >
-> > In TDX, the initial memory region is added as private memory during TD'=
-s build
-> > time, with its initial content copied from source pages in shared memor=
-y.
-> > The copy operation requires simultaneous access to both shared source m=
-emory
-> > and private target memory.
-> >
-> > Therefore, userspace cannot store the initial content in shared memory =
-at the
-> > mmap-ed VA of a guest_memfd that performs in-place conversion between s=
-hared and
-> > private memory. This is because the guest_memfd will first unmap a PFN =
-in shared
-> > page tables and then check for any extra refcount held for the shared P=
-FN before
-> > converting it to private.
->
-> I have an idea.
->
-> If I understand correctly, the KVM_GMEM_CONVERT_PRIVATE of in-place
-> conversion unmap the PFN in shared page tables while keeping the content
-> of the page unchanged, right?
+Starting GCC14 'implicit-function-declaration' are treated as errors by
+default. When building kvmtool with musl libc, the following error
+occurs due to missing declaration of 'basename':
 
-That's correct.
+vfio/core.c:537:22: error: implicit declaration of function ‘basename’ [-Wimplicit-function-declaration]
+  537 |         group_name = basename(group_path);
+      |                      ^~~~~~~~
+vfio/core.c:537:22: warning: nested extern declaration of ‘basename’ [-Wnested-externs]
+vfio/core.c:537:20: error: assignment to ‘char *’ from ‘int’ makes pointer from integer without a cast [-Wint-conversion]
+  537 |         group_name = basename(group_path);
+      |                    ^
 
->
-> So KVM_GMEM_CONVERT_PRIVATE can be used to initialize the private memory
-> actually for non-CoCo case actually, that userspace first mmap() it and
-> ensure it's shared and writes the initial content to it, after it
-> userspace convert it to private with KVM_GMEM_CONVERT_PRIVATE.
+This patch fixes the issue by including the appropriate header, ensuring
+compatibility with musl and GCC14.
 
-I think you mean pKVM by non-coco VMs that care about private memory.
-Yes, initial memory regions can start as shared which userspace can
-populate and then convert the ranges to private.
+Signed-off-by: Thomas Perale <thomas.perale@mind.be>
+Signed-off-by: Thomas Perale <perale.thomas@gmail.com>
+---
+ vfio/core.c | 1 +
+ 1 file changed, 1 insertion(+)
 
->
-> For CoCo case, like TDX, it can hook to KVM_GMEM_CONVERT_PRIVATE if it
-> wants the private memory to be initialized with initial content, and
-> just do in-place TDH.PAGE.ADD in the hook.
+diff --git a/vfio/core.c b/vfio/core.c
+index 3ff2c0b..8f88489 100644
+--- a/vfio/core.c
++++ b/vfio/core.c
+@@ -3,6 +3,7 @@
+ #include "kvm/ioport.h"
+ 
+ #include <linux/list.h>
++#include <libgen.h>
+ 
+ #define VFIO_DEV_DIR		"/dev/vfio"
+ #define VFIO_DEV_NODE		VFIO_DEV_DIR "/vfio"
+-- 
+2.50.0
 
-I think this scheme will be cleaner:
-1) Userspace marks the guest_memfd ranges corresponding to initial
-payload as shared.
-2) Userspace mmaps and populates the ranges.
-3) Userspace converts those guest_memfd ranges to private.
-4) For both SNP and TDX, userspace continues to invoke corresponding
-initial payload preparation operations via existing KVM ioctls e.g.
-KVM_SEV_SNP_LAUNCH_UPDATE/KVM_TDX_INIT_MEM_REGION.
-   - SNP/TDX KVM logic fetches the right pfns for the target gfns
-using the normal paths supported by KVM and passes those pfns directly
-to the right trusted module to initialize the "encrypted" memory
-contents.
-       - Avoiding any GUP or memcpy from source addresses.
-
-i.e. for TDX VMs, KVM_TDX_INIT_MEM_REGION still does the in-place TDH.PAGE.=
-ADD.
-
-Since we need to support VMs that will/won't use in-place conversion,
-I think operations like KVM_TDX_INIT_MEM_REGION can introduce explicit
-flags to allow userspace to indicate whether to assume in-place
-conversion or not. Maybe
-kvm_tdx_init_mem_region.source_addr/kvm_sev_snp_launch_update.uaddr
-can be null in the scenarios where in-place conversion is used.
 
