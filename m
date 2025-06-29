@@ -1,97 +1,255 @@
-Return-Path: <kvm+bounces-51047-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51048-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B631CAECC0A
-	for <lists+kvm@lfdr.de>; Sun, 29 Jun 2025 11:59:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBBE1AECC17
+	for <lists+kvm@lfdr.de>; Sun, 29 Jun 2025 12:09:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 356C73B7808
-	for <lists+kvm@lfdr.de>; Sun, 29 Jun 2025 09:58:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B61A16EE7A
+	for <lists+kvm@lfdr.de>; Sun, 29 Jun 2025 10:09:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 627642192EE;
-	Sun, 29 Jun 2025 09:58:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C181921CC7F;
+	Sun, 29 Jun 2025 10:08:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b="Jxd7fEU8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ligpxu/h"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.ispras.ru (mail.ispras.ru [83.149.199.84])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71DF21CA84;
-	Sun, 29 Jun 2025 09:58:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.149.199.84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAF15A93D;
+	Sun, 29 Jun 2025 10:08:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751191138; cv=none; b=Jn6bbqnVREi6P4MmXR7vBvmb/jyTDXFoY+yPk9kdZEHg5njQ9RJG3LZIB7IsCC5oBlI2ym0VbcpoT/MkbMC9upC3TagoEotGlxtG0UKcu6kTzCsLBciG0i9quFJ05+TIeRoOX14btvY60tMajlNqKFNWiADHck55Uec1DDidDsE=
+	t=1751191736; cv=none; b=jmZEiW2+ZIE3gRlClPUyx8yE2TcCqOSnxOL8EeSx9AzsRgOgBeeqi6GzkkMIjDqHkdworWij1wpAeedokFsXVy7Kem6B7TmptKg/wc0SozELMaU4uuexvQreqYYqRS61PXr9Iag58FwBibSmF+xgB16kCDEGj/nGAeL7uYw/8Ls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751191138; c=relaxed/simple;
-	bh=Hrliv2JoxVWlcymdZiOGwuH3Ex9wLHlVPK+l3T68CRs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TrGmngYeN3FC410l333sRC9+0Qzhehjde8VxsH0naZVAJinyP13M/RkCve+voRg6Qmi0i6QqeVyz7JQU4gH6mnhlaX8Gtdul5GHMWk0SEy/SKFyS74koGvLcSyQqSOjoQQexeKQQf9PTE+H6jxPeN/91KaHGD0+UEp3LN0FaivQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru; spf=pass smtp.mailfrom=ispras.ru; dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b=Jxd7fEU8; arc=none smtp.client-ip=83.149.199.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ispras.ru
-Received: from localhost.localdomain (unknown [178.69.224.101])
-	by mail.ispras.ru (Postfix) with ESMTPSA id 29345552F52C;
-	Sun, 29 Jun 2025 09:58:45 +0000 (UTC)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.ispras.ru 29345552F52C
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ispras.ru;
-	s=default; t=1751191125;
-	bh=4Wj/utsZiTg4gXT3s/0BCZb3A7rSjIgTPBKJ1fLaEF8=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Jxd7fEU8OMgfM24/d92RvB8OT/rmUP/Ah9DbQf8/2s8GkoPOs+UIEM8QSkxnMXcsb
-	 P689vNzP1lVaI55hYu4LjjljiThBLc08+C31zE/Aig1KcIRF4t7cayezBq0XQtXcGP
-	 JYNIWNzEMib0TfLcrKmAKtZIfeHd21jEGeVA6wmY=
-From: Artem Sadovnikov <a.sadovnikov@ispras.ru>
-To: kvm@vger.kernel.org
-Cc: Artem Sadovnikov <a.sadovnikov@ispras.ru>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
+	s=arc-20240116; t=1751191736; c=relaxed/simple;
+	bh=vm4qV0M7H2voC4CWdcN984fSwF6guPsCtLrP/3QyGI8=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rHbIWGQsbGsFlTFplmswS4uwxbXOSHoailKm6jOrVJD4o1x+374CCq+GmxNm+NWmUn+3MS8wbulUBLS4ZUeS+AbMmC5p8JJqWiXoeszjuMc216dti4WjKGLB91P6s0iDi9gTtqqPViPf0k1JeWM2S+ebE/lXcAJ3XwjcWfQLncw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ligpxu/h; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FA25C4CEEB;
+	Sun, 29 Jun 2025 10:08:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751191734;
+	bh=vm4qV0M7H2voC4CWdcN984fSwF6guPsCtLrP/3QyGI8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ligpxu/hSWPh6oMlawsQ/UdhUxEzYO7Axx5CWrt5vFRYGwCz+DRmobVslogGFjyXa
+	 eOYKwzJHsCxmF5e6XM6V3x4nAvFIFCH6HY9HusCqVY3EQaYhh84l6K485zZGSWO2hy
+	 2RTq94SqjQs9pOPRWOmJA1MUQd0zTGHcJD33Q3ToMCix3DipFtUEo3wyx3mGgwvdfZ
+	 kCcQY1Ff0l+e/EgoAO/KhoOXSrmk/8sdF4yKKpWiwGcU/d92vPpq7/HA4s27Ex/jPH
+	 K3PbBGO08muJTARgwNEhSN86yFPrjqtQm6bUVk33Glg/ErQaQns3sKmLx7TiUrVDcV
+	 wrGoNJhN5berA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1uVoxv-00AvwK-Ju;
+	Sun, 29 Jun 2025 11:08:51 +0100
+Date: Sun, 29 Jun 2025 11:08:51 +0100
+Message-ID: <86ms9qc11o.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <shuah@kernel.org>,
+	Dave Martin <Dave.Martin@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org
-Subject: [PATCH] vfio/mlx5: fix possible overflow in tracking max
-Date: Sun, 29 Jun 2025 09:58:43 +0000
-Message-ID: <20250629095843.13349-1-a.sadovnikov@ispras.ru>
-X-Mailer: git-send-email 2.43.0
+	kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v6 17/28] KVM: arm64: Support SME identification registers for guests
+In-Reply-To: <20250625-kvm-arm64-sme-v6-17-114cff4ffe04@kernel.org>
+References: <20250625-kvm-arm64-sme-v6-0-114cff4ffe04@kernel.org>
+	<20250625-kvm-arm64-sme-v6-17-114cff4ffe04@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: broonie@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, catalin.marinas@arm.com, suzuki.poulose@arm.com, will@kernel.org, pbonzini@redhat.com, corbet@lwn.net, shuah@kernel.org, Dave.Martin@arm.com, tabba@google.com, mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-MLX cap pg_track_log_max_msg_size consists of 5 bits, value of which is
-used as power of 2 for max_msg_size. This can lead to multiplication
-overflow between max_msg_size (u32) and integer constant, and afterwards
-incorrect value is being written to rq_size.
+On Wed, 25 Jun 2025 11:48:08 +0100,
+Mark Brown <broonie@kernel.org> wrote:
+> 
+> The primary register for identifying SME is ID_AA64PFR1_EL1.SME.  This
+> is hidden from guests unless SME is enabled by the VMM.
+> When it is visible it is writable and can be used to control the
+> availability of SME2.
+> 
+> There is also a new register ID_AA64SMFR0_EL1 which we make writable,
+> forcing it to all bits 0 if SME is disabled.  This includes the field
+> SMEver giving the SME version, userspace is responsible for ensuring
+> the value is consistent with ID_AA64PFR1_EL1.SME.  It also includes
+> FA64, a separately enableable extension which provides the full FPSIMD
+> and SVE instruction set including FFR in streaming mode.  Userspace can
+> control the availability of FA64 by writing to this field.  The other
+> features enumerated there only add new instructions, there are no
+> architectural controls for these.
+> 
+> There is a further identification register SMIDR_EL1 which provides a
+> basic description of the SME microarchitecture, in a manner similar to
+> MIDR_EL1 for the PE.  It also describes support for priority management
+> and a basic affinity description for shared SME units, plus some RES0
+> space.  We do not support priority management and affinity is not
+> meaningful for guests so we mask out everything except for the
+> microarchitecture description.
 
-Fix this issue by extending max_msg_size up to u64 so multiplication will
-be extended to u64.
+Both are extremely useful and meaningful to guests. You just have made
+the choice not to expose this.
 
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
+> 
+> As for MIDR_EL1 and REVIDR_EL1 we expose the implementer and revision
+> information to guests with the raw value from the CPU we are running on,
+> this may present issues for asymmetric systems or for migration as it
+> does for the existing registers.
 
-Signed-off-by: Artem Sadovnikov <a.sadovnikov@ispras.ru>
----
- drivers/vfio/pci/mlx5/cmd.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+MIDR/REVIDR are writable from userspace in order to alleviate this
+problem. So should be SMIDR.
 
-diff --git a/drivers/vfio/pci/mlx5/cmd.c b/drivers/vfio/pci/mlx5/cmd.c
-index 5b919a0b2524..0bdaf1d23a78 100644
---- a/drivers/vfio/pci/mlx5/cmd.c
-+++ b/drivers/vfio/pci/mlx5/cmd.c
-@@ -1503,7 +1503,7 @@ int mlx5vf_start_page_tracker(struct vfio_device *vdev,
- 	struct mlx5_vhca_qp *fw_qp;
- 	struct mlx5_core_dev *mdev;
- 	u32 log_max_msg_size;
--	u32 max_msg_size;
-+	u64 max_msg_size;
- 	u64 rq_size = SZ_2M;
- 	u32 max_recv_wr;
- 	int err;
+> 
+> Signed-off-by: Mark Brown <broonie@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_host.h |  1 +
+>  arch/arm64/kvm/sys_regs.c         | 46 +++++++++++++++++++++++++++++++++++----
+>  2 files changed, 43 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index c26099f74648..29b8697c8144 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -494,6 +494,7 @@ enum vcpu_sysreg {
+>  	/* FP/SIMD/SVE */
+>  	SVCR,
+>  	FPMR,
+> +	SMIDR_EL1,	/* Streaming Mode Identification Register */
+
+No. We have long made ID registers to be per-VM, not per-vcpu.
+SMIDR_EL1 must have the same behaviour.
+
+>  
+>  	/* 32bit specific registers. */
+>  	DACR32_EL2,	/* Domain Access Control Register */
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index caa90dae8184..b11bb95e9e35 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -774,6 +774,38 @@ static u64 reset_mpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+>  	return mpidr;
+>  }
+>  
+> +static u64 reset_smidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+> +{
+> +	u64 smidr = 0;
+> +
+> +	if (!system_supports_sme())
+> +		return smidr;
+> +
+> +	smidr = read_sysreg_s(SYS_SMIDR_EL1);
+> +
+> +	/*
+> +	 * Mask out everything except for the implementer and revison,
+> +	 * in particular priority management is not implemented.
+> +	 */
+> +	smidr &= SMIDR_EL1_IMPLEMENTER_MASK | SMIDR_EL1_REVISION_MASK;
+> +
+> +	vcpu_write_sys_reg(vcpu, smidr, SMIDR_EL1);
+> +
+> +	return smidr;
+> +}
+> +
+> +static bool access_smidr(struct kvm_vcpu *vcpu,
+> +			 struct sys_reg_params *p,
+> +			 const struct sys_reg_desc *r)
+> +{
+> +	if (p->is_write)
+> +		return write_to_read_only(vcpu, p, r);
+> +
+> +	p->regval = vcpu_read_sys_reg(vcpu, r->reg);
+> +
+> +	return true;
+> +}
+
+We already have 2 similar copies of this function. We're not adding a
+third one.
+
+> +
+>  static unsigned int pmu_visibility(const struct kvm_vcpu *vcpu,
+>  				   const struct sys_reg_desc *r)
+>  {
+> @@ -1607,7 +1639,9 @@ static u64 __kvm_read_sanitised_id_reg(const struct kvm_vcpu *vcpu,
+>  			val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_MTE_frac);
+>  		}
+>  
+> -		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_SME);
+> +		if (!vcpu_has_sme(vcpu))
+> +			val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_SME);
+> +
+>  		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_RNDR_trap);
+>  		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_NMI);
+>  		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_GCS);
+> @@ -1723,6 +1757,10 @@ static unsigned int id_visibility(const struct kvm_vcpu *vcpu,
+>  		if (!vcpu_has_sve(vcpu))
+>  			return REG_RAZ;
+>  		break;
+> +	case SYS_ID_AA64SMFR0_EL1:
+> +		if (!vcpu_has_sme(vcpu))
+> +			return REG_RAZ;
+> +		break;
+>  	}
+>  
+>  	return 0;
+> @@ -2905,7 +2943,6 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  				       ID_AA64PFR1_EL1_MTE_frac |
+>  				       ID_AA64PFR1_EL1_NMI |
+>  				       ID_AA64PFR1_EL1_RNDR_trap |
+> -				       ID_AA64PFR1_EL1_SME |
+>  				       ID_AA64PFR1_EL1_RES0 |
+>  				       ID_AA64PFR1_EL1_MPAM_frac |
+>  				       ID_AA64PFR1_EL1_RAS_frac |
+> @@ -2913,7 +2950,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	ID_WRITABLE(ID_AA64PFR2_EL1, ID_AA64PFR2_EL1_FPMR),
+>  	ID_UNALLOCATED(4,3),
+>  	ID_WRITABLE(ID_AA64ZFR0_EL1, ~ID_AA64ZFR0_EL1_RES0),
+> -	ID_HIDDEN(ID_AA64SMFR0_EL1),
+> +	ID_WRITABLE(ID_AA64SMFR0_EL1, ~ID_AA64SMFR0_EL1_RES0),
+>  	ID_UNALLOCATED(4,6),
+>  	ID_WRITABLE(ID_AA64FPFR0_EL1, ~ID_AA64FPFR0_EL1_RES0),
+>  
+> @@ -3112,7 +3149,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	{ SYS_DESC(SYS_CLIDR_EL1), access_clidr, reset_clidr, CLIDR_EL1,
+>  	  .set_user = set_clidr, .val = ~CLIDR_EL1_RES0 },
+>  	{ SYS_DESC(SYS_CCSIDR2_EL1), undef_access },
+> -	{ SYS_DESC(SYS_SMIDR_EL1), undef_access },
+> +	{ SYS_DESC(SYS_SMIDR_EL1), .access = access_smidr, .reset = reset_smidr,
+> +	  .reg = SMIDR_EL1, .visibility = sme_visibility },
+>  	IMPLEMENTATION_ID(AIDR_EL1, GENMASK_ULL(63, 0)),
+>  	{ SYS_DESC(SYS_CSSELR_EL1), access_csselr, reset_unknown, CSSELR_EL1 },
+>  	ID_FILTERED(CTR_EL0, ctr_el0,
+> 
+
+Please also handle the comment about FEAT_SME_SMPS in config.c.
+
+	M.
+
 -- 
-2.43.0
-
+Without deviation from the norm, progress is not possible.
 
