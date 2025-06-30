@@ -1,105 +1,112 @@
-Return-Path: <kvm+bounces-51099-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51100-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0808AEE062
-	for <lists+kvm@lfdr.de>; Mon, 30 Jun 2025 16:17:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 906CFAEE077
+	for <lists+kvm@lfdr.de>; Mon, 30 Jun 2025 16:21:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35E743AA2B4
-	for <lists+kvm@lfdr.de>; Mon, 30 Jun 2025 14:15:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1DDD2189DFD2
+	for <lists+kvm@lfdr.de>; Mon, 30 Jun 2025 14:20:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6095128C2CE;
-	Mon, 30 Jun 2025 14:14:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34AAA28C2AF;
+	Mon, 30 Jun 2025 14:20:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="p01AERoO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="laGj0GqR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3B7B246788
-	for <kvm@vger.kernel.org>; Mon, 30 Jun 2025 14:14:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97E3A28C2BC
+	for <kvm@vger.kernel.org>; Mon, 30 Jun 2025 14:20:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751292864; cv=none; b=Ydy86iQ042CHrZIQgm5kaAw5SLN43yvI/dMTQCqB0F8elH+rILEguDrXUhX/KSNComiCjIPYy3JwJbbNQLhYrQ7qBLHpfAuulof7xOtF2XS5OpicwVGYjzen0aNU/sXeHuFHAgHfas+tsBlePqqLaVfm5bLCigF+WuNwRo0KH/Y=
+	t=1751293204; cv=none; b=mcgFJjm4lfq5vxpZeU3yNJ5QAfXERlDydaN7qkRELPcBcLgFjhz7arLR2zwIyvS9JebAh3yRJIqcy/DM+h3fV4sh8fzQiqBuMApekHIR2Tvb1uBybTmYAsuFnRB7ajvOMaHLLEQk4L1o4R0HCG1IHgTDxpeeb6aknbRBZI7E2Y4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751292864; c=relaxed/simple;
-	bh=CUZcr6fVm4NlZL0RgjFMsxmp/DZt3WRGfu37PHYhU24=;
+	s=arc-20240116; t=1751293204; c=relaxed/simple;
+	bh=8p9Lu6GJRcIKPYRKLe8E7It0z/v4O/1xWIO8N0WUytM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ewiCuhzwbB+6SV+Co9udmQLOab8c/hdVHB2TP2JMj5VuVmUoEK1RKb9mGis+N6yjmjeCDV9MAGxgw9ciIbTTmZ3OaK01ZmZ59qhrOfphFgvxEGnClHqEk5fZ5+Z5HKRkjDIDfgsPrdpxMl5T06mL1P+/ZmuU0WbythiXnPwhsx8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=p01AERoO; arc=none smtp.client-ip=209.85.214.174
+	 To:Cc:Content-Type; b=pUeLQvhUa4Y3ZSsZgyp/6zfh1+6n6yd0Wx3BuL9aPCT7b5Kwf4stHt8W+9o4ODW13o4WVVGOIq99NkLGK3PxWXLIHhbWSA4RPQ4q1lVmZlQBK8apDjeaKlpKE7q+lVu7k7v1So3WwPdX/8jCmuldRnKBSXS/Qf0tXyYdW62mJ/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=laGj0GqR; arc=none smtp.client-ip=209.85.214.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-237f270513bso296575ad.1
-        for <kvm@vger.kernel.org>; Mon, 30 Jun 2025 07:14:21 -0700 (PDT)
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-235e389599fso328375ad.0
+        for <kvm@vger.kernel.org>; Mon, 30 Jun 2025 07:20:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1751292861; x=1751897661; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1751293202; x=1751898002; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=l3YhyQhhzhBw+UKvE/Ww6oXAxKgXpPIyifb0WjxIRJY=;
-        b=p01AERoOQk2PaSDNPZDw+z/nGILvCwHtMdVoNvhjQMkyho/75b2kHoi5CDFMJz/zo6
-         V8vzzCeSlyj/Gze63nKihXnoe5ZJpYqNdSaB6TXlEjSC4E725eDkZ1p1mspKj+SXC8RP
-         4e2fToV8QJUy5kqP30kIicbOCu1KNKWYQXSJ2IqtS6uJ1wj/Yvf/yNVNX5Ogz7spgvU/
-         68F5TzIW31nU3SDWe01J3yB4iFOn/xZdWQgfBs94j7exS0ZjQA4iPgFYziqeMpKGTmaL
-         yL0OuRa3zgsNtc0XYA1qy7rDgFYZTdunn8sKHqxLd/IB/B0jMhEW5u5kkjYwPqsjb6Bd
-         fTvw==
+        bh=U6BgpGI+izTDP23PbygNDraRvPegCbPWLha3s13/sL8=;
+        b=laGj0GqR5yi8pDj2PiwhV6OGIhfhvr+n3Q/OHK8mSkZ++IfOHg/SK1DCU7KpMUGfuE
+         DackhF0DrxvFZPXGmZUXkgXEhTlPzRksBbkMGxemAqFZug37/TrnsPRQ+xyonhoP829a
+         0zgcMQ3aGG/VGqMp8X69rGIysSFjWiGf0aNDDsmXRRWo22W/ixvc+fp7+nHKSeOYyJZr
+         netbfx4YwcqzTq9GZfRNNsT5FR6nNqVEa82q5mOpuYPA6J+tu2dqGcQoTkv2D4SzdgVK
+         +a9mqgQQiL5grqkAIdrh7aaHA34fwxf7jd98Gs/jwbamsEc2iOKXNhCp0kIFG/ec8mJZ
+         IJhg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751292861; x=1751897661;
+        d=1e100.net; s=20230601; t=1751293202; x=1751898002;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=l3YhyQhhzhBw+UKvE/Ww6oXAxKgXpPIyifb0WjxIRJY=;
-        b=dVLUO3xI4gN7jOAZn4IE4Bgez3AZF9GFopzhpW+mULJvEaRxNEr23S39ONrxcRiAtt
-         /9JyoUm4mzRdY46VnRH8AwL+TxdmS2o4tJdLD4SDZaGqHFJ7AnjO15Ev3cTrEPAY2xBH
-         fH2wXXQIQ5IXZ+5E5Ft8EbISv4GtUnwEJmHTomevo/0au4qLLpqePL+88D+kYqRCDe3i
-         j1GHUZHYhn4bTL2EqZA/n8T3QzljW/+NEFZptX/jYZO/jvrvHglq5ovA+CQr28DUZPMZ
-         jMjNCAEoPKyuBJvvPfWvrlT2djAsqzGk2uiaw+kWHM8uo4+MKgbg3zUJpuGUafqCvUTZ
-         YXWw==
-X-Forwarded-Encrypted: i=1; AJvYcCXNPUvyyG6pLNq4IreUYwO3dirOie57qKxTkj8MVt8Ljm1i9u9JRjdymS3OWG7e2NKJJuU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzef4idcqGxICPUpE8yRTUqQD+tDt3BIiEliwlSEb2ssIf1vSzE
-	wwAOl3zfr8Wdqc+RKrFfej2y7NrBezUQNh8uLrqZEsHfEZqVHulGBa8h7l73xqmtKzNlMaVrdhD
-	bi8hZSVNyu/zXqj/c7/2f9NRJczfu+lyI23VyB0G3
-X-Gm-Gg: ASbGncsLwETtfL9CsBjS9Y44Mvmpho55wJpwaJjis/9iutsqfBejMn+5eQZYmWA9KCX
-	BGSU9ELMw0/9gMyrQoYmHreCXNrpEepRtzSR2Z4zFsia+Bd6u5s+8/zuKJKWrO8yWMU6NEyNf4p
-	Zr1n0ziJpPca5qbTobcBF82Cy7c47O13zOehdnau/JtPzO9cf9vuHLFFRglvAPqk/NU+BIULP+e
-	Sw0
-X-Google-Smtp-Source: AGHT+IEG+yYQRShX2eCBsh+gkX2OuX0sYXUf8ANfIRJdlFT/hUpfbXpiEF5PxwlidvJtH87uoHpmmSkgeA4elew1Y58=
-X-Received: by 2002:a17:902:d588:b0:234:afcf:d9de with SMTP id
- d9443c01a7336-23ae9f7b05bmr4120325ad.29.1751292860689; Mon, 30 Jun 2025
- 07:14:20 -0700 (PDT)
+        bh=U6BgpGI+izTDP23PbygNDraRvPegCbPWLha3s13/sL8=;
+        b=puOU8PnNdx6lOdG7pLUk/dKfo1agcZDD2zDqCXlgHoiMFweTTuNIgjeCZ0oqJMuq1H
+         1bIWwx0BZgp9x3s31fYAcRKJMNb/BUanngj5/7pCHtkk6Ve41uum3ShwnUcHjQswyJnf
+         a19DxBKoCi+gL3nJcSc1L94uRSQfK4JzDE2k7oKYQS+hbjOwPxnWAJKMg2gsKYWeX+RE
+         rXsqz2vqzcNVzzw5hUgnE2Q/3x50s2ENi1gixEXswmadA4zEhW7AN0pcLfatVholi/KN
+         IZDyNUZyTVEIzSOuP1eaC/sllMeb7D5Tu4h+9vdMVXEwlQv1CAOUICSugcSSXyrWda4t
+         2iPQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVSladChHdy0OWRH6w/59wlxjrHjbwHP1b+Stw6NUm/mX5ueLalz6A0cVvWDWODSY8S9/U=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx0kWI5bMoQ12IfDaJV5yHN4nc/jp2zNS4cJB9DhJ5kQPjNylhL
+	eeGH8q1e9mKan0Tnx9uuWPoQ8yIDz1DW+FB6XwEDFyXmpYyWqy62ohfHTQ3NMJaUk80cSiWVp9U
+	GWJOTs0KBXn7E9TKX/ji4R5oywGbVaYLc+xh0LWwD
+X-Gm-Gg: ASbGnctK19YoA05dGzJaQqdFsTCaP03I9X9D3VwVeY1ZWM0vt1f6LmUZ5Cy/8f9UkQR
+	J89WpOYXukI8oBjCZlL2IpGiE0WELktM+p133vJ6fUnCick6NHrmvexD5UxtTOp/8UwBI7bIy0r
+	/KYDx2LwLWeWQbVCSf6HRK5174Krt0xylE3b5+XUiKSK11TVcj/BOqxHqE19oTUEi60BWMOS7IT
+	WFU
+X-Google-Smtp-Source: AGHT+IE5AgZOIXEN2kYR+pPHATg3kKWBvA9NG7t3TRCU6UJnhNGR4z3nEopD8cR2TPGhUdKYcMbUvEi2+5nz92PWy1A=
+X-Received: by 2002:a17:902:ecc1:b0:234:9f02:e937 with SMTP id
+ d9443c01a7336-23ae9f7531dmr3497505ad.25.1751293200306; Mon, 30 Jun 2025
+ 07:20:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1747264138.git.ackerleytng@google.com> <aFPGlAGEPzxlxM5g@yzhao56-desk.sh.intel.com>
- <d15bfdc8-e309-4041-b4c7-e8c3cdf78b26@intel.com> <CAGtprH-Kzn2kOGZ4JuNtUT53Hugw64M-_XMmhz_gCiDS6BAFtQ@mail.gmail.com>
- <aGIBGR8tLNYtbeWC@yzhao56-desk.sh.intel.com>
-In-Reply-To: <aGIBGR8tLNYtbeWC@yzhao56-desk.sh.intel.com>
+References: <cover.1747264138.git.ackerleytng@google.com> <d3832fd95a03aad562705872cbda5b3d248ca321.1747264138.git.ackerleytng@google.com>
+ <CA+EHjTxtHOgichL=UvAzczoqS1608RSUNn5HbmBw2NceO941ng@mail.gmail.com>
+ <CAGtprH8eR_S50xDnnMLHNCuXrN2Lv_0mBRzA_pcTtNbnVvdv2A@mail.gmail.com>
+ <CA+EHjTwjKVkw2_AK0Y0-eth1dVW7ZW2Sk=73LL9NeQYAPpxPiw@mail.gmail.com>
+ <CAGtprH_Evyc7tLhDB0t0fN+BUx5qeqWq8A2yZ5-ijbJ5UJ5f-g@mail.gmail.com>
+ <9502503f-e0c2-489e-99b0-94146f9b6f85@amd.com> <20250624130811.GB72557@ziepe.ca>
+ <CAGtprH_qh8sEY3s-JucW3n1Wvoq7jdVZDDokvG5HzPf0HV2=pg@mail.gmail.com>
+ <31beeed3-b1be-439b-8a5b-db8c06dadc30@amd.com> <CAGtprH9gojp6hit2SZ0jJBJnzuRvpfRhSa334UhAMFYPZzp4PA@mail.gmail.com>
+ <8f04f1df-d68d-4ef8-b176-595bbf00a9d1@amd.com>
+In-Reply-To: <8f04f1df-d68d-4ef8-b176-595bbf00a9d1@amd.com>
 From: Vishal Annapurve <vannapurve@google.com>
-Date: Mon, 30 Jun 2025 07:14:07 -0700
-X-Gm-Features: Ac12FXwfnKqMFtjiZJXXQ5NYPM9dcCUmxbZVI12HM5E-BFhANicX2DD6O3kaYs8
-Message-ID: <CAGtprH-83EOz8rrUjE+O8m7nUDjt=THyXx=kfft1xQry65mtQg@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 00/51] 1G page support for guest_memfd
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: Xiaoyao Li <xiaoyao.li@intel.com>, Ackerley Tng <ackerleytng@google.com>, kvm@vger.kernel.org, 
-	linux-mm@kvack.org, linux-kernel@vger.kernel.org, x86@kernel.org, 
-	linux-fsdevel@vger.kernel.org, aik@amd.com, ajones@ventanamicro.com, 
-	akpm@linux-foundation.org, amoorthy@google.com, anthony.yznaga@oracle.com, 
-	anup@brainfault.org, aou@eecs.berkeley.edu, bfoster@redhat.com, 
-	binbin.wu@linux.intel.com, brauner@kernel.org, catalin.marinas@arm.com, 
-	chao.p.peng@intel.com, chenhuacai@kernel.org, dave.hansen@intel.com, 
-	david@redhat.com, dmatlack@google.com, dwmw@amazon.co.uk, 
-	erdemaktas@google.com, fan.du@intel.com, fvdl@google.com, graf@amazon.com, 
-	haibo1.xu@intel.com, hch@infradead.org, hughd@google.com, ira.weiny@intel.com, 
-	isaku.yamahata@intel.com, jack@suse.cz, james.morse@arm.com, 
-	jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, jhubbard@nvidia.com, 
-	jroedel@suse.de, jthoughton@google.com, jun.miao@intel.com, 
-	kai.huang@intel.com, keirf@google.com, kent.overstreet@linux.dev, 
-	kirill.shutemov@intel.com, liam.merwick@oracle.com, 
+Date: Mon, 30 Jun 2025 07:19:47 -0700
+X-Gm-Features: Ac12FXwcrbDkWWpGm6EqP7Q9KESbZoaZfTZr5E9iZdm0C78qOvk6uq87JKmXh1E
+Message-ID: <CAGtprH-KhEM6=zegq-36yomZ8PX22EmaZpMPkLnkyzn51EF25w@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 04/51] KVM: guest_memfd: Introduce
+ KVM_GMEM_CONVERT_SHARED/PRIVATE ioctls
+To: Alexey Kardashevskiy <aik@amd.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>, Fuad Tabba <tabba@google.com>, 
+	Ackerley Tng <ackerleytng@google.com>, kvm@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, x86@kernel.org, linux-fsdevel@vger.kernel.org, 
+	ajones@ventanamicro.com, akpm@linux-foundation.org, amoorthy@google.com, 
+	anthony.yznaga@oracle.com, anup@brainfault.org, aou@eecs.berkeley.edu, 
+	bfoster@redhat.com, binbin.wu@linux.intel.com, brauner@kernel.org, 
+	catalin.marinas@arm.com, chao.p.peng@intel.com, chenhuacai@kernel.org, 
+	dave.hansen@intel.com, david@redhat.com, dmatlack@google.com, 
+	dwmw@amazon.co.uk, erdemaktas@google.com, fan.du@intel.com, fvdl@google.com, 
+	graf@amazon.com, haibo1.xu@intel.com, hch@infradead.org, hughd@google.com, 
+	ira.weiny@intel.com, isaku.yamahata@intel.com, jack@suse.cz, 
+	james.morse@arm.com, jarkko@kernel.org, jgowans@amazon.com, 
+	jhubbard@nvidia.com, jroedel@suse.de, jthoughton@google.com, 
+	jun.miao@intel.com, kai.huang@intel.com, keirf@google.com, 
+	kent.overstreet@linux.dev, kirill.shutemov@intel.com, liam.merwick@oracle.com, 
 	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, maz@kernel.org, 
 	mic@digikod.net, michael.roth@amd.com, mpe@ellerman.id.au, 
 	muchun.song@linux.dev, nikunj@amd.com, nsaenz@amazon.es, 
@@ -111,133 +118,131 @@ Cc: Xiaoyao Li <xiaoyao.li@intel.com>, Ackerley Tng <ackerleytng@google.com>, kv
 	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com, richard.weiyang@gmail.com, 
 	rick.p.edgecombe@intel.com, rientjes@google.com, roypat@amazon.co.uk, 
 	rppt@kernel.org, seanjc@google.com, shuah@kernel.org, steven.price@arm.com, 
-	steven.sistare@oracle.com, suzuki.poulose@arm.com, tabba@google.com, 
-	thomas.lendacky@amd.com, usama.arif@bytedance.com, vbabka@suse.cz, 
-	viro@zeniv.linux.org.uk, vkuznets@redhat.com, wei.w.wang@intel.com, 
-	will@kernel.org, willy@infradead.org, yilun.xu@intel.com, 
-	yuzenghui@huawei.com, zhiquan1.li@intel.com
+	steven.sistare@oracle.com, suzuki.poulose@arm.com, thomas.lendacky@amd.com, 
+	usama.arif@bytedance.com, vbabka@suse.cz, viro@zeniv.linux.org.uk, 
+	vkuznets@redhat.com, wei.w.wang@intel.com, will@kernel.org, 
+	willy@infradead.org, xiaoyao.li@intel.com, yan.y.zhao@intel.com, 
+	yilun.xu@intel.com, yuzenghui@huawei.com, zhiquan1.li@intel.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Jun 29, 2025 at 8:17=E2=80=AFPM Yan Zhao <yan.y.zhao@intel.com> wro=
-te:
->
-> On Sun, Jun 29, 2025 at 11:28:22AM -0700, Vishal Annapurve wrote:
-> > On Thu, Jun 19, 2025 at 1:59=E2=80=AFAM Xiaoyao Li <xiaoyao.li@intel.co=
-m> wrote:
-> > >
-> > > On 6/19/2025 4:13 PM, Yan Zhao wrote:
-> > > > On Wed, May 14, 2025 at 04:41:39PM -0700, Ackerley Tng wrote:
-> > > >> Hello,
-> > > >>
-> > > >> This patchset builds upon discussion at LPC 2024 and many guest_me=
-mfd
-> > > >> upstream calls to provide 1G page support for guest_memfd by takin=
+On Sun, Jun 29, 2025 at 5:19=E2=80=AFPM Alexey Kardashevskiy <aik@amd.com> =
+wrote:
+> ...
+> >>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D
+> >>>
+> >>> For IOMMU, could something like below work?
+> >>>
+> >>> * A new UAPI to bind IOMMU FDs with guest_memfd ranges
+> >>
+> >> Done that.
+> >>
+> >>> * VFIO_DMA_MAP/UNMAP operations modified to directly fetch pfns from
+> >>> guest_memfd ranges using kvm_gmem_get_pfn()
+> >>
+> >> This API imho should drop the confusing kvm_ prefix.
+> >>
+> >>>       -> kvm invokes kvm_gmem_is_private() to check for the range
+> >>> shareability, IOMMU could use the same or we could add an API in gmem
+> >>> that takes in access type and checks the shareability before returnin=
 g
-> > > >> pages from HugeTLB.
-> > > >>
-> > > >> This patchset is based on Linux v6.15-rc6, and requires the mmap s=
-upport
-> > > >> for guest_memfd patchset (Thanks Fuad!) [1].
-> > > >>
-> > > >> For ease of testing, this series is also available, stitched toget=
-her,
-> > > >> at https://github.com/googleprodkernel/linux-cc/tree/gmem-1g-page-=
-support-rfc-v2
-> > > >
-> > > > Just to record a found issue -- not one that must be fixed.
-> > > >
-> > > > In TDX, the initial memory region is added as private memory during=
- TD's build
-> > > > time, with its initial content copied from source pages in shared m=
-emory.
-> > > > The copy operation requires simultaneous access to both shared sour=
-ce memory
-> > > > and private target memory.
-> > > >
-> > > > Therefore, userspace cannot store the initial content in shared mem=
-ory at the
-> > > > mmap-ed VA of a guest_memfd that performs in-place conversion betwe=
-en shared and
-> > > > private memory. This is because the guest_memfd will first unmap a =
-PFN in shared
-> > > > page tables and then check for any extra refcount held for the shar=
-ed PFN before
-> > > > converting it to private.
-> > >
-> > > I have an idea.
-> > >
-> > > If I understand correctly, the KVM_GMEM_CONVERT_PRIVATE of in-place
-> > > conversion unmap the PFN in shared page tables while keeping the cont=
-ent
-> > > of the page unchanged, right?
+> >>> the pfn.
+> >>
+> >> Right now I cutnpasted kvm_gmem_get_folio() (which essentially is file=
+map_lock_folio()/filemap_alloc_folio()/__filemap_add_folio()) to avoid new =
+links between iommufd.ko and kvm.ko. It is probably unavoidable though.
 > >
-> > That's correct.
-> >
-> > >
-> > > So KVM_GMEM_CONVERT_PRIVATE can be used to initialize the private mem=
-ory
-> > > actually for non-CoCo case actually, that userspace first mmap() it a=
-nd
-> > > ensure it's shared and writes the initial content to it, after it
-> > > userspace convert it to private with KVM_GMEM_CONVERT_PRIVATE.
-> >
-> > I think you mean pKVM by non-coco VMs that care about private memory.
-> > Yes, initial memory regions can start as shared which userspace can
-> > populate and then convert the ranges to private.
-> >
-> > >
-> > > For CoCo case, like TDX, it can hook to KVM_GMEM_CONVERT_PRIVATE if i=
-t
-> > > wants the private memory to be initialized with initial content, and
-> > > just do in-place TDH.PAGE.ADD in the hook.
-> >
-> > I think this scheme will be cleaner:
-> > 1) Userspace marks the guest_memfd ranges corresponding to initial
-> > payload as shared.
-> > 2) Userspace mmaps and populates the ranges.
-> > 3) Userspace converts those guest_memfd ranges to private.
-> > 4) For both SNP and TDX, userspace continues to invoke corresponding
-> > initial payload preparation operations via existing KVM ioctls e.g.
-> > KVM_SEV_SNP_LAUNCH_UPDATE/KVM_TDX_INIT_MEM_REGION.
-> >    - SNP/TDX KVM logic fetches the right pfns for the target gfns
-> > using the normal paths supported by KVM and passes those pfns directly
-> > to the right trusted module to initialize the "encrypted" memory
-> > contents.
-> >        - Avoiding any GUP or memcpy from source addresses.
-> One caveat:
+> > I don't think that's the way to avoid links between iommufd.ko and
+> > kvm.ko. Cleaner way probably is to have gmem logic built-in and allow
+> > runtime registration of invalidation callbacks from KVM/IOMMU
+> > backends. Need to think about this more.
 >
-> when TDX populates the mirror root, kvm_gmem_get_pfn() is invoked.
-> Then kvm_gmem_prepare_folio() is further invoked to zero the folio.
+> Yeah, otherwise iommufd.ko will have to install a hook in guest_memfd (=
+=3D=3Dkvm.ko) in run time so more beloved symbol_get() :)
+>
+> >
+> >>
+> >>
+> >>> * IOMMU stack exposes an invalidation callback that can be invoked by
+> >>> guest_memfd.
+> >>>
+> >>> Private to Shared conversion via kvm_gmem_convert_range() -
+> >>>       1) guest_memfd invokes kvm_gmem_invalidate_begin() for the rang=
+es
+> >>> on each bound memslot overlapping with the range
+> >>>        2) guest_memfd invokes kvm_gmem_convert_should_proceed() which
+> >>> actually unmaps the KVM SEPT/NPT entries.
+> >>>              -> guest_memfd invokes IOMMU invalidation callback to za=
+p
+> >>> the secure IOMMU entries.
+> >>>        3) guest_memfd invokes kvm_gmem_execute_work() which updates t=
+he
+> >>> shareability and then splits the folios if needed
+> >>>        4) Userspace invokes IOMMU map operation to map the ranges in
+> >>> non-secure IOMMU.
+> >>>
+> >>> Shared to private conversion via kvm_gmem_convert_range() -
+> >>>       1) guest_memfd invokes kvm_gmem_invalidate_begin() for the rang=
+es
+> >>> on each bound memslot overlapping with the range
+> >>>        2) guest_memfd invokes kvm_gmem_convert_should_proceed() which
+> >>> actually unmaps the host mappings which will unmap the KVM non-seucur=
+e
+> >>> EPT/NPT entries.
+> >>>            -> guest_memfd invokes IOMMU invalidation callback to zap =
+the
+> >>> non-secure IOMMU entries.
+> >>>        3) guest_memfd invokes kvm_gmem_execute_work() which updates t=
+he
+> >>> shareability and then merges the folios if needed.
+> >>>        4) Userspace invokes IOMMU map operation to map the ranges in =
+secure IOMMU.
+> >>
+> >>
+> >> Alright (although this zap+map is not necessary on the AMD hw).
+> >
+> > IMO guest_memfd ideally should not directly interact or cater to arch
+> > specific needs, it should implement a mechanism that works for all
+> > archs. KVM/IOMMU implement invalidation callbacks and have all the
+> > architecture specific knowledge to take the right decisions.
+>
+>
+> Every page conversion will go through:
+>
+> kvm-amd.ko -1-> guest_memfd (kvm.ko) -2-> iommufd.ko -3-> amd-iommu (buil=
+d-in).
+>
+> Which one decides on IOMMU not needing (un)mapping? Got to be (1) but the=
+n it need to propagate the decision to amd-iommu (and we do not have (3) at=
+ the moment in that path).
 
-Given that confidential VMs have their own way of initializing private
-memory, I think zeroing makes sense for only shared memory ranges.
-i.e. something like below:
-1) Don't zero at allocation time.
-2) If faulting in a shared page and its not uptodate, then zero the
-page and set the page as uptodate.
-3) Clear uptodate flag on private to shared conversion.
-4) For faults on private ranges, don't zero the memory.
+If there is a need, guest_memfd can support two different callbacks:
+1) Conversion notifier/callback invoked by guest_memfd during
+conversion handling.
+2) Invalidation notifier/callback invoked by guest_memfd during truncation.
 
-There might be some other considerations here e.g. pKVM needs
-non-destructive conversion operation, which might need a way to enable
-zeroing at allocation time only.
+Iommufd/kvm can handle conversion callback/notifier as per the needs
+of underlying architecture. e.g. for TDX connect do the unmapping vs
+for SEV Trusted IO skip the unmapping.
 
-On a TDX specific note, IIUC, KVM TDX logic doesn't need to clear
-pages on future platforms [1].
-
-[1] https://lore.kernel.org/lkml/6de76911-5007-4170-bf74-e1d045c68465@intel=
-.com/
+Invalidation callback/notifier will need to be handled by unmapping page ta=
+bles.
 
 >
-> > i.e. for TDX VMs, KVM_TDX_INIT_MEM_REGION still does the in-place TDH.P=
-AGE.ADD.
-> So, upon here, the pages should not contain the original content?
+> Or we just always do unmap+map (and trigger unwanted page huge page smash=
+ing)? All is doable and neither particularly horrible, I'm trying to see wh=
+ere the consensus is now. Thanks,
 >
 
-Pages should contain the original content. Michael is already
-experimenting with similar logic [2] for SNP.
+I assume when you say huge page smashing, it means huge page NPT
+mapping getting split.
 
-[2] https://lore.kernel.org/lkml/20250613005400.3694904-6-michael.roth@amd.=
-com/
+AFAIR, based on discussion with Michael during guest_memfd calls,
+stage2 NPT entries need to be of the same granularity as RMP tables
+for AMD SNP guests. i.e. huge page NPT mappings need to be smashed on
+the KVM side during conversion. So today guest_memfd sends
+invalidation notification to KVM for both conversion and truncation.
+Doesn't the same constraint for keeping IOMMU page tables at the same
+granularity as RMP tables hold for trusted IO?
 
