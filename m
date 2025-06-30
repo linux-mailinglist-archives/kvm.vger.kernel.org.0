@@ -1,177 +1,139 @@
-Return-Path: <kvm+bounces-51086-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51087-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13881AED929
-	for <lists+kvm@lfdr.de>; Mon, 30 Jun 2025 11:59:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C8C9AEDA05
+	for <lists+kvm@lfdr.de>; Mon, 30 Jun 2025 12:39:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 347187A674D
-	for <lists+kvm@lfdr.de>; Mon, 30 Jun 2025 09:58:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B50D165430
+	for <lists+kvm@lfdr.de>; Mon, 30 Jun 2025 10:39:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D62F248F52;
-	Mon, 30 Jun 2025 09:59:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A3242512E6;
+	Mon, 30 Jun 2025 10:39:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="edJ3e2ph"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ntrS/M2i"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE93E1FF7D7
-	for <kvm@vger.kernel.org>; Mon, 30 Jun 2025 09:59:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A66224EA8F
+	for <kvm@vger.kernel.org>; Mon, 30 Jun 2025 10:39:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751277558; cv=none; b=qHve2L0qdgkTFKB9Z6cB0FVAowmMbuQhtj+q+aeQhx5QR7vc6Vmkv4jHXG2dAzRmAyCAP8a8+Xql7TjE7hU+sZGpb0Qhvi0knuA79QINxAMhrJZgWjBCu+GcWtMQb/5G9ovbc8xmzrkkfq2LJbN+IlHt38rFgXLz2kVoICH14U4=
+	t=1751279953; cv=none; b=I/zUzYjTrDkAJ8xnocF/JZRMJ5Z8N4Lg6rJ9o4QvSxcciN5dIQIeuEBoGHp+5mrX25bx2xXE/l9AeqCX/HTPjI7PqJkVM4Ihxh7UMAa4k+TTfp05BvbSdsFJ3aJBAUsqb0n34Dik/TU6mf5vxSAv698XRDEJt/bGMWzr/yRkn1k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751277558; c=relaxed/simple;
-	bh=qqVroYbCw/qk4BzecjdxS8mEuj1JbPnhJa8nZ2QrHKo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=grlR33HlpGUlemgPmC5i3eb8Hby/SHBC1fnneC3F9z6sx4kRQwwedYVkYwTLYjlVW/yBdossHLICPk5jv0tdRZS2LE6vUPxJLnx6E6TmBUOqtnxXlxDqNLJtunu/DCYpByxKRQStZonTgceUHYf7/YLLThdtuRB3LeL/0Qy0QVw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=edJ3e2ph; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4531e146a24so24199135e9.0
-        for <kvm@vger.kernel.org>; Mon, 30 Jun 2025 02:59:16 -0700 (PDT)
+	s=arc-20240116; t=1751279953; c=relaxed/simple;
+	bh=tuKrmnZg0YTKUZDpbskzPrUk1D8/CsQH1+adOwRQ9eU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TSq6gFTdb8M2TDH/j/yLAILbNdQLIPs4oTbK0NwqFvVu1wVkA+crAcJi/qEs4UWJelwVSnQGRAKUuNDfxBTXu7pKas2vf4NP4CE85GFkGvxHg7cscsZDbKQApEjDEf9Ye8gLoVt//Ay/OS6tA+uff84gfl0LAehFDV/+c82z1vA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ntrS/M2i; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-453398e90e9so14735535e9.1
+        for <kvm@vger.kernel.org>; Mon, 30 Jun 2025 03:39:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1751277555; x=1751882355; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XXGe7X0iZgUmvVFaQXoM7fBhG4zn/0blC4O6KCudJRU=;
-        b=edJ3e2phVvGBqn0hROhyeYBcmmEpW7/FXv7euCceWCAX/9mopX9eHYD8boyxMCO9FC
-         PLNon+p3WsLY74RCi9H6hyhmwL/26qrHYHlXLJ3aLlq3ByhJzpgs6nZDE93cbztqiL6q
-         7YpXJj3sgBmxJiW0TQYrO/8xE5NT/OmHCuCJ3LaVquJ+ROR0Su4SUeaQoZN1sl7MHoag
-         Ye1S+mZ5i8il6WVyXP0l6cph5BPka547jkbi0aNDdA6+PLi/uFUfbIFBsNhxrXEgJd3d
-         BPfMR19uFI9oGADnv3RqjAy4r0SHZ1Ks8Fbvd8KdzMpscZjEuGM059gSL78HHEkQH9q/
-         FnOg==
+        d=linaro.org; s=google; t=1751279950; x=1751884750; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=aY2ljNQQ7s+olZYdhb6NcXGhl/GbIzPd8ZgET/oFbLk=;
+        b=ntrS/M2ihu4iglEK0gMnH+YyIVSQVBd31+rgYO1wZkYV03Z7tCFhiuJSo0vIJ4vu/k
+         eh1HDAsFChmd6a5WqIQ1LLkSumxxwGM0PBbNi3N5MDohLMEZsXQuxPys8XEQth7QSY7T
+         Th7QEdSGMK8299smgQSigecMncYX4HN5d/eAH5RkGuFhMYGEsQwEUj7VG/2NVN90VogR
+         sGHdqq6LILPCCb/vCHa97D8f6x8vKlpAr9GXymt1LSJsWJPN+4CuTSAu8RyWo1EfkEfl
+         k4HQWyGxjrrZRknngjRNS7OER143nNCphxGli8ENniL4A7/QYb1DZHDoFH3W8X3tT2s6
+         BNYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751277555; x=1751882355;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XXGe7X0iZgUmvVFaQXoM7fBhG4zn/0blC4O6KCudJRU=;
-        b=tUzPItRA1Ma8OvoaZ7gzHHBF10clWgPDo3NLP6dnQTydhzuEkgl4hhoUPREQPG5jPr
-         d93u/p7LXMkRab02XpKoSKDYgL3ix92ZSmHWlVAXXGnOpOhy4pNSrRYQJr2URlpmlCW/
-         odA7eCweGFgVhU5Gu0EjalizLYr3TQSlCYdU1tkWkCjEgRgM9QVC9ejdpvGkZGZ3oox7
-         a3jmiJL0S3C24YZz/vCH/iSloiweuGaIVnVTkIv3lSs3meh0WxPqJh0iyYtv86BKiKgg
-         sUSfjdcBpFx/WyXtoDc7JVjvnlIuXR7H0zzTzu7c4ajB/axoESWdVhPcH3VRMmug+gSl
-         htfg==
-X-Forwarded-Encrypted: i=1; AJvYcCWKQQPzNO0HNcXoLDET9rsWZEgpMH8Q7KnytFEiDSXsBiH8bFAby8t9r2EuYo5/CCawQog=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwePzqXHOMq0HpCZCtxgIqpRTqW2y0fOD2oIF+hkNI+RpWQs70g
-	G6D0FlEld9+NvhlXp9N4Wd6V5abMCbTm/ZTHIvI2hTBXVdrSi+AqbbsjnnzyMggWqA==
-X-Gm-Gg: ASbGncsI3eEur78mlFPaiZaEhr3FW9PEC1RfV5YoL6cGEKIJ3yhLVF5XuCWQ5IbJItR
-	jG8wHbgzjLT1+nhmPDZXxuA7DnO3v0iVBDkSnLGMlJqpLNfCTj9AEG/HS5aL76zaBy/UTieeWQk
-	Uk0q7Ad9aGA3+jHMrXvfCWXg3gFAX0IpELrFm5+14ezB6OE8LrH6w/GIFd4lbOAs2pyFgJwcj53
-	SS+HBJd0aMBHiKrDuVHOBv1P/xUgnSFEaru7S1Ps7DuaElT3HhfSj9w8Fl2yJ8Z4js6CQaiX48G
-	XpOUZM0uOQDgODeXyb21i48l9tLuvJnOVkul/9A0+wDXHIve6oQc3b+XLhyw3JJ8JNANO/whHdS
-	XmZcybtoBw0UTwW0=
-X-Google-Smtp-Source: AGHT+IGCHHE7WPoHAdx0Afz3qTyhSNNdcVu6Tz20xUb804a780XJjxvmzRwAbnAKyBU5edUDUB3dlg==
-X-Received: by 2002:a05:600c:1906:b0:450:cabd:160 with SMTP id 5b1f17b1804b1-453948fceabmr105823845e9.3.1751277554978;
-        Mon, 30 Jun 2025 02:59:14 -0700 (PDT)
-Received: from google.com (65.0.187.35.bc.googleusercontent.com. [35.187.0.65])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a892e5979dsm9915422f8f.75.2025.06.30.02.59.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Jun 2025 02:59:14 -0700 (PDT)
-Date: Mon, 30 Jun 2025 09:59:10 +0000
-From: Keir Fraser <keirf@google.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, Eric Auger <eric.auger@redhat.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Li RongQing <lirongqing@baidu.com>
-Subject: Re: [PATCH 3/3] KVM: Avoid synchronize_srcu() in
- kvm_io_bus_register_dev()
-Message-ID: <aGJf7v9EQoEZiQUk@google.com>
-References: <20250624092256.1105524-1-keirf@google.com>
- <20250624092256.1105524-4-keirf@google.com>
- <aFrANSe6fJOfMpOC@google.com>
+        d=1e100.net; s=20230601; t=1751279950; x=1751884750;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=aY2ljNQQ7s+olZYdhb6NcXGhl/GbIzPd8ZgET/oFbLk=;
+        b=Ss9gPPmUjM+4e4rUgCUjsvTlIz5IYf2JzLogdPB6+IG/xk37QsLKpj6/y/S141abBl
+         KUMN6RkWw14ZVes+C1Kc8KHhmCeS3L0ERGw943CeAlemg32qXJX9fMbvsStZO5TQhrJw
+         k4ttW4e+VU9EwC57ufnBJWkZUujWwUuocyIMCl7HOUGvMD60++IAZR23rs+7XvRZAygO
+         htDFvwrbDN83m/7v9z8PGf/458t3CX1UWxEfCE9DzSx2XCJSjdYsSzooWKzXpWazjj4/
+         zTB8Stb7CD5Gh53PgqnmtkAeTZq6IoKEJl7kK1UhstYcREDU4i04Bn03FDKNXmJfN1Ta
+         T7Sg==
+X-Forwarded-Encrypted: i=1; AJvYcCXChEA2VdstTli5TZdmZLMrlGq+dDE2fYZ77aBcndtcIhCWqV/qOOVLvjFiMlpottjN9bE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzqMZs6Q2taKfT8eSVD1PaJ/cdlrgJqjIxr5USTVyU5NcHaaB3P
+	8kP+SGrNG0RM1J+RAEF59sAu7L2hVZfqkd32+U8CIH52O0cXGxFgc+8SotCYV6ADlr8=
+X-Gm-Gg: ASbGncsA8JPLmtEXNNwh0Zf+6FdBbrlve6uyYPqH9OS2jEegHLVCEpioSkEkYrA30Fv
+	zsixlN29LqydhyvKgamqgl/y4AcTLff5zhziVjFoSUmzKan/fGgsHVLcVJM4vtAnY+fFol4kVtz
+	txQBIgqsHrbUWK+RtZ/Voi01BGqKQNLsTBkg4cBKlga0by2tbMans0oi4PebtIx2k7YdORZwQZy
+	gVmZ48DCwWBX/hWQZhiHI37eeiD4rI7fL8sQ+KLn91s92cO8Px/3WxjxAkjOaSIngXICyXHzhS6
+	dMt/3tKbRzEoyzq6FFxQks+2SCXiDo9TVysUcULw9fimPI917B1AAszIYDaxP2zP6/i/vj+af+s
+	RECNHwf+0j1fl2/eQLhK9fpU9mN4yqA==
+X-Google-Smtp-Source: AGHT+IFNhBcdHyj20tEsizIFcK97MLoriVP6w1Dr62XMrnK4u6j3KiXisn9MgQ0GTm/kkt4YtpK0UA==
+X-Received: by 2002:a05:600c:138b:b0:450:d4a6:79ad with SMTP id 5b1f17b1804b1-4538ee6e564mr117965735e9.23.1751279949555;
+        Mon, 30 Jun 2025 03:39:09 -0700 (PDT)
+Received: from [192.168.69.218] (88-187-86-199.subs.proxad.net. [88.187.86.199])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a892e59628sm9858422f8f.81.2025.06.30.03.39.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 30 Jun 2025 03:39:08 -0700 (PDT)
+Message-ID: <14f8aa18-1aab-4e40-9ee4-987793f08a33@linaro.org>
+Date: Mon, 30 Jun 2025 12:39:06 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aFrANSe6fJOfMpOC@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 00/26] arm: Fixes and preparatory cleanups for
+ split-accel
+To: qemu-devel@nongnu.org
+Cc: Leif Lindholm <leif.lindholm@oss.qualcomm.com>, qemu-arm@nongnu.org,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ Roman Bolshakov <rbolshakov@ddn.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Alexander Graf <agraf@csgraf.de>, Bernhard Beschow <shentey@gmail.com>,
+ John Snow <jsnow@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>,
+ kvm@vger.kernel.org, Eric Auger <eric.auger@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Cameron Esfahani
+ <dirty@apple.com>, Cleber Rosa <crosa@redhat.com>,
+ Radoslaw Biernacki <rad@semihalf.com>,
+ Phil Dennis-Jordan <phil@philjordan.eu>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+References: <20250623121845.7214-1-philmd@linaro.org>
+Content-Language: en-US
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+In-Reply-To: <20250623121845.7214-1-philmd@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jun 24, 2025 at 08:11:49AM -0700, Sean Christopherson wrote:
-> +Li
-> 
-> On Tue, Jun 24, 2025, Keir Fraser wrote:
-> > Device MMIO registration may happen quite frequently during VM boot,
-> > and the SRCU synchronization each time has a measurable effect
-> > on VM startup time. In our experiments it can account for around 25%
-> > of a VM's startup time.
-> > 
-> > Replace the synchronization with a deferred free of the old kvm_io_bus
-> > structure.
-> > 
-> > Signed-off-by: Keir Fraser <keirf@google.com>
-> > ---
-> >  include/linux/kvm_host.h |  1 +
-> >  virt/kvm/kvm_main.c      | 10 ++++++++--
-> >  2 files changed, 9 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> > index 3bde4fb5c6aa..28a63f1ad314 100644
-> > --- a/include/linux/kvm_host.h
-> > +++ b/include/linux/kvm_host.h
-> > @@ -205,6 +205,7 @@ struct kvm_io_range {
-> >  struct kvm_io_bus {
-> >  	int dev_count;
-> >  	int ioeventfd_count;
-> > +	struct rcu_head rcu;
-> >  	struct kvm_io_range range[];
-> >  };
-> >  
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index eec82775c5bf..b7d4da8ba0b2 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -5924,6 +5924,13 @@ int kvm_io_bus_read(struct kvm_vcpu *vcpu, enum kvm_bus bus_idx, gpa_t addr,
-> >  }
-> >  EXPORT_SYMBOL_GPL(kvm_io_bus_read);
-> >  
-> > +static void __free_bus(struct rcu_head *rcu)
-> > +{
-> > +	struct kvm_io_bus *bus = container_of(rcu, struct kvm_io_bus, rcu);
-> > +
-> > +	kfree(bus);
-> > +}
-> > +
-> >  int kvm_io_bus_register_dev(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
-> >  			    int len, struct kvm_io_device *dev)
-> >  {
-> > @@ -5962,8 +5969,7 @@ int kvm_io_bus_register_dev(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
-> >  	memcpy(new_bus->range + i + 1, bus->range + i,
-> >  		(bus->dev_count - i) * sizeof(struct kvm_io_range));
-> >  	rcu_assign_pointer(kvm->buses[bus_idx], new_bus);
-> > -	synchronize_srcu_expedited(&kvm->srcu);
-> > -	kfree(bus);
-> > +	call_srcu(&kvm->srcu, &bus->rcu, __free_bus);
-> 
-> I'm 99% certain this will break ABI.  KVM needs to ensure all readers are guaranteed
-> to see the new device prior to returning to userspace.
+Ping? (series fully reviewed)
 
-I'm not sure I understand this. How can userspace (or a guest VCPU)
-know that it is executing *after* the MMIO registration, except via
-some form of synchronization or other ordering of its own? For
-example, that PCI BAR setup happens as part of PCI probing happening
-early in device registration in the guest OS, strictly before the MMIO
-region will be accessed. Otherwise the access is inherently racy
-against the registration?
+On 23/6/25 14:18, Philippe Mathieu-Daudé wrote:
 
-> I'm quite confident there
-> are other flows that rely on the synchronization, the vGIC case is simply the one
-> that's documented.
-
-If they're in the kernel they can be fixed? If necessary I'll go audit the callers.
-
- Regards,
-  Keir
-
-> https://lore.kernel.org/all/aAkAY40UbqzQNr8m@google.com
+> Philippe Mathieu-Daudé (26):
+>    target/arm: Remove arm_handle_psci_call() stub
+>    target/arm: Reduce arm_cpu_post_init() declaration scope
+>    target/arm: Unify gen_exception_internal()
+>    target/arm/hvf: Simplify GIC hvf_arch_init_vcpu()
+>    target/arm/hvf: Directly re-lock BQL after hv_vcpu_run()
+>    target/arm/hvf: Trace hv_vcpu_run() failures
+>    accel/hvf: Trace VM memory mapping
+>    target/arm/hvf: Log $pc in hvf_unknown_hvc() trace event
+>    target/arm: Correct KVM & HVF dtb_compatible value
+>    accel/hvf: Model PhysTimer register
+>    target/arm/hvf: Pass @target_el argument to hvf_raise_exception()
+>    target/arm: Restrict system register properties to system binary
+>    target/arm: Create GTimers *after* features finalized / accel realized
+>    accel: Keep reference to AccelOpsClass in AccelClass
+>    accel: Introduce AccelOpsClass::cpu_target_realize() hook
+>    accel/hvf: Add hvf_arch_cpu_realize() stubs
+>    target/arm/hvf: Really set Generic Timer counter frequency
+>    hw/arm/virt: Only require TCG || QTest to use TrustZone
+>    hw/arm/virt: Only require TCG || QTest to use virtualization extension
+>    hw/arm/virt: Rename cpu_post_init() -> post_cpus_gic_realized()
+>    hw/arm/sbsa-ref: Tidy up use of RAMLIMIT_GB definition
+>    tests/functional: Set sbsa-ref machine type in each test function
+>    tests/functional: Restrict nested Aarch64 Xen test to TCG
+>    tests/functional: Require TCG to run Aarch64 imx8mp-evk test
+>    tests/functional: Add hvf_available() helper
+>    tests/functional: Expand Aarch64 SMMU tests to run on HVF accelerator
 
