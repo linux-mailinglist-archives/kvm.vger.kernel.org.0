@@ -1,132 +1,162 @@
-Return-Path: <kvm+bounces-51059-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51060-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B322AED53D
-	for <lists+kvm@lfdr.de>; Mon, 30 Jun 2025 09:09:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92C80AED57F
+	for <lists+kvm@lfdr.de>; Mon, 30 Jun 2025 09:26:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF41D174458
-	for <lists+kvm@lfdr.de>; Mon, 30 Jun 2025 07:09:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41A1A3A24BD
+	for <lists+kvm@lfdr.de>; Mon, 30 Jun 2025 07:26:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E172E21770D;
-	Mon, 30 Jun 2025 07:09:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4D2621CC43;
+	Mon, 30 Jun 2025 07:26:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LCHSMWzt"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="JonI0cEi"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C393278F24;
-	Mon, 30 Jun 2025 07:09:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66C4721A452
+	for <kvm@vger.kernel.org>; Mon, 30 Jun 2025 07:26:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751267369; cv=none; b=K5/aeZTH46f/rohTDgvzmi4ugwwWRCgohy0ymS1/BRhz6x+VBs55/WQnUUPeIbq0Fs4r+jNPPm0u74EKFIACCZABY3jJTrAu4/R/QgLy1HnbD0I15XgIMKIfdIa89S/gmB2Si0UfKXRSCaZCdxm+n5PDN+3MRFxc8VIOIRxSUNM=
+	t=1751268381; cv=none; b=THYYoB3icCh6iaIHT/Q8SA+YIepmZpJSZu3cGH9xd3535LDr1Uix1swQ9rlP6mHRAuyEFlGXvRcIooGAweApW/dCKE1WgW8egIEhCJ2TRkNhRR3TJrydsXqkc+3iPHa89lhpaEGh2XNvywn56OaKkjaj2dj6/eF50+/U9/Z9VeM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751267369; c=relaxed/simple;
-	bh=2DtDh75BjjG1Bypjj77+rjJnfFomPfSyCzUXJ/6TNg4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tFjVW6EE8hIHdy5j+xBBnTxRveApLKqbqB/5NOnyt+WXoEIP4F8RFsTCCIGNnHUUG+WSfD/T3gWnW9OzisiTgBTtO70FSbkw246xcO/njvz42NtzwW/ReVeT+BUFbQ9W6xNUToAJV0iAil8iHj2MuPXmcIbe46WkN5URfyG5iCw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LCHSMWzt; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1751267367; x=1782803367;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=2DtDh75BjjG1Bypjj77+rjJnfFomPfSyCzUXJ/6TNg4=;
-  b=LCHSMWztD71CPBmeMlzVBpo5MP9I6PZBi8f/TVERpyfxNAUVKAkU97Bt
-   8oK98VE3//iuXmj3CiULGf3osAn97srB109sGgqlXGWhUTC/OvjjIE/F+
-   iXJ9zgY4UqHsiNTldcrxpqJhcaUuEn47DYHLuGKlSZHrys/jmaFBzkQ7M
-   jjqVYasgIVM3/6QCipkoC1NGUS35h3C739scNkwasbhNB3RRr44D912hy
-   kTFPsZ13AWdJfS/dR1cjsDhjjn22G4KaueTfiZ71RbmJxjcZ5yXY30s8a
-   So8Np0xEjRxPV+e6isSVgSE96O1H0jaGjWrmguHXa44GXZZOvKSCMYKwE
-   Q==;
-X-CSE-ConnectionGUID: 5A58bmdXSVyWIkB1Rkiwhw==
-X-CSE-MsgGUID: uhBP6YkQS5uRrjbCQJ5HZQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11479"; a="70916533"
-X-IronPort-AV: E=Sophos;i="6.16,277,1744095600"; 
-   d="scan'208";a="70916533"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2025 00:09:27 -0700
-X-CSE-ConnectionGUID: Tb+bAqywTYed8cSYmtEGVA==
-X-CSE-MsgGUID: NTLoU24QQZSwYdYu57I+4A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,277,1744095600"; 
-   d="scan'208";a="153118599"
-Received: from unknown (HELO [10.238.0.239]) ([10.238.0.239])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2025 00:09:23 -0700
-Message-ID: <c8ea05e6-58e5-4371-88fe-cde3f09dd530@linux.intel.com>
-Date: Mon, 30 Jun 2025 15:09:19 +0800
+	s=arc-20240116; t=1751268381; c=relaxed/simple;
+	bh=I5aXpogNojpmKmR+yCXkyrMsR8ui+2Tod3Gs6ibm7u4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kyVLMchvT4+xkq5I24Elc3AT0z/bX2g9IF6pLwQAzRL0sOiIeMhNdY0mhRjwSbQ7yqyay+a/0DOGEP2yswjszuGPLauCSet2vH9xBJ/ncfvlluiQBE2dXJI5yWhDNeRUbhc8PCjNIi+qCVHo96ulVp2zbNLkhLysEwuxoDOFqkk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=JonI0cEi; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2366e5e4dbaso42028275ad.1
+        for <kvm@vger.kernel.org>; Mon, 30 Jun 2025 00:26:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1751268379; x=1751873179; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=vjIw3BQMQkuEtqIZpSqBzYxhDfFJxgtZiU6HzDMOlNc=;
+        b=JonI0cEiL4FS4PzWFn99SaYHAhkkMUUvSJ2SPEOmsbE3HOM2m+9cKQAo0qDgSVtu1E
+         MEJPXJoTG7YJWAy8h1cMRopka5UL0yZHzP1SLzod605ED/BayFcGXd5HytVZ46kGin3c
+         sSTRRYCblEMJgakoptWlKw6LdsD03XCFBCztjEWF1IAcNd4DwujUAtE7fejbYkapHVCv
+         YszkkaKjd3TL+45vCAP3MAF8wQi7uAeNXti/0dOHynIF79Dbu8JO1zOJrmZVU+zarrLp
+         ES3prVkRGwWkgiuO56e1c8t93Svp5DnynqHJR7VA20Nh26zpkPlfW1ZEaSQbW5M8Pg7j
+         +VAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751268379; x=1751873179;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vjIw3BQMQkuEtqIZpSqBzYxhDfFJxgtZiU6HzDMOlNc=;
+        b=c1JPQNBmL0Qk5HhRMjpZnAw07n3vFnXuAVMHJ8itGY13f0oO8VQs9lWUfcMqUOTk8D
+         aqyRtxul2Hji6tPbTAhXrstDL2iV9DU+kBESR03bhdbeuNQYOdYb04e7WvQ6d6H1tPGh
+         uRoxJuhJLW0BS8rKpRTmKRo8wDG/M5siRjgBWDq+OzXnHqHf0AqSTjfr4sdbfUICAIsp
+         maXiVNBG+CYSHWPSHaLeqR3fMHI6JCubVz9JbZAD2AaM3x8kVDdG5S8WqDBeEGr/xbRr
+         q/+0JbHfwM+ON+tt7O0QUJS45X9gCyo2Nq2A4QNTHVC1OR9sA+PIzYpNssn/xBWefSJS
+         k2Cw==
+X-Gm-Message-State: AOJu0YxGDtzOsP3GNntpuB5cNcT1WhkHtvrWsKxpLaTHxDVHsHMZXGEO
+	qaacqa1rAxFnggDcG0thOU4VILo1KBhtY3EdZDjE2AiIVn+3lgLZVTWA351P+1TPXKU=
+X-Gm-Gg: ASbGnct9BwULPA5W1x478gQH5uwDgqdxvxK0BrYhqVED6jmX65aSrFM0WaQGQScpJwi
+	oMDm1/b2ZS0rmDqoC+JKsLxIWqePaeQ52bKjAI/veQQZsdFkWnHMYuWapFoCeX5A50MuM/tk+ga
+	nev3PUkI/zrEZuo+qoegVo3YFed23SIv6rPRYN2zjySOFU6K7ozk99Z9efVEKQh+Iw4kGk75S2x
+	GBOLVPhMVqhhcridRZE/W+9s0G7Pvj1mDsApNat9mLRfTyJCSAiREPFjF0YjNxF/W+0DqoDPhWO
+	9jkQ3i+nQ6FzANXoJq3kzbims/AUxPeLJElZRsE5CXQ37mMrzZPfdckFinOFXk2XShwUAjVPCgE
+	4KQUtJ6dqgPcgfw==
+X-Google-Smtp-Source: AGHT+IGafeZ2azc3t18RXEN8peJr6PmRhM9ZfzpHzNFPkcgsDxEqmtV9RKi7UPzP5ti8qyp0RUJeug==
+X-Received: by 2002:a17:902:f815:b0:235:f091:11e5 with SMTP id d9443c01a7336-23ac4ed5479mr113205755ad.10.1751268378623;
+        Mon, 30 Jun 2025 00:26:18 -0700 (PDT)
+Received: from localhost.localdomain ([203.208.189.13])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23acb2f17f5sm77237555ad.62.2025.06.30.00.26.15
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Mon, 30 Jun 2025 00:26:18 -0700 (PDT)
+From: lizhe.67@bytedance.com
+To: alex.williamson@redhat.com,
+	jgg@ziepe.ca,
+	david@redhat.com,
+	peterx@redhat.com
+Cc: kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	lizhe.67@bytedance.com
+Subject: [PATCH 0/4] vfio/type1: optimize vfio_pin_pages_remote() and vfio_unpin_pages_remote() for large folio
+Date: Mon, 30 Jun 2025 15:25:14 +0800
+Message-ID: <20250630072518.31846-1-lizhe.67@bytedance.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 1/6] x86/sme: Use percpu boolean to control wbinvd
- during kexec
-To: "Huang, Kai" <kai.huang@intel.com>
-Cc: "Hansen, Dave" <dave.hansen@intel.com>,
- "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>, "bp@alien8.de"
- <bp@alien8.de>, "peterz@infradead.org" <peterz@infradead.org>,
- "hpa@zytor.com" <hpa@zytor.com>, "mingo@redhat.com" <mingo@redhat.com>,
- "tglx@linutronix.de" <tglx@linutronix.de>,
- "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
- "seanjc@google.com" <seanjc@google.com>, "x86@kernel.org" <x86@kernel.org>,
- "sagis@google.com" <sagis@google.com>,
- "Chatre, Reinette" <reinette.chatre@intel.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
- "Williams, Dan J" <dan.j.williams@intel.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "Yamahata, Isaku" <isaku.yamahata@intel.com>,
- "ashish.kalra@amd.com" <ashish.kalra@amd.com>,
- "nik.borisov@suse.com" <nik.borisov@suse.com>
-References: <cover.1750934177.git.kai.huang@intel.com>
- <b963fcd60abe26c7ec5dc20b42f1a2ebbcc72397.1750934177.git.kai.huang@intel.com>
- <ffcb59ff61de9b3189cf1f1cc2f331c5d0b54170.camel@intel.com>
- <b368fb3399d1e64e98fb9ad6a7a214387c097825.camel@intel.com>
- <0b8948ed672ebf6701ddc350914e4e325032ad87.camel@intel.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <0b8948ed672ebf6701ddc350914e4e325032ad87.camel@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+From: Li Zhe <lizhe.67@bytedance.com>
 
+This patchset is an consolidation of the two previous patchsets[1][2].
 
-On 6/27/2025 8:30 AM, Huang, Kai wrote:
-[...]
->
-> And I am not 100% sure whether this issue exists, since allowing CPU hotplug
-> during kexec doesn't seem reasonable to me at least on x86, despite it is
-> indeed enabled kernel_kexec() common code:
->
->          /*
->           * migrate_to_reboot_cpu() disables CPU hotplug assuming that
->           * no further code needs to use CPU hotplug (which is true in
->           * the reboot case). However, the kexec path depends on using
->           * CPU hotplug again; so re-enable it here.
->           */
->           cpu_hotplug_enable();
->           pr_notice("Starting new kernel\n");
->           machine_shutdown();
->
-> I tried to git blame to find clue but failed since the history is lost
-> during file move/renaming etc.  I suspect it is for other ARCHs.
->
-Had a check in git history, it's related to powerpc kexec code.
+When vfio_pin_pages_remote() is called with a range of addresses that
+includes large folios, the function currently performs individual
+statistics counting operations for each page. This can lead to significant
+performance overheads, especially when dealing with large ranges of pages.
 
-First, commit e8e5c2155b00 ("powerpc/kexec: Fix orphaned offline CPUs across kexec")
-add the code to online each present CPU.
+The function vfio_unpin_pages_remote() has a similar issue, where executing
+put_pfn() for each pfn brings considerable consumption.
 
-Later, commit011e4b02f1da (" powerpc, kexec: Fix "Processor X is stuck" issue
-during kexec from ST mode") add the code in the common code kernel_kexec() to
-enable hotplug to fix the stuck issue.
+This patchset optimizes the performance of the relevant functions by
+batching the less efficient operations mentioned before.
+
+The first patch optimizes the performance of the function
+vfio_pin_pages_remote(), while the remaining patches optimize the
+performance of the function vfio_unpin_pages_remote().
+
+The performance test results, based on v6.16-rc4, for completing the 16G
+VFIO MAP/UNMAP DMA, obtained through unit test[3] with slight
+modifications[4], are as follows.
+
+Base(6.16-rc4):
+./vfio-pci-mem-dma-map 0000:03:00.0 16
+------- AVERAGE (MADV_HUGEPAGE) --------
+VFIO MAP DMA in 0.047 s (340.2 GB/s)
+VFIO UNMAP DMA in 0.135 s (118.6 GB/s)
+------- AVERAGE (MAP_POPULATE) --------
+VFIO MAP DMA in 0.280 s (57.2 GB/s)
+VFIO UNMAP DMA in 0.312 s (51.3 GB/s)
+------- AVERAGE (HUGETLBFS) --------
+VFIO MAP DMA in 0.052 s (310.5 GB/s)
+VFIO UNMAP DMA in 0.136 s (117.3 GB/s)
+
+With this patchset:
+------- AVERAGE (MADV_HUGEPAGE) --------
+VFIO MAP DMA in 0.027 s (596.4 GB/s)
+VFIO UNMAP DMA in 0.045 s (357.6 GB/s)
+------- AVERAGE (MAP_POPULATE) --------
+VFIO MAP DMA in 0.288 s (55.5 GB/s)
+VFIO UNMAP DMA in 0.288 s (55.6 GB/s)
+------- AVERAGE (HUGETLBFS) --------
+VFIO MAP DMA in 0.031 s (508.3 GB/s)
+VFIO UNMAP DMA in 0.045 s (352.9 GB/s)
+
+For large folio, we achieve an over 40% performance improvement for VFIO
+MAP DMA and an over 66% performance improvement for VFIO DMA UNMAP. For
+small folios, the performance test results show little difference compared
+with the performance before optimization.
+
+[1]: https://lore.kernel.org/all/20250529064947.38433-1-lizhe.67@bytedance.com/
+[2]: https://lore.kernel.org/all/20250620032344.13382-1-lizhe.67@bytedance.com/
+[3]: https://github.com/awilliam/tests/blob/vfio-pci-mem-dma-map/vfio-pci-mem-dma-map.c
+[4]: https://lore.kernel.org/all/20250610031013.98556-1-lizhe.67@bytedance.com/
+
+Li Zhe (4):
+  vfio/type1: optimize vfio_pin_pages_remote() for large folios
+  vfio/type1: batch vfio_find_vpfn() in function
+    vfio_unpin_pages_remote()
+  vfio/type1: introduce a new member has_rsvd for struct vfio_dma
+  vfio/type1: optimize vfio_unpin_pages_remote() for large folio
+
+ drivers/vfio/vfio_iommu_type1.c | 121 ++++++++++++++++++++++++++------
+ 1 file changed, 100 insertions(+), 21 deletions(-)
+
+-- 
+2.20.1
 
 
