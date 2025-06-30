@@ -1,226 +1,1066 @@
-Return-Path: <kvm+bounces-51123-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51128-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6D2FAEEA55
-	for <lists+kvm@lfdr.de>; Tue,  1 Jul 2025 00:31:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 923ADAEEA7C
+	for <lists+kvm@lfdr.de>; Tue,  1 Jul 2025 00:33:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2B1B422474
-	for <lists+kvm@lfdr.de>; Mon, 30 Jun 2025 22:30:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A33F160DF7
+	for <lists+kvm@lfdr.de>; Mon, 30 Jun 2025 22:33:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADDCA2EE266;
-	Mon, 30 Jun 2025 22:28:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFD9C4502F;
+	Mon, 30 Jun 2025 22:32:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="LhvLfX7L"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="agTqe+vn"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2060.outbound.protection.outlook.com [40.107.243.60])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19F762EBDD7;
-	Mon, 30 Jun 2025 22:28:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.60
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751322537; cv=fail; b=clrJfbQRhHbpe65Eidp9xklDA2830dwU8C7OM3Ocgk86dQNq89p3E0weoruO5CqXJoTo8j8IdzhUy3so9B72Z4IFSuiJBsejtb/L6E0MYj7mcSr6pA3z1J5Rd7gESXcC8MGRn5tPY4Zb3XyyHbRqXsaBpOePGTEuxdj0QjZbmM8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751322537; c=relaxed/simple;
-	bh=ddHtrLaS0touooPDS+6DUzzvL3mROYftIQly382dofs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=sagyjlF6imfQLNoBWbyZL91Qa02pihdoJwMK4DqZRc/0IbQ77Sg+5F5e2PbvNYA3HBmSTDAhHi651I/5HJn66oOUH8vKPKmBdJvLzDIslLi9sc0NPic6yDCfbS8tzRG2rwG84Fi3nWYdz4MthuzkeeenktqmhWv+Eym+xyqMlbI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=LhvLfX7L; arc=fail smtp.client-ip=40.107.243.60
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=l2debKqN3yF516MWJl2VxoiueE4wVjR4W4GGYe8+3T41/d+xok4e79DH1xJq4n/fHJKv2AXpSeFtIfzHvcA0+YoLoqcyqNOuWusPYmCDwXpQHx77NG6YIwIB95aEfm5efIrA8Ew4DnLp1n1K1wRzpMMaZ/GDruWpPE3R6zba4nq8g6v1uuka+QD92inONhsR+rvulSkAVJy4yFDIDHSkOzgV0hp6tLrhmaQyfiW3YwlBYIIYr5meXNP8P084pyf5bnX7m1rMg0U1hfCaUr/y67kk7Uu/5rdATTA3eQA4iBXeooHorViWdwq2MPVwZGtAxFrmi7t957Q/VMA1csXqGw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qAp5CTxqFxnpXliQlWWAenq4OuUaQH9PBpU3xijZBXU=;
- b=YJ258MuQqairHHSWDCoFBkhpdqbIArstJkzpLUgNYFiusEPMvvAsCZjJSRCkVMDyvIMa4q2Pbn0KbqXNox/DCZBGOyu6iLjf+anzPEhzAGTzkYIlRdA9+/mpZSYTVS5d1kyCWFTz9Y5zME6WHLh/pi91Vgdr1oTxiWnDPnssyZoOKNtjhvcYaIFhAJV2vyjVt/0v8TawffUKTM24dMIEthxIVoxcvkefeXxs2DXcPS0XVcp9NLlA9Q9sC7KQdLP7d1kr8REMm/LlDkH4g33Wtwl7IFGTGgtTX2bZRbJs80RKpWrW4NRMTMNJEC8q9Ylptg1f+pT7NHUWvbksiKYCAA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qAp5CTxqFxnpXliQlWWAenq4OuUaQH9PBpU3xijZBXU=;
- b=LhvLfX7LDhHXRmD1pjzycDq0x5GvZL/wje+iU2VehRRSPpPQx7TPASrPZJCF7gkl+WdkxgE5qNDMmNJPJZe2VXZwKi03Tu0A0K5JCH+SFh2x3SynL8ygsN9Yi0v3k/QrcNtl8cGXbu4Lt7El+x5nZEb2hGH+bQiTCyEH/3lOA95kxVRo4s5fiOz0rqpTQ7RVYL4zgYl2W4R5RBTTn8OdLNkN+Q0s+SpeilIPtll+TuDLLJGIjInqD+RvET6tKmToTCO/YzzhLxSCrnUhyHSFlAGvfoYsWzwwh3NNVOcJrp0q1DICr8EwvjwTHAM4MXyuTF/1d5hmqzi1U7v6Glun1Q==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
- by MN6PR12MB8566.namprd12.prod.outlook.com (2603:10b6:208:47c::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8880.25; Mon, 30 Jun
- 2025 22:28:47 +0000
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732%7]) with mapi id 15.20.8880.030; Mon, 30 Jun 2025
- 22:28:47 +0000
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Bjorn Helgaas <bhelgaas@google.com>,
-	iommu@lists.linux.dev,
-	Joerg Roedel <joro@8bytes.org>,
-	linux-pci@vger.kernel.org,
-	Robin Murphy <robin.murphy@arm.com>,
-	Will Deacon <will@kernel.org>
-Cc: Alex Williamson <alex.williamson@redhat.com>,
-	Lu Baolu <baolu.lu@linux.intel.com>,
-	galshalom@nvidia.com,
-	Joerg Roedel <jroedel@suse.de>,
-	Kevin Tian <kevin.tian@intel.com>,
-	kvm@vger.kernel.org,
-	maorg@nvidia.com,
-	patches@lists.linux.dev,
-	tdave@nvidia.com,
-	Tony Zhu <tony.zhu@intel.com>
-Subject: [PATCH 11/11] PCI: Check ACS Extended flags for pci_bus_isolated()
-Date: Mon, 30 Jun 2025 19:28:41 -0300
-Message-ID: <11-v1-74184c5043c6+195-pcie_switch_groups_jgg@nvidia.com>
-In-Reply-To: <0-v1-74184c5043c6+195-pcie_switch_groups_jgg@nvidia.com>
-References:
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: BYAPR01CA0069.prod.exchangelabs.com (2603:10b6:a03:94::46)
- To CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CC04285067
+	for <kvm@vger.kernel.org>; Mon, 30 Jun 2025 22:32:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751322750; cv=none; b=WHY1J8v+ZIsgwxx/Vw4Vz0cL5Vs6GrHhoyV9CjPtk3+9V9VAxCrKoWa/TMCa5IXP5/1odreVOG+Zq4REhO4fIOrcNeHBvWEEQmFGahRdMf4dsBR2hWGdWXEYMCq5CWQhPkOKpbi8VrBZ+f5o82fGjizU/aZaFY1fHwtK9AjuGXc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751322750; c=relaxed/simple;
+	bh=3tovrY5yKZBbH5I9F1Po9ZrebGuoeoO9QB0iEuedmH8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZHvmx9jQO+ZwYSzmH8SV8i4WnRoMJvOHOsfcsvewZw/1aO3DA72SY/PP9u+bbaxPvfOZU8Vg6QGtjzeE681J3yE1/E/Qyi8NiSzeBMexrjnfSGsjf8KAKKaOPOX8tfqiyhgU34k1IiBOm+dXHyYjJodkAGgIknTInF27+2D91zA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=agTqe+vn; arc=none smtp.client-ip=209.85.160.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-4a58c2430edso53588281cf.1
+        for <kvm@vger.kernel.org>; Mon, 30 Jun 2025 15:32:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1751322746; x=1751927546; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=HkfXz23P2NxxAkW5kwQRZc4kQCoKk3H+dWLfQ+AZFrg=;
+        b=agTqe+vnfYF2fyfn4jUrsR2AzCz5ErveuF+GCiDQcioWcwwQuJIBg83Sc7N6nqYScR
+         IMWOnmcsrY6trxVHfrZ1ObumV2KH8LvQWEc4EjCuXtNsH6sbbc7F4nAT5zOymgVuvaxT
+         LAbXaQ2o7zB7mj2B1TH/BqSkX9mPejUuJjugxkDgAHIWMflgSfwcRUNaPMK3iDnYPBmA
+         z5MPLPv3Ovhlt7jme0crz0J2g6shSRGCi91JWYAf7sSNVmCbWLQ7yx+EmvW9MMHfPlvH
+         evj4hQQFXTNVBl4qjqOckOIq6pVDVfS8FWzkl5fh/Rj6UczObIdEWeW3eHWIs5fKIArP
+         lDRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751322746; x=1751927546;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HkfXz23P2NxxAkW5kwQRZc4kQCoKk3H+dWLfQ+AZFrg=;
+        b=RTDHJzLZoSkRgBNkzZ+fmBVSV9iqZ/kle1Mtp7Phslt32TL2r4N718KdK5tzY+t/u1
+         7l3ZoDZKHsErFKaPHfbnrt9JUZIp+bYf/dcc3qSwScw0NeGGRrpoaFrkycu+WAx6ILHG
+         PwJQU0fvlhPiBBc8glPudcOCHmFdxAC5k1uCi44nuzl905Qx0k2p1hhLyPTq9BW9/XNX
+         l7Mqwu6bMwVJTxsTL3xNLGjTN3WT6sJsNmn5YJL5b+QCJy9oXO470fXiLmAmJZLgaBhj
+         8QfcrT4L9xNUhfIYkc3o2AhbpA/KgTE1bELQNRbLkZmUyNW2k7BzHGewYoIz/BYQGMbS
+         rkTg==
+X-Gm-Message-State: AOJu0Yw28Muriwxie1Fq+JhNChg6/++DPTWNXIK26w3i5ZVb8yUcUS2o
+	XldvUCC7NxcgqrSEPOxKIqjM2X5qkQyelZSQelAzgiFbdQxFuN4A8e5MRhBEyU+Td2AWevuddE9
+	W/ZYR
+X-Gm-Gg: ASbGnctTM8opTnDNsWrF4k7yY3EXJLgIWHd1/Jahfu6YQ2FpVroNersmsTGc98JP6BS
+	Ngfs2gWF3iF74Ctlp9GUsmd+7ZyXGsfFVS9eyQZQpcb8f/OoUxOSCe8Y9DWtWU7+aLZ2ZIN1PsF
+	ueR6eo89g8LTIZD+xjf5ONhhNjD4Ufy8iBLRtac8BeW+YjTuafuhAMlx3MoRBxDVuwgmJih1q3l
+	8+pu07r4e+nm8N7S40DzX+taVkG2ftvywENADlJvffEOi5S1ZAsDZQuroHrdHdPnCp3rIUF/fet
+	A1VgkoinpxosADN1MUisHoLNxEYr8IAW1BW39QC8j7/BWVxeGzdI0zm8SWVpep1dOkhairOQCzk
+	=
+X-Google-Smtp-Source: AGHT+IGskFVjBdVbQWJyJ5GYDPQn++PBPr5Om9rhrpa5ousdCvUPtSOkx3QHbJBv+fb3V2P40gg4Gg==
+X-Received: by 2002:a05:622a:424c:b0:494:7043:8a2 with SMTP id d75a77b69052e-4a82eab42c4mr23695661cf.16.1751322744870;
+        Mon, 30 Jun 2025 15:32:24 -0700 (PDT)
+Received: from jesse-lt.ba.rivosinc.com ([96.224.57.66])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4a7fc5ad3dcsm66857691cf.80.2025.06.30.15.32.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Jun 2025 15:32:24 -0700 (PDT)
+From: Jesse Taube <jesse@rivosinc.com>
+To: kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org,
+	linux-kselftest@vger.kernel.org
+Cc: Atish Patra <atish.patra@linux.dev>,
+	Anup Patel <anup@brainfault.org>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	=?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <cleger@rivosinc.com>,
+	Himanshu Chauhan <hchauhan@ventanamicro.com>,
+	Charlie Jenkins <charlie@rivosinc.com>,
+	Jesse Taube <jesse@rivosinc.com>,
+	Andrew Jones <andrew.jones@linux.dev>
+Subject: [kvm-unit-tests PATCH v7] riscv: sbi: Add SBI Debug Triggers Extension tests
+Date: Mon, 30 Jun 2025 15:32:23 -0700
+Message-ID: <20250630223224.1235132-1-jesse@rivosinc.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|MN6PR12MB8566:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7cbf6835-270a-4f81-4972-08ddb8257aad
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?0kvSv4AxpMVPq05FW/xoef9qEVYtjSm5XXiAznSAB2u2mzbj7N9wX/+4PTDK?=
- =?us-ascii?Q?5PmC/Kb0zf8Wpzqzq5qHd+zcjCKVV5E9bLUzXdws1Dst3h310ZvONK4puMjK?=
- =?us-ascii?Q?vJl8PDKJSsb4r9by7pEBWF2lOYGabOA9P4XEmfHZnRcLOwFe6CbnY4WpEBT7?=
- =?us-ascii?Q?18c4bywC+AruY1d4GpsnGm+UEpMJfp4hh0eU5zIqJ/khxNgJvYgZXZnG5ceo?=
- =?us-ascii?Q?fwodmT8eyMqmF2RjT0JwXEnepOgv2ZQ5V+0s16a/NcRm7kSgIneRLEgt9n+/?=
- =?us-ascii?Q?iTbESfQVga0QOLyxiQ69DccOqGtRl7wQ9WZn1jcnoIoQowy4/qIfKWCo2Niy?=
- =?us-ascii?Q?9x9yEwALefG+1j8ckY2HlVr7y4gEB+W3wa0Ui3T2oqPp/OiG1nB5uiR7pAim?=
- =?us-ascii?Q?9kNC7fo0VtP6iVlXc3JY7ENpicDShn6HMSCl3Y3Vw+4Q45c7FdsXkvAw5tJj?=
- =?us-ascii?Q?O8af5JO9E09h6MvpqhhlrcT5vBPm0lC35cWcQ22ddN8ErIdpe/7Wxi5jI/G1?=
- =?us-ascii?Q?6K8lNkwUZ9waMTIg7fQZUZ5sPwDB0M6nobIBum0rNnNrkKC0BHcPe5BH9533?=
- =?us-ascii?Q?iUZRCthIVc1G3tCjZOvCc9A+GO2JHLnaw1cY9oDwFSk/ebvAPoNm9t419U0x?=
- =?us-ascii?Q?wnywZRYpj8ds2pYqh/I8Q3fI7ajfjjNEg78ZyR8QzlCithhWXvg+xFMcTJtc?=
- =?us-ascii?Q?Dei4ktLOKrLJZ5bLsUKNWwGM8sPL0IJSO4jHJw8mZ1SiD5HeJI6e2qhZ9PRO?=
- =?us-ascii?Q?pUTw71Sg4B0j16ScGIRr9SgW/ukIaDkn3oo2P/qc26GNA+Nf7oE956mIlmMp?=
- =?us-ascii?Q?RG7ouJttVmpslMLzi5zv8o3WvBYG4dHKtbDjQV0q9lz9C06qTMdE2JBD1gx3?=
- =?us-ascii?Q?cbjmJeYH4D/dxD2cQwDLtMk+G8bzlPKR8dAyiAZD7/xvhleXlOwKw0lp9nZq?=
- =?us-ascii?Q?/UA07IbkfPKkqU3gp1QS7txjnZbWjZ7UaefxkbbxWW/UzkV23LpowpHWxgd5?=
- =?us-ascii?Q?jjvrfj/ntnXsEjv01tjEmMAZlwXraCUh/7Fi0r8iCzyLv8WUb7V3CHrU1b9Q?=
- =?us-ascii?Q?XMLr9laywkTEMFHSIhZtcf1D+Y5QBg4EBbHDE/vW5DOfgvEoOTsXmC223rB7?=
- =?us-ascii?Q?HRB8Lr/scWt1c+7CO9qaf6Ad2P/DntMB91DQQASGYBMaas2p2B1UP8nX4HFf?=
- =?us-ascii?Q?hpcvYNblJsyO0h9b/ML//xyPXE4AvACOlEv+dyNITCAEvFe2sRs3uxO2l51f?=
- =?us-ascii?Q?vfwPNUmUsWfTzoQaVFoAHXhUZmjZ1PaFZnCIXO7lXfYQKywDwaX2Yz1ZdiYx?=
- =?us-ascii?Q?kUAVJNOfYQkDXvHhw7Styr3tuHb/rXd+pkrNfYthkQzBCz5QvCDbN36DveqH?=
- =?us-ascii?Q?SQKmkqvuguY+q9idZXdqT5GpfrElAskFReU411TSTAeezJ/Q0A=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?UksA9Rg8FrxFm+mqjnZdmXhthRiApg9Y8Vzz3OpZT2uzTKKZHPZAIr2WkJuV?=
- =?us-ascii?Q?/bdbQlfokDksmf1jQcpGkRlEHd8Z4dfzJpyRyloPUdOxT8O1KuFOxfmV7M6U?=
- =?us-ascii?Q?c2XN8YE+om+YIDmXQtoLfVC1xoDFD3EpEb8UpXx26jmQ9AZ1bL8uzvyvw2Qu?=
- =?us-ascii?Q?Yo033voviJ3WWTXt+eNFrhVsFX1AwkHhdj0SDR/9KKey0SXRrzdCtnwNiql5?=
- =?us-ascii?Q?4yiaPEG4LqEWYYNfF4UyYfdfJLVp2f72tVFPjc1ftsgvhILC9C+cmM0pcZ2a?=
- =?us-ascii?Q?yiZ6Whh62EbKg6rIIWqJgxbz/bC0xzIg3rX4QKDagamu8VaucgOgcQYq/oQw?=
- =?us-ascii?Q?SNFs/R5a8bYVYeakvJ4zmFXSaheB9tUKfN/qe8gLSyekl1pFAjDaQV9XEedo?=
- =?us-ascii?Q?e0vF0/VGAsMvQUfVjX3kucfCW8MQrM4x0OnijDKJsIMGHM3wgVTQR7psqsFz?=
- =?us-ascii?Q?tgpF1pzflzT5Xn7Y9gu9WdfJaA0qyJb+lE8+joodMOsbO+YoLF36v6cGYb5g?=
- =?us-ascii?Q?Xr0rsLhCOKmTokPag2rUhHM2vqYa3z81430h2eghsEQKSttHfoUCh71Q1C4o?=
- =?us-ascii?Q?SckXNrfS4snEqEZQhropdol52PGo+kurdBoO7wnnnBXpGrcRZIpQvrQZbs4d?=
- =?us-ascii?Q?nnY5y7LawLzc2O/pANdxZ1ir5CYx2lwbcQ4bLJYlzjQlBYFaJqjbeQPe4pI7?=
- =?us-ascii?Q?yUYMW1FaGm8G9ZVpA1/qdIpBzDXcHMSxaR8Vb8upcANRaRK8uPjhfq724cAS?=
- =?us-ascii?Q?EhXZ+yZDH5/7zMfbZVEh0eEbgucQsjXOct1zroEYdDfHoB04fhrins8oMOQt?=
- =?us-ascii?Q?mG4OeuR23Vc3QhU0yW9JXa/ikT5wnnsm6Di/DivLFrgOkwrIMTvf3OAi5Nt7?=
- =?us-ascii?Q?w0lb0oK4hsmccYgOwJk3517SSigIKj+/tA/bz2tGJGatLcw7j+S18GGUjlJg?=
- =?us-ascii?Q?i4/ResFaUxzEvT+EAXZLcSFgCJqwY2g0/77vAYeTtBT5qL0lxy0OmFFqKboP?=
- =?us-ascii?Q?1hFMlA5h+BavDXNWfwwhIqEi8lew3BxrGQaqb27okSo9UJxf6K/V/Brby8xo?=
- =?us-ascii?Q?nK29TozIdY4Icw5ee3ltwGjJBWJ2SObPI4jZ1TJv7GoWC4JTM8oxZNke6p6R?=
- =?us-ascii?Q?fG/kNgvWg3XQCj2ikrsFehySkON0r37ZNrB5ScZ1FeTPK3amjaQ0y5DqIbQ9?=
- =?us-ascii?Q?OhOkWU6MaXvHFENfHndUYBcQONec3kkAmWbchUtshr6TwOVgv0fBEVDZQP2L?=
- =?us-ascii?Q?ecc69XhI0Wdbe+ATfdhjmh19o0JaC9q8A5ROiBv37SJATPsaZTnLsqruA9Z4?=
- =?us-ascii?Q?dIvs+4RaJbyL0mxy1gfNrZ8Y1LKbTMvYjRFmLt1ZUNgmFrQymgQgOjjlD5AS?=
- =?us-ascii?Q?dj5ZZ92qeD8qrlQLD4V6VSwLuhgV55mtPAkx3mLp6au5P8GZeo1kf1+ZIa4Q?=
- =?us-ascii?Q?6i6WKbw2rgAxWw2luL2xSL10ykKtm+WOcoBIRi4zxZiaOi8HDgKs9pvRJuxh?=
- =?us-ascii?Q?yT5oCgDhS0OoXx5KnkKbho/Jq/iz06TP/86HR06nhc/NfjkT3em2nan5sbqK?=
- =?us-ascii?Q?t2Yig77+Jctk8QKECrvU6gn2L1o0upiMwq5DUXB0?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7cbf6835-270a-4f81-4972-08ddb8257aad
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jun 2025 22:28:47.1620
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: C90QvMkRLncBiqV8Rm6+L0/qa269nRJFQ2EeqMGgpsSsOsvDJv15c+qhT/cVpx/+
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN6PR12MB8566
+Content-Transfer-Encoding: 8bit
 
-When looking at a PCIe switch we want to see that the USP/DSP MMIO have
-request redirect enabled. Detect the case where the USP is expressly not
-isolated from the DSP and ensure the USP is included in the group.
+Add tests for the DBTR SBI extension.
 
-The DSP Memory Target also applies to the Root Port, check it there
-too. If upstream directed transactions can reach the root port MMIO then
-it is not isolated.
-
-Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+Signed-off-by: Jesse Taube <jesse@rivosinc.com>
+Reviewed-by: Charlie Jenkins <charlie@rivosinc.com>
+Tested-by: Charlie Jenkins <charlie@rivosinc.com>
 ---
- drivers/pci/search.c | 16 +++++++++++++---
- 1 file changed, 13 insertions(+), 3 deletions(-)
+V1 -> V2:
+ - Call report_prefix_pop before returning
+ - Disable compressed instructions in exec_call, update related comment
+ - Remove extra "| 1" in dbtr_test_load
+ - Remove extra newlines
+ - Remove extra tabs in check_exec
+ - Remove typedefs from enums
+ - Return when dbtr_install_trigger fails
+ - s/avalible/available/g
+ - s/unistall/uninstall/g
+V2 -> V3:
+ - Change SBI_DBTR_SHMEM_INVALID_ADDR to -1UL
+ - Move all dbtr functions to sbi-dbtr.c
+ - Move INSN_LEN to processor.h
+ - Update include list
+ - Use C-style comments
+V3 -> V4:
+ - Include libcflat.h
+ - Remove #define SBI_DBTR_SHMEM_INVALID_ADDR
+V4 -> V5:
+ - Sort includes
+ - Add kfail for update triggers
+V5 -> V6:
+ - Add assert in gen_tdata1
+ - Add prefix to dbtr_test_type
+ - Add TRIG_STATE_DMODE
+ - Add TRIG_STATE_RESERVED
+ - Align function paramaters with opening parenthesis
+ - Change OpenSBI < v1.7 to < v1.5
+ - Constantly use spaces in prefix rather than _
+ - Export split_phys_addr
+ - Fix MCONTROL_U and MCONTROL_M mix up
+ - Fix swapped VU and VS
+ - Move /* to own line
+ - Print type in dbtr_test_type
+ - Remove _BIT suffix from macros
+ - Remove duplicate MODE_S
+ - Remove spaces before include
+ - Rename tdata1,2 to trigger and control in dbtr_install_trigger
+ - Report skip in dbtr_test_multiple
+ - Report variables in info not pass or fail
+ - s/save/store/g
+ - sbi_debug_set_shmem use split_phys_addr
+ - Use if (!report(... in dbtr_test_disable_enable
+V6 -> V7:
+ - Alphabetize Makefile
+ - Only print read info on failure
+ - Remove return after assert
+ - Remove unnecessary OpenSBI version check
+ - Rename error to exit_test in check_dbtr
+ - Use prefix in dbtr_test_num_triggers and dbtr_test_type
+---
+ lib/riscv/asm/sbi.h |   1 +
+ riscv/Makefile      |   1 +
+ riscv/sbi-dbtr.c    | 834 ++++++++++++++++++++++++++++++++++++++++++++
+ riscv/sbi-tests.h   |   2 +
+ riscv/sbi.c         |   3 +-
+ 5 files changed, 840 insertions(+), 1 deletion(-)
+ create mode 100644 riscv/sbi-dbtr.c
 
-diff --git a/drivers/pci/search.c b/drivers/pci/search.c
-index 3bc20659af6b20..779c5979443def 100644
---- a/drivers/pci/search.c
-+++ b/drivers/pci/search.c
-@@ -127,6 +127,8 @@ static enum pci_bus_isolation pcie_switch_isolated(struct pci_bus *bus)
- 	 * traffic flowing upstream back downstream through another DSP.
- 	 *
- 	 * Thus any non-permissive DSP spoils the whole bus.
-+	 * PCI_ACS_UNCLAIMED_RR is not required since rejecting requests with
-+	 * error is still isolation.
- 	 */
- 	guard(rwsem_read)(&pci_bus_sem);
- 	list_for_each_entry(pdev, &bus->devices, bus_list) {
-@@ -136,8 +138,14 @@ static enum pci_bus_isolation pcie_switch_isolated(struct pci_bus *bus)
- 		    pdev->dma_alias_mask)
- 			return PCIE_NON_ISOLATED;
+diff --git a/lib/riscv/asm/sbi.h b/lib/riscv/asm/sbi.h
+index a5738a5c..78fd6e2a 100644
+--- a/lib/riscv/asm/sbi.h
++++ b/lib/riscv/asm/sbi.h
+@@ -51,6 +51,7 @@ enum sbi_ext_id {
+ 	SBI_EXT_SUSP = 0x53555350,
+ 	SBI_EXT_FWFT = 0x46574654,
+ 	SBI_EXT_SSE = 0x535345,
++	SBI_EXT_DBTR = 0x44425452,
+ };
  
--		if (!pci_acs_enabled(pdev, PCI_ACS_ISOLATED))
-+		if (!pci_acs_enabled(pdev, PCI_ACS_ISOLATED |
-+						   PCI_ACS_DSP_MT_RR |
-+						   PCI_ACS_USP_MT_RR)) {
-+			/* The USP is isolated from the DSP */
-+			if (!pci_acs_enabled(pdev, PCI_ACS_USP_MT_RR))
-+				return PCIE_NON_ISOLATED;
- 			return PCIE_SWITCH_DSP_NON_ISOLATED;
-+		}
- 	}
- 	return PCIE_ISOLATED;
+ enum sbi_ext_base_fid {
+diff --git a/riscv/Makefile b/riscv/Makefile
+index 11e68eae..9309ac12 100644
+--- a/riscv/Makefile
++++ b/riscv/Makefile
+@@ -18,6 +18,7 @@ tests += $(TEST_DIR)/sieve.$(exe)
+ all: $(tests)
+ 
+ $(TEST_DIR)/sbi-deps += $(TEST_DIR)/sbi-asm.o
++$(TEST_DIR)/sbi-deps += $(TEST_DIR)/sbi-dbtr.o
+ $(TEST_DIR)/sbi-deps += $(TEST_DIR)/sbi-fwft.o
+ $(TEST_DIR)/sbi-deps += $(TEST_DIR)/sbi-sse.o
+ 
+diff --git a/riscv/sbi-dbtr.c b/riscv/sbi-dbtr.c
+new file mode 100644
+index 00000000..71ffcd32
+--- /dev/null
++++ b/riscv/sbi-dbtr.c
+@@ -0,0 +1,834 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * SBI DBTR testsuite
++ *
++ * Copyright (C) 2025, Rivos Inc., Jesse Taube <jesse@rivosinc.com>
++ */
++
++#include <libcflat.h>
++#include <bitops.h>
++
++#include <asm/io.h>
++#include <asm/processor.h>
++
++#include "sbi-tests.h"
++
++#define RV_MAX_TRIGGERS			32
++
++#define SBI_DBTR_TRIG_STATE_MAPPED		BIT(0)
++#define SBI_DBTR_TRIG_STATE_U			BIT(1)
++#define SBI_DBTR_TRIG_STATE_S			BIT(2)
++#define SBI_DBTR_TRIG_STATE_VU			BIT(3)
++#define SBI_DBTR_TRIG_STATE_VS			BIT(4)
++#define SBI_DBTR_TRIG_STATE_HAVE_HW_TRIG	BIT(5)
++#define SBI_DBTR_TRIG_STATE_RESERVED		GENMASK(7, 6)
++
++#define SBI_DBTR_TRIG_STATE_HW_TRIG_IDX_SHIFT		8
++#define SBI_DBTR_TRIG_STATE_HW_TRIG_IDX(trig_state)	(trig_state >> SBI_DBTR_TRIG_STATE_HW_TRIG_IDX_SHIFT)
++
++#define SBI_DBTR_TDATA1_TYPE_SHIFT		(__riscv_xlen - 4)
++#define SBI_DBTR_TDATA1_DMODE			BIT_UL(__riscv_xlen - 5)
++
++#define SBI_DBTR_TDATA1_MCONTROL6_LOAD		BIT(0)
++#define SBI_DBTR_TDATA1_MCONTROL6_STORE		BIT(1)
++#define SBI_DBTR_TDATA1_MCONTROL6_EXECUTE	BIT(2)
++#define SBI_DBTR_TDATA1_MCONTROL6_U		BIT(3)
++#define SBI_DBTR_TDATA1_MCONTROL6_S		BIT(4)
++#define SBI_DBTR_TDATA1_MCONTROL6_M		BIT(6)
++#define SBI_DBTR_TDATA1_MCONTROL6_SELECT	BIT(21)
++#define SBI_DBTR_TDATA1_MCONTROL6_VU		BIT(23)
++#define SBI_DBTR_TDATA1_MCONTROL6_VS		BIT(24)
++
++#define SBI_DBTR_TDATA1_MCONTROL_LOAD		BIT(0)
++#define SBI_DBTR_TDATA1_MCONTROL_STORE		BIT(1)
++#define SBI_DBTR_TDATA1_MCONTROL_EXECUTE	BIT(2)
++#define SBI_DBTR_TDATA1_MCONTROL_U		BIT(3)
++#define SBI_DBTR_TDATA1_MCONTROL_S		BIT(4)
++#define SBI_DBTR_TDATA1_MCONTROL_M		BIT(6)
++#define SBI_DBTR_TDATA1_MCONTROL_SELECT		BIT(19)
++
++enum McontrolType {
++	SBI_DBTR_TDATA1_TYPE_NONE =		(0UL << SBI_DBTR_TDATA1_TYPE_SHIFT),
++	SBI_DBTR_TDATA1_TYPE_LEGACY =		(1UL << SBI_DBTR_TDATA1_TYPE_SHIFT),
++	SBI_DBTR_TDATA1_TYPE_MCONTROL =		(2UL << SBI_DBTR_TDATA1_TYPE_SHIFT),
++	SBI_DBTR_TDATA1_TYPE_ICOUNT =		(3UL << SBI_DBTR_TDATA1_TYPE_SHIFT),
++	SBI_DBTR_TDATA1_TYPE_ITRIGGER =		(4UL << SBI_DBTR_TDATA1_TYPE_SHIFT),
++	SBI_DBTR_TDATA1_TYPE_ETRIGGER =		(5UL << SBI_DBTR_TDATA1_TYPE_SHIFT),
++	SBI_DBTR_TDATA1_TYPE_MCONTROL6 =	(6UL << SBI_DBTR_TDATA1_TYPE_SHIFT),
++	SBI_DBTR_TDATA1_TYPE_TMEXTTRIGGER =	(7UL << SBI_DBTR_TDATA1_TYPE_SHIFT),
++	SBI_DBTR_TDATA1_TYPE_RESERVED0 =	(8UL << SBI_DBTR_TDATA1_TYPE_SHIFT),
++	SBI_DBTR_TDATA1_TYPE_RESERVED1 =	(9UL << SBI_DBTR_TDATA1_TYPE_SHIFT),
++	SBI_DBTR_TDATA1_TYPE_RESERVED2 =	(10UL << SBI_DBTR_TDATA1_TYPE_SHIFT),
++	SBI_DBTR_TDATA1_TYPE_RESERVED3 =	(11UL << SBI_DBTR_TDATA1_TYPE_SHIFT),
++	SBI_DBTR_TDATA1_TYPE_CUSTOM0 =		(12UL << SBI_DBTR_TDATA1_TYPE_SHIFT),
++	SBI_DBTR_TDATA1_TYPE_CUSTOM1 =		(13UL << SBI_DBTR_TDATA1_TYPE_SHIFT),
++	SBI_DBTR_TDATA1_TYPE_CUSTOM2 =		(14UL << SBI_DBTR_TDATA1_TYPE_SHIFT),
++	SBI_DBTR_TDATA1_TYPE_DISABLED =		(15UL << SBI_DBTR_TDATA1_TYPE_SHIFT),
++};
++
++enum Tdata1Value {
++	VALUE_NONE =	0,
++	VALUE_LOAD =	BIT(0),
++	VALUE_STORE =	BIT(1),
++	VALUE_EXECUTE =	BIT(2),
++};
++
++enum Tdata1Mode {
++	MODE_NONE =	0,
++	MODE_M =	BIT(0),
++	MODE_U =	BIT(1),
++	MODE_S =	BIT(2),
++	MODE_VU =	BIT(3),
++	MODE_VS =	BIT(4),
++};
++
++enum sbi_ext_dbtr_fid {
++	SBI_EXT_DBTR_NUM_TRIGGERS = 0,
++	SBI_EXT_DBTR_SETUP_SHMEM,
++	SBI_EXT_DBTR_TRIGGER_READ,
++	SBI_EXT_DBTR_TRIGGER_INSTALL,
++	SBI_EXT_DBTR_TRIGGER_UPDATE,
++	SBI_EXT_DBTR_TRIGGER_UNINSTALL,
++	SBI_EXT_DBTR_TRIGGER_ENABLE,
++	SBI_EXT_DBTR_TRIGGER_DISABLE,
++};
++
++struct sbi_dbtr_data_msg {
++	unsigned long tstate;
++	unsigned long tdata1;
++	unsigned long tdata2;
++	unsigned long tdata3;
++};
++
++struct sbi_dbtr_id_msg {
++	unsigned long idx;
++};
++
++/* SBI shared mem messages layout */
++struct sbi_dbtr_shmem_entry {
++	union {
++		struct sbi_dbtr_data_msg data;
++		struct sbi_dbtr_id_msg id;
++	};
++};
++
++static bool dbtr_handled;
++
++/* Expected to be leaf function as not to disrupt frame-pointer */
++static __attribute__((naked)) void exec_call(void)
++{
++	/* skip over nop when triggered instead of ret. */
++	asm volatile (".option push\n"
++		      ".option arch, -c\n"
++		      "nop\n"
++		      "ret\n"
++		      ".option pop\n");
++}
++
++static void dbtr_exception_handler(struct pt_regs *regs)
++{
++	dbtr_handled = true;
++
++	/* Reading *epc may cause a fault, skip over nop */
++	if ((void *)regs->epc == exec_call) {
++		regs->epc += 4;
++		return;
++	}
++
++	/* WARNING: Skips over the trapped intruction */
++	regs->epc += RV_INSN_LEN(readw((void *)regs->epc));
++}
++
++static bool do_store(void *tdata2)
++{
++	bool ret;
++
++	writel(0, tdata2);
++
++	ret = dbtr_handled;
++	dbtr_handled = false;
++
++	return ret;
++}
++
++static bool do_load(void *tdata2)
++{
++	bool ret;
++
++	readl(tdata2);
++
++	ret = dbtr_handled;
++	dbtr_handled = false;
++
++	return ret;
++}
++
++static bool do_exec(void)
++{
++	bool ret;
++
++	exec_call();
++
++	ret = dbtr_handled;
++	dbtr_handled = false;
++
++	return ret;
++}
++
++static unsigned long gen_tdata1_mcontrol(enum Tdata1Mode mode, enum Tdata1Value value)
++{
++	unsigned long tdata1 = SBI_DBTR_TDATA1_TYPE_MCONTROL;
++
++	if (value & VALUE_LOAD)
++		tdata1 |= SBI_DBTR_TDATA1_MCONTROL_LOAD;
++
++	if (value & VALUE_STORE)
++		tdata1 |= SBI_DBTR_TDATA1_MCONTROL_STORE;
++
++	if (value & VALUE_EXECUTE)
++		tdata1 |= SBI_DBTR_TDATA1_MCONTROL_EXECUTE;
++
++	if (mode & MODE_M)
++		tdata1 |= SBI_DBTR_TDATA1_MCONTROL_M;
++
++	if (mode & MODE_U)
++		tdata1 |= SBI_DBTR_TDATA1_MCONTROL_U;
++
++	if (mode & MODE_S)
++		tdata1 |= SBI_DBTR_TDATA1_MCONTROL_S;
++
++	return tdata1;
++}
++
++static unsigned long gen_tdata1_mcontrol6(enum Tdata1Mode mode, enum Tdata1Value value)
++{
++	unsigned long tdata1 = SBI_DBTR_TDATA1_TYPE_MCONTROL6;
++
++	if (value & VALUE_LOAD)
++		tdata1 |= SBI_DBTR_TDATA1_MCONTROL6_LOAD;
++
++	if (value & VALUE_STORE)
++		tdata1 |= SBI_DBTR_TDATA1_MCONTROL6_STORE;
++
++	if (value & VALUE_EXECUTE)
++		tdata1 |= SBI_DBTR_TDATA1_MCONTROL6_EXECUTE;
++
++	if (mode & MODE_M)
++		tdata1 |= SBI_DBTR_TDATA1_MCONTROL6_M;
++
++	if (mode & MODE_U)
++		tdata1 |= SBI_DBTR_TDATA1_MCONTROL6_U;
++
++	if (mode & MODE_S)
++		tdata1 |= SBI_DBTR_TDATA1_MCONTROL6_S;
++
++	if (mode & MODE_VU)
++		tdata1 |= SBI_DBTR_TDATA1_MCONTROL6_VU;
++
++	if (mode & MODE_VS)
++		tdata1 |= SBI_DBTR_TDATA1_MCONTROL6_VS;
++
++	return tdata1;
++}
++
++static unsigned long gen_tdata1(enum McontrolType type, enum Tdata1Value value, enum Tdata1Mode mode)
++{
++	switch (type) {
++	case SBI_DBTR_TDATA1_TYPE_MCONTROL:
++		return gen_tdata1_mcontrol(mode, value);
++	case SBI_DBTR_TDATA1_TYPE_MCONTROL6:
++		return gen_tdata1_mcontrol6(mode, value);
++	default:
++		assert_msg(false, "Invalid mcontrol type: %lu", type);
++	}
++}
++
++static struct sbiret sbi_debug_num_triggers(unsigned long trig_tdata1)
++{
++	return sbi_ecall(SBI_EXT_DBTR, SBI_EXT_DBTR_NUM_TRIGGERS, trig_tdata1, 0, 0, 0, 0, 0);
++}
++
++static struct sbiret sbi_debug_set_shmem_raw(unsigned long shmem_phys_lo,
++					     unsigned long shmem_phys_hi,
++					     unsigned long flags)
++{
++	return sbi_ecall(SBI_EXT_DBTR, SBI_EXT_DBTR_SETUP_SHMEM, shmem_phys_lo,
++			 shmem_phys_hi, flags, 0, 0, 0);
++}
++
++static struct sbiret sbi_debug_set_shmem(void *shmem)
++{
++	unsigned long base_addr_lo, base_addr_hi;
++
++	split_phys_addr(virt_to_phys(shmem), &base_addr_hi, &base_addr_lo);
++	return sbi_debug_set_shmem_raw(base_addr_lo, base_addr_hi, 0);
++}
++
++static struct sbiret sbi_debug_read_triggers(unsigned long trig_idx_base,
++					     unsigned long trig_count)
++{
++	return sbi_ecall(SBI_EXT_DBTR, SBI_EXT_DBTR_TRIGGER_READ, trig_idx_base,
++			 trig_count, 0, 0, 0, 0);
++}
++
++static struct sbiret sbi_debug_install_triggers(unsigned long trig_count)
++{
++	return sbi_ecall(SBI_EXT_DBTR, SBI_EXT_DBTR_TRIGGER_INSTALL, trig_count, 0, 0, 0, 0, 0);
++}
++
++static struct sbiret sbi_debug_update_triggers(unsigned long trig_count)
++{
++	return sbi_ecall(SBI_EXT_DBTR, SBI_EXT_DBTR_TRIGGER_UPDATE, trig_count, 0, 0, 0, 0, 0);
++}
++
++static struct sbiret sbi_debug_uninstall_triggers(unsigned long trig_idx_base,
++						  unsigned long trig_idx_mask)
++{
++	return sbi_ecall(SBI_EXT_DBTR, SBI_EXT_DBTR_TRIGGER_UNINSTALL, trig_idx_base,
++			 trig_idx_mask, 0, 0, 0, 0);
++}
++
++static struct sbiret sbi_debug_enable_triggers(unsigned long trig_idx_base,
++					       unsigned long trig_idx_mask)
++{
++	return sbi_ecall(SBI_EXT_DBTR, SBI_EXT_DBTR_TRIGGER_ENABLE, trig_idx_base,
++			 trig_idx_mask, 0, 0, 0, 0);
++}
++
++static struct sbiret sbi_debug_disable_triggers(unsigned long trig_idx_base,
++						unsigned long trig_idx_mask)
++{
++	return sbi_ecall(SBI_EXT_DBTR, SBI_EXT_DBTR_TRIGGER_DISABLE, trig_idx_base,
++			 trig_idx_mask, 0, 0, 0, 0);
++}
++
++static bool dbtr_install_trigger(struct sbi_dbtr_shmem_entry *shmem, void *trigger,
++				 unsigned long control)
++{
++	struct sbiret sbi_ret;
++	bool ret;
++
++	shmem->data.tdata1 = control;
++	shmem->data.tdata2 = (unsigned long)trigger;
++
++	sbi_ret = sbi_debug_install_triggers(1);
++	ret = sbiret_report_error(&sbi_ret, SBI_SUCCESS, "sbi_debug_install_triggers");
++	if (ret)
++		install_exception_handler(EXC_BREAKPOINT, dbtr_exception_handler);
++
++	return ret;
++}
++
++static bool dbtr_uninstall_trigger(void)
++{
++	struct sbiret ret;
++
++	install_exception_handler(EXC_BREAKPOINT, NULL);
++
++	ret = sbi_debug_uninstall_triggers(0, 1);
++	return sbiret_report_error(&ret, SBI_SUCCESS, "sbi_debug_uninstall_triggers");
++}
++
++static unsigned long dbtr_test_num_triggers(void)
++{
++	struct sbiret ret;
++	unsigned long tdata1 = 0;
++	/* sbi_debug_num_triggers will return trig_max in sbiret.value when trig_tdata1 == 0 */
++
++	report_prefix_push("available triggers");
++
++	/* should be at least one trigger. */
++	ret = sbi_debug_num_triggers(tdata1);
++	sbiret_report_error(&ret, SBI_SUCCESS, "sbi_debug_num_triggers");
++
++	if (ret.value == 0) {
++		report_fail("Returned 0 triggers available");
++	} else {
++		report_pass("Returned triggers available");
++		report_info("Returned %lu triggers available", ret.value);
++	}
++
++	report_prefix_pop();
++	return ret.value;
++}
++
++static enum McontrolType dbtr_test_type(unsigned long *num_trig)
++{
++	struct sbiret ret;
++	unsigned long tdata1 = SBI_DBTR_TDATA1_TYPE_MCONTROL6;
++
++	report_prefix_push("test type");
++	report_prefix_push("sbi_debug_num_triggers");
++
++	ret = sbi_debug_num_triggers(tdata1);
++	sbiret_report_error(&ret, SBI_SUCCESS, "mcontrol6");
++	*num_trig = ret.value;
++	if (ret.value > 0) {
++		report_pass("Returned mcontrol6 triggers available");
++		report_info("Returned %lu mcontrol6 triggers available",
++			    ret.value);
++		report_prefix_popn(2);
++		return tdata1;
++	}
++
++	tdata1 = SBI_DBTR_TDATA1_TYPE_MCONTROL;
++
++	ret = sbi_debug_num_triggers(tdata1);
++	sbiret_report_error(&ret, SBI_SUCCESS, "mcontrol");
++	*num_trig = ret.value;
++	if (ret.value > 0) {
++		report_pass("Returned mcontrol triggers available");
++		report_info("Returned %lu mcontrol triggers available",
++			    ret.value);
++		report_prefix_popn(2);
++		return tdata1;
++	}
++
++	report_fail("Returned 0 mcontrol(6) triggers available");
++	report_prefix_popn(2);
++
++	return SBI_DBTR_TDATA1_TYPE_NONE;
++}
++
++static struct sbiret dbtr_test_store_install_uninstall(struct sbi_dbtr_shmem_entry *shmem,
++						      enum McontrolType type)
++{
++	static unsigned long test;
++	struct sbiret ret;
++
++	report_prefix_push("store trigger");
++
++	shmem->data.tdata1 = gen_tdata1(type, VALUE_STORE, MODE_S);
++	shmem->data.tdata2 = (unsigned long)&test;
++
++	ret = sbi_debug_install_triggers(1);
++	if (!sbiret_report_error(&ret, SBI_SUCCESS, "sbi_debug_install_triggers")) {
++		report_prefix_pop();
++		return ret;
++	}
++
++	install_exception_handler(EXC_BREAKPOINT, dbtr_exception_handler);
++
++	report(do_store(&test), "triggered");
++
++	if (do_load(&test))
++		report_fail("triggered by load");
++
++	ret = sbi_debug_uninstall_triggers(0, 1);
++	sbiret_report_error(&ret, SBI_SUCCESS, "sbi_debug_uninstall_triggers");
++
++	if (do_store(&test))
++		report_fail("triggered after uninstall");
++
++	install_exception_handler(EXC_BREAKPOINT, NULL);
++	report_prefix_pop();
++
++	return ret;
++}
++
++static void dbtr_test_update(struct sbi_dbtr_shmem_entry *shmem, enum McontrolType type)
++{
++	static unsigned long test;
++	struct sbiret ret;
++	bool kfail;
++
++	report_prefix_push("update trigger");
++
++	if (!dbtr_install_trigger(shmem, NULL, gen_tdata1(type, VALUE_NONE, MODE_NONE))) {
++		report_prefix_pop();
++		return;
++	}
++
++	shmem->id.idx = 0;
++	shmem->data.tdata1 = gen_tdata1(type, VALUE_STORE, MODE_S);
++	shmem->data.tdata2 = (unsigned long)&test;
++
++	ret = sbi_debug_update_triggers(1);
++	sbiret_report_error(&ret, SBI_SUCCESS, "sbi_debug_update_triggers");
++
++	/*
++	 * Known broken update_triggers.
++	 * https://lore.kernel.org/opensbi/aDdp1UeUh7GugeHp@ghost/T/#t
++	 */
++	kfail = __sbi_get_imp_id() == SBI_IMPL_OPENSBI &&
++		__sbi_get_imp_version() < sbi_impl_opensbi_mk_version(1, 7);
++	report_kfail(kfail, do_store(&test), "triggered");
++
++	dbtr_uninstall_trigger();
++	report_prefix_pop();
++}
++
++static void dbtr_test_load(struct sbi_dbtr_shmem_entry *shmem, enum McontrolType type)
++{
++	static unsigned long test;
++
++	report_prefix_push("load trigger");
++	if (!dbtr_install_trigger(shmem, &test, gen_tdata1(type, VALUE_LOAD, MODE_S))) {
++		report_prefix_pop();
++		return;
++	}
++
++	report(do_load(&test), "triggered");
++
++	if (do_store(&test))
++		report_fail("triggered by store");
++
++	dbtr_uninstall_trigger();
++	report_prefix_pop();
++}
++
++static void dbtr_test_disable_enable(struct sbi_dbtr_shmem_entry *shmem, enum McontrolType type)
++{
++	static unsigned long test;
++	struct sbiret ret;
++
++	report_prefix_push("disable trigger");
++	if (!dbtr_install_trigger(shmem, &test, gen_tdata1(type, VALUE_STORE, MODE_S))) {
++		report_prefix_pop();
++		return;
++	}
++
++	ret = sbi_debug_disable_triggers(0, 1);
++	sbiret_report_error(&ret, SBI_SUCCESS, "sbi_debug_disable_triggers");
++
++	if (!report(!do_store(&test), "should not trigger")) {
++		dbtr_uninstall_trigger();
++		report_prefix_pop();
++		report_skip("enable trigger: no disable");
++
++		return;
++	}
++
++	report_prefix_pop();
++	report_prefix_push("enable trigger");
++
++	ret = sbi_debug_enable_triggers(0, 1);
++	sbiret_report_error(&ret, SBI_SUCCESS, "sbi_debug_enable_triggers");
++
++	report(do_store(&test), "triggered");
++
++	dbtr_uninstall_trigger();
++	report_prefix_pop();
++}
++
++static void dbtr_test_exec(struct sbi_dbtr_shmem_entry *shmem, enum McontrolType type)
++{
++	static unsigned long test;
++
++	report_prefix_push("exec trigger");
++	/* check if loads and stores trigger exec */
++	if (!dbtr_install_trigger(shmem, &test, gen_tdata1(type, VALUE_EXECUTE, MODE_S))) {
++		report_prefix_pop();
++		return;
++	}
++
++	if (do_load(&test))
++		report_fail("triggered by load");
++
++	if (do_store(&test))
++		report_fail("triggered by store");
++
++	dbtr_uninstall_trigger();
++
++	/* Check if exec works */
++	if (!dbtr_install_trigger(shmem, exec_call, gen_tdata1(type, VALUE_EXECUTE, MODE_S))) {
++		report_prefix_pop();
++		return;
++	}
++	report(do_exec(), "triggered");
++
++	dbtr_uninstall_trigger();
++	report_prefix_pop();
++}
++
++static void dbtr_test_read(struct sbi_dbtr_shmem_entry *shmem, enum McontrolType type)
++{
++	const unsigned long tstatus_expected = SBI_DBTR_TRIG_STATE_S | SBI_DBTR_TRIG_STATE_MAPPED;
++	const unsigned long tdata1 = gen_tdata1(type, VALUE_STORE, MODE_S);
++	static unsigned long test;
++	struct sbiret ret;
++
++	report_prefix_push("read trigger");
++	if (!dbtr_install_trigger(shmem, &test, tdata1)) {
++		report_prefix_pop();
++		return;
++	}
++
++	ret = sbi_debug_read_triggers(0, 1);
++	sbiret_report_error(&ret, SBI_SUCCESS, "sbi_debug_read_triggers");
++
++	if (!report(shmem->data.tdata1 == tdata1, "tdata1 expected: 0x%016lx", tdata1))
++		report_info("tdata1 found: 0x%016lx", shmem->data.tdata1);
++	if (!report(shmem->data.tdata2 == ((unsigned long)&test), "tdata2 expected: 0x%016lx",
++		    (unsigned long)&test))
++		report_info("tdata2 found: 0x%016lx", shmem->data.tdata2);
++	if (!report(shmem->data.tstate == tstatus_expected, "tstate expected: 0x%016lx", tstatus_expected))
++		report_info("tstate found: 0x%016lx", shmem->data.tstate);
++
++	dbtr_uninstall_trigger();
++	report_prefix_pop();
++}
++
++static void check_exec(unsigned long base)
++{
++	struct sbiret ret;
++
++	report(do_exec(), "exec triggered");
++
++	ret = sbi_debug_uninstall_triggers(base, 1);
++	sbiret_report_error(&ret, SBI_SUCCESS, "sbi_debug_uninstall_triggers");
++}
++
++static void dbtr_test_multiple(struct sbi_dbtr_shmem_entry *shmem, enum McontrolType type,
++			       unsigned long num_trigs)
++{
++	static unsigned long test[2];
++	struct sbiret ret;
++	bool have_three = num_trigs > 2;
++
++	if (num_trigs < 2) {
++		report_skip("test multiple");
++		return;
++	}
++
++	report_prefix_push("test multiple");
++
++	if (!dbtr_install_trigger(shmem, &test[0], gen_tdata1(type, VALUE_STORE, MODE_S))) {
++		report_prefix_pop();
++		return;
++	}
++	if (!dbtr_install_trigger(shmem, &test[1], gen_tdata1(type, VALUE_LOAD, MODE_S)))
++		goto error;
++	if (have_three &&
++	    !dbtr_install_trigger(shmem, exec_call, gen_tdata1(type, VALUE_EXECUTE, MODE_S))) {
++		ret = sbi_debug_uninstall_triggers(1, 1);
++		sbiret_report_error(&ret, SBI_SUCCESS, "sbi_debug_uninstall_triggers");
++		goto error;
++	}
++
++	report(do_store(&test[0]), "store triggered");
++
++	if (do_load(&test[0]))
++		report_fail("store triggered by load");
++
++	report(do_load(&test[1]), "load triggered");
++
++	if (do_store(&test[1]))
++		report_fail("load triggered by store");
++
++	if (have_three)
++		check_exec(2);
++
++	ret = sbi_debug_uninstall_triggers(1, 1);
++	sbiret_report_error(&ret, SBI_SUCCESS, "sbi_debug_uninstall_triggers");
++
++	if (do_load(&test[1]))
++		report_fail("load triggered after uninstall");
++
++	report(do_store(&test[0]), "store triggered");
++
++	if (!have_three &&
++	    dbtr_install_trigger(shmem, exec_call, gen_tdata1(type, VALUE_EXECUTE, MODE_S)))
++		check_exec(1);
++
++error:
++	ret = sbi_debug_uninstall_triggers(0, 1);
++	sbiret_report_error(&ret, SBI_SUCCESS, "sbi_debug_uninstall_triggers");
++
++	install_exception_handler(EXC_BREAKPOINT, NULL);
++	report_prefix_pop();
++}
++
++static void dbtr_test_multiple_types(struct sbi_dbtr_shmem_entry *shmem, unsigned long type)
++{
++	static unsigned long test;
++
++	report_prefix_push("test multiple types");
++
++	/* check if loads and stores trigger exec */
++	if (!dbtr_install_trigger(shmem, &test,
++			     gen_tdata1(type, VALUE_EXECUTE | VALUE_LOAD | VALUE_STORE, MODE_S))) {
++		report_prefix_pop();
++		return;
++	}
++
++	report(do_load(&test), "load triggered");
++
++	report(do_store(&test), "store triggered");
++
++	dbtr_uninstall_trigger();
++
++	/* Check if exec works */
++	if (!dbtr_install_trigger(shmem, exec_call,
++			     gen_tdata1(type, VALUE_EXECUTE | VALUE_LOAD | VALUE_STORE, MODE_S))) {
++		report_prefix_pop();
++		return;
++	}
++
++	report(do_exec(), "exec triggered");
++
++	dbtr_uninstall_trigger();
++	report_prefix_pop();
++}
++
++static void dbtr_test_disable_uninstall(struct sbi_dbtr_shmem_entry *shmem, enum McontrolType type)
++{
++	static unsigned long test;
++	struct sbiret ret;
++
++	report_prefix_push("disable uninstall");
++	if (!dbtr_install_trigger(shmem, &test, gen_tdata1(type, VALUE_STORE, MODE_S))) {
++		report_prefix_pop();
++		return;
++	}
++
++	ret = sbi_debug_disable_triggers(0, 1);
++	sbiret_report_error(&ret, SBI_SUCCESS, "sbi_debug_disable_triggers");
++
++	dbtr_uninstall_trigger();
++
++	if (!dbtr_install_trigger(shmem, &test, gen_tdata1(type, VALUE_STORE, MODE_S))) {
++		report_prefix_pop();
++		return;
++	}
++
++	report(do_store(&test), "triggered");
++
++	dbtr_uninstall_trigger();
++	report_prefix_pop();
++}
++
++static void dbtr_test_uninstall_enable(struct sbi_dbtr_shmem_entry *shmem, enum McontrolType type)
++{
++	static unsigned long test;
++	struct sbiret ret;
++
++	report_prefix_push("uninstall enable");
++	if (!dbtr_install_trigger(shmem, &test, gen_tdata1(type, VALUE_STORE, MODE_S))) {
++		report_prefix_pop();
++		return;
++	}
++	dbtr_uninstall_trigger();
++
++	ret = sbi_debug_enable_triggers(0, 1);
++	sbiret_report_error(&ret, SBI_SUCCESS, "sbi_debug_enable_triggers");
++
++	install_exception_handler(EXC_BREAKPOINT, dbtr_exception_handler);
++
++	report(!do_store(&test), "should not trigger");
++
++	install_exception_handler(EXC_BREAKPOINT, NULL);
++	report_prefix_pop();
++}
++
++static void dbtr_test_uninstall_update(struct sbi_dbtr_shmem_entry *shmem, enum McontrolType type)
++{
++	static unsigned long test;
++	struct sbiret ret;
++	bool kfail;
++
++	report_prefix_push("uninstall update");
++	if (!dbtr_install_trigger(shmem, NULL, gen_tdata1(type, VALUE_NONE, MODE_NONE))) {
++		report_prefix_pop();
++		return;
++	}
++
++	dbtr_uninstall_trigger();
++
++	shmem->id.idx = 0;
++	shmem->data.tdata1 = gen_tdata1(type, VALUE_STORE, MODE_S);
++	shmem->data.tdata2 = (unsigned long)&test;
++
++	/*
++	 * Known broken update_triggers.
++	 * https://lore.kernel.org/opensbi/aDdp1UeUh7GugeHp@ghost/T/#t
++	 */
++	kfail = __sbi_get_imp_id() == SBI_IMPL_OPENSBI &&
++		__sbi_get_imp_version() < sbi_impl_opensbi_mk_version(1, 7);
++	ret = sbi_debug_update_triggers(1);
++	sbiret_kfail_error(kfail, &ret, SBI_ERR_FAILURE, "sbi_debug_update_triggers");
++
++	install_exception_handler(EXC_BREAKPOINT, dbtr_exception_handler);
++
++	report(!do_store(&test), "should not trigger");
++
++	install_exception_handler(EXC_BREAKPOINT, NULL);
++	report_prefix_pop();
++}
++
++static void dbtr_test_disable_read(struct sbi_dbtr_shmem_entry *shmem, enum McontrolType type)
++{
++	const unsigned long tstatus_expected = SBI_DBTR_TRIG_STATE_S | SBI_DBTR_TRIG_STATE_MAPPED;
++	const unsigned long tdata1 = gen_tdata1(type, VALUE_STORE, MODE_NONE);
++	static unsigned long test;
++	struct sbiret ret;
++
++	report_prefix_push("disable read");
++	if (!dbtr_install_trigger(shmem, &test, gen_tdata1(type, VALUE_STORE, MODE_S))) {
++		report_prefix_pop();
++		return;
++	}
++
++	ret = sbi_debug_disable_triggers(0, 1);
++	sbiret_report_error(&ret, SBI_SUCCESS, "sbi_debug_disable_triggers");
++
++	ret = sbi_debug_read_triggers(0, 1);
++	sbiret_report_error(&ret, SBI_SUCCESS, "sbi_debug_read_triggers");
++
++	if (!report(shmem->data.tdata1 == tdata1, "tdata1 expected: 0x%016lx", tdata1))
++		report_info("tdata1 found: 0x%016lx", shmem->data.tdata1);
++	if (!report(shmem->data.tdata2 == ((unsigned long)&test), "tdata2 expected: 0x%016lx",
++		    (unsigned long)&test))
++		report_info("tdata2 found: 0x%016lx", shmem->data.tdata2);
++	if (!report(shmem->data.tstate == tstatus_expected, "tstate expected: 0x%016lx", tstatus_expected))
++		report_info("tstate found: 0x%016lx", shmem->data.tstate);
++
++	dbtr_uninstall_trigger();
++	report_prefix_pop();
++}
++
++void check_dbtr(void)
++{
++	static struct sbi_dbtr_shmem_entry shmem[RV_MAX_TRIGGERS] = {};
++	unsigned long num_trigs;
++	enum McontrolType trig_type;
++	struct sbiret ret;
++
++	report_prefix_push("dbtr");
++
++	if (!sbi_probe(SBI_EXT_DBTR)) {
++		report_skip("extension not available");
++		goto exit_test;
++	}
++
++	num_trigs = dbtr_test_num_triggers();
++	if (!num_trigs)
++		goto exit_test;
++
++	trig_type = dbtr_test_type(&num_trigs);
++	if (trig_type == SBI_DBTR_TDATA1_TYPE_NONE)
++		goto exit_test;
++
++	ret = sbi_debug_set_shmem(shmem);
++	sbiret_report_error(&ret, SBI_SUCCESS, "sbi_debug_set_shmem");
++
++	ret = dbtr_test_store_install_uninstall(&shmem[0], trig_type);
++	/* install or uninstall failed */
++	if (ret.error != SBI_SUCCESS)
++		goto exit_test;
++
++	dbtr_test_load(&shmem[0], trig_type);
++	dbtr_test_exec(&shmem[0], trig_type);
++	dbtr_test_read(&shmem[0], trig_type);
++	dbtr_test_disable_enable(&shmem[0], trig_type);
++	dbtr_test_update(&shmem[0], trig_type);
++	dbtr_test_multiple_types(&shmem[0], trig_type);
++	dbtr_test_multiple(shmem, trig_type, num_trigs);
++	dbtr_test_disable_uninstall(&shmem[0], trig_type);
++	dbtr_test_uninstall_enable(&shmem[0], trig_type);
++	dbtr_test_uninstall_update(&shmem[0], trig_type);
++	dbtr_test_disable_read(&shmem[0], trig_type);
++
++exit_test:
++	report_prefix_pop();
++}
+diff --git a/riscv/sbi-tests.h b/riscv/sbi-tests.h
+index d5c4ae70..c1ebf016 100644
+--- a/riscv/sbi-tests.h
++++ b/riscv/sbi-tests.h
+@@ -97,8 +97,10 @@ static inline bool env_enabled(const char *env)
+ 	return s && (*s == '1' || *s == 'y' || *s == 'Y');
  }
-@@ -216,11 +224,13 @@ enum pci_bus_isolation pci_bus_isolated(struct pci_bus *bus)
- 	switch (type) {
- 	/*
- 	 * Since PCIe links are point to point root and downstream ports are
--	 * isolated if their own MMIO cannot be reached.
-+	 * isolated if their own MMIO cannot be reached. The root port
-+	 * uses DSP_MT_RR for its own MMIO.
- 	 */
- 	case PCI_EXP_TYPE_ROOT_PORT:
- 	case PCI_EXP_TYPE_DOWNSTREAM:
--		if (!pci_acs_enabled(bridge, PCI_ACS_ISOLATED))
-+		if (!pci_acs_enabled(bridge,
-+				     PCI_ACS_ISOLATED | PCI_ACS_DSP_MT_RR))
- 			return PCIE_NON_ISOLATED;
- 		return PCIE_ISOLATED;
  
++void split_phys_addr(phys_addr_t paddr, unsigned long *hi, unsigned long *lo);
+ void sbi_bad_fid(int ext);
+ void check_sse(void);
++void check_dbtr(void);
+ 
+ #endif /* __ASSEMBLER__ */
+ #endif /* _RISCV_SBI_TESTS_H_ */
+diff --git a/riscv/sbi.c b/riscv/sbi.c
+index edb1a6be..3b8aadce 100644
+--- a/riscv/sbi.c
++++ b/riscv/sbi.c
+@@ -105,7 +105,7 @@ static int rand_online_cpu(prng_state *ps)
+ 	return cpu;
+ }
+ 
+-static void split_phys_addr(phys_addr_t paddr, unsigned long *hi, unsigned long *lo)
++void split_phys_addr(phys_addr_t paddr, unsigned long *hi, unsigned long *lo)
+ {
+ 	*lo = (unsigned long)paddr;
+ 	*hi = 0;
+@@ -1561,6 +1561,7 @@ int main(int argc, char **argv)
+ 	check_susp();
+ 	check_sse();
+ 	check_fwft();
++	check_dbtr();
+ 
+ 	return report_summary();
+ }
 -- 
 2.43.0
 
