@@ -1,129 +1,140 @@
-Return-Path: <kvm+bounces-51105-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51106-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48F2BAEE2AF
-	for <lists+kvm@lfdr.de>; Mon, 30 Jun 2025 17:35:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77E61AEE5C9
+	for <lists+kvm@lfdr.de>; Mon, 30 Jun 2025 19:29:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 11DE017379A
-	for <lists+kvm@lfdr.de>; Mon, 30 Jun 2025 15:35:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 08E761881193
+	for <lists+kvm@lfdr.de>; Mon, 30 Jun 2025 17:29:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0251E28D85E;
-	Mon, 30 Jun 2025 15:34:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5491E2E5424;
+	Mon, 30 Jun 2025 17:28:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pXHN/Wc8"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JRR6aFMl"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E5DC28A1D4
-	for <kvm@vger.kernel.org>; Mon, 30 Jun 2025 15:34:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB4258F54
+	for <kvm@vger.kernel.org>; Mon, 30 Jun 2025 17:28:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751297687; cv=none; b=ELGFsT7//EP+X6LJiotPxG287Gx36wIcZLmVn+j86yI15om3VtwYUgmUxLqCFhdrcw3I3Xni/b8doVX2Q9x+SQ7Rq4kjWH3cZusEJqwUYTvFkRHQ1vXMReo9x2ZNzFPCUdv8qAMN5uBwSzY4ufWBfeC+031/BJNGLsSjADJNrXk=
+	t=1751304520; cv=none; b=a5AkLxaaw8ED4P4h29y5CYFu0klW94O3bSk0A5cTFdK8EMaEI9Ip53tHGe9WT+2cJb8f2XKbhYJTg8RFROPYLYzbvlk5tLuPAFY/qCoS7LwVM296ezBVMyyLlIrkZUi9kkoDX6oPecs9O1SZivVG3zKbvtu3oAc6qdwn5IaiTpM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751297687; c=relaxed/simple;
-	bh=dTIEpNfnYulofFuNLh2SOoCSx1vdBES881FHujrcw+k=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ugrpA0ufOJFl7SFPtSSErkucZXa+GNiI16AtOkr31lYjhBx5yXPGdbPj1TCBgUCqqWXrJ3sX/+1AhiiZTFEXbW4Vo+etjQZ2cbx60/WV2hXUBmDoMMWOFS9zPfaVkgZUtYOJd+04w7ijt0ysGwTQgI05MjfOJ6M9SxgC+jmC/4M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=pXHN/Wc8; arc=none smtp.client-ip=209.85.128.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-714067ecea3so17325137b3.0
-        for <kvm@vger.kernel.org>; Mon, 30 Jun 2025 08:34:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1751297684; x=1751902484; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DzC/oii9o7rPIbYU7tLpYjy4/LYNBCTnqw6z2ZXkL0s=;
-        b=pXHN/Wc8fuFwoMmjfSnoYH4cJof7PiokBtzxNnkDYWYVfPsoPGvbG4Rjrtv6kyX59t
-         vy9Sv8cguvRU2iVa5iIxZ7tjBzTrAqX4WdzM7DXpC4RW/ZeXIB1Jz5kitvmUcOe8gk+D
-         Gm6e5SrOsgBv30u12rP6G2rWFaFVnsavIPQSann+DlidNhIjZeaOfP+vaaf4drEX7TUF
-         o3pLFf2dWrIikzoma3RwrAL5BjKFpEt6WkZPkGm6hg2+odowWz8OEqd9kE/YiHBunABs
-         vXW6YQrO3Fr539IaJkHggVtgU92SXXgRQEFT1DFxyxXC8eFcvk2d6HYy33ZBq/6KUWyg
-         rJ9g==
+	s=arc-20240116; t=1751304520; c=relaxed/simple;
+	bh=AZysZLAfMgjijyvGawDaXqme8p+2Ab++Mdy0TlE6OKo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=txYDyI9j2n67b9RP0bZvIcS9P6VfLYqlYDvvGIvsUcuneFn8b+cfBnW+9QSpPz3yHZtJz390EEnskgRZL789QtctgTtY3ubAfm3ZO/zCp17zn/dSRd7VEGqdj8JDICinK5mN6gsV/WnAU3g5Z/74Q9eP1gjXpurquF7DYQ+oISQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JRR6aFMl; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1751304517;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XTEw+AZQXJDFo+sYwotNPS7NL0XSe5VzVOicEJ3vP2I=;
+	b=JRR6aFMljSUZSkipX7pHQSTAS4suuH7aqdhHEEAkumdy+1hwrW3/snBonqq3lmKlSNaqNo
+	cvHrWcaHYbjkgqNvVQmldfIJs/x6fLYy3f3gXFuNb8pR8/IJYSg32mbGMZA+z+Qp5hX4s4
+	ny6vGz2yK3RVLtVXNbaSODExTDwa2W0=
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
+ [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-34-wMCgHxSyP_GZO__f9myrfQ-1; Mon, 30 Jun 2025 13:28:35 -0400
+X-MC-Unique: wMCgHxSyP_GZO__f9myrfQ-1
+X-Mimecast-MFC-AGG-ID: wMCgHxSyP_GZO__f9myrfQ_1751304515
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3df57df1eb3so2128575ab.2
+        for <kvm@vger.kernel.org>; Mon, 30 Jun 2025 10:28:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751297684; x=1751902484;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DzC/oii9o7rPIbYU7tLpYjy4/LYNBCTnqw6z2ZXkL0s=;
-        b=C1k/uPEKcuSHc3JKFuAqDki0R+rJ+CRjo0Bo57Ue1nYGU+rfG1XAfBKXbzC3Jl2wB9
-         DRQxRtrr7fn9Xm033wpJO1FT74bmIIT9qs9tfs8+woit9fjnTfrgyI4PPx795SzZSHM7
-         VNhKz3vbWV/PpscWRK0p7HmvpZocCU83ZKtf1FfdoMk1uE+JOUnTq+liGI5aSKOFGKZr
-         PCUbLED3SMK4wN6bl9Oju1gHzULCUjklf46bVIgtuEmViWGKeE5SYTtmi1uTSDsPgfwM
-         XRR9/GWqglP8vPXSv+H81W/dXdQy79r/G36XCoEslflTh7vHYEcc3bElkdTtEPV8QOc0
-         n1WA==
-X-Forwarded-Encrypted: i=1; AJvYcCUPI5vmaX0bs2YraLgN8JRQiHSwSOPBzQEOSwxcDiFyVMVuuQ1xa71ObY+fqw24t3H1AHA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxH00ByHfsS4YewYhNDE12GAJGqTA3MvJ9tsRA0J2XVYdPnisCs
-	8F/gjeoqIlJFbmA0+fUV+bodWM5Ep4BTYQTL82D0XH43CSzoIMygswFkcyrE3/ePxRe4zVtLJvX
-	PrwMhgls4tejjsClydWFCn+lK38muSGTH20O38ZOPLw==
-X-Gm-Gg: ASbGncsRfBk9OdxtpDaRFtKvdP0eBPfCEsfvQx/+ALTwT6Va7cuEx+kwY+0RIMml7Dd
-	z/fRR3HvjveDyxrW1ErJlFoNxbuaqLKYaRFhnyRQeX/xI0jLftAjLGDEuV431q2IBHhmVt43aqT
-	AkM91RF1Frg+M/d03lmaLoiAVfdakfJFqMy2Xb+r/FCfvo
-X-Google-Smtp-Source: AGHT+IH+iwwqTU7zlX2I945lgbnNlrrxF9cxMU8gMHe6Vd7HsmOmqSLMequo3znfXJSEumDV7EvriQUoY33Fxg3xTNc=
-X-Received: by 2002:a05:690c:d85:b0:70f:8884:17af with SMTP id
- 00721157ae682-7151714d14emr228157307b3.6.1751297684555; Mon, 30 Jun 2025
- 08:34:44 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1751304515; x=1751909315;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XTEw+AZQXJDFo+sYwotNPS7NL0XSe5VzVOicEJ3vP2I=;
+        b=mbvqHNq/BNHkYfqV2Bz0rUvbEwfLwedIGxAOoPAk+qozJmYKr8LSeHVnVPWGS/ORyx
+         H/st51WoNFNle+a9w3eZCTdWGWaHqcttrflFxSTi7trQzPHY2DGcv633wV4P/AOoRUW5
+         RxeDLwyeO35LBEcCYhG+nnRJq2o1RkjgaxFdi0IhZgnBcpYWYGhUaCVMZ4Ho2NSCGOu8
+         rBrt1jsB2KfiwZ7gpm4C4Qss20f8uhICSebzOdVKaKI1tFGSk8Q6xjR3WhxsXJHbM+Ov
+         o8tlggGYOEXwJWtB0ythJguugfwODYaVmh2Cq85ZhBDbdgzDO8H4IWvQgsC/nIYSO1KE
+         a1Og==
+X-Gm-Message-State: AOJu0YyRmd44ATOx8xhRz4LjVoYoyKiF1WtsuDDrQCGqRDuVbdHv7csr
+	fr4jbwtUzetbym8TfbRWnoECeWWFxsXhX3MrEkqgXGkHk7X8+3vD0o+oUJmZT/iSQt6hIlsPvw9
+	ywp6uAYE7hrzkdNYsUhPii8Pp64MmDuOfZLlr8gsFxGTBZEg5VkzKxw==
+X-Gm-Gg: ASbGncv2ov/MGMozj36u+4jaeKofpvPuZ/4ikML19SPbCVd5WFgg7DbfEnwA2rnpHap
+	f6zz2PMBISY8xrlzc4GDOzYW7txcZHIBBLJgbsFj6AZ4svsqY29dPax0l7OiRlvsPNJpHTCbceT
+	oxvzhdTakLenr3Iz3vYTwLSa9Gg3bHWv/hj6WDOCBLf6MWgujXO3BSYVK5GqbDFZIuR4553BQfF
+	3UXczkS9j5a1OIcSCnRnKAWm+ceeCKKkAKwhOSpVcEM6Jixk9u+RPZO7/AujEMrWBm1u7ADA9FF
+	i+PbhJuX7KISTXTgdf0Vx5NrHA==
+X-Received: by 2002:a05:6602:14c7:b0:85d:9738:54ac with SMTP id ca18e2360f4ac-8769649f507mr329258539f.2.1751304514882;
+        Mon, 30 Jun 2025 10:28:34 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHBhqZGB3QLk7wR0Imzc7PvjRuRP90fkt1j/6bV+xvH6DMJu6hPhaHCi38lYJceTKtXqQLTKw==
+X-Received: by 2002:a05:6602:14c7:b0:85d:9738:54ac with SMTP id ca18e2360f4ac-8769649f507mr329256939f.2.1751304514474;
+        Mon, 30 Jun 2025 10:28:34 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-50204860506sm2003757173.9.2025.06.30.10.28.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Jun 2025 10:28:33 -0700 (PDT)
+Date: Mon, 30 Jun 2025 11:28:31 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Artem Sadovnikov <a.sadovnikov@ispras.ru>
+Cc: kvm@vger.kernel.org, Yishai Hadas <yishaih@nvidia.com>, Jason Gunthorpe
+ <jgg@ziepe.ca>, Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+ Kevin Tian <kevin.tian@intel.com>, linux-kernel@vger.kernel.org,
+ lvc-project@linuxtesting.org
+Subject: Re: [PATCH] vfio/mlx5: fix possible overflow in tracking max
+Message-ID: <20250630112831.2207fa2e.alex.williamson@redhat.com>
+In-Reply-To: <20250629095843.13349-1-a.sadovnikov@ispras.ru>
+References: <20250629095843.13349-1-a.sadovnikov@ispras.ru>
+Organization: Red Hat
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250623121845.7214-1-philmd@linaro.org> <20250623121845.7214-21-philmd@linaro.org>
-In-Reply-To: <20250623121845.7214-21-philmd@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 30 Jun 2025 16:34:32 +0100
-X-Gm-Features: Ac12FXygwnSXLP-ZPonXcEmOAhgztcCBXBn2LNuOkJFkl9HoaCecpnHthAmLnYw
-Message-ID: <CAFEAcA_xqu1oDLThHBp5T_srQs2+2oxWTXF=sQzBjKDduc0cfw@mail.gmail.com>
-Subject: Re: [PATCH v3 20/26] hw/arm/virt: Rename cpu_post_init() -> post_cpus_gic_realized()
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>
-Cc: qemu-devel@nongnu.org, Leif Lindholm <leif.lindholm@oss.qualcomm.com>, 
-	qemu-arm@nongnu.org, =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, 
-	Roman Bolshakov <rbolshakov@ddn.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Alexander Graf <agraf@csgraf.de>, Bernhard Beschow <shentey@gmail.com>, John Snow <jsnow@redhat.com>, 
-	Thomas Huth <thuth@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, 
-	kvm@vger.kernel.org, Eric Auger <eric.auger@redhat.com>, 
-	Cameron Esfahani <dirty@apple.com>, Cleber Rosa <crosa@redhat.com>, 
-	Radoslaw Biernacki <rad@semihalf.com>, Phil Dennis-Jordan <phil@philjordan.eu>, 
-	Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, 23 Jun 2025 at 13:20, Philippe Mathieu-Daud=C3=A9 <philmd@linaro.or=
-g> wrote:
->
-> QDev uses _post_init() during instance creation, before being
-> realized. Since here both vCPUs and GIC are REALIZED, rename
-> as virt_post_cpus_gic_realized() for clarity.
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org>
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+On Sun, 29 Jun 2025 09:58:43 +0000
+Artem Sadovnikov <a.sadovnikov@ispras.ru> wrote:
+
+> MLX cap pg_track_log_max_msg_size consists of 5 bits, value of which is
+> used as power of 2 for max_msg_size. This can lead to multiplication
+> overflow between max_msg_size (u32) and integer constant, and afterwards
+> incorrect value is being written to rq_size.
+> 
+> Fix this issue by extending max_msg_size up to u64 so multiplication will
+> be extended to u64.
+
+Personally I'd go with changing the multiplier to 4ULL rather than
+changing the storage size here, but let's wait for Yishai and Jason.
+Thanks,
+
+Alex
+
+> Found by Linux Verification Center (linuxtesting.org) with SVACE.
+> 
+> Signed-off-by: Artem Sadovnikov <a.sadovnikov@ispras.ru>
 > ---
->  hw/arm/virt.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
->
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index a9099570faa..da453768cce 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -2032,7 +2032,8 @@ static void finalize_gic_version(VirtMachineState *=
-vms)
->   * virt_cpu_post_init() must be called after the CPUs have
+>  drivers/vfio/pci/mlx5/cmd.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/vfio/pci/mlx5/cmd.c b/drivers/vfio/pci/mlx5/cmd.c
+> index 5b919a0b2524..0bdaf1d23a78 100644
+> --- a/drivers/vfio/pci/mlx5/cmd.c
+> +++ b/drivers/vfio/pci/mlx5/cmd.c
+> @@ -1503,7 +1503,7 @@ int mlx5vf_start_page_tracker(struct vfio_device *vdev,
+>  	struct mlx5_vhca_qp *fw_qp;
+>  	struct mlx5_core_dev *mdev;
+>  	u32 log_max_msg_size;
+> -	u32 max_msg_size;
+> +	u64 max_msg_size;
+>  	u64 rq_size = SZ_2M;
+>  	u32 max_recv_wr;
+>  	int err;
 
-You forgot to update the function name in this comment :-)
-
->   * been realized and the GIC has been created.
->   */
-> -static void virt_cpu_post_init(VirtMachineState *vms, MemoryRegion *sysm=
-em)
-> +static void virt_post_cpus_gic_realized(VirtMachineState *vms,
-> +                                        MemoryRegion *sysmem)
-
-thanks
--- PMM
 
