@@ -1,76 +1,78 @@
-Return-Path: <kvm+bounces-51065-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51066-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A25FAED5DF
-	for <lists+kvm@lfdr.de>; Mon, 30 Jun 2025 09:39:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9844AED5E7
+	for <lists+kvm@lfdr.de>; Mon, 30 Jun 2025 09:39:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B3FF16F278
-	for <lists+kvm@lfdr.de>; Mon, 30 Jun 2025 07:39:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C6AE1894400
+	for <lists+kvm@lfdr.de>; Mon, 30 Jun 2025 07:39:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 450FF224B15;
-	Mon, 30 Jun 2025 07:38:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 417B1235364;
+	Mon, 30 Jun 2025 07:38:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E0US/af/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gPk7wZTk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0336F21ABB1;
-	Mon, 30 Jun 2025 07:38:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7C1C230BF0;
+	Mon, 30 Jun 2025 07:38:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751269132; cv=none; b=TMWuTswvl7G59NDVRQuznnBo5HTl0/TJWg3ZiohTZAKZ5hbsvsz09XUHhfXmNrwKs0qdZapd+O+qS5ZDJop42AvdnQAzHD9l/0ZUVKDwkugJjhdFMjhSqftVrzGzNoybyi6cheoifvuu2xjfjRpJQOvbhNsDDDrH1wKSDa0VouE=
+	t=1751269137; cv=none; b=M8JsnWkSC2GBATzIjRWqbS8p4r+hs6fmyi7fIONkCV5GUsSn6+RhAQ+oedxkEujmzCNDuIjAHQSvaD1nRRVxnUU1MIKraIf5YjxUcfyfIPO4KIBFzdCwAIHk0KirzLHMX79Ng73iAl7lClkyJrcn0xj8H9BsiQKqD2gCiYonDEI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751269132; c=relaxed/simple;
-	bh=C1EHD1z59F2SyLvaExWmmS5+b7cLnftKwrKslD1pIe4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=qCLQ14vZ4WNW+a8yY59Ur6T1t8TE5BT77xtTmw4waoNDL2Njr1ENEt94EV7d1XFBPdlJ4P24yZx2EE03UwBVOwkITEB++Pbeq6a8z3mmEMZnnuKtpJOH5s645fwCHtNCeiyBG0/3qCWku/nGbaGeuKUhfw63ZC9nWRrpmevYkjw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E0US/af/; arc=none smtp.client-ip=209.85.215.171
+	s=arc-20240116; t=1751269137; c=relaxed/simple;
+	bh=8zHWFlCigM4oKQM+XUD7NX3O01Q7p6W6jnTQzPT3UPw=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=deESLCWshZMjtIUGQXWDzgdeFzF9g22aLKn11qwApb8ldUQMVBooyc0/g+bJzDYehvRFFSMp+eQ9RVrZAK2CQGV8CZnwvXT9TxoV536accyekf23mWRKW3owYX8mLACHeP9zxeJpH1RqO2Ok1O4lOXpvoLNCKc6ET+iZHUjtLDQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gPk7wZTk; arc=none smtp.client-ip=209.85.215.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-b34a8f69862so1673122a12.2;
-        Mon, 30 Jun 2025 00:38:50 -0700 (PDT)
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-b3220c39cffso2016027a12.0;
+        Mon, 30 Jun 2025 00:38:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751269130; x=1751873930; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=LMFps7gQrYkD6CPu+nOWqI3O3a/AKcYoOahC3/xHR+8=;
-        b=E0US/af/eSEhdOvd+fo+Oz045HDRFtoCDyY2ykFE2oGLGN7Yh+JE+FJx9MUyuFN0KK
-         Gk7LfaoY82U6s6QaSBnVrHaJGy2nIq/uiYgSqshoDRkcF/tHJWvBGC8s6EI9dgIlGSxz
-         PiPzo9CouP86j9PnKvM5UBvORyHU7YP3Scu3mxyvk/4lK3OgAqDyKLMTpA7yyfdc8pug
-         ml65VhUZa11S/cu56L9XA1s8apo6StXXxvYV2vejS5TPdiR6JbWRIBocU3zeCu8SnqF5
-         /fYneIu2RM5GvJgdpxiDACMylbUhCBu03CbI+YiMBlFGVn47IUZ5txImVg/NeMFy7WC5
-         u+UA==
+        d=gmail.com; s=20230601; t=1751269134; x=1751873934; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Zxu7ig/S9LCUmwMcMSykN7rd/mLUHqPQuKn7T6xu2vY=;
+        b=gPk7wZTkRigQ6yMrSj14kyTtJwzxXQQSTEfM7ssB/kZF+SNxvPj2O50MoDRLh6aJjH
+         pVkMxHpZ1h7c0xfalLieYhW3iGmGxGwIPlx/pMgF7et+cEMtqbjo9oRIp/YDnBIU3nmA
+         wb7pYpOOQWuqtfBoI6EgkNKoy/LNgKyFbPcWS/asU4azFjWUNFjDmX10BzeOvDxZWxqK
+         s8FWrXK2zP5fUi26bQpjT2kZ72D73POH2Cj9fWDwOR80+5n8+kclh+R60ClK67hINFhf
+         Sap+Jb2f/82knBe5W+lITU98JTL2bDTuRmYH2V3lMpwEEbZRfaTiSwiwyvtXDbxRQCGF
+         oOsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751269130; x=1751873930;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=LMFps7gQrYkD6CPu+nOWqI3O3a/AKcYoOahC3/xHR+8=;
-        b=SKvWL+ZdChOuQ14zQmefpp/md85ZefDsZBSJ1LHqNEh3cckuH29dRD/QI8HDKVAstF
-         Q/xTmSSJzCAJKAqcnrVOKlaHVTwxJqMpvuq4Jhg/a6hVUbwEveBcxFzSOk1G6O4gTBZQ
-         WcXp8gmk8NwVge/L2pKMNNVHKxnbTpDSl69Xp60DRz5GgGDaw+ETLm7GxH65oiQQ7EJp
-         NyUKu9l6wlv5DBioAstORDIeO50lKULyE8jC1cxVBdNZ2RjIHc/kAkaTJgzWm4ReBgFZ
-         REq0eRHogLlZhZxai4YqPBNNjQj8aMb8lzv/UwodRU6VUgoFwmy/SSdBZ1yy0vptgbGO
-         YnuA==
-X-Forwarded-Encrypted: i=1; AJvYcCU93k2KpGyIxQQqRIE9euoMGFfovgmKWalcZqhoR7KGQMH6DCkiVk7BGo4BiBZGtUjfZLmZqSOInUr9cxn7@vger.kernel.org, AJvYcCVrge/K+GdYFtKbcSybAAcbBzvWPR2+cRxXBE+yzrzdRRWiTg5+FUZ8mkifpu7Sa9C5zu8=@vger.kernel.org, AJvYcCWTkcfqtKmd4yhcXLfA8CgAWDOzCc8YxI6X6zzoY4DiF0avH0s1uO4od8EMDSN35VtLsPEuBSa7@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJVo8C/029VREreRiAh3MH9z5qLfBCBRH++2PvmJVSsTnafv5+
-	J3H9q8su9Xnus2NGw5y2nkqiwm6VOh+0TgZtJzoimTtQpvMxFASto2x9
-X-Gm-Gg: ASbGnctKga6paordo8fiaG/4zDROCBnxehgIGh5r/g0fg36curImdEY03AGJ88v410/
-	RHb3ZO+i4K1J/alUlSRDDhlqBwyd1MkBbmr0w0N3A8zd3szrMYeTH5W3aGsjD2E18cI900g+m9q
-	WXS8FUZMrM8LzQKl2HIK4ynPNg8kWcNXVzWsZ0z3Xu27/SoQBlhWieIkaqjZjSQmNrJ98vPMhXB
-	fav5sDkHTjzV3NJ8ZqA1iGtMJGaEkBXZ+97xcSPhUS9kY1YDtdUl7BRHdDk4tufYYS8XbdK6TcW
-	rFn6RCio5Ai65cxRquVGdRCbXXfI5aSCezYfyP0rzPQYSaH7HmBQD8KEJhNEZ4pGPucyjrXNgWS
-	tT26NYlQS41JgbH+smRo=
-X-Google-Smtp-Source: AGHT+IEg5uwH/kF0lYf7Hq59I5MKkHWlSxwYXEhG/7GCgHeyClrt5UgqGkpLTI+EfuDwglRv5LlslA==
-X-Received: by 2002:a05:6a21:4683:b0:220:245d:a30b with SMTP id adf61e73a8af0-220a17e9d75mr18242672637.38.1751269129983;
-        Mon, 30 Jun 2025 00:38:49 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1751269134; x=1751873934;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Zxu7ig/S9LCUmwMcMSykN7rd/mLUHqPQuKn7T6xu2vY=;
+        b=OPdtZ6wSCV4+bhTo7gfFZpo2TzU1UL03ohfmkVjmhutpQhYrsKPAh36k+T0y8oBuOU
+         tNXg4cLqjCw5InsQhwQeemls9q+PUrked+jsN5k5cTG+ijkB2FJyYuMKs4FqO4chFFCc
+         tmJt0clIy40YurQQ/0bQDc8a8bq40i8ZIHaqb5jBcPVAyiBwLBZkdA3SKPhp3ahJiDxT
+         90KUFlumlmqn6/rFWW4ZmemzOtHX7gWNgGCP8dpgVhjJbeRc0I/DA0rBD2YT8D9DxLyG
+         Y6ukkGquPUJs6xNexFBElKPYGCJOMm005+Mp3sffVMPavPFg+eg4zHCC8coY8QBxGwO1
+         WPVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVWDXm1Zs63pnPlv+KjEaaGJg1WmI386ylhKh+0WqQN98Lkw7zsmM5Qic6PNVOj8lykhsllcfUgy6va/+Wq@vger.kernel.org, AJvYcCW6sb8V5H5MX93EkPYE8rxYW6+caQv5cSD1GmeRc2NWQFAmhYInA+zJZs2pQmlo45pYpug=@vger.kernel.org, AJvYcCX4QUR/+JmU5EVQdn2PX4tjvhcXdC5yPYIafiCVwCBx+hJ94FwpZdIO6LYmfEivLVLCQ/wklCwu@vger.kernel.org
+X-Gm-Message-State: AOJu0YwuLZ1tO6U/Q6ipHPRy7A9ShBgaZzOBRGsk2Zz1hPFNC2UltBsl
+	hNmrNHcw5upOWLQNg/6zZ5iabKj1DaoJPkS5Y57SI49xedIlRKokN1RV
+X-Gm-Gg: ASbGncuVE26FLWAxBYRrWCC1LV1rij12XxeyGIdfUgCrS5xfRFXpWnGvHea+8NsDSyk
+	VJ9hoUEjsDBqeiFW/Rz9Tn8o/BTrCUHkMDrH9qB8lMJ4EucXcBqeob9IWgOm12xTqnSfl62GOBI
+	S6Dtq9VHMh82roIl4+TYfwB1IBjWVCYNx+P7Cf3bfdA0OdYui7gva5BH5umJgsCAloht14bOIUT
+	QvjZgZC+WZ+fBEYZM7ObwWE6jKGtRyt43rP6qd7cKDENW0NSoMmbXjfrfmiyoeUyiyuV+MWPis1
+	p/XEB5Qak1JtWSI3ohKjc0LR94gJjs/A53FWLWoAigJzmttbatPJpPCR6ENcFPpdeMF5UmBtcVI
+	WcNYj1ZDK
+X-Google-Smtp-Source: AGHT+IE1QdmSYxev8iN4dxDowA6la8V3gpzolPl3kw80LV0ejyoAdzLd6I54yNlIqSmD3I5yGH7Rww==
+X-Received: by 2002:a05:6a20:c704:b0:220:63bd:2bdb with SMTP id adf61e73a8af0-220a16ca7famr20405202637.40.1751269134043;
+        Mon, 30 Jun 2025 00:38:54 -0700 (PDT)
 Received: from devant.antgroup-inc.local ([47.89.83.0])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74af55c8437sm8075175b3a.115.2025.06.30.00.38.46
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74af55c8437sm8075175b3a.115.2025.06.30.00.38.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Jun 2025 00:38:49 -0700 (PDT)
+        Mon, 30 Jun 2025 00:38:53 -0700 (PDT)
 From: Xuewei Niu <niuxuewei97@gmail.com>
 X-Google-Original-From: Xuewei Niu <niuxuewei.nxw@antgroup.com>
 To: sgarzare@redhat.com,
@@ -88,10 +90,12 @@ Cc: virtualization@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
 	fupan.lfp@antgroup.com,
 	Xuewei Niu <niuxuewei.nxw@antgroup.com>
-Subject: [PATCH net-next v4 0/3] vsock: Introduce SIOCINQ ioctl support
-Date: Mon, 30 Jun 2025 15:38:24 +0800
-Message-Id: <20250630073827.208576-1-niuxuewei.nxw@antgroup.com>
+Subject: [PATCH net-next v4 1/3] hv_sock: Return the readable bytes in hvs_stream_has_data()
+Date: Mon, 30 Jun 2025 15:38:25 +0800
+Message-Id: <20250630073827.208576-2-niuxuewei.nxw@antgroup.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20250630073827.208576-1-niuxuewei.nxw@antgroup.com>
+References: <20250630073827.208576-1-niuxuewei.nxw@antgroup.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -100,61 +104,69 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Introduce SIOCINQ ioctl support for vsock, indicating the length of unread
-bytes.
+When hv_sock was originally added, __vsock_stream_recvmsg() and
+vsock_stream_has_data() actually only needed to know whether there
+is any readable data or not, so hvs_stream_has_data() was written to
+return 1 or 0 for simplicity.
 
-Similar with SIOCOUTQ ioctl, the information is transport-dependent.
+However, now hvs_stream_has_data() should return the readable bytes
+because vsock_data_ready() -> vsock_stream_has_data() needs to know the
+actual bytes rather than a boolean value of 1 or 0.
 
-The first patch adds SIOCINQ ioctl support in AF_VSOCK.
+The SIOCINQ ioctl support also needs hvs_stream_has_data() to return
+the readable bytes.
 
-Thanks to @dexuan, the second patch is to fix the issue where hyper-v
-`hvs_stream_has_data()` doesn't return the readable bytes.
+Let hvs_stream_has_data() return the readable bytes of the payload in
+the next host-to-guest VMBus hv_sock packet.
 
-The third patch wraps the ioctl into `ioctl_int()`, which implements a
-retry mechanism to prevent immediate failure.
+Note: there may be multpile incoming hv_sock packets pending in the
+VMBus channel's ringbuffer, but so far there is not a VMBus API that
+allows us to know all the readable bytes in total without reading and
+caching the payload of the multiple packets, so let's just return the
+readable bytes of the next single packet. In the future, we'll either
+add a VMBus API that allows us to know the total readable bytes without
+touching the data in the ringbuffer, or the hv_sock driver needs to
+understand the VMBus packet format and parse the packets directly.
 
-The last one adds two test cases to check the functionality. The changes
-have been tested, and the results are as expected.
-
+Signed-off-by: Dexuan Cui <decui@microsoft.com>
 Signed-off-by: Xuewei Niu <niuxuewei.nxw@antgroup.com>
+---
+ net/vmw_vsock/hyperv_transport.c | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
 
---
-
-v1->v2:
-https://lore.kernel.org/lkml/20250519070649.3063874-1-niuxuewei.nxw@antgroup.com/
-- Use net-next tree.
-- Reuse `rx_bytes` to count unread bytes.
-- Wrap ioctl syscall with an int pointer argument to implement a retry
-  mechanism.
-
-v2->v3:
-https://lore.kernel.org/netdev/20250613031152.1076725-1-niuxuewei.nxw@antgroup.com/
-- Update commit messages following the guidelines
-- Remove `unread_bytes` callback and reuse `vsock_stream_has_data()`
-- Move the tests to the end of array
-- Split the refactoring patch
-- Include <sys/ioctl.h> in the util.c
-
-v3->v4:
-https://lore.kernel.org/netdev/20250617045347.1233128-1-niuxuewei.nxw@antgroup.com/
-- Hyper-v `hvs_stream_has_data()` returns the readable bytes
-- Skip testing the null value for `actual` (int pointer)
-- Rename `ioctl_int()` to `vsock_ioctl_int()`
-- Fix a typo and a format issue in comments
-- Remove the `RECEIVED` barrier.
-- The return type of `vsock_ioctl_int()` has been changed to bool
-
-Xuewei Niu (3):
-  hv_sock: Return the readable bytes in hvs_stream_has_data()
-  test/vsock: Add retry mechanism to ioctl wrapper
-  test/vsock: Add ioctl SIOCINQ tests
-
- net/vmw_vsock/hyperv_transport.c | 16 +++++--
- tools/testing/vsock/util.c       | 32 +++++++++----
- tools/testing/vsock/util.h       |  1 +
- tools/testing/vsock/vsock_test.c | 80 ++++++++++++++++++++++++++++++++
- 4 files changed, 117 insertions(+), 12 deletions(-)
-
+diff --git a/net/vmw_vsock/hyperv_transport.c b/net/vmw_vsock/hyperv_transport.c
+index 31342ab502b4..64f1290a9ae7 100644
+--- a/net/vmw_vsock/hyperv_transport.c
++++ b/net/vmw_vsock/hyperv_transport.c
+@@ -694,15 +694,25 @@ static ssize_t hvs_stream_enqueue(struct vsock_sock *vsk, struct msghdr *msg,
+ static s64 hvs_stream_has_data(struct vsock_sock *vsk)
+ {
+ 	struct hvsock *hvs = vsk->trans;
++	bool need_refill = !hvs->recv_desc;
+ 	s64 ret;
+ 
+ 	if (hvs->recv_data_len > 0)
+-		return 1;
++		return hvs->recv_data_len;
+ 
+ 	switch (hvs_channel_readable_payload(hvs->chan)) {
+ 	case 1:
+-		ret = 1;
+-		break;
++		if (!need_refill)
++			return -EIO;
++
++		hvs->recv_desc = hv_pkt_iter_first(hvs->chan);
++		if (!hvs->recv_desc)
++			return -ENOBUFS;
++
++		ret = hvs_update_recv_data(hvs);
++		if (ret)
++			return ret;
++		return hvs->recv_data_len;
+ 	case 0:
+ 		vsk->peer_shutdown |= SEND_SHUTDOWN;
+ 		ret = 0;
 -- 
 2.34.1
 
