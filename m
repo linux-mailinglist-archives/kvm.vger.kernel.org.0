@@ -1,62 +1,62 @@
-Return-Path: <kvm+bounces-51121-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51124-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DC75AEEA4F
-	for <lists+kvm@lfdr.de>; Tue,  1 Jul 2025 00:30:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE9D9AEEA56
+	for <lists+kvm@lfdr.de>; Tue,  1 Jul 2025 00:31:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 374631BC3ECA
-	for <lists+kvm@lfdr.de>; Mon, 30 Jun 2025 22:31:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 274F53E1CD1
+	for <lists+kvm@lfdr.de>; Mon, 30 Jun 2025 22:31:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E82542ED143;
-	Mon, 30 Jun 2025 22:28:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B4782EE5F7;
+	Mon, 30 Jun 2025 22:29:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="GGyCYasq"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Ahj8w19Q"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2060.outbound.protection.outlook.com [40.107.243.60])
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2053.outbound.protection.outlook.com [40.107.243.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48CA72D130C;
-	Mon, 30 Jun 2025 22:28:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.60
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98F852E5404;
+	Mon, 30 Jun 2025 22:28:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.53
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751322535; cv=fail; b=i37MQgbx7JyBhSDdb9q16XDkkVyG92qGzGHmreGoR0LbQzgQAGJE/4GXPDpvqjTHuvMU27cUdqJ2ulCuePgZkyvOhHTLneMA3kpVJE8EQV9ft213QHwadslRD+WCLxcBgEyWGbDicMpCzlwLW5vSk+LCyFEBzaxvpJ83yzypxeI=
+	t=1751322539; cv=fail; b=n0Uwzip4A8Ev/0Rt+ugm1VjMocU8iINVC7voSuMN84LPC9ufWIvgkyjk/MPUe0pTt5u4juefI88iXxgWEwAYb5OAQJMnotbwDmI38SGwjSaODeqS8hks8ZYl5nx8IreulhNtDbjEImcj/CUvfiKIXxUfLUbFg2kgwjfMshczBmE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751322535; c=relaxed/simple;
-	bh=irKTCbT9H/mp2z2Lm8/fSfO97FhX6V7/Ifxq+NtYKY8=;
+	s=arc-20240116; t=1751322539; c=relaxed/simple;
+	bh=+Ef7bMk6oV4JmWwrsjqq1UOGBEoTz1eyKMc8UkBg4KY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=bnmnDxMTcWtV8HYYg0KlUJqYWfx8+qOm63VnAAdSRsrIO5p4t2YdFzMAcrvrxiS+XaL8x7udEci5olpNzTF+z4Q7XHrps166ndST5r2Vds5y3ZKRAOxM0Toy6FvS1Sq75IgjnXIgdv4ci1TjiBshRe+A9CXfeAxNpsa3sItk5rc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=GGyCYasq; arc=fail smtp.client-ip=40.107.243.60
+	 Content-Type:MIME-Version; b=J4XFafoSP8fI2w7ODo8zGJy0qHvrFmgh1b6LWc8iGnveU8yG1uy8oIZPUTJ4X851dDpxGxAU1Tq4bb5GDmOnFUM6O9xrDrUAyKh5j+aFwEVAFgdyW4yC7ESEDuJimSqkEpnDILmSkXDIhuNaFZMZ3Asx2jxcsxAmm149YzRb7+c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Ahj8w19Q; arc=fail smtp.client-ip=40.107.243.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=CqSeNcCpihnNKrybTqgriE2WvoUqRvUbs/MddwzplsYAASdluV1MJ6p5Bkk7iZEsjKrnEY4KDatj+oe8+yOk2qzbNne7U0W+a43FDzLM7s75I6ds/lg3N3DlgvShy/HQin5P+xpd6yFcsylS/AQo05vTPzx1/P0C9qGH738bdlQhXsELE1pU3z9h/a93JQvHGzatzoytG1ABzQ/IAPu/Vp6erAL9A6GIz/1iwYVysrpZFM/uW88vJkDxdQkPEqBnFVT8tMOLN2c6IgKBUPLxAzbHQLTBMWBe5zVeKlITHwYMxKYNvIkfTN1+gNtvMANXHUEmkRh3RaShjLyHArWhlA==
+ b=NKVh6aOOk8vBvItVVupDB6LA0KwfxBZUAUDARgPH3CAHwuVmAly9/uzkrtacbDkhG9n7M3DgIFZdpeexBPsACj7oQk9wDfAzyQEMbipiWjXQV7YKsxAcdRiIQqfxHmlBU5U9CXo+2o4+aArVRFGznBKUGQYWWoRtAiUSHE6E1rsifVW73EMgx//DX2bLcWbYk2HGlhIj0XFmex/u3db8CE44Tm8jO+5pF6PnnETNrNPDto4wh+/PIHv4U7fr0Wnr5s9IGVq8rFdpfNrC/qM6YrYd5uPqqA9gFWdZrbPmuQSRoeHXS6c5BmP45x0C61tviLPWL6Z/nETyJuGus37nsQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=irIYlFeNl5XtcoAewstN4M3lOQKk5iqpHg59k4MmD2Q=;
- b=hsSg6j9z7xZmUkGNTedCuPhiYOj+HLttPPDQ0j1BzougOlcNP2khxzm5dCLDGtiP44nphrV3X982J5/WeDbFlc0vsls/K77LLY852SnRFOLbZHoeo+ebdT+mq64IP8wcLpqHKaAoqtsR2WkIAgN7XGr0pY3cYzIP/5+o+vvkjsd8+DWLQc5pKpVbnS9Y1BVLrjfKQHaBFvYDU7q/l2txGoP77bXJ8xa9TTM9O6kC7GN8cpISqmdbmh8wca/VAYCrcK+SKwfzzwwuiVGkqjMF+PJvxnF8pOr59ltRr+/40MkOptV1Ctz/WgdTLN7mtXSW+76f/l6NPOSWTw7zJsh/Zg==
+ bh=KXAs9LpzfoMHU3sB47kLQF16oqtLo5puIjhfIvr+HGc=;
+ b=FFYG1XwD/jrJ1j0wGWGPiR+WGSwD7J4Nu0jIs+QAPXoNFDWAYEBABJX5CjiuEQ6Yl7r/Y2i7UAbLKcEJt86SguYt/RKs2kVXdpKfGSYHtcsncN+5k2XK5XrriAQ0QkVkm2gRMLu7m9Rwre5Sy7jEBRUmKn2177eLT4rvU/wG19KrUOzspZ01d4FRiOtRXzL3q8rFYBckItP+s6DQE+21EAZoyngwCKfjs5OzljWGZhJ8oiDOwtZ7VFycwaRxCCsvxqMT8eAVcOz9TOXNt5GNYoRN2D3j6z2tXfLRwpw7ze30U4o6ZGzmqXhMWcW3kJFNLun7u8OMhDV8TV3E0vesTw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=irIYlFeNl5XtcoAewstN4M3lOQKk5iqpHg59k4MmD2Q=;
- b=GGyCYasqbt8CB3cb7RYK8E48xSTfNs5MxHE2ZgLO9+IEA5QGYBQXNHU5G28iL3olF66qBHvNh212p0EXuUciRxlIXUvSHva9Pmrr7SZUTZ2Nt/M8hfhMY+RbmIpYnfzw1Tb686QICR+zpDzEXee5XcShtMKsf2VnaesGeCqTFApFBXqShzno+y2Khi/GYCNXko9jyg8FJHyIO+VzBhK9pT0pJNVBIiMejyjC6hPOHCV5Ld397IvNpTxA1+mPV5nCXu4XYKfOljI4tzqCylKBvfnZFSpryBDTAWNp9uuWDnp8zaIj2xNazOyL6fPS+vt9263JtCbGT80piKhjxKyHIw==
+ bh=KXAs9LpzfoMHU3sB47kLQF16oqtLo5puIjhfIvr+HGc=;
+ b=Ahj8w19QwwtCT9/q3WzXxPbPC7FZs4rkA+ZrBWbVERDuFhtqlE/DL7L4LpfXl2s0oJIe8+cum0vNg4LkQZ+pvDUJqAp5VWjgRwlUjjMKo9yrIBrzlUWBKphdwIDzOHjj6oQAta1i+0I9uL//B5CR5aEpPeDrJkA4BonnPhnIK/1TI+nNY6/cM7kIahJxa9Htp8Xka58slik4rUXjeir25qG6dzJtGWfqhZSjI9YWvpRaR5OU3NqpNzZEJ2ZCkWojDIi9rbaByNlxynUcNzBZ7kvfPPzaaGWKtu+R3uxhSRSb3M2g9nDp2tjuc9ShSCpTm/x0gTJpYIxrmL0PZCD6Ew==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nvidia.com;
 Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
  by MN6PR12MB8566.namprd12.prod.outlook.com (2603:10b6:208:47c::18) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8880.25; Mon, 30 Jun
- 2025 22:28:46 +0000
+ 2025 22:28:49 +0000
 Received: from CH3PR12MB8659.namprd12.prod.outlook.com
  ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
  ([fe80::6eb6:7d37:7b4b:1732%7]) with mapi id 15.20.8880.030; Mon, 30 Jun 2025
- 22:28:46 +0000
+ 22:28:49 +0000
 From: Jason Gunthorpe <jgg@nvidia.com>
 To: Bjorn Helgaas <bhelgaas@google.com>,
 	iommu@lists.linux.dev,
@@ -74,15 +74,15 @@ Cc: Alex Williamson <alex.williamson@redhat.com>,
 	patches@lists.linux.dev,
 	tdave@nvidia.com,
 	Tony Zhu <tony.zhu@intel.com>
-Subject: [PATCH 05/11] PCI: Add pci_reachable_set()
-Date: Mon, 30 Jun 2025 19:28:35 -0300
-Message-ID: <5-v1-74184c5043c6+195-pcie_switch_groups_jgg@nvidia.com>
+Subject: [PATCH 06/11] iommu: Use pci_reachable_set() in pci_device_group()
+Date: Mon, 30 Jun 2025 19:28:36 -0300
+Message-ID: <6-v1-74184c5043c6+195-pcie_switch_groups_jgg@nvidia.com>
 In-Reply-To: <0-v1-74184c5043c6+195-pcie_switch_groups_jgg@nvidia.com>
 References:
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: BY5PR20CA0032.namprd20.prod.outlook.com
- (2603:10b6:a03:1f4::45) To CH3PR12MB8659.namprd12.prod.outlook.com
+X-ClientProxiedBy: BYAPR21CA0013.namprd21.prod.outlook.com
+ (2603:10b6:a03:114::23) To CH3PR12MB8659.namprd12.prod.outlook.com
  (2603:10b6:610:17c::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -92,239 +92,260 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|MN6PR12MB8566:EE_
-X-MS-Office365-Filtering-Correlation-Id: 817461d6-c71c-4faa-5285-08ddb8257a54
+X-MS-Office365-Filtering-Correlation-Id: 66d4cc9c-961b-4ab7-37dc-08ddb8257be3
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?7dNFAspuKdCEc8P3+HZNiwOA266LwQm7jR5rdTnWxlon1DMw7uI81ApfaTaG?=
- =?us-ascii?Q?fiDLWmrY6167sUGDeJhlHfR1fALzIMt0ekp0vnCKhedSNk3vFdu/NQ/09bLj?=
- =?us-ascii?Q?VkbCv6+eH1w7j8m3HGbKUxSY6e9MzI5DAnDnGCj6bPFaEUbQJJG7tc4c1ZN7?=
- =?us-ascii?Q?Tb/B8KZYubCIQd21VZCILv4Qo90tabWMabGbaJNQuu8f4mYzbiBY2XLZkJ1k?=
- =?us-ascii?Q?6WhJtSVyvApJ0IHFmvpITyop8PEIaxzht0/OjbEjfhyNvY+YDbsFnF5mTo75?=
- =?us-ascii?Q?M0Bfh685dPSr9aWBZEoc+ILV+Hcg9uk5Ku+7ytKfy009pZmQUckE5UD5rQWu?=
- =?us-ascii?Q?h14xnfe7MhCJtYQNkdDfK95NvQTOODrf8ty6Btyj03OU0PPuN3iYjV7SlvtW?=
- =?us-ascii?Q?JyNdP152AzOwtLUf3FrCuuLO1FLD2/XDe47aiPgPR/3P+Gy/HqJMaUuT/bhN?=
- =?us-ascii?Q?1mn+3jukfqmrpWgznVVf6w9sHrjpyfmHev3SpbuybzPQcSnG4R/zjHsTtwFH?=
- =?us-ascii?Q?xtLCgxzcbLrhZiY3flQo8QXbqebAawbdcP1hgjrlELHWk+cHGENzYC3kVWrP?=
- =?us-ascii?Q?c6mGzJtpZQlqDzZqw4DRBjVTdKqoWrRQS7JspqVhG6n788jX7TXRYN+Cx2ZP?=
- =?us-ascii?Q?4nJ9Ltg8tkNMt5hMVMGg+fCajfRhLGau0ikdVW8+uPhKFiwMfJMRyzjflR+m?=
- =?us-ascii?Q?wEIl6ree5pf/aXKjIxPejB2S2lDqqO5uwnH1YFF4yUF8c68uaQpPGZH0YhhJ?=
- =?us-ascii?Q?mfhVII4SRKbgY/lgZStR8qSZ2bwJR9vET7Xawn8dQp1mL8UrBsG4Qw1l7qww?=
- =?us-ascii?Q?In8YDgH5VSagMBzwBa75yRIMhDtVvrqZGnOsylPv+FJZJHz4hX5ABLdcGSiY?=
- =?us-ascii?Q?Pao+ZMr2NR4MwHZ/KcIbRCp+601xf72CLeZJLp4X9n0hj3zyVA2YTWnnHsUq?=
- =?us-ascii?Q?fEIZzDlzquX7LGaIfJMDbDLT2yWCvwTF1YntEcTYkItwGnnkeyOcMWlFyR81?=
- =?us-ascii?Q?/6Yys+nWjqRAB2v8OnF2uZdwior6gkZ18vTI3eLAsD+r/P15Qmo6H3nS5vkJ?=
- =?us-ascii?Q?/kdl/BypF/Uv7FGiKTFdDCI+KNH8GBdYETflBHl1GBjNT7TG1+ee/6kVCxz9?=
- =?us-ascii?Q?kTl5hhMHweU0yfgeFRl33JOVzvFHA3VH2Hq/doj7UoPmF+V/LPgncQevsrBR?=
- =?us-ascii?Q?Du29WHTN/QqtHESY1KixnuEBbwznG8dcowm6/nEgjqf8SuQH7zLJid+wz7YR?=
- =?us-ascii?Q?vrVv7q2fDSMh18Cr0THRRpfqUe9Pqbh38MXiQOUSYJyHSv22KwVBW93ZYZpG?=
- =?us-ascii?Q?nRWXgEjVqSRUjTxWFFy6cHmSawzG+YVfZxwepBWtpRUcQJ80g3WhKx28UB39?=
- =?us-ascii?Q?5QkM9TokZk3g2OEkq7716lbMXAotgrEdDue54g8oN+rn/K5mjpLSFM0DenBC?=
- =?us-ascii?Q?H9IR2fz2Adg=3D?=
+	=?us-ascii?Q?b1t6xdt10ddpPCiqzEPDb0w5cbjRNjk1HvLQQx0sfoHCLMfNE0iLzmXy1GVM?=
+ =?us-ascii?Q?6+dtpZDaISB6OR+ZGsD8i/j7vBfEuB4t8jQ6WfqbLFmI6Nqr/DAmraFchkxV?=
+ =?us-ascii?Q?BoYjljcqKPFuvQPzsUT0eUYUdBQvvnTQEkU9C0k0vNNnB2gi+H4onqvsV0+1?=
+ =?us-ascii?Q?bduNZtH2RcbstucOboyMgPyEvkIluZk0LDojKVkJOE7mIJPBRPa7DZZ2vbK7?=
+ =?us-ascii?Q?Jn7OQhe8UjwdTPgbZVLOOmNc3R65uMZF1Gstp/GJVCOE80h55T+IJvWPFCJw?=
+ =?us-ascii?Q?OKChqOu3wWooevBOgtFJes8yEg+KDM6yst7BcMUXTG7MqRmn1Pbpz8WuVj5U?=
+ =?us-ascii?Q?G3wiQLj5GmYY7HVl/83WmFvqYKz4A277oAR4cThKyydoiUkcHTLFyQQTivOx?=
+ =?us-ascii?Q?uFQMD0lGpaXk9LQoOxO2onhMRN65HF1n1hKuwHSPFsIXQb5nwN3+oxOx9VsB?=
+ =?us-ascii?Q?m/Zk7Z8LItHRWXz8GrC0pthVqzDchXoTPuK1KNn7ZniZ9n2dGST9aJGNojGw?=
+ =?us-ascii?Q?ySl54pA3uVXaWmC2ixoPKbf4sMX3Nl9dJuy1he5pKCeK+OidneODcDRdNkYS?=
+ =?us-ascii?Q?qQbRYWE9gS98yL1B/954oLOrO2NMqcxbM6gKbe5eAwfS3/bDKafkMxNS0uzM?=
+ =?us-ascii?Q?E1LG8brVHF7IkeACens94xsyk6zHMxK6Comj5MAh2TEtdcDyxfjUXPtleagO?=
+ =?us-ascii?Q?gvOVRoEwUCX9cojvFEMkdGLi96uxXEUh8lKB2uH1YeawtZ79GxCsOKGDkutJ?=
+ =?us-ascii?Q?37/O7GyaIi2IWYtA5zKgCeCoPmUPo9GnaD77i+0N7/dTuqiOGfc6UbqPDfr5?=
+ =?us-ascii?Q?7X8WUkHYEAMlvAWBPZjwgyf3ip89JFjG4LK9b1TlJCTMouBS/qvI1cZ/WZjL?=
+ =?us-ascii?Q?s19BItJpFopX/GHaoEYKIValopSShDd1DqZxUk3UngucVLvrcJM1rf4Lvgbn?=
+ =?us-ascii?Q?lMPGhxY7CSt59axwQiaNaeDkUDkAEii1Fj1SEr9GeEELVhMh7mLjviEekgbp?=
+ =?us-ascii?Q?QryfcNuA5rqti08ROROanrkpwELEnnwY4FG9JgJPJ0kNLcpueoQbsAKvdz6b?=
+ =?us-ascii?Q?JqP45uixe5gPebGreMyuKdFdlCKaYHFCoN0FDY6+LXfhdStZFefSfrEAvpJU?=
+ =?us-ascii?Q?ZQX884JQx6xVIxbxJBJgNdPJiEpJvRxDHG+kH0DrB8r9HitqB24ITrilxQ7p?=
+ =?us-ascii?Q?Gr5FkKy8eJY7bg7814cVMVrj9eb2MIdq1BuXHYo0BZhhmkrBmU2ujaT0YsnC?=
+ =?us-ascii?Q?KqKs8HHP2gl0kgNk2zOq24RL8+eNIznk1RMSEz19AAkQmsLa02NTCnwSnj0i?=
+ =?us-ascii?Q?iPIgIxgWZV34XwVafcvCt/SpzxWYCTwjzFhYMDww8ose8IkpcFjJX5KdozzM?=
+ =?us-ascii?Q?yr1z87+z2amDfBlXTYA5VfXT2tF+IoPE2yLT5L7wA8pP1JRQfZh14tX+bgBU?=
+ =?us-ascii?Q?M/JTh10MBlc=3D?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?0EA6FPKwwvefkmHhHG+utln8oUnDN5KRQQ6Olq0vDUninzCsdTDihgegSRZS?=
- =?us-ascii?Q?m3SUKdTaM2poTzrt5bGo19kt+Is+wvzvVFvcjxAT7LX7vcUPmidx9PKj2J8+?=
- =?us-ascii?Q?7gPlq9IGtahVJ1gXWgF62TgmhkhWHxyeqQ0zQY05QHTKUTytTJSTleVQ2geG?=
- =?us-ascii?Q?TOvWPqfYOgtZQdHAT6ph9q3f5escsiLYqpwOmL3B5hfkeurQT3mCo6Y+C4yU?=
- =?us-ascii?Q?As/14OGjOTUTgN44VuqzJH0WLKBYkKZyaCpxPNhxy1dlSyz+gNCO4NHTAXxb?=
- =?us-ascii?Q?e9WpHYUrfU1oHrJVoBrwwBuRdxq9MUODwKgHOe1gd6H3uPXMevMsHqak8JGe?=
- =?us-ascii?Q?avMrYaQKumcwTRGfJF8zJUiFxvcPYgieT6Byvua9JdrUT73qxBMyg+/IJ8z8?=
- =?us-ascii?Q?zb1NvNk2QIvjIyoBUguw3QIGtrJeZXofqn0fZ7iQVK5K0BoAaUg5HTain3VA?=
- =?us-ascii?Q?XbRINp2wxVreMg7MQ8SkGbNsd1lD8g8uRfuEN01FbOqv+MiAz7wbj/TbIhJT?=
- =?us-ascii?Q?L+PYr4qM2ocInKJwMsQpktbVecBVWOhOHKGaoP+EJttZFaIdJbpLtPkYBjay?=
- =?us-ascii?Q?Cip9HwlQi2qozhkzmxde9NzMiPK1KC1tvOW3IhoADdp4LYvCBE/C9jGTpIY9?=
- =?us-ascii?Q?a9Zc53gXsUlF1IsoE6cSWYV0kwI44qRmVk6zJfaZv0QRSKMs/wNJTJwnjQgq?=
- =?us-ascii?Q?Ubptv8WA7lFxwLsVlTmvV9ZfwTlpLX9T80SB2MUYlRfHGBYkiFHLBTripwwK?=
- =?us-ascii?Q?QVeQ46MubACIKUaG9t/eMMa7BoLOZspv9yJeuMsNCJb81dKLXsnKpFvp2hah?=
- =?us-ascii?Q?zwWHn7OcQ2Xc8xcOCy3radvb1kYPZHcuV2KrMAl7sNDJ/G5ndewaONzeVLkP?=
- =?us-ascii?Q?4ARAA4EG+htMdFnRooASsj0/cE3N1aq3B6UpRcRoGFsH1qHozty5A+S6LJOT?=
- =?us-ascii?Q?CsSRI8kyQg936cTLI4duQLY6x+fVyYOR9D9x9F/75xwAhazWzvI6oeqW0lDm?=
- =?us-ascii?Q?jj1KmQ/dQFIh/+cbrJz3l5e1sy9qD+znSibmsRfU4nqt+0TEzmn6RQ0//B7Y?=
- =?us-ascii?Q?Z21lwFVVrKCdBzU7gFK5QCdV1Jjo/bf4BbsfRcCFqMYFsaTHQi9MbFU6c3jJ?=
- =?us-ascii?Q?2XcRuSeKNCnnIiowpvnTJRuEFAgyecnIjvJt1+LUnIRdgcEvUjXZ6vucymJj?=
- =?us-ascii?Q?M33dIMUEP4DIJgZDRoSxoDUUFJ79Ugoo4fTkp3h1SMengjNcVuZ8xpmo+9+2?=
- =?us-ascii?Q?JqUaDG108kzdCq/3F+hDo/yGzQ0rhVppPnj9XtMlsnox7ptE2VLEj0umwdvO?=
- =?us-ascii?Q?+IRCvnOM7tznMSi/DkEw/EOEd794pcpp+mj2mTL3L5qyW4xelUWAtgd9st+f?=
- =?us-ascii?Q?zjOiOp/BB8Y9JSIQb6H5Jf4U30pSCPu0MHTTlrN8U+nnLBkaFLvyKpD85ZlZ?=
- =?us-ascii?Q?1Zh3cc5JBhUr0kdxl041o8Tm0hae70/AziHD0uI04FDKpatKglNUmpbelnB1?=
- =?us-ascii?Q?mnjUmbwHwvj4CVZ7lRdsoyLNz9bRwTahdn81w79hmj2K8x4qnX9JfSvRER81?=
- =?us-ascii?Q?s61BgBqRH0Ly0zz2jsvK+gYIHjdIM8V7/mpGE9zB?=
+	=?us-ascii?Q?FUN8octW+NohBIanxBlFu1z4QUIVG4p8FEcV3k9rLyVfZnDhbxkzKG6ioKdN?=
+ =?us-ascii?Q?RGMze/I4yDjtz1srVLvrarJB90fUlVqgIs3pxuEnET57WeimK0bcWHgsFc+/?=
+ =?us-ascii?Q?r+xMT/RlkswFyH7nh0pQvi8GM2OHjE0f3kge6plkQ4NjfMb6Jnc/R851g1MB?=
+ =?us-ascii?Q?B99S0NlJONjA7H1fukaVI7QPwAzcHjLE3NiYNFjqZ2ltjLdS8E6FNoOW7NN0?=
+ =?us-ascii?Q?0z+TYATjyeH3erC074esZ2YXZRcNNeYipNYaOfIAbv9xn6J81PU8JtSGLsqh?=
+ =?us-ascii?Q?XHzyfU1zotgtKiA5u4zxJIcRG5+xN5kQG55iG7rZeFq5RiMliKkAFSRwvKY1?=
+ =?us-ascii?Q?pYifn6MBYy8Hgjyg6cB/U+VDAazQx4dc7IajFQbtMEJpulJAKV8Ghprxt5QO?=
+ =?us-ascii?Q?MPDpxHtvqVu6AN/fhLeHgVycZ5Wr9LVc5XtS2zJNlNRd2g2YXuCuex1a0qx/?=
+ =?us-ascii?Q?PtzOZjTDuqMBHUSB/97nqMaQQC7Fs0/GnMPB58iA2SEJjMRUz5Epq+QmQGDD?=
+ =?us-ascii?Q?rbJ0IWdZF4GM/DSkVmlUSofMAtxd1g7rcJ8irFnTu0S2fyjYFhNR5LIIuzAP?=
+ =?us-ascii?Q?lliwPct2bc9ZSzuZHvOL0TCUqhATivw9PF4j8sQMGLv3Sm7x6Vcgnx5lpv+3?=
+ =?us-ascii?Q?8Iyn3xgsN1b0lIRUAi0au0+EISqA5AWxOAUlfIfI4UUuvMm0m66o3narkvTw?=
+ =?us-ascii?Q?R42MNvX9c3ZvZC/ZX0aZ7XRW34pIyG0JvTjVoRaDRC/lem0TUEq06cKSavnU?=
+ =?us-ascii?Q?MBZ5GW2Vt+RHDocidQ3AumXstDbOonsTjdAinaAZv4FEg5IA+MQNwJ61N7rr?=
+ =?us-ascii?Q?cQMnZX+knxbeby7A0oFhNGeQQlKsNTEV/Ro/3t7WvD/thGk1bDQ9avMhKSVS?=
+ =?us-ascii?Q?psNrdkqsI/Q3JlofCf/Z4y/mx6MUazmtgW1cIIVQR5BZU4y8jcq0hS+5FTp6?=
+ =?us-ascii?Q?BhPVIPiAI7XEM44b3+YAypG7X9Xi+y6BXDey0E9zVQsaJ4vBZpL5HSz9J7zN?=
+ =?us-ascii?Q?puufM0DG00CHyz/2bMSLlk6DC2xiQAA0/L3zgzyQI78MXmw4xkwcTsSCNn/A?=
+ =?us-ascii?Q?NZUSbxBaelVRHArTYrVdvqFfMG7fEOlQHAcnyyMKYVYaGUhp2QH3dWldXgNH?=
+ =?us-ascii?Q?k2C6/Y4SdEifwk/OIcLztBsgj0h99ANUjIfNldykZdw49pqOaGZe0vTkFDAG?=
+ =?us-ascii?Q?uWPbOAQsvPt0UckVgMucxlzdY7qJukzuH9J5kOGg8T/ZdxTS91d/Dbbg7g6Q?=
+ =?us-ascii?Q?X8h4hAdwqiecxtK7kHMDjnRUFWriUMpOAoUUi2pAWSqV7bQik7/5F29FdkIM?=
+ =?us-ascii?Q?6pW8FMTgA5DtDNmX23kuqsqC2gtGiLGADYmTjKLlZn3OIPtwlZGzroimp4sp?=
+ =?us-ascii?Q?QZFL/Rwuqwuu5Ur0qct467nZdbFiV2GeYzvKHpAdD/+Rb1SP0xoTzsSdeIBY?=
+ =?us-ascii?Q?FX6Jfw4azGVOyUxTSGPOUYkS8DOJT3cZaXk5wQ1JtEqeUMtr7Crwn7WijzKe?=
+ =?us-ascii?Q?ocHTPyFoxB2VjSSJ/zuwx3chE3ws8xRrcxc1seFZeHSY/fz/qA8kmxkw6a8L?=
+ =?us-ascii?Q?KmttV5OAJhuhEGm+/jXNuH32PIzNIFipTNQ/G3EY?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 817461d6-c71c-4faa-5285-08ddb8257a54
+X-MS-Exchange-CrossTenant-Network-Message-Id: 66d4cc9c-961b-4ab7-37dc-08ddb8257be3
 X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jun 2025 22:28:46.6705
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jun 2025 22:28:49.1210
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: eyNDh1zD4ewcnzIb1dMPkhbvreOs3pTArxxBVg+dscEGCfJ2jA0bUYJOQ5MMTKCu
+X-MS-Exchange-CrossTenant-UserPrincipalName: StxmzvWrz4MHPcpvs+jGEcWKY0FhL7UxyT+EFKbgI+g90FkWEtBbqW5ilrjFSpmE
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN6PR12MB8566
 
-Implement pci_reachable_set() to efficiently compute a set of devices on
-the same bus that are "reachable" from a starting device. The meaning of
-reachability is defined by the caller through a callback function.
+This is intended as a non-functional change. It aims to simplify and
+optimize pci_get_alias_group().
 
-This is a faster implementation of the same logic in
-pci_device_group(). Being inside the PCI core allows use of pci_bus_sem so
-it can use list_for_each_entry() on a small list of devices instead of the
-expensive for_each_pci_dev(). Server systems can now have hundreds of PCI
-devices, but typically only a very small number of devices per bus.
+The purpose of pci_get_alias_group() is to find the set of devices on the
+same bus that are not ACS isolated or part of the alias set. All of these
+devices should share a group so pci_get_alias_group() will search that set
+for an existing group to join.
 
-An example of a reachability function would be pci_devs_are_dma_aliases()
-which would compute a set of devices on the same bus that are
-aliases. This would also be useful in future support for the ACS P2P
-Egress Vector which has a similar reachability problem.
+pci_reachable_set() does the calculations for figuring out the set of
+devices under the pci_bus_sem, which is better than repeatedly searching
+across all PCI devices.
 
-This is effectively a graph algorithm where the set of devices on the bus
-are vertexes and the reachable() function defines the edges. It returns a
-set of vertexes that form a connected graph.
+Once the set of devices is determined it is a quick pci_get_slot() to
+search for any existing groups in the subset.
 
 Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
 ---
- drivers/pci/search.c | 90 ++++++++++++++++++++++++++++++++++++++++++++
- include/linux/pci.h  | 12 ++++++
- 2 files changed, 102 insertions(+)
+ drivers/iommu/iommu.c | 137 ++++++++++++++----------------------------
+ 1 file changed, 45 insertions(+), 92 deletions(-)
 
-diff --git a/drivers/pci/search.c b/drivers/pci/search.c
-index 540a503b499e3f..3bc20659af6b20 100644
---- a/drivers/pci/search.c
-+++ b/drivers/pci/search.c
-@@ -571,3 +571,93 @@ int pci_dev_present(const struct pci_device_id *ids)
- 	return 0;
+diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+index f98c25514bf912..5a8077d4b79d41 100644
+--- a/drivers/iommu/iommu.c
++++ b/drivers/iommu/iommu.c
+@@ -1413,85 +1413,6 @@ int iommu_group_id(struct iommu_group *group)
  }
- EXPORT_SYMBOL(pci_dev_present);
-+
-+/**
-+ * pci_reachable_set - Generate a bitmap of devices within a reachability set
-+ * @start: First device in the set
-+ * @devfns: The set of devices on the bus
-+ * @reachable: Callback to tell if two devices can reach each other
-+ *
-+ * Compute a bitmap where every set bit is a device on the bus that is reachable
-+ * from the start device, including the start device. Reachability between two
-+ * devices is determined by a callback function.
-+ *
-+ * This is a non-recursive implementation that invokes the callback once per
-+ * pair. The callback must be commutative:
-+ *    reachable(a, b) == reachable(b, a)
-+ * reachable() can form a cyclic graph:
-+ *    reachable(a,b) == reachable(b,c) == reachable(c,a) == true
-+ *
-+ * Since this function is limited to a single bus the largest set can be 256
-+ * devices large.
-+ */
-+void pci_reachable_set(struct pci_dev *start, struct pci_alias_set *devfns,
-+		       bool (*reachable)(struct pci_dev *deva,
-+					 struct pci_dev *devb))
+ EXPORT_SYMBOL_GPL(iommu_group_id);
+ 
+-static struct iommu_group *get_pci_alias_group(struct pci_dev *pdev,
+-					       unsigned long *devfns);
+-
+-/*
+- * For multifunction devices which are not isolated from each other, find
+- * all the other non-isolated functions and look for existing groups.  For
+- * each function, we also need to look for aliases to or from other devices
+- * that may already have a group.
+- */
+-static struct iommu_group *get_pci_function_alias_group(struct pci_dev *pdev,
+-							unsigned long *devfns)
+-{
+-	struct pci_dev *tmp = NULL;
+-	struct iommu_group *group;
+-
+-	if (!pdev->multifunction || pci_acs_enabled(pdev, PCI_ACS_ISOLATED))
+-		return NULL;
+-
+-	for_each_pci_dev(tmp) {
+-		if (tmp == pdev || tmp->bus != pdev->bus ||
+-		    PCI_SLOT(tmp->devfn) != PCI_SLOT(pdev->devfn) ||
+-		    pci_acs_enabled(tmp, PCI_ACS_ISOLATED))
+-			continue;
+-
+-		group = get_pci_alias_group(tmp, devfns);
+-		if (group) {
+-			pci_dev_put(tmp);
+-			return group;
+-		}
+-	}
+-
+-	return NULL;
+-}
+-
+-/*
+- * Look for aliases to or from the given device for existing groups. DMA
+- * aliases are only supported on the same bus, therefore the search
+- * space is quite small (especially since we're really only looking at pcie
+- * device, and therefore only expect multiple slots on the root complex or
+- * downstream switch ports).  It's conceivable though that a pair of
+- * multifunction devices could have aliases between them that would cause a
+- * loop.  To prevent this, we use a bitmap to track where we've been.
+- */
+-static struct iommu_group *get_pci_alias_group(struct pci_dev *pdev,
+-					       unsigned long *devfns)
+-{
+-	struct pci_dev *tmp = NULL;
+-	struct iommu_group *group;
+-
+-	if (test_and_set_bit(pdev->devfn & 0xff, devfns))
+-		return NULL;
+-
+-	group = iommu_group_get(&pdev->dev);
+-	if (group)
+-		return group;
+-
+-	for_each_pci_dev(tmp) {
+-		if (tmp == pdev || tmp->bus != pdev->bus)
+-			continue;
+-
+-		/* We alias them or they alias us */
+-		if (pci_devs_are_dma_aliases(pdev, tmp)) {
+-			group = get_pci_alias_group(tmp, devfns);
+-			if (group) {
+-				pci_dev_put(tmp);
+-				return group;
+-			}
+-
+-			group = get_pci_function_alias_group(tmp, devfns);
+-			if (group) {
+-				pci_dev_put(tmp);
+-				return group;
+-			}
+-		}
+-	}
+-
+-	return NULL;
+-}
+-
+ /*
+  * Generic device_group call-back function. It just allocates one
+  * iommu-group per device.
+@@ -1523,25 +1444,57 @@ struct iommu_group *generic_single_device_group(struct device *dev)
+ }
+ EXPORT_SYMBOL_GPL(generic_single_device_group);
+ 
++static bool pci_devs_are_same_group(struct pci_dev *deva, struct pci_dev *devb)
 +{
-+	struct pci_alias_set todo_devfns = {};
-+	struct pci_alias_set next_devfns = {};
-+	struct pci_bus *bus = start->bus;
-+	bool again;
++	/*
++	 * This is allowed to return cycles: a,b -> b,c -> c,a can be aliases.
++	 */
++	if (pci_devs_are_dma_aliases(deva, devb))
++		return true;
 +
-+	/* Assume devfn of all PCI devices is bounded by MAX_NR_DEVFNS */
-+	static_assert(sizeof(next_devfns.devfns) * BITS_PER_BYTE >=
-+		      MAX_NR_DEVFNS);
-+
-+	memset(devfns, 0, sizeof(devfns->devfns));
-+	__set_bit(start->devfn, devfns->devfns);
-+	__set_bit(start->devfn, next_devfns.devfns);
-+
-+	down_read(&pci_bus_sem);
-+	while (true) {
-+		unsigned int devfna;
-+		unsigned int i;
-+
-+		/*
-+		 * For each device that hasn't been checked compare every
-+		 * device on the bus against it.
-+		 */
-+		again = false;
-+		for_each_set_bit(devfna, next_devfns.devfns, MAX_NR_DEVFNS) {
-+			struct pci_dev *deva = NULL;
-+			struct pci_dev *devb;
-+
-+			list_for_each_entry(devb, &bus->devices, bus_list) {
-+				if (devb->devfn == devfna)
-+					deva = devb;
-+
-+				if (test_bit(devb->devfn, devfns->devfns))
-+					continue;
-+
-+				if (!deva) {
-+					deva = devb;
-+					list_for_each_entry_continue(
-+						deva, &bus->devices, bus_list)
-+						if (deva->devfn == devfna)
-+							break;
-+				}
-+
-+				if (!reachable(deva, devb))
-+					continue;
-+
-+				__set_bit(devb->devfn, todo_devfns.devfns);
-+				again = true;
-+			}
-+		}
-+
-+		if (!again)
-+			break;
-+
-+		/*
-+		 * Every new bit adds a new deva to check, reloop the whole
-+		 * thing. Expect this to be rare.
-+		 */
-+		for (i = 0; i != ARRAY_SIZE(devfns->devfns); i++) {
-+			devfns->devfns[i] |= todo_devfns.devfns[i];
-+			next_devfns.devfns[i] = todo_devfns.devfns[i];
-+			todo_devfns.devfns[i] = 0;
-+		}
++	/*
++	 * If any function in a multi function device does not have ACS
++	 * isolation turned on then the specs allows it to loop back internally
++	 * to another function.
++	 */
++	if ((deva->multifunction || devb->multifunction) &&
++	    PCI_SLOT(deva->devfn) == PCI_SLOT(devb->devfn)) {
++		if (!pci_acs_enabled(deva, PCI_ACS_ISOLATED) ||
++		    !pci_acs_enabled(devb, PCI_ACS_ISOLATED))
++			return true;
 +	}
-+	up_read(&pci_bus_sem);
++	return false;
 +}
-+EXPORT_SYMBOL_GPL(pci_reachable_set);
-diff --git a/include/linux/pci.h b/include/linux/pci.h
-index deeb85467f4f38..dbcffc77650dd7 100644
---- a/include/linux/pci.h
-+++ b/include/linux/pci.h
-@@ -834,6 +834,10 @@ struct pci_dynids {
- 	struct list_head	list;	/* For IDs added at runtime */
- };
- 
-+struct pci_alias_set {
-+	DECLARE_BITMAP(devfns, 256);
-+};
 +
- enum pci_bus_isolation {
+ static struct iommu_group *pci_get_alias_group(struct pci_dev *pdev)
+ {
+-	struct iommu_group *group;
+-	u64 devfns[4] = { 0 };
++	struct pci_alias_set devfns;
++	unsigned int devfn;
+ 
  	/*
- 	 * The bus is off a root port and the root port has isolated ACS flags
-@@ -1248,6 +1252,9 @@ struct pci_dev *pci_get_domain_bus_and_slot(int domain, unsigned int bus,
- struct pci_dev *pci_get_class(unsigned int class, struct pci_dev *from);
- struct pci_dev *pci_get_base_class(unsigned int class, struct pci_dev *from);
+-	 * Look for existing groups on device aliases.  If we alias another
+-	 * device or another device aliases us, use the same group.
++	 * Look for existing groups on device aliases and multi-function ACS. If
++	 * we alias another device or another device aliases us, use the same
++	 * group.
++	 *
++	 * pci_reachable_set() should return the same bitmap if called for any
++	 * device in the set and we want all devices in the set to have the same
++	 * group.
+ 	 */
+-	group = get_pci_alias_group(pdev, (unsigned long *)devfns);
+-	if (group)
+-		return group;
++	pci_reachable_set(pdev, &devfns, pci_devs_are_same_group);
++	/* start is known to have iommu_group_get() == NULL */
++	__clear_bit(pdev->devfn & 0xFF, devfns.devfns);
++	for_each_set_bit(devfn, devfns.devfns,
++			 sizeof(devfns.devfns) * BITS_PER_BYTE) {
++		struct iommu_group *group;
++		struct pci_dev *pdev_slot;
  
-+void pci_reachable_set(struct pci_dev *start, struct pci_alias_set *devfns,
-+		       bool (*reachable)(struct pci_dev *deva,
-+					 struct pci_dev *devb));
- enum pci_bus_isolation pci_bus_isolated(struct pci_bus *bus);
+-	/*
+-	 * Look for existing groups on non-isolated functions on the same
+-	 * slot and aliases of those funcions, if any.  No need to clear
+-	 * the search bitmap, the tested devfns are still valid.
+-	 */
+-	return get_pci_function_alias_group(pdev, (unsigned long *)devfns);
++		pdev_slot = pci_get_slot(pdev->bus, devfn);
++		group = iommu_group_get(&pdev_slot->dev);
++		pci_dev_put(pdev_slot);
++		if (group)
++			return group;
++	}
++	return NULL;
+ }
  
- int pci_dev_present(const struct pci_device_id *ids);
-@@ -2063,6 +2070,11 @@ static inline struct pci_dev *pci_get_base_class(unsigned int class,
- 						 struct pci_dev *from)
- { return NULL; }
- 
-+void pci_reachable_set(struct pci_dev *start, struct pci_alias_set *devfns,
-+		       bool (*reachable)(struct pci_dev *deva,
-+					 struct pci_dev *devb))
-+{ }
-+
- enum pci_bus_isolation pci_bus_isolated(struct pci_bus *bus)
- { return PCI_NON_ISOLATED; }
- 
+ static struct iommu_group *pci_hierarchy_group(struct pci_dev *pdev)
 -- 
 2.43.0
 
