@@ -1,77 +1,95 @@
-Return-Path: <kvm+bounces-51056-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51057-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96924AED465
-	for <lists+kvm@lfdr.de>; Mon, 30 Jun 2025 08:18:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A63EAED475
+	for <lists+kvm@lfdr.de>; Mon, 30 Jun 2025 08:24:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C6A4F16E4F0
-	for <lists+kvm@lfdr.de>; Mon, 30 Jun 2025 06:18:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1866E7A384A
+	for <lists+kvm@lfdr.de>; Mon, 30 Jun 2025 06:23:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ACEB1F0985;
-	Mon, 30 Jun 2025 06:18:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E87981F4C84;
+	Mon, 30 Jun 2025 06:24:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="gbh2xKHq"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="JekC85cB";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="GGwRzyBi";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="JekC85cB";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="GGwRzyBi"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2073.outbound.protection.outlook.com [40.107.244.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E104417BD3;
-	Mon, 30 Jun 2025 06:18:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.73
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751264301; cv=fail; b=oSLyKIcgAw6gmPoNZM6cVitdo7NbvjgeMhv2DOYoB4Nlxmhn7N7Z/54LiZLW5KOO0j1d8B8i6XpudGygAZCndsrEIj2Clgi33AuNilZRDKO7MQbEnvLgb2rt0pkbcsy47vEZqg3h7oW+BlJvt5vxNyDeHcBzZ9DR+L+oyKPi50E=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751264301; c=relaxed/simple;
-	bh=DlWegF9TlJz9gcP5bKm5NVBM7UtpPLNmdPmNdvleeyU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=aHystE4W/VOlg/0Yz5Cf+COVuMYfCFoYT5+aoq/tFpNsVLZ4GeEm2Dj1+RAWGi0lpz1AnKAuM23cO94hTe2WL0f73ej8yoV4dCcvwQZNPvRz1rMt9tMGXpRRnpmb4i1/UxqBEI4efuFtq8gdtjizUvGXIaJghDoAICdB/iGloUg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=gbh2xKHq; arc=fail smtp.client-ip=40.107.244.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=JqILkA4V/1p89exW95l3IFVMgd0q3QHCiVaO9pw+6vEml79bAWunsmgGa7K6TdBNEoJvfC1wk+6QXkE7zcD1HFbYRwHE6uLsJ0OQioVLlrDYDnc1Byftg8deGWyol3+aguxTr9CQJDugdlfjbvU1SjVXHK5gP5ymuVuvorQ3XhPltKXrYVGsKzDiC8/MFxfbyPmL1MH2wd15IZyYOt+mPC4Q3OuI+etRF5D5JCWWOVvJSxF7Ma6Gimyrkd/ZGzFWxIfSoEDh2MYCEXgpEevHnCZKhr45GYp4nJZoxsznLvyfDxUoTwtr6cpxVN+asXY1upbhzLjkCUj1I/+iZinnkw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=nBbT1EJx3gXqHfaCyA4n6Sa0wFrHXKVqBn6ZCRwH+ro=;
- b=ECP8bfFOGjaDSQM5QkgvE5mkeaf8LXfvkQuP85oV3KH5O4AGmNW1fLTHspeBaYk99G4/JptzZQ8oHERkPkx2jJ+Ov/5P2ylIpXWvpBWXjzP6zFOJBIZos7/1I+cNoEt7nq8EWFzO60Lu3wdpIqa7SfUv3ZlwbN5skPc+zLxgB+oJlHn+8ytt2xZDudtyxpHRzXI0VcR0G2L+t2z46DoHCdyTmcSRX5dPQV1bgwSqRIfNKhpDvEqC5ibiPJ06ZPYRsQEr4ke7O+IWlhtugV9cQti7CJtKrXnarX/0SAk6kIVGYV7CjvuJERNl8Epz0Dw0S5n8LFft23GIJsKa7kbgBQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nBbT1EJx3gXqHfaCyA4n6Sa0wFrHXKVqBn6ZCRwH+ro=;
- b=gbh2xKHqJ63W7qlZWYJM5d2kgAep2E4/7sJBPXEV9nDZdovHvEe9aNWnjr/okrEPai8dLbHDwn4TVWr6qs2WLws2VqG06pZQXgidDyuOPhHfYCSifxNRaF8QbNfea4cp3F6P9UshIOY5NRzaPO9vc0MxFnHR823jHI2658gw/dE=
-Received: from MW4P222CA0019.NAMP222.PROD.OUTLOOK.COM (2603:10b6:303:114::24)
- by IA0PPFAF883AE17.namprd12.prod.outlook.com (2603:10b6:20f:fc04::be1) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.26; Mon, 30 Jun
- 2025 06:18:16 +0000
-Received: from SJ1PEPF00002323.namprd03.prod.outlook.com
- (2603:10b6:303:114:cafe::43) by MW4P222CA0019.outlook.office365.com
- (2603:10b6:303:114::24) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8880.28 via Frontend Transport; Mon,
- 30 Jun 2025 06:18:15 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SJ1PEPF00002323.mail.protection.outlook.com (10.167.242.85) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8901.15 via Frontend Transport; Mon, 30 Jun 2025 06:18:15 +0000
-Received: from [10.85.36.84] (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 30 Jun
- 2025 01:18:02 -0500
-Message-ID: <d112f9fd-5ccc-4b77-a670-4a2f3a443dbe@amd.com>
-Date: Mon, 30 Jun 2025 11:48:00 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03EB81E9B28
+	for <kvm@vger.kernel.org>; Mon, 30 Jun 2025 06:24:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751264667; cv=none; b=uMCEyLZkUnqwKMF+BeDrPsNa+9drIJKAx94LyjEiEodyH3YjkCV7kVZcPOw3WaGd8ac8rSmf5ds8sxS7vnR3pYSV/L+iVxQ0GW2+G4UBocQregR5du1MkC/FUA4O9CHy7diWgBTn2U6+i1c1zzOt2atVHYLlNu9rfewnxscoAPw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751264667; c=relaxed/simple;
+	bh=oIU0nlGeVkImkEVtE9FV85Qh8TUxliMwVa0aurlyVic=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=l+MOK1ehnlTNnBnOqDhMDiq7G6/mRIJ+7I2d5wNrvt3zvZiItcMP2BC3thcIrBRztepYygthrdjyKGHeNj+mFecrB4RgUctUbsbtcd2n1OzCP8Fh9jn8vZ0GcRkS2aVaDZQckbd+XfJiBT9CBtA7oINyRfY+o3lIYIY2n2eREdo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=JekC85cB; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=GGwRzyBi; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=JekC85cB; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=GGwRzyBi; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 43F2B1F38C;
+	Mon, 30 Jun 2025 06:24:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1751264663; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=PJyKYbqfUL2wuHqkoQTXa/2DpfteGgypmUTFXMIUHEE=;
+	b=JekC85cBCcHb3DEaAnCwMMACuYvXv0XARsQOlldGFLIsFkXSclY3qWwtQqnB6XYQEAYbfD
+	j7V4NqbWPRF6E+FErOimaVZt27sMaF5Uy8dQuyokPkO/qxm0t2CzY3ezdk/3sKwywVzj7F
+	gMOYpGve7HcD7sr8H2hkOtgyb6psutQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1751264663;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=PJyKYbqfUL2wuHqkoQTXa/2DpfteGgypmUTFXMIUHEE=;
+	b=GGwRzyBir+mjkzaB6HZuN97WHsuDsbZHQboPp33uC56cilryUX3S8vfROKa8qTRlmD9cJI
+	wbPyOQqIB6DDOtCw==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1751264663; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=PJyKYbqfUL2wuHqkoQTXa/2DpfteGgypmUTFXMIUHEE=;
+	b=JekC85cBCcHb3DEaAnCwMMACuYvXv0XARsQOlldGFLIsFkXSclY3qWwtQqnB6XYQEAYbfD
+	j7V4NqbWPRF6E+FErOimaVZt27sMaF5Uy8dQuyokPkO/qxm0t2CzY3ezdk/3sKwywVzj7F
+	gMOYpGve7HcD7sr8H2hkOtgyb6psutQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1751264663;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=PJyKYbqfUL2wuHqkoQTXa/2DpfteGgypmUTFXMIUHEE=;
+	b=GGwRzyBir+mjkzaB6HZuN97WHsuDsbZHQboPp33uC56cilryUX3S8vfROKa8qTRlmD9cJI
+	wbPyOQqIB6DDOtCw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id A55F813983;
+	Mon, 30 Jun 2025 06:24:22 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id lSErJ5YtYmiLVgAAD6G6ig
+	(envelope-from <tzimmermann@suse.de>); Mon, 30 Jun 2025 06:24:22 +0000
+Message-ID: <732aeb75-71e7-49e7-a5f2-2080ee94a273@suse.de>
+Date: Mon, 30 Jun 2025 08:24:22 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -79,188 +97,264 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 03/33] vfio: selftests: Introduce vfio_pci_device_test
-To: David Matlack <dmatlack@google.com>
-CC: Alex Williamson <alex.williamson@redhat.com>, Aaron Lewis
-	<aaronlewis@google.com>, Adhemerval Zanella <adhemerval.zanella@linaro.org>,
-	Adithya Jayachandran <ajayachandra@nvidia.com>, Andrew Jones
-	<ajones@ventanamicro.com>, Ard Biesheuvel <ardb@kernel.org>, "Arnaldo
- Carvalho de Melo" <acme@redhat.com>, Bibo Mao <maobibo@loongson.cn>, Claudio
- Imbrenda <imbrenda@linux.ibm.com>, Dan Williams <dan.j.williams@intel.com>,
-	Dave Jiang <dave.jiang@intel.com>, <dmaengine@vger.kernel.org>, Huacai Chen
-	<chenhuacai@kernel.org>, James Houghton <jthoughton@google.com>, "Jason
- Gunthorpe" <jgg@nvidia.com>, Joel Granados <joel.granados@kernel.org>, "Josh
- Hilke" <jrhilke@google.com>, Kevin Tian <kevin.tian@intel.com>,
-	<kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>, "Mike Rapoport
- (Microsoft)" <rppt@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, "Pasha
- Tatashin" <pasha.tatashin@soleen.com>, "Pratik R. Sampat" <prsampat@amd.com>,
-	Saeed Mahameed <saeedm@nvidia.com>, Sean Christopherson <seanjc@google.com>,
-	Shuah Khan <shuah@kernel.org>, Vinicius Costa Gomes
-	<vinicius.gomes@intel.com>, Vipin Sharma <vipinsh@google.com>, Wei Yang
-	<richard.weiyang@gmail.com>, "Yury Norov [NVIDIA]" <yury.norov@gmail.com>,
-	Santosh Shukla <santosh.shukla@amd.com>, Vasant Hegde <vasant.hegde@amd.com>
-References: <20250620232031.2705638-1-dmatlack@google.com>
- <20250620232031.2705638-4-dmatlack@google.com>
- <fe4b1d31-e910-40a1-ab83-d9fd936d1493@amd.com>
- <4aef95a0-a0de-4bd5-b4ec-5289f0bc0ab1@amd.com>
- <CALzav=fZcLpQ+9J=XOZ-=Cr1UA8qKa5NHXB1dJpqhCp7pee7Ow@mail.gmail.com>
- <62734f4d-8883-4145-a483-5bf2c462fad5@amd.com>
- <CALzav=eYD85ydnpAwYsTArDHbxOLd+D-BtYWaiYQxeJ1tGGp7A@mail.gmail.com>
+Subject: Re: [PATCH v6 9/9] PCI: Add a new 'boot_display' attribute
+To: Mario Limonciello <superm1@kernel.org>,
+ Bjorn Helgaas <bhelgaas@google.com>
+Cc: Alex Deucher <alexander.deucher@amd.com>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+ Lukas Wunner <lukas@wunner.de>,
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Maxime Ripard <mripard@kernel.org>, David Woodhouse <dwmw2@infradead.org>,
+ Lu Baolu <baolu.lu@linux.intel.com>, Joerg Roedel <joro@8bytes.org>,
+ Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+ "open list:DRM DRIVERS" <dri-devel@lists.freedesktop.org>,
+ open list <linux-kernel@vger.kernel.org>,
+ "open list:INTEL IOMMU (VT-d)" <iommu@lists.linux.dev>,
+ "open list:PCI SUBSYSTEM" <linux-pci@vger.kernel.org>,
+ "open list:VFIO DRIVER" <kvm@vger.kernel.org>,
+ "open list:SOUND" <linux-sound@vger.kernel.org>,
+ Daniel Dadap <ddadap@nvidia.com>,
+ Mario Limonciello <mario.limonciello@amd.com>
+References: <20250627043108.3141206-1-superm1@kernel.org>
+ <20250627043108.3141206-10-superm1@kernel.org>
+ <41587824-4a05-4ead-b24c-4729007cd663@suse.de>
+ <8878af70-3eb8-495b-b8df-43a10285c4f5@kernel.org>
 Content-Language: en-US
-From: Sairaj Kodilkar <sarunkod@amd.com>
-In-Reply-To: <CALzav=eYD85ydnpAwYsTArDHbxOLd+D-BtYWaiYQxeJ1tGGp7A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+From: Thomas Zimmermann <tzimmermann@suse.de>
+Autocrypt: addr=tzimmermann@suse.de; keydata=
+ xsBNBFs50uABCADEHPidWt974CaxBVbrIBwqcq/WURinJ3+2WlIrKWspiP83vfZKaXhFYsdg
+ XH47fDVbPPj+d6tQrw5lPQCyqjwrCPYnq3WlIBnGPJ4/jreTL6V+qfKRDlGLWFjZcsrPJGE0
+ BeB5BbqP5erN1qylK9i3gPoQjXGhpBpQYwRrEyQyjuvk+Ev0K1Jc5tVDeJAuau3TGNgah4Yc
+ hdHm3bkPjz9EErV85RwvImQ1dptvx6s7xzwXTgGAsaYZsL8WCwDaTuqFa1d1jjlaxg6+tZsB
+ 9GluwvIhSezPgnEmimZDkGnZRRSFiGP8yjqTjjWuf0bSj5rUnTGiyLyRZRNGcXmu6hjlABEB
+ AAHNJ1Rob21hcyBaaW1tZXJtYW5uIDx0emltbWVybWFubkBzdXNlLmRlPsLAjgQTAQgAOAIb
+ AwULCQgHAgYVCgkICwIEFgIDAQIeAQIXgBYhBHIX+6yM6c9jRKFo5WgNwR1TC3ojBQJftODH
+ AAoJEGgNwR1TC3ojx1wH/0hKGWugiqDgLNXLRD/4TfHBEKmxIrmfu9Z5t7vwUKfwhFL6hqvo
+ lXPJJKQpQ2z8+X2vZm/slsLn7J1yjrOsoJhKABDi+3QWWSGkaGwRJAdPVVyJMfJRNNNIKwVb
+ U6B1BkX2XDKDGffF4TxlOpSQzdtNI/9gleOoUA8+jy8knnDYzjBNOZqLG2FuTdicBXblz0Mf
+ vg41gd9kCwYXDnD91rJU8tzylXv03E75NCaTxTM+FBXPmsAVYQ4GYhhgFt8S2UWMoaaABLDe
+ 7l5FdnLdDEcbmd8uLU2CaG4W2cLrUaI4jz2XbkcPQkqTQ3EB67hYkjiEE6Zy3ggOitiQGcqp
+ j//OwE0EWznS4AEIAMYmP4M/V+T5RY5at/g7rUdNsLhWv1APYrh9RQefODYHrNRHUE9eosYb
+ T6XMryR9hT8XlGOYRwKWwiQBoWSDiTMo/Xi29jUnn4BXfI2px2DTXwc22LKtLAgTRjP+qbU6
+ 3Y0xnQN29UGDbYgyyK51DW3H0If2a3JNsheAAK+Xc9baj0LGIc8T9uiEWHBnCH+RdhgATnWW
+ GKdDegUR5BkDfDg5O/FISymJBHx2Dyoklv5g4BzkgqTqwmaYzsl8UxZKvbaxq0zbehDda8lv
+ hFXodNFMAgTLJlLuDYOGLK2AwbrS3Sp0AEbkpdJBb44qVlGm5bApZouHeJ/+n+7r12+lqdsA
+ EQEAAcLAdgQYAQgAIAIbDBYhBHIX+6yM6c9jRKFo5WgNwR1TC3ojBQJftOH6AAoJEGgNwR1T
+ C3ojVSkIALpAPkIJPQoURPb1VWjh34l0HlglmYHvZszJWTXYwavHR8+k6Baa6H7ufXNQtThR
+ yIxJrQLW6rV5lm7TjhffEhxVCn37+cg0zZ3j7zIsSS0rx/aMwi6VhFJA5hfn3T0TtrijKP4A
+ SAQO9xD1Zk9/61JWk8OysuIh7MXkl0fxbRKWE93XeQBhIJHQfnc+YBLprdnxR446Sh8Wn/2D
+ Ya8cavuWf2zrB6cZurs048xe0UbSW5AOSo4V9M0jzYI4nZqTmPxYyXbm30Kvmz0rYVRaitYJ
+ 4kyYYMhuULvrJDMjZRvaNe52tkKAvMevcGdt38H4KSVXAylqyQOW5zvPc4/sq9c=
+In-Reply-To: <8878af70-3eb8-495b-b8df-43a10285c4f5@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF00002323:EE_|IA0PPFAF883AE17:EE_
-X-MS-Office365-Filtering-Correlation-Id: 49b024be-c56d-4b8c-b393-08ddb79de5fc
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|376014|36860700013|82310400026|1800799024|13003099007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?NThtdERWQnlRS2FrVWl1aG5vZm13VWNBU0hjNEN0YzN5ZEtNSWMzL09PWXcr?=
- =?utf-8?B?ZWdJdDBZQXNZc2VDVXl5NzdlUS9OSC85aG5ZSHJNM2d5U0hIaGxXTjYxbXo1?=
- =?utf-8?B?M3RySy84WEc4QlNTb0h1RERrV1l0YytjUXVxeDVmS0k2SXB0RExBWmg4VDEw?=
- =?utf-8?B?TUszV0I1dVVLcHlHTFhZMWM0M29uK0Y2QWlyN1hIMVZGZDFISDh2QS85TjBu?=
- =?utf-8?B?MExEZE51cGQ4Ty9pNXJpZVdYL21GUTBuNitBVUxJaGM3WWh1Sk1HL09WYS9r?=
- =?utf-8?B?R05LcWdnMHlSQ0ZUekZCQnMwcmFpeEtZalBJUDRBS1hTZmtuQXN5VEFhOW5s?=
- =?utf-8?B?SU1HaFp1aWp1cXkrRWN3anZmT3cwZytobWhqcThLZ3pLd2l1R3I3SmthOTFK?=
- =?utf-8?B?dFRpV2d6Y056dWtwSHcrUkliSTVpQ3QrV0dVcHBSZ1NQM1hiaVlzdVJPSnov?=
- =?utf-8?B?MlBNZXdjSHBaRmJjaFk1RTF2WEY3d08yTXdxWk5mTmxRRkFBZTFvcFdPTmtF?=
- =?utf-8?B?YUwzVnZPWExMejVoNVRjN0UzcGwwQjlScHFDRFhSSmxQcW9zMC9VNHFxRFNT?=
- =?utf-8?B?ODdTZkpNUHdrMXVCblRDSll6SUx5QjRtcENYTzh4Rk5OaU91VUlXZFNGbHZa?=
- =?utf-8?B?amY3WnR0ZUN4dEJiQ0ExSGNvYUtBaGFtSHI4NUlzdmRDMEh2U1lRNXJ1ampE?=
- =?utf-8?B?bGdKc2x1ZUR0Z0tDY1k5b3R0OGp3NnhjUzVqekh5VWlrTTd1RjNmSnpiTk9X?=
- =?utf-8?B?aFlUb2QwV2g4cURZV05JaXJQdWZzSnM5OXhkcXUxZUJQaGYzOE5PZDdNZEg1?=
- =?utf-8?B?WndRSnpBdWE3VlFoN0VOMmN3WFk2RU1DTWk1TTlUOGRPN043cThOZHVaL1dW?=
- =?utf-8?B?cGJIMTdJeVovUm5LQ2ZTV2Yrc00rWTNEN1haQjNWUC9TM2JWZHJkektEK3BV?=
- =?utf-8?B?dU9SWUZZMEFLekR2aGE1S29sdEMxYnFrMndQcmZqS1dQYXVRcXVtdDMyaCtU?=
- =?utf-8?B?bytFSXlWQWlYWnBUNTQzcVlwOGppS216UkFJYTNCRC9YYXlQSktWdTVmakta?=
- =?utf-8?B?SzNmbTg3VnNSRVZEc3o4cnNNeHNhanNpV1JmTWxIaStEb0hqUXhlU2lYS2Ux?=
- =?utf-8?B?ZktZeUYwa0s3dTFnZk1welU1WkUwTWUzdXJXZmQ0Mi9NbHJCa3JXcW11MUty?=
- =?utf-8?B?VTZsd2RTK3hpb01ETE5YZTRqRkw2NG9VSDFzUEpORHZyWWl2SHJySEd4K1VO?=
- =?utf-8?B?TWVlaDJDOWdkQXM4QTJRclc3UjN5RmViMmVIU3ExOVhHMXRHd0ZyOHNtZEkr?=
- =?utf-8?B?c3FyNmhzUE85a0hqMitKYWcxYWpuR3luTW83dVhOcW93MEp1NUNGTVdGMGdO?=
- =?utf-8?B?QU9waFhuQkVKbENnK3o2c21SYmlZWnAwb2gvV2JBQnBRazFscDZKSlEweVhJ?=
- =?utf-8?B?YjlDSUdLRHgvOGtvd3crR0RSUnhaOFRyVlI5Q0Npb0lMbmkxb1c5dW5KTXVN?=
- =?utf-8?B?YkRva3RBUFc4S1huazlac3ZRb2tZVisvUFBKcjM3T013cDIwWm9qYnFLOWRW?=
- =?utf-8?B?MlFUL3puSnpWYnNSdUhSSUQxMUhrcCt6b3RVaGlzd0FTNHdEanVZTG1UVlY4?=
- =?utf-8?B?VUhmSFcwenRJR2cwVlMxSE1uUDA5T1VxUlVoVks3L2F3eVFhbHBTV1FiVVNp?=
- =?utf-8?B?NVh6ZEZJOUFsY3U0eXZlUGljcVpVVVBadkFjWEt5cGFFdEpMbzlWTlo0aGFi?=
- =?utf-8?B?dWtUVm5OakNvdnNZaWc3ZkxxSUZmSXU3SUdxZXprVkczYnFHdmpaQkxJSTIz?=
- =?utf-8?B?OS9QMUoxNHd3SkZDdmg4cHptVlRmQ3ozei9oSDBCT2REbzYxR2lYaFNTNENV?=
- =?utf-8?B?SHpPRTA5eFpiTXoraG1OSWhVOGJ0d25XTXQrV09Cc016OHZGUDJlbEZSOUdI?=
- =?utf-8?B?UTVNODNkMVJYTXdTR3ZURmhGcGQvV2VZOUNjVnp1VGtwNEt0TWJ3ZG96YjVs?=
- =?utf-8?B?V0IzQkx4QjZlUG13MnBESS82RUk4WGl0dDU1ejRJYXJ6YW1ORGpuQjZFeDIr?=
- =?utf-8?B?RjdaQjZwcyt0YjVxMVZmajArL3gzeWFIeUZtUT09?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(7416014)(376014)(36860700013)(82310400026)(1800799024)(13003099007);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jun 2025 06:18:15.1430
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 49b024be-c56d-4b8c-b393-08ddb79de5fc
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF00002323.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PPFAF883AE17
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_TLS_ALL(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[amd.com,gmail.com,ffwll.ch,wunner.de,linux.intel.com,kernel.org,infradead.org,8bytes.org,arm.com,redhat.com,perex.cz,suse.com,lists.freedesktop.org,vger.kernel.org,lists.linux.dev,nvidia.com];
+	RCPT_COUNT_TWELVE(0.00)[25];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_DN_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:email,imap1.dmz-prg2.suse.org:helo]
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Spam-Score: -4.30
 
+Hi
 
-
-On 6/28/2025 4:38 AM, David Matlack wrote:
-> On Thu, Jun 26, 2025 at 9:57 PM Sairaj Kodilkar <sarunkod@amd.com> wrote:
+Am 27.06.25 um 17:37 schrieb Mario Limonciello:
+> On 6/27/2025 2:07 AM, Thomas Zimmermann wrote:
+>> Hi
 >>
->>
->>
->> On 6/26/2025 9:59 PM, David Matlack wrote:
->>> On Thu, Jun 26, 2025 at 4:44 AM Sairaj Kodilkar <sarunkod@amd.com> wrote:
->>>> On 6/26/2025 4:57 PM, Sairaj Kodilkar wrote:
->>>>> On 6/21/2025 4:50 AM, David Matlack wrote:
->>>>>> +/*
->>>>>> + * Limit the number of MSIs enabled/disabled by the test regardless
->>>>>> of the
->>>>>> + * number of MSIs the device itself supports, e.g. to avoid hitting
->>>>>> IRTE limits.
->>>>>> + */
->>>>>> +#define MAX_TEST_MSI 16U
->>>>>> +
->>>>>
->>>>> Now that AMD IOMMU supports upto 2048 IRTEs per device, I wonder if we
->>>>> can include a test with max MSIs 2048.
+>> Am 27.06.25 um 06:31 schrieb Mario Limonciello:
+>>> From: Mario Limonciello <mario.limonciello@amd.com>
 >>>
->>> That sounds worth doing. I originally added this because I was hitting
->>> IRTE limits on an Intel host and a ~6.6 kernel.
+>>> On systems with multiple GPUs there can be uncertainty which GPU is the
+>>> primary one used to drive the display at bootup. In order to 
+>>> disambiguate
+>>> this add a new sysfs attribute 'boot_display' that uses the output of
+>>> video_is_primary_device() to populate whether a PCI device was used for
+>>> driving the display.
 >>>
->>> Is there some way the test can detect from userspace that the IOMMU
->>> supports 2048 IRTEs that we could key off to decide what value of
->>> MAX_TEST_MSI to use?
->>>
+>>> Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
+>>> ---
+>>> v6:
+>>>   * Only show for the device that is boot display
+>>>   * Only create after PCI device sysfs files are initialized to ensure
+>>>     that resources are ready.
+>>> v4:
+>>>   * new patch
+>>> ---
+>>>   Documentation/ABI/testing/sysfs-bus-pci |  8 +++++
+>>>   drivers/pci/pci-sysfs.c                 | 46 
+>>> +++++++++++++++++++++++++
 >>
->> The feature is published to userspace through
->>
->> $ cat /sys/class/iommu/ivhd0/amd-iommu/features
->> 25bf732fa2295afe:53d
->>
->> The output is in format "efr1:efr2". The Bit 9-8 of efr2 shows the
->> support for 2048 interrupts (efr2 & 0x300).
->>
->> Please refer 3.4.13 Extended Feature 2 Register of IOMMU specs [1] for
->> more details.
->>
->> [1]
->> https://www.amd.com/content/dam/amd/en/documents/processor-tech-docs/specifications/48882_IOMMU.pdf
->>
->> Note that, when device is behind PCIe-PCI bridge the IOMMU may hit IRTE
->> limit early as multiple devices share same IRTE table. (But this is a
->> corner case and I doubt that 2K capable device is kept behind the
->> bridge).
-> 
-> Thanks. We could definitely read that and allow up to 2048 MSIs in
-> this test. Would you be ok if we defer that to a future commit though?
-> This series is already quite big :)
-> 
+>> The code looks good. Just one more question: could this be added 
+>> independently from the PCI bus (at a reasonable cost)? There are 
+>> other busses that can host the boot display. Alternatively, we'd add 
+>> this attribute per bus as needed.
+>
+> It depends upon the underlying hardware implementation.  On x86 it's 
+> always PCI and so I realized there is a requirement that PCI resources 
+> are setup before screen_info event works.
+>
+> That is the v5 version of this patch would have had a potential race 
+> condition with userspace where boot_display didn't always show '1' if 
+> userspace read it too quickly.
+>
+> Other architecture's hardware implementation might have similar problem.
+>
+> So in summary I think it would be better to do it per-bus.  If we 
+> realize there is indeed code duplication we can always move this to a 
+> common helper at that point.
 
-Sure ! no problem.
+Ok, makes sense. With the kernel test robot's issues fixed:
 
+Reviewed-by: Thomas Zimmermann <tzimmermann@suse.de>
+
+I guess that interface also needs some sort of OK from user-space devs?
+
+Best regards
+Thomas
+
+>
 >>
->>>>>> +
->>>>>> +    vfio_pci_dma_map(self->device, iova, size, mem);
->>>>>> +    printf("Mapped HVA %p (size 0x%lx) at IOVA 0x%lx\n", mem, size,
->>>>>> iova);
->>>>>> +    vfio_pci_dma_unmap(self->device, iova, size);
->>>>>
->>>>>
->>>>> I am slightly confused here. Because You are having an assert on munmap
->>>>> and not on any of the vfio_pci_dma_(map/unmap). This test case is not
->>>>> testing VFIO.
->>>>
->>>> I missed to see ioctl_assert. Please ignore this :) Sorry about that.
->>>
->>> No worries, it's not very obvious :)
->>>
->>> vfio_pci_dma_map() and vfio_pci_dma_unmap() both return void right now
->>> and perform internal asserts since all current users of those
->>> functions want to assert success.
->>>
->>> If and when we have a use-case to assert that map or unmap fails
->>> (which I think we'll definitely have) we can add __vfio_pci_dma_map()
->>> and __vfio_pci_dma_unmap() variants that return int instead of void.
+>> Best regards
+>> Thomas
 >>
->> Yep we can. Another question, why do we need assert on mmunmap ? If
->> mmunmap fails then its not really a fault of VFIO.
-> 
-> You're right, it's very unlikely (almost impossible) to be VFIO's
-> fault if munmap() fails. But it would be a sign of a bug in the test,
-> so it is still good to detect so we can fix it.
+>>>   2 files changed, 54 insertions(+)
+>>>
+>>> diff --git a/Documentation/ABI/testing/sysfs-bus-pci 
+>>> b/Documentation/ ABI/testing/sysfs-bus-pci
+>>> index 69f952fffec72..8b455b1a58852 100644
+>>> --- a/Documentation/ABI/testing/sysfs-bus-pci
+>>> +++ b/Documentation/ABI/testing/sysfs-bus-pci
+>>> @@ -612,3 +612,11 @@ Description:
+>>>             # ls doe_features
+>>>             0001:01        0001:02        doe_discovery
+>>> +
+>>> +What:        /sys/bus/pci/devices/.../boot_display
+>>> +Date:        October 2025
+>>> +Contact:    Linux PCI developers <linux-pci@vger.kernel.org>
+>>> +Description:
+>>> +        This file indicates the device was used as a boot
+>>> +        display. If the device was used as the boot display, the file
+>>> +        will be present and contain "1".
+>>> diff --git a/drivers/pci/pci-sysfs.c b/drivers/pci/pci-sysfs.c
+>>> index 268c69daa4d57..cc766461de1da 100644
+>>> --- a/drivers/pci/pci-sysfs.c
+>>> +++ b/drivers/pci/pci-sysfs.c
+>>> @@ -30,6 +30,7 @@
+>>>   #include <linux/msi.h>
+>>>   #include <linux/of.h>
+>>>   #include <linux/aperture.h>
+>>> +#include <asm/video.h>
+>>>   #include "pci.h"
+>>>   #ifndef ARCH_PCI_DEV_GROUPS
+>>> @@ -679,6 +680,13 @@ const struct attribute_group *pcibus_groups[] = {
+>>>       NULL,
+>>>   };
+>>> +static ssize_t boot_display_show(struct device *dev, struct 
+>>> device_attribute *attr,
+>>> +                 char *buf)
+>>> +{
+>>> +    return sysfs_emit(buf, "1\n");
+>>> +}
+>>> +static DEVICE_ATTR_RO(boot_display);
+>>> +
+>>>   static ssize_t boot_vga_show(struct device *dev, struct 
+>>> device_attribute *attr,
+>>>                    char *buf)
+>>>   {
+>>> @@ -1246,6 +1254,37 @@ static int pci_create_attr(struct pci_dev 
+>>> *pdev, int num, int write_combine)
+>>>       return 0;
+>>>   }
+>>> +/**
+>>> + * pci_create_boot_display_file - create a file in sysfs for @dev
+>>> + * @pdev: dev in question
+>>> + *
+>>> + * Creates a file `boot_display` in sysfs for the PCI device @pdev
+>>> + * if it is the boot display device.
+>>> + */
+>>> +static int pci_create_boot_display_file(struct pci_dev *pdev)
+>>> +{
+>>> +#ifdef CONFIG_VIDEO
+>>> +    if (video_is_primary_device(&pdev->dev))
+>>> +        return sysfs_create_file(&pdev->dev.kobj, 
+>>> &dev_attr_boot_display.attr);
+>>> +#endif
+>>> +    return 0;
+>>> +}
+>>> +
+>>> +/**
+>>> + * pci_remove_boot_display_file - remove the boot display file for 
+>>> @dev
+>>> + * @pdev: dev in question
+>>> + *
+>>> + * Removes the file `boot_display` in sysfs for the PCI device @pdev
+>>> + * if it is the boot display device.
+>>> + */
+>>> +static void pci_remove_boot_display_file(struct pci_dev *pdev)
+>>> +{
+>>> +#ifdef CONFIG_VIDEO
+>>> +    if (video_is_primary_device(&pdev->dev))
+>>> +        sysfs_remove_file(&pdev->dev.kobj, 
+>>> &dev_attr_boot_display.attr);
+>>> +#endif
+>>> +}
+>>> +
+>>>   /**
+>>>    * pci_create_resource_files - create resource files in sysfs for 
+>>> @dev
+>>>    * @pdev: dev in question
+>>> @@ -1654,9 +1693,15 @@ static const struct attribute_group 
+>>> pci_dev_resource_resize_group = {
+>>>   int __must_check pci_create_sysfs_dev_files(struct pci_dev *pdev)
+>>>   {
+>>> +    int retval;
+>>> +
+>>>       if (!sysfs_initialized)
+>>>           return -EACCES;
+>>> +    retval = pci_create_boot_display_file(pdev);
+>>> +    if (retval)
+>>> +        return retval;
+>>> +
+>>>       return pci_create_resource_files(pdev);
+>>>   }
+>>> @@ -1671,6 +1716,7 @@ void pci_remove_sysfs_dev_files(struct pci_dev 
+>>> *pdev)
+>>>       if (!sysfs_initialized)
+>>>           return;
+>>> +    pci_remove_boot_display_file(pdev);
+>>>       pci_remove_resource_files(pdev);
+>>>   }
+>>
+>
 
-Understood. Thanks !
-
--Sairaj
+-- 
+--
+Thomas Zimmermann
+Graphics Driver Developer
+SUSE Software Solutions Germany GmbH
+Frankenstrasse 146, 90461 Nuernberg, Germany
+GF: Ivo Totev, Andrew Myers, Andrew McDonald, Boudien Moerman
+HRB 36809 (AG Nuernberg)
 
 
