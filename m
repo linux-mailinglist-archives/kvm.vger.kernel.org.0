@@ -1,52 +1,52 @@
-Return-Path: <kvm+bounces-51081-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51082-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A66FAED7E6
-	for <lists+kvm@lfdr.de>; Mon, 30 Jun 2025 10:55:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00C5FAED7EB
+	for <lists+kvm@lfdr.de>; Mon, 30 Jun 2025 10:55:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7CAE71726C6
-	for <lists+kvm@lfdr.de>; Mon, 30 Jun 2025 08:55:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF54D3AFE4C
+	for <lists+kvm@lfdr.de>; Mon, 30 Jun 2025 08:55:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0809F244667;
-	Mon, 30 Jun 2025 08:54:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6B7A24466A;
+	Mon, 30 Jun 2025 08:55:22 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 072D7242D92;
-	Mon, 30 Jun 2025 08:54:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11FF6241131;
+	Mon, 30 Jun 2025 08:55:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751273691; cv=none; b=PQPTSFLuCsliU5Z2DEqaI3eZyocYJ5NsT21l/YtFG69vEoiOFs1Jde6//n0PbN+fA0fQ42yaxRYouXXfHOd8qah+8y8ZDPfPReO5d1ASoxy1CINid82meYc4IALB98uor9OJLigO51Y1YJBHU8Z3WUIO6Zg6VNYnR6YRc7yRkh0=
+	t=1751273722; cv=none; b=l1925li6VMJ5o+g0XvtFXGjVpG4Ripp1NWTII7r4k0m/FrgyJMUgKlaoECud1mJPWipxjksVYcn7lRzMHnD7Vof+W/S4DPleKKqQU+F62pmpk4FYRBrQ+AJN4RnpRXlI9Q0CLkveM/zMfhcEMdRg9IZOnN6S7GZiYWZ54v6hmmk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751273691; c=relaxed/simple;
-	bh=shwr8MPQTjO7BLjZ2FwD1uQjcpJIj0DsyP9MRMjw2RU=;
+	s=arc-20240116; t=1751273722; c=relaxed/simple;
+	bh=pVGjvRbxhDhOFJx/CIYWm7ID6m+27homdmRLKClr78I=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BrkqcmXLNkTzeMGxA+DRaxHtB/7Ro1MsqB2WBkJjD1h+Z26KlgARd+THNLkZ5mBCZR8s9iYqtqEKSkXvR/38fpE0cTkfMbDjClFYi7TFNAniKz16i2AyuPsCgbULRWuGOet5RxPsjLUOvyTU5hrIik2PfCvp/2SnCxlrqYwrXtM=
+	 MIME-Version:Content-Type; b=A9on4WTETWXSpscqZedJD+RMS4LM1JbpB+/3jMkHHR+kG8zNNf5kieI89eGucyrNGL+DAPwBT0z+XVncywpEuBtdM5ER8r+CNy/pTwnVYRaa+VgqGGiGN4KIuWIw1zUvSSNL2qajDGxo/vYO0l1V3xWKpoJF6jUtQCPgqf0R1gs=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4bW0Lp10jZztSk9;
-	Mon, 30 Jun 2025 16:53:38 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4bW0MN44HjztSk9;
+	Mon, 30 Jun 2025 16:54:08 +0800 (CST)
 Received: from dggpemf500015.china.huawei.com (unknown [7.185.36.143])
-	by mail.maildlp.com (Postfix) with ESMTPS id 552181402C8;
-	Mon, 30 Jun 2025 16:54:46 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id BE8CE180087;
+	Mon, 30 Jun 2025 16:55:16 +0800 (CST)
 Received: from huawei.com (10.50.165.33) by dggpemf500015.china.huawei.com
  (7.185.36.143) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Mon, 30 Jun
- 2025 16:54:46 +0800
+ 2025 16:55:16 +0800
 From: Longfang Liu <liulongfang@huawei.com>
 To: <alex.williamson@redhat.com>, <jgg@nvidia.com>,
 	<shameerali.kolothum.thodi@huawei.com>, <jonathan.cameron@huawei.com>
 CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<linuxarm@openeuler.org>, <liulongfang@huawei.com>
-Subject: [PATCH v5 1/3] migration: update BAR space size
-Date: Mon, 30 Jun 2025 16:54:00 +0800
-Message-ID: <20250630085402.7491-2-liulongfang@huawei.com>
+Subject: [PATCH v5 2/3] migration: qm updates BAR configuration
+Date: Mon, 30 Jun 2025 16:54:01 +0800
+Message-ID: <20250630085402.7491-3-liulongfang@huawei.com>
 X-Mailer: git-send-email 2.24.0
 In-Reply-To: <20250630085402.7491-1-liulongfang@huawei.com>
 References: <20250630085402.7491-1-liulongfang@huawei.com>
@@ -58,96 +58,81 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
  dggpemf500015.china.huawei.com (7.185.36.143)
 
-On new platforms greater than QM_HW_V3, the live migration configuration
-region is moved from VF to PF. The VF's own configuration space is
-restored to the complete 64KB, and there is no need to divide the
-size of the BAR configuration space equally.
+On new platforms greater than QM_HW_V3, the configuration region for the
+live migration function of the accelerator device is no longer
+placed in the VF, but is instead placed in the PF.
+
+Therefore, the configuration region of the live migration function
+needs to be opened when the QM driver is loaded. When the QM driver
+is uninstalled, the driver needs to clear this configuration.
 
 Signed-off-by: Longfang Liu <liulongfang@huawei.com>
 ---
- .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 36 ++++++++++++++-----
- 1 file changed, 27 insertions(+), 9 deletions(-)
+ drivers/crypto/hisilicon/qm.c | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
-diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-index 2149f49aeec7..1ddc9dbadb70 100644
---- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-+++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-@@ -1250,6 +1250,28 @@ static struct hisi_qm *hisi_acc_get_pf_qm(struct pci_dev *pdev)
- 	return !IS_ERR(pf_qm) ? pf_qm : NULL;
+diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+index d3f5d108b898..0a8888304e15 100644
+--- a/drivers/crypto/hisilicon/qm.c
++++ b/drivers/crypto/hisilicon/qm.c
+@@ -242,6 +242,9 @@
+ #define QM_QOS_MAX_CIR_U		6
+ #define QM_AUTOSUSPEND_DELAY		3000
+ 
++#define QM_MIG_REGION_SEL		0x100198
++#define QM_MIG_REGION_EN		0x1
++
+  /* abnormal status value for stopping queue */
+ #define QM_STOP_QUEUE_FAIL		1
+ #define	QM_DUMP_SQC_FAIL		3
+@@ -3004,11 +3007,36 @@ static void qm_put_pci_res(struct hisi_qm *qm)
+ 	pci_release_mem_regions(pdev);
  }
  
-+static size_t hisi_acc_get_resource_len(struct vfio_pci_core_device *vdev,
-+					unsigned int index)
++static void hisi_mig_region_clear(struct hisi_qm *qm)
 +{
-+	struct hisi_acc_vf_core_device *hisi_acc_vdev =
-+			hisi_acc_drvdata(vdev->pdev);
++	u32 val;
 +
-+	/*
-+	 * On the old QM_HW_V3 device, the ACC VF device BAR2
-+	 * region encompasses both functional register space
-+	 * and migration control register space.
-+	 * only the functional region should be report to Guest.
-+	 *
-+	 * On the new HW device, the migration control register
-+	 * has been moved to the PF device BAR2 region.
-+	 * The VF device BAR2 is entirely functional register space.
-+	 */
-+	if (hisi_acc_vdev->pf_qm->ver == QM_HW_V3)
-+		return (pci_resource_len(vdev->pdev, index) >> 1);
-+
-+	return pci_resource_len(vdev->pdev, index);
++	/* Clear migration region set of PF */
++	if (qm->fun_type == QM_HW_PF && qm->ver > QM_HW_V3) {
++		val = readl(qm->io_base + QM_MIG_REGION_SEL);
++		val &= ~BIT(0);
++		writel(val, qm->io_base + QM_MIG_REGION_SEL);
++	}
 +}
 +
- static int hisi_acc_pci_rw_access_check(struct vfio_device *core_vdev,
- 					size_t count, loff_t *ppos,
- 					size_t *new_count)
-@@ -1260,8 +1282,9 @@ static int hisi_acc_pci_rw_access_check(struct vfio_device *core_vdev,
++static void hisi_mig_region_enable(struct hisi_qm *qm)
++{
++	u32 val;
++
++	/* Select migration region of PF */
++	if (qm->fun_type == QM_HW_PF && qm->ver > QM_HW_V3) {
++		val = readl(qm->io_base + QM_MIG_REGION_SEL);
++		val |= QM_MIG_REGION_EN;
++		writel(val, qm->io_base + QM_MIG_REGION_SEL);
++	}
++}
++
+ static void hisi_qm_pci_uninit(struct hisi_qm *qm)
+ {
+ 	struct pci_dev *pdev = qm->pdev;
  
- 	if (index == VFIO_PCI_BAR2_REGION_INDEX) {
- 		loff_t pos = *ppos & VFIO_PCI_OFFSET_MASK;
--		resource_size_t end = pci_resource_len(vdev->pdev, index) / 2;
-+		resource_size_t end;
+ 	pci_free_irq_vectors(pdev);
++	hisi_mig_region_clear(qm);
+ 	qm_put_pci_res(qm);
+ 	pci_disable_device(pdev);
+ }
+@@ -5630,6 +5658,7 @@ int hisi_qm_init(struct hisi_qm *qm)
+ 		goto err_free_qm_memory;
  
-+		end = hisi_acc_get_resource_len(vdev, index);
- 		/* Check if access is for migration control region */
- 		if (pos >= end)
- 			return -EINVAL;
-@@ -1282,8 +1305,9 @@ static int hisi_acc_vfio_pci_mmap(struct vfio_device *core_vdev,
- 	index = vma->vm_pgoff >> (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT);
- 	if (index == VFIO_PCI_BAR2_REGION_INDEX) {
- 		u64 req_len, pgoff, req_start;
--		resource_size_t end = pci_resource_len(vdev->pdev, index) / 2;
-+		resource_size_t end;
+ 	qm_cmd_init(qm);
++	hisi_mig_region_enable(qm);
  
-+		end = hisi_acc_get_resource_len(vdev, index);
- 		req_len = vma->vm_end - vma->vm_start;
- 		pgoff = vma->vm_pgoff &
- 			((1U << (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT)) - 1);
-@@ -1330,7 +1354,6 @@ static long hisi_acc_vfio_pci_ioctl(struct vfio_device *core_vdev, unsigned int
- 	if (cmd == VFIO_DEVICE_GET_REGION_INFO) {
- 		struct vfio_pci_core_device *vdev =
- 			container_of(core_vdev, struct vfio_pci_core_device, vdev);
--		struct pci_dev *pdev = vdev->pdev;
- 		struct vfio_region_info info;
- 		unsigned long minsz;
+ 	return 0;
  
-@@ -1345,12 +1368,7 @@ static long hisi_acc_vfio_pci_ioctl(struct vfio_device *core_vdev, unsigned int
- 		if (info.index == VFIO_PCI_BAR2_REGION_INDEX) {
- 			info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
- 
--			/*
--			 * ACC VF dev BAR2 region consists of both functional
--			 * register space and migration control register space.
--			 * Report only the functional region to Guest.
--			 */
--			info.size = pci_resource_len(pdev, info.index) / 2;
-+			info.size = hisi_acc_get_resource_len(vdev, info.index);
- 
- 			info.flags = VFIO_REGION_INFO_FLAG_READ |
- 					VFIO_REGION_INFO_FLAG_WRITE |
 -- 
 2.24.0
 
