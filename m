@@ -1,146 +1,170 @@
-Return-Path: <kvm+bounces-51168-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51169-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1651EAEF386
-	for <lists+kvm@lfdr.de>; Tue,  1 Jul 2025 11:40:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61755AEF3B4
+	for <lists+kvm@lfdr.de>; Tue,  1 Jul 2025 11:46:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB1271BC641A
-	for <lists+kvm@lfdr.de>; Tue,  1 Jul 2025 09:40:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 938894A2D71
+	for <lists+kvm@lfdr.de>; Tue,  1 Jul 2025 09:46:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCD0C26CE10;
-	Tue,  1 Jul 2025 09:39:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3C6E26E6F1;
+	Tue,  1 Jul 2025 09:46:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kd/4D+uD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r6nkgnRV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ECDC26CE09
-	for <kvm@vger.kernel.org>; Tue,  1 Jul 2025 09:39:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02A611F239B;
+	Tue,  1 Jul 2025 09:46:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751362793; cv=none; b=FR+LkpJPVWGgdOZWkClq9kMA2rS8ngjJIbLcN4TN2Vpr/KnKyNa0CfUXBAamC0DhXfJW0S3MhhmDNPsGZUstoPxSA2L/QFF8CZwMUWibx3CC/WOXgdgVSd+72wumbQuemVKT8GcF+tP8L+huE7NIv4XwpZI3bHUDdq2FXbvQ9Co=
+	t=1751363165; cv=none; b=lMmlBH1ou5ir4wmMQdZd1bSCUqqGx1r1lRarVshuThLZ7BNJuUWMIjKfUfNMJM8mUlVhIpPxXi/ukkAGcpKNNgIS+rykiaUJLzIDNfaibtQd6v07NOGiwiA/wEX4zZDzqDsYGy50iok3MRVhUdpR3nbKv4av9u7iGCtIXjRggko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751362793; c=relaxed/simple;
-	bh=3y3b7bhFZfSWP4Aq0SFEO4wU0GrFVtm/6TcsD9zGbW8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YinBc8tOHeyHXJ4kVccf5CgXsknSVZeQUP/T3/4wy+l1S7sCE3mz5BecTGQH286kASapJ+TXa4rIktEZKa3MA98uLaE7+DXo5QELshmtXs3ZEnZuWV2VZ15XWztLmZQTjVMjShhT4Jv6b8iaZW6z0urQNFTTbcmB9i0tBjd64rc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=kd/4D+uD; arc=none smtp.client-ip=209.85.219.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-e733a6ff491so2684322276.2
-        for <kvm@vger.kernel.org>; Tue, 01 Jul 2025 02:39:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1751362791; x=1751967591; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yCOcQLmgdtfiHoEGzlEjIWzRramti7JO+XwYRKwRFyc=;
-        b=kd/4D+uDylevUFYvCKA01n/jI3zxfJ+8HjOtiXVifzUeGsyETxB6gkD/hySMC+rsAU
-         iNHE/yASwevJCFI+DMmwN/2+tKA7yIOOIa2cQi5frgiDFFUehd20klKAqZLgQdpL8ArU
-         CAf5GEGiU9y20+LmfqlQ8QmrlNbQDdMdV7Rf14wvgVW3rI8uPbE+tnBF3vri+sS7vRfz
-         Eha/YjyEgdjpgX+TW1Zcc1QOgghSkau6cFz5w3cqXaqPM0iw8+16F4vIJRBuQ0dBWwAn
-         ID5j/OKP5dA1WB/kN2zow5iz3ctwe5Tq76D/R8+9xlCfJxKGWz8GVu6V7lx7hs9jn8rM
-         rK9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751362791; x=1751967591;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yCOcQLmgdtfiHoEGzlEjIWzRramti7JO+XwYRKwRFyc=;
-        b=otXCH5cftM6aVVjzHztPMqDjBRSFzx05/QhnhBGyXq9Fkuwl3eaEUmLtC2bXfnxVW5
-         elV+gLpbS6v8jA2N5mS7I19QdZuwG11+OK2kPiL8gDYvx4GuOODRZqm1jbIy2ZZeENcD
-         TVnA5FEQhv8EPxDs3WvRVAqW7IEDcSiZqqcyiJuTmfLn5blQb9Pgt4ybSR/jwWLCPGWJ
-         U9I5iIEbv7jzAxcZy82YW8gnzGodkUW7rlV432fMIO0/T6Tg1DF13CgnrIsQ/U4LmauG
-         6Bveka0M7hbmj+Wl6zMTdH6kDGP4BfeGG6ncpgMiFi/RYbXMSRVIDTWSG1KgK2PDOOZJ
-         AGgg==
-X-Forwarded-Encrypted: i=1; AJvYcCVX7B70+vM0dYDmw5IGWkkkFARbfAcUW9fCPkIIUySNelx2hX+vZAIoOH9n1/F3givkEwc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzh5VUjsr2KpvD54PgYE/gG5xK/sFHOjdlWLpCdjVfQ0VXxBEGy
-	3+kWgIczTcDoIs0idjBoWbNGzx+sIGcEgxTzkUkM8DoalxM8I4L9UZltI3lOyra2SA0Ww/Tpy5T
-	J7J9d4Q1qq2zr3TXL5XubXWfuwhJHniJ9tb46Gow7Bw==
-X-Gm-Gg: ASbGnct4dAUGzkXreCPsdpwGjkw9U480SWoM52XQCJuA3UQriebrhT+fPnV8m29w0FR
-	whx8cOJUM2LQ49hquHGnCtZjxnsrkF64c3bIeMyE92eV6xlO/Jy/DgrWeCgjePfPHxLthQWKY0L
-	G5bMdOeErORFDA9XgqtVYfPWo71frIfour0TK+eQaE4Uu6
-X-Google-Smtp-Source: AGHT+IHDlq2gURbFKW5g1kNI0w9591f5lYZ70IA6CEkE0lSHka0P6ZqUiCTl2McDGmbd1GXnJnECbd53cRCfMH2DS9I=
-X-Received: by 2002:a05:690c:7443:b0:70f:8883:ce60 with SMTP id
- 00721157ae682-715171aacdamr245762197b3.26.1751362790962; Tue, 01 Jul 2025
- 02:39:50 -0700 (PDT)
+	s=arc-20240116; t=1751363165; c=relaxed/simple;
+	bh=MzK+tBHEvikT/y3icY0EOlfB0eIQiJbDL/vPnBH5ZC0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hg8WMj3CxI/QUu1tk/MG3W1XQoKhqHJUJdt883WFS73IvZDKt/roYpWnpem/mIP/LOkTfBUmMcXSKWAzjCYFHn73OgtBxN7NWLpC5aeGjwL7scllAiWDmx/G7TKbKurFayYZ4CoNk7mTO7IU2dK8ppMDDrRt6ahIN/3Aev4K7nQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r6nkgnRV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFE54C4CEEB;
+	Tue,  1 Jul 2025 09:46:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751363164;
+	bh=MzK+tBHEvikT/y3icY0EOlfB0eIQiJbDL/vPnBH5ZC0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=r6nkgnRVrxpsEhrSynq7t3OUsleGE7pItMeHT0asVMWR32cxKjoPirQimg891wiwo
+	 63X/x1ovRlUxKJwCM5gmW/Qa1un4NcmGdRIf4PCMIoHuWo4ka0elgPeRcbwj/3tvRi
+	 5FzH0zsYYHdYMHZlHdo9WXkGEFt4OgRZz8I7ES/LZrE5oPAs0/CQMHYyj9N7Rg04E8
+	 nMsYPJIWcTI3uufeSdpWajM3LuDSM5/4ii7CE6CvoeocVIqn8pDb5hfJd/cF5ScJaR
+	 SaTpNfQvPcGDSv1Lpk9JDq9ncLBQr7kJx3kIF0UGrv2VTvvJMmodN8NTI5av8qdTy3
+	 lyjMHJA+sbX0Q==
+Date: Tue, 1 Jul 2025 11:45:58 +0200
+From: Lorenzo Pieralisi <lpieralisi@kernel.org>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd <nd@arm.com>,
+	"maz@kernel.org" <maz@kernel.org>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Joey Gouly <Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"will@kernel.org" <will@kernel.org>,
+	"tglx@linutronix.de" <tglx@linutronix.de>,
+	Timothy Hayes <Timothy.Hayes@arm.com>
+Subject: Re: [PATCH v2 2/5] irqchip/gic-v5: Populate struct gic_kvm_info
+Message-ID: <aGOuVhED/SSnzwWU@lpieralisi>
+References: <20250627100847.1022515-1-sascha.bischoff@arm.com>
+ <20250627100847.1022515-3-sascha.bischoff@arm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250623121845.7214-1-philmd@linaro.org> <20250623121845.7214-5-philmd@linaro.org>
-In-Reply-To: <20250623121845.7214-5-philmd@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 1 Jul 2025 10:39:39 +0100
-X-Gm-Features: Ac12FXxpYnulxisO6QVKFIKPO-zv9Pwl_r62oxyX2ZYzOaAwSavLKRmqxWTN_Jo
-Message-ID: <CAFEAcA8+9TPps4NkRwRTZXq-nkR=zJ1SsFLnMzzNf7MioU-qsw@mail.gmail.com>
-Subject: Re: [PATCH v3 04/26] target/arm/hvf: Simplify GIC hvf_arch_init_vcpu()
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>
-Cc: qemu-devel@nongnu.org, Leif Lindholm <leif.lindholm@oss.qualcomm.com>, 
-	qemu-arm@nongnu.org, =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, 
-	Roman Bolshakov <rbolshakov@ddn.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Alexander Graf <agraf@csgraf.de>, Bernhard Beschow <shentey@gmail.com>, John Snow <jsnow@redhat.com>, 
-	Thomas Huth <thuth@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, 
-	kvm@vger.kernel.org, Eric Auger <eric.auger@redhat.com>, 
-	Cameron Esfahani <dirty@apple.com>, Cleber Rosa <crosa@redhat.com>, 
-	Radoslaw Biernacki <rad@semihalf.com>, Phil Dennis-Jordan <phil@philjordan.eu>, 
-	Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250627100847.1022515-3-sascha.bischoff@arm.com>
 
-On Mon, 23 Jun 2025 at 13:19, Philippe Mathieu-Daud=C3=A9 <philmd@linaro.or=
-g> wrote:
->
-> Only update the ID_AA64PFR0_EL1 register when a GIC is provided.
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org>
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+On Fri, Jun 27, 2025 at 10:09:01AM +0000, Sascha Bischoff wrote:
+> Populate the gic_kvm_info struct based on support for
+> FEAT_GCIE_LEGACY.  The struct is used by KVM to probe for a compatible
+> GIC.
+> 
+> Co-authored-by: Timothy Hayes <timothy.hayes@arm.com>
+> Signed-off-by: Timothy Hayes <timothy.hayes@arm.com>
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 > ---
->  target/arm/hvf/hvf.c | 14 +++++++++-----
->  1 file changed, 9 insertions(+), 5 deletions(-)
->
-> diff --git a/target/arm/hvf/hvf.c b/target/arm/hvf/hvf.c
-> index 42258cc2d88..c1ed8b510db 100644
-> --- a/target/arm/hvf/hvf.c
-> +++ b/target/arm/hvf/hvf.c
-> @@ -1057,11 +1057,15 @@ int hvf_arch_init_vcpu(CPUState *cpu)
->                                arm_cpu->mp_affinity);
->      assert_hvf_ok(ret);
->
-> -    ret =3D hv_vcpu_get_sys_reg(cpu->accel->fd, HV_SYS_REG_ID_AA64PFR0_E=
-L1, &pfr);
-> -    assert_hvf_ok(ret);
-> -    pfr |=3D env->gicv3state ? (1 << 24) : 0;
-> -    ret =3D hv_vcpu_set_sys_reg(cpu->accel->fd, HV_SYS_REG_ID_AA64PFR0_E=
-L1, pfr);
-> -    assert_hvf_ok(ret);
-> +    if (env->gicv3state) {
-> +        ret =3D hv_vcpu_get_sys_reg(cpu->accel->fd,
-> +                                  HV_SYS_REG_ID_AA64PFR0_EL1, &pfr);
-> +        assert_hvf_ok(ret);
-> +        pfr =3D FIELD_DP64(pfr, ID_AA64PFR0, GIC, 1);
-> +        ret =3D hv_vcpu_set_sys_reg(cpu->accel->fd,
-> +                                  HV_SYS_REG_ID_AA64PFR0_EL1, pfr);
-> +        assert_hvf_ok(ret);
-> +    }
+>  drivers/irqchip/irq-gic-v5.c          | 33 +++++++++++++++++++++++++++
+>  include/linux/irqchip/arm-vgic-info.h |  4 ++++
+>  2 files changed, 37 insertions(+)
 
-This doesn't seem like a simplification to me...
+Reviewed-by: Lorenzo Pieralisi <lpieralisi@kernel.org>
 
-Looking at the code, I suspect what we should really be doing
-is setting the GIC field to either 0 or 1 depending on whether
-env->gicv3state. Currently if hvf hands us an initial value with
-the GIC field set to 1 but we don't have a gicv3state we won't
-correctly clear it to 0. i.e. we should change the current
-  pfr |=3D env->gicv3state ? (1 << 24) : 0;
-to
-  pfr =3D FIELD_DP64(pfr, ID_AA64PFR0, GIC, env->gicv3state ? 1 : 0);
-
-thanks
--- PMM
+> diff --git a/drivers/irqchip/irq-gic-v5.c b/drivers/irqchip/irq-gic-v5.c
+> index 6b42c4af5c79..9ba43ec9318b 100644
+> --- a/drivers/irqchip/irq-gic-v5.c
+> +++ b/drivers/irqchip/irq-gic-v5.c
+> @@ -13,6 +13,7 @@
+>  
+>  #include <linux/irqchip.h>
+>  #include <linux/irqchip/arm-gic-v5.h>
+> +#include <linux/irqchip/arm-vgic-info.h>
+>  
+>  #include <asm/cpufeature.h>
+>  #include <asm/exception.h>
+> @@ -1049,6 +1050,36 @@ static void gicv5_set_cpuif_idbits(void)
+>  	}
+>  }
+>  
+> +#ifdef CONFIG_KVM
+> +static struct gic_kvm_info gic_v5_kvm_info __initdata;
+> +
+> +static bool __init gicv5_cpuif_has_gcie_legacy(void)
+> +{
+> +	u64 idr0 = read_sysreg_s(SYS_ICC_IDR0_EL1);
+> +	return !!FIELD_GET(ICC_IDR0_EL1_GCIE_LEGACY, idr0);
+> +}
+> +
+> +static void __init gic_of_setup_kvm_info(struct device_node *node)
+> +{
+> +	gic_v5_kvm_info.type = GIC_V5;
+> +	gic_v5_kvm_info.has_gcie_v3_compat = gicv5_cpuif_has_gcie_legacy();
+> +
+> +	/* GIC Virtual CPU interface maintenance interrupt */
+> +	gic_v5_kvm_info.no_maint_irq_mask = false;
+> +	gic_v5_kvm_info.maint_irq = irq_of_parse_and_map(node, 0);
+> +	if (!gic_v5_kvm_info.maint_irq) {
+> +		pr_warn("cannot find GICv5 virtual CPU interface maintenance interrupt\n");
+> +		return;
+> +	}
+> +
+> +	vgic_set_kvm_info(&gic_v5_kvm_info);
+> +}
+> +#else
+> +static inline void __init gic_of_setup_kvm_info(struct device_node *node)
+> +{
+> +}
+> +#endif // CONFIG_KVM
+> +
+>  static int __init gicv5_of_init(struct device_node *node, struct device_node *parent)
+>  {
+>  	int ret = gicv5_irs_of_probe(node);
+> @@ -1081,6 +1112,8 @@ static int __init gicv5_of_init(struct device_node *node, struct device_node *pa
+>  
+>  	gicv5_irs_its_probe();
+>  
+> +	gic_of_setup_kvm_info(node);
+> +
+>  	return 0;
+>  
+>  out_int:
+> diff --git a/include/linux/irqchip/arm-vgic-info.h b/include/linux/irqchip/arm-vgic-info.h
+> index a75b2c7de69d..ca1713fac6e3 100644
+> --- a/include/linux/irqchip/arm-vgic-info.h
+> +++ b/include/linux/irqchip/arm-vgic-info.h
+> @@ -15,6 +15,8 @@ enum gic_type {
+>  	GIC_V2,
+>  	/* Full GICv3, optionally with v2 compat */
+>  	GIC_V3,
+> +	/* Full GICv5, optionally with v3 compat */
+> +	GIC_V5,
+>  };
+>  
+>  struct gic_kvm_info {
+> @@ -34,6 +36,8 @@ struct gic_kvm_info {
+>  	bool		has_v4_1;
+>  	/* Deactivation impared, subpar stuff */
+>  	bool		no_hw_deactivation;
+> +	/* v3 compat support (GICv5 hosts, only) */
+> +	bool		has_gcie_v3_compat;
+>  };
+>  
+>  #ifdef CONFIG_KVM
+> -- 
+> 2.34.1
 
