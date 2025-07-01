@@ -1,146 +1,100 @@
-Return-Path: <kvm+bounces-51183-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51184-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 043F1AEF583
-	for <lists+kvm@lfdr.de>; Tue,  1 Jul 2025 12:48:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 470FCAEF63E
+	for <lists+kvm@lfdr.de>; Tue,  1 Jul 2025 13:13:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F05117C106
-	for <lists+kvm@lfdr.de>; Tue,  1 Jul 2025 10:48:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D5C891C017EB
+	for <lists+kvm@lfdr.de>; Tue,  1 Jul 2025 11:13:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21FF11DED52;
-	Tue,  1 Jul 2025 10:48:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96823272804;
+	Tue,  1 Jul 2025 11:12:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dx1wFUlc"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FICxFd9O"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E5292701A3;
-	Tue,  1 Jul 2025 10:48:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEE49270EDD
+	for <kvm@vger.kernel.org>; Tue,  1 Jul 2025 11:12:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751366928; cv=none; b=aYBU+hs3ZpUTrzouqeMOZQbRSaJvP3+UyZOO/FDD4kc25oK65tQ1XZuTUhytbqvwqFvl9GPNDsQ3V5MDmIgl2hClL0g8Kf4zjk0NRdwIETIrD3Uk6CUUb3Q1Aliz2+JpfkeOLvOdDksuf78DKb88WUmAbfyFiGxCwF/eL5XMd1M=
+	t=1751368371; cv=none; b=BVYjLRNFoiCMrDGlpDFJbbcnWPm7gzYRunRUXjPJdNEMI6PYiWYuI8nBnLoSg/SxVaadxSTcVRg2A2N8bOJBWxoMxCzhzpRfu360iJ5MbJUd0uL2zpaIaoI8vQ7ExiOYmdZpn83HzBPRQKEX10Nse4QUVDwei6YFquVnlZ84m/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751366928; c=relaxed/simple;
-	bh=wWnhQlgqRFcsI0tUGKX5OnHqDSBfhTR+33mzJ5nYftg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YlAMzNsr0xeCmzKviUpmWm07oBnyVJ9H6+yKReOa32nYRGo9tmm8/bERzLbf/fYm+86IvqtRX7Tr9uucs3CQLAmeDxxH7t0KSDX7a00Im4oqmfy6ZSb3qUQDR9TUEn/8/V5CS+479baqofmgJgR5Ic/fwq/c2eR9mwqo9Aw+q2c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Dx1wFUlc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE3C8C4CEEE;
-	Tue,  1 Jul 2025 10:48:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751366927;
-	bh=wWnhQlgqRFcsI0tUGKX5OnHqDSBfhTR+33mzJ5nYftg=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=Dx1wFUlcTjJWf4FP2Ou2wYJxA8S76uOKBF1jt1AsAZBPrGET7x31WzXwxFwoOBcIM
-	 gXT1w5mYBcP6EZxbvqDqL7Bd+BrtRXgCEUsZs9xjxjUiM4IT9exa5uPj/NEk1ELY2e
-	 XJzmtoB6rBujheGlJBN40TNeJMv8SuEw2SkvlQzhh56nVrp0Oe2xa8tYhco4k15ZUs
-	 Txq5bjfW1X0GknRhEAQ+mnsoq7EVhSGg801XU/xDV+IfWovIVJXrs5cWJBZ7lslqJ+
-	 cisMRgtkHWYCWja8EGyGz93KrrNdQ3cijt1U2mSsHINZRt9MT8D0669SZY10HLWOV8
-	 IFDLSTKg5Qigw==
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-ade5a0442dfso1052437766b.1;
-        Tue, 01 Jul 2025 03:48:47 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVzNkida2W9p8+c/Jlu5496gR5fAAXIKU2oURTROnibPEp3buu9nFVIK6t1BNPNa6KDRU4=@vger.kernel.org, AJvYcCW2QUhwkKPpDaEpKKXL/fLNHwdPysLB1pSEf3GDmv2C6HX3F5OvW/opw4nhJG15H9vyFWQN87FWQeR9S7Km@vger.kernel.org
-X-Gm-Message-State: AOJu0YxKyK2baVDNNebA+TsTtJv9RP0akHi0VWW5C9FVLSr7PsqbVNRk
-	wUBfp7/fu672mlryr+EYnONHGd8NR+HjVIHrPUbfOoBp7RTvz7H2vhfo9wzOo3KeHnJkicXyMPC
-	qTsD58CivvYwPoSsjnEqMqCot3/YTvM0=
-X-Google-Smtp-Source: AGHT+IGqvzLgOVq+bSq8v3Ag9CnbkMRooSZl3rhSTQn7AarVuHFnGXtfWWpqlu2upcK8/sObIC8F7yz1RluBs0yBhAM=
-X-Received: by 2002:a17:907:e2e0:b0:ae0:cf28:6ec2 with SMTP id
- a640c23a62f3a-ae350220e87mr1484731566b.61.1751366926309; Tue, 01 Jul 2025
- 03:48:46 -0700 (PDT)
+	s=arc-20240116; t=1751368371; c=relaxed/simple;
+	bh=xFhPSyGkeq1HsapYZVzfhrWmcZVtRpfUOIl6ai+xeUs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YFl9G3GoKgPCshxn+pbpiRJ7l/0U3+a79MamgsrV/cKBiJDh1xWShBooivv5+fzxcihrm2+wcUqJEXyCgrc3wU+8e56cEBNro9LSQWUndy1rf1kaf/w6JvaQhE/ZNUhc7AvevdlUH+tZEb28s68L1QsWg9svomkukhM5fxMVoBA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FICxFd9O; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1751368370; x=1782904370;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=xFhPSyGkeq1HsapYZVzfhrWmcZVtRpfUOIl6ai+xeUs=;
+  b=FICxFd9O+6XD87++6BUUEnA3GmaldGWQ5q8Gfg6EMJP69f/Fyv5BJUud
+   QqrQatKUh9y59cXoCwKG45ocdilYkIGPwgosFASqwwEKXq3eNHDJ5u4Yf
+   oVIxC0AN1vRRYMBwu2Mf9Cyu+i2crIqDQopRxcX3EanYSy/1rYmxYW4WF
+   xhU8JZb1yc1of0OE15JPhk1hhxH7M6SUnB0iqrwWlz1gv3AaSu9ZiNixC
+   TQojNzBiCvi3hh1IuTmW6W+xZ9nfUaSfyy9wUiAe+dkapv44UIFh3DfPt
+   YTH+sUYdl8nDUkk5xV0E1LZKjV903L9Fj589HjDd5Tm+b+wucd57HRc2z
+   g==;
+X-CSE-ConnectionGUID: f8PQQPGYQRCdd/wcS+IQ2A==
+X-CSE-MsgGUID: 7OG0yOmfT6SYqQqZLxGyqw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11480"; a="53350492"
+X-IronPort-AV: E=Sophos;i="6.16,279,1744095600"; 
+   d="scan'208";a="53350492"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2025 04:12:49 -0700
+X-CSE-ConnectionGUID: 98BTe/sSTTyiYlmlyG8Eyg==
+X-CSE-MsgGUID: 0C+mcSFoTUu017pGnoEkVA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,279,1744095600"; 
+   d="scan'208";a="153906309"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2025 04:12:47 -0700
+Message-ID: <c6a79077-024f-4d2f-897c-118ac8bb9b58@intel.com>
+Date: Tue, 1 Jul 2025 19:12:44 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250701030842.1136519-1-maobibo@loongson.cn>
-In-Reply-To: <20250701030842.1136519-1-maobibo@loongson.cn>
-From: Huacai Chen <chenhuacai@kernel.org>
-Date: Tue, 1 Jul 2025 18:48:34 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H6pt74LDg0idJ=71RG9MDh2KkMxE-Fao-qCFexyd8fz4A@mail.gmail.com>
-X-Gm-Features: Ac12FXwGe-7mJS1-ZNuGmocQDey2sv7QUJ9UE-dTxWIsbFOiEKHfnUk7exY7_io
-Message-ID: <CAAhV-H6pt74LDg0idJ=71RG9MDh2KkMxE-Fao-qCFexyd8fz4A@mail.gmail.com>
-Subject: Re: [PATCH v5 00/13] LoongArch: KVM: Enhancement with eiointc emulation
-To: Bibo Mao <maobibo@loongson.cn>
-Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, Xianglai Li <lixianglai@loongson.cn>, kvm@vger.kernel.org, 
-	loongarch@lists.linux.dev, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] i386/cpu: ARCH_CAPABILITIES should not be advertised on
+ AMD
+To: Zhao Liu <zhao1.liu@intel.com>,
+ Alexandre Chartre <alexandre.chartre@oracle.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, qemu-stable@nongnu.org,
+ konrad.wilk@oracle.com, boris.ostrovsky@oracle.com,
+ maciej.szmigiero@oracle.com, Sean Christopherson <seanjc@google.com>,
+ kvm@vger.kernel.org
+References: <20250630133025.4189544-1-alexandre.chartre@oracle.com>
+ <aGO3vOfHUfjgvBQ9@intel.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <aGO3vOfHUfjgvBQ9@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi, Bibo,
+On 7/1/2025 6:26 PM, Zhao Liu wrote:
+>> unless it was explicitly requested by the user.
+> But this could still break Windows, just like issue #3001, which enables
+> arch-capabilities for EPYC-Genoa. This fact shows that even explicitly
+> turning on arch-capabilities in AMD Guest and utilizing KVM's emulated
+> value would even break something.
+> 
+> So even for named CPUs, arch-capabilities=on doesn't reflect the fact
+> that it is purely emulated, and is (maybe?) harmful.
 
-On Tue, Jul 1, 2025 at 11:08=E2=80=AFAM Bibo Mao <maobibo@loongson.cn> wrot=
-e:
->
-> This series add generic eiointc 8 bytes access interface, so that 1/2/4/8
-> bytes access can use the generic 8 bytes access interface. It reduce
-> about 300 lines redundant code and make eiointc emulation driver simple
-> than ever.
->
-> ---
-> v4 ... v5
->   1. Rebase patch on latest kernel where bugfix of eiointc has been
->      merged.
->   2. Add generic eiointc 8 bytes access interface, 1/2/4/8 bytes access
->      uses generic 8 bytes access interface.
->
-> v3 ... v4:
->   1. Remove patch about enhancement and only keep bugfix relative
->      patches.
->   2. Remove INTC indication in the patch title.
->   3. With access size, keep default case unchanged besides 1/2/4/8 since
->      here all patches are bugfix
->   4. Firstly check return value of copy_from_user() with error path,
->      keep the same order with old patch in patch 4.
->
-> v2 ... v3:
->   1. Add prefix INTC: in title of every patch.
->   2. Fix array index overflow when emulate register EIOINTC_ENABLE
->      writing operation.
->   3. Add address alignment check with eiointc register access operation.
->
-> v1 ... v2:
->   1. Add extra fix in patch 3 and patch 4, add num_cpu validation check
->   2. Name of stat information keeps unchanged, only move it from VM stat
->      to vCPU stat.
-> ---
-> Bibo Mao (13):
->   LoongArch: KVM: Use standard bitops API with eiointc
->   LoongArch: KVM: Remove unused parameter len
->   LoongArch: KVM: Add stat information with kernel irqchip
->   LoongArch: KVM: Remove never called default case statement
->   LoongArch: KVM: Rename loongarch_eiointc_readq with
->     loongarch_eiointc_read
->   LoongArch: KVM: Use generic read function loongarch_eiointc_read
->   LoongArch: KVM: Remove some unnecessary local variables
->   LoongArch: KVM: Use concise api __ffs()
->   LoongArch: KVM: Replace eiointc_enable_irq() with eiointc_update_irq()
->   LoongArch: KVM: Remove local variable offset
->   LoongArch: KVM: Rename old_data with old
->   LoongArch: KVM: Add generic function loongarch_eiointc_write()
->   LoongArch: KVM: Use generic interface loongarch_eiointc_write()
-Patch5 and Patch6 can be squashed, Patch7 and Patch10 can be squashed,
-Patch8 and Patch9 can be squshed, Patch12 and Patch13 can be squashed,
-Patch11 is useless so can be removed.
+It is because Windows adds wrong code. So it breaks itself and it's just 
+the regression of Windows.
 
-
-Huacai
-
->
->  arch/loongarch/include/asm/kvm_host.h |  12 +-
->  arch/loongarch/kvm/intc/eiointc.c     | 557 ++++----------------------
->  arch/loongarch/kvm/intc/ipi.c         |  28 +-
->  arch/loongarch/kvm/intc/pch_pic.c     |   4 +-
->  arch/loongarch/kvm/vcpu.c             |   8 +-
->  5 files changed, 102 insertions(+), 507 deletions(-)
->
->
-> base-commit: d0b3b7b22dfa1f4b515fd3a295b3fd958f9e81af
-> --
-> 2.39.3
->
+KVM and QEMU are not supposed to be blamed.
 
