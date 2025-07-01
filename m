@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-51133-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51134-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4971BAEEBC1
-	for <lists+kvm@lfdr.de>; Tue,  1 Jul 2025 03:04:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A3CFAEEC12
+	for <lists+kvm@lfdr.de>; Tue,  1 Jul 2025 03:25:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56B583BB07E
-	for <lists+kvm@lfdr.de>; Tue,  1 Jul 2025 01:04:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A3D53E026C
+	for <lists+kvm@lfdr.de>; Tue,  1 Jul 2025 01:25:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B352C1885B8;
-	Tue,  1 Jul 2025 01:04:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1127B1922FD;
+	Tue,  1 Jul 2025 01:24:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b/9Fvha7"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jTu0RpTE"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67AC519DF9A
-	for <kvm@vger.kernel.org>; Tue,  1 Jul 2025 01:04:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 130094C97;
+	Tue,  1 Jul 2025 01:24:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751331859; cv=none; b=bW69zLj2XIcCVBC3fe+x+BPGlHQUDcGVjDNyKqON/VDMaTrjNYGxhnF3RRbYuICijP9n8LfEG2T5oTyZPx/gxr41ZAfoHPSi1X3IKwbus3Du4P1c/ApzmODEPi0tvw1Jl1yuQQ36XTSeEvL4rHXsQMpUk/oLr99bSZk6fr6WLnE=
+	t=1751333094; cv=none; b=fwGLsCTn80SJjylxm+O5tR/QNHV50sdKZWZtR8wqoGYR//pFjCrlVBQSX393FZi1xM7DMJC8CHjtIOUORsy2udskZhZ3aKz1bKPVH57PCSQvE+W2RAhykmRxVdMv3XmYkwLTGomo2xd7Ofc54/rUioLFfPuLD4yIwkYWLaKrDik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751331859; c=relaxed/simple;
-	bh=6Rp+qY4bi3OIJNgIFwbTBBauHQgz4JeSoKsIyezoA9A=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DjjITbczhDp5NXtQbKTZ+7NuywYt1jAyEgv+ZABLiTnK8Y1WE9REzAQ73n2W3xnrM6ZdCTGlsSbSkFWLFxwfoXNezC/9FBZGx7xg2IvUBOqPp44y881iGs+ewLE1THP8dmbgWSPJgwfc4oxVN2jDeWurDwDW9p+qMyvWx/OHIoo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=b/9Fvha7; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751331855;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=s0hveexBlmnX8iDFyB5xczfqbkbK1IqQtF2lc4urTvQ=;
-	b=b/9Fvha76BFoXW1KpFQgafudUJAW3jDF8Dyg7jNAHGeXvHVYL81BHtmsgAkUDYuL6k1frq
-	3BfDi2LOFZFfEq94w8r+86BP68OfteryhvYzbUvO+yFvjJSYBsK58Dn01daJzodw+nZk6A
-	L/y9YfyK7gjQCBglP0p8o/liTOv3h98=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-497-fc4yjD4nO4qAjr17fPS4Lg-1; Mon,
- 30 Jun 2025 21:04:12 -0400
-X-MC-Unique: fc4yjD4nO4qAjr17fPS4Lg-1
-X-Mimecast-MFC-AGG-ID: fc4yjD4nO4qAjr17fPS4Lg_1751331850
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 260141808985;
-	Tue,  1 Jul 2025 01:04:10 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.72.112.134])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E923518003FC;
-	Tue,  1 Jul 2025 01:04:03 +0000 (UTC)
-From: Jason Wang <jasowang@redhat.com>
-To: willemdebruijn.kernel@gmail.com,
-	jasowang@redhat.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	mst@redhat.com,
-	eperezma@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
+	s=arc-20240116; t=1751333094; c=relaxed/simple;
+	bh=Mb1v2xak7UyBtCzZCdehsNqtQQX38Vfh8VcEH6S2pk4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fcuQxnPspGumJQm9WUYfQCcbJ7AyuIRu7nk/LalutfWLzmtbDXagMNyyVLHN+ZYD6uKM/n+n/x/HcQTm8nShlbwRDIJU5fI+HI4xBdkxgr/9u8aeebC/Drx2lMa+VFTtpjLKhlhHvUAkSAhjbHh1+DxxROtuCHW/+SwhDou4WHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jTu0RpTE; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1751333092; x=1782869092;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Mb1v2xak7UyBtCzZCdehsNqtQQX38Vfh8VcEH6S2pk4=;
+  b=jTu0RpTEsD9xd0M4uiP5rtETRBetLJPSFjEItx+lnqs96+2ln03wwZ2Z
+   +mxg63fz2aL95NbIKJkXt9LAsJcLwG9ztX7drjOmsMVcuVKNXsVBb1Cw2
+   omrq2DuG7WceRU9exHV1o04qw0EXE6QhPjagd5fjx+iuTTZ6SehTrVi+l
+   NX+mS4nx3gX8dFObKqkRvRHXKFI3xF7K0RoxlZvgUsP2plX08KcqVdc49
+   J6dTN9/0BIjJF1QOGFgMZn6ZVgOpLn0GSgnMaquUk12w0OkWVfutkoWMD
+   qalX51YCPjexv1G6RtMtTcoyJoikyLclXzmtEn94BCo3KLbiTblUay/5M
+   w==;
+X-CSE-ConnectionGUID: xnS6VOfDT2+d6EQa0bQHHQ==
+X-CSE-MsgGUID: +faKAyFNQ724avNx4hd9Gg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11480"; a="41203091"
+X-IronPort-AV: E=Sophos;i="6.16,279,1744095600"; 
+   d="scan'208";a="41203091"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2025 18:24:51 -0700
+X-CSE-ConnectionGUID: Xauj1Xu3TU6gU9z3sSOa1Q==
+X-CSE-MsgGUID: FI/2PDSsRm+aM6eLiJ+fBA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,279,1744095600"; 
+   d="scan'208";a="159130714"
+Received: from litbin-desktop.sh.intel.com ([10.239.156.93])
+  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2025 18:24:49 -0700
+From: Binbin Wu <binbin.wu@linux.intel.com>
+To: pbonzini@redhat.com,
+	seanjc@google.com,
 	kvm@vger.kernel.org,
-	virtualization@lists.linux.dev
-Subject: [PATCH net-next V3 2/2] vhost-net: reduce one userspace copy when building XDP buff
-Date: Tue,  1 Jul 2025 09:03:52 +0800
-Message-ID: <20250701010352.74515-2-jasowang@redhat.com>
-In-Reply-To: <20250701010352.74515-1-jasowang@redhat.com>
-References: <20250701010352.74515-1-jasowang@redhat.com>
+	linux-kernel@vger.kernel.org
+Cc: sfr@canb.auug.org.au,
+	rick.p.edgecombe@intel.com,
+	kai.huang@intel.com,
+	adrian.hunter@intel.com,
+	reinette.chatre@intel.com,
+	xiaoyao.li@intel.com,
+	tony.lindgren@intel.com,
+	isaku.yamahata@intel.com,
+	yan.y.zhao@intel.com,
+	binbin.wu@linux.intel.com
+Subject: [PATCH next] Documentation: KVM: Fix unexpected unindent warning
+Date: Tue,  1 Jul 2025 09:25:36 +0800
+Message-ID: <20250701012536.1281367-1-binbin.wu@linux.intel.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,67 +83,39 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-We used to do twice copy_from_iter() to copy virtio-net and packet
-separately. This introduce overheads for userspace access hardening as
-well as SMAP (for x86 it's stac/clac). So this patch tries to use one
-copy_from_iter() to copy them once and move the virtio-net header
-afterwards to reduce overheads.
+Add proper indentations to bullet list item to resolve the warning:
+"Bullet list ends without a blank line; unexpected unindent."
 
-Testpmd + vhost_net shows 10% improvement from 5.45Mpps to 6.0Mpps.
-
-Signed-off-by: Jason Wang <jasowang@redhat.com>
+Fixes: 4580dbef5ce0 ("KVM: TDX: Exit to userspace for SetupEventNotifyInterrupt")
+Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
+Closes:https://lore.kernel.org/kvm/20250623162110.6e2f4241@canb.auug.org.au
+Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
 ---
-Changes since V2:
-- fix the data_len calculation
-Changes since V1:
-- add a comment to explain there's no overlapping
+Fix the remaining one on the next branch. The other two are handled by
+https://lore.kernel.org/kvm/20250625014829.82289-1-binbin.wu@linux.intel.com/
 ---
- drivers/vhost/net.c | 16 ++++++----------
- 1 file changed, 6 insertions(+), 10 deletions(-)
+ Documentation/virt/kvm/api.rst | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index 777eb6193985..9dbd88eb9ff4 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -690,13 +690,13 @@ static int vhost_net_build_xdp(struct vhost_net_virtqueue *nvq,
- 	if (unlikely(!buf))
- 		return -ENOMEM;
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 43ed57e048a8..6ab242418c92 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -7230,8 +7230,8 @@ inputs and outputs of the TDVMCALL.  Currently the following values of
+    placed in fields from ``r11`` to ``r14`` of the ``get_tdvmcall_info``
+    field of the union.
  
--	copied = copy_from_iter(buf, sock_hlen, from);
--	if (copied != sock_hlen) {
-+	copied = copy_from_iter(buf + pad - sock_hlen, len, from);
-+	if (copied != len) {
- 		ret = -EFAULT;
- 		goto err;
- 	}
+-* ``TDVMCALL_SETUP_EVENT_NOTIFY_INTERRUPT``: the guest has requested to
+-set up a notification interrupt for vector ``vector``.
++ * ``TDVMCALL_SETUP_EVENT_NOTIFY_INTERRUPT``: the guest has requested to
++   set up a notification interrupt for vector ``vector``.
  
--	gso = buf;
-+	gso = buf + pad - sock_hlen;
- 
- 	if (!sock_hlen)
- 		memset(buf, 0, pad);
-@@ -715,15 +715,11 @@ static int vhost_net_build_xdp(struct vhost_net_virtqueue *nvq,
- 		}
- 	}
- 
--	len -= sock_hlen;
--	copied = copy_from_iter(buf + pad, len, from);
--	if (copied != len) {
--		ret = -EFAULT;
--		goto err;
--	}
-+	/* pad contains sock_hlen */
-+	memcpy(buf, buf + pad - sock_hlen, sock_hlen);
- 
- 	xdp_init_buff(xdp, buflen, NULL);
--	xdp_prepare_buff(xdp, buf, pad, len, true);
-+	xdp_prepare_buff(xdp, buf, pad, len - sock_hlen, true);
- 
- 	++nvq->batched_xdp;
- 
+ KVM may add support for more values in the future that may cause a userspace
+ exit, even without calls to ``KVM_ENABLE_CAP`` or similar.  In this case,
+
+base-commit: 6c7ecd725e503bf2ca69ff52c6cc48bb650b1f11
 -- 
-2.34.1
+2.46.0
 
 
