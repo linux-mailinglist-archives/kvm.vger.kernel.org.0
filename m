@@ -1,225 +1,197 @@
-Return-Path: <kvm+bounces-51225-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51226-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1EBBAF05F2
-	for <lists+kvm@lfdr.de>; Tue,  1 Jul 2025 23:48:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C328CAF05F4
+	for <lists+kvm@lfdr.de>; Tue,  1 Jul 2025 23:49:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 46EC71746DC
-	for <lists+kvm@lfdr.de>; Tue,  1 Jul 2025 21:48:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A5B931C203E8
+	for <lists+kvm@lfdr.de>; Tue,  1 Jul 2025 21:49:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FDA930206B;
-	Tue,  1 Jul 2025 21:48:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9F25283FD4;
+	Tue,  1 Jul 2025 21:48:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XJ2HjKzE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2RrCxWNN"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4060302048
-	for <kvm@vger.kernel.org>; Tue,  1 Jul 2025 21:48:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A933223DFB
+	for <kvm@vger.kernel.org>; Tue,  1 Jul 2025 21:48:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751406517; cv=none; b=U1o9inNd0AKOVfgWQOdDWA02v5xR/Nhfz3qGMxABbiGYxhP/5VEOuJ2cs8SVzi54VOoQ1nbQt3Yp0tKdDfuyk32aGVf5SZzU7fURoh6fTB/JI0vdk7kX3aLNHnUxqHpT7eSHYv0hdV/CgdWAXNZcPFr1kspz4pHR6kpHRasOtFM=
+	t=1751406539; cv=none; b=atDtmaqtUBZsdDFy6KmGR+st1N7ZgPGo4xm4rX+LgYpXiiJaYz7Azj8XA5Xgf/ycaCoiA5EgauOh4B/RhAxSwRi+M3sKN3LNge5cgRxLja9VIXyHdoJPCAfm8VDahTKVdPem0WwEmKuOo4onm+gdtXNctkqpJKtZfRxWfZDn2m8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751406517; c=relaxed/simple;
-	bh=OSRDk5TdQFt3lomuSKxjTcjaQzZeDdR93yopsXKx6cM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FF25k7CORuF9/JjxlY9RdSvlH6lc8W6R+rwsM/IAswdIHGX5FDPTaTTUUHMxnb+x3O0XJTAj7jBJl+Y41XOVlwTEVSuGqmV6nFPExD75CFVa+gpgVxZ5yQOflharBGHlxNS1CqyjBxcWUsR00/AJYj3R35L81/0FxJr8qDYCuYI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XJ2HjKzE; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751406514;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=m3bhp6Ha5yTO+37DaP3ZCEydHITdONPpySvqaXLBtLM=;
-	b=XJ2HjKzEcqweUplC25cVvJH8p31PcM/fSNkoTODqEZf8GYdcL9iWPAmfew8ui2S/NAV1M6
-	8YTrf1uCz+JcdEF8PTERyJ/qKSJM/eVQRUZy77GphIDBOOlAWunY2SyJ0hSSn+OGxNPi4E
-	2KRpixtq2jX7eM9MllFlwY/mLy1ppA0=
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
- [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-609-7bE9hYyhMTyG_3BuH28pdw-1; Tue, 01 Jul 2025 17:48:31 -0400
-X-MC-Unique: 7bE9hYyhMTyG_3BuH28pdw-1
-X-Mimecast-MFC-AGG-ID: 7bE9hYyhMTyG_3BuH28pdw_1751406511
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-873496d09ebso102272139f.2
-        for <kvm@vger.kernel.org>; Tue, 01 Jul 2025 14:48:31 -0700 (PDT)
+	s=arc-20240116; t=1751406539; c=relaxed/simple;
+	bh=MhBzcmRs4IbfRWvXPt/N6EYZPgvX5eYGeFtXHWVxwhM=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Q+/tulRM6MWwaapsp4NeFWDy9mq+r5Z0PyqCE1ZLuVzTD51Sjqobmoz8nbQC0KHhhFFBDKUr0CpfQBm0RPLbN7FU56xp2Pv4GpTgPfFLfwlgm9L/Hf1reJJso49iNy01gTTohHwK+1RsFbxs2smzBjjr3c1eOfqqFwBZ+lagagM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2RrCxWNN; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-74880a02689so5131308b3a.0
+        for <kvm@vger.kernel.org>; Tue, 01 Jul 2025 14:48:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1751406537; x=1752011337; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=JVZ4nZhVYWad2CbXoDJ3BSKbLb9HI8Q+JMXYt3i56nA=;
+        b=2RrCxWNN5QSMXMPHnWSoqOdkh9ufz7M11PsiwyocYOQ4QHpNc440fdv0qcJicqD0kL
+         lXg5XdpyBM3aaTQeAbMDrP024yMtT7C6jz8ShY8CaO0fBwjNch2Gefgn0OXgL6IF07xd
+         Vbb5cwTH6iUyiOFHAcvunbMZK21Q1/ZhMDGlXWzdfXX2d5Jrr62lcqUcXW1/x9fKkJs1
+         A3imWjXv0oAGdpQPdeo0Ln0nSjtjykiVh3SIClor82XO9Ta/LxxIpG+rM2+IGusQtowT
+         KDMMtArV5EA5IizsTXkWjMvnKDkjBbC5wYAU7VTwKI0QlHwJdhGd7HM/tmxJsycN0JXk
+         lMeg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751406511; x=1752011311;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=m3bhp6Ha5yTO+37DaP3ZCEydHITdONPpySvqaXLBtLM=;
-        b=BjIkqm4wXMZJz1v+crSTztrjy1C/hj+Z6uH5A1l+28M2xe1mkyZzGSbSadh6V0XO6E
-         5jKjJ/aCwh5kG8+Xz2EHBWWSZiAYE9N5UrVsXGxZ9ZyEWVVY4yu+n04oj0rGpNPQRdTB
-         R4G4ycBTXidnMXLI26ewZQyi/9ACLnj955XnfZiNpd7eAg3EkZ5U69Mn+UP3ycVLbwPu
-         rh0EX7uc30C3V2KC6DcSDQsaOSMfQ1Qr/Ue/SVyqoIhKXV3sW08XeGViPuZSa3k5pHiM
-         7ZH5L7KaAcmL2IV5m9pqGpWbyc+f4ISL0XoybJjU8X5dZ5pBhsNoQjn4oCgSjJLZH04o
-         WYcw==
-X-Forwarded-Encrypted: i=1; AJvYcCWhoSm1dYs3/nWnzJSCZw6iOuTQ4eo3Rx06Lq2kTvfHdY9+u+m7FwVVa3wkhy0IKTj2akg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyVi1HXT4+yDm6nIromJZ7F0CxLmRLrK8u7/xoT24XRIUteoHL6
-	O0RX9DyU2pQQ54iBLm4901hoW0DrVcFl2+Ad+nR5SPETubvrHOzvButpOmGObDpFSban0EajAMW
-	5gxaBBojPemjI8LSvQcGtV+76PIJExoVY704IpN6BRiMLYDY+vfji7A==
-X-Gm-Gg: ASbGnctijt6vsmsdb2RcUq0uCl6c2VduRTpZmcZa7cU0/7fF7ESZrvNt+jLLIubEH/h
-	0p/e+an3FC9SS6cFCQn+iQYGGgSY8BTpEuuqciGfkeBXMTf8jSjIeJpdRaorCwNn/LblBFSH+pp
-	Wm5a56xlLNKjZWAx0Gv/Xv9zfnLNcS+gfwdS7lJRrLiuN3lgwHg1o/OEAG7zYb99t23XNWrpeMw
-	WdJUlzlvp3fVkSWaW+hwThiHN/UICz3tDICYgGIg+iJNijUIgvV27bBo3IeHOQhslPAU18BLulS
-	Q8D2p9zwlMPWbpffJhtKVgaaEg==
-X-Received: by 2002:a05:6602:6c09:b0:873:13c6:f365 with SMTP id ca18e2360f4ac-876c6ac4208mr28277439f.5.1751406510604;
-        Tue, 01 Jul 2025 14:48:30 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHmrWyfpBmHZi2y801SAhlkWgQate/8F0oECz8JtWF6uLas5x68iNoKkuktF30C0qldXS88Pg==
-X-Received: by 2002:a05:6602:6c09:b0:873:13c6:f365 with SMTP id ca18e2360f4ac-876c6ac4208mr28276339f.5.1751406510099;
-        Tue, 01 Jul 2025 14:48:30 -0700 (PDT)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-87687a18102sm252006639f.14.2025.07.01.14.48.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Jul 2025 14:48:29 -0700 (PDT)
-Date: Tue, 1 Jul 2025 15:48:26 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Bjorn Helgaas <bhelgaas@google.com>, iommu@lists.linux.dev, Joerg Roedel
- <joro@8bytes.org>, linux-pci@vger.kernel.org, Robin Murphy
- <robin.murphy@arm.com>, Will Deacon <will@kernel.org>, Lu Baolu
- <baolu.lu@linux.intel.com>, galshalom@nvidia.com, Joerg Roedel
- <jroedel@suse.de>, Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
- maorg@nvidia.com, patches@lists.linux.dev, tdave@nvidia.com, Tony Zhu
- <tony.zhu@intel.com>
-Subject: Re: [PATCH 00/11] Fix incorrect iommu_groups with PCIe switches
-Message-ID: <20250701154826.75a7aba6.alex.williamson@redhat.com>
-In-Reply-To: <0-v1-74184c5043c6+195-pcie_switch_groups_jgg@nvidia.com>
-References: <0-v1-74184c5043c6+195-pcie_switch_groups_jgg@nvidia.com>
-Organization: Red Hat
+        d=1e100.net; s=20230601; t=1751406537; x=1752011337;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=JVZ4nZhVYWad2CbXoDJ3BSKbLb9HI8Q+JMXYt3i56nA=;
+        b=rHTsT76/5wvvSl1ciktrJWt0maE4FhdvwrwJl0w97Jf/hA2EGJmHnu3d83HhlSsbkl
+         TOE8PdTGjSnFlikPDsbw6yaHJyxMZbBfHcsVbrART1GrTUmcewxhNzi2UYfINUVHjgZi
+         qWhIMYlgtZ/1OSvbaIjGfLLM0Mmo+w0ffs0QoReJDTMuCXYiv7ONfzTZhpFkj5nPygR/
+         rDtVZr//gx2fkSKAmfnQBe37SPx4YvRqkomgAnKisHVk1Iirnt/CLz5b5PiFJptWdNSl
+         WbJDgf4d7Frj6X6kt4w7Hwip8K+Kg5Vk5ThSpOpE4z1oFN9GmzkViNRn4NisrllVnCjs
+         r/bQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXayL1GYEx4086/sKUxpdYTT/jbalV6du4WFesPTm2K/lnY+S74DC3qJ/4ynDpBE47+y28=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwhgS/RkMxygEJXXLn+72Azujae0dQhyIQyazLP6Y8Nl41Ew5nH
+	uQDLsNaHtX3RWcZa8OLRdv41TyPfZwXlKBj8AaUbA1ujWEH+BrEpkyreyZ61tGokKzegA0HR6nI
+	OCgHC1YKKX3Ev7ZNPmOqGCcu1NA==
+X-Google-Smtp-Source: AGHT+IEqcUpBnNJRKMdnLvZ2ZSUMUS2quj2Z66sgnJlgrefu2emFNr4Z97aJIzGPcQ4MClhKH9r+grsT8hfglCP6lg==
+X-Received: from pfbbx9.prod.google.com ([2002:a05:6a00:4289:b0:747:a97f:513f])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a00:889:b0:742:a77b:8c3 with SMTP id d2e1a72fcca58-74b50e69a06mr725062b3a.4.1751406536971;
+ Tue, 01 Jul 2025 14:48:56 -0700 (PDT)
+Date: Tue, 01 Jul 2025 14:48:54 -0700
+In-Reply-To: <cd806e9a190c6915cde16a6d411c32df133a265b.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <a3cace55ee878fefc50c68bb2b1fa38851a67dd8.camel@intel.com>
+ <diqzms9vju5j.fsf@ackerleytng-ctop.c.googlers.com> <447bae3b7f5f2439b0cb4eb77976d9be843f689b.camel@intel.com>
+ <zlxgzuoqwrbuf54wfqycnuxzxz2yduqtsjinr5uq4ss7iuk2rt@qaaolzwsy6ki>
+ <4cbdfd3128a6dcc67df41b47336a4479a07bf1bd.camel@intel.com>
+ <diqz5xghjca4.fsf@ackerleytng-ctop.c.googlers.com> <aGJxU95VvQvQ3bj6@yzhao56-desk.sh.intel.com>
+ <a40d2c0105652dfcc01169775d6852bd4729c0a3.camel@intel.com>
+ <diqzms9pjaki.fsf@ackerleytng-ctop.c.googlers.com> <fe6de7e7d72d0eed6c7a8df4ebff5f79259bd008.camel@intel.com>
+ <aGNrlWw1K6nkWdmg@yzhao56-desk.sh.intel.com> <cd806e9a190c6915cde16a6d411c32df133a265b.camel@intel.com>
+Message-ID: <diqzy0t74m61.fsf@ackerleytng-ctop.c.googlers.com>
+Subject: Re: [RFC PATCH 08/21] KVM: TDX: Increase/decrease folio ref for huge pages
+From: Ackerley Tng <ackerleytng@google.com>
+To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>, "Zhao, Yan Y" <yan.y.zhao@intel.com>
+Cc: "quic_eberman@quicinc.com" <quic_eberman@quicinc.com>, "Li, Xiaoyao" <xiaoyao.li@intel.com>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "Hansen, Dave" <dave.hansen@intel.com>, 
+	"david@redhat.com" <david@redhat.com>, "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>, 
+	"vbabka@suse.cz" <vbabka@suse.cz>, "tabba@google.com" <tabba@google.com>, 
+	"Shutemov, Kirill" <kirill.shutemov@intel.com>, "michael.roth@amd.com" <michael.roth@amd.com>, 
+	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, "seanjc@google.com" <seanjc@google.com>, 
+	"Peng, Chao P" <chao.p.peng@intel.com>, "Du, Fan" <fan.du@intel.com>, 
+	"Yamahata, Isaku" <isaku.yamahata@intel.com>, "Weiny, Ira" <ira.weiny@intel.com>, 
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Annapurve, Vishal" <vannapurve@google.com>, 
+	"jroedel@suse.de" <jroedel@suse.de>, "Miao, Jun" <jun.miao@intel.com>, 
+	"Li, Zhiquan1" <zhiquan1.li@intel.com>, "pgonda@google.com" <pgonda@google.com>, 
+	"x86@kernel.org" <x86@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-Testing on some systems here...
+"Edgecombe, Rick P" <rick.p.edgecombe@intel.com> writes:
 
-I have an AMD system:
+> On Tue, 2025-07-01 at 13:01 +0800, Yan Zhao wrote:
+>> > Maybe Yan can clarify here. I thought the HWpoison scenario was about =
+TDX
+>> > module
+>> My thinking is to set HWPoison to private pages whenever KVM_BUG_ON() wa=
+s hit
+>> in
+>> TDX. i.e., when the page is still mapped in S-EPT but the TD is bugged o=
+n and
+>> about to tear down.
+>>=20
+>> So, it could be due to KVM or TDX module bugs, which retries can't help.
+>
+> We were going to call back into guestmemfd for this, right? Not set it in=
+side
+> KVM code.
+>
 
-# lspci -tv
--[0000:00]-+-00.0  Advanced Micro Devices, Inc. [AMD] Raphael/Granite Ridge Root Complex
-           +-00.2  Advanced Micro Devices, Inc. [AMD] Raphael/Granite Ridge IOMMU
-           +-01.0  Advanced Micro Devices, Inc. [AMD] Raphael/Granite Ridge Dummy Host Bridge
-           +-01.1-[01-03]----00.0-[02-03]----00.0-[03]--+-00.0  Advanced Micro Devices, Inc. [AMD/ATI] Navi 10 [Radeon Pro W5700]
-           |                                            +-00.1  Advanced Micro Devices, Inc. [AMD/ATI] Navi 10 HDMI Audio
-           |                                            +-00.2  Advanced Micro Devices, Inc. [AMD/ATI] Device 7316
-           |                                            \-00.3  Advanced Micro Devices, Inc. [AMD/ATI] Navi 10 USB
-           +-01.2-[04]----00.0  Samsung Electronics Co Ltd NVMe SSD Controller SM981/PM981/PM983
-           +-02.0  Advanced Micro Devices, Inc. [AMD] Raphael/Granite Ridge Dummy Host Bridge
-           +-02.1-[05]----00.0  Samsung Electronics Co Ltd NVMe SSD Controller PM9C1a (DRAM-less)
-           +-02.2-[06-0b]----00.0-[07-0b]--+-01.0-[08]--+-00.0  MosChip Semiconductor Technology Ltd. MCS9922 PCIe Multi-I/O Controller
-           |                               |            \-00.1  MosChip Semiconductor Technology Ltd. MCS9922 PCIe Multi-I/O Controller
-           |                               +-02.0-[09-0a]--+-00.0  Intel Corporation 82576 Gigabit Network Connection
-           |                               |               \-00.1  Intel Corporation 82576 Gigabit Network Connection
-           |                               \-03.0-[0b]----00.0  Fresco Logic FL1100 USB 3.0 Host Controller
-           +-03.0  Advanced Micro Devices, Inc. [AMD] Raphael/Granite Ridge Dummy Host Bridge
-           +-03.1-[0c]----00.0  JMicron Technology Corp. JMB58x AHCI SATA controller
-           +-03.2-[0d]----00.0  Realtek Semiconductor Co., Ltd. RTL8125 2.5GbE Controller
-           +-04.0  Advanced Micro Devices, Inc. [AMD] Raphael/Granite Ridge Dummy Host Bridge
-           +-08.0  Advanced Micro Devices, Inc. [AMD] Raphael/Granite Ridge Dummy Host Bridge
-           +-08.1-[0e]--+-00.0  Advanced Micro Devices, Inc. [AMD/ATI] Raphael
-           |            +-00.1  Advanced Micro Devices, Inc. [AMD/ATI] Radeon High Definition Audio Controller [Rembrandt/Strix]
-           |            +-00.2  Advanced Micro Devices, Inc. [AMD] Family 19h PSP/CCP
-           |            +-00.3  Advanced Micro Devices, Inc. [AMD] Raphael/Granite Ridge USB 3.1 xHCI
-           |            +-00.4  Advanced Micro Devices, Inc. [AMD] Raphael/Granite Ridge USB 3.1 xHCI
-           |            \-00.6  Advanced Micro Devices, Inc. [AMD] Family 17h/19h/1ah HD Audio Controller
-           +-08.3-[0f]----00.0  Advanced Micro Devices, Inc. [AMD] Raphael/Granite Ridge USB 2.0 xHCI
-           +-14.0  Advanced Micro Devices, Inc. [AMD] FCH SMBus Controller
-           +-14.3  Advanced Micro Devices, Inc. [AMD] FCH LPC Bridge
-           +-18.0  Advanced Micro Devices, Inc. [AMD] Raphael/Granite Ridge Data Fabric; Function 0
-           +-18.1  Advanced Micro Devices, Inc. [AMD] Raphael/Granite Ridge Data Fabric; Function 1
-           +-18.2  Advanced Micro Devices, Inc. [AMD] Raphael/Granite Ridge Data Fabric; Function 2
-           +-18.3  Advanced Micro Devices, Inc. [AMD] Raphael/Granite Ridge Data Fabric; Function 3
-           +-18.4  Advanced Micro Devices, Inc. [AMD] Raphael/Granite Ridge Data Fabric; Function 4
-           +-18.5  Advanced Micro Devices, Inc. [AMD] Raphael/Granite Ridge Data Fabric; Function 5
-           +-18.6  Advanced Micro Devices, Inc. [AMD] Raphael/Granite Ridge Data Fabric; Function 6
-           \-18.7  Advanced Micro Devices, Inc. [AMD] Raphael/Granite Ridge Data Fabric; Function 7
+Perhaps we had different understandings of f/g :P
 
-Notably, each case where there's a dummy host bridge followed by some
-number of additional functions (ie. 01.0, 02.0, 03.0, 08.0), that dummy
-host bridge is tainting the function isolation and merging the group.
-For instance each of these were previously a separate group and are now
-combined into one group.
+I meant that TDX module should directly set the HWpoison flag on the
+folio (HugeTLB or 4K, guest_memfd or not), not call into guest_memfd.
 
-# lspci -vvvs 00:01. [manually edited]
-00:01.0 Host bridge: Advanced Micro Devices, Inc. [AMD] Raphael/Granite Ridge Dummy Host Bridge
+guest_memfd will then check this flag when necessary, specifically:
 
-00:01.1 PCI bridge: Advanced Micro Devices, Inc. [AMD] Raphael/Granite Ridge GPP Bridge (prog-if 00 [Normal decode])
-	Capabilities: [58] Express (v2) Root Port (Slot+), IntMsgNum 0
-	Capabilities: [2a0 v1] Access Control Services
-		ACSCap:	SrcValid+ TransBlk+ ReqRedir+ CmpltRedir+ UpstreamFwd+ EgressCtrl- DirectTrans+
-		ACSCtl:	SrcValid+ TransBlk- ReqRedir+ CmpltRedir+ UpstreamFwd+ EgressCtrl- DirectTrans-
+* On faults, either into guest or host page tables=20
+* When freeing the page
+    * guest_memfd will not return HugeTLB pages that are poisoned to
+      HugeTLB and just leak it
+    * 4K pages will be freed normally, because free_pages_prepare() will
+      check for HWpoison and skip freeing, from __folio_put() ->
+      free_frozen_pages() -> __free_frozen_pages() ->
+      free_pages_prepare()
+* I believe guest_memfd doesn't need to check HWpoison on conversions [1]
 
-00:01.2 PCI bridge: Advanced Micro Devices, Inc. [AMD] Raphael/Granite Ridge GPP Bridge (prog-if 00 [Normal decode])
-	Capabilities: [58] Express (v2) Root Port (Slot+), IntMsgNum 0
-	Capabilities: [2a0 v1] Access Control Services
-		ACSCap:	SrcValid+ TransBlk+ ReqRedir+ CmpltRedir+ UpstreamFwd+ EgressCtrl- DirectTrans+
-		ACSCtl:	SrcValid+ TransBlk- ReqRedir+ CmpltRedir+ UpstreamFwd+ EgressCtrl- DirectTrans-
+[1] https://lore.kernel.org/all/diqz5xghjca4.fsf@ackerleytng-ctop.c.googler=
+s.com/
 
-The endpoints result in equivalent grouping, but this is a case where I
-don't understand how we have non-isolated functions yet isolated
-subordinate buses.
+> What about a kvm_gmem_buggy_cleanup() instead of the system wide one. KVM=
+ calls
+> it and then proceeds to bug the TD only from the KVM side. It's not as sa=
+fe for
+> the system, because who knows what a buggy TDX module could do. But TDX m=
+odule
+> could also be buggy without the kernel catching wind of it.
+>
+> Having a single callback to basically bug the fd would solve the atomic c=
+ontext
+> issue. Then guestmemfd could dump the entire fd into memory_failure() ins=
+tead of
+> returning the pages. And developers could respond by fixing the bug.
+>
 
-An Alder Lake system shows something similar:
+This could work too.
 
-# lspci -tv
--[0000:00]-+-00.0  Intel Corporation 12th Gen Core Processor Host Bridge
-           +-01.0-[01-02]----00.0-[02]--
-           +-02.0  Intel Corporation Alder Lake-S GT1 [UHD Graphics 770]
-           +-04.0  Intel Corporation Alder Lake Innovation Platform Framework Processor Participant
-           +-06.0-[03]----00.0  Sandisk Corp SanDisk Ultra 3D / WD PC SN530, IX SN530, Blue SN550 NVMe SSD (DRAM-less)
-           +-08.0  Intel Corporation 12th Gen Core Processor Gaussian & Neural Accelerator
-           +-14.0  Intel Corporation Raptor Lake USB 3.2 Gen 2x2 (20 Gb/s) XHCI Host Controller
-           +-14.2  Intel Corporation Raptor Lake-S PCH Shared SRAM
-           +-15.0  Intel Corporation Raptor Lake Serial IO I2C Host Controller #0
-           +-15.1  Intel Corporation Raptor Lake Serial IO I2C Host Controller #1
-           +-15.2  Intel Corporation Raptor Lake Serial IO I2C Host Controller #2
-           +-15.3  Intel Corporation Device 7a4f
-           +-16.0  Intel Corporation Raptor Lake CSME HECI #1
-           +-17.0  Intel Corporation Raptor Lake SATA AHCI Controller
-           +-19.0  Intel Corporation Device 7a7c
-           +-19.1  Intel Corporation Device 7a7d
-           +-1a.0-[04]----00.0  Sandisk Corp SanDisk Ultra 3D / WD PC SN530, IX SN530, Blue SN550 NVMe SSD (DRAM-less)
-           +-1c.0-[05]--
-           +-1c.1-[06]----00.0  Fresco Logic FL1100 USB 3.0 Host Controller
-           +-1c.2-[07]----00.0  Realtek Semiconductor Co., Ltd. RTL8125 2.5GbE Controller
-           +-1c.3-[08-0c]----00.0-[09-0c]--+-01.0-[0a]----00.0  Realtek Semiconductor Co., Ltd. RTL8111/8168/8211/8411 PCI Express Gigabit Ethernet Controller
-           |                               +-02.0-[0b]--
-           |                               \-03.0-[0c]----00.0  Realtek Semiconductor Co., Ltd. RTL8111/8168/8211/8411 PCI Express Gigabit Ethernet Controller
-           +-1f.0  Intel Corporation Device 7a06
-           +-1f.3  Intel Corporation Raptor Lake High Definition Audio Controller
-           +-1f.4  Intel Corporation Raptor Lake-S PCH SMBus Controller
-           \-1f.5  Intel Corporation Raptor Lake SPI (flash) Controller
+I'm in favor of buying into the HWpoison system though, since we're
+quite sure this is fair use of HWpoison.
 
-00:1c. are all grouped together.  Here 1c.0 does not report ACS, but
-the other root ports do:
+Are you saying kvm_gmem_buggy_cleanup() will just set the HWpoison flag
+on the parts of the folios in trouble?
 
-# lspci -vvvs 1c. | grep -e ^0 -e "Access Control Services"
-00:1c.0 PCI bridge: Intel Corporation Raptor Lake PCI Express Root Port #1 (rev 11) (prog-if 00 [Normal decode])
-00:1c.1 PCI bridge: Intel Corporation Device 7a39 (rev 11) (prog-if 00 [Normal decode])
-	Capabilities: [220 v1] Access Control Services
-00:1c.2 PCI bridge: Intel Corporation Raptor Point-S PCH - PCI Express Root Port 3 (rev 11) (prog-if 00 [Normal decode])
-	Capabilities: [220 v1] Access Control Services
-00:1c.3 PCI bridge: Intel Corporation Raptor Lake PCI Express Root Port #4 (rev 11) (prog-if 00 [Normal decode])
-	Capabilities: [220 v1] Access Control Services
-
-So again the group is tainted by a device that cannot generate DMA, the
-endpoint grouping remains equivalent, but isolated buses downstream of
-this non-isolated group doesn't seem to make sense.
-
-I'll try to generate further interesting configs.  Thanks,
-
-Alex
-
+> IMO maintainability needs to be balanced with efforts to minimize the fal=
+lout
+> from bugs. In the end a system that is too complex is going to have more =
+bugs
+> anyway.
+>
+>>=20
+>> > bugs. Not TDX busy errors, demote failures, etc. If there are "normal"
+>> > failures,
+>> > like the ones that can be fixed with retries, then I think HWPoison is=
+ not a
+>> > good option though.
+>> >=20
+>> > > =C2=A0 there is a way to make 100%
+>> > > sure all memory becomes re-usable by the rest of the host, using
+>> > > tdx_buggy_shutdown(), wbinvd, etc?
+>>=20
+>> Not sure about this approach. When TDX module is buggy and the page is s=
+till
+>> accessible to guest as private pages, even with no-more SEAMCALLs flag, =
+is it
+>> safe enough for guest_memfd/hugetlb to re-assign the page to allow
+>> simultaneous
+>> access in shared memory with potential private access from TD or TDX mod=
+ule?
+>
+> With the no more seamcall's approach it should be safe (for the system). =
+This is
+> essentially what we are doing for kexec.
 
