@@ -1,200 +1,168 @@
-Return-Path: <kvm+bounces-51315-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51316-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC41FAF5E24
-	for <lists+kvm@lfdr.de>; Wed,  2 Jul 2025 18:12:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D741FAF5E25
+	for <lists+kvm@lfdr.de>; Wed,  2 Jul 2025 18:12:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 780147A52E0
-	for <lists+kvm@lfdr.de>; Wed,  2 Jul 2025 16:10:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F0EC652271C
+	for <lists+kvm@lfdr.de>; Wed,  2 Jul 2025 16:12:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F59C2E7BD7;
-	Wed,  2 Jul 2025 16:11:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4F3E2E7BCF;
+	Wed,  2 Jul 2025 16:12:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="gZNSODaO"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ezpBL3ub"
 X-Original-To: kvm@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC7CF1E0DD8;
-	Wed,  2 Jul 2025 16:11:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail-oo1-f41.google.com (mail-oo1-f41.google.com [209.85.161.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61D4F2D46BE
+	for <kvm@vger.kernel.org>; Wed,  2 Jul 2025 16:11:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751472709; cv=none; b=RRHeoznXm30KstXDmm5jc+amBg9GZohyVa34x5uozFZwX8AoML1vAsm3+JtCp0nVEOFqsbnijtrKRKDGZWO6uPfIbrDzmCI8vNMKNngY0sjRKRY5u2Dhf5o9LLUxKw8Vo+LnC34qGcJCuBdo24UmMw0amtY4Wv2CK6N2K8jV9+Q=
+	t=1751472720; cv=none; b=of18ZkhZvMvXDikySXTP9CVr7/a0tQah2ZP8XVqp46dasbDsfE1TgGALIlb8uOLtZA9zqRlCmQXVRR+qucnmPau0SI1zrRUmX4bcdFRyPkH7/CrQHzTWCOd2MkurfNOWSOaxSHZHDhLE+MayZLsOpMg75CGIltV8am2MUsVXVJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751472709; c=relaxed/simple;
-	bh=yS/Dw9mwlzCfupsNGgq6I0EPxICqWfjGtM2H6uUtaGY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TUnQsO4ZcYj7pTeojna3KYdZpftg5e5zAMaOzIk3/oCD8xvLC0o72BnncQ/sfadrKeN16tQ15xu7tHazvGxYyKqKjOtSHkTD7vdLJC7n3XOTEI8MKuYEfhN9o2pMPzHPDXEmBTGaEeP/03xU/iJ1kVUGinFBbWuptLO5dxHazWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=gZNSODaO; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: from [100.66.201.102] (unknown [40.68.200.63])
-	by linux.microsoft.com (Postfix) with ESMTPSA id EA292201A4D4;
-	Wed,  2 Jul 2025 09:11:44 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com EA292201A4D4
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1751472707;
-	bh=g9AKuBvLaq/WBbfdsgGRcIJWQPeX4lLdRaRJp8x1I0s=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=gZNSODaO7kwE0UbD/eZnrrO8CNnaIStHeRpiXeUoWuTm32wGkNosO/Q/m36jWsf4r
-	 s89HlQZMl2Vn07oGhTh9ghiRIVFv5ZIxoz6MojX+knBBI2GGmi2ApkzjZpbP32mhvk
-	 SPbGGBrhS+4UicxwTkulUP/Hjw05OEeTJ1fAAU1Y=
-Message-ID: <ca26fba1-c2bb-40a1-bb5e-92811c4a6fc6@linux.microsoft.com>
-Date: Wed, 2 Jul 2025 18:11:43 +0200
+	s=arc-20240116; t=1751472720; c=relaxed/simple;
+	bh=ku/1O1AIFsAJJ6qmmvnq+B5DRjf3j0x7VN0LkoGzkUQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LvkReZj9f64354BRmLeddQi9iPhL7zio+hYgthu6nWiRNcdWtehgnVcPEXJnXv8B/x0nMrux90G8ucYbWyJZPufbGKexITKBzNGV0boEYnx1gIuozd8wXpeqfVvYn5uiq+zKWKsVCW339/BAoKMWnKCDU83/2/jkyZfbzt6ZiHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ezpBL3ub; arc=none smtp.client-ip=209.85.161.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-oo1-f41.google.com with SMTP id 006d021491bc7-60d5c665fceso2086122eaf.1
+        for <kvm@vger.kernel.org>; Wed, 02 Jul 2025 09:11:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1751472717; x=1752077517; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xLl0djX76uDh2KqOF+EzMvL6PoM9gvUJ0/VwerVvcuU=;
+        b=ezpBL3ub40irIXQqvS2QZITGipRrqRa53fQq61zGxdt5X6TEtgcyGdC9y0eregS1oU
+         QqFhUcDugTZ3uJmI8AfVVgYm1CzddOw1/7XTZBT7jjEUC039+8hKTk54ZWeCRlHJrmLs
+         Kz24P0v2oDhjr5LcRBbnfgg+BKeHFTvS9qN4F7TKeMJWtXO48V2dgXGWQpb84fWuYXVU
+         qK4PQocAmmNFn6q5gVTN+obC+/BbGPawqg+X7S6fJo2mMmZtNsXIT8iyAh2YcpNHyj7f
+         VjTI4JjiWl5xDd44CP4sRV4jOfKq//TCG+cjZkYieoco8LA0DPYKg+84zLmAr3E0H3ah
+         HTCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751472717; x=1752077517;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xLl0djX76uDh2KqOF+EzMvL6PoM9gvUJ0/VwerVvcuU=;
+        b=pgOfrt6wlg7hw33P2c76tBHMMPK/yV0JWx/9r/ePZo9QK3PVws3Pr1yhAu01deF1y1
+         In17XkW3vcz/VnHPhRFVo9MBJlhf+ArbA9NOpuns+DMysFByFo7FwINLlPsZi8ZHGFp9
+         Y9T1MKof5ucfVgmHDpwH7RG+9aWJr1Ent8fOlmGtWkgkVzhHUAhzjezxDK0jLa68f1xp
+         JkRwSnSuslhLfMwYcRbEx80s8LqiUZ3vNjSopsn/AsTzC42ujl2lzurN/Dwi9Ix3e/DO
+         HtHo4I0+PFqyXSnwP05O5kQ79TkAEdbYPcHaynWBRMFn1M3eZKuZTg7iNdpBP38ud/Bh
+         eXMg==
+X-Forwarded-Encrypted: i=1; AJvYcCXqjByhKZqG80SlShiULw+cooexJAJiJZN3N97EhRk8Ni1CUwNp4xwheTO8NGLgJZdo2GE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx6OblOQPem9dv1lkG/hUjAfTzNBOCyg0JPzgwfYbiDkriBT2PO
+	M9PUrmu/5Xr7JiJoMrF66RgcwjL8QS8g9NgA5wwOwgUlhiIlYUqqm64+jegrsR1hvkSA2CdbCqB
+	p8cmkT4Y=
+X-Gm-Gg: ASbGnctJpRQl/aqeh+phz+JfFN/TkFyOMuYPqwvCWY8s7kXshYlwbo6LTt1J6yHRnCa
+	2kSmdt3PF80lOK8GsQ0HvjwpUzDUVjYhlnUinj73B9055jOnQdNOq9Sc1fh2iPNX/NTu6ZiZNc+
+	DRZf87dVsRjaWQRGY39RBFFHhLmTX67V7699h58t+2RdkWA1Uv5b9QSfRIa+uM2OB9CepdMomG1
+	b1Xr1yzSpWiiGBqrYzRLV+iEuC7xvqb22OnuLxCWInJsHuENGCVJ4qNz3k2T4Gc9rEECE+aFjzI
+	QNKQpErF1VvWvz8UFPIPlSWAUT7jgxklAsUQcO5UAOU9cGmJpN//ga3DSQFmAWFhxmqMBA==
+X-Google-Smtp-Source: AGHT+IEUcyyYplg3dAlsN64/ClYT7sGu4SJixmVO5+dP9Ynt+31d1VKg5vFlMLwsobsP4aHj0c1LwQ==
+X-Received: by 2002:a05:6870:e8c9:b0:2ea:8f12:5762 with SMTP id 586e51a60fabf-2f5a8d27ce5mr2546491fac.7.1751472717371;
+        Wed, 02 Jul 2025 09:11:57 -0700 (PDT)
+Received: from localhost ([2603:8080:b800:f700:7056:ddb5:3445:864f])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-2efd4ef7024sm3926135fac.13.2025.07.02.09.11.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Jul 2025 09:11:56 -0700 (PDT)
+Date: Wed, 2 Jul 2025 19:11:54 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: lizhe.67@bytedance.com
+Cc: alex.williamson@redhat.com, david@redhat.com, jgg@ziepe.ca,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, lkp@intel.com,
+	oe-kbuild-all@lists.linux.dev, oe-kbuild@lists.linux.dev,
+	peterx@redhat.com
+Subject: Re: [PATCH 3/4] vfio/type1: introduce a new member has_rsvd for
+ struct vfio_dma
+Message-ID: <24446bf8-3255-4622-a53c-33690c07fb17@suswa.mountain>
+References: <c209cfd6-05b1-4491-91ce-c672414d718c@suswa.mountain>
+ <20250702034720.53574-1-lizhe.67@bytedance.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 1/1] KVM: VMX: Use Hyper-V EPT flush for local TLB
- flushes
-To: Vitaly Kuznetsov <vkuznets@redhat.com>,
- Sean Christopherson <seanjc@google.com>, Paolo Bonzini
- <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc: Dave Hansen <dave.hansen@linux.intel.com>, linux-kernel@vger.kernel.org,
- alanjiang@microsoft.com, chinang.ma@microsoft.com,
- andrea.pellegrini@microsoft.com, Kevin Tian <kevin.tian@intel.com>,
- "K. Y. Srinivasan" <kys@microsoft.com>,
- Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
- Dexuan Cui <decui@microsoft.com>, linux-hyperv@vger.kernel.org
-References: <cover.1750432368.git.jpiotrowski@linux.microsoft.com>
- <4266fc8f76c152a3ffcbb2d2ebafd608aa0fb949.1750432368.git.jpiotrowski@linux.microsoft.com>
- <875xghoaac.fsf@redhat.com>
-Content-Language: en-US
-From: Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
-In-Reply-To: <875xghoaac.fsf@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250702034720.53574-1-lizhe.67@bytedance.com>
 
-On 27/06/2025 10:31, Vitaly Kuznetsov wrote:
-> Jeremi Piotrowski <jpiotrowski@linux.microsoft.com> writes:
+On Wed, Jul 02, 2025 at 11:47:20AM +0800, lizhe.67@bytedance.com wrote:
+> On Tue, 1 Jul 2025 18:13:48 +0300, dan.carpenter@linaro.org wrote:
 > 
->> Use Hyper-V's HvCallFlushGuestPhysicalAddressSpace for local TLB flushes.
->> This makes any KVM_REQ_TLB_FLUSH_CURRENT (such as on root alloc) visible to
->> all CPUs which means we no longer need to do a KVM_REQ_TLB_FLUSH on CPU
->> migration.
->>
->> The goal is to avoid invept-global in KVM_REQ_TLB_FLUSH. Hyper-V uses a
->> shadow page table for the nested hypervisor (KVM) and has to invalidate all
->> EPT roots when invept-global is issued. This has a performance impact on
->> all nested VMs.  KVM issues KVM_REQ_TLB_FLUSH on CPU migration, and under
->> load the performance hit causes vCPUs to use up more of their slice of CPU
->> time, leading to more CPU migrations. This has a snowball effect and causes
->> CPU usage spikes.
->>
->> By issuing the hypercall we are now guaranteed that any root modification
->> that requires a local TLB flush becomes visible to all CPUs. The same
->> hypercall is already used in kvm_arch_flush_remote_tlbs and
->> kvm_arch_flush_remote_tlbs_range.  The KVM expectation is that roots are
->> flushed locally on alloc and we achieve consistency on migration by
->> flushing all roots - the new behavior of achieving consistency on alloc on
->> Hyper-V is a superset of the expected guarantees. This makes the
->> KVM_REQ_TLB_FLUSH on CPU migration no longer necessary on Hyper-V.
+> > New smatch warnings:
+> > drivers/vfio/vfio_iommu_type1.c:788 vfio_pin_pages_remote() error: uninitialized symbol 'rsvd'.
+> > 
+> > Old smatch warnings:
+> > drivers/vfio/vfio_iommu_type1.c:2376 vfio_iommu_type1_attach_group() warn: '&group->next' not removed from list
+> > 
+> > vim +/rsvd +788 drivers/vfio/vfio_iommu_type1.c
+> > 
+> > 8f0d5bb95f763c Kirti Wankhede  2016-11-17  684  static long vfio_pin_pages_remote(struct vfio_dma *dma, unsigned long vaddr,
+> > 0635559233434a Alex Williamson 2025-02-18  685  				  unsigned long npage, unsigned long *pfn_base,
+> > 4b6c33b3229678 Daniel Jordan   2021-02-19  686  				  unsigned long limit, struct vfio_batch *batch)
+> > 73fa0d10d077d9 Alex Williamson 2012-07-31  687  {
+> > 4d83de6da265cd Daniel Jordan   2021-02-19  688  	unsigned long pfn;
+> > 4d83de6da265cd Daniel Jordan   2021-02-19  689  	struct mm_struct *mm = current->mm;
+> > 6c38c055cc4c0a Alex Williamson 2016-12-30  690  	long ret, pinned = 0, lock_acct = 0;
+> > 89c29def6b0101 Alex Williamson 2018-06-02  691  	bool rsvd;
+> > a54eb55045ae9b Kirti Wankhede  2016-11-17  692  	dma_addr_t iova = vaddr - dma->vaddr + dma->iova;
+> > 166fd7d94afdac Alex Williamson 2013-06-21  693  
+> > 6c38c055cc4c0a Alex Williamson 2016-12-30  694  	/* This code path is only user initiated */
+> > 4d83de6da265cd Daniel Jordan   2021-02-19  695  	if (!mm)
+> > 166fd7d94afdac Alex Williamson 2013-06-21  696  		return -ENODEV;
+> > 73fa0d10d077d9 Alex Williamson 2012-07-31  697  
+> > 4d83de6da265cd Daniel Jordan   2021-02-19  698  	if (batch->size) {
+> > 4d83de6da265cd Daniel Jordan   2021-02-19  699  		/* Leftover pages in batch from an earlier call. */
+> > 4d83de6da265cd Daniel Jordan   2021-02-19  700  		*pfn_base = page_to_pfn(batch->pages[batch->offset]);
+> > 4d83de6da265cd Daniel Jordan   2021-02-19  701  		pfn = *pfn_base;
+> > 89c29def6b0101 Alex Williamson 2018-06-02  702  		rsvd = is_invalid_reserved_pfn(*pfn_base);
 > 
-> Sounds reasonable overall, my only concern (not sure if valid or not) is
-> that using the hypercall for local flushes is going to be more expensive
-> than invept-context we do today and thus while the performance is
-> improved for the scenario when vCPUs are migrating a lot, we will take a
-> hit in other cases.
+> When batch->size is not zero, we initialize rsvd here.
 > 
-
-Discussion below, I think the impact should be limited and will try to quantify it.
-
->>
->> Coincidentally - we now match the behavior of SVM on Hyper-V.
->>
->> Signed-off-by: Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
->> ---
->>  arch/x86/include/asm/kvm_host.h |  1 +
->>  arch/x86/kvm/vmx/vmx.c          | 20 +++++++++++++++++---
->>  arch/x86/kvm/vmx/vmx_onhyperv.h |  6 ++++++
->>  arch/x86/kvm/x86.c              |  3 +++
->>  4 files changed, 27 insertions(+), 3 deletions(-)
->>
->> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
->> index b4a391929cdb..d3acab19f425 100644
->> --- a/arch/x86/include/asm/kvm_host.h
->> +++ b/arch/x86/include/asm/kvm_host.h
->> @@ -1077,6 +1077,7 @@ struct kvm_vcpu_arch {
->>  
->>  #if IS_ENABLED(CONFIG_HYPERV)
->>  	hpa_t hv_root_tdp;
->> +	bool hv_vmx_use_flush_guest_mapping;
->>  #endif
->>  };
->>  
->> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
->> index 4953846cb30d..f537e0df56fc 100644
->> --- a/arch/x86/kvm/vmx/vmx.c
->> +++ b/arch/x86/kvm/vmx/vmx.c
->> @@ -1485,8 +1485,12 @@ void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu)
->>  		/*
->>  		 * Flush all EPTP/VPID contexts, the new pCPU may have stale
->>  		 * TLB entries from its previous association with the vCPU.
->> +		 * Unless we are running on Hyper-V where we promotes local TLB
+> > 4d83de6da265cd Daniel Jordan   2021-02-19  703  	} else {
+> > 4d83de6da265cd Daniel Jordan   2021-02-19  704  		*pfn_base = 0;
 > 
-> s,promotes,promote, or, as Sean doesn't like pronouns, 
+> When the value of batch->size is zero, we set the value of *pfn_base
+> to zero and do not initialize rsvd for the time being.
 > 
-> "... where local TLB flushes are promoted ..."
+> > 5c6c2b21ecc9ad Alex Williamson 2013-06-21  705  	}
+> > 5c6c2b21ecc9ad Alex Williamson 2013-06-21  706  
+> > eb996eec783c1e Alex Williamson 2025-02-18  707  	if (unlikely(disable_hugepages))
+> > eb996eec783c1e Alex Williamson 2025-02-18  708  		npage = 1;
+> > eb996eec783c1e Alex Williamson 2025-02-18  709  
+> > 4d83de6da265cd Daniel Jordan   2021-02-19  710  	while (npage) {
+> > 4d83de6da265cd Daniel Jordan   2021-02-19  711  		if (!batch->size) {
+> > 4d83de6da265cd Daniel Jordan   2021-02-19  712  			/* Empty batch, so refill it. */
+> > eb996eec783c1e Alex Williamson 2025-02-18  713  			ret = vaddr_get_pfns(mm, vaddr, npage, dma->prot,
+> > eb996eec783c1e Alex Williamson 2025-02-18  714  					     &pfn, batch);
+> > be16c1fd99f41a Daniel Jordan   2021-02-19  715  			if (ret < 0)
+> > 4d83de6da265cd Daniel Jordan   2021-02-19  716  				goto unpin_out;
+> > 166fd7d94afdac Alex Williamson 2013-06-21  717  
+> > 4d83de6da265cd Daniel Jordan   2021-02-19  718  			if (!*pfn_base) {
+> > 4d83de6da265cd Daniel Jordan   2021-02-19  719  				*pfn_base = pfn;
+> > 4d83de6da265cd Daniel Jordan   2021-02-19  720  				rsvd = is_invalid_reserved_pfn(*pfn_base);
+> 
+> Therefore, for the first loop, when batch->size is zero, *pfn_base must
+> be zero, which will then lead to the initialization of rsvd.
 > 
 
-Will do.
+Yeah.  :/
 
->> +		 * flushes to be visible across all CPUs so no need to do again
->> +		 * on migration.
->>  		 */
->> -		kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
->> +		if (!vmx_hv_use_flush_guest_mapping(vcpu))
->> +			kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
->>  
->>  		/*
->>  		 * Linux uses per-cpu TSS and GDT, so set these when switching
->> @@ -3243,11 +3247,21 @@ void vmx_flush_tlb_current(struct kvm_vcpu *vcpu)
->>  	if (!VALID_PAGE(root_hpa))
->>  		return;
->>  
->> -	if (enable_ept)
->> +	if (enable_ept) {
->> +		/*
->> +		 * hyperv_flush_guest_mapping() has the semantics of
->> +		 * invept-single across all pCPUs. This makes root
->> +		 * modifications consistent across pCPUs, so an invept-global
->> +		 * on migration is no longer required.
->> +		 */
->> +		if (vmx_hv_use_flush_guest_mapping(vcpu))
->> +			return (void)WARN_ON_ONCE(hyperv_flush_guest_mapping(root_hpa));
->> +
-> 
-> HvCallFlushGuestPhysicalAddressSpace sounds like a heavy operation as it
-> affects all processors. Is there any visible perfomance impact of this
-> change when there are no migrations (e.g. with vCPU pinning)? Or do we
-> believe that Hyper-V actually handles invept-context the exact same way?
-> 
-I'm going to have to do some more investigation to answer that - do you have an
-idea of a workload that would be sensitive to tlb flushes that I could compare
-this on?
+I don't know why this warning was printed honestly.  Smatch is supposed
+to figure that kind of thing out correctly.  It isn't printed on my
+system.  I've tried deleting the cross function DB (which shouldn't
+matter) and I'm using the published version of Smatch but I can't get it
+to print.  Ah well.  My bad.  Thanks for taking a look.
 
-In terms of cost, Hyper-V needs to invalidate the VMs shadow page table for a root
-and do the tlb flush. The first part is CPU intensive but is the same in both cases
-(hypercall and invept-single). The tlb flush part will require a bit more work for
-the hypercall as it needs to happen on all cores, and the tlb will now be empty
-for that root.
-
-My assumption is that these local tlb flushes are rather rare as they will
-only happen when:
-- new root is allocated
-- we need to switch to a special root
-
-So not very frequent post vm boot (with or without pinning). And the effect of the
-tlb being empty for that root on other CPUs should be a neutral, as users of the
-root would have performed the same local flush at a later point in time (when using it).
-
-All the other mmu updates use kvm_flush_remote_tlbs* which already go through the
-hypercall.
-
-Jeremi
+regards,
+dan carpenter
 
 
