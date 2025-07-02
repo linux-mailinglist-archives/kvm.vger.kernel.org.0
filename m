@@ -1,78 +1,78 @@
-Return-Path: <kvm+bounces-51338-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51339-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0EFBAF6238
-	for <lists+kvm@lfdr.de>; Wed,  2 Jul 2025 21:00:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61EF3AF6239
+	for <lists+kvm@lfdr.de>; Wed,  2 Jul 2025 21:01:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 63D5A525368
-	for <lists+kvm@lfdr.de>; Wed,  2 Jul 2025 19:00:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0887B4A63BF
+	for <lists+kvm@lfdr.de>; Wed,  2 Jul 2025 19:00:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92893221F08;
-	Wed,  2 Jul 2025 19:00:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14A6B2BE654;
+	Wed,  2 Jul 2025 19:00:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sKKVKijv"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="D6FtEC9I"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25BAD2F7CF5
-	for <kvm@vger.kernel.org>; Wed,  2 Jul 2025 19:00:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63B1C2BE65D
+	for <kvm@vger.kernel.org>; Wed,  2 Jul 2025 19:00:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751482820; cv=none; b=YPrvkOLmM/p+hw6Rq+ISzrfQujHSf0G3Yu9bRkbdcjCJvu/PMAhQVbc8bgma6uX76z4kU9PABgn4ycNxVgn5xxI1DfqvX//sS5NQpuwlFdG1TjF/2oNnkxTVAMaqCKwQOcErwl3MCfNRdKUAkljfqkqdZXcl6raCEXpEgPjO5DM=
+	t=1751482824; cv=none; b=FJYfx3cDvEP0YezPlUVhBLJUHDo8Nu4zRQHHZw4xKJfBV2Bm7wgAfWxphkFtT1/sT/g0KVjmVolxk+N8vuLio1+m+JuJ/YbkmbEuML3xTNkMUwlCOya3MZbFyRmua7rfeP9XnqIFPpXsej+PeKYdgVmr+ctTb3PCh56/c+EcN+4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751482820; c=relaxed/simple;
-	bh=07xd0USMFl4sYnn/R8Q/0Y2xj+veTA6dJBtXuKiD8TA=;
+	s=arc-20240116; t=1751482824; c=relaxed/simple;
+	bh=I3FUaEQVUvsUaEf9lozQ2QFIVcbb+jXlM9CrywHH2eE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=n2aRMomkUWhFZOWgz/vEo2es+yJg7I+Xv3utKfrQsq9I86X6C1Ng3qaAWu+vZZEHgg3zVmRrXfZLeA4/rR8rq93RbQTvPrNcTYXkzcBIludu3TBnU38LT6zo3uMFP53XJXyTpvwPwI50rTkh4r9dqSkctFJZwWbvW1QQnF8AI+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=sKKVKijv; arc=none smtp.client-ip=209.85.128.53
+	 MIME-Version:Content-Type; b=oIEywB/BcYczEplOSuBCRZ9ryQZhFc0O26FWq1m8FfYBbX8IL/7nx/Xrxs5EhkKFuK7dTOpsZmBbnD1oK5IYvpeIu7wuRRAysqypmLIk35HQGl7YrdLybjh+unV45/e7LyWGevqOWkpqUt09YubcNNQkZZzD7Si29m1PsiuSpr4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=D6FtEC9I; arc=none smtp.client-ip=209.85.221.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4537deebb01so25800145e9.0
-        for <kvm@vger.kernel.org>; Wed, 02 Jul 2025 12:00:16 -0700 (PDT)
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-3a536ecbf6fso4245935f8f.2
+        for <kvm@vger.kernel.org>; Wed, 02 Jul 2025 12:00:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1751482815; x=1752087615; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1751482821; x=1752087621; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=qjqfaworQi5+uUmLYrSAUcjlpIaexJI+AEwRhAoMmIE=;
-        b=sKKVKijvrDPFma6Tm4mozTnJSl+yvHdP/SLAU3VJWno4Opr5BGO319vCpRhpqm3yCV
-         hlLaUttivSti1KLyope3ntHdlBAkC53zMFgur7G00RG9xxM79J5gOOu6ERMpuDr3/lKB
-         iIZViEPxTbuBYS1+yVqk5Zm/q82/toZVeEPa2mkQUpUiyjj+zV3c5G3zHSb/5BW/bWPT
-         D/GxFcKBFyVF9WsqWc8u8DcLfjQWemDMZ35eNL9uLAHSFZW+q65ag7sl8VBplg0HIuAd
-         ioMXc1HGqFCVOBLvhr3UsAjNdP2pqiMWk1uA10lSV/0kfq3ZNIQPei146hvv0TZiFwlq
-         SbEA==
+        bh=Tpiuwut0yPfLD1eGlX+EYtVIl2/TnFL9WqDtVZoJUMA=;
+        b=D6FtEC9IRBPoBZg2/NP900/oc/nitNgUBOb3UCNckdRqjnV/rFX1zRD8Kw/8TmFGh8
+         0Gbf6Zy08f/+QRr+QhTGyRPyEoVyKWgD3kXYOrKG7yowaWvPoRb/zmqiRJ9QBle3UPbB
+         4bKh1NReFnUBu0c8X/l03Ca/EGmcPV6PJ5aF/NEJaAvNdKO5fzc8CFbLvwW/3yEv9147
+         rDyTDOgzgpd7RxM4dCx/pZrxa8j42TKNGo2lw0L56T83npbwvGp2Bm5BBH7KENShuVGO
+         FF/NEbzuPo523L+FMYtMsOKgIfyvyofxf8M2Z1SM+TCsXDPQcOvhPany6NsuiH9baI8J
+         XFlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751482815; x=1752087615;
+        d=1e100.net; s=20230601; t=1751482821; x=1752087621;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=qjqfaworQi5+uUmLYrSAUcjlpIaexJI+AEwRhAoMmIE=;
-        b=EpKTuB1HnfppIjFohrBlUBeh4dkPkkeP4IOJqTBq5bGEJ39Q3mrZtfOon9cb/vt3vZ
-         zN+KAxStki4+NyVXjDJToyC1nBKnB2nsfkckzGLXedPy8fawSVH8A867HUTjoI18Q215
-         lHjWkxjYua/jCIOCtUZT6e6iUV+s15RnsBAPGOSJ4wDDNz2XjfM132loqDrHG12BvjiF
-         PMEKaEAsE+0uzHcMZzd9radoA1gm8MfEjtgoOUZ4bNHsiCq1gimEI5GgPHGvFm6GRCM6
-         OfJ/Ceiiz6awAMksi3uUFfmTYsA2u3bdIKCCoIlAjGTK7JXDaBevWdKUihT6GMdv57m1
-         CCMA==
-X-Forwarded-Encrypted: i=1; AJvYcCVcs6jasXEbC5g4MUYtRjHahKWqZaOwlOkIvLtxItuyN6dv/8id90nXxVYkdwgpoeIFeHQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxwtwhLRW32vIntcpOuSIBR6FXDZQB3Eo4s22slmmIye03IU1C4
-	u4jJnUI80aJt4Qv8Yz//KqRdNSFBfuJ6ei5CfNQp+2DxrcjyNgVxgkycnQDdhOpw2co=
-X-Gm-Gg: ASbGncsL2oing5bIdt8DRyQ66JyTZDz04DLapEQzBMDz1lf3X84AJFTo8htP5OcLko3
-	1ZA/0rrhbB5y3otqfoN1FAeeYgXdobRuDjYvvi9g5j/zjTToJJiPACPb/bnIf+qI9Xo+9tZZSZb
-	sviVR73LupojvlrUXLa+IuHEo5C/PGNDkr365rN0KjzGjFrPNyCqBfBkjIn/+Vn49et+wz53Da6
-	qxC8RJO9G6xdO78dC7EDebfCVsuhvoPYYkgt9yG3OGA8lg0+SOHrS3ehuJHFVWKqQ++uLewA/zN
-	/P7lW29Ap0wfv9cqLtxdPxpCXFq2Xrblpy2CAHPQH6H0ZOPWXEDFFJRDSWJK5SOkUVXxGYu104q
-	Ix2Z/NghmXIRaNzIg4BEWObBpGIYEh/hpBwFU
-X-Google-Smtp-Source: AGHT+IEMsqDmMhc/MmoijRDQjf3Y2fDb5Gx/YmjzjJrapmNl0kjGvDhI6axGOrVibgjZIifLKxTGyg==
-X-Received: by 2002:a05:600c:6309:b0:445:1984:247d with SMTP id 5b1f17b1804b1-454aa185780mr4322005e9.7.1751482815180;
-        Wed, 02 Jul 2025 12:00:15 -0700 (PDT)
+        bh=Tpiuwut0yPfLD1eGlX+EYtVIl2/TnFL9WqDtVZoJUMA=;
+        b=S2qbBVu+8tpa9V7wxnn3ZeUm5BuTGAsa2xAInNo+5Hk6TykhnXSStG9Uu5BhyX+Yff
+         7RT8BDAc69KZhVVDpyMtjoVBoUQgzS72L9voX6wGIZ03xF0X2msO7v3k/Y3kRoSg2kSO
+         DDXBOL7d7qzLYz3s03KKsZ+TM1aWE8a8XyYGfzKvcmUZUi9A9J4AtlXEG2NjsEAhDdM7
+         BqB+yWmtvtKya2NhRcuzYNUbTGgQu4HxmkCQIKMFArszBKBI9A+XoV8CekfSIAJDLpZ0
+         z0XP7zif3uArXpQLJVoBUs1Ozs+BqoiovWnvGXRJhToVfp6HVGeZxRn34qa+/SMVQ6G7
+         IMbg==
+X-Forwarded-Encrypted: i=1; AJvYcCVUpvn8NLyAy1Z3bTtIP6b00EAcsMeAfW8IjsdBYfJSIKphraVb1YLakNDKnvy1eQwjpks=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxj1V4CzD2xWJ8I5GpJ0xrZwhKQGtXWQ806uz6ogrgSaGE+D5A0
+	SSeDp69U8J9de/1CxQtKk19t0+jPCyX0m4QjgkVpZ9+L7kJ8CGwGfPGkX2h5Y1UQTQ4=
+X-Gm-Gg: ASbGncsX1STuHBU+kwPib9GDpvzTEOpXo2EBitE5rl9Dhybwz+EeDVYfG38vfYpWGch
+	yRBC3D9a6KSHBvvgOy9uN5DB6qE4EctFC8PkmiDMiKOofec6LsDI8DhUmRGBTG2wcJbUjh10nx7
+	gep0jxGtosZ8CJTo7cG1IEe87VE5Y+CnKw+sIY4vva46Mm6eUO/IBZw5sQsz4HxbnFrQgSErK1g
+	0LNCWoiK+3A74TYfgMrid7U6sOYEOaOwvmeGKoKbyMb23gwphPzaIPgBkcsEGLe385eyECgGdVz
+	v7N/xYjIKQtXwUE2rGDsZ+IAEeIggFpXgF854E3+jMq1FfJS3Gnkk6rcIjh2NjAFVMSZ4hrXMDm
+	jwi5Ct56UwHZ/eMEOWs0Vw48MZ0GXzl3BPNPB
+X-Google-Smtp-Source: AGHT+IF4lYebmXSJDkkpbBSrLVcnunRXwUEzJB3h3bw75jfnHK3g6xjQIPKWwyLiIUvuXZNP2uw57w==
+X-Received: by 2002:a05:6000:1886:b0:3a5:8600:7cff with SMTP id ffacd0b85a97d-3b1fd74c4b7mr3684763f8f.1.1751482820568;
+        Wed, 02 Jul 2025 12:00:20 -0700 (PDT)
 Received: from localhost.localdomain (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-454a997b492sm5832775e9.13.2025.07.02.12.00.13
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a892e61f48sm16952111f8f.93.2025.07.02.12.00.19
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Wed, 02 Jul 2025 12:00:14 -0700 (PDT)
+        Wed, 02 Jul 2025 12:00:19 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
@@ -84,8 +84,6 @@ Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
 	Roman Bolshakov <rbolshakov@ddn.com>,
 	Phil Dennis-Jordan <phil@philjordan.eu>,
 	Mads Ynddal <mads@ynddal.dk>,
-	Fabiano Rosas <farosas@suse.de>,
-	Laurent Vivier <lvivier@redhat.com>,
 	Stefano Stabellini <sstabellini@kernel.org>,
 	Anthony PERARD <anthony@xenproject.org>,
 	Paul Durrant <paul@xen.org>,
@@ -94,9 +92,9 @@ Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
 	Sunil Muthuswamy <sunilmut@microsoft.com>,
 	kvm@vger.kernel.org,
 	xen-devel@lists.xenproject.org
-Subject: [PATCH v4 58/65] accel: Always register AccelOpsClass::get_elapsed_ticks() handler
-Date: Wed,  2 Jul 2025 20:53:20 +0200
-Message-ID: <20250702185332.43650-59-philmd@linaro.org>
+Subject: [PATCH v4 59/65] accel: Always register AccelOpsClass::get_virtual_clock() handler
+Date: Wed,  2 Jul 2025 20:53:21 +0200
+Message-ID: <20250702185332.43650-60-philmd@linaro.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250702185332.43650-1-philmd@linaro.org>
 References: <20250702185332.43650-1-philmd@linaro.org>
@@ -109,208 +107,139 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-In order to dispatch over AccelOpsClass::get_elapsed_ticks(),
+In order to dispatch over AccelOpsClass::get_virtual_clock(),
 we need it always defined, not calling a hidden handler under
-the hood. Make AccelOpsClass::get_elapsed_ticks() mandatory.
+the hood. Make AccelOpsClass::get_virtual_clock() mandatory.
 Register the default cpus_kick_thread() for each accelerator.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- include/system/accel-ops.h        | 1 +
- accel/hvf/hvf-accel-ops.c         | 2 ++
- accel/kvm/kvm-accel-ops.c         | 3 +++
- accel/qtest/qtest.c               | 2 ++
- accel/tcg/tcg-accel-ops.c         | 3 +++
- accel/xen/xen-all.c               | 2 ++
- system/cpus.c                     | 6 ++----
- target/i386/nvmm/nvmm-accel-ops.c | 3 +++
- target/i386/whpx/whpx-accel-ops.c | 3 +++
- 9 files changed, 21 insertions(+), 4 deletions(-)
+ include/system/accel-ops.h        | 2 ++
+ accel/hvf/hvf-accel-ops.c         | 1 +
+ accel/kvm/kvm-accel-ops.c         | 1 +
+ accel/tcg/tcg-accel-ops.c         | 2 ++
+ accel/xen/xen-all.c               | 1 +
+ system/cpus.c                     | 7 ++++---
+ target/i386/nvmm/nvmm-accel-ops.c | 1 +
+ target/i386/whpx/whpx-accel-ops.c | 1 +
+ 8 files changed, 13 insertions(+), 3 deletions(-)
 
 diff --git a/include/system/accel-ops.h b/include/system/accel-ops.h
-index e1e6985a27c..8683cd37716 100644
+index 8683cd37716..d5154acc75a 100644
 --- a/include/system/accel-ops.h
 +++ b/include/system/accel-ops.h
-@@ -86,6 +86,7 @@ struct AccelOpsClass {
+@@ -82,6 +82,8 @@ struct AccelOpsClass {
+      * fetch time. The set function is needed if the accelerator wants
+      * to track the changes to time as the timer is warped through
+      * various timer events.
++     *
++     * get_virtual_clock() is mandatory.
+      */
      int64_t (*get_virtual_clock)(void);
      void (*set_virtual_clock)(int64_t time);
- 
-+    /* get_elapsed_ticks is mandatory. */
-     int64_t (*get_elapsed_ticks)(void);
- 
-     /* gdbstub hooks */
 diff --git a/accel/hvf/hvf-accel-ops.c b/accel/hvf/hvf-accel-ops.c
-index 420630773c8..17776e700eb 100644
+index 17776e700eb..cf623a1ea47 100644
 --- a/accel/hvf/hvf-accel-ops.c
 +++ b/accel/hvf/hvf-accel-ops.c
-@@ -54,6 +54,7 @@
- #include "gdbstub/enums.h"
- #include "exec/cpu-common.h"
- #include "system/accel-ops.h"
-+#include "system/cpu-timers.h"
- #include "system/cpus.h"
- #include "system/hvf.h"
- #include "system/hvf_int.h"
-@@ -367,6 +368,7 @@ static void hvf_accel_ops_class_init(ObjectClass *oc, const void *data)
-     ops->remove_all_breakpoints = hvf_remove_all_breakpoints;
+@@ -369,6 +369,7 @@ static void hvf_accel_ops_class_init(ObjectClass *oc, const void *data)
      ops->update_guest_debug = hvf_update_guest_debug;
  
-+    ops->get_elapsed_ticks = cpu_get_ticks;
+     ops->get_elapsed_ticks = cpu_get_ticks;
++    ops->get_virtual_clock = cpu_get_clock;
      ops->get_vcpu_stats = hvf_get_vcpu_stats;
  };
  
 diff --git a/accel/kvm/kvm-accel-ops.c b/accel/kvm/kvm-accel-ops.c
-index a4bcaa87c8d..f27228d4cd9 100644
+index f27228d4cd9..dde498e0626 100644
 --- a/accel/kvm/kvm-accel-ops.c
 +++ b/accel/kvm/kvm-accel-ops.c
-@@ -17,6 +17,7 @@
- #include "qemu/error-report.h"
- #include "qemu/main-loop.h"
- #include "system/accel-ops.h"
-+#include "system/cpu-timers.h"
- #include "system/kvm.h"
- #include "system/kvm_int.h"
- #include "system/runstate.h"
-@@ -94,6 +95,8 @@ static void kvm_accel_ops_class_init(ObjectClass *oc, const void *data)
-     ops->remove_breakpoint = kvm_remove_breakpoint;
-     ops->remove_all_breakpoints = kvm_remove_all_breakpoints;
+@@ -97,6 +97,7 @@ static void kvm_accel_ops_class_init(ObjectClass *oc, const void *data)
  #endif
-+
-+    ops->get_elapsed_ticks = cpu_get_ticks;
+ 
+     ops->get_elapsed_ticks = cpu_get_ticks;
++    ops->get_virtual_clock = cpu_get_clock;
  }
  
  static const TypeInfo kvm_accel_ops_type = {
-diff --git a/accel/qtest/qtest.c b/accel/qtest/qtest.c
-index 8e2379d6e37..b019cf69412 100644
---- a/accel/qtest/qtest.c
-+++ b/accel/qtest/qtest.c
-@@ -20,6 +20,7 @@
- #include "qemu/accel.h"
- #include "system/accel-ops.h"
- #include "system/qtest.h"
-+#include "system/cpu-timers.h"
- #include "system/cpus.h"
- #include "qemu/guest-random.h"
- #include "qemu/main-loop.h"
-@@ -67,6 +68,7 @@ static void qtest_accel_ops_class_init(ObjectClass *oc, const void *data)
-     ops->thread_precreate = dummy_thread_precreate;
-     ops->cpu_thread_routine = dummy_cpu_thread_routine;
-     ops->kick_vcpu_thread = cpus_kick_thread;
-+    ops->get_elapsed_ticks = cpu_get_ticks;
-     ops->get_virtual_clock = qtest_get_virtual_clock;
-     ops->set_virtual_clock = qtest_set_virtual_clock;
-     ops->handle_interrupt = generic_handle_interrupt;
 diff --git a/accel/tcg/tcg-accel-ops.c b/accel/tcg/tcg-accel-ops.c
-index a8c24cf8a4c..f22f5d73abe 100644
+index f22f5d73abe..780e9debbc4 100644
 --- a/accel/tcg/tcg-accel-ops.c
 +++ b/accel/tcg/tcg-accel-ops.c
-@@ -27,6 +27,7 @@
- 
- #include "qemu/osdep.h"
- #include "system/accel-ops.h"
-+#include "system/cpu-timers.h"
- #include "system/tcg.h"
- #include "system/replay.h"
- #include "exec/icount.h"
-@@ -205,6 +206,7 @@ static void tcg_accel_ops_init(AccelClass *ac)
-         ops->cpu_thread_routine = mttcg_cpu_thread_routine;
+@@ -207,6 +207,7 @@ static void tcg_accel_ops_init(AccelClass *ac)
          ops->kick_vcpu_thread = mttcg_kick_vcpu_thread;
          ops->handle_interrupt = tcg_handle_interrupt;
-+        ops->get_elapsed_ticks = cpu_get_ticks;
+         ops->get_elapsed_ticks = cpu_get_ticks;
++        ops->get_virtual_clock = cpu_get_clock;
      } else {
          ops->create_vcpu_thread = rr_start_vcpu_thread;
          ops->kick_vcpu_thread = rr_kick_vcpu_thread;
-@@ -215,6 +217,7 @@ static void tcg_accel_ops_init(AccelClass *ac)
+@@ -217,6 +218,7 @@ static void tcg_accel_ops_init(AccelClass *ac)
              ops->get_elapsed_ticks = icount_get;
          } else {
              ops->handle_interrupt = tcg_handle_interrupt;
-+            ops->get_elapsed_ticks = cpu_get_ticks;
++            ops->get_virtual_clock = cpu_get_clock;
+             ops->get_elapsed_ticks = cpu_get_ticks;
          }
      }
- 
 diff --git a/accel/xen/xen-all.c b/accel/xen/xen-all.c
-index 18ae0d82db5..48d458bc4c7 100644
+index 48d458bc4c7..85fb9d1606c 100644
 --- a/accel/xen/xen-all.c
 +++ b/accel/xen/xen-all.c
-@@ -20,6 +20,7 @@
- #include "qemu/accel.h"
- #include "accel/dummy-cpus.h"
- #include "system/accel-ops.h"
-+#include "system/cpu-timers.h"
- #include "system/cpus.h"
- #include "system/xen.h"
- #include "system/runstate.h"
-@@ -156,6 +157,7 @@ static void xen_accel_ops_class_init(ObjectClass *oc, const void *data)
-     ops->cpu_thread_routine = dummy_cpu_thread_routine;
+@@ -158,6 +158,7 @@ static void xen_accel_ops_class_init(ObjectClass *oc, const void *data)
      ops->kick_vcpu_thread = cpus_kick_thread;
      ops->handle_interrupt = generic_handle_interrupt;
-+    ops->get_elapsed_ticks = cpu_get_ticks;
+     ops->get_elapsed_ticks = cpu_get_ticks;
++    ops->get_virtual_clock = cpu_get_clock;
  }
  
  static const TypeInfo xen_accel_ops_type = {
 diff --git a/system/cpus.c b/system/cpus.c
-index 6c64ffccbb3..d32b89ecf7b 100644
+index d32b89ecf7b..6c99756346a 100644
 --- a/system/cpus.c
 +++ b/system/cpus.c
-@@ -240,10 +240,7 @@ void cpus_set_virtual_clock(int64_t new_time)
-  */
- int64_t cpus_get_elapsed_ticks(void)
- {
--    if (cpus_accel->get_elapsed_ticks) {
--        return cpus_accel->get_elapsed_ticks();
--    }
--    return cpu_get_ticks();
-+    return cpus_accel->get_elapsed_ticks();
+@@ -216,10 +216,10 @@ int64_t cpus_get_virtual_clock(void)
+      *
+      * XXX
+      */
+-    if (cpus_accel && cpus_accel->get_virtual_clock) {
+-        return cpus_accel->get_virtual_clock();
++    if (!cpus_accel) {
++        return cpu_get_clock();
+     }
+-    return cpu_get_clock();
++    return cpus_accel->get_virtual_clock();
  }
  
- void generic_handle_interrupt(CPUState *cpu, int old_mask, int new_mask)
-@@ -668,6 +665,7 @@ void cpus_register_accel(const AccelOpsClass *ops)
-     assert(ops->create_vcpu_thread || ops->cpu_thread_routine);
+ /*
+@@ -666,6 +666,7 @@ void cpus_register_accel(const AccelOpsClass *ops)
      assert(ops->kick_vcpu_thread);
      assert(ops->handle_interrupt);
-+    assert(ops->get_elapsed_ticks);
+     assert(ops->get_elapsed_ticks);
++    assert(ops->get_virtual_clock);
      cpus_accel = ops;
  }
  
 diff --git a/target/i386/nvmm/nvmm-accel-ops.c b/target/i386/nvmm/nvmm-accel-ops.c
-index d568cc737b1..4deff57471c 100644
+index 4deff57471c..a2e84cb087a 100644
 --- a/target/i386/nvmm/nvmm-accel-ops.c
 +++ b/target/i386/nvmm/nvmm-accel-ops.c
-@@ -11,6 +11,7 @@
- #include "system/kvm_int.h"
- #include "qemu/main-loop.h"
- #include "system/accel-ops.h"
-+#include "system/cpu-timers.h"
- #include "system/cpus.h"
- #include "qemu/guest-random.h"
- 
-@@ -83,6 +84,8 @@ static void nvmm_accel_ops_class_init(ObjectClass *oc, const void *data)
-     ops->synchronize_post_init = nvmm_cpu_synchronize_post_init;
-     ops->synchronize_state = nvmm_cpu_synchronize_state;
+@@ -86,6 +86,7 @@ static void nvmm_accel_ops_class_init(ObjectClass *oc, const void *data)
      ops->synchronize_pre_loadvm = nvmm_cpu_synchronize_pre_loadvm;
-+
-+    ops->get_elapsed_ticks = cpu_get_ticks;
+ 
+     ops->get_elapsed_ticks = cpu_get_ticks;
++    ops->get_virtual_clock = cpu_get_clock;
  }
  
  static const TypeInfo nvmm_accel_ops_type = {
 diff --git a/target/i386/whpx/whpx-accel-ops.c b/target/i386/whpx/whpx-accel-ops.c
-index fbffd952ac4..f47033a502c 100644
+index f47033a502c..d27e89dd9c5 100644
 --- a/target/i386/whpx/whpx-accel-ops.c
 +++ b/target/i386/whpx/whpx-accel-ops.c
-@@ -12,6 +12,7 @@
- #include "system/kvm_int.h"
- #include "qemu/main-loop.h"
- #include "system/accel-ops.h"
-+#include "system/cpu-timers.h"
- #include "system/cpus.h"
- #include "qemu/guest-random.h"
- 
-@@ -86,6 +87,8 @@ static void whpx_accel_ops_class_init(ObjectClass *oc, const void *data)
-     ops->synchronize_post_init = whpx_cpu_synchronize_post_init;
-     ops->synchronize_state = whpx_cpu_synchronize_state;
+@@ -89,6 +89,7 @@ static void whpx_accel_ops_class_init(ObjectClass *oc, const void *data)
      ops->synchronize_pre_loadvm = whpx_cpu_synchronize_pre_loadvm;
-+
-+    ops->get_elapsed_ticks = cpu_get_ticks;
+ 
+     ops->get_elapsed_ticks = cpu_get_ticks;
++    ops->get_virtual_clock = cpu_get_clock;
  }
  
  static const TypeInfo whpx_accel_ops_type = {
