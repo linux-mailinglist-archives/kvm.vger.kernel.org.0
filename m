@@ -1,187 +1,131 @@
-Return-Path: <kvm+bounces-51341-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51342-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC398AF63A2
-	for <lists+kvm@lfdr.de>; Wed,  2 Jul 2025 23:00:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 808B1AF63D5
+	for <lists+kvm@lfdr.de>; Wed,  2 Jul 2025 23:19:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 73DAA3AA5E3
-	for <lists+kvm@lfdr.de>; Wed,  2 Jul 2025 20:59:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 447593B34B8
+	for <lists+kvm@lfdr.de>; Wed,  2 Jul 2025 21:19:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE47B279DCE;
-	Wed,  2 Jul 2025 21:00:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24780239E90;
+	Wed,  2 Jul 2025 21:19:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TdyeUvUd"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MYmffz+J"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C14A279794
-	for <kvm@vger.kernel.org>; Wed,  2 Jul 2025 21:00:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C402C2DE700
+	for <kvm@vger.kernel.org>; Wed,  2 Jul 2025 21:19:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751490004; cv=none; b=ZVsD6PWf8vl/6mUrW/jwsRdUvnlrYPgBFiuuaanWxiMW7ZYkJuGVIWmeCV082y6vkiRbtERrI0eTw541N+SG/Z+9w8mfMa0cWT+0sH78TruaOcGZfz47S2tEFopb9t+5amQvJytW5cQvuXYGMimFo7QF9fFYTuPNThtGYuM4EOg=
+	t=1751491193; cv=none; b=RavrZiRoHhcrQO6G3QFOPXYu/ubTfYCXdqr0j662061XvJ3m37EAdNWPbQQxTfCQb3vK1P9DJ9QJ/wXIzHT5A2DlyrpJT4bHt4MaS2X57FN+OSKNSa+u/vky+M6XSgPu4Dmob223I1SPk3z4mS2UneBWnCJhFE6dDcxJXuMQNHo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751490004; c=relaxed/simple;
-	bh=eTPngYW+xIIJsPFNulV3zvN+v6Iqt2lDwz2DaFgqNr0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WwRK5h9X3xFuatoqe5XW+yxJuSzalfzF5vLuODUpVhLE1hr6tAz0vTr/i6FlmV/FM4sOzvjzEzhaga11O7H99qiVJmPbjTnDdy71lTKHYCrk9MO4aVPpcpR/LRcAVM2jqguh4UwkTCwiXu2q6yZyVa9L5pOwzMnT2Gr6wBkHu9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TdyeUvUd; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751490001;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WOTU+d2v5BAWQ3IDOfILW9WYtvyZL2oUTXZsgcEBv+A=;
-	b=TdyeUvUd9da0Wuz/9PraOC8zCrbqc0v8hh7Fj6jHULXox1EBKvVoaLpr0krTF3jY6pvwDb
-	QQuH7UhlOGHXIkct1hxLqbHnmgF6edY0So8ZfY+EsfGBn1fGrMGsSsaCwlRlLQQiWLAXSJ
-	sHwVoIJGVx0h48h9zFGx0532MoECd9g=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-652-TAoWYlJsOr6pHVBXuQQwEw-1; Wed, 02 Jul 2025 16:58:51 -0400
-X-MC-Unique: TAoWYlJsOr6pHVBXuQQwEw-1
-X-Mimecast-MFC-AGG-ID: TAoWYlJsOr6pHVBXuQQwEw_1751489931
-Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-6fabd295d12so138489686d6.1
-        for <kvm@vger.kernel.org>; Wed, 02 Jul 2025 13:58:51 -0700 (PDT)
+	s=arc-20240116; t=1751491193; c=relaxed/simple;
+	bh=0riy5ykMfBvdlp5wjLxpHeiICspjKTS2e49IyHnkS8M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LhDdeZkBzm41DmlCQs8xhTZWML/rhZlxNMbjZ2TygND7j4MTWEkHbjLPP0NnB1GniiQhJIqhXjFu73m6vTYyolLs7o1F+y7rnFvsJdyTa0mT0wvdZTs5+OHrbwtmq7jQKvpPOLODmq34+HKCTBc/hnh8iPR0tY8uxDvVrYEUdbQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=MYmffz+J; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-236192f8770so2123255ad.0
+        for <kvm@vger.kernel.org>; Wed, 02 Jul 2025 14:19:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1751491191; x=1752095991; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=z2oLpuDzuhdHiQaMDk9scXG+1ZBfQnlbCx000gNoXhE=;
+        b=MYmffz+JO++7X3bNKO2PoemyxEJsfcUKSyGBMHe0D7ul0kqXllDTaq4RP8IeaOLJ/G
+         Q22JGgnjV03CXFIaGju3OVpEpYwxOGUwDP6KYEyRMbMJeCtOziLHjoDF4oHanbtcDZdm
+         A8o4e6592y1pAHqktEzS7zzgpVXJTRVOQaJGPiGHqX0nhO/CeqBk+nEYjfCt+8+b+oLR
+         O/XLvZ9U5QlAH+RM/R8hUHnJSOqvJY/Q30EpJXdpJqbg0ImOYl2QjnK3xiXVuDg1mhKV
+         dJ2pi/s0tDq9AQ9SnuFP4B0izuTLHrvXaWqRCvqACPAtZCiOZuMwsHaRDvoTfqDpZAyR
+         Sphw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751489931; x=1752094731;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WOTU+d2v5BAWQ3IDOfILW9WYtvyZL2oUTXZsgcEBv+A=;
-        b=hYpgpeR4Wc9Ake43er4qSCRPBvm08uq4psYE7Et9O+WRms+FoEL82ZFUuFIfbhkp6J
-         mDs2Euh4yRsORB1ZGY1GPwfXtMe+ubZ+BY/XPW47rXhnj+JRWa8LnrSG8rgdQedVmSUm
-         V5NSgnTWsnk3S65PxVlVrZu3pMRv3RY26pfosDtztQNpQmka26MjD8tdU26O5sjqfKBp
-         yl7S5L8j2MJWLRZMeXqG3OsgEDqdKIA2o+7TuoMgSsjWho4ivNiS9rPCoR8+WTaG5M3k
-         SpBMvQPK82y1ksB2F5vkmkbim8+WC8OQu3fqvqjay/jWetaR5CWcPMzdzIoc+B7VSoWu
-         k/Kw==
-X-Forwarded-Encrypted: i=1; AJvYcCWNTNJhI25FgWDFBXZ3kieaIEVyh+NY+C7YL1P1vpsr2BqgS7L1D710yxx81SFBAjNMafw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyy7+hz7AA56BeQYiP/8/yU0JbCxrUZATnmEdYXJaYItZEz1utB
-	+QLMuetE2SCA168bK8n4OOglmnpQwm2l+ejJrLWm2WXntaZ6/jpHyr7U4A5wMG1gY9+zh2RQo44
-	A45jiams4NpqiOOJR8NcZcYhrDzVtcgrTqSOvY16CmGppfZJxxJUBkQ==
-X-Gm-Gg: ASbGnctVrX1pBP5ZjyDrhqYFc8S2zD84uMzxfZmJTxL5GJ86LcwK60BLoxc+BFuZH5C
-	XsClyiH26yi5VErSgJi+olegsuzDZjx1ule38d/UzhpsQ9JUnOpD3IzOv+cNcq19yDHOeqHQIxM
-	aRIwklF3Hzss6cp59xW6UUuiMqcuaaHHYazcwVCBUqnVx+7yDf3nII9YqHdz9KGFY2EiHRcDNZ+
-	aEY/ZironYBTgGR4zhMo7m1+akxxuOmQUM/s56Yf4oWzgAkD20izfXPEjzbvUxj5LaiNcHqh8rz
-	SXN8iXirP/paew==
-X-Received: by 2002:a05:6214:2aa7:b0:6f8:e66b:578e with SMTP id 6a1803df08f44-702bcc67924mr11063146d6.32.1751489930988;
-        Wed, 02 Jul 2025 13:58:50 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE+QOp1gP5d1ygXeemNGH1JhDJQDSPwFCZsqWpTNaKH+tPWObjk5CcB+1Hqk3D9Ifq7DRzEeg==
-X-Received: by 2002:a05:6214:2aa7:b0:6f8:e66b:578e with SMTP id 6a1803df08f44-702bcc67924mr11062776d6.32.1751489930414;
-        Wed, 02 Jul 2025 13:58:50 -0700 (PDT)
-Received: from x1.local ([85.131.185.92])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6fd7718da94sm106707176d6.24.2025.07.02.13.58.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Jul 2025 13:58:49 -0700 (PDT)
-Date: Wed, 2 Jul 2025 16:58:46 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: "Liam R. Howlett" <Liam.Howlett@oracle.com>,
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	kvm@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Zi Yan <ziy@nvidia.com>, Alex Mastro <amastro@fb.com>,
-	David Hildenbrand <david@redhat.com>,
-	Nico Pache <npache@redhat.com>
-Subject: Re: [PATCH 5/5] vfio-pci: Best-effort huge pfnmaps with !MAP_FIXED
- mappings
-Message-ID: <aGWdhnw7TKZKH5WM@x1.local>
-References: <aFQkxg08fs7jwXnJ@x1.local>
- <20250619184041.GA10191@nvidia.com>
- <aFsMhnejq4fq6L8N@x1.local>
- <20250624234032.GC167785@nvidia.com>
- <aFtHbXFO1ZpAsnV8@x1.local>
- <20250625130711.GH167785@nvidia.com>
- <aFwt6wjuDzbWM4_C@x1.local>
- <20250625184154.GI167785@nvidia.com>
- <aFxNdDpIlx0fZoIN@x1.local>
- <20250630140537.GW167785@nvidia.com>
+        d=1e100.net; s=20230601; t=1751491191; x=1752095991;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=z2oLpuDzuhdHiQaMDk9scXG+1ZBfQnlbCx000gNoXhE=;
+        b=Ba6g+nU1yY9+mMla/HTBQQpAfEu3vukugnzT8eClBPBF4Y15hrBKyXWZ3JEzxWL4jS
+         YsRxwk5uM9UL7RgMr/Ql3ikaEWUzUDU2QWgGS8PH3ALkc5uW1q5ctg8GOtuiZTpxtgAE
+         cFqcIdjRvTcPcQQaanaV/pcQqDsWEZnOLIf0dmR45rtGczdZm6vbrYzpQ9IuQYOvLfsK
+         6XDbmw49+zpQBZCIyeS8S4HviKlPG9k17X0aNETgjJ1Q3ZxBaZ6R1XTwkfY+8Q2NjfH3
+         XakfbS0ruHYPJu6hUA+h9y0M6PfEEqGush9sm7Z8h0HPfS0/DjSoXbjPh3uJ5xwvoEA3
+         PpYg==
+X-Forwarded-Encrypted: i=1; AJvYcCXKMcANKBaFFIFBwSVVw6aGMW+pP10skOIYgu1AOZaXiYwIAuKeLqgi3XqbPK3PCMfq/Ko=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzrXKbubIn7T0w6DczAgz/KuU4nv/ANorHHuTzWlzVKAIWQJkuZ
+	5wNk2/NEyjcyTZF4MIR6NF6V99pW5/FERIEAvOq2BhhmiA2CEeWZdl2isqL5VVfONZs=
+X-Gm-Gg: ASbGncvEbyKQiR0uhHQXLRM/SaBXKIG68Q8wYiFRkvk4y4VOkN4BY3JL9fNOtKCSJu5
+	MRfnaiOg2DsYtk2U69DLEbpipJTQnbSQckmm/Xp9l1o1k4jERHR0HG+FtigksLzVSPLZCmirPE7
+	QCcGNNt46eLm/gxb86L1zXZYbeGO1opnC4mwFr0gInukwAwXLAbFH3JLSW36UfbI4I5DP3cq3q8
+	iXTQagsRki5MnW90cgwDzHHwdZD9kgWYss0ktWlHzuAnUSKTQDMYsLY/sQBRQ7z8cSNrDMSUF7U
+	YGvlEt72xRoRGPTaQS1k9oj+XpcKjfzIEQCghxg4nDQqpj0F/srzP+ddqE4s22+uLgwVqctjatk
+	VjjlK/LQH+w==
+X-Google-Smtp-Source: AGHT+IEveK9a4pLkComAd6bEMhUh5nd/K1YH+GcPSFUDBL56X19TYihBZ8kJjOvEoyFIVMBoN6XXAg==
+X-Received: by 2002:a17:902:f690:b0:221:1497:7b08 with SMTP id d9443c01a7336-23c7942d9b2mr15121325ad.23.1751491190998;
+        Wed, 02 Jul 2025 14:19:50 -0700 (PDT)
+Received: from [192.168.1.87] ([38.41.223.211])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23acb39b95csm142670205ad.139.2025.07.02.14.19.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 02 Jul 2025 14:19:50 -0700 (PDT)
+Message-ID: <f456a9b8-5e6c-4ed9-aa94-0bb6350052f5@linaro.org>
+Date: Wed, 2 Jul 2025 14:19:49 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250630140537.GW167785@nvidia.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 56/65] accel: Expose and register
+ generic_handle_interrupt()
+Content-Language: en-US
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Cameron Esfahani <dirty@apple.com>, Roman Bolshakov <rbolshakov@ddn.com>,
+ Phil Dennis-Jordan <phil@philjordan.eu>, Mads Ynddal <mads@ynddal.dk>,
+ Fabiano Rosas <farosas@suse.de>, Laurent Vivier <lvivier@redhat.com>,
+ Stefano Stabellini <sstabellini@kernel.org>,
+ Anthony PERARD <anthony@xenproject.org>, Paul Durrant <paul@xen.org>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Reinoud Zandijk <reinoud@netbsd.org>,
+ Sunil Muthuswamy <sunilmut@microsoft.com>, kvm@vger.kernel.org,
+ xen-devel@lists.xenproject.org
+References: <20250702185332.43650-1-philmd@linaro.org>
+ <20250702185332.43650-57-philmd@linaro.org>
+From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+In-Reply-To: <20250702185332.43650-57-philmd@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jun 30, 2025 at 11:05:37AM -0300, Jason Gunthorpe wrote:
-> On Wed, Jun 25, 2025 at 03:26:44PM -0400, Peter Xu wrote:
-> > On Wed, Jun 25, 2025 at 03:41:54PM -0300, Jason Gunthorpe wrote:
-> > > On Wed, Jun 25, 2025 at 01:12:11PM -0400, Peter Xu wrote:
-> > > 
-> > > > After I read the two use cases, I mostly agree.  Just one trivial thing to
-> > > > mention, it may not be direct map but vmap() (see io_region_init_ptr()).
-> > > 
-> > > If it is vmapped then this is all silly, you should vmap and mmmap
-> > > using the same cache colouring and, AFAIK, pgoff is how this works for
-> > > purely userspace.
-> > > 
-> > > Once vmap'd it should determine the cache colour and set the pgoff
-> > > properly, then everything should already work no?
-> > 
-> > I don't yet see how to set the pgoff.  Here pgoff is passed from the
-> > userspace, which follows io_uring's definition (per io_uring_mmap).
+On 7/2/25 11:53 AM, Philippe Mathieu-Daudé wrote:
+> In order to dispatch over AccelOpsClass::handle_interrupt(),
+> we need it always defined, not calling a hidden handler under
+> the hood. Make AccelOpsClass::handle_interrupt() mandatory.
+> Expose generic_handle_interrupt() prototype and register it
+> for each accelerator.
 > 
-> That's too bad
-> 
-> So you have to do it the other way and pass the pgoff to the vmap so
-> the vmap ends up with the same colouring as a user VMa holding the
-> same pages..
+> Suggested-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+> ---
+>   include/system/accel-ops.h        | 3 +++
+>   accel/hvf/hvf-accel-ops.c         | 1 +
+>   accel/kvm/kvm-accel-ops.c         | 1 +
+>   accel/qtest/qtest.c               | 1 +
+>   accel/xen/xen-all.c               | 1 +
+>   system/cpus.c                     | 9 +++------
+>   target/i386/nvmm/nvmm-accel-ops.c | 1 +
+>   target/i386/whpx/whpx-accel-ops.c | 1 +
+>   8 files changed, 12 insertions(+), 6 deletions(-)
 
-Not sure if I get that point, but.. it'll be hard to achieve at least.
-
-The vmap() happens (submit/complete queues initializes) when io_uring
-instance is created.  The mmap() happens later, and it can also happen
-multiple times, so that all of the VAs got mmap()ed need to share the same
-colouring with the vmap()..  In this case it sounds reasonable to me to
-have the alignment done at mmap(), against the vmap() results.
-
-> 
-> > So if we want the new API to be proposed here, and make VFIO use it first
-> > (while consider it to be applicable to all existing MMU users at least,
-> > which I checked all of them so far now), I'd think this proper:
-> > 
-> >     int (*mmap_va_hint)(struct file *file, unsigned long *pgoff, size_t len);
-> > 
-> > The changes comparing to previous:
-> > 
-> >     (1) merged pgoff and *phys_pgoff parameters into one unsigned long, so
-> >     the hook can adjust the pgoff for the va allocator to be used.  The
-> >     adjustment will not be visible to future mmap() when VMA is created.
-> 
-> It seems functional, but the above is better, IMHO.
-
-Do you mean we can start with no modification allowed on *pgoff?  I'd
-prefer having *pgoff modifiable from the start, as it'll not only work for
-io_uring / parisc above since the 1st day (so we don't need to introduce it
-on top, modifying existing users..), but it'll also be cleaner to be used
-in the current VFIO's use case.
-
-> 
-> >     (2) I renamed it to mmap_va_hint(), because *pgoff will be able to be
-> >     updated, so it's not only about ordering, but "order" and "pgoff
-> >     adjustment" hints that the core mm will use when calculating the VA.
-> 
-> Where does order come back though? Returns order?
-
-Yes.
-
-> 
-> It seems viable
-
-After I double check with the API above, I can go and prepare a new version.
-
-Thanks a lot, Jason.
-
--- 
-Peter Xu
+Reviewed-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 
 
