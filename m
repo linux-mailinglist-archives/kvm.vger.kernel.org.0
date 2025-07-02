@@ -1,142 +1,206 @@
-Return-Path: <kvm+bounces-51301-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51302-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF31DAF5B25
-	for <lists+kvm@lfdr.de>; Wed,  2 Jul 2025 16:28:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56ADEAF5B2C
+	for <lists+kvm@lfdr.de>; Wed,  2 Jul 2025 16:33:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BCB494E0217
-	for <lists+kvm@lfdr.de>; Wed,  2 Jul 2025 14:28:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6744D1C27E73
+	for <lists+kvm@lfdr.de>; Wed,  2 Jul 2025 14:33:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 930422F5334;
-	Wed,  2 Jul 2025 14:28:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1694A307AE6;
+	Wed,  2 Jul 2025 14:32:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VQueI3ZW"
 X-Original-To: kvm@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6030F2F5326;
-	Wed,  2 Jul 2025 14:28:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D00E7307ACB
+	for <kvm@vger.kernel.org>; Wed,  2 Jul 2025 14:32:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751466503; cv=none; b=WYQJTcdNzF2By0pS1WrTrZxR7GBC32JW+HsLKyzNpDfLS2EYNIOPHpDQFOakPHeUQWYE+JjAG0zGLbckmF3orFbSo/RJl3L/b9j1vU6wU1i9oB+yeRrGaBsZG4LI40fJmdVEhw6mhTGlTZSpVjYf03/Ote1RwUVtkF5LPV8ZSWQ=
+	t=1751466773; cv=none; b=bI5y1XNzgYlNKamcuTezJiBZwBmtG/StRajIX9jygH0+a6sSw+hMXHhXrkwVfMppRtvXGX9XX6SgbDxEpiaafNO8Lu9Hq1rscUwnWs2hT8FFyGwD1jM1lmimqzPQF4Qv8MhEtrq5UjYwAZBoC1SmJomnBpM+Na54RYAQ1o4MVjY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751466503; c=relaxed/simple;
-	bh=NsFJdJ2JaJtHywUYIehF4YOfb8c7yEr59Tfk0oV3x1I=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jPh33B5ad36F50cDsQ/J3KXH2W4mr6AtaGBCJUSZffVNLX6bpyAhbKaA4fhd1OT/5FCMAsOfnqAKUO5zVGRUrvNv7TWdVgp7xaQJTj4igNkuL9EKAMoisiMzmNgz7IZN45/BeAMSaABfsb4RnEwPpw/lrkm+KQMm9boK5bQTn0A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4bXMfy4N74z6M4tS;
-	Wed,  2 Jul 2025 22:27:22 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id 53C1F1402EA;
-	Wed,  2 Jul 2025 22:28:18 +0800 (CST)
-Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
- (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Wed, 2 Jul
- 2025 16:28:17 +0200
-Date: Wed, 2 Jul 2025 15:28:16 +0100
-From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-CC: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	nd <nd@arm.com>, "maz@kernel.org" <maz@kernel.org>, "oliver.upton@linux.dev"
-	<oliver.upton@linux.dev>, Joey Gouly <Joey.Gouly@arm.com>, Suzuki Poulose
-	<Suzuki.Poulose@arm.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"will@kernel.org" <will@kernel.org>, "tglx@linutronix.de"
-	<tglx@linutronix.de>, "lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	Timothy Hayes <Timothy.Hayes@arm.com>
-Subject: Re: [PATCH v2 1/5] irqchip/gic-v5: Skip deactivate for forwarded
- PPI interrupts
-Message-ID: <20250702152816.000010da@huawei.com>
-In-Reply-To: <20250627100847.1022515-2-sascha.bischoff@arm.com>
-References: <20250627100847.1022515-1-sascha.bischoff@arm.com>
-	<20250627100847.1022515-2-sascha.bischoff@arm.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1751466773; c=relaxed/simple;
+	bh=2Xp9LKnZCCcV5QzGeE+WbMP668C5qrnyaJjRwCYTCkY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Ail6CgnfiFhmGqpOGIGnDFl9Q3NYEOisC463wpp5fJ96JGCviKYvup6j5c0NtoNiqoxruN+4JtGVqoOac6xnONdV5NrlsJp+AOBFdz5e53oZgQDoT8NANA23Zgx7GlZ1/0NE8lxgs86kS/tePR4gZNCic7V0XFDj/cz+0P08WGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VQueI3ZW; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-237f270513bso385505ad.1
+        for <kvm@vger.kernel.org>; Wed, 02 Jul 2025 07:32:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1751466771; x=1752071571; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZqqnRujRE2SdSp3Ji3lnU4lMv7Si9SLf3Ig6FroSxIY=;
+        b=VQueI3ZWJ0ILSZjHBnp+xric/rzGi6APYEPxLxl4WlaRYvt5v2yyeG8uQBarENAnsS
+         OttyY22vK/89om0oFs4mYNDKpwSy6JNPjkaSxCPAtAjZnJwvZ/tFfn7PUB0ksO2PED6o
+         EFeGXhHH4cCLsD/LutdtwLL7A/TQ7j5HVLgvg7qdzQPbZJpVy4JGKIEmypJTT2CgYig1
+         184bKCS4E+KEFLpbaoh4OKNSUjk/+22HsAbHzakZxeS6GSEZV5deCYyRV7WC8avBZQL2
+         BHeOrwePll61eePmIxPnaVT5hZdk6EmPGZvUJk7Nyq2QvnDzycxGQbEW9+ZCq6ZaHKvS
+         5g4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751466771; x=1752071571;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZqqnRujRE2SdSp3Ji3lnU4lMv7Si9SLf3Ig6FroSxIY=;
+        b=dzINplVgGXuCKPi0sHM3fBsK3G5rwMkBr3yrkfI9l/QPMWDBpWgdNvd9QTaleDyEFn
+         zDr1o7+JOho0y0glIhrpcFDIoW5YS+U9VXPPST6zEajRfT4xOptYMZbwRxihCJIGieu9
+         /NV/pWm8TKiEHD93CR545Zh5bNn+o+fnH2qBEG1BbD8OKA6BfRiACg4sIQMpY+Wi9axH
+         d7hN/xfWv+22eC5ttMMcNZuSfzNrtgdMdY0CHfA7uXAxWpm1E+Df2tbDMtP0NH0eyr+Q
+         f4Qn7+vgSvJf2WpxJhKdvUc4EILBXbDE7H1jizc5FLNazhqtSjASWzrRaksnGyxdC2i6
+         5MHg==
+X-Forwarded-Encrypted: i=1; AJvYcCVlOJZD0m39pITp5Drt350OKdyIkJ0ZKqkwC3aFHfgplBFMnUA3qAcZaW5zpcyH4TLb+E8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzRHF40nfoTxbLuvRHYkTHl573nOF5qHgKIK+qmahiTCi8qCxzv
+	oydDHgc2vh4j77WdqDT4ltXb/BRMiGHL7qUaWR4g702rADvCmNR+hj/te3DpHK1Q4B9vRL5dfbh
+	qO7Ks+8WP1hyURLL2de71cQAPfKbEP+Uoi6b8409Q
+X-Gm-Gg: ASbGncsvazhmdPMst0YgZrrAZwR8pDOQG8LugRImz9lC+IUsHdY39usMel1ps7Sic46
+	v310DseHCxu1Q/lYHoUd+BU9ETmmqpc3a7rK3Hp8RAhSxxrwKog6CLZdpvewhwCQ75oj+zjC6oq
+	IKmZvjGUYMI/V/HniLyhb56GvuRaIgqXltLMjALXDLgmqHboNy3A520fgEWuOHJMMwmOXCbq2EI
+	IYd
+X-Google-Smtp-Source: AGHT+IGoIHXKMSNgSYMoVATe9zftjUbnEF1aXjzvZLi/NINKt4JogRrvHG2G1VAsWUCf6cD0R3CJCF3RSOi1f9/p6D4=
+X-Received: by 2002:a17:902:c407:b0:215:42a3:e844 with SMTP id
+ d9443c01a7336-23c5ffbdd35mr6602435ad.17.1751466769703; Wed, 02 Jul 2025
+ 07:32:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml500004.china.huawei.com (7.191.163.9) To
- frapeml500008.china.huawei.com (7.182.85.71)
+References: <d3832fd95a03aad562705872cbda5b3d248ca321.1747264138.git.ackerleytng@google.com>
+ <CA+EHjTxtHOgichL=UvAzczoqS1608RSUNn5HbmBw2NceO941ng@mail.gmail.com>
+ <CAGtprH8eR_S50xDnnMLHNCuXrN2Lv_0mBRzA_pcTtNbnVvdv2A@mail.gmail.com>
+ <CA+EHjTwjKVkw2_AK0Y0-eth1dVW7ZW2Sk=73LL9NeQYAPpxPiw@mail.gmail.com>
+ <CAGtprH_Evyc7tLhDB0t0fN+BUx5qeqWq8A2yZ5-ijbJ5UJ5f-g@mail.gmail.com>
+ <9502503f-e0c2-489e-99b0-94146f9b6f85@amd.com> <20250624130811.GB72557@ziepe.ca>
+ <CAGtprH_qh8sEY3s-JucW3n1Wvoq7jdVZDDokvG5HzPf0HV2=pg@mail.gmail.com>
+ <aGTvTbPHuXbvj59t@yzhao56-desk.sh.intel.com> <CAGtprH9-njcgQjGZvGbbVX+i8D-qPUOkKFHbOWA20962niLTcw@mail.gmail.com>
+ <20250702141321.GC904431@ziepe.ca>
+In-Reply-To: <20250702141321.GC904431@ziepe.ca>
+From: Vishal Annapurve <vannapurve@google.com>
+Date: Wed, 2 Jul 2025 07:32:36 -0700
+X-Gm-Features: Ac12FXxsJnd1Ik5yTb-XA10TvLxSoUfxXWhX4Ea1BvmrwrYFJWzxZ35OP06jBy4
+Message-ID: <CAGtprH948W=5fHSB1UnE_DbB0L=C7LTC+a7P=g-uP0nZwY6fxg@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 04/51] KVM: guest_memfd: Introduce
+ KVM_GMEM_CONVERT_SHARED/PRIVATE ioctls
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Yan Zhao <yan.y.zhao@intel.com>, Alexey Kardashevskiy <aik@amd.com>, Fuad Tabba <tabba@google.com>, 
+	Ackerley Tng <ackerleytng@google.com>, kvm@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, x86@kernel.org, linux-fsdevel@vger.kernel.org, 
+	ajones@ventanamicro.com, akpm@linux-foundation.org, amoorthy@google.com, 
+	anthony.yznaga@oracle.com, anup@brainfault.org, aou@eecs.berkeley.edu, 
+	bfoster@redhat.com, binbin.wu@linux.intel.com, brauner@kernel.org, 
+	catalin.marinas@arm.com, chao.p.peng@intel.com, chenhuacai@kernel.org, 
+	dave.hansen@intel.com, david@redhat.com, dmatlack@google.com, 
+	dwmw@amazon.co.uk, erdemaktas@google.com, fan.du@intel.com, fvdl@google.com, 
+	graf@amazon.com, haibo1.xu@intel.com, hch@infradead.org, hughd@google.com, 
+	ira.weiny@intel.com, isaku.yamahata@intel.com, jack@suse.cz, 
+	james.morse@arm.com, jarkko@kernel.org, jgowans@amazon.com, 
+	jhubbard@nvidia.com, jroedel@suse.de, jthoughton@google.com, 
+	jun.miao@intel.com, kai.huang@intel.com, keirf@google.com, 
+	kent.overstreet@linux.dev, kirill.shutemov@intel.com, liam.merwick@oracle.com, 
+	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, maz@kernel.org, 
+	mic@digikod.net, michael.roth@amd.com, mpe@ellerman.id.au, 
+	muchun.song@linux.dev, nikunj@amd.com, nsaenz@amazon.es, 
+	oliver.upton@linux.dev, palmer@dabbelt.com, pankaj.gupta@amd.com, 
+	paul.walmsley@sifive.com, pbonzini@redhat.com, pdurrant@amazon.co.uk, 
+	peterx@redhat.com, pgonda@google.com, pvorel@suse.cz, qperret@google.com, 
+	quic_cvanscha@quicinc.com, quic_eberman@quicinc.com, 
+	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com, richard.weiyang@gmail.com, 
+	rick.p.edgecombe@intel.com, rientjes@google.com, roypat@amazon.co.uk, 
+	rppt@kernel.org, seanjc@google.com, shuah@kernel.org, steven.price@arm.com, 
+	steven.sistare@oracle.com, suzuki.poulose@arm.com, thomas.lendacky@amd.com, 
+	usama.arif@bytedance.com, vbabka@suse.cz, viro@zeniv.linux.org.uk, 
+	vkuznets@redhat.com, wei.w.wang@intel.com, will@kernel.org, 
+	willy@infradead.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
+	yuzenghui@huawei.com, zhiquan1.li@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 27 Jun 2025 10:09:01 +0000
-Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
+On Wed, Jul 2, 2025 at 7:13=E2=80=AFAM Jason Gunthorpe <jgg@ziepe.ca> wrote=
+:
+>
+> On Wed, Jul 02, 2025 at 06:54:10AM -0700, Vishal Annapurve wrote:
+> > On Wed, Jul 2, 2025 at 1:38=E2=80=AFAM Yan Zhao <yan.y.zhao@intel.com> =
+wrote:
+> > >
+> > > On Tue, Jun 24, 2025 at 07:10:38AM -0700, Vishal Annapurve wrote:
+> > > > On Tue, Jun 24, 2025 at 6:08=E2=80=AFAM Jason Gunthorpe <jgg@ziepe.=
+ca> wrote:
+> > > > >
+> > > > > On Tue, Jun 24, 2025 at 06:23:54PM +1000, Alexey Kardashevskiy wr=
+ote:
+> > > > >
+> > > > > > Now, I am rebasing my RFC on top of this patchset and it fails =
+in
+> > > > > > kvm_gmem_has_safe_refcount() as IOMMU holds references to all t=
+hese
+> > > > > > folios in my RFC.
+> > > > > >
+> > > > > > So what is the expected sequence here? The userspace unmaps a D=
+MA
+> > > > > > page and maps it back right away, all from the userspace? The e=
+nd
+> > > > > > result will be the exactly same which seems useless. And IOMMU =
+TLB
+> > > >
+> > > >  As Jason described, ideally IOMMU just like KVM, should just:
+> > > > 1) Directly rely on guest_memfd for pinning -> no page refcounts ta=
+ken
+> > > > by IOMMU stack
+> > > In TDX connect, TDX module and TDs do not trust VMM. So, it's the TDs=
+ to inform
+> > > TDX module about which pages are used by it for DMAs purposes.
+> > > So, if a page is regarded as pinned by TDs for DMA, the TDX module wi=
+ll fail the
+> > > unmap of the pages from S-EPT.
+>
+> I don't see this as having much to do with iommufd.
+>
+> iommufd will somehow support the T=3D1 iommu inside the TDX module but
+> it won't have an IOAS for it since the VMM does not control the
+> translation.
+>
+> The discussion here is for the T=3D0 iommu which is controlled by
+> iommufd and does have an IOAS. It should be popoulated with all the
+> shared pages from the guestmemfd.
+>
+> > > If IOMMU side does not increase refcount, IMHO, some way to indicate =
+that
+> > > certain PFNs are used by TDs for DMA is still required, so guest_memf=
+d can
+> > > reject the request before attempting the actual unmap.
+>
+> This has to be delt with between the TDX module and KVM. When KVM
+> gives pages to become secure it may not be able to get them back..
+>
+> This problem has nothing to do with iommufd.
+>
+> But generally I expect that the T=3D1 iommu follows the S-EPT entirely
+> and there is no notion of pages "locked for dma". If DMA is ongoing
+> and a page is made non-secure then the DMA fails.
+>
+> Obviously in a mode where there is a vPCI device we will need all the
+> pages to be pinned in the guestmemfd to prevent any kind of
+> migrations. Only shared/private conversions should change the page
+> around.
 
-> If a PPI interrupt is forwarded to a guest, skip the deactivate and
-> only EOI. Rely on the guest deactivating both the virtual and physical
-> interrupts (due to ICH_LRx_EL2.HW being set) later on as part of
-> handling the injected interrupt. This mimics the behaviour seen on
-> native GICv3.
-> 
-> This is part of adding support for the GICv3 compatibility mode on a
-> GICv5 host.
-> 
-> Reviewed-by: Lorenzo Pieralisi <lpieralisi@kernel.org>
-> 
+Yes, guest_memfd ensures that all the faulted-in pages (irrespective
+of shared or private ranges) are not migratable. We already have a
+similar restriction with CPU accesses to encrypted memory ranges that
+need arch specific protocols to migrate memory contents.
 
-Trivial but no gaps in tag blocks.  So no blank line here.
-Some scripting will moan about this and I think that will hit you if
-this goes into linux next.
-
-> Co-authored-by: Timothy Hayes <timothy.hayes@arm.com>
-> Signed-off-by: Timothy Hayes <timothy.hayes@arm.com>
-> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
-> ---
->  drivers/irqchip/irq-gic-v5.c | 17 +++++++++++++++++
->  1 file changed, 17 insertions(+)
-> 
-> diff --git a/drivers/irqchip/irq-gic-v5.c b/drivers/irqchip/irq-gic-v5.c
-> index 7a11521eeeca..6b42c4af5c79 100644
-> --- a/drivers/irqchip/irq-gic-v5.c
-> +++ b/drivers/irqchip/irq-gic-v5.c
-> @@ -213,6 +213,12 @@ static void gicv5_hwirq_eoi(u32 hwirq_id, u8 hwirq_type)
->  
->  static void gicv5_ppi_irq_eoi(struct irq_data *d)
->  {
-> +	/* Skip deactivate for forwarded PPI interrupts */
-> +	if (irqd_is_forwarded_to_vcpu(d)) {
-> +		gic_insn(0, CDEOI);
-> +		return;
-> +	}
-> +
->  	gicv5_hwirq_eoi(d->hwirq, GICV5_HWIRQ_TYPE_PPI);
->  }
->  
-> @@ -494,6 +500,16 @@ static bool gicv5_ppi_irq_is_level(irq_hw_number_t hwirq)
->  	return !!(read_ppi_sysreg_s(hwirq, PPI_HM) & bit);
->  }
->  
-> +static int gicv5_ppi_irq_set_vcpu_affinity(struct irq_data *d, void *vcpu)
-> +{
-> +	if (vcpu)
-> +		irqd_set_forwarded_to_vcpu(d);
-> +	else
-> +		irqd_clr_forwarded_to_vcpu(d);
-> +
-> +	return 0;
-> +}
-> +
->  static const struct irq_chip gicv5_ppi_irq_chip = {
->  	.name			= "GICv5-PPI",
->  	.irq_mask		= gicv5_ppi_irq_mask,
-> @@ -501,6 +517,7 @@ static const struct irq_chip gicv5_ppi_irq_chip = {
->  	.irq_eoi		= gicv5_ppi_irq_eoi,
->  	.irq_get_irqchip_state	= gicv5_ppi_irq_get_irqchip_state,
->  	.irq_set_irqchip_state	= gicv5_ppi_irq_set_irqchip_state,
-> +	.irq_set_vcpu_affinity	= gicv5_ppi_irq_set_vcpu_affinity,
->  	.flags			= IRQCHIP_SKIP_SET_WAKE	  |
->  				  IRQCHIP_MASK_ON_SUSPEND,
->  };
-
+>
+> Maybe this needs to be an integral functionality in guestmemfd?
+>
+> Jason
 
