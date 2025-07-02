@@ -1,80 +1,80 @@
-Return-Path: <kvm+bounces-51342-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51343-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 808B1AF63D5
-	for <lists+kvm@lfdr.de>; Wed,  2 Jul 2025 23:19:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E94DAF63F4
+	for <lists+kvm@lfdr.de>; Wed,  2 Jul 2025 23:27:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 447593B34B8
-	for <lists+kvm@lfdr.de>; Wed,  2 Jul 2025 21:19:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B3CC11C44943
+	for <lists+kvm@lfdr.de>; Wed,  2 Jul 2025 21:27:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24780239E90;
-	Wed,  2 Jul 2025 21:19:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9ED9287250;
+	Wed,  2 Jul 2025 21:26:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MYmffz+J"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iVIpgT1S"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C402C2DE700
-	for <kvm@vger.kernel.org>; Wed,  2 Jul 2025 21:19:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D13A230268
+	for <kvm@vger.kernel.org>; Wed,  2 Jul 2025 21:26:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751491193; cv=none; b=RavrZiRoHhcrQO6G3QFOPXYu/ubTfYCXdqr0j662061XvJ3m37EAdNWPbQQxTfCQb3vK1P9DJ9QJ/wXIzHT5A2DlyrpJT4bHt4MaS2X57FN+OSKNSa+u/vky+M6XSgPu4Dmob223I1SPk3z4mS2UneBWnCJhFE6dDcxJXuMQNHo=
+	t=1751491618; cv=none; b=s6WymAnL+fypKWSOTQJdN6CsfuUEDJy0EbRBZS1GYexfVAS+6veXVYBFDB+6dd5yhhKarRM1dZn3kd0EmLaZs4Ge66JzY4pDExyD++QMMJtueUDMg66cEM2jScYFoePehFQ/kd0lL9ihrti+qBEpOTH8//4YXqufWlW5rOohIWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751491193; c=relaxed/simple;
-	bh=0riy5ykMfBvdlp5wjLxpHeiICspjKTS2e49IyHnkS8M=;
+	s=arc-20240116; t=1751491618; c=relaxed/simple;
+	bh=kUmPF8TxC9tkvtwQkD7Yj7OwVbPKllNiQZiqUvowUBw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LhDdeZkBzm41DmlCQs8xhTZWML/rhZlxNMbjZ2TygND7j4MTWEkHbjLPP0NnB1GniiQhJIqhXjFu73m6vTYyolLs7o1F+y7rnFvsJdyTa0mT0wvdZTs5+OHrbwtmq7jQKvpPOLODmq34+HKCTBc/hnh8iPR0tY8uxDvVrYEUdbQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=MYmffz+J; arc=none smtp.client-ip=209.85.214.178
+	 In-Reply-To:Content-Type; b=Ce2pMwFieY2sCAXHyFko5IqhwZ37gxR8Qt7lQnFzwcOo/NXjRGPgwxFv51YrSTpNNV6scTCQptsx9oSXohAXIqpi0G5DsOPhHiqv3pyDzHT3MRku3EymgGxLq1C24MtJnkKE1Eb0+Ebe8W9R1yctOFLvjwhC6iyjqmJv0ac5vdQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=iVIpgT1S; arc=none smtp.client-ip=209.85.215.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-236192f8770so2123255ad.0
-        for <kvm@vger.kernel.org>; Wed, 02 Jul 2025 14:19:51 -0700 (PDT)
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-b2fca9dc5f8so7099520a12.1
+        for <kvm@vger.kernel.org>; Wed, 02 Jul 2025 14:26:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1751491191; x=1752095991; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1751491616; x=1752096416; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=z2oLpuDzuhdHiQaMDk9scXG+1ZBfQnlbCx000gNoXhE=;
-        b=MYmffz+JO++7X3bNKO2PoemyxEJsfcUKSyGBMHe0D7ul0kqXllDTaq4RP8IeaOLJ/G
-         Q22JGgnjV03CXFIaGju3OVpEpYwxOGUwDP6KYEyRMbMJeCtOziLHjoDF4oHanbtcDZdm
-         A8o4e6592y1pAHqktEzS7zzgpVXJTRVOQaJGPiGHqX0nhO/CeqBk+nEYjfCt+8+b+oLR
-         O/XLvZ9U5QlAH+RM/R8hUHnJSOqvJY/Q30EpJXdpJqbg0ImOYl2QjnK3xiXVuDg1mhKV
-         dJ2pi/s0tDq9AQ9SnuFP4B0izuTLHrvXaWqRCvqACPAtZCiOZuMwsHaRDvoTfqDpZAyR
-         Sphw==
+        bh=VnT9NdXE3ybydcEe8oSYwUjLjEOXETYq80rC4G+1H7Q=;
+        b=iVIpgT1SFnVgO3uiEVrkrIka32qTQJVWedShFUjeeIcxnIFeNsDgtgwfBXAq/zWy03
+         stPJALbkjjGSs88PjPm0CYSBHuzR6Bd4tzIo4yTpPKAtvGraeFHirGS+YR+8gheZdltY
+         RGXLhFc+cEVCXqHqDixmtyzLBFYm9ogrbDgpSOHAks0U5ZrsY0cUj/Ss91jWqTgjmzj1
+         Wp6k069gCpTkMxuzLmYptR0kzR26R2XO3K1aKSeff11PrvBv6VAowBG2TvIwxfCnLStF
+         544tRwrmk0A6BvQkgLdA88Y6Dn2KH8ZGnyt7PtN02a6eOfIDl75VhcdE2Uy0w6PLfnVm
+         3fsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751491191; x=1752095991;
+        d=1e100.net; s=20230601; t=1751491616; x=1752096416;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=z2oLpuDzuhdHiQaMDk9scXG+1ZBfQnlbCx000gNoXhE=;
-        b=Ba6g+nU1yY9+mMla/HTBQQpAfEu3vukugnzT8eClBPBF4Y15hrBKyXWZ3JEzxWL4jS
-         YsRxwk5uM9UL7RgMr/Ql3ikaEWUzUDU2QWgGS8PH3ALkc5uW1q5ctg8GOtuiZTpxtgAE
-         cFqcIdjRvTcPcQQaanaV/pcQqDsWEZnOLIf0dmR45rtGczdZm6vbrYzpQ9IuQYOvLfsK
-         6XDbmw49+zpQBZCIyeS8S4HviKlPG9k17X0aNETgjJ1Q3ZxBaZ6R1XTwkfY+8Q2NjfH3
-         XakfbS0ruHYPJu6hUA+h9y0M6PfEEqGush9sm7Z8h0HPfS0/DjSoXbjPh3uJ5xwvoEA3
-         PpYg==
-X-Forwarded-Encrypted: i=1; AJvYcCXKMcANKBaFFIFBwSVVw6aGMW+pP10skOIYgu1AOZaXiYwIAuKeLqgi3XqbPK3PCMfq/Ko=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzrXKbubIn7T0w6DczAgz/KuU4nv/ANorHHuTzWlzVKAIWQJkuZ
-	5wNk2/NEyjcyTZF4MIR6NF6V99pW5/FERIEAvOq2BhhmiA2CEeWZdl2isqL5VVfONZs=
-X-Gm-Gg: ASbGncvEbyKQiR0uhHQXLRM/SaBXKIG68Q8wYiFRkvk4y4VOkN4BY3JL9fNOtKCSJu5
-	MRfnaiOg2DsYtk2U69DLEbpipJTQnbSQckmm/Xp9l1o1k4jERHR0HG+FtigksLzVSPLZCmirPE7
-	QCcGNNt46eLm/gxb86L1zXZYbeGO1opnC4mwFr0gInukwAwXLAbFH3JLSW36UfbI4I5DP3cq3q8
-	iXTQagsRki5MnW90cgwDzHHwdZD9kgWYss0ktWlHzuAnUSKTQDMYsLY/sQBRQ7z8cSNrDMSUF7U
-	YGvlEt72xRoRGPTaQS1k9oj+XpcKjfzIEQCghxg4nDQqpj0F/srzP+ddqE4s22+uLgwVqctjatk
-	VjjlK/LQH+w==
-X-Google-Smtp-Source: AGHT+IEveK9a4pLkComAd6bEMhUh5nd/K1YH+GcPSFUDBL56X19TYihBZ8kJjOvEoyFIVMBoN6XXAg==
-X-Received: by 2002:a17:902:f690:b0:221:1497:7b08 with SMTP id d9443c01a7336-23c7942d9b2mr15121325ad.23.1751491190998;
-        Wed, 02 Jul 2025 14:19:50 -0700 (PDT)
+        bh=VnT9NdXE3ybydcEe8oSYwUjLjEOXETYq80rC4G+1H7Q=;
+        b=CZU388dTfTfjb3fJ1njHzALmXOAEtOXNfI8FKJgi4A66mubWNiNid4LsYyvKsLhQ+V
+         GUgbHQaOAuRO8CJl/fYlwutGtOzFGUtkrWj0OyIN7e4f65zwm4nihqR/NWvfPK3QQ23s
+         uwTlpTE7lUF0P0pOJ4HzQuh+YanfJmRbKkSZaAEDhsy40i8HmBgDWdzyFlr+4uSaAwb4
+         DLTgzKm6Fja5nBhxnQVV3foczUnLvGARc4IXbL5p4XRehohXB1L6Q5uga9yDf+6w4Cv4
+         X1Ej1ZrZ2B6M25E+OsxDISZtOOVuEq8Fd2Eje0mr9SoNUjnqU5XJmIJpIQ1ONyCclwIW
+         u9dQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW5yeDRZc2/8RbKdeFuRFIhknZVn7UIzLrXRYrNnEWARu4oC2LGCJOzgvKPdyG6ngfaHew=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwrIeLXxmDSkWWfqQEOgMUHWVe6CsNr1KFrwK+WvB0YP9KfIQw/
+	UV32quyCh9/cI1cJtdSXyxEufp5zEnDBQpuUX3X8xdckZljyMWlbVG+6J0/j4FNfr20=
+X-Gm-Gg: ASbGncvWvbgU/w30JG4mXcnsLw+h7CbbmNftwrJB+LIxlHWecPYe23YqCgnPg43ir+f
+	UH987MlmLoGZVNU0cahh+nE/1WONK7Y3k3KZQjkg+N1L8KNG0Q/bdkEWmbxMTlxFVGjOxRDHQaj
+	Tsa8Uo5KrFkzOxCdm4x5RkIpIG8GX9ePGnnV0LI/IzX4Z+24txoaVfyfETYQoZqsCW/Y9pI7RA8
+	km1skEsT5hhgBef28730qKhMdZ0sJHfhA+2lfC/H4ToVJJclDH5cRto1zFFOOHdzRigvIWItt7I
+	vgUoiie7cVhSyRTkAUf+2nUqKuXtxJTC0wfi2VU3zgfdDzJr0Ovmews6W2sKIV0XJGI2ZvQhwVY
+	=
+X-Google-Smtp-Source: AGHT+IFcgjPigidp2JUObKIfrGnW+CVetFfi2zv1TnmMkn0UzMtONPXdsIJh8GiugT0++pMmG1OYrA==
+X-Received: by 2002:a17:90b:1848:b0:313:db0b:75d8 with SMTP id 98e67ed59e1d1-31a9d64e448mr1002562a91.32.1751491615640;
+        Wed, 02 Jul 2025 14:26:55 -0700 (PDT)
 Received: from [192.168.1.87] ([38.41.223.211])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23acb39b95csm142670205ad.139.2025.07.02.14.19.50
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31a9ccf8711sm570443a91.27.2025.07.02.14.26.54
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 02 Jul 2025 14:19:50 -0700 (PDT)
-Message-ID: <f456a9b8-5e6c-4ed9-aa94-0bb6350052f5@linaro.org>
-Date: Wed, 2 Jul 2025 14:19:49 -0700
+        Wed, 02 Jul 2025 14:26:55 -0700 (PDT)
+Message-ID: <5348f155-5644-497d-b9f9-89924d961cff@linaro.org>
+Date: Wed, 2 Jul 2025 14:26:54 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,50 +82,55 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 56/65] accel: Expose and register
- generic_handle_interrupt()
+Subject: Re: [PATCH v4 57/65] accel: Always register
+ AccelOpsClass::kick_vcpu_thread() handler
 Content-Language: en-US
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
  qemu-devel@nongnu.org
 Cc: =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
  Paolo Bonzini <pbonzini@redhat.com>,
  Richard Henderson <richard.henderson@linaro.org>,
- Cameron Esfahani <dirty@apple.com>, Roman Bolshakov <rbolshakov@ddn.com>,
- Phil Dennis-Jordan <phil@philjordan.eu>, Mads Ynddal <mads@ynddal.dk>,
  Fabiano Rosas <farosas@suse.de>, Laurent Vivier <lvivier@redhat.com>,
  Stefano Stabellini <sstabellini@kernel.org>,
  Anthony PERARD <anthony@xenproject.org>, Paul Durrant <paul@xen.org>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Reinoud Zandijk <reinoud@netbsd.org>,
- Sunil Muthuswamy <sunilmut@microsoft.com>, kvm@vger.kernel.org,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, kvm@vger.kernel.org,
  xen-devel@lists.xenproject.org
 References: <20250702185332.43650-1-philmd@linaro.org>
- <20250702185332.43650-57-philmd@linaro.org>
+ <20250702185332.43650-58-philmd@linaro.org>
 From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-In-Reply-To: <20250702185332.43650-57-philmd@linaro.org>
+In-Reply-To: <20250702185332.43650-58-philmd@linaro.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
 On 7/2/25 11:53 AM, Philippe Mathieu-Daudé wrote:
-> In order to dispatch over AccelOpsClass::handle_interrupt(),
+> In order to dispatch over AccelOpsClass::kick_vcpu_thread(),
 > we need it always defined, not calling a hidden handler under
-> the hood. Make AccelOpsClass::handle_interrupt() mandatory.
-> Expose generic_handle_interrupt() prototype and register it
-> for each accelerator.
+> the hood. Make AccelOpsClass::kick_vcpu_thread() mandatory.
+> Register the default cpus_kick_thread() for each accelerator.
 > 
-> Suggested-by: Richard Henderson <richard.henderson@linaro.org>
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 > ---
->   include/system/accel-ops.h        | 3 +++
->   accel/hvf/hvf-accel-ops.c         | 1 +
->   accel/kvm/kvm-accel-ops.c         | 1 +
->   accel/qtest/qtest.c               | 1 +
->   accel/xen/xen-all.c               | 1 +
->   system/cpus.c                     | 9 +++------
->   target/i386/nvmm/nvmm-accel-ops.c | 1 +
->   target/i386/whpx/whpx-accel-ops.c | 1 +
->   8 files changed, 12 insertions(+), 6 deletions(-)
+>   include/system/accel-ops.h | 1 +
+>   accel/kvm/kvm-accel-ops.c  | 1 +
+>   accel/qtest/qtest.c        | 1 +
+>   accel/xen/xen-all.c        | 1 +
+>   system/cpus.c              | 7 ++-----
+>   5 files changed, 6 insertions(+), 5 deletions(-)
+
+Sounds good.
 
 Reviewed-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 
+Unrelated, but I noticed that hvf_kick_vcpu_thread uses hv_vcpus_exit 
+[1] on x86 and hv_vcpu_interrupt [2] on arm64.
+I'm not even sure what's the difference when reading the Apple doc, 
+except that exit existed before interrupt.
+[1] https://developer.apple.com/documentation/hypervisor/hv_vcpus_exit(_:_:)
+[2] 
+https://developer.apple.com/documentation/hypervisor/hv_vcpu_interrupt(_:_:)
+
+It might be worth moving x86 to use interrupt also, in a future series.
+
+Regards,
+Pierrick
 
