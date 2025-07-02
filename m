@@ -1,119 +1,220 @@
-Return-Path: <kvm+bounces-51323-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51324-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A8DBAF6151
-	for <lists+kvm@lfdr.de>; Wed,  2 Jul 2025 20:28:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E4483AF61BF
+	for <lists+kvm@lfdr.de>; Wed,  2 Jul 2025 20:43:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A09751760FD
-	for <lists+kvm@lfdr.de>; Wed,  2 Jul 2025 18:28:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D07B1175FB9
+	for <lists+kvm@lfdr.de>; Wed,  2 Jul 2025 18:43:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53C772E49A0;
-	Wed,  2 Jul 2025 18:28:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD3682F7CF3;
+	Wed,  2 Jul 2025 18:43:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="CKnVJuhy"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="otB81ZRH"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C0E02E498D
-	for <kvm@vger.kernel.org>; Wed,  2 Jul 2025 18:28:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 754F52F7CE3
+	for <kvm@vger.kernel.org>; Wed,  2 Jul 2025 18:43:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751480929; cv=none; b=RvMuFRIn3URLBQBA0vJFg3L4MOmFbrXuBKARtvYFT4Wi+m08Qi070a012MXrCzYOiliLy+BaZw3C0OYu4DcsziMM1Ps041P5TjkeZptOMGWf/QI3k1dEzn+xt2M89IppgcBrOYvE797naOYtBOGtShdU4R+3BHr13mkUZilujzY=
+	t=1751481807; cv=none; b=RLguM4eBsakPEGEW0YENzBACQvkOgaAAmwl6SyKXawDqeLbpIkGeWDSuuA6rh1OCqC3lVvk0Kned7Gt89BsvV8/cHavTxjCenA+JMcezDIBUaHuLTqt/ROhEcmcxEjvzKWyliQiR9PG9bjihhh1MDNsPM1zVMw0BYrGmI9x4MF8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751480929; c=relaxed/simple;
-	bh=avUNtvZK0fUa7aGIuYOyPWZE1iep4kiK5Bl0okgHHA8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GtF3HGiewwvnlo1ucUaN1WgK6xd6aorANyF5n1zhFbPJdGkSkyy8s4t59j4NcdLymxZ7GrOi1WYhHuOTzS8rpGiobX6dtkxCZZXxlVsSOw8QSYdI1peceUfLEBzlmmSppbJD9mSvzmIKqNRvC30H5OQEpx7yP1Hsw1ZydTdgclA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=CKnVJuhy; arc=none smtp.client-ip=209.85.210.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-742c3d06de3so5779594b3a.0
-        for <kvm@vger.kernel.org>; Wed, 02 Jul 2025 11:28:48 -0700 (PDT)
+	s=arc-20240116; t=1751481807; c=relaxed/simple;
+	bh=TNInFk5CSqolYCTcQiouErpywLUQzlF2nTjGjEYSQjk=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=BoGSazPHdDu5Gvn5P7tmPoko6eqE0Fb4QP41C8fHNjfpnuBSYX0xH1lOR2HvLRlon7oioDQVa+lm6RktxMGY3MUUsWr4h29+JjTpT23RAIBjS/A8uwVlU7NAOOpD/cDewaX0UtRo3Tfhhw6R7wxdqzL0g2f9P6iFGLazz2qHL+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=otB81ZRH; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3138c50d2a0so11182891a91.2
+        for <kvm@vger.kernel.org>; Wed, 02 Jul 2025 11:43:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1751480927; x=1752085727; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=46MgjvV3epJBZdXixG7o02s3aaxSYe96C/POTn0IK/4=;
-        b=CKnVJuhyqDW5v+l53C2hT1fONwq8LkyRwXuQlUE8TP6Tiuk0uDEcbyM/pfua9Mr4fv
-         VoQLwFamC0UsbQLQXU+FPEQ6YYgc0AotqxO44BpFok8cZc1iGCHD66Lkng7cdHwyXdDG
-         lOythuhDKPjjxAuQ4QG0BugwYUOzZyPHJTEUrZOuqvq4z8FxtZoBsUIkTppRmGzy4eNc
-         AcUB8HTx3a7IOIuw6DKfxGD1lNDBBDnBJV6GF0U7vKieP5rrTvqad41ycewnoFwpZktl
-         /hxOhLLqySNtYZgMUdO+kAT7DyTv3V4sl9J3Jqhw33GoiG2KbLWvIMlVUu1af4PtFzLi
-         1D6w==
+        d=google.com; s=20230601; t=1751481805; x=1752086605; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=BkXeL5WEZDbS42FI4cLgeaVQ59trAJI79NiaZaMMINw=;
+        b=otB81ZRHskW28Q4nyzxJAUN6r+V70IexTtm8IBwKnkU8uBTOZbtb3CSL2+J5qZ48xD
+         zehjmjzsx2WxxKvK9Ce3+313TQGRMj0dYznQyYa0/GP9M3AZCXapteP31Kpec9qCwc8E
+         CNp56/wDe3QOelo+grY8T8TDTNeCwmSx43i7HgDEem5RMuJs7o79pTyRvljqLNMswE50
+         tezXgg7d5HXJ3RbIk87IgdcPOVPKxyjEdJ37n/t8VJZCDjlceEjRhSOQooOtY2d2fwaf
+         +dtVXiHkJw7L1hGZPhu8L+DxV3hDHf3KIHS075m2kzxlEYZG5VOUf5xZYJeTUsJTLKeW
+         zyFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751480927; x=1752085727;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=46MgjvV3epJBZdXixG7o02s3aaxSYe96C/POTn0IK/4=;
-        b=DKT5lrgt7y011OCqFcC9RlMLZZoZ8X8ai3ZxAJrb64CQrLI3VakWnjbcWrtltpIDBt
-         REf0LTYi7T+1MEVIQmIdJyoxXdX+icDqMkVgH+13keZfLP/pmO6XjYHMMAsXp7fqZdeP
-         s9xB9i3KHzrtP29JmdHH73HsXT+X5S9aQ9rLSvZR6AM5yPH02wiYZcdVPu04PloSIX48
-         KynZ7y6dmxG4TDfW/AHRfHZR3plSggtBZJCwvI6A1SELSUEw3S5v6t4IhvHhd68GCQSq
-         l/hUROeh+bzOy5NP8cj8Pht6apzFsaWwRE9lPMR2Affg55f7IURgGZGYQSSI3+SeWZ3E
-         XItQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUDlwuddgMRSddL+vXLEQXdmnh1YAL1LyEB7o84oVYlWjRQp3Zou2gh6NctvXhTc8iPVX4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx0cZA8BuDS4CmChtttVRzSbFGJfEWVbThwQ9sIXSLvrbkHdu8q
-	q9Bj7fGl0wfjwU6ZYt66md2hubUQtHXlmSpFn92HBY/oxqIxKLi4O0Oc+j6+tzmQa7g=
-X-Gm-Gg: ASbGncsEhv62Um4iPu8CsNG5CHDLXAHnl1JZceBFfMjP2X2QyMXO6omwHa4pKtVH5t7
-	hYnLrxnvUgblwhZZSUv8nzuv3SjJwOG03xBPyZgKB6fIyhYR3sD6jbu6Th2pIUKpYmk6Y9vtD9y
-	xAuXediLqKXb9U7cDG2ggD98LER9+TZ6REjGbxN1owBubZXDbYgbo3ksPUIcd39rw+2FTCsblRT
-	wo80qcqk6xglSdSOqVOHWIiiStx5J41xAcIdVZ5DalJy8kIc1sL6W/PmzoGVgimMRZum/QBF0fe
-	qdV9YnmWd+EA2lRQvvfBdgg8iG7fLqUmrN63
-X-Google-Smtp-Source: AGHT+IF4ph0eWwg5euxsmabv0EeGQqiK9nx2/cAAJmk4J0EcaWCQHAieQ9iQbzhIPW0jSUPpbcOaPg==
-X-Received: by 2002:a05:6a00:855:b0:748:eb38:8830 with SMTP id d2e1a72fcca58-74ca0c2788emr646222b3a.13.1751480927563;
-        Wed, 02 Jul 2025 11:28:47 -0700 (PDT)
-Received: from ziepe.ca ([130.41.10.202])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74af57ef308sm14319981b3a.157.2025.07.02.11.28.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Jul 2025 11:28:46 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1uX2CK-000000051mO-3Dtn;
-	Wed, 02 Jul 2025 15:28:44 -0300
-Date: Wed, 2 Jul 2025 15:28:44 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: lizhe.67@bytedance.com
-Cc: alex.williamson@redhat.com, david@redhat.com, peterx@redhat.com,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 4/4] vfio/type1: optimize vfio_unpin_pages_remote() for
- large folio
-Message-ID: <20250702182844.GE904431@ziepe.ca>
-References: <20250630072518.31846-1-lizhe.67@bytedance.com>
- <20250630072518.31846-5-lizhe.67@bytedance.com>
+        d=1e100.net; s=20230601; t=1751481805; x=1752086605;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=BkXeL5WEZDbS42FI4cLgeaVQ59trAJI79NiaZaMMINw=;
+        b=an/qoAUrlP1UzWxbLaUSgjy7qPo1W03KvKb3Dy6nwtEjGRTVHcwSi/PSPobUqeHNBK
+         UTt+dE7nNLlv0rRqbzAhzHwGdSK3YXLjoS4/4+sIry+nh0DwRv3CnE4vUwu5XcyuyE9L
+         dZaA7K9h2egua/2RquOWr9MTgQujUlcm0366viFMCAgnFSGMdV/HdvruhzgBHxYZMmdW
+         MYus30cTcfVHBuuFXMEqbRNAlvUgv+kUc4PwHLnnxSaPkSBuLhTvUd5lxN9IKW6wr8+h
+         dmkhS3rpmSrYvf47LnGl8B1fR1aQjALxmi7IEFXyvsatNpmksNyqb38TIUIyBo7xC8PO
+         /ZEw==
+X-Forwarded-Encrypted: i=1; AJvYcCU2oqPXD2illd8NbedldQSlgagdbxlGhd5XBuJZ6uoKSwZ7bs6yp4nbtuutusft7fDDb8c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzbX31eEypKcEPxImidRUOu/U8B3r0tG/TukQM0OvQPGueHPzj5
+	zMWivJgKXD+Q3xwLqB88IObcP5Y6ikTNS6NNcBFbkDyzhDWJE/trDFd/+i5BNfLarLoQRS4X8S5
+	xjlkXp0bY+R4rD5ID3fdciO98Zw==
+X-Google-Smtp-Source: AGHT+IH1D7bLpxYmTDXOzRwdkEP/A6qvQMUvpigPT+QEJbt+kvTzeOztuKmrRtS0JYzImd2vqlH1A1VwyuT8Z8v8gA==
+X-Received: from pjbsj10.prod.google.com ([2002:a17:90b:2d8a:b0:311:a879:981f])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:5183:b0:311:c1ec:7d05 with SMTP id 98e67ed59e1d1-31a90c1faf7mr5874277a91.35.1751481804762;
+ Wed, 02 Jul 2025 11:43:24 -0700 (PDT)
+Date: Wed, 02 Jul 2025 11:43:23 -0700
+In-Reply-To: <aGUW5PlofbcNJ7s1@yzhao56-desk.sh.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250630072518.31846-5-lizhe.67@bytedance.com>
+Mime-Version: 1.0
+References: <4cbdfd3128a6dcc67df41b47336a4479a07bf1bd.camel@intel.com>
+ <diqz5xghjca4.fsf@ackerleytng-ctop.c.googlers.com> <aGJxU95VvQvQ3bj6@yzhao56-desk.sh.intel.com>
+ <a40d2c0105652dfcc01169775d6852bd4729c0a3.camel@intel.com>
+ <diqzms9pjaki.fsf@ackerleytng-ctop.c.googlers.com> <fe6de7e7d72d0eed6c7a8df4ebff5f79259bd008.camel@intel.com>
+ <aGNrlWw1K6nkWdmg@yzhao56-desk.sh.intel.com> <CAGtprH-csoPxG0hCexCUg_n4hQpsss83inRUMPRqJSFdBN0yTQ@mail.gmail.com>
+ <aGN6GIFxh57ElHPA@yzhao56-desk.sh.intel.com> <diqzms9n4l8i.fsf@ackerleytng-ctop.c.googlers.com>
+ <aGUW5PlofbcNJ7s1@yzhao56-desk.sh.intel.com>
+Message-ID: <diqzecuy4eno.fsf@ackerleytng-ctop.c.googlers.com>
+Subject: Re: [RFC PATCH 08/21] KVM: TDX: Increase/decrease folio ref for huge pages
+From: Ackerley Tng <ackerleytng@google.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Vishal Annapurve <vannapurve@google.com>, "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>, 
+	"quic_eberman@quicinc.com" <quic_eberman@quicinc.com>, "Li, Xiaoyao" <xiaoyao.li@intel.com>, 
+	"Shutemov, Kirill" <kirill.shutemov@intel.com>, "Hansen, Dave" <dave.hansen@intel.com>, 
+	"david@redhat.com" <david@redhat.com>, "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>, 
+	"vbabka@suse.cz" <vbabka@suse.cz>, "tabba@google.com" <tabba@google.com>, "Du, Fan" <fan.du@intel.com>, 
+	"michael.roth@amd.com" <michael.roth@amd.com>, "seanjc@google.com" <seanjc@google.com>, 
+	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, "Peng, Chao P" <chao.p.peng@intel.com>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "Yamahata, Isaku" <isaku.yamahata@intel.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Weiny, Ira" <ira.weiny@intel.com>, 
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, "Li, Zhiquan1" <zhiquan1.li@intel.com>, 
+	"jroedel@suse.de" <jroedel@suse.de>, "Miao, Jun" <jun.miao@intel.com>, 
+	"pgonda@google.com" <pgonda@google.com>, "x86@kernel.org" <x86@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jun 30, 2025 at 03:25:18PM +0800, lizhe.67@bytedance.com wrote:
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index a02bc340c112..7cacfb2cefe3 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -802,17 +802,29 @@ static long vfio_pin_pages_remote(struct vfio_dma *dma, unsigned long vaddr,
->  	return pinned;
->  }
->  
-> +static inline void put_valid_unreserved_pfns(unsigned long start_pfn,
-> +		unsigned long npage, int prot)
-> +{
-> +	unpin_user_page_range_dirty_lock(pfn_to_page(start_pfn), npage,
-> +					 prot & IOMMU_WRITE);
-> +}
+Yan Zhao <yan.y.zhao@intel.com> writes:
 
-I don't think you need this wrapper.
+> On Tue, Jul 01, 2025 at 03:09:01PM -0700, Ackerley Tng wrote:
+>> Yan Zhao <yan.y.zhao@intel.com> writes:
+>>=20
+>> > On Mon, Jun 30, 2025 at 10:22:26PM -0700, Vishal Annapurve wrote:
+>> >> On Mon, Jun 30, 2025 at 10:04=E2=80=AFPM Yan Zhao <yan.y.zhao@intel.c=
+om> wrote:
+>> >> >
+>> >> > On Tue, Jul 01, 2025 at 05:45:54AM +0800, Edgecombe, Rick P wrote:
+>> >> > > On Mon, 2025-06-30 at 12:25 -0700, Ackerley Tng wrote:
+>> >> > > > > So for this we can do something similar. Have the arch/x86 si=
+de of TDX grow
+>> >> > > > > a
+>> >> > > > > new tdx_buggy_shutdown(). Have it do an all-cpu IPI to kick C=
+PUs out of
+>> >> > > > > SEAMMODE, wbivnd, and set a "no more seamcalls" bool. Then an=
+y SEAMCALLs
+>> >> > > > > after
+>> >> > > > > that will return a TDX_BUGGY_SHUTDOWN error, or similar. All =
+TDs in the
+>> >> > > > > system
+>> >> > > > > die. Zap/cleanup paths return success in the buggy shutdown c=
+ase.
+>> >> > > > >
+>> >> > > >
+>> >> > > > Do you mean that on unmap/split failure:
+>> >> > >
+>> >> > > Maybe Yan can clarify here. I thought the HWpoison scenario was a=
+bout TDX module
+>> >> > My thinking is to set HWPoison to private pages whenever KVM_BUG_ON=
+() was hit in
+>> >> > TDX. i.e., when the page is still mapped in S-EPT but the TD is bug=
+ged on and
+>> >> > about to tear down.
+>> >> >
+>> >> > So, it could be due to KVM or TDX module bugs, which retries can't =
+help.
+>> >> >
+>> >> > > bugs. Not TDX busy errors, demote failures, etc. If there are "no=
+rmal" failures,
+>> >> > > like the ones that can be fixed with retries, then I think HWPois=
+on is not a
+>> >> > > good option though.
+>> >> > >
+>> >> > > >  there is a way to make 100%
+>> >> > > > sure all memory becomes re-usable by the rest of the host, usin=
+g
+>> >> > > > tdx_buggy_shutdown(), wbinvd, etc?
+>> >> >
+>> >> > Not sure about this approach. When TDX module is buggy and the page=
+ is still
+>> >> > accessible to guest as private pages, even with no-more SEAMCALLs f=
+lag, is it
+>> >> > safe enough for guest_memfd/hugetlb to re-assign the page to allow =
+simultaneous
+>> >> > access in shared memory with potential private access from TD or TD=
+X module?
+>> >>=20
+>> >> If no more seamcalls are allowed and all cpus are made to exit SEAM
+>> >> mode then how can there be potential private access from TD or TDX
+>> >> module?
+>> > Not sure. As Kirill said "TDX module has creative ways to corrupt it"
+>> > https://lore.kernel.org/all/zlxgzuoqwrbuf54wfqycnuxzxz2yduqtsjinr5uq4s=
+s7iuk2rt@qaaolzwsy6ki/.
+>> >
+>> > Or, could TDX just set a page flag, like what for XEN
+>> >
+>> >         /* XEN */
+>> >         /* Pinned in Xen as a read-only pagetable page. */
+>> >         PG_pinned =3D PG_owner_priv_1,
+>> >
+>> > e.g.
+>> > 	PG_tdx_firmware_access =3D PG_owner_priv_1,
+>> >
+>> > Then, guest_memfd checks this flag on every zap and replace it with PG=
+_hwpoison
+>> > on behalf of TDX?
+>>=20
+>> I think this question probably arose because of a misunderstanding I
+>> might have caused. I meant to set the HWpoison flag from the kernel, not
+>> from within the TDX module. Please see [1].
+> I understood.
+> But as Rick pointed out
+> https://lore.kernel.org/all/04d3e455d07042a0ab8e244e6462d9011c914581.came=
+l@intel.com/,
+> Manually setting the poison flag in KVM's TDX code (in host kernel) seems=
+ risky.
+>
 
-This patch and the prior look OK
+Will address this in a reply to Rick's email, there's more context
+there that I'd like to clarify.
 
-Jason
+>> In addition, if the TDX module (now referring specifically to the TDX
+>> module and not the kernel) sets page flags, that won't work with
+> Marking at per-folio level seems acceptable to me.
+>
+
+Will address this in a reply to Rick's email, there's more context there
+that I'd like to clarify.
+
+>> vmemmap-optimized folios. Setting a page flag on a vmemmap-optimized
+>> folio will be setting the flag on a few pages.
+> BTW, I have a concern regarding to the overhead vmemmap-optimization.
+>
+> In my system,
+> with hugetlb_free_vmemmap=3Dfalse, the TD boot time is around 30s;
+> with hugetlb_free_vmemmap=3Dtrue, the TD boot time is around 1m20s;
+>
+>
+
+I'm aware of this, was investigating this for something similar
+internally. In your system and test, were you working with 1G pages, or
+2M pages?
+
+>> [1] https://lore.kernel.org/all/diqzplej4llh.fsf@ackerleytng-ctop.c.goog=
+lers.com/
 
