@@ -1,397 +1,247 @@
-Return-Path: <kvm+bounces-51263-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51264-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 833DEAF0D28
-	for <lists+kvm@lfdr.de>; Wed,  2 Jul 2025 09:51:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCABFAF0D44
+	for <lists+kvm@lfdr.de>; Wed,  2 Jul 2025 09:56:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 12BC37AC1E3
-	for <lists+kvm@lfdr.de>; Wed,  2 Jul 2025 07:48:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8E95A7B220A
+	for <lists+kvm@lfdr.de>; Wed,  2 Jul 2025 07:54:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 968C323370F;
-	Wed,  2 Jul 2025 07:49:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E921123184F;
+	Wed,  2 Jul 2025 07:55:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="oz3WEWgg";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="c6+OnuAK";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="oz3WEWgg";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="c6+OnuAK"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FqGxchHr"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 143FC22F770
-	for <kvm@vger.kernel.org>; Wed,  2 Jul 2025 07:49:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751442581; cv=none; b=ZYwJPSH2FydQN0rk0uA3UGw4Zrk3S72K5Bl7oWwzDwAz5q15BinnCeWY0wD/iRqYBoiOZR/S4n/QVIKqS3Rd8+K5r3QWFuiAYZjyL/okskqWtptfQ+B8baUJjuxBCwMXOF1hhqKUu+qoKmKYb3REXIHVM3CsxrmgHjXmS1oXxoU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751442581; c=relaxed/simple;
-	bh=90eOtoDZR87XEjTT5OSrKcgQ+qlNMG8Uc+U/vnDdH1w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CwwL8muaSjZaa1cZzxqA6xxLSncavHuvs1Fp8yi9aMDRRaxAN9/m7oaw/T36ed9dayiW3QQZazM0oJKg1YoyXaZraNgcCLxvdpx2p+GiieIKo7JovuxbdMbbzPCQxITR/eXdkdwxp5hXj4QIQtWY20er0xEd1FxNjsfELGYdBZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=oz3WEWgg; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=c6+OnuAK; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=oz3WEWgg; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=c6+OnuAK; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 31CD62111F;
-	Wed,  2 Jul 2025 07:49:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1751442577; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=5qgNZZo+UhrOw0qZY5yzCbxyS0sZdhvhyBwDFlNZPn0=;
-	b=oz3WEWggc4R2HbV+0+aBPK1Y4RXZcIi7eBbXCZ3EUjcEJYUISWyZOfEEQKRlJzF2QYtVtm
-	ZTzk4NmRlRThEsLY2ImfBhTn7L9aGgH6w0ndqs1uKk+QtPrRToWYrRK0yN8VZJlQuSeif6
-	YgR6+CZfcXqmuC5EkymSxi0yMWnlxEY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1751442577;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=5qgNZZo+UhrOw0qZY5yzCbxyS0sZdhvhyBwDFlNZPn0=;
-	b=c6+OnuAKYY9awBdfeywvmh/5Gc+JIqt5Hl6RyTduPv+ZgHTefqJqPsT5+irWeoLvJHFmYs
-	U82NN1d5cKdzJ3Dg==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=oz3WEWgg;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=c6+OnuAK
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1751442577; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=5qgNZZo+UhrOw0qZY5yzCbxyS0sZdhvhyBwDFlNZPn0=;
-	b=oz3WEWggc4R2HbV+0+aBPK1Y4RXZcIi7eBbXCZ3EUjcEJYUISWyZOfEEQKRlJzF2QYtVtm
-	ZTzk4NmRlRThEsLY2ImfBhTn7L9aGgH6w0ndqs1uKk+QtPrRToWYrRK0yN8VZJlQuSeif6
-	YgR6+CZfcXqmuC5EkymSxi0yMWnlxEY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1751442577;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=5qgNZZo+UhrOw0qZY5yzCbxyS0sZdhvhyBwDFlNZPn0=;
-	b=c6+OnuAKYY9awBdfeywvmh/5Gc+JIqt5Hl6RyTduPv+ZgHTefqJqPsT5+irWeoLvJHFmYs
-	U82NN1d5cKdzJ3Dg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 956D213A24;
-	Wed,  2 Jul 2025 07:49:36 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id s2TeIpDkZGjoQQAAD6G6ig
-	(envelope-from <tzimmermann@suse.de>); Wed, 02 Jul 2025 07:49:36 +0000
-Message-ID: <ef053350-975b-4685-8e09-0493d526801d@suse.de>
-Date: Wed, 2 Jul 2025 09:49:36 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99886200BA1;
+	Wed,  2 Jul 2025 07:55:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.9
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751442947; cv=fail; b=LOzEIt21o1Y7XCHn4kEXPVqeldnDjad9IO917KdK7niVFi2t73yQw7/2DigAFWT9zvT4eaQ1yKtrPbYQ1bBGPWpcFRtej4OOTgX9pRgxM6AqoNUkc2SwrDD+3s1wodE2+iGwcgQ8frM5qwdEMIJsqZ9zAaqNtK77MGBmn+ePzHE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751442947; c=relaxed/simple;
+	bh=q7Q7Jq1JIpzy56YmeTUZSKSRLNZDC1sXkYrrc0WoJhw=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=KQqTSU0WuXoaC5gHFrGJFU0uwfkXnu36eY37KtyYs1CCYDEA5IlaRw4YCks25INLyvlGq805o1w5rtH+f3WAhEBERy3ZjejquMhkpbBgHz90C1CRJyNguSBXRslTOOgoVJ//Zo0XFdSXSQ0OOmqt4Q6p1ixPRNTdGMUytJbx69M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FqGxchHr; arc=fail smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1751442946; x=1782978946;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=q7Q7Jq1JIpzy56YmeTUZSKSRLNZDC1sXkYrrc0WoJhw=;
+  b=FqGxchHrBb1v/+tfW6Yw3vJh0uuZhmV+Luo2XwKmFejDQ4GNiIsNOHTk
+   2QOXrZucJzfBUmU1SDz+Mhpy5hFlkmUBwM2BiOsKYrdR3j0BvCWrOgr2J
+   kj92e1IOud9nZe7DqdXqiHZVr+cRQVWjYiW5JWZLVx0+PfrOUfwtHQVJX
+   JSp/8Ko40xBVsB/RcGaFgw79McmkpIiJ6iMkGs82mu3dIBw/q6JxvYK5k
+   xdt5WTvVbH/gGFN3ZOWGISuQ1b8ad24kZ0Sw1/P++XXTRH5X3jfXEszRy
+   Dp5dFGwybQdqaoVIP4+N60Httjrqic+Nt9WnqJsAJ/hUN3xfPk+uBa4GS
+   Q==;
+X-CSE-ConnectionGUID: 9TEFQPBjScSLVivSHQGzrA==
+X-CSE-MsgGUID: CWS+DHlzQ+qv7XbpbLj2tQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11481"; a="64421616"
+X-IronPort-AV: E=Sophos;i="6.16,281,1744095600"; 
+   d="scan'208";a="64421616"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2025 00:55:44 -0700
+X-CSE-ConnectionGUID: zzTzT3NQR/CMmemX9Im/Kw==
+X-CSE-MsgGUID: ol0naELHQCqGmUF6lS5ysw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,281,1744095600"; 
+   d="scan'208";a="154088325"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by fmviesa006.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2025 00:55:43 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Wed, 2 Jul 2025 00:55:43 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25 via Frontend Transport; Wed, 2 Jul 2025 00:55:43 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (40.107.236.42)
+ by edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Wed, 2 Jul 2025 00:55:42 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Yp844wdDgLa/9jzVtTM3rKQGewiqiEJq3D/1wvAoMuBJhDvNBgJvaVzRl/4TxQDKSvWcrsix0z0fUru427eZXiK6BOpzVC8xzYhQOgJgTz5Yy54b066v2fWTAQSOn0tvRnvYJ7Huv4GbSoG6YPT8rGxd7QplIXxnu/6GvShX2CkYOP86QDkNXY4mLcvLAPCeweB9KIWrmr+Ongx6H0mkpfd/xsn23ndYT9KFgI9i+nz4bCA+aLjCQlLv6qu0gu2nbFEmvCm6pXzVzwYBXVcbUV//XszxNG8A/gUWxWvbX1pxQ6Z0t94CgwTvRqcq7h7bauM077EOuwCRgv7OTDsiRw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=YG3ZoaNkvH0G9xHejdNAfdMNo5K33aNNeu7c0PfIjik=;
+ b=xKrmnvq9XoU1g6NpWLWebiobHsiJCrtY82RjQ75jaRQItrSP7a4kD34fz7k9LGaNgPTYl0YJ8CIHlpB6/GxTZhJ1yozMuYhb76we4dNzWOT/bir+U7f7KrLuQLSQtgHkjSbFl2HO7gvtOmJfgmKsVs2ygjPBXZGktzLQfS9favjaaMZv+Gg38X0gZK2wZ5ZRXsKO2Twe5QZiDSVrPLxM5esVA58ophg9g0iSuPVGhn4fwUhBSXvXkRyIE0B1xx6D2gpLXdDsA6SnH0wnPDZPw7w721QumT2ibhJ/ETOFvtDrJr853QBM10kFHeL0Rpn+K2366JLNlzBcZTJpn6i+hg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
+ by SA3PR11MB8047.namprd11.prod.outlook.com (2603:10b6:806:2fc::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8901.20; Wed, 2 Jul
+ 2025 07:55:13 +0000
+Received: from CH3PR11MB8660.namprd11.prod.outlook.com
+ ([fe80::cfad:add4:daad:fb9b]) by CH3PR11MB8660.namprd11.prod.outlook.com
+ ([fe80::cfad:add4:daad:fb9b%5]) with mapi id 15.20.8835.025; Wed, 2 Jul 2025
+ 07:55:12 +0000
+Date: Wed, 2 Jul 2025 15:54:59 +0800
+From: Chao Gao <chao.gao@intel.com>
+To: Kai Huang <kai.huang@intel.com>
+CC: <dave.hansen@intel.com>, <bp@alien8.de>, <tglx@linutronix.de>,
+	<peterz@infradead.org>, <mingo@redhat.com>, <hpa@zytor.com>,
+	<thomas.lendacky@amd.com>, <x86@kernel.org>,
+	<kirill.shutemov@linux.intel.com>, <rick.p.edgecombe@intel.com>,
+	<linux-kernel@vger.kernel.org>, <pbonzini@redhat.com>, <seanjc@google.com>,
+	<kvm@vger.kernel.org>, <reinette.chatre@intel.com>,
+	<isaku.yamahata@intel.com>, <dan.j.williams@intel.com>,
+	<ashish.kalra@amd.com>, <nik.borisov@suse.com>, <sagis@google.com>, "Farrah
+ Chen" <farrah.chen@intel.com>
+Subject: Re: [PATCH v3 6/6] KVM: TDX: Explicitly do WBINVD upon reboot
+ notifier
+Message-ID: <aGTl09wV1Kt6b0Hz@intel.com>
+References: <cover.1750934177.git.kai.huang@intel.com>
+ <6cc612331718a8bdaae9ee7071b6a360d71f2ab8.1750934177.git.kai.huang@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <6cc612331718a8bdaae9ee7071b6a360d71f2ab8.1750934177.git.kai.huang@intel.com>
+X-ClientProxiedBy: SG2P153CA0043.APCP153.PROD.OUTLOOK.COM (2603:1096:4:c6::12)
+ To CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 9/9] PCI: Add a new 'boot_display' attribute
-To: Mario Limonciello <superm1@kernel.org>, David Airlie <airlied@gmail.com>
-Cc: Alex Deucher <alexander.deucher@amd.com>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Simona Vetter <simona@ffwll.ch>, Lukas Wunner <lukas@wunner.de>,
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
- Maxime Ripard <mripard@kernel.org>, David Woodhouse <dwmw2@infradead.org>,
- Lu Baolu <baolu.lu@linux.intel.com>, Joerg Roedel <joro@8bytes.org>,
- Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
- "open list:DRM DRIVERS" <dri-devel@lists.freedesktop.org>,
- open list <linux-kernel@vger.kernel.org>,
- "open list:INTEL IOMMU (VT-d)" <iommu@lists.linux.dev>,
- "open list:PCI SUBSYSTEM" <linux-pci@vger.kernel.org>,
- "open list:VFIO DRIVER" <kvm@vger.kernel.org>,
- "open list:SOUND" <linux-sound@vger.kernel.org>,
- Daniel Dadap <ddadap@nvidia.com>,
- Mario Limonciello <mario.limonciello@amd.com>,
- Bjorn Helgaas <bhelgaas@google.com>
-References: <20250627043108.3141206-1-superm1@kernel.org>
- <20250627043108.3141206-10-superm1@kernel.org>
- <41587824-4a05-4ead-b24c-4729007cd663@suse.de>
- <8878af70-3eb8-495b-b8df-43a10285c4f5@kernel.org>
- <732aeb75-71e7-49e7-a5f2-2080ee94a273@suse.de>
- <8f9efe23-c774-477d-97ad-8e22532ad6b2@kernel.org>
-Content-Language: en-US
-From: Thomas Zimmermann <tzimmermann@suse.de>
-Autocrypt: addr=tzimmermann@suse.de; keydata=
- xsBNBFs50uABCADEHPidWt974CaxBVbrIBwqcq/WURinJ3+2WlIrKWspiP83vfZKaXhFYsdg
- XH47fDVbPPj+d6tQrw5lPQCyqjwrCPYnq3WlIBnGPJ4/jreTL6V+qfKRDlGLWFjZcsrPJGE0
- BeB5BbqP5erN1qylK9i3gPoQjXGhpBpQYwRrEyQyjuvk+Ev0K1Jc5tVDeJAuau3TGNgah4Yc
- hdHm3bkPjz9EErV85RwvImQ1dptvx6s7xzwXTgGAsaYZsL8WCwDaTuqFa1d1jjlaxg6+tZsB
- 9GluwvIhSezPgnEmimZDkGnZRRSFiGP8yjqTjjWuf0bSj5rUnTGiyLyRZRNGcXmu6hjlABEB
- AAHNJ1Rob21hcyBaaW1tZXJtYW5uIDx0emltbWVybWFubkBzdXNlLmRlPsLAjgQTAQgAOAIb
- AwULCQgHAgYVCgkICwIEFgIDAQIeAQIXgBYhBHIX+6yM6c9jRKFo5WgNwR1TC3ojBQJftODH
- AAoJEGgNwR1TC3ojx1wH/0hKGWugiqDgLNXLRD/4TfHBEKmxIrmfu9Z5t7vwUKfwhFL6hqvo
- lXPJJKQpQ2z8+X2vZm/slsLn7J1yjrOsoJhKABDi+3QWWSGkaGwRJAdPVVyJMfJRNNNIKwVb
- U6B1BkX2XDKDGffF4TxlOpSQzdtNI/9gleOoUA8+jy8knnDYzjBNOZqLG2FuTdicBXblz0Mf
- vg41gd9kCwYXDnD91rJU8tzylXv03E75NCaTxTM+FBXPmsAVYQ4GYhhgFt8S2UWMoaaABLDe
- 7l5FdnLdDEcbmd8uLU2CaG4W2cLrUaI4jz2XbkcPQkqTQ3EB67hYkjiEE6Zy3ggOitiQGcqp
- j//OwE0EWznS4AEIAMYmP4M/V+T5RY5at/g7rUdNsLhWv1APYrh9RQefODYHrNRHUE9eosYb
- T6XMryR9hT8XlGOYRwKWwiQBoWSDiTMo/Xi29jUnn4BXfI2px2DTXwc22LKtLAgTRjP+qbU6
- 3Y0xnQN29UGDbYgyyK51DW3H0If2a3JNsheAAK+Xc9baj0LGIc8T9uiEWHBnCH+RdhgATnWW
- GKdDegUR5BkDfDg5O/FISymJBHx2Dyoklv5g4BzkgqTqwmaYzsl8UxZKvbaxq0zbehDda8lv
- hFXodNFMAgTLJlLuDYOGLK2AwbrS3Sp0AEbkpdJBb44qVlGm5bApZouHeJ/+n+7r12+lqdsA
- EQEAAcLAdgQYAQgAIAIbDBYhBHIX+6yM6c9jRKFo5WgNwR1TC3ojBQJftOH6AAoJEGgNwR1T
- C3ojVSkIALpAPkIJPQoURPb1VWjh34l0HlglmYHvZszJWTXYwavHR8+k6Baa6H7ufXNQtThR
- yIxJrQLW6rV5lm7TjhffEhxVCn37+cg0zZ3j7zIsSS0rx/aMwi6VhFJA5hfn3T0TtrijKP4A
- SAQO9xD1Zk9/61JWk8OysuIh7MXkl0fxbRKWE93XeQBhIJHQfnc+YBLprdnxR446Sh8Wn/2D
- Ya8cavuWf2zrB6cZurs048xe0UbSW5AOSo4V9M0jzYI4nZqTmPxYyXbm30Kvmz0rYVRaitYJ
- 4kyYYMhuULvrJDMjZRvaNe52tkKAvMevcGdt38H4KSVXAylqyQOW5zvPc4/sq9c=
-In-Reply-To: <8f9efe23-c774-477d-97ad-8e22532ad6b2@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-4.51 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FREEMAIL_TO(0.00)[kernel.org,gmail.com];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCPT_COUNT_TWELVE(0.00)[25];
-	TO_DN_ALL(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	RCVD_TLS_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received,2a07:de40:b281:104:10:150:64:97:from];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	MID_RHS_MATCH_FROM(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:email,suse.de:dkim,suse.de:mid,suse.de:email,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns]
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Rspamd-Queue-Id: 31CD62111F
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spam-Score: -4.51
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR11MB8660:EE_|SA3PR11MB8047:EE_
+X-MS-Office365-Filtering-Correlation-Id: 277bb017-2404-4242-7d82-08ddb93dc5fc
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?tjkSAVn1bH7uYnwJWqVna7j7iNFNvxxtP6iMz/HQtAuEswr7KtnhmW4OYSiP?=
+ =?us-ascii?Q?oSMmDldPTbkmZGRp3DeHUwE9L3cNiv6FqxVWwWpXlb1G0LQQqq12xQdTpFKN?=
+ =?us-ascii?Q?PNRyCBBMw6xOqz8cG+ujbru6oA8ODsQeInoijHX4a7Psx9ruWiYDjG5Dn+ga?=
+ =?us-ascii?Q?97qkLZrswRNybbLJr+3QYzrV/zp7UPHGz3Kp5ux2no7kQip5Q7cm0rq7UMRp?=
+ =?us-ascii?Q?bqQ86aGxA/G+j0l/pRuE+gchz5WcoagHAH0r4l/Ecj7NGTUBNFNmXnBE95rt?=
+ =?us-ascii?Q?cKMimQkRFtthva1C4JBUgw2BW5BYWWPAJXCyzSQZ7pRNR/ufJQWMgis1QQ5k?=
+ =?us-ascii?Q?ZXgGaSryjUivD1JLGsM+JHwIp75Mf6awBfFP4llAtAQe+ertZymatJFSaevg?=
+ =?us-ascii?Q?eIH87nlPWVn6th2/qoirtSYw3acBBCOp8nRY9P9H524vH8XnDIX8/8Ox93N2?=
+ =?us-ascii?Q?8O2IunhAkfr32vBUbgCtwL5LvnpGnsRJxHVwJ3Q9OmyFx705q68qj8rj+p4x?=
+ =?us-ascii?Q?SgtXD8DQXlv3obIf+cO9xOJ5I0g1myVf8+zAz3gwdn8E/YZWntAok15zNWpF?=
+ =?us-ascii?Q?1R7y53uU11TmYtetpVvEua4fw5gjs7FDMlkQVwMVF5r3genQIEj0cFRh20nM?=
+ =?us-ascii?Q?/ID9dQIxoHnBEGNpQLdMcNH6xjSvq60VNiTQYZny6W+zVIRW4Zmr5muR06k5?=
+ =?us-ascii?Q?hQ47vbAvDTr1L13Uq4k4X6lESXoYZ6pWlnVYFBytB1Fbr6+f4taKFmkG0/Ov?=
+ =?us-ascii?Q?gApcNDQLZpFbfG2FEOmQjz++ykfDoKln2ZxmBl+D/f83n8zmKbdbZ2qmwCNk?=
+ =?us-ascii?Q?UimXGTrFbKWmFwUPOFScNiEDl4X4cNlaQZcMw5+mMmtxuuiXxeeJ+f8dEOgf?=
+ =?us-ascii?Q?prnmwJDHJ5QZzles3860mdI+LB2/DVbIz1anwz+FMEOvUMAHjWcKZhY1lKnh?=
+ =?us-ascii?Q?wkkOnLuZrwxKju5O5lMR2HrivSnlWMNyoCYfE4ihkxpQsoDU1BiWmvGizBG3?=
+ =?us-ascii?Q?RaMTOWtlQTjtIcguMQThU2vXqV+PRltDs4H4RoS6bVrqkKG7SVwuVUYtyGEV?=
+ =?us-ascii?Q?GcRhwdMa5qDiAhc1KXzJdBEGVFI05EadyPootyib+6njZQ13kGhMiz24Kevl?=
+ =?us-ascii?Q?n0KFNLWiuCdnTwG8+rp1RNFuJVopoUsvBKd6Ru61eAZ+x9Q4sN3X0Jfr6N3C?=
+ =?us-ascii?Q?rF48s2OVyCoqVCOfoh8jFHVEQphMT1lJQTrPZ6YpxYPi4rouGMtPJ5AgMBYB?=
+ =?us-ascii?Q?n7X0FMC7f2b3VYJ2TBQT8XhsxKArZ3Qc+s1jhsDeElEEOgZXg8RI4eWGQpPd?=
+ =?us-ascii?Q?DVTu85pjX+HuIwU6rXIbQkYUFu2Aro5dhpFDYidQsLOO/V2o2aaHLRyktcQY?=
+ =?us-ascii?Q?1zD3tv2LAzTKvjZB04f8D4DegzIhAqstgWxQ79HwLUHgl72osKelaOXKjprj?=
+ =?us-ascii?Q?ooZy4VTOjtg=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8660.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?5ryE5+GXkQ4647lQ+cHThGXzTvhzlUiG2AdKishNgtw499m9HUHyaaIZapOn?=
+ =?us-ascii?Q?pk599ALiG1FTOi4/8I/QqM1W+yV/NoHVOB/fUcRYtNSssXBhuciipW67CkQT?=
+ =?us-ascii?Q?r3nttFm1YB8Ohny+rSc/lXwlAz9q2PBgMgcRmPQ2CD8fmTti4OpwOBSojZQp?=
+ =?us-ascii?Q?deDGm+1xGxJ5Hj3xR+Rf8aXtSAd4moHloQPTyv8OibV+unX97H3NwNKaKoJy?=
+ =?us-ascii?Q?BxVaKHHpbZgeNoiK9+bhIB9llN/T5LU+fcWYFpo0NFh8+K5qyOILMVvOOHT2?=
+ =?us-ascii?Q?hIH9NYWFzlMoIDQT85anZFu28XSpEyPYZYqB0ra1jOI29xyzUsMDXdPv877/?=
+ =?us-ascii?Q?LBkRHGBbJ9NOj0RRQ0wejdxUx0EZajyNj+WjzkQ1Gf1aave9kk/qfmXXFhOp?=
+ =?us-ascii?Q?U/zpvPI5tES26tvm537bjrB48unHyLVG9tPjsQ/h/PSNRJZJEDKNwOemrWKL?=
+ =?us-ascii?Q?1LHSkObTXF2y4gq9swu52vGAw7N9HZScpEk2CvRtNNZmPXrWOcOVW9ZizWGs?=
+ =?us-ascii?Q?B1PeAWtHm6NU6+Ye+wFdhYT9PMQRNH64grQsK/CBNM62VqBKb8CmCurFm0VX?=
+ =?us-ascii?Q?XHVmvzJ5tOtzuwC7V6WMqehYoaENf6iBDZ3UrJ1XxvvjsOs1avRkdY5/Xe1M?=
+ =?us-ascii?Q?nYwFiiRpH6uvgdhhNGobQD/dAeCedM7BY5kG5/Xf6WzsMaBxjPighwnCp3CI?=
+ =?us-ascii?Q?DwfeCugDJmx0qldWb8D6RJmDj/c+nhOIMycnhipArDVbxcWPykRLK/r17/QM?=
+ =?us-ascii?Q?U109pCD83zrE7kYmXhjKIgn94ghfN79slfYL0m9c0f8U8+j02LkPErYmTrly?=
+ =?us-ascii?Q?xveZ75590ZG8vw29xigrKrE/6aepplH02LgdYz1aPd/JsSjhw/AwrBD/7V0l?=
+ =?us-ascii?Q?OxTx1Ij5feDBBGjuwrHjLx/+piTpUwgMPzXSwGg/E8pf48PZv91uSPN8+7LJ?=
+ =?us-ascii?Q?in6MffEVv6AM0LKJK+2SKNA8GPxKD2fWuZYAB4bmarQwcgq48cpW4H5UvXMm?=
+ =?us-ascii?Q?oj4wF8kFhVFi4sIUgFwkDLOfRzeQDKJU36Vy5NhBdhZ+ZSO4MP9eVhAnpr4V?=
+ =?us-ascii?Q?Ofbp33hNs8Cv6zHJU9lDfJD8ECTkp+8TNjiQ2RCqNqNK1Nq0u3CU6iMvTzqF?=
+ =?us-ascii?Q?ZXuQb/KT/bo1LCZtfEUOInAYSP3AZjp4i2d9C7nQo2ChqykKGa+VfX8GtjxX?=
+ =?us-ascii?Q?9VXRXzBVPaA7Z7zmzkvEJuZDzl7x00URIqtHEXF3tHUPzUU2MRZQFJm8LXCH?=
+ =?us-ascii?Q?iFl94g4CZsKMQJ8MN3lpDlbDZxaL03zqmeyiAsiT5f8ngkGKkKQGmBFXQZUK?=
+ =?us-ascii?Q?P4CglB5FkrE6+QzwHaEHG0EQ4ZNfaiqsD0lG/5lywvY9ml5QJXTDYqdNq1Rx?=
+ =?us-ascii?Q?rgfqUVj8ZZJFnf3dQaRkwGVrkIWuH2jcom7Scl1MfICzZwIol0OxjmNkpV3q?=
+ =?us-ascii?Q?so+Cl9W8F+Oa4hH7Z48g3fX7vnfcEneWWhnZ2ZseAT/01dd5Fh+7haPeUB77?=
+ =?us-ascii?Q?dVzdlr/jSmw/neNEHgRVc4FukyiPqjsp96bP5qio2CYEiqek2qM6nEF9X2pK?=
+ =?us-ascii?Q?BiDu11GLzgqJ/QfGlzLjfkE5p0HOl3wSoizGYXG8?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 277bb017-2404-4242-7d82-08ddb93dc5fc
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8660.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jul 2025 07:55:12.7006
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: jGnot7xYVND+2WBDHf5CgX+0UZqJvuj/pi+msLw90McB5gSEbCTDJwFakpjMRfSlRei+VCGIab2SgwZTIJC9mg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR11MB8047
+X-OriginatorOrg: intel.com
 
-Hi
+>--- a/arch/x86/virt/vmx/tdx/tdx.c
+>+++ b/arch/x86/virt/vmx/tdx/tdx.c
+>@@ -1870,3 +1870,12 @@ u64 tdh_phymem_page_wbinvd_hkid(u64 hkid, struct page *page)
+> 	return seamcall(TDH_PHYMEM_PAGE_WBINVD, &args);
+> }
+> EXPORT_SYMBOL_GPL(tdh_phymem_page_wbinvd_hkid);
+>+
+>+void tdx_cpu_flush_cache(void)
+>+{
+>+	lockdep_assert_preemption_disabled();
+>+
+>+	wbinvd();
 
-Am 30.06.25 um 20:37 schrieb Mario Limonciello:
-> On 6/30/2025 2:24 AM, Thomas Zimmermann wrote:
->> Hi
->>
->> Am 27.06.25 um 17:37 schrieb Mario Limonciello:
->>> On 6/27/2025 2:07 AM, Thomas Zimmermann wrote:
->>>> Hi
->>>>
->>>> Am 27.06.25 um 06:31 schrieb Mario Limonciello:
->>>>> From: Mario Limonciello <mario.limonciello@amd.com>
->>>>>
->>>>> On systems with multiple GPUs there can be uncertainty which GPU 
->>>>> is the
->>>>> primary one used to drive the display at bootup. In order to 
->>>>> disambiguate
->>>>> this add a new sysfs attribute 'boot_display' that uses the output of
->>>>> video_is_primary_device() to populate whether a PCI device was 
->>>>> used for
->>>>> driving the display.
->>>>>
->>>>> Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
->>>>> ---
->>>>> v6:
->>>>>   * Only show for the device that is boot display
->>>>>   * Only create after PCI device sysfs files are initialized to 
->>>>> ensure
->>>>>     that resources are ready.
->>>>> v4:
->>>>>   * new patch
->>>>> ---
->>>>>   Documentation/ABI/testing/sysfs-bus-pci |  8 +++++
->>>>>   drivers/pci/pci-sysfs.c                 | 46 
->>>>> +++++++++++++++++++++ ++++
->>>>
->>>> The code looks good. Just one more question: could this be added 
->>>> independently from the PCI bus (at a reasonable cost)? There are 
->>>> other busses that can host the boot display. Alternatively, we'd 
->>>> add this attribute per bus as needed.
->>>
->>> It depends upon the underlying hardware implementation.  On x86 it's 
->>> always PCI and so I realized there is a requirement that PCI 
->>> resources are setup before screen_info event works.
->>>
->>> That is the v5 version of this patch would have had a potential race 
->>> condition with userspace where boot_display didn't always show '1' 
->>> if userspace read it too quickly.
->>>
->>> Other architecture's hardware implementation might have similar 
->>> problem.
->>>
->>> So in summary I think it would be better to do it per-bus.  If we 
->>> realize there is indeed code duplication we can always move this to 
->>> a common helper at that point.
->>
->> Ok, makes sense. With the kernel test robot's issues fixed:
->>
->> Reviewed-by: Thomas Zimmermann <tzimmermann@suse.de>
->
-> Thanks, I've got a fix locally for it.
->>
->> I guess that interface also needs some sort of OK from user-space devs?
->>
->
-> Who needs to OK it?  I do have MR's for matching userspace 
-> implementations mentioned in the cover letter already.
+Shouldn't you check the per-CPU variable first? so that WBINVD can be
+skipped if there is nothing incoherent.
 
-The MRs are the right place. Maybe ask Dave Airlie for a comment. He was 
-most outspoken against the original approach.
+And reboot notifier looks the wrong place for WBINVD. Because SEAMCALLs
+(see below) called after the reboot notifier will set the per-CPU variable
+again. So in some cases, this patch will result in an *extra* WBINVD
+instead of moving WBINVD to an earlier stage.
 
-Best regards
-Thomas
+kernel_kexec()
+  ->kernel_restart_prepare()
+    ->blocking_notifier_call_chain() // reboot notifier
+  ->syscore_shutdown()
+    -> ...
+      ->tdx_disable_virtualization_cpu()
+        ->tdx_flush_vp()
 
->
->> Best regards
->> Thomas
->>
->>>
->>>>
->>>> Best regards
->>>> Thomas
->>>>
->>>>>   2 files changed, 54 insertions(+)
->>>>>
->>>>> diff --git a/Documentation/ABI/testing/sysfs-bus-pci b/ 
->>>>> Documentation/ ABI/testing/sysfs-bus-pci
->>>>> index 69f952fffec72..8b455b1a58852 100644
->>>>> --- a/Documentation/ABI/testing/sysfs-bus-pci
->>>>> +++ b/Documentation/ABI/testing/sysfs-bus-pci
->>>>> @@ -612,3 +612,11 @@ Description:
->>>>>             # ls doe_features
->>>>>             0001:01        0001:02        doe_discovery
->>>>> +
->>>>> +What:        /sys/bus/pci/devices/.../boot_display
->>>>> +Date:        October 2025
->>>>> +Contact:    Linux PCI developers <linux-pci@vger.kernel.org>
->>>>> +Description:
->>>>> +        This file indicates the device was used as a boot
->>>>> +        display. If the device was used as the boot display, the 
->>>>> file
->>>>> +        will be present and contain "1".
->>>>> diff --git a/drivers/pci/pci-sysfs.c b/drivers/pci/pci-sysfs.c
->>>>> index 268c69daa4d57..cc766461de1da 100644
->>>>> --- a/drivers/pci/pci-sysfs.c
->>>>> +++ b/drivers/pci/pci-sysfs.c
->>>>> @@ -30,6 +30,7 @@
->>>>>   #include <linux/msi.h>
->>>>>   #include <linux/of.h>
->>>>>   #include <linux/aperture.h>
->>>>> +#include <asm/video.h>
->>>>>   #include "pci.h"
->>>>>   #ifndef ARCH_PCI_DEV_GROUPS
->>>>> @@ -679,6 +680,13 @@ const struct attribute_group *pcibus_groups[] 
->>>>> = {
->>>>>       NULL,
->>>>>   };
->>>>> +static ssize_t boot_display_show(struct device *dev, struct 
->>>>> device_attribute *attr,
->>>>> +                 char *buf)
->>>>> +{
->>>>> +    return sysfs_emit(buf, "1\n");
->>>>> +}
->>>>> +static DEVICE_ATTR_RO(boot_display);
->>>>> +
->>>>>   static ssize_t boot_vga_show(struct device *dev, struct 
->>>>> device_attribute *attr,
->>>>>                    char *buf)
->>>>>   {
->>>>> @@ -1246,6 +1254,37 @@ static int pci_create_attr(struct pci_dev 
->>>>> *pdev, int num, int write_combine)
->>>>>       return 0;
->>>>>   }
->>>>> +/**
->>>>> + * pci_create_boot_display_file - create a file in sysfs for @dev
->>>>> + * @pdev: dev in question
->>>>> + *
->>>>> + * Creates a file `boot_display` in sysfs for the PCI device @pdev
->>>>> + * if it is the boot display device.
->>>>> + */
->>>>> +static int pci_create_boot_display_file(struct pci_dev *pdev)
->>>>> +{
->>>>> +#ifdef CONFIG_VIDEO
->>>>> +    if (video_is_primary_device(&pdev->dev))
->>>>> +        return sysfs_create_file(&pdev->dev.kobj, 
->>>>> &dev_attr_boot_display.attr);
->>>>> +#endif
->>>>> +    return 0;
->>>>> +}
->>>>> +
->>>>> +/**
->>>>> + * pci_remove_boot_display_file - remove the boot display file 
->>>>> for @dev
->>>>> + * @pdev: dev in question
->>>>> + *
->>>>> + * Removes the file `boot_display` in sysfs for the PCI device @pdev
->>>>> + * if it is the boot display device.
->>>>> + */
->>>>> +static void pci_remove_boot_display_file(struct pci_dev *pdev)
->>>>> +{
->>>>> +#ifdef CONFIG_VIDEO
->>>>> +    if (video_is_primary_device(&pdev->dev))
->>>>> +        sysfs_remove_file(&pdev->dev.kobj, 
->>>>> &dev_attr_boot_display.attr);
->>>>> +#endif
->>>>> +}
->>>>> +
->>>>>   /**
->>>>>    * pci_create_resource_files - create resource files in sysfs 
->>>>> for @dev
->>>>>    * @pdev: dev in question
->>>>> @@ -1654,9 +1693,15 @@ static const struct attribute_group 
->>>>> pci_dev_resource_resize_group = {
->>>>>   int __must_check pci_create_sysfs_dev_files(struct pci_dev *pdev)
->>>>>   {
->>>>> +    int retval;
->>>>> +
->>>>>       if (!sysfs_initialized)
->>>>>           return -EACCES;
->>>>> +    retval = pci_create_boot_display_file(pdev);
->>>>> +    if (retval)
->>>>> +        return retval;
->>>>> +
->>>>>       return pci_create_resource_files(pdev);
->>>>>   }
->>>>> @@ -1671,6 +1716,7 @@ void pci_remove_sysfs_dev_files(struct 
->>>>> pci_dev *pdev)
->>>>>       if (!sysfs_initialized)
->>>>>           return;
->>>>> +    pci_remove_boot_display_file(pdev);
->>>>>       pci_remove_resource_files(pdev);
->>>>>   }
->>>>
->>>
->>
->
+>+	this_cpu_write(cache_state_incoherent, false);
+>+}
+>+EXPORT_SYMBOL_GPL(tdx_cpu_flush_cache);
 
--- 
---
-Thomas Zimmermann
-Graphics Driver Developer
-SUSE Software Solutions Germany GmbH
-Frankenstrasse 146, 90461 Nuernberg, Germany
-GF: Ivo Totev, Andrew Myers, Andrew McDonald, Boudien Moerman
-HRB 36809 (AG Nuernberg)
+I wonder why we don't simply perform WBINVD in
+vt_disable_virtualization_cpu() after VMXOFF, i.e.,
 
+diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+index d1e02e567b57..1ad3c28b8eff 100644
+--- a/arch/x86/kvm/vmx/main.c
++++ b/arch/x86/kvm/vmx/main.c
+@@ -19,6 +19,8 @@ static void vt_disable_virtualization_cpu(void)
+	if (enable_tdx)
+		tdx_disable_virtualization_cpu();
+	vmx_disable_virtualization_cpu();
++	/* Explain why WBINVD is needed */
++	if (enable_tdx)
++		wbinvd();
+ }
+ 
+ static __init int vt_hardware_setup(void)
+
+It can solve the cache line aliasing problem and is much simpler than
+patches 1-2 and 6.
 
