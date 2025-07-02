@@ -1,202 +1,170 @@
-Return-Path: <kvm+bounces-51295-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51296-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CD3DAF5946
-	for <lists+kvm@lfdr.de>; Wed,  2 Jul 2025 15:34:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34F58AF5A37
+	for <lists+kvm@lfdr.de>; Wed,  2 Jul 2025 15:54:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AAF474E3A9B
-	for <lists+kvm@lfdr.de>; Wed,  2 Jul 2025 13:34:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 937EF164A41
+	for <lists+kvm@lfdr.de>; Wed,  2 Jul 2025 13:54:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85A12283CBF;
-	Wed,  2 Jul 2025 13:25:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 566CE280309;
+	Wed,  2 Jul 2025 13:54:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fEcHzlCz"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vW5p+89B"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 537F3280A52
-	for <kvm@vger.kernel.org>; Wed,  2 Jul 2025 13:25:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BA2B27A122
+	for <kvm@vger.kernel.org>; Wed,  2 Jul 2025 13:54:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751462720; cv=none; b=oAujhvTBGqmQn7dRPcWXs2s3kVnxkGZDR8qQj58Aj8X6RxMjz02GB1/9caqZx5w3dp7xyU3ojJ5q8s0fqlSAxhbKUAHCsWjqiyBdSySv8xXsqhvH9VixnmZ3HbTUHLIYOCG5IzoUIjny6cYMSO2Od0GOaCiX4oJes6I+V+DOmd0=
+	t=1751464465; cv=none; b=dbE+AjdYfj83oOLOKnHtwqIdoOeU/mugsT1ehg5shD5kaltMbFXGeOdc6st3VcmQFYu3OyxQSw9g1nNJcdaoVgzPa9R+DGCrM4WnoI9k6Yp4yMIe2IPHw/H9Pma1ODldgCBCP0brocZSMwGcvBqTNpfdIuzp0XnExXf1P3lDrKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751462720; c=relaxed/simple;
-	bh=MdRMMy04lIaDZD3VtMFnBPIPBh10oPPKF2nlCw+gDhM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TRXFamJbHH520TafFhyxuU7gKlsd2SFdgg0cy9EPvluuv/s1JFEjJViP+U/COQO5dbHv2mFELc4PxKTgs46s/3rHlvZ7ORxBIRwgfZkKCbwHvC/pNYpzEovIU2mA/Ctx4dWky1E25DJDcYvtdF4WcIkTDImgPrCBR9gS7JXMcHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fEcHzlCz; arc=none smtp.client-ip=95.215.58.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Wed, 2 Jul 2025 15:25:11 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1751462716;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2AtJHOMqWJ6F384E1w5rTvvzxDPe7+FoXKxbqUWmqh0=;
-	b=fEcHzlCzoPeE8qMosDj/PqdbnAnnkrLQNiWkgozTiYWQq6moOFQNZ4ULGlSvdSNKqwQ4S9
-	nMXZblScAuwIsDzDRl15678OpFRLRdgz43IY9yL+B+sgJrH05LN+7X+kCVgKG4C/cwuq8I
-	Jkon6MWpJl2/v5wgBBDf4twpORJobbg=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: eric.auger@redhat.com, lvivier@redhat.com, thuth@redhat.com, 
-	frankja@linux.ibm.com, imbrenda@linux.ibm.com, nrb@linux.ibm.com, david@redhat.com, 
-	pbonzini@redhat.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org, 
-	will@kernel.org, julien.thierry.kdev@gmail.com, maz@kernel.org, 
-	oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, joey.gouly@arm.com, 
-	andre.przywara@arm.com, shahuang@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v4 00/13] arm/arm64: Add kvmtool to the
- runner script
-Message-ID: <20250702-c37fbf095d2665019da2c037@orel>
-References: <20250625154813.27254-1-alexandru.elisei@arm.com>
+	s=arc-20240116; t=1751464465; c=relaxed/simple;
+	bh=JYcMfo/FRV0MXHDD6f3JXpyZw1uOm6GKaDPQ9wemazA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ptC3QwdRcerysrOBIqyyC0sF06wBEt3oK43zlVb7AB0sPT9ompXiSllXx88fb7JIR5qrz1H0YSa8j385KGMwt7nxiaNRCgL+wL2LlXiS6enHQTGngVgDrd0nL3MF8h8vzEtiz1mWercpzoEatS+Ez51E15J0b8vmBoB5IicGHv4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vW5p+89B; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-237f18108d2so416335ad.0
+        for <kvm@vger.kernel.org>; Wed, 02 Jul 2025 06:54:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1751464463; x=1752069263; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kJKh0bhmf7f4ICuPLjZddH/eg+QtQRmvEhkym3b4VZM=;
+        b=vW5p+89BxMEqixi/n3Unclc2DoAPPx7T0yzcZIbQMWq+fgM9MupOABCb3C63QIPNy8
+         3NNXf/r5Tzk/fHKVTrklfRXjMsbk9p88aLChECA4u5JmSau48iJk6aaEPTC/XVl/x2V/
+         iA4/Ucl3LS95JVVzIjPU1hYBTosJp2D5afZVk0zxsp5+a5VJS51pnL/fo0NqUnvzzrcs
+         PCRYewa2ENjR+WvisU6K/OwebjDX8uiv8GeNNmyrmra69KgHM4IAeGMBy6p5/mBZt+qO
+         Qy0alvNaZUOIFx9GX2+jcttyIG+aYFKn6XgYJG3ccEreFo7qbr+xbzOcwHcVF01MXiP6
+         D+yw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751464463; x=1752069263;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kJKh0bhmf7f4ICuPLjZddH/eg+QtQRmvEhkym3b4VZM=;
+        b=Ha/Kz6dsuJ9oISdIGAe/xpb0z8HRA8U5h2EdHNLkL3mFbfke6cdKWklwPmGc3wpxoT
+         RV53Y/fiFGwLFYykU6FeUhilew1GG4tok1FGuJQoEB0UUO8n82SuYTNB+85imk6Qo/fn
+         wNUHFfY0hFHU1fJGuiieXbE15M2VZuc/2waj/1OlMP8BiCoXBaD5QrgcfOZT+QdMFjsg
+         M3+znD2obTlBY6j5Vxbikgrj/LsuEIpzEDBOq+0tQAYVaFk3+jbQeQn1Iw4Pkd8P1qvE
+         jtMmW8GBgELFxVLvA8l6YRGCTPSpOHJ6lR/iqjtK6qYSqKL4sXqiOuX5CS8pIXL4IBkw
+         /cUA==
+X-Forwarded-Encrypted: i=1; AJvYcCXG8dVYMImnnTAOkteLu7SQN61aicx5Jetb6/7c5meHIrq5uxuQvT+lAxsdvmyseSVkMGo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyYcdSB+8MmF7lA5lEtrxfLvSh+4pPd0ky116058f/afBAvYQRo
+	E/LuTD5hzIhiRaI75P6dp85fwbS597WBmJ4UmVnA1FVqJT9H8Wq+vf6ReIt3YxjerLQDp2k7PN4
+	0f7WxTG8Om1Vdbd1F+dRQmXHKIMvk7Da2CrM+ZbGBTRIjA6toKQngribJIVo=
+X-Gm-Gg: ASbGncvVXx8AKcqC30PoWxNfHijIBixASPpDKUH39QNjLOugF7LzDvgK62nMKgeTOr+
+	G2OH1wJOd66HaIBvof48zrwcpctxv1mdGWNzDDT8KkzfRlWKFS9WEAswN4cWxx9LnT7dkPKfaBX
+	hDt//3AkCG3Rqka3QOBpL2DEXXKPXpjOVKPXn4+XWGy9MOxsINATcLk0cLr0cBjjTM7en3qFz/h
+	Jch
+X-Google-Smtp-Source: AGHT+IHkpkBgJvS1R3RkrtvsvOEZZf/jKPLYOGmrsQsZdhoqLh6xPOUqe8mNaDmp8JgFozGwZ+2Sa6aXZMCU210+49A=
+X-Received: by 2002:a17:903:1ac5:b0:215:9ab0:402 with SMTP id
+ d9443c01a7336-23c5ffc0004mr6060785ad.18.1751464462881; Wed, 02 Jul 2025
+ 06:54:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250625154813.27254-1-alexandru.elisei@arm.com>
-X-Migadu-Flow: FLOW_OUT
+References: <cover.1747264138.git.ackerleytng@google.com> <d3832fd95a03aad562705872cbda5b3d248ca321.1747264138.git.ackerleytng@google.com>
+ <CA+EHjTxtHOgichL=UvAzczoqS1608RSUNn5HbmBw2NceO941ng@mail.gmail.com>
+ <CAGtprH8eR_S50xDnnMLHNCuXrN2Lv_0mBRzA_pcTtNbnVvdv2A@mail.gmail.com>
+ <CA+EHjTwjKVkw2_AK0Y0-eth1dVW7ZW2Sk=73LL9NeQYAPpxPiw@mail.gmail.com>
+ <CAGtprH_Evyc7tLhDB0t0fN+BUx5qeqWq8A2yZ5-ijbJ5UJ5f-g@mail.gmail.com>
+ <9502503f-e0c2-489e-99b0-94146f9b6f85@amd.com> <20250624130811.GB72557@ziepe.ca>
+ <CAGtprH_qh8sEY3s-JucW3n1Wvoq7jdVZDDokvG5HzPf0HV2=pg@mail.gmail.com> <aGTvTbPHuXbvj59t@yzhao56-desk.sh.intel.com>
+In-Reply-To: <aGTvTbPHuXbvj59t@yzhao56-desk.sh.intel.com>
+From: Vishal Annapurve <vannapurve@google.com>
+Date: Wed, 2 Jul 2025 06:54:10 -0700
+X-Gm-Features: Ac12FXydqjoi-wuuZAMsDh9iHHkaJIooZH0B4_yVoZTkA8pqs4QeyD27Ae8Anyg
+Message-ID: <CAGtprH9-njcgQjGZvGbbVX+i8D-qPUOkKFHbOWA20962niLTcw@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 04/51] KVM: guest_memfd: Introduce
+ KVM_GMEM_CONVERT_SHARED/PRIVATE ioctls
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>, Alexey Kardashevskiy <aik@amd.com>, Fuad Tabba <tabba@google.com>, 
+	Ackerley Tng <ackerleytng@google.com>, kvm@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, x86@kernel.org, linux-fsdevel@vger.kernel.org, 
+	ajones@ventanamicro.com, akpm@linux-foundation.org, amoorthy@google.com, 
+	anthony.yznaga@oracle.com, anup@brainfault.org, aou@eecs.berkeley.edu, 
+	bfoster@redhat.com, binbin.wu@linux.intel.com, brauner@kernel.org, 
+	catalin.marinas@arm.com, chao.p.peng@intel.com, chenhuacai@kernel.org, 
+	dave.hansen@intel.com, david@redhat.com, dmatlack@google.com, 
+	dwmw@amazon.co.uk, erdemaktas@google.com, fan.du@intel.com, fvdl@google.com, 
+	graf@amazon.com, haibo1.xu@intel.com, hch@infradead.org, hughd@google.com, 
+	ira.weiny@intel.com, isaku.yamahata@intel.com, jack@suse.cz, 
+	james.morse@arm.com, jarkko@kernel.org, jgowans@amazon.com, 
+	jhubbard@nvidia.com, jroedel@suse.de, jthoughton@google.com, 
+	jun.miao@intel.com, kai.huang@intel.com, keirf@google.com, 
+	kent.overstreet@linux.dev, kirill.shutemov@intel.com, liam.merwick@oracle.com, 
+	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, maz@kernel.org, 
+	mic@digikod.net, michael.roth@amd.com, mpe@ellerman.id.au, 
+	muchun.song@linux.dev, nikunj@amd.com, nsaenz@amazon.es, 
+	oliver.upton@linux.dev, palmer@dabbelt.com, pankaj.gupta@amd.com, 
+	paul.walmsley@sifive.com, pbonzini@redhat.com, pdurrant@amazon.co.uk, 
+	peterx@redhat.com, pgonda@google.com, pvorel@suse.cz, qperret@google.com, 
+	quic_cvanscha@quicinc.com, quic_eberman@quicinc.com, 
+	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com, richard.weiyang@gmail.com, 
+	rick.p.edgecombe@intel.com, rientjes@google.com, roypat@amazon.co.uk, 
+	rppt@kernel.org, seanjc@google.com, shuah@kernel.org, steven.price@arm.com, 
+	steven.sistare@oracle.com, suzuki.poulose@arm.com, thomas.lendacky@amd.com, 
+	usama.arif@bytedance.com, vbabka@suse.cz, viro@zeniv.linux.org.uk, 
+	vkuznets@redhat.com, wei.w.wang@intel.com, will@kernel.org, 
+	willy@infradead.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
+	yuzenghui@huawei.com, zhiquan1.li@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Paolo, Thomas, and others,
+On Wed, Jul 2, 2025 at 1:38=E2=80=AFAM Yan Zhao <yan.y.zhao@intel.com> wrot=
+e:
+>
+> On Tue, Jun 24, 2025 at 07:10:38AM -0700, Vishal Annapurve wrote:
+> > On Tue, Jun 24, 2025 at 6:08=E2=80=AFAM Jason Gunthorpe <jgg@ziepe.ca> =
+wrote:
+> > >
+> > > On Tue, Jun 24, 2025 at 06:23:54PM +1000, Alexey Kardashevskiy wrote:
+> > >
+> > > > Now, I am rebasing my RFC on top of this patchset and it fails in
+> > > > kvm_gmem_has_safe_refcount() as IOMMU holds references to all these
+> > > > folios in my RFC.
+> > > >
+> > > > So what is the expected sequence here? The userspace unmaps a DMA
+> > > > page and maps it back right away, all from the userspace? The end
+> > > > result will be the exactly same which seems useless. And IOMMU TLB
+> >
+> >  As Jason described, ideally IOMMU just like KVM, should just:
+> > 1) Directly rely on guest_memfd for pinning -> no page refcounts taken
+> > by IOMMU stack
+> In TDX connect, TDX module and TDs do not trust VMM. So, it's the TDs to =
+inform
+> TDX module about which pages are used by it for DMAs purposes.
+> So, if a page is regarded as pinned by TDs for DMA, the TDX module will f=
+ail the
+> unmap of the pages from S-EPT.
+>
+> If IOMMU side does not increase refcount, IMHO, some way to indicate that
+> certain PFNs are used by TDs for DMA is still required, so guest_memfd ca=
+n
+> reject the request before attempting the actual unmap.
 
-This series has a subject of arm, but it makes lots of changes to
-common scripts. Can I get an ack on it? I'd like to merge it.
+So it looks like guest_memfd will need an interface with KVM/IOMMU
+backends to check if unmapping can succeed. And if unmapping still
+fails, there should be a way for KVM/IOMMU backends to kill the TD and
+any TDIs bound to that TD.
 
-Thanks,
-drew
-
-
-On Wed, Jun 25, 2025 at 04:48:00PM +0100, Alexandru Elisei wrote:
-> v3 can be found here [1]. Based on top of the series that add qemu_params and
-> test_args [2].
-> 
-> To goal is to allow the user to do:
-> 
-> $ ./configure --target=kvmtool
-> $ make clean && make
-> $ ./run_tests.sh
-> 
-> to run all the tests automatically with kvmtool.
-> 
-> Reasons to use kvmtool:
-> 
-> * kvmtool is smaller and a lot easier to modify compared to qemu, which
-> means developers may prefer it when adding or prototyping new features to
-> KVM, and being able to run all the tests reliably and automatically is very
-> useful.
-> 
-> * kvmtool is faster to run the tests (a couple of times faster on
-> my rockpro64), making for a quick turnaround. But do keep in mind that not
-> all tests work on kvmtool because of missing features compared to qemu.
-> 
-> * kvmtool does things differently than qemu: different memory layout,
-> different uart, PMU emulation is disabled by default, etc. This makes it a
-> good testing vehicule for kvm-unit-tests itself.
-> 
-> Changes v3->v4
-> --------------
-> 
-> Overview of the changes:
-> 
-> * Gathered Reviewed-by tags - thanks for the review!
-> 
-> * Sent patches #1 ("scripts: unittests.cfg: Rename 'extra_params' to
-> 'qemu_params'") and #2 ("scripts: Add 'test_args' test definition parameter")
-> as a separate series.
-> 
-> * Fixed the typos reported during the review.
-> 
-> * Ran shellcheck on the patches, this resulted in minor changes.
-> 
-> * Dropped patch "configure: Export TARGET unconditionally" - now the functions
-> in vmm.bash will check if TARGET is set, instead of having the other scripts use
-> $TARGET to directly index the vmm_opts array.
-> 
-> * Direct reads of $TARGET have been replaced with vmm_get_target(), to account
-> for the fact that most architectures don't configure $TARGET (only arm and
-> arm64 do that).
-> 
-> * Renamed check_vmm_supported() to vmm_check_supported() to match the
-> function names introduced in subsequent patches.
-> 
-> * Renamed vmm_opts->vmm_optname to match the new function names.
-> 
-> * Reordered the key-value pairs from vmm_optname in alphabetical order.
-> 
-> * Use the "," separator for the composite keys of the associative array instead
-> of ":" (don't remember why I originally settled on ":", but it was a really poor
-> choice).
-> 
-> * Dropped the Reviewed-by tags from Drew and Shaoqin Huang from patch #6
-> ("scripts: Use an associative array for qemu argument names") - the review is
-> much appreciated, but the way the vmm_opts array (now renamed to vmm_optname) is
-> created, and used, has changed, and since the patch is about introducing the
-> associative array, I thought it would be useful to have another round of review.
-> 
-> * Use functions instead of indexing vmm_opts (now vmm_optname) directly.
-> 
-> * Fixed standalone test generation by removing 'source vmm.bash' from
-> scripts/arch-run.bash, $arch/run and scripts/runtime, and having
-> scripts/mkstandalone.sh::generate_test() copy it directly in the final test
-> script. Didn't catch that during the previous iterations because I was
-> running the standalone tests from the top level source directory, and
-> "source scripts/vmm.bash" happened to work.
-> 
-> More details in the changelog for the modified patches.
-> 
-> [1] https://lore.kernel.org/kvm/20250507151256.167769-1-alexandru.elisei@arm.com/
-> [2] https://lore.kernel.org/kvm/20250625154354.27015-1-alexandru.elisei@arm.com/
-> 
-> Alexandru Elisei (13):
->   run_tests.sh: Document --probe-maxsmp argument
->   scripts: Document environment variables
->   scripts: Refuse to run the tests if not configured for qemu
->   scripts: Use an associative array for qemu argument names
->   scripts: Add 'kvmtool_params' to test definition
->   scripts: Add support for kvmtool
->   scripts: Add default arguments for kvmtool
->   scripts: Add KVMTOOL environment variable for kvmtool binary path
->   scripts: Detect kvmtool failure in premature_failure()
->   scripts: Do not probe for maximum number of VCPUs when using kvmtool
->   scripts/mkstandalone: Export $TARGET
->   scripts: Add 'disabled_if' test definition parameter for kvmtool to
->     use
->   scripts: Enable kvmtool
-> 
->  README.md               |  18 +++-
->  arm/efi/run             |   8 ++
->  arm/run                 | 161 ++++++++++++++++-----------
->  arm/unittests.cfg       |  31 ++++++
->  configure               |   1 -
->  docs/unittests.txt      |  26 ++++-
->  powerpc/run             |   5 +-
->  riscv/run               |   5 +-
->  run_tests.sh            |  35 +++---
->  s390x/run               |   3 +-
->  scripts/arch-run.bash   | 112 +++++++------------
->  scripts/common.bash     |  30 ++++--
->  scripts/mkstandalone.sh |   8 +-
->  scripts/runtime.bash    |  35 ++----
->  scripts/vmm.bash        | 234 ++++++++++++++++++++++++++++++++++++++++
->  x86/run                 |   5 +-
->  16 files changed, 525 insertions(+), 192 deletions(-)
->  create mode 100644 scripts/vmm.bash
-> 
-> -- 
-> 2.50.0
-> 
-> 
-> -- 
-> kvm-riscv mailing list
-> kvm-riscv@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/kvm-riscv
+> Otherwise, the unmap of TD-DMA-pinned pages will fail.
+>
+> Upon this kind of unmapping failure, it also doesn't help for host to ret=
+ry
+> unmapping without unpinning from TD.
+>
 
