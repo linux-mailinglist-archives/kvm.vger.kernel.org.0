@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-51256-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51257-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0BD0AF0AC9
-	for <lists+kvm@lfdr.de>; Wed,  2 Jul 2025 07:38:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26ACBAF0AD4
+	for <lists+kvm@lfdr.de>; Wed,  2 Jul 2025 07:42:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63A6A44692B
-	for <lists+kvm@lfdr.de>; Wed,  2 Jul 2025 05:38:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 634FE1C0470C
+	for <lists+kvm@lfdr.de>; Wed,  2 Jul 2025 05:43:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 974361F4179;
-	Wed,  2 Jul 2025 05:38:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1847D1F463A;
+	Wed,  2 Jul 2025 05:42:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TiOVgcON"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gb8YhKjn"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45EAC60B8A
-	for <kvm@vger.kernel.org>; Wed,  2 Jul 2025 05:38:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E2951F237E
+	for <kvm@vger.kernel.org>; Wed,  2 Jul 2025 05:42:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751434718; cv=none; b=byf0eObl29nuQq9QsMSSbeJ01FFPPnj/B2Th0DjODTRyWjqpHpZLnwZ1xMnECebmGrRzno24bDCmLU9RXLF3DKMCheUc+4l4jot8DcLnpzRS+FZApPO/wtklBjlQXQBQqVR1mzZTzmBfmpFZ+6uXB7J9jMSo2CvN32c9P6rF8Zc=
+	t=1751434971; cv=none; b=USLgOyhEC+NMLQwsRTgSrWF6QuaE3s4JOWi4dQacpQyvmn6vLwXd6Asg0G0KI1sXd8MJ61/zOfhQm9X08C3W8GMNlVbGsRYE8bSrWttJctBSG9UOusa/8pCaYPYdYnLYBNYmmqCBWWgP4lgqdIwqJBaniMlYD90NdLfjUStBwuc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751434718; c=relaxed/simple;
-	bh=9zgnB3BBaGKVhPYkrZq3To/yKcDwTfEjj3iZ5HAcZzc=;
+	s=arc-20240116; t=1751434971; c=relaxed/simple;
+	bh=JJu1pmmEn3alemdY/GcZx7/cDMvAq6dvoCyNi0CgS2Y=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=i8uc6xAxEiprHT2YvO8sqamx8Q2ImEFWn0A7jVMLAI75t4w42u/8VBEwKWdJOFIcWhCWtLhMQvMdVJYKOo3Wri31Q0hl2IfMXFlBxsLn2T7hup/si6x9W5scpv8i1FPSa9ns3BRSDKL6ia8Coh+Fk3lb2Pjun5ycMvBxqL2H1eQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TiOVgcON; arc=none smtp.client-ip=198.175.65.21
+	 In-Reply-To:Content-Type; b=Hup0OpOasWLxVnIH+k0g15oiTbWbQLypBJBXPefcdAZXZUYKLPKey1RnIf1wsxjgX2J3DA91Pv1RzQaerSDZ26ZcEeNfxzwddYccF39VlJw7+XAZnwN4AOCgYAdLFrsUI86oBZ3MRonOLWadGwIiuOEBvg3uem1wy52mIyV/+iM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gb8YhKjn; arc=none smtp.client-ip=192.198.163.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1751434718; x=1782970718;
+  t=1751434969; x=1782970969;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=9zgnB3BBaGKVhPYkrZq3To/yKcDwTfEjj3iZ5HAcZzc=;
-  b=TiOVgcONTAA1uECDC/BtizceFAtdgmL04+5o37dDVlV3bmnuI1O9DgnU
-   62C3VhrHt7IIlGqkvj8fv8BMvZGPgeUKvCLaedxjPoW/gewEM9UUbrT0G
-   h1VnkznFrUXnB+XMhsNAO4WJ4s0dvaMR7+b7eOI7EVobvo7d0jkb6l6nB
-   5e9HK/GTpqvCP7ahlTJofSCg/z2ofh1aGGoNCtSiwSSeUM7LrCuqQ+ThI
-   J0nTNHLwhAHatKXT6m34HbDGJVZDa5OAfSPLMsrs4BwQnLNB1mmmpYuYc
-   XLRDkNKXFMdTpNPP3Mc45c6teK3wo/Qe5Vfc9qqw/cSH9Lek+1gFm1o3Q
+  bh=JJu1pmmEn3alemdY/GcZx7/cDMvAq6dvoCyNi0CgS2Y=;
+  b=gb8YhKjnotn7nLuoi3/FIHjMxPr+NOszcE+JXrB0lRuY0W17ePWLfSrK
+   oQwY8g3f+e7JYf1QKnwHZXM24opZ6Y9OIsoEV2lVArFjC33sjJ/zZy9Dp
+   gdsXWLkIomtHSDZy4cNbPSQoihsql65Z/tKXte6ZGveCbp38bv5rkHoCU
+   e+cdsT85DvjzMAlLjU8JdPlCU1cJcoYrUNgNtz6s85JptAq/wr4drAT9k
+   K4rGsZRISDX+DuvryThl7a2bYjIqkFSB1ivv+/K6EKeUraxwoISRh1Xwk
+   47em0WI4ZKUyLXZavYYxbmS9pqi/uRiFy/se3oy8xvwRaxu5ZLD60+vNC
    A==;
-X-CSE-ConnectionGUID: TcS+U8jXR6eLJQeJktB4lw==
-X-CSE-MsgGUID: 3mJbNSRWQFWFDX91y6vFUw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11481"; a="53581970"
+X-CSE-ConnectionGUID: K1bPJIulRK6OAMir2KxPpQ==
+X-CSE-MsgGUID: f5cJH0xCTYqIdOrl0Jy04A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11481"; a="41347888"
 X-IronPort-AV: E=Sophos;i="6.16,281,1744095600"; 
-   d="scan'208";a="53581970"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2025 22:38:26 -0700
-X-CSE-ConnectionGUID: tUtOJQrzSdqA1qJsSylh1g==
-X-CSE-MsgGUID: nld65XTKROSvjfpOi6Ydew==
+   d="scan'208";a="41347888"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2025 22:42:48 -0700
+X-CSE-ConnectionGUID: H3MZBqqZQZ2uSfRfKb7nHQ==
+X-CSE-MsgGUID: QqYDOrwuSy+jl9lKGS8glw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,281,1744095600"; 
-   d="scan'208";a="158351488"
+   d="scan'208";a="153441060"
 Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.240.80]) ([10.124.240.80])
-  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2025 22:38:21 -0700
-Message-ID: <0057388f-ccaa-4b39-a9ba-1d3b820d12da@linux.intel.com>
-Date: Wed, 2 Jul 2025 13:38:18 +0800
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2025 22:42:44 -0700
+Message-ID: <e55fcee5-73e6-404e-834e-f5ed51e2042d@linux.intel.com>
+Date: Wed, 2 Jul 2025 13:42:41 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,8 +67,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 7/9] target/i386/kvm: reset AMD PMU registers during VM
- reset
+Subject: Re: [PATCH v6 9/9] target/i386/kvm: don't stop Intel PMU counters
 To: Dongli Zhang <dongli.zhang@oracle.com>, qemu-devel@nongnu.org,
  kvm@vger.kernel.org
 Cc: pbonzini@redhat.com, zhao1.liu@intel.com, mtosatti@redhat.com,
@@ -78,43 +77,71 @@ Cc: pbonzini@redhat.com, zhao1.liu@intel.com, mtosatti@redhat.com,
  davydov-max@yandex-team.ru, xiaoyao.li@intel.com, joe.jin@oracle.com,
  ewanhai-oc@zhaoxin.com, ewanhai@zhaoxin.com
 References: <20250624074421.40429-1-dongli.zhang@oracle.com>
- <20250624074421.40429-8-dongli.zhang@oracle.com>
+ <20250624074421.40429-10-dongli.zhang@oracle.com>
 Content-Language: en-US
 From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <20250624074421.40429-8-dongli.zhang@oracle.com>
+In-Reply-To: <20250624074421.40429-10-dongli.zhang@oracle.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 
 On 6/24/2025 3:43 PM, Dongli Zhang wrote:
-> + uint32_t sel_base = MSR_K7_EVNTSEL0;
-> + uint32_t ctr_base = MSR_K7_PERFCTR0;
-> + /*
-> + * The address of the next selector or counter register is
-> + * obtained by incrementing the address of the current selector
-> + * or counter register by one.
-> + */
-> + uint32_t step = 1;
-> +
-> + /*
-> + * When PERFCORE is enabled, AMD PMU uses a separate set of
-> + * addresses for the selector and counter registers.
-> + * Additionally, the address of the next selector or counter
-> + * register is determined by incrementing the address of the
-> + * current register by two.
-> + */
-> + if (num_pmu_gp_counters == AMD64_NUM_COUNTERS_CORE) {
-> + sel_base = MSR_F15H_PERF_CTL0;
-> + ctr_base = MSR_F15H_PERF_CTR0;
-> + step = 2;
-> + }
-
-This part of code is duplicate with previous code in kvm_put_msrs(), we'd
-better add a new helper to get PMU counter MSRs base and index for all
-vendors. (This can be done as an independent patch if no new version for
-this patchset).
-
-All others look good to me.
+> PMU MSRs are set by QEMU only at levels >= KVM_PUT_RESET_STATE,
+> excluding runtime. Therefore, updating these MSRs without stopping events
+> should be acceptable.
+>
+> In addition, KVM creates kernel perf events with host mode excluded
+> (exclude_host = 1). While the events remain active, they don't increment
+> the counter during QEMU vCPU userspace mode.
+>
+> Finally, The kvm_put_msrs() sets the MSRs using KVM_SET_MSRS. The x86 KVM
+> processes these MSRs one by one in a loop, only saving the config and
+> triggering the KVM_REQ_PMU request. This approach does not immediately stop
+> the event before updating PMC. This approach is true since Linux kernel
+> commit 68fb4757e867 ("KVM: x86/pmu: Defer reprogram_counter() to
+> kvm_pmu_handle_event"), that is, v6.2.
+>
+> No Fixed tag is going to be added for the commit 0d89436786b0 ("kvm:
+> migrate vPMU state"), because this isn't a bugfix.
+>
+> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+> Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
+> ---
+> Changed since v3:
+>   - Re-order reasons in commit messages.
+>   - Mention KVM's commit 68fb4757e867 (v6.2).
+>   - Keep Zhao's review as there isn't code change.
+>
+>  target/i386/kvm/kvm.c | 9 ---------
+>  1 file changed, 9 deletions(-)
+>
+> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+> index 4bbdf996ef..207de21404 100644
+> --- a/target/i386/kvm/kvm.c
+> +++ b/target/i386/kvm/kvm.c
+> @@ -4186,13 +4186,6 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
+>          }
+>  
+>          if ((IS_INTEL_CPU(env) || IS_ZHAOXIN_CPU(env)) && pmu_version > 0) {
+> -            if (pmu_version > 1) {
+> -                /* Stop the counter.  */
+> -                kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR_CTRL, 0);
+> -                kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_CTRL, 0);
+> -            }
+> -
+> -            /* Set the counter values.  */
+>              for (i = 0; i < num_pmu_fixed_counters; i++) {
+>                  kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR0 + i,
+>                                    env->msr_fixed_counters[i]);
+> @@ -4208,8 +4201,6 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
+>                                    env->msr_global_status);
+>                  kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_OVF_CTRL,
+>                                    env->msr_global_ovf_ctrl);
+> -
+> -                /* Now start the PMU.  */
+>                  kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR_CTRL,
+>                                    env->msr_fixed_ctr_ctrl);
+>                  kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_CTRL,
 
 Reviewed-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
 
