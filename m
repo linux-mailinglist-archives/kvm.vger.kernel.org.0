@@ -1,206 +1,75 @@
-Return-Path: <kvm+bounces-51302-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51303-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56ADEAF5B2C
-	for <lists+kvm@lfdr.de>; Wed,  2 Jul 2025 16:33:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6D45AF5B6E
+	for <lists+kvm@lfdr.de>; Wed,  2 Jul 2025 16:43:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6744D1C27E73
-	for <lists+kvm@lfdr.de>; Wed,  2 Jul 2025 14:33:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 685524A4CF9
+	for <lists+kvm@lfdr.de>; Wed,  2 Jul 2025 14:43:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1694A307AE6;
-	Wed,  2 Jul 2025 14:32:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75D0C3093AC;
+	Wed,  2 Jul 2025 14:43:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VQueI3ZW"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tMB35wON"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D00E7307ACB
-	for <kvm@vger.kernel.org>; Wed,  2 Jul 2025 14:32:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 011E72F5310
+	for <kvm@vger.kernel.org>; Wed,  2 Jul 2025 14:43:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751466773; cv=none; b=bI5y1XNzgYlNKamcuTezJiBZwBmtG/StRajIX9jygH0+a6sSw+hMXHhXrkwVfMppRtvXGX9XX6SgbDxEpiaafNO8Lu9Hq1rscUwnWs2hT8FFyGwD1jM1lmimqzPQF4Qv8MhEtrq5UjYwAZBoC1SmJomnBpM+Na54RYAQ1o4MVjY=
+	t=1751467418; cv=none; b=Y1Wx4D3eX4emski8Zw+xp0LoTP9MFyD6EP+zIgid8F+wTSerTzMTzujGEKaPwTk7s5AeWGU9aEzH1fOfimX55c1WIfGH7YIlb9TF3yaJm5vg6SOyKGQibPFrzxzcRSaj1zWB1SZUZaekzVqWxSh1Oe9Hwpj/3aSAvgjAK1AR2R4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751466773; c=relaxed/simple;
-	bh=2Xp9LKnZCCcV5QzGeE+WbMP668C5qrnyaJjRwCYTCkY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ail6CgnfiFhmGqpOGIGnDFl9Q3NYEOisC463wpp5fJ96JGCviKYvup6j5c0NtoNiqoxruN+4JtGVqoOac6xnONdV5NrlsJp+AOBFdz5e53oZgQDoT8NANA23Zgx7GlZ1/0NE8lxgs86kS/tePR4gZNCic7V0XFDj/cz+0P08WGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VQueI3ZW; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-237f270513bso385505ad.1
-        for <kvm@vger.kernel.org>; Wed, 02 Jul 2025 07:32:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1751466771; x=1752071571; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZqqnRujRE2SdSp3Ji3lnU4lMv7Si9SLf3Ig6FroSxIY=;
-        b=VQueI3ZWJ0ILSZjHBnp+xric/rzGi6APYEPxLxl4WlaRYvt5v2yyeG8uQBarENAnsS
-         OttyY22vK/89om0oFs4mYNDKpwSy6JNPjkaSxCPAtAjZnJwvZ/tFfn7PUB0ksO2PED6o
-         EFeGXhHH4cCLsD/LutdtwLL7A/TQ7j5HVLgvg7qdzQPbZJpVy4JGKIEmypJTT2CgYig1
-         184bKCS4E+KEFLpbaoh4OKNSUjk/+22HsAbHzakZxeS6GSEZV5deCYyRV7WC8avBZQL2
-         BHeOrwePll61eePmIxPnaVT5hZdk6EmPGZvUJk7Nyq2QvnDzycxGQbEW9+ZCq6ZaHKvS
-         5g4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751466771; x=1752071571;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZqqnRujRE2SdSp3Ji3lnU4lMv7Si9SLf3Ig6FroSxIY=;
-        b=dzINplVgGXuCKPi0sHM3fBsK3G5rwMkBr3yrkfI9l/QPMWDBpWgdNvd9QTaleDyEFn
-         zDr1o7+JOho0y0glIhrpcFDIoW5YS+U9VXPPST6zEajRfT4xOptYMZbwRxihCJIGieu9
-         /NV/pWm8TKiEHD93CR545Zh5bNn+o+fnH2qBEG1BbD8OKA6BfRiACg4sIQMpY+Wi9axH
-         d7hN/xfWv+22eC5ttMMcNZuSfzNrtgdMdY0CHfA7uXAxWpm1E+Df2tbDMtP0NH0eyr+Q
-         f4Qn7+vgSvJf2WpxJhKdvUc4EILBXbDE7H1jizc5FLNazhqtSjASWzrRaksnGyxdC2i6
-         5MHg==
-X-Forwarded-Encrypted: i=1; AJvYcCVlOJZD0m39pITp5Drt350OKdyIkJ0ZKqkwC3aFHfgplBFMnUA3qAcZaW5zpcyH4TLb+E8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzRHF40nfoTxbLuvRHYkTHl573nOF5qHgKIK+qmahiTCi8qCxzv
-	oydDHgc2vh4j77WdqDT4ltXb/BRMiGHL7qUaWR4g702rADvCmNR+hj/te3DpHK1Q4B9vRL5dfbh
-	qO7Ks+8WP1hyURLL2de71cQAPfKbEP+Uoi6b8409Q
-X-Gm-Gg: ASbGncsvazhmdPMst0YgZrrAZwR8pDOQG8LugRImz9lC+IUsHdY39usMel1ps7Sic46
-	v310DseHCxu1Q/lYHoUd+BU9ETmmqpc3a7rK3Hp8RAhSxxrwKog6CLZdpvewhwCQ75oj+zjC6oq
-	IKmZvjGUYMI/V/HniLyhb56GvuRaIgqXltLMjALXDLgmqHboNy3A520fgEWuOHJMMwmOXCbq2EI
-	IYd
-X-Google-Smtp-Source: AGHT+IGoIHXKMSNgSYMoVATe9zftjUbnEF1aXjzvZLi/NINKt4JogRrvHG2G1VAsWUCf6cD0R3CJCF3RSOi1f9/p6D4=
-X-Received: by 2002:a17:902:c407:b0:215:42a3:e844 with SMTP id
- d9443c01a7336-23c5ffbdd35mr6602435ad.17.1751466769703; Wed, 02 Jul 2025
- 07:32:49 -0700 (PDT)
+	s=arc-20240116; t=1751467418; c=relaxed/simple;
+	bh=43pDMyNOCKa79U0Do3mjd5FGHY7ZmX47Ylj4IJlRccU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Vore+gOiIY7/SlJvJ8Q0fdiXsRbEluKjFZSEStyYMpSX3eGHfS6byJaxcTD9NUXqpMhqzWrSSKYBVztsH3VGdUKV/CNv1NoV3DdnzFwiE9m/eWxWoT9UNQn/el1zrtBLHSUNSECma8DlbjSlZ5nnvzLBGghheoHJAm6hBbS9z8Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tMB35wON; arc=none smtp.client-ip=95.215.58.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Wed, 2 Jul 2025 16:43:29 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1751467413;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hLpYSU2x8Yb+ms57gtIv5GTWsp2J7egzMbr/41MK58A=;
+	b=tMB35wONgUnX/RY8EVbuddM+tRjah0aNJvRs+zfhzT1twzs8JGQJGtXLMmTRAO1CotFCXJ
+	4VcTz0f1nBwFkYeTYEyrB10GABY5bd6THfn9xaZt8C1zEMT8JfEn9VnBUvNC1O5elFTtEm
+	nYNAfSccXsd3E3EdauPmjNKdkCN5K+Y=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Jesse Taube <jesse@rivosinc.com>
+Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-kselftest@vger.kernel.org, Atish Patra <atish.patra@linux.dev>, 
+	Anup Patel <anup@brainfault.org>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	=?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>, Himanshu Chauhan <hchauhan@ventanamicro.com>, 
+	Charlie Jenkins <charlie@rivosinc.com>
+Subject: Re: [kvm-unit-tests PATCH v8] riscv: sbi: Add SBI Debug Triggers
+ Extension tests
+Message-ID: <20250702-398267de396e3a03f6d3982d@orel>
+References: <20250701200047.1367077-1-jesse@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <d3832fd95a03aad562705872cbda5b3d248ca321.1747264138.git.ackerleytng@google.com>
- <CA+EHjTxtHOgichL=UvAzczoqS1608RSUNn5HbmBw2NceO941ng@mail.gmail.com>
- <CAGtprH8eR_S50xDnnMLHNCuXrN2Lv_0mBRzA_pcTtNbnVvdv2A@mail.gmail.com>
- <CA+EHjTwjKVkw2_AK0Y0-eth1dVW7ZW2Sk=73LL9NeQYAPpxPiw@mail.gmail.com>
- <CAGtprH_Evyc7tLhDB0t0fN+BUx5qeqWq8A2yZ5-ijbJ5UJ5f-g@mail.gmail.com>
- <9502503f-e0c2-489e-99b0-94146f9b6f85@amd.com> <20250624130811.GB72557@ziepe.ca>
- <CAGtprH_qh8sEY3s-JucW3n1Wvoq7jdVZDDokvG5HzPf0HV2=pg@mail.gmail.com>
- <aGTvTbPHuXbvj59t@yzhao56-desk.sh.intel.com> <CAGtprH9-njcgQjGZvGbbVX+i8D-qPUOkKFHbOWA20962niLTcw@mail.gmail.com>
- <20250702141321.GC904431@ziepe.ca>
-In-Reply-To: <20250702141321.GC904431@ziepe.ca>
-From: Vishal Annapurve <vannapurve@google.com>
-Date: Wed, 2 Jul 2025 07:32:36 -0700
-X-Gm-Features: Ac12FXxsJnd1Ik5yTb-XA10TvLxSoUfxXWhX4Ea1BvmrwrYFJWzxZ35OP06jBy4
-Message-ID: <CAGtprH948W=5fHSB1UnE_DbB0L=C7LTC+a7P=g-uP0nZwY6fxg@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 04/51] KVM: guest_memfd: Introduce
- KVM_GMEM_CONVERT_SHARED/PRIVATE ioctls
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Yan Zhao <yan.y.zhao@intel.com>, Alexey Kardashevskiy <aik@amd.com>, Fuad Tabba <tabba@google.com>, 
-	Ackerley Tng <ackerleytng@google.com>, kvm@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, x86@kernel.org, linux-fsdevel@vger.kernel.org, 
-	ajones@ventanamicro.com, akpm@linux-foundation.org, amoorthy@google.com, 
-	anthony.yznaga@oracle.com, anup@brainfault.org, aou@eecs.berkeley.edu, 
-	bfoster@redhat.com, binbin.wu@linux.intel.com, brauner@kernel.org, 
-	catalin.marinas@arm.com, chao.p.peng@intel.com, chenhuacai@kernel.org, 
-	dave.hansen@intel.com, david@redhat.com, dmatlack@google.com, 
-	dwmw@amazon.co.uk, erdemaktas@google.com, fan.du@intel.com, fvdl@google.com, 
-	graf@amazon.com, haibo1.xu@intel.com, hch@infradead.org, hughd@google.com, 
-	ira.weiny@intel.com, isaku.yamahata@intel.com, jack@suse.cz, 
-	james.morse@arm.com, jarkko@kernel.org, jgowans@amazon.com, 
-	jhubbard@nvidia.com, jroedel@suse.de, jthoughton@google.com, 
-	jun.miao@intel.com, kai.huang@intel.com, keirf@google.com, 
-	kent.overstreet@linux.dev, kirill.shutemov@intel.com, liam.merwick@oracle.com, 
-	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, maz@kernel.org, 
-	mic@digikod.net, michael.roth@amd.com, mpe@ellerman.id.au, 
-	muchun.song@linux.dev, nikunj@amd.com, nsaenz@amazon.es, 
-	oliver.upton@linux.dev, palmer@dabbelt.com, pankaj.gupta@amd.com, 
-	paul.walmsley@sifive.com, pbonzini@redhat.com, pdurrant@amazon.co.uk, 
-	peterx@redhat.com, pgonda@google.com, pvorel@suse.cz, qperret@google.com, 
-	quic_cvanscha@quicinc.com, quic_eberman@quicinc.com, 
-	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com, richard.weiyang@gmail.com, 
-	rick.p.edgecombe@intel.com, rientjes@google.com, roypat@amazon.co.uk, 
-	rppt@kernel.org, seanjc@google.com, shuah@kernel.org, steven.price@arm.com, 
-	steven.sistare@oracle.com, suzuki.poulose@arm.com, thomas.lendacky@amd.com, 
-	usama.arif@bytedance.com, vbabka@suse.cz, viro@zeniv.linux.org.uk, 
-	vkuznets@redhat.com, wei.w.wang@intel.com, will@kernel.org, 
-	willy@infradead.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
-	yuzenghui@huawei.com, zhiquan1.li@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250701200047.1367077-1-jesse@rivosinc.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Jul 2, 2025 at 7:13=E2=80=AFAM Jason Gunthorpe <jgg@ziepe.ca> wrote=
-:
->
-> On Wed, Jul 02, 2025 at 06:54:10AM -0700, Vishal Annapurve wrote:
-> > On Wed, Jul 2, 2025 at 1:38=E2=80=AFAM Yan Zhao <yan.y.zhao@intel.com> =
-wrote:
-> > >
-> > > On Tue, Jun 24, 2025 at 07:10:38AM -0700, Vishal Annapurve wrote:
-> > > > On Tue, Jun 24, 2025 at 6:08=E2=80=AFAM Jason Gunthorpe <jgg@ziepe.=
-ca> wrote:
-> > > > >
-> > > > > On Tue, Jun 24, 2025 at 06:23:54PM +1000, Alexey Kardashevskiy wr=
-ote:
-> > > > >
-> > > > > > Now, I am rebasing my RFC on top of this patchset and it fails =
-in
-> > > > > > kvm_gmem_has_safe_refcount() as IOMMU holds references to all t=
-hese
-> > > > > > folios in my RFC.
-> > > > > >
-> > > > > > So what is the expected sequence here? The userspace unmaps a D=
-MA
-> > > > > > page and maps it back right away, all from the userspace? The e=
-nd
-> > > > > > result will be the exactly same which seems useless. And IOMMU =
-TLB
-> > > >
-> > > >  As Jason described, ideally IOMMU just like KVM, should just:
-> > > > 1) Directly rely on guest_memfd for pinning -> no page refcounts ta=
-ken
-> > > > by IOMMU stack
-> > > In TDX connect, TDX module and TDs do not trust VMM. So, it's the TDs=
- to inform
-> > > TDX module about which pages are used by it for DMAs purposes.
-> > > So, if a page is regarded as pinned by TDs for DMA, the TDX module wi=
-ll fail the
-> > > unmap of the pages from S-EPT.
->
-> I don't see this as having much to do with iommufd.
->
-> iommufd will somehow support the T=3D1 iommu inside the TDX module but
-> it won't have an IOAS for it since the VMM does not control the
-> translation.
->
-> The discussion here is for the T=3D0 iommu which is controlled by
-> iommufd and does have an IOAS. It should be popoulated with all the
-> shared pages from the guestmemfd.
->
-> > > If IOMMU side does not increase refcount, IMHO, some way to indicate =
-that
-> > > certain PFNs are used by TDs for DMA is still required, so guest_memf=
-d can
-> > > reject the request before attempting the actual unmap.
->
-> This has to be delt with between the TDX module and KVM. When KVM
-> gives pages to become secure it may not be able to get them back..
->
-> This problem has nothing to do with iommufd.
->
-> But generally I expect that the T=3D1 iommu follows the S-EPT entirely
-> and there is no notion of pages "locked for dma". If DMA is ongoing
-> and a page is made non-secure then the DMA fails.
->
-> Obviously in a mode where there is a vPCI device we will need all the
-> pages to be pinned in the guestmemfd to prevent any kind of
-> migrations. Only shared/private conversions should change the page
-> around.
+On Tue, Jul 01, 2025 at 01:00:47PM -0700, Jesse Taube wrote:
+> Add tests for the DBTR SBI extension.
+> 
+> Signed-off-by: Jesse Taube <jesse@rivosinc.com>
+> Reviewed-by: Charlie Jenkins <charlie@rivosinc.com>
+> Tested-by: Charlie Jenkins <charlie@rivosinc.com>
 
-Yes, guest_memfd ensures that all the faulted-in pages (irrespective
-of shared or private ranges) are not migratable. We already have a
-similar restriction with CPU accesses to encrypted memory ranges that
-need arch specific protocols to migrate memory contents.
-
->
-> Maybe this needs to be an integral functionality in guestmemfd?
->
-> Jason
+Merged. Thanks
 
