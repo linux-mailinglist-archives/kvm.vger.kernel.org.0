@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-51491-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51492-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E504AF7704
-	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 16:18:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 412D1AF7752
+	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 16:25:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 551E9189ECAC
-	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 14:15:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C4443A19DD
+	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 14:25:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B01842E8889;
-	Thu,  3 Jul 2025 14:14:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 909632EA461;
+	Thu,  3 Jul 2025 14:25:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hKlbDnAm"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="h+M97LYs"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C0622E7BB6;
-	Thu,  3 Jul 2025 14:14:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A9A91AAA1C;
+	Thu,  3 Jul 2025 14:25:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751552076; cv=none; b=Un3Muo2OTLMtfCgXQiL5SnBB3TC8XrdqXN6UDepPypCsnnrX8egEkhy9j1nzyObcCqoJijB0oZTzkY4+/P1xRnh7NncrW27xYXM8JpQ2mtHlJXtNgfFqwPcCns/uqeIpbRcgVkLl3j60YTSHvQy9r5jSlgjU3jEKizEDNMBkyxk=
+	t=1751552735; cv=none; b=SZEZzKE9+LqTo7q/LzBwwfvPUEYlGxzjE4/PXJcgc3kyxZFazdYOrsBysEdl4Rih8zxsMcmD2vaemCWzTE/pm/Y+5PiJrxJs3u7Dpgvv3l2y5A1mifYspscKeBAaXKlHrNvHoqnEa9BPSRL039ac/lX6HgGbak7BF5mxWMUMf1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751552076; c=relaxed/simple;
-	bh=mOIrJEcXWYdJy7sVFGi8rv/IpG7B8f1U9B2nnvb7414=;
+	s=arc-20240116; t=1751552735; c=relaxed/simple;
+	bh=D7Ex4CS8dD1ltntuZsF6t4VIEfE6k9LR2nt1JXfS3To=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=c+92GE7mD3iDYlz4U9qoYS9wdKmi3Xw0V3I6mZ8oOBAZ71RlvRDfnkIJxyKm5QwINuTYLhB8wMBqekTfIjgnmxD/Qjw1vh5t8Kh87GFzUrEGngU7Bkd3fZ8OEG2mZPb3IDJPnkZLB/7vEyhVvVrFDAc+SWe5tQ5AKhg8fVBVAqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hKlbDnAm; arc=none smtp.client-ip=198.175.65.20
+	 In-Reply-To:Content-Type; b=C1O66vTLq3WvbB7D2E6EAwshFuogbCfU3/OmS8T1w9Ecq9ZsTWHxXjDvHIk0Rqsv/tSy413BZ0zCt8JcLby1tpZeTGXM+/YmgcswmZ3dDSF6jF9UG+XdW2I54bkVqA5sskEKYzJ7O2sSU2Xq64Go6/jC7HuvQBiIY2pXEv8Dhck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=h+M97LYs; arc=none smtp.client-ip=192.198.163.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1751552075; x=1783088075;
+  t=1751552734; x=1783088734;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=mOIrJEcXWYdJy7sVFGi8rv/IpG7B8f1U9B2nnvb7414=;
-  b=hKlbDnAmh/PFeHFKzIu1jjcLZvr8QbYd0XVfn8O5AVr9qNBkWMgmKDjg
-   pp36qXl3eV9p5XOzvP/rVKwKvJ0sUZR5UAFeaWZNmzYSlDZL1LGKRfIew
-   NDm4uVjGLM4LTtsirUVokrUy52rwDqEZUu8rga5Cs85FgHcBHNnfMLRc5
-   OhdIwDDmFI4KY4SGaseXLiQAyM3mCSDB8dU+bC40ZsMd6WTAbpV1nFppQ
-   GFv3mSe2WMQDaZqGi8PAEZtEQjW06yluQwlpH7ssx/KfBxIRYZq+5WVSi
-   1h63aLlLpJRt9WjdjJAwafMKemSf+KJrJpa/ojV21swhRgPjM7mvXGoRh
-   g==;
-X-CSE-ConnectionGUID: XzJI5om4RlGy81Xe0vzK3w==
-X-CSE-MsgGUID: 0bvpyMsuQS6gsCDJ7Bd7ag==
-X-IronPort-AV: E=McAfee;i="6800,10657,11483"; a="53598262"
+  bh=D7Ex4CS8dD1ltntuZsF6t4VIEfE6k9LR2nt1JXfS3To=;
+  b=h+M97LYs1NkyF0fhKYQ/QYI94ea02Ve42l8xi95lVwRQEP/rcud7qsPI
+   HflvEpApYHNAKEhR6oEh5ig78eX4DXToSz1x71jOyQ6rpwZB5eiPEuxTe
+   wyk/Q+QmvPclsJQZ+TjplxCUg4GrNuyuKZ4wnP0txh4WHvLyLDyfOYBGJ
+   SaVE8A4u4IzNHexQVUPAu3DxQYlq5p/7kgXDKwIFojH4OhOK1UpnpgTAt
+   GsgbL7RsfR48lVKIrBhLdZMEc98oeYJ1OlLNy1bxwhTXpl2r47VPA6UYQ
+   vN3oSr4P8lD8I/+ILCN6GUZhDJmSb3N8tn6ct8fG3VhcCsNslo7SZhcET
+   w==;
+X-CSE-ConnectionGUID: 04bTr26eR5StJQFa5YMmWg==
+X-CSE-MsgGUID: Q5IOQKJ4Q02Pp5dwUgfWkw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11483"; a="65227621"
 X-IronPort-AV: E=Sophos;i="6.16,284,1744095600"; 
-   d="scan'208";a="53598262"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2025 07:14:29 -0700
-X-CSE-ConnectionGUID: C+xbG0rkSyKlsjwsHrUSjQ==
-X-CSE-MsgGUID: T3qHC/SFQxOwGWP27t156w==
+   d="scan'208";a="65227621"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2025 07:25:28 -0700
+X-CSE-ConnectionGUID: JItw5yr/RkahzZ5oOWeQww==
+X-CSE-MsgGUID: NS3z1/klQ6iL4U4vUpkkrA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,284,1744095600"; 
-   d="scan'208";a="154873179"
+   d="scan'208";a="158661873"
 Received: from puneetse-mobl.amr.corp.intel.com (HELO [10.125.110.13]) ([10.125.110.13])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2025 07:14:28 -0700
-Message-ID: <a0d5b60d-ea40-4f99-aed7-003102517248@intel.com>
-Date: Thu, 3 Jul 2025 07:14:27 -0700
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2025 07:25:26 -0700
+Message-ID: <4bce6d90-c0d4-4f0d-bcb7-4a58fa9643e3@intel.com>
+Date: Thu, 3 Jul 2025 07:25:25 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,7 +67,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] x86/tdx: Eliminate duplicate code in tdx_clear_page()
+Subject: Re: [PATCH 2/2] x86/tdx: Skip clearing reclaimed pages unless
+ X86_BUG_TDX_PW_MCE is present
 To: Adrian Hunter <adrian.hunter@intel.com>,
  Dave Hansen <dave.hansen@linux.intel.com>, pbonzini@redhat.com,
  seanjc@google.com, vannapurve@google.com
@@ -80,7 +81,7 @@ Cc: Tony Luck <tony.luck@intel.com>, Borislav Petkov <bp@alien8.de>,
  tony.lindgren@linux.intel.com, binbin.wu@linux.intel.com,
  isaku.yamahata@intel.com, yan.y.zhao@intel.com, chao.gao@intel.com
 References: <20250703114038.99270-1-adrian.hunter@intel.com>
- <20250703114038.99270-2-adrian.hunter@intel.com>
+ <20250703114038.99270-3-adrian.hunter@intel.com>
 From: Dave Hansen <dave.hansen@intel.com>
 Content-Language: en-US
 Autocrypt: addr=dave.hansen@intel.com; keydata=
@@ -126,16 +127,32 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
  MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
  hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
  vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
-In-Reply-To: <20250703114038.99270-2-adrian.hunter@intel.com>
+In-Reply-To: <20250703114038.99270-3-adrian.hunter@intel.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 7/3/25 04:40, Adrian Hunter wrote:
-> tdx_clear_page() and reset_tdx_pages() duplicate the TDX page clearing
-> logic.  Keep the tdx_clear_page() prototype but call reset_tdx_pages() for
-> the implementation.
+> @@ -642,6 +642,15 @@ static void reset_tdx_pages(unsigned long base, unsigned long size)
+>  	const void *zero_page = (const void *)page_address(ZERO_PAGE(0));
+>  	unsigned long phys, end;
 
-Why keep the old prototype?
+If the only possible use for reset_tdx_pages() is for the erratum, then
+it needs to be in the function name.
 
+> +	/*
+> +	 * Linux uses only KeyID 0 which can read or write pages
+> +	 * that were formerly TDX private pages, without poisoning
+> +	 * memory. However on platforms with the partial-write errata,
+> +	 * poisoning still happens for partial writes.
+> +	 */
+> +	if (!boot_cpu_has_bug(X86_BUG_TDX_PW_MCE))
+> +		return;
 
+Would this be more clear?
+
+	/*
+	 * Typically, any write to the page will convert it from TDX
+	 * private back to normal kernel memory. Systems with the
+	 * erratum need to do the conversion explicitly.
+	 */
 
