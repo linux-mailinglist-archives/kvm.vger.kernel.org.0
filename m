@@ -1,78 +1,78 @@
-Return-Path: <kvm+bounces-51467-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51468-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90761AF716A
-	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 13:03:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92E0FAF717E
+	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 13:05:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5965E188D99F
-	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 11:03:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5DB564A1DDF
+	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 11:02:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34E1A2E426A;
-	Thu,  3 Jul 2025 11:01:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC6FC2E499C;
+	Thu,  3 Jul 2025 11:01:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mYYT2aRd"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DjOBLpn8"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88ED12E3B09
-	for <kvm@vger.kernel.org>; Thu,  3 Jul 2025 11:01:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AEAB2E498B
+	for <kvm@vger.kernel.org>; Thu,  3 Jul 2025 11:01:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751540485; cv=none; b=ffF8liRDkmwYIe6qffsgKIO4VsViC5YDJHgEeBms3htoGQ+RpNumJw22PKi8s6EPV6EFCMexpVF3nfnPT4OY1t3KMQUpk9O5DF0xJyWI1KvajFdfvI/ZcFVUm1fxzdmH5ED+xA7feuzWa3YAdv+kzTGpZOXjlK2TOLrKbh6m8fc=
+	t=1751540490; cv=none; b=V6hdv+PrutydZhGYgU8g+vFOJShmkxRhvpqJtvyh3ZsVvoaSmv3oBgbTjCj3r9m/G3gs9apBb2ivyWC+U4phTsUnVU/67Jz/9y6iLVE94whXtwVaGxJ6CMUUvDiGXkHeShcxVHfX4UH/jr/e00gfXSMtkUVqNl1A48CLiesdk6Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751540485; c=relaxed/simple;
-	bh=J8AVwd1nYli3gYi5Ujw0e4ywVZrwVWrabJwo9Kgfvw8=;
+	s=arc-20240116; t=1751540490; c=relaxed/simple;
+	bh=o5TPexLQILKzEF2sAOp697m5JmBDmH929TXWrvy0EvY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tRJ78EmxX5R6l97Pb9lwQO8dCRfO9SMh8Qrz1uvSVV0Wui0kEezTZelldmhtAX7D049l/m0a7Y02ec1tr8GL2Rgr1Y7Bvq366viTMYlsdOcA4eST77UsA9nVZ7rqrgXOmSeetLByI536CRAb38LEE+jFKu0lDOagFkx5S+4hXJo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=mYYT2aRd; arc=none smtp.client-ip=209.85.128.52
+	 MIME-Version:Content-Type; b=f6R7cvZrtrcCv5ngPg8eRjkVAFkNXE0fDQbTVZijKEY42EPUUWWML8+JTobR8TTop0D4lLAxvacoLr5+s7LIHAsnL7xzlPl8y5Y54oRJTZb/CnMu3e4XIWnJ98nR2iCt4dfHpCQ8TTen474xsEkBycU6r1K0YK9zqvWrPxd8YMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=DjOBLpn8; arc=none smtp.client-ip=209.85.128.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-45348bff79fso55595395e9.2
-        for <kvm@vger.kernel.org>; Thu, 03 Jul 2025 04:01:23 -0700 (PDT)
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-451d3f72391so57659555e9.3
+        for <kvm@vger.kernel.org>; Thu, 03 Jul 2025 04:01:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1751540482; x=1752145282; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1751540487; x=1752145287; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=mzJU9cMvdw7qI1DsUYXk4sIGt7aNTKeIdxs9XPIRBAs=;
-        b=mYYT2aRdggwIK98uOu3eIfOAc/ZhyKPeiLI30WEfJ5YcqnYYBFjuAV1CZZ1D4KyEKO
-         P4E/3eeUpnmO/DkZomuEae5UNz0wGq+5XVvUsg0DNh1YBjd5SCYHKaqTX3oSlZYhAmZK
-         v3m30dpJaNE37Aa8omcowPffaCpb3rSYFacOil3JHLlHRg3sLhSVdc9LRVb17wV01O3Y
-         C5GySru4O37DD/bXIiJjaRY1JU+sdTl7OQwR/PzK4BHKzXJxfHw3xuxnj5SzAM+OVsO6
-         +puDGizXEWMjxonF4KH8stsa6SASTGe8ITT/efHr+b1bQBLr7furEJEfa/3vHqgY5iUO
-         sMoA==
+        bh=iVv77+T3+ACMfJtq+FwRrQOYxT41VnoDNDgY/IfZvIE=;
+        b=DjOBLpn8KoN3I61pFgb0fJS+tTaR0rb+etuFv3QVvxYm7NBEsQxLEbNyMlGUW5+CHb
+         AEW8yu5oeoLnmkxv+UPFOKf5DiGIfrpNoS2plYr9F8XMhOmJ70P6ukhezk+YRDRe8kee
+         S5Ee1uow/UJrCA/ACHkZDblpCEATZXJ6px1h8c40Pg2AlZ0eebc3VwbPU3GFIIDVvt/e
+         BAqan5o0HmKZ6VXLZwWa2lgCILHCpN7aiOc/xBSf3Iuz8xnW9YQS73uDqqoyK1cAqY5/
+         0ndstNs1yQ98yT9T+L9nwRwGw5l4/OBjhRsi+3xYq+FWx60c4toaYMDe52HEV/Zi3Rit
+         MdqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751540482; x=1752145282;
+        d=1e100.net; s=20230601; t=1751540487; x=1752145287;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=mzJU9cMvdw7qI1DsUYXk4sIGt7aNTKeIdxs9XPIRBAs=;
-        b=nkHLg1IrYIMS3u7hcOoDhSx/K8tBNcOuubHPbwOVeXyiWMfZa4eoqglwbPKe1oU/3Q
-         iCxqI+n2X0Km6b/bllxrJ8k0Q0n66gYhVIcgTG6wGFia4se34x6iefYtEf0BKk6Fzpnb
-         NS4/BmRzL6T/McAAleax9e7ndvBRekNw3zaQ/6LRxTZCaaWT9dx33HgxvpK6nr1YIFoo
-         2aYueuX25Tv0TPhTD+2XTDEbIL1YnSPkyrNA3tpW/8NGcZjp0LXy3PVutMyncI6QvPqw
-         wySDKMJiStbP5BOnlTdDD93FA5BmK733nb6Oo0gjokLbJAslMJKQpzz14dPt15QTO34q
-         9StA==
-X-Forwarded-Encrypted: i=1; AJvYcCW9lt1inIFqUXHF/Vv7SlecDFimsVeRNGU3vT1ePXONVSD4PwSmNyPbMH0wcgi00PwmkS0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyI3bqdFArB0fOUDYr1RqEvk6xFDX9MscQaUksxXJmoVy8R6ipU
-	Drq66uVIpXmpn35GbvcAHf6iZ3VFvjl6bGGWHhDyd0uwPI5cKo0hZKSavNgRCFrJvpo=
-X-Gm-Gg: ASbGncvg0viKq+mRa8skearD+Uj9uWT159w5qfxruBgUbwrLrMfvLva48qWRHLQ4c87
-	jzD96vswfDRGfpRU/EIsWGxxVQeHylz2gZT55Vdx5GuTouUwEnBWaqxoYtZ37NXfrUgKtOf6Nj/
-	bM9A3URV2Evv2W0D3n+t+HDLNa/7kW+pNQ1lCiPX1qj/1DjGNhYjwk1l+AEBeHXXRtYBu68Mhl6
-	cvDD+aZL8bNGHFYAcsogEHb74se2xcrs2aHF9KbtVkJQbKN89D3j6LVRoan6ylDJKRQFkNPn5jH
-	FHI7qeKxo0Cw3IMb3YZuPmt4DaGcYdj2LpbDGGp6TGY3fF7R7GFtFhzhZ4mH4QNHb/UCEbBPawp
-	nzviTy2u5UdU=
-X-Google-Smtp-Source: AGHT+IE9gr9T60NDzRkUuqivylovRxkkmt/fAWeG25n0gokPfhcpDnEXTvr0sTrW5HUyGajZcY1CBA==
-X-Received: by 2002:a05:600c:4f84:b0:450:d37c:9fc8 with SMTP id 5b1f17b1804b1-454a3e1a96amr69146295e9.13.1751540481514;
-        Thu, 03 Jul 2025 04:01:21 -0700 (PDT)
+        bh=iVv77+T3+ACMfJtq+FwRrQOYxT41VnoDNDgY/IfZvIE=;
+        b=XPAx3ULhUWSpUdBxmHZpu9eXLhIdyIHdMz50OMaKDGoByg3iGdWR+Oni2nTvnpS0uw
+         obNrUptck4yLJOAMLufFCYBpypvjOUDJY1vnvza6GE2H9Pr2kWGpfKVliQrLaGaWoMGy
+         1LSbtNQqwvbZRvP+ZgpfnnYztzOUVagyWWOK4ramrg6bO8vmP6a3CfN8rIdNNq5+1Y6i
+         0kdqz98umz5oDGcnNysX6WwGog1MpTHBUmdd+UtmlyTlomfEhmf9hZgQs4eK3NjjYJ1r
+         bRv5CpcQ5MV7jyr3m9g1tRCHXaE9OsMm0Oii8RKGxCL3WIUbirT1IMcRP9721nbNYtuC
+         5onw==
+X-Forwarded-Encrypted: i=1; AJvYcCUI4E06VZBoYoNUPmzlLQ+Bt5ipW8q3YY2er3FWw4DdGHC1QxHtBW6DJC1WGvSiRIWIZtc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwCvPABibX+w/g05sDXyhAigU4OQdCLDSTHNojhMOwca425HgAT
+	ME78wfozWVHjt5Xt+8hMC2brHY+K2WcLH9IWA0/e3BFmffZ4abS1el+JYbOBRW23bXE=
+X-Gm-Gg: ASbGncun5+pfgONeq6ZxXC+sGukc2a2xbZYDLhq/Wl27qtCmsTYYm8YqkMWaF9512wL
+	RqNN1oUhxF0o4b/SSrAznc3bEU1H5jkifA3b+w8dNshAbHODVph7LNG7BID3hS9bfzkP52WQkOF
+	q+vtUTP8HT5+kc0PcDV7q4beLpRykdaFOtCgMy1uWEnlZSrluz/ogGyA0kcOH7LTrZWrh0u/tn5
+	C0xLkKlUI/ShvklXNheCX5cAFYDDATBOqP+DDmwt3sxcZyjpDQ84J4K3HbN+Mz8avDERXVddSRi
+	o9JJ8G7IDdbbm1M/v54te0t12lbzLplH+CpUYWUSKg7SM9P8Bal0z6mygBYtNWVzqwKP7hcEIDn
+	AiiuERzh825k=
+X-Google-Smtp-Source: AGHT+IGA9I3qbJr9+lDfQNbKuMpUBqcBmxbud/aj7IOWUecC0jRGcLwEZ5BDaM+WV1v8cJyY9B2alA==
+X-Received: by 2002:a05:6000:2184:b0:3b3:e29:bda7 with SMTP id ffacd0b85a97d-3b32b14591dmr1811101f8f.9.1751540487431;
+        Thu, 03 Jul 2025 04:01:27 -0700 (PDT)
 Received: from localhost.localdomain ([83.247.137.20])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a88c7e72c1sm18152198f8f.1.2025.07.03.04.01.19
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-454adc71a96sm11323625e9.24.2025.07.03.04.01.25
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 03 Jul 2025 04:01:21 -0700 (PDT)
+        Thu, 03 Jul 2025 04:01:26 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
@@ -80,22 +80,10 @@ Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
 	Pierrick Bouvier <pierrick.bouvier@linaro.org>,
 	kvm@vger.kernel.org,
 	Richard Henderson <richard.henderson@linaro.org>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Zhao Liu <zhao1.liu@intel.com>,
-	Cameron Esfahani <dirty@apple.com>,
-	Roman Bolshakov <rbolshakov@ddn.com>,
-	Phil Dennis-Jordan <phil@philjordan.eu>,
-	Mads Ynddal <mads@ynddal.dk>,
-	Stefano Stabellini <sstabellini@kernel.org>,
-	Anthony PERARD <anthony@xenproject.org>,
-	Paul Durrant <paul@xen.org>,
-	"Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
-	Reinoud Zandijk <reinoud@netbsd.org>,
-	Sunil Muthuswamy <sunilmut@microsoft.com>,
-	xen-devel@lists.xenproject.org
-Subject: [PATCH v5 64/69] accel: Always register AccelOpsClass::get_virtual_clock() handler
-Date: Thu,  3 Jul 2025 12:55:30 +0200
-Message-ID: <20250703105540.67664-65-philmd@linaro.org>
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+Subject: [PATCH v5 65/69] accel/tcg: Factor tcg_vcpu_init() out for re-use
+Date: Thu,  3 Jul 2025 12:55:31 +0200
+Message-ID: <20250703105540.67664-66-philmd@linaro.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250703105540.67664-1-philmd@linaro.org>
 References: <20250703105540.67664-1-philmd@linaro.org>
@@ -108,144 +96,75 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-In order to dispatch over AccelOpsClass::get_virtual_clock(),
-we need it always defined, not calling a hidden handler under
-the hood. Make AccelOpsClass::get_virtual_clock() mandatory.
-Register the default cpu_get_clock() for each accelerator.
-
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-Reviewed-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/system/accel-ops.h        | 2 ++
- accel/hvf/hvf-accel-ops.c         | 1 +
- accel/kvm/kvm-accel-ops.c         | 1 +
- accel/tcg/tcg-accel-ops.c         | 2 ++
- accel/xen/xen-all.c               | 1 +
- system/cpus.c                     | 7 ++++---
- target/i386/nvmm/nvmm-accel-ops.c | 1 +
- target/i386/whpx/whpx-accel-ops.c | 1 +
- 8 files changed, 13 insertions(+), 3 deletions(-)
+ accel/tcg/tcg-accel-ops.h       | 2 ++
+ accel/tcg/tcg-accel-ops-mttcg.c | 4 +++-
+ accel/tcg/tcg-accel-ops-rr.c    | 4 +++-
+ accel/tcg/tcg-accel-ops.c       | 7 +++++++
+ 4 files changed, 15 insertions(+), 2 deletions(-)
 
-diff --git a/include/system/accel-ops.h b/include/system/accel-ops.h
-index 8683cd37716..d5154acc75a 100644
---- a/include/system/accel-ops.h
-+++ b/include/system/accel-ops.h
-@@ -82,6 +82,8 @@ struct AccelOpsClass {
-      * fetch time. The set function is needed if the accelerator wants
-      * to track the changes to time as the timer is warped through
-      * various timer events.
-+     *
-+     * get_virtual_clock() is mandatory.
-      */
-     int64_t (*get_virtual_clock)(void);
-     void (*set_virtual_clock)(int64_t time);
-diff --git a/accel/hvf/hvf-accel-ops.c b/accel/hvf/hvf-accel-ops.c
-index 17776e700eb..cf623a1ea47 100644
---- a/accel/hvf/hvf-accel-ops.c
-+++ b/accel/hvf/hvf-accel-ops.c
-@@ -369,6 +369,7 @@ static void hvf_accel_ops_class_init(ObjectClass *oc, const void *data)
-     ops->update_guest_debug = hvf_update_guest_debug;
+diff --git a/accel/tcg/tcg-accel-ops.h b/accel/tcg/tcg-accel-ops.h
+index 3f8eccb7a7f..a95d97fca29 100644
+--- a/accel/tcg/tcg-accel-ops.h
++++ b/accel/tcg/tcg-accel-ops.h
+@@ -20,4 +20,6 @@ int tcg_cpu_exec(CPUState *cpu);
+ void tcg_handle_interrupt(CPUState *cpu, int old_mask, int new_mask);
+ void tcg_cpu_init_cflags(CPUState *cpu, bool parallel);
  
-     ops->get_elapsed_ticks = cpu_get_ticks;
-+    ops->get_virtual_clock = cpu_get_clock;
-     ops->get_vcpu_stats = hvf_get_vcpu_stats;
- };
++int tcg_vcpu_init(CPUState *cpu);
++
+ #endif /* TCG_ACCEL_OPS_H */
+diff --git a/accel/tcg/tcg-accel-ops-mttcg.c b/accel/tcg/tcg-accel-ops-mttcg.c
+index 96ce065eb59..4de506a80ca 100644
+--- a/accel/tcg/tcg-accel-ops-mttcg.c
++++ b/accel/tcg/tcg-accel-ops-mttcg.c
+@@ -79,8 +79,10 @@ void *mttcg_cpu_thread_routine(void *arg)
+     qemu_thread_get_self(cpu->thread);
  
-diff --git a/accel/kvm/kvm-accel-ops.c b/accel/kvm/kvm-accel-ops.c
-index f27228d4cd9..dde498e0626 100644
---- a/accel/kvm/kvm-accel-ops.c
-+++ b/accel/kvm/kvm-accel-ops.c
-@@ -97,6 +97,7 @@ static void kvm_accel_ops_class_init(ObjectClass *oc, const void *data)
- #endif
+     cpu->thread_id = qemu_get_thread_id();
+-    cpu->neg.can_do_io = true;
+     current_cpu = cpu;
++
++    tcg_vcpu_init(cpu);
++
+     cpu_thread_signal_created(cpu);
+     qemu_guest_random_seed_thread_part2(cpu->random_seed);
  
-     ops->get_elapsed_ticks = cpu_get_ticks;
-+    ops->get_virtual_clock = cpu_get_clock;
- }
+diff --git a/accel/tcg/tcg-accel-ops-rr.c b/accel/tcg/tcg-accel-ops-rr.c
+index fc33a13e4e8..9578bc639cb 100644
+--- a/accel/tcg/tcg-accel-ops-rr.c
++++ b/accel/tcg/tcg-accel-ops-rr.c
+@@ -192,7 +192,9 @@ static void *rr_cpu_thread_fn(void *arg)
+     qemu_thread_get_self(cpu->thread);
  
- static const TypeInfo kvm_accel_ops_type = {
+     cpu->thread_id = qemu_get_thread_id();
+-    cpu->neg.can_do_io = true;
++
++    tcg_vcpu_init(cpu);
++
+     cpu_thread_signal_created(cpu);
+     qemu_guest_random_seed_thread_part2(cpu->random_seed);
+ 
 diff --git a/accel/tcg/tcg-accel-ops.c b/accel/tcg/tcg-accel-ops.c
-index f22f5d73abe..780e9debbc4 100644
+index 780e9debbc4..6823f31d8ad 100644
 --- a/accel/tcg/tcg-accel-ops.c
 +++ b/accel/tcg/tcg-accel-ops.c
-@@ -207,6 +207,7 @@ static void tcg_accel_ops_init(AccelClass *ac)
-         ops->kick_vcpu_thread = mttcg_kick_vcpu_thread;
-         ops->handle_interrupt = tcg_handle_interrupt;
-         ops->get_elapsed_ticks = cpu_get_ticks;
-+        ops->get_virtual_clock = cpu_get_clock;
-     } else {
-         ops->create_vcpu_thread = rr_start_vcpu_thread;
-         ops->kick_vcpu_thread = rr_kick_vcpu_thread;
-@@ -217,6 +218,7 @@ static void tcg_accel_ops_init(AccelClass *ac)
-             ops->get_elapsed_ticks = icount_get;
-         } else {
-             ops->handle_interrupt = tcg_handle_interrupt;
-+            ops->get_virtual_clock = cpu_get_clock;
-             ops->get_elapsed_ticks = cpu_get_ticks;
-         }
-     }
-diff --git a/accel/xen/xen-all.c b/accel/xen/xen-all.c
-index 48d458bc4c7..85fb9d1606c 100644
---- a/accel/xen/xen-all.c
-+++ b/accel/xen/xen-all.c
-@@ -158,6 +158,7 @@ static void xen_accel_ops_class_init(ObjectClass *oc, const void *data)
-     ops->kick_vcpu_thread = cpus_kick_thread;
-     ops->handle_interrupt = generic_handle_interrupt;
-     ops->get_elapsed_ticks = cpu_get_ticks;
-+    ops->get_virtual_clock = cpu_get_clock;
+@@ -77,6 +77,13 @@ void tcg_vcpu_thread_precreate(CPUState *cpu)
+     tcg_cpu_init_cflags(cpu, current_machine->smp.max_cpus > 1);
  }
  
- static const TypeInfo xen_accel_ops_type = {
-diff --git a/system/cpus.c b/system/cpus.c
-index d32b89ecf7b..6c99756346a 100644
---- a/system/cpus.c
-+++ b/system/cpus.c
-@@ -216,10 +216,10 @@ int64_t cpus_get_virtual_clock(void)
-      *
-      * XXX
-      */
--    if (cpus_accel && cpus_accel->get_virtual_clock) {
--        return cpus_accel->get_virtual_clock();
-+    if (!cpus_accel) {
-+        return cpu_get_clock();
-     }
--    return cpu_get_clock();
-+    return cpus_accel->get_virtual_clock();
- }
- 
- /*
-@@ -666,6 +666,7 @@ void cpus_register_accel(const AccelOpsClass *ops)
-     assert(ops->kick_vcpu_thread);
-     assert(ops->handle_interrupt);
-     assert(ops->get_elapsed_ticks);
-+    assert(ops->get_virtual_clock);
-     cpus_accel = ops;
- }
- 
-diff --git a/target/i386/nvmm/nvmm-accel-ops.c b/target/i386/nvmm/nvmm-accel-ops.c
-index 4deff57471c..a2e84cb087a 100644
---- a/target/i386/nvmm/nvmm-accel-ops.c
-+++ b/target/i386/nvmm/nvmm-accel-ops.c
-@@ -86,6 +86,7 @@ static void nvmm_accel_ops_class_init(ObjectClass *oc, const void *data)
-     ops->synchronize_pre_loadvm = nvmm_cpu_synchronize_pre_loadvm;
- 
-     ops->get_elapsed_ticks = cpu_get_ticks;
-+    ops->get_virtual_clock = cpu_get_clock;
- }
- 
- static const TypeInfo nvmm_accel_ops_type = {
-diff --git a/target/i386/whpx/whpx-accel-ops.c b/target/i386/whpx/whpx-accel-ops.c
-index f47033a502c..d27e89dd9c5 100644
---- a/target/i386/whpx/whpx-accel-ops.c
-+++ b/target/i386/whpx/whpx-accel-ops.c
-@@ -89,6 +89,7 @@ static void whpx_accel_ops_class_init(ObjectClass *oc, const void *data)
-     ops->synchronize_pre_loadvm = whpx_cpu_synchronize_pre_loadvm;
- 
-     ops->get_elapsed_ticks = cpu_get_ticks;
-+    ops->get_virtual_clock = cpu_get_clock;
- }
- 
- static const TypeInfo whpx_accel_ops_type = {
++int tcg_vcpu_init(CPUState *cpu)
++{
++    cpu->neg.can_do_io = true;
++
++    return 0;
++}
++
+ void tcg_cpu_destroy(CPUState *cpu)
+ {
+     cpu_thread_signal_destroyed(cpu);
 -- 
 2.49.0
 
