@@ -1,410 +1,216 @@
-Return-Path: <kvm+bounces-51366-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51367-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92EDFAF6956
-	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 07:11:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51E57AF6A1B
+	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 08:11:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 330CF4A307E
-	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 05:10:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B81D16C1EC
+	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 06:11:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6814028EBF1;
-	Thu,  3 Jul 2025 05:10:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30A5728FFEC;
+	Thu,  3 Jul 2025 06:10:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YURrSHVt"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DlLd3yZD"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C976722FE18
-	for <kvm@vger.kernel.org>; Thu,  3 Jul 2025 05:10:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751519452; cv=none; b=EVeiCZmYh/rCGSk8X9nEYyZ4MGVaEOuvLW5rQLm6mnv2YDtDTTvhPDyCwnOcTGZPVY9hhV/vzjfHiFKfeG/l9tD0geaWY8+OR4FN5iGbrAhM9PrvVqQEy4YUoVQ3NCA7xoXIuAs721JqAP5roEXkdUolJhqQ8VSEENYKpWdg5q0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751519452; c=relaxed/simple;
-	bh=vIzIJZDIFkfsEmy2wcQ+uT289kzzzIyMOaOdvEv4wY8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DOOW/ltQqZtiANUEXbeuL6NfCKJx2JKmG+OvNYpxsmuJN7DXjb39bl1y0ScImaa36IWOnRK6gJFsXodK5iN2rmKUQMrAiblXEEyhU0Ze0Z61/7l4ExjTR5iPIhPicT5C+ts4UmnAzELWSPqW44LP8X4+szA+rUgM+HRZ32Nd7SY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YURrSHVt; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-237f270513bso72925ad.1
-        for <kvm@vger.kernel.org>; Wed, 02 Jul 2025 22:10:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1751519450; x=1752124250; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9r6oSrJdvma/ppArIPNGYIDzwnPe2WkOtZUjd7ymxvs=;
-        b=YURrSHVt6hXT01y7ipzaV7XX1umnZL8cyy5nDKbQWyPjbL2a32u5R8x+VaGvetVESy
-         vKES2dehUD3M1vslEQx4Cty6qQ8/v0nN6u8dty74bo3IzvyfJrhwmKop92w1oc2F2LbK
-         ZX6S8QPSoeq4No98J95TvW5EVBDJcVb5dsRkswF87QHqOnIzZxHOE84k8N2nTH2QV+5w
-         ZzFUj3nuZSrLyMzyqUU5Cmlv3dtq9k+TSz9iDHkhzo6uqY17MpuGyB0GCEsoEvmMsK5C
-         uDgNSOrB2jHwSb+kb8MWZTrcdvjeCJoMnRytNTm7tDkFK2dD+99I2uul7MB5qzicHfWc
-         MwkQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751519450; x=1752124250;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9r6oSrJdvma/ppArIPNGYIDzwnPe2WkOtZUjd7ymxvs=;
-        b=p+vJb5Kv9fDWYpgjs0F+tzMFIZpo/Anq3vbOaAEM7wtihEHdV0JRjUCZiA1uDhgI0F
-         n3rTNUsADMvegpKP9osmck/dae+qajHlOsvBTI7nevnKCWXgD5r6qCX1VoM0Lt8nQwZS
-         M2WQxgCuUJMLzoHJkUMA3IKo6Ie9i7MzZnkttP4hphHlAI7FRHw0xudM3wUzdu8B04h7
-         2sGRrSC7s45cEaum0rY8OEq+gu+QsN1Eg9eJxqCvzF7o+nStNnx0LNtIoiX2s1OoO1Be
-         9MRFSNexGh9L/Dkk0TIrJfGbG1Xy/t/r+MbRkXmpl1j8T3dx3SWpBEZeYtB53xSlqsYC
-         Lqqw==
-X-Forwarded-Encrypted: i=1; AJvYcCXxDEuSja99bYhWHxC7eeji4XyvQlQkQ+9Em0yiyIo6Km591BdGk3oIRFg+4zZ2zk607co=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwLY2a78EgFQQSAuWkAbF5BevIoPRcysZLLsEKR5eqzaQP7IJcB
-	b8SM5I9kutjKXqGj/leGNRark3KUbgqN9fy0aLOPnnPNvCcOI4jBGMEIhxvktHmeB2ymk6a2lKt
-	bQp24vetsZjO1+oZQaojq9yMNyifaK0mp9xg4QdlZ
-X-Gm-Gg: ASbGncuKM1XcZ3W8ZqZiMLkiddafiW7te2CD8kZ2XSR/qFBz15JlxtGN5Jm7npYy+kF
-	EiJfQkqeR0YgLzJgs9d5BmQTws999FNncNRn0dCL5SXlwmufSNBFg63VeqXPjXm/Ivf8+KihKaL
-	D+ua31r6yT4sX9XtFXaaf4qP9+TGjgzrcqNfB+DAkvYor//4gBkN+jIConfgOybBUCa59JA2VkM
-	ztW
-X-Google-Smtp-Source: AGHT+IGzGo02E222/kLb1ya42jzy/0z9IuFo8tQBDelKleWoDxoJxYoeX1rAgbuzvdnV8n2Qt9RhRKHi0TjqJpdGL9I=
-X-Received: by 2002:a17:902:e551:b0:234:b2bf:e67f with SMTP id
- d9443c01a7336-23c7abfdd8dmr1343185ad.9.1751519449201; Wed, 02 Jul 2025
- 22:10:49 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50C8C136E
+	for <kvm@vger.kernel.org>; Thu,  3 Jul 2025 06:10:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.9
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751523053; cv=fail; b=GXBa8e+KnFoNKXRT/nioJo3Yny15HmBI6NTy2ObvawNyaJf2sABniw/2iaCDP6owBgUpgl7D+qSh5bEjF7IBqdvNN65nSI1bYIPJ1x2COLKTBQZgEveRUBbhx3gGUcATxW6WxjbYuJDb9sqZwVyKvqoIXzUz2YXJxoaiCNd9mcU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751523053; c=relaxed/simple;
+	bh=bU08o7ltuHgojU1qjFIv9MDao6vVBZ7WICnx9Zphk2s=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=rcficci1oo3knjwEy5VTW/66KYwRrWJe2wBtD1llAesTm7XeBmmFlw5Es9JTIaLFwP0xbTPgiXVQBnFGnj5YFCM7PUimJuy5uoPI2zr/jr68CdjT54uLJBA4TlMdq5tpipbpAL8LJZjZb8UFtcHAKOWA8P/u9FdMJe5+8kSrTRw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DlLd3yZD; arc=fail smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1751523051; x=1783059051;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=bU08o7ltuHgojU1qjFIv9MDao6vVBZ7WICnx9Zphk2s=;
+  b=DlLd3yZDMn8xLGyeG+6AnurXFxCps/7y4pY/t9yH8BcHOoKUunbbve1A
+   kYFxko7+yL0nyC/BBWsG4G4QpUl7EBH+916zLqJrb8DhqvJ0XVh6xmbJn
+   WKaNRkcN2zj6ktFP3/pU1qqCimMBck648shBYtCiA1IzIByV6Z06cAEst
+   17VrUdLMDYjvorrFpAZxF8pZzzp3cQLmLKJzkDXk89ptgumUHgcNOru2a
+   vEfaSKluaOFLIYXxi33kZoOp8CMPqh83bYdXb/Dv8hCaZW3j8i6dBqIMY
+   5sy3e1+u/hXE2XlsmBspHmC5HrUTIQns/bLzs5WmRYhIbfyZOlcLHfq4J
+   Q==;
+X-CSE-ConnectionGUID: VBQ48gkFRR+WlCUn9Sy1rQ==
+X-CSE-MsgGUID: SgLTByEUSuSkqDoxPQjiHw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11482"; a="76382623"
+X-IronPort-AV: E=Sophos;i="6.16,283,1744095600"; 
+   d="scan'208";a="76382623"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2025 23:10:50 -0700
+X-CSE-ConnectionGUID: 5la7EtYpQjWHKNaIveTEJw==
+X-CSE-MsgGUID: /VeIW4I/QuqGa+hlQ9eeog==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,283,1744095600"; 
+   d="scan'208";a="191447126"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by orviesa001.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2025 23:10:51 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Wed, 2 Jul 2025 23:10:50 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25 via Frontend Transport; Wed, 2 Jul 2025 23:10:50 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (40.107.220.63)
+ by edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Wed, 2 Jul 2025 23:10:50 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=jh7AzVmlsjPHSh5zyY1mKPbIqZPfRENr+7+wEyTbO0JALd5GoGJBpYiXb4oa+y//MYAKeW8opQiaPqTpfhRPsvmYc5ySJ0j33VwD8txKTBWHWfcC6WP1Ig3yb4tbCLimvhFl4OlF/6xmJJxGehgS5Xk+JHRddTMVBfmOAF6FOCFqV2vvTgzoomq5DUcNTEYz68RAqPmIv2IdgVyTVRMrhPmhLx3NP+vMrmsf+fN311Ly3x9+WG/hF3FtQx3umVF/6nq4V/6CYyBjCgG5zO2uTdts1OzzSZKVUmCzskl9NXGjT99ynmUhYPreFrYqxUZYRNyQ4toy2C70WfD1spTWHg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=jGIgQAxJdujsjMRW17sUtg/zrmstlgeQMlbcKu0VN2E=;
+ b=Aw2EipOOYEsG/oZZY3nz1SRTl7REHkh9RuC3BYbea8Wike44VwIgUlmd76zX3N2wgqrZL8VUSu3TcMTjwxHVc3uIZFHpp9+KmBCsvCyzQ+tgReoumMCvlcggDTiT7z/NFUWnkP8Xc5x1Lz4VpmWCsRZ7QHq+MsbQ247LabFb6A5d2LuiulaBoErKaKsHhxaGqb0du8N2w3SC4hsFgT/yGe42h/7ptNRIvp8bK2vHBSIQIEifbpBpI9b8AzJzM5DeFY7Vaxm6pf8Ao+QQ1E08mibK9ESifsEpnIOqGLfQH4vTqYcyrviwFmgjY1gCkOD2PjqzxEzRcA7RxNwaYqRcig==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by PH7PR11MB6332.namprd11.prod.outlook.com (2603:10b6:510:1fc::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8880.34; Thu, 3 Jul
+ 2025 06:10:20 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::b576:d3bd:c8e0:4bc1]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::b576:d3bd:c8e0:4bc1%4]) with mapi id 15.20.8880.029; Thu, 3 Jul 2025
+ 06:10:20 +0000
+From: "Tian, Kevin" <kevin.tian@intel.com>
+To: Jason Gunthorpe <jgg@nvidia.com>, Alex Williamson
+	<alex.williamson@redhat.com>
+CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "aaronlewis@google.com"
+	<aaronlewis@google.com>, "bhelgaas@google.com" <bhelgaas@google.com>,
+	"dmatlack@google.com" <dmatlack@google.com>, "vipinsh@google.com"
+	<vipinsh@google.com>, "seanjc@google.com" <seanjc@google.com>,
+	"jrhilke@google.com" <jrhilke@google.com>
+Subject: RE: [PATCH] vfio/pci: Separate SR-IOV VF dev_set
+Thread-Topic: [PATCH] vfio/pci: Separate SR-IOV VF dev_set
+Thread-Index: AQHb5u2iBX8tePb160qfph8YxC8X3rQfBwSAgAAevQCAAAGCAIAAzIPg
+Date: Thu, 3 Jul 2025 06:10:19 +0000
+Message-ID: <BN9PR11MB52760707F9A737186D818D1F8C43A@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20250626225623.1180952-1-alex.williamson@redhat.com>
+ <20250702160031.GB1139770@nvidia.com>
+ <20250702115032.243d194a.alex.williamson@redhat.com>
+ <20250702175556.GC1139770@nvidia.com>
+In-Reply-To: <20250702175556.GC1139770@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|PH7PR11MB6332:EE_
+x-ms-office365-filtering-correlation-id: a5bb940d-8aec-45b5-93fc-08ddb9f849f3
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?jnP4p5ao8fWLbH5l1EVIsaZYC3m0LPYVMawn5q/R6deSKFO8DxAMmrZeJBEa?=
+ =?us-ascii?Q?4zZQiGn/YaRreV1vvzRYCp7oXbmdpg/LNdctDOVW98hNMAXtrnzGOVr0Ja7m?=
+ =?us-ascii?Q?+RNelqHEuV0pYN2T1Ji7rGuKgYEdEc4OCWMj3v+Ooj3OaTapNTPWkVcixFwn?=
+ =?us-ascii?Q?Wl7psaDJgvb/5C32gEJb2bFs70JEibyK1lqe95yvRknCGrlB8kgnrkbUZ/XC?=
+ =?us-ascii?Q?nvPwncAjl/ekPzGFdFpKIGk9cXl/xxqb5hT/iYl8TS1Q+DwAlERV2ZwVe8WO?=
+ =?us-ascii?Q?+3UEHjgkfuPiPE4JgEO1Ayu/9VxUaQxUYqqQhHNK7XYEOQo+CbUIkMZn9Q4s?=
+ =?us-ascii?Q?f9J5ynectZVaAECZRSYSTx0x560gQnb34jZbANKed1dDvlkBpI/WW0QowGa0?=
+ =?us-ascii?Q?71gd0wvqViEgdmKjeOVTO6sqFhrlY15+yAUloFj0mvhy8DZmgF46b8RG9kGr?=
+ =?us-ascii?Q?Y68vlGFdTYwc+qZ2lTjNGsuLZb26wnhk1mNJ+Y8/fXA3Yr8YIioobmkdyHfK?=
+ =?us-ascii?Q?jACuDZRs1j7/8tO4luNOfpvmK5Tdx0wBdke0hcujlLb1ha4zskg6k7GomxuU?=
+ =?us-ascii?Q?q28MiETGTMPuDwAP3FfmIJv5iEGvX+evcIf13xEBg7jbWh0LEVLuNL3Hz3m6?=
+ =?us-ascii?Q?AZg1O/OhwEePYu0obJdWCzQQTAbFSTqlX+bvPBT8kkzN8gWA+kezj0NLkXT9?=
+ =?us-ascii?Q?4bQebvCbrFERKDfqJwcU2XY5vW3Lw0OBouLYtDj3ZaNJ63ov+i6Ba4TmDK0o?=
+ =?us-ascii?Q?QQzGlK8crQKTGsw7EFlZQGie6zLZx4zeR7BVOnqeDmf1/aaH9lL30R+cUzbO?=
+ =?us-ascii?Q?CKBJnV+GZ1nYLepmWo5Ab4aO1ypFkoebCKGvXavi8WwImiT9rlSObyH7e+da?=
+ =?us-ascii?Q?GusA6mMyFki/UoeJkLI7xYKP5gJXVKFxvHSmxMJkFcuC6vjvZS+HZjx7as59?=
+ =?us-ascii?Q?O6naap3gtyDEzoOkAA8H1OCHj6R7qj8IWJ1eiSVdOeEyQXzXvvrc4a1G0sTO?=
+ =?us-ascii?Q?i8OCqHu+Y5cQhRyzGQr6+zBXX6+VfLc64tkwem7a3HR6JXLg10BzVWliW1kc?=
+ =?us-ascii?Q?wbkhdIN7DJoBcrC+Mfe2K95huitA7wbicj9VD7rSulwQZzaDRj188B2pKH58?=
+ =?us-ascii?Q?u3tbnQPvwx4rCTYAcZ5LY8WTts1UM8x0v4RZ2ljF0deGg/SIPKlbiwJi6DMN?=
+ =?us-ascii?Q?jctXATkDZuI+yYZ8o05jKqItaAO2GWe5QCyj0p0PHb+ghTnLctjZyFNNSYZw?=
+ =?us-ascii?Q?OURDzFRm3iwPEJumqB0S2ZEnZ9VM7OPfRMSSU/jpGWQqi3M4xULJdZXdfFGd?=
+ =?us-ascii?Q?ZoztQ9qrRZg3uOL7ZrDdJemQCF0mYOwBNPL3tDelsGQurlCk9atCzb2L2It/?=
+ =?us-ascii?Q?9ipqhxpdZ2atnOU4LGGmKOl4F9wb8u4NwfVQos8DvwvGogmBdCkry/nK/6//?=
+ =?us-ascii?Q?TWJjv21Z4RRElmiU+96+dohDyjTgXK3K+e2LYdzZlFSdjTMYW3fry5HK25Co?=
+ =?us-ascii?Q?N6n195c4YFhVdYA=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?DsDnXOpecr2EidBu/LH8Bu0kFlcFb3Stxa7oTzqCiNrzGjWvMsLg3bBIs/zJ?=
+ =?us-ascii?Q?KOag4whOQhPMrDs0u5ApiHq9vKsDuAjKKGmRhuvnH1VRl0jZ7yWnOrPKHDJh?=
+ =?us-ascii?Q?t/rj3hlUOCU0bIEwsJcZHaO6S6TRSpsnrYpnxHqlL6CpnJYeevYN4dzaxJKY?=
+ =?us-ascii?Q?PNzswA7+n5BSBE3psTBovPrAu3UefM3QzU6VmJYa1V8gMXH/t+B85qUlVnML?=
+ =?us-ascii?Q?uf1vDojO5dpTj4gHes0bDRN73Qrr6xZMvRP3H8LcoVVP4OvOSfHgFOoy+YWc?=
+ =?us-ascii?Q?3ZHtCX3qbBiNPQR8zwGpO/QWNuPU7K86XTc7jAcVGojru3qhJM9gCO1ZwKBv?=
+ =?us-ascii?Q?V89dTit3E/yKpAB9Nu2yFZrekae9ePet8yuk8VmuAXoLZdbPASwAbM0baZKv?=
+ =?us-ascii?Q?o8lnYtxDGejnf61njEK5uwceaHIyN7lHYgTYQT3X9xIyv8JX/L1iQLCyyagI?=
+ =?us-ascii?Q?38xnyKNlaNZGLzk70kPTXjYS3xaXOexIvm8zJrcXFGweD/UjalNTBHZWZV6e?=
+ =?us-ascii?Q?Nc3VPjs9WGFeqRbaeahZOjfK+4uqKvmuDhFahWJ4D4CLmZeXfcNYqzIoJx3l?=
+ =?us-ascii?Q?N6Chk4eMAVa7c9ZC/3utcIrpC1khJJ3m8h7ozErcneRb5aPRSjRBAMGgkaxK?=
+ =?us-ascii?Q?S/hDe+fR1CRroV/RqNWoW0HMJ9XzYSFdAJoozHCSn6wJT1YKGyzkx+o7PejC?=
+ =?us-ascii?Q?2Kv6gaT8t1E6KHLfhI4XW9GGbHBRR6RfzLyCIP0lBvja9uaqr5oupikSMU+9?=
+ =?us-ascii?Q?cM6KXAvvy4v3WIKiQqlGsWcK+WxpvOnaESEGzfPnWORajwSR81njX/M2t2Kn?=
+ =?us-ascii?Q?5kcfy0SEGjsMrboQY9bFWHkQc8eIZsLcQFoodR2F5VNOdR6JcWjAbQiy4DzM?=
+ =?us-ascii?Q?E9lZXsDll+VBkLE3lNvVhUjXWSgswnFp+/218Ml8HPgmXflyeGQ5LKBFPsXe?=
+ =?us-ascii?Q?ZOJcU+BTwPJIKKgW2keFL2D1lQ7WBJ2NkEfe0A04pSEUqcwD+c8zRgbowaNJ?=
+ =?us-ascii?Q?Y+xNdXx4xU/EvWwd5CnUaIFh4qqSi2S9RrUN8X0ziK+OusAOi55vng6Qyapq?=
+ =?us-ascii?Q?L8CENLB1gGqqVqquQexyXcCzOaH6kM7glKnNPqhPS7fSfnkG+QWjF3IwBTNh?=
+ =?us-ascii?Q?lLF16A/AjejMJfzTOg9VckS8sQSK4MtL/wSu2nZeSajIwZSEWjlwY1olUIjW?=
+ =?us-ascii?Q?om/iYc013hH8S3OZeGT9SvrU/x+1KRciNHmeTSVEThXW940K6N0g9KxqvXxM?=
+ =?us-ascii?Q?1yalcJ2ckHR/vNQl6K9pMjaJQJvOwIm7ybKZ7O6hti8RlMm2TKzWbhXA7bWJ?=
+ =?us-ascii?Q?v1ta5WSAjfV9siA7XOHn/KtNLGUhpRrYrmu1RXyDTzIzZpRgVRVgHloycQDj?=
+ =?us-ascii?Q?wO4L5vmR/XUBfkY4f6WKvdZ+2gat3Ow544kyPZu3SqCk1h6ySgQk2qHq9/ok?=
+ =?us-ascii?Q?bwOzN5X3LAJMa9jGSp26CZ0n9NwUSyTpESb9SjiZ9aVQ7R+ijR85MXWgW4/t?=
+ =?us-ascii?Q?iWWboT6jqyTbgQNBU9beJubY8GE2egxF8sdfM6I9jUaciLg93FB573ZI+Y7M?=
+ =?us-ascii?Q?rilAP6p3yr0Tr10Jzj7ElKHXOT1rk+KfMM2K9lsb?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250529054227.hh2f4jmyqf6igd3i@amd.com> <diqz1prqvted.fsf@ackerleytng-ctop.c.googlers.com>
- <20250702232517.k2nqwggxfpfp3yym@amd.com> <CAGtprH-=f1FBOS=xWciBU6KQJ9LJQ5uZoms83aSRBDsC3=tpZA@mail.gmail.com>
- <20250703041210.uc4ygp4clqw2h6yd@amd.com>
-In-Reply-To: <20250703041210.uc4ygp4clqw2h6yd@amd.com>
-From: Vishal Annapurve <vannapurve@google.com>
-Date: Wed, 2 Jul 2025 22:10:36 -0700
-X-Gm-Features: Ac12FXxFL8lZ310LgZl8pxf1aGMnD30R2b-bcyCXa70teYKtmh3oAVTF6sRTjrM
-Message-ID: <CAGtprH9sckYupyU12+nK-ySJjkTgddHmBzrq_4P1Gemck5TGOQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 02/51] KVM: guest_memfd: Introduce and use
- shareability to guard faulting
-To: Michael Roth <michael.roth@amd.com>
-Cc: Ackerley Tng <ackerleytng@google.com>, kvm@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, x86@kernel.org, linux-fsdevel@vger.kernel.org, 
-	aik@amd.com, ajones@ventanamicro.com, akpm@linux-foundation.org, 
-	amoorthy@google.com, anthony.yznaga@oracle.com, anup@brainfault.org, 
-	aou@eecs.berkeley.edu, bfoster@redhat.com, binbin.wu@linux.intel.com, 
-	brauner@kernel.org, catalin.marinas@arm.com, chao.p.peng@intel.com, 
-	chenhuacai@kernel.org, dave.hansen@intel.com, david@redhat.com, 
-	dmatlack@google.com, dwmw@amazon.co.uk, erdemaktas@google.com, 
-	fan.du@intel.com, fvdl@google.com, graf@amazon.com, haibo1.xu@intel.com, 
-	hch@infradead.org, hughd@google.com, ira.weiny@intel.com, 
-	isaku.yamahata@intel.com, jack@suse.cz, james.morse@arm.com, 
-	jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, jhubbard@nvidia.com, 
-	jroedel@suse.de, jthoughton@google.com, jun.miao@intel.com, 
-	kai.huang@intel.com, keirf@google.com, kent.overstreet@linux.dev, 
-	kirill.shutemov@intel.com, liam.merwick@oracle.com, 
-	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, maz@kernel.org, 
-	mic@digikod.net, mpe@ellerman.id.au, muchun.song@linux.dev, nikunj@amd.com, 
-	nsaenz@amazon.es, oliver.upton@linux.dev, palmer@dabbelt.com, 
-	pankaj.gupta@amd.com, paul.walmsley@sifive.com, pbonzini@redhat.com, 
-	pdurrant@amazon.co.uk, peterx@redhat.com, pgonda@google.com, pvorel@suse.cz, 
-	qperret@google.com, quic_cvanscha@quicinc.com, quic_eberman@quicinc.com, 
-	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com, richard.weiyang@gmail.com, 
-	rick.p.edgecombe@intel.com, rientjes@google.com, roypat@amazon.co.uk, 
-	rppt@kernel.org, seanjc@google.com, shuah@kernel.org, steven.price@arm.com, 
-	steven.sistare@oracle.com, suzuki.poulose@arm.com, tabba@google.com, 
-	thomas.lendacky@amd.com, usama.arif@bytedance.com, vbabka@suse.cz, 
-	viro@zeniv.linux.org.uk, vkuznets@redhat.com, wei.w.wang@intel.com, 
-	will@kernel.org, willy@infradead.org, xiaoyao.li@intel.com, 
-	yan.y.zhao@intel.com, yilun.xu@intel.com, yuzenghui@huawei.com, 
-	zhiquan1.li@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a5bb940d-8aec-45b5-93fc-08ddb9f849f3
+X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Jul 2025 06:10:19.9561
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: BJaZHOXMb1qP/jQ4CWuD0N+r/5Hd7DPicwstEe240f+HY1ZSs1Y3M8dThQUUxQdGRuQeNTW13IBIqjdyl50qHA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB6332
+X-OriginatorOrg: intel.com
 
-On Wed, Jul 2, 2025 at 9:12=E2=80=AFPM Michael Roth <michael.roth@amd.com> =
-wrote:
->
-> On Wed, Jul 02, 2025 at 05:46:23PM -0700, Vishal Annapurve wrote:
-> > On Wed, Jul 2, 2025 at 4:25=E2=80=AFPM Michael Roth <michael.roth@amd.c=
-om> wrote:
-> > >
-> > > On Wed, Jun 11, 2025 at 02:51:38PM -0700, Ackerley Tng wrote:
-> > > > Michael Roth <michael.roth@amd.com> writes:
-> > > >
-> > > > > On Wed, May 14, 2025 at 04:41:41PM -0700, Ackerley Tng wrote:
-> > > > >> Track guest_memfd memory's shareability status within the inode =
-as
-> > > > >> opposed to the file, since it is property of the guest_memfd's m=
-emory
-> > > > >> contents.
-> > > > >>
-> > > > >> Shareability is a property of the memory and is indexed using th=
-e
-> > > > >> page's index in the inode. Because shareability is the memory's
-> > > > >> property, it is stored within guest_memfd instead of within KVM,=
- like
-> > > > >> in kvm->mem_attr_array.
-> > > > >>
-> > > > >> KVM_MEMORY_ATTRIBUTE_PRIVATE in kvm->mem_attr_array must still b=
-e
-> > > > >> retained to allow VMs to only use guest_memfd for private memory=
- and
-> > > > >> some other memory for shared memory.
-> > > > >>
-> > > > >> Not all use cases require guest_memfd() to be shared with the ho=
-st
-> > > > >> when first created. Add a new flag, GUEST_MEMFD_FLAG_INIT_PRIVAT=
-E,
-> > > > >> which when set on KVM_CREATE_GUEST_MEMFD, initializes the memory=
- as
-> > > > >> private to the guest, and therefore not mappable by the
-> > > > >> host. Otherwise, memory is shared until explicitly converted to
-> > > > >> private.
-> > > > >>
-> > > > >> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
-> > > > >> Co-developed-by: Vishal Annapurve <vannapurve@google.com>
-> > > > >> Signed-off-by: Vishal Annapurve <vannapurve@google.com>
-> > > > >> Co-developed-by: Fuad Tabba <tabba@google.com>
-> > > > >> Signed-off-by: Fuad Tabba <tabba@google.com>
-> > > > >> Change-Id: If03609cbab3ad1564685c85bdba6dcbb6b240c0f
-> > > > >> ---
-> > > > >>  Documentation/virt/kvm/api.rst |   5 ++
-> > > > >>  include/uapi/linux/kvm.h       |   2 +
-> > > > >>  virt/kvm/guest_memfd.c         | 124 ++++++++++++++++++++++++++=
-++++++-
-> > > > >>  3 files changed, 129 insertions(+), 2 deletions(-)
-> > > > >>
-> > > > >> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt=
-/kvm/api.rst
-> > > > >> index 86f74ce7f12a..f609337ae1c2 100644
-> > > > >> --- a/Documentation/virt/kvm/api.rst
-> > > > >> +++ b/Documentation/virt/kvm/api.rst
-> > > > >> @@ -6408,6 +6408,11 @@ belonging to the slot via its userspace_a=
-ddr.
-> > > > >>  The use of GUEST_MEMFD_FLAG_SUPPORT_SHARED will not be allowed =
-for CoCo VMs.
-> > > > >>  This is validated when the guest_memfd instance is bound to the=
- VM.
-> > > > >>
-> > > > >> +If the capability KVM_CAP_GMEM_CONVERSIONS is supported, then t=
-he 'flags' field
-> > > > >> +supports GUEST_MEMFD_FLAG_INIT_PRIVATE.  Setting GUEST_MEMFD_FL=
-AG_INIT_PRIVATE
-> > > > >> +will initialize the memory for the guest_memfd as guest-only an=
-d not faultable
-> > > > >> +by the host.
-> > > > >> +
-> > > > >
-> > > > > KVM_CAP_GMEM_CONVERSION doesn't get introduced until later, so it=
- seems
-> > > > > like this flag should be deferred until that patch is in place. I=
-s it
-> > > > > really needed at that point though? Userspace would be able to se=
-t the
-> > > > > initial state via KVM_GMEM_CONVERT_SHARED/PRIVATE ioctls.
-> > > > >
-> > > >
-> > > > I can move this change to the later patch. Thanks! Will fix in the =
-next
-> > > > revision.
-> > > >
-> > > > > The mtree contents seems to get stored in the same manner in eith=
-er case so
-> > > > > performance-wise only the overhead of a few userspace<->kernel sw=
-itches
-> > > > > would be saved. Are there any other reasons?
-> > > > >
-> > > > > Otherwise, maybe just settle on SHARED as a documented default (s=
-ince at
-> > > > > least non-CoCo VMs would be able to reliably benefit) and let
-> > > > > CoCo/GUEST_MEMFD_FLAG_SUPPORT_SHARED VMs set PRIVATE at whatever
-> > > > > granularity makes sense for the architecture/guest configuration.
-> > > > >
-> > > >
-> > > > Because shared pages are split once any memory is allocated, having=
- a
-> > > > way to INIT_PRIVATE could avoid the split and then merge on
-> > > > conversion. I feel that is enough value to have this config flag, w=
-hat
-> > > > do you think?
-> > > >
-> > > > I guess we could also have userspace be careful not to do any alloc=
-ation
-> > > > before converting.
->
-> (Re-visiting this with the assumption that we *don't* intend to use mmap(=
-) to
-> populate memory (in which case you can pretty much ignore my previous
-> response))
+> From: Jason Gunthorpe <jgg@nvidia.com>
+> Sent: Thursday, July 3, 2025 1:56 AM
+>=20
+> On Wed, Jul 02, 2025 at 11:50:32AM -0600, Alex Williamson wrote:
+> > I haven't tried it, but it may be possible to trigger a hot reset
+> > on a user owned PF while there are open VFs.  If that is possible, I
+> > wonder if it isn't just a userspace problem though, it doesn't seem
+> > there's anything fundamentally wrong with it from a vfio perspective.
+> > The vf-token already indicates at the kernel level that there is
+> > collaboration between PF and VF userspace drivers.
+>=20
+> I think it will disable SRIOV and that will leave something of a
+> mess. Arguably we should be blocking resets that disable SRIOV inside
+> vfio?
+>=20
 
-I am assuming in-place conversion with huge page backing for the
-discussion below.
-
-Looks like there are three scenarios/usecases we are discussing here:
-1) Pre-allocating guest_memfd file offsets
-   - Userspace can use fallocate to do this for hugepages by keeping
-the file ranges marked private.
-2) Prefaulting guest EPT/NPT entries
-3) Populating initial guest payload into guest_memfd memory
-   - Userspace can mark certain ranges as shared, populate the
-contents and convert the ranges back to private. So mmap will come in
-handy here.
-
->
-> I'm still not sure where the INIT_PRIVATE flag comes into play. For SNP,
-> userspace already defaults to marking everything private pretty close to
-> guest_memfd creation time, so the potential for allocations to occur
-> in-between seems small, but worth confirming.
-
-Ok, I am not much worried about whether the INIT_PRIVATE flag gets
-supported or not, but more about the default setting that different
-CVMs start with. To me, it looks like all CVMs should start as
-everything private by default and if there is a way to bake that
-configuration during guest_memfd creation time that would be good to
-have instead of doing "create and convert" operations and there is a
-fairly low cost to support this flag.
-
->
-> But I know in the past there was a desire to ensure TDX/SNP could
-> support pre-allocating guest_memfd memory (and even pre-faulting via
-> KVM_PRE_FAULT_MEMORY), but I think that could still work right? The
-> fallocate() handling could still avoid the split if the whole hugepage
-> is private, though there is a bit more potential for that fallocate()
-> to happen before userspace does the "manually" shared->private
-> conversion. I'll double-check on that aspect, but otherwise, is there
-> still any other need for it?
-
-This usecase of being able to preallocate should still work with
-in-place conversion assuming all ranges are private before
-pre-population.
-
->
-> > >
-> > > I assume we do want to support things like preallocating guest memory=
- so
-> > > not sure this approach is feasible to avoid splits.
-> > >
-> > > But I feel like we might be working around a deeper issue here, which=
- is
-> > > that we are pre-emptively splitting anything that *could* be mapped i=
-nto
-> > > userspace (i.e. allocated+shared/mixed), rather than splitting when
-> > > necessary.
-> > >
-> > > I know that was the plan laid out in the guest_memfd calls, but I've =
-run
-> > > into a couple instances that have me thinking we should revisit this.
-> > >
-> > > 1) Some of the recent guest_memfd seems to be gravitating towards hav=
-ing
-> > >    userspace populate/initialize guest memory payload prior to boot v=
-ia
-> > >    mmap()'ing the shared guest_memfd pages so things work the same as
-> > >    they would for initialized normal VM memory payload (rather than
-> > >    relying on back-channels in the kernel to user data into guest_mem=
-fd
-> > >    pages).
-> > >
-> > >    When you do this though, for an SNP guest at least, that memory
-> > >    acceptance is done in chunks of 4MB (with accept_memory=3Dlazy), a=
-nd
-> > >    because that will put each 1GB page into an allocated+mixed state,
-> >
-> > I would like your help in understanding why we need to start
-> > guest_memfd ranges as shared for SNP guests. guest_memfd ranges being
-> > private simply should mean that certain ranges are not faultable by
-> > the userspace.
->
-> It's seeming like I probably misremembered, but I thought there was a
-> discussion on guest_memfd call a month (or so?) ago about whether to
-> continue to use backchannels to populate guest_memfd pages prior to
-> launch. It was in the context of whether to keep using kvm_gmem_populate(=
-)
-> for populating guest_memfd pages by copying them in from separate
-> userspace buffer vs. simply populating them directly from userspace.
-> I thought we were leaning on the latter since it was simpler all-around,
-> which is great for SNP since that is already how it populates memory: by
-> writing to it from userspace, which kvm_gmem_populate() then copies into
-> guest_memfd pages. With shared gmem support, we just skip the latter now
-> in the kernel rather needing changes to how userspace handles things in
-> that regard. But maybe that was just wishful thinking :)
-
-You remember it correctly and that's how userspace should pre-populate
-guest memory contents with in-place conversion support available.
-Userspace can simply do the following scheme as an example:
-1) Create guest_memfd with the INIT_PRIVATE flag or if we decide to
-not go that way, create a guest_memfd file and set all ranges as
-private.
-2) Preallocate the guest_memfd ranges.
-3) Convert the needed ranges to shared, populate the initial guest
-payload and then convert those ranges back to private.
-
-Important point here is that guest_memfd ranges can be marked as
-private before pre-allocating guest_memfd ranges.
-
->
-> But you raise some very compelling points on why this might not be a
-> good idea even if that was how that discussion went.
->
-> >
-> > Will following work?
-> > 1) Userspace starts all guest_memfd ranges as private.
-> > 2) During early guest boot it starts issuing PSC requests for
-> > converting memory from shared to private
-> >     -> KVM forwards this request to userspace
-> >     -> Userspace checks that the pages are already private and simply
-> > does nothing.
-> > 3) Pvalidate from guest on that memory will result in guest_memfd
-> > offset query which will cause the RMP table entries to actually get
-> > populated.
->
-> That would work, but there will need to be changes on userspace to deal
-> with how SNP populates memory pre-boot just like normal VMs do. We will
-> instead need to copy that data into separate buffers, and pass those in
-> as the buffer hva instead of the shared hva corresponding to that GPA.
-
-Initial guest memory payload generally carries a much smaller
-footprint so I ignored that detail in the above sequence. As I said
-above, userspace should be able to use guest_memfd ranges to directly
-populate contents by converting those ranges to shared.
-
->
-> But that seems reasonable if it avoids so many other problems.
->
-> >
-> > >    we end up splitting every 1GB to 4K and the guest can't even
-> > >    accept/PVALIDATE it 2MB at that point even if userspace doesn't to=
-uch
-> > >    anything in the range. As some point the guest will convert/accept
-> > >    the entire range, at which point we could merge, but for SNP we'd
-> > >    need guest cooperation to actually use a higher-granularity in sta=
-ge2
-> > >    page tables at that point since RMP entries are effectively all sp=
-lit
-> > >    to 4K.
-> > >
-> > >    I understand the intent is to default to private where this wouldn=
-'t
-> > >    be an issue, and we could punt to userspace to deal with it, but i=
-t
-> > >    feels like an artificial restriction to place on userspace. And if=
- we
-> > >    do want to allow/expect guest_memfd contents to be initialized pre=
--boot
-> > >    just like normal memory, then userspace would need to jump through
-> > >    some hoops:
-> > >
-> > >    - if defaulting to private: add hooks to convert each range that's=
- being
-> > >      modified to a shared state prior to writing to it
-> >
-> > Why is that a problem?
->
-> These were only problems if we went the above-mentioned way of
-> populating memory pre-boot via mmap() instead of other backchannels. If
-> we don't do that, then both these things cease to be problems. Sounds goo=
-ds
-> to me. :)
-
-I think there wouldn't be a problem even if we pre-populated memory
-pre-boot via mmap(). Using mmap() seems a preferable option to me.
+Is there any reset which doesn't disable SRIOV? According to PCIe
+spec both conventional reset and FLR targeting a PF clears the
+VF enable bit.
 
