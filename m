@@ -1,122 +1,120 @@
-Return-Path: <kvm+bounces-51475-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51477-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7026AF71BD
-	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 13:10:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 248D5AF71D7
+	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 13:13:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 182B856103C
-	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 11:07:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 185773B86C4
+	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 11:12:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38F132E2EFD;
-	Thu,  3 Jul 2025 11:06:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5C212E175D;
+	Thu,  3 Jul 2025 11:12:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ypKv4c1s"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="ZpEgArdw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF22A246798
-	for <kvm@vger.kernel.org>; Thu,  3 Jul 2025 11:06:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C70F1E5B72
+	for <kvm@vger.kernel.org>; Thu,  3 Jul 2025 11:12:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751540810; cv=none; b=lEE+CVXVpOW3A/C9x3+BU72fkz5RfUOqE/EaSY8yI45myVz7qClNLxi8zkZCNLOEQ00VZs/ybcYCAMNTA0ABM0cpXq1uhnVPPyL6r2t7VlQfRe1h4X/FttmgbiVjBpqCdwimPwvC5CMlh9Yo3MPXSx5Wm71vKEhEkzvFAJCrtGk=
+	t=1751541140; cv=none; b=Thx+mtdgGI4bMK+iI98PailYu2WHds4fHmcGxfqACz1xCDQRslwWL04QFwM8HuRbsDpBGe7sFYxYo1TiSYY4NcNxEeK9Tb8h7dx9EwF8xgzYsZw1hWp4VFo4Q6hxX4tH6r/e+7F7y+2a4o5ukeL28bLEC1pvC9yvvxhJWLGsS1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751540810; c=relaxed/simple;
-	bh=j0xn+hMMzuwzIxDYA8R3Julms3gcOCroj61y1cJcCno=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mnaGDEX5ZwAZKxH5ZUETr2zebN4IPVZD+GtySyiqpLrCoi19VfonPJtTJUTW+OLOfse6ovbaa5GQgqkYexqWFS47KLh2jOOS83P1Qx1rVY+x/cvf9IIVm1RTv22Ptjm8Mpsivtde39v8gPiQqLebSuezG/i3h4txAKly8dG04Ro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ypKv4c1s; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-450ce671a08so36108455e9.3
-        for <kvm@vger.kernel.org>; Thu, 03 Jul 2025 04:06:48 -0700 (PDT)
+	s=arc-20240116; t=1751541140; c=relaxed/simple;
+	bh=bihF1qMOyKgYkmhiJ1U6KBKy1pzwOukLKYEfDly5ihw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=H/x94O7AelAQxc2nL8eAHOA6cq9aNP6p2PQC7ZyFdF2UQHDNmZ43/MVANl4j4pzwUP/eIwLHL7bSAc2Y/vntIPK8uuzYCm+25jZXqtm9+tl8SvR6g1bxupkgZ709V0FYBSxQU+xjJXbEK+wFR6fqe3GAC6H+BkNac+7CqikDObg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=ZpEgArdw; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-235f9e87f78so57158235ad.2
+        for <kvm@vger.kernel.org>; Thu, 03 Jul 2025 04:12:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1751540807; x=1752145607; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=SY3bbRxwwhqkW5iC4r3Kz/+8BMlWUXcP8I5mFKx4az8=;
-        b=ypKv4c1snUHD4IyuwNtoCAYBy6csq5ADdnRsNH4THF9KejomR3taOrbpuAUPM+rBDT
-         oAoTCTUCpNybLavzvNYFxR9vUd1iSnkFqb8Goo/P90dHY7Z6QKFsW7F3YYyr0yO89XI6
-         ZliuZSHLzLnCfRdEFQ0g3L/LVBKPAD3zpxEKwfiz4o/TN4rZmO8aS5V+Ki2uaUXrUS5F
-         IP2ScGcCmY9XEaJL9B6RUf7SGcgiWPK87HUhy1egzzdGhu8gK19Tst+FafB7dOh+4tI2
-         WG/uO/8oqmCOjv3SxRcGNV1zERzVUhtwLJCgNCM3InPW9xJ3mUebw+FeQuBVATbDLJ7P
-         wg5A==
+        d=ziepe.ca; s=google; t=1751541138; x=1752145938; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3Bi07Xa1ZYxOiNG8G/e9FKN2IkTvUaWt67C3ZOXAsBA=;
+        b=ZpEgArdwt7zC2F+yjkdSrFD1Uxdt/qh959K4vEs2PDnvEN0U19pNUm6mK0Cxwb1bFB
+         TYUAZemqrKId/G71GCfxFqWnE+dI5F9SA3nGsfGo8DoWqlDTw7rkfVAReod9eabZ+xEo
+         7XEkane57y53YtG3Lsc28YVr5bAXXG4f48t2E/ueDXcdJpBolOXZcaI5mUpKykJdo6H+
+         IhonqZAv5a9nKBBEZbJCQbqW0Cts5Vmld31Li0UAa42USYoonVtF9ixUbrXUVJbHXbLb
+         LCa0XlApRwX7DYTH+QI1i/d4/SqwdI8AzantOBmeZqOcVSoppA3Hj7YYaByeEC3Wb10Q
+         4Knw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751540807; x=1752145607;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SY3bbRxwwhqkW5iC4r3Kz/+8BMlWUXcP8I5mFKx4az8=;
-        b=slzD7d0yZwcEdy2kIeTYzWFc/H1Gukz4RFGK9qi3j4Cucnx3y8Riumae0p1zQZL/Ku
-         DDpopwwjkqc+9+thWhg5CujcXlvI7Gf/44XagcuNER+r3DmJbptMYyiAYGm8Mzm45tTG
-         IcKeHz08HDifcSmO4iHH2qmPnnSbieM+fheYUzNYwlbNPTNU/N77Z7D7SDxhWOLveHhi
-         pPWK23oLYaa/BK+gAVOp+oMFlp8Jb/ugok0og1WTWSJlKuXOTpxB4fQ9odtbhtFL7sJG
-         Xp7FmQ63t0gKW8GVSqvG5WuqnbdvXlMNpH/tvN7r7IWtIIg1bpCDldP4ut/kI9XVv1Pa
-         DS7g==
-X-Forwarded-Encrypted: i=1; AJvYcCXBslPpP66M0CHeXKZdMLer8rKgIvIzWdWRTBWaecOTlORFACLc0uD2afSnrpFp6cHd1VU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy4nCPY2wg+nyrm+fMaMpwkti/V3Y4SCsvnGEjtPbIh+JHQDvcY
-	CGtCXDBsUBO/Q/gUh8EJMC5jlKK8k6us+O7HqKEd3isKnIBsaARc0uRnopG6XP7StkY=
-X-Gm-Gg: ASbGncs5ZxLQo/4e7TaBmZIt9pzr9DcLg6mQ/e/YfM5qGzMgKnY7iU0cLKf1TPOdpTL
-	owVN974tpiY/r6/7iSiuAU5uqhegJDBKoAPlFx3941IZ+SpsPsGunwYHPZbzL+PpiHR/uXRwlM8
-	dZ3PH9w/hsmDMG49cjL+Sas3UZPEnYrtHSJiTsGX3A2AGi7IKZbvWjTMWSaOYV+6vDqR2099pta
-	Xa+kM6ZveIusy1iydKKCZOOT/XnoUz1SOOWjH32+Mbn2X+fyHtwSzjSxzAtfoOD0c/pPDvlor64
-	stRS53aPgKsRmKqieIiBJG9v66r6A51WFBlqJROINsAGl5A+JQ5SgU1xnOsyDYsoK+JC6bSOvDV
-	U
-X-Google-Smtp-Source: AGHT+IHjgZAPP08KCJfBUi9HGXkOD5sakqCz6orLObgGHxB3KaUuSEYVzqSR4uUZvniC5txn6nd8BQ==
-X-Received: by 2002:a05:600c:3504:b0:442:f4a3:8c5c with SMTP id 5b1f17b1804b1-454a36e483bmr72402135e9.10.1751540806936;
-        Thu, 03 Jul 2025 04:06:46 -0700 (PDT)
-Received: from [10.79.43.25] ([83.247.137.20])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-454a99a35f9sm23533485e9.27.2025.07.03.04.06.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 03 Jul 2025 04:06:46 -0700 (PDT)
-Message-ID: <deacf2fe-a84f-44aa-a612-7985ea9339ba@linaro.org>
-Date: Thu, 3 Jul 2025 13:06:45 +0200
+        d=1e100.net; s=20230601; t=1751541138; x=1752145938;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3Bi07Xa1ZYxOiNG8G/e9FKN2IkTvUaWt67C3ZOXAsBA=;
+        b=UICeAmXSkUUk3pT+igIj6eL1dk69pMGNp7+ayJ+PRvF6t4hnGyIzo/POuZsVv7yRYd
+         rAOIca913TYP6dOKbBhiu8Af2dkQUTn7rEPfjtB2L9WMp4VKwAW34xqyD2hHUmR61/3V
+         QSU7hHrKnDfE9MPZJ6y6TAUlFmnOyyWKG6sr6nFClW+Acw/yJEk8tkMRlIU2zj52Qlj+
+         VRPJse/QoJkJXx7wDGKSgv31SgKf26aiEbqb0XAa35VgcJyMYRAa6LTwU9UQ27nAbIiZ
+         E/q0CBvjwE7FQ2XPx5HlaNyHBUxC5yXf+W8/7atPgUeBhpDTA/+ajYgo/bhP5aiC6lzR
+         Qf5g==
+X-Forwarded-Encrypted: i=1; AJvYcCWjFCBAL6PX0y5i41vwrMlDuxygTF3SVRQBHkd/6glYRx4psHtYIMeG6756tyhGfI6nJf4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxEP+Krp72Mww8oPHg7NCMHcv5536JREX54c92HapWwcZL/Vqrn
+	w8SQ9+CKSDTCnvHKraZ4xhoIJi+XQuFs4XekmnusnBN7FkPS7MF1/v8erGv8lZtr1SE=
+X-Gm-Gg: ASbGncttv5Zlnbo3Oz67wrp4ipatRUCoZDSdltNPzlB5/bC68FqrudET/54rJtFvV3n
+	YPCha4g+WNBGAcPdHwRdu8FKZ6IQccDa6m91WIxyIPi+A0jc/aDX+wxFRDMf2eJ24YmMzINdyp/
+	9pRemeJVbLrH2zFart16yzvplQMnZivftCfawp48JeqqSsZ7QoUYatsRM1goAAycHQvZ5r6pxJN
+	pNzZEi6bBGkZ/IciXEjkUnhvCfEuArMhWe3dT8Su56BpZfqpDEFJsd9OvwB0BejGZ4fldKpp59M
+	HOF+HcgYNx6w1o7ZU5gYK1fa41PQwLbu9mIp
+X-Google-Smtp-Source: AGHT+IGu+iz//6ptjIiTWMElugg1B4roY1I/9EYRDfQHICQLOGN2lg2bGldKdCyM/eDynJL6WK36Bg==
+X-Received: by 2002:a17:903:1a67:b0:235:a9b:21e0 with SMTP id d9443c01a7336-23c795742fbmr47326015ad.0.1751541137726;
+        Thu, 03 Jul 2025 04:12:17 -0700 (PDT)
+Received: from ziepe.ca ([130.41.10.202])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23acb2f1814sm147706655ad.57.2025.07.03.04.12.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Jul 2025 04:12:17 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1uXHrU-00000005CEV-151S;
+	Thu, 03 Jul 2025 08:12:16 -0300
+Date: Thu, 3 Jul 2025 08:12:16 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: David Hildenbrand <david@redhat.com>
+Cc: lizhe.67@bytedance.com, alex.williamson@redhat.com, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, peterx@redhat.com
+Subject: Re: [PATCH 0/4] vfio/type1: optimize vfio_pin_pages_remote() and
+ vfio_unpin_pages_remote() for large folio
+Message-ID: <20250703111216.GG904431@ziepe.ca>
+References: <c1144447-6b67-48d3-b37c-5f1ca6a9b4a7@redhat.com>
+ <20250703035425.36124-1-lizhe.67@bytedance.com>
+ <664e5604-fe7c-449f-bb2a-48c9543fecf4@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 00/69] accel: Preparatory cleanups for split-accel
-To: qemu-devel@nongnu.org, =?UTF-8?Q?Alex_Benn=C3=A9e?=
- <alex.bennee@linaro.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Pierrick Bouvier <pierrick.bouvier@linaro.org>, kvm@vger.kernel.org,
- Richard Henderson <richard.henderson@linaro.org>
-References: <20250703105540.67664-1-philmd@linaro.org>
-Content-Language: en-US
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-In-Reply-To: <20250703105540.67664-1-philmd@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <664e5604-fe7c-449f-bb2a-48c9543fecf4@redhat.com>
 
-On 3/7/25 12:54, Philippe Mathieu-Daudé wrote:
-> Missing review: 23-24, 27
+On Thu, Jul 03, 2025 at 01:06:26PM +0200, David Hildenbrand wrote:
+> > +{
+> > +	struct page *first_page = pages[0];
+> > +	unsigned long i;
+> > +
+> > +	for (i = 1; i < size; i++)
+> > +		if (pages[i] != nth_page(first_page, i))
+> > +			break;
+> > +	return i;
+> > +}
+> 
+> LGTM.
+> 
+> I wonder if we can find a better function name, especially when moving this
+> to some header where it can be reused.
 
-> Few changes needed before being able to add the
-> split acceleration:
-> 
-> - few method docstring added
-> - remove pointless stubs
-> - propagate soon required AccelState argument
-> - try to reduce current_accel() uses
-> - move declarations AccelClass <-> AccelOpsClass
-> - display model name in 'info cpus'
-> - add 'info accel' command to QMP/HMP
-> - make accel_create_vcpu_thread() more generic
-> - introduce hwaccel_enabled()
-> 
-> I plan to send a PR once fully reviewed (v5 likely final, 69 is a good number).
-> 
-> Regards,
-> 
-> Phil.
+It should be a common function:
 
-Series also pushed as the following tag:
-https://gitlab.com/philmd/qemu/-/tags/20250703105540.67664-1-philmd@linaro.org
+  unsigned long num_pages_contiguous(struct page *list, size_t nelms);
+
+Jason
 
