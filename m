@@ -1,155 +1,154 @@
-Return-Path: <kvm+bounces-51489-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51490-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 086CEAF7609
-	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 15:46:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21135AF760C
+	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 15:46:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2A2327B9275
-	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 13:44:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 295754A6473
+	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 13:46:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E23F82E6D29;
-	Thu,  3 Jul 2025 13:45:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F4842E612A;
+	Thu,  3 Jul 2025 13:46:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hIqHQIm+"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LOQ7eAi8"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com [209.85.219.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21B8012B17C
-	for <kvm@vger.kernel.org>; Thu,  3 Jul 2025 13:45:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0AD112B17C
+	for <kvm@vger.kernel.org>; Thu,  3 Jul 2025 13:46:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751550349; cv=none; b=E+3riHcBhcDsmjMVP99htK1ZB9kh27w0UHzqRwMSfV8AK1cVc4Ps/C0zNsNOVkY+qKxKAB/gIzr4PZdwWRV7IygeJ0OIdnLW47Dpur03Wzs70u/ScN1UJAp6OJi3mxEGgaPoVhEnBd6a0Qdilegr0SjGKYphxLMDvUKIMMzlhL0=
+	t=1751550406; cv=none; b=n3TZC0RBUs7y/WfhP1+k4vcILk/Ftzm7NNAkkiiHe1BAOQUIgY0Tsj3+ylXyas2VSU7KvYUJk9U8GrU7Y40VlRH97rw2Zob4tE/CwaFMh1u1XjvDCy2f+6069WluHMqcAwNe8E6+1WMA4Rpel5pU/GXbpP56cBJr0XOdCJuvqCE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751550349; c=relaxed/simple;
-	bh=nREazmbwlDYG3j54zL79Ruv/R5rrYDgbd8ApPqgYqP8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tg6fhhg9hY0SSP7g4HdurZh+YL+YOfMMdYhErcirwonCtnSzQg9hoyl7eZfEnStju4iD15CIbWy7eEzUDvgJ0FRAQv9f3nzP7bGSHD05HZ+4z9AR8+k/19QKzqQesq2OttK+bmwPJGKEJPzOTnhT+dnuBCT45/2SzIIL+lJLRv8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=hIqHQIm+; arc=none smtp.client-ip=209.85.128.53
+	s=arc-20240116; t=1751550406; c=relaxed/simple;
+	bh=qZ63aL+2lKAgYqRLRoqzWvaJUN9hKJQVEJ8qxOLnbBQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TQF+dEb2wF+e5ODrWs1uVI+HLhBouCq3DgO05PmZROTXHUrwGsv4dYRMYEnDBB8ug2BsoZapUG7sjhoG71DF8edvXQw0XimeDfdI3ogMxkinIJnJ/IZ1rew6QWU7rdSOpf1Tz5KPMahND2HvBLJWqSMSlJW1hUxY9eIdr6IH42g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=LOQ7eAi8; arc=none smtp.client-ip=209.85.219.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4538bc1cffdso53520645e9.0
-        for <kvm@vger.kernel.org>; Thu, 03 Jul 2025 06:45:46 -0700 (PDT)
+Received: by mail-yb1-f172.google.com with SMTP id 3f1490d57ef6-e818a572828so5585189276.1
+        for <kvm@vger.kernel.org>; Thu, 03 Jul 2025 06:46:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1751550345; x=1752155145; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=bzgfIYKT0pu2euhC4Y01ktX+iPTZDzQ4TCdcNhT2AOU=;
-        b=hIqHQIm+yQ0mXvSmUNyIlKCdH04yQNDs0mhjLyl9KyHOcalUFgACvkEQV461W6Sn+G
-         EEU6rF1/3N3Zt3kz9m3VvlvmgQRMVNDLFnjbGdthrtXJa6zU/YeLogKcrW6NQ9jKtP8I
-         NbwCC7BjQEhY8p1kt9OWDGSKm670icmXbrkrCquzHwSX765eDgmO0rPn9NslUXz8cfkC
-         QszrCqNiTzUp+PdExskIUOKKaLrIAZ5h4In3vAFGsMhfMGqP0cCWOvT83WoQiFTOlEq5
-         iHxVT9y0ngUYPwWNWcsq9RBxg3H8lgrAtIumcROzX/hVguvkKy9MNyY0H8qxr/REzDGh
-         FvEw==
+        d=linaro.org; s=google; t=1751550404; x=1752155204; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=flS6TFeOZvoyt/ARcs3LNzYAUhneQXJ5kq+dG0ggD4s=;
+        b=LOQ7eAi854Y4O17umwGjQtW60R6T2PggXgi07d1TnNRjOQRLodvXD5XXPKWPSi+3lS
+         rpqrM7onDOeIes0ckSL2m4/cO4hph0DvEHyd8Upyr4S2kD11d4ggsKTnY2xR3hcLh9va
+         CVcHT/c52PXRWKd5TVD52OGkX0fN6idC0ZizigKYmgzeUniXo8xdoTe6QhWQvn5HUHXl
+         XARuZE/OOUeazn3AGQGrnW2yXDTWw/ZIaOn02JnDa35x+m+sfUfQWLdpdNrk5hOtQqDq
+         Lvp9gWUnj4h33/FjLehAyNY1anOsj27De6n9ewoGB816lVbIl48wZD0OJ0c+Hcdx/8Rz
+         QwEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751550345; x=1752155145;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bzgfIYKT0pu2euhC4Y01ktX+iPTZDzQ4TCdcNhT2AOU=;
-        b=YpvlgaT98PNIv0JKFGsUomccAWn6VGs5/NeQ+xvt8EhZjOjw26RlcyKF6bE3+YxFRU
-         FyE/zFyI+zZC3n/4pE2wH3ffHTEF6Nk0m2D+aHpysabPnlJ4lCWJSuJeJaN5l/febn2y
-         lWPA9r5wC4vMRKWpXCI7KGSJuy7eu5L/JqFt3T/u/YXlq5Pka9/dBHDq/BJ3tjxye+di
-         bgS2hmVU08XTqfQZKFnpu1bw4SB4FWpNsHtf/jyVAMIhlYHM3vo+UhoPknskT3iji337
-         eowEUg4cxKvyMtffzIjSvOIj1n4G1/9PgPGrMS28eDccNba3TcCi1ICK71/L4p3t2+BR
-         m1Pg==
-X-Forwarded-Encrypted: i=1; AJvYcCVxy9zQ3tCx+fHVNR0ZM2QZnULIHuSWca+Y1YSkl2wZy6LKSuSDBQbTxTRPAFcMRMKPdrc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx6kT7bkzVZoJSBuahOEof+hslJlTtsDzOxycBXKnDluTBiIlyO
-	Q3i0jx4p4qULYn3iVGNwtGYX6R0cKAHRJJfGN7tcFjkyS+zGqTdZWtrMIz6gAToGWvg=
-X-Gm-Gg: ASbGncvKHXAvKf1jRWvNS6MngJ3S2MRMNvU8HOAurktj24X47gBhvEmm3IpF2RW+fHj
-	B3tCSTPyAgzpZ3j0zELitsyEikYt9HGuXApUNIQ6kMlpYrpX2jqW4EwOzZX2foXAlIkntLYnQWs
-	38y/MyQ+vr6NCJBC7L3mzQJ+Ahym5Mjyl6NkT/0uBmoZCHvpGU/neJSBGAWIBoru4zQc+z+OD0T
-	C725HVtuYGsdAn4h3i2g5YwnLLm/3ej+nYawjSgbrIlX5ZVGFMs+WVk72EbmCn+CXOC+rRVKz2/
-	1P9WdogVJw7z37v0YZf/nkKXQ6TDfQxv+YG+/9Qb7LWb4TzFslUffGZDjEqWWlcMpSo0o+JRZSO
-	4QGpwAQiveTNu3wpk9CAJKQqAjMzA5Q==
-X-Google-Smtp-Source: AGHT+IHIBfzPNtmnIof400Agn8RwX1HvW/bLZV3KILkNnKHgCIfoputch4xZsSGQwe362Ldh+mT2Sg==
-X-Received: by 2002:a05:600c:8b10:b0:453:745:8534 with SMTP id 5b1f17b1804b1-454aa80da70mr34354995e9.12.1751550345370;
-        Thu, 03 Jul 2025 06:45:45 -0700 (PDT)
-Received: from [192.168.69.218] (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a892e5f34csm18323235f8f.85.2025.07.03.06.45.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 03 Jul 2025 06:45:44 -0700 (PDT)
-Message-ID: <364dc354-ba78-47c6-ac65-2c0282e28733@linaro.org>
-Date: Thu, 3 Jul 2025 15:45:43 +0200
+        d=1e100.net; s=20230601; t=1751550404; x=1752155204;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=flS6TFeOZvoyt/ARcs3LNzYAUhneQXJ5kq+dG0ggD4s=;
+        b=WSmOuFmvtmXIfOoS6StLMSIxDMYaqKLh5rcJW4GCWcBwZDWg1I+kT0upPLjvtXHITF
+         rigxTBW0bo3nciuwD5IevgAcQ+ZqgBTeMtyTX9FIRiGijBDRyRAvAOtNeyEVW+m7tqXt
+         TGkLF8VJvtKgwmQF2KIdL37FkiIZBDNw0bi3Hpp+I8x6dYsqhprpfNHk8Z3nr9laM/JG
+         wMYsRHr2QSmQeETxwtw/nf8D/1UgR2WD4li83ERUncxyqt4DWf5XlaT5s5BKE45iBpGI
+         5TezPWklUU03gmNRtk7tEWPnEqMc9woLoUybcx57cDYjip3iM3Bgt6nOEAzRr7w6oLH8
+         oHhg==
+X-Forwarded-Encrypted: i=1; AJvYcCUOxdutrHjJgwwa7flirivNt/M+NQNLQeCyBueZuUafuxa2/tOlcnAgzUo0TCvliCb0xws=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw3ohSTEjLJJ9bfs72P8Z8IOdcK0s+bhH3kNTrng1/s1M3Tcnn0
+	LRB9NuTgnrCK3UlzQNfPS/PyiFqj5QoPv3WOkRYJEjC7gvMBrIc4hA3bpRN7Ice8QmI1Qd4AzkI
+	I/JwZuIG48koHYYWbaC6Ctk+tp+OJ6/m8oeysfrARKQ==
+X-Gm-Gg: ASbGncvFJqwbLlfkKIxa7Z402ch1HZCuP67LINjrt2z6rF3j017Hmnh4aDZhC1zXwPi
+	rAwDb3b4c7Yv95M4qXFc7mqkR14Tg4fi6zEImVqx3JFs9IFDkA/H5ZaqmSy1dX6pslBKMYDnRGp
+	oPAWnWBtcR5EIGzvpfY313wafprXXN9Q3sD6P4GgxSD1yV
+X-Google-Smtp-Source: AGHT+IEMZm719qroFCgdt+NB/P2u1+uK5R7VzorJ6VDNhLe45GJPibffuoP2EDxqdgaryg7WVzX7vUG/Kw6HwGwMdcM=
+X-Received: by 2002:a05:690c:60c3:b0:70f:751c:2d8a with SMTP id
+ 00721157ae682-71658fbc2f8mr48735757b3.3.1751550403709; Thu, 03 Jul 2025
+ 06:46:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
+References: <20250703105540.67664-1-philmd@linaro.org> <20250703105540.67664-48-philmd@linaro.org>
+ <364dc354-ba78-47c6-ac65-2c0282e28733@linaro.org>
+In-Reply-To: <364dc354-ba78-47c6-ac65-2c0282e28733@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 3 Jul 2025 14:46:32 +0100
+X-Gm-Features: Ac12FXyjoUMUshc9DoTiWVwetwZ0Q9yjCJVVjro3qKCKC9YYLxR5jkB-AbTrEyo
+Message-ID: <CAFEAcA8-ucEJPgVLpBfNyMo8ax-sR6iYr5Zk4DJavYaOkQnfDA@mail.gmail.com>
 Subject: Re: [PATCH v5 47/69] target/arm: Use generic hwaccel_enabled() to
  check 'host' cpu type
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Pierrick Bouvier <pierrick.bouvier@linaro.org>, kvm@vger.kernel.org,
- Richard Henderson <richard.henderson@linaro.org>,
- Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org
-References: <20250703105540.67664-1-philmd@linaro.org>
- <20250703105540.67664-48-philmd@linaro.org>
-Content-Language: en-US
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-In-Reply-To: <20250703105540.67664-48-philmd@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>
+Cc: qemu-devel@nongnu.org, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Pierrick Bouvier <pierrick.bouvier@linaro.org>, kvm@vger.kernel.org, 
+	Richard Henderson <richard.henderson@linaro.org>, qemu-arm@nongnu.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 3/7/25 12:55, Philippe Mathieu-Daudé wrote:
-> We should be able to use the 'host' CPU with any hardware accelerator.
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->   target/arm/arm-qmp-cmds.c | 5 +++--
->   target/arm/cpu.c          | 5 +++--
->   2 files changed, 6 insertions(+), 4 deletions(-)
-> 
-> diff --git a/target/arm/arm-qmp-cmds.c b/target/arm/arm-qmp-cmds.c
-> index cefd2352638..ee5eb1bac9f 100644
-> --- a/target/arm/arm-qmp-cmds.c
-> +++ b/target/arm/arm-qmp-cmds.c
-> @@ -30,6 +30,7 @@
->   #include "qapi/qapi-commands-misc-arm.h"
->   #include "qobject/qdict.h"
->   #include "qom/qom-qobject.h"
-> +#include "system/hw_accel.h"
->   #include "cpu.h"
->   
->   static GICCapability *gic_cap_new(int version)
-> @@ -116,8 +117,8 @@ CpuModelExpansionInfo *qmp_query_cpu_model_expansion(CpuModelExpansionType type,
->           return NULL;
->       }
->   
-> -    if (!kvm_enabled() && !strcmp(model->name, "host")) {
-> -        error_setg(errp, "The CPU type '%s' requires KVM", model->name);
-> +    if (!hwaccel_enabled() && !strcmp(model->name, "host")) {
-> +        error_setg(errp, "The CPU type 'host' requires hardware accelerator");
->           return NULL;
->       }
+On Thu, 3 Jul 2025 at 14:45, Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org=
+> wrote:
+>
+> On 3/7/25 12:55, Philippe Mathieu-Daud=C3=A9 wrote:
+> > We should be able to use the 'host' CPU with any hardware accelerator.
+> >
+> > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org>
+> > Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> > ---
+> >   target/arm/arm-qmp-cmds.c | 5 +++--
+> >   target/arm/cpu.c          | 5 +++--
+> >   2 files changed, 6 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/target/arm/arm-qmp-cmds.c b/target/arm/arm-qmp-cmds.c
+> > index cefd2352638..ee5eb1bac9f 100644
+> > --- a/target/arm/arm-qmp-cmds.c
+> > +++ b/target/arm/arm-qmp-cmds.c
+> > @@ -30,6 +30,7 @@
+> >   #include "qapi/qapi-commands-misc-arm.h"
+> >   #include "qobject/qdict.h"
+> >   #include "qom/qom-qobject.h"
+> > +#include "system/hw_accel.h"
+> >   #include "cpu.h"
+> >
+> >   static GICCapability *gic_cap_new(int version)
+> > @@ -116,8 +117,8 @@ CpuModelExpansionInfo *qmp_query_cpu_model_expansio=
+n(CpuModelExpansionType type,
+> >           return NULL;
+> >       }
+> >
+> > -    if (!kvm_enabled() && !strcmp(model->name, "host")) {
+> > -        error_setg(errp, "The CPU type '%s' requires KVM", model->name=
+);
+> > +    if (!hwaccel_enabled() && !strcmp(model->name, "host")) {
+> > +        error_setg(errp, "The CPU type 'host' requires hardware accele=
+rator");
+> >           return NULL;
+> >       }
+>
+> Consider the following hunk squashed:
+>
+> -- >8 --
+> diff --git a/tests/qtest/arm-cpu-features.c b/tests/qtest/arm-cpu-feature=
+s.c
+> index eb8ddebffbf..bdd37cafecd 100644
+> --- a/tests/qtest/arm-cpu-features.c
+> +++ b/tests/qtest/arm-cpu-features.c
+> @@ -456,7 +456,8 @@ static void test_query_cpu_model_expansion(const
+> void *data)
+>                    "ARM CPU type", NULL);
+>       assert_error(qts, "max", "Parameter 'model.props.not-a-prop' is
+> unexpected",
+>                    "{ 'not-a-prop': false }");
+> -    assert_error(qts, "host", "The CPU type 'host' requires KVM", NULL);
+> +    assert_error(qts, "host",
+> +                 "The CPU type 'host' requires hardware accelerator",
+> NULL);
 
-Consider the following hunk squashed:
+Grammar nit: either "a hardware accelerator" or "hardware acceleration".
 
--- >8 --
-diff --git a/tests/qtest/arm-cpu-features.c b/tests/qtest/arm-cpu-features.c
-index eb8ddebffbf..bdd37cafecd 100644
---- a/tests/qtest/arm-cpu-features.c
-+++ b/tests/qtest/arm-cpu-features.c
-@@ -456,7 +456,8 @@ static void test_query_cpu_model_expansion(const 
-void *data)
-                   "ARM CPU type", NULL);
-      assert_error(qts, "max", "Parameter 'model.props.not-a-prop' is 
-unexpected",
-                   "{ 'not-a-prop': false }");
--    assert_error(qts, "host", "The CPU type 'host' requires KVM", NULL);
-+    assert_error(qts, "host",
-+                 "The CPU type 'host' requires hardware accelerator", 
-NULL);
-
-      /* Test expected feature presence/absence for some cpu types */
-      assert_has_feature_enabled(qts, "cortex-a15", "pmu");
----
+-- PMM
 
