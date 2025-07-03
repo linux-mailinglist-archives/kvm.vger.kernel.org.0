@@ -1,279 +1,124 @@
-Return-Path: <kvm+bounces-51393-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51390-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3ACE2AF6D6C
-	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 10:48:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87B06AF6CCB
+	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 10:26:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 23DC07B6327
-	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 08:47:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B00441C20739
+	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 08:27:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4442E2DE6E3;
-	Thu,  3 Jul 2025 08:48:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44B032D0275;
+	Thu,  3 Jul 2025 08:26:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fJ65uNbx"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nzktpvFv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 964C724676D
-	for <kvm@vger.kernel.org>; Thu,  3 Jul 2025 08:48:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 048DC142E73
+	for <kvm@vger.kernel.org>; Thu,  3 Jul 2025 08:26:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751532496; cv=none; b=eQ6MYf2Sy8tBzgYK8/0C9B2JprhWM6yShXf8kXgByG7YByB1K4mnEZpyBVtTTZbhJ2kz2/pi86hsMWJ7WDC3M0yxYI6YBQlH4+pjcw63PSRzkokxa/Ej6dSgXunlWkgr0Oz/v0UXwU7gjV6l5RUZjBwd4Ca2MxvNlRfh/5fKIPs=
+	t=1751531202; cv=none; b=jg9d7zIcjnJDUlFd7yHk9b+FZZ28/y37b9OUgmM5v07HiXzvL9m9rSjdhuVTNw1WBvptB+QSIt5fRy8qx9/8gsrhp8czVZH2kTRJRevJrGAddOWamVSx0rdp7TsI0wJttSTbC1sjRrXmg+G45cVmfKDU3fgv62eFpQ6x4WytjhQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751532496; c=relaxed/simple;
-	bh=TVqic+b8AVGUwxPElX65V0zWrqt8rFKvH8TJ7zuGHG8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ljqss0oaxDFp6nGHVik2vNEJMI30YQW/oSuVm4DQWmXGVBYI9nI67dFwCxV/KoESRhl0ZB7sEGFXAMxMtuP6dKgxdcyEhx0Lu1wbKHhpz6FztYHRTMuJpU4Do+8W6ElgDSgGQ2b3JPQN9P1JOqjwAgqbsLOQ5KwDE+KYWNuA6wY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fJ65uNbx; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1751531202; c=relaxed/simple;
+	bh=ZmG4X3Jhxv8Gv5+e4UWaPy0CAvjKsc9isQvzNVKdnmE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GouEKFgstB3RwEvUCo7oLibg4wNaZXt/gxcu7aFH6iOEl3iMCVCX/Lktqc34zDbXFL4BWQImGLQskn4coU7u9rlz5xHhGbUhd+EroxSfitzqYYP+K4SOEnJy8h3C8C19w/72hHMdwdhrIDf9cwli7aKSfZU17ZcfUe6DYh57EpI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nzktpvFv; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1751532494; x=1783068494;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=TVqic+b8AVGUwxPElX65V0zWrqt8rFKvH8TJ7zuGHG8=;
-  b=fJ65uNbxC2/ANx8Uq/9npr5FbcGYAgzdBNsQEmv4uvkPZ07EzntIxPju
-   CLO63OHFTZWvlsDM9r4t3x7A8AHGwEX1GPQ18NEN0DPFZjjK6dNxr7vyZ
-   pOENWwAkEYdXHfTWJZZ0Cl5TNREQA6pOArXUbK4cC3Sbv4qw3xkDzaPs1
-   pQ+PKOOj7E3oU3yV4fmAeRjER+amn4IXSYH6wkb77DSqo1DYkJx3CKgVm
-   46Me4Yd4ZBjfcovdQz+hmJlnURwwgZZJnjWGOAogQe9YYtnk1zpbyejbW
-   QunV59bN+kzkvCHIEGXYG8ZRXmnjion/0v9RbXIKDhguRf84IDoYubyy9
+  t=1751531201; x=1783067201;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=ZmG4X3Jhxv8Gv5+e4UWaPy0CAvjKsc9isQvzNVKdnmE=;
+  b=nzktpvFv952BL65jmtcdrzkJoQqmhpFH/eygzmZUKwzWKCMbaKOtomY2
+   EgsVy8W5we2IrpBRK8TbhNPmKcRDHcyOoMMgb4M0O62/8EnjKjaC7HKK5
+   9ifesQFPpVgMgSVFcXyvCK8dbZs6k1VUxTxNampDGqUrOyxZvlqgCSppH
+   1fKoKm+IfNGnZBybq1RzOVHjGrYzUHf7/qH1wxkvG08ehhK1S8k8pyo7Y
+   2+rcl7M46xr4Ny3jZL0/A7BKtHKnrNrF8xP/P/koD/UrYnGvK8yX+xjP4
+   RIfP0TFOsOx1+yi1WckX4meKjEzsSX8c0mhwyAD/QfLDfAanS12V9pnxl
    A==;
-X-CSE-ConnectionGUID: 0Ef+XiELTCyBN8voRWguWg==
-X-CSE-MsgGUID: ikeuFbtnTy6kxMfUtld7bA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11482"; a="56468917"
+X-CSE-ConnectionGUID: VfPs0tMqRTuFwpyXs/P1Rw==
+X-CSE-MsgGUID: sXiBQmYYSEyQSccqdkBRDQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11482"; a="79280742"
 X-IronPort-AV: E=Sophos;i="6.16,283,1744095600"; 
-   d="scan'208";a="56468917"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2025 01:48:05 -0700
-X-CSE-ConnectionGUID: EGto2FLtQymYlGi9LsTHFA==
-X-CSE-MsgGUID: cPaMJISUREu5N2A/94HLXA==
+   d="scan'208";a="79280742"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2025 01:26:40 -0700
+X-CSE-ConnectionGUID: z/7Ky3ApTN2kD35uOXuQkQ==
+X-CSE-MsgGUID: ag0q8rMPT1GDBYZQiY2pWg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,283,1744095600"; 
-   d="scan'208";a="154079941"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.240.80]) ([10.124.240.80])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2025 01:48:02 -0700
-Message-ID: <47aed1d6-c05d-4d60-a59c-49537a211d21@linux.intel.com>
-Date: Thu, 3 Jul 2025 16:47:59 +0800
+   d="scan'208";a="185245908"
+Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.39])
+  by fmviesa001.fm.intel.com with ESMTP; 03 Jul 2025 01:26:35 -0700
+Date: Thu, 3 Jul 2025 16:48:01 +0800
+From: Zhao Liu <zhao1.liu@intel.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>
+Cc: qemu-devel@nongnu.org,
+	Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Pierrick Bouvier <pierrick.bouvier@linaro.org>,
+	Cameron Esfahani <dirty@apple.com>,
+	Roman Bolshakov <rbolshakov@ddn.com>,
+	Phil Dennis-Jordan <phil@philjordan.eu>,
+	Mads Ynddal <mads@ynddal.dk>, Fabiano Rosas <farosas@suse.de>,
+	Laurent Vivier <lvivier@redhat.com>,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	Anthony PERARD <anthony@xenproject.org>,
+	Paul Durrant <paul@xen.org>,
+	"Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+	Reinoud Zandijk <reinoud@netbsd.org>,
+	Sunil Muthuswamy <sunilmut@microsoft.com>, kvm@vger.kernel.org,
+	xen-devel@lists.xenproject.org
+Subject: Re: [PATCH v4 58/65] accel: Always register
+ AccelOpsClass::get_elapsed_ticks() handler
+Message-ID: <aGZDwZaXu1TAfsJY@intel.com>
+References: <20250702185332.43650-1-philmd@linaro.org>
+ <20250702185332.43650-59-philmd@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 11/16] i386/cpu: Select legacy cache model based on vendor
- in CPUID 0x2
-To: Zhao Liu <zhao1.liu@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Marcelo Tosatti <mtosatti@redhat.com>, "Michael S . Tsirkin"
- <mst@redhat.com>, =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?=
- <berrange@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Eduardo Habkost <eduardo@habkost.net>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
- Babu Moger <babu.moger@amd.com>, Ewan Hai <ewanhai-oc@zhaoxin.com>,
- Pu Wen <puwen@hygon.cn>, Tao Su <tao1.su@intel.com>,
- Yi Lai <yi1.lai@intel.com>, Dapeng Mi <dapeng1.mi@intel.com>,
- qemu-devel@nongnu.org, kvm@vger.kernel.org
-References: <20250620092734.1576677-1-zhao1.liu@intel.com>
- <20250620092734.1576677-12-zhao1.liu@intel.com>
-Content-Language: en-US
-From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <20250620092734.1576677-12-zhao1.liu@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250702185332.43650-59-philmd@linaro.org>
 
-
-On 6/20/2025 5:27 PM, Zhao Liu wrote:
-> As preparation for merging cache_info_cpuid4 and cache_info_amd in
-> X86CPUState, set legacy cache model based on vendor in the CPUID 0x2
-> leaf. For AMD CPU, select legacy AMD cache model (in cache_info_amd) as
-> the default cache model, otherwise, select legacy Intel cache model (in
-> cache_info_cpuid4) as before.
->
-> To ensure compatibility is not broken, add an enable_legacy_vendor_cache
-> flag based on x-vendor-only-v2 to indicate cases where the legacy cache
-> model should be used regardless of the vendor. For CPUID 0x2 leaf,
-> enable_legacy_vendor_cache flag indicates to pick legacy Intel cache
-> model, which is for compatibility with the behavior of PC machine v10.0
-> and older.
->
-> The following explains how current vendor-based default legacy cache
-> model ensures correctness without breaking compatibility.
->
-> * For the PC machine v6.0 and older, vendor_cpuid_only=false, and
->   vendor_cpuid_only_v2=false.
->
->   - If the named CPU model has its own cache model, and doesn't use
->     legacy cache model (legacy_cache=false), then cache_info_cpuid4 and
->     cache_info_amd are same, so 0x2 leaf uses its own cache model
->     regardless of the vendor.
->
->   - For max/host/named CPU (without its own cache model), then the flag
->     enable_legacy_vendor_cache is true, they will use legacy Intel cache
->     model just like their previous behavior.
->
-> * For the PC machine v10.0 and older (to v6.1), vendor_cpuid_only=true,
->   and vendor_cpuid_only_v2=false.
->
->   - If the named CPU model has its own cache model (legacy_cache=false),
->     then cache_info_cpuid4 & cache_info_amd both equal to its own cache
->     model, so it uses its own cache model in 0x2 leaf regardless of the
->     vendor. Only AMD CPUs have all-0 leaf due to vendor_cpuid_only=true,
->     and this is exactly the behavior of these old machines.
->
->   - For max/host/named CPU (without its own cache model), then the flag
->     enable_legacy_vendor_cache is true, they will use legacy Intel cache
->     model. Similarly, only AMD CPUs have all-0 leaf, and this is exactly
->     the behavior of these old machines.
->
-> * For the PC machine v10.1 and newer, vendor_cpuid_only=true, and
->   vendor_cpuid_only_v2=true.
->
->   - If the named CPU model has its own cache model (legacy_cache=false),
->     then cache_info_cpuid4 & cache_info_amd both equal to its own cache
->     model, so it uses its own cache model in 0x2 leaf regardless of the
->     vendor. And AMD CPUs have all-0 leaf. Nothing will change.
->
->   - For max/host/named CPU (without its own cache model), then the flag
->     enable_legacy_vendor_cache is false, the legacy cache model is
->     selected based on vendor.
->
->     For AMD CPU, it will use legacy AMD cache but still get all-0 leaf
->     due to vendor_cpuid_only=true.
->
->     For non-AMD (Intel/Zhaoxin) CPU, it will use legacy Intel cache as
->     expected.
->
->     Here, selecting the legacy cache model based on the vendor does not
->     change the previous (before the change)  behavior.
->
-> Therefore, the above analysis proves that, with the help of the flag
-> enable_legacy_vendor_cache, it is acceptable to select the default
-> legacy cache model based on the vendor.
->
-> For the CPUID 0x2 leaf, in X86CPUState, a unified cache_info is enough.
-> It only needs to be initialized and configured with the corresponding
-> legacy cache model based on the vendor.
->
-> Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
+On Wed, Jul 02, 2025 at 08:53:20PM +0200, Philippe Mathieu-Daudé wrote:
+> Date: Wed,  2 Jul 2025 20:53:20 +0200
+> From: Philippe Mathieu-Daudé <philmd@linaro.org>
+> Subject: [PATCH v4 58/65] accel: Always register
+>  AccelOpsClass::get_elapsed_ticks() handler
+> X-Mailer: git-send-email 2.49.0
+> 
+> In order to dispatch over AccelOpsClass::get_elapsed_ticks(),
+> we need it always defined, not calling a hidden handler under
+> the hood. Make AccelOpsClass::get_elapsed_ticks() mandatory.
+> Register the default cpus_kick_thread() for each accelerator.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 > ---
->  target/i386/cpu.c | 47 +++++++++++++++++++++++++++++++++++++----------
->  target/i386/cpu.h |  1 +
->  2 files changed, 38 insertions(+), 10 deletions(-)
->
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index bf8d7a19c88d..524d39de9ace 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -248,23 +248,17 @@ static const CPUCaches legacy_intel_cpuid2_cache_info;
->  
->  /* Encode cache info for CPUID[4] */
->  static void encode_cache_cpuid2(X86CPU *cpu,
-> +                                const CPUCaches *caches,
->                                  uint32_t *eax, uint32_t *ebx,
->                                  uint32_t *ecx, uint32_t *edx)
->  {
->      CPUX86State *env = &cpu->env;
-> -    const CPUCaches *caches;
->      int l1d, l1i, l2, l3;
->      bool unmatched = false;
->  
->      *eax = 1; /* Number of CPUID[EAX=2] calls required */
->      *ebx = *ecx = *edx = 0;
->  
-> -    if (env->enable_legacy_cpuid2_cache) {
-> -        caches = &legacy_intel_cpuid2_cache_info;
-> -    } else {
-> -        caches = &env->cache_info_cpuid4;
-> -    }
-> -
->      l1d = cpuid2_cache_descriptor(caches->l1d_cache, &unmatched);
->      l1i = cpuid2_cache_descriptor(caches->l1i_cache, &unmatched);
->      l2 = cpuid2_cache_descriptor(caches->l2_cache, &unmatched);
-> @@ -7482,8 +7476,37 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
->              *ecx &= ~CPUID_EXT_PDCM;
->          }
->          break;
-> -    case 2:
-> -        /* cache info: needed for Pentium Pro compatibility */
-> +    case 2: { /* cache info: needed for Pentium Pro compatibility */
-> +        const CPUCaches *caches;
-> +
-> +        if (env->enable_legacy_cpuid2_cache) {
-> +            caches = &legacy_intel_cpuid2_cache_info;
-> +        } else if (env->enable_legacy_vendor_cache) {
-> +            caches = &legacy_intel_cache_info;
-> +        } else {
-> +            /*
-> +             * FIXME: Temporarily select cache info model here based on
-> +             * vendor, and merge these 2 cache info models later.
-> +             *
-> +             * This condition covers the following cases (with
-> +             * enable_legacy_vendor_cache=false):
-> +             *  - When CPU model has its own cache model and doesn't use legacy
-> +             *    cache model (legacy_model=off). Then cache_info_amd and
-> +             *    cache_info_cpuid4 are the same.
-> +             *
-> +             *  - For v10.1 and newer machines, when CPU model uses legacy cache
-> +             *    model. Non-AMD CPUs use cache_info_cpuid4 like before and AMD
-> +             *    CPU will use cache_info_amd. But this doesn't matter for AMD
-> +             *    CPU, because this leaf encodes all-0 for AMD whatever its cache
-> +             *    model is.
-> +             */
-> +            if (IS_AMD_CPU(env)) {
-> +                caches = &env->cache_info_amd;
-> +            } else {
-> +                caches = &env->cache_info_cpuid4;
-> +            }
-> +        }
-> +
->          if (cpu->cache_info_passthrough) {
->              x86_cpu_get_cache_cpuid(index, 0, eax, ebx, ecx, edx);
->              break;
-> @@ -7491,8 +7514,9 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
->              *eax = *ebx = *ecx = *edx = 0;
->              break;
->          }
-> -        encode_cache_cpuid2(cpu, eax, ebx, ecx, edx);
-> +        encode_cache_cpuid2(cpu, caches, eax, ebx, ecx, edx);
->          break;
-> +    }
->      case 4:
->          /* cache info: needed for Core compatibility */
->          if (cpu->cache_info_passthrough) {
-> @@ -8979,6 +9003,9 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
->              env->enable_legacy_cpuid2_cache = true;
->          }
->  
-> +        if (!cpu->vendor_cpuid_only_v2) {
-> +            env->enable_legacy_vendor_cache = true;
-> +        }
->          env->cache_info_cpuid4 = legacy_intel_cache_info;
->          env->cache_info_amd = legacy_amd_cache_info;
->      }
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index 02cda176798f..243383efd602 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -2078,6 +2078,7 @@ typedef struct CPUArchState {
->       */
->      CPUCaches cache_info_cpuid4, cache_info_amd;
->      bool enable_legacy_cpuid2_cache;
-> +    bool enable_legacy_vendor_cache;
->  
->      /* MTRRs */
->      uint64_t mtrr_fixed[11];
+>  include/system/accel-ops.h        | 1 +
+>  accel/hvf/hvf-accel-ops.c         | 2 ++
+>  accel/kvm/kvm-accel-ops.c         | 3 +++
+>  accel/qtest/qtest.c               | 2 ++
+>  accel/tcg/tcg-accel-ops.c         | 3 +++
+>  accel/xen/xen-all.c               | 2 ++
+>  system/cpus.c                     | 6 ++----
+>  target/i386/nvmm/nvmm-accel-ops.c | 3 +++
+>  target/i386/whpx/whpx-accel-ops.c | 3 +++
+>  9 files changed, 21 insertions(+), 4 deletions(-)
 
-LGTM. Thanks.
-
-Reviewed-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
-
+Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
 
 
