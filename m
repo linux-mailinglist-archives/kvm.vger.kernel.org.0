@@ -1,165 +1,143 @@
-Return-Path: <kvm+bounces-51400-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51401-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C21F1AF6F69
-	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 11:56:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FF6EAF6FB3
+	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 12:08:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 17C831C81521
-	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 09:57:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D29D1C80298
+	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 10:08:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBDBC2DCF68;
-	Thu,  3 Jul 2025 09:56:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBAAC2E1742;
+	Thu,  3 Jul 2025 10:07:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="p86i/b8J";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="iqDGoKzl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tDh6RQ+G"
 X-Original-To: kvm@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60F8D2E03FD;
-	Thu,  3 Jul 2025 09:56:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D631D299A85;
+	Thu,  3 Jul 2025 10:07:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751536586; cv=none; b=nzw39TkD/LIUqqbF6e/3x3v1/tC/o+A4fHbFGNpm2tZOAG77JFstiqH3ltFobVnUmDcfixz2JrsM/4aL67G9MDr3Zq7K7UdrB/vkXGVajvor/aWySXtF1wG1rtbRqfAQEIkPFW45NQfHst0tlIjT6UNdaho1EY15S4Q3dZvXN2U=
+	t=1751537274; cv=none; b=swqyKp94LPu/nqSrYQecGZSB3jzu6EGJG68/khicFIgNokv/F6EwQVjFRGKNuBkemF/c53ZUfejumCQVjsiRh6HwR8A/g88VzdYrUBSaJs+EckaFgjEDlfTHwwWhg0ZTE72Axmm1mYLWsfs9b02jCv/Sba2cGDcZ3k/YHqVuG64=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751536586; c=relaxed/simple;
-	bh=qDLm4CgNLZPOYtYXEq9zAF6zy52XqGAELNE6mJ8vijg=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=UVHG8aVp80LTNpHE8UreNByt1IenADjJso0ZQ72ngPb4neIZGVSRUfYRikpKTU2NLPeu4OR5bn/z7kMrTYP19aGM46Kp+FLj6hMq631pGRqYPGEPcUACk/WmE/ditqs3KYoYvDcpokQBbYuwo+mmTs+CktJ0TSdwjtBkOCiQx9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=p86i/b8J; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=iqDGoKzl; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1751536582;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=McVtbViVAKjtJayVZUeulSTCPeoSBRL44rxBPUG2jB8=;
-	b=p86i/b8JUVbnwgdjsNfwmENRt/T+VGmjJhmhkljdHJXvR0sTYvxvMUtIMAWhk0HqR86opU
-	V/7mrMfVSKi+JhOBdfZ2F8zsrtAIk+Uxq2cVtG8P+sHhJ4+n1lhS6Uvg9RHrvrTALii+eP
-	bdgAfjxEORipzy76Ti3r0MEGqP2Y1jn7vviPr4jzWUAbzSM6PYf45eClIhLCz0fSvKbIrF
-	ZXOJotGfsfFpE4xFufPgNzAdqSwuFlU6lY8f6d3DzRMf4kWJDDXauBN9dQCH/QKJAypuOQ
-	rBa1aS8NfJRA67EENXnp3qZth6OlKkQkLZs18ngojlFLbcU06FjtwU5PSeIORw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1751536582;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=McVtbViVAKjtJayVZUeulSTCPeoSBRL44rxBPUG2jB8=;
-	b=iqDGoKzloeHZz6Nnx+UChibR0z94U5nMP8x6gDXEyVt2mfQvdrnoGSxCmyNAVRA+Gsx1MC
-	4xnIBfXwsZgA9AAw==
-To: =?utf-8?B?55m954OB5YaJ?= <baishuoran@hrbeu.edu.cn>, Anna-Maria Behnsen
- <anna-maria@linutronix.de>, Frederic Weisbecker <frederic@kernel.org>
-Cc: Kun Hu <huk23@m.fudan.edu.cn>, Jiaji Qin <jjtan24@m.fudan.edu.cn>,
- linux-kernel@vger.kernel.org, syzkaller@googlegroups.com,
- kvm@vger.kernel.org, Paolo Bonzini <bonzini@redhat.com>
-Subject: Re: BUG: spinlock bad magic in lock_timer_base
-In-Reply-To: <8d6bd3e.1228f.197cf7e7892.Coremail.baishuoran@hrbeu.edu.cn>
-References: <8d6bd3e.1228f.197cf7e7892.Coremail.baishuoran@hrbeu.edu.cn>
-Date: Thu, 03 Jul 2025 11:56:21 +0200
-Message-ID: <87jz4pwqbe.ffs@tglx>
+	s=arc-20240116; t=1751537274; c=relaxed/simple;
+	bh=F/OkyKp+J6DRlUl/QwnUYqH016WngjOoTrYbS5ddsoQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=IR/cSXpuL5iFmiiTyWva7XNanXXkA9rvtkaBJqBQgCvJMgFLfYA+afp+sg6DyftRrN32paW6wsPBJxWFQRRqDDrUNtfuX8gvVOSXQ1ip+b8w1S5f7V+j0wKkbSu9J0IXf+wKNZ8d5nc3er9uYgcVj1WIDf/Kk2624AC7kJRttks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tDh6RQ+G; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C768C4CEE3;
+	Thu,  3 Jul 2025 10:07:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751537274;
+	bh=F/OkyKp+J6DRlUl/QwnUYqH016WngjOoTrYbS5ddsoQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=tDh6RQ+GnEb9Sr0A2319xxm6TfoOJdpr7LZSry7gSyoC0W4p6dWv4Zm4BENSOuXFi
+	 KQ4Tx+ww3cqm3iQ164Hn2fgEBYpUCCEGPxCtxCDXRO7/6nWoSbcWnu6y2f9Rt83vkR
+	 k+lw27QX1lE+Xkne73cGPepo5yIkj6feNwBM3OMmAIs/gE18xQdOPZzOwmLqfwH3Jr
+	 nyu24tIUiltzyHMAflxlkQpwFMGGTgokSh2nN1YWmoRxZWaaF5y4+AHNyijIPqfZCF
+	 lsxHJ5+mA2ab5XkG0WgNxstfx4qhxUzt0y7etKXi9nyR9921sjcqUDUcO686EgdBwJ
+	 toQFGmfiWRxSA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1uXGpD-00CG4L-Q0;
+	Thu, 03 Jul 2025 11:07:51 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	Mark Brown <broonie@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Will Deacon <will@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: [GIT PULL] KVM/arm64 fixes for 6.16, take #5
+Date: Thu,  3 Jul 2025 11:05:44 +0100
+Message-Id: <20250703100544.947908-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, catalin.marinas@arm.com, tabba@google.com, broonie@kernel.org, mark.rutland@arm.com, oliver.upton@linux.dev, will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, Jul 03 2025 at 16:54, =E7=99=BD=E7=83=81=E5=86=89 wrote:
+Paolo,
 
-> Dear Maintainers,
+The one-fixes-PR-per-week trend continues, with ever decreasing levels
+of severity.
 
-The timer maintainers are hardly the right group to ask. The timer code
-is just the messenger :)
+This time, we drop some leftovers from past fixes, removing the EL1 S1
+mapping of the host FPSIMD state, and stop advertising bogus S2 base
+granule sizes to the guest.
 
-I've Cc'ed the KVM folks, as you correctly identified KVM already as the
-probable source of the problem.
+I expect you will bundle this with the kvmarm-fixes-6.16-4 PR from
+last week.
 
-> When using our customized Syzkaller to fuzz the latest Linux kernel, the =
-following crash (110th)was triggered.
+Please pull,
 
-6.14 is not really the latest kernel.
+	M.
 
-> HEAD commit: 6537cfb395f352782918d8ee7b7f10ba2cc3cbf2
-> git tree: upstream
-> Output:https://github.com/pghk13/Kernel-Bug/blob/main/0702_6.14/BUG%3A%20=
-spinlock%20bad%20magic%20in%20lock_timer_base/report110.txt=20
-> Kernel config:https://github.com/pghk13/Kernel-Bug/blob/main/0702_6.14/co=
-nfig.txt
-> C reproducer:https://github.com/pghk13/Kernel-Bug/blob/main/0702_6.14/BUG=
-%3A%20spinlock%20bad%20magic%20in%20lock_timer_base/110repro.c Syzlang=20
-> reproducer:https://github.com/pghk13/Kernel-Bug/blob/main/0702_6.14/BUG%3=
-A%20spinlock%20bad%20magic%20in%20lock_timer_base/110repro.txt Our reproduc=
-er uses mounts a constructed filesystem image.
->=20=20
-> The error occurs in the lock_timer_base (timer.c lines 1770-1790 or
-> so). It happens cleanup_srcu_struct during the KVM VM shutdown
-> process, and it is likely that the memory pointed to by the timer
-> object has been freed. The timer_base pointer returned by the
-> get_timer_base (tf) points to an invalid memory area
-> (__init_begin+0x2a500)
+Marc Zyngier (1):
+  KVM: arm64: Fix handling of FEAT_GTG for unimplemented granule sizes
 
-If you enable DEBUG_OBJECTS_TIMERS and DEBUG_OBJECTS_FREE the kernel
-should survive and provide some useful output.
+Mark Rutland (1):
+  KVM: arm64: Remove kvm_arch_vcpu_run_map_fp()
 
-> We have reproduced this issue several times on 6.14 again.
+ arch/arm64/include/asm/kvm_host.h |  1 -
+ arch/arm64/kvm/arm.c              |  4 ----
+ arch/arm64/kvm/fpsimd.c           | 26 --------------------------
+ arch/arm64/kvm/nested.c           | 26 +++++++++++++++++++++++---
+ 4 files changed, 23 insertions(+), 34 deletions(-)
 
-Does the probkem still exist on the latest upstream kernel release
-candidate, i.e. v6.16-rc4?
+-- 
+2.39.2
 
-Leaving the report context intact for kvm folks.
+The following changes since commit 0e02219f9cf4f0c0aa3dbf3c820e6612bf3f0c8c:
 
-Thanks,
+  KVM: arm64: Don't free hyp pages with pKVM on GICv2 (2025-06-26 11:39:15 +0100)
 
-        tglx
-=20=20=20=20
+are available in the Git repository at:
 
-> If you fix this issue, please add the following tag to the commit:
-> Reported-by: Kun Hu <huk23@m.fudan.edu.cn>, Jiaji Qin <jjtan24@m.fudan.ed=
-u.cn>, Shuoran Bai <baishuoran@hrbeu.edu.cn>
->
->
->
->
-> BUG: spinlock bad magic on CPU#2, syz.6.399/18129
->  lock: __init_begin+0x2a500/0x41000, .magic: 00000000, .owner: <none>/-1,=
- .owner_cpu: 0
-> CPU: 2 UID: 0 PID: 18129 Comm: syz.6.399 Not tainted 6.14.0 #1
-> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.13.0-1ubunt=
-u1.1 04/01/2014
-> Call Trace:
->  <TASK>
->  dump_stack_lvl+0x116/0x1b0
->  do_raw_spin_lock+0x22c/0x2e0
->  _raw_spin_lock_irqsave+0x45/0x60
->  lock_timer_base+0x125/0x1c0
->  __try_to_del_timer_sync+0x7f/0x160
->  __timer_delete_sync+0x120/0x1c0
->  cleanup_srcu_struct+0x122/0x5a0
->  kvm_put_kvm+0x7c9/0xa10
->  kvm_vcpu_release+0x4b/0x70
->  __fput+0x417/0xb60
->  __fput_sync+0xa6/0xc0
->  __x64_sys_close+0x8b/0x120
->  do_syscall_64+0xcf/0x250
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> RIP: 0033:0x7fafdad1ebdb
-> Code: 03 00 00 00 0f 05 48 3d 00 f0 ff ff 77 41 c3 48 83 ec 18 89 7c 24 0=
-c e8 63 fc ff ff 8b 7c 24 0c 41 89 c0 b8 03 00 00 00 0f 05 <48> 3d 00 f0 ff=
- ff 77 2f 44 89 c7 89 44 24 0c e8 a1 fc ff ff 8b 44
-> RSP: 002b:00007ffde8c95b20 EFLAGS: 00000293 ORIG_RAX: 0000000000000003
-> RAX: ffffffffffffffda RBX: 0000000000000006 RCX: 00007fafdad1ebdb
-> RDX: ffffffffffffffff RSI: 0000000000000000 RDI: 0000000000000005
-> RBP: 00007ffde8c95bf8 R08: 0000000000000000 R09: 00007fafda8015a6
-> R10: 0000000000000001 R11: 0000000000000293 R12: 00007fafdafa5fa0
-> R13: 000000000002f3ea R14: ffffffffffffffff R15: 00007fafdafa5fa0
->  </TASK>
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.16-5
+
+for you to fetch changes up to 42ce432522a17685f5a84529de49e555477c0a1f:
+
+  KVM: arm64: Remove kvm_arch_vcpu_run_map_fp() (2025-07-03 10:39:24 +0100)
+
+----------------------------------------------------------------
+KVM/arm64 fixes for 6.16, take #
+
+- Remove the last leftovers from the ill-fated FPSIMD host state
+  mapping at EL2 stage-1
+
+- Fix unexpected advertisement to the guest of unimplemented S2 base
+  granule sizes
+
+----------------------------------------------------------------
+Marc Zyngier (1):
+      KVM: arm64: Fix handling of FEAT_GTG for unimplemented granule sizes
+
+Mark Rutland (1):
+      KVM: arm64: Remove kvm_arch_vcpu_run_map_fp()
+
+ arch/arm64/include/asm/kvm_host.h |  1 -
+ arch/arm64/kvm/arm.c              |  4 ----
+ arch/arm64/kvm/fpsimd.c           | 26 --------------------------
+ arch/arm64/kvm/nested.c           | 26 +++++++++++++++++++++++---
+ 4 files changed, 23 insertions(+), 34 deletions(-)
 
