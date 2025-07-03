@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-51377-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51378-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF5D9AF6B12
-	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 09:07:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26460AF6B19
+	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 09:10:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B8DF017A65E
-	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 07:07:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 66D297A6E29
+	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 07:08:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD27C2951DD;
-	Thu,  3 Jul 2025 07:07:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC9B7295528;
+	Thu,  3 Jul 2025 07:10:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="l/hh9gIp"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="X9mYK9uX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 715EE6AA7
-	for <kvm@vger.kernel.org>; Thu,  3 Jul 2025 07:07:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 837976AA7
+	for <kvm@vger.kernel.org>; Thu,  3 Jul 2025 07:10:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751526463; cv=none; b=a3i4VvFWXuxo+JSknQaLfKqLTDV12ypJK01bw3b4adLw/REdPgGlkCtbvIg2AzqPXTZwiP9jeHZZiVJTz0JZVTlEDpIgp9zlUez7najKrM6bajh4W1osrTWMhnhLOHgJnlUaR2e3aYXtD3RwLC9sJ5u5VeCU0SBLs/FvyvePBNQ=
+	t=1751526602; cv=none; b=KxnSmq5tVrUXtOE/a196huoQ0CSRW8bIx1KKr2wcKNL5Q0WX/iDaW721QlfRYKgBLeIY3D3GRx6MlPFpeN+qsjz7pATE2nrljPdeB3Z4HBdPu70uDtx039+EW2bG9+o6oHXnUhWwmKceA5ccUeubPOOtt7v/SA12jnScXC1Lwao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751526463; c=relaxed/simple;
-	bh=yhwYOjrKq9ebGmZR+FPGnDwzlieY5n9LStWiPQOmj6U=;
+	s=arc-20240116; t=1751526602; c=relaxed/simple;
+	bh=gu1kuX+x3jm0OL9CsPf27CAWf+gZYn1R1xuY9NCmjHM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DWgfe5AkiGnSjqKA8+Vaj3xsTNHSqK2WtzcYivalj4Q8q/WLCTEhE5Gpbqo+5GY/iQ129QJPRoJCjfaZMC8is2dpbHqfaPvml/ZUPGhNcgWZDfweh81fm4K88t51wKexhfqD1SptwBScR7VPTnlr7rD5oMXXY95y6/vH7wb7kUY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=l/hh9gIp; arc=none smtp.client-ip=198.175.65.20
+	 In-Reply-To:Content-Type; b=CjWOpMF4hVyjpnlplKjOO+yBgYSzSuMXF6gb0T3D9m9veIhj5TpejCwfV9Lu5jN8UwS0tqKIwAHjMK53DTr5xHXX616m3a3iR4DbjiYQp6D91Jg2tapYOuo3Id2dwIwRpqT6Q6gdfBe+6qnbJ9LrbXQdvGO7MjiGVeUvDX4BX4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=X9mYK9uX; arc=none smtp.client-ip=192.198.163.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1751526461; x=1783062461;
+  t=1751526601; x=1783062601;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=yhwYOjrKq9ebGmZR+FPGnDwzlieY5n9LStWiPQOmj6U=;
-  b=l/hh9gIpKu9mAT0X9pzLOZcFLIMqTyCJCNOEKL5/8g9vlJMftKYfnqii
-   fPIv6KTVZ4y20zt8cWafw6ybB4OGI5pOSrzYqeaT9ppqwhDNXSckHsqy4
-   rB6eBpnwDkD/77dF42biTJiQ2tLpxC1+XKGit8hXu8FKk36mi2rI8shHd
-   2Fs8Z72nLQkq5Rvktjwj72/bhwMhxUgN9UyUEwlX1yELHVvJcQ7VWkOgf
-   CFBt+MJjB1+s/W7jfuU6bnajnR2K5ycvYUXFFxLU/YiY5v6vCllG1kvVv
-   RqnymZzc6oK146hEqpo0Jt8aUibm9JWAxUvrfBZDIAJ966lSh1LKxj30q
+  bh=gu1kuX+x3jm0OL9CsPf27CAWf+gZYn1R1xuY9NCmjHM=;
+  b=X9mYK9uXcMDe1SD9ieD628Zxe1pm/18YFaEtuQ/Pg74z9GBFygY+I+UZ
+   aDQAM5yyw8olbbJLJccDbb+/EpkmCg8IRXl6k084Yv/iEZPfODLBy2iLw
+   l/iMfNpQFaw5TdygbYFqbQPuaLO/nyLYYTEZXZZwDnC43NTZkJjbVA5wj
+   Ib0I5x/e1Oth1jzEQc3hdkhmdUdgLV33gCQ4ftvUZMswDPsUJtblHREyQ
+   R4XUfvziKrgVsWkjm2g+tF57od8p7RkS64jfWwa7Xlra/8fya3mCPaR5L
+   cfJ4NzwHnhIbCkTuhF/D3BdeHI3MDUiKH2WQSWkBU5GitKTClQrZdD6Dl
    g==;
-X-CSE-ConnectionGUID: phrtrvh6TcKXgg32sMqmNg==
-X-CSE-MsgGUID: /+wkT1H2SUignL5aN0RdsA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11482"; a="53560553"
+X-CSE-ConnectionGUID: Jype11arQ6CwKqnSaRK/Bg==
+X-CSE-MsgGUID: fRAncxoeRgKs4he6bRoQiw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11482"; a="64436707"
 X-IronPort-AV: E=Sophos;i="6.16,283,1744095600"; 
-   d="scan'208";a="53560553"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2025 00:07:41 -0700
-X-CSE-ConnectionGUID: P2P8NYlaQfCrKV2v+DWr9g==
-X-CSE-MsgGUID: UwQDhg03RpGOCpROJUYAXw==
+   d="scan'208";a="64436707"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2025 00:10:00 -0700
+X-CSE-ConnectionGUID: 3hTdmM7uQUiRd006m8kR6w==
+X-CSE-MsgGUID: dElb9iwPQmWOI4fDtepc7g==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,283,1744095600"; 
-   d="scan'208";a="154778852"
+   d="scan'208";a="185313944"
 Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.240.80]) ([10.124.240.80])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2025 00:07:37 -0700
-Message-ID: <44cdc08c-21e9-422c-b55a-17e53d34ef90@linux.intel.com>
-Date: Thu, 3 Jul 2025 15:07:34 +0800
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2025 00:09:55 -0700
+Message-ID: <bd979e2d-e036-4a1a-bf8a-0098eadb4821@linux.intel.com>
+Date: Thu, 3 Jul 2025 15:09:52 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,8 +67,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 07/16] i386/cpu: Mark CPUID[0x80000005] as reserved for
- Intel
+Subject: Re: [PATCH 08/16] i386/cpu: Fix CPUID[0x80000006] for Intel CPU
 To: Zhao Liu <zhao1.liu@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
  Marcelo Tosatti <mtosatti@redhat.com>, "Michael S . Tsirkin"
  <mst@redhat.com>, =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?=
@@ -82,130 +81,144 @@ Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
  Yi Lai <yi1.lai@intel.com>, Dapeng Mi <dapeng1.mi@intel.com>,
  qemu-devel@nongnu.org, kvm@vger.kernel.org
 References: <20250620092734.1576677-1-zhao1.liu@intel.com>
- <20250620092734.1576677-8-zhao1.liu@intel.com>
+ <20250620092734.1576677-9-zhao1.liu@intel.com>
 Content-Language: en-US
 From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <20250620092734.1576677-8-zhao1.liu@intel.com>
+In-Reply-To: <20250620092734.1576677-9-zhao1.liu@intel.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 
 On 6/20/2025 5:27 PM, Zhao Liu wrote:
-> Per SDM, 0x80000005 leaf is reserved for Intel CPU, and its current
-> "assert" check blocks adding new cache model for non-AMD CPUs.
+> Per SDM, Intel supports CPUID[0x80000006]. But only L2 information is
+> encoded in ECX (note that L2 associativity field encodings rules
+> consistent with AMD are used), all other fields are reserved.
 >
-> And please note, although Zhaoxin mostly follows Intel behavior,
-> this leaf is an exception [1].
+> Therefore, make the following changes to CPUID[0x80000006]:
+>  * Rename AMD_ENC_ASSOC to X86_ENC_ASSOC since Intel also uses the same
+>    rules. (While there are some slight differences between the rules in
+>    AMD APM v4.07 no.40332 and those in the current QEMU, generally they
+>    are consistent.)
+>  * Check the vendor in CPUID[0x80000006] and just encode L2 to ECX for
+>    Intel.
+>  * Assert L2's lines_per_tag is not 0 for AMD, and assert it is 0 for
+>    Intel.
+>  * Apply the encoding change of Intel for Zhaoxin as well [1].
 >
-> So, add a compat property "x-vendor-cpuid-only-v2" (for PC machine v10.0
-> and older) to keep the original behavior. For the machine since v10.1,
-> check the vendor and encode this leaf as all-0 only for Intel CPU.
+> This fix also resolves the FIXME of legacy_l2_cache_amd:
 >
-> This fix also resolves 2 FIXMEs of legacy_l1d_cache_amd and
-> legacy_l1i_cache_amd:
+> /*FIXME: CPUID leaf 0x80000006 is inconsistent with leaves 2 & 4 */
 >
-> /*FIXME: CPUID leaf 0x80000005 is inconsistent with leaves 2 & 4 */
+> In addition, per AMD's APM, update the comment of CPUID[0x80000006].
 >
-> In addition, per AMD's APM, update the comment of CPUID[0x80000005].
->
-> [1]: https://lore.kernel.org/qemu-devel/fa16f7a8-4917-4731-9d9f-7d4c10977168@zhaoxin.com/
+> [1]: https://lore.kernel.org/qemu-devel/c522ebb5-04d5-49c6-9ad8-d755b8998988@zhaoxin.com/
 > Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 > ---
 > Changes since RFC:
->  * Only set all-0 for Intel CPU.
->  * Add x-vendor-cpuid-only-v2.
+>  * Check vendor_cpuid_only_v2 instead of vendor_cpuid_only.
+>  * Move lines_per_tag assert check into encode_cache_cpuid80000006().
 > ---
->  hw/i386/pc.c      |  1 +
->  target/i386/cpu.c | 11 ++++++++---
->  target/i386/cpu.h | 11 ++++++++++-
->  3 files changed, 19 insertions(+), 4 deletions(-)
+>  target/i386/cpu.c | 42 +++++++++++++++++++++++++++---------------
+>  1 file changed, 27 insertions(+), 15 deletions(-)
 >
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index ad2d6495ebde..9ec3f4db31f3 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -83,6 +83,7 @@
->  
->  GlobalProperty pc_compat_10_0[] = {
->      { TYPE_X86_CPU, "x-consistent-cache", "false" },
-> +    { TYPE_X86_CPU, "x-vendor-cpuid-only-v2", "false" },
->  };
->  const size_t pc_compat_10_0_len = G_N_ELEMENTS(pc_compat_10_0);
->  
 > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 8f174fb971b6..df40d1362566 100644
+> index df40d1362566..0b292aa2e07b 100644
 > --- a/target/i386/cpu.c
 > +++ b/target/i386/cpu.c
-> @@ -655,7 +655,6 @@ static CPUCacheInfo legacy_l1d_cache = {
+> @@ -506,8 +506,8 @@ static uint32_t encode_cache_cpuid80000005(CPUCacheInfo *cache)
+>  
+>  #define ASSOC_FULL 0xFF
+>  
+> -/* AMD associativity encoding used on CPUID Leaf 0x80000006: */
+> -#define AMD_ENC_ASSOC(a) (a <=   1 ? a   : \
+> +/* x86 associativity encoding used on CPUID Leaf 0x80000006: */
+> +#define X86_ENC_ASSOC(a) (a <=   1 ? a   : \
+>                            a ==   2 ? 0x2 : \
+>                            a ==   4 ? 0x4 : \
+>                            a ==   8 ? 0x6 : \
+> @@ -526,23 +526,26 @@ static uint32_t encode_cache_cpuid80000005(CPUCacheInfo *cache)
+>   */
+>  static void encode_cache_cpuid80000006(CPUCacheInfo *l2,
+>                                         CPUCacheInfo *l3,
+> -                                       uint32_t *ecx, uint32_t *edx)
+> +                                       uint32_t *ecx, uint32_t *edx,
+> +                                       bool lines_per_tag_supported)
+>  {
+>      assert(l2->size % 1024 == 0);
+>      assert(l2->associativity > 0);
+> -    assert(l2->lines_per_tag > 0);
+> -    assert(l2->line_size > 0);
+
+why remove the assert for l2->line_size?
+
+
+> +    assert(lines_per_tag_supported ?
+> +           l2->lines_per_tag > 0 : l2->lines_per_tag == 0);
+>      *ecx = ((l2->size / 1024) << 16) |
+> -           (AMD_ENC_ASSOC(l2->associativity) << 12) |
+> +           (X86_ENC_ASSOC(l2->associativity) << 12) |
+>             (l2->lines_per_tag << 8) | (l2->line_size);
+>  
+> +    /* For Intel, EDX is reserved. */
+>      if (l3) {
+>          assert(l3->size % (512 * 1024) == 0);
+>          assert(l3->associativity > 0);
+> -        assert(l3->lines_per_tag > 0);
+> +        assert(lines_per_tag_supported ?
+> +               l3->lines_per_tag > 0 : l3->lines_per_tag == 0);
+>          assert(l3->line_size > 0);
+>          *edx = ((l3->size / (512 * 1024)) << 18) |
+> -               (AMD_ENC_ASSOC(l3->associativity) << 12) |
+> +               (X86_ENC_ASSOC(l3->associativity) << 12) |
+>                 (l3->lines_per_tag << 8) | (l3->line_size);
+>      } else {
+>          *edx = 0;
+> @@ -711,7 +714,6 @@ static CPUCacheInfo legacy_l2_cache = {
 >      .share_level = CPU_TOPOLOGY_LEVEL_CORE,
 >  };
 >  
-> -/*FIXME: CPUID leaf 0x80000005 is inconsistent with leaves 2 & 4 */
->  static CPUCacheInfo legacy_l1d_cache_amd = {
->      .type = DATA_CACHE,
->      .level = 1,
-> @@ -684,7 +683,6 @@ static CPUCacheInfo legacy_l1i_cache = {
->      .share_level = CPU_TOPOLOGY_LEVEL_CORE,
->  };
->  
-> -/*FIXME: CPUID leaf 0x80000005 is inconsistent with leaves 2 & 4 */
->  static CPUCacheInfo legacy_l1i_cache_amd = {
->      .type = INSTRUCTION_CACHE,
->      .level = 1,
-> @@ -7889,11 +7887,17 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
->          *edx = env->cpuid_model[(index - 0x80000002) * 4 + 3];
+> -/*FIXME: CPUID leaf 0x80000006 is inconsistent with leaves 2 & 4 */
+>  static CPUCacheInfo legacy_l2_cache_amd = {
+>      .type = UNIFIED_CACHE,
+>      .level = 2,
+> @@ -7906,23 +7908,33 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+>          *edx = encode_cache_cpuid80000005(env->cache_info_amd.l1i_cache);
 >          break;
->      case 0x80000005:
-> -        /* cache info (L1 cache) */
-> +        /* cache info (L1 cache/TLB Associativity Field) */
+>      case 0x80000006:
+> -        /* cache info (L2 cache) */
+> +        /* cache info (L2 cache/TLB/L3 cache) */
 >          if (cpu->cache_info_passthrough) {
 >              x86_cpu_get_cache_cpuid(index, 0, eax, ebx, ecx, edx);
 >              break;
 >          }
+> -        *eax = (AMD_ENC_ASSOC(L2_DTLB_2M_ASSOC) << 28) |
 > +
-> +        if (cpu->vendor_cpuid_only_v2 && IS_INTEL_CPU(env)) {
-> +            *eax = *ebx = *ecx = *edx = 0;
+> +        if (cpu->vendor_cpuid_only_v2 &&
+> +            (IS_INTEL_CPU(env) || IS_ZHAOXIN_CPU(env))) {
+> +            *eax = *ebx = 0;
+> +            encode_cache_cpuid80000006(env->cache_info_cpuid4.l2_cache,
+> +                                       NULL, ecx, edx, false);
 > +            break;
 > +        }
 > +
->          *eax = (L1_DTLB_2M_ASSOC << 24) | (L1_DTLB_2M_ENTRIES << 16) |
->                 (L1_ITLB_2M_ASSOC <<  8) | (L1_ITLB_2M_ENTRIES);
->          *ebx = (L1_DTLB_4K_ASSOC << 24) | (L1_DTLB_4K_ENTRIES << 16) |
-> @@ -9464,6 +9468,7 @@ static const Property x86_cpu_properties[] = {
->      DEFINE_PROP_STRING("hv-vendor-id", X86CPU, hyperv_vendor),
->      DEFINE_PROP_BOOL("cpuid-0xb", X86CPU, enable_cpuid_0xb, true),
->      DEFINE_PROP_BOOL("x-vendor-cpuid-only", X86CPU, vendor_cpuid_only, true),
-> +    DEFINE_PROP_BOOL("x-vendor-cpuid-only-v2", X86CPU, vendor_cpuid_only_v2, true),
->      DEFINE_PROP_BOOL("x-amd-topoext-features-only", X86CPU, amd_topoext_features_only, true),
->      DEFINE_PROP_BOOL("lmce", X86CPU, enable_lmce, false),
->      DEFINE_PROP_BOOL("l3-cache", X86CPU, enable_l3_cache, true),
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index 8d3ce8a2b678..02cda176798f 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -2282,9 +2282,18 @@ struct ArchCPU {
->      /* Enable auto level-increase for all CPUID leaves */
->      bool full_cpuid_auto_level;
->  
-> -    /* Only advertise CPUID leaves defined by the vendor */
-> +    /*
-> +     * Compatibility bits for old machine types (PC machine v6.0 and older).
-> +     * Only advertise CPUID leaves defined by the vendor.
-> +     */
->      bool vendor_cpuid_only;
->  
-> +    /*
-> +     * Compatibility bits for old machine types (PC machine v10.0 and older).
-> +     * Only advertise CPUID leaves defined by the vendor.
-> +     */
-> +    bool vendor_cpuid_only_v2;
+> +        *eax = (X86_ENC_ASSOC(L2_DTLB_2M_ASSOC) << 28) |
+>                 (L2_DTLB_2M_ENTRIES << 16) |
+> -               (AMD_ENC_ASSOC(L2_ITLB_2M_ASSOC) << 12) |
+> +               (X86_ENC_ASSOC(L2_ITLB_2M_ASSOC) << 12) |
+>                 (L2_ITLB_2M_ENTRIES);
+> -        *ebx = (AMD_ENC_ASSOC(L2_DTLB_4K_ASSOC) << 28) |
+> +        *ebx = (X86_ENC_ASSOC(L2_DTLB_4K_ASSOC) << 28) |
+>                 (L2_DTLB_4K_ENTRIES << 16) |
+> -               (AMD_ENC_ASSOC(L2_ITLB_4K_ASSOC) << 12) |
+> +               (X86_ENC_ASSOC(L2_ITLB_4K_ASSOC) << 12) |
+>                 (L2_ITLB_4K_ENTRIES);
 > +
->      /* Only advertise TOPOEXT features that AMD defines */
->      bool amd_topoext_features_only;
->  
-
-The Intel related part looks good to me. (Not quite familiar with AMD's
-Spec, so no reviewed-by tag)
-
-
+>          encode_cache_cpuid80000006(env->cache_info_amd.l2_cache,
+>                                     cpu->enable_l3_cache ?
+>                                     env->cache_info_amd.l3_cache : NULL,
+> -                                   ecx, edx);
+> +                                   ecx, edx, true);
+>          break;
+>      case 0x80000007:
+>          *eax = 0;
 
