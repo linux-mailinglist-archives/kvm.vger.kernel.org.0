@@ -1,79 +1,78 @@
-Return-Path: <kvm+bounces-51450-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51451-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35BE9AF715D
-	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 13:02:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21257AF7156
+	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 13:01:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0F633BF3A1
-	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 11:00:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3D8185272D6
+	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 11:01:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 220772E425E;
-	Thu,  3 Jul 2025 10:59:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D1B22E3397;
+	Thu,  3 Jul 2025 11:00:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KzZXhtpK"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="a+ANwHei"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 924A32E339B
-	for <kvm@vger.kernel.org>; Thu,  3 Jul 2025 10:59:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF4152E2F03
+	for <kvm@vger.kernel.org>; Thu,  3 Jul 2025 10:59:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751540394; cv=none; b=nZoU5RNUEQGSF7SXZjB56JtDGVvjzYlxqTYnHNsXJbXThTQS9+0Ho7glSY/7FVE/AYD8Clq5e9MNU0v+wkCq2iOf6AY3lLLtEVv2ExV30Q8iUHVIE6s+5YONm7tw2WnAe8Llctdve3MpFlLJV06iG+PJRuzFdepdrvlcQs424pw=
+	t=1751540399; cv=none; b=ZITkuUl1bNLzHKYpmYZMElwaaSXeeJO8Vp8JJ/AUaDCjlAChxm4GePhEwhXf24pgxLVWXodnCn2tg6yklK61fSNbDNvi02HHlf99epmscuBF1L32rd8Oll3zKqB9erCsHL0MZBzGVxMnDZ5Z4n+dJtpx7M/bJDg6RZRhquPMdZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751540394; c=relaxed/simple;
-	bh=jCsPqNurZfbZWzjeAaZO7tXw2upB6/+lwB+3Ka7VrcY=;
+	s=arc-20240116; t=1751540399; c=relaxed/simple;
+	bh=OA7NyJnul1v0uPJThlucMLA7h//6EhxZ3v3F1U7edKA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=inL4JsubbLLR3Hlup5wnkk2JfaSIAZgX/+/UFYMBpXkD+dgX8rDdbF0Dqo6qwgZ5iKYtOLYC+mw0TbEv24AP+xdhWzbQMsgL/skiQooxihqLaldFALGWDV6ds84cVPumSvwX8v9F8rmtpxmKpOJq3dH1ZUdJhqnVjY6P/naz/dw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=KzZXhtpK; arc=none smtp.client-ip=209.85.128.41
+	 MIME-Version:Content-Type; b=ko3uo1RuyW8S8r70na6Cze1pDApmFK72aGsESECh7uup4KCdxTItXM2AuIMwumV0b5SAKJpIKWo4C+qfU1kMtv9QKIbq4y4YRniXVTno+SwrszfgmAPFm3dhxJq6aJvL9apa6KhVYVMyXqUtKC/r3xrsJnJidGG5OnKSFNzwvvg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=a+ANwHei; arc=none smtp.client-ip=209.85.221.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-450cf0120cdso55553815e9.2
-        for <kvm@vger.kernel.org>; Thu, 03 Jul 2025 03:59:52 -0700 (PDT)
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-3a6d1369d4eso4374007f8f.2
+        for <kvm@vger.kernel.org>; Thu, 03 Jul 2025 03:59:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1751540391; x=1752145191; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1751540396; x=1752145196; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=m+WutgSqJXFykFHZTQaYKZd8VkTwajJGbTU9Mch4jWg=;
-        b=KzZXhtpKBxHXEe7ZsP+lCdIh7N2e2rn55gQrbD5Uydu3tZWrJ2I0WlmEQ7si9nk8XS
-         5QvzAb+KdTAFLy877RF5EteDUeG4PBCcf4VdsMfrDO1Ie0xSGOTFyEa5crrGXTUTW02X
-         y+dyZQwW6vcj8UdSRuoNx3cOLhhP/9AnLwMXsJ1z5XYXnOjp4HiEj9aAAgIWBNCH4bgS
-         gx18GS42LxUPzqQN5O7gAH+z0bptqwegn2I8MmlojG7Ks5q9OYUxEmSeL668f6Ic7k4F
-         Ne0k4g8C1a6DXS059nDdaiXkXl6Rd/hakEsrKudkzGw+/HgcB3bciEmB25CCUqNtAPjg
-         HgMQ==
+        bh=1uXIn8FF+VzmPqfa1+8428fM/RDSExpMjk/8h5CzpzY=;
+        b=a+ANwHeiiVth21uPOKDkZwODDGWz6D7TTqQNXoE05vE0n5b10h0tSLIryqapeIviB6
+         2FACZK1BpTC+UeR994q+aXTmohaxfLyv5c4/sSiUWXjtGJ7Qdglm/ufJyTueZjCbJIdl
+         MlGhM2XgCKJr+GHtTa+J+FPsuUH5wavPxH3yirSsLwhn+BnfEb4eb2meNAyY08Em2XsA
+         zK8Iy+J5BoOkbq0LmkBG5XBo/M+TlbLitrPcIp7BqJwdlcObxQI3n1bZ2kHPGSxbgWUk
+         xSQs0tiGUSeKQSX+BSD3gDemjwpYFFi4mDjFNAe7fWOoKq4gwq6G5eRRvaESs1lXT+89
+         QGbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751540391; x=1752145191;
+        d=1e100.net; s=20230601; t=1751540396; x=1752145196;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=m+WutgSqJXFykFHZTQaYKZd8VkTwajJGbTU9Mch4jWg=;
-        b=XBfCzvM+dAOZ7cDhQ3NCTOd2hIYeHCnLI5w1mEQUBW50RAW6OvYMCIjMadgXOF9oob
-         I2ZPFpFAlvvBPgltolEhhrywitGngJz0psRT5ERz70QNPdjaIsjGrYzdTHpbLFuQ8oav
-         Qj4TpA5oIWlFRHlLHfUt/Cw6nOPR6u1zjzI2LmrLxzlEq2PLo7QNS3J69ju+H9gQM2I6
-         9aGuf9o9WSw3tj0dwNkZDuLZ3M+vcV9x9kiHt4NknJt4lCR+S+XQzgdGp0A8tgOqvj/D
-         mRRc1KxV7yucNrp1ESJeUd4LL2zSGYHYXgTN8d+noAA9IwQ9xkqmQW5XCuVx/JIKZXAU
-         DC5A==
-X-Forwarded-Encrypted: i=1; AJvYcCW98F/Mr6K4T6+95YI56iSVXN2/8jTOL6RHwvWwya+T60S8Pe9Zsf0nFiEu++COg/iXpJk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJJcsml2hSZMZq5YgXnYWAl0u0+pUP4otPeYFK+1RA7Xvc8rox
-	rmpIT/sneSW8kzQlyaWq7raj9uf2V+4QU4IjLyT7scHrGLaQAAgK6P5Hbn+al9l4es89RIEg4S5
-	QYH3fY/k=
-X-Gm-Gg: ASbGncszoJQkbtFZlfDZUhhNjEAbcfWCodm4lCGO8zL6WZCRcLb4WgXHV7Rlm+sE/52
-	SDLFToj+tqGnO/H0wBTvHz+jZ5lfgMaLvW7EDIsvz5Ei2vgt6o9I53rN6x0wpf3Zbg5f34CETpT
-	fX0SsewNvcjnP1Px8o5MY9nL8U6xDEfaky2U3G4FpFo+mAHF2q7FOgGMtM5M74KWj5IOMKMnACb
-	Wd6tpoKt5W/7i8BTxDkduDadyd/ODzxWE69AGMMnIZGdEIOXrgvowhIt60PZdLpnsrEwF9DSJ8x
-	KBTL9ygSQZMjnMomo7yKRbhR0glDR/Dn5sNOj4PZpbEUgb6Y5UbUiehaDgayeRHVQVaXfUuHoTN
-	4ed4opVfNkMk=
-X-Google-Smtp-Source: AGHT+IFkJTWECY2pugXbhxGY6HjeCgJxFNGAomzZaEG1B6sFjMYNKg+pM1wp3bta32pi3CVqInJhiA==
-X-Received: by 2002:a05:600c:6792:b0:450:c20d:64c3 with SMTP id 5b1f17b1804b1-454a370308cmr75309655e9.18.1751540390713;
-        Thu, 03 Jul 2025 03:59:50 -0700 (PDT)
+        bh=1uXIn8FF+VzmPqfa1+8428fM/RDSExpMjk/8h5CzpzY=;
+        b=LzHIGrWqv2M6eD5/e0yaXYFlZFnNHixR3msfSsCNkJE+qH4GtUBe8qy7rZKkFRCWs+
+         hBGpWb8ngGJmYx5VafRDVJeKWUGpBzxndqO+EW/DY+ogiU7uyz5LKJGcKYJ1ycZBwOcu
+         aYt82x2fFkMHpZcK3PcTLb6CFjWzpCH/sEpxpcs6X/02dqcoKeoBIICGwgcZ4P1+j4NK
+         7a+AQJiHhg87pXERVyQ42tiMd7IsNYUc/IFFrWrE+zKu09vIJAEGt9RTic3hsSIwhlv3
+         za1WAO7djxdu7VFOCWh1v1rdlGvhV2gxYzOcY5r1yhuWU5iHTyAJnBgkd7fexaOyxnzf
+         sECw==
+X-Forwarded-Encrypted: i=1; AJvYcCXY/QPP4XQg75nADrmsdZIXq2pmkbOa9swefG2Sazn7NfxyNYjO4WHtDay88FsPuHjbbqQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyiH42cymn2lnpzEelkOy+cS/d6kf918Zau9UMLHYUMadRLlnhE
+	zImqHxaYjswyvdMeZT18on+10pcG5pHtwy/K6BJgoh7kqFRp8v7YQhuTzXX5sN5wMoc=
+X-Gm-Gg: ASbGncsxz09FwaU7BUzLWJp7v489yzJlCn3yPT1aFnX8dKfpk62DIJtdW4PM7aPQtNa
+	i90eBV/tTBUJW3XvQZA8WGfkPQu2AcHQ40A4V6YaJLEqjppxwoglC292WIIcclUwtUK04QKiBHR
+	Bk/eCTDK7VXAfgcZIeZcx8Wwq5ngApPTyacWArNy6qnfefBI1vWDfn/nuSzr/l1r1QRU7fUGI5s
+	z6a2VcovME0sMtI+PiDJKh/HFkijc2sTqXXYJtTdly8VbW+qTnHzvRzsYGqIHDUFYMSVsaRnmP6
+	CBKsxwFKgyntSMwuxid/rVVGGWJ7ru2vKt/uLRe635W5npETVTcuOgrVg0qqFc1FA/qZil/HTUJ
+	VY6KKYh7m9PQ=
+X-Google-Smtp-Source: AGHT+IGkl7DBEVSrsarAakeoJRDOUyErzjUrrwRi8jgXThFkNvPPbLQTGnxMgTtTTTxzMt5tQq0f5g==
+X-Received: by 2002:a5d:6f02:0:b0:3a5:2575:6b45 with SMTP id ffacd0b85a97d-3b32f666124mr2129038f8f.48.1751540396119;
+        Thu, 03 Jul 2025 03:59:56 -0700 (PDT)
 Received: from localhost.localdomain ([83.247.137.20])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-454a9989423sm23583475e9.19.2025.07.03.03.59.49
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a88c7fadf3sm18662688f8f.34.2025.07.03.03.59.54
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 03 Jul 2025 03:59:50 -0700 (PDT)
+        Thu, 03 Jul 2025 03:59:55 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
@@ -82,11 +81,16 @@ Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
 	kvm@vger.kernel.org,
 	Richard Henderson <richard.henderson@linaro.org>,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	qemu-arm@nongnu.org
-Subject: [PATCH v5 47/69] target/arm: Use generic hwaccel_enabled() to check 'host' cpu type
-Date: Thu,  3 Jul 2025 12:55:13 +0200
-Message-ID: <20250703105540.67664-48-philmd@linaro.org>
+	Fabiano Rosas <farosas@suse.de>,
+	Laurent Vivier <lvivier@redhat.com>,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	Anthony PERARD <anthony@xenproject.org>,
+	Paul Durrant <paul@xen.org>,
+	"Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+	xen-devel@lists.xenproject.org
+Subject: [PATCH v5 48/69] accel/dummy: Extract 'dummy-cpus.h' header from 'system/cpus.h'
+Date: Thu,  3 Jul 2025 12:55:14 +0200
+Message-ID: <20250703105540.67664-49-philmd@linaro.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250703105540.67664-1-philmd@linaro.org>
 References: <20250703105540.67664-1-philmd@linaro.org>
@@ -99,54 +103,92 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-We should be able to use the 'host' CPU with any hardware accelerator.
+'dummy' helpers are specific to accelerator implementations,
+no need to expose them via "system/cpus.h".
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/arm-qmp-cmds.c | 5 +++--
- target/arm/cpu.c          | 5 +++--
- 2 files changed, 6 insertions(+), 4 deletions(-)
+ accel/dummy-cpus.h    | 14 ++++++++++++++
+ include/system/cpus.h |  5 -----
+ accel/dummy-cpus.c    |  1 +
+ accel/qtest/qtest.c   |  1 +
+ accel/xen/xen-all.c   |  1 +
+ 5 files changed, 17 insertions(+), 5 deletions(-)
+ create mode 100644 accel/dummy-cpus.h
 
-diff --git a/target/arm/arm-qmp-cmds.c b/target/arm/arm-qmp-cmds.c
-index cefd2352638..ee5eb1bac9f 100644
---- a/target/arm/arm-qmp-cmds.c
-+++ b/target/arm/arm-qmp-cmds.c
-@@ -30,6 +30,7 @@
- #include "qapi/qapi-commands-misc-arm.h"
- #include "qobject/qdict.h"
- #include "qom/qom-qobject.h"
-+#include "system/hw_accel.h"
- #include "cpu.h"
+diff --git a/accel/dummy-cpus.h b/accel/dummy-cpus.h
+new file mode 100644
+index 00000000000..d18dd0fdc51
+--- /dev/null
++++ b/accel/dummy-cpus.h
+@@ -0,0 +1,14 @@
++/*
++ * Dummy cpu thread code
++ *
++ * Copyright IBM, Corp. 2011
++ *
++ * SPDX-License-Identifier: GPL-2.0-or-later
++ */
++
++#ifndef ACCEL_DUMMY_CPUS_H
++#define ACCEL_DUMMY_CPUS_H
++
++void dummy_start_vcpu_thread(CPUState *cpu);
++
++#endif
+diff --git a/include/system/cpus.h b/include/system/cpus.h
+index 3226c765d01..69be6a77a75 100644
+--- a/include/system/cpus.h
++++ b/include/system/cpus.h
+@@ -7,11 +7,6 @@ void cpus_register_accel(const AccelOpsClass *i);
+ /* return registers ops */
+ const AccelOpsClass *cpus_get_accel(void);
  
- static GICCapability *gic_cap_new(int version)
-@@ -116,8 +117,8 @@ CpuModelExpansionInfo *qmp_query_cpu_model_expansion(CpuModelExpansionType type,
-         return NULL;
-     }
+-/* accel/dummy-cpus.c */
+-
+-/* Create a dummy vcpu for AccelOpsClass->create_vcpu_thread */
+-void dummy_start_vcpu_thread(CPUState *);
+-
+ /* interface available for cpus accelerator threads */
  
--    if (!kvm_enabled() && !strcmp(model->name, "host")) {
--        error_setg(errp, "The CPU type '%s' requires KVM", model->name);
-+    if (!hwaccel_enabled() && !strcmp(model->name, "host")) {
-+        error_setg(errp, "The CPU type 'host' requires hardware accelerator");
-         return NULL;
-     }
+ /* For temporary buffers for forming a name */
+diff --git a/accel/dummy-cpus.c b/accel/dummy-cpus.c
+index 867276144fa..03cfc0fa01e 100644
+--- a/accel/dummy-cpus.c
++++ b/accel/dummy-cpus.c
+@@ -17,6 +17,7 @@
+ #include "qemu/guest-random.h"
+ #include "qemu/main-loop.h"
+ #include "hw/core/cpu.h"
++#include "accel/dummy-cpus.h"
  
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index ebac86f70d3..e37376dbd2d 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -1978,8 +1978,9 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
-      * this is the first point where we can report it.
-      */
-     if (cpu->host_cpu_probe_failed) {
--        if (!kvm_enabled() && !hvf_enabled()) {
--            error_setg(errp, "The 'host' CPU type can only be used with KVM or HVF");
-+        if (!hwaccel_enabled()) {
-+            error_setg(errp, "The 'host' CPU type can only be used with "
-+                             "hardware accelator such KVM/HVF");
-         } else {
-             error_setg(errp, "Failed to retrieve host CPU features");
-         }
+ static void *dummy_cpu_thread_fn(void *arg)
+ {
+diff --git a/accel/qtest/qtest.c b/accel/qtest/qtest.c
+index 8b109d4c03b..2606fe97b49 100644
+--- a/accel/qtest/qtest.c
++++ b/accel/qtest/qtest.c
+@@ -24,6 +24,7 @@
+ #include "qemu/guest-random.h"
+ #include "qemu/main-loop.h"
+ #include "hw/core/cpu.h"
++#include "accel/dummy-cpus.h"
+ 
+ static int64_t qtest_clock_counter;
+ 
+diff --git a/accel/xen/xen-all.c b/accel/xen/xen-all.c
+index ba752bbe5de..f412ea346bb 100644
+--- a/accel/xen/xen-all.c
++++ b/accel/xen/xen-all.c
+@@ -18,6 +18,7 @@
+ #include "hw/xen/xen_igd.h"
+ #include "chardev/char.h"
+ #include "qemu/accel.h"
++#include "accel/dummy-cpus.h"
+ #include "system/accel-ops.h"
+ #include "system/cpus.h"
+ #include "system/xen.h"
 -- 
 2.49.0
 
