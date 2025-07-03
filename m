@@ -1,102 +1,93 @@
-Return-Path: <kvm+bounces-51359-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51360-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08D36AF687B
-	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 05:07:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8195AF68E3
+	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 05:54:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9FC7C4E6F4B
-	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 03:07:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C4354E2A79
+	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 03:54:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D250722A4EF;
-	Thu,  3 Jul 2025 03:06:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD73B23ED5A;
+	Thu,  3 Jul 2025 03:54:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="futhr3sV"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="GP8I1bfb"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8472D1F9F70;
-	Thu,  3 Jul 2025 03:06:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70029233D9C
+	for <kvm@vger.kernel.org>; Thu,  3 Jul 2025 03:54:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751512005; cv=none; b=BZdLhM6S5MKz2miPC+51+Q9GgiuGFunFz/rSrt4K4Tf+cqghFWvpAWk/lY0nHTwe6YrUUuH0zV4yTZzPNkxWanaSOG4UJpZnXH7xt2p96Fmw8c2z16SxvassjqOxExCxMqgTtJ53zjZcjjcZjfSTdhM0LuRqg5yOy5fZ7hEP3QQ=
+	t=1751514875; cv=none; b=cflcedPj3JE6F1Wl6b2jQhDnZCpVdPoO0Bxlt/vZupqCK80c/7/F9sUOgMG4RqCV9v2Rtb4x12nklYGVpTdi+F8zlK8/WuLKoUnHiwc+LwC+f9w7uh6jfN+Uwgcdf+bwtHulSj8FIAo3i7GjmXqaF9RdiKySUINEraN4EzxJXdE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751512005; c=relaxed/simple;
-	bh=g0goUqpz0H5nqzeA/3fuXMeQmy/4V6hWpW6/CbP1VvE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=l5TFl84bpBDACE9sqF1cQ1Wl2i28AEFzKb+Gunskc/SxFXtvSGyIPJQapND/CSyzVifl0Fl1kg8H+2VNYzafeAAXybcHOuXuv2dBMCtpwVH08o5dJmXJUkuPGDyJw3CBDCypn7+2zf3UkssiPCoDPR7lK/zllqCrwHli4DEjjEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=futhr3sV; arc=none smtp.client-ip=209.85.210.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-74801bc6dc5so435571b3a.1;
-        Wed, 02 Jul 2025 20:06:43 -0700 (PDT)
+	s=arc-20240116; t=1751514875; c=relaxed/simple;
+	bh=HHfHW5GhdKi77KdDlkccgY6Pi8ovtd+IN5UHjbuu1Ds=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=CdEdgOGMx65QQZ37MG2K4MFDlXYh8ngCe71h/uWwuTbA3NoUfvjWwTRg8a7zpHRolu8/yW/7aZ02FJcHbSpJ4qEVjA8z04u2lOog4mB/SCzFJ8aQUJPOOaRh09n+oggwP0PNiafzeDpDLwz/K8tFZbFuIkSpDBeMtvLWMnlbFPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=GP8I1bfb; arc=none smtp.client-ip=209.85.216.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-313a188174fso455994a91.1
+        for <kvm@vger.kernel.org>; Wed, 02 Jul 2025 20:54:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751512003; x=1752116803; darn=vger.kernel.org;
+        d=bytedance.com; s=google; t=1751514873; x=1752119673; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NUDKiPyVRQeazWkY4m2jYwgTMEJufvXw/+pCwXThNj0=;
-        b=futhr3sVqvVbv5PeFK1/8Ra+MBVeYj2V8zlzgc04nQ8endPFnj7RW4svet9lZJAbKT
-         cEV31cLqDBFLmLsQm8Jf2skGo0hnsMqRKGabEQ0+URkjaSgtorhH/wAkLPhJtkaLxbHu
-         xRawBoNzzdEBBjOvcBAFqdIhYdzewB/jVEe+/9/bhTVpMcSfm0UCFAzY//iLgxD8b4qJ
-         kLEmggdEfn7meLgubbgeUxiA/2KSQf+ja531OjxqS93vfSikUQVAoeSS/fKcwyeU0rbd
-         XJ6Q05pJiPJGMYXwoUxonU9Y3JT/E/6ofoy1Dvff6NyQYk+NCkO4IWcq/M74ortV5BOJ
-         kbYQ==
+        bh=I2iq5gFZkiJ1lOjd6+JzlpZeux9dqvre0Y7nukAvnik=;
+        b=GP8I1bfbuwfQpX7tvplZH/w4HLYufvZvgcV4Gs4CRA4Xq2Yb4OY+TpNTEgx1dyIrnN
+         2T10H0JHOwl+t2tURJhAf4ZD28KjdDn+xQ6aJmui9WwrdFjv1jjn6MO0M+yhbyZDyJfR
+         090yEwgzW7qfr97I3oyXP2RB9sYe6DODdW8y3zjZt9mAVN8My+iYC+DNBLFgcuxE+d/e
+         FcjUikG52GrjLlH9Bh6MaIEw0f/k9YC6SBxxlrKzoLByo/9QqWlMnZ0rq4fMcZrMdQpa
+         Zf2TVMmDqLmq9fwin8o1AUx8COuHdElulXgrJaAiSCfiM9V1+jupdiMGGCiz22v0FPoA
+         H6uQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751512003; x=1752116803;
+        d=1e100.net; s=20230601; t=1751514873; x=1752119673;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=NUDKiPyVRQeazWkY4m2jYwgTMEJufvXw/+pCwXThNj0=;
-        b=s//J6L/Vqfb67EakcIr8mJTjchfNGz8YC0O6EZqIFanGX/JFQEYyyyTbwne7xqEjmR
-         FkpREPXIZcVOxyS0D1SDlhFx3YJXe0AxQ1G28EDDjblLynQg9s9pPi0n/7L/50ROkYno
-         yCTMwHS8rHEi03qUWb9Gb52SZerZyPvhCGb/P/DsxOM1jVwcq7Wolw9lXdLc9NbOswVZ
-         vWokrceVcdBHfCOjy6VghkZUsbfGN4COqjMT4p+FBTMgn2qFwfjLRWMQEXdzAB8+A1/J
-         Any/GvpWIG3/ghpx1XCI46Lykhi4yIfUgAgCp2uAScRT5FKINYhEMQ3cZ53vAKbdtjrk
-         McWg==
-X-Forwarded-Encrypted: i=1; AJvYcCVeWs739Os2K1UWjy0HwGDr+LHiy6FI/NfWysizNPhri8m3QRzlyZ+nhHSmq1Uz3Sdxxo0=@vger.kernel.org, AJvYcCWRiudUrqgxVZ+gickPFuFMQVD2ieUJox5uPsfQdS2z4mIdhAgQ4KXWwQwYnf8XFDq684SUUNn5d1VcxROS@vger.kernel.org, AJvYcCWoTqS8OahUvQLE/zhC2jTqr1P5A1DpF/lwfTbuKzZiJaOt3hGR+tV9mPlMKQkl58470PpgqVrf@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzt32Kx+S4dc+vKhofa7FdVj+vQ15w0Adx+yqCIwt3NRbuDs1O+
-	iZTSzficQ/svkybPbjP45vACNXlU22RyrR4iQ+G72E+dKndgOIJlvJPg
-X-Gm-Gg: ASbGnctMiu5CgI+KFQjPoCxvbPcJZS04RdoISpqM/XuHiOwPgaVe6XZOxVYTWo1+UTZ
-	nPC8VqIi8J7mrghw8L1S6hWvAI92zBHblXuKicf4GdO7irjbfp8OhV4tPtvZ/2dqK+ERjPbSG15
-	mX7ssyAPilzZui/zK45j1S0IAmZ8cBn55RwBwszT5FEVAuyTl/rKxaN8epkQ7Fv5JHUV420JuO/
-	5IpmT4y2SGurcNGS2+llaJKJGyatMAnbCapxG6Rwo+PIRIVZX1UQaX9/Oilh/ofu7ZqLiOJEGti
-	FfoUO3ry+X451X05mrmfb/PiqOwyueXfQkfKx+NdMpEj8zOmRaS5o8deYj7CJ9l3qWCKU5xblUI
-	qQ64F3rdd
-X-Google-Smtp-Source: AGHT+IFz7kt0Nb7vZz+tzUh5I+gOTwteT4lcjZk9zNPo6PfyuL6H+Px1Zb73lqI3Wo071I67AWpnGQ==
-X-Received: by 2002:a05:6a00:2d94:b0:736:9f2e:1357 with SMTP id d2e1a72fcca58-74cd5b575bdmr707117b3a.12.1751512002612;
-        Wed, 02 Jul 2025 20:06:42 -0700 (PDT)
-Received: from devant.antgroup-inc.local ([47.89.83.0])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74af541d9a5sm16108617b3a.62.2025.07.02.20.06.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Jul 2025 20:06:42 -0700 (PDT)
-From: Xuewei Niu <niuxuewei97@gmail.com>
-X-Google-Original-From: Xuewei Niu <niuxuewei.nxw@antgroup.com>
-To: sgarzare@redhat.com
-Cc: davem@davemloft.net,
-	decui@microsoft.com,
-	fupan.lfp@antgroup.com,
-	jasowang@redhat.com,
+        bh=I2iq5gFZkiJ1lOjd6+JzlpZeux9dqvre0Y7nukAvnik=;
+        b=gt+rGTGo43YKWtHeVAB6BDi4lwyDppYiT+Q72Dn8hl96xAe8xf3v4VCOX7Mmvpt0ju
+         p2g78d61f+BkZVsm74pHOMwYI3s5ioZaBMDeCCNFaifTKIZbymSi3PyBnYofon7dedUQ
+         Nuh2tpTFdNnZuSsClEcQRgWA363wEDsnTPlhACVhKFu6lGdIEDPvApKVoczQWwla0l/X
+         x4dgxxtu+RkvuySXXdCyu72TqaA0Jzvihk2Y3XwbTAeQ1vGq/s9OEHVEGrkyyklg4uhc
+         nUMIcKN2UdKtKuSAnI91NDXsg9RgSmhVF3kcJCkE12QXvEe46kwaXRE81trhgx0mbxcb
+         6wcw==
+X-Forwarded-Encrypted: i=1; AJvYcCV7rDEatXOFP2Vc0P7LHY7GU1309pkUTeyZNHZj+C9myrSEYhB+hYpOEgJ1oJ2XwwauP9s=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx4xAx2mFfRWaYlasIaGVRUtJ20fzfpePFzutoxgLL03A/6cgPJ
+	DHnMlhf/FOtBIbMCnOL1wbLS7rvq6PWS+ERd+wfwPguuW9q7/tdroPMSCry8CG7O5/I=
+X-Gm-Gg: ASbGnctXdwNFfaMp2tHf1/Ac6iN1ObfDhx+mFu8pLywNY2ouLepgAjShCF5Imh59/Yq
+	1A0VXV5iIrPHWxzOWNKj+JOaTpOuxFrGsE5Spvq1F7d1ZKD2dFlmhyZFDLJhioWIIuuA2AsjC11
+	0+8AKzdCN9IFffLpHUZwRIDUJDRSOfGZWlRBXSqOMza4seU/uRFVz/s5+X65UvlhHWQvaOnsYa9
+	Div3m6IpTx2akm2/hR2Nn8s2H9tT0ZPHPj4GIXvSMRqwoLx+oe2GnPZ2rdDqn47XGh9ICiFUbXe
+	hFcuK+P+pgR3942oCsHb/7JlV30rvrMMrUNAG/yIipNPr+Gzq0ERpbj4g5sTDQkwD6oDcoMj5iX
+	M14/NfBbTqKuR
+X-Google-Smtp-Source: AGHT+IGfcRtMRByBzZxTaFRUHxC3xpANXdzXNyeVyJ8yNcQnBA/HItQ1vM7lHolX3Koa2U1xbxfF/g==
+X-Received: by 2002:a17:90a:d44f:b0:313:d342:448c with SMTP id 98e67ed59e1d1-31a9f81fad5mr831350a91.17.1751514872547;
+        Wed, 02 Jul 2025 20:54:32 -0700 (PDT)
+Received: from localhost.localdomain ([203.208.189.9])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31a4904c9d3sm3382238a91.0.2025.07.02.20.54.29
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Wed, 02 Jul 2025 20:54:32 -0700 (PDT)
+From: lizhe.67@bytedance.com
+To: david@redhat.com
+Cc: alex.williamson@redhat.com,
+	jgg@nvidia.com,
+	jgg@ziepe.ca,
 	kvm@vger.kernel.org,
-	leonardi@redhat.com,
 	linux-kernel@vger.kernel.org,
-	mst@redhat.com,
-	netdev@vger.kernel.org,
-	niuxuewei.nxw@antgroup.com,
-	niuxuewei97@gmail.com,
-	pabeni@redhat.com,
-	stefanha@redhat.com,
-	virtualization@lists.linux.dev,
-	xuanzhuo@linux.alibaba.com
-Subject: Re: [RESEND PATCH net-next v4 3/4] test/vsock: Add retry mechanism to ioctl wrapper
-Date: Thu,  3 Jul 2025 11:05:14 +0800
-Message-Id: <20250703030514.845623-1-niuxuewei.nxw@antgroup.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <2cpqw23kr4qiatpzcty6wve4qdyut5su7g7fr4kg52dx33ikdu@ljicf6mktu5z>
-References: <2cpqw23kr4qiatpzcty6wve4qdyut5su7g7fr4kg52dx33ikdu@ljicf6mktu5z>
+	lizhe.67@bytedance.com,
+	peterx@redhat.com
+Subject: Re: [PATCH 0/4] vfio/type1: optimize vfio_pin_pages_remote() and vfio_unpin_pages_remote() for large folio
+Date: Thu,  3 Jul 2025 11:54:25 +0800
+Message-ID: <20250703035425.36124-1-lizhe.67@bytedance.com>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <c1144447-6b67-48d3-b37c-5f1ca6a9b4a7@redhat.com>
+References: <c1144447-6b67-48d3-b37c-5f1ca6a9b4a7@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -105,107 +96,118 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Resend: the previous message was rejected due to HTML
-Resend: forgot to reply all...
+On Wed, 2 Jul 2025 11:57:08 +0200, david@redhat.com wrote:
 
-> On Mon, Jun 30, 2025 at 03:57:26PM +0800, Xuewei Niu wrote:
-> >Wrap the ioctl in `ioctl_int()`, which takes a pointer to the actual
-> >int value and an expected int value. The function will not return until
-> >either the ioctl returns the expected value or a timeout occurs, thus
-> >avoiding immediate failure.
-> >
-> >Signed-off-by: Xuewei Niu <niuxuewei.nxw@antgroup.com>
-> >---
-> > tools/testing/vsock/util.c | 32 +++++++++++++++++++++++---------
-> > tools/testing/vsock/util.h |  1 +
-> > 2 files changed, 24 insertions(+), 9 deletions(-)
-> >
-> >diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
-> >index 0c7e9cbcbc85..481c395227e4 100644
-> >--- a/tools/testing/vsock/util.c
-> >+++ b/tools/testing/vsock/util.c
-> >@@ -16,6 +16,7 @@
-> > #include <unistd.h>
-> > #include <assert.h>
-> > #include <sys/epoll.h>
-> >+#include <sys/ioctl.h>
-> > #include <sys/mman.h>
-> > #include <linux/sockios.h>
-> >
-> >@@ -97,28 +98,41 @@ void vsock_wait_remote_close(int fd)
-> > 	close(epollfd);
-> > }
-> >
-> >-/* Wait until transport reports no data left to be sent.
-> >- * Return false if transport does not implement the unsent_bytes() 
-> >callback.
-> >+/* Wait until ioctl gives an expected int value.
-> >+ * Return false if the op is not supported.
-> >  */
-> >-bool vsock_wait_sent(int fd)
-> >+bool vsock_ioctl_int(int fd, unsigned long op, int *actual, int expected)
+> On 02.07.25 11:38, lizhe.67@bytedance.com wrote:
+> > On Wed, 2 Jul 2025 10:15:29 +0200, david@redhat.com wrote:
+> > 
+> >> Jason mentioned in reply to the other series that, ideally, vfio
+> >> shouldn't be messing with folios at all.
+> >>
+> >> While we now do that on the unpin side, we still do it at the pin side.
+> > 
+> > Yes.
+> > 
+> >> Which makes me wonder if we can avoid folios in patch #1 in
+> >> contig_pages(), and simply collect pages that correspond to consecutive
+> >> PFNs.
+> > 
+> > In my opinion, comparing whether the pfns of two pages are contiguous
+> > is relatively inefficient. Using folios might be a more efficient
+> > solution.
 > 
-> Why we need the `actual` parameter?
+> 	buffer[i + 1] == nth_page(buffer[i], 1)
+> 
+> Is extremely efficient, except on
+> 
+> 	#if defined(CONFIG_SPARSEMEM) && !defined(CONFIG_SPARSEMEM_VMEMMAP)
+> 
+> Because it's essentially
+> 
+> 	buffer[i + 1] == buffer[i] + 1
+> 
+> But with that config it's less efficient
+> 
+> 	buffer[i + 1] == pfn_to_page(page_to_pfn(buffer[i]) + 1)
+> 
+> That could be optimized (if we care about the config), assuming that we don't cross
+> memory sections (e.g., 128 MiB on x86).
+> 
+> See page_ext_iter_next_fast_possible(), that optimized for something similar.
+> 
+> So based on the first page, one could easily determine how far to batch
+> using the simple
+> 
+> 	buffer[i + 1] == buffer[i] + 1
+> 
+> comparison.
+> 
+> That would mean that one could exceed a folio, in theory.
 
-We can exit early `if (*actual == expected)`, and the `expected` can be any integer.
-I also make it to be a pointer, because the caller might need to have the actual value.
+Thank you very much for your suggestion. I think we can focus on
+optimizing the case where
+
+!(defined(CONFIG_SPARSEMEM) && !defined(CONFIG_SPARSEMEM_VMEMMAP))
+
+I believe that in most scenarios where vfio is used,
+CONFIG_SPARSEMEM_VMEMMAP is enabled. Excessive CONFIG
+may make the patch appear overly complicated.
+
+> > Given that 'page' is already in use within vfio, it seems that adopting
+> > 'folio' wouldn't be particularly troublesome? If you have any better
+> > suggestions, I sincerely hope you would share them with me.
+> 
+> One challenge in the future will likely be that not all pages that we can
+> GUP will belong to folios. We would possibly be able to handle that by
+> checking if the page actually belongs to a folio.
+> 
+> Not dealing with folios where avoidable would be easier.
+> 
+> > 
+> >> What was the reason again, that contig_pages() would not exceed a single
+> >> folio?
+> > 
+> > Regarding this issue, I think Alex and I are on the same page[1]. For a
+> > folio, all of its pages have the same invalid or reserved state. In
+> > the function vfio_pin_pages_remote(), we need to ensure that the state
+> > is the same as the previous pfn (through variable 'rsvd' and function
+> > is_invalid_reserved_pfn()). Therefore, we do not want the return value
+> > of contig_pages() to exceed a single folio.
+> 
+> If we obtained a page from GUP, is_invalid_reserved_pfn() would only trigger
+> for the shared zeropage. but that one can no longer be returned from FOLL_LONGTERM.
+> 
+> So if you know the pages came from GUP, I would assume they are never invalid_reserved?
+
+Yes, we use function vaddr_get_pfns(), which ultimately invokes GUP
+with the FOLL_LONGTERM flag.
+
+> Again, just a thought on how to apply something similar as done for the unpin case, avoiding
+> messing with folios.
+
+Taking into account the previous discussion, it seems that we might
+simply replace the contig_pages() in patch #1 with the following one.
+Also, function contig_pages() could also be extracted into mm.h as a
+helper function. It seems that Jason would like to utilize it in other
+contexts. Moreover, the subject of this patchset should be changed to
+"Optimize vfio_pin_pages_remote() and vfio_unpin_pages_remote()". Do
+you think this would work?
+
++static inline unsigned long contig_pages(struct page **pages,
++					 unsigned long size)
++{
++	struct page *first_page = pages[0];
++	unsigned long i;
++
++	for (i = 1; i < size; i++)
++		if (pages[i] != nth_page(first_page, i))
++			break;
++	return i;
++}
+
+I have conducted a preliminary performance test, and the results are
+similar to those obtained previously.
 
 Thanks,
-Xuewei
- 
-> > {
-> >-	int ret, sock_bytes_unsent;
-> >+	int ret;
-> >+	char name[32];
-> >+
-> >+	snprintf(name, sizeof(name), "ioctl(%lu)", op);
-> >
-> > 	timeout_begin(TIMEOUT);
-> > 	do {
-> >-		ret = ioctl(fd, SIOCOUTQ, &sock_bytes_unsent);
-> >+		ret = ioctl(fd, op, actual);
-> > 		if (ret < 0) {
-> > 			if (errno == EOPNOTSUPP)
-> > 				break;
-> >
-> >-			perror("ioctl(SIOCOUTQ)");
-> >+			perror(name);
-> > 			exit(EXIT_FAILURE);
-> > 		}
-> >-		timeout_check("SIOCOUTQ");
-> >-	} while (sock_bytes_unsent != 0);
-> >+		timeout_check(name);
-> >+	} while (*actual != expected);
-> > 	timeout_end();
-> >
-> >-	return !ret;
-> >+	return ret >= 0;
-> >+}
-> >+
-> >+/* Wait until transport reports no data left to be sent.
-> >+ * Return false if transport does not implement the unsent_bytes() callback.
-> >+ */
-> >+bool vsock_wait_sent(int fd)
-> >+{
-> >+	int sock_bytes_unsent;
-> >+
-> >+	return vsock_ioctl_int(fd, SIOCOUTQ, &sock_bytes_unsent, 0);
-> > }
-> >
-> > /* Create socket <type>, bind to <cid, port> and return the file descriptor. */
-> >diff --git a/tools/testing/vsock/util.h b/tools/testing/vsock/util.h
-> >index 5e2db67072d5..d59581f68d61 100644
-> >--- a/tools/testing/vsock/util.h
-> >+++ b/tools/testing/vsock/util.h
-> >@@ -54,6 +54,7 @@ int vsock_stream_listen(unsigned int cid, unsigned int port);
-> > int vsock_seqpacket_accept(unsigned int cid, unsigned int port,
-> > 			   struct sockaddr_vm *clientaddrp);
-> > void vsock_wait_remote_close(int fd);
-> >+bool vsock_ioctl_int(int fd, unsigned long op, int *actual, int expected);
-> > bool vsock_wait_sent(int fd);
-> > void send_buf(int fd, const void *buf, size_t len, int flags,
-> > 	      ssize_t expected_ret);
-> >-- 
-> >2.34.1
-> >
+Zhe
 
