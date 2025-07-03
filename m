@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-51482-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51483-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AA2FAF72AD
-	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 13:41:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67AA6AF72AF
+	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 13:42:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C9443AA45E
-	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 11:41:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E464116DBA4
+	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 11:41:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16EE52E543B;
-	Thu,  3 Jul 2025 11:41:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EE702E3B19;
+	Thu,  3 Jul 2025 11:41:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LHpVJeIo"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="frutPASR"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A41762E5417;
-	Thu,  3 Jul 2025 11:41:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A243A2E3AEB;
+	Thu,  3 Jul 2025 11:41:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751542871; cv=none; b=igGIrb0UF4vynnL1IEaJZeKUTRkhzwkIu0j1WgaMwWEOeemXpeQRxn3W0z+mJmbVX03g5NcrvqcV2/Z1zRWjiKCK2IiCdltX6rst4Rs12TnYjQW4OrKG7734OuRxyJm2YkuVerHh7mTf6E0SkEdVbTXcCtef8BLyl5S4x8jOZps=
+	t=1751542876; cv=none; b=GNnK3ydyJhWcJExKS8G6xQvZlIyARXOZB4m7h/zhdwc0NZ5Wd2K2Mw+yjx4zL9pg4FtVuUZx1+JNR05mJMglWVkU/YWq2HnkP8fPWRPPGKYqMzYNgX24Vr6SlyHdnzv1QbP3hFx+j07doWi+jcqarOTfns+KOlr/rFYN/IVhniE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751542871; c=relaxed/simple;
-	bh=QvE1SkOi6tcReIT37C25WBczhr93pNig4GOrXwUinyM=;
+	s=arc-20240116; t=1751542876; c=relaxed/simple;
+	bh=FBOIM1GEP2pzU9ldyJaDnAjQjumia97sZT0SG+tShdM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XliGjGyPAOxN/2mzJ/wBIfiaRGJUXjtoO3thvgVh9BD00JLQt1MXEQrBsdNDX6hgxkGitXRgs251E1gHmnSlbzh+LWKhOAx8FzjtiY3as4l5r9xk9u0Np5N5xN/QV87DVNZdzZuacCYLXyjk9iW10IccFvCHnoT20L8T1qqvaWM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LHpVJeIo; arc=none smtp.client-ip=198.175.65.18
+	 MIME-Version; b=Rr26vSVSMm+er/rT9+cdz+CtzN5pKzzcr+mQ7f2Uqev9jIoPrepM1cl61ppaoxLyCVuyUq/XkO3F4KD+qDe+og7DWPUkTQrV/+ETPU1P7P7iLXL3zvCsRNYUifGb/cFJ9LFNI+RA8UZXIp12yc3K/2Wrmibr2W4PnYRUiJAGL50=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=frutPASR; arc=none smtp.client-ip=198.175.65.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1751542870; x=1783078870;
+  t=1751542875; x=1783078875;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=QvE1SkOi6tcReIT37C25WBczhr93pNig4GOrXwUinyM=;
-  b=LHpVJeIo26Eod9sMuj/sy7T7HllZWFWw6vva+eUdLhzvfhrTmmAUezGv
-   OuHrHv5MkDTFNwkBwOL4gm/BzcbNl50Huixj4iptmQuhuyP/wHTmlDWTa
-   HK8WkAyfeW3HOaF0h7lqdT1Y238VWEKNbV15twColKR+gClPB6qgKpsQT
-   gf3vdMZazb5l2gkYdMM4BE3NPeW39P3wdoaSwTu8+YlFXknivHPsxa1Fs
-   I/BjEgHQVPDavVFdxWP+Hdnv7nY4e0yDgpFj9ZcTjy4RiXcqkezb5o9E9
-   dC85chyf2+tQeePD7XEolj4h+xTU69atlQk8mAE48dKQwrhqhht4IudKz
+  bh=FBOIM1GEP2pzU9ldyJaDnAjQjumia97sZT0SG+tShdM=;
+  b=frutPASRaxPHGbXVoExrYNmvG8VDcIWmgTUlDqCKnO81MGSuNGTPdAbw
+   0S9O/R4W6gcz9vHoEEG5vK2IAVBcSOgS1hJYqfPz5KUeiJMBK1kWiKXbN
+   +x5HkqQJRTkHN2dBqf4HCY/5jUqi4blAYbLdCZB3wudJUkvktPKBpW7i/
+   9wNuK2X3eBw5VguYTc3cRwlpoy8+CSUE2JBgUqo6bl6odWDEY77rZcU1j
+   pmaWem8e5oy1oAyTYj9T70sLwkc7/AZ3a5cu9q/5EvRIy781tmUoYE7pz
+   bwW01QmfQKIEzrelkaq8BBaWulKwmtvznniSxTHZ2ndhoEyQovU+LV0Wa
    A==;
-X-CSE-ConnectionGUID: roJ6jET8RIWpc1br/Mzx5A==
-X-CSE-MsgGUID: 0+74Fqs0TWmM/V8VsaUxSw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11482"; a="53983763"
+X-CSE-ConnectionGUID: WkEAFXznTkeBu3IX+whBfA==
+X-CSE-MsgGUID: mObG2/T4SGeg5A+sJJxpPA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11482"; a="53983779"
 X-IronPort-AV: E=Sophos;i="6.16,284,1744095600"; 
-   d="scan'208";a="53983763"
+   d="scan'208";a="53983779"
 Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2025 04:41:10 -0700
-X-CSE-ConnectionGUID: dHUhRsLBSyOj7mUBYH5Drw==
-X-CSE-MsgGUID: /9wiZon6TsWug3ZTz4WjJA==
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2025 04:41:15 -0700
+X-CSE-ConnectionGUID: 5D06HJx5SBuIJItjJGokmA==
+X-CSE-MsgGUID: +saSTHvrRwm8ijnIlzHh/A==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,284,1744095600"; 
-   d="scan'208";a="155096166"
+   d="scan'208";a="155096176"
 Received: from johunt-mobl9.ger.corp.intel.com (HELO localhost.localdomain) ([10.245.244.86])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2025 04:41:04 -0700
+  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2025 04:41:09 -0700
 From: Adrian Hunter <adrian.hunter@intel.com>
 To: Dave Hansen <dave.hansen@linux.intel.com>,
 	pbonzini@redhat.com,
@@ -81,9 +81,9 @@ Cc: Tony Luck <tony.luck@intel.com>,
 	isaku.yamahata@intel.com,
 	yan.y.zhao@intel.com,
 	chao.gao@intel.com
-Subject: [PATCH 1/2] x86/tdx: Eliminate duplicate code in tdx_clear_page()
-Date: Thu,  3 Jul 2025 14:40:37 +0300
-Message-ID: <20250703114038.99270-2-adrian.hunter@intel.com>
+Subject: [PATCH 2/2] x86/tdx: Skip clearing reclaimed pages unless X86_BUG_TDX_PW_MCE is present
+Date: Thu,  3 Jul 2025 14:40:38 +0300
+Message-ID: <20250703114038.99270-3-adrian.hunter@intel.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250703114038.99270-1-adrian.hunter@intel.com>
 References: <20250703114038.99270-1-adrian.hunter@intel.com>
@@ -96,77 +96,96 @@ MIME-Version: 1.0
 Organization: Intel Finland Oy, Registered Address: c/o Alberga Business Park, 6 krs, Bertel Jungin Aukio 5, 02600 Espoo, Business Identity Code: 0357606 - 4, Domiciled in Helsinki
 Content-Transfer-Encoding: 8bit
 
-tdx_clear_page() and reset_tdx_pages() duplicate the TDX page clearing
-logic.  Keep the tdx_clear_page() prototype but call reset_tdx_pages() for
-the implementation.
+Avoid clearing reclaimed TDX private pages unless the platform is affected
+by the X86_BUG_TDX_PW_MCE erratum. This significantly reduces VM shutdown
+time on unaffected systems.
+
+Background
+
+KVM currently clears reclaimed TDX private pages using MOVDIR64B, which:
+
+   - Clears the TD Owner bit (which identifies TDX private memory) and
+     integrity metadata without triggering integrity violations.
+   - Clears poison from cache lines without consuming it, avoiding MCEs on
+     access (refer TDX Module Base spec. 16.5. Handling Machine Check
+     Events during Guest TD Operation).
+
+The TDX module also uses MOVDIR64B to initialize private pages before use.
+If cache flushing is needed, it sets TDX_FEATURES.CLFLUSH_BEFORE_ALLOC.
+However, KVM currently flushes unconditionally, refer commit 94c477a751c7b
+("x86/virt/tdx: Add SEAMCALL wrappers to add TD private pages")
+
+In contrast, when private pages are reclaimed, the TDX Module handles
+flushing via the TDH.PHYMEM.CACHE.WB SEAMCALL.
+
+Problem
+
+Clearing all private pages during VM shutdown is costly. For guests
+with a large amount of memory it can take minutes.
+
+Solution
+
+TDX Module Base Architecture spec. documents that private pages reclaimed
+from a TD should be initialized using MOVDIR64B, in order to avoid
+integrity violation or TD bit mismatch detection when later being read
+using a shared HKID, refer April 2025 spec. "Page Initialization" in
+section "8.6.2. Platforms not Using ACT: Required Cache Flush and
+Initialization by the Host VMM"
+
+That is an overstatement and will be clarified in coming versions of the
+spec. In fact, as outlined in "Table 16.2: Non-ACT Platforms Checks on
+Memory" and "Table 16.3: Non-ACT Platforms Checks on Memory Reads in Li
+Mode" in the same spec, there is no issue accessing such reclaimed pages
+using a shared key that does not have integrity enabled. Linux always uses
+KeyID 0 which never has integrity enabled. KeyID 0 is also the TME KeyID
+which disallows integrity, refer "TME Policy/Encryption Algorithm" bit
+description in "Intel Architecture Memory Encryption Technologies" spec
+version 1.6 April 2025. So there is no need to clear pages to avoid
+integrity violations.
+
+There remains a risk of poison consumption. However, in the context of
+TDX, it is expected that there would be a machine check associated with the
+original poisoning. On some platforms that results in a panic. However
+platforms may support "SEAM_NR" Machine Check capability, in which case
+Linux machine check handler marks the page as poisoned, which prevents it
+from being allocated anymore, refer commit 7911f145de5fe ("x86/mce:
+Implement recovery for errors in TDX/SEAM non-root mode")
+
+Improvement
+
+By skipping the clearing step on unaffected platforms, shutdown time
+can improve by up to 40%.
+
+On platforms with the X86_BUG_TDX_PW_MCE erratum (SPR and EMR), continue
+clearing because these platforms may trigger poison on partial writes to
+previously-private pages, even with KeyID 0, refer commit 1e536e1068970
+("x86/cpu: Detect TDX partial write machine check erratum")
 
 Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 ---
- arch/x86/include/asm/tdx.h  |  2 ++
- arch/x86/kvm/vmx/tdx.c      | 19 -------------------
- arch/x86/virt/vmx/tdx/tdx.c |  6 ++++++
- 3 files changed, 8 insertions(+), 19 deletions(-)
+ arch/x86/virt/vmx/tdx/tdx.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
-index 7ddef3a69866..e94eb0711bf1 100644
---- a/arch/x86/include/asm/tdx.h
-+++ b/arch/x86/include/asm/tdx.h
-@@ -131,6 +131,8 @@ int tdx_guest_keyid_alloc(void);
- u32 tdx_get_nr_guest_keyids(void);
- void tdx_guest_keyid_free(unsigned int keyid);
- 
-+void tdx_clear_page(struct page *page);
-+
- struct tdx_td {
- 	/* TD root structure: */
- 	struct page *tdr_page;
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index a08e7055d1db..098e4ee574bb 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -276,25 +276,6 @@ static inline void tdx_disassociate_vp(struct kvm_vcpu *vcpu)
- 	vcpu->cpu = -1;
- }
- 
--static void tdx_clear_page(struct page *page)
--{
--	const void *zero_page = (const void *) page_to_virt(ZERO_PAGE(0));
--	void *dest = page_to_virt(page);
--	unsigned long i;
--
--	/*
--	 * The page could have been poisoned.  MOVDIR64B also clears
--	 * the poison bit so the kernel can safely use the page again.
--	 */
--	for (i = 0; i < PAGE_SIZE; i += 64)
--		movdir64b(dest + i, zero_page);
--	/*
--	 * MOVDIR64B store uses WC buffer.  Prevent following memory reads
--	 * from seeing potentially poisoned cache.
--	 */
--	__mb();
--}
--
- static void tdx_no_vcpus_enter_start(struct kvm *kvm)
- {
- 	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
 diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-index c7a9a087ccaf..17a7a599facd 100644
+index 17a7a599facd..a030679c9239 100644
 --- a/arch/x86/virt/vmx/tdx/tdx.c
 +++ b/arch/x86/virt/vmx/tdx/tdx.c
-@@ -654,6 +654,12 @@ static void reset_tdx_pages(unsigned long base, unsigned long size)
- 	mb();
- }
+@@ -642,6 +642,15 @@ static void reset_tdx_pages(unsigned long base, unsigned long size)
+ 	const void *zero_page = (const void *)page_address(ZERO_PAGE(0));
+ 	unsigned long phys, end;
  
-+void tdx_clear_page(struct page *page)
-+{
-+	reset_tdx_pages(page_to_phys(page), PAGE_SIZE);
-+}
-+EXPORT_SYMBOL_GPL(tdx_clear_page);
++	/*
++	 * Linux uses only KeyID 0 which can read or write pages
++	 * that were formerly TDX private pages, without poisoning
++	 * memory. However on platforms with the partial-write errata,
++	 * poisoning still happens for partial writes.
++	 */
++	if (!boot_cpu_has_bug(X86_BUG_TDX_PW_MCE))
++		return;
 +
- static void tdmr_reset_pamt(struct tdmr_info *tdmr)
- {
- 	tdmr_do_pamt_func(tdmr, reset_tdx_pages);
+ 	end = base + size;
+ 	for (phys = base; phys < end; phys += 64)
+ 		movdir64b(__va(phys), zero_page);
 -- 
 2.48.1
 
