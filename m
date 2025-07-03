@@ -1,78 +1,78 @@
-Return-Path: <kvm+bounces-51433-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51434-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18D45AF7131
-	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 12:59:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FCE0AF7130
+	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 12:59:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12E774E54ED
-	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 10:58:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 23D27527388
+	for <lists+kvm@lfdr.de>; Thu,  3 Jul 2025 10:59:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B231F2E3AE5;
-	Thu,  3 Jul 2025 10:58:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89BC22E3AF1;
+	Thu,  3 Jul 2025 10:58:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VZ2QhoPq"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Cx3+Bs1h"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33B972E2F01
-	for <kvm@vger.kernel.org>; Thu,  3 Jul 2025 10:58:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21F0A2E2F01
+	for <kvm@vger.kernel.org>; Thu,  3 Jul 2025 10:58:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751540304; cv=none; b=Z0U8rWrNSktdCd1s++D3D7YGkuO4m1zEb5te+50NLY1X4S3igNXglQWtRDN2Pcz+7SpBkfDdunomlJ4+l8YAMU9+axhvDsO9IqXQ/gyGhMh+NeSHXMamHauJSyWUx7HH3JliATTU8dyJxl5VtcDk2V0sOG8OQ1dGux9EwPzrbs8=
+	t=1751540309; cv=none; b=htVwSTwKoQDbHpQig0hPpNJnvANeXGwzayYmIgtFhhrRPCAMdaGStG+cJOptVDhCellupMa1cL4H3610gMRQ1FxcmIh0SG+FvKOPbCsLi5KYNivcpouBTgNbOhLjcIltOjIS8DkJ29qR/G7OAGyn147vT5fUUBaYBM3qObgC5Qo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751540304; c=relaxed/simple;
-	bh=Rvf7Lpd9zhXWLAuVQkTp/pmZ2syePE36cVh+z3tDbEE=;
+	s=arc-20240116; t=1751540309; c=relaxed/simple;
+	bh=gxYn6Vq9EJ0ah0atcxmZdNORkrT6whm+K+E8EY7r2xQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AxON4XoMkbnflxfDTxnfwiF9dyTyCLVWXQv1fvzz2M/Rgpha6DUiplfmXTJV/e1rUl2GFK5ZkUJOTYj0xahzZANCOQq9Ihl/s7Ol88Y2+haIJq4Vi3dGHgeymctnVyjviNOksJfi4FZRqB4HNleQlWFJKseWSsbDdUK6dhuHwPE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=VZ2QhoPq; arc=none smtp.client-ip=209.85.128.47
+	 MIME-Version:Content-Type; b=RzbIfXfWwZUv+lzG56281mRLWAFok7bLOs4rZISYFZGOZ5A7vxQiOUSVXQNzizoglja1VCMCa/wxvWVhlAmWPXgW+nFOQw4gZIRXtAW3Y5RGKdm2RD81cgUd3evr01eBtXSTSvjl8mZuG1iays6t3Scw0NiQEOHj1/NyV2xUHNM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Cx3+Bs1h; arc=none smtp.client-ip=209.85.128.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-450cf214200so45291975e9.1
-        for <kvm@vger.kernel.org>; Thu, 03 Jul 2025 03:58:22 -0700 (PDT)
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4530921461aso52363115e9.0
+        for <kvm@vger.kernel.org>; Thu, 03 Jul 2025 03:58:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1751540301; x=1752145101; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1751540306; x=1752145106; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=65bSiZBK1YYcXSsQqihiwVaoKns5se5K6zq/pnQZJmA=;
-        b=VZ2QhoPqzdTpJOAmte5pqSQDq1P7Y+DZWbf7jRJLiGvwuc4Zcs/yaEOKdR+UONv6R1
-         zfDgpCzxPNksT+6ldjd5o+kyveuVozC/fErRzYPHr2xQKk/NdYI5VhQ8hdKXEFyvJsla
-         gXcBYtXBF1nsM25Lr08i7EqV/owyX3cAoo7LNJ5PWTn7kpQL2nIODFTZCNiKJnzvQ9O3
-         IPAqlK790Sc+KKqPNXvkV7U0uArb/YSdPkA3FnjYt5az8s+02QcnTnc3gH+zcKSyyxiR
-         dyvVZ874NWuqpGxSEw5JYiR8Vv8x1TozrzX5C3MjyG1sGsYajht4ZM0SHDUMyOmE+/nb
-         4RBA==
+        bh=Z9oDPnMiXj0W5tjbWJ4QNzpnf7Jjks18+DwO7DMnaVk=;
+        b=Cx3+Bs1hb11k6rBa3Ho1fGnRQWkSqoBy2wkS1R3dXTg+mxjSF0FnaxUqcKMyFtwWSp
+         +693aftN6a55pG68G42/WLfSo7QhE1LjWPD3y1cGqmhus/2WRkSLtD5T+HUMIT9wvPUz
+         EXnr46x2+xioRuCTCvJImJ2EhfMB/E4+01+rd0GVN7egXFaafatlZP+R29HtQUNCZljJ
+         dFxGHWX9/Cgenv3E//GytVHS49Z3P/nfHNN1RiIPc+cDkBFGdeMPrfv0zaLmKih7Zeh2
+         vhGh3yXYM230JQdlcK05nrhgQg/dJ/k8S2BC+ZjL4jawIm5j0ZLnupWqiQ8eDTy56S1D
+         3xFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751540301; x=1752145101;
+        d=1e100.net; s=20230601; t=1751540306; x=1752145106;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=65bSiZBK1YYcXSsQqihiwVaoKns5se5K6zq/pnQZJmA=;
-        b=VN6PzpgvmPCDKn/vlKrYdEiIdrYcuzemp8M6YvxwywjObVsVEtwbGkWBsNwiKyttKJ
-         HNMtUaAdeadDTOiq24gptZ8/I1b34jKEdxpQaqhgjAnyFrmgnfhRruxGMOvCTYa338am
-         CPxXFN/1mp54GSCkjNDp4iTfpltunuL3aLkCsQHzdLE/v3Z+7TI1YxlKv5iaGaHcUe1y
-         YNxXLSh6S5SGO2skdrPb3NHVviNfUHFiYJ/w8cDUveR85w1rMSR7/9TEt20hHG5ELkRj
-         jmbYaWy7s+HC/gFjZeiiDXvwMYmYLFF/8k8WMYGfzpXyzbLuIFwL5LNTCxnZLT/RAljK
-         lDbg==
-X-Forwarded-Encrypted: i=1; AJvYcCUbZ0IfTvsZq2/sUF6vNXlNbGwGAVG7IVBPMmEeSzE5AiZGDNu7ck2Cj1m74mHO9R2Yxo0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyFwMLSUm7dVg+Ur+sxlSyCz3MueGO7ihg+stvO9JMpcNZZ2Yco
-	0wpkQD+ONCfy2d3vIJa3ZZhVe7f0e9mFW15cVy3Wz+azieXUKAhU3uEcntPjQEeU9Sw=
-X-Gm-Gg: ASbGnctIk7tP03hwyov2y7q9agQKaOxGF6U83XNmGb/1qpD9zFuIVgbTeIrXn3Dgu5n
-	Aa38czxXZp/DXyPDXAwvR0MPlrpCGHmy99IYH9JzRgny++xu+Ifm6MfCBdYTwJIJ9pfnxlLCgbi
-	87Ov84rth+VLzkK3tFhpofmnzplt6Fg7LabYP5nsTI1Ak8oDls0tJJeBAWsorEKqCUk7JBfEleq
-	TpnMF5OvsKcWiOPQTfSxqQJA29gco1939MWMM+fJJg/zl5P83QwmgycCUTFy2LP3dfhaU9avxwl
-	93K+lcGTFWgZcyB2HGWAph3hBZhn7bn18U15T1h62SPSKAyrTkfJBCZpcXpJfYsab5WBy0MBNbj
-	BG8+EA8WN8Xc=
-X-Google-Smtp-Source: AGHT+IFnrXJdmwqfXVm57EvsTKQuyO3XMuVNe0870dybuwL8Cjih60IeaZAQMlXUOjIMVyzf3QlrkA==
-X-Received: by 2002:a05:600c:8b73:b0:453:8bc7:5e53 with SMTP id 5b1f17b1804b1-454a9be89demr37655095e9.0.1751540301208;
-        Thu, 03 Jul 2025 03:58:21 -0700 (PDT)
+        bh=Z9oDPnMiXj0W5tjbWJ4QNzpnf7Jjks18+DwO7DMnaVk=;
+        b=mRbP0+w1/9V+Y+x4I7zyzeObWzGWzQv8abVGR7G1kw8Sm/gunI/F5NVsC+CWqlZLYf
+         D6HGnJLBIUf/FoTT0ciWQrq5yJEk8xMlbtihJi9VdOuDWJWZ/dCUY76zC2wcs+P+g8y4
+         WswBxC8leZyzYRkVxWNx8MKURyqDkJGII8ZWgnwY44k1as5kvXvu7p5GAeoz8UHQjKT8
+         rXsoW6xJN2GZSy00VgN8jcgi66Z8cT9Ddts9uh3E5LEuDgPAfeSigmteu4F4TsUyi8iA
+         xn6mbu6d3kvZ9Rc0l0go+cDI2T6882w/TibgBSCfdbrYj64k16Yn9aHHhW9IUtQaLlTs
+         Oasg==
+X-Forwarded-Encrypted: i=1; AJvYcCVxkBMPmHw4cMhek71jHp0pON3cKL+em3eYsaO3sJSUNvpQ0tG+5gts9ZsZ+XQDBEuWhjY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw0+nBa537C7uRJIubHNDzoSgctiWLqGIzrLHDpRKa3LHr8Q0m+
+	XNbQLaoBEmBti5S4pJQPDPff/mEhYuy8/3L8AvYLiygtsIsK1Gh9pLybtHmarv46cJ0=
+X-Gm-Gg: ASbGncvNuMda4I+mx838CKBnGDyeoV6tWFuH2nlYh3tZRhBpb5tD3ZEE+TYNotlzLey
+	5jSmJhRsFPP9+M+aJKTK9Uq9REUwAAZRk0uO+xTzIxZyKp2hGAQG2pJgP1hbwd5Fhm0WJJcNi2A
+	ue86NSdlP9FhIojlOk/cAs71WZrn5eSA/CdGt43fwsQWYfLrUMglstlmEfA1pfziBJAFTkQZ/uN
+	f4yUvpRHzQn+K+qgQPohTejTMFw5hs9t+v+D2mpkzRmbs53PUpRKyQ7CWWFcNGaYP4suGYNZqdW
+	nQoS76dbM0FE+ZpiFNTXYXIen3C9DbZVrs54FwKrwRunnP7sH7hZN5elQ+In7sYV5fETU1CPLr4
+	hkX9NZrj81Ww=
+X-Google-Smtp-Source: AGHT+IEFReRAJH2FYWXivnT7yhvwImOKEpLg7WkwUoTmJ6AuJ6pGN7l7U7CUpirT0Nc9mpI2CZnvOw==
+X-Received: by 2002:a05:600c:3111:b0:453:b44:eb71 with SMTP id 5b1f17b1804b1-454ab3a8f15mr22671775e9.19.1751540306331;
+        Thu, 03 Jul 2025 03:58:26 -0700 (PDT)
 Received: from localhost.localdomain ([83.247.137.20])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-454a9bcececsm23556015e9.23.2025.07.03.03.58.20
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-454a99b1a5dsm23326275e9.29.2025.07.03.03.58.25
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 03 Jul 2025 03:58:20 -0700 (PDT)
+        Thu, 03 Jul 2025 03:58:25 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
@@ -80,11 +80,10 @@ Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
 	Pierrick Bouvier <pierrick.bouvier@linaro.org>,
 	kvm@vger.kernel.org,
 	Richard Henderson <richard.henderson@linaro.org>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	"Dr. David Alan Gilbert" <dave@treblig.org>
-Subject: [PATCH v5 30/69] accel/system: Add 'info accel' on human monitor
-Date: Thu,  3 Jul 2025 12:54:56 +0200
-Message-ID: <20250703105540.67664-31-philmd@linaro.org>
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+Subject: [PATCH v5 31/69] accel/tcg: Implement get_[vcpu]_stats()
+Date: Thu,  3 Jul 2025 12:54:57 +0200
+Message-ID: <20250703105540.67664-32-philmd@linaro.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250703105540.67664-1-philmd@linaro.org>
 References: <20250703105540.67664-1-philmd@linaro.org>
@@ -97,71 +96,34 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-'info accel' dispatches to the AccelOpsClass::get_stats()
-and get_vcpu_stats() handlers.
-
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-Acked-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- accel/accel-system.c |  8 ++++++++
- hmp-commands-info.hx | 12 ++++++++++++
- 2 files changed, 20 insertions(+)
+ accel/tcg/tcg-all.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/accel/accel-system.c b/accel/accel-system.c
-index 246ea55425f..6cdfe485c29 100644
---- a/accel/accel-system.c
-+++ b/accel/accel-system.c
-@@ -25,6 +25,8 @@
- 
- #include "qemu/osdep.h"
- #include "qemu/accel.h"
-+#include "qapi/qapi-commands-accelerator.h"
-+#include "monitor/monitor.h"
- #include "hw/boards.h"
- #include "hw/core/cpu.h"
- #include "system/accel-ops.h"
-@@ -112,11 +114,17 @@ void accel_init_ops_interfaces(AccelClass *ac)
-     cpus_register_accel(ops);
+diff --git a/accel/tcg/tcg-all.c b/accel/tcg/tcg-all.c
+index ae83ca0bd10..490596dbbd6 100644
+--- a/accel/tcg/tcg-all.c
++++ b/accel/tcg/tcg-all.c
+@@ -239,11 +239,17 @@ static int tcg_gdbstub_supported_sstep_flags(AccelState *as)
+     }
  }
  
-+static void accel_ops_class_init(ObjectClass *oc, const void *data)
++static void tcg_get_stats(AccelState *as, GString *buf)
 +{
-+    monitor_register_hmp_info_hrt("accel", qmp_x_accel_stats);
++    tcg_dump_stats(buf);
 +}
 +
- static const TypeInfo accel_ops_type_info = {
-     .name = TYPE_ACCEL_OPS,
-     .parent = TYPE_OBJECT,
-     .abstract = true,
-     .class_size = sizeof(AccelOpsClass),
-+    .class_init = accel_ops_class_init,
- };
- 
- static void accel_system_register_types(void)
-diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-index d7979222752..6142f60e7b1 100644
---- a/hmp-commands-info.hx
-+++ b/hmp-commands-info.hx
-@@ -267,6 +267,18 @@ ERST
-         .cmd        = hmp_info_sync_profile,
-     },
- 
-+    {
-+        .name       = "accel",
-+        .args_type  = "",
-+        .params     = "",
-+        .help       = "show accelerator info",
-+    },
-+
-+SRST
-+  ``info accel``
-+    Show accelerator info.
-+ERST
-+
- SRST
-   ``info sync-profile [-m|-n]`` [*max*]
-     Show synchronization profiling info, up to *max* entries (default: 10),
+ static void tcg_accel_class_init(ObjectClass *oc, const void *data)
+ {
+     AccelClass *ac = ACCEL_CLASS(oc);
+     ac->name = "tcg";
+     ac->init_machine = tcg_init_machine;
++    ac->get_stats = tcg_get_stats;
+     ac->allowed = &tcg_allowed;
+     ac->supports_guest_debug = tcg_supports_guest_debug;
+     ac->gdbstub_supported_sstep_flags = tcg_gdbstub_supported_sstep_flags;
 -- 
 2.49.0
 
