@@ -1,87 +1,87 @@
-Return-Path: <kvm+bounces-51566-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51567-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7949AF8C9B
-	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 10:50:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 847DCAF8D9F
+	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 11:08:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2613D5873A6
-	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 08:50:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6CEACB64BC5
+	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 08:49:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EE6728A735;
-	Fri,  4 Jul 2025 08:46:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0C192BEFFC;
+	Fri,  4 Jul 2025 08:47:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ItrRXHg6"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V4GYMBaR"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18DD428A708
-	for <kvm@vger.kernel.org>; Fri,  4 Jul 2025 08:46:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 688482BEFE1
+	for <kvm@vger.kernel.org>; Fri,  4 Jul 2025 08:47:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751618788; cv=none; b=RIpS/K5DhsXkz1feDz1EnYPvjfvGSjk5nbFlNlAV1Fkdp1OqTHhvzUouqgZBGd/k31Jgb3EvpU1jgwTpDmPjCRq/vNmUzdZOKCn+KpA0k2ehG2OPOsyilQhoOFDCSThXE0d4zDhiXUHLzwcFv0XpyJWOAFY3Pj6ASrB5ldWpjJw=
+	t=1751618829; cv=none; b=NuUpCPO3VVbDaEYb8A41iwVEywlJGDxSzl85x6khwPVVQDsmC9TAF6/prue4nbgr84BpcCJT4HisPHzUGqv0q8j2s5ByRMJpgpm/QietbF0rGnQOlfSjBk89HIqTIpFpZw5+xF9/Kzle+jtI1R+D3kGUExHOdwtUUmF41PyX2Vc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751618788; c=relaxed/simple;
-	bh=ggInmIOr7WKEN0+YNThAR8U4Q5TJCasopXzArJGvOFE=;
+	s=arc-20240116; t=1751618829; c=relaxed/simple;
+	bh=r5V49CGOXAoLrXqPU+rJOpeqSHYxcwrGfpX3wMAmlm8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hcvvXfadt9erruTGTAua7KNZckkETKMz6ffBXuNBJeYuxA6Sfw+Df5SHiDumogmJi4OQWMJdiHKgw/7ZGh3vrLocabMBzuEca+/2WYRyRnSyXy4794dvEFCeJ/GsqRFb0hS2tuJgX8QFSsUjqzBXju0YO2erQuUl1X6CPXJYv2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ItrRXHg6; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=pZGvSJewvjGEOUo3svmOVu7FDNW/7E9E2qfdpJ9ZBI3JkIiakoCfotjbKsijStOymnTYfSAyvnezwXwgevHvtwugXk0VoDjsitF5N4MxhMd4ybLeiyz/0sszxdL6/iuEPT4sz07FUIXTt75+HDI6/H9jr9P51j86YuB81fsgKwQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=V4GYMBaR; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751618786;
+	s=mimecast20190719; t=1751618826;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=mVyrAhiOnPT8DybQln1iSMYW0QSR+P4ZCW/jBPEH7PI=;
-	b=ItrRXHg6yCO3sKTRW+Ptg/OncZ/wF5N7v5aF6IRafTkefSEmQJYd39EfW3BKriar29X/ri
-	6wNOB9LAJO0cj3Ws/gNftBJtBfVWI6Ci7ANVnrXLeTd0gRkDZ1LqWixEaAvZBys6Ull1eI
-	e803eTOsKJcDQJs4DUoy7CFbYH7owqc=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=LbMrib8JvYyiXcynM5A1QVLEBjssYP8T6GYqmTfTDCI=;
+	b=V4GYMBaRhrIg6y5B9smCCMuJOFbdRkzWEFYsTK3JLqkjUDWtn+vE1T2dk1u7p4uHoOHqHJ
+	z4nZ1qS1KLDZySYfzTbcsf8SpW2LbL2ctARSVzlH2O+WFa3m4TBS8nA8mJk4AB1IMq5uIZ
+	Ia+KNOB8nJ5MXTU9DzwwfZNxUaays+k=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-258-2A8LeuiZNmGzYQkV_FofvA-1; Fri, 04 Jul 2025 04:46:21 -0400
-X-MC-Unique: 2A8LeuiZNmGzYQkV_FofvA-1
-X-Mimecast-MFC-AGG-ID: 2A8LeuiZNmGzYQkV_FofvA_1751618780
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-451ac1b43c4so3730735e9.0
-        for <kvm@vger.kernel.org>; Fri, 04 Jul 2025 01:46:21 -0700 (PDT)
+ us-mta-384-PnnfwWWOPb67txjRpkm0aA-1; Fri, 04 Jul 2025 04:47:04 -0400
+X-MC-Unique: PnnfwWWOPb67txjRpkm0aA-1
+X-Mimecast-MFC-AGG-ID: PnnfwWWOPb67txjRpkm0aA_1751618823
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4530ec2c87cso5614195e9.0
+        for <kvm@vger.kernel.org>; Fri, 04 Jul 2025 01:47:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751618780; x=1752223580;
+        d=1e100.net; s=20230601; t=1751618823; x=1752223623;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :content-language:from:references:cc:to:subject:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=mVyrAhiOnPT8DybQln1iSMYW0QSR+P4ZCW/jBPEH7PI=;
-        b=Pd/LGebPCDomVAQHSdOQB0dxnf+KJumVrgvHQlh5st1q+DN9+hbL3h8xsU/i37SVdA
-         13kGCHIDmEU5PG48AbmfbfE9hgjP2Plg2AadxXjB6/ohz4nXp/XLLKUHb7+Kb4Urql0h
-         eyVmm1sIaDkUL8zryeO2AjhidAGTkPMgrcspFAMxYTQ98PcoDf7WpzbCzEl7UlOvvNSd
-         IFlxpxEXBdcNpcFyIOeLM3gsQRz0lav0M0mmVOccK3hQW9I1YRHPqibqZOf5jMaT2ONs
-         q3jKikNNJFw/BcqgkTb+q5CGKXtglDQuihWK1fKsT74aVKq1MDl9Cja8IjF9tTC/WD9O
-         X+eA==
-X-Gm-Message-State: AOJu0Yz0k+wbrSPnkHEwHHc42e5fbf1SCHFDxlbq/Y+q4o9+amwNcLVY
-	3cVuB/MvuyZhBbwNRtFqSgyenAwCdKAksgFLdXYUqNoh9igafYzZkr1Zg5Ms0dlDWy5xYfGmqSu
-	1ydZmwOXTxbMH5aCsZFb6C1/XDKk57zMs/M0NDSeT3RgxfCqF2zbRVGxPrjmvrw==
-X-Gm-Gg: ASbGnctOJ98RgbaggXX/J0x4WHjRszvNi6esRl38jtKksRHmNICQ2vZro72BeZ/LhtH
-	CJ+usrH8MQERvV1oP/1f0mfJfhdrsVZVBfheBt2/CWKJ052pwK+aeyRxqP1cDPMyn+G6V77dCQ5
-	iBwWNzYlUuhWE0FTgbHs3whkbUXNJOfhG0ZA0WB8ZCpwtAy7j1wuDu1ubuKYvvNV1ksWTXqouTc
-	0yKctLbXe7LwUpeO2N2821o6eofH8Uq4FyAOf9eKD7nZrFu5Khp+fg3Heg3sfZealE/HIbXxRVl
-	tcHbCRCyUUsoPbIryde9xeZ1xEilyxsv/QyuCYtqwRmparASOclBEK7MfMLGnEOp1bE7Yb0qIh8
-	FqRmVcDfQXvbNZKntXAThj1TdJ7m4OS9A/NceqDjErkDyRAI=
-X-Received: by 2002:a05:600c:4711:b0:450:cfcb:5c9b with SMTP id 5b1f17b1804b1-454b3108982mr14259415e9.1.1751618780377;
-        Fri, 04 Jul 2025 01:46:20 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHaUV8FC+Py3RIAFTeLzepgFWje3L0XmJO5Yhj+dy4UyFtkI7upnmtWvFcBPMBDMfvgNn2l6w==
-X-Received: by 2002:a05:600c:4711:b0:450:cfcb:5c9b with SMTP id 5b1f17b1804b1-454b3108982mr14259055e9.1.1751618779935;
-        Fri, 04 Jul 2025 01:46:19 -0700 (PDT)
+        bh=LbMrib8JvYyiXcynM5A1QVLEBjssYP8T6GYqmTfTDCI=;
+        b=tIxMwMbs235xejgOijGb5r+vMBJJmW81Ny/3hq6zXSjUw/3eKhD8Ftlw3WLqs7eOuK
+         IAzEUW6SL2iJrLEXLmhmd7CkXlLBDj2mJOEW+1MuC1MRuj1tZmaJYTEn6pK5UbJvAL0k
+         eTPViTREvbBuoNDTnn1q+UYInL6p1XyDeCveqmAB+oZb84Q//ixYYneiCqL61NIHhB7m
+         eACpXcxlXPab4+tAfHfpL4E4aPfW7PuZpVoo2vMIwqud8bEWmgISshJjt32jWsLBzSpa
+         zq4Mb9uraHL9bqzdPWOpktvE9L7M3s1QeEKMhsgPcVIX8nZUVp+6zfsG7F4HNJHW+ic0
+         3hGA==
+X-Gm-Message-State: AOJu0YwG8kASqqAYd3BBinHTDfFXe5+4WARz2x4T0DJD4+G0Y6PW4oDE
+	au9Fv+akiksBD5DDdsDrL0fwBEIB/nNMWR9VN80XOS5w777gAP8N8XCNd3EspVLjAcsL7/BH9Og
+	mR3V2eOKChNRj1exJa7ERfqa6t1sjylay+WauFXpyqJr+P3wcd8/IEkrn4DpkmQ==
+X-Gm-Gg: ASbGncs0diDW8sQafptEBP311qezYbjYNKfGBk3cLPlRdJnpxrNcdl41AG+3y9amLx1
+	o+5kdmgit/8HAkQ9vn3odZCptKJ3wZwq+OpMjN+DlPpt2k2uIgwvWm8UcE/tbyuBmga8gjvRbV0
+	vdPTcF3wacxPSJ/uTaxssM3Djrxq4O6Rm6hGGBj3VrMGoS7dBGnNH2UNs0q9ctR/i/WOooqERYB
+	FY5wPFVBBNnuCQ2H/kPjcJ213BnPnExh3Q2VN4jNGlCj4OZd48uXjSIkNZ7uvAhcMkzwdNmlhbk
+	AqsIIdoEwmEwhrah+ydiLIsyMiIqdou/TQ/8FB6kD7F+V+SK7ptmXpXVolLGV3tNjEhVmPLAhP9
+	EjXZQBLP5+Z3GI2Oq6QId7gwG6CaKmuFHHq21Bo3njVqcndg=
+X-Received: by 2002:adf:a382:0:b0:3a4:dc42:a0ac with SMTP id ffacd0b85a97d-3b4966273ffmr891508f8f.49.1751618823181;
+        Fri, 04 Jul 2025 01:47:03 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHsRw575uw5CU78q39R0CUYNm5iiO5mve3sqDMWqmFqXrOdrE69CcShRjEvR2Lebt4eraqamQ==
+X-Received: by 2002:adf:a382:0:b0:3a4:dc42:a0ac with SMTP id ffacd0b85a97d-3b4966273ffmr891481f8f.49.1751618822420;
+        Fri, 04 Jul 2025 01:47:02 -0700 (PDT)
 Received: from ?IPV6:2003:d8:2f2c:5500:988:23f9:faa0:7232? (p200300d82f2c5500098823f9faa07232.dip0.t-ipconnect.de. [2003:d8:2f2c:5500:988:23f9:faa0:7232])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b471b97353sm1929683f8f.51.2025.07.04.01.46.19
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b4708d0af7sm1973309f8f.35.2025.07.04.01.47.01
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Jul 2025 01:46:19 -0700 (PDT)
-Message-ID: <10a7ced9-33f2-47a0-b368-a6fecad6a842@redhat.com>
-Date: Fri, 4 Jul 2025 10:46:18 +0200
+        Fri, 04 Jul 2025 01:47:01 -0700 (PDT)
+Message-ID: <77d99da0-10eb-4a4d-8ad9-c6ec83cb4540@redhat.com>
+Date: Fri, 4 Jul 2025 10:47:00 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -89,13 +89,12 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 4/5] vfio/type1: introduce a new member has_rsvd for
- struct vfio_dma
+Subject: Re: [PATCH v2 5/5] vfio/type1: optimize vfio_unpin_pages_remote()
 To: lizhe.67@bytedance.com, alex.williamson@redhat.com,
  akpm@linux-foundation.org, peterx@redhat.com, jgg@ziepe.ca
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org
 References: <20250704062602.33500-1-lizhe.67@bytedance.com>
- <20250704062602.33500-5-lizhe.67@bytedance.com>
+ <20250704062602.33500-6-lizhe.67@bytedance.com>
 From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=david@redhat.com; keydata=
@@ -143,44 +142,96 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <20250704062602.33500-5-lizhe.67@bytedance.com>
+In-Reply-To: <20250704062602.33500-6-lizhe.67@bytedance.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 04.07.25 08:26, lizhe.67@bytedance.com wrote:
 > From: Li Zhe <lizhe.67@bytedance.com>
 > 
-> Introduce a new member has_rsvd for struct vfio_dma. This member is
-> used to indicate whether there are any reserved or invalid pfns in
-> the region represented by this vfio_dma. If it is true, it indicates
-> that there is at least one pfn in this region that is either reserved
-> or invalid.
+> When vfio_unpin_pages_remote() is called with a range of addresses that
+> includes large folios, the function currently performs individual
+> put_pfn() operations for each page. This can lead to significant
+> performance overheads, especially when dealing with large ranges of pages.
 > 
+> It would be very rare for reserved PFNs and non reserved will to be mixed
+> within the same range. So this patch utilizes the has_rsvd variable
+> introduced in the previous patch to determine whether batch put_pfn()
+> operations can be performed. Moreover, compared to put_pfn(),
+> unpin_user_page_range_dirty_lock() is capable of handling large folio
+> scenarios more efficiently.
+> 
+> The performance test results for completing the 16G VFIO IOMMU DMA
+> unmapping are as follows.
+> 
+> Base(v6.16-rc4):
+> ./vfio-pci-mem-dma-map 0000:03:00.0 16
+> ------- AVERAGE (MADV_HUGEPAGE) --------
+> VFIO UNMAP DMA in 0.135 s (118.6 GB/s)
+> ------- AVERAGE (MAP_POPULATE) --------
+> VFIO UNMAP DMA in 0.312 s (51.3 GB/s)
+> ------- AVERAGE (HUGETLBFS) --------
+> VFIO UNMAP DMA in 0.136 s (117.3 GB/s)
+> 
+> With this patchset:
+> ------- AVERAGE (MADV_HUGEPAGE) --------
+> VFIO UNMAP DMA in 0.045 s (357.0 GB/s)
+> ------- AVERAGE (MAP_POPULATE) --------
+> VFIO UNMAP DMA in 0.288 s (55.6 GB/s)
+> ------- AVERAGE (HUGETLBFS) --------
+> VFIO UNMAP DMA in 0.045 s (353.9 GB/s)
+> 
+> For large folio, we achieve an over 66% performance improvement in
+> the VFIO UNMAP DMA item. For small folios, the performance test
+> results appear to show a slight improvement.
+> 
+> Suggested-by: Jason Gunthorpe <jgg@ziepe.ca>
 > Signed-off-by: Li Zhe <lizhe.67@bytedance.com>
 > ---
->   drivers/vfio/vfio_iommu_type1.c | 2 ++
->   1 file changed, 2 insertions(+)
+>   drivers/vfio/vfio_iommu_type1.c | 20 ++++++++++++++++----
+>   1 file changed, 16 insertions(+), 4 deletions(-)
 > 
 > diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index b770eb1c4e07..13c5667d431c 100644
+> index 13c5667d431c..3971539b0d67 100644
 > --- a/drivers/vfio/vfio_iommu_type1.c
 > +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -92,6 +92,7 @@ struct vfio_dma {
->   	bool			iommu_mapped;
->   	bool			lock_cap;	/* capable(CAP_IPC_LOCK) */
->   	bool			vaddr_invalid;
-> +	bool			has_rsvd;	/* has 1 or more rsvd pfns */
->   	struct task_struct	*task;
->   	struct rb_root		pfn_list;	/* Ex-user pinned pfn list */
->   	unsigned long		*bitmap;
-> @@ -774,6 +775,7 @@ static long vfio_pin_pages_remote(struct vfio_dma *dma, unsigned long vaddr,
->   	}
+> @@ -792,17 +792,29 @@ static long vfio_pin_pages_remote(struct vfio_dma *dma, unsigned long vaddr,
+>   	return pinned;
+>   }
 >   
->   out:
-> +	dma->has_rsvd |= rsvd;
->   	ret = vfio_lock_acct(dma, lock_acct, false);
+> +static inline void put_valid_unreserved_pfns(unsigned long start_pfn,
+> +		unsigned long npage, int prot)
+> +{
+> +	unpin_user_page_range_dirty_lock(pfn_to_page(start_pfn), npage,
+> +					 prot & IOMMU_WRITE);
+> +}
+> +
+>   static long vfio_unpin_pages_remote(struct vfio_dma *dma, dma_addr_t iova,
+>   				    unsigned long pfn, unsigned long npage,
+>   				    bool do_accounting)
+>   {
+>   	long unlocked = 0, locked = vpfn_pages(dma, iova, npage);
+> -	long i;
 >   
->   unpin_out:
+> -	for (i = 0; i < npage; i++)
+> -		if (put_pfn(pfn++, dma->prot))
+> -			unlocked++;
+> +	if (dma->has_rsvd) {
+> +		long i;
+
+No need to move "long i" here, but also doesn't really matter.
+
+>   
+> +		for (i = 0; i < npage; i++)
+> +			if (put_pfn(pfn++, dma->prot))
+> +				unlocked++;
+> +	} else {
+> +		put_valid_unreserved_pfns(pfn, npage, dma->prot);
+> +		unlocked = npage;
+> +	}
+>   	if (do_accounting)
+>   		vfio_lock_acct(dma, locked - unlocked, true);
+>   
 
 Reviewed-by: David Hildenbrand <david@redhat.com>
 
