@@ -1,82 +1,42 @@
-Return-Path: <kvm+bounces-51543-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51550-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04B0FAF87C5
-	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 08:13:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B2A1AF8806
+	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 08:29:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 341B1543497
-	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 06:12:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D3BD16D383
+	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 06:28:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E6F7232392;
-	Fri,  4 Jul 2025 06:12:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="Gjp7FOC3"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7E422566F5;
+	Fri,  4 Jul 2025 06:28:13 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from isrv.corpit.ru (isrv.corpit.ru [212.248.84.144])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 704E2223DDA
-	for <kvm@vger.kernel.org>; Fri,  4 Jul 2025 06:12:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13E75255F25
+	for <kvm@vger.kernel.org>; Fri,  4 Jul 2025 06:28:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.248.84.144
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751609534; cv=none; b=JrDjnja6++K08zQ3vcJniGHWT02ee46hNlzGtqLTHVU3IhpKx+ftJtQ2tCqeSEaQIVkAgAlb/wLH6PCXxaATuBHUhxwmTj+Yd653MnsU4q6q51FnYOl7VY9+5Uloq1t2sgsV/BytT9jpExhRxSa3aCPOh+4C5G02I/HGLUeVEYU=
+	t=1751610493; cv=none; b=WgF4KLqb4v5znbG4yIc/Fk2eEeZemnvctpr/1GSMV/EQgYkBjKqxdFv3/IcqSTAXdkoCuYXIoDvPqvb9/NNROyR0H0qRHlPN87lRpbdV8L/DU+xOdMzbw8VDCDIVQ3+TnH/NRYNir7uXCwZta5Z8R46SUsravG8afkd4nJ5MkQI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751609534; c=relaxed/simple;
-	bh=/uogvdvXfYqm/roohIkQvB+ClcSIM1FXcy29Xo6qXa8=;
-	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=OjMIyoQ8n2SE3+Oo2IiaN40LZ63e9Y7n4HHmjdaRqw6cZasUFljlGFD5yczx/b/WemPh40Nu8IgKLWwpZb5ClMDo5GcH43/u3iAKPHOTGmllqtCyFqR+sysp83Jh3MEdniUGK6y2wDSclqE0wW4UxiDI3VvLtjjqAJWzSz5LrBc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=Gjp7FOC3; arc=none smtp.client-ip=209.85.210.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-74ad4533ac5so1438776b3a.0
-        for <kvm@vger.kernel.org>; Thu, 03 Jul 2025 23:12:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1751609532; x=1752214332; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:user-agent:mime-version:date:message-id:from:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=iLc719GJ905zueoaF4JxOKSxawRWbkyYr3NzbMVW2kQ=;
-        b=Gjp7FOC3bMT0cxIVlzHyx8ZHoD5e0YtBeIXoKUgCJpKLdsQnw4q1jwOmSSAYyOmHVx
-         yZWi7d+g3Zmac1LztnVKfbhzAZZm3cS2mJrSqcCZjbCEIFW1pIklIFZDxZhXMabGflqV
-         AqkDyDADdSZ0/fmX/MiWrxR0SqikljF8LtzQ/KZakn+YA/Wgtajk8UnMJwospiJ1Queu
-         Vt2lbiG/E3JoyizqzKd7+7mecIQ+ZP05rVUmc34irMyb3VUdiZnxE/REYWRZFKpnd9eT
-         +L0kDd85UL/EXSOs48GnkDFmMoKJ9xqO8sfGIGeh2sSUKwcqll5X0mCWnxXvfD6B5uSX
-         7+6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751609532; x=1752214332;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:user-agent:mime-version:date:message-id:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iLc719GJ905zueoaF4JxOKSxawRWbkyYr3NzbMVW2kQ=;
-        b=TTxbIp3/Fkjj/slh1PHsufKLMW1QLfQKWyUDXJDpIaEyk3ld43PSAqqHFNJ+XENexy
-         4YsRr5URCYy8eMBpbec4bdsxrD3PS8IA8//0VZz3BUJE1P/YlvnJpxZIh4FScpdFWZVi
-         LLgReTF8GW6JAp23O1xHA1fCvVrYJHsaqphyEfvg12/0NfIt8JJyFySVegKXTlkqp4AJ
-         6c9y+ORszGYGhtMoKUSv718vYLI8jqHrVLmdnBpFGruXVDr8qqlD84++39xsC7Y9RVwK
-         cy74IRNiT0iTbxNPE42NcCWrogd1Y0dP1MjMzqUqMm0u+f3S+/MLZ+tjOvM/H2waC8sE
-         QqpQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX/okmh23IltOmleHSCzloMtJ0EO7o3YFd4F3o/BabjSZhpBKA+zUn0yKHiLwLNB+/+XOQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyBxUjLoX40tMtf7JF0u5U1u0bSKu76cofdQ1hPEOYfmQyWOH6a
-	nQ0OR7yCiTNs9AEUbgh7pUMZqOhpP5Ro5vuW9bLokbH4j+3DFbropwu/OI6xRkOCr/Y=
-X-Gm-Gg: ASbGncsmhG5oKLoGaucj9jAkqrCB8lGrI84U9W4oL0+aNqQlMIUz3eZTR9e78ojDFkX
-	eURgEd0IqaxB85oTGcdmlQXOfaLFSpMOzrMKYlOLtVoKouY3g/ywJuL9D8gKdFQEvKyLTUAshFI
-	6Qruq6R5D/fHakikOFI2WeGk4WpD4ehyYW0iOPEm0DwxBIP/zti8wVf/h8u3aGkPvhZ3FCHp73u
-	d8ODnYk5knzvYpEkpMASh6iL7NFqyL1l1ZNMGP2ksIWnGS4XreqTK2/JCAeOnU/fxDiTJwVyltB
-	eM7eBbr8Zq4TODkIDTN6DQmunZ1OUUMP7ueyJES2hjqUG150iymew+MwXONaQ05sreeLOvlXrlA
-	TclozjP0k586nAG/Y/fR6W8NOqBAg+xfKchQe
-X-Google-Smtp-Source: AGHT+IExD7KOIwp60ABVvZC51KGJUxkHICCIp6gpdohdZCSEaIoU6l2h4wvSvhZGHVi8H+Fsq8KURw==
-X-Received: by 2002:a05:6a20:430f:b0:220:88f2:51a5 with SMTP id adf61e73a8af0-22597d0563bmr3567125637.18.1751609531468;
-        Thu, 03 Jul 2025 23:12:11 -0700 (PDT)
-Received: from ?IPV6:fdbd:ff1:ce00:1d76:cc0:e1b1:8778:e58c? ([2001:c10:ff04:0:1000::a])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b38f879d040sm91749a12.44.2025.07.03.23.12.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 03 Jul 2025 23:12:11 -0700 (PDT)
-From: Liangyan <liangyan.peng@bytedance.com>
-X-Google-Original-From: Liangyan <liangyan.peng@google.com>
-Message-ID: <dc4d14c5-1f04-47d7-b314-e4db62f57665@google.com>
-Date: Fri, 4 Jul 2025 14:12:04 +0800
+	s=arc-20240116; t=1751610493; c=relaxed/simple;
+	bh=0mZBIOksRr3bClgpp+yfgiYHaU7H7GsjxHu1iLTb3f0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=P/NWJuYnSGen8H0yau3+MXjPwQOwxY/5n5cYimdRksYQND5tm1t2wf+GpvQBCtQLjpI0Y+JGUjE4YUn7NeosnsJXbKbvqfDLVRdRqDbh/y9keKtIbDUfOjV52dwpq9XgicRg0YXn7sxXMDsXC9MWZ7eEZ9uZ8+P6BI1FfFi8TPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tls.msk.ru; spf=pass smtp.mailfrom=tls.msk.ru; arc=none smtp.client-ip=212.248.84.144
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tls.msk.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tls.msk.ru
+Received: from tsrv.corpit.ru (tsrv.tls.msk.ru [192.168.177.2])
+	by isrv.corpit.ru (Postfix) with ESMTP id A65EB1332B5;
+	Fri, 04 Jul 2025 09:19:09 +0300 (MSK)
+Received: from [192.168.177.146] (mjtthink.wg.tls.msk.ru [192.168.177.146])
+	by tsrv.corpit.ru (Postfix) with ESMTP id A773F23AE14;
+	Fri,  4 Jul 2025 09:19:24 +0300 (MSK)
+Message-ID: <2825ccc0-9d99-42e4-b6ab-24c8cdc2c2f2@tls.msk.ru>
+Date: Fri, 4 Jul 2025 09:19:24 +0300
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -84,143 +44,75 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [External] Re: [PATCH RFC] x86/kvm: Use native qspinlock by
- default when realtime hinted
-To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Cc: Bibo Mao <maobibo@loongson.cn>, pbonzini@redhat.com, vkuznets@redhat.com,
- tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
- dave.hansen@linux.intel.com, hpa@zytor.com, wanpengli@tencent.com,
- linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org
-References: <20250702064218.894-1-liangyan.peng@bytedance.com>
- <806e3449-a7b1-fa57-b220-b791428fb28b@loongson.cn>
- <8145bb17-8ba4-4d9d-a995-5f8b09db99c4@google.com>
- <aGVdykqnaUnPBkW-@char.us.oracle.com>
-Content-Language: en-US
-In-Reply-To: <aGVdykqnaUnPBkW-@char.us.oracle.com>
+Subject: Re: [PATCH] accel/kvm: Adjust the note about the minimum required
+ kernel version
+To: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ qemu-devel@nongnu.org
+Cc: kvm@vger.kernel.org, qemu-stable@nongnu.org, qemu-trivial@nongnu.org
+References: <20250702060319.13091-1-thuth@redhat.com>
+Content-Language: en-US, ru-RU
+From: Michael Tokarev <mjt@tls.msk.ru>
+Autocrypt: addr=mjt@tls.msk.ru; keydata=
+ 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
+In-Reply-To: <20250702060319.13091-1-thuth@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-
-Find one AMD guest(AMD EPYC 9Y24 128-vCPU) to test, it seems about 9% 
-improvement.
-
-Command: ./Run -c 128 spawn
-
-With virt spin lock:
-System Benchmarks Partial Index   BASELINE       RESULT    INDEX
-Process Creation                      126.0     120449.8   9559.5
-                                                           ========
-System Benchmarks Index Score (Partial Only                9559.5
-
-
-With qspinlock:
-System Benchmarks Partial Index   BASELINE       RESULT    INDEX
-Process Creation                      126.0     131566.8  10441.8
-                                                           ========
-System Benchmarks Index Score (Partial Only)              10441.8
-
-
-
-Regards,
-Liangyan
-
-
-On 2025/7/3 00:26, Konrad Rzeszutek Wilk wrote:
-> On Wed, Jul 02, 2025 at 08:23:58PM +0800, Liangyan wrote:
->> We test that unixbench spawn has big improvement in Intel 8582c 120-CPU
->> guest vm if switch to qspinlock.
+On 02.07.2025 09:03, Thomas Huth wrote:
+> From: Thomas Huth <thuth@redhat.com>
 > 
-> And ARM or AMD?
-> 
->>
->> Command: ./Run -c 120 spawn
->>
->> Use virt_spin_lock:
->> System Benchmarks Partial Index   BASELINE       RESULT  INDEX
->> Process Creation                     126.0      71878.4   5704.6
->>                                                          ========
->> System Benchmarks Index Score (Partial Only)              5704.6
->>
->>
->> Use qspinlock:
->> System Benchmarks Partial Index   BASELINE       RESULT    INDEX
->> Process Creation                     126.0     173566.6  13775.1
->>                                                          ========
->> System Benchmarks Index Score (Partial Only              13775.1
->>
->>
->> Regards,
->> Liangyan
->>
->> On 2025/7/2 16:19, Bibo Mao wrote:
->>>
->>>
->>> On 2025/7/2 下午2:42, Liangyan wrote:
->>>> When KVM_HINTS_REALTIME is set and KVM_FEATURE_PV_UNHALT is clear,
->>>> currently guest will use virt_spin_lock.
->>>> Since KVM_HINTS_REALTIME is set, use native qspinlock should be safe
->>>> and have better performance than virt_spin_lock.
->>> Just be curious, do you have actual data where native qspinlock has
->>> better performance than virt_spin_lock()?
->>>
->>> By my understanding, qspinlock is not friendly with VM. When lock is
->>> released, it is acquired with one by one order in contending queue. If
->>> the first vCPU in contending queue is preempted, the other vCPUs can not
->>> get lock. On physical machine it is almost impossible that CPU
->>> contending lock is preempted.
->>>
->>> Regards
->>> Bibo Mao
->>>>
->>>> Signed-off-by: Liangyan <liangyan.peng@bytedance.com>
->>>> ---
->>>>    arch/x86/kernel/kvm.c | 18 +++++++++---------
->>>>    1 file changed, 9 insertions(+), 9 deletions(-)
->>>>
->>>> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
->>>> index 921c1c783bc1..9080544a4007 100644
->>>> --- a/arch/x86/kernel/kvm.c
->>>> +++ b/arch/x86/kernel/kvm.c
->>>> @@ -1072,6 +1072,15 @@ static void kvm_wait(u8 *ptr, u8 val)
->>>>     */
->>>>    void __init kvm_spinlock_init(void)
->>>>    {
->>>> +    /*
->>>> +     * Disable PV spinlocks and use native qspinlock when dedicated
->>>> pCPUs
->>>> +     * are available.
->>>> +     */
->>>> +    if (kvm_para_has_hint(KVM_HINTS_REALTIME)) {
->>>> +        pr_info("PV spinlocks disabled with KVM_HINTS_REALTIME
->>>> hints\n");
->>>> +        goto out;
->>>> +    }
->>>> +
->>>>        /*
->>>>         * In case host doesn't support KVM_FEATURE_PV_UNHALT there is
->>>> still an
->>>>         * advantage of keeping virt_spin_lock_key enabled:
->>>> virt_spin_lock() is
->>>> @@ -1082,15 +1091,6 @@ void __init kvm_spinlock_init(void)
->>>>            return;
->>>>        }
->>>> -    /*
->>>> -     * Disable PV spinlocks and use native qspinlock when dedicated
->>>> pCPUs
->>>> -     * are available.
->>>> -     */
->>>> -    if (kvm_para_has_hint(KVM_HINTS_REALTIME)) {
->>>> -        pr_info("PV spinlocks disabled with KVM_HINTS_REALTIME
->>>> hints\n");
->>>> -        goto out;
->>>> -    }
->>>> -
->>>>        if (num_possible_cpus() == 1) {
->>>>            pr_info("PV spinlocks disabled, single CPU\n");
->>>>            goto out;
->>>>
->>>
->>
->>
+> Since commit 126e7f78036 ("kvm: require KVM_CAP_IOEVENTFD and
+> KVM_CAP_IOEVENTFD_ANY_LENGTH") we require at least kernel 4.4 to
+> be able to use KVM. Adjust the upgrade_note accordingly.
+> While we're at it, remove the text about kvm-kmod and the
+> SourceForge URL since this is not actively maintained anymore.
 
+Let's be consistent and require kernel 4.5.
+
+With this, applied to qemu-trivial (keeping Philippe's R-b).
+
+Thanks,
+
+/mjt
 
