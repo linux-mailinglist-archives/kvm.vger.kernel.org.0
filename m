@@ -1,126 +1,164 @@
-Return-Path: <kvm+bounces-51594-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51595-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76824AF8EBD
-	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 11:34:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2496DAF8F60
+	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 12:04:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0DD851CA38CB
-	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 09:35:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E141586E73
+	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 10:04:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87ABC2E7F07;
-	Fri,  4 Jul 2025 09:34:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 910802EF9A7;
+	Fri,  4 Jul 2025 10:04:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ynddal.dk header.i=@ynddal.dk header.b="fv4d+/ss"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eyKzGkqX"
 X-Original-To: kvm@vger.kernel.org
-Received: from outbound.qs.icloud.com (p-east3-cluster2-host12-snip4-10.eps.apple.com [57.103.87.251])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B830136E
-	for <kvm@vger.kernel.org>; Fri,  4 Jul 2025 09:34:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.87.251
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8D38288C1C
+	for <kvm@vger.kernel.org>; Fri,  4 Jul 2025 10:04:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751621689; cv=none; b=nSxbMXFAHw8DtUfWeIAa3duG01zSmGk+xM9eJoZ++LoTXVgDP+lE05vn0mysMSUjwTM6W+0LPuOnQvESxb0wjtMTgIBKyLWFUK4TmrtZRdZ0lWvydmhw1Acol3AiMeq7CS/v5eSSvR2N6EUxSqNdSLORSqD9XvNee/TpBYRT7+k=
+	t=1751623444; cv=none; b=mL2+ezHvDpOHdopnoR4aG2GR/H8zoKmNe/V4S8FFyeCjkPpJtSF9kEwS5HD8dD/lo7mwYvB5+nyW84X2aQav+m0xaiigzC0tGLlv9/0GGhGYAY/N13MeBZgyugcizHQWp5LR0p3y6T0DSocIoIUcm8RfTtCbUkJqD12/UFwSygM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751621689; c=relaxed/simple;
-	bh=zCj+Vw0RZVvlh7Wrqj1LSqhABOtf9pPpRKfXDZjtSk0=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=frLWich454EeN1IPjm00QvmsCdeppdTSfxxV80aW5EcFTAbezxMS08AYXgGK3hp3oEyBQBMCtc0iwtyrvN1ypkGkccPkOFljOLCWg/WePVEcRdKRKk+sfHZ8GzbvVxOB5EAbdlQWMHuAU8wQrUh5T+8rTqoDuy0hwXr8WMC2f9k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ynddal.dk; spf=pass smtp.mailfrom=ynddal.dk; dkim=pass (2048-bit key) header.d=ynddal.dk header.i=@ynddal.dk header.b=fv4d+/ss; arc=none smtp.client-ip=57.103.87.251
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ynddal.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ynddal.dk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ynddal.dk; s=sig1;
-	bh=jC7wpVSfptGSKQNhfifAQf88TarhTWI3lXHmAPkaLIE=;
-	h=Content-Type:Mime-Version:Subject:From:Date:Message-Id:To:x-icloud-hme;
-	b=fv4d+/ssMjjZRvl+bi2zpn1ICNfnzzmG2pf+BB3syOrG+HLD2UnuHw9UJqfMpn0Cz
-	 oCNxQG3iNNDAfVvMLWDOo0J8axx8pDeZA9iwsDphTABCjkHHOTiR60DePOKkzMhA1r
-	 w6sqv/KEq4g6KRcEdpV5Fm25TcUL4dAtFDzMqdw2ATaqUqLAyBq0rWfOrV8m5hvkj8
-	 8hfnr/Qd63XZYhOzP7VZwRN9noq/FbDkmYggLZP8BsG/4PNxOM0YCSSOfIwAEoDYUy
-	 o/ejRzOVXWuwGp1nPBPwa48hsxjf76seYOyPTuerm61lx6CrricdKlBvnpmz3BAztG
-	 UjS/kP4MWi5mQ==
-Received: from outbound.qs.icloud.com (unknown [127.0.0.2])
-	by outbound.qs.icloud.com (Postfix) with ESMTPS id 4B3EE1800146;
-	Fri,  4 Jul 2025 09:34:42 +0000 (UTC)
-Received: from smtpclient.apple (qs-asmtp-me-k8s.p00.prod.me.com [17.57.155.37])
-	by outbound.qs.icloud.com (Postfix) with ESMTPSA id 80C6D1800166;
-	Fri,  4 Jul 2025 09:34:39 +0000 (UTC)
-Content-Type: text/plain;
-	charset=utf-8
+	s=arc-20240116; t=1751623444; c=relaxed/simple;
+	bh=B7aUvk/jHjdAbP1Txi087l61k45RNX1ZWe+SIygilVA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bmq1rie0C9/bOmmgJbID7Gfx1Ib0sYGicYJ0lvKs0Iex9+FFKSQRewtA4jAN1JDwNFPypWa+PI6haJ67UTR0I+43l6n9PsoL7rWrslMLyV07o4+apSZy3DXipu2QqxWHeYVvSJxLl8PqdcFZkMqQnPzWE9z9YD7+1hZfif+LE6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eyKzGkqX; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1751623441;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rWi88a+JkVfvhFesKDsYwPcS3Up3wpcEEvDnhl9YEKo=;
+	b=eyKzGkqXL8vpPgddz8IWyIRdr9pBfI6XprIXpUXmxSkbh0ZtZwSnP9GvX2ZbHdMRfB38l4
+	iqdEBmqSC3CxGd4M8YhgxAumfTKLgSs5N3uYLeyWx1A+aiWAtic8kNrFYo2aJ0sMpTiuTA
+	Teo/EN5UpwwsBgZ6BoKMollsPlhbCsE=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-36-qv616qA2PQGDJd6NAFm21A-1; Fri, 04 Jul 2025 06:04:00 -0400
+X-MC-Unique: qv616qA2PQGDJd6NAFm21A-1
+X-Mimecast-MFC-AGG-ID: qv616qA2PQGDJd6NAFm21A_1751623439
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-ae2b7bdc8f6so80718566b.1
+        for <kvm@vger.kernel.org>; Fri, 04 Jul 2025 03:04:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751623439; x=1752228239;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rWi88a+JkVfvhFesKDsYwPcS3Up3wpcEEvDnhl9YEKo=;
+        b=QWKR4b7JDFfvYSGp6iXaGfXVg/hXkOme/7xM37CaXtVQ9PygpEB1/kKGYoHYnIjepp
+         Aoi9CvQAJqyH99lmHeTBRMg+Vc8l2J/HccOyTI9dSJdvOaoH4YoKKyo1iB+WSwr4hETY
+         OIGRcP8SiUeoQrFtxGOgnFuWORBnRJ6SkDvmOZW5F7PhAQ9mDd+3UgYfLe6vDrmu5UPS
+         1kgItMS1KHkbpwxLh/BKCeKcwCeoGfrD4mpP3a9QW2NsxqewWyn+ykkEJzLDyHl8Y3XV
+         TqyY7Ne72atz1lJoLPSYEpidWIqUF9PVq+npnUikHwxxVvCSYOIjOCPhIyN/mqElqWOb
+         ZpRg==
+X-Forwarded-Encrypted: i=1; AJvYcCXkXBcnXjN49MN2n4WEvMaqdRuDVSEzack0MrUm7IZB6fy1hzbBak6q7fkZUigmHispFzM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw7LjRnFLlSPaiqB49da+VJFsu6OSf7FVO0/nG/h32mVG9Rk04K
+	tcn9bvUHQFk78qKfW3Ho5nCXZiy5U+4fHZdUDlPBSXxT1BjW1hzaeKRvNTgxazGEKUoJjfDrWEl
+	r2nWBSt+hmLd6eaW6YY77c2+Wmj1hDY1zReUIaFJsQm4j+fJgjxulVRr2yCVuODKuNhd6+mM84L
+	v4cKDdfXIwP/T4V+OP1nTc094+7yf7
+X-Gm-Gg: ASbGnctajmOWhjjQypNh11gKm0C1mBNrCAQmMPQ4gHjywzPp8LQsNdnbNvbDW38t5n/
+	7XifjJ3YE5aW6IJNhwfM2eekXvjLfhbRMYGVex04TKMfBi7meBJk4blmySd7koDqHs85bF4isDR
+	g4DDwW
+X-Received: by 2002:a17:907:1b28:b0:ae3:6038:ad6f with SMTP id a640c23a62f3a-ae3f801ffffmr257588266b.3.1751623439181;
+        Fri, 04 Jul 2025 03:03:59 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHS9N1eCIk/WZ0O55TJaTXfCqhycvxAdX3gpiv7v0S1xEAaaTDokoaZNHnw35/eNshgWtKvOMMHV8DKBFb9MEc=
+X-Received: by 2002:a17:907:1b28:b0:ae3:6038:ad6f with SMTP id
+ a640c23a62f3a-ae3f801ffffmr257584266b.3.1751623438615; Fri, 04 Jul 2025
+ 03:03:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.600.51.1.1\))
-Subject: Re: [PATCH v4 58/65] accel: Always register
- AccelOpsClass::get_elapsed_ticks() handler
-From: Mads Ynddal <mads@ynddal.dk>
-In-Reply-To: <20250702185332.43650-59-philmd@linaro.org>
-Date: Fri, 4 Jul 2025 11:34:28 +0200
-Cc: qemu-devel@nongnu.org,
- =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Pierrick Bouvier <pierrick.bouvier@linaro.org>,
- Cameron Esfahani <dirty@apple.com>,
- Roman Bolshakov <rbolshakov@ddn.com>,
- Phil Dennis-Jordan <phil@philjordan.eu>,
- Fabiano Rosas <farosas@suse.de>,
- Laurent Vivier <lvivier@redhat.com>,
- Stefano Stabellini <sstabellini@kernel.org>,
- Anthony PERARD <anthony@xenproject.org>,
- Paul Durrant <paul@xen.org>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Reinoud Zandijk <reinoud@netbsd.org>,
- Sunil Muthuswamy <sunilmut@microsoft.com>,
- kvm@vger.kernel.org,
- xen-devel@lists.xenproject.org
+MIME-Version: 1.0
+References: <20250702014139.721-1-liming.wu@jaguarmicro.com>
+In-Reply-To: <20250702014139.721-1-liming.wu@jaguarmicro.com>
+From: Lei Yang <leiyang@redhat.com>
+Date: Fri, 4 Jul 2025 18:03:21 +0800
+X-Gm-Features: Ac12FXx2LPRflMaDOhrK2WN9s4Zkqha02pwAGwf7MkpIy2PH8obbz9l4skjV1c8
+Message-ID: <CAPpAL=wY_JU7r8oWgcF_keq+rbpGdkhS5KF0K67g=rbX7_nwng@mail.gmail.com>
+Subject: Re: [PATCH] virtio_net: simplify tx queue wake condition check
+To: liming.wu@jaguarmicro.com
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, angus.chen@jaguarmicro.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <6E85BEC9-8431-4078-AE7D-B39575A0A155@ynddal.dk>
-References: <20250702185332.43650-1-philmd@linaro.org>
- <20250702185332.43650-59-philmd@linaro.org>
-To: =?utf-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-X-Mailer: Apple Mail (2.3826.600.51.1.1)
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzA0MDA3MyBTYWx0ZWRfX4RhBOv1FtGUi
- paYD8h7EWn4Xf8MRKYylkrEyXc7vsT7b8A8y8ICl5BJ44GCBKuwIMwd8OID7Lt1AmN6Xkbpkhxo
- evhMRfcU7UWhMWy3GNDmwmyoZiLPr6wGzGw2vkkRlXhJ64tqKG5+VrP8KolE79P+YubgkeKiqdy
- tbBKrZiEF/Wf3FDcv/Sk8qOgqjLaGWQvYvcNk2O5OxoM5dZDfsucgJRG9/dVgd1DvfbUy4ULiJO
- P6I5JALT74fCxmhI0WoAHBdkUjQpWs7e3kCzNKhfkcvVb6yQTSkeYbC/0i8HoZ9vCMH6tvFgY=
-X-Proofpoint-GUID: koFkGGtkRgsisw6n9qz2oN3WDN2lMeNE
-X-Proofpoint-ORIG-GUID: koFkGGtkRgsisw6n9qz2oN3WDN2lMeNE
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
- definitions=2025-07-04_03,2025-07-02_04,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
- spamscore=0 bulkscore=0 mlxlogscore=999 suspectscore=0 malwarescore=0
- adultscore=0 mlxscore=0 clxscore=1030 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.22.0-2506060001 definitions=main-2507040073
 
+I tested this patch with virito-net regression tests, everything works fine=
+.
 
-> On 2 Jul 2025, at 20.53, Philippe Mathieu-Daud=C3=A9 =
-<philmd@linaro.org> wrote:
->=20
-> In order to dispatch over AccelOpsClass::get_elapsed_ticks(),
-> we need it always defined, not calling a hidden handler under
-> the hood. Make AccelOpsClass::get_elapsed_ticks() mandatory.
-> Register the default cpus_kick_thread() for each accelerator.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org>
+Tested-by: Lei Yang <leiyang@redhat.com>
+
+On Wed, Jul 2, 2025 at 9:42=E2=80=AFAM <liming.wu@jaguarmicro.com> wrote:
+>
+> From: Liming Wu <liming.wu@jaguarmicro.com>
+>
+> Consolidate the two nested if conditions for checking tx queue wake
+> conditions into a single combined condition. This improves code
+> readability without changing functionality. And move netif_tx_wake_queue
+> into if condition to reduce unnecessary checks for queue stops.
+>
+> Signed-off-by: Liming Wu <liming.wu@jaguarmicro.com>
 > ---
-> include/system/accel-ops.h        | 1 +
-> accel/hvf/hvf-accel-ops.c         | 2 ++
-> accel/kvm/kvm-accel-ops.c         | 3 +++
-> accel/qtest/qtest.c               | 2 ++
-> accel/tcg/tcg-accel-ops.c         | 3 +++
-> accel/xen/xen-all.c               | 2 ++
-> system/cpus.c                     | 6 ++----
-> target/i386/nvmm/nvmm-accel-ops.c | 3 +++
-> target/i386/whpx/whpx-accel-ops.c | 3 +++
-> 9 files changed, 21 insertions(+), 4 deletions(-)
->=20
-
-Reviewed-by: Mads Ynddal <mads@ynddal.dk>
+>  drivers/net/virtio_net.c | 22 ++++++++++------------
+>  1 file changed, 10 insertions(+), 12 deletions(-)
+>
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index e53ba600605a..6f3d69feb427 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -2998,12 +2998,11 @@ static void virtnet_poll_cleantx(struct receive_q=
+ueue *rq, int budget)
+>                         free_old_xmit(sq, txq, !!budget);
+>                 } while (unlikely(!virtqueue_enable_cb_delayed(sq->vq)));
+>
+> -               if (sq->vq->num_free >=3D 2 + MAX_SKB_FRAGS) {
+> -                       if (netif_tx_queue_stopped(txq)) {
+> -                               u64_stats_update_begin(&sq->stats.syncp);
+> -                               u64_stats_inc(&sq->stats.wake);
+> -                               u64_stats_update_end(&sq->stats.syncp);
+> -                       }
+> +               if (sq->vq->num_free >=3D 2 + MAX_SKB_FRAGS &&
+> +                   netif_tx_queue_stopped(txq)) {
+> +                       u64_stats_update_begin(&sq->stats.syncp);
+> +                       u64_stats_inc(&sq->stats.wake);
+> +                       u64_stats_update_end(&sq->stats.syncp);
+>                         netif_tx_wake_queue(txq);
+>                 }
+>
+> @@ -3195,12 +3194,11 @@ static int virtnet_poll_tx(struct napi_struct *na=
+pi, int budget)
+>         else
+>                 free_old_xmit(sq, txq, !!budget);
+>
+> -       if (sq->vq->num_free >=3D 2 + MAX_SKB_FRAGS) {
+> -               if (netif_tx_queue_stopped(txq)) {
+> -                       u64_stats_update_begin(&sq->stats.syncp);
+> -                       u64_stats_inc(&sq->stats.wake);
+> -                       u64_stats_update_end(&sq->stats.syncp);
+> -               }
+> +       if (sq->vq->num_free >=3D 2 + MAX_SKB_FRAGS &&
+> +           netif_tx_queue_stopped(txq)) {
+> +               u64_stats_update_begin(&sq->stats.syncp);
+> +               u64_stats_inc(&sq->stats.wake);
+> +               u64_stats_update_end(&sq->stats.syncp);
+>                 netif_tx_wake_queue(txq);
+>         }
+>
+> --
+> 2.34.1
+>
+>
 
 
