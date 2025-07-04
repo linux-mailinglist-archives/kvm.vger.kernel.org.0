@@ -1,209 +1,175 @@
-Return-Path: <kvm+bounces-51554-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51555-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91943AF8AF9
-	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 10:17:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91C47AF8BD6
+	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 10:34:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F32101C80B82
-	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 08:16:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BCCBC3B7DF1
+	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 08:30:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AA5D32277F;
-	Fri,  4 Jul 2025 07:56:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69B1131552E;
+	Fri,  4 Jul 2025 08:17:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AUYGBVSS"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="DOepv9ob"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C160321E63
-	for <kvm@vger.kernel.org>; Fri,  4 Jul 2025 07:56:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76AE71EF1D
+	for <kvm@vger.kernel.org>; Fri,  4 Jul 2025 08:17:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751615792; cv=none; b=GQqeDldQU22BMh5NG7Tvw34dTGCOxvlAVQMbVIBRNLYvNhshwErGUOVU4Y8uydu2098Wp+d4zbrajoY6sNLxvLyQwq4uDItfeJoFaZ8cGHNU0bTzqzlYyuahFjPgl+Mc3zRzJ6/js99GglcKCvnPRNbnFN9MyEEpY2ZJF7PLvfE=
+	t=1751617066; cv=none; b=UEz5WrnTQ1ZUtQKDiUgZCnpTs1qVWzmIlawEQKgXWbJz+GUHKE/+jhFTqccfdO3ptOot4LsKfSoqDplU64PJHTdq3fKIDx7SPgf/cXFH8rV+jhn4TrjnjmE7SiyNh+R5Y4reETSNzEspv6zLGA7OicCtAWZKjUi2I+pLiIFRs6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751615792; c=relaxed/simple;
-	bh=Cx8GCnQwlVs+0cZzdmyltfEszaQtvN1psdzaOH+jcGs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gymURv1fe/FiTCSjoYiRPX/GzfflMh10mSVvdpg7LSiPzeo4BGeFR3BYgYsGiaOUqindQb7TSpRx02U3LbzyhZ0St7Azd1Vi+pJZb6V6n5nXKouu1BtCG5fbRgIv0wNkpPPRDIZ692REUXrdsngZQkLt0sw3QcfOt3cEqad4zsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AUYGBVSS; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751615788;
+	s=arc-20240116; t=1751617066; c=relaxed/simple;
+	bh=0lqAuo6UHKIcEVdcAhQ0RFFWEYzjNGi1bzBgpaylOuo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QDChLK3rz7boTSoBiJnlbCu9seLjJ+cPPL+YnASpGjfkQYvfi/0c0uVpEFkHvLfYtHB3/U7giz7kdCOnASI6b2SFEF+qardCxZO29kA4yma5+2i0Phoov/D5zDroHdPRWK+op6o2UwHCRTo1UD2MNmfvOI4d1wTIoJIvVqKojLM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=DOepv9ob; arc=none smtp.client-ip=95.215.58.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Fri, 4 Jul 2025 10:17:36 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1751617061;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=0uaRp4EpGhUSeziv02wWzTYB6IodAtLkWURM9ee31dI=;
-	b=AUYGBVSSlziQ3qedj2OMu75BiUYtsJuSlBg8V+RbP90TUaFF37wP7S3avqDwr6P03805pS
-	8NoDIGhDLpXKvlIFyC0MJQBhZPfOr3KQeXLZFdy1vis/hBkk5681wgyQIdFCAN1XrBJFIm
-	DUcGEENJqKzbTKx+Q95U/4xzx80Xi94=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-600-4Vo-0_KaN26DDF86VKnE_w-1; Fri, 04 Jul 2025 03:56:26 -0400
-X-MC-Unique: 4Vo-0_KaN26DDF86VKnE_w-1
-X-Mimecast-MFC-AGG-ID: 4Vo-0_KaN26DDF86VKnE_w_1751615785
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-45359bfe631so3144415e9.0
-        for <kvm@vger.kernel.org>; Fri, 04 Jul 2025 00:56:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751615785; x=1752220585;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=0uaRp4EpGhUSeziv02wWzTYB6IodAtLkWURM9ee31dI=;
-        b=ui1Gt5Z/67WVlExO2JhqfHsspc79gT0dqvgF7vjdTf9phe7kZoCaOJt9TEcDoHYoCn
-         SUnCi44vBsa2T28N7hQx0igalyB5BhC428y5xxlKX+BjOn8Mt0DY6kxREyJgqlIhj6/A
-         RSU++b19cUXfEumyW66ax98CqVIB/PD8uauXi4MxAoAIOK1cWXXByuVcgwz9I002dTTX
-         IwSCw/DfvjDvB/viKHmosho2VxI7uoKjbFCrno/UdYD3Unoe3fGev8DiQHjmNJUOkYTq
-         i1VV6b8Kjc9N0Zi5MYs/P1SBxmmWrb6atYIQyr78Mn/9s4T0OPBJhpw1T39Z9owu64tG
-         mctA==
-X-Gm-Message-State: AOJu0Yz9XTZGvhIbp8K88iKScRJamJkaAyM85UOBgnZZDMOVBjvIVLTm
-	VN+dQHdlOTdjxW8QUpP2KH2luU+JU8koGovlY3TLktPALsAvpJHNXQaL8nHRRy9GmzLaQaL1s1Q
-	QR9JsjiAHU2Xlwa09V+g0xuK5gkthkYcfQAV6LaCq2RjjT/qEfPAO7w==
-X-Gm-Gg: ASbGncv8JC/0feiiUdi4HHrRiPEzKiNgLy8FMhjPG+idmVowjCinzwvZ8OC64HW17Rz
-	sNoDcXZlJUrcadgYriHp4GZPBKNCaN0XR2290JdoPl6QbxppY11C7hhoFjaCb/Aw4cJyuNQBikZ
-	MmkR2TwNkV4HlRhTQrH3MGmAcKtZklfL3qbMKLT9ShYImjW7axnzb1u4OSCOqrVl2uKdxgDvPah
-	PYA/SfQ340F2Wg84B7pnFvx6yWnkk6Vya67jnMclZ0VdOeX76DaXieM9fPYx/ctkKxsRk4duola
-	UxOt+Nr1Z7O21v074ZWJkqbcA7y1jAXaXgO4Oa+trScwgb/SLiOXNupyoK+0rPIjw/9rVX142QA
-	ShW17fZwWVIepw7EACFJdbqUtozZeMi5F8B1sUDQzbj25zS8=
-X-Received: by 2002:a05:600c:3e1a:b0:454:aba2:c332 with SMTP id 5b1f17b1804b1-454b3187c22mr14015535e9.29.1751615785170;
-        Fri, 04 Jul 2025 00:56:25 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE5QPrWj7L9jFsdKgPgTH8F2oFmdewm+dCoh4A6AxVtHkNOjPG73CwemCQhmtK/JCTNeSmafg==
-X-Received: by 2002:a05:600c:3e1a:b0:454:aba2:c332 with SMTP id 5b1f17b1804b1-454b3187c22mr14015215e9.29.1751615784694;
-        Fri, 04 Jul 2025 00:56:24 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f2c:5500:988:23f9:faa0:7232? (p200300d82f2c5500098823f9faa07232.dip0.t-ipconnect.de. [2003:d8:2f2c:5500:988:23f9:faa0:7232])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b47285c9f9sm1807879f8f.93.2025.07.04.00.56.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Jul 2025 00:56:24 -0700 (PDT)
-Message-ID: <97d3993c-12aa-4917-9bbd-d9c94fbda788@redhat.com>
-Date: Fri, 4 Jul 2025 09:56:23 +0200
+	 in-reply-to:in-reply-to:references:references;
+	bh=ASASzrlKQboUIkLWluBZCrMel/BU8gIUIO5M+yGTLBA=;
+	b=DOepv9ob4oyEgjlwBbB1vq7+7jS4+iMelHgcPgmwT+0LSL9PngbsDS1WFEIz7g4iXTIm+h
+	CFrbZdLKyj25uRPSu+SLUGfRvUj1rC8DDIzz0Ts5LjZT+kFlTd5/M3CDq6L6LiazYQ/G8B
+	iPQxH8ltXx5yJQYujzO5OLz2R9awH1w=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Jesse Taube <jesse@rivosinc.com>
+Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-kselftest@vger.kernel.org, =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>, 
+	Charlie Jenkins <charlie@rivosinc.com>, James Raphael Tiovalen <jamestiotio@gmail.com>, 
+	Sean Christopherson <seanjc@google.com>, Cade Richard <cade.richard@gmail.com>
+Subject: Re: [kvm-unit-tests PATCH] riscv: lib: Add sbi-exit-code to
+ configure and environment
+Message-ID: <20250704-d2ca01be799a71427b5163f9@orel>
+References: <20250703133601.1396848-1-jesse@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/5] mm: introduce num_pages_contiguous()
-To: lizhe.67@bytedance.com, alex.williamson@redhat.com,
- akpm@linux-foundation.org, peterx@redhat.com, jgg@ziepe.ca
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org
-References: <20250704062602.33500-1-lizhe.67@bytedance.com>
- <20250704062602.33500-2-lizhe.67@bytedance.com>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <20250704062602.33500-2-lizhe.67@bytedance.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250703133601.1396848-1-jesse@rivosinc.com>
+X-Migadu-Flow: FLOW_OUT
 
-On 04.07.25 08:25, lizhe.67@bytedance.com wrote:
-> From: Li Zhe <lizhe.67@bytedance.com>
+On Thu, Jul 03, 2025 at 06:36:00AM -0700, Jesse Taube wrote:
+> Add --[enable|disable]-sbi-exit-code to configure script.
+> With the default value disabled.
+> Add a check for SBI_PASS_EXIT_CODE in the environment, so that passing
+> of the test status is configurable from both the
+> environment and the configure script
 > 
-> Function num_pages_contiguous() determine the number of contiguous
-> pages starting from the first page in the given array of page pointers.
-> VFIO will utilize this interface to accelerate the VFIO DMA map process.
-> 
-> Suggested-by: David Hildenbrand <david@redhat.com>
-
-I think Jason suggested having this as a helper as well.
-
-> Signed-off-by: Li Zhe <lizhe.67@bytedance.com>
+> Signed-off-by: Jesse Taube <jesse@rivosinc.com>
 > ---
->   include/linux/mm.h | 20 ++++++++++++++++++++
->   1 file changed, 20 insertions(+)
+>  configure      | 11 +++++++++++
+>  lib/riscv/io.c | 12 +++++++++++-
+>  2 files changed, 22 insertions(+), 1 deletion(-)
 > 
-> diff --git a/include/linux/mm.h b/include/linux/mm.h
-> index 0ef2ba0c667a..1d26203d1ced 100644
-> --- a/include/linux/mm.h
-> +++ b/include/linux/mm.h
-> @@ -205,6 +205,26 @@ extern unsigned long sysctl_admin_reserve_kbytes;
->   #define folio_page_idx(folio, p)	((p) - &(folio)->page)
->   #endif
->   
-> +/*
-> + * num_pages_contiguous() - determine the number of contiguous pages
-> + * starting from the first page.
+> diff --git a/configure b/configure
+> index 20bf5042..7c949bdc 100755
+> --- a/configure
+> +++ b/configure
+> @@ -67,6 +67,7 @@ earlycon=
+>  console=
+>  efi=
+>  efi_direct=
+> +sbi_exit_code=0
+>  target_cpu=
+>  
+>  # Enable -Werror by default for git repositories only (i.e. developer builds)
+> @@ -141,6 +142,9 @@ usage() {
+>  	                           system and run from the UEFI shell. Ignored when efi isn't enabled
+>  	                           and defaults to enabled when efi is enabled for riscv64.
+>  	                           (arm64 and riscv64 only)
+> +	    --[enable|disable]-sbi-exit-code
+> +	                           Enable or disable sending pass/fail exit code to SBI SRST.
+> +	                           (disabled by default, riscv only)
+>  EOF
+>      exit 1
+>  }
+> @@ -236,6 +240,12 @@ while [[ $optno -le $argc ]]; do
+>  	--disable-efi-direct)
+>  	    efi_direct=n
+>  	    ;;
+> +	--enable-sbi-exit-code)
+> +	    sbi_exit_code=1
+> +	    ;;
+> +	--disable-sbi-exit-code)
+> +	    sbi_exit_code=0
+> +	    ;;
+>  	--enable-werror)
+>  	    werror=-Werror
+>  	    ;;
+> @@ -551,6 +561,7 @@ EOF
+>  elif [ "$arch" = "riscv32" ] || [ "$arch" = "riscv64" ]; then
+>      echo "#define CONFIG_UART_EARLY_BASE ${uart_early_addr}" >> lib/config.h
+>      [ "$console" = "sbi" ] && echo "#define CONFIG_SBI_CONSOLE" >> lib/config.h
+> +    echo "#define CONFIG_SBI_EXIT_CODE ${sbi_exit_code}" >> lib/config.h
+>      echo >> lib/config.h
+>  fi
+>  echo "#endif" >> lib/config.h
+> diff --git a/lib/riscv/io.c b/lib/riscv/io.c
+> index b1163404..0e666009 100644
+> --- a/lib/riscv/io.c
+> +++ b/lib/riscv/io.c
+> @@ -162,8 +162,18 @@ void halt(int code);
+>  
+>  void exit(int code)
+>  {
+> +	char *s = getenv("SBI_PASS_EXIT_CODE");
+> +	bool pass_exit = CONFIG_SBI_EXIT_CODE;
 
+This is the first case of what may become more common - a config variable
+which also has an env override. I think it may be good convention to
+name them the same, i.e. the env name would also be CONFIG_SBI_EXIT_CODE,
+unless you think that would be confusing for some reason?
 
-Maybe clarify here here:
-
-"Pages are contiguous if they represent contiguous PFNs. Depending on 
-the memory model, this can mean that the addresses of the "struct page"s 
-are not contiguous."
-
-
-> + *
-> + * @pages: an array of page pointers
-> + * @nr_pages: length of the array
-> + */
-> +static inline unsigned long num_pages_contiguous(struct page **pages,
-> +						 unsigned long nr_pages)
-> +{
-> +	struct page *first_page = pages[0];
-> +	unsigned long i;
 > +
-> +	for (i = 1; i < nr_pages; i++)
-> +		if (pages[i] != nth_page(first_page, i))
+>  	printf("\nEXIT: STATUS=%d\n", ((code) << 1) | 1);
+> -	sbi_shutdown(code == 0);
+> +
+> +	if (s)
+> +		pass_exit = (*s == '1' || *s == 'y' || *s == 'Y');
 
-if (pages[i] != nth_page(pages[0], i))
+We now have this logic in four places[1]. I think it's time we factor it,
+and it's counterpart "!(s && (*s == '0' || *s == 'n' || *s == 'N'))"
+into a couple helper macros. I'm not sure where the best place for
+those macros to live is, though. I guess libcflat.h, but we really
+ought to split that thing apart someday...
 
-Should be clear as well, so no need for the temporary "first_page" variable.
+[1]
+ - twice in lib/errata.h
+ - once in riscv/sbi-tests.ha
+ - and now here
 
-Apart from that LGTM.
+> +
+> +	if (pass_exit)
+> +		sbi_shutdown(code == 0);
+> +	else
+> +		sbi_shutdown(true);
 
--- 
-Cheers,
+nit: can be written more concisely as
 
-David / dhildenb
+ sbi_shutdown(pass_exit ? code == 0 : true)
 
+>  	halt(code);
+>  	__builtin_unreachable();
+>  }
+> -- 
+> 2.43.0
+>
+
+Thanks,
+drew
 
