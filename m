@@ -1,167 +1,121 @@
-Return-Path: <kvm+bounces-51557-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51558-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8AE0AF8BD2
-	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 10:34:13 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9E2DAF8D0A
+	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 10:59:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 58DDA1891130
-	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 08:32:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CCEE3B46E97
+	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 08:33:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD8F3288527;
-	Fri,  4 Jul 2025 08:21:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FA972857E9;
+	Fri,  4 Jul 2025 08:24:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="brNKqTev"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Uyg4sHmn"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F29B328641C
-	for <kvm@vger.kernel.org>; Fri,  4 Jul 2025 08:21:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0DF328A41C
+	for <kvm@vger.kernel.org>; Fri,  4 Jul 2025 08:24:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751617311; cv=none; b=RSxjGlCx6iRLLHFFZb1QosgakkK4+wKKiKob1Gs0XhXNT3s+tfAXzrMKQgXoK5GLDqBPWKHp6KoL2BdkCoqOoF3Yhuo/pfL8qGD1HJzUPkCxTCW5B2zR68XR34D5y83A3qvKakkVTucvWM/wwUWO36tKad3D5rJSlGJ1WJusCho=
+	t=1751617455; cv=none; b=JpiojYM4/aNMDv949rNSScSZ/0MedLoYFzRBMtQ561Z9jV3TP4itwKxI4H4c5d0vozy07RdF4xSB26TCmPmphcCNXrSg6AN2Ektxzndc2VE1lCz8nHSvwewFhI/xLeoprKEukas0W2ZusEk6kDjczSIp67bsZXmNGtPRZFoCZRI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751617311; c=relaxed/simple;
-	bh=FfFgM3w89Awms9ouorvrgypiEYg34rdveJXyfHtSI7E=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fCwgGlsOKiql76dOhlbMZqHSUp3WMIcVkn5CtWHfDsk7hPz+PXOWDabV6ksp4Q4Bk3Fh0UlssHUKhweEhHT0CWs/EvwRWfpbX9b4S3A0x8eALyzi6L3MxOoidZOfPAEaGsFSd7dLp/gO4v4Nj769jB7gsUY1aBIi/vOeHeD5Zrg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=brNKqTev; arc=none smtp.client-ip=209.85.210.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-7490702fc7cso505188b3a.1
-        for <kvm@vger.kernel.org>; Fri, 04 Jul 2025 01:21:48 -0700 (PDT)
+	s=arc-20240116; t=1751617455; c=relaxed/simple;
+	bh=3t5ghVz6DHHGFPX5js32sJ17AtW18gtbRjNssDlc9jU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GwYTW9DICgBdOwqaqhtrbPYEcDrA7FnvEkHzXsgPBMoLm/anCH5IbBpkLMuCXLzam/1ld/CcVjlUZi9Lh1bIyxjibV8H33e7yx7DJT1g3J1uWy3xLNNR4x3GT/ICCFnOhTm6M6++pyvWEV5JPM12JiiUmBZOPENW7pRAXzAO6BQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Uyg4sHmn; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4539cd7990cso3935225e9.0
+        for <kvm@vger.kernel.org>; Fri, 04 Jul 2025 01:24:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1751617308; x=1752222108; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NrmplSRpTLjvU/Va5okWFiaAeK95G6eUg5bBPQchAfY=;
-        b=brNKqTevBOgKwPtTsO9WRWeDphqfkFHq34hJ9aosqdWkOegn1wSQyTmGdBSkdEpV1a
-         vzuE/h+f7quD/4KCqFFA4nzEsV/KXRfSRAgFGfFV6EPRhYCH1p52jzYssGDpeFbLyhS0
-         sg6N0XWXiptwq4mRuoysGskUMpuffCCIx2VxppoBHbrVfBFCnSd0XyLoNN20N3qKELQu
-         L1Ra+as1f12DGZyt3jMIvsSO1osNKobk24KEpv03s/WAz21B15ouGhw1m5XD4x+rjJ8J
-         AxCV4bLcsMBr8JOtOQAEeGlND/nGLB7zT1AydQzl5f7u8QrzrghYtR8qr9T1sgRev4Dy
-         Q9pQ==
+        d=linaro.org; s=google; t=1751617452; x=1752222252; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=gbVbXkk5gDrDkKIlQNzN2k5Qj4CadpnxfSGFBliSJPE=;
+        b=Uyg4sHmnBQODeD214bLXOdWpFGZZSr51FzxBR/7bEYuWXwbsYBvYvuIxFEymMPDKqt
+         jAG+HEy8V2kYR6JKWv3YCyoPcycIPCObBgfEj9sfttFGiF/y5pZGhm1uSR74UMumVY1y
+         haEFEG2oohe3oPy+uFqIIhDV9LeqA7ERCKNNbzFBmPW1/RGaLi6No/NnIPDvJ3RcvKTN
+         wgPQfRAqCdJfCrtlJ207bVYqV96D0+LY0zIPRw1fX90amZz8nzevTXNLg9CADGdizxH5
+         Mj+pFf9GskB/BlxK3zerR6kbLc2V+3OPn0g7lCFBwVKO654nq+iR1G05B3Q/6ePvDAN0
+         X6RA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751617308; x=1752222108;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NrmplSRpTLjvU/Va5okWFiaAeK95G6eUg5bBPQchAfY=;
-        b=fzS1z4ioWhGIJ/2/WQrflokhxGpToOl0tnJSFFblSrmclaaMS/weuQbyt6k3EOw8SC
-         1f6Gh6VGPeMQnmqPGGSvqnR7wowz7gNZ8C4fO6l+wl618KAIyDjpODpgde4z2IUa5Iuq
-         Xu6DFrrTX6YYjrsMq2tZiwXmlAytuq2dHOlbKvwdM834YEGXk/hTZtZXSDNUoMhHnN8X
-         anwVWo+Y82qcq7/k8NnogXkUHhkbGCkGMVEQhuVJtRDtDkdjTE1/5VTMlJ1hTVaIoDst
-         JTW6RcoYAzxlJACBkJc/4Jo4CTZhvu+9xNmsFfJ1DU9Gjf7HrUXrQMbstLUYhpYos7bI
-         /Ang==
-X-Forwarded-Encrypted: i=1; AJvYcCVWA7Cjol7AgKHC7KiEiwqaNcgA3VS7FAt20d3GZGPE7ZZFub3+fJEb6juLlpo5i34onPc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHi7pmeeESubKRz8xd/chj4Tl0ZGlsR4wvhiALMRiksIkCszNQ
-	ZKVpIOwScDqC87+BpkSwnOJipAncZYW3eCm6R6vV1p35YuYxdRvBnj+SNHQI2uaT+O8=
-X-Gm-Gg: ASbGncu1GNbFZSdejRckIa10Gk9Qb2NV7pfQ7Wukt5BlNgUHaDrGAa3YzzTNY1LIZ0w
-	HXqyzWC1Mm12rYiVZFgE/iYuaES7xoaFBdYYHeeVr7U+RPqWhSXW3t6gBT1p8n8mcZTTCimkZ6z
-	k4HaU1jLsSj+0xtzcaxfDPAMPULQicSj0/oEhN7TgUmXMLrBMzCz6lvtZ7Yati6g8KUeGeFMp9Q
-	1kVd+zu1IIE8Vj/a0KCnJ72lMK5LeY0XjydNMUjCZKFW43OlQlgHL6yBEWJ8knlZ0mtZg1CPaYG
-	tRON+ydOBokhmuXGcTtKBoFiG1Lhywz75yuqxIMNfoBGAFUAxKZtt9Ro+gJWZIre8Oune2B9lqR
-	6yPcehGGLjyV1sw==
-X-Google-Smtp-Source: AGHT+IEQSnitJcJwwymY7BAhQB7Bq74NDZ5Q89nksgDSVvuG7bIuc9yS6M7KIOggYg5ZF+gQ+5gttw==
-X-Received: by 2002:a05:6a00:2e15:b0:749:112:c172 with SMTP id d2e1a72fcca58-74ce69c53f3mr2224202b3a.16.1751617307987;
-        Fri, 04 Jul 2025 01:21:47 -0700 (PDT)
-Received: from localhost.localdomain ([203.208.189.11])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74ce35cdaaasm1483166b3a.61.2025.07.04.01.21.44
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Fri, 04 Jul 2025 01:21:47 -0700 (PDT)
-From: lizhe.67@bytedance.com
-To: david@redhat.com
-Cc: akpm@linux-foundation.org,
-	alex.williamson@redhat.com,
-	jgg@ziepe.ca,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	lizhe.67@bytedance.com,
-	peterx@redhat.com
-Subject: Re: [PATCH v2 1/5] mm: introduce num_pages_contiguous()
-Date: Fri,  4 Jul 2025 16:21:30 +0800
-Message-ID: <20250704082130.11804-1-lizhe.67@bytedance.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <97d3993c-12aa-4917-9bbd-d9c94fbda788@redhat.com>
-References: <97d3993c-12aa-4917-9bbd-d9c94fbda788@redhat.com>
+        d=1e100.net; s=20230601; t=1751617452; x=1752222252;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gbVbXkk5gDrDkKIlQNzN2k5Qj4CadpnxfSGFBliSJPE=;
+        b=symxPJcMmb44RLoRjdvROJ490FtM7Xa727z58+jBIKW6BP7J5137zF7HemI/DN9kbS
+         nKe+7O9LBLv//gppIIrqT29eCWaPJqX3AWG3XWMCVGInxdtcsZu8TUgrxf0xRsSUOTpP
+         q7GgRjoXk0S6B8H4l39Y5ZB9RMiVbosYmsH5mwSCXmN8yPg7/RpB2csN/uol/dEycbKt
+         3Encs+gB4V1Wzp6xsV8r6QqceHZEFmJQFZ4UtDaT4AltRu7uzAcSViM1VDg5MCUvhZRR
+         OAOvdf+fSblGHPHpqXCXu/HD0rP8PJ7obO66u6k5lvbo2WiV3PnAR/CexG3O7dqLutbk
+         SIXw==
+X-Forwarded-Encrypted: i=1; AJvYcCWvYN9Oydm/ymesn020qumOyyWWdBd/vz9lzclHulIHefCyuOPy9vnajkk/7Ti0J8MYGAM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YydtI4DrKnu0l4x+K2/C80bS9tnVsiwSJXZvoHFxhBKf7lUXd7X
+	I4kHr3Kl/h43Jk/VhV1b634uJDulaVuf3slPODz7T3V6xNs97H0Qwz3g51cLEl6pZ00=
+X-Gm-Gg: ASbGncvRV+BQax2PQHRk9NqexbnXdJrHHMJluJK+k+HYsNiDAlhbnMJ9Z7E+SFmD8Y/
+	i4DsxTQba3mP6318bTCsgtIhZeEmmL0n2fMjB/g8HrtgSdn7VjR0LlTLj1LvzS8l0dv7kaj5Z7X
+	WdffLA9BO/6EuPPorhJAaBA4A2M4VM48FR3HtAaUICda4eKL6jzerX4Hjt8Ne6ifAE5cbdkCPfx
+	tSwxAqgxooDQCB4VOdWsbRsP5oqs4GM5g80V0MT2VKctaegGm8TEc6mAijLRyOgxdJVi68euymz
+	LX3eCZWdoyoyIb9FM5P1qH8nkxk77WWjD0p2M9DgE9GyRHiIsCUkLbpdh+5lTCWg0dmo5WuHpnW
+	hWtjPP8/hUvdrnCR7tbvAwNLveGsX1g==
+X-Google-Smtp-Source: AGHT+IFUpR6YVd+jwwGoGAPDXDizijOZsEJuq4QgesB8hsZrhPWodKx66l1+jFS6o4KLQyfu2as9sg==
+X-Received: by 2002:a05:600c:a385:b0:43d:5264:3cf0 with SMTP id 5b1f17b1804b1-454b1f63e81mr14382345e9.11.1751617451892;
+        Fri, 04 Jul 2025 01:24:11 -0700 (PDT)
+Received: from [192.168.69.218] (88-187-86-199.subs.proxad.net. [88.187.86.199])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-454b1893479sm19374815e9.39.2025.07.04.01.24.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 04 Jul 2025 01:24:11 -0700 (PDT)
+Message-ID: <7e3cd619-e934-4c2d-8ac6-a9d9bcdc798d@linaro.org>
+Date: Fri, 4 Jul 2025 10:24:10 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 05/39] accel/kvm: Remove kvm_init_cpu_signals() stub
+To: Xiaoyao Li <xiaoyao.li@intel.com>, qemu-devel@nongnu.org
+Cc: Zhao Liu <zhao1.liu@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Pierrick Bouvier <pierrick.bouvier@linaro.org>,
+ =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>, kvm@vger.kernel.org
+References: <20250703173248.44995-1-philmd@linaro.org>
+ <20250703173248.44995-6-philmd@linaro.org>
+ <9292a723-eb6f-4106-bbf4-e046146686e4@intel.com>
+Content-Language: en-US
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+In-Reply-To: <9292a723-eb6f-4106-bbf4-e046146686e4@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On Fri, 4 Jul 2025 09:56:23 +0200, david@redhat.com wrote:
-
-> On 04.07.25 08:25, lizhe.67@bytedance.com wrote:
-> > From: Li Zhe <lizhe.67@bytedance.com>
-> > 
-> > Function num_pages_contiguous() determine the number of contiguous
-> > pages starting from the first page in the given array of page pointers.
-> > VFIO will utilize this interface to accelerate the VFIO DMA map process.
-> > 
-> > Suggested-by: David Hildenbrand <david@redhat.com>
+On 4/7/25 06:13, Xiaoyao Li wrote:
+> On 7/4/2025 1:32 AM, Philippe Mathieu-Daudé wrote:
+>> Since commit 57038a92bb0 ("cpus: extract out kvm-specific code
+>> to accel/kvm") the kvm_init_cpu_signals() stub is not necessary.
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+>> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 > 
-> I think Jason suggested having this as a helper as well.
-
-Yes, thank you for the reminder. Jason needs to be added here.
-
-Suggested-by: Jason Gunthorpe <jgg@ziepe.ca>
-
-> > Signed-off-by: Li Zhe <lizhe.67@bytedance.com>
-> > ---
-> >   include/linux/mm.h | 20 ++++++++++++++++++++
-> >   1 file changed, 20 insertions(+)
-> > 
-> > diff --git a/include/linux/mm.h b/include/linux/mm.h
-> > index 0ef2ba0c667a..1d26203d1ced 100644
-> > --- a/include/linux/mm.h
-> > +++ b/include/linux/mm.h
-> > @@ -205,6 +205,26 @@ extern unsigned long sysctl_admin_reserve_kbytes;
-> >   #define folio_page_idx(folio, p)	((p) - &(folio)->page)
-> >   #endif
-> >   
-> > +/*
-> > + * num_pages_contiguous() - determine the number of contiguous pages
-> > + * starting from the first page.
+> Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
 > 
-> Maybe clarify here here:
+> BTW, it seems we can further move kvm_init_cpu_signals() into
+> kvm-accel-ops.c and make it internal static function?
+
+I suppose we can if we move kvm_immediate_exit to KVM's AccelState,
+but KVM code isn't really using it. We ought to move KVM specific
+fields from CPUState to KVM's AccelState. Not a priority.
+
 > 
-> "Pages are contiguous if they represent contiguous PFNs. Depending on 
-> the memory model, this can mean that the addresses of the "struct page"s 
-> are not contiguous."
-
-Thank you. I will include this clarification in the comment.
-
-> > + *
-> > + * @pages: an array of page pointers
-> > + * @nr_pages: length of the array
-> > + */
-> > +static inline unsigned long num_pages_contiguous(struct page **pages,
-> > +						 unsigned long nr_pages)
-> > +{
-> > +	struct page *first_page = pages[0];
-> > +	unsigned long i;
-> > +
-> > +	for (i = 1; i < nr_pages; i++)
-> > +		if (pages[i] != nth_page(first_page, i))
-> 
-> if (pages[i] != nth_page(pages[0], i))
-> 
-> Should be clear as well, so no need for the temporary "first_page" variable.
-
-Thank you. Doing so makes the function appear much clearer.
-
-> Apart from that LGTM.
-
-Thank you for your review!
-
-Thanks,
-Zhe
+>> ---
+>>   accel/stubs/kvm-stub.c | 5 -----
+>>   1 file changed, 5 deletions(-)
 
