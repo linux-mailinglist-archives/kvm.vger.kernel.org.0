@@ -1,127 +1,187 @@
-Return-Path: <kvm+bounces-51596-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51597-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 737F9AF90B3
-	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 12:35:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C20FAAF9110
+	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 13:11:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 55AAE170DBC
-	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 10:34:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3DDC3AFD72
+	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 11:11:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 746C62EF9C7;
-	Fri,  4 Jul 2025 10:31:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6CA82C15A0;
+	Fri,  4 Jul 2025 11:11:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ynddal.dk header.i=@ynddal.dk header.b="KQA9ilY+"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZHGROoWI"
 X-Original-To: kvm@vger.kernel.org
-Received: from outbound.qs.icloud.com (p-east3-cluster2-host6-snip4-7.eps.apple.com [57.103.87.188])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC45428A1EE
-	for <kvm@vger.kernel.org>; Fri,  4 Jul 2025 10:31:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.87.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48736236A9F
+	for <kvm@vger.kernel.org>; Fri,  4 Jul 2025 11:11:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751625076; cv=none; b=AFwvdKDYnu+fEK6FbwM5enMhVN9CxTCDSIXPuq6ePdCKCnvRyyYgbRQ1buFzCc9N/w9ht0lTZ+EqHBqz4zNcA2IHT4cNtVLPjTuHpewGOqAJdFRABm54OEr+UtmYW5eL6X8v5b3lqZaRoUE7fWhH7/N6RdMxqsZnYEPNyxD4COE=
+	t=1751627510; cv=none; b=cFcuV4mJjJOjb564kJK1lLKHZVj1bWFiyEgQJHDgVcL9TxJX1AxDl54BcMsYkMO/R0hYLbZbifWp4EoAntBlVUAdwHM/0aGZgvoha7bzWp1TuffkksjFn9MKTcMthbulOpwjncC4Vk2xTxUWi++hf161a9qrACCi/NzCs+KMAw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751625076; c=relaxed/simple;
-	bh=Q0jgkaAsShBU4EV05TCyNoLNhwFPgKqwCmBifgtPLSM=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=LQ77eU88VCk+skyD5VC6zEijU/M7etMbLquBrZ/JfvrbpcFgtkWNxZ95qka/bTZ7H3BU8f56bK8Ld+vkfqGM2KOFhmtAffdSMk+bUpLZEqLMbHoocBB/e+ZUE9zGctVFwTBWvvpxv83PYH857iv5yi/S1600m5kMuHxpRZH/wRs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ynddal.dk; spf=pass smtp.mailfrom=ynddal.dk; dkim=pass (2048-bit key) header.d=ynddal.dk header.i=@ynddal.dk header.b=KQA9ilY+; arc=none smtp.client-ip=57.103.87.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ynddal.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ynddal.dk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ynddal.dk; s=sig1;
-	bh=sMuvWNAlThdQUT/Jm7Bs2UfiTYxk4u/ZKdImK+MyzHE=;
-	h=Content-Type:Mime-Version:Subject:From:Date:Message-Id:To:x-icloud-hme;
-	b=KQA9ilY+zLk/ev5yDcg6mI7uP2UwKDDek2FgQNBPu3X8F6yeTpo9yz9NTJqLzh7q0
-	 fbA8xsY06V3wI5Tnb97jXJoG1InjTd5e6qTcqUbQXqhbb/0WyKEAgtfpUCplAZ5BcH
-	 m+hdCMd9TaUu2n+COz/CB3+G7iDgGf8kC7mVVJNX9LJMDuDIoyLqTUzEPuPG2dnTb8
-	 FiHULwMsMARvwg0ew8zkoTqppFU6hopNzdttzWfXO587RQHWA3w3T9fmDye0tEa48f
-	 AuyWM0DIyaMYqYCZFNbzX6NbcRyDhp327CwGQyVQv5Ty7I9Wt8FQmvLAxD/VBhnn9I
-	 4y5tDZvqmpHPA==
-Received: from outbound.qs.icloud.com (unknown [127.0.0.2])
-	by outbound.qs.icloud.com (Postfix) with ESMTPS id AF6B218474DD;
-	Fri,  4 Jul 2025 10:31:08 +0000 (UTC)
-Received: from smtpclient.apple (qs-asmtp-me-k8s.p00.prod.me.com [17.57.155.37])
-	by outbound.qs.icloud.com (Postfix) with ESMTPSA id 201081800D26;
-	Fri,  4 Jul 2025 10:31:05 +0000 (UTC)
-Content-Type: text/plain;
-	charset=utf-8
+	s=arc-20240116; t=1751627510; c=relaxed/simple;
+	bh=o1Nrk5RUp6fY1bkTBtN3Hp9y0X6x3rmoyVhWTfb40es=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fldwwBQjZidBCtDkx6AXo8IbF6u39Hq1BtoUmgSd+JmS7GK2imVMJGRUIoQ2nXqpVDiprv8g1Uxm+MVTKpHCN4hUvX2HhWbgoJXHWVw1O38NKsvfRE3A28amQQJ67w/jjswq2ujPC2yDE3Zhrs/PLe8Q2bEiBSKxnYe9T6SfLNs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZHGROoWI; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1751627509; x=1783163509;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=o1Nrk5RUp6fY1bkTBtN3Hp9y0X6x3rmoyVhWTfb40es=;
+  b=ZHGROoWIVbTocSnS11JN8T3jPsmxOxVDM6+AH3jW51UzojTNVqY3QnFm
+   5JoqhrhI7kyoBphsVaVzVteJWyxKpTu2R/Z1i9vzC1zhc/8Ntxdpb4bM7
+   z1EraBwG8AuJHEwc8+1PZKbG0+AquZEUVH6xgpuyRoPe7GjOmN3Huqkrz
+   hsLwehFw/N83Wb95eSWfZ7WoQ2ujJF4LHiWJeGlV7pqrB7qzt6dXCynQX
+   t8jY6xekMUGgYZoAfJoE4ffF/gniHtu2Qtav9XsXZ+BbhtXx7X253qm2r
+   TeS0TwY4OlxTDASXxe8DqJkmlAjPGmIRdySwIZqeKnAJnTb+3UqJgoDt8
+   Q==;
+X-CSE-ConnectionGUID: ybu3KKynT8WEpjVDaapGKw==
+X-CSE-MsgGUID: 1G7iltQcS8mbXeejMFXFAg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11483"; a="54104359"
+X-IronPort-AV: E=Sophos;i="6.16,287,1744095600"; 
+   d="scan'208";a="54104359"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jul 2025 04:11:48 -0700
+X-CSE-ConnectionGUID: 9GV3W5YtQfabXlm8uFAwUA==
+X-CSE-MsgGUID: Rb2p5PN2TDWcFZtsdBilyw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,287,1744095600"; 
+   d="scan'208";a="154746779"
+Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.39])
+  by orviesa007.jf.intel.com with ESMTP; 04 Jul 2025 04:11:44 -0700
+Date: Fri, 4 Jul 2025 19:33:09 +0800
+From: Zhao Liu <zhao1.liu@intel.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Pierrick Bouvier <pierrick.bouvier@linaro.org>,
+	Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+	Cameron Esfahani <dirty@apple.com>,
+	Roman Bolshakov <rbolshakov@ddn.com>,
+	Phil Dennis-Jordan <phil@philjordan.eu>,
+	Mads Ynddal <mads@ynddal.dk>, Fabiano Rosas <farosas@suse.de>,
+	Laurent Vivier <lvivier@redhat.com>,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	Anthony PERARD <anthony@xenproject.org>,
+	Paul Durrant <paul@xen.org>,
+	"Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+	Warner Losh <imp@bsdimp.com>, Kyle Evans <kevans@freebsd.org>,
+	Reinoud Zandijk <reinoud@netbsd.org>,
+	Sunil Muthuswamy <sunilmut@microsoft.com>, kvm@vger.kernel.org,
+	xen-devel@lists.xenproject.org
+Subject: Re: [PATCH v6 30/39] accel: Propagate AccelState to
+ AccelClass::init_machine()
+Message-ID: <aGe79U/acV51nQM9@intel.com>
+References: <20250703173248.44995-1-philmd@linaro.org>
+ <20250703173248.44995-31-philmd@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.600.51.1.1\))
-Subject: Re: [PATCH v4 56/65] accel: Expose and register
- generic_handle_interrupt()
-From: Mads Ynddal <mads@ynddal.dk>
-In-Reply-To: <20250702185332.43650-57-philmd@linaro.org>
-Date: Fri, 4 Jul 2025 12:30:53 +0200
-Cc: qemu-devel@nongnu.org,
- =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Pierrick Bouvier <pierrick.bouvier@linaro.org>,
- Cameron Esfahani <dirty@apple.com>,
- Roman Bolshakov <rbolshakov@ddn.com>,
- Phil Dennis-Jordan <phil@philjordan.eu>,
- Fabiano Rosas <farosas@suse.de>,
- Laurent Vivier <lvivier@redhat.com>,
- Stefano Stabellini <sstabellini@kernel.org>,
- Anthony PERARD <anthony@xenproject.org>,
- Paul Durrant <paul@xen.org>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Reinoud Zandijk <reinoud@netbsd.org>,
- Sunil Muthuswamy <sunilmut@microsoft.com>,
- kvm@vger.kernel.org,
- xen-devel@lists.xenproject.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <2974E816-ED2F-45A3-988C-ABA4F52B3CCE@ynddal.dk>
-References: <20250702185332.43650-1-philmd@linaro.org>
- <20250702185332.43650-57-philmd@linaro.org>
-To: =?utf-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-X-Mailer: Apple Mail (2.3826.600.51.1.1)
-X-Proofpoint-GUID: KQj32bSACKGkz9oeNzR-NIMXRigV6oVh
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzA0MDA4MCBTYWx0ZWRfX9balHnkxxi/e
- VU0upZooqQ0VYpwfKxM8EcAGk4hlTjFqBvN4x6d2apopuSDiOED5VzlE/O2FLhnWsp3LR4a/vzX
- vFLAMIEhhf/uxwm1MbJRzh6XhgsHqE+7xQ1HfBe8xym7SL/++rJRO6L0bbCMiP85fT+gr9BpUOV
- TDZsUjpZ6r4uNldEPAkDBJSEVqUQAliaffVx/0Q9Gbk93bAfFbav4DKAFqhQfPe+tiIbYty7Ic5
- FjyUTPSVQ3qfJGGVguN7cFDqT12dQ3NZB89x0HES3JRu0OZ8mqBC/trvm0E1/ul19OIU8j3i4=
-X-Proofpoint-ORIG-GUID: KQj32bSACKGkz9oeNzR-NIMXRigV6oVh
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
- definitions=2025-07-04_04,2025-07-02_04,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
- clxscore=1030 phishscore=0 spamscore=0 mlxlogscore=704 malwarescore=0
- adultscore=0 suspectscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.22.0-2506060001 definitions=main-2507040080
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250703173248.44995-31-philmd@linaro.org>
 
-
-> On 2 Jul 2025, at 20.53, Philippe Mathieu-Daud=C3=A9 =
-<philmd@linaro.org> wrote:
->=20
-> In order to dispatch over AccelOpsClass::handle_interrupt(),
-> we need it always defined, not calling a hidden handler under
-> the hood. Make AccelOpsClass::handle_interrupt() mandatory.
-> Expose generic_handle_interrupt() prototype and register it
-> for each accelerator.
->=20
-> Suggested-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org>
+On Thu, Jul 03, 2025 at 07:32:36PM +0200, Philippe Mathieu-Daudé wrote:
+> Date: Thu,  3 Jul 2025 19:32:36 +0200
+> From: Philippe Mathieu-Daudé <philmd@linaro.org>
+> Subject: [PATCH v6 30/39] accel: Propagate AccelState to
+>  AccelClass::init_machine()
+> X-Mailer: git-send-email 2.49.0
+> 
+> In order to avoid init_machine() to call current_accel(),
+> pass AccelState along.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 > ---
-> include/system/accel-ops.h        | 3 +++
-> accel/hvf/hvf-accel-ops.c         | 1 +
-> accel/kvm/kvm-accel-ops.c         | 1 +
-> accel/qtest/qtest.c               | 1 +
-> accel/xen/xen-all.c               | 1 +
-> system/cpus.c                     | 9 +++------
-> target/i386/nvmm/nvmm-accel-ops.c | 1 +
-> target/i386/whpx/whpx-accel-ops.c | 1 +
-> 8 files changed, 12 insertions(+), 6 deletions(-)
->=20
+>  include/qemu/accel.h        | 2 +-
+>  accel/accel-system.c        | 2 +-
+>  accel/hvf/hvf-all.c         | 2 +-
+>  accel/kvm/kvm-all.c         | 2 +-
+>  accel/qtest/qtest.c         | 2 +-
+>  accel/tcg/tcg-all.c         | 2 +-
+>  accel/xen/xen-all.c         | 2 +-
+>  bsd-user/main.c             | 2 +-
+>  linux-user/main.c           | 2 +-
+>  target/i386/nvmm/nvmm-all.c | 2 +-
+>  target/i386/whpx/whpx-all.c | 2 +-
+>  11 files changed, 11 insertions(+), 11 deletions(-)
 
-Reviewed-by: Mads Ynddal <mads@ynddal.dk>
+...
+
+> diff --git a/accel/accel-system.c b/accel/accel-system.c
+> index b5b368c6a9c..fb8abe38594 100644
+> --- a/accel/accel-system.c
+> +++ b/accel/accel-system.c
+> @@ -37,7 +37,7 @@ int accel_init_machine(AccelState *accel, MachineState *ms)
+>      int ret;
+>      ms->accelerator = accel;
+>      *(acc->allowed) = true;
+> -    ret = acc->init_machine(ms);
+> +    ret = acc->init_machine(accel, ms);
+
+Now we've already set "ms->accelerator", so that we could get @accel
+by ms->accelerator.
+
+But considerring the user emulation, where the @ms is NULL, and for
+these cases, it needs to bring current_accel() back in patch 32.
+
+Anyway, this solution is also fine for me, so,
+
+Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
+
+
+...But there're still more comments/questions about user emulation:
+
+> --- a/bsd-user/main.c
+> +++ b/bsd-user/main.c
+> @@ -474,7 +474,7 @@ int main(int argc, char **argv)
+>                                   opt_one_insn_per_tb, &error_abort);
+>          object_property_set_int(OBJECT(accel), "tb-size",
+>                                  opt_tb_size, &error_abort);
+> -        ac->init_machine(NULL);
+> +        ac->init_machine(accel, NULL);
+
+Not the issue about this patch though,
+
+it seems user emulation doesn't set acc->allowed. At least TCG enabled
+is necessary, I guess?
+
+>      }
+>  
+>      /*
+> diff --git a/linux-user/main.c b/linux-user/main.c
+> index 5ac5b55dc65..a9142ee7268 100644
+> --- a/linux-user/main.c
+> +++ b/linux-user/main.c
+> @@ -820,7 +820,7 @@ int main(int argc, char **argv, char **envp)
+>                                   opt_one_insn_per_tb, &error_abort);
+>          object_property_set_int(OBJECT(accel), "tb-size",
+>                                  opt_tb_size, &error_abort);
+> -        ac->init_machine(NULL);
+> +        ac->init_machine(accel, NULL);
+
+Ditto.
+
+>      }
+>  
+>      /*
+
+Thanks,
+Zhao
 
 
