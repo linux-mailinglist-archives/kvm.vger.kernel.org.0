@@ -1,152 +1,148 @@
-Return-Path: <kvm+bounces-51534-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51535-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41D0AAF855F
-	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 03:58:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC4CBAF8583
+	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 04:20:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E76AE7A1C45
-	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 01:57:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 986866E0E68
+	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 02:20:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2DFA1DCB09;
-	Fri,  4 Jul 2025 01:58:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3830B1DE889;
+	Fri,  4 Jul 2025 02:20:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="E8s9xIPa"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="j1J9cO7a"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9237C33DF
-	for <kvm@vger.kernel.org>; Fri,  4 Jul 2025 01:58:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 749DB4315F
+	for <kvm@vger.kernel.org>; Fri,  4 Jul 2025 02:20:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751594322; cv=none; b=YvpMDn5CFS1YbLDoxJokUeuwHf/HaSJwqHcuCCAVAjeJ/J+bNjmkEhprWg7PIOWdsKFzgWo9I3dHgU7mkUd2cARcsVbgyiMd+Atj/Vcushcq3evgb0GltpU27Uh8O08vL+c9rT85TtVOMpe6tyCTZF3P9RtBWZTxvAwm6zBGR+o=
+	t=1751595634; cv=none; b=g4qF4hBBF7s49D3Gtjf3h23sydEPvcpgHIEGTOF09sXISzon7V7i+WDhUakHMpizkns5FHam74jgBG9FtlJ9AZs3Wca3QY/jTUYa5N1Y3KYh1lpEz9GVctRox9lZTJmmyMC1k5LUZQ7iQf9I2ll7EnDHAJgpckHJz7035v2BByU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751594322; c=relaxed/simple;
-	bh=MEYakmUKLHnF3WCekXxwTM657RRlyZwoI6/HTrtAUdQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=CrWSbhSlWAirlFw9yS8RUKPhRcxmdbyidwI1aDgBDYFZlHJ/tujUBGeEqNydQQz4C2Oy3XHpLXBkpxJx/u5+H0VnspMy6+SeO2eWwUWkMFVfWG/Ckh1KdY0ietvDxQjxHHdwcpMeZA7nQpGRWxz3LT8Armz2oO/Abihm70OT2Uo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=E8s9xIPa; arc=none smtp.client-ip=209.85.219.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-6fae04a3795so6183386d6.3
-        for <kvm@vger.kernel.org>; Thu, 03 Jul 2025 18:58:39 -0700 (PDT)
+	s=arc-20240116; t=1751595634; c=relaxed/simple;
+	bh=ycIHSnGYILJIPVpfKHa7ftGdGsIB8TwD8cX2/vQx/UY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=VeCgTAOIKeS8GKbHe4k+5zPfwT4iIBJy7QzDvihTFyxDfDRsBKd7ZOtcBp8X3s4KnzYykQkdJ1WL0IVrYQgQE57MhIT821vZ0AYN2A4u3p+BcPeRhJC+3h2Au1hCD9YfKBiNv2YqQBOHomYNg6vKuJjwO6SGIz/672jwhRVl+qs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=j1J9cO7a; arc=none smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-748f5a4a423so372185b3a.1
+        for <kvm@vger.kernel.org>; Thu, 03 Jul 2025 19:20:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1751594318; x=1752199118; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=QnLXVWExKoNZiJLIxtursHY+uAzhVs7mpFreujfZRkc=;
-        b=E8s9xIPaszufggYHV2jiN0GUc++dd6QdoQzdYE/f6WMIvjo22mPILkUR8rNYPITyqI
-         l7w+beXVgJvBwxRBQpFdQrl5eBKN8t9l7S7QH9/EOVg8wXR3BE1S7pslneppQqP2+Zyt
-         BxVCi4LgBqaQWFrAyYMGKIPrDzxQ3W+2g98goZN5XXpGVNR1v97+gZrcCDDZTQM/t+xj
-         /PMD2rBD1GanOh9+5U1ZW+MpxkO4JX4Mk/EVp3e9JGsIkQag0PiiRZOLbYY2O/PVVatG
-         OTRo/JEsVZvykAnYEFfeeiuMaKkQ13/BmtdlAaLdvOmrb+27fczyj6P+NXl6ZQte9pb+
-         v+uw==
+        d=bytedance.com; s=google; t=1751595631; x=1752200431; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nB2mhHfPsdN/BAHed7HqkYTpkP4d7ANXryStYAUTRgU=;
+        b=j1J9cO7aMDyQmkhusxG8aMeLib4pH2ViQfhYNhQjK2l7KpX3P3V6sZs0WOGgf81Tdk
+         6mw5r72IRloqSqxM9cZC1jux+4WOnA98YcT5pNpn9wu5SZoKZJ0RWq1s6I0KKQkOlUi5
+         yyA9izam0GT9ilPkO6FbOVCjkuOFKofjwhZMzm0GRbxiIsGiKc1HIvJVO72qudLjEP9/
+         fSIr8FFGgBzwkpVB2uDvvkabXc1hOTWuXrvBadyhzEsgTOZeaBWH1Xq47UGhjnNSloNh
+         Wkpyx16gp/c7sD4TtKAkBoEyTi0Zlah+ywfq0KKgPT3Rp24NqwQYA5PfeNKp14mNSrvz
+         Zv8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751594318; x=1752199118;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=QnLXVWExKoNZiJLIxtursHY+uAzhVs7mpFreujfZRkc=;
-        b=Z8XW+veMOA9PmfJtv0nvMyff08spv4iXmHkr2i1ARdm9bjg7A8rOOC2Ol4OvhQfAkZ
-         jGwOvZnVi1ga5bX1YL8yMKtoRD9w964L0ugVp6C76ATTKbc+gJZGNFZa72djBmFkW2LX
-         jg/TSO7GNUEJgPi9VI79LaEXlhFtg4rK+2h9SZG8L2NFrnZeyIVlVQFcf0vYa/0uKXUV
-         HFFfslC5tZgF0p0HoOXVUEyPh0I2yflEHtCuvW204UVPcb9GihD4sL+o4NZ1BKWJN0oV
-         TQsM0P/D314cE4f4bfcr4LusFq+uDL1N/PyN+Q8aNg8jQyF8ihpA6c8Gx2q5y0LXslfD
-         RPhw==
-X-Gm-Message-State: AOJu0YwsbNl0n19q/2ITpE0E0N2Pds870ybdBJk5uWzrJEpHiV2TMaiV
-	AdusD4JFo+uLx1CPtDRbqMTOPQPuNpViW9dsKck0Ja1Rlihvu7aFFk1F/3V8klbTON0py7YJdDO
-	12kMZ
-X-Gm-Gg: ASbGncvs4AnXV5aOuWew7tO5Xcqh3DPyctTkAOllZk7r8LQ7GvJQz9crBRVr5ntl25h
-	oHabSHgK6Cisa2Tq4ndl6Ux2cs41n8K2wcmN6lhVkL5REnNY2gmJyfuqFS//ewLJKOcx7dOLfjJ
-	YzNgf72A7GqatC6ysMeUokzbJKGguQjapYcYdf0dTjx+p4p6aG5Q/50GBddVxrwH9YT1K7P8qxL
-	oOQSuqXrGX0fFMyCue6abz9tdo8mxu/nOpQA64nppjoyxhtvI8LwFr9m/a+89uVYRxpjTu0TsnP
-	XCIrQej/hAENLpUtlk8YCS/SVvup7FCoRRGEu0aSBm9Rd3dxagnxXH6ZactkztW6AdVM9Vtn/Ap
-	C390nO9vZHw==
-X-Google-Smtp-Source: AGHT+IFjxkaBEImztNDgLRUCPF9Hxz9tbtkMiO4rL8Aov5ucKBXPKeNdTk/a5C14X/9WkJXb6dZhzw==
-X-Received: by 2002:a05:6214:4291:b0:6e8:fcde:58d5 with SMTP id 6a1803df08f44-702c6dedfa8mr10308586d6.42.1751594318341;
-        Thu, 03 Jul 2025 18:58:38 -0700 (PDT)
-Received: from jesse-lt.ba.rivosinc.com ([96.224.57.66])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-702c4d601a7sm5842446d6.107.2025.07.03.18.58.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Jul 2025 18:58:38 -0700 (PDT)
-From: Jesse Taube <jesse@rivosinc.com>
-To: kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org,
-	linux-kselftest@vger.kernel.org
-Cc: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <cleger@rivosinc.com>,
-	Charlie Jenkins <charlie@rivosinc.com>,
-	Jesse Taube <jesse@rivosinc.com>,
-	Andrew Jones <andrew.jones@linux.dev>
-Subject: [kvm-unit-tests PATCH] riscv: Use norvc over arch, -c
-Date: Thu,  3 Jul 2025 18:58:37 -0700
-Message-ID: <20250704015837.1700249-1-jesse@rivosinc.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20230601; t=1751595631; x=1752200431;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nB2mhHfPsdN/BAHed7HqkYTpkP4d7ANXryStYAUTRgU=;
+        b=RpAJV9uCvUU/cYo7dYfhQP/S5cLTW7DcwyuQG7UmauiKcfNW1cUnxi0mmGGWHDalYE
+         Ehgpiax+Y77g2mDAXHLT2z8CHiuoThhfAiEI3Pet9Tz3C2Kf5zpx1cNDGacYeMKW9V61
+         J1k3BowBRz/kbMtmYd0+sfA63IFdP4bhDSX4ouYsvQQbqxSjtYEz9DM8Wr8Pu4IVSQL+
+         /iRJKmhHodaECUYNKsDGZyb7qhnEqLd2p2j2nSpBkHdOpV4RzUuqvfO/YX0Fg/nGu2y5
+         mBa0Tyr1OkcbCVGUWJEam8uzXKD+N7s6Pizm2IlasirV/QRUMfFl+wrJg3F4WdJccOCz
+         csXw==
+X-Forwarded-Encrypted: i=1; AJvYcCVxIql9To43zqz6kJ885Iz31V47WoI2yC3OEP/qG+J1H8UPZUgMBI1zoUAPU6J/o9N14/g=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw7a3+NGA2b//ZtZCIs4MGNOgiX0qOWYOXqiEkly009ozOzjpGX
+	pwMwCCKBhnZcgGMQjZiGhpSfDM1ZUYMx4akEM6vKhNeIcXlB+7nWWLxdaKPCLLB5ZyI=
+X-Gm-Gg: ASbGncu4iVJ/c/0u7VJFJPPYndmXk2r4b8c8k5TEUm96PsYky+ySjgaccy0odk45ol/
+	C/IvNEk2/fnbC/SBWxtG2r/rLfPWgfi6/qanPWsW9AAGYIXwEZBhs8pI+UvDdI8J5atH9wNtzW3
+	RCjIlONJKq/xo2dhBrwxQKQ+CyhC3JRg5praqTOPCmMNwfz2YM9cGdYhuIE2K9T3KN6SqBeg1Y/
+	AZWnwa5rgx7vvmAuUuyM2ucpcKYJ8n6DNOz9KSfPIqLTpDka1Fhv620Ew6SNc/MXacCP1wr1NuN
+	tk4Ug6njo9cZUqnW0WA6y9Y3jk9nDjMlOqfCPbTfwfDrUAeMdqzptnG7x44TqfLnXXZa4ZY+fOk
+	E839zfNVPIYWwPBkh4g8qaV8a
+X-Google-Smtp-Source: AGHT+IF5FgaG48Lz7SQabgqQ96oyxCzyELFi6hJD/bR45TR94ijLKiZUWTQ6L0DOK/RO4NSLyKHLaQ==
+X-Received: by 2002:a05:6a00:3e21:b0:749:8c3:873e with SMTP id d2e1a72fcca58-74ce8ad900emr652873b3a.24.1751595630812;
+        Thu, 03 Jul 2025 19:20:30 -0700 (PDT)
+Received: from localhost.localdomain ([203.208.189.14])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74ce35cc722sm799335b3a.49.2025.07.03.19.20.27
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Thu, 03 Jul 2025 19:20:30 -0700 (PDT)
+From: lizhe.67@bytedance.com
+To: jgg@nvidia.com
+Cc: alex.williamson@redhat.com,
+	david@redhat.com,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	lizhe.67@bytedance.com,
+	peterx@redhat.com
+Subject: Re: [PATCH 2/4] vfio/type1: batch vfio_find_vpfn() in function vfio_unpin_pages_remote()
+Date: Fri,  4 Jul 2025 10:20:24 +0800
+Message-ID: <20250704022024.14481-1-lizhe.67@bytedance.com>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20250703122756.GB1209783@nvidia.com>
+References: <20250703122756.GB1209783@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-The Linux kernel main tree uses "norvc" over
-"arch, -c" change to match this.
+On Thu, 3 Jul 2025 09:27:56 -0300, jgg@nvidia.com wrote:
 
-GCC 15 started to add _zca_zcd to the assembler flags causing a bug
-which made "arch, -c" generate a compressed instruction.
+> On Thu, Jul 03, 2025 at 12:18:22PM +0800, lizhe.67@bytedance.com wrote:
+> > On Wed, 2 Jul 2025 15:27:59 -0300, jgg@ziepe.ca wrote:
+> > 
+> > > On Mon, Jun 30, 2025 at 03:25:16PM +0800, lizhe.67@bytedance.com wrote:
+> > > > From: Li Zhe <lizhe.67@bytedance.com>
+> > > > 
+> > > > The function vpfn_pages() can help us determine the number of vpfn
+> > > > nodes on the vpfn rb tree within a specified range. This allows us
+> > > > to avoid searching for each vpfn individually in the function
+> > > > vfio_unpin_pages_remote(). This patch batches the vfio_find_vpfn()
+> > > > calls in function vfio_unpin_pages_remote().
+> > > > 
+> > > > Signed-off-by: Li Zhe <lizhe.67@bytedance.com>
+> > > > ---
+> > > >  drivers/vfio/vfio_iommu_type1.c | 10 +++-------
+> > > >  1 file changed, 3 insertions(+), 7 deletions(-)
+> > > > 
+> > > > diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> > > > index a2d7abd4f2c2..330fff4fe96d 100644
+> > > > --- a/drivers/vfio/vfio_iommu_type1.c
+> > > > +++ b/drivers/vfio/vfio_iommu_type1.c
+> > > > @@ -804,16 +804,12 @@ static long vfio_unpin_pages_remote(struct vfio_dma *dma, dma_addr_t iova,
+> > > >  				    unsigned long pfn, unsigned long npage,
+> > > >  				    bool do_accounting)
+> > > >  {
+> > > > -	long unlocked = 0, locked = 0;
+> > > > +	long unlocked = 0, locked = vpfn_pages(dma, iova, npage);
+> > > >  	long i;
+> > > 
+> > > The logic in vpfn_pages?() doesn't seem quite right? Don't we want  to
+> > > count the number of pages within the range that fall within the rb
+> > > tree?
+> > > 
+> > > vpfn_pages() looks like it is only counting the number of RB tree
+> > > nodes within the range?
+> > 
+> > As I understand it, a vfio_pfn corresponds to a single page, am I right?
+> 
+> It does look that way, it is not what I was expecting iommufd holds
+> ranges for this job..
+> 
+> So this is OK then
 
-Link: https://sourceware.org/bugzilla/show_bug.cgi?id=33128
-Cc: Clément Léger <cleger@rivosinc.com>
-Signed-off-by: Jesse Taube <jesse@rivosinc.com>
----
- riscv/isa-dbltrp.c | 2 +-
- riscv/sbi-dbtr.c   | 2 +-
- riscv/sbi-fwft.c   | 2 +-
- 3 files changed, 3 insertions(+), 3 deletions(-)
+Thank you. It seems that we have reached a consensus on all the comments.
+I will send out a v2 patchset soon.
 
-diff --git a/riscv/isa-dbltrp.c b/riscv/isa-dbltrp.c
-index b7e21589..af12860c 100644
---- a/riscv/isa-dbltrp.c
-+++ b/riscv/isa-dbltrp.c
-@@ -26,7 +26,7 @@ do {										\
- 	unsigned long value = 0;						\
- 	asm volatile(								\
- 	"	.option push\n"							\
--	"	.option arch,-c\n"						\
-+	"	.option norvc\n"						\
- 	"	sw %0, 0(%1)\n"							\
- 	"	.option pop\n"							\
- 	: : "r" (value), "r" (ptr) : "memory");					\
-diff --git a/riscv/sbi-dbtr.c b/riscv/sbi-dbtr.c
-index c4ccd81d..129f79b8 100644
---- a/riscv/sbi-dbtr.c
-+++ b/riscv/sbi-dbtr.c
-@@ -134,7 +134,7 @@ static __attribute__((naked)) void exec_call(void)
- {
- 	/* skip over nop when triggered instead of ret. */
- 	asm volatile (".option push\n"
--		      ".option arch, -c\n"
-+		      ".option norvc\n"
- 		      "nop\n"
- 		      "ret\n"
- 		      ".option pop\n");
-diff --git a/riscv/sbi-fwft.c b/riscv/sbi-fwft.c
-index 8920bcb5..fda7eb52 100644
---- a/riscv/sbi-fwft.c
-+++ b/riscv/sbi-fwft.c
-@@ -174,7 +174,7 @@ static void fwft_check_misaligned_exc_deleg(void)
- 		 * Disable compression so the lw takes exactly 4 bytes and thus
- 		 * can be skipped reliably from the exception handler.
- 		 */
--		".option arch,-c\n"
-+		".option norvc\n"
- 		"lw %[val], 1(%[val_addr])\n"
- 		".option pop\n"
- 		: [val] "+r" (ret.value)
--- 
-2.43.0
-
+Thanks,
+Zhe
 
