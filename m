@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-51585-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51586-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A709AF8CFE
-	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 10:58:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37681AF8CEE
+	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 10:57:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05FF0764E19
-	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 08:56:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9CC581C45329
+	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 08:57:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 919CF2F50BC;
-	Fri,  4 Jul 2025 08:50:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15DA42F532E;
+	Fri,  4 Jul 2025 08:50:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iDgI+A72"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NfrmX6Gx"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A63A72F3C1D;
-	Fri,  4 Jul 2025 08:50:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 272532F3C39;
+	Fri,  4 Jul 2025 08:50:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751619052; cv=none; b=MEjtHe29RFoAqgSmGjIAbJouUvmR4TQRXdpDOGwx7hBwdneSA/guSUjnNeGiXErhokcuI7ejtzukJ2zFAnB/+gV29aEU2zVtiypPNrUl/RXjYq7dziMIVJAnwv9w/lnU4+Zt80e0zwcLCp2pTh3K/QNQVfHI8UxQh9dRpy5ZqVs=
+	t=1751619053; cv=none; b=idJaWGmF8V2z7kFrrOm+fyZR+q/kav5faF8yrA9DWOwGkVw9jEUDzpTDFZ2JtkBKeR788v259HV+Hx7Ek+iPIJ9x6MirQ7hxMQppMdUSk300Wx00Xs65Ls0rQt6MdXBUaxqcmst9HiiYaZbjDzlvTtJbhS6PUZKh1GQqLlO2A9w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751619052; c=relaxed/simple;
-	bh=nv2RAE0OageOtvQQzhopp7CbMfGiLnkE692bRmNksbA=;
+	s=arc-20240116; t=1751619053; c=relaxed/simple;
+	bh=q3+O8GiGLocWEpflC2Wd3vskAmfbMtiBRRP6KstRaFw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZXrHBFXCYMmQf7+xyPdkdbxacZ5s0Gc5Z3KPOXMP3WU5WfEXSZdDfqdU8kzKX0Hkk14owKMH86c+9PHa4sZbgCT3OsmcGppVlu7rTs9jVN+YA9cGDXPO12dGdLDEy3EYfRKbMlfulj3+iqiB4FSC0zLrA2Nl9GpYGwh32RRptek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iDgI+A72; arc=none smtp.client-ip=192.198.163.7
+	 MIME-Version; b=tj4CmDiWSJmvJZFQCFxJta/zR/Ygk4VpQdrXA6RAPPptdbe0RlZdqTVTNMS6y96hMqrAgsnLNizztBTckEMxpIR5r4GLf//XaVYB885kvu1rXB7DAQnW9mHy17LB7kBNXy63TYvmzRFEsb0ZxrwmSIWgDuT2Q8RsjH1NeMRtd7w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NfrmX6Gx; arc=none smtp.client-ip=192.198.163.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1751619050; x=1783155050;
+  t=1751619051; x=1783155051;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=nv2RAE0OageOtvQQzhopp7CbMfGiLnkE692bRmNksbA=;
-  b=iDgI+A724xY4IcE7wyxgmIhko/vt9yCPU5MZnO9NXB/jqp56LAH+2IjZ
-   zxU23hiN3mSPNrHlSkHm/LOf3uOsU0sPZbuPVEp3Cc1ThzJnvrYqz8bHN
-   axKJVLh1zcNNhsnH4283FMUaKq8X6chdgvpgyKK68oEYSXD0s3NsYHQAl
-   i3D+EufBO/58FoKNS0nzn6EUTjOiEaOd/eIykSsl2Mz6FRQG4SVVc0bjD
-   o5w5rPbyy3F3VXyYte6XBE5lnhQ1kIryF7OGM2K7ldF3aqrciw+kc7Arc
-   ly8nXpbbAeOQI5XzKzp1+1m1atj0MatnFXpsq6IzwJl4dw0k/CnwTyXyF
+  bh=q3+O8GiGLocWEpflC2Wd3vskAmfbMtiBRRP6KstRaFw=;
+  b=NfrmX6GxYrhHjK5tUVIZwIloEAnK5mKvH/z+kK/HONzyfkKIIblCBEu1
+   F4p+lRHmBdi2QqjWhs2F7jZdnfzHaAt0TYJ2HkCJ8ZfEqWxgQ7ZR1DXfL
+   EwyyPo/M8AgwkDU/utFxRbVBx3npiUaA0yKesyNXYA8HOxtIVHurqc9Mh
+   Jcp228HT8HxrFBDAt0SZxwJYdy0QOltpQhJZ9RLajTvdpSlAfSvR1YWab
+   v/FjVllRyYDplsMFDZJ9O2rl8tcZ7q3a6VG/LuLs8BR6Gnr8r6VjsyuGo
+   z9jDD30jwCDO/ZVKUgJx5tKdaswV2rbNThc5D7hrM/xJMwAL4fFyjb1T4
    w==;
-X-CSE-ConnectionGUID: 1ZNPVmtATeamVDVeXXCJcA==
-X-CSE-MsgGUID: vjhRO+sXSCGvhcNM7BQn9Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11483"; a="79391732"
+X-CSE-ConnectionGUID: 91IQ5tEzRnyIXTU8zd4YGg==
+X-CSE-MsgGUID: T1w2dT59Q8WGFXowovjUqA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11483"; a="79391744"
 X-IronPort-AV: E=Sophos;i="6.16,286,1744095600"; 
-   d="scan'208";a="79391732"
+   d="scan'208";a="79391744"
 Received: from orviesa007.jf.intel.com ([10.64.159.147])
   by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jul 2025 01:50:43 -0700
-X-CSE-ConnectionGUID: Jg4iLQEkSR2+OWHIIHOqfg==
-X-CSE-MsgGUID: ANF+CFmIToaTkF0K815jnw==
+X-CSE-ConnectionGUID: 2bWhjjDLTFWOR8oDRwa+cQ==
+X-CSE-MsgGUID: bgP70kNOQuKD8nFtl4Bw2w==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,286,1744095600"; 
-   d="scan'208";a="154722005"
+   d="scan'208";a="154722008"
 Received: from 984fee019967.jf.intel.com ([10.165.54.94])
   by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jul 2025 01:50:43 -0700
 From: Chao Gao <chao.gao@intel.com>
@@ -77,9 +77,9 @@ Cc: rick.p.edgecombe@intel.com,
 	Borislav Petkov <bp@alien8.de>,
 	Dave Hansen <dave.hansen@linux.intel.com>,
 	"H. Peter Anvin" <hpa@zytor.com>
-Subject: [PATCH v11 17/23] KVM: VMX: Set host constant supervisor states to VMCS fields
-Date: Fri,  4 Jul 2025 01:49:48 -0700
-Message-ID: <20250704085027.182163-18-chao.gao@intel.com>
+Subject: [PATCH v11 18/23] KVM: x86: Don't emulate instructions guarded by CET
+Date: Fri,  4 Jul 2025 01:49:49 -0700
+Message-ID: <20250704085027.182163-19-chao.gao@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250704085027.182163-1-chao.gao@intel.com>
 References: <20250704085027.182163-1-chao.gao@intel.com>
@@ -93,110 +93,123 @@ Content-Transfer-Encoding: 8bit
 
 From: Yang Weijiang <weijiang.yang@intel.com>
 
-Save constant values to HOST_{S_CET,SSP,INTR_SSP_TABLE} field explicitly.
-Kernel IBT is supported and the setting in MSR_IA32_S_CET is static after
-post-boot(The exception is BIOS call case but vCPU thread never across it)
-and KVM doesn't need to refresh HOST_S_CET field before every VM-Enter/
-VM-Exit sequence.
+Don't emulate the branch instructions, e.g., CALL/RET/JMP etc., when CET
+is active in guest, return KVM_INTERNAL_ERROR_EMULATION to userspace to
+handle it.
 
-Host supervisor shadow stack is not enabled now and SSP is not accessible
-to kernel mode, thus it's safe to set host IA32_INT_SSP_TAB/SSP VMCS field
-to 0s. When shadow stack is enabled for CPL3, SSP is reloaded from PL3_SSP
-before it exits to userspace. Check SDM Vol 2A/B Chapter 3/4 for SYSCALL/
-SYSRET/SYSENTER SYSEXIT/RDSSP/CALL etc.
+KVM doesn't emulate CPU behaviors to check CET protected stuffs while
+emulating guest instructions, instead it stops emulation on detecting
+the instructions in process are CET protected. By doing so, it can avoid
+generating bogus #CP in guest and preventing CET protected execution flow
+subversion from guest side.
 
-Prevent KVM module loading if host supervisor shadow stack SHSTK_EN is set
-in MSR_IA32_S_CET as KVM cannot co-exit with it correctly.
-
-Suggested-by: Sean Christopherson <seanjc@google.com>
 Suggested-by: Chao Gao <chao.gao@intel.com>
 Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
 Signed-off-by: Chao Gao <chao.gao@intel.com>
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-Reviewed-by: Chao Gao <chao.gao@intel.com>
 ---
- arch/x86/kvm/vmx/capabilities.h |  4 ++++
- arch/x86/kvm/vmx/vmx.c          | 15 +++++++++++++++
- arch/x86/kvm/x86.c              | 12 ++++++++++++
- arch/x86/kvm/x86.h              |  1 +
- 4 files changed, 32 insertions(+)
+ arch/x86/kvm/emulate.c | 46 ++++++++++++++++++++++++++++++++----------
+ 1 file changed, 35 insertions(+), 11 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
-index cb6588238f46..0f0e1717dc80 100644
---- a/arch/x86/kvm/vmx/capabilities.h
-+++ b/arch/x86/kvm/vmx/capabilities.h
-@@ -104,6 +104,10 @@ static inline bool cpu_has_load_perf_global_ctrl(void)
- 	return vmcs_config.vmentry_ctrl & VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL;
- }
+diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+index 1349e278cd2a..80b9d1e4a50a 100644
+--- a/arch/x86/kvm/emulate.c
++++ b/arch/x86/kvm/emulate.c
+@@ -178,6 +178,8 @@
+ #define IncSP       ((u64)1 << 54)  /* SP is incremented before ModRM calc */
+ #define TwoMemOp    ((u64)1 << 55)  /* Instruction has two memory operand */
+ #define IsBranch    ((u64)1 << 56)  /* Instruction is considered a branch. */
++#define ShadowStack ((u64)1 << 57)  /* Instruction protected by Shadow Stack. */
++#define IndirBrnTrk ((u64)1 << 58)  /* Instruction protected by IBT. */
  
-+static inline bool cpu_has_load_cet_ctrl(void)
-+{
-+	return (vmcs_config.vmentry_ctrl & VM_ENTRY_LOAD_CET_STATE);
-+}
- static inline bool cpu_has_vmx_mpx(void)
- {
- 	return vmcs_config.vmentry_ctrl & VM_ENTRY_LOAD_BNDCFGS;
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index ba46c1dcdb9d..3d6da3836e6b 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -4300,6 +4300,21 @@ void vmx_set_constant_host_state(struct vcpu_vmx *vmx)
+ #define DstXacc     (DstAccLo | SrcAccHi | SrcWrite)
  
- 	if (cpu_has_load_ia32_efer())
- 		vmcs_write64(HOST_IA32_EFER, kvm_host.efer);
-+
-+	/*
-+	 * Supervisor shadow stack is not enabled on host side, i.e.,
-+	 * host IA32_S_CET.SHSTK_EN bit is guaranteed to 0 now, per SDM
-+	 * description(RDSSP instruction), SSP is not readable in CPL0,
-+	 * so resetting the two registers to 0s at VM-Exit does no harm
-+	 * to kernel execution. When execution flow exits to userspace,
-+	 * SSP is reloaded from IA32_PL3_SSP. Check SDM Vol.2A/B Chapter
-+	 * 3 and 4 for details.
-+	 */
-+	if (cpu_has_load_cet_ctrl()) {
-+		vmcs_writel(HOST_S_CET, kvm_host.s_cet);
-+		vmcs_writel(HOST_SSP, 0);
-+		vmcs_writel(HOST_INTR_SSP_TABLE, 0);
-+	}
- }
- 
- void set_cr4_guest_host_mask(struct vcpu_vmx *vmx)
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 9ff7996d7534..b17a8bf84db3 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9975,6 +9975,18 @@ int kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
- 		return -EIO;
- 	}
- 
-+	if (boot_cpu_has(X86_FEATURE_SHSTK)) {
-+		rdmsrl(MSR_IA32_S_CET, kvm_host.s_cet);
-+		/*
-+		 * Linux doesn't yet support supervisor shadow stacks (SSS), so
-+		 * KVM doesn't save/restore the associated MSRs, i.e. KVM may
-+		 * clobber the host values.  Yell and refuse to load if SSS is
-+		 * unexpectedly enabled, e.g. to avoid crashing the host.
-+		 */
-+		if (WARN_ON_ONCE(kvm_host.s_cet & CET_SHSTK_EN))
-+			return -EIO;
-+	}
-+
- 	memset(&kvm_caps, 0, sizeof(kvm_caps));
- 
- 	x86_emulator_cache = kvm_alloc_emulator_cache();
-diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index 1b5a96329c64..8d2049a1f41b 100644
---- a/arch/x86/kvm/x86.h
-+++ b/arch/x86/kvm/x86.h
-@@ -50,6 +50,7 @@ struct kvm_host_values {
- 	u64 efer;
- 	u64 xcr0;
- 	u64 xss;
-+	u64 s_cet;
- 	u64 arch_capabilities;
+@@ -4068,9 +4070,11 @@ static const struct opcode group4[] = {
+ static const struct opcode group5[] = {
+ 	F(DstMem | SrcNone | Lock,		em_inc),
+ 	F(DstMem | SrcNone | Lock,		em_dec),
+-	I(SrcMem | NearBranch | IsBranch,       em_call_near_abs),
+-	I(SrcMemFAddr | ImplicitOps | IsBranch, em_call_far),
+-	I(SrcMem | NearBranch | IsBranch,       em_jmp_abs),
++	I(SrcMem | NearBranch | IsBranch | ShadowStack | IndirBrnTrk,
++	em_call_near_abs),
++	I(SrcMemFAddr | ImplicitOps | IsBranch | ShadowStack | IndirBrnTrk,
++	em_call_far),
++	I(SrcMem | NearBranch | IsBranch | IndirBrnTrk, em_jmp_abs),
+ 	I(SrcMemFAddr | ImplicitOps | IsBranch, em_jmp_far),
+ 	I(SrcMem | Stack | TwoMemOp,		em_push), D(Undefined),
  };
+@@ -4332,11 +4336,11 @@ static const struct opcode opcode_table[256] = {
+ 	/* 0xC8 - 0xCF */
+ 	I(Stack | SrcImmU16 | Src2ImmByte | IsBranch, em_enter),
+ 	I(Stack | IsBranch, em_leave),
+-	I(ImplicitOps | SrcImmU16 | IsBranch, em_ret_far_imm),
+-	I(ImplicitOps | IsBranch, em_ret_far),
+-	D(ImplicitOps | IsBranch), DI(SrcImmByte | IsBranch, intn),
++	I(ImplicitOps | SrcImmU16 | IsBranch | ShadowStack, em_ret_far_imm),
++	I(ImplicitOps | IsBranch | ShadowStack, em_ret_far),
++	D(ImplicitOps | IsBranch), DI(SrcImmByte | IsBranch | ShadowStack, intn),
+ 	D(ImplicitOps | No64 | IsBranch),
+-	II(ImplicitOps | IsBranch, em_iret, iret),
++	II(ImplicitOps | IsBranch | ShadowStack, em_iret, iret),
+ 	/* 0xD0 - 0xD7 */
+ 	G(Src2One | ByteOp, group2), G(Src2One, group2),
+ 	G(Src2CL | ByteOp, group2), G(Src2CL, group2),
+@@ -4352,7 +4356,7 @@ static const struct opcode opcode_table[256] = {
+ 	I2bvIP(SrcImmUByte | DstAcc, em_in,  in,  check_perm_in),
+ 	I2bvIP(SrcAcc | DstImmUByte, em_out, out, check_perm_out),
+ 	/* 0xE8 - 0xEF */
+-	I(SrcImm | NearBranch | IsBranch, em_call),
++	I(SrcImm | NearBranch | IsBranch | ShadowStack, em_call),
+ 	D(SrcImm | ImplicitOps | NearBranch | IsBranch),
+ 	I(SrcImmFAddr | No64 | IsBranch, em_jmp_far),
+ 	D(SrcImmByte | ImplicitOps | NearBranch | IsBranch),
+@@ -4371,7 +4375,8 @@ static const struct opcode opcode_table[256] = {
+ static const struct opcode twobyte_table[256] = {
+ 	/* 0x00 - 0x0F */
+ 	G(0, group6), GD(0, &group7), N, N,
+-	N, I(ImplicitOps | EmulateOnUD | IsBranch, em_syscall),
++	N, I(ImplicitOps | EmulateOnUD | IsBranch | ShadowStack | IndirBrnTrk,
++	em_syscall),
+ 	II(ImplicitOps | Priv, em_clts, clts), N,
+ 	DI(ImplicitOps | Priv, invd), DI(ImplicitOps | Priv, wbinvd), N, N,
+ 	N, D(ImplicitOps | ModRM | SrcMem | NoAccess), N, N,
+@@ -4402,8 +4407,9 @@ static const struct opcode twobyte_table[256] = {
+ 	IIP(ImplicitOps, em_rdtsc, rdtsc, check_rdtsc),
+ 	II(ImplicitOps | Priv, em_rdmsr, rdmsr),
+ 	IIP(ImplicitOps, em_rdpmc, rdpmc, check_rdpmc),
+-	I(ImplicitOps | EmulateOnUD | IsBranch, em_sysenter),
+-	I(ImplicitOps | Priv | EmulateOnUD | IsBranch, em_sysexit),
++	I(ImplicitOps | EmulateOnUD | IsBranch | ShadowStack | IndirBrnTrk,
++	em_sysenter),
++	I(ImplicitOps | Priv | EmulateOnUD | IsBranch | ShadowStack, em_sysexit),
+ 	N, N,
+ 	N, N, N, N, N, N, N, N,
+ 	/* 0x40 - 0x4F */
+@@ -4941,6 +4947,24 @@ int x86_decode_insn(struct x86_emulate_ctxt *ctxt, void *insn, int insn_len, int
+ 	if (ctxt->d == 0)
+ 		return EMULATION_FAILED;
  
++	if (ctxt->ops->get_cr(ctxt, 4) & X86_CR4_CET) {
++		u64 u_cet, s_cet;
++		bool stop_em;
++
++		if (ctxt->ops->get_msr(ctxt, MSR_IA32_U_CET, &u_cet) ||
++		    ctxt->ops->get_msr(ctxt, MSR_IA32_S_CET, &s_cet))
++			return EMULATION_FAILED;
++
++		stop_em = ((u_cet & CET_SHSTK_EN) || (s_cet & CET_SHSTK_EN)) &&
++			  (opcode.flags & ShadowStack);
++
++		stop_em |= ((u_cet & CET_ENDBR_EN) || (s_cet & CET_ENDBR_EN)) &&
++			   (opcode.flags & IndirBrnTrk);
++
++		if (stop_em)
++			return EMULATION_FAILED;
++	}
++
+ 	ctxt->execute = opcode.u.execute;
+ 
+ 	if (unlikely(emulation_type & EMULTYPE_TRAP_UD) &&
 -- 
 2.47.1
 
