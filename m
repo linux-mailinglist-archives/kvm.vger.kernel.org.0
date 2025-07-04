@@ -1,197 +1,152 @@
-Return-Path: <kvm+bounces-51533-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51534-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F6AFAF853B
-	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 03:32:27 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41D0AAF855F
+	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 03:58:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D86C51C48467
-	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 01:32:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E76AE7A1C45
+	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 01:57:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 365A313D51E;
-	Fri,  4 Jul 2025 01:32:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2DFA1DCB09;
+	Fri,  4 Jul 2025 01:58:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BbwY/pZW"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="E8s9xIPa"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A83FC182D7;
-	Fri,  4 Jul 2025 01:32:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9237C33DF
+	for <kvm@vger.kernel.org>; Fri,  4 Jul 2025 01:58:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751592738; cv=none; b=EF/tKchT/YFCCsjGc/D/DVbobIx7OGXtYcuiIu1E6Z+o1r7SAfkMu8Kp2r4bT3yAzXrf7gsffCJoeDLBdZcvnprWUokd3ydrvYxcka7fhhrmZz61sXTph1n4CQEA5uAwon6q6uUWTgdN0ydYa2f4GMLDmIoYKi/N94FUWqW1O9k=
+	t=1751594322; cv=none; b=YvpMDn5CFS1YbLDoxJokUeuwHf/HaSJwqHcuCCAVAjeJ/J+bNjmkEhprWg7PIOWdsKFzgWo9I3dHgU7mkUd2cARcsVbgyiMd+Atj/Vcushcq3evgb0GltpU27Uh8O08vL+c9rT85TtVOMpe6tyCTZF3P9RtBWZTxvAwm6zBGR+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751592738; c=relaxed/simple;
-	bh=cVajWqbMaA8FdWsImYY7QMdtU6iMOS61HOPiAKw5xLQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OjgkYuy+NBi8ehrsATOQPgWHddZD76PGdrnbX0jy0NHaYKBvWtEG2JJ6Sv4DzhbOTwbruvqAoHM+hhDqvcR6yZulZAZJ4/SvCKKHQyqIXjv/uUguyhX+R6mgidPDkJYveN7UKFw4h7RZwuaNZXmKu5Tk5uk/N1aQiRQ+sn8iR+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BbwY/pZW; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1751592736; x=1783128736;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=cVajWqbMaA8FdWsImYY7QMdtU6iMOS61HOPiAKw5xLQ=;
-  b=BbwY/pZWo1q9TpB7eI+Y8gQhxKugCWqdXaGQO0rULvCgNYxt6fBZlbQg
-   quZOulHu6oaKXye9zduo+fXP3MnGadwRrcbCjbrrbq3YXsSbS/dLYkZP8
-   y+UOML1HR9cAGlMI/G8MsaMa4EazgQ7+AqaKc6QCHwda+uKmXiJj0fAd4
-   q09lG7e02+uGCh8l3lAF9jxZXXeclP8XeEYuHVpuvQr7U2aPmSBwIIzSm
-   QLxkTg0I6ri5h/BDBnb4fZ5dSmiK4fcou0wrjD4s4iiB7Zqyr7uDSJ5M8
-   CheOgT66d8CHVVGnRL06HPD4vDuw/7ISvtAgaryjZadnLjrfdsKhq50cO
-   A==;
-X-CSE-ConnectionGUID: /J+kJCmjQN20861Ecy0/0A==
-X-CSE-MsgGUID: ig33fD0vTfmFp5T+Dg92Dw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11483"; a="56550996"
-X-IronPort-AV: E=Sophos;i="6.16,285,1744095600"; 
-   d="scan'208";a="56550996"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2025 18:32:15 -0700
-X-CSE-ConnectionGUID: lLbGmm3wRs6oQvZyeAd2xg==
-X-CSE-MsgGUID: ETxZ+JWFQYys57YZkpM9SQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,285,1744095600"; 
-   d="scan'208";a="158867833"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
-  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2025 18:32:10 -0700
-Message-ID: <d1cd2b34-9a3f-4dfc-93a2-2a20e9f16e1d@intel.com>
-Date: Fri, 4 Jul 2025 09:32:07 +0800
+	s=arc-20240116; t=1751594322; c=relaxed/simple;
+	bh=MEYakmUKLHnF3WCekXxwTM657RRlyZwoI6/HTrtAUdQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=CrWSbhSlWAirlFw9yS8RUKPhRcxmdbyidwI1aDgBDYFZlHJ/tujUBGeEqNydQQz4C2Oy3XHpLXBkpxJx/u5+H0VnspMy6+SeO2eWwUWkMFVfWG/Ckh1KdY0ietvDxQjxHHdwcpMeZA7nQpGRWxz3LT8Armz2oO/Abihm70OT2Uo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=E8s9xIPa; arc=none smtp.client-ip=209.85.219.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-6fae04a3795so6183386d6.3
+        for <kvm@vger.kernel.org>; Thu, 03 Jul 2025 18:58:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1751594318; x=1752199118; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=QnLXVWExKoNZiJLIxtursHY+uAzhVs7mpFreujfZRkc=;
+        b=E8s9xIPaszufggYHV2jiN0GUc++dd6QdoQzdYE/f6WMIvjo22mPILkUR8rNYPITyqI
+         l7w+beXVgJvBwxRBQpFdQrl5eBKN8t9l7S7QH9/EOVg8wXR3BE1S7pslneppQqP2+Zyt
+         BxVCi4LgBqaQWFrAyYMGKIPrDzxQ3W+2g98goZN5XXpGVNR1v97+gZrcCDDZTQM/t+xj
+         /PMD2rBD1GanOh9+5U1ZW+MpxkO4JX4Mk/EVp3e9JGsIkQag0PiiRZOLbYY2O/PVVatG
+         OTRo/JEsVZvykAnYEFfeeiuMaKkQ13/BmtdlAaLdvOmrb+27fczyj6P+NXl6ZQte9pb+
+         v+uw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751594318; x=1752199118;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QnLXVWExKoNZiJLIxtursHY+uAzhVs7mpFreujfZRkc=;
+        b=Z8XW+veMOA9PmfJtv0nvMyff08spv4iXmHkr2i1ARdm9bjg7A8rOOC2Ol4OvhQfAkZ
+         jGwOvZnVi1ga5bX1YL8yMKtoRD9w964L0ugVp6C76ATTKbc+gJZGNFZa72djBmFkW2LX
+         jg/TSO7GNUEJgPi9VI79LaEXlhFtg4rK+2h9SZG8L2NFrnZeyIVlVQFcf0vYa/0uKXUV
+         HFFfslC5tZgF0p0HoOXVUEyPh0I2yflEHtCuvW204UVPcb9GihD4sL+o4NZ1BKWJN0oV
+         TQsM0P/D314cE4f4bfcr4LusFq+uDL1N/PyN+Q8aNg8jQyF8ihpA6c8Gx2q5y0LXslfD
+         RPhw==
+X-Gm-Message-State: AOJu0YwsbNl0n19q/2ITpE0E0N2Pds870ybdBJk5uWzrJEpHiV2TMaiV
+	AdusD4JFo+uLx1CPtDRbqMTOPQPuNpViW9dsKck0Ja1Rlihvu7aFFk1F/3V8klbTON0py7YJdDO
+	12kMZ
+X-Gm-Gg: ASbGncvs4AnXV5aOuWew7tO5Xcqh3DPyctTkAOllZk7r8LQ7GvJQz9crBRVr5ntl25h
+	oHabSHgK6Cisa2Tq4ndl6Ux2cs41n8K2wcmN6lhVkL5REnNY2gmJyfuqFS//ewLJKOcx7dOLfjJ
+	YzNgf72A7GqatC6ysMeUokzbJKGguQjapYcYdf0dTjx+p4p6aG5Q/50GBddVxrwH9YT1K7P8qxL
+	oOQSuqXrGX0fFMyCue6abz9tdo8mxu/nOpQA64nppjoyxhtvI8LwFr9m/a+89uVYRxpjTu0TsnP
+	XCIrQej/hAENLpUtlk8YCS/SVvup7FCoRRGEu0aSBm9Rd3dxagnxXH6ZactkztW6AdVM9Vtn/Ap
+	C390nO9vZHw==
+X-Google-Smtp-Source: AGHT+IFjxkaBEImztNDgLRUCPF9Hxz9tbtkMiO4rL8Aov5ucKBXPKeNdTk/a5C14X/9WkJXb6dZhzw==
+X-Received: by 2002:a05:6214:4291:b0:6e8:fcde:58d5 with SMTP id 6a1803df08f44-702c6dedfa8mr10308586d6.42.1751594318341;
+        Thu, 03 Jul 2025 18:58:38 -0700 (PDT)
+Received: from jesse-lt.ba.rivosinc.com ([96.224.57.66])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-702c4d601a7sm5842446d6.107.2025.07.03.18.58.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Jul 2025 18:58:38 -0700 (PDT)
+From: Jesse Taube <jesse@rivosinc.com>
+To: kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org,
+	linux-kselftest@vger.kernel.org
+Cc: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <cleger@rivosinc.com>,
+	Charlie Jenkins <charlie@rivosinc.com>,
+	Jesse Taube <jesse@rivosinc.com>,
+	Andrew Jones <andrew.jones@linux.dev>
+Subject: [kvm-unit-tests PATCH] riscv: Use norvc over arch, -c
+Date: Thu,  3 Jul 2025 18:58:37 -0700
+Message-ID: <20250704015837.1700249-1-jesse@rivosinc.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V2 2/2] x86/tdx: Skip clearing reclaimed pages unless
- X86_BUG_TDX_PW_MCE is present
-To: Adrian Hunter <adrian.hunter@intel.com>,
- Dave Hansen <dave.hansen@linux.intel.com>, pbonzini@redhat.com,
- seanjc@google.com, vannapurve@google.com
-Cc: Tony Luck <tony.luck@intel.com>, Borislav Petkov <bp@alien8.de>,
- Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
- x86@kernel.org, H Peter Anvin <hpa@zytor.com>, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, rick.p.edgecombe@intel.com,
- kirill.shutemov@linux.intel.com, kai.huang@intel.com,
- reinette.chatre@intel.com, tony.lindgren@linux.intel.com,
- binbin.wu@linux.intel.com, isaku.yamahata@intel.com, yan.y.zhao@intel.com,
- chao.gao@intel.com
-References: <20250703153712.155600-1-adrian.hunter@intel.com>
- <20250703153712.155600-3-adrian.hunter@intel.com>
-Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20250703153712.155600-3-adrian.hunter@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On 7/3/2025 11:37 PM, Adrian Hunter wrote:
-> Avoid clearing reclaimed TDX private pages unless the platform is affected
-> by the X86_BUG_TDX_PW_MCE erratum. This significantly reduces VM shutdown
-> time on unaffected systems.
-> 
-> Background
-> 
-> KVM currently clears reclaimed TDX private pages using MOVDIR64B, which:
-> 
->     - Clears the TD Owner bit (which identifies TDX private memory) and
->       integrity metadata without triggering integrity violations.
->     - Clears poison from cache lines without consuming it, avoiding MCEs on
->       access (refer TDX Module Base spec. 16.5. Handling Machine Check
->       Events during Guest TD Operation).
-> 
-> The TDX module also uses MOVDIR64B to initialize private pages before use.
-> If cache flushing is needed, it sets TDX_FEATURES.CLFLUSH_BEFORE_ALLOC.
-> However, KVM currently flushes unconditionally, refer commit 94c477a751c7b
-> ("x86/virt/tdx: Add SEAMCALL wrappers to add TD private pages")
-> 
-> In contrast, when private pages are reclaimed, the TDX Module handles
-> flushing via the TDH.PHYMEM.CACHE.WB SEAMCALL.
-> 
-> Problem
-> 
-> Clearing all private pages during VM shutdown is costly. For guests
-> with a large amount of memory it can take minutes.
-> 
-> Solution
-> 
-> TDX Module Base Architecture spec. documents that private pages reclaimed
-> from a TD should be initialized using MOVDIR64B, in order to avoid
-> integrity violation or TD bit mismatch detection when later being read
-> using a shared HKID, refer April 2025 spec. "Page Initialization" in
-> section "8.6.2. Platforms not Using ACT: Required Cache Flush and
-> Initialization by the Host VMM"
-> 
-> That is an overstatement and will be clarified in coming versions of the
-> spec. In fact, as outlined in "Table 16.2: Non-ACT Platforms Checks on
-> Memory" and "Table 16.3: Non-ACT Platforms Checks on Memory Reads in Li
-> Mode" in the same spec, there is no issue accessing such reclaimed pages
-> using a shared key that does not have integrity enabled. Linux always uses
-> KeyID 0 which never has integrity enabled. KeyID 0 is also the TME KeyID
-> which disallows integrity, refer "TME Policy/Encryption Algorithm" bit
-> description in "Intel Architecture Memory Encryption Technologies" spec
-> version 1.6 April 2025. So there is no need to clear pages to avoid
-> integrity violations.
-> 
-> There remains a risk of poison consumption. However, in the context of
-> TDX, it is expected that there would be a machine check associated with the
-> original poisoning. On some platforms that results in a panic. However
-> platforms may support "SEAM_NR" Machine Check capability, in which case
-> Linux machine check handler marks the page as poisoned, which prevents it
-> from being allocated anymore, refer commit 7911f145de5fe ("x86/mce:
-> Implement recovery for errors in TDX/SEAM non-root mode")
-> 
-> Improvement
-> 
-> By skipping the clearing step on unaffected platforms, shutdown time
-> can improve by up to 40%.
-> 
-> On platforms with the X86_BUG_TDX_PW_MCE erratum (SPR and EMR), continue
-> clearing because these platforms may trigger poison on partial writes to
-> previously-private pages, even with KeyID 0, refer commit 1e536e1068970
-> ("x86/cpu: Detect TDX partial write machine check erratum")
-> 
-> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
-> ---
-> 
-> 
-> Changes in V2:
-> 
-> 	Improve the comment
-> 
-> 
->   arch/x86/virt/vmx/tdx/tdx.c | 8 ++++++++
->   1 file changed, 8 insertions(+)
-> 
-> diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-> index 14d93ed05bd2..4fa86188aa40 100644
-> --- a/arch/x86/virt/vmx/tdx/tdx.c
-> +++ b/arch/x86/virt/vmx/tdx/tdx.c
-> @@ -642,6 +642,14 @@ void tdx_quirk_reset_paddr(unsigned long base, unsigned long size)
->   	const void *zero_page = (const void *)page_address(ZERO_PAGE(0));
->   	unsigned long phys, end;
->   
-> +	/*
-> +	 * Typically, any write to the page will convert it from TDX
-> +	 * private back to normal kernel memory. Systems with the
-> +	 * erratum need to do the conversion explicitly.
+The Linux kernel main tree uses "norvc" over
+"arch, -c" change to match this.
 
-Can we call out that "system with erratum need to do the conversion 
-explicitly via MOVDIR64B" ?
+GCC 15 started to add _zca_zcd to the assembler flags causing a bug
+which made "arch, -c" generate a compressed instruction.
 
-Without "via MOVDIR64B", it leads to the impression that explicit 
-conversion with any write is OK for system with the erratum, and maybe 
-the following code just happened to use movdir64b().
+Link: https://sourceware.org/bugzilla/show_bug.cgi?id=33128
+Cc: Clément Léger <cleger@rivosinc.com>
+Signed-off-by: Jesse Taube <jesse@rivosinc.com>
+---
+ riscv/isa-dbltrp.c | 2 +-
+ riscv/sbi-dbtr.c   | 2 +-
+ riscv/sbi-fwft.c   | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
-> +	 */
-> +	if (!boot_cpu_has_bug(X86_BUG_TDX_PW_MCE))
-> +		return;
-> +
->   	end = base + size;
->   	for (phys = base; phys < end; phys += 64)
->   		movdir64b(__va(phys), zero_page);
+diff --git a/riscv/isa-dbltrp.c b/riscv/isa-dbltrp.c
+index b7e21589..af12860c 100644
+--- a/riscv/isa-dbltrp.c
++++ b/riscv/isa-dbltrp.c
+@@ -26,7 +26,7 @@ do {										\
+ 	unsigned long value = 0;						\
+ 	asm volatile(								\
+ 	"	.option push\n"							\
+-	"	.option arch,-c\n"						\
++	"	.option norvc\n"						\
+ 	"	sw %0, 0(%1)\n"							\
+ 	"	.option pop\n"							\
+ 	: : "r" (value), "r" (ptr) : "memory");					\
+diff --git a/riscv/sbi-dbtr.c b/riscv/sbi-dbtr.c
+index c4ccd81d..129f79b8 100644
+--- a/riscv/sbi-dbtr.c
++++ b/riscv/sbi-dbtr.c
+@@ -134,7 +134,7 @@ static __attribute__((naked)) void exec_call(void)
+ {
+ 	/* skip over nop when triggered instead of ret. */
+ 	asm volatile (".option push\n"
+-		      ".option arch, -c\n"
++		      ".option norvc\n"
+ 		      "nop\n"
+ 		      "ret\n"
+ 		      ".option pop\n");
+diff --git a/riscv/sbi-fwft.c b/riscv/sbi-fwft.c
+index 8920bcb5..fda7eb52 100644
+--- a/riscv/sbi-fwft.c
++++ b/riscv/sbi-fwft.c
+@@ -174,7 +174,7 @@ static void fwft_check_misaligned_exc_deleg(void)
+ 		 * Disable compression so the lw takes exactly 4 bytes and thus
+ 		 * can be skipped reliably from the exception handler.
+ 		 */
+-		".option arch,-c\n"
++		".option norvc\n"
+ 		"lw %[val], 1(%[val_addr])\n"
+ 		".option pop\n"
+ 		: [val] "+r" (ret.value)
+-- 
+2.43.0
 
 
