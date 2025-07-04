@@ -1,117 +1,168 @@
-Return-Path: <kvm+bounces-51610-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51611-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5377AF997E
-	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 19:11:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 68E5CAF9B48
+	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 21:46:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3030B5636CE
-	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 17:11:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B1D69586CE7
+	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 19:46:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E3FE2D836C;
-	Fri,  4 Jul 2025 17:11:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79F8021B9C5;
+	Fri,  4 Jul 2025 19:46:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="NrmoZvWA"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="otjJEI8r"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E26CB285CB2
-	for <kvm@vger.kernel.org>; Fri,  4 Jul 2025 17:11:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 625FD6A8D2
+	for <kvm@vger.kernel.org>; Fri,  4 Jul 2025 19:46:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751649087; cv=none; b=GhmKdxGokufr5M3a9OWlIbKzQ4FCeUdpp/dhcfMrTSW4BgCW6rwdiYeGG9rwJWw7SGWYDMiLBjxEhdon3tGbRNSrLH8n/lGKzmxS5bWn5BF7yW2CXCMQZYge+IR0KhcQhdWSQPeBPakQMIdnhuFAHbpEbJCPJtCjM4euXEZnhGU=
+	t=1751658393; cv=none; b=ratn4ucJxfKXe5uMA77l2RgTHffzrBGn0lyQ3ewl6ukeIU7qoj2asXcRLMlp2qflft4OedCMwJD7Em/UfQgZap8KrmyqXJvTLtxS0g+Sm8zguNEqDYnOX4p+ACCx/qY6Kt68AVMEWk7R4R1mlQwpujEOV3sYADDUCf2gIRjBNf4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751649087; c=relaxed/simple;
-	bh=vahKKOsLIDOZ64bsLWsKQ3P4MU1oQ5S1vZDGJVQDQVs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AuTO/HkAZ0leg/Yv/vd0mfrYKZhVrqsJudZwiqrMfgcs5qiNA3ScLMh0qW8FYdolpc24pw2YkOcdb+OzUxWCGdXDMr5jQ/RXFDV0mcorrjYwLxc8unMmC7sxXEZ6TS+3DqJk2UXppg8sbT9e75DfJB1F5LzyLBl38UJJcMlBR8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=NrmoZvWA; arc=none smtp.client-ip=209.85.219.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-6fd0a3cd326so14650266d6.1
-        for <kvm@vger.kernel.org>; Fri, 04 Jul 2025 10:11:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1751649085; x=1752253885; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Dy7722iywegXhOE4714PEcfy4nzS/kIHDwpfpiOiUEQ=;
-        b=NrmoZvWA500mPNzxqheXYGWO9E2fUtpGYVMc3pd/majVdiSqWgO9MsZW3F9zNj8Jcb
-         2Xs6gxlJg38lVAM7SJIUgaMREdmFjnnfIYNGp3/C+kKoW1FvrBvDUQ7RFQWj/J+fFwix
-         Lay/gDzTCZ1Kw9bIeAF60/1WnrBfz67RtEj+nsbhkPeUSLxdltGYiK9yyMNdERBsmyHd
-         a2wzrqKmm6oLQRYLy3fumtKiF8TGPsFUngFokEUYsBtSVqfteUYXPKwP8k9IrmjIGT6v
-         E1JO4+BfqdSBCU0hL4dL/Fp/qpVqDSVcj9GTGEBrlae0pFTwDt4hjLeF5iKnIlv/0gUh
-         RhIA==
+	s=arc-20240116; t=1751658393; c=relaxed/simple;
+	bh=Cz5o5jdZk1UsVK7l+hF5hjL+kmroRZbpDpggHIKg10Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YAapnA78gOS8ME4ZaHxLv7EskjO/TVFvCNzSk0ore7LmvfLbd0yUe17uyzPDy0+goXnE6p9oilUsyNn6V5yV5NhIpiZdd4FVlJQf66wVoCrCITlhwRMKzP5p+AYz1eF5tsvybZEB9OREGxGkj5J0SzlEeoRURCojouXQxRheUZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=otjJEI8r; arc=none smtp.client-ip=185.125.188.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com [209.85.218.71])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 662A93F946
+	for <kvm@vger.kernel.org>; Fri,  4 Jul 2025 19:46:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1751658389;
+	bh=VLrA3L+1opa6K3kyWseF7FHmwqIbcBLyJ0FYSjgmPjU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type;
+	b=otjJEI8rNeCO1Q+zaB+U5fSLRvKrYkI5zq+uuTGSTToJYDTqasqya4UHJnuRuKvJL
+	 qMYo4qVXcJ+KcNEl0G1XGADBPWRbGxJsgPJ1XTw1663Em9CU42IZgnP35XuBw8K9Zv
+	 CqFbLn3oBuY9dfNLwucJIHSu0MALr/wTs4mrhX9kpAogBpfK5EQVYLkA85oeYcDxOf
+	 5ikrRV5zZM2cPhMN9QGBVOnXSenRJAWGm/qZ6HLroROmX1PZ5LorX5jqzeqkW5nxiy
+	 rQjLwvIyIbis/JiF6/ZPh/mdCG6wC6OTBGiTv1cWGAtl69e0MuqVoh75XpRcPwnuV/
+	 qdzG5Ib91F4Nw==
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-ae0b629918eso141869166b.0
+        for <kvm@vger.kernel.org>; Fri, 04 Jul 2025 12:46:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751649085; x=1752253885;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Dy7722iywegXhOE4714PEcfy4nzS/kIHDwpfpiOiUEQ=;
-        b=Gi4NLOXAO+oxBGXeizw/jTyYCf3VFDVyyFlw6BZJS/ToQSaqG9qJE+NeAi4EE3pGEJ
-         NvMfseIT3kqtAPkR0tvBkSrJEI5cfGwVcMv5dPHdhvEVNykZTBjxXRu+QTVzMhLNx2tv
-         O18jYSzGjjsOBp0HXIAz24Hpsgh+4O4dsciCBEjleu4Iph5SPjdXjQcex05Y8cu1NBhV
-         kFhpUb8E3Sg3RWrl5DXfoVTDmFWEiMkB8qudgHLstmjFBTA+e7x3ornstVCiDlmhhOX5
-         YCIHf7C6SFT0fhNfYdN+B7kQ/wNUgPF2Rrd6ZESUVC6Azy1pyT+YBniw0ospxM45zxsd
-         hAxg==
-X-Forwarded-Encrypted: i=1; AJvYcCXNi1mzyny27N1MpNTQdUXK4H2HALrilVdtMOgLgmd6THHqEsTJ4kIo0Ca/1G1hK8U1yOU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyf5C58Wf91ox96xXVWhDC7JcFRlKDb5yMLOqNRxEvi3lMaGW3i
-	jPxshzNYMyUcGisUAxF7Cguj4c+SPZ1EKrhiAOMrMYFDy2+Hxa/Ui5kWV1d7bua5gFY=
-X-Gm-Gg: ASbGncse3qT69WVrrAXK67V5H18wMwwHHkVfVknU4jvOcs9xBj0Xg8faneLqDHyDyig
-	r+hlq7jU0m3ACX/91leY92jJOKyqDNwysjFQl1koAeQEs1ZMJ2ZbcDUnqOwfGWM7k1JFVcKFGDp
-	LFzlGx+piXcoifXq/JSxFtqmuBChU2Riym18xNHTEFCEcOc6svdhkYcHoETg9Q4BmByBvmlWTB0
-	3VCCbiyK1OF6wooZ3Y2s3ihvIgG8cjbUZSO8wx1A59J/1AFj69BwAfIwjLYyEMxmoMvWs7S4BgF
-	U7Lxgqh3c58TUfyEbmN78Fib/N3h7cksSRWf
-X-Google-Smtp-Source: AGHT+IHUyP8Jk6Ior57ZnKsObhf10XeF3HAK2GWVA5IP8bfBE/gUEt+nc/2G02wLrOp5ynhFeb6YBQ==
-X-Received: by 2002:a05:6214:5346:b0:6ed:19d1:212f with SMTP id 6a1803df08f44-702c6cdfc66mr46822446d6.5.1751649084732;
-        Fri, 04 Jul 2025 10:11:24 -0700 (PDT)
-Received: from ziepe.ca ([130.41.10.202])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-702c4d5ab9csm15480956d6.87.2025.07.04.10.11.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Jul 2025 10:11:24 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1uXjwZ-00000005zCd-2nMQ;
-	Fri, 04 Jul 2025 14:11:23 -0300
-Date: Fri, 4 Jul 2025 14:11:23 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: David Hildenbrand <david@redhat.com>
-Cc: lizhe.67@bytedance.com, alex.williamson@redhat.com,
-	akpm@linux-foundation.org, peterx@redhat.com, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH v2 5/5] vfio/type1: optimize vfio_unpin_pages_remote()
-Message-ID: <20250704171123.GK904431@ziepe.ca>
-References: <20250704062602.33500-1-lizhe.67@bytedance.com>
- <20250704062602.33500-6-lizhe.67@bytedance.com>
- <77d99da0-10eb-4a4d-8ad9-c6ec83cb4540@redhat.com>
+        d=1e100.net; s=20230601; t=1751658385; x=1752263185;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VLrA3L+1opa6K3kyWseF7FHmwqIbcBLyJ0FYSjgmPjU=;
+        b=SH42sYc2ZxfrRgc/htLuxZooTeAtLCE95/8RS+e6M2IiH4vzQn63tKHco0i13CLXsN
+         00kC3M86fyozePvUi3uYFXVg21MEw11DD0NMmWv7yGSX2TcQmmBR5e+NlOVnuVXDEPus
+         rD/L29WZoa2fZvLk9cDgPGcxJda/i3P6DU7uszavBy912FKCAtgo7HWtFA9auDvF1mTa
+         vTIyFZUTqfjRICgma6WdyJAUs4MdLfwglk2BI1XVhEovsIEpY/dSY5PkusulfwiQVFy3
+         e3tG5b8Uhv9DzbfadpOO/zAwzhGlWyOpbhQr9MMLsAbL95jA+8/ZZJy92ZUluyZeLXOO
+         c3Aw==
+X-Forwarded-Encrypted: i=1; AJvYcCUtUXBUoQtFOMta937lIp49dkZHvFte19nfK0Ar0M7Zp9+Lncb1A3NEqlzbcxqouh/CZ1A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzbA1ULF5Lf85u/xdu5c3z+SjaZ9rINCSsvlvZpbw/lYy8m3v4W
+	k0I0K36WOyI1mbetHkM44fvBBsqsR1SL+WQGgpdKrnXDvycQheFmD6y739neJFnEfIEKeBxYgWn
+	PFnKaSODRdAh2fQedny2d/Gh1jdqVChaehnELUSEwZ2Ep++/dxDJJUHDXpCR0rD+KUHn7iQ==
+X-Gm-Gg: ASbGncsBrX4F7D2M/9EXKRNaGPN3QnA6N/mAiZm4UseuWz5laSMjIkd2O5DgCJ+SXyP
+	oKkL3VGrUQWXCk41qwsOQH8YmMRHiefc8raCFr0TmMEMsVerY+0b3rDhjKH/0+96/1mKnweFAoY
+	0rXDi5tJZEXCj319Y6ZeH3Vmi/Ie/HObyZ1qFcWbVdG6kzjy7NuGYlElqg23C0iYeQkFojM0M76
+	sPiKPQcB5xU2jCqQJRqzmteNhl7EByn3QpNuR9dxGRKf6oqKByKAf4JVTnGL/RIbOLyg6E21OWp
+	pLnHh/dJHzAdHNmCmIhrglQbwUpZkvn0qnqJdNz2TZUhJbKX2hT0f/JgBGapv/5uMGHUT6edt1W
+	F9Lgyu9yARDk=
+X-Received: by 2002:a17:906:f5a7:b0:ae1:f1e0:8730 with SMTP id a640c23a62f3a-ae3fe78fd44mr368751966b.57.1751658384969;
+        Fri, 04 Jul 2025 12:46:24 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGbsxPqPhYYSbtLZBKO2k3ZdPJhfdbdyy0/f6vKPhOggzCylZPnmMjp2Q8zbaJhX5YMtK8lng==
+X-Received: by 2002:a17:906:f5a7:b0:ae1:f1e0:8730 with SMTP id a640c23a62f3a-ae3fe78fd44mr368750466b.57.1751658384601;
+        Fri, 04 Jul 2025 12:46:24 -0700 (PDT)
+Received: from ?IPV6:2a02:3035:6e0:a37c:f324:1674:f46a:492? ([2a02:3035:6e0:a37c:f324:1674:f46a:492])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae3f6ac5643sm221184466b.74.2025.07.04.12.46.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 04 Jul 2025 12:46:23 -0700 (PDT)
+Message-ID: <42c6f9d7-ac1a-4f74-8b0b-ac8fb02de0b0@canonical.com>
+Date: Fri, 4 Jul 2025 21:46:22 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <77d99da0-10eb-4a4d-8ad9-c6ec83cb4540@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] RISC-V: KVM: Disable vstimecmp before exiting to
+ user-space
+To: Anup Patel <apatel@ventanamicro.com>, Atish Patra <atish.patra@linux.dev>
+Cc: Palmer Dabbelt <palmer@dabbelt.com>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Alexandre Ghiti <alex@ghiti.fr>,
+ Andrew Jones <ajones@ventanamicro.com>, Anup Patel <anup@brainfault.org>,
+ kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+ linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Emil Renner Berthing <emil.renner.berthing@canonical.com>
+References: <20250704153838.6575-1-apatel@ventanamicro.com>
+ <20250704153838.6575-2-apatel@ventanamicro.com>
+Content-Language: en-US
+From: Heinrich Schuchardt <heinrich.schuchardt@canonical.com>
+In-Reply-To: <20250704153838.6575-2-apatel@ventanamicro.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jul 04, 2025 at 10:47:00AM +0200, David Hildenbrand wrote:
-> >   static long vfio_unpin_pages_remote(struct vfio_dma *dma, dma_addr_t iova,
-> >   				    unsigned long pfn, unsigned long npage,
-> >   				    bool do_accounting)
-> >   {
-> >   	long unlocked = 0, locked = vpfn_pages(dma, iova, npage);
-> > -	long i;
-> > -	for (i = 0; i < npage; i++)
-> > -		if (put_pfn(pfn++, dma->prot))
-> > -			unlocked++;
-> > +	if (dma->has_rsvd) {
-> > +		long i;
+On 04.07.25 17:38, Anup Patel wrote:
+> If VS-timer expires when no VCPU running on a host CPU then WFI
+> executed by such host CPU will be effective NOP resulting in no
+> power savings. This is as-per RISC-V Privileged specificaiton
+> which says: "WFI is also required to resume execution for locally
+> enabled interrupts pending at any privilege level, regardless of
+> the global interrupt enable at each privilege level."
 > 
-> No need to move "long i" here, but also doesn't really matter.
+> To address the above issue, vstimecmp CSR must be set to -1UL over
+> here when VCPU is scheduled-out or exits to user space.
+> 
+> Fixes: 8f5cb44b1bae ("RISC-V: KVM: Support sstc extension")
+> Fixes: cea8896bd936 ("RISC-V: KVM: Fix kvm_riscv_vcpu_timer_pending() for Sstc")
+> Reported-by: Heinrich Schuchardt <heinrich.schuchardt@canonical.com>
+> Closes: https://bugs.launchpad.net/ubuntu/+source/linux/+bug/2112578
+> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
 
-It should also be unsigned long as npage is unsigned
+Anup and Atish, thanks a lot for investigating.
 
-Jason
+I built upstream kernel 6.14.9 with the patches of this series and that 
+resolved the problem reported in Launchpad bug report 2112578.
+
+Tested-by: Heinrich Schuchardt <heinrich.schuchardt@canonical.com>
+
+> ---
+>   arch/riscv/kvm/vcpu_timer.c | 16 ++++++++++++++++
+>   1 file changed, 16 insertions(+)
+> 
+> diff --git a/arch/riscv/kvm/vcpu_timer.c b/arch/riscv/kvm/vcpu_timer.c
+> index ff672fa71fcc..85a7262115e1 100644
+> --- a/arch/riscv/kvm/vcpu_timer.c
+> +++ b/arch/riscv/kvm/vcpu_timer.c
+> @@ -345,8 +345,24 @@ void kvm_riscv_vcpu_timer_save(struct kvm_vcpu *vcpu)
+>   	/*
+>   	 * The vstimecmp CSRs are saved by kvm_riscv_vcpu_timer_sync()
+>   	 * upon every VM exit so no need to save here.
+> +	 *
+> +	 * If VS-timer expires when no VCPU running on a host CPU then
+> +	 * WFI executed by such host CPU will be effective NOP resulting
+> +	 * in no power savings. This is because as-per RISC-V Privileged
+> +	 * specificaiton: "WFI is also required to resume execution for
+> +	 * locally enabled interrupts pending at any privilege level,
+> +	 * regardless of the global interrupt enable at each privilege
+> +	 * level."
+> +	 *
+> +	 * To address the above issue, vstimecmp CSR must be set to -1UL
+> +	 * over here when VCPU is scheduled-out or exits to user space.
+>   	 */
+>   
+> +	csr_write(CSR_VSTIMECMP, -1UL);
+> +#if defined(CONFIG_32BIT)
+> +	csr_write(CSR_VSTIMECMPH, -1UL);
+> +#endif
+> +
+>   	/* timer should be enabled for the remaining operations */
+>   	if (unlikely(!t->init_done))
+>   		return;
+
 
