@@ -1,243 +1,262 @@
-Return-Path: <kvm+bounces-51567-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51568-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 847DCAF8D9F
-	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 11:08:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 235B6AF8CBB
+	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 10:52:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6CEACB64BC5
-	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 08:49:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B88555A4CBD
+	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 08:52:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0C192BEFFC;
-	Fri,  4 Jul 2025 08:47:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 929E52877F9;
+	Fri,  4 Jul 2025 08:50:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V4GYMBaR"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SdZcmBoL"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 688482BEFE1
-	for <kvm@vger.kernel.org>; Fri,  4 Jul 2025 08:47:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFF4528688D;
+	Fri,  4 Jul 2025 08:50:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751618829; cv=none; b=NuUpCPO3VVbDaEYb8A41iwVEywlJGDxSzl85x6khwPVVQDsmC9TAF6/prue4nbgr84BpcCJT4HisPHzUGqv0q8j2s5ByRMJpgpm/QietbF0rGnQOlfSjBk89HIqTIpFpZw5+xF9/Kzle+jtI1R+D3kGUExHOdwtUUmF41PyX2Vc=
+	t=1751619038; cv=none; b=lN+73lbocWv3xGpN/t/32VxMO0AIzEBspuyy6TdXNk6MjNcFlZXoeEA9lhv5uh91P9Nn8tepc2rjSLCkVdNoMk3sVy+u6eG8oPK+xG/ImoGQLmmQ/5joziIQnPV2MGYsdNsBRIpINiOipYcg/B5jxInMjzluUhRyR1+oUxHFtBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751618829; c=relaxed/simple;
-	bh=r5V49CGOXAoLrXqPU+rJOpeqSHYxcwrGfpX3wMAmlm8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pZGvSJewvjGEOUo3svmOVu7FDNW/7E9E2qfdpJ9ZBI3JkIiakoCfotjbKsijStOymnTYfSAyvnezwXwgevHvtwugXk0VoDjsitF5N4MxhMd4ybLeiyz/0sszxdL6/iuEPT4sz07FUIXTt75+HDI6/H9jr9P51j86YuB81fsgKwQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=V4GYMBaR; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751618826;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=LbMrib8JvYyiXcynM5A1QVLEBjssYP8T6GYqmTfTDCI=;
-	b=V4GYMBaRhrIg6y5B9smCCMuJOFbdRkzWEFYsTK3JLqkjUDWtn+vE1T2dk1u7p4uHoOHqHJ
-	z4nZ1qS1KLDZySYfzTbcsf8SpW2LbL2ctARSVzlH2O+WFa3m4TBS8nA8mJk4AB1IMq5uIZ
-	Ia+KNOB8nJ5MXTU9DzwwfZNxUaays+k=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-384-PnnfwWWOPb67txjRpkm0aA-1; Fri, 04 Jul 2025 04:47:04 -0400
-X-MC-Unique: PnnfwWWOPb67txjRpkm0aA-1
-X-Mimecast-MFC-AGG-ID: PnnfwWWOPb67txjRpkm0aA_1751618823
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4530ec2c87cso5614195e9.0
-        for <kvm@vger.kernel.org>; Fri, 04 Jul 2025 01:47:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751618823; x=1752223623;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=LbMrib8JvYyiXcynM5A1QVLEBjssYP8T6GYqmTfTDCI=;
-        b=tIxMwMbs235xejgOijGb5r+vMBJJmW81Ny/3hq6zXSjUw/3eKhD8Ftlw3WLqs7eOuK
-         IAzEUW6SL2iJrLEXLmhmd7CkXlLBDj2mJOEW+1MuC1MRuj1tZmaJYTEn6pK5UbJvAL0k
-         eTPViTREvbBuoNDTnn1q+UYInL6p1XyDeCveqmAB+oZb84Q//ixYYneiCqL61NIHhB7m
-         eACpXcxlXPab4+tAfHfpL4E4aPfW7PuZpVoo2vMIwqud8bEWmgISshJjt32jWsLBzSpa
-         zq4Mb9uraHL9bqzdPWOpktvE9L7M3s1QeEKMhsgPcVIX8nZUVp+6zfsG7F4HNJHW+ic0
-         3hGA==
-X-Gm-Message-State: AOJu0YwG8kASqqAYd3BBinHTDfFXe5+4WARz2x4T0DJD4+G0Y6PW4oDE
-	au9Fv+akiksBD5DDdsDrL0fwBEIB/nNMWR9VN80XOS5w777gAP8N8XCNd3EspVLjAcsL7/BH9Og
-	mR3V2eOKChNRj1exJa7ERfqa6t1sjylay+WauFXpyqJr+P3wcd8/IEkrn4DpkmQ==
-X-Gm-Gg: ASbGncs0diDW8sQafptEBP311qezYbjYNKfGBk3cLPlRdJnpxrNcdl41AG+3y9amLx1
-	o+5kdmgit/8HAkQ9vn3odZCptKJ3wZwq+OpMjN+DlPpt2k2uIgwvWm8UcE/tbyuBmga8gjvRbV0
-	vdPTcF3wacxPSJ/uTaxssM3Djrxq4O6Rm6hGGBj3VrMGoS7dBGnNH2UNs0q9ctR/i/WOooqERYB
-	FY5wPFVBBNnuCQ2H/kPjcJ213BnPnExh3Q2VN4jNGlCj4OZd48uXjSIkNZ7uvAhcMkzwdNmlhbk
-	AqsIIdoEwmEwhrah+ydiLIsyMiIqdou/TQ/8FB6kD7F+V+SK7ptmXpXVolLGV3tNjEhVmPLAhP9
-	EjXZQBLP5+Z3GI2Oq6QId7gwG6CaKmuFHHq21Bo3njVqcndg=
-X-Received: by 2002:adf:a382:0:b0:3a4:dc42:a0ac with SMTP id ffacd0b85a97d-3b4966273ffmr891508f8f.49.1751618823181;
-        Fri, 04 Jul 2025 01:47:03 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHsRw575uw5CU78q39R0CUYNm5iiO5mve3sqDMWqmFqXrOdrE69CcShRjEvR2Lebt4eraqamQ==
-X-Received: by 2002:adf:a382:0:b0:3a4:dc42:a0ac with SMTP id ffacd0b85a97d-3b4966273ffmr891481f8f.49.1751618822420;
-        Fri, 04 Jul 2025 01:47:02 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f2c:5500:988:23f9:faa0:7232? (p200300d82f2c5500098823f9faa07232.dip0.t-ipconnect.de. [2003:d8:2f2c:5500:988:23f9:faa0:7232])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b4708d0af7sm1973309f8f.35.2025.07.04.01.47.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Jul 2025 01:47:01 -0700 (PDT)
-Message-ID: <77d99da0-10eb-4a4d-8ad9-c6ec83cb4540@redhat.com>
-Date: Fri, 4 Jul 2025 10:47:00 +0200
+	s=arc-20240116; t=1751619038; c=relaxed/simple;
+	bh=A2wv0IZfdbxzU81ud5vuwnzI9si9a6zbVp0UNJnJUQE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DE+wG6VyMl/+Vh8/q79/mfmkWqWN0ku4KuWzT8nhOJ1I7oM8xc4THulHLIRfh6l8c8vKb0gEzJXFLvrk+RjlhDY+2cVAuMl/uVsAeJRgbWkCpWaRfQPD+jjIJ2z6OJDTbJHXdwFMgPwap9hHYI+ns0T/636DcUIcr/NdqAXQtPY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SdZcmBoL; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1751619037; x=1783155037;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=A2wv0IZfdbxzU81ud5vuwnzI9si9a6zbVp0UNJnJUQE=;
+  b=SdZcmBoL8qLGArFvq0RFh0J3uJPxh3wVCtuoS4rKImUdlWPowFXM14r2
+   qzOBqkXkhTcSvhnHHd34feiFcRYSc5iSWmq/OnU2dWbS0D7Bm5OZrLjha
+   aArbpxY7MMyJExLL/TMPGvp3r2Ccv9kOuLibwx8ACaeTNGqK8Y8o3yEks
+   2rNhCkKcXRSsRDX5PFxM9lJ+tYqIdVatXXCsgd5Xyz0X2ANYf/9UBq/VT
+   plgQpvqUb0NeVbtUvUVBwVZgqBw7/qZ/xprgjInFdO62McIAGsBWLxMYf
+   es6h1UIamYuRxEh2zFOJTDFsRDXLLwWAphGUlCq9lD8oM6QDS5dVToeyr
+   w==;
+X-CSE-ConnectionGUID: 3YtK3zI+QfuiPudA4bQj3g==
+X-CSE-MsgGUID: H0QbiduGSJ6fkerunb7EXg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11483"; a="79391559"
+X-IronPort-AV: E=Sophos;i="6.16,286,1744095600"; 
+   d="scan'208";a="79391559"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jul 2025 01:50:35 -0700
+X-CSE-ConnectionGUID: OYriw+5qRbiQix6MwFS6HA==
+X-CSE-MsgGUID: EobLxaQlQTiqWEXQdZ1nhA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,286,1744095600"; 
+   d="scan'208";a="154721943"
+Received: from 984fee019967.jf.intel.com ([10.165.54.94])
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jul 2025 01:50:34 -0700
+From: Chao Gao <chao.gao@intel.com>
+To: kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	x86@kernel.org,
+	seanjc@google.com,
+	pbonzini@redhat.com,
+	dave.hansen@intel.com
+Cc: rick.p.edgecombe@intel.com,
+	mlevitsk@redhat.com,
+	john.allen@amd.com,
+	weijiang.yang@intel.com,
+	minipli@grsecurity.net,
+	xin@zytor.com,
+	Chao Gao <chao.gao@intel.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Ingo Molnar <mingo@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>
+Subject: [PATCH v11 00/23] Enable CET Virtualization
+Date: Fri,  4 Jul 2025 01:49:31 -0700
+Message-ID: <20250704085027.182163-1-chao.gao@intel.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 5/5] vfio/type1: optimize vfio_unpin_pages_remote()
-To: lizhe.67@bytedance.com, alex.williamson@redhat.com,
- akpm@linux-foundation.org, peterx@redhat.com, jgg@ziepe.ca
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org
-References: <20250704062602.33500-1-lizhe.67@bytedance.com>
- <20250704062602.33500-6-lizhe.67@bytedance.com>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <20250704062602.33500-6-lizhe.67@bytedance.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 04.07.25 08:26, lizhe.67@bytedance.com wrote:
-> From: Li Zhe <lizhe.67@bytedance.com>
-> 
-> When vfio_unpin_pages_remote() is called with a range of addresses that
-> includes large folios, the function currently performs individual
-> put_pfn() operations for each page. This can lead to significant
-> performance overheads, especially when dealing with large ranges of pages.
-> 
-> It would be very rare for reserved PFNs and non reserved will to be mixed
-> within the same range. So this patch utilizes the has_rsvd variable
-> introduced in the previous patch to determine whether batch put_pfn()
-> operations can be performed. Moreover, compared to put_pfn(),
-> unpin_user_page_range_dirty_lock() is capable of handling large folio
-> scenarios more efficiently.
-> 
-> The performance test results for completing the 16G VFIO IOMMU DMA
-> unmapping are as follows.
-> 
-> Base(v6.16-rc4):
-> ./vfio-pci-mem-dma-map 0000:03:00.0 16
-> ------- AVERAGE (MADV_HUGEPAGE) --------
-> VFIO UNMAP DMA in 0.135 s (118.6 GB/s)
-> ------- AVERAGE (MAP_POPULATE) --------
-> VFIO UNMAP DMA in 0.312 s (51.3 GB/s)
-> ------- AVERAGE (HUGETLBFS) --------
-> VFIO UNMAP DMA in 0.136 s (117.3 GB/s)
-> 
-> With this patchset:
-> ------- AVERAGE (MADV_HUGEPAGE) --------
-> VFIO UNMAP DMA in 0.045 s (357.0 GB/s)
-> ------- AVERAGE (MAP_POPULATE) --------
-> VFIO UNMAP DMA in 0.288 s (55.6 GB/s)
-> ------- AVERAGE (HUGETLBFS) --------
-> VFIO UNMAP DMA in 0.045 s (353.9 GB/s)
-> 
-> For large folio, we achieve an over 66% performance improvement in
-> the VFIO UNMAP DMA item. For small folios, the performance test
-> results appear to show a slight improvement.
-> 
-> Suggested-by: Jason Gunthorpe <jgg@ziepe.ca>
-> Signed-off-by: Li Zhe <lizhe.67@bytedance.com>
-> ---
->   drivers/vfio/vfio_iommu_type1.c | 20 ++++++++++++++++----
->   1 file changed, 16 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 13c5667d431c..3971539b0d67 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -792,17 +792,29 @@ static long vfio_pin_pages_remote(struct vfio_dma *dma, unsigned long vaddr,
->   	return pinned;
->   }
->   
-> +static inline void put_valid_unreserved_pfns(unsigned long start_pfn,
-> +		unsigned long npage, int prot)
-> +{
-> +	unpin_user_page_range_dirty_lock(pfn_to_page(start_pfn), npage,
-> +					 prot & IOMMU_WRITE);
-> +}
-> +
->   static long vfio_unpin_pages_remote(struct vfio_dma *dma, dma_addr_t iova,
->   				    unsigned long pfn, unsigned long npage,
->   				    bool do_accounting)
->   {
->   	long unlocked = 0, locked = vpfn_pages(dma, iova, npage);
-> -	long i;
->   
-> -	for (i = 0; i < npage; i++)
-> -		if (put_pfn(pfn++, dma->prot))
-> -			unlocked++;
-> +	if (dma->has_rsvd) {
-> +		long i;
+The FPU support for CET virtualization has already been merged into the tip
+tree. This v11 adds Intel CET virtualization in KVM and is based on
+tip/master plus Sean's MSR cleanups. For your convenience, it is also
+available at
 
-No need to move "long i" here, but also doesn't really matter.
+  https://github.com/gaochaointel/linux-dev cet-v11
 
->   
-> +		for (i = 0; i < npage; i++)
-> +			if (put_pfn(pfn++, dma->prot))
-> +				unlocked++;
-> +	} else {
-> +		put_valid_unreserved_pfns(pfn, npage, dma->prot);
-> +		unlocked = npage;
-> +	}
->   	if (do_accounting)
->   		vfio_lock_acct(dma, locked - unlocked, true);
->   
+Changes in v11 (Most changes are suggested by Sean. Thanks!):
+1. Rebased onto the latest tip tree + Sean's MSR cleanups
+2. Made patch 1's shortlog informative and accurate
+3. Slotted in two cleanup patches from Sean (patch 3/4)
+4. Used KVM_GET/SET_ONE_REG ioctl for userspace to read/write SSP.
+   still assigned a KVM-defined MSR index for SSP but the index isn't
+   part of uAPI now.
+5. Used KVM_MSR_RET_UNSUPPORTED to reject accesses to unsupported CET MSRs
+6. Synthesized triple-fault when reading/writing SSP failed during
+   entering into SMM or exiting from SMM
+7. Removed an inappropriate "quirk" in v10 that advertised IBT to userspace
+   when the hardware supports it but the host does not enable it.
+8. Disabled IBT/SHSTK explicitly for SVM to avoid them being enabled on
+   AMD CPU accidentally before AMD CET series lands. Because IBT/SHSTK are
+   advertised in KVM x86 common code but only Intel support is added by
+   this series.
+9. Re-ordered "Don't emulate branch instructions" (patch 18) before
+   advertising CET support to userspace.
+10.Added consistency checks for CR4.CET and other CET MSRs during VM-entry
+   (patches 22-23)
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+Control-flow Enforcement Technology (CET) is a kind of CPU feature used
+to prevent Return/CALL/Jump-Oriented Programming (ROP/COP/JOP) attacks.
+It provides two sub-features(SHSTK,IBT) to defend against ROP/COP/JOP
+style control-flow subversion attacks.
+
+Shadow Stack (SHSTK):
+  A shadow stack is a second stack used exclusively for control transfer
+  operations. The shadow stack is separate from the data/normal stack and
+  can be enabled individually in user and kernel mode. When shadow stack
+  is enabled, CALL pushes the return address on both the data and shadow
+  stack. RET pops the return address from both stacks and compares them.
+  If the return addresses from the two stacks do not match, the processor
+  generates a #CP.
+
+Indirect Branch Tracking (IBT):
+  IBT introduces new instruction(ENDBRANCH)to mark valid target addresses
+  of indirect branches (CALL, JMP etc...). If an indirect branch is
+  executed and the next instruction is _not_ an ENDBRANCH, the processor
+  generates a #CP. These instruction behaves as a NOP on platforms that
+  doesn't support CET.
+
+CET states management:
+======================
+KVM cooperates with host kernel FPU framework to manage guest CET registers.
+With CET supervisor mode state support in this series, KVM can save/restore
+full guest CET xsave-managed states.
+
+CET user mode and supervisor mode xstates, i.e., MSR_IA32_{U_CET,PL3_SSP}
+and MSR_IA32_PL{0,1,2}, depend on host FPU framework to swap guest and host
+xstates. On VM-Exit, guest CET xstates are saved to guest fpu area and host
+CET xstates are loaded from task/thread context before vCPU returns to
+userspace, vice-versa on VM-Entry. See details in kvm_{load,put}_guest_fpu().
+So guest CET xstates management depends on CET xstate bits(U_CET/S_CET bit)
+set in host XSS MSR.
+
+CET supervisor mode states are grouped into two categories : XSAVE-managed
+and non-XSAVE-managed, the former includes MSR_IA32_PL{0,1,2}_SSP and are
+controlled by CET supervisor mode bit(S_CET bit) in XSS, the later consists
+of MSR_IA32_S_CET and MSR_IA32_INTR_SSP_TBL.
+
+VMX introduces new VMCS fields, {GUEST|HOST}_{S_CET,SSP,INTR_SSP_TABL}, to
+facilitate guest/host non-XSAVES-managed states. When VMX CET entry/exit load
+bits are set, guest/host MSR_IA32_{S_CET,INTR_SSP_TBL,SSP} are loaded from
+equivalent fields at VM-Exit/Entry. With these new fields, such supervisor
+states require no addtional KVM save/reload actions.
+
+Tests:
+======================
+This series passed basic CET user shadow stack test and kernel IBT test in L1
+and L2 guest.
+The patch series _has_ impact to existing vmx test cases in KVM-unit-tests,the
+failures have been fixed here[1].
+One new selftest app[2] is introduced for testing CET MSRs accessibilities.
+
+Note, this series hasn't been tested on AMD platform yet.
+
+To run user SHSTK test and kernel IBT test in guest, an CET capable platform
+is required, e.g., Sapphire Rapids server, and follow below steps to build
+the binaries:
+
+1. Host kernel: Apply this series to mainline kernel (>= v6.6) and build.
+
+2. Guest kernel: Pull kernel (>= v6.6), opt-in CONFIG_X86_KERNEL_IBT
+and CONFIG_X86_USER_SHADOW_STACK options. Build with CET enabled gcc versions
+(>= 8.5.0).
+
+3. Apply CET QEMU patches[3] before build mainline QEMU.
+
+Check kernel selftest test_shadow_stack_64 output:
+[INFO]  new_ssp = 7f8c82100ff8, *new_ssp = 7f8c82101001
+[INFO]  changing ssp from 7f8c82900ff0 to 7f8c82100ff8
+[INFO]  ssp is now 7f8c82101000
+[OK]    Shadow stack pivot
+[OK]    Shadow stack faults
+[INFO]  Corrupting shadow stack
+[INFO]  Generated shadow stack violation successfully
+[OK]    Shadow stack violation test
+[INFO]  Gup read -> shstk access success
+[INFO]  Gup write -> shstk access success
+[INFO]  Violation from normal write
+[INFO]  Gup read -> write access success
+[INFO]  Violation from normal write
+[INFO]  Gup write -> write access success
+[INFO]  Cow gup write -> write access success
+[OK]    Shadow gup test
+[INFO]  Violation from shstk access
+[OK]    mprotect() test
+[SKIP]  Userfaultfd unavailable.
+[OK]    32 bit test
+
+Chao Gao (3):
+  KVM: x86: Zero XSTATE components on INIT by iterating over supported
+    features
+  KVM: nVMX: Add consistency checks for CR0.WP and CR4.CET
+  KVM: nVMX: Add consistency checks for CET states
+
+Sean Christopherson (3):
+  KVM: x86: Manually clear MPX state only on INIT
+  KVM: x86: Report XSS as to-be-saved if there are supported features
+  KVM: x86: Load guest FPU state when access XSAVE-managed MSRs
+
+Yang Weijiang (17):
+  KVM: x86: Rename kvm_{g,s}et_msr()* to show that they emulate guest
+    accesses
+  KVM: x86: Add kvm_msr_{read,write}() helpers
+  KVM: x86: Introduce KVM_{G,S}ET_ONE_REG uAPIs support
+  KVM: x86: Refresh CPUID on write to guest MSR_IA32_XSS
+  KVM: x86: Initialize kvm_caps.supported_xss
+  KVM: x86: Add fault checks for guest CR4.CET setting
+  KVM: x86: Report KVM supported CET MSRs as to-be-saved
+  KVM: VMX: Introduce CET VMCS fields and control bits
+  KVM: x86: Enable guest SSP read/write interface with new uAPIs
+  KVM: VMX: Emulate read and write to CET MSRs
+  KVM: x86: Save and reload SSP to/from SMRAM
+  KVM: VMX: Set up interception for CET MSRs
+  KVM: VMX: Set host constant supervisor states to VMCS fields
+  KVM: x86: Don't emulate instructions guarded by CET
+  KVM: x86: Enable CET virtualization for VMX and advertise to userspace
+  KVM: nVMX: Virtualize NO_HW_ERROR_CODE_CC for L1 event injection to L2
+  KVM: nVMX: Enable CET support for nested guest
+
+ arch/x86/include/asm/kvm_host.h |  16 +-
+ arch/x86/include/asm/vmx.h      |   9 +
+ arch/x86/include/uapi/asm/kvm.h |  13 ++
+ arch/x86/kvm/cpuid.c            |  19 +-
+ arch/x86/kvm/emulate.c          |  46 +++--
+ arch/x86/kvm/smm.c              |  12 +-
+ arch/x86/kvm/smm.h              |   2 +-
+ arch/x86/kvm/svm/svm.c          |   4 +
+ arch/x86/kvm/vmx/capabilities.h |   9 +
+ arch/x86/kvm/vmx/nested.c       | 174 +++++++++++++++--
+ arch/x86/kvm/vmx/nested.h       |   5 +
+ arch/x86/kvm/vmx/vmcs12.c       |   6 +
+ arch/x86/kvm/vmx/vmcs12.h       |  14 +-
+ arch/x86/kvm/vmx/vmx.c          |  85 ++++++++-
+ arch/x86/kvm/vmx/vmx.h          |   9 +-
+ arch/x86/kvm/x86.c              | 326 ++++++++++++++++++++++++++++----
+ arch/x86/kvm/x86.h              |  61 ++++++
+ 17 files changed, 725 insertions(+), 85 deletions(-)
 
 -- 
-Cheers,
-
-David / dhildenb
+2.47.1
 
 
