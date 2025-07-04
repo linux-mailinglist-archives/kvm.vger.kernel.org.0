@@ -1,34 +1,34 @@
-Return-Path: <kvm+bounces-51581-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51580-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 595C0AF8CF2
-	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 10:57:31 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0D89AF8EA9
+	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 11:32:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 115CB7624A8
-	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 08:55:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A83D9B6651E
+	for <lists+kvm@lfdr.de>; Fri,  4 Jul 2025 08:54:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C5F42F365F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24FE02F365D;
 	Fri,  4 Jul 2025 08:50:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HynNp4il"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WkxCfwCB"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED2882EF652;
-	Fri,  4 Jul 2025 08:50:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C2652EF665;
+	Fri,  4 Jul 2025 08:50:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751619049; cv=none; b=JqDCYVWWEmuVLOc5SZF362JX2d9845rFjJ4kBeo9g/KRYGfkYGKLTQiOzYj5uvPS+dOGv8siuc9JW/fuo+NOQqWgDTHCtk9hyVxN+Ej69/Pois0emHl2K2fbmBgJCF87u/7ZpJal2XX3mtxickghp7WSfK0oyCLrNsN8GHh0SzM=
+	t=1751619048; cv=none; b=OOFKl1uk78P7uVxQ5ToSG4AUyqkUAyPHB0AMQaSbg3EptjUOKMPHegni4yfRj/FtDMG5/ZQotcxDyKJJTc+dH21T5KXCgrxp65sXYaECQaxZMn6+KxfIu1ZyF4v2GxxDOUlHcK/1fTKZe1H4KzniAjAy0YEuxA1wX4Hexwt/W80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751619049; c=relaxed/simple;
-	bh=Y9DoKMqGzQP7+uvu6aciV7CeSa7ruTJiuJ2QADc+LIw=;
+	s=arc-20240116; t=1751619048; c=relaxed/simple;
+	bh=WrIErqpAsLYYcuED0WnH89yjpjhV9lt00b3Cnw3x7v4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Adou8odef9AABMSI3UmQxxAkN8kIGbKqBvFgCk+im9RpqwEfZVGibFDp4uF6xBOhiGn7xXGecB3yJjcu/o+gf6WNmi+BWTQZ/dgaqDDG3V0bau6HXSUePd4IVFuIBG+ryKsJbMkhgsY1a4eWswK4gMiE6PSRpqQQ1CQpQ/QBVww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HynNp4il; arc=none smtp.client-ip=192.198.163.7
+	 MIME-Version; b=GZfuQvWfmcpz8AUQFotIXAcVzxsmI+23ahmkwMauT094p7wAmut/k5V5aHBnR5hx5OuF2PRvPpEJXcsFtIMbNjCNVoRWOCrtiJxwax1MUF+83cGckX/qm+kBdlPAG8r7/HGzfToiJvnxk1I/9Qj18P51VBxErl+Rnqhg6uf+JQI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WkxCfwCB; arc=none smtp.client-ip=192.198.163.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
@@ -36,28 +36,28 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   t=1751619047; x=1783155047;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Y9DoKMqGzQP7+uvu6aciV7CeSa7ruTJiuJ2QADc+LIw=;
-  b=HynNp4ilWAoILfzqoIJFIwhi8jW6o6gcKxdHDDpRIqFoW7jbmHLOUFXW
-   NbUe6+B2t+ZAA7xpiYj2lk5Wnqfv8AO0VYQg2vMQSx+2PuCMwCZGsjPSd
-   LuOBEWfA50dtlSFlW15IdK288L+TCSRPF16MCoBy7DWTEJxmtK8IfpuZG
-   l3jOAwoQH9CHiKPpPWFTDX5S0z0GOayARlSgxW1A9TXcl1tyns0xjZgHr
-   rOiJ/WgG5xyzsdZKfY47OXU9DHIz8dv2Lyssh6EXcH0ffHz9aXA650tvQ
-   0ObJ0aS4SaVJ6J8slfRDUwfmB82/XBD3KICrCcVcp25/hPJVzNho1v5st
-   A==;
-X-CSE-ConnectionGUID: h0uEjbY/R1au4jCBYUwhNg==
-X-CSE-MsgGUID: Z7Ig+hz8TlaAK0h0HxIQRA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11483"; a="79391680"
+  bh=WrIErqpAsLYYcuED0WnH89yjpjhV9lt00b3Cnw3x7v4=;
+  b=WkxCfwCBubsK8HXaQke8yMhFzhy2dEADL4ll5KW5mN2cDbWyAW1I7Nax
+   kxmpsHgLC5DMfeGjwrIp01CQo6m34G7225i5EqBS6QE2x3Otas2pSi3Bz
+   VPvUeHCQEdXqzhv2nCYV/j7lxZP54jDfvIfGkjm5PgKMV1DiqvqjejgLm
+   uRTBJXUJ+Y5saTKk9buDcM5v2ATk23QWv4ZItIkfEy8H+ZUSnC82IfemJ
+   l1+nCjWCfnhO0iF9VjLh1OKTSk1I6+gAdVbxhS8MeqhV7yF/jJrr8BrKx
+   ygIFeRFNcunOqc/qFk/AsPakCn09pASZQFJl0lMHuvUp4g8C9AdNi5qXd
+   w==;
+X-CSE-ConnectionGUID: BrOYzSWITb+AFfrmdWlZ/Q==
+X-CSE-MsgGUID: iALvERIvSHWf/wFZ8fbrzg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11483"; a="79391690"
 X-IronPort-AV: E=Sophos;i="6.16,286,1744095600"; 
-   d="scan'208";a="79391680"
+   d="scan'208";a="79391690"
 Received: from orviesa007.jf.intel.com ([10.64.159.147])
   by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jul 2025 01:50:40 -0700
-X-CSE-ConnectionGUID: TWQp+ZLGR+O418Akzlds1w==
-X-CSE-MsgGUID: igb7oOL9RAqQMR+BOtosXA==
+X-CSE-ConnectionGUID: KXGYiM98SnSFxwMV5CV1XQ==
+X-CSE-MsgGUID: jCFfnOosSD+lEZGGHB7log==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,286,1744095600"; 
-   d="scan'208";a="154721983"
+   d="scan'208";a="154721989"
 Received: from 984fee019967.jf.intel.com ([10.165.54.94])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jul 2025 01:50:40 -0700
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jul 2025 01:50:41 -0700
 From: Chao Gao <chao.gao@intel.com>
 To: kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
@@ -71,16 +71,15 @@ Cc: rick.p.edgecombe@intel.com,
 	weijiang.yang@intel.com,
 	minipli@grsecurity.net,
 	xin@zytor.com,
-	Zhang Yi Z <yi.z.zhang@linux.intel.com>,
 	Chao Gao <chao.gao@intel.com>,
 	Thomas Gleixner <tglx@linutronix.de>,
 	Ingo Molnar <mingo@redhat.com>,
 	Borislav Petkov <bp@alien8.de>,
 	Dave Hansen <dave.hansen@linux.intel.com>,
 	"H. Peter Anvin" <hpa@zytor.com>
-Subject: [PATCH v11 12/23] KVM: VMX: Introduce CET VMCS fields and control bits
-Date: Fri,  4 Jul 2025 01:49:43 -0700
-Message-ID: <20250704085027.182163-13-chao.gao@intel.com>
+Subject: [PATCH v11 13/23] KVM: x86: Enable guest SSP read/write interface with new uAPIs
+Date: Fri,  4 Jul 2025 01:49:44 -0700
+Message-ID: <20250704085027.182163-14-chao.gao@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250704085027.182163-1-chao.gao@intel.com>
 References: <20250704085027.182163-1-chao.gao@intel.com>
@@ -94,107 +93,80 @@ Content-Transfer-Encoding: 8bit
 
 From: Yang Weijiang <weijiang.yang@intel.com>
 
-Control-flow Enforcement Technology (CET) is a kind of CPU feature used
-to prevent Return/CALL/Jump-Oriented Programming (ROP/COP/JOP) attacks.
-It provides two sub-features(SHSTK,IBT) to defend against ROP/COP/JOP
-style control-flow subversion attacks.
+Enable guest shadow stack pointer(SSP) access interface with new uAPIs.
+CET guest SSP is HW register which has corresponding VMCS field to save
+/restore guest values when VM-{Exit,Entry} happens. KVM handles SSP as
+a synthetic MSR for userspace access.
 
-Shadow Stack (SHSTK):
-  A shadow stack is a second stack used exclusively for control transfer
-  operations. The shadow stack is separate from the data/normal stack and
-  can be enabled individually in user and kernel mode. When shadow stack
-  is enabled, CALL pushes the return address on both the data and shadow
-  stack. RET pops the return address from both stacks and compares them.
-  If the return addresses from the two stacks do not match, the processor
-  generates a #CP.
+Use a translation helper to set up mapping for SSP synthetic index and
+KVM-internal MSR index so that userspace doesn't need to take care of
+KVM's management for synthetic MSRs and avoid conflicts.
 
-Indirect Branch Tracking (IBT):
-  IBT introduces instruction(ENDBRANCH)to mark valid target addresses of
-  indirect branches (CALL, JMP etc...). If an indirect branch is executed
-  and the next instruction is _not_ an ENDBRANCH, the processor generates
-  a #CP. These instruction behaves as a NOP on platforms that have no CET.
-
-Several new CET MSRs are defined to support CET:
-  MSR_IA32_{U,S}_CET: CET settings for {user,supervisor} CET respectively.
-
-  MSR_IA32_PL{0,1,2,3}_SSP: SHSTK pointer linear address for CPL{0,1,2,3}.
-
-  MSR_IA32_INT_SSP_TAB: Linear address of SHSTK pointer table, whose entry
-			is indexed by IST of interrupt gate desc.
-
-Two XSAVES state bits are introduced for CET:
-  IA32_XSS:[bit 11]: Control saving/restoring user mode CET states
-  IA32_XSS:[bit 12]: Control saving/restoring supervisor mode CET states.
-
-Six VMCS fields are introduced for CET:
-  {HOST,GUEST}_S_CET: Stores CET settings for kernel mode.
-  {HOST,GUEST}_SSP: Stores current active SSP.
-  {HOST,GUEST}_INTR_SSP_TABLE: Stores current active MSR_IA32_INT_SSP_TAB.
-
-On Intel platforms, two additional bits are defined in VM_EXIT and VM_ENTRY
-control fields:
-If VM_EXIT_LOAD_CET_STATE = 1, host CET states are loaded from following
-VMCS fields at VM-Exit:
-  HOST_S_CET
-  HOST_SSP
-  HOST_INTR_SSP_TABLE
-
-If VM_ENTRY_LOAD_CET_STATE = 1, guest CET states are loaded from following
-VMCS fields at VM-Entry:
-  GUEST_S_CET
-  GUEST_SSP
-  GUEST_INTR_SSP_TABLE
-
-Co-developed-by: Zhang Yi Z <yi.z.zhang@linux.intel.com>
-Signed-off-by: Zhang Yi Z <yi.z.zhang@linux.intel.com>
+Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
 Signed-off-by: Chao Gao <chao.gao@intel.com>
-Reviewed-by: Chao Gao <chao.gao@intel.com>
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- arch/x86/include/asm/vmx.h | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ arch/x86/include/uapi/asm/kvm.h |  3 +++
+ arch/x86/kvm/x86.c              | 10 +++++++++-
+ arch/x86/kvm/x86.h              | 10 ++++++++++
+ 3 files changed, 22 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
-index cca7d6641287..ce10a7e2d3d9 100644
---- a/arch/x86/include/asm/vmx.h
-+++ b/arch/x86/include/asm/vmx.h
-@@ -106,6 +106,7 @@
- #define VM_EXIT_CLEAR_BNDCFGS                   0x00800000
- #define VM_EXIT_PT_CONCEAL_PIP			0x01000000
- #define VM_EXIT_CLEAR_IA32_RTIT_CTL		0x02000000
-+#define VM_EXIT_LOAD_CET_STATE                  0x10000000
- 
- #define VM_EXIT_ALWAYSON_WITHOUT_TRUE_MSR	0x00036dff
- 
-@@ -119,6 +120,7 @@
- #define VM_ENTRY_LOAD_BNDCFGS                   0x00010000
- #define VM_ENTRY_PT_CONCEAL_PIP			0x00020000
- #define VM_ENTRY_LOAD_IA32_RTIT_CTL		0x00040000
-+#define VM_ENTRY_LOAD_CET_STATE                 0x00100000
- 
- #define VM_ENTRY_ALWAYSON_WITHOUT_TRUE_MSR	0x000011ff
- 
-@@ -369,6 +371,9 @@ enum vmcs_field {
- 	GUEST_PENDING_DBG_EXCEPTIONS    = 0x00006822,
- 	GUEST_SYSENTER_ESP              = 0x00006824,
- 	GUEST_SYSENTER_EIP              = 0x00006826,
-+	GUEST_S_CET                     = 0x00006828,
-+	GUEST_SSP                       = 0x0000682a,
-+	GUEST_INTR_SSP_TABLE            = 0x0000682c,
- 	HOST_CR0                        = 0x00006c00,
- 	HOST_CR3                        = 0x00006c02,
- 	HOST_CR4                        = 0x00006c04,
-@@ -381,6 +386,9 @@ enum vmcs_field {
- 	HOST_IA32_SYSENTER_EIP          = 0x00006c12,
- 	HOST_RSP                        = 0x00006c14,
- 	HOST_RIP                        = 0x00006c16,
-+	HOST_S_CET                      = 0x00006c18,
-+	HOST_SSP                        = 0x00006c1a,
-+	HOST_INTR_SSP_TABLE             = 0x00006c1c
+diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+index e72d9e6c1739..a4870d9c9279 100644
+--- a/arch/x86/include/uapi/asm/kvm.h
++++ b/arch/x86/include/uapi/asm/kvm.h
+@@ -421,6 +421,9 @@ struct kvm_x86_reg_id {
+ 	__u16 rsvd16;
  };
  
- /*
++/* KVM synthetic MSR index staring from 0 */
++#define KVM_SYNTHETIC_GUEST_SSP 0
++
+ #define KVM_SYNC_X86_REGS      (1UL << 0)
+ #define KVM_SYNC_X86_SREGS     (1UL << 1)
+ #define KVM_SYNC_X86_EVENTS    (1UL << 2)
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index f6cf371ee16a..2373968ea7fd 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -5969,7 +5969,15 @@ static int kvm_vcpu_ioctl_enable_cap(struct kvm_vcpu *vcpu,
+ 
+ static int kvm_translate_synthetic_msr(struct kvm_x86_reg_id *reg)
+ {
+-	return -EINVAL;
++	switch (reg->index) {
++	case KVM_SYNTHETIC_GUEST_SSP:
++		reg->type = KVM_X86_REG_MSR;
++		reg->index = MSR_KVM_INTERNAL_GUEST_SSP;
++		break;
++	default:
++		return -EINVAL;
++	}
++	return 0;
+ }
+ 
+ long kvm_arch_vcpu_ioctl(struct file *filp,
+diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+index 2914e99059c9..17b1485fa2f4 100644
+--- a/arch/x86/kvm/x86.h
++++ b/arch/x86/kvm/x86.h
+@@ -79,6 +79,16 @@ void kvm_spurious_fault(void);
+ #define KVM_SVM_DEFAULT_PLE_WINDOW_MAX	USHRT_MAX
+ #define KVM_SVM_DEFAULT_PLE_WINDOW	3000
+ 
++/*
++ * KVM's internal, non-ABI indices for synthetic MSRs. The values themselves
++ * are arbitrary and have no meaning, the only requirement is that they don't
++ * conflict with "real" MSRs that KVM supports. Use values at the upper end
++ * of KVM's reserved paravirtual MSR range to minimize churn, i.e. these values
++ * will be usable until KVM exhausts its supply of paravirtual MSR indices.
++ */
++
++#define MSR_KVM_INTERNAL_GUEST_SSP	0x4b564dff
++
+ static inline unsigned int __grow_ple_window(unsigned int val,
+ 		unsigned int base, unsigned int modifier, unsigned int max)
+ {
 -- 
 2.47.1
 
