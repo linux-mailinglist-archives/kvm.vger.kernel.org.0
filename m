@@ -1,46 +1,46 @@
-Return-Path: <kvm+bounces-51627-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51628-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B0FEAFA5EF
-	for <lists+kvm@lfdr.de>; Sun,  6 Jul 2025 16:40:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB2F8AFA5F2
+	for <lists+kvm@lfdr.de>; Sun,  6 Jul 2025 16:41:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BBD0F189B8C1
-	for <lists+kvm@lfdr.de>; Sun,  6 Jul 2025 14:40:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE6D23AE5CD
+	for <lists+kvm@lfdr.de>; Sun,  6 Jul 2025 14:40:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35D8C28B7D4;
-	Sun,  6 Jul 2025 14:36:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CABF28C031;
+	Sun,  6 Jul 2025 14:36:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N0ZgnBp9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PpbWlYDR"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F77E28AAFE;
-	Sun,  6 Jul 2025 14:36:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AA57230BC9;
+	Sun,  6 Jul 2025 14:36:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751812602; cv=none; b=ps9t8qI9Vcx3gLe+cMk+ukSGN1w7DNA/4wh3OuGL3cbB0thcubLx162mA+KPoASuzWG6sVbjoYYgODk47w4a5w9+ujaM8Cn6bDHQ3i9LI6RgGm/WwFrP97jgyKMQBAt+r69F9YSZfKEsZ/XJsodlr5tI+a/C7TJPM/jtfV0dWS8=
+	t=1751812604; cv=none; b=BKZHCPPCI7Uq6oNExfPQyCHxympLlEmiCSDXGTLjp6AsqjYnSCpOAxEHBzw7YfWJIbQIWXs2YGqy5OLvZbW3/mEJXaVnCwY5RD/jAzcv4/f3QLB1Pd5JqoXXSRiqlY/AukbxTHyu0joghkB18oZbU4fghys4/OFlJS/RNW/8H34=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751812602; c=relaxed/simple;
-	bh=hely8rCeQBZS770H5X6E0gNUH0kghs8qNa/SePVXMhs=;
+	s=arc-20240116; t=1751812604; c=relaxed/simple;
+	bh=qucJBD1l7cekJwkkW3sSPDQAFelB6SpfdgNHX+7KrGs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=V8OivHlijofE3jEa8wpSSnh1V1TmTSZD0Mghb0hftlMU7lWNdGwOQinTehysvzrPBgVvKlMUOcvx8g7kYu924vn5+3quxE4F2Xl1zPFq5CQDBb5N+mSboBS07Ar5qz8s0ta+CMzJbh+lFmdUf4qSeOyl1iEhTQ03r3WMN3OXkcE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N0ZgnBp9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE09FC4CEF5;
-	Sun,  6 Jul 2025 14:36:39 +0000 (UTC)
+	 MIME-Version; b=e0cxjz0iGzgAdWREOEspNTpjzombqbu1+vDoVBdyY6twTkwV2fYuhPP1CfP4qkzLf24Tn0xOlFxHRio2530q4rkYop/PNOPf2kBgr7D6Z7BS7OzaHVBXXqcdznmhAnCZYRy0RxrqeN84zhz6FN2OsbrYGIm/MqWA7vtUOHOT7s8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PpbWlYDR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 341F7C4CEEF;
+	Sun,  6 Jul 2025 14:36:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751812602;
-	bh=hely8rCeQBZS770H5X6E0gNUH0kghs8qNa/SePVXMhs=;
+	s=k20201202; t=1751812604;
+	bh=qucJBD1l7cekJwkkW3sSPDQAFelB6SpfdgNHX+7KrGs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=N0ZgnBp9YJ0UPchsvkNm4Jl8YLOp3FgQq3vRwPImT8zZTiwUzKbkm61vMgG44uuUp
-	 Bw6wcv+tkgc0SMhw+205GtPxxKjIixNrNNH1pZDki24F8mHiQFO7K/8AXbqBhb0YMy
-	 RR3Xsa8FB4MFQe6wKLrCzaH5u9Pnb40v0E6IdAQSO6IEnrrKVva31tS3ETN3R9eXkj
-	 VISu+08ZhhW5aPP7k12X0jDcTu4dgf6CuOwWx8qBwsuMAT7SfPCY1MHth0X886q7q/
-	 T4c+3Ee8KmK2VfytHViGO2UxV2hYD2bQgmBULGo6JGYpTK0gTCiM/ShN4NPkmlTgRZ
-	 CmglaNfB+AmmA==
+	b=PpbWlYDRkCuGunmFT9sTtHbxSwd/gVVaMktE59Av5bQNJlpIpRWWnBMwON8LQkbBW
+	 6gXenJkP+sbVWehgc9Qa4LZngn4VzayvaKyP4D/gf5ASSXZlb5Nr869RaVew8OnB/6
+	 kE61VerYy9vnazyRtGJxRv8MDOupgCzJ6JB3k+P2jlvgUjPkMUX7fXh4EBt5sp4/pE
+	 O9W0Z/s5Q9iKMr63iqMxPUUSFuSKz5F64qsgf9NdYhX1RBfEbnOplk9TaDJlRXdfRx
+	 zuNEX/u0VqDtrmTAtzX598+shxngHQGeh+kFXhAikczUIzAiLs53PC4Fj2CNbZC1nW
+	 i0MO8mX+JbXqg==
 From: Mario Limonciello <superm1@kernel.org>
 To: David Airlie <airlied@gmail.com>,
 	Bjorn Helgaas <bhelgaas@google.com>
@@ -67,9 +67,9 @@ Cc: Alex Deucher <alexander.deucher@amd.com>,
 	linux-sound@vger.kernel.org (open list:SOUND),
 	Daniel Dadap <ddadap@nvidia.com>,
 	Mario Limonciello <mario.limonciello@amd.com>
-Subject: [PATCH v7 7/9] PCI/VGA: Replace vga_is_firmware_default() with a screen info check
-Date: Sun,  6 Jul 2025 09:36:11 -0500
-Message-ID: <20250706143613.1972252-8-superm1@kernel.org>
+Subject: [PATCH v7 8/9] fbcon: Use screen info to find primary device
+Date: Sun,  6 Jul 2025 09:36:12 -0500
+Message-ID: <20250706143613.1972252-9-superm1@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250706143613.1972252-1-superm1@kernel.org>
 References: <20250706143613.1972252-1-superm1@kernel.org>
@@ -83,67 +83,62 @@ Content-Transfer-Encoding: 8bit
 
 From: Mario Limonciello <mario.limonciello@amd.com>
 
-vga_is_firmware_default() checks firmware resources to find the owner
-framebuffer resources to find the firmware PCI device.  This is an
-open coded implementation of screen_info_pci_dev().  Switch to using
-screen_info_pci_dev() instead.
+On systems with non VGA GPUs fbcon can't find the primary GPU because
+video_is_primary_device() only checks the VGA arbiter.
 
-Acked-by: Bjorn Helgaas <bhelgaas@google.com>
+Add a screen info check to video_is_primary_device() so that callers
+can get accurate data on such systems.
+
+Reviewed-by: Thomas Zimmermann <tzimmermann@suse.de>
 Suggested-by: Thomas Zimmermann <tzimmermann@suse.de>
 Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
 ---
-v6:
- * fix lkp robot error
 v5:
- * split from next patch
+ * Only change video-common.c
+v4:
+ * use helper
 ---
- drivers/pci/vgaarb.c | 31 +++++--------------------------
- 1 file changed, 5 insertions(+), 26 deletions(-)
+ arch/x86/video/video-common.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/pci/vgaarb.c b/drivers/pci/vgaarb.c
-index 78748e8d2dbae..b58f94ee48916 100644
---- a/drivers/pci/vgaarb.c
-+++ b/drivers/pci/vgaarb.c
-@@ -556,34 +556,13 @@ EXPORT_SYMBOL(vga_put);
+diff --git a/arch/x86/video/video-common.c b/arch/x86/video/video-common.c
+index 81fc97a2a837a..917568e4d7fb1 100644
+--- a/arch/x86/video/video-common.c
++++ b/arch/x86/video/video-common.c
+@@ -9,6 +9,7 @@
  
- static bool vga_is_firmware_default(struct pci_dev *pdev)
+ #include <linux/module.h>
+ #include <linux/pci.h>
++#include <linux/screen_info.h>
+ #include <linux/vgaarb.h>
+ 
+ #include <asm/video.h>
+@@ -27,6 +28,7 @@ EXPORT_SYMBOL(pgprot_framebuffer);
+ 
+ bool video_is_primary_device(struct device *dev)
  {
--#if defined(CONFIG_X86)
--	u64 base = screen_info.lfb_base;
--	u64 size = screen_info.lfb_size;
--	struct resource *r;
--	u64 limit;
-+#ifdef CONFIG_SCREEN_INFO
 +	struct screen_info *si = &screen_info;
+ 	struct pci_dev *pdev;
  
--	/* Select the device owning the boot framebuffer if there is one */
--
--	if (screen_info.capabilities & VIDEO_CAPABILITY_64BIT_BASE)
--		base |= (u64)screen_info.ext_lfb_base << 32;
--
--	limit = base + size;
--
--	/* Does firmware framebuffer belong to us? */
--	pci_dev_for_each_resource(pdev, r) {
--		if (resource_type(r) != IORESOURCE_MEM)
--			continue;
--
--		if (!r->start || !r->end)
--			continue;
--
--		if (base < r->start || limit >= r->end)
--			continue;
--
--		return true;
--	}
--#endif
-+	return pdev == screen_info_pci_dev(si);
-+#else
- 	return false;
-+#endif
+ 	if (!dev_is_pci(dev))
+@@ -34,7 +36,16 @@ bool video_is_primary_device(struct device *dev)
+ 
+ 	pdev = to_pci_dev(dev);
+ 
+-	return (pdev == vga_default_device());
++	if (!pci_is_display(pdev))
++		return false;
++
++	if (pdev == vga_default_device())
++		return true;
++
++	if (pdev == screen_info_pci_dev(si))
++		return true;
++
++	return false;
  }
+ EXPORT_SYMBOL(video_is_primary_device);
  
- static bool vga_arb_integrated_gpu(struct device *dev)
 -- 
 2.43.0
 
