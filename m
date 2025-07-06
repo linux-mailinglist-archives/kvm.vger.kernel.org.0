@@ -1,99 +1,102 @@
-Return-Path: <kvm+bounces-51616-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51617-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 469CEAF9EDD
-	for <lists+kvm@lfdr.de>; Sat,  5 Jul 2025 09:43:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56323AFA35A
+	for <lists+kvm@lfdr.de>; Sun,  6 Jul 2025 09:00:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 901674A71E9
-	for <lists+kvm@lfdr.de>; Sat,  5 Jul 2025 07:43:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8811C3AEB3F
+	for <lists+kvm@lfdr.de>; Sun,  6 Jul 2025 07:00:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C432274FDC;
-	Sat,  5 Jul 2025 07:43:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A73081A316C;
+	Sun,  6 Jul 2025 07:00:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FbNTWIVg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l3SatRWw"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C97E82E36E0
-	for <kvm@vger.kernel.org>; Sat,  5 Jul 2025 07:43:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD5842E370C
+	for <kvm@vger.kernel.org>; Sun,  6 Jul 2025 07:00:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751701427; cv=none; b=ZjGDHSC8LRP5AUl+YhPwFXMXzvnTssId5iRmR2593weok/Xgowoi1D2qZCeAPFoDb2gYg7cqfZ/lRXXG8Qyxrbnn6GQEdvAk1H3U9yqDlL3I1vMWjMohwGIKaCEm0U6Q1Uk+DcJVPS9slzQzFnUg0nD77LHgIcV4Y4NECOPnJUg=
+	t=1751785224; cv=none; b=VfqMlXNHHFuhl+gehgnk21UhG51CL/7JBOHEleGctJ9oQTjN7lTGQBnpdXMSktkJEr4BTet/TkRldU8a1NQJ261aUxdV6ebIAUulllfQ439X8FjqwuyDS3uA97mhdUpo+9cL/yQZxPLBhHzs01Woz0o547XSzrZvcU+O7e+KO2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751701427; c=relaxed/simple;
-	bh=WEF59fri1fwXjBvvMO9QMW1xvg67eaPTRymMTMW4pUI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KZJM6DX2EgiZ1YWcz3x/bn86PtjxDQM3w+PRZ5KQn/e/RHWYMexI4WcJMlrKoiuWInZb22TxylDacd1tWNaEqAgmp3AY+gCNLn0WStzoJy5CW/BEAuunCU2OBaQInB02ptn+dhxjfX31AtyzMFKsbQdzfHlwgrqXWYZrrq/BtV0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FbNTWIVg; arc=none smtp.client-ip=95.215.58.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <031be49c-b079-40c3-af92-7ab3abeec6b3@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1751701424;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0cOvaEMZDlYCZuGP3rV6CtMosiqfse3Z99B9fDQMSYw=;
-	b=FbNTWIVgOlZtetO3M0PMTBYjNEGkFB6gofMu0uuxu6L278lqSckZEj5A5BLsbZQmMt9GSy
-	5xXYY4i67hFkR0gDmGta1AFupbhMqb6ObtZD6RAlwW/dBxCJ9FmIj3zYA4/rGw0hg4c65P
-	R+Kats95irR9U7JcEne0wYdhlMeA/EQ=
-Date: Sat, 5 Jul 2025 00:43:36 -0700
+	s=arc-20240116; t=1751785224; c=relaxed/simple;
+	bh=27PYfGl47rsGn3Zobkmo29Q/O40zNNDdUkiDFpDCEzM=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=S1YjIsY3P+YFjqh2YZQYhHcJUmwwbHFHSm3HPLXAiLIeLN1aypCuI27WD9K79tqQ6X8nRodUaXNt6ABYKkTymxNyrVFgyIoqiXfibAOdVqUP5hqbAiARcb4VVa9/6OT0EQKG/GrBT0VOSYbAwwTh3fEEYWDj+YHf9wEWa98htdk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l3SatRWw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6302CC4CEFA
+	for <kvm@vger.kernel.org>; Sun,  6 Jul 2025 07:00:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751785224;
+	bh=27PYfGl47rsGn3Zobkmo29Q/O40zNNDdUkiDFpDCEzM=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=l3SatRWwzzFYb9n+solqHtWH2ThuEYFft52IR3T3oon008T0rJOJcw0ns4+afiKh+
+	 dcip/g7n4VLSla+N0xb1TNIwZjTRi/LOd6ROF9k+PBRzPbt018RonEXcQm7uTA52wt
+	 lAJN88jO/uTI/yvHB9TMNAK9rgTiCWR/mmcaaEPWdGuuhjVbW8MZ5wGcqkp9ldJqIn
+	 Pt252DNeDEgVGU6Cm7mrfhpp3PXl9/hawbi2MMEX7OWppLtKogptomiRGr3uvuNHtw
+	 39sAIUno2NkZaRBbfuchrM06aKiBZ4k8Z82IXm/DlJJLt84cFiR21Oj1LHUNPE9lzD
+	 T1XU7dE+3C2lA==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 5AA9FC53BBF; Sun,  6 Jul 2025 07:00:24 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: kvm@vger.kernel.org
+Subject: [Bug 219787] Guest's applications crash with EXCEPTION_SINGLE_STEP
+ (0x80000004)
+Date: Sun, 06 Jul 2025 07:00:23 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: aros@gmx.com
+X-Bugzilla-Status: RESOLVED
+X-Bugzilla-Resolution: CODE_FIX
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_status resolution
+Message-ID: <bug-219787-28872-IAgqH9R4VE@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-219787-28872@https.bugzilla.kernel.org/>
+References: <bug-219787-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH 0/2] Few timer and AIA fixes for KVM RISC-V
-To: Anup Patel <apatel@ventanamicro.com>
-Cc: Palmer Dabbelt <palmer@dabbelt.com>,
- Paul Walmsley <paul.walmsley@sifive.com>, Alexandre Ghiti <alex@ghiti.fr>,
- Andrew Jones <ajones@ventanamicro.com>, Anup Patel <anup@brainfault.org>,
- kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
- linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20250704153838.6575-1-apatel@ventanamicro.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Atish Patra <atish.patra@linux.dev>
-In-Reply-To: <20250704153838.6575-1-apatel@ventanamicro.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
+https://bugzilla.kernel.org/show_bug.cgi?id=3D219787
 
-On 7/4/25 8:38 AM, Anup Patel wrote:
-> The RISC-V Privileged specificaiton says the following: "WFI is also
-> required to resume execution for locally enabled interrupts pending
-> at any privilege level, regardless of the global interrupt enable at
-> each privilege level."
->
-> Based on the above, if there is pending VS-timer interrupt when the
-> host (aka HS-mode) executes WFI then such a WFI will simply become NOP
-> and not do anything. This result in QEMU RISC-V consuming a lot of CPU
-> time on the x86 machine where it is running. The PATCH1 solves this
-> issue by adding appropriate cleanup in KVM RISC-V timer virtualization.
->
-> As a result PATCH1, race conditions in updating HGEI[E|P] CSRs when a
-> VCPU is moved from one host CPU to another are being observed on QEMU
-> so the PATCH2 tries to minimize the chances of these race conditions.
->
-> Anup Patel (2):
->    RISC-V: KVM: Disable vstimecmp before exiting to user-space
->    RISC-V: KVM: Move HGEI[E|P] CSR access to IMSIC virtualization
->
->   arch/riscv/include/asm/kvm_aia.h |  4 ++-
->   arch/riscv/kvm/aia.c             | 51 +++++---------------------------
->   arch/riscv/kvm/aia_imsic.c       | 45 ++++++++++++++++++++++++++++
->   arch/riscv/kvm/vcpu.c            |  2 --
->   arch/riscv/kvm/vcpu_timer.c      | 16 ++++++++++
->   5 files changed, 71 insertions(+), 47 deletions(-)
->
-For the entire series :
+Artem S. Tashkinov (aros@gmx.com) changed:
 
-Tested-by: Atish Patra <atishp@rivosinc.com>
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+             Status|NEW                         |RESOLVED
+         Resolution|---                         |CODE_FIX
+
+--- Comment #22 from Artem S. Tashkinov (aros@gmx.com) ---
+(In reply to Brian from comment #21)
+> How can I still have the problem on Ubuntu 6.14.0-22-generic with VMware
+> Workstation and VirtualBox?
+
+VMWare Workstation and VirtualBox use their own supervisors (kernel modules=
+).
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are watching the assignee of the bug.=
 
