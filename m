@@ -1,46 +1,46 @@
-Return-Path: <kvm+bounces-51626-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51627-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EED82AFA5EB
-	for <lists+kvm@lfdr.de>; Sun,  6 Jul 2025 16:40:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B0FEAFA5EF
+	for <lists+kvm@lfdr.de>; Sun,  6 Jul 2025 16:40:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 541AA16F176
-	for <lists+kvm@lfdr.de>; Sun,  6 Jul 2025 14:40:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BBD0F189B8C1
+	for <lists+kvm@lfdr.de>; Sun,  6 Jul 2025 14:40:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03A5428A724;
-	Sun,  6 Jul 2025 14:36:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35D8C28B7D4;
+	Sun,  6 Jul 2025 14:36:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rb39vlJC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N0ZgnBp9"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BDA628A3FC;
-	Sun,  6 Jul 2025 14:36:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F77E28AAFE;
+	Sun,  6 Jul 2025 14:36:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751812600; cv=none; b=NOJSO0CkoW1F/wBdStEveqGAoTClMvTCvnBNoRj1WLncSAay42t0jR7O0h56yG+NiDNaNgFqCdUOtnVwK/RQ0nAKVQDfWiOAHcK7Abzn6mUMwS7/TY0XG+TDPhxQ4o8ypy0EJoPdBZF+J/xJp6A2wq7wRNuht8aLsD4RuiKG2Kk=
+	t=1751812602; cv=none; b=ps9t8qI9Vcx3gLe+cMk+ukSGN1w7DNA/4wh3OuGL3cbB0thcubLx162mA+KPoASuzWG6sVbjoYYgODk47w4a5w9+ujaM8Cn6bDHQ3i9LI6RgGm/WwFrP97jgyKMQBAt+r69F9YSZfKEsZ/XJsodlr5tI+a/C7TJPM/jtfV0dWS8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751812600; c=relaxed/simple;
-	bh=glRBi2ARDp3d+Stsv79iYRajcXAB16Ljdcta010d3iw=;
+	s=arc-20240116; t=1751812602; c=relaxed/simple;
+	bh=hely8rCeQBZS770H5X6E0gNUH0kghs8qNa/SePVXMhs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Y+bzwQmCiNh40dpbIyNNoWvYwhIMthpcxfloSwKHl1iVczQmohj2Xeu8dK3jqznMxllB0Sc4ZrTZr14sDQYGZtFYweUmXfd+l8OMPYsgvru6HM7urJW95JI4Cpz73+qa+Q2nBnooqsDSaAhBpFRM7g2TdDSPB1oByWrPdBB5ACM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rb39vlJC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82A09C4CEED;
-	Sun,  6 Jul 2025 14:36:37 +0000 (UTC)
+	 MIME-Version; b=V8OivHlijofE3jEa8wpSSnh1V1TmTSZD0Mghb0hftlMU7lWNdGwOQinTehysvzrPBgVvKlMUOcvx8g7kYu924vn5+3quxE4F2Xl1zPFq5CQDBb5N+mSboBS07Ar5qz8s0ta+CMzJbh+lFmdUf4qSeOyl1iEhTQ03r3WMN3OXkcE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N0ZgnBp9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE09FC4CEF5;
+	Sun,  6 Jul 2025 14:36:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751812599;
-	bh=glRBi2ARDp3d+Stsv79iYRajcXAB16Ljdcta010d3iw=;
+	s=k20201202; t=1751812602;
+	bh=hely8rCeQBZS770H5X6E0gNUH0kghs8qNa/SePVXMhs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Rb39vlJCKeQwVdPoO/bdw5hvXKkd3cqPAyVwOMlpGBCHBuAbkPjUuOFF+Skkg3SHw
-	 Qi/4h8679eEnUCSbDGbPx5CFn6ScV+cHOdhFEdR+mGgndyfLMrRkOKalzZ0lv6D83g
-	 fHa6CLIWd0av4S4LyFmJUFDTz+kfEQuDYQLK4pPOphpNNsYQgj2L0xNSv6oXxuNCJ6
-	 EkYNmBpK8wuvMc7GfoyeZ8iX8bRMjusJk2gCyhsON+kFJ0rQmPVMVgvw0oXhBIVKR7
-	 xvGoboZXv3412PwIrJB/CVcAcuoDOTPljmwRv/EZDLpGR3KvDmgvVSO0/SwQR2oq87
-	 0C44YUNKj4r8A==
+	b=N0ZgnBp9YJ0UPchsvkNm4Jl8YLOp3FgQq3vRwPImT8zZTiwUzKbkm61vMgG44uuUp
+	 Bw6wcv+tkgc0SMhw+205GtPxxKjIixNrNNH1pZDki24F8mHiQFO7K/8AXbqBhb0YMy
+	 RR3Xsa8FB4MFQe6wKLrCzaH5u9Pnb40v0E6IdAQSO6IEnrrKVva31tS3ETN3R9eXkj
+	 VISu+08ZhhW5aPP7k12X0jDcTu4dgf6CuOwWx8qBwsuMAT7SfPCY1MHth0X886q7q/
+	 T4c+3Ee8KmK2VfytHViGO2UxV2hYD2bQgmBULGo6JGYpTK0gTCiM/ShN4NPkmlTgRZ
+	 CmglaNfB+AmmA==
 From: Mario Limonciello <superm1@kernel.org>
 To: David Airlie <airlied@gmail.com>,
 	Bjorn Helgaas <bhelgaas@google.com>
@@ -66,11 +66,10 @@ Cc: Alex Deucher <alexander.deucher@amd.com>,
 	kvm@vger.kernel.org (open list:VFIO DRIVER),
 	linux-sound@vger.kernel.org (open list:SOUND),
 	Daniel Dadap <ddadap@nvidia.com>,
-	Mario Limonciello <mario.limonciello@amd.com>,
-	kernel test robot <lkp@intel.com>
-Subject: [PATCH v7 6/9] Fix access to video_is_primary_device() when compiled without CONFIG_VIDEO
-Date: Sun,  6 Jul 2025 09:36:10 -0500
-Message-ID: <20250706143613.1972252-7-superm1@kernel.org>
+	Mario Limonciello <mario.limonciello@amd.com>
+Subject: [PATCH v7 7/9] PCI/VGA: Replace vga_is_firmware_default() with a screen info check
+Date: Sun,  6 Jul 2025 09:36:11 -0500
+Message-ID: <20250706143613.1972252-8-superm1@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250706143613.1972252-1-superm1@kernel.org>
 References: <20250706143613.1972252-1-superm1@kernel.org>
@@ -84,70 +83,67 @@ Content-Transfer-Encoding: 8bit
 
 From: Mario Limonciello <mario.limonciello@amd.com>
 
-When compiled without CONFIG_VIDEO the architecture specific
-implementations of video_is_primary_device() include prototypes and
-assume that video-common.c will be linked. Guard against this so that the
-fallback inline implementation that returns false will be used when
-compiled without CONFIG_VIDEO.
+vga_is_firmware_default() checks firmware resources to find the owner
+framebuffer resources to find the firmware PCI device.  This is an
+open coded implementation of screen_info_pci_dev().  Switch to using
+screen_info_pci_dev() instead.
 
-Acked-by: Thomas Zimmermann <tzimmermann@suse.de>
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202506221312.49Fy1aNA-lkp@intel.com/
+Acked-by: Bjorn Helgaas <bhelgaas@google.com>
+Suggested-by: Thomas Zimmermann <tzimmermann@suse.de>
 Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
 ---
+v6:
+ * fix lkp robot error
 v5:
- * add tag
-v4:
- * new patch
+ * split from next patch
 ---
- arch/parisc/include/asm/video.h | 2 +-
- arch/sparc/include/asm/video.h  | 2 ++
- arch/x86/include/asm/video.h    | 2 ++
- 3 files changed, 5 insertions(+), 1 deletion(-)
+ drivers/pci/vgaarb.c | 31 +++++--------------------------
+ 1 file changed, 5 insertions(+), 26 deletions(-)
 
-diff --git a/arch/parisc/include/asm/video.h b/arch/parisc/include/asm/video.h
-index c5dff3223194a..a9d50ebd6e769 100644
---- a/arch/parisc/include/asm/video.h
-+++ b/arch/parisc/include/asm/video.h
-@@ -6,7 +6,7 @@
+diff --git a/drivers/pci/vgaarb.c b/drivers/pci/vgaarb.c
+index 78748e8d2dbae..b58f94ee48916 100644
+--- a/drivers/pci/vgaarb.c
++++ b/drivers/pci/vgaarb.c
+@@ -556,34 +556,13 @@ EXPORT_SYMBOL(vga_put);
  
- struct device;
- 
--#if defined(CONFIG_STI_CORE)
-+#if defined(CONFIG_STI_CORE) && defined(CONFIG_VIDEO)
- bool video_is_primary_device(struct device *dev);
- #define video_is_primary_device video_is_primary_device
- #endif
-diff --git a/arch/sparc/include/asm/video.h b/arch/sparc/include/asm/video.h
-index a6f48f52db584..773717b6d4914 100644
---- a/arch/sparc/include/asm/video.h
-+++ b/arch/sparc/include/asm/video.h
-@@ -19,8 +19,10 @@ static inline pgprot_t pgprot_framebuffer(pgprot_t prot,
- #define pgprot_framebuffer pgprot_framebuffer
- #endif
- 
-+#ifdef CONFIG_VIDEO
- bool video_is_primary_device(struct device *dev);
- #define video_is_primary_device video_is_primary_device
-+#endif
- 
- static inline void fb_memcpy_fromio(void *to, const volatile void __iomem *from, size_t n)
+ static bool vga_is_firmware_default(struct pci_dev *pdev)
  {
-diff --git a/arch/x86/include/asm/video.h b/arch/x86/include/asm/video.h
-index 0950c9535fae9..08ec328203ef8 100644
---- a/arch/x86/include/asm/video.h
-+++ b/arch/x86/include/asm/video.h
-@@ -13,8 +13,10 @@ pgprot_t pgprot_framebuffer(pgprot_t prot,
- 			    unsigned long offset);
- #define pgprot_framebuffer pgprot_framebuffer
+-#if defined(CONFIG_X86)
+-	u64 base = screen_info.lfb_base;
+-	u64 size = screen_info.lfb_size;
+-	struct resource *r;
+-	u64 limit;
++#ifdef CONFIG_SCREEN_INFO
++	struct screen_info *si = &screen_info;
  
-+#ifdef CONFIG_VIDEO
- bool video_is_primary_device(struct device *dev);
- #define video_is_primary_device video_is_primary_device
+-	/* Select the device owning the boot framebuffer if there is one */
+-
+-	if (screen_info.capabilities & VIDEO_CAPABILITY_64BIT_BASE)
+-		base |= (u64)screen_info.ext_lfb_base << 32;
+-
+-	limit = base + size;
+-
+-	/* Does firmware framebuffer belong to us? */
+-	pci_dev_for_each_resource(pdev, r) {
+-		if (resource_type(r) != IORESOURCE_MEM)
+-			continue;
+-
+-		if (!r->start || !r->end)
+-			continue;
+-
+-		if (base < r->start || limit >= r->end)
+-			continue;
+-
+-		return true;
+-	}
+-#endif
++	return pdev == screen_info_pci_dev(si);
++#else
+ 	return false;
 +#endif
+ }
  
- #include <asm-generic/video.h>
- 
+ static bool vga_arb_integrated_gpu(struct device *dev)
 -- 
 2.43.0
 
