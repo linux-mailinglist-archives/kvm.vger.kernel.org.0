@@ -1,216 +1,112 @@
-Return-Path: <kvm+bounces-51629-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51630-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BF3FAFA5F5
-	for <lists+kvm@lfdr.de>; Sun,  6 Jul 2025 16:41:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFE5CAFA697
+	for <lists+kvm@lfdr.de>; Sun,  6 Jul 2025 18:51:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED70D3B5121
-	for <lists+kvm@lfdr.de>; Sun,  6 Jul 2025 14:40:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F7B718923B5
+	for <lists+kvm@lfdr.de>; Sun,  6 Jul 2025 16:51:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0D0128C86E;
-	Sun,  6 Jul 2025 14:36:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0455E288C30;
+	Sun,  6 Jul 2025 16:51:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sYVYeC+6"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bVDC+am/"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBE7128C2DC;
-	Sun,  6 Jul 2025 14:36:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0703A78F36;
+	Sun,  6 Jul 2025 16:51:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751812607; cv=none; b=kFNLa8c0KMm4fDcvPES1CozCYZuwtwRfM3RlI01J4FH4e0em82wFoLtGdo3EdSGNbww7Mn6BLUsweLCFD6Ym/oappIDeceegKrzoBRf3lxAUhX9Bo//NF05OKquhpkhxa0jm7IRmZKa+hM4Vd+AF+xt5S6f2jblPBM7SvYkd5SU=
+	t=1751820690; cv=none; b=gFgkg0tSSYqt6QabYRwfuIJCIVqi/tewlauEvkpb4l8YXpliVTQbDS28V2g9WIUqz0s6HAl9B2ULDFYbw35z5/IVlg0UjSlUoclPgByw6tVt29jfOvoYyTdzODMOay945WVsb4KrH7x5TKQ266fXS/3DDLUPJ+kcKudSykM6V4U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751812607; c=relaxed/simple;
-	bh=mA7SFMfHy8OinIxgtmu9yWbldbYt6k6q8NSeQegNnJA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rjwmW3d+zmb44h1qe9P7JWlotp93BpNvVkho1kl7iXDCgP5ksNWONugjnP2XiV73FO86YxyIqBQJhkNWNsx2vgFNCOagQMN4aUMkaqFDtQqIdcHHiaYRaO7UvwE5imtn54z8FbIcWEhyzLX84y8RcEWkUCyXD8rfkRYtV4Q4Z8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sYVYeC+6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BA94C4CEF4;
-	Sun,  6 Jul 2025 14:36:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751812606;
-	bh=mA7SFMfHy8OinIxgtmu9yWbldbYt6k6q8NSeQegNnJA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=sYVYeC+6e5OzGIchOu7GvaySxrAMZ+Bls0YeuisZup4XCUIRLsoBGtO+yoGMLuEbz
-	 BWzz0dfPhCzA6rCFKmi8QdDoeOhV3mmLqLskqGGhMFiVKHcEBvAvYWfBgNlI8N+fdI
-	 lpPH3flaG6PJJbHwr5ae62YYTCuxr5XkC2nLmfi0BP+InVH4+f3b9ETwE4p91f5LtX
-	 NXL01QEjUR0etWMbpJqif9KssgNkjfwwUywJYxEd6XRvZKTeMewbJbFfifB9L2wE1a
-	 IxlMW4hX3ZO+lWVzAAsGmTojyQt4cE9AOSC39/BlHNEPVXvwresJ6XINXMYLST9anZ
-	 6cS53xc8Tkymg==
-From: Mario Limonciello <superm1@kernel.org>
-To: David Airlie <airlied@gmail.com>,
-	Bjorn Helgaas <bhelgaas@google.com>
-Cc: Alex Deucher <alexander.deucher@amd.com>,
-	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
-	Simona Vetter <simona@ffwll.ch>,
-	Lukas Wunner <lukas@wunner.de>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Lu Baolu <baolu.lu@linux.intel.com>,
-	Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Jaroslav Kysela <perex@perex.cz>,
-	Takashi Iwai <tiwai@suse.com>,
-	dri-devel@lists.freedesktop.org (open list:DRM DRIVERS),
-	linux-kernel@vger.kernel.org (open list),
-	iommu@lists.linux.dev (open list:INTEL IOMMU (VT-d)),
-	linux-pci@vger.kernel.org (open list:PCI SUBSYSTEM),
-	kvm@vger.kernel.org (open list:VFIO DRIVER),
-	linux-sound@vger.kernel.org (open list:SOUND),
-	Daniel Dadap <ddadap@nvidia.com>,
-	Mario Limonciello <mario.limonciello@amd.com>
-Subject: [PATCH v7 9/9] PCI: Add a new 'boot_display' attribute
-Date: Sun,  6 Jul 2025 09:36:13 -0500
-Message-ID: <20250706143613.1972252-10-superm1@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250706143613.1972252-1-superm1@kernel.org>
-References: <20250706143613.1972252-1-superm1@kernel.org>
+	s=arc-20240116; t=1751820690; c=relaxed/simple;
+	bh=nlEyQhEw16C79uO0evj+Vjv3rpn6lWiDlaXgWwj9gk0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bRaGd9loSYWvKcCMfBr2PEs4Kfs6WPqAToIY2HQiBDTLwps06MgPpAhFl6OXuoSXEuLHCKWSnzAO2ZkQQLkZu+25vO3DZJDvGBVC6fcaCcX8dhxZFhvhcNl5w0zrxP2JHtM29VqDYCkpT8fLtLaStNqae67WQ2UMzKzS6BACqT8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bVDC+am/; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1751820688; x=1783356688;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=nlEyQhEw16C79uO0evj+Vjv3rpn6lWiDlaXgWwj9gk0=;
+  b=bVDC+am/KoGnhT6HdkEEkfzan3tS0Am9cLq4g4UQ38JMsWWcZF++gcYD
+   frPkVj+jVob4uNRIVeZbqLw+eSd2XRKhS6vuUZHR8MccmtgtA0o8SqTb/
+   S40BDNjWTX51ylpv9xcAel4lw2mRRnSfFyTZNDROzkLfAfrNo88dJBUvO
+   Fw+17l19msbsUrPWsjK+o+zfz9YASa6GAetE4hvMykt+0TqGzAQQfi4cd
+   GRK5sekzWOhIfujz67U522KeJZTYpxll34cuToPXc/H5BkQszGAtampWI
+   J0DLUDE3LIAmzRkr83tiKxrdvQzZfU7obH9YVod8n41TAnl0nWuofb8/O
+   g==;
+X-CSE-ConnectionGUID: CajnHK0qQM+nFdTW7fi0Sw==
+X-CSE-MsgGUID: n9HMrGxsQhukRWe1ZN9Oqw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11486"; a="65114753"
+X-IronPort-AV: E=Sophos;i="6.16,292,1744095600"; 
+   d="scan'208";a="65114753"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2025 09:51:27 -0700
+X-CSE-ConnectionGUID: cJxF1SzoQUyj4GSjmlQnVw==
+X-CSE-MsgGUID: F8wvTVUVSL6IUAGQGoTQbQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,292,1744095600"; 
+   d="scan'208";a="192205025"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2025 09:51:21 -0700
+Message-ID: <88443d81-78ac-45ad-b359-b328b9db5829@intel.com>
+Date: Mon, 7 Jul 2025 00:51:14 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v11 00/23] Enable CET Virtualization
+To: Chao Gao <chao.gao@intel.com>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, x86@kernel.org, seanjc@google.com,
+ pbonzini@redhat.com, dave.hansen@intel.com
+Cc: rick.p.edgecombe@intel.com, mlevitsk@redhat.com, john.allen@amd.com,
+ weijiang.yang@intel.com, minipli@grsecurity.net, xin@zytor.com,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+ Thomas Gleixner <tglx@linutronix.de>
+References: <20250704085027.182163-1-chao.gao@intel.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20250704085027.182163-1-chao.gao@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Mario Limonciello <mario.limonciello@amd.com>
+Hi Chao,
 
-On systems with multiple GPUs there can be uncertainty which GPU is the
-primary one used to drive the display at bootup. In order to disambiguate
-this add a new sysfs attribute 'boot_display' that uses the output of
-video_is_primary_device() to populate whether a PCI device was used for
-driving the display.
+On 7/4/2025 4:49 PM, Chao Gao wrote:
+> Tests:
+> ======================
+> This series passed basic CET user shadow stack test and kernel IBT test in L1
+> and L2 guest.
+> The patch series_has_ impact to existing vmx test cases in KVM-unit-tests,the
+> failures have been fixed here[1].
+> One new selftest app[2] is introduced for testing CET MSRs accessibilities.
+> 
+> Note, this series hasn't been tested on AMD platform yet.
+> 
+> To run user SHSTK test and kernel IBT test in guest, an CET capable platform
+> is required, e.g., Sapphire Rapids server, and follow below steps to build
+> the binaries:
+> 
+> 1. Host kernel: Apply this series to mainline kernel (>= v6.6) and build.
+> 
+> 2. Guest kernel: Pull kernel (>= v6.6), opt-in CONFIG_X86_KERNEL_IBT
+> and CONFIG_X86_USER_SHADOW_STACK options. Build with CET enabled gcc versions
+> (>= 8.5.0).
+> 
+> 3. Apply CET QEMU patches[3] before build mainline QEMU.
 
-Reviewed-by: Thomas Zimmermann <tzimmermann@suse.de>
-Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
----
-v7:
- * fix lkp failure
- * Add tag
-v6:
- * Only show for the device that is boot display
- * Only create after PCI device sysfs files are initialized to ensure
-   that resources are ready.
-v4:
- * new patch
----
- Documentation/ABI/testing/sysfs-bus-pci |  8 +++++
- drivers/pci/pci-sysfs.c                 | 46 +++++++++++++++++++++++++
- 2 files changed, 54 insertions(+)
-
-diff --git a/Documentation/ABI/testing/sysfs-bus-pci b/Documentation/ABI/testing/sysfs-bus-pci
-index 69f952fffec72..8b455b1a58852 100644
---- a/Documentation/ABI/testing/sysfs-bus-pci
-+++ b/Documentation/ABI/testing/sysfs-bus-pci
-@@ -612,3 +612,11 @@ Description:
- 
- 		  # ls doe_features
- 		  0001:01        0001:02        doe_discovery
-+
-+What:		/sys/bus/pci/devices/.../boot_display
-+Date:		October 2025
-+Contact:	Linux PCI developers <linux-pci@vger.kernel.org>
-+Description:
-+		This file indicates the device was used as a boot
-+		display. If the device was used as the boot display, the file
-+		will be present and contain "1".
-diff --git a/drivers/pci/pci-sysfs.c b/drivers/pci/pci-sysfs.c
-index 268c69daa4d57..6b1a0ae254d3a 100644
---- a/drivers/pci/pci-sysfs.c
-+++ b/drivers/pci/pci-sysfs.c
-@@ -30,6 +30,7 @@
- #include <linux/msi.h>
- #include <linux/of.h>
- #include <linux/aperture.h>
-+#include <asm/video.h>
- #include "pci.h"
- 
- #ifndef ARCH_PCI_DEV_GROUPS
-@@ -679,6 +680,13 @@ const struct attribute_group *pcibus_groups[] = {
- 	NULL,
- };
- 
-+static ssize_t boot_display_show(struct device *dev, struct device_attribute *attr,
-+				 char *buf)
-+{
-+	return sysfs_emit(buf, "1\n");
-+}
-+static DEVICE_ATTR_RO(boot_display);
-+
- static ssize_t boot_vga_show(struct device *dev, struct device_attribute *attr,
- 			     char *buf)
- {
-@@ -1051,6 +1059,37 @@ void pci_remove_legacy_files(struct pci_bus *b)
- }
- #endif /* HAVE_PCI_LEGACY */
- 
-+/**
-+ * pci_create_boot_display_file - create a file in sysfs for @dev
-+ * @pdev: dev in question
-+ *
-+ * Creates a file `boot_display` in sysfs for the PCI device @pdev
-+ * if it is the boot display device.
-+ */
-+static int pci_create_boot_display_file(struct pci_dev *pdev)
-+{
-+#ifdef CONFIG_VIDEO
-+	if (video_is_primary_device(&pdev->dev))
-+		return sysfs_create_file(&pdev->dev.kobj, &dev_attr_boot_display.attr);
-+#endif
-+	return 0;
-+}
-+
-+/**
-+ * pci_remove_boot_display_file - remove the boot display file for @dev
-+ * @pdev: dev in question
-+ *
-+ * Removes the file `boot_display` in sysfs for the PCI device @pdev
-+ * if it is the boot display device.
-+ */
-+static void pci_remove_boot_display_file(struct pci_dev *pdev)
-+{
-+#ifdef CONFIG_VIDEO
-+	if (video_is_primary_device(&pdev->dev))
-+		sysfs_remove_file(&pdev->dev.kobj, &dev_attr_boot_display.attr);
-+#endif
-+}
-+
- #if defined(HAVE_PCI_MMAP) || defined(ARCH_GENERIC_PCI_MMAP_RESOURCE)
- /**
-  * pci_mmap_resource - map a PCI resource into user memory space
-@@ -1654,9 +1693,15 @@ static const struct attribute_group pci_dev_resource_resize_group = {
- 
- int __must_check pci_create_sysfs_dev_files(struct pci_dev *pdev)
- {
-+	int retval;
-+
- 	if (!sysfs_initialized)
- 		return -EACCES;
- 
-+	retval = pci_create_boot_display_file(pdev);
-+	if (retval)
-+		return retval;
-+
- 	return pci_create_resource_files(pdev);
- }
- 
-@@ -1671,6 +1716,7 @@ void pci_remove_sysfs_dev_files(struct pci_dev *pdev)
- 	if (!sysfs_initialized)
- 		return;
- 
-+	pci_remove_boot_display_file(pdev);
- 	pci_remove_resource_files(pdev);
- }
- 
--- 
-2.43.0
-
+You forgot to provide the links of [1][2][3].
 
