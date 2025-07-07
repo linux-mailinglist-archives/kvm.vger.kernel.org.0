@@ -1,130 +1,214 @@
-Return-Path: <kvm+bounces-51715-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51716-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F398EAFBE97
-	for <lists+kvm@lfdr.de>; Tue,  8 Jul 2025 01:25:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 45262AFBE9E
+	for <lists+kvm@lfdr.de>; Tue,  8 Jul 2025 01:32:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C457B3B1B9E
-	for <lists+kvm@lfdr.de>; Mon,  7 Jul 2025 23:25:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E6E3E3BBBF1
+	for <lists+kvm@lfdr.de>; Mon,  7 Jul 2025 23:31:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74172289E2C;
-	Mon,  7 Jul 2025 23:25:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C7C82868AD;
+	Mon,  7 Jul 2025 23:32:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hBKybkcB"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wfmjdwhJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E25417DFE7
-	for <kvm@vger.kernel.org>; Mon,  7 Jul 2025 23:25:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A1114C6E
+	for <kvm@vger.kernel.org>; Mon,  7 Jul 2025 23:32:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751930717; cv=none; b=CzOw1ACb77f0wQR7g3bEGmxxxAccyS4i2PScX8ZZreNzZv/glJ96jnPMTP6b+KwGjt1q/prB2Boh9XqDViZLLpeW5rRpHK/zFGejvm+to7ZrTk+GZ23cYJm9kkXFPjz2lRgKD5IFafpJ/nH4yH7ManaztjMhTokh4pAboLE7WUY=
+	t=1751931131; cv=none; b=ubzDYhL1DzzS9v8y2CwtpBJZemOcW3HfUPIuo389lxwNMMwvf4dvJQPCuBzCI41o3UUgKuFW666buHAPpVNPJ19YcmOUkQTvvSIRN4hyM5+XyzBJ968mu+0CvvTn2sfbJpnxTqwOAK7RML+8dZGIZBIQMinlDcuU7uFckAVmI1o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751930717; c=relaxed/simple;
-	bh=JHbksS7Ik6LaoWpSJU26eNZHwnoWAXLMnPu9PY2UpqE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=LsZpTcWod3HTxJOy6yg06qOgxaLq8BGRt7sZYe6u5tHgAnbRRSc3C16T6I9OvFl7PM0xoxvj5NY2MoO3YZrBQrAFn1sX2ge6l1X0Vjdf5b7he7kpar463dF3BKHFSM3uSPtCHbp1AyCyIb3zc4cDBvcFegaKNbMW/uHbIEhRVbE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hBKybkcB; arc=none smtp.client-ip=209.85.216.73
+	s=arc-20240116; t=1751931131; c=relaxed/simple;
+	bh=1ffb14bfAcbOruhUZZk4RbIL9SB3DbmZ8qKgrgg4Hec=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=k3crJTT0iWLeGq318T/E1Dwatzenao/8azix3G1hqpYu4CPcMHLyFt7PmNJRiq1xsOBm37OmMu6x7nQqjzSbvl9wwabSCAeE3rA5KUNkcXoGw8rekGxPGXHbetz5Bq8GaGKdM77ylgZg3MHdtubsGuMCh+dkHguhP5GmJbUbEn4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wfmjdwhJ; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3132c1942a1so5345675a91.2
-        for <kvm@vger.kernel.org>; Mon, 07 Jul 2025 16:25:16 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-235e389599fso98575ad.0
+        for <kvm@vger.kernel.org>; Mon, 07 Jul 2025 16:32:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1751930716; x=1752535516; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JHbksS7Ik6LaoWpSJU26eNZHwnoWAXLMnPu9PY2UpqE=;
-        b=hBKybkcB3e5Dt9TDYEYCScfGA6befovCy1IXOtsYuFtk4kqSyhdThoQM1eaDZs6Npc
-         hzFkjzoXBSZ+hv6Vly9GVeAiMpdSt7qnxiiapTBqD5GOE6hraA5+JfqndWL9P1eOO05a
-         ZAGbBlERJDeYA09NI/Mee514Pufi8wJ/LOUwc49eCD2QIbirV8sLbvsj3b0i/kwh+Vna
-         KqTGp6ItLIyR51mEpsZjrpxiUTCMHZfklFd3LZHy6AfM7u1ZYF2a70Lw5TfyH7S9FHAY
-         q0tEix/1rSp5ZDBJBa8NYhThcKdYkj/sIw++MF/MaZIPkWoCLSeSZP3V91nwMfYi/iYx
-         nxcQ==
+        d=google.com; s=20230601; t=1751931129; x=1752535929; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=b25Saen0Ouv9TFO7AIEKB3BvyD7uu12IqNtwgf3v9N0=;
+        b=wfmjdwhJkSyl/IlhRGziETMDJhnvhg82N11FtSFwQl/7ZFa6dNWJkexhdlvq1Wt+fx
+         pPcTkTH6JGgQAOYNGASyrhN1uqR+SBklNs0O1qCQ9Lj/ho571+aJxAHUMj/v9l80OHyu
+         tUuvOZ59BZCRIPPfR3UOJjt4JoGpcRLa6fz3QmztDM0xBDwXY6TEXSnQdZCwOYAwwyTx
+         v8NfRnk6q4AUGTlSxAxP6CY9yZY/WpZL9B+QuYtDGIyt0wX2CoVOJiPQXqqs/iJtLwqS
+         ImX0q05r7nZbyk24ESagf+xU/m3kbU7qcGkmClKxvuGBJYoexyKiRjcvskXRXg1nPS8X
+         3Cdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751930716; x=1752535516;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JHbksS7Ik6LaoWpSJU26eNZHwnoWAXLMnPu9PY2UpqE=;
-        b=JIoQhvaYfMH8TPQQRORFB56N59JhyghGP86BYKhPZlauOyZJhlKj/Fmpqga6tEyb4z
-         KqmHlAwfFuJE/lgPu7PiOYTiIveca7Ax7GEByGEpe9Ce0ltL9hOLfavN4X9zBU4iQfsU
-         vSgAIWDVvWYYMHLy7pNhhyyygATrZRgXWmRWi50m3Fj0EVtGSXfgtfUvkJCgpXLbwA0a
-         +z5Duc+cOfZjLoFWeozyUCfIMyAkxjOvoUPMigIoE2ALQjBZXfmmi4DKuRNhSie7N+vt
-         mAwtBFcIRCBIxHg4lINmVQjEpPBYdVnwwEpOrMaEkBGMEHchiRGigdrfevc84Ri063O2
-         UTeA==
-X-Forwarded-Encrypted: i=1; AJvYcCUT1Als3xzkhZq2BJuDQGE8oKDFvuQ1494HYbWFQ6CMvlqQ4HsYeyhUXEd8EAp2qSr4V6E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZ5QgMU/K1D8d8RCBcQUPW1lch6UyfC7nAal0zIfLFjXzSL13x
-	1/nSDqLireFcFO2nmQ95i1of1/J9VZ8VO+Fy9+A8YGnL4Gv7O4wn97xcaKGOZSX1XGd7DVt3SK3
-	wIPM2nA==
-X-Google-Smtp-Source: AGHT+IHec07vkrbcNzUBZe/F6EmhpBPtyl7Ef0BOzGMA51wQ8QB8Pn/cPlRz3g6O/7DZmfJqJVUpfLdRuGc=
-X-Received: from pjbqx14.prod.google.com ([2002:a17:90b:3e4e:b0:312:e914:4548])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:37c8:b0:311:ab20:159d
- with SMTP id 98e67ed59e1d1-31aadd9ce5bmr19229725a91.19.1751930715704; Mon, 07
- Jul 2025 16:25:15 -0700 (PDT)
-Date: Mon, 7 Jul 2025 16:25:14 -0700
-In-Reply-To: <CAGtprH-Je5OL-djtsZ9nLbruuOqAJb0RCPAnPipC1CXr2XeTzQ@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1751931130; x=1752535930;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=b25Saen0Ouv9TFO7AIEKB3BvyD7uu12IqNtwgf3v9N0=;
+        b=Khems6qz0cwXTuwrtQnCWh/TCQXrhZGbmo1st2Exr0YD/0v1CvwDN6s+aiW/eqc/I5
+         3lO9RnHk8f+ri8OkisZ7HUfgtnx+NSlU/9t0SBqxRsAqJFu6TAcTj81x4JZYyQkFFTXw
+         61EEs5gmuICJHN2775ER98HzWyrzbNscAjSLGkhOCumZBy/fia09SUPG+JjnL4XjMXhS
+         Qn9yAhV/rIzuQkcfGTIGlxwOWwnlpZ+LVUOy2/YVfzIe1LUdKP57jFH6udNQ4LPnIxfQ
+         yAhP1UFnqZcW+S/XB4fO1S6lcNils6thl7pTUvRPyUpSK2tL2d21pQhuWNUtn6Rqn1D3
+         ViYg==
+X-Forwarded-Encrypted: i=1; AJvYcCVfGVdu7GeT35Io79yZvB7VExIaPtH0zNselTLxGZFfI5/Tcu8+9QNi5RDKE2yzErY2eHw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxmamRr6NvbBXAeX4UnwzY8NJ5opgc+T+dDgQnj3ngqevrpTbid
+	mPpiXoVIo5bUEHRG/N3Ir/mOdEBqREUWhSXkwDr6EAgkxAZzeh/zrJ83cJbAaWfzS7JanbJ6kBN
+	ZjHkzw1DKaqeHb+bY2YoY+dginJUTC7nQJq0KRO1NomLG8jaW4vx0ddcpKq+9sQ==
+X-Gm-Gg: ASbGncuXUhmyNAVu9njJZ4xSgbiv7fHI4E7cgruAYGRjRi2U5DHQnFjca+BpCUhJ0M+
+	quG3DUe32z6anyIXlu9yrL6SnQQc3w5obBb20XekGEIvZfB7uMhnAnj4M1NmwAqEY54yj7+oyxV
+	7stA0JUe9U7DrmRAvkrGeKPj8uWS1GmEmjuLQOZ0Uay5MHL2oBbybQA+Izf6AgMUbN2FfXnO6/z
+	A==
+X-Google-Smtp-Source: AGHT+IGqmRprZYTBLI8qv+P8RjDA1HbE3ENdRoMTXbFRRnjoRR+yK0qlEKy2k3qHP1SasQQQ8ZzgWChIrCrLnGg4qR8=
+X-Received: by 2002:a17:903:2f81:b0:23c:5f63:b67 with SMTP id
+ d9443c01a7336-23dd0f824a5mr1163805ad.4.1751931129206; Mon, 07 Jul 2025
+ 16:32:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <cover.1747264138.git.ackerleytng@google.com> <aFPGlAGEPzxlxM5g@yzhao56-desk.sh.intel.com>
- <d15bfdc8-e309-4041-b4c7-e8c3cdf78b26@intel.com> <CAGtprH-Kzn2kOGZ4JuNtUT53Hugw64M-_XMmhz_gCiDS6BAFtQ@mail.gmail.com>
- <aGIBGR8tLNYtbeWC@yzhao56-desk.sh.intel.com> <CAGtprH-83EOz8rrUjE+O8m7nUDjt=THyXx=kfft1xQry65mtQg@mail.gmail.com>
- <aGNw4ZJwlClvqezR@yzhao56-desk.sh.intel.com> <CAGtprH-Je5OL-djtsZ9nLbruuOqAJb0RCPAnPipC1CXr2XeTzQ@mail.gmail.com>
-Message-ID: <aGxXWvZCfhNaWISY@google.com>
-Subject: Re: [RFC PATCH v2 00/51] 1G page support for guest_memfd
-From: Sean Christopherson <seanjc@google.com>
-To: Vishal Annapurve <vannapurve@google.com>
-Cc: Yan Zhao <yan.y.zhao@intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	Ackerley Tng <ackerleytng@google.com>, kvm@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, x86@kernel.org, linux-fsdevel@vger.kernel.org, 
-	aik@amd.com, ajones@ventanamicro.com, akpm@linux-foundation.org, 
-	amoorthy@google.com, anthony.yznaga@oracle.com, anup@brainfault.org, 
-	aou@eecs.berkeley.edu, bfoster@redhat.com, binbin.wu@linux.intel.com, 
-	brauner@kernel.org, catalin.marinas@arm.com, chao.p.peng@intel.com, 
-	chenhuacai@kernel.org, dave.hansen@intel.com, david@redhat.com, 
-	dmatlack@google.com, dwmw@amazon.co.uk, erdemaktas@google.com, 
-	fan.du@intel.com, fvdl@google.com, graf@amazon.com, haibo1.xu@intel.com, 
-	hch@infradead.org, hughd@google.com, ira.weiny@intel.com, 
-	isaku.yamahata@intel.com, jack@suse.cz, james.morse@arm.com, 
-	jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, jhubbard@nvidia.com, 
-	jroedel@suse.de, jthoughton@google.com, jun.miao@intel.com, 
-	kai.huang@intel.com, keirf@google.com, kent.overstreet@linux.dev, 
-	kirill.shutemov@intel.com, liam.merwick@oracle.com, 
-	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, maz@kernel.org, 
-	mic@digikod.net, michael.roth@amd.com, mpe@ellerman.id.au, 
-	muchun.song@linux.dev, nikunj@amd.com, nsaenz@amazon.es, 
-	oliver.upton@linux.dev, palmer@dabbelt.com, pankaj.gupta@amd.com, 
-	paul.walmsley@sifive.com, pbonzini@redhat.com, pdurrant@amazon.co.uk, 
-	peterx@redhat.com, pgonda@google.com, pvorel@suse.cz, qperret@google.com, 
-	quic_cvanscha@quicinc.com, quic_eberman@quicinc.com, 
-	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com, richard.weiyang@gmail.com, 
-	rick.p.edgecombe@intel.com, rientjes@google.com, roypat@amazon.co.uk, 
-	rppt@kernel.org, shuah@kernel.org, steven.price@arm.com, 
-	steven.sistare@oracle.com, suzuki.poulose@arm.com, tabba@google.com, 
-	thomas.lendacky@amd.com, usama.arif@bytedance.com, vbabka@suse.cz, 
-	viro@zeniv.linux.org.uk, vkuznets@redhat.com, wei.w.wang@intel.com, 
-	will@kernel.org, willy@infradead.org, yilun.xu@intel.com, 
-	yuzenghui@huawei.com, zhiquan1.li@intel.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20250703153712.155600-1-adrian.hunter@intel.com>
+ <20250703153712.155600-3-adrian.hunter@intel.com> <CAGtprH8boLi3PjXqU=bXA8th0s7=XE4gtFL+6wmmGaRqWQvAMw@mail.gmail.com>
+ <2e444491-f296-4fa4-9221-036f9b010c1d@intel.com>
+In-Reply-To: <2e444491-f296-4fa4-9221-036f9b010c1d@intel.com>
+From: Vishal Annapurve <vannapurve@google.com>
+Date: Mon, 7 Jul 2025 16:31:56 -0700
+X-Gm-Features: Ac12FXwUanPwhUwd2qO24xrbiqz5Xe6HKml-XwovpsbcB_MYLVSiljzosapeYaw
+Message-ID: <CAGtprH8SqMH6GiRp=kgkUHxiPhtYDcrN8=AiudeTsS+7q2WGbQ@mail.gmail.com>
+Subject: Re: [PATCH V2 2/2] x86/tdx: Skip clearing reclaimed pages unless
+ X86_BUG_TDX_PW_MCE is present
+To: Adrian Hunter <adrian.hunter@intel.com>
+Cc: Dave Hansen <dave.hansen@linux.intel.com>, pbonzini@redhat.com, seanjc@google.com, 
+	Tony Luck <tony.luck@intel.com>, Borislav Petkov <bp@alien8.de>, Thomas Gleixner <tglx@linutronix.de>, 
+	Ingo Molnar <mingo@redhat.com>, x86@kernel.org, H Peter Anvin <hpa@zytor.com>, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, rick.p.edgecombe@intel.com, 
+	kirill.shutemov@linux.intel.com, kai.huang@intel.com, 
+	reinette.chatre@intel.com, xiaoyao.li@intel.com, 
+	tony.lindgren@linux.intel.com, binbin.wu@linux.intel.com, 
+	isaku.yamahata@intel.com, yan.y.zhao@intel.com, chao.gao@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jul 01, 2025, Vishal Annapurve wrote:
-> I would be curious to understand if we need zeroing on conversion for
-> Confidential VMs. If not, then the simple rule of zeroing on
-> allocation only will work for all usecases.
+On Thu, Jul 3, 2025 at 10:38=E2=80=AFPM Adrian Hunter <adrian.hunter@intel.=
+com> wrote:
+>
+> On 03/07/2025 20:06, Vishal Annapurve wrote:
+> > On Thu, Jul 3, 2025 at 8:37=E2=80=AFAM Adrian Hunter <adrian.hunter@int=
+el.com> wrote:
+> >>
+> >> Avoid clearing reclaimed TDX private pages unless the platform is affe=
+cted
+> >> by the X86_BUG_TDX_PW_MCE erratum. This significantly reduces VM shutd=
+own
+> >> time on unaffected systems.
+> >>
+> >> Background
+> >>
+> >> KVM currently clears reclaimed TDX private pages using MOVDIR64B, whic=
+h:
+> >>
+> >>    - Clears the TD Owner bit (which identifies TDX private memory) and
+> >>      integrity metadata without triggering integrity violations.
+> >>    - Clears poison from cache lines without consuming it, avoiding MCE=
+s on
+> >>      access (refer TDX Module Base spec. 16.5. Handling Machine Check
+> >>      Events during Guest TD Operation).
+> >>
+> >> The TDX module also uses MOVDIR64B to initialize private pages before =
+use.
+> >> If cache flushing is needed, it sets TDX_FEATURES.CLFLUSH_BEFORE_ALLOC=
+.
+> >> However, KVM currently flushes unconditionally, refer commit 94c477a75=
+1c7b
+> >> ("x86/virt/tdx: Add SEAMCALL wrappers to add TD private pages")
+> >>
+> >> In contrast, when private pages are reclaimed, the TDX Module handles
+> >> flushing via the TDH.PHYMEM.CACHE.WB SEAMCALL.
+> >>
+> >> Problem
+> >>
+> >> Clearing all private pages during VM shutdown is costly. For guests
+> >> with a large amount of memory it can take minutes.
+> >>
+> >> Solution
+> >>
+> >> TDX Module Base Architecture spec. documents that private pages reclai=
+med
+> >> from a TD should be initialized using MOVDIR64B, in order to avoid
+> >> integrity violation or TD bit mismatch detection when later being read
+> >> using a shared HKID, refer April 2025 spec. "Page Initialization" in
+> >> section "8.6.2. Platforms not Using ACT: Required Cache Flush and
+> >> Initialization by the Host VMM"
+> >>
+> >> That is an overstatement and will be clarified in coming versions of t=
+he
+> >> spec. In fact, as outlined in "Table 16.2: Non-ACT Platforms Checks on
+> >> Memory" and "Table 16.3: Non-ACT Platforms Checks on Memory Reads in L=
+i
+> >> Mode" in the same spec, there is no issue accessing such reclaimed pag=
+es
+> >> using a shared key that does not have integrity enabled. Linux always =
+uses
+> >> KeyID 0 which never has integrity enabled. KeyID 0 is also the TME Key=
+ID
+> >> which disallows integrity, refer "TME Policy/Encryption Algorithm" bit
+> >> description in "Intel Architecture Memory Encryption Technologies" spe=
+c
+> >> version 1.6 April 2025. So there is no need to clear pages to avoid
+> >> integrity violations.
+> >>
+> >> There remains a risk of poison consumption. However, in the context of
+> >> TDX, it is expected that there would be a machine check associated wit=
+h the
+> >> original poisoning. On some platforms that results in a panic. However
+> >> platforms may support "SEAM_NR" Machine Check capability, in which cas=
+e
+> >> Linux machine check handler marks the page as poisoned, which prevents=
+ it
+> >> from being allocated anymore, refer commit 7911f145de5fe ("x86/mce:
+> >> Implement recovery for errors in TDX/SEAM non-root mode")
+> >>
+> >> Improvement
+> >>
+> >> By skipping the clearing step on unaffected platforms, shutdown time
+> >> can improve by up to 40%.
+> >
+> > This patch looks good to me.
+> >
+> > I would like to raise a related topic, is there any requirement for
+> > zeroing pages on conversion from private to shared before
+> > userspace/guest faults in the gpa ranges as shared?
+>
+> For TDX, clearing must still be done for platforms with the
+> partial-write errata (SPR and EMR).
+>
 
-Unless I'm misunderstanding what your asking, pKVM very specific does NOT want
-zeroing on conversion, because one of its use cases is in-place conversion, e.g.
-to fill a shared buffer and then convert it to private so that the buffer can be
-processed in the TEE.
+So I take it that vmm/guest_memfd can safely assume no responsibility
+of clearing contents on conversion outside of the X86_BUG_TDX_PW_MCE
+scenario, given that the spec doesn't dictate initial contents of
+converted memory and no guest/host software should depend on the
+initial values after conversion.
 
-Some architectures, e.g. SNP and TDX, may effectively require zeroing on conversion,
-but that's essentially a property of the architecture, i.e. an arch/vendor specific
-detail.
+> >
+> > If the answer is no for all CoCo architectures then guest_memfd can
+> > simply just zero pages on allocation for all it's users and not worry
+> > about zeroing later.
+>
+> In fact TDX does not need private pages to be zeroed on allocation
+> because the TDX Module always does that.
+>
+
+guest_memfd allocated pages may get faulted in as shared first. To
+keep things simple, guest_memfd can start with the "just zero on
+allocation" policy which works for all current/future CoCo/non-CoCo
+users of guest_memfd and we can later iterate with any arch-specific
+optimizations as needed.
 
