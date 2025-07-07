@@ -1,186 +1,166 @@
-Return-Path: <kvm+bounces-51690-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51691-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 030F0AFBA2A
-	for <lists+kvm@lfdr.de>; Mon,  7 Jul 2025 19:54:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 506EBAFBA61
+	for <lists+kvm@lfdr.de>; Mon,  7 Jul 2025 20:09:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BE32C7A15F9
-	for <lists+kvm@lfdr.de>; Mon,  7 Jul 2025 17:52:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C76D4A539C
+	for <lists+kvm@lfdr.de>; Mon,  7 Jul 2025 18:09:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41487262FD5;
-	Mon,  7 Jul 2025 17:53:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1652F264A86;
+	Mon,  7 Jul 2025 18:09:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RI5Nhayh"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="e041tUKA"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76C361E25FA
-	for <kvm@vger.kernel.org>; Mon,  7 Jul 2025 17:53:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADF39194C96
+	for <kvm@vger.kernel.org>; Mon,  7 Jul 2025 18:09:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751910824; cv=none; b=i+fS6WsWHG0C8al9MCrx2ozMiPlld91R1yl7z0TdBoTibyJPKXlpVTiNXFkd6vkiayLrIw8gj6PWU80YbWfSIXWi/UmEM7YaF956qjIOtaqfaO+OzB4d9fMX8mrBD9ILVaeAEh0FLcddtjtkbe6jkiQ41hvI445k8BPC7ioFjHo=
+	t=1751911780; cv=none; b=nGxriFpOdAOYHB+1/7UZIWsaRkvQL1J7fOT5hksLjpnbxMFgVRG1WKEo2qh9BCE9lXH5tUJtrzZX0CJ/TWl7vF2BsTNmlQjV4iIGwXsMfs0RkrCu7XaN3GZ7olvoTGbN3lQqGMG4pYclMj6iWw6AyejKQQhe73qHvaBswYZEu7w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751910824; c=relaxed/simple;
-	bh=FstgiVezS+Cw4bDkM5mjMlSN7kCGC2v6i5mmTGG3mIw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i0+XbvOpY4HZ3WolqnuXaDBqxq+22taNRPeO4bK/I8M/mPB/+dlNzxhxdcP7lfEXBOvEaEutvZ8Jk3oRH3bSoPzjlcsojjrXnhHKO2aR8qouNT2i9CaTfLz6DA61ZVznv5M0eWUXo4W47eZ1eEAqoMPVvVaD45h5J1IUcS3Q9Wg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RI5Nhayh; arc=none smtp.client-ip=91.218.175.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Mon, 7 Jul 2025 19:53:26 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1751910809;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VX5mOV2ECOy6u103HTCnW/J+6b4n2WBzehnt0d4S7Wg=;
-	b=RI5Nhayh8Fr9nxe3pak2axqXExcuDOeR7ka7nKly+UZdcMtGZAek5Ps+eNublCjABLL+yv
-	t8kOCa5SO2GHLb6bCcM14Gbb8ClYDKYAtI4uFFaE51GMjfMoUGkHDqtzLfhvUiXlsk8f5w
-	kT4r/kWyk18GHvUoNBVr/Dg82P+A7kw=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Jesse Taube <jesse@rivosinc.com>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	linux-kselftest@vger.kernel.org, =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>, 
-	Charlie Jenkins <charlie@rivosinc.com>, James Raphael Tiovalen <jamestiotio@gmail.com>, 
-	Sean Christopherson <seanjc@google.com>, Cade Richard <cade.richard@gmail.com>
-Subject: Re: [kvm-unit-tests PATCH] riscv: lib: Add sbi-exit-code to
- configure and environment
-Message-ID: <20250707-b3aab15f7951255daaf14671@orel>
-References: <20250703133601.1396848-1-jesse@rivosinc.com>
- <20250704-d2ca01be799a71427b5163f9@orel>
- <CALSpo=bieq=T8DZR9u=MeEs4w+6_fAshYcpVj4zC-zRhKkc6OA@mail.gmail.com>
+	s=arc-20240116; t=1751911780; c=relaxed/simple;
+	bh=PXvVCyvgHb0eHBfQ0bThDfdbXMaikQlhmHXanhLrTdw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CAXoIHOL37UmlYADu7195WdhAzuaobPr974Gegx0FBCSEzo+XMCWsiLTYeF3V4dprVu/xRLKEaqOag28x6oK079zVW3wC0j8H0Y8PSx8k3BIUadGyZ0OTjbTRY66QpQtyQglBY1c27haKbH4dS0gKePxHP042Ip7Z8V1oWNjxow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=e041tUKA; arc=none smtp.client-ip=209.85.128.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-711d4689084so33883247b3.0
+        for <kvm@vger.kernel.org>; Mon, 07 Jul 2025 11:09:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1751911777; x=1752516577; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PXvVCyvgHb0eHBfQ0bThDfdbXMaikQlhmHXanhLrTdw=;
+        b=e041tUKA2RUHgU1A/PX4XENmCCATfpqbwVkWm5XRnZrNUQer4xIieucZloUvC3yi3A
+         66c0RhmtEP1awHOlmIF4N/bdUm/Qz+lPEHL17Wrc6JLDnr+p6ZGR8ID1TwV5JqvS/krG
+         FKSn7LUMkBvY3kUMdciO59x/1JjG6Tk4KJji+Y2z0lzFu5K93LTbzBfU9IecKiT0UGOJ
+         C6kzP4haB/GassxPnZQVNqlOqc2PVE4SExdpFdM4iMZbDCymhfxERzB+koaMivXipUNM
+         PsIQryNkN+T3PA2V0rlaFpe0NIOP146z+bIZrR68DDeUAfY0htR3YnLX5zcDu2t1bVqH
+         ovoA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751911777; x=1752516577;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PXvVCyvgHb0eHBfQ0bThDfdbXMaikQlhmHXanhLrTdw=;
+        b=igwl+PJpDJpao8M80axf3Iv0mTnO97sEifmDAyF/PieRv0xriiGie/awyrEsRVQLqP
+         ebAAoMOrcZRngdedDIavcDbkjrwiKK0bWgjMBsGSyVWuS1QGTEzp6cIbpE19LELr/pOA
+         9iYUr0sVfR2hUIg4dopi0mfdM/UyQaQJuA75JEz1IIEDoZ+q9OGr8Z9mRhuuAyj5voVx
+         IArcpV0Jv7iAPFou5B8eWouXbTlYkiWtRMC9Qtgm4PdfIO3Hsf6xQw/B2kllqYnCjd6a
+         zABRTZYa7vOwz+4Q4rXdIoSmhpwcLRMp6NDETZtBI2UjVOWdqHcrqbTvaITXRS+f8oRJ
+         hZtA==
+X-Gm-Message-State: AOJu0YxBKMpr4BwXxwylir8+9VbI6WJqzs9JK+7mG6f5dkk7Z4SATEEO
+	/YPLJz3CLJXQiQZUeGuOy6Dh03aDKrBvjmVHB6nnDzWEwLbFf/s0kQe5y8mEnPoyJq/4/9OFoMr
+	5C8BzmRGxmg8JJva0Gf7M+1dw9cuZMxZKhXue5L4NaFtxFDk1Q5+aUBvnuZPXXA==
+X-Gm-Gg: ASbGnctgrlJ42Suj+F0V/lA5naGbvFhyIlcFKOiq9PazA6wNdMZE0qIuya9HVU+EVy9
+	KQAvweQ57rx3zQhUqz8dFIsgdMudazsZH8KgqvHDUXnSYyz4FmE8Zq9LI8P8guoLW9dyM+axwOf
+	5tsSLtbeWo2PPpnJmG7AdCsNGRcP3pXrfwt+TdS4cNFBM7Gkvh04QDOXGRkGshMS8ltOxKS3WAH
+	g==
+X-Google-Smtp-Source: AGHT+IHw3HaZiyB/1y8CtGslDwQWQzV0+e50NJs7lEmDy5dHXsDu2ggjTmBQ1yT/1DSW6T5pgUsirP3gLE9OKHg0VWE=
+X-Received: by 2002:a05:690c:941c:b0:714:583:6d05 with SMTP id
+ 00721157ae682-7179e42c376mr6996117b3.32.1751911777302; Mon, 07 Jul 2025
+ 11:09:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CALSpo=bieq=T8DZR9u=MeEs4w+6_fAshYcpVj4zC-zRhKkc6OA@mail.gmail.com>
-X-Migadu-Flow: FLOW_OUT
+References: <cover.1747264138.git.ackerleytng@google.com> <782bb82a0d2d62b616daebb77dc3d9e345fb76fa.1747264138.git.ackerleytng@google.com>
+In-Reply-To: <782bb82a0d2d62b616daebb77dc3d9e345fb76fa.1747264138.git.ackerleytng@google.com>
+From: James Houghton <jthoughton@google.com>
+Date: Mon, 7 Jul 2025 11:08:59 -0700
+X-Gm-Features: Ac12FXwKcvqRRUd0nsd7X92g5DnBajTeAMgxLisNdzU_VSoAb0b8Kq03tT52h7g
+Message-ID: <CADrL8HW-vMqkocOxWURRB5vdi+Amx5QE6sNQOJx4hpD5L2rp5w@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 18/51] mm: hugetlb: Cleanup interpretation of
+ map_chg_state within alloc_hugetlb_folio()
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: kvm@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
+	x86@kernel.org, linux-fsdevel@vger.kernel.org, aik@amd.com, 
+	ajones@ventanamicro.com, akpm@linux-foundation.org, amoorthy@google.com, 
+	anthony.yznaga@oracle.com, anup@brainfault.org, aou@eecs.berkeley.edu, 
+	bfoster@redhat.com, binbin.wu@linux.intel.com, brauner@kernel.org, 
+	catalin.marinas@arm.com, chao.p.peng@intel.com, chenhuacai@kernel.org, 
+	dave.hansen@intel.com, david@redhat.com, dmatlack@google.com, 
+	dwmw@amazon.co.uk, erdemaktas@google.com, fan.du@intel.com, fvdl@google.com, 
+	graf@amazon.com, haibo1.xu@intel.com, hch@infradead.org, hughd@google.com, 
+	ira.weiny@intel.com, isaku.yamahata@intel.com, jack@suse.cz, 
+	james.morse@arm.com, jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, 
+	jhubbard@nvidia.com, jroedel@suse.de, jun.miao@intel.com, kai.huang@intel.com, 
+	keirf@google.com, kent.overstreet@linux.dev, kirill.shutemov@intel.com, 
+	liam.merwick@oracle.com, maciej.wieczor-retman@intel.com, 
+	mail@maciej.szmigiero.name, maz@kernel.org, mic@digikod.net, 
+	michael.roth@amd.com, mpe@ellerman.id.au, muchun.song@linux.dev, 
+	nikunj@amd.com, nsaenz@amazon.es, oliver.upton@linux.dev, palmer@dabbelt.com, 
+	pankaj.gupta@amd.com, paul.walmsley@sifive.com, pbonzini@redhat.com, 
+	pdurrant@amazon.co.uk, peterx@redhat.com, pgonda@google.com, pvorel@suse.cz, 
+	qperret@google.com, quic_cvanscha@quicinc.com, quic_eberman@quicinc.com, 
+	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com, richard.weiyang@gmail.com, 
+	rick.p.edgecombe@intel.com, rientjes@google.com, roypat@amazon.co.uk, 
+	rppt@kernel.org, seanjc@google.com, shuah@kernel.org, steven.price@arm.com, 
+	steven.sistare@oracle.com, suzuki.poulose@arm.com, tabba@google.com, 
+	thomas.lendacky@amd.com, usama.arif@bytedance.com, vannapurve@google.com, 
+	vbabka@suse.cz, viro@zeniv.linux.org.uk, vkuznets@redhat.com, 
+	wei.w.wang@intel.com, will@kernel.org, willy@infradead.org, 
+	xiaoyao.li@intel.com, yan.y.zhao@intel.com, yilun.xu@intel.com, 
+	yuzenghui@huawei.com, zhiquan1.li@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 07, 2025 at 08:57:37AM -0700, Jesse Taube wrote:
-> On Fri, Jul 4, 2025 at 1:17 AM Andrew Jones <andrew.jones@linux.dev> wrote:
-> >
-> > On Thu, Jul 03, 2025 at 06:36:00AM -0700, Jesse Taube wrote:
-> > > Add --[enable|disable]-sbi-exit-code to configure script.
-> > > With the default value disabled.
-> > > Add a check for SBI_PASS_EXIT_CODE in the environment, so that passing
-> > > of the test status is configurable from both the
-> > > environment and the configure script
-> > >
-> > > Signed-off-by: Jesse Taube <jesse@rivosinc.com>
-> > > ---
-> > >  configure      | 11 +++++++++++
-> > >  lib/riscv/io.c | 12 +++++++++++-
-> > >  2 files changed, 22 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/configure b/configure
-> > > index 20bf5042..7c949bdc 100755
-> > > --- a/configure
-> > > +++ b/configure
-> > > @@ -67,6 +67,7 @@ earlycon=
-> > >  console=
-> > >  efi=
-> > >  efi_direct=
-> > > +sbi_exit_code=0
-> > >  target_cpu=
-> > >
-> > >  # Enable -Werror by default for git repositories only (i.e. developer builds)
-> > > @@ -141,6 +142,9 @@ usage() {
-> > >                                  system and run from the UEFI shell. Ignored when efi isn't enabled
-> > >                                  and defaults to enabled when efi is enabled for riscv64.
-> > >                                  (arm64 and riscv64 only)
-> > > +         --[enable|disable]-sbi-exit-code
-> > > +                                Enable or disable sending pass/fail exit code to SBI SRST.
-> > > +                                (disabled by default, riscv only)
-> > >  EOF
-> > >      exit 1
-> > >  }
-> > > @@ -236,6 +240,12 @@ while [[ $optno -le $argc ]]; do
-> > >       --disable-efi-direct)
-> > >           efi_direct=n
-> > >           ;;
-> > > +     --enable-sbi-exit-code)
-> > > +         sbi_exit_code=1
-> > > +         ;;
-> > > +     --disable-sbi-exit-code)
-> > > +         sbi_exit_code=0
-> > > +         ;;
-> > >       --enable-werror)
-> > >           werror=-Werror
-> > >           ;;
-> > > @@ -551,6 +561,7 @@ EOF
-> > >  elif [ "$arch" = "riscv32" ] || [ "$arch" = "riscv64" ]; then
-> > >      echo "#define CONFIG_UART_EARLY_BASE ${uart_early_addr}" >> lib/config.h
-> > >      [ "$console" = "sbi" ] && echo "#define CONFIG_SBI_CONSOLE" >> lib/config.h
-> > > +    echo "#define CONFIG_SBI_EXIT_CODE ${sbi_exit_code}" >> lib/config.h
-> > >      echo >> lib/config.h
-> > >  fi
-> > >  echo "#endif" >> lib/config.h
-> > > diff --git a/lib/riscv/io.c b/lib/riscv/io.c
-> > > index b1163404..0e666009 100644
-> > > --- a/lib/riscv/io.c
-> > > +++ b/lib/riscv/io.c
-> > > @@ -162,8 +162,18 @@ void halt(int code);
-> > >
-> > >  void exit(int code)
-> > >  {
-> > > +     char *s = getenv("SBI_PASS_EXIT_CODE");
-> > > +     bool pass_exit = CONFIG_SBI_EXIT_CODE;
-> >
-> > This is the first case of what may become more common - a config variable
-> > which also has an env override. I think it may be good convention to
-> > name them the same, i.e. the env name would also be CONFIG_SBI_EXIT_CODE,
-> > unless you think that would be confusing for some reason?
-> 
-> I changed the name because the configure option seemed very long.
-> I will make them both SBI_EXIT_CODE.
+On Wed, May 14, 2025 at 4:43=E2=80=AFPM Ackerley Tng <ackerleytng@google.co=
+m> wrote:
+>
+> Interpreting map_chg_state inline, within alloc_hugetlb_folio(),
+> improves readability.
+>
+> Instead of having cow_from_owner and the result of
+> vma_needs_reservation() compute a map_chg_state, and then interpreting
+> map_chg_state within alloc_hugetlb_folio() to determine whether to
+>
+> + Get a page from the subpool or
+> + Charge cgroup reservations or
+> + Commit vma reservations or
+> + Clean up reservations
+>
+> This refactoring makes those decisions just based on whether a
+> vma_reservation_exists. If a vma_reservation_exists, the subpool had
+> already been debited and the cgroup had been charged, hence
+> alloc_hugetlb_folio() should not double-debit or double-charge. If the
+> vma reservation can't be used (as in cow_from_owner), then the vma
+> reservation effectively does not exist and vma_reservation_exists is
+> set to false.
+>
+> The conditions for committing reservations or cleaning are also
+> updated to be paired with the corresponding conditions guarding
+> reservation creation.
+>
+> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> Change-Id: I22d72a2cae61fb64dc78e0a870b254811a06a31e
 
-We need the CONFIG_ part on the config name in order keep it consistent
-with other configs, so I think we just need a long name for both.
+Hi Ackerley,
 
-> Should I add a macro to simplify
-> future uses
-> of a config variable which also has an env override.
+Can you help me better understand how useful the refactors in this and
+the preceding patch are for the series as a whole?
 
-Sounds good to me.
+It seems like you and Peter had two different, but mostly equivalent,
+directions with how this code should be refactored[1]. Do you gain
+much by replacing Peter's refactoring strategy? If it's mostly a
+stylistic thing, maybe it would be better to remove these patches just
+to get the number of patches to review down.
 
-> 
-> >
-> > > +
-> > >       printf("\nEXIT: STATUS=%d\n", ((code) << 1) | 1);
-> > > -     sbi_shutdown(code == 0);
-> > > +
-> > > +     if (s)
-> > > +             pass_exit = (*s == '1' || *s == 'y' || *s == 'Y');
-> >
-> > We now have this logic in four places[1]. I think it's time we factor it,
-> > and it's counterpart "!(s && (*s == '0' || *s == 'n' || *s == 'N'))"
-> > into a couple helper macros. I'm not sure where the best place for
-> > those macros to live is, though. I guess libcflat.h, but we really
-> > ought to split that thing apart someday...
-> 
-> Is lib/argv.h an ok place?
+The logic in these two patches looks good to me, and I think I do
+slightly prefer your approach. But if we could drop these patches
+(i.e., mail them separately), that's probably better.
 
-That could work.
-
-> getenv is defined in lib/string.c which is interesting. I wonder if it
-> could be moved to lib/argv.c?
-
-getenv is libc and in lives in stdlib in libc, so we should move our
-prototype to lib/stdlib.h from libcflat.h, but we don't have a stdlib.c
-file so string.c and argv.c are both "wrong", but at least string.c
-also has all the functions getenv depends on locally...
-
-Thanks,
-drew
+[1]: https://lore.kernel.org/linux-mm/20250107204002.2683356-5-peterx@redha=
+t.com/
 
