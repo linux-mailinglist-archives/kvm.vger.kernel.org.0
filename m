@@ -1,147 +1,237 @@
-Return-Path: <kvm+bounces-51671-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51672-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 518F3AFB61E
-	for <lists+kvm@lfdr.de>; Mon,  7 Jul 2025 16:31:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBCF7AFB68D
+	for <lists+kvm@lfdr.de>; Mon,  7 Jul 2025 16:55:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4790B3A8DE2
-	for <lists+kvm@lfdr.de>; Mon,  7 Jul 2025 14:30:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 135E517AB0C
+	for <lists+kvm@lfdr.de>; Mon,  7 Jul 2025 14:55:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A20022D8DDF;
-	Mon,  7 Jul 2025 14:30:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2137286D5D;
+	Mon,  7 Jul 2025 14:55:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="f9PpeKBK"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vvWXpmOY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 364B52DAFD7;
-	Mon,  7 Jul 2025 14:30:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59AC42288CB
+	for <kvm@vger.kernel.org>; Mon,  7 Jul 2025 14:55:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751898623; cv=none; b=uYI7aYI2up3arGZ4kTSu1nFUdr7BffwKM09ac3mx4GmF2PkoyQVj6k7GMnmgBRS+tCyuEBtgp4D2SZMDItUGqoV6H8UuRh60Y6TgF+pw//8fmZlulaZMtimoS+rNJTrZjGC0x2SqySQPrjs9t8t4IbMhpyugvAOakfgaD8n0ttg=
+	t=1751900116; cv=none; b=dD/RN2PrE9Y7c6D4nL5JBuGHiG9xoI9wLpxSr8GQlftS8FXWA5mCQPTbjYTtjXOzD/JNtv5ZcYKRUriAK4ZsAmh7js/N4CTWIPLpV6k0DuJ0LF/1OX/LzSSAzatQfRIj60/UNLfDmnIz6bChb/qdfiaW86d8rt/ayrookohf2b8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751898623; c=relaxed/simple;
-	bh=NfUDdwPix+9itkgwC8E75ftiwPaf/VHXbHet3Bp+v10=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=u9371mxV/tHFm/dLpnbh3TO1bUS+cqbEcQXI1PadbP1wXiTriZn7IzavNnGDMNymiDe1E8nSpwuQWV6hHtwlEUCYDK67QNJEysZj799tnTA8vIkgOM/lYG/Gr0A82xNLnjfz8Ey3Qk3DL3VOog6vMmAHMBAolDttY7s2qqQxPf0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=f9PpeKBK; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1751898622; x=1783434622;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=NfUDdwPix+9itkgwC8E75ftiwPaf/VHXbHet3Bp+v10=;
-  b=f9PpeKBKNLTBnKdV67/yqbYK+1+3QbOAfFN9hxpBv1Ryupt8PYbi5x5N
-   J8LcC5tar5tfQAdzYaPyUEmYHu/mBeNNx5JlAtZxpRHf6nLMHsHPt5u2R
-   yY+mRkmmOb2Ot1Y+NWLoOYtKgsQWCiAq/C1otj/e160fI62jZh9WQJbN9
-   TRAgp22ireQQL2/JGxsCi7Zq3RwzarPqSJC5vbx25qVmmGnchl9mZ2RMD
-   lWV8xds1Qemds+K4E5yun1cR5Fbbz4QLbLDH0szyPBK5ibzo0c1P7iMSv
-   0KLt00YpXWNvwG2I7E4AgiCBkN/Xxa1ilsrpwVgAwVs6t/DbVdy2pnGuk
-   Q==;
-X-CSE-ConnectionGUID: GxuoQpv1RTKUO1TxbJaHxw==
-X-CSE-MsgGUID: 4EZ/JJ1PSii8pBOwD/OZfA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11487"; a="53979471"
-X-IronPort-AV: E=Sophos;i="6.16,294,1744095600"; 
-   d="scan'208";a="53979471"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jul 2025 07:30:22 -0700
-X-CSE-ConnectionGUID: GFFW95NWSUuF1SlNGSRCMQ==
-X-CSE-MsgGUID: 9hsmmFd2Qem2IG39sEfR/A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,294,1744095600"; 
-   d="scan'208";a="159769728"
-Received: from tslove-mobl4.amr.corp.intel.com (HELO [10.125.110.93]) ([10.125.110.93])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jul 2025 07:30:21 -0700
-Message-ID: <a8d517f5-80fc-4225-969d-1191564aceb3@intel.com>
-Date: Mon, 7 Jul 2025 07:32:28 -0700
+	s=arc-20240116; t=1751900116; c=relaxed/simple;
+	bh=B7JxrGmXJuGH2czgl8Oj0PyXhtTmI8a8+b/ZFGmsa4s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TPRXRJy4KCS7g5wObI+vn2HoDiLrszYQqE9YCMM4ySl8EH6qXE1KMsYm1coyD2GYAdG3/DKBkJmH8FQ9ac1lfp31DhECbOtqN9ho2slkgdWeNR+aPlI4z2oT7/MijA5PlfpowQeqSf3vaUbq9C/3SnxMHWHOYnxAnLPeIumWiZM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vvWXpmOY; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-237f18108d2so685595ad.0
+        for <kvm@vger.kernel.org>; Mon, 07 Jul 2025 07:55:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1751900114; x=1752504914; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uRktVXf5mIe78Av0JuWhtfTpF59d0PhecR0EGwcUxk0=;
+        b=vvWXpmOYzJ3CZ9oU8Rl/E5BrSQJOVO7UyZJMu7tXUGoTeMVhCP6qmC0q8p12n9v/wd
+         BtrsRm/dDIFVLSM07dKJ5kBI7UyGmzjJkaYCwGRx9Np5G/XUMCpDLRSPBb+pLLUTILaA
+         LeRu+tyemXwAdM+4ZnSM8CSCqs4vDawIcu/aYLB7MfGNWenH/2nRY7oI1RVgckLsZJQd
+         WzuBLwwazjBGb92BfG+QQ5FKWEfqBBTmHUEqMNW9PDnnSmGU5DkUHHGU0zUPtDXUcwsG
+         148dzr0sBRqoFNm1MAMMH0Y/6Ll9/UTjlpx+Y9eUSP8ShfQs7W26VnRp7gszzwlR8zXW
+         2jEw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751900114; x=1752504914;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=uRktVXf5mIe78Av0JuWhtfTpF59d0PhecR0EGwcUxk0=;
+        b=nirUZcXbcpcXAQ38EcFZUza9XCrG4MgHQn690VT0V2cvcx9CmuXyC62IWPdM25J8T6
+         6fI1PFAHH1iv75muDeRhXOYCsmGrs/iuWGwsYmtzcZdp2O9gJ5SHIrc8eyRFqUjj8J5P
+         xhO1RnGpLDzqjqz5hjOBCa2yTRqRbqu8Ck2dPCoUxpM79n6kDHe0peVcoYIMf0lwav1m
+         NFzj97sQmhCD819TUJBAphnlIzsckPg9CZ7UWnBK+Jr6ON5yfLZVdzFek3hdwQBuduET
+         EI1Nx2Nokzqixleoe/uTMXv2vsj403RAOkCp0gucD0AN20wMBKajcfMCC7w0RZtD/Bpo
+         zV+A==
+X-Forwarded-Encrypted: i=1; AJvYcCUFEAfVty9NRVDDWicf5Qz6H+IPPCONOVcPvkr/2LItr6PxW0f3c9ciKHEF9faduzuKFE8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzOnNdOG/yISiO67nGwugeHRJiIBmEV3th5owk2zOQS1XvYDNyl
+	Sm8ud0ZvdgxOUJTZ7JkSY3wU7aXXnWuDHVQo22imeXIYA0nYBONJ9hTIPwBUFSG/golXeCWx5fW
+	56p+iNFNwg+SGL91P1sc8FMRPQp5E7b/xl+H1u7YQ
+X-Gm-Gg: ASbGnctRJM59LHwG4GNdDkd0UlCGgyCJM0IrUD64qewc9YtgpZo3C8Jnd0pcU2TMa04
+	sQ2o1QCavFARfh9S/7u48ArdiApVJai7PPwpUPDfOxC18SCVPiUgsMB9D+HrGPXnZxffr1Kdy0j
+	YgG4DwpuJpe9+PAlPJPNgxwjiU/iZ41GOxbA1wTJSWcdxSvDLat9qt/FaEkpmi0o0GEUTX38lfM
+	cIq
+X-Google-Smtp-Source: AGHT+IEJT+lPpiVSgfMXZ2IKzRwmdKmEWyobwf3mOCnOwgAU724C9llo2Jg9w2I/TgbZ9BGhgSoxJ70KADaog3FlAY8=
+X-Received: by 2002:a17:902:d492:b0:234:8eeb:d81a with SMTP id
+ d9443c01a7336-23c79c421fdmr9042025ad.16.1751900113952; Mon, 07 Jul 2025
+ 07:55:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V2 2/2] x86/tdx: Skip clearing reclaimed pages unless
- X86_BUG_TDX_PW_MCE is present
-To: Chao Gao <chao.gao@intel.com>
-Cc: Adrian Hunter <adrian.hunter@intel.com>,
- Dave Hansen <dave.hansen@linux.intel.com>, pbonzini@redhat.com,
- seanjc@google.com, vannapurve@google.com, Tony Luck <tony.luck@intel.com>,
- Borislav Petkov <bp@alien8.de>, Thomas Gleixner <tglx@linutronix.de>,
- Ingo Molnar <mingo@redhat.com>, x86@kernel.org, H Peter Anvin
- <hpa@zytor.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- rick.p.edgecombe@intel.com, kirill.shutemov@linux.intel.com,
- kai.huang@intel.com, reinette.chatre@intel.com, xiaoyao.li@intel.com,
- tony.lindgren@linux.intel.com, binbin.wu@linux.intel.com,
- isaku.yamahata@intel.com, yan.y.zhao@intel.com
-References: <20250703153712.155600-1-adrian.hunter@intel.com>
- <20250703153712.155600-3-adrian.hunter@intel.com>
- <aGs7/C0W58nEUVNk@intel.com> <ca275d32-c9fd-4f60-9cf4-cd88efc77d78@intel.com>
- <aGtz9KfszwNKBrZb@intel.com>
-From: Dave Hansen <dave.hansen@intel.com>
-Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- xsFNBE6HMP0BEADIMA3XYkQfF3dwHlj58Yjsc4E5y5G67cfbt8dvaUq2fx1lR0K9h1bOI6fC
- oAiUXvGAOxPDsB/P6UEOISPpLl5IuYsSwAeZGkdQ5g6m1xq7AlDJQZddhr/1DC/nMVa/2BoY
- 2UnKuZuSBu7lgOE193+7Uks3416N2hTkyKUSNkduyoZ9F5twiBhxPJwPtn/wnch6n5RsoXsb
- ygOEDxLEsSk/7eyFycjE+btUtAWZtx+HseyaGfqkZK0Z9bT1lsaHecmB203xShwCPT49Blxz
- VOab8668QpaEOdLGhtvrVYVK7x4skyT3nGWcgDCl5/Vp3TWA4K+IofwvXzX2ON/Mj7aQwf5W
- iC+3nWC7q0uxKwwsddJ0Nu+dpA/UORQWa1NiAftEoSpk5+nUUi0WE+5DRm0H+TXKBWMGNCFn
- c6+EKg5zQaa8KqymHcOrSXNPmzJuXvDQ8uj2J8XuzCZfK4uy1+YdIr0yyEMI7mdh4KX50LO1
- pmowEqDh7dLShTOif/7UtQYrzYq9cPnjU2ZW4qd5Qz2joSGTG9eCXLz5PRe5SqHxv6ljk8mb
- ApNuY7bOXO/A7T2j5RwXIlcmssqIjBcxsRRoIbpCwWWGjkYjzYCjgsNFL6rt4OL11OUF37wL
- QcTl7fbCGv53KfKPdYD5hcbguLKi/aCccJK18ZwNjFhqr4MliQARAQABzUVEYXZpZCBDaHJp
- c3RvcGhlciBIYW5zZW4gKEludGVsIFdvcmsgQWRkcmVzcykgPGRhdmUuaGFuc2VuQGludGVs
- LmNvbT7CwXgEEwECACIFAlQ+9J0CGwMGCwkIBwMCBhUIAgkKCwQWAgMBAh4BAheAAAoJEGg1
- lTBwyZKwLZUP/0dnbhDc229u2u6WtK1s1cSd9WsflGXGagkR6liJ4um3XCfYWDHvIdkHYC1t
- MNcVHFBwmQkawxsYvgO8kXT3SaFZe4ISfB4K4CL2qp4JO+nJdlFUbZI7cz/Td9z8nHjMcWYF
- IQuTsWOLs/LBMTs+ANumibtw6UkiGVD3dfHJAOPNApjVr+M0P/lVmTeP8w0uVcd2syiaU5jB
- aht9CYATn+ytFGWZnBEEQFnqcibIaOrmoBLu2b3fKJEd8Jp7NHDSIdrvrMjYynmc6sZKUqH2
- I1qOevaa8jUg7wlLJAWGfIqnu85kkqrVOkbNbk4TPub7VOqA6qG5GCNEIv6ZY7HLYd/vAkVY
- E8Plzq/NwLAuOWxvGrOl7OPuwVeR4hBDfcrNb990MFPpjGgACzAZyjdmYoMu8j3/MAEW4P0z
- F5+EYJAOZ+z212y1pchNNauehORXgjrNKsZwxwKpPY9qb84E3O9KYpwfATsqOoQ6tTgr+1BR
- CCwP712H+E9U5HJ0iibN/CDZFVPL1bRerHziuwuQuvE0qWg0+0SChFe9oq0KAwEkVs6ZDMB2
- P16MieEEQ6StQRlvy2YBv80L1TMl3T90Bo1UUn6ARXEpcbFE0/aORH/jEXcRteb+vuik5UGY
- 5TsyLYdPur3TXm7XDBdmmyQVJjnJKYK9AQxj95KlXLVO38lczsFNBFRjzmoBEACyAxbvUEhd
- GDGNg0JhDdezyTdN8C9BFsdxyTLnSH31NRiyp1QtuxvcqGZjb2trDVuCbIzRrgMZLVgo3upr
- MIOx1CXEgmn23Zhh0EpdVHM8IKx9Z7V0r+rrpRWFE8/wQZngKYVi49PGoZj50ZEifEJ5qn/H
- Nsp2+Y+bTUjDdgWMATg9DiFMyv8fvoqgNsNyrrZTnSgoLzdxr89FGHZCoSoAK8gfgFHuO54B
- lI8QOfPDG9WDPJ66HCodjTlBEr/Cwq6GruxS5i2Y33YVqxvFvDa1tUtl+iJ2SWKS9kCai2DR
- 3BwVONJEYSDQaven/EHMlY1q8Vln3lGPsS11vSUK3QcNJjmrgYxH5KsVsf6PNRj9mp8Z1kIG
- qjRx08+nnyStWC0gZH6NrYyS9rpqH3j+hA2WcI7De51L4Rv9pFwzp161mvtc6eC/GxaiUGuH
- BNAVP0PY0fqvIC68p3rLIAW3f97uv4ce2RSQ7LbsPsimOeCo/5vgS6YQsj83E+AipPr09Caj
- 0hloj+hFoqiticNpmsxdWKoOsV0PftcQvBCCYuhKbZV9s5hjt9qn8CE86A5g5KqDf83Fxqm/
- vXKgHNFHE5zgXGZnrmaf6resQzbvJHO0Fb0CcIohzrpPaL3YepcLDoCCgElGMGQjdCcSQ+Ci
- FCRl0Bvyj1YZUql+ZkptgGjikQARAQABwsFfBBgBAgAJBQJUY85qAhsMAAoJEGg1lTBwyZKw
- l4IQAIKHs/9po4spZDFyfDjunimEhVHqlUt7ggR1Hsl/tkvTSze8pI1P6dGp2XW6AnH1iayn
- yRcoyT0ZJ+Zmm4xAH1zqKjWplzqdb/dO28qk0bPso8+1oPO8oDhLm1+tY+cOvufXkBTm+whm
- +AyNTjaCRt6aSMnA/QHVGSJ8grrTJCoACVNhnXg/R0g90g8iV8Q+IBZyDkG0tBThaDdw1B2l
- asInUTeb9EiVfL/Zjdg5VWiF9LL7iS+9hTeVdR09vThQ/DhVbCNxVk+DtyBHsjOKifrVsYep
- WpRGBIAu3bK8eXtyvrw1igWTNs2wazJ71+0z2jMzbclKAyRHKU9JdN6Hkkgr2nPb561yjcB8
- sIq1pFXKyO+nKy6SZYxOvHxCcjk2fkw6UmPU6/j/nQlj2lfOAgNVKuDLothIxzi8pndB8Jju
- KktE5HJqUUMXePkAYIxEQ0mMc8Po7tuXdejgPMwgP7x65xtfEqI0RuzbUioFltsp1jUaRwQZ
- MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
- hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
- vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
-In-Reply-To: <aGtz9KfszwNKBrZb@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20250529054227.hh2f4jmyqf6igd3i@amd.com> <diqz1prqvted.fsf@ackerleytng-ctop.c.googlers.com>
+ <20250702232517.k2nqwggxfpfp3yym@amd.com> <CAGtprH-=f1FBOS=xWciBU6KQJ9LJQ5uZoms83aSRBDsC3=tpZA@mail.gmail.com>
+ <20250703041210.uc4ygp4clqw2h6yd@amd.com> <CAGtprH9sckYupyU12+nK-ySJjkTgddHmBzrq_4P1Gemck5TGOQ@mail.gmail.com>
+ <20250703203944.lhpyzu7elgqmplkl@amd.com>
+In-Reply-To: <20250703203944.lhpyzu7elgqmplkl@amd.com>
+From: Vishal Annapurve <vannapurve@google.com>
+Date: Mon, 7 Jul 2025 07:55:01 -0700
+X-Gm-Features: Ac12FXz_kcb6k45NrqHWXfpE1zl6Ylgp3cPdDP8rbyvC0i3k7kTaxp08jYwop3A
+Message-ID: <CAGtprH9_zS=QMW9y8krZ5Hq5jTL3Y9v0iVxxUY2+vSe9Mz83Tw@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 02/51] KVM: guest_memfd: Introduce and use
+ shareability to guard faulting
+To: Michael Roth <michael.roth@amd.com>
+Cc: Ackerley Tng <ackerleytng@google.com>, kvm@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, x86@kernel.org, linux-fsdevel@vger.kernel.org, 
+	aik@amd.com, ajones@ventanamicro.com, akpm@linux-foundation.org, 
+	amoorthy@google.com, anthony.yznaga@oracle.com, anup@brainfault.org, 
+	aou@eecs.berkeley.edu, bfoster@redhat.com, binbin.wu@linux.intel.com, 
+	brauner@kernel.org, catalin.marinas@arm.com, chao.p.peng@intel.com, 
+	chenhuacai@kernel.org, dave.hansen@intel.com, david@redhat.com, 
+	dmatlack@google.com, dwmw@amazon.co.uk, erdemaktas@google.com, 
+	fan.du@intel.com, fvdl@google.com, graf@amazon.com, haibo1.xu@intel.com, 
+	hch@infradead.org, hughd@google.com, ira.weiny@intel.com, 
+	isaku.yamahata@intel.com, jack@suse.cz, james.morse@arm.com, 
+	jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, jhubbard@nvidia.com, 
+	jroedel@suse.de, jthoughton@google.com, jun.miao@intel.com, 
+	kai.huang@intel.com, keirf@google.com, kent.overstreet@linux.dev, 
+	kirill.shutemov@intel.com, liam.merwick@oracle.com, 
+	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, maz@kernel.org, 
+	mic@digikod.net, mpe@ellerman.id.au, muchun.song@linux.dev, nikunj@amd.com, 
+	nsaenz@amazon.es, oliver.upton@linux.dev, palmer@dabbelt.com, 
+	pankaj.gupta@amd.com, paul.walmsley@sifive.com, pbonzini@redhat.com, 
+	pdurrant@amazon.co.uk, peterx@redhat.com, pgonda@google.com, pvorel@suse.cz, 
+	qperret@google.com, quic_cvanscha@quicinc.com, quic_eberman@quicinc.com, 
+	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com, richard.weiyang@gmail.com, 
+	rick.p.edgecombe@intel.com, rientjes@google.com, roypat@amazon.co.uk, 
+	rppt@kernel.org, seanjc@google.com, shuah@kernel.org, steven.price@arm.com, 
+	steven.sistare@oracle.com, suzuki.poulose@arm.com, tabba@google.com, 
+	thomas.lendacky@amd.com, usama.arif@bytedance.com, vbabka@suse.cz, 
+	viro@zeniv.linux.org.uk, vkuznets@redhat.com, wei.w.wang@intel.com, 
+	will@kernel.org, willy@infradead.org, xiaoyao.li@intel.com, 
+	yan.y.zhao@intel.com, yilun.xu@intel.com, yuzenghui@huawei.com, 
+	zhiquan1.li@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 7/7/25 00:15, Chao Gao wrote:
->> Why should this specific kind of freeing (TDX private memory being freed
->> back to the host) operation be different from any other kind of free?
-> To limit the impact of software bugs (e.g., TDX module bugs) to TDX guests
-> rather than affecting the entire kernel.
+On Thu, Jul 3, 2025 at 1:41=E2=80=AFPM Michael Roth <michael.roth@amd.com> =
+wrote:
+> > > > > >
+> > > > > > Because shared pages are split once any memory is allocated, ha=
+ving a
+> > > > > > way to INIT_PRIVATE could avoid the split and then merge on
+> > > > > > conversion. I feel that is enough value to have this config fla=
+g, what
+> > > > > > do you think?
+> > > > > >
+> > > > > > I guess we could also have userspace be careful not to do any a=
+llocation
+> > > > > > before converting.
+> > >
+> > > (Re-visiting this with the assumption that we *don't* intend to use m=
+map() to
+> > > populate memory (in which case you can pretty much ignore my previous
+> > > response))
+> >
+> > I am assuming in-place conversion with huge page backing for the
+> > discussion below.
+> >
+> > Looks like there are three scenarios/usecases we are discussing here:
+> > 1) Pre-allocating guest_memfd file offsets
+> >    - Userspace can use fallocate to do this for hugepages by keeping
+> > the file ranges marked private.
+> > 2) Prefaulting guest EPT/NPT entries
+> > 3) Populating initial guest payload into guest_memfd memory
+> >    - Userspace can mark certain ranges as shared, populate the
+> > contents and convert the ranges back to private. So mmap will come in
+> > handy here.
+> >
+> > >
+> > > I'm still not sure where the INIT_PRIVATE flag comes into play. For S=
+NP,
+> > > userspace already defaults to marking everything private pretty close=
+ to
+> > > guest_memfd creation time, so the potential for allocations to occur
+> > > in-between seems small, but worth confirming.
+> >
+> > Ok, I am not much worried about whether the INIT_PRIVATE flag gets
+> > supported or not, but more about the default setting that different
+> > CVMs start with. To me, it looks like all CVMs should start as
+> > everything private by default and if there is a way to bake that
+> > configuration during guest_memfd creation time that would be good to
+> > have instead of doing "create and convert" operations and there is a
+> > fairly low cost to support this flag.
+> >
+> > >
+> > > But I know in the past there was a desire to ensure TDX/SNP could
+> > > support pre-allocating guest_memfd memory (and even pre-faulting via
+> > > KVM_PRE_FAULT_MEMORY), but I think that could still work right? The
+> > > fallocate() handling could still avoid the split if the whole hugepag=
+e
+> > > is private, though there is a bit more potential for that fallocate()
+> > > to happen before userspace does the "manually" shared->private
+> > > conversion. I'll double-check on that aspect, but otherwise, is there
+> > > still any other need for it?
+> >
+> > This usecase of being able to preallocate should still work with
+> > in-place conversion assuming all ranges are private before
+> > pre-population.
+>
+> Ok, I think I was missing that the merge logic here will then restore it
+> to 1GB before the guest starts, so the folio isn't permanently split if
+> we do the mmap() and that gives us more flexibility on how we can use
+> it.
+>
+> I was thinking we needed to avoid the split from the start by avoiding
+> paths like mmap() which might trigger the split. I was trying to avoid
+> any merge->unsplit logic in the THP case (or unsplit in general), in
+> which case we'd get permanent splits via the mmap() approach, but for
+> 2MB that's probably not a big deal.
 
-It's one thing if the TDX module is so constantly buggy that we're
-getting tons of kernel crash reports that we track back to the TDX module.
+After initial payload population, during its runtime guest can cause
+different hugepages to get split which can remain split even after
+guest converts them back to private. For THP there may not be much
+benefit of merging those pages together specially if NPT/EPT entries
+can't be promoted back to hugepage mapping and there is no memory
+penalty as THP doesn't use HVO.
 
-It's quite another thing to add kernel complexity to preemptively lessen
-the chance of a theoretical TDX bug.
+Wishful thinking on my part: It would be great to figure out a way to
+promote these pagetable entries without relying on the guest, if
+possible with ABI updates, as I think the host should have some
+control over EPT/NPT granularities even for Confidential VMs. Along
+the similar lines, it would be great to have "page struct"-less memory
+working for Confidential VMs, which should greatly reduce the toil
+with merge/split operations and will render the conversions mostly to
+be pagetable manipulations.
+
+That being said, memory split and merge seem to be relatively
+lightweight for THP (with no memory allocation/freeing) and reusing
+the memory files after reboot of the guest VM will require pages to be
+merged to start with a clean slate. One possible option is to always
+merge as early as possible, second option is to invent a new UAPI to
+do it on demand.
+
+For 1G pages, even if we go with 1G -> 2M -> 4K split stages, page
+splits result in higher memory usage with HVO around and it becomes
+useful to merge them back as early as possible as guest proceeds to
+convert subranges of different hugepages over its lifetime. Merging
+pages as early as possible also allows reusing of memory files during
+the next reboot without having to invent a new UAPI.
+
+Caveats with "merge as early as possible":
+- Shared to private conversions will be slower for hugetlb pages.
+   * Counter argument: These conversions are already slow as we need
+safe refcounts to reach on the ranges getting converted.
+- If guests convert a particular range often then extra merge/split
+operations will result in overhead.
+   * Counter argument: Since conversions are anyways slow, it's
+beneficial for guests to avoid such a scenario and keep back and forth
+conversions as less frequent as possible.
 
