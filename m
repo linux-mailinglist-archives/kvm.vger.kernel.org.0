@@ -1,161 +1,113 @@
-Return-Path: <kvm+bounces-51636-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51637-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B0FCAFAA4F
-	for <lists+kvm@lfdr.de>; Mon,  7 Jul 2025 05:38:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75DF2AFAA51
+	for <lists+kvm@lfdr.de>; Mon,  7 Jul 2025 05:39:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A1621177976
-	for <lists+kvm@lfdr.de>; Mon,  7 Jul 2025 03:38:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1B14B189A842
+	for <lists+kvm@lfdr.de>; Mon,  7 Jul 2025 03:39:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7065425A330;
-	Mon,  7 Jul 2025 03:38:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24962259CBD;
+	Mon,  7 Jul 2025 03:39:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="deDSSNVO"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F+hz+iNq"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD94D72639
-	for <kvm@vger.kernel.org>; Mon,  7 Jul 2025 03:38:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94351258CC8
+	for <kvm@vger.kernel.org>; Mon,  7 Jul 2025 03:39:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751859523; cv=none; b=TKRANEaLRrFqSeQkjWxZewOHWlc36qfkqrKuu3pY/vvPnxSD9xOAOPZcc5TQYnbmAS+LJ00bj9fyyB2ctFalw3bdq92ZLsL6PSMmQTmr5rgu9Wmjq3W8mRUAozN6WRRxQXolwnqjJ58+KKcn0XAQVr6ozmvN6X7N7p6FXXTaP84=
+	t=1751859544; cv=none; b=MQwCIB2H30TBK3hNYpUfrEnQnAGsM+CqLUFuFvbapt11O7e17ksR1ZtinIVz8t3L+RbRd6ez8uZ4xOGT4H5tw3UeG7A7pIprE45NQedVByxDdYFA6lpM4QaHgIr4RUItwkzhSyvrifKSCT7MB975jiltrv9WgxxPZYBy54bOp2g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751859523; c=relaxed/simple;
-	bh=xP2bREtdvnGbOLwW7B3gpwqiB0qIwzFyIIj2JKt5GFc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ffXYZtc56uUPYfegR3fvf9v4TmVuvzhLXhwqxYi52vYMYknhOmcx903zEhYveq7kq26r0v92rAdzrhLBt2+qHGY6+RTtfX3oCH6cBnT1A8/lM3eWT6IJXq22t4BoZjNrYIJ4ph0ojHkaXsoQU664C07VgBZ1Dgk5IAhizRq5UW8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=deDSSNVO; arc=none smtp.client-ip=209.85.210.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-74b50c71b0aso1324565b3a.0
-        for <kvm@vger.kernel.org>; Sun, 06 Jul 2025 20:38:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1751859520; x=1752464320; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gYLAUdUJTR9rpX/RucDx6r9U6vpMoU3BznYDYTgd2Is=;
-        b=deDSSNVO6EHM27EEpN5zgDVNe5cIYmIQsGgECnAysp1VJ2/Yu2+bsR6IK5GaCH7zyl
-         fGJArFnmt74msAx+nmfNg/lunwta7LtPFFzr78d8v6g1TdgEjddnky+E1y2iUr2i3z0J
-         30BuBXByTmYssYjdTLRSYUMxXM9KeRZth9qH9vdDYp60wA6BvIemGbmi9dguJDfFgRSn
-         aws4ikGoTOzQmmkivWC8BN6yIYW+PG+mdSMGtefeip7QwGBSvPxM0BXJDFs1oiCEfVRB
-         PT5i76wXrosq+nsrmwJvXEhQA1Ts82ecr9j7GACfKxGUAVJ6ako5rl5baVmvJYKalAU3
-         dvNg==
+	s=arc-20240116; t=1751859544; c=relaxed/simple;
+	bh=cToKybjXtrPshKXsvriTLIFQT34mAn7DrvDWsf8sYmc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Coo+OrZHJ8PQtK+NfUa8DPDWKTL9lEk6pooLr8cP50J0rvqy3mrnY/09JkdurM3sHVHIvEBkE98gHIEti8mWP8ZFhK71/umIuu8HRLnljvEijpl5VmTqDLkYEy+Ag5U1PXV2uchW6pkXylPGR9D1VHq4Pe/2OcsGzLQ2BErRhCI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=F+hz+iNq; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1751859541;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cToKybjXtrPshKXsvriTLIFQT34mAn7DrvDWsf8sYmc=;
+	b=F+hz+iNqpFR5zX+hdW73Rq2Gwj3fxSQZJQZJvCrL+isfNclNnQZzXwWy3FNURADIUE+EsY
+	UefGbU0+1OJml6CGotDFumULj6ImhDiUapE5VbndRmlwWycbpL7JGth53xhb+NIdAguV7t
+	4Kp2YW/xOzKDcoZY/13LpZjbuj9R64c=
+Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
+ [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-336-aoqwTsIGOtulhx-vray_hA-1; Sun, 06 Jul 2025 23:39:00 -0400
+X-MC-Unique: aoqwTsIGOtulhx-vray_hA-1
+X-Mimecast-MFC-AGG-ID: aoqwTsIGOtulhx-vray_hA_1751859539
+Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-3132e7266d3so2626503a91.2
+        for <kvm@vger.kernel.org>; Sun, 06 Jul 2025 20:38:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751859520; x=1752464320;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1751859539; x=1752464339;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=gYLAUdUJTR9rpX/RucDx6r9U6vpMoU3BznYDYTgd2Is=;
-        b=sshvexz3QW6d81XF+oH9g8G7kB/3IbYypeDIXwr2EorexsOX/M4TBm57Rwa7swNMv5
-         zax38kIGBm4xzI15FyKcoye756Y9QI5i2H5kxzxjOJ9trCWVpSIe4auejCFO8Li8HbrP
-         8HhiJRl1H48CtBRxasMzVqVg5k51xvOP11pAGAbxrMkJWWumA/KGriZZyR3o54sJPqJL
-         ssjNowxoUokasVWwZo3Fz0+tJ7hFuHdx8SNWHpRyoWjWXq7rqjtL0lwo27637DNfeCAu
-         xLgGjPM7ogIHblOc9syhkG53E8hixCaYwlyBhmJhvmxXOJyasEAHrTjX8Y+93cy+eVWo
-         EajQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUQxE6C5B4bqAHHkSzu3lZPv8+HIxZ663LLg19aAKtPM9xYeARB24WG56mY5//IdqKtyMc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz40jQmW14NUztHZuPoyjjzknezOci0XRdQqdsedD4etbw+kTuM
-	nerlbWIJOTEB6F+4NrISD0GUu33unx3zewTD9WPunaFgN2wn9ctGndCoxwjMfi5fl7E=
-X-Gm-Gg: ASbGncuomKHw3IThA1n8jP1SNe29Z/6Pz+Ue32FYA1WPCMjhnEYKh6CHsAbCb1Nzwtu
-	karAsPPDBH6TrlaHEDi6V8vNl+yIcURYC6vaL3Vqo/QadICjX8zM/0Gwz9P7KAdrJucCJuZsjU8
-	NgKTIs84JjucY7/Pzoc1B1h28FsGNBn2Tu9zN7UPnFUynZ3f9/kJeNosKGvRiF38Iqk03nt6T0e
-	B7QtbQmQX1D32eaHUPggwiVMW3Tg8zrz42flbuUt2I6JZXWGnNgsB1SuDFj1LFwylAKWBzHdfgz
-	kKj7AsT+Xdl4r3Tjxq6xCoD7As/cmLCx53AV91rmESpRF2E3nPtGxViBcYAIcb3hY956TIZWEuf
-	LEegsYDv/7ufMng==
-X-Google-Smtp-Source: AGHT+IHQ+vMn4AUfTUfzbidm8jT0R/lnwjN3Q065ykEjKC8AayhHkU7jvtK+lcztQOyY68HYaP5uQQ==
-X-Received: by 2002:a05:6a00:4f8b:b0:746:2a0b:3dc8 with SMTP id d2e1a72fcca58-74ce8aca411mr12735141b3a.17.1751859520171;
-        Sun, 06 Jul 2025 20:38:40 -0700 (PDT)
-Received: from localhost.localdomain ([203.208.189.10])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74ce4299c3dsm7789475b3a.116.2025.07.06.20.38.36
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Sun, 06 Jul 2025 20:38:39 -0700 (PDT)
-From: lizhe.67@bytedance.com
-To: jgg@ziepe.ca
-Cc: akpm@linux-foundation.org,
-	alex.williamson@redhat.com,
-	david@redhat.com,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	lizhe.67@bytedance.com,
-	peterx@redhat.com
-Subject: Re: [PATCH v2 1/5] mm: introduce num_pages_contiguous()
-Date: Mon,  7 Jul 2025 11:38:33 +0800
-Message-ID: <20250707033833.59970-1-lizhe.67@bytedance.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20250704171015.GJ904431@ziepe.ca>
-References: <20250704171015.GJ904431@ziepe.ca>
+        bh=cToKybjXtrPshKXsvriTLIFQT34mAn7DrvDWsf8sYmc=;
+        b=QKE30VL6oUipCgbMdUPftoFiRCmWow3hdfcVeZoomToV6RRCmA4Hf81Nf67tUoJ+7I
+         M5PvlVc5YdZhvwa0toZA9TOXA+U3T1eekjYduLW8eD1n1rtBQL4fQgSyrS/B2FH9mxyS
+         wNlnGP/ps25VYLPc/srS0a//Mzc8iksAegMFoDy+ydKxccP8VwqqIEahNxs4d6vp6mL+
+         T/Y/VxbsNCbzBHBRh8StoPvBTqPaP+IYh+mWaEwap7iAPusitAqcVZy33F2JIZznNJpz
+         yOR2ygMWonmZhod13hCCloxNISe2M3qvO4rSTqD1lZlDU5QCNOXAuChyg+kUveH6WcwV
+         /r9w==
+X-Forwarded-Encrypted: i=1; AJvYcCU9Rwu0Xw89lxq7dNscVlRfFzDn/bkVYeV+Y9ezYV8jrZX+yLD+8SkYuZznCY2Ds08o5BM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzXNo3StOLixG6EI28E3l4XTFYPKBLzdizpT7G5/bNJk0LaV1KK
+	sEJ2X9WT6oukqP3l/CS/u/QH9W0JNmhnxvDvfVLeMTpwmW9wqSDLEauqVh8t5ql+59qCVbo5Yu9
+	CUU6N6TNaH2xcMUPVBs00jhH97R7P8FfUdknjyqnJAYCVH4FUQQOlVAq8MHXWCeSVUPsDfli+qn
+	JGxQv7kk67LAFJsOK3PxDr8kVZriaFVM9PF5i2wOE=
+X-Gm-Gg: ASbGncsPimN5J6C+xHtPFLwJ7BXqhEyfTth02aQ6aU9GPBIJ8/REBswTo0cBq/NjVT7
+	lZRGJW7DEvqonsvzQL2P+d31L+Q2r1yGDBCCjFHicN+GPg/wtWGAzGhfm0N82eb86TyyD28mepr
+	SxwNYH
+X-Received: by 2002:a17:90b:55cb:b0:31c:15da:2175 with SMTP id 98e67ed59e1d1-31c15da23cemr1276678a91.9.1751859538656;
+        Sun, 06 Jul 2025 20:38:58 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE/OScOfzxvN6ffL+e+JM/H+J3/JdD4csUZUpOcHgC06UuyYVCjZh3kPiyRl4cX84Tq+BwKAeQqS9ePIWOt/tw=
+X-Received: by 2002:a17:90b:55cb:b0:31c:15da:2175 with SMTP id
+ 98e67ed59e1d1-31c15da23cemr1276643a91.9.1751859538244; Sun, 06 Jul 2025
+ 20:38:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250702014139.721-1-liming.wu@jaguarmicro.com>
+In-Reply-To: <20250702014139.721-1-liming.wu@jaguarmicro.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Mon, 7 Jul 2025 11:38:46 +0800
+X-Gm-Features: Ac12FXzRSQJDauDNVYKvCZUnjp7a1__tIs86dizLjOKq_h5WbWMweaIbaRJmiis
+Message-ID: <CACGkMEuxSsJVkvNnGGZtrK=MOyzc1ajW+SNR-xP_XzO5=R25jA@mail.gmail.com>
+Subject: Re: [PATCH] virtio_net: simplify tx queue wake condition check
+To: liming.wu@jaguarmicro.com
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, angus.chen@jaguarmicro.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 4 Jul 2025 14:10:15 -0300, jgg@ziepe.ca wrote:
+On Wed, Jul 2, 2025 at 9:41=E2=80=AFAM <liming.wu@jaguarmicro.com> wrote:
+>
+> From: Liming Wu <liming.wu@jaguarmicro.com>
+>
+> Consolidate the two nested if conditions for checking tx queue wake
+> conditions into a single combined condition. This improves code
+> readability without changing functionality. And move netif_tx_wake_queue
+> into if condition to reduce unnecessary checks for queue stops.
+>
+> Signed-off-by: Liming Wu <liming.wu@jaguarmicro.com>
 
-> > diff --git a/include/linux/mm.h b/include/linux/mm.h
-> > index 0ef2ba0c667a..1d26203d1ced 100644
-> > --- a/include/linux/mm.h
-> > +++ b/include/linux/mm.h
-> > @@ -205,6 +205,26 @@ extern unsigned long sysctl_admin_reserve_kbytes;
-> >  #define folio_page_idx(folio, p)	((p) - &(folio)->page)
-> >  #endif
-> >  
-> > +/*
-> > + * num_pages_contiguous() - determine the number of contiguous pages
-> > + * starting from the first page.
-> > + *
-> > + * @pages: an array of page pointers
-> > + * @nr_pages: length of the array
-> > + */
-> > +static inline unsigned long num_pages_contiguous(struct page **pages,
-> > +						 unsigned long nr_pages)
-> 
-> Both longs should be size_t I think
+Acked-by: Jason Wang <jasowang@redhat.com>
 
-Yes, size_t is a better choice.
+Thanks
 
-> > +{
-> > +	struct page *first_page = pages[0];
-> > +	unsigned long i;
-> 
-> Size_t
-> 
-> > +
-> > +	for (i = 1; i < nr_pages; i++)
-> > +		if (pages[i] != nth_page(first_page, i))
-> > +			break;
-> 
-> It seems OK. So the reasoning here is this is faster on
-> CONFIG_SPARSEMEM_VMEMMAP/nonsparse
-
-Yes.
-
-> and about the same on sparse mem?
-> (or we don't care?)
-
-Regarding sparse memory, I'm not entirely certain. From my
-understanding, VFIO is predominantly utilized in virtualization
-scenarios, which typically have sufficient kernel resources. This
-implies that CONFIG_SPARSEMEM_VMEMMAP is generally set to "y" in
-such cases. Therefore, we need not overly concern ourselves with
-this particular scenario. Of course, David has also proposed
-optimization solutions for sparse memory scenarios[1]. If anyone
-later complains about performance in this context, I would be happy
-to assist with further optimization efforts. Currently, I only have
-a x86_64 machine, on which CONFIG_SPARSEMEM_VMEMMAP is forcibly
-enabled. Attempting to compile with CONFIG_SPARSEMEM &&
-!CONFIG_SPARSEMEM_VMEMMAP results in compilation errors, preventing
-me from conducting the relevant performance tests.
-
-Thanks,
-Zhe
-
-[1]: https://lore.kernel.org/all/c1144447-6b67-48d3-b37c-5f1ca6a9b4a7@redhat.com/#t
 
