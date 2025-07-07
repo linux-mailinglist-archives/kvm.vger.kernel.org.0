@@ -1,75 +1,77 @@
-Return-Path: <kvm+bounces-51652-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51653-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4076AFAC1B
-	for <lists+kvm@lfdr.de>; Mon,  7 Jul 2025 08:50:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F8ADAFAC1D
+	for <lists+kvm@lfdr.de>; Mon,  7 Jul 2025 08:50:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1FAB418995ED
-	for <lists+kvm@lfdr.de>; Mon,  7 Jul 2025 06:50:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D23E3A448E
+	for <lists+kvm@lfdr.de>; Mon,  7 Jul 2025 06:50:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A445727A92A;
-	Mon,  7 Jul 2025 06:50:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28D0027F007;
+	Mon,  7 Jul 2025 06:50:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="aFEQue5B"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="QeN9lzcF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23ACC279787
-	for <kvm@vger.kernel.org>; Mon,  7 Jul 2025 06:50:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE9E02627F9
+	for <kvm@vger.kernel.org>; Mon,  7 Jul 2025 06:50:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751871008; cv=none; b=Df30Hb1sQYIxJhMwspe/sal3toZGTDC6iwrgSVU0QwHAXuVL09T9sUqb4+rnndKYFNab9qdwkIdlnUA7rZMwjiCeg0S7LqKbEC3vnnLTRoQL7vy4x4AmERu+3dM605GPROvzE4tuJdICrMGHTWtketkNkNL4bJnPaLSNvuwtKjU=
+	t=1751871014; cv=none; b=N5xEhJRjihLlCrwTokqb1aKQXBurm/qKpeKzGXb4UpTpSsAkcMRLRjuRyrJOk8VgRl23tytHuC05jiABoT0pvIi7t5tZVNVCE6R6bPXRtvmanzbDo6lY0+e1DGBPb+9vtkASIoDCgUxvVswD7UQIWxmlmW1UnTI5obdHmrbO+eU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751871008; c=relaxed/simple;
-	bh=iuzlfF6PXexPT6SoFJbxBuA9UcLZfFM/8mhOjMDSD7I=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=icFyK56NZ1jGTRvVlM5aDrQDxb3VpBzyo33glatzk0DJrO4fLCLdfky7vjMTguIbkTGtESThqMXsOXtmVKtnCp7Y7RweTh2GRSsmfygShWpewV+U3FcTtVw8UKMnqcVycudeliFHCJw8gFN/PmTTfD7sze11NmV15zAPh3begBs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=aFEQue5B; arc=none smtp.client-ip=209.85.214.178
+	s=arc-20240116; t=1751871014; c=relaxed/simple;
+	bh=yySkyAzKw9ZyNy7KrfMmwyacolQBHXtTfXNgEj0CYxg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=qCqqliHTw2Z+Tp+nCLyeeetLODx3xF5nfwI3Qqx+Dc/hp/v9Y2Um6+nPntEvGmsOsPZTHvTYblc9biZ3UO2t4z9VTUpseDD59jYF4ENV2Oyn/zIUBPNuXbGTwgpP84rcqeJBvpjnY05noPb8P7l/msRW1x7e+mAUX0jP6oUg21E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=QeN9lzcF; arc=none smtp.client-ip=209.85.214.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2352400344aso26391875ad.2
-        for <kvm@vger.kernel.org>; Sun, 06 Jul 2025 23:50:05 -0700 (PDT)
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2350fc2591dso24562115ad.1
+        for <kvm@vger.kernel.org>; Sun, 06 Jul 2025 23:50:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1751871005; x=1752475805; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=i8AsWeXMLhqUn3H7B9xWkZ8Mg80AN3Bq26h9flJP3Ag=;
-        b=aFEQue5BtNmT2CiL4dlW3cmX6lspkgBfE1OQURF9bk+CoO2VtejTKsvqrCWlsJgIfr
-         wEdovltkkm7WKv0yM45OeuN77MJSeLsqPm4gPOO3QJV7gKziMZ587DzxMpY6XgIgQ4qv
-         5lrNqHzd8znsrcX345sn1BMemeAsvRbTE4ZiUnXJdJYWaFKOh/FWqJYY6NomV19xRbzU
-         yYaJhJa9Ua158Bb3JbRSoC2OONESjgXqR9jvQ9VCSYXW201sz/KlpJJfoI7RXIKZWr2X
-         Bhgf4cRC9sbJPGkoU6p2CvkZP5dWnTdq9AykYjwEoFo2sDP1iEWgmF8agquYDQ0dnJNA
-         fdqA==
+        d=bytedance.com; s=google; t=1751871011; x=1752475811; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=e83zaooyctJVGMAyfqno/5MLE5GO1gHM6Xp57jXORKE=;
+        b=QeN9lzcFeolJxlBX+zujzzwobxK2Gg6SiwflUy05DPo4ug3gvEMhonmN5vdSkicxeR
+         pHEMI6SwATKY9gYMbgZgiXstVFINEMrB24meOeTUtl6P4RHKC8hLf9bVMOrmu5Gsyn7b
+         j1K3z+yxVMsGNtDL8aRntfd6d8qM6NMFRgJ48U1uioPY4XFVlKYYbTLpETQaCA7SAeDU
+         tw6KtNxVhHVzp8nIgUCLbDYHsDPpuDW7Qvk+rSvnHtnTO7Jtix5qcWcC8ikzAsA6E91D
+         wJez2vn7Ise6yJlGUmbNuja6Kodpmd83lT+X2Akw4YGa0VWqdEDTYI8KL4J5DY8x60IQ
+         b7hw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751871005; x=1752475805;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=i8AsWeXMLhqUn3H7B9xWkZ8Mg80AN3Bq26h9flJP3Ag=;
-        b=uu+UpPi3p1T2z2Ov3QGpJbIDoKiIyQBp1eZc4WgYCh/3qMZLYigfeb8IZPIPb4WBmM
-         KWMVRdFflATemgE2WqRHBOWurLjY+LoqUcxZa9fpYcRyGI0PEGz0q/1yPmR5x6Vyc3Ob
-         gZC7OUR8LB7bJ8FoLooKTxVuQQP1Thg+PUgTZodW+M/N13lwM6i9j+IuUd8COriX904A
-         wLGyx48erhuzmF46qfngC5PukuhwTpZ7f3137oLnhTxo1aOhrFBt2SXJPmOCcJbb0DwW
-         1H98jbqNDISZj5ITy4N/Ta2I8D7dc/Vcj0Tj2IIstdsygOq1jip92kPEFcXE9mh9yrJ8
-         KZfw==
-X-Gm-Message-State: AOJu0Yyxz2hPx/gq2Vcc3Up2yS2rNDqGT9UOb+Qhuc4ybBxoA8E6OQ4v
-	Xo+ouxA4fYFGcHrhrUmw52beK1jz8sT4959iPGgy4Qk0MXqlF6JbUbHaOBW8IVJP4k4=
-X-Gm-Gg: ASbGncuJn+IYZEu6LlRDFiMfW5exUa82Utb9UQuoAxGLN+ZJ2S8KfsIJaCBw0rn5a+f
-	x6BVIeDQDfOD0qgawVYHKopJk7/pELcvaxkODo1JBBw9OCi/+fQCi5OqZZK3hT/z1J7SbADBoYP
-	9hNp9oeFALjInBsZWT/ZdCXt3IY13eYyGkFh7lJHUW8epsbxKaa3O/EWnsX02sfE3+6ZzscOoZM
-	an88wD2ohGe9vfwjLGaqDKTwCF22WrbL1T9QsFntwBw73yaO4MIAx0C6oq3U00Fn/a7FxT4c0Kf
-	+5t+L/OrVL7DfoIkFAoDVNssrgaLWW7NB2m7NPLXGEz8RsK3bAh0rLincjyGOh/NZexCJ0bIduN
-	xiqNi+eqelZh5jcfq+/096h0=
-X-Google-Smtp-Source: AGHT+IGLihlBavJmP5vmETh0vLgxwYfBYMI7r7oHFioBXcwdK0RdD8OiHt5kuZB6aRF9wDmBnGCq9A==
-X-Received: by 2002:a17:902:f70f:b0:235:e309:7dec with SMTP id d9443c01a7336-23c9105d8dcmr85967755ad.26.1751871005195;
-        Sun, 06 Jul 2025 23:50:05 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1751871011; x=1752475811;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=e83zaooyctJVGMAyfqno/5MLE5GO1gHM6Xp57jXORKE=;
+        b=qmQBWQ0MAy4+PppgqLRP9//3TrSan2D4Q5rwfw5cr4AKdiVscDwyd9LK6b+wPcznjq
+         vmG/3PpJI0cdsq140nyPGOpvspqdIHI6rmM5pLtZLDGxi6+LpW58BoCdvWDJ3KFLRI4f
+         rufAsA7rx6EV3Fb58N9oLd8vgalw2ddRSpYmyXa38h6X7eQqeptDa4Sct0VsIcI8N9Jz
+         UjQ2wI0TpDofyxE44HBDYm8k5Z/Cs+33YHcrfxpg1SXVrZM5CV/jOvWcZSzLWyMWHHDQ
+         t8uODRbv8ySNDlT+8UaqXdrMds8t3IT8a8zfLxsXsPXE957Xa3+4m445CGGZGx5FYR7e
+         KbDg==
+X-Gm-Message-State: AOJu0Yyns5GghUDkNjOz/9prR2joCz1Unq06tFwkE7JuoICASRDi8Fud
+	oESb7Z2RdbLjwmww2zxOViCV1vTN13+02o76KLN2rzcRrh03/hKJQrRkosTzCx8fbac=
+X-Gm-Gg: ASbGnctP8v3m6kzwjxDSMpGJG7aLsbrlJlMlTACqMzIuvWd6QBkK8e+nyqJWsCoj8/i
+	ka+UEEwzcuvVgJEfyGUT+9i7bPDNWYwYMwR2SBdxKkwZGZxCsVwDv6T5D8RRE33Mje72ThvCciX
+	CPAITimVjxRXQZmEVlx21BtF8/Fx1YSCMladlMdsg3w6psM1PDQKKKiuBDD4Er/WHyin8cOQnes
+	DUZFTXZ+y7L/3l32ZxY7QQBkfI6vbpiwgusqpRdw8Yvgu3puXfou2wKWgDrd9RvA1vo8nKvUiGM
+	mcWyfmSzQvWSdARn85X6Kfix7ja9zgeF2XHuszL6Y0bCXnW0KREc2Ez+y6OVwkn4TDftO92MCTQ
+	+0QXi1kQDEPGO
+X-Google-Smtp-Source: AGHT+IHZIatv+CFtPNahfbucN1jWL70KTS2wbiORevgf6e2vHgPOO4LbLUKtKdQFdYuPICyB+irnmw==
+X-Received: by 2002:a17:903:1ce:b0:237:e753:1808 with SMTP id d9443c01a7336-23c84b9a123mr186936395ad.20.1751871011205;
+        Sun, 06 Jul 2025 23:50:11 -0700 (PDT)
 Received: from localhost.localdomain ([203.208.189.9])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23c8431a1aasm77377635ad.15.2025.07.06.23.50.01
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23c8431a1aasm77377635ad.15.2025.07.06.23.50.07
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Sun, 06 Jul 2025 23:50:04 -0700 (PDT)
+        Sun, 06 Jul 2025 23:50:10 -0700 (PDT)
 From: lizhe.67@bytedance.com
 To: alex.williamson@redhat.com,
 	akpm@linux-foundation.org,
@@ -80,10 +82,12 @@ Cc: kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	linux-mm@kvack.org,
 	lizhe.67@bytedance.com
-Subject: [PATCH v3 0/5] vfio/type1: optimize vfio_pin_pages_remote() and vfio_unpin_pages_remote()
-Date: Mon,  7 Jul 2025 14:49:45 +0800
-Message-ID: <20250707064950.72048-1-lizhe.67@bytedance.com>
+Subject: [PATCH v3 1/5] mm: introduce num_pages_contiguous()
+Date: Mon,  7 Jul 2025 14:49:46 +0800
+Message-ID: <20250707064950.72048-2-lizhe.67@bytedance.com>
 X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20250707064950.72048-1-lizhe.67@bytedance.com>
+References: <20250707064950.72048-1-lizhe.67@bytedance.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -94,90 +98,51 @@ Content-Transfer-Encoding: 8bit
 
 From: Li Zhe <lizhe.67@bytedance.com>
 
-This patchset is an integration of the two previous patchsets[1][2].
+Function num_pages_contiguous() determine the number of contiguous
+pages starting from the first page in the given array of page pointers.
+VFIO will utilize this interface to accelerate the VFIO DMA map process.
 
-When vfio_pin_pages_remote() is called with a range of addresses that
-includes large folios, the function currently performs individual
-statistics counting operations for each page. This can lead to significant
-performance overheads, especially when dealing with large ranges of pages.
-
-The function vfio_unpin_pages_remote() has a similar issue, where executing
-put_pfn() for each pfn brings considerable consumption.
-
-This patchset primarily optimizes the performance of the relevant functions
-by batching the less efficient operations mentioned before.
-
-The first two patch optimizes the performance of the function
-vfio_pin_pages_remote(), while the remaining patches optimize the
-performance of the function vfio_unpin_pages_remote().
-
-The performance test results, based on v6.16-rc4, for completing the 16G
-VFIO MAP/UNMAP DMA, obtained through unit test[3] with slight
-modifications[4], are as follows.
-
-Base(6.16-rc4):
-./vfio-pci-mem-dma-map 0000:03:00.0 16
-------- AVERAGE (MADV_HUGEPAGE) --------
-VFIO MAP DMA in 0.047 s (340.2 GB/s)
-VFIO UNMAP DMA in 0.135 s (118.6 GB/s)
-------- AVERAGE (MAP_POPULATE) --------
-VFIO MAP DMA in 0.280 s (57.2 GB/s)
-VFIO UNMAP DMA in 0.312 s (51.3 GB/s)
-------- AVERAGE (HUGETLBFS) --------
-VFIO MAP DMA in 0.052 s (310.5 GB/s)
-VFIO UNMAP DMA in 0.136 s (117.3 GB/s)
-
-With this patchset:
-------- AVERAGE (MADV_HUGEPAGE) --------
-VFIO MAP DMA in 0.027 s (600.7 GB/s)
-VFIO UNMAP DMA in 0.045 s (357.0 GB/s)
-------- AVERAGE (MAP_POPULATE) --------
-VFIO MAP DMA in 0.261 s (61.4 GB/s)
-VFIO UNMAP DMA in 0.288 s (55.6 GB/s)
-------- AVERAGE (HUGETLBFS) --------
-VFIO MAP DMA in 0.031 s (516.4 GB/s)
-VFIO UNMAP DMA in 0.045 s (353.9 GB/s)
-
-For large folio, we achieve an over 40% performance improvement for VFIO
-MAP DMA and an over 66% performance improvement for VFIO DMA UNMAP. For
-small folios, the performance test results show a slight improvement with
-the performance before optimization.
-
-[1]: https://lore.kernel.org/all/20250529064947.38433-1-lizhe.67@bytedance.com/
-[2]: https://lore.kernel.org/all/20250620032344.13382-1-lizhe.67@bytedance.com/#t
-[3]: https://github.com/awilliam/tests/blob/vfio-pci-mem-dma-map/vfio-pci-mem-dma-map.c
-[4]: https://lore.kernel.org/all/20250610031013.98556-1-lizhe.67@bytedance.com/
-
-Li Zhe (5):
-  mm: introduce num_pages_contiguous()
-  vfio/type1: optimize vfio_pin_pages_remote()
-  vfio/type1: batch vfio_find_vpfn() in function
-    vfio_unpin_pages_remote()
-  vfio/type1: introduce a new member has_rsvd for struct vfio_dma
-  vfio/type1: optimize vfio_unpin_pages_remote()
-
- drivers/vfio/vfio_iommu_type1.c | 111 ++++++++++++++++++++++++++------
- include/linux/mm.h              |  23 +++++++
- 2 files changed, 113 insertions(+), 21 deletions(-)
-
+Suggested-by: David Hildenbrand <david@redhat.com>
+Suggested-by: Jason Gunthorpe <jgg@ziepe.ca>
+Signed-off-by: Li Zhe <lizhe.67@bytedance.com>
 ---
-Changelogs:
+ include/linux/mm.h | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
-v2->v3:
-- Add a "Suggested-by" and a "Reviewed-by" tag.
-- Address the compilation errors introduced by patch #1.
-- Resolved several variable type issues.
-- Add clarification for function num_pages_contiguous().
-
-v1->v2:
-- Update the performance test results.
-- The function num_pages_contiguous() is extracted and placed in a
-  separate commit.
-- The phrase 'for large folio' has been removed from the patchset title.
-
-v2: https://lore.kernel.org/all/20250704062602.33500-1-lizhe.67@bytedance.com/
-v1: https://lore.kernel.org/all/20250630072518.31846-1-lizhe.67@bytedance.com/
-
+diff --git a/include/linux/mm.h b/include/linux/mm.h
+index 0ef2ba0c667a..fae82df6d7d7 100644
+--- a/include/linux/mm.h
++++ b/include/linux/mm.h
+@@ -1761,6 +1761,29 @@ static inline unsigned long page_to_section(const struct page *page)
+ }
+ #endif
+ 
++/*
++ * num_pages_contiguous() - determine the number of contiguous pages
++ * starting from the first page.
++ *
++ * Pages are contiguous if they represent contiguous PFNs. Depending on
++ * the memory model, this can mean that the addresses of the "struct page"s
++ * are not contiguous.
++ *
++ * @pages: an array of page pointers
++ * @nr_pages: length of the array
++ */
++static inline unsigned long num_pages_contiguous(struct page **pages,
++						 size_t nr_pages)
++{
++	size_t i;
++
++	for (i = 1; i < nr_pages; i++)
++		if (pages[i] != nth_page(pages[0], i))
++			break;
++
++	return i;
++}
++
+ /**
+  * folio_pfn - Return the Page Frame Number of a folio.
+  * @folio: The folio.
 -- 
 2.20.1
 
