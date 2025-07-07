@@ -1,240 +1,198 @@
-Return-Path: <kvm+bounces-51661-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51662-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E45ECAFAD17
-	for <lists+kvm@lfdr.de>; Mon,  7 Jul 2025 09:30:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADFD2AFB0D0
+	for <lists+kvm@lfdr.de>; Mon,  7 Jul 2025 12:11:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8902618997FC
-	for <lists+kvm@lfdr.de>; Mon,  7 Jul 2025 07:30:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 909953BB2F8
+	for <lists+kvm@lfdr.de>; Mon,  7 Jul 2025 10:10:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FC8F286894;
-	Mon,  7 Jul 2025 07:30:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C7DD293B55;
+	Mon,  7 Jul 2025 10:10:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QecbfRfn"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="x4EkyGSt"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2044.outbound.protection.outlook.com [40.107.95.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0E52286D6B
-	for <kvm@vger.kernel.org>; Mon,  7 Jul 2025 07:30:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751873417; cv=none; b=Xi0v4Ua4yqr07zP8K0bx7i9WTSRmgjbG7cKejWPeI4EUgaoTATP+8fL/ym2TM136gSQQIoeNXavy6NnVWCwK56TVagPNBA+QagLucgsrcpcwKsHiofzdHvF7OMofd5s9Ij7GdNkthfPElTZWAiHkEVV2L6cBtiY0N7/yn4VQ7RM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751873417; c=relaxed/simple;
-	bh=WmVnFmJUPhDnz0+tyC6BI6D27WW0ZZYe9AXhgzfa86o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LJAxgmpt5cP+y5kNQTtyJe19spjoSuEkxBRr4rPx1wj03eVg1CPwWiUGT5j14cSD29Vpoijr8A3521NcXOaDuZ7WeQpc6nZAHTMR3oDkLUgKgcdcc5jufMK8raiT19JcnyPyJELZul46zkBH+4Ndk1/eNOVgVWNhFHTR1KSlnNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QecbfRfn; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751873414;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=IEmUGUoP/avhzVo01ZX3tJQ9D8xg/B8atIijwjnlXi0=;
-	b=QecbfRfnDVZBbFfCqzZ0kiGZosr6UDv28sGaejK9WLVLBiezJ8RadmOdrHHMvTm4aAktYS
-	ubr482uPOK5C7WEBXJsfbhbZ87NayaaaCxv1fsjWgLObgYpbvyojFzkyEa57/MMHZkoNb7
-	XxcwYANg3/eRDlYeKB8c5zW0lMPVt7s=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-482-1OZ1PW4SOfWYo_Sl5-s9Og-1; Mon, 07 Jul 2025 03:30:13 -0400
-X-MC-Unique: 1OZ1PW4SOfWYo_Sl5-s9Og-1
-X-Mimecast-MFC-AGG-ID: 1OZ1PW4SOfWYo_Sl5-s9Og_1751873412
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-450db029f2aso12185535e9.3
-        for <kvm@vger.kernel.org>; Mon, 07 Jul 2025 00:30:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751873412; x=1752478212;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=IEmUGUoP/avhzVo01ZX3tJQ9D8xg/B8atIijwjnlXi0=;
-        b=lefFZZ2BUOg8kmoJ9Xb4W626U9sGtlbFCZkVX5mcPIIOZCz/7D6PAW1PVmNS03w2uo
-         vFcdkgGHmuFVoGOuAwybXkchjL0B1zt7dUjPKwfl6uoXa5Qyh1uclzGVJh3QbIXHPxQL
-         cnMWOQgA+PKGqHmbqAEwwrhiDhvLIJXg297TQpTvI3LbCagDHl89TyPY5oRsKqga4yx8
-         GtkmWhGIsbAYPnm3aQC9kMecxusvAq8OuYJzRwIxxI75PNn+yDoIEB/V8+whet+xVMS4
-         svPYi/C/HnO1zxg13jH+ZSF0rTsZU9HA5kEzwnhUgtMQBKLTiIWngGWd2cVsuJxt0bkH
-         4aiA==
-X-Gm-Message-State: AOJu0Yztm9uYdm60x55Q+XfCbIHJnHu1//RNActo5n5zvDVRJuoEygVM
-	zmmjr9jPrtZ+iJKBRBQ7pDTDYNVoMfeNcK7Lf3idZOKVr8SqOpdov9yyWZHtIN/OsGCX4VszBsD
-	/jG7r59QNk+zx3y39shevxCrDjZaiVYDMDFS8huOyc1FlvekvuOi2HaFpLc3TxA==
-X-Gm-Gg: ASbGnctswfJ6pYRufJyvVFlTwFDyeW0xnAj9HcIpR1EHEd4yAV9up4GWQaiiyucvcKP
-	BZeBAxzNWjQNJVjap2Aopa1pTKiTPVdBZBi5cJ+Z6AS8TCuzys/p/vZExzRIVflizjDRJcwsw2+
-	S45rLHUh89OD/P6OHVWaGhXhBQzrtNVoNrOcGB8BNB98mtE4pDG2cuAyRhAhGjzcm/whc+C4GTG
-	4XrISg1f9BP+i35uDMEJPVPY8GIMsFBoYrgty7DCoISaQpc3EsszqVhq6pCnQ6qpxi91VErI9oh
-	NEIjgvdFfxorQkAb0QSalrpltkfEWaobaw6jID6WHNySSaMIjH+dWc+vYe3BZwFZUtuw/V12to0
-	7V4JOPo3Z45OaA1rG1ibTfhVGIUQOJh4KH2rfKlFRBiUBIo7g7w==
-X-Received: by 2002:a05:600c:83c7:b0:454:aedd:96fb with SMTP id 5b1f17b1804b1-454bb8881d3mr59456585e9.29.1751873411779;
-        Mon, 07 Jul 2025 00:30:11 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGANzkfEpkskqRvxDNn0Dc/JyBFAyOt8aPzL6q0SSinW8r5eRcBQDlAdYyFsiIqoTwO4ChXzg==
-X-Received: by 2002:a05:600c:83c7:b0:454:aedd:96fb with SMTP id 5b1f17b1804b1-454bb8881d3mr59456205e9.29.1751873411261;
-        Mon, 07 Jul 2025 00:30:11 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f38:1d00:657c:2aac:ecf5:5df8? (p200300d82f381d00657c2aacecf55df8.dip0.t-ipconnect.de. [2003:d8:2f38:1d00:657c:2aac:ecf5:5df8])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b471b9736bsm9494939f8f.60.2025.07.07.00.30.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 07 Jul 2025 00:30:10 -0700 (PDT)
-Message-ID: <c298273a-a286-41c3-a1a0-e9d876283bb1@redhat.com>
-Date: Mon, 7 Jul 2025 09:30:09 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BAF51F8755
+	for <kvm@vger.kernel.org>; Mon,  7 Jul 2025 10:10:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.44
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751883056; cv=fail; b=Y+9JnGIt/tNVk5gJoIh1zM3NxNy10daDmRRkBUCp9aE6wLYT5DwpwitWkvejRyJScLFC/vkyHcIPavJD6muqTcI12BD19DNwKZ8EOEwRoJjgHZo5qzO7HtoKLkZC/inC2QE357mfSVgFCRKse0ktzBpK80kk6CFxl9dxWJvUkT8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751883056; c=relaxed/simple;
+	bh=mT9TzEBCIDrEFhMwOuP4XZx1QndlHX2MUWJnONNX9z4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=XsgrAaVNicsVqoT5d1VFsyUoE5QEmtEwRPe/Oyw5b5fd6mEkmtde6MW5YlwlbsfJsneSOMLONw7APaIkakrmDC+A4qixq52o9/NEOIA8g3TYFs/slgPKgMX/vHICjc6ZTU+V2WvgNr01KSBMz+FixRheLLNEC9FOqDGZlyjFw3o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=x4EkyGSt; arc=fail smtp.client-ip=40.107.95.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=WowMs8f9aV4Gm10t1jzvKKw6/umq6rCEHCLUqNpSQgOnZfOuB3lluMB5c4VsEBLq/Rd3b2V+VwFHJH2VP54rfWR7K9EeaVgeheY+ypHoENpR67XLTQynQHNi5PVtgOjLk05kMG4MhL650LNkqTHWXVPeh8JPw9iIiens4shpkr1HEytn9d9bTgCQJ3qevTY9Y6uQ5SEdQ4ulENKAE9QtC4VCgRQ4jvD1u1eTbmBomFtgFxBjRbKUUe3VfAQ2RvD8C67t9Do3W5nZYd5/IMa/zdmJrvWv73BpMhB3yvrBTtxz7n+i2M9G2fgqg4jOkD1ikNHEIxqAHV+c4QunQS/gjA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=SmXyIOWWTjeCQOLINct0I9MKvba7OHnSpDsVBJRHLTs=;
+ b=hGTFZvXtWcCSS5mOiWsBcBOTvfMmLZ/dGVm31MdXPPIC6RTrugwKdlVnrFy8+wDoX39ur3SRYobC7kThCOijcf2E2Vdq5iSV79+tZuJ/PE3qeBCzb0g+/UF0jaOAL+Wf8FvDQeBR2Bs+gloPFQGu+KkB51e4SVDLF0kd6Ei13pWpo0LfU5Lr6WXDYwcaC9crumlrnwn711hxnxTyNHAVhVlSWnzk5nCRRgjl68NE4TZUZp0+bWtu0I4v+MSYJ2PaoTIiqHbYf14HfBjYI9osLQGE6apBCoQGe4R4ov4teNVH5NRdMD5FKVNiAzykiySBRaxifr1AKhv1oYhqOHl4VQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SmXyIOWWTjeCQOLINct0I9MKvba7OHnSpDsVBJRHLTs=;
+ b=x4EkyGSt+yaD9lhm/wgJtBAC51a44JpntvTeEWZuOucxjQAe8hiCcpBm96E3BZEOTVgnlwr6W7fcCsnvpa4esGh0ApaBcYeGcPUGFnPTnwciX47Im+0EGN2xOhe32Jibq+yTlz1K0HF10uZRo5xBYvHQ15WyvleocW8lB8SvIYw=
+Received: from BLAP220CA0008.NAMP220.PROD.OUTLOOK.COM (2603:10b6:208:32c::13)
+ by SJ5PPFF62310189.namprd12.prod.outlook.com (2603:10b6:a0f:fc02::9a9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.30; Mon, 7 Jul
+ 2025 10:10:51 +0000
+Received: from BL02EPF0002992A.namprd02.prod.outlook.com
+ (2603:10b6:208:32c:cafe::d3) by BLAP220CA0008.outlook.office365.com
+ (2603:10b6:208:32c::13) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8901.26 via Frontend Transport; Mon,
+ 7 Jul 2025 10:10:50 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BL02EPF0002992A.mail.protection.outlook.com (10.167.249.55) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.8901.15 via Frontend Transport; Mon, 7 Jul 2025 10:10:50 +0000
+Received: from gomati.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 7 Jul
+ 2025 05:10:47 -0500
+From: Nikunj A Dadhania <nikunj@amd.com>
+To: <seanjc@google.com>, <pbonzini@redhat.com>, <kvm@vger.kernel.org>
+CC: <thomas.lendacky@amd.com>, <santosh.shukla@amd.com>, <bp@alien8.de>,
+	<nikunj@amd.com>, <isaku.yamahata@intel.com>, <vaishali.thakkar@suse.com>,
+	<kai.huang@intel.com>
+Subject: [PATCH v8 0/2] Enable Secure TSC for SEV-SNP
+Date: Mon, 7 Jul 2025 15:40:27 +0530
+Message-ID: <20250707101029.927906-1-nikunj@amd.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 5/5] vfio/type1: optimize vfio_unpin_pages_remote()
-To: lizhe.67@bytedance.com, alex.williamson@redhat.com,
- akpm@linux-foundation.org, jgg@ziepe.ca, peterx@redhat.com
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org
-References: <20250707064950.72048-1-lizhe.67@bytedance.com>
- <20250707064950.72048-6-lizhe.67@bytedance.com>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <20250707064950.72048-6-lizhe.67@bytedance.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL02EPF0002992A:EE_|SJ5PPFF62310189:EE_
+X-MS-Office365-Filtering-Correlation-Id: aab08542-0cbf-4b8c-a563-08ddbd3e8d08
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|376014|36860700013|1800799024|13003099007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?0QuDgAwqcijcYUb0/jhHK4x544ihiQy0Xm2YFswEhglof3Q9V909EVv8CNNh?=
+ =?us-ascii?Q?jI+b5T8jfIIlPOAOFzHKVQuPH6m9lwq5ave9iI6V0Pg2yfAshr0/iq71Oerg?=
+ =?us-ascii?Q?Bmp7AJoKxDnnTQnChVvZ9gDUMwzmNtIHuHS0mwB5t054G2i4ioDOWqPVH/jK?=
+ =?us-ascii?Q?fJsMLjeHiS0FzpbSHY7cT6aDLwm6TGRGXx7K96Jzo6+K/O0zpmS8vT9nCcmF?=
+ =?us-ascii?Q?HIfxlip4lEuwKXEjwdNxrJkcE3kc+HCjbL+1p3QaSWAcxMPftd7Kh9/mqxMR?=
+ =?us-ascii?Q?lD3++KsdAt0vXRs9cFS7XWJQMq++gB6ugalMVYFftLFG2g5bD2Q/6FXLr8SK?=
+ =?us-ascii?Q?X/4D8t4xqCfk6kSyagh27hlBL3rZzJ/Ob0Pz6n9piKcE4qZe7FOgma2wYy+m?=
+ =?us-ascii?Q?Fpp3Uftu9uQRkqa4XT/4FpIz4xPW1vVdAGYZd2yRriyWtu8XzaeYhepcRe94?=
+ =?us-ascii?Q?DtD024UICErHAoTyUZv5uTbBEApqsULbRdyliLvO7cjXVUGR/2xkbII2TP8L?=
+ =?us-ascii?Q?410a6BqddoTWejDVaVE+oKqD0rl+RryNXmaXUWkiCtsD7HZhJZTG6C3LaVgP?=
+ =?us-ascii?Q?FIYm6E1mABTB8NkvbObPOtnLbEy/93Di3ju45CBHbpR1qKAv2jbL7iwTKP5g?=
+ =?us-ascii?Q?A7lKUPXA0N9EbkpMPIoGzhMLMTnqi1yXmwhbgJZC45XNX5/NnpKtP8WJdcVf?=
+ =?us-ascii?Q?/s7zAnRct31QMgv3lduMMxWCPmVZ46hvGRxQf3tgm0s7azNsWoaPEVtylqRn?=
+ =?us-ascii?Q?KUL/GrCK1yxrwaJEQi/xFmCeyE/yHXhn/Z/uyGPeo4oZB3qLUw30ik6oD1vc?=
+ =?us-ascii?Q?7CGW34UUjn/LfkavMN221J1k8DaB6oBEeGjiA+Cnwwryg0hWg2Nr6ljuMfRX?=
+ =?us-ascii?Q?xTfQXQvsp6KLdT+eaITW0QNcMLLIxIkD4KXvIj/3qA95j4lJAKwcei7CCphE?=
+ =?us-ascii?Q?leoUOKeH7f9o1CnwpzdXr9hDrzwwk8l8jR0h3V8CVoro//yXSnyzV5WVvVV7?=
+ =?us-ascii?Q?G1u8adc7eAZz4OVT0W63bzkze1Oh/ZYl3jxTIywge1LzwdZg9XSwnsQ6kwVE?=
+ =?us-ascii?Q?6QikKwNUPOxxJh35b/ZJPGMTb83J1WJUPgcjl6CiDtYI9GCstM6eelE+mHsV?=
+ =?us-ascii?Q?3B5s09wsdGslqHRaDGsltHGVVme3vlp2tsHYeuHMYu2Nubx6TQoX+YbeRbbH?=
+ =?us-ascii?Q?VQGqs54oVvSZvEysb32CaTCw4jLxFeJIZX4r6fWtWZKXnAUJk65HpeCjgCDO?=
+ =?us-ascii?Q?ZA84ogc2oM19KzagRsCC4tEJd5FR4d+Xmdl+T4QVWVXWwDTCv7xKtAhJZwwp?=
+ =?us-ascii?Q?GgAs3Ku1RnPHewrs2kJLvVfT/YBj9zczIyEWJSkuHRXtvY4HYXL0Z2Dzl02Y?=
+ =?us-ascii?Q?gMw7ep/U7hnOCwOmA45XSqiDx4rjG9BX2sN51e1wMR27Fw6Tx9qW0GU88CpM?=
+ =?us-ascii?Q?tI7FLE27wpT4rEweYM9PX39ixBHsjXUiXPl3pyayhs7BAQNliF7aqyQ+oequ?=
+ =?us-ascii?Q?AnAFPdR7oPeCBC72ar/JljzgsjBCQIwX4zqQ2avnJZiFAiMQQM2RUeqF0w?=
+ =?us-ascii?Q?=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(376014)(36860700013)(1800799024)(13003099007);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jul 2025 10:10:50.7812
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: aab08542-0cbf-4b8c-a563-08ddbd3e8d08
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL02EPF0002992A.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ5PPFF62310189
 
-On 07.07.25 08:49, lizhe.67@bytedance.com wrote:
-> From: Li Zhe <lizhe.67@bytedance.com>
-> 
-> When vfio_unpin_pages_remote() is called with a range of addresses that
-> includes large folios, the function currently performs individual
-> put_pfn() operations for each page. This can lead to significant
-> performance overheads, especially when dealing with large ranges of pages.
-> 
-> It would be very rare for reserved PFNs and non reserved will to be mixed
-> within the same range. So this patch utilizes the has_rsvd variable
-> introduced in the previous patch to determine whether batch put_pfn()
-> operations can be performed. Moreover, compared to put_pfn(),
-> unpin_user_page_range_dirty_lock() is capable of handling large folio
-> scenarios more efficiently.
-> 
-> The performance test results for completing the 16G VFIO IOMMU DMA
-> unmapping are as follows.
-> 
-> Base(v6.16-rc4):
-> ./vfio-pci-mem-dma-map 0000:03:00.0 16
-> ------- AVERAGE (MADV_HUGEPAGE) --------
-> VFIO UNMAP DMA in 0.135 s (118.6 GB/s)
-> ------- AVERAGE (MAP_POPULATE) --------
-> VFIO UNMAP DMA in 0.312 s (51.3 GB/s)
-> ------- AVERAGE (HUGETLBFS) --------
-> VFIO UNMAP DMA in 0.136 s (117.3 GB/s)
-> 
-> With this patchset:
-> ------- AVERAGE (MADV_HUGEPAGE) --------
-> VFIO UNMAP DMA in 0.045 s (357.0 GB/s)
-> ------- AVERAGE (MAP_POPULATE) --------
-> VFIO UNMAP DMA in 0.288 s (55.6 GB/s)
-> ------- AVERAGE (HUGETLBFS) --------
-> VFIO UNMAP DMA in 0.045 s (353.9 GB/s)
-> 
-> For large folio, we achieve an over 66% performance improvement in
-> the VFIO UNMAP DMA item. For small folios, the performance test
-> results appear to show a slight improvement.
-> 
-> Suggested-by: Jason Gunthorpe <jgg@ziepe.ca>
-> Signed-off-by: Li Zhe <lizhe.67@bytedance.com>
-> ---
->   drivers/vfio/vfio_iommu_type1.c | 20 ++++++++++++++++----
->   1 file changed, 16 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 13c5667d431c..208576bd5ac3 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -792,17 +792,29 @@ static long vfio_pin_pages_remote(struct vfio_dma *dma, unsigned long vaddr,
->   	return pinned;
->   }
->   
-> +static inline void put_valid_unreserved_pfns(unsigned long start_pfn,
-> +		unsigned long npage, int prot)
-> +{
-> +	unpin_user_page_range_dirty_lock(pfn_to_page(start_pfn), npage,
-> +					 prot & IOMMU_WRITE);
-> +}
-> +
->   static long vfio_unpin_pages_remote(struct vfio_dma *dma, dma_addr_t iova,
->   				    unsigned long pfn, unsigned long npage,
->   				    bool do_accounting)
->   {
->   	long unlocked = 0, locked = vpfn_pages(dma, iova, npage);
-> -	long i;
->   
-> -	for (i = 0; i < npage; i++)
-> -		if (put_pfn(pfn++, dma->prot))
-> -			unlocked++;
-> +	if (dma->has_rsvd) {
-> +		unsigned long i;
->   
-> +		for (i = 0; i < npage; i++)
-> +			if (put_pfn(pfn++, dma->prot))
-> +				unlocked++;
-> +	} else {
-> +		put_valid_unreserved_pfns(pfn, npage, dma->prot);
-> +		unlocked = npage;
-> +	}
->   	if (do_accounting)
->   		vfio_lock_acct(dma, locked - unlocked, true);
->   
+The hypervisor controls TSC value calculations for the guest. A malicious
+hypervisor can prevent the guest from progressing. The Secure TSC feature for
+SEV-SNP allows guests to securely use the RDTSC and RDTSCP instructions. This
+ensures the guest has a consistent view of time and prevents a malicious
+hypervisor from manipulating time, such as making it appear to move backward or
+advance too quickly. For more details, refer to the "Secure Nested Paging
+(SEV-SNP)" section, subsection "Secure TSC" in APM Volume 2.
 
-Acked-by: David Hildenbrand <david@redhat.com>
+Patches are based on kvm-x86/next which includes MSR interception rework and a
+fix adding missing desired_tsc_khz to struct sev_data_snp_launch_start
 
+51a4273dcab3 ("KVM: SVM: Add missing member in SNP_LAUNCH_START command structure")
+
+Testing Secure TSC
+-----------------
+
+Secure TSC guest patches are available as part of v6.14.
+
+QEMU changes:
+https://github.com/nikunjad/qemu/tree/snp-securetsc-latest
+
+QEMU command line SEV-SNP with Secure TSC:
+
+  qemu-system-x86_64 -cpu EPYC-Milan-v2 -smp 4 \
+    -object memory-backend-memfd,id=ram1,size=1G,share=true,prealloc=false,reserve=false \
+    -object sev-snp-guest,id=sev0,cbitpos=51,reduced-phys-bits=1,secure-tsc=on,stsc-freq=2000000000 \
+    -machine q35,confidential-guest-support=sev0,memory-backend=ram1 \
+    ...
+
+Changelog:
+----------
+v8:
+* Commit message improvements (Kai Huang)
+* Remove 'desired_tsc_khz' from 'struct Kim_sev_snp_launch_start' (Kai Huang)
+
+v7: https://lore.kernel.org/kvm/20250630104426.13812-1-nikunj@amd.com/
+
+* Rebased on top of kvm-x86/next that has MSR interception rework
+* As snp_secure_tsc_enabled() is used only in sev.c, move it there (Sean) 
+* Add checks to prevent user-triggerable WARN_ON_ONCE (Sean)
+* Squash GUEST_TSC_FREQ MSR addition patch
+* Dropped RB/TB as patch 3/4 got changed
+
+Nikunj A Dadhania (2):
+  x86/cpufeatures: Add SNP Secure TSC
+  KVM: SVM: Enable Secure TSC for SNP guests
+
+ arch/x86/include/asm/cpufeatures.h |  1 +
+ arch/x86/include/asm/svm.h         |  1 +
+ arch/x86/kvm/svm/sev.c             | 34 +++++++++++++++++++++++++++---
+ 3 files changed, 33 insertions(+), 3 deletions(-)
+
+
+base-commit: 6c7ecd725e503bf2ca69ff52c6cc48bb650b1f11
 -- 
-Cheers,
-
-David / dhildenb
+2.43.0
 
 
