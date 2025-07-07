@@ -1,251 +1,253 @@
-Return-Path: <kvm+bounces-51702-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51703-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3154AFBC7E
-	for <lists+kvm@lfdr.de>; Mon,  7 Jul 2025 22:26:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F3C2AFBC93
+	for <lists+kvm@lfdr.de>; Mon,  7 Jul 2025 22:32:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 44A414A66D6
-	for <lists+kvm@lfdr.de>; Mon,  7 Jul 2025 20:26:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8914516C1EB
+	for <lists+kvm@lfdr.de>; Mon,  7 Jul 2025 20:32:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7543521CC5B;
-	Mon,  7 Jul 2025 20:26:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4351220F33;
+	Mon,  7 Jul 2025 20:32:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="p2L5tIjv"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DNfZe93S"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09B5621C167
-	for <kvm@vger.kernel.org>; Mon,  7 Jul 2025 20:26:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751919962; cv=none; b=KwVCGPBPNZZRQxYyVf0hmQv3oqtqP4fmqW+l/IDnFU9JLlFpVTu+43uOo3ewRbcNaRqwzGyZ/y4e2Z0VoWJZ6OSfABa5+SnaiLwP74ygQGO4+30r1uo0OT9XxnALK3mup7ygEyx+Uj1RaFSDOYfvCGt+3z2pHhjs57p7OgzEAxI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751919962; c=relaxed/simple;
-	bh=CUORdPvw1cX4h66ndzLvStG5j7Op+139XvwyrrREJrk=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=GUGVhCDrknDT5BKzUrf+VXExngsudhjWQrltKQuEeUssqQKv7PJrGcrrX2uiCI2UahMiqocvCFel5NY3HPtYNTC9YSoNCFu1HIFAuasMs1ouWZT/8BaG3hU1Phkg2i3necp9fbP42PmEq3j/HWLv5MDNz8cr7E81f9rnTH047ck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=p2L5tIjv; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-748fd21468cso2850274b3a.1
-        for <kvm@vger.kernel.org>; Mon, 07 Jul 2025 13:26:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1751919960; x=1752524760; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=iDHpPitSS0mzs6saY8nYUe4AbTUUpZo+s9Jeux1OhIQ=;
-        b=p2L5tIjvqzyikO684wUOuFMy03ShPidY57Ke1k1vhi45gealcxG/mNbVVvZuTurre7
-         fkt+49lGawnIQ8LpicG6fKSmy881+qq8WNrXDSmScIZSOG/M/UX2zHOnb6xwohL5a1qN
-         E/4j4pUSZ0p+B75nGVtFaBPDO1fBSm1fplvNCfcQGhB8v0FR1UxMHiE3Bes9wWASCx17
-         +l7YwSiULCx4cGSymfHE9h3rH6rid20ggxDe6Le1aMhaRObbo5U9TKHgqQ8TpyFHLcRI
-         aIuxUFsVOhGj1PfklZzburCGRPLDjIM+jZMJ6dKu2QEkAqtM68uAUHe1g5nQtj+l21Sg
-         F6rQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751919960; x=1752524760;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=iDHpPitSS0mzs6saY8nYUe4AbTUUpZo+s9Jeux1OhIQ=;
-        b=Wu3h+gKG752JOfgrAvf+keq2U5uKA9UqKju0AzAkwpwokzJyXIGNXIRc56ED2teskb
-         I+mrtkZoumvCofYfNShTITDk2vOHfYGMmdYlPuIQ6ugWMSWuvG8LnEdRKJXvJMs53GNL
-         a7h0cx1EsesOoO0GEif8pWWsmdugmmnNA9Mv7ayXPixQ6mhHuaLiYBTF70a6OuSIGZtC
-         ul3dDqEmpJwKFwwYNhfveJY8x7NVxIt9Lef/uRkDLZwNxlOpLNRCsPBnLNyyJybKHTO0
-         EruNN8+eWkpMmYQyydmxfai33gZq/KM/+qZf3LVHcAE23yLpnKSn3g9Y2+gUVC/+deMp
-         vqqQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXsU9ZLeMefp3xeRM6Y3RnvYOMlmSddgk+N50H5aUBognRh/BxoscbMZYvcxbVsKBXED6A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyOCC1tX1AvqDZVe8HO3pOE1gBhrAbEVRtjSajxsT3NeXqJ1T9r
-	Mpq0h4xiHSBu5ELOEfV5kpNh38IUazm5M3+sxe28UltlSY7tIXTLNrrYoHnKWoiQU/QDiOf6eeI
-	QU87mag==
-X-Google-Smtp-Source: AGHT+IFl8zMk4n4kKwZdLDcVRgIXGtT2XaLzjhr0sN/pKm4EFVOSPvZMjw56qXhYU9AsX5p7+6HZjthUz/0=
-X-Received: from pgbee1.prod.google.com ([2002:a05:6a02:4581:b0:b1f:fd39:8314])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:12c7:b0:21f:51ea:5c57
- with SMTP id adf61e73a8af0-22b437de321mr627011637.16.1751919960279; Mon, 07
- Jul 2025 13:26:00 -0700 (PDT)
-Date: Mon, 7 Jul 2025 13:25:59 -0700
-In-Reply-To: <aF8FwqaBpfvQ7dYW@char.us.oracle.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70AD712FF69;
+	Mon,  7 Jul 2025 20:32:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.13
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751920355; cv=fail; b=HNQu4qLZLFKqOzd1LkQlzQKBCBO8ZMYc3VF1Bcwjlg4HaH6/vBxEXvt4Xknz4yUrhCLQLUddVMh90czX4yJQZsLu4Z+HeXkS4rZ3ilryShlEy2Qy3vE6RS/uddIXCLAtG5ij69YxDWOb/bdIlqpxS3dRyJivE8VojIhmxPoRkWs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751920355; c=relaxed/simple;
+	bh=YmWymMTeyf3Mz999BORbgdvH+jjso0w9ebDyee3f6Hg=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=DdXnYukKYlvkIBRJYXuMtIDENnx8OLvIEntePduhWmOA0Eq5SIWh1ucxF8a9E8/jYwWWIWQydSSWCrCZPYyBxo0XJZWejnpBp4rlX7U0ttqdZKJdVQil/KO9OGVQ08VVV9KH6UtSHeq6TC0YfH/bib7dz+jGHoJzk93QbgcBdws=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DNfZe93S; arc=fail smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1751920353; x=1783456353;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=YmWymMTeyf3Mz999BORbgdvH+jjso0w9ebDyee3f6Hg=;
+  b=DNfZe93Sb0bN9izaNOEhdqPYbDj53nq4YufR0hlT9VqWMLbvR1s3r7Tw
+   O0Ddq7zEveuG54ziERe5f3AQXL5AWwapM40TdkHZuhgZxXKY6jSt8VRwp
+   HVNUyjc9wS1+NS+S5MnyNkFt645HiAOVbH6LPuU/IiCb41pnm00JN/sNp
+   TL9qIxbAwhBZ8+P2resjx9kp5dxqSRakWFfAwWJzfiPnh1P4qMxmMDpQp
+   0BT66/apndgKBaq7HGX23xOnynxv+EMiYVCDvzOz6s4AtdPSRSvRnjq5f
+   fqDbN8tZj9ux30tQ3zUGjm/Pd+EY7bS/Z4zTmrirLMdwp53DKW/hTnGmU
+   g==;
+X-CSE-ConnectionGUID: j9/Q3vpXQnqYL8qxahS8jg==
+X-CSE-MsgGUID: gA8OXFo1Qcuu/fk+UpYw2w==
+X-IronPort-AV: E=McAfee;i="6800,10657,11487"; a="56763360"
+X-IronPort-AV: E=Sophos;i="6.16,295,1744095600"; 
+   d="scan'208";a="56763360"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jul 2025 13:32:32 -0700
+X-CSE-ConnectionGUID: rq6RG3ztTjeqJKNeAo1pXg==
+X-CSE-MsgGUID: WF0Om5HFRvCdCto1ZG3hlQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,295,1744095600"; 
+   d="scan'208";a="156045350"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by fmviesa010.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jul 2025 13:32:32 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Mon, 7 Jul 2025 13:32:31 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25 via Frontend Transport; Mon, 7 Jul 2025 13:32:31 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (40.107.220.47)
+ by edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Mon, 7 Jul 2025 13:32:30 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=f64TiGUXWQMOC8e0CZwD10FKqL4NuWwq361JAiIszL9UsTbfzB7AXQgm3PLfPCcsyjDgjeLPrq+aJnMbpkf2SuWj2zvOg1bVxxIObdSKsvSS9mafjzWL/cpa5EceIfwksLD5tWSiroH3hmqk0tuCg+GX3yuz5fFTZmed2O7+aEqi19MMXH4W+iR4Tnzf36ehEZeyW4AFKZE8rbc5YeReVZuKLRvUN43zAD/Lv3IrQV987IWqSYCf61qTrvk2fJbmv8+lUV9Ivs4S1MfLZdsOafJvz6gZe/tcRGfBcHm0jDdoY09WAVCofCNEhHHw8pFNRG9Mira3n2ALrjhYbJaEWg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Gk5IImT0vPiWe2LrQ3tXAODuMMYAitYt7pj1EDmT1LQ=;
+ b=mRv9EstEfpPEjaprgYcGNlHTq4qV3VmBiRcdGL7PdO+ZMZGK+Z9sOfeLbNCA5CGk6i6UMkHJ2/7KTRJGxQ9ojuoPmzBTC196DRqAMbRP8YuZtxjhYnVJlS/N2h2bD4I06sxT7xW45LjRm61UJEPTYF4Y3GBm2NdxTTcJWapycKl6fYogo1FvVKEZhlBgXkRDhpfgsvaEkOMruelXfaKqyabCsC0MwHOm/M9mGDLNAaWC9h8oqTYUkbOnzD9Nt1qIbV+1GCONjaH20m/dVZIzX5o51TZFoSSva3EBeITEfTN3l187qqleM/9xmYf/PCivZjcaICcRAsfEButWa95BTg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from BYAPR11MB3320.namprd11.prod.outlook.com (2603:10b6:a03:18::25)
+ by CO1PR11MB5058.namprd11.prod.outlook.com (2603:10b6:303:99::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8901.26; Mon, 7 Jul
+ 2025 20:32:28 +0000
+Received: from BYAPR11MB3320.namprd11.prod.outlook.com
+ ([fe80::e8c4:59e3:f1d5:af3b]) by BYAPR11MB3320.namprd11.prod.outlook.com
+ ([fe80::e8c4:59e3:f1d5:af3b%7]) with mapi id 15.20.8901.024; Mon, 7 Jul 2025
+ 20:32:28 +0000
+Message-ID: <a9ed726f-a44b-4497-be21-d5a10febc21b@intel.com>
+Date: Mon, 7 Jul 2025 13:32:26 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 06/10] x86/nmi: Add support to handle NMIs with source
+ information
+Content-Language: en-US
+To: "Zhuo, Qiuxu" <qiuxu.zhuo@intel.com>, "x86@kernel.org" <x86@kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+CC: Xin Li <xin@zytor.com>, "H . Peter Anvin" <hpa@zytor.com>, Andy Lutomirski
+	<luto@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar
+	<mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
+	<dave.hansen@linux.intel.com>, Peter Zijlstra <peterz@infradead.org>, "Sean
+ Christopherson" <seanjc@google.com>, "Hunter, Adrian"
+	<adrian.hunter@intel.com>, Kan Liang <kan.liang@linux.intel.com>, "Luck,
+ Tony" <tony.luck@intel.com>, "Zhang, Rui" <rui.zhang@intel.com>, "Steven
+ Rostedt" <rostedt@goodmis.org>, "andrew.cooper3@citrix.com"
+	<andrew.cooper3@citrix.com>, "Kirill A . Shutemov"
+	<kirill.shutemov@linux.intel.com>, Jacob Pan <jacob.pan@linux.microsoft.com>,
+	Andi Kleen <ak@linux.intel.com>, "Huang, Kai" <kai.huang@intel.com>,
+	"Sandipan Das" <sandipan.das@amd.com>, "linux-perf-users@vger.kernel.org"
+	<linux-perf-users@vger.kernel.org>, "linux-edac@vger.kernel.org"
+	<linux-edac@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
+	"linux-trace-kernel@vger.kernel.org" <linux-trace-kernel@vger.kernel.org>
+References: <20250612214849.3950094-1-sohil.mehta@intel.com>
+ <20250612214849.3950094-7-sohil.mehta@intel.com>
+ <CY8PR11MB7134EC0ACDE4772F2CB8A87A894FA@CY8PR11MB7134.namprd11.prod.outlook.com>
+From: Sohil Mehta <sohil.mehta@intel.com>
+In-Reply-To: <CY8PR11MB7134EC0ACDE4772F2CB8A87A894FA@CY8PR11MB7134.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SJ0PR05CA0015.namprd05.prod.outlook.com
+ (2603:10b6:a03:33b::20) To BYAPR11MB3320.namprd11.prod.outlook.com
+ (2603:10b6:a03:18::25)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250626125720.3132623-1-alexandre.chartre@oracle.com>
- <aF1S2EIJWN47zLDG@google.com> <67bd4e2f-24a8-49d8-80af-feaca6926e45@intel.com>
- <61df5e77-dfc4-4189-a86d-f1b2cabcac88@oracle.com> <aF8FwqaBpfvQ7dYW@char.us.oracle.com>
-Message-ID: <aGwtV8f253c6IOwC@google.com>
-Subject: Re: [PATCH] kvm/x86: ARCH_CAPABILITIES should not be advertised on AMD
-From: Sean Christopherson <seanjc@google.com>
-To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Cc: Alexandre Chartre <alexandre.chartre@oracle.com>, 
-	Linus Torvalds <torvalds@linux-foundation.org>, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, pbonzini@redhat.com, 
-	x86@kernel.org, boris.ostrovsky@oracle.com, Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BYAPR11MB3320:EE_|CO1PR11MB5058:EE_
+X-MS-Office365-Filtering-Correlation-Id: efe8df48-2f98-4985-1f1c-08ddbd9563f6
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?QUtVdnNpZmd4UjB0cm9xNHpwUDZ0YW80ZzFHSnMyYlJEOXRRKzZ4U1NYeGxn?=
+ =?utf-8?B?YVlGSnRWbjd4UHBmUldlQlo2aTJPOFo0UEcwQWJqMXl3cmJpQktVVkdqcXZL?=
+ =?utf-8?B?QUhNOWlERTIvUnRMNFdiODZQNnBEdmhzKzJMRFljWjBCdDFkKzRRYjl2R1JR?=
+ =?utf-8?B?MmZZWFhzT29MeThHSWpQSWd2bVBEckMyTEJ3ZExFdFd5Wm5meC9ZVWxMRGJL?=
+ =?utf-8?B?L2kwc2l3M3Z2QldaTSt4TnY5ZUZjcVdFb1UrdytqN0VMTmc1TEVHVllUQ0sr?=
+ =?utf-8?B?RHN1YWNQSkQ0emtRcGNjVkZ1RlEyc3lqRng1S0Q2TWRQaXBQajJ5dGJ3MDdn?=
+ =?utf-8?B?a2ZZcFI3aWFHYmRncEFGVTl1dEFMU2VQTDZrRGdURHMwZHo2ODJ6a2QrUEcv?=
+ =?utf-8?B?cjVveVdTOUFXYWFXcTBNRy9SWUkvaGV1b1lSNkVXekN4Z1lrRng1Y011TTJ5?=
+ =?utf-8?B?KzlhbGJjS29teW5ocW54MElqUml6SkVjOXgwYXZXMi9NTW9XWFl2MjBnWFdV?=
+ =?utf-8?B?UkZBZGR0QnI4V0xONzc4VWk3dDk1dDU3RHhmTzArU0FXWUczRnQ3Y2JlN2pC?=
+ =?utf-8?B?K1k0eTJuUXo0d0JHUVYxWEhZU01oY2FVeFVQVEJjRWlVaFdaL0RGRTBqTkRy?=
+ =?utf-8?B?dDJiWFlTYjJnMDlYejdCbldYT1dPbmxpYnNFWlVpRlR0eUNxbVdxVDR0eTZl?=
+ =?utf-8?B?ZUFuS241TTE0Y204L29KSHU1TXI4VG5SUlFPQW9ETnhtTjNsKytQSDlNeG5T?=
+ =?utf-8?B?U0trKzRCTWw5RjJkeWZJTm56OWxyZ2ozbGdWNyt5S3MzU29QK3dmS0Q0M0h2?=
+ =?utf-8?B?RE9vR2dSZzF2NWF0dGM4T2pBSmlMWU16NFN2amVqeG9OUXB0ZkMzSGw2bnhv?=
+ =?utf-8?B?VFhKWGdHcHYzbE1xZVRaZVFSYWo4REc0RUFNN2xLR0VPSE16VXNmeWo2SFg1?=
+ =?utf-8?B?OG5WdVQ4eEpBdGJEOFV2K1Z2U3doUUM3cHJJenJKbDFVQVNUbjBPUXE5L3ZI?=
+ =?utf-8?B?U3pKOXNrUk9STGYzZndtYlFUL21TVVVOMlpKYWZYd2N0M1RVL3oydHJxZi9L?=
+ =?utf-8?B?S3lRek0vZUxHdHFubGVEc1FVSG44cTVleHZub3pMRndTUjNHQUZsOC9KczJm?=
+ =?utf-8?B?UmlSNmkvRkE0c0dRUTB2QVI2emhKdWVwRW5tTHpoVldOc2dSMHhoYXVkVzk5?=
+ =?utf-8?B?WFYrVk5nMTVMRHZneUxCeWNacE5GQmM4NXdHME1Qb3BNcGQxUWltbDRzc0ZM?=
+ =?utf-8?B?M2tzR0lEMlQwbVExZWVTaGloZmZ3eUhRTTNVL3NrNGpVQmMvN3htRERTUUZW?=
+ =?utf-8?B?NXEwck8raVdhTFdWV2hZSU1ycGlEc0JqeERvRVVaMERlOG9pVnBMWEdPSlY1?=
+ =?utf-8?B?SmNISnRJdWpua0dpRU9FcGFFajdwKzVIdXl0UUxzY2hJalBjWTFlTVB3NURQ?=
+ =?utf-8?B?T3F5WktMOHpqdVRoUW5PaHBNTWNyamR3Ynp1T0tJOUxOWUlEZkVsMlRVcmR4?=
+ =?utf-8?B?eGtvMDNWRkdPWGlrQ3o2MktURTJIUDdJNmlFTFdNT1NaQmVzVS9KT084VFNy?=
+ =?utf-8?B?c1UvZGttMUh5cmh4WWFrZEQzb2h3UUZzVEtoWEFwS2VvVHF4RlRwY2lZaWFY?=
+ =?utf-8?B?M0lyMEtxOTBLNmw4Vk1OaEVvNERTVGk2aTdBUzREZWZYQ1dSbmdEVGZOeFlv?=
+ =?utf-8?B?SXhNZnRwbWNjWDBSSVBSQUoyUnBEYjYrWkl2NXZiMUk2WWFGYkg4WURlRlFw?=
+ =?utf-8?B?d0tCTmZVTkhhOU5UVVBZcUUybVh5QXgzNUgvbmNmZXhSL2pQUExCZDc3SmdQ?=
+ =?utf-8?B?b1hyc0N3ZVB0cGlQdjMxRFcweXdsazBwTDNVV3hhRm1kY0lPaEU1a3RxQUp6?=
+ =?utf-8?B?RkRGY3RjN0t2eVZpUmpJN0FJUGNlMlkxUWhWTnZheEx0dHJaRUswTS80RVB2?=
+ =?utf-8?Q?E45Blcf5Ri4=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR11MB3320.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZGsvSnRVbVMxRlRSbkRGcG51STJVeW5IYXJoWDAxaGpxVm13YTRFakJ3VDZT?=
+ =?utf-8?B?Z2thcTN2RUlRQy9nWXpHYjBRV2pDbEZSSlYwcDJFSnVUMXV2MWUySW9lRXdS?=
+ =?utf-8?B?Q1pYa0Vzc1U1MWYvUWJjaW5jU0crN1F3dTA3aXlQMWJnMW0yYzBaU2N2VDJ1?=
+ =?utf-8?B?bFVRTml0SWVsK2VjR2NTbjJZVlk4U09CNzFNVmM0Z1RPMUUzUzdZRHprMGd6?=
+ =?utf-8?B?ZG5OcjIyNzJZVHN4ZWd3TkJ5T1llVGIveEdhU0twMWhNVGVUQ2NaYjJnK2FE?=
+ =?utf-8?B?clVEYXN3YlgwVC9LYXdPQjdnajNUeVg5b3hwVlJKbE5SYlhyd3RSeEpER1M2?=
+ =?utf-8?B?d0lMcXdtSHMyc01JeDhMUG8vbnRHVjdWUHVkR1NUSGdocXNwKzJ0TDRNMUdr?=
+ =?utf-8?B?WkI1ZHN6d1l4T20rWTBBOWxJR3FCNUs4Z2Z2ai9UMWZSRjhpOGNTZVpuMjNB?=
+ =?utf-8?B?UHdISmNVQTFKbkNHUVlOWGt0MzNsMmFjbStQNnFXQ3AvTG43c1BreTUxR01h?=
+ =?utf-8?B?SC83V2RJdmNzdWZWVGQ2T1F5dXlBc3hkeWRSYlVYQUllUzZOSC9wYnBTRlJ0?=
+ =?utf-8?B?bU5pSHJSeDBlUlZ5eXlrRExnVUZ1OXlvMG9KeFN5OVY5L2xsUFdnNEhhT0sv?=
+ =?utf-8?B?MXIvVHlkT3VwNEVFS2d0ZjJZa09lZTF6RkxIa1dwcUloUlcxUEw2a2pjdjFV?=
+ =?utf-8?B?OFhwQnNjcnRCVEI5WHFnbE5pWTU2Wkp5NnZvZlNwbmpPOVl2QUdxeE5CQmdP?=
+ =?utf-8?B?MlkrWnhjcTNHakVqSVc0NFF2OUxEeVMvMk4zK3J3NHl2MU5iQ2ZnNkt4T1l0?=
+ =?utf-8?B?NGhCaDU1SUpFc0ZBQmU5c1JVLzBRZTR2UE1WTG9rY0lwU05jV0RkQXRJK09s?=
+ =?utf-8?B?enZKZ1hIa21icW9PS3cvVEtCSjBnODFORmcwK2haa2ZZY200c2VXZThzem5o?=
+ =?utf-8?B?NVYyMmkyOW9FR1ZLWE9oemNEVUlJVW9Rb0FuUHB5ZmovYTYvSnRDdDArMmM1?=
+ =?utf-8?B?UUxYUXBPYUd0TUErK2pEdFdNOXZ3L0pXN2kwVmxyZzlwUHRaamRoWnN1a2VO?=
+ =?utf-8?B?VzBNamxxYU5SUEtHSWZSQXFWRlRuQTJlYUYyRWlQbGNBMzYrdkQ0bnhCOERI?=
+ =?utf-8?B?RGVqdFVya09pTXpaQUpJR0pveGJFemd6Mm5mMTlqZEFoYzhlSmYrZDFmencz?=
+ =?utf-8?B?dHFkblFwNjBmY3hjckpQc0w1U3E0bG1DTTQ5bk0wbWtoZkNqbjYyY0l3ekhr?=
+ =?utf-8?B?SzdRa2Z1NWprMmhINjdGMG5SVkNjcXlvcFM2UXVJUG04ekZ5R2hDWnRQaEM3?=
+ =?utf-8?B?cjRnZkY0QlBUbkhiakRZYlFMYTZlWWxxODUwenJBMjJUSEdNcXhONS9pd0dP?=
+ =?utf-8?B?Y3hjRkU3VGpQbXRaWjgzU2JDaitLbDlPZDd2QlE0eVNvb3M3TWIvQWlxanlr?=
+ =?utf-8?B?NFZrdE1TeUVkbjM3Sks1TjBuNzRYek1TaWVEUnFMWXg2Ti9LZ20za1lPQzQ1?=
+ =?utf-8?B?T2NLN056VThZQ1BvRkdRN1dpUG1kNmdFT2tROWNSY1huTURhQTNoOXdOUkFR?=
+ =?utf-8?B?cEE0eGpnK2loYjdnVzk1R1ZZeWJ1VVNBY2YxWnBjcnUyN29HK0JmOStUelpw?=
+ =?utf-8?B?RWJUcWV0MXBva2VNRkthenBodks1cWROL2N6M1FPVUVtazllS21waWtFQmgz?=
+ =?utf-8?B?TWVqWGZnbUs2VmxxL2VvZHhZYUxKWEp2SEEvenAxZUtKcVVCS2RvMFppYnZo?=
+ =?utf-8?B?Qm1PUlRrMlhHWDFvRWZqdDM5SGQzdHBlT3ZGUjdOOHN4Y3p2TWttdHNWRDdD?=
+ =?utf-8?B?SDdnZEdJSkxXd2piS2dFbmdQZERlbjNlaStsT21EbzdVUnRyOVA0YWxjaEk1?=
+ =?utf-8?B?cGx6akNrN0ZuSk5vV3o3ZW0zenVvbDVKYm5pRHo0TnZCWkt0YVFZcW1rKzFo?=
+ =?utf-8?B?K2JLZFdkM0JDSmh2clhmS3RYWVBDV25SelZDWEwxTFJMa1ArMUVRWEgySVAr?=
+ =?utf-8?B?ZUhGWDlBbmxGZXB6dXk1VWxpU25XendUMDV0N2JabHNVcUpJUWNUUnZ2d0Jw?=
+ =?utf-8?B?VXd5NjA2dkhGYTlqeTdHVWFpK1ZyUzNEMEFkTG5MREx5SElvNllNUEJPendO?=
+ =?utf-8?Q?dAHvWblNx3thUg9UFnz2p0G+o?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: efe8df48-2f98-4985-1f1c-08ddbd9563f6
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR11MB3320.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jul 2025 20:32:28.2615
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6EFT89+t8ccwyvqObkcrE2L7sC+XYtYuN2oecSI/VFFq19Sjw1bFuZIXwbmjLq4F8XlW5/h/O650KL0Vn5LP5w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB5058
+X-OriginatorOrg: intel.com
 
-On Fri, Jun 27, 2025, Konrad Rzeszutek Wilk wrote:
-> On Fri, Jun 27, 2025 at 08:23:52AM +0200, Alexandre Chartre wrote:
-> >=20
-> > On 6/27/25 07:41, Xiaoyao Li wrote:
-> > > On 6/26/2025 10:02 PM, Sean Christopherson wrote:
-> > > > +Jim
-> > > >=20
-> > > > For the scope, "KVM: x86:"
-> > > >=20
-> > > > On Thu, Jun 26, 2025, Alexandre Chartre wrote:
-> > > > > KVM emulates the ARCH_CAPABILITIES on x86 for both vmx and svm.
-> > > > > However the IA32_ARCH_CAPABILITIES MSR is an Intel-specific MSR
-> > > > > so it makes no sense to emulate it on AMD.
-> > > > >=20
-> > > > > The AMD documentation specifies that this MSR is not defined on
-> > > > > the AMD architecture. So emulating this MSR on AMD can even cause
-> > > > > issues (like Windows BSOD) as the guest OS might not expect this
-> > > > > MSR to exist on such architecture.
-> > > > >=20
-> > > > > Signed-off-by: Alexandre Chartre<alexandre.chartre@oracle.com>
-> > > > > ---
-> > > > >=20
-> > > > > A similar patch was submitted some years ago but it looks like it=
- felt
-> > > > > through the cracks:
-> > > > > https://lore.kernel.org/kvm/20190307093143.77182-1- xiaoyao.li@li=
-nux.intel.com/
-> > > > It didn't fall through the cracks, we deliberately elected to emula=
-te the MSR in
-> > > > common code so that KVM's advertised CPUID support would match KVM'=
-s emulation.
-> > > >=20
-> > > > =C2=A0=C2=A0 On Thu, 2019-03-07 at 19:15 +0100, Paolo Bonzini wrote=
-:
-> > > > =C2=A0=C2=A0 > On 07/03/19 18:37, Sean Christopherson wrote:
-> > > > =C2=A0=C2=A0 > > On Thu, Mar 07, 2019 at 05:31:43PM +0800, Xiaoyao =
-Li wrote:
-> > > > =C2=A0=C2=A0 > > > At present, we report F(ARCH_CAPABILITIES) for x=
-86 arch(both vmx and svm)
-> > > > =C2=A0=C2=A0 > > > unconditionally, but we only emulate this MSR in=
- vmx. It will cause #GP
-> > > > =C2=A0=C2=A0 > > > while guest kernel rdmsr(MSR_IA32_ARCH_CAPABILIT=
-IES) in an AMD host.
-> > > > =C2=A0=C2=A0 > > >
-> > > > =C2=A0=C2=A0 > > > Since MSR IA32_ARCH_CAPABILITIES is an intel-spe=
-cific MSR, it makes no
-> > > > =C2=A0=C2=A0 > > > sense to emulate it in svm. Thus this patch choo=
-ses to only emulate it
-> > > > =C2=A0=C2=A0 > > > for vmx, and moves the related handling to vmx r=
-elated files.
-> > > > =C2=A0=C2=A0 > >
-> > > > =C2=A0=C2=A0 > > What about emulating the MSR on an AMD host for te=
-sting purpsoes?=C2=A0 It
-> > > > =C2=A0=C2=A0 > > might be a useful way for someone without Intel ha=
-rdware to test spectre
-> > > > =C2=A0=C2=A0 > > related flows.
-> > > > =C2=A0=C2=A0 > >
-> > > > =C2=A0=C2=A0 > > In other words, an alternative to restricting emul=
-ation of the MSR to
-> > > > =C2=A0=C2=A0 > > Intel CPUS would be to move MSR_IA32_ARCH_CAPABILI=
-TIES handling into
-> > > > =C2=A0=C2=A0 > > kvm_{get,set}_msr_common().=C2=A0 Guest access to =
-MSR_IA32_ARCH_CAPABILITIES
-> > > > =C2=A0=C2=A0 > > is gated by X86_FEATURE_ARCH_CAPABILITIES in the g=
-uest's CPUID, e.g.
-> > > > =C2=A0=C2=A0 > > RDMSR will naturally #GP fault if userspace passes=
- through the host's
-> > > > =C2=A0=C2=A0 > > CPUID on a non-Intel system.
-> > > > =C2=A0=C2=A0 >
-> > > > =C2=A0=C2=A0 > This is also better because it wouldn't change the g=
-uest ABI for AMD
-> > > > =C2=A0=C2=A0 > processors.=C2=A0 Dropping CPUID flags is generally =
-not a good idea.
-> > > > =C2=A0=C2=A0 >
-> > > > =C2=A0=C2=A0 > Paolo
-> > > >=20
-> > > > I don't necessarily disagree about emulating ARCH_CAPABILITIES bein=
-g pointless,
-> > > > but Paolo's point about not changing ABI for existing setups still =
-stands.=C2=A0 This
-> > > > has been KVM's behavior for 6 years (since commit 0cf9135b773b ("KV=
-M: x86: Emulate
-> > > > MSR_IA32_ARCH_CAPABILITIES on AMD hosts"); 7 years, if we go back t=
-o when KVM
-> > > > enumerated support without emulating the MSR (commit 1eaafe91a0df (=
-"kvm: x86:
-> > > > IA32_ARCH_CAPABILITIES is always supported").
-> > > >=20
-> > > > And it's not like KVM is forcing userspace to enumerate support for
-> > > > ARCH_CAPABILITIES, e.g. QEMU's named AMD configs don't enumerate su=
-pport.=C2=A0 So
-> > > > while I completely agree KVM's behavior is odd and annoying for use=
-rspace to deal
-> > > > with, this is probably something that should be addressed in usersp=
-ace.
-> > > >=20
-> > > > > I am resurecting this change because some recent Windows updates =
-(like OS Build
-> > > > > 26100.4351) crashes on AMD KVM guests (BSOD with Stop code: UNSUP=
-PORTED PROCESSOR)
-> > > > > just because the ARCH_CAPABILITIES is available.
-> > >=20
-> > > Isn't it the Windows bugs? I think it is incorrect to assume AMD will=
- never implement ARCH_CAPABILITIES.
-> > >=20
-> >=20
-> > Yes, although on one hand they are just following the current AMD speci=
-fication which
-> > says that ARCH_CAPABILITIES is not defined on AMD cpus; but on the othe=
-r hand they are
-> > breaking a 6+ years behavior. So it might be nice if we could prevent s=
-uch an issue in
-> > the future.
->=20
-> Hi Sean,
->=20
-> Part of the virtualization stack is to lie accurately and in this case
-> KVM is doing it incorrectly.=20
+On 7/7/2025 6:50 AM, Zhuo, Qiuxu wrote:
 
-No, KVM isn't doing anything "incorrectly".  The ioctl in question,
-KVM_GET_SUPPORTED_CPUID, advertises what *KVM* supports.  The CPUID model t=
-hat
-is configured for and presented to the guest is fully controlled by userspa=
-ce,
-i.e. by QEMU.
+> Is it possible for the "source_bitmap" to have some non-NMIS_NO_SOURCE bit set 
+> while the user registers their NMI handler with the NMIS_NO_SOURCE type? 
+> 
 
-And relative to what KVM is advertising, KVM's behavior is correct.  Prior =
-to
-commit 0cf9135b773b, KVM was indeed buggy, because KVM didn't emulate a fea=
-ture
-that was advertised to userspace.  But that hasn't been the case for 6+ yea=
-rs.
+IIUC, this is what you are asking:
 
-Even if KVM were explicitly setting guest CPUID, KVM's behavior _still_ wou=
-ldn't
-be incorrect, because it wouldn't violate AMD's architecture.  Per AMD's AP=
-M,
-software cannot assume reserved CPUID bits are '0':
+Someone registers a handler without any source information.
+For example, GHES does this.
 
-  All bit positions that are not defined as fields are reserved. The value =
-of
-  bits within reserved ranges cannot be relied upon to be zero. Software mu=
-st
-  mask off all reserved bits in the return value prior to making any value
-  comparisons of represented information.
+register_nmi_handler(NMI_LOCAL, ghes_notify_nmi, 0, "ghes", NMIS_NO_SOURCE);
 
-> Not fixing it b/c of it being for 7 years in and being part of an ABI but
-> saying it should be fixed in QEMU sounds like you agree technically, but =
-are
-> constrained by a policy.
+Now, when a GHES NMI shows up, can it have anything other than bit 0
+(NMIS_NO_SOURCE) set in the source bitmap?
 
-I'm not constrained by policy, I'm weighing the risk vs. reward of changing=
- KVM's
-ABI to remedy a problem that affects exactly one configuration in one VMM, =
-is
-relatively straightforward to address in said VMM, and has already been fix=
-ed in
-the affected guest kernel (because as above, QEMU's behavior isn't a violat=
-ion
-of AMD's architecture).
+I believe the answer is no. Unless the GHES implementation or the
+hardware has a bug, this should not happen. If this happens, it would
+get logged as an unknown NMI in the kernel log.
+
+
+> If so, we may need to allow the NMI handler with the NMIS_NO_SOURCE type to be 
+> invoked unconditionally to ensure no NMIs are lost.
+> 
+
+If the kernel can't rely on the accuracy of the source_bitmap, then
+NMI-source as a feature starts losing value.
+
+Sohil
 
