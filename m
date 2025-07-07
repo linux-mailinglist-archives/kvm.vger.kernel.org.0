@@ -1,94 +1,48 @@
-Return-Path: <kvm+bounces-51638-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51639-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B816AFAA55
-	for <lists+kvm@lfdr.de>; Mon,  7 Jul 2025 05:44:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F913AFAA63
+	for <lists+kvm@lfdr.de>; Mon,  7 Jul 2025 05:52:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5477B1768AC
-	for <lists+kvm@lfdr.de>; Mon,  7 Jul 2025 03:44:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A4011897B55
+	for <lists+kvm@lfdr.de>; Mon,  7 Jul 2025 03:52:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78DA025A2DE;
-	Mon,  7 Jul 2025 03:44:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="Uw8F2oXo"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE66725A320;
+	Mon,  7 Jul 2025 03:51:54 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D4817E792
-	for <kvm@vger.kernel.org>; Mon,  7 Jul 2025 03:44:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFD191BD9F0;
+	Mon,  7 Jul 2025 03:51:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751859871; cv=none; b=mFw53TfJuVz3nIzk3BTO/HkEAc4zSvzuQoDQ7/pI03Dkaa1jOWIuV5ylvopkRnWNtmjv4qfECV3ouNmDySBDWNF1lxfhZVhlB7lN7hRg53/4Hkp2dwdyCNgQSjBJkeIu5QdZ8PiMNiMGgUD4k/qZ+nv3WaICV4qt2YReLTFJh2w=
+	t=1751860314; cv=none; b=XNjUj2q53SiExEUg9SlLzILw51kSIT4/yFFxmaM2eU1QGnR4qhyWth4HGALWMC/EG3bJ45swdzQc1zoCINp+bSSxzEDRIznz5z2Iaj6KENCRt3G5oq/uI5WJK3uHBN1FZ2o+ILsgqoG3UjpXOYSqJV0L7QxLU4/jWT4W3Xk1418=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751859871; c=relaxed/simple;
-	bh=v+lWgSyoOtCf+VjdFCWVDMbMmwGujDRm79XmRjvY/vQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=L0Rck2Hv6LhH6I7b/HtghNa75RYMPxMd2AGxB2jBn1F5ekYsPCXs3x1NMLfVdWFP2tsGbmqPNCEurSWVK/1NhjRcmOhpiklEYPVb0E7mRV3UsXeZtXmTBKK0wKre86wOBIKwyBB8Zuz0f84TB4JlfWnz4s7L2adf6wb5HEt4YRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=Uw8F2oXo; arc=none smtp.client-ip=209.85.210.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-7426c44e014so1988757b3a.3
-        for <kvm@vger.kernel.org>; Sun, 06 Jul 2025 20:44:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1751859869; x=1752464669; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Y9T7JAbV7vhWy0qtdBRWYfecJwaqMI3weyY2as/tnrU=;
-        b=Uw8F2oXoYUXS1o3vVGFxIGBl2LBpQAFca6MBWcobKIlzgXEXbXaz+06Ie4JkmR+KCY
-         E8HVCXv+7nHpryizyOVUbTiODNcup0N6KqdN10TnOk3QJp04rp579+sz7rHrihuEQ/8m
-         M/qXVOovBjB/1D7D+Uwugutn5q8s80wPaie5s2XCWppL6rmGtMK4Djdbn5tiOXWADwB4
-         wkEW2wahocnywgBMYpF+F9z065v8S9zzSLaPfTfPVqKCutSfz4QxeETjVDNa1KQEDEcV
-         97opmWCwkXpjk5qb/Hg6D/+c4uClttOc86UUeecsPVewuoVVenaDV4mfzbJGRn5T54J5
-         Xp1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751859869; x=1752464669;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Y9T7JAbV7vhWy0qtdBRWYfecJwaqMI3weyY2as/tnrU=;
-        b=ca1RmQvJMTTrf4v8I2RHX4yR919IqkHobWlh6kr1WoSjfryxpKwulNLZl5TXbTEdgV
-         cIADxsbd44MdCMxXVkeuhZ1y2vOF4CjpV25yAa2vt8Jpw/FJDnzqi5E6m8TZXQrBqVwm
-         kAf+wTuUQGVE/X/PJIs+8VJOx+fCZ1zyP7VBOKGgN9hpy0e53QypdE7haarq5ynuyNJ3
-         UTyvqarVWgmas7ImvLauh2JDuWFfpjC04DbVD+7Z0nSPvTp9QVHNGH/wQLSesVml71/K
-         ecGoiOTk/2aCMjZigUQvNg8nypuFF1UcHdtFlO9JNevusDVIl0MA/77TzOvwVqT3PXiH
-         XKZA==
-X-Forwarded-Encrypted: i=1; AJvYcCWHec7H6XUC8WCZz3vabmghVRcJ4RCKcqnbzZ+HE5xzuGjLsK5vfX+c7gH5d/lSm1m5wL4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy71H+jAiSMJ2KcOyZ7mvAGLb/lNGXDQpU6IZjPFnq8KQ/dBTFf
-	KVYZ5lxm/okKhuAqu0SX3Fu7AEtF3gwvgKk5wKys4b4LuVQzB/GvdkJDyiEW4BCmkPs=
-X-Gm-Gg: ASbGncsQYJNeyAbhv9lPEdgIIJBE2jWJAq0DDooZZ31jb5ZJbsmdcJgbXLkiuP70KzX
-	TOQL98HybfhIqQ9sU0JK57J9wZDVFbt4CczJpyUEONZF/BUW/gIIW6AE8VQs80OVfMEI2l4GgGL
-	XRzZF896K5k8MkPFF6gyVlcRMr2Z5loT5lRLpIBoLx4qbWpkUI3NluUL3zcfsliekZCADK635e5
-	EYbvRh4kO0sZYnQDP4mdS79j3cuisZtzqd6LRJlktZRuToHIud6paniNM1R+YgFfcnbZ8wM7zyd
-	ApRRIwYOc99zKrPVKZm5VejNnh7XnYWlER2BVW4r3OMpwSQpdozdoOAQeffkYPKSTmvNJ6GfaCU
-	lWqrwN6pYvKDLig==
-X-Google-Smtp-Source: AGHT+IFhikC4ANTNT4wO7MH/YDAPzkIkD1KcHaFO9YiTTHdwtSqlnsVb8YiTPSRI5B9f3J+BTMiLgw==
-X-Received: by 2002:a05:6a00:1828:b0:748:edf5:95de with SMTP id d2e1a72fcca58-74cf6f309d2mr7682954b3a.10.1751859869592;
-        Sun, 06 Jul 2025 20:44:29 -0700 (PDT)
-Received: from localhost.localdomain ([203.208.189.13])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74ce429a003sm7735262b3a.112.2025.07.06.20.44.26
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Sun, 06 Jul 2025 20:44:29 -0700 (PDT)
-From: lizhe.67@bytedance.com
-To: jgg@ziepe.ca
-Cc: akpm@linux-foundation.org,
-	alex.williamson@redhat.com,
-	david@redhat.com,
+	s=arc-20240116; t=1751860314; c=relaxed/simple;
+	bh=Y5A6Iyc032Pc2f/tiQhfEjDTEEYWG84EtKu1fDLhGIg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=gCRKthNjJIzgdmniD6JLwhOVV1vAZlJMKtLYYIEP7qSU2xjM3+TVHZFtmJ/abKO68rvfSilE5Jkb8HzxgJax5jcSFjJQiao2tKbI3bNhwD6cFJ2cd16GmzweqWF8k5xAy7JeOAHZzQUdUj2tH4lBzhtuWRjakNwimjNtXzq8yV0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.2.5.213])
+	by gateway (Coremail) with SMTP id _____8DxbKxURGtoZEkjAQ--.10962S3;
+	Mon, 07 Jul 2025 11:51:48 +0800 (CST)
+Received: from localhost.localdomain (unknown [10.2.5.213])
+	by front1 (Coremail) with SMTP id qMiowJCxM+RPRGtoZlsMAA--.6231S2;
+	Mon, 07 Jul 2025 11:51:44 +0800 (CST)
+From: Bibo Mao <maobibo@loongson.cn>
+To: Tianrui Zhao <zhaotianrui@loongson.cn>,
+	Huacai Chen <chenhuacai@kernel.org>
+Cc: WANG Xuerui <kernel@xen0n.name>,
 	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	lizhe.67@bytedance.com,
-	peterx@redhat.com
-Subject: Re: [PATCH v2 5/5] vfio/type1: optimize vfio_unpin_pages_remote()
-Date: Mon,  7 Jul 2025 11:44:22 +0800
-Message-ID: <20250707034422.60153-1-lizhe.67@bytedance.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20250704171123.GK904431@ziepe.ca>
-References: <20250704171123.GK904431@ziepe.ca>
+	loongarch@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] LoongArch: KVM: Add some feature detection on host with 3C6000
+Date: Mon,  7 Jul 2025 11:51:43 +0800
+Message-Id: <20250707035143.1979013-1-maobibo@loongson.cn>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -96,28 +50,55 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowJCxM+RPRGtoZlsMAA--.6231S2
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
+	ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
+	nUUI43ZEXa7xR_UUUUUUUUU==
 
-On Fri, 4 Jul 2025 14:11:23 -0300, jgg@ziepe.ca wrote:
+With 3C6000 hardware platform, hardware page table walking and avec
+features are supported on host. Here add these two feature detection
+on KVM host.
 
-> On Fri, Jul 04, 2025 at 10:47:00AM +0200, David Hildenbrand wrote:
-> > >   static long vfio_unpin_pages_remote(struct vfio_dma *dma, dma_addr_t iova,
-> > >   				    unsigned long pfn, unsigned long npage,
-> > >   				    bool do_accounting)
-> > >   {
-> > >   	long unlocked = 0, locked = vpfn_pages(dma, iova, npage);
-> > > -	long i;
-> > > -	for (i = 0; i < npage; i++)
-> > > -		if (put_pfn(pfn++, dma->prot))
-> > > -			unlocked++;
-> > > +	if (dma->has_rsvd) {
-> > > +		long i;
-> > 
-> > No need to move "long i" here, but also doesn't really matter.
-> 
-> It should also be unsigned long as npage is unsigned
+Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+---
+ arch/loongarch/include/uapi/asm/kvm.h | 2 ++
+ arch/loongarch/kvm/vm.c               | 8 ++++++++
+ 2 files changed, 10 insertions(+)
 
-Yes, unsigned long is a better choice.
+diff --git a/arch/loongarch/include/uapi/asm/kvm.h b/arch/loongarch/include/uapi/asm/kvm.h
+index 5f354f5c6847..0b9feb6c0d53 100644
+--- a/arch/loongarch/include/uapi/asm/kvm.h
++++ b/arch/loongarch/include/uapi/asm/kvm.h
+@@ -103,6 +103,8 @@ struct kvm_fpu {
+ #define  KVM_LOONGARCH_VM_FEAT_PMU		5
+ #define  KVM_LOONGARCH_VM_FEAT_PV_IPI		6
+ #define  KVM_LOONGARCH_VM_FEAT_PV_STEALTIME	7
++#define  KVM_LOONGARCH_VM_FEAT_PTW		8
++#define  KVM_LOONGARCH_VM_FEAT_AVEC		9
+ 
+ /* Device Control API on vcpu fd */
+ #define KVM_LOONGARCH_VCPU_CPUCFG	0
+diff --git a/arch/loongarch/kvm/vm.c b/arch/loongarch/kvm/vm.c
+index edccfc8c9cd8..728b24a62f1e 100644
+--- a/arch/loongarch/kvm/vm.c
++++ b/arch/loongarch/kvm/vm.c
+@@ -146,6 +146,14 @@ static int kvm_vm_feature_has_attr(struct kvm *kvm, struct kvm_device_attr *attr
+ 		if (kvm_pvtime_supported())
+ 			return 0;
+ 		return -ENXIO;
++	case KVM_LOONGARCH_VM_FEAT_PTW:
++		if (cpu_has_ptw)
++			return 0;
++		return -ENXIO;
++	case KVM_LOONGARCH_VM_FEAT_AVEC:
++		if (cpu_has_avecint)
++			return 0;
++		return -ENXIO;
+ 	default:
+ 		return -ENXIO;
+ 	}
+-- 
+2.39.3
 
-Thanks,
-Zhe
 
