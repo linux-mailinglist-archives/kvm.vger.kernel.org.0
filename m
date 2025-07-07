@@ -1,113 +1,123 @@
-Return-Path: <kvm+bounces-51637-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51638-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75DF2AFAA51
-	for <lists+kvm@lfdr.de>; Mon,  7 Jul 2025 05:39:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B816AFAA55
+	for <lists+kvm@lfdr.de>; Mon,  7 Jul 2025 05:44:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1B14B189A842
-	for <lists+kvm@lfdr.de>; Mon,  7 Jul 2025 03:39:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5477B1768AC
+	for <lists+kvm@lfdr.de>; Mon,  7 Jul 2025 03:44:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24962259CBD;
-	Mon,  7 Jul 2025 03:39:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78DA025A2DE;
+	Mon,  7 Jul 2025 03:44:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F+hz+iNq"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="Uw8F2oXo"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94351258CC8
-	for <kvm@vger.kernel.org>; Mon,  7 Jul 2025 03:39:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D4817E792
+	for <kvm@vger.kernel.org>; Mon,  7 Jul 2025 03:44:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751859544; cv=none; b=MQwCIB2H30TBK3hNYpUfrEnQnAGsM+CqLUFuFvbapt11O7e17ksR1ZtinIVz8t3L+RbRd6ez8uZ4xOGT4H5tw3UeG7A7pIprE45NQedVByxDdYFA6lpM4QaHgIr4RUItwkzhSyvrifKSCT7MB975jiltrv9WgxxPZYBy54bOp2g=
+	t=1751859871; cv=none; b=mFw53TfJuVz3nIzk3BTO/HkEAc4zSvzuQoDQ7/pI03Dkaa1jOWIuV5ylvopkRnWNtmjv4qfECV3ouNmDySBDWNF1lxfhZVhlB7lN7hRg53/4Hkp2dwdyCNgQSjBJkeIu5QdZ8PiMNiMGgUD4k/qZ+nv3WaICV4qt2YReLTFJh2w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751859544; c=relaxed/simple;
-	bh=cToKybjXtrPshKXsvriTLIFQT34mAn7DrvDWsf8sYmc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Coo+OrZHJ8PQtK+NfUa8DPDWKTL9lEk6pooLr8cP50J0rvqy3mrnY/09JkdurM3sHVHIvEBkE98gHIEti8mWP8ZFhK71/umIuu8HRLnljvEijpl5VmTqDLkYEy+Ag5U1PXV2uchW6pkXylPGR9D1VHq4Pe/2OcsGzLQ2BErRhCI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=F+hz+iNq; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751859541;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cToKybjXtrPshKXsvriTLIFQT34mAn7DrvDWsf8sYmc=;
-	b=F+hz+iNqpFR5zX+hdW73Rq2Gwj3fxSQZJQZJvCrL+isfNclNnQZzXwWy3FNURADIUE+EsY
-	UefGbU0+1OJml6CGotDFumULj6ImhDiUapE5VbndRmlwWycbpL7JGth53xhb+NIdAguV7t
-	4Kp2YW/xOzKDcoZY/13LpZjbuj9R64c=
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
- [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-336-aoqwTsIGOtulhx-vray_hA-1; Sun, 06 Jul 2025 23:39:00 -0400
-X-MC-Unique: aoqwTsIGOtulhx-vray_hA-1
-X-Mimecast-MFC-AGG-ID: aoqwTsIGOtulhx-vray_hA_1751859539
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-3132e7266d3so2626503a91.2
-        for <kvm@vger.kernel.org>; Sun, 06 Jul 2025 20:38:59 -0700 (PDT)
+	s=arc-20240116; t=1751859871; c=relaxed/simple;
+	bh=v+lWgSyoOtCf+VjdFCWVDMbMmwGujDRm79XmRjvY/vQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=L0Rck2Hv6LhH6I7b/HtghNa75RYMPxMd2AGxB2jBn1F5ekYsPCXs3x1NMLfVdWFP2tsGbmqPNCEurSWVK/1NhjRcmOhpiklEYPVb0E7mRV3UsXeZtXmTBKK0wKre86wOBIKwyBB8Zuz0f84TB4JlfWnz4s7L2adf6wb5HEt4YRk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=Uw8F2oXo; arc=none smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-7426c44e014so1988757b3a.3
+        for <kvm@vger.kernel.org>; Sun, 06 Jul 2025 20:44:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1751859869; x=1752464669; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Y9T7JAbV7vhWy0qtdBRWYfecJwaqMI3weyY2as/tnrU=;
+        b=Uw8F2oXoYUXS1o3vVGFxIGBl2LBpQAFca6MBWcobKIlzgXEXbXaz+06Ie4JkmR+KCY
+         E8HVCXv+7nHpryizyOVUbTiODNcup0N6KqdN10TnOk3QJp04rp579+sz7rHrihuEQ/8m
+         M/qXVOovBjB/1D7D+Uwugutn5q8s80wPaie5s2XCWppL6rmGtMK4Djdbn5tiOXWADwB4
+         wkEW2wahocnywgBMYpF+F9z065v8S9zzSLaPfTfPVqKCutSfz4QxeETjVDNa1KQEDEcV
+         97opmWCwkXpjk5qb/Hg6D/+c4uClttOc86UUeecsPVewuoVVenaDV4mfzbJGRn5T54J5
+         Xp1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751859539; x=1752464339;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1751859869; x=1752464669;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=cToKybjXtrPshKXsvriTLIFQT34mAn7DrvDWsf8sYmc=;
-        b=QKE30VL6oUipCgbMdUPftoFiRCmWow3hdfcVeZoomToV6RRCmA4Hf81Nf67tUoJ+7I
-         M5PvlVc5YdZhvwa0toZA9TOXA+U3T1eekjYduLW8eD1n1rtBQL4fQgSyrS/B2FH9mxyS
-         wNlnGP/ps25VYLPc/srS0a//Mzc8iksAegMFoDy+ydKxccP8VwqqIEahNxs4d6vp6mL+
-         T/Y/VxbsNCbzBHBRh8StoPvBTqPaP+IYh+mWaEwap7iAPusitAqcVZy33F2JIZznNJpz
-         yOR2ygMWonmZhod13hCCloxNISe2M3qvO4rSTqD1lZlDU5QCNOXAuChyg+kUveH6WcwV
-         /r9w==
-X-Forwarded-Encrypted: i=1; AJvYcCU9Rwu0Xw89lxq7dNscVlRfFzDn/bkVYeV+Y9ezYV8jrZX+yLD+8SkYuZznCY2Ds08o5BM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzXNo3StOLixG6EI28E3l4XTFYPKBLzdizpT7G5/bNJk0LaV1KK
-	sEJ2X9WT6oukqP3l/CS/u/QH9W0JNmhnxvDvfVLeMTpwmW9wqSDLEauqVh8t5ql+59qCVbo5Yu9
-	CUU6N6TNaH2xcMUPVBs00jhH97R7P8FfUdknjyqnJAYCVH4FUQQOlVAq8MHXWCeSVUPsDfli+qn
-	JGxQv7kk67LAFJsOK3PxDr8kVZriaFVM9PF5i2wOE=
-X-Gm-Gg: ASbGncsPimN5J6C+xHtPFLwJ7BXqhEyfTth02aQ6aU9GPBIJ8/REBswTo0cBq/NjVT7
-	lZRGJW7DEvqonsvzQL2P+d31L+Q2r1yGDBCCjFHicN+GPg/wtWGAzGhfm0N82eb86TyyD28mepr
-	SxwNYH
-X-Received: by 2002:a17:90b:55cb:b0:31c:15da:2175 with SMTP id 98e67ed59e1d1-31c15da23cemr1276678a91.9.1751859538656;
-        Sun, 06 Jul 2025 20:38:58 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE/OScOfzxvN6ffL+e+JM/H+J3/JdD4csUZUpOcHgC06UuyYVCjZh3kPiyRl4cX84Tq+BwKAeQqS9ePIWOt/tw=
-X-Received: by 2002:a17:90b:55cb:b0:31c:15da:2175 with SMTP id
- 98e67ed59e1d1-31c15da23cemr1276643a91.9.1751859538244; Sun, 06 Jul 2025
- 20:38:58 -0700 (PDT)
+        bh=Y9T7JAbV7vhWy0qtdBRWYfecJwaqMI3weyY2as/tnrU=;
+        b=ca1RmQvJMTTrf4v8I2RHX4yR919IqkHobWlh6kr1WoSjfryxpKwulNLZl5TXbTEdgV
+         cIADxsbd44MdCMxXVkeuhZ1y2vOF4CjpV25yAa2vt8Jpw/FJDnzqi5E6m8TZXQrBqVwm
+         kAf+wTuUQGVE/X/PJIs+8VJOx+fCZ1zyP7VBOKGgN9hpy0e53QypdE7haarq5ynuyNJ3
+         UTyvqarVWgmas7ImvLauh2JDuWFfpjC04DbVD+7Z0nSPvTp9QVHNGH/wQLSesVml71/K
+         ecGoiOTk/2aCMjZigUQvNg8nypuFF1UcHdtFlO9JNevusDVIl0MA/77TzOvwVqT3PXiH
+         XKZA==
+X-Forwarded-Encrypted: i=1; AJvYcCWHec7H6XUC8WCZz3vabmghVRcJ4RCKcqnbzZ+HE5xzuGjLsK5vfX+c7gH5d/lSm1m5wL4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy71H+jAiSMJ2KcOyZ7mvAGLb/lNGXDQpU6IZjPFnq8KQ/dBTFf
+	KVYZ5lxm/okKhuAqu0SX3Fu7AEtF3gwvgKk5wKys4b4LuVQzB/GvdkJDyiEW4BCmkPs=
+X-Gm-Gg: ASbGncsQYJNeyAbhv9lPEdgIIJBE2jWJAq0DDooZZ31jb5ZJbsmdcJgbXLkiuP70KzX
+	TOQL98HybfhIqQ9sU0JK57J9wZDVFbt4CczJpyUEONZF/BUW/gIIW6AE8VQs80OVfMEI2l4GgGL
+	XRzZF896K5k8MkPFF6gyVlcRMr2Z5loT5lRLpIBoLx4qbWpkUI3NluUL3zcfsliekZCADK635e5
+	EYbvRh4kO0sZYnQDP4mdS79j3cuisZtzqd6LRJlktZRuToHIud6paniNM1R+YgFfcnbZ8wM7zyd
+	ApRRIwYOc99zKrPVKZm5VejNnh7XnYWlER2BVW4r3OMpwSQpdozdoOAQeffkYPKSTmvNJ6GfaCU
+	lWqrwN6pYvKDLig==
+X-Google-Smtp-Source: AGHT+IFhikC4ANTNT4wO7MH/YDAPzkIkD1KcHaFO9YiTTHdwtSqlnsVb8YiTPSRI5B9f3J+BTMiLgw==
+X-Received: by 2002:a05:6a00:1828:b0:748:edf5:95de with SMTP id d2e1a72fcca58-74cf6f309d2mr7682954b3a.10.1751859869592;
+        Sun, 06 Jul 2025 20:44:29 -0700 (PDT)
+Received: from localhost.localdomain ([203.208.189.13])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74ce429a003sm7735262b3a.112.2025.07.06.20.44.26
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Sun, 06 Jul 2025 20:44:29 -0700 (PDT)
+From: lizhe.67@bytedance.com
+To: jgg@ziepe.ca
+Cc: akpm@linux-foundation.org,
+	alex.williamson@redhat.com,
+	david@redhat.com,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	lizhe.67@bytedance.com,
+	peterx@redhat.com
+Subject: Re: [PATCH v2 5/5] vfio/type1: optimize vfio_unpin_pages_remote()
+Date: Mon,  7 Jul 2025 11:44:22 +0800
+Message-ID: <20250707034422.60153-1-lizhe.67@bytedance.com>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20250704171123.GK904431@ziepe.ca>
+References: <20250704171123.GK904431@ziepe.ca>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250702014139.721-1-liming.wu@jaguarmicro.com>
-In-Reply-To: <20250702014139.721-1-liming.wu@jaguarmicro.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 7 Jul 2025 11:38:46 +0800
-X-Gm-Features: Ac12FXzRSQJDauDNVYKvCZUnjp7a1__tIs86dizLjOKq_h5WbWMweaIbaRJmiis
-Message-ID: <CACGkMEuxSsJVkvNnGGZtrK=MOyzc1ajW+SNR-xP_XzO5=R25jA@mail.gmail.com>
-Subject: Re: [PATCH] virtio_net: simplify tx queue wake condition check
-To: liming.wu@jaguarmicro.com
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, angus.chen@jaguarmicro.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jul 2, 2025 at 9:41=E2=80=AFAM <liming.wu@jaguarmicro.com> wrote:
->
-> From: Liming Wu <liming.wu@jaguarmicro.com>
->
-> Consolidate the two nested if conditions for checking tx queue wake
-> conditions into a single combined condition. This improves code
-> readability without changing functionality. And move netif_tx_wake_queue
-> into if condition to reduce unnecessary checks for queue stops.
->
-> Signed-off-by: Liming Wu <liming.wu@jaguarmicro.com>
+On Fri, 4 Jul 2025 14:11:23 -0300, jgg@ziepe.ca wrote:
 
-Acked-by: Jason Wang <jasowang@redhat.com>
+> On Fri, Jul 04, 2025 at 10:47:00AM +0200, David Hildenbrand wrote:
+> > >   static long vfio_unpin_pages_remote(struct vfio_dma *dma, dma_addr_t iova,
+> > >   				    unsigned long pfn, unsigned long npage,
+> > >   				    bool do_accounting)
+> > >   {
+> > >   	long unlocked = 0, locked = vpfn_pages(dma, iova, npage);
+> > > -	long i;
+> > > -	for (i = 0; i < npage; i++)
+> > > -		if (put_pfn(pfn++, dma->prot))
+> > > -			unlocked++;
+> > > +	if (dma->has_rsvd) {
+> > > +		long i;
+> > 
+> > No need to move "long i" here, but also doesn't really matter.
+> 
+> It should also be unsigned long as npage is unsigned
 
-Thanks
+Yes, unsigned long is a better choice.
 
+Thanks,
+Zhe
 
