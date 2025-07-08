@@ -1,235 +1,176 @@
-Return-Path: <kvm+bounces-51805-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51806-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F68DAFD68C
-	for <lists+kvm@lfdr.de>; Tue,  8 Jul 2025 20:37:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54FB7AFD697
+	for <lists+kvm@lfdr.de>; Tue,  8 Jul 2025 20:39:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 10C2F1894BCE
-	for <lists+kvm@lfdr.de>; Tue,  8 Jul 2025 18:38:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E4E505420F9
+	for <lists+kvm@lfdr.de>; Tue,  8 Jul 2025 18:38:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0114F2E5B07;
-	Tue,  8 Jul 2025 18:37:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 287042E716D;
+	Tue,  8 Jul 2025 18:38:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JzJzAK+h"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nYMC7eVt"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C0A01754B
-	for <kvm@vger.kernel.org>; Tue,  8 Jul 2025 18:37:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B06B71C5F13
+	for <kvm@vger.kernel.org>; Tue,  8 Jul 2025 18:38:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751999853; cv=none; b=fD7au/KxSCPrsfjX+qZ6QDNPyrZCORI7B3/uvmVW8emNJXfUxKg8kUVPSsyLMT25Ld/0fZgEcCNA1Xoq5ySQSNPEHIJ3yThQNogkIv2FM6nszuDqkgzvp+2S67LsvA5ZitJAXbaLKoQXvCw+juXI4BOmTtSsWhY+pMT0Gf7OfgQ=
+	t=1751999919; cv=none; b=R0SrvgqG1MAGAuV8cqlW8woNXCzLYPRXIivJnferp9c5/aA+T2KLzgccGHC4Gdl8RNbn7VkxawED4mQY1Hgjt/ifbMbJ/P1FP23oZADdojGVY7nueUoRhmnJVKB4006tMt9irgQ/3J+bBLlUUQbf7mzn9mzF62e7cX4wYvjhJFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751999853; c=relaxed/simple;
-	bh=vg+uQCJ+lSN99jIomcmUQZbwXNmXTfe07jNsopO6k20=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=DkFLK8KESSoLL6EhIZHqDURYityECZIGgir1QPSHCn27aJrnKIggpEIDr9QfLH9Eqoy69ZVEtt4+U683SnqIVQUJum2fpjoKDnRkGATuZ444AXtIahWGe6gowIU3SItE/mA0tqBAIPSADY+krgBIY27O64vdmiwUGOT0N7724Hw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JzJzAK+h; arc=none smtp.client-ip=209.85.210.202
+	s=arc-20240116; t=1751999919; c=relaxed/simple;
+	bh=2+com1G9ZklhZ2ukEIDRDdsjQqkHF0dZ5BYb3p3/qWE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MCWgCXJyKMGx/GV/aD8TyZ8M4Ky5pN21mxCZzxvre5tSy03SFsFqj9wm0A3HwAbxLQADx02NoaXtr8Spync9kdQOBai4t/z1kF1EUfSr1ESZ8Wb0KbmDq1z3xfhoeO0jwiFbAsDlN+cN0FRFABM9ePW6mKAT9bywNcgm5te/XB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nYMC7eVt; arc=none smtp.client-ip=209.85.160.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-747ddba7c90so3464361b3a.0
-        for <kvm@vger.kernel.org>; Tue, 08 Jul 2025 11:37:30 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4a58197794eso23291cf.1
+        for <kvm@vger.kernel.org>; Tue, 08 Jul 2025 11:38:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1751999850; x=1752604650; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yuihDo1m5FyoRrxBA7eIdTW1eQsHNBGooJAzPvs8+c8=;
-        b=JzJzAK+hOjajiXZF2foPPNeEcg8NgJEqFaw4SXnoVwtt0Ow0MQ0Yym5Si4xM5OxKJ7
-         uJAn0hwGne/geNeEqPkBj8iyu7wdQddTjdOiqm79OrNacRCk8suq3s5gig9hTqmcqMOc
-         JEjtcThza8JjMKihIp/QgskQYRuRS+266BXwFjU0u7FTHV67aDkBD85TrQVM2t+I5sZl
-         sVifKdzVCNtabPIkbY01vab2YCX0NXVp0XiaFs4CYylp4LJPzl0TryWQ9VI/bLeGw2ul
-         Yv/M/3kpBi2Wlc6bwQ7Alo+wFYYNO0FloWHprl5ARmoob82Jhhr9xUfuA6/rSGG58VhF
-         qCkQ==
+        d=google.com; s=20230601; t=1751999917; x=1752604717; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=SK7lrk7xIi5tD0jrlmCDVWKn5xeGvg9C1giWU24k6Z8=;
+        b=nYMC7eVtKKMXXTOFOYgTEEFDvFzOVHHl1EceffcuBqHT2fRZd0TjLZ6QWYmMVTNJjj
+         UZfy54O2sCtD4FdSph82wuPU8O8XKaN40Q2At/JbRQhmsTq4J2nnHpKO5ilsI9uKm3yo
+         UIST+piFapNcjdXz8L/jIchw4EKjgbKgxnvq30dfgY3Vney/5ohg/2msbpffHf7Jo4LL
+         D7qT+Ibx1/ops5cBb7z4Siln440gUsOrk12xHcKW8DD1DUEuldI+RW1BuHnGbmQkZmo1
+         u0kV1vFzHbnR68SqWdJQMmPg5T+FJw2nw2bUSglFQ7+oVSztCiGKtkL1pLuZkQaIBv8R
+         miIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751999850; x=1752604650;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yuihDo1m5FyoRrxBA7eIdTW1eQsHNBGooJAzPvs8+c8=;
-        b=n818Ys9aJVAj6OBNXbRiyGxL10cOPjVzIjZ4u1u0M3TYDwBAETnL30zPhu4kUKmHYX
-         f/Fzi3m9eDCnkUDFeEQevq956CjwZa1qortQQu4FFNEEuJfzBTscVgYRxJIfGlJQZ13m
-         EOv4ISu5tBZ3k6QPIORdF5MdP1xbywKFtpnZevhJ++MoUsNroMzLs3LnMMZgiaTo7Lxm
-         gHKeJsKJfA/jbIlNWrN7sbHZr61aVs+lehngSHXaEJokno3rcclkdTWtwUsqPt7eqAUY
-         kCtPgSn82qt9ksjiWARVqnrh5lIsrXRRPa2LGFF8fV3+z64TPtoXO5DJIqMXej7vd/Y+
-         IMVg==
-X-Forwarded-Encrypted: i=1; AJvYcCXuyWj2jZaeZRr9ePZaNts4PDM8uw2lY0Q0fK3Wpwx1hka7878k6LF9Yvluy/oRNcz1yf0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwRwfN2jkXSgs8Lv2VLpEASlayEtV2A/xOKQbIBnhnUdOdDMUyC
-	5H0Y4dYOHY3Cem8TBBA8jHUvxsDPnWH/PHUZq7tqgjR58P1q8adhfdM+F6za08ml+QR+Z6aURXx
-	QJAg8yA==
-X-Google-Smtp-Source: AGHT+IE0jOeDJGjqyFwQLwFs8IMKVlBUzhMwAfpeufc6A4eZa0THyR4cN5PjdVCjvg8e5KCGp+se29EjQ+4=
-X-Received: from pfbjw38.prod.google.com ([2002:a05:6a00:92a6:b0:74c:ee73:4859])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:856:b0:748:e1e4:71e7
- with SMTP id d2e1a72fcca58-74ea498dc91mr157508b3a.23.1751999850363; Tue, 08
- Jul 2025 11:37:30 -0700 (PDT)
-Date: Tue, 8 Jul 2025 11:37:28 -0700
-In-Reply-To: <20250612214849.3950094-9-sohil.mehta@intel.com>
+        d=1e100.net; s=20230601; t=1751999917; x=1752604717;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SK7lrk7xIi5tD0jrlmCDVWKn5xeGvg9C1giWU24k6Z8=;
+        b=hMo8IEvskmHfbcw6gJ22RGI9RMrhmnSbLRiWe2HyG2NF907pbPTs6BbM0RAdBKYP6P
+         sea4p8Whl2dCzxqJ9sLLiiRaAWXJVODE7uPlLS1qxrS9wa54nVqrpJb+w8ofPHGvTXLu
+         kl4lDZTD8MWY0PAdCYWx6Q1349fDJOdSEssheaNOmbfsTkplZaHs720t1CqwxlphNQhn
+         8oHKkMhC+U6dX9BAlVRIXvK0pNGFtr09FjBk1G18hM2eprJlI4iwC389N6aB9Gc9QGKq
+         +HSPwj8YB+OCbrziNG89VAlzga2lGXe3+/n6rv4pPitR3dabcOanvEOAKQTRZvNGKDVB
+         Kl0Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWgdEz6ZLK8Rm5dqgq8ycjLtGqme+oMZX6ifISDNL3Q/+w9yiCV1RsCZFlZH3AMG0l/0UE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YykOR8tLtSW1zxYkdX3fgVzfzZnXrBK57vRjj2GBYl2Irb6potX
+	5Rn8UK4qt4DN8YKo6xAWJ/mnGWBLBmTpHAAx0/xFxiiv5y/j6Z6KmtN+jbZPpE/U0lKv8rGB2Xx
+	4eq7fEsccx9lCC1Hr/48Ds8bKxnnNzTYvlG8suMJt
+X-Gm-Gg: ASbGncu/1U8JPloGHkfeaxtol0d/kVIOJxSMgNbhwPucrrXkAWfsFBWfCC1V9oIQ0Cp
+	Kvm56PLA8VVxdss/cBKMj+37Z2bb3zEo8oFBWJTpC47Oxg0goXi6Wds5k790IZjzNY5G6BP4GeN
+	Gg4ht0ky4OTw7ENL5/3mjaOUXPVelRRrRl9VVRzg06aow=
+X-Google-Smtp-Source: AGHT+IF41f/hEDuNuA09VXbvGPxQNXbKGxA34LGVDDyoOV/7cGhIV3x5DLuwYtaeSPBxKEM3yRLjJM9SZjLNovd7gB4=
+X-Received: by 2002:a05:622a:5514:b0:4a9:d263:dbc5 with SMTP id
+ d75a77b69052e-4a9dcd2238fmr290521cf.20.1751999916086; Tue, 08 Jul 2025
+ 11:38:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250612214849.3950094-1-sohil.mehta@intel.com> <20250612214849.3950094-9-sohil.mehta@intel.com>
-Message-ID: <aG1laKXYu7Uc4Tsb@google.com>
-Subject: Re: [PATCH v7 08/10] x86/nmi: Enable NMI-source for IPIs delivered as NMIs
-From: Sean Christopherson <seanjc@google.com>
-To: Sohil Mehta <sohil.mehta@intel.com>
-Cc: x86@kernel.org, linux-kernel@vger.kernel.org, Xin Li <xin@zytor.com>, 
-	"H . Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, Peter Zijlstra <peterz@infradead.org>, 
-	Adrian Hunter <adrian.hunter@intel.com>, Kan Liang <kan.liang@linux.intel.com>, 
-	Tony Luck <tony.luck@intel.com>, Zhang Rui <rui.zhang@intel.com>, 
-	Steven Rostedt <rostedt@goodmis.org>, Andrew Cooper <andrew.cooper3@citrix.com>, 
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Jacob Pan <jacob.pan@linux.microsoft.com>, 
-	Andi Kleen <ak@linux.intel.com>, Kai Huang <kai.huang@intel.com>, 
-	Sandipan Das <sandipan.das@amd.com>, linux-perf-users@vger.kernel.org, 
-	linux-edac@vger.kernel.org, kvm@vger.kernel.org, linux-pm@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <aGNw4ZJwlClvqezR@yzhao56-desk.sh.intel.com> <CAGtprH-Je5OL-djtsZ9nLbruuOqAJb0RCPAnPipC1CXr2XeTzQ@mail.gmail.com>
+ <aGxXWvZCfhNaWISY@google.com> <CAGtprH_57HN4Psxr5MzAZ6k+mLEON2jVzrLH4Tk+Ws29JJuL4Q@mail.gmail.com>
+ <006899ccedf93f45082390460620753090c01914.camel@intel.com>
+ <aG0pNijVpl0czqXu@google.com> <a0129a912e21c5f3219b382f2f51571ab2709460.camel@intel.com>
+ <CAGtprH8ozWpFLa2TSRLci-SgXRfJxcW7BsJSYOxa4Lgud+76qQ@mail.gmail.com>
+ <aG07j4Pfkd5EEobQ@google.com> <CA+EHjTx0UkYSduDxe13dFi4+J5L28H+wB4FBXLsMRC5HaHaaFg@mail.gmail.com>
+ <aG1UenipkaGyVUz-@google.com>
+In-Reply-To: <aG1UenipkaGyVUz-@google.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Tue, 8 Jul 2025 19:37:58 +0100
+X-Gm-Features: Ac12FXz2ea5j5gW9dhHxsUTG3z5TMtb4pNBOQU8cekFqn3Ye8zgo2zFcr57HDR8
+Message-ID: <CA+EHjTzQwt4Xux7AtB_eiuerKXeCmann2PFBoJTDZ8+qvFuX+w@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 00/51] 1G page support for guest_memfd
+To: Sean Christopherson <seanjc@google.com>
+Cc: Vishal Annapurve <vannapurve@google.com>, Rick P Edgecombe <rick.p.edgecombe@intel.com>, 
+	"pvorel@suse.cz" <pvorel@suse.cz>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"catalin.marinas@arm.com" <catalin.marinas@arm.com>, Jun Miao <jun.miao@intel.com>, 
+	Kirill Shutemov <kirill.shutemov@intel.com>, "pdurrant@amazon.co.uk" <pdurrant@amazon.co.uk>, 
+	"vbabka@suse.cz" <vbabka@suse.cz>, "peterx@redhat.com" <peterx@redhat.com>, "x86@kernel.org" <x86@kernel.org>, 
+	"amoorthy@google.com" <amoorthy@google.com>, "jack@suse.cz" <jack@suse.cz>, 
+	"quic_svaddagi@quicinc.com" <quic_svaddagi@quicinc.com>, "keirf@google.com" <keirf@google.com>, 
+	"palmer@dabbelt.com" <palmer@dabbelt.com>, "vkuznets@redhat.com" <vkuznets@redhat.com>, 
+	"mail@maciej.szmigiero.name" <mail@maciej.szmigiero.name>, 
+	"anthony.yznaga@oracle.com" <anthony.yznaga@oracle.com>, Wei W Wang <wei.w.wang@intel.com>, 
+	"Wieczor-Retman, Maciej" <maciej.wieczor-retman@intel.com>, Yan Y Zhao <yan.y.zhao@intel.com>, 
+	"ajones@ventanamicro.com" <ajones@ventanamicro.com>, "willy@infradead.org" <willy@infradead.org>, 
+	"rppt@kernel.org" <rppt@kernel.org>, "quic_mnalajal@quicinc.com" <quic_mnalajal@quicinc.com>, "aik@amd.com" <aik@amd.com>, 
+	"usama.arif@bytedance.com" <usama.arif@bytedance.com>, Dave Hansen <dave.hansen@intel.com>, 
+	"fvdl@google.com" <fvdl@google.com>, "paul.walmsley@sifive.com" <paul.walmsley@sifive.com>, 
+	"bfoster@redhat.com" <bfoster@redhat.com>, "nsaenz@amazon.es" <nsaenz@amazon.es>, 
+	"anup@brainfault.org" <anup@brainfault.org>, "quic_eberman@quicinc.com" <quic_eberman@quicinc.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"thomas.lendacky@amd.com" <thomas.lendacky@amd.com>, "mic@digikod.net" <mic@digikod.net>, 
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, 
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, 
+	"quic_cvanscha@quicinc.com" <quic_cvanscha@quicinc.com>, "steven.price@arm.com" <steven.price@arm.com>, 
+	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, "hughd@google.com" <hughd@google.com>, 
+	Zhiquan1 Li <zhiquan1.li@intel.com>, "rientjes@google.com" <rientjes@google.com>, 
+	"mpe@ellerman.id.au" <mpe@ellerman.id.au>, Erdem Aktas <erdemaktas@google.com>, 
+	"david@redhat.com" <david@redhat.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>, 
+	"jhubbard@nvidia.com" <jhubbard@nvidia.com>, Haibo1 Xu <haibo1.xu@intel.com>, Fan Du <fan.du@intel.com>, 
+	"maz@kernel.org" <maz@kernel.org>, "muchun.song@linux.dev" <muchun.song@linux.dev>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>, "jthoughton@google.com" <jthoughton@google.com>, 
+	"steven.sistare@oracle.com" <steven.sistare@oracle.com>, 
+	"quic_pheragu@quicinc.com" <quic_pheragu@quicinc.com>, "jarkko@kernel.org" <jarkko@kernel.org>, 
+	"chenhuacai@kernel.org" <chenhuacai@kernel.org>, Kai Huang <kai.huang@intel.com>, 
+	"shuah@kernel.org" <shuah@kernel.org>, "dwmw@amazon.co.uk" <dwmw@amazon.co.uk>, 
+	Chao P Peng <chao.p.peng@intel.com>, "pankaj.gupta@amd.com" <pankaj.gupta@amd.com>, 
+	Alexander Graf <graf@amazon.com>, "nikunj@amd.com" <nikunj@amd.com>, 
+	"viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>, "jroedel@suse.de" <jroedel@suse.de>, 
+	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, "jgowans@amazon.com" <jgowans@amazon.com>, 
+	Yilun Xu <yilun.xu@intel.com>, "liam.merwick@oracle.com" <liam.merwick@oracle.com>, 
+	"michael.roth@amd.com" <michael.roth@amd.com>, "quic_tsoni@quicinc.com" <quic_tsoni@quicinc.com>, 
+	Xiaoyao Li <xiaoyao.li@intel.com>, "aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, 
+	Ira Weiny <ira.weiny@intel.com>, 
+	"richard.weiyang@gmail.com" <richard.weiyang@gmail.com>, 
+	"kent.overstreet@linux.dev" <kent.overstreet@linux.dev>, "qperret@google.com" <qperret@google.com>, 
+	"dmatlack@google.com" <dmatlack@google.com>, "james.morse@arm.com" <james.morse@arm.com>, 
+	"brauner@kernel.org" <brauner@kernel.org>, 
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, 
+	"ackerleytng@google.com" <ackerleytng@google.com>, "pgonda@google.com" <pgonda@google.com>, 
+	"quic_pderrin@quicinc.com" <quic_pderrin@quicinc.com>, "hch@infradead.org" <hch@infradead.org>, 
+	"linux-mm@kvack.org" <linux-mm@kvack.org>, "will@kernel.org" <will@kernel.org>, 
+	"roypat@amazon.co.uk" <roypat@amazon.co.uk>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Jun 12, 2025, Sohil Mehta wrote:
-> With the IPI handling APIs ready to support the new NMI encoding, encode
-> the NMI delivery mode directly with the NMI-source vectors to trigger
-> NMIs.
-> 
-> Move most of the existing NMI-based IPIs to use the new NMI-source
-> vectors, except for the microcode rendezvous NMI and the crash reboot
-> NMI. NMI handling for them is special-cased in exc_nmi() and does not
-> need NMI-source reporting.
-> 
-> However, in the future, it might be useful to assign a source vector to
-> all NMI sources to improve isolation and debuggability.
-> 
-> Originally-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Co-developed-by: Xin Li (Intel) <xin@zytor.com>
-> Signed-off-by: Xin Li (Intel) <xin@zytor.com>
-> Signed-off-by: Sohil Mehta <sohil.mehta@intel.com>
-> ---
-> v7: No change.
-> 
-> v6: Include asm/nmi.h to avoid compile errors. (LKP)
-> 
-> v5: Encode APIC_DM_NMI directly with the NMI-source vector.
-> ---
->  arch/x86/include/asm/apic.h      | 8 ++++++++
->  arch/x86/kernel/apic/hw_nmi.c    | 2 +-
->  arch/x86/kernel/cpu/mce/inject.c | 2 +-
->  arch/x86/kernel/kgdb.c           | 2 +-
->  arch/x86/kernel/nmi_selftest.c   | 2 +-
->  arch/x86/kernel/smp.c            | 2 +-
->  6 files changed, 13 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/apic.h b/arch/x86/include/asm/apic.h
-> index 32cdd81e5e45..5789df1708bd 100644
-> --- a/arch/x86/include/asm/apic.h
-> +++ b/arch/x86/include/asm/apic.h
-> @@ -14,6 +14,7 @@
->  #include <asm/msr.h>
->  #include <asm/hardirq.h>
->  #include <asm/io.h>
-> +#include <asm/nmi.h>
->  #include <asm/posted_intr.h>
->  
->  #define ARCH_APICTIMER_STOPS_ON_C3	1
-> @@ -23,6 +24,13 @@
->  #define APIC_EXTNMI_ALL		1
->  #define APIC_EXTNMI_NONE	2
->  
-> +/* Trigger NMIs with source information */
-> +#define TEST_NMI		(APIC_DM_NMI | NMIS_VECTOR_TEST)
-> +#define SMP_STOP_NMI		(APIC_DM_NMI | NMIS_VECTOR_SMP_STOP)
-> +#define BT_NMI			(APIC_DM_NMI | NMIS_VECTOR_BT)
+On Tue, 8 Jul 2025 at 18:25, Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Tue, Jul 08, 2025, Fuad Tabba wrote:
+> > > > I don't think we need a flag to preserve memory as I mentioned in [2]. IIUC,
+> > > > 1) Conversions are always content-preserving for pKVM.
+> > >
+> > > No?  Perserving contents on private => shared is a security vulnerability waiting
+> > > to happen.
+> >
+> > Actually it is one of the requirements for pKVM as well as its current
+> > behavior. We would like to preserve contents both ways, private <=>
+> > shared, since it is required by some of the potential use cases (e.g.,
+> > guest handling video encoding/decoding).
+> >
+> > To make it clear, I'm talking about explicit sharing from the guest,
+> > not relinquishing memory back to the host. In the case of
+> > relinquishing (and guest teardown), relinquished memory is poisoned
+> > (zeroed) in pKVM.
+>
+> I forget, what's the "explicit sharing" flow look like?  E.g. how/when does pKVM
+> know it's ok to convert memory from private to shared?  I think we'd still want
+> to make data preservation optional, e.g. to avoid potential leakage with setups
+> where memory is private by default, but a flag in KVM's uAPI might not be a good
+> fit since whether or not to preserve data is more of a guest decision (or at least
+> needs to be ok'd by the guest).
 
-s/BT/BACKTRACE?
+In pKVM all sharing and unsharing is triggered by the guest via
+hypercalls. The host cannot unshare. That said, making data
+preservation optional works for pKVM and is a good idea, for the
+reasons that you've mentioned.
 
-> +#define KGDB_NMI		(APIC_DM_NMI | NMIS_VECTOR_KGDB)
-> +#define MCE_NMI			(APIC_DM_NMI | NMIS_VECTOR_MCE)
-
-IMO, NMI_xxx reads better, e.g. it's easier to see that code is sending an NMI
-at the call sites.
-
-> +
->  /*
->   * Debugging macros
->   */
-> diff --git a/arch/x86/kernel/apic/hw_nmi.c b/arch/x86/kernel/apic/hw_nmi.c
-> index 4e04f13d2de9..586f4b25feae 100644
-> --- a/arch/x86/kernel/apic/hw_nmi.c
-> +++ b/arch/x86/kernel/apic/hw_nmi.c
-> @@ -33,7 +33,7 @@ u64 hw_nmi_get_sample_period(int watchdog_thresh)
->  #ifdef arch_trigger_cpumask_backtrace
->  static void nmi_raise_cpu_backtrace(cpumask_t *mask)
->  {
-> -	__apic_send_IPI_mask(mask, NMI_VECTOR);
-> +	__apic_send_IPI_mask(mask, BT_NMI);
-
-This patch is buggy.  There are at least two implementations of ->send_IPI_mask()
-that this breaks:
-
-  uv_send_IPI_mask() = > uv_send_IPI_one():
-
-	if (vector == NMI_VECTOR)
-		dmode = APIC_DELIVERY_MODE_NMI;
-	else
-		dmode = APIC_DELIVERY_MODE_FIXED;
-
-
-and xen_send_IPI_mask() => xen_map_vector():
-
-	switch (vector) {
-	case RESCHEDULE_VECTOR:
-		xen_vector = XEN_RESCHEDULE_VECTOR;
-		break;
-	case CALL_FUNCTION_VECTOR:
-		xen_vector = XEN_CALL_FUNCTION_VECTOR;
-		break;
-	case CALL_FUNCTION_SINGLE_VECTOR:
-		xen_vector = XEN_CALL_FUNCTION_SINGLE_VECTOR;
-		break;
-	case IRQ_WORK_VECTOR:
-		xen_vector = XEN_IRQ_WORK_VECTOR;
-		break;
-#ifdef CONFIG_X86_64
-	case NMI_VECTOR:
-	case APIC_DM_NMI: /* Some use that instead of NMI_VECTOR */
-		xen_vector = XEN_NMI_VECTOR;
-		break;
-#endif
-	default:
-		xen_vector = -1;
-		printk(KERN_ERR "xen: vector 0x%x is not implemented\n",
-			vector);
-	}
-
-	return xen_vector;
-
-Looking at all of this again, shoving the NMI source information into the @vector
-is quite brittle.  Nothing forces implementations to handle embedded delivery
-mode information.
-
-One thought would be to pass a small struct (by value), and then provide macros
-to generate the structure for a specific vector.  That provides some amount of
-type safety and should make it a bit harder to pass in garbage, without making
-the callers any less readable.
-
-struct apic_ipi {
-	u8 vector;
-	u8 type;
-};
-
-#define APIC_IPI(v, t) ({ struct apic_ipi i = { .vector = v, .type = t }; i; })
-#define APIC_IPI_IRQ(vector) APIC_IPI(vector, APIC_DELIVERY_MODE_FIXED)
-#define APIC_IPI_NMI(vector) APIC_IPI(vector, APIC_DELIVERY_MODE_NMI)
-
-#define IPI_IRQ_WORK		APIC_IPI_IRQ(IRQ_WORK_VECTOR)
-#define IPI_POSTED_INTR_WAKEUP	APIC_IPI_IRQ(POSTED_INTR_WAKEUP_VECTOR)
-
-#define IPI_NMI_BACKTRACE	APIC_IPI_NMI(NMI_BACKTRACE_VECTOR)
-
-static __always_inline void __apic_send_IPI_self(struct apic_ipi ipi)
+Cheers,
+/fuad
 
