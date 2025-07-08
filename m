@@ -1,284 +1,170 @@
-Return-Path: <kvm+bounces-51808-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51809-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9513AFD718
-	for <lists+kvm@lfdr.de>; Tue,  8 Jul 2025 21:29:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B3516AFD78A
+	for <lists+kvm@lfdr.de>; Tue,  8 Jul 2025 21:50:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9B953188E26E
-	for <lists+kvm@lfdr.de>; Tue,  8 Jul 2025 19:29:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 67A041C26C2C
+	for <lists+kvm@lfdr.de>; Tue,  8 Jul 2025 19:50:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78ACB2E6D08;
-	Tue,  8 Jul 2025 19:29:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B19CF23A9BD;
+	Tue,  8 Jul 2025 19:50:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hXTYoaHE"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="acaZgnYj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EF2A21ABDB
-	for <kvm@vger.kernel.org>; Tue,  8 Jul 2025 19:29:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 387EB21CC5A
+	for <kvm@vger.kernel.org>; Tue,  8 Jul 2025 19:50:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752002943; cv=none; b=Okz7M2Xf+p4zJutuFM4lyd4gONeK7kOZ4pcsyRwPEgC2+s0qMjotZwhsxFHWVAAoC3jtRJgnPaGtbcJmW5mUfwjW/AmzXTbu7iV0IdmHnSKEFgy+8TlMnejR1qPpsrBGf8kzVhlhK1TIrjnu/IjVvmzh7DWBpRRMgEgjTrLcRvA=
+	t=1752004216; cv=none; b=rhjzUweLV9FD4jtpQ4P9FcQ6PzWLolbdh6nx4u2z4s3j5B1TizABHqvCiGDCUpQs/70jhZOUziIUit2h3xMR4kykvusLlVqdpvgKWgpDbSAxSduCVH1LonFDocjP+kiDwvFK8GaOJB1f3cUrDbQRLP9nniRBnvJpCVv3H1ngetg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752002943; c=relaxed/simple;
-	bh=/iJoCZWBT+k8ZJ6PfVSPFNHJUwaMG+UGQ97S5m2HT6M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=A/hAksPVuvc6hrZAJ/rHk8Tp/7wpluYe9zTJ/fI9QcKujyxhXxTHUF2NbAeVGEN+ybqrU3xmSUSN5fxL3cgCbwP+H9YZvYtQCGdEoxsktUeRQ1zRZo4OrMMP1zRonelDFcROPsrpTJgzh8gLPS7sfvKPWtc7uOkJ08sV2IR85NY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hXTYoaHE; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-237f18108d2so43105ad.0
-        for <kvm@vger.kernel.org>; Tue, 08 Jul 2025 12:29:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752002941; x=1752607741; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NTYdn6rBYcWLJ4T1Xl4c7iktQHkSqqtyT5L40Z5QBgA=;
-        b=hXTYoaHEHy16NlWEZlwcr7yQErw5dEochhAgeK/6WqGK+PhASpiQs/p3j7608/FoL9
-         kslXhRb80AbUieUt0CY1czkkWXMx/+7ez5C4dkbTP3ufcwlbalu5g1o96jfz2cjakekj
-         aDb+XaoaKL+PRF5q7eWuGbKXzYidtS5yV4KHJE91pDcB/nK1cMNqpbChJbp0QEwep4fu
-         HNE4kyuDv/uCXq+28aGnsSHYeBXTjFToZDOe+SMAbtvm0BevfWC9/PgNlgeW7IuyMA0g
-         9YUA2qgbc05ey81JdMJTQTHhNQvajLo62PBJ/k6eiPWPlzXFO5HRYm27m7UCHB+tHjWd
-         dNpA==
+	s=arc-20240116; t=1752004216; c=relaxed/simple;
+	bh=Y0iXoUqOLs0llj8Kqny8AlCcLxbD6abRir5vykfWqaE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OqS847ZLZ9HjGCbCTN0w5MO13YAk9mG2HROsBThtE1G9g3hgaPInd3QE6ot6uHw6CUU7UUo5rV9xx7Or4h3cVtjvDCrtwQy2kcrOlIY6jdiBNi0A5vUFl5Ov02sWR4FqutAkzPeZ24BczRFRiuRJTqkOaInMyuERJP3Xhpl/Rrg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=acaZgnYj; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752004213;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LikuVg883RBnSofMj2iv/RfyoEWwYa7j+D9dFy02hRA=;
+	b=acaZgnYjSQYldoe0kl+GmPtgv9mVlZkx07qTAiHqHZQfDA90f9DsyG4BZuYDNmOKGXeG2q
+	a3VDhYBUVsbTVY4N6s5yxH3VwSjye0s9R6EhDTI16HBh5Xh+Whpq3i38yAbTjUJ7mfv3es
+	HCGc1byXU6BHluZM9hpEuhT4bpeuLNg=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-226-acwgP8WdO5qE5eWHkq2_BQ-1; Tue, 08 Jul 2025 15:50:10 -0400
+X-MC-Unique: acwgP8WdO5qE5eWHkq2_BQ-1
+X-Mimecast-MFC-AGG-ID: acwgP8WdO5qE5eWHkq2_BQ_1752004210
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3a4e713e05bso2004449f8f.3
+        for <kvm@vger.kernel.org>; Tue, 08 Jul 2025 12:50:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752002941; x=1752607741;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NTYdn6rBYcWLJ4T1Xl4c7iktQHkSqqtyT5L40Z5QBgA=;
-        b=Gb6qhaCFoQJSGeu4CljbMwnk4GRXZkDANB62c/RZkgrqdDeai7NW5+UygHB5Q6cJt5
-         uLO4Y4a/ZP+yo19uxkghnvZBOTHcT2ZKswj584GG9zTmiwnc8Imay9yf8N8+KKfxfhQV
-         V1pdFZ0kHd7Q0c/gnTvTRi4XLI4RSUqeZ5cMKGA2pkgES9suElPoy/jMLvi/xqVlzt3n
-         u/0Yk0YPwdwjO/W/DE5nJsVOndNpsH/JU+DPn92KlF0X0XwPETo8kXgVFIUDY+LUVfEi
-         zuAopP/C5lfivLIBoKntea5Nn4+RMtyDV4+Md01PRujVn9HfX48+keXnEk8VoeFlnJcZ
-         Gt0g==
-X-Forwarded-Encrypted: i=1; AJvYcCXEOIf3wcwdM85vSVhuxqVH+m4ghXPejgYo3i9LKqSV8vlduO/+Eyjsvq05P8UbbOQEkFw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwS3ubZIV/lucKNSsqSkKo8rN/OoUgFESIW69VHfpDAO7k+dAd5
-	ace2mXYOGyx5AjaI6Jec+Rq6Qd+v4tSmbDiFMn/nslctLNb/a6XsaJTNFk+z2qDpCLYpvkVBWwU
-	39Vo8q3apcJ19fAMZ0W3MVKYdat72Mb5wEsXkYz8J
-X-Gm-Gg: ASbGncvKg/jkQ4o1HDTQ3GO5ugMlw0BbL71Tp18llOI+0iYZbQ91lDJWMuIbSkh+DM2
-	B1+0bz8L8rEKUXek59H0RmRDF1rb4uFfUzgdCzLdADjm36Jb29JMv+Ga+JNv8sLsO74B8VgyBVE
-	yDskx5c85Xd6VLtzVTe3xWFaDND9xZkdUBMwJA7DTgmFGH7dsGeI4PtRU8bYKFOrSH29878vy1v
-	Y8eVb03srt+
-X-Google-Smtp-Source: AGHT+IF+e0b/viSVE3deh/eLOleNwJVHNQOYU2XyylIkxIAW3YRR/V3A96+f2y39KaRwcjn13Ytsxc06jpGoXpOjB3o=
-X-Received: by 2002:a17:903:2f47:b0:236:9402:a610 with SMTP id
- d9443c01a7336-23dda44c1fbmr452675ad.22.1752002940898; Tue, 08 Jul 2025
- 12:29:00 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1752004209; x=1752609009;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LikuVg883RBnSofMj2iv/RfyoEWwYa7j+D9dFy02hRA=;
+        b=oE/I66IU9zGDgfhjjbOxPmOhUsZImbJIQI1v1KQP07/m6Sp/N14hfD1kjmTC0/Viys
+         eVlRNG9UhI4w9YtRgCKiZsiTAE8WUg2NBhCvQZRvmvw6XRLrH6dlVW6rPx33Jyevi+AK
+         0vvkZOLH9rATMJ/ecra9TsardbmDby7HpQz8oBahjnC/agW83vdpqxunCj88BOS28lDE
+         +0IPmrt2IXByutIfOs+J+Znos4kd5we/kILx+Oy/iw3LGwkFmW0gJuEfjhnOrobCoOqq
+         UEmuY+iKcJd+a+NpisO6uadSW8lq63ZOZzNxR+k2mJy+2LME2jl5qxqvV3vKcf6BcBin
+         N+rw==
+X-Forwarded-Encrypted: i=1; AJvYcCX6BLbLAC4hAV7lioAp7fB0WaGpBn2d/sJE9CYIDxHJU9WgrKu6We1HS3EZFbfxhIcIEsM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxoHSFnQGGCEpovkiVou6Cd4K6HHJPb4W44DIdw/7WgnoYdhl9h
+	6TLp9yHbaK9ObXVjvpcg7o5mSzHl1u1lpfyg2kGwe2X/nXn/p6iVTUIpFZjfBqETI00kgxLsrMJ
+	QVUT3zRsjhZKBDx3cF9Evo5W0aoiNLzkSyHUiVB7ne3g6XNwb/V4f2w==
+X-Gm-Gg: ASbGncsvzoKXY+f5L10f1FqurADWocApsfHrPQo4GNbOdCi0buKwdUfXBPTKRZSE84W
+	Hvk3RSo4PdsV7rAFb4A0QzEAE0LlP+ryZ3YGNoRU0YlGQ75MLzEbUFA6jLxuLWcPEeNqmMiPI1P
+	PvdSTpXSP71pLseddj0BMd4wquD3yEJ8uUh0v07tKpoyrjzKX2XNd+Lgw4ll05t9e999KZ73w0M
+	GChYwhvbRFkvWYMLmaE8Yz9pIYkThkca5F30O2ZdkVzIuP2JTMEW65pUFcd34aXqRxbdbb5LZp7
+	zlKzHQ8CDF3WDxA=
+X-Received: by 2002:a5d:5d0e:0:b0:3a4:f35b:d016 with SMTP id ffacd0b85a97d-3b497011a15mr15320226f8f.11.1752004209400;
+        Tue, 08 Jul 2025 12:50:09 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF1jBraagOsk3QI107z1D1hHowlYV/qp00H/NJFxbB801oXkh53Lpf4M+P4ApVMlSTE/u2Aig==
+X-Received: by 2002:a5d:5d0e:0:b0:3a4:f35b:d016 with SMTP id ffacd0b85a97d-3b497011a15mr15320197f8f.11.1752004208849;
+        Tue, 08 Jul 2025 12:50:08 -0700 (PDT)
+Received: from redhat.com ([2a0d:6fc0:150d:fc00:de3:4725:47c6:6809])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-454cd49e64dsm30477795e9.34.2025.07.08.12.50.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Jul 2025 12:50:07 -0700 (PDT)
+Date: Tue, 8 Jul 2025 15:50:04 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Yuri Benditovich <yuri.benditovich@daynix.com>,
+	Akihiko Odaki <akihiko.odaki@daynix.com>,
+	Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org
+Subject: Re: [PATCH v7 net-next 0/9] virtio: introduce GSO over UDP tunnel
+Message-ID: <20250708154718-mutt-send-email-mst@kernel.org>
+References: <cover.1751874094.git.pabeni@redhat.com>
+ <20250708105816-mutt-send-email-mst@kernel.org>
+ <20250708082404.21d1fe61@kernel.org>
+ <20250708120014-mutt-send-email-mst@kernel.org>
+ <27d6b80a-3153-4523-9ccf-0471a85cb245@redhat.com>
+ <ef9864e5-3198-4e85-81eb-a491dfbda0d2@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAGtprH-Je5OL-djtsZ9nLbruuOqAJb0RCPAnPipC1CXr2XeTzQ@mail.gmail.com>
- <aGxXWvZCfhNaWISY@google.com> <CAGtprH_57HN4Psxr5MzAZ6k+mLEON2jVzrLH4Tk+Ws29JJuL4Q@mail.gmail.com>
- <006899ccedf93f45082390460620753090c01914.camel@intel.com>
- <aG0pNijVpl0czqXu@google.com> <a0129a912e21c5f3219b382f2f51571ab2709460.camel@intel.com>
- <CAGtprH8ozWpFLa2TSRLci-SgXRfJxcW7BsJSYOxa4Lgud+76qQ@mail.gmail.com>
- <eeb8f4b8308b5160f913294c4373290a64e736b8.camel@intel.com>
- <CAGtprH8cg1HwuYG0mrkTbpnZfHoKJDd63CAQGEScCDA-9Qbsqw@mail.gmail.com>
- <b1348c229c67e2bad24e273ec9a7fc29771e18c5.camel@intel.com> <aG1dbD2Xnpi_Cqf_@google.com>
-In-Reply-To: <aG1dbD2Xnpi_Cqf_@google.com>
-From: Vishal Annapurve <vannapurve@google.com>
-Date: Tue, 8 Jul 2025 12:28:48 -0700
-X-Gm-Features: Ac12FXypoF-PMAkZ7mwB0oOR5Y1QBTCoc64ZMQzShq2qX-6W01tjlHIokvek2B8
-Message-ID: <CAGtprH-ESrdhCeHkuRtiDoaqxCS9JVKu_CC9fbDRo+k+3jKCcQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 00/51] 1G page support for guest_memfd
-To: Sean Christopherson <seanjc@google.com>
-Cc: Rick P Edgecombe <rick.p.edgecombe@intel.com>, "pvorel@suse.cz" <pvorel@suse.cz>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, 
-	Jun Miao <jun.miao@intel.com>, "nsaenz@amazon.es" <nsaenz@amazon.es>, 
-	Kirill Shutemov <kirill.shutemov@intel.com>, "pdurrant@amazon.co.uk" <pdurrant@amazon.co.uk>, 
-	"peterx@redhat.com" <peterx@redhat.com>, "x86@kernel.org" <x86@kernel.org>, 
-	"tabba@google.com" <tabba@google.com>, "amoorthy@google.com" <amoorthy@google.com>, 
-	"quic_svaddagi@quicinc.com" <quic_svaddagi@quicinc.com>, "jack@suse.cz" <jack@suse.cz>, 
-	"vkuznets@redhat.com" <vkuznets@redhat.com>, "quic_eberman@quicinc.com" <quic_eberman@quicinc.com>, 
-	"keirf@google.com" <keirf@google.com>, 
-	"mail@maciej.szmigiero.name" <mail@maciej.szmigiero.name>, 
-	"anthony.yznaga@oracle.com" <anthony.yznaga@oracle.com>, Wei W Wang <wei.w.wang@intel.com>, 
-	"palmer@dabbelt.com" <palmer@dabbelt.com>, 
-	"Wieczor-Retman, Maciej" <maciej.wieczor-retman@intel.com>, Yan Y Zhao <yan.y.zhao@intel.com>, 
-	"ajones@ventanamicro.com" <ajones@ventanamicro.com>, "willy@infradead.org" <willy@infradead.org>, 
-	"paul.walmsley@sifive.com" <paul.walmsley@sifive.com>, Dave Hansen <dave.hansen@intel.com>, 
-	"aik@amd.com" <aik@amd.com>, "usama.arif@bytedance.com" <usama.arif@bytedance.com>, 
-	"quic_mnalajal@quicinc.com" <quic_mnalajal@quicinc.com>, "fvdl@google.com" <fvdl@google.com>, 
-	"rppt@kernel.org" <rppt@kernel.org>, "quic_cvanscha@quicinc.com" <quic_cvanscha@quicinc.com>, 
-	"maz@kernel.org" <maz@kernel.org>, "vbabka@suse.cz" <vbabka@suse.cz>, 
-	"anup@brainfault.org" <anup@brainfault.org>, "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "mic@digikod.net" <mic@digikod.net>, 
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, Fan Du <fan.du@intel.com>, 
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, "steven.price@arm.com" <steven.price@arm.com>, 
-	"muchun.song@linux.dev" <muchun.song@linux.dev>, 
-	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, Zhiquan1 Li <zhiquan1.li@intel.com>, 
-	"rientjes@google.com" <rientjes@google.com>, "mpe@ellerman.id.au" <mpe@ellerman.id.au>, 
-	Erdem Aktas <erdemaktas@google.com>, "david@redhat.com" <david@redhat.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>, 
-	"hughd@google.com" <hughd@google.com>, "jhubbard@nvidia.com" <jhubbard@nvidia.com>, Haibo1 Xu <haibo1.xu@intel.com>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, "jthoughton@google.com" <jthoughton@google.com>, 
-	"steven.sistare@oracle.com" <steven.sistare@oracle.com>, 
-	"quic_pheragu@quicinc.com" <quic_pheragu@quicinc.com>, "jarkko@kernel.org" <jarkko@kernel.org>, 
-	"chenhuacai@kernel.org" <chenhuacai@kernel.org>, Kai Huang <kai.huang@intel.com>, 
-	"shuah@kernel.org" <shuah@kernel.org>, "bfoster@redhat.com" <bfoster@redhat.com>, 
-	"dwmw@amazon.co.uk" <dwmw@amazon.co.uk>, Chao P Peng <chao.p.peng@intel.com>, 
-	"pankaj.gupta@amd.com" <pankaj.gupta@amd.com>, Alexander Graf <graf@amazon.com>, 
-	"nikunj@amd.com" <nikunj@amd.com>, "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>, 
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>, 
-	"jroedel@suse.de" <jroedel@suse.de>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, 
-	"jgowans@amazon.com" <jgowans@amazon.com>, Yilun Xu <yilun.xu@intel.com>, 
-	"liam.merwick@oracle.com" <liam.merwick@oracle.com>, "michael.roth@amd.com" <michael.roth@amd.com>, 
-	"quic_tsoni@quicinc.com" <quic_tsoni@quicinc.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, Ira Weiny <ira.weiny@intel.com>, 
-	"richard.weiyang@gmail.com" <richard.weiyang@gmail.com>, 
-	"kent.overstreet@linux.dev" <kent.overstreet@linux.dev>, "qperret@google.com" <qperret@google.com>, 
-	"dmatlack@google.com" <dmatlack@google.com>, "james.morse@arm.com" <james.morse@arm.com>, 
-	"brauner@kernel.org" <brauner@kernel.org>, "roypat@amazon.co.uk" <roypat@amazon.co.uk>, 
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, 
-	"ackerleytng@google.com" <ackerleytng@google.com>, "pgonda@google.com" <pgonda@google.com>, 
-	"quic_pderrin@quicinc.com" <quic_pderrin@quicinc.com>, "hch@infradead.org" <hch@infradead.org>, 
-	"will@kernel.org" <will@kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ef9864e5-3198-4e85-81eb-a491dfbda0d2@redhat.com>
 
-On Tue, Jul 8, 2025 at 11:03=E2=80=AFAM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> On Tue, Jul 08, 2025, Rick P Edgecombe wrote:
-> > On Tue, 2025-07-08 at 10:16 -0700, Vishal Annapurve wrote:
-> > > > Right, I read that. I still don't see why pKVM needs to do normal
-> > > > private/shared
-> > > > conversion for data provisioning. Vs a dedicated operation/flag to =
-make it a
-> > > > special case.
-> > >
-> > > It's dictated by pKVM usecases, memory contents need to be preserved
-> > > for every conversion not just for initial payload population.
-> >
-> > We are weighing pros/cons between:
-> >  - Unifying this uABI across all gmemfd VM types
-> >  - Userspace for one VM type passing a flag for it's special non-shared=
- use case
-> >
-> > I don't see how passing a flag or not is dictated by pKVM use case.
->
-> Yep.  Baking the behavior of a single usecase into the kernel's ABI is ra=
-rely a
-> good idea.  Just because pKVM's current usecases always wants contents to=
- be
-> preserved doesn't mean that pKVM will never change.
->
-> As a general rule, KVM should push policy to userspace whenever possible.
->
-> > P.S. This doesn't really impact TDX I think. Except that TDX developmen=
-t needs
-> > to work in the code without bumping anything. So just wishing to work i=
-n code
-> > with less conditionals.
-> >
-> > >
-> > > >
-> > > > I'm trying to suggest there could be a benefit to making all gmem V=
-M types
-> > > > behave the same. If conversions are always content preserving for p=
-KVM, why
-> > > > can't userspace  always use the operation that says preserve conten=
-t? Vs
-> > > > changing the behavior of the common operations?
-> > >
-> > > I don't see a benefit of userspace passing a flag that's kind of
-> > > default for the VM type (assuming pKVM will use a special VM type).
-> >
-> > The benefit is that we don't need to have special VM default behavior f=
-or
-> > gmemfd. Think about if some day (very hypothetical and made up) we want=
- to add a
-> > mode for TDX that adds new private data to a running guest (with specia=
-l accept
-> > on the guest side or something). Then we might want to add a flag to ov=
-erride
-> > the default destructive behavior. Then maybe pKVM wants to add a "don't
-> > preserve" operation and it adds a second flag to not destroy. Now gmemf=
-d has
-> > lots of VM specific flags. The point of this example is to show how uni=
-fied uABI
-> > can he helpful.
->
-> Yep again. Pivoting on the VM type would be completely inflexible.  If pK=
-VM gains
-> a usecase that wants to zero memory on conversions, we're hosed.  If SNP =
-or TDX
-> gains the ability to preserve data on conversions, we're hosed.
->
-> The VM type may restrict what is possible, but (a) that should be abstrac=
-ted,
-> e.g. by defining the allowed flags during guest_memfd creation, and (b) t=
-he
-> capabilities of the guest_memfd instance need to be communicated to users=
-pace.
+On Tue, Jul 08, 2025 at 07:00:19PM +0200, Paolo Abeni wrote:
+> On 7/8/25 6:43 PM, Paolo Abeni wrote:
+> > On 7/8/25 6:00 PM, Michael S. Tsirkin wrote:
+> >> On Tue, Jul 08, 2025 at 08:24:04AM -0700, Jakub Kicinski wrote:
+> >>> On Tue, 8 Jul 2025 11:01:30 -0400 Michael S. Tsirkin wrote:
+> >>>>> git@github.com:pabeni/linux-devel.git virtio_udp_tunnel_07_07_2025
+> >>>>>
+> >>>>> The first 5 patches in this series, that is, the virtio features
+> >>>>> extension bits are also available at [2]:
+> >>>>>
+> >>>>> git@github.com:pabeni/linux-devel.git virtio_features_extension_07_07_2025
+> >>>>>
+> >>>>> Ideally the virtio features extension bit should go via the virtio tree
+> >>>>> and the virtio_net/tun patches via the net-next tree. The latter have
+> >>>>> a dependency in the first and will cause conflicts if merged via the
+> >>>>> virtio tree, both when applied and at merge window time - inside Linus
+> >>>>> tree.
+> >>>>>
+> >>>>> To avoid such conflicts and duplicate commits I think the net-next
+> >>>>> could pull from [1], while the virtio tree could pull from [2].  
+> >>>>
+> >>>> Or I could just merge all of this in my tree, if that's ok
+> >>>> with others?
+> >>>
+> >>> No strong preference here. My first choice would be a branch based
+> >>> on v6.16-rc5 so we can all pull in and resolve the conflicts that
+> >>> already exist. But I haven't looked how bad the conflicts would 
+> >>> be for virtio if we did that. On net-next side they look manageable.
+> >>
+> >> OK, let's do it the way Paolo wants then.
+> > 
+> > I actually messed a bit with my proposal, as I forgot I need to use a
+> > common ancestor for the branches I shared.
+> > 
+> > git@github.com:pabeni/linux-devel.git virtio_features_extension_07_07_2025
+> > 
+> > is based on current net-next and pulling from such tag will take a lot
+> > of unwanted stuff into the vhost tree.
+> > 
+> > @Michael: AFAICS the current vhost devel tree is based on top of
+> > v6.15-rc7, am I correct?
+> 
+> Which in turn means that you rebase your tree (before sending the PR to
+> Linus), am I correct? If so we can't have stable hashes shared between
+> net-next and vhost.
+> 
+> /P
 
-Ok, I concur with this: It's beneficial to keep a unified ABI that
-allows guest_memfd to make runtime decisions without relying on VM
-type as far as possible.
+We can, I can merge your tree after rebasing. It's a hassle if I rebase
+repeatedly but I've been known to do it.
 
-Few points that seem important here:
-1) Userspace can and should be able to only dictate if memory contents
-need to be preserved on shared to private conversion.
-   -> For SNP/TDX VMs:
-        * Only usecase for preserving contents is initial memory
-population, which can be achieved by:
-               -  Userspace converting the ranges to shared,
-populating the contents, converting them back to private and then
-calling SNP/TDX specific existing ABI functions.
-        * For runtime conversions, guest_memfd can't ensure memory
-contents are preserved during shared to private conversions as the
-architectures don't support that behavior.
-        * So IMO, this "preserve" flag doesn't make sense for SNP/TDX
-VMs, even if we add this flag, today guest_memfd should effectively
-mark this unsupported based on the backing architecture support.
-2) For pKVM, if userspace wants to specify a "preserve" flag then this
-flag can be allowed based on the known capabilities of the backing
-architecture.
+If this is what you want, pls just base on some recent RC by Linus.
 
-So this topic is still orthogonal to "zeroing on private to shared conversi=
-on".
+-- 
+MST
 
-
-
-
-
->
-> > > Common operations in guest_memfd will need to either check for the
-> > > userspace passed flag or the VM type, so no major change in
-> > > guest_memfd implementation for either mechanism.
-> >
-> > While we discuss ABI, we should allow ourselves to think ahead. So, is =
-a gmemfd
-> > fd tied to a VM?
->
-> Yes.
->
-> > I think there is interest in de-coupling it?
->
-> No?  Even if we get to a point where multiple distinct VMs can bind to a =
-single
-> guest_memfd, e.g. for inter-VM shared memory, there will still need to be=
- a sole
-> owner of the memory.  AFAICT, fully decoupling guest_memfd from a VM woul=
-d add
-> non-trivial complexity for zero practical benefit.
->
-> > Is the VM type sticky?
-> >
-> > It seems the more they are separate, the better it will be to not have =
-VM-aware
-> > behavior living in gmem.
->
-> Ya.  A guest_memfd instance may have capabilities/features that are restr=
-icted
-> and/or defined based on the properties of the owning VM, but we should do=
- our
-> best to make guest_memfd itself blissly unaware of the VM type.
 
