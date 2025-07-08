@@ -1,86 +1,65 @@
-Return-Path: <kvm+bounces-51740-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51741-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9AADAFC3C7
-	for <lists+kvm@lfdr.de>; Tue,  8 Jul 2025 09:12:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B24DAFC3D5
+	for <lists+kvm@lfdr.de>; Tue,  8 Jul 2025 09:17:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 88C5A4A05B8
-	for <lists+kvm@lfdr.de>; Tue,  8 Jul 2025 07:12:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 354D5189FC79
+	for <lists+kvm@lfdr.de>; Tue,  8 Jul 2025 07:17:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B8FC259CA1;
-	Tue,  8 Jul 2025 07:12:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14DE229617D;
+	Tue,  8 Jul 2025 07:17:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jPD77ooU"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QCLjcjQP"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D442A21B905
-	for <kvm@vger.kernel.org>; Tue,  8 Jul 2025 07:12:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ECF61386B4
+	for <kvm@vger.kernel.org>; Tue,  8 Jul 2025 07:17:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751958733; cv=none; b=FObI5AR59CBH3s1DbDX34vP+paTs7UXIvRXBYI5eStpp1/SRmjSfjjwKngLep/1QhBAmZXeW8tke8pgFvUsSDGQHXuL2mmsN+thTdxb882QNtWIDQIcRoKCsLWgYz2VBhIop9N9cBRiFLEra+aPuzpFJm9itRM0YrQ5Fku/yRW4=
+	t=1751959026; cv=none; b=S/G5EIlNd/byvQfDP5b2s3lU2W32TrY/K2hGhV6PjiW4VggoRHgyr5FQOK97QhrXChQlGl9e9Z+PEIBnVrCZJtnZcBZOsijX6AHbM/dYzAg/7zDM5vK8j0PKvxPwmVkpzglYyOJ/Ea6Wi13H4aVuLPhhMhWy3g5ZK8y/ZgP/8sQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751958733; c=relaxed/simple;
-	bh=5lwDy8ZYNMTW4ldI2+BzIqOokv8FO+QSb76sSEuZo+U=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=bUBOaQ0NA582Z6/VTUBsRTTQNeIYyGhUNWRZpd/UlTZhdh6IfiRyzB3T7M0Vbd3qo/ncR9sckTpv4AV/DWXAvGwMsoXnbPWYknUHHHXSoF7GBF6lA81WzylveuujikL4TTeucyVmrBO57f5DO/Q2L1A6bkrcRfOxmm/ajVyUyF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jPD77ooU; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751958730;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6al2WSZTd7CdtJL8s2F8tIL0jpPencH2sAuuH9551kk=;
-	b=jPD77ooU7phFiE5STtPKn0Xyd+sK3S85WODUOXRIiH2C19IFUUIJNJ+NYQpIJM54OdR21J
-	I/B02ppqwpADDHnScNlBFjRiHRcJcEqIU70LS9D5kJDlwEMXfALXgT5s6xWhPRSA+4XvI9
-	700EfV/o8TZ9LXgSqPUUMQkAUbsa+oQ=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-110-hZwCcSHjOUa6aY7T9gZPww-1; Tue, 08 Jul 2025 03:12:07 -0400
-X-MC-Unique: hZwCcSHjOUa6aY7T9gZPww-1
-X-Mimecast-MFC-AGG-ID: hZwCcSHjOUa6aY7T9gZPww_1751958726
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3a4e9252ba0so2112129f8f.0
-        for <kvm@vger.kernel.org>; Tue, 08 Jul 2025 00:12:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751958726; x=1752563526;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6al2WSZTd7CdtJL8s2F8tIL0jpPencH2sAuuH9551kk=;
-        b=KuIEfeHMyOHJQcjxnqqQD5Huh7f2+Sh4XUbz1uvCsn+06LWbOxXoGt8MqHvKEEiXHt
-         XdeALOFVIPMvYCPrTwgXnqAMU0mmiOrJDDDkHN+IuF++oMssdPDvYcvzt+xL3yFv7t9p
-         e4+MJZqCtWBBAGAXc/3nax0ulCponDqvMlVfZMcImAr/+RQQ+d2yKkvc9olJH627ixmT
-         CxqkorhuZkWK17lybiBu6t84UqDHDOQPhu/prcwV+ye0q4XrIt2YuEmIKSXBn8cB9oIF
-         M0Y3bd/871FrTsL09UKS8ZwzdgJpClGwZPclaJYYCMcKk1qyXOBDatCkfam0Ke2BeTm4
-         EE4g==
-X-Forwarded-Encrypted: i=1; AJvYcCUDvXa++/cwFVh4x6T23yt/W6RhQ8pElOl8oP/uoKCHtiotwAo/D3otrnDqzrVxZebfpZw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz5Zh+72wUpQcqc7TG3IK57xuLR9Ik4te9gWyiOEITuYGO3KfKM
-	nWkBmiC/b9PFdHuirkv2fVrW6hArqkZuAmJrsI6iTU30Q4nePWx1oOUYAlgLujX6RlDsOORi5O5
-	cKiH/0MvYmMDmGFW/jqLWUC7uz3HHqD6tmnnLfLRm1zzQQot4TSe6gg==
-X-Gm-Gg: ASbGncsGBWjnszpTfnAQgfOWPnKb3TReePgPLMR3kIpZG9NU5KthffEhgsCVY7AcFHM
-	zMNoB+MaaPi0cONG9IUlNtVos6wnCwUHGla/sFeuAVsbJrM55stSnCTUUfpTU8nHa6PQbugUWHw
-	Dy0MonmAkcr0YLwO2ysAkeDwX6sLMelQFB21ub+VQKv9DGa7LC0d020FiTz97qcnHkAc1hNxoko
-	xdf+W6IhEMoBzpYYg/CbmuBX1oDzjANpEEcBZxaNI6HG6InU3eqfhvtwntrXIUhsz7ZPa9T5ZSA
-	wZx0+CMA1ZH5nCFh4e6AszRoE1SEjYwvLhknDYv/ecBFZVjzNldC4J4fEb7oUBR+H1OWDQ==
-X-Received: by 2002:a05:6000:2289:b0:3a5:2ec5:35a3 with SMTP id ffacd0b85a97d-3b49661da34mr13442614f8f.45.1751958726394;
-        Tue, 08 Jul 2025 00:12:06 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEUa0YAy1NBgIDOiXc5gNSB+BOVkjsJ3ZjAZUt++LCSItxzDjYj+HoOIwwZ6aldycNJxaG+/w==
-X-Received: by 2002:a05:6000:2289:b0:3a5:2ec5:35a3 with SMTP id ffacd0b85a97d-3b49661da34mr13442567f8f.45.1751958725979;
-        Tue, 08 Jul 2025 00:12:05 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2717:8910:b663:3b86:247e:dba2? ([2a0d:3344:2717:8910:b663:3b86:247e:dba2])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-454cd4938ffsm12723525e9.21.2025.07.08.00.12.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Jul 2025 00:12:05 -0700 (PDT)
-Message-ID: <41eb8d72-bfa3-4063-88af-1ec23593b0f8@redhat.com>
-Date: Tue, 8 Jul 2025 09:12:04 +0200
+	s=arc-20240116; t=1751959026; c=relaxed/simple;
+	bh=iTuacHb5oSnJ7VSx7pk7QtG2xA0c2fNHQgkfsycKdNk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=m6vNfgqYyCEEymgsjBQFswFhNHTljCDDjKiMCeNZIHNd/Z6Oh4lsJs9nNkqlJFiuuDXC9xLg23KayW8sx0xJH2UyPScoAjoAKCavJQ7V7fANta1pw3SVlvATxh6tFxbJpw3unmyU2HMz9ZlpefNr5VBV5pG0nAPVtwSnk0iUfx0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QCLjcjQP; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1751959023; x=1783495023;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=iTuacHb5oSnJ7VSx7pk7QtG2xA0c2fNHQgkfsycKdNk=;
+  b=QCLjcjQPUbw7+Cg/Ob8Prwc7vWtbUaW+vicktNNJEjIL9bKimwlketPV
+   CIXXTalX0iPav4rYxPmPKrG9zMeuh9xU9a4JClgskDr5eIPPgMpOiuFGx
+   gDFKcuF6y4JhpKQ+oNP5Wa10+u4cYiLE1FxRbZ020sK3OgAnlLtstrFvK
+   s/zfiCbsydUmNHzrT6Y74pi1z68eiawwwdMgN8ADBSVEDwlzXWr6iDYB0
+   VKF8Keehp/M238kgwU1Hk3H+j8ALh7mxoXlcjrMtbVsG1dCE0NDFheR9u
+   WckL7Vuu+78o5qe0+dJypMxWeLATh89JylLT5PQ5TN/8zdHSbu5bQK2gg
+   A==;
+X-CSE-ConnectionGUID: qy0pFH1XTPWfmINNlU1V1w==
+X-CSE-MsgGUID: WSKTGDv0QT6GeZkpCvHPHw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11487"; a="54073086"
+X-IronPort-AV: E=Sophos;i="6.16,296,1744095600"; 
+   d="scan'208";a="54073086"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jul 2025 00:16:55 -0700
+X-CSE-ConnectionGUID: 8QuCIgNTRYqss+XejEVw9Q==
+X-CSE-MsgGUID: qxM6hqD6R/qTgCjHr3uUKA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,296,1744095600"; 
+   d="scan'208";a="154836136"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
+  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jul 2025 00:16:52 -0700
+Message-ID: <cf03633c-63ba-40b7-abd1-8cbeb4daadd9@intel.com>
+Date: Tue, 8 Jul 2025 15:16:48 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -88,72 +67,124 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 net-next 0/9] virtio: introduce GSO over UDP tunnel
-From: Paolo Abeni <pabeni@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Jason Wang <jasowang@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, Yuri Benditovich <yuri.benditovich@daynix.com>,
- Akihiko Odaki <akihiko.odaki@daynix.com>, Jonathan Corbet <corbet@lwn.net>,
- kvm@vger.kernel.org, linux-doc@vger.kernel.org
-References: <cover.1750753211.git.pabeni@redhat.com>
+Subject: Re: [PATCH v8 2/2] KVM: SVM: Enable Secure TSC for SNP guests
+To: "Huang, Kai" <kai.huang@intel.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "seanjc@google.com" <seanjc@google.com>, "nikunj@amd.com" <nikunj@amd.com>
+Cc: "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
+ "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+ "vaishali.thakkar@suse.com" <vaishali.thakkar@suse.com>,
+ "santosh.shukla@amd.com" <santosh.shukla@amd.com>,
+ "bp@alien8.de" <bp@alien8.de>
+References: <20250707101029.927906-1-nikunj@amd.com>
+ <20250707101029.927906-3-nikunj@amd.com>
+ <26a5d7dcc54ec434615e0cfb340ad93a429b3f90.camel@intel.com>
 Content-Language: en-US
-In-Reply-To: <cover.1750753211.git.pabeni@redhat.com>
-Content-Type: text/plain; charset=UTF-8
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <26a5d7dcc54ec434615e0cfb340ad93a429b3f90.camel@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 6/24/25 4:09 PM, Paolo Abeni wrote:
-> Some virtualized deployments use UDP tunnel pervasively and are impacted
-> negatively by the lack of GSO support for such kind of traffic in the
-> virtual NIC driver.
+On 7/8/2025 10:21 AM, Huang, Kai wrote:
+> On Mon, 2025-07-07 at 15:40 +0530, Nikunj A Dadhania wrote:
+>> Add support for Secure TSC, allowing userspace to configure the Secure TSC
+>> feature for SNP guests. Use the SNP specification's desired TSC frequency
+>> parameter during the SNP_LAUNCH_START command to set the mean TSC
+>> frequency in KHz for Secure TSC enabled guests.
+>>
+>> Always use kvm->arch.arch.default_tsc_khz as the TSC frequency that is
+>> passed to SNP guests in the SNP_LAUNCH_START command.  The default value
+>> is the host TSC frequency.  The userspace can optionally change the TSC
+>> frequency via the KVM_SET_TSC_KHZ ioctl before calling the
+>> SNP_LAUNCH_START ioctl.
+>>
+>> Introduce the read-only MSR GUEST_TSC_FREQ (0xc0010134) that returns
+>> guest's effective frequency in MHZ when Secure TSC is enabled for SNP
+>> guests. Disable interception of this MSR when Secure TSC is enabled. Note
+>> that GUEST_TSC_FREQ MSR is accessible only to the guest and not from the
+>> hypervisor context.
+>>
+>> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
 > 
-> The virtio_net specification recently introduced support for GS over
-> UDP tunnel, this series updates the virtio implementation to support
-> such a feature.
+> This SoB isn't needed.
 > 
-> Currently the kernel virtio support limits the feature space to 64,
-> while the virtio specification allows for a larger number of features.
-> Specifically the GSO-over-UDP-tunnel-related virtio features use bits
-> 65-69.
+>> Co-developed-by: Ketan Chaturvedi <Ketan.Chaturvedi@amd.com>
+>> Signed-off-by: Ketan Chaturvedi <Ketan.Chaturvedi@amd.com>
+>> Co-developed-by: Sean Christopherson <seanjc@google.com>
+>> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
+>>
 > 
-> The first four patches in this series rework the virtio and vhost
-> feature support to cope with up to 128 bits. The limit is set by
-> a define and could be easily raised in future, as needed.
+> [...]
 > 
-> This implementation choice is aimed at keeping the code churn as
-> limited as possible. For the same reason, only the virtio_net driver is
-> reworked to leverage the extended feature space; all other
-> virtio/vhost drivers are unaffected, but could be upgraded to support
-> the extended features space in a later time.
+>> @@ -2146,6 +2158,14 @@ static int snp_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>>   
+>>   	start.gctx_paddr = __psp_pa(sev->snp_context);
+>>   	start.policy = params.policy;
+>> +
+>> +	if (snp_secure_tsc_enabled(kvm)) {
+>> +		if (!kvm->arch.default_tsc_khz)
+>> +			return -EINVAL;
 > 
-> The last four patches bring in the actual GSO over UDP tunnel support.
-> As per specification, some additional fields are introduced into the
-> virtio net header to support the new offload. The presence of such
-> fields depends on the negotiated features.
+> Here snp_context_create() has been called successfully therefore IIUC you
+> need to use
 > 
-> New helpers are introduced to convert the UDP-tunneled skb metadata to
-> an extended virtio net header and vice versa. Such helpers are used by
-> the tun and virtio_net driver to cope with the newly supported offloads.
+> 		goto e_free_context;
 > 
-> Tested with basic stream transfer with all the possible permutations of
-> host kernel/qemu/guest kernel with/without GSO over UDP tunnel support.
+> instead.
 > 
-> This is also are available in the Git repository at:
+> Btw, IIUC it shouldn't be possible for the kvm->arch.default_tsc_khz to be
+> 0.  Perhaps we can just remove the check.
 > 
-> git@github.com:pabeni/linux-devel.git virtio_udp_tunnel_24_06_2025
+> Even some bug results in the default_tsc_khz being 0, will the
+> SNP_LAUNCH_START command catch this and return error?
 > 
-> Ideally both the net-next tree and the vhost tree could pull from the
-> above.
+>> +
+>> +		start.desired_tsc_khz = kvm->arch.default_tsc_khz;
+>> +	}
+>> +
+>>   	memcpy(start.gosvw, params.gosvw, sizeof(params.gosvw));
+>>   	rc = __sev_issue_cmd(argp->sev_fd, SEV_CMD_SNP_LAUNCH_START, &start, &argp->error);
+>>   	if (rc) {
+>> @@ -2386,7 +2406,9 @@ static int snp_launch_update_vmsa(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>>   			return ret;
+>>   		}
+>>   
+>> -		svm->vcpu.arch.guest_state_protected = true;
+>> +		vcpu->arch.guest_state_protected = true;
+>> +		vcpu->arch.guest_tsc_protected = snp_secure_tsc_enabled(kvm);
+>> +
+> 
+> + Xiaoyao.
+> 
+> The KVM_SET_TSC_KHZ can also be a vCPU ioctl (in fact, the support of VM
+> ioctl of it was added later).  I am wondering whether we should reject
+> this vCPU ioctl for TSC protected guests, like:
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 2806f7104295..699ca5e74bba 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -6186,6 +6186,10 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+>                  u32 user_tsc_khz;
+>   
+>                  r = -EINVAL;
+> +
+> +               if (vcpu->arch.guest_tsc_protected)
+> +                       goto out;
+> +
+>                  user_tsc_khz = (u32)arg;
+>   
+>                  if (kvm_caps.has_tsc_control &&
 
-As Michael prefers to hide the warning in patch 4/9 and this series in
-the current form has now conflicts with the current net-next tree, I
-just shared a v7, with a more detailed merge plan in the cover letter.
+It seems to need to be opt-in since it changes the ABI somehow. E.g., it 
+at least works before when the VMM calls KVM_SET_TSC_KHZ at vcpu with 
+the same value passed to KVM_SET_TSC_KHZ at vm. But with the above 
+change, it would fail.
 
-Thanks,
-
-Paolo
+Well, in reality, it's OK for QEMU since QEMU explicitly doesn't call 
+KVM_SET_TSC_KHZ at vcpu for TDX VMs. But I'm not sure about the impact 
+on other VMMs. Considering KVM TDX support just gets in from v6.16-rc1, 
+maybe it doesn't have real impact for other VMMs as well?
 
 
