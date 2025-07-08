@@ -1,34 +1,34 @@
-Return-Path: <kvm+bounces-51757-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51758-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53F9DAFC82A
-	for <lists+kvm@lfdr.de>; Tue,  8 Jul 2025 12:20:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F2C9AFC82F
+	for <lists+kvm@lfdr.de>; Tue,  8 Jul 2025 12:20:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 354154838FB
-	for <lists+kvm@lfdr.de>; Tue,  8 Jul 2025 10:19:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C4E8563FE2
+	for <lists+kvm@lfdr.de>; Tue,  8 Jul 2025 10:20:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2E4F26B2B3;
-	Tue,  8 Jul 2025 10:19:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA23126B94F;
+	Tue,  8 Jul 2025 10:19:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZJ4Z77Hq"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cQKdMtJd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79DC9256C8D;
-	Tue,  8 Jul 2025 10:19:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EBB126A1C1;
+	Tue,  8 Jul 2025 10:19:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751969975; cv=none; b=ofwIK+ZYPSW/i7lIF34SGJ44oLT/FqDwq5YpDDx2OXifkeVsMPFPTjMWvjpxFxMjoPWsiBuSI4CG65Sexse2wKuAxZBLNIPCJ3/U1ArZBfRH/pEpLa1scd9uSlTdrhziP/rr7fhBiSImrMeKiQ51byiZVafJcs9OZx3gN5Oxb2I=
+	t=1751969976; cv=none; b=QMhMx8SzZWeux3FQhW7yOHX9KlBe+UPU/kN+i89lCAQHPpcKzUD/llNlFGP5t2qc2FXOFRGS0zUYab2H74EUhftbKlrC6Bexid1LfH8v76f5lIsXF+KVM8P9mYx9g2zvgSsj+Eu2TcvftlRtwiLX6BPQj75dleTovmYYozW06JM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751969975; c=relaxed/simple;
-	bh=wvJMYsc9yWz2URT+SK4ZAszSqtGgIMpsnmycjhsLP10=;
+	s=arc-20240116; t=1751969976; c=relaxed/simple;
+	bh=8ul1RV4tBolZAx/RFBjHZzoaOwiSn78OumHYnn57vxM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dvUP2/wh/A0+m4tXct8fcILbtkO8e5RsXMBS4qNzZ1ZscgPgJMfKUwXlfCG8GFSskGfTEa2vVOKpyEW/u385+Uit6wcX9VbcH6ARUUFDShR12TNKpaBB0Su/OJnaIcAZE1zYsj/F8I3bNpqydLQhsroQQi5+XplrVTplOnJ9xbY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.helo=mgamail.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZJ4Z77Hq; arc=none smtp.client-ip=198.175.65.9
+	 MIME-Version; b=Bx4/GwUNsyxCKXr7cxYhRXVh7ugnQ8LiR8EklPdBlP5YxXlNJ+9/MnOglqKH46FeaZTmxgfQCpYGlcD4TzkwolzY9/Ok7JLQF5RRtxcTe8t9A5mxoag5GukxfnFiKpzPVijXlWDiUTYgeHWZwI1uwEKstabymfbn7QbG75Rf4nQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.helo=mgamail.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cQKdMtJd; arc=none smtp.client-ip=192.198.163.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.helo=mgamail.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
@@ -36,30 +36,30 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   t=1751969975; x=1783505975;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=wvJMYsc9yWz2URT+SK4ZAszSqtGgIMpsnmycjhsLP10=;
-  b=ZJ4Z77Hqk8PGSZ73TlH+PNvnDiLofw23OnszGwlppVKhefmDXsYfWxqc
-   WA0I/tGUSXgmBl1Q3yoVDL9bZotOrphItryR5M1ru0zJhNe0wZUZkNSqX
-   ImyIgpUHmLTaBxiS03cJhwOkuh+3vH5eSofzgqCtClxm6BmsAgRozE45B
-   57clgib8FdI+T8o2XEkr6jZGREkRL9m86F8C80T0AyyuEcmtT79QySOKv
-   6JkTLwfEhB49O6X2TKP3H1qSha2lTMJ2VZIqmMqyJVtKYU8+MQVdd3le6
-   sLAbEWUhufalBwMy5gw0ut90KRkk9aZmDlQHOGDukiToij/N4+sOv2Di3
-   g==;
-X-CSE-ConnectionGUID: WQf8ui9vS0uyQMRaQZOjdg==
-X-CSE-MsgGUID: 4utsMFzoQQi1tkkq7OraFw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11487"; a="76751336"
+  bh=8ul1RV4tBolZAx/RFBjHZzoaOwiSn78OumHYnn57vxM=;
+  b=cQKdMtJdlMLx/mTBHyCFkB5X2owaoLqlh5Pz61sMAgApgXxiw0uWbUIk
+   +ud6owzcdAepvLLWQ7WG70TrEx2Zxys28Vfpf6mEg5uVU4VYIpPpIU0Oc
+   TmQm2CX1AVX79K4BX/tIUsjKTwCNJY4ioYzaGeD5eNyGoBEQgtiY+1uSI
+   VnowAwxVpBa/W02TpyOwacF4nJaP3cTdhef/SG545CeCaBKGEk892xWOw
+   M1ukSkuoAwdLVYumtmF508HvleDQ6gFS+c9novynM98NwhA+izRHItE1e
+   McE4ddhHHo5xDfNqAYKDb79gV6+RxczmFav2jyQaAEVvU5fd2mxgVXLS7
+   Q==;
+X-CSE-ConnectionGUID: bxv7W+I0SPuKKKmxk4TVSQ==
+X-CSE-MsgGUID: NRx+TMTWR0uqiHKzHYdEuA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11487"; a="79632836"
 X-IronPort-AV: E=Sophos;i="6.16,297,1744095600"; 
-   d="scan'208";a="76751336"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jul 2025 03:19:33 -0700
-X-CSE-ConnectionGUID: TVh3WA+aQ0qfksSH3ynRVA==
-X-CSE-MsgGUID: 1kOjowWnSzC9c4OYM785lQ==
+   d="scan'208";a="79632836"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jul 2025 03:19:33 -0700
+X-CSE-ConnectionGUID: KMzA/f9XTPidh33tExTg4Q==
+X-CSE-MsgGUID: D7YuoiXoS5Om6mzDiRT7Hg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,297,1744095600"; 
-   d="scan'208";a="155196381"
+   d="scan'208";a="155952282"
 Received: from black.fi.intel.com ([10.237.72.28])
-  by orviesa009.jf.intel.com with ESMTP; 08 Jul 2025 03:19:28 -0700
+  by orviesa008.jf.intel.com with ESMTP; 08 Jul 2025 03:19:29 -0700
 Received: by black.fi.intel.com (Postfix, from userid 1000)
-	id A0F741B5; Tue, 08 Jul 2025 13:19:27 +0300 (EEST)
+	id AD5F91C5; Tue, 08 Jul 2025 13:19:27 +0300 (EEST)
 From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 To: Dave Hansen <dave.hansen@linux.intel.com>,
 	Paolo Bonzini <pbonzini@redhat.com>,
@@ -75,9 +75,9 @@ Cc: Rick Edgecombe <rick.p.edgecombe@intel.com>,
 	linux-kernel@vger.kernel.org,
 	linux-coco@lists.linux.dev,
 	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCH 2/3] MAINTAINERS: Add Rick Edgecombe as a TDX reviewer
-Date: Tue,  8 Jul 2025 13:19:21 +0300
-Message-ID: <20250708101922.50560-3-kirill.shutemov@linux.intel.com>
+Subject: [PATCH 3/3] MAINTAINERS: Update Kirill Shutemov's email address
+Date: Tue,  8 Jul 2025 13:19:22 +0300
+Message-ID: <20250708101922.50560-4-kirill.shutemov@linux.intel.com>
 X-Mailer: git-send-email 2.47.2
 In-Reply-To: <20250708101922.50560-1-kirill.shutemov@linux.intel.com>
 References: <20250708101922.50560-1-kirill.shutemov@linux.intel.com>
@@ -89,28 +89,39 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Rick worked extensively to enable TDX in KVM. He will continue to work
-on TDX and should be involved in discussions regarding TDX.
-
-Add Rick as a TDX reviewer.
+Update MAINTAINERS to use my @kernel.org email address.
 
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- MAINTAINERS | 1 +
- 1 file changed, 1 insertion(+)
+ .mailmap    | 1 +
+ MAINTAINERS | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
+diff --git a/.mailmap b/.mailmap
+index b0ace71968ab..85ad46d20220 100644
+--- a/.mailmap
++++ b/.mailmap
+@@ -416,6 +416,7 @@ Kenneth W Chen <kenneth.w.chen@intel.com>
+ Kenneth Westfield <quic_kwestfie@quicinc.com> <kwestfie@codeaurora.org>
+ Kiran Gunda <quic_kgunda@quicinc.com> <kgunda@codeaurora.org>
+ Kirill Tkhai <tkhai@ya.ru> <ktkhai@virtuozzo.com>
++Kirill A. Shutemov <kas@kernel.org> <kirill.shutemov@linux.intel.com>
+ Kishon Vijay Abraham I <kishon@kernel.org> <kishon@ti.com>
+ Konrad Dybcio <konradybcio@kernel.org> <konrad.dybcio@linaro.org>
+ Konrad Dybcio <konradybcio@kernel.org> <konrad.dybcio@somainline.org>
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 8071871ea59c..b0363770450f 100644
+index b0363770450f..d7da3e22f4d9 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -26947,6 +26947,7 @@ F:	arch/x86/kernel/unwind_*.c
+@@ -26945,7 +26945,7 @@ F:	arch/x86/kernel/stacktrace.c
+ F:	arch/x86/kernel/unwind_*.c
+ 
  X86 TRUST DOMAIN EXTENSIONS (TDX)
- M:	Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+-M:	Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
++M:	Kirill A. Shutemov <kas@kernel.org>
  R:	Dave Hansen <dave.hansen@linux.intel.com>
-+R:	Rick Edgecombe <rick.p.edgecombe@intel.com>
+ R:	Rick Edgecombe <rick.p.edgecombe@intel.com>
  L:	x86@kernel.org
- L:	linux-coco@lists.linux.dev
- S:	Supported
 -- 
 2.47.2
 
