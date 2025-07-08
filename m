@@ -1,76 +1,78 @@
-Return-Path: <kvm+bounces-51791-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51792-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 704F4AFCF9F
-	for <lists+kvm@lfdr.de>; Tue,  8 Jul 2025 17:48:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6297BAFCFA9
+	for <lists+kvm@lfdr.de>; Tue,  8 Jul 2025 17:49:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 273DB1BC7ECF
-	for <lists+kvm@lfdr.de>; Tue,  8 Jul 2025 15:49:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B4DE5566D4B
+	for <lists+kvm@lfdr.de>; Tue,  8 Jul 2025 15:48:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A46A2E11D7;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 613A92E2EEC;
 	Tue,  8 Jul 2025 15:48:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="d2HOgvdF"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="AaV51Lfe"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
+Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38C272DEA67
-	for <kvm@vger.kernel.org>; Tue,  8 Jul 2025 15:48:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC8AD2E1C5C
+	for <kvm@vger.kernel.org>; Tue,  8 Jul 2025 15:48:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751989697; cv=none; b=NHl2slUknbLbb9j2EBkSXZsoBjn2cMQ5DBhLKxP9f8jx99eV8lif+34yVUhPspeAwpQRW7lp7k+9ThS45DESX4yze11ffTE4WR9vYeIRPWtjol+BIzPyRYh41WLuW+TvB2m2wHd27k5Btze2mfW+zZiQvt71lB2Wd0Eku5RAPQE=
+	t=1751989697; cv=none; b=kgqKw/HX8pY60LkakA7hx67LdfYS0rtnu3iHdk0rcpaUsJrS0HI+bhHl0WuYhx9jx0sDoJlAJ0pI+9lfVu4y2AYvUsiI54ROVrpEdXfQ9/eUu3ve7CFvlpjv/i4RB+kUq6PzGq80m3YkeTwuJDgogaqhv43HSuQdHkUHkjQ+xd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1751989697; c=relaxed/simple;
-	bh=SuJWuCF7OAV/GlOZ9B+iIodl+kxg17EuYp8KipNEP/Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bBpg/cWI6PAMPSy3cisaOEpdAj6L2FKO77SAvtXNktPTfX28WpW30Vg9Yl8STudBF9ZgvIa7/kLJgozpheGXAD9nUCMTdMHGq/bt6wv+NfI6aTgR4RczRkDP8tjH+7ZhHgfFsPNoTJp+OKhvErzTArj4z3pnOCb6p62lIsybGDg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=d2HOgvdF; arc=none smtp.client-ip=209.85.219.42
+	bh=ds5SN/ud6IreyNpgodB7PP6useD2H+9ogieo60SRHek=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=SF/fGLwuktwka0v9S9ec3/6jTAJdrsEdknbMMHXYxHn7xKANhftYTo5bvkv8EW/hpETN1GZ1ElZlcJSfiTxsN2UIS9fLwyJos25orcrLAr3q28XRCXNkVWFExvNgXroVK2DZ1NpAmVn6oTZ48EI9LPvSzRB2e4wg8BdhqISX0vw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=AaV51Lfe; arc=none smtp.client-ip=209.85.219.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-700fee04941so43698656d6.1
-        for <kvm@vger.kernel.org>; Tue, 08 Jul 2025 08:48:13 -0700 (PDT)
+Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-700fee04941so43698756d6.1
+        for <kvm@vger.kernel.org>; Tue, 08 Jul 2025 08:48:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1751989693; x=1752594493; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=jdccv8r6kG2HcBolVBSqhEyDLxi/NJUpMCqQXxW/BNg=;
-        b=d2HOgvdFsWXRkzzKjPKPUmPlhg7XbUEM87uf2k4wojLdmDICOjVrSXku8OQ0+OrYpI
-         1AAYOUomyHAp1Y6lBhtLsnQ61luept/IjX9WvrMPUlnlKr3EUiQVpj086PRPJhjGg6H4
-         E1iCEl1hE4HjhwPjrPlouke3W9rjxYgYIH+qjCjoryPy5Vi1SggA8zqBL/ScyJcJ5QhE
-         vP4UuHmreWGZcvjwZRXVr/cH96TjdUgz48Be46+Fsj36r6lj6D4WhTeRTKjnSOdbX91X
-         MxNMkXr8+Ohj9quagL5H0uJBC/fAWKfR8pZeKgKRQ0ygpCSg3kCDCTXrirvYLQAIPzRg
-         JFvA==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iH04xoC4HJJjcr3JF880EHmqHS1N+xsYoFSsuwlbdaQ=;
+        b=AaV51Lfev6Qp8tdyZv2g7NRGgMs+qZodiXVapmdyH8iFqJ+iIDC+s+LzViHZwizJzx
+         k/WNcT5UxTnQKCFgAfTjnYG8pUlYWmm2le122Hy98pXgFkShftt5SuM1F61jvdXFS1GK
+         NvT04frwRN4DtwjIffQhsWvb0Vqh2gQ+VmxGFAjx5+kWMSWRotNdQj66IsQsujsxyf3C
+         wzxpwbsgiayNBU2f6qm0s9EhS/3ACCJRbp/q4GCkWy275yTVz2PTAmWtN2jHrkdF11xX
+         UaXRjpdi8cVcG8yLJ8/Qj8cuKDwKSIxuKotnPi8T1kZw9+agVv2GY2p9duPkjoACNgFn
+         XCfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1751989693; x=1752594493;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jdccv8r6kG2HcBolVBSqhEyDLxi/NJUpMCqQXxW/BNg=;
-        b=kQqBSEmM8pP3mDmF1GXVi+tt9prL4EYvTVGiUrCMhKeZywrjUdfUwzuAtxug0labYK
-         vX7nTeokxyKqxm0VX1hKHN7/3B/LkE0rB3ZUbVUx8c11tJgLGr1TihpVs4kdR4gQVDN8
-         /1nUCpoZpQq3fhpbv5MChY01cbl0KB4uU8XMnEmuZ4WPSZEqDRngbMKkScMVebcGz8BJ
-         HbXXmKdTonRhCa2mHS/OetyNVtTSXMuPpDyoou5Kxy4tELez5OJKckQrJ7dc3WuKzefM
-         kXZofRxS4Mp4A5LPRnTAus1H52lGpU0VeeWPqeN0kvkF+cN4/SnDIM4kb2H1uCz4vi0C
-         3S6w==
-X-Gm-Message-State: AOJu0YxOZzKLsWem9ASqqi6YOlUBDwZqdHExy/CilfSxx7XeNr4iuhek
-	PJ3FjHpWp5qABkHmezTzzb9ZaHZdqbNJ38w12GOsfkcsUMKHJYSKi1FTVVOBxP9HeSuc78AxW2n
-	yYAgH
-X-Gm-Gg: ASbGncvuopowvFecvao5tgYFXnoS7eYBEBK2WARZwV9W7bW8iuR8cZZG3RUGGSYJYpB
-	/EUcWtoAkroASi2Wcn4TKLool2oXQjNPzGD8MY5zai7idQCmrhYK4bxh0bwu1FHgp6R5hJiiKR8
-	G/KDUvwhqqH9BfG0YLzQzvR4VLGsXsLxdjzQmLmGISDNEPvQYB9BW5m40zEAyEbm/c5arte+Hog
-	JCpHAdW6MFvc9pkzLO4IVmb65G5UsuiZWNv2tuDNSDP7ngAAYaBXJbJl1KKOPessJNqhGdgfhxm
-	8ftpoK0Wf/eXH8kEeAcmUYmze1XaECDu+4U6rCa5URCrUlTJC11De6yuTPgJVrzMQHHSxVS/Px0
-	AUhcO7ySMw5SjTTUCNKZOgJXjQSs5PAlnw84oeOHABfVn+KZDsIU=
-X-Google-Smtp-Source: AGHT+IE10mwZp93cedil7BBoyf7eRyBi7gEfNMAHy9LlTfGe5O2WZp+UKFVlKh4/QpyDqG/ZjLpyWQ==
-X-Received: by 2002:ad4:5ba3:0:b0:6f8:d223:3c32 with SMTP id 6a1803df08f44-7047d96feaamr62114746d6.10.1751989692807;
-        Tue, 08 Jul 2025 08:48:12 -0700 (PDT)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=iH04xoC4HJJjcr3JF880EHmqHS1N+xsYoFSsuwlbdaQ=;
+        b=S64VLGqi0v6Xa0jxITOUYTAE336zFY6PS/izzm/3lvVEklDUgSEbBeOLyj2jmt3w+Q
+         LWUik6EFBZNSAg/XvycvX9VHnxZ8NrHu7Oz3XvBPBD8+29sOjsv27Km0GBpgV1UbrtI2
+         5XVsxBqF6vug1NBo4P2eUpAx0eiY6TFKN3tpWqv9eZn5EjxcT6/XCftRCxVdwBxfO6tV
+         Szv/gArq0NVU/bCgph4qzbZpjKrxI1l9kO8FFdnU22lqLCQCe6Vy7nxFDB4t7nVVIS7D
+         zJhsOuyr5E/dS0jKm6yfSb8EMxUU0b5hE3oMxPdwPqfd2+fqEkUHoT543o9PfpHCkzh0
+         ROAA==
+X-Gm-Message-State: AOJu0YwDeWxtaKP3bG1s29g3fgLAPJkZjxE0VNAyRSJUGZ2DXkNfhi8a
+	yTNSZ+R6d28kRXgZGmYIHJQIlt72+a3SB3MJj+HCxr3IdDhuSSmfvxq3hUF39vC3DO0+n7BZ/+9
+	ARtSF
+X-Gm-Gg: ASbGnctLkp01OtJOmo1L6u6vgphJL0QHQuLrUG8fhUmlNpNBs3Rqr2XjpftIBpY9/+i
+	T+8Rkk80+ZREf9LqBHRnpG8RG0Ls55znMZbKiKMnxmtyvKIwh4CuP5xagJtT7sWFshR9FU7ScqR
+	eP9FUodNwjeenDB7ejC8WKUO8q+ypDYe4oaZSklume9XnqbWhVYCYEWWnLgglY6AJoVh5Q+f9FU
+	ymkDF4WV5ExsH7Z+lE264uDSOZskmsfgA/XTxA6D2J4f2zYJUv763g+KZe2YR4aJnhJNUT4vzeT
+	hGIPHXgNvaKZKjOfX1jamd4nrAn3JXDSL+WCjxSdEqa926oG0ww5ejoOgVsfxaZyc2jfX2X51CE
+	aOt4aPrSYYBzquEkJCkq2YUsz4YtkVwqfd0n9ALyYEONAFoLtI7bOs6T+nxAkTg==
+X-Google-Smtp-Source: AGHT+IGUQo5EBx/tNY5n3ZATmL3uaoM4iK61VNEuctuQHFnVd7lY/jZGvovGvruOSz6T58HuyGkltw==
+X-Received: by 2002:a05:6214:5b81:b0:6fb:3d7:71bb with SMTP id 6a1803df08f44-7047d931790mr46736666d6.1.1751989693532;
+        Tue, 08 Jul 2025 08:48:13 -0700 (PDT)
 Received: from jesse-lt.ba.rivosinc.com (pool-108-26-215-125.bstnma.fios.verizon.net. [108.26.215.125])
         by smtp.gmail.com with ESMTPSA id 6a1803df08f44-702c4d5ab9csm78453346d6.87.2025.07.08.08.48.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Jul 2025 08:48:12 -0700 (PDT)
+        Tue, 08 Jul 2025 08:48:13 -0700 (PDT)
 From: Jesse Taube <jesse@rivosinc.com>
 To: kvm@vger.kernel.org,
 	kvm-riscv@lists.infradead.org,
@@ -82,10 +84,12 @@ Cc: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <cleger@rivosinc.com>,
 	James Raphael Tiovalen <jamestiotio@gmail.com>,
 	Sean Christopherson <seanjc@google.com>,
 	Cade Richard <cade.richard@gmail.com>
-Subject: [kvm-unit-tests PATCH v2 1/2] lib: Add STR_IS_Y and STR_IS_N for checking env vars
-Date: Tue,  8 Jul 2025 08:48:10 -0700
-Message-ID: <20250708154811.1888319-1-jesse@rivosinc.com>
+Subject: [kvm-unit-tests PATCH v2 2/2] riscv: lib: Add sbi-exit-code to configure and environment
+Date: Tue,  8 Jul 2025 08:48:11 -0700
+Message-ID: <20250708154811.1888319-2-jesse@rivosinc.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20250708154811.1888319-1-jesse@rivosinc.com>
+References: <20250708154811.1888319-1-jesse@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -94,102 +98,83 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-the line:
-(s && (*s == '1' || *s == 'y' || *s == 'Y'))
-is used in a few places add a macro for it and it's 'n' counterpart.
-
-Add GET_CONFIG_OR_ENV for CONFIG values which can be overridden by
-the environment.
+Add --[enable|disable]-sbi-exit-code to configure script.
+With the default value as disabled.
+Add a check for SBI_EXIT_CODE in the environment, so that passing
+of the test status is configurable from both the
+environment and the configure script
 
 Signed-off-by: Jesse Taube <jesse@rivosinc.com>
 ---
- lib/argv.h        | 13 +++++++++++++
- lib/errata.h      |  7 ++++---
- riscv/sbi-tests.h |  3 ++-
- 3 files changed, 19 insertions(+), 4 deletions(-)
+ configure      | 11 +++++++++++
+ lib/riscv/io.c |  4 +++-
+ 2 files changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/lib/argv.h b/lib/argv.h
-index 0fa77725..ecbb40d7 100644
---- a/lib/argv.h
-+++ b/lib/argv.h
-@@ -14,4 +14,17 @@ extern void setup_args_progname(const char *args);
- extern void setup_env(char *env, int size);
- extern void add_setup_arg(const char *arg);
+diff --git a/configure b/configure
+index 20bf5042..7c949bdc 100755
+--- a/configure
++++ b/configure
+@@ -67,6 +67,7 @@ earlycon=
+ console=
+ efi=
+ efi_direct=
++sbi_exit_code=0
+ target_cpu=
  
-+#define STR_IS_Y(s) (s && (*s == '1' || *s == 'y' || *s == 'Y'))
-+#define STR_IS_N(s) (s && (*s == '0' || *s == 'n' || *s == 'N'))
-+
-+/*
-+ * Get the boolean value of CONFIG_{name}
-+ * which can be overridden by the {name}
-+ * variable in the environment if present.
-+ */
-+#define GET_CONFIG_OR_ENV(name) ({		\
-+	const char *s = getenv(#name);		\
-+	s ? STR_IS_Y(s) : CONFIG_##name;	\
-+})
-+
- #endif
-diff --git a/lib/errata.h b/lib/errata.h
-index de8205d8..78007243 100644
---- a/lib/errata.h
-+++ b/lib/errata.h
-@@ -7,6 +7,7 @@
- #ifndef _ERRATA_H_
- #define _ERRATA_H_
+ # Enable -Werror by default for git repositories only (i.e. developer builds)
+@@ -141,6 +142,9 @@ usage() {
+ 	                           system and run from the UEFI shell. Ignored when efi isn't enabled
+ 	                           and defaults to enabled when efi is enabled for riscv64.
+ 	                           (arm64 and riscv64 only)
++	    --[enable|disable]-sbi-exit-code
++	                           Enable or disable sending pass/fail exit code to SBI SRST.
++	                           (disabled by default, riscv only)
+ EOF
+     exit 1
+ }
+@@ -236,6 +240,12 @@ while [[ $optno -le $argc ]]; do
+ 	--disable-efi-direct)
+ 	    efi_direct=n
+ 	    ;;
++	--enable-sbi-exit-code)
++	    sbi_exit_code=1
++	    ;;
++	--disable-sbi-exit-code)
++	    sbi_exit_code=0
++	    ;;
+ 	--enable-werror)
+ 	    werror=-Werror
+ 	    ;;
+@@ -551,6 +561,7 @@ EOF
+ elif [ "$arch" = "riscv32" ] || [ "$arch" = "riscv64" ]; then
+     echo "#define CONFIG_UART_EARLY_BASE ${uart_early_addr}" >> lib/config.h
+     [ "$console" = "sbi" ] && echo "#define CONFIG_SBI_CONSOLE" >> lib/config.h
++    echo "#define CONFIG_SBI_EXIT_CODE ${sbi_exit_code}" >> lib/config.h
+     echo >> lib/config.h
+ fi
+ echo "#endif" >> lib/config.h
+diff --git a/lib/riscv/io.c b/lib/riscv/io.c
+index b1163404..c46845de 100644
+--- a/lib/riscv/io.c
++++ b/lib/riscv/io.c
+@@ -6,6 +6,7 @@
+  * Copyright (C) 2023, Ventana Micro Systems Inc., Andrew Jones <ajones@ventanamicro.com>
+  */
  #include <libcflat.h>
 +#include <argv.h>
- 
- #include "config.h"
- 
-@@ -28,7 +29,7 @@ static inline bool errata_force(void)
- 		return true;
- 
- 	s = getenv("ERRATA_FORCE");
--	return s && (*s == '1' || *s == 'y' || *s == 'Y');
-+	return STR_IS_Y(s);
- }
- 
- static inline bool errata(const char *erratum)
-@@ -40,7 +41,7 @@ static inline bool errata(const char *erratum)
- 
- 	s = getenv(erratum);
- 
--	return s && (*s == '1' || *s == 'y' || *s == 'Y');
-+	return STR_IS_Y(s);
- }
- 
- static inline bool errata_relaxed(const char *erratum)
-@@ -52,7 +53,7 @@ static inline bool errata_relaxed(const char *erratum)
- 
- 	s = getenv(erratum);
- 
--	return !(s && (*s == '0' || *s == 'n' || *s == 'N'));
-+	return !STR_IS_N(s);
- }
- 
- #endif
-diff --git a/riscv/sbi-tests.h b/riscv/sbi-tests.h
-index c1ebf016..4e051dca 100644
---- a/riscv/sbi-tests.h
-+++ b/riscv/sbi-tests.h
-@@ -37,6 +37,7 @@
- 
- #ifndef __ASSEMBLER__
- #include <libcflat.h>
-+#include <argv.h>
- #include <asm/sbi.h>
- 
- #define __sbiret_report(kfail, ret, expected_error, expected_value,						\
-@@ -94,7 +95,7 @@ static inline bool env_enabled(const char *env)
+ #include <bitops.h>
+ #include <config.h>
+ #include <devicetree.h>
+@@ -163,7 +164,8 @@ void halt(int code);
+ void exit(int code)
  {
- 	char *s = getenv(env);
- 
--	return s && (*s == '1' || *s == 'y' || *s == 'Y');
-+	return STR_IS_Y(s);
+ 	printf("\nEXIT: STATUS=%d\n", ((code) << 1) | 1);
+-	sbi_shutdown(code == 0);
++
++	sbi_shutdown(GET_CONFIG_OR_ENV(SBI_EXIT_CODE) ? code == 0 : true);
+ 	halt(code);
+ 	__builtin_unreachable();
  }
- 
- void split_phys_addr(phys_addr_t paddr, unsigned long *hi, unsigned long *lo);
 -- 
 2.43.0
 
