@@ -1,214 +1,273 @@
-Return-Path: <kvm+bounces-51716-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51717-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45262AFBE9E
-	for <lists+kvm@lfdr.de>; Tue,  8 Jul 2025 01:32:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF7DCAFBF14
+	for <lists+kvm@lfdr.de>; Tue,  8 Jul 2025 02:05:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E6E3E3BBBF1
-	for <lists+kvm@lfdr.de>; Mon,  7 Jul 2025 23:31:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7A6C27AA6AE
+	for <lists+kvm@lfdr.de>; Tue,  8 Jul 2025 00:04:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C7C82868AD;
-	Mon,  7 Jul 2025 23:32:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0743BA36;
+	Tue,  8 Jul 2025 00:05:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wfmjdwhJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JaJrLQoV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A1114C6E
-	for <kvm@vger.kernel.org>; Mon,  7 Jul 2025 23:32:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 675E3290F
+	for <kvm@vger.kernel.org>; Tue,  8 Jul 2025 00:05:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751931131; cv=none; b=ubzDYhL1DzzS9v8y2CwtpBJZemOcW3HfUPIuo389lxwNMMwvf4dvJQPCuBzCI41o3UUgKuFW666buHAPpVNPJ19YcmOUkQTvvSIRN4hyM5+XyzBJ968mu+0CvvTn2sfbJpnxTqwOAK7RML+8dZGIZBIQMinlDcuU7uFckAVmI1o=
+	t=1751933135; cv=none; b=s6SL4hbH201eSJ14J6psM+EBCS8OjWcbTxQSVd7FI65rxiyHp9lWaPE3zNtd2IrYIARVwH1mQP/oXAWpa+ZiMZnv7ZuuDhBuCStKbEmL3N0Q7baZqKVvHsOZnWBQQMwfsJfJS41Zdo2Tvdw2qm0s0CeFiFlrR0cxOLF21Ck2IVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751931131; c=relaxed/simple;
-	bh=1ffb14bfAcbOruhUZZk4RbIL9SB3DbmZ8qKgrgg4Hec=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=k3crJTT0iWLeGq318T/E1Dwatzenao/8azix3G1hqpYu4CPcMHLyFt7PmNJRiq1xsOBm37OmMu6x7nQqjzSbvl9wwabSCAeE3rA5KUNkcXoGw8rekGxPGXHbetz5Bq8GaGKdM77ylgZg3MHdtubsGuMCh+dkHguhP5GmJbUbEn4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wfmjdwhJ; arc=none smtp.client-ip=209.85.214.178
+	s=arc-20240116; t=1751933135; c=relaxed/simple;
+	bh=a2s1WJloUwxXuW2VFtCfi2TG+ObPXQO6JV7FHyfW0G4=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=jF4Wfro0psIULBfzPeCEJPogCEXQYT4mkiuYihm4I4ddGiQCVlNl6IMOYJ/NjeEdUeBROu9bZOS9h09nsopwApXKj7Nt9Q//GzqkDLzTDmlfoid2enDKoe3ohDGC9m+7cnnv/DRmYO2Ic9g+7XVu/TogJYV2FEzjji5c/5HFs5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JaJrLQoV; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-235e389599fso98575ad.0
-        for <kvm@vger.kernel.org>; Mon, 07 Jul 2025 16:32:10 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-31220ecc586so3354595a91.2
+        for <kvm@vger.kernel.org>; Mon, 07 Jul 2025 17:05:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1751931129; x=1752535929; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=b25Saen0Ouv9TFO7AIEKB3BvyD7uu12IqNtwgf3v9N0=;
-        b=wfmjdwhJkSyl/IlhRGziETMDJhnvhg82N11FtSFwQl/7ZFa6dNWJkexhdlvq1Wt+fx
-         pPcTkTH6JGgQAOYNGASyrhN1uqR+SBklNs0O1qCQ9Lj/ho571+aJxAHUMj/v9l80OHyu
-         tUuvOZ59BZCRIPPfR3UOJjt4JoGpcRLa6fz3QmztDM0xBDwXY6TEXSnQdZCwOYAwwyTx
-         v8NfRnk6q4AUGTlSxAxP6CY9yZY/WpZL9B+QuYtDGIyt0wX2CoVOJiPQXqqs/iJtLwqS
-         ImX0q05r7nZbyk24ESagf+xU/m3kbU7qcGkmClKxvuGBJYoexyKiRjcvskXRXg1nPS8X
-         3Cdg==
+        d=google.com; s=20230601; t=1751933133; x=1752537933; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=bUSsATYF1ni3LzC4mC5bWgDkacywyYgXO+8ZXgpBxbM=;
+        b=JaJrLQoVjdBdjLTWY7K9rOCuuMx0eNb83snASoc7Oi+OvG5OoEAbUzDRnU5JKGHUZp
+         XYPxGpid7SCm/W4jZe8/aQWB0T9sDiYQhUCofZgoSRPsgYPcXRiAaatG6FXvqUxjMJXH
+         eXXnCWF3A7yUTcbMGvld7eWTsENFS7yIZGk+euIILEjFr2DH+HZaREQlRojY0pEDCwaX
+         ixwh79Q1EhePtObSPPJn6KUrK/TRYOSj1bSqqWCWPlZKK8jiLuJTYCfLCA6B/NQtkDTR
+         dzjqbHgWp3YDd7OYzeDOO8V71b7efobMgjY4ih9uA9Rs58hqFfMqKJgWtGUeURBkW47z
+         eHKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751931130; x=1752535930;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=b25Saen0Ouv9TFO7AIEKB3BvyD7uu12IqNtwgf3v9N0=;
-        b=Khems6qz0cwXTuwrtQnCWh/TCQXrhZGbmo1st2Exr0YD/0v1CvwDN6s+aiW/eqc/I5
-         3lO9RnHk8f+ri8OkisZ7HUfgtnx+NSlU/9t0SBqxRsAqJFu6TAcTj81x4JZYyQkFFTXw
-         61EEs5gmuICJHN2775ER98HzWyrzbNscAjSLGkhOCumZBy/fia09SUPG+JjnL4XjMXhS
-         Qn9yAhV/rIzuQkcfGTIGlxwOWwnlpZ+LVUOy2/YVfzIe1LUdKP57jFH6udNQ4LPnIxfQ
-         yAhP1UFnqZcW+S/XB4fO1S6lcNils6thl7pTUvRPyUpSK2tL2d21pQhuWNUtn6Rqn1D3
-         ViYg==
-X-Forwarded-Encrypted: i=1; AJvYcCVfGVdu7GeT35Io79yZvB7VExIaPtH0zNselTLxGZFfI5/Tcu8+9QNi5RDKE2yzErY2eHw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxmamRr6NvbBXAeX4UnwzY8NJ5opgc+T+dDgQnj3ngqevrpTbid
-	mPpiXoVIo5bUEHRG/N3Ir/mOdEBqREUWhSXkwDr6EAgkxAZzeh/zrJ83cJbAaWfzS7JanbJ6kBN
-	ZjHkzw1DKaqeHb+bY2YoY+dginJUTC7nQJq0KRO1NomLG8jaW4vx0ddcpKq+9sQ==
-X-Gm-Gg: ASbGncuXUhmyNAVu9njJZ4xSgbiv7fHI4E7cgruAYGRjRi2U5DHQnFjca+BpCUhJ0M+
-	quG3DUe32z6anyIXlu9yrL6SnQQc3w5obBb20XekGEIvZfB7uMhnAnj4M1NmwAqEY54yj7+oyxV
-	7stA0JUe9U7DrmRAvkrGeKPj8uWS1GmEmjuLQOZ0Uay5MHL2oBbybQA+Izf6AgMUbN2FfXnO6/z
-	A==
-X-Google-Smtp-Source: AGHT+IGqmRprZYTBLI8qv+P8RjDA1HbE3ENdRoMTXbFRRnjoRR+yK0qlEKy2k3qHP1SasQQQ8ZzgWChIrCrLnGg4qR8=
-X-Received: by 2002:a17:903:2f81:b0:23c:5f63:b67 with SMTP id
- d9443c01a7336-23dd0f824a5mr1163805ad.4.1751931129206; Mon, 07 Jul 2025
- 16:32:09 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1751933133; x=1752537933;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=bUSsATYF1ni3LzC4mC5bWgDkacywyYgXO+8ZXgpBxbM=;
+        b=IjDcOJBdbIz2b3vNIi/qFMRtDwVDJFyfJF0LYl1/O+gdVCcd9ByzqKPNsJOu8WLpWl
+         V4HQfy/lAGApFcpJBMEIzUgdawumILb/enmpG10ItPGsBwij5JgrLZfTYiYkhUuc7TxH
+         zKeZ0T73yHV8X5RPnVJ9dhLluSBY72Mdq0LKfMF0TJc9bMzL0qOe4r4lVTKELPlZICE3
+         KLmqFMKXo5eQO8nyr+X/hesMrx6T2ibwPCkky2chil4W9WYlYC0bj6lNnVbk0kcAPl9G
+         lgwhyvHDXmYVVmwd7GTpxAJ6qCjde8AM/9owMQwmGCXoaAr2l9cQIJRmlHHEWat5K5i7
+         EAdg==
+X-Forwarded-Encrypted: i=1; AJvYcCUruaTP4axfmQtpXgjEkIA7FjX8U1Yz444qScFcW1Jkkci6Tke73WNvsI0pGxKarrPiLEk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzFf32cSYVicC2rOVOFmQumrN8BJ5fIrCa27AuDQp9goed5pttz
+	uQIckM6XYafvG0/eyuWqOKOATBS3x0DGpmyGiksfSuQyifOHCibhrdwaAsLDz6LXLZvfZCMiYEP
+	OADEK7g==
+X-Google-Smtp-Source: AGHT+IF2BwRN0aroTvNd7kwxawQk7XZesc7Ff2rjPXh0vuuuTamAUm/XoRpwibDL1NZmjUEIy01ScuBK2pw=
+X-Received: from pjbqx14.prod.google.com ([2002:a17:90b:3e4e:b0:312:e914:4548])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1f87:b0:312:db8:dbd2
+ with SMTP id 98e67ed59e1d1-31c21dbd35cmr1083943a91.19.1751933132692; Mon, 07
+ Jul 2025 17:05:32 -0700 (PDT)
+Date: Mon, 7 Jul 2025 17:05:31 -0700
+In-Reply-To: <0cdc7890-aade-4fa5-ad72-24cde6c7bce9@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250703153712.155600-1-adrian.hunter@intel.com>
- <20250703153712.155600-3-adrian.hunter@intel.com> <CAGtprH8boLi3PjXqU=bXA8th0s7=XE4gtFL+6wmmGaRqWQvAMw@mail.gmail.com>
- <2e444491-f296-4fa4-9221-036f9b010c1d@intel.com>
-In-Reply-To: <2e444491-f296-4fa4-9221-036f9b010c1d@intel.com>
-From: Vishal Annapurve <vannapurve@google.com>
-Date: Mon, 7 Jul 2025 16:31:56 -0700
-X-Gm-Features: Ac12FXwUanPwhUwd2qO24xrbiqz5Xe6HKml-XwovpsbcB_MYLVSiljzosapeYaw
-Message-ID: <CAGtprH8SqMH6GiRp=kgkUHxiPhtYDcrN8=AiudeTsS+7q2WGbQ@mail.gmail.com>
-Subject: Re: [PATCH V2 2/2] x86/tdx: Skip clearing reclaimed pages unless
- X86_BUG_TDX_PW_MCE is present
-To: Adrian Hunter <adrian.hunter@intel.com>
-Cc: Dave Hansen <dave.hansen@linux.intel.com>, pbonzini@redhat.com, seanjc@google.com, 
-	Tony Luck <tony.luck@intel.com>, Borislav Petkov <bp@alien8.de>, Thomas Gleixner <tglx@linutronix.de>, 
-	Ingo Molnar <mingo@redhat.com>, x86@kernel.org, H Peter Anvin <hpa@zytor.com>, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, rick.p.edgecombe@intel.com, 
-	kirill.shutemov@linux.intel.com, kai.huang@intel.com, 
-	reinette.chatre@intel.com, xiaoyao.li@intel.com, 
-	tony.lindgren@linux.intel.com, binbin.wu@linux.intel.com, 
-	isaku.yamahata@intel.com, yan.y.zhao@intel.com, chao.gao@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <aEyhHgwQXW4zbx-k@google.com> <diqz1pr8lndp.fsf@ackerleytng-ctop.c.googlers.com>
+ <diqza55tjkk1.fsf@ackerleytng-ctop.c.googlers.com> <CA+EHjTxECJ3=ywbAPvpdA1-pm=stXWqU75mgG1epWaXiUr0raw@mail.gmail.com>
+ <diqzv7odjnln.fsf@ackerleytng-ctop.c.googlers.com> <CA+EHjTwqOwO2zVd4zTYF7w7reTWMNjmCV6XnKux2JtPwYCAoZQ@mail.gmail.com>
+ <434ab5a3-fedb-4c9e-8034-8f616b7e5e52@amd.com> <923b1c02-407a-4689-a047-dd94e885b103@redhat.com>
+ <diqz34bg575i.fsf@ackerleytng-ctop.c.googlers.com> <0cdc7890-aade-4fa5-ad72-24cde6c7bce9@redhat.com>
+Message-ID: <aGxgywrqiPAV7ruh@google.com>
+Subject: Re: [PATCH v12 10/18] KVM: x86/mmu: Handle guest page faults for
+ guest_memfd with shared memory
+From: Sean Christopherson <seanjc@google.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: Ackerley Tng <ackerleytng@google.com>, Shivank Garg <shivankg@amd.com>, 
+	Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-mm@kvack.org, kvmarm@lists.linux.dev, pbonzini@redhat.com, 
+	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
+	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
+	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
+	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, 
+	dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net, 
+	vbabka@suse.cz, vannapurve@google.com, mail@maciej.szmigiero.name, 
+	michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com, 
+	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com, 
+	suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com, 
+	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, 
+	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, 
+	oliver.upton@linux.dev, maz@kernel.org, will@kernel.org, qperret@google.com, 
+	keirf@google.com, roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, 
+	jgg@nvidia.com, rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, 
+	hughd@google.com, jthoughton@google.com, peterx@redhat.com, 
+	pankaj.gupta@amd.com, ira.weiny@intel.com
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Jul 3, 2025 at 10:38=E2=80=AFPM Adrian Hunter <adrian.hunter@intel.=
-com> wrote:
->
-> On 03/07/2025 20:06, Vishal Annapurve wrote:
-> > On Thu, Jul 3, 2025 at 8:37=E2=80=AFAM Adrian Hunter <adrian.hunter@int=
-el.com> wrote:
-> >>
-> >> Avoid clearing reclaimed TDX private pages unless the platform is affe=
-cted
-> >> by the X86_BUG_TDX_PW_MCE erratum. This significantly reduces VM shutd=
-own
-> >> time on unaffected systems.
-> >>
-> >> Background
-> >>
-> >> KVM currently clears reclaimed TDX private pages using MOVDIR64B, whic=
-h:
-> >>
-> >>    - Clears the TD Owner bit (which identifies TDX private memory) and
-> >>      integrity metadata without triggering integrity violations.
-> >>    - Clears poison from cache lines without consuming it, avoiding MCE=
-s on
-> >>      access (refer TDX Module Base spec. 16.5. Handling Machine Check
-> >>      Events during Guest TD Operation).
-> >>
-> >> The TDX module also uses MOVDIR64B to initialize private pages before =
-use.
-> >> If cache flushing is needed, it sets TDX_FEATURES.CLFLUSH_BEFORE_ALLOC=
-.
-> >> However, KVM currently flushes unconditionally, refer commit 94c477a75=
-1c7b
-> >> ("x86/virt/tdx: Add SEAMCALL wrappers to add TD private pages")
-> >>
-> >> In contrast, when private pages are reclaimed, the TDX Module handles
-> >> flushing via the TDH.PHYMEM.CACHE.WB SEAMCALL.
-> >>
-> >> Problem
-> >>
-> >> Clearing all private pages during VM shutdown is costly. For guests
-> >> with a large amount of memory it can take minutes.
-> >>
-> >> Solution
-> >>
-> >> TDX Module Base Architecture spec. documents that private pages reclai=
-med
-> >> from a TD should be initialized using MOVDIR64B, in order to avoid
-> >> integrity violation or TD bit mismatch detection when later being read
-> >> using a shared HKID, refer April 2025 spec. "Page Initialization" in
-> >> section "8.6.2. Platforms not Using ACT: Required Cache Flush and
-> >> Initialization by the Host VMM"
-> >>
-> >> That is an overstatement and will be clarified in coming versions of t=
-he
-> >> spec. In fact, as outlined in "Table 16.2: Non-ACT Platforms Checks on
-> >> Memory" and "Table 16.3: Non-ACT Platforms Checks on Memory Reads in L=
-i
-> >> Mode" in the same spec, there is no issue accessing such reclaimed pag=
-es
-> >> using a shared key that does not have integrity enabled. Linux always =
-uses
-> >> KeyID 0 which never has integrity enabled. KeyID 0 is also the TME Key=
-ID
-> >> which disallows integrity, refer "TME Policy/Encryption Algorithm" bit
-> >> description in "Intel Architecture Memory Encryption Technologies" spe=
-c
-> >> version 1.6 April 2025. So there is no need to clear pages to avoid
-> >> integrity violations.
-> >>
-> >> There remains a risk of poison consumption. However, in the context of
-> >> TDX, it is expected that there would be a machine check associated wit=
-h the
-> >> original poisoning. On some platforms that results in a panic. However
-> >> platforms may support "SEAM_NR" Machine Check capability, in which cas=
-e
-> >> Linux machine check handler marks the page as poisoned, which prevents=
- it
-> >> from being allocated anymore, refer commit 7911f145de5fe ("x86/mce:
-> >> Implement recovery for errors in TDX/SEAM non-root mode")
-> >>
-> >> Improvement
-> >>
-> >> By skipping the clearing step on unaffected platforms, shutdown time
-> >> can improve by up to 40%.
-> >
-> > This patch looks good to me.
-> >
-> > I would like to raise a related topic, is there any requirement for
-> > zeroing pages on conversion from private to shared before
-> > userspace/guest faults in the gpa ranges as shared?
->
-> For TDX, clearing must still be done for platforms with the
-> partial-write errata (SPR and EMR).
->
+On Tue, Jul 01, 2025, David Hildenbrand wrote:
+> > > > I support this approach.
+> > > 
+> > > Agreed. Let's get this in with the changes requested by Sean applied.
+> > > 
+> > > How to use GUEST_MEMFD_FLAG_MMAP in combination with a CoCo VM with
+> > > legacy mem attributes (-> all memory in guest_memfd private) could be
+> > > added later on top, once really required.
+> > > 
+> > > As discussed, CoCo VMs that want to support GUEST_MEMFD_FLAG_MMAP will
+> > > have to disable legacy mem attributes using a new capability in stage-2.
+> > > 
+> > 
+> > I rewatched the guest_memfd meeting on 2025-06-12.  We do want to
+> > support the use case where userspace wants to have mmap (e.g. to set
+> > mempolicy) but does not want to allow faulting into the host.
+> > 
+> > On 2025-06-12, the conclusion was that the problem will be solved once
+> > guest_memfd supports shareability, and that's because userspace can set
+> > shareability to GUEST, so the memory can't be faulted into the host.
+> > 
+> > On 2025-06-26, Sean said we want to let userspace have an extra layer of
+> > protection so that memory cannot be faulted in to the host, ever. IOW,
+> > we want to let userspace say that even if there is a stray
+> > private-to-shared conversion, *don't* allow faulting memory into the
+> > host.
 
-So I take it that vmm/guest_memfd can safely assume no responsibility
-of clearing contents on conversion outside of the X86_BUG_TDX_PW_MCE
-scenario, given that the spec doesn't dictate initial contents of
-converted memory and no guest/host software should depend on the
-initial values after conversion.
+Eh, my comments were more along the lines of "it would be nice if we could have
+such protections", not a "we must support this".  And I suspect that making the
+behavior all-or-nothing for a given guest_memfd wouldn't be very useful, i.e.
+that userspace would probably want to be able to prevent accessing a specific
+chunk of the gmem instance.
 
-> >
-> > If the answer is no for all CoCo architectures then guest_memfd can
-> > simply just zero pages on allocation for all it's users and not worry
-> > about zeroing later.
->
-> In fact TDX does not need private pages to be zeroed on allocation
-> because the TDX Module always does that.
->
+Actually, we can probably get that via mseal(), maybe even for free today?  E.g.
+mmap() w/ PROT_NONE, mbind(), and then mseal().
 
-guest_memfd allocated pages may get faulted in as shared first. To
-keep things simple, guest_memfd can start with the "just zero on
-allocation" policy which works for all current/future CoCo/non-CoCo
-users of guest_memfd and we can later iterate with any arch-specific
-optimizations as needed.
+So yeah, I think we do nothing for now.
+
+> > The difference is the "extra layer of protection", which should remain
+> > in effect even if there are (stray/unexpected) private-to-shared
+> > conversions to guest_memfd or to KVM. Here's a direct link to the point
+> > in the video where Sean brought this up [1]. I'm really hoping I didn't
+> > misinterpret this!
+> > 
+> > Let me look ahead a little, since this involves use cases already
+> > brought up though I'm not sure how real they are. I just want to make
+> > sure that in a few patch series' time, we don't end up needing userspace
+> > to use a complex bunch of CAPs and FLAGs.
+> > 
+> > In this series (mmap support, V12, patch 10/18) [2], to allow
+> > KVM_X86_DEFAULT_VMs to use guest_memfd, I added a `fault_from_gmem()`
+> > helper, which is defined as follows (before the renaming Sean requested):
+> > 
+> > +static inline bool fault_from_gmem(struct kvm_page_fault *fault)
+> > +{
+> > +	return fault->is_private || kvm_gmem_memslot_supports_shared(fault->slot);
+> > +}
+> > 
+> > The above is changeable, of course :). The intention is that if the
+> > fault is private, fault from guest_memfd. If GUEST_MEMFD_FLAG_MMAP is
+> > set (KVM_MEMSLOT_GMEM_ONLY will be set on the memslot), fault from
+> > guest_memfd.
+> > 
+> > If we defer handling GUEST_MEMFD_FLAG_MMAP in combination with a CoCo VM
+> > with legacy mem attributes to the future, this helper will probably
+> > become
+> > 
+> > -static inline bool fault_from_gmem(struct kvm_page_fault *fault)
+> > +static inline bool fault_from_gmem(struct kvm *kvm, struct kvm_page_fault *fault)
+> > +{
+> > -	return fault->is_private || kvm_gmem_memslot_supports_shared(fault->slot);
+> > +	return fault->is_private || (kvm_gmem_memslot_supports_shared(fault->slot) &&
+> > +	                             !kvm_arch_disable_legacy_private_tracking(kvm));
+> > +}
+> > 
+> > And on memslot binding we check
+> > 
+> > if kvm_arch_disable_legacy_private_tracking(kvm)
+
+I would invert the KVM-internal arch hook, and only have KVM x86's capability refer
+to the private memory attribute as legacy (because it simply doesn't exist for
+any thing else).
+
+> > and not GUEST_MEMFD_FLAG_MMAP
+> > 	return -EINVAL;
+> > 
+> > 1. Is that what yall meant?
+
+I was thinking:
+
+	if (kvm_arch_has_private_memory_attribute(kvm) ==
+	    kvm_gmem_mmap(...))
+		return -EINVAL;
+
+I.e. in addition to requiring mmap() when KVM doesn't track private/sahred via
+memory attributes, also disallow mmap() when private/shared is tracked via memory
+attributes.
+
+> My understanding:
+> 
+> CoCo VMs will initially (stage-1) only support !GUEST_MEMFD_FLAG_MMAP.
+> 
+> With stage-2, CoCo VMs will support GUEST_MEMFD_FLAG_MMAP only with
+> kvm_arch_disable_legacy_private_tracking().
+
+Yep, and everything except x86 will unconditionally return true for
+kvm_arch_disable_legacy_private_tracking() (or false if it's inverted as above).
+
+> Non-CoCo VMs will only support GUEST_MEMFD_FLAG_MMAP. (no concept of
+> private)
+> 
+> > 
+> > 2. Does this kind of not satisfy the "extra layer of protection"
+> >     requirement (if it is a requirement)?
+
+It's not a requirement.
+
+> >     A legacy CoCo VM using guest_memfd only for private memory (shared
+> >     memory from say, shmem) and needing to set mempolicy would
+> >     * Set GUEST_MEMFD_FLAG_MMAP
+
+I think we should keep it simple as above, and not support mmap() (and therefore
+mbind()) with legacy CoCo VMs.  Given the double allocation flaws with the legacy
+approach, supporting mbind() seems like putting a bandaid on a doomed idea.
+
+> >     * Leave KVM_CAP_DISABLE_LEGACY_PRIVATE_TRACKING defaulted to false
+> >     but still be able to send conversion ioctls directly to guest_memfd,
+> >     and then be able to fault guest_memfd memory into the host.
+> 
+> In that configuration, I would expect that all memory in guest_memfd is
+> private and remains private.
+> 
+> guest_memfd without memory attributes cannot support in-place conversion.
+> 
+> How to achieve that might be interesting: the capability will affect
+> guest_memfd behavior?
+> 
+> > 
+> > 3. Now for a use case I've heard of (feel free to tell me this will
+> >     never be supported or "we'll deal with it if it comes"): On a
+> >     non-CoCo VM, we want to use guest_memfd but not use mmap (and the
+> >     initial VM image will be written using write() syscall or something
+> >     else).
+> > 
+> >     * Set GUEST_MEMFD_FLAG_MMAP to false
+> >     * Leave KVM_CAP_DISABLE_LEGACY_PRIVATE_TRACKING defaulted to false
+> >       (it's a non-CoCo VM, weird to do anything to do with private
+> >       tracking)
+> > 
+> >     And now we're stuck because fault_from_gmem() will return false all
+> >     the time and we can't use memory from guest_memfd.
+
+Nah, don't support this scenario.  Or rather, use mseal() as above.  If someone
+comes along with a concrete, strong use case for backing non-CoCo VMs and using
+mseal() to wall off guest memory doesn't suffice, then they can have the honor
+of justifying why KVM needs to take on more complexity.  :-)
+
+> I think I discussed that with Sean: we would have GUEST_MEMFD_FLAG_WRITE
+> that will imply everything that GUEST_MEMFD_FLAG_MMAP would imply, except
+> the actual mmap() support.
+
+Ya, for the write() access or whatever.  But there are bigger problems beyond
+populating the memory, e.g. a non-CoCo VM won't support private memory, so without
+many more changes to redirect KVM to gmem when faulting in guest memory, KVM won't
+be able to map any memory into the guest.
 
