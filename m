@@ -1,170 +1,203 @@
-Return-Path: <kvm+bounces-51809-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51810-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3516AFD78A
-	for <lists+kvm@lfdr.de>; Tue,  8 Jul 2025 21:50:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D37B5AFD7BE
+	for <lists+kvm@lfdr.de>; Tue,  8 Jul 2025 21:59:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 67A041C26C2C
-	for <lists+kvm@lfdr.de>; Tue,  8 Jul 2025 19:50:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB7E63A5B45
+	for <lists+kvm@lfdr.de>; Tue,  8 Jul 2025 19:58:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B19CF23A9BD;
-	Tue,  8 Jul 2025 19:50:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C08C23D29B;
+	Tue,  8 Jul 2025 19:59:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="acaZgnYj"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SMGwHSev"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 387EB21CC5A
-	for <kvm@vger.kernel.org>; Tue,  8 Jul 2025 19:50:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAFCD17CA17
+	for <kvm@vger.kernel.org>; Tue,  8 Jul 2025 19:58:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752004216; cv=none; b=rhjzUweLV9FD4jtpQ4P9FcQ6PzWLolbdh6nx4u2z4s3j5B1TizABHqvCiGDCUpQs/70jhZOUziIUit2h3xMR4kykvusLlVqdpvgKWgpDbSAxSduCVH1LonFDocjP+kiDwvFK8GaOJB1f3cUrDbQRLP9nniRBnvJpCVv3H1ngetg=
+	t=1752004741; cv=none; b=lAKB5Q8/eA/lRGwNwtUWtSCF4i8saxTKSQveJ6AgbZ3zjJlT1A65jarIYYaDGO1pNBtI8Ib5Jp2UnF5mZwXJFf2Y0s00IDoQXH48WEC3vhm0mh4tzktlLyJ7lD/UT2TZEqHGRzsfoaLTK/ebvfFRBtcVdEA5JqZo/SJu67ftPJs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752004216; c=relaxed/simple;
-	bh=Y0iXoUqOLs0llj8Kqny8AlCcLxbD6abRir5vykfWqaE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OqS847ZLZ9HjGCbCTN0w5MO13YAk9mG2HROsBThtE1G9g3hgaPInd3QE6ot6uHw6CUU7UUo5rV9xx7Or4h3cVtjvDCrtwQy2kcrOlIY6jdiBNi0A5vUFl5Ov02sWR4FqutAkzPeZ24BczRFRiuRJTqkOaInMyuERJP3Xhpl/Rrg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=acaZgnYj; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752004213;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LikuVg883RBnSofMj2iv/RfyoEWwYa7j+D9dFy02hRA=;
-	b=acaZgnYjSQYldoe0kl+GmPtgv9mVlZkx07qTAiHqHZQfDA90f9DsyG4BZuYDNmOKGXeG2q
-	a3VDhYBUVsbTVY4N6s5yxH3VwSjye0s9R6EhDTI16HBh5Xh+Whpq3i38yAbTjUJ7mfv3es
-	HCGc1byXU6BHluZM9hpEuhT4bpeuLNg=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-226-acwgP8WdO5qE5eWHkq2_BQ-1; Tue, 08 Jul 2025 15:50:10 -0400
-X-MC-Unique: acwgP8WdO5qE5eWHkq2_BQ-1
-X-Mimecast-MFC-AGG-ID: acwgP8WdO5qE5eWHkq2_BQ_1752004210
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3a4e713e05bso2004449f8f.3
-        for <kvm@vger.kernel.org>; Tue, 08 Jul 2025 12:50:10 -0700 (PDT)
+	s=arc-20240116; t=1752004741; c=relaxed/simple;
+	bh=qeaevY/WBAqE5QxM+YJ+9KYZuYqdnkSGgPZgsl4/+24=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=VOwxp43V4KBAZKlHNNJ9+9RJ12SPVLATwcNdwXX2RJGnBYSm/bbdjFYmb6+OgSZ4l63SXc01BuE3fgmm63aLeMfZVXXSt1czGfkuUaO+fGUTs5bS7LNM67wT/0iIL9XujnC3J5dZtowP4RtuHSISx7z2ZOQglVP65ZIKYD480f8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SMGwHSev; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3122368d82bso7266113a91.0
+        for <kvm@vger.kernel.org>; Tue, 08 Jul 2025 12:58:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1752004739; x=1752609539; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=bK9rO788tLxJ4WTQcJIR4xppsNUsK51AEUh9HOz+/ZU=;
+        b=SMGwHSevuBX8uNe7gV8O9YfcpuqqnWDeXaCNOcST83AMAhqcZ1XSHq9ViVw+uCImZu
+         y6jO2HTl0Q3Z5v0szokGSVipKrWbC02Jy+/cQzTNlop4v3dV6KApdRmVM8lkj9xVq9IH
+         yJapcaDc5QPvQZnRd4toVcrEK6LwzJXvoH0RYoyq7ii5rSFZQkeuwgrk7LTta2QTtRGa
+         pu488oT8uOBeYu15u/NzlvE8MUV/tetecR38brWhYV5VRsKMq3llnnu6Rd9/OFToySN5
+         cUnFC0w3wJEZ/0NBPMy9x52a6w4M0Updzosw1m0i92BS4XOAbW92bW1pfPEway0ml1bk
+         ao2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752004209; x=1752609009;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LikuVg883RBnSofMj2iv/RfyoEWwYa7j+D9dFy02hRA=;
-        b=oE/I66IU9zGDgfhjjbOxPmOhUsZImbJIQI1v1KQP07/m6Sp/N14hfD1kjmTC0/Viys
-         eVlRNG9UhI4w9YtRgCKiZsiTAE8WUg2NBhCvQZRvmvw6XRLrH6dlVW6rPx33Jyevi+AK
-         0vvkZOLH9rATMJ/ecra9TsardbmDby7HpQz8oBahjnC/agW83vdpqxunCj88BOS28lDE
-         +0IPmrt2IXByutIfOs+J+Znos4kd5we/kILx+Oy/iw3LGwkFmW0gJuEfjhnOrobCoOqq
-         UEmuY+iKcJd+a+NpisO6uadSW8lq63ZOZzNxR+k2mJy+2LME2jl5qxqvV3vKcf6BcBin
-         N+rw==
-X-Forwarded-Encrypted: i=1; AJvYcCX6BLbLAC4hAV7lioAp7fB0WaGpBn2d/sJE9CYIDxHJU9WgrKu6We1HS3EZFbfxhIcIEsM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxoHSFnQGGCEpovkiVou6Cd4K6HHJPb4W44DIdw/7WgnoYdhl9h
-	6TLp9yHbaK9ObXVjvpcg7o5mSzHl1u1lpfyg2kGwe2X/nXn/p6iVTUIpFZjfBqETI00kgxLsrMJ
-	QVUT3zRsjhZKBDx3cF9Evo5W0aoiNLzkSyHUiVB7ne3g6XNwb/V4f2w==
-X-Gm-Gg: ASbGncsvzoKXY+f5L10f1FqurADWocApsfHrPQo4GNbOdCi0buKwdUfXBPTKRZSE84W
-	Hvk3RSo4PdsV7rAFb4A0QzEAE0LlP+ryZ3YGNoRU0YlGQ75MLzEbUFA6jLxuLWcPEeNqmMiPI1P
-	PvdSTpXSP71pLseddj0BMd4wquD3yEJ8uUh0v07tKpoyrjzKX2XNd+Lgw4ll05t9e999KZ73w0M
-	GChYwhvbRFkvWYMLmaE8Yz9pIYkThkca5F30O2ZdkVzIuP2JTMEW65pUFcd34aXqRxbdbb5LZp7
-	zlKzHQ8CDF3WDxA=
-X-Received: by 2002:a5d:5d0e:0:b0:3a4:f35b:d016 with SMTP id ffacd0b85a97d-3b497011a15mr15320226f8f.11.1752004209400;
-        Tue, 08 Jul 2025 12:50:09 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF1jBraagOsk3QI107z1D1hHowlYV/qp00H/NJFxbB801oXkh53Lpf4M+P4ApVMlSTE/u2Aig==
-X-Received: by 2002:a5d:5d0e:0:b0:3a4:f35b:d016 with SMTP id ffacd0b85a97d-3b497011a15mr15320197f8f.11.1752004208849;
-        Tue, 08 Jul 2025 12:50:08 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc0:150d:fc00:de3:4725:47c6:6809])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-454cd49e64dsm30477795e9.34.2025.07.08.12.50.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Jul 2025 12:50:07 -0700 (PDT)
-Date: Tue, 8 Jul 2025 15:50:04 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Yuri Benditovich <yuri.benditovich@daynix.com>,
-	Akihiko Odaki <akihiko.odaki@daynix.com>,
-	Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
-	linux-doc@vger.kernel.org
-Subject: Re: [PATCH v7 net-next 0/9] virtio: introduce GSO over UDP tunnel
-Message-ID: <20250708154718-mutt-send-email-mst@kernel.org>
-References: <cover.1751874094.git.pabeni@redhat.com>
- <20250708105816-mutt-send-email-mst@kernel.org>
- <20250708082404.21d1fe61@kernel.org>
- <20250708120014-mutt-send-email-mst@kernel.org>
- <27d6b80a-3153-4523-9ccf-0471a85cb245@redhat.com>
- <ef9864e5-3198-4e85-81eb-a491dfbda0d2@redhat.com>
+        d=1e100.net; s=20230601; t=1752004739; x=1752609539;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=bK9rO788tLxJ4WTQcJIR4xppsNUsK51AEUh9HOz+/ZU=;
+        b=UB4RJL2ThjE0YpwqhXInBPdZU61Wy4jgajKLjnc9ayOFvhdDZjQQqaZl/Qfwc2VouW
+         ArX1QOp+yvjZ/Jh+3BwOUgMptMWY00gHBUm/C/AFQk12GsEC5itmiCinBYxMs+TPJkZo
+         DdU6KMFHEeLIe5cs3DIwhjBr+42mnRGZGlMnpJYy3L+6uPPAkCd2zEtPl+H+UpcK7OhZ
+         UsI+LIe7/nIo4OYrC5ZBPar1qo2Q7hmcbh4eegDxd+9pS0oqBD+8NqS7GnuGO9LIbKGW
+         l4NhuY9whIxa2MavWwFv78g26PSG5eco+4teQRVlyNBm2TvXJEmMb4GE6LH6GF5vFGMy
+         p9Lw==
+X-Forwarded-Encrypted: i=1; AJvYcCXFl7rcBA/9VtNv93ukdgth8PQgwwbsMnpOhbmTOfPshf9pCir5bIYXG0RDqUCMaNYovX4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyzpfOM45SVGUveD91Y0azXRd3TBwOUFK9SZgpDF+28oAARh55Z
+	U+CuE3iWGC1WDe//fPXA+ItQRNJuIkRRUAAtsu3tCLvv7KAsyJIgeJ8Njv6cssTFyqBsTKuMEGp
+	cvNkYwQ==
+X-Google-Smtp-Source: AGHT+IFkETqYRl85TaDCY+mhRsKj3yh+DlVRrd5kJgA8yrUlr1VJNZkXzaK8N5MZ0Opd+f6mnf+G32B45Fc=
+X-Received: from pja6.prod.google.com ([2002:a17:90b:5486:b0:2ff:84e6:b2bd])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1f83:b0:311:df4b:4b94
+ with SMTP id 98e67ed59e1d1-31aac432a89mr24009325a91.4.1752004738302; Tue, 08
+ Jul 2025 12:58:58 -0700 (PDT)
+Date: Tue, 8 Jul 2025 12:58:56 -0700
+In-Reply-To: <CAGtprH-ESrdhCeHkuRtiDoaqxCS9JVKu_CC9fbDRo+k+3jKCcQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ef9864e5-3198-4e85-81eb-a491dfbda0d2@redhat.com>
+Mime-Version: 1.0
+References: <CAGtprH_57HN4Psxr5MzAZ6k+mLEON2jVzrLH4Tk+Ws29JJuL4Q@mail.gmail.com>
+ <006899ccedf93f45082390460620753090c01914.camel@intel.com>
+ <aG0pNijVpl0czqXu@google.com> <a0129a912e21c5f3219b382f2f51571ab2709460.camel@intel.com>
+ <CAGtprH8ozWpFLa2TSRLci-SgXRfJxcW7BsJSYOxa4Lgud+76qQ@mail.gmail.com>
+ <eeb8f4b8308b5160f913294c4373290a64e736b8.camel@intel.com>
+ <CAGtprH8cg1HwuYG0mrkTbpnZfHoKJDd63CAQGEScCDA-9Qbsqw@mail.gmail.com>
+ <b1348c229c67e2bad24e273ec9a7fc29771e18c5.camel@intel.com>
+ <aG1dbD2Xnpi_Cqf_@google.com> <CAGtprH-ESrdhCeHkuRtiDoaqxCS9JVKu_CC9fbDRo+k+3jKCcQ@mail.gmail.com>
+Message-ID: <aG14gLz9C_601TJ3@google.com>
+Subject: Re: [RFC PATCH v2 00/51] 1G page support for guest_memfd
+From: Sean Christopherson <seanjc@google.com>
+To: Vishal Annapurve <vannapurve@google.com>
+Cc: Rick P Edgecombe <rick.p.edgecombe@intel.com>, "pvorel@suse.cz" <pvorel@suse.cz>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, 
+	Jun Miao <jun.miao@intel.com>, "nsaenz@amazon.es" <nsaenz@amazon.es>, 
+	Kirill Shutemov <kirill.shutemov@intel.com>, "pdurrant@amazon.co.uk" <pdurrant@amazon.co.uk>, 
+	"peterx@redhat.com" <peterx@redhat.com>, "x86@kernel.org" <x86@kernel.org>, 
+	"tabba@google.com" <tabba@google.com>, "amoorthy@google.com" <amoorthy@google.com>, 
+	"quic_svaddagi@quicinc.com" <quic_svaddagi@quicinc.com>, "jack@suse.cz" <jack@suse.cz>, 
+	"vkuznets@redhat.com" <vkuznets@redhat.com>, "quic_eberman@quicinc.com" <quic_eberman@quicinc.com>, 
+	"keirf@google.com" <keirf@google.com>, 
+	"mail@maciej.szmigiero.name" <mail@maciej.szmigiero.name>, 
+	"anthony.yznaga@oracle.com" <anthony.yznaga@oracle.com>, Wei W Wang <wei.w.wang@intel.com>, 
+	"palmer@dabbelt.com" <palmer@dabbelt.com>, 
+	"Wieczor-Retman, Maciej" <maciej.wieczor-retman@intel.com>, Yan Y Zhao <yan.y.zhao@intel.com>, 
+	"ajones@ventanamicro.com" <ajones@ventanamicro.com>, "willy@infradead.org" <willy@infradead.org>, 
+	"paul.walmsley@sifive.com" <paul.walmsley@sifive.com>, Dave Hansen <dave.hansen@intel.com>, 
+	"aik@amd.com" <aik@amd.com>, "usama.arif@bytedance.com" <usama.arif@bytedance.com>, 
+	"quic_mnalajal@quicinc.com" <quic_mnalajal@quicinc.com>, "fvdl@google.com" <fvdl@google.com>, 
+	"rppt@kernel.org" <rppt@kernel.org>, "quic_cvanscha@quicinc.com" <quic_cvanscha@quicinc.com>, 
+	"maz@kernel.org" <maz@kernel.org>, "vbabka@suse.cz" <vbabka@suse.cz>, 
+	"anup@brainfault.org" <anup@brainfault.org>, "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "mic@digikod.net" <mic@digikod.net>, 
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, Fan Du <fan.du@intel.com>, 
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, "steven.price@arm.com" <steven.price@arm.com>, 
+	"muchun.song@linux.dev" <muchun.song@linux.dev>, 
+	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, Zhiquan1 Li <zhiquan1.li@intel.com>, 
+	"rientjes@google.com" <rientjes@google.com>, "mpe@ellerman.id.au" <mpe@ellerman.id.au>, 
+	Erdem Aktas <erdemaktas@google.com>, "david@redhat.com" <david@redhat.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>, 
+	"hughd@google.com" <hughd@google.com>, "jhubbard@nvidia.com" <jhubbard@nvidia.com>, Haibo1 Xu <haibo1.xu@intel.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>, "jthoughton@google.com" <jthoughton@google.com>, 
+	"steven.sistare@oracle.com" <steven.sistare@oracle.com>, 
+	"quic_pheragu@quicinc.com" <quic_pheragu@quicinc.com>, "jarkko@kernel.org" <jarkko@kernel.org>, 
+	"chenhuacai@kernel.org" <chenhuacai@kernel.org>, Kai Huang <kai.huang@intel.com>, 
+	"shuah@kernel.org" <shuah@kernel.org>, "bfoster@redhat.com" <bfoster@redhat.com>, 
+	"dwmw@amazon.co.uk" <dwmw@amazon.co.uk>, Chao P Peng <chao.p.peng@intel.com>, 
+	"pankaj.gupta@amd.com" <pankaj.gupta@amd.com>, Alexander Graf <graf@amazon.com>, 
+	"nikunj@amd.com" <nikunj@amd.com>, "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>, 
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>, 
+	"jroedel@suse.de" <jroedel@suse.de>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, 
+	"jgowans@amazon.com" <jgowans@amazon.com>, Yilun Xu <yilun.xu@intel.com>, 
+	"liam.merwick@oracle.com" <liam.merwick@oracle.com>, "michael.roth@amd.com" <michael.roth@amd.com>, 
+	"quic_tsoni@quicinc.com" <quic_tsoni@quicinc.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, Ira Weiny <ira.weiny@intel.com>, 
+	"richard.weiyang@gmail.com" <richard.weiyang@gmail.com>, 
+	"kent.overstreet@linux.dev" <kent.overstreet@linux.dev>, "qperret@google.com" <qperret@google.com>, 
+	"dmatlack@google.com" <dmatlack@google.com>, "james.morse@arm.com" <james.morse@arm.com>, 
+	"brauner@kernel.org" <brauner@kernel.org>, "roypat@amazon.co.uk" <roypat@amazon.co.uk>, 
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, 
+	"ackerleytng@google.com" <ackerleytng@google.com>, "pgonda@google.com" <pgonda@google.com>, 
+	"quic_pderrin@quicinc.com" <quic_pderrin@quicinc.com>, "hch@infradead.org" <hch@infradead.org>, 
+	"will@kernel.org" <will@kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jul 08, 2025 at 07:00:19PM +0200, Paolo Abeni wrote:
-> On 7/8/25 6:43 PM, Paolo Abeni wrote:
-> > On 7/8/25 6:00 PM, Michael S. Tsirkin wrote:
-> >> On Tue, Jul 08, 2025 at 08:24:04AM -0700, Jakub Kicinski wrote:
-> >>> On Tue, 8 Jul 2025 11:01:30 -0400 Michael S. Tsirkin wrote:
-> >>>>> git@github.com:pabeni/linux-devel.git virtio_udp_tunnel_07_07_2025
-> >>>>>
-> >>>>> The first 5 patches in this series, that is, the virtio features
-> >>>>> extension bits are also available at [2]:
-> >>>>>
-> >>>>> git@github.com:pabeni/linux-devel.git virtio_features_extension_07_07_2025
-> >>>>>
-> >>>>> Ideally the virtio features extension bit should go via the virtio tree
-> >>>>> and the virtio_net/tun patches via the net-next tree. The latter have
-> >>>>> a dependency in the first and will cause conflicts if merged via the
-> >>>>> virtio tree, both when applied and at merge window time - inside Linus
-> >>>>> tree.
-> >>>>>
-> >>>>> To avoid such conflicts and duplicate commits I think the net-next
-> >>>>> could pull from [1], while the virtio tree could pull from [2].  
-> >>>>
-> >>>> Or I could just merge all of this in my tree, if that's ok
-> >>>> with others?
-> >>>
-> >>> No strong preference here. My first choice would be a branch based
-> >>> on v6.16-rc5 so we can all pull in and resolve the conflicts that
-> >>> already exist. But I haven't looked how bad the conflicts would 
-> >>> be for virtio if we did that. On net-next side they look manageable.
-> >>
-> >> OK, let's do it the way Paolo wants then.
-> > 
-> > I actually messed a bit with my proposal, as I forgot I need to use a
-> > common ancestor for the branches I shared.
-> > 
-> > git@github.com:pabeni/linux-devel.git virtio_features_extension_07_07_2025
-> > 
-> > is based on current net-next and pulling from such tag will take a lot
-> > of unwanted stuff into the vhost tree.
-> > 
-> > @Michael: AFAICS the current vhost devel tree is based on top of
-> > v6.15-rc7, am I correct?
-> 
-> Which in turn means that you rebase your tree (before sending the PR to
-> Linus), am I correct? If so we can't have stable hashes shared between
-> net-next and vhost.
-> 
-> /P
+On Tue, Jul 08, 2025, Vishal Annapurve wrote:
+> On Tue, Jul 8, 2025 at 11:03=E2=80=AFAM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> Few points that seem important here:
+> 1) Userspace can and should be able to only dictate if memory contents
+> need to be preserved on shared to private conversion.
 
-We can, I can merge your tree after rebasing. It's a hassle if I rebase
-repeatedly but I've been known to do it.
+No, I was wrong, pKVM has use cases where it's desirable to preserve data o=
+n
+private =3D> shared conversions.
 
-If this is what you want, pls just base on some recent RC by Linus.
+Side topic, if you're going to use fancy indentation, align the indentation=
+ so
+it's actually readable.
 
--- 
-MST
+>   -> For SNP/TDX VMs:
+>        * Only usecase for preserving contents is initial memory
+>          population, which can be achieved by:
+>               -  Userspace converting the ranges to shared, populating th=
+e contents,
+>                  converting them back to private and then calling SNP/TDX=
+ specific
+>                  existing ABI functions.
+>        * For runtime conversions, guest_memfd can't ensure memory content=
+s are
+>          preserved during shared to private conversions as the architectu=
+res
+>          don't support that behavior.
+>        * So IMO, this "preserve" flag doesn't make sense for SNP/TDX VMs,=
+ even
 
+It makes sense, it's just not supported by the architecture *at runtime*.  =
+Case
+in point, *something* needs to allow preserving data prior to launching the=
+ VM.
+If we want to go with the PRIVATE =3D> SHARED =3D> FILL =3D> PRIVATE approa=
+ch for TDX
+and SNP, then we'll probably want to allow PRESERVE only until the VM image=
+ is
+finalized.
+
+>          if we add this flag, today guest_memfd should effectively mark t=
+his
+>          unsupported based on the backing architecture support.
+>
+> 2) For pKVM, if userspace wants to specify a "preserve" flag then this
+
+There is no "For pKVM".  We are defining uAPI for guest_memfd.  I.e. this s=
+tatement
+holds true for all implementations: PRESERVE is allowed based on the capabi=
+lities
+of the architecture.
+
+> So this topic is still orthogonal to "zeroing on private to shared conver=
+sion".
+
+As above, no.  pKVM might not expose PRESERVE to _userspace_ since all curr=
+ent
+conversions are initiated by the guest, but for guest_memfd itself, this is=
+ all
+one and the same.
 
