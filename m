@@ -1,203 +1,174 @@
-Return-Path: <kvm+bounces-51810-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51811-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D37B5AFD7BE
-	for <lists+kvm@lfdr.de>; Tue,  8 Jul 2025 21:59:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1AEAAFD864
+	for <lists+kvm@lfdr.de>; Tue,  8 Jul 2025 22:32:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB7E63A5B45
-	for <lists+kvm@lfdr.de>; Tue,  8 Jul 2025 19:58:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 43AC317635E
+	for <lists+kvm@lfdr.de>; Tue,  8 Jul 2025 20:32:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C08C23D29B;
-	Tue,  8 Jul 2025 19:59:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E2BF23AE9A;
+	Tue,  8 Jul 2025 20:32:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SMGwHSev"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PXyEA8Io"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAFCD17CA17
-	for <kvm@vger.kernel.org>; Tue,  8 Jul 2025 19:58:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F029F14A60D
+	for <kvm@vger.kernel.org>; Tue,  8 Jul 2025 20:32:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752004741; cv=none; b=lAKB5Q8/eA/lRGwNwtUWtSCF4i8saxTKSQveJ6AgbZ3zjJlT1A65jarIYYaDGO1pNBtI8Ib5Jp2UnF5mZwXJFf2Y0s00IDoQXH48WEC3vhm0mh4tzktlLyJ7lD/UT2TZEqHGRzsfoaLTK/ebvfFRBtcVdEA5JqZo/SJu67ftPJs=
+	t=1752006744; cv=none; b=PUu5qYZPUshTEq+FfG6Ag45gphZUoI4CLloh3Gsp3vB5iLRMl1ISmoz3g8GoHTeoqlZzjG9CC5WUzHXSA3sFPJJmlL7sb+UZWJbvx2dpzLizk/PPpnpYhw2RNkZBeQ30a1chCHeYntkW0iWUX2+VV4HmSoyI+ZFCXFfYpKQIcag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752004741; c=relaxed/simple;
-	bh=qeaevY/WBAqE5QxM+YJ+9KYZuYqdnkSGgPZgsl4/+24=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=VOwxp43V4KBAZKlHNNJ9+9RJ12SPVLATwcNdwXX2RJGnBYSm/bbdjFYmb6+OgSZ4l63SXc01BuE3fgmm63aLeMfZVXXSt1czGfkuUaO+fGUTs5bS7LNM67wT/0iIL9XujnC3J5dZtowP4RtuHSISx7z2ZOQglVP65ZIKYD480f8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SMGwHSev; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3122368d82bso7266113a91.0
-        for <kvm@vger.kernel.org>; Tue, 08 Jul 2025 12:58:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752004739; x=1752609539; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=bK9rO788tLxJ4WTQcJIR4xppsNUsK51AEUh9HOz+/ZU=;
-        b=SMGwHSevuBX8uNe7gV8O9YfcpuqqnWDeXaCNOcST83AMAhqcZ1XSHq9ViVw+uCImZu
-         y6jO2HTl0Q3Z5v0szokGSVipKrWbC02Jy+/cQzTNlop4v3dV6KApdRmVM8lkj9xVq9IH
-         yJapcaDc5QPvQZnRd4toVcrEK6LwzJXvoH0RYoyq7ii5rSFZQkeuwgrk7LTta2QTtRGa
-         pu488oT8uOBeYu15u/NzlvE8MUV/tetecR38brWhYV5VRsKMq3llnnu6Rd9/OFToySN5
-         cUnFC0w3wJEZ/0NBPMy9x52a6w4M0Updzosw1m0i92BS4XOAbW92bW1pfPEway0ml1bk
-         ao2Q==
+	s=arc-20240116; t=1752006744; c=relaxed/simple;
+	bh=MxGXajIRbMndTP6Y7jkVKKVwgRoh5XnkmqHEkrXJAQc=;
+	h=Message-ID:Date:MIME-Version:From:To:Subject:Content-Type; b=hwwHN3fJoRUT06X6rh1HSGmOym1GmQFwR1sokynzd4zN95Ow0ucTkGretlONnmE0a2vLar+EEVwCV17QEYm2byQnELyXIDdszmyMsfOH8wV54xmB07YIxOT4VgVeTA1ziKZhdZC+zWH0PWZhvRULuXIY5D3nDkph9JoyEM/6xqU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PXyEA8Io; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752006741;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:autocrypt:autocrypt;
+	bh=fZ18WZFpEezwzDghyjVN7O2vbGP067o5/z+6fSH4cdI=;
+	b=PXyEA8IoGYI+uglsdUhOPAuBZHATMnsh4cs660NXlDrAPSsDutwlFg4sB3PLrUu3vD+8Wg
+	X3ZnmVgSdTVb72RsBjZ3d3+SAPlloomistmOXHadU3EXC4yyRqDX62r37SLWZqkgD28iZn
+	vE9RIJcVuyT1k601YJ1J16W5SFVQq8s=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-183-8Jhbf7cgNf-UW72IYhKQ_g-1; Tue, 08 Jul 2025 16:32:20 -0400
+X-MC-Unique: 8Jhbf7cgNf-UW72IYhKQ_g-1
+X-Mimecast-MFC-AGG-ID: 8Jhbf7cgNf-UW72IYhKQ_g_1752006739
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3a6d1394b07so3014860f8f.3
+        for <kvm@vger.kernel.org>; Tue, 08 Jul 2025 13:32:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752004739; x=1752609539;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=bK9rO788tLxJ4WTQcJIR4xppsNUsK51AEUh9HOz+/ZU=;
-        b=UB4RJL2ThjE0YpwqhXInBPdZU61Wy4jgajKLjnc9ayOFvhdDZjQQqaZl/Qfwc2VouW
-         ArX1QOp+yvjZ/Jh+3BwOUgMptMWY00gHBUm/C/AFQk12GsEC5itmiCinBYxMs+TPJkZo
-         DdU6KMFHEeLIe5cs3DIwhjBr+42mnRGZGlMnpJYy3L+6uPPAkCd2zEtPl+H+UpcK7OhZ
-         UsI+LIe7/nIo4OYrC5ZBPar1qo2Q7hmcbh4eegDxd+9pS0oqBD+8NqS7GnuGO9LIbKGW
-         l4NhuY9whIxa2MavWwFv78g26PSG5eco+4teQRVlyNBm2TvXJEmMb4GE6LH6GF5vFGMy
-         p9Lw==
-X-Forwarded-Encrypted: i=1; AJvYcCXFl7rcBA/9VtNv93ukdgth8PQgwwbsMnpOhbmTOfPshf9pCir5bIYXG0RDqUCMaNYovX4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyzpfOM45SVGUveD91Y0azXRd3TBwOUFK9SZgpDF+28oAARh55Z
-	U+CuE3iWGC1WDe//fPXA+ItQRNJuIkRRUAAtsu3tCLvv7KAsyJIgeJ8Njv6cssTFyqBsTKuMEGp
-	cvNkYwQ==
-X-Google-Smtp-Source: AGHT+IFkETqYRl85TaDCY+mhRsKj3yh+DlVRrd5kJgA8yrUlr1VJNZkXzaK8N5MZ0Opd+f6mnf+G32B45Fc=
-X-Received: from pja6.prod.google.com ([2002:a17:90b:5486:b0:2ff:84e6:b2bd])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1f83:b0:311:df4b:4b94
- with SMTP id 98e67ed59e1d1-31aac432a89mr24009325a91.4.1752004738302; Tue, 08
- Jul 2025 12:58:58 -0700 (PDT)
-Date: Tue, 8 Jul 2025 12:58:56 -0700
-In-Reply-To: <CAGtprH-ESrdhCeHkuRtiDoaqxCS9JVKu_CC9fbDRo+k+3jKCcQ@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1752006739; x=1752611539;
+        h=content-transfer-encoding:organization:autocrypt:subject:to
+         :content-language:from:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fZ18WZFpEezwzDghyjVN7O2vbGP067o5/z+6fSH4cdI=;
+        b=DmjtdoowtaGN2yVA2RgMOP8Fp1mmW4zgHGAB3KY1cMLPSzLPjWcOFe3l/oSBjIYVZy
+         RJCYpTQjV3FSOKgbJsn0vOcz0z9MKc2GYHy5ETHAnc62eYLBmoAfZAYNxRQL0xBNmVpE
+         emjrWM3RrzKUiG6ksIqtfNNGJYJtr4MBSDqgOpUo0ZlCy2zgio5Qqn4fEcoIKvcvVhYh
+         sDyvringtBAV/3exu2FVoB93r6JJOGpByQnoTo2wxR9NgD0q8TImIVpHKRn9Zfi6yrjs
+         Smh285NeXzoCBrOvV9bZb77PWuGuVWO73lS19ZeZdPVKDGjETI7WTA9zAFSjdQWfRK6O
+         1n8w==
+X-Forwarded-Encrypted: i=1; AJvYcCV8hbHpiN6dId1NvEC92+qygAU8+z3nftYYJwmY+WDbBAsg6QDD/RtQUzJSzbKO7/Y4zN4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKz3iX/YRF1wTB2bXrRN+TbaaJt6uePJgpwYCN9K0ZYPkSS2LJ
+	vtw30kBv+oECk788e7kWVw1QuhfsKUqqDi4zOYBDkTWCtwqvQd0QgyZg/kD5fQYND/8hGO4nkCb
+	aVznTiLiJJm4iQkNjQULyNUdH2FOm3/CpZPseKqaAfxzC6yTUCZijfw==
+X-Gm-Gg: ASbGncs51PFGZjj9xmEVP4YMDCxux5lc18b7onVl08aIZlK3DG137gxsIyGtkk153tN
+	KAw+j6E+uHj0ALahe8fsNTYh0ks1xxPc2rL5akaZItcHz0qqYLy5yAJ1/8qho+z7vc6mdkFgl1W
+	R6yVWj5ZcTpsc4htP13ILEFchdnAV/nQadmp1/H5QiOXMWA/k57y5OUlbvo+gUjXeolmugRFyfm
+	+MpBSNjlI6B2HdkoJbAzq7T0OogIyRrV+XEt2ryivNp4yCjU2j2DeIbHDp9DUVj3L44/GueOtV/
+	PDPFNgz7eA592E5FlpWRLJc89Yeixiq3DDvf+hzwIn0JF5ZqB1t54bE0aG6zh1ahl01dkm0VVec
+	cY/Nbcj1PK813IF3nITyj09tL9ztji3Eccw0kIijlvXaTWtZI1A==
+X-Received: by 2002:a05:6000:2709:b0:3a4:eeb5:58c0 with SMTP id ffacd0b85a97d-3b5e2fec716mr510102f8f.20.1752006739163;
+        Tue, 08 Jul 2025 13:32:19 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGnJABxlTXixFupmtv5X6j7MccF5K1JtEQNdIDPVmGE+/olUcE1tUKL/Yi1nQz41qQUDyEHsA==
+X-Received: by 2002:a05:6000:2709:b0:3a4:eeb5:58c0 with SMTP id ffacd0b85a97d-3b5e2fec716mr510064f8f.20.1752006738511;
+        Tue, 08 Jul 2025 13:32:18 -0700 (PDT)
+Received: from ?IPV6:2003:d8:2f1a:f500:4346:f17c:2bde:808c? (p200300d82f1af5004346f17c2bde808c.dip0.t-ipconnect.de. [2003:d8:2f1a:f500:4346:f17c:2bde:808c])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b470d9e470sm13681312f8f.41.2025.07.08.13.32.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Jul 2025 13:32:18 -0700 (PDT)
+Message-ID: <044a8f63-32d9-4c6f-ae3f-79072062d076@redhat.com>
+Date: Tue, 8 Jul 2025 22:32:15 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <CAGtprH_57HN4Psxr5MzAZ6k+mLEON2jVzrLH4Tk+Ws29JJuL4Q@mail.gmail.com>
- <006899ccedf93f45082390460620753090c01914.camel@intel.com>
- <aG0pNijVpl0czqXu@google.com> <a0129a912e21c5f3219b382f2f51571ab2709460.camel@intel.com>
- <CAGtprH8ozWpFLa2TSRLci-SgXRfJxcW7BsJSYOxa4Lgud+76qQ@mail.gmail.com>
- <eeb8f4b8308b5160f913294c4373290a64e736b8.camel@intel.com>
- <CAGtprH8cg1HwuYG0mrkTbpnZfHoKJDd63CAQGEScCDA-9Qbsqw@mail.gmail.com>
- <b1348c229c67e2bad24e273ec9a7fc29771e18c5.camel@intel.com>
- <aG1dbD2Xnpi_Cqf_@google.com> <CAGtprH-ESrdhCeHkuRtiDoaqxCS9JVKu_CC9fbDRo+k+3jKCcQ@mail.gmail.com>
-Message-ID: <aG14gLz9C_601TJ3@google.com>
-Subject: Re: [RFC PATCH v2 00/51] 1G page support for guest_memfd
-From: Sean Christopherson <seanjc@google.com>
-To: Vishal Annapurve <vannapurve@google.com>
-Cc: Rick P Edgecombe <rick.p.edgecombe@intel.com>, "pvorel@suse.cz" <pvorel@suse.cz>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, 
-	Jun Miao <jun.miao@intel.com>, "nsaenz@amazon.es" <nsaenz@amazon.es>, 
-	Kirill Shutemov <kirill.shutemov@intel.com>, "pdurrant@amazon.co.uk" <pdurrant@amazon.co.uk>, 
-	"peterx@redhat.com" <peterx@redhat.com>, "x86@kernel.org" <x86@kernel.org>, 
-	"tabba@google.com" <tabba@google.com>, "amoorthy@google.com" <amoorthy@google.com>, 
-	"quic_svaddagi@quicinc.com" <quic_svaddagi@quicinc.com>, "jack@suse.cz" <jack@suse.cz>, 
-	"vkuznets@redhat.com" <vkuznets@redhat.com>, "quic_eberman@quicinc.com" <quic_eberman@quicinc.com>, 
-	"keirf@google.com" <keirf@google.com>, 
-	"mail@maciej.szmigiero.name" <mail@maciej.szmigiero.name>, 
-	"anthony.yznaga@oracle.com" <anthony.yznaga@oracle.com>, Wei W Wang <wei.w.wang@intel.com>, 
-	"palmer@dabbelt.com" <palmer@dabbelt.com>, 
-	"Wieczor-Retman, Maciej" <maciej.wieczor-retman@intel.com>, Yan Y Zhao <yan.y.zhao@intel.com>, 
-	"ajones@ventanamicro.com" <ajones@ventanamicro.com>, "willy@infradead.org" <willy@infradead.org>, 
-	"paul.walmsley@sifive.com" <paul.walmsley@sifive.com>, Dave Hansen <dave.hansen@intel.com>, 
-	"aik@amd.com" <aik@amd.com>, "usama.arif@bytedance.com" <usama.arif@bytedance.com>, 
-	"quic_mnalajal@quicinc.com" <quic_mnalajal@quicinc.com>, "fvdl@google.com" <fvdl@google.com>, 
-	"rppt@kernel.org" <rppt@kernel.org>, "quic_cvanscha@quicinc.com" <quic_cvanscha@quicinc.com>, 
-	"maz@kernel.org" <maz@kernel.org>, "vbabka@suse.cz" <vbabka@suse.cz>, 
-	"anup@brainfault.org" <anup@brainfault.org>, "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "mic@digikod.net" <mic@digikod.net>, 
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, Fan Du <fan.du@intel.com>, 
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, "steven.price@arm.com" <steven.price@arm.com>, 
-	"muchun.song@linux.dev" <muchun.song@linux.dev>, 
-	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, Zhiquan1 Li <zhiquan1.li@intel.com>, 
-	"rientjes@google.com" <rientjes@google.com>, "mpe@ellerman.id.au" <mpe@ellerman.id.au>, 
-	Erdem Aktas <erdemaktas@google.com>, "david@redhat.com" <david@redhat.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>, 
-	"hughd@google.com" <hughd@google.com>, "jhubbard@nvidia.com" <jhubbard@nvidia.com>, Haibo1 Xu <haibo1.xu@intel.com>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, "jthoughton@google.com" <jthoughton@google.com>, 
-	"steven.sistare@oracle.com" <steven.sistare@oracle.com>, 
-	"quic_pheragu@quicinc.com" <quic_pheragu@quicinc.com>, "jarkko@kernel.org" <jarkko@kernel.org>, 
-	"chenhuacai@kernel.org" <chenhuacai@kernel.org>, Kai Huang <kai.huang@intel.com>, 
-	"shuah@kernel.org" <shuah@kernel.org>, "bfoster@redhat.com" <bfoster@redhat.com>, 
-	"dwmw@amazon.co.uk" <dwmw@amazon.co.uk>, Chao P Peng <chao.p.peng@intel.com>, 
-	"pankaj.gupta@amd.com" <pankaj.gupta@amd.com>, Alexander Graf <graf@amazon.com>, 
-	"nikunj@amd.com" <nikunj@amd.com>, "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>, 
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>, 
-	"jroedel@suse.de" <jroedel@suse.de>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, 
-	"jgowans@amazon.com" <jgowans@amazon.com>, Yilun Xu <yilun.xu@intel.com>, 
-	"liam.merwick@oracle.com" <liam.merwick@oracle.com>, "michael.roth@amd.com" <michael.roth@amd.com>, 
-	"quic_tsoni@quicinc.com" <quic_tsoni@quicinc.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, Ira Weiny <ira.weiny@intel.com>, 
-	"richard.weiyang@gmail.com" <richard.weiyang@gmail.com>, 
-	"kent.overstreet@linux.dev" <kent.overstreet@linux.dev>, "qperret@google.com" <qperret@google.com>, 
-	"dmatlack@google.com" <dmatlack@google.com>, "james.morse@arm.com" <james.morse@arm.com>, 
-	"brauner@kernel.org" <brauner@kernel.org>, "roypat@amazon.co.uk" <roypat@amazon.co.uk>, 
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, 
-	"ackerleytng@google.com" <ackerleytng@google.com>, "pgonda@google.com" <pgonda@google.com>, 
-	"quic_pderrin@quicinc.com" <quic_pderrin@quicinc.com>, "hch@infradead.org" <hch@infradead.org>, 
-	"will@kernel.org" <will@kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
+To: "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+ "linux-mm@kvack.org" <linux-mm@kvack.org>, KVM <kvm@vger.kernel.org>
+Subject: [Invitation] bi-weekly guest_memfd upstream call on 2025-07-17
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jul 08, 2025, Vishal Annapurve wrote:
-> On Tue, Jul 8, 2025 at 11:03=E2=80=AFAM Sean Christopherson <seanjc@googl=
-e.com> wrote:
-> Few points that seem important here:
-> 1) Userspace can and should be able to only dictate if memory contents
-> need to be preserved on shared to private conversion.
+Hi everybody,
 
-No, I was wrong, pKVM has use cases where it's desirable to preserve data o=
-n
-private =3D> shared conversions.
+I had to move the meeting by one week -- I'll be out the next two days 
+-- and decided to send the invite out already to highlight that :)
 
-Side topic, if you're going to use fancy indentation, align the indentation=
- so
-it's actually readable.
+So, our next guest_memfd upstream call is scheduled for next week, 
+Thursday, 2025-07-17 at 8:00 - 9:00am (GMT-07:00) Pacific Time - Vancouver.
 
->   -> For SNP/TDX VMs:
->        * Only usecase for preserving contents is initial memory
->          population, which can be achieved by:
->               -  Userspace converting the ranges to shared, populating th=
-e contents,
->                  converting them back to private and then calling SNP/TDX=
- specific
->                  existing ABI functions.
->        * For runtime conversions, guest_memfd can't ensure memory content=
-s are
->          preserved during shared to private conversions as the architectu=
-res
->          don't support that behavior.
->        * So IMO, this "preserve" flag doesn't make sense for SNP/TDX VMs,=
- even
+We'll be using the following Google meet:
+http://meet.google.com/wxp-wtju-jzw
 
-It makes sense, it's just not supported by the architecture *at runtime*.  =
-Case
-in point, *something* needs to allow preserving data prior to launching the=
- VM.
-If we want to go with the PRIVATE =3D> SHARED =3D> FILL =3D> PRIVATE approa=
-ch for TDX
-and SNP, then we'll probably want to allow PRESERVE only until the VM image=
- is
-finalized.
+The meeting notes can be found at [1], where we also link recordings and
+collect current guest_memfd upstream proposals. If you want an google
+calendar invitation that also covers all future meetings, just write me
+a mail.
 
->          if we add this flag, today guest_memfd should effectively mark t=
-his
->          unsupported based on the backing architecture support.
->
-> 2) For pKVM, if userspace wants to specify a "preserve" flag then this
+In this meeting, we'll talk about memory failure handling, and continue 
+our discussion on polishing up mmap support ("stage-1") to finally get 
+it merged ... and whatever else comes up around that.
 
-There is no "For pKVM".  We are defining uAPI for guest_memfd.  I.e. this s=
-tatement
-holds true for all implementations: PRESERVE is allowed based on the capabi=
-lities
-of the architecture.
+To put something to discuss onto the agenda, reply to this mail or add
+them to the "Topics/questions for next meeting(s)" section in the
+meeting notes as a comment.
 
-> So this topic is still orthogonal to "zeroing on private to shared conver=
-sion".
+Cheers,
 
-As above, no.  pKVM might not expose PRESERVE to _userspace_ since all curr=
-ent
-conversions are initiated by the guest, but for guest_memfd itself, this is=
- all
-one and the same.
+David
+
+[1]
+https://docs.google.com/document/d/1M6766BzdY1Lhk7LiR5IqVR8B8mG3cr-cxTxOrAosPOk/edit?usp=sharing
+
 
