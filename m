@@ -1,131 +1,130 @@
-Return-Path: <kvm+bounces-51776-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51777-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E770EAFCE1E
-	for <lists+kvm@lfdr.de>; Tue,  8 Jul 2025 16:47:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFBD4AFCE2F
+	for <lists+kvm@lfdr.de>; Tue,  8 Jul 2025 16:50:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C01181884B08
-	for <lists+kvm@lfdr.de>; Tue,  8 Jul 2025 14:44:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE5FC18851C7
+	for <lists+kvm@lfdr.de>; Tue,  8 Jul 2025 14:48:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA78D2E06D7;
-	Tue,  8 Jul 2025 14:44:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 016CA2DFA32;
+	Tue,  8 Jul 2025 14:48:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SP9ycgxx"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W4AmxOP/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD41A226D0A
-	for <kvm@vger.kernel.org>; Tue,  8 Jul 2025 14:44:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CF8D2DEA78
+	for <kvm@vger.kernel.org>; Tue,  8 Jul 2025 14:48:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751985869; cv=none; b=WMIZFwh28TKeUunaQanUmbDu+UMnetlz8EqvPmWt3yklPVTIa6Wittsd9TXtXIJPtGCPJ0ErM3OFG7SV779e0llOmuOCw8d0dVmnn2RgZauDFjwAKDFKqKO/nRgDIhXaJp4mBQROuEFiey88hULWqDrxldzcfh572YhfPFr9GOQ=
+	t=1751986099; cv=none; b=pjB6yNVO+FSvJf6P+N/tNXgV9bV2782PhPmakPlF7dHokDoO1jo10YRFlCcPlbtnHFiQroS5O4CL0Jkmdnl5mjyAeOthrlWZIV5FLFG9bizvMbaoZuC/1J5NtvJGkJbEzrQK/0cAxK2NLm6yfRIOKqSlStKlxrQDex6VHPQhGlA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751985869; c=relaxed/simple;
-	bh=TXEGRBsgm+n8P+t42R28we4U8CCik0hjXIM15uylAJU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=OBik2/LCFCu6yV7wTzpPjqPACPn1vILJQbCTmMKkdEuWEpogJjrgMj4TGvaFtsUv4Z1oOfAw4fSyqQ5nRe9T7IgXfHoW8f1MT2y+LFUrz99zwtqIxbvD+bOFfhpxPqX9n0ll2mdMBa2dv50jezUa6u0J3oWz5kK0PjpwGIq7uW0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SP9ycgxx; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-74913385dd8so6104996b3a.0
-        for <kvm@vger.kernel.org>; Tue, 08 Jul 2025 07:44:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1751985866; x=1752590666; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=M4Y0LHIYImOnqvxWJNSqr5NHEbLMZdgrbi8mWqVwvxE=;
-        b=SP9ycgxxWe9uVDqLKT9uTgkRWv3yG8pB5WdXkOTT8grhG4s7QcHhSos1qYPoE6Z1Hd
-         vb4nm45o4AHRi2Hsz0OEgup02EenohWOdAwVO3wBNGLE4H37W/fWR1rERjn69jIaK98l
-         RLqcinvtVVYQ8qXJGcVYxKH709aiXBnUbn3fVQFFdagSsYfAWpK4DiJq6U1HCIGtsCHP
-         8TME3OvW0X+LMpVVYIAn469JBEtjSi2UqqZN9BZEHcMDs91febIdzQetXqgJmWMCDsHp
-         xtKckyXavrhDmvgtaUupof/MdHPWz+hYuaj4mE25G7idqQ/zttbeWk/DL+DOpf6oHopO
-         aBIQ==
+	s=arc-20240116; t=1751986099; c=relaxed/simple;
+	bh=K6D0w4TlB1r2EMOgBoPLENgpbBMsqqcZbsDwAVdJIRg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=N/JBQMzuO4pgFlYmOViJ1UOGMEAms87ZHnsd40gFWxovaAD88knb9hI4dkr2cGvDWzIgFEUERmGcg4LDTBNmDx5zj6FnRq/KYOO3kAhvBp25oY0Z37cNXb0J7x30efVF6eroFaTK67AAN+1h/Pgt/wEhXgP9PJcDg3FxMwYU1Lo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=W4AmxOP/; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1751986096;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VYwFNZ7gJ7YL/bHRH7pGKeSkqhcvD8xNXSGdyMHjqaw=;
+	b=W4AmxOP/b/rOln4svI+tHyspeH6aX7BEkX6HENZoN7ZlEt+m+6mXsLLcOsYg0nUgYPt0LE
+	0ZPjWPrLmhz9bMggMu6NyqoBc23HV3EYw8yPIkdUzNNEeA0hPfx/o9vDCFm0MudYx8M5ih
+	CA4yAbIfg5EFug5wvpDA1ORcaLWDyvM=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-502-YBf6QXq2OrGy5aC-6HAmUw-1; Tue, 08 Jul 2025 10:48:14 -0400
+X-MC-Unique: YBf6QXq2OrGy5aC-6HAmUw-1
+X-Mimecast-MFC-AGG-ID: YBf6QXq2OrGy5aC-6HAmUw_1751986094
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3a5780e8137so2903757f8f.1
+        for <kvm@vger.kernel.org>; Tue, 08 Jul 2025 07:48:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751985866; x=1752590666;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=M4Y0LHIYImOnqvxWJNSqr5NHEbLMZdgrbi8mWqVwvxE=;
-        b=jWqJKDyrhzlrnPa4xgBP1kz4rf8JnUecgDXiMRlUQ4h+IQsmJbm096LuH1f1eYrbfW
-         ElfabxsXvk0m0th9eb1zXr/eepyW43o1/VPgt8CV6R1+Q41Gc2G0io6geqruDN0Uvjow
-         nJH8bKZrsdqRN+zsiB8akJBEtV1sQfL0AUYCWEYCfd2CVx3RzT7JRpkf4k3q6A0Wb+RR
-         5AkNk7qOC7ItuosdHxDbQ5aoc1OObaD+7YuscpuageJNBOYLiKRpMg2adyvWXdhAUmgC
-         RKzR7uHhLeFqhmy5OqbRb+HRW9Q/jCFioTg7TNln2bv2OzFxmeV4YUWUFt3VVVWs0RDA
-         d0sA==
-X-Forwarded-Encrypted: i=1; AJvYcCUry9xx4P3wo4hZtuRRCQFCOSZOnGndgiSR7VEetm4jApiml2ivDXzmElqfCbfDukRl6kk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyh7MP8RShr4cGGnGdef3IDYASrcppuGzDEktR4u/q5evMRQyj/
-	PKhjXDbvbcZm0X6pFN/QkTcK2TG+tcNPyPUEI+wsOMZCCG0S2FwS8tJSQzLH3WHYBs4sWsxQUSH
-	bHrgbeQ==
-X-Google-Smtp-Source: AGHT+IEryFAJQIP1RYdnl3B5+MmSaaqt34bQLLxukJow6DGBXYKU32xvLqLVHhWhYnnjS3IC2/q6uMASVdg=
-X-Received: from pfus6.prod.google.com ([2002:a05:6a00:8c6:b0:747:9faf:ed39])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:80c:b0:736:5664:53f3
- with SMTP id d2e1a72fcca58-74ce6668f9cmr23430472b3a.15.1751985866098; Tue, 08
- Jul 2025 07:44:26 -0700 (PDT)
-Date: Tue, 8 Jul 2025 07:44:24 -0700
-In-Reply-To: <bdd84a04818a40dd1c7f94bb7d47c4a0116d5e5d.camel@intel.com>
+        d=1e100.net; s=20230601; t=1751986094; x=1752590894;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VYwFNZ7gJ7YL/bHRH7pGKeSkqhcvD8xNXSGdyMHjqaw=;
+        b=mK7m+dvjW1PvIB3pKrW0Y8zPst+ot1vcXKEhrKs+OjlTvKe2PMCxUge71q2Ifc1GrT
+         bR82wBYQrMEL0HJzEmY87xEWYvDSunWJw4CS//i1+AxJUFZQrnzCvxFM2d1McIlyH1U5
+         roSzM16IESfk6hefVjOAkI2N/GYUrjK3ahKQAD4YnPNGN85u3fbir/ZuKWSs7MlHuDgQ
+         A2lUiIcichtIGlTmFsPTp17nVTCvjtD03prBspic6Un3zqV6VdPMVBdMs2wzucv2F+9Q
+         JXvXM8mFm9R/1djIP0r8H8EwPRXtGU+M7YOyIWryrHO/j0w1boY/Do6g3XWfyZlk0kD2
+         kI5Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWgXshVl0XnLXX3ssMgKCsKL1IyvhQWUp3tQ3LxC5vo10tSFvY3SK31sKoRXxjKA/nHsUY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzljY77FWTokONgZgdj08AWMeE2hrWgaSXSq3VvEFvDnD606yLe
+	CzqgsRCd7PK0v3Jx1wWzjm9A1DQhKtQLZ73zIMegTEJq4FwCiP04jJjw3SKgPokFm4hXs5GkkMC
+	AJT9SBOpNGB4FI0Znxbnqyz1+D8Jo1+XwAtz5+TjcJ44iqeQuCCwa87GkzF4B68gXcjowGxQK8z
+	z2pxr0Hh9JthlW2pyZPcYUR/QT0sDr
+X-Gm-Gg: ASbGncug39e9g6aybSt5DPYwLAsZhu2h2bzqINsnfj9q4AKNXxPnTR5YHzynECyl2da
+	FIP1ksugJuY7Zc0+/RgjTZHGt8Bbdkh1/vYaD0jrymxtX1fk/mXBU4KemSe9YqrO6kia5touVJ+
+	mBkg==
+X-Received: by 2002:a05:6000:2303:b0:3a5:271e:c684 with SMTP id ffacd0b85a97d-3b5de020c32mr2975735f8f.24.1751986093520;
+        Tue, 08 Jul 2025 07:48:13 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGZiM0/9n6ueMPFfbYNFhT+fBviGPPImQB1n/AEnAcH0tJWdCzJAc7ZdV1DzjlOYDO19wxA0F443c++AksjL/c=
+X-Received: by 2002:a05:6000:2303:b0:3a5:271e:c684 with SMTP id
+ ffacd0b85a97d-3b5de020c32mr2975705f8f.24.1751986093032; Tue, 08 Jul 2025
+ 07:48:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250708080314.43081-1-xiaoyao.li@intel.com> <20250708080314.43081-3-xiaoyao.li@intel.com>
- <aG0lK5MiufiTCi9x@google.com> <bdd84a04818a40dd1c7f94bb7d47c4a0116d5e5d.camel@intel.com>
-Message-ID: <aG0uyLwxqfKSX72s@google.com>
-Subject: Re: [PATCH 2/2] KVM: TDX: Remove redundant definitions of TDX_TD_ATTR_*
-From: Sean Christopherson <seanjc@google.com>
-To: Rick P Edgecombe <rick.p.edgecombe@intel.com>
-Cc: Xiaoyao Li <xiaoyao.li@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>, Kai Huang <kai.huang@intel.com>, 
-	Yan Y Zhao <yan.y.zhao@intel.com>, 
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, Adrian Hunter <adrian.hunter@intel.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Reinette Chatre <reinette.chatre@intel.com>, 
-	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
-	"mingo@redhat.com" <mingo@redhat.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	"kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>, "tglx@linutronix.de" <tglx@linutronix.de>, 
-	"hpa@zytor.com" <hpa@zytor.com>, Tony Lindgren <tony.lindgren@intel.com>, "bp@alien8.de" <bp@alien8.de>, 
-	"x86@kernel.org" <x86@kernel.org>
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+References: <20250626152023.192347-1-maz@kernel.org>
+In-Reply-To: <20250626152023.192347-1-maz@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue, 8 Jul 2025 16:48:01 +0200
+X-Gm-Features: Ac12FXzzshxqceQql3qnuEeB1aBk-3TKPKyjGfeEqol9jVWILuBd4g9oY4XHIv0
+Message-ID: <CABgObfZ3RepTFAMVSB4v1cmuOg+JB7LAcqx04EZui6qF3q5QtA@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.16, take #4
+To: Marc Zyngier <maz@kernel.org>
+Cc: Mostafa Saleh <smostafa@google.com>, Quentin Perret <qperret@google.com>, 
+	Wei-Lin Chang <r09922117@csie.ntu.edu.tw>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jul 08, 2025, Rick P Edgecombe wrote:
-> On Tue, 2025-07-08 at 07:03 -0700, Sean Christopherson wrote:
-> > > diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> > > index c539c2e6109f..efb7d589b672 100644
-> > > --- a/arch/x86/kvm/vmx/tdx.c
-> > > +++ b/arch/x86/kvm/vmx/tdx.c
-> > > @@ -62,7 +62,7 @@ void tdh_vp_wr_failed(struct vcpu_tdx *tdx, char *u=
-class,
-> > > char *op, u32 field,
-> > > =C2=A0=C2=A0	pr_err("TDH_VP_WR[%s.0x%x]%s0x%llx failed: 0x%llx\n", uc=
-lass,
-> > > field, op, val, err);
-> > > =C2=A0 }
-> > > =C2=A0=20
-> > > -#define KVM_SUPPORTED_TD_ATTRS (TDX_TD_ATTR_SEPT_VE_DISABLE)
-> > > +#define KVM_SUPPORTED_TD_ATTRS (TDX_ATTR_SEPT_VE_DISABLE)
-> >=20
-> > Would it make sense to rename KVM_SUPPORTED_TD_ATTRS to
-> > KVM_SUPPORTED_TDX_ATTRS?
-> > The names from common code lack the TD qualifier, and I think it'd be h=
-elpful
-> > for
-> > readers to have have TDX in the name (even though I agree "TD" is more
-> > precise).
->=20
-> It's useful to know that these are per-TD attributes and not per-TDX modu=
-le.
-> Especially for TDX_TD_ATTR_DEBUG. I kind of prefer the KVM naming scheme =
-that is
-> removed in this patch.
+On Thu, Jun 26, 2025 at 5:20=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrote=
+:
+>
+> Paolo,
+>
+> Another week, another set of fixes. Nothing major this time: allow
+> pKVM to fail to initialise without taking the host down, make sure we
+> are not mapping too much in the host S2 (another pKVM special), and a
+> brown-paper-bag quality bug fix on the nested GICv3 emulation.
+>
+> Please pull,
+>
+>         M.
+>
+> The following changes since commit 04c5355b2a94ff3191ce63ab035fb7f04d0368=
+69:
+>
+>   KVM: arm64: VHE: Centralize ISBs when returning to host (2025-06-19 13:=
+34:59 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kv=
+marm-fixes-6.16-4
 
-Heh, as does Xiaoyao, and me too.  I thought I was just being nitpicky :-)
+Done now, thanks!  Note that in the meanwhile git:// is not working
+anymore, so you probably want https:// in there.
 
-Though in that case, I think I'd prefer KVM_SUPPORTED_TDX_TD_ATTRS.
+Paolo
 
 
