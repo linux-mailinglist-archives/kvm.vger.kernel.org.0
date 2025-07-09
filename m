@@ -1,98 +1,293 @@
-Return-Path: <kvm+bounces-51950-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51951-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A96DAFEBF5
-	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 16:30:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DA67AFEC00
+	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 16:31:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C402179B8D
-	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 14:27:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1DD004A301D
+	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 14:29:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27EBE2E541B;
-	Wed,  9 Jul 2025 14:27:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEE1B2E5434;
+	Wed,  9 Jul 2025 14:29:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ATCuB4OP"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Jkl2KRat"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7A5A2E0411
-	for <kvm@vger.kernel.org>; Wed,  9 Jul 2025 14:27:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 631D42E3B17
+	for <kvm@vger.kernel.org>; Wed,  9 Jul 2025 14:29:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752071245; cv=none; b=lZfVEdPP/Odx+hdAoLvK1OKTzPcSbQQAU3sUAyGchDp4cGV29j/fxY1OQChMrNZSoXn/xyP5GTa/Xv0uvlCK5IO0l9SR/FIxamiPBEMwKQLMKl6r6ca9nIfOh7l2V396wDINsxKA4fjyPtS9vJHpovbbOQf8pPQXoh3ju/D5Cb8=
+	t=1752071344; cv=none; b=VtRnqjvJ9qxInTLRIGt/sQeUu+HNqKzEwLmT5c7nJiau1konmt3y5IcOKYm+SDD+1qVXhAUfgYAkawutw5pzaDpSiRKBO0AlFC2leIpyNaQDnBmw6OkyMh77fXnXMApbxVAR3tLWhE6Pm054PYao1qmxXPuucZjAwQcx5cKDw/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752071245; c=relaxed/simple;
-	bh=pvkwBrcqCz/q7TbAy/707f2NDn31fDmeAF6bySTr6Ic=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=J17Ll3x2ZW2ADAUtdOqOy/PtCKCYVi8gftGXh8DZFxF+sbf3tELyx62I5dQmt/0Vn3ufbC4vB4UfNf+0VeoYYS3zeCbWn8hrNLYm2oIce2UBLBij3yD1bsZY8KT7NQNSY8XUXH9qPyuYA8xhc/DDNzKQKgY4BVMAaIH3bNkvpLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ATCuB4OP; arc=none smtp.client-ip=209.85.215.201
+	s=arc-20240116; t=1752071344; c=relaxed/simple;
+	bh=W7s40s+PfnHkEfrZ9uqQOxuCwAKK3oCV4Tf1biTsg8A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QdvspaE+akDalSMAlT/sWVtGo2N2tF9OmzkCu7zCADixR5nrySNd7Fet9db0PNSCTywQ8KU2jgCoyCiHaNLngCgEg2CEfT0WYDLdwrkqwrxpBGAEQ7iS2f9TXt2t+TI8tjzZqpkQK6049HxmAcwtGGRVLdO9Iao+X82UU8O9Moc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Jkl2KRat; arc=none smtp.client-ip=209.85.214.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b31bc3128fcso4158a12.0
-        for <kvm@vger.kernel.org>; Wed, 09 Jul 2025 07:27:23 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2357c61cda7so155725ad.1
+        for <kvm@vger.kernel.org>; Wed, 09 Jul 2025 07:29:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752071243; x=1752676043; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2ny4OheUvtoLgeKPBXu3zvqh0EKHCtc/bq+iQEnC2Ww=;
-        b=ATCuB4OPm2JrQ8VZzrN+rTJK57JI3Do2WfSxO9+7NP+yKclh6m6DasSc4CCB9AelNx
-         sgO0GxHZW19n+O9RWJrWyHRcA9y39o+wuftkVC9F6fOKMXOWqq+N/VMAs7PgZbv8kYBG
-         NhGrXvMxDDfzM5cU7NO3iA6q+DmU0Z8Gx7hArtaB01OrWflXWb4+oa2DvV4rvhb95tnT
-         zwwsGYLRePAku6o7KIH7RUOXDXqQh6vd90IspzWg/7DOLfBsMYDc6agGs23Vv3f/jcRN
-         fKmJiv7VpgvO90qOzKNS4JsqU+2O6SmZfDjzQ78lhJDykSWAJhWtyVQxh01y6NwWwcLw
-         UBuw==
+        d=google.com; s=20230601; t=1752071341; x=1752676141; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=otqsPDt5osEXqjc5euk3u1KgCdwLcQ8YUxZOr7B7LAY=;
+        b=Jkl2KRatCfbuD0/wXDThvA/ceDPQMsmpJlCa5Zabksrp+egx9Hh6fbixeqUP8PYA8o
+         A7gHnZVnyyCHWiXR/toyRNLk0FVYn6mxwfaQ4J1u0VxiA3fufwIWoQeFBgCxsh+LGUEp
+         PVKbuzVAnTMQzMwVgctEV8l/0nDfsAG7YRZV4702tmRgGfvvN6doNaYUt6sFkc5Q6uc6
+         bLQO3h7X883lCkX+Cs4nV40QNi5iBL+cF597lwy/n3Rxh79e3JCwhDUo6ei0ROqn7AG3
+         xtNpQaXq9aq/AVK5TdlKsKLDKQiQMk0OMCPy0iegIVJyzZen5ZTUErO4uOj1kbqX/MNs
+         eRtw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752071243; x=1752676043;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2ny4OheUvtoLgeKPBXu3zvqh0EKHCtc/bq+iQEnC2Ww=;
-        b=wpojz4lwy8BUI5JFivGRLOnnj5y4qZaaIlcj5ITccWk3WqOLbsGS86OeZ+BLpbDrmk
-         sIesHpiZUPPh4Me7RuYrimXH4ylQpJYJSZg02ipW4jL9dqzfic7l9IJS5KSumk2fJhGC
-         tANNBi1U396oUudplwWK8zFy6Eoo39ctMqGDlUZbSArKvbqMmK7N1HWWGv1cor/xB7h1
-         QPMJcEVJPYdnjLkPShrSGcsWeMNM6469ozzGaljoyIfy90S9j2p3EdYyu/lfYK4eTHiO
-         lRHqq0ej7Rxa5ZSEhmJlDertRDFLi+tQCLIVgPFWqxFDx/xtFT/lGthDdz1EmnwOlX83
-         GWQg==
-X-Forwarded-Encrypted: i=1; AJvYcCX9z1++TC276+Kw6O+Qcg1h0ZP/368xsQMaJw99vaugZMm9rbzTb19OhuBIMnwqU3wqRDk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxeXvVssq6gR5BS8P9FcpxpNgf8BtJddYC2s3acPZR05uPShvy4
-	G6zmN4RnCdrcXNnWtFwiCOi4UlYLjbTdgEOHdeD7cb2Uv1OCfR0n6SJDv/e1pBmQo3rL9qt+wxY
-	AV62rqA==
-X-Google-Smtp-Source: AGHT+IGcOXxhoDOk+P/ex+nqUAh1f+wKkBdBcrVKVPPMAEpZzWU3sIlfK65sSX3bA5bYd6D9J3w71Pwer9Y=
-X-Received: from pgbcj11.prod.google.com ([2002:a05:6a02:208b:b0:b38:f5cc:7771])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:734b:b0:1ee:d418:f764
- with SMTP id adf61e73a8af0-22cdaad6959mr4171366637.38.1752071243305; Wed, 09
- Jul 2025 07:27:23 -0700 (PDT)
-Date: Wed, 9 Jul 2025 07:27:21 -0700
-In-Reply-To: <20250709141035.70299-1-xiaoyao.li@intel.com>
+        d=1e100.net; s=20230601; t=1752071341; x=1752676141;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=otqsPDt5osEXqjc5euk3u1KgCdwLcQ8YUxZOr7B7LAY=;
+        b=cp4rHeUUybKmN2shNdxo/vToGhP1h1a5BLUH2B983JU6JMFSxwXXBiew5QQkg/PX+6
+         OiF5enlcGRK6k3t6SYUJwILNzVZqvJcEnzTEGfo9qzTm+ud/7tzpgOmOTbtakM4Rbh2W
+         PAryMw21ezU9U6cPODASYPFzC4HXefZtF0C9Nnhx30pOky54Vl5YRDQjEeFYvjHZSgb7
+         8a4zVBvo7JvihQDqgbdxNrPeZaO+iTJ1mBz/Oquu6Zvn8snJEBWohapE+av1RIpAvC+t
+         9AtvOpeRj5g1kijzCEuE6G8lHjiqqam353l/Qz95JbFECtGyufbW4YrlIdLo1cR5yAuN
+         qXbQ==
+X-Forwarded-Encrypted: i=1; AJvYcCULCeUBHkYdbzDmhFtZkjQoPeyrsjH6UYXl6QGhipxvu2A0dhYNr9nmd7z8GmF0UcSnQqo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyhRoT8EFLYT4tmeg4Q/GMXQt8k3dzexaeWcvKt0P2RQ9WhElBq
+	OE/y4UBwoQP1xmgHSc3wMg9FCI8uSFW1UCZERxtN2nDOe3uFqfZ5Qh4OGbaxWi7IcTz1lcT6on7
+	FXLZyVDTQTsYIcO1yRfSAUy/pnaOA5lAbsfLcv+XI
+X-Gm-Gg: ASbGncs6MpkNzlDUaknvsRR7fAH7sToysfZwqq81OXgfd9B9vQyOlmUTheSJbMzBPhn
+	wzuqqJr7Xy+4tEPQzerRJVzHO2t+KNDXlHezwnHfJhyzoJFsoimd+0s6V1z5BxJKZwMVnogDyBo
+	NCXtO9mQOkxYt3SvvmuRGeodz5i8wO4fbUKzilXYBm/poBwuhPcY+DY5nbltXzjSi5lgA+OHQ2T
+	8rS
+X-Google-Smtp-Source: AGHT+IHZnJT8IPYNYYlq8IZWbrFrKSERazCCUgk/PYCXPT2eafZj+EWruKSZR2KdLOBmcVX/Dr9qFLZcvU+hjVe4mck=
+X-Received: by 2002:a17:903:234a:b0:22e:4509:cb86 with SMTP id
+ d9443c01a7336-23ddae070d9mr2349035ad.19.1752071340735; Wed, 09 Jul 2025
+ 07:29:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250709141035.70299-1-xiaoyao.li@intel.com>
-Message-ID: <aG58SdS7HibYuoW-@google.com>
-Subject: Re: [PATCH] MAINTAINERS: Add KVM mail list to the TDX entry
-From: Sean Christopherson <seanjc@google.com>
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: Dave Hansen <dave.hansen@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Rick Edgecombe <rick.p.edgecombe@intel.com>, 
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, "H . Peter Anvin" <hpa@zytor.com>, x86@kernel.org, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-coco@lists.linux.dev
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <CAGtprH_57HN4Psxr5MzAZ6k+mLEON2jVzrLH4Tk+Ws29JJuL4Q@mail.gmail.com>
+ <006899ccedf93f45082390460620753090c01914.camel@intel.com>
+ <aG0pNijVpl0czqXu@google.com> <a0129a912e21c5f3219b382f2f51571ab2709460.camel@intel.com>
+ <CAGtprH8ozWpFLa2TSRLci-SgXRfJxcW7BsJSYOxa4Lgud+76qQ@mail.gmail.com>
+ <eeb8f4b8308b5160f913294c4373290a64e736b8.camel@intel.com>
+ <CAGtprH8cg1HwuYG0mrkTbpnZfHoKJDd63CAQGEScCDA-9Qbsqw@mail.gmail.com>
+ <b1348c229c67e2bad24e273ec9a7fc29771e18c5.camel@intel.com>
+ <aG1dbD2Xnpi_Cqf_@google.com> <5decd42b3239d665d5e6c5c23e58c16c86488ca8.camel@intel.com>
+ <aG1ps4uC4jyr8ED1@google.com>
+In-Reply-To: <aG1ps4uC4jyr8ED1@google.com>
+From: Vishal Annapurve <vannapurve@google.com>
+Date: Wed, 9 Jul 2025 07:28:48 -0700
+X-Gm-Features: Ac12FXzvLP7atWaiCB-cuaA1xwFEC8dxkhwp1kDPwptSswG_7FLCPsdSJrQ6QBQ
+Message-ID: <CAGtprH86N7XgEXq0UyOexjVRXYV1KdOguURVOYXTnQzsTHPrJQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 00/51] 1G page support for guest_memfd
+To: Sean Christopherson <seanjc@google.com>
+Cc: Rick P Edgecombe <rick.p.edgecombe@intel.com>, "pvorel@suse.cz" <pvorel@suse.cz>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, 
+	Jun Miao <jun.miao@intel.com>, "palmer@dabbelt.com" <palmer@dabbelt.com>, 
+	"pdurrant@amazon.co.uk" <pdurrant@amazon.co.uk>, "vbabka@suse.cz" <vbabka@suse.cz>, 
+	"peterx@redhat.com" <peterx@redhat.com>, "x86@kernel.org" <x86@kernel.org>, 
+	"amoorthy@google.com" <amoorthy@google.com>, "tabba@google.com" <tabba@google.com>, 
+	"quic_svaddagi@quicinc.com" <quic_svaddagi@quicinc.com>, "maz@kernel.org" <maz@kernel.org>, 
+	"vkuznets@redhat.com" <vkuznets@redhat.com>, 
+	"anthony.yznaga@oracle.com" <anthony.yznaga@oracle.com>, 
+	"mail@maciej.szmigiero.name" <mail@maciej.szmigiero.name>, 
+	"quic_eberman@quicinc.com" <quic_eberman@quicinc.com>, Wei W Wang <wei.w.wang@intel.com>, 
+	Fan Du <fan.du@intel.com>, 
+	"Wieczor-Retman, Maciej" <maciej.wieczor-retman@intel.com>, Yan Y Zhao <yan.y.zhao@intel.com>, 
+	"ajones@ventanamicro.com" <ajones@ventanamicro.com>, Dave Hansen <dave.hansen@intel.com>, 
+	"paul.walmsley@sifive.com" <paul.walmsley@sifive.com>, 
+	"quic_mnalajal@quicinc.com" <quic_mnalajal@quicinc.com>, "aik@amd.com" <aik@amd.com>, 
+	"usama.arif@bytedance.com" <usama.arif@bytedance.com>, "fvdl@google.com" <fvdl@google.com>, 
+	"jack@suse.cz" <jack@suse.cz>, "quic_cvanscha@quicinc.com" <quic_cvanscha@quicinc.com>, 
+	Kirill Shutemov <kirill.shutemov@intel.com>, "willy@infradead.org" <willy@infradead.org>, 
+	"steven.price@arm.com" <steven.price@arm.com>, "anup@brainfault.org" <anup@brainfault.org>, 
+	"thomas.lendacky@amd.com" <thomas.lendacky@amd.com>, "keirf@google.com" <keirf@google.com>, 
+	"mic@digikod.net" <mic@digikod.net>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "nsaenz@amazon.es" <nsaenz@amazon.es>, 
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, 
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, 
+	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, "muchun.song@linux.dev" <muchun.song@linux.dev>, 
+	Zhiquan1 Li <zhiquan1.li@intel.com>, "rientjes@google.com" <rientjes@google.com>, 
+	Erdem Aktas <erdemaktas@google.com>, "mpe@ellerman.id.au" <mpe@ellerman.id.au>, 
+	"david@redhat.com" <david@redhat.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>, "hughd@google.com" <hughd@google.com>, 
+	"jhubbard@nvidia.com" <jhubbard@nvidia.com>, Haibo1 Xu <haibo1.xu@intel.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>, "jthoughton@google.com" <jthoughton@google.com>, 
+	"rppt@kernel.org" <rppt@kernel.org>, "steven.sistare@oracle.com" <steven.sistare@oracle.com>, 
+	"jarkko@kernel.org" <jarkko@kernel.org>, "quic_pheragu@quicinc.com" <quic_pheragu@quicinc.com>, 
+	"chenhuacai@kernel.org" <chenhuacai@kernel.org>, Kai Huang <kai.huang@intel.com>, 
+	"shuah@kernel.org" <shuah@kernel.org>, "bfoster@redhat.com" <bfoster@redhat.com>, 
+	"dwmw@amazon.co.uk" <dwmw@amazon.co.uk>, Chao P Peng <chao.p.peng@intel.com>, 
+	"pankaj.gupta@amd.com" <pankaj.gupta@amd.com>, Alexander Graf <graf@amazon.com>, 
+	"nikunj@amd.com" <nikunj@amd.com>, "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>, 
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>, 
+	"jroedel@suse.de" <jroedel@suse.de>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, 
+	"jgowans@amazon.com" <jgowans@amazon.com>, Yilun Xu <yilun.xu@intel.com>, 
+	"liam.merwick@oracle.com" <liam.merwick@oracle.com>, "michael.roth@amd.com" <michael.roth@amd.com>, 
+	"quic_tsoni@quicinc.com" <quic_tsoni@quicinc.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, Ira Weiny <ira.weiny@intel.com>, 
+	"richard.weiyang@gmail.com" <richard.weiyang@gmail.com>, 
+	"kent.overstreet@linux.dev" <kent.overstreet@linux.dev>, "qperret@google.com" <qperret@google.com>, 
+	"dmatlack@google.com" <dmatlack@google.com>, "james.morse@arm.com" <james.morse@arm.com>, 
+	"brauner@kernel.org" <brauner@kernel.org>, 
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, 
+	"ackerleytng@google.com" <ackerleytng@google.com>, "pgonda@google.com" <pgonda@google.com>, 
+	"quic_pderrin@quicinc.com" <quic_pderrin@quicinc.com>, "roypat@amazon.co.uk" <roypat@amazon.co.uk>, 
+	"hch@infradead.org" <hch@infradead.org>, "will@kernel.org" <will@kernel.org>, 
+	"linux-mm@kvack.org" <linux-mm@kvack.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jul 09, 2025, Xiaoyao Li wrote:
-> KVM is the primary user of TDX within the kernel, and it is KVM that
-> provides support for running TDX guests.
-> 
-> Add the KVM mailing list to the TDX entry so that KVM people can be
-> informed of proposed changes and updates related to TDX.
-> 
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> ---
+On Tue, Jul 8, 2025 at 11:55=E2=80=AFAM Sean Christopherson <seanjc@google.=
+com> wrote:
+>
+> On Tue, Jul 08, 2025, Rick P Edgecombe wrote:
+> > On Tue, 2025-07-08 at 11:03 -0700, Sean Christopherson wrote:
+> > > > I think there is interest in de-coupling it?
+> > >
+> > > No?
+> >
+> > I'm talking about the intra-host migration/reboot optimization stuff. A=
+nd not
+> > doing a good job, sorry.
+> >
+> > >   Even if we get to a point where multiple distinct VMs can bind to a=
+ single
+> > > guest_memfd, e.g. for inter-VM shared memory, there will still need t=
+o be a
+> > > sole
+> > > owner of the memory.  AFAICT, fully decoupling guest_memfd from a VM =
+would add
+> > > non-trivial complexity for zero practical benefit.
+> >
+> > I'm talking about moving a gmem fd between different VMs or something u=
+sing
+> > KVM_LINK_GUEST_MEMFD [0]. Not advocating to try to support it. But tryi=
+ng to
+> > feel out where the concepts are headed. It kind of allows gmem fds (or =
+just
+> > their source memory?) to live beyond a VM lifecycle.
+>
+> I think the answer is that we want to let guest_memfd live beyond the "st=
+ruct kvm"
+> instance, but not beyond the Virtual Machine.  From a past discussion on =
+this topic[*].
+>
+>  : No go.  Because again, the inode (physical memory) is coupled to the v=
+irtual machine
+>  : as a thing, not to a "struct kvm".  Or more concretely, the inode is c=
+oupled to an
+>  : ASID or an HKID, and there can be multiple "struct kvm" objects associ=
+ated with a
+>  : single ASID.  And at some point in the future, I suspect we'll have mu=
+ltiple KVM
+>  : objects per HKID too.
+>  :
+>  : The current SEV use case is for the migration helper, where two KVM ob=
+jects share
+>  : a single ASID (the "real" VM and the helper).  I suspect TDX will end =
+up with
+>  : similar behavior where helper "VMs" can use the HKID of the "real" VM.=
+  For KVM,
+>  : that means multiple struct kvm objects being associated with a single =
+HKID.
+>  :
+>  : To prevent use-after-free, KVM "just" needs to ensure the helper insta=
+nces can't
+>  : outlive the real instance, i.e. can't use the HKID/ASID after the owni=
+ng virtual
+>  : machine has been destroyed.
+>  :
+>  : To put it differently, "struct kvm" is a KVM software construct that _=
+usually_,
+>  : but not always, is associated 1:1 with a virtual machine.
+>  :
+>  : And FWIW, stashing the pointer without holding a reference would not b=
+e a complete
+>  : solution, because it couldn't guard against KVM reusing a pointer.  E.=
+g. if a
+>  : struct kvm was unbound and then freed, KVM could reuse the same memory=
+ for a new
+>  : struct kvm, with a different ASID/HKID, and get a false negative on th=
+e rebinding
+>  : check.
+>
+> Exactly what that will look like in code is TBD, but the concept/logic ho=
+lds up.
 
-Acked-by: Sean Christopherson <seanjc@google.com>
+I think we can simplify the role of guest_memfd in line with discussion [1]=
+:
+1) guest_memfd is a memory provider for userspace, KVM, IOMMU.
+         - It allows fallocate to populate/deallocate memory
+2) guest_memfd supports the notion of private/shared faults.
+3) guest_memfd supports memory access control:
+         - It allows shared faults from userspace, KVM, IOMMU
+         - It allows private faults from KVM, IOMMU
+4) guest_memfd supports changing access control on its ranges between
+shared/private.
+         - It notifies the users to invalidate their mappings for the
+ranges getting converted/truncated.
+
+Responsibilities that ideally should not be taken up by guest_memfd:
+1) guest_memfd can not initiate pre-faulting on behalf of it's users.
+2) guest_memfd should not be directly communicating with the
+underlying architecture layers.
+         - All communication should go via KVM/IOMMU.
+3) KVM should ideally associate the lifetime of backing
+pagetables/protection tables/RMP tables with the lifetime of the
+binding of memslots with guest_memfd.
+         - Today KVM SNP logic ties RMP table entry lifetimes with how
+long the folios are mapped in guest_memfd, which I think should be
+revisited.
+
+Some very early thoughts on how guest_memfd could be laid out for the long =
+term:
+1) guest_memfd code ideally should be built-in to the kernel.
+2) guest_memfd instances should still be created using KVM IOCTLs that
+carry specific capabilities/restrictions for its users based on the
+backing VM/arch.
+3) Any outgoing communication from guest_memfd to it's users like
+userspace/KVM/IOMMU should be via notifiers to invalidate similar to
+how MMU notifiers work.
+4) KVM and IOMMU can implement intermediate layers to handle
+interaction with guest_memfd.
+     - e.g. there could be a layer within kvm that handles:
+             - creating guest_memfd files and associating a
+kvm_gmem_context with those files.
+             - memslot binding
+                       - kvm_gmem_context will be used to bind kvm
+memslots with the context ranges.
+             - invalidate notifier handling
+                        - kvm_gmem_context will be used to intercept
+guest_memfd callbacks and
+                          translate them to the right GPA ranges.
+             - linking
+                        - kvm_gmem_context can be linked to different
+KVM instances.
+
+This line of thinking can allow cleaner separation between
+guest_memfd/KVM/IOMMU [2].
+
+[1] https://lore.kernel.org/lkml/CAGtprH-+gPN8J_RaEit=3DM_ErHWTmFHeCipC6viT=
+6PHhG3ELg6A@mail.gmail.com/#t
+[2] https://lore.kernel.org/lkml/31beeed3-b1be-439b-8a5b-db8c06dadc30@amd.c=
+om/
+
+
+
+>
+> [*] https://lore.kernel.org/all/ZOO782YGRY0YMuPu@google.com
+>
+> > [0] https://lore.kernel.org/all/cover.1747368092.git.afranji@google.com=
+/
+> > https://lore.kernel.org/kvm/cover.1749672978.git.afranji@google.com/
 
