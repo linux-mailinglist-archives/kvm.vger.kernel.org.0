@@ -1,229 +1,174 @@
-Return-Path: <kvm+bounces-51966-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51977-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28CC8AFECAE
-	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 16:54:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C7E6AFECED
+	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 17:00:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8BCCD544EA6
-	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 14:53:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 971DB6473B9
+	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 15:00:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E2AF2E92C3;
-	Wed,  9 Jul 2025 14:52:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 077342E6D2F;
+	Wed,  9 Jul 2025 15:00:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="i3jxUiF4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MfyKwjx3"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2083.outbound.protection.outlook.com [40.107.96.83])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCFD12E88BB;
-	Wed,  9 Jul 2025 14:52:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.96.83
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752072754; cv=fail; b=M/nf1wSUyJX6D4wxyHs5DwTjw6+zIUwW5b5tjc3j+cXCOitVnvwmm7L53NLsIQ/RAGauFi9QgA4K7B/lIVq1Jdm7KDd4Y+1e59QxjoUojkk8fmKYGYUeI2Wri56PFYtMaZZu4MvjN3WCPrNbaTuKdw9NluDK5PoUNDdJoIx3FK8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752072754; c=relaxed/simple;
-	bh=w2dO5Q3NygYiGcU+DQU9AKzM4BryCrhbdKcJfSotd/4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Mi2y28YKVPEbIGWP4vB1z/P9RL0XlIxBE/kFjP+u34xd96D8mPg50USArtXO6kmTcQOPXpFm4P7vjbEsYTl6nVnEikEDBNpPqjSA5JHKtZsRQCX3TTtdp3MWFQUQs4CIN5RRV5OmM2hFbD359pyhJkLwd/KoTjQ8x2klaZCLBHo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=i3jxUiF4; arc=fail smtp.client-ip=40.107.96.83
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=V4nBIsWLawwjMlXujcQ0mo9Cot+DGeQpyd8kt4W7BjdtB4oGh8xt5uEtUL5zW+PtwXEJOL2TJdLbsulx+j9krwAtxE0TlU/AUk6f6B092CMmIvoNQb9OOstiu8GU8OjQnI7jVTGqGpyHVHzK7B3hxx6XtyN1jIcZebWBrS0p3egMcPIlavawk8B6GqbJXb/0QnaQK9AV48lymjYpCgHF9ppMiwCMEGTS0DK4aZx8BHy121dYr1kAPoSZAhaUXJNB0G6MC5GPhozurcrRW6qTVxKLHM4zIQkEOpjRW+K1mhvNXlyq3gRdAV82oor61GqHesCEwCDcoCVNrGNpDqfGCg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=9eChUcLElPLXFp8Y4tChQPK+79mOueTzGDxAPi0DicU=;
- b=McWpTse0THyqRoiwAvG9iRWRCX07RiMVlJ1U9ttw44IDLMcJHmsnDt7XWJqir3dvU9UB/e0ejsyM3mO5IFXC2JHrm3V4Kzrc2iOpQn0RRG2jSKzmNLGiao9r5ln2xoaBOIXqfv+mzug47mLLzgV0H8sVSaytfDK1sTk2w7eP9NCbYn32moT4drQwiLlQKaBy1ZF5UIX81bq7d/s5ZzD/ikdinn6pDKcam8RcDfdTBgrZydLjqMiOfFKQ3fuhqFAf6Tk9cx6ZoXURqiJGE0nI2wNKzyGmVoICvgpxn6zeLZH/DuNlM+PbJlNzX6ZCDIWNab7PUcL5anCLoDnl4eAJQg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9eChUcLElPLXFp8Y4tChQPK+79mOueTzGDxAPi0DicU=;
- b=i3jxUiF4tEfIO5KZ1VKDiICNADZxlOBBATkHKPCFrCHn+KN1A5oWPcFaoM98HcpXyjxFn5Ia2CvVjx7YqGfMedMZba3+ifrDDZNWij55d4b9+SKtYBXIkrdHtNbbbuXQ5WobUO8SLiUGIHa9nOjB6ISvVfDEqaQ+sJTnv9hy01lr5TnMTr+AZAw6Z0EEuiQ7YphiP5Be/K5BMWhuJJ/WyXIhhz3hgyTNlbPTnUek54sFBuYzPlI5yJSt6K7wQrAApC8udYkLd4DRYDAbmFTOY0qPxljSLipwSfwRUxW+uAVoyhHLsgk5GSjvl+1K0SbcFo4gZ5mKl7woOW6Fv9Gpng==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
- by MN0PR12MB6125.namprd12.prod.outlook.com (2603:10b6:208:3c7::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8901.23; Wed, 9 Jul
- 2025 14:52:23 +0000
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732%7]) with mapi id 15.20.8901.024; Wed, 9 Jul 2025
- 14:52:23 +0000
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Bjorn Helgaas <bhelgaas@google.com>,
-	iommu@lists.linux.dev,
-	Joerg Roedel <joro@8bytes.org>,
-	linux-pci@vger.kernel.org,
-	Robin Murphy <robin.murphy@arm.com>,
-	Will Deacon <will@kernel.org>
-Cc: Alex Williamson <alex.williamson@redhat.com>,
-	Lu Baolu <baolu.lu@linux.intel.com>,
-	galshalom@nvidia.com,
-	Joerg Roedel <jroedel@suse.de>,
-	Kevin Tian <kevin.tian@intel.com>,
-	kvm@vger.kernel.org,
-	maorg@nvidia.com,
-	patches@lists.linux.dev,
-	tdave@nvidia.com,
-	Tony Zhu <tony.zhu@intel.com>
-Subject: [PATCH v2 16/16] PCI: Check ACS Extended flags for pci_bus_isolated()
-Date: Wed,  9 Jul 2025 11:52:19 -0300
-Message-ID: <16-v2-4a9b9c983431+10e2-pcie_switch_groups_jgg@nvidia.com>
-In-Reply-To: <0-v2-4a9b9c983431+10e2-pcie_switch_groups_jgg@nvidia.com>
-References:
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SA9PR13CA0165.namprd13.prod.outlook.com
- (2603:10b6:806:28::20) To CH3PR12MB8659.namprd12.prod.outlook.com
- (2603:10b6:610:17c::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE3482C2ABF
+	for <kvm@vger.kernel.org>; Wed,  9 Jul 2025 15:00:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752073208; cv=none; b=Xkbz/mZvwlIZl7Y79pDZG5zdcfHsxMGtHZ6JfG2X2vP3jjqLenTvYdEeQQltC876VKbWwxrSnuVZYpZ8ra2d0nWirV1kVWDorSUX8kVuZvRxlTHMhytL2K0CfzLD074nNXp04C5H3La/m/tpbRDFTbm7McIuFpVTvJUHpGyTaW4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752073208; c=relaxed/simple;
+	bh=B9Oiu1rYO7kb4Rbx/R2PzIjG/vjXHDSn58ZvxIx3Eng=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=BpFfgD5A7gd++UoGKJ1IGKRzVh3q92yjWt3PMvkSawi3XhbSxQOoSULbJaW+dZk1qkWbEx7vdUeEuk6L9tfysfWowl5ZpfXK3OrAgZoq51ZYKGBXf/X5dKa/YVXFKAMjiknDXE+EhJpXN3ihPs1lizrEClG1DHkpCdYIv47Y1W4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MfyKwjx3; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2369261224bso66645ad.0
+        for <kvm@vger.kernel.org>; Wed, 09 Jul 2025 08:00:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1752073206; x=1752678006; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=EgTnAwf0t/6F9APa2rh1DyKxauhomMCkahh2HJItwX0=;
+        b=MfyKwjx3nX24F99iC2py8lcZG7sdzQhK02cBPPcFo7Hso0DPH0GbdpYt+irMdF8l2z
+         NCR0bAGeK2BozuZaO/bAfffrGPfwV4SKXU+/3Oc7RgfxUU/lk6so04f0uE6Noc3DhEpr
+         9njwESzWnkeWVBrZXvzKpKzyqrOkOLhh3SFY7C17iNzpI+iWHL4VOLT8AKfXS9jQ1F7u
+         mE0Ip19mGChe1OWQAT/adAIbGZolaugq47z+rn9QLtngPRy7Da5UbyJ/8Zv0g+QRwZhQ
+         cklJwMJlgRKVY0dU/JVDh7jV/5thD7xKAZigJF+rpGfO2Ah40u10BihxMhbHu5GW4H6m
+         xmpw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752073206; x=1752678006;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EgTnAwf0t/6F9APa2rh1DyKxauhomMCkahh2HJItwX0=;
+        b=NpUbPSsZbq32n3vh9m2ZR6cEx0BvX2X/zP5TPiU8pbCo2IuoSGydCPglC0jOCGk0g6
+         G8hq2J2+caDZ86yWOhf8uIqNaCM40Dr5yrjcCoRL0qXAOhh+CjhlnXoBLA3Im1ZQDDKn
+         7puc4WwAxzIAkYf1yJXny2TZ9gzCH+jayW4jnI0fmCB3x7oo5V07GDQvDSqTF/VH2E0z
+         CfnabjDYqMYq32Qq+njh509IrLf+/rQkum63mrGxfOwIFUezv+Jnst4xV3YoCti4N5LZ
+         mGEbwKJlSG1i0SgOwYwE0VwjyZ51ce47XHSNKLh4rWJMhWcKNdnw4OtBhqe1/HK8pF3v
+         DkAQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVUYR4PKcdJWRBJfBvcwdJI8EvfDdxYFYH/YjtVVZVzbfXikI3W59J6+r+NwBs4yxe/eQg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxodOqmgfOSaMyecZQ4X2zlJTqmeHDX8aP79H9QFoAUMkY+kgoU
+	PgMg7Z40TCOF+Z9JIP+1j0emgXgEv5sBDBWiQHsMeyi6IcZKMQMUa/Si8mSGVDyjxZPSwkp/RWm
+	2ZR2g9w==
+X-Google-Smtp-Source: AGHT+IGIxCNWDvTXdGWXukQOWTlHDKHcqKhvDakCv68J774ZGhWIyAsbzsp2bcmyGLtmMTkKs6eBKiZcgtc=
+X-Received: from plvv2.prod.google.com ([2002:a17:902:d082:b0:234:3f28:4851])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:2f87:b0:235:e96b:191c
+ with SMTP id d9443c01a7336-23ddb34fa56mr52368805ad.29.1752073205780; Wed, 09
+ Jul 2025 08:00:05 -0700 (PDT)
+Date: Wed, 9 Jul 2025 08:00:04 -0700
+In-Reply-To: <CAGtprH86N7XgEXq0UyOexjVRXYV1KdOguURVOYXTnQzsTHPrJQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|MN0PR12MB6125:EE_
-X-MS-Office365-Filtering-Correlation-Id: 81115552-b875-4807-01ee-08ddbef835d0
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?4n289W9yq3oaapTogA6qFq47wPg1TpiTlyvmK+Nu7Svs6ljaLHCBpLYXMjlp?=
- =?us-ascii?Q?kMOaVzqkVGTU1sYhkoJkw72qcUaiW5MFF0GJ93PMSExbNAzQEmHVqCfQyB9m?=
- =?us-ascii?Q?ZoykwN5+XHyeykLPNmv+uhaN/g/tRzwrL/TpNKF8TT4NfXSvemlLwzk2PYNa?=
- =?us-ascii?Q?vHKxZVYYPlihrw53dLAk+wYgmz1PJocQYb4EDme/aElnWMwa1idiBXQq5kq6?=
- =?us-ascii?Q?7Dt6EusS+tlB7Xae7B22nQ+BaheaMgh1q7y60U8FVf5zqlZluFZOKomFVk5E?=
- =?us-ascii?Q?zYv+hay8XT5CjTVF228JxsIqs7dUTPxlTtiXv9WgAq/T4/LyXkZXgNm+Wqc5?=
- =?us-ascii?Q?TzYYTL8kvuhdcQEXYWRr8mT+nW5de4ipyCBEjHJbN6jRNMBRIussg08Pb3Ho?=
- =?us-ascii?Q?UkEASMTQc6jW3+UvhyAnmajfBhJ8L9Fv+IgIErOdqqa+6MDlPoqjNH3BT7Rq?=
- =?us-ascii?Q?mn/EyoHKIEbm51z4OnJtUORCnfQEMcvdhohjnq4gzov/tg3pcI6ILz/R4uy5?=
- =?us-ascii?Q?rNX0apuy2571Z3CfyWlT/ltbatkoP1+P7QS4UPZ0qzEekOcFB/Ghx3WoipIF?=
- =?us-ascii?Q?RdA45QTUhf2Cbz9yH2Ygpc7CL0e/q9VPuKwV/MCrxg/ELEedhVvnltHg29n2?=
- =?us-ascii?Q?b24BLih39orY8rX5egLXcYZ6L9uG4JH5M2sd6TiXK6mWPdHj/JpNDsQIaKMS?=
- =?us-ascii?Q?ARMgsRvzND91uM0CgHXouPkkj5VstP6/ZwzRbcE4j5OmDoutYEatWfJR7oAi?=
- =?us-ascii?Q?jb7e/53/L9YraP3RTC8A50NlfapPWANDkk2I++8siyeEzNi6RDWFdNmgcj47?=
- =?us-ascii?Q?5ivi0OamneXJVE+rp1y4Cq/NqpUh9TnekTfPeGaZDC5ujvZygp4ALdiGFI55?=
- =?us-ascii?Q?EZnuFSLE9qlcrhlsEcwKr8/v/2dErslhbAbBZOIW54mJgNfriXF57RjkAHUQ?=
- =?us-ascii?Q?Z1pmpaXwYRsmBlWc9kko47KbtWG7cBP2HrkkeEb28s+5SwtKsJsWZImt+roO?=
- =?us-ascii?Q?5vqt+DI2KELyf4t0fUkYCWlzS+As9jP8H+7Ra/8vpXoiFA2rA/GoEvovZEp8?=
- =?us-ascii?Q?OW6rQ/MoB7/ubFb13vmzd6HWndmPzly0GYOqpG9QJSapyP+RqUaji5Sj44an?=
- =?us-ascii?Q?1T/6ve2CoSYPL0k3eaDiOHa9335Ia2jEjvuMw+6bhfEGznrR++JG8f3Bf7zj?=
- =?us-ascii?Q?JKmQAn0EYfWvvv1zSbiaDiGNGYD0oZ61tFe87JIy6v/wHTRGWjnRQwrAMe6N?=
- =?us-ascii?Q?o1DmNWDHoUKNsECRBCz4Kh0EB0eAhr5wVnhqNMcMB4yMZIF2jfrCUFG45pSM?=
- =?us-ascii?Q?EwG39wVyagPNRxLzYNIZhtM6QJvD0MHzbEf9y/X6UcgVQZmBvFlj/riZ1dNb?=
- =?us-ascii?Q?qAIzaQ9R4X3eEBJmEqeZNC7FgowjJbyFv4d68df4MjaedLVLVpgdVunJlcaT?=
- =?us-ascii?Q?l401nfesoTA=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?+FoKeeBAXTC1/84DRFxVPKg6Yuz+o5fXbPTYo343yTxBbRNxy6du5o4HV++M?=
- =?us-ascii?Q?232QybW5llu5mqlysXtJL/Y5B5VYcaRW7nyHUAgWIR1zGRQQitssYsn105K6?=
- =?us-ascii?Q?QsiCQQXiypQvmVBw/7ldOGpbqx7ADTWNU4rBQ1qiuD1XmfbFVXICD2FRGqw4?=
- =?us-ascii?Q?eblSBRmqFUKwIJresx1Ai2InPlDlE/6U+tToRxC47qqghgpuKMuU2gA7XAzb?=
- =?us-ascii?Q?GriejXoZU4ZKjEq7SK8BQvOX+9NbJU5KCcisRVjBD9O33Rd6yoUvTjHaR0vU?=
- =?us-ascii?Q?G/Adx3BEN4hfda9NzHeBclOFodNaJPUhbB3UILxeLn7JqVdUxPhQ8ZnfML3f?=
- =?us-ascii?Q?sOJZK4qecNLQyXI5dcA8jt7gS/Wk4N2EMvzZkahE5zu1N7lsApFZdvZVwq2V?=
- =?us-ascii?Q?qgG0o5MrEmk7UtzU1J9d1RlaKrpANonCsiUcB9FbEDP9S9wUZafI/MLf+4Lb?=
- =?us-ascii?Q?3FPu0fQ9o/33hSD1tPzQlUuwYwK1wgDlrwukAAIAdAsZyghRxl0naoP+NUmz?=
- =?us-ascii?Q?Oz8nxyMclYGSxKIybI7ZNAT8FogjDTEDcZBsHzyNKaPbYSUkQV9LmRiwu3PI?=
- =?us-ascii?Q?WlhRU553+ssn0A13wHbSdzQAe0lhcwaj3BxpKF6fWi5HYCnea9/u3zitMqR4?=
- =?us-ascii?Q?zWTPr+MsZn/cw7FFcVXSV1jYssOvqyCn4VHIZ/EUtjjuzU1BAe3bIZ+3/Ic/?=
- =?us-ascii?Q?vzIntiWnSCC5FrEnieVHhDC5c1wVx7YESELCKtuJaVZtdTIdiToHmvDy/3f6?=
- =?us-ascii?Q?ixaKErBxJ1Sf5JH1k46dQ6JHuP5LRirk0OEbvnEIFbLmdFZQV5JWBkOyJoME?=
- =?us-ascii?Q?V1GkwYdRC2yDPHxT2MkwpLA17Qtn4vVCJNiiOS1C9De3uDxoAe/ORy+8yW1i?=
- =?us-ascii?Q?z3I6K6lmUjKVA3v7uiFmdmIXYwD3MFqjj2GWqU+2rFVPOiTY9EK1nkzuK1TW?=
- =?us-ascii?Q?PRvgd5Qjc0++4QN/F39GG5P80xW+8SId1Sumjs4zr16pM11w5z1bUPJdGkLo?=
- =?us-ascii?Q?UMU35HHT3T89/1rQJXCwJGaQ3KIGGLcV0kvnq0SYNigTzL0q7Pe02Q0v6VuC?=
- =?us-ascii?Q?Zcyef+0Lh0Q+ZOg8RxjWVT5Qa3OjIjB1wDT38AfRMgR8oDZtYhpHH/nwNkeR?=
- =?us-ascii?Q?/OKoWDDzxazREl8gSUyRNGzPDQ+J24iTR/IaCNwu0pcwhA7dwpMNp2Mf0IYZ?=
- =?us-ascii?Q?vw1akpu8HXSzQDNK0KBlnKtfXgGfgT9FmTobc9ipdrdoafKCrVe1p2hAswsA?=
- =?us-ascii?Q?A/pQUlU2Wle4YxXMNiUB6YByTY7ZD7Bos0aOPBbjcEcMaq8DF6fZonQw3hzL?=
- =?us-ascii?Q?gC52ielWZYNfU2dIbkBHu9nfmKaNDJnpxLzCz9pYInmdh8W0J0zGHMZVf08w?=
- =?us-ascii?Q?4GQRQ9gX77qNqs8EY5+N0byZ5PtWr4t3nPBN6MnQJzQmbbUC3/wFQU+o8v7E?=
- =?us-ascii?Q?3kADsvS8PhV9iqh3118SXS+LQSi3+GQcei8HxHH523K+4YgwGAd+W45c1GU7?=
- =?us-ascii?Q?rKFQlnTpLKfXSwPbOuCpkXW0RYp0el0/SJAWk0Cyc/0Ckw5jrHU3TPgLHzFS?=
- =?us-ascii?Q?9HyN7t1TTdyy3UICyfPJTuadnmFsUcZjhRw6kOth?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 81115552-b875-4807-01ee-08ddbef835d0
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jul 2025 14:52:22.2722
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: xtE324kw0qe5ELMB7+ZTysLZhqCIX3VVSEVCmswby77q4wBtCyhC6qCSW1T9EuXN
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6125
+Mime-Version: 1.0
+References: <aG0pNijVpl0czqXu@google.com> <a0129a912e21c5f3219b382f2f51571ab2709460.camel@intel.com>
+ <CAGtprH8ozWpFLa2TSRLci-SgXRfJxcW7BsJSYOxa4Lgud+76qQ@mail.gmail.com>
+ <eeb8f4b8308b5160f913294c4373290a64e736b8.camel@intel.com>
+ <CAGtprH8cg1HwuYG0mrkTbpnZfHoKJDd63CAQGEScCDA-9Qbsqw@mail.gmail.com>
+ <b1348c229c67e2bad24e273ec9a7fc29771e18c5.camel@intel.com>
+ <aG1dbD2Xnpi_Cqf_@google.com> <5decd42b3239d665d5e6c5c23e58c16c86488ca8.camel@intel.com>
+ <aG1ps4uC4jyr8ED1@google.com> <CAGtprH86N7XgEXq0UyOexjVRXYV1KdOguURVOYXTnQzsTHPrJQ@mail.gmail.com>
+Message-ID: <aG6D9NqG0r6iKPL0@google.com>
+Subject: Re: [RFC PATCH v2 00/51] 1G page support for guest_memfd
+From: Sean Christopherson <seanjc@google.com>
+To: Vishal Annapurve <vannapurve@google.com>
+Cc: Rick P Edgecombe <rick.p.edgecombe@intel.com>, "pvorel@suse.cz" <pvorel@suse.cz>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, 
+	Jun Miao <jun.miao@intel.com>, "palmer@dabbelt.com" <palmer@dabbelt.com>, 
+	"pdurrant@amazon.co.uk" <pdurrant@amazon.co.uk>, "vbabka@suse.cz" <vbabka@suse.cz>, 
+	"peterx@redhat.com" <peterx@redhat.com>, "x86@kernel.org" <x86@kernel.org>, 
+	"amoorthy@google.com" <amoorthy@google.com>, "tabba@google.com" <tabba@google.com>, 
+	"quic_svaddagi@quicinc.com" <quic_svaddagi@quicinc.com>, "maz@kernel.org" <maz@kernel.org>, 
+	"vkuznets@redhat.com" <vkuznets@redhat.com>, 
+	"anthony.yznaga@oracle.com" <anthony.yznaga@oracle.com>, 
+	"mail@maciej.szmigiero.name" <mail@maciej.szmigiero.name>, 
+	"quic_eberman@quicinc.com" <quic_eberman@quicinc.com>, Wei W Wang <wei.w.wang@intel.com>, 
+	Fan Du <fan.du@intel.com>, 
+	"Wieczor-Retman, Maciej" <maciej.wieczor-retman@intel.com>, Yan Y Zhao <yan.y.zhao@intel.com>, 
+	"ajones@ventanamicro.com" <ajones@ventanamicro.com>, Dave Hansen <dave.hansen@intel.com>, 
+	"paul.walmsley@sifive.com" <paul.walmsley@sifive.com>, 
+	"quic_mnalajal@quicinc.com" <quic_mnalajal@quicinc.com>, "aik@amd.com" <aik@amd.com>, 
+	"usama.arif@bytedance.com" <usama.arif@bytedance.com>, "fvdl@google.com" <fvdl@google.com>, 
+	"jack@suse.cz" <jack@suse.cz>, "quic_cvanscha@quicinc.com" <quic_cvanscha@quicinc.com>, 
+	Kirill Shutemov <kirill.shutemov@intel.com>, "willy@infradead.org" <willy@infradead.org>, 
+	"steven.price@arm.com" <steven.price@arm.com>, "anup@brainfault.org" <anup@brainfault.org>, 
+	"thomas.lendacky@amd.com" <thomas.lendacky@amd.com>, "keirf@google.com" <keirf@google.com>, 
+	"mic@digikod.net" <mic@digikod.net>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "nsaenz@amazon.es" <nsaenz@amazon.es>, 
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, 
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, 
+	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, "muchun.song@linux.dev" <muchun.song@linux.dev>, 
+	Zhiquan1 Li <zhiquan1.li@intel.com>, "rientjes@google.com" <rientjes@google.com>, 
+	Erdem Aktas <erdemaktas@google.com>, "mpe@ellerman.id.au" <mpe@ellerman.id.au>, 
+	"david@redhat.com" <david@redhat.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>, "hughd@google.com" <hughd@google.com>, 
+	"jhubbard@nvidia.com" <jhubbard@nvidia.com>, Haibo1 Xu <haibo1.xu@intel.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>, "jthoughton@google.com" <jthoughton@google.com>, 
+	"rppt@kernel.org" <rppt@kernel.org>, "steven.sistare@oracle.com" <steven.sistare@oracle.com>, 
+	"jarkko@kernel.org" <jarkko@kernel.org>, "quic_pheragu@quicinc.com" <quic_pheragu@quicinc.com>, 
+	"chenhuacai@kernel.org" <chenhuacai@kernel.org>, Kai Huang <kai.huang@intel.com>, 
+	"shuah@kernel.org" <shuah@kernel.org>, "bfoster@redhat.com" <bfoster@redhat.com>, 
+	"dwmw@amazon.co.uk" <dwmw@amazon.co.uk>, Chao P Peng <chao.p.peng@intel.com>, 
+	"pankaj.gupta@amd.com" <pankaj.gupta@amd.com>, Alexander Graf <graf@amazon.com>, 
+	"nikunj@amd.com" <nikunj@amd.com>, "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>, 
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>, 
+	"jroedel@suse.de" <jroedel@suse.de>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, 
+	"jgowans@amazon.com" <jgowans@amazon.com>, Yilun Xu <yilun.xu@intel.com>, 
+	"liam.merwick@oracle.com" <liam.merwick@oracle.com>, "michael.roth@amd.com" <michael.roth@amd.com>, 
+	"quic_tsoni@quicinc.com" <quic_tsoni@quicinc.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, Ira Weiny <ira.weiny@intel.com>, 
+	"richard.weiyang@gmail.com" <richard.weiyang@gmail.com>, 
+	"kent.overstreet@linux.dev" <kent.overstreet@linux.dev>, "qperret@google.com" <qperret@google.com>, 
+	"dmatlack@google.com" <dmatlack@google.com>, "james.morse@arm.com" <james.morse@arm.com>, 
+	"brauner@kernel.org" <brauner@kernel.org>, 
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, 
+	"ackerleytng@google.com" <ackerleytng@google.com>, "pgonda@google.com" <pgonda@google.com>, 
+	"quic_pderrin@quicinc.com" <quic_pderrin@quicinc.com>, "roypat@amazon.co.uk" <roypat@amazon.co.uk>, 
+	"hch@infradead.org" <hch@infradead.org>, "will@kernel.org" <will@kernel.org>, 
+	"linux-mm@kvack.org" <linux-mm@kvack.org>
+Content-Type: text/plain; charset="us-ascii"
 
-When looking at a PCIe switch we want to see that the USP/DSP MMIO have
-request redirect enabled. Detect the case where the USP is expressly not
-isolated from the DSP and ensure the USP is included in the group.
+On Wed, Jul 09, 2025, Vishal Annapurve wrote:
+> I think we can simplify the role of guest_memfd in line with discussion [1]:
 
-The DSP Memory Target also applies to the Root Port, check it there
-too. If upstream directed transactions can reach the root port MMIO then
-it is not isolated.
+I genuinely don't understand what you're trying to "simplify".  We need to define
+an ABI that is flexible and robust, but beyond that most of these guidelines boil
+down to "don't write bad code".
 
-Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
----
- drivers/pci/search.c | 16 +++++++++++++---
- 1 file changed, 13 insertions(+), 3 deletions(-)
+> 1) guest_memfd is a memory provider for userspace, KVM, IOMMU.
 
-diff --git a/drivers/pci/search.c b/drivers/pci/search.c
-index 2be6881087b335..7425680fe92d60 100644
---- a/drivers/pci/search.c
-+++ b/drivers/pci/search.c
-@@ -127,6 +127,8 @@ static enum pci_bus_isolation pcie_switch_isolated(struct pci_bus *bus)
- 	 * traffic flowing upstream back downstream through another DSP.
- 	 *
- 	 * Thus any non-permissive DSP spoils the whole bus.
-+	 * PCI_ACS_UNCLAIMED_RR is not required since rejecting requests with
-+	 * error is still isolation.
- 	 */
- 	guard(rwsem_read)(&pci_bus_sem);
- 	list_for_each_entry(pdev, &bus->devices, bus_list) {
-@@ -136,8 +138,14 @@ static enum pci_bus_isolation pcie_switch_isolated(struct pci_bus *bus)
- 		    pdev->dma_alias_mask)
- 			return PCIE_NON_ISOLATED;
- 
--		if (!pci_acs_enabled(pdev, PCI_ACS_ISOLATED))
-+		if (!pci_acs_enabled(pdev, PCI_ACS_ISOLATED |
-+						   PCI_ACS_DSP_MT_RR |
-+						   PCI_ACS_USP_MT_RR)) {
-+			/* The USP is isolated from the DSP */
-+			if (!pci_acs_enabled(pdev, PCI_ACS_USP_MT_RR))
-+				return PCIE_NON_ISOLATED;
- 			return PCIE_SWITCH_DSP_NON_ISOLATED;
-+		}
- 	}
- 	return PCIE_ISOLATED;
- }
-@@ -231,11 +239,13 @@ enum pci_bus_isolation pci_bus_isolated(struct pci_bus *bus)
- 	switch (type) {
- 	/*
- 	 * Since PCIe links are point to point root and downstream ports are
--	 * isolated if their own MMIO cannot be reached.
-+	 * isolated if their own MMIO cannot be reached. The root port
-+	 * uses DSP_MT_RR for its own MMIO.
- 	 */
- 	case PCI_EXP_TYPE_ROOT_PORT:
- 	case PCI_EXP_TYPE_DOWNSTREAM:
--		if (!pci_acs_enabled(bridge, PCI_ACS_ISOLATED))
-+		if (!pci_acs_enabled(bridge,
-+				     PCI_ACS_ISOLATED | PCI_ACS_DSP_MT_RR))
- 			return PCIE_NON_ISOLATED;
- 		return PCIE_ISOLATED;
- 
--- 
-2.43.0
+No, guest_memfd is a memory provider for KVM guests.  That memory *might* be
+mapped by userspace and/or into IOMMU page tables in order out of functional
+necessity, but guest_memfd exists solely to serve memory to KVM guests, full stop.
 
+> 3) KVM should ideally associate the lifetime of backing
+> pagetables/protection tables/RMP tables with the lifetime of the
+> binding of memslots with guest_memfd.
+
+Again, please align your indentation.
+
+>          - Today KVM SNP logic ties RMP table entry lifetimes with how
+>            long the folios are mapped in guest_memfd, which I think should be
+>            revisited.
+
+Why?  Memslots are ephemeral per-"struct kvm" mappings.  RMP entries and guest_memfd
+inodes are tied to the Virtual Machine, not to the "struct kvm" instance.
+
+> Some very early thoughts on how guest_memfd could be laid out for the long term:
+> 1) guest_memfd code ideally should be built-in to the kernel.
+
+Why?  How is this at all relevant?  If we need to bake some parts of guest_memfd
+into the kernel in order to avoid nasty exports and/or ordering dependencies, then
+we can do so.  But that is 100% an implementation detail and in no way a design
+goal.
 
