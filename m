@@ -1,76 +1,62 @@
-Return-Path: <kvm+bounces-51958-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51959-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6673DAFEC89
-	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 16:49:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71142AFEC90
+	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 16:51:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6626644826
-	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 14:49:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05EF65A1E92
+	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 14:50:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D7432E54D8;
-	Wed,  9 Jul 2025 14:49:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Rw+tz0Vo"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 865FF2E62AB;
+	Wed,  9 Jul 2025 14:49:50 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDDAD1C32FF;
-	Wed,  9 Jul 2025 14:49:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75CA22E611F;
+	Wed,  9 Jul 2025 14:49:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752072571; cv=none; b=RvFtG+kB7UNeaEUHhaCQlKJNbFNIPaceL3Ms0YCuRGBWmmew6evjAKGp4N3bMT6bkkaTCNhUARIVVze1qMBJ3v2RFZJvmtemyvRZ5tuUMGknsJTCZDctpJKeOm7tsgpf38Apt54G3R/G+2S7EpiLqvmZD13A1f5vh/FEF3iPOk0=
+	t=1752072590; cv=none; b=gI7PMfk8rpD54VnYspMPc1rqcJsWeITRualaxOLCmgw1e5c1Xwv51ExJZXI1Lb0qcs2y99tnIXsSczfuz8aloO7bBnNOOZZhmYSlVmr9xq36dclKdeDoE5S9hLl141RaCukIxadcSneVA14G6n83OSyD0VzQ+vGNNHV8Y+6/sFE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752072571; c=relaxed/simple;
-	bh=xSvl9CF1jwzTxynZwjFnyiil9ZqCw6GWmeWc8+RV6Ig=;
+	s=arc-20240116; t=1752072590; c=relaxed/simple;
+	bh=CBaf9D1Y5jz2uqiBK+j/ZZJ39e77o1iEu4tYrP0yisE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EcEi8pl+7wgJKgvSxgF/o1ftjboo7HsMZSVqr/dpznPQTIDOZvjLPYnbVT/SzB6obfd6SISbMikIq9tWMjyauLfR0HLgWMeLASM9c9P0A6klJB8scUKXILtGk09WL0ybiHte0t3eaNfGBjhOjAicIn7NEbwtccmO1SE3VLRGIm4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Rw+tz0Vo; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752072570; x=1783608570;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=xSvl9CF1jwzTxynZwjFnyiil9ZqCw6GWmeWc8+RV6Ig=;
-  b=Rw+tz0VoF7w4Qh63wXNnkdDB81T1tdU0DPgwWyEJHTSlxU1i4y62vpoO
-   gc4UYWD2UR4RgGs3HVgqgx3H02bvuUWMttkkkZrKYnx20IGvmr0cdV4qO
-   RvMw+O6m4mvR+3mc/keB505y3r90kUM7/tmGDVgBRMyWjqonEi5ndTpnD
-   +TPoiCbeUNUDBJui+31U5+AKqn7MubUHDs+M3HG6rZQC17j1biAcGa5e+
-   GzedySpYUJOU7PcUM/QAks1vT7WuUrO9pCD5CeRoxcgNCwoIGwJmR9PFE
-   W+0eTpl6am1HrF9uNGFnfvWC72NcVH/48oqkfqXo+RienYSKFCBUcO/f9
-   w==;
-X-CSE-ConnectionGUID: T/vd+8vXS0i7RCZ0b9cofA==
-X-CSE-MsgGUID: HxFgaz6CSieE9S29ZPrJbw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11489"; a="71782705"
-X-IronPort-AV: E=Sophos;i="6.16,298,1744095600"; 
-   d="scan'208";a="71782705"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2025 07:49:30 -0700
-X-CSE-ConnectionGUID: b6ledUAKSMeLI8Nv3S2uKw==
-X-CSE-MsgGUID: 9PZQ7DKfQwOwHS70iJ4o0w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,298,1744095600"; 
-   d="scan'208";a="156281138"
-Received: from black.fi.intel.com ([10.237.72.28])
-  by orviesa008.jf.intel.com with ESMTP; 09 Jul 2025 07:49:25 -0700
-Received: by black.fi.intel.com (Postfix, from userid 1000)
-	id 112C91B7; Wed, 09 Jul 2025 17:49:23 +0300 (EEST)
-Date: Wed, 9 Jul 2025 17:49:23 +0300
-From: "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: Dave Hansen <dave.hansen@linux.intel.com>, 
-	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Rick Edgecombe <rick.p.edgecombe@intel.com>, "H . Peter Anvin" <hpa@zytor.com>, x86@kernel.org, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-coco@lists.linux.dev
-Subject: Re: [PATCH] MAINTAINERS: Add KVM mail list to the TDX entry
-Message-ID: <4w73ozniubjoqgd636q6lohdxvcg2ryp4tlje6cm66rxjadjlr@jwxtq4lez6dl>
-References: <20250709141035.70299-1-xiaoyao.li@intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=aBequ1ZWkHTdZAQxQVQX+kstLEoE3247krkAr3q1slW/qA1lNKjC0GxAVre9UDwoUMaKVgqURXsQd/h7S3fYkQipXiAO78IBp35iVgV1mRSzXZ+LhdUBWk+Ve5wcthW1lxDaWTXokfSM9y8zq4deldolFqRPV1CwC58UU8qpNXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5D191339;
+	Wed,  9 Jul 2025 07:49:36 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 62BBD3F694;
+	Wed,  9 Jul 2025 07:49:44 -0700 (PDT)
+Date: Wed, 9 Jul 2025 15:49:39 +0100
+From: Joey Gouly <joey.gouly@arm.com>
+To: Steven Price <steven.price@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
+	Emi Kisanuki <fj0570is@fujitsu.com>
+Subject: Re: [PATCH v9 14/43] KVM: arm64: Support timers in realm RECs
+Message-ID: <20250709144939.GA2753450@e124191.cambridge.arm.com>
+References: <20250611104844.245235-1-steven.price@arm.com>
+ <20250611104844.245235-15-steven.price@arm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -79,19 +65,184 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250709141035.70299-1-xiaoyao.li@intel.com>
+In-Reply-To: <20250611104844.245235-15-steven.price@arm.com>
 
-On Wed, Jul 09, 2025 at 10:10:35PM +0800, Xiaoyao Li wrote:
-> KVM is the primary user of TDX within the kernel, and it is KVM that
-> provides support for running TDX guests.
+Hi Steven,
+
+On Wed, Jun 11, 2025 at 11:48:11AM +0100, Steven Price wrote:
+> The RMM keeps track of the timer while the realm REC is running, but on
+> exit to the normal world KVM is responsible for handling the timers.
 > 
-> Add the KVM mailing list to the TDX entry so that KVM people can be
-> informed of proposed changes and updates related to TDX.
+> The RMM doesn't provide a mechanism to set the counter offset, so don't
+> expose KVM_CAP_COUNTER_OFFSET for a realm VM.
 > 
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> A later patch adds the support for propagating the timer values from the
+> exit data structure and calling kvm_realm_timers_update().
+> 
+> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+> Changes since v7:
+>  * Hide KVM_CAP_COUNTER_OFFSET for realm guests.
+> ---
+>  arch/arm64/kvm/arch_timer.c  | 48 +++++++++++++++++++++++++++++++++---
+>  arch/arm64/kvm/arm.c         |  2 +-
+>  include/kvm/arm_arch_timer.h |  2 ++
+>  3 files changed, 47 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> index fdbc8beec930..7f8705d6fdf5 100644
+> --- a/arch/arm64/kvm/arch_timer.c
+> +++ b/arch/arm64/kvm/arch_timer.c
+> @@ -148,6 +148,13 @@ static void timer_set_cval(struct arch_timer_context *ctxt, u64 cval)
+>  
+>  static void timer_set_offset(struct arch_timer_context *ctxt, u64 offset)
+>  {
+> +	struct kvm_vcpu *vcpu = ctxt->vcpu;
+> +
+> +	if (kvm_is_realm(vcpu->kvm)) {
+> +		WARN_ON(offset);
+> +		return;
+> +	}
+> +
+>  	if (!ctxt->offset.vm_offset) {
+>  		WARN(offset, "timer %ld\n", arch_timer_ctx_index(ctxt));
+>  		return;
+> @@ -462,6 +469,21 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
+>  			    timer_ctx);
+>  }
+>  
+> +void kvm_realm_timers_update(struct kvm_vcpu *vcpu)
+> +{
+> +	struct arch_timer_cpu *arch_timer = &vcpu->arch.timer_cpu;
+> +	int i;
+> +
+> +	for (i = 0; i < NR_KVM_EL0_TIMERS; i++) {
+> +		struct arch_timer_context *timer = &arch_timer->timers[i];
+> +		bool status = timer_get_ctl(timer) & ARCH_TIMER_CTRL_IT_STAT;
+> +		bool level = kvm_timer_irq_can_fire(timer) && status;
+> +
+> +		if (level != timer->irq.level)
+> +			kvm_timer_update_irq(vcpu, level, timer);
+> +	}
+> +}
+> +
+>  /* Only called for a fully emulated timer */
+>  static void timer_emulate(struct arch_timer_context *ctx)
+>  {
+> @@ -870,6 +892,8 @@ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
+>  	if (unlikely(!timer->enabled))
+>  		return;
+>  
+> +	kvm_timer_unblocking(vcpu);
+> +
+>  	get_timer_map(vcpu, &map);
+>  
+>  	if (static_branch_likely(&has_gic_active_state)) {
+> @@ -883,8 +907,6 @@ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
+>  		kvm_timer_vcpu_load_nogic(vcpu);
+>  	}
+>  
+> -	kvm_timer_unblocking(vcpu);
+> -
 
-Acked-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+The change here to move kvm_timer_unblocking() looks unnecessary, as the change
+to add an early return in kvm_timer_enable() causes timer->enable to never be
+set to 1.  Since it is never set, kvm_timer_vcpu_load() will return early
+before this call to kvm_timer_unblocking().
 
--- 
-  Kiryl Shutsemau / Kirill A. Shutemov
+Thanks,
+Joey
+
+>  	timer_restore_state(map.direct_vtimer);
+>  	if (map.direct_ptimer)
+>  		timer_restore_state(map.direct_ptimer);
+> @@ -1065,7 +1087,9 @@ static void timer_context_init(struct kvm_vcpu *vcpu, int timerid)
+>  
+>  	ctxt->vcpu = vcpu;
+>  
+> -	if (timerid == TIMER_VTIMER)
+> +	if (kvm_is_realm(vcpu->kvm))
+> +		ctxt->offset.vm_offset = NULL;
+> +	else if (timerid == TIMER_VTIMER)
+>  		ctxt->offset.vm_offset = &kvm->arch.timer_data.voffset;
+>  	else
+>  		ctxt->offset.vm_offset = &kvm->arch.timer_data.poffset;
+> @@ -1087,13 +1111,19 @@ static void timer_context_init(struct kvm_vcpu *vcpu, int timerid)
+>  void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
+>  {
+>  	struct arch_timer_cpu *timer = vcpu_timer(vcpu);
+> +	u64 cntvoff;
+>  
+>  	for (int i = 0; i < NR_KVM_TIMERS; i++)
+>  		timer_context_init(vcpu, i);
+>  
+> +	if (kvm_is_realm(vcpu->kvm))
+> +		cntvoff = 0;
+> +	else
+> +		cntvoff = kvm_phys_timer_read();
+> +
+>  	/* Synchronize offsets across timers of a VM if not already provided */
+>  	if (!test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &vcpu->kvm->arch.flags)) {
+> -		timer_set_offset(vcpu_vtimer(vcpu), kvm_phys_timer_read());
+> +		timer_set_offset(vcpu_vtimer(vcpu), cntvoff);
+>  		timer_set_offset(vcpu_ptimer(vcpu), 0);
+>  	}
+>  
+> @@ -1633,6 +1663,13 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
+>  		return -EINVAL;
+>  	}
+>  
+> +	/*
+> +	 * We don't use mapped IRQs for Realms because the RMI doesn't allow
+> +	 * us setting the LR.HW bit in the VGIC.
+> +	 */
+> +	if (vcpu_is_rec(vcpu))
+> +		return 0;
+> +
+>  	get_timer_map(vcpu, &map);
+>  
+>  	ret = kvm_vgic_map_phys_irq(vcpu,
+> @@ -1764,6 +1801,9 @@ int kvm_vm_ioctl_set_counter_offset(struct kvm *kvm,
+>  	if (offset->reserved)
+>  		return -EINVAL;
+>  
+> +	if (kvm_is_realm(kvm))
+> +		return -EINVAL;
+> +
+>  	mutex_lock(&kvm->lock);
+>  
+>  	if (!kvm_trylock_all_vcpus(kvm)) {
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 0cdcc2ca4a88..6a5c9be4af2d 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -350,10 +350,10 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  	case KVM_CAP_PTP_KVM:
+>  	case KVM_CAP_ARM_SYSTEM_SUSPEND:
+>  	case KVM_CAP_IRQFD_RESAMPLE:
+> -	case KVM_CAP_COUNTER_OFFSET:
+>  	case KVM_CAP_ARM_WRITABLE_IMP_ID_REGS:
+>  		r = 1;
+>  		break;
+> +	case KVM_CAP_COUNTER_OFFSET:
+>  	case KVM_CAP_SET_GUEST_DEBUG:
+>  		r = !kvm_is_realm(kvm);
+>  		break;
+> diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+> index 681cf0c8b9df..f64e317c091b 100644
+> --- a/include/kvm/arm_arch_timer.h
+> +++ b/include/kvm/arm_arch_timer.h
+> @@ -113,6 +113,8 @@ int kvm_arm_timer_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
+>  int kvm_arm_timer_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
+>  int kvm_arm_timer_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
+>  
+> +void kvm_realm_timers_update(struct kvm_vcpu *vcpu);
+> +
+>  u64 kvm_phys_timer_read(void);
+>  
+>  void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu);
+> -- 
+> 2.43.0
+> 
 
