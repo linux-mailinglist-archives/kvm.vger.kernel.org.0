@@ -1,123 +1,100 @@
-Return-Path: <kvm+bounces-51879-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51880-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C9EEAFE010
-	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 08:41:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 27D5FAFE092
+	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 08:53:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5AFE97AE58A
-	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 06:39:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 895377B86D0
+	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 06:50:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97E0D26C393;
-	Wed,  9 Jul 2025 06:40:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="k6q9S1b0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F13B726CE04;
+	Wed,  9 Jul 2025 06:50:29 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B18126B2D7;
-	Wed,  9 Jul 2025 06:40:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A40BB29B0;
+	Wed,  9 Jul 2025 06:50:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752043255; cv=none; b=lDw6+y4EH/aWh9L7e4epLOQg4v9poayyQ+duj+1BDZ+38pq8myzeuLX6IGYudoz/LQ3i34pd+tVACNDWKe1upqP8kX5Ed53Ptn7Oaj1+pak2axV1a74vHcona73xhOSCjmwBwStNNMhfgfBgddNxTEeYfH8hQeKfkPbMlgr89/A=
+	t=1752043829; cv=none; b=ijMI76LCAWjV/Zg0UO3z24L7jGHG0PTeOxO0yvM5lUB6zPnj6N1QNEWOXg+X+t7qJ9RqggSbN88LUhjMrR2+Gv9azEY6PmXtkck5LG1cHbf0iqghQNMaerWe1vncjjQ3l3J7ktjvCf3HKJYE/KwhO+xukxVfSN5bw6AaBEDcsjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752043255; c=relaxed/simple;
-	bh=A60mkx3Y5hsCHKpYmi2pKKiC91EnkELTL/wVOKJV8S8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Fsd0V6JyG7tESv2HqtIh7vAWkew3VsD/7a3wWTpOfmcH+w5kf/87PtRcECTBRWQ6IhLZb+0XZ/TW3KsLIhiaxF/isTeuxSCnEAcVbjjaBF/DIHTjxnWezkzCWhUyYYnQJILRr2Yhsi0Tf2xq0CMbGFD8xgdiVl6MhuIo8rKCdVk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=k6q9S1b0; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752043254; x=1783579254;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=A60mkx3Y5hsCHKpYmi2pKKiC91EnkELTL/wVOKJV8S8=;
-  b=k6q9S1b0eDbWsIYatHouVYielxyLlFMxFvhKQVo2K+qzIBtMMJdK3oid
-   yg6uBpdDfDoDF8+WiG9G243+XNwyt9LUusyUrMYbK/WskUwGcHPR5jib9
-   axVBqMjfOH4plkO/f88gn8KbzrPxYh3ecZURAYCm+jsDdCA/qCOuFzUWP
-   ibBAR/FJGnxQ2wSNg2nFEycrtggU+NRuUYyvU4Dwc6moVlqBQ3ZTLpN4J
-   YIYZMc1UxDVlqGBnFVi4Vjb0Xs1omOjc+QMT5VqYHX9LPklNwMO7ajArS
-   fT3ni7wlYeqjhKFqd8Fm3+NrY0H3/I0OyFxIexC7iwD17FtWtzHdvytwN
-   Q==;
-X-CSE-ConnectionGUID: MRgNHLxeTeKLFy0f+OhSIA==
-X-CSE-MsgGUID: ZwKurisPQe6XWiLuPDPusA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11487"; a="41914975"
-X-IronPort-AV: E=Sophos;i="6.16,298,1744095600"; 
-   d="scan'208";a="41914975"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jul 2025 23:40:53 -0700
-X-CSE-ConnectionGUID: kIi/t9oaSPuU1kBd2ihhHA==
-X-CSE-MsgGUID: ewMJn9f+ThWLi68O9tOfcg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,298,1744095600"; 
-   d="scan'208";a="159962867"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jul 2025 23:40:50 -0700
-Message-ID: <5335d070-1489-4e85-804b-b063bfda3f47@intel.com>
-Date: Wed, 9 Jul 2025 14:40:48 +0800
+	s=arc-20240116; t=1752043829; c=relaxed/simple;
+	bh=4MHCMXqkaf7S/tE0zRVKzQ5WFpevnAtw1v2rwPlBjVA=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=rpguwynZQEO+K2TEZvrqccwa1BBGHKgphDVIaJ2YGrk/96tMvMrm8S1qjedp0/PDZGHENytOLR5VJ9NRPE+0ihT2Njz8E1ho0VmtipI04xnmlsuUOL83DvUjHMz04tTwUwTyEV1vGyHYRY9ydd+hpj8yKcj+Q5YJo+W9oCFHUHo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.105])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4bcT980wTkztSlX;
+	Wed,  9 Jul 2025 14:49:16 +0800 (CST)
+Received: from kwepemf200001.china.huawei.com (unknown [7.202.181.227])
+	by mail.maildlp.com (Postfix) with ESMTPS id AA188140203;
+	Wed,  9 Jul 2025 14:50:22 +0800 (CST)
+Received: from kwepemf200001.china.huawei.com (7.202.181.227) by
+ kwepemf200001.china.huawei.com (7.202.181.227) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Wed, 9 Jul 2025 14:50:22 +0800
+Received: from kwepemf200001.china.huawei.com ([7.202.181.227]) by
+ kwepemf200001.china.huawei.com ([7.202.181.227]) with mapi id 15.02.1544.011;
+ Wed, 9 Jul 2025 14:50:22 +0800
+From: "zoudongjie (A)" <zoudongjie@huawei.com>
+To: "seanjc@google.com" <seanjc@google.com>, "pbonzini@redhat.com"
+	<pbonzini@redhat.com>, "tglx@linutronix.de" <tglx@linutronix.de>,
+	"mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>,
+	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "x86@kernel.org"
+	<x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>, "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+CC: "Chenzhendong (alex)" <alex.chen@huawei.com>, luolongmin
+	<luolongmin@huawei.com>, "Mujinsheng (DxJanesir)" <mujinsheng@huawei.com>,
+	"chenjianfei (D)" <chenjianfei3@huawei.com>, "Fangyi (Eric)"
+	<eric.fangyi@huawei.com>, "lishan (E)" <lishan24@huawei.com>, Renxuming
+	<renxuming@huawei.com>, suxiaodong <suxiaodong1@huawei.com>, "caijunjie (A)"
+	<caijunjie15@h-partners.com>, "zoudongjie (A)" <zoudongjie@huawei.com>
+Subject: [v2] KVM: x86: Question on lock protection in handle_ept_misconfig
+Thread-Topic: [v2] KVM: x86: Question on lock protection in
+ handle_ept_misconfig
+Thread-Index: AdvwnWLWK0cIKxYnTaSRFSLUUanbNQ==
+Date: Wed, 9 Jul 2025 06:50:22 +0000
+Message-ID: <32045ab842954dd5867b55ee965ffcc7@huawei.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] KVM: x86: Reject KVM_SET_TSC_KHZ VM ioctl when vCPU
- has been created
-To: Kai Huang <kai.huang@intel.com>, seanjc@google.com, pbonzini@redhat.com
-Cc: kvm@vger.kernel.org, thomas.lendacky@amd.com, nikunj@amd.com,
- bp@alien8.de, isaku.yamahata@intel.com, rick.p.edgecombe@intel.com,
- linux-kernel@vger.kernel.org
-References: <cover.1752038725.git.kai.huang@intel.com>
- <1eaa9ba08d383a7db785491a9bdf667e780a76cc.1752038726.git.kai.huang@intel.com>
-Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <1eaa9ba08d383a7db785491a9bdf667e780a76cc.1752038726.git.kai.huang@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
 
-On 7/9/2025 1:38 PM, Kai Huang wrote:
-> Reject the KVM_SET_TSC_KHZ VM ioctl when there's vCPU has already been
-> created.
-> 
-> The VM scope KVM_SET_TSC_KHZ ioctl is used to set up the default TSC
-> frequency that all subsequent created vCPUs use.  It is only intended to
-> be called before any vCPU is created.  Allowing it to be called after
-> that only results in confusion but nothing good.
-> 
-> Note this is an ABI change.  But currently in Qemu (the de facto
-> userspace VMM) only TDX uses this VM ioctl, and it is only called once
-> before creating any vCPU, therefore the risk of breaking userspace is
-> pretty low.
-> 
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Kai Huang <kai.huang@intel.com>
+Resending as plain text to fix formatting issues.
+---
 
-Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+Hi all,
 
-> ---
->   arch/x86/kvm/x86.c | 4 ++++
->   1 file changed, 4 insertions(+)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 699ca5e74bba..e5e55d549468 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -7194,6 +7194,10 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
->   		u32 user_tsc_khz;
->   
->   		r = -EINVAL;
-> +
-> +		if (kvm->created_vcpus)
-> +			goto out;
-> +
->   		user_tsc_khz = (u32)arg;
->   
->   		if (kvm_caps.has_tsc_control &&
+I noticed that in handle_ept_misconfig(), kvm_io_bus_write() is called. And=
+=20
+within kvm_io_bus_write(), BUS is obtained through srcu_dereference(). Duri=
+ng=20
+this process, kvm->slots_lock is not acquired, nor is srcu_read_lock() call=
+ed=20
+for protection. If another process is synchronizing BUS at the same time,=20
+synchronize_srcu_expedited() cannot safely reclaim space(it cannot protect=
+=20
+srcu_dereference() outside the critical section?), how can we ensure that B=
+US=20
+obtained by kvm_io_bus_write() is the latest?
+
+Thanks,
+Junjie Cai
+
+Reported by: Junjie Cai <mailto:caijunjie15@h-partners.com>
 
 
