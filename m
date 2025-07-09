@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-51943-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51944-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6790AFEB8B
-	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 16:17:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1254EAFEB92
+	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 16:17:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 895071C87864
-	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 14:11:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7774F189927B
+	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 14:11:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF5ED28135D;
-	Wed,  9 Jul 2025 14:06:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 499CA2E8DF7;
+	Wed,  9 Jul 2025 14:07:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="J3OokrYm"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fo+dVGE+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BE262E7F20
-	for <kvm@vger.kernel.org>; Wed,  9 Jul 2025 14:06:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20BA22E8DEF
+	for <kvm@vger.kernel.org>; Wed,  9 Jul 2025 14:07:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752070016; cv=none; b=l2KUJR1e+rQFkKa+571gmAp+FVsJnFucy2Q20hDIBS3LO8xf6xLOgb4dBIAyz95SKo8VobBZVUxQFtCWsiSY3Ui8C+m7Sl7lm9Y0k/hLpYDWLVmnsWTyvWLoozy0rWl/aIWNsNeymZpciAytKyQzYwdzkJfYww9fCKYgAX1mxCM=
+	t=1752070027; cv=none; b=R8QAu+0IJRCT8ft/nZg5/93I1mf/BOgE1F8Fs2mXld1+GTRYBT3J8Xn7kb2TwF9LPUoFZe+GY0o5lUov3QYyFpoKUJkYvOooijNE+rPWi7z2WiBm+QHbtueluEbR7GgVXm8VLBCdO8k9iM5po7zVnvpLnCJgV/ClgNCgjZ4uP7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752070016; c=relaxed/simple;
-	bh=hkntFlFAHX/8LClrortGJsunMQhI9Rf+tcTEWjk0YoQ=;
+	s=arc-20240116; t=1752070027; c=relaxed/simple;
+	bh=LJafJh5xCNMq1ouGVqPO4QJrs9QZXQjwYEc57uay5eI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=tGLYoGNASKWkdR/GEwhFrcrwrp9SfWFyf13Ie19mBv21YMoTs4iqzK46UAInKkM+GScij7AGyh96j1lTYYjMYswOGrYZL2LxKuL+IXBSW46xzjmHx3yl1nRbS3bjhL5L+uDP3CWaQ+pBkh9WF2At958Veb/Og/Mag5pto/+AIQE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=J3OokrYm; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=F9GgpX3ydWp2SjvrL8rw2ZnHq9dQFuNUXSnpmyyQ1n05bphg25shvHGwb7Plp5L6mRLlZbRW/M5P051P/fg23lKXCDnageQma+LGnlHNq38t7qwQVSFZvVI2duSjMdcajzg6bS0Tkq2ZuJ5hz34XcE8y9yBev6idzmcoDc+G0Ow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fo+dVGE+; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3138e671316so882950a91.0
-        for <kvm@vger.kernel.org>; Wed, 09 Jul 2025 07:06:54 -0700 (PDT)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-74927be2ec0so8121373b3a.0
+        for <kvm@vger.kernel.org>; Wed, 09 Jul 2025 07:07:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752070014; x=1752674814; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1752070024; x=1752674824; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=w8fWPt2BfkTPkJ9RpJOZFh1liGwFojbw+uk1VvqODzg=;
-        b=J3OokrYmX6HWOzk9nRg/w+JEis1zh89IA6vQ0vjsG3C1JXQBLB8+V5vqVFp//q03DB
-         6CFlmbWqfvVgiz7fwoFDkssgbM5LvzaFsLOdmlzKO1RQnQiSHrJJMNb6QgW5xauC7E0G
-         KRGEWX2smoIWPYM0uxPYKsNY6gjEYjrpUeCAczZzGK9D8zYbram4J9Luzj0CZQbK1M0h
-         ijAX7u4cON4dhGX4YQ/pW4BT9YplgHSnAdb74vrXgxIXdKCQyOmKY6Y0fXdabp6V8CBa
-         UBcOICRQV0rDtgfm+PSNNCcJzhuo4y7FaFtz0oDW0U3GlJ4Hbp2+yrv1bq9eTplen0t1
-         EifA==
+        bh=Cmcguu9UCBEWTTsjlEJwXa1dAvNETj0uDtiVn25gJe8=;
+        b=fo+dVGE+5q470LwpG8ikF/rM5t+hipIoAghM369HC6vcoCKptSzhAsy4SLOtekwKC3
+         6OK5asxO0B1Y2COCxm9Qeb2TxzQUTJRMIe6AvO/v0fWALTNznxOoL60cj6TxRN9LJa3g
+         SHYuThK78Tp5URxQsoGTfDSLkmQDr0UsT6dgdvlhluAz3F09SHcYkOkPYDKJhskeEZK1
+         NYX/SQkZjbn82giH71HYkAkraCDqBR+JQIQlHjpBnrLEyioSmkQ4OtUKt73aE+224tHZ
+         pjIhm/Uy7vbobTHlb3gGTZaZmuko7zITgNEqYvh7FVUWRiOO+BGL7may824MHnlak0ao
+         w2Qg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752070014; x=1752674814;
+        d=1e100.net; s=20230601; t=1752070024; x=1752674824;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=w8fWPt2BfkTPkJ9RpJOZFh1liGwFojbw+uk1VvqODzg=;
-        b=oZJ71ujzA8NnY++2YhdkjMapbQ00OryFycV86ISlxUAGx8O98ZKDKnf93X3pbz2eWO
-         KQSg7hu4eC0onGUSH9DBQ/bJC9hCTVr6eOThBprIXWMMwN3/1djzcl5NHAdNXS14vBfC
-         ozNoXegBmuu58KzaY8EqMj5lh47SxigJEwh1+lBcnDtJ21es2hxLX/dBNly1u9FqF+oT
-         vxbQSiZwVBSfOKHwaZWzXRc6ro1yNejMu7o9721m2WyylMw3jVteqNk6uqfZDGY7KUQA
-         83tjS6XeodzNFEyXoRpajS/vHUfrOqeFMTFOYtLprimQUJERQaiFeOJM7SAxgvOkwi0M
-         8Ddw==
-X-Forwarded-Encrypted: i=1; AJvYcCUyJEPk3jTrpCfkHy0ohOU9ACDpgyrJRahK6846DVM/oFQ/iayBcoVfVo40tXs2hR7VQW0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZ9thNy8y1sFwFMvxe2rWfaZAo9xIMUm6ZI4NFZX85XpPioFxm
-	TMGWZdWlZ+swKum5O0N9Eap9DCKpgkYctswUFCrFKvgnm0NQWQE5de5kjGN1ksJ2fpRCRBv8EKq
-	+dDJuiQ==
-X-Google-Smtp-Source: AGHT+IGIWsx7d/E56vX8/ELK8FvDCsCc7kZDsZlRa7N3LnxbBm/kaiz6qFgCJN+q7ZZTN94p0dGqXi8ZWKw=
-X-Received: from pjbof13.prod.google.com ([2002:a17:90b:39cd:b0:30a:31eb:ec8e])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:ec85:b0:302:fc48:4f0a
- with SMTP id 98e67ed59e1d1-31c3050462dmr4342914a91.0.1752070013937; Wed, 09
- Jul 2025 07:06:53 -0700 (PDT)
-Date: Wed, 9 Jul 2025 07:06:52 -0700
-In-Reply-To: <20250709033242.267892-12-Neeraj.Upadhyay@amd.com>
+        bh=Cmcguu9UCBEWTTsjlEJwXa1dAvNETj0uDtiVn25gJe8=;
+        b=wOlIZkY0MZy+Xqbt13h94ciD9BklR3Jbto7jBxmh3oFSlgSXHdj/S/gVvbWYEDqrfY
+         4LjbRM35YTTDHRciijEHA66DepPV8sAXn7b8p3CTBU8Nu5de6i4j+3I5q48XqdCOfjeV
+         pkBhw4jQWRZ0wUL5pD7drHAIEpwBA8435J6q6FW2+3kyvN/wzR/jKe/Dgl9Ey3Xe88Dh
+         5Jc9WDZ/fJ8w1TUqmB0hyJLpb38Fe8QpNHdoB4aw+zbNIhYybza1xcKY9muhUQYhMowT
+         iUtRVU2nnu+0gvyaFhixkhK4kNai00kqJvoNJDiBlmpfsk2rF4zgpx6ImDERhbG/TaAx
+         r8YQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVkk/NPnrHMdx7VNDbuq5Td4d/wejHSkZIzJKhYjP5snrjCNQJuMcrFYjmEOSqMxmLWvH4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzDK6DnYgzh6k4P9Ch442+v7sW2jNDyjxcOA/pKd0bTpWJf9PZD
+	DvtmGSwFz6XQqv/tDVwTBuIiSnPTk5jvMpVKYxtUMTIeyw357tMTabmfDQC8bGq+p8cKXmLoY0d
+	Y4gvcFA==
+X-Google-Smtp-Source: AGHT+IGiLDmO9tNUZfK8M1pEp/RxQc8CmRskg2wRHx06WOqlp7dEAHwv1HMGlLulwL0mtGCwLp1D/JwbiWE=
+X-Received: from pgc17.prod.google.com ([2002:a05:6a02:2f91:b0:b2c:3d70:9c1])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:682:b0:220:21bd:75c6
+ with SMTP id adf61e73a8af0-22cd7c9dbc9mr4663887637.33.1752070024417; Wed, 09
+ Jul 2025 07:07:04 -0700 (PDT)
+Date: Wed, 9 Jul 2025 07:07:02 -0700
+In-Reply-To: <20250709033242.267892-13-Neeraj.Upadhyay@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250709033242.267892-1-Neeraj.Upadhyay@amd.com> <20250709033242.267892-12-Neeraj.Upadhyay@amd.com>
-Message-ID: <aG53fJ9VlLxurnKW@google.com>
-Subject: Re: [RFC PATCH v8 11/35] x86/apic: KVM: Move lapic get/set helpers to
- common code
+References: <20250709033242.267892-1-Neeraj.Upadhyay@amd.com> <20250709033242.267892-13-Neeraj.Upadhyay@amd.com>
+Message-ID: <aG53huKPYCxmAZGQ@google.com>
+Subject: Re: [RFC PATCH v8 12/35] x86/apic: KVM: Move lapic set/clear_vector()
+ helpers to common code
 From: Sean Christopherson <seanjc@google.com>
 To: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
 Cc: linux-kernel@vger.kernel.org, bp@alien8.de, tglx@linutronix.de, 
@@ -88,10 +88,10 @@ Cc: linux-kernel@vger.kernel.org, bp@alien8.de, tglx@linutronix.de,
 Content-Type: text/plain; charset="us-ascii"
 
 On Wed, Jul 09, 2025, Neeraj Upadhyay wrote:
-> Move the apic_get_reg(), apic_set_reg(), apic_get_reg64() and
-> apic_set_reg64() helper functions to apic.h in order to reuse them in the
-> Secure AVIC guest APIC driver in later patches to read/write registers
-> from/to the APIC backing page.
+> Move apic_clear_vector() and apic_set_vector() helper functions to
+> apic.h in order to reuse them in the Secure AVIC guest APIC driver
+> in later patches to atomically set/clear vectors in the APIC backing
+> page.
 > 
 > No functional change intended.
 > 
