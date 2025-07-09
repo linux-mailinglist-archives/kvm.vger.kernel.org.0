@@ -1,117 +1,112 @@
-Return-Path: <kvm+bounces-51992-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51993-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4980CAFF401
-	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 23:39:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 51C12AFF412
+	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 23:44:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3836F3A7F94
-	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 21:38:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01744641AD0
+	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 21:43:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F37323E344;
-	Wed,  9 Jul 2025 21:39:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C209224DD10;
+	Wed,  9 Jul 2025 21:41:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Y296VOx0"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="R2qbSb5y"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 139A8221710
-	for <kvm@vger.kernel.org>; Wed,  9 Jul 2025 21:39:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0B0D241673;
+	Wed,  9 Jul 2025 21:41:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752097149; cv=none; b=YHZhJP/23ryyWlpcpl5DUQV+m+J8kvgc7FB0nOk5KoBRMNIOTdi4DTDrCgWwjgoyijvZ0eJuJl/gojlc6RZJHjz2N3JpmoY7uSRATQM0yj0ZYm26SkxW1ptCZxVt9MuwnpRqHBlcdalmAsupjQO5FcqVCV2nKj+qH/L1v/PIz9Q=
+	t=1752097305; cv=none; b=UUm6XSozLrSa/Yzi7FjWuoqq6JxPqpP/Ki4QLrvfKWsmRdhYQL2fpVTMEqmK3YNI1EEty2+t4B7QvX//QX7EtZVNC8ZnKt7EK2MY+uDytf2D2eBNBcgMgjZ0i2zm7YjOlUC3SrgN6+NvAjJ6agZ5DbaToi2uSQ4DTChFWO+zyg8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752097149; c=relaxed/simple;
-	bh=GODhRmDiVJiCnZUnkaX8NW89MJRIIVn4pvNiMuRjOq8=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=sPyVVKhATW19+NCUIjL/izKROXGbQRwWRZHDCosJr0Iz7wfO6jyShjXjBSsXEn7rZgpDBTDAqGIZ75xF30WXitvcaQhfwHpHJM/zNNCniJp/WcxankE7jQSqO/qzKxBc17Z4gbylss+fkk/AiNBJxFWrAz0nEXzc5tN+a/303lQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Y296VOx0; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3141f9ce4e2so529539a91.1
-        for <kvm@vger.kernel.org>; Wed, 09 Jul 2025 14:39:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752097147; x=1752701947; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tRjFnmCzYN+qn8kF+o9IzfpkXQ4+JquW4HupC73fftA=;
-        b=Y296VOx08prQDUbgf6MjuyRgedbJQGEMVHxpB4a9zJmOHXPvclNjmF+ZEjZpSpwWFW
-         PEo1jaAqSjP3PPA+AENpDq5fRCVM1NG6B7wYJpHnz+EbE1D09aGNYDau3HRnfUEdCUej
-         KRlskOYrpRCOooM5GdlP+NAv8rZD9mWb1thpviaQHhcU+qDS3fp6q/yCtU1oNYYgTKsV
-         miB0bQztHYUTROhBvkqjVhQthgc7+Cljiq/TljGXWIZm2QHKEY1uRv/lTIb9EeJneTbk
-         8DTwz0+a23pC1HQQjlQlaBfSQr+JZ1YYBrS0BKbyqwvrGSKkv9u5r6NghqhxYybR2g6P
-         E75w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752097147; x=1752701947;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tRjFnmCzYN+qn8kF+o9IzfpkXQ4+JquW4HupC73fftA=;
-        b=f7S6ygJiUTSFWGBCROnpeShXRbAgO/UGCWGaID3iDjai4SZ8ntVZFyNhv47LiUMZmp
-         4VxKLufODvzLvlu+Dy/ZzUWFqp0KqGq7aLtevJGmy1hRiTwtkKJYtwOql674paLLzXYN
-         hhpCfaoX3XoE52JSRMaFYF3siRLSXkhrgeVwINbBQPrYzGAq0uJCdUwIz+S6YCvLK7Lu
-         ElAZu7qEBiAufEnbt8AQQoiemoF+YSr52Fox6RAAFxBrMPO8jZSyITfB0xCfGKjaJQ5X
-         b49hWQiOEVRw+Eyg1x/bC1vjPrtzgHzt9nPgfQeji4iyhTJnJgQhxY0HkL5V59GOvbED
-         h0Dg==
-X-Gm-Message-State: AOJu0YzWbmlmLnyp81d7pjXp0yKzkXTIm0EHa2DEh0FspKSMRTzGR14M
-	DgA9bonAt4OR0JdgbkiKGF50HUz7dSDS8N9vneYCitjQlAiswhBWD7E0EAITgoHFTECYTLcSWk7
-	wB7evvg==
-X-Google-Smtp-Source: AGHT+IGqLtd25jQcDPlbBnyHm57aZXVZqGANjf8aQ+PHIDAz5DerrzktIfl+GNc39oHL/0frC4tukw2+CLQ=
-X-Received: from pjbqn6.prod.google.com ([2002:a17:90b:3d46:b0:312:2b3:7143])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5344:b0:313:62ee:45a
- with SMTP id 98e67ed59e1d1-31c3ef2308emr245837a91.13.1752097147476; Wed, 09
- Jul 2025 14:39:07 -0700 (PDT)
-Date: Wed, 9 Jul 2025 14:39:05 -0700
-In-Reply-To: <20250606235619.1841595-3-vipinsh@google.com>
+	s=arc-20240116; t=1752097305; c=relaxed/simple;
+	bh=aQbzgSyNSih8ocOpxy2RZ+8ww8LgbwU4eJQbGKAzvVs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tauSWLz/pBwZZzAHG7OunlzZUhdk6rvCEmLPkgkENpcbnoAg59f0nrGJWgYh4lzP5EeBua1XueyOLFkR70VBdkAySv5XY4j0HknJDLjZPKKSCsRPI7bon0xvSUWpR/fZv45X9a0D5tRSCBI3o8DUNRdZNqMfBWBUY9OjE6xn1Lk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=R2qbSb5y; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 902CB40E0216;
+	Wed,  9 Jul 2025 21:41:40 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id 7TXVX2LfnEoA; Wed,  9 Jul 2025 21:41:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1752097297; bh=welqa06GFJI4VOR5xGX4jgUpfnRTCDdVT0ZtjsQ9UPM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=R2qbSb5yJ3ZE4CO49ocu83kCx+CRDiDhZpqRz6j8nuSw7Jrco38J+A8aYhK9Pzf1s
+	 R8IG7HnToowum2itDeWC88m3q6n5TheGlEJoftjqy+0+BOm8GSxg07BspPgpZ7ueSv
+	 JyOueLKkE7Ryi0oiYGAfVC1y1cfAVngXNqDwVGhQx4eBGzX91LdwR1/WGxXr61c1ca
+	 hG6xWLjVbroFJ6GmP8vD52x4rwB7+xg8jyhpqwvAh5OwLdri3Kvsu63j1Q+NYECTzy
+	 Sk1lNknMO8ADT3bRG4bsZ7wzDodlXbTU5lf5ldGHu1V/X8xh+eMTt6Xsw/RpBgijO4
+	 Vi3EHbltTWA5klvGeaRD2aXdl4hjwb3Uyi6EMFOtP8G9/18HkGUkgWkP0v7dssQtE3
+	 Lun7IaXbAWTRRVAnYB8EvydK6lttTLw6Ukaa8LHyj1f1YegyYg/6EO/2nG5R5aLjQw
+	 rIrmhG54P9lrI5ryd9bKOT+cCl64zD57Erl0CM4OBlnMizQqNyAJ0CkyIC6zj1495A
+	 S4eLKCwYDJPhbEGFo4UdjX+98bXvsK0kN9ypt1C02arxsF33uW8FnzZqypE2Prh3FH
+	 g/MhuI6O8SC3vnpQ0+eldX+FlmSa3SNZGT4Ix+Utbjwo4z09ozbHy469tyXdCxYm3K
+	 zkyJ5qvlOYju0Eu4iXpG9ys0=
+Received: from zn.tnic (p57969c58.dip0.t-ipconnect.de [87.150.156.88])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 1110540E0215;
+	Wed,  9 Jul 2025 21:41:16 +0000 (UTC)
+Date: Wed, 9 Jul 2025 23:41:10 +0200
+From: Borislav Petkov <bp@alien8.de>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>, linux-kernel@vger.kernel.org,
+	tglx@linutronix.de, mingo@redhat.com, dave.hansen@linux.intel.com,
+	Thomas.Lendacky@amd.com, nikunj@amd.com, Santosh.Shukla@amd.com,
+	Vasant.Hegde@amd.com, Suravee.Suthikulpanit@amd.com,
+	David.Kaplan@amd.com, x86@kernel.org, hpa@zytor.com,
+	peterz@infradead.org, pbonzini@redhat.com, kvm@vger.kernel.org,
+	kirill.shutemov@linux.intel.com, huibo.wang@amd.com,
+	naveen.rao@amd.com, kai.huang@intel.com
+Subject: Re: [RFC PATCH v8 00/35] AMD: Add Secure AVIC Guest Support
+Message-ID: <20250709214110.GFaG7h9kPZoSS_MhIr@fat_crate.local>
+References: <20250709033242.267892-1-Neeraj.Upadhyay@amd.com>
+ <aG5_mowwoIogBSqH@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250606235619.1841595-1-vipinsh@google.com> <20250606235619.1841595-3-vipinsh@google.com>
-Message-ID: <aG7heUe_zBf83tlJ@google.com>
-Subject: Re: [PATCH v2 02/15] KVM: selftests: Enable selftests runner to find
- executables in different path
-From: Sean Christopherson <seanjc@google.com>
-To: Vipin Sharma <vipinsh@google.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org, 
-	linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com, 
-	anup@brainfault.org, borntraeger@linux.ibm.com, frankja@linux.ibm.com, 
-	imbrenda@linux.ibm.com, maz@kernel.org, oliver.upton@linux.dev, 
-	dmatlack@google.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <aG5_mowwoIogBSqH@google.com>
 
-On Fri, Jun 06, 2025, Vipin Sharma wrote:
-> Add command line option, --executable/-e, to specify a directory where
-> test binaries are present. If this option is not provided then default
-> to the current directory.
-> 
-> Example:
->   python3 runner --test-dirs test -e ~/build/selftests
-> 
-> This option enables executing tests from out-of-tree builds.
-> 
-> Signed-off-by: Vipin Sharma <vipinsh@google.com>
-> ---
->  tools/testing/selftests/kvm/runner/__main__.py    | 8 +++++++-
->  tools/testing/selftests/kvm/runner/selftest.py    | 4 ++--
->  tools/testing/selftests/kvm/runner/test_runner.py | 4 ++--
->  3 files changed, 11 insertions(+), 5 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/runner/__main__.py b/tools/testing/selftests/kvm/runner/__main__.py
-> index b2c85606c516..599300831504 100644
-> --- a/tools/testing/selftests/kvm/runner/__main__.py
-> +++ b/tools/testing/selftests/kvm/runner/__main__.py
-> @@ -29,6 +29,12 @@ def cli():
->                          default=[],
->                          help="Run tests in the given directory and all of its sub directories. Provide the space separated paths to add multiple directories.")
->  
-> +    parser.add_argument("-e",
-> +                        "--executable",
+On Wed, Jul 09, 2025 at 07:41:30AM -0700, Sean Christopherson wrote:
+> Boris, do you anticipate taking this entire series for 6.17?  If not, I'd be more
+> than happy to grab all of the KVM => x86/apic renames and code movement for 6.17,
+> e.g. to avoid complications if a conflicting KVM change comes along.  I can throw
+> them in a dedicated topic branch so that you could ingest the dependency prior to
+> 6.17-rc1 if necessary.
+ 
+> I.e. these:
 
-"executable" is kinda odd to me, as that suggests a single, specific executable.
--p/--path seems more aligned with how this concept is typically described in Linux.
+Yah, I'd feel much more at ease if you took the KVM cleanups so that the
+patchset is slimmed down and then we cat concentrate on reviewing the
+remaining pile. I haven't gone through it, I know tglx did look at this and
+with vacations upcoming we might not be ready for the merge window...
+
+I can see how far I can get but you could give me that topic branch just in
+case and I'll see what I can stick ontop if/when I get to it.
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
