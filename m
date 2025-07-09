@@ -1,95 +1,204 @@
-Return-Path: <kvm+bounces-51985-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51986-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 712B9AFEF40
-	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 18:55:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F2EB6AFEF49
+	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 18:59:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 577E7189A3F5
-	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 16:55:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2278818820EF
+	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 16:59:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC8E9222585;
-	Wed,  9 Jul 2025 16:55:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 232F121423C;
+	Wed,  9 Jul 2025 16:59:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UlpUDOES"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xqiZ1pRU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D3EE21CFF4
-	for <kvm@vger.kernel.org>; Wed,  9 Jul 2025 16:55:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9163222577
+	for <kvm@vger.kernel.org>; Wed,  9 Jul 2025 16:58:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752080114; cv=none; b=QBo1YgJpH9sUqz/BNX7VAT4U0FKZhesKySVsNUMcSkNa3jlKVN5CdwOWeIXzGjW5YABJUxOPjzXw+c9rVhmxXarSwAuf6S346BzzWFwgnHxtHa7I8xRFOCzEj19cBd2Pn7pCHA+Y258stZQXpLQWOTzAQp8VbTZPfdUS5kEj/jM=
+	t=1752080339; cv=none; b=QfD+5BK9dbdf8of9cVihVM3nbeDPz9ttUMONWPxAQ/l07za9TyrmdjTpgnAht2aERJWxNMJPFjQDn1z2SpVggJXvQ+gptrK4kn/Iu4IMS3/uP03W60FYN5otcNLCmZxNdq0qBgg5RBvh0MRVzDB751vwQUcvXk0ZZPe9V8DVCKU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752080114; c=relaxed/simple;
-	bh=vLzbLdb1U5XClidkLMNM7JnUKFZel/V2OLapIrBbU5o=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=G0/XLa0nMD0TUJu6v3QcQpCQIROSkKDGuj98qKLqs93WYt1FWaWTbS+eIajSOcerIy207NTnfhlQLpkVWT9G6kF1pFzVe5mRAAmFKQVSh2iZ0gIIhTpSUQQUdPpzBNxGgyTlCI/mPK6lspsqX96O/EqH9SfrHZCDb40F4DksB8k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UlpUDOES; arc=none smtp.client-ip=209.85.167.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-553a66c3567so160e87.1
-        for <kvm@vger.kernel.org>; Wed, 09 Jul 2025 09:55:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752080110; x=1752684910; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=V6LeSQHYUwsCDHk/q0CXvTAidWrzxxRxH53jdjxgKos=;
-        b=UlpUDOESePShYUuRnvnVhu0Fl+tMQFmT9wHXwrqM1wye2cW3Um9uV7fPDzJlUrFEbU
-         Eu/emY6GFHGtgxTnclh++CbRozwBUt0qf4HOuTiEqiB28V4jOhkJe1SbXVeFyzJjYazF
-         ZBsA44NSer5XCTYwfJQnyKIzXp4BHT8LKuAMUQsgfrTSigQ6Vcsgb8umQlw5d/rOGrqR
-         YE+CCl6BZgJwsD7Gry0ghms46P/WD0LiSe/dUwYshZQ6TxFtXCn5P+q2bE9An7vVKYoP
-         i95c+W2lvnBZk2cvqfRFm+ShqCenttn/75SWGNMH5iiaBup1rvk/Xm1DsDVkpUuSHOxF
-         MGEQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752080110; x=1752684910;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=V6LeSQHYUwsCDHk/q0CXvTAidWrzxxRxH53jdjxgKos=;
-        b=QB+Um958jPokfDctwfGLDAl8kCjmwYU324gTWjC4Z6tGGXAXGH3oafzHYqiBc7l2gm
-         tLjEEJ4b1f+LdEhybiDiJatuL0/2dKm7NhNek60k8iebMz3NTvnn4kBu3WXUz8+lNqH9
-         BDWU8eM26MUCJBBqNNY5GH07yhIrJ3LsvVSG96lUXwFIOjnchmXGF/120qgyUNRmqEK7
-         eyumVQ2iip7+pxxzpWeg7vx7FYAr6m5Cwuv74yUyFOXA+osgul4MuNnLHZnqtZ3wSds0
-         bYFyDO0+TeRgp4BGsab2ZMykxbV/lUj3JRF1mxh57PmSO98d/9K9JrLvCV1C6bIWhMgX
-         I/ZA==
-X-Forwarded-Encrypted: i=1; AJvYcCUy0IqWLrEY7mzcgBzX0zd5iSk+Aj1/9QRIgiopxd2hDAAoWQhHncklhZMk1pO0ZhbJGhk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxEss2kWSyFs5XAauMr2Rk5t+ASCqr8baFoCjD7JaWvcBcw/8UR
-	T/gojx2OhC8u1sd9mt1BnY3ZjQDE8OBS4hvb5v4YNL98vXTyvbgkuGOY+MeC8tLnHupRlBRbpvx
-	tIkdilUqistCMExErsFnc0BHsMp+cn5efCZZrWWCv
-X-Gm-Gg: ASbGncufKZYHx5VmL+pbS/Jynefn5+cNnT6c5khJGgJ/HmsweIoPFkzOIkztxMYhqid
-	wZ5KUji32xLOQzPteGIIX+fzuKiN535b8lIKVctQrsUZF7UFSCPmyObk5TwBVANED/v4fAPu3q9
-	VXmzXAhnNV345l0MaIfHlOOAEFSov/u0nLBccuKRYOPx2M8/dMVdPReg==
-X-Google-Smtp-Source: AGHT+IGT9okQqPsrICn/X7FUpzA1ZLzGeBqb+5MaAmCxIsAJb55shFjxBxMb10S9EL6aXbkegpCt3f5GqNGlkep1/Ok=
-X-Received: by 2002:a05:6512:15a6:b0:557:eadb:253d with SMTP id
- 2adb3069b0e04-558fa988ed4mr305929e87.1.1752080110144; Wed, 09 Jul 2025
- 09:55:10 -0700 (PDT)
+	s=arc-20240116; t=1752080339; c=relaxed/simple;
+	bh=yGxwMcJwZQFmGY0FXwaOPaiDi66sXp3M37GaPltJy9E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UV5hpks/Z7A96PbU8gLpCC6QQuhAsSM1l6N49xzi0YgWCG73mVoOKRvRsaLgPTKJ/fdtd7EX9x9D+I3FBPQYDf5Fm74pG7klmugRtTa8t3cT95jhsrPdcjaSY/WfbQkrdHTbvkgYTL3u024bu9T5pTFVqr3gTXQJe4QPj+NyL3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xqiZ1pRU; arc=none smtp.client-ip=91.218.175.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Wed, 9 Jul 2025 18:58:42 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1752080334;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SmTSwGokE6/pfKrE9j0nZ7Ups7+XDSSuEFqTSsIVIX0=;
+	b=xqiZ1pRUBftM4W7jFWkb3PN9Y7YNdP4pql/jWxdTKgjnbNVYMiT2PdwtMxj9NBRnEeFYa5
+	dIZjC1CFfoDh/9NUI2KSHmf3N/dTOgjnUPnytA0Er+hvkQ0pXSzI2JKtnz/BthyJDNeRZR
+	H8bb2mxP6DRQpgUX1qfh5DGDMU72eRw=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Jesse Taube <jesse@rivosinc.com>
+Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-kselftest@vger.kernel.org, =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>, 
+	Charlie Jenkins <charlie@rivosinc.com>, James Raphael Tiovalen <jamestiotio@gmail.com>, 
+	Sean Christopherson <seanjc@google.com>, Cade Richard <cade.richard@gmail.com>
+Subject: Re: [kvm-unit-tests PATCH v3 1/2] lib: Add STR_IS_Y and STR_IS_N for
+ checking env vars
+Message-ID: <20250709-bf1dae41ebcc5c636afdab9d@orel>
+References: <20250709134707.1931882-1-jesse@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Jianxiong Gao <jxgao@google.com>
-Date: Wed, 9 Jul 2025 09:54:57 -0700
-X-Gm-Features: Ac12FXwaVU09T6hqP7ML5TAzYqCMnAihwqTx1BO0dyOj4qWUTT9Mnw_kDwS_y4k
-Message-ID: <CAMGD6P1Q9tK89AjaPXAVvVNKtD77-zkDr0Kmrm29+e=i+R+33w@mail.gmail.com>
-Subject: Re: [PATCH 0/2] x86/kvm: Force legacy PCI hole as WB under SNP/TDX
-To: Nikolay Borisov <nik.borisov@suse.com>
-Cc: binbin.wu@intel.com, "Borislav Petkov (AMD)" <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, Dionna Glaze <dionnaglaze@google.com>, 
-	"H. Peter Anvin" <hpa@zytor.com>, jgross@suse.com, 
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Ingo Molnar <mingo@redhat.com>, pbonzini@redhat.com, 
-	Peter Gonda <pgonda@google.com>, Sean Christopherson <seanjc@google.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Tom Lendacky <thomas.lendacky@amd.com>, 
-	Vitaly Kuznetsov <vkuznets@redhat.com>, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250709134707.1931882-1-jesse@rivosinc.com>
+X-Migadu-Flow: FLOW_OUT
 
-I tested this patch on top of commit 8e690b817e38, however we are
-still experiencing the same failure.
+On Wed, Jul 09, 2025 at 06:47:06AM -0700, Jesse Taube wrote:
+> the line:
+> (s && (*s == '1' || *s == 'y' || *s == 'Y'))
+> is used in a few places add a macro for it and its 'n' counterpart.
+> 
+> Add a copy of Linux's IS_ENABLED macro to be used in GET_ENV_OR_CONFIG.
+> Add GET_ENV_OR_CONFIG for CONFIG values which can be overridden by
+> the environment.
+> 
+> Signed-off-by: Jesse Taube <jesse@rivosinc.com>
+> ---
+> V1 -> V2:
+>  - New commit
+> V2 -> V3:
+>  - Add IS_ENABLED so CONFIG_##name can be undefined
+>  - Change GET_ENV_OR_CONFIG to GET_CONFIG_OR_ENV
+>  - Fix it's to its
+> ---
+>  lib/argv.h        | 38 ++++++++++++++++++++++++++++++++++++++
+>  lib/errata.h      |  7 ++++---
+>  riscv/sbi-tests.h |  3 ++-
+>  3 files changed, 44 insertions(+), 4 deletions(-)
+> 
+> diff --git a/lib/argv.h b/lib/argv.h
+> index 0fa77725..111af078 100644
+> --- a/lib/argv.h
+> +++ b/lib/argv.h
+> @@ -14,4 +14,42 @@ extern void setup_args_progname(const char *args);
+>  extern void setup_env(char *env, int size);
+>  extern void add_setup_arg(const char *arg);
+>  
+> +/*
+> + * Helper macros to use CONFIG_ options in C/CPP expressions. Note that
+> + * these only work with boolean and tristate options.
+> + */
+> +
+> +/*
+> + * Getting something that works in C and CPP for an arg that may or may
+> + * not be defined is tricky.  Here, if we have "#define CONFIG_BOOGER 1"
+> + * we match on the placeholder define, insert the "0," for arg1 and generate
+> + * the triplet (0, 1, 0).  Then the last step cherry picks the 2nd arg (a one).
+> + * When CONFIG_BOOGER is not defined, we generate a (... 1, 0) pair, and when
+> + * the last step cherry picks the 2nd arg, we get a zero.
+> + */
+> +#define __ARG_PLACEHOLDER_1 0,
+> +#define __take_second_arg(__ignored, val, ...) val
+> +#define __is_defined(x)			___is_defined(x)
+> +#define ___is_defined(val)		____is_defined(__ARG_PLACEHOLDER_##val)
+> +#define ____is_defined(arg1_or_junk)	__take_second_arg(arg1_or_junk 1, 0)
+> +
+> +/*
+> + * IS_ENABLED(CONFIG_FOO) evaluates to 1 if CONFIG_FOO is set to '1', 0
+> + * otherwise.
+> + */
+> +#define IS_ENABLED(option) __is_defined(option)
 
--- 
-Jianxiong Gao
+I'm tempted to say this belongs in lib/linux/kconfig.h, but since we don't
+have any other kconfig stuff, then I guess argv.h is fine.
+
+> +
+> +#define STR_IS_Y(s) (s && (*s == '1' || *s == 'y' || *s == 'Y'))
+> +#define STR_IS_N(s) (s && (*s == '0' || *s == 'n' || *s == 'N'))
+> +
+> +/*
+> + * Get the boolean value of CONFIG_{name}
+> + * which can be overridden by the {name}
+> + * variable in the environment if present.
+> + */
+> +#define GET_ENV_OR_CONFIG(name) ({				\
+> +	const char *genv_s = getenv(#name);			\
+> +	genv_s ? STR_IS_Y(genv_s) : IS_ENABLED(CONFIG_##name);	\
+> +})
+> +
+>  #endif
+> diff --git a/lib/errata.h b/lib/errata.h
+> index de8205d8..78007243 100644
+> --- a/lib/errata.h
+> +++ b/lib/errata.h
+> @@ -7,6 +7,7 @@
+>  #ifndef _ERRATA_H_
+>  #define _ERRATA_H_
+>  #include <libcflat.h>
+> +#include <argv.h>
+>  
+>  #include "config.h"
+>  
+> @@ -28,7 +29,7 @@ static inline bool errata_force(void)
+>  		return true;
+>  
+>  	s = getenv("ERRATA_FORCE");
+> -	return s && (*s == '1' || *s == 'y' || *s == 'Y');
+> +	return STR_IS_Y(s);
+>  }
+>  
+>  static inline bool errata(const char *erratum)
+> @@ -40,7 +41,7 @@ static inline bool errata(const char *erratum)
+>  
+>  	s = getenv(erratum);
+>  
+> -	return s && (*s == '1' || *s == 'y' || *s == 'Y');
+> +	return STR_IS_Y(s);
+>  }
+>  
+>  static inline bool errata_relaxed(const char *erratum)
+> @@ -52,7 +53,7 @@ static inline bool errata_relaxed(const char *erratum)
+>  
+>  	s = getenv(erratum);
+>  
+> -	return !(s && (*s == '0' || *s == 'n' || *s == 'N'));
+> +	return !STR_IS_N(s);
+>  }
+>  
+>  #endif
+> diff --git a/riscv/sbi-tests.h b/riscv/sbi-tests.h
+> index c1ebf016..4e051dca 100644
+> --- a/riscv/sbi-tests.h
+> +++ b/riscv/sbi-tests.h
+> @@ -37,6 +37,7 @@
+>  
+>  #ifndef __ASSEMBLER__
+>  #include <libcflat.h>
+> +#include <argv.h>
+>  #include <asm/sbi.h>
+>  
+>  #define __sbiret_report(kfail, ret, expected_error, expected_value,						\
+> @@ -94,7 +95,7 @@ static inline bool env_enabled(const char *env)
+>  {
+>  	char *s = getenv(env);
+>  
+> -	return s && (*s == '1' || *s == 'y' || *s == 'Y');
+> +	return STR_IS_Y(s);
+>  }
+>  
+>  void split_phys_addr(phys_addr_t paddr, unsigned long *hi, unsigned long *lo);
+> -- 
+> 2.43.0
+
+Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
 
