@@ -1,153 +1,119 @@
-Return-Path: <kvm+bounces-51884-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51889-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4164EAFE0D6
-	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 09:06:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 090F2AFE1C9
+	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 10:03:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F3D91172990
-	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 07:06:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5AC0F16FFEE
+	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 08:03:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1D022749E0;
-	Wed,  9 Jul 2025 07:05:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lGa5dMb4"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CDDE23C4EC;
+	Wed,  9 Jul 2025 08:02:43 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6402B273D8B
-	for <kvm@vger.kernel.org>; Wed,  9 Jul 2025 07:05:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 045A92222D0;
+	Wed,  9 Jul 2025 08:02:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752044708; cv=none; b=RJce0rOyM37R1sWoilaup8quL3NU3q9cGnnI5obJPxxtAP5Yi/s/Bypl/8mrYW6OotpBABmXZeBb8ww7yAbIz6lRlBHPo69oOToCbglt2SOjH2lta+mQ24b7mqgt56moTWI0CBqgfRcGVHPIVdm9ilTot9kO3eXtpNshTjhNVRM=
+	t=1752048162; cv=none; b=RSiWBhTh1zhmJy3VpRIIkN2QdH1olFX8jdSzf2zhDuuaaqt4dHcWqMr49Mcc3JLYTf9ac9btvUhbfwFpc9c7OsSknN9YPBVP3VOLB7l+i2G6f9DAnJhR3gtH5Xelzc641Ng9aK2eHLqOAHDXVa+ROiJnt0kmKGhr84IYoJWDlyk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752044708; c=relaxed/simple;
-	bh=bqDfiVKFuR+e8N7emCK6GdbPPlTbsBsyYl3PH3KjyJw=;
-	h=Date:In-Reply-To:Message-Id:Mime-Version:References:Subject:From:
-	 To:Cc:Content-Type; b=lW//EAhFeRQ+q4AfHV9L6FmC7+uS7251jvfS/WEqaPQO6s7QhCKwJXITWWE30vRfz/iWOV8iGEXskLFPY7swHih/QPRDdCxfjjTAGJmgTGrlvVBw2zn7f/B4ycWpzygKuE3kuJgCP4G5x+bYl8j33016V/5MBppXRabLGqIzqVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--suleiman.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lGa5dMb4; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--suleiman.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e81b3e168a6so5692020276.1
-        for <kvm@vger.kernel.org>; Wed, 09 Jul 2025 00:05:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752044706; x=1752649506; darn=vger.kernel.org;
-        h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HaDQLHJuamQG+Oz/rXsc1nJQc3j6887WnfJ3FWY6wPY=;
-        b=lGa5dMb4/QCskSc/99m9viQEHFXRqBqRbuSxe8xbbz1YtNKIQIHcB3SWi2d6gc03NM
-         yjMjJYjLpL0efYbj12ikl3F9Vt1vpd40ZbT4SQEUyFezNUsZuxbxOO4foCxR9M6eeRDJ
-         0ddqiQYvYZsttyrpxusJBc1Lk8t31SSk11tb7LaEAQGqTgEeEUdjrQKl2FmJjeFNYvlx
-         ZQx3s3C0sOEOxfUt+NQeDSIvkXR1lQGvJs7RuI4fVOKa7zt/5mQkLHPa+eI0mAKQuPkm
-         PC5ZUj4H62nz3hRyxxrxayLIkoMo8SV9au9VXzGrTmwxQGpk0vde0OVl5yOU90R5uDLE
-         Q7pQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752044706; x=1752649506;
-        h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HaDQLHJuamQG+Oz/rXsc1nJQc3j6887WnfJ3FWY6wPY=;
-        b=SOUbDdHVp4imwzIdYrQgiAIrzoae8y70ZN7tM1KseYdv/ax5KDcsfdEiCeTuuc9zcp
-         9vr1u6ua4fsYmByB1w4EEyWWIcec1oe5RtyCO9/5hMnVw/hzR42IQylJYhhOcdSgkhZd
-         I1ruU/wFs9xlDM0NlSYa0dSBqnGGXQKOTlFrjCE2pTaPJanY/ii6bxPeVNC1ni0fJnTZ
-         KxSvMY83wxeeOZ/5EQz8HBFXs2zTdwkoc6neM6+t9k3P+ccQpkV9wnNG1KIa7+KNVQxk
-         93vhBOCBAz7UxQaDPa363BeeYo8c5OjQsZ2vL4Z8VQcPKGLdt8XQxsUodEwXSDgtuseA
-         tfPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVBXZuecxZkfpBPkUbvBkEK9X7OJu8dhc/siD/Rg8fJf4pBdRaNiDmBVLYr+2N81gvFOY4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywcw+RL9ktsM4wsFFPA7zv2/7usKEK7myPMZlI2ozURXcEWFwXw
-	n8MdYOq+ND/54wvbUu68aNQB/M1nle2kIuBaLXpoBNtrrzEvuMS5iw1cX59g51VuY6s2nseSwEy
-	Syjf1iPoFmaYYgQ==
-X-Google-Smtp-Source: AGHT+IE5ZkJJrfChwxmjelv9TbY/xNBu5uRt03nGE+i4WAPwg6JLhbF8sllzldrGvtvYqXjNVHB2+Nx7G6uM6w==
-X-Received: from suleiman1.tok.corp.google.com ([2401:fa00:8f:203:a92c:694f:82fe:62a])
- (user=suleiman job=sendgmr) by 2002:a05:6902:6c0e:b0:e89:883d:dd33 with SMTP
- id 3f1490d57ef6-e8b6e19fdcamr688276.5.1752044706399; Wed, 09 Jul 2025
- 00:05:06 -0700 (PDT)
-Date: Wed,  9 Jul 2025 16:04:50 +0900
-In-Reply-To: <20250709070450.473297-1-suleiman@google.com>
-Message-Id: <20250709070450.473297-4-suleiman@google.com>
+	s=arc-20240116; t=1752048162; c=relaxed/simple;
+	bh=BUgPGjWpn/5cTFdXjgeSnXucpvBBjqJ1G3jY8tlkWnc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=qFdOjUL+4lYYh4y53/riKQYgWoIH8qd6YAe8cTKlk0vKaZkwBHhxnxiFAK1xvrYENoNosz/uImdgWSZkPfYvvFWjcaHYYFvABxgfc5ynFQqcF4oBjHc0E26xKgl44LPW/C3xzgQ+xJSSM840emP0jLK9J3zG8oF3EkP+gXbGSag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.2.5.213])
+	by gateway (Coremail) with SMTP id _____8Axx2kaIm5oTyklAQ--.44988S3;
+	Wed, 09 Jul 2025 16:02:34 +0800 (CST)
+Received: from localhost.localdomain (unknown [10.2.5.213])
+	by front1 (Coremail) with SMTP id qMiowJBxpeQZIm5oS6cPAA--.24964S2;
+	Wed, 09 Jul 2025 16:02:34 +0800 (CST)
+From: Bibo Mao <maobibo@loongson.cn>
+To: Tianrui Zhao <zhaotianrui@loongson.cn>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Xianglai Li <lixianglai@loongson.cn>
+Cc: kvm@vger.kernel.org,
+	loongarch@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v6 0/8] LoongArch: KVM: Enhancement with eiointc emulation
+Date: Wed,  9 Jul 2025 16:02:25 +0800
+Message-Id: <20250709080233.3948503-1-maobibo@loongson.cn>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250709070450.473297-1-suleiman@google.com>
-X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Subject: [PATCH v6 3/3] KVM: x86: Add "suspendsteal" cmdline to request host
- to add suspend duration in steal time
-From: Suleiman Souhlal <suleiman@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Chao Gao <chao.gao@intel.com>, 
-	David Woodhouse <dwmw2@infradead.org>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Tzung-Bi Shih <tzungbi@kernel.org>, 
-	John Stultz <jstultz@google.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	ssouhlal@freebsd.org, Suleiman Souhlal <suleiman@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowJBxpeQZIm5oS6cPAA--.24964S2
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
+	ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
+	nUUI43ZEXa7xR_UUUUUUUUU==
 
-Introduce a new command line parameter, "suspendsteal", enabling the
-guest to use MSR_KVM_SUSPEND_STEAL, which tells the host that it would
-like host suspend duration to be included in steal time.
+This series add generic eiointc 8 bytes access interface, so that 1/2/4/8
+bytes access can use the generic 8 bytes access interface. It reduce
+about 500 lines redundant code and make eiointc emulation driver
+simpler than ever.
 
-Signed-off-by: Suleiman Souhlal <suleiman@google.com>
 ---
- Documentation/admin-guide/kernel-parameters.txt |  5 +++++
- arch/x86/kernel/kvm.c                           | 15 +++++++++++++++
- 2 files changed, 20 insertions(+)
+v5 ... v6:
+  1. Merge previous patch 5 & 6 into one, patch 7 & 10 into into one and
+     patch 12 and patch 13 into one.
+  2. Use sign extension with destination register for IOCSRRD.{B/H/W}
+     kernel emulation.
 
-diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index f1f2c0874da9dd..9f5758ca8fadd5 100644
---- a/Documentation/admin-guide/kernel-parameters.txt
-+++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -7074,6 +7074,11 @@
- 			improve throughput, but will also increase the
- 			amount of memory reserved for use by the client.
- 
-+	suspendsteal
-+			[X86,PV_OPS]
-+			Enable requesting the host to include the duration the
-+			host was suspended in steal time. Disabled by default.
-+
- 	suspend.pm_test_delay=
- 			[SUSPEND]
- 			Sets the number of seconds to remain in a suspend test
-diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-index 921c1c783bc187..35d1bb2283c2c0 100644
---- a/arch/x86/kernel/kvm.c
-+++ b/arch/x86/kernel/kvm.c
-@@ -320,6 +320,18 @@ static void __init paravirt_ops_setup(void)
- #endif
- }
- 
-+static bool suspend_steal;
-+
-+static int __init suspendsteal_setup(char *s)
-+{
-+	if (kvm_para_has_feature(KVM_FEATURE_SUSPEND_STEAL))
-+		suspend_steal = true;
-+
-+	return 0;
-+}
-+
-+early_param("suspendsteal", suspendsteal_setup);
-+
- static void kvm_register_steal_time(void)
- {
- 	int cpu = smp_processor_id();
-@@ -331,6 +343,9 @@ static void kvm_register_steal_time(void)
- 	wrmsrq(MSR_KVM_STEAL_TIME, (slow_virt_to_phys(st) | KVM_MSR_ENABLED));
- 	pr_debug("stealtime: cpu %d, msr %llx\n", cpu,
- 		(unsigned long long) slow_virt_to_phys(st));
-+
-+	if (suspend_steal)
-+		wrmsrl(MSR_KVM_SUSPEND_STEAL, KVM_MSR_ENABLED);
- }
- 
- static DEFINE_PER_CPU_DECRYPTED(unsigned long, kvm_apic_eoi) = KVM_PV_EOI_DISABLED;
+v4 ... v5
+  1. Rebase patch on latest kernel where bugfix of eiointc has been
+     merged.
+  2. Add generic eiointc 8 bytes access interface, 1/2/4/8 bytes access
+     uses generic 8 bytes access interface.
+
+v3 ... v4:
+  1. Remove patch about enhancement and only keep bugfix relative
+     patches.
+  2. Remove INTC indication in the patch title.
+  3. With access size, keep default case unchanged besides 1/2/4/8 since
+     here all patches are bugfix
+  4. Firstly check return value of copy_from_user() with error path,
+     keep the same order with old patch in patch 4.
+
+v2 ... v3:
+  1. Add prefix INTC: in title of every patch.
+  2. Fix array index overflow when emulate register EIOINTC_ENABLE
+     writing operation.
+  3. Add address alignment check with eiointc register access operation.
+
+v1 ... v2:
+  1. Add extra fix in patch 3 and patch 4, add num_cpu validation check
+  2. Name of stat information keeps unchanged, only move it from VM stat
+     to vCPU stat.
+---
+Bibo Mao (8):
+  LoongArch: KVM: Use standard bitops API with eiointc
+  LoongArch: KVM: Remove unused parameter len
+  LoongArch: KVM: Add stat information with kernel irqchip
+  LoongArch: KVM: Remove never called default case statement
+  LoongArch: KVM: Use generic function loongarch_eiointc_read()
+  LoongArch: KVM: Remove some unnecessary local variables
+  LoongArch: KVM: Replace eiointc_enable_irq() with eiointc_update_irq()
+  LoongArch: KVM: Add generic function loongarch_eiointc_write()
+
+ arch/loongarch/include/asm/kvm_host.h |  12 +-
+ arch/loongarch/kvm/intc/eiointc.c     | 558 ++++----------------------
+ arch/loongarch/kvm/intc/ipi.c         |  28 +-
+ arch/loongarch/kvm/intc/pch_pic.c     |   4 +-
+ arch/loongarch/kvm/vcpu.c             |   8 +-
+ 5 files changed, 102 insertions(+), 508 deletions(-)
+
+
+base-commit: 733923397fd95405a48f165c9b1fbc8c4b0a4681
 -- 
-2.50.0.727.gbf7dc18ff4-goog
+2.39.3
 
 
