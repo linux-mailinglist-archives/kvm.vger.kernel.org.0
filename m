@@ -1,194 +1,176 @@
-Return-Path: <kvm+bounces-51903-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51904-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE931AFE401
-	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 11:23:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C1C4AFE54D
+	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 12:13:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A41904E7FF3
-	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 09:22:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA64A1C24147
+	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 10:11:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E829284685;
-	Wed,  9 Jul 2025 09:22:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 536B728AB02;
+	Wed,  9 Jul 2025 10:09:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Pnm61yOi"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mD+1PGqt"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6E30283FE4;
-	Wed,  9 Jul 2025 09:22:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C8E8280308
+	for <kvm@vger.kernel.org>; Wed,  9 Jul 2025 10:09:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752052970; cv=none; b=E5I6PzFYuHoLKtZhHmuA3EIUXYdrvDHbrtULgpEf1vT3j1HYKsFVDlJCAb+stArCsCVOAWfhdDQi4asY9U4LpXle77QFu+BIQJtBdVeF9nVGOVFsAaoGbxkHoyiSsu+RsQAStCYS4Qr9sCIMPyDuDO8TwVuc+XISn117LNbQAD0=
+	t=1752055785; cv=none; b=nk7rpKXYkljWt4dLCNPIvjFFLhdfOTQkTiaNdcuefqc+nwpyNsaCmK9bWQiDcgQ3c7GVlEIsX3O9+bIc/d1UYHnghKOnZLzOi6ph1ArmtlgGOcNBjMJbJJ5X5LVdXFJztPcM0c+pdZeJsLeJAeTW/b6nolnWQMm6kTeEu2IqF+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752052970; c=relaxed/simple;
-	bh=dIIT9VxUTgRSYOTemi/qjydnfCdr6tW1kL+wYiGK/MU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cip4hpR0vQUnWLI90uN1joC+5AnkiEHhhK41EIsAaIbvPCf0V091O8KJxdndpTJNFQtu83p8WY/5eTLuMLyM0eyCs725Gy/eDxGJ1VUBtN0M4LhZl/CnZQj0UVDcoqCHqqIzg4NSrK5Seh64sopfjsHaprPmboKV0NkkpxRoQOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Pnm61yOi; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56985h4s019426;
-	Wed, 9 Jul 2025 09:22:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=SKwpHe
-	JS3gD+I45YYrsXUtTAaYzI2H0VMmVTSnt9rkw=; b=Pnm61yOiIpmuRP6H5ksdgG
-	KcHSQ2RRV0f04ZJhtEgm3qDJuPL+kWsEef3gz58i/NICNPZxWQwEKDAOq9vj0Yxo
-	iQMt2WcLFS7s3aCO8cG6yOa2h0iIqqyKSzO9qQfyF0/YEG190SPCVITDmHxwSLF6
-	5RLe+BRD3Ljsb8m+GrUk3y+hx/JbGzthzoQ9xZKdEO81uoUtixxvlPwv/Acihz7q
-	9qKWD5CwDtGhddr8ahz6FeFDX1WD4udWOc0Ds9uNHh1l0/CNFyHkBJGsR132Pu2h
-	rpsDkzSO3wyBUyDWBHnXVzSLXfFFIjDliRzm03pMhRaq78QlHLxsoMXn5urcYVoQ
-	==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47pur75a9a-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 09 Jul 2025 09:22:34 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5696PlCx010851;
-	Wed, 9 Jul 2025 09:22:33 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 47qes07na0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 09 Jul 2025 09:22:33 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5699MS0250004364
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 9 Jul 2025 09:22:28 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8514C2004D;
-	Wed,  9 Jul 2025 09:22:28 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 99EE420043;
-	Wed,  9 Jul 2025 09:22:27 +0000 (GMT)
-Received: from [9.87.155.2] (unknown [9.87.155.2])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed,  9 Jul 2025 09:22:27 +0000 (GMT)
-Message-ID: <447aafca-124a-45fc-85b2-8a653466fa34@linux.ibm.com>
-Date: Wed, 9 Jul 2025 11:22:27 +0200
+	s=arc-20240116; t=1752055785; c=relaxed/simple;
+	bh=WvppvSdJdTLlcTn66Yg4ZPNZ7uf4597BV3t3nEa5sgY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nZidn6qXs8lrGgJslxk8U+PGStWEYEheskBIgmgLLsfwziZKvGcLLXmAVG62hyy7+cqknwErBcLOb7/Hos1g1p31qOgoxD7truhy9Hx/DNUs6QOnPhEWUacgX+gbvPAsLefFCZRQ8FDSJxd0PJItwby2as3SOTBwdR5J2l6GybI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mD+1PGqt; arc=none smtp.client-ip=91.218.175.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Wed, 9 Jul 2025 12:09:36 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1752055779;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=T/m36q47DzH0sZai6UBloJIaV9zTL7B9oaqtL4C7wzU=;
+	b=mD+1PGqtDf42qbyO1yo0DC3cSlUh9yJBWScJ/iE5gE0yjCggTZ3XEAVOFz0mp9OgGKi9RK
+	HhXXex9A+nWWC4qQHOGekyAXg4sckQUeXKPQot9BXqTg/pdQYLOw12LZE4PJGBitM+cx8M
+	iU/2fynj3fbKnrE8sjKOQMwoENGNZgw=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Jesse Taube <jesse@rivosinc.com>
+Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-kselftest@vger.kernel.org, =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>, 
+	Charlie Jenkins <charlie@rivosinc.com>, James Raphael Tiovalen <jamestiotio@gmail.com>, 
+	Sean Christopherson <seanjc@google.com>, Cade Richard <cade.richard@gmail.com>
+Subject: Re: [kvm-unit-tests PATCH v2 1/2] lib: Add STR_IS_Y and STR_IS_N for
+ checking env vars
+Message-ID: <20250709-a6dd287628433e8bdf5ea51c@orel>
+References: <20250708154811.1888319-1-jesse@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/2] KVM: s390: Fix latent guest entry/exit bugs
-To: Andrew Donnellan <ajd@linux.ibm.com>, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org
-Cc: Mark Rutland <mark.rutland@arm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Frederic Weisbecker <frederic@kernel.org>,
-        Heiko Carstens
- <hca@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        Sven Schnelle
- <svens@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Andy Lutomirski
- <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Thomas Gleixner <tglx@linutronix.de>
-References: <20250708092742.104309-1-ajd@linux.ibm.com>
-Content-Language: en-US
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; keydata=
- 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
-In-Reply-To: <20250708092742.104309-1-ajd@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzA5MDA4MyBTYWx0ZWRfX+PGMHybAzlvx rIHMz2SYXAzWYhu9hKHQhJ9Uzsy+t3O8lKbwGUXSpA/haFNzpbQWSKzh0u3OWVq9HSOWQLPoaWr LWUBPwE83G+FG4PX4FAQ+5W3RXQrE2/ZMOtSuRMB5sgkTqzIWH4qBj/Pt6YYSslZMJ1F+cNw0lm
- TSEvPWxU9VhSB/CLxiI1o9NTyLmMdwTXMV40/jgzDWVa8NM+iZQ7SJPKZJfDP9juCbThl+eaP9M eDET93OhROrTrpohCzE9PcGcWvUkmwxqw8LJvjGKDDQoaJJI+vmqa87IcBOVl1BJDsLPYOX3KqL 0Be9b+u/Xqgexq3AyxgigaNxCIVxKhfBRljs/FVkwvV/lQnTYNbbGrFTjIuy0Oe5ldyJmZKKiy3
- qIli91RlRT2KMERfMJEyJxhDbpYLUdgAYDgA85aDilJOqqmcooD88YuQwpVnDKEvftpGGoUo
-X-Proofpoint-GUID: 75-xueHZvcwxx2KI7_mu1visZkXrr_Ar
-X-Proofpoint-ORIG-GUID: 75-xueHZvcwxx2KI7_mu1visZkXrr_Ar
-X-Authority-Analysis: v=2.4 cv=W/M4VQWk c=1 sm=1 tr=0 ts=686e34da cx=c_pps a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17 a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=VnNF1IyMAAAA:8 a=__GJD7VX6N_aT_KMK8QA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
- definitions=2025-07-09_02,2025-07-08_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 phishscore=0
- mlxscore=0 priorityscore=1501 adultscore=0 clxscore=1011 suspectscore=0
- spamscore=0 lowpriorityscore=0 mlxlogscore=672 bulkscore=0 impostorscore=0
- classifier=spam authscore=0 authtc=n/a authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2507090083
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250708154811.1888319-1-jesse@rivosinc.com>
+X-Migadu-Flow: FLOW_OUT
 
-On 7/8/25 11:27 AM, Andrew Donnellan wrote:
-> In [0], the guest_{enter,exit}_irqoff() helpers were deprecated, in favour
-> of guest_timing_{enter,exit}_irqoff() and
-> guest_context_{enter,exit}_irqoff(). This was to fix a number of latent
-> guest entry/exit bugs, relating to the enabling of interrupts during an
-> RCU extended quiescent state, instrumentation code, and correct handling
-> of lockdep and tracing.
+On Tue, Jul 08, 2025 at 08:48:10AM -0700, Jesse Taube wrote:
+> the line:
+> (s && (*s == '1' || *s == 'y' || *s == 'Y'))
+> is used in a few places add a macro for it and it's 'n' counterpart.
+                                                 ^ its
 > 
-> However, while arm64, mips, riscv and x86 have been migrated to the new
-> helpers, s390 hasn't been. There was an initial attempt at [1] to do this,
-> but that didn't work for reasons discussed at [2].
+> Add GET_CONFIG_OR_ENV for CONFIG values which can be overridden by
+> the environment.
 > 
-> Since then, Claudio Imbrenda has reworked much of the interrupt handling.
-> Moving interrupt handling into vcpu_post_run() avoids the issues in [2],
-> so we can now move to the new helpers.
+> Signed-off-by: Jesse Taube <jesse@rivosinc.com>
+> ---
+>  lib/argv.h        | 13 +++++++++++++
+>  lib/errata.h      |  7 ++++---
+>  riscv/sbi-tests.h |  3 ++-
+>  3 files changed, 19 insertions(+), 4 deletions(-)
 > 
-> I've rebased Mark's patches from [1]. kvm-unit-tests, the kvm selftests,
-> and IBM's internal test suites pass under debug_defconfig.
-> 
-> These patches do introduce some overhead - in my testing, a few of the
-> tests in the kvm-unit-tests exittime test suite appear 6-11% slower, but
-> some noticeable overhead may be unavoidable (we introduce a new function
-> call and the irq entry/exit paths change a bit).
-> 
+> diff --git a/lib/argv.h b/lib/argv.h
+> index 0fa77725..ecbb40d7 100644
+> --- a/lib/argv.h
+> +++ b/lib/argv.h
+> @@ -14,4 +14,17 @@ extern void setup_args_progname(const char *args);
+>  extern void setup_env(char *env, int size);
+>  extern void add_setup_arg(const char *arg);
+>  
+> +#define STR_IS_Y(s) (s && (*s == '1' || *s == 'y' || *s == 'Y'))
+> +#define STR_IS_N(s) (s && (*s == '0' || *s == 'n' || *s == 'N'))
+> +
+> +/*
+> + * Get the boolean value of CONFIG_{name}
+> + * which can be overridden by the {name}
+> + * variable in the environment if present.
+> + */
+> +#define GET_CONFIG_OR_ENV(name) ({		\
+> +	const char *s = getenv(#name);		\
+> +	s ? STR_IS_Y(s) : CONFIG_##name;	\
+> +})
 
-This series has been part of our CI runs for some while and hasn't 
-caused issues.
+This requires CONFIG_##name to be defined, even if it's a 'no'. That's
+probably OK, but a solution that allows it to be undefined, which then
+means 'no' would be nice.
 
-Series:
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+> +
+>  #endif
+> diff --git a/lib/errata.h b/lib/errata.h
+> index de8205d8..78007243 100644
+> --- a/lib/errata.h
+> +++ b/lib/errata.h
+> @@ -7,6 +7,7 @@
+>  #ifndef _ERRATA_H_
+>  #define _ERRATA_H_
+>  #include <libcflat.h>
+> +#include <argv.h>
+>  
+>  #include "config.h"
+>  
+> @@ -28,7 +29,7 @@ static inline bool errata_force(void)
+>  		return true;
+>  
+>  	s = getenv("ERRATA_FORCE");
+> -	return s && (*s == '1' || *s == 'y' || *s == 'Y');
+> +	return STR_IS_Y(s);
+>  }
+>  
+>  static inline bool errata(const char *erratum)
+> @@ -40,7 +41,7 @@ static inline bool errata(const char *erratum)
+>  
+>  	s = getenv(erratum);
+>  
+> -	return s && (*s == '1' || *s == 'y' || *s == 'Y');
+> +	return STR_IS_Y(s);
+>  }
+>  
+>  static inline bool errata_relaxed(const char *erratum)
+> @@ -52,7 +53,7 @@ static inline bool errata_relaxed(const char *erratum)
+>  
+>  	s = getenv(erratum);
+>  
+> -	return !(s && (*s == '0' || *s == 'n' || *s == 'N'));
+> +	return !STR_IS_N(s);
+>  }
+>  
+>  #endif
+> diff --git a/riscv/sbi-tests.h b/riscv/sbi-tests.h
+> index c1ebf016..4e051dca 100644
+> --- a/riscv/sbi-tests.h
+> +++ b/riscv/sbi-tests.h
+> @@ -37,6 +37,7 @@
+>  
+>  #ifndef __ASSEMBLER__
+>  #include <libcflat.h>
+> +#include <argv.h>
+>  #include <asm/sbi.h>
+>  
+>  #define __sbiret_report(kfail, ret, expected_error, expected_value,						\
+> @@ -94,7 +95,7 @@ static inline bool env_enabled(const char *env)
+>  {
+>  	char *s = getenv(env);
+>  
+> -	return s && (*s == '1' || *s == 'y' || *s == 'Y');
+> +	return STR_IS_Y(s);
+>  }
+>  
+>  void split_phys_addr(phys_addr_t paddr, unsigned long *hi, unsigned long *lo);
+> -- 
+> 2.43.0
+>
+
+Besides the typo, LGTM
+
+Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
 
