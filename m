@@ -1,126 +1,113 @@
-Return-Path: <kvm+bounces-51946-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51948-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21DE2AFEB93
-	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 16:17:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94BD6AFEBD2
+	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 16:26:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97FD6564B5A
-	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 14:11:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05FA45C41F3
+	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 14:18:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED8C22E5403;
-	Wed,  9 Jul 2025 14:09:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E7012E54B3;
+	Wed,  9 Jul 2025 14:18:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hvw/csdQ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EJwiWyA0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC5972E3B1E
-	for <kvm@vger.kernel.org>; Wed,  9 Jul 2025 14:09:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0D55276025;
+	Wed,  9 Jul 2025 14:18:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752070155; cv=none; b=HOmh5inTaY2oVzCIdabfAhBXHYI2+Hiw30V1dtaWoN72P0UDzuR//X8Fd36yW6VxrZdgItMZ+rTJqIRrsQ+JqOUIbl4mnQLZeG4MAIo0+v8QkMEEgbrXzlDFJAY0auOLFFQEAd2fQ7YMY2GMFSBoQS5yczyKEDSRsDGl3nv6Mh4=
+	t=1752070712; cv=none; b=N61ViKQ0OkaB31kQldChcRe4n6YKXyhXXE6siCH1+nh3RoD4GY4Egc3K5msJGMXXFGrfKBbiUNtHsEwuFsv0SgB51PxC8FegsA13bcKv5Jilg5uVdhlCI/lGZQMVN35sUv4RSHuz+4PWHo4Yg3R/UaojP1QDD6kchMVm3Fus3Gw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752070155; c=relaxed/simple;
-	bh=u9ZCL26Udw7csZPMMP8KEX8jrLO4XNBGOHz68QbHy+I=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=OWCa4fjR9z+Zltd4xvKw09BA2W/mC8RF89v364TiGV/cjNGVazY6RXmhcdClbNOKGWbKjeIq0uQxemu7sFkARIEFmjEOz1QD9JDMkCuofG+Ic9TdBlr3gf0uvBt3iMkAGaDvXTlbBB3vN0Ng48zxsj6D4nKh+zGp7YgI6LokO5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hvw/csdQ; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-74b185fba41so4559111b3a.1
-        for <kvm@vger.kernel.org>; Wed, 09 Jul 2025 07:09:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752070153; x=1752674953; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=t5tpTrrg2hny9/I7I2qzQrheZCqRZ5KWbbmlizq7TnU=;
-        b=hvw/csdQcOW2edZ1v/B1i0Xk30K7Ks+5iCIa3+u/MpiwN++sSvnsE8TnSeBARb+r6k
-         8CUe12Kp9H0yvK6RsSh1gL9GgQiMUQq5gSrt29+t6s8GW3AJbDmYvi63zL3Zzdk1PkfM
-         +x1CdfYk0/oNraFjxdzx7Y19pnc66hA05dyjMO4wIG3+u6I5A1cukNXaOfvlTJfCypbc
-         JFlwdCgNlp7owLrBMXbBGK56/uFg8lXP4qauNHYv9Q1IfsLMFBQC6IRi/JRItxD9dmjq
-         VVDWdhGhZiEf1hEaYsuqLdbs3EmwiKZgDCi/olH+gFpyI8rCX6Qr44Iy1NQ9Jr46zE0e
-         ttcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752070153; x=1752674953;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=t5tpTrrg2hny9/I7I2qzQrheZCqRZ5KWbbmlizq7TnU=;
-        b=maqdPzM1G9I2xTWx9KFpMwYB7qUtC4OtrDyYgrzSVIrXC8mT89DjeHEID7Xe9VbuMT
-         ApRk+DR1E+ReLgM7fvNWchCKL+22f0oWd4ziLVAXV/9QFtJqHPo/0crzC6n3e8KFIEYQ
-         QWqDLTSl5l2sNwkbzSSD8pwsU7ugbXiHjqWhsuHzmBkx5Qmv4D+pVywgsvmYUEZIzOX6
-         etc2Qo0r4gTVspOQFw4pVwWknx7e9g5LJByn5h158v23wKYBqffaXja3H/xRhY68hgUI
-         GVFrqU2CDOyvDvcOWO6o2kckkWf3Lj0Y6Zh46mkC+VDpjIhWosCgdSlo4vrxuhRDBtmt
-         V1VA==
-X-Forwarded-Encrypted: i=1; AJvYcCXHZNJPmGR8lY2wVXDC408QhenMLrmCC2cdWzPaGiPVNdAe9OtJIRP8zhUrIHYrrK1Bozk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzOhQfo/EJBHXxlq404v5jsw9/kaHPhTfGASX7bCiObSo/+Ng8y
-	kYma3fe3+pAN6BngFIZCh0+hdW3HlXGxduoLaa0N8r9+grrzS24JDIYbqwPEJdiQ0rBhKAlzJVP
-	dJtIoTA==
-X-Google-Smtp-Source: AGHT+IHDb9Dv+1va9PvqDCQHLOYKAmeY56qPvJ4RxAeantsKZ8J12hViLyDpj1gcR3GtO9OpwmQWTNCFJms=
-X-Received: from pfbcp14.prod.google.com ([2002:a05:6a00:348e:b0:746:279c:7298])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:14d6:b0:746:298e:4ed0
- with SMTP id d2e1a72fcca58-74ea6641bd6mr4374759b3a.13.1752070153115; Wed, 09
- Jul 2025 07:09:13 -0700 (PDT)
-Date: Wed, 9 Jul 2025 07:09:11 -0700
-In-Reply-To: <20250709033242.267892-5-Neeraj.Upadhyay@amd.com>
+	s=arc-20240116; t=1752070712; c=relaxed/simple;
+	bh=OENTxUU6mdDY92C/NOL14GnVLsxzDa319iL2JkpR7/U=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LqR4OhIVErBizyvWox+Grq4HjnkmY+lpEu95YbLfyBMTS7wc8qwTjR12620FX1csYzZ2f/XoVa8/My/M2fURDNESTF0ByATHjrJJ83neMi2Gf3hTplQrKdyasGu3WR42a8adz6PCeKg7uQdnP1JpVKg1vkH2Rx0uiC2fTiGIiC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EJwiWyA0; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1752070711; x=1783606711;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=OENTxUU6mdDY92C/NOL14GnVLsxzDa319iL2JkpR7/U=;
+  b=EJwiWyA0LRCaAUXfrhrkeeWvaFojFEZOa6Q1HMMp/Sl4tydBtLguf/LC
+   BGF/07MT/1ygxzHkMTfMJXzTHzIZD0Yf5LD7R3xQ8FAnfATJUqyRZyqmo
+   rGpmyawp/YqWioRA5Y5xIp2YrJBsNS8GrZB9tJutbM74p1BKfuV2yOewe
+   rlo0Ql+FZhaPc23Z8b9iZNjRAW2WoDKYY95G4t+3UQgMdom6X4hGbJNi4
+   e+yT627tvl2FEVnsWTb6db5J6sPP2P9E+7HcOu5A0HlKDkhi9XceYquX4
+   K5U7wfy/TSvO0dgA1LHvhcei3K+pPbzRHMPKAAsFwHV2RfnXiFjEBi28v
+   A==;
+X-CSE-ConnectionGUID: +bCT5fIcR7OmWS8Cv6u1mA==
+X-CSE-MsgGUID: qeY2HhW/R2WxR7h/5mjIpg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11489"; a="41956153"
+X-IronPort-AV: E=Sophos;i="6.16,298,1744095600"; 
+   d="scan'208";a="41956153"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2025 07:18:30 -0700
+X-CSE-ConnectionGUID: 7yWtpJG6Rg6KTR8esRC+GA==
+X-CSE-MsgGUID: nGHKQhmtQIaZZWyfnLFhHw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,298,1744095600"; 
+   d="scan'208";a="161447456"
+Received: from lxy-clx-4s.sh.intel.com ([10.239.48.52])
+  by orviesa005.jf.intel.com with ESMTP; 09 Jul 2025 07:18:26 -0700
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+To: Dave Hansen <dave.hansen@linux.intel.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>
+Cc: Rick Edgecombe <rick.p.edgecombe@intel.com>,
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+	Xiaoyao Li <xiaoyao.li@intel.com>,
+	"H . Peter Anvin" <hpa@zytor.com>,
+	x86@kernel.org,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-coco@lists.linux.dev
+Subject: [PATCH] MAINTAINERS: Add KVM mail list to the TDX entry
+Date: Wed,  9 Jul 2025 22:10:35 +0800
+Message-ID: <20250709141035.70299-1-xiaoyao.li@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250709033242.267892-1-Neeraj.Upadhyay@amd.com> <20250709033242.267892-5-Neeraj.Upadhyay@amd.com>
-Message-ID: <aG54B8frrerb0pn4@google.com>
-Subject: Re: [RFC PATCH v8 04/35] KVM: x86: Rename VEC_POS/REG_POS macro usages
-From: Sean Christopherson <seanjc@google.com>
-To: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
-Cc: linux-kernel@vger.kernel.org, bp@alien8.de, tglx@linutronix.de, 
-	mingo@redhat.com, dave.hansen@linux.intel.com, Thomas.Lendacky@amd.com, 
-	nikunj@amd.com, Santosh.Shukla@amd.com, Vasant.Hegde@amd.com, 
-	Suravee.Suthikulpanit@amd.com, David.Kaplan@amd.com, x86@kernel.org, 
-	hpa@zytor.com, peterz@infradead.org, pbonzini@redhat.com, kvm@vger.kernel.org, 
-	kirill.shutemov@linux.intel.com, huibo.wang@amd.com, naveen.rao@amd.com, 
-	kai.huang@intel.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jul 09, 2025, Neeraj Upadhyay wrote:
-> @@ -736,12 +735,12 @@ EXPORT_SYMBOL_GPL(kvm_apic_clear_irr);
->  
->  static void *apic_vector_to_isr(int vec, struct kvm_lapic *apic)
->  {
-> -	return apic->regs + APIC_ISR + REG_POS(vec);
-> +	return apic->regs + APIC_ISR + APIC_VECTOR_TO_REG_OFFSET(vec);
->  }
->  
->  static inline void apic_set_isr(int vec, struct kvm_lapic *apic)
->  {
-> -	if (__test_and_set_bit(VEC_POS(vec), apic_vector_to_isr(vec, apic)))
-> +	if (__test_and_set_bit(APIC_VECTOR_TO_BIT_NUMBER(vec), apic_vector_to_isr(vec, apic)))
->  		return;
->  
->  	/*
-> @@ -784,7 +783,7 @@ static inline int apic_find_highest_isr(struct kvm_lapic *apic)
->  
->  static inline void apic_clear_isr(int vec, struct kvm_lapic *apic)
->  {
-> -	if (!__test_and_clear_bit(VEC_POS(vec), apic_vector_to_isr(vec, apic)))
-> +	if (!__test_and_clear_bit(APIC_VECTOR_TO_BIT_NUMBER(vec), apic_vector_to_isr(vec, apic)))
->  		return;
->  
->  	/*
+KVM is the primary user of TDX within the kernel, and it is KVM that
+provides support for running TDX guests.
 
-Almost forgot.  I'd prefer to wrap these two, i.e.
+Add the KVM mailing list to the TDX entry so that KVM people can be
+informed of proposed changes and updates related to TDX.
 
-	if (__test_and_set_bit(APIC_VECTOR_TO_BIT_NUMBER(vec),
-			       apic_vector_to_isr(vec, apic)))
-		return;
+Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+---
+ MAINTAINERS | 1 +
+ 1 file changed, 1 insertion(+)
 
-and
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 0c1d245bf7b8..f1fb15729460 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -26907,6 +26907,7 @@ M:	Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+ R:	Dave Hansen <dave.hansen@linux.intel.com>
+ L:	x86@kernel.org
+ L:	linux-coco@lists.linux.dev
++L:	kvm@vger.kernel.org
+ S:	Supported
+ T:	git git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git x86/tdx
+ F:	Documentation/ABI/testing/sysfs-devices-virtual-misc-tdx_guest
+-- 
+2.43.0
 
-	if (!__test_and_clear_bit(APIC_VECTOR_TO_BIT_NUMBER(vec),
-				  apic_vector_to_isr(vec, apic)))
-		return;
 
