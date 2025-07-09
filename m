@@ -1,112 +1,157 @@
-Return-Path: <kvm+bounces-51993-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51994-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51C12AFF412
-	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 23:44:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADACBAFF41B
+	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 23:46:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01744641AD0
-	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 21:43:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A0E21C2543F
+	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 21:46:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C209224DD10;
-	Wed,  9 Jul 2025 21:41:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9923E22539E;
+	Wed,  9 Jul 2025 21:46:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="R2qbSb5y"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nfXbmUyv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0B0D241673;
-	Wed,  9 Jul 2025 21:41:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67A321EA73
+	for <kvm@vger.kernel.org>; Wed,  9 Jul 2025 21:46:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752097305; cv=none; b=UUm6XSozLrSa/Yzi7FjWuoqq6JxPqpP/Ki4QLrvfKWsmRdhYQL2fpVTMEqmK3YNI1EEty2+t4B7QvX//QX7EtZVNC8ZnKt7EK2MY+uDytf2D2eBNBcgMgjZ0i2zm7YjOlUC3SrgN6+NvAjJ6agZ5DbaToi2uSQ4DTChFWO+zyg8=
+	t=1752097583; cv=none; b=mG1kzUbo8/R/eBe9IhqjOwksNsJUeU+29ZPuM9wXK1o3LhttLY29NXwrmFpLpPEdMeKyqFkuX8DLKSGViLoCsLiq5C1197nYqsp0siqEoO2oMc9cbD5RCLmsIh5KY2/iefnfR6BBWqDbCzmsveAIw+holBaPjMlot5AodJCnZXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752097305; c=relaxed/simple;
-	bh=aQbzgSyNSih8ocOpxy2RZ+8ww8LgbwU4eJQbGKAzvVs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tauSWLz/pBwZZzAHG7OunlzZUhdk6rvCEmLPkgkENpcbnoAg59f0nrGJWgYh4lzP5EeBua1XueyOLFkR70VBdkAySv5XY4j0HknJDLjZPKKSCsRPI7bon0xvSUWpR/fZv45X9a0D5tRSCBI3o8DUNRdZNqMfBWBUY9OjE6xn1Lk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=R2qbSb5y; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 902CB40E0216;
-	Wed,  9 Jul 2025 21:41:40 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id 7TXVX2LfnEoA; Wed,  9 Jul 2025 21:41:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1752097297; bh=welqa06GFJI4VOR5xGX4jgUpfnRTCDdVT0ZtjsQ9UPM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=R2qbSb5yJ3ZE4CO49ocu83kCx+CRDiDhZpqRz6j8nuSw7Jrco38J+A8aYhK9Pzf1s
-	 R8IG7HnToowum2itDeWC88m3q6n5TheGlEJoftjqy+0+BOm8GSxg07BspPgpZ7ueSv
-	 JyOueLKkE7Ryi0oiYGAfVC1y1cfAVngXNqDwVGhQx4eBGzX91LdwR1/WGxXr61c1ca
-	 hG6xWLjVbroFJ6GmP8vD52x4rwB7+xg8jyhpqwvAh5OwLdri3Kvsu63j1Q+NYECTzy
-	 Sk1lNknMO8ADT3bRG4bsZ7wzDodlXbTU5lf5ldGHu1V/X8xh+eMTt6Xsw/RpBgijO4
-	 Vi3EHbltTWA5klvGeaRD2aXdl4hjwb3Uyi6EMFOtP8G9/18HkGUkgWkP0v7dssQtE3
-	 Lun7IaXbAWTRRVAnYB8EvydK6lttTLw6Ukaa8LHyj1f1YegyYg/6EO/2nG5R5aLjQw
-	 rIrmhG54P9lrI5ryd9bKOT+cCl64zD57Erl0CM4OBlnMizQqNyAJ0CkyIC6zj1495A
-	 S4eLKCwYDJPhbEGFo4UdjX+98bXvsK0kN9ypt1C02arxsF33uW8FnzZqypE2Prh3FH
-	 g/MhuI6O8SC3vnpQ0+eldX+FlmSa3SNZGT4Ix+Utbjwo4z09ozbHy469tyXdCxYm3K
-	 zkyJ5qvlOYju0Eu4iXpG9ys0=
-Received: from zn.tnic (p57969c58.dip0.t-ipconnect.de [87.150.156.88])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 1110540E0215;
-	Wed,  9 Jul 2025 21:41:16 +0000 (UTC)
-Date: Wed, 9 Jul 2025 23:41:10 +0200
-From: Borislav Petkov <bp@alien8.de>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>, linux-kernel@vger.kernel.org,
-	tglx@linutronix.de, mingo@redhat.com, dave.hansen@linux.intel.com,
-	Thomas.Lendacky@amd.com, nikunj@amd.com, Santosh.Shukla@amd.com,
-	Vasant.Hegde@amd.com, Suravee.Suthikulpanit@amd.com,
-	David.Kaplan@amd.com, x86@kernel.org, hpa@zytor.com,
-	peterz@infradead.org, pbonzini@redhat.com, kvm@vger.kernel.org,
-	kirill.shutemov@linux.intel.com, huibo.wang@amd.com,
-	naveen.rao@amd.com, kai.huang@intel.com
-Subject: Re: [RFC PATCH v8 00/35] AMD: Add Secure AVIC Guest Support
-Message-ID: <20250709214110.GFaG7h9kPZoSS_MhIr@fat_crate.local>
-References: <20250709033242.267892-1-Neeraj.Upadhyay@amd.com>
- <aG5_mowwoIogBSqH@google.com>
+	s=arc-20240116; t=1752097583; c=relaxed/simple;
+	bh=L9LVrS8VhpVhZDH5rGUCmQfvq+9qwn0aD/goPecosqs=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=dbMzbJLLPiI6iUEM6tNDCaBtOxELfQo6QaYqKdDk2HAtJ9Jj5aKfVlue3QxxjamzmCGvpD8elbYT8BHs26HOVx+358AyH53LwvmEqdiXOcV7OlhsFebYK9yLM0Huz1IJ+9DufZkoehp2iblVTX+QFA2JpIKBUxyACtU6uA5seJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nfXbmUyv; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3139c0001b5so315552a91.2
+        for <kvm@vger.kernel.org>; Wed, 09 Jul 2025 14:46:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1752097582; x=1752702382; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=WaqfKSmh/HmFIuS+sSnBu07GpBGE4YrxsliW83zfkFo=;
+        b=nfXbmUyvKgjjQhxZ1DMKR9nAU3wnU7b/w8XBBzYyOzzeLjRd3unnRAUF8N3ekQ9xhT
+         1Te+0kENlVGLO/E99s10rWnvZ4zptxk2ow4ZaBBGyYg+Tcb82Sdbo1vDEK1Xyi4SRVg/
+         GPdcoO9bTafnXVfPiFhnz6n/rLEUa3rXU85yHEzjAMxXxohPXCjT6xF7bZ8Mm8n1wfl0
+         jlublq4xq1A5N7oZeunvEH6GDR/xFRayIxJxoBc9fp/UX+rbszG7dahQmxdpqsBSMqjR
+         SGKC8UEACTEeCeOcMLD18JW+jobpmJ8e29XVtq4evqtEST8rANiee4ns+Nm2epEA+DfI
+         g9fA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752097582; x=1752702382;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WaqfKSmh/HmFIuS+sSnBu07GpBGE4YrxsliW83zfkFo=;
+        b=jgpf+Fg5obih0rwNogejnHe7y4IivNaZU8nfnaiezc/WtG/k/9GYAOGRfMYR5y4nrX
+         AbXeu+aW52WGvqGPH8jkwNu0U9pan+Q1zR39yepBQao2Lmklj+YuTjjDPVSlpyHesjgT
+         BYKsTFwuEF0u0+X2V2uAoQPlzkzUSWVEwATmpIcMr4hLgz/mDmjW/pe3TyzTbkaoQDbN
+         XlPFpzA4As8SEo4LCIGr2wCt5gcEgT3AJ2YDsOIoh6mOrZbv7j7devAy4IDGHmtozPFA
+         s4vm+XmKzfD2nJdPxIpQo/cAuFje72Qfv9pgMm25IYIx22jGZCxh8YS+3CDDlDKInDnB
+         21nQ==
+X-Gm-Message-State: AOJu0Ywfjq9+eH6bedFkcq4CLw13LKX/LoFRcZRjXA0eElhhI8clIDf4
+	OevIJ1yvg2sa8PcA/ZOTYwlKH//RDaW3UOZ/MD9Cyn4IMetMzpI98hCf6kpv1gDRoW7RpwDvF/w
+	OsCNAeg==
+X-Google-Smtp-Source: AGHT+IGcqFJmd+hfGvHB0iLaIOFTZC36nD5olbTkWzVffAwi5c8bazohN60XOEuv/ND8XITKiAvhLA/8GEg=
+X-Received: from pjboh12.prod.google.com ([2002:a17:90b:3a4c:b0:313:230:89ed])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2dcd:b0:311:b0ec:135f
+ with SMTP id 98e67ed59e1d1-31c3c2f158emr1976074a91.30.1752097581827; Wed, 09
+ Jul 2025 14:46:21 -0700 (PDT)
+Date: Wed, 9 Jul 2025 14:46:20 -0700
+In-Reply-To: <20250606235619.1841595-4-vipinsh@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <aG5_mowwoIogBSqH@google.com>
+Mime-Version: 1.0
+References: <20250606235619.1841595-1-vipinsh@google.com> <20250606235619.1841595-4-vipinsh@google.com>
+Message-ID: <aG7jLBAqo1F3SjCl@google.com>
+Subject: Re: [PATCH v2 03/15] KVM: selftests: Add timeout option in selftests runner
+From: Sean Christopherson <seanjc@google.com>
+To: Vipin Sharma <vipinsh@google.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org, 
+	linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com, 
+	anup@brainfault.org, borntraeger@linux.ibm.com, frankja@linux.ibm.com, 
+	imbrenda@linux.ibm.com, maz@kernel.org, oliver.upton@linux.dev, 
+	dmatlack@google.com
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Jul 09, 2025 at 07:41:30AM -0700, Sean Christopherson wrote:
-> Boris, do you anticipate taking this entire series for 6.17?  If not, I'd be more
-> than happy to grab all of the KVM => x86/apic renames and code movement for 6.17,
-> e.g. to avoid complications if a conflicting KVM change comes along.  I can throw
-> them in a dedicated topic branch so that you could ingest the dependency prior to
-> 6.17-rc1 if necessary.
- 
-> I.e. these:
+On Fri, Jun 06, 2025, Vipin Sharma wrote:
+> diff --git a/tools/testing/selftests/kvm/runner/command.py b/tools/testing/selftests/kvm/runner/command.py
+> index a63ff53a92b3..44c8e0875779 100644
+> --- a/tools/testing/selftests/kvm/runner/command.py
+> +++ b/tools/testing/selftests/kvm/runner/command.py
+> @@ -12,14 +12,16 @@ class Command:
+>      Returns the exit code, std output and std error of the command.
+>      """
+>  
+> -    def __init__(self, command):
+> +    def __init__(self, command, timeout):
+>          self.command = command
+> +        self.timeout = timeout
+>  
+>      def run(self):
+>          run_args = {
+>              "universal_newlines": True,
+>              "shell": True,
+>              "capture_output": True,
+> +            "timeout": self.timeout,
+>          }
+> @@ -48,10 +50,13 @@ class Selftest:
+>              self.stderr = "File doesn't exists."
+>              return
+>  
+> -        ret, self.stdout, self.stderr = self.command.run()
+> -        if ret == 0:
+> -            self.status = SelftestStatus.PASSED
+> -        elif ret == 4:
+> -            self.status = SelftestStatus.SKIPPED
+> -        else:
+> -            self.status = SelftestStatus.FAILED
+> +        try:
+> +            ret, self.stdout, self.stderr = self.command.run()
 
-Yah, I'd feel much more at ease if you took the KVM cleanups so that the
-patchset is slimmed down and then we cat concentrate on reviewing the
-remaining pile. I haven't gone through it, I know tglx did look at this and
-with vacations upcoming we might not be ready for the merge window...
+I don't see any value in having both command.py and selftest.py.  TimeoutExpired
+*really* should be handled by Command, especially with respect to stdout/stderr
+(more on that later), but that complicates converting return codes to SelftestStatus.
 
-I can see how far I can get but you could give me that topic branch just in
-case and I'll see what I can stick ontop if/when I get to it.
+And even if we do figure out a clean split, one of Command or Selftest would end
+but being little more than a wrapper or trampoline, with more boilerplate code
+than novel logic.
 
-Thx.
+I don't anticipate turning this into a general execution framework.  The entire
+purpose is to run a selftest, so I think it makes sense to scrap Command and just
+have Selftest deal with running the executable.
 
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+> +            if ret == 0:
+> +                self.status = SelftestStatus.PASSED
+> +            elif ret == 4:
+> +                self.status = SelftestStatus.SKIPPED
+> +            else:
+> +                self.status = SelftestStatus.FAILED
+> +        except subprocess.TimeoutExpired as e:
+> +            self.status = SelftestStatus.TIMED_OUT
+> diff --git a/tools/testing/selftests/kvm/runner/test_runner.py b/tools/testing/selftests/kvm/runner/test_runner.py
+> index 104f0b4c2e4e..1409e1cfe7d5 100644
+> --- a/tools/testing/selftests/kvm/runner/test_runner.py
+> +++ b/tools/testing/selftests/kvm/runner/test_runner.py
+> @@ -15,7 +15,7 @@ class TestRunner:
+>          self.tests = []
+>  
+>          for test_file in test_files:
+> -            self.tests.append(Selftest(test_file, args.executable))
+> +            self.tests.append(Selftest(test_file, args.executable, args.timeout))
+>  
+>      def _log_result(self, test_result):
+>          logger.log(test_result.status,
+> -- 
+> 2.50.0.rc0.604.gd4ff7b7c86-goog
+> 
 
