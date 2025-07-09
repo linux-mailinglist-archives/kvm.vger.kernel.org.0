@@ -1,188 +1,125 @@
-Return-Path: <kvm+bounces-51934-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51935-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0A51AFEAA0
-	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 15:47:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3814BAFEB49
+	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 16:09:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED21117EF5F
-	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 13:47:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A06765C308A
+	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 14:02:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96ED52E265E;
-	Wed,  9 Jul 2025 13:47:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8FFC2E7196;
+	Wed,  9 Jul 2025 13:55:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="x04yMWtK"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IzOVu1vH"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46A6B2D9EFE
-	for <kvm@vger.kernel.org>; Wed,  9 Jul 2025 13:47:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53B5C2E6D1E
+	for <kvm@vger.kernel.org>; Wed,  9 Jul 2025 13:55:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752068833; cv=none; b=bP5bSYmUqepF3isJaWs4V5mIAp5o7t4P/iRJQA2YaBAz3CkSuMt4sEuByr3DPvskmAQ28qoagxcID0Vq+bds1LgP0bNw893xB0PGEK0c+Q0gR/NYTQ5KXHpFCa//E5oxKkfoax+PP/w14xJYiAGXx4+QpiO74I4ggVapv7D/UqM=
+	t=1752069338; cv=none; b=Psi+oySh/jx8fnEjjpk0Xn2e40DU1Yfy4gNL2rXTa0UH8ERc0HPV253va6NsGNlW9U+WkUw1zn9vhg5YpUf60sUVE4kc+LAEWI3TjGhqqltytnYh1gZ9+3m010rYQLg8C2+Ri6tL1swvgqdxkvPmDq6nTdMn3xGbMLQnt5ld3WA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752068833; c=relaxed/simple;
-	bh=FIanCaFnhH61IsjdDniSv32kh4AxVhWk7Ms3D8V9sgY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tCWKRVCW0VSCqviguK5sLk9EkJKviQfdpFXbaQ+21eloG2UjVWlgdWBv9NAXrevELrez88Ny37mqyLO7sJ+rq16kS6sGAb4pRAEzCPwlLgTy4nnLfxHPeiWyIdIyS3SFO0MWdpWz3aCuIRVbGGM7E2/IE/bixPUFrN1F3kKmW6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=x04yMWtK; arc=none smtp.client-ip=209.85.222.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7da6ca0f1acso192377585a.1
-        for <kvm@vger.kernel.org>; Wed, 09 Jul 2025 06:47:11 -0700 (PDT)
+	s=arc-20240116; t=1752069338; c=relaxed/simple;
+	bh=0h9vbjsgJ4KM4kpziRTulPuUJGQOT13eleRpBAru710=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=A8sVCIauD08divPigKi+EL5jKoBBtZPPGidR7VaYDJuK9Pl6pQYvR+6tf1rw/GKWq55JKXPLX6hnTzpj/G8b4gstUvvYLFwSiIh25lnTFz7JotBAdgVeImzu1nSUiigFWCaP+gsHgWUFQStXEXvqdD/nNE8n/9IASMXunspAD/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IzOVu1vH; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3138f5e8ff5so5587402a91.3
+        for <kvm@vger.kernel.org>; Wed, 09 Jul 2025 06:55:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1752068830; x=1752673630; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PkQL/QnW0HIaHElVDSrszmZZE65FaoB07Pptz0kqcu0=;
-        b=x04yMWtKFM8qNoCoSCy2vKrib3RJptjSUidYtXG6Dv9VFsY1MEPUbjfaE5oJJeyNJT
-         VhzDYiKF6J4rCeONhzOFaSgXOTkSvq+tssxgVaDgC2p7SGoVKYFv+bjY7rpx3b2WJEa6
-         f0/S4kW+RUTGHxF5cnLsYm2TEPiPzum22be0PWMG+DH9VW8q5BEy3z30tmtPupErsLdq
-         3gO++9MuPEI3gpD1Mcjyi/q2zZBDXt1wLJGkYHPcFn31gm8Hz05HPprybP/QGBVcIfF8
-         1aZ+kshi2sl7Vyg0qlA+ZIRFljaJAbf9aReINoe97OrqmIVls+MvDjKC4MyEDgeocQEg
-         L1Kg==
+        d=google.com; s=20230601; t=1752069336; x=1752674136; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=hB2pq64+EiT3q+LG5n2vE09OllB22A/8i32Rf86ziks=;
+        b=IzOVu1vHAiZQEW1SK9aITiCIGPOggzl8NHWRVQJBgoLcGSg2u/0on9W2TcDLu6JHny
+         Ugz1GTUMT2tGgQkTI3WJXqTCzVXvsRdVAxrObAnSaMhd3EuRXcWzffk+1eRMuZnrflg0
+         ATpR7ptMUXiAil3evEELHgLyEEn68SCHZFUsK9zV43w6C5QwBWkO+UV+9Jw9HoZnObYM
+         8QdAj8VdML8ieYhklbw9GfwqSFBfHsQX5Ef4ADBG0f2MRElJ5Xkxpu78AxA76NEad84e
+         v6OLA75Wu9vSZHwFiBdDMJyzs7+Cm3wFCtms3jO96QwWZcw9NsLmA915hMd+rRDxq7pK
+         b8+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752068830; x=1752673630;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PkQL/QnW0HIaHElVDSrszmZZE65FaoB07Pptz0kqcu0=;
-        b=D82OheScG/tLWIX8pd3H9E4qS4a2noUHpyeI8zM59ouSUkp2zpkytAdeGMOw/D0afl
-         OtdCqBbZU8ktPOebD/vdgzlzKZ+tE0nFTsOVLMj0U4z72OFsLU6Hhqjl/C7CFoaudCaJ
-         9E2GQqW2bVW21Z/lLAaDN6WGS71MykUkhZGAqUjKvITs81Dey7aJronk3SkG2tg/jOG4
-         aGYdOeBSU7TktI093VaiazUidYT8Riq3s1DOY3U8Neqf89izVm/lu5lESKM4oniTJo8n
-         tAwTvHJyaY+4i33HKCM0y9nwKlgKqrXvFWXCHRq5QPVIzT6OhEFdWcHqVtsip7dt2k2V
-         L4hw==
-X-Gm-Message-State: AOJu0YzyM7HL7oWIimdVxQjSFm+u0oiAlqhPFWh6lR6YHwzsfjAFa17B
-	um0R+zDkzHhzBdlMA07vUS49/QQNUVdqYSV54DvAIEyvz9hz7cNo+17vC2zAKGtU0w4984fE8Wu
-	1P6xT
-X-Gm-Gg: ASbGnctsHfcXt/4BKU5GJLhrQdj45WnP4BT5gQgBetlnlN9Sd3heFl9lJx1/bTZP9Xh
-	NzbYMGi25gHjHOpa7x1py4qY4ZCBI318iXCZEXZGmElnQxkiRKLsC60mXGoPKiL5HtRYBpzbAO4
-	3mcqNhLp/83oYLbomXqAcLCkh3OBlOpcyuQyfNzN1WeEp6wwnBMvDPOff9KbS2oAjWukktMWeIE
-	W06vkMdj/GVh5SJ6aqwUUZ8eE+SzpC0Rbwe/ixvMO1LCzYaQgIoh5oMaE2RunDVIZZF/hCieNfT
-	aLNVpjDL/JGfaO9TcGRBPtUGd81e0YXlibUlbh85HFUfJl5qLCEImyLxZqYSOo1Y2t4mw4IUCg9
-	RmJwyWCOMXwe01pN8IV1z4eZwNxKNGLEvzNFFrcPvv/D5BuT3un4=
-X-Google-Smtp-Source: AGHT+IF6EabVBfNj9TyCGaqSVgiR7S7smfJ0nR0CAviq3h0164unEH7TrL4vBL/kFHbWctB/IwCQcA==
-X-Received: by 2002:a05:620a:2544:b0:7d5:d0a1:c907 with SMTP id af79cd13be357-7db7cfa32f5mr370206385a.30.1752068829670;
-        Wed, 09 Jul 2025 06:47:09 -0700 (PDT)
-Received: from jesse-lt.ba.rivosinc.com (pool-108-26-215-125.bstnma.fios.verizon.net. [108.26.215.125])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7d5dbdb5088sm937846285a.25.2025.07.09.06.47.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Jul 2025 06:47:09 -0700 (PDT)
-From: Jesse Taube <jesse@rivosinc.com>
-To: kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org,
-	linux-kselftest@vger.kernel.org
-Cc: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <cleger@rivosinc.com>,
-	Charlie Jenkins <charlie@rivosinc.com>,
-	Jesse Taube <jesse@rivosinc.com>,
-	Andrew Jones <andrew.jones@linux.dev>,
-	James Raphael Tiovalen <jamestiotio@gmail.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Cade Richard <cade.richard@gmail.com>
-Subject: [kvm-unit-tests PATCH v3 2/2] riscv: lib: Add sbi-exit-code to configure and environment
-Date: Wed,  9 Jul 2025 06:47:07 -0700
-Message-ID: <20250709134707.1931882-2-jesse@rivosinc.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250709134707.1931882-1-jesse@rivosinc.com>
-References: <20250709134707.1931882-1-jesse@rivosinc.com>
+        d=1e100.net; s=20230601; t=1752069337; x=1752674137;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hB2pq64+EiT3q+LG5n2vE09OllB22A/8i32Rf86ziks=;
+        b=j19YUC009yukzzdTHzTFFcvCKBKhcT/pl3W229Bdu8y5ULqYYlValdnC6qkY0r6JU2
+         VI2iQ5v7naJDO+pmC7v48OPuQEMHVkaUejDg76BJou0SIZN/a1CmlyvHAuk/EGHIzQWd
+         oD6ZexncGSmr45N4QKfg3G11sxrYHxV4SlgAMl5KEmK+MDiM8DhvGiBzynw4vNXVHURU
+         j+n1cgJ87LH+phwaMjIIdrLpFIEWc/wmB+MLwVeVspLJJMxDVD15q9msaRvowxrDj8w/
+         yPc2yi90Y6c2GANy6aKG3wKrvYMkDVnVLKVB3TIyJ0YpIYfZwkaO54UlRjZtd3XD0d3J
+         /FOg==
+X-Forwarded-Encrypted: i=1; AJvYcCWpSBBrL7r2X6REDmI4/Ejv4l0ACuWEJo0cjG5S/8gC79s0UfrRoOjt4xjUnjL7yyR0Y1o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwAFF/+i2kpVV4lLXOOKsqqZpW3FFbql4C2XLN0BmY3KPobCkb6
+	lNwoPY6xPpfI/eh3DIfkGY5vAxBNQwb962/VsKDZFqkYQ02CnGhHfjRXmrFo/XkoD04ZPnbPFYY
+	5F4GEoQ==
+X-Google-Smtp-Source: AGHT+IEoqYqG05CCJJatVWyMPh8LvhP8g90wNpXynV+lVfyOqsEL9Ixv2ihGPj+7dKMNBozMlFC5A8s1AoU=
+X-Received: from pjbta13.prod.google.com ([2002:a17:90b:4ecd:b0:311:ea2a:3919])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5345:b0:31a:bc78:7fe1
+ with SMTP id 98e67ed59e1d1-31c3c2d4748mr6038a91.18.1752069336491; Wed, 09 Jul
+ 2025 06:55:36 -0700 (PDT)
+Date: Wed, 9 Jul 2025 06:55:35 -0700
+In-Reply-To: <aG4ph7gNK4o3+04i@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <cover.1752038725.git.kai.huang@intel.com> <1eaa9ba08d383a7db785491a9bdf667e780a76cc.1752038726.git.kai.huang@intel.com>
+ <aG4ph7gNK4o3+04i@intel.com>
+Message-ID: <aG501qKTDjmcLEyV@google.com>
+Subject: Re: [PATCH 2/2] KVM: x86: Reject KVM_SET_TSC_KHZ VM ioctl when vCPU
+ has been created
+From: Sean Christopherson <seanjc@google.com>
+To: Chao Gao <chao.gao@intel.com>
+Cc: Kai Huang <kai.huang@intel.com>, pbonzini@redhat.com, kvm@vger.kernel.org, 
+	thomas.lendacky@amd.com, nikunj@amd.com, bp@alien8.de, 
+	isaku.yamahata@intel.com, xiaoyao.li@intel.com, rick.p.edgecombe@intel.com, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-Add --[enable|disable]-sbi-exit-code to configure script.
-With the default value as disabled.
-Add a check for SBI_EXIT_CODE in the environment, so that passing
-of the test status is configurable from both the
-environment and the configure script
+On Wed, Jul 09, 2025, Chao Gao wrote:
+> On Wed, Jul 09, 2025 at 05:38:00PM +1200, Kai Huang wrote:
+> >Reject the KVM_SET_TSC_KHZ VM ioctl when there's vCPU has already been
+> >created.
+> >
+> >The VM scope KVM_SET_TSC_KHZ ioctl is used to set up the default TSC
+> >frequency that all subsequent created vCPUs use.  It is only intended to
+> >be called before any vCPU is created.  Allowing it to be called after
+> >that only results in confusion but nothing good.
+> >
+> >Note this is an ABI change.  But currently in Qemu (the de facto
+> >userspace VMM) only TDX uses this VM ioctl, and it is only called once
+> >before creating any vCPU, therefore the risk of breaking userspace is
+> >pretty low.
+> >
+> >Suggested-by: Sean Christopherson <seanjc@google.com>
+> >Signed-off-by: Kai Huang <kai.huang@intel.com>
+> >---
+> > arch/x86/kvm/x86.c | 4 ++++
+> > 1 file changed, 4 insertions(+)
+> >
+> >diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> >index 699ca5e74bba..e5e55d549468 100644
+> >--- a/arch/x86/kvm/x86.c
+> >+++ b/arch/x86/kvm/x86.c
+> >@@ -7194,6 +7194,10 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
+> > 		u32 user_tsc_khz;
+> > 
+> > 		r = -EINVAL;
+> >+
+> >+		if (kvm->created_vcpus)
+> >+			goto out;
+> >+
+> 
+> shouldn't kvm->lock be held?
 
-Signed-off-by: Jesse Taube <jesse@rivosinc.com>
-Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
----
-V1 -> V2:
- - Factor out commonly used macros to new commit
- - Use ternary operator over if
-V2 -> V3:
- - No changes
----
- configure      | 11 +++++++++++
- lib/riscv/io.c |  4 +++-
- 2 files changed, 14 insertions(+), 1 deletion(-)
-
-diff --git a/configure b/configure
-index 20bf5042..7c949bdc 100755
---- a/configure
-+++ b/configure
-@@ -67,6 +67,7 @@ earlycon=
- console=
- efi=
- efi_direct=
-+sbi_exit_code=0
- target_cpu=
- 
- # Enable -Werror by default for git repositories only (i.e. developer builds)
-@@ -141,6 +142,9 @@ usage() {
- 	                           system and run from the UEFI shell. Ignored when efi isn't enabled
- 	                           and defaults to enabled when efi is enabled for riscv64.
- 	                           (arm64 and riscv64 only)
-+	    --[enable|disable]-sbi-exit-code
-+	                           Enable or disable sending pass/fail exit code to SBI SRST.
-+	                           (disabled by default, riscv only)
- EOF
-     exit 1
- }
-@@ -236,6 +240,12 @@ while [[ $optno -le $argc ]]; do
- 	--disable-efi-direct)
- 	    efi_direct=n
- 	    ;;
-+	--enable-sbi-exit-code)
-+	    sbi_exit_code=1
-+	    ;;
-+	--disable-sbi-exit-code)
-+	    sbi_exit_code=0
-+	    ;;
- 	--enable-werror)
- 	    werror=-Werror
- 	    ;;
-@@ -551,6 +561,7 @@ EOF
- elif [ "$arch" = "riscv32" ] || [ "$arch" = "riscv64" ]; then
-     echo "#define CONFIG_UART_EARLY_BASE ${uart_early_addr}" >> lib/config.h
-     [ "$console" = "sbi" ] && echo "#define CONFIG_SBI_CONSOLE" >> lib/config.h
-+    echo "#define CONFIG_SBI_EXIT_CODE ${sbi_exit_code}" >> lib/config.h
-     echo >> lib/config.h
- fi
- echo "#endif" >> lib/config.h
-diff --git a/lib/riscv/io.c b/lib/riscv/io.c
-index b1163404..c46845de 100644
---- a/lib/riscv/io.c
-+++ b/lib/riscv/io.c
-@@ -6,6 +6,7 @@
-  * Copyright (C) 2023, Ventana Micro Systems Inc., Andrew Jones <ajones@ventanamicro.com>
-  */
- #include <libcflat.h>
-+#include <argv.h>
- #include <bitops.h>
- #include <config.h>
- #include <devicetree.h>
-@@ -163,7 +164,8 @@ void halt(int code);
- void exit(int code)
- {
- 	printf("\nEXIT: STATUS=%d\n", ((code) << 1) | 1);
--	sbi_shutdown(code == 0);
-+
-+	sbi_shutdown(GET_CONFIG_OR_ENV(SBI_EXIT_CODE) ? code == 0 : true);
- 	halt(code);
- 	__builtin_unreachable();
- }
--- 
-2.43.0
-
+Yep.
 
