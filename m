@@ -1,222 +1,500 @@
-Return-Path: <kvm+bounces-51898-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51899-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE3F0AFE334
-	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 10:52:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E4B82AFE366
+	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 11:00:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 28FE6567622
-	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 08:52:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 36447172697
+	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 09:00:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8464A280308;
-	Wed,  9 Jul 2025 08:52:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A6152820A9;
+	Wed,  9 Jul 2025 09:00:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="biZJGlQJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QmIp3yeK"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2070.outbound.protection.outlook.com [40.107.94.70])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A521277C82;
-	Wed,  9 Jul 2025 08:52:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.70
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752051126; cv=fail; b=n4JN+eE4maGCcgE5lwVfxlr/Sf7wx8ZwpI59/SFnsWnPnfxY1s+4tm9ucP3lmPLpkENkQCs4ZYneB5RoszUn9T7G6zxsBYMLdfmOFbjf/OLDV/ZuiN3GuEqX1UnB3kxMVynJCEsCUDpzn4sMDDFvnuAWt1fCOVWq/UqMDIXyg1k=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752051126; c=relaxed/simple;
-	bh=0s2uUyH3ESeE5ij206jJ9+R5l0fLteyWxxOcXJC9S9M=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=ZW9CVgyOS+Dq5cG749lGGidXPmqZbKsqNdyVMAvXbl5RwAazSSgsWhIjeQ9Km9dB8Yj8Zx7TUueZ05Hwmm5qNOszggceIHuHAIbQpJtTw2Ax3r3iuIYr/t36EuOt7/zeFfgLR6Rb5taKtl1tcQWSU5nBRFYmB4EfZ4Zl88LHAWk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=biZJGlQJ; arc=fail smtp.client-ip=40.107.94.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ilo3cEZxeNtQ5Wl3/EDPAm+d+3t0Yqs7xKKfWYz0VvZKtmqdSb0osEkG6JGiM0bmw3KmcKUqNJ0UU69/sCFrmM7IjoUhqzHSjRwtvP22q8cGGi0G/Se76czYw2cT0j6qf9Ea8nRL+KnfhMXT7/OXJzBL4aRFol0C2cVU/0BXa10/rdSAF/3xLSACY+lYPjKpn6viNeLPNyTeZuoebe1vactoKtkzpDJ+n6VRBbANcJBRtAfJ8AX7pt0CvxKXr5QTfVJKUA556+8e4KIEfB0TrRrkhuh9NTs8j78Zs0QrCw4dWYhvWcJVdW98R6lVBGZXLh+HFGpQ6k22fWLeegQVMg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Lj0vnoKZ+3htgK8duLi6GTQncsVqVZvdIryVBvDmv8Y=;
- b=lcXBe2Pl8uPbo/0KOfSF0/+gpy8uiUi2QeJfANmhiHeE2ZtAGtdqincw0flnyMSdaP0Yr38Kiqh5iuWiE05Cq0dGtjXV2pPQtdcQsDKUkdxazoT8P5MLdAkRjb35VYqd/V/7jS7xTT5ls/62r3fu/VjmRk5a0ymZm1Ar5L9W0kVHkccBRNzWiDnNFbckPGEMJqwPq+DoOCHIdzTOOWlpis6IKvFVKofeVviyYnThOh8OTSk0OtWSaciSgkh5r6tuVkVqr2JBZ60sGgiaceeCmVMfLufJvvbmDdn35JT5DNaRpGYQ4CGDsWXHe1dpGcSnWBCtukrks9FWIlYr5n0pVA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Lj0vnoKZ+3htgK8duLi6GTQncsVqVZvdIryVBvDmv8Y=;
- b=biZJGlQJaY8ay04Ptx5f3/JxoWzI8DCgEfz3vp0Njo/IzobK9ZZNcSDjxGY09TF0d4viBpeOEQvWsOl0gb1AlTyF8Ucv9vCeIcvyyoe2oJTDhchYy9LlyyvYFZPxYugGmBTqAxe/bToq/R9KZPYIRCL0EIIxDB1nm/ozxLv2Gac=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from MN0PR12MB6317.namprd12.prod.outlook.com (2603:10b6:208:3c2::12)
- by CYYPR12MB9015.namprd12.prod.outlook.com (2603:10b6:930:c8::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8901.27; Wed, 9 Jul
- 2025 08:52:03 +0000
-Received: from MN0PR12MB6317.namprd12.prod.outlook.com
- ([fe80::6946:6aa5:d057:ff4]) by MN0PR12MB6317.namprd12.prod.outlook.com
- ([fe80::6946:6aa5:d057:ff4%6]) with mapi id 15.20.8901.021; Wed, 9 Jul 2025
- 08:52:02 +0000
-Message-ID: <6513254f-106e-4ed9-9622-8ed20909e1fa@amd.com>
-Date: Wed, 9 Jul 2025 14:21:55 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] KVM: x86: Reject KVM_SET_TSC_KHZ VM ioctl when vCPU
- has been created
-To: Kai Huang <kai.huang@intel.com>, seanjc@google.com, pbonzini@redhat.com
-Cc: kvm@vger.kernel.org, thomas.lendacky@amd.com, bp@alien8.de,
- isaku.yamahata@intel.com, xiaoyao.li@intel.com, rick.p.edgecombe@intel.com,
- linux-kernel@vger.kernel.org
-References: <cover.1752038725.git.kai.huang@intel.com>
- <1eaa9ba08d383a7db785491a9bdf667e780a76cc.1752038726.git.kai.huang@intel.com>
-Content-Language: en-US
-From: "Nikunj A. Dadhania" <nikunj@amd.com>
-In-Reply-To: <1eaa9ba08d383a7db785491a9bdf667e780a76cc.1752038726.git.kai.huang@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PN4P287CA0044.INDP287.PROD.OUTLOOK.COM
- (2603:1096:c01:271::14) To CY5PR12MB6321.namprd12.prod.outlook.com
- (2603:10b6:930:22::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C72321D3C6;
+	Wed,  9 Jul 2025 09:00:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752051631; cv=none; b=oHqJDNYDRqb5OlT+Cun4H3W7D3EISxMpbH1tu4nFEeeKH2qHmBKHebbdp19bbMHYuulstgIZwVFf8R1fY2OfPy71bgkumrc+hSlWalgicJIe3Lu+One8727znudTr1wpAnLnfM8YlCbWvc/V4oSDyFj0FqcigFQ/qARYCPdsMgE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752051631; c=relaxed/simple;
+	bh=3W8qVVfy1m1dAB50xQSGfq2umDoRwSj8QNVsyWSaMUA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oFARYK6zbyI6YaTbM0j4RjLwA7YfY/X2dfzMoJFG7RkUjLqGVv8gA6HqpVRVV/Bk+Eu3mLCPNtwil36X2u0dTZT1utya2iMyw9cvuuEU1MQ/H61vhQkpz1KyBRw8HLVmDMjJLdmUDMnhNiMDHWrgQ1KOxselPRVluqyHvXmthlw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QmIp3yeK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5C59C4CEEF;
+	Wed,  9 Jul 2025 09:00:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752051631;
+	bh=3W8qVVfy1m1dAB50xQSGfq2umDoRwSj8QNVsyWSaMUA=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=QmIp3yeKPc/YFNhrxbX/JjnynYjAQVoXG8P/a13V/yPdEvYSpEEEkDXcHbEUDEYLl
+	 gdc1vXNcvhNSw2htLaAtVvqoanyptCEZpKiwNw4xc0FNTHawcwxKnZmdqhu9lCyygx
+	 pS5Mrd+jkuHJF9F4FZElk1HBvCLWUPlYpX4cJWo6ytxdJlYq+DMZRgAtiSW/1TgtiI
+	 0VaAdQMtkQA45e+LFyV6UypHl2gZRxK5wFrJMFj4Eyrt0asphQO/sDhI7bag3L3Pr7
+	 lZdWgILFM8QiahTgbBccY2tokIqgFrpXEZeNM+O3qRZ1+zCWpC+bRp3R3Ku1hqL+0j
+	 R03OsvV7hEt1g==
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-60c01b983b6so1420807a12.0;
+        Wed, 09 Jul 2025 02:00:30 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCV5uBnWfAXKWzlz2crfdMvj/pK3QfSqwAr8HLSTqOBEWWWe9aMu27z4UL4BXjexVbWUyuKLqz7jK53sjoHA@vger.kernel.org, AJvYcCXqwF57HkHOKUJ4k6ZaccBYtSgRN9+smrlJTRTYc8TuVNd0yhF5w9T+Jj2GtaYFTVztDIQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw5uFDd5iGwOqgRf/Ei2Ax9QYlg1VLq26971rrHXx5xHzKLUyR0
+	CZ6M/uHyeAAkgmeVWUlpD9k2p0xhVQBzc9aL51ejQXpB8hQvUo/wHhdHDmC0Q4R34ZyKMuGUU0M
+	3Fc8kOtnjfvywELnbwYdky10m672tKLM=
+X-Google-Smtp-Source: AGHT+IE0bwBdL9EgKGkkC/fjIoquOEEZDiQWP4vbQEMxFBTWIZrB4zSK1TG6WDEk/eEVsy8uQmVmDXlJaRSIJb5uVU0=
+X-Received: by 2002:a05:6402:51d3:b0:60f:c32a:834 with SMTP id
+ 4fb4d7f45d1cf-6104bf2097amr5135170a12.5.1752051629320; Wed, 09 Jul 2025
+ 02:00:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN0PR12MB6317:EE_|CYYPR12MB9015:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7e613bcc-064c-4e41-e6e4-08ddbec5df65
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?a2cwbm13akhVOUxnSkZhaXVrdVhRaHFJUmJ0dDE2OFBkekRzZ1dGQWk0ZnFm?=
- =?utf-8?B?YnlkWEVwZEV5SEhGS2czbitXdnNmWjliRjBlOFJWVlpXK094R3czQjU4Q2tJ?=
- =?utf-8?B?UHF5QVpSK0ZWZWdWYjlkU3A5dzdzbnV3SFMzUitxd1pKeDZOZFNSUkpXRFBp?=
- =?utf-8?B?cWpBUVJCbE5UVWdKRDI0Ky9TSnhDWFJBZFBpaHpVWVZzc21DSE9XcVk2REl2?=
- =?utf-8?B?WGhuS0xRT3lhaGd5SndpejFjMFkwejZHeVowQnhpdHlIREFHN0VNZGZONG4y?=
- =?utf-8?B?bC9CcEJ4T0FKS3VoZkE3dEcwTjhWa28yQWhGeUc1bGJwK0ZNZzI0RGIzdXRW?=
- =?utf-8?B?VDJ4Y1EvWWg2bE9RZCt3QW04TGEyWHJoTWVnK0tsQUxnZEJWbWh3cVdSYlUz?=
- =?utf-8?B?NWljWThlK00yWEFSV1pTUDd1MGs1NktmQmNuMm1BcWlDS1JUbXNKRWdpVElp?=
- =?utf-8?B?SWcyc2FTZ2RKSzZBSEpKMjdUZHkzbytBeFZFOHNIcjNGN0R2RE83cW5pS2pz?=
- =?utf-8?B?dVZhVFBvb1ZLK0cyN05oNVl4RzJjdW5ScVordnZqdy96R3ZUajR3UVhtTzlU?=
- =?utf-8?B?SjFqTjcyeGd0dGZ0eHhNbmVjbkc0SUxqalhSS0FGOUx6YWJiWHpzY0VFZC9B?=
- =?utf-8?B?b09vRGtWWjF5amdQL2NqcVRra1NiaUNvRGtheGdreEsvTk5aSE5ONStYN1Za?=
- =?utf-8?B?NHA3SXdRY0Q0eStFcnJJNzlxUHh6ajNjd1grTmFyK1BWK0hnSWxOcTA4VGV3?=
- =?utf-8?B?UUpGZ3Bremo1Y2dJQ2RmTEkrUU4xTHNhcldzbHBXOXVQOCtMVkc0bE9MU1ho?=
- =?utf-8?B?QVVnUWo4OW9ab3dOR0RWeHNRaUlCOWVQdW9JYTVwTGhXSTBMWDBZVy9TSjVK?=
- =?utf-8?B?ZmRxcUFhNTNUN2hZdkpHSzlxTkV4dHBrK1g1dFllL1F3RXZEQjFNcUpham1L?=
- =?utf-8?B?LzdjQm9yU2hLRFpGWXJNYmgwZUcxalk2ajVrWEQwOThQTDdveU1SK08yaVlW?=
- =?utf-8?B?QTFYSWIvdEJ1R2RoVGEvMEZ5cXNFUkxvWEc5MmF3a1RFNTdBb1kxTWcxNWJp?=
- =?utf-8?B?OUMrRGJwb0JJd3pNcTl5YzdXN1dLMk9FTlpCVkkwVG5vbDVxZTV6WnJXMFdL?=
- =?utf-8?B?eVBNT3dqcmIyVzRNQitFT2FmYmxTVEo1akY1Rks2aTQzTmNqSDJqdlg2VjRF?=
- =?utf-8?B?NkVoYkxQTXFWR0NRejBwN3FaeU96OVBQdG03NlRxQ3hMdEU4NGhlbG9YRXVu?=
- =?utf-8?B?K3NkbkQ3L3NZRUh4M2N1QlBaTTRFc0NIM0FnWWxla2V5NXN1K1htMzdHSHpX?=
- =?utf-8?B?VGIxSHFQckN3T1hHc2VtT3Q3aHBzV2ZTUStNQy92U2hPclJlM2hLYnI5ZWZm?=
- =?utf-8?B?ZExENCtWbS9qcWVWNUhyODBUUlg5QWo4SFZ0bDF6c1h3amMxMzhOcElvKy9M?=
- =?utf-8?B?eFJ1RUZRV3FLbWNYK2J2ZGhiRzdVbkdtNitWblZCamtLRmxJV3poUkJrc1Qx?=
- =?utf-8?B?OHlNQ2plZHJkcS92dm1sMTVCRk92V3NGc0JrRm9EK2srTHpaNmNKcWhqUERo?=
- =?utf-8?B?V3ZXZ1V4SlNnR3lvZ2t3eVBKczUwb2ExWVNRVU9RTGNDWUtuS05mNlAvU0o4?=
- =?utf-8?B?T1R0dlp4aGF5K3BFbFFqclRkMzdZMnBKV2Yxcy9sUHRxd0ZMaTNRK0xMckdu?=
- =?utf-8?B?NFRtK2FGYUFjMGx0WWM3SjVuOEQ5b0JYUTQ3NzlhTXRLeGo2Z0szSjY2bExY?=
- =?utf-8?B?NXJEL0RyYjY5SkFmRHBTQ1NVY2M0aG5USzEreExpMjNVdkMwelFQSSs2WXV6?=
- =?utf-8?B?QUNmK0J1Nm9Cc0t4Z2hDeEloZkNxMERTckxhYkVRWld5dXRsd0dySy9tMmkv?=
- =?utf-8?B?N1BUWVpYMlRnS2s5dkVOangwbWV3S01qdUFKNXNaZll6YTAxL1dGMi9xNHM3?=
- =?utf-8?Q?/Hfq3jjOwj8=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR12MB6317.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?QmpxdjlXYVVXRTB2dUg3Ym5yM085RVBsYTJwblFhN25VbExGT25nK2hJNGF1?=
- =?utf-8?B?T0tTZVkzQjFqRGQzMUZPK1NqQys5WS9KQVlqZnJ6VkcxOHFKZEtsT2U5NXRl?=
- =?utf-8?B?ZGYxT2xoUVFtTjJyeWJrNHdJcDdZQ0EvSzVZcmpvWHo1WWdBV005T2JKWUdo?=
- =?utf-8?B?T3FjMmFyRFltVnI4ZDJIV3BZQk5Ic3Y0aktKdzBjVTFFL3lPcHdDcEN2RDJG?=
- =?utf-8?B?L1NCVkJFdXJBdVpzM2M1VXg1b0gvK0E2WGdwZTJFZ3Y0TlhURG9SV09Ia3Vo?=
- =?utf-8?B?SG9HRHdPanRpUU1OeW44Uk1nS2hyVy9XNm9yQ0wrSGt1alhZeGE0R1VFUDk5?=
- =?utf-8?B?NjUxV2poTkUwQUtSeFVPN2owb08xQVdSSWVpdjhyaUhmQWFrRUFSZ0krVm5G?=
- =?utf-8?B?ZmdsSG9jREZCUGdpMWh0MnB2eHROTWNuQlZGNVJuWEhaRDBMUkp3WUtGaG5h?=
- =?utf-8?B?Q3Ztd0JnaWhucmw2ZDdWR1hBcTlUS0FhZFg1d0JNTGNJMGxicThCZVpKWGVq?=
- =?utf-8?B?U1FLSUZVTmlEWTBpOHVMbzlSVGFvSUlzTEJUS0x4aWp1U2twOXlXS1lDNE5t?=
- =?utf-8?B?TC9nWm1tVXgwTVc1N1NiZzVnam9XR3p6U1JreE5QRU1TSUNiZFJraVQ1eHc0?=
- =?utf-8?B?eVdUVCt2MFF6SDRhTE1aRkpiTGNNQ2FuYmJBU2xhWFVMK09DVCt5RkgyN3Qx?=
- =?utf-8?B?cjhETWRSZHQzNE05THloSk5nQlJSSlpjQWlYMkhTNjUrODVVb3RRUVg4aWVi?=
- =?utf-8?B?SzFVN0hWQmw5MFhMYy8rTm53d2hxU3FzVkRtQUxYdUgzWUZOUk05a1F4Y3BX?=
- =?utf-8?B?RkQ4RkF4ODltS3NVOS84TVdYV04wUlZ2Snh2dzkvZDY2azM1eFEvaldFSVVx?=
- =?utf-8?B?SFFUbHhOdUxPb3BPeTV1QUw3NWJlT1FHZ2NvUUhsblNQL0s1amZjQlc4eXNE?=
- =?utf-8?B?cGRzeGlVQ2pjK3lkVG1kdSthU3gycFFKbWYwcmRjUzZCajd0Z3RhSDh6WG05?=
- =?utf-8?B?REUzZ1RsNER5RGRKQTJMSWJpRXRYQjhlMEVyUzlFc0tveFlEMHcrZ1pGeFFO?=
- =?utf-8?B?SnhYUkJLbk9tempEaG96T3pydXJaOS9nZVR4MFMrQThudnF0N2NJV0VBY2FV?=
- =?utf-8?B?RVFNRFdNV2NRRGRaQ20rc0FXaUlIdXhHY2hrUzBKRWNoUDZuL0RjT3d2Tm1p?=
- =?utf-8?B?aEZZM3N3a1RxcVdraTZNSU4zeGtaYnduS0ozV296bWhQMDF0Nm9SSlJtWGZK?=
- =?utf-8?B?M3Y2S1EwV0tHMFVQZTFFWVF5NTk3ZXhNT0U4WUg3dTE4Y3locGY1UTFkMG9p?=
- =?utf-8?B?TWZDbGJFNlJ6eFlFN0tEdlVrS1kvY09FUmZyT2I4Ym5NMW0xTjg2UU1NQy9G?=
- =?utf-8?B?ZkYyVWtHSlJ1RWg2NWliQzJobERCVkY5d0Z2NHlwSEhYSGp2cmlDbkpWWG51?=
- =?utf-8?B?Q0tHbFVnQ2w3clVlNWlvZzAwTVRZMEJuYkVyejEvaTkwN3R0U1doSmZEK0M4?=
- =?utf-8?B?QW4vQnVXd0hzV1NScnRMbDFzZFJ3WGFaRGlma3BrTGpERXF6RHRCcE92UUla?=
- =?utf-8?B?cGt1SWVnUDJDSm1rdUlnODVNSCt4aVBUUWVWd0JwTHd0aGxBMHlKcGZwMmI1?=
- =?utf-8?B?cFZRc2lBRVBWOEpGN1IwRDVWOElNVndIdWxuQU0rd2lUenIwWHZVNlZjdHhX?=
- =?utf-8?B?T1REZnhsd1RhQUVmZEdJdkpSUkFxbEk4aklENHBDOFNMOEpLd2RvVHgxc1hu?=
- =?utf-8?B?Y2JRc05TYXZlS0VLQTRENDc3dy9TdUFuakNOMHpJM29vWHR0YlBzVVphMVYz?=
- =?utf-8?B?dDZNbVExTTZYTmdxS1kyWDFjZVMxUTN0K3h3cjlaS3VuNi9lQ1M1Y1VscW1K?=
- =?utf-8?B?MXdkaWpaWWd0MW5BdmFhVWNVZHRNZ0FlUWd4bHlJZ2l2ZnV3YWhWSlFYN1Qw?=
- =?utf-8?B?QVIvQlpualk4YndFNFhYN0FJcExzZ1BpemUxNlkrT1d3TXNCSTVGYnpCeXBX?=
- =?utf-8?B?S1Z6ZDRacGdxQkZucDZFMG12azNuMzlWd1k0azJXbk5aRC8wOGJCVUd4SFd6?=
- =?utf-8?B?R0R0a1JSSU1HeEdtN3BoSXFuNFJ1S3Q1NHdFT1plcUVhQVVYQVN0YzJyRXl1?=
- =?utf-8?Q?kCLCnn35nI8o6o8oUcG+h3BI4?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7e613bcc-064c-4e41-e6e4-08ddbec5df65
-X-MS-Exchange-CrossTenant-AuthSource: CY5PR12MB6321.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jul 2025 08:52:02.9255
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: JR0HuYId5bUppsO6MTR9ommmX0iRQBfxcECjF1bDWcKOLpWoMYx/eyWL+QCrJrh0cqaNLe+fvF74gp8p7R0eLA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR12MB9015
+References: <20250619071449.1714869-1-maobibo@loongson.cn> <CAAhV-H42wPsxNCSp-4wy1+f-2yAJ1fuWbsC57bvQkHL0E3n=-g@mail.gmail.com>
+ <31541826-2802-32e0-f8f0-f717e1c02d74@loongson.cn> <CAAhV-H6Pzw0uuoK3DfyNz=GMzk+9od-hm2NGqGa44C+=E-cufA@mail.gmail.com>
+ <2688b612-3ace-b1d2-b9d1-dd35d35919c5@loongson.cn>
+In-Reply-To: <2688b612-3ace-b1d2-b9d1-dd35d35919c5@loongson.cn>
+From: Huacai Chen <chenhuacai@kernel.org>
+Date: Wed, 9 Jul 2025 16:59:39 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H41WOLU6ae-iWKLnuUtSXgq4DogEUYS49ndmERauuPgXA@mail.gmail.com>
+X-Gm-Features: Ac12FXxnwcoZqkjF75xsIwlgRNuGnLMKAkVUGn2wVl4wq9fB7gfPzF7t2Wd19s4
+Message-ID: <CAAhV-H41WOLU6ae-iWKLnuUtSXgq4DogEUYS49ndmERauuPgXA@mail.gmail.com>
+Subject: Re: [PATCH v2] LoongArch: KVM: INTC: Add IOCSR MISC register emulation
+To: Bibo Mao <maobibo@loongson.cn>
+Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, Xianglai Li <lixianglai@loongson.cn>, kvm@vger.kernel.org, 
+	loongarch@lists.linux.dev, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, Jul 1, 2025 at 7:40=E2=80=AFPM Bibo Mao <maobibo@loongson.cn> wrote=
+:
+>
+>
+>
+> On 2025/7/1 =E4=B8=8B=E5=8D=885:20, Huacai Chen wrote:
+> > On Mon, Jun 30, 2025 at 4:44=E2=80=AFPM Bibo Mao <maobibo@loongson.cn> =
+wrote:
+> >>
+> >>
+> >>
+> >> On 2025/6/30 =E4=B8=8B=E5=8D=884:04, Huacai Chen wrote:
+> >>> Hi, Bibo,
+> >>>
+> >>> On Thu, Jun 19, 2025 at 3:15=E2=80=AFPM Bibo Mao <maobibo@loongson.cn=
+> wrote:
+> >>>>
+> >>>> IOCSR MISC register 0x420 controlls some features of eiointc, such a=
+s
+> >>>> BIT 48 enables eiointc and BIT 49 set interrupt encoding mode.
+> >>>>
+> >>>> When kernel irqchip is set, IOCSR MISC register should be emulated i=
+n
+> >>>> kernel also. Here add IOCSR MISC register emulation in kernel side.
+> >>>>
+> >>>> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+> >>>> ---
+> >>>> v1 ... v2:
+> >>>>     1. Add separate file arch/loongarch/kvm/intc/misc.c for IOCSR MI=
+SC
+> >>>>        register 0x420 emulation, since it controls feature about AVE=
+C
+> >>>>        irqchip also.
+> >>> I found we can decouple the misc register and EIOINTC in addition:
+> >>> 1, Move misc.c out of intc directory;
+> >>> 2, Call kvm_loongarch_create_misc() in kvm_arch_init_vm();
+> >>> 3, Call kvm_loongarch_destroy_misc() in kvm_arch_destroy_vm();
+> >>> 4, Then maybe misc_created can be removed.
+> >> Now irqchip in kernel is optional, the same with misc register. Misc
+> >> register will be emulated in user VMM if kernel-irqchip option is off.
+> >>
+> >> There is no way to detect kernel-irqchip option when function
+> >> kvm_arch_init_vm() is called, and kvm_loongarch_create_misc() needs be
+> >> dynamically called from ioctl command.
+> > Can we use  kvm_arch_irqchip_in_kernel() to detect?
+> No, it can not be used. kvm_arch_irqchip_in_kernel() is usable only when
+> irqchip is created in kernel, however kvm_arch_init_vm() is called when
+> VM is created.
+>
+> VM is created always before kernel irqchip is created. So
+> kvm_arch_irqchip_in_kernel() will return false if it is called in
+> kvm_arch_init_vm().
+What will happen if call kvm_loongarch_create_misc() in
+kvm_arch_init_vm() unconditionally?
 
-
-On 7/9/2025 11:08 AM, Kai Huang wrote:
-> Reject the KVM_SET_TSC_KHZ VM ioctl when there's vCPU has already been
-> created.
-
-Probably the below is clear:
-
-Reject KVM_SET_TSC_KHZ VM ioctl when vCPUs have been created
-
-> 
-> The VM scope KVM_SET_TSC_KHZ ioctl is used to set up the default TSC
-> frequency that all subsequent created vCPUs use.  It is only intended to
-> be called before any vCPU is created.  Allowing it to be called after
-> that only results in confusion but nothing good.
-> 
-> Note this is an ABI change.  But currently in Qemu (the de facto
-> userspace VMM) only TDX uses this VM ioctl, and it is only called once
-> before creating any vCPU, therefore the risk of breaking userspace is
-> pretty low.
-> 
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Kai Huang <kai.huang@intel.com>
-
-Reviewed-by: Nikunj A Dadhania <nikunj@amd.com>
-
-> ---
->  arch/x86/kvm/x86.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 699ca5e74bba..e5e55d549468 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -7194,6 +7194,10 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
->  		u32 user_tsc_khz;
->  
->  		r = -EINVAL;
-> +
-> +		if (kvm->created_vcpus)
-> +			goto out;
-> +
->  		user_tsc_khz = (u32)arg;
->  
->  		if (kvm_caps.has_tsc_control &&
-
+Huacai
+>
+> Regards
+> Bibo Mao
+> >
+> >
+> > Huacai
+> >
+> >>
+> >> Regards
+> >> Bibo Mao
+> >>>
+> >>> At last you can make this patch and others from another series to be =
+a
+> >>> new series.
+> >>>
+> >>>
+> >>> Huacai
+> >>>
+> >>>>
+> >>>>     2. Define macro MISC_BASE as LOONGARCH_IOCSR_MISC_FUNC rather th=
+an
+> >>>>        hard coded 0x420
+> >>>> ---
+> >>>>    arch/loongarch/include/asm/kvm_eiointc.h |   2 +
+> >>>>    arch/loongarch/include/asm/kvm_host.h    |   2 +
+> >>>>    arch/loongarch/include/asm/kvm_misc.h    |  17 +++
+> >>>>    arch/loongarch/include/asm/loongarch.h   |   1 +
+> >>>>    arch/loongarch/kvm/Makefile              |   1 +
+> >>>>    arch/loongarch/kvm/intc/eiointc.c        |  61 +++++++++++
+> >>>>    arch/loongarch/kvm/intc/misc.c           | 125 ++++++++++++++++++=
++++++
+> >>>>    7 files changed, 209 insertions(+)
+> >>>>    create mode 100644 arch/loongarch/include/asm/kvm_misc.h
+> >>>>    create mode 100644 arch/loongarch/kvm/intc/misc.c
+> >>>>
+> >>>> diff --git a/arch/loongarch/include/asm/kvm_eiointc.h b/arch/loongar=
+ch/include/asm/kvm_eiointc.h
+> >>>> index a3a40aba8acf..2d1c183f2b1b 100644
+> >>>> --- a/arch/loongarch/include/asm/kvm_eiointc.h
+> >>>> +++ b/arch/loongarch/include/asm/kvm_eiointc.h
+> >>>> @@ -119,5 +119,7 @@ struct loongarch_eiointc {
+> >>>>
+> >>>>    int kvm_loongarch_register_eiointc_device(void);
+> >>>>    void eiointc_set_irq(struct loongarch_eiointc *s, int irq, int le=
+vel);
+> >>>> +int kvm_eiointc_get_status(struct kvm_vcpu *vcpu, unsigned long *va=
+lue);
+> >>>> +int kvm_eiointc_update_status(struct kvm_vcpu *vcpu, unsigned long =
+value, unsigned long mask);
+> >>>>
+> >>>>    #endif /* __ASM_KVM_EIOINTC_H */
+> >>>> diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/=
+include/asm/kvm_host.h
+> >>>> index a3c4cc46c892..f463ec52d86c 100644
+> >>>> --- a/arch/loongarch/include/asm/kvm_host.h
+> >>>> +++ b/arch/loongarch/include/asm/kvm_host.h
+> >>>> @@ -132,6 +132,8 @@ struct kvm_arch {
+> >>>>           struct loongarch_ipi *ipi;
+> >>>>           struct loongarch_eiointc *eiointc;
+> >>>>           struct loongarch_pch_pic *pch_pic;
+> >>>> +       struct kvm_io_device misc;
+> >>>> +       bool   misc_created;
+> >>>>    };
+> >>>>
+> >>>>    #define CSR_MAX_NUMS           0x800
+> >>>> diff --git a/arch/loongarch/include/asm/kvm_misc.h b/arch/loongarch/=
+include/asm/kvm_misc.h
+> >>>> new file mode 100644
+> >>>> index 000000000000..621e4228dea2
+> >>>> --- /dev/null
+> >>>> +++ b/arch/loongarch/include/asm/kvm_misc.h
+> >>>> @@ -0,0 +1,17 @@
+> >>>> +/* SPDX-License-Identifier: GPL-2.0 */
+> >>>> +/*
+> >>>> + * Copyright (C) 2025 Loongson Technology Corporation Limited
+> >>>> + */
+> >>>> +
+> >>>> +#ifndef __ASM_KVM_MISC_H
+> >>>> +#define __ASM_KVM_MISC_H
+> >>>> +
+> >>>> +#include <asm/loongarch.h>
+> >>>> +
+> >>>> +#define MISC_BASE              LOONGARCH_IOCSR_MISC_FUNC
+> >>>> +#define MISC_SIZE              0x8
+> >>>> +
+> >>>> +int kvm_loongarch_create_misc(struct kvm *kvm);
+> >>>> +void kvm_loongarch_destroy_misc(struct kvm *kvm);
+> >>>> +
+> >>>> +#endif /* __ASM_KVM_MISC_H */
+> >>>> diff --git a/arch/loongarch/include/asm/loongarch.h b/arch/loongarch=
+/include/asm/loongarch.h
+> >>>> index d84dac88a584..e30d330d497e 100644
+> >>>> --- a/arch/loongarch/include/asm/loongarch.h
+> >>>> +++ b/arch/loongarch/include/asm/loongarch.h
+> >>>> @@ -1141,6 +1141,7 @@
+> >>>>    #define  IOCSR_MISC_FUNC_SOFT_INT      BIT_ULL(10)
+> >>>>    #define  IOCSR_MISC_FUNC_TIMER_RESET   BIT_ULL(21)
+> >>>>    #define  IOCSR_MISC_FUNC_EXT_IOI_EN    BIT_ULL(48)
+> >>>> +#define  IOCSR_MISC_FUNC_INT_ENCODE    BIT_ULL(49)
+> >>>>    #define  IOCSR_MISC_FUNC_AVEC_EN       BIT_ULL(51)
+> >>>>
+> >>>>    #define LOONGARCH_IOCSR_CPUTEMP                0x428
+> >>>> diff --git a/arch/loongarch/kvm/Makefile b/arch/loongarch/kvm/Makefi=
+le
+> >>>> index cb41d9265662..25fa3866613d 100644
+> >>>> --- a/arch/loongarch/kvm/Makefile
+> >>>> +++ b/arch/loongarch/kvm/Makefile
+> >>>> @@ -18,6 +18,7 @@ kvm-y +=3D vcpu.o
+> >>>>    kvm-y +=3D vm.o
+> >>>>    kvm-y +=3D intc/ipi.o
+> >>>>    kvm-y +=3D intc/eiointc.o
+> >>>> +kvm-y +=3D intc/misc.o
+> >>>>    kvm-y +=3D intc/pch_pic.o
+> >>>>    kvm-y +=3D irqfd.o
+> >>>>
+> >>>> diff --git a/arch/loongarch/kvm/intc/eiointc.c b/arch/loongarch/kvm/=
+intc/eiointc.c
+> >>>> index f39929d7bf8a..87d01521e92f 100644
+> >>>> --- a/arch/loongarch/kvm/intc/eiointc.c
+> >>>> +++ b/arch/loongarch/kvm/intc/eiointc.c
+> >>>> @@ -4,6 +4,7 @@
+> >>>>     */
+> >>>>
+> >>>>    #include <asm/kvm_eiointc.h>
+> >>>> +#include <asm/kvm_misc.h>
+> >>>>    #include <asm/kvm_vcpu.h>
+> >>>>    #include <linux/count_zeros.h>
+> >>>>
+> >>>> @@ -708,6 +709,56 @@ static const struct kvm_io_device_ops kvm_eioin=
+tc_ops =3D {
+> >>>>           .write  =3D kvm_eiointc_write,
+> >>>>    };
+> >>>>
+> >>>> +int kvm_eiointc_get_status(struct kvm_vcpu *vcpu, unsigned long *va=
+lue)
+> >>>> +{
+> >>>> +       unsigned long data, flags;
+> >>>> +       struct loongarch_eiointc *eiointc =3D vcpu->kvm->arch.eioint=
+c;
+> >>>> +
+> >>>> +       if (!eiointc) {
+> >>>> +               kvm_err("%s: eiointc irqchip not valid!\n", __func__=
+);
+> >>>> +               return -EINVAL;
+> >>>> +       }
+> >>>> +
+> >>>> +       data =3D 0;
+> >>>> +       spin_lock_irqsave(&eiointc->lock, flags);
+> >>>> +       if (eiointc->status & BIT(EIOINTC_ENABLE))
+> >>>> +               data |=3D IOCSR_MISC_FUNC_EXT_IOI_EN;
+> >>>> +
+> >>>> +       if (eiointc->status & BIT(EIOINTC_ENABLE_INT_ENCODE))
+> >>>> +               data |=3D IOCSR_MISC_FUNC_INT_ENCODE;
+> >>>> +       spin_unlock_irqrestore(&eiointc->lock, flags);
+> >>>> +
+> >>>> +       *value =3D data;
+> >>>> +       return 0;
+> >>>> +}
+> >>>> +
+> >>>> +int kvm_eiointc_update_status(struct kvm_vcpu *vcpu, unsigned long =
+value, unsigned long mask)
+> >>>> +{
+> >>>> +       struct loongarch_eiointc *eiointc =3D vcpu->kvm->arch.eioint=
+c;
+> >>>> +       unsigned long old, flags;
+> >>>> +
+> >>>> +       if (!eiointc) {
+> >>>> +               kvm_err("%s: eiointc irqchip not valid!\n", __func__=
+);
+> >>>> +               return -EINVAL;
+> >>>> +       }
+> >>>> +
+> >>>> +       old =3D 0;
+> >>>> +       spin_lock_irqsave(&eiointc->lock, flags);
+> >>>> +       if (eiointc->status & BIT(EIOINTC_ENABLE))
+> >>>> +               old |=3D IOCSR_MISC_FUNC_EXT_IOI_EN;
+> >>>> +       if (eiointc->status & BIT(EIOINTC_ENABLE_INT_ENCODE))
+> >>>> +               old |=3D IOCSR_MISC_FUNC_INT_ENCODE;
+> >>>> +
+> >>>> +       value |=3D (old & ~mask);
+> >>>> +       eiointc->status &=3D ~(BIT(EIOINTC_ENABLE_INT_ENCODE) | BIT(=
+EIOINTC_ENABLE));
+> >>>> +       if (value & IOCSR_MISC_FUNC_INT_ENCODE)
+> >>>> +               eiointc->status |=3D BIT(EIOINTC_ENABLE_INT_ENCODE);
+> >>>> +       if (value & IOCSR_MISC_FUNC_EXT_IOI_EN)
+> >>>> +               eiointc->status |=3D BIT(EIOINTC_ENABLE);
+> >>>> +       spin_unlock_irqrestore(&eiointc->lock, flags);
+> >>>> +       return 0;
+> >>>> +}
+> >>>> +
+> >>>>    static int kvm_eiointc_virt_read(struct kvm_vcpu *vcpu,
+> >>>>                                   struct kvm_io_device *dev,
+> >>>>                                   gpa_t addr, int len, void *val)
+> >>>> @@ -993,6 +1044,15 @@ static int kvm_eiointc_create(struct kvm_devic=
+e *dev, u32 type)
+> >>>>                   kfree(s);
+> >>>>                   return ret;
+> >>>>           }
+> >>>> +
+> >>>> +       ret =3D kvm_loongarch_create_misc(kvm);
+> >>>> +       if (ret < 0) {
+> >>>> +               kvm_io_bus_unregister_dev(kvm, KVM_IOCSR_BUS, &s->de=
+vice);
+> >>>> +               kvm_io_bus_unregister_dev(kvm, KVM_IOCSR_BUS, &s->de=
+vice_vext);
+> >>>> +               kfree(s);
+> >>>> +               return ret;
+> >>>> +       }
+> >>>> +
+> >>>>           kvm->arch.eiointc =3D s;
+> >>>>
+> >>>>           return 0;
+> >>>> @@ -1010,6 +1070,7 @@ static void kvm_eiointc_destroy(struct kvm_dev=
+ice *dev)
+> >>>>           eiointc =3D kvm->arch.eiointc;
+> >>>>           kvm_io_bus_unregister_dev(kvm, KVM_IOCSR_BUS, &eiointc->de=
+vice);
+> >>>>           kvm_io_bus_unregister_dev(kvm, KVM_IOCSR_BUS, &eiointc->de=
+vice_vext);
+> >>>> +       kvm_loongarch_destroy_misc(kvm);
+> >>>>           kfree(eiointc);
+> >>>>    }
+> >>>>
+> >>>> diff --git a/arch/loongarch/kvm/intc/misc.c b/arch/loongarch/kvm/int=
+c/misc.c
+> >>>> new file mode 100644
+> >>>> index 000000000000..edee66afa36e
+> >>>> --- /dev/null
+> >>>> +++ b/arch/loongarch/kvm/intc/misc.c
+> >>>> @@ -0,0 +1,125 @@
+> >>>> +// SPDX-License-Identifier: GPL-2.0
+> >>>> +/*
+> >>>> + * Copyright (C) 2025 Loongson Technology Corporation Limited
+> >>>> + */
+> >>>> +#include <asm/kvm_vcpu.h>
+> >>>> +#include <asm/kvm_eiointc.h>
+> >>>> +#include <asm/kvm_misc.h>
+> >>>> +
+> >>>> +static int kvm_misc_read(struct kvm_vcpu *vcpu, struct kvm_io_devic=
+e *dev,
+> >>>> +                       gpa_t addr, int len, void *val)
+> >>>> +{
+> >>>> +       unsigned long data;
+> >>>> +       unsigned int ret;
+> >>>> +
+> >>>> +       addr -=3D MISC_BASE;
+> >>>> +       if (addr & (len - 1)) {
+> >>>> +               kvm_err("%s: eiointc not aligned addr %llx len %d\n"=
+, __func__, addr, len);
+> >>>> +               return -EINVAL;
+> >>>> +       }
+> >>>> +
+> >>>> +       ret =3D kvm_eiointc_get_status(vcpu, &data);
+> >>>> +       if (ret)
+> >>>> +               return ret;
+> >>>> +
+> >>>> +       data =3D data >> ((addr & 7) * 8);
+> >>>> +       switch (len) {
+> >>>> +       case 1:
+> >>>> +               *(unsigned char *)val =3D (unsigned char)data;
+> >>>> +               break;
+> >>>> +
+> >>>> +       case 2:
+> >>>> +               *(unsigned short *)val =3D (unsigned short)data;
+> >>>> +               break;
+> >>>> +
+> >>>> +       case 4:
+> >>>> +               *(unsigned int *)val =3D (unsigned int)data;
+> >>>> +               break;
+> >>>> +
+> >>>> +       default:
+> >>>> +               *(unsigned long *)val =3D data;
+> >>>> +               break;
+> >>>> +       }
+> >>>> +
+> >>>> +       return 0;
+> >>>> +}
+> >>>> +
+> >>>> +static int kvm_misc_write(struct kvm_vcpu *vcpu, struct kvm_io_devi=
+ce *dev,
+> >>>> +               gpa_t addr, int len, const void *val)
+> >>>> +{
+> >>>> +       unsigned long data, mask;
+> >>>> +       unsigned int shift;
+> >>>> +
+> >>>> +       addr -=3D MISC_BASE;
+> >>>> +       if (addr & (len - 1)) {
+> >>>> +               kvm_err("%s: eiointc not aligned addr %llx len %d\n"=
+, __func__, addr, len);
+> >>>> +               return -EINVAL;
+> >>>> +       }
+> >>>> +
+> >>>> +       shift =3D (addr & 7) * 8;
+> >>>> +       switch (len) {
+> >>>> +       case 1:
+> >>>> +               data =3D *(unsigned char *)val;
+> >>>> +               mask =3D 0xFF;
+> >>>> +               mask =3D mask << shift;
+> >>>> +               data =3D data << shift;
+> >>>> +               break;
+> >>>> +
+> >>>> +       case 2:
+> >>>> +               data =3D *(unsigned short *)val;
+> >>>> +               mask =3D 0xFFFF;
+> >>>> +               mask =3D mask << shift;
+> >>>> +               data =3D data << shift;
+> >>>> +               break;
+> >>>> +
+> >>>> +       case 4:
+> >>>> +               data =3D *(unsigned int *)val;
+> >>>> +               mask =3D UINT_MAX;
+> >>>> +               mask =3D mask << shift;
+> >>>> +               data =3D data << shift;
+> >>>> +               break;
+> >>>> +
+> >>>> +       default:
+> >>>> +               data =3D *(unsigned long *)val;
+> >>>> +               mask =3D ULONG_MAX;
+> >>>> +               mask =3D mask << shift;
+> >>>> +               data =3D data << shift;
+> >>>> +               break;
+> >>>> +       }
+> >>>> +
+> >>>> +       return kvm_eiointc_update_status(vcpu, data, mask);
+> >>>> +}
+> >>>> +
+> >>>> +static const struct kvm_io_device_ops kvm_misc_ops =3D {
+> >>>> +       .read   =3D kvm_misc_read,
+> >>>> +       .write  =3D kvm_misc_write,
+> >>>> +};
+> >>>> +
+> >>>> +int kvm_loongarch_create_misc(struct kvm *kvm)
+> >>>> +{
+> >>>> +       struct kvm_io_device *device;
+> >>>> +       int ret;
+> >>>> +
+> >>>> +       if (kvm->arch.misc_created)
+> >>>> +               return 0;
+> >>>> +
+> >>>> +       device =3D &kvm->arch.misc;
+> >>>> +       kvm_iodevice_init(device, &kvm_misc_ops);
+> >>>> +       ret =3D kvm_io_bus_register_dev(kvm, KVM_IOCSR_BUS, MISC_BAS=
+E, MISC_SIZE, device);
+> >>>> +       if (ret < 0)
+> >>>> +               return ret;
+> >>>> +
+> >>>> +       kvm->arch.misc_created =3D true;
+> >>>> +       return 0;
+> >>>> +}
+> >>>> +
+> >>>> +void kvm_loongarch_destroy_misc(struct kvm *kvm)
+> >>>> +{
+> >>>> +       struct kvm_io_device *device;
+> >>>> +
+> >>>> +       if (kvm->arch.misc_created) {
+> >>>> +               device =3D &kvm->arch.misc;
+> >>>> +               kvm_io_bus_unregister_dev(kvm, KVM_IOCSR_BUS, device=
+);
+> >>>> +               kvm->arch.misc_created =3D false;
+> >>>> +       }
+> >>>> +}
+> >>>>
+> >>>> base-commit: 52da431bf03b5506203bca27fe14a97895c80faf
+> >>>> --
+> >>>> 2.39.3
+> >>>>
+> >>
+>
 
