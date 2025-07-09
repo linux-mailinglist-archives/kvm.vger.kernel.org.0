@@ -1,141 +1,236 @@
-Return-Path: <kvm+bounces-51894-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51895-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEBDAAFE1F2
-	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 10:08:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56A23AFE237
+	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 10:16:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A56B1C41297
-	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 08:07:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8AB28580ED5
+	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 08:16:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1B302309BE;
-	Wed,  9 Jul 2025 08:07:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nhPt3EcG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8830273D71;
+	Wed,  9 Jul 2025 08:12:31 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 548A02222D0;
-	Wed,  9 Jul 2025 08:07:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02A70238C21
+	for <kvm@vger.kernel.org>; Wed,  9 Jul 2025 08:12:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752048426; cv=none; b=rhDxtPTctKOX+CGeHoAtP5qncJsJWap2n6zlB5MAVvq9YoioBC5d33Mp7jFtdb98WGG1nnhz1OHb6r4+9Eq5EQwuRFj9RufnfYKpSwJlVTXsqe3h0IV9vKFCYCeHa5VLBZFasZTbnp39lvwZx1RurhdoZNoI6j2H4i/vLTcD2u4=
+	t=1752048751; cv=none; b=AJEm3WOOUPxFrmRJbpYGcYacc524ZiNO0HN5G4aGX2W2myVRdgtD6oNFCtC1ptALdHTrXNGi8nICCFnpZe2GC6v447FptOFiFJpS/IxnAF4Ldqj6yXcMNsjA8bm/IMVeXze6pMhK9Es+OVMT1dWduhCca105nHP5ryUH6wdhgBY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752048426; c=relaxed/simple;
-	bh=qHFlp0Eymzpq0DGn/ABKDHy5ssBB/JtPZafxiGG8/jk=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=KXXc2Z6qTcLrXxa+QlLYvFSMGpAkWwfYSsVyPwmZkp9yQRI7AHDFrAD9zLn07kIr2gIFkenQPNCEmzKZ9/wrmrprM6UkuKU9t/eCLfQmVrn1PzmBF7yeDnt/04MpGr5uqtqBqON6D5NPHEFv1Bably6Or7UGfhF+OQIMRSodO+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nhPt3EcG; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752048423; x=1783584423;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=qHFlp0Eymzpq0DGn/ABKDHy5ssBB/JtPZafxiGG8/jk=;
-  b=nhPt3EcGIFWTQDTwQdQzaM3B03qRrMHiFzj0gDTT5lC6seAVLyzCemzD
-   2HHn6whhbIJAoxhQMkBzizoFK/ZN0qYyKTZ5f15+wcP2OuT8QECF/hDq/
-   bFLqCS/jGIftRmz8wvD6tURrOnQIfllLMk6ipl6rhgWIgSxkP8dfbWNW/
-   d69KGR1YRUjyEvAPwHP6TAsQ0yrKUYRMDN0WZrkcwWw2ZVG7oB3bSeL5r
-   phfog63q0VpasWgzg+YHvHWd5T73FBOMMcpOQ+INNftAzz2Jemyl9N95C
-   uAGe26apIyyw3ctXPCi5VlKuGS+kRITBr5joLGSpN0bfJzvD1N55UC1SG
-   w==;
-X-CSE-ConnectionGUID: GgXhjHteSgOHBJQhQOpXCg==
-X-CSE-MsgGUID: pak3XXKeQwOkByDRB2IXYA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11487"; a="58106220"
-X-IronPort-AV: E=Sophos;i="6.16,298,1744095600"; 
-   d="scan'208";a="58106220"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2025 01:07:03 -0700
-X-CSE-ConnectionGUID: nKnaAaCNQLKlfhQL+i2/ag==
-X-CSE-MsgGUID: itnNVE9jRp+vu1HGp5yBlA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,298,1744095600"; 
-   d="scan'208";a="156043916"
-Received: from lkp-server01.sh.intel.com (HELO 9ee84586c615) ([10.239.97.150])
-  by fmviesa009.fm.intel.com with ESMTP; 09 Jul 2025 01:07:01 -0700
-Received: from kbuild by 9ee84586c615 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uZPpT-0003HZ-00;
-	Wed, 09 Jul 2025 08:06:59 +0000
-Date: Wed, 9 Jul 2025 16:06:50 +0800
-From: kernel test robot <lkp@intel.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-	netdev@vger.kernel.org
-Subject: [mst-vhost:vhost 4/8] include/linux/pci.h:2738:7: error: call to
- undeclared function 'pci_device_is_present'; ISO C99 and later do not
- support implicit function declarations
-Message-ID: <202507091645.aPGUJH6X-lkp@intel.com>
+	s=arc-20240116; t=1752048751; c=relaxed/simple;
+	bh=zKSIKyAQfm7s+xvMcP8dCeHkRcSWeCevTGLrV4DJAsQ=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=l39fyUw9YzKOVYVDrs+NQbUtu+mO5g2eVGiHJSsV7X5gbIFMxVlGXu23VGML9heoD9Y7o4GvqDT9LaZtijxbSDvKnaPbX3KqVnV1VwnEplPSESTjDaHdkaX2arpLYaxR2H3ET4X+dUDvHl0kfBNCyB7V3sidqOShRz9dwsOO7U0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.105])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4bcVy24B3xz13Mny;
+	Wed,  9 Jul 2025 16:09:46 +0800 (CST)
+Received: from kwepemk200017.china.huawei.com (unknown [7.202.194.83])
+	by mail.maildlp.com (Postfix) with ESMTPS id 513CD140203;
+	Wed,  9 Jul 2025 16:12:25 +0800 (CST)
+Received: from [10.174.178.219] (10.174.178.219) by
+ kwepemk200017.china.huawei.com (7.202.194.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Wed, 9 Jul 2025 16:12:24 +0800
+Subject: Re: [PATCH v4 05/20] KVM: arm64: timers: Allow physical offset
+ without CNTPOFF_EL2
+To: Marc Zyngier <maz@kernel.org>
+CC: <kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton
+	<oliver.upton@linux.dev>, Ricardo Koller <ricarkol@google.com>, Simon Veith
+	<sveith@amazon.de>, Reiji Watanabe <reijiw@google.com>, Colton Lewis
+	<coltonlewis@google.com>, Joey Gouly <joey.gouly@arm.com>,
+	<dwmw2@infradead.org>
+References: <20230330174800.2677007-1-maz@kernel.org>
+ <20230330174800.2677007-6-maz@kernel.org>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <460258be-0102-e922-c342-4e87cd94b9e5@huawei.com>
+Date: Wed, 9 Jul 2025 16:12:18 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+In-Reply-To: <20230330174800.2677007-6-maz@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
+ kwepemk200017.china.huawei.com (7.202.194.83)
 
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git vhost
-head:   97d5f469f45a2312a124376fd6fa368ef8419dff
-commit: b7468115b6045e555aa8a8f2fa327c1c073fc6df [4/8] pci: report surprise removal event
-config: x86_64-allnoconfig (https://download.01.org/0day-ci/archive/20250709/202507091645.aPGUJH6X-lkp@intel.com/config)
-compiler: clang version 20.1.7 (https://github.com/llvm/llvm-project 6146a88f60492b520a36f8f8f3231e15f3cc6082)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250709/202507091645.aPGUJH6X-lkp@intel.com/reproduce)
+[ Record some interesting bits noticed while testing
+  arch_timer_edge_cases. ]
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202507091645.aPGUJH6X-lkp@intel.com/
+On 2023/3/31 1:47, Marc Zyngier wrote:
+> CNTPOFF_EL2 is awesome, but it is mostly vapourware, and no publicly
+> available implementation has it. So for the common mortals, let's
+> implement the emulated version of this thing.
+> 
+> It means trapping accesses to the physical counter and timer, and
+> emulate some of it as necessary.
+> 
+> As for CNTPOFF_EL2, nobody sets the offset yet.
+> 
+> Reviewed-by: Colton Lewis <coltonlewis@google.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/sysreg.h    |  2 +
+>  arch/arm64/kvm/arch_timer.c        | 98 +++++++++++++++++++++++-------
+>  arch/arm64/kvm/hyp/nvhe/timer-sr.c | 18 ++++--
+>  arch/arm64/kvm/sys_regs.c          |  9 +++
+>  4 files changed, 98 insertions(+), 29 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index 9e3ecba3c4e6..f8da9e1b0c11 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -388,6 +388,7 @@
+>  
+>  #define SYS_CNTFRQ_EL0			sys_reg(3, 3, 14, 0, 0)
+>  
+> +#define SYS_CNTPCT_EL0			sys_reg(3, 3, 14, 0, 1)
+>  #define SYS_CNTPCTSS_EL0		sys_reg(3, 3, 14, 0, 5)
+>  #define SYS_CNTVCTSS_EL0		sys_reg(3, 3, 14, 0, 6)
+>  
+> @@ -400,6 +401,7 @@
+>  
+>  #define SYS_AARCH32_CNTP_TVAL		sys_reg(0, 0, 14, 2, 0)
+>  #define SYS_AARCH32_CNTP_CTL		sys_reg(0, 0, 14, 2, 1)
+> +#define SYS_AARCH32_CNTPCT		sys_reg(0, 0, 0, 14, 0)
+>  #define SYS_AARCH32_CNTP_CVAL		sys_reg(0, 2, 0, 14, 0)
+>  
+>  #define __PMEV_op2(n)			((n) & 0x7)
+> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> index 3118ea0a1b41..bb64a71ae193 100644
+> --- a/arch/arm64/kvm/arch_timer.c
+> +++ b/arch/arm64/kvm/arch_timer.c
+> @@ -458,6 +458,8 @@ static void timer_save_state(struct arch_timer_context *ctx)
+>  		goto out;
+>  
+>  	switch (index) {
+> +		u64 cval;
+> +
+>  	case TIMER_VTIMER:
+>  		timer_set_ctl(ctx, read_sysreg_el0(SYS_CNTV_CTL));
+>  		timer_set_cval(ctx, read_sysreg_el0(SYS_CNTV_CVAL));
+> @@ -485,7 +487,12 @@ static void timer_save_state(struct arch_timer_context *ctx)
+>  		break;
+>  	case TIMER_PTIMER:
+>  		timer_set_ctl(ctx, read_sysreg_el0(SYS_CNTP_CTL));
+> -		timer_set_cval(ctx, read_sysreg_el0(SYS_CNTP_CVAL));
+> +		cval = read_sysreg_el0(SYS_CNTP_CVAL);
+> +
+> +		if (!has_cntpoff())
+> +			cval -= timer_get_offset(ctx);
+> +
+> +		timer_set_cval(ctx, cval);
+>  
+>  		/* Disable the timer */
+>  		write_sysreg_el0(0, SYS_CNTP_CTL);
+> @@ -555,6 +562,8 @@ static void timer_restore_state(struct arch_timer_context *ctx)
+>  		goto out;
+>  
+>  	switch (index) {
+> +		u64 cval, offset;
+> +
+>  	case TIMER_VTIMER:
+>  		set_cntvoff(timer_get_offset(ctx));
+>  		write_sysreg_el0(timer_get_cval(ctx), SYS_CNTV_CVAL);
+> @@ -562,8 +571,12 @@ static void timer_restore_state(struct arch_timer_context *ctx)
+>  		write_sysreg_el0(timer_get_ctl(ctx), SYS_CNTV_CTL);
+>  		break;
+>  	case TIMER_PTIMER:
+> -		set_cntpoff(timer_get_offset(ctx));
+> -		write_sysreg_el0(timer_get_cval(ctx), SYS_CNTP_CVAL);
+> +		cval = timer_get_cval(ctx);
+> +		offset = timer_get_offset(ctx);
+> +		set_cntpoff(offset);
+> +		if (!has_cntpoff())
+> +			cval += offset;
+> +		write_sysreg_el0(cval, SYS_CNTP_CVAL);
+>  		isb();
+>  		write_sysreg_el0(timer_get_ctl(ctx), SYS_CNTP_CTL);
+>  		break;
 
-All errors (new ones prefixed by >>):
+I tested arch_timer_edge_cases on my Kunpeng920 (has VHE, doesn't have
+ECV) and noticed that the test_timer_cval() below takes a long period to
+return when testing the _physical_ timer.
 
-   In file included from kernel/dma/direct.c:16:
-   In file included from include/linux/pci-p2pdma.h:14:
->> include/linux/pci.h:2738:7: error: call to undeclared function 'pci_device_is_present'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-    2738 |         if (!pci_device_is_present(pdev))
-         |              ^
-   include/linux/pci.h:2738:7: note: did you mean 'pci_dev_present'?
-   include/linux/pci.h:2042:19: note: 'pci_dev_present' declared here
-    2042 | static inline int pci_dev_present(const struct pci_device_id *ids)
-         |                   ^
-   kernel/dma/direct.c:148:20: warning: shift count >= width of type [-Wshift-count-overflow]
-     148 |                     phys_limit < DMA_BIT_MASK(64) &&
-         |                                  ^~~~~~~~~~~~~~~~
-   include/linux/dma-mapping.h:73:54: note: expanded from macro 'DMA_BIT_MASK'
-      73 | #define DMA_BIT_MASK(n) (((n) == 64) ? ~0ULL : ((1ULL<<(n))-1))
-         |                                                      ^ ~~~
-   1 warning and 1 error generated.
+static void test_timers_in_the_past(enum arch_timer timer)
+{
+	[...]
 
+	for (i = 0; i < ARRAY_SIZE(irq_wait_method); i++) {
+		irq_wait_method_t wm = irq_wait_method[i];
 
-vim +/pci_device_is_present +2738 include/linux/pci.h
+		[...]
 
-  2722	
-  2723	/*
-  2724	 * Caller must initialize @pdev->disconnect_work before invoking this.
-  2725	 * The work function must run and check pci_test_and_clear_disconnect_enable.
-  2726	 * Note that device can go away right after this call.
-  2727	 */
-  2728	static inline void pci_set_disconnect_work(struct pci_dev *pdev)
-  2729	{
-  2730		/* Make sure WQ has been initialized already */
-  2731		smp_wmb();
-  2732	
-  2733		WRITE_ONCE(pdev->disconnect_work_enable, 0x1);
-  2734	
-  2735		/* check the device did not go away meanwhile. */
-  2736		mb();
-  2737	
-> 2738		if (!pci_device_is_present(pdev))
-  2739			schedule_work(&pdev->disconnect_work);
-  2740	}
-  2741	
+		/* Set a timer to counter=0 (in the past) */
+		test_timer_cval(timer, 0, wm, DEF_CNT);
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+The comment is obviously wrong. It should say "Set a timer to CVAL=0".
+
+No physical timer interrupt ("kvm guest ptimer") was triggered when I
+executed it separately.
+
+Let me try to explain _this_ test_timer_cval() in a bit more detail.
+
+|Guest					KVM
+|-----					---
+|local_irq_disable()
+|
+|reset_timer_state()
+|   set_counter()			// SET_ONE_REG via user-space
+|					// for KVM_REG_ARM_PTIMER_CNT
+|					kvm_arm_timer_set_reg()
+|					   timer_set_offset()      [1]
+|   timer_set_ctl()
+|      MSR CNTP_CTL_EL0, IMASK
+|
+|set_xval_irq()
+|   timer_set_cval()
+|      MSR CNTP_CVAL_EL0, cval=0
+|   timer_set_ctl()
+|      MSR CNTP_CTL_EL0, ENABLE		// trap
+|					kvm_arm_timer_write_sysreg()
+|					   timer_save_state()
+|					   kvm_arm_timer_write()
+|					   timer_restore_state()   [2]
+|
+|/* This method re-enables IRQs to handle the one we're looking for. */
+|wm()
+|
+|assert_irqs_handled(1)
+|local_irq_enable()
+
+[1] kvm_phys_timer_read()			= 0x7895c0ab2
+    value					= 0x7fffffffffffff
+    offset = kvm_phys_timer_read() - value	= 0xff800007895c0ab3
+
+... which was observed in my test.
+
+[2] cval += offset;			// cval	= 0xff800007895c0ab3
+    kvm_phys_timer_read()			= 0x7895c1b86
+
+No ptimer interrupt was triggered with that. And we relied on the next
+kvm_timer_vcpu_load() to catch the timer expiration and inject an
+interrupt to the guest..
+
+It's apparent that this test case is not a practical use case. Not sure
+if we should (/can) emulate it properly. Or I may have already missed
+some obvious points.
+
+Thanks,
+Zenghui
 
