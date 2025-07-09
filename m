@@ -1,130 +1,194 @@
-Return-Path: <kvm+bounces-51902-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51903-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48114AFE3FA
-	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 11:21:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE931AFE401
+	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 11:23:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D5D31891733
-	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 09:21:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A41904E7FF3
+	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 09:22:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87022284686;
-	Wed,  9 Jul 2025 09:21:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E829284685;
+	Wed,  9 Jul 2025 09:22:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aKU1KqTH"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Pnm61yOi"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EB2B27C84B;
-	Wed,  9 Jul 2025 09:21:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6E30283FE4;
+	Wed,  9 Jul 2025 09:22:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752052870; cv=none; b=lW26HuT3C6whr8+L9gJXIuZjMNRQGXpDGDf7OWdaY9YCdkdm7muYuivDErRyrvbcJgZS8GbExvOLN6BcqXB7VWzIGHnhgz9mOxLgI46b+VF6qDMG9bscBcdNLsbcWytNdB+VZsvHfkQFX/bkgHLw8BnohE/8DUgfHGG6/1vgPC8=
+	t=1752052970; cv=none; b=E5I6PzFYuHoLKtZhHmuA3EIUXYdrvDHbrtULgpEf1vT3j1HYKsFVDlJCAb+stArCsCVOAWfhdDQi4asY9U4LpXle77QFu+BIQJtBdVeF9nVGOVFsAaoGbxkHoyiSsu+RsQAStCYS4Qr9sCIMPyDuDO8TwVuc+XISn117LNbQAD0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752052870; c=relaxed/simple;
-	bh=z3x2Gt1rt8xqTtqo9CeUFY3qwCPecBK5Nelp2o0HyOg=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=H7cpn5lOx3oWdWa1xnavY5BhGGqDQfNOK6y5S/+sRiURBH6G45WhnD9OKG623Qtqb9N9scrHvdp4MMb3kc9BuuYDus28APBs01p9hTsnANnq+cjMwT8HIWjObqOBfUJRIBphkhD9H2W5CmUCtWVGp9TAtiJXIqSZcID9uAK89ow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aKU1KqTH; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752052869; x=1783588869;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=z3x2Gt1rt8xqTtqo9CeUFY3qwCPecBK5Nelp2o0HyOg=;
-  b=aKU1KqTHLpk/LCkQ2gt4yfBdALjqL1JLlAE0C+FiW9hEillThSUwuLEF
-   2ZJXywMSE+C+KYdEKLNcRxrYFEpkEU3JnuIFp1AZiDNvJVoLxVk3qBugR
-   8IBAOkXJld3VZ7DlgmHgTGK6vQAJa81lVcT+kDuOprzTA4qOU8f3Uajny
-   SYgg/jiX1hv2aoHe8zo+VeCMlgkDcrf+LR1t1K2Jz9D4YK/tYmvl7lfVY
-   3w7iNHn5YgcLAceI5UvOoanJzXx0Mnwe/6RXkmMflHgXBduyajK66L2sM
-   sYnj8biKr0oUhYF3emMMSnXEZz5lIRDOnpoOmiCcpyotuPS39SLh37p7j
-   g==;
-X-CSE-ConnectionGUID: wQUBUx2ZS5SKuNl/nFBkmA==
-X-CSE-MsgGUID: LShm/L3wRrSETS1Qgfc5YQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11487"; a="76853898"
-X-IronPort-AV: E=Sophos;i="6.16,298,1744095600"; 
-   d="scan'208";a="76853898"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2025 02:21:09 -0700
-X-CSE-ConnectionGUID: sw36Ee8kSUeQoStCO4NcvQ==
-X-CSE-MsgGUID: hW/y84lhQlyCmjDEid+m6w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,298,1744095600"; 
-   d="scan'208";a="161374562"
-Received: from lkp-server01.sh.intel.com (HELO 9ee84586c615) ([10.239.97.150])
-  by orviesa005.jf.intel.com with ESMTP; 09 Jul 2025 02:21:07 -0700
-Received: from kbuild by 9ee84586c615 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uZQzB-0003Ld-17;
-	Wed, 09 Jul 2025 09:21:05 +0000
-Date: Wed, 9 Jul 2025 17:20:10 +0800
-From: kernel test robot <lkp@intel.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: oe-kbuild-all@lists.linux.dev, kvm@vger.kernel.org,
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Subject: [mst-vhost:vhost 4/8] include/linux/pci.h:2738:14: warning: implicit
- declaration of function 'pci_device_is_present'; did you mean
- 'pci_dev_present'?
-Message-ID: <202507091726.qKSmDnk7-lkp@intel.com>
+	s=arc-20240116; t=1752052970; c=relaxed/simple;
+	bh=dIIT9VxUTgRSYOTemi/qjydnfCdr6tW1kL+wYiGK/MU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cip4hpR0vQUnWLI90uN1joC+5AnkiEHhhK41EIsAaIbvPCf0V091O8KJxdndpTJNFQtu83p8WY/5eTLuMLyM0eyCs725Gy/eDxGJ1VUBtN0M4LhZl/CnZQj0UVDcoqCHqqIzg4NSrK5Seh64sopfjsHaprPmboKV0NkkpxRoQOo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Pnm61yOi; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56985h4s019426;
+	Wed, 9 Jul 2025 09:22:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=SKwpHe
+	JS3gD+I45YYrsXUtTAaYzI2H0VMmVTSnt9rkw=; b=Pnm61yOiIpmuRP6H5ksdgG
+	KcHSQ2RRV0f04ZJhtEgm3qDJuPL+kWsEef3gz58i/NICNPZxWQwEKDAOq9vj0Yxo
+	iQMt2WcLFS7s3aCO8cG6yOa2h0iIqqyKSzO9qQfyF0/YEG190SPCVITDmHxwSLF6
+	5RLe+BRD3Ljsb8m+GrUk3y+hx/JbGzthzoQ9xZKdEO81uoUtixxvlPwv/Acihz7q
+	9qKWD5CwDtGhddr8ahz6FeFDX1WD4udWOc0Ds9uNHh1l0/CNFyHkBJGsR132Pu2h
+	rpsDkzSO3wyBUyDWBHnXVzSLXfFFIjDliRzm03pMhRaq78QlHLxsoMXn5urcYVoQ
+	==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47pur75a9a-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 09 Jul 2025 09:22:34 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5696PlCx010851;
+	Wed, 9 Jul 2025 09:22:33 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 47qes07na0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 09 Jul 2025 09:22:33 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5699MS0250004364
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 9 Jul 2025 09:22:28 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8514C2004D;
+	Wed,  9 Jul 2025 09:22:28 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 99EE420043;
+	Wed,  9 Jul 2025 09:22:27 +0000 (GMT)
+Received: from [9.87.155.2] (unknown [9.87.155.2])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed,  9 Jul 2025 09:22:27 +0000 (GMT)
+Message-ID: <447aafca-124a-45fc-85b2-8a653466fa34@linux.ibm.com>
+Date: Wed, 9 Jul 2025 11:22:27 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/2] KVM: s390: Fix latent guest entry/exit bugs
+To: Andrew Donnellan <ajd@linux.ibm.com>, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org
+Cc: Mark Rutland <mark.rutland@arm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Frederic Weisbecker <frederic@kernel.org>,
+        Heiko Carstens
+ <hca@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        Sven Schnelle
+ <svens@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Andy Lutomirski
+ <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Thomas Gleixner <tglx@linutronix.de>
+References: <20250708092742.104309-1-ajd@linux.ibm.com>
+Content-Language: en-US
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; keydata=
+ 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
+In-Reply-To: <20250708092742.104309-1-ajd@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzA5MDA4MyBTYWx0ZWRfX+PGMHybAzlvx rIHMz2SYXAzWYhu9hKHQhJ9Uzsy+t3O8lKbwGUXSpA/haFNzpbQWSKzh0u3OWVq9HSOWQLPoaWr LWUBPwE83G+FG4PX4FAQ+5W3RXQrE2/ZMOtSuRMB5sgkTqzIWH4qBj/Pt6YYSslZMJ1F+cNw0lm
+ TSEvPWxU9VhSB/CLxiI1o9NTyLmMdwTXMV40/jgzDWVa8NM+iZQ7SJPKZJfDP9juCbThl+eaP9M eDET93OhROrTrpohCzE9PcGcWvUkmwxqw8LJvjGKDDQoaJJI+vmqa87IcBOVl1BJDsLPYOX3KqL 0Be9b+u/Xqgexq3AyxgigaNxCIVxKhfBRljs/FVkwvV/lQnTYNbbGrFTjIuy0Oe5ldyJmZKKiy3
+ qIli91RlRT2KMERfMJEyJxhDbpYLUdgAYDgA85aDilJOqqmcooD88YuQwpVnDKEvftpGGoUo
+X-Proofpoint-GUID: 75-xueHZvcwxx2KI7_mu1visZkXrr_Ar
+X-Proofpoint-ORIG-GUID: 75-xueHZvcwxx2KI7_mu1visZkXrr_Ar
+X-Authority-Analysis: v=2.4 cv=W/M4VQWk c=1 sm=1 tr=0 ts=686e34da cx=c_pps a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17 a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=VnNF1IyMAAAA:8 a=__GJD7VX6N_aT_KMK8QA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
+ definitions=2025-07-09_02,2025-07-08_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 phishscore=0
+ mlxscore=0 priorityscore=1501 adultscore=0 clxscore=1011 suspectscore=0
+ spamscore=0 lowpriorityscore=0 mlxlogscore=672 bulkscore=0 impostorscore=0
+ classifier=spam authscore=0 authtc=n/a authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2507090083
 
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git vhost
-head:   97d5f469f45a2312a124376fd6fa368ef8419dff
-commit: b7468115b6045e555aa8a8f2fa327c1c073fc6df [4/8] pci: report surprise removal event
-config: x86_64-buildonly-randconfig-004-20250709 (https://download.01.org/0day-ci/archive/20250709/202507091726.qKSmDnk7-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14+deb12u1) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250709/202507091726.qKSmDnk7-lkp@intel.com/reproduce)
+On 7/8/25 11:27 AM, Andrew Donnellan wrote:
+> In [0], the guest_{enter,exit}_irqoff() helpers were deprecated, in favour
+> of guest_timing_{enter,exit}_irqoff() and
+> guest_context_{enter,exit}_irqoff(). This was to fix a number of latent
+> guest entry/exit bugs, relating to the enabling of interrupts during an
+> RCU extended quiescent state, instrumentation code, and correct handling
+> of lockdep and tracing.
+> 
+> However, while arm64, mips, riscv and x86 have been migrated to the new
+> helpers, s390 hasn't been. There was an initial attempt at [1] to do this,
+> but that didn't work for reasons discussed at [2].
+> 
+> Since then, Claudio Imbrenda has reworked much of the interrupt handling.
+> Moving interrupt handling into vcpu_post_run() avoids the issues in [2],
+> so we can now move to the new helpers.
+> 
+> I've rebased Mark's patches from [1]. kvm-unit-tests, the kvm selftests,
+> and IBM's internal test suites pass under debug_defconfig.
+> 
+> These patches do introduce some overhead - in my testing, a few of the
+> tests in the kvm-unit-tests exittime test suite appear 6-11% slower, but
+> some noticeable overhead may be unavoidable (we introduce a new function
+> call and the irq entry/exit paths change a bit).
+> 
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202507091726.qKSmDnk7-lkp@intel.com/
+This series has been part of our CI runs for some while and hasn't 
+caused issues.
 
-All warnings (new ones prefixed by >>):
-
-   In file included from drivers/firmware/efi/libstub/pci.c:10:
-   include/linux/pci.h: In function 'pci_set_disconnect_work':
->> include/linux/pci.h:2738:14: warning: implicit declaration of function 'pci_device_is_present'; did you mean 'pci_dev_present'? [-Wimplicit-function-declaration]
-    2738 |         if (!pci_device_is_present(pdev))
-         |              ^~~~~~~~~~~~~~~~~~~~~
-         |              pci_dev_present
-
-
-vim +2738 include/linux/pci.h
-
-  2722	
-  2723	/*
-  2724	 * Caller must initialize @pdev->disconnect_work before invoking this.
-  2725	 * The work function must run and check pci_test_and_clear_disconnect_enable.
-  2726	 * Note that device can go away right after this call.
-  2727	 */
-  2728	static inline void pci_set_disconnect_work(struct pci_dev *pdev)
-  2729	{
-  2730		/* Make sure WQ has been initialized already */
-  2731		smp_wmb();
-  2732	
-  2733		WRITE_ONCE(pdev->disconnect_work_enable, 0x1);
-  2734	
-  2735		/* check the device did not go away meanwhile. */
-  2736		mb();
-  2737	
-> 2738		if (!pci_device_is_present(pdev))
-  2739			schedule_work(&pdev->disconnect_work);
-  2740	}
-  2741	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Series:
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 
