@@ -1,142 +1,128 @@
-Return-Path: <kvm+bounces-51929-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-51930-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44A64AFE98D
-	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 15:02:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA400AFE995
+	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 15:03:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 869827BB12E
-	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 13:00:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 51236568AE9
+	for <lists+kvm@lfdr.de>; Wed,  9 Jul 2025 13:02:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A81262DC32C;
-	Wed,  9 Jul 2025 13:01:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C8072DE217;
+	Wed,  9 Jul 2025 13:02:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HyZ05wz3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ihiwuqaw"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45CC81E492
-	for <kvm@vger.kernel.org>; Wed,  9 Jul 2025 13:01:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7BAE2DCC03
+	for <kvm@vger.kernel.org>; Wed,  9 Jul 2025 13:02:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752066112; cv=none; b=TPBVkzqCoV8HFWnF2ol40K5/u5iCuRLkVQmf/yNILnIUQdm/gPhrk0niwMlgMUeF2sUXtGRkCMDxFMhwqgAw6XC/qlmc2+lt/1GJzhhXCftYFN/fziRlKfmqaR2tVOatn2GAgbVP/GYM1+bWOPleNlBmjrpJ7TOAStCsn3S9wj0=
+	t=1752066128; cv=none; b=u+qepBcsHLgqmL8kU8iF7sm7QyjkMn2gGcQRxKcLeVmiAUZ8eDKdYmjlMqm87+aIgoAHXd6Q7iTgerhKVCXGP0pLYUNRLS6LniNM+jTSjplMmHu4iwv6TqEwKcIvjMofxVzzg7F6y+XDZsfNdU6k49O+wHN6h0HWIYB/1M07YCA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752066112; c=relaxed/simple;
-	bh=eiyH3L7PkijYQuy2lwj+LBn5Obme2Qi7ZnOyH2/C52s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ns+iiV5UcO85RoZXM8nT/KJZd3VaL+ZbYtr1IPgd78YpKUb5jimSSCq4DwzddBMD4HHtcW0wElma/iEsn9sXmxHbDgU2hU9x4T8iqTdVkKsc8laNzKjXaKj6e+yLuXQqbrBXHPXQOvrV4NyvnG/FSx8hMKMTC+XBMEqaRC8WLX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HyZ05wz3; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752066110;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eiyH3L7PkijYQuy2lwj+LBn5Obme2Qi7ZnOyH2/C52s=;
-	b=HyZ05wz3BKIc50ml7b/9hLMuvE8kOwOoYS0sHMZNKNOAf40+buYmwRqrEe3D15DetrR2+5
-	VSBq/plKgQfr1WrBHSZBhNHOqgQZsvuE3QeW6DRXpffTiSSrkAa+OwnM6y559+r98BlPyW
-	hoa87ZTqCWORfZpyieT/tr87t1HyHZo=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-647-8_mavmPQOomLdJ_hIUH5lA-1; Wed, 09 Jul 2025 09:01:49 -0400
-X-MC-Unique: 8_mavmPQOomLdJ_hIUH5lA-1
-X-Mimecast-MFC-AGG-ID: 8_mavmPQOomLdJ_hIUH5lA_1752066108
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-450d64026baso28059225e9.1
-        for <kvm@vger.kernel.org>; Wed, 09 Jul 2025 06:01:48 -0700 (PDT)
+	s=arc-20240116; t=1752066128; c=relaxed/simple;
+	bh=PKN05u2GZVZFQVi8mYkv9AgVNmgvP8VQmZ7IS1XT7mc=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=up5Th7wGJ65qJ9ioGSeVa52q3JZnkkCG+noMRqhml9RDrH1zb+XVLGbC8bawfuoCK6hFDUnIqwA+zLr6Jyi8IC4TjjA7JK1AZe5z6jyjqjQhUtFA2OtY/Dd9xIc9dWAtZJg92Fa/6RhCob7/V/V0NnQnl+2sdKAmPRi1b8B5mbc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ihiwuqaw; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b31ff607527so4093121a12.0
+        for <kvm@vger.kernel.org>; Wed, 09 Jul 2025 06:02:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1752066126; x=1752670926; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Nk4HVwXuMe6h7bhTVh6kU5/xhXMf/wzhNXvAy/BcLNA=;
+        b=ihiwuqawJp/3oaQCLzrF89Ga5C7q+msM8t/hB+3Aj5QNV7YlxBqif6mKjT2fZiYHOh
+         BJFPreo+5+/uYS2pizNivHR4DM1wPb4eYQNhja8g19tc9Z0unEZX0BawoLol1oq84bAX
+         RVSinv3HGHuUwQvPQTtT3BMmM0MMMY+LWvdhnthKITUOH3gZESldsxJCWGnkgpY6NkY5
+         Gatz/tD6lSzHjRCddFGPKzdEFrcLcrXHLZU8AQJVQvc7TbByzIrn7OTVDj0VG9FDcGVs
+         mX1LDKBKfNxVVdHmy6DSp2GFo+dEYQoCWgOal0t1rtWJFmNqRlxvy7jxesZYHSOb8v3r
+         jwrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752066107; x=1752670907;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=eiyH3L7PkijYQuy2lwj+LBn5Obme2Qi7ZnOyH2/C52s=;
-        b=q4Q/QPeLuayKP5E1uZdnBTJuzOU3uE28CHWtHAfI+fq1p9XlfQAoPXrUhE26LFtjWH
-         tQO8o5dBG6srs1kJWSNlIHBZCWU7mDo0RS96jf0FuZ3vASeakdHuGg1A6fsyx678dyiu
-         Ijvc4TcAyKy8Xfw+KhUo0As0nqpsgHXN19dlx4njm14IHPfxicllXmZ9sA7gqyzLdPak
-         EdJmVh6pDrmpPAVcx4bflls+/ZOtyOPvJBVH7nAiuTd3CGa6hhyQ6dgwicX73Kbeti5f
-         5sy4N26ilYSXsrFunEVcErQooO2SdcQFyxuENr+5VtLZWI6WEpPL5G4dRzApL0tyFBVm
-         jfHA==
-X-Forwarded-Encrypted: i=1; AJvYcCURX605vfp2apZ0bt+KsotdBfDFKjgDZQWK6rR+DH/6k7GiUgHpeY1ncD2XDZqncJmSNrw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxRKBTQR3UgS5ZGxSr7BJbHBhQCIhbdF8bPCRw8uw5a4kVvysxZ
-	hDpr2F7I78T/9X52/wq2kEvey4Xr52Tp1U+uJgFn3OOoOZEr0ZflkOAbBSFWaE04tyTPYqlOueP
-	k/7525VsFMfk+11l5cWAI5iloL0pmiusv5wFqYNhrgPVl1Mm95ePdKJGm/tECzGVT/dvQ8leH9W
-	HENiP6ptJ9h+pE+Yg+uFdp3sNPfp9l
-X-Gm-Gg: ASbGnctvItdonM42ej6ohW3Z6ONcxXUXI7N+di4qUqg1nMjg2veVyRZEvCX8xz3fWxN
-	ZXZf6ZUcAaJ6ceTa2BLDmovgLWmU5uJNMbrvGT4llFAXAKZ7gA/xDcMyu4/MGH2Z4/rs1TWEatw
-	leN0rZ
-X-Received: by 2002:a05:6000:2584:b0:3a4:d6ed:8df8 with SMTP id ffacd0b85a97d-3b5e4533bfbmr2032631f8f.39.1752066107160;
-        Wed, 09 Jul 2025 06:01:47 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFARDLdqg2tz5961d2aQtC0kYqwNWKO8nVx+Yu/WEo7+ZJo65HQhq27gzmpbKCeWarSuvm0r+WJ/hL4MtT85rQ=
-X-Received: by 2002:a05:6000:2584:b0:3a4:d6ed:8df8 with SMTP id
- ffacd0b85a97d-3b5e4533bfbmr2032568f8f.39.1752066106520; Wed, 09 Jul 2025
- 06:01:46 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1752066126; x=1752670926;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Nk4HVwXuMe6h7bhTVh6kU5/xhXMf/wzhNXvAy/BcLNA=;
+        b=UfkdrggaBsxZIoN82k5V6tmaYVFZD4Xhh62Te0tyxwDiCZs4hknuY1kkwBZS67NVrD
+         0wLNfQDfL5S5RV/l6u2AGzXCsB47jT3dPTLeQpJs1E+FiYFCbegNOyvs+YbR7rVSEkp2
+         WtUqPHOzrngc5eNpJl32S+bNwxYOZz31D5N+iM/QWOKcO7GnsSp0+XHIS0fAu/72Wvsw
+         KgLbk6eIOOz8JJrIdlHbnvk1+vDmunOyI4n+tTo8myJGw51w6L82H5L8ZOJnLsc2kLpa
+         oKT8eZUQOqWfnV1IvLb6WdoxaVWgvYnqY0rL8q5gFp4qODc1SKmC10qiq2S5oA1AEEqP
+         A1ZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXmqkHDlAnWVJxPZ5tFmK62nNyyt7hOBJUZil9gFF8/nij2jCdQyDCKR75LE5KKISqvdHA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJ+b9UZM5avnwSMLqNfUlicxpsOVYMx6o1EBnJwSWxR5ptYhAX
+	WRYV3Sl4/JwMi7HvFIqIGO7hclDD8mR6i8t8VlDiNqPmt1b2Xhifqp7kxQocPYBeF1iMPwCBul1
+	QHAtirg==
+X-Google-Smtp-Source: AGHT+IEqA/QiNyqu/E2QYf39DzVcxxyp+7qsmUCTcR5JkCtmLF6Gg2fzq88sjURjxp34pOpwKi25NkyDfxY=
+X-Received: from pfbjc28.prod.google.com ([2002:a05:6a00:6c9c:b0:748:d9c7:291e])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:918d:b0:215:dbb0:2a85
+ with SMTP id adf61e73a8af0-22cd2e919ccmr4500528637.0.1752066126241; Wed, 09
+ Jul 2025 06:02:06 -0700 (PDT)
+Date: Wed, 9 Jul 2025 06:02:04 -0700
+In-Reply-To: <63f08c9e-b228-4282-bd08-454ccdf53ecf@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <32045ab842954dd5867b55ee965ffcc7@huawei.com>
-In-Reply-To: <32045ab842954dd5867b55ee965ffcc7@huawei.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 9 Jul 2025 15:01:34 +0200
-X-Gm-Features: Ac12FXwatrB--9KQo-YJgLj3vSbfF0I9bp9UaU-RUh_KY7dTRJTq6UwkjzJxyTU
-Message-ID: <CABgObfYi2uM9Ek8pPrHXzeuzXd_9p_sL=0WckWnyOmtuJnj_ug@mail.gmail.com>
-Subject: Re: [v2] KVM: x86: Question on lock protection in handle_ept_misconfig
-To: "zoudongjie (A)" <zoudongjie@huawei.com>
-Cc: Sean Christopherson <seanjc@google.com>, Thomas Gleixner <tglx@linutronix.de>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, "the arch/x86 maintainers" <x86@kernel.org>, 
-	"Anvin, H. Peter" <hpa@zytor.com>, kvm <kvm@vger.kernel.org>, 
-	"Kernel Mailing List, Linux" <linux-kernel@vger.kernel.org>, "Chenzhendong (alex)" <alex.chen@huawei.com>, 
-	luolongmin <luolongmin@huawei.com>, "Mujinsheng (DxJanesir)" <mujinsheng@huawei.com>, 
-	"chenjianfei (D)" <chenjianfei3@huawei.com>, "Fangyi (Eric)" <eric.fangyi@huawei.com>, 
-	"lishan (E)" <lishan24@huawei.com>, Renxuming <renxuming@huawei.com>, 
-	suxiaodong <suxiaodong1@huawei.com>, "caijunjie (A)" <caijunjie15@h-partners.com>
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+References: <20250707101029.927906-1-nikunj@amd.com> <20250707101029.927906-3-nikunj@amd.com>
+ <aG0tFvoEXzUqRjnC@google.com> <63f08c9e-b228-4282-bd08-454ccdf53ecf@amd.com>
+Message-ID: <aG5oTKtWWqhwoFlI@google.com>
+Subject: Re: [PATCH v8 2/2] KVM: SVM: Enable Secure TSC for SNP guests
+From: Sean Christopherson <seanjc@google.com>
+To: "Nikunj A. Dadhania" <nikunj@amd.com>
+Cc: pbonzini@redhat.com, kvm@vger.kernel.org, thomas.lendacky@amd.com, 
+	santosh.shukla@amd.com, bp@alien8.de, isaku.yamahata@intel.com, 
+	vaishali.thakkar@suse.com, kai.huang@intel.com
+Content-Type: text/plain; charset="us-ascii"
 
-Il mer 9 lug 2025, 08:50 zoudongjie (A) <zoudongjie@huawei.com> ha scritto:
+On Wed, Jul 09, 2025, Nikunj A. Dadhania wrote:
+> On 7/8/2025 8:07 PM, Sean Christopherson wrote:
+> > On Mon, Jul 07, 2025, Nikunj A Dadhania wrote:
+> >> Introduce the read-only MSR GUEST_TSC_FREQ (0xc0010134) that returns
+> >> guest's effective frequency in MHZ when Secure TSC is enabled for SNP
+> >> guests. Disable interception of this MSR when Secure TSC is enabled. Note
+> >> that GUEST_TSC_FREQ MSR is accessible only to the guest and not from the
+> >> hypervisor context.
+> > 
+> > ...
+> > 
+> >> @@ -4487,6 +4512,9 @@ static void sev_es_init_vmcb(struct vcpu_svm *svm)
+> >>  
+> >>  	/* Can't intercept XSETBV, HV can't modify XCR0 directly */
+> >>  	svm_clr_intercept(svm, INTERCEPT_XSETBV);
+> >> +
+> >> +	if (snp_secure_tsc_enabled(svm->vcpu.kvm))
+> >> +		svm_disable_intercept_for_msr(&svm->vcpu, MSR_AMD64_GUEST_TSC_FREQ, MSR_TYPE_RW);
+> > 
+> > KVM shouldn't be disabling write interception for a read-only MSR. 
+> 
+> Few of things to consider here:
+> 1) GUEST_TSC_FREQ is a *guest only* MSR and what is the point in KVM intercepting writes
+>    to that MSR.
+
+Because there's zero point in not intercepting writes, and KVM shouldn't do
+things for no reason as doing so tends to confuse readers.  E.g. I reacted to
+this because I didn't read the changelog first, and was surprised that the guest
+could adjust its TSC frequency (which it obviously can't, but that's what the
+code implies to me).
+
+>    The guest vCPU handles it appropriately when interception is disabled.
 >
-> Resending as plain text to fix formatting issues.
-> ---
->
-> Hi all,
->
-> I noticed that in handle_ept_misconfig(), kvm_io_bus_write() is called. And
-> within kvm_io_bus_write(), BUS is obtained through srcu_dereference(). During
-> this process, kvm->slots_lock is not acquired, nor is srcu_read_lock() called
-> for protection.
+> 2) Guest does not expect GUEST_TSC_FREQ MSR to be intercepted(read or write), guest 
+>    will terminate if GUEST_TSC_FREQ MSR is intercepted by the hypervisor:
 
+But it's read-only, the guest shouldn't be writing.  If the vCPU handles #GPs
+appropriately, then it should have no problem handling #VCs on bad writes.
 
-Hi, srcu_read_lock() is guaranteed by the caller (see vcpu_enter_guest
-in arch/x86/kvm/x86.c).
+> 38cc6495cdec x86/sev: Prevent GUEST_TSC_FREQ MSR interception for Secure TSC enabled guests
 
-In fact, almost all of KVM_RUN is covered by a SRCU read critical
-section, except for:
-
-1) the part where the processor is in guest mode and the nearby
-preparations (that's vcpu_enter_guest)
-
-2) when the vCPU goes to a non-runnable state, for example waiting for
-an interrupt (search for kvm_vcpu_block and kvm_vcpu_halt)
-
-Thanks,
-
-Paolo
-
-> If another process is synchronizing BUS at the same time,
-> synchronize_srcu_expedited() cannot safely reclaim space(it cannot protect
-> srcu_dereference() outside the critical section?), how can we ensure that BUS
-> obtained by kvm_io_bus_write() is the latest?
->
-> Thanks,
-> Junjie Cai
->
-> Reported by: Junjie Cai <mailto:caijunjie15@h-partners.com>
->
-
+That's a guest bug, it shouldn't be complaining about the host intercepting writes.
 
