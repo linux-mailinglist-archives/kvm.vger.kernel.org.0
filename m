@@ -1,224 +1,120 @@
-Return-Path: <kvm+bounces-52028-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52029-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D275AFFF4A
-	for <lists+kvm@lfdr.de>; Thu, 10 Jul 2025 12:29:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BE8DAFFF9E
+	for <lists+kvm@lfdr.de>; Thu, 10 Jul 2025 12:48:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1C7F3B4B1B
-	for <lists+kvm@lfdr.de>; Thu, 10 Jul 2025 10:29:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D88B1C847E4
+	for <lists+kvm@lfdr.de>; Thu, 10 Jul 2025 10:49:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6911B2D8DDC;
-	Thu, 10 Jul 2025 10:29:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19E4C2DECB4;
+	Thu, 10 Jul 2025 10:48:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OCntFvBi"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dIkebAk1"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAA192D8778
-	for <kvm@vger.kernel.org>; Thu, 10 Jul 2025 10:29:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAF261FBEA2
+	for <kvm@vger.kernel.org>; Thu, 10 Jul 2025 10:48:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752143366; cv=none; b=IGIY0/+sTuxNSNkFWVFvAp+lTWUGbRiaYBnIQKXRgiEatNNClr9Yh1Keb3+T4mJeEelbnPF/+NG9J/Qpovh3U8Tm98m+x9X6RlXfgM0X+r5LrvWgsvpD1BKwvvJEU/n8YJCYvZsu4JODvGqMqnjQ0sQfXnqKFseF5RC8IVAvEIo=
+	t=1752144526; cv=none; b=dvaB211NObK+L4SKQK620JlmOXsZyAVg9pxDDZkd5hNoDyZV0qzRZteOCDH0T1VWcuW0KDccumF4sHfXANfyGm3X8s4dsuysXyFCimoKH/mSm1FzSi5kK+r87unW+i+1rrYsnaBmDmm/YZAFaZ/HxWMhENuDro+okWwnI4ff4O8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752143366; c=relaxed/simple;
-	bh=2QWhoM0mWymndRaVSrqd72lnEQHxsPB5lSFxXslQrjM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QgU8kf+gjofUs50UoypvH24dCp1VdLiwUZV3UOd3GZK7NMDSLyuPpVN9xiq940A8cP4GKL+Rw2YgSW31G0/oVvh+w9eDR2SMvKqCVuvPc6j8YC+DalYstr1nqgk7yt1wpVhVWjVnINdC/tZVgSrhDmVxN7yS5eMJ/GxV0xBLn+4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OCntFvBi; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1752144526; c=relaxed/simple;
+	bh=reDJB+jVA2jze/Op4vAV+YAROelsnXkSfMwWLjC3sb0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=a1cpoy7xwjosa5Ak8d2RciKk8yixxGZMQPuEj6Bc/ls6nt9tz17wSG+aQR9M+NSm1x/CquJ3Y22tIrlDKoBCD0Xb5ie25bUx1r3frC1SA64vmWIzWrxvMrSFhpFPB/oiMc94+OdtAwCaFDG0gz2E5O9AE/hwFOTUtaoTvoT/wMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dIkebAk1; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752143362;
+	s=mimecast20190719; t=1752144524;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=wY7K55zKGpDrRjZXwu1uqWR3zVKuspjibxDl7C+lpPc=;
-	b=OCntFvBi/ZCyBr/d/ToZb1fL3a7qOtw7hiIyz18TgkS2TBmVsAOwsK8lUODRYTCGmh0FGB
-	mSQh1Q1gIzR/lPsCXDHe8/AeLT4zMTPkPaNB9K0vOrEP0vs+ANbqtCLJhHrbMi0At/7kJo
-	jcLY1+8QJEgXa8oktzEtN9nGN1kbe9w=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lNmncl3vzJsUWRoJNZxmBhE+E8sb6lSPv1tCHk92ysY=;
+	b=dIkebAk1ZdzdUBJFPM4NbPa0JluLcJhoi4Eln2fHo+KiAgd680T7KCd/XrSa60gkaz09Xf
+	+meb8i0ckSiTzQ8u9acfeZzotQwu6eNkaMfIN57veLTL3zBosngCMIuXPmVHa7shnllFKO
+	Nmd3Ho1gD1y/Iwt24dQYFaU6wLCVzJ0=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-256-Pnk1kgTCMnySmPAgq87_Xg-1; Thu, 10 Jul 2025 06:29:21 -0400
-X-MC-Unique: Pnk1kgTCMnySmPAgq87_Xg-1
-X-Mimecast-MFC-AGG-ID: Pnk1kgTCMnySmPAgq87_Xg_1752143360
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3a50816ccc6so575863f8f.1
-        for <kvm@vger.kernel.org>; Thu, 10 Jul 2025 03:29:21 -0700 (PDT)
+ us-mta-45-ir1mki2-NWC0Ke_zAPKMwg-1; Thu, 10 Jul 2025 06:48:40 -0400
+X-MC-Unique: ir1mki2-NWC0Ke_zAPKMwg-1
+X-Mimecast-MFC-AGG-ID: ir1mki2-NWC0Ke_zAPKMwg_1752144519
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-45311704d1fso5387615e9.1
+        for <kvm@vger.kernel.org>; Thu, 10 Jul 2025 03:48:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752143360; x=1752748160;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=wY7K55zKGpDrRjZXwu1uqWR3zVKuspjibxDl7C+lpPc=;
-        b=GO1YT6BcjNiZgvYAeJkDMe9SV87Pw4K3YUeY9qzX5US+c328s2sdRC/bYPJZEZgErR
-         eq1Q+7l7/AtqWujxF4G9e2g12zp2AEHD+IiXhqmgIEHbftgJG5hkWFXOMBPTnMBuHxcF
-         CWeb/tibXzrzyn5uWvQY7tDQh2P2elzDwFy2fBvlpKN9m1r8IvQ51ig65OHpGoFyFOLq
-         +GtnLH0YBmDERVhnwDU6ZrnXcplBtnBqnsWjRdZOeggqa23al4MxkO5hrAE06vll+vc4
-         qEf4fk3DgL6NcT3cKYdDlRwjZw7X5EwW36wtClof9VDHlHfcwVn7wEeDbo5yiwQg+1Yv
-         Mumg==
-X-Forwarded-Encrypted: i=1; AJvYcCXse8N1o/yvoWcyt9Z76AXCIrlFIfabS2M5L6/ILzLSTuk8cCNZDuL1xKjdFMQN/6mqLLk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyrTHxrfp4hVxLlKYJgx0LJ1inkjVEIZdgCqFs68eK4xlSh4YpI
-	kptBcDPCL7VsFn8c6u4eGWKypaEVgU3uTXxw/48KNKMTygHEQJFDMGX18+rHxZBFB1HLIuDwWqz
-	cekNZrzQXC+TkRd4McwGMCnN6n1gQ/OAUaHFxEH7lW26LklWZ8AY2AQ==
-X-Gm-Gg: ASbGncsY5sU1q7op50C391gqpao4QrsXhpAR7uEzNSjoHZpPK8MSI4IWEuyuHHNRrcO
-	3yBabS80NAjaNgASbN6UBsWV3Mlaz2sqO10kkL/8zjAuvKRHBdBiMby3An52kBB9dKqiH5ywtkB
-	TBGdOaZvII0Pg0rUcabx6iPd2h/oWaNcN2mZ6ZgsuPgWlwWJ8mMr9HdEx8zXjLwkZomJHFy/RfC
-	bkhKXiGe/tGG1iF4R8am/RhZxuHc/0nFCCHyminGkucNXsoOfYhf+PfRO4B8H3qiAj5Mm24vQ9H
-	48IKi8zjppl3UXx1rKMu4if9Vbg=
-X-Received: by 2002:a5d:6f12:0:b0:3a5:541c:b40f with SMTP id ffacd0b85a97d-3b5e866b02bmr2207648f8f.9.1752143360040;
-        Thu, 10 Jul 2025 03:29:20 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEP+KlTnZ761Q6UY9fIQIXQSv43xuQra8a1ir/3lJsDWF78oojl38M+s7mgvd2ajLHSrEGAjg==
-X-Received: by 2002:a5d:6f12:0:b0:3a5:541c:b40f with SMTP id ffacd0b85a97d-3b5e866b02bmr2207610f8f.9.1752143359427;
-        Thu, 10 Jul 2025 03:29:19 -0700 (PDT)
-Received: from [192.168.10.48] ([151.49.202.169])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b5e8dc3a62sm1474020f8f.40.2025.07.10.03.29.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Jul 2025 03:29:18 -0700 (PDT)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Cc: seanjc@google.com,
-	Rick Edgecombe <rick.p.edgecombe@intel.com>
-Subject: [PATCH] KVM: Documentation: document how KVM is tested
-Date: Thu, 10 Jul 2025 12:29:17 +0200
-Message-ID: <20250710102917.250176-1-pbonzini@redhat.com>
-X-Mailer: git-send-email 2.50.0
+        d=1e100.net; s=20230601; t=1752144519; x=1752749319;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lNmncl3vzJsUWRoJNZxmBhE+E8sb6lSPv1tCHk92ysY=;
+        b=LQIl2DX48em/uasDDNP+vHQL1PXq1XB7mFg1koY7KyLyC/K3B1aePD+MKzoQnTr1Tv
+         E1ekSLdp+l132v7rSeFvQzZBRhQcWbJ5Fu8Xp2PE+K1VL9fnViFmxJCwAgVSLSPSZjvE
+         Tf/zm4Wbt1preJH0Lv/NXbDjo/HCU/RA9T682kXXgP0TOo8wqnre80GSjHdgAW1IAEA4
+         c9HhDN1/LJ3nHXYJXw7lWnMf0O/tFIDfaHJVDQfJsOqOGSktsrs+yqdS1NlC6eaaVNmW
+         Mcpso93t+lKMkIP8NfUFxagTIHSe+KZ1X23DqsriXtZOv3M5qkk+1o5Z9yIbkDkdk4z3
+         5nMg==
+X-Forwarded-Encrypted: i=1; AJvYcCWaTDbudqhM2rn//KwwcNvkQpJE790agrXO6rKMa0UhH8Sy/cviU64Sa/OmY39YtfPwAZE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzQeLO2W04vN9sk/2heg4usVjTw3PcRAFBPfmOmbWzNa/DpISzw
+	6VQ0lF+Q/MZ7rYMior0ErOwm2hBcHXfey33DqyuekOosITnHnl5Zk915kMEVP+lSghpaplFCSqJ
+	aVvIzrY7zIfqP2ZG8VNnkvSqz6nH0p3QAjhWeiXEJl/YeUSkNpOfpiPIup7+XQyLF4oQRK+eTdh
+	ZS8+OS5jEjldeeOishGO+voi2EXxth
+X-Gm-Gg: ASbGncs86lBpTq/8EhCoztWbdd5CZlxgeReqrbQUMrdfY3Ckwp8Y7ZAfevfvQsyru2Y
+	SOoRbVZw3ugB5zOjDoUUbIz2ARC0J3sWyFmHILw2o4AyXG57LmrxUJtcb57WS55TZKW58NyiKIt
+	lkC1xZ
+X-Received: by 2002:a05:6000:240e:b0:3b2:dfc6:2485 with SMTP id ffacd0b85a97d-3b5e866be37mr1530565f8f.4.1752144519479;
+        Thu, 10 Jul 2025 03:48:39 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHmY5FVV5iTS8z0YqIW6yODFY43cB2gfswppkDLC9lidIswhlzZ5Ms1OGnA8y43lftuWydzsAPcndaHukvYemo=
+X-Received: by 2002:a05:6000:240e:b0:3b2:dfc6:2485 with SMTP id
+ ffacd0b85a97d-3b5e866be37mr1530551f8f.4.1752144519104; Thu, 10 Jul 2025
+ 03:48:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250626152023.192347-1-maz@kernel.org> <CABgObfZ3RepTFAMVSB4v1cmuOg+JB7LAcqx04EZui6qF3q5QtA@mail.gmail.com>
+ <86o6tua76o.wl-maz@kernel.org>
+In-Reply-To: <86o6tua76o.wl-maz@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu, 10 Jul 2025 12:48:27 +0200
+X-Gm-Features: Ac12FXwkZUiiCJDC2HojeWiVZysisH16fFGmMHmUxWKm3vmZc3XEF7c6L-0RtaY
+Message-ID: <CABgObfa-1ee9ugHk2WmwYmqTqUtc5x1wOW2JPv9+5VigvSAkZA@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.16, take #4
+To: Marc Zyngier <maz@kernel.org>
+Cc: Mostafa Saleh <smostafa@google.com>, Quentin Perret <qperret@google.com>, 
+	Wei-Lin Chang <r09922117@csie.ntu.edu.tw>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Proper testing greatly simplifies both patch development and review,
-but it can be unclear what kind of userspace or guest support
-should accompany new features. Clarify maintainer expectations
-in terms of testing expectations; additionally, list the cases in
-which open-source userspace support is pretty much a necessity and
-its absence can only be mitigated by selftests.
+On Tue, Jul 8, 2025 at 8:06=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrote:
+> On Tue, 08 Jul 2025 15:48:01 +0100,
+> Paolo Bonzini <pbonzini@redhat.com> wrote:
+> > On Thu, Jun 26, 2025 at 5:20=E2=80=AFPM Marc Zyngier <maz@kernel.org> w=
+rote:
+> > >   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tag=
+s/kvmarm-fixes-6.16-4
+> >
+> > Done now, thanks!  Note that in the meanwhile git:// is not working
+> > anymore, so you probably want https:// in there.
+>
+> Really? That's... odd. Was this announced one way or another? I can
+> definitely use git:// from where I seat:
 
-While these ideas have long been followed implicitly by KVM contributors
-and maintainers, formalize them in writing to provide consistent (though
-not universal) guidelines.
+And it works now for me too, so it must have been a fluke on
+git.kernel.org's side.
 
-Suggested-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- Documentation/virt/kvm/review-checklist.rst | 92 +++++++++++++++++++--
- 1 file changed, 87 insertions(+), 5 deletions(-)
-
-diff --git a/Documentation/virt/kvm/review-checklist.rst b/Documentation/virt/kvm/review-checklist.rst
-index 7eb9974c676d..87d5aee4366c 100644
---- a/Documentation/virt/kvm/review-checklist.rst
-+++ b/Documentation/virt/kvm/review-checklist.rst
-@@ -21,8 +21,7 @@ Review checklist for kvm patches
- 6.  New cpu features should be exposed via KVM_GET_SUPPORTED_CPUID2,
-     or its equivalent for non-x86 architectures
- 
--7.  Emulator changes should be accompanied by unit tests for qemu-kvm.git
--    kvm/test directory.
-+7.  The feature should be testable (see below).
- 
- 8.  Changes should be vendor neutral when possible.  Changes to common code
-     are better than duplicating changes to vendor code.
-@@ -37,6 +36,89 @@ Review checklist for kvm patches
- 11. New guest visible features must either be documented in a hardware manual
-     or be accompanied by documentation.
- 
--12. Features must be robust against reset and kexec - for example, shared
--    host/guest memory must be unshared to prevent the host from writing to
--    guest memory that the guest has not reserved for this purpose.
-+Testing of KVM code
-+-------------------
-+
-+All features contributed to KVM, and in many cases bugfixes too, should be
-+accompanied by some kind of tests and/or enablement in open source guests
-+and VMMs.  KVM is covered by multiple test suites:
-+
-+*Selftests*
-+  These are low level tests included in the kernel tree.  While relatively
-+  challenging to write, they allow granular testing of kernel APIs.  This
-+  includes API failure scenarios, invoking APIs after specific guest
-+  instructions, and testing multiple calls to ``KVM_CREATE_VM`` within
-+  a single test.
-+
-+``kvm-unit-tests``
-+  A collection of small guests that test CPU and emulated device features
-+  from a guest's perspective.  They run under QEMU or ``kvmtool``,
-+  are relatively easy to write.  `kvm-`unit-tests`` are generally not
-+  KVM-specific; they can be run with any accelerator that QEMU support
-+  or even on bare metal, making it possible to compare behavior across
-+  hypervisors and processor families.
-+
-+Functional test suites
-+  Various sets of functional tests exist, such as QEMU's ``tests/functional``
-+  suite and `avocado-vt <https://avocado-vt.readthedocs.io/en/latest/>`__.
-+  These typically involve running a full operating system in a virtual
-+  machine.
-+
-+The best testing approach depends on the feature's complexity and
-+operation. Here are some examples and guidelines:
-+
-+New instructions (no new registers or APIs)
-+  The corresponding CPU features (if applicable) should be made available
-+  in QEMU.  If the instructions require emulation support or other code in
-+  KVM, it is worth adding coverage to ``kvm-unit-tests`` or selftests.
-+  While selftests are generally larger and harder to write, they may be
-+  a better choice if the instructions relate to an API that already
-+  has good selftest coverage.
-+
-+New hardware features (new registers, no new APIs)
-+  These should be tested via ``kvm-unit-tests``; this more or less implies
-+  supporting them in QEMU and/or ``kvmtool``.  In some cases selftests
-+  can be used instead, similar to the previous case, or specifically to
-+  test corner cases in guest state save/restore.
-+
-+Bug fixes and performance improvements
-+  These usually do not introduce new APIs, but it's worth sharing
-+  any benchmarks and tests used to validate your contribution,
-+  ideally in the form of regression tests.  Tests and benchmarks
-+  can be included in either ``kvm-unit-tests`` or selftests, depending
-+  on the specifics of your change.  Selftests are especially useful for
-+  regression tests because they are included directly in Linux's tree.
-+
-+Large scale internal changes
-+  While it's difficult to provide a single policy, you should ensure that
-+  the changed code is covered by either ``kvm-unit-tests`` or selftests.
-+  In some cases the affected code is run for any guests and functional
-+  tests suffice.  Explain your testing process in the cover letter,
-+  as that can help identify gaps in existing test suites.
-+
-+New APIs
-+  It is important to demonstrate your use case.  This can be as simple as
-+  explaining that the feature is already in use on bare metal, or it can be
-+  a proof-of-concept implementation in userspace.  The latter need not be
-+  open source, though that is of course preferrable for easier testing.
-+  Selftests should test corner cases of the APIs, and should also cover
-+  basic guest operation if no open source VMM uses the feature.
-+
-+Bigger features, usually spanning host and guest
-+  These should be supported by Linux guests, with limited exceptions
-+  for Hyper-V features that are testable on Windows guests.  It is
-+  strongly suggested that the feature be usable exclusively with open
-+  source code, including in at least one of QEMU or crosvm.  Selftests
-+  should test at least API error cases.  Guest operation can be
-+  covered by either selftests of ``kvm-unit-tests`` (this is especially
-+  important for paravirtualized and Windows-only features).  Strong
-+  selftest coverage can also be a replacement for implementation in an
-+  open source VMM, but this is generally not recommended.
-+
-+Following the above suggestions for testing in selftests and
-+``kvm-unit-tests`` will make it easier for the maintainers to review
-+and accept your code.  In fact, even before you contribute your changes
-+upstream it will make it easier for you to develop for KVM.
-+
-+Of course, the KVM maintainers reserve the right to require more tests,
-+though they may also waive the requirement from time to time.
--- 
-2.50.0
+Paolo
 
 
