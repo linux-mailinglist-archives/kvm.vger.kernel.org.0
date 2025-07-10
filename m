@@ -1,363 +1,356 @@
-Return-Path: <kvm+bounces-52014-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52015-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57BCFAFF867
-	for <lists+kvm@lfdr.de>; Thu, 10 Jul 2025 07:24:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72935AFFA23
+	for <lists+kvm@lfdr.de>; Thu, 10 Jul 2025 08:51:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 29B351C42DD4
-	for <lists+kvm@lfdr.de>; Thu, 10 Jul 2025 05:25:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B50F64A8357
+	for <lists+kvm@lfdr.de>; Thu, 10 Jul 2025 06:51:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D2F3281530;
-	Thu, 10 Jul 2025 05:24:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA828287507;
+	Thu, 10 Jul 2025 06:51:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PA1ejXCQ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fOvRouwJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6924527F749
-	for <kvm@vger.kernel.org>; Thu, 10 Jul 2025 05:24:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 931DE22AE75
+	for <kvm@vger.kernel.org>; Thu, 10 Jul 2025 06:51:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752125081; cv=none; b=gHhvFicRsz458Ve+48BnIKBRoL0Rmo2fytU6cdMsHUA5Kn+qRLOt6mZGT/E8mKmBOBH575QxWgUxZsNdD87ti/5cbh1QRWvLwv8RysT4ZucUk/ZB93ydDE1oxkLNrpm+3sEDjWVGrD+obgEYGp+nigR+5mRb5Tg8HFf8Yp/fQEk=
+	t=1752130287; cv=none; b=GHBZwBQfP337IVgE8LWulMu5ftpam3NkMIHKPKSJaDXxJgITOAAH3B30JZdeJV2cWCR9mhob6YUNGH6PpwvDd4gcnPjSlXAWKiv8VkyaBUlUSYz43L6+wfe5xxeUwXvGyOQ59nrI6QYNA+p1DdL1t8aJIVIf4xTyZjQhSPjRmO0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752125081; c=relaxed/simple;
-	bh=Ey67Z/gTuqQmc1QbGtinKiUnNLbmMPU31ReUX4pxfq8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=E4ckFEoghXIq32N78DvGbnL7hvSaFrFRIjgVtlDB/ozUOHxCWXtrpC6YqnkqwLOgRPucko2NA41e6QpjJOE3X32vDgtA/Z3sPB34zI47s3H7x5OfQubsBSPoIfplAGc/3isFpHGodcFJuTCXBkAO046Cquxz8ps2vH6CG+3HN10=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PA1ejXCQ; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752125077;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CceeV7J/K+B1j1BDTYnc8IYXP16jroD6AWzd6NMmE60=;
-	b=PA1ejXCQF3lanNT1eKanBHahBUhLUSMeZwuzRNiEeB7vlOmbzhfxScWOqbQ1L8UVlDK+OA
-	k1S4+eJvq+bL53vUyfkYo+8//z5L2llovCm2O1ePI9Ys6N6EDrQ8qv5Lr3uxR3ySMaVlbH
-	fYZAcmRCBAv3VpHmRSj0kwCTy5vJJOQ=
-Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com
- [209.85.210.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-252-Y3ZF9DimMXmEE5d7J3_gvQ-1; Thu, 10 Jul 2025 01:24:35 -0400
-X-MC-Unique: Y3ZF9DimMXmEE5d7J3_gvQ-1
-X-Mimecast-MFC-AGG-ID: Y3ZF9DimMXmEE5d7J3_gvQ_1752125073
-Received: by mail-pf1-f197.google.com with SMTP id d2e1a72fcca58-748cf01de06so997144b3a.3
-        for <kvm@vger.kernel.org>; Wed, 09 Jul 2025 22:24:34 -0700 (PDT)
+	s=arc-20240116; t=1752130287; c=relaxed/simple;
+	bh=ywQ0NJXMilsYJwI3bmhXom6mcoqPdnzSy0iMQDhlMiU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=umJHNV/RVlLv9rlsrTF4vtToCWIPNGO3NagejYBPQ89bcl9GrtBU3ydpE6AVuW2AxmU7EUhgZnGTnZVPXkqnw+x6VuZ5keAaFjvixD0NHywJVrEJE6cam1I25yPofvoH4gbh5f1I5iAntelyxM6Tewf1QXcGQu1Qu7Xcz9PL7/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fOvRouwJ; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-453643020bdso4070635e9.1
+        for <kvm@vger.kernel.org>; Wed, 09 Jul 2025 23:51:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1752130282; x=1752735082; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xpVqT/0ziCiQWbhFEKbAX/q6iQaKzlbqaJjN/YymYjI=;
+        b=fOvRouwJfSAMFSXSzM1mOtKrfbjLIQP4v+o1Ow9CWhbJPM9ZL/W8ii7vVZq8bgA6Q3
+         Aj05jiHcR54tmeC/pGphxn2W0J6g3TfBkXjxZvHZt8XErriCoU6sFwVf1NXxBCaSGUm4
+         rvd7FQRp7t9S9bNtk27KI8xwTPsTQYW79Y27+uitNbDJDDhnTprlusBOBxUfuBcQ9Xg2
+         nCKgbgYDFAibc1zPEVtDvUKqgmJPlaf+npUnQc9fl1+OCODcNLTT1JgX0SCWGOLnDJ2x
+         teAQnqi85DgZ6luBUbW/rS/j8/6dIllz/MspTNIFs11AJ2CyrscKyKT5NtDSR+791hH+
+         KwNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752125073; x=1752729873;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CceeV7J/K+B1j1BDTYnc8IYXP16jroD6AWzd6NMmE60=;
-        b=fuRRnCn2NMT2AnuNPnkIU/GmQsOYSi0DfaINrdrLiRg2jjqfC586Dc1F5S6dvtUz8s
-         YnGSOccPnZd+jUf0XPyv89zXU9cbrPZ/DXjKqxOnU6Rp6xsY3U8AkE8dmoh8DwmSiZIN
-         VrRueEAWK/4iczwZmeSemRq5kb1/9fo+8UBCg+JwwKqUto8zfnS4Us59BfrToe3cb9Pg
-         ep+q8UaJZiwnpNn8mOHOGZLvsu/tz4mC64/KinIeN2qkpDTWiPNogcZKq9h9YeavwBEd
-         dYBrc1w3uUTHkPopnxP557GqpxvQwJ/xPxRiUgBdT/K0PzWiAx2hGpEBbQMNcApgVuzZ
-         4bcQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVNlOeRsO7K4S+Uue3Efdpx1wTxLC5gajwGHwasBtMDxObd0CvURoAcn9TY1jIcxFL/7lw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxzWPCmzn4gJTQAsu+Clr5cd9lvo97/a4imxYepEKLW87XrIkFN
-	f+ZOsDgDgfLUUgU9MYfbzIx0rz+ZHY/ZC7KmDJMaCgrVrpCGQi4dmFXiWbvtKvPHXMOz4RbcKuL
-	DHZvKygAmut9rI5JJh5vzD6G9XK9G0k4nWog5heFYNDGJeR2BhUArag==
-X-Gm-Gg: ASbGnctZ7CuxaW0gVRV5E0uX+AYakcnnZzRZuon3tNiVclmj7gfcW8vyKkfVtV0WK1g
-	Loz2m88rMsmi0JSF9rfyaIWfpYQXxYsW8KoIgKSG9YlMkO/Yc+v3BIuqupgq8CdzulL4wFgIoSC
-	1z9fEcpiYeTPjGPuIdsU4cBe0L77G2/Xtm/u5G8jPkO8rfhY48JkFBQNYpF9QCknjoUz1pbWRU1
-	j7YswV9Vy+LbJ0A25Ul0jrxYI/3fN8lchAj1zSOkojX7my3ik9VqhZmWJRndL/hGC1F2wA1Rps3
-	vHWUrSc2sT/PciYn+24kZ5K2JWtT+WnFqvIFVXeMAgwvGm3oKoH/Nhl8WqH24w==
-X-Received: by 2002:a05:6a21:33aa:b0:1f5:8a1d:3904 with SMTP id adf61e73a8af0-23003fd7f75mr2412341637.7.1752125073442;
-        Wed, 09 Jul 2025 22:24:33 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFhW5qdYaRRhJg7AUBogJ5g2fTOaOL30BzyYQhpOK9w1RwhZRAF6XqSga3MM3ZEdVwm9ACHkA==
-X-Received: by 2002:a05:6a21:33aa:b0:1f5:8a1d:3904 with SMTP id adf61e73a8af0-23003fd7f75mr2412277637.7.1752125072831;
-        Wed, 09 Jul 2025 22:24:32 -0700 (PDT)
-Received: from [192.168.68.51] (n175-34-62-5.mrk21.qld.optusnet.com.au. [175.34.62.5])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74eb9dd7140sm950086b3a.24.2025.07.09.22.24.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Jul 2025 22:24:31 -0700 (PDT)
-Message-ID: <a8183dcd-f82e-49b3-b5b4-96e5363e060a@redhat.com>
-Date: Thu, 10 Jul 2025 15:24:22 +1000
+        d=1e100.net; s=20230601; t=1752130282; x=1752735082;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xpVqT/0ziCiQWbhFEKbAX/q6iQaKzlbqaJjN/YymYjI=;
+        b=mp7/PaJ2rWRwMXT9S7ITQ2vS2yJbNPcQlvb58UN67nyflwM4suDxfAmZZzGIaq+Hcl
+         /nKlTWy1pw034xc4B71Ye9eJsSx2+NHyCw98JIrXoaZR8yr36ysnthQkclMtcNilu5b8
+         gIrlNsUPc+Ru55Cx6XXgGPdL+TyJ74K0T/kPrs/lSOncbL20+Lxr+LtQZAplTFoBp2p9
+         ba7nL1o2nitQkfjqMm+m7wOrmDdJp5R4k//icToYb78k0sVPXnGOHP5I/wrh7r/Dtbki
+         Fv6yEpOid2S+p+DFAux5+nMSzmFvAVb8gpDOj8gZRDCiWXTFwQ1n4LE5S4y72QKho4Bn
+         NPmg==
+X-Forwarded-Encrypted: i=1; AJvYcCWDq2bw8nEYEpSuPStf7oaonMvmiqTYgsZN/NVE6E7KvYXG6tyKiSPen4oa7DV4NZFK/Qw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwUgswqmze8zTX/4PpnMZdtct2Dmk5njj855dufXwivHb0Cp3yL
+	sj7oduh8NCaq3uLZRcHMz5crNok85F6xvd+odKxroWpezLDn5V9620W/Bm3d8MORow==
+X-Gm-Gg: ASbGncvTxkefLkcknzn4GwlZNUDLVsFIRQZWkq6OkCbapjJdKZ5/wyLweh7bnRvKTgZ
+	4riazrhDzAx9QnmQb8wh04K/dGPNiMe7CSmGdZ/RDxRKhzct0sHPyvYdif3P9jukb9Ve4D7+IWV
+	n7M/mgRW7WGbyzvB/uoK7WZ4Dal2UaTrHrQ18pcUBbHSeJHMcWvpOR/Da/4dmTA3rsTglnHndud
+	icb+t8A+T+sDXuhpPm+jCcJoHO+vDsSS2xpnDlxpsQX7zTzMC6PYavRAdD0eZl1wFPDvuK7Gt2B
+	HD4z7A2By8HEQooZP6CemKSEELZsg/4bOeO4c9kTj1zCrvimz0NCKOPDAK4KUG5joHtdli6Aje8
+	Yyt099CwabP8JQbQ44RNBueM=
+X-Google-Smtp-Source: AGHT+IFZP/UMNnhVWneOpJDGvjArQoTmSoQxfALO8N9dgC9g7qQ/GhXWcBfsOhwQL5ABm6JTjSKyuQ==
+X-Received: by 2002:a05:600c:1546:b0:442:ccf9:e6f2 with SMTP id 5b1f17b1804b1-454d53a608dmr55979805e9.16.1752130281641;
+        Wed, 09 Jul 2025 23:51:21 -0700 (PDT)
+Received: from google.com (120.142.205.35.bc.googleusercontent.com. [35.205.142.120])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-454dd439326sm9964525e9.1.2025.07.09.23.51.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Jul 2025 23:51:20 -0700 (PDT)
+Date: Thu, 10 Jul 2025 06:51:16 +0000
+From: Keir Fraser <keirf@google.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, Eric Auger <eric.auger@redhat.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Li RongQing <lirongqing@baidu.com>
+Subject: Re: [PATCH 3/3] KVM: Avoid synchronize_srcu() in
+ kvm_io_bus_register_dev()
+Message-ID: <aG9i5BHDHRlFRFnb@google.com>
+References: <20250624092256.1105524-1-keirf@google.com>
+ <20250624092256.1105524-4-keirf@google.com>
+ <aFrANSe6fJOfMpOC@google.com>
+ <aGJf7v9EQoEZiQUk@google.com>
+ <aGwWvp_JeWe9tIJx@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 15/43] arm64: RME: Allow VMM to set RIPAS
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
- Emi Kisanuki <fj0570is@fujitsu.com>
-References: <20250611104844.245235-1-steven.price@arm.com>
- <20250611104844.245235-16-steven.price@arm.com>
- <60bb33b4-133e-4ebd-950c-e9e2ba8fc38b@redhat.com>
- <b2f3ddac-956e-4779-9202-fc393266aa6c@arm.com>
-Content-Language: en-US
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <b2f3ddac-956e-4779-9202-fc393266aa6c@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aGwWvp_JeWe9tIJx@google.com>
 
-Hi Steve,
+On Mon, Jul 07, 2025 at 11:49:34AM -0700, Sean Christopherson wrote:
+> On Mon, Jun 30, 2025, Keir Fraser wrote:
+> > On Tue, Jun 24, 2025 at 08:11:49AM -0700, Sean Christopherson wrote:
+> > > +Li
+> > > 
+> > > On Tue, Jun 24, 2025, Keir Fraser wrote:
+> > > > Device MMIO registration may happen quite frequently during VM boot,
+> > > > and the SRCU synchronization each time has a measurable effect
+> > > > on VM startup time. In our experiments it can account for around 25%
+> > > > of a VM's startup time.
+> > > > 
+> > > > Replace the synchronization with a deferred free of the old kvm_io_bus
+> > > > structure.
+> > > > 
+> > > > Signed-off-by: Keir Fraser <keirf@google.com>
+> > > > ---
+> > > >  include/linux/kvm_host.h |  1 +
+> > > >  virt/kvm/kvm_main.c      | 10 ++++++++--
+> > > >  2 files changed, 9 insertions(+), 2 deletions(-)
+> > > > 
+> > > > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > > > index 3bde4fb5c6aa..28a63f1ad314 100644
+> > > > --- a/include/linux/kvm_host.h
+> > > > +++ b/include/linux/kvm_host.h
+> > > > @@ -205,6 +205,7 @@ struct kvm_io_range {
+> > > >  struct kvm_io_bus {
+> > > >  	int dev_count;
+> > > >  	int ioeventfd_count;
+> > > > +	struct rcu_head rcu;
+> > > >  	struct kvm_io_range range[];
+> > > >  };
+> > > >  
+> > > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > > > index eec82775c5bf..b7d4da8ba0b2 100644
+> > > > --- a/virt/kvm/kvm_main.c
+> > > > +++ b/virt/kvm/kvm_main.c
+> > > > @@ -5924,6 +5924,13 @@ int kvm_io_bus_read(struct kvm_vcpu *vcpu, enum kvm_bus bus_idx, gpa_t addr,
+> > > >  }
+> > > >  EXPORT_SYMBOL_GPL(kvm_io_bus_read);
+> > > >  
+> > > > +static void __free_bus(struct rcu_head *rcu)
+> > > > +{
+> > > > +	struct kvm_io_bus *bus = container_of(rcu, struct kvm_io_bus, rcu);
+> > > > +
+> > > > +	kfree(bus);
+> > > > +}
+> > > > +
+> > > >  int kvm_io_bus_register_dev(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
+> > > >  			    int len, struct kvm_io_device *dev)
+> > > >  {
+> > > > @@ -5962,8 +5969,7 @@ int kvm_io_bus_register_dev(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
+> > > >  	memcpy(new_bus->range + i + 1, bus->range + i,
+> > > >  		(bus->dev_count - i) * sizeof(struct kvm_io_range));
+> > > >  	rcu_assign_pointer(kvm->buses[bus_idx], new_bus);
+> > > > -	synchronize_srcu_expedited(&kvm->srcu);
+> > > > -	kfree(bus);
+> > > > +	call_srcu(&kvm->srcu, &bus->rcu, __free_bus);
+> > > 
+> > > I'm 99% certain this will break ABI.  KVM needs to ensure all readers are
+> > > guaranteed to see the new device prior to returning to userspace.
+> > 
+> > I'm not sure I understand this. How can userspace (or a guest VCPU) know that
+> > it is executing *after* the MMIO registration, except via some form of
+> > synchronization or other ordering of its own? For example, that PCI BAR setup
+> > happens as part of PCI probing happening early in device registration in the
+> > guest OS, strictly before the MMIO region will be accessed. Otherwise the
+> > access is inherently racy against the registration?
+> 
+> Yes, guest software needs its own synchronization.  What I am pointing out is that,
+> very strictly speaking, KVM relies on synchronize_srcu_expedited() to ensure that
+> KVM's emulation of MMIO accesses are correctly ordered with respect to the guest's
+> synchronization.
+> 
+> It's legal, though *extremely* uncommon, for KVM to emulate large swaths of guest
+> code, including emulated MMIO accesses.  If KVM grabs kvm->buses at the start of
+> an emulation block, and then uses that reference to resolve MMIO, it's theoretically
+> possible for KVM to mishandle an access due to using a stale bus.
 
-On 7/10/25 12:42 AM, Steven Price wrote:
-> On 02/07/2025 01:37, Gavin Shan wrote:
->> On 6/11/25 8:48 PM, Steven Price wrote:
->>> Each page within the protected region of the realm guest can be marked
->>> as either RAM or EMPTY. Allow the VMM to control this before the guest
->>> has started and provide the equivalent functions to change this (with
->>> the guest's approval) at runtime.
->>>
->>> When transitioning from RIPAS RAM (1) to RIPAS EMPTY (0) the memory is
->>> unmapped from the guest and undelegated allowing the memory to be reused
->>> by the host. When transitioning to RIPAS RAM the actual population of
->>> the leaf RTTs is done later on stage 2 fault, however it may be
->>> necessary to allocate additional RTTs to allow the RMM track the RIPAS
->>> for the requested range.
->>>
->>> When freeing a block mapping it is necessary to temporarily unfold the
->>> RTT which requires delegating an extra page to the RMM, this page can
->>> then be recovered once the contents of the block mapping have been
->>> freed.
->>>
->>> Signed-off-by: Steven Price <steven.price@arm.com>
->>> ---
->>> Changes from v8:
->>>    * Propagate the 'may_block' flag to allow conditional calls to
->>>      cond_resched_rwlock_write().
->>>    * Introduce alloc_rtt() to wrap alloc_delegated_granule() and
->>>      kvm_account_pgtable_pages() and use when allocating RTTs.
->>>    * Code reorganisation to allow init_ipa_state and set_ipa_state to
->>>      share a common ripas_change() function,
->>>    * Other minor changes following review.
->>> Changes from v7:
->>>    * Replace use of "only_shared" with the upstream "attr_filter" field
->>>      of struct kvm_gfn_range.
->>>    * Clean up the logic in alloc_delegated_granule() for when to call
->>>      kvm_account_pgtable_pages().
->>>    * Rename realm_destroy_protected_granule() to
->>>      realm_destroy_private_granule() to match the naming elsewhere. Also
->>>      fix the return codes in the function to be descriptive.
->>>    * Several other minor changes to names/return codes.
->>> Changes from v6:
->>>    * Split the code dealing with the guest triggering a RIPAS change into
->>>      a separate patch, so this patch is purely for the VMM setting up the
->>>      RIPAS before the guest first runs.
->>>    * Drop the useless flags argument from alloc_delegated_granule().
->>>    * Account RTTs allocated for a guest using kvm_account_pgtable_pages().
->>>    * Deal with the RMM granule size potentially being smaller than the
->>>      host's PAGE_SIZE. Although note alloc_delegated_granule() currently
->>>      still allocates an entire host page for every RMM granule (so wasting
->>>      memory when PAGE_SIZE>4k).
->>> Changes from v5:
->>>    * Adapt to rebasing.
->>>    * Introduce find_map_level()
->>>    * Rename some functions to be clearer.
->>>    * Drop the "spare page" functionality.
->>> Changes from v2:
->>>    * {alloc,free}_delegated_page() moved from previous patch to this one.
->>>    * alloc_delegated_page() now takes a gfp_t flags parameter.
->>>    * Fix the reference counting of guestmem pages to avoid leaking memory.
->>>    * Several misc code improvements and extra comments.
->>> ---
->>>    arch/arm64/include/asm/kvm_rme.h |   6 +
->>>    arch/arm64/kvm/mmu.c             |   8 +-
->>>    arch/arm64/kvm/rme.c             | 447 +++++++++++++++++++++++++++++++
->>>    3 files changed, 458 insertions(+), 3 deletions(-)
->>>
->>
->> With below nitpicks addressed. The changes looks good to me.
->>
->> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> 
-> Thanks, most the nitpicks I agree - thanks for raising. Just one below I
-> wanted to comment on...
-> 
-> [...]
+But it doesn't do that? I think I understand now though that you are
+concerned about the buses API exposed to the kernel at large. And yes
+I see this would be a problem for example if a kvm_get_bus() return
+value was cached.
 
-You're welcome.
+Will and I also had a brainstorm in the office and theorised that a
+really "smart" compiler might somehow unroll
+handle_invalid_guest_state() 130 times and hoist all the READ_ONCE()s
+of the bus to the start. It's impractical, even likely impossible, but
+we couldn't outright say it's disallowed by the current enforcements
+in the KVM subsystem itself.
 
->>> +
->>> +enum ripas_action {
->>> +    RIPAS_INIT,
->>> +    RIPAS_SET,
->>> +};
->>> +
->>> +static int ripas_change(struct kvm *kvm,
->>> +            struct kvm_vcpu *vcpu,
->>> +            unsigned long ipa,
->>> +            unsigned long end,
->>> +            enum ripas_action action,
->>> +            unsigned long *top_ipa)
->>> +{
->>
->> The 'enum ripas_action' is used in limited scope, I would replace it
->> with a 'bool'
->> parameter to ripas_change(), something like below. If we plan to support
->> more actions
->> in future, then the 'enum ripas_action' makes sense to me.
-> 
-> The v1.1 spec[1] adds RMI_RTT_SET_S2AP (set stage 2 access permission).
-> So that adds a third option to the enum. I agree the enum is a little
-> clunky but it allows extension and at least spells out the action which
-> is occurring.
-> 
-> The part I'm not especially happy with is the 'vcpu' argument which is
-> not applicable to RIPAS_INIT but otherwise required (and in those cases
-> could replace 'kvm'). But I couldn't come up with a better solution for
-> that.
-> 
-> [1] Available from:
-> https://developer.arm.com/documentation/den0137/latest (following the
-> small "here" link near the end).
-> 
+> Today, such scenarios are effectively prevented by synchronize_srcu_expedited().
+> Using kvm->buses outside of SRCU protection would be a bug (per KVM's locking
+> rules), i.e. a large emulation block must take and hold SRCU for its entire
+> duration.  And so waiting for all SRCU readers to go away ensures that the new
+> kvm->buses will be observed if KVM starts a new emulation block.
 
-Right, it's as I guessed. A enum looks good if we need to extend it
-to cover the third case (RMI_RTT_SET_S2AP in RMMv1.1). Note that I just
-started looking into RMMv1.1 implementation several days ago and didn't
-have a good understanding on RMMv1.1 at present :-)
+Understood. Yes that does make the current code definitely safe in
+this regard, just slow!
 
-Thanks,
-Gavin
+> AFAIK, the only example of such emulation is x86's handle_invalid_guest_state().
+> And in practice, it's probably impossible for the compiler to keep a reference to
+> kvm->buses across multiple invocations of kvm_emulate_instruction() while still
+> honoring the READ_ONCE() in __rcu_dereference_check().
 
-> Thanks,
-> Steve
+That certainly stops compiler reordering. But I think I now agree with
+your concern about needing an actual memory barrier. I am worried for
+example if the guest is relying on an address dependency to
+synchronise an MMIO access. For example:
+     data = READ_ONCE(*READ_ONCE(mmio_base_addr));
+
+Two loads, ordered by address dependency. But that dependency would
+not prevent the access to kvm->buses[idx] from being
+hoisted/speculated by the CPU, since it's not data-dependent on the
+preceding load...
+
+That said, on x86, loads are ordered anyway.
+
+> But I don't want to simply drop KVM's synchronization, because we need a rule of
+> some kind to ensure correct ordering, even if it's only for documentation purposes
+> for 99% of cases.  And because the existence of kvm_get_bus() means that it would
+> be possible for KVM to grab a long-term reference to kvm->buses and use it across
+> emulation of multiple instructions (though actually doing that would be all kinds
+> of crazy).
+
+That seems reasonable, in terms of maintaining a fool-proof API to kvm->buses.
+
 > 
->> static int ripas_change(struct kvm *kvm,
->>              struct kvm_vcpu *vcpu,
->>              unsigned long ipa,
->>              unsigned long end,
->>              bool set_ripas,
->>              unsigned long *top_ipa)
->>
->>> +    struct realm *realm = &kvm->arch.realm;
->>> +    phys_addr_t rd_phys = virt_to_phys(realm->rd);
->>> +    phys_addr_t rec_phys;
->>> +    struct kvm_mmu_memory_cache *memcache = NULL;
->>> +    int ret = 0;
->>> +
->>> +    if (vcpu) {
->>> +        rec_phys = virt_to_phys(vcpu->arch.rec.rec_page);
->>> +        memcache = &vcpu->arch.mmu_page_cache;
->>> +
->>> +        WARN_ON(action != RIPAS_SET);
->>> +    } else {
->>> +        WARN_ON(action != RIPAS_INIT);
->>> +    }
->>> +
->>> +    while (ipa < end) {
->>> +        unsigned long next;
->>> +
->>> +        switch (action) {
->>> +        case RIPAS_INIT:
->>> +            ret = rmi_rtt_init_ripas(rd_phys, ipa, end, &next);
->>> +            break;
->>> +        case RIPAS_SET:
->>> +            ret = rmi_rtt_set_ripas(rd_phys, rec_phys, ipa, end,
->>> +                        &next);
->>> +            break;
->>> +        }
->>> +
->>
->> if 'enum ripas_action' is replaced by 'bool set_ripas' as above, this needs
->> twist either.
->>
->>> +        switch (RMI_RETURN_STATUS(ret)) {
->>> +        case RMI_SUCCESS:
->>> +            ipa = next;
->>> +            break;
->>> +        case RMI_ERROR_RTT:
->>> +            int err_level = RMI_RETURN_INDEX(ret);
->>> +            int level = find_map_level(realm, ipa, end);
->>> +
->>> +            if (err_level >= level)
->>> +                return -EINVAL;
->>> +
->>> +            ret = realm_create_rtt_levels(realm, ipa, err_level,
->>> +                              level, memcache);
->>> +            if (ret)
->>> +                return ret;
->>> +            /* Retry with the RTT levels in place */
->>> +            break;
->>> +        default:
->>> +            WARN_ON(1);
->>> +            return -ENXIO;
->>> +        }
->>> +    }
->>> +
->>> +    if (top_ipa)
->>> +        *top_ipa = ipa;
->>> +
->>> +    return 0;
->>> +}
->>> +
->>> +static int realm_init_ipa_state(struct kvm *kvm,
->>> +                unsigned long ipa,
->>> +                unsigned long end)
->>> +{
->>> +    return ripas_change(kvm, NULL, ipa, end, RIPAS_INIT, NULL);
->>> +}
->>> +
->>> +static int kvm_init_ipa_range_realm(struct kvm *kvm,
->>> +                    struct arm_rme_init_ripas *args)
->>> +{
->>> +    gpa_t addr, end;
->>> +
->>> +    addr = args->base;
->>> +    end = addr + args->size;
->>> +
->>> +    if (end < addr)
->>> +        return -EINVAL;
->>> +
->>> +    if (kvm_realm_state(kvm) != REALM_STATE_NEW)
->>> +        return -EPERM;
->>> +
->>> +    return realm_init_ipa_state(kvm, addr, end);
->>> +}
->>> +
->>>    /* Protects access to rme_vmid_bitmap */
->>>    static DEFINE_SPINLOCK(rme_vmid_lock);
->>>    static unsigned long *rme_vmid_bitmap;
->>> @@ -441,6 +876,18 @@ int kvm_realm_enable_cap(struct kvm *kvm, struct
->>> kvm_enable_cap *cap)
->>>        case KVM_CAP_ARM_RME_CREATE_REALM:
->>>            r = kvm_create_realm(kvm);
->>>            break;
->>> +    case KVM_CAP_ARM_RME_INIT_RIPAS_REALM: {
->>> +        struct arm_rme_init_ripas args;
->>> +        void __user *argp = u64_to_user_ptr(cap->args[1]);
->>> +
->>> +        if (copy_from_user(&args, argp, sizeof(args))) {
->>> +            r = -EFAULT;
->>> +            break;
->>> +        }
->>> +
->>> +        r = kvm_init_ipa_range_realm(kvm, &args);
->>> +        break;
->>> +    }
->>>        default:
->>>            r = -EINVAL;
->>>            break;
->>
->> Thanks,
->> Gavin
->>
+> > > I'm quite confident there are other flows that rely on the synchronization,
+> > > the vGIC case is simply the one that's documented.
+> > 
+> > If they're in the kernel they can be fixed? If necessary I'll go audit the callers.
+> 
+> Yes, I'm sure there's a solution.  Thinking more about this, you make a good
+> point that KVM needs to order access with respect to instruction execution, not
+> with respect to the start of KVM_RUN.
+> 
+> For all intents and purposes, holding kvm->srcu across VM-Enter/VM-Exit is
+> disallowed (though I don't think this is formally documented), i.e. every
+> architecture is guaranteed to do srcu_read_lock() after a VM-Exit, prior to
+> reading kvm->buses.  And srcu_read_lock() contains a full smp_mb(), which ensures
+> KVM will get a fresh kvm->buses relative to the instruction that triggered the
+> exit.
+> 
+> So for the common case of one-off accesses after a VM-Exit, I think we can simply
+> add calls to smp_mb__after_srcu_read_lock() (which is a nop on all architectures)
+> to formalize the dependency on reacquiring SRCU.  AFAICT, that would also suffice
+> for arm64's use of kvm_io_bus_get_dev().  And then add an explicit barrier of some
+> kind in handle_invalid_guest_state()?
+> 
+> Then to prevent grabbing long-term references to a bus, require kvm->slots_lock
+> in kvm_get_bus() (and special case the kfree() in VM destruction).
+> 
+> So something like this?  I think the barriers would pair with the smp_store_release()
+> in rcu_assign_pointer()?
+
+It would certainly mean that kvm->buses would be accessed *after* any
+preceding vCPU memory access. Including any that "observed" the
+newly-registered IO region, somehow (lock acquisition, read of a flag
+or base address, or whatever).
+
+Would it be satisfactory to put a patch along the lines of your
+suggestions below into a v2 of this patch series? I have made some
+comments below.
+
+> 
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 4953846cb30d..057fb4ce66b0 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -5861,6 +5861,9 @@ static int handle_invalid_guest_state(struct kvm_vcpu *vcpu)
+>                 if (kvm_test_request(KVM_REQ_EVENT, vcpu))
+>                         return 1;
+>  
+> +               /* Or maybe smp_mb()?  Not sure what this needs to be. */
+> +               barrier();
+> +
+
+Looks weak but maybe strong enough for x86? Maybe smp_rmb() would be better statement of intention?
+
+>                 if (!kvm_emulate_instruction(vcpu, 0))
+>                         return 0;
+>  
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 3bde4fb5c6aa..066438b6571a 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -967,9 +967,8 @@ static inline bool kvm_dirty_log_manual_protect_and_init_set(struct kvm *kvm)
+>  
+>  static inline struct kvm_io_bus *kvm_get_bus(struct kvm *kvm, enum kvm_bus idx)
+>  {
+> -       return srcu_dereference_check(kvm->buses[idx], &kvm->srcu,
+> -                                     lockdep_is_held(&kvm->slots_lock) ||
+> -                                     !refcount_read(&kvm->users_count));
+> +       return rcu_dereference_protected(kvm->buses[idx],
+> +                                        lockdep_is_held(&kvm->slots_lock));
+>  }
+>  
+>  static inline struct kvm_vcpu *kvm_get_vcpu(struct kvm *kvm, int i)
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index eec82775c5bf..7b0e881351f7 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -1228,7 +1228,8 @@ static struct kvm *kvm_create_vm(unsigned long type, const char *fdname)
+>  out_err_no_arch_destroy_vm:
+>         WARN_ON_ONCE(!refcount_dec_and_test(&kvm->users_count));
+>         for (i = 0; i < KVM_NR_BUSES; i++)
+> -               kfree(kvm_get_bus(kvm, i));
+> +               kfree(rcu_dereference_check(kvm->buses[i], &kvm->srcu,
+> +                                           !refcount_read(&kvm->users_count));
+
+srcu_dereference_check()
+
+>         kvm_free_irq_routing(kvm);
+>  out_err_no_irq_routing:
+>         cleanup_srcu_struct(&kvm->irq_srcu);
+> @@ -5847,6 +5848,9 @@ int kvm_io_bus_write(struct kvm_vcpu *vcpu, enum kvm_bus bus_idx, gpa_t addr,
+>                 .len = len,
+>         };
+>  
+> +       /* comment goes here */
+> +       smp_mb__after_srcu_read_lock();
+> +
+>         bus = srcu_dereference(vcpu->kvm->buses[bus_idx], &vcpu->kvm->srcu);
+>         if (!bus)
+>                 return -ENOMEM;
+> @@ -5866,6 +5870,9 @@ int kvm_io_bus_write_cookie(struct kvm_vcpu *vcpu, enum kvm_bus bus_idx,
+>                 .len = len,
+>         };
+>  
+> +       /* comment goes here */
+> +       smp_mb__after_srcu_read_lock();
+> +
+>         bus = srcu_dereference(vcpu->kvm->buses[bus_idx], &vcpu->kvm->srcu);
+>         if (!bus)
+>                 return -ENOMEM;
+> @@ -6025,6 +6032,9 @@ struct kvm_io_device *kvm_io_bus_get_dev(struct kvm *kvm, enum kvm_bus bus_idx,
+>  
+>         srcu_idx = srcu_read_lock(&kvm->srcu);
+>  
+> +       /* comment goes here */
+> +       smp_mb__after_srcu_read_lock();
+> +
+>         bus = srcu_dereference(kvm->buses[bus_idx], &kvm->srcu);
+>         if (!bus)
+>                 goto out_unlock;
+> 
 > 
 
+I guess kvm_io_bus_read() is to be done as well? Perhaps the barrier
+and dereference should be pulled into a helper with the comment, just
+in one place?
+
+ -- Keir (with thanks to Will for brainstorming!)
+ 
 
