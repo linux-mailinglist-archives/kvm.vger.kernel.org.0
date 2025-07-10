@@ -1,288 +1,222 @@
-Return-Path: <kvm+bounces-52006-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52007-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42454AFF667
-	for <lists+kvm@lfdr.de>; Thu, 10 Jul 2025 03:26:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80207AFF669
+	for <lists+kvm@lfdr.de>; Thu, 10 Jul 2025 03:30:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 457C27B7133
-	for <lists+kvm@lfdr.de>; Thu, 10 Jul 2025 01:24:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EC1217AF14D
+	for <lists+kvm@lfdr.de>; Thu, 10 Jul 2025 01:29:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B998B2701D8;
-	Thu, 10 Jul 2025 01:25:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26E5527E1C6;
+	Thu, 10 Jul 2025 01:30:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XHIJjma+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qt7vjTZB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00C6F230997;
-	Thu, 10 Jul 2025 01:25:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0DFB1E50B
+	for <kvm@vger.kernel.org>; Thu, 10 Jul 2025 01:30:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752110755; cv=none; b=krDtVcLt75BHlKXtiWKDTPbpHqaGQMa6IcicpGPPj4uxkOPgqrIaCHtjd4CBkAwvDUJJcUaOyinJMXlCIp03mk0a9QCPd2KoX9Q6dTQ8Kw2qOKbE7FuUGTgISHQ/AHaZvlZ9/PueG5mtfByKJ8iYQxI32Fkt9Pr97bPqYVVL8KU=
+	t=1752111039; cv=none; b=k1bCZUE9w5hbpzByYII+cimQQvZfnLsAgrJNHpc3OmVSd+M6RsUtN2Kwqk09+8HE4QmPrSVdApwMrCXKxX+jWUS59vnW0wQbdGJy94P4HJtGqHpb+bTX+cgpc1p7IdaMNyp081FWZO4dOlSgLmRAyY9jkn8hycswm4HK6piuIXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752110755; c=relaxed/simple;
-	bh=c3o3o5MgoZYDwVx/0ytOtVFtAUqCATZ4t7Y9Efk3G7A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DlgFSPrf2VxOdWaT6mfHRacQT4b8QYNSZXa1UmEVFC0p9ySQrkudr/rREVBZUVmq2+cL5ykg0H7N+Vj1mFT974JTxtXn5mOgffCh0ROKmOYWw/SwGAYCzYFiPlbxOiUuKIIolxn+ABW+DSiJZCxwJNxpob5FSvg5ZIxNB38FZKk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XHIJjma+; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752110754; x=1783646754;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=c3o3o5MgoZYDwVx/0ytOtVFtAUqCATZ4t7Y9Efk3G7A=;
-  b=XHIJjma+fk8EH5pM/dker890uDziDvLjhaOJLRoBth7iuxa81raHoAFz
-   wQGgbpCfNXjZ83G8DwU/gWkR0UD1/w1gPN9q1svQFH9nW2uv2DJumtxnh
-   bpq77h9zdmA0JLT1OIZtDCyQhLMGz52phaz7JJvwGIqE4CB/qesc/edtr
-   9L9LtSNWIlb26ftm5KHG/6/Qa0gHpY7Nev02Tldw/qXennil6+hkIQRa9
-   B+zENOgL3ISp7bmRzt2dJV7IFTs/Do12jUD4+uXdyWRezzlLY4NuCYxM5
-   tVuQkVgx8H/bynOBr/CbiGjLqWHGNS2VTWmw4RJvXOe9tcwKuoCYrHkbH
-   Q==;
-X-CSE-ConnectionGUID: eHi9ySmxSMul5fA901RegQ==
-X-CSE-MsgGUID: +WDUqpHETmKnZgzRRvabhQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11489"; a="58048147"
-X-IronPort-AV: E=Sophos;i="6.16,299,1744095600"; 
-   d="scan'208";a="58048147"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2025 18:25:53 -0700
-X-CSE-ConnectionGUID: r+oFE+c+Q6SJBTij1pblqw==
-X-CSE-MsgGUID: hcN+cDC2QEiYF/r1fFfVlw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,299,1744095600"; 
-   d="scan'208";a="156269224"
-Received: from lkp-server01.sh.intel.com (HELO 9ee84586c615) ([10.239.97.150])
-  by fmviesa009.fm.intel.com with ESMTP; 09 Jul 2025 18:25:48 -0700
-Received: from kbuild by 9ee84586c615 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uZg2k-0004JD-23;
-	Thu, 10 Jul 2025 01:25:46 +0000
-Date: Thu, 10 Jul 2025 09:25:03 +0800
-From: kernel test robot <lkp@intel.com>
-To: Suleiman Souhlal <suleiman@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>
-Cc: oe-kbuild-all@lists.linux.dev, Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>, Chao Gao <chao.gao@intel.com>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	Tzung-Bi Shih <tzungbi@kernel.org>,
-	John Stultz <jstultz@google.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, ssouhlal@freebsd.org,
-	Suleiman Souhlal <suleiman@google.com>
-Subject: Re: [PATCH v6 1/3] KVM: x86: Advance guest TSC after deep suspend.
-Message-ID: <202507100824.oV2rHgt9-lkp@intel.com>
-References: <20250709070450.473297-2-suleiman@google.com>
+	s=arc-20240116; t=1752111039; c=relaxed/simple;
+	bh=cwlgChzOqSfKCiRvjUu84m9aH/2achBZS5mS3a+AbGQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KuhkrWxTagLGnlyZe77Rn/SujxjrTWAILqbPh+4CE6/M/BKvfvSX12lD9psDJ5k83BmwbAsF05Gy7XKJESdf7Lv6TzKzP+/cF62cimYBfpCURAFM0Vk18SJNQmFnenyxy2ae8Nnp1/FgS2dfD+nMRt3IAErB7XhdSenruk2N9Lk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qt7vjTZB; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-23dd9ae5aacso56895ad.1
+        for <kvm@vger.kernel.org>; Wed, 09 Jul 2025 18:30:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1752111037; x=1752715837; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Is04f/Bkm7gJJ/jV1LRjXX51WkiBnOdhDaBr6UaJT6Q=;
+        b=qt7vjTZBOSl2e4TphPTy2W3hTeBjLXqu4dyqx5skISoVZdsGx5rcvZWEfc/9ROOEak
+         249pd604w+dTfp4d06nv7e6Wwe0wfNPxdL4bAB8lMd3f6jqOiAP/IEUkFffrEQ5FO+RW
+         e15/GHTSb64wK+HW9PHg7ntVM9Jc0eGBaaz1MsBdABW28+TQymyG9g++XDifdXgovA4A
+         Ln24pXXh2uOutLtrbTsq+g81rT0Ltz5E+owZBpIeWVID+3HXQbiOklu8abQA3It2y0Uf
+         6M0N4yap6vqyV9JCnJhkFTPh2fxitg+su+qlqkKKAKjpSCbjtRTMLZ5UEvy74emZ+fFW
+         8J8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752111037; x=1752715837;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Is04f/Bkm7gJJ/jV1LRjXX51WkiBnOdhDaBr6UaJT6Q=;
+        b=PcjWmQKixQl9YKbt+njyIca+xZkSHy/0LFes/lM5gBxjPkuMzFGarGWn9MUJuSeoWi
+         zXCSRTvPO9nsbmmr3Zcu89hY4dzJvPbelJmdpf9n74bcilp/IViumCXW9bK2xvxsxvwt
+         FMzGeHzRxst/ogw0MZ/R/vwKh+5yp0kbEbruohTsSLg7efLusq5vanJRmvNP/Z9eGtaS
+         N9uQgNQCLoNt9IqPLXmqE2nReA9Oc6Y6yULQOtp4ygWBfS/O6itdSEsLwy24KN2WSKD8
+         j+6BZsqLFS0SBc4OmAmGnQ3AcRkxoPXnktWGNXcfbUVp+msJK5qzTT9DHOFSQxOlCcRO
+         ur3Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWL7aXUfctJl9l2Vcq2XnqUOsfNezMb6qZH1MYXb5pMJNlM0sjeupo+8CWwN5QIz9rpzsY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyH/4l9GY8r1W3pgvSnAz03iC7pjVgBOgvdGjE7pwUiCBw12pjx
+	ZYkw7QXQMJZWH256wybKTOQkf8AeR1WsSwGeE69MrW6MCO8S7A4ChXc76tOrlzsGXdRS2eoOrm2
+	WMVFpOmiIadyj5859Q4PGuXWLZEDdV6E1FCY9needIR71+YCPhUFHRosIbY0HsQ==
+X-Gm-Gg: ASbGncv5QOj5BN/Iza1V4eoUUDTG//HMuXFPCpEYrG5SLjFT+Qlx+pt8vF/tc8Fr50b
+	S+IR9STNTUC5f13JDmRndRbX3RYc/i8MXP7dVGE+JSMA27GxX2IPvUA9bUmpuiXbJna9+tl3sLA
+	wI8iTU0q5Q/PE0YjPAYNjTR5Puudu6hRPuVCuLRaqW4yPAkUfG0p1679cffa5pKxnO3u1tWFmqV
+	g==
+X-Google-Smtp-Source: AGHT+IHQRxLhKTVLkbXOo+VEMkswy/Fljlw0yFW5tZ5FbAGr3AvPtN+zX/l8wR12tsrz7uBXDg3nz5YzYaXHlJhS9FA=
+X-Received: by 2002:a17:903:2350:b0:23c:7be2:59d0 with SMTP id
+ d9443c01a7336-23de43709f4mr1099425ad.23.1752111036578; Wed, 09 Jul 2025
+ 18:30:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250709070450.473297-2-suleiman@google.com>
+References: <aG0pNijVpl0czqXu@google.com> <a0129a912e21c5f3219b382f2f51571ab2709460.camel@intel.com>
+ <CAGtprH8ozWpFLa2TSRLci-SgXRfJxcW7BsJSYOxa4Lgud+76qQ@mail.gmail.com>
+ <eeb8f4b8308b5160f913294c4373290a64e736b8.camel@intel.com>
+ <CAGtprH8cg1HwuYG0mrkTbpnZfHoKJDd63CAQGEScCDA-9Qbsqw@mail.gmail.com>
+ <b1348c229c67e2bad24e273ec9a7fc29771e18c5.camel@intel.com>
+ <aG1dbD2Xnpi_Cqf_@google.com> <5decd42b3239d665d5e6c5c23e58c16c86488ca8.camel@intel.com>
+ <aG1ps4uC4jyr8ED1@google.com> <CAGtprH86N7XgEXq0UyOexjVRXYV1KdOguURVOYXTnQzsTHPrJQ@mail.gmail.com>
+ <aG6D9NqG0r6iKPL0@google.com>
+In-Reply-To: <aG6D9NqG0r6iKPL0@google.com>
+From: Vishal Annapurve <vannapurve@google.com>
+Date: Wed, 9 Jul 2025 18:30:23 -0700
+X-Gm-Features: Ac12FXw12BTQ2UDgvxWfgcVv3vtRLhBXnJJTOmc7eonn3MPXMwv6b46DcRxjVuk
+Message-ID: <CAGtprH_DY=Sjeh32NCc7Y3t2Vug8LKz+-=df4oSw09cRbb6QZw@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 00/51] 1G page support for guest_memfd
+To: Sean Christopherson <seanjc@google.com>
+Cc: Rick P Edgecombe <rick.p.edgecombe@intel.com>, "pvorel@suse.cz" <pvorel@suse.cz>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, 
+	Jun Miao <jun.miao@intel.com>, "palmer@dabbelt.com" <palmer@dabbelt.com>, 
+	"pdurrant@amazon.co.uk" <pdurrant@amazon.co.uk>, "vbabka@suse.cz" <vbabka@suse.cz>, 
+	"peterx@redhat.com" <peterx@redhat.com>, "x86@kernel.org" <x86@kernel.org>, 
+	"amoorthy@google.com" <amoorthy@google.com>, "tabba@google.com" <tabba@google.com>, 
+	"quic_svaddagi@quicinc.com" <quic_svaddagi@quicinc.com>, "maz@kernel.org" <maz@kernel.org>, 
+	"vkuznets@redhat.com" <vkuznets@redhat.com>, 
+	"anthony.yznaga@oracle.com" <anthony.yznaga@oracle.com>, 
+	"mail@maciej.szmigiero.name" <mail@maciej.szmigiero.name>, 
+	"quic_eberman@quicinc.com" <quic_eberman@quicinc.com>, Wei W Wang <wei.w.wang@intel.com>, 
+	Fan Du <fan.du@intel.com>, 
+	"Wieczor-Retman, Maciej" <maciej.wieczor-retman@intel.com>, Yan Y Zhao <yan.y.zhao@intel.com>, 
+	"ajones@ventanamicro.com" <ajones@ventanamicro.com>, Dave Hansen <dave.hansen@intel.com>, 
+	"paul.walmsley@sifive.com" <paul.walmsley@sifive.com>, 
+	"quic_mnalajal@quicinc.com" <quic_mnalajal@quicinc.com>, "aik@amd.com" <aik@amd.com>, 
+	"usama.arif@bytedance.com" <usama.arif@bytedance.com>, "fvdl@google.com" <fvdl@google.com>, 
+	"jack@suse.cz" <jack@suse.cz>, "quic_cvanscha@quicinc.com" <quic_cvanscha@quicinc.com>, 
+	Kirill Shutemov <kirill.shutemov@intel.com>, "willy@infradead.org" <willy@infradead.org>, 
+	"steven.price@arm.com" <steven.price@arm.com>, "anup@brainfault.org" <anup@brainfault.org>, 
+	"thomas.lendacky@amd.com" <thomas.lendacky@amd.com>, "keirf@google.com" <keirf@google.com>, 
+	"mic@digikod.net" <mic@digikod.net>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "nsaenz@amazon.es" <nsaenz@amazon.es>, 
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, 
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, 
+	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, "muchun.song@linux.dev" <muchun.song@linux.dev>, 
+	Zhiquan1 Li <zhiquan1.li@intel.com>, "rientjes@google.com" <rientjes@google.com>, 
+	Erdem Aktas <erdemaktas@google.com>, "mpe@ellerman.id.au" <mpe@ellerman.id.au>, 
+	"david@redhat.com" <david@redhat.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>, "hughd@google.com" <hughd@google.com>, 
+	"jhubbard@nvidia.com" <jhubbard@nvidia.com>, Haibo1 Xu <haibo1.xu@intel.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>, "jthoughton@google.com" <jthoughton@google.com>, 
+	"rppt@kernel.org" <rppt@kernel.org>, "steven.sistare@oracle.com" <steven.sistare@oracle.com>, 
+	"jarkko@kernel.org" <jarkko@kernel.org>, "quic_pheragu@quicinc.com" <quic_pheragu@quicinc.com>, 
+	"chenhuacai@kernel.org" <chenhuacai@kernel.org>, Kai Huang <kai.huang@intel.com>, 
+	"shuah@kernel.org" <shuah@kernel.org>, "bfoster@redhat.com" <bfoster@redhat.com>, 
+	"dwmw@amazon.co.uk" <dwmw@amazon.co.uk>, Chao P Peng <chao.p.peng@intel.com>, 
+	"pankaj.gupta@amd.com" <pankaj.gupta@amd.com>, Alexander Graf <graf@amazon.com>, 
+	"nikunj@amd.com" <nikunj@amd.com>, "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>, 
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>, 
+	"jroedel@suse.de" <jroedel@suse.de>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, 
+	"jgowans@amazon.com" <jgowans@amazon.com>, Yilun Xu <yilun.xu@intel.com>, 
+	"liam.merwick@oracle.com" <liam.merwick@oracle.com>, "michael.roth@amd.com" <michael.roth@amd.com>, 
+	"quic_tsoni@quicinc.com" <quic_tsoni@quicinc.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, Ira Weiny <ira.weiny@intel.com>, 
+	"richard.weiyang@gmail.com" <richard.weiyang@gmail.com>, 
+	"kent.overstreet@linux.dev" <kent.overstreet@linux.dev>, "qperret@google.com" <qperret@google.com>, 
+	"dmatlack@google.com" <dmatlack@google.com>, "james.morse@arm.com" <james.morse@arm.com>, 
+	"brauner@kernel.org" <brauner@kernel.org>, 
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, 
+	"ackerleytng@google.com" <ackerleytng@google.com>, "pgonda@google.com" <pgonda@google.com>, 
+	"quic_pderrin@quicinc.com" <quic_pderrin@quicinc.com>, "roypat@amazon.co.uk" <roypat@amazon.co.uk>, 
+	"hch@infradead.org" <hch@infradead.org>, "will@kernel.org" <will@kernel.org>, 
+	"linux-mm@kvack.org" <linux-mm@kvack.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Suleiman,
+On Wed, Jul 9, 2025 at 8:00=E2=80=AFAM Sean Christopherson <seanjc@google.c=
+om> wrote:
+>
+> On Wed, Jul 09, 2025, Vishal Annapurve wrote:
+> > I think we can simplify the role of guest_memfd in line with discussion=
+ [1]:
+>
+> I genuinely don't understand what you're trying to "simplify".  We need t=
+o define
+> an ABI that is flexible and robust, but beyond that most of these guideli=
+nes boil
+> down to "don't write bad code".
 
-kernel test robot noticed the following build errors:
+My goal for bringing this discussion up is to see if we can better
+define the role of guest_memfd and how it interacts with other layers,
+as I see some scenarios that can be improved like kvm_gmem_populate[1]
+where guest_memfd is trying to fault in pages on behalf of KVM.
 
-[auto build test ERROR on kvm/queue]
-[also build test ERROR on kvm/next kvm/linux-next linus/master v6.16-rc5 next-20250709]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+[1] https://lore.kernel.org/lkml/20250703062641.3247-1-yan.y.zhao@intel.com=
+/
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Suleiman-Souhlal/KVM-x86-Advance-guest-TSC-after-deep-suspend/20250709-150751
-base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
-patch link:    https://lore.kernel.org/r/20250709070450.473297-2-suleiman%40google.com
-patch subject: [PATCH v6 1/3] KVM: x86: Advance guest TSC after deep suspend.
-config: i386-buildonly-randconfig-002-20250710 (https://download.01.org/0day-ci/archive/20250710/202507100824.oV2rHgt9-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14+deb12u1) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250710/202507100824.oV2rHgt9-lkp@intel.com/reproduce)
+>
+> > 1) guest_memfd is a memory provider for userspace, KVM, IOMMU.
+>
+> No, guest_memfd is a memory provider for KVM guests.  That memory *might*=
+ be
+> mapped by userspace and/or into IOMMU page tables in order out of functio=
+nal
+> necessity, but guest_memfd exists solely to serve memory to KVM guests, f=
+ull stop.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202507100824.oV2rHgt9-lkp@intel.com/
+I look at this as guest_memfd should serve memory to KVM guests and to
+other users by following some KVM/Arch related guidelines e.g. for CC
+VMs, guest_memfd can handle certain behavior differently.
 
-All errors (new ones prefixed by >>):
+>
+> > 3) KVM should ideally associate the lifetime of backing
+> > pagetables/protection tables/RMP tables with the lifetime of the
+> > binding of memslots with guest_memfd.
+>
+> Again, please align your indentation.
+>
+> >          - Today KVM SNP logic ties RMP table entry lifetimes with how
+> >            long the folios are mapped in guest_memfd, which I think sho=
+uld be
+> >            revisited.
+>
+> Why?  Memslots are ephemeral per-"struct kvm" mappings.  RMP entries and =
+guest_memfd
+> inodes are tied to the Virtual Machine, not to the "struct kvm" instance.
 
-   arch/x86/kvm/x86.c: In function 'kvm_arch_vcpu_load':
->> arch/x86/kvm/x86.c:5044:27: error: implicit declaration of function 'kvm_get_time_and_clockread'; did you mean 'kvm_get_monotonic_and_clockread'? [-Werror=implicit-function-declaration]
-    5044 |                 advance = kvm_get_time_and_clockread(&kernel_ns, &tsc_now);
-         |                           ^~~~~~~~~~~~~~~~~~~~~~~~~~
-         |                           kvm_get_monotonic_and_clockread
->> arch/x86/kvm/x86.c:5062:17: error: 'kvm' undeclared (first use in this function)
-    5062 |                 kvm->arch.host_was_suspended = false;
-         |                 ^~~
-   arch/x86/kvm/x86.c:5062:17: note: each undeclared identifier is reported only once for each function it appears in
-   In file included from include/linux/bitops.h:7,
-                    from include/linux/kernel.h:23,
-                    from include/linux/cpumask.h:11,
-                    from include/linux/alloc_tag.h:13,
-                    from include/linux/percpu.h:5,
-                    from include/linux/context_tracking_state.h:5,
-                    from include/linux/hardirq.h:5,
-                    from include/linux/kvm_host.h:7,
-                    from arch/x86/kvm/x86.c:20:
->> arch/x86/kvm/x86.c:5063:71: error: 'flags' undeclared (first use in this function)
-    5063 |                 raw_spin_unlock_irqrestore(&kvm->arch.tsc_write_lock, flags);
-         |                                                                       ^~~~~
-   include/linux/typecheck.h:11:16: note: in definition of macro 'typecheck'
-      11 |         typeof(x) __dummy2; \
-         |                ^
-   arch/x86/kvm/x86.c:5063:17: note: in expansion of macro 'raw_spin_unlock_irqrestore'
-    5063 |                 raw_spin_unlock_irqrestore(&kvm->arch.tsc_write_lock, flags);
-         |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/typecheck.h:12:25: warning: comparison of distinct pointer types lacks a cast
-      12 |         (void)(&__dummy == &__dummy2); \
-         |                         ^~
-   include/linux/spinlock.h:281:17: note: in expansion of macro 'typecheck'
-     281 |                 typecheck(unsigned long, flags);                \
-         |                 ^~~~~~~~~
-   arch/x86/kvm/x86.c:5063:17: note: in expansion of macro 'raw_spin_unlock_irqrestore'
-    5063 |                 raw_spin_unlock_irqrestore(&kvm->arch.tsc_write_lock, flags);
-         |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~
-   arch/x86/kvm/x86.c: At top level:
->> arch/x86/kvm/x86.c:5068:9: error: expected identifier or '(' before 'if'
-    5068 |         if (unlikely(vcpu->cpu != cpu) || kvm_check_tsc_unstable()) {
-         |         ^~
->> include/linux/kvm_host.h:182:39: error: expected declaration specifiers or '...' before '(' token
-     182 | #define KVM_ARCH_REQ_FLAGS(nr, flags) ({ \
-         |                                       ^
-   include/linux/kvm_host.h:186:36: note: in expansion of macro 'KVM_ARCH_REQ_FLAGS'
-     186 | #define KVM_ARCH_REQ(nr)           KVM_ARCH_REQ_FLAGS(nr, 0)
-         |                                    ^~~~~~~~~~~~~~~~~~
-   arch/x86/include/asm/kvm_host.h:94:41: note: in expansion of macro 'KVM_ARCH_REQ'
-      94 | #define KVM_REQ_STEAL_UPDATE            KVM_ARCH_REQ(8)
-         |                                         ^~~~~~~~~~~~
-   arch/x86/kvm/x86.c:5096:26: note: in expansion of macro 'KVM_REQ_STEAL_UPDATE'
-    5096 |         kvm_make_request(KVM_REQ_STEAL_UPDATE, vcpu);
-         |                          ^~~~~~~~~~~~~~~~~~~~
->> arch/x86/kvm/x86.c:5096:48: error: unknown type name 'vcpu'
-    5096 |         kvm_make_request(KVM_REQ_STEAL_UPDATE, vcpu);
-         |                                                ^~~~
->> arch/x86/kvm/x86.c:5097:1: error: expected identifier or '(' before '}' token
-    5097 | }
-         | ^
-   cc1: some warnings being treated as errors
+IIUC guest_memfd can only be accessed through the window of memslots
+and if there are no memslots I don't see the reason for memory still
+being associated with "virtual machine". Likely because I am yet to
+completely wrap my head around 'guest_memfd inodes are tied to the
+Virtual Machine, not to the "struct kvm" instance', I need to spend
+more time on this one.
 
+>
+> > Some very early thoughts on how guest_memfd could be laid out for the l=
+ong term:
+> > 1) guest_memfd code ideally should be built-in to the kernel.
+>
+> Why?  How is this at all relevant?  If we need to bake some parts of gues=
+t_memfd
+> into the kernel in order to avoid nasty exports and/or ordering dependenc=
+ies, then
+> we can do so.  But that is 100% an implementation detail and in no way a =
+design
+> goal.
 
-vim +5044 arch/x86/kvm/x86.c
-
-  4997	
-  4998	void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
-  4999	{
-  5000		struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-  5001	
-  5002		vcpu->arch.l1tf_flush_l1d = true;
-  5003	
-  5004		if (vcpu->scheduled_out && pmu->version && pmu->event_count) {
-  5005			pmu->need_cleanup = true;
-  5006			kvm_make_request(KVM_REQ_PMU, vcpu);
-  5007		}
-  5008	
-  5009		/* Address WBINVD may be executed by guest */
-  5010		if (need_emulate_wbinvd(vcpu)) {
-  5011			if (kvm_x86_call(has_wbinvd_exit)())
-  5012				cpumask_set_cpu(cpu, vcpu->arch.wbinvd_dirty_mask);
-  5013			else if (vcpu->cpu != -1 && vcpu->cpu != cpu)
-  5014				smp_call_function_single(vcpu->cpu,
-  5015						wbinvd_ipi, NULL, 1);
-  5016		}
-  5017	
-  5018		kvm_x86_call(vcpu_load)(vcpu, cpu);
-  5019	
-  5020		if (vcpu != per_cpu(last_vcpu, cpu)) {
-  5021			/*
-  5022			 * Flush the branch predictor when switching vCPUs on the same
-  5023			 * physical CPU, as each vCPU needs its own branch prediction
-  5024			 * domain.  No IBPB is needed when switching between L1 and L2
-  5025			 * on the same vCPU unless IBRS is advertised to the vCPU; that
-  5026			 * is handled on the nested VM-Exit path.
-  5027			 */
-  5028			if (static_branch_likely(&switch_vcpu_ibpb))
-  5029				indirect_branch_prediction_barrier();
-  5030			per_cpu(last_vcpu, cpu) = vcpu;
-  5031		}
-  5032	
-  5033		/* Save host pkru register if supported */
-  5034		vcpu->arch.host_pkru = read_pkru();
-  5035	
-  5036		/* Apply any externally detected TSC adjustments (due to suspend) */
-  5037		if (unlikely(vcpu->arch.tsc_offset_adjustment)) {
-  5038			unsigned long flags;
-  5039			struct kvm *kvm;
-  5040			bool advance;
-  5041			u64 kernel_ns, l1_tsc, offset, tsc_now;
-  5042	
-  5043			kvm = vcpu->kvm;
-> 5044			advance = kvm_get_time_and_clockread(&kernel_ns, &tsc_now);
-  5045			raw_spin_lock_irqsave(&kvm->arch.tsc_write_lock, flags);
-  5046			/*
-  5047			 * Advance the guest's TSC to current time instead of only
-  5048			 * preventing it from going backwards, while making sure
-  5049			 * all the vCPUs use the same offset.
-  5050			 */
-  5051			if (kvm->arch.host_was_suspended && advance) {
-  5052				l1_tsc = nsec_to_cycles(vcpu,
-  5053							kvm->arch.kvmclock_offset + kernel_ns);
-  5054				offset = kvm_compute_l1_tsc_offset(vcpu, l1_tsc);
-  5055				kvm->arch.cur_tsc_offset = offset;
-  5056				kvm_vcpu_write_tsc_offset(vcpu, offset);
-  5057			} else if (advance)
-  5058				kvm_vcpu_write_tsc_offset(vcpu, kvm->arch.cur_tsc_offset);
-  5059			} else {
-  5060				adjust_tsc_offset_host(vcpu, vcpu->arch.tsc_offset_adjustment);
-  5061			}
-> 5062			kvm->arch.host_was_suspended = false;
-> 5063			raw_spin_unlock_irqrestore(&kvm->arch.tsc_write_lock, flags);
-  5064			vcpu->arch.tsc_offset_adjustment = 0;
-  5065			kvm_make_request(KVM_REQ_CLOCK_UPDATE, vcpu);
-  5066		}
-  5067	
-> 5068		if (unlikely(vcpu->cpu != cpu) || kvm_check_tsc_unstable()) {
-  5069			s64 tsc_delta = !vcpu->arch.last_host_tsc ? 0 :
-  5070					rdtsc() - vcpu->arch.last_host_tsc;
-  5071			if (tsc_delta < 0)
-  5072				mark_tsc_unstable("KVM discovered backwards TSC");
-  5073	
-  5074			if (kvm_check_tsc_unstable()) {
-  5075				u64 offset = kvm_compute_l1_tsc_offset(vcpu,
-  5076							vcpu->arch.last_guest_tsc);
-  5077				kvm_vcpu_write_tsc_offset(vcpu, offset);
-  5078				if (!vcpu->arch.guest_tsc_protected)
-  5079					vcpu->arch.tsc_catchup = 1;
-  5080			}
-  5081	
-  5082			if (kvm_lapic_hv_timer_in_use(vcpu))
-  5083				kvm_lapic_restart_hv_timer(vcpu);
-  5084	
-  5085			/*
-  5086			 * On a host with synchronized TSC, there is no need to update
-  5087			 * kvmclock on vcpu->cpu migration
-  5088			 */
-  5089			if (!vcpu->kvm->arch.use_master_clock || vcpu->cpu == -1)
-  5090				kvm_make_request(KVM_REQ_GLOBAL_CLOCK_UPDATE, vcpu);
-  5091			if (vcpu->cpu != cpu)
-  5092				kvm_make_request(KVM_REQ_MIGRATE_TIMER, vcpu);
-  5093			vcpu->cpu = cpu;
-  5094		}
-  5095	
-> 5096		kvm_make_request(KVM_REQ_STEAL_UPDATE, vcpu);
-> 5097	}
-  5098	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+I agree, this is implementation detail and we need real code to
+discuss this better.
 
