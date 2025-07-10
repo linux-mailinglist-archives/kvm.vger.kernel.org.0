@@ -1,112 +1,110 @@
-Return-Path: <kvm+bounces-52068-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52069-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43F85B00F4D
-	for <lists+kvm@lfdr.de>; Fri, 11 Jul 2025 01:10:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76D48B00F53
+	for <lists+kvm@lfdr.de>; Fri, 11 Jul 2025 01:11:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8EB6C5C4D1B
-	for <lists+kvm@lfdr.de>; Thu, 10 Jul 2025 23:10:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 44B0A7BF55E
+	for <lists+kvm@lfdr.de>; Thu, 10 Jul 2025 23:09:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F3B62C031B;
-	Thu, 10 Jul 2025 23:09:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C26BC2D29BA;
+	Thu, 10 Jul 2025 23:09:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ns11KrTg"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Jf5TrXoA"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDEC42BE63F
-	for <kvm@vger.kernel.org>; Thu, 10 Jul 2025 23:09:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BF6D2BE7A5
+	for <kvm@vger.kernel.org>; Thu, 10 Jul 2025 23:09:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752188981; cv=none; b=ecOSE56Hkeqdk4DduwcYszwv+9CR/4hnPl/PbpPMb86uQP+v6MBcIj/cxDKZudsywjq3iyZnKPS+6qvupX3wJobjTrrg/k5g9Gm+rHAhexoR6U1+cNNXnTUvI+55XA7rI35xfCnTFZm4JEvMvnTVSsFKAMeL5oNMs7SgPvc3TvM=
+	t=1752188986; cv=none; b=AQUXWmdB6/DNvZH1Yy0DLS2/bkKKdM0vbcIWOHEb6Oyrc8Pqgs7/F713uWwyuzwFDQw/5g8K20LouHK3tj2+2R4fjd4ClML7bxxMHhP7cQBeEyAOTZU5ZSoW7Vnzd3+d7vPOO1ISiCSN1zS5kEkbkjKYojudeeu+0xjmxNHyPIc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752188981; c=relaxed/simple;
-	bh=Imhpk93MYLp8xwLOAgb07FPvQgj67wyrPnSesGvWOhg=;
+	s=arc-20240116; t=1752188986; c=relaxed/simple;
+	bh=4H+zfNPlWxOixUuqGBEeIQ3sWiU8ACGmQ8OjV8qazRo=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=MFIsJ4Wan9DID1KolyZB3d/te84X0TLXjie1X6qythbiB/je1HaJfQjvG5SFR8qhfJrw4HuQ9aHTDW1Xjm7lwITyx7Nrt+bLhdJ9FIljkIhfdWBnLdXKi0Igz8tEuweJwn27xgLGaD1SdZiTCBlvQzi09Lurc89cBFe3ll9Al2c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ns11KrTg; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=VD4ob3pY2YYYqDM8yBu21pW4pnWAXkq25Zi2c5W9XnybRavak8I1MdacA7WV0nnxwsMRvdnBtCDZx/rXNOpveZFBjb1wAfBdk0be4O6tRJLCJnBCAtCwV6Thg3zVSC4ty34ltqjKjrtYA5cZ5YP/Yglxl5XAc0gBLl0gbuAUgcE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Jf5TrXoA; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-312df02acf5so2099242a91.1
-        for <kvm@vger.kernel.org>; Thu, 10 Jul 2025 16:09:39 -0700 (PDT)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b31df10dfadso1090940a12.0
+        for <kvm@vger.kernel.org>; Thu, 10 Jul 2025 16:09:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752188979; x=1752793779; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vc4gFx6otObzph4vmcdpjljmy/wmOvcgw6O6DXvqQUk=;
-        b=ns11KrTgbS08jYLZt5K+8VZ+5NRz62DB0uE77+Z4u36YOWMwLP9Dg6jIlWvZuYrl71
-         bLyiNoCNVpYvSztVSBBea/HP9MPz/QkxZuDw4PQWcgyjJ5F3y/PLNmpNMoCrnQRUnkUN
-         WK+SshohnLlOCDMwCv2+bvlUrUoKlZ1o/jdRAfOMb9YbmtB5k/AjFzpPVGoxTiOfBvbw
-         LC5Ej0N8ITzSaDCRgA06s90pAoX3jf27o5Fglbv+DqI2WTc7i4tuxDq+JiV7xQ5CVoII
-         cKmt4LR9fG9rnsSsNAq9gQ5P0ZjGe4nh3of7d09cML7K3UkGI3tec6sAj4TDoBE0NkC7
-         ynZA==
+        d=google.com; s=20230601; t=1752188985; x=1752793785; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=f3IsLiXimwfLJYfCYW4Bpk5RR6JeL2hZFlHaP7Q6GbY=;
+        b=Jf5TrXoANrCuQ7PXNScAcQ/92YMsTaJ9MU2d/JGRNWITilmPpZ+4iZ2EjE3MYp8tOe
+         hIR5RQgezWsvx5XnLnzs2CT3R6HYObnXZJrLdItV6Z93it5R85jxX74gC7Ali3xhvD2w
+         KG935lZu+Ih7fZ/Ys55z5uWu7cCmFs8Y3yXoruyb53yxQ+BYSjsRwKHJ4EsMRHpuKGBr
+         WecbYDAKO4ZBI0RgZpUC1Gc2Z6dLVJeRAFTsM/8jj8a+ITO3upC4tU8hwVlnAKV1uh7G
+         mwbPdzv1ZFegQshHrsHw3lOUOJrEX+alqC0kNXQRigE3iM2a9R4kUqbOzuNpayaaP+6g
+         xCFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752188979; x=1752793779;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vc4gFx6otObzph4vmcdpjljmy/wmOvcgw6O6DXvqQUk=;
-        b=jv9DkpsTDPL1Fc7Lc5bfe+mZg9olcLRlS4B9NjOdX/dWh3Cd6Um902iyev1Sy+e+cZ
-         AwpOFX4acQhCdXJoVGtu7J7NFplf3BTQ5Hf9Xr4w7WAdXSolDpHWJsrCLsXkLBMV3YYH
-         2Fx6ACGUrLrkMNKyjCcB3wXNi0aLwai93+Lil0e+EIw1gATVq7W+8tmTHFtmFtUhfBL+
-         zidf4n3ej6Ma4OnpX9vyJMW6lBtcRqSSpyhPU/moxKo/MHUHHmeOvK7D9kad/k0Nx8e/
-         UYQyXKianOLPAMDi0jkWLL69dDuXYb/LEI5khhy9uq04khUF6hh0/gUZgSF6gh3XUOMR
-         Jbcg==
-X-Gm-Message-State: AOJu0YwTz5Iug9TdaPNGezNXx9vieHCLA16bHr4x1Yr0WEzWrJpO3h//
-	Tj0EZQ/ys8nqS8Ks4aiqatcMZCHiKqM2hR1eUKOzyrb5aSHGy1DT5MOXspVAmjldzHLBFflUQ4f
-	5THkUWQ==
-X-Google-Smtp-Source: AGHT+IE+dyK2d0uR86qfpkwgq8AVI1vUVbhbMbwUukxTkGUUqxum4AWqrZhpfpFloZnZbssgldsJ/GbSzP4=
-X-Received: from pjbee8.prod.google.com ([2002:a17:90a:fc48:b0:31c:2fe4:33b4])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:568f:b0:313:d7ec:b7b7
- with SMTP id 98e67ed59e1d1-31c3d0c25b6mr8663625a91.13.1752188979183; Thu, 10
- Jul 2025 16:09:39 -0700 (PDT)
-Date: Thu, 10 Jul 2025 16:08:50 -0700
-In-Reply-To: <20250626001225.744268-1-seanjc@google.com>
+        d=1e100.net; s=20230601; t=1752188985; x=1752793785;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=f3IsLiXimwfLJYfCYW4Bpk5RR6JeL2hZFlHaP7Q6GbY=;
+        b=aFT8gcD9rFltIrRVmhxf1dO6jwhyw0oL/nXBnA3rTMwOeiOP7NOe39murZbkdRa5JP
+         3kVXA6eNayW1bjViUNVIFn6TVPfL4ov2J08TSqm5mZ/FBORqb7+KeY+hYLgzmXr+bH7j
+         yO780pMKK6KRT8lui+JMNLHFpvRP2NfPREh1bgJCUsnrjKeDFty4o3n/j2wzx5aWKSuv
+         4ONSDb4qtzpdI+XHyeIlqvMTijVI20YbkMX4kX7NVmX2xmZW2ySSHKayseir8Qy+kM8l
+         TG2nf1Sw5Pf43vxu9g4NmD9Nim4TWGAbTVnkPmbo+cTjEctG0QGaMmVkAMgauFGlcU8s
+         +aGA==
+X-Forwarded-Encrypted: i=1; AJvYcCXczfc7sFJaXE2zJu0N5st56elYA++W5SFClRpByQsWpqcOcbxWvjsT+apI+5h+AMTF8a0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YztAtpKpn+fQkXlROeXOJA/aefCiE4nUHhcSwuGUnt62qSedjni
+	Y9kL7F2X9bCQswwni+Q/1rghVP6uSWbRDuvwb4lOcZd4TsAnPgIazlTF5JEigH3aJ3Ft2Rl+oii
+	JCYe/Yw==
+X-Google-Smtp-Source: AGHT+IFeAvInzitINf3pLc1nD4We9OcxFw+HFWEOb6jDjct/HCN8/9fWYbI2cS57Z0CpUUQIKJo63+gaZTU=
+X-Received: from pjz11.prod.google.com ([2002:a17:90b:56cb:b0:311:6040:2c7a])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:184d:b0:312:e49b:c972
+ with SMTP id 98e67ed59e1d1-31c4ccdaa7dmr1480704a91.15.1752188984740; Thu, 10
+ Jul 2025 16:09:44 -0700 (PDT)
+Date: Thu, 10 Jul 2025 16:08:52 -0700
+In-Reply-To: <20250626173521.2301088-1-xin@zytor.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250626001225.744268-1-seanjc@google.com>
+References: <20250626173521.2301088-1-xin@zytor.com>
 X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Message-ID: <175218136720.1489574.7636607289998193683.b4-ty@google.com>
-Subject: Re: [PATCH v5 0/5] KVM: x86: Provide a cap to disable APERF/MPERF
- read intercepts
+Message-ID: <175218111367.1487754.6051373868234671503.b4-ty@google.com>
+Subject: Re: [PATCH v1 1/1] KVM: x86: Advertise support for LKGS
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	Jim Mattson <jmattson@google.com>
+To: Sean Christopherson <seanjc@google.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	"Xin Li (Intel)" <xin@zytor.com>
+Cc: pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, 
+	chao.gao@intel.com
 Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 25 Jun 2025 17:12:20 -0700, Sean Christopherson wrote:
-> arm64 folks, y'all got pulled in because of selftests changes.  I deliberately
-> put that patch at the end of the series so that it can be discarded/ignored
-> without interfering with the x86 stuff.
-> 
-> 
-> Jim's series to allow a guest to read IA32_APERF and IA32_MPERF, so that it
-> can determine the effective frequency multiplier for the physical LPU.
-> 
+On Thu, 26 Jun 2025 10:35:21 -0700, Xin Li (Intel) wrote:
+> Advertise support for LKGS (load into IA32_KERNEL_GS_BASE) to userspace
+> if the instruction is supported by the underlying CPU.
+>=20
+> LKGS is introduced with FRED to completely eliminate the need to swapgs
+> explicilty.  It behaves like the MOV to GS instruction except that it
+> loads the base address into the IA32_KERNEL_GS_BASE MSR instead of the
+> GS segment=E2=80=99s descriptor cache, which is exactly what Linux kernel=
+ does
+> to load a user level GS base.  Thus there is no need to SWAPGS away
+> from the kernel GS base.
+>=20
 > [...]
 
-Applied to kvm-x86 misc, with the thean typo fixed.  Thanks!
+Applied to kvm-x86 misc, thanks!
 
-[1/5] KVM: x86: Replace growing set of *_in_guest bools with a u64
-      https://github.com/kvm-x86/linux/commit/6fbef8615d35
-[2/5] KVM: x86: Provide a capability to disable APERF/MPERF read intercepts
-      https://github.com/kvm-x86/linux/commit/a7cec20845a6
-[3/5] KVM: selftests: Expand set of APIs for pinning tasks to a single CPU
-      https://github.com/kvm-x86/linux/commit/e83ee6f76c33
-[4/5] KVM: selftests: Test behavior of KVM_X86_DISABLE_EXITS_APERFMPERF
-      https://github.com/kvm-x86/linux/commit/df98ce784aeb
-[5/5] KVM: selftests: Convert arch_timer tests to common helpers to pin task
-      https://github.com/kvm-x86/linux/commit/95826e1ed359
+[1/1] KVM: x86: Advertise support for LKGS
+      https://github.com/kvm-x86/linux/commit/e88cfd50b606
 
 --
 https://github.com/kvm-x86/linux/tree/next
