@@ -1,139 +1,187 @@
-Return-Path: <kvm+bounces-52019-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52020-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05CA7AFFCB5
-	for <lists+kvm@lfdr.de>; Thu, 10 Jul 2025 10:45:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35458AFFCD5
+	for <lists+kvm@lfdr.de>; Thu, 10 Jul 2025 10:54:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 433D61C243E2
-	for <lists+kvm@lfdr.de>; Thu, 10 Jul 2025 08:46:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF56A3BED1D
+	for <lists+kvm@lfdr.de>; Thu, 10 Jul 2025 08:53:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80B5128C86D;
-	Thu, 10 Jul 2025 08:45:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D808E28DEE4;
+	Thu, 10 Jul 2025 08:54:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="i9tcv87J"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="QSw1rtTn"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5651212B28;
-	Thu, 10 Jul 2025 08:45:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77E94156F4A
+	for <kvm@vger.kernel.org>; Thu, 10 Jul 2025 08:54:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752137135; cv=none; b=QEZiTu/ioE4p/OrIKMRBG7VmG+k33Re3+gWjiUy9jCmuudDC0IjN8kfJLGX34scCEmdmZVnuoIyFqZhTjht+Yq+Mp7IuJJDBSjrv1jJlAUa7n3fxB18V5lsMweMYa6C5oBk/qOYnTGgwt6tFjetNlL7BBk76AYIYHgQ4Agmtzvg=
+	t=1752137649; cv=none; b=NMNIS06HOBvK2WpTE/ElxXNuMMmjTNjyTSlDP1yDUMJ2VBVawhiKBoR818U/G9920OMrbehUV31eSndbVyRMPiNeVGAqX+gsYbCTHKhTBUE/xjNQOip4pASLI28AlUkbDcLXokk+RF8y3fDQY3IiXUucyVGTkYJ4oX3JTpqTxpc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752137135; c=relaxed/simple;
-	bh=uzTHlkiMqVttpURo60tiyRON8rgNyiEWMXPl9W1Ix6w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nFBoS638w/kHKGbWaux8srrPO2MOKtq5yLDAFkA1vI/aHmFFxRRnVWo4MoO0uBEdHOMtrPREq9qyE0HkPWaBjLBMdSMVqmgPcyxAiX0czlM5UIsjfxDo2PqdBd5aHUMl0L6ddTbyAIifVyhKKzacRzOJUfFV0pWBweE1ot3CY7k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=i9tcv87J; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752137134; x=1783673134;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=uzTHlkiMqVttpURo60tiyRON8rgNyiEWMXPl9W1Ix6w=;
-  b=i9tcv87JBNxlWHpvZuVJP/veY5wCSMj5ghsTNmgX3wfAPcHAKRR+8Lc4
-   kGwvxbZIBeTyV8YdjSJVMKKMHiCiKtvZDbwBJ3CDhxg6HJvQSRcUmfNkA
-   JP4Voe5LVsrCXxdyVPuYJQzenqR4HgGPzDdWVT8Yi155hhXqKW5OUuZxt
-   hijy5T1muTazgMm0uo4GkNjY7qJjnM9mDIOIY5NybXIHDgFDbgppujX4n
-   +hX10VIeiApEwMeSFBFWDVO+YmmZWPB0+y5qkJOWYF4AjyTxh/6t6qlqu
-   pCw6JaIvRjxwh3t+gvRR9/+vmPTCI33sMwk4hXVPoqajHo4ztE/EzFqq+
-   g==;
-X-CSE-ConnectionGUID: 9aLoP/4WSySSfGmSrcpKNw==
-X-CSE-MsgGUID: MWu0MsAnRv63tq+L7iQtVQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11489"; a="71857203"
-X-IronPort-AV: E=Sophos;i="6.16,300,1744095600"; 
-   d="scan'208";a="71857203"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2025 01:45:32 -0700
-X-CSE-ConnectionGUID: jKzJ0e0ZTDuIMxVti1Bh6w==
-X-CSE-MsgGUID: 60fiJbQISPC03apMVho8eA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,300,1744095600"; 
-   d="scan'208";a="156123394"
-Received: from black.fi.intel.com ([10.237.72.28])
-  by fmviesa006.fm.intel.com with ESMTP; 10 Jul 2025 01:45:27 -0700
-Received: by black.fi.intel.com (Postfix, from userid 1000)
-	id E00651B7; Thu, 10 Jul 2025 11:45:26 +0300 (EEST)
-Date: Thu, 10 Jul 2025 11:45:26 +0300
-From: "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>
-To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, 
-	"seanjc@google.com" <seanjc@google.com>, "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, 
-	"Gao, Chao" <chao.gao@intel.com>, "bp@alien8.de" <bp@alien8.de>, 
-	"Huang, Kai" <kai.huang@intel.com>, "x86@kernel.org" <x86@kernel.org>, 
-	"mingo@redhat.com" <mingo@redhat.com>, "Zhao, Yan Y" <yan.y.zhao@intel.com>, 
-	"tglx@linutronix.de" <tglx@linutronix.de>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>, "Yamahata, Isaku" <isaku.yamahata@intel.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCHv2 08/12] KVM: TDX: Handle PAMT allocation in fault path
-Message-ID: <ypsnjhvy2odzedxtujzaumvz4mxe3dcci7biepsjrate7pzw7d@6h7qwy3xcqld>
-References: <20250609191340.2051741-1-kirill.shutemov@linux.intel.com>
- <20250609191340.2051741-9-kirill.shutemov@linux.intel.com>
- <5c0b2e7acbfe59e8919cadfec1ab2503eec1a022.camel@intel.com>
+	s=arc-20240116; t=1752137649; c=relaxed/simple;
+	bh=+Z5WADhe/Xuq6DteK13WAlWULoqbZ60Vl2RjQpdIoM4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Q3IS+gkFD+8WV39iz2liq/sLVQGyR6vp/8Z+T8IJhr7+/SN7Ff48MFTUgZnkA/68o76qXi8DJ0t0FN9rk6IUb2xBhwqAjIjUnaTRPcCG3Xc2Jah/SAA99+kWyrT95eYdE//J5yOXBKDn5mC2Au9diPK37KSUsCw1jnC9gGAcX+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=QSw1rtTn; arc=none smtp.client-ip=209.85.216.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-315cd33fa79so597077a91.3
+        for <kvm@vger.kernel.org>; Thu, 10 Jul 2025 01:54:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1752137646; x=1752742446; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=gWbi6xFF8NpvBvxiKjb+PGBnnwTuskR8M/z7QpKQFLM=;
+        b=QSw1rtTnbD3y4LHBG/zJqD+WTw1CDZxWx7C0vW7YA9/Ccc863xYzzJaGTTbd6b7P9k
+         RJKrV0MG4bNxqg/t3NSeKnJWbmMG8Gr/hyiqzmGkO00k0Y8rphKElENkzFh07iaV7hO/
+         JNi+65cXjGw9hX8ZaFbhetdPOPQ+CBCjFdfGHf8wlI0EVPcIqSk9hRNjgJAZQdF4JXSR
+         nrK/qQwzKbskM01y8NS2pHNGpMRd0a2kSs6+MZn/v4cSTJf6/X+4/2oyD9O32GHK2CTU
+         nWRywC6P/QoSd/rSDO4Iyls0E88Pq1L4FNECmtFT5ps3qKZIxp1rQz0WC0cOsu2dCC8p
+         tHoA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752137646; x=1752742446;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gWbi6xFF8NpvBvxiKjb+PGBnnwTuskR8M/z7QpKQFLM=;
+        b=DKv3LlP8O0QzrdRBeyvVKNuCMv2sL170BVfQtaa5rdFsmpx2mbhOWauBD9NMMNhoKb
+         uKB7dL7BHezuQNLWhJRVfOCJuC2jx48Oy9iXIYMQ+rq4MbZ0eq8gdMPlpjI2ay+xszrR
+         wlZLACwpYVihyUN1o/u6Mt/l+OxfBmwBl82ByJdWIfDOqXknI3xkhzJzBSbs2kWD0kdq
+         X+MtOjRUZTckX/k4UtxaoETwAhAo6is/cv63bWD8V8eXhpqG/nM2TlTTmP6T2RbdxaY0
+         8ONj8AhuZ9F6I6dBBCUDJWMs6ORXKgQnjYQ5VNlbb5lh/g9trLF2UvA86WdTOzIjYUKi
+         +dgw==
+X-Gm-Message-State: AOJu0YzxLawuXjxpv1eNoBSYphL/ZOUIoAMQsVp3sWwdRRdZuEl0wCCw
+	2St5JmBEoebEd6grPC5Xx5eTnNUW555QDt3GxiZRKFdFiRJSFfZTa4MUhik/QTdGFv4=
+X-Gm-Gg: ASbGnctaZGIHAEdzxgW4QR1NfvP+K5OPRyDmoQm3Hu1Fi6bu8njc60HLuxKiQOiXmwf
+	dd2Q7ux5r2zDcZ5laW9++ML+UMgmRhhBGvvG0gyS60rYFhUroPcZKlHS0Dse9VfyJumvRtxoJwH
+	p+fSZyG4g7/YZWUNQyiC792yooVv0ELubtl35tyxWUosE07kZE7AdbJz1POHKS7dkTa1WWO/XfI
+	VqL6/qj7Mo+ag83wXm6OyPXusRls90+KrFhZckp7n5Fy+ofBcXETEH9yxj/HuBqFhkSH7AL3lio
+	BMinS4CupqB5aNFhHgXjGnQ5nDgvLL9uSY0SMEoorp8QUbes0/EngZKoB/EXwzhNp/sR28dsVCc
+	3o5NlnkV46WThv8c0qUelEbIe
+X-Google-Smtp-Source: AGHT+IFSCTXPP1Dwv220thp+IerNnUa3CxD3gdRWucNdZnQM1rhZZ8D4iNbDue+54p483oZCo9Cdfw==
+X-Received: by 2002:a17:90a:d884:b0:312:e90b:419e with SMTP id 98e67ed59e1d1-31c2fcffd1cmr10025787a91.12.1752137645501;
+        Thu, 10 Jul 2025 01:54:05 -0700 (PDT)
+Received: from localhost.localdomain ([203.208.189.12])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31c3e975d41sm1650228a91.13.2025.07.10.01.54.01
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Thu, 10 Jul 2025 01:54:05 -0700 (PDT)
+From: lizhe.67@bytedance.com
+To: alex.williamson@redhat.com,
+	akpm@linux-foundation.org,
+	david@redhat.com,
+	jgg@ziepe.ca,
+	peterx@redhat.com
+Cc: kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	lizhe.67@bytedance.com
+Subject: [PATCH v4 0/5] vfio/type1: optimize vfio_pin_pages_remote() and vfio_unpin_pages_remote()
+Date: Thu, 10 Jul 2025 16:53:50 +0800
+Message-ID: <20250710085355.54208-1-lizhe.67@bytedance.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <5c0b2e7acbfe59e8919cadfec1ab2503eec1a022.camel@intel.com>
 
-On Thu, Jul 10, 2025 at 01:33:41AM +0000, Edgecombe, Rick P wrote:
-> On Mon, 2025-06-09 at 22:13 +0300, Kirill A. Shutemov wrote:
-> >  int tdx_sept_set_private_spte(struct kvm *kvm, gfn_t gfn,
-> >  			      enum pg_level level, kvm_pfn_t pfn)
-> >  {
-> > +	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
-> 
-> This is unfortunate. In practice, all of the callers will be in a vCPU context,
-> but __tdp_mmu_set_spte_atomic() can be called for zap's which is why there is no
-> vCPU.
+From: Li Zhe <lizhe.67@bytedance.com>
 
-IIUC, __tdp_mmu_set_spte_atomic() to zap, only for shared case which is
-!is_mirror_sptep() and will not get us here. !shared case get to
-tdx_sept_remove_private_spte().
+This patchset is an integration of the two previous patchsets[1][2].
 
-> We don't want to split the tdp mmu calling code to introduce a variant that has
-> a vCPU. 
-> 
-> What about a big comment? Or checking for NULL and returning -EINVAL like
-> PG_LEVEL_4K below? I guess in this case a NULL pointer will be plenty loud. So
-> probably a comment is enough.
+When vfio_pin_pages_remote() is called with a range of addresses that
+includes large folios, the function currently performs individual
+statistics counting operations for each page. This can lead to significant
+performance overheads, especially when dealing with large ranges of pages.
 
-Yes, comment is helpful here
+The function vfio_unpin_pages_remote() has a similar issue, where executing
+put_pfn() for each pfn brings considerable consumption.
 
-> Hmm, the only reason we need the vCPU here is to get at the the per-vCPU pamt
-> page cache. This is also the reason for the strange callback scheme I was
-> complaining about in the other patch. It kind of seems like there are two
-> friction points in this series:
-> 1. How to allocate dpamt pages
-> 2. How to serialize the global DPAMT resource inside a read lock
-> 
-> I'd like to try to figure out a better solution for (1). (2) seems good. But I'm
-> still processing.
+This patchset primarily optimizes the performance of the relevant functions
+by batching the less efficient operations mentioned before.
 
-I tried few different approached to address the problem. See phys_prepare
-and phys_cleanup in v1.
+The first two patch optimizes the performance of the function
+vfio_pin_pages_remote(), while the remaining patches optimize the
+performance of the function vfio_unpin_pages_remote().
 
-> 
-> >  	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-> >  	struct page *page = pfn_to_page(pfn);
-> > +	int ret;
-> > +
-> > +	ret = tdx_pamt_get(page, level, tdx_alloc_pamt_page_atomic, vcpu);
-> > +	if (ret)
-> > +		return ret;
-> 
+The performance test results, based on v6.16-rc4, for completing the 16G
+VFIO MAP/UNMAP DMA, obtained through unit test[3] with slight
+modifications[4], are as follows.
 
+Base(6.16-rc4):
+./vfio-pci-mem-dma-map 0000:03:00.0 16
+------- AVERAGE (MADV_HUGEPAGE) --------
+VFIO MAP DMA in 0.047 s (340.2 GB/s)
+VFIO UNMAP DMA in 0.135 s (118.6 GB/s)
+------- AVERAGE (MAP_POPULATE) --------
+VFIO MAP DMA in 0.280 s (57.2 GB/s)
+VFIO UNMAP DMA in 0.312 s (51.3 GB/s)
+------- AVERAGE (HUGETLBFS) --------
+VFIO MAP DMA in 0.052 s (310.5 GB/s)
+VFIO UNMAP DMA in 0.136 s (117.3 GB/s)
+
+With this patchset:
+------- AVERAGE (MADV_HUGEPAGE) --------
+VFIO MAP DMA in 0.027 s (600.7 GB/s)
+VFIO UNMAP DMA in 0.045 s (357.0 GB/s)
+------- AVERAGE (MAP_POPULATE) --------
+VFIO MAP DMA in 0.261 s (61.4 GB/s)
+VFIO UNMAP DMA in 0.288 s (55.6 GB/s)
+------- AVERAGE (HUGETLBFS) --------
+VFIO MAP DMA in 0.031 s (516.4 GB/s)
+VFIO UNMAP DMA in 0.045 s (353.9 GB/s)
+
+For large folio, we achieve an over 40% performance improvement for VFIO
+MAP DMA and an over 66% performance improvement for VFIO DMA UNMAP. For
+small folios, the performance test results show a slight improvement with
+the performance before optimization.
+
+[1]: https://lore.kernel.org/all/20250529064947.38433-1-lizhe.67@bytedance.com/
+[2]: https://lore.kernel.org/all/20250620032344.13382-1-lizhe.67@bytedance.com/#t
+[3]: https://github.com/awilliam/tests/blob/vfio-pci-mem-dma-map/vfio-pci-mem-dma-map.c
+[4]: https://lore.kernel.org/all/20250610031013.98556-1-lizhe.67@bytedance.com/
+
+Li Zhe (5):
+  mm: introduce num_pages_contiguous()
+  vfio/type1: optimize vfio_pin_pages_remote()
+  vfio/type1: batch vfio_find_vpfn() in function
+    vfio_unpin_pages_remote()
+  vfio/type1: introduce a new member has_rsvd for struct vfio_dma
+  vfio/type1: optimize vfio_unpin_pages_remote()
+
+ drivers/vfio/vfio_iommu_type1.c | 111 ++++++++++++++++++++++++++------
+ include/linux/mm.h              |  23 +++++++
+ 2 files changed, 113 insertions(+), 21 deletions(-)
+
+---
+Changelogs:
+
+v3->v4:
+- Fix an indentation issue in patch #2.
+
+v2->v3:
+- Add a "Suggested-by" and a "Reviewed-by" tag.
+- Address the compilation errors introduced by patch #1.
+- Resolved several variable type issues.
+- Add clarification for function num_pages_contiguous().
+
+v1->v2:
+- Update the performance test results.
+- The function num_pages_contiguous() is extracted and placed in a
+  separate commit.
+- The phrase 'for large folio' has been removed from the patchset title.
+
+v3: https://lore.kernel.org/all/20250707064950.72048-1-lizhe.67@bytedance.com/
+v2: https://lore.kernel.org/all/20250704062602.33500-1-lizhe.67@bytedance.com/
+v1: https://lore.kernel.org/all/20250630072518.31846-1-lizhe.67@bytedance.com/
 -- 
-  Kiryl Shutsemau / Kirill A. Shutemov
+2.20.1
+
 
