@@ -1,77 +1,78 @@
-Return-Path: <kvm+bounces-52024-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52025-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86C09AFFCEE
-	for <lists+kvm@lfdr.de>; Thu, 10 Jul 2025 10:55:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E6C0AFFCF1
+	for <lists+kvm@lfdr.de>; Thu, 10 Jul 2025 10:56:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 23F301C86D37
-	for <lists+kvm@lfdr.de>; Thu, 10 Jul 2025 08:55:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 87F271C86C09
+	for <lists+kvm@lfdr.de>; Thu, 10 Jul 2025 08:56:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 853F0293B55;
-	Thu, 10 Jul 2025 08:54:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A500E293C7C;
+	Thu, 10 Jul 2025 08:54:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="LENEC6da"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="GvPDJlwY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DADF292B5E
-	for <kvm@vger.kernel.org>; Thu, 10 Jul 2025 08:54:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68DC7292B5B
+	for <kvm@vger.kernel.org>; Thu, 10 Jul 2025 08:54:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752137667; cv=none; b=gLQ9I3rfRcjxgW9cf8OLP5Gygv5jq9I9IDoTpsU9EJEuGxLi8uI+Z81NXqkJwOWdS2+Y4T7v+xozjWre42fbaYpMwImITXKc30HrDTRDTtjaP6sasmuqApkuP+Hp3SdV7/h7R0FUQ4ApfBBG8i89LuO0Xa44uZyDxX51tJqgZIs=
+	t=1752137673; cv=none; b=MTDn6sMun8+uCtlqpVPBJdI+M1M/SFdiA14uiIdRpezuVB2lBjmdJcymV1IklRuNKWkNPQatbwc4n0AFzpQW6fb3/tCJo0MEnH1hIUjW92FZtjLrwEw0GW5nXnciz7xbc81KyQLERVJLAtIuHwdtPp2/XnpPD49XGwEh1cpO/Ao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752137667; c=relaxed/simple;
-	bh=kuMO4alh4taqq6qqK8Ezmq1eFdMQaf8rRvbNnP7x1ZQ=;
+	s=arc-20240116; t=1752137673; c=relaxed/simple;
+	bh=XzjoEAh+cvHyRje+0Tjj6rqGbTKwrsSfOvDNlMabzbU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ewaXxvDcA08GdKd5CkLUFVZsK0eqRuS2DlgxFOZRg6uXOsEfKh/xgw6A3XZe1LaRihrHgGXzm2dDVRsHO4nSvhA/dJ9yaX2DmixquUYiOvim5pLVHTGYgr/FuxDrDW2zWsUFxVRmJqyNJCgzz2iGD7kyzI3fhem6QlIXbqk4BAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=LENEC6da; arc=none smtp.client-ip=209.85.214.172
+	 MIME-Version; b=W6jpiBCsreOzKDuyo9X3zRGDaco8aF31d1UggziUHNYJ7dxW35c0dIcYiF4kMIR1VC+BcfSEfb1f8esWZecyaFz8+AHzTgzappKkdbspI/5KVMwmWHCwEIh88GZVLa3tY7BaTrhUUlT8E9zD9JMGr26mBqwiixjTeOYGx77xfso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=GvPDJlwY; arc=none smtp.client-ip=209.85.215.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-236470b2dceso7457505ad.0
-        for <kvm@vger.kernel.org>; Thu, 10 Jul 2025 01:54:26 -0700 (PDT)
+Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-b271f3ae786so688286a12.3
+        for <kvm@vger.kernel.org>; Thu, 10 Jul 2025 01:54:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1752137666; x=1752742466; darn=vger.kernel.org;
+        d=bytedance.com; s=google; t=1752137672; x=1752742472; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=euNz/l/CHGPv/Gat71a8nUVi70h05zHrvuBm3oNz29E=;
-        b=LENEC6dajcKktGlvKMstisUT7+YxOsw6i+54mmKubHTWy8oH2js8w+1etQkArkfdPd
-         Z5BO9cwZc7LFDTpSt7kwHcQzOUEnB1YTVUpYfrP5nbq7aa92r9sKiscMtsgyuPZgcr6N
-         /dW78f71s/1bf9ZO+eEqyiLT+9cx+0W+uMy4m5FyzjnwUrT6OnfPyS9mscJzp5nNv2JC
-         ARkEtXIEeOSWNL3kLpmLoTULpVELNluih7qd6turjp0UEbtDPYTJu3FMm1wyI1zJkeIT
-         OvAItdgXmNSCXrQuAcg8Y/xg9affIgB33aLOHHlzGgHZF+opOtuXP1pui/lPMrF8AYhd
-         hS5w==
+        bh=i4mO6QS2sYfv7EymtBvZKW+/VtzFT/ogV5HmARdE954=;
+        b=GvPDJlwYCa0EBotRO1G6jKvgrURnBT/0qOFF844NJuPh5mxNgqDfu1uX2wJ8zJP8ra
+         EfVxne82R6oR1oQXLSZguqop+c/hrZ4bq0jInTgt5v+zW4IRAmrsmuVXR/kDMsVSWu1I
+         Vsccg+SLrdhwBjO2sXzvRGfwkCDGKKeKBn62SwqfO0z/XUjfPBwF/CKRFyOu+81xslUJ
+         My+ASvGz68uRYFE9FT2SHjqpMQQFCJxQs/sRXvG0dt1mffn0yzMr8Roc57r5fQI6rk1f
+         jKROmQJt8/7IOB4X42ro+P9uTkjZ66IsYA3Q58sUN+EN5hi5j+LVHkXrWHE+ovJvw24B
+         Tvqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752137666; x=1752742466;
+        d=1e100.net; s=20230601; t=1752137672; x=1752742472;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=euNz/l/CHGPv/Gat71a8nUVi70h05zHrvuBm3oNz29E=;
-        b=Rr1GEldr3RqhE9XwtX9Fd7xTvS8Eza867c2YBLA9zjbxoMC5dXKk0aIuEotmo91CHE
-         rijjRXvhOG8RneqVzObJ2DWUwqA1zCEsuebF61b9cWAMMt3v7YxiWeUjZPUtyrLFjRYJ
-         NADWEYoAcvPPCEr+OW1SEjbLKK6rct1T99txZpzSCbuheFG0hjA4hSFDOx+zCP+mtSkH
-         A+knU+joZFBqAoV6wyZjPfhWDn16LmMgt5W0EYylIPW6Zi55T5SOdfu/5V7MyTdBSC8g
-         LWIG2kgyT1ftziHY3mnFW/hz0EAqp4+REmi4p1eSH4izULgVXPu1JpdDLmwMnbRguL6C
-         4jwg==
-X-Gm-Message-State: AOJu0Ywk7cOT5YCQdkBdKM/WHoPtJeV2l5Ofc9mGDOHyy783R95sGuS/
-	ERZSX1eJlZiFWgw4Bt4uydsbF0JY8MqxKQ8RNzm6sqmxN3QeoaQH2YQl7/hRp1w5uLw=
-X-Gm-Gg: ASbGncuzJwTVsTxEbROuojKVeiPH2DPvm1oAqZJ052j3r2sgiJltGkhVwYGoBtrq0gY
-	xrz8iktKqo8BNWJkRrQfsLRgYRrLzMtyzd8qpo7/hcngyFKhBFlnSAmvdydCDyTXLhS6iFKUX1y
-	WVRq0VSNMusNjCrIet5Vfnk2PKE+zKLrwWk0QzOA8YtJS7FlRzgRJI1KmFfttSUdVMb5SyDj88e
-	OkuJMRM8tfvQdLT+3lfsl8L5nmE4G9NNvQVcYzg4zqHoqhcZf30smvAXbCA+88rC3YbFlwUiTU+
-	6jj48RMvWNQdFk1NK0uRS6DsrcaJdYiaPR5YryjFM89jdCmzBdp41rTEsJDN38yzld1qtQGH9Cp
-	ajwI/OmgO84UVvA==
-X-Google-Smtp-Source: AGHT+IEt7OZwGubuhbBz8Z/1KB4UN6EU83aIIreg1b4VW2wSiqDfLzbhNwjVrNvPGleM5LD1QDFIHw==
-X-Received: by 2002:a17:903:a8f:b0:235:1962:1bf4 with SMTP id d9443c01a7336-23de4803965mr31979305ad.14.1752137665596;
-        Thu, 10 Jul 2025 01:54:25 -0700 (PDT)
+        bh=i4mO6QS2sYfv7EymtBvZKW+/VtzFT/ogV5HmARdE954=;
+        b=LQVFavMThOy4JIahsjlb2inSZDHrFdluDvhRbXQctEdAaINc6LgLxRADMx0b5bIIsC
+         0yaox/vTrWh97ZKr4T1RSMrndTwnQOfUBDWR9Z8SWVsg8YK0zgmppiByZYtpjKSq7VdR
+         JoUmLvRqQl2EPLAI18GO/fheUI8xPqmjjA0g/C94+gyxb49ZH/QO+mL8FMjzOvumBcfW
+         qf6PaTr/5P5pUA5u7L0i9oF6DPsM4DHaqkGN376LxhgEFlQQliZseAfrBfuYg1SV9Q4U
+         K/BYiqhg4Uo4koSa7Qgd2LGHOkWnv6fFNExuVI1NFMgu8/Z2LbwZXtH00+0LGzxMLvEw
+         g7xA==
+X-Gm-Message-State: AOJu0Ywsx0FWyjE4WlCWSEp/5gRuymPrFkIk6LmfMdSWdo/EQTuikovC
+	shTePTigQO6i5ZC3e1JYuLOG8m3Ss3Y/EO5vGKa/8mk6rX4CjjF9osDPAgI4yZ2E9m2DFyDvrgy
+	EfJFU
+X-Gm-Gg: ASbGncuiSEKuhsYLf+41VEeci2f2/Cl3TpLEQv+H9gSIX3r28Uv+s0YP3lWTHr7r4/i
+	VNM+ve5GJLDSZBAp40A+Ko7lJIwLHAYKl6Bt2IzABFzcZyGKw0C02p7GTodanaT+ylDsGI1ne2G
+	s9tMdhTqj3XcPwDrLhke/qPVE11+lCnxcQ8TRhMvYMUmRhkIBino3UTZGp4g5bs030PTcp73/Jh
+	y/k5XJb0g/qs1k34IpOXBXpSrp1zQyVnhbYYHMeoS1gBoak3mwpChFxB5ZWN4ORC5sqwMFVQjIu
+	QQM2o5evSWwU90fx9MOUmjiMTx4XYuEoWLFIb208JBpMYGm4EbIFV29Ib3B/0mWruQ5QYZ8UCBu
+	NSBL+aJSF03Hllg==
+X-Google-Smtp-Source: AGHT+IHpGnM8/RSgCKrl528Fh5n6c4YlUKSZpBOagB5O4dzJXeVEsMY3FEHcb5l/h+FzLkNngxE9NQ==
+X-Received: by 2002:a17:90b:4a4a:b0:311:b005:93d4 with SMTP id 98e67ed59e1d1-31c2fdd1479mr9203981a91.25.1752137671529;
+        Thu, 10 Jul 2025 01:54:31 -0700 (PDT)
 Received: from localhost.localdomain ([203.208.189.12])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31c3e975d41sm1650228a91.13.2025.07.10.01.54.21
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31c3e975d41sm1650228a91.13.2025.07.10.01.54.27
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 10 Jul 2025 01:54:25 -0700 (PDT)
+        Thu, 10 Jul 2025 01:54:31 -0700 (PDT)
 From: lizhe.67@bytedance.com
 To: alex.williamson@redhat.com,
 	akpm@linux-foundation.org,
@@ -82,9 +83,9 @@ Cc: kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	linux-mm@kvack.org,
 	lizhe.67@bytedance.com
-Subject: [PATCH v4 4/5] vfio/type1: introduce a new member has_rsvd for struct vfio_dma
-Date: Thu, 10 Jul 2025 16:53:54 +0800
-Message-ID: <20250710085355.54208-5-lizhe.67@bytedance.com>
+Subject: [PATCH v4 5/5] vfio/type1: optimize vfio_unpin_pages_remote()
+Date: Thu, 10 Jul 2025 16:53:55 +0800
+Message-ID: <20250710085355.54208-6-lizhe.67@bytedance.com>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20250710085355.54208-1-lizhe.67@bytedance.com>
 References: <20250710085355.54208-1-lizhe.67@bytedance.com>
@@ -98,38 +99,88 @@ Content-Transfer-Encoding: 8bit
 
 From: Li Zhe <lizhe.67@bytedance.com>
 
-Introduce a new member has_rsvd for struct vfio_dma. This member is
-used to indicate whether there are any reserved or invalid pfns in
-the region represented by this vfio_dma. If it is true, it indicates
-that there is at least one pfn in this region that is either reserved
-or invalid.
+When vfio_unpin_pages_remote() is called with a range of addresses that
+includes large folios, the function currently performs individual
+put_pfn() operations for each page. This can lead to significant
+performance overheads, especially when dealing with large ranges of pages.
 
+It would be very rare for reserved PFNs and non reserved will to be mixed
+within the same range. So this patch utilizes the has_rsvd variable
+introduced in the previous patch to determine whether batch put_pfn()
+operations can be performed. Moreover, compared to put_pfn(),
+unpin_user_page_range_dirty_lock() is capable of handling large folio
+scenarios more efficiently.
+
+The performance test results for completing the 16G VFIO IOMMU DMA
+unmapping are as follows.
+
+Base(v6.16-rc4):
+./vfio-pci-mem-dma-map 0000:03:00.0 16
+------- AVERAGE (MADV_HUGEPAGE) --------
+VFIO UNMAP DMA in 0.135 s (118.6 GB/s)
+------- AVERAGE (MAP_POPULATE) --------
+VFIO UNMAP DMA in 0.312 s (51.3 GB/s)
+------- AVERAGE (HUGETLBFS) --------
+VFIO UNMAP DMA in 0.136 s (117.3 GB/s)
+
+With this patchset:
+------- AVERAGE (MADV_HUGEPAGE) --------
+VFIO UNMAP DMA in 0.045 s (357.0 GB/s)
+------- AVERAGE (MAP_POPULATE) --------
+VFIO UNMAP DMA in 0.288 s (55.6 GB/s)
+------- AVERAGE (HUGETLBFS) --------
+VFIO UNMAP DMA in 0.045 s (353.9 GB/s)
+
+For large folio, we achieve an over 66% performance improvement in
+the VFIO UNMAP DMA item. For small folios, the performance test
+results appear to show a slight improvement.
+
+Suggested-by: Jason Gunthorpe <jgg@ziepe.ca>
 Signed-off-by: Li Zhe <lizhe.67@bytedance.com>
 Reviewed-by: David Hildenbrand <david@redhat.com>
+Acked-by: David Hildenbrand <david@redhat.com>
 ---
- drivers/vfio/vfio_iommu_type1.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/vfio/vfio_iommu_type1.c | 20 ++++++++++++++++----
+ 1 file changed, 16 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index cade7ac25eea..61455d725412 100644
+index 61455d725412..133f284ae168 100644
 --- a/drivers/vfio/vfio_iommu_type1.c
 +++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -92,6 +92,7 @@ struct vfio_dma {
- 	bool			iommu_mapped;
- 	bool			lock_cap;	/* capable(CAP_IPC_LOCK) */
- 	bool			vaddr_invalid;
-+	bool			has_rsvd;	/* has 1 or more rsvd pfns */
- 	struct task_struct	*task;
- 	struct rb_root		pfn_list;	/* Ex-user pinned pfn list */
- 	unsigned long		*bitmap;
-@@ -774,6 +775,7 @@ static long vfio_pin_pages_remote(struct vfio_dma *dma, unsigned long vaddr,
- 	}
+@@ -792,17 +792,29 @@ static long vfio_pin_pages_remote(struct vfio_dma *dma, unsigned long vaddr,
+ 	return pinned;
+ }
  
- out:
-+	dma->has_rsvd |= rsvd;
- 	ret = vfio_lock_acct(dma, lock_acct, false);
++static inline void put_valid_unreserved_pfns(unsigned long start_pfn,
++		unsigned long npage, int prot)
++{
++	unpin_user_page_range_dirty_lock(pfn_to_page(start_pfn), npage,
++					 prot & IOMMU_WRITE);
++}
++
+ static long vfio_unpin_pages_remote(struct vfio_dma *dma, dma_addr_t iova,
+ 				    unsigned long pfn, unsigned long npage,
+ 				    bool do_accounting)
+ {
+ 	long unlocked = 0, locked = vpfn_pages(dma, iova, npage);
+-	long i;
  
- unpin_out:
+-	for (i = 0; i < npage; i++)
+-		if (put_pfn(pfn++, dma->prot))
+-			unlocked++;
++	if (dma->has_rsvd) {
++		unsigned long i;
+ 
++		for (i = 0; i < npage; i++)
++			if (put_pfn(pfn++, dma->prot))
++				unlocked++;
++	} else {
++		put_valid_unreserved_pfns(pfn, npage, dma->prot);
++		unlocked = npage;
++	}
+ 	if (do_accounting)
+ 		vfio_lock_acct(dma, locked - unlocked, true);
+ 
 -- 
 2.20.1
 
