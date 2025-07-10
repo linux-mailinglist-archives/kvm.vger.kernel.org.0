@@ -1,356 +1,329 @@
-Return-Path: <kvm+bounces-52015-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52016-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72935AFFA23
-	for <lists+kvm@lfdr.de>; Thu, 10 Jul 2025 08:51:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC606AFFA41
+	for <lists+kvm@lfdr.de>; Thu, 10 Jul 2025 08:58:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B50F64A8357
-	for <lists+kvm@lfdr.de>; Thu, 10 Jul 2025 06:51:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B9254884AB
+	for <lists+kvm@lfdr.de>; Thu, 10 Jul 2025 06:57:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA828287507;
-	Thu, 10 Jul 2025 06:51:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D957D2877C1;
+	Thu, 10 Jul 2025 06:57:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fOvRouwJ"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="gIH5Fo+i"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2068.outbound.protection.outlook.com [40.107.244.68])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 931DE22AE75
-	for <kvm@vger.kernel.org>; Thu, 10 Jul 2025 06:51:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752130287; cv=none; b=GHBZwBQfP337IVgE8LWulMu5ftpam3NkMIHKPKSJaDXxJgITOAAH3B30JZdeJV2cWCR9mhob6YUNGH6PpwvDd4gcnPjSlXAWKiv8VkyaBUlUSYz43L6+wfe5xxeUwXvGyOQ59nrI6QYNA+p1DdL1t8aJIVIf4xTyZjQhSPjRmO0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752130287; c=relaxed/simple;
-	bh=ywQ0NJXMilsYJwI3bmhXom6mcoqPdnzSy0iMQDhlMiU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=umJHNV/RVlLv9rlsrTF4vtToCWIPNGO3NagejYBPQ89bcl9GrtBU3ydpE6AVuW2AxmU7EUhgZnGTnZVPXkqnw+x6VuZ5keAaFjvixD0NHywJVrEJE6cam1I25yPofvoH4gbh5f1I5iAntelyxM6Tewf1QXcGQu1Qu7Xcz9PL7/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fOvRouwJ; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-453643020bdso4070635e9.1
-        for <kvm@vger.kernel.org>; Wed, 09 Jul 2025 23:51:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752130282; x=1752735082; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xpVqT/0ziCiQWbhFEKbAX/q6iQaKzlbqaJjN/YymYjI=;
-        b=fOvRouwJfSAMFSXSzM1mOtKrfbjLIQP4v+o1Ow9CWhbJPM9ZL/W8ii7vVZq8bgA6Q3
-         Aj05jiHcR54tmeC/pGphxn2W0J6g3TfBkXjxZvHZt8XErriCoU6sFwVf1NXxBCaSGUm4
-         rvd7FQRp7t9S9bNtk27KI8xwTPsTQYW79Y27+uitNbDJDDhnTprlusBOBxUfuBcQ9Xg2
-         nCKgbgYDFAibc1zPEVtDvUKqgmJPlaf+npUnQc9fl1+OCODcNLTT1JgX0SCWGOLnDJ2x
-         teAQnqi85DgZ6luBUbW/rS/j8/6dIllz/MspTNIFs11AJ2CyrscKyKT5NtDSR+791hH+
-         KwNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752130282; x=1752735082;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xpVqT/0ziCiQWbhFEKbAX/q6iQaKzlbqaJjN/YymYjI=;
-        b=mp7/PaJ2rWRwMXT9S7ITQ2vS2yJbNPcQlvb58UN67nyflwM4suDxfAmZZzGIaq+Hcl
-         /nKlTWy1pw034xc4B71Ye9eJsSx2+NHyCw98JIrXoaZR8yr36ysnthQkclMtcNilu5b8
-         gIrlNsUPc+Ru55Cx6XXgGPdL+TyJ74K0T/kPrs/lSOncbL20+Lxr+LtQZAplTFoBp2p9
-         ba7nL1o2nitQkfjqMm+m7wOrmDdJp5R4k//icToYb78k0sVPXnGOHP5I/wrh7r/Dtbki
-         Fv6yEpOid2S+p+DFAux5+nMSzmFvAVb8gpDOj8gZRDCiWXTFwQ1n4LE5S4y72QKho4Bn
-         NPmg==
-X-Forwarded-Encrypted: i=1; AJvYcCWDq2bw8nEYEpSuPStf7oaonMvmiqTYgsZN/NVE6E7KvYXG6tyKiSPen4oa7DV4NZFK/Qw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwUgswqmze8zTX/4PpnMZdtct2Dmk5njj855dufXwivHb0Cp3yL
-	sj7oduh8NCaq3uLZRcHMz5crNok85F6xvd+odKxroWpezLDn5V9620W/Bm3d8MORow==
-X-Gm-Gg: ASbGncvTxkefLkcknzn4GwlZNUDLVsFIRQZWkq6OkCbapjJdKZ5/wyLweh7bnRvKTgZ
-	4riazrhDzAx9QnmQb8wh04K/dGPNiMe7CSmGdZ/RDxRKhzct0sHPyvYdif3P9jukb9Ve4D7+IWV
-	n7M/mgRW7WGbyzvB/uoK7WZ4Dal2UaTrHrQ18pcUBbHSeJHMcWvpOR/Da/4dmTA3rsTglnHndud
-	icb+t8A+T+sDXuhpPm+jCcJoHO+vDsSS2xpnDlxpsQX7zTzMC6PYavRAdD0eZl1wFPDvuK7Gt2B
-	HD4z7A2By8HEQooZP6CemKSEELZsg/4bOeO4c9kTj1zCrvimz0NCKOPDAK4KUG5joHtdli6Aje8
-	Yyt099CwabP8JQbQ44RNBueM=
-X-Google-Smtp-Source: AGHT+IFZP/UMNnhVWneOpJDGvjArQoTmSoQxfALO8N9dgC9g7qQ/GhXWcBfsOhwQL5ABm6JTjSKyuQ==
-X-Received: by 2002:a05:600c:1546:b0:442:ccf9:e6f2 with SMTP id 5b1f17b1804b1-454d53a608dmr55979805e9.16.1752130281641;
-        Wed, 09 Jul 2025 23:51:21 -0700 (PDT)
-Received: from google.com (120.142.205.35.bc.googleusercontent.com. [35.205.142.120])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-454dd439326sm9964525e9.1.2025.07.09.23.51.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Jul 2025 23:51:20 -0700 (PDT)
-Date: Thu, 10 Jul 2025 06:51:16 +0000
-From: Keir Fraser <keirf@google.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, Eric Auger <eric.auger@redhat.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Li RongQing <lirongqing@baidu.com>
-Subject: Re: [PATCH 3/3] KVM: Avoid synchronize_srcu() in
- kvm_io_bus_register_dev()
-Message-ID: <aG9i5BHDHRlFRFnb@google.com>
-References: <20250624092256.1105524-1-keirf@google.com>
- <20250624092256.1105524-4-keirf@google.com>
- <aFrANSe6fJOfMpOC@google.com>
- <aGJf7v9EQoEZiQUk@google.com>
- <aGwWvp_JeWe9tIJx@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D32817A300;
+	Thu, 10 Jul 2025 06:57:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.68
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752130672; cv=fail; b=KcbGBed6PryLQXW4PI9KtkUY5a0GRj+TWLOqh2RK1Ex1cDptexbJd2QqBKVA7OXAJWtKVaCzbLfYZDGQ0ATZVhhrjOdzJshAqYZQC4JBJMpARl/8JYTlYn5PJVbaiwXH8SthVqnagqvelOLVAiOeBuO6pCEI4+RglEN6C8Cm4k8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752130672; c=relaxed/simple;
+	bh=QviFC8191V7fEjye/q4rKx888CNpulT3kIhDZCxsbqU=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=O1isJSd2Zs+hEzOAJq/aum92FtOr3snS0P3Oj6biJsZxboq+nPcVlWbYMjPrGMDvVCZBvi7ryzimkajvBVlRc95upX8nORNnQ6sIODZPSbL2H78B42Wm0kYEwavvkKQ0ofIme5bfSllcXYfjwpmy0ypN9yNHK2ZF42dgyEGsyZ4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=gIH5Fo+i; arc=fail smtp.client-ip=40.107.244.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=pHM9sZIYGqZqMNOql/6J1W2fcUZWhN8a8DOLi7mpzripBEWvWkx1XWgX4iynZtONg3mgRwyZnHUjcnE1i/9S63Vuuku04CnHDNcl0f/og+backJKCPB9unBMZfJETUnPOpQ9GviAYuYU4QipRILOcwp4lU9Q1g9g29D7w1gFNcbrLI9V96QNvSbGoEEBwQFfM4chteoslBxoUuu+0niX46XAw2JeZWIbdGlaUkZEiRK1VGq71OmdfKgm7L+DHeu33svF2nI3M7hOSCzrKH8sC897iPsHrAEB96j9dpNXVlYNuVOhLr5rbIt4gbPved35JG7lNSkjj8Q4qbATtFuAyw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=JXA/Hs7cimaxFh2CePsl6TKUIk059eoD81cwHWHuXOg=;
+ b=HPRiPtjqRVWKO+nobwG0EFfr7Dj6HChr3gNFmBf1UQtu41y+zbyiBse4BlXrfgT8ZAQRI//42IEN3VpXivguYU8tFVsalG61qixeyrW66pfV1D6FcuhIDW4dE0Ilg3eiNB03h7T/nd7ouL4rioeujbAj1Dp92/t5SuAA/a0HBOzFMDOc4rajFAE1XX+UPJuMeegQJJr/v+NFSL8UKjeqKQ2JyC32fB/muNCVQoQ/10F6U2l1YxJXy4Ppa7g1Pvm3lQ2+C1CIOado1nk3w//stX48A8XILm5u9/h+X38K7vJ3AtIxHyxK2vjGDXvOjs+tFmHhQCrQ6Vhbm1rgQMGUcg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=JXA/Hs7cimaxFh2CePsl6TKUIk059eoD81cwHWHuXOg=;
+ b=gIH5Fo+i1uKWF8ofH6DKsgrb2peRka5iXEhahWU7/ZD3WHIkz84DHrUP+yrzOMd8+kGqtEvEHBCaYvZz/DMFhZPK9g5SFrhyNtpwz9ieoMDu4hIJs2YWAzTPedntucT2wD3M1PQiZ7Wg0BV2Nj18PG4mkONjA9uQZEa52QLhA6c=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from CH3PR12MB9194.namprd12.prod.outlook.com (2603:10b6:610:19f::7)
+ by SJ2PR12MB9243.namprd12.prod.outlook.com (2603:10b6:a03:578::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.27; Thu, 10 Jul
+ 2025 06:57:47 +0000
+Received: from CH3PR12MB9194.namprd12.prod.outlook.com
+ ([fe80::1e6b:ca8b:7715:6fee]) by CH3PR12MB9194.namprd12.prod.outlook.com
+ ([fe80::1e6b:ca8b:7715:6fee%7]) with mapi id 15.20.8901.028; Thu, 10 Jul 2025
+ 06:57:47 +0000
+Message-ID: <09db374e-fa7d-4c1d-bf03-aaaafd93bd01@amd.com>
+Date: Thu, 10 Jul 2025 16:57:25 +1000
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [RFC PATCH v2 04/51] KVM: guest_memfd: Introduce
+ KVM_GMEM_CONVERT_SHARED/PRIVATE ioctls
+To: Vishal Annapurve <vannapurve@google.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>, Fuad Tabba <tabba@google.com>,
+ Ackerley Tng <ackerleytng@google.com>, kvm@vger.kernel.org,
+ linux-mm@kvack.org, linux-kernel@vger.kernel.org, x86@kernel.org,
+ linux-fsdevel@vger.kernel.org, ajones@ventanamicro.com,
+ akpm@linux-foundation.org, amoorthy@google.com, anthony.yznaga@oracle.com,
+ anup@brainfault.org, aou@eecs.berkeley.edu, bfoster@redhat.com,
+ binbin.wu@linux.intel.com, brauner@kernel.org, catalin.marinas@arm.com,
+ chao.p.peng@intel.com, chenhuacai@kernel.org, dave.hansen@intel.com,
+ david@redhat.com, dmatlack@google.com, dwmw@amazon.co.uk,
+ erdemaktas@google.com, fan.du@intel.com, fvdl@google.com, graf@amazon.com,
+ haibo1.xu@intel.com, hch@infradead.org, hughd@google.com,
+ ira.weiny@intel.com, isaku.yamahata@intel.com, jack@suse.cz,
+ james.morse@arm.com, jarkko@kernel.org, jgowans@amazon.com,
+ jhubbard@nvidia.com, jroedel@suse.de, jthoughton@google.com,
+ jun.miao@intel.com, kai.huang@intel.com, keirf@google.com,
+ kent.overstreet@linux.dev, kirill.shutemov@intel.com,
+ liam.merwick@oracle.com, maciej.wieczor-retman@intel.com,
+ mail@maciej.szmigiero.name, maz@kernel.org, mic@digikod.net,
+ michael.roth@amd.com, mpe@ellerman.id.au, muchun.song@linux.dev,
+ nikunj@amd.com, nsaenz@amazon.es, oliver.upton@linux.dev,
+ palmer@dabbelt.com, pankaj.gupta@amd.com, paul.walmsley@sifive.com,
+ pbonzini@redhat.com, pdurrant@amazon.co.uk, peterx@redhat.com,
+ pgonda@google.com, pvorel@suse.cz, qperret@google.com,
+ quic_cvanscha@quicinc.com, quic_eberman@quicinc.com,
+ quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com,
+ quic_pheragu@quicinc.com, quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com,
+ richard.weiyang@gmail.com, rick.p.edgecombe@intel.com, rientjes@google.com,
+ roypat@amazon.co.uk, rppt@kernel.org, seanjc@google.com, shuah@kernel.org,
+ steven.price@arm.com, steven.sistare@oracle.com, suzuki.poulose@arm.com,
+ thomas.lendacky@amd.com, usama.arif@bytedance.com, vbabka@suse.cz,
+ viro@zeniv.linux.org.uk, vkuznets@redhat.com, wei.w.wang@intel.com,
+ will@kernel.org, willy@infradead.org, xiaoyao.li@intel.com,
+ yan.y.zhao@intel.com, yilun.xu@intel.com, yuzenghui@huawei.com,
+ zhiquan1.li@intel.com
+References: <cover.1747264138.git.ackerleytng@google.com>
+ <d3832fd95a03aad562705872cbda5b3d248ca321.1747264138.git.ackerleytng@google.com>
+ <CA+EHjTxtHOgichL=UvAzczoqS1608RSUNn5HbmBw2NceO941ng@mail.gmail.com>
+ <CAGtprH8eR_S50xDnnMLHNCuXrN2Lv_0mBRzA_pcTtNbnVvdv2A@mail.gmail.com>
+ <CA+EHjTwjKVkw2_AK0Y0-eth1dVW7ZW2Sk=73LL9NeQYAPpxPiw@mail.gmail.com>
+ <CAGtprH_Evyc7tLhDB0t0fN+BUx5qeqWq8A2yZ5-ijbJ5UJ5f-g@mail.gmail.com>
+ <9502503f-e0c2-489e-99b0-94146f9b6f85@amd.com>
+ <20250624130811.GB72557@ziepe.ca>
+ <CAGtprH_qh8sEY3s-JucW3n1Wvoq7jdVZDDokvG5HzPf0HV2=pg@mail.gmail.com>
+ <31beeed3-b1be-439b-8a5b-db8c06dadc30@amd.com>
+ <CAGtprH9gojp6hit2SZ0jJBJnzuRvpfRhSa334UhAMFYPZzp4PA@mail.gmail.com>
+ <8f04f1df-d68d-4ef8-b176-595bbf00a9d1@amd.com>
+ <CAGtprH-KhEM6=zegq-36yomZ8PX22EmaZpMPkLnkyzn51EF25w@mail.gmail.com>
+Content-Language: en-US
+From: Alexey Kardashevskiy <aik@amd.com>
+In-Reply-To: <CAGtprH-KhEM6=zegq-36yomZ8PX22EmaZpMPkLnkyzn51EF25w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SYYP282CA0006.AUSP282.PROD.OUTLOOK.COM
+ (2603:10c6:10:b4::16) To CH3PR12MB9194.namprd12.prod.outlook.com
+ (2603:10b6:610:19f::7)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aGwWvp_JeWe9tIJx@google.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB9194:EE_|SJ2PR12MB9243:EE_
+X-MS-Office365-Filtering-Correlation-Id: f2d53acb-c5ab-4b66-21f1-08ddbf7f13e3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?WmJHUVU0M0NPZENXdDNTcm5zdm1HUzJWWkJReU9ZVnM1anpQZm5uOUE0V2Jq?=
+ =?utf-8?B?ZmIrdHF6QnVQWlBaZTBKakVBTE1SdFdpemJlSFFVNXJsbzhSQmgrdUJObFpS?=
+ =?utf-8?B?am5pNG02NlZSL3p4V0swb2hrWmZmdk4zeEVJRnA2bDErVWZtSDhjK0pvSEtL?=
+ =?utf-8?B?aG9TTE41dHRDTGYreldZblQvd3pyRnQzZEZSQVI0bE95RDMxOE5scjZ0M1Jv?=
+ =?utf-8?B?Q0lNTjY1N0ZKdVNiaG8vZ1o1bEQ2Q01SRXZyNHNUakNXcUFYVkNzSkpmeHpV?=
+ =?utf-8?B?cnRqdSt6RmwrUS9RaHJ4UkZJeHdmdXFMOXozZEg1elROaGhMS3JBSXJLVXVu?=
+ =?utf-8?B?ZjFFZ2oyNXRZVVhZWUdNaG1EYkNEVVd0VW8ycFBCNllDRUhDSENaRnkvdlpZ?=
+ =?utf-8?B?Zm9IUS9JbEZvNVlod0xNdXdidGxVaVVzL3ZUSXEvZWJna3B4L1pQQmt1bXZU?=
+ =?utf-8?B?eVlGMWZIUThMZlR0RWVPMmZOSHdpbnMyaDRVLzd6R1FIeXE4MDcxcmF5YVgw?=
+ =?utf-8?B?VlQ0K1ZPbGFIcEZiTW5Gbk1kTmdUQ0M5Y1BxcVM3RTNOdmVQMU1ncXdUTEgy?=
+ =?utf-8?B?a1NoNTRQb0s5aHhBdWM4U3U3WjlxclNvTzkwNkd6M0xPZnl1dWVocS9RSC9u?=
+ =?utf-8?B?OEtGV2hrNGxYSGxxamduRS9HNXlVM2cvL2psTFAybGhsL2ZFaFZBZGVTdUlt?=
+ =?utf-8?B?WmFNN3hrRHFKUnJyaVIyWGZ2bHlpRS9qZmFXaW5JVElFbnlGZXFGZDEyUS9t?=
+ =?utf-8?B?MEl4cFpaNk1lcW1NSW9rT0c4YURJWko2Qm1Dclg0dnVQTFg0eWkydmlnRFll?=
+ =?utf-8?B?VXRLdXY3b3NYb29JbjRSTGZzMmZmbGNVZFdBbjE0d2ViVi9XMFdOdUZTZlJq?=
+ =?utf-8?B?TllmLy9DWUZyNmpIbnFuRG1vRlZiMkc4c3lvZWFzV3VHK3FycDdrUEsyeVJ6?=
+ =?utf-8?B?amw3b015VmhYVlYyTFRJaG9Ub1k0T000WFNOT2pmVldZTkhMQmJyZEhSeFFr?=
+ =?utf-8?B?TzZITEpEcHA5QmNmSUh0ZmsxU1dCMk8wU3dyejc2aGgrT0hxZDR5Ky8xSzdq?=
+ =?utf-8?B?N0RMa1p6bDlTcFgwbkZlbUhNZ094UmY1NWpDdHZTcXAzK3VOejNZMDZSRVNR?=
+ =?utf-8?B?dEJLcE0xVUpYdkZ2Z2FLb1Nma0JwMjBIZXdyN2UwNlFIWmtvQ043dUo1UWZa?=
+ =?utf-8?B?b3hHRUxYZ3R2Rm1mT3VUeXVWZVFNa1pyaW1oK2xIM1RUZHlKNHRoTlBiL2lG?=
+ =?utf-8?B?dDFrUFNzUVpZNGZDMS9oMzQ0a2d4V2RrdWQ2OTdRY09KQ3ZTWjVJNmFlTzFV?=
+ =?utf-8?B?VDhPbVdUc1huM3NwM1l5bGRURWF1cHdSN0g5b3ZLZW5DeTJWU0RqcERPaVNq?=
+ =?utf-8?B?RlJQcURIM2l6VTN6OVA1R3hNRzhFUDNYdTFNVnNnektTWS8vd010dnhZaXNJ?=
+ =?utf-8?B?SlhwajRZMFhwQWlrQVFrREpLcHpjNWh5d1FXL2FHQWV6alk5cGQvdjd4OXJD?=
+ =?utf-8?B?TmhSWWIxU1F1K3FnYkpsaFJyUDVmcUJlclo0WHpROTNKRElmNjJlM1BRVkNy?=
+ =?utf-8?B?M0EzVWxzRHNtUk5qa1Noa1JXTlNDVnNwdjdPY3JvU0VRWWh5MUtOMGJrUmY1?=
+ =?utf-8?B?VTlhd2dQbXhNM0hCQzFCUHRRY1RrLy9mdnp5bW5nemhyK3o2OElyWlQ4cXlt?=
+ =?utf-8?B?VmQ5bmpjMWZ2SmFZcDFmVVdqTm1rVzJReVBxOFBXVUpiY3dTVFZtZ0pRU3BG?=
+ =?utf-8?B?R2xWN2NacVhSZ3gzaklHNHluQzVKQ1hHTVRZbmFFRDJZUnk0SjVMVWF0dDJJ?=
+ =?utf-8?B?WlBtakI4cWRWc0tvaHV3N3hRQkVqZ0tGRzlLeXNSdXUzZlJsZDJvajgzRFlk?=
+ =?utf-8?B?M0xoMmNocUtGS1V5cDhFRm83U1M5WkhIeUZUZXgyRXFCakxJVkhyQy8xbjVa?=
+ =?utf-8?Q?RFxtc5ZPp/4=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB9194.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?VjJZWnlJVU56YndGTHV2aVY3MWR1R0xvWTYwNkNGNm5Gc2VpK2lHb25aaXVw?=
+ =?utf-8?B?WTAwK28vcnBRc3FNaWw5eU5wZ05kYldZYlUyTDVsQkZxQ24wdVJTUUI3V1Zx?=
+ =?utf-8?B?YkZlb20vNFVkeWNFQjhoU0djNEV2VTNoM3hTaWEyY01xTU9YVWtmV3ZLbkli?=
+ =?utf-8?B?TisyMGw1NUhCMWhZenp4bmZOLzRKZGw2UklZSVZtYkNNM0pTSXNFRHhKekZE?=
+ =?utf-8?B?NmZnMTBtaTEwN3c4ZW1SOW5sZHRYV0luVlhnRTNSQjZMMlJ0d1lGN0RGcTIw?=
+ =?utf-8?B?ZHVTQ3REakxROWMvb1JTVElLZDBnc1MvaFZVSmwra1h6N2cwQncwQUxSRnlB?=
+ =?utf-8?B?QVdoQ3JPQlUxMWFNOFVLRXFuencrY2Z5YURpTlhadm1NeHdhMVRCckhETmlp?=
+ =?utf-8?B?azBNR2pMRVR3V3N0cU9nSjNHOTRqSFp1N2plOUR0dGZlK0xCZHlhWE5ERlVW?=
+ =?utf-8?B?M3BsNUhyY1hvUmZlVUNDVkdvZEIwc2I2a05MWTlVT0FVVDYza2p5bWd3SEs1?=
+ =?utf-8?B?cVAzZ3dqUGFkK0FOeDMvT1UzaFhncUc3RTZ4L25aM3lEMnBNbzdBNTlhTWV6?=
+ =?utf-8?B?d3NsQkN0ZUpsRnVzS3YvOXZ5bzNUbWhENkdON20wczZvclZDTFpnT3ZrYWM0?=
+ =?utf-8?B?dXpRWWRoUytlRDllZTJ0MCtPR0xCYXEvL2w3Q3hFMGp2NC8vb1VFRDJRZDFJ?=
+ =?utf-8?B?b1VrSVJoSVBPOWlyWk1PUmY4MmFJa0lmdVVRNExCSUdKS1RUajdQd2pNOUFr?=
+ =?utf-8?B?RXQrSE1oYWowTnRFemgyUHNLWFhMUFZrdSt4NXFCSUpzZk1NYURXOTdiYkJm?=
+ =?utf-8?B?WWdZeHY1MFphbWpvaFAvaHFTT1lNSEM4MEJmbUZ2NnZHZTdtaEJib3RrUTZD?=
+ =?utf-8?B?TFpmc0htbGNUb3V3dnAzcGdnOUNScnRnVjdnYWkzVFJRN3ZNV1VDTGhGVVZy?=
+ =?utf-8?B?VFc5R0hISktUUXROZUhUNFdvMjZSdW9vSFVUbExDTXdlK1ZDbWZUUDc5bjhl?=
+ =?utf-8?B?Z2d5WHRUOG81MG9lWDA5eE5BNWRRZTFXcUVkbXpNTXdZRlgzYzBmRWpqUG5y?=
+ =?utf-8?B?QlJ3RFd5Q1Y4VmY5b21nL1ltZ0VYMHkrU2hwMVVxNEdGb2FXRHBtQ2RJNXl0?=
+ =?utf-8?B?NzRtVFNtYjRpTW9xbTRkcTVYUVQ5czNQY0pFa1loZStYaXhTYnNaQVRnTzht?=
+ =?utf-8?B?RTJkTmFOcHVxeStWYSt1Q0J5b09wejFheFJQdkVqaE5KVXlvaDN1VFUxYytH?=
+ =?utf-8?B?d1ZMbDlNSTNhSWkxd2lRWTJ1bWtLcno3NjhOelNMUjZlQ1BIdjFLWkk1V1Jj?=
+ =?utf-8?B?RkpORDBseHY2UzhtQ1Jma3JISmdCTmdwU3lYVklZSERaRjVmcmRZSlJuTEVD?=
+ =?utf-8?B?bVFqTHBEUjYwMHNMVG42c0dROFlpSmdSWEI4R2drc0lycmdQdmR2aFRMSnhJ?=
+ =?utf-8?B?dlJvdmJlekFyaXZhYlRKbDJMb0Z1dmhsekhIRkRPMGZob1Y1MkQyM0ZpNU1S?=
+ =?utf-8?B?STVGcitxeFdPNDJTdmhvaU5MU0ZOM2JJakk2RWpkTU1RU2d4elloaXZQMUh0?=
+ =?utf-8?B?V0RNSitnNmFncWRyQkUzU2VIeXBzRkZoYmx6ZStuck9OcFQrMUVxVWVWTnpW?=
+ =?utf-8?B?YmJvU0grUFlLTE1pT24xcTA5UExaVVJNcTRSYmVWWk9qWVdkRVFMN01HNHB6?=
+ =?utf-8?B?MzBWNURFTVRVdTlKbEFOZTh6U29OK3lqcTB4KzhKSGJyM3RGVFFESENWNVdH?=
+ =?utf-8?B?M0JYcGdIZmw3TnhLU0lsbU5NYS9pb1dlQmhub3hCU0kyUXpvbGtUZjNKbDZI?=
+ =?utf-8?B?c0s3c0JpaWlvQmpSdjB3cGZLaFV6ZDY2OEZzVU16STR3a2dEQXBvcUl4YmZp?=
+ =?utf-8?B?Zk4wR1pjb0NyeWoxT09sbUFQaXFYT3hyTGpZeHdVbjI4QWYyejIybE9XMGlJ?=
+ =?utf-8?B?dDZxem5La2VnK01pY1VhQlE3L1A0ZkduSGFpaE5vVWh1YlZocFJEd1hMaWZH?=
+ =?utf-8?B?K2FMUUhvaVhPcHplQ1oxanBiOXFiZVdORGx1ei9KUDFVZTBCN1lHQk9BT1F3?=
+ =?utf-8?B?dDNlTkFqMkQ2dVU3enFJWllTRThvbWJaNkUrVXBUVURqdHh6dHM5ek5HK2F2?=
+ =?utf-8?Q?crExsggHQdCu8BMJNzWorxZHr?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f2d53acb-c5ab-4b66-21f1-08ddbf7f13e3
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB9194.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jul 2025 06:57:47.3741
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: tbkrabhUyaYIHnMjLD9gnM04YFXwRIj5tpGldIqkNWo48wqEgEip/cBzOvc8QEh7vV1PbVa8LSLuMClcAy+02w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB9243
 
-On Mon, Jul 07, 2025 at 11:49:34AM -0700, Sean Christopherson wrote:
-> On Mon, Jun 30, 2025, Keir Fraser wrote:
-> > On Tue, Jun 24, 2025 at 08:11:49AM -0700, Sean Christopherson wrote:
-> > > +Li
-> > > 
-> > > On Tue, Jun 24, 2025, Keir Fraser wrote:
-> > > > Device MMIO registration may happen quite frequently during VM boot,
-> > > > and the SRCU synchronization each time has a measurable effect
-> > > > on VM startup time. In our experiments it can account for around 25%
-> > > > of a VM's startup time.
-> > > > 
-> > > > Replace the synchronization with a deferred free of the old kvm_io_bus
-> > > > structure.
-> > > > 
-> > > > Signed-off-by: Keir Fraser <keirf@google.com>
-> > > > ---
-> > > >  include/linux/kvm_host.h |  1 +
-> > > >  virt/kvm/kvm_main.c      | 10 ++++++++--
-> > > >  2 files changed, 9 insertions(+), 2 deletions(-)
-> > > > 
-> > > > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> > > > index 3bde4fb5c6aa..28a63f1ad314 100644
-> > > > --- a/include/linux/kvm_host.h
-> > > > +++ b/include/linux/kvm_host.h
-> > > > @@ -205,6 +205,7 @@ struct kvm_io_range {
-> > > >  struct kvm_io_bus {
-> > > >  	int dev_count;
-> > > >  	int ioeventfd_count;
-> > > > +	struct rcu_head rcu;
-> > > >  	struct kvm_io_range range[];
-> > > >  };
-> > > >  
-> > > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > > > index eec82775c5bf..b7d4da8ba0b2 100644
-> > > > --- a/virt/kvm/kvm_main.c
-> > > > +++ b/virt/kvm/kvm_main.c
-> > > > @@ -5924,6 +5924,13 @@ int kvm_io_bus_read(struct kvm_vcpu *vcpu, enum kvm_bus bus_idx, gpa_t addr,
-> > > >  }
-> > > >  EXPORT_SYMBOL_GPL(kvm_io_bus_read);
-> > > >  
-> > > > +static void __free_bus(struct rcu_head *rcu)
-> > > > +{
-> > > > +	struct kvm_io_bus *bus = container_of(rcu, struct kvm_io_bus, rcu);
-> > > > +
-> > > > +	kfree(bus);
-> > > > +}
-> > > > +
-> > > >  int kvm_io_bus_register_dev(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
-> > > >  			    int len, struct kvm_io_device *dev)
-> > > >  {
-> > > > @@ -5962,8 +5969,7 @@ int kvm_io_bus_register_dev(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
-> > > >  	memcpy(new_bus->range + i + 1, bus->range + i,
-> > > >  		(bus->dev_count - i) * sizeof(struct kvm_io_range));
-> > > >  	rcu_assign_pointer(kvm->buses[bus_idx], new_bus);
-> > > > -	synchronize_srcu_expedited(&kvm->srcu);
-> > > > -	kfree(bus);
-> > > > +	call_srcu(&kvm->srcu, &bus->rcu, __free_bus);
-> > > 
-> > > I'm 99% certain this will break ABI.  KVM needs to ensure all readers are
-> > > guaranteed to see the new device prior to returning to userspace.
-> > 
-> > I'm not sure I understand this. How can userspace (or a guest VCPU) know that
-> > it is executing *after* the MMIO registration, except via some form of
-> > synchronization or other ordering of its own? For example, that PCI BAR setup
-> > happens as part of PCI probing happening early in device registration in the
-> > guest OS, strictly before the MMIO region will be accessed. Otherwise the
-> > access is inherently racy against the registration?
+
+
+On 1/7/25 00:19, Vishal Annapurve wrote:
+> On Sun, Jun 29, 2025 at 5:19 PM Alexey Kardashevskiy <aik@amd.com> wrote:
+>> ...
+>>>>> ============================
+>>>>>
+>>>>> For IOMMU, could something like below work?
+>>>>>
+>>>>> * A new UAPI to bind IOMMU FDs with guest_memfd ranges
+>>>>
+>>>> Done that.
+>>>>
+>>>>> * VFIO_DMA_MAP/UNMAP operations modified to directly fetch pfns from
+>>>>> guest_memfd ranges using kvm_gmem_get_pfn()
+>>>>
+>>>> This API imho should drop the confusing kvm_ prefix.
+>>>>
+>>>>>        -> kvm invokes kvm_gmem_is_private() to check for the range
+>>>>> shareability, IOMMU could use the same or we could add an API in gmem
+>>>>> that takes in access type and checks the shareability before returning
+>>>>> the pfn.
+>>>>
+>>>> Right now I cutnpasted kvm_gmem_get_folio() (which essentially is filemap_lock_folio()/filemap_alloc_folio()/__filemap_add_folio()) to avoid new links between iommufd.ko and kvm.ko. It is probably unavoidable though.
+>>>
+>>> I don't think that's the way to avoid links between iommufd.ko and
+>>> kvm.ko. Cleaner way probably is to have gmem logic built-in and allow
+>>> runtime registration of invalidation callbacks from KVM/IOMMU
+>>> backends. Need to think about this more.
+>>
+>> Yeah, otherwise iommufd.ko will have to install a hook in guest_memfd (==kvm.ko) in run time so more beloved symbol_get() :)
+>>
+>>>
+>>>>
+>>>>
+>>>>> * IOMMU stack exposes an invalidation callback that can be invoked by
+>>>>> guest_memfd.
+>>>>>
+>>>>> Private to Shared conversion via kvm_gmem_convert_range() -
+>>>>>        1) guest_memfd invokes kvm_gmem_invalidate_begin() for the ranges
+>>>>> on each bound memslot overlapping with the range
+>>>>>         2) guest_memfd invokes kvm_gmem_convert_should_proceed() which
+>>>>> actually unmaps the KVM SEPT/NPT entries.
+>>>>>               -> guest_memfd invokes IOMMU invalidation callback to zap
+>>>>> the secure IOMMU entries.
+>>>>>         3) guest_memfd invokes kvm_gmem_execute_work() which updates the
+>>>>> shareability and then splits the folios if needed
+>>>>>         4) Userspace invokes IOMMU map operation to map the ranges in
+>>>>> non-secure IOMMU.
+>>>>>
+>>>>> Shared to private conversion via kvm_gmem_convert_range() -
+>>>>>        1) guest_memfd invokes kvm_gmem_invalidate_begin() for the ranges
+>>>>> on each bound memslot overlapping with the range
+>>>>>         2) guest_memfd invokes kvm_gmem_convert_should_proceed() which
+>>>>> actually unmaps the host mappings which will unmap the KVM non-seucure
+>>>>> EPT/NPT entries.
+>>>>>             -> guest_memfd invokes IOMMU invalidation callback to zap the
+>>>>> non-secure IOMMU entries.
+>>>>>         3) guest_memfd invokes kvm_gmem_execute_work() which updates the
+>>>>> shareability and then merges the folios if needed.
+>>>>>         4) Userspace invokes IOMMU map operation to map the ranges in secure IOMMU.
+>>>>
+>>>>
+>>>> Alright (although this zap+map is not necessary on the AMD hw).
+>>>
+>>> IMO guest_memfd ideally should not directly interact or cater to arch
+>>> specific needs, it should implement a mechanism that works for all
+>>> archs. KVM/IOMMU implement invalidation callbacks and have all the
+>>> architecture specific knowledge to take the right decisions.
+>>
+>>
+>> Every page conversion will go through:
+>>
+>> kvm-amd.ko -1-> guest_memfd (kvm.ko) -2-> iommufd.ko -3-> amd-iommu (build-in).
+>>
+>> Which one decides on IOMMU not needing (un)mapping? Got to be (1) but then it need to propagate the decision to amd-iommu (and we do not have (3) at the moment in that path).
 > 
-> Yes, guest software needs its own synchronization.  What I am pointing out is that,
-> very strictly speaking, KVM relies on synchronize_srcu_expedited() to ensure that
-> KVM's emulation of MMIO accesses are correctly ordered with respect to the guest's
-> synchronization.
+> If there is a need, guest_memfd can support two different callbacks:
+> 1) Conversion notifier/callback invoked by guest_memfd during
+> conversion handling.
+> 2) Invalidation notifier/callback invoked by guest_memfd during truncation.
 > 
-> It's legal, though *extremely* uncommon, for KVM to emulate large swaths of guest
-> code, including emulated MMIO accesses.  If KVM grabs kvm->buses at the start of
-> an emulation block, and then uses that reference to resolve MMIO, it's theoretically
-> possible for KVM to mishandle an access due to using a stale bus.
-
-But it doesn't do that? I think I understand now though that you are
-concerned about the buses API exposed to the kernel at large. And yes
-I see this would be a problem for example if a kvm_get_bus() return
-value was cached.
-
-Will and I also had a brainstorm in the office and theorised that a
-really "smart" compiler might somehow unroll
-handle_invalid_guest_state() 130 times and hoist all the READ_ONCE()s
-of the bus to the start. It's impractical, even likely impossible, but
-we couldn't outright say it's disallowed by the current enforcements
-in the KVM subsystem itself.
-
-> Today, such scenarios are effectively prevented by synchronize_srcu_expedited().
-> Using kvm->buses outside of SRCU protection would be a bug (per KVM's locking
-> rules), i.e. a large emulation block must take and hold SRCU for its entire
-> duration.  And so waiting for all SRCU readers to go away ensures that the new
-> kvm->buses will be observed if KVM starts a new emulation block.
-
-Understood. Yes that does make the current code definitely safe in
-this regard, just slow!
-
-> AFAIK, the only example of such emulation is x86's handle_invalid_guest_state().
-> And in practice, it's probably impossible for the compiler to keep a reference to
-> kvm->buses across multiple invocations of kvm_emulate_instruction() while still
-> honoring the READ_ONCE() in __rcu_dereference_check().
-
-That certainly stops compiler reordering. But I think I now agree with
-your concern about needing an actual memory barrier. I am worried for
-example if the guest is relying on an address dependency to
-synchronise an MMIO access. For example:
-     data = READ_ONCE(*READ_ONCE(mmio_base_addr));
-
-Two loads, ordered by address dependency. But that dependency would
-not prevent the access to kvm->buses[idx] from being
-hoisted/speculated by the CPU, since it's not data-dependent on the
-preceding load...
-
-That said, on x86, loads are ordered anyway.
-
-> But I don't want to simply drop KVM's synchronization, because we need a rule of
-> some kind to ensure correct ordering, even if it's only for documentation purposes
-> for 99% of cases.  And because the existence of kvm_get_bus() means that it would
-> be possible for KVM to grab a long-term reference to kvm->buses and use it across
-> emulation of multiple instructions (though actually doing that would be all kinds
-> of crazy).
-
-That seems reasonable, in terms of maintaining a fool-proof API to kvm->buses.
-
+> Iommufd/kvm can handle conversion callback/notifier as per the needs
+> of underlying architecture. e.g. for TDX connect do the unmapping vs
+> for SEV Trusted IO skip the unmapping.
 > 
-> > > I'm quite confident there are other flows that rely on the synchronization,
-> > > the vGIC case is simply the one that's documented.
-> > 
-> > If they're in the kernel they can be fixed? If necessary I'll go audit the callers.
+> Invalidation callback/notifier will need to be handled by unmapping page tables.
 > 
-> Yes, I'm sure there's a solution.  Thinking more about this, you make a good
-> point that KVM needs to order access with respect to instruction execution, not
-> with respect to the start of KVM_RUN.
+>>
+>> Or we just always do unmap+map (and trigger unwanted page huge page smashing)? All is doable and neither particularly horrible, I'm trying to see where the consensus is now. Thanks,
+>>
 > 
-> For all intents and purposes, holding kvm->srcu across VM-Enter/VM-Exit is
-> disallowed (though I don't think this is formally documented), i.e. every
-> architecture is guaranteed to do srcu_read_lock() after a VM-Exit, prior to
-> reading kvm->buses.  And srcu_read_lock() contains a full smp_mb(), which ensures
-> KVM will get a fresh kvm->buses relative to the instruction that triggered the
-> exit.
+> I assume when you say huge page smashing, it means huge page NPT
+> mapping getting split.
 > 
-> So for the common case of one-off accesses after a VM-Exit, I think we can simply
-> add calls to smp_mb__after_srcu_read_lock() (which is a nop on all architectures)
-> to formalize the dependency on reacquiring SRCU.  AFAICT, that would also suffice
-> for arm64's use of kvm_io_bus_get_dev().  And then add an explicit barrier of some
-> kind in handle_invalid_guest_state()?
-> 
-> Then to prevent grabbing long-term references to a bus, require kvm->slots_lock
-> in kvm_get_bus() (and special case the kfree() in VM destruction).
-> 
-> So something like this?  I think the barriers would pair with the smp_store_release()
-> in rcu_assign_pointer()?
+> AFAIR, based on discussion with Michael during guest_memfd calls,
+> stage2 NPT entries need to be of the same granularity as RMP tables
+> for AMD SNP guests. i.e. huge page NPT mappings need to be smashed on
+> the KVM side during conversion. So today guest_memfd sends
+> invalidation notification to KVM for both conversion and truncation.
+> Doesn't the same constraint for keeping IOMMU page tables at the same
+> granularity as RMP tables hold for trusted IO?
 
-It would certainly mean that kvm->buses would be accessed *after* any
-preceding vCPU memory access. Including any that "observed" the
-newly-registered IO region, somehow (lock acquisition, read of a flag
-or base address, or whatever).
 
-Would it be satisfactory to put a patch along the lines of your
-suggestions below into a v2 of this patch series? I have made some
-comments below.
+Currently I handle this from the KVM with a hack to get IOPDE from AMD IOMMU so both 2MB RMP entry and IOPDE entries are smashed in one go in one of many firmwares running on EPYC, and atm this is too hacky to be posted even as an RFC. This likely needs to move to IOMMUFD then (via some callbacks) which could call AMD IOMMU which then would call that firmware (called "TMPM" and it is not the PSP which is "TSM), probably. Thanks,
 
-> 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 4953846cb30d..057fb4ce66b0 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -5861,6 +5861,9 @@ static int handle_invalid_guest_state(struct kvm_vcpu *vcpu)
->                 if (kvm_test_request(KVM_REQ_EVENT, vcpu))
->                         return 1;
->  
-> +               /* Or maybe smp_mb()?  Not sure what this needs to be. */
-> +               barrier();
-> +
 
-Looks weak but maybe strong enough for x86? Maybe smp_rmb() would be better statement of intention?
 
->                 if (!kvm_emulate_instruction(vcpu, 0))
->                         return 0;
->  
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 3bde4fb5c6aa..066438b6571a 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -967,9 +967,8 @@ static inline bool kvm_dirty_log_manual_protect_and_init_set(struct kvm *kvm)
->  
->  static inline struct kvm_io_bus *kvm_get_bus(struct kvm *kvm, enum kvm_bus idx)
->  {
-> -       return srcu_dereference_check(kvm->buses[idx], &kvm->srcu,
-> -                                     lockdep_is_held(&kvm->slots_lock) ||
-> -                                     !refcount_read(&kvm->users_count));
-> +       return rcu_dereference_protected(kvm->buses[idx],
-> +                                        lockdep_is_held(&kvm->slots_lock));
->  }
->  
->  static inline struct kvm_vcpu *kvm_get_vcpu(struct kvm *kvm, int i)
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index eec82775c5bf..7b0e881351f7 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -1228,7 +1228,8 @@ static struct kvm *kvm_create_vm(unsigned long type, const char *fdname)
->  out_err_no_arch_destroy_vm:
->         WARN_ON_ONCE(!refcount_dec_and_test(&kvm->users_count));
->         for (i = 0; i < KVM_NR_BUSES; i++)
-> -               kfree(kvm_get_bus(kvm, i));
-> +               kfree(rcu_dereference_check(kvm->buses[i], &kvm->srcu,
-> +                                           !refcount_read(&kvm->users_count));
+-- 
+Alexey
 
-srcu_dereference_check()
-
->         kvm_free_irq_routing(kvm);
->  out_err_no_irq_routing:
->         cleanup_srcu_struct(&kvm->irq_srcu);
-> @@ -5847,6 +5848,9 @@ int kvm_io_bus_write(struct kvm_vcpu *vcpu, enum kvm_bus bus_idx, gpa_t addr,
->                 .len = len,
->         };
->  
-> +       /* comment goes here */
-> +       smp_mb__after_srcu_read_lock();
-> +
->         bus = srcu_dereference(vcpu->kvm->buses[bus_idx], &vcpu->kvm->srcu);
->         if (!bus)
->                 return -ENOMEM;
-> @@ -5866,6 +5870,9 @@ int kvm_io_bus_write_cookie(struct kvm_vcpu *vcpu, enum kvm_bus bus_idx,
->                 .len = len,
->         };
->  
-> +       /* comment goes here */
-> +       smp_mb__after_srcu_read_lock();
-> +
->         bus = srcu_dereference(vcpu->kvm->buses[bus_idx], &vcpu->kvm->srcu);
->         if (!bus)
->                 return -ENOMEM;
-> @@ -6025,6 +6032,9 @@ struct kvm_io_device *kvm_io_bus_get_dev(struct kvm *kvm, enum kvm_bus bus_idx,
->  
->         srcu_idx = srcu_read_lock(&kvm->srcu);
->  
-> +       /* comment goes here */
-> +       smp_mb__after_srcu_read_lock();
-> +
->         bus = srcu_dereference(kvm->buses[bus_idx], &kvm->srcu);
->         if (!bus)
->                 goto out_unlock;
-> 
-> 
-
-I guess kvm_io_bus_read() is to be done as well? Perhaps the barrier
-and dereference should be pulled into a helper with the comment, just
-in one place?
-
- -- Keir (with thanks to Will for brainstorming!)
- 
 
