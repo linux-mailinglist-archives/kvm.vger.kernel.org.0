@@ -1,107 +1,127 @@
-Return-Path: <kvm+bounces-52033-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52034-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E1D5B0003F
-	for <lists+kvm@lfdr.de>; Thu, 10 Jul 2025 13:13:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88962B00093
+	for <lists+kvm@lfdr.de>; Thu, 10 Jul 2025 13:29:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 98CE25A7591
-	for <lists+kvm@lfdr.de>; Thu, 10 Jul 2025 11:13:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 46CB41BC160E
+	for <lists+kvm@lfdr.de>; Thu, 10 Jul 2025 11:30:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B111D2E11B6;
-	Thu, 10 Jul 2025 11:13:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9F332E5417;
+	Thu, 10 Jul 2025 11:29:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i67cN5Zb"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="Gxx2HqAt"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA2D4219E8D;
-	Thu, 10 Jul 2025 11:13:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3BAA944F;
+	Thu, 10 Jul 2025 11:29:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752145997; cv=none; b=ujsGQshCQpj2R0jOJdgo7cbVcLjB5ssXaFI3LOFoo2ryj/ipB4qp9gXXjU5ne7D4wVQcW38cMdjBFeTvP2kJNaHnN3kBh+hHe7s1bxunmQVJ9lI/QNZexg51tzk3vgyFARFgY47IZH7swAtJRqL866tOXFIIS/B9Q6yjlDwNaIw=
+	t=1752146980; cv=none; b=pdA38mMZvsNzvBDamEzXL1wivcbywY3xy3aBLCGBugPhgvml825oN5U4UhlNSfBIz60ZTdcG2nmCk0Vo7JLbvhtqZUiGqAjRHq15CcycpEpLVM6TLMW2IXogWRgru8740OaSmeIzEuk8cFRsb6uGAzRTJPXd74VDmlVoXU7z4Nc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752145997; c=relaxed/simple;
-	bh=fCMFwl6Oa7Wwc2XvpmzD1mwe0tkqTEL6NM+Z25HU34w=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=fXcOXMoADYd9nDO4z3E/cEkvBRFw1GRh0dxyJwuU8SjTDorRzhgwxyqERtxLSgRl7j/m0d9TUZjNVnD++jtKCypBKPSjgEKgQq7DXgslTDKyvJNpiiJxF4HbLIm0YUpTTlh6z1KrJYa7wEomZKwEqZctOE/r3b5pyz4m8uNmCos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i67cN5Zb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2C53C4CEF5;
-	Thu, 10 Jul 2025 11:13:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752145997;
-	bh=fCMFwl6Oa7Wwc2XvpmzD1mwe0tkqTEL6NM+Z25HU34w=;
-	h=From:Date:Subject:To:Cc:From;
-	b=i67cN5ZbNoDe/jqjQnZYTWyFqQH50gksbF036qEU3JKLHZ2KAD2ErKmJgIjqev+VV
-	 29cbgSrYABAOXv42x+s+0GNKXLVw5lKu2kpTGSAohZZl7i4G3EtRjiEfMZHR/ofjH5
-	 vHO9g7cQ0pyryGPqD61AfRUNmoHTbbq8zoqjvmyf+oZxL/CSJaV6K51yic92/Qeh0m
-	 HS/VcYGMEeJYNXBE4GixHapnsaC/U3eFsMIpdwmcnBZ1yQLpGD/WHusFtpOh+Q8AgS
-	 5Fd2P9UGpRtHB5HOSOlfPyWTAFcZEdfHYOO9ygdArQ5lCBAbfGFn2jtRasxpHN1GIS
-	 DM68A1yvraTOA==
-From: Mark Brown <broonie@kernel.org>
-Date: Thu, 10 Jul 2025 12:12:20 +0100
-Subject: [PATCH] KVM: selftests: Add CONFIG_EVENTFD for irqfd selftest
+	s=arc-20240116; t=1752146980; c=relaxed/simple;
+	bh=sDvvwgksakgq1MqUj25WTBeUoKn2iNnomLd7Pz5rxXo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bjiNxanqA5WPz3gf2Z7zaUFJe9r6vilsQpPJYBRSEWJQYmDoSu6/9qGuiKIPiMH1rBCNesshekBRvic9E5meaVLq3P28a3YsA7CFgSL1JUjLQpabt+lJgSQcgvKyzlZOpV4btaH49Ud+zn6RnfmTmOYajvg9a3x21zWqjHPL544=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=Gxx2HqAt; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 6369D40E020E;
+	Thu, 10 Jul 2025 11:29:33 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id A2zW3RKcDLpp; Thu, 10 Jul 2025 11:29:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1752146969; bh=rz8G5mq5LEqN6TYjqrNYUDOCAUTijX5k1pmbJpMz6Wo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Gxx2HqAt2d7wKhrw8qlXYmeSAXd4/gkw6ItvVB03Muzq83pesnZBOdnMprWCPwYjG
+	 k1qNqreeCMZPLMvlku5bg0vHS6JPw1K/RcsAv6r7QV+LVYH/banXQ1/Y16aluIvtM6
+	 Z4ptd4CYVBDSX0l5TNYKaZUAD3RqKb98oW8ydzRLCujZhjLiDDlQgnI38UO5cYzih2
+	 qQEc9XoPyXo877fkwmIehL3nQLAVmYrBqpfILk8KAtNtUPSATeKmK53rwi4kGjOkQb
+	 YizHosSyl5WrCqmzxO2wk5FUU64gctO1lGcJXaAX5zU25vANQiM/hTdii11QBdKu8u
+	 enBHAoJF4MqUS26CNU5lKoZVNLRC2wmssH+KSS1frBS5a6GhTnpGblW4n2RR/VwhnN
+	 8WL+5MacS2wpFxXg0Y0OkAT9nCydML3orMjTV5rxmJYoT7zgDlZ14VSByU/E2YwvVe
+	 bWb/GlHW2r7Go8gU2Y5N4VJcumPFXCbOKyLJp++e9m5lyE+UjAR2IiTMmS/tJWWfLT
+	 xD5Zez9BWA5eQNUOfwgeC2o7rjnUoxEcTC+WKiynpeHRpLkFxDv74wiS7HuoKUA7O2
+	 OYXszMq9ZMg1t/sCUDsTzf+VddiNxtHp3NorcXff1rsF3je1SBOCsqgeirdXDeJ4tW
+	 heQxpPz7qMMsD8sr7S4nGtHM=
+Received: from zn.tnic (p57969c58.dip0.t-ipconnect.de [87.150.156.88])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 79A2D40E0169;
+	Thu, 10 Jul 2025 11:29:08 +0000 (UTC)
+Date: Thu, 10 Jul 2025 13:29:02 +0200
+From: Borislav Petkov <bp@alien8.de>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
+	Kevin Loughlin <kevinloughlin@google.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	Kai Huang <kai.huang@intel.com>, Ingo Molnar <mingo@kernel.org>,
+	Zheyun Shen <szy0127@sjtu.edu.cn>,
+	Mingwei Zhang <mizhang@google.com>,
+	Francesco Lavra <francescolavra.fl@gmail.com>
+Subject: Re: [PATCH v3 3/8] x86, lib: Add WBNOINVD helper functions
+Message-ID: <20250710112902.GCaG-j_l-K6LYRzZsb@fat_crate.local>
+References: <20250522233733.3176144-1-seanjc@google.com>
+ <20250522233733.3176144-4-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250710-kvm-selftests-eventfd-config-v1-1-78c276e4b80f@kernel.org>
-X-B4-Tracking: v=1; b=H4sIABOgb2gC/x3MSwqDQAwA0KtI1g3EVJH2KqULP4kG27FMhkEQ7
- 97B5du8A1yiicOzOiBKNrctFNS3CsalD7OgTcXAxC119MA1f9Hlo0k8OUqWkHTCcQtqM9Z8HwZ
- i1p4aKMUvitp+9a/3ef4Bpycq6G4AAAA=
-X-Change-ID: 20250709-kvm-selftests-eventfd-config-123bb022fa04
-To: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>
-Cc: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Mark Brown <broonie@kernel.org>
-X-Mailer: b4 0.15-dev-07fe9
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1001; i=broonie@kernel.org;
- h=from:subject:message-id; bh=fCMFwl6Oa7Wwc2XvpmzD1mwe0tkqTEL6NM+Z25HU34w=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBob6BLebvS2hzgRttjOHmgmDaPDjFiJuGaolRni
- SApdh0D+0uJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCaG+gSwAKCRAk1otyXVSH
- 0JJEB/9/0Zr9vUk2isLoTJ42gYIKHIod1FJ9lnc334JElWb5/rhVM65dOb58xb1Tpf5UUdXh13I
- I1uWo5raNoM5QB5KMfYLgrHqbLih1w8B5T66ZDoncwUNFNRnYsdgyRhnQQeJzIU4J6Ce/LUKpZ+
- yjjosFgrjatnNNCRnAoq2Zlg5XbM2sCs+9bSAVn8xIArJfIEKa1g5ZHhYwSXQUOrsA0GH50WT/F
- 468nnOizUpRjwM1K+rq84Cgc2sPO+WdLLKsBPsWiWwULRzgYwoZQhNHfSx4bmxJMAkIWwc7ffeW
- PeV8+f51XaF6RdUfJbF2L9VyHtKu8T1qNJdx6pcsah+DpuSw
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250522233733.3176144-4-seanjc@google.com>
 
-In 7e9b231c402a ("KVM: selftests: Add a KVM_IRQFD test to verify
-uniqueness requirements") we added a test for the newly added irqfd
-support but since this feature works with eventfds it won't work unless
-the kernel has been built wth eventfd support.  Add CONFIG_EVENTFD to
-the list of required options for the KVM selftests.
+On Thu, May 22, 2025 at 04:37:27PM -0700, Sean Christopherson wrote:
+> diff --git a/arch/x86/lib/cache-smp.c b/arch/x86/lib/cache-smp.c
+> index 079c3f3cd32c..1789db5d8825 100644
+> --- a/arch/x86/lib/cache-smp.c
+> +++ b/arch/x86/lib/cache-smp.c
+> @@ -19,3 +19,14 @@ void wbinvd_on_all_cpus(void)
+>  	on_each_cpu(__wbinvd, NULL, 1);
+>  }
+>  EXPORT_SYMBOL(wbinvd_on_all_cpus);
+> +
+> +static void __wbnoinvd(void *dummy)
+> +{
+> +	wbnoinvd();
+> +}
+> +
+> +void wbnoinvd_on_all_cpus(void)
+> +{
+> +	on_each_cpu(__wbnoinvd, NULL, 1);
+> +}
+> +EXPORT_SYMBOL(wbnoinvd_on_all_cpus);
 
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
- tools/testing/selftests/kvm/config | 1 +
- 1 file changed, 1 insertion(+)
+If there's no particular reason for the non-GPL export besides being
+consistent with the rest - yes, I did the change for wbinvd_on_all_cpus() but
+that was loooong time ago - I'd simply make this export _GPL.
 
-diff --git a/tools/testing/selftests/kvm/config b/tools/testing/selftests/kvm/config
-index 8835fed09e9f..96d874b239eb 100644
---- a/tools/testing/selftests/kvm/config
-+++ b/tools/testing/selftests/kvm/config
-@@ -1,5 +1,6 @@
- CONFIG_KVM=y
- CONFIG_KVM_INTEL=y
- CONFIG_KVM_AMD=y
-+CONFIG_EVENTFD=y
- CONFIG_USERFAULTFD=y
- CONFIG_IDLE_PAGE_TRACKING=y
+Thx.
 
----
-base-commit: 7e9b231c402a297251b3e6e0f5cc16cef7dd3ce5
-change-id: 20250709-kvm-selftests-eventfd-config-123bb022fa04
+-- 
+Regards/Gruss,
+    Boris.
 
-Best regards,
---  
-Mark Brown <broonie@kernel.org>
-
+https://people.kernel.org/tglx/notes-about-netiquette
 
