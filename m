@@ -1,175 +1,131 @@
-Return-Path: <kvm+bounces-52038-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52039-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9238CB0035D
-	for <lists+kvm@lfdr.de>; Thu, 10 Jul 2025 15:30:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33E59B003A7
+	for <lists+kvm@lfdr.de>; Thu, 10 Jul 2025 15:37:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1D06D1C46D59
-	for <lists+kvm@lfdr.de>; Thu, 10 Jul 2025 13:31:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F0A4F5A0424
+	for <lists+kvm@lfdr.de>; Thu, 10 Jul 2025 13:35:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C76B25A33E;
-	Thu, 10 Jul 2025 13:30:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12B5A264F9B;
+	Thu, 10 Jul 2025 13:34:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="YXS1MaOk"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="z1FVPxqw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40D9A258CF6
-	for <kvm@vger.kernel.org>; Thu, 10 Jul 2025 13:30:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8C1D25B305
+	for <kvm@vger.kernel.org>; Thu, 10 Jul 2025 13:34:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752154245; cv=none; b=TqKdl8ef88Dyuc/Pot6/ExFo0pEDPZ9F8ry1IMqwieattPOcP4HX0xRLvwUeTtL+a84k0MaeYuHXNCNEvVhAfZRnlPJq3K2IXXhogQpReKdfXApW4GkYrS1Zqlm7rN3cPetTteh6bLTVo9ii6UX01rbhFyH4hS5fPWKzya4MKUk=
+	t=1752154460; cv=none; b=aDUiCJDx11UnGG7aWN1ZHCYtEoN+pGDGYlrqeowx/F3QLfj0EwFp1qd9fIe8GNr/DuhDx1PqeFouYaRscoEmBwNjgbuqCbsZCJrO1n0hM7Y2lo0HtnTTDFqBCGhBsie/Sxp83FfuRI7k2zjCg+/Gf0mNKveVvz3vGk4ih7qQtbM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752154245; c=relaxed/simple;
-	bh=6cJe+9YLwNrTwWDQYUOtkNfP4N7/9YXpdhwaVt+OH4o=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=VXe4SuHXYS3vq/YeorSCJjJOUhRTS3tHPDs5D1T4NV5dwIao3tWrKwVjTf96eIo/yHnXWNobZcQB+o5kzlEBgM+g15OskteDz4x9PWIPeSQhDlIrEV+JjzKV18DDOwIfRIQOdRpQ3K7CvRQ3IcmMXR6FGRPORVSwNAnh49gIwFo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=YXS1MaOk; arc=none smtp.client-ip=209.85.210.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-74b54cead6cso706976b3a.1
-        for <kvm@vger.kernel.org>; Thu, 10 Jul 2025 06:30:42 -0700 (PDT)
+	s=arc-20240116; t=1752154460; c=relaxed/simple;
+	bh=PdnAmJI/ibMqf5UpOzfaxAEl/qpkrqa532gIvvDVcpM=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=rENZvqMrviqBcJc4IOwbWq+fTiO7vNWyXdhHtIurkB8kV/w+Q5CbTsZy5FK/SdDQnARNb4PlQJA1689gQwiZKkiFDmYpB2htYgdjXGCdYz5izhlgtq0+P2qv/9/C2CzVnTZoounlXWeozNGLSX8AUT4Pxb74dZoPo36UfZy9Y2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=z1FVPxqw; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-748f3613e6aso534602b3a.0
+        for <kvm@vger.kernel.org>; Thu, 10 Jul 2025 06:34:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1752154242; x=1752759042; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=gSBRru92EdCdQV6HwNa+ZCQ/jNa0Vw05HCx0FcTUBpY=;
-        b=YXS1MaOk5QDe7t3fFDXsU0qT6IuOTEF1vqOPcnL/XL5XO1EEntwCGz6SqUyeMoPQhl
-         /5qvHXY6XTRgh+WiXIXPNR/PQcqJdwfc6pj7w+1/cMlkujBlHXmXEsxTTvo+Pf116AR6
-         kujTydwQFVsn1sMW6m6rDjas4RWUJSuilEWzJPEH3iJcGayuSgIw4rOBjRyPZ223Zj1f
-         5GRYryE/I4hqQXfDU2Yzu7yaFBGZ3U2D5jHzL2IDk7DK+p71NoDAV3Re5YBEVpl6GV5H
-         +CHUxtKaYBC67q5UOJiq+bi5sqWgUUtXIDeinvV9qwcQnc4ja5VmCo8dsMb/m265DpCv
-         8n8w==
+        d=google.com; s=20230601; t=1752154457; x=1752759257; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=wr3J+RHblG5GJaM0j5JuIylNt4iRFZX8BEhZw6kzZM4=;
+        b=z1FVPxqwrNaV2BBJYvZLJjwV37OOefCjESZxdpighHDipB39hacMw/RI1wFGYy0ZM1
+         O/H0cvbbqATu/BcsfSIhrgeQme/M14d6v8IYZp68VM7sVJ1rnWa8NDNeedUAWOKaYAhP
+         6pc7DCuLn2lVKvRVSp4fEH6iejlyOqJZdtGvNMUx30SLDnLb28mOCNIKrvqnr73vsGag
+         w4sbaM3NvLJMi6x1uaogGg4lwf4ARl3e9bU3M5usM17xE8LTqJQGt0qsmyUo6tViA0BL
+         bH8nE7F1/mSs4HWLr8xVCAXZVNyPCQ5hTT4Y9BAIjCZoalk4vC+/iKl1PjmfW2KT9vYJ
+         V+8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752154242; x=1752759042;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gSBRru92EdCdQV6HwNa+ZCQ/jNa0Vw05HCx0FcTUBpY=;
-        b=kLrcqPaMmlEv3WsZPWsngWEo16JHvgJZVf4a9HYfOKdeOOkKBU9DSOqrEKBtMiGrSP
-         /t3zIEaoNmdVYE1cTLeT7LptIe4vqVU/n0Dym5cwjmOKcU6XoMfyryIpQl/eWTHj/ORR
-         tLXjKUxZU2ULs2Q0T7DO5wCUzc6ck5/Vj7N6G1TrkjxoDlKW3U+OHO4rVE0IVrLM8zKE
-         wILLTHoVEdNsxzvfTRm4qPcBmD6+3mB6hQ35rXMAk2E0jMT9+mk5x0RVrVlnmM+UCQH+
-         /9WzoO3O8OHbCWcSckI9TnkSGYysodu0EUMd8rWLOLoC/ZHr8xWRJmyxqPDeDO/BEkiv
-         fINA==
-X-Gm-Message-State: AOJu0YwYE+jlDgJhee+tPhgD0wsnvtQSWLgQWcKaBs1sPUq4NKRfgMI7
-	DC4vnP5zeK0G43RO8LNGEAWD3M/MGjKR/EKuLb2v4Dhxtw8fFTi8p8vBZzwWnjWNvJI=
-X-Gm-Gg: ASbGncvitKvsMbQHKT+RcTv4rP7N/dr920D7fXfbI3W/T8qU6Vbv2TcvKJmwkMfaLfN
-	s4R6ZjzkxneDEsgW248gwofezJ7D8lMS/ZTWKYYhgSmAOpYU6/7qt+xVCf6lpydwol3PqMhOnCZ
-	/B+dPax9nqbhrgtgJNmGgdV7WIWg0TQ/GdMNoz/i8z2nD7yzQKIrD//CVPuRpwi/OJ/Hc2Zzwj5
-	pDKMcw5du8SHxvgJFy/2yHDFnKxTivYxR0WhzM1rvJie8gElaUD1KquX3X/HbBrM9Y1ypzTLmn4
-	aEF5sQPnfzX8X0OrxyxakSu5rg2M3+zHUQuqw48ONDhw0g0pEPMsic9wbx7NJ3YNiw4eK8XmD3Y
-	GxKRQQU3kIjG8oLrtWaKwGnDHe98izEWMWIycy40sB49S566aFA==
-X-Google-Smtp-Source: AGHT+IHzdljx762BgYLfxVy1uhiO6LuhOaahxzDQYVaWG7z0trKJ290Cb4AzI3z+szgHVgerISzuBA==
-X-Received: by 2002:a05:6a00:4f8e:b0:749:b9c:1ea7 with SMTP id d2e1a72fcca58-74eb55f4f43mr4292361b3a.17.1752154242363;
-        Thu, 10 Jul 2025 06:30:42 -0700 (PDT)
-Received: from J9GPGXL7NT.bytedance.net ([61.213.176.56])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74eb9f4c9c4sm2334373b3a.126.2025.07.10.06.30.38
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 10 Jul 2025 06:30:41 -0700 (PDT)
-From: Xu Lu <luxu.kernel@bytedance.com>
-To: rkrcmar@ventanamicro.com,
-	cleger@rivosinc.com,
-	anup@brainfault.org,
-	atish.patra@linux.dev,
-	paul.walmsley@sifive.com,
-	palmer@dabbelt.com,
-	aou@eecs.berkeley.edu,
-	alex@ghiti.fr
-Cc: kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org,
-	linux-riscv@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Xu Lu <luxu.kernel@bytedance.com>
-Subject: [PATCH v2] RISC-V: KVM: Delegate kvm unhandled faults to VS mode
-Date: Thu, 10 Jul 2025 21:30:30 +0800
-Message-Id: <20250710133030.88940-1-luxu.kernel@bytedance.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+        d=1e100.net; s=20230601; t=1752154457; x=1752759257;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wr3J+RHblG5GJaM0j5JuIylNt4iRFZX8BEhZw6kzZM4=;
+        b=uDPV2uNLgNZMkxdQY4mnfSkZ6eWNKAeqnFrXHUPVZZ/D3+HUeRd7tdYzup9nciTEeK
+         V9hcg2uPO7jGopqiQECOQe0qwLl5Vu+1Yp8wjTnzmBM1nuYiNgxRTnw9/35AHaN6Kr6+
+         kEwc4li2piwXhtLkFvA+VFRxDRESxT407fSgv1/v2Vx7zQU+sLenxMGRxKgOKWUUwihy
+         gEdmLHmRqIjNEwmuRx2+KC2dkDu2W1QezSkhb3s1x7IxZqUmngV2ph5w2aiy3DzAKjEP
+         z8gB/+X+j+SfxiLIgLS7aNDyHeD31BK2jOd2ZGE9/KHNzbbedZy2WuJfXgCbYPuNIelY
+         aTXQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWu47In3BpDYbrDR6FQWJ1gg0pMrZ7Pz35WyTNhP75WAnZzvAlBQ/VUFG6A2J7/x8EADiM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy+ybkxbeg/lSOQEU9W11Hta2nkYkh1RENf81iWEz+mTgRx/n0x
+	Q0rG8EpJiLE4QIxS/fKfCFgvjOagJ5mIFr1aiyDDcEdMwrWEBZdRKAGtUz6jCZgWQD5cKZ/odxd
+	HtbjihA==
+X-Google-Smtp-Source: AGHT+IGSaHIBRoN/S9txevmPNNTrr4Q5vAkgijLk90fjXn6DImx6okraCPXWwkAGxJiWt5+DBd6m7A0lCUs=
+X-Received: from pfbil5.prod.google.com ([2002:a05:6a00:8d45:b0:748:2476:b25f])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:1789:b0:742:a91d:b2f6
+ with SMTP id d2e1a72fcca58-74eb8f7c144mr4500112b3a.13.1752154457032; Thu, 10
+ Jul 2025 06:34:17 -0700 (PDT)
+Date: Thu, 10 Jul 2025 06:34:15 -0700
+In-Reply-To: <aG9i5BHDHRlFRFnb@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20250624092256.1105524-1-keirf@google.com> <20250624092256.1105524-4-keirf@google.com>
+ <aFrANSe6fJOfMpOC@google.com> <aGJf7v9EQoEZiQUk@google.com>
+ <aGwWvp_JeWe9tIJx@google.com> <aG9i5BHDHRlFRFnb@google.com>
+Message-ID: <aG_BV_tKzqktRlOA@google.com>
+Subject: Re: [PATCH 3/3] KVM: Avoid synchronize_srcu() in kvm_io_bus_register_dev()
+From: Sean Christopherson <seanjc@google.com>
+To: Keir Fraser <keirf@google.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, Eric Auger <eric.auger@redhat.com>, 
+	Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Li RongQing <lirongqing@baidu.com>
+Content-Type: text/plain; charset="us-ascii"
 
-Delegate faults which are not handled by kvm to VS mode to avoid
-unnecessary traps to HS mode. These faults include illegal instruction
-fault, instruction access fault, load access fault and store access
-fault.
+On Thu, Jul 10, 2025, Keir Fraser wrote:
+> On Mon, Jul 07, 2025 at 11:49:34AM -0700, Sean Christopherson wrote:
+> Would it be satisfactory to put a patch along the lines of your
+> suggestions below into a v2 of this patch series?
 
-The delegation of illegal instruction fault is particularly important
-to guest applications that use vector instructions frequently. In such
-cases, an illegal instruction fault will be raised when guest user thread
-uses vector instruction the first time and then guest kernel will enable
-user thread to execute following vector instructions.
+Ya, works for me.
 
-The fw pmu event counters remain undeleted so that guest can still get
-these events via sbi call. Guest will only see zero count on these
-events and know 'firmware' has delegated these faults.
+> I have made some comments below.
+> 
+> > 
+> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> > index 4953846cb30d..057fb4ce66b0 100644
+> > --- a/arch/x86/kvm/vmx/vmx.c
+> > +++ b/arch/x86/kvm/vmx/vmx.c
+> > @@ -5861,6 +5861,9 @@ static int handle_invalid_guest_state(struct kvm_vcpu *vcpu)
+> >                 if (kvm_test_request(KVM_REQ_EVENT, vcpu))
+> >                         return 1;
+> >  
+> > +               /* Or maybe smp_mb()?  Not sure what this needs to be. */
+> > +               barrier();
+> > +
+> 
+> Looks weak but maybe strong enough for x86? Maybe smp_rmb() would be better
+> statement of intention?
 
-Signed-off-by: Xu Lu <luxu.kernel@bytedance.com>
----
- arch/riscv/include/asm/kvm_host.h |  4 ++++
- arch/riscv/kvm/vcpu_exit.c        | 18 ------------------
- 2 files changed, 4 insertions(+), 18 deletions(-)
+Hmm, yeah, smp_rmb() is better.  I was thinking it just needs to be a compiler
+barrier, to ensure KVM reads kvm->buses as needed for each emulated instruction.
+But ignoring that x86 is strongly ordered, KVM also needs to ensure a store to
+kvm->buses that is supposed to be observed by the next guest instruction is fully
+visibile before that instruction executes.
 
-diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
-index 85cfebc32e4cf..e04851cf0115c 100644
---- a/arch/riscv/include/asm/kvm_host.h
-+++ b/arch/riscv/include/asm/kvm_host.h
-@@ -44,7 +44,11 @@
- #define KVM_REQ_STEAL_UPDATE		KVM_ARCH_REQ(6)
- 
- #define KVM_HEDELEG_DEFAULT		(BIT(EXC_INST_MISALIGNED) | \
-+					 BIT(EXC_INST_ACCESS)     | \
-+					 BIT(EXC_INST_ILLEGAL)    | \
- 					 BIT(EXC_BREAKPOINT)      | \
-+					 BIT(EXC_LOAD_ACCESS)     | \
-+					 BIT(EXC_STORE_ACCESS)    | \
- 					 BIT(EXC_SYSCALL)         | \
- 					 BIT(EXC_INST_PAGE_FAULT) | \
- 					 BIT(EXC_LOAD_PAGE_FAULT) | \
-diff --git a/arch/riscv/kvm/vcpu_exit.c b/arch/riscv/kvm/vcpu_exit.c
-index 6e0c184127956..6e2302c65e193 100644
---- a/arch/riscv/kvm/vcpu_exit.c
-+++ b/arch/riscv/kvm/vcpu_exit.c
-@@ -193,11 +193,6 @@ int kvm_riscv_vcpu_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 	ret = -EFAULT;
- 	run->exit_reason = KVM_EXIT_UNKNOWN;
- 	switch (trap->scause) {
--	case EXC_INST_ILLEGAL:
--		kvm_riscv_vcpu_pmu_incr_fw(vcpu, SBI_PMU_FW_ILLEGAL_INSN);
--		vcpu->stat.instr_illegal_exits++;
--		ret = vcpu_redirect(vcpu, trap);
--		break;
- 	case EXC_LOAD_MISALIGNED:
- 		kvm_riscv_vcpu_pmu_incr_fw(vcpu, SBI_PMU_FW_MISALIGNED_LOAD);
- 		vcpu->stat.load_misaligned_exits++;
-@@ -208,19 +203,6 @@ int kvm_riscv_vcpu_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 		vcpu->stat.store_misaligned_exits++;
- 		ret = vcpu_redirect(vcpu, trap);
- 		break;
--	case EXC_LOAD_ACCESS:
--		kvm_riscv_vcpu_pmu_incr_fw(vcpu, SBI_PMU_FW_ACCESS_LOAD);
--		vcpu->stat.load_access_exits++;
--		ret = vcpu_redirect(vcpu, trap);
--		break;
--	case EXC_STORE_ACCESS:
--		kvm_riscv_vcpu_pmu_incr_fw(vcpu, SBI_PMU_FW_ACCESS_STORE);
--		vcpu->stat.store_access_exits++;
--		ret = vcpu_redirect(vcpu, trap);
--		break;
--	case EXC_INST_ACCESS:
--		ret = vcpu_redirect(vcpu, trap);
--		break;
- 	case EXC_VIRTUAL_INST_FAULT:
- 		if (vcpu->arch.guest_context.hstatus & HSTATUS_SPV)
- 			ret = kvm_riscv_vcpu_virtual_insn(vcpu, run, trap);
--- 
-2.20.1
+> 
+> >                 if (!kvm_emulate_instruction(vcpu, 0))
+> >                         return 0;
+> >  
 
+...
+
+> I guess kvm_io_bus_read() is to be done as well? Perhaps the barrier
+> and dereference should be pulled into a helper with the comment, just
+> in one place?
+
+Ya, +1 to a helper.
 
