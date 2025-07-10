@@ -1,79 +1,187 @@
-Return-Path: <kvm+bounces-52050-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52051-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E4FBB00976
-	for <lists+kvm@lfdr.de>; Thu, 10 Jul 2025 19:02:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6529DB00A0C
+	for <lists+kvm@lfdr.de>; Thu, 10 Jul 2025 19:40:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D08FF17BD06
-	for <lists+kvm@lfdr.de>; Thu, 10 Jul 2025 17:02:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA4A31889543
+	for <lists+kvm@lfdr.de>; Thu, 10 Jul 2025 17:40:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BF4A2F005B;
-	Thu, 10 Jul 2025 17:02:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cu7FgyA5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18A802F0C7D;
+	Thu, 10 Jul 2025 17:39:59 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61C7A42A9D;
-	Thu, 10 Jul 2025 17:02:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from gate.crashing.org (gate.crashing.org [63.228.1.57])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC9BD12B71;
+	Thu, 10 Jul 2025 17:39:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=63.228.1.57
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752166961; cv=none; b=bt+OiCOHNy7W2lfsGnBfnGYX66p/e+1YaQfnbhdxMqrPo7BqWfNXfNF7fysBx9r3z+gPdimNnPL1wu1wQldNzwmRDkUH/J0N9QDy/k7KazAH+BTSgluqGEjYKpinvtgvkxsAAhtRcVjTsxDmD5kXGv2IFjUXSOS5u1Cxra0wQ8g=
+	t=1752169198; cv=none; b=gywaG/irCr++GVtMe5wdQ/MefCmPpC3WytXwc0y5E1/tDW7UVEGqNMyE1oNhkCAMhbWYwIMmGO0VK130s8TGrQJ+yh1TCLp3YFN/e6IkKcDw/ISPjR/9NgjbkRcXaAxRJ3y9znNl6QcsrWnq7CNrUIoAyvwXRJae1kicpirRC8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752166961; c=relaxed/simple;
-	bh=fKAKKMdSBqRzZLrbcsxwo3WoN2zJWYgBhkXCdwB1Wr0=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=JQi9mVGLEcxoGxaAv7dz0xv9qp7AqOeTnWG6w3aJWTUYdvkbzsBuzfc4ehvu7OvZx7HELTmwxqK7hbNjR2++swCStOpULcC0FrSncfNDxv1v9+y0WqLYiNtBgIEbptdCK4nLvriql4jQxLI4tNJ2mmdrDeTndpzQuXIGoxHVj/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cu7FgyA5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D2DCC4CEE3;
-	Thu, 10 Jul 2025 17:02:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752166961;
-	bh=fKAKKMdSBqRzZLrbcsxwo3WoN2zJWYgBhkXCdwB1Wr0=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=cu7FgyA5ZHgm2IkCElL7dXPQ2fbMo12b1Cjdga21OtmAfFZip5qk5/LKFx/oC1R/C
-	 pwLGjaxsrTEs5LJBmwNmiUvI8edk+qzp59+UWmfLsHjGSJe2OG08pxL7tAfRgQBDAM
-	 ovN4WAu5V+Mp1SRzVSS5eXY9gEUYpK9YktOEaFUWjbe7c7v6hda2x9czzgzqShWyxV
-	 eBEN4MsGTuv+ArEnkIqVuX/QIc34wVKjinZXH0t8ZPKun0UFXZDq2A9F5+IbdVsmdC
-	 VORPGOSEDt0trpI0FRy/iSWRhFCNi7MZ4Ejhju1bzyXIbFeVEMlua8qhBHGVBZTdWS
-	 UdLbzxvgYZcbg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE2C0383B266;
-	Thu, 10 Jul 2025 17:03:03 +0000 (UTC)
-Subject: Re: [GIT PULL] KVM fixes for Linux 6.16-rc6
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20250710104936.232026-1-pbonzini@redhat.com>
-References: <20250710104936.232026-1-pbonzini@redhat.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20250710104936.232026-1-pbonzini@redhat.com>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-X-PR-Tracked-Commit-Id: 4578a747f3c7950be3feb93c2db32eb597a3e55b
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 73d7cf07109e79b093d1a1fb57a88d4048cd9b4b
-Message-Id: <175216698234.1599846.11474661596875605855.pr-tracker-bot@kernel.org>
-Date: Thu, 10 Jul 2025 17:03:02 +0000
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: torvalds@linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+	s=arc-20240116; t=1752169198; c=relaxed/simple;
+	bh=RSxWcKNTwFXrVX5CebJk5177Z4CdLNW1KEpXWN+IGhA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pcO4krrsC81kNFSn+K13OQRLKuNojyYh+ZCcX5hIAk2hnA6PH0382jLbUEOAFHvSgcQpxI23O4rt1+JFwLQWkmuSxfL9eFY86HhBpEh40OuBeWbngJ1q33vb5XU3oydKjYvLleXkpqXs06FTjvpi7doadX+4izapa2Ed3PROWR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.crashing.org; spf=pass smtp.mailfrom=kernel.crashing.org; arc=none smtp.client-ip=63.228.1.57
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.crashing.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.crashing.org
+Received: from gate.crashing.org (localhost [127.0.0.1])
+	by gate.crashing.org (8.18.1/8.18.1/Debian-2) with ESMTP id 56AHdJKS508082;
+	Thu, 10 Jul 2025 12:39:19 -0500
+Received: (from segher@localhost)
+	by gate.crashing.org (8.18.1/8.18.1/Submit) id 56AHdDIB508074;
+	Thu, 10 Jul 2025 12:39:13 -0500
+X-Authentication-Warning: gate.crashing.org: segher set sender to segher@kernel.crashing.org using -f
+Date: Thu, 10 Jul 2025 12:39:13 -0500
+From: Segher Boessenkool <segher@kernel.crashing.org>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Madhavan Srinivasan <maddy@linux.ibm.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH] powerpc: Replace the obsolete address of the FSF
+Message-ID: <aG_6wcivy5-0oiyB@gate>
+References: <20250710121657.169969-1-thuth@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250710121657.169969-1-thuth@redhat.com>
 
-The pull request you sent on Thu, 10 Jul 2025 06:49:36 -0400:
+On Thu, Jul 10, 2025 at 02:16:57PM +0200, Thomas Huth wrote:
+> From: Thomas Huth <thuth@redhat.com>
+> 
+> The FSF does not reside in the Franklin street anymore. Let's update
+> the address with the link to their website, as suggested in the latest
+> revision of the GPL-2.0 license.
+> (See https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt for example)
 
-> https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+That looks good, this is indeed the newer GPLv2 text.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/73d7cf07109e79b093d1a1fb57a88d4048cd9b4b
+Acked-by: Segher Boessenkool <segher@kernel.crashing.org>
 
-Thank you!
+> diff --git a/arch/powerpc/boot/crtsavres.S b/arch/powerpc/boot/crtsavres.S
+Segher
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+
+> index 085fb2b9a8b89..a710a49a5dbca 100644
+> --- a/arch/powerpc/boot/crtsavres.S
+> +++ b/arch/powerpc/boot/crtsavres.S
+> @@ -26,9 +26,8 @@
+>   * General Public License for more details.
+>   *
+>   * You should have received a copy of the GNU General Public License
+> - * along with this program; see the file COPYING.  If not, write to
+> - * the Free Software Foundation, 51 Franklin Street, Fifth Floor,
+> - * Boston, MA 02110-1301, USA.
+> + * along with this program; see the file COPYING.  If not, see
+> + * <https://www.gnu.org/licenses/>.
+>   *
+>   *    As a special exception, if you link this library with files
+>   *    compiled with GCC to produce an executable, this does not cause
+> diff --git a/arch/powerpc/include/uapi/asm/eeh.h b/arch/powerpc/include/uapi/asm/eeh.h
+> index 28186071fafc4..4a117cc475299 100644
+> --- a/arch/powerpc/include/uapi/asm/eeh.h
+> +++ b/arch/powerpc/include/uapi/asm/eeh.h
+> @@ -9,9 +9,8 @@
+>   * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+>   * GNU General Public License for more details.
+>   *
+> - * You should have received a copy of the GNU General Public License
+> - * along with this program; if not, write to the Free Software
+> - * Foundation, 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+> + * You should have received a copy of the GNU General Public License along
+> + * with this program; if not, see <https://www.gnu.org/licenses/>.
+>   *
+>   * Copyright IBM Corp. 2015
+>   *
+> diff --git a/arch/powerpc/include/uapi/asm/kvm.h b/arch/powerpc/include/uapi/asm/kvm.h
+> index eaeda001784eb..75c1d7a48ad52 100644
+> --- a/arch/powerpc/include/uapi/asm/kvm.h
+> +++ b/arch/powerpc/include/uapi/asm/kvm.h
+> @@ -9,9 +9,8 @@
+>   * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+>   * GNU General Public License for more details.
+>   *
+> - * You should have received a copy of the GNU General Public License
+> - * along with this program; if not, write to the Free Software
+> - * Foundation, 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+> + * You should have received a copy of the GNU General Public License along
+> + * with this program; if not, see <https://www.gnu.org/licenses/>.
+>   *
+>   * Copyright IBM Corp. 2007
+>   *
+> diff --git a/arch/powerpc/include/uapi/asm/kvm_para.h b/arch/powerpc/include/uapi/asm/kvm_para.h
+> index a809b1b44ddfe..66d1e17e427a6 100644
+> --- a/arch/powerpc/include/uapi/asm/kvm_para.h
+> +++ b/arch/powerpc/include/uapi/asm/kvm_para.h
+> @@ -9,9 +9,8 @@
+>   * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+>   * GNU General Public License for more details.
+>   *
+> - * You should have received a copy of the GNU General Public License
+> - * along with this program; if not, write to the Free Software
+> - * Foundation, 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+> + * You should have received a copy of the GNU General Public License along
+> + * with this program; if not, see <https://www.gnu.org/licenses/>.
+>   *
+>   * Copyright IBM Corp. 2008
+>   *
+> diff --git a/arch/powerpc/include/uapi/asm/ps3fb.h b/arch/powerpc/include/uapi/asm/ps3fb.h
+> index fd7e3a0d35d57..af6322042b3b0 100644
+> --- a/arch/powerpc/include/uapi/asm/ps3fb.h
+> +++ b/arch/powerpc/include/uapi/asm/ps3fb.h
+> @@ -13,8 +13,7 @@
+>   * General Public License for more details.
+>   *
+>   * You should have received a copy of the GNU General Public License along
+> - * with this program; if not, write to the Free Software Foundation, Inc.,
+> - * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+> + * with this program; if not, see <https://www.gnu.org/licenses/>.
+>   */
+>  
+>  #ifndef _ASM_POWERPC_PS3FB_H_
+> diff --git a/arch/powerpc/lib/crtsavres.S b/arch/powerpc/lib/crtsavres.S
+> index 8967903c15e99..c7e58b6614169 100644
+> --- a/arch/powerpc/lib/crtsavres.S
+> +++ b/arch/powerpc/lib/crtsavres.S
+> @@ -27,9 +27,8 @@
+>   * General Public License for more details.
+>   *
+>   * You should have received a copy of the GNU General Public License
+> - * along with this program; see the file COPYING.  If not, write to
+> - * the Free Software Foundation, 51 Franklin Street, Fifth Floor,
+> - * Boston, MA 02110-1301, USA.
+> + * along with this program; see the file COPYING.  If not, see
+> + * <https://www.gnu.org/licenses/>.
+>   *
+>   *    As a special exception, if you link this library with files
+>   *    compiled with GCC to produce an executable, this does not cause
+> diff --git a/arch/powerpc/xmon/ppc.h b/arch/powerpc/xmon/ppc.h
+> index 1d98b8dd134ef..270097f6e905b 100644
+> --- a/arch/powerpc/xmon/ppc.h
+> +++ b/arch/powerpc/xmon/ppc.h
+> @@ -15,8 +15,9 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
+>  the GNU General Public License for more details.
+>  
+>  You should have received a copy of the GNU General Public License
+> -along with this file; see the file COPYING.  If not, write to the Free
+> -Software Foundation, 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA.  */
+> +along with this file; see the file COPYING.  If not, see
+> +<https://www.gnu.org/licenses/>.
+> +*/
+>  
+>  #ifndef PPC_H
+>  #define PPC_H
+> -- 
+> 2.50.0
+> 
 
