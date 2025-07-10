@@ -1,216 +1,271 @@
-Return-Path: <kvm+bounces-52031-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52032-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EF0FAFFFE0
-	for <lists+kvm@lfdr.de>; Thu, 10 Jul 2025 12:59:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C563AFFFEA
+	for <lists+kvm@lfdr.de>; Thu, 10 Jul 2025 13:00:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C6D177BCB3D
-	for <lists+kvm@lfdr.de>; Thu, 10 Jul 2025 10:57:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5800D7BD521
+	for <lists+kvm@lfdr.de>; Thu, 10 Jul 2025 10:58:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7C142E2F18;
-	Thu, 10 Jul 2025 10:58:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52B702E3AFC;
+	Thu, 10 Jul 2025 10:59:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UvbkjF96"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="U0IaOHzU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2048.outbound.protection.outlook.com [40.107.102.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD03D24501E;
-	Thu, 10 Jul 2025 10:58:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752145135; cv=none; b=ZTxeKxkVs9OGoOTAOdYrvHJQZU+PRQX9wKgurO06O4AH9IxQ7wLXhAleHuDKByvSaSfbsxlrUAOFGg8vLLAUl/S4S156SlEV6DLJPVO3CgJha63mL9eDNB/WOmjOoTX9N0vbCDa7g5f0Km1LvZI1zb23oMm7ztW9u3MaMbNFpWI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752145135; c=relaxed/simple;
-	bh=9k5W5ZlQ8WnZ+a92Zh9oGjnC5+4ALfoaYoiYSen1FNs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RbRAwpcoK9JRwHZE+cH6CNt/Ri6OMIDlVkV36IgrOBDgWvfWq+fqUKra/T9/JLAgAlfT0CbfEqRlNhGPPLrD6mIs7u5hAJic1rfokvsXyXlAsROypkhdGrtguko6FdSkQMtknK+3tlvRMwVOj8GmGbW0WCEajyBY6u3SsKosdjw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UvbkjF96; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752145131; x=1783681131;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=9k5W5ZlQ8WnZ+a92Zh9oGjnC5+4ALfoaYoiYSen1FNs=;
-  b=UvbkjF96XtNCBWEkx8tmMtFy1FD1Gni/QuKFP8tJTv4whyx6LCqe0fZB
-   pgqt0ZtUNKjFAgCF5Qod4Z9lF8VeBnKDchK6E+24SuWMnPoj7odY5ztoE
-   ZVo3splVxcIRI0Yngm5EFKX2CQgZVe7jDEV2VUrrVEmqTbxBnA1GZaHu4
-   +1Fg5nEsVcqYQq36nWS9elJ/DtxHEdpIcqxEoC+8aGU0v/z/qCIZR5Z2b
-   IyirNTkzkGzAAydT6QZ4IlVFMh4vukh5aaw3+8gziI3odsU8LwQwnLk/w
-   XZ84pFnASOi8uTeYCS3NsQIQATR8kN+8kLv1MNrFVh/KuTsHrBVAEc50/
-   w==;
-X-CSE-ConnectionGUID: 1dhaDUGwSDaugtSKuZcFNw==
-X-CSE-MsgGUID: 9gABBNkvRtqhTxqQ/ETOVg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11489"; a="54273831"
-X-IronPort-AV: E=Sophos;i="6.16,300,1744095600"; 
-   d="scan'208";a="54273831"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2025 03:58:49 -0700
-X-CSE-ConnectionGUID: GVMNZSOxTjSy6hBum/1yyA==
-X-CSE-MsgGUID: TMRuTq9TRJ2zPj9tdZWeaQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,300,1744095600"; 
-   d="scan'208";a="187047312"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by orviesa002.jf.intel.com with ESMTP; 10 Jul 2025 03:58:29 -0700
-Date: Thu, 10 Jul 2025 18:50:09 +0800
-From: Xu Yilun <yilun.xu@linux.intel.com>
-To: Vishal Annapurve <vannapurve@google.com>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>, Yan Zhao <yan.y.zhao@intel.com>,
-	Alexey Kardashevskiy <aik@amd.com>, Fuad Tabba <tabba@google.com>,
-	Ackerley Tng <ackerleytng@google.com>, kvm@vger.kernel.org,
-	linux-mm@kvack.org, linux-kernel@vger.kernel.org, x86@kernel.org,
-	linux-fsdevel@vger.kernel.org, ajones@ventanamicro.com,
-	akpm@linux-foundation.org, amoorthy@google.com,
-	anthony.yznaga@oracle.com, anup@brainfault.org,
-	aou@eecs.berkeley.edu, bfoster@redhat.com,
-	binbin.wu@linux.intel.com, brauner@kernel.org,
-	catalin.marinas@arm.com, chao.p.peng@intel.com,
-	chenhuacai@kernel.org, dave.hansen@intel.com, david@redhat.com,
-	dmatlack@google.com, dwmw@amazon.co.uk, erdemaktas@google.com,
-	fan.du@intel.com, fvdl@google.com, graf@amazon.com,
-	haibo1.xu@intel.com, hch@infradead.org, hughd@google.com,
-	ira.weiny@intel.com, isaku.yamahata@intel.com, jack@suse.cz,
-	james.morse@arm.com, jarkko@kernel.org, jgowans@amazon.com,
-	jhubbard@nvidia.com, jroedel@suse.de, jthoughton@google.com,
-	jun.miao@intel.com, kai.huang@intel.com, keirf@google.com,
-	kent.overstreet@linux.dev, kirill.shutemov@intel.com,
-	liam.merwick@oracle.com, maciej.wieczor-retman@intel.com,
-	mail@maciej.szmigiero.name, maz@kernel.org, mic@digikod.net,
-	michael.roth@amd.com, mpe@ellerman.id.au, muchun.song@linux.dev,
-	nikunj@amd.com, nsaenz@amazon.es, oliver.upton@linux.dev,
-	palmer@dabbelt.com, pankaj.gupta@amd.com, paul.walmsley@sifive.com,
-	pbonzini@redhat.com, pdurrant@amazon.co.uk, peterx@redhat.com,
-	pgonda@google.com, pvorel@suse.cz, qperret@google.com,
-	quic_cvanscha@quicinc.com, quic_eberman@quicinc.com,
-	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com,
-	quic_pheragu@quicinc.com, quic_svaddagi@quicinc.com,
-	quic_tsoni@quicinc.com, richard.weiyang@gmail.com,
-	rick.p.edgecombe@intel.com, rientjes@google.com,
-	roypat@amazon.co.uk, rppt@kernel.org, seanjc@google.com,
-	shuah@kernel.org, steven.price@arm.com, steven.sistare@oracle.com,
-	suzuki.poulose@arm.com, thomas.lendacky@amd.com,
-	usama.arif@bytedance.com, vbabka@suse.cz, viro@zeniv.linux.org.uk,
-	vkuznets@redhat.com, wei.w.wang@intel.com, will@kernel.org,
-	willy@infradead.org, xiaoyao.li@intel.com, yilun.xu@intel.com,
-	yuzenghui@huawei.com, zhiquan1.li@intel.com
-Subject: Re: [RFC PATCH v2 04/51] KVM: guest_memfd: Introduce
- KVM_GMEM_CONVERT_SHARED/PRIVATE ioctls
-Message-ID: <aG+a4XRRc2fMrEZc@yilunxu-OptiPlex-7050>
-References: <CAGtprH8eR_S50xDnnMLHNCuXrN2Lv_0mBRzA_pcTtNbnVvdv2A@mail.gmail.com>
- <CA+EHjTwjKVkw2_AK0Y0-eth1dVW7ZW2Sk=73LL9NeQYAPpxPiw@mail.gmail.com>
- <CAGtprH_Evyc7tLhDB0t0fN+BUx5qeqWq8A2yZ5-ijbJ5UJ5f-g@mail.gmail.com>
- <9502503f-e0c2-489e-99b0-94146f9b6f85@amd.com>
- <20250624130811.GB72557@ziepe.ca>
- <CAGtprH_qh8sEY3s-JucW3n1Wvoq7jdVZDDokvG5HzPf0HV2=pg@mail.gmail.com>
- <aGTvTbPHuXbvj59t@yzhao56-desk.sh.intel.com>
- <CAGtprH9-njcgQjGZvGbbVX+i8D-qPUOkKFHbOWA20962niLTcw@mail.gmail.com>
- <20250702141321.GC904431@ziepe.ca>
- <CAGtprH948W=5fHSB1UnE_DbB0L=C7LTC+a7P=g-uP0nZwY6fxg@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A960D2E11B3
+	for <kvm@vger.kernel.org>; Thu, 10 Jul 2025 10:59:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.48
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752145174; cv=fail; b=ffPnfBUY1bSQ2sRUk14k1NoFfQLKiKOjvzs/qhlELHBq0a15CFKMhyDBYKliTRlFpDhAtviHaRucr582RC++3MrJbxDGwnRbTAC4Dxj+y2627QKzgRet4V+i4EETKtyjYUo1XD8Qn+iouaSvUF95kUm6u8K7fOktl6K6BkSQBzc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752145174; c=relaxed/simple;
+	bh=yEltx6LR1MCEjShfBLnFB8kiA3emB3nWqxk0wgd8Dn4=;
+	h=From:To:CC:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=ogEVrbyWM3wu3uzzipLrs5K6TJcJjnZNCh9XiAKngBa9UUdxTHqjx8WV/OK71sFH7GGFP1oxrZHjUApJR4Bc0wQMWmCdGq7qP2nAyTd+TnkYF+RUlFmetQ0hh+8mIoCY/vUIekKjlKMIdhv10oAftZUKSQSAlm3AXsYhiw1uLX4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=U0IaOHzU; arc=fail smtp.client-ip=40.107.102.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Dwufa5m+mKUwwUdR/a5DzK6fFosEf+6bpRtSWqfsDsm2JNm6gyOULrNTStK3h4euqdiSq35RZsSGBmH2Iiu0EBy37Dwn0bmb4y+H8+7S3SSq0r3vtqpC9lOi9pCKNlQmwQMDgBGjs44CHS4tbPGNXYjK2kbJvdZ/3vdRqLVdTNJ3LQTlREc8swSm0G2Ta6D7qGmH/pHCVD/wcaPse/poDE4av98H5a7Dgv5ESpNmIeM9XA1S5kiaZUZVekqoDjpdR17gnZ0krPbweRM5uQkcHFlM/+qOJ8G/PtIxNqeBwyuS9NHEkPCCTOokH3Dz698yoBkY7IqpsoNzwKeIE4is1w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=4swwFSI8uTX56SS2SHgcdn3DfVMD0rCdmTcRgo5XYbo=;
+ b=mfgBI9CtLL76DVhfbkFJyQapHoNAvbrzUN8F7sBbOCYfskWhKGYOrogq5azLD/3DPtm5MHmURQx4douhU3Kzn/G3mfmXoT0BNFz6MrFjdRHnP0YPxOXYpBwOl7BmQC/03W/ph+gJxAySNjSf8IkE988cKPlzZsI75akuun2+MaMHUWXcQTEeRSTyYxTWUk/yh6f3yD2sLdoNhdudMPcp8uqpw2Q9+4+u6hYCjGXv6sigFfKik9/otfOSZzyiH4vcYjhnQadB1WDVxI1q/MKVE2EFFc1iabjy/O32EkHx7uZHVZxaZ7DcgZ+OSuImwQl/DEIt1gVwKVvFyp59fpBDPg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=intel.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4swwFSI8uTX56SS2SHgcdn3DfVMD0rCdmTcRgo5XYbo=;
+ b=U0IaOHzUPGGqoUZ/sFzUJ2tMr315lTPHiXnDnDi0jLDO19iJdvcEIUXzFny9dDV2KFkv4Y+CFkO0/cHraoNpHYoQ1F5xj168Z+rk4VeY976UWvEvMr8PmVw4TU7KJHwSiqoq3QJA0K9c84cWKLyk0qfNOpKh+MJS/3mx5uK0/3g=
+Received: from MN2PR01CA0010.prod.exchangelabs.com (2603:10b6:208:10c::23) by
+ DS4PR12MB9795.namprd12.prod.outlook.com (2603:10b6:8:29e::19) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8901.27; Thu, 10 Jul 2025 10:59:29 +0000
+Received: from BN2PEPF0000449F.namprd02.prod.outlook.com
+ (2603:10b6:208:10c:cafe::79) by MN2PR01CA0010.outlook.office365.com
+ (2603:10b6:208:10c::23) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8922.22 via Frontend Transport; Thu,
+ 10 Jul 2025 11:00:14 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BN2PEPF0000449F.mail.protection.outlook.com (10.167.243.150) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.8922.22 via Frontend Transport; Thu, 10 Jul 2025 10:59:28 +0000
+Received: from BLR-L1-NDADHANI (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 10 Jul
+ 2025 05:59:25 -0500
+From: Nikunj A Dadhania <nikunj@amd.com>
+To: Sean Christopherson <seanjc@google.com>, <bp@alien8.de>
+CC: <pbonzini@redhat.com>, <kvm@vger.kernel.org>, <thomas.lendacky@amd.com>,
+	<santosh.shukla@amd.com>, <isaku.yamahata@intel.com>,
+	<vaishali.thakkar@suse.com>, <kai.huang@intel.com>
+Subject: Re: [PATCH v8 2/2] KVM: SVM: Enable Secure TSC for SNP guests
+In-Reply-To: <aG5oTKtWWqhwoFlI@google.com>
+References: <20250707101029.927906-1-nikunj@amd.com>
+ <20250707101029.927906-3-nikunj@amd.com> <aG0tFvoEXzUqRjnC@google.com>
+ <63f08c9e-b228-4282-bd08-454ccdf53ecf@amd.com>
+ <aG5oTKtWWqhwoFlI@google.com>
+Date: Thu, 10 Jul 2025 10:59:17 +0000
+Message-ID: <85h5zkuxa2.fsf@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAGtprH948W=5fHSB1UnE_DbB0L=C7LTC+a7P=g-uP0nZwY6fxg@mail.gmail.com>
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN2PEPF0000449F:EE_|DS4PR12MB9795:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3db30ea6-4e1a-4038-b448-08ddbfa0d77e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|1800799024|36860700013|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?paEw4yOBHiOncd3iyFRe7PzwBN6lg79K3jJEQhtwjzfy1EomIOsdn/eDSmjs?=
+ =?us-ascii?Q?G0Mq94ypHLJKjtLPVSh2xmVRXF8jMKYKeVqxiyrHuXZ1DJLX2ricB5zPFase?=
+ =?us-ascii?Q?gJqVsXRXKkhYjyt7nbEeoatNOzd0eJhtXYIOu7lF58tpV682cbysMVhiFEwn?=
+ =?us-ascii?Q?xZeHKa04tvz2JqnG903WNlunMVIfW5udRcSBQomeuEuqiZUrurp7q4DISe85?=
+ =?us-ascii?Q?h1UWTSNE2gC8yflb2QoT1WqH4gQCcaRbSUNMthXJfeahlBDuR5pQTShupFOw?=
+ =?us-ascii?Q?Kwh5Ow6kFFnzJphp4fsR5b+seaYqOKmDTfVKD4BRYWBWFGuSWItT+L5KvMB4?=
+ =?us-ascii?Q?zSSXJFJDkHFfeusRrES89AQKgKfb19nxpEPfJIGFjwSaK1N5gJFhq+yggEmw?=
+ =?us-ascii?Q?cagvOz8HsIe6Pv0oLxO39VeHK1hrX98UHP8Sqe8SjAmVZcnqG8sJ/lhGI443?=
+ =?us-ascii?Q?GHJ4fHPG1VsvFLAxqMYERtjJkh4DHh4R7r9CrAri3ZV9IhHdPNn4gw66+J5F?=
+ =?us-ascii?Q?g0dZ55uywsqRHRbj9lYPsznbutR1zWY6Yhjaovy4jszu/mpTaf3z1qOTqkXq?=
+ =?us-ascii?Q?ZQEZw2WWFYDaJU/hNXBRCRzaQC1N+BqVasTSG1PtisBKRBOKTymhS3xWdwcA?=
+ =?us-ascii?Q?nDmIRp3WthiE0XoH57wg4pP4O/xZJ5X1hZVhrqPTwV95v2oawI/bsv9qaAIF?=
+ =?us-ascii?Q?RfeKf9zePE6aTzUdfX3SNyCQGrR+q+4ny2c9zdC6ifmVDBLEceoeuFNpYTwo?=
+ =?us-ascii?Q?w27dJdbmsqYF+s/jhtKNPDMsbNB49gHx8Q+jbh2BebIRS/Oy5kDFaWcTWHTL?=
+ =?us-ascii?Q?3ciYwjrpTSr6h1LEbX8HIj8Yq0mkbCA3lveJZ+1Kx7+gf8nMyI5WvOcVbjmp?=
+ =?us-ascii?Q?Ps5nmSRsGmFmhSRzzeW7QmaC+XuzUQ3E+3bA8RPs0P7ePgCBCW9J5Pky9a9m?=
+ =?us-ascii?Q?l+cZ4G6tD9d+RSO3cF6FRJYbDGTl+dmAyDad+JO479a4tylgeQUIfinuQ2cS?=
+ =?us-ascii?Q?9qLrvB5VVwi1M8QJENxANJYrR7g0agg8l3xzyv9xwXBIttgR7nCEZ6BvwdWu?=
+ =?us-ascii?Q?t45IDHSoMMGwxlDVFC7yc9RM9jsTZcZ11aAuzqkp3HJHcJGt/OljXfwncn/v?=
+ =?us-ascii?Q?+4Znnobrq+ujrm1yRGkTipuCYmv/ulE/5RVGLCW6wUkV2/2i338foRhMnKpK?=
+ =?us-ascii?Q?C5yndpPu6eCpMsFH25nFxC5/0QJ243uOgBHBRGbkrXVsaaESHj9q+gv8ay8H?=
+ =?us-ascii?Q?VPDNHjT0ROW3H8IRY8ife1BUYgQ61Std4GJDbOe4bWVMU74/uyG06P6DV+MA?=
+ =?us-ascii?Q?fi03GLGT0ftAOLiMoVVKkBmqvbsKANZ6vCnVGKEhwvd+kNYDj9ftEyQcQhh7?=
+ =?us-ascii?Q?KSnejYDT5R29mkxlUxa/K2Fyiqc87bpWVijcEkO140csoZxC9ir+lPTpjj2k?=
+ =?us-ascii?Q?Pe6a5yGf0CYyNbh8D6+JQNP7ZTus1dfyHu4Dta5/BPH8rSX418/9bmCGX1+F?=
+ =?us-ascii?Q?PlzaYUSEKBSy13TPhgqGuDBZDSMhnnbH7OxE?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(36860700013)(376014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jul 2025 10:59:28.7140
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3db30ea6-4e1a-4038-b448-08ddbfa0d77e
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN2PEPF0000449F.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS4PR12MB9795
 
-On Wed, Jul 02, 2025 at 07:32:36AM -0700, Vishal Annapurve wrote:
-> On Wed, Jul 2, 2025 at 7:13 AM Jason Gunthorpe <jgg@ziepe.ca> wrote:
-> >
-> > On Wed, Jul 02, 2025 at 06:54:10AM -0700, Vishal Annapurve wrote:
-> > > On Wed, Jul 2, 2025 at 1:38 AM Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > > >
-> > > > On Tue, Jun 24, 2025 at 07:10:38AM -0700, Vishal Annapurve wrote:
-> > > > > On Tue, Jun 24, 2025 at 6:08 AM Jason Gunthorpe <jgg@ziepe.ca> wrote:
-> > > > > >
-> > > > > > On Tue, Jun 24, 2025 at 06:23:54PM +1000, Alexey Kardashevskiy wrote:
-> > > > > >
-> > > > > > > Now, I am rebasing my RFC on top of this patchset and it fails in
-> > > > > > > kvm_gmem_has_safe_refcount() as IOMMU holds references to all these
-> > > > > > > folios in my RFC.
-> > > > > > >
-> > > > > > > So what is the expected sequence here? The userspace unmaps a DMA
-> > > > > > > page and maps it back right away, all from the userspace? The end
-> > > > > > > result will be the exactly same which seems useless. And IOMMU TLB
-> > > > >
-> > > > >  As Jason described, ideally IOMMU just like KVM, should just:
-> > > > > 1) Directly rely on guest_memfd for pinning -> no page refcounts taken
-> > > > > by IOMMU stack
-> > > > In TDX connect, TDX module and TDs do not trust VMM. So, it's the TDs to inform
-> > > > TDX module about which pages are used by it for DMAs purposes.
-> > > > So, if a page is regarded as pinned by TDs for DMA, the TDX module will fail the
-> > > > unmap of the pages from S-EPT.
-> >
-> > I don't see this as having much to do with iommufd.
-> >
-> > iommufd will somehow support the T=1 iommu inside the TDX module but
-> > it won't have an IOAS for it since the VMM does not control the
-> > translation.
+Sean Christopherson <seanjc@google.com> writes:
 
-I partially agree with this.
+> On Wed, Jul 09, 2025, Nikunj A. Dadhania wrote:
+>> On 7/8/2025 8:07 PM, Sean Christopherson wrote:
+>> > On Mon, Jul 07, 2025, Nikunj A Dadhania wrote:
+>> >> Introduce the read-only MSR GUEST_TSC_FREQ (0xc0010134) that returns
+>> >> guest's effective frequency in MHZ when Secure TSC is enabled for SNP
+>> >> guests. Disable interception of this MSR when Secure TSC is enabled. Note
+>> >> that GUEST_TSC_FREQ MSR is accessible only to the guest and not from the
+>> >> hypervisor context.
+>> > 
+>> > ...
+>> > 
+>> >> @@ -4487,6 +4512,9 @@ static void sev_es_init_vmcb(struct vcpu_svm *svm)
+>> >>  
+>> >>  	/* Can't intercept XSETBV, HV can't modify XCR0 directly */
+>> >>  	svm_clr_intercept(svm, INTERCEPT_XSETBV);
+>> >> +
+>> >> +	if (snp_secure_tsc_enabled(svm->vcpu.kvm))
+>> >> +		svm_disable_intercept_for_msr(&svm->vcpu, MSR_AMD64_GUEST_TSC_FREQ, MSR_TYPE_RW);
+>> > 
+>> > KVM shouldn't be disabling write interception for a read-only MSR. 
+>> 
+>> Few of things to consider here:
+>> 1) GUEST_TSC_FREQ is a *guest only* MSR and what is the point in KVM intercepting writes
+>>    to that MSR.
+>
+> Because there's zero point in not intercepting writes, and KVM shouldn't do
+> things for no reason as doing so tends to confuse readers.  E.g. I reacted to
+> this because I didn't read the changelog first, and was surprised that the guest
+> could adjust its TSC frequency (which it obviously can't, but that's what the
+> code implies to me).
+>
 
-This is still the DMA Silent drop issue for security.  The HW (Also
-applicable to AMD/ARM) screams out if the trusted DMA path (IOMMU
-mapping, or access control table like RMP) is changed out of TD's
-expectation. So from HW POV, it is the iommu problem.
+Agree to your point that MSR read-only and having a MSR_TYPE_RW
+creates a special case. I can change this to MSR_TYPE_R. The only thing
+which looks inefficient to me is the path to generate the #GP when the
+MSR interception is enabled.
 
-For SW, if we don't blame iommu, maybe we rephrase as gmemfd can't
-invalidate private pages unless TD agrees.
+AFAIU, the GUEST_TSC_FREQ write handling for SEV-SNP guest:
 
-> >
-> > The discussion here is for the T=0 iommu which is controlled by
-> > iommufd and does have an IOAS. It should be popoulated with all the
-> > shared pages from the guestmemfd.
-> >
-> > > > If IOMMU side does not increase refcount, IMHO, some way to indicate that
-> > > > certain PFNs are used by TDs for DMA is still required, so guest_memfd can
-> > > > reject the request before attempting the actual unmap.
-> >
-> > This has to be delt with between the TDX module and KVM. When KVM
-> > gives pages to become secure it may not be able to get them back..
+sev_handle_vmgexit()
+-> msr_interception()
+  -> kvm_set_msr_common()
+     -> kvm_emulate_wrmsr()
+        -> kvm_set_msr_with_filter()
+        -> svm_complete_emulated_msr() will inject the #GP
 
-Just to be clear. With In-place conversion, it is not KVM gives pages
-to become secure, it is gmemfd. Or maybe you mean gmemfd is part of KVM.
+With MSR interception disabled: vCPU will directly generate #GP
 
-https://lore.kernel.org/all/aC86OsU2HSFZkJP6@google.com/
+>>    The guest vCPU handles it appropriately when interception is disabled.
+>>
+>> 2) Guest does not expect GUEST_TSC_FREQ MSR to be intercepted(read or write), guest 
+>>    will terminate if GUEST_TSC_FREQ MSR is intercepted by the hypervisor:
+>
+> But it's read-only, the guest shouldn't be writing.  If the vCPU handles #GPs
+> appropriately, then it should have no problem handling #VCs on bad writes.
+>
+>> 38cc6495cdec x86/sev: Prevent GUEST_TSC_FREQ MSR interception for Secure TSC enabled guests
+>
+> That's a guest bug, it shouldn't be complaining about the host
+> intercepting writes.
 
-> >
-> > This problem has nothing to do with iommufd.
-> >
-> > But generally I expect that the T=1 iommu follows the S-EPT entirely
-> > and there is no notion of pages "locked for dma". If DMA is ongoing
-> > and a page is made non-secure then the DMA fails.
-> >
-> > Obviously in a mode where there is a vPCI device we will need all the
-> > pages to be pinned in the guestmemfd to prevent any kind of
-> > migrations. Only shared/private conversions should change the page
-> > around.
+The code was written with a perspective that host should not be
+intercepting GUEST_TSC_FREQ, as it is a guest-only MSR. To fix guest we
+will need to add something like below:
 
-Only *guest permitted* conversion should change the page. I.e only when
-VMM is dealing with the KVM_HC_MAP_GPA_RANGE hypercall. Not sure if we
-could just let QEMU ensure this or KVM/guestmemfd should ensure this.
+diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
+index e50736d15e02..180a26d5751c 100644
+--- a/arch/x86/include/asm/sev.h
++++ b/arch/x86/include/asm/sev.h
+@@ -32,6 +32,7 @@ enum es_result {
+ 	ES_DECODE_FAILED,	/* Instruction decoding failed */
+ 	ES_EXCEPTION,		/* Instruction caused exception */
+ 	ES_RETRY,		/* Retry instruction emulation */
++	ES_CONTINUE,		/* Continue current operation */
+ };
+ 
+ struct es_fault_info {
+diff --git a/arch/x86/coco/sev/vc-handle.c b/arch/x86/coco/sev/vc-handle.c
+index 9a5e16f70e83..ed4b207ea362 100644
+--- a/arch/x86/coco/sev/vc-handle.c
++++ b/arch/x86/coco/sev/vc-handle.c
+@@ -369,20 +369,23 @@ static enum es_result __vc_handle_msr_caa(struct pt_regs *regs, bool write)
+ }
+ 
+ /*
+- * TSC related accesses should not exit to the hypervisor when a guest is
+- * executing with Secure TSC enabled, so special handling is required for
+- * accesses of MSR_IA32_TSC and MSR_AMD64_GUEST_TSC_FREQ.
++ * Some of the TSC related accesses should not exit to the hypervisor when
++ * a guest is executing with Secure TSC enabled, so special handling is
++ * required for accesses of MSR_IA32_TSC and MSR_AMD64_GUEST_TSC_FREQ.
+  */
+ static enum es_result __vc_handle_secure_tsc_msrs(struct pt_regs *regs, bool write)
+ {
+ 	u64 tsc;
+ 
++	if (!(sev_status & MSR_AMD64_SNP_SECURE_TSC))
++		return ES_CONTINUE;
++
+ 	/*
+-	 * GUEST_TSC_FREQ should not be intercepted when Secure TSC is enabled.
+-	 * Terminate the SNP guest when the interception is enabled.
++	 * GUEST_TSC_FREQ read should not be intercepted when Secure TSC is enabled.
++	 * Terminate the SNP guest when the read interception is enabled.
+ 	 */
+ 	if (regs->cx == MSR_AMD64_GUEST_TSC_FREQ)
+-		return ES_VMM_ERROR;
++		return write ? ES_CONTINUE : ES_VMM_ERROR;
+ 
+ 	/*
+ 	 * Writes: Writing to MSR_IA32_TSC can cause subsequent reads of the TSC
+@@ -417,8 +420,9 @@ static enum es_result vc_handle_msr(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
+ 		return __vc_handle_msr_caa(regs, write);
+ 	case MSR_IA32_TSC:
+ 	case MSR_AMD64_GUEST_TSC_FREQ:
+-		if (sev_status & MSR_AMD64_SNP_SECURE_TSC)
+-			return __vc_handle_secure_tsc_msrs(regs, write);
++		ret = __vc_handle_secure_tsc_msrs(regs, write);
++		if (ret != ES_CONTINUE)
++			return ret;
+ 		break;
+ 	default:
+ 		break;
 
-Thanks,
-Yilun
-
-> 
-> Yes, guest_memfd ensures that all the faulted-in pages (irrespective
-> of shared or private ranges) are not migratable. We already have a
-> similar restriction with CPU accesses to encrypted memory ranges that
-> need arch specific protocols to migrate memory contents.
-> 
-> >
-> > Maybe this needs to be an integral functionality in guestmemfd?
-> >
-> > Jason
-> 
+Regards,
+Nikunj
 
