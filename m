@@ -1,226 +1,178 @@
-Return-Path: <kvm+bounces-52105-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52104-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1ACC0B016D3
-	for <lists+kvm@lfdr.de>; Fri, 11 Jul 2025 10:51:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4ABC9B016D1
+	for <lists+kvm@lfdr.de>; Fri, 11 Jul 2025 10:51:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B9B737600D3
-	for <lists+kvm@lfdr.de>; Fri, 11 Jul 2025 08:51:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8DB61565E30
+	for <lists+kvm@lfdr.de>; Fri, 11 Jul 2025 08:51:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E96AF21ABCB;
-	Fri, 11 Jul 2025 08:51:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C596620D50B;
+	Fri, 11 Jul 2025 08:51:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ffwll.ch header.i=@ffwll.ch header.b="K4OQB0am"
+	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="HY3500yC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 702341F8722
-	for <kvm@vger.kernel.org>; Fri, 11 Jul 2025 08:51:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 921357DA6C
+	for <kvm@vger.kernel.org>; Fri, 11 Jul 2025 08:51:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752223873; cv=none; b=UA864qBsg/oH3+S1SUhGso+HB6RNhjoW3xYhsPdUX6lfL9bR5KXp2O2RRzqtTKe2/JVVwjMi9OpNPddH90QOC0tHCJvMMlNt4lQpYxCy9PvHno1VT5Tfs7OC/1/WGtHhu/8XQR4bvgOd0nRRG6GxhXYW2dx6JjAQo8SciM5tNyE=
+	t=1752223871; cv=none; b=QhXxFPXIKIo4NTRSfOksjyJZfP/a3BQV6s0d4adjK+NKJfAoH7brEcZh2Sdtt7NkClOMkVs9IsvPie/k97y9cEtaQDepG24KKqrvERIggHxLD07oYqBiXv5JFHdGy+cXAbmcZWYmKrbMnnN4aiQTN1aNpZUkbcA9rQ5InDOMa6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752223873; c=relaxed/simple;
-	bh=z8h37/P+/Go2N/WRw7N3Bh2YW9ttrIhdTMNeQsayI1w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s1XtkfS7T95PqIFka+xwvY805UetJl1wi4wepdKZlmBJ+kdSLCMhClaSppZ7K9xCI5rG6rx0s82QG0MilYlzAsCLssTHfERP0jr+bNb/o8eQO3xLQecLMudvdCv4+wXMJ5qYrD0xhyK60ZAWJKhdpVHaMlgP1nGZQ2pJop/eZ6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ffwll.ch; spf=none smtp.mailfrom=ffwll.ch; dkim=pass (1024-bit key) header.d=ffwll.ch header.i=@ffwll.ch header.b=K4OQB0am; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ffwll.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ffwll.ch
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-3b49ffbb31bso1121615f8f.3
-        for <kvm@vger.kernel.org>; Fri, 11 Jul 2025 01:51:10 -0700 (PDT)
+	s=arc-20240116; t=1752223871; c=relaxed/simple;
+	bh=cOpNarnP8xkXyeK+wQK9G4fFwvShV2VHZ7nxWSLkzcM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=W37vDGSIts8W4WaARTyQwLcSg7dEFgHWOqqU2DKHhQ4fEhjOcT0y0Yeykyj6tyiO0xUpz9BbuiQTVYKVr3ykYkbvP+ElHuqS/SXWWpU7Iu2Z8g3GRR2VSXtajsx4xNdXMFU9I3WCuMjqAOvekmJ7o6/57SSRsLAPlP4PbS/MI6U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=HY3500yC; arc=none smtp.client-ip=209.85.221.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensrcsec.com
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-3a507e88b0aso1484099f8f.1
+        for <kvm@vger.kernel.org>; Fri, 11 Jul 2025 01:51:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ffwll.ch; s=google; t=1752223869; x=1752828669; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wLc+yAyLpgSsVL0DY27MbVKG7PMR2I1NMPg5UEUaSYE=;
-        b=K4OQB0amdd4XDc0xIgjIUKIA7KOpnYL9ZnXtzWEcHVqy40zZ1qwYMH+78nAFS36fgP
-         ZKN3ucEg2YGZAcesweH3KkV5sh4kDxbi7HcWjq5ZBVXTZOgPU8OULctVcQNksPgazee9
-         AkahTFw+vforK/0KBuWkEC3gd2rycTIcQ2+lg=
+        d=grsecurity.net; s=grsec; t=1752223868; x=1752828668; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZHN7XafE/fMpmcgKsOaKWbjbKNouI94+9r5jalF8gic=;
+        b=HY3500yCV2FLXS7VD/SwmTAq1FTxLYegnbtSl1xsFkePhRTCz+z1Wutqy4Y3QOngPQ
+         fjQGxDDVmy7b0FikJaRNKg+mj+nZ0vVcMIQB1PC3G2m36gQ3MmgBBsOv2lTsNfxxsCqi
+         r5Jv+Oh2Ve7w4cdAZxexvKOSMLxZS3+cc+Dh7z7jF5XtdBWg2zjx5hduOsmbc4IDGKrB
+         U8RcIfFpE/OjejOrOhxlmODMoSI479KNLwZUvuC08OfcyXAfHuRY6i7gI/0s0EL4+/Xm
+         saG6GlsX7h+lgxKtFMqawHX6z6eojrHHFbkxJIV31X3MNqFJQ10p86PMQr7jttoLwNQE
+         Perw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752223869; x=1752828669;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wLc+yAyLpgSsVL0DY27MbVKG7PMR2I1NMPg5UEUaSYE=;
-        b=o+SxCixhi+sDQq1tBYWX4/V2GXEi8gErzFCUyy2ERiQ0EHkp+HWE6/Sob+UvUatHuP
-         xy18AnJg5aWRuqzCq2EluVaszPbuwd2qXVGl0A817LvwIZ8E8+liDOXEPvMOTY0NMxGU
-         G3v2pJ83NJfRWw9FG3/UNPvpJiuBe3Y/YungevGS4vyKv67ci9PVCpZ14oZh4SJRWoJ6
-         GYH1VT00XNh8MA0Lnt011YWkjSFErb+n+lpyh0tCN3nxV3y1F6W4oYn6b0zpUp0MfEiM
-         pQFpMkLS0C3YBSFy76bP6pWynx20QwxzE7xTrm/rd0lCJbiRSM9rv0t2a5D5/3X8Ik10
-         jcjA==
-X-Forwarded-Encrypted: i=1; AJvYcCWfgId+2kzSb45aEoloHJoNUMdsWU0PMK3lVLfR9Ah7+Us4auDT/7z1U9ntCtNAEFldAO8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzqKO1XB+T7pHiz5nFc0av2dZzg6h3DWkhdaiwteA7rqsOpNEbq
-	6uYpU4Ly8AvgvKnN+mXvgnHcrcudusKksMvsEIf8hV8fZThOZF/eHIg4MUxS4QuvpZc=
-X-Gm-Gg: ASbGnctdQjkrJRT8CHw1msq8XbIQlm5Mkv+nhFhj9Iiyz27ov73f4vygkdWjzLE18M5
-	aakAYstu5QrN4kekRAkLcAV4lGO2zX1F7onhd9nj5NdT3arEIBfe7SK1pMfx28ZDcgYp0NoqKGF
-	ha4CoTGac4Bc7dhMEDwOr1aFNo18zFqHOHkUjK5dEAhs71nCFVsIOeh/jii9H5tYrg8Cb3HNo0s
-	OhGXMgbkan5OtPCRtkMVj7hV3Z000IE0aUAqstuwX3XXHqH3FQL59w5sYNCbn3BPdcDs8VfbJFV
-	J386sme4sBxb8/L2VB+DdAVzg90jLyrpedhWSkOa2ba3BzMhFlMn9h6FHoNJl4Szg72C4mqf0Ou
-	J6TmejcvwQZKai3SUOdm+DbWqgG+SOBNQCg==
-X-Google-Smtp-Source: AGHT+IF/p5JseJYyVQuyUwqnGmfxYrQbso5K+hNI8FrIUfZsi1LkIHNT8yNbMfG/FKzdOjwH5E48Pg==
-X-Received: by 2002:adf:9c84:0:b0:3a5:1f2:68f3 with SMTP id ffacd0b85a97d-3b5f18d2e76mr2229476f8f.46.1752223868625;
-        Fri, 11 Jul 2025 01:51:08 -0700 (PDT)
-Received: from phenom.ffwll.local ([2a02:168:57f4:0:5485:d4b2:c087:b497])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b5e8dc2087sm3957272f8f.30.2025.07.11.01.51.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Jul 2025 01:51:08 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1752223868; x=1752828668;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZHN7XafE/fMpmcgKsOaKWbjbKNouI94+9r5jalF8gic=;
+        b=sHU+zZwXXNQioRlAB/OUp5r+vMIQuUfd+Rj/umJ6xUnfjw45vajGWpuIIa/PP+00a2
+         8742b3F7oI/kkfw+zjwewpWwtSwLlkLedjE6FWQaRn8fTuP6tHIodXsMg0DxlZvtS0Wr
+         yYLV9X9g4dJjiM25IkKIyzESS9P0xbzkeH5UgtuorXy24YVr5NrgMsgdedcmKniqYSo6
+         9+cSSvZmwHgVHyZvOLzGFNV2MYMkjrylSCNGZvBU5b16XmPlUd0RcYuA/j2GxDEAkvuG
+         pTDO+U/7XiBjBiSN/jpPhPTjbIZxY2NFhJJsnGVe/B/FSJlCSE8OsOx38Kymne79MH7+
+         QUog==
+X-Forwarded-Encrypted: i=1; AJvYcCVlgCNzTtO9aCpleGjbheLzKWQ0AoXUSe+8otOjDnG+WMKgUuGkSstpVqoi6a/Rzlt852c=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzn1NfUMWtKyR9zHHpeNrmIQktw8OKHufqciz3l1FLohh8egGXa
+	4a08orXiqAhGRNjbiWitXTFBAiraS360wXpIUFePrX7AodGgf0xz/ohgEIvqkdbe+Uw=
+X-Gm-Gg: ASbGncsz7DJy8l0AKSWA2bbOThm3QxLYBAQtcikBOmflcUXp0YT4jSJXhMrBfZA9GMT
+	Kuf4/FiqOhy3lP4TNWLpnIWdIe0nkYkpvOSeI8Ptq4+yqB7gGmM9lG+8HHTmG2MUfbPQbg4L7Ll
+	z+14AdRB43T4tDsqxiMRJa4M1XhqndvSSTnR8C/JSQBjqD485D3rardkec6E1l00nQdJkDykBKh
+	OL3EL0YIchGeKOCWis/pMWBAXaqOosjT7c8UfnIXrteHZpCM0UyJ0QknJS5EHNCz1NsumADfNrY
+	L/C2yAlG6zQnXanVll0VHYa4FMLG46XGIJGp+3czwgMsA4hLB1dCAt1sdLqVrMeQA/SDNU1oFO6
+	u0/7hJFHM+GN01odZSCdEYzY7nOe6a1M5NMp8KdPybKTwMjAeVa086Wc73v/Kouzz0gbXjTrYBI
+	JpAx84DwKZtgqG0pMIUg9GBZi0mMypKRUzfTV+Ih2wYm/runAaavv+XnU=
+X-Google-Smtp-Source: AGHT+IFXJvqvX01k/W5kDJShrT6YxUQWrdXsoUCYkg+dY7uSsRQsDJkzZUdDI9BHWXS6CsQdrL3hTA==
+X-Received: by 2002:adf:b601:0:b0:3a5:1240:6802 with SMTP id ffacd0b85a97d-3b5f18fbaf2mr1885034f8f.57.1752223867760;
+        Fri, 11 Jul 2025 01:51:07 -0700 (PDT)
+Received: from ?IPV6:2003:fa:af22:cf00:2208:a86d:dff:5ae9? (p200300faaf22cf002208a86d0dff5ae9.dip0.t-ipconnect.de. [2003:fa:af22:cf00:2208:a86d:dff:5ae9])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b5e8e1e02csm3888846f8f.73.2025.07.11.01.51.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 11 Jul 2025 01:51:07 -0700 (PDT)
+Message-ID: <e5377f36-bc19-4b16-bbbe-884951fb414b@grsecurity.net>
 Date: Fri, 11 Jul 2025 10:51:06 +0200
-From: Simona Vetter <simona.vetter@ffwll.ch>
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: Borislav Petkov <bp@alien8.de>, Sean Christopherson <seanjc@google.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	dri-devel@lists.freedesktop.org,
-	Kevin Loughlin <kevinloughlin@google.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	Kai Huang <kai.huang@intel.com>, Ingo Molnar <mingo@kernel.org>,
-	Zheyun Shen <szy0127@sjtu.edu.cn>,
-	Mingwei Zhang <mizhang@google.com>,
-	Francesco Lavra <francescolavra.fl@gmail.com>
-Subject: Re: [PATCH v3 3/8] x86, lib: Add WBNOINVD helper functions
-Message-ID: <aHDQersZPA9D8fJb@phenom.ffwll.local>
-Mail-Followup-To: Peter Zijlstra <peterz@infradead.org>,
-	Borislav Petkov <bp@alien8.de>,
-	Sean Christopherson <seanjc@google.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	dri-devel@lists.freedesktop.org,
-	Kevin Loughlin <kevinloughlin@google.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	Kai Huang <kai.huang@intel.com>, Ingo Molnar <mingo@kernel.org>,
-	Zheyun Shen <szy0127@sjtu.edu.cn>,
-	Mingwei Zhang <mizhang@google.com>,
-	Francesco Lavra <francescolavra.fl@gmail.com>
-References: <20250522233733.3176144-1-seanjc@google.com>
- <20250522233733.3176144-4-seanjc@google.com>
- <20250710112902.GCaG-j_l-K6LYRzZsb@fat_crate.local>
- <20250710143729.GL1613200@noisy.programming.kicks-ass.net>
- <20250710154704.GJ1613633@noisy.programming.kicks-ass.net>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250710154704.GJ1613633@noisy.programming.kicks-ass.net>
-X-Operating-System: Linux phenom 6.12.30-amd64 
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests PATCH v2 08/13] x86: cet: Validate CET states
+ during VMX transitions
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>, Chao Gao <chao.gao@intel.com>,
+ kvm@vger.kernel.org
+References: <20250626073459.12990-1-minipli@grsecurity.net>
+ <20250626073459.12990-9-minipli@grsecurity.net>
+Content-Language: en-US, de-DE
+From: Mathias Krause <minipli@grsecurity.net>
+Autocrypt: addr=minipli@grsecurity.net; keydata=
+ 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
+ RzDVkdgPJkL/NFTKZHo5foFXNi89kA==
+In-Reply-To: <20250626073459.12990-9-minipli@grsecurity.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jul 10, 2025 at 05:47:04PM +0200, Peter Zijlstra wrote:
-> On Thu, Jul 10, 2025 at 04:37:29PM +0200, Peter Zijlstra wrote:
-> > On Thu, Jul 10, 2025 at 01:29:02PM +0200, Borislav Petkov wrote:
-> > > On Thu, May 22, 2025 at 04:37:27PM -0700, Sean Christopherson wrote:
-> > > > diff --git a/arch/x86/lib/cache-smp.c b/arch/x86/lib/cache-smp.c
-> > > > index 079c3f3cd32c..1789db5d8825 100644
-> > > > --- a/arch/x86/lib/cache-smp.c
-> > > > +++ b/arch/x86/lib/cache-smp.c
-> > > > @@ -19,3 +19,14 @@ void wbinvd_on_all_cpus(void)
-> > > >  	on_each_cpu(__wbinvd, NULL, 1);
-> > > >  }
-> > > >  EXPORT_SYMBOL(wbinvd_on_all_cpus);
-> > > > +
-> > > > +static void __wbnoinvd(void *dummy)
-> > > > +{
-> > > > +	wbnoinvd();
-> > > > +}
-> > > > +
-> > > > +void wbnoinvd_on_all_cpus(void)
-> > > > +{
-> > > > +	on_each_cpu(__wbnoinvd, NULL, 1);
-> > > > +}
-> > > > +EXPORT_SYMBOL(wbnoinvd_on_all_cpus);
-> > > 
-> > > If there's no particular reason for the non-GPL export besides being
-> > > consistent with the rest - yes, I did the change for wbinvd_on_all_cpus() but
-> > > that was loooong time ago - I'd simply make this export _GPL.
-> > 
-> > Uhhhh, how about we use this fancy export to known modules only thing
-> > for this?
-> > 
-> > These are typical things we do *NOT* want people to actually use.
-> 
-> So kvm-amd is the SEV stuff, AGPGART is the ancient crap nobody cares
-> about, CCP is more SEV stuff, DRM actually does CLFLUSH loops, but has a
-> WBINVD fallback. i915 is rude and actually does WBINVD. Could they
-> pretty please also do CLFLUSH loops?
+On 26.06.25 09:34, Mathias Krause wrote:
+> [...]
 
-There's some ancient pentium M where clflush is a no-op (or at least not
-getting stuff flushed enough for the gpu to see it), but we still need to
-ensure cache coherency with the non-coherent gpu, and wbinvd does the job.
-I figured this out with sheer desperation over a decade ago myself,
-it's pain.
-
-There shouldn't be any other reason for i915 to wbinvd.
--Sima
-
-> 
-> Anyway, the below seems to survive an allmodconfig.
-> 
-> ---
-> diff --git a/arch/x86/lib/cache-smp.c b/arch/x86/lib/cache-smp.c
-> index c5c60d07308c..ac3cc32a4054 100644
-> --- a/arch/x86/lib/cache-smp.c
-> +++ b/arch/x86/lib/cache-smp.c
-> @@ -12,19 +12,19 @@ void wbinvd_on_cpu(int cpu)
->  {
->  	smp_call_function_single(cpu, __wbinvd, NULL, 1);
->  }
-> -EXPORT_SYMBOL(wbinvd_on_cpu);
-> +EXPORT_SYMBOL_GPL_FOR_MODULES(wbinvd_on_cpu, "kvm-amd,agpgart,ccp,drm,i915");
+> diff --git a/x86/unittests.cfg b/x86/unittests.cfg
+> index a2b351ff552a..d07f65b6b207 100644
+> --- a/x86/unittests.cfg
+> +++ b/x86/unittests.cfg
+> @@ -427,6 +427,13 @@ arch = x86_64
+>  groups = vmx nested_exception
+>  check = /sys/module/kvm_intel/parameters/allow_smaller_maxphyaddr=Y
 >  
->  void wbinvd_on_all_cpus(void)
->  {
->  	on_each_cpu(__wbinvd, NULL, 1);
->  }
-> -EXPORT_SYMBOL(wbinvd_on_all_cpus);
-> +EXPORT_SYMBOL_GPL_FOR_MODULES(wbinvd_on_all_cpus, "kvm-amd,agpgart,ccp,drm,i915,intel-gtt");
->  
->  void wbinvd_on_cpus_mask(struct cpumask *cpus)
->  {
->  	on_each_cpu_mask(cpus, __wbinvd, NULL, 1);
->  }
-> -EXPORT_SYMBOL_GPL(wbinvd_on_cpus_mask);
-> +EXPORT_SYMBOL_GPL_FOR_MODULES(wbinvd_on_cpus_mask, "kvm,kvm-amd,agpgart,ccp,drm,i915");
->  
->  static void __wbnoinvd(void *dummy)
->  {
-> @@ -35,10 +35,10 @@ void wbnoinvd_on_all_cpus(void)
->  {
->  	on_each_cpu(__wbnoinvd, NULL, 1);
->  }
-> -EXPORT_SYMBOL_GPL(wbnoinvd_on_all_cpus);
-> +EXPORT_SYMBOL_GPL_FOR_MODULES(wbnoinvd_on_all_cpus, "kvm-amd,agpgart,ccp,drm,i915");
->  
->  void wbnoinvd_on_cpus_mask(struct cpumask *cpus)
->  {
->  	on_each_cpu_mask(cpus, __wbnoinvd, NULL, 1);
->  }
-> -EXPORT_SYMBOL_GPL(wbnoinvd_on_cpus_mask);
-> +EXPORT_SYMBOL_GPL_FOR_MODULES(wbnoinvd_on_cpus_mask, "kvm-amd,agpgart,ccp,drm,i915");
+> +[vmx_cet_test]
+> +file = vmx.flat
+> +extra_params = -cpu max,+vmx -append "vmx_cet_test"
+> +arch = x86_64
+> +groups = vmx
+> +timeout = 240
+> +
+>  [debug]
+>  file = debug.flat
+>  arch = x86_64
 
--- 
-Simona Vetter
-Software Engineer, Intel Corporation
-http://blog.ffwll.ch
+This needs the following fixup since commit a7794f16c84a ("scripts: Add
+'test_args' test definition parameter"):
+
+diff --git a/x86/unittests.cfg b/x86/unittests.cfg
+index ec07d26b7016..a814bfacf052 100644
+--- a/x86/unittests.cfg
++++ b/x86/unittests.cfg
+@@ -455,7 +455,8 @@ check = /sys/module/kvm_intel/parameters/allow_smaller_maxphyaddr=Y
+
+ [vmx_cet_test]
+ file = vmx.flat
+-extra_params = -cpu max,+vmx -append "vmx_cet_test"
++test_args = "vmx_cet_test"
++qemu_params = -cpu max,+vmx
+ arch = x86_64
+ groups = vmx
+ timeout = 240
+
+I can fold it into a respin if you want me to.
+
+Thanks,
+Mathias
 
