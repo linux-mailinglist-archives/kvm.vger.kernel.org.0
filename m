@@ -1,74 +1,74 @@
-Return-Path: <kvm+bounces-52193-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52194-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BCC9B023F4
-	for <lists+kvm@lfdr.de>; Fri, 11 Jul 2025 20:42:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9CEFB0240E
+	for <lists+kvm@lfdr.de>; Fri, 11 Jul 2025 20:47:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8F4135C70E9
-	for <lists+kvm@lfdr.de>; Fri, 11 Jul 2025 18:42:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 779FC3AAD96
+	for <lists+kvm@lfdr.de>; Fri, 11 Jul 2025 18:47:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8724E2F85E0;
-	Fri, 11 Jul 2025 18:38:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FBE52F2711;
+	Fri, 11 Jul 2025 18:46:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uz+SxpuO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1KFlKADO"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4005C2F7D07
-	for <kvm@vger.kernel.org>; Fri, 11 Jul 2025 18:38:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D45B13B590
+	for <kvm@vger.kernel.org>; Fri, 11 Jul 2025 18:46:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752259104; cv=none; b=SIVRZ15iSEvRn3mcynLZJtGcRlm0NYCONfdBXo/7SAAU7D3PmcmUNsdUP5jgL48qurlsKxkoo7Qk1IpExuqyfLA/nlf4JoWCCH7dy2IdScFcMvkVxte00+uT6wAA1R9yN2sLTns3JWz8OfGgg/uajhlrs+xM7CspI15uUZGe+6k=
+	t=1752259587; cv=none; b=dNKnGe/0guqukcZU6KNhGDFzaHEbbaWKkp4Bl7vpymnxLfzW0lDWKFwGxtLV7iadDD5rinosh6hZX/4PcqZ32ZKjrvfEokPrRqBJBx4QBnjC/nlFtRvWfqym9y6kHgD16RL4qUz9OzdC6iVUMOVQmItsLJ/S5nKNpgiDaH77InM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752259104; c=relaxed/simple;
-	bh=KsKnsKGUi1F4lD4jyihaduxyCksjkhEdPI8sb5wYzkw=;
+	s=arc-20240116; t=1752259587; c=relaxed/simple;
+	bh=zYiGdxOL7zThjAm9ak0MVc2aInvxHTk2ZyWy/3uXVMM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=drVVqZ9fXiaYjNVBBgjHcBwgKFRpHDAIZGDwaKqh+FCHitXaWXR6AV618MOnCY+x00AdHretPLW7BrF1C4W2nlq8ykpq/bUVLkWgf5Y1IZFoKCnSZweWr30+jJtA3RyxSzQth8FqeSRveafXG8uQKBbNaxe14qiQ++/vKz08DuE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uz+SxpuO; arc=none smtp.client-ip=209.85.214.171
+	 To:Cc:Content-Type; b=Dztdl3Ck/VDCA1bvy2MbSHcNbcFkxBty70UwF+p/set1gn7DEmodVLjwjR5F/hQHqf2BohWYtyaSgKXn/iImkDCzxUGFaA88TGrDgP42Y3GC6R/jyZvJrOzu2JzURqXyq/f/JgnhPnR/DEZbUn7bCRl1oOzkBViAgbeaJzZ2Rro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1KFlKADO; arc=none smtp.client-ip=209.85.214.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-235e389599fso27285ad.0
-        for <kvm@vger.kernel.org>; Fri, 11 Jul 2025 11:38:23 -0700 (PDT)
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-235e389599fso28615ad.0
+        for <kvm@vger.kernel.org>; Fri, 11 Jul 2025 11:46:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752259102; x=1752863902; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1752259585; x=1752864385; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=y75aBbK6qJ4jIj5tJXhEU3PzErB73/x9/veiIRAROC4=;
-        b=uz+SxpuOqvCybR+FYYLtEuS4QfvZnJwhFe7sfNCwWzrTlTNJ1F8Jc22qfHgZHhq5Cc
-         CmiNSHZCPQwGdNF1jQGJ8uUZusVxcryZh0TO6cyKxaRXbYlMQq/Yra5HQiQvlmloi5IA
-         qZapyn/cPEqm2bX2ppXapJMZ97hU4eBQLXZnBZ46L+h9tcyfT4rHevjxObomGVYy43IW
-         xo7r6/yAu5pzjceb1VKk0dumF9sZTT4QNI4p+chyjUcz+7HoCJF7vjTGhciZciagEScJ
-         AS8i6fY/hhGcTM4+vOpkJ8XEDMuqg4DIrkN79r5a3Ojee1sPTlLUbUtEGSvHn0qbhNF+
-         cEDw==
+        bh=q3aEobjPCY0l74zDE1rwtOs+YJ5bZnTUHt69hJSYx74=;
+        b=1KFlKADOX2x+IU2feQiUTjByA17XFUtmEXyHKzLAXDUNBZy3Hh6Pt2T30cDFjNfEfF
+         GW6KwYvROeqbazzlDDpGx8URU4ztlIbDplvIgGdPeUn1nxE5zXu+aitMzpIaBRh1A5Xs
+         krYn8Ixzb7IurIP3tg1sI0cTL6bTVEbEx9EgAkkcoXYHl+U3RPeejLTJKqpzuaBQJZJM
+         pyfRXI2KpeLKWt6z9xCFRau577sPoPrHJsDusJpHlqo9OJX0jN37TjU+Iy2UC9JwZ22Y
+         vF24rIB1Ibb0LVH3HCDKXsEOYZPYREPLz8Ui/iZ25pjvvVDgEh1NuamQO5Zwr/Z5bpII
+         CLAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752259102; x=1752863902;
+        d=1e100.net; s=20230601; t=1752259585; x=1752864385;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=y75aBbK6qJ4jIj5tJXhEU3PzErB73/x9/veiIRAROC4=;
-        b=pbqyA/zbN+3lrvVgRZfTHMXiar6yECrxRT7v3IJA6PEHLjgpyVbv7Cplf0X85fFitl
-         K9W2El5wGbxbVo5Gi3f6cRTfR3WKhInhP2qZ8WsIi6LClPYl3/nwotHlLGskLoW4IrwN
-         z84y9FvlG0fsjAvwYsXF1POxXDP5pPQJZk20i/mWrl6iiQftLYpt0USrzcV/1vxf8T8L
-         NeAi98uIlvElFKh1dKZNkDvOpKmsXET/NaHeIjuaj8byHKSjiVoHRFCIbbYsXaa93PLd
-         RGnv4Dnf9Z1Uvz0xMLFX9G4m4mDzqMCXB2aMGwl612koynR1jodqZFxAc9pd5V2KSEwz
-         1j4A==
-X-Forwarded-Encrypted: i=1; AJvYcCUlAY/yLT321cs7mwE2P5ieW1AdtHqDqI2rQGCVgF1O6HCuBEyDAfW4PtedRQWS2iygyWE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyhr8vQ7o6E7PUg+wHF7VtIE2oKfJYWfXPQ5IPVStvAfU2Aiw0u
-	ICEVVrJUng6RwnzouaJUxaZSVwJ0TY/2dSHXE95NndeIyMsGjV14ygyOL1mL2T4+cm3Km2gOBIZ
-	95Gjjz3WAjzS1DHqYVAtIGSOklqIex+bXmymFbYPt
-X-Gm-Gg: ASbGncsENZ1uqjZtTOC5oGsChI7PYpOpKfl/zFk/NkksNN8bvG8+DQd7Kz2Dwmby+wK
-	GofjDVcNXQPbo9PNcH2z1qMoE7+xSCUVat8QNoulRXMwnJtLg3E034Nbwp5R1JDIXm5W0F9dboJ
-	G9mYN+chrMyM8CSXeuccb70ybaBT8zOCsE0MJPfgqI/W6chNzd9gt0fUCRTIUAxCJ0nYe8mpcJU
-	7nkoToQ7H8mQFhC37cmBSYLGeuLWmdxE/jjoA==
-X-Google-Smtp-Source: AGHT+IGsu8dSs8HJE5goCzoJkCBjTvbHWuRcDJlMXLNqwNbWfzgwWgKINnvVish1bZEUN4Zyz8kT0A+nnxPAT2pqPWY=
-X-Received: by 2002:a17:903:1a28:b0:231:d0ef:e8ff with SMTP id
- d9443c01a7336-23df6954266mr236965ad.8.1752259102079; Fri, 11 Jul 2025
- 11:38:22 -0700 (PDT)
+        bh=q3aEobjPCY0l74zDE1rwtOs+YJ5bZnTUHt69hJSYx74=;
+        b=dqGkrk0urJqkI6VXZV67/nev+tZR4SANcVLCbb5jz7D8QI9/uGa9Hs+kLeNZhEXqef
+         jHAImOc2LPR8kpu3QoF4B+enx5ztAQsfCmw5wfr9WqKEGZR5JKUSt/N4OORDJmHUSSeQ
+         AcgTYStAenH1TD+h6d/wvuzv83z0L+ON48qss+vTZWCeQpKVc5exPI1UCFg+CM1asyp0
+         6uhQngcvVSbQ1+vcdmQyBLXBOSIJjDESnSpZRCaNXbor4jZV+04CZUw5AKDPBNMSARCh
+         WhH3xuCeTvmVvTXSyI5lQaupA5dCF8aK8o0YOZGEJNzty39hcXNvbEq+MIYBJMiHrhp1
+         ThJw==
+X-Forwarded-Encrypted: i=1; AJvYcCWyS9zg7lUadFv2QWydwvjoCw5UvecLeZmobQqAh69vyG6CyOkueU6LejKOxcPoiQhzK9M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxYyQgu7+CS4Dml+axC50BMOfFs2bda8MAKOlAaxFt8kePyZ1+J
+	IjEy/7KiSeSEqD+CSBucw/6ZRhgkcg8fGgV6mixXOzPLJy0QtJLbrj133eO36mf6yxkq4OeE/k+
+	sJSUOVPZ45L9R0nE8HF8TP84yXoaAmGxCjbIQuh4v
+X-Gm-Gg: ASbGncuE4LE5i8QVtS/zJzcXVJZHSQrwCSLzk3hx9wkGTzLfWja+FOvx1E52EhUx/Py
+	vqleRqUA3SPz2MHg63mNLv4ZflV8JgvtyC5FgBqrK26a3zxq7oNZjUM9RJlN3cOldjP04t7pS9Q
+	5JDyYFBu7wGXaWFcDcpPtN4LC4VLbljuvaDa45mQ6X1IVUW6aE53hDzoAt3GycAif8f0CDNFNX7
+	MeQrhCqaOo9N8wOf0e54C3i+FRip9S9ZZ+DLQ==
+X-Google-Smtp-Source: AGHT+IElSHIK+nFgCq+qGXxEYfAJicQBUs9O8jurR7Ssr4uaPjtm1X6j112grWmousd9jed4zUvBFs/XqJrLOCmyabM=
+X-Received: by 2002:a17:903:1b30:b0:234:a734:4ab9 with SMTP id
+ d9443c01a7336-23df6a2907bmr282615ad.20.1752259584520; Fri, 11 Jul 2025
+ 11:46:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -77,15 +77,15 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20250703062641.3247-1-yan.y.zhao@intel.com> <20250709232103.zwmufocd3l7sqk7y@amd.com>
  <aG_pLUlHdYIZ2luh@google.com> <aHCUyKJ4I4BQnfFP@yzhao56-desk>
- <20250711151719.goee7eqti4xyhsqr@amd.com> <aHEwT4X0RcfZzHlt@google.com> <20250711163440.kwjebnzd7zeb4bxt@amd.com>
-In-Reply-To: <20250711163440.kwjebnzd7zeb4bxt@amd.com>
+ <20250711151719.goee7eqti4xyhsqr@amd.com> <aHEwT4X0RcfZzHlt@google.com>
+In-Reply-To: <aHEwT4X0RcfZzHlt@google.com>
 From: Vishal Annapurve <vannapurve@google.com>
-Date: Fri, 11 Jul 2025 11:38:10 -0700
-X-Gm-Features: Ac12FXwD76UGHX5gmLSUps735MnaXyS3ozgzuTfC8AJyvzOHbfbFx5Je1WNljjM
-Message-ID: <CAGtprH9dCCxK=GwVZTUKCeERQGbYD78-t4xDzQprmwtGxDoZXw@mail.gmail.com>
+Date: Fri, 11 Jul 2025 11:46:12 -0700
+X-Gm-Features: Ac12FXxHO3aH_ClVGK7BVe1DV9rCSynSWxs-Uxj1Wjji9UEyfhn7erZXSt82de4
+Message-ID: <CAGtprH9NOdN9VZWkWLjYcTixrN1+dgWfC3rcdmv9rQBkriZrdQ@mail.gmail.com>
 Subject: Re: [RFC PATCH] KVM: TDX: Decouple TDX init mem region from kvm_gmem_populate()
-To: Michael Roth <michael.roth@amd.com>
-Cc: Sean Christopherson <seanjc@google.com>, Yan Zhao <yan.y.zhao@intel.com>, pbonzini@redhat.com, 
+To: Sean Christopherson <seanjc@google.com>
+Cc: Michael Roth <michael.roth@amd.com>, Yan Zhao <yan.y.zhao@intel.com>, pbonzini@redhat.com, 
 	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, rick.p.edgecombe@intel.com, 
 	kai.huang@intel.com, adrian.hunter@intel.com, reinette.chatre@intel.com, 
 	xiaoyao.li@intel.com, tony.lindgren@intel.com, binbin.wu@linux.intel.com, 
@@ -95,57 +95,62 @@ Cc: Sean Christopherson <seanjc@google.com>, Yan Zhao <yan.y.zhao@intel.com>, pb
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jul 11, 2025 at 9:37=E2=80=AFAM Michael Roth <michael.roth@amd.com>=
- wrote:
+On Fri, Jul 11, 2025 at 8:40=E2=80=AFAM Sean Christopherson <seanjc@google.=
+com> wrote:
 >
+> On Fri, Jul 11, 2025, Michael Roth wrote:
+> > On Fri, Jul 11, 2025 at 12:36:24PM +0800, Yan Zhao wrote:
+> > > Besides, it can't address the 2nd AB-BA lock issue as mentioned in th=
+e patch
+> > > log:
+> > >
+> > > Problem
+> > > =3D=3D=3D
+> > > ...
+> > > (2)
+> > > Moreover, in step 2, get_user_pages_fast() may acquire mm->mmap_lock,
+> > > resulting in the following lock sequence in tdx_vcpu_init_mem_region(=
+):
+> > > - filemap invalidation lock --> mm->mmap_lock
+> > >
+> > > However, in future code, the shared filemap invalidation lock will be=
+ held
+> > > in kvm_gmem_fault_shared() (see [6]), leading to the lock sequence:
+> > > - mm->mmap_lock --> filemap invalidation lock
 > >
-> > static long __kvm_gmem_populate(struct kvm *kvm, struct kvm_memory_slot=
- *slot,
-> >                               struct file *file, gfn_t gfn, void __user=
- *src,
-> >                               kvm_gmem_populate_cb post_populate, void =
-*opaque)
-> > {
-> >       pgoff_t index =3D kvm_gmem_get_index(slot, gfn);
-> >       struct page *src_page =3D NULL;
-> >       bool is_prepared =3D false;
-> >       struct folio *folio;
-> >       int ret, max_order;
-> >       kvm_pfn_t pfn;
-> >
-> >       if (src) {
-> >               ret =3D get_user_pages((unsigned long)src, 1, 0, &src_pag=
-e);
-> >               if (ret < 0)
-> >                       return ret;
-> >               if (ret !=3D 1)
-> >                       return -ENOMEM;
-> >       }
+> > I wouldn't expect kvm_gmem_fault_shared() to trigger for the
+> > KVM_MEMSLOT_SUPPORTS_GMEM_SHARED case (or whatever we end up naming it)=
+.
 >
-> One tricky part here is that the uAPI currently expects the pages to
-> have the private attribute set prior to calling kvm_gmem_populate(),
-> which gets enforced below.
+> Irrespective of shared faults, I think the API could do with a bit of cle=
+anup
+> now that TDX has landed, i.e. now that we can see a bit more of the pictu=
+re.
 >
-> For in-place conversion: the idea is that userspace will convert
-> private->shared to update in-place, then immediately convert back
-> shared->private; so that approach would remain compatible with above
-> behavior. But if we pass a 'src' parameter to kvm_gmem_populate(),
-> and do a GUP or copy_from_user() on it at any point, regardless if
-> it is is outside of filemap_invalidate_lock(), then
-> kvm_gmem_fault_shared() will return -EACCES.
-
-I think that's a fine way to fail the initial memory population, this
-simply means userspace didn't pass the right source address. Why do we
-have to work around this error? Userspace should simply pass the
-source buffer that is accessible to the host or pass null to indicate
-that the target gfn already has the needed contents.
-
-That is, userspace can still bring a separate source buffer even with
-in-place conversion available.
-
-> The only 2 ways I see
-> around that are to either a) stop enforcing that pages that get
-> processed by kvm_gmem_populate() are private for in-place conversion
-> case, or b) enforce that 'src' is NULL for in-place conversion case.
+> As is, I'm pretty sure TDX is broken with respect to hugepage support, be=
+cause
+> kvm_gmem_populate() marks an entire folio as prepared, but TDX only ever =
+deals
+> with one page at a time.  So that needs to be changed.  I assume it's alr=
+eady
+> address in one of the many upcoming series, but it still shows a flaw in =
+the API.
 >
+> Hoisting the retrieval of the source page outside of filemap_invalidate_l=
+ock()
+> seems pretty straightforward, and would provide consistent ABI for all ve=
+ndor
+
+Will relying on standard KVM -> guest_memfd interaction i.e.
+simulating a second stage fault to get the right target address work
+for all vendors i.e. CCA/SNP/TDX? If so, we might not have to maintain
+this out of band path of kvm_gmem_populate.
+
+> flavors.  E.g. as is, non-struct-page memory will work for SNP, but not T=
+DX.  The
+> obvious downside is that struct-page becomes a requirement for SNP, but t=
+hat
+>
+
+Maybe you had more thought here?
 
