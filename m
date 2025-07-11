@@ -1,144 +1,164 @@
-Return-Path: <kvm+bounces-52216-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52217-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E52F4B0275A
-	for <lists+kvm@lfdr.de>; Sat, 12 Jul 2025 01:05:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7C0AB0275C
+	for <lists+kvm@lfdr.de>; Sat, 12 Jul 2025 01:05:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 44C247ABC1D
-	for <lists+kvm@lfdr.de>; Fri, 11 Jul 2025 23:03:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A9183A7923
+	for <lists+kvm@lfdr.de>; Fri, 11 Jul 2025 23:05:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F165224225;
-	Fri, 11 Jul 2025 23:05:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5D7F22256B;
+	Fri, 11 Jul 2025 23:05:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Y2wEzcns"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0nKtppeL"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 650EF2236E1
-	for <kvm@vger.kernel.org>; Fri, 11 Jul 2025 23:05:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72C631F63C1
+	for <kvm@vger.kernel.org>; Fri, 11 Jul 2025 23:05:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752275101; cv=none; b=NjHyivxAf3c2gFAZcqDNyrrlOV707paQfNJFH2ehTyY/MAoY5d4GEwLYKDjDxesARppYTDrtrNHvgR8Qh5Q2h9ma2eTRBdYwhhaCtMVxPqbNs9Zt6ZDeKmxUWM96rIUUW0YDyNQ5yHZCov/DqwCp6xCKDXSYXpwU4eZ9EhyHkVw=
+	t=1752275138; cv=none; b=laRIeFY4CDL687v8VXXuDSd552tfqatkRYnWKcnlyrTPE4U6lfg1H+N/pPcznb2PuZ5VGs9J/MCs/+piPxwdXWzQQii/F/oTMf01hYZdUWXHRhHQ7eQdBP2dNtS3B8y8Xmr9/jV9ac1mQ7K9mWBaIKmpL7s+0LEx3vjQdhq+2C0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752275101; c=relaxed/simple;
-	bh=nnIOfDA/IHDzCc1ICgQILjechAoW55OWkyKQz0wmAqg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EkCSDRhFUmm/tlAPIpdr6u+A9O3U0jtYPiNdaBc5rgJcr2mDBND4ghthpAOHZtKufvyVRMr1rJ79Lkwl4dezUQN+izELyD4k4K5vmMxS1otOirrwxNdACWKJdX6eT38sg19Y/SBA4K9POs6+Ufz0IdTixWmFPttYyWOhrgrXyKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Y2wEzcns; arc=none smtp.client-ip=209.85.214.179
+	s=arc-20240116; t=1752275138; c=relaxed/simple;
+	bh=4Bs5SqTUY3Q4P4/q3DDE8Asi3dU/+HcJjGHK1BPmIps=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=aj3xGHh4dFSiOM12/A6Jp9pTsmsCHgKunpM+K4hftnetpqvJ7oiW9w8CicXr2vSN7NmYLK/fFaqSy4XcElbVgEOxc6gOMkmcyjdLkg1UsKNOSb6jgECLzI276RTSRTn9qV7lp8mnvy/5D2T9HujrMrEMSuHOWdq6ZShRi8QNtjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0nKtppeL; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-237f18108d2so65595ad.0
-        for <kvm@vger.kernel.org>; Fri, 11 Jul 2025 16:05:00 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3138f5e8ff5so2747155a91.3
+        for <kvm@vger.kernel.org>; Fri, 11 Jul 2025 16:05:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752275099; x=1752879899; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tIRp4nuNG0MkOmILiokqVBZt7BZxwtFgO4R23+cjxTY=;
-        b=Y2wEzcnsMqasj78uorWQ4hkczpVVM85zRCSFlV3nAEsX+wWQgT6oesYW1ldVFvouJD
-         ouV4ws21uCsRWhX2jkrcOvglMsE49w319ERFoh2JxmWS6k1EzFqASMG1cc04TDOakZG8
-         YvQF6kkj4EQ7Io9oMntkhYGuz0u3p+NlJOIexc0PhUZBtVof032WJVUfspVKiFafgO1C
-         LMvehmlBoKcZZ7Y9wT3m4wBan5vsYif/niwdWOwrqhgwNPvuxxm7jey07LRzbIu3XKFS
-         VqqMDNv8+cHXRRlBd4GfGaBPBVGquTrI2IvIMjzUI8ST8rcuFKHQ6+uFIqT1wQ31ItGO
-         Al9g==
+        d=google.com; s=20230601; t=1752275137; x=1752879937; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=NqcyLGxIFUK8WWTsF+7z0v9HoFqFccJotlk3guwsLTU=;
+        b=0nKtppeLRATHUSKJG67V+l3SfK+m5I0Qvwj5KdzVFmABB0BHMG8UPo7dq8cg88SZ0p
+         WZky3aZsZOTz4tOlp87UHJLzwqEUMorhLgDaOFVZFPBFhXHfQvVDlGDmAlTUAsswZYvs
+         KydQR09v0HT0kakwcZvj7QX1pLNVPpFIo+pYbY8amWetVvFGOcVUbmvdr47/HDAonUel
+         TT6rvJYYQjFYM7RkRQvffce957hyzfiJhNHmr14qMPHq02KQLaTpNPZ1vko1kNa5+0cW
+         XjT483T6g8+M4VJl9wU6Q9m68ByZCgWy3or8frldVzLZsYvW/XldTbSI3thEBDdmpVD2
+         5q8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752275099; x=1752879899;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tIRp4nuNG0MkOmILiokqVBZt7BZxwtFgO4R23+cjxTY=;
-        b=f7A+VUO/A7z/EPiFOyZng7Y1bUq2MY7HEm2POQZTMDXfcE66leZKa+eZEOhOl5w2DL
-         rPDflYHJDI3AdYh+tecLbvRwCXLeLdGrkDFeppVWs1+6nDVvZmah1M+S7o3kRYRtRl1Z
-         fS/4Wu2csvjIBX6bjwLDl/zXihe09IXbZFf8shAhvEgPCOCE0ZYYuwtXFWBke1B1Ea6K
-         77NybRAQxKsCkYXq/lQ3ImiDMjr0WehawnxlqkH6B+nB5sLHdnsxjDHS6spo1Nfhjqtj
-         Zgf/QNW54zBnqiX6afvrdKZn3DCwBRMgQC5//GZPAAMukiOiT6SD6NKYjqCeflrT633N
-         ZtNQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXrt1MUfa+8lqp31QXz5vwUEwSWxadB5cVR/RbkrunV+99vjdl/qKknioWavXKYRt1ERtM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx6tDcszNaAjBNpLGqAE2VlDeBvXX+0fW6p/88uauJPFTmEeDqJ
-	VwewfoehyDEYfqb/Gpti1nz7ZGpwB6ejod2aDfryrCbNV/XzZpOp+pGJviS4rYkQ6lVV8N8AfTl
-	5GVtoATx58TwiGKy9/JFk1t04cM//4sItyNVQ6O8z
-X-Gm-Gg: ASbGncsJm7/EVW5gUGHWGufFkqwjE16MYvgpKXNqEawZgmw10Q7ZIfPh0vyhoQCWq8v
-	Q2bxF+nEoZQytRKeTi+pPLbp7EM1DLf0Pulc+bxHy3jEKtaIpHy0Rv+U0Eb/tNb879MgG/NDmbS
-	Z/aNI30gwWIFhn5TJtv+Z9A5EqutIRWN9VHsBL57DZjLCR27lKL9hpGHItnrA5Qd9OoEKUpI6cg
-	i3x3ih72SnsfJUpdlArf3QEj8Vl3wp3oR8g6w==
-X-Google-Smtp-Source: AGHT+IFJLvFxh6Cj1EDVhy5GEJi7jwQTmD7bIFZI5RL+Eu8jhB1itNhMZdfzi4fnCqB1Sk/SsjQhxXaIpf58qI+KDks=
-X-Received: by 2002:a17:903:f87:b0:235:e1fa:1fbc with SMTP id
- d9443c01a7336-23df69c05b2mr1076015ad.0.1752275099063; Fri, 11 Jul 2025
- 16:04:59 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1752275137; x=1752879937;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=NqcyLGxIFUK8WWTsF+7z0v9HoFqFccJotlk3guwsLTU=;
+        b=LVjWg+RhdcKatv8ALgt2IYUi7aXSCSq61Unp51BwvljLzgFL6Ql00ElH4yft5xnlqd
+         J9VNBf4t3f4TzDx2VMjwJHrR7iD19vZHy62p7T8ggE5aEdCIe/vfLiZEoxTZPB76ooLc
+         ilsCW/xxtKPN6jRkWy9bRYZ7Ma/UKNFdEk8I7PLNDfp6a51HJHKCj6bvquLvjHe1BnPC
+         3ku+YbeOgP+0e8JLBozHxSocsKHfsYQ91oA1cOvGF+8PYKo14QncoNcE7JljOpYYRFL0
+         9q2BYUquA6P7BE8g/jJQfG20hJy+tJIQ5HzmdUAU9uc4z6aVjcmuupqKeOfcCerQp20D
+         IZ8w==
+X-Forwarded-Encrypted: i=1; AJvYcCVqPjIDLcv6+8dDdfMuZY5FVBE6aluM08ukSIUPkicIPGH3XQPLT5RxI/BIJ3UtQIPK7o4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzJMAO4gWOBIrPy+ohf/AdhylmnqqT4REfosVaicvQvolRPh0sB
+	Y3X0iVGhR4I6RzzbFAGX3PAR0qVExm6dhfAAqqvEAes4DtEvm79KUsNqSYkGq5cczmGJOJWtBbJ
+	9t/Ii+Q==
+X-Google-Smtp-Source: AGHT+IHJS4NYEGdNVSCubE3H0tM+nH35otXVHe/B14UXjQoS/iyHp2xCF6S4MKDSQhqkXVqrclfIfjnfgAk=
+X-Received: from pjbsd11.prod.google.com ([2002:a17:90b:514b:b0:312:df0e:5f09])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1850:b0:313:33ca:3b8b
+ with SMTP id 98e67ed59e1d1-31c4ca848dfmr7233660a91.9.1752275136707; Fri, 11
+ Jul 2025 16:05:36 -0700 (PDT)
+Date: Fri, 11 Jul 2025 16:05:34 -0700
+In-Reply-To: <b5df4f84b473524fc3abc33f9c263372d0424372.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250703062641.3247-1-yan.y.zhao@intel.com> <20250709232103.zwmufocd3l7sqk7y@amd.com>
- <aG_pLUlHdYIZ2luh@google.com> <aHCUyKJ4I4BQnfFP@yzhao56-desk>
- <20250711151719.goee7eqti4xyhsqr@amd.com> <aHEwT4X0RcfZzHlt@google.com>
- <20250711163440.kwjebnzd7zeb4bxt@amd.com> <68717342cfafc_37c14b294a6@iweiny-mobl.notmuch>
- <aHGWtsqr8c403nIj@google.com>
-In-Reply-To: <aHGWtsqr8c403nIj@google.com>
-From: Vishal Annapurve <vannapurve@google.com>
-Date: Fri, 11 Jul 2025 16:04:46 -0700
-X-Gm-Features: Ac12FXyee47OthrUwA6ohIyisIic2g-mdZCcRA0a9PdY6GqJGMDKM9zNg7Zgiy0
-Message-ID: <CAGtprH8trSVcES50p6dFCMQ+2aY2YSDMOPW0C03iBN4tfvgaWQ@mail.gmail.com>
-Subject: Re: [RFC PATCH] KVM: TDX: Decouple TDX init mem region from kvm_gmem_populate()
-To: Sean Christopherson <seanjc@google.com>
-Cc: Ira Weiny <ira.weiny@intel.com>, Michael Roth <michael.roth@amd.com>, 
-	Yan Zhao <yan.y.zhao@intel.com>, pbonzini@redhat.com, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, rick.p.edgecombe@intel.com, kai.huang@intel.com, 
-	adrian.hunter@intel.com, reinette.chatre@intel.com, xiaoyao.li@intel.com, 
-	tony.lindgren@intel.com, binbin.wu@linux.intel.com, dmatlack@google.com, 
-	isaku.yamahata@intel.com, david@redhat.com, ackerleytng@google.com, 
-	tabba@google.com, chao.p.peng@intel.com
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+References: <20250611095158.19398-1-adrian.hunter@intel.com>
+ <175088949072.720373.4112758062004721516.b4-ty@google.com>
+ <aF1uNonhK1rQ8ViZ@google.com> <7103b312-b02d-440e-9fa6-ba219a510c2d@intel.com>
+ <aHEMBuVieGioMVaT@google.com> <3989f123-6888-459b-bb65-4571f5cad8ce@intel.com>
+ <aHEdg0jQp7xkOJp5@google.com> <b5df4f84b473524fc3abc33f9c263372d0424372.camel@intel.com>
+Message-ID: <aHGYvrdX4biqKYih@google.com>
+Subject: Re: [PATCH V4 0/1] KVM: TDX: Decrease TDX VM shutdown time
+From: Sean Christopherson <seanjc@google.com>
+To: Rick P Edgecombe <rick.p.edgecombe@intel.com>
+Cc: Xiaoyao Li <xiaoyao.li@intel.com>, Chao Gao <chao.gao@intel.com>, 
+	Kai Huang <kai.huang@intel.com>, 
+	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, Reinette Chatre <reinette.chatre@intel.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>, Adrian Hunter <adrian.hunter@intel.com>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
+	"tony.lindgren@linux.intel.com" <tony.lindgren@linux.intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	Yan Y Zhao <yan.y.zhao@intel.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jul 11, 2025 at 3:56=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> On Fri, Jul 11, 2025, Ira Weiny wrote:
-> > Michael Roth wrote:
-> > > For in-place conversion: the idea is that userspace will convert
-> > > private->shared to update in-place, then immediately convert back
-> > > shared->private;
-> >
-> > Why convert from private to shared and back to private?  Userspace whic=
-h
-> > knows about mmap and supports it should create shared pages, mmap, writ=
-e
-> > data, then convert to private.
->
-> Dunno if there's a strong usecase for converting to shared *and* populati=
-ng the
-> data, but I also don't know that it's worth going out of our way to preve=
-nt such
-> behavior, at least not without a strong reason to do so.  E.g. if it allo=
-wed for
-> a cleaner implementation or better semantics, then by all means.  But I d=
-on't
-> think that's true here?  Though I haven't thought hard about this, so don=
-'t
-> quote me on that. :-)
+On Fri, Jul 11, 2025, Rick P Edgecombe wrote:
+> On Fri, 2025-07-11 at 07:19 -0700, Sean Christopherson wrote:
+> > --
+> > diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> > index f4d4fd5cc6e8..9c2997665762 100644
+> > --- a/arch/x86/kvm/vmx/tdx.c
+> > +++ b/arch/x86/kvm/vmx/tdx.c
+> > @@ -181,6 +181,8 @@ static int init_kvm_tdx_caps(const struct tdx_sys_i=
+nfo_td_conf *td_conf,
+> > =C2=A0{
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int i;
+> > =C2=A0
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 memset(caps->reserved, 0, sizeof(=
+caps->reserved));
+> > +
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 caps->supported_attrs =3D td=
+x_get_supported_attrs(td_conf);
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!caps->supported_attrs)
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 return -EIO;
+> > --
+>=20
+> I started to try to help by chipping in a log for this, but I couldn't ju=
+stify
+> it very well. struct kvm_tdx_capabilities gets copied from userspace befo=
+re
+> being populated So a userspace that knows to look for something in the re=
+served
+> area could know to zero it. If they left their own data in the reserved a=
+rea,
+> and then relied on that data to remain the same, and then we started sett=
+ing a
+> new field in it I guess it could disturb it. But that is strange, and I'm=
+ not
+> sure it really reduces much risk. Anyway here is the attempt to justify i=
+t.
+>=20
+>=20
+> KVM: TDX: Zero reserved reserved area in struct kvm_tdx_capabilities
+>=20
+> Zero the reserved area in struct kvm_tdx_capabilities so that fields adde=
+d in
+> the reserved area won't disturb any userspace that previously had garbage=
+ there.
 
-If this is a huge page backing, starting as shared will split all the
-pages to 4K granularity upon allocation. To avoid splitting, userspace
-can start with everything as private when working with hugepages and
-then follow convert to shared -> populate -> convert to private as
-needed.
+It's not only about disturbing userspace, it's also about actually being ab=
+le to
+repurpose the reserved fields in the future without needing *another* flag =
+to tell
+userspace that it's ok to read the previously-reserved fields.  I care abou=
+t this
+much more than I care about userspace using reserved fields as scratch spac=
+e.
 
->
-> > Old userspace will create private and pass in a source pointer for the
-> > initial data as it does today.
-> >
-> > Internally, the post_populate() callback only needs to know if the data=
- is
-> > in place or coming from somewhere else (ie src !=3D NULL).
->
-> I think there will be a third option: data needs to be zeroed, i.e. the !=
-src &&
-> !PRESERVED case.
+> struct kvm_tdx_capabilities holds information about the combined support =
+of KVM
+> and the TDX module. For future growth, there is an area of the struct mar=
+ked as
+> reserved. This way fields can be added into that space without increasing=
+ the
+> size of the struct.
+>=20
+> However, currently the reserved area is not zeroed, meaning any data that
+> userspace left in the reserved area would be clobbered by a future field =
+written
+> in the reserved area. So zero the reserved area to reduce the risk that
+> userspace might try to rely on some data there.
 
