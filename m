@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-52122-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52123-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BDABB01936
-	for <lists+kvm@lfdr.de>; Fri, 11 Jul 2025 12:02:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC1DFB01919
+	for <lists+kvm@lfdr.de>; Fri, 11 Jul 2025 12:01:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 456647BD011
-	for <lists+kvm@lfdr.de>; Fri, 11 Jul 2025 09:59:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6275C8E330A
+	for <lists+kvm@lfdr.de>; Fri, 11 Jul 2025 10:00:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32634280328;
-	Fri, 11 Jul 2025 10:00:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65E1727FB05;
+	Fri, 11 Jul 2025 10:00:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OaVeRLvh"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nAaybmHq"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 514F91C84D9
-	for <kvm@vger.kernel.org>; Fri, 11 Jul 2025 10:00:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F7BA218EBF
+	for <kvm@vger.kernel.org>; Fri, 11 Jul 2025 10:00:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752228043; cv=none; b=Ct9knHff+BHp9uHnu/OjViRQYGjesDEO/jMPTRXRztqxILdEb630BgMazIBXp1ys5lyFVLAO48owYhh/dSnn4asvEaorA81Y9bEH/VjrsRBMxV8M+ZXYCz0PlDHlijCM171kuG/l55PdoGadFOJ4ZKZktcF7ojTaN2E4hPzeGtk=
+	t=1752228051; cv=none; b=B/6QmivYvs4OZnegDlgCydkbHaHqbpEs0w1P9ROM4W18dAwVFNAgl6neBrltH/TuB7b78icTmSZV/zyww6uoooIk2JckrzJFFhAJTYrNU9mR5xwaVeuWWLzPeRqKAxwm0LUi4g1kG7Ai/u59lKFt1GB5O8nLhnQ9Fe6xb7N4RA4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752228043; c=relaxed/simple;
-	bh=yG3qiMYa7f3Vg06cEK8SdJIMxpzMK6proPRZfmYy1os=;
+	s=arc-20240116; t=1752228051; c=relaxed/simple;
+	bh=NAdqAYTXJZb5DjKif7WlBLOUKuZAQoUj2XZSaZ6yx2o=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=W4koIMZ9xkdvK9d1rPvneiRQiS+3XNYLYgrMR3SP/P3mpXtSUYAUSC3rVf76QTwRozdrmaXFlwJUUoC5idFsDIWyDjCfaabIQMfkBGZ6jwTY9uZuYnwyQd/tlNIuiIzqWRx+gsQTU3wKmDgyEvMgbNcRNXYMv+KtrdYrQL6oPTo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OaVeRLvh; arc=none smtp.client-ip=198.175.65.17
+	 MIME-Version; b=AXyChS9YOckGvv02hWa57OPmQEqKboZgsVTMfJxzrnbSl/LoJTb7Y8jsOxFZKLy2aD3fa6gzXGTDyl8jbZ0GLhkrkN/slYkXDsT3hgp+pKeKUfJiBGTqz+hxKuoGMPgI1glpBruBjkpASga2hVrqdS8Povulf6IUsODV4dsByR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nAaybmHq; arc=none smtp.client-ip=198.175.65.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752228041; x=1783764041;
+  t=1752228050; x=1783764050;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=yG3qiMYa7f3Vg06cEK8SdJIMxpzMK6proPRZfmYy1os=;
-  b=OaVeRLvhnO6BtaluugUf3Hll8zSsO2phMi8zd4lBVqx1yirlrmJtKEUd
-   U5H5hwySbpmTHlyI9N7WEIuLmSO05Ofo8id13hDbBjrgd8k/Qn8/x7NYp
-   ckR8cRzwwH0M+L5S02YAjUAuI2bwKeiSTFCUrL8HwqrYiVMvhY6/91FPD
-   LrD/3p8MKe/6ez93vgEhVhCakub1D9uFTdW05KSRWybmqaR1H2lVP77kt
-   WaTv1M7QQn4scvdEbLNBspHku/Fb83b70GfaDWg+pyQg/kYCBf7xj2fKj
-   UzZuK07e4Y+7zdLdGyfN7h+UdNNGSPlaz9C6dwXi5TjjYalOXp+/PIfxZ
-   Q==;
-X-CSE-ConnectionGUID: CFwpZL/LRUeRlF79xAfXiw==
-X-CSE-MsgGUID: XAeWgiZdR8mDbTC0nMrirg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11490"; a="54496258"
+  bh=NAdqAYTXJZb5DjKif7WlBLOUKuZAQoUj2XZSaZ6yx2o=;
+  b=nAaybmHqWMV7Ma0vub6Hj4u+2JHcMroFHZIy8Dpb74K7G1B2Ld4Ui6pP
+   wVIYR68KEq21XSROn4dL93Q92qoYqQJI8NFG6GRIutqVMaj58acvuAbxA
+   xfTINFJfONenOVxNeqHwmBkXowh4BlL5/jMP7daasNyprAp1ADt3JGFuQ
+   M+dONoyMR5+46PkhZAJzrD83X8wbGTYGyD57AcOm3wJJig5EGpWfnwjt9
+   9vHN5jVmLT4DQefdfGesG1M6pyIKauG74J0B2pF6xOukXxLNIj69ld+Ri
+   Ym30dtchFGLf84WHwiEMRIkGbD+2coMcNpNRAd4mVPeGRnPw+zWhVILIy
+   w==;
+X-CSE-ConnectionGUID: N6a0/j7HRGSXVu505bdRcg==
+X-CSE-MsgGUID: VrVsSHKrRUWHOiB+Mfr2PQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11490"; a="54496263"
 X-IronPort-AV: E=Sophos;i="6.16,303,1744095600"; 
-   d="scan'208";a="54496258"
+   d="scan'208";a="54496263"
 Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2025 03:00:41 -0700
-X-CSE-ConnectionGUID: RFZxQlyATGagBmo5IyZX9A==
-X-CSE-MsgGUID: 54hzDnYpRJqJEGjMYteDSw==
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2025 03:00:49 -0700
+X-CSE-ConnectionGUID: TL4xReLGT6GyGPh2jf5l2w==
+X-CSE-MsgGUID: e8KFagqBT5yjLtE1jLAYew==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,303,1744095600"; 
-   d="scan'208";a="160662043"
+   d="scan'208";a="160662047"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.39])
-  by orviesa003.jf.intel.com with ESMTP; 11 Jul 2025 03:00:35 -0700
+  by orviesa003.jf.intel.com with ESMTP; 11 Jul 2025 03:00:40 -0700
 From: Zhao Liu <zhao1.liu@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Marcelo Tosatti <mtosatti@redhat.com>,
@@ -77,10 +77,10 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
 	qemu-devel@nongnu.org,
 	kvm@vger.kernel.org,
 	Zhao Liu <zhao1.liu@intel.com>,
-	Alexander Graf <agraf@csgraf.de>
-Subject: [PATCH v2 04/18] i386/cpu: Present same cache model in CPUID 0x2 & 0x4
-Date: Fri, 11 Jul 2025 18:21:29 +0800
-Message-Id: <20250711102143.1622339-5-zhao1.liu@intel.com>
+	Dapeng Mi <dapeng1.mi@linux.intel.com>
+Subject: [PATCH v2 05/18] i386/cpu: Consolidate CPUID 0x4 leaf
+Date: Fri, 11 Jul 2025 18:21:30 +0800
+Message-Id: <20250711102143.1622339-6-zhao1.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250711102143.1622339-1-zhao1.liu@intel.com>
 References: <20250711102143.1622339-1-zhao1.liu@intel.com>
@@ -92,130 +92,108 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-For a long time, the default cache models used in CPUID 0x2 and
-0x4 were inconsistent and had a FIXME note from Eduardo at commit
-5e891bf8fd50 ("target-i386: Use #defines instead of magic numbers for
-CPUID cache info"):
+Modern Intel CPUs use CPUID 0x4 leaf to describe cache information
+and leave space in 0x2 for prefetch and TLBs (even TLB has its own leaf
+CPUID 0x18).
 
-"/*FIXME: CPUID leaf 2 descriptor is inconsistent with CPUID leaf 4 */".
+And 0x2 leaf provides a descriptor 0xFF to instruct software to check
+cache information in 0x4 leaf instead.
 
-This difference is wrong, in principle, both 0x2 and 0x4 are used for
-Intel's cache description. 0x2 leaf is used for ancient machines while
-0x4 leaf is a subsequent addition, and both should be based on the same
-cache model. Furthermore, on real hardware, 0x4 leaf should be used in
-preference to 0x2 when it is available.
+Therefore, follow this behavior to encode 0xFF when Intel CPU has 0x4
+leaf with "x-consistent-cache=true" for compatibility.
 
-Revisiting the git history, that difference occurred much earlier.
+In addition, for older CPUs without 0x4 leaf, still enumerate the cache
+descriptor in 0x2 leaf, except the case that there's no descriptor
+matching the cache model, then directly encode 0xFF in 0x2 leaf. This
+makes sense, as in the 0x2 leaf era, all supported caches should have
+the corresponding descriptor.
 
-Current legacy_l2_cache_cpuid2 (hardcode: "0x2c307d"), which is used for
-CPUID 0x2 leaf, is introduced in commit d8134d91d9b7 ("Intel cache info,
-by Filip Navara."). Its commit message didn't said anything, but its
-patch [1] mentioned the cache model chosen is "closest to the ones
-reported in the AMD registers". Now it is not possible to check which
-AMD generation this cache model is based on (unfortunately, AMD does not
-use 0x2 leaf), but at least it is close to the Pentium 4.
-
-In fact, the patch description of commit d8134d91d9b7 is also a bit
-wrong, the original cache model in leaf 2 is from Pentium Pro, and its
-cache descriptor had specified the cache line size ad 32 byte by default,
-while the updated cache model in commit d8134d91d9b7 has 64 byte line
-size. But after so many years, such judgments are no longer meaningful.
-
-On the other hand, for legacy_l2_cache, which is used in CPUID 0x4 leaf,
-is based on Intel Core Duo (patch [2]) and Core2 Duo (commit e737b32a3688
-("Core 2 Duo specification (Alexander Graf).")
-
-The patches of Core Duo and Core 2 Duo add the cache model for CPUID
-0x4, but did not update CPUID 0x2 encoding. This is the reason that
-Intel Guests use two cache models in 0x2 and 0x4 all the time.
-
-Of course, while no Core Duo or Core 2 Duo machines have been found for
-double checking, this still makes no sense to encode different cache
-models on a single machine.
-
-Referring to the SDM and the real hardware available, 0x2 leaf can be
-directly encoded 0xFF to instruct software to go to 0x4 leaf to get the
-cache information, when 0x4 is available.
-
-Therefore, it's time to clean up Intel's default cache models. As the
-first step, add "x-consistent-cache" compat option to allow newer
-machines (v10.1 and newer) to have the consistent cache model in CPUID
-0x2 and 0x4 leaves.
-
-This doesn't affect the CPU models with CPUID level < 4 ("486",
-"pentium", "pentium2" and "pentium3"), because they have already had the
-special default cache model - legacy_intel_cpuid2_cache_info.
-
-[1]: https://lore.kernel.org/qemu-devel/5b31733c0709081227w3e5f1036odbc649edfdc8c79b@mail.gmail.com/
-[2]: https://lore.kernel.org/qemu-devel/478B65C8.2080602@csgraf.de/
-
-Cc: Alexander Graf <agraf@csgraf.de>
+Reviewed-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
 Tested-by: Yi Lai <yi1.lai@intel.com>
 Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 ---
- hw/i386/pc.c      | 4 +++-
- target/i386/cpu.c | 7 ++++++-
- target/i386/cpu.h | 7 +++++++
- 3 files changed, 16 insertions(+), 2 deletions(-)
+Changes Since v1:
+ * Fix the typo in comment. (Ewan)
+---
+ target/i386/cpu.c | 48 ++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 37 insertions(+), 11 deletions(-)
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index b2116335752d..ad2d6495ebde 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -81,7 +81,9 @@
-     { "qemu64-" TYPE_X86_CPU, "model-id", "QEMU Virtual CPU version " v, },\
-     { "athlon-" TYPE_X86_CPU, "model-id", "QEMU Virtual CPU version " v, },
- 
--GlobalProperty pc_compat_10_0[] = {};
-+GlobalProperty pc_compat_10_0[] = {
-+    { TYPE_X86_CPU, "x-consistent-cache", "false" },
-+};
- const size_t pc_compat_10_0_len = G_N_ELEMENTS(pc_compat_10_0);
- 
- GlobalProperty pc_compat_9_2[] = {};
 diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index f85e087bf7df..70ac969a9cdc 100644
+index 70ac969a9cdc..37cf591bea8d 100644
 --- a/target/i386/cpu.c
 +++ b/target/i386/cpu.c
-@@ -8935,7 +8935,11 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
-         /* Build legacy cache information */
-         env->cache_info_cpuid2.l1d_cache = &legacy_l1d_cache;
-         env->cache_info_cpuid2.l1i_cache = &legacy_l1i_cache;
--        env->cache_info_cpuid2.l2_cache = &legacy_l2_cache_cpuid2;
-+        if (!cpu->consistent_cache) {
-+            env->cache_info_cpuid2.l2_cache = &legacy_l2_cache_cpuid2;
-+        } else {
-+            env->cache_info_cpuid2.l2_cache = &legacy_l2_cache;
-+        }
-         env->cache_info_cpuid2.l3_cache = &legacy_l3_cache;
+@@ -223,7 +223,7 @@ struct CPUID2CacheDescriptorInfo cpuid2_cache_descriptors[] = {
+  * Return a CPUID 2 cache descriptor for a given cache.
+  * If no known descriptor is found, return CACHE_DESCRIPTOR_UNAVAILABLE
+  */
+-static uint8_t cpuid2_cache_descriptor(CPUCacheInfo *cache)
++static uint8_t cpuid2_cache_descriptor(CPUCacheInfo *cache, bool *unmacthed)
+ {
+     int i;
  
-         env->cache_info_cpuid4.l1d_cache = &legacy_l1d_cache;
-@@ -9461,6 +9465,7 @@ static const Property x86_cpu_properties[] = {
-      * own cache information (see x86_cpu_load_def()).
-      */
-     DEFINE_PROP_BOOL("legacy-cache", X86CPU, legacy_cache, true),
-+    DEFINE_PROP_BOOL("x-consistent-cache", X86CPU, consistent_cache, true),
-     DEFINE_PROP_BOOL("legacy-multi-node", X86CPU, legacy_multi_node, false),
-     DEFINE_PROP_BOOL("xen-vapic", X86CPU, xen_vapic, false),
+@@ -240,9 +240,44 @@ static uint8_t cpuid2_cache_descriptor(CPUCacheInfo *cache)
+             }
+     }
  
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 51e10139dfdf..d7c9a1f91446 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -2259,6 +2259,13 @@ struct ArchCPU {
-      */
-     bool legacy_cache;
++    *unmacthed |= true;
+     return CACHE_DESCRIPTOR_UNAVAILABLE;
+ }
  
-+    /*
-+     * Compatibility bits for old machine types.
-+     * If true, use the same cache model in CPUID leaf 0x2
-+     * and 0x4.
-+     */
-+    bool consistent_cache;
++/* Encode cache info for CPUID[2] */
++static void encode_cache_cpuid2(X86CPU *cpu,
++                                uint32_t *eax, uint32_t *ebx,
++                                uint32_t *ecx, uint32_t *edx)
++{
++    CPUX86State *env = &cpu->env;
++    CPUCaches *caches = &env->cache_info_cpuid2;
++    int l1d, l1i, l2, l3;
++    bool unmatched = false;
 +
-     /* Compatibility bits for old machine types.
-      * If true decode the CPUID Function 0x8000001E_ECX to support multiple
-      * nodes per processor
++    *eax = 1; /* Number of CPUID[EAX=2] calls required */
++    *ebx = *ecx = *edx = 0;
++
++    l1d = cpuid2_cache_descriptor(caches->l1d_cache, &unmatched);
++    l1i = cpuid2_cache_descriptor(caches->l1i_cache, &unmatched);
++    l2 = cpuid2_cache_descriptor(caches->l2_cache, &unmatched);
++    l3 = cpuid2_cache_descriptor(caches->l3_cache, &unmatched);
++
++    if (!cpu->consistent_cache ||
++        (env->cpuid_min_level < 0x4 && !unmatched)) {
++        /*
++         * Though SDM defines code 0x40 for cases with no L2 or L3. It's
++         * also valid to just ignore l3's code if there's no l2.
++         */
++        if (cpu->enable_l3_cache) {
++            *ecx = l3;
++        }
++        *edx = (l1d << 16) | (l1i <<  8) | l2;
++    } else {
++        *ecx = 0;
++        *edx = CACHE_DESCRIPTOR_UNAVAILABLE;
++    }
++}
++
+ /* CPUID Leaf 4 constants: */
+ 
+ /* EAX: */
+@@ -7448,16 +7483,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+             *eax = *ebx = *ecx = *edx = 0;
+             break;
+         }
+-        *eax = 1; /* Number of CPUID[EAX=2] calls required */
+-        *ebx = 0;
+-        if (!cpu->enable_l3_cache) {
+-            *ecx = 0;
+-        } else {
+-            *ecx = cpuid2_cache_descriptor(env->cache_info_cpuid2.l3_cache);
+-        }
+-        *edx = (cpuid2_cache_descriptor(env->cache_info_cpuid2.l1d_cache) << 16) |
+-               (cpuid2_cache_descriptor(env->cache_info_cpuid2.l1i_cache) <<  8) |
+-               (cpuid2_cache_descriptor(env->cache_info_cpuid2.l2_cache));
++        encode_cache_cpuid2(cpu, eax, ebx, ecx, edx);
+         break;
+     case 4:
+         /* cache info: needed for Core compatibility */
 -- 
 2.34.1
 
