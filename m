@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-52123-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52124-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC1DFB01919
-	for <lists+kvm@lfdr.de>; Fri, 11 Jul 2025 12:01:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFCC6B0191C
+	for <lists+kvm@lfdr.de>; Fri, 11 Jul 2025 12:01:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6275C8E330A
-	for <lists+kvm@lfdr.de>; Fri, 11 Jul 2025 10:00:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 740B61C20892
+	for <lists+kvm@lfdr.de>; Fri, 11 Jul 2025 10:01:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65E1727FB05;
-	Fri, 11 Jul 2025 10:00:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 037CF21127D;
+	Fri, 11 Jul 2025 10:00:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nAaybmHq"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="X/bgxXTz"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F7BA218EBF
-	for <kvm@vger.kernel.org>; Fri, 11 Jul 2025 10:00:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB04A27EFED
+	for <kvm@vger.kernel.org>; Fri, 11 Jul 2025 10:00:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752228051; cv=none; b=B/6QmivYvs4OZnegDlgCydkbHaHqbpEs0w1P9ROM4W18dAwVFNAgl6neBrltH/TuB7b78icTmSZV/zyww6uoooIk2JckrzJFFhAJTYrNU9mR5xwaVeuWWLzPeRqKAxwm0LUi4g1kG7Ai/u59lKFt1GB5O8nLhnQ9Fe6xb7N4RA4=
+	t=1752228053; cv=none; b=SK+4In51hg3ILllpRw6L00i8lASauyiK8JzoNUYDYu5pClLTkQ/d9f1IUSfi0mtl2XoUcBr1cZXvMVTJ+qfwvAetd5RFu49aZrfRlAq5O73MPiz1tRvjRoXRVTwwIKTPyfIyWDDfgM3hA04asAlFWFNnpOTTND1fDFhf16jD5xA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752228051; c=relaxed/simple;
-	bh=NAdqAYTXJZb5DjKif7WlBLOUKuZAQoUj2XZSaZ6yx2o=;
+	s=arc-20240116; t=1752228053; c=relaxed/simple;
+	bh=37ekHmbjiymc2w14B0h3SzMdkzEg65B1RzqZEcyBXL0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=AXyChS9YOckGvv02hWa57OPmQEqKboZgsVTMfJxzrnbSl/LoJTb7Y8jsOxFZKLy2aD3fa6gzXGTDyl8jbZ0GLhkrkN/slYkXDsT3hgp+pKeKUfJiBGTqz+hxKuoGMPgI1glpBruBjkpASga2hVrqdS8Povulf6IUsODV4dsByR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nAaybmHq; arc=none smtp.client-ip=198.175.65.17
+	 MIME-Version; b=mC/dgrKbTbJxBdWABgPlrONan3liJmDXM8pAhsVxVYLEBUkp0MSdrOVT2MQSqUwhE7tg9dw4geofZQ3vPe3cS6qaUVnday7MCm8Hs0gzpTK4879yRvlR4kOtCUeUEFEbLpDm6F3r/lbwQzmxwHavlxTI/8Eqr9mkqv1Dlu9EP3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=X/bgxXTz; arc=none smtp.client-ip=198.175.65.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752228050; x=1783764050;
+  t=1752228052; x=1783764052;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=NAdqAYTXJZb5DjKif7WlBLOUKuZAQoUj2XZSaZ6yx2o=;
-  b=nAaybmHqWMV7Ma0vub6Hj4u+2JHcMroFHZIy8Dpb74K7G1B2Ld4Ui6pP
-   wVIYR68KEq21XSROn4dL93Q92qoYqQJI8NFG6GRIutqVMaj58acvuAbxA
-   xfTINFJfONenOVxNeqHwmBkXowh4BlL5/jMP7daasNyprAp1ADt3JGFuQ
-   M+dONoyMR5+46PkhZAJzrD83X8wbGTYGyD57AcOm3wJJig5EGpWfnwjt9
-   9vHN5jVmLT4DQefdfGesG1M6pyIKauG74J0B2pF6xOukXxLNIj69ld+Ri
-   Ym30dtchFGLf84WHwiEMRIkGbD+2coMcNpNRAd4mVPeGRnPw+zWhVILIy
-   w==;
-X-CSE-ConnectionGUID: N6a0/j7HRGSXVu505bdRcg==
-X-CSE-MsgGUID: VrVsSHKrRUWHOiB+Mfr2PQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11490"; a="54496263"
+  bh=37ekHmbjiymc2w14B0h3SzMdkzEg65B1RzqZEcyBXL0=;
+  b=X/bgxXTzaF6TQW61E30Tb8jpxSzmdE4BIpefYMAMFscXblmIjKCOoWgh
+   TK6MDQsaSLPSZ983t1ZhCD9dz8WxBF0rJN2O7Vqzxv5jW+wKpQVrV4k71
+   9lQTpaTdqWWKfAVfdnZFAiJn287wAJNc8I3zkliMFjp/hVTKByqA1SHA0
+   kMg9Stug/kaU5PbNDZnTVaVqXDJJw4WSYZblbYj8Sqat10TfaHf+K/rWF
+   QhScc3Ey6Pm5/8p5CVHaTTzJ91M9U8wBqAMvWwFpIlGNrYyTg8/RHeBSt
+   5vuZUlE4pUvPutLN3SFUaie04pYp9YEhgLAounmJ/8WSEXCD3NfnH+nDs
+   A==;
+X-CSE-ConnectionGUID: mJwkzLf3QzOMBdY+DX6vcg==
+X-CSE-MsgGUID: gHp2EN1IQp+Dp8KKdQoqkw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11490"; a="54496272"
 X-IronPort-AV: E=Sophos;i="6.16,303,1744095600"; 
-   d="scan'208";a="54496263"
+   d="scan'208";a="54496272"
 Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2025 03:00:49 -0700
-X-CSE-ConnectionGUID: TL4xReLGT6GyGPh2jf5l2w==
-X-CSE-MsgGUID: e8KFagqBT5yjLtE1jLAYew==
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2025 03:00:51 -0700
+X-CSE-ConnectionGUID: kbaFEx9UQ9aHinuKt7LG5A==
+X-CSE-MsgGUID: RtRdR5z/Tf6auFkf17qefg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,303,1744095600"; 
-   d="scan'208";a="160662047"
+   d="scan'208";a="160662051"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.39])
-  by orviesa003.jf.intel.com with ESMTP; 11 Jul 2025 03:00:40 -0700
+  by orviesa003.jf.intel.com with ESMTP; 11 Jul 2025 03:00:46 -0700
 From: Zhao Liu <zhao1.liu@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Marcelo Tosatti <mtosatti@redhat.com>,
@@ -78,9 +78,9 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
 	kvm@vger.kernel.org,
 	Zhao Liu <zhao1.liu@intel.com>,
 	Dapeng Mi <dapeng1.mi@linux.intel.com>
-Subject: [PATCH v2 05/18] i386/cpu: Consolidate CPUID 0x4 leaf
-Date: Fri, 11 Jul 2025 18:21:30 +0800
-Message-Id: <20250711102143.1622339-6-zhao1.liu@intel.com>
+Subject: [PATCH v2 06/18] i386/cpu: Drop CPUID 0x2 specific cache info in X86CPUState
+Date: Fri, 11 Jul 2025 18:21:31 +0800
+Message-Id: <20250711102143.1622339-7-zhao1.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250711102143.1622339-1-zhao1.liu@intel.com>
 References: <20250711102143.1622339-1-zhao1.liu@intel.com>
@@ -92,108 +92,107 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Modern Intel CPUs use CPUID 0x4 leaf to describe cache information
-and leave space in 0x2 for prefetch and TLBs (even TLB has its own leaf
-CPUID 0x18).
+With the pre-defined cache model legacy_intel_cpuid2_cache_info,
+for X86CPUState there's no need to cache special cache information
+for CPUID 0x2 leaf.
 
-And 0x2 leaf provides a descriptor 0xFF to instruct software to check
-cache information in 0x4 leaf instead.
-
-Therefore, follow this behavior to encode 0xFF when Intel CPU has 0x4
-leaf with "x-consistent-cache=true" for compatibility.
-
-In addition, for older CPUs without 0x4 leaf, still enumerate the cache
-descriptor in 0x2 leaf, except the case that there's no descriptor
-matching the cache model, then directly encode 0xFF in 0x2 leaf. This
-makes sense, as in the 0x2 leaf era, all supported caches should have
-the corresponding descriptor.
+Drop the cache_info_cpuid2 field of X86CPUState and use the
+legacy_intel_cpuid2_cache_info directly.
 
 Reviewed-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
 Tested-by: Yi Lai <yi1.lai@intel.com>
 Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 ---
-Changes Since v1:
- * Fix the typo in comment. (Ewan)
----
- target/i386/cpu.c | 48 ++++++++++++++++++++++++++++++++++++-----------
- 1 file changed, 37 insertions(+), 11 deletions(-)
+ target/i386/cpu.c | 31 +++++++++++--------------------
+ target/i386/cpu.h |  3 ++-
+ 2 files changed, 13 insertions(+), 21 deletions(-)
 
 diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 70ac969a9cdc..37cf591bea8d 100644
+index 37cf591bea8d..af67f12e939d 100644
 --- a/target/i386/cpu.c
 +++ b/target/i386/cpu.c
-@@ -223,7 +223,7 @@ struct CPUID2CacheDescriptorInfo cpuid2_cache_descriptors[] = {
-  * Return a CPUID 2 cache descriptor for a given cache.
-  * If no known descriptor is found, return CACHE_DESCRIPTOR_UNAVAILABLE
-  */
--static uint8_t cpuid2_cache_descriptor(CPUCacheInfo *cache)
-+static uint8_t cpuid2_cache_descriptor(CPUCacheInfo *cache, bool *unmacthed)
- {
-     int i;
- 
-@@ -240,9 +240,44 @@ static uint8_t cpuid2_cache_descriptor(CPUCacheInfo *cache)
-             }
-     }
- 
-+    *unmacthed |= true;
+@@ -244,19 +244,27 @@ static uint8_t cpuid2_cache_descriptor(CPUCacheInfo *cache, bool *unmacthed)
      return CACHE_DESCRIPTOR_UNAVAILABLE;
  }
  
-+/* Encode cache info for CPUID[2] */
-+static void encode_cache_cpuid2(X86CPU *cpu,
-+                                uint32_t *eax, uint32_t *ebx,
-+                                uint32_t *ecx, uint32_t *edx)
-+{
-+    CPUX86State *env = &cpu->env;
-+    CPUCaches *caches = &env->cache_info_cpuid2;
-+    int l1d, l1i, l2, l3;
-+    bool unmatched = false;
++static const CPUCaches legacy_intel_cpuid2_cache_info;
 +
-+    *eax = 1; /* Number of CPUID[EAX=2] calls required */
-+    *ebx = *ecx = *edx = 0;
-+
-+    l1d = cpuid2_cache_descriptor(caches->l1d_cache, &unmatched);
-+    l1i = cpuid2_cache_descriptor(caches->l1i_cache, &unmatched);
-+    l2 = cpuid2_cache_descriptor(caches->l2_cache, &unmatched);
-+    l3 = cpuid2_cache_descriptor(caches->l3_cache, &unmatched);
-+
-+    if (!cpu->consistent_cache ||
-+        (env->cpuid_min_level < 0x4 && !unmatched)) {
-+        /*
-+         * Though SDM defines code 0x40 for cases with no L2 or L3. It's
-+         * also valid to just ignore l3's code if there's no l2.
-+         */
-+        if (cpu->enable_l3_cache) {
-+            *ecx = l3;
-+        }
-+        *edx = (l1d << 16) | (l1i <<  8) | l2;
-+    } else {
-+        *ecx = 0;
-+        *edx = CACHE_DESCRIPTOR_UNAVAILABLE;
-+    }
-+}
-+
- /* CPUID Leaf 4 constants: */
+ /* Encode cache info for CPUID[2] */
+ static void encode_cache_cpuid2(X86CPU *cpu,
+                                 uint32_t *eax, uint32_t *ebx,
+                                 uint32_t *ecx, uint32_t *edx)
+ {
+     CPUX86State *env = &cpu->env;
+-    CPUCaches *caches = &env->cache_info_cpuid2;
++    const CPUCaches *caches;
+     int l1d, l1i, l2, l3;
+     bool unmatched = false;
  
- /* EAX: */
-@@ -7448,16 +7483,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-             *eax = *ebx = *ecx = *edx = 0;
-             break;
+     *eax = 1; /* Number of CPUID[EAX=2] calls required */
+     *ebx = *ecx = *edx = 0;
+ 
++    if (env->enable_legacy_cpuid2_cache) {
++        caches = &legacy_intel_cpuid2_cache_info;
++    } else {
++        caches = &env->cache_info_cpuid4;
++    }
++
+     l1d = cpuid2_cache_descriptor(caches->l1d_cache, &unmatched);
+     l1i = cpuid2_cache_descriptor(caches->l1i_cache, &unmatched);
+     l2 = cpuid2_cache_descriptor(caches->l2_cache, &unmatched);
+@@ -705,17 +713,6 @@ static CPUCacheInfo legacy_l2_cache = {
+     .share_level = CPU_TOPOLOGY_LEVEL_CORE,
+ };
+ 
+-/*FIXME: CPUID leaf 2 descriptor is inconsistent with CPUID leaf 4 */
+-static CPUCacheInfo legacy_l2_cache_cpuid2 = {
+-    .type = UNIFIED_CACHE,
+-    .level = 2,
+-    .size = 2 * MiB,
+-    .line_size = 64,
+-    .associativity = 8,
+-    .share_level = CPU_TOPOLOGY_LEVEL_INVALID,
+-};
+-
+-
+ /*FIXME: CPUID leaf 0x80000006 is inconsistent with leaves 2 & 4 */
+ static CPUCacheInfo legacy_l2_cache_amd = {
+     .type = UNIFIED_CACHE,
+@@ -8955,18 +8952,12 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+                        "CPU model '%s' doesn't support legacy-cache=off", name);
+             return;
          }
--        *eax = 1; /* Number of CPUID[EAX=2] calls required */
--        *ebx = 0;
--        if (!cpu->enable_l3_cache) {
--            *ecx = 0;
+-        env->cache_info_cpuid2 = env->cache_info_cpuid4 = env->cache_info_amd =
+-            *cache_info;
++        env->cache_info_cpuid4 = env->cache_info_amd = *cache_info;
+     } else {
+         /* Build legacy cache information */
+-        env->cache_info_cpuid2.l1d_cache = &legacy_l1d_cache;
+-        env->cache_info_cpuid2.l1i_cache = &legacy_l1i_cache;
+         if (!cpu->consistent_cache) {
+-            env->cache_info_cpuid2.l2_cache = &legacy_l2_cache_cpuid2;
 -        } else {
--            *ecx = cpuid2_cache_descriptor(env->cache_info_cpuid2.l3_cache);
--        }
--        *edx = (cpuid2_cache_descriptor(env->cache_info_cpuid2.l1d_cache) << 16) |
--               (cpuid2_cache_descriptor(env->cache_info_cpuid2.l1i_cache) <<  8) |
--               (cpuid2_cache_descriptor(env->cache_info_cpuid2.l2_cache));
-+        encode_cache_cpuid2(cpu, eax, ebx, ecx, edx);
-         break;
-     case 4:
-         /* cache info: needed for Core compatibility */
+-            env->cache_info_cpuid2.l2_cache = &legacy_l2_cache;
++            env->enable_legacy_cpuid2_cache = true;
+         }
+-        env->cache_info_cpuid2.l3_cache = &legacy_l3_cache;
+ 
+         env->cache_info_cpuid4.l1d_cache = &legacy_l1d_cache;
+         env->cache_info_cpuid4.l1i_cache = &legacy_l1i_cache;
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index d7c9a1f91446..9adba8fdf773 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -2076,7 +2076,8 @@ typedef struct CPUArchState {
+      * on each CPUID leaf will be different, because we keep compatibility
+      * with old QEMU versions.
+      */
+-    CPUCaches cache_info_cpuid2, cache_info_cpuid4, cache_info_amd;
++    CPUCaches cache_info_cpuid4, cache_info_amd;
++    bool enable_legacy_cpuid2_cache;
+ 
+     /* MTRRs */
+     uint64_t mtrr_fixed[11];
 -- 
 2.34.1
 
