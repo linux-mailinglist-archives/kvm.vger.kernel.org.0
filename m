@@ -1,92 +1,119 @@
-Return-Path: <kvm+bounces-52219-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52220-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 007B2B02775
-	for <lists+kvm@lfdr.de>; Sat, 12 Jul 2025 01:10:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DA6E8B0278B
+	for <lists+kvm@lfdr.de>; Sat, 12 Jul 2025 01:14:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 49C27587838
-	for <lists+kvm@lfdr.de>; Fri, 11 Jul 2025 23:10:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3800B5A56DA
+	for <lists+kvm@lfdr.de>; Fri, 11 Jul 2025 23:14:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC1902236E8;
-	Fri, 11 Jul 2025 23:10:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kBAmpCav"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2766022259A;
+	Fri, 11 Jul 2025 23:14:21 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00C091A3145;
-	Fri, 11 Jul 2025 23:10:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from gate.crashing.org (gate.crashing.org [63.228.1.57])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6926A1F2BAB;
+	Fri, 11 Jul 2025 23:14:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=63.228.1.57
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752275407; cv=none; b=Kpt2wFex6X2Sp52b0grTaZhkuH861Naoorr2dERPpJu2vd1A7kTAMTDxsJJ5Zxm0lCzAI7BdBprOZ94nCZZApIJ2Sjg5iL+WZyoeRNwV9BSn/ov+3MqM8rUEhX01QheZGp1VmR+fZkjR8o61mRk/kEwrbYNNjCuxEVfIBBlG4xs=
+	t=1752275660; cv=none; b=jTo8lY3JM6JEiyUh1cplp6QhPG6dU1/9QIcEfpt5y9EZYvVBqq+/OjAF4Jh1S9JS2Khy8FryI4WjTOpinywrnS+ZaspazZ3WGPgi3nvj9nQzNxptGOw8Z8Pn1UT3B2oEGdAEtBg5VOqqzgfOb7shPd3uw4Lc3BXD+spEct4JcZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752275407; c=relaxed/simple;
-	bh=tKheb8OjsLoz5R8RDmCIXx68KmbGB8ishC8u4d7w0qo=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=EW1zMkfyLzPG6TBhnBpZNWAHJL1WKcy54+TGTE226UoVy+u7DcuKTa1Aowz4E1IrepVNmN6WGPEpYUJyQt78UVGswP/kUWqHF4NN1FUCKX2VbgZ1+vvHnIsjyV79toZY/faFYOOcQiiu6oPkB48vGnzafMCgjv1jvwvP3EnhbDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kBAmpCav; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24270C4CEED;
-	Fri, 11 Jul 2025 23:10:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752275405;
-	bh=tKheb8OjsLoz5R8RDmCIXx68KmbGB8ishC8u4d7w0qo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=kBAmpCav8UawscICq11TjS1xmaXivlfU+81KKNmwlAUucB434hpKWNce49BNAGENJ
-	 t0BWHZvQhzA2vKl0ZqGW0RN7nXeYm8U2FgvcUOQZrMyxgDB/SxCXp2TDmQ92zqBczL
-	 Yaz6CBLDRVuTg2GIZl1qSGZ6+L4HKXhzK8RzJ81+sxdMRCBA311V1FZuhnSJ9k5is4
-	 EO0F4eWSedKzpb0HPY+rZhVDS4OesML6S+vsi0sgVoszDTNyMHT0R9V5Dyff+OBvBL
-	 kBazLcyn3YuKD7ihQH0+lQnHvjbZPZX+cQVtrCAHv13sR9tEgxBuQo4xLCHg/U2XCt
-	 KgOKKx7x8CURA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33B7D383B275;
-	Fri, 11 Jul 2025 23:10:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1752275660; c=relaxed/simple;
+	bh=bFbJVZY43Jpn39tYWKXR9nU1JbUGappWLcKOMLT4sl4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mWZ8UP0C7F7knLR+UEIvMMhyNfxRcIkIeJ5S/8ElBLzX6VhPtyqaJiaIv/vkow51nqeF+CdUeqE2H/CfW4WxXLNKtZOBIeslXr1AjYMws4niLRZUhc+P2FPonojp6fZktk7EqomY2Hmc4kdGYUiPlgzrVR7KXGqc3miD0U+83ZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.crashing.org; spf=pass smtp.mailfrom=kernel.crashing.org; arc=none smtp.client-ip=63.228.1.57
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.crashing.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.crashing.org
+Received: from gate.crashing.org (localhost [127.0.0.1])
+	by gate.crashing.org (8.18.1/8.18.1/Debian-2) with ESMTP id 56BND41k624388;
+	Fri, 11 Jul 2025 18:13:04 -0500
+Received: (from segher@localhost)
+	by gate.crashing.org (8.18.1/8.18.1/Submit) id 56BND1e0624384;
+	Fri, 11 Jul 2025 18:13:01 -0500
+X-Authentication-Warning: gate.crashing.org: segher set sender to segher@kernel.crashing.org using -f
+Date: Fri, 11 Jul 2025 18:13:01 -0500
+From: Segher Boessenkool <segher@kernel.crashing.org>
+To: Richard Fontana <rfontana@redhat.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Christoph Hellwig <hch@infradead.org>, Thomas Huth <thuth@redhat.com>,
+        Madhavan Srinivasan <maddy@linux.ibm.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-spdx@vger.kernel.org,
+        J Lovejoy <opensource@jilayne.com>
+Subject: Re: [PATCH v2] powerpc: Replace the obsolete address of the FSF
+Message-ID: <aHGafTZTcdlpw1gN@gate>
+References: <20250711053509.194751-1-thuth@redhat.com>
+ <2025071125-talon-clammy-4971@gregkh>
+ <9f7242e8-1082-4a5d-bb6e-a80106d1b1f9@redhat.com>
+ <2025071152-name-spoon-88e8@gregkh>
+ <aHC-Ke2oLri_m7p6@infradead.org>
+ <2025071119-important-convene-ab85@gregkh>
+ <CAC1cPGx0Chmz3s+rd5AJAPNCuoyZX-AGC=hfp9JPAG_-H_J6vw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] virtio_net: simplify tx queue wake condition check
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175227542702.2429127.17012200251961296918.git-patchwork-notify@kernel.org>
-Date: Fri, 11 Jul 2025 23:10:27 +0000
-References: <20250710023208.846-1-liming.wu@jaguarmicro.com>
-In-Reply-To: <20250710023208.846-1-liming.wu@jaguarmicro.com>
-To: Liming Wu <liming.wu@jaguarmicro.com>
-Cc: mst@redhat.com, jasowang@redhat.com, kuba@kernel.org, kvm@vger.kernel.org,
- virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, angus.chen@jaguarmicro.com, leiyang@redhat.com
+In-Reply-To: <CAC1cPGx0Chmz3s+rd5AJAPNCuoyZX-AGC=hfp9JPAG_-H_J6vw@mail.gmail.com>
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu, 10 Jul 2025 10:32:08 +0800 you wrote:
-> From: Liming Wu <liming.wu@jaguarmicro.com>
+On Fri, Jul 11, 2025 at 05:02:18PM -0400, Richard Fontana wrote:
+> On Fri, Jul 11, 2025 at 3:38 AM Greg Kroah-Hartman
+> <gregkh@linuxfoundation.org> wrote:
+> >
+> > On Fri, Jul 11, 2025 at 12:32:57AM -0700, Christoph Hellwig wrote:
+> > > On Fri, Jul 11, 2025 at 09:30:31AM +0200, Greg Kroah-Hartman wrote:
+> > > > That's a crazy exception, and one that should probably be talked about
+> > > > with the FSF to determine exactly what the SPDX lines should be.
+> > >
+> > > It is called the libgcc exception and has been around forever for the
+> > > files in libgcc.a that a lot of these low-level kernel helpers were
+> > > copied from as the kernel doesn't link libgcc.
+> >
+> > Ah, so it would be something like this exception:
+> >         https://spdx.org/licenses/GCC-exception-2.0.html
+> > but the wording doesn't seem to match.
+> >
+> > I'll let the license lawyers figure this out, thanks for the hint!
 > 
-> Consolidate the two nested if conditions for checking tx queue wake
-> conditions into a single combined condition. This improves code
-> readability without changing functionality. And move netif_tx_wake_queue
-> into if condition to reduce unnecessary checks for queue stops.
+> This one
 > 
-> [...]
+>  * In addition to the permissions in the GNU General Public License, the
+>  * Free Software Foundation gives you unlimited permission to link the
+>  * compiled version of this file with other programs, and to distribute
+>  * those programs without any restriction coming from the use of this
+>  * file.  (The General Public License restrictions do apply in other
+>  * respects; for example, they cover modification of the file, and
+>  * distribution when not linked into another program.)
+> 
+> is `GCC-exception-2.0`
+> 
+> while this one:
+> 
+>  *    As a special exception, if you link this library with files
+>  *    compiled with GCC to produce an executable, this does not cause
+>  *    the resulting executable to be covered by the GNU General Public License.
+>  *    This exception does not however invalidate any other reasons why
+>  *    the executable file might be covered by the GNU General Public License.
+> 
+> does not seem to be in the SPDX exception list. It is very similar to
+> `GNU-compiler-exception` except it specifically mentions GCC instead
+> of saying "a GNU compiler".
 
-Here is the summary with links:
-  - [v2] virtio_net: simplify tx queue wake condition check
-    https://git.kernel.org/netdev/net-next/c/2f82e9954662
+https://spdx.org/licenses/GNU-compiler-exception.html
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+is exactly this.
 
 
+Segher
 
