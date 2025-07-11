@@ -1,66 +1,66 @@
-Return-Path: <kvm+bounces-52101-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52102-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07FEDB01672
-	for <lists+kvm@lfdr.de>; Fri, 11 Jul 2025 10:38:18 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DF4FB016C7
+	for <lists+kvm@lfdr.de>; Fri, 11 Jul 2025 10:49:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C61875C0F9B
-	for <lists+kvm@lfdr.de>; Fri, 11 Jul 2025 08:37:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3ACF67A7D49
+	for <lists+kvm@lfdr.de>; Fri, 11 Jul 2025 08:47:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DCDB21127D;
-	Fri, 11 Jul 2025 08:35:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3884820C461;
+	Fri, 11 Jul 2025 08:48:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="xl7mvNxb"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="212TbKaR"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2043.outbound.protection.outlook.com [40.107.244.43])
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2080.outbound.protection.outlook.com [40.107.96.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EFFC1FBCAF;
-	Fri, 11 Jul 2025 08:35:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEC6918D;
+	Fri, 11 Jul 2025 08:48:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.96.80
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752222903; cv=fail; b=CVkw/seH/mXa1dnPMcCRpYO7SaUwSQ4Ci6a03j+omNN4x+kd8DhHpWhq05K8KmoaaRk3YXrPO5byJ9ici1zdNm8Rt+zG8j+JCvZGDzBAFz8oASx9c3RAe4G5KBqXsdwTjeK+TS5mNuIqyNhHlmkL9b+hZvnzhGK56uCsMI7MshI=
+	t=1752223737; cv=fail; b=qoyQrfYO6t+BEkf39IIBN+4ZVNscP+jh/gYMsv9fva+PuMpEyZWV/IFeIdXmghq6+X1nAS4yCYPSDkuo9h2/J5zWGMAZZ+uHXFvbUDGfI1xTj/rO+sPemT7R1B9A913S080RPDd9tqxUU+S3zZGrxbl+n+hzav+ABt0W8uTe6JU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752222903; c=relaxed/simple;
-	bh=S6PXf+PaPwGg5a32kBKp2b6rP/wZVKEpd/7jRwnLirc=;
+	s=arc-20240116; t=1752223737; c=relaxed/simple;
+	bh=HiAUSDpmmWpl8z/kgHMC6TD2s77DTpBK/p8xXo6YSTA=;
 	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Zj04skzyKciI37Ei1t8Dr7LbZkPeHQ15NphnwbJX1CbOJ2u4Ng/O3F934SAH9hWM8oG6HLK17K7cpdZZ41iejxDpUjEjOWI4Q42nHKyL1DNNYDQGQhRpRxGo3XxJwuNCKUwwrOT2fpuuXWh6MMLlR4rRLAG5zNtCsHbFewCsItg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=xl7mvNxb; arc=fail smtp.client-ip=40.107.244.43
+	 Content-Type:MIME-Version; b=N2bOXRfesJS4xgDUQQJCQ/DLS6A3esKKLh4nwZQL81yJdTFc9FX4lcU4eOp41uZ72+qqF3D6FKSpi6o/dw+xNbPDkR4fwku9KO95lBHBbtVZ5Ma6TOLHm1QmRPOw0FSNCY7F0G3vDNUAJZbFvzlnmGP5D9QRaLd5yQ0U3UwS/pE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=212TbKaR; arc=fail smtp.client-ip=40.107.96.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=rpBVTkrTw6SpoRQzW99gsQpVqhYYWQf3Yeq9Gfib/LP6cRucsukE7U8JNJq+B71+yXnbR2njdvBn0bUExqu7IVLKJuDeDXc4vv9I+vpNTPaJOQP4AEpAMZ6ky31306Kc2f9czMt6NAb8QEz3ZMcWDcpRtm6qC/AHYHkr1+ePMc505ww6BLPAQSCQiv9fz+ll6g+8F+mOPVBQLyQlOBNv9RHORv1fUK4Xo5wJ1mfEIS4MeE3ky+a6uDbIBUwkkhpzlz8kgem7bOJsXmiuWeoMJN/azVl5+lcJcJZ0yvNsxF1B3K5V3jIxrWcwkGB+wFEUbGg4kfAWSE6t6XY+9tkZ3Q==
+ b=tnbo4W1+bcDmOy6eEPxStrfY2ZfJ9mo6yeeI851Qhkl6jdIbFNGw7hPJUUGUgne+YwBj8YfjS11gUANkWqSmOx8Oc9sE16osB8Lu/3S+sCoTWkbHdn+3UbIA+aSpa4w3n7IBStaEG5tgsuio/bEDqQfXyVDsx/TJsCldF8lwI/YzbXzqYM9wjNv2wj++2invcNzeL94Oox9WgdTqPFKkFnbxOLyjQ8j3u4wwdPnf33UEf4p8WMz7Ni5ddrzpvgYS2KwlHnaqRQo3K5mf4LXRaDgKmrRgmhrwDNTeqK4xDkL7ATJzidH70JoXBAkfZbS0AgCUVmJqJREdEwo9+H4hwA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=AOa1pkgWoFcXZXCQFW9nY5Z85x6P4Hhstfq3Pv+s7Vw=;
- b=S8lUwDMtbiDnaREJy/mlTKaYIBoGBZSE7kaZfvufb8NWgfpAGwdA9EBvyLKtFAaiE/NVJywXL0ci99OqpwpDkG/cdi5DAW/VN8TH04dzd5MiNrLT+lSPHcolepNoRExq24QhxbbiyJyymBAahyOLSGjBBwAFP8JRUsRVY5cf88t5UcSAgNWMGh61B4yoJ0//cVRmsaRFGnCgC3x9PcYlUPtgKNesrtf7fUUMSLn6+OYGeGGIMAv3W2tEH0C2oTpP0WoxadsPsrEN4hWW3JOfe6+hsm8B5x4AJ0YmvoiIIagpKl1Lsn4pxn0lajkP2nJLPY1gDaw8byBVm8PI02KU1A==
+ bh=K9MMFZQUwfuBVw9OL0tXKjD9ed1WxvtpRBCF3fCu5zo=;
+ b=WBITUcpHYmcR57DSbKtcFPw/xojKsuGxVsS7FC7QTDu97sQxnbWPmny8Qi5IS8P3IeBXunjKjAnPgiJBq+tHhLn6V9Ke9yFkIDf1T/q9cAHD8PhWkd9WULcSJzLC2v0HpULlGhyonhTCMmY/5TzoXVhtTBZeuQrTbrX0+U+SXsjrRnh8NoEKQxa9Dy4aot4W8AZzxISKKS4YPZ/Tf7MLRFmAtjVDX6Z90JgYss5rSb7r+R/Xe790vm/A1RMpKPyu8EL8t0QMamP+yrxgOMCQOqzMYBPMOGOsk3a2ztIcndrzOJz1uXzQwdjlVc+2z1I76e1wLRDLgs88NQvS5HRNHQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=AOa1pkgWoFcXZXCQFW9nY5Z85x6P4Hhstfq3Pv+s7Vw=;
- b=xl7mvNxbNUAGIaZFVdy5ElrNST54s8DetApdtVK4LKtB2EutnkoGtp9vuPLDdDwjIMTycPbeaHupOiQb420nuAzfpcfuqH+O2FLOunad1DVOxEkxdcOlQ/oqZClY8pa5/kKMk0Kp/Hado9LPEL89QuylC+VJBk/rcsnh5vr3m70=
+ bh=K9MMFZQUwfuBVw9OL0tXKjD9ed1WxvtpRBCF3fCu5zo=;
+ b=212TbKaR2oa3pxcaeVBtze3NL6O399aGF8Iiec0OO3P2I074B5NFxwPdFHPepvQ0UHzHVeIRd5wnA4etdmmGdxoRHC2w8/CXuzrOyX8FWqSZt3JzRGd11J1EAOmnYBT9+m7Prok3PVltp6EYro9lVilFlj3fQlclXyCaoI/pQaY=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=amd.com;
 Received: from SJ5PPFF6E64BC2C.namprd12.prod.outlook.com
- (2603:10b6:a0f:fc02::9aa) by DM4PR12MB7671.namprd12.prod.outlook.com
- (2603:10b6:8:104::17) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8880.34; Fri, 11 Jul
- 2025 08:34:58 +0000
+ (2603:10b6:a0f:fc02::9aa) by SJ2PR12MB7920.namprd12.prod.outlook.com
+ (2603:10b6:a03:4c6::9) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8901.27; Fri, 11 Jul
+ 2025 08:48:52 +0000
 Received: from SJ5PPFF6E64BC2C.namprd12.prod.outlook.com
  ([fe80::40bb:ae48:4c30:c3bf]) by SJ5PPFF6E64BC2C.namprd12.prod.outlook.com
  ([fe80::40bb:ae48:4c30:c3bf%8]) with mapi id 15.20.8722.031; Fri, 11 Jul 2025
- 08:34:56 +0000
-Message-ID: <5d335c0c-3676-4158-9093-bc5e9f95c1dc@amd.com>
-Date: Fri, 11 Jul 2025 14:04:32 +0530
+ 08:48:52 +0000
+Message-ID: <bd261513-bd19-4c3b-a729-56b9e280a0bc@amd.com>
+Date: Fri, 11 Jul 2025 14:18:31 +0530
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v13 09/20] KVM: guest_memfd: Track guest_memfd mmap
- support in memslot
+Subject: Re: [PATCH v13 18/20] KVM: Introduce the KVM capability
+ KVM_CAP_GMEM_MMAP
 To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
  linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev
 Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
@@ -85,14 +85,14 @@ Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
  jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com,
  ira.weiny@intel.com
 References: <20250709105946.4009897-1-tabba@google.com>
- <20250709105946.4009897-10-tabba@google.com>
+ <20250709105946.4009897-19-tabba@google.com>
 Content-Language: en-US
 From: Shivank Garg <shivankg@amd.com>
-In-Reply-To: <20250709105946.4009897-10-tabba@google.com>
+In-Reply-To: <20250709105946.4009897-19-tabba@google.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PN4PR01CA0042.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:277::11) To SJ5PPFF6E64BC2C.namprd12.prod.outlook.com
+X-ClientProxiedBy: PN4P287CA0042.INDP287.PROD.OUTLOOK.COM
+ (2603:1096:c01:271::12) To SJ5PPFF6E64BC2C.namprd12.prod.outlook.com
  (2603:10b6:a0f:fc02::9aa)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -101,163 +101,169 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ5PPFF6E64BC2C:EE_|DM4PR12MB7671:EE_
-X-MS-Office365-Filtering-Correlation-Id: 325c4ce8-3db0-42e9-cc4e-08ddc055d05a
+X-MS-TrafficTypeDiagnostic: SJ5PPFF6E64BC2C:EE_|SJ2PR12MB7920:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3bdf94fa-526e-4610-5361-08ddc057c2f6
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|7416014|1800799024|376014|7053199007;
+	BCL:0;ARA:13230040|376014|7416014|1800799024|366016|7053199007;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?Z3JVWUp1MVByZnNUY0dtS0RPNzV2a2FPdDluTldFUm5EQ2xSc20zaW54TEI0?=
- =?utf-8?B?L3c0VFAxSStPZitxcldYQ0IxZm1Od2poTDJ3ekNwY3NUZW5KMlBwc3FNYXox?=
- =?utf-8?B?WDhVYVNjakxSQmlvaVJoRnBYMjh1b0R3U3RFdy8zZEhQVDI2a28ybEkzV1ht?=
- =?utf-8?B?am9Eejk4dmJBV3ZJdmllODlyb1JDWGUrVE1QeHVxaXFTMHJPZE05ajVDUEFU?=
- =?utf-8?B?cnRiT0YrcUZnR1NRbWI5MVVSY1pXT0ZLYTFmRnJTR3YxVTk5K1poS2JkeGJr?=
- =?utf-8?B?RlhtUjA2alBsNHRBMms2eGlnYkZKZ1dHaXNERWpSY0ZYVEw5ODEzaXZnaDZk?=
- =?utf-8?B?aHpxM1R6bmVIb05KV3hCRy80RHNnbndxdlpRTHM5YnR3c0lZVS9qREdpOURH?=
- =?utf-8?B?dmcrUjZFeW5WMGNwa1BjMit5K3VsY1RTY0x2TENJVURKZUh0azRGVGdpZmxt?=
- =?utf-8?B?YjlNWEVmNjlQVXIyTFQvNWo1NHZhcU1qUmdaV3l3YnN3RXk1dDYvRnpOTG5W?=
- =?utf-8?B?dnlFNzY4dFI3SUM1ZzZCR0Nta29jQ3k5L09PNEZvWmNoTklJUnBsV2V6aXdE?=
- =?utf-8?B?eXU2cFl2MHRIN2NVMjVqK2E5WmpDQ2FBNWQyTWg4OHJpWWVURnBhenB1RjZM?=
- =?utf-8?B?L1RqaXFEV01zZWZhYVY4UEd4ZW5odDA2THpia1VzQ01tWVl5ODgwSFVoOU9j?=
- =?utf-8?B?OGt3L1FQaGhmZzBZQ3lDQUVLM0Q5YTRwSXByTEUvV01zRzVKY1pUSXp5M0FT?=
- =?utf-8?B?Tk5BbHI1a3pXaXJOWWdCZTFxR0t2R0pHS1FsVU1tT0VKQlpsVVJXeWY5K3ZY?=
- =?utf-8?B?QWpuYU9kYVppZGk2WWtndENJUGRWRm1JZXFXVjRNZm5POXZScU9pR1IyQ25q?=
- =?utf-8?B?Y2FLMDRUZlAxdURIOVNDTDFnSjVSL0ZSQ3FKelViMUJZRWJpUUMycnVVWkhP?=
- =?utf-8?B?Vk5pcXo0aGJrMU9MUzV4Y05ITW51TXpHbDdCUmdEYy94WnJDZm4wc29Mcmla?=
- =?utf-8?B?OHlQb3hxQXA2aktxaXlPamN1ZEJyUHZFL2Z6T21mT1p6aXlaeCswQzlXUkJm?=
- =?utf-8?B?UldQbGRyeTlPaW5heGtpSGFNQnBwOGJFRkhsK2doamtuUnZTODNSWDMzNFU4?=
- =?utf-8?B?Z0pUY0VMWE4vOHIyZGcwZVhVaEJnL05HSFg0ckJmYlZaUGhvUVVRWWpxeE5w?=
- =?utf-8?B?ZTJzdklUNU9hd2lYS3VrY3NmbFY2TStUZTF3N2lMaWdpQXY0cUZ0YWU2aVNa?=
- =?utf-8?B?amFYMndqOFFFeG1rMzhVa0J3RWtVbG5GUm5ieDM1UzN3VHVIZisyVnpZTFd2?=
- =?utf-8?B?NzlCRXFoelorbDhnZ3BvVWdBcU93OW1WZndsUjh3dXVIRXJhc0FiUXlpbHBi?=
- =?utf-8?B?MEdBMWp6QlBvR2xPK2pkbGJQOGRmTFhvWVVpSUtINlZRQjlvMzZ2NkNqVTcv?=
- =?utf-8?B?ZDN6UFFidzJjOFJvRFdMUkhqTlVYQnZ5TlZMSFVLRWRmRGZHcVFYZjcrYnhx?=
- =?utf-8?B?UUVWbXVHbFJOUG5sL0RYREg5WmlzakEvYmpKejhpRms4SGZ3T1dzdWNaSTda?=
- =?utf-8?B?SkdHSjllc3dGYlhaengvTFRacEZzWXliWkI1MXRoYUVqdzROMVdVZDJYdkhN?=
- =?utf-8?B?Rk9TSkFaWUtoekQ2WHVkWmtVSkRsV1l2bUZhQlFsODRVZlVrLzZkZC9LZCt4?=
- =?utf-8?B?OHlWSnRrZkc0bW5hWXpMWko5ZlVUYTExRk5PQ1VrRE9IemMrbjhJeUtVRGta?=
- =?utf-8?B?WkFHa0V5WDZrUExGSjBNUVROU1A1ZUx6a08wTFBLVlRYcU01RzkyNXdwWCtH?=
- =?utf-8?B?OFFTOG5nZENsblVVM2RicUNGSllNRDdEWk1yMElLaVh6cmYxMHczSzQ3ZzBI?=
- =?utf-8?B?TXRVU2JMRk5jdWNYMzFEUlluaU9RaERMSE05UFliVjhmVHJ6QzVreTZYYjgw?=
- =?utf-8?Q?9XboXW2NJJA=3D?=
+	=?utf-8?B?MmlKRUtIV3kxVnU0UFNVYVNERjBRcXZPekxVS3NqS1pxL1NVTForSVlVMVFh?=
+ =?utf-8?B?NXprNmE1cWk3cTdBbEpDMzg0SVlWcEV3WGRnZS9nbUJHamo0eVVNUzBRbFBF?=
+ =?utf-8?B?Tm8xZldQQ1gwN0JZdFZiZHRWcWNtcDEyYzFpZk5BTDQxWkxsdmEwZllsQ3di?=
+ =?utf-8?B?RnJmMTRDOUZ6dzQ2MEdrWHhzbDFYaWovUFFEV3ZlMWpzaVQ1QXgvTTJINWND?=
+ =?utf-8?B?Q3ovK2RNUXFPQlIzQkprempWREdLZHNZcmV1bUtrMjU5eVBvVUdub0lxL3FK?=
+ =?utf-8?B?QytjMlBabzlPL0FRUkUyRHdwM1ErYWRjZi9pSkR6eXRSOHhRSlk1REtXdS80?=
+ =?utf-8?B?YnprZHdBU1hQS3AwZnRZMkdNTnh0dklvSFY5bnRKWkhJQ2tPVksrdTZhWENa?=
+ =?utf-8?B?aWxpSHRxWjI5Yi9GQlJqbU5OMUVqdG1DbTFJN0lNZ0N1SUwvMmh4aURnU2Jh?=
+ =?utf-8?B?MUpZd2FlSUNNWjhlVkNXTXVCU04vZ0pISFFablFXc21PcmZCVWwyVktYTHhx?=
+ =?utf-8?B?ZTRGYThybDlEQVZtWG1TWUJsN2o5QmdwbWZoeFJ1T3Q2U04vVXhKN2N1REww?=
+ =?utf-8?B?Zm9kMlZOYzVBK2FYNTVMaTV4V3lSMy9KSFFtUUNoeWdSODFWZG02TGtXcWlG?=
+ =?utf-8?B?b3FnaE5ObzJ4Q2J1Z2lPeTVQOE8wYm5nZUs4Q2xyUUdHcFZ2cGpEcHgxaXN5?=
+ =?utf-8?B?eDRuUGJjRjNBNHhEczZOUHNLVU1Za3ducXQ1UEFWZEVCcGUrMlM2OVR2KzRk?=
+ =?utf-8?B?Qmx5bThZaC9FaGV1a29aWHBaNmRXK2RvNjhLUVVpV2NvK3VQbkE5RkF6OG1l?=
+ =?utf-8?B?aFNhQjVpL3M4Nm9xck9ZQ1FuNlpWZ3BLVnV1cnJJSUw4SWpsZGdVS2h1bW9i?=
+ =?utf-8?B?YzFtdmlwOUNCM0dlNGhQVVJtWDdSNisrMnRoWDRXTXRiMHNpRkg3QWh6UWNv?=
+ =?utf-8?B?UlEvKzREd255bHE3QXNyYzg3ZkJ6dWR2OXpnTmx2ZEhsR0pJa3BJek9LQjVB?=
+ =?utf-8?B?QkY4cHFKcW1ZZmF0aE16YW1VRGZ5TnlmMkNORHhNVGt5RGJBVk1rSEErVnps?=
+ =?utf-8?B?V0huQVF0UnJqbHJmbFdCMHhnWTV1ZS8yZFkvSU1BN01uK0JTVU4zMmIyWVdT?=
+ =?utf-8?B?aGpBTkpTNUxuZmFMNDdoY2ROMWw0WitzbjRSWTF6aTdocXpaTEZRYllQeEl3?=
+ =?utf-8?B?Z0xwTmVZUUliU2JaS244Z1JheEdOV3VramY4OTN1K3NTeGRFRk01QzNSRWw0?=
+ =?utf-8?B?S3gzZ3JIWlpLRzZQS29MandxdUlJeG4zcWwzM25HUXB1VjM0SWJmTlU2OGg0?=
+ =?utf-8?B?YUMveWJSTVl4eGw0RWZObzFuQS9LUGdiVzduSnNOV296Nkg0WTVPRU9TNFZX?=
+ =?utf-8?B?di9wOVRCaG00L3BHbDE4VjljTUZXOFhzVDNWZTh2ZXVZMXluRXh6ZVI2KzFE?=
+ =?utf-8?B?aGF4cDFMK3RqaFlQd2t2ZHc2eDhUcFpudTVXdEJFWUJHSmYzSW4xa3NMM0k5?=
+ =?utf-8?B?dHN5YVNHYmp5UGxVMllPbnh1T0lQZ3hMSVZjZmpTM0Fpd284aUtMaHJlOTlm?=
+ =?utf-8?B?L041VDNkd2M2T0ZCaTZhYVR2TVBmSEpSUGNYS1JqT3RwV0RqL1V6RUVHdmR5?=
+ =?utf-8?B?OVhLM3R3cTRJNHc5QlZXeG50dzhXM21vY1pjbXh5L2hMWCt6eTRPRUdqSENR?=
+ =?utf-8?B?U2tQYS9DM3g3TzhJMmczYUk3UEVRS3RVTE9WRkRrU1BKZHluWXFzUkpnOEpG?=
+ =?utf-8?B?STh6Sm1TcHFpWUVGbU1BMmxkY2pnakdIaVBvZ3lFSy9SK2orRTM4R1phYmZP?=
+ =?utf-8?B?ZUtKRXdTajZLVDZ3cjI0MzRualZGYjB0YTZVK1dWa1V6M0REWWo2VGNvNGJL?=
+ =?utf-8?B?dTFHQnRHWDlIWUdGQTRhVjJnSzJxajdkR0Ixc0lkK1hLdEs4Q2oxRStkamFV?=
+ =?utf-8?Q?9/mxo7rw6Is=3D?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ5PPFF6E64BC2C.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(1800799024)(376014)(7053199007);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ5PPFF6E64BC2C.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016)(7053199007);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?TlQyWVZQUHoydXUrR29yT3FadUtaUUs5ZlpHL0FCVkQwL1J2RHJHODlKOVJ3?=
- =?utf-8?B?cThSRmRDcGY0cW9pS1ppdHl0bE9NVjJrQ2tOVjNkOFNDOUZPMmFVaHJyWENK?=
- =?utf-8?B?SlAzM3NnZWkvdm1DNW9keEhJdE5STE8vMFlMandjZlB3ZG1UOFpleXhOd3Ft?=
- =?utf-8?B?ZUJCbFRRM3FWTXBZaUYwTFVMeUN1SERyVlRRbFN4czc4ZDdPNXlVWHcvblQ2?=
- =?utf-8?B?SENwWG1OLzd5YTFKWHhxMmw1dE9GTTBYdVRhN2dyaFpnYXRnWmJDckh4NVpn?=
- =?utf-8?B?Tll0WEtpSE1YL0NKOExZMXgweWIvOVZoY2RRVEl0aXlQSmkvNVlrN2YxWUhk?=
- =?utf-8?B?YzRoV0ZDVHRWTndZOG44a1E2UGJVcXdzaVZpZTJmbzYwNGlYelE2K093Vi9Z?=
- =?utf-8?B?d0ZHRnNSeThNV3pheEc2WUxSMVcrVmNzdmFpMVh2b3NCWGN5U2RkaWdocmlr?=
- =?utf-8?B?WDJPWFV6YkVKTVh4MDVUL2FYd2JzME5FOEJIRENTYVgzVEVKckhMVCtyZXNQ?=
- =?utf-8?B?bllGeWt3YmhWMS9iRGcwYmJOSm1RNm5GdUNoM0dDbmxmT0pDdE5XMVkraWM3?=
- =?utf-8?B?Y2hySUlOcURmN0dpT1lCY0VHNGNTY3hmanE3NlgwYXJnblRFZkNDNmVWTkxD?=
- =?utf-8?B?WVcvem8zZkF1dlduR0hLeFBtbDhoVklpcGtpb3orTFlZNk9Bc29ya1BJV2l0?=
- =?utf-8?B?UHVZVCs4bHZSR1JDaDBkRzNZUlRMaWdzOFAzN2tYeWxwMmp4RzJrVk9IVzNU?=
- =?utf-8?B?ZXhuRnIxR0lDWTFyaUx2Vnd2QzJ5cDFoQW1CN3FlWUc5elVSc1cwWEJLTmR0?=
- =?utf-8?B?RzVtNTlVN3ZVYnR1YU1OY243TVJUb0lDQ3B6Z2Z6US9Sb0FOTWhvTi9WaHBL?=
- =?utf-8?B?QmVKRjBvV1hYT2lYY1lJYnNYZENkUEVySU1FOEFwVDJVSWFFWEpGTGVycDVF?=
- =?utf-8?B?ODZUd2J1dUtpTGxzWFR1a29LeGlydUpXbTY2MUhESTNzUHdVa2xXOCtyZGNq?=
- =?utf-8?B?ZUZaQzVNekFtaXlhN3drVEJ6MmxvcXlhL0dTR21HU0s4RmttbXNSS0xWNUJi?=
- =?utf-8?B?R3ZyZVZYcUFBbnZsTlZ2TC8vRmhBWCs5RjhNdlp3aFBkMXY3QW5ZV1RyVEpu?=
- =?utf-8?B?KzJ3OUdVSEhsOVBYajJzL0YwNEZWTVE2dko4c3daY0pWa3ptWTJudmZSNllV?=
- =?utf-8?B?L2R1WDVZNFNXejFPOVF0V05EUC9iem1NUllNNFFjYy9EYTM0STZuenp2bkNE?=
- =?utf-8?B?QmlPV3hwNitQMm55K05iS3BNQkJELzM5Z0tLUGlTZkdFOStabk5aYnVwYklt?=
- =?utf-8?B?RjgrRGtyWUl6bkxtRWhBZ1JLazBKd1NQc21IOFBLOEtOcEhwWXFBVThIc0JF?=
- =?utf-8?B?eXFUbWs4NlZpSEszV1dFUHNKZUE2TnFDT2lsbjI2YkNOOFd5TnJMS0ZaMmZr?=
- =?utf-8?B?bk1SMzRrM1pjWCtjOGV4WTlaTmU4N1JZSHorNmN1d2MyQk1FUlB3ZmxGanNB?=
- =?utf-8?B?c3JBNDNib05kT2FjSTd0N2JLWUU5dHZkZGd5MTVGcU9nRUdObDNHMU1TTFp2?=
- =?utf-8?B?VDk1QUNhZ1NENjhlY3lTWEltandoZVpXL2hyVVJlYk9xKy95Q204K2lrRHdu?=
- =?utf-8?B?bjNnZ2VKbHRtbm13Nk53RTJtNkU3b3I1VlV6bTJ1K2lDanNsaWpRcmdwdGNN?=
- =?utf-8?B?bEZISEhIRHRhdzBTdjdMbWVmZy9nbThQZ29pVURRNnJRTDBXS1RjZVc0cXJR?=
- =?utf-8?B?S1VWNUdweTF4ZzJWWUhZenF5TFBjY3AxU1ZOcTQ2UXF3cHlIdjJjZmhvcW92?=
- =?utf-8?B?Nk0xbEpEVzlzSmF1RTNwMDhCVVNFaTM2OXRJeUFjdUVudHByeDRua2taSlBq?=
- =?utf-8?B?NGE3WjVzZjlOWkdLSEJaWHFsaHBEOHJlZnJ5Z1VOa201MlRYTXEzUE5QSFNB?=
- =?utf-8?B?RlV1L0tjUVArYldrVCttOWlFNXlpbGRxcko2T2krbHFnMFVRT04yMndINWRx?=
- =?utf-8?B?eGdWMmFEdCtoSzAvS055WHlCdW1vbGxCenF1TUh1aDJYNXZ6MkdhbVd1UExZ?=
- =?utf-8?B?ek9KeGd5dEU5aWJBbVpjeTV4cU5oT0FxY05jYUd5ZThUK0xJTEJVTlRLTE5v?=
- =?utf-8?Q?9GNl46PKM3XHFHnhBKSxj85OY?=
+	=?utf-8?B?cHlFajhJMEQ3K0J6bXRmZ2VWeDEvc0FyVXJGQnd5WE1oVnJFMzcwc3c2Q3Rp?=
+ =?utf-8?B?TmJEbWh3RnVpOHRadVRkcmlOOVVxRVowcnkwS3dRbDd2dVdSWEZjSEwxSDdR?=
+ =?utf-8?B?ZWE5Z3pDMmNFRC9pOFBDNGNvdnNmRE1rRlVCVytoaDd1SFJORlRNeW13RlFt?=
+ =?utf-8?B?aXIyZGEzTjJ5a1F3cEgzeGc4aDhjSDE3dnhrQ2lxL1NXRDk0WmI2WkZaZVcv?=
+ =?utf-8?B?MlpaMXBjejVvMms5UDRQWFlPTUNPanNqTjZlWFk3aXFHSmwrOGc3N0swc0dE?=
+ =?utf-8?B?U3RRMU8wdmlacmkxMWg2YUhyT1JORjJIcjhMSG9YWjRSQURIdkZpTHdGOWN6?=
+ =?utf-8?B?dzlDWDlOSUlSTWdLWGR0ekxISUVMaWlLS3FXUk03OVBaT2tMWjVzczJ5WFhz?=
+ =?utf-8?B?QzQxaXgxQk5lbzVvZ3BiVnhhT0IzM2IveUE4Q29EYVM0dHJtR2x1ZExZS1dj?=
+ =?utf-8?B?YWxkRHp1SFZrUVV0QUdCWmwzV0ZTUU1WVTlWYXFwUzBiMjRlQ0tMQVMrOENr?=
+ =?utf-8?B?NkhoZmNFQTUwTnZDdEZSalZVYkRYNzI3N29BZDRZbnFuaW1xS3M4RGwyeUJV?=
+ =?utf-8?B?WTloM1R4NVNiVW9BWlh1Tk9KVTJoY1cxVVR2Vm11a2lIZkoxSmFkcFhmV3Jy?=
+ =?utf-8?B?STZaMU9sRTVHL0dmZW5jQVFQVERRQWNqNldyaEhNb3FNWWZ1dlJkVUxUaGFy?=
+ =?utf-8?B?Z0VacERaTkNrb2MvRzF5dU16c0dTRFFIcXBUTHExbXIvbkpaVjFZQm1PdDU3?=
+ =?utf-8?B?VWFiUWVWTitvZjJIbnZUOFh2Nit5NW9RcTFDbUtSVnNaOCtiL3Q1Q0w1NHFN?=
+ =?utf-8?B?eGcxWTd2ZENselozTXVFeEh3bUdWem9xS21pNDlDbEpjeGRqU0lxaTZ3LzBP?=
+ =?utf-8?B?cnU0ODRqQ2RIRjdmeWRDNVJDZGdBU1E5b29hUUZWQ2ZLdHpScVIzM0xkSzJr?=
+ =?utf-8?B?aWxWOUtYZXZMRGI5OXA5dE16WG50VEdRTnIzajRWcFNEVTcvQWxDTTJObFlC?=
+ =?utf-8?B?bHc2N1cyYm9qRC9rWG5CLzhJTnNQU2Z4ZTE3ZTNuY1IwemRtM1RaTk11eWhh?=
+ =?utf-8?B?TStYYzZkZnk5QXkxdklERkJjcmRNZmpsVjNZUjJ5cWxjSWFmUXJFQ3gxTi95?=
+ =?utf-8?B?RTZEVUxLK0JrU29tYTBybTR5azBIdTcrMkxtWGV3SkZIL0wzUFc4NUtSaXdS?=
+ =?utf-8?B?L1BXb0NZU21TRC9XRnVmWGdIajk5S3h2STY0Vlc4TmFUek8wWmlMVUZMd0pT?=
+ =?utf-8?B?R3hsa2NsbENxdjZrTzBaRFIwS2ZOOTR4aWNnZSt1Uk5DZUdnbXdPRytIVkRr?=
+ =?utf-8?B?b3FlS01nTDJYYUw3WWVZWFIwVUc3MUhaRWhSdFhWeTlzRVA0MmZHR1REUTMw?=
+ =?utf-8?B?eEZBb05wblpsSGxwRkR2d1ExQXdoRlUxTitqcG9JdjFqdStmTWtaTnQ1b1Fs?=
+ =?utf-8?B?eGxrVytCdkJyUVhYWFRtUnpVREtKYTlXbVNHMkhMVFpSdm1vQTFrWWJ6N2lj?=
+ =?utf-8?B?YXlCdDZZaVRUempMUDZVeTZwaldRdTl6MzdvMFNuOEdrTmM2LzM3aVJVK1gx?=
+ =?utf-8?B?TVV5OEhBNmNMOVFXdzd4UElqbmpqTktrR1NFanNyTnFnVE1PTjRKVldBWmlL?=
+ =?utf-8?B?U1kxbVJkZGpML3ViY3c5OGljMHpmTW51ZFBLS2hLU2pKbGxtWG1jV0RWUm1Q?=
+ =?utf-8?B?Q1JKUmRxRWlrNUo3M0FaUVZKbmZGODZRYVZWZU96ek9ER24rZm9lSDZ6SUcr?=
+ =?utf-8?B?N0IwQkRGdllWVDBMdTdiYTU3MDBZTm1JdElneDVEQy9VcUx5ZzdWVytCekxv?=
+ =?utf-8?B?SHZEVGJaZzI0Y3drZTVzRGpnRHNqWkNiMTVmQTFia2tQMms4YVN5bDRJNnR6?=
+ =?utf-8?B?S2NDS3Q4Z205b1QxQUUyZ3BGaC9wRUI4R0lBSjRiQTVSckN4RG5YMUtHQjlr?=
+ =?utf-8?B?bCtoQ3M1R25yazNxblVkem9iRkxMdWNsYzhoMTVqVS81NnFxQ2lTa2tBWkV5?=
+ =?utf-8?B?Nzdad1dqUTV5YTFVc2J0RnBuM3FZcFdFMGhXZDRySzE0b1hZdmloaVRudTZ0?=
+ =?utf-8?B?UEwvZHJQMmFMUmkrMzVqc0ErSS9GaHNnZk1UanZ3cVZXNUVaN2JLaHBzSEdh?=
+ =?utf-8?Q?tMurWmB7OK+JPtwmzaiMpcYXn?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 325c4ce8-3db0-42e9-cc4e-08ddc055d05a
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3bdf94fa-526e-4610-5361-08ddc057c2f6
 X-MS-Exchange-CrossTenant-AuthSource: SJ5PPFF6E64BC2C.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jul 2025 08:34:56.2885
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jul 2025 08:48:52.5286
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: A8jyHFOB33ObvFTTeftbhHIs8qBl4l0Xs8E80WTN0G7R3+yU9IVZ3Lww+rIowy/hB9pF/SzcXoyLmMZcF3m3TA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB7671
+X-MS-Exchange-CrossTenant-UserPrincipalName: n6ejpQzIo23Soluz+GxJxMTucnbyOBavrDRtTnQB1wzj0QmxcYEjwk97KYdjfoVaaIqxd+5fmgTzxImpfhkhcg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB7920
 
 
 
 On 7/9/2025 4:29 PM, Fuad Tabba wrote:
-> Add a new internal flag, KVM_MEMSLOT_GMEM_ONLY, to the top half of
-> memslot->flags. This flag tracks when a guest_memfd-backed memory slot
-> supports host userspace mmap operations. It's strictly for KVM's
-> internal use.
+> Introduce the new KVM capability KVM_CAP_GMEM_MMAP. This capability
+> signals to userspace that a KVM instance supports host userspace mapping
+> of guest_memfd-backed memory.
 > 
-> This optimization avoids repeatedly checking the underlying guest_memfd
-> file for mmap support, which would otherwise require taking and
-> releasing a reference on the file for each check. By caching this
-> information directly in the memslot, we reduce overhead and simplify the
-> logic involved in handling guest_memfd-backed pages for host mappings.
+> The availability of this capability is determined per architecture, and
+> its enablement for a specific guest_memfd instance is controlled by the
+> GUEST_MEMFD_FLAG_MMAP flag at creation time.
 > 
+> Update the KVM API documentation to detail the KVM_CAP_GMEM_MMAP
+> capability, the associated GUEST_MEMFD_FLAG_MMAP, and provide essential
+> information regarding support for mmap in guest_memfd.
+> 
+> Reviewed-by: David Hildenbrand <david@redhat.com>
 > Reviewed-by: Gavin Shan <gshan@redhat.com>
-> Acked-by: David Hildenbrand <david@redhat.com>
-> Suggested-by: David Hildenbrand <david@redhat.com>
 > Signed-off-by: Fuad Tabba <tabba@google.com>
 > ---
->  include/linux/kvm_host.h | 11 ++++++++++-
->  virt/kvm/guest_memfd.c   |  2 ++
->  2 files changed, 12 insertions(+), 1 deletion(-)
+>  Documentation/virt/kvm/api.rst | 9 +++++++++
+>  include/uapi/linux/kvm.h       | 1 +
+>  virt/kvm/kvm_main.c            | 4 ++++
+>  3 files changed, 14 insertions(+)
 > 
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 9ac21985f3b5..d2218ec57ceb 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -54,7 +54,8 @@
->   * used in kvm, other bits are visible for userspace which are defined in
->   * include/uapi/linux/kvm.h.
->   */
-> -#define KVM_MEMSLOT_INVALID	(1UL << 16)
-> +#define KVM_MEMSLOT_INVALID			(1UL << 16)
-> +#define KVM_MEMSLOT_GMEM_ONLY			(1UL << 17)
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 9abf93ee5f65..70261e189162 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -6407,6 +6407,15 @@ most one mapping per page, i.e. binding multiple memory regions to a single
+>  guest_memfd range is not allowed (any number of memory regions can be bound to
+>  a single guest_memfd file, but the bound ranges must not overlap).
 >  
->  /*
->   * Bit 63 of the memslot generation number is an "update in-progress flag",
-> @@ -2536,6 +2537,14 @@ static inline void kvm_prepare_memory_fault_exit(struct kvm_vcpu *vcpu,
->  		vcpu->run->memory_fault.flags |= KVM_MEMORY_EXIT_FLAG_PRIVATE;
->  }
->  
-> +static inline bool kvm_memslot_is_gmem_only(const struct kvm_memory_slot *slot)
-> +{
-> +	if (!IS_ENABLED(CONFIG_KVM_GMEM_SUPPORTS_MMAP))
-> +		return false;
+> +When the capability KVM_CAP_GMEM_MMAP is supported, the 'flags' field supports
+> +GUEST_MEMFD_FLAG_MMAP.  Setting this flag on guest_memfd creation enables mmap()
+> +and faulting of guest_memfd memory to host userspace.
 > +
-> +	return slot->flags & KVM_MEMSLOT_GMEM_ONLY;
-> +}
+> +When the KVM MMU performs a PFN lookup to service a guest fault and the backing
+> +guest_memfd has the GUEST_MEMFD_FLAG_MMAP set, then the fault will always be
+> +consumed from guest_memfd, regardless of whether it is a shared or a private
+> +fault.
 > +
->  #ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
->  static inline unsigned long kvm_get_memory_attributes(struct kvm *kvm, gfn_t gfn)
->  {
-> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-> index 07a4b165471d..2b00f8796a15 100644
-> --- a/virt/kvm/guest_memfd.c
-> +++ b/virt/kvm/guest_memfd.c
-> @@ -592,6 +592,8 @@ int kvm_gmem_bind(struct kvm *kvm, struct kvm_memory_slot *slot,
->  	 */
->  	WRITE_ONCE(slot->gmem.file, file);
->  	slot->gmem.pgoff = start;
-> +	if (kvm_gmem_supports_mmap(inode))
-> +		slot->flags |= KVM_MEMSLOT_GMEM_ONLY;
+>  See KVM_SET_USER_MEMORY_REGION2 for additional details.
 >  
->  	xa_store_range(&gmem->bindings, start, end - 1, slot, GFP_KERNEL);
->  	filemap_invalidate_unlock(inode->i_mapping);
+>  4.143 KVM_PRE_FAULT_MEMORY
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index c71348db818f..cbf28237af79 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -956,6 +956,7 @@ struct kvm_enable_cap {
+>  #define KVM_CAP_ARM_EL2 240
+>  #define KVM_CAP_ARM_EL2_E2H0 241
+>  #define KVM_CAP_RISCV_MP_STATE_RESET 242
+> +#define KVM_CAP_GMEM_MMAP 243
+>  
+>  struct kvm_irq_routing_irqchip {
+>  	__u32 irqchip;
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 81bb18fa8655..5463e81b08b9 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -4913,6 +4913,10 @@ static int kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
+>  #ifdef CONFIG_KVM_GMEM
+>  	case KVM_CAP_GUEST_MEMFD:
+>  		return !kvm || kvm_arch_supports_gmem(kvm);
+> +#endif
+> +#ifdef CONFIG_KVM_GMEM_SUPPORTS_MMAP
+> +	case KVM_CAP_GMEM_MMAP:
+> +		return !kvm || kvm_arch_supports_gmem_mmap(kvm);
+>  #endif
+>  	default:
+>  		break;
 
 Reviewed-by: Shivank Garg <shivankg@amd.com>
 
