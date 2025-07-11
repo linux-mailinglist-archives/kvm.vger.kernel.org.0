@@ -1,88 +1,88 @@
-Return-Path: <kvm+bounces-52114-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52116-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E35E7B0182B
-	for <lists+kvm@lfdr.de>; Fri, 11 Jul 2025 11:39:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39522B01890
+	for <lists+kvm@lfdr.de>; Fri, 11 Jul 2025 11:45:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7343B1898456
-	for <lists+kvm@lfdr.de>; Fri, 11 Jul 2025 09:39:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C9161CA1711
+	for <lists+kvm@lfdr.de>; Fri, 11 Jul 2025 09:45:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DE4727A903;
-	Fri, 11 Jul 2025 09:39:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35B3A27EC99;
+	Fri, 11 Jul 2025 09:45:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CT7VU5KF"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Keqr5+Fn"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 240C72586DA
-	for <kvm@vger.kernel.org>; Fri, 11 Jul 2025 09:39:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE3B127E06D
+	for <kvm@vger.kernel.org>; Fri, 11 Jul 2025 09:45:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752226749; cv=none; b=Uh6UGLX+sdXqISTM0Q4XMPfFOWzZ3K8QcJ6Jkcu8/gSBS+rL1TtD3hwzX1FAnv6WrAeRBdBpi+rejtZmvQeONvHeddgZSRoSr0VwhntcCNuXoXyXPoNB7iyes0uQIQKQzhyI0BZ+78wY7iojaPYevpE95iEZhUklBq20PryQiRk=
+	t=1752227124; cv=none; b=eGcQ3fr4nhw25qhzg2mu189bortJjKRflvxbUZBrgnx5YeIY9qVowcrslx4jhVhDvZDzHAKUoOCh/FTxCGyZZHKbJ/Iuy0A9Hh3YqP5ublLgY/5xBl+uxdX+vmUzSiH05oznWZwBObcN62IW5esDPkt/ijdeSnYRPqzHD00HCxg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752226749; c=relaxed/simple;
-	bh=vY/001+f5o8pVVDfNEyy6yYui6CQQ2+0NkOOLOagp5Q=;
+	s=arc-20240116; t=1752227124; c=relaxed/simple;
+	bh=G9mm78zXYI6piKO+tCuvJ8phdn2YIo88+qdAXqWDekI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uCZaFGesQBjx9xdR6J9HxxGSoKQL5ZWBHR6rrEvzVahMWk7PL/BBq9VT+oZnOwgYwf5L+zzKCnWdgxvdFHAAnd0PnqrYez2MsFJUUGfzc6yhVraNGvMdU4ed8v8mFt01hAG0Dk0g1wyI8q27ty8SFwC0W2KoYmQ7NHAUxUxxUwM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CT7VU5KF; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=oUZ2rzYsnKuLgmgtO0gTOj2KyzFmO8rynZuba3Aw5dDSMfpYromlJIlS4fsohpv2kSy2DO0pSzy0i/ScYYc17jeP5jYW8CAtiI3ZoPLyFZaX9a7kg1QJH+tFjIAHBQN2n1ztQLskojAE2hX5G/ITdrCjHntNLggAxOyYHg7PVTg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Keqr5+Fn; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752226746;
+	s=mimecast20190719; t=1752227121;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=wQecZyWmWsgHDALYGnZ4BgAt7aKBzE7knExhR/Vkoxc=;
-	b=CT7VU5KFMxkVYCdPdmm5lom+9jmJ69BWOEAKBhWo2/LxAeJlSWoQJaJMQhnwSlh9o2wsZa
-	uohvALNaWjQ++REALwPrQ3gSDqfkBSJh9ODGNLKAY56WJ/EkHjkq9f22BjodzuKRfYv1dp
-	Ulri6OEUGTvjBj22P6Sr6YxDdj0JoPs=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=QSYtK8W1hoFX+G4/TI9sDJE2SYg5NnfEH2SkGUJResc=;
+	b=Keqr5+Fnwb7K6orxG//0TKcY54vswYkr5JdcVizKgVzkiGakt+kROFjLHYaTDlEO8cmXes
+	39HpyQALbuiT5sQ397k1EeC30MXT9qGyBJW9r6JbiiA8EFfyAakjKaNA0upzvCkBglRttO
+	u/dlbJl3VioZlQxMPOlyCmuqP0Pfimg=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-272-27BVOMISPqSwOl0tnQVdgQ-1; Fri, 11 Jul 2025 05:39:02 -0400
-X-MC-Unique: 27BVOMISPqSwOl0tnQVdgQ-1
-X-Mimecast-MFC-AGG-ID: 27BVOMISPqSwOl0tnQVdgQ_1752226741
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-454e25b2b83so6313875e9.3
-        for <kvm@vger.kernel.org>; Fri, 11 Jul 2025 02:39:02 -0700 (PDT)
+ us-mta-591-_jvpW098N7Cia1UydMisOA-1; Fri, 11 Jul 2025 05:45:20 -0400
+X-MC-Unique: _jvpW098N7Cia1UydMisOA-1
+X-Mimecast-MFC-AGG-ID: _jvpW098N7Cia1UydMisOA_1752227119
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4538f375e86so14857225e9.3
+        for <kvm@vger.kernel.org>; Fri, 11 Jul 2025 02:45:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752226741; x=1752831541;
+        d=1e100.net; s=20230601; t=1752227119; x=1752831919;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :content-language:from:references:cc:to:subject:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=wQecZyWmWsgHDALYGnZ4BgAt7aKBzE7knExhR/Vkoxc=;
-        b=n4Atsng0rnF4Nm47Cm3+Cvu902oiSukrJUbsS02gxNVWxhp5dLNaFG4id+flHAEX1o
-         /jWGoLBbPsW9PKjtpTuwdi9z90cCPC3OaP3Zj3uPnFDuPj9BYGBNGvY1vKSm0QETa02k
-         KSiunWlg/mDKkARfYqddr+dawJ74mI7ySdvW/a5ekElLZqbe6013zsCPG7DBTTi7KZh6
-         BlGoIcAhNXhFkRALwdzcnvbas2l+OZjsS+QylbtoxQeK1bAJ1r1wUKwdbnWE98N6easZ
-         fXbR0xf7sT3lTKrW1ggbMWp4pKnxVUJ/+Btr0rh70KA/Y6xLN1dMsevDi43MJCl1B+/T
-         T3BQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUNExUmESrQ/UOg8ccZY+CDTS05y3ujvuXeWIA2otH2CecBeZLEsU4BNo89x7zIsPxIvKM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyED/ouL8b6wYcKTVQd1WP0TI2E4/GXgxB7G+RPLMieNuEB9ZI5
-	ZjZaNd+lBf8ToKY8N8RHtbdAhhPJAKJ6WBHxi9W9vTFAE9xu43RJWFVxOlipqv9vpLtTOjGYicz
-	wzxsWBLZL3710nI10zdVbjBOW199LrDhQ4/9Rc1OGNpoI2yF2cKyx1Q==
-X-Gm-Gg: ASbGncusFYT9aZ+Xa/dOFuTxERNa7N2D0ASEaN0L6XOhjPGBw36N1u6HY6lAlW4fMGa
-	swzGi8lfc5iePe1sZDU/yh5fSAY1cmHgJM8VmQhgsMpaK/V9QFub0Fh7k+naUui/zZGHGt5eZGW
-	62jRWvKAbc8ivKiMsMOzG8SJcOnuh1TFDZFSvGLbWjsQ5wYoIzqrccsy3TDZDlFWSvZtXNPzsJI
-	ZcP6PbgzwqRfaAVVEoGPf3Fk2KT4E/oSBV1aAsSGbbiqcGhivniM5wXQQ/Z8o1S5wWSMcQ+ro+6
-	d8ihH0fNQI+/3QCeK4321kaNaNh/9weNtA7AuWJFUdvkh3E1EmQT9XbR0/mIPxXuPKOcXMliUMy
-	Oyz5ndclDknV5Wmmgc8zTwY06YNWdM91zW9WAdawe3TKbk02LTg7nBH7MZk1lf4RS8hc=
-X-Received: by 2002:a05:600c:4ecf:b0:453:dda:a52e with SMTP id 5b1f17b1804b1-454ec27e3b9mr16495235e9.33.1752226741128;
-        Fri, 11 Jul 2025 02:39:01 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IExWIvCiETlaLEh+tomf4x2EEMzXLfA9UvWDVsAMK1xk9DaBUTK6aJcyWeSpLnlgw09g/FhNA==
-X-Received: by 2002:a05:600c:4ecf:b0:453:dda:a52e with SMTP id 5b1f17b1804b1-454ec27e3b9mr16494695e9.33.1752226740563;
-        Fri, 11 Jul 2025 02:39:00 -0700 (PDT)
+        bh=QSYtK8W1hoFX+G4/TI9sDJE2SYg5NnfEH2SkGUJResc=;
+        b=jxAgKujoN+S4w7SrM0nGIS4eGPnb+edsfZc+D2kkkm2m8J3g6bSbiw5BlzZt4y2dXn
+         l0YWOM0SGt5PBxXpTVtiOalEnZkpG5Kd5zxM3zSJ2TYdf+qJAtZN/QwJV8TQbGokN2yo
+         HzJkr/FKHSXfqRbf6E5sEHRirs6wcd/p+5EJBwM1LyvQP6d8EAp5y9E4oB4ypo3Bp2b0
+         1ivMjk/YfZGLjACJDg0o6a16ytHui3n5PxA6FDbVZKFjZUNUAXJuVGHj6vlsgkhb7N9F
+         SdX0uIwccLWFAwwp6orgQS/g0nKroiKSCFwXuNtNgr96hHO1KnG4mj133S4bMCUdIfmw
+         JPlw==
+X-Forwarded-Encrypted: i=1; AJvYcCVnjvxrkrRuW/OL15YLrFF+hqxwviJz2n3DrlD+QG4s8Eqs8J0aqz+1apMLAuLOrAOJ5jQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzbs4Jgksj9f1UNyv9BfF7chXkPa3K3ATFS2ELszANua444EVy/
+	07NPhOlWB+tl8g+Sr66BedwMuiu2c1QiUjDExyd1+0KHLVaEuAmm6eRZpwtNBUQNEYKY6UT0Q1Q
+	fgNMTuR/ECAyr+N/dOZofFftIA+MzMeGR0BmXMlE6vfqUXDruSM/J+g==
+X-Gm-Gg: ASbGncsNVyeTY3X4oP2jSXT9zfyMUPIXMMPQIaW674vLRiuWrLPqhGGmVK0M0ggsHg7
+	mLQDvkSM0mKHmurydGMthxG89bJh1EWfuSnadH5VlUVAP4USY8ell7DngMy+RC6s6YyHv3npUnh
+	oeJS5Cqnhwc85qpVf8MIQ7PoLTVIkxe2+trPuoixAZFf3kOHs0KvhL+aoheoITbAgumbldz1Mku
+	FQ+cr4240aqPQvURqUMpUtuzR78XGZgfLovrByjMHVRHoGocYuFarNfIGwcVc0KJpZagV3yWN6k
+	ZuOq6y3UkjxIb7FaSnqdX07eN6yYxc5eL3xSwbqZ0XPxngMECfALRghQ30p5YDoI1XTtB+c70gU
+	DX4tm7TZS2/s2XVBltK1tiFv7r2hml45eKmHf7sqN4e91X+SenHxhb4C1rl9BkR99A9g=
+X-Received: by 2002:a05:600c:46c3:b0:453:8bc7:5cbb with SMTP id 5b1f17b1804b1-454ec281d0amr20339435e9.25.1752227118962;
+        Fri, 11 Jul 2025 02:45:18 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGFnas8XgQ3IWLS2hIV11hHrPJlB9u2ohUWXcGE0uQdIEF9JiXqxZYBzaTwnR729ZNAjccDGg==
+X-Received: by 2002:a05:600c:46c3:b0:453:8bc7:5cbb with SMTP id 5b1f17b1804b1-454ec281d0amr20338625e9.25.1752227118391;
+        Fri, 11 Jul 2025 02:45:18 -0700 (PDT)
 Received: from ?IPV6:2003:d8:2f3c:3a00:5662:26b3:3e5d:438e? (p200300d82f3c3a00566226b33e5d438e.dip0.t-ipconnect.de. [2003:d8:2f3c:3a00:5662:26b3:3e5d:438e])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-454dd54115bsm42810775e9.31.2025.07.11.02.38.57
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-454d50df0cdsm84339815e9.25.2025.07.11.02.45.15
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 11 Jul 2025 02:39:00 -0700 (PDT)
-Message-ID: <f76653bf-c170-4d21-b7cf-b1d2eb8f723e@redhat.com>
-Date: Fri, 11 Jul 2025 11:38:57 +0200
+        Fri, 11 Jul 2025 02:45:17 -0700 (PDT)
+Message-ID: <6fc1edd4-8a3c-4cba-8779-461a16b5126e@redhat.com>
+Date: Fri, 11 Jul 2025 11:45:15 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -90,8 +90,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v13 11/20] KVM: x86/mmu: Allow NULL-able fault in
- kvm_max_private_mapping_level
+Subject: Re: [PATCH v13 14/20] KVM: x86: Enable guest_memfd mmap for default
+ VM type
 To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
  linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev
 Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
@@ -115,7 +115,7 @@ Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
  jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com,
  ira.weiny@intel.com
 References: <20250709105946.4009897-1-tabba@google.com>
- <20250709105946.4009897-12-tabba@google.com>
+ <20250709105946.4009897-15-tabba@google.com>
 From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=david@redhat.com; keydata=
@@ -163,81 +163,85 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <20250709105946.4009897-12-tabba@google.com>
+In-Reply-To: <20250709105946.4009897-15-tabba@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 09.07.25 12:59, Fuad Tabba wrote:
-> From: Ackerley Tng <ackerleytng@google.com>
+> Enable host userspace mmap support for guest_memfd-backed memory when
+> running KVM with the KVM_X86_DEFAULT_VM type:
 > 
-> Refactor kvm_max_private_mapping_level() to accept a NULL kvm_page_fault
-> pointer and rename it to kvm_gmem_max_mapping_level().
+> * Define kvm_arch_supports_gmem_mmap() for KVM_X86_DEFAULT_VM: Introduce
+>    the architecture-specific kvm_arch_supports_gmem_mmap() macro,
+>    specifically enabling mmap support for KVM_X86_DEFAULT_VM instances.
+>    This macro, gated by CONFIG_KVM_GMEM_SUPPORTS_MMAP, ensures that only
+>    the default VM type can leverage guest_memfd mmap functionality on
+>    x86. This explicit enablement prevents CoCo VMs, which use guest_memfd
+>    primarily for private memory and rely on hardware-enforced privacy,
+>    from accidentally exposing guest memory via host userspace mappings.
 > 
-> The max_mapping_level x86 operation (previously private_max_mapping_level)
-> is designed to potentially be called without an active page fault, for
-> instance, when kvm_mmu_max_mapping_level() is determining the maximum
-> mapping level for a gfn proactively.
+> * Select CONFIG_KVM_GMEM_SUPPORTS_MMAP in KVM_X86: Enable the
+>    CONFIG_KVM_GMEM_SUPPORTS_MMAP Kconfig option when KVM_X86 is selected.
+>    This ensures that the necessary code for guest_memfd mmap support
+>    (introduced earlier) is compiled into the kernel for x86. This Kconfig
+>    option acts as a system-wide gate for the guest_memfd mmap capability.
+>    It implicitly enables CONFIG_KVM_GMEM, making guest_memfd available,
+>    and then layers the mmap capability on top specifically for the
+>    default VM.
 > 
-> Allow NULL fault pointer: Modify kvm_max_private_mapping_level() to
-> safely handle a NULL fault argument. This aligns its interface with the
-> kvm_x86_ops.max_mapping_level operation it wraps, which can also be
-> called with NULL.
+> These changes make guest_memfd a more versatile memory backing for
+> standard KVM guests, allowing VMMs to use a unified guest_memfd model
+> for both private (CoCo) and non-private (default) VMs. This is a
+> prerequisite for use cases such as running Firecracker guests entirely
+> backed by guest_memfd and implementing direct map removal for non-CoCo
+> VMs.
 > 
-> Rename function to kvm_gmem_max_mapping_level(): This reinforces that
-> the function's scope is for guest_memfd-backed memory, which can be
-> either private or non-private, removing any remaining "private"
-> connotation from its name.
-> 
-> Optimize max_level checks: Introduce a check in the caller to skip
-> querying for max_mapping_level if the current max_level is already
-> PG_LEVEL_4K, as no further reduction is possible.
-> 
-> Suggested-by: Sean Christoperson <seanjc@google.com>
+> Co-developed-by: Ackerley Tng <ackerleytng@google.com>
 > Signed-off-by: Ackerley Tng <ackerleytng@google.com>
 > Signed-off-by: Fuad Tabba <tabba@google.com>
 > ---
->   arch/x86/kvm/mmu/mmu.c | 17 ++++++++---------
->   1 file changed, 8 insertions(+), 9 deletions(-)
+>   arch/x86/include/asm/kvm_host.h | 9 +++++++++
+>   arch/x86/kvm/Kconfig            | 1 +
+>   arch/x86/kvm/x86.c              | 3 ++-
+>   3 files changed, 12 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index bb925994cbc5..495dcedaeafa 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -4467,17 +4467,13 @@ static inline u8 kvm_max_level_for_order(int order)
->   	return PG_LEVEL_4K;
->   }
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 4c764faa12f3..4c89feaa1910 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -2273,9 +2273,18 @@ void kvm_configure_mmu(bool enable_tdp, int tdp_forced_root_level,
+>   #ifdef CONFIG_KVM_GMEM
+>   #define kvm_arch_has_private_mem(kvm) ((kvm)->arch.has_private_mem)
+>   #define kvm_arch_supports_gmem(kvm)  ((kvm)->arch.supports_gmem)
+> +
+> +/*
+> + * CoCo VMs with hardware support that use guest_memfd only for backing private
+> + * memory, e.g., TDX, cannot use guest_memfd with userspace mapping enabled.
+> + */
+> +#define kvm_arch_supports_gmem_mmap(kvm)		\
+> +	(IS_ENABLED(CONFIG_KVM_GMEM_SUPPORTS_MMAP) &&	\
+> +	 (kvm)->arch.vm_type == KVM_X86_DEFAULT_VM)
+>   #else
+>   #define kvm_arch_has_private_mem(kvm) false
+>   #define kvm_arch_supports_gmem(kvm) false
+> +#define kvm_arch_supports_gmem_mmap(kvm) false
+>   #endif
 >   
-> -static u8 kvm_max_private_mapping_level(struct kvm *kvm,
-> -					struct kvm_page_fault *fault,
-> -					int gmem_order)
-> +static u8 kvm_gmem_max_mapping_level(struct kvm *kvm, int order,
-> +				     struct kvm_page_fault *fault)
->   {
-> -	u8 max_level = fault->max_level;
->   	u8 req_max_level;
-> +	u8 max_level;
->   
-> -	if (max_level == PG_LEVEL_4K)
-> -		return PG_LEVEL_4K;
-> -
-> -	max_level = min(kvm_max_level_for_order(gmem_order), max_level);
-> +	max_level = kvm_max_level_for_order(order);
->   	if (max_level == PG_LEVEL_4K)
->   		return PG_LEVEL_4K;
->   
-> @@ -4513,7 +4509,10 @@ static int kvm_mmu_faultin_pfn_private(struct kvm_vcpu *vcpu,
->   	}
->   
->   	fault->map_writable = !(fault->slot->flags & KVM_MEM_READONLY);
-> -	fault->max_level = kvm_max_private_mapping_level(vcpu->kvm, fault, max_order);
-> +	if (fault->max_level >= PG_LEVEL_4K) {
-> +		fault->max_level = kvm_gmem_max_mapping_level(vcpu->kvm,
-> +							      max_order, fault);
-> +	}
+>   #define kvm_arch_has_readonly_mem(kvm) (!(kvm)->arch.has_protected_state)
+> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+> index df1fdbb4024b..239637b663dc 100644
+> --- a/arch/x86/kvm/Kconfig
+> +++ b/arch/x86/kvm/Kconfig
+> @@ -47,6 +47,7 @@ config KVM_X86
+>   	select KVM_GENERIC_HARDWARE_ENABLING
+>   	select KVM_GENERIC_PRE_FAULT_MEMORY
+>   	select KVM_GENERIC_GMEM_POPULATE if KVM_SW_PROTECTED_VM
+> +	select KVM_GMEM_SUPPORTS_MMAP
+>   	select KVM_WERROR if WERROR
 
-Could drop {}
+Given the error, likely we want to limit to 64BIT.
 
-Acked-by: David Hildenbrand <david@redhat.com>
+select KVM_GMEM_SUPPORTS_MMAP if X86_64
 
 -- 
 Cheers,
