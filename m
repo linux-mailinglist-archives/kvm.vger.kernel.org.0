@@ -1,156 +1,335 @@
-Return-Path: <kvm+bounces-52194-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52195-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9CEFB0240E
-	for <lists+kvm@lfdr.de>; Fri, 11 Jul 2025 20:47:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C15EB024B6
+	for <lists+kvm@lfdr.de>; Fri, 11 Jul 2025 21:40:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 779FC3AAD96
-	for <lists+kvm@lfdr.de>; Fri, 11 Jul 2025 18:47:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9480A1CC0E75
+	for <lists+kvm@lfdr.de>; Fri, 11 Jul 2025 19:40:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FBE52F2711;
-	Fri, 11 Jul 2025 18:46:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6C112E7BA7;
+	Fri, 11 Jul 2025 19:40:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1KFlKADO"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="h4IFLRru"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D45B13B590
-	for <kvm@vger.kernel.org>; Fri, 11 Jul 2025 18:46:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFA641D61BC
+	for <kvm@vger.kernel.org>; Fri, 11 Jul 2025 19:40:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752259587; cv=none; b=dNKnGe/0guqukcZU6KNhGDFzaHEbbaWKkp4Bl7vpymnxLfzW0lDWKFwGxtLV7iadDD5rinosh6hZX/4PcqZ32ZKjrvfEokPrRqBJBx4QBnjC/nlFtRvWfqym9y6kHgD16RL4qUz9OzdC6iVUMOVQmItsLJ/S5nKNpgiDaH77InM=
+	t=1752262815; cv=none; b=b0/N59hopwIVk9uZDtXtioIK2M8pUY1NdJ5oyrxypRCCF47vY798f/slEl6frwFyCGq2MNMvICj8M3IEQuiXsXrAr15x5wN4ZCxOvp/+lJXeiQbwAcRzzZ7OLIs/utli68b6hvc9WUdtLoyue60wo/+jPT339M73XTIrL+xOSpU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752259587; c=relaxed/simple;
-	bh=zYiGdxOL7zThjAm9ak0MVc2aInvxHTk2ZyWy/3uXVMM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Dztdl3Ck/VDCA1bvy2MbSHcNbcFkxBty70UwF+p/set1gn7DEmodVLjwjR5F/hQHqf2BohWYtyaSgKXn/iImkDCzxUGFaA88TGrDgP42Y3GC6R/jyZvJrOzu2JzURqXyq/f/JgnhPnR/DEZbUn7bCRl1oOzkBViAgbeaJzZ2Rro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1KFlKADO; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-235e389599fso28615ad.0
-        for <kvm@vger.kernel.org>; Fri, 11 Jul 2025 11:46:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752259585; x=1752864385; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=q3aEobjPCY0l74zDE1rwtOs+YJ5bZnTUHt69hJSYx74=;
-        b=1KFlKADOX2x+IU2feQiUTjByA17XFUtmEXyHKzLAXDUNBZy3Hh6Pt2T30cDFjNfEfF
-         GW6KwYvROeqbazzlDDpGx8URU4ztlIbDplvIgGdPeUn1nxE5zXu+aitMzpIaBRh1A5Xs
-         krYn8Ixzb7IurIP3tg1sI0cTL6bTVEbEx9EgAkkcoXYHl+U3RPeejLTJKqpzuaBQJZJM
-         pyfRXI2KpeLKWt6z9xCFRau577sPoPrHJsDusJpHlqo9OJX0jN37TjU+Iy2UC9JwZ22Y
-         vF24rIB1Ibb0LVH3HCDKXsEOYZPYREPLz8Ui/iZ25pjvvVDgEh1NuamQO5Zwr/Z5bpII
-         CLAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752259585; x=1752864385;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=q3aEobjPCY0l74zDE1rwtOs+YJ5bZnTUHt69hJSYx74=;
-        b=dqGkrk0urJqkI6VXZV67/nev+tZR4SANcVLCbb5jz7D8QI9/uGa9Hs+kLeNZhEXqef
-         jHAImOc2LPR8kpu3QoF4B+enx5ztAQsfCmw5wfr9WqKEGZR5JKUSt/N4OORDJmHUSSeQ
-         AcgTYStAenH1TD+h6d/wvuzv83z0L+ON48qss+vTZWCeQpKVc5exPI1UCFg+CM1asyp0
-         6uhQngcvVSbQ1+vcdmQyBLXBOSIJjDESnSpZRCaNXbor4jZV+04CZUw5AKDPBNMSARCh
-         WhH3xuCeTvmVvTXSyI5lQaupA5dCF8aK8o0YOZGEJNzty39hcXNvbEq+MIYBJMiHrhp1
-         ThJw==
-X-Forwarded-Encrypted: i=1; AJvYcCWyS9zg7lUadFv2QWydwvjoCw5UvecLeZmobQqAh69vyG6CyOkueU6LejKOxcPoiQhzK9M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxYyQgu7+CS4Dml+axC50BMOfFs2bda8MAKOlAaxFt8kePyZ1+J
-	IjEy/7KiSeSEqD+CSBucw/6ZRhgkcg8fGgV6mixXOzPLJy0QtJLbrj133eO36mf6yxkq4OeE/k+
-	sJSUOVPZ45L9R0nE8HF8TP84yXoaAmGxCjbIQuh4v
-X-Gm-Gg: ASbGncuE4LE5i8QVtS/zJzcXVJZHSQrwCSLzk3hx9wkGTzLfWja+FOvx1E52EhUx/Py
-	vqleRqUA3SPz2MHg63mNLv4ZflV8JgvtyC5FgBqrK26a3zxq7oNZjUM9RJlN3cOldjP04t7pS9Q
-	5JDyYFBu7wGXaWFcDcpPtN4LC4VLbljuvaDa45mQ6X1IVUW6aE53hDzoAt3GycAif8f0CDNFNX7
-	MeQrhCqaOo9N8wOf0e54C3i+FRip9S9ZZ+DLQ==
-X-Google-Smtp-Source: AGHT+IElSHIK+nFgCq+qGXxEYfAJicQBUs9O8jurR7Ssr4uaPjtm1X6j112grWmousd9jed4zUvBFs/XqJrLOCmyabM=
-X-Received: by 2002:a17:903:1b30:b0:234:a734:4ab9 with SMTP id
- d9443c01a7336-23df6a2907bmr282615ad.20.1752259584520; Fri, 11 Jul 2025
- 11:46:24 -0700 (PDT)
+	s=arc-20240116; t=1752262815; c=relaxed/simple;
+	bh=fTSsVw307/IhVUB6nmlk5kiLbB9+XjCXO0Yz6uvKT2M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=r4xeNmGyY3QG/E1XpvXadPNy8Nb5puA07PNM1BZvrCVjfiiDtXNWYtg1Qw1MsskCqL/NWoXgalS0uViIN/le1s6oAvWxGfloi7j6kroe0MF8ta600thfN0LDOIARd8FsFc+muGZR0cp8pFZ4S4fafWV583JVcBNASLJAmIzVPPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=h4IFLRru; arc=none smtp.client-ip=91.218.175.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Fri, 11 Jul 2025 12:39:50 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1752262801;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9Zhck/rOf1TsKn/sLukuI+2Jhtq1hlKXQKKyBss4j7k=;
+	b=h4IFLRrum4DGnMgcj570rWlK55BqT0Tn1Iu2sfRUzzd0OJim+Cyjw7afBHf390mLVS/Cwj
+	4i/97s4qtnB9JHo3DdZe/Qj+aA5jcfQaCXfamCgk8qmiIvuMddlqg2uDda1pT0tHUCPCeo
+	azXccTRzmOwVmKsXhpaM0ch/2+kl1oI=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Jiaqi Yan <jiaqiyan@google.com>
+Cc: maz@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org,
+	pbonzini@redhat.com, corbet@lwn.net, shuah@kernel.org,
+	kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	duenwen@google.com, rananta@google.com, jthoughton@google.com
+Subject: Re: [PATCH v2 1/6] KVM: arm64: VM exit to userspace to handle SEA
+Message-ID: <aHFohmTb9qR_JG1E@linux.dev>
+References: <20250604050902.3944054-1-jiaqiyan@google.com>
+ <20250604050902.3944054-2-jiaqiyan@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250703062641.3247-1-yan.y.zhao@intel.com> <20250709232103.zwmufocd3l7sqk7y@amd.com>
- <aG_pLUlHdYIZ2luh@google.com> <aHCUyKJ4I4BQnfFP@yzhao56-desk>
- <20250711151719.goee7eqti4xyhsqr@amd.com> <aHEwT4X0RcfZzHlt@google.com>
-In-Reply-To: <aHEwT4X0RcfZzHlt@google.com>
-From: Vishal Annapurve <vannapurve@google.com>
-Date: Fri, 11 Jul 2025 11:46:12 -0700
-X-Gm-Features: Ac12FXxHO3aH_ClVGK7BVe1DV9rCSynSWxs-Uxj1Wjji9UEyfhn7erZXSt82de4
-Message-ID: <CAGtprH9NOdN9VZWkWLjYcTixrN1+dgWfC3rcdmv9rQBkriZrdQ@mail.gmail.com>
-Subject: Re: [RFC PATCH] KVM: TDX: Decouple TDX init mem region from kvm_gmem_populate()
-To: Sean Christopherson <seanjc@google.com>
-Cc: Michael Roth <michael.roth@amd.com>, Yan Zhao <yan.y.zhao@intel.com>, pbonzini@redhat.com, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, rick.p.edgecombe@intel.com, 
-	kai.huang@intel.com, adrian.hunter@intel.com, reinette.chatre@intel.com, 
-	xiaoyao.li@intel.com, tony.lindgren@intel.com, binbin.wu@linux.intel.com, 
-	dmatlack@google.com, isaku.yamahata@intel.com, ira.weiny@intel.com, 
-	david@redhat.com, ackerleytng@google.com, tabba@google.com, 
-	chao.p.peng@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250604050902.3944054-2-jiaqiyan@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, Jul 11, 2025 at 8:40=E2=80=AFAM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> On Fri, Jul 11, 2025, Michael Roth wrote:
-> > On Fri, Jul 11, 2025 at 12:36:24PM +0800, Yan Zhao wrote:
-> > > Besides, it can't address the 2nd AB-BA lock issue as mentioned in th=
-e patch
-> > > log:
-> > >
-> > > Problem
-> > > =3D=3D=3D
-> > > ...
-> > > (2)
-> > > Moreover, in step 2, get_user_pages_fast() may acquire mm->mmap_lock,
-> > > resulting in the following lock sequence in tdx_vcpu_init_mem_region(=
-):
-> > > - filemap invalidation lock --> mm->mmap_lock
-> > >
-> > > However, in future code, the shared filemap invalidation lock will be=
- held
-> > > in kvm_gmem_fault_shared() (see [6]), leading to the lock sequence:
-> > > - mm->mmap_lock --> filemap invalidation lock
-> >
-> > I wouldn't expect kvm_gmem_fault_shared() to trigger for the
-> > KVM_MEMSLOT_SUPPORTS_GMEM_SHARED case (or whatever we end up naming it)=
-.
->
-> Irrespective of shared faults, I think the API could do with a bit of cle=
-anup
-> now that TDX has landed, i.e. now that we can see a bit more of the pictu=
-re.
->
-> As is, I'm pretty sure TDX is broken with respect to hugepage support, be=
-cause
-> kvm_gmem_populate() marks an entire folio as prepared, but TDX only ever =
-deals
-> with one page at a time.  So that needs to be changed.  I assume it's alr=
-eady
-> address in one of the many upcoming series, but it still shows a flaw in =
-the API.
->
-> Hoisting the retrieval of the source page outside of filemap_invalidate_l=
-ock()
-> seems pretty straightforward, and would provide consistent ABI for all ve=
-ndor
+Hi Jiaqi,
 
-Will relying on standard KVM -> guest_memfd interaction i.e.
-simulating a second stage fault to get the right target address work
-for all vendors i.e. CCA/SNP/TDX? If so, we might not have to maintain
-this out of band path of kvm_gmem_populate.
+On Wed, Jun 04, 2025 at 05:08:56AM +0000, Jiaqi Yan wrote:
+> When APEI fails to handle a stage-2 synchronous external abort (SEA),
+> today KVM directly injects an async SError to the VCPU then resumes it,
+> which usually results in unpleasant guest kernel panic.
+> 
+> One major situation of guest SEA is when vCPU consumes recoverable
+> uncorrected memory error (UER). Although SError and guest kernel panic
+> effectively stops the propagation of corrupted memory, there is room
+> to recover from an UER in a more graceful manner.
+> 
+> Alternatively KVM can redirect the synchronous SEA event to VMM to
+> - Reduce blast radius if possible. VMM can inject a SEA to VCPU via
+>   KVM's existing KVM_SET_VCPU_EVENTS API. If the memory poison
+>   consumption or fault is not from guest kernel, blast radius can be
+>   limited to the triggering thread in guest userspace, so VM can
+>   keep running.
+> - VMM can protect from future memory poison consumption by unmapping
+>   the page from stage-2, or interrupt guest of the poisoned guest page
+>   so guest kernel can unmap it from stage-1.
+> - VMM can also track SEA events that VM customers care about, restart
+>   VM when certain number of distinct poison events have happened,
+>   provide observability to customers in log management UI.
+> 
+> Introduce an userspace-visible feature to enable VMM to handle SEA:
+> - KVM_CAP_ARM_SEA_TO_USER. As the alternative fallback behavior
+>   when host APEI fails to claim a SEA, userspace can opt in this new
+>   capability to let KVM exit to userspace during SEA if it is not
+>   caused by access on memory of stage-2 translation table.
+> - KVM_EXIT_ARM_SEA. A new exit reason is introduced for this.
+>   KVM fills kvm_run.arm_sea with as much as possible information about
+>   the SEA, enabling VMM to emulate SEA to guest by itself.
+>   - Sanitized ESR_EL2. The general rule is to keep only the bits
+>     useful for userspace and relevant to guest memory. See code
+>     comments for why bits are hidden/reported.
+>   - If faulting guest virtual and physical addresses are available.
+>   - Faulting guest virtual address if available.
+>   - Faulting guest physical address if available.
+> 
+> Signed-off-by: Jiaqi Yan <jiaqiyan@google.com>
 
-> flavors.  E.g. as is, non-struct-page memory will work for SNP, but not T=
-DX.  The
-> obvious downside is that struct-page becomes a requirement for SNP, but t=
-hat
->
+I was reviewing this locally and wound up making enough changes where it
+just made more sense to share the diff. General comments:
 
-Maybe you had more thought here?
+ - Avoid adding helpers to headers when they're used in a single
+   callsite / compilation unit
+
+ - Add some detail about FEAT_RAS where we may still exit to userspace
+   for host-controlled memory, as we cannot differentiate between a
+   stage-1 or stage-2 TTW SEA when taken on the descriptor PA
+
+ - Explicitly handle SEAs due to VNCR (I have a separate prereq patch)
+
+From aac0bb8f90c43b5b17c3b4e50379cb8ca828812c Mon Sep 17 00:00:00 2001
+From: Jiaqi Yan <jiaqiyan@google.com>
+Date: Wed, 4 Jun 2025 05:08:56 +0000
+Subject: [PATCH] KVM: arm64: VM exit to userspace to handle SEA
+
+When APEI fails to handle a stage-2 synchronous external abort (SEA),
+today KVM directly injects an async SError to the VCPU then resumes it,
+which usually results in unpleasant guest kernel panic.
+
+One major situation of guest SEA is when vCPU consumes recoverable
+uncorrected memory error (UER). Although SError and guest kernel panic
+effectively stops the propagation of corrupted memory, there is room
+to recover from an UER in a more graceful manner.
+
+Alternatively KVM can redirect the synchronous SEA event to VMM to
+- Reduce blast radius if possible. VMM can inject a SEA to VCPU via
+  KVM's existing KVM_SET_VCPU_EVENTS API. If the memory poison
+  consumption or fault is not from guest kernel, blast radius can be
+  limited to the triggering thread in guest userspace, so VM can
+  keep running.
+- VMM can protect from future memory poison consumption by unmapping
+  the page from stage-2, or interrupt guest of the poisoned guest page
+  so guest kernel can unmap it from stage-1.
+- VMM can also track SEA events that VM customers care about, restart
+  VM when certain number of distinct poison events have happened,
+  provide observability to customers in log management UI.
+
+Introduce an userspace-visible feature to enable VMM to handle SEA:
+- KVM_CAP_ARM_SEA_TO_USER. As the alternative fallback behavior
+  when host APEI fails to claim a SEA, userspace can opt in this new
+  capability to let KVM exit to userspace during SEA if it is not
+  caused by access on memory of stage-2 translation table.
+- KVM_EXIT_ARM_SEA. A new exit reason is introduced for this.
+  KVM fills kvm_run.arm_sea with as much as possible information about
+  the SEA, enabling VMM to emulate SEA to guest by itself.
+  - Sanitized ESR_EL2. The general rule is to keep only the bits
+    useful for userspace and relevant to guest memory. See code
+    comments for why bits are hidden/reported.
+  - If faulting guest virtual and physical addresses are available.
+  - Faulting guest virtual address if available.
+  - Faulting guest physical address if available.
+
+Signed-off-by: Jiaqi Yan <jiaqiyan@google.com>
+Link: https://lore.kernel.org/r/20250604050902.3944054-2-jiaqiyan@google.com
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+---
+ arch/arm64/include/asm/kvm_host.h |  2 +
+ arch/arm64/kvm/arm.c              |  5 +++
+ arch/arm64/kvm/mmu.c              | 67 ++++++++++++++++++++++++++++++-
+ include/uapi/linux/kvm.h          | 10 +++++
+ 4 files changed, 83 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index e54d29feb469..98ce2d58ac8d 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -349,6 +349,8 @@ struct kvm_arch {
+ #define KVM_ARCH_FLAG_GUEST_HAS_SVE			9
+ 	/* MIDR_EL1, REVIDR_EL1, and AIDR_EL1 are writable from userspace */
+ #define KVM_ARCH_FLAG_WRITABLE_IMP_ID_REGS		10
++	/* Unhandled SEAs are taken to userspace */
++#define KVM_ARCH_FLAG_EXIT_SEA				11
+ 	unsigned long flags;
+ 
+ 	/* VM-wide vCPU feature set */
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 7a1a8210ff91..aec6034db1e7 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -133,6 +133,10 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 		}
+ 		mutex_unlock(&kvm->lock);
+ 		break;
++	case KVM_CAP_ARM_SEA_TO_USER:
++		r = 0;
++		set_bit(KVM_ARCH_FLAG_EXIT_SEA, &kvm->arch.flags);
++		break;
+ 	default:
+ 		break;
+ 	}
+@@ -322,6 +326,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_IRQFD_RESAMPLE:
+ 	case KVM_CAP_COUNTER_OFFSET:
+ 	case KVM_CAP_ARM_WRITABLE_IMP_ID_REGS:
++	case KVM_CAP_ARM_SEA_TO_USER:
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_SET_GUEST_DEBUG2:
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index a34924d75069..26b2e71994be 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1813,8 +1813,48 @@ static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
+ 	read_unlock(&vcpu->kvm->mmu_lock);
+ }
+ 
++/*
++ * Returns true if the SEA should be handled locally within KVM if the abort is
++ * caused by a kernel memory allocation (e.g. stage-2 table memory).
++ */
++static bool host_owns_sea(struct kvm_vcpu *vcpu, u64 esr)
++{
++	/*
++	 * Without FEAT_RAS HCR_EL2.TEA is RES0, meaning any external abort
++	 * taken from a guest EL to EL2 is due to a host-imposed access (e.g.
++	 * stage-2 PTW).
++	 */
++	if (!cpus_have_final_cap(ARM64_HAS_RAS_EXTN))
++		return true;
++
++	/* KVM owns the VNCR when the vCPU isn't in a nested context. */
++	if (is_hyp_ctxt(vcpu) && (esr & ESR_ELx_VNCR))
++		return true;
++
++	/*
++	 * Determining if an external abort during a table walk happened at
++	 * stage-2 is only possible with S1PTW is set. Otherwise, since KVM
++	 * sets HCR_EL2.TEA, SEAs due to a stage-1 walk (i.e. accessing the PA
++	 * of the stage-1 descriptor) can reach here and are reported with a
++	 * TTW ESR value.
++	 */
++	return esr_fsc_is_sea_ttw(esr) && (esr & ESR_ELx_S1PTW);
++}
++
+ int kvm_handle_guest_sea(struct kvm_vcpu *vcpu)
+ {
++	u64 esr = kvm_vcpu_get_esr(vcpu);
++	struct kvm_run *run = vcpu->run;
++	struct kvm *kvm = vcpu->kvm;
++	u64 esr_mask = ESR_ELx_EC_MASK	|
++		       ESR_ELx_FnV	|
++		       ESR_ELx_EA	|
++	               ESR_ELx_CM	|
++		       ESR_ELx_WNR	|
++		       ESR_ELx_FSC;
++	u64 ipa;
++
++
+ 	/*
+ 	 * Give APEI the opportunity to claim the abort before handling it
+ 	 * within KVM. apei_claim_sea() expects to be called with IRQs
+@@ -1824,7 +1864,32 @@ int kvm_handle_guest_sea(struct kvm_vcpu *vcpu)
+ 	if (apei_claim_sea(NULL) == 0)
+ 		return 1;
+ 
+-	return kvm_inject_serror(vcpu);
++	if (host_owns_sea(vcpu, esr) || !test_bit(KVM_ARCH_FLAG_EXIT_SEA, &kvm->arch.flags))
++		return kvm_inject_serror(vcpu);
++
++	/* ESR_ELx.SET is RES0 when FEAT_RAS isn't implemented. */
++	if (kvm_has_ras(kvm))
++		esr_mask |= ESR_ELx_SET_MASK;
++
++	/*
++	 * Exit to userspace, and provide faulting guest virtual and physical
++	 * addresses in case userspace wants to emulate SEA to guest by
++	 * writing to FAR_EL1 and HPFAR_EL1 registers.
++	 */
++	memset(&run->arm_sea, 0, sizeof(run->arm_sea));
++	run->exit_reason = KVM_EXIT_ARM_SEA;
++	run->arm_sea.esr = esr & esr_mask;
++
++	if (!(esr & ESR_ELx_FnV))
++		run->arm_sea.gva = kvm_vcpu_get_hfar(vcpu);
++
++	ipa = kvm_vcpu_get_fault_ipa(vcpu);
++	if (ipa != INVALID_GPA) {
++		run->arm_sea.flags |= KVM_EXIT_ARM_SEA_FLAG_GPA_VALID;
++		run->arm_sea.gpa = ipa;
++	}
++
++	return 0;
+ }
+ 
+ /**
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index e4e566ff348b..b2cc3d74d769 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -179,6 +179,7 @@ struct kvm_xen_exit {
+ #define KVM_EXIT_LOONGARCH_IOCSR  38
+ #define KVM_EXIT_MEMORY_FAULT     39
+ #define KVM_EXIT_TDX              40
++#define KVM_EXIT_ARM_SEA          41
+ 
+ /* For KVM_EXIT_INTERNAL_ERROR */
+ /* Emulate instruction failed. */
+@@ -469,6 +470,14 @@ struct kvm_run {
+ 				} get_tdvmcall_info;
+ 			};
+ 		} tdx;
++		/* KVM_EXIT_ARM_SEA */
++		struct {
++#define KVM_EXIT_ARM_SEA_FLAG_GPA_VALID	(1ULL << 0)
++			__u64 flags;
++			__u64 esr;
++			__u64 gva;
++			__u64 gpa;
++		} arm_sea;
+ 		/* Fix the size of the union. */
+ 		char padding[256];
+ 	};
+@@ -957,6 +966,7 @@ struct kvm_enable_cap {
+ #define KVM_CAP_ARM_EL2_E2H0 241
+ #define KVM_CAP_RISCV_MP_STATE_RESET 242
+ #define KVM_CAP_ARM_CACHEABLE_PFNMAP_SUPPORTED 243
++#define KVM_CAP_ARM_SEA_TO_USER 244
+ 
+ struct kvm_irq_routing_irqchip {
+ 	__u32 irqchip;
+-- 
+2.39.5
 
