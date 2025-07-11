@@ -1,47 +1,54 @@
-Return-Path: <kvm+bounces-52095-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52096-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D53B1B014B8
-	for <lists+kvm@lfdr.de>; Fri, 11 Jul 2025 09:31:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C01E7B014C2
+	for <lists+kvm@lfdr.de>; Fri, 11 Jul 2025 09:33:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F315E3A9E85
-	for <lists+kvm@lfdr.de>; Fri, 11 Jul 2025 07:30:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AFC001891047
+	for <lists+kvm@lfdr.de>; Fri, 11 Jul 2025 07:33:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC1251EF397;
-	Fri, 11 Jul 2025 07:30:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E88491EFF8B;
+	Fri, 11 Jul 2025 07:33:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="lGEJEelw"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="XNWRWlQ4"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFDD8A933;
-	Fri, 11 Jul 2025 07:30:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DC69197A6C;
+	Fri, 11 Jul 2025 07:33:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752219035; cv=none; b=aLhFeozM+JymHAIa3gsg6CyE2w8zubWkWZB9R6aga1m7BJUvs7+8tZcVw4Ut59b4K+OQDFdFW1DPk1q7apkqSaJTvUG9BcU06rD96y9Om0cRtw3fUj+fpqWALZsWH/1VjlRY2GmE+kVpo2YqnSZ/cgjHOzgZ21ohEZSQPtHsvg4=
+	t=1752219187; cv=none; b=uRaAEtBlvFUALRKFDCAEeej+XrwLa8j9kKSPCGpy/cTGxDt/cRoNnGTXbA4cZfvUB9/OD1yRKJvu3v+duJ5/BsBToSqhLPDjUZQRy1djEok+1CmbbBAOYlxPessPI4C3tHZxgDmbi+o9nnp7bMB0Tk+2GqxoxR78vusPgYohqWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752219035; c=relaxed/simple;
-	bh=pT4xr25h93j0ZqqII9Nj3hCTFizY/oID/swt1J6vurU=;
+	s=arc-20240116; t=1752219187; c=relaxed/simple;
+	bh=4+cMq7WmCP7QhJEBuMAp8KaJDQvkZ/CG9iiej1+tkVo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tkgBxBE3dvt9yLCwNdxy/U4Jii/cTgMhHgN9EDtXvotznNa2uuAOun2Be4G6NcZEj+W6cVvj1p9aqeTqWCqp8kNIr7aVQB7/h4UO2wSvRYMy/GOgAzE8SXR73JaVuYZSPvqyJ3Q6ovPtByrMv08ANgCJktaeXwqbhbC3/tE/8gM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=lGEJEelw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2052C4CEED;
-	Fri, 11 Jul 2025 07:30:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1752219034;
-	bh=pT4xr25h93j0ZqqII9Nj3hCTFizY/oID/swt1J6vurU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lGEJEelwUyYuRvhj82dJRzXqyXiJt/Hqq6g6H3IlCwKtFFJUvMSULkZGNjzul7iDZ
-	 E2jBAkEH3Ng4wnr4fdgouMjbHMRaGvLWDXTyunnJPFYCmOIpEIerU/fWy2tDGtXMYm
-	 lzTP9c3FngPwfbqG+YufABBmFtWdHzIeSL5fd/gU=
-Date: Fri, 11 Jul 2025 09:30:31 +0200
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Madhavan Srinivasan <maddy@linux.ibm.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=e1wsc0LfupCfdQSVdROMEAKZmiUlW/02R4NUfINc3rjSSwSQq6FzQ6JyY7H5TSuHnkfiTHn0gE7w85dtuYIIWODsJeKwHk0BIjjaoz44WKu2zVzRjE5zx5EijDGJfkyJQIJJKe5AmNUrqV4Suw3SXxPpPGP0gSK9akL9Mapc7rc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=XNWRWlQ4; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=4+cMq7WmCP7QhJEBuMAp8KaJDQvkZ/CG9iiej1+tkVo=; b=XNWRWlQ4dgmJ6wpuZvxs5QUPjb
+	HN6OlB+k1idOw1y0xPiAzlZRJd4/RLvfKq2eqTe4IvanbkVeSmJGXNEYogwnKoR9NO2bhSYOfVnW7
+	k+2uJVD6cvasP5jDsN0n6V+h1CAFG0LPxwv2czLF5KH/8qJuFm6i4FjMaP76W4N2rZNHS4M/oGesI
+	Nz4DWWmpjgycR4V0Z/IzXAGxcplRWE7jEryFRWZbRFUSqVa22aBYPS80dCT2CLwFHEa2aRfcjK1G5
+	Ht19QJbmhOGoH+mLrfTTQUDyB7+kzBykLRZDayXLMqlov0lsLKthJ9yi67NPQp4OeGHELod7npE9Y
+	zyH/ZxZA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1ua8Fd-0000000DzJT-3ext;
+	Fri, 11 Jul 2025 07:32:57 +0000
+Date: Fri, 11 Jul 2025 00:32:57 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Thomas Huth <thuth@redhat.com>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
 	Michael Ellerman <mpe@ellerman.id.au>,
 	Thomas Gleixner <tglx@linutronix.de>,
 	Nicholas Piggin <npiggin@gmail.com>,
@@ -49,10 +56,11 @@ Cc: Madhavan Srinivasan <maddy@linux.ibm.com>,
 	linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org, linux-spdx@vger.kernel.org
 Subject: Re: [PATCH v2] powerpc: Replace the obsolete address of the FSF
-Message-ID: <2025071152-name-spoon-88e8@gregkh>
+Message-ID: <aHC-Ke2oLri_m7p6@infradead.org>
 References: <20250711053509.194751-1-thuth@redhat.com>
  <2025071125-talon-clammy-4971@gregkh>
  <9f7242e8-1082-4a5d-bb6e-a80106d1b1f9@redhat.com>
+ <2025071152-name-spoon-88e8@gregkh>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -61,60 +69,14 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <9f7242e8-1082-4a5d-bb6e-a80106d1b1f9@redhat.com>
+In-Reply-To: <2025071152-name-spoon-88e8@gregkh>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Fri, Jul 11, 2025 at 09:09:08AM +0200, Thomas Huth wrote:
-> On 11/07/2025 07.52, Greg Kroah-Hartman wrote:
-> > On Fri, Jul 11, 2025 at 07:35:09AM +0200, Thomas Huth wrote:
-> > > From: Thomas Huth <thuth@redhat.com>
-> > > 
-> > > The FSF does not reside in the Franklin street anymore. Let's update
-> > > the address with the link to their website, as suggested in the latest
-> > > revision of the GPL-2.0 license.
-> > > (See https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt for example)
-> > > 
-> > > Acked-by: Segher Boessenkool <segher@kernel.crashing.org>
-> > > Signed-off-by: Thomas Huth <thuth@redhat.com>
-> > > ---
-> > >   v2: Resend with CC: linux-spdx@vger.kernel.org as suggested here:
-> > >       https://lore.kernel.org/linuxppc-dev/e5de8010-5663-47f4-a2f0-87fd88230925@csgroup.eu
-> > >   arch/powerpc/boot/crtsavres.S            | 5 ++---
-> > >   arch/powerpc/include/uapi/asm/eeh.h      | 5 ++---
-> > >   arch/powerpc/include/uapi/asm/kvm.h      | 5 ++---
-> > >   arch/powerpc/include/uapi/asm/kvm_para.h | 5 ++---
-> > >   arch/powerpc/include/uapi/asm/ps3fb.h    | 3 +--
-> > >   arch/powerpc/lib/crtsavres.S             | 5 ++---
-> > >   arch/powerpc/xmon/ppc.h                  | 5 +++--
-> > >   7 files changed, 14 insertions(+), 19 deletions(-)
-> > > 
-> > > diff --git a/arch/powerpc/boot/crtsavres.S b/arch/powerpc/boot/crtsavres.S
-> > > index 085fb2b9a8b89..a710a49a5dbca 100644
-> > > --- a/arch/powerpc/boot/crtsavres.S
-> > > +++ b/arch/powerpc/boot/crtsavres.S
-> > > @@ -26,9 +26,8 @@
-> > >    * General Public License for more details.
-> > >    *
-> > >    * You should have received a copy of the GNU General Public License
-> > > - * along with this program; see the file COPYING.  If not, write to
-> > > - * the Free Software Foundation, 51 Franklin Street, Fifth Floor,
-> > > - * Boston, MA 02110-1301, USA.
-> > > + * along with this program; see the file COPYING.  If not, see
-> > > + * <https://www.gnu.org/licenses/>.
-> > >    *
-> > >    *    As a special exception, if you link this library with files
-> > >    *    compiled with GCC to produce an executable, this does not cause
-> > 
-> > Please just drop all the "boilerplate" license text from these files,
-> > and use the proper SPDX line at the top of them instead.  That is the
-> > overall goal for all kernel files.
-> 
-> Ok, I can do that for the header files ... not quite sure about the *.S
-> files though since they contain some additional text about exceptions.
+On Fri, Jul 11, 2025 at 09:30:31AM +0200, Greg Kroah-Hartman wrote:
+> That's a crazy exception, and one that should probably be talked about
+> with the FSF to determine exactly what the SPDX lines should be.
 
-That's a crazy exception, and one that should probably be talked about
-with the FSF to determine exactly what the SPDX lines should be.
-
-thanks,
-
-greg k-h
+It is called the libgcc exception and has been around forever for the
+files in libgcc.a that a lot of these low-level kernel helpers were
+copied from as the kernel doesn't link libgcc.
 
