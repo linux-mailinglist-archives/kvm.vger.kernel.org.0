@@ -1,300 +1,206 @@
-Return-Path: <kvm+bounces-52206-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52207-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EA3FB0266F
-	for <lists+kvm@lfdr.de>; Fri, 11 Jul 2025 23:35:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F7B9B0267B
+	for <lists+kvm@lfdr.de>; Fri, 11 Jul 2025 23:42:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 63B345A0A9F
-	for <lists+kvm@lfdr.de>; Fri, 11 Jul 2025 21:35:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5ADAA7BA9E7
+	for <lists+kvm@lfdr.de>; Fri, 11 Jul 2025 21:41:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0ABF1EFF8D;
-	Fri, 11 Jul 2025 21:35:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFC39217666;
+	Fri, 11 Jul 2025 21:42:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tu/kR/Fr"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZyhMw0iy"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 209691D90A5
-	for <kvm@vger.kernel.org>; Fri, 11 Jul 2025 21:35:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FFA41991C9;
+	Fri, 11 Jul 2025 21:42:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752269730; cv=none; b=cC5J4P8oep/k4lkqcNR1ukzCuNC9/ObYXqVNkNjOz/T4mcqm0eHob3aOx8cX9N8dXCPTDtNLMcBfDG5vqV+1tt9pGT6auyCRP+HiPj3YlYSy+jxn9l7c/soJm9d5mSYZtqmmNJcFPp0nPXZ4tC0YNn1Wx+AftYRZcYtUEWx20Q8=
+	t=1752270145; cv=none; b=iGAlbyLQ/nyZuXhFcbmNqAAAk0DsH//IwVvQ9t9/+o5AqM0TOdbdo9iGrXNaJSwc0uivr7yUd2rAfGx7uDt/F8F5f6FeWmp1kMWmtz9TthfKoHn7al3C+/yn4rdO+9M6mSOc9h6omRBbAkiZ9nuJFueFN17agDG09Iy0wFU/UDU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752269730; c=relaxed/simple;
-	bh=OUcUNJcRYDEm75ZahQ2/IVIkiNvpeKnv3wB3UibZRHI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JVw8SD2GM7zYcjWR8A+t4fXZye5C39+5uT8rOegSyZH5iw7dRsioTvHRHp+M3xi3H45LACtUYW9PdKlChYcU13v5DbXQcTcYirkxQ5j7JzpVKHpd/4a+r9+015t23Y53DXbWXANltB4KuwS0wLzh5eHwOWgsbi+NiMIEUwWRCs8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Tu/kR/Fr; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752269728;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GgkWm7qRDs+Q41tEmKDUfbmdZCqmGjrzM3iUWhFiHo4=;
-	b=Tu/kR/FrLWKB7x+NplPxx3Y1Z7SpgUaa0gN1tp9tcTOMgm5r1JhUGbItbx8sv1tJpDI/Pf
-	pZXioQSfS9ELrYYYlWjP7eLw1nG+hM27YyQ6KpclZY9Sh/433h5vW3xUhjgX2H8TRtmSzT
-	6qm/3p9W0x9kur9ARZ6bS8w89mI3/Ps=
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
- [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-145-zNRxczmkOTGPKh44kgi3fQ-1; Fri, 11 Jul 2025 17:35:27 -0400
-X-MC-Unique: zNRxczmkOTGPKh44kgi3fQ-1
-X-Mimecast-MFC-AGG-ID: zNRxczmkOTGPKh44kgi3fQ_1752269726
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-86cfa305eb6so11310539f.0
-        for <kvm@vger.kernel.org>; Fri, 11 Jul 2025 14:35:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752269726; x=1752874526;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=GgkWm7qRDs+Q41tEmKDUfbmdZCqmGjrzM3iUWhFiHo4=;
-        b=gYPu4oCecngpkVd+rQYXGavynHnFmZVRGpa4CTxZ0xqbE656eDJqcgGkpfkYIMYzD9
-         kuKsZ0fmVFNgV1uqFw2Buo5vemBHUL9JmGQGRMkBxXlLGXN4vvZj3Jn2lyrFxP3Gor21
-         00Pn6FS1idvogUgdt+Uo+gynCZrjfIpXCnVGp1wlClRimOg9TettSTcFUhiPMt4S8QFL
-         lBQIHyXXktJMpnQii4xIP7nSRBNcT+BCsPyagHerwKSUf0P7tQXbuqsb02X9mj6DBUvU
-         Ic0S2ZlJOuJI0pvi+6tK3C8nioh5Fl8U0DSdzH4P0Fmle4w9QcyJD8U9EZIOa5sE5BgQ
-         rbBw==
-X-Forwarded-Encrypted: i=1; AJvYcCXyowi+seoPMeb5qCoXUV0YwL5fPXf/X0urSHE7eHOBVHflWi5BovXKvW2xJ4YWGkF3yak=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzsREycidBITcXMsHOE02GtX8wms6Ahk30lfp/XySWnYFdGj5n/
-	1cy1ggxDNexmebEjaAlO8UhtXmIySf9LzzeHd9enqelug99oGZ45lBTuu+p7E+wOeRgnYNR6Rtn
-	iS+FMcHqkpCw5xXSGsfQHKF3H3d9lm+sWhBCPQxwmSNdULc+kL5zyjQ==
-X-Gm-Gg: ASbGncsJq2EjSXeSiAvhlykcXyizVTuNXg0TEIis3IfsLvX/QxuYy7fHqrnRi22A1XD
-	TEe/QZZ7m4cF3XKcmhmdd54WfrS2m6aZSSZEA4yVLDX2hdtNtJgzHjCcJDlmc53rPBtPyVAaFdA
-	EsjOB+VaXTYUy7Fi7Zb2srB7+DA5JBTZg1mCZE7GPh32Kv3VYSojgknmrQzoz/hsizTBT5uEH/w
-	RNoz1QGJxMCQ7c1GK+raEj3H6RgkFQUNdk2SrOjPk+YwnwHgGQ6WyclTEYpiEOUNVvCWYpYDOOX
-	OxaBCqY7ELGls9ASGWxKUuBk1BB8sp31v6XFjZ5ogVU=
-X-Received: by 2002:a05:6602:1688:b0:85e:12c1:fe90 with SMTP id ca18e2360f4ac-879792f8fbemr145243439f.5.1752269726188;
-        Fri, 11 Jul 2025 14:35:26 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGgzikGdHj30Bq9CuVwdpEt36LfpGDi5nuIaLVIiPS6ipxZYS3T0Muy4zgTBSWsG9GGcy2HpQ==
-X-Received: by 2002:a05:6602:1688:b0:85e:12c1:fe90 with SMTP id ca18e2360f4ac-879792f8fbemr145242639f.5.1752269725706;
-        Fri, 11 Jul 2025 14:35:25 -0700 (PDT)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-50556b1d379sm989950173.129.2025.07.11.14.35.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Jul 2025 14:35:25 -0700 (PDT)
-Date: Fri, 11 Jul 2025 15:35:23 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: lizhe.67@bytedance.com
-Cc: akpm@linux-foundation.org, david@redhat.com, jgg@ziepe.ca,
- peterx@redhat.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org
-Subject: Re: [PATCH v4 2/5] vfio/type1: optimize vfio_pin_pages_remote()
-Message-ID: <20250711153523.42d68ec0.alex.williamson@redhat.com>
-In-Reply-To: <20250710085355.54208-3-lizhe.67@bytedance.com>
-References: <20250710085355.54208-1-lizhe.67@bytedance.com>
-	<20250710085355.54208-3-lizhe.67@bytedance.com>
-Organization: Red Hat
+	s=arc-20240116; t=1752270145; c=relaxed/simple;
+	bh=FRJZTMDli33z+2VYtIwPjKtkzXPLWnmyhYXuUGVZ4Hc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kRl11OzuIE07/kWkvnBB8xKRGuxWqiZ7M0wVC1OAqmk/qm+BvQl5nfcZVezinBWDvZrvGuwvu2PGG0rO9eI5o0OOYTQiqvTYvN719ikwWYwgxAhjKWBdLCIiUjl4YLS5yFelPawWPXryQBZ0UNYSKuOiCDVDf0Ai4MGTz4tn1Ek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZyhMw0iy; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1752270142; x=1783806142;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=FRJZTMDli33z+2VYtIwPjKtkzXPLWnmyhYXuUGVZ4Hc=;
+  b=ZyhMw0iyqoO6BKg1ZY98ZdWk3d0RLfZjuUlLMkLsS0pVZRz2wNJP6EXc
+   8GvT41UVlFz47z2rPQnmqNmCsCkA8qjqU6B8BqyBOKO0r22tGPYpsMLI9
+   9kr56yYE8+vjePOp+7K3c/59AyPp+rE63aZEK+SJkpuhffDLoOhS3os42
+   MJ/HqPalSuEPw36glQI6CfFteEi143St8E17K6qApiYU39LaVP8MQPM/F
+   GM1DT0rYNOiHj26c43UgD6U2jyD6B09dcO0IkTsRDRHR0QR5C4u+bDdKG
+   +gicy0qxSeVz497KmocSNZaaetiPjepaFFA64U5LOTeT6T704XV/ma7mY
+   A==;
+X-CSE-ConnectionGUID: /243kq0ERAe4dc0aZ5/AgA==
+X-CSE-MsgGUID: En9f3oxGSIOA0M/zyoC1zw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11491"; a="58381142"
+X-IronPort-AV: E=Sophos;i="6.16,304,1744095600"; 
+   d="scan'208";a="58381142"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2025 14:42:21 -0700
+X-CSE-ConnectionGUID: DLeCp0zyQniDp8k0huMS+w==
+X-CSE-MsgGUID: D+NrjiQ5QSK5LShoTx+gxA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,304,1744095600"; 
+   d="scan'208";a="160759947"
+Received: from lkp-server01.sh.intel.com (HELO 9ee84586c615) ([10.239.97.150])
+  by fmviesa005.fm.intel.com with ESMTP; 11 Jul 2025 14:42:19 -0700
+Received: from kbuild by 9ee84586c615 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uaLVZ-0006oN-0u;
+	Fri, 11 Jul 2025 21:42:17 +0000
+Date: Sat, 12 Jul 2025 05:42:06 +0800
+From: kernel test robot <lkp@intel.com>
+To: Nikunj A Dadhania <nikunj@amd.com>, seanjc@google.com,
+	pbonzini@redhat.com, kvm@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	thomas.lendacky@amd.com, santosh.shukla@amd.com, bp@alien8.de,
+	nikunj@amd.com, Michael Roth <michael.roth@amd.com>,
+	stable@vger.kernel.org
+Subject: Re: [PATCH] KVM: SEV: Enforce minimum GHCB version requirement for
+ SEV-SNP guests
+Message-ID: <202507120551.iDEiTBBN-lkp@intel.com>
+References: <20250711045408.95129-1-nikunj@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250711045408.95129-1-nikunj@amd.com>
 
-On Thu, 10 Jul 2025 16:53:52 +0800
-lizhe.67@bytedance.com wrote:
+Hi Nikunj,
 
-> From: Li Zhe <lizhe.67@bytedance.com>
-> 
-> When vfio_pin_pages_remote() is called with a range of addresses that
-> includes large folios, the function currently performs individual
-> statistics counting operations for each page. This can lead to significant
-> performance overheads, especially when dealing with large ranges of pages.
-> Batch processing of statistical counting operations can effectively enhance
-> performance.
-> 
-> In addition, the pages obtained through longterm GUP are neither invalid
-> nor reserved. Therefore, we can reduce the overhead associated with some
-> calls to function is_invalid_reserved_pfn().
-> 
-> The performance test results for completing the 16G VFIO IOMMU DMA mapping
-> are as follows.
-> 
-> Base(v6.16-rc4):
-> ------- AVERAGE (MADV_HUGEPAGE) --------
-> VFIO MAP DMA in 0.047 s (340.2 GB/s)
-> ------- AVERAGE (MAP_POPULATE) --------
-> VFIO MAP DMA in 0.280 s (57.2 GB/s)
-> ------- AVERAGE (HUGETLBFS) --------
-> VFIO MAP DMA in 0.052 s (310.5 GB/s)
-> 
-> With this patch:
-> ------- AVERAGE (MADV_HUGEPAGE) --------
-> VFIO MAP DMA in 0.027 s (602.1 GB/s)
-> ------- AVERAGE (MAP_POPULATE) --------
-> VFIO MAP DMA in 0.257 s (62.4 GB/s)
-> ------- AVERAGE (HUGETLBFS) --------
-> VFIO MAP DMA in 0.031 s (517.4 GB/s)
-> 
-> For large folio, we achieve an over 40% performance improvement.
-> For small folios, the performance test results indicate a
-> slight improvement.
-> 
-> Signed-off-by: Li Zhe <lizhe.67@bytedance.com>
-> Co-developed-by: Alex Williamson <alex.williamson@redhat.com>
-> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-> Acked-by: David Hildenbrand <david@redhat.com>
-> ---
->  drivers/vfio/vfio_iommu_type1.c | 83 ++++++++++++++++++++++++++++-----
->  1 file changed, 71 insertions(+), 12 deletions(-)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 1136d7ac6b59..6909275e46c2 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -318,7 +318,13 @@ static void vfio_dma_bitmap_free_all(struct vfio_iommu *iommu)
->  /*
->   * Helper Functions for host iova-pfn list
->   */
-> -static struct vfio_pfn *vfio_find_vpfn(struct vfio_dma *dma, dma_addr_t iova)
-> +
-> +/*
-> + * Find the highest vfio_pfn that overlapping the range
-> + * [iova_start, iova_end) in rb tree.
-> + */
-> +static struct vfio_pfn *vfio_find_vpfn_range(struct vfio_dma *dma,
-> +		dma_addr_t iova_start, dma_addr_t iova_end)
->  {
->  	struct vfio_pfn *vpfn;
->  	struct rb_node *node = dma->pfn_list.rb_node;
-> @@ -326,9 +332,9 @@ static struct vfio_pfn *vfio_find_vpfn(struct vfio_dma *dma, dma_addr_t iova)
->  	while (node) {
->  		vpfn = rb_entry(node, struct vfio_pfn, node);
->  
-> -		if (iova < vpfn->iova)
-> +		if (iova_end <= vpfn->iova)
->  			node = node->rb_left;
-> -		else if (iova > vpfn->iova)
-> +		else if (iova_start > vpfn->iova)
->  			node = node->rb_right;
->  		else
->  			return vpfn;
-> @@ -336,6 +342,11 @@ static struct vfio_pfn *vfio_find_vpfn(struct vfio_dma *dma, dma_addr_t iova)
->  	return NULL;
->  }
->  
-> +static inline struct vfio_pfn *vfio_find_vpfn(struct vfio_dma *dma, dma_addr_t iova)
-> +{
-> +	return vfio_find_vpfn_range(dma, iova, iova + PAGE_SIZE);
-> +}
-> +
->  static void vfio_link_pfn(struct vfio_dma *dma,
->  			  struct vfio_pfn *new)
->  {
-> @@ -614,6 +625,39 @@ static long vaddr_get_pfns(struct mm_struct *mm, unsigned long vaddr,
->  	return ret;
->  }
->  
-> +
-> +static long vpfn_pages(struct vfio_dma *dma,
-> +		dma_addr_t iova_start, long nr_pages)
-> +{
-> +	dma_addr_t iova_end = iova_start + (nr_pages << PAGE_SHIFT);
-> +	struct vfio_pfn *top = vfio_find_vpfn_range(dma, iova_start, iova_end);
-> +	long ret = 1;
-> +	struct vfio_pfn *vpfn;
-> +	struct rb_node *prev;
-> +	struct rb_node *next;
-> +
-> +	if (likely(!top))
-> +		return 0;
-> +
-> +	prev = next = &top->node;
-> +
-> +	while ((prev = rb_prev(prev))) {
-> +		vpfn = rb_entry(prev, struct vfio_pfn, node);
-> +		if (vpfn->iova < iova_start)
-> +			break;
-> +		ret++;
-> +	}
-> +
-> +	while ((next = rb_next(next))) {
-> +		vpfn = rb_entry(next, struct vfio_pfn, node);
-> +		if (vpfn->iova >= iova_end)
-> +			break;
-> +		ret++;
-> +	}
-> +
-> +	return ret;
-> +}
-> +
->  /*
->   * Attempt to pin pages.  We really don't want to track all the pfns and
->   * the iommu can only map chunks of consecutive pfns anyway, so get the
-> @@ -680,32 +724,47 @@ static long vfio_pin_pages_remote(struct vfio_dma *dma, unsigned long vaddr,
->  		 * and rsvd here, and therefore continues to use the batch.
->  		 */
->  		while (true) {
-> +			long nr_pages, acct_pages = 0;
-> +
->  			if (pfn != *pfn_base + pinned ||
->  			    rsvd != is_invalid_reserved_pfn(pfn))
->  				goto out;
->  
-> +			/*
-> +			 * Using GUP with the FOLL_LONGTERM in
-> +			 * vaddr_get_pfns() will not return invalid
-> +			 * or reserved pages.
-> +			 */
-> +			nr_pages = num_pages_contiguous(
-> +					&batch->pages[batch->offset],
-> +					batch->size);
-> +			if (!rsvd) {
-> +				acct_pages = nr_pages;
-> +				acct_pages -= vpfn_pages(dma, iova, nr_pages);
-> +			}
-> +
->  			/*
->  			 * Reserved pages aren't counted against the user,
->  			 * externally pinned pages are already counted against
->  			 * the user.
->  			 */
-> -			if (!rsvd && !vfio_find_vpfn(dma, iova)) {
-> +			if (acct_pages) {
->  				if (!dma->lock_cap &&
-> -				    mm->locked_vm + lock_acct + 1 > limit) {
-> +				     mm->locked_vm + lock_acct + acct_pages > limit) {
+kernel test robot noticed the following build errors:
 
-Don't resend, I'll fix on commit, but there's still a gratuitous
-difference in leading white space from the original.  Otherwise the
-series looks good to me but I'll give Jason a little more time to
-provide reviews since he's been so active in the thread (though he'd
-rather we just use iommufd ;).  Thanks,
+[auto build test ERROR on kvm/queue]
+[also build test ERROR on kvm/next linus/master v6.16-rc5 next-20250711]
+[cannot apply to kvm/linux-next]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Alex
+url:    https://github.com/intel-lab-lkp/linux/commits/Nikunj-A-Dadhania/KVM-SEV-Enforce-minimum-GHCB-version-requirement-for-SEV-SNP-guests/20250711-125527
+base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
+patch link:    https://lore.kernel.org/r/20250711045408.95129-1-nikunj%40amd.com
+patch subject: [PATCH] KVM: SEV: Enforce minimum GHCB version requirement for SEV-SNP guests
+config: x86_64-rhel-9.4-rust (https://download.01.org/0day-ci/archive/20250712/202507120551.iDEiTBBN-lkp@intel.com/config)
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+rustc: rustc 1.88.0 (6b00bc388 2025-06-23)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250712/202507120551.iDEiTBBN-lkp@intel.com/reproduce)
 
->  					pr_warn("%s: RLIMIT_MEMLOCK (%ld) exceeded\n",
->  						__func__, limit << PAGE_SHIFT);
->  					ret = -ENOMEM;
->  					goto unpin_out;
->  				}
-> -				lock_acct++;
-> +				lock_acct += acct_pages;
->  			}
->  
-> -			pinned++;
-> -			npage--;
-> -			vaddr += PAGE_SIZE;
-> -			iova += PAGE_SIZE;
-> -			batch->offset++;
-> -			batch->size--;
-> +			pinned += nr_pages;
-> +			npage -= nr_pages;
-> +			vaddr += PAGE_SIZE * nr_pages;
-> +			iova += PAGE_SIZE * nr_pages;
-> +			batch->offset += nr_pages;
-> +			batch->size -= nr_pages;
->  
->  			if (!batch->size)
->  				break;
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202507120551.iDEiTBBN-lkp@intel.com/
 
+All errors (new ones prefixed by >>):
+
+>> arch/x86/kvm/svm/sev.c:426:6: error: use of undeclared identifier 'snp_active'
+     426 |         if (snp_active && data->ghcb_version && data->ghcb_version < 2)
+         |             ^
+   1 error generated.
+
+
+vim +/snp_active +426 arch/x86/kvm/svm/sev.c
+
+   400	
+   401	static int __sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp,
+   402				    struct kvm_sev_init *data,
+   403				    unsigned long vm_type)
+   404	{
+   405		struct kvm_sev_info *sev = to_kvm_sev_info(kvm);
+   406		struct sev_platform_init_args init_args = {0};
+   407		bool es_active = vm_type != KVM_X86_SEV_VM;
+   408		u64 valid_vmsa_features = es_active ? sev_supported_vmsa_features : 0;
+   409		int ret;
+   410	
+   411		if (kvm->created_vcpus)
+   412			return -EINVAL;
+   413	
+   414		if (data->flags)
+   415			return -EINVAL;
+   416	
+   417		if (data->vmsa_features & ~valid_vmsa_features)
+   418			return -EINVAL;
+   419	
+   420		if (data->ghcb_version > GHCB_VERSION_MAX || (!es_active && data->ghcb_version))
+   421			return -EINVAL;
+   422	
+   423		if (unlikely(sev->active))
+   424			return -EINVAL;
+   425	
+ > 426		if (snp_active && data->ghcb_version && data->ghcb_version < 2)
+   427			return -EINVAL;
+   428	
+   429		sev->active = true;
+   430		sev->es_active = es_active;
+   431		sev->vmsa_features = data->vmsa_features;
+   432		sev->ghcb_version = data->ghcb_version;
+   433	
+   434		/*
+   435		 * Currently KVM supports the full range of mandatory features defined
+   436		 * by version 2 of the GHCB protocol, so default to that for SEV-ES
+   437		 * guests created via KVM_SEV_INIT2.
+   438		 */
+   439		if (sev->es_active && !sev->ghcb_version)
+   440			sev->ghcb_version = GHCB_VERSION_DEFAULT;
+   441	
+   442		if (vm_type == KVM_X86_SNP_VM)
+   443			sev->vmsa_features |= SVM_SEV_FEAT_SNP_ACTIVE;
+   444	
+   445		ret = sev_asid_new(sev);
+   446		if (ret)
+   447			goto e_no_asid;
+   448	
+   449		init_args.probe = false;
+   450		ret = sev_platform_init(&init_args);
+   451		if (ret)
+   452			goto e_free;
+   453	
+   454		/* This needs to happen after SEV/SNP firmware initialization. */
+   455		if (vm_type == KVM_X86_SNP_VM) {
+   456			ret = snp_guest_req_init(kvm);
+   457			if (ret)
+   458				goto e_free;
+   459		}
+   460	
+   461		INIT_LIST_HEAD(&sev->regions_list);
+   462		INIT_LIST_HEAD(&sev->mirror_vms);
+   463		sev->need_init = false;
+   464	
+   465		kvm_set_apicv_inhibit(kvm, APICV_INHIBIT_REASON_SEV);
+   466	
+   467		return 0;
+   468	
+   469	e_free:
+   470		argp->error = init_args.error;
+   471		sev_asid_free(sev);
+   472		sev->asid = 0;
+   473	e_no_asid:
+   474		sev->vmsa_features = 0;
+   475		sev->es_active = false;
+   476		sev->active = false;
+   477		return ret;
+   478	}
+   479	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
