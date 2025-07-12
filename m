@@ -1,242 +1,187 @@
-Return-Path: <kvm+bounces-52231-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52232-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 972C0B02C24
-	for <lists+kvm@lfdr.de>; Sat, 12 Jul 2025 19:33:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11590B02C30
+	for <lists+kvm@lfdr.de>; Sat, 12 Jul 2025 19:38:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B9E74A651D
-	for <lists+kvm@lfdr.de>; Sat, 12 Jul 2025 17:33:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 92ACC4E385B
+	for <lists+kvm@lfdr.de>; Sat, 12 Jul 2025 17:38:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A5A66F073;
-	Sat, 12 Jul 2025 17:33:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 455EF28A419;
+	Sat, 12 Jul 2025 17:38:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Uv9yqfdP"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fgWoQDHH"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB7C61A08DB
-	for <kvm@vger.kernel.org>; Sat, 12 Jul 2025 17:33:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A2B6287245
+	for <kvm@vger.kernel.org>; Sat, 12 Jul 2025 17:38:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752341610; cv=none; b=qZhV37tCUuA0oWO/dvbkvxYkNz19+fhU98lnYXRUH1XjX2+KrhTKMKlTgcNkQ5UGT0WKM/y/buCVmr8w5KhxBHEY3qlgdcI0zpxX3cvvMcg48y/UifvP5RuRMHBLAec5Bq6WKh63vereDM4qh3N1njb+2Tm245dQNuXTdLBl7M4=
+	t=1752341898; cv=none; b=PsoHRArKlBYVpojK+Y/Zgll0aa/MW4OTtElwMo5AAYXipcXOmO9vsR5ya7imDVeaIF3jtrUkenLtSz0MkpNqqz+S6opANosv/GD3R9vOD/6zOZ7Pk9aidYLoFMYFMgf7Y7+VDMi7xxNZ9UsP1QgCYmxDERRjYD950DKnFJ1uzDg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752341610; c=relaxed/simple;
-	bh=D/+sxTwjJgwlHE5NC/YiqbecaXDt11k/7Z+0KkMnR8k=;
+	s=arc-20240116; t=1752341898; c=relaxed/simple;
+	bh=CIsoW6negRSHBNMbMwVYgOZOquPv5s9MF7IMD32fmDM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nOE0J10jNiW+eyPA3DPN1EK3R7YK/mfgO07r2V67pGqsCCLfaZrg1zwQKLepaHsB2E8ee2tWY+a3cgtlnNRT5Zilxw8TGWzhVfftF/Huh5C19oFUjm8tO0kCfCttZHuK79nnN4fQn62vMxkxzY8/Q2ZLxuUUtGgJcFTyitPhFS4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Uv9yqfdP; arc=none smtp.client-ip=209.85.214.181
+	 To:Cc:Content-Type; b=UP+GUlMr6UYtRIyGpYLzK3KTaOm55es6UdvKW9oT7m4EJdfRAMOqnRHK7LZL/iUud+gwCY5YZb8hLzib2YpLcr+R0ho8y/SeArhtpP4ApYnsFpoCYnDlIx/cWM6t5w+QPQQj1wJBGOHfb+RrOhCq6j8+wsUQ0NexfZEr+BBewWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fgWoQDHH; arc=none smtp.client-ip=209.85.214.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-237f18108d2so132625ad.0
-        for <kvm@vger.kernel.org>; Sat, 12 Jul 2025 10:33:28 -0700 (PDT)
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2357c61cda7so120085ad.1
+        for <kvm@vger.kernel.org>; Sat, 12 Jul 2025 10:38:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752341608; x=1752946408; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1752341895; x=1752946695; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=V7msmF5PY7ib+4ZMdkz9ddSo3sJ/jTEzwKLjkgSY+Dg=;
-        b=Uv9yqfdP8ITh2CQoi3FYXJy0y1scZFYv1cMyteLZbXdJWbLoRxu0aXHwStBtPryV7E
-         8u+tEadVtTA1k+EHsL8l41gGfjgPKuwjVljQtZpZGHyCp4bWSGysj1mjHc7sBOUR6mkZ
-         w0iZJjphlAA5M+A/Uh2u5nlZeHGkKMxhRBJ1HKDT79RAWQKHWcq55w/xHQP1O+525TiO
-         2Lm/yCyQPP7MiycfHxw+n6S5D7mXreP6qmBUlXtvFRqoIWZBUXZScXVFS0bg6B1s2r1M
-         tyhQQ57SIOqnbRWEs/517e9YCCiaoSoWUaSvQsI41pc6hv6xfHUeipmnXaD6D5G0QRTZ
-         yr6Q==
+        bh=1fuujDqaQx6OHLyap4BpfcTFKLHlqSEv1YVCxl1pX/c=;
+        b=fgWoQDHHUI6VCQ4VhKL256ng1IC2AdiQZQ0LQ86LFteAG4oS3J0Jdy3ECoZ7OoRjR8
+         dYVEDlZA5E7fQuLo21nso93jiW11g/r170Nzmrg7iy6eAczSKO/iz//N1zbWQQ7LmxHa
+         FIrFYufoK9nPoSpfNkf+RL4HaMnyn1tE4sgQ3j07eWs2Qc0OqUwTs3dXkfKe4D+RsWKl
+         5t4jZW97QI83/qpegVpclT+Txb6QMN4dF16gVNQ5IIXjY/E4vQZyAc3kn1/pLpA27P6s
+         WAcTalCJbC/CCBR7aF6k9qnFV32P7mRWDKywjd6AAaJAbdxg9Fl0IGRZU85oDaG9YmSX
+         /usQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752341608; x=1752946408;
+        d=1e100.net; s=20230601; t=1752341895; x=1752946695;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=V7msmF5PY7ib+4ZMdkz9ddSo3sJ/jTEzwKLjkgSY+Dg=;
-        b=X00sUvS9AIrxYjZraQynK1D1yrI6VsxNvg6AkdD0+dFZP4c68FU7/Z2FhDpKjkxRkh
-         yf0FOabqjT2ooICGngGZg5ffin10Re8QVg0PskkTk9uQtEhdbbr4yK7RiylKTZ/ZSYQV
-         jeOMd4I9J6/zD1MtGHLe7nYeWdOBSHuXrGLJBocnCUQnddrEkVvl35TGlO7W9a6n15kn
-         zcBn80iNhkCnnmargQHtEQhbljPRkb4z0GbP1rMPcaVDYChnij+AXWUzFochn9Zep8hM
-         2KBeq7H2riSGeT5bFwuGj0BBFdTp/n1umF2R1YH+tL/TWvN4Rkcz1sguYy8a88jtiV1R
-         uOTw==
-X-Forwarded-Encrypted: i=1; AJvYcCVySuSXtkDTtIl74JghSSXvBivHuUJLFYvtn3/VZVC7/VhpukwMtxjoJS7HmvcQqDYU9jI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7FyYrATNBbm6CrWxFjOMqZguMCN6Vbpl6oLlI6zntJ2KUsWLr
-	mJuVN15bo8GZ0MCxu+3VIge3z5FIfo/q6yag4Ncgy/1TFZsEYHFtuKCvW0G2Mq3YFJYYXw1qFA8
-	EzT6aGMyEdp3NYWzxKmLzPSlfckkynHjzC5ZQjQbR
-X-Gm-Gg: ASbGnct1PcOa/0JnaqxAgVsFzU7jygMc0Tq0GnFtM3AqK3RA7N4ZwBPiwpq9c/rvMX1
-	d7k+4ej0lRlK3vFfAVErB/oDfYx3Nm60oT2uNJR1dyChpaYdSQ01+bRfkJ+iOtTFcP2VEeosaZE
-	0SE9DQjophBK/YCuJY+Sm3Vele0p0EDPyNQSSUo7762vtq3CVwJPBN2EqodhhiwLa9SSlmcCfHW
-	dGqdJiktGP5J4vx77VAodEahlrWe3mDuhgqZXMa
-X-Google-Smtp-Source: AGHT+IGOwmmOvHU5TdyUaaF7aTYL0i8GNBXrrhGyi3z4BA4euoatDzGCE8dL+1tDQ9wYfDVbsYBeS729UYvOHJmxrWU=
-X-Received: by 2002:a17:902:ec85:b0:22e:766f:d66e with SMTP id
- d9443c01a7336-23df6afcdb8mr1791365ad.12.1752341607051; Sat, 12 Jul 2025
- 10:33:27 -0700 (PDT)
+        bh=1fuujDqaQx6OHLyap4BpfcTFKLHlqSEv1YVCxl1pX/c=;
+        b=s8Yn/OV+gAd1CLs2kK6ibqcwU92Rg/S7GFucRAo3ybnVoawBDj9YJOLEI1FSJbO5Dn
+         T3mRC0oekTGRM/mFSAeT/h1wUmMOTsS2CoMyd6gi6ovf9K9PDG4YAvTUQbEHwRGwTuNy
+         FpiLmQvVaaxREEapgXD3SKKfFIvW3q0Lcododtv+ui5cteffoEIY7P7a2X/2ekp9lYxp
+         h4C3rDvSSJb+O9//T770qcYH1+ynIIvR2qaXSG8MU4wWz6a0sgHSMO8idBZuBI+w7YXM
+         Yvbiyfp/31qBz4ZA9ujW+OXyt2SZnrHmnSaESorHsFFmqvzi2k7HrsheVzpP16LDIGK8
+         jFew==
+X-Forwarded-Encrypted: i=1; AJvYcCXi86pk4Nf6Tcy3l7PQeYzJdvPgyH5S+y06lfirmz9VCc7NREGBx5Cf66tcS0kVb3GUb44=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyj+/cqB4E+vmwaInn68ezUIyt5zKK5QNq1pKibwST41Y9AfKeg
+	y12Unjgj5YrDekIX4RF0pRWUFAeJ6av4AGCJI9U9X5WtrkPb9jGX4TfpBUjG+g9u8y0ObZCB0uU
+	A8hnYsMq1nudB51/9oiFlJfXo7ovtWMnNvMfGpacn
+X-Gm-Gg: ASbGnctl2dvOgO3l3NfFOfTIiUmvmPIHu3n9ZTjoqezE0u0Cs7p4Frpo2jdQsY/bAHs
+	y+CpUl77kXoPEb8No3dIldul0RjUcU4+JR7ZXGLnVjgkn3OUK8I55v30x4sMaw7yHwvWxASlhpK
+	MPZJpQDbEisE8BwjaNFMe1NPdPLOR4L7mK5cbLLVb0bJK0MAK2lh+j2VyGM0QOVjmcW5htmWDPa
+	CKXWdhajW6RjVVhF0jGLrQqicpcTKPGNrXXUQaVcmBT8H8vYC8=
+X-Google-Smtp-Source: AGHT+IGAqWu1DGMbWjH0/2U+cZ9+ZzEcCYnI9VhTIeknxHrrYXHWqYhdWNsKIuqG2rmHdTiSyYjUDWLtmTq56SxZYE0=
+X-Received: by 2002:a17:903:fad:b0:231:ed22:e230 with SMTP id
+ d9443c01a7336-23df7b2c48bmr1248235ad.15.1752341894575; Sat, 12 Jul 2025
+ 10:38:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <aG0pNijVpl0czqXu@google.com> <a0129a912e21c5f3219b382f2f51571ab2709460.camel@intel.com>
- <CAGtprH8ozWpFLa2TSRLci-SgXRfJxcW7BsJSYOxa4Lgud+76qQ@mail.gmail.com>
- <eeb8f4b8308b5160f913294c4373290a64e736b8.camel@intel.com>
- <CAGtprH8cg1HwuYG0mrkTbpnZfHoKJDd63CAQGEScCDA-9Qbsqw@mail.gmail.com>
- <b1348c229c67e2bad24e273ec9a7fc29771e18c5.camel@intel.com>
- <aG1dbD2Xnpi_Cqf_@google.com> <5decd42b3239d665d5e6c5c23e58c16c86488ca8.camel@intel.com>
- <aG1ps4uC4jyr8ED1@google.com> <CAGtprH86N7XgEXq0UyOexjVRXYV1KdOguURVOYXTnQzsTHPrJQ@mail.gmail.com>
- <aG6D9NqG0r6iKPL0@google.com> <CAGtprH_DY=Sjeh32NCc7Y3t2Vug8LKz+-=df4oSw09cRbb6QZw@mail.gmail.com>
- <CAGtprH9NbCPSwZrQAUzFw=4rZPA60QBM2G8opYo9CZxRiYihzg@mail.gmail.com>
-In-Reply-To: <CAGtprH9NbCPSwZrQAUzFw=4rZPA60QBM2G8opYo9CZxRiYihzg@mail.gmail.com>
+References: <20250703062641.3247-1-yan.y.zhao@intel.com> <20250709232103.zwmufocd3l7sqk7y@amd.com>
+ <aG_pLUlHdYIZ2luh@google.com> <aHCUyKJ4I4BQnfFP@yzhao56-desk>
+ <20250711151719.goee7eqti4xyhsqr@amd.com> <aHEwT4X0RcfZzHlt@google.com> <CAGtprH9NOdN9VZWkWLjYcTixrN1+dgWfC3rcdmv9rQBkriZrdQ@mail.gmail.com>
+In-Reply-To: <CAGtprH9NOdN9VZWkWLjYcTixrN1+dgWfC3rcdmv9rQBkriZrdQ@mail.gmail.com>
 From: Vishal Annapurve <vannapurve@google.com>
-Date: Sat, 12 Jul 2025 10:33:12 -0700
-X-Gm-Features: Ac12FXyZj5IyRrPeX-4vUKfdJIwXEzSvUSNEtsk0ttD7VXz_GmBFr4rl6viPRO0
-Message-ID: <CAGtprH_cy1pLWQ572zUfxf_Y0XbW5-kX6j4XE2qjvF9YnxHjfw@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 00/51] 1G page support for guest_memfd
+Date: Sat, 12 Jul 2025 10:38:01 -0700
+X-Gm-Features: Ac12FXzcEfAGKe3hL7rXr_HBU-6nL6kTZLckW9PQ7tEbTEw-NPkHUDBcGjGyWkc
+Message-ID: <CAGtprH8+x5Z=tPz=NcrQM6Dor2AYBu3jiZdo+Lg4NqAk0pUJ3w@mail.gmail.com>
+Subject: Re: [RFC PATCH] KVM: TDX: Decouple TDX init mem region from kvm_gmem_populate()
 To: Sean Christopherson <seanjc@google.com>
-Cc: Rick P Edgecombe <rick.p.edgecombe@intel.com>, "pvorel@suse.cz" <pvorel@suse.cz>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, 
-	Jun Miao <jun.miao@intel.com>, "palmer@dabbelt.com" <palmer@dabbelt.com>, 
-	"pdurrant@amazon.co.uk" <pdurrant@amazon.co.uk>, "vbabka@suse.cz" <vbabka@suse.cz>, 
-	"peterx@redhat.com" <peterx@redhat.com>, "x86@kernel.org" <x86@kernel.org>, 
-	"amoorthy@google.com" <amoorthy@google.com>, "tabba@google.com" <tabba@google.com>, 
-	"quic_svaddagi@quicinc.com" <quic_svaddagi@quicinc.com>, "maz@kernel.org" <maz@kernel.org>, 
-	"vkuznets@redhat.com" <vkuznets@redhat.com>, 
-	"anthony.yznaga@oracle.com" <anthony.yznaga@oracle.com>, 
-	"mail@maciej.szmigiero.name" <mail@maciej.szmigiero.name>, 
-	"quic_eberman@quicinc.com" <quic_eberman@quicinc.com>, Wei W Wang <wei.w.wang@intel.com>, 
-	Fan Du <fan.du@intel.com>, 
-	"Wieczor-Retman, Maciej" <maciej.wieczor-retman@intel.com>, Yan Y Zhao <yan.y.zhao@intel.com>, 
-	"ajones@ventanamicro.com" <ajones@ventanamicro.com>, Dave Hansen <dave.hansen@intel.com>, 
-	"paul.walmsley@sifive.com" <paul.walmsley@sifive.com>, 
-	"quic_mnalajal@quicinc.com" <quic_mnalajal@quicinc.com>, "aik@amd.com" <aik@amd.com>, 
-	"usama.arif@bytedance.com" <usama.arif@bytedance.com>, "fvdl@google.com" <fvdl@google.com>, 
-	"jack@suse.cz" <jack@suse.cz>, "quic_cvanscha@quicinc.com" <quic_cvanscha@quicinc.com>, 
-	Kirill Shutemov <kirill.shutemov@intel.com>, "willy@infradead.org" <willy@infradead.org>, 
-	"steven.price@arm.com" <steven.price@arm.com>, "anup@brainfault.org" <anup@brainfault.org>, 
-	"thomas.lendacky@amd.com" <thomas.lendacky@amd.com>, "keirf@google.com" <keirf@google.com>, 
-	"mic@digikod.net" <mic@digikod.net>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "nsaenz@amazon.es" <nsaenz@amazon.es>, 
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, 
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, 
-	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, "muchun.song@linux.dev" <muchun.song@linux.dev>, 
-	Zhiquan1 Li <zhiquan1.li@intel.com>, "rientjes@google.com" <rientjes@google.com>, 
-	Erdem Aktas <erdemaktas@google.com>, "mpe@ellerman.id.au" <mpe@ellerman.id.au>, 
-	"david@redhat.com" <david@redhat.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>, "hughd@google.com" <hughd@google.com>, 
-	"jhubbard@nvidia.com" <jhubbard@nvidia.com>, Haibo1 Xu <haibo1.xu@intel.com>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, "jthoughton@google.com" <jthoughton@google.com>, 
-	"rppt@kernel.org" <rppt@kernel.org>, "steven.sistare@oracle.com" <steven.sistare@oracle.com>, 
-	"jarkko@kernel.org" <jarkko@kernel.org>, "quic_pheragu@quicinc.com" <quic_pheragu@quicinc.com>, 
-	"chenhuacai@kernel.org" <chenhuacai@kernel.org>, Kai Huang <kai.huang@intel.com>, 
-	"shuah@kernel.org" <shuah@kernel.org>, "bfoster@redhat.com" <bfoster@redhat.com>, 
-	"dwmw@amazon.co.uk" <dwmw@amazon.co.uk>, Chao P Peng <chao.p.peng@intel.com>, 
-	"pankaj.gupta@amd.com" <pankaj.gupta@amd.com>, Alexander Graf <graf@amazon.com>, 
-	"nikunj@amd.com" <nikunj@amd.com>, "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>, 
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>, 
-	"jroedel@suse.de" <jroedel@suse.de>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, 
-	"jgowans@amazon.com" <jgowans@amazon.com>, Yilun Xu <yilun.xu@intel.com>, 
-	"liam.merwick@oracle.com" <liam.merwick@oracle.com>, "michael.roth@amd.com" <michael.roth@amd.com>, 
-	"quic_tsoni@quicinc.com" <quic_tsoni@quicinc.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, Ira Weiny <ira.weiny@intel.com>, 
-	"richard.weiyang@gmail.com" <richard.weiyang@gmail.com>, 
-	"kent.overstreet@linux.dev" <kent.overstreet@linux.dev>, "qperret@google.com" <qperret@google.com>, 
-	"dmatlack@google.com" <dmatlack@google.com>, "james.morse@arm.com" <james.morse@arm.com>, 
-	"brauner@kernel.org" <brauner@kernel.org>, 
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, 
-	"ackerleytng@google.com" <ackerleytng@google.com>, "pgonda@google.com" <pgonda@google.com>, 
-	"quic_pderrin@quicinc.com" <quic_pderrin@quicinc.com>, "roypat@amazon.co.uk" <roypat@amazon.co.uk>, 
-	"hch@infradead.org" <hch@infradead.org>, "will@kernel.org" <will@kernel.org>, 
-	"linux-mm@kvack.org" <linux-mm@kvack.org>
+Cc: Michael Roth <michael.roth@amd.com>, Yan Zhao <yan.y.zhao@intel.com>, pbonzini@redhat.com, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, rick.p.edgecombe@intel.com, 
+	kai.huang@intel.com, adrian.hunter@intel.com, reinette.chatre@intel.com, 
+	xiaoyao.li@intel.com, tony.lindgren@intel.com, binbin.wu@linux.intel.com, 
+	dmatlack@google.com, isaku.yamahata@intel.com, ira.weiny@intel.com, 
+	david@redhat.com, ackerleytng@google.com, tabba@google.com, 
+	chao.p.peng@intel.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jul 11, 2025 at 2:18=E2=80=AFPM Vishal Annapurve <vannapurve@google=
-.com> wrote:
->
-> On Wed, Jul 9, 2025 at 6:30=E2=80=AFPM Vishal Annapurve <vannapurve@googl=
+On Fri, Jul 11, 2025 at 11:46=E2=80=AFAM Vishal Annapurve <vannapurve@googl=
 e.com> wrote:
-> > > > 3) KVM should ideally associate the lifetime of backing
-> > > > pagetables/protection tables/RMP tables with the lifetime of the
-> > > > binding of memslots with guest_memfd.
-> > >
-> > > Again, please align your indentation.
-> > >
-> > > >          - Today KVM SNP logic ties RMP table entry lifetimes with =
-how
-> > > >            long the folios are mapped in guest_memfd, which I think=
- should be
-> > > >            revisited.
-> > >
-> > > Why?  Memslots are ephemeral per-"struct kvm" mappings.  RMP entries =
-and guest_memfd
-> > > inodes are tied to the Virtual Machine, not to the "struct kvm" insta=
-nce.
+>
+> On Fri, Jul 11, 2025 at 8:40=E2=80=AFAM Sean Christopherson <seanjc@googl=
+e.com> wrote:
 > >
-> > IIUC guest_memfd can only be accessed through the window of memslots
-> > and if there are no memslots I don't see the reason for memory still
-> > being associated with "virtual machine". Likely because I am yet to
-> > completely wrap my head around 'guest_memfd inodes are tied to the
-> > Virtual Machine, not to the "struct kvm" instance', I need to spend
-> > more time on this one.
+> > On Fri, Jul 11, 2025, Michael Roth wrote:
+> > > On Fri, Jul 11, 2025 at 12:36:24PM +0800, Yan Zhao wrote:
+> > > > Besides, it can't address the 2nd AB-BA lock issue as mentioned in =
+the patch
+> > > > log:
+> > > >
+> > > > Problem
+> > > > =3D=3D=3D
+> > > > ...
+> > > > (2)
+> > > > Moreover, in step 2, get_user_pages_fast() may acquire mm->mmap_loc=
+k,
+> > > > resulting in the following lock sequence in tdx_vcpu_init_mem_regio=
+n():
+> > > > - filemap invalidation lock --> mm->mmap_lock
+> > > >
+> > > > However, in future code, the shared filemap invalidation lock will =
+be held
+> > > > in kvm_gmem_fault_shared() (see [6]), leading to the lock sequence:
+> > > > - mm->mmap_lock --> filemap invalidation lock
+> > >
+> > > I wouldn't expect kvm_gmem_fault_shared() to trigger for the
+> > > KVM_MEMSLOT_SUPPORTS_GMEM_SHARED case (or whatever we end up naming i=
+t).
+> >
+> > Irrespective of shared faults, I think the API could do with a bit of c=
+leanup
+> > now that TDX has landed, i.e. now that we can see a bit more of the pic=
+ture.
+> >
+> > As is, I'm pretty sure TDX is broken with respect to hugepage support, =
+because
+> > kvm_gmem_populate() marks an entire folio as prepared, but TDX only eve=
+r deals
+> > with one page at a time.  So that needs to be changed.  I assume it's a=
+lready
+> > address in one of the many upcoming series, but it still shows a flaw i=
+n the API.
+> >
+> > Hoisting the retrieval of the source page outside of filemap_invalidate=
+_lock()
+> > seems pretty straightforward, and would provide consistent ABI for all =
+vendor
+>
+> Will relying on standard KVM -> guest_memfd interaction i.e.
+> simulating a second stage fault to get the right target address work
+> for all vendors i.e. CCA/SNP/TDX? If so, we might not have to maintain
+> this out of band path of kvm_gmem_populate.
+
+I think the only different scenario is SNP, where the host must write
+initial contents to guest memory.
+
+Will this work for all cases CCA/SNP/TDX during initial memory
+population from within KVM:
+1) Simulate stage2 fault
+2) Take a KVM mmu read lock
+3) Check that the needed gpa is mapped in EPT/NPT entries
+4) For SNP, if src !=3D null, make the target pfn to be shared, copy
+contents and then make the target pfn back to private.
+5) For TDX, if src !=3D null, pass the same address for source and
+target (likely this works for CCA too)
+6) Invoke appropriate memory encryption operations
+7) measure contents
+8) release the KVM mmu read lock
+
+If this scheme works, ideally we should also not call RMP table
+population logic from guest_memfd, but from KVM NPT fault handling
+logic directly (a bit of cosmetic change). Ideally any outgoing
+interaction from guest_memfd to KVM should be only via invalidation
+notifiers.
+
+
+
+
+
+>
+> > flavors.  E.g. as is, non-struct-page memory will work for SNP, but not=
+ TDX.  The
+> > obvious downside is that struct-page becomes a requirement for SNP, but=
+ that
 > >
 >
-> I see the benefits of tying inodes to the virtual machine and
-> different guest_memfd files to different KVM instances. This allows us
-> to exercise intra-host migration usecases for TDX/SNP. But I think
-> this model doesn't allow us to reuse guest_memfd files for SNP VMs
-> during reboot.
->
-> Reboot scenario assuming reuse of existing guest_memfd inode for the
-> next instance:
-> 1) Create a VM
-> 2) Create guest_memfd files that pin KVM instance
-> 3) Create memslots
-> 4) Start the VM
-> 5) For reboot/shutdown, Execute VM specific Termination (e.g.
-> KVM_TDX_TERMINATE_VM)
-> 6) if allowed, delete the memslots
-> 7) Create a new VM instance
-> 8) Link the existing guest_memfd files to the new VM -> which creates
-> new files for the same inode.
-> 9) Close the existing guest_memfd files and the existing VM
-> 10) Jump to step 3
->
-> The difference between SNP and TDX is that TDX memory ownership is
-> limited to the duration the pages are mapped in the second stage
-> secure EPT tables, whereas SNP/RMP memory ownership lasts beyond
-> memslots and effectively remains till folios are punched out from
-> guest_memfd filemap. IIUC CCA might follow the suite of SNP in this
-> regard with the pfns populated in GPT entries.
->
-> I don't have a sense of how critical this problem could be, but this
-> would mean for every reboot all large memory allocations will have to
-> let go and need to be reallocated. For 1G support, we will be freeing
-> guest_memfd pages using a background thread which may add some delays
-> in being able to free up the memory in time.
->
-> Instead if we did this:
-> 1) Support creating guest_memfd files for a certain VM type that
-> allows KVM to dictate the behavior of the guest_memfd.
-> 2) Tie lifetime of KVM SNP/TDX memory ownership with guest_memfd and
-> memslot bindings
->     - Each binding will increase a refcount on both guest_memfd file
-> and KVM, so both can't go away while the binding exists.
-
-I think if we can ensure that any guest_memfd initiated interaction
-with KVM is only for invalidation and is based on binding and under
-filemap_invalidate_lock then there is no need to pin KVM on each
-binding, as binding/unbinding should be protected using
-filemap_invalidate_lock and so KVM can't go away during invalidation.
-
-
-
-> 3) For SNP/CCA, pfns are invalidated from RMP/GPT tables during unbind
-> operations while for TDX, KVM will invalidate secure EPT entries.
->
-> This can allow us to decouple memory lifecycle from VM lifecycle and
-> match the behavior with non-confidential VMs where memory can outlast
-> VMs. Though this approach will mean change in intrahost migration
-> implementation as we don't need to differentiate guest_memfd files and
-> inodes.
->
-> That being said, I might be missing something here and I don't have
-> any data to back the criticality of this usecase for SNP and possibly
-> CCA VMs.
+> Maybe you had more thought here?
 
