@@ -1,63 +1,62 @@
-Return-Path: <kvm+bounces-52449-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52454-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3300B05426
-	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 10:08:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5432EB054F3
+	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 10:32:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 39A527ADF09
-	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 08:07:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B5AC67B8BED
+	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 08:30:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43FE1275AE8;
-	Tue, 15 Jul 2025 08:08:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 529CD2741D4;
+	Tue, 15 Jul 2025 08:31:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TxFCpZwL"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="biITL8wI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E68E9275863;
-	Tue, 15 Jul 2025 08:07:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D55D4218AAD;
+	Tue, 15 Jul 2025 08:31:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752566881; cv=none; b=nJKd4sx5ffqcXJdFrZDnYlDNAi1vj3LMNa5vwiMpzzbNcAQOHxcwFnEhdj3/QXYzfkInfvq3I0z8BmrLL4ArkCZ4gYPhkMrN7Bes8YKgVHUSwi7eQppwyvGZ9b7xaJLx1ASZCJ7EkQcWpYtr7DdZv6Dn7crlRSpIJRf9H/A1pbE=
+	t=1752568301; cv=none; b=lbcs7BsHXU1aDv5Mh2R5KVi5KFUSqzxx3+LkClR63S2PDFPWezWC40BKHfP2ivfItQZ7lE9UQAclEDfBM/NP62pLO/o38zcOHBJgfyuclFJQkflS8Y4y8XStgl827/KANhGiNZ7F2b73OD7brgierQvgsHq3GH7IuyBRfqqrdXw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752566881; c=relaxed/simple;
-	bh=NXaK9A6F5geqHuLjSmTOtivGrEFJHLoLN+Ro7D+Sc8s=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Siz5Ey3bUYEqvlJiBhlzcjMo19ZxLponKjSYNEq5eTd/CvkS5S3TfP4/o1nETfMIgy/OjxiTGQ+VdXn7vG/x2Nee6EcPBdpKDjNISSjTijWDNATCvF2Ee3aD3Sm+Gxw24W1XFn1I7oIPGM9ue9KrWP8pKdJs49WEMaf21PxrqVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TxFCpZwL; arc=none smtp.client-ip=192.198.163.10
+	s=arc-20240116; t=1752568301; c=relaxed/simple;
+	bh=GmF9A0uu3R9vARY/nDJM60P6Cx1d4Wo0ZlBrgNqfd84=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XlcUOSVqc5CBnX6uzy+iN+5YUTytH1k5sLP2h7PGiCIDKKrhejZ8Az5RdphwThN+hN1x0TarYX2uWwMu0kpBUI4M4CA00TB6TC3VY5YYNjFvJISEghKcNw/s5Lt5ugkYdivSX6PovIE4q2N3If/eWGbHwF+BCFQ9yykdlnz3i/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=biITL8wI; arc=none smtp.client-ip=198.175.65.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752566880; x=1784102880;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=NXaK9A6F5geqHuLjSmTOtivGrEFJHLoLN+Ro7D+Sc8s=;
-  b=TxFCpZwLhjcXoHXUMvLzhL0SzDf5wVnlXErMPkbGKl/VnhYroegtiMVk
-   fsTtqGShkz8jDUI3FmcJPEshYT0H7y2MUlpy1r8oqoIanVi04WdzxELHd
-   BgG051WXZSVfCzMyZ9EyLkhUh29m65PDywK7nPIPWMFHo7JrcDhDCRvPN
-   OYFLLb3sqDFuUkyACov7PiKLwGVxvH+YmMUA9d6Ysh7Qh/mJZiqoFiRqc
-   ps/hvETt8g/2qYooLoYlp26K0JSOQDvFgtpakhFDpSq306+zIA2DhPLVw
-   k7p9Xa6qZ0AOt+eBlEK54zQHofHuP+NN+2elCMX4lxPaZNqj8QixPWebR
-   Q==;
-X-CSE-ConnectionGUID: ncUmbUA2QmaobfI8TI7Fdw==
-X-CSE-MsgGUID: J27uAH9PQNihKExa+YtbAA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11491"; a="66135097"
+  t=1752568300; x=1784104300;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=GmF9A0uu3R9vARY/nDJM60P6Cx1d4Wo0ZlBrgNqfd84=;
+  b=biITL8wIY9WngxTeQ4D1A5Bfb18u5TZ4hm2T6A1jumE6pSBZOeEPrtGc
+   q8xG4SFM1imcoKmopxXVQCqH0gSZjtFd3QQnM6Irtid4I8fFP28Ni38/L
+   vcYSOjReb5lfaaRvr2NNSDM6cZhb8BaMaaeT4M40X6NocDNm4yVleobye
+   9368iyQ7rq/1X6xidGXdg1OyhAeX+8SKJtr5xhVO9IouCQ68hpBsMWUTV
+   a94ZvMDKyATWiRourURSDyUvlJi0c01sKOn7U8GSf4C0jbgUdZ4+geK+b
+   2JVE4D8ceGzAsHNECEQX7xFf6poL6X7QZMerI8gX7f0Hy+NRPKE5EPdhQ
+   g==;
+X-CSE-ConnectionGUID: LdIaf76DTMiDvwvoNAugDw==
+X-CSE-MsgGUID: gKf4W8etSzKP0GJOPY0LIQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11491"; a="54632066"
 X-IronPort-AV: E=Sophos;i="6.16,313,1744095600"; 
-   d="scan'208";a="66135097"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2025 01:07:59 -0700
-X-CSE-ConnectionGUID: Rp6jLuBHT+CRzAJ3VpvueQ==
-X-CSE-MsgGUID: kDddVAQdQOSeDtDtwM8UwA==
+   d="scan'208";a="54632066"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2025 01:31:40 -0700
+X-CSE-ConnectionGUID: 4dAzZFJxT2mI/S/bqqC+yA==
+X-CSE-MsgGUID: BeFlch+ITxKNun+ncE9GMw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,313,1744095600"; 
-   d="scan'208";a="161471353"
+   d="scan'208";a="156572560"
 Received: from emr.sh.intel.com ([10.112.229.56])
-  by orviesa003.jf.intel.com with ESMTP; 15 Jul 2025 01:07:57 -0700
+  by orviesa010.jf.intel.com with ESMTP; 15 Jul 2025 01:31:36 -0700
 From: Dapeng Mi <dapeng1.mi@linux.intel.com>
 To: Sean Christopherson <seanjc@google.com>,
 	Paolo Bonzini <pbonzini@redhat.com>
@@ -71,12 +70,10 @@ Cc: kvm@vger.kernel.org,
 	Yi Lai <yi1.lai@intel.com>,
 	Dapeng Mi <dapeng1.mi@intel.com>,
 	Dapeng Mi <dapeng1.mi@linux.intel.com>
-Subject: [PATCH 3/3] KVM: selftests: Relax branches event count check for event_filter test
-Date: Sat, 12 Jul 2025 17:25:21 +0000
-Message-ID: <20250712172522.187414-4-dapeng1.mi@linux.intel.com>
+Subject: [kvm-unit-tests patch 0/5] Fix pmu test errors on SRF/CWF
+Date: Sat, 12 Jul 2025 17:49:10 +0000
+Message-ID: <20250712174915.196103-1-dapeng1.mi@linux.intel.com>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250712172522.187414-1-dapeng1.mi@linux.intel.com>
-References: <20250712172522.187414-1-dapeng1.mi@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -85,56 +82,48 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-As the branches event overcount issue on Atom platforms, once there are
-VM-Exits triggered (external interrupts) in the guest loop, the measured
-branch event count could be larger than NUM_BRANCHES, this would lead to
-the pmu_event_filter_test print warning to info the measured branches
-event count is mismatched with expected number (NUM_BRANCHES).
+This patchset fixes the pmu test errors on Atom server like Sierra
+Forest (SRF) and Clearwater Forest (CWF).
 
-To eliminate this warning, relax the branches event count check on the
-Atom platform which have the branches event overcount issue.
+On Intel Atom platforms, the PMU events "Instruction Retired" or
+"Branch Instruction Retired" may be overcounted for some certain
+instructions, like FAR CALL/JMP, RETF, IRET, VMENTRY/VMEXIT/VMPTRLD
+and complex SGX/SMX/CSTATE instructions/flows[1].
 
-Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
-Tested-by: Yi Lai <yi1.lai@intel.com>
----
- tools/testing/selftests/kvm/x86/pmu_event_filter_test.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+In details, for the Atom platforms before Sierra Forest (including
+Sierra Forest), Both 2 events "Instruction Retired" and
+"Branch Instruction Retired" would be overcounted on these certain
+instructions, but for Clearwater Forest only "Instruction Retired" event
+is overcounted on these instructions.
 
-diff --git a/tools/testing/selftests/kvm/x86/pmu_event_filter_test.c b/tools/testing/selftests/kvm/x86/pmu_event_filter_test.c
-index c15513cd74d1..9c1a92f05786 100644
---- a/tools/testing/selftests/kvm/x86/pmu_event_filter_test.c
-+++ b/tools/testing/selftests/kvm/x86/pmu_event_filter_test.c
-@@ -60,6 +60,8 @@ struct {
- 	uint64_t instructions_retired;
- } pmc_results;
- 
-+static uint8_t inst_overcount_flags;
-+
- /*
-  * If we encounter a #GP during the guest PMU sanity check, then the guest
-  * PMU is not functional. Inform the hypervisor via GUEST_SYNC(0).
-@@ -214,8 +216,10 @@ static void remove_event(struct __kvm_pmu_event_filter *f, uint64_t event)
- do {											\
- 	uint64_t br = pmc_results.branches_retired;					\
- 	uint64_t ir = pmc_results.instructions_retired;					\
-+	bool br_matched = inst_overcount_flags & BR_RETIRED_OVERCOUNT ?			\
-+			  br >= NUM_BRANCHES : br == NUM_BRANCHES;			\
- 											\
--	if (br && br != NUM_BRANCHES)							\
-+	if (br && !br_matched)								\
- 		pr_info("%s: Branch instructions retired = %lu (expected %u)\n",	\
- 			__func__, br, NUM_BRANCHES);					\
- 	TEST_ASSERT(br, "%s: Branch instructions retired = %lu (expected > 0)",		\
-@@ -850,6 +854,9 @@ int main(int argc, char *argv[])
- 	if (use_amd_pmu())
- 		test_amd_deny_list(vcpu);
- 
-+	if (use_intel_pmu())
-+		inst_overcount_flags = detect_inst_overcount_flags();
-+
- 	test_without_filter(vcpu);
- 	test_member_deny_list(vcpu);
- 	test_member_allow_list(vcpu);
+As the overcount issue, pmu test would fail to validate the precise
+count for these 2 events on SRF and CWF. Patches 1-3/5 detects if the
+platform has this overcount issue, if so relax the precise count
+validation for these 2 events.
+
+Besides it looks more LLC references are needed on SRF/CWF, so adjust
+the "LLC references" event count range.
+
+Tests:
+  * pmu test passes on Intel GNR/SRF/CWF platforms.
+
+Ref:
+  [1]https://edc.intel.com/content/www/us/en/design/products-and-solutions/processors-and-chipsets/sierra-forest/xeon-6700-series-processor-with-e-cores-specification-update/errata-details
+
+dongsheng (5):
+  x86/pmu: Add helper to detect Intel overcount issues
+  x86/pmu: Relax precise count validation for Intel overcounted
+    platforms
+  x86/pmu: Fix incorrect masking of fixed counters
+  x86/pmu: Handle instruction overcount issue in overflow test
+  x86/pmu: Expand "llc references" upper limit for broader compatibility
+
+ lib/x86/processor.h | 17 +++++++++
+ x86/pmu.c           | 93 +++++++++++++++++++++++++++++++++++++++------
+ 2 files changed, 98 insertions(+), 12 deletions(-)
+
+
+base-commit: 525bdb5d65d51a367341f471eb1bcd505d73c51f
 -- 
 2.43.0
 
