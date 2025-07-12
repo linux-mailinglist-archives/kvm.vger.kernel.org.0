@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-52458-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52459-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 447FAB054FC
-	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 10:33:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F269B054FB
+	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 10:33:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 438F17B9F51
-	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 08:31:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F170178D27
+	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 08:33:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D7062D5402;
-	Tue, 15 Jul 2025 08:32:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2C382D5C8E;
+	Tue, 15 Jul 2025 08:32:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="U68rNiPf"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="btkodKuJ"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2BEE2D3737;
-	Tue, 15 Jul 2025 08:31:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F1462D4B47;
+	Tue, 15 Jul 2025 08:31:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752568319; cv=none; b=jdeyzEldweHGAtyO/5Esep1x5nDkbZL7TDfHEeASaTicEex99KXG3Zg7mnGqrZtPx8Vegoo9QdPE22949Wy9GrJx6KZ9TnlW3S8O3qb40v9sVaXOWpJHx4mBszQZNC8SqQ0C1Tr8Qoan1O2TX/oSWGx421ZJgODMtBlLZPghU+Q=
+	t=1752568320; cv=none; b=Pv2WpH8RathtqZoftQmrpDrQI6p1jTU2PM8feXyDv6VwlUwlxTyIUD7VU6nIW7+GQL1h66JiWLKhJQtjU4XlnQaWiyVEELdQzLhtif1H0Z2hDC+8kIXAoIuiSj7ho1YbT6L4c1vbmJeUEh9oB18Dl4P/Wer3nBjY2V9GLY4upRg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752568319; c=relaxed/simple;
-	bh=u3ipQeeF+33UNym7RHJSoeJHycW2i7A3nLZ2wZJmLxM=;
+	s=arc-20240116; t=1752568320; c=relaxed/simple;
+	bh=wB6hEFFzvmOcnpBZLYTMSOsSPCn29ml9ZB1Zmap4zqg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nWgCRgt9P8c3sL5TED/D5Ky0Mzj04ah8nVqv5rbEOBptwHnvoOH+/QasQdef+k0NTPHWRlQKY5YJa0cnNCb8Ulc3+roObPG1C3LtiaO1sm7SXJ7rTbt4b2jYlMnHr7FnR8wRrSDuxv6Ir6hbRpcH4Sp7rkgKAMMC8fP1QEzgzok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=U68rNiPf; arc=none smtp.client-ip=198.175.65.19
+	 MIME-Version; b=p5Af1NdwtliVSyfrBlrk+eDd0VTcmGxa6CMzFrzh1BhAXFiZAgbWkUnZJ9rDJPJaga+9Qj3deurBvDGNwFYJvFsuPOGxKYjvrVc1AK/gHPV8WhCmPxCQrj3LbCFS73DGKQnUymutecI60rKH2A/sH6eMOCJLQXzaD9OwfSfmc9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=btkodKuJ; arc=none smtp.client-ip=198.175.65.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752568318; x=1784104318;
+  t=1752568320; x=1784104320;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=u3ipQeeF+33UNym7RHJSoeJHycW2i7A3nLZ2wZJmLxM=;
-  b=U68rNiPfgeJf+O+mxo2snsUGm+qUDSHKy6o2DWEhiHFmMB3ab384NLi5
-   efgupjO4wYQln5npiGkv4N8H15K2uIb1FvAbFY2kN43YNU4ZSk/eQ8/+T
-   0ajHwtatFlNyJMZYdud15JiHbsPF3Vnhh9TW8Fyw/rIQHgMLpA5fuMndB
-   Xn6vOThq2IGD+f4WEg75AuHJMkI2d9dJj3RD5OUsry5YDjAYO7n8kWPsU
-   ccZ+JlRSLYhI2q9ZpZJKN/ZKflT4pk6gb8SNpaOpLTZY+E1i8czesApnX
-   bsDgEOqa8zhg5dPog0HYqaJc/XZyXXEArg6qPS+TWbWeKBlAZRxQbRKvg
+  bh=wB6hEFFzvmOcnpBZLYTMSOsSPCn29ml9ZB1Zmap4zqg=;
+  b=btkodKuJJsBumquyM8UTsmY93elcYYG/LJhFN/kh0Bi3K/q/k5R/DZJg
+   aEDOw5ETu7jte7P70rgmLC3ZMU1G26GWJOQzT/H9O2a3+TJDkPY0+wtBp
+   uaAZSAYNC028W2ZyzkwY8g21jBGTklf+KqxVFH5Znva2YmeXvX56hVwG0
+   IAoXkYUpZqx6C8x0qbAKlTdo9n0On1VEiwncupeOP2yVzsa/zL5oP+4XW
+   Jco2WYRsELYk2Z7QgU9YDDO7WR+drtJOEeeZnjogTfrZxGfQRcQTVOBtZ
+   sOcFrp15PjfPxt7ntL9+xLlagzIWMgtKjnRfVcpdIsLulJZix0KSkxCJU
    w==;
-X-CSE-ConnectionGUID: uGFjuvdlQ5qGIFmaymOLpg==
-X-CSE-MsgGUID: ITZgW9qyQDmW9EJR+oSHcQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11491"; a="54632115"
+X-CSE-ConnectionGUID: 81rBu93kRRKJ36qGvrcZ/w==
+X-CSE-MsgGUID: Da+TjxOwSoyfHAfWbBkpxw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11491"; a="54632125"
 X-IronPort-AV: E=Sophos;i="6.16,313,1744095600"; 
-   d="scan'208";a="54632115"
+   d="scan'208";a="54632125"
 Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2025 01:31:55 -0700
-X-CSE-ConnectionGUID: wGviGYVxQFOSC56kLauAYA==
-X-CSE-MsgGUID: 6QQLg926TlyNN43MCJi3Qg==
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2025 01:31:59 -0700
+X-CSE-ConnectionGUID: 85HYvWqASsWSDK7lGaxF2A==
+X-CSE-MsgGUID: SgsKgsojRpu7AnERVa8LMA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,313,1744095600"; 
-   d="scan'208";a="156572597"
+   d="scan'208";a="156572604"
 Received: from emr.sh.intel.com ([10.112.229.56])
-  by orviesa010.jf.intel.com with ESMTP; 15 Jul 2025 01:31:51 -0700
+  by orviesa010.jf.intel.com with ESMTP; 15 Jul 2025 01:31:55 -0700
 From: Dapeng Mi <dapeng1.mi@linux.intel.com>
 To: Sean Christopherson <seanjc@google.com>,
 	Paolo Bonzini <pbonzini@redhat.com>
@@ -72,9 +72,9 @@ Cc: kvm@vger.kernel.org,
 	Dapeng Mi <dapeng1.mi@intel.com>,
 	dongsheng <dongsheng.x.zhang@intel.com>,
 	Dapeng Mi <dapeng1.mi@linux.intel.com>
-Subject: [kvm-unit-tests patch 4/5] x86/pmu: Handle instruction overcount issue in overflow test
-Date: Sat, 12 Jul 2025 17:49:14 +0000
-Message-ID: <20250712174915.196103-5-dapeng1.mi@linux.intel.com>
+Subject: [kvm-unit-tests patch 5/5] x86/pmu: Expand "llc references" upper limit for broader compatibility
+Date: Sat, 12 Jul 2025 17:49:15 +0000
+Message-ID: <20250712174915.196103-6-dapeng1.mi@linux.intel.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250712174915.196103-1-dapeng1.mi@linux.intel.com>
 References: <20250712174915.196103-1-dapeng1.mi@linux.intel.com>
@@ -88,72 +88,32 @@ Content-Transfer-Encoding: 8bit
 
 From: dongsheng <dongsheng.x.zhang@intel.com>
 
-During the execution of __measure(), VM exits (e.g., due to
-WRMSR/EXTERNAL_INTERRUPT) may occur. On systems affected by the
-instruction overcount issue, each VM-Exit/VM-Entry can erroneously
-increment the instruction count by one, leading to false failures in
-overflow tests.
-
-To address this, the patch introduces a range-based validation in place
-of precise instruction count checks. Additionally, overflow_preset is
-now statically set to 1 - LOOP_INSNS, rather than being dynamically
-determined via measure_for_overflow().
-
-These changes ensure consistent and predictable behavior aligned with the
-intended loop instruction count, while avoiding modifications to the
-subsequent status and status-clear testing logic.
-
-The chosen validation range is empirically derived to maintain test
-reliability across hardware variations.
+Increase the upper limit of the "llc references" test to accommodate
+results observed on additional Intel CPU models, including CWF and
+SRF.
+These CPUs exhibited higher reference counts that previously caused
+the test to fail.
 
 Signed-off-by: dongsheng <dongsheng.x.zhang@intel.com>
 Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
 Tested-by: Yi Lai <yi1.lai@intel.com>
 ---
- x86/pmu.c | 23 +++++++++++++++++++++--
- 1 file changed, 21 insertions(+), 2 deletions(-)
+ x86/pmu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/x86/pmu.c b/x86/pmu.c
-index 44c728a5..c54c0988 100644
+index c54c0988..445ea6b4 100644
 --- a/x86/pmu.c
 +++ b/x86/pmu.c
-@@ -518,6 +518,21 @@ static void check_counters_many(void)
- 
- static uint64_t measure_for_overflow(pmu_counter_t *cnt)
- {
-+	/*
-+	 * During the execution of __measure(), VM exits (e.g., due to
-+	 * WRMSR/EXTERNAL_INTERRUPT) may occur. On systems affected by the
-+	 * instruction overcount issue, each VM-Exit/VM-Entry can erroneously
-+	 * increment the instruction count by one, leading to false failures
-+	 * in overflow tests.
-+	 *
-+	 * To mitigate this, if the overcount issue is detected, we hardcode
-+	 * the overflow preset to (1 - LOOP_INSNS) instead of calculating it
-+	 * dynamically. This ensures that an overflow will reliably occur,
-+	 * regardless of any overcounting caused by VM exits.
-+	 */
-+	if (intel_inst_overcount_flags & INST_RETIRED_OVERCOUNT)
-+		return 1 - LOOP_INSNS;
-+
- 	__measure(cnt, 0);
- 	/*
- 	 * To generate overflow, i.e. roll over to '0', the initial count just
-@@ -574,8 +589,12 @@ static void check_counter_overflow(void)
- 			cnt.config &= ~EVNTSEL_INT;
- 		idx = event_to_global_idx(&cnt);
- 		__measure(&cnt, cnt.count);
--		if (pmu.is_intel)
--			report(cnt.count == 1, "cntr-%d", i);
-+		if (pmu.is_intel) {
-+			if (intel_inst_overcount_flags & INST_RETIRED_OVERCOUNT)
-+				report(cnt.count < 14, "cntr-%d", i);
-+			else
-+				report(cnt.count == 1, "cntr-%d", i);
-+		}
- 		else
- 			report(cnt.count == 0xffffffffffff || cnt.count < 7, "cntr-%d", i);
- 
+@@ -116,7 +116,7 @@ struct pmu_event {
+ 	{"core cycles", 0x003c, 1*N, 50*N},
+ 	{"instructions", 0x00c0, 10*N, 10.2*N},
+ 	{"ref cycles", 0x013c, 1*N, 30*N},
+-	{"llc references", 0x4f2e, 1, 2*N},
++	{"llc references", 0x4f2e, 1, 2.5*N},
+ 	{"llc misses", 0x412e, 1, 1*N},
+ 	{"branches", 0x00c4, 1*N, 1.1*N},
+ 	{"branch misses", 0x00c5, 1, 0.1*N},
 -- 
 2.43.0
 
