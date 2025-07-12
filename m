@@ -1,85 +1,64 @@
-Return-Path: <kvm+bounces-52234-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52235-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74299B02C78
-	for <lists+kvm@lfdr.de>; Sat, 12 Jul 2025 20:47:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC92AB02CB2
+	for <lists+kvm@lfdr.de>; Sat, 12 Jul 2025 21:47:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 63C6D7AF164
-	for <lists+kvm@lfdr.de>; Sat, 12 Jul 2025 18:45:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 40273174BD5
+	for <lists+kvm@lfdr.de>; Sat, 12 Jul 2025 19:47:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1AF328B3F6;
-	Sat, 12 Jul 2025 18:47:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57B6E289357;
+	Sat, 12 Jul 2025 19:47:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="X5XXcU2y"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ri65r+c5"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA4E41F3B85;
-	Sat, 12 Jul 2025 18:47:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 295E381E
+	for <kvm@vger.kernel.org>; Sat, 12 Jul 2025 19:47:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752346035; cv=none; b=GydjaX5+OIS3+SNujm55N0ho+IzvJYUe9II6wmqmPwwiqGjNEZx51J3sEN2lKN+SIjCzc3sIZe1/DXPJvOB877hom6066VBc2/Qlz4YolUBM42c9UTb4bSpno6r/9t3buhfqFZ6rWz7vIGAZfZEuG1KOnyoT0DNOXZrkzmEglMU=
+	t=1752349656; cv=none; b=DRXzlYKag6VZSmJGua3vFvXnrnUbs/l34OiTr2TxXnPLtx6fKjkKxMlnPzs4TcqSTYbw6KSRjQiLQf7a5RBx7B0+UtAc/GLhxF3qsrOUuR9GpAcX7R+28+8CwnjjaIKEnULHKQjqB9kw0frFXjMsMvxnfW09++Mtn7EGlKo9C4I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752346035; c=relaxed/simple;
-	bh=vZHJd/EyhCeWVcS/kNi/tekdBeWGgTbd98m97HKj8rE=;
+	s=arc-20240116; t=1752349656; c=relaxed/simple;
+	bh=f7jirJngtZPmjp6nUuToVUR1+33dys87/8xXFSMeddQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BLctZE2zRQZTbuFI4/JvxpboUdlitVhKtE7XOE6o6dFZ4LKXjxKBBsPnkHrHubS0KvqzijJBJTwTSue31AqYujjeeEFYz50IR3ySpmubvwufgR4Ey2RsYHVZH+It6mtBMw/BsHetsZJ+D78E7RvkIKPFYfKPvL114EijKJ4NfYc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=X5XXcU2y; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 7EB1840E0198;
-	Sat, 12 Jul 2025 18:47:10 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id IiMW9QXRFUAO; Sat, 12 Jul 2025 18:47:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1752346027; bh=rIKSthC2S+D7tehs9yM7s5VVdshVZuEZur+23cX4wP0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=X5XXcU2yj2sMeQ/UM0OtP7Gt4pZ5Vo0FurvDPZURWSwI4N7z9+y3zzU4JhOwISFyX
-	 geBm4UHF0s+40pmmTLMl2RvEnL0vM9m6DN+N4DhQH8GDUKkhwr+u0UUV+vBH80MUpM
-	 At04+ntGM1eZVXTLdLUeNqYYe5RIcXvTBWo/rNPSXRY00dTSbMmmh7u0F/xOlNxcaI
-	 7ddZKPCREfoHNxqtSclCBnk4aglaHuznLIfNc0QC1HDVPMGi4fhQKSSQ6Ulk7Y+z2r
-	 y9TmfZ2K535yDIf1i305HUQWeTUxvZXVQ6zqmnnFRBjRpJQd4C7zhI8iYYZIykDewR
-	 SNXM7iHVvtMxmzlwsGV5td9pzrRxWa13IjUNsj6h5ACIAW1DWeiHD1uh4twt+epsNt
-	 NTYWONHpCqZ1bl54zcp1iIQxjtWphK3eTrERh2A3NSYZ63zx8Lua7R/0gITyrPTskf
-	 D8qgaWXCTdcUl7slDaz3j/5rxuCDYCWv7EXP2czFqTzWMA2gW1It13pNpaTVCu9h6x
-	 /L7o2cF1xmIcVmGzeZL27juS+OgJaYLubPXDjFa3wC2fsh9QEZfd44arQlIq9wXvOW
-	 yqZty8TTpDpCP9HJgZQMo2cVOMXLJWmtjOZ8NAvuA5EyP0U31StZQiSlkW7WOZnDNn
-	 YX40LaZXe1LaiMXyMLP9SacA=
-Received: from zn.tnic (p57969c58.dip0.t-ipconnect.de [87.150.156.88])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id EDAD740E00DC;
-	Sat, 12 Jul 2025 18:46:45 +0000 (UTC)
-Date: Sat, 12 Jul 2025 20:46:39 +0200
-From: Borislav Petkov <bp@alien8.de>
-To: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
-Cc: Sean Christopherson <seanjc@google.com>, linux-kernel@vger.kernel.org,
-	tglx@linutronix.de, mingo@redhat.com, dave.hansen@linux.intel.com,
-	Thomas.Lendacky@amd.com, nikunj@amd.com, Santosh.Shukla@amd.com,
-	Vasant.Hegde@amd.com, Suravee.Suthikulpanit@amd.com,
-	David.Kaplan@amd.com, x86@kernel.org, hpa@zytor.com,
-	peterz@infradead.org, pbonzini@redhat.com, kvm@vger.kernel.org,
-	kirill.shutemov@linux.intel.com, huibo.wang@amd.com,
-	naveen.rao@amd.com, kai.huang@intel.com
-Subject: Re: [RFC PATCH v8 15/35] x86/apic: Unionize apic regs for
- 32bit/64bit access w/o type casting
-Message-ID: <20250712184639.GFaHKtj_Clr_Oa3SgP@fat_crate.local>
-References: <20250709033242.267892-1-Neeraj.Upadhyay@amd.com>
- <20250709033242.267892-16-Neeraj.Upadhyay@amd.com>
- <aG59lcEc3ZBq8aHZ@google.com>
- <be596f16-3a03-4ad0-b3d0-c6737174534a@amd.com>
- <20250712152123.GEaHJ9c16GcM5AGaNq@fat_crate.local>
- <e8483f20-b8ee-4369-ad00-0154ff05d10c@amd.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=JbzVwYYyOFUOTaNrVKsVD44vC46fxPbX5KqF2Jz0nQs6hQy15fCGJavPFPEkZsEQ+7diPiEFi/k5IWDl6rcNqUskDWdD6s9BBf4Y+o8/KtNSgPfHNe7IzMFS39jnajBzfbkp2x+eSN5dwDf2n8F9tyJSbNYZJw2bWsgCuqYPFvU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Ri65r+c5; arc=none smtp.client-ip=95.215.58.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Sat, 12 Jul 2025 12:47:15 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1752349649;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=t/KO7cxY55TZXEuxm/aJMlnOT2I2d5MUZFj4P6QELUY=;
+	b=Ri65r+c54bI2Dx0vVIuVeDzldrENr3nFiK2CbHP8HII66ewc/paI3WssyPiPfNrGcdB//4
+	Z14A96Kb4SwBP+zq6/FtDPWBPhETyDJXYfATv3PnpWMTj34Qn4ihFcM7hWAG6/gm0+ONYp
+	AgolM6pN6cUvnHKnZ+EXg6jN/91qaTg=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Jiaqi Yan <jiaqiyan@google.com>
+Cc: maz@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org,
+	pbonzini@redhat.com, corbet@lwn.net, shuah@kernel.org,
+	kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	duenwen@google.com, rananta@google.com, jthoughton@google.com
+Subject: Re: [PATCH v2 3/6] KVM: arm64: Allow userspace to inject external
+ instruction aborts
+Message-ID: <aHK7w4TTEm7a1mco@linux.dev>
+References: <20250604050902.3944054-1-jiaqiyan@google.com>
+ <20250604050902.3944054-4-jiaqiyan@google.com>
+ <aHFpIpIfqVCQZVgG@linux.dev>
+ <CACw3F51xRWr5LXz4-JhK+mjizY7D7Oa+GrJ-OZHktfPzFGKeiw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -88,19 +67,70 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <e8483f20-b8ee-4369-ad00-0154ff05d10c@amd.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACw3F51xRWr5LXz4-JhK+mjizY7D7Oa+GrJ-OZHktfPzFGKeiw@mail.gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Sat, Jul 12, 2025 at 10:38:08PM +0530, Neeraj Upadhyay wrote:
-> It was more to imply like secure APIC-page rather than Secure-APIC page. I will change
-> it to secure_avic_page or savic_apic_page, if one of these looks cleaner. Please suggest.
+On Fri, Jul 11, 2025 at 04:58:57PM -0700, Jiaqi Yan wrote:
+> On Fri, Jul 11, 2025 at 12:42 PM Oliver Upton <oliver.upton@linux.dev> wrote:
+> >
+> > On Wed, Jun 04, 2025 at 05:08:58AM +0000, Jiaqi Yan wrote:
+> > > From: Raghavendra Rao Ananta <rananta@google.com>
+> > >
+> > > When KVM returns to userspace for KVM_EXIT_ARM_SEA, the userspace is
+> > > encouraged to inject the abort into the guest via KVM_SET_VCPU_EVENTS.
+> > >
+> > > KVM_SET_VCPU_EVENTS currently only allows injecting external data aborts.
+> > > However, the synchronous external abort that caused KVM_EXIT_ARM_SEA
+> > > is possible to be an instruction abort. Userspace is already able to
+> > > tell if an abort is due to data or instruction via kvm_run.arm_sea.esr,
+> > > by checking its Exception Class value.
+> > >
+> > > Extend the KVM_SET_VCPU_EVENTS ioctl to allow injecting instruction
+> > > abort into the guest.
+> > >
+> > > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> > > Signed-off-by: Jiaqi Yan <jiaqiyan@google.com>
+> >
+> > Hmm. Since we expose an ESR value to userspace I get the feeling that we
+> > should allow the user to supply an ISS for the external abort, similar
+> > to what we already do for SErrors.
+> 
+> Oh, I will create something in v3, by extending kvm_vcpu_events to
+> something like:
+> 
+> struct {
+>   __u8 serror_pending;
+>   __u8 serror_has_esr;
+>   __u8 ext_dabt_pending;
+>   __u8 ext_iabt_pending;
+>   __u8 ext_abt_has_esr;  // <= new
+>   /* Align it to 8 bytes */
+>   __u8 pad[3];
+>   union {
+>     __u64 serror_esr;
+>     __u64 ext_abt_esr;  // <= new
 
-If the page belongs to the guest's secure AVIC machinery then it should be
-called secure_avic_page to avoid confusion. Or at least have a comment above
-it explaining what it is.
+This doesn't work. The ABI allows userspace to pend both an SError and
+SEA, so we can't use the same storage for the ESR.
 
--- 
-Regards/Gruss,
-    Boris.
+>   };
+> } exception;
+> 
+> One question about the naming since we cannot change it once
+> committed. Taking the existing SError injection as example, although
+> the name in kvm_vcpu_events is serror_has_esr, it is essentially just
+> the ISS fields of the ESR (which is also written in virt/kvm/api.rst).
+> Why named after "esr" instead of "iss"? The only reason I can think of
+> is, KVM wants to leave the room to accept more fields than ISS from
+> userspace. Does this reason apply to external aborts? Asking in case
+> if "iss" is a better name in kvm_vcpu_events, maybe for external
+> aborts, we should use ext_abt_has_iss?
 
-https://people.kernel.org/tglx/notes-about-netiquette
+We will probably need to include more ESR fields in the future, like
+ESR_ELx.ISS2. So let's just keep the existing naming if that's OK with
+you.
+
+Thanks,
+Oliver
 
