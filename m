@@ -1,201 +1,218 @@
-Return-Path: <kvm+bounces-52238-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52239-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0465B02E63
-	for <lists+kvm@lfdr.de>; Sun, 13 Jul 2025 04:12:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43619B02E72
+	for <lists+kvm@lfdr.de>; Sun, 13 Jul 2025 04:42:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CDD64A065C
-	for <lists+kvm@lfdr.de>; Sun, 13 Jul 2025 02:12:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 816B94A1B72
+	for <lists+kvm@lfdr.de>; Sun, 13 Jul 2025 02:42:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAAD513B5A9;
-	Sun, 13 Jul 2025 02:12:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE51E14A0B7;
+	Sun, 13 Jul 2025 02:42:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="BZ/lOopX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KEllP/8V"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2040.outbound.protection.outlook.com [40.107.237.40])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95C69F9EC;
-	Sun, 13 Jul 2025 02:12:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.40
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752372743; cv=fail; b=EYp4G84ML8IqR+wDcoyoi5v4TldyKHLdnxPMxrPcy15qLRxMboyHWdcC7raxuO6lvZSlqNWzLldxZHqxEQ6+vN0TX25xhSE+2BBZgmREzSgvNDoIeHXBr+wRWs5nXdqHpGfrg8xMyPpeD0vxb1D77SAcz7gsb3QEaNk3OApgvpc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752372743; c=relaxed/simple;
-	bh=hAftpFzcSEHOE8szU31oSi4QHVP+tyLoXu5OWrEL9Sw=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=OxVM2bllUgKLcR8vXYmcruYspYNfjKrBXz5qOAseYjstO6py+/Dc6wBEWSpr0PNhBnRl317waKCkw+B/GVWgIqHxdqOwv7Z+g9Z7XvFlkeT67jRdRBhKuu3ajpqVz+iX4crrMr7sftsqzWoWS4LXQ6rtodLXYgGWnIHT0i+OkAM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=BZ/lOopX; arc=fail smtp.client-ip=40.107.237.40
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=qbJiN7JwIpWzs4I1liOPlNEbPTLK7kOMBThEofWmcZw6aIN7Y0U8FgUHeZ8f0F5wWMHwZkunOHza6T81GcqqfjAb9u0yI1qClJZ9sE07iZ6hcbm0cuNq6VD4vcd+iwfCP4sFbHn7342HItYieGDolvwRW0Qs0OfCBijroTWXVv2tWLNbG7HWwCBy2r3QyCdet9UkojqSb/fO8vkae1YGWJEhrKdA3vWE7yawHOMFfTbj9ppknOQG34n87DsO3wrsrx4ugdexcJ1XX6SLhMO3VXwcT80ATGz63VyFPLHu4VY4ydo/KqjDn7M81AAF9zQDGq5GQcQvSnagOgLJ3jy1hg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=DZK3E4MwakaMSsh1CS6yMxdrpqssNlcBvFafIG73VdA=;
- b=E4yjUshXAoVkzDAZyxgAKX4iI+PhpBhYg4klyPLudvyRRnjstw62CMzVduO2YZ4BAxbX8aUs/QIGsbe2GVjoe2XW9Idy+Zv94un3HYIeB+xVtsGA23LtcZPfbzLmh1H8hfNYtR4aW+QQjO8tUwmOsS8tz5u+PqfjSCTsHzRzRtjSQoTnbV2C9Q2Or+pM/ykEIDN7xf4UXVMXjT014C4c2K2HAROvVFx6W+fgOQbk6OhsigeXAjpMb/26JpwJQc1h4fkxegtXzfX6Vo5Uxu2wAKt2k+C7dudVNCy+qm7Z1yJ8wQ4W6f7FXVAWokQnHbY3N5Bovwn2o9sROSrvQ8lgvg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DZK3E4MwakaMSsh1CS6yMxdrpqssNlcBvFafIG73VdA=;
- b=BZ/lOopXCbB+udOKyXzVI08BhUaZm8CrlDKbz9jnMGM3R0+KfNGyFLfRudLCmffWfR3GJZvjs9484Tc4B663G3hUxp+CPyJB/9fAhqvKRJnOR7UZw8qOD26IA9DY7lZkHskOzUF+qTcBtijOQe6ZrlijJUGwn1EKZ6/g9zikQjs=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS0PR12MB6608.namprd12.prod.outlook.com (2603:10b6:8:d0::10) by
- BL3PR12MB6476.namprd12.prod.outlook.com (2603:10b6:208:3bc::8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8901.28; Sun, 13 Jul 2025 02:12:15 +0000
-Received: from DS0PR12MB6608.namprd12.prod.outlook.com
- ([fe80::b71d:8902:9ab3:f627]) by DS0PR12MB6608.namprd12.prod.outlook.com
- ([fe80::b71d:8902:9ab3:f627%7]) with mapi id 15.20.8901.024; Sun, 13 Jul 2025
- 02:12:15 +0000
-Message-ID: <d648e1dc-4409-4263-861a-8c30e96719ac@amd.com>
-Date: Sun, 13 Jul 2025 07:41:58 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v8 15/35] x86/apic: Unionize apic regs for 32bit/64bit
- access w/o type casting
-To: Borislav Petkov <bp@alien8.de>
-Cc: Sean Christopherson <seanjc@google.com>, linux-kernel@vger.kernel.org,
- tglx@linutronix.de, mingo@redhat.com, dave.hansen@linux.intel.com,
- Thomas.Lendacky@amd.com, nikunj@amd.com, Santosh.Shukla@amd.com,
- Vasant.Hegde@amd.com, Suravee.Suthikulpanit@amd.com, David.Kaplan@amd.com,
- x86@kernel.org, hpa@zytor.com, peterz@infradead.org, pbonzini@redhat.com,
- kvm@vger.kernel.org, kirill.shutemov@linux.intel.com, huibo.wang@amd.com,
- naveen.rao@amd.com, kai.huang@intel.com
-References: <20250709033242.267892-1-Neeraj.Upadhyay@amd.com>
- <20250709033242.267892-16-Neeraj.Upadhyay@amd.com>
- <aG59lcEc3ZBq8aHZ@google.com> <be596f16-3a03-4ad0-b3d0-c6737174534a@amd.com>
- <20250712152123.GEaHJ9c16GcM5AGaNq@fat_crate.local>
- <e8483f20-b8ee-4369-ad00-0154ff05d10c@amd.com>
- <20250712184639.GFaHKtj_Clr_Oa3SgP@fat_crate.local>
-Content-Language: en-US
-From: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
-In-Reply-To: <20250712184639.GFaHKtj_Clr_Oa3SgP@fat_crate.local>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PN4P287CA0107.INDP287.PROD.OUTLOOK.COM
- (2603:1096:c01:276::10) To DS0PR12MB6608.namprd12.prod.outlook.com
- (2603:10b6:8:d0::10)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39E8313D8A4
+	for <kvm@vger.kernel.org>; Sun, 13 Jul 2025 02:42:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752374550; cv=none; b=hiciTcVBIw+TIdqgNU3yvGT1mfn1VOqlhiuww4snjzqIlCb6j4tjpGvN1+en9Mr5XUk+C8XafTkThN1/v7g9OxnfXHj9xAnwYJaQMH1zdii2wifiJDhTY52e03ANd5Z/BMEUt8WkTJ/Qp2Ekdm4cOLNo6f6uaQCK3IJ81GdMAIs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752374550; c=relaxed/simple;
+	bh=5bX1npMW4eRdsgUzazLqr3N4PDD7Cv9Oex66u7+0x44=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=R6D2Me/ktHMeu2ogaZM4O8blPydZUHZ2VMfBq+5WVKamtOC5nlEW42jWemJfMGtZsWs/hurgY+xiuSUCsNtwfGmkxg9xcZ5lYiGMkCiI7uQJ5RHNA5saUYvjZcZVEIgVmg9YnRm6DbARzU0JQKMw5AuxoOlKmCnJSu6s1FXHrbo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KEllP/8V; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-45390dcca6dso31425e9.1
+        for <kvm@vger.kernel.org>; Sat, 12 Jul 2025 19:42:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1752374546; x=1752979346; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=30Xr3GjHx9JM48k5qZe/WnzL0VPEvAcLel6Lrxu+plE=;
+        b=KEllP/8VJ3NnCOiy3bfiB0NGEdfycr+UqBRPaebbwpKTu0hCLgJRThRzZkZOICrw0t
+         b8Blg5h6PJ+Cu0qUntI6NciOx7PKcAbnG4WodzhNLR6pVJ7qi/JKV5KGQREf0wKJK/XQ
+         iQg63lAyHMQg9TcRHuyODqljiP+n1mq0Kxzc0Ffa4ql4i6sx37NfRWNiQTa2PLOstfPr
+         6KWMCVdboZnM9d7pm1qLd5YskMWzrIPESUMDmeZt/rPgs+tU9BSnMAOckRGchl4PLV7P
+         UvLvVpPgOik9aB/pdhJIAZb4UG8bbUzDLDsUmfpf9oNs2vvT9RS9VGWY5llbmRKCDmZs
+         +7iA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752374546; x=1752979346;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=30Xr3GjHx9JM48k5qZe/WnzL0VPEvAcLel6Lrxu+plE=;
+        b=DG5ZqFdafZPfYEdnRq2Xvbc/+DzAHTyKYifg88IoNj8EA4ju+o91Q0JpVikQ2IEkiv
+         ehaZl5wj54Xy8vOlADOhqPPaKTP57T7lFwtFKXQccfVPoinCK7YSe2H3P0FtAWjFHUdi
+         S5VYz0q5UWDAzhupq7euDrdSEwMEVQCfGh6Xd9Jwm8jdYqfvzqT5C4x/nNfdpi0LCXrD
+         4TWB6z25+qgo/DVfhV6UGXebjGF7g2a7Y5BsQ/tJY1fSFdFti4WZBeFXnLTTR2BwD2HT
+         5D7aKf0ETuYwe5ZqeWWKCHF4dUHbu14kxctXmQvsKHFQTnfLSmuAnYmjoFe0xcra8H5n
+         WyKA==
+X-Forwarded-Encrypted: i=1; AJvYcCUZZE52skwW3xRz6zIcwucB0DRjcj8EcG5LeHZotK/5a3tmgVSsR7QVigasSDzhfsLtHa4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwlLEoZZOUKcgjaZalwL+n4bFb0c7BWEO5WP34ARLJBrQvo7LZT
+	Z9HvLxpsbYQ+ldfisaZmZtjKm7WavcIi8ttBfvENshn75O5Pd5t+5PnN2H6Az5ThuFvo4ZwV2Do
+	oie2+sEFky8Fw9gxLOH6oNayOyEuwjorPFIYdhNOV
+X-Gm-Gg: ASbGncufoaTwsmkWsVbGbKSTLzzM7qM353E9F3hjjb5IEiF537I5dHS68JUJME449QE
+	rdn9MXUPYvwDqDJwAUu7tI/iNEev3MfMb3QuaMYkaaYQk4MWW5s2mWIblactjyAYnULd0Zwqoln
+	qIOY31ke6HMpE5PoWCfy6swzoeLPvsggopCLNifZ7q3HQ2aJ/20vlulSdhreouHgPHfY2i8ILu1
+	rn8kC+ELIVcVKnua0tBMq7ME8Uyq/+ldNZCprbK
+X-Google-Smtp-Source: AGHT+IEleF8ivksR26XpmTWXy3KCMqLtp7lcXHp94NqMETszAgAyRO8FnYgynO7hXWeiXu6R0Q4pDW3VdH8z0Y3FkYk=
+X-Received: by 2002:a05:600c:5023:b0:453:79c3:91d6 with SMTP id
+ 5b1f17b1804b1-45604733553mr1556035e9.1.1752374546338; Sat, 12 Jul 2025
+ 19:42:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR12MB6608:EE_|BL3PR12MB6476:EE_
-X-MS-Office365-Filtering-Correlation-Id: 70aaf0b7-f657-4f4a-d4fb-08ddc1b2af43
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|366016|1800799024|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?OWJ4UUJ0NEpScHNCWEROK0p1a3NIYjEvZFNtODlKZVJOYXpJSkN4VGJUdFYz?=
- =?utf-8?B?YnYyeFFFTTJVL3dlWVFHUTNicVRydktTN3RPdHJyeWhYUytGdDFSVGlkRFla?=
- =?utf-8?B?NXNSNnJDa092YUdMYVBuTGdaZmlvaTdnbVRSSWpYVktSNkx3OTNXb1A5b0Vx?=
- =?utf-8?B?SThESXlLKytldTVIc1UvQ056RWpjOFF1eHgwMUlXK2p6YjJ0QXFFRkplT24w?=
- =?utf-8?B?aFh3eElNTEZYcmJxK1pZZWluYkhuOTVMN0hrMkMxWlNLWjVJcitNc2t3djN6?=
- =?utf-8?B?UE1UKzkrYUtSZjBpby9ZM1VXRFVoVnNsdTlacmdlSDZvd29RMkVqUWVuMnFi?=
- =?utf-8?B?NkJoY01vSW8xRjdLMHRwUWVpSmxrSTg3RkthbmlDaTJBZ1ZrRFg2NmQwVnpi?=
- =?utf-8?B?RnFDVmtqdWF3bWhCSGNia1RES2p3SGw1K25ibTUwM1R5TWdZVisxRGNpRzRO?=
- =?utf-8?B?U09rQytVSU5Ob1R0cHNNWXVzeGozd0RFbHRlOHVmN0NvVWVVVVgzcEw4ZWEr?=
- =?utf-8?B?dEQ5bHVwaDNjS1FRVG0vRDJ5Ty9WL0t4NXByQzlMTitUTzRSYVJ4RnYxejBS?=
- =?utf-8?B?SDFyWVZFeXljRnA2Y05OZUNFcHl2TFhBU0J5cm1vWjlEV2xydVNsbVhwU0VK?=
- =?utf-8?B?QXc3c3h6YnczcklmcmR6bStKOFR0Qk5zVzUxblVTV3B2UFFVTFVMSzNlYkVT?=
- =?utf-8?B?OWQ2cGs1VTM1RytsbFVPVjh0VjBaMXpVcFc3Q294cGRSQ2FXazljcng0YXJC?=
- =?utf-8?B?eHhtLzh6bUtZcmM5am9OMXV5TS9WVFJlWWhsaWpSdUdXM3RESWJIdW93ajBo?=
- =?utf-8?B?UjhubFAzbHQrQUVaOEFReDRCc2RPc1ZSY2ZFaU02VDJTcTh3bElsYXZrOTFw?=
- =?utf-8?B?UVBMMUFNd1hHVFl0LzhSYmZJMG0vUk51cDcwTDV1OUFUSThmakhONFBYMTAy?=
- =?utf-8?B?SnZmRFZaWXd6aGJvZFNXdU9OR2xKSncxd2ZmMG8xdHcxbWFJQnVTNEJGZmxY?=
- =?utf-8?B?ckJlaEtmYXR6aHViNVdNSnE2T0ZyMWFOWUtqSWpHdHZqaXlndTY0N3RkRXNS?=
- =?utf-8?B?bmpBVjUyS3BzZ0l3Tk0rTDA1TndjZ2k0YkprQmQ5c3BBenpTTFhRY1ZEanVE?=
- =?utf-8?B?MERnWUFieFh5TDF0UTJYVUJPKzhNWHA1ajAzS3lJdE5VNkRDdVNEeXJQTHll?=
- =?utf-8?B?cW9GNWh1TFEzNFRCc25LZi9Ja3FGRXVXU201MzRZQTVyRnZUYUtLR2ZMVFhB?=
- =?utf-8?B?TkJDS3FJRlgwM3lpdnpiZGxyYWd5dThPUmRVZnM4aVhpT3Z5MmNCSE5Qc3RF?=
- =?utf-8?B?OGIvd2hKSDZZQ1RkajNBck9QenRTQXg3UnQ5Ky9RZXpIWFJoUW1jempnV1NB?=
- =?utf-8?B?Q09tejR0WFFjQzJPQzNIRFVhTzllUUNCTlBxZ01yeWI5cS82TFhvRlZOVk1I?=
- =?utf-8?B?eU0xYXdXNXhRM3IrL01KQTBPcUpYNVdZMWFEZDJjTjAvZ2dKL2tmeERTUXY1?=
- =?utf-8?B?Q0tocnd0OG9sWHVGSDR2V2FRRDVjd3pRSXNKWStDd2ZUS0ZmVGxRNWozR2VQ?=
- =?utf-8?B?MlBQZ3RRLzNQcWdSbDNEalNFd2greXhmRnFlQitkdURURnEvN1ppWmpLWnVY?=
- =?utf-8?B?Mzd0SW5OS003dERIWFFSb2lVUHBENmJTTE05U3V4TCtrS1h3Z2hsL05sRHVr?=
- =?utf-8?B?REJHTDhIZDV2NzdnRDd2ZHhubHp2T1JJdG1MVU5BdE96RVR4YlhlVnQvVjRv?=
- =?utf-8?B?YWlIbWM2RUlQQ21MUW5BUkpTNnJMeWVjNGJ6TXZKcmlsWTlLSkJDMkhGVkM2?=
- =?utf-8?B?QU9JeDduMVJmeDhtQTRJRk9pQmVpdEtyUEhEZ1lFT0xGOTlMaU5JWEtFQThF?=
- =?utf-8?B?WTRxZzFkY2RaeG41U3JLYzVUODgwaDhkQjdXVFZZRFFJdk0yY255dnZGOVR4?=
- =?utf-8?Q?xPttp8QMc/o=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6608.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?ZzgvRVhseVRUVlZLRlhuY1lZZmZNVmxmRzJqdG5GRWtZM1dmVGMyYXZyaXRs?=
- =?utf-8?B?ZkN4YVRHVzZBT0JPQmlDOW5aUkc2ajhXQS9nWStkK0ZFY3lDT0R0WDFhTFFm?=
- =?utf-8?B?aXk5U3dFNHZjajc4S3dBc3pONG13b09ObElpY0tGcXorRUc4QkxxTWxWaTRG?=
- =?utf-8?B?SlZVd1U4N3pQcG1HSURQb0dNZG5vT2lmT1hHWFpEOTRpaEVsVHJvQm8vblJp?=
- =?utf-8?B?SVpwdDJ5OTROM0k2Ny9tOGNDcW05Wm9lRnFvV3kxaUV5NGFqemorZ01ic3dG?=
- =?utf-8?B?WlAzOVFnazRPdjNOaVZWVFU4Vm9vSnVTTlk0dGtIK3Ivc29UUVB2L243Z05M?=
- =?utf-8?B?Mk9aV1ZIQStBWTNKVTRVbjRkbGZnVlN0ekhuMElTK25rVm5UQXZjM1lleVNP?=
- =?utf-8?B?UFVzUktZWHQ4SStQRGVzT0liVTlEM2xIRnp2Y3l0RlNDSFpycjVpaGlJM0lk?=
- =?utf-8?B?NlpxVnpYbjUyYlphZjg5c0NjN0E0aFFmcGtOOGxRZnljNHVhNlhjNUo4a1Fn?=
- =?utf-8?B?azdLRTV3bHdOVjJvcSt5bll5Q290K29oMVZGdWt0N1hWRDBNYTZ4TEJ3UU93?=
- =?utf-8?B?VFF6SzBsVHE1QjRhYjZTNDVvc2owYU9obDU1ZitHcG9vNlcwUFZWTVNCaG9u?=
- =?utf-8?B?ejIrZlZoZkhBeG10UXBMTWswam1oRXVQdWVMdE0vSmoveUdkdDF0REZ1VFhm?=
- =?utf-8?B?aTdZdlVUSXZxOC9jM0JoaGNLd1Y2UHFtc2NzYlJVZVA1dWVra0s4K3lwNlJ4?=
- =?utf-8?B?a254UXVBbnlGWC9pMFdqenNMeHV2ZHdGSXRzcjZDbXA3YUc1OURwN0NpU3ov?=
- =?utf-8?B?Myt6MUZUaDM0SWZUOCtJbzhoM3ozNkxRdUVwVUtuTzViQkozVEk4azlmLytQ?=
- =?utf-8?B?ZHh4TEIzUWo3Rm1nYW9oRzdoWTM1WERsZWJLekp5TWFWQzFhdTNLaDlNTGsz?=
- =?utf-8?B?SU1rRTZTNitzTGM3dE80aTNCN0lRemFpSlRIQWh1WVJhWjVXWmFrcm94QnpX?=
- =?utf-8?B?SWdiWSthcWpnMnFCaEEwZXA1dlZMbWtCeEZiVDBIeXovRkFiR2VxTHVBTFFR?=
- =?utf-8?B?U1JGcUl2NENPeVBFejhYNGJKUzU3dmxPOXl1ZDlPaXhUaEZ6T2JUQmlHYU5M?=
- =?utf-8?B?a0hjTnVRaEJDdHFBaFVBUDBkbEEyME9kejd5bmU3UDBBemtuNkNJeFFoWVRn?=
- =?utf-8?B?V1ZXYnJCd25nemM2M1lKZnRxVnRycUk4Y3A2MW9PUXpwK3lXTjVjc1VXTi90?=
- =?utf-8?B?QVRiUTk1T2l1K1hJcS9QUk43Yk1lSnBSZ25vVVVybnZiaFV0VUZhWWgyMFNX?=
- =?utf-8?B?elhlVHA5ZXBwalBRUWExSDI0YUcwUVEvZVdxRnhXTmpKNEl0d0ZpRGEyb2I0?=
- =?utf-8?B?b0tsaGtsaU5SNXREazdYTEtaYUQvN1pRdlZuUUhoWnoxRmhFL082UHJqZitn?=
- =?utf-8?B?ZFhWZ3htd1g4bFU0dysycWRHRjE0MjlBQUdXM0ViZFdHcXh5TEpHdWV3NTFq?=
- =?utf-8?B?ZlQwK01wZjVnMXg2Y3ZJVDZVem05YmpKU3RhNG8zREVZTkY2NG81SHNweW91?=
- =?utf-8?B?YTZDQm0wUDAzUGtCUlFmN2JLYXBSR1N6T0dJUFp2TnBHSCtCTkovWVVpOXZm?=
- =?utf-8?B?YThaZTdORnBtQWZFdUpscy9zUVYxOSswbmw2aWdqdm1paktTakRZaTlWVVJ5?=
- =?utf-8?B?eDVyUkNSM251K1BDZGQ4ZGFibEtBQlRzMGdVUWhhYS81OW5YMUwrY0xRSDM1?=
- =?utf-8?B?QTFESnBOeVFBaFdxQ2QyTnRkUUdDMXNvYkpDMldiWlZXWTloTE1hRkdZaHAw?=
- =?utf-8?B?UEFMd2I1YzRNWEhNd2g1cmhsZ0daeHFKK0tzRGkzVFdGMHB4TENoRjgwU2Vt?=
- =?utf-8?B?UlBIdUF2Y1hHODF4dnlZSjBlYldNQnVDZU52U3pTV2hmeUdHS2V0QjlzUVNU?=
- =?utf-8?B?U1FyTWVQR2h1ekhGSlNnc0VBSTk5a0hJaHQwOFhhQ0NOeldERFc4eStaRFh6?=
- =?utf-8?B?Um1YM1NDOHBNSituOEVVVWNuU0tybGN1R2ZGOFRSa3F4MVVaSDBqcTN2Mmpa?=
- =?utf-8?B?Z1NIM3F3R3dTN2Y0S1RWV0k3QlovM0hwYjBjQk8xSXJUY0Y1SlIxYitkVWpC?=
- =?utf-8?Q?D7DpWi6EIHhUgSeKvOdNqO8IX?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 70aaf0b7-f657-4f4a-d4fb-08ddc1b2af43
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6608.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jul 2025 02:12:14.9339
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: GtBVkrMvXsBRkx9r3itUyqBQBpnLl5OVXSw7DJaA0rJo0DTKfKDD4S4FCJNAQUxRDEXmso1O5DfQ/0zgY4Z04g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR12MB6476
+References: <20250604050902.3944054-1-jiaqiyan@google.com> <20250604050902.3944054-4-jiaqiyan@google.com>
+ <aHFpIpIfqVCQZVgG@linux.dev> <CACw3F51xRWr5LXz4-JhK+mjizY7D7Oa+GrJ-OZHktfPzFGKeiw@mail.gmail.com>
+ <aHK7w4TTEm7a1mco@linux.dev>
+In-Reply-To: <aHK7w4TTEm7a1mco@linux.dev>
+From: Jiaqi Yan <jiaqiyan@google.com>
+Date: Sat, 12 Jul 2025 19:42:15 -0700
+X-Gm-Features: Ac12FXxcNa4e9HwM2rPqBWqAlsG9UDRsiS6fK2kefjn5JOWhY0L8gHWyQHAnvJ0
+Message-ID: <CACw3F50mTCB0h4GbdcERz4j=CcnwVCfA0Mc9OL-u0nJCJPEVnA@mail.gmail.com>
+Subject: Re: [PATCH v2 3/6] KVM: arm64: Allow userspace to inject external
+ instruction aborts
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: maz@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
+	pbonzini@redhat.com, corbet@lwn.net, shuah@kernel.org, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, duenwen@google.com, rananta@google.com, 
+	jthoughton@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Sat, Jul 12, 2025 at 12:47=E2=80=AFPM Oliver Upton <oliver.upton@linux.d=
+ev> wrote:
+>
+> On Fri, Jul 11, 2025 at 04:58:57PM -0700, Jiaqi Yan wrote:
+> > On Fri, Jul 11, 2025 at 12:42=E2=80=AFPM Oliver Upton <oliver.upton@lin=
+ux.dev> wrote:
+> > >
+> > > On Wed, Jun 04, 2025 at 05:08:58AM +0000, Jiaqi Yan wrote:
+> > > > From: Raghavendra Rao Ananta <rananta@google.com>
+> > > >
+> > > > When KVM returns to userspace for KVM_EXIT_ARM_SEA, the userspace i=
+s
+> > > > encouraged to inject the abort into the guest via KVM_SET_VCPU_EVEN=
+TS.
+> > > >
+> > > > KVM_SET_VCPU_EVENTS currently only allows injecting external data a=
+borts.
+> > > > However, the synchronous external abort that caused KVM_EXIT_ARM_SE=
+A
+> > > > is possible to be an instruction abort. Userspace is already able t=
+o
+> > > > tell if an abort is due to data or instruction via kvm_run.arm_sea.=
+esr,
+> > > > by checking its Exception Class value.
+> > > >
+> > > > Extend the KVM_SET_VCPU_EVENTS ioctl to allow injecting instruction
+> > > > abort into the guest.
+> > > >
+> > > > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> > > > Signed-off-by: Jiaqi Yan <jiaqiyan@google.com>
+> > >
+> > > Hmm. Since we expose an ESR value to userspace I get the feeling that=
+ we
+> > > should allow the user to supply an ISS for the external abort, simila=
+r
+> > > to what we already do for SErrors.
+> >
+> > Oh, I will create something in v3, by extending kvm_vcpu_events to
+> > something like:
+> >
+> > struct {
+> >   __u8 serror_pending;
+> >   __u8 serror_has_esr;
+> >   __u8 ext_dabt_pending;
+> >   __u8 ext_iabt_pending;
+> >   __u8 ext_abt_has_esr;  // <=3D new
+> >   /* Align it to 8 bytes */
+> >   __u8 pad[3];
+> >   union {
+> >     __u64 serror_esr;
+> >     __u64 ext_abt_esr;  // <=3D new
+>
+> This doesn't work. The ABI allows userspace to pend both an SError and
+> SEA, so we can't use the same storage for the ESR.
 
+You are right, the implementation (__kvm_arm_vcpu_set_events) indeed
+continues to inject SError after injecting SEA.
 
-On 7/13/2025 12:16 AM, Borislav Petkov wrote:
-> On Sat, Jul 12, 2025 at 10:38:08PM +0530, Neeraj Upadhyay wrote:
->> It was more to imply like secure APIC-page rather than Secure-APIC page. I will change
->> it to secure_avic_page or savic_apic_page, if one of these looks cleaner. Please suggest.
-> 
-> If the page belongs to the guest's secure AVIC machinery then it should be
-> called secure_avic_page to avoid confusion. Or at least have a comment above
-> it explaining what it is.
-> 
+Then we may have to extend the size of exception and meanwhile reduce
+the size of reserved, because I believe we want to place ext_abt_esr
+into kvm_vcpu_events.exception. Something like:
+struct kvm_vcpu_events {
+  struct {
+    __u8 serror_pending;
+    __u8 serror_has_esr;
+    __u8 ext_dabt_pending;
+    __u8 ext_iabt_pending;
+    __u8 ext_abt_has_esr;
+    __u8 pad[3];
+    __u64 serror_esr;
+    __u64 ext_abt_esr;  // <=3D +64 bits
+  } exception;
+  __u32 reserved[10];  // <=3D -64 bits
+};
 
-Ok. I will change this to secure_avic_page in next version. Thanks for taking a look at
-it during weekend.
+The offset to kvm_vcpu_events .reserved changes; I don' think
+userspace will read/write reserved (so its offset is probably not very
+important?), but theoretically this is an ABI break.
 
+Another safer but not very readable way is to add at the end:
+struct kvm_vcpu_events {
+  struct {
+    __u8 serror_pending;
+    __u8 serror_has_esr;
+    __u8 ext_dabt_pending;
+    __u8 ext_iabt_pending;
+    __u8 ext_abt_has_esr;
+    __u8 pad[3];
+    __u64 serror_esr;
+  } exception;
+  __u32 reserved[10];  // <=3D -64 bits
+  __u64 ext_abt_esr;  // <=3D +64 bits
+};
 
-- Neeraj
+Any better suggestions?
 
+>
+> >   };
+> > } exception;
+> >
+> > One question about the naming since we cannot change it once
+> > committed. Taking the existing SError injection as example, although
+> > the name in kvm_vcpu_events is serror_has_esr, it is essentially just
+> > the ISS fields of the ESR (which is also written in virt/kvm/api.rst).
+> > Why named after "esr" instead of "iss"? The only reason I can think of
+> > is, KVM wants to leave the room to accept more fields than ISS from
+> > userspace. Does this reason apply to external aborts? Asking in case
+> > if "iss" is a better name in kvm_vcpu_events, maybe for external
+> > aborts, we should use ext_abt_has_iss?
+>
+> We will probably need to include more ESR fields in the future, like
+> ESR_ELx.ISS2. So let's just keep the existing naming if that's OK with
+> you.
+
+Ack to "esr", thanks Oliver!
+
+>
+> Thanks,
+> Oliver
 
