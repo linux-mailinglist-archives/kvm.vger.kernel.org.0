@@ -1,167 +1,148 @@
-Return-Path: <kvm+bounces-52352-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52353-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF504B04814
-	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 21:49:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3BA3B04948
+	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 23:22:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D476C1A658D1
-	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 19:50:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8119E3B2101
+	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 21:21:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E459923958A;
-	Mon, 14 Jul 2025 19:49:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CA7F26C391;
+	Mon, 14 Jul 2025 21:22:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mrV7aq1d"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pIG4Hiep"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBDB21CD1F
-	for <kvm@vger.kernel.org>; Mon, 14 Jul 2025 19:49:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47D752397A4;
+	Mon, 14 Jul 2025 21:22:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752522588; cv=none; b=gqED6I8RgCjxDwUn0Zt1vBy5xKdJDSFSaJR3WvSrXhqrcvN3zYw4LkSRNl7xGUct1jKzycvnCdiEhzyrvDUVRqdydZwYpWkr293WIwIL9EkAS1pdPr3oqe2muqcHBtPRd82cKvne0xWET0e6Ieo47sW64EtcCxtX6AiPK7s4KRU=
+	t=1752528121; cv=none; b=cO4xWWHzm9sPOQaOEjC2OyiznEEcA2TMR1b0VhfhHPUURuk/ZPnSiVOu5pi0s0Ww1JL7oEUD32EyCjIYfyc6LFauCLTeFKbvvhbmPTOqMdDUTyoMIVQgx9JYROPdtUd8gYuq/XEPajUnFzQo5icH4MVyjyEK43AkBhPuX03/tdA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752522588; c=relaxed/simple;
-	bh=yWOqjM+tnJXB+iS8z8RSLG6VbltiE5lZkB4fv77IZdg=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=SZlCS/rYQAkJpX4+nUeF4yBtwaETKjgLuS7Jbr0EHaozvy4Bxfy/XYnwOrEz/jLyBB3M9PAG1dceHqUBfwoG3N7/DOLnSETbJBZbD6c1DDpBKeg0OH00u/CM7ATPFz00zygn8mf5q6aaAy1Wcztk9z6em2Q0NkyCel8doa7rLuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mrV7aq1d; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b115fb801bcso4994780a12.3
-        for <kvm@vger.kernel.org>; Mon, 14 Jul 2025 12:49:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752522586; x=1753127386; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ICcg0kScB2Zwj8UqwZwwX6H3Hb3sbc2THMrldLCPfAE=;
-        b=mrV7aq1dFqDxTapv8jzGX8ekE7CbCBPrU54VhTHi7AiBfBjispbdVQbQ5/J2l7xTLs
-         ETphmykk5WEbzRoYKXK57QDPxsm2TcXZ+WnShdd8GA0jdmoxnQXMyjMTkRd3+B+5GRPY
-         eVSLY8IBW00BWNfacBDeW5cNIXm9Un+hxXCcC4ZjSM6E/MzQGAK5CZGpE244jZtK7YYc
-         UIlpmjC2rHto2Ksxv02HJ7gjjlpFFLyRl3KHHpvhhmgO1yNPn92tc9xYX6IHnTqe6AWX
-         A2spY2bSkjZvtNUlQhAx+5GXl+qWEjFk+hl1cxZdTQ3deZVAyPZdKPZP50AXph+yGGbC
-         RzLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752522586; x=1753127386;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ICcg0kScB2Zwj8UqwZwwX6H3Hb3sbc2THMrldLCPfAE=;
-        b=rsoiTKG2/hARX8faZaKaRk+1WEyOHNoMejvedtQxh6uHDpkVyj01u9q2o4YZmKdJE+
-         j/75xy8+yShYbnGgBJJtKPpkHuaX7Lj4kLl7POqvy7pRjbq9pnsQnzLsSfqJsD1djYVh
-         gOnAutSSqWYX1+i62HOAK8LspxqTlKPOBdnfVRpr2mYMjvw/8zUPlpfxVcopp93mw58c
-         IM2s1GVFqGFEgJ01c3iGtL9MuC03/dgS9ZFZc4ukW6/ekInveJKeBfhpURKm8F7NVK7/
-         1byoARyRuf9NkF9CCLr8X79ak1fsHpgT3z2MH+YUjrkTx4U7csarRrp4pQtA+J2IWN2P
-         wzFQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUAoCiIebcw5BH4YrqET7iD3wvRpuBNNxBj0L94HDGhvxabVgSSxhh72wpRcyiLqvFlyqg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxMgys2V/4ZhTQlJFEyeA0LRWxSfKiTcM/4sx/emrJKtA7VDYLD
-	0T56bgUOTu04eVg6isXaRfChh42ZWFbJhF/YBWWSLMyCru8vIVoG7fmafpvV+lYdngZ9Nem1cpb
-	XE73l2b4rpx1KEZsa6anstdWZTg==
-X-Google-Smtp-Source: AGHT+IHYRx34pwTQ1/zxuK41iVUIxojsyjeG9fu7hIcirB2HtzSq/CDTqyAKgWSVpxntbG5X9IzCGePZMY1LK4n9RA==
-X-Received: from pfblm11.prod.google.com ([2002:a05:6a00:3c8b:b0:748:f270:c438])
- (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a20:7f8e:b0:1f5:79c4:5da6 with SMTP id adf61e73a8af0-2311dc59daemr19721553637.5.1752522585949;
- Mon, 14 Jul 2025 12:49:45 -0700 (PDT)
-Date: Mon, 14 Jul 2025 12:49:44 -0700
-In-Reply-To: <4c70424ab8bc076142e5f6e8423f207539602ff1.camel@intel.com>
+	s=arc-20240116; t=1752528121; c=relaxed/simple;
+	bh=jkjnzC6sfDjlzR/6PyyPq8gX7cfAVbCf+7AS5IFUxHc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Vl1DPRlr7S4zvbHTzKkoI/LORptxROy8zUCca7MSLNMLGy7sMY23h7P8s/QGiCKTb8PUuY93CJeEDpw6gJA0hsohMeAJqm4qXxnIv5EmCsjU36e7Fjo+Ow7KjkCJ7vvpBdG83QbQHBlSrOv4qvd7A8C+Srb54HtNkuW1wbfvSjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pIG4Hiep; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90D86C4CEF0;
+	Mon, 14 Jul 2025 21:21:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752528120;
+	bh=jkjnzC6sfDjlzR/6PyyPq8gX7cfAVbCf+7AS5IFUxHc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=pIG4Hieprrm1uA4UcmMad5xVbCbju19dZ03/KYWx+XQvV8NEgoxno/feg6GtPL7QT
+	 Wn0n/9r1FzD47RscE8VDY/GQ+e51jq2FOpdPb1AYh/wieR6ZpyKhZ1QvP/gk4G8baS
+	 UzSaFh1F/fP22w7LVhKAVRvkpdkzXj6Gx2CZCkImzjpR0sHa3HP34jxyg2UbVj8tiZ
+	 YF5jx0f/QDXoL+SPCBjOP872b9JCgxNopkXbqO6XZmV2igdU3sHGB3FlC1TpIw+595
+	 0Yt26o+RiEIUf0r+zbWjgbXWjkpNNK9+28GudvoMs+0dN3sjMVxq3ckYyY0VV8uBDm
+	 TBd5esulbTznQ==
+From: Mario Limonciello <superm1@kernel.org>
+To: David Airlie <airlied@gmail.com>,
+	Bjorn Helgaas <bhelgaas@google.com>
+Cc: Alex Deucher <alexander.deucher@amd.com>,
+	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+	Simona Vetter <simona@ffwll.ch>,
+	Lukas Wunner <lukas@wunner.de>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Lu Baolu <baolu.lu@linux.intel.com>,
+	Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Jaroslav Kysela <perex@perex.cz>,
+	Takashi Iwai <tiwai@suse.com>,
+	dri-devel@lists.freedesktop.org (open list:DRM DRIVERS),
+	linux-kernel@vger.kernel.org (open list),
+	iommu@lists.linux.dev (open list:INTEL IOMMU (VT-d)),
+	linux-pci@vger.kernel.org (open list:PCI SUBSYSTEM),
+	kvm@vger.kernel.org (open list:VFIO DRIVER),
+	linux-sound@vger.kernel.org (open list:SOUND),
+	Daniel Dadap <ddadap@nvidia.com>,
+	Mario Limonciello <mario.limonciello@amd.com>
+Subject: [PATCH v8 0/9] Adjust fbcon console device detection
+Date: Mon, 14 Jul 2025 16:21:37 -0500
+Message-ID: <20250714212147.2248039-1-superm1@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <diqzms9pjaki.fsf@ackerleytng-ctop.c.googlers.com>
- <fe6de7e7d72d0eed6c7a8df4ebff5f79259bd008.camel@intel.com>
- <aGNrlWw1K6nkWdmg@yzhao56-desk.sh.intel.com> <cd806e9a190c6915cde16a6d411c32df133a265b.camel@intel.com>
- <diqzy0t74m61.fsf@ackerleytng-ctop.c.googlers.com> <04d3e455d07042a0ab8e244e6462d9011c914581.camel@intel.com>
- <diqz7c0q48g7.fsf@ackerleytng-ctop.c.googlers.com> <a9affa03c7cdc8109d0ed6b5ca30ec69269e2f34.camel@intel.com>
- <diqz1pqq5qio.fsf@ackerleytng-ctop.c.googlers.com> <53ea5239f8ef9d8df9af593647243c10435fd219.camel@intel.com>
- <aHCdRF10S0fU/EY2@yzhao56-desk> <4c70424ab8bc076142e5f6e8423f207539602ff1.camel@intel.com>
-Message-ID: <diqzikju4ko7.fsf@ackerleytng-ctop.c.googlers.com>
-Subject: Re: [RFC PATCH 08/21] KVM: TDX: Increase/decrease folio ref for huge pages
-From: Ackerley Tng <ackerleytng@google.com>
-To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>, "Zhao, Yan Y" <yan.y.zhao@intel.com>
-Cc: "quic_eberman@quicinc.com" <quic_eberman@quicinc.com>, "Li, Xiaoyao" <xiaoyao.li@intel.com>, 
-	"Du, Fan" <fan.du@intel.com>, "Hansen, Dave" <dave.hansen@intel.com>, 
-	"david@redhat.com" <david@redhat.com>, "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>, 
-	"vbabka@suse.cz" <vbabka@suse.cz>, "Li, Zhiquan1" <zhiquan1.li@intel.com>, 
-	"Shutemov, Kirill" <kirill.shutemov@intel.com>, "michael.roth@amd.com" <michael.roth@amd.com>, 
-	"seanjc@google.com" <seanjc@google.com>, "Weiny, Ira" <ira.weiny@intel.com>, 
-	"Peng, Chao P" <chao.p.peng@intel.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
-	"Yamahata, Isaku" <isaku.yamahata@intel.com>, "tabba@google.com" <tabba@google.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, "Annapurve, Vishal" <vannapurve@google.com>, 
-	"jroedel@suse.de" <jroedel@suse.de>, "Miao, Jun" <jun.miao@intel.com>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pgonda@google.com" <pgonda@google.com>, 
-	"x86@kernel.org" <x86@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-"Edgecombe, Rick P" <rick.p.edgecombe@intel.com> writes:
+From: Mario Limonciello <mario.limonciello@amd.com>
 
-> On Fri, 2025-07-11 at 13:12 +0800, Yan Zhao wrote:
->> > Yan, is that your recollection? I guess the other points were that although
->> > TDX
->> I'm ok if KVM_BUG_ON() is considered loud enough to warn about the rare
->> potential corruption, thereby making TDX less special.
->> 
->> > doesn't need it today, for long term, userspace ABI around invalidations
->> > should
->> > support failure. But the actual gmem/kvm interface for this can be figured
->> > out
->> Could we elaborate what're included in userspace ABI around invalidations?
->
-> Let's see what Ackerley says.
->
+This series started out as changes to VGA arbiter to try to handle a case
+of a system with 2 GPUs that are not VGA devices.  This was discussed
+but decided not to overload the VGA arbiter for non VGA devices.
 
-There's no specific invalidation command for ioctl but I assume you're
-referring to the conversion ioctl?
+Instead move the x86 specific detection of framebuffer resources into x86
+specific code that the fbcon can use to properly identify the primary
+device. This code is still called from the VGA arbiter, and the logic does
+not change there. To avoid regression default to VGA arbiter and only fall
+back to looking up with x86 specific detection method.
 
-There is a conversion ioctl planned for guest_memfd and the conversion
-ioctl can return an error. The process of conversion involves
-invalidating the memory that is to be converted, and for now,
-guest_memfd assumes unmapping is successful (like Yan says), but that
-can be changed.
+In order for userspace to also be able to discover which device was the
+primary video display device create a new sysfs file 'boot_display'.
 
->> 
->> I'm a bit confused as I think the userspace ABI today supports failure
->> already.
->> 
->> Currently, the unmap API between gmem and KVM does not support failure.
->
-> Great. I'm just trying to summarize the internal conversations. I think the
-> point was for a future looking user ABI, supporting failure is important. But we
-> don't need the KVM/gmem interface figured out yet.
->
+A matching userspace implementation for this file is available here:
+Link: https://gitlab.freedesktop.org/xorg/lib/libpciaccess/-/merge_requests/39
+Link: https://gitlab.freedesktop.org/xorg/xserver/-/merge_requests/2038
 
-I'm onboard here. So "do nothing" means if there is a TDX unmap failure,
+Dave Airlie has been pinged for a comment on this approach.
+Dave had suggested in the past [1]:
 
-+ KVM_BUG_ON() and hence the TD in question stops running,
-    + No more conversions will be possible for this TD since the TD
-      stops running.
-    + Other TDs can continue running?
-+ No refcounts will be taken for the folio/page where the memory failure
-  happened.
-+ No other indication (including HWpoison) anywhere in folio/page to
-  indicate this happened.
-+ To round this topic up, do we do anything else as part of "do nothing"
-  that I missed? Is there any record in the TDX module (TDX module
-  itself, not within the kernel)?
+"
+ But yes if that doesn't work, then maybe we need to make the boot_vga
+ flag mean boot_display_gpu, and fix it in the kernel
+"
 
-I'll probably be okay with an answer like "won't know what will happen",
-but just checking - what might happen if this page that had an unmap
-failure gets reused? Suppose the KVM_BUG_ON() is noted but somehow we
-couldn't get to the machine in time and the machine continues to serve,
-and the memory is used by 
+This was one of the approached tried in earlier revisions and it was
+rejected in favor of creating a new sysfs file (which is what this
+version does).
 
-1. Some other non-VM user, something else entirely, say a database?
-2. Some new non-TDX VM?
-3. Some new TD?
+It is suggested that this series merge entirely through the PCI tree.
 
+Link: https://gitlab.freedesktop.org/xorg/lib/libpciaccess/-/merge_requests/37#note_2938602 [1]
 
->> 
->> In the future, we hope gmem can check if KVM allows a page to be unmapped
->> before
->> triggering the actual unmap.
+v8 fixes an LKP robot reported issue
+
+Mario Limonciello (9):
+  PCI: Add helper for checking if a PCI device is a display controller
+  vfio/pci: Use pci_is_display()
+  vga_switcheroo: Use pci_is_display()
+  iommu/vt-d: Use pci_is_display()
+  ALSA: hda: Use pci_is_display()
+  Fix access to video_is_primary_device() when compiled without
+    CONFIG_VIDEO
+  PCI/VGA: Replace vga_is_firmware_default() with a screen info check
+  fbcon: Use screen info to find primary device
+  PCI: Add a new 'boot_display' attribute
+
+ Documentation/ABI/testing/sysfs-bus-pci |  8 +++++
+ arch/parisc/include/asm/video.h         |  2 +-
+ arch/sparc/include/asm/video.h          |  2 ++
+ arch/x86/include/asm/video.h            |  2 ++
+ arch/x86/video/video-common.c           | 17 ++++++++-
+ drivers/gpu/vga/vga_switcheroo.c        |  2 +-
+ drivers/iommu/intel/iommu.c             |  2 +-
+ drivers/pci/pci-sysfs.c                 | 46 +++++++++++++++++++++++++
+ drivers/pci/vgaarb.c                    | 31 +++--------------
+ drivers/vfio/pci/vfio_pci_igd.c         |  3 +-
+ include/linux/pci.h                     | 15 ++++++++
+ sound/hda/hdac_i915.c                   |  2 +-
+ sound/pci/hda/hda_intel.c               |  4 +--
+ 13 files changed, 101 insertions(+), 35 deletions(-)
+
+-- 
+2.43.0
+
 
