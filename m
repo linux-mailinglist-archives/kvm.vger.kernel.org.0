@@ -1,349 +1,193 @@
-Return-Path: <kvm+bounces-52333-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52334-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B26DEB04185
-	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 16:25:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D48BCB041A5
+	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 16:30:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B35B4A5EE9
-	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 14:23:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0A8EB18888D5
+	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 14:29:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 390A52609D4;
-	Mon, 14 Jul 2025 14:21:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFB402571AA;
+	Mon, 14 Jul 2025 14:29:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="RMd1smpA"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp232.sjtu.edu.cn (smtp232.sjtu.edu.cn [202.120.2.232])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2056.outbound.protection.outlook.com [40.107.93.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27B6225B67D;
-	Mon, 14 Jul 2025 14:21:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.120.2.232
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752502911; cv=none; b=iZ64zKxppXrYSh6JARmxD2o7SZq3rNqJUhvxhYbbdLShdB7Mv2YeZtintDOp2HSH9rJLuR2uAGQiT65qwNH+GiCXN7+d9cqaq6QqQg8uG5a1xrnotl+KhA5qChZvOvYwCngTjRyfEZ9zABQ9mAinT6R0ByzS3ADFbz317RMcem8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752502911; c=relaxed/simple;
-	bh=MJhPyBPJffxuH0kZd/ed3DDAXWNlbw953m5XyamjTA0=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=i+21o42zuXDvZTg6Dc1pu1PnMcaFSGL/vHvvtetC616CMmItJikNH3mRBYJiST0/HHiWfu0p8wumdeFQ/IkKH6Oc+lMhkPftynJZjUtxp+i8S7TAZTF3iJ512qaJsudYKfebIVRYqv8VmvzF6ep8Ya+pC5V7VOU4gvfnqA0dcTs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sjtu.edu.cn; spf=pass smtp.mailfrom=sjtu.edu.cn; arc=none smtp.client-ip=202.120.2.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sjtu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sjtu.edu.cn
-Received: from proxy188.sjtu.edu.cn (smtp188.sjtu.edu.cn [202.120.2.188])
-	by smtp232.sjtu.edu.cn (Postfix) with ESMTPS id F0A87102CD484;
-	Mon, 14 Jul 2025 22:12:45 +0800 (CST)
-Received: from smtpclient.apple (unknown [202.120.40.82])
-	by proxy188.sjtu.edu.cn (Postfix) with ESMTPSA id 234FA37C929;
-	Mon, 14 Jul 2025 22:12:45 +0800 (CST)
-Content-Type: text/plain;
-	charset=utf-8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B3CF22129F
+	for <kvm@vger.kernel.org>; Mon, 14 Jul 2025 14:29:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.56
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752503350; cv=fail; b=upRZgSQAXv3l0ynrJfH3rA0gWMkOkLEmNaDT66He6Xlc82MMZpQO9+XWqNnTzidhdHaN5hlKXqtt03gWDiFXoBosX43xns5hRgbdAAtR7VQdVXqq0/xNeU6V5voI7WkeSp+0KjhdGMUdWdA43qp10mbxIlZYMOv5PfhOxtyLUxM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752503350; c=relaxed/simple;
+	bh=3hz+PaKCnJriZMkFg2nNBiYrTYhXiIwjz3qrFFSqH8I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=SDSOS4aWxmepvbaYClWGWUnrQlngSFrA6uvFt5xlFZd+G6rin+fp1m38NMcY+G9U5ryaW0wGp5jVNBYuFSnIZmu9EXityufGPqQo75+mez+bIYaYG4+NlGX7UtXAnG3r9lgmlaDpP+c/XwvrvxON70ToHBy6CjiJFe5UIPo9ntQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=RMd1smpA; arc=fail smtp.client-ip=40.107.93.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=VcSfpXxeuDhLpz4Ce8fReGLZQQU1wAWyDJ3gC7l2wNysUmoqRTi0ahZZhqLp1dxTQiGGRcTE5f8tllzzodsu2Gf+6XO1gjwcVRmnjeu8xmDM5oD4CmUgknm/ygu0uIh7r5GEwDih0FG7kgz2Hx66+Xw4UTplPwSTkq21/ebWJMzkyFNbTtivPpIFYX1h7HryZ/YM0k7/5qWJwI1kdGUNd+utp+HVwuKzpNxJ20wbezvEnsFjzxupTFoTMJkJK/kW9e1s1U7V0zxZ8SWZPY6Ut+3kK5yG+eNJ1vpQwkLFbO/DVzh236IjII5EqKXiF29EIzMSa6BUcVPf3F3h8cAbDQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=VrAddBCVgyb+rSDDanIrnt3Fn7L+pNCErNYOS+o5ke0=;
+ b=TnbPAJkQjnT8KX0wVjAYzAONIVCdvmhMe6F9t1JbrV6XPWIxbKfu4y4JdZVP5BkZvp/+/QRewm49V3vqB7E5AfS7qjif4CK/pQd6XIKSaei8KN5Pkl1Zc1/CxP63KYomRbBVuPx9E6VKluLdbQmXccbR2/E4ZTfAzA/1n9H7HFJEEa56Dl9g0jrIQp4/u+M6VTfgMqf9UgKneiot//Lc58RwbGu3ppdHIa9Kd6qyKv6E6NObgEyz3wBlzclLdKZ/MEQNyrHnTr3mvQHYBA2sf3sqFRFYMiNaXFUczn5P/k9ojfpKIahHmOYxaaJesAsYn0a+3UOCuEZKkYX1asaRAQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=VrAddBCVgyb+rSDDanIrnt3Fn7L+pNCErNYOS+o5ke0=;
+ b=RMd1smpA4KWXzJf+gDo4FZSsMM4AQzJ6rpLGtu9LuUHQ2NWLFiv/lZeTHI8bGwbIIIRxs5snBl6YSmdP+yWb+5fHczNjtNzwk1b7ZBVU1ho53xHz8uEdLs0+fG2y2M1lljLGTkuPkCgZGQ0QNl1Pud3M3HiuVqvEJcsVA+d1Vu5JQkkRrw8qIxqoy3/h0Fl7RIAm+vUtBx0FMQ3q18Kn5zxfBOjH45XZGHT21mVMCICp61Y4/MJkNCxNbRCSQ1wCTunjA5TQCtURCad7iTCG63TsN0YBtuAC/y3uskjyp+4tTYHFnJEiWs6SrXSpvtL+6wJFIuogsZRyaTIOH6bIow==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
+ by PH7PR12MB7915.namprd12.prod.outlook.com (2603:10b6:510:27c::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8901.35; Mon, 14 Jul
+ 2025 14:29:05 +0000
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732%7]) with mapi id 15.20.8901.033; Mon, 14 Jul 2025
+ 14:29:05 +0000
+Date: Mon, 14 Jul 2025 11:29:04 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Yi Liu <yi.l.liu@intel.com>
+Cc: Ankit Agrawal <ankita@nvidia.com>,
+	Brett Creeley <brett.creeley@amd.com>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
+	Longfang Liu <liulongfang@huawei.com>, qat-linux@intel.com,
+	virtualization@lists.linux.dev, Xin Zeng <xin.zeng@intel.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Matthew Rosato <mjrosato@linux.ibm.com>,
+	Nicolin Chen <nicolinc@nvidia.com>, patches@lists.linux.dev,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Terrence Xu <terrence.xu@intel.com>,
+	Yanting Jiang <yanting.jiang@intel.com>,
+	Zhenzhong Duan <zhenzhong.duan@intel.com>
+Subject: Re: [PATCH v2] vfio/pci: Do vf_token checks for
+ VFIO_DEVICE_BIND_IOMMUFD
+Message-ID: <20250714142904.GA2059966@nvidia.com>
+References: <0-v2-470f044801ef+a887e-vfio_token_jgg@nvidia.com>
+ <a8484641-34d9-40bf-af8a-e472afdab0cc@intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a8484641-34d9-40bf-af8a-e472afdab0cc@intel.com>
+X-ClientProxiedBy: BLAP220CA0029.NAMP220.PROD.OUTLOOK.COM
+ (2603:10b6:208:32c::34) To CH3PR12MB8659.namprd12.prod.outlook.com
+ (2603:10b6:610:17c::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.600.51.1.1\))
-Subject: Re: [BUG] NULL pointer dereference in sev_writeback_caches during KVM
- SEV migration kselftest on AMD platform
-From: Zheyun Shen <szy0127@sjtu.edu.cn>
-In-Reply-To: <935a82e3-f7ad-47d7-aaaf-f3d2b62ed768@amd.com>
-Date: Mon, 14 Jul 2025 22:12:32 +0800
-Cc: seanjc@google.com,
- linux-next@vger.kernel.org,
- kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <F7AF073C-D630-45A3-8746-DE66B15FC3E1@sjtu.edu.cn>
-References: <935a82e3-f7ad-47d7-aaaf-f3d2b62ed768@amd.com>
-To: "Aithal, Srikanth" <sraithal@amd.com>
-X-Mailer: Apple Mail (2.3826.600.51.1.1)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|PH7PR12MB7915:EE_
+X-MS-Office365-Filtering-Correlation-Id: ab947831-7953-45f4-c172-08ddc2e2c91d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?9Bfa83P+A55NchijAWeK8FcfCDW2z6LvqAzz+46BZ66pWClVJJuBYlpwvVgN?=
+ =?us-ascii?Q?NIqUef7wI7k6LVo8yfA/0bxf8Z+vbxL+qp7P/SwZHF462g7bgRm8urX/X2ve?=
+ =?us-ascii?Q?gIrqPoJWRiMkEnz8rsSGIY53409x1lKE576AqSI8/dCUD27Y18d1BgvjRJXU?=
+ =?us-ascii?Q?38PGbmw1W5E/F63EUUHjZr4VucU00E4X2/jH3PP4ZxaCsS4uwpsfV4u2etcR?=
+ =?us-ascii?Q?INq+LGqXBjU9Zji7FmKnnPC+3PxNTT6F02aU7+aHNBeeawtlb24e0v8kA8Pv?=
+ =?us-ascii?Q?dudtUEWGpxZuXXDltkIGC+mDqUUErHJnJYGBkdtgjejnWwCE+cNJ1toJykxb?=
+ =?us-ascii?Q?8HPhWgtiV/fiZIsjZujdyvIqswg4Pq8HOhNcM7JL4RNgMYnU6ex6uUzD5WYA?=
+ =?us-ascii?Q?YSyLstZmDtdQ5sWRMfUtjXfeoq9IVdVSdW6l7otZtIL5LHX1zKux88VRK63D?=
+ =?us-ascii?Q?0P5Kgj7KRCUW/MoIQYGkQrWeXvxdqbQjk0gtoLDayUxAyfheQWBzv2OnyFfx?=
+ =?us-ascii?Q?I6O6eAH14vQxRNbUCpQ99MowfPaIuSDnABASEec6fsqIm/C/wblqkbB4/9d6?=
+ =?us-ascii?Q?Z6o7E5/eJQLJ3zMwC7Yjn88Q9UDXtu2zLCsNdqPiBkqAkQhvl89GRW8VlEPz?=
+ =?us-ascii?Q?qPAZIYcylO50KIdtlHJmcfVsSjLezEW0gILQEtmU13J5B46Q/cpR8ESf5R/N?=
+ =?us-ascii?Q?LrI4+wJxeP2jjI8QsWrM90kRWpQNcJy/xkb0yU/Y+OuxY3UqTAdn7BMTag+S?=
+ =?us-ascii?Q?coCtgC3jDPk/kJIj5fHbu8+uUF5jriYG1BX9alphwHdy0D/zRL1RGAglzE06?=
+ =?us-ascii?Q?CuZbMXQfpcq/PACbeCWCE8nGEVnNfRx0dp9gAl9is/vfcLlOpQAaMNLUInDd?=
+ =?us-ascii?Q?bZ0CxE9OypT8/LMOFg1JEwfuBMpegJkxopJslizlZFsnO+3JWuUP5Qn9WTBw?=
+ =?us-ascii?Q?DCjCdUH04F8HRBJntdocNOlvY9oMnekoYaFXQvmRZH16o967yDd855IaN9wn?=
+ =?us-ascii?Q?iWNnE8ZNNZmSB448Cn8uX1/ii91Ka1ROJJxswlVzNzAnG8e+TiA4rYCM7J/6?=
+ =?us-ascii?Q?A4BUR5uNWzb5kWvCxhRWU/J6cxWp/Fpi5r1FmBA1WSVelIPykBg3c1TfLx/K?=
+ =?us-ascii?Q?rNcWfmi2+Jj9wQ5q7q56nV685pLdw6tC0aZzVsu6HVUhTtaAUiDr6yr8psF0?=
+ =?us-ascii?Q?RegrlVZsh7lw8IDNXNtyXmxSjCBxc7B8aUs7zUaJBgb5nBta/6CoSOR4j37g?=
+ =?us-ascii?Q?nXhp+nyR0vsYo+AGrWU6uI2W7/oJ0wW+NKH9MXpmSCCbZDnGn1vjQkxrPas7?=
+ =?us-ascii?Q?Fk0XZD9hjeY9TmWZwnZPtiuDOcF5UTjoTDI/SIaNn9HMufeFJYSjOmPPL+r4?=
+ =?us-ascii?Q?ScW+OG7sj3qBzsyBofXHSHL2MzJ0AHkmCxjejXMiLhHZPCrlqw=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?KNtYygOZjuKp6ZdwfhPekTcOfeJXeGOFexnBFLkF506q7nAfkBfJ8GuZGKNl?=
+ =?us-ascii?Q?5/jCWDhb6XvMQMtFpzKZMsG16xr8sF6BGuc0m4MTmbnmntZ7Jcq+wUJ7HNP6?=
+ =?us-ascii?Q?fBDjfOwVdnyWvA1OuzjstgSkPazO4iwCsl+mYIwANVCpW58U7qtugQH+8Ky0?=
+ =?us-ascii?Q?uOmpTJlgkbxxvtyV0rV2+1PtB9rVldJJx7qVWT1kRCFQnoDkNAyCzMGV1qfR?=
+ =?us-ascii?Q?1NwbDi/GJVZxSuzTysDzWgHbOj9+3Qn4vx3yAvkB3rEcpCWwwm1HVungGk2h?=
+ =?us-ascii?Q?f0tJcrgP8A/tIzUQDHRudLTSiVqMguyNG5CTh6hGou3uQujskqs83v/Whtgt?=
+ =?us-ascii?Q?wnHkW/GMAwZdb2bIdk0v2/66jUkaRtjPTAGjX++tt+29ts401HgUyUtic9u5?=
+ =?us-ascii?Q?r4MNqpTfBG8uozQIuOPEh/DX/t4u/Ejuz7OFZjxTr1xIGRbf2DeV36DIEF5d?=
+ =?us-ascii?Q?/1Jja+jxyR8WS+Rwk8JCirZbuS16u8YccreUU3sgxyH+VAModd974j2bZP8t?=
+ =?us-ascii?Q?dtkpc9bgvzOvnhNBFdGMLudd+eokVGN1WnC41bgF9TDOsDc2oda9BP6sR3rq?=
+ =?us-ascii?Q?73pACx/4LWdP2dfYsnii1k59twZDjNqSVgUm24Ib1Qh9SDCeb9Vhvd/QZuvn?=
+ =?us-ascii?Q?5GWyuD+BumpTJvyPXuFqu8O7Chn2Ji2xJPhpmZiLyR+EQx0geZgeyA0GVTrm?=
+ =?us-ascii?Q?PFcxrnQZW+dNjs8rVNPTUBQd33kAsD/2RORn+AzrNh7nROEu0yZjqu00A5nM?=
+ =?us-ascii?Q?XYuYXf08cP8TOQbeVrHQqOio1nlPul2UcC3EQbszuIQzylAyiPN5tJ6oEOYq?=
+ =?us-ascii?Q?LJQapL8Jn/CZlCY1aVTHI9oqejUdH5VMcTDa2wN/oh8TN5P+6aOvi/0zZDWa?=
+ =?us-ascii?Q?ZhEk9B5u43vG4jOVWr7fGGIFG157wWAs3fHVobNugs3tHuO7wD0J6og2gQo5?=
+ =?us-ascii?Q?IBFtPVuUM8VjOvgkQ+xuKnLEhIY0RYNKhyLGPg9o7glm1gJBecBIeC6w2QE3?=
+ =?us-ascii?Q?o5waDggn6ZPcxuqCnW3aFOV1myCWZvh3o+UN5MwcWTxL62iPe2a/GNZbaJAt?=
+ =?us-ascii?Q?iXW9UTZLttOKy4+te+/baO9kKDAlxxdHsOBtw0Z3ngJImcC5BbQqpBazXKPP?=
+ =?us-ascii?Q?FIF/k1ZPy2cs04bFO12l60ZeNQgCf3KGcV6JpHLzooCjDKjsRCbiasjIchLx?=
+ =?us-ascii?Q?X18hMwOnm42TvGnBMQOVQe1VAAyQH/e7Vo+cwLNFw3n5Y1s3bzEncOcNNDLE?=
+ =?us-ascii?Q?OJ9eyvSOZGKN5NmCaNIOP3A5VdUACEUM5X4lIrgm2sxjRSAFOBV8WRDvbPKg?=
+ =?us-ascii?Q?mAFdr4mIrlDwZO6Ok6FJd+WfqEjyw76oEQoRuH0PmAnflReNrOZrPdo3DGvF?=
+ =?us-ascii?Q?pxVKek8ErPProsLAsaOFAmbmjRDQU+eUkckMWFKoqFL77k6uHMuvAd546XBJ?=
+ =?us-ascii?Q?LDCvRNr+aQkXw+S7aaw5M3TNOMx5LaaqZnrfgC+6QNbJLfSVQTPMr6krYSF5?=
+ =?us-ascii?Q?utJrGu01vFX4AmBoghebPCrFhLAkv5O/YTllgd/A6L/TunWxru2DNFFgr2dN?=
+ =?us-ascii?Q?K9H4uaAgqp1NzzK/Q3yERbn3gUCUaoN45XcVe2dD?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ab947831-7953-45f4-c172-08ddc2e2c91d
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jul 2025 14:29:05.1018
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6xeEBqq8d6NiTQn+u7qSPCJiBOC1L/7RfvJPBuaPyQdaCAFXQ/M4EQBMvPJsPDNK
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7915
 
-Hi Aithal,
-I can reproduce this issue in my environment, and I will try to resolve =
-it as soon as possible.
+On Mon, Jul 14, 2025 at 09:12:30PM +0800, Yi Liu wrote:
+> On 2025/7/10 23:30, Jason Gunthorpe wrote:
+> > This was missed during the initial implementation. The VFIO PCI encodes
+> > the vf_token inside the device name when opening the device from the group
+> > FD, something like:
+> > 
+> >    "0000:04:10.0 vf_token=bd8d9d2b-5a5f-4f5a-a211-f591514ba1f3"
+> > 
+> > This is used to control access to a VF unless there is co-ordination with
+> > the owner of the PF.
+> > 
+> > Since we no longer have a device name, pass the token directly through
+> > VFIO_DEVICE_BIND_IOMMUFD using an optional field indicated by
+> > VFIO_DEVICE_BIND_TOKEN.
+> 
+> two nits though I think the code is clear enough :)
+> 
+> s/Since we no longer have a device name/Since we no longer have a device
+> name in the device cdev path/
+> 
+> s/VFIO_DEVICE_BIND_TOKEN/VFIO_DEVICE_BIND_FLAG_TOKEN/
 
-Thanks,
-Zheyun Shen
+Alex, can you fix this when applying the v3 version?
 
-> 2025=E5=B9=B47=E6=9C=8814=E6=97=A5 13:21=EF=BC=8CAithal, Srikanth =
-<sraithal@amd.com> =E5=86=99=E9=81=93=EF=BC=9A
->=20
-> Hello,
->=20
-> While running the kselftest for SEV migration (sev_migrate_tes) on =
-linux-next (6.16.0-rc5-next-20250711, commit a62b7a37e6) on an AMD-based =
-paltforms [Milan,Genoa,Turin], I encountered below kernel crash while =
-running kvm kselftests:
->=20
-> [ 714.008402] BUG: kernel NULL pointer dereference, address: =
-0000000000000000
-> [ 714.015363] #PF: supervisor read access in kernel mode
-> [ 714.020504] #PF: error_code(0x0000) - not-present page
-> [ 714.025643] PGD 11364b067 P4D 11364b067 PUD 12e195067 PMD 0
-> [ 714.031303] Oops: Oops: 0000 [#1] SMP NOPTI
-> [ 714.035487] CPU: 14 UID: 0 PID: 16663 Comm: sev_migrate_tes Not =
-tainted 6.16.0-rc5-next-20250711-a62b7a37e6-42f78243e0c #1 =
-PREEMPT(voluntary)
-> [ 714.048253] Hardware name: Dell Inc. PowerEdge R6515/07PXPY, BIOS =
-2.17.0 12/04/2024
-> [ 714.055905] RIP: 0010:_find_first_bit+0x1d/0x40
-> [ 714.060439] Code: 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e fa =
-48 89 f0 48 85 f6 74 2d 31 d2 eb 0d 48 83 c2 40 48 83 c7 08 48 39 c2 73 =
-1c <48> 8b 0f 48 85 c9 74 eb f3 48 0f bc c9 48 01 ca 48 39 d0 48 0f 47
-> [ 714.079184] RSP: 0018:ffffb9a769b7fdc8 EFLAGS: 00010246
-> [ 714.084409] RAX: 0000000000000080 RBX: ffff95e0a54fe000 RCX: =
-000000000000f7ff
-> [ 714.091541] RDX: 0000000000000000 RSI: 0000000000000080 RDI: =
-0000000000000000
-> [ 714.098674] RBP: ffffb9a769b7fde0 R08: ffff95e0a54ff670 R09: =
-00000000000002aa
-> [ 714.105807] R10: ffff95ff801b7ec0 R11: 0000000000000086 R12: =
-0000000000000080
-> [ 714.112939] R13: 0000000000000000 R14: ffff95e0a54fe000 R15: =
-ffff95e087e8ac98
-> [ 714.120072] FS: 00007fd51a0f5740(0000) GS:ffff95ffd53b0000(0000) =
-knlGS:0000000000000000
-> [ 714.128156] CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [ 714.133902] CR2: 0000000000000000 CR3: 000000014f670003 CR4: =
-0000000000770ef0
-> [ 714.141035] PKRU: 55555554
-> [ 714.143750] Call Trace:
-> [ 714.146201] <TASK>
-> [ 714.148307] ? sev_writeback_caches+0x25/0x40 [kvm_amd]
-> [ 714.153544] sev_guest_memory_reclaimed+0x34/0x40 [kvm_amd]
-> [ 714.159115] kvm_arch_guest_memory_reclaimed+0x12/0x20 [kvm]
-> [ 714.164817] kvm_mmu_notifier_release+0x3c/0x60 [kvm]
-> [ 714.169896] mmu_notifier_unregister+0x53/0xf0
-> [ 714.174343] kvm_destroy_vm+0x12d/0x2d0 [kvm]
-> [ 714.178727] kvm_vm_stats_release+0x34/0x60 [kvm]
-> [ 714.183459] __fput+0xf2/0x2d0
-> [ 714.186520] fput_close_sync+0x44/0xa0
-> [ 714.190269] __x64_sys_close+0x42/0x80
-> [ 714.194024] x64_sys_call+0x1960/0x2180
-> [ 714.197861] do_syscall_64+0x56/0x1e0
-> [ 714.201530] entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> [ 714.206579] RIP: 0033:0x7fd519efe717
-> [ 714.210161] Code: ff e8 6d ec 01 00 66 2e 0f 1f 84 00 00 00 00 00 0f =
-1f 00 f3 0f 1e fa 64 8b 04 25 18 00 00 00 85 c0 75 10 b8 03 00 00 00 0f =
-05 <48> 3d 00 f0 ff ff 77 41 c3 48 83 ec 18 89 7c 24 0c e8 a3 83 f8 ff
-> [ 714.228906] RSP: 002b:00007fffbb2193e8 EFLAGS: 00000246 ORIG_RAX: =
-0000000000000003
-> [ 714.236472] RAX: ffffffffffffffda RBX: 0000000002623f48 RCX: =
-00007fd519efe717
-> [ 714.243604] RDX: 0000000000420146 RSI: 000000000041f05e RDI: =
-0000000000000029
-> [ 714.250737] RBP: 0000000002622e80 R08: 0000000000000000 R09: =
-000000000042013e
-> [ 714.257869] R10: 00007fd519fb83dd R11: 0000000000000246 R12: =
-0000000002623ed8
-> [ 714.265000] R13: 0000000002623ed8 R14: 000000000042fe08 R15: =
-00007fd51a147000
-> [ 714.272136] </TASK>
-> [ 714.274326] Modules linked in: nft_fib_inet nft_fib_ipv4 =
-nft_fib_ipv6 nft_fib nft_reject_inet nf_reject_ipv4 nf_reject_ipv6 =
-nft_reject nft_ct nft_chain_nat nf_nat nf_conntrack nf_defrag_ipv6 =
-nf_defrag_ipv4 ip_set nf_tables nfnetlink sunrpc nls_iso8859_1 amd_atl =
-intel_rapl_msr intel_rapl_common amd64_edac ipmi_ssif ee1004 kvm_amd kvm =
-rapl wmi_bmof i2c_piix4 pcspkr acpi_power_meter efi_pstore ipmi_si =
-k10temp i2c_smbus acpi_ipmi ipmi_devintf ipmi_msghandler mac_hid =
-sch_fq_codel dmi_sysfs xfs mgag200 drm_client_lib i2c_algo_bit =
-drm_shmem_helper drm_kms_helper ghash_clmulni_intel mpt3sas sha1_ssse3 =
-raid_class drm tg3 ccp scsi_transport_sas sp5100_tco wmi dm_mirror =
-dm_region_hash dm_log msr autofs4 aesni_intel
-> [ 714.336656] CR2: 0000000000000000
-> [ 714.339975] ---[ end trace 0000000000000000 ]---
-> [ 714.379956] pstore: backend (erst) writing error (-28)
-> [ 714.385093] RIP: 0010:_find_first_bit+0x1d/0x40
-> [ 714.389625] Code: 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e fa =
-48 89 f0 48 85 f6 74 2d 31 d2 eb 0d 48 83 c2 40 48 83 c7 08 48 39 c2 73 =
-1c <48> 8b 0f 48 85 c9 74 eb f3 48 0f bc c9 48 01 ca 48 39 d0 48 0f 47
-> [ 714.408370] RSP: 0018:ffffb9a769b7fdc8 EFLAGS: 00010246
-> [ 714.413595] RAX: 0000000000000080 RBX: ffff95e0a54fe000 RCX: =
-000000000000f7ff
-> [ 714.420729] RDX: 0000000000000000 RSI: 0000000000000080 RDI: =
-0000000000000000
-> [ 714.427862] RBP: ffffb9a769b7fde0 R08: ffff95e0a54ff670 R09: =
-00000000000002aa
-> [ 714.434992] R10: ffff95ff801b7ec0 R11: 0000000000000086 R12: =
-0000000000000080
-> [ 714.442126] R13: 0000000000000000 R14: ffff95e0a54fe000 R15: =
-ffff95e087e8ac98
-> [ 714.449257] FS: 00007fd51a0f5740(0000) GS:ffff95ffd53b0000(0000) =
-knlGS:0000000000000000
-> [ 714.457344] CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [ 714.463090] CR2: 0000000000000000 CR3: 000000014f670003 CR4: =
-0000000000770ef0
-> [ 714.470223] PKRU: 55555554
-> [ 714.472936] note: sev_migrate_tes[16663] exited with irqs disabled
-> [ 714.479189] BUG: kernel NULL pointer dereference, address: =
-0000000000000000
-> [ 714.486145] #PF: supervisor read access in kernel mode
-> [ 714.491281] #PF: error_code(0x0000) - not-present page
-> [ 714.496421] PGD 11364b067 P4D 11364b067 PUD 12e195067 PMD 0
-> [ 714.502082] Oops: Oops: 0000 [#2] SMP NOPTI
-> [ 714.506267] CPU: 14 UID: 0 PID: 16663 Comm: sev_migrate_tes Tainted: =
-G D 6.16.0-rc5-next-20250711-a62b7a37e6-42f78243e0c #1 =
-PREEMPT(voluntary)
-> [ 714.520593] Tainted: [D]=3DDIE
-> [ 714.523477] Hardware name: Dell Inc. PowerEdge R6515/07PXPY, BIOS =
-2.17.0 12/04/2024
-> [ 714.531131] RIP: 0010:_find_first_bit+0x1d/0x40
-> [ 714.535662] Code: 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e fa =
-48 89 f0 48 85 f6 74 2d 31 d2 eb 0d 48 83 c2 40 48 83 c7 08 48 39 c2 73 =
-1c <48> 8b 0f 48 85 c9 74 eb f3 48 0f bc c9 48 01 ca 48 39 d0 48 0f 47
-> [ 714.554409] RSP: 0018:ffffb9a769b7fcd0 EFLAGS: 00010246
-> [ 714.559635] RAX: 0000000000000080 RBX: ffff95e0a54fe000 RCX: =
-0000000000000000
-> [ 714.566768] RDX: 0000000000000000 RSI: 0000000000000080 RDI: =
-0000000000000000
-> [ 714.573900] RBP: ffffb9a769b7fce8 R08: ffff95e0a54ff670 R09: =
-0000000080100001
-> [ 714.581033] R10: 0000000000020000 R11: 0000000000000000 R12: =
-0000000000000080
-> [ 714.588165] R13: 0000000000000000 R14: ffff95e0a54fe000 R15: =
-ffff95e089d95a08
-> [ 714.595296] FS: 0000000000000000(0000) GS:ffff95ffd53b0000(0000) =
-knlGS:0000000000000000
-> [ 714.603381] CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [ 714.609130] CR2: 0000000000000000 CR3: 000000014f670003 CR4: =
-0000000000770ef0
-> [ 714.616260] PKRU: 55555554
-> [ 714.618963] Call Trace:
-> [ 714.621407] <TASK>
-> [ 714.623516] ? sev_writeback_caches+0x25/0x40 [kvm_amd]
-> [ 714.628741] sev_guest_memory_reclaimed+0x34/0x40 [kvm_amd]
-> [ 714.634315] kvm_arch_guest_memory_reclaimed+0x12/0x20 [kvm]
-> [ 714.640008] kvm_mmu_notifier_release+0x3c/0x60 [kvm]
-> [ 714.645088] __mmu_notifier_release+0x73/0x1e0
-> [ 714.649532] ? srso_alias_return_thunk+0x5/0xfbef5
-> [ 714.654323] ? sched_clock_cpu+0x14/0x1a0
-> [ 714.658338] exit_mmap+0x3b1/0x400
-> [ 714.661745] ? srso_alias_return_thunk+0x5/0xfbef5
-> [ 714.666536] ? futex_cleanup+0xb0/0x460
-> [ 714.670375] ? srso_alias_return_thunk+0x5/0xfbef5
-> [ 714.675166] ? perf_event_exit_task_context+0x33/0x280
-> [ 714.680307] ? srso_alias_return_thunk+0x5/0xfbef5
-> [ 714.685100] ? srso_alias_return_thunk+0x5/0xfbef5
-> [ 714.689890] ? mutex_lock+0x17/0x50
-> [ 714.693383] ? srso_alias_return_thunk+0x5/0xfbef5
-> [ 714.698177] mmput+0x6a/0x130
-> [ 714.701148] do_exit+0x258/0xa40
-> [ 714.704385] make_task_dead+0x85/0x160
-> [ 714.708134] rewind_stack_and_make_dead+0x16/0x20
-> [ 714.712951] RIP: 0033:0x7fd519efe717
-> [ 714.716532] Code: Unable to access opcode bytes at 0x7fd519efe6ed.
-> [ 714.722710] RSP: 002b:00007fffbb2193e8 EFLAGS: 00000246 ORIG_RAX: =
-0000000000000003
-> [ 714.730276] RAX: ffffffffffffffda RBX: 0000000002623f48 RCX: =
-00007fd519efe717
-> [ 714.737409] RDX: 0000000000420146 RSI: 000000000041f05e RDI: =
-0000000000000029
-> [ 714.744543] RBP: 0000000002622e80 R08: 0000000000000000 R09: =
-000000000042013e
-> [ 714.751673] R10: 00007fd519fb83dd R11: 0000000000000246 R12: =
-0000000002623ed8
-> [ 714.758807] R13: 0000000002623ed8 R14: 000000000042fe08 R15: =
-00007fd51a147000
-> [ 714.765942] </TASK>
-> [ 714.768132] Modules linked in: nft_fib_inet nft_fib_ipv4 =
-nft_fib_ipv6 nft_fib nft_reject_inet nf_reject_ipv4 nf_reject_ipv6 =
-nft_reject nft_ct nft_chain_nat nf_nat nf_conntrack nf_defrag_ipv6 =
-nf_defrag_ipv4 ip_set nf_tables nfnetlink sunrpc nls_iso8859_1 amd_atl =
-intel_rapl_msr intel_rapl_common amd64_edac ipmi_ssif ee1004 kvm_amd kvm =
-rapl wmi_bmof i2c_piix4 pcspkr acpi_power_meter efi_pstore ipmi_si =
-k10temp i2c_smbus acpi_ipmi ipmi_devintf ipmi_msghandler mac_hid =
-sch_fq_codel dmi_sysfs xfs mgag200 drm_client_lib i2c_algo_bit =
-drm_shmem_helper drm_kms_helper ghash_clmulni_intel mpt3sas sha1_ssse3 =
-raid_class drm tg3 ccp scsi_transport_sas sp5100_tco wmi dm_mirror =
-dm_region_hash dm_log msr autofs4 aesni_intel
-> [ 714.830455] CR2: 0000000000000000
-> [ 714.833773] ---[ end trace 0000000000000000 ]---
-> [ 714.886371] RIP: 0010:_find_first_bit+0x1d/0x40
-> [ 714.890899] Code: 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e fa =
-48 89 f0 48 85 f6 74 2d 31 d2 eb 0d 48 83 c2 40 48 83 c7 08 48 39 c2 73 =
-1c <48> 8b 0f 48 85 c9 74 eb f3 48 0f bc c9 48 01 ca 48 39 d0 48 0f 47
-> [ 714.909647] RSP: 0018:ffffb9a769b7fdc8 EFLAGS: 00010246
-> [ 714.914871] RAX: 0000000000000080 RBX: ffff95e0a54fe000 RCX: =
-000000000000f7ff
-> [ 714.922004] RDX: 0000000000000000 RSI: 0000000000000080 RDI: =
-0000000000000000
-> [ 714.929138] RBP: ffffb9a769b7fde0 R08: ffff95e0a54ff670 R09: =
-00000000000002aa
-> [ 714.936271] R10: ffff95ff801b7ec0 R11: 0000000000000086 R12: =
-0000000000000080
-> [ 714.943400] R13: 0000000000000000 R14: ffff95e0a54fe000 R15: =
-ffff95e087e8ac98
-> [ 714.950527] FS: 0000000000000000(0000) GS:ffff95ffd53b0000(0000) =
-knlGS:0000000000000000
-> [ 714.958613] CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [ 714.964357] CR2: 0000000000000000 CR3: 000000014f670003 CR4: =
-0000000000770ef0
-> [ 714.971490] PKRU: 55555554
-> [ 714.974202] note: sev_migrate_tes[16663] exited with irqs disabled
-> [ 714.980397] Fixing recursive fault but reboot is needed!
-> [ 714.985708] BUG: scheduling while atomic: =
-sev_migrate_tes/16663/0x00000000
-> [ 714.992580] Modules linked in: nft_fib_inet nft_fib_ipv4 =
-nft_fib_ipv6 nft_fib nft_reject_inet nf_reject_ipv4 nf_reject_ipv6 =
-nft_reject nft_ct nft_chain_nat nf_nat nf_conntrack nf_defrag_ipv6 =
-nf_defrag_ipv4 ip_set nf_tables nfnetlink sunrpc nls_iso8859_1 amd_atl =
-intel_rapl_msr intel_rapl_common amd64_edac ipmi_ssif ee1004 kvm_amd kvm =
-rapl wmi_bmof i2c_piix4 pcspkr acpi_power_meter efi_pstore ipmi_si =
-k10temp i2c_smbus acpi_ipmi ipmi_devintf ipmi_msghandler mac_hid =
-sch_fq_codel dmi_sysfs xfs mgag200 drm_client_lib i2c_algo_bit =
-drm_shmem_helper drm_kms_helper ghash_clmulni_intel mpt3sas sha1_ssse3 =
-raid_class drm tg3 ccp scsi_transport_sas sp5100_tco wmi dm_mirror =
-dm_region_hash dm_log msr autofs4 aesni_intel
-> [ 715.054914] CPU: 14 UID: 0 PID: 16663 Comm: sev_migrate_tes Tainted: =
-G D 6.16.0-rc5-next-20250711-a62b7a37e6-42f78243e0c #1 =
-PREEMPT(voluntary)
-> [ 715.054918] Tainted: [D]=3DDIE
-> [ 715.054920] Hardware name: Dell Inc. PowerEdge R6515/07PXPY, BIOS =
-2.17.0 12/04/2024
-> [ 715.054921] Call Trace:
-> [ 715.054922] <TASK>
-> [ 715.054923] dump_stack_lvl+0x70/0x90
-> [ 715.054928] dump_stack+0x14/0x20
-> [ 715.054931] __schedule_bug+0x5a/0x70
-> [ 715.054934] __schedule+0xa0d/0xb30
-> [ 715.054938] ? srso_alias_return_thunk+0x5/0xfbef5
-> [ 715.054941] ? vprintk_default+0x21/0x30
-> [ 715.054944] ? srso_alias_return_thunk+0x5/0xfbef5
-> [ 715.054946] ? vprintk+0x1c/0x50
-> [ 715.054949] ? srso_alias_return_thunk+0x5/0xfbef5
-> [ 715.054952] do_task_dead+0x4e/0xa0
-> [ 715.054956] make_task_dead+0x146/0x160
-> [ 715.054960] rewind_stack_and_make_dead+0x16/0x20
-> [ 715.054962] RIP: 0033:0x7fd519efe717
-> [ 715.054964] Code: Unable to access opcode bytes at 0x7fd519efe6ed.
-> [ 715.054965] RSP: 002b:00007fffbb2193e8 EFLAGS: 00000246 ORIG_RAX: =
-0000000000000003
-> [ 715.054967] RAX: ffffffffffffffda RBX: 0000000002623f48 RCX: =
-00007fd519efe717
-> [ 715.054968] RDX: 0000000000420146 RSI: 000000000041f05e RDI: =
-0000000000000029
-> [ 715.054970] RBP: 0000000002622e80 R08: 0000000000000000 R09: =
-000000000042013e
-> [ 715.054971] R10: 00007fd519fb83dd R11: 0000000000000246 R12: =
-0000000002623ed8
-> [ 715.054972] R13: 0000000002623ed8 R14: 000000000042fe08 R15: =
-00007fd51a147000
-> [ 715.054978] </TASK>
->=20
->=20
-> Below is the culprit commit:
->=20
-> commit d6581b6f2e2622f0fc350020a8e991e8be6b05d8
-> Author: Zheyun Shen szy0127@sjtu.edu.cn
-> Date: Thu May 22 16:37:32 2025 -0700
->=20
-> KVM: SVM: Flush cache only on CPUs running SEV guest
-> Link: =
-https://lore.kernel.org/r/20250522233733.3176144-9-seanjc@google.com
->=20
-> The issue goes away if I revert above commit.
->=20
-> Regards,
-> Srikanth Aithal sraithal@amd.com
-
+Jason
 
