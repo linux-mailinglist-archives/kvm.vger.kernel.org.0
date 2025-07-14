@@ -1,263 +1,165 @@
-Return-Path: <kvm+bounces-52271-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52272-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A348B0383B
-	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 09:43:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D781B0389C
+	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 10:04:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC635168A47
-	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 07:43:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B69CF179F6D
+	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 08:04:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27E852264D4;
-	Mon, 14 Jul 2025 07:43:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B1B823956E;
+	Mon, 14 Jul 2025 08:04:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="a6n9dcXW"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="tL3yj00f"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAD003D76
-	for <kvm@vger.kernel.org>; Mon, 14 Jul 2025 07:43:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99BD41F0994
+	for <kvm@vger.kernel.org>; Mon, 14 Jul 2025 08:04:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752479029; cv=none; b=VSOLcxzo+lmhRPJPEAtl0hqol4q44sqJm84SdGj5UFCVSiV/+nzVLnFMa6GdezOIYV8tp83ZiCUIHD8Qycan9pnNxVI0Kn0gGJAKz2Jp9tKK6fnMvbQqUrnvg/qhlKejqrTkPNWb/MK+jeeiiNd93OpYZ4kAUtw0urJB4oe9NmU=
+	t=1752480253; cv=none; b=nAI4wz1gKMg5sHNKhGXlGgQ/8m4HCH6zjSoPQdVRbmz51vRK6dp+zepc7hWqKD4LV48OX/oiCHMAS+8E3RXBISmbvLkGggbVn9/XAsHgXFw1haPB4r2ldQxfBmD4WjPzSwCIoYRVsbVV9+C7yqoY+HiaghiazTqY4KdrvwKAvCc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752479029; c=relaxed/simple;
-	bh=72mcn/0aA36J4IDVjbzyIq+5WtdsSwvXzhtQrJVppjU=;
+	s=arc-20240116; t=1752480253; c=relaxed/simple;
+	bh=f+o9WVDsyRj3e9aXVc3KN67EOFIQrJYY2xIcE0eTzEA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=e2dIXxYAxQylS/k1c+WYsQrh19GqB+MkwmHPmyDuh7qMxvs1bySmMlcC2HFW8IBAGbgY1kOedOQBb9bTlCJYSQ4x7IPKkei0xWd0WjBNsaMFGohiwibzdNCKU3NwJsIwpP7EzQLEy5V4u3DgkxuuRpOubijSs0BDubN6CbUcSVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=a6n9dcXW; arc=none smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4ab3855fca3so612721cf.1
-        for <kvm@vger.kernel.org>; Mon, 14 Jul 2025 00:43:47 -0700 (PDT)
+	 To:Cc:Content-Type; b=gEq7fdti8TuSo55bFV6GEyAgfkZSHRvSzbUO7pju8fTjlxkYAd5OyKW+Dc0nz3p70LvXyahgpaUj4htB+ESuDvoG7Pfe5mpyr2EJtfx69BNM2vRyea5BwDDjxXoLsVQahSYUtMpkA1sW6bOu4AAB/w/88wGTW8RxM2wwXDM7KVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=tL3yj00f; arc=none smtp.client-ip=209.85.166.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
+Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-3df2d8cb8d2so14577795ab.2
+        for <kvm@vger.kernel.org>; Mon, 14 Jul 2025 01:04:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752479026; x=1753083826; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=c3n8ur35WlJXxN48wV7a1ksueuqBtEVY/pvsx7vZS2c=;
-        b=a6n9dcXWblTgZBt50AgxpNTo/lZ2CjHRMWpCjXqOK2JSFYM7hXJGnBj0QaUCw2YiDe
-         UdxJ36bW1cRyCPHZ6ZzpNQdxTkeMOGQjc9rZ7mhvzz1SrJV0yyuLlZagh0Dq1KnJGUPs
-         2yIo/CLfR/xZCiT55wEtM6S1zuJm5cpyo1wPcOkPs+5hvvw3GORctBvbqaR6mdmTy+rv
-         Nz91dz+bN46Pn6hLVh0PCsRnT6+VsPrvSAJJzqfiiHaR/jbuGMwGut5p46I/gNaEYQL9
-         GI/N7lEcyCGrOHng6nCfrWemzab+KYbIEMyQg0W69LREAVJ0rZx8EvhKF7OvdA9SgmwA
-         30LQ==
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1752480251; x=1753085051; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OZgIQGeH6iTe1iCoPtim6lSFnAFbmo2QUEBDo1A3JBQ=;
+        b=tL3yj00fNL/H6AzWzxrsDV+69GuYO5036L104qSA1sZJ4oBiXtvJbLiygI6YkPtswg
+         l4MJCXCegnoTrBEaYin6YCFVnEhMVEuLUZ3bd0/7LfjdBTTgciZ5Tu+AcgtgAbaV8U1J
+         ZAxLf+RB+g5DK1+UYedfK8/yixClNC5whozruCCu8S0TZhYqUTJfYslvrrrm3hahfju3
+         f2giv9mU8Q0Ivo9AqHbsdgvVQ+dqh9SV1zHnj5IeHrRQ/jGpIl+foybYCo7ow7S2/whs
+         Xtzzx1B+TpAmLnUaIR6AjtnWqm7E0q0luSIhAFBMDaFI7NKkoOrsgRiyMTfwuCT1cm3n
+         it6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752479026; x=1753083826;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=c3n8ur35WlJXxN48wV7a1ksueuqBtEVY/pvsx7vZS2c=;
-        b=igfl9SZWl0gkFNPqrbvo/dBGJcytVkSyxxXQxH/eK93fKoX3AsOuU2aIRUiV3oHsyE
-         XBOSj5iMuKo/4h14fMIwIEHfivPJf0AlLR43x7LLo66X8wMcotXIslE8R1C/mgS38Eil
-         P8UFIy8g6xMFm/LAZNDfxom7PEPqV88X5EqXchaVcAcpjQRqlwxy1/iF6ltt5icxCUQs
-         t5nQ5lwJGxLgAmq2Btg0oNe7yaXkDhtTES3bvJeG4rmMH06db71dzm9IJwfyGeSwo5wf
-         NT9b79WmbS6HwwTdmiCcVactVFD/e+gutmIi+RcuSB2jkNbkQxFIi3SHJAbnLHnIoY+l
-         kAxQ==
-X-Gm-Message-State: AOJu0YzKBdLATVDzZ3zWjLHRHs+erLCT4SQvs/S/JWENHcQCedmPPMu6
-	pk95pFaURUO9mPilONjkVER6jzEfjFznq+c6QKUa1mVJ23UxtXliOZt9R/HagaPNuqE31V+Hke5
-	TK4T2E85aODj4yJCBUuU5rnDzoabC1XajzfJnDUjD
-X-Gm-Gg: ASbGncs8P4oQJGcbuPZCN+Hf1k8T+iZxgNsohj2SagiswcGRcCpRDFUGUO6+0lW4OIW
-	jnZlzkJb+9Lm7Ab6joIFv0McYvA6Lq0X2jU0LOZd/3wsMD6UQMlcKeBYjaZWcAmigSYreLz0PbY
-	xGXYIkeEbuMDQUjPqCW+GrKXeSmvHOqcWwl/MuN3N3vorTR2QMUbj90GIlNE9akCuW70KckgYFw
-	uV07ZM=
-X-Google-Smtp-Source: AGHT+IHZIX9RI0TnyvMf+ARf3WYRNyQhLo11e35YR15synL7j0UDgLvWSoCAnl1yZlle4Zkk5jSk1V0g6QRxltnOhdE=
-X-Received: by 2002:ac8:7fc6:0:b0:48d:8f6e:ece7 with SMTP id
- d75a77b69052e-4ab544362a6mr4595061cf.3.1752479023731; Mon, 14 Jul 2025
- 00:43:43 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1752480251; x=1753085051;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OZgIQGeH6iTe1iCoPtim6lSFnAFbmo2QUEBDo1A3JBQ=;
+        b=nBvu4ratM0ZyCIme9nokYClZvFDryGxng6SA7A5IglUNHyNvO+GifQT7MpVzI+0ZFI
+         a7M1/Ivw1tbwRClQmIA857UgCGM8Hy+tqpO0p0oNE/4R1WMHqkF5IKPXy78tdfiJW8Eb
+         6A1vgjfnVjSmbuvcnTnzN+RkryCWsoow729f0f2UJpdcTiplOvNkAlxnGdnG3ZDWaQNA
+         KjrFt7KAB1K7ieDIrZYee3T8IIXGesIhYoOl7tJsZviaF84KqfJa1eNHvqOQ1h5ZUnu8
+         hy1sIFyRZT2yFJ7dwbSDcmmuSLPHgl7B5HlJ2R9mY6B2PPn6QQNg7/yyVDt43vLxiRgP
+         2LXA==
+X-Forwarded-Encrypted: i=1; AJvYcCWDbSXhfxIfxyFIZhHIDJLcpAADN3RzUYVLFKEF9QEDdqOI5EITFGcRXBEvjGkfM1YTUxQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwM1KKmXHg7RQfuam2shTRQyg+YriKskfY1rZAHb0+eVXJm+7DW
+	LvkCJPS2s47dd2foZXL4qhdmHpqU3FB5LoZD3q7pIYfwZM6+u6aOewBe8JALScEkho4sy8OklAr
+	nIZATMqbYjleKGCgvRZfqKc4YnE62XRKiMcxjHruVRA==
+X-Gm-Gg: ASbGncsb3u4FXBw9ViYsWA+EIPRB8UBctcAiUDYiv2JRrBBw77rNBbhV5vfxtzUfIAu
+	42zvh/uTmCqP1Btrop2mQ96wUUN9WJnuSplOgUTzcTwKmYZMHS9ssKt/XYCgXbR5clEPvwevgp6
+	z+IJPMhcIqM1caYkSnGAqXMuCugMT2qWeJwxd9RxLvQLoLfYQtn71960BFUFyJvT3eL2KZlPPj4
+	LKB/w9qJoTX4Moafks=
+X-Google-Smtp-Source: AGHT+IFRHVQzoAt1qKkfWgKOuTxoczx2KhtXwBF+kniHBzyY3kBO8gLSgMJy+LXX+IM1zlPXQQUK731W+/4cNca4pWM=
+X-Received: by 2002:a05:6e02:304a:b0:3df:4046:93a9 with SMTP id
+ e9e14a558f8ab-3e25325550bmr122893985ab.5.1752480250607; Mon, 14 Jul 2025
+ 01:04:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250709105946.4009897-1-tabba@google.com> <20250709105946.4009897-17-tabba@google.com>
- <865xfyadjv.wl-maz@kernel.org>
-In-Reply-To: <865xfyadjv.wl-maz@kernel.org>
-From: Fuad Tabba <tabba@google.com>
-Date: Mon, 14 Jul 2025 08:42:00 +0100
-X-Gm-Features: Ac12FXyjoYpzT_P-oaUrzRgkOcTbxS1Ta0rucFG3EteXkZMxtRhRlP_YmBV37o0
-Message-ID: <CA+EHjTyJGWJ0Pj-jPjriFjy3JHpVUa0PW0vQz4o8UPdLbMV7pg@mail.gmail.com>
-Subject: Re: [PATCH v13 16/20] KVM: arm64: Handle guest_memfd-backed guest
- page faults
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
-	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, 
-	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
-	palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com, 
-	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
-	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
-	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, 
-	dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net, 
-	vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com, 
-	mail@maciej.szmigiero.name, david@redhat.com, michael.roth@amd.com, 
-	wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	will@kernel.org, qperret@google.com, keirf@google.com, roypat@amazon.co.uk, 
-	shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, rientjes@google.com, 
-	jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, jthoughton@google.com, 
-	peterx@redhat.com, pankaj.gupta@amd.com, ira.weiny@intel.com
+References: <20250711101537.16308-1-luxu.kernel@bytedance.com>
+In-Reply-To: <20250711101537.16308-1-luxu.kernel@bytedance.com>
+From: Anup Patel <anup@brainfault.org>
+Date: Mon, 14 Jul 2025 13:33:59 +0530
+X-Gm-Features: Ac12FXxof_i54yoTN6sBpKdXuMFJfg4CBnTxqLczo_oXcUYHd6dY56mBe6MespY
+Message-ID: <CAAhSdy0OumSXbJEEafE6q-LPu2PTdN9Tzx_aoapy=RJD214uBw@mail.gmail.com>
+Subject: Re: [PATCH v3] RISC-V: KVM: Delegate illegal instruction fault to VS mode
+To: Xu Lu <luxu.kernel@bytedance.com>
+Cc: rkrcmar@ventanamicro.com, cleger@rivosinc.com, atish.patra@linux.dev, 
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
+	alex@ghiti.fr, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Marc,
+On Fri, Jul 11, 2025 at 3:45=E2=80=AFPM Xu Lu <luxu.kernel@bytedance.com> w=
+rote:
+>
+> Delegate illegal instruction fault to VS mode in default to avoid such
 
+s/in default/by default/
 
-On Fri, 11 Jul 2025 at 17:38, Marc Zyngier <maz@kernel.org> wrote:
+> exceptions being trapped to HS and redirected back to VS.
 >
-> On Wed, 09 Jul 2025 11:59:42 +0100,
-> Fuad Tabba <tabba@google.com> wrote:
-> >
-> > Add arm64 architecture support for handling guest page faults on memory
-> > slots backed by guest_memfd.
-> >
-> > This change introduces a new function, gmem_abort(), which encapsulates
-> > the fault handling logic specific to guest_memfd-backed memory. The
-> > kvm_handle_guest_abort() entry point is updated to dispatch to
-> > gmem_abort() when a fault occurs on a guest_memfd-backed memory slot (as
-> > determined by kvm_slot_has_gmem()).
-> >
-> > Until guest_memfd gains support for huge pages, the fault granule for
-> > these memory regions is restricted to PAGE_SIZE.
-> >
-> > Reviewed-by: Gavin Shan <gshan@redhat.com>
-> > Reviewed-by: James Houghton <jthoughton@google.com>
-> > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > ---
-> >  arch/arm64/kvm/mmu.c | 82 ++++++++++++++++++++++++++++++++++++++++++--
-> >  1 file changed, 79 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index 58662e0ef13e..71f8b53683e7 100644
-> > --- a/arch/arm64/kvm/mmu.c
-> > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -1512,6 +1512,78 @@ static void adjust_nested_fault_perms(struct kvm_s2_trans *nested,
-> >       *prot |= kvm_encode_nested_level(nested);
-> >  }
-> >
-> > +#define KVM_PGTABLE_WALK_MEMABORT_FLAGS (KVM_PGTABLE_WALK_HANDLE_FAULT | KVM_PGTABLE_WALK_SHARED)
-> > +
-> > +static int gmem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> > +                   struct kvm_s2_trans *nested,
-> > +                   struct kvm_memory_slot *memslot, bool is_perm)
-> > +{
-> > +     bool write_fault, exec_fault, writable;
-> > +     enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_MEMABORT_FLAGS;
-> > +     enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
-> > +     struct kvm_pgtable *pgt = vcpu->arch.hw_mmu->pgt;
-> > +     struct page *page;
-> > +     struct kvm *kvm = vcpu->kvm;
-> > +     void *memcache;
-> > +     kvm_pfn_t pfn;
-> > +     gfn_t gfn;
-> > +     int ret;
-> > +
-> > +     ret = prepare_mmu_memcache(vcpu, true, &memcache);
-> > +     if (ret)
-> > +             return ret;
-> > +
-> > +     if (nested)
-> > +             gfn = kvm_s2_trans_output(nested) >> PAGE_SHIFT;
-> > +     else
-> > +             gfn = fault_ipa >> PAGE_SHIFT;
-> > +
-> > +     write_fault = kvm_is_write_fault(vcpu);
-> > +     exec_fault = kvm_vcpu_trap_is_exec_fault(vcpu);
-> > +
-> > +     if (write_fault && exec_fault) {
-> > +             kvm_err("Simultaneous write and execution fault\n");
-> > +             return -EFAULT;
-> > +     }
+> The delegation of illegal instruction fault is particularly important
+> to guest applications that use vector instructions frequently. In such
+> cases, an illegal instruction fault will be raised when guest user thread
+> uses vector instruction the first time and then guest kernel will enable
+> user thread to execute following vector instructions.
 >
-> I don't think we need to cargo-cult this stuff. This cannot happen
-> architecturally (data and instruction aborts are two different
-> exceptions, so you can't have both at the same time), and is only
-> there because we were young and foolish when we wrote this crap.
+> The fw pmu event counter remains undeleted so that guest can still query
+> illegal instruction events via sbi call. Guest will only see zero count
+> on illegal instruction faults and know 'firmware' has delegated it.
 >
-> Now that we (the royal We) are only foolish, we can save a few bits by
-> dropping it. Or turn it into a VM_BUG_ON() if you really want to keep
-> it.
+> Signed-off-by: Xu Lu <luxu.kernel@bytedance.com>
+> ---
+>  arch/riscv/include/asm/kvm_host.h | 1 +
+>  arch/riscv/kvm/vcpu_exit.c        | 5 -----
+>  2 files changed, 1 insertion(+), 5 deletions(-)
+>
+> diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/k=
+vm_host.h
+> index 85cfebc32e4cf..3f6b9270f366a 100644
+> --- a/arch/riscv/include/asm/kvm_host.h
+> +++ b/arch/riscv/include/asm/kvm_host.h
+> @@ -44,6 +44,7 @@
+>  #define KVM_REQ_STEAL_UPDATE           KVM_ARCH_REQ(6)
+>
+>  #define KVM_HEDELEG_DEFAULT            (BIT(EXC_INST_MISALIGNED) | \
+> +                                        BIT(EXC_INST_ILLEGAL)     | \
+>                                          BIT(EXC_BREAKPOINT)      | \
+>                                          BIT(EXC_SYSCALL)         | \
+>                                          BIT(EXC_INST_PAGE_FAULT) | \
+> diff --git a/arch/riscv/kvm/vcpu_exit.c b/arch/riscv/kvm/vcpu_exit.c
+> index 6e0c184127956..cd8fa68f3642c 100644
+> --- a/arch/riscv/kvm/vcpu_exit.c
+> +++ b/arch/riscv/kvm/vcpu_exit.c
+> @@ -193,11 +193,6 @@ int kvm_riscv_vcpu_exit(struct kvm_vcpu *vcpu, struc=
+t kvm_run *run,
+>         ret =3D -EFAULT;
+>         run->exit_reason =3D KVM_EXIT_UNKNOWN;
+>         switch (trap->scause) {
+> -       case EXC_INST_ILLEGAL:
+> -               kvm_riscv_vcpu_pmu_incr_fw(vcpu, SBI_PMU_FW_ILLEGAL_INSN)=
+;
+> -               vcpu->stat.instr_illegal_exits++;
+> -               ret =3D vcpu_redirect(vcpu, trap);
+> -               break;
 
-Will do, but if you agree, I'll go with a VM_WARN_ON_ONCE() since
-VM_BUG_ON is going away [1][2]
+Lets keep the illegal instruction trap handling so that if SBI implementati=
+on
+forwards VS-mode illegal instruction trap to HS-mode ignoring hedeleg
+due to unknown reasons then we still forward this trap to Guest otherwise
+such an illegal instruction trap will cause exit to user-space and eventual=
+ly
+kill the Guest.
 
-[1] https://lore.kernel.org/all/b247be59-c76e-4eb8-8a6a-f0129e330b11@redhat.com/
-[2] https://lore.kernel.org/all/20250604140544.688711-1-david@redhat.com/T/#u
-
-
-> > +
-> > +     if (is_perm && !write_fault && !exec_fault) {
-> > +             kvm_err("Unexpected L2 read permission error\n");
-> > +             return -EFAULT;
-> > +     }
->
-> Again, this is copying something that was always a bit crap:
->
-> - it's not an "error", it's a permission fault
-> - it's not "L2", it's "stage-2"
->
-> But this should equally be turned into an assertion, ideally in a
-> single spot. See below for the usual untested hack.
-
-Will do, but like above, with VM_WARN_ON_ONCE() if you agree.
-
-Thanks!
-/fuad
-
-> Thanks,
->
->         M.
->
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index b92ce4d9b4e01..c79dc8fd45d5a 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1540,16 +1540,7 @@ static int gmem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->
->         write_fault = kvm_is_write_fault(vcpu);
->         exec_fault = kvm_vcpu_trap_is_exec_fault(vcpu);
-> -
-> -       if (write_fault && exec_fault) {
-> -               kvm_err("Simultaneous write and execution fault\n");
-> -               return -EFAULT;
-> -       }
-> -
-> -       if (is_perm && !write_fault && !exec_fault) {
-> -               kvm_err("Unexpected L2 read permission error\n");
-> -               return -EFAULT;
-> -       }
-> +       VM_BUG_ON(write_fault && exec_fault);
->
->         ret = kvm_gmem_get_pfn(kvm, memslot, gfn, &pfn, &page, NULL);
->         if (ret) {
-> @@ -1616,11 +1607,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->         exec_fault = kvm_vcpu_trap_is_exec_fault(vcpu);
->         VM_BUG_ON(write_fault && exec_fault);
->
-> -       if (fault_is_perm && !write_fault && !exec_fault) {
-> -               kvm_err("Unexpected L2 read permission error\n");
-> -               return -EFAULT;
-> -       }
-> -
->         /*
->          * Permission faults just need to update the existing leaf entry,
->          * and so normally don't require allocations from the memcache. The
-> @@ -2035,6 +2021,9 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
->                 goto out_unlock;
->         }
->
-> +       VM_BUG_ON(kvm_vcpu_trap_is_permission_fault(vcpu) &&
-> +                 !write_fault && !kvm_vcpu_trap_is_exec_fault(vcpu));
-> +
->         if (kvm_slot_has_gmem(memslot))
->                 ret = gmem_abort(vcpu, fault_ipa, nested, memslot,
->                                  esr_fsc_is_permission_fault(esr));
->
+>         case EXC_LOAD_MISALIGNED:
+>                 kvm_riscv_vcpu_pmu_incr_fw(vcpu, SBI_PMU_FW_MISALIGNED_LO=
+AD);
+>                 vcpu->stat.load_misaligned_exits++;
 > --
-> Without deviation from the norm, progress is not possible.
+> 2.20.1
+>
+
+Regards,
+Anup
 
