@@ -1,317 +1,208 @@
-Return-Path: <kvm+bounces-52274-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52275-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C5FAB039B7
-	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 10:44:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C093B039BA
+	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 10:44:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 852CE7A160C
-	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 08:42:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D4D03B4BDA
+	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 08:44:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13CB92367AC;
-	Mon, 14 Jul 2025 08:43:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5691923C4E5;
+	Mon, 14 Jul 2025 08:44:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BcqrduxP"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AZF5DED5"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AC3123BCED
-	for <kvm@vger.kernel.org>; Mon, 14 Jul 2025 08:43:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752482633; cv=none; b=F6tYpDVx9YvYW1aR9PAX+C87g8Sots+LMJiVUBRi7umxtc6ailrEkQe0iP32IUawrJYZCsYcm2aU/vwE7/PuZp1U54RoWi2A5xgF9PZ9kQAsp0/QLATOTiljjhHMv9eamtqlMOKMRH6BeBtt43DWwapJpqHie2ZDqHQIVCwZg5s=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752482633; c=relaxed/simple;
-	bh=nKikz81r3l+aHUp6DieQEkL62kbMU6I327pUJe6ybZo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XdgcUHU6+xLtzvc2IVDP+K+cYHKYaeJ1q0vjd5hjRxrDbA629TzGuPthubTNph1AY23px0NdKep5zgkurTcnuLGscQ7hCkpoiBLiyJ3Gn/j2cr3FerfHtOJfem3o4E+Pcx2d3FsBEqKH3CRf41NgDm1cPxDQBed+iKXer/d63Sk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BcqrduxP; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752482629;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GRhLUFEqvojdLmOsG0Ejy1GkfyZq+eqUAsj94u+Dgrw=;
-	b=BcqrduxPNTi1lC/axohIc01lTs6Gx/kBuEkcX3jfQHl8mOdQdoMJOetJ4H3Sg9LylG+agP
-	iawp2xMm7qhlXFRVUO7fFsCRMUKhhnDQoLID/DNsd05dSneBi9A52Renj/Sczaa5qI7zbC
-	tT9NTwHUCA4AgDGb1EO3mu3gYE+VW0w=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-611-BSF6oWzTM5-up0IvqwCWfw-1; Mon, 14 Jul 2025 04:43:48 -0400
-X-MC-Unique: BSF6oWzTM5-up0IvqwCWfw-1
-X-Mimecast-MFC-AGG-ID: BSF6oWzTM5-up0IvqwCWfw_1752482627
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-ae70ebad856so153253266b.2
-        for <kvm@vger.kernel.org>; Mon, 14 Jul 2025 01:43:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752482627; x=1753087427;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GRhLUFEqvojdLmOsG0Ejy1GkfyZq+eqUAsj94u+Dgrw=;
-        b=mQX5AERPz4gLQXM5GuMiP4MySsTg3YBN4t4NDub0TtfIgy0vuiUeXFjBq730qwFreO
-         +poxb5ei7pLmEz7RoUy3otCV7PCz+zNM4NrmNTJH35+i4ZkljUM/cM9KydnoV1CUXPYX
-         Gx8LazcKBSlnaxZyRs/st7T2DE8QPerKR9emWclPox/Xm7C+poErcVN6J9bcptuHmAxh
-         cOZFdm24wunj11040p62Gla+xTpg+Dx//fVEYFYCLbcC6KaUB0TJr1R4wDpGmKHbQATm
-         bIz8zqoKFTqfIZW8WnZh9Vjx8FMcLZBqhAAccMVAFurCr2QCLSHjLnUay2KT62lo75Ox
-         aaIg==
-X-Forwarded-Encrypted: i=1; AJvYcCXNZJZDYXsVWwSJmEbhp3L5t6yKbXjvvtzkXKgU9tApabTtlYek5Twf3z24d4Oqc6rx1AM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxkqD1tJ+IXj7iusmAH49goakFfscQQQbMpGKNs1+0wLi7T7By3
-	nZyMB/wQstVx5yDiRSZUv0q5scr6VDeAMCMH6LH8p5bTk7XEEpDrh4Cewzbvnc144Hya9/R1/7C
-	eSlEhD8JdnvQPPIMZ79+JE/NH6eylF1++g/xhRiada2peRprml3bVGonZM3mZBhT8hCjPapWJph
-	732refpPfSmzQ7kM2mePhPocCWQqEk
-X-Gm-Gg: ASbGnct5b4XMi6J2eunDMKvZnkTb1l6OQ22QQIWn6Dzm729Z3gTK9RzjzoefsV19mEz
-	wZ+45UrRKxMfN/u5ojEKexy54fop7byDg81xkbghfVojgIvjMPoKc7e+b9hoOnICM6q39uabPDr
-	VthD1wqRLI+UZheyDmaVgYuA==
-X-Received: by 2002:a17:906:478d:b0:ae6:d94f:4326 with SMTP id a640c23a62f3a-ae6fcb520ccmr1362644266b.57.1752482627114;
-        Mon, 14 Jul 2025 01:43:47 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGyp6tHCDEPwymTJwFNP12fJma5TYDhuC8m6nlnf+pWF04et2UyRfdJXz40rUF9nb6cenSI9JuCqjX2X2ZgfJU=
-X-Received: by 2002:a17:906:478d:b0:ae6:d94f:4326 with SMTP id
- a640c23a62f3a-ae6fcb520ccmr1362640466b.57.1752482626639; Mon, 14 Jul 2025
- 01:43:46 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6F6C7464;
+	Mon, 14 Jul 2025 08:44:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.19
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752482671; cv=fail; b=UeggR7JodBZhKypRQMzSw6XNwjCyK+4qh+mt134ww7JYVXj8PyNQPCU92FvjeFqYnGO8HgAzLAxqCyDt4IMWamgm9xWfq9nQjq/4UVJX6yX1ijUFX+TNGxQjUL+TmGrdfnbtgk8f7JUcowQDwlxVPljhwVzV+8uQiUpRK5OrW2o=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752482671; c=relaxed/simple;
+	bh=gQWkKxeTBueRNIATTehtYeiSnhMrz3hX9K5MLwl3syY=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=Ke5C6W33lx0BJvF/ihQVofz4NVilMbvnCIFgJbcDxySzBXbXKHukRLixjQsIpk/9MnjAUsHGF/z6Lkfo9f9BO7XElqkjrqKi+mZyauRG6pOMUBz22esBAwCuQuWA4wDelYWZUSVUbXDLNXKv+2A4kCZH6Td0KcgNku4HU02tCrk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AZF5DED5; arc=fail smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1752482670; x=1784018670;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=gQWkKxeTBueRNIATTehtYeiSnhMrz3hX9K5MLwl3syY=;
+  b=AZF5DED5mwTs4OJeDDhpMIIWjXenyof5KfsFA/WaVGP7QGBM/nc1LLtR
+   hrOywGFDAjbFA+ifuxhNSfwH8AGTeEGmBKm6qfw7GO75KP3Rkyp5IfsKL
+   m16HJ98L9Qvto49/VWqWuJ1Gd/W8u82zaWhExLoXqhZYGVmXKC5/htDF0
+   5L0XKBokixlWjqphYxs8iMpLfF2sH7AjNPu2KNg/xUnOnl0nrgoFXlXRf
+   YxlUM0BGL59LT5WUoqShQVgW0AMYWfNQR07gSe9FtjK7Lx5XzkKgH3JB0
+   6Q7rNCzwe46uRIibhTe1vDUteUXvW6L2EjKe+mF+XX74nrNfP34iaQpJx
+   Q==;
+X-CSE-ConnectionGUID: EMUbT/JrSbWOm8QbWjXj9A==
+X-CSE-MsgGUID: bGQVe8nXQ+ClWeiQ/cCXVg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11491"; a="53780327"
+X-IronPort-AV: E=Sophos;i="6.16,310,1744095600"; 
+   d="scan'208";a="53780327"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2025 01:44:29 -0700
+X-CSE-ConnectionGUID: boF9a3vQQL605HPVcwOZ1g==
+X-CSE-MsgGUID: Twb9K+GzSBSQ0KSTsVNXRw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,310,1744095600"; 
+   d="scan'208";a="156977593"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by fmviesa006.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2025 01:44:29 -0700
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Mon, 14 Jul 2025 01:44:28 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25 via Frontend Transport; Mon, 14 Jul 2025 01:44:28 -0700
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (40.107.94.69) by
+ edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Mon, 14 Jul 2025 01:44:27 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=AMCWv/q3NmGrZkYZ2/oN8/4bJeZtpz1MOoBkOQiMc6Oukrecm0Y3TRpjY/PQgFC0eQit8COLMzARsZlPq2WPOMQDNEdoSmwNOAJY7tFJlg5P0nMZT70sPc4qclt5nXjbWii/74n/4ts5+znDEpIJGRJtjAmIuifcQX/PMh8bJc0CzK27jx9hv0vVNBs5PNYDQGgCVcgLl+dXqPg92uLNqy8vTgAJj8KDDYininlrxyD3mJimp/8u3veY1P/8wP2lwlNezlblASZlCHhCyeMRTi7DDB1WT6jqAh4Xk1QH2iYiZGQfRAl6j5C65qOV+gGqXuieXoUVhg9iq3J+S4LMkA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fjtHUvtiXJnzYmIVx5kwEnyxmmKSp+3puJjYwjhOIWI=;
+ b=FH8eEEybSwhI+RXL4OUg2rEBpFBZnOMnBUuUSbgpoXnMil/adL6ZzVPyaMwPGrJZmiCG61eycyxngRRy7SrZ34VrOLG1jWeqqU/BEJO6c2ERUeQF7vp3F7XVTuUpvyZ+kdqT5NAjKNAl5cYencwDHVoLr0wEPzDR70XjdIKZNsYSKPb6Aops9DPFCWlkHziDSVQ0lvQczQYz587jEI0uVvSVJWnPDsh5rcSdAbjjgz8gDVFH9vmqjJm25zJHg1kWXflyn8RUZnt1V9KSXMOBG/bq58Ia4A9lEy8h0yk+yVWy3a+LyltSQzaLT3Ww2lBOOoC6Qra/nssD/Zho8xzxtg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
+ by SA1PR11MB8857.namprd11.prod.outlook.com (2603:10b6:806:46b::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8922.33; Mon, 14 Jul
+ 2025 08:44:26 +0000
+Received: from CH3PR11MB8660.namprd11.prod.outlook.com
+ ([fe80::cfad:add4:daad:fb9b]) by CH3PR11MB8660.namprd11.prod.outlook.com
+ ([fe80::cfad:add4:daad:fb9b%6]) with mapi id 15.20.8901.033; Mon, 14 Jul 2025
+ 08:44:25 +0000
+Date: Mon, 14 Jul 2025 16:44:15 +0800
+From: Chao Gao <chao.gao@intel.com>
+To: Kai Huang <kai.huang@intel.com>
+CC: <seanjc@google.com>, <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
+	<thomas.lendacky@amd.com>, <nikunj@amd.com>, <bp@alien8.de>,
+	<isaku.yamahata@intel.com>, <xiaoyao.li@intel.com>,
+	<rick.p.edgecombe@intel.com>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 1/2] KVM: x86: Reject KVM_SET_TSC_KHZ VM ioctl when
+ vCPUs have been created
+Message-ID: <aHTDX1IQuyWYUwL+@intel.com>
+References: <cover.1752444335.git.kai.huang@intel.com>
+ <135a35223ce8d01cea06b6cef30bfe494ec85827.1752444335.git.kai.huang@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <135a35223ce8d01cea06b6cef30bfe494ec85827.1752444335.git.kai.huang@intel.com>
+X-ClientProxiedBy: SG2PR03CA0093.apcprd03.prod.outlook.com
+ (2603:1096:4:7c::21) To CH3PR11MB8660.namprd11.prod.outlook.com
+ (2603:10b6:610:1ce::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1752229731.git.pabeni@redhat.com>
-In-Reply-To: <cover.1752229731.git.pabeni@redhat.com>
-From: Lei Yang <leiyang@redhat.com>
-Date: Mon, 14 Jul 2025 16:43:09 +0800
-X-Gm-Features: Ac12FXxatr64OrUhmel8luErrVbEIm_iqCQ2G7Fi9UrLidUG2qqfbpb6ijcKDPw
-Message-ID: <CAPpAL=y4e=+H2rxHwwgbGvU+x10aTDVZ7ix+2YqVC3e6hd6L7g@mail.gmail.com>
-Subject: Re: [PATCH RFC v2 00/13] virtio: introduce support for GSO over UDP tunnel
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, 
-	Dmitry Fleytman <dmitry.fleytman@gmail.com>, Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>, 
-	Jason Wang <jasowang@redhat.com>, Sriram Yagnaraman <sriram.yagnaraman@ericsson.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Cornelia Huck <cohuck@redhat.com>, 
-	Luigi Rizzo <lrizzo@google.com>, Giuseppe Lettieri <g.lettieri@iet.unipi.it>, 
-	Vincenzo Maffione <v.maffione@gmail.com>, Eric Blake <eblake@redhat.com>, 
-	Markus Armbruster <armbru@redhat.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR11MB8660:EE_|SA1PR11MB8857:EE_
+X-MS-Office365-Filtering-Correlation-Id: 52114cec-b8e0-411c-f11e-08ddc2b2a2fe
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7053199007;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?9QKLsdAHKf6OF0xXkBh5e7DsqGwJVPsjZu+skfDknfmUnLdCGccTKy8GnahR?=
+ =?us-ascii?Q?qJuCDE59KoNyN37zLTdMg8d2FAOIMRFgzoIxErLE4EZmZm0B6x0hkTmBP522?=
+ =?us-ascii?Q?roxv+iqNQP4QEv2WvUkklC4w+9gC2+XS5fdn+zYSacFgmvyZXH4yN+Inzm7A?=
+ =?us-ascii?Q?mD6GcEa/O9oRgMm2IGv9UA1qWaBK6s0mvW1ULHhrGOEIdZdQvNtTWTOOfgTb?=
+ =?us-ascii?Q?B3MfFBl+Fxk/DPlmBsU9pqTclgVQO2o6xtQR3R2jFXzp6iNbnfWipyR8W8dN?=
+ =?us-ascii?Q?7vdMJebD7fmV6PDguTIWTqBj7fW1vm1BEvb3U1w1Vb6fAmyhmNEjcw75lbXR?=
+ =?us-ascii?Q?QL6mOdIJA80SC1RAqblBQNMI9tqhbBujvLu+Gn4LCiin0Z9Pxz+kZomyzgIF?=
+ =?us-ascii?Q?ZiToLxNa/yq9DdljMLPlqPJmYbI6PD6YXFSHMe+E0mQQz2GuFJ7lF0DfTurh?=
+ =?us-ascii?Q?SfPSSCA1fArECXgeysyGhg83P8YWGjC/pL11wGM0V8GeN1r3BqYZl4kCUD+Z?=
+ =?us-ascii?Q?LBzEFC1SmOTAwGZI7ottQy8aKWCbsQvX37kY2YKWjmOzhZXFs9qjPVCs8f1Q?=
+ =?us-ascii?Q?fxhMtmySo4+p6YiJgnUgQPECLfmbHHN9E/sIvGaOX4SbTwqtp+0NFxstmGWN?=
+ =?us-ascii?Q?FFGai92hO9MMNcbsbN6ErySGP1lhjTdjtUFVYN2Bfw95w1j05UP0UkxgwNoH?=
+ =?us-ascii?Q?xDsEaV8fO/NxIxb13dD8RZ7JY3rmAMiFGKFfAkf8g2TKjwdEiIDXoc31thXp?=
+ =?us-ascii?Q?EBpOVnDo9LvuzuY+SaSy6iViZmtDIyeYCx7U7pNOtd2SC43N0ssqQmPijOdb?=
+ =?us-ascii?Q?qGZxJnZiMFMHKbQlWEh5UUwfh2mKO84O1SganeQbrIXqE0kvDRUJ7ZaA/mUA?=
+ =?us-ascii?Q?mnY34LxJX4ZpzMMfRQiIzFcM8hqXYBL+JONSyQTKbnqljrKfbX/KNUxagKBL?=
+ =?us-ascii?Q?+col4rmDSAt37h5vOtEYpuM3Xu2oEg1P5wG2tGNCK0nYri0seCmXnIqhSsa5?=
+ =?us-ascii?Q?6Ew/6fa0c2VObyyyaLJPvvYVzBZqfrSUnlWvUvwSC03BWSvGPkz3h6aRIiuq?=
+ =?us-ascii?Q?95UsGa/lKpSUmvshL+AfQVv+6Anqxiaq7a7f6BlJnrcb8tNKOZqsjQWbXhsd?=
+ =?us-ascii?Q?H/SxDmFI/pK01tGY/P3VqqHITj40HzErFJc+THdcZ+ldEWuzwD9EDizxCnEx?=
+ =?us-ascii?Q?s1cgYlNmFGiA3aTQgzFBB3DsMH2rce6BQOw0qodUqt0hi4pE4Gn/sSChX7Wo?=
+ =?us-ascii?Q?dEhOnbTbi8dcZGBkhnrkjByNB2FAgkc4U8Z7mpEkSBqYwsQ1bKhkVOQA69Wk?=
+ =?us-ascii?Q?wV5iOb48IhediFLzWgtBl7vcFqmd1/6EoDQaNSx73MA+nzGuxjZS8o85O+/l?=
+ =?us-ascii?Q?BG27kXeHkD0MOCp5DMDzuBPWqIGbkWWEXGAJ1nEsAJDd3yyXTg=3D=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8660.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?XtjiPoA9+kdH2574ebTcbsep5x1r/Pal611RM1ucRilndWhTmDcdIu/V5BOG?=
+ =?us-ascii?Q?4eDBTbjoHjQ4kbCQXYnSxaNM7YrYHooy/KiYyAvgdW3PqYE0FbAbxqqKdv6n?=
+ =?us-ascii?Q?/mhNB9LU3tpXB4TODw8SXRd7P/BrVmrE6KBwNX8GasaVFOO0CUWsr5re+nhs?=
+ =?us-ascii?Q?JR3mBRSGXsdFtGok8OeP2aNcvwonLmuVoSQCorxaIdJhqF31e83bsACmorL9?=
+ =?us-ascii?Q?5F6jBsoycHZHlHav7xfC5SV3HfVoAA9TrYT03TkZw1cpW6Bhj0cuXn87aWYC?=
+ =?us-ascii?Q?lTuz7r+7ha8ELmJNky2GSdJB4AwDJs45IE7JHbWMchLefc8ci79iwiHmftag?=
+ =?us-ascii?Q?UCAiSP4DtFWWjS80n4lemhdSQxRRpEbuaUom6ZTKpZg3cnuHeyaPaJnDq2ox?=
+ =?us-ascii?Q?DQxnwJPbMdRiUsuVvY8TdISAXYNq0WYUTw508X6f4sxXu2GPLkyWFC9Ja9lR?=
+ =?us-ascii?Q?jUZTM6Tj33A05AWngh5WQubz8rDrto6CKBjhEWqVm+txBMi/z1ql7wYLeb3a?=
+ =?us-ascii?Q?Ifpq4r1ERxC+DOWxy88seAVYEdQnLTU8g4RCS3AVAUlnnBcl4qmohuGHzwHP?=
+ =?us-ascii?Q?ueyHgdS6ysP3cK6l2sYvi05pHIei054OpGbw8b3SY+rmrjLn1eQfMSOs/+10?=
+ =?us-ascii?Q?0MPGS7LfwZ+lrIU5wQkUDC4LejXb/EN526DXHX47MyH8Us6n/rRDEHUWzeRg?=
+ =?us-ascii?Q?bokmBtNrKkprfoS6722nZWMsvql2SzTYSiLiUJOFEgGRViV4zAoc4Ozreast?=
+ =?us-ascii?Q?xn6nL2NpsScOJV9UUWlkQ9sVXQLYvu1/Yfy15wAFpJljHM9ZWjEn7ZtBX3oO?=
+ =?us-ascii?Q?bEuVKlcKqPnvP70gaPoX/E0xPLqP1LR8jdE9Qhnn/QvLLJKQr3XLou0bqFhn?=
+ =?us-ascii?Q?p/gaBSCfidYRscf8wBjx3XkHEBnoxnjotC0cVGRhMmQxUCfWSHCc94bSH0cZ?=
+ =?us-ascii?Q?JJhXIstCfMzAn4WZT4+IAjnB4Z3h9wQoWkXiBIT1M3r420IQP8cJW8/ZgXFG?=
+ =?us-ascii?Q?udCQMsuB3L7uqWpPaBIRhnv1HfSCYQ+hRNboYcZKyC3Li7UhdfwiJnJ/4PRE?=
+ =?us-ascii?Q?hTKjYE5TTm/mLGpS/xbQzlUvmyUM8PmLqEBYhfjOVohmIBQGebsivckW6mHD?=
+ =?us-ascii?Q?xpzdxvWlYa4ieU8KmHNNapYBfB6EO7noye+nQplklKQPg2syQcqxyb32N0z+?=
+ =?us-ascii?Q?65npej4e3X7LdvUPPPoM5fknPp6na4ikl2n3Q2WDWYcNCgv5HeUtP/XPOti4?=
+ =?us-ascii?Q?ShmSbp4Hh+BalZ1KVRevquV8alfSFvzFP4+0OauP69u6xXufkyD18TJ3Hg5F?=
+ =?us-ascii?Q?TZ2ONCvhbwCzrWG6VMpfX7JJrfzDvgc6QsBikmHGb4P0g1HAMw4MtiR0p+L9?=
+ =?us-ascii?Q?STkfXk58UmpTlkVMrS99hxyXdoF7MstuHZlYZYJUwWuxW49OIWGuNMrDtKvz?=
+ =?us-ascii?Q?5HbtWHHweRZ4ACy7aE5/kKBFKBRwQ6gYmoBVyJvPHA1dK7xqms+igzASLfif?=
+ =?us-ascii?Q?qFBdYH0Z3lIwwSugpr5vvCwReXLMCucUnFKfm4qKk6aZAO/pFcpsr6SZ+gBm?=
+ =?us-ascii?Q?jWsUQdiVzqYj8gvYQPIlRsGDkF0H3vthIl+gqAHi?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 52114cec-b8e0-411c-f11e-08ddc2b2a2fe
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8660.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jul 2025 08:44:25.2314
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: mgFOTzo5GD8WeBNTsQFumqjEisL76aqMT/HXPbP0pKwUm9IxfPMZIdZMhV882NE9YMY/u4qDGqOvugXi+gpEqQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB8857
+X-OriginatorOrg: intel.com
 
-Hi Paolo
+On Mon, Jul 14, 2025 at 10:20:19AM +1200, Kai Huang wrote:
+>Reject the KVM_SET_TSC_KHZ VM ioctl when vCPUs have been created and
+>update the documentation to reflect it.
+>
+>The VM scope KVM_SET_TSC_KHZ ioctl is used to set up the default TSC
+>frequency that all subsequently created vCPUs can use.  It is only
+>intended to be called before any vCPU is created.  Allowing it to be
+>called after that only results in confusion but nothing good.
+>
+>Note this is an ABI change.  But currently in Qemu (the de facto
+>userspace VMM) only TDX uses this VM ioctl, and it is only called once
+>before creating any vCPU, therefore the risk of breaking userspace is
+>pretty low.
+>
+>Suggested-by: Sean Christopherson <seanjc@google.com>
+>Signed-off-by: Kai Huang <kai.huang@intel.com>
+>Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
 
-Does the compile of this series of patches require support for a
-special kernel environment? I hit a compile issue after applied you
-patches:
-[1440/2928] Compiling C object libsystem.a.p/hw_virtio_vhost.c.o
-FAILED: libsystem.a.p/hw_virtio_vhost.c.o
-cc -m64 -Ilibsystem.a.p -I. -I.. -Isubprojects/dtc/libfdt
--I../subprojects/dtc/libfdt -Isubprojects/libvduse
--I../subprojects/libvduse -Iui -Iqapi -Itrace -Iui/shader
--I/usr/include/pixman-1 -I/usr/include/glib-2.0
--I/usr/lib64/glib-2.0/include -I/usr/include/libmount
--I/usr/include/blkid -I/usr/include/sysprof-6
--I/usr/include/gio-unix-2.0 -I/usr/include/slirp
--fdiagnostics-color=3Dauto -Wall -Winvalid-pch -Werror -std=3Dgnu11 -O0 -g
--fstack-protector-strong -Wempty-body -Wendif-labels
--Wexpansion-to-defined -Wformat-security -Wformat-y2k
--Wignored-qualifiers -Wimplicit-fallthrough=3D2 -Winit-self
--Wmissing-format-attribute -Wmissing-prototypes -Wnested-externs
--Wold-style-declaration -Wold-style-definition -Wredundant-decls
--Wshadow=3Dlocal -Wstrict-prototypes -Wtype-limits -Wundef -Wvla
--Wwrite-strings -Wno-missing-include-dirs -Wno-psabi
--Wno-shift-negative-value -isystem
-/mnt/tests/distribution/command/qemu/linux-headers -isystem
-linux-headers -iquote . -iquote /mnt/tests/distribution/command/qemu
--iquote /mnt/tests/distribution/command/qemu/include -iquote
-/mnt/tests/distribution/command/qemu/host/include/x86_64 -iquote
-/mnt/tests/distribution/command/qemu/host/include/generic -iquote
-/mnt/tests/distribution/command/qemu/tcg/i386 -pthread -mcx16 -msse2
--D_GNU_SOURCE -D_FILE_OFFSET_BITS=3D64 -D_LARGEFILE_SOURCE
--fno-strict-aliasing -fno-common -fwrapv -ftrivial-auto-var-init=3Dzero
--fzero-call-used-regs=3Dused-gpr -fPIE -DWITH_GZFILEOP -DCONFIG_SOFTMMU
--DCOMPILING_SYSTEM_VS_USER -MD -MQ libsystem.a.p/hw_virtio_vhost.c.o
--MF libsystem.a.p/hw_virtio_vhost.c.o.d -o
-libsystem.a.p/hw_virtio_vhost.c.o -c ../hw/virtio/vhost.c
-../hw/virtio/vhost.c: In function =E2=80=98vhost_dev_set_features=E2=80=99:
-../hw/virtio/vhost.c:38:9: error: =E2=80=98r=E2=80=99 may be used uninitial=
-ized
-[-Werror=3Dmaybe-uninitialized]
-   38 |         error_report(fmt ": %s (%d)", ## __VA_ARGS__, \
-      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   39 |                      strerror(-retval), -retval); \
-      |                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-../hw/virtio/vhost.c:1006:9: note: in expansion of macro =E2=80=98VHOST_OPS=
-_DEBUG=E2=80=99
- 1006 |         VHOST_OPS_DEBUG(r, "extended features without device suppor=
-t");
-      |         ^~~~~~~~~~~~~~~
-../hw/virtio/vhost.c:989:9: note: =E2=80=98r=E2=80=99 was declared here
-  989 |     int r;
-      |         ^
-cc1: all warnings being treated as errors
-ninja: build stopped: subcommand failed.
-make[1]: *** [Makefile:168: run-ninja] Error 1
-make[1]: Leaving directory '/mnt/tests/distribution/command/qemu/build'
-make[1]: Entering directory '/mnt/tests/distribution/command/qemu/build'
-[1/1493] Generating subprojects/dtc/version_gen.h with a custom command
-[2/1493] Generating qemu-version.h with a custom command (wrapped by
-meson to capture output)
-[3/1492] Compiling C object libsystem.a.p/hw_virtio_vhost.c.o
-FAILED: libsystem.a.p/hw_virtio_vhost.c.o
-cc -m64 -Ilibsystem.a.p -I. -I.. -Isubprojects/dtc/libfdt
--I../subprojects/dtc/libfdt -Isubprojects/libvduse
--I../subprojects/libvduse -Iui -Iqapi -Itrace -Iui/shader
--I/usr/include/pixman-1 -I/usr/include/glib-2.0
--I/usr/lib64/glib-2.0/include -I/usr/include/libmount
--I/usr/include/blkid -I/usr/include/sysprof-6
--I/usr/include/gio-unix-2.0 -I/usr/include/slirp
--fdiagnostics-color=3Dauto -Wall -Winvalid-pch -Werror -std=3Dgnu11 -O0 -g
--fstack-protector-strong -Wempty-body -Wendif-labels
--Wexpansion-to-defined -Wformat-security -Wformat-y2k
--Wignored-qualifiers -Wimplicit-fallthrough=3D2 -Winit-self
--Wmissing-format-attribute -Wmissing-prototypes -Wnested-externs
--Wold-style-declaration -Wold-style-definition -Wredundant-decls
--Wshadow=3Dlocal -Wstrict-prototypes -Wtype-limits -Wundef -Wvla
--Wwrite-strings -Wno-missing-include-dirs -Wno-psabi
--Wno-shift-negative-value -isystem
-/mnt/tests/distribution/command/qemu/linux-headers -isystem
-linux-headers -iquote . -iquote /mnt/tests/distribution/command/qemu
--iquote /mnt/tests/distribution/command/qemu/include -iquote
-/mnt/tests/distribution/command/qemu/host/include/x86_64 -iquote
-/mnt/tests/distribution/command/qemu/host/include/generic -iquote
-/mnt/tests/distribution/command/qemu/tcg/i386 -pthread -mcx16 -msse2
--D_GNU_SOURCE -D_FILE_OFFSET_BITS=3D64 -D_LARGEFILE_SOURCE
--fno-strict-aliasing -fno-common -fwrapv -ftrivial-auto-var-init=3Dzero
--fzero-call-used-regs=3Dused-gpr -fPIE -DWITH_GZFILEOP -DCONFIG_SOFTMMU
--DCOMPILING_SYSTEM_VS_USER -MD -MQ libsystem.a.p/hw_virtio_vhost.c.o
--MF libsystem.a.p/hw_virtio_vhost.c.o.d -o
-libsystem.a.p/hw_virtio_vhost.c.o -c ../hw/virtio/vhost.c
-../hw/virtio/vhost.c: In function =E2=80=98vhost_dev_set_features=E2=80=99:
-../hw/virtio/vhost.c:38:9: error: =E2=80=98r=E2=80=99 may be used uninitial=
-ized
-[-Werror=3Dmaybe-uninitialized]
-   38 |         error_report(fmt ": %s (%d)", ## __VA_ARGS__, \
-      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   39 |                      strerror(-retval), -retval); \
-      |                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-../hw/virtio/vhost.c:1006:9: note: in expansion of macro =E2=80=98VHOST_OPS=
-_DEBUG=E2=80=99
- 1006 |         VHOST_OPS_DEBUG(r, "extended features without device suppor=
-t");
-      |         ^~~~~~~~~~~~~~~
-../hw/virtio/vhost.c:989:9: note: =E2=80=98r=E2=80=99 was declared here
-  989 |     int r;
-      |         ^
-cc1: all warnings being treated as errors
-ninja: build stopped: subcommand failed.
-make[1]: *** [Makefile:168: run-ninja] Error 1
-make[1]: Leaving directory '/mnt/tests/distribution/command/qemu/build'
-
-Thanks
-Lei
-
-On Fri, Jul 11, 2025 at 9:08=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> Some virtualized deployments use UDP tunnel pervasively and are impacted
-> negatively by the lack of GSO support for such kind of traffic in the
-> virtual NIC driver.
->
-> The virtio_net specification recently introduced support for GSO over
-> UDP tunnel, and the kernel side of the implementation has been merged
-> into the net-next tree; this series updates the virtio implementation to
-> support such a feature.
->
-> Currently the qemu virtio support limits the feature space to 64 bits,
-> while the virtio specification allows for a larger number of features.
-> Specifically the GSO-over-UDP-tunnel-related virtio features use bits
-> 65-69; the larger part of this series (patches 3-11) actually deals with
-> extending the features space.
->
-> The extended features are carried by fixed size uint64_t arrays,
-> bringing the current maximum features number to 128.
->
-> The patches use some syntactic sugar to try to minimize the otherwise
-> very large code churn. Specifically the extended features are boundled
-> in an union with 'legacy' features definition, allowing no changes in
-> the virtio devices not needing the extended features set.
->
-> The actual offload implementation is in patches 12 and 13 and boils down
-> to propagating the new offload to the tun devices and the vhost backend.
->
-> Finally patch 1 is a small pre-req refactor that ideally could enter the
-> tree separately; it's presented here in the same series to help
-> reviewers more easily getting the full picture and patch 2 is a needed
-> linux headers update.
->
-> Tested with basic stream transfer with all the possible permutations of
-> host kernel/qemu/guest kernel with/without GSO over UDP tunnel support,
-> vs snapshots creation and restore and vs migration.
->
-> Sharing again as RFC as the kernel bits have not entered the Linus tree
-> yet - but they should on next merge window.
->
-> Paolo Abeni (13):
->   net: bundle all offloads in a single struct
->   linux-headers: Update to Linux ~v6.16-rc5 net-next
->   virtio: introduce extended features type
->   virtio: serialize extended features state
->   virtio: add support for negotiating extended features
->   virtio-pci: implement support for extended features
->   vhost: add support for negotiating extended features
->   qmp: update virtio features map to support extended features
->   vhost-backend: implement extended features support
->   vhost-net: implement extended features support
->   virtio-net: implement extended features support
->   net: implement tunnel probing
->   net: implement UDP tunnel features offloading
->
->  hw/net/e1000e_core.c                         |   5 +-
->  hw/net/igb_core.c                            |   5 +-
->  hw/net/vhost_net-stub.c                      |   8 +-
->  hw/net/vhost_net.c                           |  50 +++--
->  hw/net/virtio-net.c                          | 215 +++++++++++++------
->  hw/net/vmxnet3.c                             |  13 +-
->  hw/virtio/vhost-backend.c                    |  62 +++++-
->  hw/virtio/vhost.c                            |  73 ++++++-
->  hw/virtio/virtio-bus.c                       |  11 +-
->  hw/virtio/virtio-hmp-cmds.c                  |   3 +-
->  hw/virtio/virtio-pci.c                       | 101 ++++++++-
->  hw/virtio/virtio-qmp.c                       |  89 +++++---
->  hw/virtio/virtio-qmp.h                       |   3 +-
->  hw/virtio/virtio.c                           | 111 ++++++++--
->  include/hw/virtio/vhost-backend.h            |   6 +
->  include/hw/virtio/vhost.h                    |  36 +++-
->  include/hw/virtio/virtio-features.h          | 124 +++++++++++
->  include/hw/virtio/virtio-net.h               |   2 +-
->  include/hw/virtio/virtio-pci.h               |   6 +-
->  include/hw/virtio/virtio.h                   |  11 +-
->  include/net/net.h                            |  20 +-
->  include/net/vhost_net.h                      |  33 ++-
->  include/standard-headers/linux/ethtool.h     |   4 +-
->  include/standard-headers/linux/vhost_types.h |   5 +
->  include/standard-headers/linux/virtio_net.h  |  33 +++
->  linux-headers/asm-x86/kvm.h                  |   8 +-
->  linux-headers/linux/kvm.h                    |   4 +
->  linux-headers/linux/vhost.h                  |   7 +
->  net/net.c                                    |  17 +-
->  net/netmap.c                                 |   3 +-
->  net/tap-bsd.c                                |   8 +-
->  net/tap-linux.c                              |  38 +++-
->  net/tap-linux.h                              |   9 +
->  net/tap-solaris.c                            |   9 +-
->  net/tap-stub.c                               |   8 +-
->  net/tap.c                                    |  19 +-
->  net/tap_int.h                                |   5 +-
->  qapi/virtio.json                             |   8 +-
->  38 files changed, 945 insertions(+), 227 deletions(-)
->  create mode 100644 include/hw/virtio/virtio-features.h
->
-> --
-> 2.50.0
->
->
-
+Reviewed-by: Chao Gao <chao.gao@intel.com>
 
