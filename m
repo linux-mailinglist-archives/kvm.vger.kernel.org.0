@@ -1,87 +1,65 @@
-Return-Path: <kvm+bounces-52257-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52258-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D28DCB033FF
-	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 02:56:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BE32B03464
+	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 04:14:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2765516629C
-	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 00:56:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4BED31885A21
+	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 02:14:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F9DD1891A9;
-	Mon, 14 Jul 2025 00:56:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C260F1C861D;
+	Mon, 14 Jul 2025 02:14:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bLiXd8+L"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CdSYKPx2"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA6A211CBA
-	for <kvm@vger.kernel.org>; Mon, 14 Jul 2025 00:56:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16CF817B50A
+	for <kvm@vger.kernel.org>; Mon, 14 Jul 2025 02:14:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752454605; cv=none; b=psW27lc0Vc0JysllYnDGCFen+iuKJBwH9jkrmMxDi0YlvH6wFbHw8n1FNCWL1Wj/5gdZyzAnp5tQQ/GeGpRuOovkzFr5KqHfgextKMHk6L+LLDV4n+8aPdwu8+VPm9Sh2i1eiigl+OJDJ41OpkUtDvCZqhRmZ6wq0frga/AXvcU=
+	t=1752459268; cv=none; b=BPLvM0QH0X4SoWW2uaCxmnkVw5eib6V/ynLtmsMZvs3wbJREhj1UmbwCYloN1MnXPeel553ATf0qNCsy669ttGKJk4vIZQOsa4M3HZKyjIvQumxT9Hqn19FqBnCqD3Rk4D/ATBM45WNtHF9w4v1LbqEcn3DV3IsE0bRwYk+3cv8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752454605; c=relaxed/simple;
-	bh=Aj2wrqzNkDFUp0Qlcm9ZHkXFqT0KNjoQwLntUrA8h4w=;
+	s=arc-20240116; t=1752459268; c=relaxed/simple;
+	bh=HRVqwjo/sUcMRBRRlPeumOnSGG3iOiRC73GSgqSZB1g=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=seE/SFm0x/ClXmWQF+yacnpaqOPFLy0NyEAZ35sfGsgZloVYMufD1dWnATh0OcfeqypnUoA+l4CDZJNboMEogvW+aOoCrqiRKc3ObOnChXUhtaD1HkXNeT4zniqHAQz+ldODGSp+BlgvFnmBXJyOq59KFrLjsmqg84d/ZGgVuno=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bLiXd8+L; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752454602;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qUmVGWmiQ9qj6UDI8yyGeFapyi86on9NnjOakrMOqpk=;
-	b=bLiXd8+LtLU0OzbdzO/ANH6EO6G5V8QjtSjGPcap0esMuzMg0g5aNpliz5T3ZRs4gRbk3S
-	WRgDZx4///LPkIRUyiKbSBV95tKjNStKsV9KeUJPBUoUn6xyEa7xHjlVbRFp8bG6PUGdF4
-	eMLrrEVf3VZpy9svJSrWy0/Rgiar+7s=
-Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
- [209.85.215.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-687--a37NWxFNKm5RD2nB5tryg-1; Sun, 13 Jul 2025 20:56:41 -0400
-X-MC-Unique: -a37NWxFNKm5RD2nB5tryg-1
-X-Mimecast-MFC-AGG-ID: -a37NWxFNKm5RD2nB5tryg_1752454600
-Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-b391a561225so2931408a12.1
-        for <kvm@vger.kernel.org>; Sun, 13 Jul 2025 17:56:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752454600; x=1753059400;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qUmVGWmiQ9qj6UDI8yyGeFapyi86on9NnjOakrMOqpk=;
-        b=Gjz3OCRs+VqTqCf7cHQJv0rYu7jREm7dAKU8fRbq2efnFk8uxMTWiIMyGTJQTW6WSI
-         D/mniiX/uX9dMqTc2hBNPOtZvxdHKgmhXraR2zF4sNkjdKY3Iv24hjN32QB924x3tVV3
-         yMjx53lLDeHLdgrpRC7ZD9GYgSosOgaRyYaYU4WliYPmM/4ZHWZH1Z2FhRo2+GFhkYHn
-         d9xn7UgU43XDixX6+nvulwrzKJ4FEwkGMjdvaqYyfs5mstQvMUyhefeWGgAEQE+7sPYV
-         DssiXm80RVkns/Va1gs0wwV83/NrQfTTlTxypECPc18LVuVqvnvfvLheQ8aGKSrDt2My
-         kXfw==
-X-Forwarded-Encrypted: i=1; AJvYcCWkpZFhYRTnV9mZxT5xtz3AuJn90l8m4+zQlTRaltuapzPKl6txCx/wBLioxmCmHRsSIjo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzBg7N2ajY96X9pkEeBhOGqnSJ9w3+v7/cxvZY1jlo9x7mSGtYG
-	+tP5pOWLs29v/XxopEfgVdMJuN+Lw0Lxk6l5VWpEtlTe2IWQX/gkOaKWK58OKkSXHP16hOY4Y+F
-	zToXmxpi69J7I9B/wEaY2Ywszj83C/qr1IkQApxFGPV1fS0tNYc0jhg==
-X-Gm-Gg: ASbGncvRB3kEEFJ6enKJo6iQ5Gs0s2bT8tvAjLiZ014/akNHejlWSCjEoBbWIaNWztY
-	ZRjeXQW7atAQsPFoXZX1IkU9gwSWxgWpVUosbIXYz3VTHlUsAJvy2F5j/nSb10nSru2vOZbvH4X
-	OLphyOWHs1oLiv9TBXyv6ig5ov4cdj/sKypqUauo0E5nHEOtHgVL7/hejBkmDc9k6ofE6be/A8z
-	Bzd2xmu3t+FTS7/GVcpj4FNd8stN93ytdN//nc0VqyFkxHegIVhPmHOqGmuxPYkhqzUUq05MhTn
-	DeAfcZaxrVZFuYlnA7JOJfHqwxwy5viFBbj6EB0jQZq66gMv946dkb8NwjwoHKM6VlbISk53YZA
-	VxWs=
-X-Received: by 2002:a05:6a20:a108:b0:1f5:95a7:8159 with SMTP id adf61e73a8af0-2313504eae8mr16343998637.10.1752454599971;
-        Sun, 13 Jul 2025 17:56:39 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEuM+Zi92A0hbUgn10WrjgmwNif+FKdGvokkBLHmwp/rW6/7cd0fjnuie824/YWyiFVdE8dUA==
-X-Received: by 2002:a05:6a20:a108:b0:1f5:95a7:8159 with SMTP id adf61e73a8af0-2313504eae8mr16343960637.10.1752454599481;
-        Sun, 13 Jul 2025 17:56:39 -0700 (PDT)
-Received: from [192.168.68.51] (n175-34-62-5.mrk21.qld.optusnet.com.au. [175.34.62.5])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b3bbe727e33sm9168382a12.68.2025.07.13.17.56.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 13 Jul 2025 17:56:38 -0700 (PDT)
-Message-ID: <05605650-2dd2-4abf-b0a5-f727753db7f5@redhat.com>
-Date: Mon, 14 Jul 2025 10:56:28 +1000
+	 In-Reply-To:Content-Type; b=NB5ULlTaHDeTLJ+Bo49aAe8GjT+FLVgw6enqvptANyMU3Oonki80d5dB8Ws/NpzXoLIHGHCq8LjPaobCJBP++7mQRgINxp0POUaX4SZ8jxtLbVk8qgAqiPEhl81GNaEYbA5dbOikRXXD6oYBTbDuQLdVcN1DfhAkkk0ENoMdcFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CdSYKPx2; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1752459267; x=1783995267;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=HRVqwjo/sUcMRBRRlPeumOnSGG3iOiRC73GSgqSZB1g=;
+  b=CdSYKPx25DR+4omlTZ6qQ5f6Xwy9E40DAi2lb8JVe4iMuZtZ+VT713tI
+   VcJrsmawozLijL/Ei4fwA8FpMW5Ciw5rF35WARvRMi4UtHy8jyQfru+Yi
+   Iq8r2kkMB8IEV+jjtiU8egiifMWDfZhTwfabVnWUiBU54YMMAygdauD+m
+   ZyLK62xWWiGB2XxxvR5A8sAGvACk5Giz6voF6VNP8PTiLmY1A63olaXiY
+   zxoBOn96RpZQXPhz70yfqL5idVdjz3G6njdBhXBS5ZWr+d6awsPCh43Mg
+   5ZunLC6pn+wTYQ73xZlqMZ/shcx7Smh0SsaIViBgCubS2zohiNBFUYVDB
+   Q==;
+X-CSE-ConnectionGUID: zmTuyGVEQbOyuTAp+PanKw==
+X-CSE-MsgGUID: 7FlZBd0nRCyX8Da5spU9Og==
+X-IronPort-AV: E=McAfee;i="6800,10657,11491"; a="54781331"
+X-IronPort-AV: E=Sophos;i="6.16,310,1744095600"; 
+   d="scan'208";a="54781331"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jul 2025 19:14:27 -0700
+X-CSE-ConnectionGUID: n/fwqHXaRaCNrrZ1LIZ6yQ==
+X-CSE-MsgGUID: sOxpYQfBQlSd1+04/xh3uw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,310,1744095600"; 
+   d="scan'208";a="157304989"
+Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.240.57]) ([10.124.240.57])
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jul 2025 19:14:22 -0700
+Message-ID: <2c2ea3ae-30ea-4ff3-848a-fed6a86c0c53@linux.intel.com>
+Date: Mon, 14 Jul 2025 10:14:18 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -89,87 +67,176 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v10 (RESEND) 00/20] Change ghes to use HEST-based offsets
- and add support for error inject
-To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
- Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
-Cc: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
- Shiju Jose <shiju.jose@huawei.com>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?=
- <philmd@linaro.org>, Ani Sinha <anisinha@redhat.com>,
- Dongjiu Geng <gengdongjiu1@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- Shannon Zhao <shannon.zhaosl@gmail.com>, Yanan Wang
- <wangyanan55@huawei.com>, Zhao Liu <zhao1.liu@intel.com>,
- kvm@vger.kernel.org, Cleber Rosa <crosa@redhat.com>,
- Eduardo Habkost <eduardo@habkost.net>, Eric Blake <eblake@redhat.com>,
- John Snow <jsnow@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- Markus Armbruster <armbru@redhat.com>, Michael Roth <michael.roth@amd.com>,
- linux-kernel@vger.kernel.org
-References: <cover.1749741085.git.mchehab+huawei@kernel.org>
+Subject: Re: [PATCH v2 03/18] i386/cpu: Add default cache model for Intel CPUs
+ with level < 4
+To: Zhao Liu <zhao1.liu@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>, "Michael S . Tsirkin"
+ <mst@redhat.com>, =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?=
+ <berrange@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Eduardo Habkost <eduardo@habkost.net>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ Babu Moger <babu.moger@amd.com>, Ewan Hai <ewanhai-oc@zhaoxin.com>,
+ Pu Wen <puwen@hygon.cn>, Tao Su <tao1.su@intel.com>,
+ Yi Lai <yi1.lai@intel.com>, Dapeng Mi <dapeng1.mi@intel.com>,
+ qemu-devel@nongnu.org, kvm@vger.kernel.org
+References: <20250711102143.1622339-1-zhao1.liu@intel.com>
+ <20250711102143.1622339-4-zhao1.liu@intel.com>
 Content-Language: en-US
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <cover.1749741085.git.mchehab+huawei@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
+In-Reply-To: <20250711102143.1622339-4-zhao1.liu@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi Mauro,
 
-On 6/13/25 1:17 AM, Mauro Carvalho Chehab wrote:
-> Hi Michael,
-> 
-> This is v10 of the patch series, rebased to apply after release
-> 10.0. The only difference against v9 is a minor confict resolution.
-> 
-> I sent already the patch with conflicts, but, as you didn't pick,
-> I'm assuming you're opting to see the entire series again, as it
-> could make easier for you to use b4 or some other script you may
-> use to pick patches. So, let me resend the entire series.
-> 
-> It is nearly identical to v9 which addressed 3 issues:
-> 
-> - backward compatibility logic moved to version 10.0;
-> - fixed a compilation issue with target/arm/kvm.c (probably
->    caused by some rebase - funny enough, incremental
->    compilation was fine here);
-> - added two missing SPDX comments.
-> 
-> As ghes_record_cper_errors() was written since the beginning
-> to be public and used by ghes-cper.c. It ended being meged
-> earlier because the error-injection series become too big,
-> so it was decided last year to split in two to make easier for
-> reviewers and maintainers to discuss.
-> 
-> This series change the way HEST table offsets are calculated,
-> making them identical to what an OSPM would do and allowing
-> multiple HEST entries without causing migration issues. It open
-> space to add HEST support for non-arm architectures, as now
-> the number and type of HEST notification entries are not
-> hardcoded at ghes.c. Instead, they're passed as a parameter
-> from the arch-dependent init code.
-> 
-> With such issue addressed, it adds a new notification type and
-> add support to inject errors via a Python script. The script
-> itself is at the final patch.
-> 
+On 7/11/2025 6:21 PM, Zhao Liu wrote:
+> Old Intel CPUs with CPUID level < 4, use CPUID 0x2 leaf (if available)
+> to encode cache information.
+>
+> Introduce a cache model "legacy_intel_cpuid2_cache_info" for the CPUs
+> with CPUID level < 4, based on legacy_l1d_cache, legacy_l1i_cache,
+> legacy_l2_cache_cpuid2 and legacy_l3_cache. But for L2 cache, this
+> cache model completes self_init, sets, partitions, no_invd_sharing and
+> share_level fields, referring legacy_l2_cache, to avoid someone
+> increases CPUID level manually and meets assert() error. But the cache
+> information present in CPUID 0x2 leaf doesn't change.
+>
+> This new cache model makes it possible to remove legacy_l2_cache_cpuid2
+> in X86CPUState and help to clarify historical cache inconsistency issue.
+>
+> Furthermore, apply this legacy cache model to all Intel CPUs with CPUID
+> level < 4. This includes not only "pentium2" and "pentium3" (which have
+> 0x2 leaf), but also "486" and "pentium" (which only have 0x1 leaf, and
+> cache model won't be presented, just for simplicity).
+>
+> A legacy_intel_cpuid2_cache_info cache model doesn't change the cache
+> information of the above CPUs, because they just depend on 0x2 leaf.
+>
+> Only when someone adjusts the min-level to >=4 will the cache
+> information in CPUID leaf 4 differ from before: previously, the L2
+> cache information in CPUID leaf 0x2 and 0x4 was different, but now with
+> legacy_intel_cpuid2_cache_info, the information they present will be
+> consistent. This case almost never happens, emulating a CPUID that is
+> not supported by the "ancient" hardware is itself meaningless behavior.
+>
+> Therefore, even though there's the above difference (for really rare
+> case) and considering these old CPUs ("486", "pentium", "pentium2" and
+> "pentium3") won't be used for migration, there's no need to add new
+> versioned CPU models
+>
+> Tested-by: Yi Lai <yi1.lai@intel.com>
+> Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 > ---
-> 
-> v10:
-> - rebased on the top of current upstream:
->    d9ce74873a6a ("Merge tag 'pull-vfio-20250611' of https://github.com/legoater/qemu into staging")
-> - solved a minor conflict
-> 
+>  target/i386/cpu.c | 65 +++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 65 insertions(+)
+>
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 75932579542a..f85e087bf7df 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -710,6 +710,67 @@ static CPUCacheInfo legacy_l3_cache = {
+>      .share_level = CPU_TOPOLOGY_LEVEL_DIE,
+>  };
+>  
+> +/*
+> + * Only used for the CPU models with CPUID level < 4.
+> + * These CPUs (CPUID level < 4) only use CPUID leaf 2 to present
+> + * cache information.
+> + *
+> + * Note: This cache model is just a default one, and is not
+> + *       guaranteed to match real hardwares.
+> + */
+> +static const CPUCaches legacy_intel_cpuid2_cache_info = {
+> +    .l1d_cache = &(CPUCacheInfo) {
+> +        .type = DATA_CACHE,
+> +        .level = 1,
+> +        .size = 32 * KiB,
+> +        .self_init = 1,
+> +        .line_size = 64,
+> +        .associativity = 8,
+> +        .sets = 64,
+> +        .partitions = 1,
+> +        .no_invd_sharing = true,
+> +        .share_level = CPU_TOPOLOGY_LEVEL_CORE,
+> +    },
+> +    .l1i_cache = &(CPUCacheInfo) {
+> +        .type = INSTRUCTION_CACHE,
+> +        .level = 1,
+> +        .size = 32 * KiB,
+> +        .self_init = 1,
+> +        .line_size = 64,
+> +        .associativity = 8,
+> +        .sets = 64,
+> +        .partitions = 1,
+> +        .no_invd_sharing = true,
+> +        .share_level = CPU_TOPOLOGY_LEVEL_CORE,
+> +    },
+> +    .l2_cache = &(CPUCacheInfo) {
+> +        .type = UNIFIED_CACHE,
+> +        .level = 2,
+> +        .size = 2 * MiB,
+> +        .self_init = 1,
+> +        .line_size = 64,
+> +        .associativity = 8,
+> +        .sets = 4096,
+> +        .partitions = 1,
+> +        .no_invd_sharing = true,
+> +        .share_level = CPU_TOPOLOGY_LEVEL_CORE,
+> +    },
+> +    .l3_cache = &(CPUCacheInfo) {
+> +        .type = UNIFIED_CACHE,
+> +        .level = 3,
+> +        .size = 16 * MiB,
+> +        .line_size = 64,
+> +        .associativity = 16,
+> +        .sets = 16384,
+> +        .partitions = 1,
+> +        .lines_per_tag = 1,
+> +        .self_init = true,
+> +        .inclusive = true,
+> +        .complex_indexing = true,
+> +        .share_level = CPU_TOPOLOGY_LEVEL_DIE,
+> +    },
+> +};
+> +
+>  /* TLB definitions: */
+>  
+>  #define L1_DTLB_2M_ASSOC       1
+> @@ -3043,6 +3104,7 @@ static const X86CPUDefinition builtin_x86_defs[] = {
+>              I486_FEATURES,
+>          .xlevel = 0,
+>          .model_id = "",
+> +        .cache_info = &legacy_intel_cpuid2_cache_info,
+>      },
+>      {
+>          .name = "pentium",
+> @@ -3055,6 +3117,7 @@ static const X86CPUDefinition builtin_x86_defs[] = {
+>              PENTIUM_FEATURES,
+>          .xlevel = 0,
+>          .model_id = "",
+> +        .cache_info = &legacy_intel_cpuid2_cache_info,
+>      },
+>      {
+>          .name = "pentium2",
+> @@ -3067,6 +3130,7 @@ static const X86CPUDefinition builtin_x86_defs[] = {
+>              PENTIUM2_FEATURES,
+>          .xlevel = 0,
+>          .model_id = "",
+> +        .cache_info = &legacy_intel_cpuid2_cache_info,
+>      },
+>      {
+>          .name = "pentium3",
+> @@ -3079,6 +3143,7 @@ static const X86CPUDefinition builtin_x86_defs[] = {
+>              PENTIUM3_FEATURES,
+>          .xlevel = 0,
+>          .model_id = "",
+> +        .cache_info = &legacy_intel_cpuid2_cache_info,
+>      },
+>      {
+>          .name = "athlon",
 
-[...]
-
-Just head up to check if this series has been merged? I don't see those patches
-show up in the latest upstream QEMU yet. The reason why I'm asking is the subsequent
-fix [1], which depends on this series.
-
-[1] https://lists.nongnu.org/archive/html/qemu-devel/2025-05/msg06433.html
-
-Thanks,
-Gavin
+Reviewed-by:  Dapeng Mi <dapeng1.mi@linux.intel.com>
 
 
 
