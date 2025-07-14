@@ -1,194 +1,199 @@
-Return-Path: <kvm+bounces-52338-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52339-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B494DB0422A
-	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 16:51:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBB22B0424F
+	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 16:57:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF1AB1A634B9
-	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 14:51:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 862723A87CE
+	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 14:57:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47711259CAF;
-	Mon, 14 Jul 2025 14:51:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cphnF2fP"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6088B25B2F4;
+	Mon, 14 Jul 2025 14:57:10 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp232.sjtu.edu.cn (smtp232.sjtu.edu.cn [202.120.2.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C27D67262A
-	for <kvm@vger.kernel.org>; Mon, 14 Jul 2025 14:51:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C570259CB0;
+	Mon, 14 Jul 2025 14:57:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.120.2.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752504664; cv=none; b=lxK3WoiyIAfDSiCL6NWUe9OV4Bz+TiirGrQfaaJwV2lhDZIXG6Ca76liPQ3SWkpPy5Nkw/H8naV7zB5/72PiI+i2V3qnCWEK46Jl5880kUPRjAa+5Rgp2ncbpq4IZ/4ndYCywkqcSHj78sWqi+wfFfaVNi2IPfDu+wNP+uv59Q8=
+	t=1752505029; cv=none; b=ZV/aR09l2nrX94WVE2T5saJVHal6MZoAWe3arbsYlx0SLaWE75xER8qz6gA958o0CuoLKCl9b0354ipCfOW9d1pvZPEa4CjQUUIvDyO5ssOOZlry1kXPGHLg2ALCY5bm43y1uvuT1TF3ZGkGgzHFg5uJfbgLyb6U8gRkJyQOjGI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752504664; c=relaxed/simple;
-	bh=TpRjwZhFaB4hUyHwO85TEJZ9oWPA3B/qZb/0ol8ov4I=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=V5mhz79s++6ZNcsOpU5sM6DboQYHuvEJa+C0VZSceL/hgAUuqhQDidUxsLrZ0XAjr1SDxIXRVTZI6PB6SRpNpay/eppPl5vQHfu2KnlzcSWDp2Up+JEN9Of7ug60sC/0x/2C+OlPKTF2IMX46MUWXequEMbnTe5wJxf45iiCYes=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cphnF2fP; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752504661;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=077iID017x5hekrx8ZJxn5xmRJvz5gqq3mLhkRXv4F0=;
-	b=cphnF2fPNbUC2DNTkeAk2rMqpQMNWlEyUfJC4gtD6vX+dpTDWrJLmiXVv3YhXKOVncqM2H
-	BiPVbh+QmEh+k5HfkSKL0THfunxIN1iSIHxhiIPfEo8PQTBsVyoOoV27CjD8rDLR+Hq7cB
-	v/sgy6CKwODmfBG+PeU6IT5RFX2GEzg=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-388-vrPzNYbiOQKhd7KwcHHQQw-1; Mon,
- 14 Jul 2025 10:51:00 -0400
-X-MC-Unique: vrPzNYbiOQKhd7KwcHHQQw-1
-X-Mimecast-MFC-AGG-ID: vrPzNYbiOQKhd7KwcHHQQw_1752504659
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 38F9E18001D6
-	for <kvm@vger.kernel.org>; Mon, 14 Jul 2025 14:50:59 +0000 (UTC)
-Received: from dell-r430-03.lab.eng.brq2.redhat.com (dell-r430-03.lab.eng.brq2.redhat.com [10.37.153.18])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 51D9B1956094;
-	Mon, 14 Jul 2025 14:50:58 +0000 (UTC)
-From: Igor Mammedov <imammedo@redhat.com>
-To: kvm@vger.kernel.org
-Cc: pbonzini@redhat.com
-Subject: [PATCH v2] x86: add HPET counter read micro benchmark and enable/disable torture tests
-Date: Mon, 14 Jul 2025 16:50:55 +0200
-Message-ID: <20250714145055.1487738-1-imammedo@redhat.com>
+	s=arc-20240116; t=1752505029; c=relaxed/simple;
+	bh=CVaX47SHOe4vJ05VeCEEWy1KKUEuNVXFqHTL3r5qeSk=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=f/DiWHBoeG/wE23/GF6zE1j3NvEtIHwEiqImvGVJFVpQ61XNXsE2lnKu1KIYo+/Unk1A+dgZbHhfRCCyGNoKNEy+t84cJJADjzbZ2bEDljjiRICsMvBuHgMAgO4fCz+Mq4D8NyHxMscp29/P7wGRlVrnPpfwKGzSqsVbQIYSRYQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sjtu.edu.cn; spf=pass smtp.mailfrom=sjtu.edu.cn; arc=none smtp.client-ip=202.120.2.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sjtu.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sjtu.edu.cn
+Received: from proxy188.sjtu.edu.cn (smtp188.sjtu.edu.cn [202.120.2.188])
+	by smtp232.sjtu.edu.cn (Postfix) with ESMTPS id 3318710051698;
+	Mon, 14 Jul 2025 22:57:02 +0800 (CST)
+Received: from smtpclient.apple (unknown [202.120.40.82])
+	by proxy188.sjtu.edu.cn (Postfix) with ESMTPSA id B68BC37C929;
+	Mon, 14 Jul 2025 22:56:59 +0800 (CST)
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.600.51.1.1\))
+Subject: Re: [BUG] NULL pointer dereference in sev_writeback_caches during KVM
+ SEV migration kselftest on AMD platform
+From: Zheyun Shen <szy0127@sjtu.edu.cn>
+In-Reply-To: <aHUYwCNDWlsar3qk@google.com>
+Date: Mon, 14 Jul 2025 22:56:44 +0800
+Cc: Srikanth Aithal <sraithal@amd.com>,
+ linux-next@vger.kernel.org,
+ kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <15D0C887-E17F-4432-8716-BF62EEE61B6B@sjtu.edu.cn>
+References: <935a82e3-f7ad-47d7-aaaf-f3d2b62ed768@amd.com>
+ <F7AF073C-D630-45A3-8746-DE66B15FC3E1@sjtu.edu.cn>
+ <aHUYwCNDWlsar3qk@google.com>
+To: Sean Christopherson <seanjc@google.com>
+X-Mailer: Apple Mail (2.3826.600.51.1.1)
 
-test is to be used for benchmarking/validating HPET main counter reading
+The problem is triggered by the following codes in =
+tools/testing/selftests/kvm/x86/sev_migrate_tests.c:
+static void test_sev_migrate_from(bool es)
+{
+	struct kvm_vm *src_vm;
+	struct kvm_vm *dst_vms[NR_MIGRATE_TEST_VMS];
+	int i, ret;
 
-how to run:
-   QEMU=/foo/qemu-system-x86_64 x86/run x86/hpet_read_test.flat -smp X
-where X is desired (max) number of logical CPUs on host
+	src_vm =3D sev_vm_create(es);
+	for (i =3D 0; i < NR_MIGRATE_TEST_VMS; ++i)
+		dst_vms[i] =3D aux_vm_create(true);
 
-it will 1st execute concurrent read benchmark
-and after that it will run torture test enabling/disabling HPET counter,
-while running readers in parallel. Goal is to verify counter that always
-goes up.
+	/* Initial migration from the src to the first dst. */
+	sev_migrate_from(dst_vms[0], src_vm);
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
----
-v2:
-   * fix broken timer going backwards check
-   * report # of fails
-   * warn if number of vcpus is not sufficient for torture test and skip
-     it
-   * style fixups
----
- x86/Makefile.common  |  2 ++
- x86/hpet_read_test.c | 73 ++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 75 insertions(+)
- create mode 100644 x86/hpet_read_test.c
+	for (i =3D 1; i < NR_MIGRATE_TEST_VMS; i++)
+		sev_migrate_from(dst_vms[i], dst_vms[i - 1]);
 
-diff --git a/x86/Makefile.common b/x86/Makefile.common
-index 5663a65d..ef0e09a6 100644
---- a/x86/Makefile.common
-+++ b/x86/Makefile.common
-@@ -101,6 +101,8 @@ tests-common += $(TEST_DIR)/realmode.$(exe) \
- realmode_bits := $(if $(call cc-option,-m16,""),16,32)
- endif
- 
-+tests-common += $(TEST_DIR)/hpet_read_test.$(exe)
-+
- test_cases: $(tests-common) $(tests)
- 
- $(TEST_DIR)/%.o: CFLAGS += -std=gnu99 -ffreestanding -I $(SRCDIR)/lib -I $(SRCDIR)/lib/x86 -I lib
-diff --git a/x86/hpet_read_test.c b/x86/hpet_read_test.c
-new file mode 100644
-index 00000000..a14194e6
---- /dev/null
-+++ b/x86/hpet_read_test.c
-@@ -0,0 +1,73 @@
-+#include "libcflat.h"
-+#include "smp.h"
-+#include "asm/barrier.h"
-+#include "x86/atomic.h"
-+
-+#define HPET_ADDR         0xFED00000L
-+#define HPET_COUNTER_ADDR ((uint8_t *)HPET_ADDR + 0xF0UL)
-+#define HPET_CONFIG_ADDR  ((uint8_t *)HPET_ADDR + 0x10UL)
-+#define HPET_ENABLE_BIT   0x01UL
-+#define HPET_CLK_PERIOD   10
-+
-+static atomic_t fail;
-+
-+static void hpet_reader(void *data)
-+{
-+	uint64_t old_counter = 0, new_counter;
-+	long cycles = (long)data;
-+
-+	while (cycles--) {
-+		new_counter = *(volatile uint64_t *)HPET_COUNTER_ADDR;
-+		if (new_counter < old_counter) {
-+			atomic_inc(&fail);
-+		}
-+		old_counter = new_counter;
-+	}
-+}
-+
-+static void hpet_writer(void *data)
-+{
-+	int i;
-+	long cycles = (long)data;
-+
-+	for (i = 0; i < cycles; ++i)
-+		if (i % 2)
-+			*(volatile uint64_t *)HPET_CONFIG_ADDR |= HPET_ENABLE_BIT;
-+		else
-+			*(volatile uint64_t *)HPET_CONFIG_ADDR &= ~HPET_ENABLE_BIT;
-+}
-+
-+int main(void)
-+{
-+	long cycles = 100000;
-+	int i;
-+	int ncpus;
-+	uint64_t start, end, time_ns;
-+
-+	ncpus = cpu_count();
-+	do {
-+		printf("* starting concurrent read bench on %d cpus\n", ncpus);
-+		*(volatile uint64_t *)HPET_CONFIG_ADDR |= HPET_ENABLE_BIT;
-+		start = *(volatile uint64_t *)HPET_COUNTER_ADDR;
-+		on_cpus(hpet_reader, (void *)cycles);
-+		end = (*(volatile uint64_t *)HPET_COUNTER_ADDR);
-+		time_ns = (end - start) * HPET_CLK_PERIOD;
-+		report(time_ns && !atomic_read(&fail),
-+			"read test took %lu ms, avg read: %lu ns\n", time_ns/1000000,  time_ns/cycles);
-+	} while (0);
-+
-+	do {
-+		printf("* starting enable/disable with concurent readers torture\n");
-+		if (ncpus > 2) {
-+			for (i = 2; i < ncpus; i++)
-+			    on_cpu_async(i, hpet_reader, (void *)cycles);
-+
-+			on_cpu(1, hpet_writer, (void *)cycles);
-+			report(!atomic_read(&fail), "torture test, fails: %u\n", atomic_read(&fail));
-+		} else {
-+			printf("SKIP: torture test: '-smp X' should be greater than 2\n");
-+	}
-+	} while (0);
-+
-+	return report_summary();
-+}
--- 
-2.47.1
+	/* Migrate the guest back to the original VM. */
+	ret =3D __sev_migrate_from(src_vm, dst_vms[NR_MIGRATE_TEST_VMS - =
+1]);
+	TEST_ASSERT(ret =3D=3D -1 && errno =3D=3D EIO,
+		    "VM that was migrated from should be dead. ret %d, =
+errno: %d", ret,
+		    errno);
+
+	kvm_vm_free(src_vm);
+	for (i =3D 0; i < NR_MIGRATE_TEST_VMS; ++i)
+		kvm_vm_free(dst_vms[i]);
+}
+
+I add some logs in kvm and following shows the result:
+[   51.618135] sev guest init kvm:ff177f272432e000                       =
+                                                          =20
+[   51.627235] kvm destory vm kvm:ff177f272432e000                       =
+                                                           =20
+[   51.628011] kvm destory vm mmu notifier unregister =
+kvm:ff177f272432e000                                                     =
+    =20
+[   51.642840] kvm destory vm arch destory vm kvm:ff177f272432e000       =
+                                                          =20
+[   51.673612] vm destory x86                                            =
+                                                          =20
+[   51.673957] svm vm destory                                            =
+                                                          =20
+[   51.674401] kvm destory vm kvm:ff177f272432c000                       =
+                                                           =20
+[   51.675152] kvm destory vm mmu notifier unregister =
+kvm:ff177f272432c000                                                     =
+    =20
+[   51.675981] kvm destory vm arch destory vm kvm:ff177f272432c000       =
+                                                          =20
+[   51.715937] vm destory x86                                            =
+                                                          =20
+[   51.716289] svm vm destory                                            =
+                                                          =20
+[   51.716754] kvm destory vm kvm:ff177f272432a000                       =
+                                                           =20
+[   51.717530] kvm destory vm mmu notifier unregister =
+kvm:ff177f272432a000                                                     =
+    =20
+[   51.718363] kvm destory vm arch destory vm kvm:ff177f272432a000       =
+                                                          =20
+[   51.746672] vm destory x86
+[   51.747018] svm vm destory
+[   51.747454] kvm destory vm kvm:ff177f2724328000
+[   51.748219] kvm destory vm mmu notifier unregister =
+kvm:ff177f2724328000
+[   51.749033] BUG: kernel NULL pointer dereference, address: =
+0000000000000000
+[   51.749885] #PF: supervisor read access in kernel mode
+[   51.750519] #PF: error_code(0x0000) - not-present page
+
+It seems that the cpumask structure is not transferred correctly from =
+ff177f272432e000 to ff177f2724328000.
+But unfortunately I=E2=80=99m not familiar with SEV migration. I need to =
+spend some time looking into how SEV=20
+migration works in order to solve this issue.
+
+Thanks,
+Zheyun Shen
+
+> 2025=E5=B9=B47=E6=9C=8814=E6=97=A5 22:48=EF=BC=8CSean Christopherson =
+<seanjc@google.com> =E5=86=99=E9=81=93=EF=BC=9A
+>=20
+> On Mon, Jul 14, 2025, Zheyun Shen wrote:
+>> Hi Aithal,
+>> I can reproduce this issue in my environment, and I will try to =
+resolve it as
+>> soon as possible.
+>=20
+> Phew, that's good, because I can't repro this, and I don't see =
+anything obviously
+> wrong.
+>=20
+>>> 2025=E5=B9=B47=E6=9C=8814=E6=97=A5 13:21=EF=BC=8CAithal, Srikanth =
+<sraithal@amd.com> =E5=86=99=E9=81=93=EF=BC=9A
+>>>=20
+>>> Hello,
+>>>=20
+>>> While running the kselftest for SEV migration (sev_migrate_tes) on
+>>> linux-next (6.16.0-rc5-next-20250711, commit a62b7a37e6) on an =
+AMD-based
+>>> paltforms [Milan,Genoa,Turin], I encountered below kernel crash =
+while
+>>> running kvm kselftests:
+>>>=20
+>>> [ 714.008402] BUG: kernel NULL pointer dereference, address: =
+0000000000000000
+>>> [ 714.015363] #PF: supervisor read access in kernel mode
+>>> [ 714.020504] #PF: error_code(0x0000) - not-present page
+>>> [ 714.025643] PGD 11364b067 P4D 11364b067 PUD 12e195067 PMD 0
+>>> [ 714.031303] Oops: Oops: 0000 [#1] SMP NOPTI
+>>> [ 714.035487] CPU: 14 UID: 0 PID: 16663 Comm: sev_migrate_tes Not =
+tainted 6.16.0-rc5-next-20250711-a62b7a37e6-42f78243e0c #1 =
+PREEMPT(voluntary)
+>>> [ 714.048253] Hardware name: Dell Inc. PowerEdge R6515/07PXPY, BIOS =
+2.17.0 12/04/2024
+>>> [ 714.055905] RIP: 0010:_find_first_bit+0x1d/0x40
+>=20
+> ..
+>=20
+>>> [ 714.148307] ? sev_writeback_caches+0x25/0x40 [kvm_amd]
+>>> [ 714.153544] sev_guest_memory_reclaimed+0x34/0x40 [kvm_amd]
+>>> [ 714.159115] kvm_arch_guest_memory_reclaimed+0x12/0x20 [kvm]
+>>> [ 714.164817] kvm_mmu_notifier_release+0x3c/0x60 [kvm]
+>>> [ 714.169896] mmu_notifier_unregister+0x53/0xf0
+>>> [ 714.174343] kvm_destroy_vm+0x12d/0x2d0 [kvm]
+>>> [ 714.178727] kvm_vm_stats_release+0x34/0x60 [kvm]
+>>> [ 714.183459] __fput+0xf2/0x2d0
+>>> [ 714.186520] fput_close_sync+0x44/0xa0
+>>> [ 714.190269] __x64_sys_close+0x42/0x80
+>>> [ 714.194024] x64_sys_call+0x1960/0x2180
+>>> [ 714.197861] do_syscall_64+0x56/0x1e0
+>>> [ 714.201530] entry_SYSCALL_64_after_hwframe+0x76/0x7e
 
 
