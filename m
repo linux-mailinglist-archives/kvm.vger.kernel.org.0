@@ -1,147 +1,132 @@
-Return-Path: <kvm+bounces-52286-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52287-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00C86B03B8C
-	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 11:59:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE873B03B8B
+	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 11:59:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 863447A2A3F
-	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 09:57:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4EA203B1768
+	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 09:58:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 411F724337D;
-	Mon, 14 Jul 2025 09:58:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="XbOMrdkV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0A0D24397B;
+	Mon, 14 Jul 2025 09:59:04 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtpbgbr1.qq.com (smtpbgbr1.qq.com [54.207.19.206])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFE4F242930
-	for <kvm@vger.kernel.org>; Mon, 14 Jul 2025 09:58:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.19.206
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A29C7242D82;
+	Mon, 14 Jul 2025 09:59:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752487094; cv=none; b=ng/lsNxG6+JDj11RNzHh+NRB8h08yaKKxGCQw3/YvGbvf/QsNtpR0rjiSvZkNDepjypswde94VKqFW7WZrPieAGz9aSEyeDhEvLc1TDgDC7lpCLkqIFnXeOtCAlSpk8K6MAX4belq/5b1f19fW2cLriVIf1NAHim/0eNOe4Dwjo=
+	t=1752487144; cv=none; b=i54LT9PGKGS/WtDmpSeNPgWzvwtB9LwOIZdwr8xK9/snHQNqeDSYNbtAnssdAgn3e4pTCOuHIiALBpFoclgdByav0qwBz1BD9RJXX/fIucbU2LWeKrw5S02jwZkpHyTYITf1nlbqrgMr1GbnWVuBgXQKzTMHHhrPZQ/MxLD2r/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752487094; c=relaxed/simple;
-	bh=3JxyGduxoKfpBfNPCoClE2fonMXWAcHTNOvurq5RQN8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=CeLCkiUANJJLA1TksNmxxVXFI1ADtdFch9Nb3RRR4SaxSrMtt/6pppFwPaaCEoEDlIA7Dg26f+G49NQ6xGldKakh2lmbTtQAKbNg5e6Rk+j1rCjP4pA4scdFFKTZjVD63nw185yNERxpOKVA8tTn03BIebD5Me4P3ZYAwuCnpRI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=XbOMrdkV; arc=none smtp.client-ip=54.207.19.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1752486992;
-	bh=1VLZ/TxnScpdUwIKEh3OguVq0kTcER2qBYmnDf1YyUs=;
-	h=From:To:Subject:Date:Message-Id:MIME-Version;
-	b=XbOMrdkVXYyXld44pQC1QrDCTlVtdWl2pye31+KlJld7g9RZFLOqNjrKly5G+/CNd
-	 BalS6YWT0bpb6Jhy72EcV7GP7Hu8RjIL0LpiFTcxKd7nWZNOM+uqSrCJye7ZYn0gGl
-	 btAooULWEh5tf0OYN6STfe0aFBiXb/PuCyqMuYvo=
-X-QQ-mid: zesmtpsz7t1752486977t03bc3352
-X-QQ-Originating-IP: VBUv8AB24h/qlMCQoqldEWulkzF9VWqRBnkTf0D3l58=
-Received: from localhost.localdomain ( [123.114.60.34])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Mon, 14 Jul 2025 17:56:16 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 10135975146205815428
-EX-QQ-RecipientCnt: 3
-From: Qiang Ma <maqianga@uniontech.com>
-To: pbonzini@redhat.com
-Cc: kvm@vger.kernel.org,
-	Qiang Ma <maqianga@uniontech.com>
-Subject: [kvm-unit-tests PATCH] x86: nSVM: Fix exit_info_2 check error of npt_rw_pfwalk_check()
-Date: Mon, 14 Jul 2025 17:56:14 +0800
-Message-Id: <20250714095614.30657-1-maqianga@uniontech.com>
-X-Mailer: git-send-email 2.20.1
+	s=arc-20240116; t=1752487144; c=relaxed/simple;
+	bh=lHk2IUnwJuUw4LIROoT7XX5z7h9Wq0IAV/QNY3bBi7k=;
+	h=Subject:From:To:Cc:References:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=AzXsFRqKSfXraaeK3oWWwUMTvcMPCom4UEv7C2tfJdk5bdW439HEF2zVMk0MZqGDUmJUSwceevIjyCaNYGEUDK5A0n/vJbbSqTex4uwQ/kdBVZvc89TRFDs9Mj8VRLAfS/rmfVsJNCTC3X04VKHhlJ1GHVnSBtqSepEMyiwO854=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.62])
+	by gateway (Coremail) with SMTP id _____8Bx22ri1HRovSopAQ--.51104S3;
+	Mon, 14 Jul 2025 17:58:59 +0800 (CST)
+Received: from [10.20.42.62] (unknown [10.20.42.62])
+	by front1 (Coremail) with SMTP id qMiowJCxH8Lf1HRoTqsWAA--.5040S3;
+	Mon, 14 Jul 2025 17:58:57 +0800 (CST)
+Subject: Re: [PATCH] LoongArch: KVM: Add some feature detection on host with
+ 3C6000
+From: Bibo Mao <maobibo@loongson.cn>
+To: Tianrui Zhao <zhaotianrui@loongson.cn>,
+ Huacai Chen <chenhuacai@kernel.org>
+Cc: WANG Xuerui <kernel@xen0n.name>, kvm@vger.kernel.org,
+ loongarch@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <20250707035143.1979013-1-maobibo@loongson.cn>
+Message-ID: <de4c715f-db47-70b5-91a7-a436bf3a1c1b@loongson.cn>
+Date: Mon, 14 Jul 2025 17:57:18 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20250707035143.1979013-1-maobibo@loongson.cn>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpsz:uniontech.com:qybglogicsvrsz:qybglogicsvrsz4a-0
-X-QQ-XMAILINFO: MUe2PhP7Eq79W/mOFq7B/rsAj3FH04XmzZ2aA8McmrOUbYh0DZ+LJeqe
-	VRJlN/lOvGhj/stTXmk0Ti8OkRiYwbfsGS50iGS5KOmwIIxrbEJv2xrB/ivxte2YqELrZCu
-	xO+M0EL8J9eq6I77+iz96KPKZViZJ/IHYY3wUQifH5+pdbNqhQVRl3xixG/8R9Y+dhhzhco
-	DEoNLeq4JwDF9Ns4QM/KDVrPOls3Yk0bwckiIjoDHAVJJ9O06yOuNHT17XZ0FHWIB0FLV8t
-	6RM5lzbSzAUPIo9obuMRqRE8dOXP2+1As+dYijINSTKCfWsnzx7EgqFYKjdATkUsqWVHM31
-	08P0edX4uqKTm/ARt4mXSO23E6cpKxbAiSVuGlhulfAfkfMbJ4qDih5SRIwwyD9jD3to3qF
-	FUuqEgL6gkZI1bN3FXSQTEXA+ONCiX1SrTceVQARPiJEjyTDE9v7BYG5RBH5ipfD8DjJ3WT
-	5L7aAn4cN9/jt+twnuFpqTQMQtVGcxETiF6a7fShTKD141/bVVGc97nU52oZLj/f4loQdLv
-	hnOeuFz7AKpzE7nukWoFFWEeVk43LaXNqTqySsN+qdFyMKGXtDQpLjcbdPLicWm+3/fhiSB
-	V3BOAZjQojS1QqUPlioxp0/k5uwJCKZGeG2tMP2Urstv/80iJOhLKYPcdYo9BZNt+87m09C
-	/ZmlBlocUoRDz5t/qsX6hHZ7ftfbmQy7tJiBwCmHNmfx4P4l1scxB+ibsadhYvpeiZ4m+a+
-	rmPXduCvZ2dc+n/CljGn/ALXfvHGCbFJa92oxlr5whsvv9l7dvFW+XjiTSiGmstIrflgMP+
-	2L1LUAT2In2bFlwJmTgWM/VnEm55R/6624JbklVvn/7BCE6PpoqosWVR+xlnqOa/W+Z+9/M
-	kdMZYU0bYFA4mV7kzLmSEGIUjQsNfVopYOSW6T9sBdphesdqV7Ky9euMR8qSvW1J7kQ8951
-	MmaJw+x/2I3K7daXjYJCFVKBwcN4jxJQtpqE63p//iGh5VA2P6e6Uda59RjGNgNI80a+Z+K
-	rK8oQuxksZkBuB4xpA51ZHG869tDyr6CxTOlaYhvnnw2cLcYGYdpfuYiSp7AWZMVtJKdhzZ
-	g==
-X-QQ-XMRINFO: Mp0Kj//9VHAxr69bL5MkOOs=
-X-QQ-RECHKSPAM: 0
+X-CM-TRANSID:qMiowJCxH8Lf1HRoTqsWAA--.5040S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoW7Kry5CF17Kr4Uuw4DXw4UKFX_yoW8Aw17pF
+	yDAF4kJr4Fkr1fAan5tw1q9r43Xa1Ikr4Fga429rW5Arn0qrykAr1kKr9ruFy5tw4rW34x
+	uFnYkw4Yva1qqwcCm3ZEXasCq-sJn29KB7ZKAUJUUUUr529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUBYb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v2
+	6F4UJVW0owAaw2AFwI0_Jrv_JF1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0c
+	Ia020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JF0_
+	Jw1lYx0Ex4A2jsIE14v26r4j6F4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrw
+	CYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j
+	6r4UMxCIbckI1I0E14v26r1Y6r17MI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
+	AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
+	0xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4
+	v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AK
+	xVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU8uuWJUUUUU==
 
-The testcase log:
+Maybe it is too early to submit such patch :(
 
-kvm-unit-tests]# TESTNAME=svm_npt TIMEOUT=90s MACHINE= ACCEL= ./x86/run x86/svm_npt.flat -smp 2 -cpu max,+svm -m 4g
-...
-enabling apic
-smp: waiting for 1 APs
-enabling apic
-setup: CPU 1 online
-paging enabled
-cr0 = 80010011
-cr3 = 10bf000
-cr4 = 20
-NPT detected - running all tests with NPT enabled
-PASS: npt_nx
-PASS: npt_np
-PASS: npt_us
-PASS: npt_rw
-npt_rw_pfwalk_check: CR3: 10bf000 EXIT_INFO_2: 10bf5f8
-FAIL: npt_rw_pfwalk
-...
+At least there is new CSR registers about AVEC feature which are not 
+saved and restored in vCPU context switch function. And the AVEC feature 
+in KVM is not tested also.
 
-CR4=0x20, PAE is enabled, CR3 is PDPT base address, aligned on a 32-byte
-boundary, looking at the above test results, it is still 4k alignment in reality,
-exit_info_2 in vmcb stores the falut address of GPA.
+Regards
+Bibo Mao
 
-So, after aligning the GPA to PAGE_SIZE, compare the CR3 and GPA.
-
-PAE Paging (CR4.PAE=1)—This field is 27 bits and occupies bits 31:5.
-The CR3 register points to the base address of the page-directory-pointer
-table. The page-directory-pointer table is aligned on a 32-byte boundary,
-with the low 5 address bits 4:0 assumed to be 0.
-
-Table C-1. SVM Intercept Codes (continued):
-Code Name       Cause
-400h VMEXIT_NPF EXITINFO2 contains the guest physical address causing the fault.
-
-This is described in the AMD64 Architecture Programmers Manual Volume
-2, Order Number 24593.
-
-Signed-off-by: Qiang Ma <maqianga@uniontech.com>
----
- x86/svm_npt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/x86/svm_npt.c b/x86/svm_npt.c
-index bd5e8f35..08614d84 100644
---- a/x86/svm_npt.c
-+++ b/x86/svm_npt.c
-@@ -132,7 +132,7 @@ static bool npt_rw_pfwalk_check(struct svm_test *test)
- 
- 	return (vmcb->control.exit_code == SVM_EXIT_NPF)
- 	    && (vmcb->control.exit_info_1 == 0x200000007ULL)
--	    && (vmcb->control.exit_info_2 == read_cr3());
-+	    && ((vmcb->control.exit_info_2 & PAGE_MASK) == read_cr3());
- }
- 
- static bool was_x2apic;
--- 
-2.20.1
+On 2025/7/7 上午11:51, Bibo Mao wrote:
+> With 3C6000 hardware platform, hardware page table walking and avec
+> features are supported on host. Here add these two feature detection
+> on KVM host.
+> 
+> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+> ---
+>   arch/loongarch/include/uapi/asm/kvm.h | 2 ++
+>   arch/loongarch/kvm/vm.c               | 8 ++++++++
+>   2 files changed, 10 insertions(+)
+> 
+> diff --git a/arch/loongarch/include/uapi/asm/kvm.h b/arch/loongarch/include/uapi/asm/kvm.h
+> index 5f354f5c6847..0b9feb6c0d53 100644
+> --- a/arch/loongarch/include/uapi/asm/kvm.h
+> +++ b/arch/loongarch/include/uapi/asm/kvm.h
+> @@ -103,6 +103,8 @@ struct kvm_fpu {
+>   #define  KVM_LOONGARCH_VM_FEAT_PMU		5
+>   #define  KVM_LOONGARCH_VM_FEAT_PV_IPI		6
+>   #define  KVM_LOONGARCH_VM_FEAT_PV_STEALTIME	7
+> +#define  KVM_LOONGARCH_VM_FEAT_PTW		8
+> +#define  KVM_LOONGARCH_VM_FEAT_AVEC		9
+>   
+>   /* Device Control API on vcpu fd */
+>   #define KVM_LOONGARCH_VCPU_CPUCFG	0
+> diff --git a/arch/loongarch/kvm/vm.c b/arch/loongarch/kvm/vm.c
+> index edccfc8c9cd8..728b24a62f1e 100644
+> --- a/arch/loongarch/kvm/vm.c
+> +++ b/arch/loongarch/kvm/vm.c
+> @@ -146,6 +146,14 @@ static int kvm_vm_feature_has_attr(struct kvm *kvm, struct kvm_device_attr *attr
+>   		if (kvm_pvtime_supported())
+>   			return 0;
+>   		return -ENXIO;
+> +	case KVM_LOONGARCH_VM_FEAT_PTW:
+> +		if (cpu_has_ptw)
+> +			return 0;
+> +		return -ENXIO;
+> +	case KVM_LOONGARCH_VM_FEAT_AVEC:
+> +		if (cpu_has_avecint)
+> +			return 0;
+> +		return -ENXIO;
+>   	default:
+>   		return -ENXIO;
+>   	}
+> 
 
 
