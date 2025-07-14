@@ -1,124 +1,136 @@
-Return-Path: <kvm+bounces-52306-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52307-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D58DB03C8E
-	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 12:53:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE62AB03CB3
+	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 12:57:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2852117EF33
-	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 10:53:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB18A18907E2
+	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 10:54:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02B9624E01D;
-	Mon, 14 Jul 2025 10:49:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E43AD248895;
+	Mon, 14 Jul 2025 10:53:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ZgKmApd7"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="LGJuBfVJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3B2B246348;
-	Mon, 14 Jul 2025 10:49:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 889AC24887E;
+	Mon, 14 Jul 2025 10:53:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752490169; cv=none; b=SRd0QbwpEhU2po3EtSS1TJ7EzraYXh0Vr+8vZKj4yRfyLhtx6aCxOS1kK2Xs+ONW9tRtrHQC1dd2pYYG3dE3/q+ug71PjTdPrVr2DI2/RAz4f9ICeq9xsqyi8i1qWg0BXzR754v6VgljOEA5b+yNRtza8Z/HvrNwqefc9ZGOFVw=
+	t=1752490398; cv=none; b=U3ra9Va5GuECsRYZzu/iX/uWYcQnAicl6gMhu6u/v6Jjdl2hl6taK9GfUoZWAvRBWpMygdcb6tXGZcijY7boH4J/m8Flj9JafAzmyv1gAP357EM5S9mw5fPXRyjlGaqf9a1d5FjhZ8j6WYdJI74n/ekgFHQld4C95eFI7RnQjeQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752490169; c=relaxed/simple;
-	bh=lmMO9oWiY1La7NZpL7XvxppUXvYIpzkkNjadrtUu4bQ=;
+	s=arc-20240116; t=1752490398; c=relaxed/simple;
+	bh=faQh3yDJ3cmAtPWHJAAYh+8EJbkuKGS8rv10u+6kVdA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m67ntqh4Ov93FngLHKdUNbCNj7V+jIAshPLoN+gWUtrUITthSYr6PPbDrsR+rG/QeB5QA69cyvaoYZlz5FE7qzuzTW4WNc4sDjUF4+lmBw9lF1S426cCqZrsGl9MtTsF6oIadIuu1Cv5LzcFVo+VeDpsxqWR5h0i5asn0vEOUz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ZgKmApd7; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=sO+NWpjecFiPMw41O/Ux4KHMrLlaxGVkWqwkrh1sfjg=; b=ZgKmApd78AJ8K+Zxx2N+3LgMYS
-	e+q4x/TjxrEwsKIWi5LhxsYA7mFvf4cqT0UkD9/LrLMx9/qvwZkzrwaFNAdwGtJx1Jnlhsd7+M5D1
-	95nLHfjk98QmtXcsEnC4+ZJi4GEuOEr6GrauK6VuFd5qPGMsOFp42zOyUqzDpQHR8jD+Z9aT9Pcli
-	ZJn2xfw94xoz3RQzndfwe/7WDsREwiJNrXWBouxZwJMWLANI+YiIT43PldtrjTyBULVtb1mrLcAp1
-	TtLgcwgtrlXreF/N1SQ6zsGookNGMJoiLoe8J3ctRx5noHazWD2MotKNQcRUDQ6ENecBusKSQMZQJ
-	UYG0Oazw==;
-Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
-	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1ubGkJ-00000006v9i-3mPe;
-	Mon, 14 Jul 2025 10:49:20 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 633F4300186; Mon, 14 Jul 2025 12:49:19 +0200 (CEST)
-Date: Mon, 14 Jul 2025 12:49:19 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-To: x86@kernel.org
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, tglx@linutronix.de, mingo@redhat.com,
-	bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
-	seanjc@google.com, pbonzini@redhat.com, ardb@kernel.org,
-	kees@kernel.org, Arnd Bergmann <arnd@arndb.de>,
-	gregkh@linuxfoundation.org, jpoimboe@kernel.org,
-	linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, linux-efi@vger.kernel.org,
-	samitolvanen@google.com, ojeda@kernel.org
-Subject: Re: [PATCH v3 16/16] objtool: Validate kCFI calls
-Message-ID: <20250714104919.GR905792@noisy.programming.kicks-ass.net>
-References: <20250714102011.758008629@infradead.org>
- <20250714103441.496787279@infradead.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=LiAwpH6c+ARGTcsguiT0/E9yRxSPml67jSup8FbXwG38lwQ/kxNz43KeX5aFo1Q7Z4aYQxSB2u62wm+j5lp8Yz5pQoKZ7elGbRMItwRDj5t2rDFzXpOE0nCYkECyKAA1bs+OUn2Yfg2g5FpbFI07t+tobASpsdo9TARgHni73OE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=LGJuBfVJ; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 176A840E0163;
+	Mon, 14 Jul 2025 10:53:14 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id 4Z3gr6BUp_8I; Mon, 14 Jul 2025 10:53:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1752490390; bh=6rOjcKLLPgtL8H8EwqYk8h4UdVGv4zjdYvcfXegnVJk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=LGJuBfVJv5V78O/C0L4MoZYTuwjK5J+gcPXX2cgukGxgzvxEgt37jJUN/SCv6kZaz
+	 xX7j+jLBpSu9dx7xf6CkThp8UtgEj85Cc7q6sf3aIR3z9DYiyhEIxqopRQHXHqYiom
+	 qYf/1nboKxOOMz648e1eYL2JfYLseRkEwJpjZ6SnCH2/JzA/JpwNDULq0dTOWYiqiY
+	 5PJR2Wxk8Cdk/LgTKC3FOz/BuvZK4dC/kA00Tq5xgqqgyjWrbn+KJp4pwPtvulZH89
+	 CopPPaFErRwNusjZy0lTNFrMjE7qeMAYl8zWhXdZQRa92bNYdB2qFAtjbdSBJJWcAG
+	 qNWjgMZd4LMrRvXuLX+RbB8r6GMGt2dXB3/jx0GTuuj2x8EmbSJojcJFcidV9qMnKc
+	 2kYdFUFbHNXshbXj5OwmihP1d4w1EbyJ3Y2oWPSIcK9K0AtCTS9a0gyVH56fNlidjv
+	 COyC6Puwys9eb0KxnpDRA/UPEj8bWd7cJCUtWpac1On40A1a9tyYPIMoTONsFOv/bk
+	 NieBSEVb2oq6om8TZoIXMos79NNuEQkWNHyjmhSJ2boV4nKvPt+nPSlcejkdIAZWXP
+	 Ij2ODJWDH4UIMJzrHSo+AVJNwrDhNfUxaYvCiaJCVT0YkY3GUab5GI4WJsTOl5Nv4y
+	 bLEvZGjCi+Wv4DvRwJ1G14fg=
+Received: from zn.tnic (p57969c58.dip0.t-ipconnect.de [87.150.156.88])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 3934140E01FD;
+	Mon, 14 Jul 2025 10:52:49 +0000 (UTC)
+Date: Mon, 14 Jul 2025 12:52:48 +0200
+From: Borislav Petkov <bp@alien8.de>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>, linux-kernel@vger.kernel.org,
+	tglx@linutronix.de, mingo@redhat.com, dave.hansen@linux.intel.com,
+	Thomas.Lendacky@amd.com, nikunj@amd.com, Santosh.Shukla@amd.com,
+	Vasant.Hegde@amd.com, Suravee.Suthikulpanit@amd.com,
+	David.Kaplan@amd.com, x86@kernel.org, hpa@zytor.com,
+	peterz@infradead.org, pbonzini@redhat.com, kvm@vger.kernel.org,
+	kirill.shutemov@linux.intel.com, huibo.wang@amd.com,
+	naveen.rao@amd.com, kai.huang@intel.com
+Subject: Re: [RFC PATCH v8 16/35] x86/apic: Simplify bitwise operations on
+ APIC bitmap
+Message-ID: <20250714105248.GFaHThgLB9QnrW2xLW@fat_crate.local>
+References: <20250709033242.267892-1-Neeraj.Upadhyay@amd.com>
+ <20250709033242.267892-17-Neeraj.Upadhyay@amd.com>
+ <aG5-PV7U2KaZDNGX@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250714103441.496787279@infradead.org>
+In-Reply-To: <aG5-PV7U2KaZDNGX@google.com>
 
-On Mon, Jul 14, 2025 at 12:20:27PM +0200, Peter Zijlstra wrote:
+On Wed, Jul 09, 2025 at 07:35:41AM -0700, Sean Christopherson wrote:
+> On Wed, Jul 09, 2025, Neeraj Upadhyay wrote:
+> > Use 'regs' as a contiguous linear bitmap for bitwise operations in
+> > apic_{set|clear|test}_vector(). This makes the code simpler by eliminating
+> 
+> That's very debatable.  I don't find this code to be any simpler.  Quite the
+> opposite; it adds yet another open coded math exercise, which is so "simple"
+> that it warrants its own comment to explain what it's doing.
+> 
+> I'm not dead set against this, but I'd strongly prefer to drop this patch.
 
-> --- a/arch/x86/platform/efi/efi_stub_64.S
-> +++ b/arch/x86/platform/efi/efi_stub_64.S
-> @@ -11,6 +11,10 @@
->  #include <asm/nospec-branch.h>
->  
->  SYM_FUNC_START(__efi_call)
-> +	/*
-> +	 * The EFI code doesn't have any CFI, annotate away the CFI violation.
-> +	 */
-> +	ANNOTATE_NOCFI_SYM
->  	pushq %rbp
->  	movq %rsp, %rbp
->  	and $~0xf, %rsp
+> > +static inline unsigned int get_vec_bit(unsigned int vec)
+> > +{
+> > +	/*
+> > +	 * The registers are 32-bit wide and 16-byte aligned.
+> > +	 * Compensate for the resulting bit number spacing.
+> > +	 */
+> > +	return vec + 96 * (vec / 32);
 
-FWIW, we should probably do something like this as well.
+I kinda agree. The naked 96 doesn't tell me anything. If we do this, the
+explaination of what this thing does should be crystal clear, perhaps even
+with an example. And the naked numbers need to be defines with proper names.
 
----
+Also:
 
---- a/arch/x86/kernel/cpu/common.c
-+++ b/arch/x86/kernel/cpu/common.c
-@@ -562,6 +562,13 @@ __noendbr u64 ibt_save(bool disable)
- {
- 	u64 msr = 0;
- 
-+	/*
-+	 * Firmware code will not provide the same level of
-+	 * control-flow-integriry. Taint the kernel to let the user know.
-+	 */
-+	if (disable || (IS_ENABLED(CONFIG_CFI_CLANG) && cfi_mode != CFI_OFF))
-+		add_taint(TAINT_CFI, LOCKDEP_STILL_OK);
-+
- 	if (cpu_feature_enabled(X86_FEATURE_IBT)) {
- 		rdmsrq(MSR_IA32_S_CET, msr);
- 		if (disable)
---- a/include/linux/panic.h
-+++ b/include/linux/panic.h
-@@ -73,7 +73,8 @@ static inline void set_arch_panic_timeou
- #define TAINT_RANDSTRUCT		17
- #define TAINT_TEST			18
- #define TAINT_FWCTL			19
--#define TAINT_FLAGS_COUNT		20
-+#define TAINT_CFI			20
-+#define TAINT_FLAGS_COUNT		21
- #define TAINT_FLAGS_MAX			((1UL << TAINT_FLAGS_COUNT) - 1)
- 
- struct taint_flag {
+>     This change results in slight increase in generated code size for
+>     gcc-14.2.
+>     
+>     - Without change
+
+What is the asm supposed to tell me?
+
+The new change gets a LEA which is noticeable or so?
+
+The generated code size increase is, what, a couple of bytes? Who cares?
+
+We add asm to commit messages when it is really important. Doesn't seem so to
+me here but maybe I'm missing an angle...
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
