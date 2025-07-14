@@ -1,46 +1,46 @@
-Return-Path: <kvm+bounces-52357-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52358-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 496B7B0495E
-	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 23:23:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9FA2B0495F
+	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 23:23:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D29484A4B96
-	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 21:22:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 444844A3D07
+	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 21:23:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ED87281355;
-	Mon, 14 Jul 2025 21:22:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44C772857EC;
+	Mon, 14 Jul 2025 21:22:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LLuzYvcj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gy2qXNG+"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 985DE27F18F;
-	Mon, 14 Jul 2025 21:22:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57855283FF7;
+	Mon, 14 Jul 2025 21:22:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752528131; cv=none; b=oWLnKmr8IEmsAgo30Z874VqORPEdmxat+VHb/xXi4z/zQhq2QKfj8wVlg/qRuPv32rf4xKwT8L5nmp+q+oqv/crusUNK7tWPWU7w49XVy3D6Xmu6KyY/pV2/yJZXifgm5S87ia191D7sJDaAovuUb9aNxTpQMIBMKV3ccFrRobE=
+	t=1752528134; cv=none; b=WUMe/wWXgBQmIk2pDEPjg8wpnB32z3f35Xp+s0+VyblOsTJ7+Fims3fJaXu+NzNvZaNRrhzhCjpLHVseQ9M2ZOj2oEHU8WGd22m6FcRQMH50AkL94kp5zWCeMRAS8BmoO/fMVEA0CeNGpOypPMwMVvvWb4Kci2UStm9EoNQnrkk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752528131; c=relaxed/simple;
-	bh=wZDfgswU2/pwcpS3H3uILO4jDTDnQH15cewPVoii5Es=;
+	s=arc-20240116; t=1752528134; c=relaxed/simple;
+	bh=IOGKTg8m2lLVk2BGnUQp473zWXZ7OF1rNECuXqPIWig=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QR8ROKKoWNLlRkR0Gw/Ci0wi/B6RGkPAx8KSIG+A0yime65cGzw7htvQ7u4hON5fomw+CDxFpbJov0MM5zjLXXSaUdRwoS45Wo7M+BTThTyms6uidgwnt4Lrc246w9sg+OIzh5rbtl9BgUrZsRbMRqCH4PZ4/4/VNPUTzMQNHRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LLuzYvcj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6CAFC4CEF0;
-	Mon, 14 Jul 2025 21:22:08 +0000 (UTC)
+	 MIME-Version; b=BAAkUm85LjUgJudhRJq0O5fjBGQcUdP/1YH9ANapmP3bvLo//dKCEqqa1Rbz7QqfEJhivjhxMb+vHQxsAtT5x8F2/nxoCORlSmJ0OZBoVh1+yTQ8nZztHpx+zw/imlVWZ6LauZ2OnHODNln5/8RNbcIMci+p3MqS7dCIZSjixpM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gy2qXNG+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C88CC4CEED;
+	Mon, 14 Jul 2025 21:22:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752528131;
-	bh=wZDfgswU2/pwcpS3H3uILO4jDTDnQH15cewPVoii5Es=;
+	s=k20201202; t=1752528133;
+	bh=IOGKTg8m2lLVk2BGnUQp473zWXZ7OF1rNECuXqPIWig=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=LLuzYvcjG1bWqK2FxVDyS7x6p59I3loyCe4uOPnY9U47CAaEThr1YdegxP/ldkp7A
-	 RBAe0rxuWdIBzbthzUDS7oWsQDo0q/ghG15/dQmFyovSOfmH6BLaqYPnXY2WP4CZ4S
-	 5DzWJDZ0aEX0bu8COxbzLKms0EgZIb4FH2TnaphH6hLUnWDzRrtKFhE72E32ORHuG2
-	 qRi6G/E250/z0MbjuMYiImSdJDvKY91jcqNSb8h03VJ4103K+UTy5SL6/WcxQUobGN
-	 DkNf5uXoyWuCzcY0rbKIDG8sYo0kgNiukFwFfh/DOk3ZrjOuc003E58jceBJj2AMwa
-	 FTWvLHqqj/M9Q==
+	b=gy2qXNG+WX9619YErVTK34n6+SwFCzSxIL/vfVLF7ZifTynwnIAXwEsAjcEmAqUWg
+	 PHbBlZs6sC0XX6H2O+66EGjs+jBEQsFXvTNtTBY6dSamkxbXlB+gqHXPod7cUIpQn7
+	 zRU328hOdf+0z7dRfUCehI1iIEi/fH0Y49JAhXAfop0bZwSQsnHtBC9p+QW70bsjAq
+	 utSnwnNxTVxh7ifP4vy1mjsegdPVtOIkv/CXb2Cx/NcREGPf9IINq61textVOzvEyO
+	 FJegHUhNYrziF7NOUzv6Lv4b9Ii4JZkGKmp7vFzFmBOlCxpFprq39dIpIZ6DN+F2dC
+	 JIckicffgz7tA==
 From: Mario Limonciello <superm1@kernel.org>
 To: David Airlie <airlied@gmail.com>,
 	Bjorn Helgaas <bhelgaas@google.com>
@@ -67,11 +67,12 @@ Cc: Alex Deucher <alexander.deucher@amd.com>,
 	linux-sound@vger.kernel.org (open list:SOUND),
 	Daniel Dadap <ddadap@nvidia.com>,
 	Mario Limonciello <mario.limonciello@amd.com>,
+	Takashi Iwai <tiwai@suse.de>,
 	Simona Vetter <simona.vetter@ffwll.ch>,
 	Bjorn Helgaas <helgaas@kernel.org>
-Subject: [PATCH v8 4/9] iommu/vt-d: Use pci_is_display()
-Date: Mon, 14 Jul 2025 16:21:41 -0500
-Message-ID: <20250714212147.2248039-5-superm1@kernel.org>
+Subject: [PATCH v8 5/9] ALSA: hda: Use pci_is_display()
+Date: Mon, 14 Jul 2025 16:21:42 -0500
+Message-ID: <20250714212147.2248039-6-superm1@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250714212147.2248039-1-superm1@kernel.org>
 References: <20250714212147.2248039-1-superm1@kernel.org>
@@ -87,28 +88,51 @@ From: Mario Limonciello <mario.limonciello@amd.com>
 
 The inline pci_is_display() helper does the same thing.  Use it.
 
-Reviewed-by: Lu Baolu <baolu.lu@linux.intel.com>
+Reviewed-by: Takashi Iwai <tiwai@suse.de>
 Reviewed-by: Daniel Dadap <ddadap@nvidia.com>
 Reviewed-by: Simona Vetter <simona.vetter@ffwll.ch>
 Suggested-by: Bjorn Helgaas <helgaas@kernel.org>
 Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
 ---
- drivers/iommu/intel/iommu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ sound/hda/hdac_i915.c     | 2 +-
+ sound/pci/hda/hda_intel.c | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/iommu/intel/iommu.c b/drivers/iommu/intel/iommu.c
-index 148b944143b81..cad9ed1016cfc 100644
---- a/drivers/iommu/intel/iommu.c
-+++ b/drivers/iommu/intel/iommu.c
-@@ -34,7 +34,7 @@
- #define ROOT_SIZE		VTD_PAGE_SIZE
- #define CONTEXT_SIZE		VTD_PAGE_SIZE
+diff --git a/sound/hda/hdac_i915.c b/sound/hda/hdac_i915.c
+index e9425213320ea..44438c799f957 100644
+--- a/sound/hda/hdac_i915.c
++++ b/sound/hda/hdac_i915.c
+@@ -155,7 +155,7 @@ static int i915_gfx_present(struct pci_dev *hdac_pci)
  
--#define IS_GFX_DEVICE(pdev) ((pdev->class >> 16) == PCI_BASE_CLASS_DISPLAY)
-+#define IS_GFX_DEVICE(pdev) pci_is_display(pdev)
- #define IS_USB_DEVICE(pdev) ((pdev->class >> 8) == PCI_CLASS_SERIAL_USB)
- #define IS_ISA_DEVICE(pdev) ((pdev->class >> 8) == PCI_CLASS_BRIDGE_ISA)
- #define IS_AZALIA(pdev) ((pdev)->vendor == 0x8086 && (pdev)->device == 0x3a3e)
+ 	for_each_pci_dev(display_dev) {
+ 		if (display_dev->vendor != PCI_VENDOR_ID_INTEL ||
+-		    (display_dev->class >> 16) != PCI_BASE_CLASS_DISPLAY)
++		    !pci_is_display(display_dev))
+ 			continue;
+ 
+ 		if (pci_match_id(denylist, display_dev))
+diff --git a/sound/pci/hda/hda_intel.c b/sound/pci/hda/hda_intel.c
+index 439cf1bda6e66..75badb5c69b8e 100644
+--- a/sound/pci/hda/hda_intel.c
++++ b/sound/pci/hda/hda_intel.c
+@@ -1465,7 +1465,7 @@ static struct pci_dev *get_bound_vga(struct pci_dev *pci)
+ 				 * the dGPU is the one who is involved in
+ 				 * vgaswitcheroo.
+ 				 */
+-				if (((p->class >> 16) == PCI_BASE_CLASS_DISPLAY) &&
++				if (pci_is_display(p) &&
+ 				    (atpx_present() || apple_gmux_detect(NULL, NULL)))
+ 					return p;
+ 				pci_dev_put(p);
+@@ -1477,7 +1477,7 @@ static struct pci_dev *get_bound_vga(struct pci_dev *pci)
+ 			p = pci_get_domain_bus_and_slot(pci_domain_nr(pci->bus),
+ 							pci->bus->number, 0);
+ 			if (p) {
+-				if ((p->class >> 16) == PCI_BASE_CLASS_DISPLAY)
++				if (pci_is_display(p))
+ 					return p;
+ 				pci_dev_put(p);
+ 			}
 -- 
 2.43.0
 
