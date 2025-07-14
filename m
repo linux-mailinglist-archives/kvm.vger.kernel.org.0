@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-52329-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52322-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 596B1B03EA0
-	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 14:27:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79AF5B03E96
+	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 14:27:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6329417E0FC
-	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 12:27:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DB2047A8586
+	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 12:25:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A1DF2505A5;
-	Mon, 14 Jul 2025 12:26:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 566D521B91F;
+	Mon, 14 Jul 2025 12:26:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YGIxjV1V"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SkjN7X8l"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9534524DD00;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D0722475E3;
 	Mon, 14 Jul 2025 12:26:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752496006; cv=none; b=ic1tINqjnEyTBXAgV+YRg8wseHfKqD2iT4V8GbmEVY5lLsxMqfbQLiG+1cA4kINVYqH5ACMGV3GUKcs6ISE594vx1VI+D2B2E0KxpnDk+Nx/oTYh+f6moxRzjZdz2JMGDxBWQsaZqtx9fUYM/IRmJfbHtcWrSi3pJcXdQG23aCc=
+	t=1752496004; cv=none; b=rA4typlThfkEyW/ucs0qOYOkRs6oCBR26uk7jCr0AOELtdvy4qP7NpEdJfgmUkRLYqJ7GLPAwKH08LiQZpa4+5i3d1NyXJajdddbztf24yO6QgNk6tpy8AerYrXfRk/UrSRJtUCx5IndrGybRWN8WGYjD/OipuzNg93M5xzVXeY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752496006; c=relaxed/simple;
-	bh=Maovpa248I7CBxH/PejkKeRqHw0v3C94HDRXqdy2Gn4=;
+	s=arc-20240116; t=1752496004; c=relaxed/simple;
+	bh=ncwASAA1qi99xaHllmrz6NR9vRZXa0OXO/G8CF9AaoA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=H/DCLpvpGc57K5aIxYj+rSUVyupKbu526VaQMB+hUqm1QNEEROALag8KiUT8P0JsbvE4n47cywuXoxZfKbdC37NhBsYowUGHsl4DLgWFWv8zsb4xQocn242H9iZDdiHWawaZnXDndDc99ZhzJrhvwursGl39jHei93WBIsJzkH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YGIxjV1V; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 347F8C4CEF8;
+	 MIME-Version; b=XjcWPTn9rdhTnmpJ2iyAlsKWUC9Q7fBTxmhVaTYPwPDT5VyIZGhjKN9SefUHI8/IyKh/Cui7w10rOuTuoYdMqBXxTmU9DzzBNITgrVXjwpAHG/tUJV+sTECTg58szN/EsfEWxUKhgYccBFUWbbShbEEROk9l4sz9EdH760dVl50=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SkjN7X8l; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A3A2C4CEED;
 	Mon, 14 Jul 2025 12:26:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1752496004;
-	bh=Maovpa248I7CBxH/PejkKeRqHw0v3C94HDRXqdy2Gn4=;
+	bh=ncwASAA1qi99xaHllmrz6NR9vRZXa0OXO/G8CF9AaoA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=YGIxjV1VLwuQ9bjvR8ejkKTI4UlvucRA1/U7qw4hnYK8IkMLAjMAMIZrHQJxC64X0
-	 1aOSGT+EYPZqXEf3DswiINdBCJjK0mA5Dqbkpa7nTNUiK3X4FfziMc15GESZE29V4U
-	 1pgP6Nh8XT/AJsChmuTfvc53QLmUlPyiCo1OnCtWFPJ6eSDMUO6gtlWOt7IDcVmCbz
-	 hrcSd5sLm7MxBf5mp5yIF0pn6sdS/HI5sAziFo3rIz/gryJ7Hz/ZmmX5YibJFGzAoj
-	 9yX4gUjLt1bw0ioTew/zebE5nBrXAPaRzpM4mq8B4bTrc525TqOnTN3okaZvNc+iqo
-	 C6vtgwqe6KkGw==
+	b=SkjN7X8lo/gUYjopp59OGVBV5OTYpP6g/nojuQ/EmEgJOt5mwhl+qccDIrpWMqo4L
+	 bobBG+h4fu7rVhecD+De3hwcF31M2VRVGoAlNNOwtiR3V/vGmXm/WjQ1IPpxyilevm
+	 y5Z4dInppH7HI8yR/2nCMlv7+GzrC06E7+ufXeaHo52yNrzLPXAsKy+Mr1HIQ1sZB+
+	 0kQkVtGVBzrPIuolUax1AlVbr5V4/uVRzMsqK+x7oxyxj+l+E5mYXuyh1dUwyFW4rx
+	 R/GHkKM5ACGJ93H18ZP/lMHAv4jU/vJlPIeR7zlKyrILcp4ZFWrX0hLq7HMQMZ0BLb
+	 JxO8kCVm8pJDg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1ubIGY-00FW7V-D3;
+	id 1ubIGY-00FW7V-JG;
 	Mon, 14 Jul 2025 13:26:42 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -57,9 +57,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Eric Auger <eric.auger@redhat.com>,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH 04/11] KVM: arm64: Define helper for ICH_VTR_EL2
-Date: Mon, 14 Jul 2025 13:26:27 +0100
-Message-Id: <20250714122634.3334816-5-maz@kernel.org>
+Subject: [PATCH 05/11] KVM: arm64: Let GICv3 save/restore honor visibility attribute
+Date: Mon, 14 Jul 2025 13:26:28 +0100
+Message-Id: <20250714122634.3334816-6-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250714122634.3334816-1-maz@kernel.org>
 References: <20250714122634.3334816-1-maz@kernel.org>
@@ -75,58 +75,34 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Move the computation of the ICH_VTR_EL2 value to a common location,
-so that it can be reused by the save/restore code.
+The GICv3 save/restore code never needed any visibility attribute,
+but that's about to change. Make vgic_v3_has_cpu_sysregs_attr()
+check the visibility in case a register is hidden.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c  |  6 +-----
- arch/arm64/kvm/vgic/vgic.h | 15 +++++++++++++++
- 2 files changed, 16 insertions(+), 5 deletions(-)
+ arch/arm64/kvm/vgic-sys-reg-v3.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 6981c1b34c2c4..6763910fdf1f3 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2521,11 +2521,7 @@ static bool access_gic_vtr(struct kvm_vcpu *vcpu,
- 	if (p->is_write)
- 		return write_to_read_only(vcpu, p, r);
+diff --git a/arch/arm64/kvm/vgic-sys-reg-v3.c b/arch/arm64/kvm/vgic-sys-reg-v3.c
+index 5eacb4b3250a1..6f40225c4a3ff 100644
+--- a/arch/arm64/kvm/vgic-sys-reg-v3.c
++++ b/arch/arm64/kvm/vgic-sys-reg-v3.c
+@@ -341,8 +341,12 @@ static u64 attr_to_id(u64 attr)
  
--	p->regval = kvm_vgic_global_state.ich_vtr_el2;
--	p->regval &= ~(ICH_VTR_EL2_DVIM 	|
--		       ICH_VTR_EL2_A3V		|
--		       ICH_VTR_EL2_IDbits);
--	p->regval |= ICH_VTR_EL2_nV4;
-+	p->regval = kvm_get_guest_vtr_el2();
- 
- 	return true;
- }
-diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-index af4bf80b785c3..67233fa04e709 100644
---- a/arch/arm64/kvm/vgic/vgic.h
-+++ b/arch/arm64/kvm/vgic/vgic.h
-@@ -66,6 +66,21 @@
- 
- #define KVM_ICC_SRE_EL2		(ICC_SRE_EL2_ENABLE | ICC_SRE_EL2_SRE |	\
- 				 ICC_SRE_EL1_DIB | ICC_SRE_EL1_DFB)
-+#define KVM_ICH_VTR_EL2_RES0	(ICH_VTR_EL2_DVIM 	|	\
-+				 ICH_VTR_EL2_A3V	|	\
-+				 ICH_VTR_EL2_IDbits)
-+#define KVM_ICH_VTR_EL2_RES1	ICH_VTR_EL2_nV4
+ int vgic_v3_has_cpu_sysregs_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+ {
+-	if (get_reg_by_id(attr_to_id(attr->attr), gic_v3_icc_reg_descs,
+-			  ARRAY_SIZE(gic_v3_icc_reg_descs)))
++	const struct sys_reg_desc *r;
 +
-+static inline u64 kvm_get_guest_vtr_el2(void)
-+{
-+	u64 vtr;
++	r = get_reg_by_id(attr_to_id(attr->attr), gic_v3_icc_reg_descs,
++			  ARRAY_SIZE(gic_v3_icc_reg_descs));
 +
-+	vtr  = kvm_vgic_global_state.ich_vtr_el2;
-+	vtr &= ~KVM_ICH_VTR_EL2_RES0;
-+	vtr |= KVM_ICH_VTR_EL2_RES1;
-+
-+	return vtr;
-+}
++	if (r && !sysreg_hidden(vcpu, r))
+ 		return 0;
  
- /*
-  * As per Documentation/virt/kvm/devices/arm-vgic-its.rst,
+ 	return -ENXIO;
 -- 
 2.39.2
 
