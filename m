@@ -1,118 +1,133 @@
-Return-Path: <kvm+bounces-52284-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52285-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1147B03B28
-	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 11:43:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C6047B03B3D
+	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 11:46:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DAAAD172184
-	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 09:43:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 29B85164654
+	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 09:46:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E247A246760;
-	Mon, 14 Jul 2025 09:42:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEFF523505E;
+	Mon, 14 Jul 2025 09:46:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="EPweWqJ7"
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F269A2459DC;
-	Mon, 14 Jul 2025 09:42:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF4AE19AD48
+	for <kvm@vger.kernel.org>; Mon, 14 Jul 2025 09:46:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752486136; cv=none; b=jqW7e/y0bXdT6L5nbrYa3BCyRKCQ/jXgP++wzHW5jpTt552wtmNb6sMqVJQbgy/27ozVsP2iqwEjkwVNDzK12k3+FYZNIwCIbDx0pGGi8gwdwmh28pt6z1t76L6q335RVtrhRb0l1HspkXuGd04a84mOanP2eoUJcKmVYaO8LFM=
+	t=1752486367; cv=none; b=TYywYY8UVArN99+txWWnm7hVbHnRukcaCqwKwgc3dcUqUpk8/Dq7sLRojB/834gAKNmuycxr7A48IIXMpiwK+Cwr1fDLqCy7TE+QXForbZ7MC9wCUv/xdPdzfjnrQHUl5WA/8QUhgXtvFqFuFF8X9Pe8ORNzgH5Znr+VL+MgHIE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752486136; c=relaxed/simple;
-	bh=NtkYmkh+MWKkc3tiz4++RahH7N+j3NrwtINdVItqgGc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=jrPYGH+Q+WFJ+3X8gJNhe+JxtTGPJ/T0jCjrM+gNbxVLrA+SbWhdUj+GMw+6RfU8gg0ZTvLJlPLuwL9Nn1tHnhZP5ncOl4SniQ9ql/ZlbE268vF106HUiTWDlpu4jvwFteDkHsSP7PijRsuo9IMAEdkGe2iwABCS3mkY68Bh7hs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4bgcnS34D0z2YPrJ;
-	Mon, 14 Jul 2025 17:43:08 +0800 (CST)
-Received: from kwepemo200008.china.huawei.com (unknown [7.202.195.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id C6F441400FD;
-	Mon, 14 Jul 2025 17:42:09 +0800 (CST)
-Received: from [10.67.110.83] (10.67.110.83) by kwepemo200008.china.huawei.com
- (7.202.195.61) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Mon, 14 Jul
- 2025 17:42:09 +0800
-Message-ID: <10baccb6-f00e-4911-a3ec-8d28aec67b13@huawei.com>
-Date: Mon, 14 Jul 2025 17:42:08 +0800
+	s=arc-20240116; t=1752486367; c=relaxed/simple;
+	bh=nSDiWwcKhqBcSjyKV3EIuCxjblg1mWRaJe5gw9GZdDQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ixkbQt7aW6qg16PKYNszlWa2WN24PDdFsaixAsVLxVpir29RjvQPewL6F3KmEg7x04aK3LCmYsWOoAFrCm6PpZzhYZgoXikiM5rpvHwxbeTdOY16VHGB35Qbkwenpa85THOGgJQPVdwqE8kN2a54w3UDWoglsoBuio6cMxvzecM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=EPweWqJ7; arc=none smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-7490cb9a892so2403129b3a.0
+        for <kvm@vger.kernel.org>; Mon, 14 Jul 2025 02:46:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1752486364; x=1753091164; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=0dnf5JriQVpHQM4YNtZJFgadu2tM3f9E9KiPFuztXa0=;
+        b=EPweWqJ7HGg20kQdGVRKB9YV8O/2pre0jfr1xrOznkxR8hzx86XPJ8Dx2JJVvIPsCc
+         p1WuWswI9AwmsYV7XcVyiE9A967cY2F0CYgBa/q4Rwex+6HhMPXf8bH2GZyePZTKPMQy
+         ZjRwDhHv5F1bLW0nKHyW+zDoTjYzcyTlVnsM2Qjw1JYPyuL8S67N//kveGksavFSJ62c
+         ld6Z/Az/NlQSUhaFCRyJTbpl1FDACPiOxKPOTLQ/PbkoBEQsDeL5aULTi2NbBhXPeET4
+         NGBOKpeRkdbnG63LUqMYNk1bpDFUehwNLz1YwBB1r5Mz3UooC3w7I7yl3eKf9KQJs0WU
+         9DwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752486364; x=1753091164;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0dnf5JriQVpHQM4YNtZJFgadu2tM3f9E9KiPFuztXa0=;
+        b=RJpHn8CHJmdIhdNFYHA7iSjyBth/yaLN1KcDbBRwnExHBPTf5G1nh/OBmaEfzCNgW1
+         oSCsil/rS6NH97DQ+Qn7BEzyssBFcpmrC0zHGFLIRsZcJ9Oz540nHcheB14TKHD78FIM
+         Ibyln5UdYuNNE7QL48seABppX3czcbnD9tcALm92AbRE6amjMYgHIzhJuK3OkX7EWkcC
+         6zYa8PI3ZVyMjOXHPo9ZCZXJ8C4eyCxJOKaaLXkQS/ALSRLFeHxGLcoC0zwS6NTenCxa
+         ZzLcYvaAKfZCdEJRYIzBmkdxKawSQLr2NsP6+PFlZawhhpdt7lGVUAKOi6GcOeI8kKrv
+         Bvgw==
+X-Gm-Message-State: AOJu0YxKTamr1TTPaR2mqh5XEnTqL7mVgS6J0R9jEWhkpaPE8x0QaH7F
+	odJt6hh9OtDtk/kb60NtAWUmbCOvRFIfKNlHnG8/GYn45hOlIZd0W4FiV8g7W09JQvw=
+X-Gm-Gg: ASbGnctqnXTizpfMVjvRvZfnUJXbk5JPU3zYPzfYfSS6zcsTBh9Oph+bG/fBxUC7chd
+	NUvSXvvV0oTYMXNRi4s31SaUCG4nUxMf4Ao/hhHLrgDhG9vUHXLlCK+34yuhXJ5kGNsW48zlMTT
+	6aKFVpCnCm9rlhj5r2fy+qVgxTsSUxg8np1dRM+g8M7D/na6PbH2+smE+vly9VVbvaSC6jmGHJe
+	cVy2u6YkShwG14YYmcDWaCN4XtaIoQItD7k5PpQSAxGbGs9nZRfxmLbFvksHILndp/VEPLqT7xy
+	lGidmRihIvsAkGu2A5ShmVALloxTJMl6QdnCei/7o1+B7VsnyWmMLcdGXdN7kUJUAmP+xbV/DMT
+	+IsoWzZq7cVz+ICrM0e1pgvdnn4up8AV/zW0vDuTNzD89hpVq4d0m3tffUmcdPpLIOweCyxhVAb
+	l3MnPdwwtaqg==
+X-Google-Smtp-Source: AGHT+IFF990cxBBIj5rcns4ua/Z9mSLbBzTWgWQcSkoafAxgEV/F4FcvyqoXGxjBchTkM6/hWtRe9Q==
+X-Received: by 2002:a05:6a00:1992:b0:747:accb:773c with SMTP id d2e1a72fcca58-74ee2c509e7mr17413857b3a.13.1752486364023;
+        Mon, 14 Jul 2025 02:46:04 -0700 (PDT)
+Received: from J9GPGXL7NT.bytedance.net ([61.213.176.56])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74eb9dd73b7sm10201283b3a.1.2025.07.14.02.45.59
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Mon, 14 Jul 2025 02:46:03 -0700 (PDT)
+From: Xu Lu <luxu.kernel@bytedance.com>
+To: rkrcmar@ventanamicro.com,
+	cleger@rivosinc.com,
+	anup@brainfault.org,
+	atish.patra@linux.dev,
+	paul.walmsley@sifive.com,
+	palmer@dabbelt.com,
+	aou@eecs.berkeley.edu,
+	alex@ghiti.fr
+Cc: kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org,
+	linux-riscv@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Xu Lu <luxu.kernel@bytedance.com>
+Subject: [PATCH v4] RISC-V: KVM: Delegate illegal instruction fault to VS mode
+Date: Mon, 14 Jul 2025 17:45:54 +0800
+Message-Id: <20250714094554.89151-1-luxu.kernel@bytedance.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5.10] vhost-scsi: protect vq->log_used with vq->mutex
-To: Greg KH <gregkh@linuxfoundation.org>
-CC: <mst@redhat.com>, <jasowang@redhat.com>, <pbonzini@redhat.com>,
-	<stefanha@redhat.com>, <virtualization@lists.linux-foundation.org>,
-	<kvm@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <stable@vger.kernel.org>
-References: <20250702082945.4164475-1-zhengxinyu6@huawei.com>
- <2025071002-festive-outcast-7edd@gregkh>
-From: "zhengxinyu (E)" <zhengxinyu6@huawei.com>
-In-Reply-To: <2025071002-festive-outcast-7edd@gregkh>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
- kwepemo200008.china.huawei.com (7.202.195.61)
+Content-Transfer-Encoding: 8bit
 
+Delegate illegal instruction fault to VS mode by default to avoid such
+exceptions being trapped to HS and redirected back to VS.
 
+The delegation of illegal instruction fault is particularly important
+to guest applications that use vector instructions frequently. In such
+cases, an illegal instruction fault will be raised when guest user thread
+uses vector instruction the first time and then guest kernel will enable
+user thread to execute following vector instructions.
 
-On 7/10/2025 9:41 PM, Greg KH wrote:
-> On Wed, Jul 02, 2025 at 08:29:45AM +0000, Xinyu Zheng wrote:
->> From: Dongli Zhang <dongli.zhang@oracle.com>
->>
->> [ Upstream commit f591cf9fce724e5075cc67488c43c6e39e8cbe27 ]
->>
->> The vhost-scsi completion path may access vq->log_base when vq->log_used is
->> already set to false.
->>
->>      vhost-thread                       QEMU-thread
->>
->> vhost_scsi_complete_cmd_work()
->> -> vhost_add_used()
->>     -> vhost_add_used_n()
->>        if (unlikely(vq->log_used))
->>                                        QEMU disables vq->log_used
->>                                        via VHOST_SET_VRING_ADDR.
->>                                        mutex_lock(&vq->mutex);
->>                                        vq->log_used = false now!
->>                                        mutex_unlock(&vq->mutex);
->>
->> 				      QEMU gfree(vq->log_base)
->>          log_used()
->>          -> log_write(vq->log_base)
->>
->> Assuming the VMM is QEMU. The vq->log_base is from QEMU userpace and can be
->> reclaimed via gfree(). As a result, this causes invalid memory writes to
->> QEMU userspace.
->>
->> The control queue path has the same issue.
->>
->> CVE-2025-38074
-> 
-> This is not needed.
-> 
->> Cc: stable@vger.kernel.org#5.10.x
-> 
-> What about 5.15.y and 6.1.y?  We can't take a patch just for 5.10 as
-> that would cause regressions, right?
-> 
-> Please provide all relevant backports and I will be glad to queue them
-> up then.  I'll drop this from my queue for now, thanks.
-> 
-> greg k-h
+The fw pmu event counter remains undeleted so that guest can still query
+illegal instruction events via sbi call. Guest will only see zero count
+on illegal instruction faults and know 'firmware' has delegated it.
 
-Sorry for forgetting the 5.15.y and 6.1.y patches. I will resend it as 
-soon as possible. Thanks for pointing out my patch format error.
+Signed-off-by: Xu Lu <luxu.kernel@bytedance.com>
+---
+ arch/riscv/include/asm/kvm_host.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-Xinyu Zheng
+diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
+index 85cfebc32e4cf..3f6b9270f366a 100644
+--- a/arch/riscv/include/asm/kvm_host.h
++++ b/arch/riscv/include/asm/kvm_host.h
+@@ -44,6 +44,7 @@
+ #define KVM_REQ_STEAL_UPDATE		KVM_ARCH_REQ(6)
+ 
+ #define KVM_HEDELEG_DEFAULT		(BIT(EXC_INST_MISALIGNED) | \
++					 BIT(EXC_INST_ILLEGAL)     | \
+ 					 BIT(EXC_BREAKPOINT)      | \
+ 					 BIT(EXC_SYSCALL)         | \
+ 					 BIT(EXC_INST_PAGE_FAULT) | \
+-- 
+2.20.1
 
 
