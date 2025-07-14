@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-52391-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52392-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A37AB04B6F
-	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 01:04:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8331B04B74
+	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 01:05:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A5C7A1AA1536
-	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 23:05:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 896113B45EF
+	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 23:04:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87B702868B7;
-	Mon, 14 Jul 2025 22:59:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D29F2BCF48;
+	Mon, 14 Jul 2025 22:59:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="K+d2rj5P"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kShKSK6B"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-io1-f74.google.com (mail-io1-f74.google.com [209.85.166.74])
+Received: from mail-io1-f73.google.com (mail-io1-f73.google.com [209.85.166.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5468B291C05
-	for <kvm@vger.kernel.org>; Mon, 14 Jul 2025 22:59:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAD5A292B34
+	for <kvm@vger.kernel.org>; Mon, 14 Jul 2025 22:59:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752533992; cv=none; b=R8zdk/sTpFFcpDkRPVE58hbkGFLEUl03BTjQOnyHUgiDaPR9bYeyvPXlGGh/+GRO0NU+XCHbY9vZyLUuPyjqQD0Ql572VC+zTLCqDrY8yNmCCytCc2sdEQu/L6b9kb6WastR84h3t/Tfqh1C0AvFfLcugwJ/N86MMIVF2b6Q1+o=
+	t=1752533994; cv=none; b=V8vEd51uJuZEHMEIhXJYA3PWckRVOA8Md3P6pqFsxcYqwn5lGelqu1bJXvujykaTV98d7iZ0tbTyoXQH+N3yMBq8hzwgb0itURDeN6vmJRAmpt05i/iCjfO3p7D6FmjB2izJSyPKWomuMzSogbXqLBU6jPB/ATZ+8recnWVkkrU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752533992; c=relaxed/simple;
-	bh=XicCoLbThtlYTD62aDg8ni1reIMr7qH1gveTP/e6XR4=;
+	s=arc-20240116; t=1752533994; c=relaxed/simple;
+	bh=0KMiE20SLJLD7kdsdsCqqE1XhXEsDWHdcA9/wtSWkSQ=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=H7CzxF1n3RFmW6/KhpRknOzQnQ8KG1UqaNqVmvg577gT91zkERfWZkCJJQ+En66y/PtjrHA84Vh5OXEu1FxfLcF13MwZt+s0RTFK6PBtz+ARDOq7gHKszQK2q7D+iBTab3yj6ya3P6k1BmiAr6RI9Q31IXLAQXtxgdQRYU7Bftw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=K+d2rj5P; arc=none smtp.client-ip=209.85.166.74
+	 To:Cc:Content-Type; b=oN6VDEDW40qsV8F0V81rIrRUFonoNVyGDHIXExmEHT3BtT9YSTrhWAalouDs210/47Pwyexz/I1pqMmVNzdqC4f9pmIonR9Z0cnXpCOd2aANlaubLEigX9+06xymhJh0g/84puG4bbs9AV2F0Gj20ck8E9yyq4vmB7wCM83anGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kShKSK6B; arc=none smtp.client-ip=209.85.166.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
-Received: by mail-io1-f74.google.com with SMTP id ca18e2360f4ac-86d01ff56ebso829328039f.1
-        for <kvm@vger.kernel.org>; Mon, 14 Jul 2025 15:59:48 -0700 (PDT)
+Received: by mail-io1-f73.google.com with SMTP id ca18e2360f4ac-876a88d14baso981407739f.2
+        for <kvm@vger.kernel.org>; Mon, 14 Jul 2025 15:59:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752533988; x=1753138788; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1752533989; x=1753138789; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=sXnlk8Oj50kBtPmAQ5IhbS6eNdNw6B/15jx/cysRtNw=;
-        b=K+d2rj5PDWs+xY8PVWrV3HZ3eVroETFuoNuPjNWpL0RJQWPuGuNNAdP2zzmmyIfkP3
-         5UCIJFtEiSioj9frP9vCQHcHiWGqY7EA2L6s/QqP4Z0gtFZrNQBbookxMqtczGVWRdW9
-         NWvrH4C8KfgWZxKOFP7fMdcbTP4Hw9/zjf9o2LoDW7BnOOsQGvOJT+eYHsXBFDQ+pFop
-         71F9AWSVHU1whrsml8Vyhu0v/eOWwOkizy/49SikUNmDa4ou0z8ofvwgux0RXhbnJd5J
-         /le9G/nEKwdYqObxjH8NyV+lp4jKOrFbneOhoTzFmrLK11f43swNf2DfvEPp0ipbAOqV
-         U7hA==
+        bh=kYf1NlmF8/QTGj97Qxw1rCkue71OyUvLh0xkN4pVh4E=;
+        b=kShKSK6Bl5pVcTV+IN3n2Gb/3CFTUHPnr2rY3s69to94bVu/ThyGiMHmyphDFM2SFd
+         EC6n70zZRkxFpdkSl1WFcnqNvfIc8Wnfpp5owanfGv6A/pml8Bmj2NNLCuXCi+g5b57q
+         e1zCLRBz30TyfqWWxD08/Mim1Tl6Bd7Q6SW+vu0lPUYOY3/UWg/3rL73/TBUHIyggvXu
+         O2XIDfdoJtzKA4Zat/STylgM98ccae3I7UobCWHn4ylFEuOm2UlLbucOfWsQXI3XvcYM
+         hQWrAFBuXabEyE30BF1/ohSmJkWqweU0nP6sZ9GpmgbPmu8E3Z3TGdmEvr72xB+aud+P
+         CG7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752533988; x=1753138788;
+        d=1e100.net; s=20230601; t=1752533989; x=1753138789;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sXnlk8Oj50kBtPmAQ5IhbS6eNdNw6B/15jx/cysRtNw=;
-        b=XPkRenhaCyk3fdye7Dym4vc7URqpJbD80ajFaSi/ZDKy6lsGlE6/HNaLOpCp5M6Nuq
-         m9crXLfUEbyzTelyhsBUi9MLjEcKIm2Omo9XaIcpPj8hZAZvJEbVsfT8cwYH0902cARk
-         GwpxPP8uifKCQiO4ZWofE2Ttw2q+Fs4Meh3u0H+K53x/MZMgeg/N0ZNMOhKEsJrnHOh1
-         px02m6ymr3d4GMlO4oqvEiPiZxHyDUPHSALAeXzWBqb1iToZoC6LyK1MaTfHq2SUcb7L
-         +4LhR/YFSaTcJT+rm9nSnZG15V7BUUY/bQJ6xoMyT2KeN3m1tBg8FmSRvxqccdjxdOAb
-         +Jsw==
-X-Gm-Message-State: AOJu0YxM2na7nYfwIodGPpcZf0It7qZXwCqLdLj0BhtcchOg2mAl2zS8
-	BH/2miwLqRw5AdPAWJN1LezouHuc1EZhUsfmF2r+pxTWcfC1mJE7KPtxOsJuBoVXIxH6lChusub
-	o7YArZ0qMINd69mMTmIy200shwbq2gR6kUnRw3OxiVmLt1xSOomLLqTJkLWDMx0/MakL+0Sexwj
-	ohcwfQ6W8yVc/uiHCElUh9ZdLv1UCTD0sFVQOoPidUWmZ6uzORSDedfFx4yic=
-X-Google-Smtp-Source: AGHT+IE357sOrApLJCq1WzFbQdDxZmtg7XTkGgz6+RXD/fX/V+IYmhdKT8OJFTHuEVtH1u9P9MhFxUvuEWSnRycsww==
-X-Received: from iola12.prod.google.com ([2002:a5d:980c:0:b0:86c:f382:ca95])
+        bh=kYf1NlmF8/QTGj97Qxw1rCkue71OyUvLh0xkN4pVh4E=;
+        b=QoJ0GrTXvYKcLtmMMwOH0zzDPaSPOPPGeLTG0K4fTj+SnYzGUKt6sL33FxxPtkVQ8f
+         BdFFVkH4ydc2D6J0ABXDth8RiuIkQAIPWOR7v6AUEfxK3L+ovoVJSmn5Bz71NpS3BDZ5
+         h5MxA/D0ls9y2zISxyw8POoCzi7Xwl6DwQpfwInDZJmc4+F3UKFgNAxE+AmHJwTU12eD
+         xMWNsHQgSATKuDCt4oMp+usq+mWBf6oMc7sb6hZNSb8RtH8KU0KpbfX/LtSG+tNpsBWB
+         O3GMUCyOwt6y1e9CCiJOjZSHPbpbRkFdFFEk1UHZ/enEQUEnulJparE7ZQl3WeJ6CtlC
+         y0+w==
+X-Gm-Message-State: AOJu0YwTW+1S6XAW6a55eYKVahyCMgdrt0bFBP89Bu/RnmomMZChXTwt
+	DL3cSMdGH2BdpJ7IBagS4XFhHyX6DzP0d+lkYbb2BpSVoDuIROBwmZW5pEnEBSgc6FxKANn7H+9
+	RE1OxG6hvTmQmuBHXmlrtolAOTddqkxJTzzb3pFIv1jQgtm6cYp9ky7iwrTtRsvdbssOSxifpwj
+	3SScIsNL/aRqBPS6wwk1gZR1CBOP3VJKwpDHo4VR+BR4pxJKD7iO0/af6d3sg=
+X-Google-Smtp-Source: AGHT+IEqn9WMczkmgGJMqe3Pfe69AM+/PU1iKi1PXg3+tmFjAie5sPccK6SXrZKFiKE60xITkz3trTASZ14i+omdNw==
+X-Received: from ilos18.prod.google.com ([2002:a92:cb12:0:b0:3df:53d6:5d35])
  (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6602:27c1:b0:86d:1218:de96 with SMTP id ca18e2360f4ac-8797886bf8fmr1673529039f.12.1752533987975;
- Mon, 14 Jul 2025 15:59:47 -0700 (PDT)
-Date: Mon, 14 Jul 2025 22:59:11 +0000
+ 2002:a05:6e02:3388:b0:3df:3d1a:2e76 with SMTP id e9e14a558f8ab-3e255571390mr143216325ab.1.1752533989026;
+ Mon, 14 Jul 2025 15:59:49 -0700 (PDT)
+Date: Mon, 14 Jul 2025 22:59:12 +0000
 In-Reply-To: <20250714225917.1396543-1-coltonlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250714225917.1396543-1-coltonlewis@google.com>
 X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Message-ID: <20250714225917.1396543-18-coltonlewis@google.com>
-Subject: [PATCH v4 17/23] KVM: arm64: Enforce PMU event filter at vcpu_load()
+Message-ID: <20250714225917.1396543-19-coltonlewis@google.com>
+Subject: [PATCH v4 18/23] KVM: arm64: Extract enum debug_owner to enum vcpu_register_owner
 From: Colton Lewis <coltonlewis@google.com>
 To: kvm@vger.kernel.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
@@ -89,77 +89,137 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
 	linux-kselftest@vger.kernel.org, Colton Lewis <coltonlewis@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-The KVM API for event filtering says that counters do not count when
-blocked by the event filter. To enforce that, the event filter must be
-rechecked on every load. If the event is filtered, exclude counting at
-all exception levels before writing the hardware.
+The concept of a register or set of registers being owned by the host,
+guest, or neither and choosing how to handle traps based on that state
+applies equally well to PMU registers as other debug registers.
+
+Extract the enum debug_owner previously defined inside struct
+kvm_vcpu_arch to it's own type and add a the field to struct kvm_pmu
+as well.
 
 Signed-off-by: Colton Lewis <coltonlewis@google.com>
 ---
- arch/arm64/kvm/pmu-direct.c | 43 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 43 insertions(+)
+ arch/arm64/include/asm/kvm_host.h         | 12 ++++--------
+ arch/arm64/include/asm/kvm_pmu.h          |  1 +
+ arch/arm64/include/asm/kvm_types.h        |  7 ++++++-
+ arch/arm64/kvm/debug.c                    |  8 ++++----
+ arch/arm64/kvm/hyp/include/hyp/debug-sr.h |  6 +++---
+ 5 files changed, 18 insertions(+), 16 deletions(-)
 
-diff --git a/arch/arm64/kvm/pmu-direct.c b/arch/arm64/kvm/pmu-direct.c
-index 16b01320ca77..e21fdd274c2e 100644
---- a/arch/arm64/kvm/pmu-direct.c
-+++ b/arch/arm64/kvm/pmu-direct.c
-@@ -195,6 +195,47 @@ u8 kvm_pmu_hpmn(struct kvm_vcpu *vcpu)
- 	return hpmn;
- }
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 463dbf7f0821..21e32d7fa19b 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -846,11 +846,7 @@ struct kvm_vcpu_arch {
+ 	struct kvm_guest_debug_arch external_debug_state;
+ 	u64 external_mdscr_el1;
  
-+/**
-+ * kvm_pmu_apply_event_filter()
-+ * @vcpu: Pointer to vcpu struct
-+ *
-+ * To uphold the guarantee of the KVM PMU event filter, we must ensure
-+ * no counter counts if the event is filtered. Accomplish this by
-+ * filtering all exception levels if the event is filtered.
-+ */
-+static void kvm_pmu_apply_event_filter(struct kvm_vcpu *vcpu)
-+{
-+	struct arm_pmu *pmu = vcpu->kvm->arch.arm_pmu;
-+	u64 evtyper_set = kvm_pmu_evtyper_mask(vcpu->kvm)
-+		& ~kvm_pmu_event_mask(vcpu->kvm)
-+		& ~ARMV8_PMU_INCLUDE_EL2;
-+	u64 evtyper_clr = ARMV8_PMU_INCLUDE_EL2;
-+	u8 i;
-+	u64 val;
-+
-+	for (i = 0; i < pmu->hpmn_max; i++) {
-+		val = __vcpu_sys_reg(vcpu, PMEVTYPER0_EL0 + i);
-+
-+		if (vcpu->kvm->arch.pmu_filter &&
-+		    !test_bit(val, vcpu->kvm->arch.pmu_filter)) {
-+			val |= evtyper_set;
-+			val &= ~evtyper_clr;
-+		}
-+
-+		write_pmevtypern(i, val);
-+	}
-+
-+	val = __vcpu_sys_reg(vcpu, PMCCFILTR_EL0);
-+
-+	if (vcpu->kvm->arch.pmu_filter &&
-+	    !test_bit(ARMV8_PMUV3_PERFCTR_CPU_CYCLES, vcpu->kvm->arch.pmu_filter)) {
-+		val |= evtyper_set;
-+		val &= ~evtyper_clr;
-+	}
-+
-+	write_pmccfiltr(val);
-+}
-+
- /**
-  * kvm_pmu_load() - Load untrapped PMU registers
-  * @vcpu: Pointer to struct kvm_vcpu
-@@ -217,6 +258,8 @@ void kvm_pmu_load(struct kvm_vcpu *vcpu)
- 	if (!kvm_vcpu_pmu_use_fgt(vcpu))
+-	enum {
+-		VCPU_DEBUG_FREE,
+-		VCPU_DEBUG_HOST_OWNED,
+-		VCPU_DEBUG_GUEST_OWNED,
+-	} debug_owner;
++	enum vcpu_register_owner debug_owner;
+ 
+ 	/* VGIC state */
+ 	struct vgic_cpu vgic_cpu;
+@@ -1467,11 +1463,11 @@ void kvm_debug_handle_oslar(struct kvm_vcpu *vcpu, u64 val);
+ 	(!!(__vcpu_sys_reg(vcpu, OSLSR_EL1) & OSLSR_EL1_OSLK))
+ 
+ #define kvm_debug_regs_in_use(vcpu)		\
+-	((vcpu)->arch.debug_owner != VCPU_DEBUG_FREE)
++	((vcpu)->arch.debug_owner != VCPU_REGISTER_FREE)
+ #define kvm_host_owns_debug_regs(vcpu)		\
+-	((vcpu)->arch.debug_owner == VCPU_DEBUG_HOST_OWNED)
++	((vcpu)->arch.debug_owner == VCPU_REGISTER_HOST_OWNED)
+ #define kvm_guest_owns_debug_regs(vcpu)		\
+-	((vcpu)->arch.debug_owner == VCPU_DEBUG_GUEST_OWNED)
++	((vcpu)->arch.debug_owner == VCPU_REGISTER_GUEST_OWNED)
+ 
+ int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
+ 			       struct kvm_device_attr *attr);
+diff --git a/arch/arm64/include/asm/kvm_pmu.h b/arch/arm64/include/asm/kvm_pmu.h
+index 4f0741bf6779..58c1219adf54 100644
+--- a/arch/arm64/include/asm/kvm_pmu.h
++++ b/arch/arm64/include/asm/kvm_pmu.h
+@@ -38,6 +38,7 @@ struct kvm_pmu {
+ 	int irq_num;
+ 	bool created;
+ 	bool irq_level;
++	enum vcpu_register_owner owner;
+ };
+ 
+ struct arm_pmu_entry {
+diff --git a/arch/arm64/include/asm/kvm_types.h b/arch/arm64/include/asm/kvm_types.h
+index 9a126b9e2d7c..1d951fb1ad78 100644
+--- a/arch/arm64/include/asm/kvm_types.h
++++ b/arch/arm64/include/asm/kvm_types.h
+@@ -4,5 +4,10 @@
+ 
+ #define KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE 40
+ 
+-#endif /* _ASM_ARM64_KVM_TYPES_H */
++enum vcpu_register_owner {
++	VCPU_REGISTER_FREE,
++	VCPU_REGISTER_HOST_OWNED,
++	VCPU_REGISTER_GUEST_OWNED,
++};
+ 
++#endif /* _ASM_ARM64_KVM_TYPES_H */
+diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+index 8ae9d141cad4..fa8b4f846b68 100644
+--- a/arch/arm64/kvm/debug.c
++++ b/arch/arm64/kvm/debug.c
+@@ -161,7 +161,7 @@ void kvm_vcpu_load_debug(struct kvm_vcpu *vcpu)
+ 	 *    context needs to be loaded on the CPU.
+ 	 */
+ 	if (vcpu->guest_debug || kvm_vcpu_os_lock_enabled(vcpu)) {
+-		vcpu->arch.debug_owner = VCPU_DEBUG_HOST_OWNED;
++		vcpu->arch.debug_owner = VCPU_REGISTER_HOST_OWNED;
+ 		setup_external_mdscr(vcpu);
+ 
+ 		/*
+@@ -183,9 +183,9 @@ void kvm_vcpu_load_debug(struct kvm_vcpu *vcpu)
+ 		mdscr = vcpu_read_sys_reg(vcpu, MDSCR_EL1);
+ 
+ 		if (mdscr & (MDSCR_EL1_KDE | MDSCR_EL1_MDE))
+-			vcpu->arch.debug_owner = VCPU_DEBUG_GUEST_OWNED;
++			vcpu->arch.debug_owner = VCPU_REGISTER_GUEST_OWNED;
+ 		else
+-			vcpu->arch.debug_owner = VCPU_DEBUG_FREE;
++			vcpu->arch.debug_owner = VCPU_REGISTER_FREE;
+ 	}
+ 
+ 	kvm_arm_setup_mdcr_el2(vcpu);
+@@ -222,7 +222,7 @@ void kvm_debug_set_guest_ownership(struct kvm_vcpu *vcpu)
+ 	if (kvm_host_owns_debug_regs(vcpu))
  		return;
  
-+	kvm_pmu_apply_event_filter(vcpu);
-+
- 	for (i = 0; i < pmu->hpmn_max; i++) {
- 		val = __vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i);
- 		write_pmevcntrn(i, val);
+-	vcpu->arch.debug_owner = VCPU_DEBUG_GUEST_OWNED;
++	vcpu->arch.debug_owner = VCPU_REGISTER_GUEST_OWNED;
+ 	kvm_arm_setup_mdcr_el2(vcpu);
+ }
+ 
+diff --git a/arch/arm64/kvm/hyp/include/hyp/debug-sr.h b/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
+index 502a5b73ee70..048234439a41 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
++++ b/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
+@@ -91,12 +91,12 @@
+ static struct kvm_guest_debug_arch *__vcpu_debug_regs(struct kvm_vcpu *vcpu)
+ {
+ 	switch (vcpu->arch.debug_owner) {
+-	case VCPU_DEBUG_FREE:
++	case VCPU_REGISTER_FREE:
+ 		WARN_ON_ONCE(1);
+ 		fallthrough;
+-	case VCPU_DEBUG_GUEST_OWNED:
++	case VCPU_REGISTER_GUEST_OWNED:
+ 		return &vcpu->arch.vcpu_debug_state;
+-	case VCPU_DEBUG_HOST_OWNED:
++	case VCPU_REGISTER_HOST_OWNED:
+ 		return &vcpu->arch.external_debug_state;
+ 	}
+ 
 -- 
 2.50.0.727.gbf7dc18ff4-goog
 
