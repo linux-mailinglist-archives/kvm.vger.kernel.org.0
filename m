@@ -1,120 +1,131 @@
-Return-Path: <kvm+bounces-52259-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52260-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50265B03499
-	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 04:44:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1677EB034EF
+	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 05:20:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A67C6173ED9
-	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 02:44:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C324176C94
+	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 03:20:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 459051DE4F3;
-	Mon, 14 Jul 2025 02:44:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5B631E5B82;
+	Mon, 14 Jul 2025 03:20:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="QJPqD/lS"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="U5gw4PFN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B967E7262A
-	for <kvm@vger.kernel.org>; Mon, 14 Jul 2025 02:44:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17759BE4A;
+	Mon, 14 Jul 2025 03:20:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752461083; cv=none; b=RVI6pJyL2Kox7pb531HMwkYtlQvg7G8FVdtMPLdwwQ1gpmkAgzotGSErmMVnOsMw14VikAsYpZF+rE3J7G+rOvh0q8nBuvi8P5gqiBwps8uBs2zsD13BCg/9iTFFJi0OdznjrfCU0TPQFeXKEXC8WjzBXjozcxTdHpSMb/4SOM8=
+	t=1752463214; cv=none; b=T+5TakWEtYDgO5pcUBNh8XstbGQyEPvkL9IJKmo0ToHn1l5HDcE4QC1wf68h8efm1m6b4DZkgfQvXMEcmApjtfSFivWlwOM5eWJ1lt18UndlonvLgJn12se3IVWQsxJU1KaPGrjl4ZbEgCrsW7RmQ9tyiTvPbZrV1ab3vHZOuFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752461083; c=relaxed/simple;
-	bh=woqpO3NRbjhHBU4xUE1MFG1XPmmi0HP0qmLRNxoUwpM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WiIkhNKwuSlYlL5svijKawCsTYn9cXb7Tk4SIXEY6oJXlRx8K1kpMZ0sZSGbj68KBTH65IzJmIH33NEljiR0lXPBrFb8qd1JxRtUxG/9LWoEj0gp3oqG5LEtl6LyrYjENtLjCd75yGO2XLrg37qknTlE+Fq2f9LTweP6b8Xz1MI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=QJPqD/lS; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-23602481460so35325605ad.0
-        for <kvm@vger.kernel.org>; Sun, 13 Jul 2025 19:44:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1752461081; x=1753065881; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GGnDLyzoK1hk6QcZEHX4yplSrEzwZbOUE/lD+OVxxOo=;
-        b=QJPqD/lSzuaCQxFW6bVir/fstzj/7y39TTmNX7Zkh03BiE2mUquJDD3ZEOMb+uuNBU
-         HnRlSzDiTiBudOPZdP4Nn2ke8f1sSeYT296S28EzeodATLrlDcjc/MncsQSEcr0oJwvH
-         f8Lkqih7H37AUaYwPFuTwnmLKx5kavXJqcDnmClb5ex6msiHzPOkzFBKBffrYnkafB93
-         0odF8UXAXvYw7IBfxSFBx1I5jAaIoDvKaUMG5d3VMwh0fZ3G4SJwg3BSY9LagKsn6eCa
-         ct6UCvXfrRkoyQNcmgPf/yezWj7W/sUD/2Wk63+l7KH+nVAzR63Am0QbJX/MRdAfZBUA
-         P8cA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752461081; x=1753065881;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GGnDLyzoK1hk6QcZEHX4yplSrEzwZbOUE/lD+OVxxOo=;
-        b=eOYMD4q5XtAlnMzuQXf/hB/No9ys9A3p2ocwXp0Kge+Z/Gr+b93mP9+U9FIPeQDnMm
-         +nx21Co16U/U7v8yu9wP00wzZmWg81BUepy4gb9N7JErMBRwhbl7GBnUjozhiBZSJZLv
-         zw2w1cXa4638WGWytTPaflwtkGu72ezjzCF7LTw80VSRkOTt91ocRqFbaLQfZDrhZaao
-         oRuFmvBBvC17CHyizSKfLHxLIL2AImJWXBDd+dumbegI4Nzdr7jzazKjYJxXyMTKRuI2
-         14olyBA9G4Yn3vrGTJWVlu3yoOuuQJsMDrnSguEU8PzPKQrYsgrZcD5IJF3Zsv544YOk
-         MdOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX6Ql9PyuVyWealQCff3WKHqetu+/dM9/QbCcW+O8Jq0zL46EfbaIK6UpyD7mPXTe3aC/w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxOOqcp9Kf+HK2XDZgu3+W+EikDa197Ijhjh4ej1rF/PYFGGJqH
-	679EChbwqSBJLo8gTjk85Dh4hu6p7/psg27lMO78cVPczXquHGwSK2ESeO1YVCLb9WQ=
-X-Gm-Gg: ASbGncuKw992PD1Q/+UbqqYqGSNkXvc0JXH48Tsu+AuQrX5jS0XRCkjtP935yYjw3P3
-	2Eoxb4pRIFQtozGTNG81rDi3xfWoxMaObaQISXaLDF4zOPvfP1xtVRWDxMIECVjrIsvJk5Zo48W
-	d3KPWnGKAfWsrCz9LvQ8G4zmmOi4+DUMC+K0RL9SQIndVERhlLG4nzV8WQsRNg6TDx9m747CWtj
-	oiBsUWW01MHvQTDJWkANzfmfLpjHUH2Kb2w14aIsVBN+v6XCouHvC3SlzrGpbdHNH8N9mbbsZOZ
-	6uf0/oQlWkAWGrNXV05SH59OWXLG5EMMGvS7v42GHH4TFqKceMhiDs6qXZUtwiVpg117cPhGtfO
-	Z6M98R/NXS5cqUBMld5gTGDoyEBrPnfVnSKuFF9qo4izk2V1XYg==
-X-Google-Smtp-Source: AGHT+IG2a3ZcNn/X49Q30mvFsGR46F/NachCN13vl0w9s5ICMWR61xTnTwucl1IEoa++sqdOjScs+w==
-X-Received: by 2002:a17:902:f70d:b0:234:a139:1206 with SMTP id d9443c01a7336-23df093ca68mr146385185ad.40.1752461080974;
-        Sun, 13 Jul 2025 19:44:40 -0700 (PDT)
-Received: from localhost.localdomain ([203.208.189.11])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23de4323daesm82683445ad.139.2025.07.13.19.44.37
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Sun, 13 Jul 2025 19:44:40 -0700 (PDT)
-From: lizhe.67@bytedance.com
-To: alex.williamson@redhat.com
-Cc: akpm@linux-foundation.org,
-	david@redhat.com,
-	jgg@ziepe.ca,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	lizhe.67@bytedance.com,
-	peterx@redhat.com
-Subject: Re: [PATCH v4 2/5] vfio/type1: optimize vfio_pin_pages_remote()
-Date: Mon, 14 Jul 2025 10:44:33 +0800
-Message-ID: <20250714024433.14441-1-lizhe.67@bytedance.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20250711153523.42d68ec0.alex.williamson@redhat.com>
-References: <20250711153523.42d68ec0.alex.williamson@redhat.com>
+	s=arc-20240116; t=1752463214; c=relaxed/simple;
+	bh=tcn1GO9tcnkz5xuh+C1NWSfQ89jGjB/xyI/3lDc+SsA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YAvGbpfaF01WKdTHI5GBwOjKgZ49IZIU2OL1aKtPF0Zk90J1LkQWcyqVP861aPqewBfS5P0ofkM+TxKe1n2CeirIBK6AWnEbosO1Eu0cyCDli723RctErUpCEt01O8klsU0Bjkrxa6YALMgUdrpLw1ANtAuyiYSJJ9BxRgQJ+3Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=U5gw4PFN; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1752463212; x=1783999212;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=tcn1GO9tcnkz5xuh+C1NWSfQ89jGjB/xyI/3lDc+SsA=;
+  b=U5gw4PFNIfbBA2WusrE8sFlDGJGzKhPgl6pbKit8u1AAlZnXAKYzaNk5
+   YsadZFlkLqW+8eJMSZDXH7InPWk9DnfeSHzbmz15kVXEhilIPBj7eu3de
+   X/nG+EBvFUpYAVz2KbiSg3NUO0TB0kkslsgZ9weGpjAuSrKHlgBx+2iNF
+   Jbnoiykk3AX8ciU9EgYvA7+ffZ5vQ1OTeiAeXnWqCfmTjj/fSixJP6qee
+   UW6e6EaKr+5prs8YR1Ns29xh2O55KLCQjk4gw3A1kpd5zFmREMqE6KtZs
+   //46xXrd0ZOe3E8ZPkVYvZOnFv3kFGKSp07D1jFUI1hlzU5mf2FFsvSJA
+   w==;
+X-CSE-ConnectionGUID: jgzObkzbQwWwqz7Y28H6og==
+X-CSE-MsgGUID: q6VNLVDSTQede8VWszpVHw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11491"; a="54618422"
+X-IronPort-AV: E=Sophos;i="6.16,310,1744095600"; 
+   d="scan'208";a="54618422"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jul 2025 20:20:12 -0700
+X-CSE-ConnectionGUID: 9VMJp6EYRK6Ki/tWNX+Stg==
+X-CSE-MsgGUID: p4PkuAAfQm2kCmoCIpy2Cg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,310,1744095600"; 
+   d="scan'208";a="157312424"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jul 2025 20:20:08 -0700
+Message-ID: <3ef581f1-1ff1-4b99-b216-b316f6415318@intel.com>
+Date: Mon, 14 Jul 2025 11:20:05 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V4 0/1] KVM: TDX: Decrease TDX VM shutdown time
+To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+ "seanjc@google.com" <seanjc@google.com>
+Cc: "Gao, Chao" <chao.gao@intel.com>, "Huang, Kai" <kai.huang@intel.com>,
+ "binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "Hunter, Adrian" <adrian.hunter@intel.com>,
+ "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "Chatre, Reinette" <reinette.chatre@intel.com>,
+ "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+ "Zhao, Yan Y" <yan.y.zhao@intel.com>,
+ "tony.lindgren@linux.intel.com" <tony.lindgren@linux.intel.com>
+References: <20250611095158.19398-1-adrian.hunter@intel.com>
+ <175088949072.720373.4112758062004721516.b4-ty@google.com>
+ <aF1uNonhK1rQ8ViZ@google.com>
+ <7103b312-b02d-440e-9fa6-ba219a510c2d@intel.com>
+ <aHEMBuVieGioMVaT@google.com>
+ <3989f123-6888-459b-bb65-4571f5cad8ce@intel.com>
+ <aHEdg0jQp7xkOJp5@google.com>
+ <b5df4f84b473524fc3abc33f9c263372d0424372.camel@intel.com>
+ <aHGYvrdX4biqKYih@google.com>
+ <a29d4a7f319f95a45f775270c75ccf136645fad4.camel@intel.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <a29d4a7f319f95a45f775270c75ccf136645fad4.camel@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On Fri, 11 Jul 2025 15:35:23 -0600, alex.williamson@redhat.com wrote:
- 
-> > +			if (acct_pages) {
-> >  				if (!dma->lock_cap &&
-> > -				    mm->locked_vm + lock_acct + 1 > limit) {
-> > +				     mm->locked_vm + lock_acct + acct_pages > limit) {
+On 7/12/2025 7:17 AM, Edgecombe, Rick P wrote:
+> On Fri, 2025-07-11 at 16:05 -0700, Sean Christopherson wrote:
+>>> Zero the reserved area in struct kvm_tdx_capabilities so that fields added
+>>> in
+>>> the reserved area won't disturb any userspace that previously had garbage
+>>> there.
+>>
+>> It's not only about disturbing userspace, it's also about actually being able
+>> to repurpose the reserved fields in the future without needing *another* flag
+>> to tell userspace that it's ok to read the previously-reserved fields.  I care
+>> about this much more than I care about userspace using reserved fields as
+>> scratch space.
 > 
-> Don't resend, I'll fix on commit, but there's still a gratuitous
-> difference in leading white space from the original. Otherwise the
-> series looks good to me
+> If, before calling KVM_TDX_CAPABILITIES, userspace zeros the new field that it
+> knows about, but isn't sure if the kernel does, it's the same no?
+> 
+> Did you see that the way KVM_TDX_CAPABILITIES is implemented today is a little
+> weird? It actually copies the whole struct kvm_tdx_capabilities from userspace
+> and then sets some fields (not reserved) and then copies it back. So userspace
+> can zero any fields it wants to know about before calling KVM_TDX_CAPABILITIES.
+> Then it could know the same things as if the kernel zeroed it.
+> 
+> I was actually wondering if we want to change the kernel to zero reserved, if it
+> might make more sense to just copy caps->cpuid.nent field from userspace, and
+> then populate the whole thing starting from a zero'd buffer in the kernel.
 
-The leading-white-space indentation was adjusted in accordance with
-David's suggestion[1]. It seems to me that either approach is acceptable.
++1 to zero the whole buffer of *caps in the kernel.
 
-Thank you for your review.
-
-Thanks,
-Zhe
-
-[1]: https://lore.kernel.org/all/9d74e93d-5a5f-4ffa-91fa-eb2061080f94@redhat.com/
+current code seems to have issue on the 
+caps->kernel_tdvmcallinfo_1_r11/kernel_tdvmcallinfo_1_r12/user_tdvmcallinfo_1_r12, 
+as KVM cannot guarantee zero'ed value are returned to userspace.
 
