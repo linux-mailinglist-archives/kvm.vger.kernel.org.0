@@ -1,158 +1,145 @@
-Return-Path: <kvm+bounces-52343-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52341-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEC95B0435E
-	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 17:19:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E113B04333
+	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 17:16:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06BC4168314
-	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 15:16:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49D824E185D
+	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 15:14:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 303B3263F47;
-	Mon, 14 Jul 2025 15:14:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1227725C82E;
+	Mon, 14 Jul 2025 15:13:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="H/FEVB8b"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e1XPcjUy"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CB1526059F;
-	Mon, 14 Jul 2025 15:14:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98C56246BB6
+	for <kvm@vger.kernel.org>; Mon, 14 Jul 2025 15:13:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752506090; cv=none; b=WpiZUUHk1ZMdQ0pRg9PiMosVMyeP8bgjrot64xHPzgP+XrwdZ4ezn9VQY1yyazoVWcuw/2Q1KHKtejPcEExPV6iw9IcqqejbUYO5cy5T8GQNIgGYVW6bWRQQ4Kpio2BEJGPEVyc1SGdgyRBPpalFTA3757vCtliGR4A2utGWIfc=
+	t=1752505982; cv=none; b=XCG5e/liEeUSYpGEfbRfn4xbgkI2zk8j7TzQ6MwfsSv3sCOcLt2YR7uZEigvupanK/VSGd4NKpz20uagX/zlmLTyzDFxXSYoSROGKkarKjEBbWxc/wpHCLEDDgWMNsnLeQknnIXtos5IrLA+XaaECnF7nxIwVICSRKNZLQFiii4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752506090; c=relaxed/simple;
-	bh=uhR4oTtyTLRPzkqDzPtiWEgon2j5NRv9mdaGjQ0k3OM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kIi42md/X1hQw9EVtsDkcwrX+I6+uUuLJEYaQdun0ivHZmZcHWKVvNpPc/ccXM9iCNeYpQVj9WTLzhhHnDHakg4Ew1VZ0WRV7Hil3wFHhQFu1Pr5/Gkd8WXcSUZm0kKQu63/j14HpVARPc+msc5wBNN5FrtCuzKART2NrJpmgv8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=H/FEVB8b; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752506089; x=1784042089;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=uhR4oTtyTLRPzkqDzPtiWEgon2j5NRv9mdaGjQ0k3OM=;
-  b=H/FEVB8b9xRpa7Xc/WVPnq4+ZBj5QLgziPs1Qt6n3UXuQv77Zav+ybhv
-   LFmYXkI0BCutQGtdi6SyX4sBmFS3Zsa6vv+qqYwh5pEVkCOHYF4FJq879
-   5lN6UJv7Vsgt1UPX/tNX8xvv5kkT5OFPTsWfTDAL1Vs021v4LoJkclNxu
-   h8b58djYKF5S3L4VcDSiHHRYMJh46DhUsLjnk6REKvgReLgL8bGM3gar5
-   8FkyfX44Sji9oNd142R1swa2ov50MUN7ucn9Nd/1U2RJCQQ+H+ml/ZXVa
-   Kc+m67YUJ3qeMt6KC2ue1F1xhGda7jZO+qLopcivmIftbZLCBM4P4U5X6
-   A==;
-X-CSE-ConnectionGUID: 983ENTieT7iFwO6PgxQyyw==
-X-CSE-MsgGUID: nCNbLcm9TWKYmV6EoXX5lw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11491"; a="66147844"
-X-IronPort-AV: E=Sophos;i="6.16,311,1744095600"; 
-   d="scan'208";a="66147844"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2025 08:13:30 -0700
-X-CSE-ConnectionGUID: QsmEd6zUTNqnT0GaVeEtLA==
-X-CSE-MsgGUID: 47IN3f/gR+WROpmruZ/DZw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,311,1744095600"; 
-   d="scan'208";a="187943702"
-Received: from lkp-server01.sh.intel.com (HELO 9ee84586c615) ([10.239.97.150])
-  by orviesa002.jf.intel.com with ESMTP; 14 Jul 2025 08:13:23 -0700
-Received: from kbuild by 9ee84586c615 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1ubKro-00092V-1w;
-	Mon, 14 Jul 2025 15:13:20 +0000
-Date: Mon, 14 Jul 2025 23:12:41 +0800
-From: kernel test robot <lkp@intel.com>
-To: Mario Limonciello <superm1@kernel.org>,
-	David Airlie <airlied@gmail.com>,
-	Bjorn Helgaas <helgaas@kernel.org>
-Cc: oe-kbuild-all@lists.linux.dev, Alex Deucher <alexander.deucher@amd.com>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	Simona Vetter <simona@ffwll.ch>, Lukas Wunner <lukas@wunner.de>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Lu Baolu <baolu.lu@linux.intel.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
-	"(open list:INTEL IOMMU (VT-d))" <iommu@lists.linux.dev>,
-	linux-pci@vger.kernel.org, kvm@vger.kernel.org,
-	linux-sound@vger.kernel.org, Daniel Dadap <ddadap@nvidia.com>,
-	Mario Limonciello <mario.limonciello@amd.com>
-Subject: Re: [PATCH v7 8/9] fbcon: Use screen info to find primary device
-Message-ID: <202507142313.iWVTOSVB-lkp@intel.com>
-References: <20250706143613.1972252-9-superm1@kernel.org>
+	s=arc-20240116; t=1752505982; c=relaxed/simple;
+	bh=wq3jkDXmL2kbDR8yLPZKxT4RkHzlMSQh4F6k/stG0gE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cUZenHhvDUpJP6FlmL+j5rGUkpBBy7vOEFGyQTDxxng6PsOREJA6hsfIGStqozqcACcqQaYjEOWPyA26IOE+c7i7yW8035jQ11SpUack/Jhvw26MohB67WenWNt8EpphAfoCY72pZ84x5Nwed7/b+IX3luDSsL/Wz+EspH8dBXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e1XPcjUy; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752505979;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UAuWLDvGONYS4aGI3o9+xx7hOflsVGv3mSCNJ1rkux4=;
+	b=e1XPcjUycwHqcVBnMuTCDORZnjuUpcE24raCFN8dV9cDQfyaFobcxGNRYnenyw2QHF+0C+
+	nHnJhXWCmz53EpluEOMk7PDjvCSyi5sPF27fL+M1wdDHfk3U2RqBiyS0ambjDWhngb8ezj
+	DS2zBMUQ8qMw4rgfaitLhuATIQ2NBtk=
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
+ [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-251-boog__mpMcq9rkb9Pp3YTw-1; Mon, 14 Jul 2025 11:12:58 -0400
+X-MC-Unique: boog__mpMcq9rkb9Pp3YTw-1
+X-Mimecast-MFC-AGG-ID: boog__mpMcq9rkb9Pp3YTw_1752505977
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3df359a108bso7869275ab.3
+        for <kvm@vger.kernel.org>; Mon, 14 Jul 2025 08:12:58 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752505976; x=1753110776;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=UAuWLDvGONYS4aGI3o9+xx7hOflsVGv3mSCNJ1rkux4=;
+        b=mx0LC6OTxaHQaPaCz/HT5S03MYTGGRUwnDgTIQBjwMm5zwEjmUV69/RShBKUOSGwPX
+         1UQ/qk/VLqjCBHyhW7OWtN2DJZmZK4dpGM1duHULnnfkCrqX1I9uAszAKg9yR9Stk6lO
+         IeKb97NLwNFqOQ+ECQQ9hhyPd1EdM9DMeKq7WyOglZrs4vN5aYDUe3lqvMVkQOTQaWuX
+         7a7cxxoTFA32XRkSvV32KtV9jmzAHGxArcBukQpw2eD7V47HWgFb9jk3gtetq2HvrA+6
+         q0avQG8mAKkhuk/aMA0zI7eG6hcaCsghhOp3i5vyr+Dhb3GigbwfaDQV04RfFPWfbQo3
+         t6sQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUZsE7wAW9Id2I+Ec4bPrzPaciUBdBgICrmi+dglHsOOEWmN7YiL9mQq+PU1oph4P1gWC8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy76uca8XnFfVknkm+UFzYauq6pIfWycvVnPJvVYbuHrVpdNOoJ
+	3KIgbUEarabfOfNqpUG/XOPF1WpjnRyUns0WkAPWGOWwF6o+KVonXhDdJdt15noSTxVF5+h//Hu
+	o6vAoGNs7lXwC7mc4ydDxTXkarZ81La5gepCCvABMvIqNSNIxkKe7iUgVfP/5xg==
+X-Gm-Gg: ASbGncuWbukGIGAK6NrZVHTzPPj2zSHXp/1X3tcrNC/UtRdxEKASkTsKbFa7D/QVP1t
+	vir0OJswGjZOS8PUP9sZNKGq4HlSRwW84CXc3fKHCs3hduKTllAlvMZzRNjmnfKkjQY58ANneC8
+	VOpo8HOCQepWzAbuDqaEUxSmalSu7HCanWSnspmQADxXeluqdC+hswXa/ieBnGhhGC110RlDs48
+	wFnZDHqdWb7BbYkXLACC+ScBUoK49+YqSjt2tBWwrlE25eyOkLZGaBV0UogprLjswBGpPxb8AYg
+	zyb7136tINcrKQRbsK9HBMxVwiQSDz5s1eOh8PqcHWk=
+X-Received: by 2002:a05:6e02:3083:b0:3d4:6d6f:6e1f with SMTP id e9e14a558f8ab-3e2543f45a2mr42634965ab.6.1752505976225;
+        Mon, 14 Jul 2025 08:12:56 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHQWWnsQP46KCBBDLLmrvxRjBMZE+wrW8uiPq3ltdhzNoM6uXIgiwf7w6/nI+O/Wf1S85BaBQ==
+X-Received: by 2002:a05:6e02:3083:b0:3d4:6d6f:6e1f with SMTP id e9e14a558f8ab-3e2543f45a2mr42634705ab.6.1752505975706;
+        Mon, 14 Jul 2025 08:12:55 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-50556970df3sm2049358173.90.2025.07.14.08.12.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Jul 2025 08:12:54 -0700 (PDT)
+Date: Mon, 14 Jul 2025 09:12:52 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Yi Liu <yi.l.liu@intel.com>, Ankit Agrawal <ankita@nvidia.com>, Brett
+ Creeley <brett.creeley@amd.com>, Giovanni Cabiddu
+ <giovanni.cabiddu@intel.com>, Kevin Tian <kevin.tian@intel.com>,
+ kvm@vger.kernel.org, Longfang Liu <liulongfang@huawei.com>,
+ qat-linux@intel.com, virtualization@lists.linux.dev, Xin Zeng
+ <xin.zeng@intel.com>, Yishai Hadas <yishaih@nvidia.com>, Matthew Rosato
+ <mjrosato@linux.ibm.com>, Nicolin Chen <nicolinc@nvidia.com>,
+ patches@lists.linux.dev, Shameer Kolothum
+ <shameerali.kolothum.thodi@huawei.com>, Terrence Xu
+ <terrence.xu@intel.com>, Yanting Jiang <yanting.jiang@intel.com>, Zhenzhong
+ Duan <zhenzhong.duan@intel.com>
+Subject: Re: [PATCH v2] vfio/pci: Do vf_token checks for
+ VFIO_DEVICE_BIND_IOMMUFD
+Message-ID: <20250714091252.118a4638.alex.williamson@redhat.com>
+In-Reply-To: <20250714142904.GA2059966@nvidia.com>
+References: <0-v2-470f044801ef+a887e-vfio_token_jgg@nvidia.com>
+	<a8484641-34d9-40bf-af8a-e472afdab0cc@intel.com>
+	<20250714142904.GA2059966@nvidia.com>
+Organization: Red Hat
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250706143613.1972252-9-superm1@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Mario,
+On Mon, 14 Jul 2025 11:29:04 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-kernel test robot noticed the following build errors:
+> On Mon, Jul 14, 2025 at 09:12:30PM +0800, Yi Liu wrote:
+> > On 2025/7/10 23:30, Jason Gunthorpe wrote:  
+> > > This was missed during the initial implementation. The VFIO PCI encodes
+> > > the vf_token inside the device name when opening the device from the group
+> > > FD, something like:
+> > > 
+> > >    "0000:04:10.0 vf_token=bd8d9d2b-5a5f-4f5a-a211-f591514ba1f3"
+> > > 
+> > > This is used to control access to a VF unless there is co-ordination with
+> > > the owner of the PF.
+> > > 
+> > > Since we no longer have a device name, pass the token directly through
+> > > VFIO_DEVICE_BIND_IOMMUFD using an optional field indicated by
+> > > VFIO_DEVICE_BIND_TOKEN.  
+> > 
+> > two nits though I think the code is clear enough :)
+> > 
+> > s/Since we no longer have a device name/Since we no longer have a device
+> > name in the device cdev path/
+> > 
+> > s/VFIO_DEVICE_BIND_TOKEN/VFIO_DEVICE_BIND_FLAG_TOKEN/  
+> 
+> Alex, can you fix this when applying the v3 version?
 
-[auto build test ERROR on pci/next]
-[also build test ERROR on pci/for-linus tiwai-sound/for-next tiwai-sound/for-linus tip/x86/core linus/master v6.16-rc6 next-20250714]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Hmm, where's this v3 version?  Did you already send a version with
+Shameer's fix (s/bind.argsz/user_size)?  Lore can't find it.  Thanks,
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Mario-Limonciello/PCI-Add-helper-for-checking-if-a-PCI-device-is-a-display-controller/20250706-223745
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/pci/pci.git next
-patch link:    https://lore.kernel.org/r/20250706143613.1972252-9-superm1%40kernel.org
-patch subject: [PATCH v7 8/9] fbcon: Use screen info to find primary device
-config: i386-randconfig-053-20250714 (https://download.01.org/0day-ci/archive/20250714/202507142313.iWVTOSVB-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14+deb12u1) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250714/202507142313.iWVTOSVB-lkp@intel.com/reproduce)
+Alex
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202507142313.iWVTOSVB-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   ld: arch/x86/video/video-common.o: in function `video_is_primary_device':
->> arch/x86/video/video-common.c:45: undefined reference to `screen_info_pci_dev'
-
-
-vim +45 arch/x86/video/video-common.c
-
-    28	
-    29	bool video_is_primary_device(struct device *dev)
-    30	{
-    31		struct screen_info *si = &screen_info;
-    32		struct pci_dev *pdev;
-    33	
-    34		if (!dev_is_pci(dev))
-    35			return false;
-    36	
-    37		pdev = to_pci_dev(dev);
-    38	
-    39		if (!pci_is_display(pdev))
-    40			return false;
-    41	
-    42		if (pdev == vga_default_device())
-    43			return true;
-    44	
-  > 45		if (pdev == screen_info_pci_dev(si))
-    46			return true;
-    47	
-    48		return false;
-    49	}
-    50	EXPORT_SYMBOL(video_is_primary_device);
-    51	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
