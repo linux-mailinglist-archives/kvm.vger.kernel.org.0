@@ -1,242 +1,120 @@
-Return-Path: <kvm+bounces-52258-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52259-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BE32B03464
-	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 04:14:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50265B03499
+	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 04:44:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4BED31885A21
-	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 02:14:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A67C6173ED9
+	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 02:44:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C260F1C861D;
-	Mon, 14 Jul 2025 02:14:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 459051DE4F3;
+	Mon, 14 Jul 2025 02:44:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CdSYKPx2"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="QJPqD/lS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16CF817B50A
-	for <kvm@vger.kernel.org>; Mon, 14 Jul 2025 02:14:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B967E7262A
+	for <kvm@vger.kernel.org>; Mon, 14 Jul 2025 02:44:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752459268; cv=none; b=BPLvM0QH0X4SoWW2uaCxmnkVw5eib6V/ynLtmsMZvs3wbJREhj1UmbwCYloN1MnXPeel553ATf0qNCsy669ttGKJk4vIZQOsa4M3HZKyjIvQumxT9Hqn19FqBnCqD3Rk4D/ATBM45WNtHF9w4v1LbqEcn3DV3IsE0bRwYk+3cv8=
+	t=1752461083; cv=none; b=RVI6pJyL2Kox7pb531HMwkYtlQvg7G8FVdtMPLdwwQ1gpmkAgzotGSErmMVnOsMw14VikAsYpZF+rE3J7G+rOvh0q8nBuvi8P5gqiBwps8uBs2zsD13BCg/9iTFFJi0OdznjrfCU0TPQFeXKEXC8WjzBXjozcxTdHpSMb/4SOM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752459268; c=relaxed/simple;
-	bh=HRVqwjo/sUcMRBRRlPeumOnSGG3iOiRC73GSgqSZB1g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NB5ULlTaHDeTLJ+Bo49aAe8GjT+FLVgw6enqvptANyMU3Oonki80d5dB8Ws/NpzXoLIHGHCq8LjPaobCJBP++7mQRgINxp0POUaX4SZ8jxtLbVk8qgAqiPEhl81GNaEYbA5dbOikRXXD6oYBTbDuQLdVcN1DfhAkkk0ENoMdcFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CdSYKPx2; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752459267; x=1783995267;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=HRVqwjo/sUcMRBRRlPeumOnSGG3iOiRC73GSgqSZB1g=;
-  b=CdSYKPx25DR+4omlTZ6qQ5f6Xwy9E40DAi2lb8JVe4iMuZtZ+VT713tI
-   VcJrsmawozLijL/Ei4fwA8FpMW5Ciw5rF35WARvRMi4UtHy8jyQfru+Yi
-   Iq8r2kkMB8IEV+jjtiU8egiifMWDfZhTwfabVnWUiBU54YMMAygdauD+m
-   ZyLK62xWWiGB2XxxvR5A8sAGvACk5Giz6voF6VNP8PTiLmY1A63olaXiY
-   zxoBOn96RpZQXPhz70yfqL5idVdjz3G6njdBhXBS5ZWr+d6awsPCh43Mg
-   5ZunLC6pn+wTYQ73xZlqMZ/shcx7Smh0SsaIViBgCubS2zohiNBFUYVDB
-   Q==;
-X-CSE-ConnectionGUID: zmTuyGVEQbOyuTAp+PanKw==
-X-CSE-MsgGUID: 7FlZBd0nRCyX8Da5spU9Og==
-X-IronPort-AV: E=McAfee;i="6800,10657,11491"; a="54781331"
-X-IronPort-AV: E=Sophos;i="6.16,310,1744095600"; 
-   d="scan'208";a="54781331"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jul 2025 19:14:27 -0700
-X-CSE-ConnectionGUID: n/fwqHXaRaCNrrZ1LIZ6yQ==
-X-CSE-MsgGUID: sOxpYQfBQlSd1+04/xh3uw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,310,1744095600"; 
-   d="scan'208";a="157304989"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.240.57]) ([10.124.240.57])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jul 2025 19:14:22 -0700
-Message-ID: <2c2ea3ae-30ea-4ff3-848a-fed6a86c0c53@linux.intel.com>
-Date: Mon, 14 Jul 2025 10:14:18 +0800
+	s=arc-20240116; t=1752461083; c=relaxed/simple;
+	bh=woqpO3NRbjhHBU4xUE1MFG1XPmmi0HP0qmLRNxoUwpM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=WiIkhNKwuSlYlL5svijKawCsTYn9cXb7Tk4SIXEY6oJXlRx8K1kpMZ0sZSGbj68KBTH65IzJmIH33NEljiR0lXPBrFb8qd1JxRtUxG/9LWoEj0gp3oqG5LEtl6LyrYjENtLjCd75yGO2XLrg37qknTlE+Fq2f9LTweP6b8Xz1MI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=QJPqD/lS; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-23602481460so35325605ad.0
+        for <kvm@vger.kernel.org>; Sun, 13 Jul 2025 19:44:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1752461081; x=1753065881; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GGnDLyzoK1hk6QcZEHX4yplSrEzwZbOUE/lD+OVxxOo=;
+        b=QJPqD/lSzuaCQxFW6bVir/fstzj/7y39TTmNX7Zkh03BiE2mUquJDD3ZEOMb+uuNBU
+         HnRlSzDiTiBudOPZdP4Nn2ke8f1sSeYT296S28EzeodATLrlDcjc/MncsQSEcr0oJwvH
+         f8Lkqih7H37AUaYwPFuTwnmLKx5kavXJqcDnmClb5ex6msiHzPOkzFBKBffrYnkafB93
+         0odF8UXAXvYw7IBfxSFBx1I5jAaIoDvKaUMG5d3VMwh0fZ3G4SJwg3BSY9LagKsn6eCa
+         ct6UCvXfrRkoyQNcmgPf/yezWj7W/sUD/2Wk63+l7KH+nVAzR63Am0QbJX/MRdAfZBUA
+         P8cA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752461081; x=1753065881;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GGnDLyzoK1hk6QcZEHX4yplSrEzwZbOUE/lD+OVxxOo=;
+        b=eOYMD4q5XtAlnMzuQXf/hB/No9ys9A3p2ocwXp0Kge+Z/Gr+b93mP9+U9FIPeQDnMm
+         +nx21Co16U/U7v8yu9wP00wzZmWg81BUepy4gb9N7JErMBRwhbl7GBnUjozhiBZSJZLv
+         zw2w1cXa4638WGWytTPaflwtkGu72ezjzCF7LTw80VSRkOTt91ocRqFbaLQfZDrhZaao
+         oRuFmvBBvC17CHyizSKfLHxLIL2AImJWXBDd+dumbegI4Nzdr7jzazKjYJxXyMTKRuI2
+         14olyBA9G4Yn3vrGTJWVlu3yoOuuQJsMDrnSguEU8PzPKQrYsgrZcD5IJF3Zsv544YOk
+         MdOQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX6Ql9PyuVyWealQCff3WKHqetu+/dM9/QbCcW+O8Jq0zL46EfbaIK6UpyD7mPXTe3aC/w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOOqcp9Kf+HK2XDZgu3+W+EikDa197Ijhjh4ej1rF/PYFGGJqH
+	679EChbwqSBJLo8gTjk85Dh4hu6p7/psg27lMO78cVPczXquHGwSK2ESeO1YVCLb9WQ=
+X-Gm-Gg: ASbGncuKw992PD1Q/+UbqqYqGSNkXvc0JXH48Tsu+AuQrX5jS0XRCkjtP935yYjw3P3
+	2Eoxb4pRIFQtozGTNG81rDi3xfWoxMaObaQISXaLDF4zOPvfP1xtVRWDxMIECVjrIsvJk5Zo48W
+	d3KPWnGKAfWsrCz9LvQ8G4zmmOi4+DUMC+K0RL9SQIndVERhlLG4nzV8WQsRNg6TDx9m747CWtj
+	oiBsUWW01MHvQTDJWkANzfmfLpjHUH2Kb2w14aIsVBN+v6XCouHvC3SlzrGpbdHNH8N9mbbsZOZ
+	6uf0/oQlWkAWGrNXV05SH59OWXLG5EMMGvS7v42GHH4TFqKceMhiDs6qXZUtwiVpg117cPhGtfO
+	Z6M98R/NXS5cqUBMld5gTGDoyEBrPnfVnSKuFF9qo4izk2V1XYg==
+X-Google-Smtp-Source: AGHT+IG2a3ZcNn/X49Q30mvFsGR46F/NachCN13vl0w9s5ICMWR61xTnTwucl1IEoa++sqdOjScs+w==
+X-Received: by 2002:a17:902:f70d:b0:234:a139:1206 with SMTP id d9443c01a7336-23df093ca68mr146385185ad.40.1752461080974;
+        Sun, 13 Jul 2025 19:44:40 -0700 (PDT)
+Received: from localhost.localdomain ([203.208.189.11])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23de4323daesm82683445ad.139.2025.07.13.19.44.37
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Sun, 13 Jul 2025 19:44:40 -0700 (PDT)
+From: lizhe.67@bytedance.com
+To: alex.williamson@redhat.com
+Cc: akpm@linux-foundation.org,
+	david@redhat.com,
+	jgg@ziepe.ca,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	lizhe.67@bytedance.com,
+	peterx@redhat.com
+Subject: Re: [PATCH v4 2/5] vfio/type1: optimize vfio_pin_pages_remote()
+Date: Mon, 14 Jul 2025 10:44:33 +0800
+Message-ID: <20250714024433.14441-1-lizhe.67@bytedance.com>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20250711153523.42d68ec0.alex.williamson@redhat.com>
+References: <20250711153523.42d68ec0.alex.williamson@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 03/18] i386/cpu: Add default cache model for Intel CPUs
- with level < 4
-To: Zhao Liu <zhao1.liu@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Marcelo Tosatti <mtosatti@redhat.com>, "Michael S . Tsirkin"
- <mst@redhat.com>, =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?=
- <berrange@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Eduardo Habkost <eduardo@habkost.net>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
- Babu Moger <babu.moger@amd.com>, Ewan Hai <ewanhai-oc@zhaoxin.com>,
- Pu Wen <puwen@hygon.cn>, Tao Su <tao1.su@intel.com>,
- Yi Lai <yi1.lai@intel.com>, Dapeng Mi <dapeng1.mi@intel.com>,
- qemu-devel@nongnu.org, kvm@vger.kernel.org
-References: <20250711102143.1622339-1-zhao1.liu@intel.com>
- <20250711102143.1622339-4-zhao1.liu@intel.com>
-Content-Language: en-US
-From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <20250711102143.1622339-4-zhao1.liu@intel.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
+On Fri, 11 Jul 2025 15:35:23 -0600, alex.williamson@redhat.com wrote:
+ 
+> > +			if (acct_pages) {
+> >  				if (!dma->lock_cap &&
+> > -				    mm->locked_vm + lock_acct + 1 > limit) {
+> > +				     mm->locked_vm + lock_acct + acct_pages > limit) {
+> 
+> Don't resend, I'll fix on commit, but there's still a gratuitous
+> difference in leading white space from the original. Otherwise the
+> series looks good to me
 
-On 7/11/2025 6:21 PM, Zhao Liu wrote:
-> Old Intel CPUs with CPUID level < 4, use CPUID 0x2 leaf (if available)
-> to encode cache information.
->
-> Introduce a cache model "legacy_intel_cpuid2_cache_info" for the CPUs
-> with CPUID level < 4, based on legacy_l1d_cache, legacy_l1i_cache,
-> legacy_l2_cache_cpuid2 and legacy_l3_cache. But for L2 cache, this
-> cache model completes self_init, sets, partitions, no_invd_sharing and
-> share_level fields, referring legacy_l2_cache, to avoid someone
-> increases CPUID level manually and meets assert() error. But the cache
-> information present in CPUID 0x2 leaf doesn't change.
->
-> This new cache model makes it possible to remove legacy_l2_cache_cpuid2
-> in X86CPUState and help to clarify historical cache inconsistency issue.
->
-> Furthermore, apply this legacy cache model to all Intel CPUs with CPUID
-> level < 4. This includes not only "pentium2" and "pentium3" (which have
-> 0x2 leaf), but also "486" and "pentium" (which only have 0x1 leaf, and
-> cache model won't be presented, just for simplicity).
->
-> A legacy_intel_cpuid2_cache_info cache model doesn't change the cache
-> information of the above CPUs, because they just depend on 0x2 leaf.
->
-> Only when someone adjusts the min-level to >=4 will the cache
-> information in CPUID leaf 4 differ from before: previously, the L2
-> cache information in CPUID leaf 0x2 and 0x4 was different, but now with
-> legacy_intel_cpuid2_cache_info, the information they present will be
-> consistent. This case almost never happens, emulating a CPUID that is
-> not supported by the "ancient" hardware is itself meaningless behavior.
->
-> Therefore, even though there's the above difference (for really rare
-> case) and considering these old CPUs ("486", "pentium", "pentium2" and
-> "pentium3") won't be used for migration, there's no need to add new
-> versioned CPU models
->
-> Tested-by: Yi Lai <yi1.lai@intel.com>
-> Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
-> ---
->  target/i386/cpu.c | 65 +++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 65 insertions(+)
->
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 75932579542a..f85e087bf7df 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -710,6 +710,67 @@ static CPUCacheInfo legacy_l3_cache = {
->      .share_level = CPU_TOPOLOGY_LEVEL_DIE,
->  };
->  
-> +/*
-> + * Only used for the CPU models with CPUID level < 4.
-> + * These CPUs (CPUID level < 4) only use CPUID leaf 2 to present
-> + * cache information.
-> + *
-> + * Note: This cache model is just a default one, and is not
-> + *       guaranteed to match real hardwares.
-> + */
-> +static const CPUCaches legacy_intel_cpuid2_cache_info = {
-> +    .l1d_cache = &(CPUCacheInfo) {
-> +        .type = DATA_CACHE,
-> +        .level = 1,
-> +        .size = 32 * KiB,
-> +        .self_init = 1,
-> +        .line_size = 64,
-> +        .associativity = 8,
-> +        .sets = 64,
-> +        .partitions = 1,
-> +        .no_invd_sharing = true,
-> +        .share_level = CPU_TOPOLOGY_LEVEL_CORE,
-> +    },
-> +    .l1i_cache = &(CPUCacheInfo) {
-> +        .type = INSTRUCTION_CACHE,
-> +        .level = 1,
-> +        .size = 32 * KiB,
-> +        .self_init = 1,
-> +        .line_size = 64,
-> +        .associativity = 8,
-> +        .sets = 64,
-> +        .partitions = 1,
-> +        .no_invd_sharing = true,
-> +        .share_level = CPU_TOPOLOGY_LEVEL_CORE,
-> +    },
-> +    .l2_cache = &(CPUCacheInfo) {
-> +        .type = UNIFIED_CACHE,
-> +        .level = 2,
-> +        .size = 2 * MiB,
-> +        .self_init = 1,
-> +        .line_size = 64,
-> +        .associativity = 8,
-> +        .sets = 4096,
-> +        .partitions = 1,
-> +        .no_invd_sharing = true,
-> +        .share_level = CPU_TOPOLOGY_LEVEL_CORE,
-> +    },
-> +    .l3_cache = &(CPUCacheInfo) {
-> +        .type = UNIFIED_CACHE,
-> +        .level = 3,
-> +        .size = 16 * MiB,
-> +        .line_size = 64,
-> +        .associativity = 16,
-> +        .sets = 16384,
-> +        .partitions = 1,
-> +        .lines_per_tag = 1,
-> +        .self_init = true,
-> +        .inclusive = true,
-> +        .complex_indexing = true,
-> +        .share_level = CPU_TOPOLOGY_LEVEL_DIE,
-> +    },
-> +};
-> +
->  /* TLB definitions: */
->  
->  #define L1_DTLB_2M_ASSOC       1
-> @@ -3043,6 +3104,7 @@ static const X86CPUDefinition builtin_x86_defs[] = {
->              I486_FEATURES,
->          .xlevel = 0,
->          .model_id = "",
-> +        .cache_info = &legacy_intel_cpuid2_cache_info,
->      },
->      {
->          .name = "pentium",
-> @@ -3055,6 +3117,7 @@ static const X86CPUDefinition builtin_x86_defs[] = {
->              PENTIUM_FEATURES,
->          .xlevel = 0,
->          .model_id = "",
-> +        .cache_info = &legacy_intel_cpuid2_cache_info,
->      },
->      {
->          .name = "pentium2",
-> @@ -3067,6 +3130,7 @@ static const X86CPUDefinition builtin_x86_defs[] = {
->              PENTIUM2_FEATURES,
->          .xlevel = 0,
->          .model_id = "",
-> +        .cache_info = &legacy_intel_cpuid2_cache_info,
->      },
->      {
->          .name = "pentium3",
-> @@ -3079,6 +3143,7 @@ static const X86CPUDefinition builtin_x86_defs[] = {
->              PENTIUM3_FEATURES,
->          .xlevel = 0,
->          .model_id = "",
-> +        .cache_info = &legacy_intel_cpuid2_cache_info,
->      },
->      {
->          .name = "athlon",
+The leading-white-space indentation was adjusted in accordance with
+David's suggestion[1]. It seems to me that either approach is acceptable.
 
-Reviewed-by:  Dapeng Mi <dapeng1.mi@linux.intel.com>
+Thank you for your review.
 
+Thanks,
+Zhe
 
+[1]: https://lore.kernel.org/all/9d74e93d-5a5f-4ffa-91fa-eb2061080f94@redhat.com/
 
