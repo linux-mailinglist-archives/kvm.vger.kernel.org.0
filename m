@@ -1,145 +1,211 @@
-Return-Path: <kvm+bounces-52341-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52342-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E113B04333
-	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 17:16:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 389B8B04347
+	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 17:18:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49D824E185D
-	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 15:14:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A44E4E1F42
+	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 15:15:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1227725C82E;
-	Mon, 14 Jul 2025 15:13:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DDA8261584;
+	Mon, 14 Jul 2025 15:14:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e1XPcjUy"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oC/V2J1U"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98C56246BB6
-	for <kvm@vger.kernel.org>; Mon, 14 Jul 2025 15:13:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80618260566
+	for <kvm@vger.kernel.org>; Mon, 14 Jul 2025 15:14:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752505982; cv=none; b=XCG5e/liEeUSYpGEfbRfn4xbgkI2zk8j7TzQ6MwfsSv3sCOcLt2YR7uZEigvupanK/VSGd4NKpz20uagX/zlmLTyzDFxXSYoSROGKkarKjEBbWxc/wpHCLEDDgWMNsnLeQknnIXtos5IrLA+XaaECnF7nxIwVICSRKNZLQFiii4=
+	t=1752506088; cv=none; b=buFQ4HDlMVtxwD97SnuvuUJOhMC3wtC2QGuageBt/rUQF4oZdUBX465I1cAEMs8247iaPY7RkiVEf1QpCqT55m7sw6LInkTQjI4hylBw1HsLjSHLV4EUHnUAFyK5fAzjdrYNXQJybyZzSZpuIUoowEDMZqFodhNUS5vWRy5N9yg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752505982; c=relaxed/simple;
-	bh=wq3jkDXmL2kbDR8yLPZKxT4RkHzlMSQh4F6k/stG0gE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cUZenHhvDUpJP6FlmL+j5rGUkpBBy7vOEFGyQTDxxng6PsOREJA6hsfIGStqozqcACcqQaYjEOWPyA26IOE+c7i7yW8035jQ11SpUack/Jhvw26MohB67WenWNt8EpphAfoCY72pZ84x5Nwed7/b+IX3luDSsL/Wz+EspH8dBXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e1XPcjUy; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752505979;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UAuWLDvGONYS4aGI3o9+xx7hOflsVGv3mSCNJ1rkux4=;
-	b=e1XPcjUycwHqcVBnMuTCDORZnjuUpcE24raCFN8dV9cDQfyaFobcxGNRYnenyw2QHF+0C+
-	nHnJhXWCmz53EpluEOMk7PDjvCSyi5sPF27fL+M1wdDHfk3U2RqBiyS0ambjDWhngb8ezj
-	DS2zBMUQ8qMw4rgfaitLhuATIQ2NBtk=
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
- [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-251-boog__mpMcq9rkb9Pp3YTw-1; Mon, 14 Jul 2025 11:12:58 -0400
-X-MC-Unique: boog__mpMcq9rkb9Pp3YTw-1
-X-Mimecast-MFC-AGG-ID: boog__mpMcq9rkb9Pp3YTw_1752505977
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3df359a108bso7869275ab.3
-        for <kvm@vger.kernel.org>; Mon, 14 Jul 2025 08:12:58 -0700 (PDT)
+	s=arc-20240116; t=1752506088; c=relaxed/simple;
+	bh=Rb5Ojqqhv5eA0DyW6c06TTTVEu+CSbhkppk2UGzPmqI=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=ApUEnlcas3XxkFV85LhIzdsteHoF8lj9mopfnKt9S990uutV8Dctw2itUQ7l+hJgf88s2bNL+AhdEKrR86+WOTswypC/eB9ZgBzU6AXFxtlYzFYEBe6c+arg4OTLeuSHpgAfFSvlvz/dq0zvpNWZ0fP5Sedj+cp+djW+udC+Pq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oC/V2J1U; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-313d346dc8dso7263237a91.1
+        for <kvm@vger.kernel.org>; Mon, 14 Jul 2025 08:14:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1752506086; x=1753110886; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2Mly3ZZQYDnlEsq3pZjTSNYHkF/08sz7EiTQ0FuSgIM=;
+        b=oC/V2J1Uv0NMGgtIG/hxBZvfJMx7HhTEUxPJfVqBOMVNycGUPUt6n49iq03KVsWMXB
+         ilcOjrwsjGVB5BzyVzSFYqHTXFw6LVN7VcqdNHPS24sh+w2tHwuxNnIQbsH8j85IjzYU
+         iti1YU9UW8IdLg8ehl4ebuLmZKJdi87lEESYBwmw55H8y2/WIH+fpw4FEMWQWNig6hXW
+         WxID7C6PW7Pj1KGiNjEm5/r+Vqrpikw3PWQEoxoP0TN1+T7VN2K6eunnuLheP8d5KP/5
+         svHn0uEtGjsvjcDfsIzoNBTpqaQTzNZ1UEv9P2OIMHtCdDwnYvfaVdpWKhx6JIO0z3T8
+         tNjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752505976; x=1753110776;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=UAuWLDvGONYS4aGI3o9+xx7hOflsVGv3mSCNJ1rkux4=;
-        b=mx0LC6OTxaHQaPaCz/HT5S03MYTGGRUwnDgTIQBjwMm5zwEjmUV69/RShBKUOSGwPX
-         1UQ/qk/VLqjCBHyhW7OWtN2DJZmZK4dpGM1duHULnnfkCrqX1I9uAszAKg9yR9Stk6lO
-         IeKb97NLwNFqOQ+ECQQ9hhyPd1EdM9DMeKq7WyOglZrs4vN5aYDUe3lqvMVkQOTQaWuX
-         7a7cxxoTFA32XRkSvV32KtV9jmzAHGxArcBukQpw2eD7V47HWgFb9jk3gtetq2HvrA+6
-         q0avQG8mAKkhuk/aMA0zI7eG6hcaCsghhOp3i5vyr+Dhb3GigbwfaDQV04RfFPWfbQo3
-         t6sQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUZsE7wAW9Id2I+Ec4bPrzPaciUBdBgICrmi+dglHsOOEWmN7YiL9mQq+PU1oph4P1gWC8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy76uca8XnFfVknkm+UFzYauq6pIfWycvVnPJvVYbuHrVpdNOoJ
-	3KIgbUEarabfOfNqpUG/XOPF1WpjnRyUns0WkAPWGOWwF6o+KVonXhDdJdt15noSTxVF5+h//Hu
-	o6vAoGNs7lXwC7mc4ydDxTXkarZ81La5gepCCvABMvIqNSNIxkKe7iUgVfP/5xg==
-X-Gm-Gg: ASbGncuWbukGIGAK6NrZVHTzPPj2zSHXp/1X3tcrNC/UtRdxEKASkTsKbFa7D/QVP1t
-	vir0OJswGjZOS8PUP9sZNKGq4HlSRwW84CXc3fKHCs3hduKTllAlvMZzRNjmnfKkjQY58ANneC8
-	VOpo8HOCQepWzAbuDqaEUxSmalSu7HCanWSnspmQADxXeluqdC+hswXa/ieBnGhhGC110RlDs48
-	wFnZDHqdWb7BbYkXLACC+ScBUoK49+YqSjt2tBWwrlE25eyOkLZGaBV0UogprLjswBGpPxb8AYg
-	zyb7136tINcrKQRbsK9HBMxVwiQSDz5s1eOh8PqcHWk=
-X-Received: by 2002:a05:6e02:3083:b0:3d4:6d6f:6e1f with SMTP id e9e14a558f8ab-3e2543f45a2mr42634965ab.6.1752505976225;
-        Mon, 14 Jul 2025 08:12:56 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHQWWnsQP46KCBBDLLmrvxRjBMZE+wrW8uiPq3ltdhzNoM6uXIgiwf7w6/nI+O/Wf1S85BaBQ==
-X-Received: by 2002:a05:6e02:3083:b0:3d4:6d6f:6e1f with SMTP id e9e14a558f8ab-3e2543f45a2mr42634705ab.6.1752505975706;
-        Mon, 14 Jul 2025 08:12:55 -0700 (PDT)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-50556970df3sm2049358173.90.2025.07.14.08.12.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Jul 2025 08:12:54 -0700 (PDT)
-Date: Mon, 14 Jul 2025 09:12:52 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Yi Liu <yi.l.liu@intel.com>, Ankit Agrawal <ankita@nvidia.com>, Brett
- Creeley <brett.creeley@amd.com>, Giovanni Cabiddu
- <giovanni.cabiddu@intel.com>, Kevin Tian <kevin.tian@intel.com>,
- kvm@vger.kernel.org, Longfang Liu <liulongfang@huawei.com>,
- qat-linux@intel.com, virtualization@lists.linux.dev, Xin Zeng
- <xin.zeng@intel.com>, Yishai Hadas <yishaih@nvidia.com>, Matthew Rosato
- <mjrosato@linux.ibm.com>, Nicolin Chen <nicolinc@nvidia.com>,
- patches@lists.linux.dev, Shameer Kolothum
- <shameerali.kolothum.thodi@huawei.com>, Terrence Xu
- <terrence.xu@intel.com>, Yanting Jiang <yanting.jiang@intel.com>, Zhenzhong
- Duan <zhenzhong.duan@intel.com>
-Subject: Re: [PATCH v2] vfio/pci: Do vf_token checks for
- VFIO_DEVICE_BIND_IOMMUFD
-Message-ID: <20250714091252.118a4638.alex.williamson@redhat.com>
-In-Reply-To: <20250714142904.GA2059966@nvidia.com>
-References: <0-v2-470f044801ef+a887e-vfio_token_jgg@nvidia.com>
-	<a8484641-34d9-40bf-af8a-e472afdab0cc@intel.com>
-	<20250714142904.GA2059966@nvidia.com>
-Organization: Red Hat
+        d=1e100.net; s=20230601; t=1752506086; x=1753110886;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=2Mly3ZZQYDnlEsq3pZjTSNYHkF/08sz7EiTQ0FuSgIM=;
+        b=gk6V+X6gVH/yxyjir9/pltqUsg3K19QvFMYCW1WzLwEZrQrAu4LS2H3YNEqryM1afX
+         ysmZrIA700RCKq3fyoCkbmjwadKBEZFw/VcaLlxZDOAjkWpPzup3U3pZk1kB4nMacEvn
+         6na45ggb2gV4Y6Ad8p0MQd1QUFet6TyO5X8PqojHFbijUWCdnjXqawie/jOOQ4FoEdB6
+         2fXTp1DnBHEaYXuT5PcahmRixSitJnAgqbe3sDsFMFbVIFk6ecEDwg6HfRbdNKFA60KQ
+         nIi8Cp8UCtbewqv51TUSOJXzduxAxZY3rXVX2ECH1uh2oe3xE2+yDfdYkWcyC+a+BPo7
+         BTcg==
+X-Forwarded-Encrypted: i=1; AJvYcCUh4e29F63oiwzhK+AVe26R+36hlDJteH9B+HLpXOZZYCbqU3kodpB5MK/RRuNhpPjJEFY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyubho0XTh5Roaz/RtDDuqvrAduSb7jNyWNZRbrKEgSMpGwnYGQ
+	9aGxr3dXVmFS64Jb8k0PgS8TUWrMAO9nKgfdvNFtKFGsqJjhLESK4iy+Vmm34Y037VooOTd/bBX
+	Y6UzxPQ==
+X-Google-Smtp-Source: AGHT+IFBQoWH3T35EGiYhrDKTL5i22UHbM257opXaQWUd5rayk7z4NwPu6Y8eWW3cbf2CEYUVF5qa++lnWc=
+X-Received: from pjbss4.prod.google.com ([2002:a17:90b:2ec4:b0:31c:2fe4:33be])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:d610:b0:313:fb08:4261
+ with SMTP id 98e67ed59e1d1-31c4cd55c4cmr19544828a91.32.1752506085892; Mon, 14
+ Jul 2025 08:14:45 -0700 (PDT)
+Date: Mon, 14 Jul 2025 08:14:44 -0700
+In-Reply-To: <15D0C887-E17F-4432-8716-BF62EEE61B6B@sjtu.edu.cn>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <935a82e3-f7ad-47d7-aaaf-f3d2b62ed768@amd.com> <F7AF073C-D630-45A3-8746-DE66B15FC3E1@sjtu.edu.cn>
+ <aHUYwCNDWlsar3qk@google.com> <15D0C887-E17F-4432-8716-BF62EEE61B6B@sjtu.edu.cn>
+Message-ID: <aHUe5HY4C2vungCd@google.com>
+Subject: Re: [BUG] NULL pointer dereference in sev_writeback_caches during KVM
+ SEV migration kselftest on AMD platform
+From: Sean Christopherson <seanjc@google.com>
+To: Zheyun Shen <szy0127@sjtu.edu.cn>
+Cc: Srikanth Aithal <sraithal@amd.com>, linux-next@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 14 Jul 2025 11:29:04 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+On Mon, Jul 14, 2025, Zheyun Shen wrote:
+> The problem is triggered by the following codes in tools/testing/selftest=
+s/kvm/x86/sev_migrate_tests.c:
+> static void test_sev_migrate_from(bool es)
+> {
+> 	struct kvm_vm *src_vm;
+> 	struct kvm_vm *dst_vms[NR_MIGRATE_TEST_VMS];
+> 	int i, ret;
+>=20
+> 	src_vm =3D sev_vm_create(es);
+> 	for (i =3D 0; i < NR_MIGRATE_TEST_VMS; ++i)
+> 		dst_vms[i] =3D aux_vm_create(true);
+>=20
+> 	/* Initial migration from the src to the first dst. */
+> 	sev_migrate_from(dst_vms[0], src_vm);
+>=20
+> 	for (i =3D 1; i < NR_MIGRATE_TEST_VMS; i++)
+> 		sev_migrate_from(dst_vms[i], dst_vms[i - 1]);
+>=20
+> 	/* Migrate the guest back to the original VM. */
+> 	ret =3D __sev_migrate_from(src_vm, dst_vms[NR_MIGRATE_TEST_VMS - 1]);
+> 	TEST_ASSERT(ret =3D=3D -1 && errno =3D=3D EIO,
+> 		    "VM that was migrated from should be dead. ret %d, errno: %d", ret,
+> 		    errno);
+>=20
+> 	kvm_vm_free(src_vm);
+> 	for (i =3D 0; i < NR_MIGRATE_TEST_VMS; ++i)
+> 		kvm_vm_free(dst_vms[i]);
+> }
+>=20
+> I add some logs in kvm and following shows the result:
+> [   51.618135] sev guest init kvm:ff177f272432e000                       =
+                                                          =20
 
-> On Mon, Jul 14, 2025 at 09:12:30PM +0800, Yi Liu wrote:
-> > On 2025/7/10 23:30, Jason Gunthorpe wrote:  
-> > > This was missed during the initial implementation. The VFIO PCI encodes
-> > > the vf_token inside the device name when opening the device from the group
-> > > FD, something like:
-> > > 
-> > >    "0000:04:10.0 vf_token=bd8d9d2b-5a5f-4f5a-a211-f591514ba1f3"
-> > > 
-> > > This is used to control access to a VF unless there is co-ordination with
-> > > the owner of the PF.
-> > > 
-> > > Since we no longer have a device name, pass the token directly through
-> > > VFIO_DEVICE_BIND_IOMMUFD using an optional field indicated by
-> > > VFIO_DEVICE_BIND_TOKEN.  
-> > 
-> > two nits though I think the code is clear enough :)
-> > 
-> > s/Since we no longer have a device name/Since we no longer have a device
-> > name in the device cdev path/
-> > 
-> > s/VFIO_DEVICE_BIND_TOKEN/VFIO_DEVICE_BIND_FLAG_TOKEN/  
-> 
-> Alex, can you fix this when applying the v3 version?
+Argh, I forgot that sev_vm_move_enc_context_from() requires the destination=
+ to
+*not* be an SEV guest.  KVM needs to explicitly copy over the stack.
 
-Hmm, where's this v3 version?  Did you already send a version with
-Shameer's fix (s/bind.argsz/user_size)?  Lore can't find it.  Thanks,
+> [   51.627235] kvm destory vm kvm:ff177f272432e000                       =
+                                                           =20
+> [   51.628011] kvm destory vm mmu notifier unregister kvm:ff177f272432e00=
+0                                                         =20
+> [   51.642840] kvm destory vm arch destory vm kvm:ff177f272432e000       =
+                                                          =20
+> [   51.673612] vm destory x86                                            =
+                                                          =20
+> [   51.673957] svm vm destory                                            =
+                                                          =20
+> [   51.674401] kvm destory vm kvm:ff177f272432c000                       =
+                                                           =20
+> [   51.675152] kvm destory vm mmu notifier unregister kvm:ff177f272432c00=
+0                                                         =20
+> [   51.675981] kvm destory vm arch destory vm kvm:ff177f272432c000       =
+                                                          =20
+> [   51.715937] vm destory x86                                            =
+                                                          =20
+> [   51.716289] svm vm destory                                            =
+                                                          =20
+> [   51.716754] kvm destory vm kvm:ff177f272432a000                       =
+                                                           =20
+> [   51.717530] kvm destory vm mmu notifier unregister kvm:ff177f272432a00=
+0                                                         =20
+> [   51.718363] kvm destory vm arch destory vm kvm:ff177f272432a000       =
+                                                          =20
+> [   51.746672] vm destory x86
+> [   51.747018] svm vm destory
+> [   51.747454] kvm destory vm kvm:ff177f2724328000
+> [   51.748219] kvm destory vm mmu notifier unregister kvm:ff177f272432800=
+0
+> [   51.749033] BUG: kernel NULL pointer dereference, address: 00000000000=
+00000
+> [   51.749885] #PF: supervisor read access in kernel mode
+> [   51.750519] #PF: error_code(0x0000) - not-present page
+>=20
+> It seems that the cpumask structure is not transferred correctly from
+> ff177f272432e000 to ff177f2724328000.  But unfortunately I=E2=80=99m not =
+familiar
+> with SEV migration. I need to spend some time looking into how SEV migrat=
+ion
+> works in order to solve this issue.
 
-Alex
+...
 
+> >> I can reproduce this issue in my environment, and I will try to resolv=
+e it as
+> >> soon as possible.
+> >=20
+> > Phew, that's good, because I can't repro this, and I don't see anything=
+ obviously
+> > wrong.
+
+/facepalm
+
+-ENOCOFFEE.  I was conflating CONFIG_VMAP_STACK with CONFIG_CPUMASK_OFFSTAC=
+K and
+thus testing the wrong thing.
+
+I think this is the fix, testing now...
+
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 95668e84ab86..1476e877b2dc 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -1936,6 +1936,7 @@ static void sev_migrate_from(struct kvm *dst_kvm, str=
+uct kvm *src_kvm)
+        dst->enc_context_owner =3D src->enc_context_owner;
+        dst->es_active =3D src->es_active;
+        dst->vmsa_features =3D src->vmsa_features;
++       memcpy(&dst->have_run_cpus, &src->have_run_cpus, sizeof(src->have_r=
+un_cpus));
+=20
+        src->asid =3D 0;
+        src->active =3D false;
+@@ -1943,6 +1944,7 @@ static void sev_migrate_from(struct kvm *dst_kvm, str=
+uct kvm *src_kvm)
+        src->pages_locked =3D 0;
+        src->enc_context_owner =3D NULL;
+        src->es_active =3D false;
++       memset(&src->have_run_cpus, 0, sizeof(src->have_run_cpus));
+=20
+        list_cut_before(&dst->regions_list, &src->regions_list, &src->regio=
+ns_list);
 
