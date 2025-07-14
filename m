@@ -1,199 +1,179 @@
-Return-Path: <kvm+bounces-52339-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52340-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBB22B0424F
-	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 16:57:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CEE9B042A0
+	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 17:08:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 862723A87CE
-	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 14:57:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30D5D3B9D97
+	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 15:06:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6088B25B2F4;
-	Mon, 14 Jul 2025 14:57:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DCAD25BEF0;
+	Mon, 14 Jul 2025 15:06:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DMoNOnfC"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp232.sjtu.edu.cn (smtp232.sjtu.edu.cn [202.120.2.232])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C570259CB0;
-	Mon, 14 Jul 2025 14:57:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.120.2.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D85212E630;
+	Mon, 14 Jul 2025 15:06:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752505029; cv=none; b=ZV/aR09l2nrX94WVE2T5saJVHal6MZoAWe3arbsYlx0SLaWE75xER8qz6gA958o0CuoLKCl9b0354ipCfOW9d1pvZPEa4CjQUUIvDyO5ssOOZlry1kXPGHLg2ALCY5bm43y1uvuT1TF3ZGkGgzHFg5uJfbgLyb6U8gRkJyQOjGI=
+	t=1752505603; cv=none; b=WIslCaqRiK94oX8t4vtwTlT5e0Zl0r4BQnkuTzivW26YdZ0QFJlXN1b08MxQx2bU1rRabweBtwS1ppT8tXUujNz79CnW851PWYnYAXstcJUW76u/DW9WnIpZzDrpKjHEGMYGiOr/+Awc2/R6ChE4KLSnM1VvpmXBd4ahyjobutA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752505029; c=relaxed/simple;
-	bh=CVaX47SHOe4vJ05VeCEEWy1KKUEuNVXFqHTL3r5qeSk=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=f/DiWHBoeG/wE23/GF6zE1j3NvEtIHwEiqImvGVJFVpQ61XNXsE2lnKu1KIYo+/Unk1A+dgZbHhfRCCyGNoKNEy+t84cJJADjzbZ2bEDljjiRICsMvBuHgMAgO4fCz+Mq4D8NyHxMscp29/P7wGRlVrnPpfwKGzSqsVbQIYSRYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sjtu.edu.cn; spf=pass smtp.mailfrom=sjtu.edu.cn; arc=none smtp.client-ip=202.120.2.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sjtu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sjtu.edu.cn
-Received: from proxy188.sjtu.edu.cn (smtp188.sjtu.edu.cn [202.120.2.188])
-	by smtp232.sjtu.edu.cn (Postfix) with ESMTPS id 3318710051698;
-	Mon, 14 Jul 2025 22:57:02 +0800 (CST)
-Received: from smtpclient.apple (unknown [202.120.40.82])
-	by proxy188.sjtu.edu.cn (Postfix) with ESMTPSA id B68BC37C929;
-	Mon, 14 Jul 2025 22:56:59 +0800 (CST)
-Content-Type: text/plain;
-	charset=utf-8
+	s=arc-20240116; t=1752505603; c=relaxed/simple;
+	bh=i4jwoQP0/RIhlR6TJLl5Ajz5CQOFMYIW0zuR6sjVikM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=C4sO4noI/8Qx8po47heU39L42q2ZJa0IE3Knc2o3nxa/913dxHFeh6d8WPey0j6Hez+km/iSqzUVOuCTUYKp9Y2XbXXIn6wUcxWKsKKTwYciJwPGvOBEF9QiQBJPA0VYBYxhWQNpPKp8pkcol0aoVepBQt9nAeOYrC/wCWKlTSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DMoNOnfC; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1752505601; x=1784041601;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=i4jwoQP0/RIhlR6TJLl5Ajz5CQOFMYIW0zuR6sjVikM=;
+  b=DMoNOnfCf5KwUBU6u9T8W9eYLm++39Ks1W//b3iA33UoDINnp4ieOTnn
+   SBCjYbEPp+AZdki/wHrA9+tLbbC7bBnnUUjM+4Le8Y1l9jV/2fxt9HXWc
+   TeWVMTrXUP5pgXA2969iF2ENvXARmmhFBjZq9Kt7PcIHvArgcXfLnpo/N
+   7IUnzBUdreXwPvbh2UHgwluZsosgCymGSh2+xNwEIV4+fxV2H4HOP+H8e
+   wsFCNvC1VBKexAjHSbv+c9mcetdy+gjAGv9LNWrL9IdzuZQu2ikRV/ssW
+   IEPYM5cfzBlXhdBtMj6ZFtX1gCdR99HSOGxqNGqtjj7bVGyzsnSB1yagA
+   A==;
+X-CSE-ConnectionGUID: igbzh/BSSO+ZLHNRixbC+g==
+X-CSE-MsgGUID: 4IbZvekgSXyJwYJMXvVLqw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11491"; a="72148166"
+X-IronPort-AV: E=Sophos;i="6.16,311,1744095600"; 
+   d="scan'208";a="72148166"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2025 08:06:41 -0700
+X-CSE-ConnectionGUID: jD/NGjtxQfmbeS4epycsAA==
+X-CSE-MsgGUID: GWcYVzotSNOmpy4dCaijWQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,311,1744095600"; 
+   d="scan'208";a="157049798"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
+  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2025 08:06:37 -0700
+Message-ID: <5a8a4804-ee15-42dd-90e0-360000ef661a@intel.com>
+Date: Mon, 14 Jul 2025 23:06:33 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.600.51.1.1\))
-Subject: Re: [BUG] NULL pointer dereference in sev_writeback_caches during KVM
- SEV migration kselftest on AMD platform
-From: Zheyun Shen <szy0127@sjtu.edu.cn>
-In-Reply-To: <aHUYwCNDWlsar3qk@google.com>
-Date: Mon, 14 Jul 2025 22:56:44 +0800
-Cc: Srikanth Aithal <sraithal@amd.com>,
- linux-next@vger.kernel.org,
- kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <15D0C887-E17F-4432-8716-BF62EEE61B6B@sjtu.edu.cn>
-References: <935a82e3-f7ad-47d7-aaaf-f3d2b62ed768@amd.com>
- <F7AF073C-D630-45A3-8746-DE66B15FC3E1@sjtu.edu.cn>
- <aHUYwCNDWlsar3qk@google.com>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V4 0/1] KVM: TDX: Decrease TDX VM shutdown time
 To: Sean Christopherson <seanjc@google.com>
-X-Mailer: Apple Mail (2.3826.600.51.1.1)
+Cc: Rick P Edgecombe <rick.p.edgecombe@intel.com>,
+ Chao Gao <chao.gao@intel.com>, Kai Huang <kai.huang@intel.com>,
+ "binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ Adrian Hunter <adrian.hunter@intel.com>,
+ "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ Reinette Chatre <reinette.chatre@intel.com>,
+ Isaku Yamahata <isaku.yamahata@intel.com>, Yan Y Zhao
+ <yan.y.zhao@intel.com>,
+ "tony.lindgren@linux.intel.com" <tony.lindgren@linux.intel.com>
+References: <175088949072.720373.4112758062004721516.b4-ty@google.com>
+ <aF1uNonhK1rQ8ViZ@google.com>
+ <7103b312-b02d-440e-9fa6-ba219a510c2d@intel.com>
+ <aHEMBuVieGioMVaT@google.com>
+ <3989f123-6888-459b-bb65-4571f5cad8ce@intel.com>
+ <aHEdg0jQp7xkOJp5@google.com>
+ <b5df4f84b473524fc3abc33f9c263372d0424372.camel@intel.com>
+ <aHGYvrdX4biqKYih@google.com>
+ <a29d4a7f319f95a45f775270c75ccf136645fad4.camel@intel.com>
+ <3ef581f1-1ff1-4b99-b216-b316f6415318@intel.com>
+ <aHUMcdJ9Khh2Yeox@google.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <aHUMcdJ9Khh2Yeox@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-The problem is triggered by the following codes in =
-tools/testing/selftests/kvm/x86/sev_migrate_tests.c:
-static void test_sev_migrate_from(bool es)
-{
-	struct kvm_vm *src_vm;
-	struct kvm_vm *dst_vms[NR_MIGRATE_TEST_VMS];
-	int i, ret;
+On 7/14/2025 9:56 PM, Sean Christopherson wrote:
+> On Mon, Jul 14, 2025, Xiaoyao Li wrote:
+>> On 7/12/2025 7:17 AM, Edgecombe, Rick P wrote:
+>>> On Fri, 2025-07-11 at 16:05 -0700, Sean Christopherson wrote:
+>>>>> Zero the reserved area in struct kvm_tdx_capabilities so that fields added
+>>>>> in
+>>>>> the reserved area won't disturb any userspace that previously had garbage
+>>>>> there.
+>>>>
+>>>> It's not only about disturbing userspace, it's also about actually being able
+>>>> to repurpose the reserved fields in the future without needing *another* flag
+>>>> to tell userspace that it's ok to read the previously-reserved fields.  I care
+>>>> about this much more than I care about userspace using reserved fields as
+>>>> scratch space.
+>>>
+>>> If, before calling KVM_TDX_CAPABILITIES, userspace zeros the new field that it
+>>> knows about, but isn't sure if the kernel does, it's the same no?
+> 
+> Heh, yeah, this crossed my mind about 5 minutes after I logged off :-)
+> 
+>>> Did you see that the way KVM_TDX_CAPABILITIES is implemented today is a little
+>>> weird? It actually copies the whole struct kvm_tdx_capabilities from userspace
+>>> and then sets some fields (not reserved) and then copies it back. So userspace
+>>> can zero any fields it wants to know about before calling KVM_TDX_CAPABILITIES.
+>>> Then it could know the same things as if the kernel zeroed it.
+>>>
+>>> I was actually wondering if we want to change the kernel to zero reserved, if it
+>>> might make more sense to just copy caps->cpuid.nent field from userspace, and
+>>> then populate the whole thing starting from a zero'd buffer in the kernel.
+>>
+>> +1 to zero the whole buffer of *caps in the kernel.
+> 
+> Ya, I almost suggested that, but assumed there was a reason for copying the entire
+> structure.
+> 
+>> current code seems to have issue on the caps->kernel_tdvmcallinfo_1_r11/kernel_tdvmcallinfo_1_r12/user_tdvmcallinfo_1_r12,
+>> as KVM cannot guarantee zero'ed value are returned to userspace.
+> 
+> This?  (untested)
 
-	src_vm =3D sev_vm_create(es);
-	for (i =3D 0; i < NR_MIGRATE_TEST_VMS; ++i)
-		dst_vms[i] =3D aux_vm_create(true);
+Tested-by: Xiaoyao Li <xiaoyao.li@intel.com>
+Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
 
-	/* Initial migration from the src to the first dst. */
-	sev_migrate_from(dst_vms[0], src_vm);
-
-	for (i =3D 1; i < NR_MIGRATE_TEST_VMS; i++)
-		sev_migrate_from(dst_vms[i], dst_vms[i - 1]);
-
-	/* Migrate the guest back to the original VM. */
-	ret =3D __sev_migrate_from(src_vm, dst_vms[NR_MIGRATE_TEST_VMS - =
-1]);
-	TEST_ASSERT(ret =3D=3D -1 && errno =3D=3D EIO,
-		    "VM that was migrated from should be dead. ret %d, =
-errno: %d", ret,
-		    errno);
-
-	kvm_vm_free(src_vm);
-	for (i =3D 0; i < NR_MIGRATE_TEST_VMS; ++i)
-		kvm_vm_free(dst_vms[i]);
-}
-
-I add some logs in kvm and following shows the result:
-[   51.618135] sev guest init kvm:ff177f272432e000                       =
-                                                          =20
-[   51.627235] kvm destory vm kvm:ff177f272432e000                       =
-                                                           =20
-[   51.628011] kvm destory vm mmu notifier unregister =
-kvm:ff177f272432e000                                                     =
-    =20
-[   51.642840] kvm destory vm arch destory vm kvm:ff177f272432e000       =
-                                                          =20
-[   51.673612] vm destory x86                                            =
-                                                          =20
-[   51.673957] svm vm destory                                            =
-                                                          =20
-[   51.674401] kvm destory vm kvm:ff177f272432c000                       =
-                                                           =20
-[   51.675152] kvm destory vm mmu notifier unregister =
-kvm:ff177f272432c000                                                     =
-    =20
-[   51.675981] kvm destory vm arch destory vm kvm:ff177f272432c000       =
-                                                          =20
-[   51.715937] vm destory x86                                            =
-                                                          =20
-[   51.716289] svm vm destory                                            =
-                                                          =20
-[   51.716754] kvm destory vm kvm:ff177f272432a000                       =
-                                                           =20
-[   51.717530] kvm destory vm mmu notifier unregister =
-kvm:ff177f272432a000                                                     =
-    =20
-[   51.718363] kvm destory vm arch destory vm kvm:ff177f272432a000       =
-                                                          =20
-[   51.746672] vm destory x86
-[   51.747018] svm vm destory
-[   51.747454] kvm destory vm kvm:ff177f2724328000
-[   51.748219] kvm destory vm mmu notifier unregister =
-kvm:ff177f2724328000
-[   51.749033] BUG: kernel NULL pointer dereference, address: =
-0000000000000000
-[   51.749885] #PF: supervisor read access in kernel mode
-[   51.750519] #PF: error_code(0x0000) - not-present page
-
-It seems that the cpumask structure is not transferred correctly from =
-ff177f272432e000 to ff177f2724328000.
-But unfortunately I=E2=80=99m not familiar with SEV migration. I need to =
-spend some time looking into how SEV=20
-migration works in order to solve this issue.
-
-Thanks,
-Zheyun Shen
-
-> 2025=E5=B9=B47=E6=9C=8814=E6=97=A5 22:48=EF=BC=8CSean Christopherson =
-<seanjc@google.com> =E5=86=99=E9=81=93=EF=BC=9A
->=20
-> On Mon, Jul 14, 2025, Zheyun Shen wrote:
->> Hi Aithal,
->> I can reproduce this issue in my environment, and I will try to =
-resolve it as
->> soon as possible.
->=20
-> Phew, that's good, because I can't repro this, and I don't see =
-anything obviously
-> wrong.
->=20
->>> 2025=E5=B9=B47=E6=9C=8814=E6=97=A5 13:21=EF=BC=8CAithal, Srikanth =
-<sraithal@amd.com> =E5=86=99=E9=81=93=EF=BC=9A
->>>=20
->>> Hello,
->>>=20
->>> While running the kselftest for SEV migration (sev_migrate_tes) on
->>> linux-next (6.16.0-rc5-next-20250711, commit a62b7a37e6) on an =
-AMD-based
->>> paltforms [Milan,Genoa,Turin], I encountered below kernel crash =
-while
->>> running kvm kselftests:
->>>=20
->>> [ 714.008402] BUG: kernel NULL pointer dereference, address: =
-0000000000000000
->>> [ 714.015363] #PF: supervisor read access in kernel mode
->>> [ 714.020504] #PF: error_code(0x0000) - not-present page
->>> [ 714.025643] PGD 11364b067 P4D 11364b067 PUD 12e195067 PMD 0
->>> [ 714.031303] Oops: Oops: 0000 [#1] SMP NOPTI
->>> [ 714.035487] CPU: 14 UID: 0 PID: 16663 Comm: sev_migrate_tes Not =
-tainted 6.16.0-rc5-next-20250711-a62b7a37e6-42f78243e0c #1 =
-PREEMPT(voluntary)
->>> [ 714.048253] Hardware name: Dell Inc. PowerEdge R6515/07PXPY, BIOS =
-2.17.0 12/04/2024
->>> [ 714.055905] RIP: 0010:_find_first_bit+0x1d/0x40
->=20
-> ..
->=20
->>> [ 714.148307] ? sev_writeback_caches+0x25/0x40 [kvm_amd]
->>> [ 714.153544] sev_guest_memory_reclaimed+0x34/0x40 [kvm_amd]
->>> [ 714.159115] kvm_arch_guest_memory_reclaimed+0x12/0x20 [kvm]
->>> [ 714.164817] kvm_mmu_notifier_release+0x3c/0x60 [kvm]
->>> [ 714.169896] mmu_notifier_unregister+0x53/0xf0
->>> [ 714.174343] kvm_destroy_vm+0x12d/0x2d0 [kvm]
->>> [ 714.178727] kvm_vm_stats_release+0x34/0x60 [kvm]
->>> [ 714.183459] __fput+0xf2/0x2d0
->>> [ 714.186520] fput_close_sync+0x44/0xa0
->>> [ 714.190269] __x64_sys_close+0x42/0x80
->>> [ 714.194024] x64_sys_call+0x1960/0x2180
->>> [ 714.197861] do_syscall_64+0x56/0x1e0
->>> [ 714.201530] entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> index f4d4fd5cc6e8..42cb328d8a7d 100644
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -2270,25 +2270,26 @@ static int tdx_get_capabilities(struct kvm_tdx_cmd *cmd)
+>          const struct tdx_sys_info_td_conf *td_conf = &tdx_sysinfo->td_conf;
+>          struct kvm_tdx_capabilities __user *user_caps;
+>          struct kvm_tdx_capabilities *caps = NULL;
+> +       u32 nr_user_entries;
+>          int ret = 0;
+>   
+>          /* flags is reserved for future use */
+>          if (cmd->flags)
+>                  return -EINVAL;
+>   
+> -       caps = kmalloc(sizeof(*caps) +
+> +       caps = kzalloc(sizeof(*caps) +
+>                         sizeof(struct kvm_cpuid_entry2) * td_conf->num_cpuid_config,
+>                         GFP_KERNEL);
+>          if (!caps)
+>                  return -ENOMEM;
+>   
+>          user_caps = u64_to_user_ptr(cmd->data);
+> -       if (copy_from_user(caps, user_caps, sizeof(*caps))) {
+> +       if (get_user(nr_user_entries, &user_caps->cpuid.nent)) {
+>                  ret = -EFAULT;
+>                  goto out;
+>          }
+>   
+> -       if (caps->cpuid.nent < td_conf->num_cpuid_config) {
+> +       if (nr_user_entries < td_conf->num_cpuid_config) {
+>                  ret = -E2BIG;
+>                  goto out;
+>          }
 
 
