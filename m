@@ -1,149 +1,175 @@
-Return-Path: <kvm+bounces-52256-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52257-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE95BB03349
-	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 00:21:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D28DCB033FF
+	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 02:56:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B12C51894F5C
-	for <lists+kvm@lfdr.de>; Sun, 13 Jul 2025 22:21:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2765516629C
+	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 00:56:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 371D420C478;
-	Sun, 13 Jul 2025 22:20:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F9DD1891A9;
+	Mon, 14 Jul 2025 00:56:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="M5NecNqW"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bLiXd8+L"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5D1E2046A9;
-	Sun, 13 Jul 2025 22:20:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA6A211CBA
+	for <kvm@vger.kernel.org>; Mon, 14 Jul 2025 00:56:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752445243; cv=none; b=iY33G1KNQX7iCyLI7rU2AEWw7RnakgrzfJkRWaUh8ugUtoefrNWl0AJKTtTNUOZmRdnB8sJ314dZBnAfrgpUVsFSKfDSNI5xxNTXty7h9rUmRaMVj6rBKd35ZCeLqCd5sRcn1SU6QfTesRR/2jdDKZa2NRCU/PEFE9ZgKwBz/2g=
+	t=1752454605; cv=none; b=psW27lc0Vc0JysllYnDGCFen+iuKJBwH9jkrmMxDi0YlvH6wFbHw8n1FNCWL1Wj/5gdZyzAnp5tQQ/GeGpRuOovkzFr5KqHfgextKMHk6L+LLDV4n+8aPdwu8+VPm9Sh2i1eiigl+OJDJ41OpkUtDvCZqhRmZ6wq0frga/AXvcU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752445243; c=relaxed/simple;
-	bh=Evzy0z8dVOISDH5lXgms8Aq3Kfyn1mwy+RJB/+zm9Ow=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UBPP9j/oxr9JqBAspcquIw8/E2DPP0VHCZK9Y2KWJbNNJ5UjN8JtZzmcOQNUSqp9XSk+m0Hue8Cyf2DDw4leE/l8uLK4Zd1dhObbdSXRe5XkKPgQbMobffvM/nnWwwSWutJitDuite/I84xRjJmiV63MTVooACn6hObMvy3Tnh0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=M5NecNqW; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752445242; x=1783981242;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Evzy0z8dVOISDH5lXgms8Aq3Kfyn1mwy+RJB/+zm9Ow=;
-  b=M5NecNqWoFRIsHOnB79Zmyd6ZC/qOB2U9fPCY9dTr5TYDeNPSfPl2o2t
-   bwCu7dDhybZlwdPa/r6l1MYWqJePXf7tc781h3m8wvUn8gNibj7jYeaQo
-   Nc2z4LdWy8FP62b0iaSUD4j5Yj/A3QNpFsr6kwZfuK7yVtLEIBI6nSY1p
-   c6cSuavl4PBOEQhP4V7SRNSX4kqs7XMm5s7bkQeNt4c0vaR7NEesCXsZ5
-   kKWfSv3joqHTNDAcqvY8c1yOUj0J86nMnMPzaORMYiz3UrhIaNxZktV/V
-   rX33SLuz1q8sXRVAetd7qoO/LXhkmnKZHh67r4W+UWpd5L3MvrVyW40V4
-   Q==;
-X-CSE-ConnectionGUID: p9fIXb7RShu2fTc8bOKqqA==
-X-CSE-MsgGUID: 5bF3lHYOSxSeSNW3xMrKhg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11491"; a="80077254"
-X-IronPort-AV: E=Sophos;i="6.16,309,1744095600"; 
-   d="scan'208";a="80077254"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jul 2025 15:20:42 -0700
-X-CSE-ConnectionGUID: 37v/o9/oR3iteh3zY9Io2g==
-X-CSE-MsgGUID: ZPozDmYRSW2VIlKne1TC+Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,309,1744095600"; 
-   d="scan'208";a="156891933"
-Received: from gpacheco-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.124.223.7])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jul 2025 15:20:38 -0700
-From: Kai Huang <kai.huang@intel.com>
-To: seanjc@google.com,
-	pbonzini@redhat.com
-Cc: kvm@vger.kernel.org,
-	thomas.lendacky@amd.com,
-	nikunj@amd.com,
-	bp@alien8.de,
-	isaku.yamahata@intel.com,
-	xiaoyao.li@intel.com,
-	rick.p.edgecombe@intel.com,
-	chao.gao@intel.com,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 2/2] KVM: x86: Reject KVM_SET_TSC_KHZ vCPU ioctl for TSC protected guest
-Date: Mon, 14 Jul 2025 10:20:20 +1200
-Message-ID: <71bbdf87fdd423e3ba3a45b57642c119ee2dd98c.1752444335.git.kai.huang@intel.com>
-X-Mailer: git-send-email 2.50.0
-In-Reply-To: <cover.1752444335.git.kai.huang@intel.com>
-References: <cover.1752444335.git.kai.huang@intel.com>
+	s=arc-20240116; t=1752454605; c=relaxed/simple;
+	bh=Aj2wrqzNkDFUp0Qlcm9ZHkXFqT0KNjoQwLntUrA8h4w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=seE/SFm0x/ClXmWQF+yacnpaqOPFLy0NyEAZ35sfGsgZloVYMufD1dWnATh0OcfeqypnUoA+l4CDZJNboMEogvW+aOoCrqiRKc3ObOnChXUhtaD1HkXNeT4zniqHAQz+ldODGSp+BlgvFnmBXJyOq59KFrLjsmqg84d/ZGgVuno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bLiXd8+L; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752454602;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qUmVGWmiQ9qj6UDI8yyGeFapyi86on9NnjOakrMOqpk=;
+	b=bLiXd8+LtLU0OzbdzO/ANH6EO6G5V8QjtSjGPcap0esMuzMg0g5aNpliz5T3ZRs4gRbk3S
+	WRgDZx4///LPkIRUyiKbSBV95tKjNStKsV9KeUJPBUoUn6xyEa7xHjlVbRFp8bG6PUGdF4
+	eMLrrEVf3VZpy9svJSrWy0/Rgiar+7s=
+Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
+ [209.85.215.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-687--a37NWxFNKm5RD2nB5tryg-1; Sun, 13 Jul 2025 20:56:41 -0400
+X-MC-Unique: -a37NWxFNKm5RD2nB5tryg-1
+X-Mimecast-MFC-AGG-ID: -a37NWxFNKm5RD2nB5tryg_1752454600
+Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-b391a561225so2931408a12.1
+        for <kvm@vger.kernel.org>; Sun, 13 Jul 2025 17:56:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752454600; x=1753059400;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qUmVGWmiQ9qj6UDI8yyGeFapyi86on9NnjOakrMOqpk=;
+        b=Gjz3OCRs+VqTqCf7cHQJv0rYu7jREm7dAKU8fRbq2efnFk8uxMTWiIMyGTJQTW6WSI
+         D/mniiX/uX9dMqTc2hBNPOtZvxdHKgmhXraR2zF4sNkjdKY3Iv24hjN32QB924x3tVV3
+         yMjx53lLDeHLdgrpRC7ZD9GYgSosOgaRyYaYU4WliYPmM/4ZHWZH1Z2FhRo2+GFhkYHn
+         d9xn7UgU43XDixX6+nvulwrzKJ4FEwkGMjdvaqYyfs5mstQvMUyhefeWGgAEQE+7sPYV
+         DssiXm80RVkns/Va1gs0wwV83/NrQfTTlTxypECPc18LVuVqvnvfvLheQ8aGKSrDt2My
+         kXfw==
+X-Forwarded-Encrypted: i=1; AJvYcCWkpZFhYRTnV9mZxT5xtz3AuJn90l8m4+zQlTRaltuapzPKl6txCx/wBLioxmCmHRsSIjo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzBg7N2ajY96X9pkEeBhOGqnSJ9w3+v7/cxvZY1jlo9x7mSGtYG
+	+tP5pOWLs29v/XxopEfgVdMJuN+Lw0Lxk6l5VWpEtlTe2IWQX/gkOaKWK58OKkSXHP16hOY4Y+F
+	zToXmxpi69J7I9B/wEaY2Ywszj83C/qr1IkQApxFGPV1fS0tNYc0jhg==
+X-Gm-Gg: ASbGncvRB3kEEFJ6enKJo6iQ5Gs0s2bT8tvAjLiZ014/akNHejlWSCjEoBbWIaNWztY
+	ZRjeXQW7atAQsPFoXZX1IkU9gwSWxgWpVUosbIXYz3VTHlUsAJvy2F5j/nSb10nSru2vOZbvH4X
+	OLphyOWHs1oLiv9TBXyv6ig5ov4cdj/sKypqUauo0E5nHEOtHgVL7/hejBkmDc9k6ofE6be/A8z
+	Bzd2xmu3t+FTS7/GVcpj4FNd8stN93ytdN//nc0VqyFkxHegIVhPmHOqGmuxPYkhqzUUq05MhTn
+	DeAfcZaxrVZFuYlnA7JOJfHqwxwy5viFBbj6EB0jQZq66gMv946dkb8NwjwoHKM6VlbISk53YZA
+	VxWs=
+X-Received: by 2002:a05:6a20:a108:b0:1f5:95a7:8159 with SMTP id adf61e73a8af0-2313504eae8mr16343998637.10.1752454599971;
+        Sun, 13 Jul 2025 17:56:39 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEuM+Zi92A0hbUgn10WrjgmwNif+FKdGvokkBLHmwp/rW6/7cd0fjnuie824/YWyiFVdE8dUA==
+X-Received: by 2002:a05:6a20:a108:b0:1f5:95a7:8159 with SMTP id adf61e73a8af0-2313504eae8mr16343960637.10.1752454599481;
+        Sun, 13 Jul 2025 17:56:39 -0700 (PDT)
+Received: from [192.168.68.51] (n175-34-62-5.mrk21.qld.optusnet.com.au. [175.34.62.5])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b3bbe727e33sm9168382a12.68.2025.07.13.17.56.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 13 Jul 2025 17:56:38 -0700 (PDT)
+Message-ID: <05605650-2dd2-4abf-b0a5-f727753db7f5@redhat.com>
+Date: Mon, 14 Jul 2025 10:56:28 +1000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v10 (RESEND) 00/20] Change ghes to use HEST-based offsets
+ and add support for error inject
+To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+ Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
+Cc: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+ Shiju Jose <shiju.jose@huawei.com>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?=
+ <philmd@linaro.org>, Ani Sinha <anisinha@redhat.com>,
+ Dongjiu Geng <gengdongjiu1@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ Shannon Zhao <shannon.zhaosl@gmail.com>, Yanan Wang
+ <wangyanan55@huawei.com>, Zhao Liu <zhao1.liu@intel.com>,
+ kvm@vger.kernel.org, Cleber Rosa <crosa@redhat.com>,
+ Eduardo Habkost <eduardo@habkost.net>, Eric Blake <eblake@redhat.com>,
+ John Snow <jsnow@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ Markus Armbruster <armbru@redhat.com>, Michael Roth <michael.roth@amd.com>,
+ linux-kernel@vger.kernel.org
+References: <cover.1749741085.git.mchehab+huawei@kernel.org>
+Content-Language: en-US
+From: Gavin Shan <gshan@redhat.com>
+In-Reply-To: <cover.1749741085.git.mchehab+huawei@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Reject KVM_SET_TSC_KHZ vCPU ioctl if guest's TSC is protected and not
-changeable by KVM, and update the documentation to reflect it.
+Hi Mauro,
 
-For such TSC protected guests, e.g. TDX guests, typically the TSC is
-configured once at VM level before any vCPU are created and remains
-unchanged during VM's lifetime.  KVM provides the KVM_SET_TSC_KHZ VM
-scope ioctl to allow the userspace VMM to configure the TSC of such VM.
-After that the userspace VMM is not supposed to call the KVM_SET_TSC_KHZ
-vCPU scope ioctl anymore when creating the vCPU.
+On 6/13/25 1:17 AM, Mauro Carvalho Chehab wrote:
+> Hi Michael,
+> 
+> This is v10 of the patch series, rebased to apply after release
+> 10.0. The only difference against v9 is a minor confict resolution.
+> 
+> I sent already the patch with conflicts, but, as you didn't pick,
+> I'm assuming you're opting to see the entire series again, as it
+> could make easier for you to use b4 or some other script you may
+> use to pick patches. So, let me resend the entire series.
+> 
+> It is nearly identical to v9 which addressed 3 issues:
+> 
+> - backward compatibility logic moved to version 10.0;
+> - fixed a compilation issue with target/arm/kvm.c (probably
+>    caused by some rebase - funny enough, incremental
+>    compilation was fine here);
+> - added two missing SPDX comments.
+> 
+> As ghes_record_cper_errors() was written since the beginning
+> to be public and used by ghes-cper.c. It ended being meged
+> earlier because the error-injection series become too big,
+> so it was decided last year to split in two to make easier for
+> reviewers and maintainers to discuss.
+> 
+> This series change the way HEST table offsets are calculated,
+> making them identical to what an OSPM would do and allowing
+> multiple HEST entries without causing migration issues. It open
+> space to add HEST support for non-arm architectures, as now
+> the number and type of HEST notification entries are not
+> hardcoded at ghes.c. Instead, they're passed as a parameter
+> from the arch-dependent init code.
+> 
+> With such issue addressed, it adds a new notification type and
+> add support to inject errors via a Python script. The script
+> itself is at the final patch.
+> 
+> ---
+> 
+> v10:
+> - rebased on the top of current upstream:
+>    d9ce74873a6a ("Merge tag 'pull-vfio-20250611' of https://github.com/legoater/qemu into staging")
+> - solved a minor conflict
+> 
 
-The de facto userspace VMM Qemu does this for TDX guests.  The upcoming
-SEV-SNP guests with Secure TSC should follow.
+[...]
 
-Note this could be a break of ABI.  But for now only TDX guests are TSC
-protected and only Qemu supports TDX, thus in practice this should not
-break any existing userspace.
+Just head up to check if this series has been merged? I don't see those patches
+show up in the latest upstream QEMU yet. The reason why I'm asking is the subsequent
+fix [1], which depends on this series.
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Kai Huang <kai.huang@intel.com>
-Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
-Reviewed-by: Nikunj A Dadhania <nikunj@amd.com>
----
- Documentation/virt/kvm/api.rst | 7 +++++++
- arch/x86/kvm/x86.c             | 4 ++++
- 2 files changed, 11 insertions(+)
+[1] https://lists.nongnu.org/archive/html/qemu-devel/2025-05/msg06433.html
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index e343430ccb01..563878465a6a 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -2008,6 +2008,13 @@ If the KVM_CAP_VM_TSC_CONTROL capability is advertised, this can also
- be used as a vm ioctl to set the initial tsc frequency of subsequently
- created vCPUs. The vm ioctl must be called before any vCPU is created.
- 
-+For TSC protected Confidential Computing (CoCo) VMs where TSC frequency
-+is configured once at VM scope and remains unchanged during VM's
-+lifetime, the vm ioctl should be used to configure the TSC frequency
-+and the vcpu ioctl is not supported.
-+
-+Example of such CoCo VMs: TDX guests.
-+
- 4.56 KVM_GET_TSC_KHZ
- --------------------
- 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 4051c0cacb92..26737bc4decb 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -6186,6 +6186,10 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
- 		u32 user_tsc_khz;
- 
- 		r = -EINVAL;
-+
-+		if (vcpu->arch.guest_tsc_protected)
-+			goto out;
-+
- 		user_tsc_khz = (u32)arg;
- 
- 		if (kvm_caps.has_tsc_control &&
--- 
-2.50.0
+Thanks,
+Gavin
+
 
 
