@@ -1,90 +1,82 @@
-Return-Path: <kvm+bounces-52347-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52348-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA2C8B0451F
-	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 18:11:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D00FB04513
+	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 18:09:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D88A93A4076
-	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 16:08:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3F15D7A6BD5
+	for <lists+kvm@lfdr.de>; Mon, 14 Jul 2025 16:07:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3776225EFB6;
-	Mon, 14 Jul 2025 16:08:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4210F25EFBF;
+	Mon, 14 Jul 2025 16:08:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="NkuE6P1/"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="lIqJtBKz"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2044.outbound.protection.outlook.com [40.107.96.44])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2063.outbound.protection.outlook.com [40.107.244.63])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB66F1F94A
-	for <kvm@vger.kernel.org>; Mon, 14 Jul 2025 16:08:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.96.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE7832571C6
+	for <kvm@vger.kernel.org>; Mon, 14 Jul 2025 16:08:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.63
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752509312; cv=fail; b=l1ToHezFXitnmCriWDaHnHjrB5/DHlg7KTB2z0rwSOJsseMD3DltB6pZ3emRcHn8DdlNClhF+Cw3pDFApUvIWNsuJCrYvON5ZFa2N8teCXgY/8g9hSnsKmjH0xUSJ9Dt3vLUF9+Z+CZXFokhArBnSuLXq9riH6k+IDVE2XVGhwA=
+	t=1752509316; cv=fail; b=FRnNyoi4TXHN0vEkEaZgmW0TTyhhb/bV7L9tqgC3fvP62l83pL3aDyTTvlexVfBwgIe3YYhQGzLV22PqtmJonpIXEufky2Uua7cNKZS/b0M5YhOWtt71xxT/dNI5vCI3a/Ah13fDxyuSi0fxn3isO9uFFhacTXwfJQoE2z+flqc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752509312; c=relaxed/simple;
-	bh=534qjgJXUgoOsayCT3CSoCXPJWwvjZJGGIDvm7Ntgjw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=q/nbgxBphAy8Z7WLZ3yINCIifvPrsTeB1817/F5u+TtJmOcW5JkPwCh/rQcDOmw8DqdpnlTf1GsPVx3UOmO3iwIToQCNeGtiU73MKuotbO5Zqi9npXsiO8UMXqXz19mueQ6RbClFnHdIdaqh83dvkFMYX+BlYi2DcD55llBgtx0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=NkuE6P1/; arc=fail smtp.client-ip=40.107.96.44
+	s=arc-20240116; t=1752509316; c=relaxed/simple;
+	bh=KtAHLoyLJ4HPEun9xqFXB4ahqOgHXTXoTRRDZTOJSuk=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=h7CdZfwYInbxCz9a9X4xpBwtG4Hw1G+t6HsOBxkD5n1azeEDR9Q3LmZENhGUB0OX8nAYTOkYRND92dfaczKrD8PZ/1r81XUjxfqtbrmBCaKyhqN87RiRAuSUVudumieC0BORdIO+YQxLti7DGOr86RTVBSfBEjKVAirMTlroVGE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=lIqJtBKz; arc=fail smtp.client-ip=40.107.244.63
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=EOBOHwdSHn4yrvrEt/Zbt7sAmbucLet/Rv8+yzr8jdaVcGz0buR09DQqEXfDTbq4QvfUbFXW1bly/8y2BtS/HwVC0EiFHPGU7eAj0MLF9r78KbjU7IwLdvO7hJOlbvBjOyY8+etOmMT/WSKA29LGZyUb7Geqdr4nVCeDUqSx6SJA3LlS8MZN8RqWSvhrHiP16jD9DlklMcsBmS6SppZT1ot2K659iuVL4+7KjqgEArvCShDOpJW1iLbGxzl7wCCly46HW37wfdu7jQbtg2V3thQ6xL8WIJjGnXc3PXMvTYA5/15U1IqhWc9It3oWEKTYZ+JfqJ6BXfkir49sNR9w6Q==
+ b=QvNzj6OWGfQTPx+iD7rYqP+ZBQFtz9F9i87a75waoGtTurbE0gH6SOBcfNjPO/FkUBIcCcey/a31F6DCgxd2LIYT9DG71Km6LC5Ky4kM69aGujnXrvpKhte6Oq3DOBsqQt3PJgrwI2nSPl+h7HHs0saP35Rq4PHLPRQuwcFajo2iD3UyW7hNY/H5ugtv+7OyZokV6JIkk8yotqtSapaVLkJE0BwXRhNidz5KSa3JS+l+Kj8J0Ib3CoOhT7XkGa3ZTh9A09SD+6I1zel9XQcVUMSN4qGtejCSkDf0MgGTgtnccSSzF+8U2rV0kNN8OqO0KYVpUSSaffM1TNA4dEOgZQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=N+agGZGno06NC/OTlIYxDpcloNpkOoeQll75PHNP6uE=;
- b=IxURVRcnBumVXVl/haMQ21UkwE2b1yUALnMo0peBHx8qoPEeqa9nY/PlE1+3ds6ebkpTx8kIDs80bLH4xVP/5zbOKD04yHKgk1Y7smej1Hm7Rzgqj+ow1M+lzHwndPNerBbRLiLv2Ele0rmrHGcI92ARfyGpXi1X4u0whP/QwjEH+Nef5Gcb/ZDfztcjV+kvrA6NhfAa0//CWBV7432HekZJlS+id2SE6HuvfHKssUuGMkSp4a7zRCTwjsdMWP8SifdUa6bYhJurYx5W4M32nMw9cUntuHJ7dN+n2lSkR/VRA2ws6XIJEfH9Pc0Q5m4VygxQZ64Ixumoe20Fyj62Sg==
+ bh=YH5593dpow9WqF5gTP8KE0ivOpWmlcgXNaTdvTSA6Tg=;
+ b=w5KbOZ8lE7vroGNaGRdCnC1/hb9uufYHAyWydWIWuNVUCOdsVFnGfhpHirRt+UowPVQQ2fXxbj0gFoeinNPNS7I7IUf1pK6zKoG8mdX8OJBwqdTGaFGx4s/le4YRmsBkgjTOohWVxR0KHvUyEOTAFUepib0BNYOFfvjiNPfRlg+MXZAagFMluwHd7z4H3WDHiHSnKfoEZXeBTdzUmQWItAr/4gZlPVjIlj5koaNfH+kwaqOk6U0idq0uIAWnaJk3UaHanOFSMxCyXCUhQNtcTz6nAJU5Zf2Rp+WSw78nHALMZEPfRUshwzZG6I7h1ovEWc5Zdt2vYFSc7kFWksXlAQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=N+agGZGno06NC/OTlIYxDpcloNpkOoeQll75PHNP6uE=;
- b=NkuE6P1/3ZM0cq9FIVagqnp4UWch6+esliPSxDDFimICGr8/TcYy4VKVsTOXm7se/0bO/PUbEAGaDlXhAa96uDtVLWQCUvGuxAoIwzi0HlNEK+VfIjFsBIFGtz9PlQ54qB8ZI4mf80oizk1iBI/Wqm5lCK2Sa5mJ3Qsgsj9rkIEoTgicMo363dKYw2tRlT1N2QutTuNSXoZsUVVfAVUkctHzAZdB/VSv8jpsoC1gdGtyypF8gUBqxoyUH6q+AaK2LjkHOkRHK/CGDxpwQheg6BsPi6wT3GAyHcCCuidcJ3NQ6+YK8+91Fhk7mn23RJw689EW1YHZI3kiLzL3IsBHxw==
+ bh=YH5593dpow9WqF5gTP8KE0ivOpWmlcgXNaTdvTSA6Tg=;
+ b=lIqJtBKzNsRLcKrNIsAYZM8voFhnwViCRu2iqVEz+1Fjj4zvS1n7OvuD6gvLZKqL2P1KNvFGJKcK9gwaqjp4ZNIZb1hJkLVoclXusY5BbkQdQZGe9VhJxGzZl/f9Q6hbvJkgw5n4gdGeH5qqbcJw55L3bQrLRs6W4L7bInWkDoZ53G5xjDTTkwDv1u7YAi2pCJWC7f+x7UoGHSDatJOysH73Vjmzn4m9VQSh3n0mTjUUWHuAFZiaV3BTRMBcr/TlLrjRkHXm460MghscoWUEqZSHgbwzHNLLPoEU0IKECQWy+s0864xGp3+ipQg7qFbHkQM5Q1AeHuKaVZzZWq4KQw==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nvidia.com;
 Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
- by MW3PR12MB4459.namprd12.prod.outlook.com (2603:10b6:303:56::22) with
+ by SJ5PPF1C7838BF6.namprd12.prod.outlook.com (2603:10b6:a0f:fc02::98d) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8901.26; Mon, 14 Jul
- 2025 16:08:25 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.29; Mon, 14 Jul
+ 2025 16:08:27 +0000
 Received: from CH3PR12MB8659.namprd12.prod.outlook.com
  ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
  ([fe80::6eb6:7d37:7b4b:1732%7]) with mapi id 15.20.8901.033; Mon, 14 Jul 2025
- 16:08:25 +0000
-Date: Mon, 14 Jul 2025 13:08:23 -0300
+ 16:08:26 +0000
 From: Jason Gunthorpe <jgg@nvidia.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Yi Liu <yi.l.liu@intel.com>, Ankit Agrawal <ankita@nvidia.com>,
+To: Alex Williamson <alex.williamson@redhat.com>,
+	Ankit Agrawal <ankita@nvidia.com>,
 	Brett Creeley <brett.creeley@amd.com>,
 	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
-	Longfang Liu <liulongfang@huawei.com>, qat-linux@intel.com,
-	virtualization@lists.linux.dev, Xin Zeng <xin.zeng@intel.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Matthew Rosato <mjrosato@linux.ibm.com>,
-	Nicolin Chen <nicolinc@nvidia.com>, patches@lists.linux.dev,
+	Kevin Tian <kevin.tian@intel.com>,
+	kvm@vger.kernel.org,
+	Longfang Liu <liulongfang@huawei.com>,
+	qat-linux@intel.com,
 	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Terrence Xu <terrence.xu@intel.com>,
-	Yanting Jiang <yanting.jiang@intel.com>,
-	Zhenzhong Duan <zhenzhong.duan@intel.com>
-Subject: Re: [PATCH v2] vfio/pci: Do vf_token checks for
- VFIO_DEVICE_BIND_IOMMUFD
-Message-ID: <20250714160823.GB2067380@nvidia.com>
-References: <0-v2-470f044801ef+a887e-vfio_token_jgg@nvidia.com>
- <a8484641-34d9-40bf-af8a-e472afdab0cc@intel.com>
- <20250714142904.GA2059966@nvidia.com>
- <20250714091252.118a4638.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250714091252.118a4638.alex.williamson@redhat.com>
-X-ClientProxiedBy: BL1PR13CA0212.namprd13.prod.outlook.com
- (2603:10b6:208:2bf::7) To CH3PR12MB8659.namprd12.prod.outlook.com
+	virtualization@lists.linux.dev,
+	Xin Zeng <xin.zeng@intel.com>,
+	Yishai Hadas <yishaih@nvidia.com>
+Cc: patches@lists.linux.dev
+Subject: [PATCH v3] vfio/pci: Do vf_token checks for VFIO_DEVICE_BIND_IOMMUFD
+Date: Mon, 14 Jul 2025 13:08:25 -0300
+Message-ID: <0-v3-bdd8716e85fe+3978a-vfio_token_jgg@nvidia.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: MN2PR18CA0018.namprd18.prod.outlook.com
+ (2603:10b6:208:23c::23) To CH3PR12MB8659.namprd12.prod.outlook.com
  (2603:10b6:610:17c::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -93,112 +85,456 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|MW3PR12MB4459:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5bac5357-2643-4e59-da3a-08ddc2f0a98b
+X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|SJ5PPF1C7838BF6:EE_
+X-MS-Office365-Filtering-Correlation-Id: b7dc3832-3781-4bc0-1f9b-08ddc2f0aa6a
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|366016|1800799024|376014;
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|376014|7416014|366016|921020;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?12c4d3xD6ol7ZXjc2LL2gv6ONyml4Le8NPSIM+tQ11zpicm0DJG1ACZiIUAP?=
- =?us-ascii?Q?YiTp1i6VE3wSwdcpNeQeI3ZhvplVlniPm6Ngq5TMENnsfo/mDTMzUR6RU8gm?=
- =?us-ascii?Q?AupGNKpHMeaO0z613e2yMuLiW8hc9Sn3MASPqQwtXN6Wak78rPYwaz7a17rH?=
- =?us-ascii?Q?zq4gInmKBNNhPdMvQinsJkZCjsmDIgm8F4+9sbzWPExVgy/85hkIELgdDkee?=
- =?us-ascii?Q?n+Xh6/eWBbKxRq+LdOhBW0Z4lGausd4yNqzou+cU/tD9lYH/RVyWqEgq7t89?=
- =?us-ascii?Q?cKuyj3QYyuLMmqRkAtoghvuU+sLbz4kA5a+oL2O1fkTRM2ygTb43CDma/vz7?=
- =?us-ascii?Q?g+jYgV5N8E/FioRy69bBJj+am2M3sp5Mew95IuhGZUR8D77S3zyGt8OuRblK?=
- =?us-ascii?Q?+KNjm3aldUTAB1abgjscHg0PvSV/yHhgfwcX9R3J3lDJsOPoQhDFoLgVH2bL?=
- =?us-ascii?Q?k8qi56w1ZwtZA1LwH+b8AJOWUimwgyvE+ms5QbCXAfwCjNTmnmHJG1oqQASp?=
- =?us-ascii?Q?2R1Z8S7gMogYzt1N50cwgfybEAlcxOloYYmsN7uxr9NTsNVpeEtNSumS/DIn?=
- =?us-ascii?Q?34Wle7FL/jJwOVl6LVL4bc0lIQZ5tg3vkPBbDnA8ZxZad7FtniaytRGRvLQS?=
- =?us-ascii?Q?HlCyGFX2rht5h1/MeSInmQW3kRC7SLQ0X4yWb7YjetjJPZgzrg1NYKiLzhbh?=
- =?us-ascii?Q?A0+rmDKde4vb1T5wDAVsFFq0q7rmo17MyQo6wU0E4wQfsAItBsaP+gY+jmeD?=
- =?us-ascii?Q?rJ5N12bmD5LUpmuypxzjFbJpX+92szvmzwkIGRIMrZJXXkMHqIKHe/PH2dHd?=
- =?us-ascii?Q?UNoxGEI0gx/+1JluhBwR0+/KQ0NYh4kJ+Mz9Oqq6gnIB9v9nJJ2nMs4ZiwiZ?=
- =?us-ascii?Q?QnUxw9pEWMbHQTeE3VPIqHRZxTYnkb+YDQeJgYSgEDwbH3dlloUSTlOR0GQt?=
- =?us-ascii?Q?GV4Ftn/l2QjnIKgcHtGJx3UBPEB3oL3sxQPyK5IatNpqyXSTkbwpCxkZlfOV?=
- =?us-ascii?Q?1eREC5WyWSq/hHvkG9g0WxbEULsLy78ktz2fG2IK/wDl66SIVwoIQSkUVPuV?=
- =?us-ascii?Q?txPzosZGV7kevXLsvKnz4crKf+7Sy1/xXL60/zCIvtQyf7AM9TcAQFX5IdiE?=
- =?us-ascii?Q?FwGm+keu37rJF0r5C0E3ZJgYh2J/U0lqJu0bcrbFMiJdN6dbzRupAoidFlkT?=
- =?us-ascii?Q?2IcOH/UeNOzI2vTCkCtqaxlW45ePkvWBK+gS+IoAKSUEKYijqQtW1O6BWm0f?=
- =?us-ascii?Q?raFWRm/GK3BRA3uKFNWN+oQlioRrpi/7JOuAr7Oi/wq3TCR9DxT8+Qoo08aC?=
- =?us-ascii?Q?sNX/IAnUw6K7X7j3SKSjfKnzPm+g/b5BRloYwKCD1xPUhAqbVhanrT/oMREo?=
- =?us-ascii?Q?AypR+Ua5FUVnjxN1NKttb4lIJpZM9KD9r9LFFjNziEChRt7Q4Q=3D=3D?=
+	=?us-ascii?Q?s/GBPyLHVM25xoZndE5icTroiCAW71faEqq+a5Mfow88sXTYtz2EtFtL3t8q?=
+ =?us-ascii?Q?h5y0ScidWP0DLzf9g14I0HomcFqkA3n9hFT8uTj4J1iD3NBkQ2YIytTQBenm?=
+ =?us-ascii?Q?E44whqbpehU+KJzJ8eHE3E5RZ3GHXFy9yWlM6V0dGXJGdtFXWOUuNHfMnSi+?=
+ =?us-ascii?Q?x9y+wlMookH9KeqKND1dYcsfObILgEnKfAoZ6k9alugNrPQol9etFElg9rKv?=
+ =?us-ascii?Q?wPF10fMVMQsnHB3yKpreLuUhIrcybfC3yNLp7TEojjHSKNTSGlvI6zRSoT67?=
+ =?us-ascii?Q?t7e+wUYQG5sZt8xD55bxoOecJySeuKCNlrL+WdEVuRifVi6dpR4jOuAIZ3Sv?=
+ =?us-ascii?Q?+sKGmk5aBwMHIVQlGK6IPMspwElJ7iV1o4xX6CO9uB4tyEBEciLj6l+YEoxY?=
+ =?us-ascii?Q?uLC6DStbxieym9E+1IYZerIT06WNNxd8eW3w2LTAYiT69gyZkvZrU/whj9Sn?=
+ =?us-ascii?Q?FVsbb1Fx5ksdH0TxLT54hfiliCbxQ+vtNjHbfe59TFVxK6fL1KVouFjM69V1?=
+ =?us-ascii?Q?0ot+SLOhcXINHv1QoHuoEbeQUsyeHII1jN1aHyXNCRLb0eE26YXl0BI4iyDq?=
+ =?us-ascii?Q?/PjwG7Hcqn2al5aqlwSl+VTWaDSgY5mDRcGml4IcAGSYvR/lnTCcr8+rrzlu?=
+ =?us-ascii?Q?s5uSC3YzkC65S0uREP4aQ75uiUghn2Avt98+XMJrWb7s8kYNrU1CE7HUrf+C?=
+ =?us-ascii?Q?t5Lm7Xk5BTiY0Z6Ee+2CA6EMXO9rQ4gS2K5fxiVWyCTULzaXj+S+qC8JpKrQ?=
+ =?us-ascii?Q?3BjLLhDRUP/qKT4vbrq2F7h3L1Rc1eXOPINp/tbe98HQpq7JckN4zZI9gYoD?=
+ =?us-ascii?Q?I/vwQccvIKf4QSCJ6wBDzUdd7/Hq5AYh/Z9qeZb0cBEvUAKpvk+ApYcL9i5z?=
+ =?us-ascii?Q?Ch7ysL8DYrrEdEQWLFgZ0HGPa1VCDLBSW7okh7sIJ469H9qOZ22u3pTeiS6m?=
+ =?us-ascii?Q?S/jvOBC5btuXTmOqKzXkdwgBNl9EhNWiPjKz+OCTNVKDADTSZbLz+g+U+LOY?=
+ =?us-ascii?Q?752hO3VZbELQiymwyYTy1wcNQcSbptbAxwx4CiwSTDPc+HmHwk/YGthDvp5F?=
+ =?us-ascii?Q?fTV+weUh7+NrYGWAEBmagNZ98KtIjtAolqmPvK0cBixqhPBJURXVmVZXDX5D?=
+ =?us-ascii?Q?mydEwAtyybqm3mhU93RCcuFyikGxTBDkmlVdMtwm1lUSd3G8qc35O0XUygDV?=
+ =?us-ascii?Q?NK/YjnmRVcj31brBJNkygUVsQM7S09RKI18fZRxGTvpGyKcmJ+GFTaBGfSPq?=
+ =?us-ascii?Q?bBKKSI2fhtmJpjcS094ilTJjKalmNvvNgRHupiIvSb66OqaULHdZ1it4etxU?=
+ =?us-ascii?Q?K6OnLGqaF4e99E2laE/HTsLoQS9p6AIwRk9MHqQfP6BtG69m26SDOnpCoEkx?=
+ =?us-ascii?Q?6VKk6QB3Q24LZebntnORtFVMGq8/7bfHXoc6EUHHaPgcdK34zGXB2lbvMVAQ?=
+ =?us-ascii?Q?3YAQ59AK2hKC+CQzcDq86ROYoSH5lKIjuZKp6WTSnC0nAMF6eY0Z2w=3D=3D?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016)(921020);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?+H9pdushxQCXtKosIAymhnKehoKfbAkyFgECTr3E0+LdQHLjhDaV6Da8Yrcx?=
- =?us-ascii?Q?OIv13umATABU3ecCnbo/ClZ5v2eCedkQiUl+8+O/PWvNxwaPjoGToAA3k7IC?=
- =?us-ascii?Q?KGjTFLN06uEaNcYfO2N8LQY1t5vHYp03024V4eRQoKpXELNvzrwkjDLFmsEE?=
- =?us-ascii?Q?eITSpFq+UCTo8nq58z5NWnmWJ9MWLSpSBwybANGfkJN/r8t/Pi28KZPbvNPf?=
- =?us-ascii?Q?nwdM/oFcBFYaeekS8VYW29hD3ehqn9ZlBAKnQ6Qqch6LBD/RVBDH3vKnIluP?=
- =?us-ascii?Q?rmt+blt+tdYFSte+ZOhqsNXq5iGXJPlpQX2guZszhw1KhfIDulkrN/53YWvn?=
- =?us-ascii?Q?AQ2gMduQ8IrqDkVUAkm4DjAKd/TCy2T4MX58zftPkAD0+YDISAuiXmVJKgMx?=
- =?us-ascii?Q?3QPvOI5YVcQVS3JUc0QbjWjSyzRcJED93cuHnFoELOiAObKEhBqTJgYFiyRh?=
- =?us-ascii?Q?NrKh0MOCMTxqyOOgwFjUQ1oGrmnqATcqoSvvPPyvjhGi39+VIltPvvw+NwN8?=
- =?us-ascii?Q?Z3WvVkEgeZQbPGMPIea2RGVVVqZY55RQJFwG4hKtIEf9KY2BiXN47JYthyek?=
- =?us-ascii?Q?18q0qB3VoCmJsA7t6njqaqv3virtbz8fsR8s9qX76bbLDozEprLaqWa8lukO?=
- =?us-ascii?Q?L6Py9u0yhy2KPjzWVM3mK0lcGtBtLW6hF9DdbyMw6fiHtRUCDG2jD7POP2SV?=
- =?us-ascii?Q?e/eS71i4c9MTw9VF0XxbV049NmYnoaxGV14BM2awvkx+sazuam+xQWQqjAl3?=
- =?us-ascii?Q?vzl8fnrJ0UeaurRJrreAbE59Vj/YX7ddzgzVnEIWAxJrZI/42JpEupjopMip?=
- =?us-ascii?Q?JABEYkzE4DX2j6QeDAOt0HxSJRnUgBGokgIx4Gb6Xum+wjS5RVzwK8GNlpFp?=
- =?us-ascii?Q?kswc89ePEknWmU8Ecd3cWBl9s14m5BhD17HFrF+n6WhRaoMyh57RDfYAlP7Y?=
- =?us-ascii?Q?0Tb0q2sEzn1GlU9i7V6j1dAup7800wNXraOF3TVom7tLBVBnCfGP1A+eJJFL?=
- =?us-ascii?Q?J8597LinXmCpYWLinHw+wZAMzVOmjsWg6xutDwP3KxEjuuh78zRN1ZTCLULS?=
- =?us-ascii?Q?T3C5B3u/0QcCpgko4r3vV8g+U9ihZeZJwY1zJwQrHSzvpasEjuBiT4ZUdGAM?=
- =?us-ascii?Q?xLZruCbgA0TR7+aoG2lIeOWA4NiRJVnMAoe3m6nB4wQW1xhHcsynl+ECtTPR?=
- =?us-ascii?Q?hoEWFClO0CnXBPubEYzNAMIwH4bMaFGVYjtLwfvs5TRN4PLFRGX1cdllMmSs?=
- =?us-ascii?Q?HEMNagzd6UeGOr7dBWK32PGeUodFYpiETq2Zujq6E4OKRHaM37liREUVGu/j?=
- =?us-ascii?Q?/gOcdVYgBg+EyT9SoURrk6JZ+AOGDIrhRhrrc6t2CYxsibUihXPoB2PKgQzk?=
- =?us-ascii?Q?xRlai9KJxUZkT8bdA+2FkuxiqSh/JHBL6/Jwlh3Jq4Wsc531ItRDrjCkMFGf?=
- =?us-ascii?Q?wgspqldBWdAmBF4O7l5fEfj/n1IukN46TrlbEXM+Co1IOkehSd6xjdXiq5va?=
- =?us-ascii?Q?0KpFZs86qJvHPGNH5M/MIoq3lQkdgbTiSceiAv1yTI21OyprsqKrbVoBHorI?=
- =?us-ascii?Q?HSZLj+lRCny/ukiN1rNyOg3f2JnyngED4cNESJVo?=
+	=?us-ascii?Q?P6S7Yv97UWFcuxz6eX60CtcxYCWKDXjICA3cuVzTkKEIYgOjYWqrSAPo4aMk?=
+ =?us-ascii?Q?mA7aESsFrn6bO7ozeEEHy5Z8iPxnsojNJC4BGVu3SOEjPNGu5EVMZhSnESbS?=
+ =?us-ascii?Q?rAU3dkJnnxwbsy50igtNcpXFzBHyA26S4F+3Zn/SHi+Z7LBb9/hRz0YedtFT?=
+ =?us-ascii?Q?fsADTLNOCl8KjZAu3XyFYai6KXr3RNH+zsanN87PL+M3PYRXxkvWx/9CYIml?=
+ =?us-ascii?Q?58mc3K+G0om+udrkh0YEsj2zmw2IsJFe12++JGAl1XOllU6iyKd7AGL82QE/?=
+ =?us-ascii?Q?pOgz8VpWY699Qo3tRV3Piu7r4L/MRFG+VUjglmYH1oH5bJJVwqG1SmrXSPEu?=
+ =?us-ascii?Q?uPv5O+x1sAvnvSA3RORiPIr75QOW8ICv0EZG5kAVjU173HzRFBUZUURdED//?=
+ =?us-ascii?Q?bUuBY1drH/WC2GTTdhr2aVyddUb2lZ/7ayat9dZz6sfTQvJVT79Zy+Rfk2B3?=
+ =?us-ascii?Q?m1kXUs8PXEvkp0Y36V20aUrdxdN5jOjXLMFia/4Oemv3AZkeGajb38cO80Dj?=
+ =?us-ascii?Q?s6s1A+xvDE+O27vO4+a1kPvIH+8J3zwahZraVdmx9OrSuPl4LeMgOgPdevfD?=
+ =?us-ascii?Q?s1T4vsP1HhmFRogEGZLBFlyaUzKABfx58KmMaPqtfxmJ6FLeWoYsEXI+68rE?=
+ =?us-ascii?Q?KGUx3HiWS4/m1Xs3Sl7vEGOSsOH5ifqO0pZsrQLfZnEAlOwqHExAgqvnMoHI?=
+ =?us-ascii?Q?5lYT0TICbTXCwPcMtblImUzG1y4xRdCpdnZ1u7YhR99m6uzRqKVDYOjjleLn?=
+ =?us-ascii?Q?3LrgamvXSO6OmyR2wz84urWBXbTHc+WnXlsFRYos/sCiZdQnwVuij6Gaq6rB?=
+ =?us-ascii?Q?WlxdfLWP7n3iMfQRp/6JtM1y5Awu2BtFbJxIUdkOq9IhVtSbBWq0IvpafnLk?=
+ =?us-ascii?Q?NAZolPmxoAI6CN4IDHzIHp3HfLtiZ4u6u7qSt84ZFGYPgkGQ6OA3hzUfBvpk?=
+ =?us-ascii?Q?RfsKCuIH8lJCjAfGgva9hyMdOEIICiCTHgzShMijy5dZYtUWJbHopcJ3T2xH?=
+ =?us-ascii?Q?QykDk/dn6Z6jo5SDR4ZGZea4rF7vv/OftWcUQIDrsHX15CR3zE/ipBRZ2EiA?=
+ =?us-ascii?Q?yDLHmx+0pIsXfN1w0JrojultfkXsgPnhKlmwytbXIImxmXDkTAge3ieSfUYr?=
+ =?us-ascii?Q?2J9leE8J6WCInF5StJCsXAJIv4EcljtoHqgbPTubJXy6TixQxXJVOpCGEjVT?=
+ =?us-ascii?Q?e52WUerTPj/posYFnQFpvhE1CH58Mt+O6Sx9rc1YMDc82/IXpeVMfbgM85Uq?=
+ =?us-ascii?Q?+G24DCeuQJhn6XHZqSBH2SPrXLWxbH6pmC/WeKZvc3D6Wj+RUkHqO0C/f3Zp?=
+ =?us-ascii?Q?bzCxublEKaBwjCq/h6GUHMsJA6pUj2JGrX46IOXZ9HA1zOLcW/qCJ8PNq6Jv?=
+ =?us-ascii?Q?uD99tNeKizqcNxYOSozK0TtU9vSc2b/wBSwBvF4ErLD/JDeEzUbH/x4XFliR?=
+ =?us-ascii?Q?v2IoaN+ihIGr9CbXMDYzDuXMOCcsZuAlgJjiDJtUNWelmDTV9uzrcgeGtFEd?=
+ =?us-ascii?Q?5B7cCgW0P+Qter4kniMSkdKgKR38ZMf7MsjiI/BucN4FMyDmyM/iyRZJMuG0?=
+ =?us-ascii?Q?nl9jD3bO+8MvJBHE5r7qZTHSr7FnmAMFW089eKXS?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5bac5357-2643-4e59-da3a-08ddc2f0a98b
+X-MS-Exchange-CrossTenant-Network-Message-Id: b7dc3832-3781-4bc0-1f9b-08ddc2f0aa6a
 X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jul 2025 16:08:25.0825
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jul 2025 16:08:26.6511
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: R7CUpLFQ5iw7Ul/snzQ+VhVr4bJuqWXyuvRt/jOSRTL5nHgusZEZF/oE1FX7Av6Z
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR12MB4459
+X-MS-Exchange-CrossTenant-UserPrincipalName: S/8wTXZJjoWQwCTllgnh6dS6dvAfW6nhLX07CRFnRGWRCweCnfdsKM1HxpjoMl5S
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ5PPF1C7838BF6
 
-On Mon, Jul 14, 2025 at 09:12:52AM -0600, Alex Williamson wrote:
-> On Mon, 14 Jul 2025 11:29:04 -0300
-> Jason Gunthorpe <jgg@nvidia.com> wrote:
-> 
-> > On Mon, Jul 14, 2025 at 09:12:30PM +0800, Yi Liu wrote:
-> > > On 2025/7/10 23:30, Jason Gunthorpe wrote:  
-> > > > This was missed during the initial implementation. The VFIO PCI encodes
-> > > > the vf_token inside the device name when opening the device from the group
-> > > > FD, something like:
-> > > > 
-> > > >    "0000:04:10.0 vf_token=bd8d9d2b-5a5f-4f5a-a211-f591514ba1f3"
-> > > > 
-> > > > This is used to control access to a VF unless there is co-ordination with
-> > > > the owner of the PF.
-> > > > 
-> > > > Since we no longer have a device name, pass the token directly through
-> > > > VFIO_DEVICE_BIND_IOMMUFD using an optional field indicated by
-> > > > VFIO_DEVICE_BIND_TOKEN.  
-> > > 
-> > > two nits though I think the code is clear enough :)
-> > > 
-> > > s/Since we no longer have a device name/Since we no longer have a device
-> > > name in the device cdev path/
-> > > 
-> > > s/VFIO_DEVICE_BIND_TOKEN/VFIO_DEVICE_BIND_FLAG_TOKEN/  
-> > 
-> > Alex, can you fix this when applying the v3 version?
-> 
-> Hmm, where's this v3 version?  Did you already send a version with
-> Shameer's fix (s/bind.argsz/user_size)?  Lore can't find it.  Thanks,
+This was missed during the initial implementation. The VFIO PCI encodes
+the vf_token inside the device name when opening the device from the group
+FD, something like:
 
-Hmm! I seems I prepared it and then got called away before I pressed
-send. :\
+  "0000:04:10.0 vf_token=bd8d9d2b-5a5f-4f5a-a211-f591514ba1f3"
 
-Jason
+This is used to control access to a VF unless there is co-ordination with
+the owner of the PF.
+
+Since we no longer have a device name in the cdev path, pass the token
+directly through VFIO_DEVICE_BIND_IOMMUFD using an optional field
+indicated by VFIO_DEVICE_BIND_FLAG_TOKEN.
+
+Fixes: 5fcc26969a16 ("vfio: Add VFIO_DEVICE_BIND_IOMMUFD")
+Tested-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Reviewed-by: Yi Liu <yi.l.liu@intel.com>
+Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+---
+ drivers/vfio/device_cdev.c                    | 38 +++++++++++++++++--
+ .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    |  1 +
+ drivers/vfio/pci/mlx5/main.c                  |  1 +
+ drivers/vfio/pci/nvgrace-gpu/main.c           |  2 +
+ drivers/vfio/pci/pds/vfio_dev.c               |  1 +
+ drivers/vfio/pci/qat/main.c                   |  1 +
+ drivers/vfio/pci/vfio_pci.c                   |  1 +
+ drivers/vfio/pci/vfio_pci_core.c              | 22 +++++++----
+ drivers/vfio/pci/virtio/main.c                |  3 ++
+ include/linux/vfio.h                          |  4 ++
+ include/linux/vfio_pci_core.h                 |  2 +
+ include/uapi/linux/vfio.h                     | 12 +++++-
+ 12 files changed, 76 insertions(+), 12 deletions(-)
+
+v3:
+ - Fix user_size check
+v2: https://lore.kernel.org/all/0-v2-470f044801ef+a887e-vfio_token_jgg@nvidia.com
+ - Revise VFIO_DEVICE_BIND_TOKEN -> VFIO_DEVICE_BIND_FLAG_TOKEN
+ - Call the match_token_uuid through ops instead of directly
+ - update comments/style
+v1: https://patch.msgid.link/r/0-v1-8639f9aed215+853-vfio_token_jgg@nvidia.com
+
+diff --git a/drivers/vfio/device_cdev.c b/drivers/vfio/device_cdev.c
+index 281a8dc3ed4974..53a602563f002d 100644
+--- a/drivers/vfio/device_cdev.c
++++ b/drivers/vfio/device_cdev.c
+@@ -60,22 +60,50 @@ static void vfio_df_get_kvm_safe(struct vfio_device_file *df)
+ 	spin_unlock(&df->kvm_ref_lock);
+ }
+ 
++static int vfio_df_check_token(struct vfio_device *device,
++			       const struct vfio_device_bind_iommufd *bind)
++{
++	uuid_t uuid;
++
++	if (!device->ops->match_token_uuid) {
++		if (bind->flags & VFIO_DEVICE_BIND_FLAG_TOKEN)
++			return -EINVAL;
++		return 0;
++	}
++
++	if (!(bind->flags & VFIO_DEVICE_BIND_FLAG_TOKEN))
++		return device->ops->match_token_uuid(device, NULL);
++
++	if (copy_from_user(&uuid, u64_to_user_ptr(bind->token_uuid_ptr),
++			   sizeof(uuid)))
++		return -EFAULT;
++	return device->ops->match_token_uuid(device, &uuid);
++}
++
+ long vfio_df_ioctl_bind_iommufd(struct vfio_device_file *df,
+ 				struct vfio_device_bind_iommufd __user *arg)
+ {
++	const u32 VALID_FLAGS = VFIO_DEVICE_BIND_FLAG_TOKEN;
+ 	struct vfio_device *device = df->device;
+ 	struct vfio_device_bind_iommufd bind;
+ 	unsigned long minsz;
++	u32 user_size;
+ 	int ret;
+ 
+ 	static_assert(__same_type(arg->out_devid, df->devid));
+ 
+ 	minsz = offsetofend(struct vfio_device_bind_iommufd, out_devid);
+ 
+-	if (copy_from_user(&bind, arg, minsz))
+-		return -EFAULT;
++	ret = get_user(user_size, &arg->argsz);
++	if (ret)
++		return ret;
++	if (user_size < minsz)
++		return -EINVAL;
++	ret = copy_struct_from_user(&bind, minsz, arg, user_size);
++	if (ret)
++		return ret;
+ 
+-	if (bind.argsz < minsz || bind.flags || bind.iommufd < 0)
++	if (bind.iommufd < 0 || bind.flags & ~VALID_FLAGS)
+ 		return -EINVAL;
+ 
+ 	/* BIND_IOMMUFD only allowed for cdev fds */
+@@ -93,6 +121,10 @@ long vfio_df_ioctl_bind_iommufd(struct vfio_device_file *df,
+ 		goto out_unlock;
+ 	}
+ 
++	ret = vfio_df_check_token(device, &bind);
++	if (ret)
++		return ret;
++
+ 	df->iommufd = iommufd_ctx_from_fd(bind.iommufd);
+ 	if (IS_ERR(df->iommufd)) {
+ 		ret = PTR_ERR(df->iommufd);
+diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+index 2149f49aeec7f8..397f5e44513639 100644
+--- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
++++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+@@ -1583,6 +1583,7 @@ static const struct vfio_device_ops hisi_acc_vfio_pci_ops = {
+ 	.mmap = vfio_pci_core_mmap,
+ 	.request = vfio_pci_core_request,
+ 	.match = vfio_pci_core_match,
++	.match_token_uuid = vfio_pci_core_match_token_uuid,
+ 	.bind_iommufd = vfio_iommufd_physical_bind,
+ 	.unbind_iommufd = vfio_iommufd_physical_unbind,
+ 	.attach_ioas = vfio_iommufd_physical_attach_ioas,
+diff --git a/drivers/vfio/pci/mlx5/main.c b/drivers/vfio/pci/mlx5/main.c
+index 93f894fe60d221..7ec47e736a8e5a 100644
+--- a/drivers/vfio/pci/mlx5/main.c
++++ b/drivers/vfio/pci/mlx5/main.c
+@@ -1372,6 +1372,7 @@ static const struct vfio_device_ops mlx5vf_pci_ops = {
+ 	.mmap = vfio_pci_core_mmap,
+ 	.request = vfio_pci_core_request,
+ 	.match = vfio_pci_core_match,
++	.match_token_uuid = vfio_pci_core_match_token_uuid,
+ 	.bind_iommufd = vfio_iommufd_physical_bind,
+ 	.unbind_iommufd = vfio_iommufd_physical_unbind,
+ 	.attach_ioas = vfio_iommufd_physical_attach_ioas,
+diff --git a/drivers/vfio/pci/nvgrace-gpu/main.c b/drivers/vfio/pci/nvgrace-gpu/main.c
+index e5ac39c4cc6b6f..d95761dcdd58c4 100644
+--- a/drivers/vfio/pci/nvgrace-gpu/main.c
++++ b/drivers/vfio/pci/nvgrace-gpu/main.c
+@@ -696,6 +696,7 @@ static const struct vfio_device_ops nvgrace_gpu_pci_ops = {
+ 	.mmap		= nvgrace_gpu_mmap,
+ 	.request	= vfio_pci_core_request,
+ 	.match		= vfio_pci_core_match,
++	.match_token_uuid = vfio_pci_core_match_token_uuid,
+ 	.bind_iommufd	= vfio_iommufd_physical_bind,
+ 	.unbind_iommufd	= vfio_iommufd_physical_unbind,
+ 	.attach_ioas	= vfio_iommufd_physical_attach_ioas,
+@@ -715,6 +716,7 @@ static const struct vfio_device_ops nvgrace_gpu_pci_core_ops = {
+ 	.mmap		= vfio_pci_core_mmap,
+ 	.request	= vfio_pci_core_request,
+ 	.match		= vfio_pci_core_match,
++	.match_token_uuid = vfio_pci_core_match_token_uuid,
+ 	.bind_iommufd	= vfio_iommufd_physical_bind,
+ 	.unbind_iommufd	= vfio_iommufd_physical_unbind,
+ 	.attach_ioas	= vfio_iommufd_physical_attach_ioas,
+diff --git a/drivers/vfio/pci/pds/vfio_dev.c b/drivers/vfio/pci/pds/vfio_dev.c
+index 76a80ae7087b51..5731e6856deaf1 100644
+--- a/drivers/vfio/pci/pds/vfio_dev.c
++++ b/drivers/vfio/pci/pds/vfio_dev.c
+@@ -201,6 +201,7 @@ static const struct vfio_device_ops pds_vfio_ops = {
+ 	.mmap = vfio_pci_core_mmap,
+ 	.request = vfio_pci_core_request,
+ 	.match = vfio_pci_core_match,
++	.match_token_uuid = vfio_pci_core_match_token_uuid,
+ 	.bind_iommufd = vfio_iommufd_physical_bind,
+ 	.unbind_iommufd = vfio_iommufd_physical_unbind,
+ 	.attach_ioas = vfio_iommufd_physical_attach_ioas,
+diff --git a/drivers/vfio/pci/qat/main.c b/drivers/vfio/pci/qat/main.c
+index 845ed15b67718c..5cce6b0b8d2f3e 100644
+--- a/drivers/vfio/pci/qat/main.c
++++ b/drivers/vfio/pci/qat/main.c
+@@ -614,6 +614,7 @@ static const struct vfio_device_ops qat_vf_pci_ops = {
+ 	.mmap = vfio_pci_core_mmap,
+ 	.request = vfio_pci_core_request,
+ 	.match = vfio_pci_core_match,
++	.match_token_uuid = vfio_pci_core_match_token_uuid,
+ 	.bind_iommufd = vfio_iommufd_physical_bind,
+ 	.unbind_iommufd = vfio_iommufd_physical_unbind,
+ 	.attach_ioas = vfio_iommufd_physical_attach_ioas,
+diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+index 5ba39f7623bb76..ac10f14417f2f3 100644
+--- a/drivers/vfio/pci/vfio_pci.c
++++ b/drivers/vfio/pci/vfio_pci.c
+@@ -138,6 +138,7 @@ static const struct vfio_device_ops vfio_pci_ops = {
+ 	.mmap		= vfio_pci_core_mmap,
+ 	.request	= vfio_pci_core_request,
+ 	.match		= vfio_pci_core_match,
++	.match_token_uuid = vfio_pci_core_match_token_uuid,
+ 	.bind_iommufd	= vfio_iommufd_physical_bind,
+ 	.unbind_iommufd	= vfio_iommufd_physical_unbind,
+ 	.attach_ioas	= vfio_iommufd_physical_attach_ioas,
+diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+index 6328c3a05bcdd4..d39b0201d910fd 100644
+--- a/drivers/vfio/pci/vfio_pci_core.c
++++ b/drivers/vfio/pci/vfio_pci_core.c
+@@ -1821,9 +1821,13 @@ void vfio_pci_core_request(struct vfio_device *core_vdev, unsigned int count)
+ }
+ EXPORT_SYMBOL_GPL(vfio_pci_core_request);
+ 
+-static int vfio_pci_validate_vf_token(struct vfio_pci_core_device *vdev,
+-				      bool vf_token, uuid_t *uuid)
++int vfio_pci_core_match_token_uuid(struct vfio_device *core_vdev,
++				   const uuid_t *uuid)
++
+ {
++	struct vfio_pci_core_device *vdev =
++		container_of(core_vdev, struct vfio_pci_core_device, vdev);
++
+ 	/*
+ 	 * There's always some degree of trust or collaboration between SR-IOV
+ 	 * PF and VFs, even if just that the PF hosts the SR-IOV capability and
+@@ -1854,7 +1858,7 @@ static int vfio_pci_validate_vf_token(struct vfio_pci_core_device *vdev,
+ 		bool match;
+ 
+ 		if (!pf_vdev) {
+-			if (!vf_token)
++			if (!uuid)
+ 				return 0; /* PF is not vfio-pci, no VF token */
+ 
+ 			pci_info_ratelimited(vdev->pdev,
+@@ -1862,7 +1866,7 @@ static int vfio_pci_validate_vf_token(struct vfio_pci_core_device *vdev,
+ 			return -EINVAL;
+ 		}
+ 
+-		if (!vf_token) {
++		if (!uuid) {
+ 			pci_info_ratelimited(vdev->pdev,
+ 				"VF token required to access device\n");
+ 			return -EACCES;
+@@ -1880,7 +1884,7 @@ static int vfio_pci_validate_vf_token(struct vfio_pci_core_device *vdev,
+ 	} else if (vdev->vf_token) {
+ 		mutex_lock(&vdev->vf_token->lock);
+ 		if (vdev->vf_token->users) {
+-			if (!vf_token) {
++			if (!uuid) {
+ 				mutex_unlock(&vdev->vf_token->lock);
+ 				pci_info_ratelimited(vdev->pdev,
+ 					"VF token required to access device\n");
+@@ -1893,12 +1897,12 @@ static int vfio_pci_validate_vf_token(struct vfio_pci_core_device *vdev,
+ 					"Incorrect VF token provided for device\n");
+ 				return -EACCES;
+ 			}
+-		} else if (vf_token) {
++		} else if (uuid) {
+ 			uuid_copy(&vdev->vf_token->uuid, uuid);
+ 		}
+ 
+ 		mutex_unlock(&vdev->vf_token->lock);
+-	} else if (vf_token) {
++	} else if (uuid) {
+ 		pci_info_ratelimited(vdev->pdev,
+ 			"VF token incorrectly provided, not a PF or VF\n");
+ 		return -EINVAL;
+@@ -1906,6 +1910,7 @@ static int vfio_pci_validate_vf_token(struct vfio_pci_core_device *vdev,
+ 
+ 	return 0;
+ }
++EXPORT_SYMBOL_GPL(vfio_pci_core_match_token_uuid);
+ 
+ #define VF_TOKEN_ARG "vf_token="
+ 
+@@ -1952,7 +1957,8 @@ int vfio_pci_core_match(struct vfio_device *core_vdev, char *buf)
+ 		}
+ 	}
+ 
+-	ret = vfio_pci_validate_vf_token(vdev, vf_token, &uuid);
++	ret = core_vdev->ops->match_token_uuid(core_vdev,
++					       vf_token ? &uuid : NULL);
+ 	if (ret)
+ 		return ret;
+ 
+diff --git a/drivers/vfio/pci/virtio/main.c b/drivers/vfio/pci/virtio/main.c
+index 515fe1b9f94d80..8084f3e36a9f70 100644
+--- a/drivers/vfio/pci/virtio/main.c
++++ b/drivers/vfio/pci/virtio/main.c
+@@ -94,6 +94,7 @@ static const struct vfio_device_ops virtiovf_vfio_pci_lm_ops = {
+ 	.mmap = vfio_pci_core_mmap,
+ 	.request = vfio_pci_core_request,
+ 	.match = vfio_pci_core_match,
++	.match_token_uuid = vfio_pci_core_match_token_uuid,
+ 	.bind_iommufd = vfio_iommufd_physical_bind,
+ 	.unbind_iommufd = vfio_iommufd_physical_unbind,
+ 	.attach_ioas = vfio_iommufd_physical_attach_ioas,
+@@ -114,6 +115,7 @@ static const struct vfio_device_ops virtiovf_vfio_pci_tran_lm_ops = {
+ 	.mmap = vfio_pci_core_mmap,
+ 	.request = vfio_pci_core_request,
+ 	.match = vfio_pci_core_match,
++	.match_token_uuid = vfio_pci_core_match_token_uuid,
+ 	.bind_iommufd = vfio_iommufd_physical_bind,
+ 	.unbind_iommufd = vfio_iommufd_physical_unbind,
+ 	.attach_ioas = vfio_iommufd_physical_attach_ioas,
+@@ -134,6 +136,7 @@ static const struct vfio_device_ops virtiovf_vfio_pci_ops = {
+ 	.mmap = vfio_pci_core_mmap,
+ 	.request = vfio_pci_core_request,
+ 	.match = vfio_pci_core_match,
++	.match_token_uuid = vfio_pci_core_match_token_uuid,
+ 	.bind_iommufd = vfio_iommufd_physical_bind,
+ 	.unbind_iommufd = vfio_iommufd_physical_unbind,
+ 	.attach_ioas = vfio_iommufd_physical_attach_ioas,
+diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+index 707b00772ce1ff..eb563f538dee51 100644
+--- a/include/linux/vfio.h
++++ b/include/linux/vfio.h
+@@ -105,6 +105,9 @@ struct vfio_device {
+  * @match: Optional device name match callback (return: 0 for no-match, >0 for
+  *         match, -errno for abort (ex. match with insufficient or incorrect
+  *         additional args)
++ * @match_token_uuid: Optional device token match/validation. Return 0
++ *         if the uuid is valid for the device, -errno otherwise. uuid is NULL
++ *         if none was provided.
+  * @dma_unmap: Called when userspace unmaps IOVA from the container
+  *             this device is attached to.
+  * @device_feature: Optional, fill in the VFIO_DEVICE_FEATURE ioctl
+@@ -132,6 +135,7 @@ struct vfio_device_ops {
+ 	int	(*mmap)(struct vfio_device *vdev, struct vm_area_struct *vma);
+ 	void	(*request)(struct vfio_device *vdev, unsigned int count);
+ 	int	(*match)(struct vfio_device *vdev, char *buf);
++	int	(*match_token_uuid)(struct vfio_device *vdev, const uuid_t *uuid);
+ 	void	(*dma_unmap)(struct vfio_device *vdev, u64 iova, u64 length);
+ 	int	(*device_feature)(struct vfio_device *device, u32 flags,
+ 				  void __user *arg, size_t argsz);
+diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
+index fbb472dd99b361..f541044e42a2ad 100644
+--- a/include/linux/vfio_pci_core.h
++++ b/include/linux/vfio_pci_core.h
+@@ -122,6 +122,8 @@ ssize_t vfio_pci_core_write(struct vfio_device *core_vdev, const char __user *bu
+ int vfio_pci_core_mmap(struct vfio_device *core_vdev, struct vm_area_struct *vma);
+ void vfio_pci_core_request(struct vfio_device *core_vdev, unsigned int count);
+ int vfio_pci_core_match(struct vfio_device *core_vdev, char *buf);
++int vfio_pci_core_match_token_uuid(struct vfio_device *core_vdev,
++				   const uuid_t *uuid);
+ int vfio_pci_core_enable(struct vfio_pci_core_device *vdev);
+ void vfio_pci_core_disable(struct vfio_pci_core_device *vdev);
+ void vfio_pci_core_finish_enable(struct vfio_pci_core_device *vdev);
+diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+index 5764f315137f99..75100bf009baf5 100644
+--- a/include/uapi/linux/vfio.h
++++ b/include/uapi/linux/vfio.h
+@@ -905,10 +905,12 @@ struct vfio_device_feature {
+  * VFIO_DEVICE_BIND_IOMMUFD - _IOR(VFIO_TYPE, VFIO_BASE + 18,
+  *				   struct vfio_device_bind_iommufd)
+  * @argsz:	 User filled size of this data.
+- * @flags:	 Must be 0.
++ * @flags:	 Must be 0 or a bit flags of VFIO_DEVICE_BIND_*
+  * @iommufd:	 iommufd to bind.
+  * @out_devid:	 The device id generated by this bind. devid is a handle for
+  *		 this device/iommufd bond and can be used in IOMMUFD commands.
++ * @token_uuid_ptr: Valid if VFIO_DEVICE_BIND_FLAG_TOKEN. Points to a 16 byte
++ *                  UUID in the same format as VFIO_DEVICE_FEATURE_PCI_VF_TOKEN.
+  *
+  * Bind a vfio_device to the specified iommufd.
+  *
+@@ -917,13 +919,21 @@ struct vfio_device_feature {
+  *
+  * Unbind is automatically conducted when device fd is closed.
+  *
++ * A token is sometimes required to open the device, unless this is known to be
++ * needed VFIO_DEVICE_BIND_FLAG_TOKEN should not be set and token_uuid_ptr is
++ * ignored. The only case today is a PF/VF relationship where the VF bind must
++ * be provided the same token as VFIO_DEVICE_FEATURE_PCI_VF_TOKEN provided to
++ * the PF.
++ *
+  * Return: 0 on success, -errno on failure.
+  */
+ struct vfio_device_bind_iommufd {
+ 	__u32		argsz;
+ 	__u32		flags;
++#define VFIO_DEVICE_BIND_FLAG_TOKEN (1 << 0)
+ 	__s32		iommufd;
+ 	__u32		out_devid;
++	__aligned_u64	token_uuid_ptr;
+ };
+ 
+ #define VFIO_DEVICE_BIND_IOMMUFD	_IO(VFIO_TYPE, VFIO_BASE + 18)
+
+base-commit: 32b2d3a57e26804ca96d82a222667ac0fa226cb7
+-- 
+2.43.0
+
 
