@@ -1,165 +1,155 @@
-Return-Path: <kvm+bounces-52495-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52496-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EB24B05B82
-	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 15:21:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BFE0B05CCD
+	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 15:36:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B949560090
-	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 13:20:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 094BD3A87DC
+	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 13:31:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51F2B2E2F12;
-	Tue, 15 Jul 2025 13:20:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA9102397BF;
+	Tue, 15 Jul 2025 13:27:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qPp6ElAc"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="D3eImw9K"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E460B2E2EE9
-	for <kvm@vger.kernel.org>; Tue, 15 Jul 2025 13:20:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 369C08633F;
+	Tue, 15 Jul 2025 13:27:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752585624; cv=none; b=K91YQp/8b0n4MGIhZoIMbSpNGQeKZUaQ0jLdCtlIyiWvYJpsJyYFOCsnVTqH+MYwWX7YdyvqUwcTGZYiP1pJMO2/cNZce+lBE6dEAksJw+a3T25eGwf2oU2T7BZOPQnoHutjOL5A73EtYY5dbMVWAGi3CJZ4l+GjY5Sirbi+oVI=
+	t=1752586070; cv=none; b=XW177bFAVIStleUpUCvTjmirGm2yKrBPHPZZ/GpUOAoQia9F/gx1ae1uOKSePH8s3Qxq4hNxGBuNYzj7Nu9SrHk4OXg6XMSKKjt7irt8dvVqeyNn/3QDb1NRlRBVfUlTTRvpsueWlWlbylxupqfHMU7iJ40ggaIfCLVeQc/BkN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752585624; c=relaxed/simple;
-	bh=VR+8NUW3mL4ffGA48bjJUkuulhr2EyhWFt/DyW2IpGM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Acx1S/j+0ZEJkNPAxKDKiWUJ2fNlYxa8GhDAcTq+JHp/vslgZItTeLAdC4jWi1I8dxp9R5x0bAe5sDDFT9Yt6+DA0SrZyLsWEE/Esb1uqyRUcELau4CYBb5hLCTrDVRcFHiB5yMRGOmTwcr+hIqO0+XqXwSdcVyA2rlxcnsbdT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qPp6ElAc; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2357c61cda7so123865ad.1
-        for <kvm@vger.kernel.org>; Tue, 15 Jul 2025 06:20:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752585622; x=1753190422; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WlCJGXh+DOqyEfoBPhnw3kKyfxuvyf4oF8jquZF4T+0=;
-        b=qPp6ElAcn3YZzdeLnh2XO09IHE6zFhv1bXpkiScncmXrWm+oRv0JH+0zgCWQ+t4GHc
-         yUAPq2ns1xt+PpVIisxZyLUADFcF6CEoatgpRZXQFT41b/WlCTGvEQrtRicRW7sElm+s
-         fqyQWQrpNhOqcWRomiy1Zplct2cJqc4U9SOYha3Gz0F9f30Tg+N9RiXAjjAmwCTLvMAD
-         HLinsxohWorTD8+Kj58hHZJFwZaHakvHBFbAlsB7HPzQiUpcdOKilm/K4B1iSRDmHXTl
-         /oA2BRVm1mMmFYB3QCXZZH0pkUNLS5hDVKDD94vHzBOlqHb0YFZANKCUZOmzMsPRvKvs
-         uyNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752585622; x=1753190422;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WlCJGXh+DOqyEfoBPhnw3kKyfxuvyf4oF8jquZF4T+0=;
-        b=NOcGEiDj7SAv6hmfzgnrexa9EHyAFSGgxHRXOAvNZOhUk/PkeHjKrg2ntqG0WNNpNu
-         mDblheQytjmuz0KfZ1k4cLjIxfeg6o2jgH0CoDMK+/oDUCK7uzYX+qoDQx2a6vfUDFqp
-         BSERjIfu4LwAFNzuOEva0BK2tYXOtoP0onWvpfjgvzzwsSyoC98ubul6IjrH/G8fpy1+
-         Q1IgNcVUJw9n0POq/LDCV5DqBQNuoKTwb15UW5q0P9XUvkDI1cSe2po2+wlDyfpW/54u
-         om7Sik9ICqwFMsFSutsUhZXueElULCDCCvjrFpgvQ0grP4Sd2DWMy2w3nmVNHWvbEdjD
-         2gTg==
-X-Gm-Message-State: AOJu0YzJKUFpSJbs6V9giHbzk5mFDIMzzcHf8lj9MG5KN3xc8i6POGKe
-	XYZsQ+l9b7P0GqXvJYRK1IX6cVvr0gFtZmgXZRfyRVmSfMI3YDfd55U2lsZcwXH/lCnPLbEHXu3
-	tOxIgKuubDSOz8mEAqeJRAA2UjqkDEGt8kZ+Yo1ze
-X-Gm-Gg: ASbGncuDZgSO06Rm1cGwhvaeh5DSFhV89Bp7QLGx8lJ2f5sAIj1SKVFDDLU6FUFpekS
-	OQ4BN/JuPeCYyAH85ZyVSc5KDH87VEn3hBBJcOSxG5sfsXSX1xB5xoMj4cesLkMhtqBaMcJz2OW
-	gOT3uCKiObnAPw/rsA5/u/SINOkSbqxpPVdVhWG7zA4t+ou6R6RXAWzS6u7zPyGocKvi05bhXc3
-	SL7LlwfsUrCFkDY3E83dalsA24g/fzS+/rJTqs=
-X-Google-Smtp-Source: AGHT+IFmDnj7+7K2+mnfOTNdR+Aw+YaytnwDDjpn3qAQ9yqrximLoYRf4l3rk/6s3TFG9z/SXMskhFKqUBehgiK3Wys=
-X-Received: by 2002:a17:902:e84a:b0:234:c37:85a with SMTP id
- d9443c01a7336-23e1ab85c7amr2901485ad.24.1752585621695; Tue, 15 Jul 2025
- 06:20:21 -0700 (PDT)
+	s=arc-20240116; t=1752586070; c=relaxed/simple;
+	bh=piGD4FwRVCAt6B4eBAwBCwgyfxtHlNrnruAIbLdI6GM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Kv/eLH+cAfwe8DgTqpJ8b7RXIswSYGR6q/rvBZv5TSnD+AMKAI/E9oSL2sp6SuXBxG6g0L6zOPxtdOCOqt3P8I6++TDifmvt1fmTGwQzcAenw0sX1SrNvN7ZSnrpmwef3jwG0ena7EbSdAVHfr+swj0tinf0+aeqOzppbN0Nz08=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=D3eImw9K; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1752586068; x=1784122068;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=piGD4FwRVCAt6B4eBAwBCwgyfxtHlNrnruAIbLdI6GM=;
+  b=D3eImw9KKG4NG0iSZdmGSnRQBWarxv9xT6UKTCGrMg6ixeejJnKTeYKV
+   Rwtn6PnQGFe9ZcmayLXefT6P9w1NycoVh47BO8ecQ7CPq5B4Yv0eLi1rC
+   fgnuvVgzQhNdwUwUd7rcNgo1i6ymdZbUVV9fty+E4ZX0j1dcWHDIAQK5J
+   snVqp7wujXggsMuTxEsFEr/oBEM1p8qh7liWBiOKJHGA5o1o/KzkPfXNr
+   RodFnG6JzSiZGEcnpBP31gQI7wk4LM5ydJjFtIUG2LHmELztkB7VLbJjO
+   6D62/4/Gefh5Zo8UicTYGEGt4lcNFBpykcV12JgVWpUvKIOv4z58oN8Z+
+   A==;
+X-CSE-ConnectionGUID: xyZsN/c+RAe9PYctKXePHw==
+X-CSE-MsgGUID: 6RgXSpLfQ6GMSzDzT5I1Ag==
+X-IronPort-AV: E=McAfee;i="6800,10657,11493"; a="53918396"
+X-IronPort-AV: E=Sophos;i="6.16,313,1744095600"; 
+   d="scan'208";a="53918396"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2025 06:27:47 -0700
+X-CSE-ConnectionGUID: XAO5LoGBRWir+UkimXidwg==
+X-CSE-MsgGUID: x40WA/RnR3uqahYvAJh38w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,313,1744095600"; 
+   d="scan'208";a="156638325"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2025 06:27:43 -0700
+Message-ID: <e635c41e-55be-408d-ab43-7875021a9ecc@intel.com>
+Date: Tue, 15 Jul 2025 21:27:40 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250613005400.3694904-1-michael.roth@amd.com> <20250613005400.3694904-4-michael.roth@amd.com>
-In-Reply-To: <20250613005400.3694904-4-michael.roth@amd.com>
-From: Vishal Annapurve <vannapurve@google.com>
-Date: Tue, 15 Jul 2025 06:20:09 -0700
-X-Gm-Features: Ac12FXw0-WaLjY8qLo4gIdV3Uj1d2qvRKcayg-mqAaNlcSi7aOXIlvsa9VQBB5w
-Message-ID: <CAGtprH9gtG0s9ZCRJXx_EkRzLnBcZdbjQcOYVP_g9PzKcbkVwA@mail.gmail.com>
-Subject: Re: [PATCH RFC v1 3/5] KVM: guest_memfd: Call arch invalidation hooks
- when converting to shared
-To: Michael Roth <michael.roth@amd.com>
-Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, david@redhat.com, tabba@google.com, 
-	ackerleytng@google.com, ira.weiny@intel.com, thomas.lendacky@amd.com, 
-	pbonzini@redhat.com, seanjc@google.com, vbabka@suse.cz, joro@8bytes.org, 
-	pratikrajesh.sampat@amd.com, liam.merwick@oracle.com, yan.y.zhao@intel.com, 
-	aik@amd.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests patch 1/5] x86/pmu: Add helper to detect Intel
+ overcount issues
+To: Dapeng Mi <dapeng1.mi@linux.intel.com>,
+ Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Jim Mattson <jmattson@google.com>, Mingwei Zhang <mizhang@google.com>,
+ Zide Chen <zide.chen@intel.com>, Das Sandipan <Sandipan.Das@amd.com>,
+ Shukla Manali <Manali.Shukla@amd.com>, Yi Lai <yi1.lai@intel.com>,
+ Dapeng Mi <dapeng1.mi@intel.com>, dongsheng <dongsheng.x.zhang@intel.com>
+References: <20250712174915.196103-1-dapeng1.mi@linux.intel.com>
+ <20250712174915.196103-2-dapeng1.mi@linux.intel.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20250712174915.196103-2-dapeng1.mi@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jun 12, 2025 at 5:56=E2=80=AFPM Michael Roth <michael.roth@amd.com>=
- wrote:
->
-> When guest_memfd is used for both shared/private memory, converting
-> pages to shared may require kvm_arch_gmem_invalidate() to be issued to
-> return the pages to an architecturally-defined "shared" state if the
-> pages were previously allocated and transitioned to a private state via
-> kvm_arch_gmem_prepare().
->
-> Handle this by issuing the appropriate kvm_arch_gmem_invalidate() calls
-> when converting ranges in the filemap to a shared state.
->
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
+On 7/13/2025 1:49 AM, Dapeng Mi wrote:
+> From: dongsheng <dongsheng.x.zhang@intel.com>
+> 
+> For Intel Atom CPUs, the PMU events "Instruction Retired" or
+> "Branch Instruction Retired" may be overcounted for some certain
+> instructions, like FAR CALL/JMP, RETF, IRET, VMENTRY/VMEXIT/VMPTRLD
+> and complex SGX/SMX/CSTATE instructions/flows.
+> 
+> The detailed information can be found in the errata (section SRF7):
+> https://edc.intel.com/content/www/us/en/design/products-and-solutions/processors-and-chipsets/sierra-forest/xeon-6700-series-processor-with-e-cores-specification-update/errata-details/
+> 
+> For the Atom platforms before Sierra Forest (including Sierra Forest),
+> Both 2 events "Instruction Retired" and "Branch Instruction Retired" would
+> be overcounted on these certain instructions, but for Clearwater Forest
+> only "Instruction Retired" event is overcounted on these instructions.
+> 
+> So add a helper detect_inst_overcount_flags() to detect whether the
+> platform has the overcount issue and the later patches would relax the
+> precise count check by leveraging the gotten overcount flags from this
+> helper.
+> 
+> Signed-off-by: dongsheng <dongsheng.x.zhang@intel.com>
+> [Rewrite comments and commit message - Dapeng]
+> Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+> Tested-by: Yi Lai <yi1.lai@intel.com>
 > ---
->  virt/kvm/guest_memfd.c | 22 ++++++++++++++++++++++
->  1 file changed, 22 insertions(+)
->
-> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-> index b77cdccd340e..f27e1f3962bb 100644
-> --- a/virt/kvm/guest_memfd.c
-> +++ b/virt/kvm/guest_memfd.c
-> @@ -203,6 +203,28 @@ static int kvm_gmem_shareability_apply(struct inode =
-*inode,
->         struct maple_tree *mt;
->
->         mt =3D &kvm_gmem_private(inode)->shareability;
+>   lib/x86/processor.h | 17 ++++++++++++++++
+>   x86/pmu.c           | 47 +++++++++++++++++++++++++++++++++++++++++++++
+>   2 files changed, 64 insertions(+)
+> 
+> diff --git a/lib/x86/processor.h b/lib/x86/processor.h
+> index 62f3d578..3f475c21 100644
+> --- a/lib/x86/processor.h
+> +++ b/lib/x86/processor.h
+> @@ -1188,4 +1188,21 @@ static inline bool is_lam_u57_enabled(void)
+>   	return !!(read_cr3() & X86_CR3_LAM_U57);
+>   }
+>   
+> +static inline u32 x86_family(u32 eax)
+> +{
+> +	u32 x86;
 > +
-> +       /*
-> +        * If a folio has been allocated then it was possibly in a privat=
-e
-> +        * state prior to conversion. Ensure arch invalidations are issue=
-d
-> +        * to return the folio to a normal/shared state as defined by the
-> +        * architecture before tracking it as shared in gmem.
-> +        */
-> +       if (m =3D=3D SHAREABILITY_ALL) {
-> +               pgoff_t idx;
+> +	x86 = (eax >> 8) & 0xf;
 > +
-> +               for (idx =3D work->start; idx < work->start + work->nr_pa=
-ges; idx++) {
+> +	if (x86 == 0xf)
+> +		x86 += (eax >> 20) & 0xff;
+> +
+> +	return x86;
+> +}
+> +
+> +static inline u32 x86_model(u32 eax)
+> +{
+> +	return ((eax >> 12) & 0xf0) | ((eax >> 4) & 0x0f);
+> +}
 
-It is redundant to enter this loop for VM variants that don't need
-this loop e.g. for pKVM/TDX. I think KVM can dictate a set of rules
-(based on VM type) that guest_memfd will follow for memory management
-when it's created, e.g. something like:
-1) needs pfn invalidation
-2) needs zeroing on shared faults
-3) needs zeroing on allocation
+It seems to copy the implementation of kvm selftest.
 
-> +                       struct folio *folio =3D filemap_lock_folio(inode-=
->i_mapping, idx);
-> +
-> +                       if (!IS_ERR(folio)) {
-> +                               kvm_arch_gmem_invalidate(folio_pfn(folio)=
-,
-> +                                                        folio_pfn(folio)=
- + folio_nr_pages(folio));
-> +                               folio_unlock(folio);
-> +                               folio_put(folio);
-> +                       }
-> +               }
-> +       }
-> +
->         return kvm_gmem_shareability_store(mt, work->start, work->nr_page=
-s, m);
->  }
->
-> --
-> 2.25.1
->
+I need to point it out that it's not correct (because I fixed the 
+similar issue on QEMU recently).
+
+We cannot count Extended Model ID unconditionally. Intel counts Extended 
+Model when (base) Family is 0x6 or 0xF, while AMD counts EXtended Model 
+when (base) Family is 0xF.
+
+You can refer to kernel's x86_model() in arch/x86/lib/cpu.c, while it 
+optimizes the condition to "family >= 0x6", which seems to have the 
+assumption that Intel doesn't have processor with family ID from 7 to 
+0xe and AMD doesn't have processor with family ID from 6 to 0xe.
 
