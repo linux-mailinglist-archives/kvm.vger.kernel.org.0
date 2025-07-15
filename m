@@ -1,210 +1,100 @@
-Return-Path: <kvm+bounces-52453-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52460-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A41D9B054E8
-	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 10:31:28 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5161B05520
+	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 10:40:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA2473A9DC9
-	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 08:31:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2B5967ADC20
+	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 08:37:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D16F526D4DA;
-	Tue, 15 Jul 2025 08:31:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4550D275851;
+	Tue, 15 Jul 2025 08:38:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LlNIijNk"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="kYm/zufu"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 060671D5ABA;
-	Tue, 15 Jul 2025 08:31:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCD6A25D55D;
+	Tue, 15 Jul 2025 08:38:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752568282; cv=none; b=u8SR3XxCSa8wI3xSW3RqfsdydfawdCwdPJ0vHQuRPiVFQSZemSRYpJ/mbsvWXH2dMR+/emEynpOnr0AM3Tnx4D9uX6ca+DkVnuBeQ69liK3MZGeLqzHIRMhK8y275Ds2AumYoiL2g2kcG3odNin+HFPLcP41B0dv6IjdiaTJEaw=
+	t=1752568712; cv=none; b=Fl0IOH9FTrmmXCE2iEXbrqDpmyiAT9bxAs8xsf51T8hsDF/R5EfrNA7Gh26DIRttf0qGpLRHGNFfiwFsqApAL17xktPS0Qzrb2UXcRgM/hDxxVbsH7eJFCE+8g0aZFBKM0lQcoekrN00yj56gmmBQXkt0QVrSDp6hB8L7tb3Y08=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752568282; c=relaxed/simple;
-	bh=vc8sRdp2JkS0f6MKjzIVxwH/P9BFLMdE+QPnjQlwYQI=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kiAzgo9VlsuAL7xvw52fDaRjjWcfKS2XOR67QmG+pyE+c0inFb5phMcFYS3V/jNsz04HPSzbGQTjrQNuWRDeM2ZvnLs/MoPo2/ieatIgBF1/Zydpq/2tfph5npuEgJlDaHSXP3SCPzuDKHOnubyE6ADVM6PM0Ocpaj4M8dWwn8Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LlNIijNk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E3FCC4CEE3;
-	Tue, 15 Jul 2025 08:31:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752568281;
-	bh=vc8sRdp2JkS0f6MKjzIVxwH/P9BFLMdE+QPnjQlwYQI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LlNIijNklPQOePOENYJKmMSyRYEpLVgmZUM+p2trP4XEl+EVWsWzniSK914ybz6Nq
-	 Kndd87u/GPxZMCK7WuuBwYoQrdwOPrFPUML6HFiUF4+is3D/ZJJF4wXUgGx/Si4DL5
-	 /RUg6+TYDFsEDievEqzV1QD6KK6WFMXGvzAoICOrl7tBLpxzexv0vx0eDFbk+LWzsQ
-	 nURsAZx2+jLx7hWOKZ4vU+Qkh8zpyelO/M+3Kt3xcJGXmY833vC4p7+T6WhmNMIa1Q
-	 GJNmYJpk4A7p6L7iOJWUIk1T2Pi4FcXwUVw5+EQfV7g0fUd5wCJQm1e47XHvt4S87z
-	 VEJjqpPrdWBkQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1ubb4I-00Fndi-N4;
-	Tue, 15 Jul 2025 09:31:18 +0100
-Date: Tue, 15 Jul 2025 09:31:18 +0100
-Message-ID: <86zfd597op.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	syzbot+4e09b1432de3774b86ae@syzkaller.appspotmail.com
-Subject: Re: [PATCH] KVM: arm64: Clear pending exception state before injecting a new one
-In-Reply-To: <aHX6XXhSSnHL_T1d@linux.dev>
-References: <20250714144636.3569479-1-maz@kernel.org>
-	<aHX6XXhSSnHL_T1d@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1752568712; c=relaxed/simple;
+	bh=+vwArnrY1WUKpHwVAhWW4AdnqAXxb7+tLN01yLid6D8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Slkfyg+ej85HvkNiD9XRqgOlMG9Xj8Y6f8JtSmsRy6YT7oGS5Dv1+ezdrTH0A7hfh+dZBl1dzLDfz28nDTGHtXrqee1LthMHsTfkuNkTCH/ZtzhmJMYhLcVBCN3UIY395/hyFHSa3yjSWjYYoG7zAlu/n5pnr05KnNjPll7lkgI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=kYm/zufu; arc=none smtp.client-ip=90.155.92.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Transfer-Encoding:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+	Sender:Reply-To:Content-ID:Content-Description;
+	bh=0T1MAaef5TRDgYb2ggWbaAQ7P+Pjl4UPCbAZTCdx3jU=; b=kYm/zuful5YpIcQKeAogobkh5w
+	gtQgGyCJvrx88F9aqMMCBThiUhl8tokdLvPaee1EvNBGSJAYFMMp8yBW3mg4Q4+/sSRLHUuLbSs60
+	edg3jsXa+qD1hGBCyJlwoyzaPK4/QjexBONi1etGhmU1pUcG6P6pCna+AR5KtJZ9cw127OtcBF36s
+	3UQ/FxrqQ/wnDTcsiJXPhbrO8CP/w+DY3zMWaKbZ6DzPXgzTF5UVEZTxb+osOwHsOtKJ7xlfgjTyv
+	uBqEZKmTGLj5GFwPkC8Dzl4ZRzMDdJ0eMf6+3a1/p2Wl98qKQIYzhVpMwirc/DPG8dMQM/Inwf90o
+	CwVwtdzg==;
+Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
+	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1ubbAx-00000009rLY-34gi;
+	Tue, 15 Jul 2025 08:38:12 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id 68E1E3001AA; Tue, 15 Jul 2025 10:38:10 +0200 (CEST)
+Date: Tue, 15 Jul 2025 10:38:10 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Cc: x86@kernel.org, kys@microsoft.com, haiyangz@microsoft.com,
+	wei.liu@kernel.org, decui@microsoft.com, tglx@linutronix.de,
+	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+	hpa@zytor.com, seanjc@google.com, pbonzini@redhat.com,
+	ardb@kernel.org, kees@kernel.org, Arnd Bergmann <arnd@arndb.de>,
+	gregkh@linuxfoundation.org, jpoimboe@kernel.org,
+	linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, linux-efi@vger.kernel.org,
+	samitolvanen@google.com, ojeda@kernel.org
+Subject: Re: [PATCH v3 16/16] objtool: Validate kCFI calls
+Message-ID: <20250715083810.GN1613200@noisy.programming.kicks-ass.net>
+References: <20250714102011.758008629@infradead.org>
+ <20250714103441.496787279@infradead.org>
+ <CANiq72kP7_24ChdQ+vDg+HWJB-4mKWvB9P33C9O=0W_kLt0+eA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, syzbot+4e09b1432de3774b86ae@syzkaller.appspotmail.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANiq72kP7_24ChdQ+vDg+HWJB-4mKWvB9P33C9O=0W_kLt0+eA@mail.gmail.com>
 
-On Tue, 15 Jul 2025 07:51:09 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+On Mon, Jul 14, 2025 at 06:30:09PM +0200, Miguel Ojeda wrote:
+> On Mon, Jul 14, 2025 at 12:45 PM Peter Zijlstra <peterz@infradead.org> wrote:
+> >
+> > Apparently some Rust 'core' code violates this and explodes when ran
+> > with FineIBT.
 > 
-> Hey,
+> I think this was fixed in Rust 1.88 (latest version), right? Or is
+> there an issue still?
 > 
-> On Mon, Jul 14, 2025 at 03:46:36PM +0100, Marc Zyngier wrote:
-> > Repeatedly injecting an exception from userspace without running
-> > the vcpu between calls results in a nasty warning, as we're not
-> > really keen on losing already pending exceptions.
-> > 
-> > But this precaution doesn't really apply to userspace, who can
-> > do whatever it wants (within reason). So let's simply clear any
-> > previous exception state before injecting a new one.
-> > 
-> > Note that this is done unconditionally, even if the injection
-> > ultimately fails.
-> > 
-> > Reported-by: syzbot+4e09b1432de3774b86ae@syzkaller.appspotmail.com
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> 
-> Thanks for taking a look at this. I think the correct fix is a bit more
-> involved, as:
-> 
->  - ABI prior to my patches allowed dumb things like injecting both an
->    SEA and SError from the same ioctl. With your patch I think you could
->    still get the warning to fire with serror_pending && ext_dabt_pending
-> 
->  - KVM_GET_VCPU_EVENTS is broken for 'pending' SEAs, as we assume
->    they're committed in the vCPU state immediately when they're actually
->    deferred to the next KVM_RUN.
-> 
-> I thoroughly hate the fix I have but it should address both of these
-> issues. Although the pending PC adjustment flags seem more like a
-> liability than anything else if ioctls need to flush them before
-> returning to userspace. Might look at a larger cleanup down the road.
-> 
-> Thanks,
-> Oliver
-> 
-> From 149262689dfe881542f5c5b60f9ee308a00f0596 Mon Sep 17 00:00:00 2001
-> From: Oliver Upton <oliver.upton@linux.dev>
-> Date: Mon, 14 Jul 2025 23:25:07 -0700
-> Subject: [PATCH] KVM: arm64: Commit exceptions from KVM_SET_VCPU_EVENTS
->  immediately
-> 
-> syzkaller has found that it can trip a warning in KVM's exception
-> emulation infrastructure by repeatedly injecting exceptions into the
-> guest.
-> 
-> While it's unlikely that a reasonable VMM will do this, further
-> investigation of the issue reveals that KVM can potentially discard the
-> "pending" SEA state. While the handling of KVM_GET_VCPU_EVENTS presumes
-> that userspace-injected SEAs are realized immediately, in reality the
-> emulated exception entry is deferred until the next call to KVM_RUN.
-> 
-> Hack-a-fix the immediate issues by committing the pending exceptions to
-> the vCPU's architectural state immediately in KVM_SET_VCPU_EVENTS. This
-> is no different to the way KVM-injected exceptions are handled in
-> KVM_RUN where we potentially call __kvm_adjust_pc() before returning to
-> userspace.
-> 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  arch/arm64/kvm/guest.c | 28 +++++++++++++++++++++++++++-
->  1 file changed, 27 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> index e2702718d56d..16ba5e9ac86c 100644
-> --- a/arch/arm64/kvm/guest.c
-> +++ b/arch/arm64/kvm/guest.c
-> @@ -834,6 +834,19 @@ int __kvm_arm_vcpu_get_events(struct kvm_vcpu *vcpu,
->  	return 0;
->  }
->  
-> +static void commit_pending_events(struct kvm_vcpu *vcpu)
-> +{
-> +	if (!vcpu_get_flag(vcpu, PENDING_EXCEPTION))
-> +		return;
-> +
-> +	/*
-> +	 * Reset the MMIO emulation state to avoid stepping PC after emulating
-> +	 * the exception entry.
-> +	 */
-> +	vcpu->mmio_needed = false;
-> +	kvm_call_hyp(__kvm_adjust_pc, vcpu);
-> +}
-> +
->  int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
->  			      struct kvm_vcpu_events *events)
->  {
-> @@ -843,8 +856,15 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
->  	u64 esr = events->exception.serror_esr;
->  	int ret = 0;
->  
-> -	if (ext_dabt_pending)
-> +	/*
-> +	 * Immediately commit the pending SEA to the vCPU's architectural
-> +	 * state which is necessary since we do not return a pending SEA
-> +	 * to userspace via KVM_GET_VCPU_EVENTS.
-> +	 */
-> +	if (ext_dabt_pending) {
->  		ret = kvm_inject_sea_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
-> +		commit_pending_events(vcpu);
-> +	}
->  
->  	if (ret < 0)
->  		return ret;
-> @@ -863,6 +883,12 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
->  	else
->  		ret = kvm_inject_serror(vcpu);
->  
-> +	/*
-> +	 * We could've decided that the SError is due for immediate software
-> +	 * injection; commit the exception in case userspace decides it wants
-> +	 * to inject more exceptions for some strange reason.
-> +	 */
-> +	commit_pending_events(vcpu);
->  	return (ret < 0) ? ret : 0;
->  }
+>     5595c31c3709 ("x86/Kconfig: make CFI_AUTO_DEFAULT depend on !RUST
+> or Rust >= 1.88")
 
-Yup, this seems looks reasonable. I would have liked the commit helper
-to be used just before vcpu_put(), but obviously, that's not the right
-thing to do because of the mmio_needed field.
+Oh yeah, it got fixed. Clearly I failed to update the Changelog.
 
-Reviewed-by: Marc Zyngier <maz@kernel.org>
+> >  - runtime EFI is especially henous because it also needs to disable
+> >    IBT. Basically calling unknown code without CFI protection at
+> >    runtime is a massice security issue.
+> 
+> heinous
+> massive
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Typing hard; Thanks!
 
