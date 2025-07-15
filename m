@@ -1,87 +1,87 @@
-Return-Path: <kvm+bounces-52518-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52519-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1043AB0632F
-	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 17:40:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 086C5B06353
+	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 17:44:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 171034E699F
-	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 15:39:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E56F580D33
+	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 15:43:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A85292309B3;
-	Tue, 15 Jul 2025 15:40:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A0C5246BA7;
+	Tue, 15 Jul 2025 15:43:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dEgjhxPt"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zry0ZiIl"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5319C18DF80
-	for <kvm@vger.kernel.org>; Tue, 15 Jul 2025 15:40:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97117233148
+	for <kvm@vger.kernel.org>; Tue, 15 Jul 2025 15:43:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752594016; cv=none; b=C1lqIwIG85RpJIoyRFwVYRpmg7E8MQ8Fta/ExlVmDDbE8yR32kySCwBXfB2wRlgMAy7f0l2v5FxnppPiGGLkC2J3zmXvPoeIg23kfXsTwNugCYfaY3eSlGF9Qk/4o0F6m/r9eCV/xQm8gXA7y/fnrweZzj/YSsfkM7hZtCuAqIE=
+	t=1752594226; cv=none; b=EtClJGgzLtdeZnozB5hB3El/sONDxMbqVGZzECTIZSn5e0mkQbrOOvQSBj38+n5puKwycKoD1WDDCKIdvlbZf2RVoB+7Gp5efY7mJl10pa0V19dKjeiFeDOqTdijM67PtIfnX5mQED9nderYLpD1Kf8FLNrN1AUSt+1GEdTERXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752594016; c=relaxed/simple;
-	bh=M/rABkmdhlxiGYMWbA4aNOloRqnti9HG/ZEw2946Kw4=;
+	s=arc-20240116; t=1752594226; c=relaxed/simple;
+	bh=9u4rXL9f2+7dBf3c7Jm9K1/Cr4gxItdrmBJVUBTQ6Zw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HdOD9C4fKxpUQdywsUnHY0C06+yd7UrBm2vg9ppiuGFjh7yapkMmsMhi++EclaP7hQOoH1cCh4DTXM3SQLIbqIB9gWn6YLeePzqATAEI0prbvJoWAP1GtmgwgIUgcgX3XES3MrHNasxxz1L3oOl/diavyy5UHOYHCfwakk3j4SA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dEgjhxPt; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=fi8Ka98w+3+y/rumWSVX7NaAtIzc6aVcXmwIKOW+aTe8fuznNh1pqk0rN6QHWj3cCBjYaBxYpZk0L3LKiUVUU4CEOGQ3M59OzxACb6E3OXThiJB61zmdayJOjxh32j1AxjOltmy5ZIJKnq3YfIBeVXY7jYuUqJhhV/g7BGY40c0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Zry0ZiIl; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752594014;
+	s=mimecast20190719; t=1752594223;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=4x2jlzMGApIh8vYUvg0aTLjZqP/Wbam/+YquAKpgluc=;
-	b=dEgjhxPtrGnVAsTHLL5JkUp2Ejz+vp8EAKEl2X9rvuzSK/yHgTZv3cAqVkiGo9u7lA7PN0
-	oFKVLaJ1eJjEtE6Tre5IJcAfK6iwl5xeBdTfZOpf8D3TzyxI0pr61j1dBMzx6O7XjZ+s3b
-	UFphpSLwIHBOp33hSvqr+eABB6Q4iQw=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=EVVEV06Cr3MWb3YGwMKwm90D771RfLGEYdYgZysRI0c=;
+	b=Zry0ZiIliyJXPKVMcK97kE35C5qhR/WOqfVy1a5554M5Y8dy/12+6Ks7fq3v5jltYDqBTT
+	h6ZkCCLuD+MwiMo8oYH62zHur8D2JMIe6hUM0n1PD2uFMVFmAb07ROpm9rXVsNk2c/SU6n
+	7I+pNQ1kN9muHiUdVLtAPRf0EF/kN+c=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-671-FV59YrbsMhW8v5ftUo8lzg-1; Tue, 15 Jul 2025 11:40:13 -0400
-X-MC-Unique: FV59YrbsMhW8v5ftUo8lzg-1
-X-Mimecast-MFC-AGG-ID: FV59YrbsMhW8v5ftUo8lzg_1752594012
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3a5281ba3a4so2085727f8f.0
-        for <kvm@vger.kernel.org>; Tue, 15 Jul 2025 08:40:12 -0700 (PDT)
+ us-mta-668-y-OMMpAAOo-CyucOfYQiPA-1; Tue, 15 Jul 2025 11:43:41 -0400
+X-MC-Unique: y-OMMpAAOo-CyucOfYQiPA-1
+X-Mimecast-MFC-AGG-ID: y-OMMpAAOo-CyucOfYQiPA_1752594220
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3a52bfda108so2757564f8f.3
+        for <kvm@vger.kernel.org>; Tue, 15 Jul 2025 08:43:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752594011; x=1753198811;
+        d=1e100.net; s=20230601; t=1752594220; x=1753199020;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4x2jlzMGApIh8vYUvg0aTLjZqP/Wbam/+YquAKpgluc=;
-        b=U9uPRRerBqGqTyjA5G3lcxm/Ofu6pycq9Kcn5Hs26pzfVFFRXXzfet59P7+2GQ5769
-         fxMdVMwxZM+zgsZSg1KdYIDNpsc3cJ6gzySIYyAk3PzfvnSKWx2FGeWtOsC1VBSJy87M
-         NNek1jX0yD2AXlt2A3BKZF1Ry+/Dw07jPlGP/3+VUl4hYz/PZQkAndEUjkE5mawcJJ6t
-         nBw8A3YBouWNWyotJmpWipe+24KcLnGZeSbmfLfvt+dJF1E+dKHd6QTwqV8tU7JFgw7G
-         TjV7W9RPMuJob2dhAj1FgA4CCeH0Vho5ngsh+q6YRvhKNGabM2gTEqqadXDkJmsDNksB
-         dJCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWhcnM/QFKV4GHBwBPWO5NzOW6c+6QvmPoFts/Tz+PTd/9gyPcDKfW/zoT3nBDZRKj/Pdo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwnSpxlZ7ffmn+HzVElyMUOYE7i3ofKLNnMeUnAV1X20WPVDI17
-	3CUO14jddoXWm8ydBxZNDbZ9Ahe3sAQi9G+YIA20VyKDP9gEjoYV6NqobWXj0GQoNSRK4pmYFX/
-	ha1q9dWr8ONz9lcggS4dJ8BkTWPTevEoIykklaPdd5BbrxW9rBxT0yA==
-X-Gm-Gg: ASbGncvQrSB2EXRkMwEMFqGBzb+S/z/2gGScJ1xJERJe2T3oZ/iQawNBTdWIAyiLtbP
-	FS+g8n+1Lxd5x2XjuTnmEu8yemHUl3frnVFPybcFX0auTV4tS0lpalR2WpXH5RQZg2ByJksd4ow
-	jI5UgR8ShCLYgNpgdjLLsG6WER1qzB9EUeWvMru3xTlFgwsNAwofr3RgSurob04tjjKJHUOS4JX
-	YHgjWqqfuKmfzCiq5lemJM4i6TudQIorXVK7HFiOtl6A/pHwmZmsMSSzmzttTV+JEKZsoZ1J+rb
-	NWOQ+aczn1S15ha9qwg+lPJlwcXRBBz3SvH2RCGyEvS6pJExsQQ+PUl/so7eWZNeu0hKRKy16WR
-	cTsAeCAKvdlY=
-X-Received: by 2002:a05:600c:4695:b0:450:d4a6:799e with SMTP id 5b1f17b1804b1-454f4259c7cmr145301425e9.20.1752594011263;
-        Tue, 15 Jul 2025 08:40:11 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFj/GOomg8/tuMfFm6+QQtZ8zHD+1Mr4bMdEvTBuHrv4Wc3OP8vgETy0L8oGZp1WPdBtBd1RA==
-X-Received: by 2002:a05:600c:4695:b0:450:d4a6:799e with SMTP id 5b1f17b1804b1-454f4259c7cmr145301085e9.20.1752594010805;
-        Tue, 15 Jul 2025 08:40:10 -0700 (PDT)
+        bh=EVVEV06Cr3MWb3YGwMKwm90D771RfLGEYdYgZysRI0c=;
+        b=r4JNs7VZdDDV9pKd/RMINa9puFyEzi+G+8D6SyWxIXTNRuxt5sYYRW+DtiOCEHMLBh
+         6FTmrTA7Nw2gdkNMMDw7IYkcCHef5RcUHUuxnQBAx2Ee80MpDHvCYcCx9sOkVGoKFJrB
+         d8O654pL/SjgcewJw+MibUGjq5Mtt5frK7Yhz/X2Q62H/bt1HbHoBDEccmFDRYgcRsZT
+         lP4SAJ/ajhjYRV9jYzPL/k+YaEg0K9gSW9KMVy9/zWUzOPVNxxmplb8a4gY3cH2VhV8e
+         gC9e6MuLwuteeW0SgYMZT5wbAkQx1pf4n4LyXu4gPcH3pc+B8HHhHMzS6gI0zAeYuUVl
+         tBlw==
+X-Forwarded-Encrypted: i=1; AJvYcCXAyFALm+SHYpK2Qn7D4aikE9ImdpIBB2qWYTy8fjWXmCtWStTbvJskJMn52GIiPLGU1hE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxEa/cpVbrAyHch2WlSbzdrQ78R5CDefPgIpKvRk4Tn4Il2rLfH
+	I0SBsfqUjfpF+9eIlvnEXcAB0C3P6275D4WjkfNHYpwOaphYihxfOIoktAV4GU+gGEOZep0FQZj
+	4Vr0SmG18f/c4It22qq9Tj2duY5wdRR3dKkxvH+8lys2RRx90ZG8OBA==
+X-Gm-Gg: ASbGncsY4U/jCRqg06jOwSosrWX2QZR1Hl8cf9bp7M02hJFyf/YkntcEK3324VvU8yL
+	IQawqmjNaJpu6TnApxsIdkT52tLbqVxlLCZJ0bm07F+pHjUoIXtgQNIeum2+HFtSiSMLV2kEDOx
+	9eIethSLa2ZZ/wEL9kZr7lLPjWh6M9/8nyrs8lyWOkr+iKWufdbva/bCyQeXCAhWIh7SD1mps6w
+	5v5/bnKOyOLfmT+NiZ8SZNLXj5E/rfOjSRyNywfhdFO4G5gi7561NFZyl3viv0vrp3jXh+lXfFw
+	Iq3YOH7LV6jIwD2BU3hZZr5ZpVB+0YjVrpq2KOzXIw4zD6RGG2tqA4zP1FsbNOmajNIxzSTFavN
+	2CazuuBAi9WA=
+X-Received: by 2002:a05:6000:178c:b0:3a6:d92f:b7a0 with SMTP id ffacd0b85a97d-3b5f359d05fmr12157630f8f.58.1752594220237;
+        Tue, 15 Jul 2025 08:43:40 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHQdixTkib7IKderVRJRpNZBQyOcCCqBywj9UR7izGUcjMQdWUcilMbnriF7fEvi4gh/vD27w==
+X-Received: by 2002:a05:6000:178c:b0:3a6:d92f:b7a0 with SMTP id ffacd0b85a97d-3b5f359d05fmr12157605f8f.58.1752594219735;
+        Tue, 15 Jul 2025 08:43:39 -0700 (PDT)
 Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4560f844c2dsm93287775e9.0.2025.07.15.08.40.09
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b5e8e26daasm15773872f8f.91.2025.07.15.08.43.38
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Jul 2025 08:40:10 -0700 (PDT)
-Message-ID: <efd96b88-284c-4853-93ea-9e1b81b1ffe7@redhat.com>
-Date: Tue, 15 Jul 2025 17:40:08 +0200
+        Tue, 15 Jul 2025 08:43:39 -0700 (PDT)
+Message-ID: <b0ff2033-b8ab-4cee-833c-83e70951a9d9@redhat.com>
+Date: Tue, 15 Jul 2025 17:43:37 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -89,7 +89,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v2 04/13] virtio: serialize extended features state
+Subject: Re: [PATCH RFC v2 08/13] qmp: update virtio features map to support
+ extended features
 To: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>, qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
  Dmitry Fleytman <dmitry.fleytman@gmail.com>, Jason Wang
@@ -101,47 +102,75 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>,
  Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>,
  kvm@vger.kernel.org
 References: <cover.1752229731.git.pabeni@redhat.com>
- <d0f97a8157c718dcb0799353394e1469153c6b22.1752229731.git.pabeni@redhat.com>
- <08285c9c-f522-4c64-ba3b-4fa533e42962@rsg.ci.i.u-tokyo.ac.jp>
+ <5f5a6718fa5ae82d5cd3b73523deea41089ffeb5.1752229731.git.pabeni@redhat.com>
+ <aab8c434-364e-4305-9d8b-943eb0c98406@rsg.ci.i.u-tokyo.ac.jp>
 Content-Language: en-US
 From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <08285c9c-f522-4c64-ba3b-4fa533e42962@rsg.ci.i.u-tokyo.ac.jp>
+In-Reply-To: <aab8c434-364e-4305-9d8b-943eb0c98406@rsg.ci.i.u-tokyo.ac.jp>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 7/15/25 9:24 AM, Akihiko Odaki wrote:
+On 7/15/25 9:59 AM, Akihiko Odaki wrote:
 > On 2025/07/11 22:02, Paolo Abeni wrote:
->> +     */
->> +    QEMU_BUILD_BUG_ON(VIRTIO_FEATURES_DWORDS != 2);
->> +    if (virtio_128bit_features_needed(vdev)) {
+>> @@ -785,11 +821,12 @@ VirtioStatus *qmp_x_query_virtio_status(const char *path, Error **errp)
+>>           status->vhost_dev->nvqs = hdev->nvqs;
+>>           status->vhost_dev->vq_index = hdev->vq_index;
+>>           status->vhost_dev->features =
+>> -            qmp_decode_features(vdev->device_id, hdev->features);
+>> +            qmp_decode_features(vdev->device_id, hdev->features_array);
+>>           status->vhost_dev->acked_features =
+>> -            qmp_decode_features(vdev->device_id, hdev->acked_features);
+>> +            qmp_decode_features(vdev->device_id, hdev->acked_features_array);
+>>           status->vhost_dev->backend_features =
+>> -            qmp_decode_features(vdev->device_id, hdev->backend_features);
+>> +            qmp_decode_features(vdev->device_id, hdev->backend_features_array);
+>> +
+>>           status->vhost_dev->protocol_features =
+>>               qmp_decode_protocols(hdev->protocol_features);
+>>           status->vhost_dev->max_queues = hdev->max_queues;
+>> diff --git a/hw/virtio/virtio-qmp.h b/hw/virtio/virtio-qmp.h
+>> index 245a446a56..e0a1e49035 100644
+>> --- a/hw/virtio/virtio-qmp.h
+>> +++ b/hw/virtio/virtio-qmp.h
+>> @@ -18,6 +18,7 @@
+>>   VirtIODevice *qmp_find_virtio_device(const char *path);
+>>   VirtioDeviceStatus *qmp_decode_status(uint8_t bitmap);
+>>   VhostDeviceProtocols *qmp_decode_protocols(uint64_t bitmap);
+>> -VirtioDeviceFeatures *qmp_decode_features(uint16_t device_id, uint64_t bitmap);
+>> +VirtioDeviceFeatures *qmp_decode_features(uint16_t device_id,
+>> +                                          const uint64_t *bitmap);
+>>   
+>>   #endif
+>> diff --git a/qapi/virtio.json b/qapi/virtio.json
+>> index 73df718a26..f0442e144b 100644
+>> --- a/qapi/virtio.json
+>> +++ b/qapi/virtio.json
+>> @@ -488,14 +488,18 @@
+>>   #     unique features)
+>>   #
+>>   # @unknown-dev-features: Virtio device features bitmap that have not
+>> -#     been decoded
+>> +#     been decoded (lower 64 bit)
+>> +#
+>> +# @unknown-dev-features-dword2: Virtio device features bitmap that have not
+>> +#     been decoded (bits 65-128)
+>>   #
+>>   # Since: 7.2
+>>   ##
+>>   { 'struct': 'VirtioDeviceFeatures',
+>>     'data': { 'transports': [ 'str' ],
+>>               '*dev-features': [ 'str' ],
+>> -            '*unknown-dev-features': 'uint64' } }
+>> +            '*unknown-dev-features': 'uint64',
+>> +            '*unknown-dev-features-dword2': 'uint64' } }
 > 
-> There is no need to distinguish virtio_128bit_features_needed() and 
-> virtio_64bit_features_needed() here.
+> Let's omit "dword" for consistency with unknown-dev-features, which is 
+> also uint64 but don't have the keyword.
 
-Double checking I'm reading the above correctly. Are you suggesting to
-replace this chunk with something alike:
+Ok. Can I infer that is actually legit to update a qapi struct
+definition? It's not clear to me it such change violates any qemu
+assumptions.
 
-    if (virtio_64bit_features_needed(vdev)) {
-        /* The 64 highest bit has been cleared by the previous
-         *  virtio_features_from_u64() and ev.
-         * initialized as needed when loading
-         * "virtio/128bit_features"*/
-        uint64_t *val = vdev->guest_features_array;
-
-        if (virtio_set_128bit_features_nocheck_maybe_co(vdev, val) < 0)
-// ...
-
-> For the 32-bit case, it will be simpler to have an array here and use 
-> virtio_set_128bit_features_nocheck_maybe_co() instead of having 
-> virtio_set_features_nocheck_maybe_co().
-
-Again double checking I'm parsing the above correctly. You are
-suggesting to dismiss the  virtio_set_features_nocheck_maybe_co() helper
-entirely and use virtio_set_128bit_features_nocheck_maybe_co() even when
-only 32bit features are loaded. Am I correct?
-
-Thanks,
-
-Paolo
+/P
 
 
