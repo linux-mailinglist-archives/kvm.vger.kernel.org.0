@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-52504-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52505-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9C07B05F36
-	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 16:02:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B129B05F2C
+	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 16:01:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1E16D1C26A66
-	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 13:54:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BCCA81C40143
+	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 13:55:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 393652EE5F4;
-	Tue, 15 Jul 2025 13:45:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8EAD2EF291;
+	Tue, 15 Jul 2025 13:46:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="S1ENMm7f"
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="Phz6hZP+"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtpbgsg1.qq.com (smtpbgsg1.qq.com [54.254.200.92])
+Received: from smtpbgeu1.qq.com (smtpbgeu1.qq.com [52.59.177.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4D362EE5E9;
-	Tue, 15 Jul 2025 13:45:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.92
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB5C62ECE8D;
+	Tue, 15 Jul 2025 13:46:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.59.177.22
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752587141; cv=none; b=IF+2ex7YjdRO79mZroqG8qVGmA3JViskl6ri6vPaJRIkdKJUK1ui0yEb4HmjAqTNfZfX0N49rXQzLX885PkXdnACX0h8IibWbdPIpHiGdUR5ZHpuTKcAcYnpYxMk4OVBg++coc/HvaGBpWpEBt/jFtU1vyQ5RYIGn4zLKjQHub0=
+	t=1752587175; cv=none; b=AiwCewEm0Ljj0WHaPVml8hD0tcGCxIwccImsQ4DGpRcuMXBEdZDCasDMPyP5LcIygSY11gHDMrN5P97mCfscwnpbW+k4OUsyPkhfp0yf1NpS5P/vAKY+hbu0GEs8B5usm+riKBm1+fvAb705iN6h9vtd0iKtA9mfUk9pVWJwl6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752587141; c=relaxed/simple;
-	bh=HjU6PxyUlCUhs2dvYf0iMA7Zry8aPzm7Aen+lVRuL90=;
+	s=arc-20240116; t=1752587175; c=relaxed/simple;
+	bh=NHY04lWbnuGt7TUMVXMBAd99xrE3nzf7tN3dhvAdpFk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RJWH5dN4zZ1zo1ccstJIVZF4Ctp5eajhnww5mk5OZ+PLxNFRHM5rCQmXzgxpWQcMkpFc/C6mNNkKComh/mXB3FHTtGmXlhp6Cn3dABOUifFZvtViUsFUAmUXQKY1MOygzV1UnlZY1+wDDnAnfaFgNRAp1S3qQ/lpkoKoNo1DJXA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=S1ENMm7f; arc=none smtp.client-ip=54.254.200.92
+	 MIME-Version; b=PiTTdvSdnneMZaaZurzdfvwI+oz+gylPOybpSITVduy5HeWC6m8oLIx/WodF4G/YYAabmOGJGOgM8OKcbgKPePIsojIZANG+2XJe9D7xd7rzl3mXXYsy9qVu3A0AL+o7swmg15z47TJAg4T32469cIwVJQ/h/KpaczGrDHG/xIs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=Phz6hZP+; arc=none smtp.client-ip=52.59.177.22
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1752587135;
-	bh=ltFUUSzAPz2OoVfH54nkwDpFnO/axW/szGNu9HIiAOI=;
+	s=onoh2408; t=1752587163;
+	bh=NWDrOIeUTkfMgeyG9DirCptVDnqPmotqOLDK+VZpCcc=;
 	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=S1ENMm7fYMw+wC3Nc2T3W/1mnOrrRxwGSj+HE9H3+L091aDpIgD6Awpfjaz9oABYV
-	 ctOVZ/zt5hFQcVniHRXwpmmjkuoS0JpQZz87BbfHHONx220+fIhL/4OmFSeOxFyeKM
-	 u7o3HWlJC3p334oMD1WZaIXnaDSJIQGAOU9Q5Zo4=
-X-QQ-mid: zesmtpip2t1752587121taaa03ec6
-X-QQ-Originating-IP: IIvVAyKvuXb4Hz7pVF2rGJuCkoWUtC78LZlVFBjDx2g=
+	b=Phz6hZP+BX4JxgSZv0yx6y4RzgAezdoknG6JcU4T+5IiBA1DlhmX0IRf92dZHV7Mh
+	 Uq1gANZLNFY8pjDy9/8lguRTsytG6eIhAvdZ47kuKQzBnFqrfPZVuFOJ09ChWQabIg
+	 Yuyz5WaWnAYwlrPiMU+QMUa0YAAlPAz6Zk+N214Y=
+X-QQ-mid: zesmtpip2t1752587129tb54538eb
+X-QQ-Originating-IP: PsIrTfnu37O5BQpc09CPKOeWtbwmOWY2B4qF0spybKw=
 Received: from avenger-e500 ( [localhost])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 15 Jul 2025 21:45:17 +0800 (CST)
+	id ; Tue, 15 Jul 2025 21:45:25 +0800 (CST)
 X-QQ-SSF: 0000000000000000000000000000000
 X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 8982638937609059235
+X-BIZMAIL-ID: 9443703254596192763
 EX-QQ-RecipientCnt: 63
 From: WangYuli <wangyuli@uniontech.com>
 To: wangyuli@uniontech.com
@@ -111,9 +111,9 @@ Cc: airlied@gmail.com,
 	xen-devel@lists.xenproject.org,
 	yujiaoliang@vivo.com,
 	zhanjun@uniontech.com
-Subject: [PATCH v2 7/8] xen/xenbus: Fix typo "notifer"
-Date: Tue, 15 Jul 2025 21:44:06 +0800
-Message-ID: <906F22CD3C183048+20250715134407.540483-7-wangyuli@uniontech.com>
+Subject: [PATCH v2 8/8] scripts/spelling.txt: Add notifer||notifier to spelling.txt
+Date: Tue, 15 Jul 2025 21:44:07 +0800
+Message-ID: <A205796B545C4241+20250715134407.540483-8-wangyuli@uniontech.com>
 X-Mailer: git-send-email 2.50.0
 In-Reply-To: <BD5C52D2838AEA48+20250715134050.539234-1-wangyuli@uniontech.com>
 References: <BD5C52D2838AEA48+20250715134050.539234-1-wangyuli@uniontech.com>
@@ -126,48 +126,47 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: zesmtpip:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: NeiODhwCHPGzKHrJxxcTf/HitCFXbH2HBXsG3+PC8fVik+z9z8p47XS6
-	necdHM7/3hxZe1WJ7Z1r203loZcpiuw2nIGAV1iNiGmSgCFe+WCuV3y7E0yhElySmJt6zUG
-	woDHyKNrHpIVVNDyv698La+qDZJ8My0v42Wp7OU4g65FAMFdbd49OZzoX4xsxovZS6S0YUs
-	aItNiHZc5AfI9HbATohIh1+uaZ66EvosyJhCOaOu+DiyOR3L7dbw0gX4jQexfqxg1AOYnfA
-	UDHmKbfwy+OER5bLiHLFOajjVcMPn/6TOk7NhOR+n88aW1hXQJo5ySeNuQmtObXhLraRWdI
-	DMx1fKxc2/bvRv1vTPAz/LWihgELM7uA2W5rA1swlYbjJqyoab/kAgruKRNxxWtYb+cBxWW
-	ZRVd5jzn5WoYkX4n6A3PlJfvemk7KMaYYQzCB9cVlERkwbEzZ1RMLtpqxTXvvv023FJuY48
-	+eAeq35ePcc0t+pWhkSNw2bCNpA3eorj4s/dakzoXc4bcb4/X6C/k+htFcYG2yNKdba8cJX
-	f+ISe4ILFVDklR83oR1YfZr+Y/LgWZRU7rGoA9KS9MRzkKrr4BjuN9IkMKadqkHe7blGi68
-	Nn/YW4ckYrChK36YtqmyUDxP0pOshYXfU19vCjW9z75x6lzF6xUHLRs4la+N52u2vJuEvDM
-	AGJs9niVguRobgVgoZoxpyH6e0IY0K+TkRRPYga7QkqUBNHwROHgHiMq7iXE3DttBxZ5yn3
-	NMV2U7a62XHPXVhfQ4FjCB1yq338MRxxpiFstftH7D4+wGGMTXwEPQJlk38QYwlfvU6MYhJ
-	K73lHJKBukxE/kWUqJFF5EkYXb3X79sa49PG+QJ/YuscK+cTazJc3WOC9cFQy3dOurAiRtY
-	Li4TyBZn+guhCMs6MOUR0DFCx8Y7tP92HCEw/gfCh1mUmy/1qt7uargKHI1FhfvkL1kSdhb
-	c0CKdLGHKr7XHNVG+H/Wht+HwTU9ybdfZbO/rvULoIMxm5daQmsU+t5w1aH1zhsLexnz9wc
-	+DJq/HYOJkUibD29iB4/aIiPo0o4eorNMEAJiEmX7Fvc4L1NGyCHzn6dms/MjI1KdbPQe+M
-	jh8VEn+I2WPA3sLWULRDCGBO6yH65m2A7ffv/Wp14KFfu7dI+QxkQQ=
+X-QQ-XMAILINFO: MhWaMTxgikzcXM78z348aNip/MqyZXeaEcqps5e452C7wk+IjCoLDT5P
+	bx/+gd1zygbbCORvht4sKMoIGWIpEfRoJrGSkDTCbWGKNv/UB9dtGaVmvvcn+wt7AjsAWtP
+	vIOHA5e69i8ggVIh0HCI5l92uDyE1pkFZV9TGujQw9a3uyc3k+446kZKbZ4OaMk2hFhKz/Z
+	SYt3TCLDKfxFYpH6a8CQASXr5uNFR6wQcmuRGxC06Ic2GzK7mNtIkMDmK+VtTCbhcWDeia2
+	H9bqo6LGBdd1CK3vSDm/GiNfDvL1b1dTpLi2VGl+zPH2tebta/VgQ8y9GvVviClntMj+CX3
+	WpmubpOmgOcfR2zHV4h31YNQpCwvx09dWj1tZB+qLPUtwibshvSw61YV0n17xleed9EZ3eZ
+	7Pm1/SV+PxrroEbc327V6SG9/MOe1plIUiiqEy9OFN/EXpZGVVeePzCQOedLOsZ4FJVfmxJ
+	jodDR4VcL4s3qrLr0yfLCHFhoxJU386EaxpBp/Gd0rqcLUfDARMPJnI6VzVbTvnymhcxksp
+	5xvY8BgJMks70NMwqAr8OnfWHmUSYAVSAzmRPdkhMgzLTnQMRKBGj9t3cFSOQNOX8mcQTax
+	rFe/aP0a+gVCWOxvj1wHpqybcK2jCRJhOjWBtUagbKEqfkUlWazasSselbdD3Gv7+9xAq5x
+	l0vGyP2qFUY0GYGCsy7Ea9eyAgPdxh9uyNlQYh+CZGOoRodgoT7Fd3wt1Tb4IHvY39n/6S8
+	wfeeQmLFR7CSjgSDQy/KnmRbqjHSrJZvwnrLV4N3BWbVvqEU+FhGdmv0GI+sujt5g7FMh2t
+	/w9/NYr/Ce7ZwqWSg1/rlgcpfe5wTEsrwz1dASQ5ZimjhsPOqKCSeiT7Fz0Zm4M0GVXLxzd
+	RlqqGfrfRxbk+MU8XY2N0xK9fE6n65s6y9WUcSWaI872AEbClgCmbTdVMZ6+gFGP6WB01Ve
+	eHVUqt5gS8ma4gJVcQxx5bmgmEuQKvNeCDorxP28mFZgb6w9GG+lfxgJewMSOnTPAI1GYAE
+	ZjGgB98iRoJNIy3entSX2Y1Rda99NmnrGL7FBTstavaUIfLzDzH6kddcSosZM03IZA7ufk1
+	TpzbO5K0Eae
 X-QQ-XMRINFO: NS+P29fieYNw95Bth2bWPxk=
 X-QQ-RECHKSPAM: 0
 
-There is a spelling mistake of 'notifer' in the comment which
-should be 'notifier'.
+This typo was not listed in scripts/spelling.txt, thus it was more
+difficult to detect. Add it for convenience.
 
 Link: https://lore.kernel.org/all/B3C019B63C93846F+20250715071245.398846-1-wangyuli@uniontech.com/
 Signed-off-by: WangYuli <wangyuli@uniontech.com>
 ---
- include/xen/xenbus.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ scripts/spelling.txt | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/include/xen/xenbus.h b/include/xen/xenbus.h
-index 3f90bdd387b6..00b84f2e402b 100644
---- a/include/xen/xenbus.h
-+++ b/include/xen/xenbus.h
-@@ -180,7 +180,7 @@ int xenbus_printf(struct xenbus_transaction t,
-  * sprintf-style type string, and pointer. Returns 0 or errno.*/
- int xenbus_gather(struct xenbus_transaction t, const char *dir, ...);
- 
--/* notifer routines for when the xenstore comes up */
-+/* notifier routines for when the xenstore comes up */
- extern int xenstored_ready;
- int register_xenstore_notifier(struct notifier_block *nb);
- void unregister_xenstore_notifier(struct notifier_block *nb);
+diff --git a/scripts/spelling.txt b/scripts/spelling.txt
+index c9a6df5be281..d824c4b17390 100644
+--- a/scripts/spelling.txt
++++ b/scripts/spelling.txt
+@@ -1099,6 +1099,7 @@ notication||notification
+ notications||notifications
+ notifcations||notifications
+ notifed||notified
++notifer||notifier
+ notity||notify
+ notfify||notify
+ nubmer||number
 -- 
 2.50.0
 
