@@ -1,188 +1,160 @@
-Return-Path: <kvm+bounces-52531-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52532-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF23FB06624
-	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 20:42:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3225FB06643
+	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 20:47:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 301C01898FBD
-	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 18:43:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA20F3AE464
+	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 18:46:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADEF22BE635;
-	Tue, 15 Jul 2025 18:42:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 718A92BE057;
+	Tue, 15 Jul 2025 18:46:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XmU2ZhNn"
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="coooAKnf"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1487242D9B
-	for <kvm@vger.kernel.org>; Tue, 15 Jul 2025 18:42:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 185D61B042E
+	for <kvm@vger.kernel.org>; Tue, 15 Jul 2025 18:46:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752604955; cv=none; b=LeoH6F6cvVUtnvWFuVz18SKHYulsko/jk7T8xQI8RJjv1t7GcbzvHiZPKvBHb0kW1QcVduS0e5lefnZU7J97lVSZisGLXg8w68qRupH2EIG4bo3T+F0WPRTHy9ZtLvIu5Sd0qLdlbVmbHtUDOBlNoXPz2KJNHj1BzGt1ulVDdAc=
+	t=1752605213; cv=none; b=lAEsglnXFTJ4IGB5zeGz33L9dBzfJEk+kJcBzogDbf7XXYd8IkXE9HzYETNc4q+AAYcdawl90X7G5ZEEyE74f1/ybyNlCBPiaSbaL+vt7yrvr+819IJcPzfRY25wcmBsb4SKyTO2emOZCjFtXhISlJ5rBqhi+4DMMpvGf8eL6xg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752604955; c=relaxed/simple;
-	bh=s5ZR8Cnl70aU3op1u1952EDYPeq92Rsw7PQKDi50J6w=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=npgAQSHfRgd5WdSKoqupMtaVPaBCNZvAHjqc/2CCAH/msgfgid+kTAtFt8E/FXQUn9HxbymJcYOcXjbMCSvI+s42zLgCuSXVgG7K1LUeGckSbJ7+75/TAGgzRTkWRw+HtVhUyf+KFS18u3kc55DNMQf0lVJi2QUV5SgjARRiFPs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XmU2ZhNn; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752604952;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FHWKVcj3+I/wvWqZ4ODBBP3h54lJrQD+89h8230/I98=;
-	b=XmU2ZhNnAMsHgnMUI1FzYI2oJfPsU91ENR6ccxhdW4p9SXgpPQtR30DCe9iNOmNP/rDX/q
-	ZTti8uXmyG/OaT8zQ0FTQbD5PilXvcbAmOQdCgmiK1V8G8GPQStUMrzX8IB0JG0Q+aFgOj
-	cRUOpStl26q5usq4xxjsIDtl9skt5uE=
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
- [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-675-CWFhg2BaPcqvj6r8SPlbMw-1; Tue, 15 Jul 2025 14:42:31 -0400
-X-MC-Unique: CWFhg2BaPcqvj6r8SPlbMw-1
-X-Mimecast-MFC-AGG-ID: CWFhg2BaPcqvj6r8SPlbMw_1752604947
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-86cf14fd106so102687739f.2
-        for <kvm@vger.kernel.org>; Tue, 15 Jul 2025 11:42:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752604947; x=1753209747;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FHWKVcj3+I/wvWqZ4ODBBP3h54lJrQD+89h8230/I98=;
-        b=wiLZaqtqE/4K9YgPqPRZ58OhBJVGb+jSF4/18PVmWt/TSbbKv89ijE8gBZWJ9sxAeK
-         kAcSBtS1qYpiwFKyiwc9vbqq9JScCilufvhf4P5k9f3KrnGNgxVkQSZ5zGeqtzXAwGhe
-         xACVkP7a7XnCmL0QbenBScQNRgJZwOd7EmPrVKI1D+nmmxXcebs79sc9D1GrV+odwKus
-         H14XcE9Fv9YLFxq+xSymZX5uMrnuokZ0ag7+zC8lt1sEKD5pgQy3JxBjZA6Bm+LXT5a/
-         YZJdDRId08LwyJinQcECBhxPIVDnRC/R+HI43uC6MBRrUUdb0ivTn7n+b6Oi/uI8gQ+c
-         2DaQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVc1eMIFObajMtNpJvzmu4h6Iyf692MGUcF7lPJQinewMYNZNb+MtPWL7SYHtDZuezL94w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxKu9zoBTR1qVCV3aTxnXUQG0Fg8ASZUPuTbS1V+xHJ2nIDCtnz
-	I3BH60/wLBi6ydZe5moR7sREzwjt+mS59FAEtt4JrZ68A9CHU/hFSD442Bm7LMZV4pCignnAaCB
-	pUjLUNRAY9YZODjLUrsU3e8yPb0JPWzoy5JhduFo54bF9ioPAVnZpMw==
-X-Gm-Gg: ASbGncsjkq/MRPxsJFR3HYakAE5quucKmh1ujFOkNcnvpsjgIJZ8ekGo4xG4nt/o6jm
-	MW7vMnsjOJKCSCfb+IOCHg//v0wtUFfFBlTqtTSsrkQmHqRyld2wlgXhzJ66uA7JjsBU+QHF5nN
-	OuJNCAIb/aHGSnB1IpgvfMUOVsmILzF49pUk6oNP5bQVoGwZe6Lg000ZFAfBy6IJusDRTWRUceL
-	zRWUrTt0bqmbgXu54GWQfhhCP8WwuxmKBgsaUeB4b3s96ARGd4oMCIFLeVfce+PxOgKQAxUGMiK
-	U8GKM0o2GLEGEL/tebPAY4024t4n7dZmc45FElMB+2o=
-X-Received: by 2002:a05:6602:619c:b0:85a:fe80:cdd1 with SMTP id ca18e2360f4ac-879c0580553mr19252439f.0.1752604947392;
-        Tue, 15 Jul 2025 11:42:27 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGKy4ntzavpoglgjJNIISnwjoGcjFj1v0plW/t4NW2RQRcmCmInuGMexiG1Oj3xr2ay5HFnKA==
-X-Received: by 2002:a05:6602:619c:b0:85a:fe80:cdd1 with SMTP id ca18e2360f4ac-879c0580553mr19251639f.0.1752604946858;
-        Tue, 15 Jul 2025 11:42:26 -0700 (PDT)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-8796bc5a706sm322376939f.45.2025.07.15.11.42.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Jul 2025 11:42:25 -0700 (PDT)
-Date: Tue, 15 Jul 2025 12:42:23 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: "Tian, Kevin" <kevin.tian@intel.com>, "kvm@vger.kernel.org"
- <kvm@vger.kernel.org>, "aaronlewis@google.com" <aaronlewis@google.com>,
- "bhelgaas@google.com" <bhelgaas@google.com>, "dmatlack@google.com"
- <dmatlack@google.com>, "vipinsh@google.com" <vipinsh@google.com>,
- "seanjc@google.com" <seanjc@google.com>, "jrhilke@google.com"
- <jrhilke@google.com>
-Subject: Re: [PATCH] vfio/pci: Separate SR-IOV VF dev_set
-Message-ID: <20250715124223.67a36d2a.alex.williamson@redhat.com>
-In-Reply-To: <20250703233533.GI1209783@nvidia.com>
-References: <20250626225623.1180952-1-alex.williamson@redhat.com>
-	<20250702160031.GB1139770@nvidia.com>
-	<20250702115032.243d194a.alex.williamson@redhat.com>
-	<20250702175556.GC1139770@nvidia.com>
-	<BN9PR11MB52760707F9A737186D818D1F8C43A@BN9PR11MB5276.namprd11.prod.outlook.com>
-	<20250703132350.GC1209783@nvidia.com>
-	<20250703142904.56924edf.alex.williamson@redhat.com>
-	<20250703233533.GI1209783@nvidia.com>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1752605213; c=relaxed/simple;
+	bh=GOJACDJXUMisUR1fmp0MKPRTPk/DYcVVDYSoJX5CKXY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Tnp8PEsjOgJrqMivO+qqafn6NfLbJXHdbU+YMhvRwYv9YHupCLPpS3Y278sPJBfLYZiviuuBaK8IoyZIhRuQFS3nQNRqHaeStTYuDw6PSf9MviNd1Q2hKrpfDig7p0T89/hoSEqNMqsy8Rli/MTWrBnNs9o3HnJc5h5GMKN6D0o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=coooAKnf; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
+	by m0001303.ppops.net (8.18.1.2/8.18.1.2) with ESMTP id 56FIbeeC024291
+	for <kvm@vger.kernel.org>; Tue, 15 Jul 2025 11:46:51 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=s2048-2025-q2; bh=KZjDm1wvJ23syPo4uo
+	j8WYyxyPTvBVBLLxkdCEZKbuU=; b=coooAKnf1GO/VeaczDmMFPv4n1NoIg6C57
+	de5wPPx1SlSreWGiNSRzSaAo2dY+7JKQCW+HtokF9Y2jMpug9T54JxIY+3/QGSa8
+	4oGi6puQEjBsDQ+/DUgSDzwJCucNotjK84AIonYkFOm8Te6P6L3Pz4x8KfpEzQB5
+	GQFwvpNtNZihffo4fDrRKCW3kej7BfR7cV+ryhRVB8ffpHoyOnod4tbD1vDhr2ro
+	41tT5gZXwXeQWV8QNT2sNdHPC0YoFaxez6LME2CTITItPLAydFh9vUn8JiyuDpZg
+	BPhDDVWdeciZe7ZsinpzZ1coSjQCaiMQLbslooOs2Ta1vHoCjdrA==
+Received: from maileast.thefacebook.com ([163.114.135.16])
+	by m0001303.ppops.net (PPS) with ESMTPS id 47whwjnefm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <kvm@vger.kernel.org>; Tue, 15 Jul 2025 11:46:50 -0700 (PDT)
+Received: from twshared78382.04.prn6.facebook.com (2620:10d:c0a8:1c::1b) by
+ mail.thefacebook.com (2620:10d:c0a9:6f::8fd4) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.1748.24; Tue, 15 Jul 2025 18:46:35 +0000
+Received: by devbig1708.prn1.facebook.com (Postfix, from userid 544533)
+	id 9DA2714A4DE5; Tue, 15 Jul 2025 11:46:22 -0700 (PDT)
+From: Keith Busch <kbusch@meta.com>
+To: <alex.williamson@redhat.com>, <kvm@vger.kernel.org>,
+        <linux-pci@vger.kernel.org>
+CC: <paulmck@kernel.org>, Keith Busch <kbusch@kernel.org>
+Subject: [PATCHv2] vfio/type1: conditional rescheduling while pinning
+Date: Tue, 15 Jul 2025 11:46:22 -0700
+Message-ID: <20250715184622.3561598-1-kbusch@meta.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzE1MDE3MyBTYWx0ZWRfX6DqeNB/Hgnpz UmJ1cZv/Hbbyxpy1Jp/VvIufWXphXRJiZfUnmVCQLoYSzaQ3p9gg/nAeongKgSbgGofReLjYobZ LYWJdF3fbfGmfgGOhT2QJIkYk7OlYcvk3KjHgk5t1dpf1/PqEvXBnWDmolHMfaqa+9qFX8AosiW
+ qnx/oN/xRlRN21gK6clHTGRHjQnU3AH1haJDqqfZ71T/zSp7KGY4bsWLpplQGgsYiIN2UDSuqZ8 uGgcFiBdZLmUrhLcQ6fTKaAsJbd40p4govHssMWfwdt2vNxNRL7cW6D1U8VSUaCdI7umjaHQpcg 7mosJGmjP/Hrp7EZqlaD/Am9nKzM6ypPgmkjrQEHqENILrImGONY3GvrZJNoBO9CZAis9+W5TRl
+ hXMPQ+kFTtmQdJsQzlA/pd9Hc4pcq2LXS/W97Qo0jkARplYDaJGcoiaWRP02zHpw1yp1L2nO
+X-Proofpoint-GUID: qIVZ9IwXSpK_WAVcRBumjspvSTvIw_rL
+X-Authority-Analysis: v=2.4 cv=SMtCVPvH c=1 sm=1 tr=0 ts=6876a21a cx=c_pps a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17 a=Wb1JkmetP80A:10 a=VwQbUJbxAAAA:8 a=De36-Z_BrdwR9qEJ7zUA:9
+X-Proofpoint-ORIG-GUID: qIVZ9IwXSpK_WAVcRBumjspvSTvIw_rL
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-07-15_04,2025-07-15_02,2025-03-28_01
 
-On Thu, 3 Jul 2025 20:35:33 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+From: Keith Busch <kbusch@kernel.org>
 
-> On Thu, Jul 03, 2025 at 02:29:04PM -0600, Alex Williamson wrote:
-> 
-> > > > Is there any reset which doesn't disable SRIOV? According to PCIe
-> > > > spec both conventional reset and FLR targeting a PF clears the
-> > > > VF enable bit.    
-> > > 
-> > > This is my understanding, I think there might be a little hole here in
-> > > the vfio SRIOV support?  
-> > 
-> > I wrote a test case and we don't prevent a vfio-pci userspace driver
-> > from resetting the PF while also having open a VF, but I'm also not
-> > sure what problem that causes.
-> > 
-> > pci_restore_state() calls pci_restore_iov_state(), so VF Enable does get
-> > cleared by the reset (we don't actively tear down SR-IOV before reset),
-> > but it's restored.   
-> 
-> Oh interesting, I did not know that happened. Makes sense.
-> 
-> > Also, PF->bus != VF->bus,   
-> 
-> Unrelated, but I've been looking at this and I haven't tried it yet,
-> but it looked to me like:
-> 
-> 	bus = virtfn_add_bus(dev->bus, pci_iov_virtfn_bus(dev, id));
->  [.. inside virtfn_add_bus ]
-> 	child = pci_find_bus(pci_domain_nr(bus), busnr);
-> 	if (child)
-> 		return child;
-> 
-> Will re-use the bus of the PF if they happen to have the same bus
-> numbers. I thought the virtual busses come up if the VF RID calculation:
-> 
-> 	return dev->bus->number + ((dev->devfn + dev->sriov->offset +
-> 				    dev->sriov->stride * vf_id) >> 8);
-> 
-> Exceeds the primary bus?
+A large DMA mapping request can loop through dma address pinning for
+many pages. In cases where THP can not be used, the repeated vmf_insert_p=
+fn can
+be costly, so let the task reschedule as need to prevent CPU stalls. Fail=
+ure to
+do so has potential harmful side effects, like increased memory pressure
+as unrelated rcu tasks are unable to make their reclaim callbacks and
+result in OOM conditions.
 
-I tried it, I've got 82576 NICs in both a system with and without ARI
-hierarchy.  Without:
+ rcu: INFO: rcu_sched self-detected stall on CPU
+ rcu:   36-....: (20999 ticks this GP) idle=3Db01c/1/0x4000000000000000 s=
+oftirq=3D35839/35839 fqs=3D3538
+ rcu:            hardirqs   softirqs   csw/system
+ rcu:    number:        0        107            0
+ rcu:   cputime:       50          0        10446   =3D=3D> 10556(ms)
+ rcu:   (t=3D21075 jiffies g=3D377761 q=3D204059 ncpus=3D384)
+...
+  <TASK>
+  ? asm_sysvec_apic_timer_interrupt+0x16/0x20
+  ? walk_system_ram_range+0x63/0x120
+  ? walk_system_ram_range+0x46/0x120
+  ? pgprot_writethrough+0x20/0x20
+  lookup_memtype+0x67/0xf0
+  track_pfn_insert+0x20/0x40
+  vmf_insert_pfn_prot+0x88/0x140
+  vfio_pci_mmap_huge_fault+0xf9/0x1b0 [vfio_pci_core]
+  __do_fault+0x28/0x1b0
+  handle_mm_fault+0xef1/0x2560
+  fixup_user_fault+0xf5/0x270
+  vaddr_get_pfns+0x169/0x2f0 [vfio_iommu_type1]
+  vfio_pin_pages_remote+0x162/0x8e0 [vfio_iommu_type1]
+  vfio_iommu_type1_ioctl+0x1121/0x1810 [vfio_iommu_type1]
+  ? futex_wake+0x1c1/0x260
+  x64_sys_call+0x234/0x17a0
+  do_syscall_64+0x63/0x130
+  ? exc_page_fault+0x63/0x130
+  entry_SYSCALL_64_after_hwframe+0x4b/0x53
 
- VF offset: 384, stride: 2
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+---
+v1->v2:
 
-With:
+  Merged up to vfio/next
 
- VF offset: 128, stride: 2
+  Moved the cond_resched() to a more appropriate place within the
+  loop, and added a comment about why it's there.
 
-So the former places VFs on the N+1 bus (new struct pci_bus) from the PF
-while the latter use the same bus number and struct.  Therefore my
-previous inequality is not necessarily correct, the VF and PF could use
-the same struct pci_bus.
+  Update to change log describing one of the consequences of not doing
+  this.
 
-In the ARI case, I believe you were right that the PF and VFs would have
-then been sharing a dev_set.
+ drivers/vfio/vfio_iommu_type1.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-So that does seem to be a visible difference as a result of this
-change, in an ARI hierarchy, it would have previously been necessary to
-supply the VF group FDs as proof of ownership of affected devices for a
-hot-reset of the PF.  A non-ARI hierarchy would not have required that.
-With this, neither require that.
-
-Technically the VFs are affected by a PF bus reset, but unlike other
-devices the VFs are also potentially affected by lots of things that
-might happen to the VF and that's why we have the VF-token concept.  So
-I kind of have a hard time getting bent out of shape by this.
-
-I went ahead and added this to my next branch because I think your
-impression is that this is generally ok based on the vf-token, but if
-this raises new concerns I can drop it and we can discuss further.
-Thanks,
-
-Alex
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_ty=
+pe1.c
+index 1136d7ac6b597..ad599b1601711 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -647,6 +647,13 @@ static long vfio_pin_pages_remote(struct vfio_dma *d=
+ma, unsigned long vaddr,
+=20
+ 	while (npage) {
+ 		if (!batch->size) {
++			/*
++			 * Large mappings may take a while to repeatedly refill
++			 * the batch, so conditionally relinquish the CPU when
++			 * needed to avoid stalls.
++			 */
++			cond_resched();
++
+ 			/* Empty batch, so refill it. */
+ 			ret =3D vaddr_get_pfns(mm, vaddr, npage, dma->prot,
+ 					     &pfn, batch);
+--=20
+2.47.1
 
 
