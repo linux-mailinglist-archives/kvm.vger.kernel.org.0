@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-52462-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52463-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5A2EB05634
-	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 11:22:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6594B05633
+	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 11:22:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1CEEA4A27CE
-	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 09:21:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 436181C235B9
+	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 09:22:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E756D2D661A;
-	Tue, 15 Jul 2025 09:21:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E8502D8361;
+	Tue, 15 Jul 2025 09:21:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nLjHAb9I"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nwGLhbNt"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A46B52D63FD;
-	Tue, 15 Jul 2025 09:21:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AC062D7810;
+	Tue, 15 Jul 2025 09:21:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752571293; cv=none; b=Y2k0Em3DMZknOVgGC9feANtX9SMLmRbN0bXk/JlTBlOrtuJAzJiNK5y59vdvvO9hg+OLb3utnux/NY7+FnSJEAATxO8tqUu5ZBTE0jZ5NQ3SrTlGtUYFMlRvFp1vKDcW8DYjicK0eypilIgzpFi+8GjX0aPdHcfsSplnyMXe4rU=
+	t=1752571297; cv=none; b=iq/nSY41MVqVTo2gO0Vg2ZXociE4HgPQuK/wmTwObQsinbO3nEkojgkH8OjQCZoRubmAFfZpjh6cY5pWrjIt1R0QmVImEWqpGxqeUf5uVJC35wMhhUg7iOFRNVC8wt75RvnojVKMGy9d3NyDc741S2OinHJD15y+JmwLv8eCNEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752571293; c=relaxed/simple;
-	bh=Yhdrbsi3xuNdiYEULNrhlmxNwKvVco8Ee/2zWHgoN20=;
+	s=arc-20240116; t=1752571297; c=relaxed/simple;
+	bh=x092r1fSBa4wry6ULv5QvHdrP4+so9lToB70GqLJWdY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BO4SVndgEhhVk+icfkAtXb34RbeDat9h61AZ++f3tAaN+zlayFKoVMpLltRidp5vs8x3tgEdK7Poj7UL8t6xeEaK6NvjqmOKZPl1NWlWGKRWuZPityXPQNfYGdryLTQV7Ci+nYd44RUiusCjwWgF6IH3ZKfIHbBKmnp2hb8DQHs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nLjHAb9I; arc=none smtp.client-ip=192.198.163.18
+	 MIME-Version; b=X/B71A+fBIeegKAltx3ymFisfhHCb8b+ANybAULrVP8P6qkw3ztIdnifhAcnUBlWZ1iXiWmra9wSuaDRQ3uw2ppMLNrC93vma4SWYn3byLEce6c1cJYsK1wDYk4CcdMmmOUuzqpycSSELbUdBIvmW74kCDeuxaLK4x55IsvONKA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nwGLhbNt; arc=none smtp.client-ip=192.198.163.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752571292; x=1784107292;
+  t=1752571296; x=1784107296;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Yhdrbsi3xuNdiYEULNrhlmxNwKvVco8Ee/2zWHgoN20=;
-  b=nLjHAb9ISnMroBnAyNa7YXP9qvMP8UIoDZMpvIME1E76CiXsuKpyW/2L
-   mG+9IVwezj9PKKHqhqO6/WtXtc1/Zu0xXcUZ9WQlSz5HX/k6pu7XEWLFN
-   HeP8hXhyrCEL0onAHojuoYN5+//BgVgrBKyXOM1mvC3avRv5PNcMmbGsh
-   eekEVFko+lNzzLAD0TDpMCJnSrNhW5bi47/3OC1o+cwFHAy+bCfrmJZA/
-   3dX885WKEeqgwlcKjzw//7O8/5BPTNP5G5tPtJ5LSRmgVinPtJPhXXiJ7
-   2yrXKtjRbqvw3FvpXRRwR60TRRrYC2RkbjQ9H8dc9iGUAJskBVXA7UoGC
-   g==;
-X-CSE-ConnectionGUID: JnJg2x9FQvuugYPxe2hAKg==
-X-CSE-MsgGUID: UNAKeIwsROSQqNutu0U+dA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11491"; a="54003326"
+  bh=x092r1fSBa4wry6ULv5QvHdrP4+so9lToB70GqLJWdY=;
+  b=nwGLhbNtBNfoF9GTT5h5kVhDt7WCI/+ZkT+5rywQWNUUF3yMYr2IdCg7
+   XUuLSq141RtWIPMUzEbXsNumEMDvEkHxQ+s64HhfyX4H/aUXzwa0b4+BR
+   dihzQKvN76z5YqMLQqytqCwIUjFd5KJpFjHJ1e090N9bg8FpTMgJJFIFs
+   0dFfvs9QpVsT8OAfrZ5b4xEGKZdsZB1abWWBUahSL5Iwtc8a778/S8eLS
+   p01Y8kUxEhhMf8aWSck8Yo0+MtsrSp041659/NxnKo+yV8fIeMcSw6xLh
+   IoSMw7PgwgNfFb8mm/K2kyvxlSglP/OUjnoTvXfQ9OwFjlQ9/C/fF+gV+
+   w==;
+X-CSE-ConnectionGUID: AvrbvQnCQ6uymaH9Az09IA==
+X-CSE-MsgGUID: s7mlzyBuTs+ZBGRoEQEEpQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11491"; a="54003351"
 X-IronPort-AV: E=Sophos;i="6.16,313,1744095600"; 
-   d="scan'208";a="54003326"
+   d="scan'208";a="54003351"
 Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2025 02:21:31 -0700
-X-CSE-ConnectionGUID: OK7oovUBQhCxcMhG+1povw==
-X-CSE-MsgGUID: lU6ChvMNQV68E7Vha6HFew==
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2025 02:21:36 -0700
+X-CSE-ConnectionGUID: 19HcrPZkQyaUkFNFIdbYUA==
+X-CSE-MsgGUID: 8P4M9pqnQOmbtc9nqXq5vg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,313,1744095600"; 
-   d="scan'208";a="188183684"
+   d="scan'208";a="188183701"
 Received: from lxy-clx-4s.sh.intel.com ([10.239.48.52])
-  by fmviesa001.fm.intel.com with ESMTP; 15 Jul 2025 02:21:25 -0700
+  by fmviesa001.fm.intel.com with ESMTP; 15 Jul 2025 02:21:31 -0700
 From: Xiaoyao Li <xiaoyao.li@intel.com>
 To: "Kirill A. Shutemov" <kas@kernel.org>,
 	Dave Hansen <dave.hansen@linux.intel.com>,
@@ -79,9 +79,9 @@ Cc: Thomas Gleixner <tglx@linutronix.de>,
 	adrian.hunter@intel.com,
 	tony.lindgren@intel.com,
 	xiaoyao.li@intel.com
-Subject: [PATCH v3 1/4] x86/tdx: Fix the typo in TDX_ATTR_MIGRTABLE
-Date: Tue, 15 Jul 2025 17:13:09 +0800
-Message-ID: <20250715091312.563773-2-xiaoyao.li@intel.com>
+Subject: [PATCH v3 2/4] KVM: TDX: Remove redundant definitions of TDX_TD_ATTR_*
+Date: Tue, 15 Jul 2025 17:13:10 +0800
+Message-ID: <20250715091312.563773-3-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250715091312.563773-1-xiaoyao.li@intel.com>
 References: <20250715091312.563773-1-xiaoyao.li@intel.com>
@@ -93,63 +93,58 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The TD scoped TDCS attributes are defined by bit positions. In the guest
-side of the TDX code, the 'tdx_attributes' string array holds pretty
-print names for these attributes, which are generated via macros and
-defines. Today these pretty print names are only used to print the
-attribute names to dmesg.
+There are definitions of TD attributes bits inside asm/shared/tdx.h as
+TDX_ATTR_*.
 
-Unfortunately there is a typo in the define for the migratable bit.
-Change the defines TDX_ATTR_MIGRTABLE* to TDX_ATTR_MIGRATABLE*. Update
-the sole user, the tdx_attributes array, to use the fixed name.
+Remove KVM's definitions and use the ones in asm/shared/tdx.h
 
-Since these defines control the string printed to dmesg, the change is
-user visible. But the risk of breakage is almost zero since it is not
-exposed in any interface expected to be consumed programmatically.
-
-Fixes: 564ea84c8c14 ("x86/tdx: Dump attributes and TD_CTLS on boot")
 Reviewed-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 Reviewed-by: Kai Huang <kai.huang@intel.com>
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 ---
-Changes in v3:
- - Use the rewritten changelog from Rick.
+ arch/x86/kvm/vmx/tdx.c      | 4 ++--
+ arch/x86/kvm/vmx/tdx_arch.h | 6 ------
+ 2 files changed, 2 insertions(+), 8 deletions(-)
 
-Changes in v2:
- - Add the impact of the change in the commit message. (provided by Rick)
----
- arch/x86/coco/tdx/debug.c         | 2 +-
- arch/x86/include/asm/shared/tdx.h | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/arch/x86/coco/tdx/debug.c b/arch/x86/coco/tdx/debug.c
-index cef847c8bb67..28990c2ab0a1 100644
---- a/arch/x86/coco/tdx/debug.c
-+++ b/arch/x86/coco/tdx/debug.c
-@@ -17,7 +17,7 @@ static __initdata const char *tdx_attributes[] = {
- 	DEF_TDX_ATTR_NAME(ICSSD),
- 	DEF_TDX_ATTR_NAME(LASS),
- 	DEF_TDX_ATTR_NAME(SEPT_VE_DISABLE),
--	DEF_TDX_ATTR_NAME(MIGRTABLE),
-+	DEF_TDX_ATTR_NAME(MIGRATABLE),
- 	DEF_TDX_ATTR_NAME(PKS),
- 	DEF_TDX_ATTR_NAME(KL),
- 	DEF_TDX_ATTR_NAME(TPA),
-diff --git a/arch/x86/include/asm/shared/tdx.h b/arch/x86/include/asm/shared/tdx.h
-index 8bc074c8d7c6..11f3cf30b1ac 100644
---- a/arch/x86/include/asm/shared/tdx.h
-+++ b/arch/x86/include/asm/shared/tdx.h
-@@ -35,8 +35,8 @@
- #define TDX_ATTR_LASS			BIT_ULL(TDX_ATTR_LASS_BIT)
- #define TDX_ATTR_SEPT_VE_DISABLE_BIT	28
- #define TDX_ATTR_SEPT_VE_DISABLE	BIT_ULL(TDX_ATTR_SEPT_VE_DISABLE_BIT)
--#define TDX_ATTR_MIGRTABLE_BIT		29
--#define TDX_ATTR_MIGRTABLE		BIT_ULL(TDX_ATTR_MIGRTABLE_BIT)
-+#define TDX_ATTR_MIGRATABLE_BIT		29
-+#define TDX_ATTR_MIGRATABLE		BIT_ULL(TDX_ATTR_MIGRATABLE_BIT)
- #define TDX_ATTR_PKS_BIT		30
- #define TDX_ATTR_PKS			BIT_ULL(TDX_ATTR_PKS_BIT)
- #define TDX_ATTR_KL_BIT			31
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+index c539c2e6109f..efb7d589b672 100644
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -62,7 +62,7 @@ void tdh_vp_wr_failed(struct vcpu_tdx *tdx, char *uclass, char *op, u32 field,
+ 	pr_err("TDH_VP_WR[%s.0x%x]%s0x%llx failed: 0x%llx\n", uclass, field, op, val, err);
+ }
+ 
+-#define KVM_SUPPORTED_TD_ATTRS (TDX_TD_ATTR_SEPT_VE_DISABLE)
++#define KVM_SUPPORTED_TD_ATTRS (TDX_ATTR_SEPT_VE_DISABLE)
+ 
+ static __always_inline struct kvm_tdx *to_kvm_tdx(struct kvm *kvm)
+ {
+@@ -700,7 +700,7 @@ int tdx_vcpu_create(struct kvm_vcpu *vcpu)
+ 	vcpu->arch.l1_tsc_scaling_ratio = kvm_tdx->tsc_multiplier;
+ 
+ 	vcpu->arch.guest_state_protected =
+-		!(to_kvm_tdx(vcpu->kvm)->attributes & TDX_TD_ATTR_DEBUG);
++		!(to_kvm_tdx(vcpu->kvm)->attributes & TDX_ATTR_DEBUG);
+ 
+ 	if ((kvm_tdx->xfam & XFEATURE_MASK_XTILE) == XFEATURE_MASK_XTILE)
+ 		vcpu->arch.xfd_no_write_intercept = true;
+diff --git a/arch/x86/kvm/vmx/tdx_arch.h b/arch/x86/kvm/vmx/tdx_arch.h
+index a30e880849e3..350143b9b145 100644
+--- a/arch/x86/kvm/vmx/tdx_arch.h
++++ b/arch/x86/kvm/vmx/tdx_arch.h
+@@ -75,12 +75,6 @@ struct tdx_cpuid_value {
+ 	u32 edx;
+ } __packed;
+ 
+-#define TDX_TD_ATTR_DEBUG		BIT_ULL(0)
+-#define TDX_TD_ATTR_SEPT_VE_DISABLE	BIT_ULL(28)
+-#define TDX_TD_ATTR_PKS			BIT_ULL(30)
+-#define TDX_TD_ATTR_KL			BIT_ULL(31)
+-#define TDX_TD_ATTR_PERFMON		BIT_ULL(63)
+-
+ #define TDX_EXT_EXIT_QUAL_TYPE_MASK	GENMASK(3, 0)
+ #define TDX_EXT_EXIT_QUAL_TYPE_PENDING_EPT_VIOLATION  6
+ /*
 -- 
 2.43.0
 
