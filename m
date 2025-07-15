@@ -1,156 +1,210 @@
-Return-Path: <kvm+bounces-52452-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52453-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 582B5B0548C
-	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 10:17:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A41D9B054E8
+	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 10:31:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B6BD61AA2549
-	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 08:18:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA2473A9DC9
+	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 08:31:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F39B72741D4;
-	Tue, 15 Jul 2025 08:17:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D16F526D4DA;
+	Tue, 15 Jul 2025 08:31:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wze5KBOR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LlNIijNk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5C931DED5F;
-	Tue, 15 Jul 2025 08:17:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 060671D5ABA;
+	Tue, 15 Jul 2025 08:31:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752567455; cv=none; b=a+9ls89xMb9BIjlE5S6QVqB9Kia6DdYSN/ndgBMJlfs0xvr7wU78sJItivMWuxbZk/xlvXkAfFSJKdKlUSsKZZhdlDss01Yo+IQpn7S84VSdtA0wMP+AqS1Z37PPUNueAG6jm5A9fp2Tv3dWmCeFp7diGS8aFwfGkgPcBDip69s=
+	t=1752568282; cv=none; b=u8SR3XxCSa8wI3xSW3RqfsdydfawdCwdPJ0vHQuRPiVFQSZemSRYpJ/mbsvWXH2dMR+/emEynpOnr0AM3Tnx4D9uX6ca+DkVnuBeQ69liK3MZGeLqzHIRMhK8y275Ds2AumYoiL2g2kcG3odNin+HFPLcP41B0dv6IjdiaTJEaw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752567455; c=relaxed/simple;
-	bh=B2i2mE7/q8o00PDlL5rVCsg5r6ROQYQBRQfO4c99+/8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=G6Y4d1dFYUBt1NfQWbRWZNzAoS1wk+AKAlFAuISZTJPafDHolYa8hkNrOvjoOaS/KNZRNeGiYHkctVK2ytHom1QlN2qOGicpFwwkcRBi2xCuzkofvQfkCgp/pDIqxK1QvFffM5Mn9Dc8AK/OAGkszzGnISCCxTskRkYWUQX8luA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wze5KBOR; arc=none smtp.client-ip=209.85.215.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-b350704f506so4043647a12.0;
-        Tue, 15 Jul 2025 01:17:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752567453; x=1753172253; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cIDPXywsEVB5HcRcVHQgnm1zzAlxNSarDIxQPMMSz4Y=;
-        b=Wze5KBOR6X9NnbMy2ltMiTof1/RaLxLpn18NwGRffDZVW9J3HQTp22xhIOBQkYeSBI
-         +VD5NYMI9hGVp7ImXxI9HgQImsqrA7nTmR76PpHGkgQF6cl6lCPYXT+Hf2UR9vT42pCa
-         hToDyNTnnH2x7eFiYGIo24m+jFEiefOxWJcbAZfPlub1jkBpKoDr0IbQjr8zLumTknED
-         zEJtFNzue1VPWTUxkN31eqpUsyG6G0mFL70bh5KCeHm35nFPYJiJFrFHMnIJb+/dhsRG
-         8q/XM1Lf4Wk4KoHE7Iau91c+o3YZR2/CxFnJ4xvtVxTBnxnsSypwjG8rY4Q6S4jhtTQT
-         YC1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752567453; x=1753172253;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cIDPXywsEVB5HcRcVHQgnm1zzAlxNSarDIxQPMMSz4Y=;
-        b=qzlxQACF4ku+ifvZVXtZp3CYORh/Sg/0F8QXyi0qYXICTJ3ihm99jBtDcX5Nj1v3zt
-         oedV2bWWIZTcN7qMH8cJCkWw45gNIB+MlpeKaN0xi/LBZC8dxynqoXon1iFJ8tsR8TtO
-         prBD1bYSMsDHFEOhQNQgXEEeePIovvk3oCd8RYYSiFvp1ooaqhJ987X0njA++4UGWTF+
-         jvACRulN8iPkJpxxb9bFEfmWvPqp5Cg/lsxnL1JHsRn/Q6DBwlEdFgkeLbt+5seSdvM4
-         TrfB0SsCURiqzP0hMZQVClMdScui4yjIUmEmkfD5mb1HqEV3guKtbalfGHjKXE+EMYcC
-         ZqHg==
-X-Forwarded-Encrypted: i=1; AJvYcCUvyLs5iJugD88aTOxBkdUcgNoSoY1fuAihH40gp+KbKxsiSu5iCdKQxsykbBXw+HDDmK4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxD+7fZ04Gwzl0kcxI6Q6Zl5dGTLRt72fSmXX3XyMLO8CUkXzh4
-	XCu7y51IFbmNVfQgLaKSiQX03aM7/L91NbEFa7X6GJxkI6B8uibNgCiX9BMwT1rYj8ffg8BGiZe
-	/T5TkYwkA2WOJ50p0nph3H0GfsUTLbSU=
-X-Gm-Gg: ASbGncsxGEb34KCOiq3F5CzXRyNXIbmhmCzJz+XPZyhX3nkcJrL7PVfUaI0iBTzRvDx
-	pym8qgVj/UIdnO5UaEkvGlzi8QS11aHh7+WfFLAcpSvNA68W+TeTqvu5YpQZW06izuLQMLWWjiv
-	EDN8mdDVhzaGXzs6hHH+ifOAcZ8ktApfllUBFjiDgNM3h0uto9J+3lRAuBHxi4EPtg9JVSqiqo/
-	wll
-X-Google-Smtp-Source: AGHT+IHduJlmeIitGuEnOXQxzzGBsMqvN70L4DO8oLDAs6lZKoHUCffLJxv/+fYcJUjYR/0C8senNa5cFI1V8GuuJNE=
-X-Received: by 2002:a17:90b:3f8f:b0:315:f6d6:d29c with SMTP id
- 98e67ed59e1d1-31c8fbc1b65mr4070709a91.15.1752567453044; Tue, 15 Jul 2025
- 01:17:33 -0700 (PDT)
+	s=arc-20240116; t=1752568282; c=relaxed/simple;
+	bh=vc8sRdp2JkS0f6MKjzIVxwH/P9BFLMdE+QPnjQlwYQI=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kiAzgo9VlsuAL7xvw52fDaRjjWcfKS2XOR67QmG+pyE+c0inFb5phMcFYS3V/jNsz04HPSzbGQTjrQNuWRDeM2ZvnLs/MoPo2/ieatIgBF1/Zydpq/2tfph5npuEgJlDaHSXP3SCPzuDKHOnubyE6ADVM6PM0Ocpaj4M8dWwn8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LlNIijNk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E3FCC4CEE3;
+	Tue, 15 Jul 2025 08:31:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752568281;
+	bh=vc8sRdp2JkS0f6MKjzIVxwH/P9BFLMdE+QPnjQlwYQI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=LlNIijNklPQOePOENYJKmMSyRYEpLVgmZUM+p2trP4XEl+EVWsWzniSK914ybz6Nq
+	 Kndd87u/GPxZMCK7WuuBwYoQrdwOPrFPUML6HFiUF4+is3D/ZJJF4wXUgGx/Si4DL5
+	 /RUg6+TYDFsEDievEqzV1QD6KK6WFMXGvzAoICOrl7tBLpxzexv0vx0eDFbk+LWzsQ
+	 nURsAZx2+jLx7hWOKZ4vU+Qkh8zpyelO/M+3Kt3xcJGXmY833vC4p7+T6WhmNMIa1Q
+	 GJNmYJpk4A7p6L7iOJWUIk1T2Pi4FcXwUVw5+EQfV7g0fUd5wCJQm1e47XHvt4S87z
+	 VEJjqpPrdWBkQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1ubb4I-00Fndi-N4;
+	Tue, 15 Jul 2025 09:31:18 +0100
+Date: Tue, 15 Jul 2025 09:31:18 +0100
+Message-ID: <86zfd597op.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	syzbot+4e09b1432de3774b86ae@syzkaller.appspotmail.com
+Subject: Re: [PATCH] KVM: arm64: Clear pending exception state before injecting a new one
+In-Reply-To: <aHX6XXhSSnHL_T1d@linux.dev>
+References: <20250714144636.3569479-1-maz@kernel.org>
+	<aHX6XXhSSnHL_T1d@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250709033242.267892-1-Neeraj.Upadhyay@amd.com> <20250709033242.267892-22-Neeraj.Upadhyay@amd.com>
-In-Reply-To: <20250709033242.267892-22-Neeraj.Upadhyay@amd.com>
-From: Tianyu Lan <ltykernel@gmail.com>
-Date: Tue, 15 Jul 2025 16:16:57 +0800
-X-Gm-Features: Ac12FXyO4skjIVSvdfNnDDtno4cCVvnzq_dBGANg7kA5K8Zsnn8dpEaphfliOdI
-Message-ID: <CAMvTesDWSUxj+KtdLnymu6HEATEPW2525KswZyP07PpjK+hD1g@mail.gmail.com>
-Subject: Re: [RFC PATCH v8 21/35] x86/apic: Initialize APIC ID for Secure AVIC
-To: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
-Cc: linux-kernel@vger.kernel.org, bp@alien8.de, tglx@linutronix.de, 
-	mingo@redhat.com, dave.hansen@linux.intel.com, Thomas.Lendacky@amd.com, 
-	nikunj@amd.com, Santosh.Shukla@amd.com, Vasant.Hegde@amd.com, 
-	Suravee.Suthikulpanit@amd.com, David.Kaplan@amd.com, x86@kernel.org, 
-	hpa@zytor.com, peterz@infradead.org, seanjc@google.com, pbonzini@redhat.com, 
-	kvm@vger.kernel.org, kirill.shutemov@linux.intel.com, huibo.wang@amd.com, 
-	naveen.rao@amd.com, kai.huang@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, syzbot+4e09b1432de3774b86ae@syzkaller.appspotmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, Jul 9, 2025 at 11:40=E2=80=AFAM Neeraj Upadhyay <Neeraj.Upadhyay@am=
-d.com> wrote:
->
-> Initialize the APIC ID in the Secure AVIC APIC backing page with
-> the APIC_ID msr value read from Hypervisor. CPU topology evaluation
-> later during boot would catch and report any duplicate APIC ID for
-> two CPUs.
->
-> Signed-off-by: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
+On Tue, 15 Jul 2025 07:51:09 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> Hey,
+> 
+> On Mon, Jul 14, 2025 at 03:46:36PM +0100, Marc Zyngier wrote:
+> > Repeatedly injecting an exception from userspace without running
+> > the vcpu between calls results in a nasty warning, as we're not
+> > really keen on losing already pending exceptions.
+> > 
+> > But this precaution doesn't really apply to userspace, who can
+> > do whatever it wants (within reason). So let's simply clear any
+> > previous exception state before injecting a new one.
+> > 
+> > Note that this is done unconditionally, even if the injection
+> > ultimately fails.
+> > 
+> > Reported-by: syzbot+4e09b1432de3774b86ae@syzkaller.appspotmail.com
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> 
+> Thanks for taking a look at this. I think the correct fix is a bit more
+> involved, as:
+> 
+>  - ABI prior to my patches allowed dumb things like injecting both an
+>    SEA and SError from the same ioctl. With your patch I think you could
+>    still get the warning to fire with serror_pending && ext_dabt_pending
+> 
+>  - KVM_GET_VCPU_EVENTS is broken for 'pending' SEAs, as we assume
+>    they're committed in the vCPU state immediately when they're actually
+>    deferred to the next KVM_RUN.
+> 
+> I thoroughly hate the fix I have but it should address both of these
+> issues. Although the pending PC adjustment flags seem more like a
+> liability than anything else if ioctls need to flush them before
+> returning to userspace. Might look at a larger cleanup down the road.
+> 
+> Thanks,
+> Oliver
+> 
+> From 149262689dfe881542f5c5b60f9ee308a00f0596 Mon Sep 17 00:00:00 2001
+> From: Oliver Upton <oliver.upton@linux.dev>
+> Date: Mon, 14 Jul 2025 23:25:07 -0700
+> Subject: [PATCH] KVM: arm64: Commit exceptions from KVM_SET_VCPU_EVENTS
+>  immediately
+> 
+> syzkaller has found that it can trip a warning in KVM's exception
+> emulation infrastructure by repeatedly injecting exceptions into the
+> guest.
+> 
+> While it's unlikely that a reasonable VMM will do this, further
+> investigation of the issue reveals that KVM can potentially discard the
+> "pending" SEA state. While the handling of KVM_GET_VCPU_EVENTS presumes
+> that userspace-injected SEAs are realized immediately, in reality the
+> emulated exception entry is deferred until the next call to KVM_RUN.
+> 
+> Hack-a-fix the immediate issues by committing the pending exceptions to
+> the vCPU's architectural state immediately in KVM_SET_VCPU_EVENTS. This
+> is no different to the way KVM-injected exceptions are handled in
+> KVM_RUN where we potentially call __kvm_adjust_pc() before returning to
+> userspace.
+> 
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 > ---
-> Changes since v7:
->  - No change.
->
-
-Reviewed-by: Tianyu Lan <tiala@microsoft.com>
-
->  arch/x86/kernel/apic/x2apic_savic.c | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
->
-> diff --git a/arch/x86/kernel/apic/x2apic_savic.c b/arch/x86/kernel/apic/x=
-2apic_savic.c
-> index 186e69a5e169..618643e7242f 100644
-> --- a/arch/x86/kernel/apic/x2apic_savic.c
-> +++ b/arch/x86/kernel/apic/x2apic_savic.c
-> @@ -131,6 +131,18 @@ static void savic_write(u32 reg, u32 data)
->         }
+>  arch/arm64/kvm/guest.c | 28 +++++++++++++++++++++++++++-
+>  1 file changed, 27 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> index e2702718d56d..16ba5e9ac86c 100644
+> --- a/arch/arm64/kvm/guest.c
+> +++ b/arch/arm64/kvm/guest.c
+> @@ -834,6 +834,19 @@ int __kvm_arm_vcpu_get_events(struct kvm_vcpu *vcpu,
+>  	return 0;
 >  }
->
-> +static void init_apic_page(struct apic_page *ap)
+>  
+> +static void commit_pending_events(struct kvm_vcpu *vcpu)
 > +{
-> +       u32 apic_id;
+> +	if (!vcpu_get_flag(vcpu, PENDING_EXCEPTION))
+> +		return;
 > +
-> +       /*
-> +        * Before Secure AVIC is enabled, APIC msr reads are intercepted.
-> +        * APIC_ID msr read returns the value from the Hypervisor.
-> +        */
-> +       apic_id =3D native_apic_msr_read(APIC_ID);
-> +       apic_set_reg(ap, APIC_ID, apic_id);
+> +	/*
+> +	 * Reset the MMIO emulation state to avoid stepping PC after emulating
+> +	 * the exception entry.
+> +	 */
+> +	vcpu->mmio_needed = false;
+> +	kvm_call_hyp(__kvm_adjust_pc, vcpu);
 > +}
 > +
->  static void savic_setup(void)
+>  int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
+>  			      struct kvm_vcpu_events *events)
 >  {
->         void *backing_page;
-> @@ -138,6 +150,7 @@ static void savic_setup(void)
->         unsigned long gpa;
->
->         backing_page =3D this_cpu_ptr(apic_page);
-> +       init_apic_page(backing_page);
->         gpa =3D __pa(backing_page);
->
->         /*
-> --
-> 2.34.1
->
->
+> @@ -843,8 +856,15 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
+>  	u64 esr = events->exception.serror_esr;
+>  	int ret = 0;
+>  
+> -	if (ext_dabt_pending)
+> +	/*
+> +	 * Immediately commit the pending SEA to the vCPU's architectural
+> +	 * state which is necessary since we do not return a pending SEA
+> +	 * to userspace via KVM_GET_VCPU_EVENTS.
+> +	 */
+> +	if (ext_dabt_pending) {
+>  		ret = kvm_inject_sea_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
+> +		commit_pending_events(vcpu);
+> +	}
+>  
+>  	if (ret < 0)
+>  		return ret;
+> @@ -863,6 +883,12 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
+>  	else
+>  		ret = kvm_inject_serror(vcpu);
+>  
+> +	/*
+> +	 * We could've decided that the SError is due for immediate software
+> +	 * injection; commit the exception in case userspace decides it wants
+> +	 * to inject more exceptions for some strange reason.
+> +	 */
+> +	commit_pending_events(vcpu);
+>  	return (ret < 0) ? ret : 0;
+>  }
 
+Yup, this seems looks reasonable. I would have liked the commit helper
+to be used just before vcpu_put(), but obviously, that's not the right
+thing to do because of the mmio_needed field.
 
---=20
-Thanks
-Tianyu Lan
+Reviewed-by: Marc Zyngier <maz@kernel.org>
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
