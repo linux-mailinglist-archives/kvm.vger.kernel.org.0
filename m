@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-52538-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52539-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F250FB066CB
-	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 21:27:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97E2CB066CD
+	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 21:27:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 36D677AEBC4
-	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 19:25:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE9333A5643
+	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 19:27:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDEAC2BEFE0;
-	Tue, 15 Jul 2025 19:27:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53ACD2BEFEF;
+	Tue, 15 Jul 2025 19:27:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="o/ZRrRIs"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="QOhcMPGJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2063.outbound.protection.outlook.com [40.107.94.63])
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2078.outbound.protection.outlook.com [40.107.101.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B72B26D4CF;
-	Tue, 15 Jul 2025 19:27:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.63
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9C9826E6F9;
+	Tue, 15 Jul 2025 19:27:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.78
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752607628; cv=fail; b=lJk9yzk9yw9LzMYDtVMisCs1Pf0WI6ZD+FD5tDgyodRkYk7XBIgH9Ca/MfiAt9iSS6pqS5KUfWYwnBUxkiJW6MddIjsH0pTXRxwj0xwJs04rzrDoCUv9BjzAuFMsb0rL8rfdGtLCMo40DT56+DqtLwfTsNXf2yAYtWFY8f7IczI=
+	t=1752607645; cv=fail; b=YfQoS84K/fGE4aZOW+dXc6mly/FrC9R6Q6/eSlyIehModQwSfsME9gVhQMC6Dfa5PGIdMFRallRXnFi96Nt5LViB8wlSFkavYJD7FhqWvDFPfGtxFxojsbGbntCJM80KcOAut67k/MT1qvJ1hPU1YoG51IO9+f6TLrCxAR9rPX4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752607628; c=relaxed/simple;
-	bh=HqGDQkqNVa1XfY4gD8jyEAtnH4Tszdi4l5Yh6m0emdI=;
+	s=arc-20240116; t=1752607645; c=relaxed/simple;
+	bh=RsLsMBfT3oFtSQPVaOY83qAm5tohUg50yrPM4/5mepE=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Jyu8dt78JOdL+aRXTOSATqU/WYEZ5oKci+OWvB2krZQc+atYvFNn/Tn3ME5RGnrNQiQ3hpGs9VSTq640mKLcYc+wahGlpIYwJ6yp4adBmXxTjcgf3yG0ATCDii9mGF5dL9BiIHkC+D2jYx1q11UAyOxryTwolv5T8kkLLIvdboo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=o/ZRrRIs; arc=fail smtp.client-ip=40.107.94.63
+	 MIME-Version:Content-Type; b=pKk1sJmcInaEx2fxP8hD14CUsBzmnIZkQh8pSTPwvPubYxjRwIELHSIsQjpoOAUfsm5+gUkBzWBJ9EpcU2C4O/rL09FE90ZNbbWIkeQqjiadpCxHzC3J1maen5JyTQyRsUnfcMPuH2hm0Lu1ij1E/MdIioxNUF4agBhJ8xX+PtU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=QOhcMPGJ; arc=fail smtp.client-ip=40.107.101.78
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=kHj/SR1xLr61hfTelj6XRe3C06bPmRzh4Ns127dmIkfCalB9x3hiYKi0Mm/6sUH/WfU3CAfzS0HAiFqnve0kATzXIbPiTJp5oQtNr1KbOlZX01YW8AaKclY2NgsWM6hCKTV9YXtqTMN21NpfBCm/wU7gBh5eFHfNcwLa93+kXXeUIYGlizVsb4/kpQw5u5eCDt91q5MQnE9MJDXpPhtfgGXPix/eVuYQmIWBhCmiTWhzIp8pAB6vXLfwSc6H2PLsMAbtE+v4KwdSj4XdXOGOue5VDEKr5Oqx2qQtBwOjgFyS8esWzoaKF33WPB4rmydU0CHQ5MbojOaj8c6Zl1BWhg==
+ b=eWG5TuMxpVph+KMW+gcs4adL5myAqp0dgDhPStgc4f7wNcCH+MWBu2o4LhxNY6kTYexzQa2QPo28fCzCS8nGYPpZH7yZXQ8eSYly3V1HlSm4gDtS0s8OdgiR4GHO0G+87CpqDr4GOWBBp6dXcVEzSWNO6HK/Dp/n0ogYhzzKFOUsaKCFooXsu03KmBivX9MOgsKxFs9CcltYkt1hhkWL08kliTQQADWlL7uTAJB0i8Qc1rODXgym3p4IvdnJcSS7kWZVAZSQYxBd2P8NtrQriE8VMQIN6pX5p17MBBJd66iLIitLU5D4Yy6Uzia0UyrJdW+rgET4byYmh5d7pH5cCw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=B7tfcPG0qajXCwLCBFk0xVABJgmM+sjD/chUX4F5tqo=;
- b=t5VNGhXhq4QoYw4sLE4a93n2x0kI1l7rWsTVTqOvJ4sXroSaVa8ldZWvFnJdbuWNIXNHS/9jomez4831lzsaGiJMupqKh4J3v0kGKg8bgxcGBGnUh5AJciyxj1PTnKFTONkjlS/RTveZhlIj5wjQSYcG/vem1zUjOb+invEknCimjUtcTLCzub6JmwQ9vtANvhqhVG8HrDS5AOCokx16XkAbAqyHdBRaNM02HzOlQmKWLyuOXdlMZJvPRZ7C17SMD3CxjBmwcuB1+RoHiICg2ohB9hc6ZLt1gkzHsALQQOXksP/BYOoTduKHg+1iXO/CwGWh9V4Xmyjk5AkSjYqvig==
+ bh=LOmz/Qfnesm1R+qGj0SuSYM+CAJKsBOxrpgII8SeKy4=;
+ b=gac+mjQOoAyTiwJV94wzpCVPzVuvjIpOs2WuLnUjl1OqOI6LlqPK+iKS2Kq6VCZ9g4qYXAirF0s2aW0pcPbyuE2TP/iW9nzE1S+AV6WqPdNWLkXBGAhoeRzsEuq77Y9kke+Ga4sKLfZT6gN6mqG6zM8jFenI0t9CcHM3w706S8s0+LUjTIx6/u5apaQ7oyk6OVQECUc4cH4M5NUUJF19kUCSISWytZP5XgWjMiTWHHTjMwY3BTYmJN5QEbmr0nNNtF1wXZf7Q69kEAxxR91WJ3NGqNHVj0CHNdzSRMACE6guJ8hZkDkEcSSKOEbkxOCLKL+GwgZwhmc8uLHmXmTiKQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=8bytes.org smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=B7tfcPG0qajXCwLCBFk0xVABJgmM+sjD/chUX4F5tqo=;
- b=o/ZRrRIsXikpdlbF45Qtx3h+YfBVR5Tmno0ZeZOpUaQEe3VlPW6k0ALy/MA5DekUpPRsvg/6s/1vU/d9qEs6bETt1ClyNolAC2ECto3F5/5CUuX637M0ZSBm5tcW1VRv8SLdtxNGos7UTRv9HpKYfY7AqqMLqQ3H+r33sp9Ggug=
-Received: from SJ0PR03CA0025.namprd03.prod.outlook.com (2603:10b6:a03:33a::30)
- by IA1PR12MB6113.namprd12.prod.outlook.com (2603:10b6:208:3eb::8) with
+ bh=LOmz/Qfnesm1R+qGj0SuSYM+CAJKsBOxrpgII8SeKy4=;
+ b=QOhcMPGJyGvLUhCUkQLpDSfEG8kkxxx5O7wwa6nxQ5SB9GJ/Q/rwjXDxszc7JJ8rcMkLzBe+EBjuZf17WnM4GZ/BoqWlPBpE+Z6mkgPOnndCxzxThThuBoOT04yZ1V8Z/TF0Pp6+9RjJnCrFVosyZqL2WdqokqaooflLOBxQL6s=
+Received: from SJ0PR03CA0375.namprd03.prod.outlook.com (2603:10b6:a03:3a1::20)
+ by CH3PR12MB8459.namprd12.prod.outlook.com (2603:10b6:610:139::14) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8922.32; Tue, 15 Jul
- 2025 19:27:03 +0000
-Received: from SJ1PEPF00001CE4.namprd03.prod.outlook.com
- (2603:10b6:a03:33a:cafe::e7) by SJ0PR03CA0025.outlook.office365.com
- (2603:10b6:a03:33a::30) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8901.35; Tue, 15 Jul
+ 2025 19:27:21 +0000
+Received: from SJ1PEPF00001CEB.namprd03.prod.outlook.com
+ (2603:10b6:a03:3a1:cafe::83) by SJ0PR03CA0375.outlook.office365.com
+ (2603:10b6:a03:3a1::20) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.20.8943.17 via Frontend Transport; Tue,
- 15 Jul 2025 19:27:02 +0000
+ 15 Jul 2025 19:27:21 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -63,13 +63,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SJ1PEPF00001CE4.mail.protection.outlook.com (10.167.242.20) with Microsoft
+ SJ1PEPF00001CEB.mail.protection.outlook.com (10.167.242.27) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8922.22 via Frontend Transport; Tue, 15 Jul 2025 19:27:02 +0000
+ 15.20.8922.22 via Frontend Transport; Tue, 15 Jul 2025 19:27:20 +0000
 Received: from ethanolx7e2ehost.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 15 Jul
- 2025 14:26:59 -0500
+ 2025 14:27:19 -0500
 From: Ashish Kalra <Ashish.Kalra@amd.com>
 To: <joro@8bytes.org>, <suravee.suthikulpanit@amd.com>,
 	<thomas.lendacky@amd.com>, <Sairaj.ArunKodilkar@amd.com>,
@@ -79,9 +79,9 @@ CC: <seanjc@google.com>, <pbonzini@redhat.com>, <will@kernel.org>,
 	<bp@alien8.de>, <michael.roth@amd.com>, <iommu@lists.linux.dev>,
 	<linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
 	<kvm@vger.kernel.org>
-Subject: [PATCH v3 1/4] iommu/amd: Add support to remap/unmap IOMMU buffers for kdump
-Date: Tue, 15 Jul 2025 19:26:50 +0000
-Message-ID: <7c7e241f960759934aced9a04d7620d204ad5d68.1752605725.git.ashish.kalra@amd.com>
+Subject: [PATCH v3 2/4] iommu/amd: Reuse device table for kdump
+Date: Tue, 15 Jul 2025 19:27:05 +0000
+Message-ID: <42842f0455c1439327aaa593ef22576ef97c16ee.1752605725.git.ashish.kalra@amd.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <cover.1752605725.git.ashish.kalra@amd.com>
 References: <cover.1752605725.git.ashish.kalra@amd.com>
@@ -91,343 +91,265 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CE4:EE_|IA1PR12MB6113:EE_
-X-MS-Office365-Filtering-Correlation-Id: ab85c45d-5a09-4968-f89a-08ddc3d5938c
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CEB:EE_|CH3PR12MB8459:EE_
+X-MS-Office365-Filtering-Correlation-Id: f503860a-3b6b-4b16-d88a-08ddc3d59e8e
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|7416014|376014|1800799024|82310400026;
+	BCL:0;ARA:13230040|1800799024|36860700013|7416014|82310400026|376014;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?dGNmVkFRaWpQU3RGbjBMWE83STZkK0c0cytySE9rZjZ3czdSaHJBVHRURGF1?=
- =?utf-8?B?NHVXNWgxVDdldVZiNUhHSmJ4c2JUSGkwcmd3NWxiNkVzcW9uWFJ4TFFwS2Fo?=
- =?utf-8?B?ZlhvV2FTblhZbi8xdGU3LzNmSXRUbjJhVzBEekV0V3hUaE1xTk9FRlRPZFp1?=
- =?utf-8?B?NjlYNkdqdXlNdWhObm1UMmZseUdpeHRaYXNXUHphM0krRS9LYTVjS1MyeWJW?=
- =?utf-8?B?WFVJczhZK3VEcDRHNDQ0bVZnWTkwRlgwMGUxZDVIeWY4ZDRoOGFaV3ByWGVS?=
- =?utf-8?B?WDhlRmxiRHVzdXhpYVZNYmJtNXV4RWVqcVBCNFFSQXBja0pERTVBbVk1QjBS?=
- =?utf-8?B?dVpSWXZMVEhDUVRQUHRkajZRTno5SnNjcFNTQXExSmgwZnF2RUFaeUs4bEc1?=
- =?utf-8?B?cWpvUk1wSHlMQzhGdytmUVBlck5FZFp4T1llVzZNK2FRaXNxZGpVeWlQSTRq?=
- =?utf-8?B?L0U4K1I2SVZiL3hIbzd5cGVIOXhVREFFS2dvdHVoTlJiRXJjNEg3VlQwd0JS?=
- =?utf-8?B?aVJhYkd1bXh4emhUT1dHVlVTWHFlVzh3dFVhanhBbXFEUVRpYmdqYVViK2VM?=
- =?utf-8?B?dDhQWEpFRlI0aG1GYW9LZVhackdwQ1FPOUh6Y0g4WWczaHBKcVFFNUdibHk4?=
- =?utf-8?B?ODhXUUIwbmpxeDJTRXhSa1U5b0FKcXRnNmEyQkc4RHlYRlNPMGZKbHlVbmZx?=
- =?utf-8?B?UGlydzB0VE1mMW92dUMvVGJOY1NobkdFbmZaTGQwTzdFRzJvUVUxVXBCanhl?=
- =?utf-8?B?SUtoNGNGQkFVc0VUTUlTb2FPcHVITitEakgyazFqamo3MjB4U1VSR2Evb2FE?=
- =?utf-8?B?bjVIZTduZ3Y5N0xlSmtGYlFLSnQwNk9WajMxK2JraTd1Ukw4aWpPV2draFpP?=
- =?utf-8?B?MG1tNXZFVjk0alc0eVJWMVFOSGRMSWx5NmNjbG9iYm0rR2VvanY2UFdnbDgy?=
- =?utf-8?B?eS9MWnAvOTBqaGs1blRkM1paeWpFQ09tWFFaODV3TkUxVHJqNndhbDVFVXNP?=
- =?utf-8?B?MldtdUhlT1NHUTc0Njk4czB0TndKdHhsNVZTbDdDY3hPM3NvbUhZdWFFL1pH?=
- =?utf-8?B?QUVIbzJhQkladndDYWhZZGVaYWNUNHNWRFdhR3NCajJpdVA5eDFZakxjc09y?=
- =?utf-8?B?eFJYS0V3eWJqRStoT1BFbnYzSndEK0FGZUM1L2Y4OC83RjA0T1c5dmR1ODhX?=
- =?utf-8?B?SXVUK0tGcVBlSmx1Q0ZJRGZLOHBnN29hVE82UFRMeHUzNVBOQU5PWTZ1bmpN?=
- =?utf-8?B?VkJrTmgwNEJDTmZxZmd2QzNyMVdRdFRKc014NWc2L0xGbnNwSlBDMi9qdUNB?=
- =?utf-8?B?NlN2bTJsbEVldlFVV3dVQnc3VitoN0F5MVRjTy92ZXZ1YTdvYjU0Q2p4TEUw?=
- =?utf-8?B?NjY5SFhDZU8vSEQzZ2x1ZWtyS0RFR1ZsaUFDV3BmZE85bCt5WURqYU1ZejhP?=
- =?utf-8?B?Ny9rSFlLeWtEOWJSSExYdUw4dU5QL3BOZjNWUk1KWStkcE9RYVZFMmV1ZGFX?=
- =?utf-8?B?MG0wakFscVl1WEtLU2xmcmQ3NmxZUHltU05mWlZQMkFsY1V3Z28wbitMSDhw?=
- =?utf-8?B?VUVkdStPbGltS01lTnBHcEhGUzFtNjhrVTlDckpKazc2d2t6c0JtdlVsTnd3?=
- =?utf-8?B?SUpWVTVBVGhsM3BzMjJlSzNtZVQ4Zys5Z2wvNklmdUNxbmc1bEZGb1RyNjFT?=
- =?utf-8?B?cWp2a1pSd0VyNVhqaVZKb2hqeWZCVlU4OTBTVlgyTmtFKzFhblcrd1kxdFo0?=
- =?utf-8?B?TlljcDFqSmhhTzhzZEtuV25VcnpBU0xNM2VWVDJ2T0diK1VOWkZIUEV6RWZC?=
- =?utf-8?B?SEpiM05KRkN3OWtvdmVDRS9jOWE1MFU4UWM1VlhOa2NKWEJXOVRDZ0xIZ0hF?=
- =?utf-8?B?SGNEOWYvOUdhMVQ3TTQ5UG9HVENaeHNJQmc0b2NUcndwNEFPUDVidkhRTDQr?=
- =?utf-8?B?Vk8zV1NobXhCeXNuSjlLdnZiWURnWE12MzF0MGdlNXhpWTNEc3VFK2ZXUXM2?=
- =?utf-8?B?N1d4WEQ4emdZOVpKUDhRYVk4MDV0VmRTaVZUdUNRZkNzOXMzQTc2UitBMThp?=
- =?utf-8?Q?5Tin4O?=
+	=?us-ascii?Q?fsjWKTiQ0WFGy58pmy9y6JXB5gA5ZIQ0kQjEN3kYWjw2FdH+DsOk7bcPiS3Y?=
+ =?us-ascii?Q?dC5COGa1qvIqPIUiIZ5SmZdy3jefatkI3ym73LyaDudeZx72Mkg0dObn5nwR?=
+ =?us-ascii?Q?76LRxfamID2ssY5C12uUHtk/LqSAKXuIC6Yz4KIEFXs6jk6lEedVqNAo42rw?=
+ =?us-ascii?Q?cs2PtFOd5JAPnnL6bY1vvdbw3goq1iQSa7PfoFwOuzt6LcbepwM4txK6Fdlk?=
+ =?us-ascii?Q?VTDicKFsDR2QJC0jPXjnA4P7C+pOizWErhLB8pRL7ntRcspkLEDfUZPrcpML?=
+ =?us-ascii?Q?tEQ7v1gT7e8XFzNtUVjrN3OFHT5DYQRfd1HLIhsY41RKgcsPs9TaoGa6EknQ?=
+ =?us-ascii?Q?9mZtcz4N9A5Yrqc/19RZI2FbID2B7IwjzzB/Qd36+MuoHKOyxkZc9mXkxpuo?=
+ =?us-ascii?Q?W00RsG4d8LrqHde/0mkLld4N+MWBxgr3uMaHZ6Wf/ltFWi1ayNYSah1RJLo6?=
+ =?us-ascii?Q?pgx8HEXKnXhYWTrHInwUANTaTUUuviq8ebSYcrB/I1nLGCgprW3Wk7OeMiDW?=
+ =?us-ascii?Q?7wac5Ioo5egoGK3PyjgBzwjF/vgyqPnlQV+1iLQKqrBdffThpCXJS4XgoJyT?=
+ =?us-ascii?Q?B6KBNlN9qpbboZBhg/8jmtMLgtxJKmOs781IMnB76+zPcF4PPfUdUsbSZpMd?=
+ =?us-ascii?Q?8oWZf6wXNpj0cmr1uoeguKUQ2CkumkSfzYb4diRztPJzppYpcuUE3rVLp4QB?=
+ =?us-ascii?Q?t58pHszzGrj+oPNicOke/7NjJL+6BzGi9q9wb1WnbwpLB+OK3cg/yrP1qCQx?=
+ =?us-ascii?Q?jcXB+AV2wQaP6TVpjxKJdOf6GL5TdwEVgeB5gi9sVvUFW7Wt8fsl+6Yd/ph0?=
+ =?us-ascii?Q?KEB2wbScD3Tje72J6ZRWGhTEp4I4Bz6m3DCZ9/cymxqjiu7kafXnMOhWoTIu?=
+ =?us-ascii?Q?U8Jrm/lfDPX/RFu97YhzzMILTASgSasLvWJww1M3udDQ8xN8g6LKMVkLKZZm?=
+ =?us-ascii?Q?MAegtxh4Is2g6mqHjYFfpXJtRPHQrmTmMSXPWaTxj8e6ZeMcXo86lSZtK4OT?=
+ =?us-ascii?Q?bf5vPkeqCFPYELoa5rLP8pslIH6jD1hWdYMAG0G8RlT1BWd0oqMrmowzo9y/?=
+ =?us-ascii?Q?rgdYadQvZ6EtzopnOgcFhMmN8Y09NrV+s/yqgVrBXfNOeqF0gkhC6MmHisn1?=
+ =?us-ascii?Q?J0J8Z2l0mMHvmVXZPtWWIE8Yy4hJVOw5t7Gbd9HLUJ/Iu2DSuLzt19mmzy3a?=
+ =?us-ascii?Q?HDtZkgB7fLO/Rceo0zNx6w8EWPHlDzlzph3MX3Kfd+D2DcFm36Zm51/v9ToB?=
+ =?us-ascii?Q?YZhqUfLK/SS1sByKmbkMwaQzoeFrIE91tikPbfSZlflmPXmENbz05430TJRE?=
+ =?us-ascii?Q?RLBlp+3jn8zFIt/fTddCB9plhrhFgeeEsmFUjNEyvUA2pngu506oKW8JZRBe?=
+ =?us-ascii?Q?PSle82GYUioWaFgl5moMPHpjJaBlYe7IRZoTJmr/HypCgQr6eK07tOg8fu4l?=
+ =?us-ascii?Q?7ZvLXFUv12yBHTtm96PDghu+4CqECyXqmqxUNZa93u6GsjX7cNJeNsAffMZ4?=
+ =?us-ascii?Q?Y5IswL/ybmNlOoJS4/lHCSJOexCGVdnMGLdX?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(7416014)(376014)(1800799024)(82310400026);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(7416014)(82310400026)(376014);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jul 2025 19:27:02.6021
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jul 2025 19:27:20.8882
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ab85c45d-5a09-4968-f89a-08ddc3d5938c
+X-MS-Exchange-CrossTenant-Network-Message-Id: f503860a-3b6b-4b16-d88a-08ddc3d59e8e
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF00001CE4.namprd03.prod.outlook.com
+	SJ1PEPF00001CEB.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6113
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8459
 
 From: Ashish Kalra <ashish.kalra@amd.com>
 
 After a panic if SNP is enabled in the previous kernel then the kdump
 kernel boots with IOMMU SNP enforcement still enabled.
 
-IOMMU completion wait buffers (CWBs), command buffers and event buffer
-registers remain locked and exclusive to the previous kernel. Attempts
-to allocate and use new buffers in the kdump kernel fail, as hardware
-ignores writes to the locked MMIO registers as per AMD IOMMU spec
-Section 2.12.2.1.
+IOMMU device table register is locked and exclusive to the previous
+kernel. Attempts to copy old device table from the previous kernel
+fails in kdump kernel as hardware ignores writes to the locked device
+table base address register as per AMD IOMMU spec Section 2.12.2.1.
 
 This results in repeated "Completion-Wait loop timed out" errors and a
 second kernel panic: "Kernel panic - not syncing: timer doesn't work
-through Interrupt-remapped IO-APIC"
+through Interrupt-remapped IO-APIC".
 
-The following MMIO registers are locked and ignore writes after failed
-SNP shutdown:
-Command Buffer Base Address Register
-Event Log Base Address Register
-Completion Store Base Register/Exclusion Base Register
-Completion Store Limit Register/Exclusion Limit Register
-As a result, the kdump kernel cannot initialize the IOMMU or enable IRQ
-remapping, which is required for proper operation.
-
-Reuse the pages of the previous kernel for completion wait buffers,
-command buffers, event buffers and memremap them during kdump boot
-and essentially work with an already enabled IOMMU configuration and
-re-using the previous kernel’s data structures.
-
-Reusing of command buffers and event buffers is now done for kdump boot
-irrespective of SNP being enabled during kdump.
-
-Re-use of completion wait buffers is only done when SNP is enabled as
-the exclusion base register is used for the completion wait buffer
-(CWB) address only when SNP is enabled.
+Reuse device table instead of copying device table in case of kdump
+boot and remove all copying device table code.
 
 Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
 ---
- drivers/iommu/amd/amd_iommu_types.h |   5 +
- drivers/iommu/amd/init.c            | 163 ++++++++++++++++++++++++++--
- drivers/iommu/amd/iommu.c           |   2 +-
- 3 files changed, 157 insertions(+), 13 deletions(-)
+ drivers/iommu/amd/init.c | 97 ++++++++++++----------------------------
+ 1 file changed, 28 insertions(+), 69 deletions(-)
 
-diff --git a/drivers/iommu/amd/amd_iommu_types.h b/drivers/iommu/amd/amd_iommu_types.h
-index 9b64cd706c96..082eb1270818 100644
---- a/drivers/iommu/amd/amd_iommu_types.h
-+++ b/drivers/iommu/amd/amd_iommu_types.h
-@@ -791,6 +791,11 @@ struct amd_iommu {
- 	u32 flags;
- 	volatile u64 *cmd_sem;
- 	atomic64_t cmd_sem_val;
-+	/*
-+	 * Track physical address to directly use it in build_completion_wait()
-+	 * and avoid adding any special checks and handling for kdump.
-+	 */
-+	u64 cmd_sem_paddr;
- 
- #ifdef CONFIG_AMD_IOMMU_DEBUGFS
- 	/* DebugFS Info */
 diff --git a/drivers/iommu/amd/init.c b/drivers/iommu/amd/init.c
-index cadb2c735ffc..32295f26be1b 100644
+index 32295f26be1b..18bd869a82d9 100644
 --- a/drivers/iommu/amd/init.c
 +++ b/drivers/iommu/amd/init.c
-@@ -710,6 +710,23 @@ static void __init free_alias_table(struct amd_iommu_pci_seg *pci_seg)
- 	pci_seg->alias_table = NULL;
+@@ -406,6 +406,9 @@ static void iommu_set_device_table(struct amd_iommu *iommu)
+ 
+ 	BUG_ON(iommu->mmio_base == NULL);
+ 
++	if (is_kdump_kernel())
++		return;
++
+ 	entry = iommu_virt_to_phys(dev_table);
+ 	entry |= (dev_table_size >> 12) - 1;
+ 	memcpy_toio(iommu->mmio_base + MMIO_DEV_TABLE_OFFSET,
+@@ -646,7 +649,10 @@ static inline int __init alloc_dev_table(struct amd_iommu_pci_seg *pci_seg)
+ 
+ static inline void free_dev_table(struct amd_iommu_pci_seg *pci_seg)
+ {
+-	iommu_free_pages(pci_seg->dev_table);
++	if (is_kdump_kernel())
++		memunmap((void *)pci_seg->dev_table);
++	else
++		iommu_free_pages(pci_seg->dev_table);
+ 	pci_seg->dev_table = NULL;
  }
  
-+static inline void *iommu_memremap(unsigned long paddr, size_t size)
-+{
-+	phys_addr_t phys;
-+
-+	if (!paddr)
-+		return NULL;
-+
-+	/*
-+	 * Obtain true physical address in kdump kernel when SME is enabled.
-+	 * Currently, IOMMU driver does not support booting into an unencrypted
-+	 * kdump kernel.
-+	 */
-+	phys = __sme_clr(paddr);
-+
-+	return ioremap_encrypted(phys, size);
-+}
-+
- /*
-  * Allocates the command buffer. This buffer is per AMD IOMMU. We can
-  * write commands to that buffer later and the IOMMU will execute them
-@@ -942,8 +959,105 @@ static int iommu_init_ga_log(struct amd_iommu *iommu)
- static int __init alloc_cwwb_sem(struct amd_iommu *iommu)
- {
- 	iommu->cmd_sem = iommu_alloc_4k_pages(iommu, GFP_KERNEL, 1);
-+	if (!iommu->cmd_sem)
-+		return -ENOMEM;
-+	iommu->cmd_sem_paddr = iommu_virt_to_phys((void *)iommu->cmd_sem);
-+	return 0;
-+}
-+
-+static int __init remap_event_buffer(struct amd_iommu *iommu)
-+{
-+	u64 paddr;
-+
-+	pr_info_once("Re-using event buffer from the previous kernel\n");
-+	/*
-+	 * Read-back the event log base address register and apply
-+	 * PM_ADDR_MASK to obtain the event log base address.
-+	 */
-+	paddr = readq(iommu->mmio_base + MMIO_EVT_BUF_OFFSET) & PM_ADDR_MASK;
-+	iommu->evt_buf = iommu_memremap(paddr, EVT_BUFFER_SIZE);
-+
-+	return iommu->evt_buf ? 0 : -ENOMEM;
-+}
-+
-+static int __init remap_command_buffer(struct amd_iommu *iommu)
-+{
-+	u64 paddr;
-+
-+	pr_info_once("Re-using command buffer from the previous kernel\n");
-+	/*
-+	 * Read-back the command buffer base address register and apply
-+	 * PM_ADDR_MASK to obtain the command buffer base address.
-+	 */
-+	paddr = readq(iommu->mmio_base + MMIO_CMD_BUF_OFFSET) & PM_ADDR_MASK;
-+	iommu->cmd_buf = iommu_memremap(paddr, CMD_BUFFER_SIZE);
-+
-+	return iommu->cmd_buf ? 0 : -ENOMEM;
-+}
-+
-+static int __init remap_cwwb_sem(struct amd_iommu *iommu)
-+{
-+	u64 paddr;
-+
-+	if (check_feature(FEATURE_SNP)) {
-+		/*
-+		 * When SNP is enabled, the exclusion base register is used for the
-+		 * completion wait buffer (CWB) address. Read and re-use it.
-+		 */
-+		pr_info_once("Re-using CWB buffers from the previous kernel\n");
-+		/*
-+		 * Read-back the exclusion base register and apply PM_ADDR_MASK
-+		 * to obtain the exclusion range base address.
-+		 */
-+		paddr = readq(iommu->mmio_base + MMIO_EXCL_BASE_OFFSET) & PM_ADDR_MASK;
-+		iommu->cmd_sem = iommu_memremap(paddr, PAGE_SIZE);
-+		if (!iommu->cmd_sem)
-+			return -ENOMEM;
-+		iommu->cmd_sem_paddr = paddr;
-+	} else {
-+		return alloc_cwwb_sem(iommu);
-+	}
-+
-+	return 0;
-+}
-+
-+static int __init alloc_iommu_buffers(struct amd_iommu *iommu)
-+{
-+	int ret;
-+
-+	/*
-+	 * IOMMU Completion Store Base MMIO, Command Buffer Base Address MMIO
-+	 * registers are locked if SNP is enabled during kdump, reuse/remap
-+	 * the previous kernel's allocated completion wait and command buffers
-+	 * for kdump boot.
-+	 */
-+	if (is_kdump_kernel()) {
-+		ret = remap_cwwb_sem(iommu);
-+		if (ret)
-+			return ret;
-+
-+		ret = remap_command_buffer(iommu);
-+		if (ret)
-+			return ret;
-+
-+		ret = remap_event_buffer(iommu);
-+		if (ret)
-+			return ret;
-+	} else {
-+		ret = alloc_cwwb_sem(iommu);
-+		if (ret)
-+			return ret;
-+
-+		ret = alloc_command_buffer(iommu);
-+		if (ret)
-+			return ret;
- 
--	return iommu->cmd_sem ? 0 : -ENOMEM;
-+		ret = alloc_event_buffer(iommu);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	return 0;
+@@ -1128,15 +1134,12 @@ static void set_dte_bit(struct dev_table_entry *dte, u8 bit)
+ 	dte->data[i] |= (1UL << _bit);
  }
  
- static void __init free_cwwb_sem(struct amd_iommu *iommu)
-@@ -951,6 +1065,38 @@ static void __init free_cwwb_sem(struct amd_iommu *iommu)
- 	if (iommu->cmd_sem)
- 		iommu_free_pages((void *)iommu->cmd_sem);
- }
-+static void __init unmap_cwwb_sem(struct amd_iommu *iommu)
-+{
-+	if (iommu->cmd_sem) {
-+		if (check_feature(FEATURE_SNP))
-+			memunmap((void *)iommu->cmd_sem);
-+		else
-+			iommu_free_pages((void *)iommu->cmd_sem);
-+	}
-+}
-+
-+static void __init unmap_command_buffer(struct amd_iommu *iommu)
-+{
-+	memunmap((void *)iommu->cmd_buf);
-+}
-+
-+static void __init unmap_event_buffer(struct amd_iommu *iommu)
-+{
-+	memunmap(iommu->evt_buf);
-+}
-+
-+static void __init free_iommu_buffers(struct amd_iommu *iommu)
-+{
-+	if (is_kdump_kernel()) {
-+		unmap_cwwb_sem(iommu);
-+		unmap_command_buffer(iommu);
-+		unmap_event_buffer(iommu);
-+	} else {
-+		free_cwwb_sem(iommu);
-+		free_command_buffer(iommu);
-+		free_event_buffer(iommu);
-+	}
-+}
+-static bool __copy_device_table(struct amd_iommu *iommu)
++static bool __reuse_device_table(struct amd_iommu *iommu)
+ {
+-	u64 int_ctl, int_tab_len, entry = 0;
+ 	struct amd_iommu_pci_seg *pci_seg = iommu->pci_seg;
+-	struct dev_table_entry *old_devtb = NULL;
+-	u32 lo, hi, devid, old_devtb_size;
++	u32 lo, hi, old_devtb_size;
+ 	phys_addr_t old_devtb_phys;
+-	u16 dom_id, dte_v, irq_v;
+-	u64 tmp;
++	u64 entry;
  
- static void iommu_enable_xt(struct amd_iommu *iommu)
- {
-@@ -1655,9 +1801,7 @@ static void __init free_sysfs(struct amd_iommu *iommu)
- static void __init free_iommu_one(struct amd_iommu *iommu)
- {
- 	free_sysfs(iommu);
--	free_cwwb_sem(iommu);
--	free_command_buffer(iommu);
--	free_event_buffer(iommu);
-+	free_iommu_buffers(iommu);
- 	amd_iommu_free_ppr_log(iommu);
- 	free_ga_log(iommu);
- 	iommu_unmap_mmio_space(iommu);
-@@ -1821,14 +1965,9 @@ static int __init init_iommu_one_late(struct amd_iommu *iommu)
- {
- 	int ret;
- 
--	if (alloc_cwwb_sem(iommu))
--		return -ENOMEM;
+ 	/* Each IOMMU use separate device table with the same size */
+ 	lo = readl(iommu->mmio_base + MMIO_DEV_TABLE_OFFSET);
+@@ -1161,66 +1164,22 @@ static bool __copy_device_table(struct amd_iommu *iommu)
+ 		pr_err("The address of old device table is above 4G, not trustworthy!\n");
+ 		return false;
+ 	}
+-	old_devtb = (cc_platform_has(CC_ATTR_HOST_MEM_ENCRYPT) && is_kdump_kernel())
+-		    ? (__force void *)ioremap_encrypted(old_devtb_phys,
+-							pci_seg->dev_table_size)
+-		    : memremap(old_devtb_phys, pci_seg->dev_table_size, MEMREMAP_WB);
 -
--	if (alloc_command_buffer(iommu))
--		return -ENOMEM;
+-	if (!old_devtb)
+-		return false;
+ 
+-	pci_seg->old_dev_tbl_cpy = iommu_alloc_pages_sz(
+-		GFP_KERNEL | GFP_DMA32, pci_seg->dev_table_size);
++	/*
++	 * IOMMU Device Table Base Address MMIO register is locked
++	 * if SNP is enabled during kdump, reuse the previous kernel's
++	 * device table.
++	 */
++	pci_seg->old_dev_tbl_cpy = iommu_memremap(old_devtb_phys, pci_seg->dev_table_size);
+ 	if (pci_seg->old_dev_tbl_cpy == NULL) {
+-		pr_err("Failed to allocate memory for copying old device table!\n");
+-		memunmap(old_devtb);
++		pr_err("Failed to remap memory for reusing old device table!\n");
+ 		return false;
+ 	}
+ 
+-	for (devid = 0; devid <= pci_seg->last_bdf; ++devid) {
+-		pci_seg->old_dev_tbl_cpy[devid] = old_devtb[devid];
+-		dom_id = old_devtb[devid].data[1] & DEV_DOMID_MASK;
+-		dte_v = old_devtb[devid].data[0] & DTE_FLAG_V;
 -
--	if (alloc_event_buffer(iommu))
--		return -ENOMEM;
-+	ret = alloc_iommu_buffers(iommu);
-+	if (ret)
-+		return ret;
+-		if (dte_v && dom_id) {
+-			pci_seg->old_dev_tbl_cpy[devid].data[0] = old_devtb[devid].data[0];
+-			pci_seg->old_dev_tbl_cpy[devid].data[1] = old_devtb[devid].data[1];
+-			/* Reserve the Domain IDs used by previous kernel */
+-			if (ida_alloc_range(&pdom_ids, dom_id, dom_id, GFP_ATOMIC) != dom_id) {
+-				pr_err("Failed to reserve domain ID 0x%x\n", dom_id);
+-				memunmap(old_devtb);
+-				return false;
+-			}
+-			/* If gcr3 table existed, mask it out */
+-			if (old_devtb[devid].data[0] & DTE_FLAG_GV) {
+-				tmp = (DTE_GCR3_30_15 | DTE_GCR3_51_31);
+-				pci_seg->old_dev_tbl_cpy[devid].data[1] &= ~tmp;
+-				tmp = (DTE_GCR3_14_12 | DTE_FLAG_GV);
+-				pci_seg->old_dev_tbl_cpy[devid].data[0] &= ~tmp;
+-			}
+-		}
+-
+-		irq_v = old_devtb[devid].data[2] & DTE_IRQ_REMAP_ENABLE;
+-		int_ctl = old_devtb[devid].data[2] & DTE_IRQ_REMAP_INTCTL_MASK;
+-		int_tab_len = old_devtb[devid].data[2] & DTE_INTTABLEN_MASK;
+-		if (irq_v && (int_ctl || int_tab_len)) {
+-			if ((int_ctl != DTE_IRQ_REMAP_INTCTL) ||
+-			    (int_tab_len != DTE_INTTABLEN_512 &&
+-			     int_tab_len != DTE_INTTABLEN_2K)) {
+-				pr_err("Wrong old irq remapping flag: %#x\n", devid);
+-				memunmap(old_devtb);
+-				return false;
+-			}
+-
+-			pci_seg->old_dev_tbl_cpy[devid].data[2] = old_devtb[devid].data[2];
+-		}
+-	}
+-	memunmap(old_devtb);
+-
+ 	return true;
+ }
  
- 	iommu->int_enabled = false;
- 
-diff --git a/drivers/iommu/amd/iommu.c b/drivers/iommu/amd/iommu.c
-index 7dc6d2dd8dd1..8e1b475e39c7 100644
---- a/drivers/iommu/amd/iommu.c
-+++ b/drivers/iommu/amd/iommu.c
-@@ -1201,7 +1201,7 @@ static void build_completion_wait(struct iommu_cmd *cmd,
- 				  struct amd_iommu *iommu,
- 				  u64 data)
+-static bool copy_device_table(void)
++static bool reuse_device_table(void)
  {
--	u64 paddr = iommu_virt_to_phys((void *)iommu->cmd_sem);
-+	u64 paddr = iommu->cmd_sem_paddr;
+ 	struct amd_iommu *iommu;
+ 	struct amd_iommu_pci_seg *pci_seg;
+@@ -1228,17 +1187,17 @@ static bool copy_device_table(void)
+ 	if (!amd_iommu_pre_enabled)
+ 		return false;
  
- 	memset(cmd, 0, sizeof(*cmd));
- 	cmd->data[0] = lower_32_bits(paddr) | CMD_COMPL_WAIT_STORE_MASK;
+-	pr_warn("Translation is already enabled - trying to copy translation structures\n");
++	pr_warn("Translation is already enabled - trying to reuse translation structures\n");
+ 
+ 	/*
+ 	 * All IOMMUs within PCI segment shares common device table.
+-	 * Hence copy device table only once per PCI segment.
++	 * Hence reuse device table only once per PCI segment.
+ 	 */
+ 	for_each_pci_segment(pci_seg) {
+ 		for_each_iommu(iommu) {
+ 			if (pci_seg->id != iommu->pci_seg->id)
+ 				continue;
+-			if (!__copy_device_table(iommu))
++			if (!__reuse_device_table(iommu))
+ 				return false;
+ 			break;
+ 		}
+@@ -2917,8 +2876,8 @@ static void early_enable_iommu(struct amd_iommu *iommu)
+  * This function finally enables all IOMMUs found in the system after
+  * they have been initialized.
+  *
+- * Or if in kdump kernel and IOMMUs are all pre-enabled, try to copy
+- * the old content of device table entries. Not this case or copy failed,
++ * Or if in kdump kernel and IOMMUs are all pre-enabled, try to reuse
++ * the old content of device table entries. Not this case or reuse failed,
+  * just continue as normal kernel does.
+  */
+ static void early_enable_iommus(void)
+@@ -2926,18 +2885,18 @@ static void early_enable_iommus(void)
+ 	struct amd_iommu *iommu;
+ 	struct amd_iommu_pci_seg *pci_seg;
+ 
+-	if (!copy_device_table()) {
++	if (!reuse_device_table()) {
+ 		/*
+-		 * If come here because of failure in copying device table from old
++		 * If come here because of failure in reusing device table from old
+ 		 * kernel with all IOMMUs enabled, print error message and try to
+ 		 * free allocated old_dev_tbl_cpy.
+ 		 */
+ 		if (amd_iommu_pre_enabled)
+-			pr_err("Failed to copy DEV table from previous kernel.\n");
++			pr_err("Failed to reuse DEV table from previous kernel.\n");
+ 
+ 		for_each_pci_segment(pci_seg) {
+ 			if (pci_seg->old_dev_tbl_cpy != NULL) {
+-				iommu_free_pages(pci_seg->old_dev_tbl_cpy);
++				memunmap((void *)pci_seg->old_dev_tbl_cpy);
+ 				pci_seg->old_dev_tbl_cpy = NULL;
+ 			}
+ 		}
+@@ -2947,7 +2906,7 @@ static void early_enable_iommus(void)
+ 			early_enable_iommu(iommu);
+ 		}
+ 	} else {
+-		pr_info("Copied DEV table from previous kernel.\n");
++		pr_info("Reused DEV table from previous kernel.\n");
+ 
+ 		for_each_pci_segment(pci_seg) {
+ 			iommu_free_pages(pci_seg->dev_table);
 -- 
 2.34.1
 
