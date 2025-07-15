@@ -1,308 +1,414 @@
-Return-Path: <kvm+bounces-52439-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52440-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E13AB05384
-	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 09:43:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3A51B0539E
+	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 09:49:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60B851AA7A15
-	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 07:43:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5B323A3385
+	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 07:48:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D86232701D2;
-	Tue, 15 Jul 2025 07:42:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b="EM8wQ8HW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78C432727F7;
+	Tue, 15 Jul 2025 07:49:19 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from www3579.sakura.ne.jp (www3579.sakura.ne.jp [49.212.243.89])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 947EA26FD9B
-	for <kvm@vger.kernel.org>; Tue, 15 Jul 2025 07:42:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.243.89
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7516A2747B;
+	Tue, 15 Jul 2025 07:49:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752565373; cv=none; b=KNRLLgPUVoXRz3C6lpwfS3OPLHQJEiKFfV7b30QvVcnchqRR+Pzl6kgRFlbkzjlJNKFlfJgfd3q+blpEBn3KDuBDjpek/JIjuNuExiAKe7kFvhG3Q/XaNgVypjxRSVRNcsx+lYvtqgT+2+zA4AEz0dXJ1L6DLBGugLTr30zlu6w=
+	t=1752565759; cv=none; b=GCJ19Naz0YcYSlb6joXQPWbpNUMZYSOggc0HltNoItDy3gwIUvy+qmun83K/4QlytYEjpA/6OmKo2RrMConvD2RNQv2fScFBvqcsc+9ppyBUNYaIAWDpQ2wq8+ZsZ5eE8zZr3zW0MIiD7ELMgW+atx4Q0Gvk8zs5YFoNi3L9aBs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752565373; c=relaxed/simple;
-	bh=SNRknQLv6NPDTQMb++m9SSF9AEy/CaOpDPIFHvGwoDw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aIkieU5WeqkmRsFRM0YlZRPdx3lfZHG4g4EoD93KbabJiT8MM1sPinexudiu0rKWs/VukyDRXr1/S+OEQooambekGF8r4/LWgxwcBUV3rWNMtBeRVh78A3xMYXRT7f+PnckZ4kMqaQGceVZsK3ngeFLeLhWcIYBEsmcV2ZbMJRw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp; dkim=fail (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b=EM8wQ8HW reason="key not found in DNS"; arc=none smtp.client-ip=49.212.243.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp
-Received: from [10.105.8.218] ([192.51.222.130])
-	(authenticated bits=0)
-	by www3579.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 56F7gmrF023054
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Tue, 15 Jul 2025 16:42:48 +0900 (JST)
-	(envelope-from odaki@rsg.ci.i.u-tokyo.ac.jp)
-DKIM-Signature: a=rsa-sha256; bh=kx29O3j64MckhEwy/8xrLI+WMcwnZ0a/DV+G30DWIt4=;
-        c=relaxed/relaxed; d=rsg.ci.i.u-tokyo.ac.jp;
-        h=Message-ID:Date:Subject:To:From;
-        s=rs20250326; t=1752565368; v=1;
-        b=EM8wQ8HW2O8SSEOhYmNg3PskWpwOwfaKYdS/xScxjL8o43n2ua8JiFXFbFGzEN87
-         GCRt0wfCypl49ZS4Y1xHX5tC/eh9eh6n9Eutc8CwvvDdguSrEDYa17zt5tA6Dp5v
-         de13QRh2oVK9ZWfHNw3lr9iAdEV4wFmPhq0m1sM0JjEORML1876fuQtxc0RhWsgE
-         6E34F9YMbUxRx1PJlS9UK3YPbFKSNfv/f6+etly4NbpITgZvM4WlWC7/sNuQkyLC
-         /wI7Yc4s14XUz9MyB4ek44cxdOEFxWLcTP/+/Uf2ZfWhTOnZN14coQXqAzG0qAbB
-         Tu689Fp4DYpsSFfcL//DDQ==
-Message-ID: <8af39b78-a95d-4093-b68c-20b556860a09@rsg.ci.i.u-tokyo.ac.jp>
-Date: Tue, 15 Jul 2025 16:42:48 +0900
+	s=arc-20240116; t=1752565759; c=relaxed/simple;
+	bh=xtcctwkaOfneMSd+4iXn3mlK4lXhScpievgxBQ+UX4Y=;
+	h=Subject:From:To:CC:References:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=foAfhNiZ+kf0ftDSwEDzV7wUI+QJ4o47J+Dk5A7gjGtW5KVTVXA+kY3Lx4YjjjGV2Q5rCiOgAVVTCMHBnd7lkwd1K5Y6s3a6j+mySxDcgDblJSB4gYdwbNjZd+os5mGwEuHJuv4tyVlLFLbPtjfEVmt2/sGuUfU7H2+Z2opY8is=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.234])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4bhB985RhYz2FbNV;
+	Tue, 15 Jul 2025 15:47:08 +0800 (CST)
+Received: from dggpemf500015.china.huawei.com (unknown [7.185.36.143])
+	by mail.maildlp.com (Postfix) with ESMTPS id 3D70714011F;
+	Tue, 15 Jul 2025 15:49:11 +0800 (CST)
+Received: from [10.67.121.110] (10.67.121.110) by
+ dggpemf500015.china.huawei.com (7.185.36.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 15 Jul 2025 15:49:10 +0800
+Subject: Re: [PATCH v5 3/3] migration: adapt to new migration configuration
+From: liulongfang <liulongfang@huawei.com>
+To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+	"alex.williamson@redhat.com" <alex.williamson@redhat.com>, "jgg@nvidia.com"
+	<jgg@nvidia.com>, Jonathan Cameron <jonathan.cameron@huawei.com>
+CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linuxarm@openeuler.org" <linuxarm@openeuler.org>
+References: <20250630085402.7491-1-liulongfang@huawei.com>
+ <20250630085402.7491-4-liulongfang@huawei.com>
+ <7bdf1024bdcd4ba6b0bce352caefdefc@huawei.com>
+ <38061357-1b9b-1e35-5273-0ebb1d7bcadd@huawei.com>
+Message-ID: <b1644a95-0671-2c1e-8e2c-0b2b368595a3@huawei.com>
+Date: Tue, 15 Jul 2025 15:49:09 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v2 06/13] virtio-pci: implement support for extended
- features
-To: Paolo Abeni <pabeni@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-        Dmitry Fleytman <dmitry.fleytman@gmail.com>,
-        Jason Wang
- <jasowang@redhat.com>,
-        Sriram Yagnaraman <sriram.yagnaraman@ericsson.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, Luigi Rizzo <lrizzo@google.com>,
-        Giuseppe Lettieri
- <g.lettieri@iet.unipi.it>,
-        Vincenzo Maffione <v.maffione@gmail.com>,
-        Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>,
-        kvm@vger.kernel.org
-References: <cover.1752229731.git.pabeni@redhat.com>
- <eb1aa9c8442d9b482b5c84fdca54b92c8a824495.1752229731.git.pabeni@redhat.com>
-Content-Language: en-US
-From: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
-In-Reply-To: <eb1aa9c8442d9b482b5c84fdca54b92c8a824495.1752229731.git.pabeni@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <38061357-1b9b-1e35-5273-0ebb1d7bcadd@huawei.com>
+Content-Type: text/plain; charset="gbk"
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
+ dggpemf500015.china.huawei.com (7.185.36.143)
 
-On 2025/07/11 22:02, Paolo Abeni wrote:
-> Extend the features configuration space to 128 bits, and allow the
-> common read/write operation to access all of it.
+On 2025/7/15 15:15, liulongfang wrote:
+> On 2025/7/8 16:28, Shameerali Kolothum Thodi wrote:
+>>
+>>
+>>> -----Original Message-----
+>>> From: liulongfang <liulongfang@huawei.com>
+>>> Sent: Monday, June 30, 2025 9:54 AM
+>>> To: alex.williamson@redhat.com; jgg@nvidia.com; Shameerali Kolothum
+>>> Thodi <shameerali.kolothum.thodi@huawei.com>; Jonathan Cameron
+>>> <jonathan.cameron@huawei.com>
+>>> Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
+>>> linuxarm@openeuler.org; liulongfang <liulongfang@huawei.com>
+>>> Subject: [PATCH v5 3/3] migration: adapt to new migration configuration
+>>>
+>>> On new platforms greater than QM_HW_V3, the migration region has been
+>>> relocated from the VF to the PF. The driver must also be modified
+>>> accordingly to adapt to the new hardware device.
+>>>
+>>> Utilize the PF's I/O base directly on the new hardware platform,
+>>> and no mmap operation is required. If it is on an old platform,
+>>> the driver needs to be compatible with the old solution.
+>>>
+>>> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
+>>> ---
+>>>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 166 ++++++++++++------
+>>>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |   7 +
+>>>  2 files changed, 120 insertions(+), 53 deletions(-)
+>>>
+>>> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+>>> b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+>>> index 1ddc9dbadb70..3aec3b92787f 100644
+>>> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+>>> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+>>> @@ -125,6 +125,72 @@ static int qm_get_cqc(struct hisi_qm *qm, u64
+>>> *addr)
+>>>  	return 0;
+>>>  }
+>>>
+>>> +static int qm_get_xqc_regs(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+>>> +			   struct acc_vf_data *vf_data)
+>>> +{
+>>> +	struct hisi_qm *qm = &hisi_acc_vdev->vf_qm;
+>>> +	struct device *dev = &qm->pdev->dev;
+>>> +	u32 eqc_addr, aeqc_addr;
+>>> +	int ret;
+>>> +
+>>> +	if (qm->ver == QM_HW_V3) {
+>>> +		eqc_addr = QM_EQC_DW0;
+>>> +		aeqc_addr = QM_AEQC_DW0;
+>>> +	} else {
+>>> +		eqc_addr = QM_EQC_PF_DW0;
+>>> +		aeqc_addr = QM_AEQC_PF_DW0;
+>>> +	}
+>>> +
+>>> +	/* QM_EQC_DW has 7 regs */
+>>> +	ret = qm_read_regs(qm, eqc_addr, vf_data->qm_eqc_dw, 7);
+>>> +	if (ret) {
+>>> +		dev_err(dev, "failed to read QM_EQC_DW\n");
+>>> +		return ret;
+>>> +	}
+>>> +
+>>> +	/* QM_AEQC_DW has 7 regs */
+>>> +	ret = qm_read_regs(qm, aeqc_addr, vf_data->qm_aeqc_dw, 7);
+>>> +	if (ret) {
+>>> +		dev_err(dev, "failed to read QM_AEQC_DW\n");
+>>> +		return ret;
+>>> +	}
+>>> +
+>>> +	return 0;
+>>> +}
+>>> +
+>>> +static int qm_set_xqc_regs(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+>>> +			   struct acc_vf_data *vf_data)
+>>> +{
+>>> +	struct hisi_qm *qm = &hisi_acc_vdev->vf_qm;
+>>> +	struct device *dev = &qm->pdev->dev;
+>>> +	u32 eqc_addr, aeqc_addr;
+>>> +	int ret;
+>>> +
+>>> +	if (qm->ver == QM_HW_V3) {
+>>> +		eqc_addr = QM_EQC_DW0;
+>>> +		aeqc_addr = QM_AEQC_DW0;
+>>> +	} else {
+>>> +		eqc_addr = QM_EQC_PF_DW0;
+>>> +		aeqc_addr = QM_AEQC_PF_DW0;
+>>> +	}
+>>> +
+>>> +	/* QM_EQC_DW has 7 regs */
+>>> +	ret = qm_write_regs(qm, eqc_addr, vf_data->qm_eqc_dw, 7);
+>>> +	if (ret) {
+>>> +		dev_err(dev, "failed to write QM_EQC_DW\n");
+>>> +		return ret;
+>>> +	}
+>>> +
+>>> +	/* QM_AEQC_DW has 7 regs */
+>>> +	ret = qm_write_regs(qm, aeqc_addr, vf_data->qm_aeqc_dw, 7);
+>>> +	if (ret) {
+>>> +		dev_err(dev, "failed to write QM_AEQC_DW\n");
+>>> +		return ret;
+>>> +	}
+>>> +
+>>> +	return 0;
+>>> +}
+>>> +
+>>>  static int qm_get_regs(struct hisi_qm *qm, struct acc_vf_data *vf_data)
+>>>  {
+>>>  	struct device *dev = &qm->pdev->dev;
+>>> @@ -167,20 +233,6 @@ static int qm_get_regs(struct hisi_qm *qm, struct
+>>> acc_vf_data *vf_data)
+>>>  		return ret;
+>>>  	}
+>>>
+>>> -	/* QM_EQC_DW has 7 regs */
+>>> -	ret = qm_read_regs(qm, QM_EQC_DW0, vf_data->qm_eqc_dw, 7);
+>>> -	if (ret) {
+>>> -		dev_err(dev, "failed to read QM_EQC_DW\n");
+>>> -		return ret;
+>>> -	}
+>>> -
+>>> -	/* QM_AEQC_DW has 7 regs */
+>>> -	ret = qm_read_regs(qm, QM_AEQC_DW0, vf_data->qm_aeqc_dw,
+>>> 7);
+>>> -	if (ret) {
+>>> -		dev_err(dev, "failed to read QM_AEQC_DW\n");
+>>> -		return ret;
+>>> -	}
+>>> -
+>>>  	return 0;
+>>>  }
+>>>
+>>> @@ -239,20 +291,6 @@ static int qm_set_regs(struct hisi_qm *qm, struct
+>>> acc_vf_data *vf_data)
+>>>  		return ret;
+>>>  	}
+>>>
+>>> -	/* QM_EQC_DW has 7 regs */
+>>> -	ret = qm_write_regs(qm, QM_EQC_DW0, vf_data->qm_eqc_dw, 7);
+>>> -	if (ret) {
+>>> -		dev_err(dev, "failed to write QM_EQC_DW\n");
+>>> -		return ret;
+>>> -	}
+>>> -
+>>> -	/* QM_AEQC_DW has 7 regs */
+>>> -	ret = qm_write_regs(qm, QM_AEQC_DW0, vf_data->qm_aeqc_dw,
+>>> 7);
+>>> -	if (ret) {
+>>> -		dev_err(dev, "failed to write QM_AEQC_DW\n");
+>>> -		return ret;
+>>> -	}
+>>> -
+>>>  	return 0;
+>>>  }
+>>>
+>>> @@ -522,6 +560,10 @@ static int vf_qm_load_data(struct
+>>> hisi_acc_vf_core_device *hisi_acc_vdev,
+>>>  		return ret;
+>>>  	}
+>>>
+>>> +	ret = qm_set_xqc_regs(hisi_acc_vdev, vf_data);
+>>> +	if (ret)
+>>> +		return ret;
+>>> +
+>>>  	ret = hisi_qm_mb(qm, QM_MB_CMD_SQC_BT, qm->sqc_dma, 0, 0);
+>>>  	if (ret) {
+>>>  		dev_err(dev, "set sqc failed\n");
+>>> @@ -589,6 +631,10 @@ static int vf_qm_state_save(struct
+>>> hisi_acc_vf_core_device *hisi_acc_vdev,
+>>>  	vf_data->vf_qm_state = QM_READY;
+>>>  	hisi_acc_vdev->vf_qm_state = vf_data->vf_qm_state;
+>>>
+>>> +	ret = qm_get_xqc_regs(hisi_acc_vdev, vf_data);
+>>> +	if (ret)
+>>> +		return ret;
+>>> +
+>>>  	ret = vf_qm_read_data(vf_qm, vf_data);
+>>>  	if (ret)
+>>>  		return ret;
+>>> @@ -1186,34 +1232,47 @@ static int hisi_acc_vf_qm_init(struct
+>>> hisi_acc_vf_core_device *hisi_acc_vdev)
+>>>  {
+>>>  	struct vfio_pci_core_device *vdev = &hisi_acc_vdev->core_device;
+>>>  	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
+>>> +	struct hisi_qm *pf_qm = hisi_acc_vdev->pf_qm;
+>>>  	struct pci_dev *vf_dev = vdev->pdev;
+>>>
+>>> -	/*
+>>> -	 * ACC VF dev BAR2 region consists of both functional register space
+>>> -	 * and migration control register space. For migration to work, we
+>>> -	 * need access to both. Hence, we map the entire BAR2 region here.
+>>> -	 * But unnecessarily exposing the migration BAR region to the Guest
+>>> -	 * has the potential to prevent/corrupt the Guest migration. Hence,
+>>> -	 * we restrict access to the migration control space from
+>>> -	 * Guest(Please see mmap/ioctl/read/write override functions).
+>>> -	 *
+>>> -	 * Please note that it is OK to expose the entire VF BAR if migration
+>>> -	 * is not supported or required as this cannot affect the ACC PF
+>>> -	 * configurations.
+>>> -	 *
+>>> -	 * Also the HiSilicon ACC VF devices supported by this driver on
+>>> -	 * HiSilicon hardware platforms are integrated end point devices
+>>> -	 * and the platform lacks the capability to perform any PCIe P2P
+>>> -	 * between these devices.
+>>> -	 */
+>>> +	if (pf_qm->ver == QM_HW_V3) {
+>>> +		/*
+>>> +		 * ACC VF dev BAR2 region consists of both functional
+>>> register space
+>>> +		 * and migration control register space. For migration to
+>>> work, we
+>>> +		 * need access to both. Hence, we map the entire BAR2
+>>> region here.
+>>> +		 * But unnecessarily exposing the migration BAR region to
+>>> the Guest
+>>> +		 * has the potential to prevent/corrupt the Guest migration.
+>>> Hence,
+>>> +		 * we restrict access to the migration control space from
+>>> +		 * Guest(Please see mmap/ioctl/read/write override
+>>> functions).
+>>> +		 *
+>>> +		 * Please note that it is OK to expose the entire VF BAR if
+>>> migration
+>>> +		 * is not supported or required as this cannot affect the ACC
+>>> PF
+>>> +		 * configurations.
+>>> +		 *
+>>> +		 * Also the HiSilicon ACC VF devices supported by this driver
+>>> on
+>>> +		 * HiSilicon hardware platforms are integrated end point
+>>> devices
+>>> +		 * and the platform lacks the capability to perform any PCIe
+>>> P2P
+>>> +		 * between these devices.
+>>> +		 */
+>>>
+>>> -	vf_qm->io_base =
+>>> -		ioremap(pci_resource_start(vf_dev,
+>>> VFIO_PCI_BAR2_REGION_INDEX),
+>>> -			pci_resource_len(vf_dev,
+>>> VFIO_PCI_BAR2_REGION_INDEX));
+>>> -	if (!vf_qm->io_base)
+>>> -		return -EIO;
+>>> +		vf_qm->io_base =
+>>> +			ioremap(pci_resource_start(vf_dev,
+>>> VFIO_PCI_BAR2_REGION_INDEX),
+>>> +				pci_resource_len(vf_dev,
+>>> VFIO_PCI_BAR2_REGION_INDEX));
+>>> +		if (!vf_qm->io_base)
+>>> +			return -EIO;
+>>>
+>>> -	vf_qm->fun_type = QM_HW_VF;
+>>> +		vf_qm->fun_type = QM_HW_VF;
+>>> +		vf_qm->ver = pf_qm->ver;
+>>> +	} else {
+>>> +		/*
+>>> +		 * On hardware platforms greater than QM_HW_V3, the
+>>> migration function
+>>> +		 * register is placed in the BAR2 configuration region of the
+>>> PF,
+>>> +		 * and each VF device occupies 8KB of configuration space.
+>>> +		 */
+>>> +		vf_qm->io_base = pf_qm->io_base +
+>>> QM_MIG_REGION_OFFSET +
+>>> +				 hisi_acc_vdev->vf_id *
+>>> QM_MIG_REGION_SIZE;
+>>> +		vf_qm->fun_type = QM_HW_PF;
+>>
+>> I don't think you can use the QM fun_type to distinguish this, because it is still a
+>> VF dev. Better to have another field to detect this.
+>>
+>
+
+Yes, I understand your point. The device is still a VF device, even though its configuration domain
+is in the PF. I will modify it accordingly and assign it as QM_HW_VF.
+
+Thanks.
+Longfang.
+
+> The devices that explicitly support live migration have already been identified during probe,
+> and only versions >= QM_HW_V3 are supported.
+> Among these, only QM_HW_V3 uses the VF's BAR2 configuration space. The others use the PF's
+> configuration space. This difference is already distinguishable through the QM fun_type,
+> and both functional verification and testing are OK.
 > 
-> On migration, save the 128 bit version of the features only if the
-> upper bits are non zero; after load zero the upper bits if the extended
-> features were not loaded.
+>> Also I have another question. In the hisi_acc_vfio_pci_probe()  we currently
+>> look for pf_qm-> >= QM_HW_V3. This means current driver can get loaded
+>> on this new hardware, right? If so, I think we need to prevent that. And also
+>> we need to block any migration  attempt from existing host kernels to new
+>> ones.
+>>
 > 
-> Note that we must clear the proxy-ed features on device reset, otherwise
-> a guest kernel not supporting extended features booted after an extended
-> features enabled one could end-up wrongly inheriting extended features.
+> The current driver can be loaded on both old QM_HW_V3 hardware and new hardware platforms.
+> This is because they only differ in the io_base, while other functionalities are the same.
+> Additionally, the compatibility issue for live migration between old and new devices is handled.
+> Compatibility checks are performed during vf_qm_check_match --> vf_qm_version_check to
+> ensure normal functionality after migration.
 > 
-> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-> ---
-> v1 -> v2:
->    - use separate VMStateDescription and pre/post load to avoid breaking
->      migration
->    - clear proxy features on device reset
-> ---
->   hw/virtio/virtio-pci.c         | 101 +++++++++++++++++++++++++++++----
->   include/hw/virtio/virtio-pci.h |   6 +-
->   2 files changed, 96 insertions(+), 11 deletions(-)
+> Thanks,
+> Longfang.
 > 
-> diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-> index fba2372c93..dc5e7eaf81 100644
-> --- a/hw/virtio/virtio-pci.c
-> +++ b/hw/virtio/virtio-pci.c
-> @@ -108,6 +108,39 @@ static const VMStateDescription vmstate_virtio_pci_modern_queue_state = {
->       }
->   };
->   
-> +static bool virtio_pci_modern_state_features128_needed(void *opaque)
-> +{
-> +    VirtIOPCIProxy *proxy = opaque;
-> +    uint32_t features = 0;
-> +    int i;
-> +
-> +    for (i = 2; i < ARRAY_SIZE(proxy->guest_features128); ++i) {
-> +        features |= proxy->guest_features128[i];
-> +    }
-> +    return !!features;
-
-"!!" is unnecessary; the implicit cast will clamp the value into true/false.
-
-> +}
-> +
-> +static int virtio_pci_modern_state_features128_post_load(void *opaque,
-> +                                                         int version_id)
-> +{
-> +    VirtIOPCIProxy *proxy = opaque;
-> +
-> +    proxy->extended_features_loaded = true;
-> +    return 0;
-> +}
-> +
-> +static const VMStateDescription vmstate_virtio_pci_modern_state_features128 = {
-> +    .name = "virtio_pci/modern_state/features128",
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .post_load = &virtio_pci_modern_state_features128_post_load,
-> +    .needed = &virtio_pci_modern_state_features128_needed,
-> +    .fields = (const VMStateField[]) {
-> +        VMSTATE_UINT32_ARRAY(guest_features128, VirtIOPCIProxy, 4),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
->   static bool virtio_pci_modern_state_needed(void *opaque)
->   {
->       VirtIOPCIProxy *proxy = opaque;
-> @@ -115,10 +148,40 @@ static bool virtio_pci_modern_state_needed(void *opaque)
->       return virtio_pci_modern(proxy);
->   }
->   
-> +static int virtio_pci_modern_state_pre_load(void *opaque)
-> +{
-> +    VirtIOPCIProxy *proxy = opaque;
-> +
-> +    proxy->extended_features_loaded = false;
-> +    return 0;
-> +}
-> +
-> +static int virtio_pci_modern_state_post_load(void *opaque, int version_id)
-> +{
-> +    VirtIOPCIProxy *proxy = opaque;
-> +    int i;
-> +
-> +    if (proxy->extended_features_loaded) {
-> +        return 0;
-> +    }
-> +
-> +    QEMU_BUILD_BUG_ON(offsetof(VirtIOPCIProxy, guest_features[0]) !=
-> +                      offsetof(VirtIOPCIProxy, guest_features128[0]));
-> +    QEMU_BUILD_BUG_ON(offsetof(VirtIOPCIProxy, guest_features[1]) !=
-> +                      offsetof(VirtIOPCIProxy, guest_features128[1]));
-> +
-> +    for (i = 2; i < ARRAY_SIZE(proxy->guest_features128); ++i) {
-> +        proxy->guest_features128[i] = 0;
-> +    }
-> +    return 0;
-> +}
-> +
-
-You can expect the device is in the reset state when migrating so expect 
-guest_features128 is initialized as zero; there are already plenty of 
-code expecting the reset state.
-
->   static const VMStateDescription vmstate_virtio_pci_modern_state_sub = {
->       .name = "virtio_pci/modern_state",
->       .version_id = 1,
->       .minimum_version_id = 1,
-> +    .pre_load = &virtio_pci_modern_state_pre_load,
-> +    .post_load = &virtio_pci_modern_state_post_load,
->       .needed = &virtio_pci_modern_state_needed,
->       .fields = (const VMStateField[]) {
->           VMSTATE_UINT32(dfselect, VirtIOPCIProxy),
-> @@ -128,6 +191,10 @@ static const VMStateDescription vmstate_virtio_pci_modern_state_sub = {
->                                vmstate_virtio_pci_modern_queue_state,
->                                VirtIOPCIQueue),
->           VMSTATE_END_OF_LIST()
-> +    },
-> +    .subsections = (const VMStateDescription * const []) {
-> +        &vmstate_virtio_pci_modern_state_features128,
-> +        NULL
->       }
->   };
->   
-> @@ -1493,19 +1560,22 @@ static uint64_t virtio_pci_common_read(void *opaque, hwaddr addr,
->           val = proxy->dfselect;
->           break;
->       case VIRTIO_PCI_COMMON_DF:
-> -        if (proxy->dfselect <= 1) {
-> +        if (proxy->dfselect < VIRTIO_FEATURES_WORDS) {
->               VirtioDeviceClass *vdc = VIRTIO_DEVICE_GET_CLASS(vdev);
->   
-> -            val = (vdev->host_features & ~vdc->legacy_features) >>
-> -                (32 * proxy->dfselect);
-> +            val = vdev->host_features_array[proxy->dfselect >> 1] >>
-> +                  (32 * (proxy->dfselect & 1));
-> +            if (proxy->dfselect <= 1) {
-> +                val &= (~vdc->legacy_features) >> (32 * proxy->dfselect);
-> +            }
->           }
->           break;
->       case VIRTIO_PCI_COMMON_GFSELECT:
->           val = proxy->gfselect;
->           break;
->       case VIRTIO_PCI_COMMON_GF:
-> -        if (proxy->gfselect < ARRAY_SIZE(proxy->guest_features)) {
-> -            val = proxy->guest_features[proxy->gfselect];
-> +        if (proxy->gfselect < ARRAY_SIZE(proxy->guest_features128)) {
-> +            val = proxy->guest_features128[proxy->gfselect];
->           }
->           break;
->       case VIRTIO_PCI_COMMON_MSIX:
-> @@ -1587,11 +1657,18 @@ static void virtio_pci_common_write(void *opaque, hwaddr addr,
->           proxy->gfselect = val;
->           break;
->       case VIRTIO_PCI_COMMON_GF:
-> -        if (proxy->gfselect < ARRAY_SIZE(proxy->guest_features)) {
-> -            proxy->guest_features[proxy->gfselect] = val;
-> -            virtio_set_features(vdev,
-> -                                (((uint64_t)proxy->guest_features[1]) << 32) |
-> -                                proxy->guest_features[0]);
-> +        if (proxy->gfselect < ARRAY_SIZE(proxy->guest_features128)) {
-> +            uint64_t features[VIRTIO_FEATURES_DWORDS];
-> +            int i;
-> +
-> +            proxy->guest_features128[proxy->gfselect] = val;
-> +            virtio_features_clear(features);
-> +            for (i = 0; i < ARRAY_SIZE(proxy->guest_features128); ++i) {
-> +                uint64_t cur = proxy->guest_features128[i];
-> +
-> +                features[i >> 1] |= cur << ((i & 1) * 32);
-> +            }
-> +            virtio_set_features_ex(vdev, features);
->           }
->           break;
->       case VIRTIO_PCI_COMMON_MSIX:
-> @@ -2310,6 +2387,10 @@ static void virtio_pci_reset(DeviceState *qdev)
->       virtio_bus_reset(bus);
->       msix_unuse_all_vectors(&proxy->pci_dev);
->   
-> +    /* be sure to not carry over any feature across reset */
-
-It's obvious so I don't think the comment makes difference.
-
-> +    memset(proxy->guest_features128, 0, sizeof(uint32_t) *
-> +           ARRAY_SIZE(proxy->guest_features128));
-
-Simpler:
-memset(proxy->guest_features128, 0, sizeof(proxy->guest_features128);
-
-> +
->       for (i = 0; i < VIRTIO_QUEUE_MAX; i++) {
->           proxy->vqs[i].enabled = 0;
->           proxy->vqs[i].reset = 0;
-> diff --git a/include/hw/virtio/virtio-pci.h b/include/hw/virtio/virtio-pci.h
-> index eab5394898..1868e3b106 100644
-> --- a/include/hw/virtio/virtio-pci.h
-> +++ b/include/hw/virtio/virtio-pci.h
-> @@ -151,6 +151,7 @@ struct VirtIOPCIProxy {
->       uint32_t flags;
->       bool disable_modern;
->       bool ignore_backend_features;
-> +    bool extended_features_loaded;
->       OnOffAuto disable_legacy;
->       /* Transitional device id */
->       uint16_t trans_devid;
-> @@ -158,7 +159,10 @@ struct VirtIOPCIProxy {
->       uint32_t nvectors;
->       uint32_t dfselect;
->       uint32_t gfselect;
-> -    uint32_t guest_features[2];
-> +    union {
-> +        uint32_t guest_features[2];
-> +        uint32_t guest_features128[4];
-> +    };
-
-I don't see anything preventing you from directly extending guest_features.
-
->       VirtIOPCIQueue vqs[VIRTIO_QUEUE_MAX];
->   
->       VirtIOIRQFD *vector_irqfd;
-
+>> Thanks,
+>> Shameer
+>>
+>>> +	}
+>>>  	vf_qm->pdev = vf_dev;
+>>>  	mutex_init(&vf_qm->mailbox_lock);
+>>>
+>>> @@ -1539,7 +1598,8 @@ static void hisi_acc_vfio_pci_close_device(struct
+>>> vfio_device *core_vdev)
+>>>  	hisi_acc_vf_disable_fds(hisi_acc_vdev);
+>>>  	mutex_lock(&hisi_acc_vdev->open_mutex);
+>>>  	hisi_acc_vdev->dev_opened = false;
+>>> -	iounmap(vf_qm->io_base);
+>>> +	if (vf_qm->ver == QM_HW_V3)
+>>> +		iounmap(vf_qm->io_base);
+>>>  	mutex_unlock(&hisi_acc_vdev->open_mutex);
+>>>  	vfio_pci_core_close_device(core_vdev);
+>>>  }
+>>> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+>>> b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+>>> index 91002ceeebc1..348f8bb5b42c 100644
+>>> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+>>> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+>>> @@ -59,6 +59,13 @@
+>>>  #define ACC_DEV_MAGIC_V1	0XCDCDCDCDFEEDAACC
+>>>  #define ACC_DEV_MAGIC_V2	0xAACCFEEDDECADEDE
+>>>
+>>> +#define QM_MIG_REGION_OFFSET		0x180000
+>>> +#define QM_MIG_REGION_SIZE		0x2000
+>>> +
+>>> +#define QM_SUB_VERSION_ID		0x100210
+>>> +#define QM_EQC_PF_DW0			0x1c00
+>>> +#define QM_AEQC_PF_DW0			0x1c20
+>>> +
+>>>  struct acc_vf_data {
+>>>  #define QM_MATCH_SIZE offsetofend(struct acc_vf_data, qm_rsv_state)
+>>>  	/* QM match information */
+>>> --
+>>> 2.24.0
+>>
+>> .
+>>
+> 
+> .
+> 
 
