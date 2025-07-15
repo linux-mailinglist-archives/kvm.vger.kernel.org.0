@@ -1,81 +1,66 @@
-Return-Path: <kvm+bounces-52549-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52552-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E104B06973
-	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 00:56:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48D9BB069B8
+	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 01:06:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 511DD5673B4
-	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 22:56:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 74E941AA754F
+	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 23:06:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 796152C324F;
-	Tue, 15 Jul 2025 22:55:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D0952D3728;
+	Tue, 15 Jul 2025 23:06:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Kbr6OAkP"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="hVunNKCr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oa1-f48.google.com (mail-oa1-f48.google.com [209.85.160.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2063.outbound.protection.outlook.com [40.107.93.63])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C658C274B5A
-	for <kvm@vger.kernel.org>; Tue, 15 Jul 2025 22:55:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.48
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752620153; cv=none; b=GVFFYfvIl0A4PBP+Cu15aFbVq9DbQUmbYYOH5bNEKNgJVuFuUdKyMIgBqVYsUCZfkdHIqBCDG63xcbNx5IhB3ueTE5MERC9EJhNFYGrh1Xy/e9RrHf4piXsH+LAWgxa/phWM1L9oYgzBsJe7cbVjBbGjo/B1dJcgZDlXsVHQn2Q=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752620153; c=relaxed/simple;
-	bh=vEmMpBK5/tPkb9KHvQ0SdOc52MTBa8ee6/BHSUyXBLo=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=r2b0RdMsmnKN1Ll5xtnqgjcS8hMvrEhwEp7TLSkhyVutsq/MJhcwQtHrT8E8aAS5lZXmvX5gi+KFuIsS5lUe8Rt4zcLNTtINRhJQnEyp+681tkQpliDai1qw2CN3kjQdbK8EP2tbpQM2Ajhq+hOv721V1nUsa2nEyLR6MhRImtk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Kbr6OAkP; arc=none smtp.client-ip=209.85.160.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-oa1-f48.google.com with SMTP id 586e51a60fabf-2eb6c422828so256464fac.1
-        for <kvm@vger.kernel.org>; Tue, 15 Jul 2025 15:55:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1752620151; x=1753224951; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oi4TdNlobhflphwjzdK68I/IBj5StICPNqn66i2gNn4=;
-        b=Kbr6OAkPfiuAqNJM+Cq68H++WBeoRMd9s087WavWfC6VkyI1rS3y9xaJqGPCcw3iKU
-         6a6GHFMTfbIEePJ8S0eQY8r2XeDSvV/fT6rZWxFSfP5YBICOCxXxYnYzZtgotKWabfr9
-         ohntDJMeS9A5jO461DzdwG4zIRv7/P6yx6qOmK1h/pdxiCqO/dIGUbBscl30AOld4LSb
-         erJiUQRjmZUO5Ysl63/4xbSiOGzHarl6LYmISPkYfPWkJzuwN7E2nlKqpSB5N/PyCe9w
-         QrT1sG41pyHg9NpNMBm6DNkcyu6Fd3nBBDq0/xPjABvQeRgGzQyiD8j2QMf001WJFuX1
-         mD1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752620151; x=1753224951;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=oi4TdNlobhflphwjzdK68I/IBj5StICPNqn66i2gNn4=;
-        b=CefkfhydaXlZO6TtjA/cFnKx+jgpClrSYeaM55tiuGbY4+qyS11p2jDCPLy1q0sGtY
-         WxPSNb4If0LnZamgrxhk48mU+0T2UIIx5CROQrAx8ylDmVAnuPJP6b1dNy105NPw2ViK
-         yJTzvtlW7xsc6SWRm9/pk8Xfcl5fZ58OFjfi3PFePwAnxkgYwoSZq63umzLt3sAkYuiv
-         2haH6fllyDpjo8Fk3+ZOokZlmFpzqByDknoxEySsp1BEv2KQBm4qfOp7U7eNVWR6eWwi
-         zuclubA6oqpaIsE99Xs8QfXY5KfpI3gbrSfDEYLYW2HhPgU1ag3EEUv9r+6XWLaGE0tg
-         VHrw==
-X-Forwarded-Encrypted: i=1; AJvYcCWyTuc5gtTAN1W5QIcGfFPck5YoJWq/A7UmsHnHq31Ft3Bn5a+qeqfcbq4lcxpMBydEB34=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzzd94OL+gBtUDYbNNsvmsxYE/A+zHK4W0MOC7/cO+9W4U37DQP
-	sHzjyfs/J8wwgLVqfuOXHh26G85NjWNUYl4bzVEiGrxsc7NdeW+s3Q4QOlP2moq4GXU=
-X-Gm-Gg: ASbGncv7A6t0C3JoaGZp/tgROtpcnc+PYJwp5Ag9fIUWVPIqfn0RPdUNkjhEbjduMqL
-	AFqoOHdiGjqWWWgXtaopIFZ4zyEpcvzd5hP+kff3tlM0khOxiftHZTZC+fVDDsKZ8PXjMcZ4bnQ
-	24lRLqTPttHjm3zYyh16eSVYfRc/caWgEzRYb6UaHpAaQf2l9CammtSl8FYs+/RRy5i8jjTG4M9
-	XddhHPlU6NfC/FsU/HqUYzPzGZuQlQ8/vDXyRN+SHeOB/KpupL1MbzlbdTrEnxngT0eJMly5GFl
-	kCsi8ZpLYhEn+5aYdllBGu4jAfJHAckpYqrRqI+vZXoaMnGVxtBY0ol49CUUrf4O2rlTsnBgx+i
-	FVqz94GqUsDnPHp+yHmiOj5uEG1UkNzh6ql77Rzw=
-X-Google-Smtp-Source: AGHT+IF5HaHuyKCM6E4t2p7V295FGoLcL158yabHcCEf0sSmb2eM1U+wbvg4ZE1zb1cHzfegWFEB5Q==
-X-Received: by 2002:a05:6870:3288:b0:2f7:64f7:8d40 with SMTP id 586e51a60fabf-2ffb0bed7efmr740669fac.9.1752620150775;
-        Tue, 15 Jul 2025 15:55:50 -0700 (PDT)
-Received: from localhost ([2603:8080:b800:f700:a172:6205:b5e:43cb])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-2ff116d22easm2976522fac.33.2025.07.15.15.55.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Jul 2025 15:55:49 -0700 (PDT)
-Date: Wed, 16 Jul 2025 01:55:45 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: oe-kbuild@lists.linux.dev, Jason Gunthorpe <jgg@nvidia.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 019D4274B5A
+	for <kvm@vger.kernel.org>; Tue, 15 Jul 2025 23:06:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.63
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752620784; cv=fail; b=WDg5I+hG8hiY3dOIt9a+4CJdFvY1+bAyqwsvwkcc57/wwZn1C7tWJ+VzyfCq1MT/jdmLLYTEU20dudDSvAHKz7c1ZbzzS/vHQLpgeX7SdmJ950wJlsi+31meA/h7Qw5AtLoQtDnxdGXjXcAvBgUsZ7BzkCpeFKGfxeHV3R+emCQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752620784; c=relaxed/simple;
+	bh=GiYsImW/hoq/7En+FhgGZAxZ8PJFxpLbcy2WC+0+CTY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=F8Lmag/Vt8EqX3ByJXAiEg2E/iZbm++4QNOe7TTJsesSl5pujCv2FHBp7YLPnuAfi7uTL3u4v15t9WugZWlenyYsoFX2Uu0Zszma2sBsEsiEnDKHhyc/jKEOCV0PIWZgsQM7XFJCnBwrQiQaBbbC81pGX7XalY7T6eGUHweenMc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=hVunNKCr; arc=fail smtp.client-ip=40.107.93.63
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=egKncoy6EIpkJdjO8crnLg9X/ldGOlOmrlFNybYKp3LYcSf4ExALdVJQzsPWkXaCHxx2nKaFu76f653i7cLw8B5x58PHm4GUEpBoYMqL10kzppnpFLtkrDbYztNP86TClb/aTZugA2QObnEm1tfcBVPb4Rj7UsZhpbTJrvvauh4j+NabAoL6gCRF1B7VN80Gq1vJvUMhTqnMc+qRKwituUIZ5QCkpF1u61ypmgmkvXuLXIXtHw9fxVLdWGgcEOTFm7xmKNQR9V4w4jtw7NP0ke/Ra37X+i1s2Ne/KxvOSiNpI/SyIJKwMM6Jb9YVmIQwlOYdQqaQzyIDb2NoRLrRFA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=8th83DLt0rkS9fDxPIsPdyGHQ+6iYhQ5qkxeZiTiPv4=;
+ b=kvzdtx40xrsLWY4Tn5WY1G1hrgNJhETiSbZuxStEHqA8jGtDvTtirnKfUcK61qpGX0Yl05yNqP5AGm9CZwvzLsgx0QcJxX4kq5yKcuNweC5Iw3LP/gRI6h32FkkiteSeFAwbHD8Vo3Eh+WndEGbqN7fDc4CBsa16f6jp/7Hy5If8TIYLy6TbhSNGt2H3MvOOi6q5iUb0Mq3N2eECazqxgt6lkRmhj/SZB41+2sUuvixgRgdPzI0JfMGCGqmTpN5MrXTfpKrbJTt555PTNxvLS97nilJ6+i33MRspI71/IlcUO/xiuGKb4BJJ/r4oVonUr8He2b+N1u8dSrD0xjIZLw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8th83DLt0rkS9fDxPIsPdyGHQ+6iYhQ5qkxeZiTiPv4=;
+ b=hVunNKCraRytCwTg7fMQjgtlnP8ttWm0WzFJIQ3o1L+dJb2aaxUNG3FwA6X02Oa02ZJ5BIjOdn+1UfErLR7SjrvwnSfCsNodXS297fci8Zz7yJSqCLg353qqz7FWFWiCe/Bx45Tl7/B54+reFooee5fXMTnNHlx8dALYR9SVNv9rPLyOWW+0UlrhFdKlkz4V4aYpNmmzybV7SV4Nj/RSFMBf19psQEGqhnMQy3twcVtwcmcge0CJ2giLP3NYDt6Ljt2gcGlTEvaVwpmWjHmvlCTAX/rJat/25nOXt9+87kkRWL8Fx7YXtrc9jCXEP4NU+O5nRp2hn1L4BaUwQoIVtA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
+ by DS0PR12MB8200.namprd12.prod.outlook.com (2603:10b6:8:f5::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8901.27; Tue, 15 Jul
+ 2025 23:06:19 +0000
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732%7]) with mapi id 15.20.8901.033; Tue, 15 Jul 2025
+ 23:06:19 +0000
+Date: Tue, 15 Jul 2025 20:06:18 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: oe-kbuild@lists.linux.dev, Alex Williamson <alex.williamson@redhat.com>,
 	Ankit Agrawal <ankita@nvidia.com>,
 	Brett Creeley <brett.creeley@amd.com>,
 	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
@@ -83,139 +68,118 @@ To: oe-kbuild@lists.linux.dev, Jason Gunthorpe <jgg@nvidia.com>,
 	Longfang Liu <liulongfang@huawei.com>, qat-linux@intel.com,
 	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
 	virtualization@lists.linux.dev, Xin Zeng <xin.zeng@intel.com>,
-	Yishai Hadas <yishaih@nvidia.com>
-Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev, patches@lists.linux.dev
+	Yishai Hadas <yishaih@nvidia.com>, lkp@intel.com,
+	oe-kbuild-all@lists.linux.dev, patches@lists.linux.dev
 Subject: Re: [PATCH v3] vfio/pci: Do vf_token checks for
  VFIO_DEVICE_BIND_IOMMUFD
-Message-ID: <76f27eb9-7f56-45e7-813e-e3f595f3b6e9@suswa.mountain>
+Message-ID: <20250715230618.GV2067380@nvidia.com>
+References: <0-v3-bdd8716e85fe+3978a-vfio_token_jgg@nvidia.com>
+ <76f27eb9-7f56-45e7-813e-e3f595f3b6e9@suswa.mountain>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <76f27eb9-7f56-45e7-813e-e3f595f3b6e9@suswa.mountain>
+X-ClientProxiedBy: MN2PR19CA0042.namprd19.prod.outlook.com
+ (2603:10b6:208:19b::19) To CH3PR12MB8659.namprd12.prod.outlook.com
+ (2603:10b6:610:17c::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0-v3-bdd8716e85fe+3978a-vfio_token_jgg@nvidia.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|DS0PR12MB8200:EE_
+X-MS-Office365-Filtering-Correlation-Id: 88165ed8-f426-4bee-eec2-08ddc3f4354c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016|7416014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?k+CUtbz0ionJTwwwearsvvsiDdh+PvS4m78lqaOyp5u9Zam45vA8dbfuQJON?=
+ =?us-ascii?Q?Ap0huUKuHpGfKsPvBACaVxtaUE3iesR5BKqpJtJgkRH5S5dcrH0LsJYNxAcu?=
+ =?us-ascii?Q?r/OutXR/UuUKKpOytKX2L7OLqlhd1wyAEuskmYjBIMWeLi5LUIdXo6wElEH7?=
+ =?us-ascii?Q?bj/llgkJcvE7hP9gZ3jaRujcy8aKVyCDOAeCP+oB4YAx3yHgwK1W9HdAlVT2?=
+ =?us-ascii?Q?nSibiK/wDOjDTqb2Xq2yXl60zeTj+vt2EiDzICtG8g6lSipWf1iAFgP39zLo?=
+ =?us-ascii?Q?E4gPg2oEFLBuJt6h81mT6KXHg+NJ340OEs/k+hOLJoDP0K59AYlGM8Ur56od?=
+ =?us-ascii?Q?fuYvsLMBrZ8XGLKN9cr3B9xzYnAQ8Xw0eTthlS+n/eJDYFt8wsCAZuwpie2R?=
+ =?us-ascii?Q?QF2Pu8v3rMSpxCoKbMwCFWFaDBvvPFgUzVwlJrRjucQxK023eBJAO8RBwSaB?=
+ =?us-ascii?Q?B/RiZ0/9NcputzzjyvNfrfWd7ZlAdW849jjOPExJ5ejjNLKIQg+6sKi4iUAX?=
+ =?us-ascii?Q?GgyErL1UOekpbCp7TJbKuycquciGOq4/nlmwdrsRzhw2fSCnLlqYfnZkRFh+?=
+ =?us-ascii?Q?RA3PLe3geQS//FGLByVwQi0dVE+rWbKyRNfFRKbFBLdyyaGjZNZaGgovIzNd?=
+ =?us-ascii?Q?aga9JJgEou7DHmkcYi+5Gt6Gcko2xrQUdee8z/Z8W/cUyaJBNNVJGz1w+d6/?=
+ =?us-ascii?Q?FcM1ASt2zruNRGueiUIvQ4I8qVEjkG3NXckZxKK14qNyNHBjnEWunkhlLNxy?=
+ =?us-ascii?Q?wY4lLQ7Nvejv0BYg1BnAqed+w9KhrpED5midBkAqeOJQLLPo/3gefP4l+lkP?=
+ =?us-ascii?Q?YyX6UklMungvlttJFqON6+biNE4E3e43app/wR1lBQ8/hjSvQ0480XwHNUD7?=
+ =?us-ascii?Q?Yp/5dpNpp+V5jm1W8ZdV/lggkhSy1F5QHCQSmJ81uHSZAhAAeOI/cy5zUIIa?=
+ =?us-ascii?Q?OgNVxqf3Hhwxzk4bbVMmO2xynL0lvRUBmEvuFcyOiN5KIqNl/br6L5SrmYeZ?=
+ =?us-ascii?Q?Z3Q0H8Yee2f8UsBPQqop7r/Mn0I0w3I5wo3b84+8kkPXHwrw7sXzib+fT+Zy?=
+ =?us-ascii?Q?4lKHmcElrAqKdb0fzNojwQKRZQGkMNLw+aDcVtfemy6TWaLOmUPH+1N8/M8y?=
+ =?us-ascii?Q?UL5sMStIDIjLSHzSJqJPn6LOZZclXIcVNI1X3vYEeVRK3MjjRU+iYa5d+viK?=
+ =?us-ascii?Q?vprYB0LEgeeqsfrHJdvOrUpff22/PMfkZzNumjUjqrcMGpl9l3WgeidVHEm2?=
+ =?us-ascii?Q?UBtipFZLshzgI5zHxK4fUgcV4Uk+TH10LE2cnYDj7d4+kLfzfNeSQlLXjzhf?=
+ =?us-ascii?Q?hU0MG06Volk1AlQ9euptOeKE0cl9o5PQSjNvoJgu/6Ku5bMRM7nfrc3IeFmS?=
+ =?us-ascii?Q?Y6C4aZ67DZIRTBUfbch823o9gakaVynAriwIdqQsGb9dzB5cwjkFdts7zM3h?=
+ =?us-ascii?Q?NQ+hASKDYTg=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?ctY729hCs/pnwSbCKAiJHm3H4IoeO6r1hYFhsYI5K7TFYib/FZDHmCgqIb9l?=
+ =?us-ascii?Q?EYLegBGTdBf4eFpbxpBz7iZ2ZgaHwc3UdFjkYitb7AykTAzPUki9DeCG0McQ?=
+ =?us-ascii?Q?0sgM2L7KpqbViRsTTAEEuCiqeYUQM0PSwvjyBYscN90YNSck2RYvn49BcqNe?=
+ =?us-ascii?Q?2wvNNWTond1lOFDIZD/YFflW0m7nHwp187hZf3zGfQsmck29oPYys3LDjEKa?=
+ =?us-ascii?Q?4v1lCmZ2b6GJpJyfiUamKKVqX8mophvH07g9UEjvSfBi3EniDX6fRmIeqQrs?=
+ =?us-ascii?Q?8B1dmdyr9RmkPPSdKe8Z7TeIJj1VmQvX3rfFIdL4TP2FLraD/9kLiMrDAM4T?=
+ =?us-ascii?Q?ADKyh5AzjNBKogYv7DZ59LC+trKQ500Up+L5PM2/paet4BALabA7rKfSe2dQ?=
+ =?us-ascii?Q?mR0r3TSySoYTxdtIxtLIJRfubLjkQQwABXa1hrtQbr5mJCYr428+QRKg0Hwg?=
+ =?us-ascii?Q?2vbh57PSPpk+s9554yBsGjjAU0WsY804zx1MNZF+us1gNBisQHfKNYVyUyaF?=
+ =?us-ascii?Q?rCHC3a/xal17wFFIcIEck8hMhmTSaEBUTvmUJjDiKQ5Df+9MQmlFgqhGsSpi?=
+ =?us-ascii?Q?FndiVpEDwHtSLrCnZ4C9YiM3V5mC0spU8tubABXt7BK1MlaHR8K5/d+ujJ8x?=
+ =?us-ascii?Q?0hQit/WVAC8RKMJ6gBV9iFXRkO/VYJmyJv6rhLgnGJI0qrZbggC4zGp+sXBw?=
+ =?us-ascii?Q?94qbIF0xgjvLOX5TavHtRONBlQO1WsYe9f96q88SArr9QimxLmCukTyv5Lc2?=
+ =?us-ascii?Q?8XqQu42cF7Kf97vkVB0rj7223O/QaCiR4UGhsU6r8mU80T9tUm6PfzYwBnxH?=
+ =?us-ascii?Q?Rpp8htKAQD74Ehiwe8URwxNinOiJYD9O8jZFAO76TQUbZHttV7+HP9y/5nzR?=
+ =?us-ascii?Q?BVOB37rL7DRkeliYhxLicEGS8PLmi5E7D7NcvCBJA3tAU8A2jJYi4SWa81ni?=
+ =?us-ascii?Q?a25KryAVUSmchex/KKMBfzStOQgLO1XiadQe3WIjH3MRvV/OPcY7Z4SxpxIV?=
+ =?us-ascii?Q?RRlOwzVCyvLoHr4MFpvgzdC0Ujpp52Jm5cNh9iYnmVm9+kByimNzgK9y+9es?=
+ =?us-ascii?Q?15HqFlKZOAOFBVVtVb6F0gvR2lUpvB1qgKVO1tjoJMaNKpu/rOFtXSO9sVxJ?=
+ =?us-ascii?Q?R4vctIT4q7sNH9Dmzvs65qVc5LOvyfDeedPzMzB1LSck1SyZo5hnVBlrIoRn?=
+ =?us-ascii?Q?HSzDN5Xcvv9BHwrVSaES/tClImAjlZ862eNelEIJTdg5KTUPwT0DGCc3wGhV?=
+ =?us-ascii?Q?QUHaX/hkpqc1MmyS+zb6Af24bpQQjMu5AuKVFz4OcVc6+/is2ldxmlfsI1JQ?=
+ =?us-ascii?Q?Ctw/NryayVYV6gc0v1Epqtg1ktNC+MON9XbZWQBYCJdscncZanuGJnIadazG?=
+ =?us-ascii?Q?89C7vTSNmSIsl2LMDb/tbfs3BR3ik3GJnDYq+QFnA5sFQ0qr3bF/FQYp/FxQ?=
+ =?us-ascii?Q?M0JOHXlsdVqkAi56UvC8Gvj8g89hxoP8alpuGJQNUoDZnuLbw0Qesj9B9Kt+?=
+ =?us-ascii?Q?PYDLWOUci97Qr53apIFGgd42wN8P/2W7k1prMTpCWTT37MP8IS39I3HxOEmB?=
+ =?us-ascii?Q?p1fDbkIfxWdSfSsYwrdfoXzjb+iYSAt4lYmwq36M?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 88165ed8-f426-4bee-eec2-08ddc3f4354c
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jul 2025 23:06:19.1793
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: NiCNU88DqxwFhhR96SDt8LAyTZGOeujfOdJPcc6yyC/jp5samkiIW+qGGrXRwbob
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8200
 
-Hi Jason,
+On Wed, Jul 16, 2025 at 01:55:45AM +0300, Dan Carpenter wrote:
+> 5fcc26969a164e Yi Liu          2023-07-18  117  	mutex_lock(&device->dev_set->lock);
+> 5fcc26969a164e Yi Liu          2023-07-18  118  	/* one device cannot be bound twice */
+> 5fcc26969a164e Yi Liu          2023-07-18  119  	if (df->access_granted) {
+> 5fcc26969a164e Yi Liu          2023-07-18  120  		ret = -EINVAL;
+> 5fcc26969a164e Yi Liu          2023-07-18  121  		goto out_unlock;
+> 5fcc26969a164e Yi Liu          2023-07-18  122  	}
+> 5fcc26969a164e Yi Liu          2023-07-18  123  
+> be2e70b96c3e54 Jason Gunthorpe 2025-07-14  124  	ret = vfio_df_check_token(device, &bind);
+> be2e70b96c3e54 Jason Gunthorpe 2025-07-14  125  	if (ret)
+> be2e70b96c3e54 Jason Gunthorpe 2025-07-14 @126  		return ret;
+> 
+> This needs to be a goto unlock.
 
-kernel test robot noticed the following build warnings:
+Oop yes, thank you
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Jason-Gunthorpe/vfio-pci-Do-vf_token-checks-for-VFIO_DEVICE_BIND_IOMMUFD/20250715-001209
-base:   32b2d3a57e26804ca96d82a222667ac0fa226cb7
-patch link:    https://lore.kernel.org/r/0-v3-bdd8716e85fe%2B3978a-vfio_token_jgg%40nvidia.com
-patch subject: [PATCH v3] vfio/pci: Do vf_token checks for VFIO_DEVICE_BIND_IOMMUFD
-config: openrisc-randconfig-r071-20250715 (https://download.01.org/0day-ci/archive/20250716/202507160254.dAjYAz9h-lkp@intel.com/config)
-compiler: or1k-linux-gcc (GCC) 15.1.0
+Alex can you fix it up when applying?
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-| Closes: https://lore.kernel.org/r/202507160254.dAjYAz9h-lkp@intel.com/
-
-smatch warnings:
-drivers/vfio/device_cdev.c:126 vfio_df_ioctl_bind_iommufd() warn: missing unwind goto?
-drivers/vfio/device_cdev.c:170 vfio_df_ioctl_bind_iommufd() warn: inconsistent returns '&device->dev_set->lock'.
-
-vim +126 drivers/vfio/device_cdev.c
-
-5fcc26969a164e Yi Liu          2023-07-18   83  long vfio_df_ioctl_bind_iommufd(struct vfio_device_file *df,
-5fcc26969a164e Yi Liu          2023-07-18   84  				struct vfio_device_bind_iommufd __user *arg)
-5fcc26969a164e Yi Liu          2023-07-18   85  {
-be2e70b96c3e54 Jason Gunthorpe 2025-07-14   86  	const u32 VALID_FLAGS = VFIO_DEVICE_BIND_FLAG_TOKEN;
-5fcc26969a164e Yi Liu          2023-07-18   87  	struct vfio_device *device = df->device;
-5fcc26969a164e Yi Liu          2023-07-18   88  	struct vfio_device_bind_iommufd bind;
-5fcc26969a164e Yi Liu          2023-07-18   89  	unsigned long minsz;
-be2e70b96c3e54 Jason Gunthorpe 2025-07-14   90  	u32 user_size;
-5fcc26969a164e Yi Liu          2023-07-18   91  	int ret;
-5fcc26969a164e Yi Liu          2023-07-18   92  
-5fcc26969a164e Yi Liu          2023-07-18   93  	static_assert(__same_type(arg->out_devid, df->devid));
-5fcc26969a164e Yi Liu          2023-07-18   94  
-5fcc26969a164e Yi Liu          2023-07-18   95  	minsz = offsetofend(struct vfio_device_bind_iommufd, out_devid);
-5fcc26969a164e Yi Liu          2023-07-18   96  
-be2e70b96c3e54 Jason Gunthorpe 2025-07-14   97  	ret = get_user(user_size, &arg->argsz);
-be2e70b96c3e54 Jason Gunthorpe 2025-07-14   98  	if (ret)
-be2e70b96c3e54 Jason Gunthorpe 2025-07-14   99  		return ret;
-be2e70b96c3e54 Jason Gunthorpe 2025-07-14  100  	if (user_size < minsz)
-be2e70b96c3e54 Jason Gunthorpe 2025-07-14  101  		return -EINVAL;
-be2e70b96c3e54 Jason Gunthorpe 2025-07-14  102  	ret = copy_struct_from_user(&bind, minsz, arg, user_size);
-be2e70b96c3e54 Jason Gunthorpe 2025-07-14  103  	if (ret)
-be2e70b96c3e54 Jason Gunthorpe 2025-07-14  104  		return ret;
-5fcc26969a164e Yi Liu          2023-07-18  105  
-be2e70b96c3e54 Jason Gunthorpe 2025-07-14  106  	if (bind.iommufd < 0 || bind.flags & ~VALID_FLAGS)
-5fcc26969a164e Yi Liu          2023-07-18  107  		return -EINVAL;
-5fcc26969a164e Yi Liu          2023-07-18  108  
-5fcc26969a164e Yi Liu          2023-07-18  109  	/* BIND_IOMMUFD only allowed for cdev fds */
-5fcc26969a164e Yi Liu          2023-07-18  110  	if (df->group)
-5fcc26969a164e Yi Liu          2023-07-18  111  		return -EINVAL;
-5fcc26969a164e Yi Liu          2023-07-18  112  
-5fcc26969a164e Yi Liu          2023-07-18  113  	ret = vfio_device_block_group(device);
-5fcc26969a164e Yi Liu          2023-07-18  114  	if (ret)
-5fcc26969a164e Yi Liu          2023-07-18  115  		return ret;
-5fcc26969a164e Yi Liu          2023-07-18  116  
-5fcc26969a164e Yi Liu          2023-07-18  117  	mutex_lock(&device->dev_set->lock);
-5fcc26969a164e Yi Liu          2023-07-18  118  	/* one device cannot be bound twice */
-5fcc26969a164e Yi Liu          2023-07-18  119  	if (df->access_granted) {
-5fcc26969a164e Yi Liu          2023-07-18  120  		ret = -EINVAL;
-5fcc26969a164e Yi Liu          2023-07-18  121  		goto out_unlock;
-5fcc26969a164e Yi Liu          2023-07-18  122  	}
-5fcc26969a164e Yi Liu          2023-07-18  123  
-be2e70b96c3e54 Jason Gunthorpe 2025-07-14  124  	ret = vfio_df_check_token(device, &bind);
-be2e70b96c3e54 Jason Gunthorpe 2025-07-14  125  	if (ret)
-be2e70b96c3e54 Jason Gunthorpe 2025-07-14 @126  		return ret;
-
-This needs to be a goto unlock.
-
-be2e70b96c3e54 Jason Gunthorpe 2025-07-14  127  
-5fcc26969a164e Yi Liu          2023-07-18  128  	df->iommufd = iommufd_ctx_from_fd(bind.iommufd);
-5fcc26969a164e Yi Liu          2023-07-18  129  	if (IS_ERR(df->iommufd)) {
-5fcc26969a164e Yi Liu          2023-07-18  130  		ret = PTR_ERR(df->iommufd);
-5fcc26969a164e Yi Liu          2023-07-18  131  		df->iommufd = NULL;
-5fcc26969a164e Yi Liu          2023-07-18  132  		goto out_unlock;
-5fcc26969a164e Yi Liu          2023-07-18  133  	}
-5fcc26969a164e Yi Liu          2023-07-18  134  
-5fcc26969a164e Yi Liu          2023-07-18  135  	/*
-5fcc26969a164e Yi Liu          2023-07-18  136  	 * Before the device open, get the KVM pointer currently
-5fcc26969a164e Yi Liu          2023-07-18  137  	 * associated with the device file (if there is) and obtain
-5fcc26969a164e Yi Liu          2023-07-18  138  	 * a reference.  This reference is held until device closed.
-5fcc26969a164e Yi Liu          2023-07-18  139  	 * Save the pointer in the device for use by drivers.
-5fcc26969a164e Yi Liu          2023-07-18  140  	 */
-5fcc26969a164e Yi Liu          2023-07-18  141  	vfio_df_get_kvm_safe(df);
-5fcc26969a164e Yi Liu          2023-07-18  142  
-5fcc26969a164e Yi Liu          2023-07-18  143  	ret = vfio_df_open(df);
-5fcc26969a164e Yi Liu          2023-07-18  144  	if (ret)
-5fcc26969a164e Yi Liu          2023-07-18  145  		goto out_put_kvm;
-5fcc26969a164e Yi Liu          2023-07-18  146  
-5fcc26969a164e Yi Liu          2023-07-18  147  	ret = copy_to_user(&arg->out_devid, &df->devid,
-5fcc26969a164e Yi Liu          2023-07-18  148  			   sizeof(df->devid)) ? -EFAULT : 0;
-5fcc26969a164e Yi Liu          2023-07-18  149  	if (ret)
-5fcc26969a164e Yi Liu          2023-07-18  150  		goto out_close_device;
-5fcc26969a164e Yi Liu          2023-07-18  151  
-5fcc26969a164e Yi Liu          2023-07-18  152  	device->cdev_opened = true;
-5fcc26969a164e Yi Liu          2023-07-18  153  	/*
-5fcc26969a164e Yi Liu          2023-07-18  154  	 * Paired with smp_load_acquire() in vfio_device_fops::ioctl/
-5fcc26969a164e Yi Liu          2023-07-18  155  	 * read/write/mmap
-5fcc26969a164e Yi Liu          2023-07-18  156  	 */
-5fcc26969a164e Yi Liu          2023-07-18  157  	smp_store_release(&df->access_granted, true);
-5fcc26969a164e Yi Liu          2023-07-18  158  	mutex_unlock(&device->dev_set->lock);
-5fcc26969a164e Yi Liu          2023-07-18  159  	return 0;
-5fcc26969a164e Yi Liu          2023-07-18  160  
-5fcc26969a164e Yi Liu          2023-07-18  161  out_close_device:
-5fcc26969a164e Yi Liu          2023-07-18  162  	vfio_df_close(df);
-5fcc26969a164e Yi Liu          2023-07-18  163  out_put_kvm:
-5fcc26969a164e Yi Liu          2023-07-18  164  	vfio_device_put_kvm(device);
-5fcc26969a164e Yi Liu          2023-07-18  165  	iommufd_ctx_put(df->iommufd);
-5fcc26969a164e Yi Liu          2023-07-18  166  	df->iommufd = NULL;
-5fcc26969a164e Yi Liu          2023-07-18  167  out_unlock:
-5fcc26969a164e Yi Liu          2023-07-18  168  	mutex_unlock(&device->dev_set->lock);
-5fcc26969a164e Yi Liu          2023-07-18  169  	vfio_device_unblock_group(device);
-5fcc26969a164e Yi Liu          2023-07-18 @170  	return ret;
-5fcc26969a164e Yi Liu          2023-07-18  171  }
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
-
+Thanks,
+Jason
 
