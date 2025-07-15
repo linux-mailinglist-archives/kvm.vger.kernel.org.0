@@ -1,108 +1,145 @@
-Return-Path: <kvm+bounces-52554-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52555-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 679EBB069D9
-	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 01:24:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87A9BB06A0D
+	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 01:47:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2BCA3AB80D
-	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 23:24:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 92A794A3294
+	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 23:47:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F36602D63E6;
-	Tue, 15 Jul 2025 23:24:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C83C02D661D;
+	Tue, 15 Jul 2025 23:47:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EGCpR5Dq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="na5YKnSf"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFAFA2D46C7
-	for <kvm@vger.kernel.org>; Tue, 15 Jul 2025 23:24:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF04425B31B;
+	Tue, 15 Jul 2025 23:47:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752621868; cv=none; b=HhbaGXLLPFK9r9lUAUZe2lB68jqhslj7m8eP69qiL6+89kcU/Vz+5JyuLgi8/3195nbP+OAMdzijoiA49lE0MU7+5yyoBh9Coz6vthZb0ud4r32gkQWmtKwmgDGUlv6dhQnF0iFv/AcsPO2Mpe+GECXlVQreyzse8jOPGuOPbh0=
+	t=1752623260; cv=none; b=uPYHg4szx5aotXopaG5iIIcodKWKz+RMNY3MvyE+hP5J1dwBdD6HiKZBb3tnIo8VLPmQaB+spI78BZhL5qeqNi3YzZRtI2Ec0+gxi3qXumHLWptY1lDdLSci4ryK5UoD3LMTJ+8VCv9sX1SJWjsJ1gDjIeoi6qT2eJZDKcPh5QE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752621868; c=relaxed/simple;
-	bh=nq6i7UWsrChHFspcpqg8vmXlrYiwDO/Qz7sfzZ29Fgs=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=rOF270ejp/a8oQtY3DnaiVkFbjCxEd42sRO5t2c9cGcPYj46PNb+wp8F4tYoJJD8vMLTfP0/hQPDz9PSSFrid7goUDq/z7zXVQJ5W1J+R5dsZaz9XaicBUkX1sz8bXl0YZjoza4gCov00VaA6t5fAy7KJAdhdcIm8FKM/uikQKg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EGCpR5Dq; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3122368d82bso8627752a91.0
-        for <kvm@vger.kernel.org>; Tue, 15 Jul 2025 16:24:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752621866; x=1753226666; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=975PH/shSeR0AqFV7Pd5lI4L1+eV8i/9w38Uuqw+Whw=;
-        b=EGCpR5Dq85Oqro/C2PkvWSsue+hQR6p1oaXxS9GigJ14LFIM0Iy8+sXwQvgDxL5aAC
-         kWZAmnizbKjuO8nWRxL3fmFFIIesSDD5gN2ubrQ/SEJJ+kRXirE+639QVjLTv7o/VChj
-         siLmLbpPoqbAb7q99Vg6rIoFJ0h+sElobIYRe4lzCqkYzp8pyp9aCh1wxDRf+OnZLLaX
-         xbfy1NS82JC3xNz6rT+2LglwBTk4/EBwWnFQ0caf3Vw2mhUebf2NRaX67A6Ujrwms/pG
-         kbhk5EBcg/0Zh/xspU76mUmVyZOKGIw9b6vNTPHq5KGUK5g9Wq4mYQ9kSnNoi9yB28WQ
-         67Qg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752621866; x=1753226666;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=975PH/shSeR0AqFV7Pd5lI4L1+eV8i/9w38Uuqw+Whw=;
-        b=TqUnbmX9gTOKEcMbxqcOBOjeoIIQ5UBvpJwKkwWn4V0/tboyvC+dWPOsg1WdWls3vx
-         ln0wbtta8VRHWJYy9UZ6k4SIfeG56vITaRJyfrjlL+BSS9/fK89j6wKPLvWUJG5oWp+P
-         5LFJm+Fr8yv7FObNQR15PAGfYK8TfVeM28NPXS+VbLF7TjtaylUQxCY8OOY9D8LzDRcs
-         vmNx42zT+3xUtB/q+TZSfY027VfULJn9KuE2HG9UuLq49Iu43R0iJEu8COauzNY7pkkw
-         xclRTb0iEf9zEZbdPYvefXKJlINha+BJsa4cBUJ/O8RLzP3FgjSv0HzeC+eMROpwAcgx
-         WrPw==
-X-Gm-Message-State: AOJu0YwNtUpEiBOJErXcTQwwhlcdvO27QcBsXuB6H40t8oRY2bBD6Xgk
-	UlrLdqcccH80S+6WWL6Jo2TrvxF+KNyLA822SrfMOzR32zGW3mOPWUmuFUzBjKFY769rWT23+wH
-	WentWMw==
-X-Google-Smtp-Source: AGHT+IG5Zjbdlf9KDwHnS2wt9su30n3/ohIFoDKHlCcpDxi/IzL0dMDtTweTGTBWrQ0Ul0Zzj5WG2JG4hxk=
-X-Received: from pjb13.prod.google.com ([2002:a17:90b:2f0d:b0:313:246f:8d54])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1fce:b0:311:9e59:7aba
- with SMTP id 98e67ed59e1d1-31c9f3ee951mr736995a91.2.1752621866253; Tue, 15
- Jul 2025 16:24:26 -0700 (PDT)
-Date: Tue, 15 Jul 2025 16:24:21 -0700
-In-Reply-To: <20250714221928.1788095-1-seanjc@google.com>
+	s=arc-20240116; t=1752623260; c=relaxed/simple;
+	bh=D3c6sfdeoqU0+rpixMaPXjWlnYZEYRf6Fje/K+TEVYk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ckNghBTMxpo9yxwXoNhflovyLMzbL7cMk3i1kBseENdzHW6j4LwlHkrQXdOXYzWG8w8FigCld14deKOkTfKkPvt4G5B2tzytk2DWnPLpDNsE4B6aMC+TL57sRjdjVwveHI4sQ2w+0srHLlxncyD7J0U6IZ23xpR8joN0TP+tkIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=na5YKnSf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BB2FC4CEE3;
+	Tue, 15 Jul 2025 23:47:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752623256;
+	bh=D3c6sfdeoqU0+rpixMaPXjWlnYZEYRf6Fje/K+TEVYk=;
+	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
+	b=na5YKnSffEt9VavXq/l8lZWfSazjB4rpYX/YnWyZPMJ/jlvIVI8z3wGV1ZbAUhB1i
+	 8C7UFx8Qo4WTZrmqcWE7d1ZHUgXgjCCTRwP9OfC8IgTp7nYafVSDDqALiEDKFvvRvP
+	 ps223zl6DOta6+Hq/AUYdUyk/+Y/Fz1HcpZYCBNbY8fE+9arK0nIXUF6E3hJmFUT2i
+	 goPaXvzctB100fcLRfF6X9MdrQ7POeCCBlrT6U3XUfXSaPRzPSB1zYndpDUL51Znsg
+	 17SCUk5jt5AvUKcTOgIhp+RZrT8c3xzKErM7wo0ceXg/WadxHc0pI48MjEo4+Ed8BJ
+	 sFfIcz4DA5hXA==
+Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
+	id CBA16CE0811; Tue, 15 Jul 2025 16:47:35 -0700 (PDT)
+Date: Tue, 15 Jul 2025 16:47:35 -0700
+From: "Paul E. McKenney" <paulmck@kernel.org>
+To: Keith Busch <kbusch@meta.com>
+Cc: alex.williamson@redhat.com, kvm@vger.kernel.org,
+	linux-pci@vger.kernel.org, Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCHv2] vfio/type1: conditional rescheduling while pinning
+Message-ID: <d00cc343-b900-47d5-ba30-1ecc5d11393f@paulmck-laptop>
+Reply-To: paulmck@kernel.org
+References: <20250715184622.3561598-1-kbusch@meta.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250714221928.1788095-1-seanjc@google.com>
-X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Message-ID: <175261351809.1924612.2322752513285300165.b4-ty@google.com>
-Subject: Re: [PATCH] KVM: VMX: Ensure unused kvm_tdx_capabilities fields are
- zeroed out
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Rick Edgecombe <rick.p.edgecombe@intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250715184622.3561598-1-kbusch@meta.com>
 
-On Mon, 14 Jul 2025 15:19:28 -0700, Sean Christopherson wrote:
-> Zero-allocate the kernel's kvm_tdx_capabilities structure and copy only
-> the number of CPUID entries from the userspace structure.  As is, KVM
-> doesn't ensure kernel_tdvmcallinfo_1_{r11,r12} and user_tdvmcallinfo_1_r12
-> are zeroed, i.e. KVM will reflect whatever happens to be in the userspace
-> structure back at usersepace, and thus may report garbage to userspace.
+On Tue, Jul 15, 2025 at 11:46:22AM -0700, Keith Busch wrote:
+> From: Keith Busch <kbusch@kernel.org>
 > 
-> Zeroing the entire kernel structure also provides better semantics for the
-> reserved field.  E.g. if KVM extends kvm_tdx_capabilities to enumerate new
-> information by repurposing bytes from the reserved field, userspace would
-> be required to zero the new field in order to get useful information back
-> (because older KVMs without support for the repurposed field would report
-> garbage, a la the aforementioned tdvmcallinfo bugs).
+> A large DMA mapping request can loop through dma address pinning for
+> many pages. In cases where THP can not be used, the repeated vmf_insert_pfn can
+> be costly, so let the task reschedule as need to prevent CPU stalls. Failure to
+> do so has potential harmful side effects, like increased memory pressure
+> as unrelated rcu tasks are unable to make their reclaim callbacks and
+> result in OOM conditions.
 > 
-> [...]
+>  rcu: INFO: rcu_sched self-detected stall on CPU
+>  rcu:   36-....: (20999 ticks this GP) idle=b01c/1/0x4000000000000000 softirq=35839/35839 fqs=3538
+>  rcu:            hardirqs   softirqs   csw/system
+>  rcu:    number:        0        107            0
+>  rcu:   cputime:       50          0        10446   ==> 10556(ms)
+>  rcu:   (t=21075 jiffies g=377761 q=204059 ncpus=384)
+> ...
+>   <TASK>
+>   ? asm_sysvec_apic_timer_interrupt+0x16/0x20
+>   ? walk_system_ram_range+0x63/0x120
+>   ? walk_system_ram_range+0x46/0x120
+>   ? pgprot_writethrough+0x20/0x20
+>   lookup_memtype+0x67/0xf0
+>   track_pfn_insert+0x20/0x40
+>   vmf_insert_pfn_prot+0x88/0x140
+>   vfio_pci_mmap_huge_fault+0xf9/0x1b0 [vfio_pci_core]
+>   __do_fault+0x28/0x1b0
+>   handle_mm_fault+0xef1/0x2560
+>   fixup_user_fault+0xf5/0x270
+>   vaddr_get_pfns+0x169/0x2f0 [vfio_iommu_type1]
+>   vfio_pin_pages_remote+0x162/0x8e0 [vfio_iommu_type1]
+>   vfio_iommu_type1_ioctl+0x1121/0x1810 [vfio_iommu_type1]
+>   ? futex_wake+0x1c1/0x260
+>   x64_sys_call+0x234/0x17a0
+>   do_syscall_64+0x63/0x130
+>   ? exc_page_fault+0x63/0x130
+>   entry_SYSCALL_64_after_hwframe+0x4b/0x53
+> 
+> Signed-off-by: Keith Busch <kbusch@kernel.org>
 
-Applied to kvm-x86 fixes, (with the typo fixed), thanks!
+From an RCU CPU stall-warning viewpoint, given that vaddr_get_pfns()
+invokes mmap_read_lock(), thus this code can schedule:
 
-[1/1] KVM: VMX: Ensure unused kvm_tdx_capabilities fields are zeroed out
-      https://github.com/kvm-x86/linux/commit/b8be70ec2b47
+Reviewed-by: Paul E. McKenney <paulmck@kernel.org>
 
---
-https://github.com/kvm-x86/linux/tree/next
+> ---
+> v1->v2:
+> 
+>   Merged up to vfio/next
+> 
+>   Moved the cond_resched() to a more appropriate place within the
+>   loop, and added a comment about why it's there.
+> 
+>   Update to change log describing one of the consequences of not doing
+>   this.
+> 
+>  drivers/vfio/vfio_iommu_type1.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> index 1136d7ac6b597..ad599b1601711 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -647,6 +647,13 @@ static long vfio_pin_pages_remote(struct vfio_dma *dma, unsigned long vaddr,
+>  
+>  	while (npage) {
+>  		if (!batch->size) {
+> +			/*
+> +			 * Large mappings may take a while to repeatedly refill
+> +			 * the batch, so conditionally relinquish the CPU when
+> +			 * needed to avoid stalls.
+> +			 */
+> +			cond_resched();
+> +
+>  			/* Empty batch, so refill it. */
+>  			ret = vaddr_get_pfns(mm, vaddr, npage, dma->prot,
+>  					     &pfn, batch);
+> -- 
+> 2.47.1
+> 
 
