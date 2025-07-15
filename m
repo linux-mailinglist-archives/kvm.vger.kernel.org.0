@@ -1,119 +1,122 @@
-Return-Path: <kvm+bounces-52497-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52498-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59976B05EAB
-	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 15:55:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15265B05EC3
+	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 15:56:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D4E91C220AD
-	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 13:49:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB5F71711A4
+	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 13:51:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B82022EAB76;
-	Tue, 15 Jul 2025 13:41:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A63D42EB5A5;
+	Tue, 15 Jul 2025 13:44:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="FuSGLnLw"
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="OZuPSAzw"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtpbgbr2.qq.com (smtpbgbr2.qq.com [54.207.22.56])
+Received: from smtpbguseast2.qq.com (smtpbguseast2.qq.com [54.204.34.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BA1B2E49BE;
-	Tue, 15 Jul 2025 13:41:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.22.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD4682E6D2B;
+	Tue, 15 Jul 2025 13:44:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752586896; cv=none; b=SVNIWeq4AQp7l7y7AynCEwWelGuXtCYElk5FSWagvQRAG3InJDMUHmjylt3mbZNEudctDRcsIrJJj+vxvlQrOFA6GOFf8ISE5Hb2OQM1dpqPJAZt1Y0dBssPEb+3LZBOkE5PEe57flVojMqJUC47qKqD40uabE4eLiwafy74hhA=
+	t=1752587080; cv=none; b=Ubcat/P4+1Xq/LVUQQ5FdDvg1/dE+97Tg3i43X0aGNKpToEzTzEgOHmYY9zjoQgr43pH0oc3SdKqgCWMqNBDRxaXgQSMXL7EH4LMhNM/hKIGzcys7cErDc+tiB7Xj/uVUMxTJRE7KXnR81Wris6iMsQxmpHBoJkqK09c9p4uV10=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752586896; c=relaxed/simple;
-	bh=7dSG76ruHEHqbRjXtpbZP2fQrkMNdrnwG4/ymtpfEKY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IX+G7jgcTI0KHTFLTtXpYY03Z/5rDLHoL1OrtQGegQ72yO79oE0CRWWJiyyBH0JULHW4JR2qDutGRQDLMUn8Qxb7MaD2tiyv3hh/K44uE9zk/OOuqrH6brWZWtsf83MPeiez/kHEsOFtqUpzlu99PurkUbbVHlycrYNx5/HithY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=FuSGLnLw; arc=none smtp.client-ip=54.207.22.56
+	s=arc-20240116; t=1752587080; c=relaxed/simple;
+	bh=TZJTn2E5BL5VAE49e7YaK4SCRoFGgemXPDOntw9si8U=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=q2uyRb6JBuHbLLZDFS94OqCVYpPRtBaYl2C827yiXhEtGlVotoo7RBni6Hi2Eyc249B2RTlndLJ8vV+NYfsh9e4Rwgo1ACx3R6kj/cb76U01wLipmdJwKXZ6/fFhmnL3u72QmfSa1/us3LdBl1gKV9JWKRh767/ARM6sR4LpbMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=OZuPSAzw; arc=none smtp.client-ip=54.204.34.130
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1752586877;
-	bh=DYh+6PDIK8SljIBmyMHrXvBMyc6UvyjoLxtRvLKcLYw=;
+	s=onoh2408; t=1752587073;
+	bh=IjnQY0kPhK20QaffYXVWEq0vHT5rpi7BYCx3cV6Q92A=;
 	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=FuSGLnLwCgAHTPyGVASWNIky64prQYBGC23iLTwJaxSXF2msqdPe5oYgoHClHMjNJ
-	 5jf6pn/sdZvM2ROoK0aOG8bcnlxOzGOhJhgJVveAYgoF3H4us4KUN8Hiz2cHR4q8Yp
-	 EkZeBNRjaS9QdvY/QRZfUBTVHqYWXKOCZC3PZvZ8=
-X-QQ-mid: zesmtpip4t1752586865t2a0dea2e
-X-QQ-Originating-IP: vd1RqZ1Qgxy/7VfOTmQ9xNBTBKWDttmC7/G/8c4FLA8=
+	b=OZuPSAzw/znlblyI0bHmsoUFw9GT59ynhGDp3kiqGRyqyteMccLtaWi/wwp2jFIR5
+	 m/P4hflxCxhj27DnNbJn7/ubi0zOoS9+uzS78H2Xeq90eLwEXyxKlBYGNU1fkvSXcF
+	 BefoPOtGk8GZLHtZRLOp09AR5FKixg0KyATgNVjY=
+X-QQ-mid: zesmtpip2t1752587060t139a5737
+X-QQ-Originating-IP: /8D94xQN+8JOFpNiEQb4FTVnmmcArlmhUzeqfbRCotE=
 Received: from avenger-e500 ( [localhost])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 15 Jul 2025 21:41:00 +0800 (CST)
+	id ; Tue, 15 Jul 2025 21:44:14 +0800 (CST)
 X-QQ-SSF: 0000000000000000000000000000000
 X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 13011556839216271353
+X-BIZMAIL-ID: 6857427455089537098
 EX-QQ-RecipientCnt: 63
 From: WangYuli <wangyuli@uniontech.com>
-To: seanjc@google.com,
-	pbonzini@redhat.com,
-	tglx@linutronix.de,
-	mingo@redhat.com,
-	bp@alien8.de,
-	dave.hansen@linux.intel.com,
-	x86@kernel.org,
-	hpa@zytor.com,
-	dave@stgolabs.net,
-	jonathan.cameron@huawei.com,
-	dave.jiang@intel.com,
+To: wangyuli@uniontech.com
+Cc: airlied@gmail.com,
+	akpm@linux-foundation.org,
 	alison.schofield@intel.com,
-	vishal.l.verma@intel.com,
-	ira.weiny@intel.com,
-	dan.j.williams@intel.com,
-	lucas.demarchi@intel.com,
-	thomas.hellstrom@linux.intel.com,
-	rodrigo.vivi@intel.com,
-	airlied@gmail.com,
-	simona@ffwll.ch,
-	marcin.s.wojtas@gmail.com,
 	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	arend.vanspriel@broadcom.com,
-	ilpo.jarvinen@linux.intel.com,
 	andriy.shevchenko@linux.intel.com,
-	gregkh@linuxfoundation.org,
-	jirislaby@kernel.org,
-	jgross@suse.com,
-	sstabellini@kernel.org,
-	oleksandr_tyshchenko@epam.com,
-	akpm@linux-foundation.org
-Cc: kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	wangyuli@uniontech.com,
-	ming.li@zohomail.com,
-	linux-cxl@vger.kernel.org,
-	intel-xe@lists.freedesktop.org,
-	dri-devel@lists.freedesktop.org,
-	netdev@vger.kernel.org,
-	kvalo@kernel.org,
-	johannes.berg@intel.com,
-	quic_ramess@quicinc.com,
-	ragazenta@gmail.com,
-	jeff.johnson@oss.qualcomm.com,
-	mingo@kernel.org,
-	j@jannau.net,
-	linux@treblig.org,
-	linux-wireless@vger.kernel.org,
-	brcm80211@lists.linux.dev,
+	arend.vanspriel@broadcom.com,
+	bp@alien8.de,
 	brcm80211-dev-list.pdl@broadcom.com,
-	linux-serial@vger.kernel.org,
-	xen-devel@lists.xenproject.org,
-	shenlichuan@vivo.com,
-	yujiaoliang@vivo.com,
+	brcm80211@lists.linux.dev,
 	colin.i.king@gmail.com,
 	cvam0000@gmail.com,
-	zhanjun@uniontech.com,
+	dan.j.williams@intel.com,
+	dave.hansen@linux.intel.com,
+	dave.jiang@intel.com,
+	dave@stgolabs.net,
+	davem@davemloft.net,
+	dri-devel@lists.freedesktop.org,
+	edumazet@google.com,
+	gregkh@linuxfoundation.org,
+	guanwentao@uniontech.com,
+	hpa@zytor.com,
+	ilpo.jarvinen@linux.intel.com,
+	intel-xe@lists.freedesktop.org,
+	ira.weiny@intel.com,
+	j@jannau.net,
+	jeff.johnson@oss.qualcomm.com,
+	jgross@suse.com,
+	jirislaby@kernel.org,
+	johannes.berg@intel.com,
+	jonathan.cameron@huawei.com,
+	kuba@kernel.org,
+	kvalo@kernel.org,
+	kvm@vger.kernel.org,
+	linux-cxl@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-serial@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	linux@treblig.org,
+	lucas.demarchi@intel.com,
+	marcin.s.wojtas@gmail.com,
+	ming.li@zohomail.com,
+	mingo@kernel.org,
+	mingo@redhat.com,
+	netdev@vger.kernel.org,
 	niecheng1@uniontech.com,
-	guanwentao@uniontech.com
-Subject: [PATCH v2 0/8] treewide: Fix typo "notifer"
-Date: Tue, 15 Jul 2025 21:40:50 +0800
-Message-ID: <BD5C52D2838AEA48+20250715134050.539234-1-wangyuli@uniontech.com>
+	oleksandr_tyshchenko@epam.com,
+	pabeni@redhat.com,
+	pbonzini@redhat.com,
+	quic_ramess@quicinc.com,
+	ragazenta@gmail.com,
+	rodrigo.vivi@intel.com,
+	seanjc@google.com,
+	shenlichuan@vivo.com,
+	simona@ffwll.ch,
+	sstabellini@kernel.org,
+	tglx@linutronix.de,
+	thomas.hellstrom@linux.intel.com,
+	vishal.l.verma@intel.com,
+	x86@kernel.org,
+	xen-devel@lists.xenproject.org,
+	yujiaoliang@vivo.com,
+	zhanjun@uniontech.com
+Subject: [PATCH v2 1/8] KVM: x86: Fix typo "notifer"
+Date: Tue, 15 Jul 2025 21:44:00 +0800
+Message-ID: <2EBE0C87C4CF3E11+20250715134407.540483-1-wangyuli@uniontech.com>
 X-Mailer: git-send-email 2.50.0
+In-Reply-To: <BD5C52D2838AEA48+20250715134050.539234-1-wangyuli@uniontech.com>
+References: <BD5C52D2838AEA48+20250715134050.539234-1-wangyuli@uniontech.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -123,56 +126,56 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: zesmtpip:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: NZr6/RNpGK5SfqfItW1gwmB4fdP/yaAI8BjxMzEyrAN/+7gEvhmt0TO5
-	0K7ByGfAqClW9vCmLuSNyyUVSzzRwkYLG/gYQ4vO4byn0Lz1QU9CwoKglBUVQNqE2doodzZ
-	cPNHxwX1XRPNLRftosOI9avSKMFhETTLTlehLeuZF0gQwFDDRVb3s5AK17VbCr1A+vXdwOJ
-	tXLyt274inujbvmrXWU3et9c4dLGVFBBXLW1CuNhUsreL2lfIMMi0I/IhKuLvJFuxgzFABc
-	d0Gnn9Fgn/EiwccYAONUb/umCyi18g4q3EbPwEzfy2Tn39oQTV5xE07jru4PxNZ7LG1gEu6
-	9fR4p+gvPak5lDv9r+ScDPFUmNPhoyUe56DeifyJqXt/RoByUo09qho/Vq8uYOdqtnI2lWy
-	CX5PYhUwBfFLRLyOWJCDn5f9O3gXhz8ctHjdA0nS73Hst7LXWkLRbCLMT7U3B9q7NJSIOzS
-	JjGWgmXcKQVL0DczdrFak6soVaQxYIH/1Wc+eRYUZ7uQ+zbmwa5dti8MqLFxbHjyHSJrZa0
-	Xo1zxLX3C5v1zlhJ17Nkpa682+ywYCRgysZs6Yu3vB2wkuynZb4AipDNdTT9hhQWpO4Sv8o
-	Weti8SwnAMIxNg23BUz/FNK+JJFeAxB4cbrswbPGKE864TiK/cgxTKQdMH9enn76s5ptsXw
-	N9PW1qLRph0GXAuxEoS8OqGgSuY6mXwG5G8mxnhmmUMBOEufNeS3RAcDrEf1QTTnpIzRUCM
-	wcAAs6xYI71u9lGwRJcAVv6nWdUrC0GhEWx98p2Llz+brQ1f0WUavFhHQE6FN1nj3H7VzEK
-	C3Hdq8YTEPaLZIvehVMmy6/rQfhq3VFR1Y0dHoVQke6M7MZmCYpe7N7N0MynrllAixMD7Wp
-	3WcvwHn6POrNhAot8hBk3cM7hBh75FFtNN8QR3k/XrfUgR8JkPUrKsC0Fva5p36qiRU8TTf
-	XSNyts4gCKapy/cBda9BqZRBsXLeRMcS6+e8GKgTeY/QcVGA5Vkp6a1+PuXWnW5p94EI1pp
-	HcT22YEIYBamPJaVUlnWoI1r7jXunNCCyy9TRbHgGXlvbT2U5TiigQHnWQ9K3T11XB/lUEA
-	LiACin1OKKECMA09cGsm/Q=
-X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
+X-QQ-XMAILINFO: NqKKeJ6KDgGJk0Q/k5eew1Rcj/7GqYu29nqiw1KNaEt0P3kxYukP6kms
+	ZdBiLJbwIe5UK/zNqfTOaeIjqeGbMNVl1IhvjNICqfNNFeuleAmqLJ0zi+E5Z3A834MPuFo
+	o3/hAMFn6lpy5LA02nfq9jZkvvtZg/UwT9KjonRNZjYNx1sYrWbqZgQ5jzD4Bqq7u/zZgvL
+	o4IYxiky2wiGW9WoPfZL4DM+YCbYKcRt+oJP3GrLuJpVAnlphfMwWvbRTuuPz84wLBIciq0
+	fzr3LFjWeMBDa62aZHwCnU6fgTXxo2et1np+0l/5BuePHsxMYKjcKn/8qVPavjf2C86xYP6
+	W7j6I24HPRciLLRwZrQwLji64KBf76umFALJgnRYleByQpvhoVNfHenQG+7uCQ5anT0cRsi
+	NfRgB0z2yGLmf4z0e/CWc3BxMUaN5PxWaTacqR2Iy3VgIxt18f5jUTdlCrIYlvZZ9IQXUuO
+	Sw/t0Xc+nnSdj1sHsH4ALe1cXygJIDSh8oVvu0oFRTzBdeRMLOw3V19qhHg6Fzp9q/74/8X
+	M9D6mLIEEBtajIGnDRfpj9YQ7HsntEkxxcg0aNB+ugXGTTfgeNKQhLVmPpQgYpQnEnROZD/
+	9tLAvy8hQcKMyr0hX/w9Day7veIVMiFYM4dXuT8wwRzLHI0aaN31T62rESaEgrdcKiGSibn
+	SCaBtWxk5EnnRuH4RWrj0jieQjXkEjGgx0xeV6OuxNUJ4aYhksLXLR8vrGIn+m9G9J0rSlp
+	eEKMX8dU494kaMKURExfmLJK2cS8JTGzmpHRMRc9jwHl4n4DpN2x78jy62FKiDY6BzL77oG
+	GjdXpUOaFY91e+xmKjDbU8AdSkmG3fItQuchfKeviNcW/R1ufj0y/cNQKVwvWbaH97M2uHe
+	KUhzQpHHs2NSJQAb4uPPSMqB6VvdPeNYOf398QVv9jJ6sJTbAl9I2afhpNvCSACF4bZscVG
+	dsmhLnPnEf3B+7HENTENnA0ue5k7akqrNp3PK2wIKkPzwMGz+bC+bSAf/P3k4JgAyLwZb1m
+	tJeZZbMHYQaMyuSn+PjQRUx2HVVGpFwaSkUScJwKkdb1IqXS/L3Lm9Yz+gjANX7d9ULLG4m
+	slSQ5h88sBF
+X-QQ-XMRINFO: NyFYKkN4Ny6FSmKK/uo/jdU=
 X-QQ-RECHKSPAM: 0
 
-There are some spelling mistakes of 'notifer' in comments which
-should be 'notifier'.
-
-Fix them and add it to scripts/spelling.txt.
+There are some spelling mistakes of 'notifer' which should be 'notifier'.
 
 Link: https://lore.kernel.org/all/B3C019B63C93846F+20250715071245.398846-1-wangyuli@uniontech.com/
-
-WangYuli (8):
-  KVM: x86: Fix typo "notifer"
-  cxl: mce: Fix typo "notifer"
-  drm/xe: Fix typo "notifer"
-  net: mvneta: Fix typo "notifer"
-  wifi: brcmfmac: Fix typo "notifer"
-  serial: 8250_dw: Fix typo "notifer"
-  xen/xenbus: Fix typo "notifer"
-  scripts/spelling.txt: Add notifer||notifier to spelling.txt
-
- arch/x86/kvm/i8254.c                                        | 4 ++--
- drivers/cxl/core/mce.h                                      | 2 +-
- drivers/gpu/drm/xe/xe_vm_types.h                            | 2 +-
- drivers/net/ethernet/marvell/mvneta.c                       | 2 +-
- drivers/net/wireless/broadcom/brcm80211/brcmfmac/cfg80211.c | 2 +-
- drivers/tty/serial/8250/8250_dw.c                           | 2 +-
- include/xen/xenbus.h                                        | 2 +-
- scripts/spelling.txt                                        | 1 +
- 8 files changed, 9 insertions(+), 8 deletions(-)
+Signed-off-by: WangYuli <wangyuli@uniontech.com>
 ---
-Changelog:
- *v1->v2: Break patch v1 up into one-patch-per-subsystem.
+ arch/x86/kvm/i8254.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/arch/x86/kvm/i8254.c b/arch/x86/kvm/i8254.c
+index 739aa6c0d0c3..9ff55112900a 100644
+--- a/arch/x86/kvm/i8254.c
++++ b/arch/x86/kvm/i8254.c
+@@ -641,7 +641,7 @@ static void kvm_pit_reset(struct kvm_pit *pit)
+ 	kvm_pit_reset_reinject(pit);
+ }
+ 
+-static void pit_mask_notifer(struct kvm_irq_mask_notifier *kimn, bool mask)
++static void pit_mask_notifier(struct kvm_irq_mask_notifier *kimn, bool mask)
+ {
+ 	struct kvm_pit *pit = container_of(kimn, struct kvm_pit, mask_notifier);
+ 
+@@ -694,7 +694,7 @@ struct kvm_pit *kvm_create_pit(struct kvm *kvm, u32 flags)
+ 
+ 	pit_state->irq_ack_notifier.gsi = 0;
+ 	pit_state->irq_ack_notifier.irq_acked = kvm_pit_ack_irq;
+-	pit->mask_notifier.func = pit_mask_notifer;
++	pit->mask_notifier.func = pit_mask_notifier;
+ 
+ 	kvm_pit_reset(pit);
+ 
 -- 
 2.50.0
 
