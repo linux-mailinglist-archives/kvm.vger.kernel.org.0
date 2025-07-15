@@ -1,120 +1,277 @@
-Return-Path: <kvm+bounces-52459-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52448-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F269B054FB
-	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 10:33:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 929BCB05423
+	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 10:08:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F170178D27
-	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 08:33:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 988867A1939
+	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 08:07:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2C382D5C8E;
-	Tue, 15 Jul 2025 08:32:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFD48275104;
+	Tue, 15 Jul 2025 08:08:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="btkodKuJ"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b="ENxKpLZ3"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from www3579.sakura.ne.jp (www3579.sakura.ne.jp [49.212.243.89])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F1462D4B47;
-	Tue, 15 Jul 2025 08:31:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D954B2741BC
+	for <kvm@vger.kernel.org>; Tue, 15 Jul 2025 08:07:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.243.89
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752568320; cv=none; b=Pv2WpH8RathtqZoftQmrpDrQI6p1jTU2PM8feXyDv6VwlUwlxTyIUD7VU6nIW7+GQL1h66JiWLKhJQtjU4XlnQaWiyVEELdQzLhtif1H0Z2hDC+8kIXAoIuiSj7ho1YbT6L4c1vbmJeUEh9oB18Dl4P/Wer3nBjY2V9GLY4upRg=
+	t=1752566880; cv=none; b=POdOMM5AJ/78Je3tQxem5qZWusZxIhdr/hSBN0iWxuvqzIpIpqIMGh9nFMvHetrouiy0dTmbMHro1F3fsyPNRhRAk/C7OElnSBG2fOh5a/d44eiVXHv61MPrN5n2OyMCFsyswgnQaq4sASSOQGyY9YxzouUoEWfKLtcd4t0BQLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752568320; c=relaxed/simple;
-	bh=wB6hEFFzvmOcnpBZLYTMSOsSPCn29ml9ZB1Zmap4zqg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=p5Af1NdwtliVSyfrBlrk+eDd0VTcmGxa6CMzFrzh1BhAXFiZAgbWkUnZJ9rDJPJaga+9Qj3deurBvDGNwFYJvFsuPOGxKYjvrVc1AK/gHPV8WhCmPxCQrj3LbCFS73DGKQnUymutecI60rKH2A/sH6eMOCJLQXzaD9OwfSfmc9w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=btkodKuJ; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752568320; x=1784104320;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=wB6hEFFzvmOcnpBZLYTMSOsSPCn29ml9ZB1Zmap4zqg=;
-  b=btkodKuJJsBumquyM8UTsmY93elcYYG/LJhFN/kh0Bi3K/q/k5R/DZJg
-   aEDOw5ETu7jte7P70rgmLC3ZMU1G26GWJOQzT/H9O2a3+TJDkPY0+wtBp
-   uaAZSAYNC028W2ZyzkwY8g21jBGTklf+KqxVFH5Znva2YmeXvX56hVwG0
-   IAoXkYUpZqx6C8x0qbAKlTdo9n0On1VEiwncupeOP2yVzsa/zL5oP+4XW
-   Jco2WYRsELYk2Z7QgU9YDDO7WR+drtJOEeeZnjogTfrZxGfQRcQTVOBtZ
-   sOcFrp15PjfPxt7ntL9+xLlagzIWMgtKjnRfVcpdIsLulJZix0KSkxCJU
-   w==;
-X-CSE-ConnectionGUID: 81rBu93kRRKJ36qGvrcZ/w==
-X-CSE-MsgGUID: Da+TjxOwSoyfHAfWbBkpxw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11491"; a="54632125"
-X-IronPort-AV: E=Sophos;i="6.16,313,1744095600"; 
-   d="scan'208";a="54632125"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2025 01:31:59 -0700
-X-CSE-ConnectionGUID: 85HYvWqASsWSDK7lGaxF2A==
-X-CSE-MsgGUID: SgsKgsojRpu7AnERVa8LMA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,313,1744095600"; 
-   d="scan'208";a="156572604"
-Received: from emr.sh.intel.com ([10.112.229.56])
-  by orviesa010.jf.intel.com with ESMTP; 15 Jul 2025 01:31:55 -0700
-From: Dapeng Mi <dapeng1.mi@linux.intel.com>
-To: Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Jim Mattson <jmattson@google.com>,
-	Mingwei Zhang <mizhang@google.com>,
-	Zide Chen <zide.chen@intel.com>,
-	Das Sandipan <Sandipan.Das@amd.com>,
-	Shukla Manali <Manali.Shukla@amd.com>,
-	Yi Lai <yi1.lai@intel.com>,
-	Dapeng Mi <dapeng1.mi@intel.com>,
-	dongsheng <dongsheng.x.zhang@intel.com>,
-	Dapeng Mi <dapeng1.mi@linux.intel.com>
-Subject: [kvm-unit-tests patch 5/5] x86/pmu: Expand "llc references" upper limit for broader compatibility
-Date: Sat, 12 Jul 2025 17:49:15 +0000
-Message-ID: <20250712174915.196103-6-dapeng1.mi@linux.intel.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250712174915.196103-1-dapeng1.mi@linux.intel.com>
-References: <20250712174915.196103-1-dapeng1.mi@linux.intel.com>
+	s=arc-20240116; t=1752566880; c=relaxed/simple;
+	bh=VxPsONAhRvZcdxNfGrR/cnHj+80owlOigV3mNPQaleM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=psCfhXtsB6QNyWmiOtRohcT+c/PAET7EV1DWlPb1k8ZhCpXfVz/tMKyy6wbxkSffCVGYm4ydfCofbcHxhAoIA7HoMRqaTAC9HlzH6HHeafjkF5/nYm5Wtj1stRB7Otxj+xQTS7RHwpuz+CMzjkcvGQ39EMHu4V0iM/BBS/TQcuk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp; dkim=fail (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b=ENxKpLZ3 reason="key not found in DNS"; arc=none smtp.client-ip=49.212.243.89
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp
+Received: from [10.105.8.218] ([192.51.222.130])
+	(authenticated bits=0)
+	by www3579.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 56F87tWT033093
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Tue, 15 Jul 2025 17:07:56 +0900 (JST)
+	(envelope-from odaki@rsg.ci.i.u-tokyo.ac.jp)
+DKIM-Signature: a=rsa-sha256; bh=HiQ/pSw7l2j0DIryjxyCnwtVk0l52eZq68BJAAQ1Xtk=;
+        c=relaxed/relaxed; d=rsg.ci.i.u-tokyo.ac.jp;
+        h=Message-ID:Date:Subject:To:From;
+        s=rs20250326; t=1752566876; v=1;
+        b=ENxKpLZ3f1fk5RuPvkVPiiHz8tP0w0IbdEretBBICh9UBIZEC7aoKrWFd1l0hY7d
+         ryWI0uxxXY1r1wsfVujr2DR9z1OUzlGvDSOoOEW2Wgy7iISbzm0LidgGXc44Qtnb
+         Zzu4kEDUvhy0j1VOc/plL1dO6/nHFIhASt3mpM2GxIWGmYkTC4SEc7+cEgZupMrE
+         QIqLdExgNBHfvSCZWAddGLp7hrPt3bSdkxUm4FV/x6xcsIjY1K9U1tQC+3lv1rIe
+         tHL4e1vzShs18CG2J0xVZCTxvw98cAFH+rF4DUhouAcoM7zX8zac4/KJcuADHtjz
+         EP9r0WNtbB1kkKWq/u+T+g==
+Message-ID: <f266ffe9-f601-46cc-85be-515475cbfe12@rsg.ci.i.u-tokyo.ac.jp>
+Date: Tue, 15 Jul 2025 17:07:55 +0900
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC v2 13/13] net: implement UDP tunnel features
+ offloading
+To: Paolo Abeni <pabeni@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+        Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+        Jason Wang
+ <jasowang@redhat.com>,
+        Sriram Yagnaraman <sriram.yagnaraman@ericsson.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, Luigi Rizzo <lrizzo@google.com>,
+        Giuseppe Lettieri
+ <g.lettieri@iet.unipi.it>,
+        Vincenzo Maffione <v.maffione@gmail.com>,
+        Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+        kvm@vger.kernel.org
+References: <cover.1752229731.git.pabeni@redhat.com>
+ <509e49207e4dc4a10ef36492a2ee1f90f3c2c237.1752229731.git.pabeni@redhat.com>
+Content-Language: en-US
+From: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
+In-Reply-To: <509e49207e4dc4a10ef36492a2ee1f90f3c2c237.1752229731.git.pabeni@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: dongsheng <dongsheng.x.zhang@intel.com>
+On 2025/07/11 22:02, Paolo Abeni wrote:
+> When any host or guest GSO over UDP tunnel offload is enabled the
+> virtio net header includes the additional tunnel-related fields,
+> update the size accordingly.
+> 
+> Push the GSO over UDP tunnel offloads all the way down to the tap
+> device extending the newly introduced NetFeatures struct, and
+> eventually enable the associated features.
+> 
+> As per virtio specification, to convert features bit to offload bit,
+> map the extended features into the reserved range.
+> 
+> Finally, make the vhost backend aware of the exact header layout, to
+> copy it correctly. The tunnel-related field are present if either
+> the guest or the host negotiated any UDP tunnel related feature:
+> add them to host kernel supported features list, to allow qemu
+> transfer to such backend the needed information.
 
-Increase the upper limit of the "llc references" test to accommodate
-results observed on additional Intel CPU models, including CWF and
-SRF.
-These CPUs exhibited higher reference counts that previously caused
-the test to fail.
+Please also update: hw/virtio/virtio-qmp.c
 
-Signed-off-by: dongsheng <dongsheng.x.zhang@intel.com>
-Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
-Tested-by: Yi Lai <yi1.lai@intel.com>
----
- x86/pmu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/x86/pmu.c b/x86/pmu.c
-index c54c0988..445ea6b4 100644
---- a/x86/pmu.c
-+++ b/x86/pmu.c
-@@ -116,7 +116,7 @@ struct pmu_event {
- 	{"core cycles", 0x003c, 1*N, 50*N},
- 	{"instructions", 0x00c0, 10*N, 10.2*N},
- 	{"ref cycles", 0x013c, 1*N, 30*N},
--	{"llc references", 0x4f2e, 1, 2*N},
-+	{"llc references", 0x4f2e, 1, 2.5*N},
- 	{"llc misses", 0x412e, 1, 1*N},
- 	{"branches", 0x00c4, 1*N, 1.1*N},
- 	{"branch misses", 0x00c5, 1, 0.1*N},
--- 
-2.43.0
+> 
+> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> ---
+> v1 -> v2:
+>    - squashed vhost support into this patch
+>    - dropped tun offload consistency checks; they are implemented in
+>      the kernel side
+>    - virtio_has_tnl_hdr ->virtio_has_tunnel_hdr
+> ---
+>   hw/net/vhost_net.c  |  2 ++
+>   hw/net/virtio-net.c | 34 ++++++++++++++++++++++++++--------
+>   include/net/net.h   |  2 ++
+>   net/net.c           |  3 ++-
+>   net/tap-linux.c     |  6 ++++++
+>   5 files changed, 38 insertions(+), 9 deletions(-)
+> 
+> diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
+> index bae595607a..a15dc51d84 100644
+> --- a/hw/net/vhost_net.c
+> +++ b/hw/net/vhost_net.c
+> @@ -52,6 +52,8 @@ static const int kernel_feature_bits[] = {
+>       VIRTIO_F_NOTIFICATION_DATA,
+>       VIRTIO_NET_F_RSC_EXT,
+>       VIRTIO_NET_F_HASH_REPORT,
+> +    VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO,
+> +    VIRTIO_NET_F_HOST_UDP_TUNNEL_GSO,
+>       VHOST_INVALID_FEATURE_BIT
+>   };
+>   
+> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+> index 8ed1cad363..ff2f34d98a 100644
+> --- a/hw/net/virtio-net.c
+> +++ b/hw/net/virtio-net.c
+> @@ -103,6 +103,12 @@
+>   #define VIRTIO_NET_F2O_SHIFT          (VIRTIO_NET_OFFLOAD_MAP_MIN - \
+>                                          VIRTIO_NET_FEATURES_MAP_MIN + 64)
+>   
+> +static bool virtio_has_tunnel_hdr(const uint64_t *features)
+> +{
+> +    return virtio_has_feature_ex(features, VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO) |
+> +           virtio_has_feature_ex(features, VIRTIO_NET_F_HOST_UDP_TUNNEL_GSO);
+> +}
+> +
+>   static const VirtIOFeature feature_sizes[] = {
+>       {.flags = 1ULL << VIRTIO_NET_F_MAC,
+>        .end = endof(struct virtio_net_config, mac)},
+> @@ -659,7 +665,8 @@ static bool peer_has_tunnel(VirtIONet *n)
+>   }
+>   
+>   static void virtio_net_set_mrg_rx_bufs(VirtIONet *n, int mergeable_rx_bufs,
+> -                                       int version_1, int hash_report)
+> +                                       int version_1, int hash_report,
+> +                                       int tunnel)
+>   {
+>       int i;
+>       NetClientState *nc;
+> @@ -667,9 +674,11 @@ static void virtio_net_set_mrg_rx_bufs(VirtIONet *n, int mergeable_rx_bufs,
+>       n->mergeable_rx_bufs = mergeable_rx_bufs;
+>   
+>       if (version_1) {
+> -        n->guest_hdr_len = hash_report ?
+> -            sizeof(struct virtio_net_hdr_v1_hash) :
+> -            sizeof(struct virtio_net_hdr_mrg_rxbuf);
+> +        n->guest_hdr_len = tunnel ?
+> +            sizeof(struct virtio_net_hdr_v1_hash_tunnel) :
+> +            (hash_report ?
+> +             sizeof(struct virtio_net_hdr_v1_hash) :
+> +             sizeof(struct virtio_net_hdr_mrg_rxbuf));
+>           n->rss_data.populate_hash = !!hash_report;
+>       } else {
+>           n->guest_hdr_len = n->mergeable_rx_bufs ?
+> @@ -886,6 +895,10 @@ static void virtio_net_apply_guest_offloads(VirtIONet *n)
+>          .ufo  = !!(n->curr_guest_offloads & (1ULL << VIRTIO_NET_F_GUEST_UFO)),
+>          .uso4 = !!(n->curr_guest_offloads & (1ULL << VIRTIO_NET_F_GUEST_USO4)),
+>          .uso6 = !!(n->curr_guest_offloads & (1ULL << VIRTIO_NET_F_GUEST_USO6)),
+> +       .tnl  = !!(n->curr_guest_offloads &
+> +                  (1ULL << VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO_MAPPED)),
+> +       .tnl_csum = !!(n->curr_guest_offloads &
+> +                      (1ULL << VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO_CSUM_MAPPED)),
+>       };
+>   
+>       qemu_set_offload(qemu_get_queue(n->nic)->peer, &ol);
+> @@ -907,7 +920,9 @@ virtio_net_guest_offloads_by_features(const uint64_t *features)
+>           (1ULL << VIRTIO_NET_F_GUEST_ECN)  |
+>           (1ULL << VIRTIO_NET_F_GUEST_UFO)  |
+>           (1ULL << VIRTIO_NET_F_GUEST_USO4) |
+> -        (1ULL << VIRTIO_NET_F_GUEST_USO6);
+> +        (1ULL << VIRTIO_NET_F_GUEST_USO6) |
+> +        (1ULL << VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO_MAPPED) |
+> +        (1ULL << VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO_CSUM_MAPPED);
+>   
+>       return guest_offloads_mask & virtio_net_features_to_offload(features);
+>   }
+> @@ -1020,7 +1035,8 @@ static void virtio_net_set_features(VirtIODevice *vdev,
+>                                  virtio_has_feature_ex(features,
+>                                                     VIRTIO_F_VERSION_1),
+>                                  virtio_has_feature_ex(features,
+> -                                                  VIRTIO_NET_F_HASH_REPORT));
+> +                                                  VIRTIO_NET_F_HASH_REPORT),
+> +                               virtio_has_tunnel_hdr(features));
+>   
+>       n->rsc4_enabled = virtio_has_feature_ex(features, VIRTIO_NET_F_RSC_EXT) &&
+>           virtio_has_feature_ex(features, VIRTIO_NET_F_GUEST_TSO4);
+> @@ -3132,13 +3148,15 @@ static int virtio_net_post_load_device(void *opaque, int version_id)
+>       VirtIONet *n = opaque;
+>       VirtIODevice *vdev = VIRTIO_DEVICE(n);
+>       int i, link_down;
+> +    bool has_tunnel_hdr = virtio_has_tunnel_hdr(vdev->guest_features_array);
+>   
+>       trace_virtio_net_post_load_device();
+>       virtio_net_set_mrg_rx_bufs(n, n->mergeable_rx_bufs,
+>                                  virtio_vdev_has_feature(vdev,
+>                                                          VIRTIO_F_VERSION_1),
+>                                  virtio_vdev_has_feature(vdev,
+> -                                                       VIRTIO_NET_F_HASH_REPORT));
+> +                                                      VIRTIO_NET_F_HASH_REPORT),
+> +                               has_tunnel_hdr);
+>   
+>       /* MAC_TABLE_ENTRIES may be different from the saved image */
+>       if (n->mac_table.in_use > MAC_TABLE_ENTRIES) {
+> @@ -3945,7 +3963,7 @@ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
+>   
+>       n->vqs[0].tx_waiting = 0;
+>       n->tx_burst = n->net_conf.txburst;
+> -    virtio_net_set_mrg_rx_bufs(n, 0, 0, 0);
+> +    virtio_net_set_mrg_rx_bufs(n, 0, 0, 0, 0);
+>       n->promisc = 1; /* for compatibility */
+>   
+>       n->mac_table.macs = g_malloc0(MAC_TABLE_ENTRIES * ETH_ALEN);
+> diff --git a/include/net/net.h b/include/net/net.h
+> index c71d7c6074..5049d293f2 100644
+> --- a/include/net/net.h
+> +++ b/include/net/net.h
+> @@ -43,6 +43,8 @@ typedef struct NetOffloads {
+>       bool ufo;
+>       bool uso4;
+>       bool uso6;
+> +    bool tnl;
+> +    bool tnl_csum;
+>   } NetOffloads;
+>   
+>   #define DEFINE_NIC_PROPERTIES(_state, _conf)                            \
+> diff --git a/net/net.c b/net/net.c
+> index 5a2f00c108..eb98c8a8b9 100644
+> --- a/net/net.c
+> +++ b/net/net.c
+> @@ -575,7 +575,8 @@ void qemu_set_vnet_hdr_len(NetClientState *nc, int len)
+>   
+>       assert(len == sizeof(struct virtio_net_hdr_mrg_rxbuf) ||
+>              len == sizeof(struct virtio_net_hdr) ||
+> -           len == sizeof(struct virtio_net_hdr_v1_hash));
+> +           len == sizeof(struct virtio_net_hdr_v1_hash) ||
+> +           len == sizeof(struct virtio_net_hdr_v1_hash_tunnel));
+>   
+>       nc->vnet_hdr_len = len;
+>       nc->info->set_vnet_hdr_len(nc, len);
+> diff --git a/net/tap-linux.c b/net/tap-linux.c
+> index 4ec638add6..5e6c2d3cbd 100644
+> --- a/net/tap-linux.c
+> +++ b/net/tap-linux.c
+> @@ -279,6 +279,12 @@ void tap_fd_set_offload(int fd, const NetOffloads *ol)
+>           if (ol->uso6) {
+>               offload |= TUN_F_USO6;
+>           }
+> +        if (ol->tnl) {
+> +            offload |= TUN_F_UDP_TUNNEL_GSO;
+> +        }
+> +        if (ol->tnl_csum) {
+> +            offload |= TUN_F_UDP_TUNNEL_GSO_CSUM;
+> +        }
+>       }
+>   
+>       if (ioctl(fd, TUNSETOFFLOAD, offload) != 0) {
 
 
