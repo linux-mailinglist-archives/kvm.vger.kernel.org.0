@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-52411-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52412-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E50A9B04E04
-	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 04:53:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48A05B04E73
+	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 05:00:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A27C4E0BDB
-	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 02:52:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6CF7217F61B
+	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 03:00:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9F812D0C71;
-	Tue, 15 Jul 2025 02:53:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 631DD2D1900;
+	Tue, 15 Jul 2025 02:58:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OayyatsQ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VwigAkba"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 101881A5B84;
-	Tue, 15 Jul 2025 02:53:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73B632D0C65;
+	Tue, 15 Jul 2025 02:58:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752547996; cv=none; b=AoTHmd8mGZjD9gOuwwTdwLmiRPytMqqiRwU3Qy1+Rjn1m+v+jB4Tjv6LUwlUiNw5OQEzebFU0RPgc5XjZqVr5Yrci9iNsUYIn+Dbiygv4IkFW4SUeEfLanBnLmlciYKiAkBvVpmNZ0Z3yKnBuysI1hH6LWCwE3d1ZSYt4l3dO7M=
+	t=1752548290; cv=none; b=Gvxdtg+1+IcnXna7GQ3KTuOc9I2qezHY4hO158TIYARiAA1MKwBROIW1kB/gtS40FjkDq884S/2cwyA9/iWI2mL9lRwNd+2GvjleRkwBLxnqXn9OLyNv8x48TSiYFEdx0dx42ProJD8VICp7xt1Xo6M+/9JC91kpzwA8sEQq94U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752547996; c=relaxed/simple;
-	bh=J3tdY+zXYeG6ZJJovx/ZvkZlfYqF3Z47aosAbptPIPo=;
+	s=arc-20240116; t=1752548290; c=relaxed/simple;
+	bh=6yTgUKJorR47kxn96iQ3GqWt6LE97FTkIzEnwVaE3as=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hBbdyrAIBt7geFBrp7CileD+/EqcgJb2TTE0/50a4g+9qZMIB+jUvrWArd2A9KDqbw+wUWEjB6rtTzZmeOStbhmpK3I16HEH7vx9EtvpvJXpAwrPIHZfwo2QnUiHGTiMvar9AqcChdWf4BR8WwgQ4LtELtqYdYXNdaxztxBcNUU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OayyatsQ; arc=none smtp.client-ip=198.175.65.19
+	 In-Reply-To:Content-Type; b=iIGORd60U0DhaD4LgSQJKyRQrVKB7tM/7vBVFg9rnzmtXhLOHarrz+2pvWzWeQMlpIhQPK5tyVKtE6P+7ePYxcWMfHzVy2VSskD6wqgd9ZC6zeWiGy0jEhdkV7AgcX6iQ9mI5FIZxkrWrPTqtIciVnVlAPFssuEvSeKME1ebvlk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VwigAkba; arc=none smtp.client-ip=192.198.163.8
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752547994; x=1784083994;
+  t=1752548288; x=1784084288;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=J3tdY+zXYeG6ZJJovx/ZvkZlfYqF3Z47aosAbptPIPo=;
-  b=OayyatsQMwc1ULx+nn+mkyVe+Y/+1nljM8BKEo6DDeWDV7FUkxpuWn3j
-   YCYUa8zrWFrJYEFnva1KKrQzMLPaoLK4KOV1lP7p0BAPpKsaqH7ZcPksr
-   H0B8UHm75Ok63MfyxitzNUTwEfOQKFdOsFTaV6qVXiuKrHYbgp+0MkLaw
-   yQHqPYwo/3qWuDQat55VYnPPqbqYNoMImXoD5/5dD5aym+sipiWirVIKt
-   Yg7U4l9y/9duWBl4Zm22Gybntzk4Pe+9h3S+5K+ksyv4HIRZV7Ju5JvAt
-   brK+lMfuM3JdWeiKsEjLs4toTOYQ3Nx93zk1JXML4fUS/lHEtgVnOfdG8
+  bh=6yTgUKJorR47kxn96iQ3GqWt6LE97FTkIzEnwVaE3as=;
+  b=VwigAkbaszrQ2PthPacJ5nWmRbzZyYenn/Kna2YtAWmgy73lk4Phxhew
+   3TRdsite5erGPzUOl6scJMXxZFJ86jCx0IRDF+4o0hKyK3g4lzx5VLSZn
+   cFasdbiwYg15Ksh0TcFF4mVjuw79PHfKbBqBb08azwEfHt9kiNmurN/rW
+   ej2ATBjnBOLxtuylwlIa/pm+o4pgKbsuqSlPhdgLVZBS3aJgvGWhpr9dj
+   X4ihcpqH7CvHN7++7UOjPF05tIVgPqFAOCm+EE5zrNFIcZHhKyZEEeAv8
+   jwz9Dsji88yJbtMKofkIWylxpH7UXQK7fUGG7hFTkalXc2GSwyqdFFTlV
    w==;
-X-CSE-ConnectionGUID: xcRJMWkGTa2bz7XvaevRgg==
-X-CSE-MsgGUID: OfMjM/y7SPig/y1nQV0KSQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11491"; a="54608076"
+X-CSE-ConnectionGUID: +9N9OWdKSeCJ+sqwi4i99A==
+X-CSE-MsgGUID: JNhesDZjSCmXug5fZKfCRQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11491"; a="72331725"
 X-IronPort-AV: E=Sophos;i="6.16,312,1744095600"; 
-   d="scan'208";a="54608076"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2025 19:53:13 -0700
-X-CSE-ConnectionGUID: NnaJ/l+zSBG6lpiZgEmL3Q==
-X-CSE-MsgGUID: S6FZIWGYQg+vnSOtfLoiIA==
+   d="scan'208";a="72331725"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2025 19:58:07 -0700
+X-CSE-ConnectionGUID: CF4GwnOOSTi92XbIzlfJ2Q==
+X-CSE-MsgGUID: zeZ2AhbVTAmb4Uuu5p3PFg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,312,1744095600"; 
-   d="scan'208";a="188099069"
-Received: from unknown (HELO [10.238.11.128]) ([10.238.11.128])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2025 19:53:09 -0700
-Message-ID: <8137d98e-8825-415b-9282-1d2a115bb51a@linux.intel.com>
-Date: Tue, 15 Jul 2025 10:53:06 +0800
+   d="scan'208";a="157609384"
+Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.240.57]) ([10.124.240.57])
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2025 19:58:04 -0700
+Message-ID: <3b37d820-12cd-4f33-b059-66e12693b779@linux.intel.com>
+Date: Tue, 15 Jul 2025 10:58:01 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,128 +67,281 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/2] x86/kvm: Force legacy PCI hole as WB under SNP/TDX
-To: Sean Christopherson <seanjc@google.com>,
- Nikolay Borisov <nik.borisov@suse.com>, Jianxiong Gao <jxgao@google.com>
-Cc: "Borislav Petkov (AMD)" <bp@alien8.de>,
- Dave Hansen <dave.hansen@linux.intel.com>,
- Dionna Glaze <dionnaglaze@google.com>, "H. Peter Anvin" <hpa@zytor.com>,
- jgross@suse.com, "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Ingo Molnar <mingo@redhat.com>, pbonzini@redhat.com,
- Peter Gonda <pgonda@google.com>, Thomas Gleixner <tglx@linutronix.de>,
- Tom Lendacky <thomas.lendacky@amd.com>,
- Vitaly Kuznetsov <vkuznets@redhat.com>, x86@kernel.org,
- Rick Edgecombe <rick.p.edgecombe@intel.com>, kas@kernel.org,
- "Xu, Min M" <min.m.xu@intel.com>, Binbin Wu <binbin.wu@linux.intel.com>
-References: <CAMGD6P1Q9tK89AjaPXAVvVNKtD77-zkDr0Kmrm29+e=i+R+33w@mail.gmail.com>
- <0dc2b8d2-6e1d-4530-898b-3cb4220b5d42@linux.intel.com>
- <4acfa729-e0ad-4dc7-8958-ececfae8ab80@suse.com>
+Subject: Re: [PATCH v1 04/11] KVM: x86: Add emulation support for Extented LVT
+ registers
+To: Manali Shukla <manali.shukla@amd.com>, kvm@vger.kernel.org,
+ linux-perf-users@vger.kernel.org, linux-doc@vger.kernel.org
+Cc: seanjc@google.com, pbonzini@redhat.com, nikunj@amd.com, bp@alien8.de,
+ peterz@infradead.org, mingo@redhat.com, mizhang@google.com,
+ thomas.lendacky@amd.com, ravi.bangoria@amd.com, Sandipan.Das@amd.com
+References: <20250627162550.14197-1-manali.shukla@amd.com>
+ <20250627162550.14197-5-manali.shukla@amd.com>
 Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <4acfa729-e0ad-4dc7-8958-ececfae8ab80@suse.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
+In-Reply-To: <20250627162550.14197-5-manali.shukla@amd.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 
+On 6/28/2025 12:25 AM, Manali Shukla wrote:
+> From: Santosh Shukla <santosh.shukla@amd.com>
+>
+> The local interrupts are extended to include more LVT registers in
+> order to allow additional interrupt sources, like Instruction Based
+> Sampling (IBS) and many more.
+>
+> Currently there are four additional LVT registers defined and they are
+> located at APIC offsets 400h-530h.
+>
+> AMD IBS driver is designed to use EXTLVT (Extended interrupt local
+> vector table) by default for driver initialization.
+>
+> Extended LVT registers are required to be emulated to initialize the
+> guest IBS driver successfully.
+>
+> Please refer to Section 16.4.5 in AMD Programmer's Manual Volume 2 at
+> https://bugzilla.kernel.org/attachment.cgi?id=306250 for more details
+> on Extended LVT.
+>
+> Signed-off-by: Santosh Shukla <santosh.shukla@amd.com>
+> Co-developed-by: Manali Shukla <manali.shukla@amd.com>
+> Signed-off-by: Manali Shukla <manali.shukla@amd.com>
+> ---
+>  arch/x86/include/asm/apicdef.h | 17 +++++++++
+>  arch/x86/kvm/cpuid.c           |  6 +++
+>  arch/x86/kvm/lapic.c           | 69 +++++++++++++++++++++++++++++++++-
+>  arch/x86/kvm/lapic.h           |  1 +
+>  arch/x86/kvm/svm/avic.c        |  4 ++
+>  arch/x86/kvm/svm/svm.c         |  4 ++
+>  6 files changed, 99 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/x86/include/asm/apicdef.h b/arch/x86/include/asm/apicdef.h
+> index 094106b6a538..4c0f580578aa 100644
+> --- a/arch/x86/include/asm/apicdef.h
+> +++ b/arch/x86/include/asm/apicdef.h
+> @@ -146,6 +146,23 @@
+>  #define		APIC_EILVT_MSG_EXT	0x7
+>  #define		APIC_EILVT_MASKED	(1 << 16)
+>  
+> +/*
+> + * Initialize extended APIC registers to the default value when guest
+> + * is started and EXTAPIC feature is enabled on the guest.
+> + *
+> + * APIC_EFEAT is a read only Extended APIC feature register, whose
+> + * default value is 0x00040007. However, bits 0, 1, and 2 represent
+> + * features that are not currently emulated by KVM. Therefore, these
+> + * bits must be cleared during initialization. As a result, the
+> + * default value used for APIC_EFEAT in KVM is 0x00040000.
+> + *
+> + * APIC_ECTRL is a read-write Extended APIC control register, whose
+> + * default value is 0x0.
+> + */
+> +
+> +#define		APIC_EFEAT_DEFAULT	0x00040000
+> +#define		APIC_ECTRL_DEFAULT	0x0
+> +
+>  #define APIC_BASE (fix_to_virt(FIX_APIC_BASE))
+>  #define APIC_BASE_MSR		0x800
+>  #define APIC_X2APIC_ID_MSR	0x802
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index eb7be340138b..7270d22fbf31 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -458,6 +458,12 @@ void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+>  	/* Invoke the vendor callback only after the above state is updated. */
+>  	kvm_x86_call(vcpu_after_set_cpuid)(vcpu);
+>  
+> +	/*
+> +	 * Initialize extended LVT registers at guest startup to support delivery
+> +	 * of interrupts via the extended APIC space (offsets 0x400–0x530).
+> +	 */
+> +	kvm_apic_init_eilvt_regs(vcpu);
+> +
+>  	/*
+>  	 * Except for the MMU, which needs to do its thing any vendor specific
+>  	 * adjustments to the reserved GPA bits.
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index 00ca2b0faa45..cffe44eb3f2b 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -1624,9 +1624,13 @@ static inline struct kvm_lapic *to_lapic(struct kvm_io_device *dev)
+>  }
+>  
+>  #define APIC_REG_MASK(reg)	(1ull << ((reg) >> 4))
+> +#define APIC_REG_EXT_MASK(reg)	(1ull << (((reg) >> 4) - 0x40))
 
-On 7/14/2025 7:24 PM, Nikolay Borisov wrote:
->
->
-> On 14.07.25 г. 12:06 ч., Binbin Wu wrote:
->>
->>
->> On 7/10/2025 12:54 AM, Jianxiong Gao wrote:
->>> I tested this patch on top of commit 8e690b817e38, however we are
->>> still experiencing the same failure.
->>>
->> I didn't reproduce the issue with QEMU.
->> After some comparison on how QEMU building the ACPI tables for HPET and TPM,
->>
->> - For HPET, the HPET range is added as Operation Region:
->>      aml_append(dev,
->>          aml_operation_region("HPTM", AML_SYSTEM_MEMORY, aml_int(HPET_BASE),
->>                               HPET_LEN));
->>
->> - For TPM, the range is added as 32-Bit Fixed Memory Range:
->>      if (TPM_IS_TIS_ISA(tpm_find())) {
->>          aml_append(crs, aml_memory32_fixed(TPM_TIS_ADDR_BASE,
->>                     TPM_TIS_ADDR_SIZE, AML_READ_WRITE));
->>      }
->>
->> So, in KVM, the code patch of TPM is different from the trace for HPET in the
->> patch https://lore.kernel.org/kvm/20250201005048.657470-3-seanjc@google.com/,
->> HPET will trigger the code path acpi_os_map_iomem(), but TPM doesn't.
->>
->> I tried to hack the code to map the region to WB first in tpm_tis driver to
->> trigger the error.
->> diff --git a/drivers/char/tpm/tpm_tis.c b/drivers/char/tpm/tpm_tis.c
->> index 9aa230a63616..62d303f88041 100644
->> --- a/drivers/char/tpm/tpm_tis.c
->> +++ b/drivers/char/tpm/tpm_tis.c
->> @@ -232,6 +232,7 @@ static int tpm_tis_init(struct device *dev, struct tpm_info *tpm_info)
->>          if (phy == NULL)
->>                  return -ENOMEM;
->>
->> +       ioremap_cache(tpm_info->res.start, resource_size(&tpm_info->res));
->>          phy->iobase = devm_ioremap_resource(dev, &tpm_info->res);
->>          if (IS_ERR(phy->iobase))
->>                  return PTR_ERR(phy->iobase);
->> Then I got the same error
->> [ 4.606075] ioremap error for 0xfed40000-0xfed45000, requested 0x2, got 0x0
->> [ 4.607728] tpm_tis MSFT0101:00: probe with driver tpm_tis failed with error -12
->
->
-> The thing is we don't really want to get into the if (pcm != new_pcm) { branch, because even if it succeeds there then the mapping will be wrong, because we want accesses to the TPM to be uncached since that's an iomem region, whereas this error shows that the new_pcm is WB.
->
-> Also looking at memtype_reserve in it there is the following piece of code:
->
-> if (x86_platform.is_untracked_pat_range(start, end)) {
->      7                 if (new_type)
->      6                         *new_type = _PAGE_CACHE_MODE_WB;
->      5                 return 0;
->      4         }
->
->
-> So if is_untracked_pat_range returns true then the cache mode will always be WB.
-So there are two different things per my understanding:
-1. The patch set https://lore.kernel.org/all/20250201005048.657470-3-seanjc@google.com/
-     applied to "Guest" kernel should be able to dismiss the error message.
-     In __ioremap_caller(), when branch "pcm != new_pcm" is triggered, since
-     is_new_memtype_allowed() returns true for TPM range, the error message
-     shouldn NOT be printed.
-     Otherwise, it really confuses me.
+It seems there is no difference on the MASK definition between
+APIC_REG_MASK() and APIC_REG_EXT_MASK(). Why not directly use the original
+APIC_REG_MASK()?
 
-2. Setting the PAT to WB for iomem region of TPM is not desired the target type.
-    Per my understanding, it should be safe to program the "iomem" to WB.
-    - If the iomem region is emulated, it's OK since the accesses will be
-      trapped.
-    - If the iomem region is passed-through, the EPT will use UC and the
-      effective memory type will be UC.
+BTW, If we indeed need to define this new macro, could we define the macro
+like blow?
+
+#define APIC_REG_EXT_MASK(reg)	(1ull << (((reg) - 0x400) >> 4))
+
+It's more easily to understand. 
 
 
-Another solution is using MTRR MSRs as the communication channel b/t guest BIOS
-and guest kernel, probably need to do the following things:
-For guest BIOS (i.e, OVMF), allow it to program the MTRR MSRs
-- Revert 071d2cfab8 ("OvmfPkg/Sec: Skip setup MTRR early in TD-Guest")
-- Revert 3a3b12cbda ("UefiCpuPkg/MtrrLib: MtrrLibIsMtrrSupported always return
-   FALSE in TD-Guest")
-- Make sure OVMF doesn't toggle CR0.CD, which will trigger #VE.
-For guest linux kernel
-- Revert 8e690b817e38 ("x86/kvm: Override default caching mode for SEV-SNP and
-   TDX")
-- Make sure guest kernel doesn't toggle CR0.CD, which will trigger #VE.
+>  #define APIC_REGS_MASK(first, count) \
+>  	(APIC_REG_MASK(first) * ((1ull << (count)) - 1))
+>  
+> +#define APIC_LAST_REG_OFFSET		0x3f0
+> +#define APIC_EXT_LAST_REG_OFFSET	0x530
+> +
+>  u64 kvm_lapic_readable_reg_mask(struct kvm_lapic *apic)
+>  {
+>  	/* Leave bits '0' for reserved and write-only registers. */
+> @@ -1668,6 +1672,8 @@ EXPORT_SYMBOL_GPL(kvm_lapic_readable_reg_mask);
+>  static int kvm_lapic_reg_read(struct kvm_lapic *apic, u32 offset, int len,
+>  			      void *data)
+>  {
+> +	u64 valid_reg_ext_mask = 0;
+> +	unsigned int last_reg = APIC_LAST_REG_OFFSET;
+>  	unsigned char alignment = offset & 0xf;
+>  	u32 result;
+>  
+> @@ -1677,13 +1683,44 @@ static int kvm_lapic_reg_read(struct kvm_lapic *apic, u32 offset, int len,
+>  	 */
+>  	WARN_ON_ONCE(apic_x2apic_mode(apic) && offset == APIC_ICR);
+>  
+> +	/*
+> +	 * The local interrupts are extended to include LVT registers to allow
+> +	 * additional interrupt sources when the EXTAPIC feature bit is enabled.
+> +	 * The Extended Interrupt LVT registers are located at APIC offsets 400-530h.
+> +	 */
+> +	if (guest_cpu_cap_has(apic->vcpu, X86_FEATURE_EXTAPIC)) {
+> +		valid_reg_ext_mask =
+> +			APIC_REG_EXT_MASK(APIC_EFEAT) |
+> +			APIC_REG_EXT_MASK(APIC_ECTRL) |
+> +			APIC_REG_EXT_MASK(APIC_EILVTn(0)) |
+> +			APIC_REG_EXT_MASK(APIC_EILVTn(1)) |
+> +			APIC_REG_EXT_MASK(APIC_EILVTn(2)) |
+> +			APIC_REG_EXT_MASK(APIC_EILVTn(3));
+> +		last_reg = APIC_EXT_LAST_REG_OFFSET;
+> +	}
 
-Sean, do you think this solution is the direction to go?
+Why not move this code piece into kvm_lapic_readable_reg_mask() and
+directly use APIC_REG_MASK() for these extended regs? Then we don't need to
+modify the below code. 
 
->
->
->>
->> And with Sean's patch set, the issue can be resolved.
->>
->> I guess google's VMM has built different ACPI table for TPM.
->> But according to my experiment, the issue should be able to be fixed by this
->> patch set, though I am not sure whether it will be the final solution or not.
->
 
+> +
+>  	if (alignment + len > 4)
+>  		return 1;
+>  
+> -	if (offset > 0x3f0 ||
+> -	    !(kvm_lapic_readable_reg_mask(apic) & APIC_REG_MASK(offset)))
+> +	if (offset > last_reg)
+>  		return 1;
+>  
+> +	switch (offset) {
+> +	/*
+> +	 * Section 16.3.2 in the AMD Programmer's Manual Volume 2 states:
+> +	 * "APIC registers are aligned to 16-byte offsets and must be accessed
+> +	 * using naturally-aligned DWORD size read and writes."
+> +	 */
+> +	case KVM_APIC_REG_SIZE ... KVM_APIC_EXT_REG_SIZE - 16:
+> +		if (!(valid_reg_ext_mask & APIC_REG_EXT_MASK(offset)))
+> +			return 1;
+> +		break;
+> +	default:
+> +		if (!(kvm_lapic_readable_reg_mask(apic) & APIC_REG_MASK(offset)))
+> +			return 1;
+> +
+> +	}
+> +
+>  	result = __apic_read(apic, offset & ~0xf);
+>  
+>  	trace_kvm_apic_read(offset, result);
+> @@ -2419,6 +2456,14 @@ static int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
+>  		else
+>  			kvm_apic_send_ipi(apic, APIC_DEST_SELF | val, 0);
+>  		break;
+> +
+> +	case APIC_ECTRL:
+> +	case APIC_EILVTn(0):
+> +	case APIC_EILVTn(1):
+> +	case APIC_EILVTn(2):
+> +	case APIC_EILVTn(3):
+> +		kvm_lapic_set_reg(apic, reg, val);
+> +		break;
+>  	default:
+>  		ret = 1;
+>  		break;
+> @@ -2757,6 +2802,24 @@ void kvm_inhibit_apic_access_page(struct kvm_vcpu *vcpu)
+>  	kvm_vcpu_srcu_read_lock(vcpu);
+>  }
+>  
+> +/*
+> + * Initialize extended APIC registers to the default value when guest is
+> + * started. The extended APIC registers should only be initialized when the
+> + * EXTAPIC feature is enabled on the guest.
+> + */
+> +void kvm_apic_init_eilvt_regs(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm_lapic *apic = vcpu->arch.apic;
+> +	int i;
+> +
+> +	if (guest_cpu_cap_has(vcpu, X86_FEATURE_EXTAPIC)) {
+> +		kvm_lapic_set_reg(apic, APIC_EFEAT, APIC_EFEAT_DEFAULT);
+> +		kvm_lapic_set_reg(apic, APIC_ECTRL, APIC_ECTRL_DEFAULT);
+> +		for (i = 0; i < APIC_EILVT_NR_MAX; i++)
+> +			kvm_lapic_set_reg(apic, APIC_EILVTn(i), APIC_EILVT_MASKED);
+> +	}
+> +}
+> +
+>  void kvm_lapic_reset(struct kvm_vcpu *vcpu, bool init_event)
+>  {
+>  	struct kvm_lapic *apic = vcpu->arch.apic;
+> @@ -2818,6 +2881,8 @@ void kvm_lapic_reset(struct kvm_vcpu *vcpu, bool init_event)
+>  		kvm_lapic_set_reg(apic, APIC_ISR + 0x10 * i, 0);
+>  		kvm_lapic_set_reg(apic, APIC_TMR + 0x10 * i, 0);
+>  	}
+> +	kvm_apic_init_eilvt_regs(vcpu);
+> +
+>  	kvm_apic_update_apicv(vcpu);
+>  	update_divide_count(apic);
+>  	atomic_set(&apic->lapic_timer.pending, 0);
+> diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
+> index 7ad946b3738d..ff0f9eb3417b 100644
+> --- a/arch/x86/kvm/lapic.h
+> +++ b/arch/x86/kvm/lapic.h
+> @@ -96,6 +96,7 @@ void kvm_apic_ack_interrupt(struct kvm_vcpu *vcpu, int vector);
+>  int kvm_apic_accept_pic_intr(struct kvm_vcpu *vcpu);
+>  int kvm_apic_accept_events(struct kvm_vcpu *vcpu);
+>  void kvm_lapic_reset(struct kvm_vcpu *vcpu, bool init_event);
+> +void kvm_apic_init_eilvt_regs(struct kvm_vcpu *vcpu);
+>  u64 kvm_lapic_get_cr8(struct kvm_vcpu *vcpu);
+>  void kvm_lapic_set_tpr(struct kvm_vcpu *vcpu, unsigned long cr8);
+>  void kvm_lapic_set_eoi(struct kvm_vcpu *vcpu);
+> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+> index 7338879d1c0c..323927fb6f57 100644
+> --- a/arch/x86/kvm/svm/avic.c
+> +++ b/arch/x86/kvm/svm/avic.c
+> @@ -682,6 +682,10 @@ static bool is_avic_unaccelerated_access_trap(u32 offset)
+>  	case APIC_LVTERR:
+>  	case APIC_TMICT:
+>  	case APIC_TDCR:
+> +	case APIC_EILVTn(0):
+> +	case APIC_EILVTn(1):
+> +	case APIC_EILVTn(2):
+> +	case APIC_EILVTn(3):
+>  		ret = true;
+>  		break;
+>  	default:
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index fffc3320ea00..f9a7ff37ea10 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -791,6 +791,10 @@ void svm_set_x2apic_msr_interception(struct vcpu_svm *svm, bool intercept)
+>  		X2APIC_MSR(APIC_TMICT),
+>  		X2APIC_MSR(APIC_TMCCT),
+>  		X2APIC_MSR(APIC_TDCR),
+> +		X2APIC_MSR(APIC_EILVTn(0)),
+> +		X2APIC_MSR(APIC_EILVTn(1)),
+> +		X2APIC_MSR(APIC_EILVTn(2)),
+> +		X2APIC_MSR(APIC_EILVTn(3)),
+>  	};
+>  	int i;
+>  
 
