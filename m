@@ -1,152 +1,140 @@
-Return-Path: <kvm+bounces-52413-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52414-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 024B0B04E8B
-	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 05:13:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 08B6CB04F18
+	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 05:33:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35F864A2061
-	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 03:13:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 816BD4A18A6
+	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 03:32:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72CFE2D0C74;
-	Tue, 15 Jul 2025 03:13:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JsLXV5B3"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C92E2D12E6;
+	Tue, 15 Jul 2025 03:33:06 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBC152C15A3;
-	Tue, 15 Jul 2025 03:13:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 136001487F4;
+	Tue, 15 Jul 2025 03:33:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752549202; cv=none; b=aNBFPUWyMGQps2Kd765qY13/FlFn67mJZrqUHwHG7oPEWUJu2C/Zj53Yqd3g2IZIiYIOzP6DZR4KpLYhbBjMonXZ5XBwrTrjNhWrqnWEekVxtwQ4pRNHMKy/AR+yO9iVoEn1DKplT1nLNytuCyMSqCVOH7ae7Zck56b4xOoJghU=
+	t=1752550385; cv=none; b=OITE2h3ugvnwUioPrLch9zhHB9aMVvRbFbujPRw5/Ilwydp8vDKeZi0rj52phH1KlM0QY/ruFVZQUshy01mjr+/wi9tKNmDe6McE9njlPMgr0wQC45I+zxZXdc6cnLh1XNNZh+WVtmpeQCpEpXHR0+lWy3se+Z4Klot5myviAFM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752549202; c=relaxed/simple;
-	bh=cmJ9Aikh1+ZORyu24AlmHtsfp1yuhUrUZNONYneZerQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=P6ZQlpvzgsDmt2MJ24GaZpjleJPeLfuW65hiuN7M5n0D42o4rO0Pm7zPQhzM1Xez8KBmMLm3DA4fZclgDpuhxZoJ3qV+n9s/URQUxTqxVqXsAscGsxl+s5yRhCGgMZIm8TFxmrV3QbJZ+XMjOaYApvLPF1yhlHlVW9Pdzb3cqYg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JsLXV5B3; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752549201; x=1784085201;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=cmJ9Aikh1+ZORyu24AlmHtsfp1yuhUrUZNONYneZerQ=;
-  b=JsLXV5B3r2MjxEAbSlAfWw/htidC+yutBU7OdgXsDlN983wUSO3+Kyz2
-   Pg5q9At8M3oUoX4fdS3BDw/ELGsjFbHOKhg+JjdP2ULXu+lRSLm4i1XW8
-   R9iVbyhr55QxXShv2wzq/f0p1sKbhhXrNtNsv9I+B+wjUCeIxoEd3n/iB
-   NDDPJS6dimz9iSAidQGapCScl+5LfbE8yjYt/BHS1N9aHF9LUgcy+fLas
-   ctcCRF25fH4w0KFqrY3OnSy1v6Xc3iqlhfsEehT3XevvLtha0aIf5XWla
-   f0HAw5UAUx7bsCGtPu96zyhHkc9ZoLDHXjxsGFnGeZtBaZVp6ZCF5CfZH
-   A==;
-X-CSE-ConnectionGUID: mAiNquGRSgCAvc8mua9rxA==
-X-CSE-MsgGUID: V0ldb+rGSTCUViDJllCTSA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11491"; a="58563051"
-X-IronPort-AV: E=Sophos;i="6.16,312,1744095600"; 
-   d="scan'208";a="58563051"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2025 20:13:20 -0700
-X-CSE-ConnectionGUID: OxUNvS3WT0KnKKCtD1njTw==
-X-CSE-MsgGUID: HAbh1PGWS4iXuv8Km4FrJQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,312,1744095600"; 
-   d="scan'208";a="161417551"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.240.57]) ([10.124.240.57])
-  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2025 20:13:16 -0700
-Message-ID: <03480d7a-7808-454c-8e3d-872901c31b1d@linux.intel.com>
-Date: Tue, 15 Jul 2025 11:13:13 +0800
+	s=arc-20240116; t=1752550385; c=relaxed/simple;
+	bh=UJ+ui+6YpbQeBXRY8FDN7OeI2IwWSgW+6ApfXKdlyAE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=B94uOa8opq4N16gm481LKSGohmkq3bvZMNL3OtUe26Ir23qEvapOtOnsko6n9SBWyE+QIYCCGFalAxXf3uQTpKsgF+ct23e6tjeJVCrN5iTWXC5wSjSC2S9zrZUPT192QITGqEUn8mvcbnC6wQaXeN9TUnsOgT1wviWmSFRrfSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.112])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4bh4T84DfTz2TSvn;
+	Tue, 15 Jul 2025 11:30:36 +0800 (CST)
+Received: from kwepemo200008.china.huawei.com (unknown [7.202.195.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 461411400CB;
+	Tue, 15 Jul 2025 11:32:39 +0800 (CST)
+Received: from huawei.com (10.67.175.28) by kwepemo200008.china.huawei.com
+ (7.202.195.61) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 15 Jul
+ 2025 11:32:38 +0800
+From: Xinyu Zheng <zhengxinyu6@huawei.com>
+To: <mst@redhat.com>, <jasowang@redhat.com>, <pbonzini@redhat.com>,
+	<stefanha@redhat.com>, <virtualization@lists.linux-foundation.org>,
+	<kvm@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <gregkh@linuxfoundation.org>,
+	<stable@vger.kernel.org>
+CC: <zhengxinyu6@huawei.com>
+Subject: [PATCH v5.10 v2] vhost-scsi: protect vq->log_used with vq->mutex
+Date: Tue, 15 Jul 2025 03:21:03 +0000
+Message-ID: <20250715032103.1624084-1-zhengxinyu6@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 08/11] KVM: SVM: Extend VMCB area for virtualized IBS
- registers
-To: Manali Shukla <manali.shukla@amd.com>, kvm@vger.kernel.org,
- linux-perf-users@vger.kernel.org, linux-doc@vger.kernel.org
-Cc: seanjc@google.com, pbonzini@redhat.com, nikunj@amd.com, bp@alien8.de,
- peterz@infradead.org, mingo@redhat.com, mizhang@google.com,
- thomas.lendacky@amd.com, ravi.bangoria@amd.com, Sandipan.Das@amd.com
-References: <20250627162550.14197-1-manali.shukla@amd.com>
- <20250627162550.14197-9-manali.shukla@amd.com>
-Content-Language: en-US
-From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <20250627162550.14197-9-manali.shukla@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
+ kwepemo200008.china.huawei.com (7.202.195.61)
 
+From: Dongli Zhang <dongli.zhang@oracle.com>
 
-On 6/28/2025 12:25 AM, Manali Shukla wrote:
-> From: Santosh Shukla <santosh.shukla@amd.com>
->
-> Define the new VMCB fields that will beused to save and restore the
+[ Upstream commit f591cf9fce724e5075cc67488c43c6e39e8cbe27 ]
 
-s/beused/be used/
+The vhost-scsi completion path may access vq->log_base when vq->log_used is
+already set to false.
 
+    vhost-thread                       QEMU-thread
 
-> satate of the following fetch and op IBS related MSRs.
->
->   * MSRC001_1030 [IBS Fetch Control]
->   * MSRC001_1031 [IBS Fetch Linear Address]
->   * MSRC001_1033 [IBS Execution Control]
->   * MSRC001_1034 [IBS Op Logical Address]
->   * MSRC001_1035 [IBS Op Data]
->   * MSRC001_1036 [IBS Op Data 2]
->   * MSRC001_1037 [IBS Op Data 3]
->   * MSRC001_1038 [IBS DC Linear Address]
->   * MSRC001_103B [IBS Branch Target Address]
->   * MSRC001_103C [IBS Fetch Control Extended]
->
-> Signed-off-by: Santosh Shukla <santosh.shukla@amd.com>
-> Signed-off-by: Manali Shukla <manali.shukla@amd.com>
-> ---
->  arch/x86/include/asm/svm.h | 14 +++++++++++++-
->  1 file changed, 13 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
-> index ad954a1a6656..b62049b51ebb 100644
-> --- a/arch/x86/include/asm/svm.h
-> +++ b/arch/x86/include/asm/svm.h
-> @@ -356,6 +356,17 @@ struct vmcb_save_area {
->  	u64 last_excp_to;
->  	u8 reserved_0x298[72];
->  	u64 spec_ctrl;		/* Guest version of SPEC_CTRL at 0x2E0 */
-> +	u8 reserved_0x2e8[1168];
-> +	u64 ibs_fetch_ctl;
-> +	u64 ibs_fetch_linear_addr;
-> +	u64 ibs_op_ctl;
-> +	u64 ibs_op_rip;
-> +	u64 ibs_op_data;
-> +	u64 ibs_op_data2;
-> +	u64 ibs_op_data3;
-> +	u64 ibs_dc_linear_addr;
-> +	u64 ibs_br_target;
-> +	u64 ibs_fetch_extd_ctl;
->  } __packed;
->  
->  /* Save area definition for SEV-ES and SEV-SNP guests */
-> @@ -538,7 +549,7 @@ struct vmcb {
->  	};
->  } __packed;
->  
-> -#define EXPECTED_VMCB_SAVE_AREA_SIZE		744
-> +#define EXPECTED_VMCB_SAVE_AREA_SIZE		1992
->  #define EXPECTED_GHCB_SAVE_AREA_SIZE		1032
->  #define EXPECTED_SEV_ES_SAVE_AREA_SIZE		1648
->  #define EXPECTED_VMCB_CONTROL_AREA_SIZE		1024
-> @@ -564,6 +575,7 @@ static inline void __unused_size_checks(void)
->  	BUILD_BUG_RESERVED_OFFSET(vmcb_save_area, 0x180);
->  	BUILD_BUG_RESERVED_OFFSET(vmcb_save_area, 0x248);
->  	BUILD_BUG_RESERVED_OFFSET(vmcb_save_area, 0x298);
-> +	BUILD_BUG_RESERVED_OFFSET(vmcb_save_area, 0x2e8);
->  
->  	BUILD_BUG_RESERVED_OFFSET(sev_es_save_area, 0xc8);
->  	BUILD_BUG_RESERVED_OFFSET(sev_es_save_area, 0xcc);
+vhost_scsi_complete_cmd_work()
+-> vhost_add_used()
+   -> vhost_add_used_n()
+      if (unlikely(vq->log_used))
+                                      QEMU disables vq->log_used
+                                      via VHOST_SET_VRING_ADDR.
+                                      mutex_lock(&vq->mutex);
+                                      vq->log_used = false now!
+                                      mutex_unlock(&vq->mutex);
+
+				      QEMU gfree(vq->log_base)
+        log_used()
+        -> log_write(vq->log_base)
+
+Assuming the VMM is QEMU. The vq->log_base is from QEMU userpace and can be
+reclaimed via gfree(). As a result, this causes invalid memory writes to
+QEMU userspace.
+
+The control queue path has the same issue.
+
+Cc: stable@vger.kernel.org#5.10.x
+Cc: gregkh@linuxfoundation.org
+Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+Acked-by: Jason Wang <jasowang@redhat.com>
+Reviewed-by: Mike Christie <michael.christie@oracle.com>
+Message-Id: <20250403063028.16045-2-dongli.zhang@oracle.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+[ Conflicts in drivers/vhost/scsi.c
+  bacause vhost_scsi_complete_cmd_work() has been refactored. ]
+Signed-off-by: Xinyu Zheng <zhengxinyu6@huawei.com>
+---
+V1 -> V2: Remove unnecessary CVE tag
+ 
+ drivers/vhost/scsi.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/vhost/scsi.c b/drivers/vhost/scsi.c
+index a23a65e7d828..fcde3752b4f1 100644
+--- a/drivers/vhost/scsi.c
++++ b/drivers/vhost/scsi.c
+@@ -579,8 +579,10 @@ static void vhost_scsi_complete_cmd_work(struct vhost_work *work)
+ 		ret = copy_to_iter(&v_rsp, sizeof(v_rsp), &iov_iter);
+ 		if (likely(ret == sizeof(v_rsp))) {
+ 			struct vhost_scsi_virtqueue *q;
+-			vhost_add_used(cmd->tvc_vq, cmd->tvc_vq_desc, 0);
+ 			q = container_of(cmd->tvc_vq, struct vhost_scsi_virtqueue, vq);
++			mutex_lock(&q->vq.mutex);
++			vhost_add_used(cmd->tvc_vq, cmd->tvc_vq_desc, 0);
++			mutex_unlock(&q->vq.mutex);
+ 			vq = q - vs->vqs;
+ 			__set_bit(vq, signal);
+ 		} else
+@@ -1193,8 +1195,11 @@ static void vhost_scsi_tmf_resp_work(struct vhost_work *work)
+ 	else
+ 		resp_code = VIRTIO_SCSI_S_FUNCTION_REJECTED;
+ 
++	mutex_lock(&tmf->svq->vq.mutex);
+ 	vhost_scsi_send_tmf_resp(tmf->vhost, &tmf->svq->vq, tmf->in_iovs,
+ 				 tmf->vq_desc, &tmf->resp_iov, resp_code);
++	mutex_unlock(&tmf->svq->vq.mutex);
++
+ 	vhost_scsi_release_tmf_res(tmf);
+ }
+ 
+-- 
+2.34.1
+
 
