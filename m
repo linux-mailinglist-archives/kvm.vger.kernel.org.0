@@ -1,275 +1,181 @@
-Return-Path: <kvm+bounces-52547-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52548-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C68DCB0692F
-	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 00:22:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80C32B06952
+	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 00:32:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 10D66172285
-	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 22:22:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BAA8F189E654
+	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 22:32:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EB472C15AB;
-	Tue, 15 Jul 2025 22:22:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F4182D3732;
+	Tue, 15 Jul 2025 22:31:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="kfG6cVF0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GoCbTlGR"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2073.outbound.protection.outlook.com [40.107.237.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E749A1DDC0F
-	for <kvm@vger.kernel.org>; Tue, 15 Jul 2025 22:22:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.73
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752618165; cv=fail; b=nce+e7SQqgD1vI1x1Czldt1Aj7OqahxW93E82AnZFltHTj0dZt1PEdy/uxk+MWVKXG5O6yN4V9R99Axf/YrCXZLUkLx8fQY5z2QukzNyivQVWZSyjxxu7P23LVBblb9O74oJaA0BWkDyfV3El9SFULSiQSkjmyd+lhbNGmYCi5w=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752618165; c=relaxed/simple;
-	bh=9wdyXhm/6Y/sVNiWjk035w9bfKReSGFeXbcEwPy8Kuk=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=iFP3aVeeDgVPzy37Gx4CWMatt9Cd+m3fZOtpT/KsRYKXxqcCNX5LkZKa4LUYxMw38azjVGgtJISrHAzPYqXCWgZAQS6okCY6MkfsSb5MinZmrlJCtKUjzomjLN4NjTF9YgrIbHke5voPRPkvstjkIPTho1dLANwYwuxHKLlQgKM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=kfG6cVF0; arc=fail smtp.client-ip=40.107.237.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=nuHPz4fvR+APTo1QWprY/wwhi/xrH+W9PLIOss+9zK3w6DH6YS1mNaCAeTxHv2uNCGY/dwfThr2Y/Vx8a+abebHHjLjsc8sMO+vXR8uD1VpdcgGUYJx7rlykz+4/ZxpK/cuugPTN57eYyTf965+loU51ncspVBO6LRao71XQUMmveANGatqzoO5AcO9dDK/n7cTdURWB5GZV/ivbb/5lp5/KzFSgisblfUdtl3YmpHwV0BL0de1UmPOtmO/xdGPP+wiJp7/VLhxNRwwBIqxSrjEy2YYpIYo4slJ6epxb7RiHIjjSLFFoaEwwULjYJAWL9UxtYik9mR8+6mS8pdHsUQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=EJr17DcCooXzpV3OGnSuhuOYQmK4BOCmZNtG6yXYHkk=;
- b=q/Dj2O9fvx/PNL9qdRIpsYHtKTneBAQ6iEVQ/8G5oOV5vjlXLGvys8+pDMnyfHS/xAjRL6K8MkM5m0lZHe5H8rlCbLLKYZqLKOZlz4BMKFTdJKaojKC2k2JYTpmjjIeBzOQQ0g3IqYgsM8RJyO6ssQy//TrINVC7gc90kMIa6ZIZj7YYO4odd9D1tJFRuKy4pRqgW19uEydR4CGBeNNHKNcTtPQg3wdTr1b7lCNGffc0UQ9oK7B1NJs4FSCxkP7k9N6bgKFIK8Ufvv0ba41kLTaRYY4k0ehO4apbFSO+/fXgrdQM761ziPOldMIsgMXT6qdFKedA+t0hMEiHwgYecQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=EJr17DcCooXzpV3OGnSuhuOYQmK4BOCmZNtG6yXYHkk=;
- b=kfG6cVF0wBQPtOfVCjiuE9+ORajuo8NKKdWqZL49PBgPAdQU6CLqqnQOomKhAFCIVsjAJYse1vYth7/L+dF7b6eScpmCRpN12WkpuLvrwUYJlKhGsfiWi3Ek36zje8vU8RrUmF+JeHP+2h/BvLwF5C60BP8dkEE2q24R50JQA38=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from MW3PR12MB4553.namprd12.prod.outlook.com (2603:10b6:303:2c::19)
- by SA1PR12MB9471.namprd12.prod.outlook.com (2603:10b6:806:458::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8922.27; Tue, 15 Jul
- 2025 22:22:39 +0000
-Received: from MW3PR12MB4553.namprd12.prod.outlook.com
- ([fe80::b0ef:2936:fec1:3a87]) by MW3PR12MB4553.namprd12.prod.outlook.com
- ([fe80::b0ef:2936:fec1:3a87%3]) with mapi id 15.20.8922.028; Tue, 15 Jul 2025
- 22:22:39 +0000
-Message-ID: <0e7bb322-e6c3-409a-ba30-1d8a3a6dc865@amd.com>
-Date: Tue, 15 Jul 2025 17:22:37 -0500
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/2] target/i386: Add TSA attack variants TSA-SQ and
- TSA-L1
-To: Babu Moger <babu.moger@amd.com>, pbonzini@redhat.com,
- zhao1.liu@intel.com, bp@alien8.de
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org
-References: <12881b2c03fa351316057ddc5f39c011074b4549.1752176771.git.babu.moger@amd.com>
-Content-Language: en-US
-From: "Moger, Babu" <bmoger@amd.com>
-In-Reply-To: <12881b2c03fa351316057ddc5f39c011074b4549.1752176771.git.babu.moger@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA1PR04CA0015.namprd04.prod.outlook.com
- (2603:10b6:806:2ce::11) To MW3PR12MB4553.namprd12.prod.outlook.com
- (2603:10b6:303:2c::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5495A2D1F7E
+	for <kvm@vger.kernel.org>; Tue, 15 Jul 2025 22:31:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752618711; cv=none; b=chVzE1ceKZPDchkEX8TGgKz8eTn3P+ppcZL3lILs7FgFNIMdRz1Y8VnDDdtcmSJVZQ7VcQqUuKPC55Q/khajUCuMVIC7S6ykWvqlKJ0rlP+yQhSfoZKQpCIav7TTUseSGNW01PW0RrpDEAr2AAPzK9Yz6ajHWy/jQpIbfh8OhwQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752618711; c=relaxed/simple;
+	bh=EGo71pGB25aRe+dzBTxG5hUAh1TU9qUWx5DqyUNZDD0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=UikGk9EbH3yHrAHIGVa0aETuN2SlrlBSiZSkvv0Rwp5CruGmOhKYUYO/E/Z/6NBwVrwtWzz2BvH/7tDPCjdB4q5bDG27lbsfKHNw6mb4RZe35bafjHZQ/pSP2GdywgRznLWpzJ1Hx0zFJbKPD7zVnysfigIwIjbVk/uIolKBa24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GoCbTlGR; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-313ff01d2a6so6528947a91.3
+        for <kvm@vger.kernel.org>; Tue, 15 Jul 2025 15:31:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1752618710; x=1753223510; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=EGo71pGB25aRe+dzBTxG5hUAh1TU9qUWx5DqyUNZDD0=;
+        b=GoCbTlGRhMnyFft9cjqn8cZJEmwTtHZ3RUte1tyR8MwBojoBhYBqdMKzeceSQOMERR
+         uK54YmSpA5Nb5OvCdlRpL1tThb/F7qOLz3T/6ziaqRcXbcSqVF0cH9D5yxrVNlKkDpaS
+         oeawh/DBTrVRMbZcHipIx3ZS87EurMp+E1/KuVLhV+FdAXouhwRhHepaJmD794P8g0H4
+         gVzU2Q3aL7gUR/5rCLlPfJbKW8ZRWW+hhkV8TA9O7R8MvDCwbRYdrAdmQVMevDwE+B5X
+         242A4QijoU3/Yq24HsZ/okwd7NRKvbibPtOdt1AhqeDhVJftC937W7laDHEfUZyVbwD7
+         SEjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752618710; x=1753223510;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=EGo71pGB25aRe+dzBTxG5hUAh1TU9qUWx5DqyUNZDD0=;
+        b=SvC5nONUirSb6+xr3rCEs3gVDNPWtaDPmUVs5r0VEYUr2yw9U8yFbe7OaDFQ+jYn+c
+         XJf9Q9pUMSwlBVZe0BJ0CeoUN7CoFA9TzYnFfRxFml/1r6dNmGR6knCCe53oLKYvR+sD
+         xFYCS81O3cxJdFs99yW+Rud3M2a5LNqLkXXP0bFQaIY/iTnq4DI+3K8X48z9F8KLUc+7
+         Z5unn8O1i4lreGD6+3O+Cu1kodIAsAU74ZS03YDgVA7R6lNzRwGzdArudo6NRg4gJnnd
+         IJAxBKYHEmEV7E2nJ6jP3oVGm2LXMaEbQGk+4lh5EzZMwhtmMKqjiCp8jaUyUrnVaeOB
+         r38w==
+X-Forwarded-Encrypted: i=1; AJvYcCXb6P6HzH6BFLh1GHadQJSFzMaPA3NyA76lvf1erLNXBzDPc6rK8Qrc/5lnF04eyCylbnI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxcH1ZT9QLKCfjwVNXdScwa2r2jYWmo6fGf8uwsTg87i0jlrPsC
+	2lYAjkyJjuWH2jg1GngOMQWJSNZAlNyJQqAuQZudV50eP3aT5LJYAdjQ9UXjnTlMUgpMQtQOxv+
+	NEBs0CLzNWklhsONzvMWg/hGYSg==
+X-Google-Smtp-Source: AGHT+IEJmk08WJfnlzLLoLwdM9qLMEEvMBr3WhmfjtruDn3UecOESho2SIVbYJkbM8TfrUrOHaIdkcaEyzEJ1IOF4g==
+X-Received: from pjtu13.prod.google.com ([2002:a17:90a:c88d:b0:312:e266:f849])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:57ed:b0:311:a314:c2dc with SMTP id 98e67ed59e1d1-31c9e6f11camr1291163a91.14.1752618709635;
+ Tue, 15 Jul 2025 15:31:49 -0700 (PDT)
+Date: Tue, 15 Jul 2025 15:31:48 -0700
+In-Reply-To: <345e890e65907e03674e8f1850f5c73f707d5a36.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW3PR12MB4553:EE_|SA1PR12MB9471:EE_
-X-MS-Office365-Filtering-Correlation-Id: a90d0079-d902-4fcd-e1a1-08ddc3ee1bc3
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?Y0dTdkNZZWlLTjFyTWltcnk1Ynk0MmNvcG9WSlErMWY0L09aa0d0TDFzT3dP?=
- =?utf-8?B?eDJRRW1jUlhtY2Q3VlNwdmxrcUVkMHVRTDFGWjJMaGN5aWxMUzI1ZWRMUGVt?=
- =?utf-8?B?L0g1QTNJT3BVVkg1OUNFbE1kQVQxWUFqMnA1SjA1cGVrUWpuNFcxendCTUlQ?=
- =?utf-8?B?R0N3cStNWUVqVkloS052QUY5Y29qVnZmRmNFcG9KbklqQkwyL2RrWVhFSGQ1?=
- =?utf-8?B?a0daS2tIa2lJc3ZuWDl1dzRTdDVWNW9scXc0RnZReG5kMW4yeFJPZUZXWTJs?=
- =?utf-8?B?MlpiUEtJZEpJbExrbzQ2azNnanYrcWFuWU5wdlZvVllIUVJ0TTg2Y2VmTUVm?=
- =?utf-8?B?MFdHWU1uNDgvZHBqYUV3MStpVlR0Szl3Z3lHRHdZd3NhUzNsSW9RYjR4NlN5?=
- =?utf-8?B?aG1jSWlEN1J4bGxwMGU0bmZrUnAycFk1OUFyN1paL1F5TFBuR3luMDZrb2lH?=
- =?utf-8?B?dUxHSXYwQ00zcXZjTkx3VjdyNGRHSHRvUzNCcUpkT21MQVhtQ2dyZ2VISHJz?=
- =?utf-8?B?K2RURStucjFFR2pnVTh4b2tkRENBOFU5NjNUSmNjTW5VSUVaa0l3a2ZMS3lz?=
- =?utf-8?B?ZWs0UGduS29zdC8yT0FkV2Y3c3hVVlhpbFlaVEg5T0M0dmtFRk92L0pMZWNJ?=
- =?utf-8?B?dG81R3FLZkMrUEpMK0loeldjTi9CQ1c3UHVXUVkycGZMUHg0LzZ0bUNGMXpt?=
- =?utf-8?B?Y29tTFU2V1JXaGpIZXlQNDVhVzQ4MWwyYkUxLzRmOVU3UzdBV3dvYlpXL0VR?=
- =?utf-8?B?QjhGR0p5RmlaeHZTWTFEVmxQdDFITTNtUWRUTVQ5TXlQNTJnUW5OSGpINHZn?=
- =?utf-8?B?NkVpVTJKd1B4N0NRL0Z1WnVLcXJZSnZyZGJWV0dKSTJRV2hYdUUvYnZma1Rz?=
- =?utf-8?B?Y2dZQnB3R1I0V2R4TkxTb3RZRUFxVEJuUTd5c2dwRStwZU9pdmxQcFJPWitv?=
- =?utf-8?B?NGRnanc0WTI4YUR1TWplcGROK0ZPNWdJU1dzQ2M5MnJRVU5ZbzVqZGdWOXV6?=
- =?utf-8?B?bGpiZXU5MEJFdmd2Y3pwYXFGMVVmMTFRazRBTFhNQmRXMDZHUm5LYjZpdDhZ?=
- =?utf-8?B?TTBsUlJUb2JOb0VmWDJoNkcwVHhOQ1FnYWpEY202bkRXYUIyL3BtWHhBcTJs?=
- =?utf-8?B?bXRubnZTOFJIcFQ4RG9PaFVPZWRwSDI4UUFmQWRSVkVpMnYrT1F5NXBzV3Ro?=
- =?utf-8?B?ekhGZmh4TTVjOVIxY25XUndFQkh5SDJtZStEUEpZQm1BbTVDN3hKZ0F4dnNG?=
- =?utf-8?B?YURNempmU1ZabW5tMUkrRWkwNExtSk5ZZC9XaE5nNHE0NzB6Nmx3OXNpVHlB?=
- =?utf-8?B?Mnh5RVBiQVBySVMwV0h4VWFxUnA2aGJNdnYyYmRIdW8yU0FLNXRmb1RsNjYz?=
- =?utf-8?B?THlDRjRJS2d0dXVwRjRBMTdJMkxqWlpuaGxrcnZnU1lJRFUvKzhhWkpUbHVX?=
- =?utf-8?B?MmJEM1dmKzRtdjdERmRsR1hRYkxIRSsxSklyWGl1OFZDS1k2OXljOGw0YVpt?=
- =?utf-8?B?SFVFMDVPTVdnTW1UcGx5dncrcjlValZxRW9wdE1rNXNEU3JVVmVwcWxIdnkz?=
- =?utf-8?B?b1ZUWlhuc0pSc0RLMjU4SHhzWVlrUktsT3AxMEdBQVFuQkU3ZmZNWm42QnFF?=
- =?utf-8?B?YWVEYmQ4Mk80YUR0WXgway9JbHJyaW1qY3JNQkhKZ2x2cDRXaldOQmhTSFRj?=
- =?utf-8?B?VEZHRm45Z0FVZG1MU0JoOUVEVE1yZTFYTFpCVVNpamt2LzYvY2pJaTN1U3lq?=
- =?utf-8?B?ZUFERjNkVkJaOGFzN3JTVXE3Ymg5bm8xaHJpMTErZUxuaHdTNVpydEUza2Jk?=
- =?utf-8?B?bnpwTFhYMWxFNlVvU251eGJHb0h2WUtveXE2OEg0RlR4QklraXZrMGNZVzRJ?=
- =?utf-8?B?TWlSUThqeTJPTnA5QzZtZGZ4OU40bkhRNGVWbzRaeWltMkxwT2dzYTFjWEpq?=
- =?utf-8?Q?ILE+oCQI8Ds=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW3PR12MB4553.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?NDBPVHNoNkVkNVNSWHFvK0Naa0dOU1RiMjdTUnRDcTBGRVJXcGpPOHZQbFdT?=
- =?utf-8?B?OEwzU3lldjlsanhkOTd4TXhCT0EwelRhYU1DSi9FYkt0VmlYWE9XUThFd1My?=
- =?utf-8?B?TXZlK0ZhSzBCMUpnT0E1UWRLNGpSZFhnODM4RE5IdkFybzROYk9iSDVNbWMy?=
- =?utf-8?B?MDFhSURFZFJFTlN6TUpwd0M5alBFdldPbmdQNksxMUY0WklnY0V4OTQwWVpm?=
- =?utf-8?B?RVArYW1XZjRMd0daY2xQTThYdmpZR1RaUUxqNlFYd29jVS9KcWNJSUVldHR1?=
- =?utf-8?B?aGFncHpwZXg0WEM5RDk3QUlmQ2VTRDN0UUx0bklZaDlYYUgveDdtY3NBMnJZ?=
- =?utf-8?B?cGd2Mm1jdjJ0K0hIcWxGaFVaV1Z1OHYxWldmUzJ4SVRHckhqcUdLS1BsZ1FI?=
- =?utf-8?B?VGE4aWdnQ3l6eTRmclcwRlA4S3BTdS9nK01hUVZGcDIvOU9vTHczeWJyamdT?=
- =?utf-8?B?ZTlJZzhTOXFOSVkxSlk4SU5BbFg2K3VYWGNlM2FoWjgvd1dlYnAxUTNzSlhU?=
- =?utf-8?B?ZDVzVUlCNFpJL0VWV2xnVmFwdUhoU1RuZTZhWGZJZGZGVGxsbmdLcjMyZDA2?=
- =?utf-8?B?SnFGMXJobzY4a3F5YVJyanZYUndGZVJzZXlLQlZTc2EzRTFaeURta2xRRWZu?=
- =?utf-8?B?ZGxjL2I2Sk4rLzg3ZDBrN0dqM0ZXRVMxNWl6Z0FOVDI2Qm5IUjE4WFBKbmFD?=
- =?utf-8?B?SU1JeldGZUdkMXpsZzlJejFGQU1FWnRyUzYxZ003Sk5xQ0xkK0hsaERqc3pU?=
- =?utf-8?B?cDVnY25CQWdacXhaMGllSnZ5bXNHdHV1UkFkQ3piRm9jV1Y3UUxEZlV0ZzFh?=
- =?utf-8?B?VWFRUjM5TWoxZ3U3cXowSW9pZXdZcUR0Q0F6Wjcyd0FRdjhNc0VLYm1ubVZN?=
- =?utf-8?B?bnlqVTdhRkYzU2o3TkxFNHEweUR5alM2aXhnSkE0SEJxb0YxZWNLOFpxc1Y1?=
- =?utf-8?B?Qzg1Q3ozZHR0V3d3S2pIenFqSmxRKzltcUtTK0dxa0dNa3diSVlnRXFoL2p1?=
- =?utf-8?B?WktNZnlvTSs3Y3I4Zi9VdW1rTGlBemlaai9XeWduK3BkMk54ZHl4eVBOQXZq?=
- =?utf-8?B?bCtsU1hwNVBQbFdlQXQvWVFnMHdCb3hOMzI0VjF0bm8yVXphKzhwbU1BUXlV?=
- =?utf-8?B?bGdMOXpjKzAvVExUZzQ4YWNVSTF4cU45MjRNSUp0S0xjMTdqdTBiSW1ZNVdQ?=
- =?utf-8?B?QWQ0RHAwMEFUUnNBQ1E0a0xQSEZkSmdtTDd1YVdjZVhTeTBqWW4rYlVIV1BS?=
- =?utf-8?B?cEtERFVjdncxVmZJUFVnMWtCVmJpQ2o2T0x3cElQRDB4blJTVE1kYzV5Ry91?=
- =?utf-8?B?RFRHRkNjTzczSWYzNGo1aWZYaktqOXJLS3grdUlNU2hrSWZDYmROMVQ3Umcw?=
- =?utf-8?B?RS9JY0pQR3djcmg4aHJQZTBDY0xBRFJsMUlGS1p5UUlQNkg3YkEraWE2U0J0?=
- =?utf-8?B?MmozMUtqU0tRUUxwUjJwRG1tZnNpRjAwbXdlZC9uc2hES2g1MEpDWmhOUGdZ?=
- =?utf-8?B?ZWZYS08xZFdkaGlBSnpiNXJhcXN1ZFVpT2hnZ1k5MkVVOHNrbDN5Y1RaOXlz?=
- =?utf-8?B?aHBNdlVybS9KVE40RGF2UGd1aHJRcVZPeTE3Zm5Md1I3Ykx0dHBVeitCT3A3?=
- =?utf-8?B?SkwyRkdDZXp2R1JnVGJ5ai9hWGQyUCtVQWY2M0xhMndHV0tMSElKTTlLamVM?=
- =?utf-8?B?L3FHTS9sMzRwcWd4WnlqQTRWZXN3Yy9wbm4vL3ZDWXhENElWTStHd08vOXJz?=
- =?utf-8?B?TjJ0cVFzUVFveUoxclZtTVlROXVEcndkOEZhV2tmWVQ4V0NHNm1iTm5ueXN4?=
- =?utf-8?B?RHh4R2o2NXBkNzZHalYzekRZQlg0NVkrMEZSMGdBazk1QThXSnd5OXk5bmQ3?=
- =?utf-8?B?NTVzZm1kRGxCaVlmRkZSd3BJZ25nZzQvRTNyL3FLZ0srd3ZiYlVaclVFd0w1?=
- =?utf-8?B?aElLQm1ubXRveFg0eTBHMDZwNnRnMDI5cHdEK2VWK1QzQkFlNlFORXYra29a?=
- =?utf-8?B?MGxIV1pjdEs3SW9QQVpuNSs1Y1hiNEZOcGZybERBK0hpQVR0UnIyMWZvN0tW?=
- =?utf-8?B?SXI5SjUzK08xMzdNYTJZZ1NVSFliUklhRHpOOGJxU1JZOTZQRnhkb2tWT0Nw?=
- =?utf-8?Q?rS80=3D?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a90d0079-d902-4fcd-e1a1-08ddc3ee1bc3
-X-MS-Exchange-CrossTenant-AuthSource: MW3PR12MB4553.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jul 2025 22:22:39.3994
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: caF/zt7y0HtHgQqyrbR9PX8kaNjTklozKWt4JzTvPZ/CBpzY7x6gi6seLKG4XZKk
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB9471
+Mime-Version: 1.0
+References: <diqzms9pjaki.fsf@ackerleytng-ctop.c.googlers.com>
+ <fe6de7e7d72d0eed6c7a8df4ebff5f79259bd008.camel@intel.com>
+ <aGNrlWw1K6nkWdmg@yzhao56-desk.sh.intel.com> <cd806e9a190c6915cde16a6d411c32df133a265b.camel@intel.com>
+ <diqzy0t74m61.fsf@ackerleytng-ctop.c.googlers.com> <04d3e455d07042a0ab8e244e6462d9011c914581.camel@intel.com>
+ <diqz7c0q48g7.fsf@ackerleytng-ctop.c.googlers.com> <a9affa03c7cdc8109d0ed6b5ca30ec69269e2f34.camel@intel.com>
+ <diqz1pqq5qio.fsf@ackerleytng-ctop.c.googlers.com> <53ea5239f8ef9d8df9af593647243c10435fd219.camel@intel.com>
+ <aHCdRF10S0fU/EY2@yzhao56-desk> <4c70424ab8bc076142e5f6e8423f207539602ff1.camel@intel.com>
+ <diqzikju4ko7.fsf@ackerleytng-ctop.c.googlers.com> <345e890e65907e03674e8f1850f5c73f707d5a36.camel@intel.com>
+Message-ID: <diqzcya13x2j.fsf@ackerleytng-ctop.c.googlers.com>
+Subject: Re: [RFC PATCH 08/21] KVM: TDX: Increase/decrease folio ref for huge pages
+From: Ackerley Tng <ackerleytng@google.com>
+To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>, "Zhao, Yan Y" <yan.y.zhao@intel.com>
+Cc: "quic_eberman@quicinc.com" <quic_eberman@quicinc.com>, "Li, Xiaoyao" <xiaoyao.li@intel.com>, 
+	"kirill.shutemov@intel.com" <kirill.shutemov@intel.com>, "Hansen, Dave" <dave.hansen@intel.com>, 
+	"david@redhat.com" <david@redhat.com>, "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>, 
+	"vbabka@suse.cz" <vbabka@suse.cz>, "Li, Zhiquan1" <zhiquan1.li@intel.com>, "Du, Fan" <fan.du@intel.com>, 
+	"tabba@google.com" <tabba@google.com>, "seanjc@google.com" <seanjc@google.com>, "Weiny, Ira" <ira.weiny@intel.com>, 
+	"Peng, Chao P" <chao.p.peng@intel.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
+	"Yamahata, Isaku" <isaku.yamahata@intel.com>, "michael.roth@amd.com" <michael.roth@amd.com>, 
+	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Annapurve, Vishal" <vannapurve@google.com>, 
+	"jroedel@suse.de" <jroedel@suse.de>, "Miao, Jun" <jun.miao@intel.com>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pgonda@google.com" <pgonda@google.com>, 
+	"x86@kernel.org" <x86@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Paolo,
+"Edgecombe, Rick P" <rick.p.edgecombe@intel.com> writes:
 
-Can these two patches be included in the QEMU 10.1 release? We are only 
-adding bit definitions and not updating the CPU models, so the risk 
-should be very low.
+> On Mon, 2025-07-14 at 12:49 -0700, Ackerley Tng wrote:
+>> I'm onboard here. So "do nothing" means if there is a TDX unmap failure,
+>>=20
+>> + KVM_BUG_ON() and hence the TD in question stops running,
+>> =C2=A0=C2=A0=C2=A0 + No more conversions will be possible for this TD si=
+nce the TD
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 stops running.
+>> =C2=A0=C2=A0=C2=A0 + Other TDs can continue running?
+>> + No refcounts will be taken for the folio/page where the memory failure
+>> =C2=A0 happened.
+>> + No other indication (including HWpoison) anywhere in folio/page to
+>> =C2=A0 indicate this happened.
+>
+> Yea.
+>
+>> + To round this topic up, do we do anything else as part of "do nothing"
+>> =C2=A0 that I missed? Is there any record in the TDX module (TDX module
+>> =C2=A0 itself, not within the kernel)?
+>
+> We should keep this as an option for how to change the TDX module to make=
+ this
+> solution safer. For future arch things, we should maybe pursue something =
+that
+> works for TDX connect too, which could be more complicated.
+>
+>>=20
+>> I'll probably be okay with an answer like "won't know what will happen",
+>
+> I have not exhaustively looked at that there won't be cascading failures.=
+ I
+> think it's reasonable given this is a bug case which we already have a wa=
+y to
+> catch with a warning.
+>
+>> but just checking - what might happen if this page that had an unmap
+>> failure gets reused?=C2=A0
+>>=20
+>
+> The TDX module has this thing called the PAMT which records how each phys=
+ical
+> page is in use. If KVM tries to re-add the page, the SEAMCALL will check =
+PAMT,
+> see it is not in the NDA (Not directly assigned) state, and give an error
+> (TDX_OPERAND_PAGE_METADATA_INCORRECT). This is part of the security enfor=
+cement.
+>
+>> Suppose the KVM_BUG_ON() is noted but somehow we
+>> couldn't get to the machine in time and the machine continues to serve,
+>> and the memory is used by=20
+>>=20
+>> 1. Some other non-VM user, something else entirely, say a database?
+>
+> We are in a "there is a bug" state at this point, which means stability s=
+hould
+> not be expected to be as good. But it should be optimistically ok to re-u=
+se the
+> page as long as the TD is not re-entered, or otherwise actuated via SEAMC=
+ALL.
+>
+>> 2. Some new non-TDX VM?
+>
+> Same as (1)
+>
+>> 3. Some new TD?
+>
+> As above, the TDX module should prevent this.
 
-thanks
-Babu
+Thanks for clarifying! SGTM!
 
-On 7/10/2025 2:46 PM, Babu Moger wrote:
-> Transient Scheduler Attacks (TSA) are new speculative side channel attacks
-> related to the execution timing of instructions under specific
-> microarchitectural conditions. In some cases, an attacker may be able to
-> use this timing information to infer data from other contexts, resulting in
-> information leakage.
-> 
-> AMD has identified two sub-variants two variants of TSA.
-> CPUID Fn8000_0021 ECX[1] (TSA_SQ_NO).
-> 	If this bit is 1, the CPU is not vulnerable to TSA-SQ.
-> 
-> CPUID Fn8000_0021 ECX[2] (TSA_L1_NO).
-> 	If this bit is 1, the CPU is not vulnerable to TSA-L1.
-> 
-> Add the new feature word FEAT_8000_0021_ECX and corresponding bits to
-> detect TSA variants.
-> 
-> Link: https://www.amd.com/content/dam/amd/en/documents/resources/bulletin/technical-guidance-for-mitigating-transient-scheduler-attacks.pdf
-> Co-developed-by: Borislav Petkov (AMD) <bp@alien8.de>
-> Signed-off-by: Borislav Petkov (AMD) <bp@alien8.de>
-> Signed-off-by: Babu Moger <babu.moger@amd.com>
-> ---
-> v2: Split the patches into two.
->      Not adding the feature bit in CPU model now. Users can add the feature
->      bits by using the option "-cpu EPYC-Genoa,+tsa-sq-no,+tsa-l1-no".
-> 
-> v1: https://lore.kernel.org/qemu-devel/20250709104956.GAaG5JVO-74EF96hHO@fat_crate.local/
-> ---
->   target/i386/cpu.c | 17 +++++++++++++++++
->   target/i386/cpu.h |  6 ++++++
->   2 files changed, 23 insertions(+)
-> 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 0d35e95430..2cd07b86b5 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -1292,6 +1292,22 @@ FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
->           .tcg_features = 0,
->           .unmigratable_flags = 0,
->       },
-> +    [FEAT_8000_0021_ECX] = {
-> +        .type = CPUID_FEATURE_WORD,
-> +        .feat_names = {
-> +            NULL, "tsa-sq-no", "tsa-l1-no", NULL,
-> +            NULL, NULL, NULL, NULL,
-> +            NULL, NULL, NULL, NULL,
-> +            NULL, NULL, NULL, NULL,
-> +            NULL, NULL, NULL, NULL,
-> +            NULL, NULL, NULL, NULL,
-> +            NULL, NULL, NULL, NULL,
-> +            NULL, NULL, NULL, NULL,
-> +        },
-> +        .cpuid = { .eax = 0x80000021, .reg = R_ECX, },
-> +        .tcg_features = 0,
-> +        .unmigratable_flags = 0,
-> +    },
->       [FEAT_8000_0022_EAX] = {
->           .type = CPUID_FEATURE_WORD,
->           .feat_names = {
-> @@ -7934,6 +7950,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
->           *eax = *ebx = *ecx = *edx = 0;
->           *eax = env->features[FEAT_8000_0021_EAX];
->           *ebx = env->features[FEAT_8000_0021_EBX];
-> +        *ecx = env->features[FEAT_8000_0021_ECX];
->           break;
->       default:
->           /* reserved values: zero */
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index 51e10139df..6a9eb2dbf7 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -641,6 +641,7 @@ typedef enum FeatureWord {
->       FEAT_8000_0008_EBX, /* CPUID[8000_0008].EBX */
->       FEAT_8000_0021_EAX, /* CPUID[8000_0021].EAX */
->       FEAT_8000_0021_EBX, /* CPUID[8000_0021].EBX */
-> +    FEAT_8000_0021_ECX, /* CPUID[8000_0021].ECX */
->       FEAT_8000_0022_EAX, /* CPUID[8000_0022].EAX */
->       FEAT_C000_0001_EDX, /* CPUID[C000_0001].EDX */
->       FEAT_KVM,           /* CPUID[4000_0001].EAX (KVM_CPUID_FEATURES) */
-> @@ -1124,6 +1125,11 @@ uint64_t x86_cpu_get_supported_feature_word(X86CPU *cpu, FeatureWord w);
->    */
->   #define CPUID_8000_0021_EBX_RAPSIZE    (8U << 16)
->   
-> +/* CPU is not vulnerable TSA SA-SQ attack */
-> +#define CPUID_8000_0021_ECX_TSA_SQ_NO  (1U << 1)
-> +/* CPU is not vulnerable TSA SA-L1 attack */
-> +#define CPUID_8000_0021_ECX_TSA_L1_NO  (1U << 2)
-> +
->   /* Performance Monitoring Version 2 */
->   #define CPUID_8000_0022_EAX_PERFMON_V2  (1U << 0)
->   
+Btw, after some more work on handling memory failures for guest_memfd,
+it now seems like it's better for guest_memfd to not use the HWpoison
+flag internally either.
 
+So it turns out well that for TDX unmap failures we're aligned on not
+using HWpoison :)
 
