@@ -1,141 +1,388 @@
-Return-Path: <kvm+bounces-52443-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52442-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79F29B053E9
-	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 10:00:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04852B053E0
+	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 09:59:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8246B4E5810
-	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 07:59:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C5C74E4D82
+	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 07:59:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBBCF2741D4;
-	Tue, 15 Jul 2025 07:59:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 515812737E2;
+	Tue, 15 Jul 2025 07:59:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mGYc/83S"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b="F/RW2qH5"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from www3579.sakura.ne.jp (www3579.sakura.ne.jp [49.212.243.89])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74F9C157493;
-	Tue, 15 Jul 2025 07:59:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25B7872612
+	for <kvm@vger.kernel.org>; Tue, 15 Jul 2025 07:59:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.243.89
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752566390; cv=none; b=HhQsStGZaeTGZyjuT5wk78zGruViIo34ZdPkBKlXV4CoCd1v22LLP0UW98xFIjDAu1WiCIkfO+nSMO2OtSUjLQD6jzXtwqPiMd+6F5gICRqUZPAgctv/Rn0QTNZoivmM6/7GkXNCw63afmSs4OXfiQ89o+d3pVlF1OZXv5qhKHw=
+	t=1752566373; cv=none; b=QMp/MjE9yMy9orDI3dTfRUv34x7Kix/U7K/L+dStTGiHQrLeSFd7n3ap+OeB+yOC+3oMvGSP1/BAGz4Jr0CnpRvCXPagN0KRl1u3k1J+MHAiMFLe/LblPW4oAVn6ers6ehYfDtcLKmFeV4rhfy38ov/gBM5EKqZj5AykPxc84g0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752566390; c=relaxed/simple;
-	bh=UeR90blzl1UkanLlvwh7Gs4nuz3Jzfvnov9b2Px8QHk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i8wFwPLCrjYaYuLbmgcsFBFl7syIg4nb6OoUH++3kb/jbPsnTXvxlyXNax2DwNh6kPmOVbylETot7CgCsB2mGM0MTDTj7lV8bvZvHA2JIx2xw0RqbpZ9ExbWyypX2p0Np8oIXGWRbKxP4TwPEkcOEgAhNjrzmh7xAalqPx+TMU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mGYc/83S; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752566389; x=1784102389;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=UeR90blzl1UkanLlvwh7Gs4nuz3Jzfvnov9b2Px8QHk=;
-  b=mGYc/83S4Pw4MSj0CRlVhgvIOB6Bghe9OIi0MCL5XKR68PfG7fdKMoBn
-   GDdzxL4EqkHjVmqJuglu5rpFCa2/fLxF6w9MRWlICh0Aaxrf5a4EII6II
-   +TmAaNiVUMCkPnofLsX2bbwZgb/6j1LKp8IL8TNBcsyLl50Te/LrEVA6q
-   wAabd73OcaUhvpAPuPpSNxWZ8NCC0EgkOvB5todD1AZkHuRrNeJZ/IpaW
-   uELWvSxuTQzVvpcEyNYWm76SQJU8B0hN90iBOkIGPCriZYoa8OpeRY/x/
-   MPIgX10NTXIWPzOtzf+/EtWCIM5ApG0FAfDieBevctSrlBtNdZale8vox
-   g==;
-X-CSE-ConnectionGUID: Kr12rtJ7Q4uXJy/+ThIsZA==
-X-CSE-MsgGUID: 0PqRyTODQd2wmec84yPADw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11491"; a="54920732"
-X-IronPort-AV: E=Sophos;i="6.16,313,1744095600"; 
-   d="scan'208";a="54920732"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2025 00:59:47 -0700
-X-CSE-ConnectionGUID: LAglGVJPSx+FTNAdNBYyDw==
-X-CSE-MsgGUID: ZxagDbPCR3a8lGaD4xN+/Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,313,1744095600"; 
-   d="scan'208";a="156565039"
-Received: from smile.fi.intel.com ([10.237.72.52])
-  by orviesa006.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2025 00:59:32 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.98.2)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1ubaZS-0000000Fadw-49Fb;
-	Tue, 15 Jul 2025 10:59:26 +0300
-Date: Tue, 15 Jul 2025 10:59:26 +0300
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: WangYuli <wangyuli@uniontech.com>
-Cc: Greg KH <gregkh@linuxfoundation.org>, seanjc@google.com,
-	pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
-	bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
-	hpa@zytor.com, dave@stgolabs.net, jonathan.cameron@huawei.com,
-	dave.jiang@intel.com, alison.schofield@intel.com,
-	vishal.l.verma@intel.com, ira.weiny@intel.com,
-	dan.j.williams@intel.com, lucas.demarchi@intel.com,
-	thomas.hellstrom@linux.intel.com, rodrigo.vivi@intel.com,
-	airlied@gmail.com, simona@ffwll.ch, marcin.s.wojtas@gmail.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, arend.vanspriel@broadcom.com,
-	ilpo.jarvinen@linux.intel.com, jirislaby@kernel.org,
-	jgross@suse.com, sstabellini@kernel.org,
-	oleksandr_tyshchenko@epam.com, akpm@linux-foundation.org,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	ming.li@zohomail.com, linux-cxl@vger.kernel.org,
-	intel-xe@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-	netdev@vger.kernel.org, kvalo@kernel.org, johannes.berg@intel.com,
-	quic_ramess@quicinc.com, ragazenta@gmail.com,
-	jeff.johnson@oss.qualcomm.com, mingo@kernel.org, j@jannau.net,
-	linux@treblig.org, linux-wireless@vger.kernel.org,
-	brcm80211@lists.linux.dev, brcm80211-dev-list.pdl@broadcom.com,
-	linux-serial@vger.kernel.org, xen-devel@lists.xenproject.org,
-	shenlichuan@vivo.com, yujiaoliang@vivo.com, colin.i.king@gmail.com,
-	cvam0000@gmail.com, zhanjun@uniontech.com, niecheng1@uniontech.com,
-	guanwentao@uniontech.com
-Subject: Re: [PATCH] treewide: Fix typo "notifer"
-Message-ID: <aHYKXgc2k5wDY32c@smile.fi.intel.com>
-References: <B3C019B63C93846F+20250715071245.398846-1-wangyuli@uniontech.com>
- <2025071545-endnote-imprison-2b98@gregkh>
- <5D06C25920559D71+06c9ce34-9867-495c-9842-dcfe9f1d51bb@uniontech.com>
+	s=arc-20240116; t=1752566373; c=relaxed/simple;
+	bh=mXwD+Og7N4TxJPCWEfkX7A3yIc1jcyU8AYQ49ucw4Zk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ia7TJ08roUCRSLtOUKUGPeb8uKs8oscQvvI3ApyGdCIo8WSNnaL6+NPL1NToIYNyfd1K7mBXN54bVvnYJFkmXyjylbPOEqm7vtubmzaP/E+80Z5KckmXNOF0Acy1m3P+Yio/SIUhULmmxNTdBuS+ijxYXPViPike7JVfhEpazDE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp; dkim=fail (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b=F/RW2qH5 reason="key not found in DNS"; arc=none smtp.client-ip=49.212.243.89
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp
+Received: from [10.105.8.218] ([192.51.222.130])
+	(authenticated bits=0)
+	by www3579.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 56F7xRAf029644
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Tue, 15 Jul 2025 16:59:28 +0900 (JST)
+	(envelope-from odaki@rsg.ci.i.u-tokyo.ac.jp)
+DKIM-Signature: a=rsa-sha256; bh=B82bZnsgKMOdZd1ud2VVFzw50cCrbey6TAkDG2iCrrI=;
+        c=relaxed/relaxed; d=rsg.ci.i.u-tokyo.ac.jp;
+        h=Message-ID:Date:Subject:To:From;
+        s=rs20250326; t=1752566368; v=1;
+        b=F/RW2qH5hw2AZ8d1RWCNLMiAF9zZDcE7Kwf4LSvcPkBHIxnN6wrmR5zawfYnrEv3
+         AI8xURPP5O9st5x890CL9poOd0tUTLs5ABonHTmk24MkXcUJ5cli51jB4pQMqP6L
+         RNcU6J5PxXqw9Ypyf6f7PjuY4lkdq3U5SrFVRthDGHbITFWkg387osSeeQv4zsQA
+         KE7fER+Kgxm7PNNs5ul1xdOmzyL8yf94TBx/gYrr3Vu+k3nkaT2yiIGXBTAt7Rhn
+         dZsYjAL3cKbQXUMw0QC0xyga/lDvAQCaseby6rKuJxKdKZ10/psmOUkr9idZDioJ
+         Lp+YA03BdjO6pnw6pCSprA==
+Message-ID: <aab8c434-364e-4305-9d8b-943eb0c98406@rsg.ci.i.u-tokyo.ac.jp>
+Date: Tue, 15 Jul 2025 16:59:27 +0900
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5D06C25920559D71+06c9ce34-9867-495c-9842-dcfe9f1d51bb@uniontech.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
- krs, Bertel Jungin Aukio 5, 02600 Espoo
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC v2 08/13] qmp: update virtio features map to support
+ extended features
+To: Paolo Abeni <pabeni@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+        Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+        Jason Wang
+ <jasowang@redhat.com>,
+        Sriram Yagnaraman <sriram.yagnaraman@ericsson.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, Luigi Rizzo <lrizzo@google.com>,
+        Giuseppe Lettieri
+ <g.lettieri@iet.unipi.it>,
+        Vincenzo Maffione <v.maffione@gmail.com>,
+        Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+        kvm@vger.kernel.org
+References: <cover.1752229731.git.pabeni@redhat.com>
+ <5f5a6718fa5ae82d5cd3b73523deea41089ffeb5.1752229731.git.pabeni@redhat.com>
+Content-Language: en-US
+From: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
+In-Reply-To: <5f5a6718fa5ae82d5cd3b73523deea41089ffeb5.1752229731.git.pabeni@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jul 15, 2025 at 03:53:18PM +0800, WangYuli wrote:
-> On 2025/7/15 15:22, Greg KH wrote:
-> > Please break this up into one-patch-per-subsystem, like is required for
-> > things like this.
-
-> Honestly, I've always been quite unsure how to handle situations like this.
+On 2025/07/11 22:02, Paolo Abeni wrote:
+> Extend the VirtioDeviceFeatures struct with an additional u64
+> to track unknown features in the 65-128 bit range and decode
+> the full virtio features spaces for vhost and virtio devices.
 > 
-> It seems every subsystem maintainer has different preferences.
-
-True, but at least if you see the specific driver in the MAINTAINERS, split for
-that driver. For instance, 8250_dw in this patch is exactly the case.
-
-> I've previously encountered some maintainers who suggested I split such
-> patches by subsystem so each maintainer could merge them into their tree
-> without contention. However, other ones have argued that fixing spelling
-> errors isn't worth multiple commits, claiming it would create chaos.
-
-> Since I genuinely discover these spelling errors by chance each time, and to
-> avoid giving the impression I'm "spamming" the kernel tree for some ulterior
-> motive, I've opted to squash them into a single commit.
+> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> ---
+> I'm unsure if it's actually legit to update a qapi struct
+> definition?
 > 
-> That said, I personally don't have any strong feelings or preferences on
-> this matter. Since you've requested it, I'll go ahead and split it up and
-> send a v2 patchset.
+> v1 -> v2:
+>    - uint128_t -> uint64_t[]
+> ---
+>   hw/virtio/virtio-hmp-cmds.c |  3 +-
+>   hw/virtio/virtio-qmp.c      | 89 ++++++++++++++++++++++++++-----------
+>   hw/virtio/virtio-qmp.h      |  3 +-
+>   qapi/virtio.json            |  8 +++-
+>   4 files changed, 73 insertions(+), 30 deletions(-)
+> 
+> diff --git a/hw/virtio/virtio-hmp-cmds.c b/hw/virtio/virtio-hmp-cmds.c
+> index 7d8677bcf0..e8c2a76a2a 100644
+> --- a/hw/virtio/virtio-hmp-cmds.c
+> +++ b/hw/virtio/virtio-hmp-cmds.c
+> @@ -74,7 +74,8 @@ static void hmp_virtio_dump_features(Monitor *mon,
+>       }
+>   
+>       if (features->has_unknown_dev_features) {
+> -        monitor_printf(mon, "  unknown-features(0x%016"PRIx64")\n",
+> +        monitor_printf(mon, "  unknown-features(0x%016"PRIx64"%016"PRIx64")\n",
+> +                       features->unknown_dev_features_dword2,
+>                          features->unknown_dev_features);
+>       }
+>   }
+> diff --git a/hw/virtio/virtio-qmp.c b/hw/virtio/virtio-qmp.c
+> index 3b6377cf0d..0d06e7a7db 100644
+> --- a/hw/virtio/virtio-qmp.c
+> +++ b/hw/virtio/virtio-qmp.c
+> @@ -325,6 +325,20 @@ static const qmp_virtio_feature_map_t virtio_net_feature_map[] = {
+>       FEATURE_ENTRY(VHOST_USER_F_PROTOCOL_FEATURES, \
+>               "VHOST_USER_F_PROTOCOL_FEATURES: Vhost-user protocol features "
+>               "negotiation supported"),
+> +    FEATURE_ENTRY(VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO, \
+> +            "VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO: Driver can receive GSO over "
+> +            "UDP tunnel packets"),
+> +    FEATURE_ENTRY(VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO_CSUM, \
+> +            "VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO: Driver can receive GSO over "
+> +            "UDP tunnel packets requiring checksum offload for the outer "
+> +            "header"),
+> +    FEATURE_ENTRY(VIRTIO_NET_F_HOST_UDP_TUNNEL_GSO, \
+> +            "VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO: Device can receive GSO over "
+> +            "UDP tunnel packets"),
+> +    FEATURE_ENTRY(VIRTIO_NET_F_HOST_UDP_TUNNEL_GSO_CSUM, \
+> +            "VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO: Device can receive GSO over "
+> +            "UDP tunnel packets requiring checksum offload for the outer "
+> +            "header"),
+>       { -1, "" }
+>   };
+>   #endif
+> @@ -510,6 +524,24 @@ static const qmp_virtio_feature_map_t virtio_gpio_feature_map[] = {
+>           list;                                            \
+>       })
+>   
+> +#define CONVERT_FEATURES_EX(type, map, bitmap)           \
+> +    ({                                                   \
+> +        type *list = NULL;                               \
+> +        type *node;                                      \
+> +        for (i = 0; map[i].virtio_bit != -1; i++) {      \
+> +            bit = map[i].virtio_bit;                     \
+> +            if (!virtio_has_feature_ex(bitmap, bit)) {   \
+> +                continue;                                \
+> +            }                                            \
+> +            node = g_new0(type, 1);                      \
+> +            node->value = g_strdup(map[i].feature_desc); \
+> +            node->next = list;                           \
+> +            list = node;                                 \
+> +            virtio_clear_feature_ex(bitmap, bit);        \
+> +        }                                                \
+> +        list;                                            \
+> +    })
+> +
+>   VirtioDeviceStatus *qmp_decode_status(uint8_t bitmap)
+>   {
+>       VirtioDeviceStatus *status;
+> @@ -545,109 +577,112 @@ VhostDeviceProtocols *qmp_decode_protocols(uint64_t bitmap)
+>       return vhu_protocols;
+>   }
+>   
+> -VirtioDeviceFeatures *qmp_decode_features(uint16_t device_id, uint64_t bitmap)
+> +VirtioDeviceFeatures *qmp_decode_features(uint16_t device_id,
+> +                                          const uint64_t *bmap)
+>   {
+> +    uint64_t bitmap[VIRTIO_FEATURES_DWORDS];
+>       VirtioDeviceFeatures *features;
+>       uint64_t bit;
+>       int i;
+>   
+> +    virtio_features_copy(bitmap, bmap);
+>       features = g_new0(VirtioDeviceFeatures, 1);
+>       features->has_dev_features = true;
+>   
+>       /* transport features */
+> -    features->transports = CONVERT_FEATURES(strList, virtio_transport_map, 0,
+> -                                            bitmap);
+> +    features->transports = CONVERT_FEATURES_EX(strList, virtio_transport_map,
+> +                                               bitmap);
+>   
+>       /* device features */
+>       switch (device_id) {
+>   #ifdef CONFIG_VIRTIO_SERIAL
+>       case VIRTIO_ID_CONSOLE:
+>           features->dev_features =
+> -            CONVERT_FEATURES(strList, virtio_serial_feature_map, 0, bitmap);
+> +            CONVERT_FEATURES_EX(strList, virtio_serial_feature_map, bitmap);
+>           break;
+>   #endif
+>   #ifdef CONFIG_VIRTIO_BLK
+>       case VIRTIO_ID_BLOCK:
+>           features->dev_features =
+> -            CONVERT_FEATURES(strList, virtio_blk_feature_map, 0, bitmap);
+> +            CONVERT_FEATURES_EX(strList, virtio_blk_feature_map, bitmap);
+>           break;
+>   #endif
+>   #ifdef CONFIG_VIRTIO_GPU
+>       case VIRTIO_ID_GPU:
+>           features->dev_features =
+> -            CONVERT_FEATURES(strList, virtio_gpu_feature_map, 0, bitmap);
+> +            CONVERT_FEATURES_EX(strList, virtio_gpu_feature_map, bitmap);
+>           break;
+>   #endif
+>   #ifdef CONFIG_VIRTIO_NET
+>       case VIRTIO_ID_NET:
+>           features->dev_features =
+> -            CONVERT_FEATURES(strList, virtio_net_feature_map, 0, bitmap);
+> +            CONVERT_FEATURES_EX(strList, virtio_net_feature_map, bitmap);
+>           break;
+>   #endif
+>   #ifdef CONFIG_VIRTIO_SCSI
+>       case VIRTIO_ID_SCSI:
+>           features->dev_features =
+> -            CONVERT_FEATURES(strList, virtio_scsi_feature_map, 0, bitmap);
+> +            CONVERT_FEATURES_EX(strList, virtio_scsi_feature_map, bitmap);
+>           break;
+>   #endif
+>   #ifdef CONFIG_VIRTIO_BALLOON
+>       case VIRTIO_ID_BALLOON:
+>           features->dev_features =
+> -            CONVERT_FEATURES(strList, virtio_balloon_feature_map, 0, bitmap);
+> +            CONVERT_FEATURES_EX(strList, virtio_balloon_feature_map, bitmap);
+>           break;
+>   #endif
+>   #ifdef CONFIG_VIRTIO_IOMMU
+>       case VIRTIO_ID_IOMMU:
+>           features->dev_features =
+> -            CONVERT_FEATURES(strList, virtio_iommu_feature_map, 0, bitmap);
+> +            CONVERT_FEATURES_EX(strList, virtio_iommu_feature_map, bitmap);
+>           break;
+>   #endif
+>   #ifdef CONFIG_VIRTIO_INPUT
+>       case VIRTIO_ID_INPUT:
+>           features->dev_features =
+> -            CONVERT_FEATURES(strList, virtio_input_feature_map, 0, bitmap);
+> +            CONVERT_FEATURES_EX(strList, virtio_input_feature_map, bitmap);
+>           break;
+>   #endif
+>   #ifdef CONFIG_VHOST_USER_FS
+>       case VIRTIO_ID_FS:
+>           features->dev_features =
+> -            CONVERT_FEATURES(strList, virtio_fs_feature_map, 0, bitmap);
+> +            CONVERT_FEATURES_EX(strList, virtio_fs_feature_map, bitmap);
+>           break;
+>   #endif
+>   #ifdef CONFIG_VHOST_VSOCK
+>       case VIRTIO_ID_VSOCK:
+>           features->dev_features =
+> -            CONVERT_FEATURES(strList, virtio_vsock_feature_map, 0, bitmap);
+> +            CONVERT_FEATURES_EX(strList, virtio_vsock_feature_map, bitmap);
+>           break;
+>   #endif
+>   #ifdef CONFIG_VIRTIO_CRYPTO
+>       case VIRTIO_ID_CRYPTO:
+>           features->dev_features =
+> -            CONVERT_FEATURES(strList, virtio_crypto_feature_map, 0, bitmap);
+> +            CONVERT_FEATURES_EX(strList, virtio_crypto_feature_map, bitmap);
+>           break;
+>   #endif
+>   #ifdef CONFIG_VIRTIO_MEM
+>       case VIRTIO_ID_MEM:
+>           features->dev_features =
+> -            CONVERT_FEATURES(strList, virtio_mem_feature_map, 0, bitmap);
+> +            CONVERT_FEATURES_EX(strList, virtio_mem_feature_map, bitmap);
+>           break;
+>   #endif
+>   #ifdef CONFIG_VIRTIO_I2C_ADAPTER
+>       case VIRTIO_ID_I2C_ADAPTER:
+>           features->dev_features =
+> -            CONVERT_FEATURES(strList, virtio_i2c_feature_map, 0, bitmap);
+> +            CONVERT_FEATURES_EX(strList, virtio_i2c_feature_map, bitmap);
+>           break;
+>   #endif
+>   #ifdef CONFIG_VIRTIO_RNG
+>       case VIRTIO_ID_RNG:
+>           features->dev_features =
+> -            CONVERT_FEATURES(strList, virtio_rng_feature_map, 0, bitmap);
+> +            CONVERT_FEATURES_EX(strList, virtio_rng_feature_map, bitmap);
+>           break;
+>   #endif
+>   #ifdef CONFIG_VHOST_USER_GPIO
+>       case VIRTIO_ID_GPIO:
+>           features->dev_features =
+> -            CONVERT_FEATURES(strList, virtio_gpio_feature_map, 0, bitmap);
+> +            CONVERT_FEATURES_EX(strList, virtio_gpio_feature_map, bitmap);
+>           break;
+>   #endif
+>       /* No features */
+> @@ -680,9 +715,10 @@ VirtioDeviceFeatures *qmp_decode_features(uint16_t device_id, uint64_t bitmap)
+>           g_assert_not_reached();
+>       }
+>   
+> -    features->has_unknown_dev_features = bitmap != 0;
+> +    features->has_unknown_dev_features = virtio_features_is_empty(bitmap);
+>       if (features->has_unknown_dev_features) {
+> -        features->unknown_dev_features = bitmap;
+> +        features->unknown_dev_features = bitmap[0];
+> +        features->unknown_dev_features_dword2 = bitmap[1];
+>       }
+>   
+>       return features;
+> @@ -743,11 +779,11 @@ VirtioStatus *qmp_x_query_virtio_status(const char *path, Error **errp)
+>       status->device_id = vdev->device_id;
+>       status->vhost_started = vdev->vhost_started;
+>       status->guest_features = qmp_decode_features(vdev->device_id,
+> -                                                 vdev->guest_features);
+> +                                                 vdev->guest_features_array);
+>       status->host_features = qmp_decode_features(vdev->device_id,
+> -                                                vdev->host_features);
+> +                                                vdev->host_features_array);
+>       status->backend_features = qmp_decode_features(vdev->device_id,
+> -                                                   vdev->backend_features);
+> +                                                 vdev->backend_features_array);
+>   
+>       switch (vdev->device_endian) {
+>       case VIRTIO_DEVICE_ENDIAN_LITTLE:
+> @@ -785,11 +821,12 @@ VirtioStatus *qmp_x_query_virtio_status(const char *path, Error **errp)
+>           status->vhost_dev->nvqs = hdev->nvqs;
+>           status->vhost_dev->vq_index = hdev->vq_index;
+>           status->vhost_dev->features =
+> -            qmp_decode_features(vdev->device_id, hdev->features);
+> +            qmp_decode_features(vdev->device_id, hdev->features_array);
+>           status->vhost_dev->acked_features =
+> -            qmp_decode_features(vdev->device_id, hdev->acked_features);
+> +            qmp_decode_features(vdev->device_id, hdev->acked_features_array);
+>           status->vhost_dev->backend_features =
+> -            qmp_decode_features(vdev->device_id, hdev->backend_features);
+> +            qmp_decode_features(vdev->device_id, hdev->backend_features_array);
+> +
+>           status->vhost_dev->protocol_features =
+>               qmp_decode_protocols(hdev->protocol_features);
+>           status->vhost_dev->max_queues = hdev->max_queues;
+> diff --git a/hw/virtio/virtio-qmp.h b/hw/virtio/virtio-qmp.h
+> index 245a446a56..e0a1e49035 100644
+> --- a/hw/virtio/virtio-qmp.h
+> +++ b/hw/virtio/virtio-qmp.h
+> @@ -18,6 +18,7 @@
+>   VirtIODevice *qmp_find_virtio_device(const char *path);
+>   VirtioDeviceStatus *qmp_decode_status(uint8_t bitmap);
+>   VhostDeviceProtocols *qmp_decode_protocols(uint64_t bitmap);
+> -VirtioDeviceFeatures *qmp_decode_features(uint16_t device_id, uint64_t bitmap);
+> +VirtioDeviceFeatures *qmp_decode_features(uint16_t device_id,
+> +                                          const uint64_t *bitmap);
+>   
+>   #endif
+> diff --git a/qapi/virtio.json b/qapi/virtio.json
+> index 73df718a26..f0442e144b 100644
+> --- a/qapi/virtio.json
+> +++ b/qapi/virtio.json
+> @@ -488,14 +488,18 @@
+>   #     unique features)
+>   #
+>   # @unknown-dev-features: Virtio device features bitmap that have not
+> -#     been decoded
+> +#     been decoded (lower 64 bit)
+> +#
+> +# @unknown-dev-features-dword2: Virtio device features bitmap that have not
+> +#     been decoded (bits 65-128)
+>   #
+>   # Since: 7.2
+>   ##
+>   { 'struct': 'VirtioDeviceFeatures',
+>     'data': { 'transports': [ 'str' ],
+>               '*dev-features': [ 'str' ],
+> -            '*unknown-dev-features': 'uint64' } }
+> +            '*unknown-dev-features': 'uint64',
+> +            '*unknown-dev-features-dword2': 'uint64' } }
 
--- 
-With Best Regards,
-Andy Shevchenko
+Let's omit "dword" for consistency with unknown-dev-features, which is 
+also uint64 but don't have the keyword.
 
+By the way, "dword" is somewhat confusing in QEMU; in many cases (if not 
+all), it represents 32-bit because of Windows and PCI, which define 
+dword as 32-bit. "U64" is a more common phrase.
+
+>   
+>   ##
+>   # @VirtQueueStatus:
 
 
