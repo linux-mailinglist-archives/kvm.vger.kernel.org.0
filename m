@@ -1,45 +1,45 @@
-Return-Path: <kvm+bounces-52506-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52507-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 230DDB05F63
-	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 16:05:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 238B9B05F4C
+	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 16:04:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A42714A6545
-	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 13:58:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A62057BC3C0
+	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 13:59:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 490782ED14E;
-	Tue, 15 Jul 2025 13:48:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 410C12EAB83;
+	Tue, 15 Jul 2025 13:50:23 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A84212E266C;
-	Tue, 15 Jul 2025 13:48:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 130642E6136;
+	Tue, 15 Jul 2025 13:50:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752587312; cv=none; b=Zbau1ZzSaurFsTfK+bJ0m284UM13M8j4wz3imwUMu1/7ADEBIds6SInI8E6SELmU60p9jyCS/hRHiVf8y2qKHUpxtdjqYg05AdG7W65F7A6shcSc1TR6Yxt6O+bkLbYu4zcorUo3aHKC/cJo9t3DtDENYo5ltJp/QqRlG8MS1Hk=
+	t=1752587422; cv=none; b=nSQeM90gmr8QzB2fDyUsA9rujAhSCM7Zs7TDyXu+fn427s7CBNnpQrZ+Zco/f+HyQuzhoEueH2jaAYqu+p5ZEtOnjiOvkRD5i00vfDSjhd+B9mg73Kvtwm4s4v6nW8zCfPo0PzCqzUdWt3wUCzsE7Rha2EVszw0cLnKnaFWcpE0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752587312; c=relaxed/simple;
-	bh=bxFF8xXnRj/qbdJtG1Sq0YERT3ln8lonNLu9XL31+hY=;
+	s=arc-20240116; t=1752587422; c=relaxed/simple;
+	bh=+0PGXrsSAKe+iUuwlrADb2v3BmRkBV8/GR6xTlwwAMo=;
 	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LsjTlusU/KHB8Td49FOYnKysZLfe22WWYBmb70wdftuUfwSAf3jaURuN890HmDdUaSbZVTdNVkxaJ2hAPgOCobdGu6UDRrW/UmbHWnXOQ8LIr8oEAukq2lShQerXzwRYCkOJOXrDDE5eDL1BM65XUle0+8cwcJ6kEMof14JL5IU=
+	 MIME-Version:Content-Type; b=U/i9oZ8kA3RpLFZSkTm21BRt4negqC3pKfBOvQTOqx9kOzdlDRSUdi6WKUkuyfQm2E2mBtudUcwhUqf0UrlhU+LujNTYqdDs/M1SjfGlF6WWC4BFRCgPqHQIW/hAyaE5LISy/MWwzgAwi8XPzLWD399i59BWUSmxWDVRn+D0qaI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4bhL8k2J7Tz67KXb;
-	Tue, 15 Jul 2025 21:47:18 +0800 (CST)
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4bhL874BTNz6L4wL;
+	Tue, 15 Jul 2025 21:46:47 +0800 (CST)
 Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id 2579A1402EB;
-	Tue, 15 Jul 2025 21:48:26 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 7F934140446;
+	Tue, 15 Jul 2025 21:50:17 +0800 (CST)
 Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
  (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Tue, 15 Jul
- 2025 15:48:23 +0200
-Date: Tue, 15 Jul 2025 14:48:22 +0100
+ 2025 15:50:15 +0200
+Date: Tue, 15 Jul 2025 14:50:14 +0100
 From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 To: WangYuli <wangyuli@uniontech.com>
 CC: <airlied@gmail.com>, <akpm@linux-foundation.org>,
@@ -67,11 +67,12 @@ CC: <airlied@gmail.com>, <akpm@linux-foundation.org>,
 	<thomas.hellstrom@linux.intel.com>, <vishal.l.verma@intel.com>,
 	<x86@kernel.org>, <xen-devel@lists.xenproject.org>, <yujiaoliang@vivo.com>,
 	<zhanjun@uniontech.com>
-Subject: Re: [PATCH v2 2/8] cxl: mce: Fix typo "notifer"
-Message-ID: <20250715144822.000006b9@huawei.com>
-In-Reply-To: <65FC7B96ECBDB052+20250715134407.540483-2-wangyuli@uniontech.com>
+Subject: Re: [PATCH v2 8/8] scripts/spelling.txt: Add notifer||notifier to
+ spelling.txt
+Message-ID: <20250715145014.000075ec@huawei.com>
+In-Reply-To: <A205796B545C4241+20250715134407.540483-8-wangyuli@uniontech.com>
 References: <BD5C52D2838AEA48+20250715134050.539234-1-wangyuli@uniontech.com>
-	<65FC7B96ECBDB052+20250715134407.540483-2-wangyuli@uniontech.com>
+	<A205796B545C4241+20250715134407.540483-8-wangyuli@uniontech.com>
 X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -84,32 +85,38 @@ Content-Transfer-Encoding: 7bit
 X-ClientProxiedBy: lhrpeml100002.china.huawei.com (7.191.160.241) To
  frapeml500008.china.huawei.com (7.182.85.71)
 
-On Tue, 15 Jul 2025 21:44:01 +0800
+On Tue, 15 Jul 2025 21:44:07 +0800
 WangYuli <wangyuli@uniontech.com> wrote:
 
-> According to the context, "mce_notifer" should be "mce_notifier".
+> This typo was not listed in scripts/spelling.txt, thus it was more
+> difficult to detect. Add it for convenience.
 > 
 > Link: https://lore.kernel.org/all/B3C019B63C93846F+20250715071245.398846-1-wangyuli@uniontech.com/
-> Fixes: 516e5bd0b6bf ("cxl: Add mce notifier to emit aliased address for extended linear cache")
+
+Adding a link tag to your own previous patch doesn't seem particularly
+useful as something to end up in the git log (which depending on
+maintainer preference may gain a link tag to this version).
+
 > Signed-off-by: WangYuli <wangyuli@uniontech.com>
+other than that, LGTM
+
 Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
 
 > ---
->  drivers/cxl/core/mce.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  scripts/spelling.txt | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> diff --git a/drivers/cxl/core/mce.h b/drivers/cxl/core/mce.h
-> index ace73424eeb6..ca272e8db6c7 100644
-> --- a/drivers/cxl/core/mce.h
-> +++ b/drivers/cxl/core/mce.h
-> @@ -7,7 +7,7 @@
->  
->  #ifdef CONFIG_CXL_MCE
->  int devm_cxl_register_mce_notifier(struct device *dev,
-> -				   struct notifier_block *mce_notifer);
-> +				   struct notifier_block *mce_notifier);
->  #else
->  static inline int
->  devm_cxl_register_mce_notifier(struct device *dev,
+> diff --git a/scripts/spelling.txt b/scripts/spelling.txt
+> index c9a6df5be281..d824c4b17390 100644
+> --- a/scripts/spelling.txt
+> +++ b/scripts/spelling.txt
+> @@ -1099,6 +1099,7 @@ notication||notification
+>  notications||notifications
+>  notifcations||notifications
+>  notifed||notified
+> +notifer||notifier
+>  notity||notify
+>  notfify||notify
+>  nubmer||number
 
 
