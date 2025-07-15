@@ -1,54 +1,86 @@
-Return-Path: <kvm+bounces-52416-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52417-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A5F0B04F22
-	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 05:35:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72BC0B04F33
+	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 05:40:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E54E73BBD08
-	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 03:34:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C316E4A49F9
+	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 03:40:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FBB72D1F42;
-	Tue, 15 Jul 2025 03:34:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7292A2D0C9C;
+	Tue, 15 Jul 2025 03:39:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jcWxei49"
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37BD425B2E3;
-	Tue, 15 Jul 2025 03:34:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00A9B218827
+	for <kvm@vger.kernel.org>; Tue, 15 Jul 2025 03:39:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752550475; cv=none; b=XsCbozQrzK9woSVHwp/PsLGw8yxxi6PpDRqiaOCfklk8K0xbhzy2S43Wgp0LMzvN01wlR9rbfCfqPUvUNmbQCsyWsa+x4wcmzlBcpnEc+TH+Yv1lrWYGn4wcsPRPIdXCBLcK7V8DUkBvxtXX5AKRyF4SUOoWr7EGuoU8qCkQMSw=
+	t=1752550794; cv=none; b=ELhsMyEdFIMqD3s0rSO0GAcajfTBgM34c8d8AISkvnIZkzv9gP+vY//AMmyFhN1tmRAte8hGC0HoqECnZN3Az2i4h9/VucR1+N68hOByMgZZzg9Mkfm8s3mXsK+4hJ/rYirfZBHqxllgSTiM4rLkyMPCOrcRqmcoQOYRR+7OAD0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752550475; c=relaxed/simple;
-	bh=iGIynGgZcN+Tky8z+74hs/M6AuLP5AAfdj32j/amb0Q=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=AJvdAYfd1PUhWzYA9BRtYk/zt9mhO9W0Qlc8Y3VnHYRA35I7KZZRHyDJKpOczPx+A54Vnyma71k0erVFA7XfnNKIkX6GRTI5NzpWtmMSjK3DukSrnhQJMIiObjsIjQCy08R7BA2MqOm+lsJ2pZvtoFUlgQ3KxliHuJ7AwzBjt/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4bh4WJ74gLz2FbPL;
-	Tue, 15 Jul 2025 11:32:28 +0800 (CST)
-Received: from kwepemo200008.china.huawei.com (unknown [7.202.195.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 34F83140156;
-	Tue, 15 Jul 2025 11:34:31 +0800 (CST)
-Received: from huawei.com (10.67.175.28) by kwepemo200008.china.huawei.com
- (7.202.195.61) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 15 Jul
- 2025 11:34:30 +0800
-From: Xinyu Zheng <zhengxinyu6@huawei.com>
-To: <mst@redhat.com>, <jasowang@redhat.com>, <pbonzini@redhat.com>,
-	<stefanha@redhat.com>, <virtualization@lists.linux-foundation.org>,
-	<kvm@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <gregkh@linuxfoundation.org>,
-	<stable@vger.kernel.org>
-CC: <zhengxinyu6@huawei.com>
-Subject: [PATCH v6.1] vhost-scsi: protect vq->log_used with vq->mutex
-Date: Tue, 15 Jul 2025 03:22:55 +0000
-Message-ID: <20250715032255.1624137-1-zhengxinyu6@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1752550794; c=relaxed/simple;
+	bh=zhKngkI310nx9PU9b2zv40h2kHDRfhghd844MS9S4mY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=hL72yTVxaEZ6fyixKCwo2aiKIs8IFhpiM5myypcex+jrVKJEN39wLp7miQY1fN9SG3yxhp45Aac7HPF+bA0WJgmIPsa9Yk1f0o3pbkjItVnOMt71vdXpG6bWcw16ak8VeLDVvCvjbaP73MZLmSv+0+QLXecb151+svCNObtUTuQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jcWxei49; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1752550793; x=1784086793;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=zhKngkI310nx9PU9b2zv40h2kHDRfhghd844MS9S4mY=;
+  b=jcWxei49bQES8OrkmJLDU1GdkFQ04vnKe2zpf/PsD2M/b+RFRLJTh1LY
+   qChAa1+ZhKRl1Pt1IYMjYafSNgUF0ZT/9m/DH2AOD3CpmoXZPLR1d0SoV
+   ePs2Srs08fSvBV09EYMRo1n26Z9peVRX8Yeu34gMftfN8gZ4iiUuQLf4V
+   JhwhyWZE+ySsn8BqSrRnNrkqPWFWWTnLjCI5xUbgzO9E+2DD4oBQuZA9k
+   82QcJ5Flzld2UGctq86Mfg1Sv+BzY7DzDx/Mtsug4sC6wsrro9SYfYK9Y
+   pLxLkLZNbs7p+voNnOM/t3jipbZBUIf1rbiQCgBg5hu3VZmAFIBUWbJyn
+   A==;
+X-CSE-ConnectionGUID: Gk4OjLeyRVWaOZhFh1gXMQ==
+X-CSE-MsgGUID: E0LupAEQTWST+2Vp4iSQwQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11491"; a="72334909"
+X-IronPort-AV: E=Sophos;i="6.16,312,1744095600"; 
+   d="scan'208";a="72334909"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2025 20:39:52 -0700
+X-CSE-ConnectionGUID: 7lV0nEFjREiili/VteL1eQ==
+X-CSE-MsgGUID: BpnnbOhaSRKnTfEwSDjg4w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,312,1744095600"; 
+   d="scan'208";a="180808082"
+Received: from lxy-clx-4s.sh.intel.com ([10.239.48.52])
+  by fmviesa002.fm.intel.com with ESMTP; 14 Jul 2025 20:39:49 -0700
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+	David Hildenbrand <david@redhat.com>,
+	ackerleytng@google.com,
+	seanjc@google.com
+Cc: Fuad Tabba <tabba@google.com>,
+	Vishal Annapurve <vannapurve@google.com>,
+	rick.p.edgecombe@intel.com,
+	Kai Huang <kai.huang@intel.com>,
+	binbin.wu@linux.intel.com,
+	yan.y.zhao@intel.com,
+	ira.weiny@intel.com,
+	michael.roth@amd.com,
+	kvm@vger.kernel.org,
+	qemu-devel@nongnu.org,
+	Peter Xu <peterx@redhat.com>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+Subject: [POC PATCH 0/5] QEMU: Enable in-place conversion and hugetlb gmem
+Date: Tue, 15 Jul 2025 11:31:36 +0800
+Message-ID: <20250715033141.517457-1-xiaoyao.li@intel.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <cover.1747264138.git.ackerleytng@google.com>
+References: <cover.1747264138.git.ackerleytng@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -56,83 +88,51 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
- kwepemo200008.china.huawei.com (7.202.195.61)
 
-From: Dongli Zhang <dongli.zhang@oracle.com>
+Hi all,
 
-[ Upstream commit f591cf9fce724e5075cc67488c43c6e39e8cbe27 ]
+This is the POC to enable in-place conversion and hugetlb support of
+gmem (guest memfd) in QEMU. It can work with 1G gmem support series[1] and
+TDX hugepage support series[2] to run TDX guest with hugepage. I don't
+have SNP environment and don't know how it goes with SNP.
 
-The vhost-scsi completion path may access vq->log_base when vq->log_used is
-already set to false.
+It is just the POC and we share it to show how QEMU work with gmem ABI.
 
-    vhost-thread                       QEMU-thread
+The POC uses the simple implementation that switches to use in-place
+conversion and hugetlb when it is supported and it doesn't introduce new
+interface in QEMU so that existing command line to boot TDX can work without
+any change.
 
-vhost_scsi_complete_cmd_work()
--> vhost_add_used()
-   -> vhost_add_used_n()
-      if (unlikely(vq->log_used))
-                                      QEMU disables vq->log_used
-                                      via VHOST_SET_VRING_ADDR.
-                                      mutex_lock(&vq->mutex);
-                                      vq->log_used = false now!
-                                      mutex_unlock(&vq->mutex);
+Please go to each patch (specifically patch 3/4/5) to discuss the ABI
+usage, potential issue, and maybe the upstreamable design.
 
-				      QEMU gfree(vq->log_base)
-        log_used()
-        -> log_write(vq->log_base)
+[1] https://lore.kernel.org/all/cover.1747264138.git.ackerleytng@google.com/
+[2] https://lore.kernel.org/all/20250424030033.32635-1-yan.y.zhao@intel.com/
 
-Assuming the VMM is QEMU. The vq->log_base is from QEMU userpace and can be
-reclaimed via gfree(). As a result, this causes invalid memory writes to
-QEMU userspace.
+Xiaoyao Li (4):
+  update-linux-headers: Add guestmem.h
+  headers: Fetch gmem updates
+  memory/guest_memfd: Enable hugetlb support
+  [HACK] memory: Don't enable in-place conversion for internal
+    MemoryRegion with gmem
 
-The control queue path has the same issue.
+Yan Zhao (1):
+  memory/guest_memfd: Enable in-place conversion when available
 
-Cc: stable@vger.kernel.org#6.1.x
-Cc: gregkh@linuxfoundation.org
-Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
-Acked-by: Jason Wang <jasowang@redhat.com>
-Reviewed-by: Mike Christie <michael.christie@oracle.com>
-Message-Id: <20250403063028.16045-2-dongli.zhang@oracle.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
-[ Conflicts in drivers/vhost/scsi.c
-  bacause vhost_scsi_complete_cmd_work() has been refactored. ]
-Signed-off-by: Xinyu Zheng <zhengxinyu6@huawei.com>
----
- drivers/vhost/scsi.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ accel/kvm/kvm-all.c             | 82 ++++++++++++++++++++++++---------
+ accel/stubs/kvm-stub.c          |  2 +
+ include/system/kvm.h            |  2 +
+ include/system/memory.h         |  5 ++
+ include/system/ramblock.h       |  1 +
+ linux-headers/linux/guestmem.h  | 29 ++++++++++++
+ linux-headers/linux/kvm.h       | 18 ++++++++
+ scripts/update-linux-headers.sh |  2 +-
+ system/memory.c                 |  9 +++-
+ system/physmem.c                | 40 ++++++++++++++--
+ 10 files changed, 163 insertions(+), 27 deletions(-)
+ create mode 100644 linux-headers/linux/guestmem.h
 
-diff --git a/drivers/vhost/scsi.c b/drivers/vhost/scsi.c
-index 3077cb9d58d6..87f2f56fd20a 100644
---- a/drivers/vhost/scsi.c
-+++ b/drivers/vhost/scsi.c
-@@ -568,8 +568,10 @@ static void vhost_scsi_complete_cmd_work(struct vhost_work *work)
- 		ret = copy_to_iter(&v_rsp, sizeof(v_rsp), &iov_iter);
- 		if (likely(ret == sizeof(v_rsp))) {
- 			struct vhost_scsi_virtqueue *q;
--			vhost_add_used(cmd->tvc_vq, cmd->tvc_vq_desc, 0);
- 			q = container_of(cmd->tvc_vq, struct vhost_scsi_virtqueue, vq);
-+			mutex_lock(&q->vq.mutex);
-+			vhost_add_used(cmd->tvc_vq, cmd->tvc_vq_desc, 0);
-+			mutex_unlock(&q->vq.mutex);
- 			vq = q - vs->vqs;
- 			__set_bit(vq, vs->compl_bitmap);
- 		} else
-@@ -1173,8 +1175,11 @@ static void vhost_scsi_tmf_resp_work(struct vhost_work *work)
- 	else
- 		resp_code = VIRTIO_SCSI_S_FUNCTION_REJECTED;
- 
-+	mutex_lock(&tmf->svq->vq.mutex);
- 	vhost_scsi_send_tmf_resp(tmf->vhost, &tmf->svq->vq, tmf->in_iovs,
- 				 tmf->vq_desc, &tmf->resp_iov, resp_code);
-+	mutex_unlock(&tmf->svq->vq.mutex);
-+
- 	vhost_scsi_release_tmf_res(tmf);
- }
- 
 -- 
-2.34.1
+2.43.0
 
 
