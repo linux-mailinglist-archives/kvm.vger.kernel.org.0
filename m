@@ -1,122 +1,116 @@
-Return-Path: <kvm+bounces-52507-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52508-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 238B9B05F4C
-	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 16:04:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A52B9B060CB
+	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 16:23:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A62057BC3C0
-	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 13:59:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27C8D1C816D5
+	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 14:13:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 410C12EAB83;
-	Tue, 15 Jul 2025 13:50:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 666371DED40;
+	Tue, 15 Jul 2025 14:01:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="M/QNfehJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 130642E6136;
-	Tue, 15 Jul 2025 13:50:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FBC31D86FF
+	for <kvm@vger.kernel.org>; Tue, 15 Jul 2025 14:01:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752587422; cv=none; b=nSQeM90gmr8QzB2fDyUsA9rujAhSCM7Zs7TDyXu+fn427s7CBNnpQrZ+Zco/f+HyQuzhoEueH2jaAYqu+p5ZEtOnjiOvkRD5i00vfDSjhd+B9mg73Kvtwm4s4v6nW8zCfPo0PzCqzUdWt3wUCzsE7Rha2EVszw0cLnKnaFWcpE0=
+	t=1752588065; cv=none; b=OHXI/yFD5Cu6DXXKYG5SNFyR00Vtp9hQm7ViveyywUk5tYqS6h35zLFStX9SWEdoGUJoxvb9zCtrebehkUjB1QrSpGUfX+YTpqThNAxPztZMFAODfCZF0rWpM1tsGmSVxRgZ/yT5E0rzKkDof36Bky3KnRnFlCKpJlueeyHa8rY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752587422; c=relaxed/simple;
-	bh=+0PGXrsSAKe+iUuwlrADb2v3BmRkBV8/GR6xTlwwAMo=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=U/i9oZ8kA3RpLFZSkTm21BRt4negqC3pKfBOvQTOqx9kOzdlDRSUdi6WKUkuyfQm2E2mBtudUcwhUqf0UrlhU+LujNTYqdDs/M1SjfGlF6WWC4BFRCgPqHQIW/hAyaE5LISy/MWwzgAwi8XPzLWD399i59BWUSmxWDVRn+D0qaI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4bhL874BTNz6L4wL;
-	Tue, 15 Jul 2025 21:46:47 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id 7F934140446;
-	Tue, 15 Jul 2025 21:50:17 +0800 (CST)
-Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
- (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Tue, 15 Jul
- 2025 15:50:15 +0200
-Date: Tue, 15 Jul 2025 14:50:14 +0100
-From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-To: WangYuli <wangyuli@uniontech.com>
-CC: <airlied@gmail.com>, <akpm@linux-foundation.org>,
-	<alison.schofield@intel.com>, <andrew+netdev@lunn.ch>,
-	<andriy.shevchenko@linux.intel.com>, <arend.vanspriel@broadcom.com>,
-	<bp@alien8.de>, <brcm80211-dev-list.pdl@broadcom.com>,
-	<brcm80211@lists.linux.dev>, <colin.i.king@gmail.com>, <cvam0000@gmail.com>,
-	<dan.j.williams@intel.com>, <dave.hansen@linux.intel.com>,
-	<dave.jiang@intel.com>, <dave@stgolabs.net>, <davem@davemloft.net>,
-	<dri-devel@lists.freedesktop.org>, <edumazet@google.com>,
-	<gregkh@linuxfoundation.org>, <guanwentao@uniontech.com>, <hpa@zytor.com>,
-	<ilpo.jarvinen@linux.intel.com>, <intel-xe@lists.freedesktop.org>,
-	<ira.weiny@intel.com>, <j@jannau.net>, <jeff.johnson@oss.qualcomm.com>,
-	<jgross@suse.com>, <jirislaby@kernel.org>, <johannes.berg@intel.com>,
-	<kuba@kernel.org>, <kvalo@kernel.org>, <kvm@vger.kernel.org>,
-	<linux-cxl@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-serial@vger.kernel.org>, <linux-wireless@vger.kernel.org>,
-	<linux@treblig.org>, <lucas.demarchi@intel.com>, <marcin.s.wojtas@gmail.com>,
-	<ming.li@zohomail.com>, <mingo@kernel.org>, <mingo@redhat.com>,
-	<netdev@vger.kernel.org>, <niecheng1@uniontech.com>,
-	<oleksandr_tyshchenko@epam.com>, <pabeni@redhat.com>, <pbonzini@redhat.com>,
-	<quic_ramess@quicinc.com>, <ragazenta@gmail.com>, <rodrigo.vivi@intel.com>,
-	<seanjc@google.com>, <shenlichuan@vivo.com>, <simona@ffwll.ch>,
-	<sstabellini@kernel.org>, <tglx@linutronix.de>,
-	<thomas.hellstrom@linux.intel.com>, <vishal.l.verma@intel.com>,
-	<x86@kernel.org>, <xen-devel@lists.xenproject.org>, <yujiaoliang@vivo.com>,
-	<zhanjun@uniontech.com>
-Subject: Re: [PATCH v2 8/8] scripts/spelling.txt: Add notifer||notifier to
- spelling.txt
-Message-ID: <20250715145014.000075ec@huawei.com>
-In-Reply-To: <A205796B545C4241+20250715134407.540483-8-wangyuli@uniontech.com>
-References: <BD5C52D2838AEA48+20250715134050.539234-1-wangyuli@uniontech.com>
-	<A205796B545C4241+20250715134407.540483-8-wangyuli@uniontech.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1752588065; c=relaxed/simple;
+	bh=TrnovlFvN9Zd+BkP1HH/ZUQYJ9eJy+bV7Q1OsXxaEj4=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=iB+8Ag15+uAnHBMjmD202+d5TuCyPA/CiPgDzoO3dnXG5tLHOTDs4TtbeZbo7aw241C2bWz51VQJ7gmoAxLQIDn80DsEfn5aVCIJCvRBpvs4/oLBn5MSbhWbTV2xQoykhCe8eb6sMxycPWaPgrNYdTd/6VjvZBGkt60KgKEAaSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=M/QNfehJ; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-313fb0ec33bso5305829a91.2
+        for <kvm@vger.kernel.org>; Tue, 15 Jul 2025 07:01:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1752588063; x=1753192863; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=An8FlwzirITNbBr0qyU5frw+U6I6QNI3+OjkL8lhnTw=;
+        b=M/QNfehJ0AuVLENN9wW/YrJX2uXXrRacEOQMxNkI4ZT/42DvFFrmYPiZctLQTFWdVX
+         7VsTgFddrELGJB72VeSmprpIsZq6YPD9mdcrBKf/U8xC+tU/nLaL+lvxODg74MZfwh6x
+         h6O+Q6PL59p9Y419sCSRv/tgGKbqWcg9pQqL2zUdt9TGB4uN9qVVv2U6A9eTypdc3CsF
+         Gc7o3f7EkCT1wVCE1JibzLugTiR5gDCqTL5bmCKibw7tv20fJ7cdyDl/UB6TtAKZVGWK
+         xxMDGXezPG3wrbdY3sshNqto4iVEu9wXGzi+aS18gbIOf1ESc7Uyh4llbcPqkeVReqJD
+         SybA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752588063; x=1753192863;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=An8FlwzirITNbBr0qyU5frw+U6I6QNI3+OjkL8lhnTw=;
+        b=sGcuCKY9qIq1MLlbiWJ80+Z47nGEJ6ZommmKKoc+hDZs0kGH5awb2GS12hmDIdOel7
+         x1jJC5s3zf3qvCwxXy1vfTu9xK0t/gfDnt0DxNRxuO/TXLo6NjrZSJqyd6K3RKszrZLs
+         1s2gD9ris6XTdoksRJpmPEsgw1oOu36ba6XXO/CetV/IecZw5phL+JGULDcJSGE7En6t
+         MZfuTRiQv+KuaYkxYNCyl/fts7v6mGpl0y1ymhceqbOPaMz8J8t/JjJXOjxpJzogRIw/
+         2/PKpPm6jwXSO3NyBTvXYEHxs5QS7MPjE/Km6aQ56RKNj4+PBa3e2t6eOYyUJa1Jmm3B
+         nTRQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX4IuXWhMClELgT7woW29DnhTj6srxQh036DQw44u/cp7B9c0BWVAcPFxgEMGM6dArccdI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxxznZvONDsTbXMByr7jkvHiRxtW3Z4PENaa+NxXipux8MkQYEF
+	jU+qd3y+tSgIQtq/v2A2CPEwVm8rxjs2mq7RUUVNnSUlnMXFnzJICdnsIJBEFRlb/2ykuAdlBv6
+	czLlqgg==
+X-Google-Smtp-Source: AGHT+IGw0SjVGVK2JASNvhRI2hQZzMIFRjE0AK9+sp6bRe6KtNKNJpueU9J9XmAZCXadJk7v7N9P2NDvbf4=
+X-Received: from pjbtc11.prod.google.com ([2002:a17:90b:540b:b0:312:15b:e5d1])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:524c:b0:315:6f2b:ce53
+ with SMTP id 98e67ed59e1d1-31c4cd8b6b4mr24938091a91.25.1752588063607; Tue, 15
+ Jul 2025 07:01:03 -0700 (PDT)
+Date: Tue, 15 Jul 2025 07:01:01 -0700
+In-Reply-To: <aHZM1ZhTsET5AE91@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100002.china.huawei.com (7.191.160.241) To
- frapeml500008.china.huawei.com (7.182.85.71)
+Mime-Version: 1.0
+References: <20250624092256.1105524-1-keirf@google.com> <20250624092256.1105524-4-keirf@google.com>
+ <aFrANSe6fJOfMpOC@google.com> <aGJf7v9EQoEZiQUk@google.com>
+ <aGwWvp_JeWe9tIJx@google.com> <aHZM1ZhTsET5AE91@google.com>
+Message-ID: <aHZbyAIoyJZ7c__9@google.com>
+Subject: Re: [PATCH 3/3] KVM: Avoid synchronize_srcu() in kvm_io_bus_register_dev()
+From: Sean Christopherson <seanjc@google.com>
+To: Keir Fraser <keirf@google.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, Eric Auger <eric.auger@redhat.com>, 
+	Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Li RongQing <lirongqing@baidu.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, 15 Jul 2025 21:44:07 +0800
-WangYuli <wangyuli@uniontech.com> wrote:
-
-> This typo was not listed in scripts/spelling.txt, thus it was more
-> difficult to detect. Add it for convenience.
+On Tue, Jul 15, 2025, Keir Fraser wrote:
+> On Mon, Jul 07, 2025 at 11:49:34AM -0700, Sean Christopherson wrote:
+> > For all intents and purposes, holding kvm->srcu across VM-Enter/VM-Exit is
+> > disallowed (though I don't think this is formally documented), i.e. every
+> > architecture is guaranteed to do srcu_read_lock() after a VM-Exit, prior to
+> > reading kvm->buses.  And srcu_read_lock() contains a full smp_mb(), which ensures
+> > KVM will get a fresh kvm->buses relative to the instruction that triggered the
+> > exit.
 > 
-> Link: https://lore.kernel.org/all/B3C019B63C93846F+20250715071245.398846-1-wangyuli@uniontech.com/
+> I've got a new patch series ready to go, but thinking more about the
+> one-off accesses after a VM-Exit: I think VM-Exit is a barrier on all
+> architectures? That would mean the changes to include
+> smp_mb__after_srcu_read_lock() are unnecessary and confusing. Maybe I
+> can drop those hunks. What do you think?
 
-Adding a link tag to your own previous patch doesn't seem particularly
-useful as something to end up in the git log (which depending on
-maintainer preference may gain a link tag to this version).
+It's not.
 
-> Signed-off-by: WangYuli <wangyuli@uniontech.com>
-other than that, LGTM
+commit 65a4de0ffd975af7e2ffc9acb875b6a8ae7ee1aa
+Author:     Yan Zhao <yan.y.zhao@intel.com>
+AuthorDate: Fri Mar 8 17:09:28 2024 -0800
+Commit:     Sean Christopherson <seanjc@google.com>
+CommitDate: Fri Jun 7 07:18:02 2024 -0700
 
-Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
-
-> ---
->  scripts/spelling.txt | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/scripts/spelling.txt b/scripts/spelling.txt
-> index c9a6df5be281..d824c4b17390 100644
-> --- a/scripts/spelling.txt
-> +++ b/scripts/spelling.txt
-> @@ -1099,6 +1099,7 @@ notication||notification
->  notications||notifications
->  notifcations||notifications
->  notifed||notified
-> +notifer||notifier
->  notity||notify
->  notfify||notify
->  nubmer||number
-
+    KVM: x86: Ensure a full memory barrier is emitted in the VM-Exit path
+    
+    Ensure a full memory barrier is emitted in the VM-Exit path, as a full
+    barrier is required on Intel CPUs to evict WC buffers.  This will allow
+    unconditionally honoring guest PAT on Intel CPUs that support self-snoop.
 
