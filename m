@@ -1,104 +1,166 @@
-Return-Path: <kvm+bounces-52515-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52517-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EE69B0627A
-	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 17:11:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76718B062FD
+	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 17:32:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A434F3B0762
-	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 15:10:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 46E637AB98F
+	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 15:31:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E44B1214818;
-	Tue, 15 Jul 2025 15:10:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B248B24A078;
+	Tue, 15 Jul 2025 15:32:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iXdtKS72"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WkPjtxJS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA32E1E834F
-	for <kvm@vger.kernel.org>; Tue, 15 Jul 2025 15:10:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B27F1EA7D2
+	for <kvm@vger.kernel.org>; Tue, 15 Jul 2025 15:32:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752592242; cv=none; b=u7WxiR9oedoPUZMK0TGDK3KyFKt+dxRFO5bNKQ1CIDpLL+evBIfK3LHJjLzgUpNf0Fh1xaDUJGRI+/fR5Wt3F/OyjhMQy5cbo61evIaMKbBU3nXkhm0dOUh7UOPSFV7r0r/Pvs/16KqYKPm3taZCkVwn4VZ7Fh2h4lkDYHduMV4=
+	t=1752593539; cv=none; b=SGJ9+/kDwf7yA7qzuIeYcSitMwx0WkEZQx0Mwoa0KpGIORkJKMWwA6bHR2MRTt1hQzdVK/7KaAqv4bmecMvjt0YLhvujZKat1/FY7X+J865sy2cFlVRqiid8y91tCWN04eIqqJyA3YUP+32/QZkRnUMmnGiCVjRDzMWv0LjfiYs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752592242; c=relaxed/simple;
-	bh=4VggX2D7gPOxcgo1aao/mMvKRzUYIRe+bl1k2gkC6I4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=IyOMja/cu1WfhPywpVcspnq+t6jgPloFgVA5DNEWY44PxYP4Thy+vma6cN2wG/k470cBB83VHEUx8RtvkQdxSG6Gi4WlUito/iCNvZanZYHllF192pL5WeSoIe4J/fhlAJAr1/Kh68WiuzoNzjDwf1bb/75gmPH1fL42ILVDbGU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iXdtKS72; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-74927be2ec0so8436410b3a.0
-        for <kvm@vger.kernel.org>; Tue, 15 Jul 2025 08:10:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752592240; x=1753197040; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ryg0XVXx/d3QRix1Y2kL+AIJsLkxuJ3xCLHGA+yS2Dg=;
-        b=iXdtKS72tYAN4sQEw/9M1xIwgl+v7lEAQmPOn7KrlSNgDdc1Km7P4LNBBM6vidyq0m
-         Tsxd8fMPOMSTmnzx4C6VRW3yFNKIg2eqT+ApVv40PhhTwnZfOYIdcFYW1vGXwT1BXWwn
-         2d37ED9KKQdvk3ljXl7lT8VnFBlZhCOHFUZWOHmecnetwYE6pom8/Y9nZlAaFOVcF0BM
-         w3N7QBJcZmaxZgB3YVADf0ogiI0A8abpRvd70AL9OI7g34qWkWEEqZdYpuOLZsP02N3/
-         0Q7UDiwPXFZTeXk8NGbIcfN3oNVfU5LK39I5WC/9Vsorkd2BrZsayQL7BHJzqROWhnfV
-         rHWA==
+	s=arc-20240116; t=1752593539; c=relaxed/simple;
+	bh=5rdRvK0/wv3rgyzsgXz0n1m+AdOdwgEE5BaXSVwhhTU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=X5xwQPMR01IJj71vfQV4KYN+n7fLUS/Zzr3iOQwfTGGcOPPKD+Szr21LMmmK9lVN4lAntpRLKpYa2xo+5CpJuEibhTfRA3pcfSfXLTYCstCZIKEXygSuoMBH35RJppbYDELpyDUGMoAO6eeaMw8JS3l5iaervhPcJ2bs4hOeVco=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WkPjtxJS; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752593536;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Wnh22gI/k+OIEWCf+4ySowORAdVnUSIEoD4hbUCmi1M=;
+	b=WkPjtxJSVWQMk2C5as1nCxaCE1ldStlV+zztTaJRs7GiSv4gaCccbRPDfShBs/+COQ/E3i
+	clxEm0/cYWCMzkJ5NxM31s5LY/Rxk9cmiMnjOdONXfsEOSFQjM18pjsO9GZkB7wQuKqHGF
+	qXGj8KZvoy/qV55Tc7Z+vDaXz39JwTE=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-14-Tqc-6TjfOhuhFkftWYTBnw-1; Tue, 15 Jul 2025 11:32:15 -0400
+X-MC-Unique: Tqc-6TjfOhuhFkftWYTBnw-1
+X-Mimecast-MFC-AGG-ID: Tqc-6TjfOhuhFkftWYTBnw_1752593534
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-ae354979e7aso467669966b.0
+        for <kvm@vger.kernel.org>; Tue, 15 Jul 2025 08:32:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752592240; x=1753197040;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ryg0XVXx/d3QRix1Y2kL+AIJsLkxuJ3xCLHGA+yS2Dg=;
-        b=ryFdloP/eKvdxRfdaXrvqgX7eXmdLx0WI/Vsdwt2Fty/tBA/Zv15iezp6MQ3uX0ZKu
-         xkKLKYCey1/EXr6SgiYZQa09l9/7tdcyhaiVd0/3/mmf3m7Qk7I3pLBbDOvMbR7xa7eL
-         UILc/yhZKm0R81hh+6CtreQJW7c6CVw3yZ3tbF/Xsb7XBsrN5l/UwNQRJSTqJyvD3ekj
-         hGtBLJZJZEAhWPmN4b87Xcq2haxD+KfNHW0XhjbA/Sc3IMQSuHHdh2AwD31rIUg832Dm
-         dS/DqY2wLKZnsV5R+rrKH/YCfUioQn7xp9RFh0Lkbm35z602A6H/qvHF5Abc/5J3uuGT
-         nZzg==
-X-Forwarded-Encrypted: i=1; AJvYcCVR+EnBpzbVjG7YdVtw50m8bRHi+KYxSSOX3xTgqxn+OhLrvjCPbrp1yCfAzw/ZmKQ6fBs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwTctC6eGXIY2drFUD85181EZmH8lmzaKJKyDBigEH1eXBTVS07
-	En6RK+ZWbywS6F+uS35A4zcM4q48AbHVi4hD68Y6GD6/TpUhiWkfnxR8QubRE1l2ZidSGffLx+i
-	yAxH/og==
-X-Google-Smtp-Source: AGHT+IE8AvoOdg4HoJ39XtR7Ju366xu15Xs/lxrGtWzcB0GyotBFu+SxAx156O4/XuUxhfBVnfRu+AiVvCM=
-X-Received: from pfez19.prod.google.com ([2002:aa7:8893:0:b0:746:1fcb:a9cc])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:813:b0:736:35d4:f03f
- with SMTP id d2e1a72fcca58-74ee09a9561mr24411992b3a.6.1752592239880; Tue, 15
- Jul 2025 08:10:39 -0700 (PDT)
-Date: Tue, 15 Jul 2025 08:10:38 -0700
-In-Reply-To: <20250715091312.563773-1-xiaoyao.li@intel.com>
+        d=1e100.net; s=20230601; t=1752593533; x=1753198333;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Wnh22gI/k+OIEWCf+4ySowORAdVnUSIEoD4hbUCmi1M=;
+        b=El64FL4iWqFRjs+lG0hddm3hXKIetPuHomPQ9TNZT/encBE2pTZuVbodyY6sWxzpnU
+         WH5SxeJGMyYqEAmksA4lyDZYpQFSu1nJQIe9AD8BgKy3bbzKMXDxCI1/jFn+hG8Ryj9y
+         smZ4/NqjZypiAuInDs+hYuWQ/nJ6WaQj95Z/exMriDTTXNzylIfPmvwMrGZlEe/bAmiW
+         /PwRV8vuBMVOSbw/J2EgF7/VFyFRk6l8G771UQi9kt2pWZtCSkS8rpAbJFuzhcJy0VA2
+         +k/cSr7u0z9arQxZhTc4lo0MI7deFE/szSliR0v2D7pdm1wD2z0ugd51/IbkxTO/bgqN
+         yeSA==
+X-Forwarded-Encrypted: i=1; AJvYcCU6LvS/4AzAyC0Vasak//+oA4WPid5HEBv0a/PGhtlI2cwfM4mvKooS1VPvIj47uvV6E10=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy4w/ehAsZVDBRAioNN9TdVXAfIL7JEcXUfrqGDh9p9Dxx1Ibmx
+	SozVOjrvpesnMZt0IhwqvRWXW9CrkikU0UR9ItE63Ipg7kkk5sOuRWNQSwsU8ptlSCxFAVU0U5o
+	Olh9kxYjLNOGs7lO7is2oWCPDvg7pEbW7q+sxhbPlWDxQL3NStG2PeZ6kK77WFX23sV2n/yrAbe
+	Vaev64uFkhHMQ0aMU9PS1t+bZR36bA9rxlgpnL
+X-Gm-Gg: ASbGncvLU+kt5xEwKdsS3hetcqagmPqYfzJc8CxP14jGmtk0xTlxouFt7xGkCDI1rZa
+	V9hcQj7Dz9R35nCzFw05pREeuj7eOg65ri7yIoIx/1IYQwrZs4osNosn2/TwyaDXcx/YwAmWyHt
+	BQQan3YlGp/dPo8tHzsHo7Tw==
+X-Received: by 2002:a17:907:cf93:b0:ae3:cf41:b93b with SMTP id a640c23a62f3a-ae6fc0a7f90mr1582699166b.41.1752593533371;
+        Tue, 15 Jul 2025 08:32:13 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHOIuENMcFdE7XVF/eBak/JoBXEh87UvUrI/EctpEOdONudRuCPXduAkkRmy07jHtjgT20K0pXxQIEZJ9U0ySo=
+X-Received: by 2002:a17:907:cf93:b0:ae3:cf41:b93b with SMTP id
+ a640c23a62f3a-ae6fc0a7f90mr1582696366b.41.1752593532954; Tue, 15 Jul 2025
+ 08:32:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250715091312.563773-1-xiaoyao.li@intel.com>
-Message-ID: <aHZvbok0tr7U4wf1@google.com>
-Subject: Re: [PATCH v3 0/4] TDX: Clean up the definitions of TDX TD ATTRIBUTES
-From: Sean Christopherson <seanjc@google.com>
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: "Kirill A. Shutemov" <kas@kernel.org>, Dave Hansen <dave.hansen@linux.intel.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>, linux-coco@lists.linux.dev, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org, 
-	Rick Edgecombe <rick.p.edgecombe@intel.com>, Kai Huang <kai.huang@intel.com>, 
-	binbin.wu@linux.intel.com, yan.y.zhao@intel.com, reinette.chatre@intel.com, 
-	adrian.hunter@intel.com, tony.lindgren@intel.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20250710023208.846-1-liming.wu@jaguarmicro.com>
+In-Reply-To: <20250710023208.846-1-liming.wu@jaguarmicro.com>
+From: Lei Yang <leiyang@redhat.com>
+Date: Tue, 15 Jul 2025 23:31:35 +0800
+X-Gm-Features: Ac12FXx0K4HuoaUKypyFETVzBZg3F6wzzVt1s3aBwTTAZbrGnPQbtaOUcuDFRP8
+Message-ID: <CAPpAL=wvL2LfRV5BFgLVG69hUoO5fYVx6WEK-PimjoQpy1S7ZA@mail.gmail.com>
+Subject: Re: [PATCH v2] virtio_net: simplify tx queue wake condition check
+To: liming.wu@jaguarmicro.com
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Jakub Kicinski <kuba@kernel.org>, kvm@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, angus.chen@jaguarmicro.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jul 15, 2025, Xiaoyao Li wrote:
-> Xiaoyao Li (4):
->   x86/tdx: Fix the typo in TDX_ATTR_MIGRTABLE
->   KVM: TDX: Remove redundant definitions of TDX_TD_ATTR_*
->   x86/tdx: Rename TDX_ATTR_* to TDX_TD_ATTR_*
->   KVM: TDX: Rename KVM_SUPPORTED_TD_ATTRS to KVM_SUPPORTED_TDX_TD_ATTRS
-> 
->  arch/x86/coco/tdx/debug.c         | 26 ++++++++--------
->  arch/x86/coco/tdx/tdx.c           |  8 ++---
->  arch/x86/include/asm/shared/tdx.h | 50 +++++++++++++++----------------
->  arch/x86/kvm/vmx/tdx.c            |  4 +--
->  arch/x86/kvm/vmx/tdx_arch.h       |  6 ----
->  5 files changed, 44 insertions(+), 50 deletions(-)
+Tested this series of patches v2 with virtio-net regression tests,
+everything works fine.
 
-Acked-by: Sean Christopherson <seanjc@google.com>
+Tested-by: Lei Yang <leiyang@redhat.com>
+
+On Thu, Jul 10, 2025 at 10:32=E2=80=AFAM <liming.wu@jaguarmicro.com> wrote:
+>
+> From: Liming Wu <liming.wu@jaguarmicro.com>
+>
+> Consolidate the two nested if conditions for checking tx queue wake
+> conditions into a single combined condition. This improves code
+> readability without changing functionality. And move netif_tx_wake_queue
+> into if condition to reduce unnecessary checks for queue stops.
+>
+> Signed-off-by: Liming Wu <liming.wu@jaguarmicro.com>
+> Tested-by: Lei Yang <leiyang@redhat.com>
+> Acked-by: Jason Wang <jasowang@redhat.com>
+> ---
+>  drivers/net/virtio_net.c | 22 ++++++++++------------
+>  1 file changed, 10 insertions(+), 12 deletions(-)
+>
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 5d674eb9a0f2..07a378220643 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -3021,12 +3021,11 @@ static void virtnet_poll_cleantx(struct receive_q=
+ueue *rq, int budget)
+>                         free_old_xmit(sq, txq, !!budget);
+>                 } while (unlikely(!virtqueue_enable_cb_delayed(sq->vq)));
+>
+> -               if (sq->vq->num_free >=3D MAX_SKB_FRAGS + 2) {
+> -                       if (netif_tx_queue_stopped(txq)) {
+> -                               u64_stats_update_begin(&sq->stats.syncp);
+> -                               u64_stats_inc(&sq->stats.wake);
+> -                               u64_stats_update_end(&sq->stats.syncp);
+> -                       }
+> +               if (sq->vq->num_free >=3D MAX_SKB_FRAGS + 2 &&
+> +                   netif_tx_queue_stopped(txq)) {
+> +                       u64_stats_update_begin(&sq->stats.syncp);
+> +                       u64_stats_inc(&sq->stats.wake);
+> +                       u64_stats_update_end(&sq->stats.syncp);
+>                         netif_tx_wake_queue(txq);
+>                 }
+>
+> @@ -3218,12 +3217,11 @@ static int virtnet_poll_tx(struct napi_struct *na=
+pi, int budget)
+>         else
+>                 free_old_xmit(sq, txq, !!budget);
+>
+> -       if (sq->vq->num_free >=3D MAX_SKB_FRAGS + 2) {
+> -               if (netif_tx_queue_stopped(txq)) {
+> -                       u64_stats_update_begin(&sq->stats.syncp);
+> -                       u64_stats_inc(&sq->stats.wake);
+> -                       u64_stats_update_end(&sq->stats.syncp);
+> -               }
+> +       if (sq->vq->num_free >=3D MAX_SKB_FRAGS + 2 &&
+> +           netif_tx_queue_stopped(txq)) {
+> +               u64_stats_update_begin(&sq->stats.syncp);
+> +               u64_stats_inc(&sq->stats.wake);
+> +               u64_stats_update_end(&sq->stats.syncp);
+>                 netif_tx_wake_queue(txq);
+>         }
+>
+> --
+> 2.34.1
+>
+
 
