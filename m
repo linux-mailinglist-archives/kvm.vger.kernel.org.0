@@ -1,143 +1,155 @@
-Return-Path: <kvm+bounces-52647-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52648-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72D75B079C2
-	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 17:27:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4921B07B17
+	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 18:24:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5843A43D52
-	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 15:25:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E53B3BD134
+	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 16:24:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AAAD2F4A1E;
-	Wed, 16 Jul 2025 15:24:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E1DD2F548A;
+	Wed, 16 Jul 2025 16:24:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eXV0vx9q"
+	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="YdrDG6Nv"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from forwardcorp1d.mail.yandex.net (forwardcorp1d.mail.yandex.net [178.154.239.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90394288CAF;
-	Wed, 16 Jul 2025 15:24:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D0F02F3C3E;
+	Wed, 16 Jul 2025 16:24:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752679467; cv=none; b=OVMI6W7KKKqxk/HfuMUbdTEDjYWZK7A5vbMrIU2en1zEWDtCYzVDvliokVjcmLH0JXOR46+YuLdAn+icn/vJ5dLInsPvOZ4KYV5DTponitw5xeOT/l4y+bWP/MpOLSoghQiHWgit+vJBoIJJAOE77AICowCcHlaWn80Np14IB+Y=
+	t=1752683070; cv=none; b=IU7rXkQNA4lauaUZmlPuazYmY7TNtHPlBS4rqfQYSodrRmGm4xwkhyjGWZ/LGCbQfX2SX2hmxT+Vb2I1rEq2GJ0oOFGuHGR5qp5nLdGC3UOV8V3ygHIeLk2f/TFxK6n2YovSEutplzHFOxGmGAR5a00gqC2oSi7itAqJhExD61w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752679467; c=relaxed/simple;
-	bh=LAicS+pihtv9EEihexoFYLo1L3pM9ZqAXYRukX438Nw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uINzc62rXn4EpAkJ3LS4mW2ssoPAUxhvgU5KsdG5LdCwUzFfjv735sldHs26nQFoXaW45TIvYXbbXwNLpU1V6g9FBHPIId3F+n+sTiPEgePy+yRJBIMKEs43iF4qL9CzGjxm5YTxeC0WXfWWS6DYq3122dXL7bj6IuxKwvc5OMI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eXV0vx9q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5741BC4CEF0;
-	Wed, 16 Jul 2025 15:24:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752679467;
-	bh=LAicS+pihtv9EEihexoFYLo1L3pM9ZqAXYRukX438Nw=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=eXV0vx9qsPrkBBLAYy4/BJFyqFKY7mfLVIIl/hUHZBRcBi1p1i6xoMoDMgFTiDcsV
-	 MVBJDfF+6g2FvAvMAt0V8p0+SxYErYjU4HcK2UM0oiqt4PSzCpPNxGIZVYqIx0ivDs
-	 c0huQIb6tjN3KkM2uKjEqN7BVSSZoHZIaZonZbGPViwBo9SG6hayKuMuS+LSyuhFvM
-	 bOYzJWOWLGEspFmpulKbFJoyvEkfovtHTDN4qRg3zoNLQuNwJ4hyqMzUvs7GLBL49Z
-	 rR2DpPB6jo2d1Dew+8bEJ6F4aQ8FtryO+uO3Xb+jgh380PaOaULW6g5H0RVSmHdK9P
-	 Szcu9EgUZpT9w==
-Message-ID: <051e5c07-f012-44b1-8e6b-ef9c13ee7177@kernel.org>
-Date: Wed, 16 Jul 2025 10:24:24 -0500
+	s=arc-20240116; t=1752683070; c=relaxed/simple;
+	bh=kVoWv3/iwWNxGI8jNRCZPVMbIMQrh2BMtxaTtjHOzdA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=A03xwgHOlMIxSBtV8loomCdf0ShHrID1TYumq9ne0FXyr+aEqy2EVRfMH8xK09c8HXdHaNmypEu4CXAfZO0Nzw7q70Z9d4cRSNgfABU3WX6lPV6k2mYex7fPVOSBAWERVqTcGSFJ4a/6BGpZGd3w15iKanXzv5qLqEvlONTFzPE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex-team.ru; spf=pass smtp.mailfrom=yandex-team.ru; dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b=YdrDG6Nv; arc=none smtp.client-ip=178.154.239.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex-team.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex-team.ru
+Received: from mail-nwsmtp-smtp-corp-main-56.klg.yp-c.yandex.net (mail-nwsmtp-smtp-corp-main-56.klg.yp-c.yandex.net [IPv6:2a02:6b8:c42:d42b:0:640:f3fc:0])
+	by forwardcorp1d.mail.yandex.net (Yandex) with ESMTPS id 5A3C060AFE;
+	Wed, 16 Jul 2025 19:22:56 +0300 (MSK)
+Received: from kniv-nix.yandex-team.ru (unknown [2a02:6bf:8080:a75::1:7])
+	by mail-nwsmtp-smtp-corp-main-56.klg.yp-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id nMP7Db0GwW20-oO643L00;
+	Wed, 16 Jul 2025 19:22:55 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+	s=default; t=1752682975;
+	bh=/lRCgvKC2NqnnCP6neakgrl2Mgl3BpNaQQjJ8bFZqVM=;
+	h=Message-Id:Date:Cc:Subject:To:From;
+	b=YdrDG6NvtUApDy+jUsqDv7peLcj/w2Jxu3hDLFaZWAk1fINhDPP+RynnBH4Z/MdKI
+	 Kmm90wBRxeiJWZCCI+UmC06pOQVwG+qJSQjZtw2ks8bNqWeqo22q3diIWf5R/HvODm
+	 XoJC15jJgqoVUVeAhtnCNdOpPxpbG6+jCjup6MHw=
+Authentication-Results: mail-nwsmtp-smtp-corp-main-56.klg.yp-c.yandex.net; dkim=pass header.i=@yandex-team.ru
+From: Nikolay Kuratov <kniv@yandex-team.ru>
+To: linux-kernel@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	kvm@vger.kernel.org,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	Nikolay Kuratov <kniv@yandex-team.ru>,
+	stable@vger.kernel.org,
+	Andrey Ryabinin <arbn@yandex-team.com>,
+	Andrey Smetanin <asmetanin@yandex-team.ru>
+Subject: [PATCH] vhost/net: Replace wait_queue with completion in ubufs reference
+Date: Wed, 16 Jul 2025 19:22:43 +0300
+Message-Id: <20250716162243.1401676-1-kniv@yandex-team.ru>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 9/9] PCI: Add a new 'boot_display' attribute
-To: Maxime Ripard <mripard@kernel.org>
-Cc: David Airlie <airlied@gmail.com>, Bjorn Helgaas <bhelgaas@google.com>,
- Alex Deucher <alexander.deucher@amd.com>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Simona Vetter <simona@ffwll.ch>, Lukas Wunner <lukas@wunner.de>,
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
- Thomas Zimmermann <tzimmermann@suse.de>,
- David Woodhouse <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>,
- Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
- Robin Murphy <robin.murphy@arm.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
- "open list:DRM DRIVERS" <dri-devel@lists.freedesktop.org>,
- open list <linux-kernel@vger.kernel.org>,
- "open list:INTEL IOMMU (VT-d)" <iommu@lists.linux.dev>,
- "open list:PCI SUBSYSTEM" <linux-pci@vger.kernel.org>,
- "open list:VFIO DRIVER" <kvm@vger.kernel.org>,
- "open list:SOUND" <linux-sound@vger.kernel.org>,
- Daniel Dadap <ddadap@nvidia.com>,
- Mario Limonciello <mario.limonciello@amd.com>
-References: <20250714212147.2248039-1-superm1@kernel.org>
- <20250714212147.2248039-10-superm1@kernel.org>
- <20250716-upbeat-tody-of-psychology-93e2a2@houat>
-Content-Language: en-US
-From: Mario Limonciello <superm1@kernel.org>
-In-Reply-To: <20250716-upbeat-tody-of-psychology-93e2a2@houat>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 7/16/25 3:22 AM, Maxime Ripard wrote:
-> Hi Mario,
-> 
-> On Mon, Jul 14, 2025 at 04:21:46PM -0500, Mario Limonciello wrote:
->> From: Mario Limonciello <mario.limonciello@amd.com>
->>
->> On systems with multiple GPUs there can be uncertainty which GPU is the
->> primary one used to drive the display at bootup. In order to disambiguate
->> this add a new sysfs attribute 'boot_display' that uses the output of
->> video_is_primary_device() to populate whether a PCI device was used for
->> driving the display.
->>
->> Reviewed-by: Thomas Zimmermann <tzimmermann@suse.de>
->> Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
->> ---
->> v7:
->>   * fix lkp failure
->>   * Add tag
->> v6:
->>   * Only show for the device that is boot display
->>   * Only create after PCI device sysfs files are initialized to ensure
->>     that resources are ready.
->> v4:
->>   * new patch
->> ---
->>   Documentation/ABI/testing/sysfs-bus-pci |  8 +++++
->>   drivers/pci/pci-sysfs.c                 | 46 +++++++++++++++++++++++++
->>   2 files changed, 54 insertions(+)
->>
->> diff --git a/Documentation/ABI/testing/sysfs-bus-pci b/Documentation/ABI/testing/sysfs-bus-pci
->> index 69f952fffec72..8b455b1a58852 100644
->> --- a/Documentation/ABI/testing/sysfs-bus-pci
->> +++ b/Documentation/ABI/testing/sysfs-bus-pci
->> @@ -612,3 +612,11 @@ Description:
->>   
->>   		  # ls doe_features
->>   		  0001:01        0001:02        doe_discovery
->> +
->> +What:		/sys/bus/pci/devices/.../boot_display
->> +Date:		October 2025
->> +Contact:	Linux PCI developers <linux-pci@vger.kernel.org>
->> +Description:
->> +		This file indicates the device was used as a boot
->> +		display. If the device was used as the boot display, the file
->> +		will be present and contain "1".
-> 
-> It would probably be a good idea to define what a "boot display" here
-> is. I get what you mean, but it's pretty vague and could easily be
-> misunderstood.
-> 
-> Maxime
+When operating on struct vhost_net_ubuf_ref, the following execution
+sequence is theoretically possible:
+CPU0 is finalizing DMA operation                   CPU1 is doing VHOST_NET_SET_BACKEND
+                             // &ubufs->refcount == 2
+vhost_net_ubuf_put()                               vhost_net_ubuf_put_wait_and_free(oldubufs)
+                                                     vhost_net_ubuf_put_and_wait()
+                                                       vhost_net_ubuf_put()
+                                                         int r = atomic_sub_return(1, &ubufs->refcount);
+                                                         // r = 1
+int r = atomic_sub_return(1, &ubufs->refcount);
+// r = 0
+                                                      wait_event(ubufs->wait, !atomic_read(&ubufs->refcount));
+                                                      // no wait occurs here because condition is already true
+                                                    kfree(ubufs);
+if (unlikely(!r))
+  wake_up(&ubufs->wait);  // use-after-free
 
-Here's my proposal for updated text, can you please bikeshed or propose 
-an alternative?
+This leads to use-after-free on ubufs access. This happens because CPU1
+skips waiting for wake_up() when refcount is already zero.
 
-This file indicates that displays connected to the device were used to 
-display the boot sequence.  If a display connected to the device was
-used to display the boot sequence the file will be present and contain "1".
+To prevent that use a completion instead of wait_queue as the ubufs
+notification mechanism. wait_for_completion() guarantees that there will
+be complete() call prior to its return.
 
+We also need to reinit completion because refcnt == 0 does not mean
+freeing in case of vhost_net_flush() - it then sets refcnt back to 1.
+AFAIK concurrent calls to vhost_net_ubuf_put_and_wait() with the same
+ubufs object aren't possible since those calls (through vhost_net_flush()
+or vhost_net_set_backend()) are protected by the device mutex.
+So reinit_completion() right after wait_for_completion() should be fine.
+
+Cc: stable@vger.kernel.org
+Fixes: 0ad8b480d6ee9 ("vhost: fix ref cnt checking deadlock")
+Reported-by: Andrey Ryabinin <arbn@yandex-team.com>
+Suggested-by: Andrey Smetanin <asmetanin@yandex-team.ru>
+Signed-off-by: Nikolay Kuratov <kniv@yandex-team.ru>
+---
+ drivers/vhost/net.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+index 7cbfc7d718b3..454d179fffeb 100644
+--- a/drivers/vhost/net.c
++++ b/drivers/vhost/net.c
+@@ -94,7 +94,7 @@ struct vhost_net_ubuf_ref {
+ 	 * >1: outstanding ubufs
+ 	 */
+ 	atomic_t refcount;
+-	wait_queue_head_t wait;
++	struct completion wait;
+ 	struct vhost_virtqueue *vq;
+ };
+ 
+@@ -240,7 +240,7 @@ vhost_net_ubuf_alloc(struct vhost_virtqueue *vq, bool zcopy)
+ 	if (!ubufs)
+ 		return ERR_PTR(-ENOMEM);
+ 	atomic_set(&ubufs->refcount, 1);
+-	init_waitqueue_head(&ubufs->wait);
++	init_completion(&ubufs->wait);
+ 	ubufs->vq = vq;
+ 	return ubufs;
+ }
+@@ -249,14 +249,15 @@ static int vhost_net_ubuf_put(struct vhost_net_ubuf_ref *ubufs)
+ {
+ 	int r = atomic_sub_return(1, &ubufs->refcount);
+ 	if (unlikely(!r))
+-		wake_up(&ubufs->wait);
++		complete_all(&ubufs->wait);
+ 	return r;
+ }
+ 
+ static void vhost_net_ubuf_put_and_wait(struct vhost_net_ubuf_ref *ubufs)
+ {
+ 	vhost_net_ubuf_put(ubufs);
+-	wait_event(ubufs->wait, !atomic_read(&ubufs->refcount));
++	wait_for_completion(&ubufs->wait);
++	reinit_completion(&ubufs->wait);
+ }
+ 
+ static void vhost_net_ubuf_put_wait_and_free(struct vhost_net_ubuf_ref *ubufs)
+-- 
+2.34.1
 
 
