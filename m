@@ -1,202 +1,307 @@
-Return-Path: <kvm+bounces-52592-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52593-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36B15B070F5
-	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 10:53:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03A23B070F8
+	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 10:55:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4D2347AAFBD
-	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 08:51:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B152189CD86
+	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 08:56:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D0262EF9D2;
-	Wed, 16 Jul 2025 08:52:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 295A82EF9D8;
+	Wed, 16 Jul 2025 08:55:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GLwLjflv"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gm1MINn9"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D46322E88B5;
-	Wed, 16 Jul 2025 08:52:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AAA428C2DB
+	for <kvm@vger.kernel.org>; Wed, 16 Jul 2025 08:55:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752655964; cv=none; b=Dfiq/Vbdu25Izq6dBYCTFW/l2M1dvXCiXLPZ1A8pzgEgmaIzVX5PcC+xMX5i7pEW95eY5dYZdxPwxFGoxabNvwf/TM/IxK9palRibluHm+QwTo1LlL2J8IA0uV0+h6ZIKswkq1NBPeGc/bmPyIs1jkASSTbdBMdytYfiGkAX/XI=
+	t=1752656141; cv=none; b=DUGNWDKrS9E1uU4NKPvtRMEfYYlb3gRWwolHAqWP3V6vuf/QiZbVje8+pG8eim5e3B4FKcZiLcI1V6E+GNwrO+OXGtlNg46ZZSJRUBuC18z5lKcukFRQPm0ZQ6/oI7San5QLLfEgRgyPAQtNrVBy2ki6XVt3VOTQNC26vJ32w98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752655964; c=relaxed/simple;
-	bh=94kf4M+XD6NApSPBMCDqmsn2ygZAgx+ZZdELWr26Y9s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LO/fa8uzNn29HpRWoDdoVbYC3/mNZknfrXF8nKpXWIlJk9zQptTegNFQR2hH0WVXRmGjZzK5qP2Fi5HbSqgmIsw9rLJuS/svwpBcJ1sviqPEmeBBWDK/81tXiHj4cKn38ZTEAy+2hboiLLoGMVa1889TPUS/c7htXR179TGvH/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GLwLjflv; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752655963; x=1784191963;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=94kf4M+XD6NApSPBMCDqmsn2ygZAgx+ZZdELWr26Y9s=;
-  b=GLwLjflvStxM1HxaZI9WXUq6OVE9PhQka6J/3EuqwweyTTeK6bIo4PRx
-   wXsHBBUDrs602N/vWZHRyHVjIyWVXYAXlw2ph82E+/KjwYcLP9Sz8wMxw
-   dDlL9XrAWAOV4E5yRzA+pNkHVVEGoEsMzeN+OHiYRra0eqwWv6oM/Xbty
-   mRgbKugEGu283TswETlkp7Zn5yhCQ9i8yx82yVpJ2qL0FZ8d6qFSFXBA8
-   Es1VPfMPSAyVQqzTIPQHh/LqV7uFqEvXHMxAvQdq1rPH3QjYz9nGnkciq
-   zpp3lMIp25/u5E3X3AGznjMZIFWjYUbqIcktYm1wEg1rvQe5L4uUpTZO0
-   A==;
-X-CSE-ConnectionGUID: 0Dwb0hK8RHyzRvlVU/P+Rw==
-X-CSE-MsgGUID: petg+5MFQr+nV0LxdLjm3g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11493"; a="55013966"
-X-IronPort-AV: E=Sophos;i="6.16,315,1744095600"; 
-   d="scan'208";a="55013966"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jul 2025 01:52:42 -0700
-X-CSE-ConnectionGUID: v3EhzNgHRDyuDzMapsSL+g==
-X-CSE-MsgGUID: pr/19EOUSoCs0Cadba9NhQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,315,1744095600"; 
-   d="scan'208";a="157534744"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jul 2025 01:52:27 -0700
-Message-ID: <47bc83a0-5b5b-4f00-a6d2-1e5b4486f94f@intel.com>
-Date: Wed, 16 Jul 2025 16:52:25 +0800
+	s=arc-20240116; t=1752656141; c=relaxed/simple;
+	bh=3XujhVuiu4yaKX8VdtoT8L7ry694S9HL3N/1pn8FpHE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rHB3Fyy17fyk9TNjE6l3IMnlO+O60QXOtmltI5tj5sSgj9AwgNYNdCVo3ABuyy0GJtFtLHpE5bZxnnbBhq2bf9IfED/bOJ/cca1OZvjmNSp2iDnO7xlzAbiEOxkYbMahvC8t94VaF5/KldtxWkBvhTC12tgmx/hJS0LTjZXOqTc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Gm1MINn9; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752656138;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=KJc5h/pWyKQ+w9Bq81OUahiAahZ/ZW6ST7tvA1a1o5A=;
+	b=Gm1MINn9K/y7W01Ows2FwWQY8oATFbsUjn5LS42aZnDOnu9aWsTQbttjDXhndSUtEeolQ2
+	zMQ0F2KY6nI4hZaEopvD54C7sGkYtJw8cJ5WZT8c7Apyfr8HXwz0OM9l+ai7KygRwc+x+f
+	ASlUijx39Ml1nCQl5p21CIRuamJ8mzw=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-617-ssgPFq-hMFanu2wNKSjNlQ-1; Wed, 16 Jul 2025 04:55:36 -0400
+X-MC-Unique: ssgPFq-hMFanu2wNKSjNlQ-1
+X-Mimecast-MFC-AGG-ID: ssgPFq-hMFanu2wNKSjNlQ_1752656135
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-454dee17a91so49516355e9.3
+        for <kvm@vger.kernel.org>; Wed, 16 Jul 2025 01:55:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752656135; x=1753260935;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KJc5h/pWyKQ+w9Bq81OUahiAahZ/ZW6ST7tvA1a1o5A=;
+        b=bQjG561p0Ed79BIowClJOD/uKMJgBCw4i5ntL4MVceP0GUqO67KQrBxNhEoqJABg0z
+         kfaumzBGYqx5dY7l+7PAvJ+540DHnB0g69aa3AikR4nsgaRqBEbrb/G6X6MTg3FAbepp
+         w1pX+ZvcGu/EUDl93LwkLnYEYB18xdJzIfjldqwsKG7LKDgkb/OWMAtuYsnU0b9hck/+
+         wea6WB7k20OKQ22TeUHP8ZpNHZcG2AsUWpQRt7BgVnwhoLOOREc/8vDawxxYrIDy+ItQ
+         vDVOpnlWUZRK06Wh4/2RPciCNMIRJeBh/rwNUBvgPwtx84CBIXc77N8/NUQcmCfydMq0
+         T1OQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWln380gwnhvdHIxeGefc9EItEeYHgiGi5jSf8546O4cxWRVmOerBZLMTDApDZJYyXLIUs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzXngZyhEqUkjWm3f7eeYGDY2KzNyk90DTf1zy1lMckhb7EdRFN
+	ffrrYIMmjNYI20HAsUx5z5PIZr1em+zkbJORTA3VGMjfJ8CjxIe/WyS0mNIrw52pydSz4cR5JrX
+	ff9+ISkQWxKQHoiUhHAnH0UuItYs00vNtWZ3lf2FY3U+nO7X6ACCMyA==
+X-Gm-Gg: ASbGncv2+RwIl5FTEFqgUgNPE2LqpdJuPcWsf10R/SsctDo408HwVGOhRMjfihFHTlA
+	yEP6q6s7XDFd11AeukYsv8KATEce+35vXFAObka/mAowIergO6zqCfuRytJ9l5Zj3o063DmHSqj
+	swOaMogXsvxyop6tckQP++N0+Gvdw5HhfpgQ9Sm02pYlxfAjg3/9OWD6F08m8N5U6z3Y2X2MzGl
+	ygCO3cA8Vjk1mwOxAP22JDOt4zma7WVqZvAVcnNZKEtused3h+5Otnyo1j4OGEARGAK3Ub/WEJ7
+	FyEt+zds2adqQREjyj5xre/0wsTolxoM
+X-Received: by 2002:a05:600c:35d3:b0:456:18ca:68db with SMTP id 5b1f17b1804b1-4562e371b1fmr17014695e9.8.1752656134982;
+        Wed, 16 Jul 2025 01:55:34 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFIeeddWD/zXeNIK28bnOIs260/kSZeIsxuV6ecZ6mZpopBKmOyYwzIAIRkqbaMPhqIXtY3WA==
+X-Received: by 2002:a05:600c:35d3:b0:456:18ca:68db with SMTP id 5b1f17b1804b1-4562e371b1fmr17014325e9.8.1752656134500;
+        Wed, 16 Jul 2025 01:55:34 -0700 (PDT)
+Received: from redhat.com ([2a0d:6fc0:150d:fc00:de3:4725:47c6:6809])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4562e81ccb4sm14628415e9.17.2025.07.16.01.55.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Jul 2025 01:55:33 -0700 (PDT)
+Date: Wed, 16 Jul 2025 04:55:30 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: Jonathan Corbet <corbet@lwn.net>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Jason Wang <jasowang@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Shuah Khan <shuah@kernel.org>, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+	linux-kselftest@vger.kernel.org,
+	Yuri Benditovich <yuri.benditovich@daynix.com>,
+	Andrew Melnychenko <andrew@daynix.com>,
+	Stephen Hemminger <stephen@networkplumber.org>,
+	gur.stavi@huawei.com, Lei Yang <leiyang@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH net-next v12 00/10] tun: Introduce virtio-net hashing
+ feature
+Message-ID: <20250716045513-mutt-send-email-mst@kernel.org>
+References: <20250530-rss-v12-0-95d8b348de91@daynix.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v14 09/21] KVM: guest_memfd: Track guest_memfd mmap
- support in memslot
-To: Fuad Tabba <tabba@google.com>
-Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org,
- kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org,
- mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com,
- palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com,
- viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org,
- akpm@linux-foundation.org, yilun.xu@intel.com, chao.p.peng@linux.intel.com,
- jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com,
- isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz,
- vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name,
- david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com,
- liam.merwick@oracle.com, isaku.yamahata@gmail.com,
- kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com,
- steven.price@arm.com, quic_eberman@quicinc.com, quic_mnalajal@quicinc.com,
- quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com,
- quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com,
- quic_pheragu@quicinc.com, catalin.marinas@arm.com, james.morse@arm.com,
- yuzenghui@huawei.com, oliver.upton@linux.dev, maz@kernel.org,
- will@kernel.org, qperret@google.com, keirf@google.com, roypat@amazon.co.uk,
- shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, rientjes@google.com,
- jhubbard@nvidia.com, fvdl@google.com, hughd@google.com,
- jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com,
- ira.weiny@intel.com
-References: <20250715093350.2584932-1-tabba@google.com>
- <20250715093350.2584932-10-tabba@google.com>
- <eb9d39b4-0de8-4abb-b0f7-7180dc1aaee5@intel.com>
- <CA+EHjTw8Pezyut+pjpRyT9R5ZWvjOZUes27SHJAEeygCOV_HQA@mail.gmail.com>
-Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <CA+EHjTw8Pezyut+pjpRyT9R5ZWvjOZUes27SHJAEeygCOV_HQA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250530-rss-v12-0-95d8b348de91@daynix.com>
 
-On 7/16/2025 4:21 PM, Fuad Tabba wrote:
-> Hi Xiaoyao,
+On Fri, May 30, 2025 at 01:50:04PM +0900, Akihiko Odaki wrote:
+> NOTE: I'm leaving Daynix Computing Ltd., for which I worked on this
+> patch series, by the end of this month.
 > 
-> On Wed, 16 Jul 2025 at 07:11, Xiaoyao Li <xiaoyao.li@intel.com> wrote:
->>
->> On 7/15/2025 5:33 PM, Fuad Tabba wrote:
->>> Add a new internal flag, KVM_MEMSLOT_GMEM_ONLY, to the top half of
->>> memslot->flags. This flag tracks when a guest_memfd-backed memory slot
->>> supports host userspace mmap operations. It's strictly for KVM's
->>> internal use.
->>
->> I would expect some clarification of why naming it with
->> KVM_MEMSLOT_GMEM_ONLY, not something like KVM_MEMSLOT_GMEM_MMAP_ENABLED
->>
->> There was a patch to check the userspace_addr of the memslot refers to
->> the same memory as guest memfd[1], but that patch was dropped. Without
->> the background that when guest memfd is mmapable, userspace doesn't need
->> to provide separate memory via userspace_addr, it's hard to understand
->> and accept the name of GMEM_ONLY.
+> While net-next is closed, this is the last chance for me to send another
+> version so let me send the local changes now.
 > 
-> The commit message could have clarified this a bit more. Regarding the
-> rationale for the naming, there have been various threads and live
-> discussions in the biweekly guest_memfd meeting . Instead of rehashing
-> the discussion here, I can refer you to a couple [1, 2].
+> Please contact Yuri Benditovich, who is CCed on this email, for anything
+> about this series.
+> 
+> virtio-net have two usage of hashes: one is RSS and another is hash
+> reporting. Conventionally the hash calculation was done by the VMM.
+> However, computing the hash after the queue was chosen defeats the
+> purpose of RSS.
+> 
+> Another approach is to use eBPF steering program. This approach has
+> another downside: it cannot report the calculated hash due to the
+> restrictive nature of eBPF.
+> 
+> Introduce the code to compute hashes to the kernel in order to overcome
+> thse challenges.
+> 
+> An alternative solution is to extend the eBPF steering program so that it
+> will be able to report to the userspace, but it is based on context
+> rewrites, which is in feature freeze. We can adopt kfuncs, but they will
+> not be UAPIs. We opt to ioctl to align with other relevant UAPIs (KVM
+> and vhost_net).
+> 
+> The patches for QEMU to use this new feature was submitted as RFC and
+> is available at:
+> https://patchew.org/QEMU/20250530-hash-v5-0-343d7d7a8200@daynix.com/
+> 
+> This work was presented at LPC 2024:
+> https://lpc.events/event/18/contributions/1963/
 
-I don't object the name. Just want the clarification in commit message 
-and even better add comment in code. That will be truly helpful for 
-future readers.
 
-> [1] https://docs.google.com/document/d/1M6766BzdY1Lhk7LiR5IqVR8B8mG3cr-cxTxOrAosPOk/edit?tab=t.0#heading=h.a15es1buok51
-> [2] https://lore.kernel.org/all/aFwChljXL5QJYLM_@google.com/
+It's been a while, do you intend to post v13?
+
+> V1 -> V2:
+>   Changed to introduce a new BPF program type.
 > 
-> Thanks,
-> /fuad
+> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+> ---
+> Changes in v12:
+> - Updated tools/testing/selftests/net/config.
+> - Split TUNSETVNETHASH.
+> - Link to v11: https://lore.kernel.org/r/20250317-rss-v11-0-4cacca92f31f@daynix.com
 > 
->> [1] https://lore.kernel.org/all/20250513163438.3942405-9-tabba@google.com/
->>
->>> This optimization avoids repeatedly checking the underlying guest_memfd
->>> file for mmap support, which would otherwise require taking and
->>> releasing a reference on the file for each check. By caching this
->>> information directly in the memslot, we reduce overhead and simplify the
->>> logic involved in handling guest_memfd-backed pages for host mappings.
->>>
->>> Reviewed-by: Gavin Shan <gshan@redhat.com>
->>> Reviewed-by: Shivank Garg <shivankg@amd.com>
->>> Acked-by: David Hildenbrand <david@redhat.com>
->>> Suggested-by: David Hildenbrand <david@redhat.com>
->>> Signed-off-by: Fuad Tabba <tabba@google.com>
->>> ---
->>>    include/linux/kvm_host.h | 11 ++++++++++-
->>>    virt/kvm/guest_memfd.c   |  2 ++
->>>    2 files changed, 12 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
->>> index 9ac21985f3b5..d2218ec57ceb 100644
->>> --- a/include/linux/kvm_host.h
->>> +++ b/include/linux/kvm_host.h
->>> @@ -54,7 +54,8 @@
->>>     * used in kvm, other bits are visible for userspace which are defined in
->>>     * include/uapi/linux/kvm.h.
->>>     */
->>> -#define KVM_MEMSLOT_INVALID  (1UL << 16)
->>> +#define KVM_MEMSLOT_INVALID                  (1UL << 16)
->>> +#define KVM_MEMSLOT_GMEM_ONLY                        (1UL << 17)
->>>
->>>    /*
->>>     * Bit 63 of the memslot generation number is an "update in-progress flag",
->>> @@ -2536,6 +2537,14 @@ static inline void kvm_prepare_memory_fault_exit(struct kvm_vcpu *vcpu,
->>>                vcpu->run->memory_fault.flags |= KVM_MEMORY_EXIT_FLAG_PRIVATE;
->>>    }
->>>
->>> +static inline bool kvm_memslot_is_gmem_only(const struct kvm_memory_slot *slot)
->>> +{
->>> +     if (!IS_ENABLED(CONFIG_KVM_GMEM_SUPPORTS_MMAP))
->>> +             return false;
->>> +
->>> +     return slot->flags & KVM_MEMSLOT_GMEM_ONLY;
->>> +}
->>> +
->>>    #ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
->>>    static inline unsigned long kvm_get_memory_attributes(struct kvm *kvm, gfn_t gfn)
->>>    {
->>> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
->>> index 07a4b165471d..2b00f8796a15 100644
->>> --- a/virt/kvm/guest_memfd.c
->>> +++ b/virt/kvm/guest_memfd.c
->>> @@ -592,6 +592,8 @@ int kvm_gmem_bind(struct kvm *kvm, struct kvm_memory_slot *slot,
->>>         */
->>>        WRITE_ONCE(slot->gmem.file, file);
->>>        slot->gmem.pgoff = start;
->>> +     if (kvm_gmem_supports_mmap(inode))
->>> +             slot->flags |= KVM_MEMSLOT_GMEM_ONLY;
->>>
->>>        xa_store_range(&gmem->bindings, start, end - 1, slot, GFP_KERNEL);
->>>        filemap_invalidate_unlock(inode->i_mapping);
->>
+> Changes in v11:
+> - Added the missing code to free vnet_hash in patch
+>   "tap: Introduce virtio-net hash feature".
+> - Link to v10: https://lore.kernel.org/r/20250313-rss-v10-0-3185d73a9af0@daynix.com
+> 
+> Changes in v10:
+> - Split common code and TUN/TAP-specific code into separate patches.
+> - Reverted a spurious style change in patch "tun: Introduce virtio-net
+>   hash feature".
+> - Added a comment explaining disable_ipv6 in tests.
+> - Used AF_PACKET for patch "selftest: tun: Add tests for
+>   virtio-net hashing". I also added the usage of FIXTURE_VARIANT() as
+>   the testing function now needs access to more variant-specific
+>   variables.
+> - Corrected the message of patch "selftest: tun: Add tests for
+>   virtio-net hashing"; it mentioned validation of configuration but
+>   it is not scope of this patch.
+> - Expanded the description of patch "selftest: tun: Add tests for
+>   virtio-net hashing".
+> - Added patch "tun: Allow steering eBPF program to fall back".
+> - Changed to handle TUNGETVNETHASHCAP before taking the rtnl lock.
+> - Removed redundant tests for tun_vnet_ioctl().
+> - Added patch "selftest: tap: Add tests for virtio-net ioctls".
+> - Added a design explanation of ioctls for extensibility and migration.
+> - Removed a few branches in patch
+>   "vhost/net: Support VIRTIO_NET_F_HASH_REPORT".
+> - Link to v9: https://lore.kernel.org/r/20250307-rss-v9-0-df76624025eb@daynix.com
+> 
+> Changes in v9:
+> - Added a missing return statement in patch
+>   "tun: Introduce virtio-net hash feature".
+> - Link to v8: https://lore.kernel.org/r/20250306-rss-v8-0-7ab4f56ff423@daynix.com
+> 
+> Changes in v8:
+> - Disabled IPv6 to eliminate noises in tests.
+> - Added a branch in tap to avoid unnecessary dissection when hash
+>   reporting is disabled.
+> - Removed unnecessary rtnl_lock().
+> - Extracted code to handle new ioctls into separate functions to avoid
+>   adding extra NULL checks to the code handling other ioctls.
+> - Introduced variable named "fd" to __tun_chr_ioctl().
+> - s/-/=/g in a patch message to avoid confusing Git.
+> - Link to v7: https://lore.kernel.org/r/20250228-rss-v7-0-844205cbbdd6@daynix.com
+> 
+> Changes in v7:
+> - Ensured to set hash_report to VIRTIO_NET_HASH_REPORT_NONE for
+>   VHOST_NET_F_VIRTIO_NET_HDR.
+> - s/4/sizeof(u32)/ in patch "virtio_net: Add functions for hashing".
+> - Added tap_skb_cb type.
+> - Rebased.
+> - Link to v6: https://lore.kernel.org/r/20250109-rss-v6-0-b1c90ad708f6@daynix.com
+> 
+> Changes in v6:
+> - Extracted changes to fill vnet header holes into another series.
+> - Squashed patches "skbuff: Introduce SKB_EXT_TUN_VNET_HASH", "tun:
+>   Introduce virtio-net hash reporting feature", and "tun: Introduce
+>   virtio-net RSS" into patch "tun: Introduce virtio-net hash feature".
+> - Dropped the RFC tag.
+> - Link to v5: https://lore.kernel.org/r/20241008-rss-v5-0-f3cf68df005d@daynix.com
+> 
+> Changes in v5:
+> - Fixed a compilation error with CONFIG_TUN_VNET_CROSS_LE.
+> - Optimized the calculation of the hash value according to:
+>   https://git.dpdk.org/dpdk/commit/?id=3fb1ea032bd6ff8317af5dac9af901f1f324cab4
+> - Added patch "tun: Unify vnet implementation".
+> - Dropped patch "tap: Pad virtio header with zero".
+> - Added patch "selftest: tun: Test vnet ioctls without device".
+> - Reworked selftests to skip for older kernels.
+> - Documented the case when the underlying device is deleted and packets
+>   have queue_mapping set by TC.
+> - Reordered test harness arguments.
+> - Added code to handle fragmented packets.
+> - Link to v4: https://lore.kernel.org/r/20240924-rss-v4-0-84e932ec0e6c@daynix.com
+> 
+> Changes in v4:
+> - Moved tun_vnet_hash_ext to if_tun.h.
+> - Renamed virtio_net_toeplitz() to virtio_net_toeplitz_calc().
+> - Replaced htons() with cpu_to_be16().
+> - Changed virtio_net_hash_rss() to return void.
+> - Reordered variable declarations in virtio_net_hash_rss().
+> - Removed virtio_net_hdr_v1_hash_from_skb().
+> - Updated messages of "tap: Pad virtio header with zero" and
+>   "tun: Pad virtio header with zero".
+> - Fixed vnet_hash allocation size.
+> - Ensured to free vnet_hash when destructing tun_struct.
+> - Link to v3: https://lore.kernel.org/r/20240915-rss-v3-0-c630015db082@daynix.com
+> 
+> Changes in v3:
+> - Reverted back to add ioctl.
+> - Split patch "tun: Introduce virtio-net hashing feature" into
+>   "tun: Introduce virtio-net hash reporting feature" and
+>   "tun: Introduce virtio-net RSS".
+> - Changed to reuse hash values computed for automq instead of performing
+>   RSS hashing when hash reporting is requested but RSS is not.
+> - Extracted relevant data from struct tun_struct to keep it minimal.
+> - Added kernel-doc.
+> - Changed to allow calling TUNGETVNETHASHCAP before TUNSETIFF.
+> - Initialized num_buffers with 1.
+> - Added a test case for unclassified packets.
+> - Fixed error handling in tests.
+> - Changed tests to verify that the queue index will not overflow.
+> - Rebased.
+> - Link to v2: https://lore.kernel.org/r/20231015141644.260646-1-akihiko.odaki@daynix.com
+> 
+> ---
+> Akihiko Odaki (10):
+>       virtio_net: Add functions for hashing
+>       net: flow_dissector: Export flow_keys_dissector_symmetric
+>       tun: Allow steering eBPF program to fall back
+>       tun: Add common virtio-net hash feature code
+>       tun: Introduce virtio-net hash feature
+>       tap: Introduce virtio-net hash feature
+>       selftest: tun: Test vnet ioctls without device
+>       selftest: tun: Add tests for virtio-net hashing
+>       selftest: tap: Add tests for virtio-net ioctls
+>       vhost/net: Support VIRTIO_NET_F_HASH_REPORT
+> 
+>  Documentation/networking/tuntap.rst  |   7 +
+>  drivers/net/Kconfig                  |   1 +
+>  drivers/net/ipvlan/ipvtap.c          |   2 +-
+>  drivers/net/macvtap.c                |   2 +-
+>  drivers/net/tap.c                    |  80 +++++-
+>  drivers/net/tun.c                    |  92 +++++--
+>  drivers/net/tun_vnet.h               | 165 +++++++++++-
+>  drivers/vhost/net.c                  |  68 ++---
+>  include/linux/if_tap.h               |   4 +-
+>  include/linux/skbuff.h               |   3 +
+>  include/linux/virtio_net.h           | 188 ++++++++++++++
+>  include/net/flow_dissector.h         |   1 +
+>  include/uapi/linux/if_tun.h          |  80 ++++++
+>  net/core/flow_dissector.c            |   3 +-
+>  net/core/skbuff.c                    |   4 +
+>  tools/testing/selftests/net/Makefile |   2 +-
+>  tools/testing/selftests/net/config   |   1 +
+>  tools/testing/selftests/net/tap.c    | 131 +++++++++-
+>  tools/testing/selftests/net/tun.c    | 485 ++++++++++++++++++++++++++++++++++-
+>  19 files changed, 1234 insertions(+), 85 deletions(-)
+> ---
+> base-commit: 5cb8274d66c611b7889565c418a8158517810f9b
+> change-id: 20240403-rss-e737d89efa77
+> 
+> Best regards,
+> -- 
+> Akihiko Odaki <akihiko.odaki@daynix.com>
 
 
