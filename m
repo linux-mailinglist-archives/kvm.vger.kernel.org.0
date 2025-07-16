@@ -1,147 +1,203 @@
-Return-Path: <kvm+bounces-52588-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52590-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 903C9B07061
-	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 10:23:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9979B07067
+	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 10:23:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB67A1C2363E
-	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 08:23:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A7AB0580C7A
+	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 08:23:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B62D62EACF1;
-	Wed, 16 Jul 2025 08:22:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CA0A2EACF1;
+	Wed, 16 Jul 2025 08:23:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ju9r0yge"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="exXqPj6W"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7A462EAB82;
-	Wed, 16 Jul 2025 08:22:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB63F256C6D
+	for <kvm@vger.kernel.org>; Wed, 16 Jul 2025 08:23:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752654150; cv=none; b=PyPUsYMqow+KZfdNQOsWdxtx3WKjxudlI6j8orbfBw3v9n4Eb72CTN71UP/JcQT4YoAyWV5nUf+OXaOoMcizHMyyb28PlwkDgjIfLPnoCayPZutso7aRPnTcJME21WgxNIUcLyR6xVVQAaoDezFVYqd7xoK3MPRPUpm7x1OXU1g=
+	t=1752654221; cv=none; b=j6Hm1bIQ1O0GhryrP0LWXA55MPHSmAD+aS59Ng5c8cMKfL+faPtzh5jddVYfQ7YXvX/NJgvPgGh+fL+aPqg9eXWL7k89LlHG03fmGHdQ6kLCO4fDsENI0dzVdX6vF6jahZBmMxBEJSh8ESmyIkJVEzOv/KrD5w+7q6p4K6/4qDI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752654150; c=relaxed/simple;
-	bh=V4D522z6UUEGIW4Wg6YSnm8NKzfzikRtghcHIDH2hWc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QF994wi8pWN/2UI8sVYPhp326qGNHhCZql9NoN0jeXXYI0F28X0M0SJxvs2CmkQ5uGc/8r/3HmXzRsGhb1kUxcSyBLhVGAZZLAmJRXKnHywrdyRnrnS7UhqbdcKwnsxHLVJhI3aD9m5ZVN3IL4hjxf/0dciZ57udGGTAvPmAmaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ju9r0yge; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3AC8C4CEF9;
-	Wed, 16 Jul 2025 08:22:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752654150;
-	bh=V4D522z6UUEGIW4Wg6YSnm8NKzfzikRtghcHIDH2hWc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Ju9r0ygeIoehctwwAmdbT/gnfDwO9Wx9CcOiz8KdX+fbbUUW44D3fiXaJL6ORkQll
-	 NStAgkyukkjf0jmlnc+7NmUNmVnsxXJtXtjpIEZfICw+MgHB6EukkgT+gI0GlE0ymn
-	 0sB/lbzBlumLdjrsptDrl/3BbpnNY4NxBxXo79i7geNfD4Ip4W7E7vNPGo6MQ+HL3s
-	 XNk3X9dbyeUezh1dNqRL+ALj9ijiDE+UH1Ko4if/JVXnV6dkA0fqgeaxcUjfplQznk
-	 hmsDIryCvejDyEO1edOecCZ/ea1g5mxVBovVrHfR3gaLjaG7eJTDw3g71cPoAdDVUf
-	 HMZZxthoAuLpg==
-Date: Wed, 16 Jul 2025 10:22:27 +0200
-From: Maxime Ripard <mripard@kernel.org>
-To: Mario Limonciello <superm1@kernel.org>
-Cc: David Airlie <airlied@gmail.com>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Alex Deucher <alexander.deucher@amd.com>, Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>, 
-	Simona Vetter <simona@ffwll.ch>, Lukas Wunner <lukas@wunner.de>, 
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Thomas Zimmermann <tzimmermann@suse.de>, 
-	David Woodhouse <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>, 
-	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>, 
-	Robin Murphy <robin.murphy@arm.com>, Alex Williamson <alex.williamson@redhat.com>, 
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
-	"open list:DRM DRIVERS" <dri-devel@lists.freedesktop.org>, open list <linux-kernel@vger.kernel.org>, 
-	"open list:INTEL IOMMU (VT-d)" <iommu@lists.linux.dev>, "open list:PCI SUBSYSTEM" <linux-pci@vger.kernel.org>, 
-	"open list:VFIO DRIVER" <kvm@vger.kernel.org>, "open list:SOUND" <linux-sound@vger.kernel.org>, 
-	Daniel Dadap <ddadap@nvidia.com>, Mario Limonciello <mario.limonciello@amd.com>
-Subject: Re: [PATCH v8 9/9] PCI: Add a new 'boot_display' attribute
-Message-ID: <20250716-upbeat-tody-of-psychology-93e2a2@houat>
-References: <20250714212147.2248039-1-superm1@kernel.org>
- <20250714212147.2248039-10-superm1@kernel.org>
+	s=arc-20240116; t=1752654221; c=relaxed/simple;
+	bh=paTfRGHkvf1SbD2JKx5jmgOaLo6grjWR4gpGzCvi9/Q=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=nMfi7S7TDYOmqEF2aEY1Xwjwao+yLYiv9bXcQCkHwQWGGPV02tH8uA1RbbjtuwQCGINbfZbq8K+lV7WA7HvYYWUIpmtAztWSO8XJWXB9P/L5W/182JphRMY9/ACvaAcm6DlvNOlxnc7VhMDpn+kUprU0XP8KEYIpWymrAv6KS/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=exXqPj6W; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752654215;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=STUiBIB+Th2T363ay6GOHVdT+QkghnT6vecX0DXWUeM=;
+	b=exXqPj6Wy9JdyE02Sn9DMdT9J2DR76lV62Hav/curm/CDE44nOA8CKpJ3jZhFuhfdgRzfs
+	/wgVukx0xolJfn+ZXOL9PCvdvSioGgKZkl1aPWeAqM8wwl3XUavcHTP6oNpM/E/SAi9Cjh
+	weEO+mBPaKLZ1WfMVccUP/M4gBt4cVA=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-612-41NsQrsXNwWBG8ttagMCbg-1; Wed,
+ 16 Jul 2025 04:23:32 -0400
+X-MC-Unique: 41NsQrsXNwWBG8ttagMCbg-1
+X-Mimecast-MFC-AGG-ID: 41NsQrsXNwWBG8ttagMCbg_1752654210
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 23F491800366;
+	Wed, 16 Jul 2025 08:23:30 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.45.242.6])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8355F1955F16;
+	Wed, 16 Jul 2025 08:23:29 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id D3D1D21E6A27; Wed, 16 Jul 2025 10:23:26 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+Cc: qemu-devel@nongnu.org,  Alex =?utf-8?Q?Benn=C3=A9e?=
+ <alex.bennee@linaro.org>,  Paolo
+ Bonzini <pbonzini@redhat.com>,  Pierrick Bouvier
+ <pierrick.bouvier@linaro.org>,  kvm@vger.kernel.org,  Richard Henderson
+ <richard.henderson@linaro.org>,  Zhao Liu <zhao1.liu@intel.com>,  Eduardo
+ Habkost <eduardo@habkost.net>,  Marcel Apfelbaum
+ <marcel.apfelbaum@gmail.com>,  Yanan Wang <wangyanan55@huawei.com>,  Eric
+ Blake <eblake@redhat.com>,  Michael Roth <michael.roth@amd.com>,  Daniel
+ P. =?utf-8?Q?Berrang=C3=A9?= <berrange@redhat.com>
+Subject: Re: [PATCH v5 28/69] qapi: Move definitions related to accelerators
+ in their own file
+In-Reply-To: <db0b2ce0-e702-4f32-b284-29cccc8d67ba@linaro.org> ("Philippe
+	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Thu, 3 Jul 2025 18:42:06
+ +0200")
+References: <20250703105540.67664-1-philmd@linaro.org>
+	<20250703105540.67664-29-philmd@linaro.org>
+	<db0b2ce0-e702-4f32-b284-29cccc8d67ba@linaro.org>
+Date: Wed, 16 Jul 2025 10:23:26 +0200
+Message-ID: <877c08wnlt.fsf@pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha384;
-	protocol="application/pgp-signature"; boundary="k6j22jwrkd2tjfpl"
-Content-Disposition: inline
-In-Reply-To: <20250714212147.2248039-10-superm1@kernel.org>
-
-
---k6j22jwrkd2tjfpl
-Content-Type: text/plain; protected-headers=v1; charset=us-ascii
-Content-Disposition: inline
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH v8 9/9] PCI: Add a new 'boot_display' attribute
-MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Hi Mario,
+Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org> writes:
 
-On Mon, Jul 14, 2025 at 04:21:46PM -0500, Mario Limonciello wrote:
-> From: Mario Limonciello <mario.limonciello@amd.com>
->=20
-> On systems with multiple GPUs there can be uncertainty which GPU is the
-> primary one used to drive the display at bootup. In order to disambiguate
-> this add a new sysfs attribute 'boot_display' that uses the output of
-> video_is_primary_device() to populate whether a PCI device was used for
-> driving the display.
->=20
-> Reviewed-by: Thomas Zimmermann <tzimmermann@suse.de>
-> Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
-> ---
-> v7:
->  * fix lkp failure
->  * Add tag
-> v6:
->  * Only show for the device that is boot display
->  * Only create after PCI device sysfs files are initialized to ensure
->    that resources are ready.
-> v4:
->  * new patch
-> ---
->  Documentation/ABI/testing/sysfs-bus-pci |  8 +++++
->  drivers/pci/pci-sysfs.c                 | 46 +++++++++++++++++++++++++
->  2 files changed, 54 insertions(+)
->=20
-> diff --git a/Documentation/ABI/testing/sysfs-bus-pci b/Documentation/ABI/=
-testing/sysfs-bus-pci
-> index 69f952fffec72..8b455b1a58852 100644
-> --- a/Documentation/ABI/testing/sysfs-bus-pci
-> +++ b/Documentation/ABI/testing/sysfs-bus-pci
-> @@ -612,3 +612,11 @@ Description:
-> =20
->  		  # ls doe_features
->  		  0001:01        0001:02        doe_discovery
-> +
-> +What:		/sys/bus/pci/devices/.../boot_display
-> +Date:		October 2025
-> +Contact:	Linux PCI developers <linux-pci@vger.kernel.org>
-> +Description:
-> +		This file indicates the device was used as a boot
-> +		display. If the device was used as the boot display, the file
-> +		will be present and contain "1".
+> Hi Markus,
 
-It would probably be a good idea to define what a "boot display" here
-is. I get what you mean, but it's pretty vague and could easily be
-misunderstood.
+I missed this one, sorry!
 
-Maxime
+> On 3/7/25 12:54, Philippe Mathieu-Daud=C3=A9 wrote:
+>> Extract TCG and KVM definitions from machine.json to accelerator.json.
+>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org>
+>> Reviewed-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+>> Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
 
---k6j22jwrkd2tjfpl
-Content-Type: application/pgp-signature; name="signature.asc"
+[...]
 
------BEGIN PGP SIGNATURE-----
+>> diff --git a/qapi/accelerator.json b/qapi/accelerator.json
+>> new file mode 100644
+>> index 00000000000..00d25427059
+>> --- /dev/null
+>> +++ b/qapi/accelerator.json
+>> @@ -0,0 +1,57 @@
+>> +# -*- Mode: Python -*-
+>> +# vim: filetype=3Dpython
+>> +#
+>> +# SPDX-License-Identifier: GPL-2.0-or-later
+>> +
+>> +##
+>> +# =3D Accelerators
+>> +##
+>> +
+>> +{ 'include': 'common.json' }
+>
+> common.json defines @HumanReadableText, ...
+>
+> [...]
+>
+>> +##
+>> +# @x-query-jit:
+>> +#
+>> +# Query TCG compiler statistics
+>> +#
+>> +# Features:
+>> +#
+>> +# @unstable: This command is meant for debugging.
+>> +#
+>> +# Returns: TCG compiler statistics
+>> +#
+>> +# Since: 6.2
+>> +##
+>> +{ 'command': 'x-query-jit',
+>> +  'returns': 'HumanReadableText',
+>> +  'if': 'CONFIG_TCG',
+>
+> ... which is *optionally* used here, triggering when
+> TCG is not built in:
+>
+> qapi/qapi-commands-accelerator.c:85:13: error: =E2=80=98qmp_marshal_outpu=
+t_HumanReadableText=E2=80=99 defined but not used [-Werror=3Dunused-functio=
+n]
+>    85 | static void qmp_marshal_output_HumanReadableText(HumanReadableTex=
+t *ret_in,
+>       |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> cc1: all warnings being treated as errors
 
-iJUEABMJAB0WIQTkHFbLp4ejekA/qfgnX84Zoj2+dgUCaHdhQwAKCRAnX84Zoj2+
-dmq9AYDxe/0Z5T43z0PYAkTEFn17IfyWd5PSFPwPt5sbAZu5sPFpkiTIYzsW8zQO
-FdVNAZgBgMbsfM0ASem/uZk2LHVlbNAmBeJms8JHF/ENscuRsyCN5ltCZOVlNZM0
-tOdrKjIKvw==
-=zc9C
------END PGP SIGNATURE-----
+This is a defect in the QAPI code generator.  More below.
 
---k6j22jwrkd2tjfpl--
+> We previously discussed that issue:
+> https://mail.gnu.org/archive/html/qemu-devel/2021-06/msg02667.html
+>
+> where you said:
+>
+> "conditional commands returning an unconditional type is a bit
+> of a code smell". Is it however a "non-smelly instances of this pattern"?
+
+The instance discussed there wasn't.
+
+You ran into it when you made TPM commands conditional on CONFIG_TPM
+without also making the types they return conditional.  The proper
+solution was to make the types conditional, too.  Avoided generating
+dead code.  I told you "The user is responsible for making T's 'if' the
+conjunction of the commands'."
+
+Some of the commands returning HumanReadableText are unconditional, so
+said conjunction is also unconditional.  So how do we end up with unused
+qmp_marshal_output_HumanReadableText()?
+
+A qmp_marshal_output_T() is only ever called by qmp_marshal_C() for a
+command C that returns T.
+
+We've always generated it as a static function on demand, i.e. when we
+generate a call.
+
+Since we split up monolithic generated code into modules, we do this on
+per module.  This can result in identical (static)
+qmp_marshal_output_T() in several modules.  Fine, but we haven't
+considered conditionals, yet.
+
+As long as all functions returning T are in the same module, "making T's
+'if' the conjunction of the commands'" works.  This is the case for the
+TPM commands.
+
+However, it need not work when the functions returning T are in multiple
+modules.  For each module, we need the conjunction of that module's
+commands' conditions.  We can't make it T's condition unless they are
+all the same.  They aren't for HumanReadableText, as you found out.
+
+I need to ponder this to decide on a solution.
+
+Thanks!
+
 
