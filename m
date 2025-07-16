@@ -1,179 +1,101 @@
-Return-Path: <kvm+bounces-52673-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52674-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01EC7B080CF
-	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 01:06:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 062E7B080D4
+	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 01:07:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 368CA4A3150
-	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 23:06:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 846124A5826
+	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 23:07:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2974C2EF648;
-	Wed, 16 Jul 2025 23:06:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 852302EF64A;
+	Wed, 16 Jul 2025 23:07:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0NvWwdvM"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="KFLU13GF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EABE93FE7
-	for <kvm@vger.kernel.org>; Wed, 16 Jul 2025 23:06:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98C0A3FE7;
+	Wed, 16 Jul 2025 23:07:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752707177; cv=none; b=W3kIDt0faBfo8W7A8e3aBAOQxAVo3Irs7coCwR6phYottinOqeW89uUgbnP08yT/UEVozXdWRdTUiMhkfBp8gZeZjr5KWblsogz+QBEHhymCxZg/vWmgwnz5mu56sy0WaVbFK0FNhGMegWETW0phJEBAVzg+6o+Udn4Ko+CaIYE=
+	t=1752707263; cv=none; b=FE8Djgh4qOThVDWc0Ha7VZXhBuWFnyO02wyy6D7OhsdhrZF22Ayke/eOmY3uWi6THXXATNBjLp6E66O5LzbPw65hhOPTQu9OVXVPsSIcszem0C5ShwA1mjgOS8aoZ+RWY9Dvff/VXRbxb7F8tl4EK5tpxqwQs8MEYrNQk2MoV1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752707177; c=relaxed/simple;
-	bh=6zRY70nEbDsA1kkyqfI9kHtVCDHZXeIjCB38pisAjpQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=JwBgvgxHietv3EJFCWIbmNAjnL/MpUOSvI2ovk0PGqzft6CxKbv4IZ01XFKUCOgEq6/gkTBlFlQ7wA/T3NlMvqGzJPP7Twc3Obo9+3BXyQq68R3apSZ1xmczm6GaP+pnnnJrit3KidN/7E6yMX9kzFzLOlON2UVzwXEpzMkY8Rg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0NvWwdvM; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-74928291bc3so240117b3a.0
-        for <kvm@vger.kernel.org>; Wed, 16 Jul 2025 16:06:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752707175; x=1753311975; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=adcqncZXuKWrstQvgpFavoHNK5nsVYpbKX4vNDqmYr8=;
-        b=0NvWwdvMmmcuC9OJC9hGWen4CUzG+dntzVMaKVZEOYUDG+qv18qneC+czlCElGqwe4
-         lYNBPc9bb0CejnN+b0qUwccSMZzl++O/sWjhU+iAJDMqaSBLlxVKsuI5+Tb+zEUNUik+
-         5J35OUVfc3J+RgVgHzxFweioou3uz6cSUuuEKBQA10uw0xcKuypT7uCe5GqoRCHN2PIl
-         6A03mn5YmdVVmEf1LndmqK2WAuTILmnBZ9NhCnbQ03AMNTtJcyDXDs7i+3Vj1jqcZzmu
-         T8mlDPkg+TGGvJOjDg5WyZZhNjYEnD5on8PUdrCKfdu5bl4xMdDy7Duz97QA4jqwAIJv
-         nFqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752707175; x=1753311975;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=adcqncZXuKWrstQvgpFavoHNK5nsVYpbKX4vNDqmYr8=;
-        b=d2Zh0vzzRgAotzQdNKT/IduzqVN8YOfeE9wa2UU3WBm0n3GRm7T3AL4zJpja56hSc+
-         jh5SQfjsP43O9z9oOZIjpv63uootCc3rTuxmG2N2XfswJccDBKxQFkFcPNCMINVG0zEX
-         7YcFZ6s72Hy5XIMVFi5g4K7zka/NwjqjrTJNIGzBvusAPT+qKfqMzuNOKtGVrpdpnokx
-         t6XycTp22zi/gl+3CUn+ttKjwSiA/VFYtC3JSkyvwFgN1gM3WxHmbT009OgvoS3hxTQ5
-         boYOWcGXJLk5wiQd0dzjzu19J5NySqVdccZ95yi2QzyiIqKJUxh58TCoVAIhdYJbBCRF
-         0RjA==
-X-Forwarded-Encrypted: i=1; AJvYcCWnIEKqtIGSgzJQyfAD1nCypisF1Go1/FmKXT9V4TbaZj7Vy7HhKREddrdAfUoBJKAvGcY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxJJurd4H+jf/10Dq/G1h4LDmFGF4LGdS0QOy/r3EJ5QMfzwtet
-	uKZjSVUWstytbWXAJvuOGNOHKlEyGb/TV6ZMW6RXI5u5r1RJBJxJA5SprX5iqznjvF2uhSbpTjM
-	9s7P8SzmkY8Gs/Z+0B+Obv6XIzA==
-X-Google-Smtp-Source: AGHT+IEkMWa2Fbym2vWCv7D3Erwky7+KyVGpa/foKNybzbL0WNkaHxozAp9QYAhPJYnoNy6cgJaknHtaJQ+s/tVRNw==
-X-Received: from pfxa17.prod.google.com ([2002:a05:6a00:1d11:b0:756:c6cf:2462])
- (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a00:92a7:b0:74d:f997:1b45 with SMTP id d2e1a72fcca58-756e81a0b16mr8759465b3a.8.1752707175027;
- Wed, 16 Jul 2025 16:06:15 -0700 (PDT)
-Date: Wed, 16 Jul 2025 16:06:13 -0700
-In-Reply-To: <CA+EHjTzQwt4Xux7AtB_eiuerKXeCmann2PFBoJTDZ8+qvFuX+w@mail.gmail.com>
+	s=arc-20240116; t=1752707263; c=relaxed/simple;
+	bh=BEoXnAAQJ4E+fgJTyB4gNSBQL4iMYHUyYrJsXxB9A6A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qomKISe1HjBW4FzJjvGdbkhbZ6i6+nceRovsXxU9ZK98NMWja9vURcJAaAf4lCtFyL0EMhfejlT3gARiYvc+X/LxjczRK340YD8OgfJ+GzosfA+EKKEykDxVO4ltlAEghhL5+y1j9sVA2JUFGaFafytsrlAFlOt4uG6UEgnbl84=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=KFLU13GF; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=DeMkf81B5yNrigfNCgydML/LD6DZlbT9djSrJqCL3NI=; b=KFLU13GFIsRrfZBt7JylDpgKIM
+	OHsWxOYmMRk4JiTf5nzk6kszvXMW2QZEGYqLwxu3iJAuT0UMEp0pixuApTGZwq+yKUYUy7j6AacDq
+	UidV35YHgyjbzESoCzP83FvnSzbKxzI67+UuWj9mopNW2wJaehlL0Ohj8PdtV9bvBzneODWNlveo1
+	gUmGPz26wapKtOYIwILWjJm9HFA+x2Fx7knFk04tLgKnUxLtVyGaSjh6cvWFqGnQWT1k3kq5E9s4A
+	WujcSQu2s8Vb7nYeMPziXzRJO+YMAqtCfuAJlWaTcGUf0WsOGLvgrwA3mcJ2Zv64eGpCjhAtOMi6x
+	7iDrYvBw==;
+Received: from [50.53.25.54] (helo=[192.168.254.17])
+	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1ucBDw-00000008qNf-0YZ9;
+	Wed, 16 Jul 2025 23:07:40 +0000
+Message-ID: <4a6fd102-f8e0-42f3-b789-6e3340897032@infradead.org>
+Date: Wed, 16 Jul 2025 16:07:38 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <aGNw4ZJwlClvqezR@yzhao56-desk.sh.intel.com> <CAGtprH-Je5OL-djtsZ9nLbruuOqAJb0RCPAnPipC1CXr2XeTzQ@mail.gmail.com>
- <aGxXWvZCfhNaWISY@google.com> <CAGtprH_57HN4Psxr5MzAZ6k+mLEON2jVzrLH4Tk+Ws29JJuL4Q@mail.gmail.com>
- <006899ccedf93f45082390460620753090c01914.camel@intel.com>
- <aG0pNijVpl0czqXu@google.com> <a0129a912e21c5f3219b382f2f51571ab2709460.camel@intel.com>
- <CAGtprH8ozWpFLa2TSRLci-SgXRfJxcW7BsJSYOxa4Lgud+76qQ@mail.gmail.com>
- <aG07j4Pfkd5EEobQ@google.com> <CA+EHjTx0UkYSduDxe13dFi4+J5L28H+wB4FBXLsMRC5HaHaaFg@mail.gmail.com>
- <aG1UenipkaGyVUz-@google.com> <CA+EHjTzQwt4Xux7AtB_eiuerKXeCmann2PFBoJTDZ8+qvFuX+w@mail.gmail.com>
-Message-ID: <diqz5xfrhh22.fsf@ackerleytng-ctop.c.googlers.com>
-Subject: Re: [RFC PATCH v2 00/51] 1G page support for guest_memfd
-From: Ackerley Tng <ackerleytng@google.com>
-To: Fuad Tabba <tabba@google.com>, Sean Christopherson <seanjc@google.com>
-Cc: Vishal Annapurve <vannapurve@google.com>, Rick P Edgecombe <rick.p.edgecombe@intel.com>, 
-	"pvorel@suse.cz" <pvorel@suse.cz>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"catalin.marinas@arm.com" <catalin.marinas@arm.com>, Jun Miao <jun.miao@intel.com>, 
-	Kirill Shutemov <kirill.shutemov@intel.com>, "pdurrant@amazon.co.uk" <pdurrant@amazon.co.uk>, 
-	"vbabka@suse.cz" <vbabka@suse.cz>, "peterx@redhat.com" <peterx@redhat.com>, "x86@kernel.org" <x86@kernel.org>, 
-	"amoorthy@google.com" <amoorthy@google.com>, "jack@suse.cz" <jack@suse.cz>, 
-	"quic_svaddagi@quicinc.com" <quic_svaddagi@quicinc.com>, "keirf@google.com" <keirf@google.com>, 
-	"palmer@dabbelt.com" <palmer@dabbelt.com>, "vkuznets@redhat.com" <vkuznets@redhat.com>, 
-	"mail@maciej.szmigiero.name" <mail@maciej.szmigiero.name>, 
-	"anthony.yznaga@oracle.com" <anthony.yznaga@oracle.com>, Wei W Wang <wei.w.wang@intel.com>, 
-	"Wieczor-Retman, Maciej" <maciej.wieczor-retman@intel.com>, Yan Y Zhao <yan.y.zhao@intel.com>, 
-	"ajones@ventanamicro.com" <ajones@ventanamicro.com>, "willy@infradead.org" <willy@infradead.org>, 
-	"rppt@kernel.org" <rppt@kernel.org>, "quic_mnalajal@quicinc.com" <quic_mnalajal@quicinc.com>, "aik@amd.com" <aik@amd.com>, 
-	"usama.arif@bytedance.com" <usama.arif@bytedance.com>, Dave Hansen <dave.hansen@intel.com>, 
-	"fvdl@google.com" <fvdl@google.com>, "paul.walmsley@sifive.com" <paul.walmsley@sifive.com>, 
-	"bfoster@redhat.com" <bfoster@redhat.com>, "nsaenz@amazon.es" <nsaenz@amazon.es>, 
-	"anup@brainfault.org" <anup@brainfault.org>, "quic_eberman@quicinc.com" <quic_eberman@quicinc.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"thomas.lendacky@amd.com" <thomas.lendacky@amd.com>, "mic@digikod.net" <mic@digikod.net>, 
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, 
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, 
-	"quic_cvanscha@quicinc.com" <quic_cvanscha@quicinc.com>, "steven.price@arm.com" <steven.price@arm.com>, 
-	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, "hughd@google.com" <hughd@google.com>, 
-	Zhiquan1 Li <zhiquan1.li@intel.com>, "rientjes@google.com" <rientjes@google.com>, 
-	"mpe@ellerman.id.au" <mpe@ellerman.id.au>, Erdem Aktas <erdemaktas@google.com>, 
-	"david@redhat.com" <david@redhat.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>, 
-	"jhubbard@nvidia.com" <jhubbard@nvidia.com>, Haibo1 Xu <haibo1.xu@intel.com>, Fan Du <fan.du@intel.com>, 
-	"maz@kernel.org" <maz@kernel.org>, "muchun.song@linux.dev" <muchun.song@linux.dev>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, "jthoughton@google.com" <jthoughton@google.com>, 
-	"steven.sistare@oracle.com" <steven.sistare@oracle.com>, 
-	"quic_pheragu@quicinc.com" <quic_pheragu@quicinc.com>, "jarkko@kernel.org" <jarkko@kernel.org>, 
-	"chenhuacai@kernel.org" <chenhuacai@kernel.org>, Kai Huang <kai.huang@intel.com>, 
-	"shuah@kernel.org" <shuah@kernel.org>, "dwmw@amazon.co.uk" <dwmw@amazon.co.uk>, 
-	Chao P Peng <chao.p.peng@intel.com>, "pankaj.gupta@amd.com" <pankaj.gupta@amd.com>, 
-	Alexander Graf <graf@amazon.com>, "nikunj@amd.com" <nikunj@amd.com>, 
-	"viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>, "jroedel@suse.de" <jroedel@suse.de>, 
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, "jgowans@amazon.com" <jgowans@amazon.com>, 
-	Yilun Xu <yilun.xu@intel.com>, "liam.merwick@oracle.com" <liam.merwick@oracle.com>, 
-	"michael.roth@amd.com" <michael.roth@amd.com>, "quic_tsoni@quicinc.com" <quic_tsoni@quicinc.com>, 
-	Xiaoyao Li <xiaoyao.li@intel.com>, "aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, 
-	Ira Weiny <ira.weiny@intel.com>, 
-	"richard.weiyang@gmail.com" <richard.weiyang@gmail.com>, 
-	"kent.overstreet@linux.dev" <kent.overstreet@linux.dev>, "qperret@google.com" <qperret@google.com>, 
-	"dmatlack@google.com" <dmatlack@google.com>, "james.morse@arm.com" <james.morse@arm.com>, 
-	"brauner@kernel.org" <brauner@kernel.org>, 
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, "pgonda@google.com" <pgonda@google.com>, 
-	"quic_pderrin@quicinc.com" <quic_pderrin@quicinc.com>, "hch@infradead.org" <hch@infradead.org>, 
-	"linux-mm@kvack.org" <linux-mm@kvack.org>, "will@kernel.org" <will@kernel.org>, 
-	"roypat@amazon.co.uk" <roypat@amazon.co.uk>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: linux-next: Tree for Jul 16 (drivers/vfio/cdx/intr.c)
+To: Stephen Rothwell <sfr@canb.auug.org.au>,
+ Linux Next Mailing List <linux-next@vger.kernel.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ linux-um@lists.infradead.org, Linux KVM <kvm@vger.kernel.org>,
+ Nipun Gupta <nipun.gupta@amd.com>, Nikhil Agarwal <nikhil.agarwal@amd.com>,
+ Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+References: <20250716212558.4dd0502b@canb.auug.org.au>
+Content-Language: en-US
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20250716212558.4dd0502b@canb.auug.org.au>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Fuad Tabba <tabba@google.com> writes:
 
-> On Tue, 8 Jul 2025 at 18:25, Sean Christopherson <seanjc@google.com> wrote:
->>
->> On Tue, Jul 08, 2025, Fuad Tabba wrote:
->> > > > I don't think we need a flag to preserve memory as I mentioned in [2]. IIUC,
->> > > > 1) Conversions are always content-preserving for pKVM.
->> > >
->> > > No?  Perserving contents on private => shared is a security vulnerability waiting
->> > > to happen.
->> >
->> > Actually it is one of the requirements for pKVM as well as its current
->> > behavior. We would like to preserve contents both ways, private <=>
->> > shared, since it is required by some of the potential use cases (e.g.,
->> > guest handling video encoding/decoding).
->> >
->> > To make it clear, I'm talking about explicit sharing from the guest,
->> > not relinquishing memory back to the host. In the case of
->> > relinquishing (and guest teardown), relinquished memory is poisoned
->> > (zeroed) in pKVM.
->>
->> I forget, what's the "explicit sharing" flow look like?  E.g. how/when does pKVM
->> know it's ok to convert memory from private to shared?  I think we'd still want
->> to make data preservation optional, e.g. to avoid potential leakage with setups
->> where memory is private by default, but a flag in KVM's uAPI might not be a good
->> fit since whether or not to preserve data is more of a guest decision (or at least
->> needs to be ok'd by the guest).
->
-> In pKVM all sharing and unsharing is triggered by the guest via
-> hypercalls. The host cannot unshare.
 
-In pKVM's case, would the conversion ioctl be disabled completely, or
-would the ioctl be allowed, but conversion always checks with pKVM to
-see if the guest had previously requested a unshare?
+On 7/16/25 4:25 AM, Stephen Rothwell wrote:
+> Hi all,
+> 
+> Changes since 20250715:
+> 
 
-> That said, making data
-> preservation optional works for pKVM and is a good idea, for the
-> reasons that you've mentioned.
->
-> Cheers,
-> /fuad
+on ARCH=um SUBARCH=x86_64:
+
+../drivers/vfio/cdx/intr.c: In function ‘vfio_cdx_msi_enable’:
+../drivers/vfio/cdx/intr.c:41:15: error: implicit declaration of function ‘msi_domain_alloc_irqs’; did you mean ‘msi_domain_get_virq’? [-Wimplicit-function-declaration]
+   41 |         ret = msi_domain_alloc_irqs(dev, MSI_DEFAULT_DOMAIN, nvec);
+      |               ^~~~~~~~~~~~~~~~~~~~~
+      |               msi_domain_get_virq
+../drivers/vfio/cdx/intr.c: In function ‘vfio_cdx_msi_disable’:
+../drivers/vfio/cdx/intr.c:135:9: error: implicit declaration of function ‘msi_domain_free_irqs_all’ [-Wimplicit-function-declaration]
+  135 |         msi_domain_free_irqs_all(dev, MSI_DEFAULT_DOMAIN);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Those missing functions are provided by CONFIG_GENERIC_MSI_IRQ
+(which is not set).
+
+Should VFIO_CDX select GENERIC_MSI_IRQ or just not build on ARCH=um?
+
+
+-- 
+~Randy
+
 
