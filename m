@@ -1,145 +1,137 @@
-Return-Path: <kvm+bounces-52555-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52556-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87A9BB06A0D
-	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 01:47:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F23FDB06B01
+	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 03:13:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 92A794A3294
-	for <lists+kvm@lfdr.de>; Tue, 15 Jul 2025 23:47:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD8C14E09A7
+	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 01:12:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C83C02D661D;
-	Tue, 15 Jul 2025 23:47:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC38521C195;
+	Wed, 16 Jul 2025 01:13:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="na5YKnSf"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ENPkD07o"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF04425B31B;
-	Tue, 15 Jul 2025 23:47:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E91D126C17
+	for <kvm@vger.kernel.org>; Wed, 16 Jul 2025 01:13:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752623260; cv=none; b=uPYHg4szx5aotXopaG5iIIcodKWKz+RMNY3MvyE+hP5J1dwBdD6HiKZBb3tnIo8VLPmQaB+spI78BZhL5qeqNi3YzZRtI2Ec0+gxi3qXumHLWptY1lDdLSci4ryK5UoD3LMTJ+8VCv9sX1SJWjsJ1gDjIeoi6qT2eJZDKcPh5QE=
+	t=1752628392; cv=none; b=U0bOwGPDJ0qW/OCcUSa8rUOoxRFZ6hmf77WknUtsK/5NRFbhNrpuOCcMhrz3wDC7/wk3OQ8kP/76YMsGzZ716jNYRaAzPSWY1rNeUd9krJPuoDJCagiwuOhbHefo9rJCn8szNEeIANnwQy6uoYJTMYi+l1vWGDX9s46CSWKniPU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752623260; c=relaxed/simple;
-	bh=D3c6sfdeoqU0+rpixMaPXjWlnYZEYRf6Fje/K+TEVYk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ckNghBTMxpo9yxwXoNhflovyLMzbL7cMk3i1kBseENdzHW6j4LwlHkrQXdOXYzWG8w8FigCld14deKOkTfKkPvt4G5B2tzytk2DWnPLpDNsE4B6aMC+TL57sRjdjVwveHI4sQ2w+0srHLlxncyD7J0U6IZ23xpR8joN0TP+tkIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=na5YKnSf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BB2FC4CEE3;
-	Tue, 15 Jul 2025 23:47:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752623256;
-	bh=D3c6sfdeoqU0+rpixMaPXjWlnYZEYRf6Fje/K+TEVYk=;
-	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-	b=na5YKnSffEt9VavXq/l8lZWfSazjB4rpYX/YnWyZPMJ/jlvIVI8z3wGV1ZbAUhB1i
-	 8C7UFx8Qo4WTZrmqcWE7d1ZHUgXgjCCTRwP9OfC8IgTp7nYafVSDDqALiEDKFvvRvP
-	 ps223zl6DOta6+Hq/AUYdUyk/+Y/Fz1HcpZYCBNbY8fE+9arK0nIXUF6E3hJmFUT2i
-	 goPaXvzctB100fcLRfF6X9MdrQ7POeCCBlrT6U3XUfXSaPRzPSB1zYndpDUL51Znsg
-	 17SCUk5jt5AvUKcTOgIhp+RZrT8c3xzKErM7wo0ceXg/WadxHc0pI48MjEo4+Ed8BJ
-	 sFfIcz4DA5hXA==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-	id CBA16CE0811; Tue, 15 Jul 2025 16:47:35 -0700 (PDT)
-Date: Tue, 15 Jul 2025 16:47:35 -0700
-From: "Paul E. McKenney" <paulmck@kernel.org>
-To: Keith Busch <kbusch@meta.com>
-Cc: alex.williamson@redhat.com, kvm@vger.kernel.org,
-	linux-pci@vger.kernel.org, Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCHv2] vfio/type1: conditional rescheduling while pinning
-Message-ID: <d00cc343-b900-47d5-ba30-1ecc5d11393f@paulmck-laptop>
-Reply-To: paulmck@kernel.org
-References: <20250715184622.3561598-1-kbusch@meta.com>
+	s=arc-20240116; t=1752628392; c=relaxed/simple;
+	bh=BKWyQDlgpduqK70y5bsJ48SQyWbfCqQEOJF0Pjbu2y4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YNq92iSlVcSOpfdiKeDCuiQQnW3KdwAEOv95rqQSXGEcJIQI1ASD25KyV/CEenNZ1IuvzKIl6v0VZFbry5/wQ/SoYKFr/6BbIFNXbtwKGy2tDUW9AwnxqQAXZj+IiMonmXPs9uqweTQwcW2p3qDLFbLNx3OzW5mZt0YqaN0bTI8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ENPkD07o; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752628389;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/keS/EUkYyBiSPiys9/nqLBkkMQLW+p9NKDLAaBTJK4=;
+	b=ENPkD07ouisyU8WItzwUq5QZFcdCpG7onJkf+7bzyjGYZb0zzwID4vffrzQdj52atFaoOo
+	xvd3beDoTSvMypMhIKMma6zSoeSR0owYP29bHq/Rk/2OiTFyVyR9UnXoF+RviYVRYdFtNQ
+	mKGADuqwCUW+Fq/bAA+GOcK9AWO9dR8=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-21-IVS0TFQuM5-s-6YxG_Ix5g-1; Tue, 15 Jul 2025 21:13:07 -0400
+X-MC-Unique: IVS0TFQuM5-s-6YxG_Ix5g-1
+X-Mimecast-MFC-AGG-ID: IVS0TFQuM5-s-6YxG_Ix5g_1752628387
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-ae0a3511145so421768566b.3
+        for <kvm@vger.kernel.org>; Tue, 15 Jul 2025 18:13:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752628386; x=1753233186;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/keS/EUkYyBiSPiys9/nqLBkkMQLW+p9NKDLAaBTJK4=;
+        b=qvu0tafYiqvure+mMZ3fAc1CJoIbgnFDefELs473AjsAjYMUP3XHLi1bNGeozGEGaK
+         iwOWpq+e6mCYyCEEgGB0FdSaJknqogBAw50pwNJi430VseykTVTQKKZMh6YaYnKmMAEo
+         tpQGSkgr08PAwV9iWYLuRW0F0Sq0lsQNeLS8jnw1wU8XFVthT3yXRD49A4QPPpFo/W5A
+         LJRr7SIm8O9prLy+iYyq2Vxa4zn1v+Vd9boqRHUwwvng81njL4iTg5ny+oxwWhupt3vO
+         2jrGVt3ntRbbmkmxJMI51GYUsxudC2rk91o4UXUyJXRdabWQtuNV5/vhqoRiSBMTG9he
+         YNpw==
+X-Forwarded-Encrypted: i=1; AJvYcCUF+J3nFu047VQVZ3dkDYzWYGGgekPys0sg6HlshRMQkH75Uj9BY8fTozzx7ejOvJ5rB7U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyDON7AnZXqu07wNOF82y778oj1WazyojZOcxGRCyiqLet+0evA
+	HsKYcvQDrJE63xYwjVzdxjoAA3sNbXfm2Ji9/KT4dsoVVITPQnY+oWkkk1sCRrPL7+nsa3VvdSc
+	8YoIdVl3ak8HigIV9zx6nFghK0ZvB1Hl8fMYN/dTirFlnStJKYdtTsDR8x+QdcpKDddDPCYzN14
+	6r2VoC54P5Ia86HuZ5ZhuAZF9Q99VXsKO7dilYiIpkeA==
+X-Gm-Gg: ASbGncs9qjUMcMGBDiPKAnUUs87jJ1rN2QO4BUY6+0x04qpcBEtU2jYapYRDkXMe+f8
+	kzhjak3z3dWEdeW42+43x74h1lCJJranNpnNf6KiEv6lBo3hTlp8KiBuBbWaME8ze9U+srCJ8zQ
+	CuZOSauzG3YmEQh5acKhX6bQ==
+X-Received: by 2002:a17:907:c89d:b0:ae3:6cc8:e431 with SMTP id a640c23a62f3a-ae9c9b6c4f7mr138674866b.57.1752628386130;
+        Tue, 15 Jul 2025 18:13:06 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHUD3HiOIYDUW7hX6g4mjiRwOrmAALXXgw8/ypx88cvn2L6gXAwS9h7hC+qro3T7N25vt1Mq+1Ot39s20uVR1Y=
+X-Received: by 2002:a17:907:c89d:b0:ae3:6cc8:e431 with SMTP id
+ a640c23a62f3a-ae9c9b6c4f7mr138673666b.57.1752628385746; Tue, 15 Jul 2025
+ 18:13:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250715184622.3561598-1-kbusch@meta.com>
+References: <20250714084755.11921-1-jasowang@redhat.com>
+In-Reply-To: <20250714084755.11921-1-jasowang@redhat.com>
+From: Lei Yang <leiyang@redhat.com>
+Date: Wed, 16 Jul 2025 09:12:27 +0800
+X-Gm-Features: Ac12FXzEZyLhkQ-ZlRuaRJizHbPzC5U2b0INYQwKCqtanE6LNjchFHQweOloptQ
+Message-ID: <CAPpAL=zo2nom7=nL6y8g5N+7qR3oG+bVip1KFxCnJCu9V-M8nA@mail.gmail.com>
+Subject: Re: [PATCH net-next V2 0/3] in order support for vhost-net
+To: Jason Wang <jasowang@redhat.com>
+Cc: mst@redhat.com, eperezma@redhat.com, kvm@vger.kernel.org, 
+	virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, jonah.palmer@oracle.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jul 15, 2025 at 11:46:22AM -0700, Keith Busch wrote:
-> From: Keith Busch <kbusch@kernel.org>
-> 
-> A large DMA mapping request can loop through dma address pinning for
-> many pages. In cases where THP can not be used, the repeated vmf_insert_pfn can
-> be costly, so let the task reschedule as need to prevent CPU stalls. Failure to
-> do so has potential harmful side effects, like increased memory pressure
-> as unrelated rcu tasks are unable to make their reclaim callbacks and
-> result in OOM conditions.
-> 
->  rcu: INFO: rcu_sched self-detected stall on CPU
->  rcu:   36-....: (20999 ticks this GP) idle=b01c/1/0x4000000000000000 softirq=35839/35839 fqs=3538
->  rcu:            hardirqs   softirqs   csw/system
->  rcu:    number:        0        107            0
->  rcu:   cputime:       50          0        10446   ==> 10556(ms)
->  rcu:   (t=21075 jiffies g=377761 q=204059 ncpus=384)
-> ...
->   <TASK>
->   ? asm_sysvec_apic_timer_interrupt+0x16/0x20
->   ? walk_system_ram_range+0x63/0x120
->   ? walk_system_ram_range+0x46/0x120
->   ? pgprot_writethrough+0x20/0x20
->   lookup_memtype+0x67/0xf0
->   track_pfn_insert+0x20/0x40
->   vmf_insert_pfn_prot+0x88/0x140
->   vfio_pci_mmap_huge_fault+0xf9/0x1b0 [vfio_pci_core]
->   __do_fault+0x28/0x1b0
->   handle_mm_fault+0xef1/0x2560
->   fixup_user_fault+0xf5/0x270
->   vaddr_get_pfns+0x169/0x2f0 [vfio_iommu_type1]
->   vfio_pin_pages_remote+0x162/0x8e0 [vfio_iommu_type1]
->   vfio_iommu_type1_ioctl+0x1121/0x1810 [vfio_iommu_type1]
->   ? futex_wake+0x1c1/0x260
->   x64_sys_call+0x234/0x17a0
->   do_syscall_64+0x63/0x130
->   ? exc_page_fault+0x63/0x130
->   entry_SYSCALL_64_after_hwframe+0x4b/0x53
-> 
-> Signed-off-by: Keith Busch <kbusch@kernel.org>
+Tested this series of patches v2 with "virtio-net-pci,..,in_order=3Don",
+regression tests pass.
 
-From an RCU CPU stall-warning viewpoint, given that vaddr_get_pfns()
-invokes mmap_read_lock(), thus this code can schedule:
+Tested-by: Lei Yang <leiyang@redhat.com>
 
-Reviewed-by: Paul E. McKenney <paulmck@kernel.org>
+On Mon, Jul 14, 2025 at 4:48=E2=80=AFPM Jason Wang <jasowang@redhat.com> wr=
+ote:
+>
+> Hi all,
+>
+> This series implements VIRTIO_F_IN_ORDER support for vhost-net. This
+> feature is designed to improve the performance of the virtio ring by
+> optimizing descriptor processing.
+>
+> Benchmarks show a notable improvement. Please see patch 3 for details.
+>
+> Changes since V1:
+> - add a new patch to fail early when vhost_add_used() fails
+> - drop unused parameters of vhost_add_used_ooo()
+> - conisty nheads for vhost_add_used_in_order()
+> - typo fixes and other tweaks
+>
+> Thanks
+>
+> Jason Wang (3):
+>   vhost: fail early when __vhost_add_used() fails
+>   vhost: basic in order support
+>   vhost_net: basic in_order support
+>
+>  drivers/vhost/net.c   |  88 +++++++++++++++++++++---------
+>  drivers/vhost/vhost.c | 123 ++++++++++++++++++++++++++++++++++--------
+>  drivers/vhost/vhost.h |   8 ++-
+>  3 files changed, 171 insertions(+), 48 deletions(-)
+>
+> --
+> 2.39.5
+>
+>
 
-> ---
-> v1->v2:
-> 
->   Merged up to vfio/next
-> 
->   Moved the cond_resched() to a more appropriate place within the
->   loop, and added a comment about why it's there.
-> 
->   Update to change log describing one of the consequences of not doing
->   this.
-> 
->  drivers/vfio/vfio_iommu_type1.c | 7 +++++++
->  1 file changed, 7 insertions(+)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 1136d7ac6b597..ad599b1601711 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -647,6 +647,13 @@ static long vfio_pin_pages_remote(struct vfio_dma *dma, unsigned long vaddr,
->  
->  	while (npage) {
->  		if (!batch->size) {
-> +			/*
-> +			 * Large mappings may take a while to repeatedly refill
-> +			 * the batch, so conditionally relinquish the CPU when
-> +			 * needed to avoid stalls.
-> +			 */
-> +			cond_resched();
-> +
->  			/* Empty batch, so refill it. */
->  			ret = vaddr_get_pfns(mm, vaddr, npage, dma->prot,
->  					     &pfn, batch);
-> -- 
-> 2.47.1
-> 
 
