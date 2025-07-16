@@ -1,203 +1,155 @@
-Return-Path: <kvm+bounces-52590-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52591-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9979B07067
-	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 10:23:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 41472B0709A
+	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 10:31:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A7AB0580C7A
-	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 08:23:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7877D560F9B
+	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 08:31:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CA0A2EACF1;
-	Wed, 16 Jul 2025 08:23:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCAEE2EE979;
+	Wed, 16 Jul 2025 08:31:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="exXqPj6W"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="m+ije0PC"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB63F256C6D
-	for <kvm@vger.kernel.org>; Wed, 16 Jul 2025 08:23:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 715AB2749DB;
+	Wed, 16 Jul 2025 08:31:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752654221; cv=none; b=j6Hm1bIQ1O0GhryrP0LWXA55MPHSmAD+aS59Ng5c8cMKfL+faPtzh5jddVYfQ7YXvX/NJgvPgGh+fL+aPqg9eXWL7k89LlHG03fmGHdQ6kLCO4fDsENI0dzVdX6vF6jahZBmMxBEJSh8ESmyIkJVEzOv/KrD5w+7q6p4K6/4qDI=
+	t=1752654700; cv=none; b=s62OwU1deixQT2mQL8iiRGRS4JtNNE+57dOfWX5TfRcXSfno/7JuXAS0N9v9JFLqxgtazDH0dx3Zes+reZf+q+T4Bj7a4AfRdhswA0FSZLUtKTHWxPauk7BVua7O0aaEM5MGifEnVGJsj07hw/NIXkcTbSzTO6WPbTjyowdLjEg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752654221; c=relaxed/simple;
-	bh=paTfRGHkvf1SbD2JKx5jmgOaLo6grjWR4gpGzCvi9/Q=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=nMfi7S7TDYOmqEF2aEY1Xwjwao+yLYiv9bXcQCkHwQWGGPV02tH8uA1RbbjtuwQCGINbfZbq8K+lV7WA7HvYYWUIpmtAztWSO8XJWXB9P/L5W/182JphRMY9/ACvaAcm6DlvNOlxnc7VhMDpn+kUprU0XP8KEYIpWymrAv6KS/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=exXqPj6W; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752654215;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=STUiBIB+Th2T363ay6GOHVdT+QkghnT6vecX0DXWUeM=;
-	b=exXqPj6Wy9JdyE02Sn9DMdT9J2DR76lV62Hav/curm/CDE44nOA8CKpJ3jZhFuhfdgRzfs
-	/wgVukx0xolJfn+ZXOL9PCvdvSioGgKZkl1aPWeAqM8wwl3XUavcHTP6oNpM/E/SAi9Cjh
-	weEO+mBPaKLZ1WfMVccUP/M4gBt4cVA=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-612-41NsQrsXNwWBG8ttagMCbg-1; Wed,
- 16 Jul 2025 04:23:32 -0400
-X-MC-Unique: 41NsQrsXNwWBG8ttagMCbg-1
-X-Mimecast-MFC-AGG-ID: 41NsQrsXNwWBG8ttagMCbg_1752654210
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 23F491800366;
-	Wed, 16 Jul 2025 08:23:30 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.45.242.6])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8355F1955F16;
-	Wed, 16 Jul 2025 08:23:29 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id D3D1D21E6A27; Wed, 16 Jul 2025 10:23:26 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-Cc: qemu-devel@nongnu.org,  Alex =?utf-8?Q?Benn=C3=A9e?=
- <alex.bennee@linaro.org>,  Paolo
- Bonzini <pbonzini@redhat.com>,  Pierrick Bouvier
- <pierrick.bouvier@linaro.org>,  kvm@vger.kernel.org,  Richard Henderson
- <richard.henderson@linaro.org>,  Zhao Liu <zhao1.liu@intel.com>,  Eduardo
- Habkost <eduardo@habkost.net>,  Marcel Apfelbaum
- <marcel.apfelbaum@gmail.com>,  Yanan Wang <wangyanan55@huawei.com>,  Eric
- Blake <eblake@redhat.com>,  Michael Roth <michael.roth@amd.com>,  Daniel
- P. =?utf-8?Q?Berrang=C3=A9?= <berrange@redhat.com>
-Subject: Re: [PATCH v5 28/69] qapi: Move definitions related to accelerators
- in their own file
-In-Reply-To: <db0b2ce0-e702-4f32-b284-29cccc8d67ba@linaro.org> ("Philippe
-	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Thu, 3 Jul 2025 18:42:06
- +0200")
-References: <20250703105540.67664-1-philmd@linaro.org>
-	<20250703105540.67664-29-philmd@linaro.org>
-	<db0b2ce0-e702-4f32-b284-29cccc8d67ba@linaro.org>
-Date: Wed, 16 Jul 2025 10:23:26 +0200
-Message-ID: <877c08wnlt.fsf@pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1752654700; c=relaxed/simple;
+	bh=M8tEAX0g/+FHjCYjptDJd+fCfcSOLCtDuZhA2so9Vs8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jhExvWQqqFt0hyF4XSVL8X5Mpdwagncqo6hpDld6+nKQ2xxLP6w0j+Z96pu/g56sPRYtFpehKAu3O77HrpAJ8IFy0Ngb/s9ADGrQDD5wRNo3GuwKhIu/r7LiY78IKspZOChBdl85Y7SsxxEhZxTgUOM3ltlGZwjkLsIiJZKlnH4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=m+ije0PC; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1752654698; x=1784190698;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=M8tEAX0g/+FHjCYjptDJd+fCfcSOLCtDuZhA2so9Vs8=;
+  b=m+ije0PCXiTk3aCEYB1z5NPshRBpc/6hI16sqSR023mTZisrBMD34m6X
+   /YdlJRY/JByZJiyL+l0eIjpRaiXzZDapQAm83UE+gjAZhu4TrmjNlOwy+
+   nScbY49kke/0VMigr2jZNb8zHbFhApL+ztSz/MAyYKW0kU/nKfJJTBBXY
+   imoNjMgECJ+IsOE697hWKQ7p4js9thiWuqGn40yRsCkUFyscskP7lb+Vi
+   LB0EQMu+P1w/yXlxF8FhnmeX7mU6G+fineinWjNyr46Y98L7Hm8HLg00o
+   dGSjauY7IdZrBo5bKBh/diT/t0CwZjB6rG9BdG0GLJ2vSKk7WtvaPFFnv
+   w==;
+X-CSE-ConnectionGUID: XP0hD86kRMGdbkfQ4MUwGA==
+X-CSE-MsgGUID: 6KPrFpDFQwqlxgoK5x9yGg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11493"; a="65955342"
+X-IronPort-AV: E=Sophos;i="6.16,315,1744095600"; 
+   d="scan'208";a="65955342"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jul 2025 01:31:33 -0700
+X-CSE-ConnectionGUID: nVOQ/N/PSSSwhIizbLv+DA==
+X-CSE-MsgGUID: O80dBXWoQ8GoQDCI749OMQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,315,1744095600"; 
+   d="scan'208";a="162986525"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
+  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jul 2025 01:31:18 -0700
+Message-ID: <418ddbbd-c25e-4047-9317-c05735e02807@intel.com>
+Date: Wed, 16 Jul 2025 16:31:15 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v14 02/21] KVM: Rename CONFIG_KVM_GENERIC_PRIVATE_MEM to
+ CONFIG_KVM_GENERIC_GMEM_POPULATE
+To: Fuad Tabba <tabba@google.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org,
+ kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org,
+ mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com,
+ palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com,
+ viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org,
+ akpm@linux-foundation.org, yilun.xu@intel.com, chao.p.peng@linux.intel.com,
+ jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com,
+ isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz,
+ vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name,
+ david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com,
+ liam.merwick@oracle.com, isaku.yamahata@gmail.com,
+ kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com,
+ steven.price@arm.com, quic_eberman@quicinc.com, quic_mnalajal@quicinc.com,
+ quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com,
+ quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com,
+ quic_pheragu@quicinc.com, catalin.marinas@arm.com, james.morse@arm.com,
+ yuzenghui@huawei.com, oliver.upton@linux.dev, maz@kernel.org,
+ will@kernel.org, qperret@google.com, keirf@google.com, roypat@amazon.co.uk,
+ shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, rientjes@google.com,
+ jhubbard@nvidia.com, fvdl@google.com, hughd@google.com,
+ jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com,
+ ira.weiny@intel.com
+References: <20250715093350.2584932-1-tabba@google.com>
+ <20250715093350.2584932-3-tabba@google.com>
+ <a4091b13-9c3b-48bf-a7f6-f56868224cf5@intel.com>
+ <CA+EHjTy5zUJt5n5N1tRyHUQN6-P6CPqyC7+6Zqhokx-3=mvx+A@mail.gmail.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <CA+EHjTy5zUJt5n5N1tRyHUQN6-P6CPqyC7+6Zqhokx-3=mvx+A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org> writes:
+On 7/16/2025 4:11 PM, Fuad Tabba wrote:
+> On Wed, 16 Jul 2025 at 05:09, Xiaoyao Li<xiaoyao.li@intel.com> wrote:
+>> On 7/15/2025 5:33 PM, Fuad Tabba wrote:
+>>> The original name was vague regarding its functionality. This Kconfig
+>>> option specifically enables and gates the kvm_gmem_populate() function,
+>>> which is responsible for populating a GPA range with guest data.
+>> Well, I disagree.
+>>
+>> The config KVM_GENERIC_PRIVATE_MEM was introduced by commit 89ea60c2c7b5
+>> ("KVM: x86: Add support for "protected VMs" that can utilize private
+>> memory"), which is a convenient config for vm types that requires
+>> private memory support, e.g., SNP, TDX, and KVM_X86_SW_PROTECTED_VM.
+>>
+>> It was commit e4ee54479273 ("KVM: guest_memfd: let kvm_gmem_populate()
+>> operate only on private gfns") that started to use
+>> CONFIG_KVM_GENERIC_PRIVATE_MEM gates kvm_gmem_populate() function. But
+>> CONFIG_KVM_GENERIC_PRIVATE_MEM is not for kvm_gmem_populate() only.
+>>
+>> If using CONFIG_KVM_GENERIC_PRIVATE_MEM to gate kvm_gmem_populate() is
+>> vague and confusing, we can introduce KVM_GENERIC_GMEM_POPULATE to gate
+>> kvm_gmem_populate() and select KVM_GENERIC_GMEM_POPULATE under
+>> CONFIG_KVM_GENERIC_PRIVATE_MEM.
+>>
+>> Directly replace CONFIG_KVM_GENERIC_PRIVATE_MEM with
+>> KVM_GENERIC_GMEM_POPULATE doesn't look correct to me.
+> I'll quote David's reply to an earlier version of this patch [*]:
 
-> Hi Markus,
+It's not related to my concern.
 
-I missed this one, sorry!
+My point is that CONFIG_KVM_GENERIC_PRIVATE_MEM is used for selecting 
+the private memory support. Rename it to KVM_GENERIC_GMEM_POPULATE is 
+not correct.
 
-> On 3/7/25 12:54, Philippe Mathieu-Daud=C3=A9 wrote:
->> Extract TCG and KVM definitions from machine.json to accelerator.json.
->> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org>
->> Reviewed-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
->> Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
+Current code uses CONFIG_KVM_GENERIC_PRIVATE_MEM to gate 
+kvm_gmem_populate() because kvm_gmem_populate() requires both gmem and 
+memory attributes support and CONFIG_KVM_GENERIC_PRIVATE_MEM can ensure 
+it. But CONFIG_KVM_GENERIC_PRIVATE_MEM was not only for gating 
+kvm_gmem_populate().
 
-[...]
-
->> diff --git a/qapi/accelerator.json b/qapi/accelerator.json
->> new file mode 100644
->> index 00000000000..00d25427059
->> --- /dev/null
->> +++ b/qapi/accelerator.json
->> @@ -0,0 +1,57 @@
->> +# -*- Mode: Python -*-
->> +# vim: filetype=3Dpython
->> +#
->> +# SPDX-License-Identifier: GPL-2.0-or-later
->> +
->> +##
->> +# =3D Accelerators
->> +##
->> +
->> +{ 'include': 'common.json' }
->
-> common.json defines @HumanReadableText, ...
->
-> [...]
->
->> +##
->> +# @x-query-jit:
->> +#
->> +# Query TCG compiler statistics
->> +#
->> +# Features:
->> +#
->> +# @unstable: This command is meant for debugging.
->> +#
->> +# Returns: TCG compiler statistics
->> +#
->> +# Since: 6.2
->> +##
->> +{ 'command': 'x-query-jit',
->> +  'returns': 'HumanReadableText',
->> +  'if': 'CONFIG_TCG',
->
-> ... which is *optionally* used here, triggering when
-> TCG is not built in:
->
-> qapi/qapi-commands-accelerator.c:85:13: error: =E2=80=98qmp_marshal_outpu=
-t_HumanReadableText=E2=80=99 defined but not used [-Werror=3Dunused-functio=
-n]
->    85 | static void qmp_marshal_output_HumanReadableText(HumanReadableTex=
-t *ret_in,
->       |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> cc1: all warnings being treated as errors
-
-This is a defect in the QAPI code generator.  More below.
-
-> We previously discussed that issue:
-> https://mail.gnu.org/archive/html/qemu-devel/2021-06/msg02667.html
->
-> where you said:
->
-> "conditional commands returning an unconditional type is a bit
-> of a code smell". Is it however a "non-smelly instances of this pattern"?
-
-The instance discussed there wasn't.
-
-You ran into it when you made TPM commands conditional on CONFIG_TPM
-without also making the types they return conditional.  The proper
-solution was to make the types conditional, too.  Avoided generating
-dead code.  I told you "The user is responsible for making T's 'if' the
-conjunction of the commands'."
-
-Some of the commands returning HumanReadableText are unconditional, so
-said conjunction is also unconditional.  So how do we end up with unused
-qmp_marshal_output_HumanReadableText()?
-
-A qmp_marshal_output_T() is only ever called by qmp_marshal_C() for a
-command C that returns T.
-
-We've always generated it as a static function on demand, i.e. when we
-generate a call.
-
-Since we split up monolithic generated code into modules, we do this on
-per module.  This can result in identical (static)
-qmp_marshal_output_T() in several modules.  Fine, but we haven't
-considered conditionals, yet.
-
-As long as all functions returning T are in the same module, "making T's
-'if' the conjunction of the commands'" works.  This is the case for the
-TPM commands.
-
-However, it need not work when the functions returning T are in multiple
-modules.  For each module, we need the conjunction of that module's
-commands' conditions.  We can't make it T's condition unless they are
-all the same.  They aren't for HumanReadableText, as you found out.
-
-I need to ponder this to decide on a solution.
-
-Thanks!
+>>> I'm curious what generic means in this name?
+>> That an architecture wants to use the generic version and not provide
+>> it's own alternative implementation.
+>>
+>> We frequently use that term in this context, see GENERIC_IOREMAP as one
+>> example.
+> [*]https://lore.kernel.org/all/b6355951-5f9d-4ca9-850f-79e767d8caa2@redhat.com/
+> 
+> Thanks,
+> /fuad
 
 
