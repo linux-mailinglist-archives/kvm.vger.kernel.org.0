@@ -1,96 +1,92 @@
-Return-Path: <kvm+bounces-52662-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52663-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D244B07ED1
-	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 22:23:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77E14B07ED3
+	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 22:24:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C88EA42EDD
-	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 20:23:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 71421A437CB
+	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 20:23:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AF192BFC7B;
-	Wed, 16 Jul 2025 20:23:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D899C2C08DC;
+	Wed, 16 Jul 2025 20:24:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DP/AWZ3Y"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ConPimHK"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ED9727EFEF
-	for <kvm@vger.kernel.org>; Wed, 16 Jul 2025 20:23:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B37B27EFEF
+	for <kvm@vger.kernel.org>; Wed, 16 Jul 2025 20:24:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752697426; cv=none; b=QJddsCpEBeM9UZlkYXkfzfv/fvD5cbnYBuuGf1XOxvWlR3BP1odywRgG1RtjlLYZx/mQe3JTItwAp4pNQ8Ptval50eGYt8Cu5MpY8P08j2IEM9LyTfAztIXt/AK3Hg6Aj4NPEuEoVyacYHJ/sSXEMwZBsZ6+3T6OB8xN9kZdKnI=
+	t=1752697451; cv=none; b=LuOtN6Ij0VNm2EQY2gMZY9haKRc6VwKEFE3X2R0dh8/xynThTMGqSo73CfYiN5YiG+L+i0uGM0cNcx31+TBYHkm9t/gvbiUoI1c0panSkRCMOJzP+n85IeX+wzz5WhtwTP6j7y8JXeUwvN1ays3r9Q13ucwPAKB9R7JQsrPuUeo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752697426; c=relaxed/simple;
-	bh=9y5dIKyKcHriMVF+KPx9heA9eZVH1cEEVWtkW4af3I4=;
+	s=arc-20240116; t=1752697451; c=relaxed/simple;
+	bh=OWwOEwoL4c/cHl9tlOPdM7T7kTDMxYThoiSS5XwyRkw=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=L3xGAZ3JAB8b5S1dzDeQsFZVJpawzWOCC5mJsCyvmiyYvdDsY6iRRl/hekjfRYlwsze/VXZcB9xTgpico+WxpcJvvdarNDSq8pYg/frcFSRXY8Rlvxh0XuLIyWJ8rl1pdgOL58T/ZHsoUwiSz57GcrfIw/3cP+ukb+vy7kelM4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DP/AWZ3Y; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version:Content-Type; b=WJ/ytoQf13IRwCEkHxDsAPxBiFQY0rP/WmbZa7xrUCmXifbpc+GN6sYNgayN4ynCTxHaqKt17Xso7jS1rMjLdrwW7+sIKFIy6Zff5fPLZ55iQigshBN89ZCGFex4NeptbioZCKhtwuyhvVp12qaSY8dkHSoArN7dh8pEO0R6/QU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ConPimHK; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752697422;
+	s=mimecast20190719; t=1752697448;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=My5jpWLBkASAD4KArmdY125PUanYXYQ2hsJPAgTrsRo=;
-	b=DP/AWZ3Y9mwrhVjCcSBQFhSCNveiLVYIGozaJD78LWtDPrZOhAxIIVBK/HzE25RUJY9yK2
-	QVpZS6Apjgk09aFKGcRvk8MFNDsKgE7KsElHNYhL54uZDCO7XQmMj7IY6dd5yJMpOhBj5m
-	mxc2tu8IUnJYkgCZR5cwngdQusFAbH0=
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
- [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=fPvdI3YhlO9GI6rBP8ySVGpgSYgi0LJtZ9QTwrrpP/g=;
+	b=ConPimHK8z3teBZr/hzOQhU4Mqj63QGYUiMZTvMQY2op1PKF648w1wDITirnkthpdPgraY
+	F2+cUN/x4hmMt5y1tGIaM6X3kq9DSDS7dxTpeMK9jYrfKMKd9lkfVxGseKWqg/u9vufzke
+	MnnPWLnvzBdrFLoR+bXqF8apBYYbNuY=
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
+ [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-210-oCbPWmZqPL2XQ6sIXLMh5Q-1; Wed, 16 Jul 2025 16:23:40 -0400
-X-MC-Unique: oCbPWmZqPL2XQ6sIXLMh5Q-1
-X-Mimecast-MFC-AGG-ID: oCbPWmZqPL2XQ6sIXLMh5Q_1752697420
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3df410b6753so404935ab.2
-        for <kvm@vger.kernel.org>; Wed, 16 Jul 2025 13:23:40 -0700 (PDT)
+ us-mta-630-WC9d_bhJP4OOWNckmWkH7A-1; Wed, 16 Jul 2025 16:24:05 -0400
+X-MC-Unique: WC9d_bhJP4OOWNckmWkH7A-1
+X-Mimecast-MFC-AGG-ID: WC9d_bhJP4OOWNckmWkH7A_1752697444
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-86cf14fd106so5466739f.2
+        for <kvm@vger.kernel.org>; Wed, 16 Jul 2025 13:24:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752697419; x=1753302219;
+        d=1e100.net; s=20230601; t=1752697444; x=1753302244;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=My5jpWLBkASAD4KArmdY125PUanYXYQ2hsJPAgTrsRo=;
-        b=cTPDWdJIJowuo3dFTVXJ76ChhaZl+7c3yZF+kpCJPLrlq62d0n6j4+t0MOFCVuTfYK
-         EyXvD97SoqIaO8ELbjbmbr0GJ9ezyDLlLDKAiDuNbarB6FQXHYM+5Jt5Za5Tq+xzX9dm
-         ww9KadiEHpDLuk7P8nEORQ6QVkeltCU9ckQ2Puu0RP1V6zOD9xq9LnkJp/QHfHwI3qNf
-         b3MF9AHKjA0aPL1Feeu2dpVaUmsA4OlSdXhy7EVGyWvgyBUgwf2XbEYtE4QANDmJeUbO
-         ZjVqxilVxqL2YjLwglHKZ3PqSWiEtqVtUP0oyAD7KcNO+XAIl9Ha+keQEgfq1zgAr+f1
-         Iv6g==
-X-Forwarded-Encrypted: i=1; AJvYcCWn3pGh7NdnZLWRLj1fi1UArH0DuTHF8FE5Q6NCVmnHaY/TDCqR+ucTpcWB3OnGDOdlXmQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyzgab9hy/ncpcKcOuwIb94Px0E7ULsxRwyagYNRAUH595/uYDj
-	EkkM5jh3JI66LraUI2iy2xKwEa8G5zP/IO6jKJ/z2eC3A+fCAGSpHFNjF0MUyuiZZFepw/RLipB
-	hi4Rz5PpZAzS1mnTdyNfAILiXLLEh8N+Nwq+mpFnZGSSX7CJ2io0/3a1W9o4Acw==
-X-Gm-Gg: ASbGncsFP1bxA5b4NxFIzsEXP5FPJBdELZLxl6UKwcG38ryVtNNAPn73o1J3438ftzS
-	8zi05OMFdvBqhq15dM955GI3GsAO9gqbY4OqAd0ojPWLGvzTe4SSRYLOiPvBkclraz+uoRtJ9zi
-	/N5oVSKRFzKsmTQqa+5Mgs6+BLHn2QZz3UGbFVOKOBsxQ2T4yta5I7rmSUFPkVi3ORVfZv4vHsq
-	mKz8KnYim660Nt3B7YuVgXATgT6lc8zk3ynY8VziIkTe8twFZv3U6kSYGGiTQtbLnaAHeBXe90y
-	/y1EqMtF/QAuFFnCs6vgvn7P7DUe/kojsntKs/j3ER8=
-X-Received: by 2002:a05:6e02:19c7:b0:3dd:c947:b3a7 with SMTP id e9e14a558f8ab-3e28248636amr13309475ab.5.1752697419360;
-        Wed, 16 Jul 2025 13:23:39 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGMl6y7UqY2FBdwuRnrCWvwt+QUeVsLSVmif96lmdg75vZtFWDA98rR4kL8WbkV9VEitm+gsw==
-X-Received: by 2002:a05:6e02:19c7:b0:3dd:c947:b3a7 with SMTP id e9e14a558f8ab-3e28248636amr13309375ab.5.1752697418882;
-        Wed, 16 Jul 2025 13:23:38 -0700 (PDT)
+        bh=fPvdI3YhlO9GI6rBP8ySVGpgSYgi0LJtZ9QTwrrpP/g=;
+        b=pxEwY8hUJVDfEKIyPe/MlaUJiaEayvZO8QxJEf2Ftg6Vv5idaajFau6FX2Z2RYQ3A5
+         Ira1NFtFvouE1/pf2WRHk9m4ol/5Keo63C8soW4nn3wyhJLdBb1jTW2ee4v1Kv5drePP
+         4E7NBS0lxnXacmuw6yBAygqVcEVeVkByrZTh9b957ObNGqkT8RaaTU6xvFjIb7WUKZrB
+         sGv7CGoefULtv96w3QwDsefzX4zTmEqWIHtjAN63MgFF0aTkHMEpwDPp7WBi3taERW5e
+         Xp+G7rS8zKVfV3A3/TImDubyKjpI1gQ9OZ4kBS3FQlvIMEibW2s6a2zJ708JaGIvnraA
+         3pig==
+X-Gm-Message-State: AOJu0YzGD00+0Rsi8U0iId+nPevhwNls9IO1NolEac0eCbzjTpDvVpFv
+	nyu+XsKeJowclysPCl4pR7jIO5seLbYneASkYvdbSy/yKmoQ+VGa0EoxQMraOOxerfxU9j7JRTJ
+	QSA01/l/HGXlrWT/TEgZFf6I02y2AnTf2nKnvgvLfld3/HL664ls16w==
+X-Gm-Gg: ASbGncvgGWg6ckfI76uvgFxPTTxIOrF954yij5MnuVLa721fI76xPPU8P1AVxnmVjrX
+	WcD7clEK4l3Z24YiIVfx+y2iOkOh3lTIFn7suen4a5NXC5vS+xApJRbspWbfCQ68AN6+5tXd+Jy
+	nMm8pyS2GH8xC3lznE29myB0rWv3gGLAkNz4QJ27LbloP0K4S+oQ9vMLSFC0uJIeYU+TThpwUL8
+	0xvju9PlFtMttqVCpg7bb343tiW46XE9Kbt3JSTZbQbecx3NsUnac8TtQY573Ie3DFePl9Q8cVt
+	tJaDKVPJ5YZeqjKWNiYBcNEUDiMhsD9O0/FFArhCMwo=
+X-Received: by 2002:a05:6602:2c93:b0:876:6fc6:1358 with SMTP id ca18e2360f4ac-879c090005fmr159784439f.4.1752697443991;
+        Wed, 16 Jul 2025 13:24:03 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFQM57KH4/hrYzJ2qXCdt8qoMrmX+6pQyjYsFU6u0/Mwn4A6JffpiIcPzJ2oqyc3L8xzdEkFQ==
+X-Received: by 2002:a05:6602:2c93:b0:876:6fc6:1358 with SMTP id ca18e2360f4ac-879c090005fmr159783739f.4.1752697443521;
+        Wed, 16 Jul 2025 13:24:03 -0700 (PDT)
 Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3e246134e8fsm48302815ab.22.2025.07.16.13.23.37
+        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-879c3419538sm52469639f.19.2025.07.16.13.24.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Jul 2025 13:23:38 -0700 (PDT)
-Date: Wed, 16 Jul 2025 14:23:37 -0600
+        Wed, 16 Jul 2025 13:24:02 -0700 (PDT)
+Date: Wed, 16 Jul 2025 14:24:01 -0600
 From: Alex Williamson <alex.williamson@redhat.com>
-To: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
-Cc: jgg@ziepe.ca, yishaih@nvidia.com, shameerali.kolothum.thodi@huawei.com,
- kevin.tian@intel.com, linux-crypto@vger.kernel.org, qat-linux@intel.com,
- kvm@vger.kernel.org, herbert@gondor.apana.org.au,
- giovanni.cabiddu@intel.com
-Subject: Re: [PATCH] vfio/qat: add support for intel QAT 6xxx virtual
- functions
-Message-ID: <20250716142337.64ba908d.alex.williamson@redhat.com>
-In-Reply-To: <20250715081150.1244466-1-suman.kumar.chakraborty@intel.com>
-References: <20250715081150.1244466-1-suman.kumar.chakraborty@intel.com>
+To: Keith Busch <kbusch@meta.com>
+Cc: <kvm@vger.kernel.org>, <linux-pci@vger.kernel.org>,
+ <paulmck@kernel.org>, Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCHv2] vfio/type1: conditional rescheduling while pinning
+Message-ID: <20250716142401.3104ee01.alex.williamson@redhat.com>
+In-Reply-To: <20250715184622.3561598-1-kbusch@meta.com>
+References: <20250715184622.3561598-1-kbusch@meta.com>
 X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -98,54 +94,82 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, 15 Jul 2025 09:11:50 +0100
-Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com> wrote:
+On Tue, 15 Jul 2025 11:46:22 -0700
+Keith Busch <kbusch@meta.com> wrote:
 
-> From: Ma=C5=82gorzata Mielnik <malgorzata.mielnik@intel.com>
->=20
-> Extend the qat_vfio_pci variant driver to support QAT 6xxx Virtual
-> Functions (VFs). Add the relevant QAT 6xxx VF device IDs to the driver's
-> probe table, enabling proper detection and initialization of these device=
-s.
->=20
-> Update the module description to reflect that the driver now supports all
-> QAT generations.
->=20
-> Signed-off-by: Ma=C5=82gorzata Mielnik <malgorzata.mielnik@intel.com>
-> Signed-off-by: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
-> Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+> From: Keith Busch <kbusch@kernel.org>
+> 
+> A large DMA mapping request can loop through dma address pinning for
+> many pages. In cases where THP can not be used, the repeated vmf_insert_pfn can
+> be costly, so let the task reschedule as need to prevent CPU stalls. Failure to
+> do so has potential harmful side effects, like increased memory pressure
+> as unrelated rcu tasks are unable to make their reclaim callbacks and
+> result in OOM conditions.
+> 
+>  rcu: INFO: rcu_sched self-detected stall on CPU
+>  rcu:   36-....: (20999 ticks this GP) idle=b01c/1/0x4000000000000000 softirq=35839/35839 fqs=3538
+>  rcu:            hardirqs   softirqs   csw/system
+>  rcu:    number:        0        107            0
+>  rcu:   cputime:       50          0        10446   ==> 10556(ms)
+>  rcu:   (t=21075 jiffies g=377761 q=204059 ncpus=384)
+> ...
+>   <TASK>
+>   ? asm_sysvec_apic_timer_interrupt+0x16/0x20
+>   ? walk_system_ram_range+0x63/0x120
+>   ? walk_system_ram_range+0x46/0x120
+>   ? pgprot_writethrough+0x20/0x20
+>   lookup_memtype+0x67/0xf0
+>   track_pfn_insert+0x20/0x40
+>   vmf_insert_pfn_prot+0x88/0x140
+>   vfio_pci_mmap_huge_fault+0xf9/0x1b0 [vfio_pci_core]
+>   __do_fault+0x28/0x1b0
+>   handle_mm_fault+0xef1/0x2560
+>   fixup_user_fault+0xf5/0x270
+>   vaddr_get_pfns+0x169/0x2f0 [vfio_iommu_type1]
+>   vfio_pin_pages_remote+0x162/0x8e0 [vfio_iommu_type1]
+>   vfio_iommu_type1_ioctl+0x1121/0x1810 [vfio_iommu_type1]
+>   ? futex_wake+0x1c1/0x260
+>   x64_sys_call+0x234/0x17a0
+>   do_syscall_64+0x63/0x130
+>   ? exc_page_fault+0x63/0x130
+>   entry_SYSCALL_64_after_hwframe+0x4b/0x53
+> 
+> Signed-off-by: Keith Busch <kbusch@kernel.org>
 > ---
->  drivers/vfio/pci/qat/main.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->=20
-> diff --git a/drivers/vfio/pci/qat/main.c b/drivers/vfio/pci/qat/main.c
-> index 845ed15b6771..499c9e1d67ee 100644
-> --- a/drivers/vfio/pci/qat/main.c
-> +++ b/drivers/vfio/pci/qat/main.c
-> @@ -675,6 +675,8 @@ static const struct pci_device_id qat_vf_vfio_pci_tab=
-le[] =3D {
->  	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_INTEL, 0x4941) },
->  	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_INTEL, 0x4943) },
->  	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_INTEL, 0x4945) },
-> +	/* Intel QAT GEN6 6xxx VF device */
-> +	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_INTEL, 0x4949) },
->  	{}
->  };
->  MODULE_DEVICE_TABLE(pci, qat_vf_vfio_pci_table);
-> @@ -696,5 +698,5 @@ module_pci_driver(qat_vf_vfio_pci_driver);
-> =20
->  MODULE_LICENSE("GPL");
->  MODULE_AUTHOR("Xin Zeng <xin.zeng@intel.com>");
-> -MODULE_DESCRIPTION("QAT VFIO PCI - VFIO PCI driver with live migration s=
-upport for Intel(R) QAT GEN4 device family");
-> +MODULE_DESCRIPTION("QAT VFIO PCI - VFIO PCI driver with live migration s=
-upport for Intel(R) QAT device family");
->  MODULE_IMPORT_NS("CRYPTO_QAT");
->=20
-> base-commit: bfeda8f971d01d0c1d0e3f4cf9d4e2b0a2b09d89
+> v1->v2:
+> 
+>   Merged up to vfio/next
+> 
+>   Moved the cond_resched() to a more appropriate place within the
+>   loop, and added a comment about why it's there.
+> 
+>   Update to change log describing one of the consequences of not doing
+>   this.
+> 
+>  drivers/vfio/vfio_iommu_type1.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> index 1136d7ac6b597..ad599b1601711 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -647,6 +647,13 @@ static long vfio_pin_pages_remote(struct vfio_dma *dma, unsigned long vaddr,
+>  
+>  	while (npage) {
+>  		if (!batch->size) {
+> +			/*
+> +			 * Large mappings may take a while to repeatedly refill
+> +			 * the batch, so conditionally relinquish the CPU when
+> +			 * needed to avoid stalls.
+> +			 */
+> +			cond_resched();
+> +
+>  			/* Empty batch, so refill it. */
+>  			ret = vaddr_get_pfns(mm, vaddr, npage, dma->prot,
+>  					     &pfn, batch);
 
 Applied to vfio next branch for v6.17.  Thanks,
 
