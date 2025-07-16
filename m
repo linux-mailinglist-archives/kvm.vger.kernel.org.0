@@ -1,155 +1,110 @@
-Return-Path: <kvm+bounces-52648-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52650-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4921B07B17
-	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 18:24:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 505C1B07B7E
+	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 18:49:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E53B3BD134
-	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 16:24:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 87DB84A4149
+	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 16:48:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E1DD2F548A;
-	Wed, 16 Jul 2025 16:24:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20A932F549F;
+	Wed, 16 Jul 2025 16:48:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="YdrDG6Nv"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="XdKcKA4x"
 X-Original-To: kvm@vger.kernel.org
-Received: from forwardcorp1d.mail.yandex.net (forwardcorp1d.mail.yandex.net [178.154.239.200])
+Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D0F02F3C3E;
-	Wed, 16 Jul 2025 16:24:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B73EA2F5499
+	for <kvm@vger.kernel.org>; Wed, 16 Jul 2025 16:48:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752683070; cv=none; b=IU7rXkQNA4lauaUZmlPuazYmY7TNtHPlBS4rqfQYSodrRmGm4xwkhyjGWZ/LGCbQfX2SX2hmxT+Vb2I1rEq2GJ0oOFGuHGR5qp5nLdGC3UOV8V3ygHIeLk2f/TFxK6n2YovSEutplzHFOxGmGAR5a00gqC2oSi7itAqJhExD61w=
+	t=1752684509; cv=none; b=e9+f4v62YweIGGzIF3eFkeAOMiJWio8pe1BUmkdSbiPnQghgVjqR/wNqzGrqar60W3MHyMgw6XE/GxsgaM21/W+0saIfg+48AMhBOsfGUe2s2x9lgAO6IkTQXI0Okme5ZQmu+lEhZrvqbqy69q5afiklwcBM7BQFdZIZ/UlmMh4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752683070; c=relaxed/simple;
-	bh=kVoWv3/iwWNxGI8jNRCZPVMbIMQrh2BMtxaTtjHOzdA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=A03xwgHOlMIxSBtV8loomCdf0ShHrID1TYumq9ne0FXyr+aEqy2EVRfMH8xK09c8HXdHaNmypEu4CXAfZO0Nzw7q70Z9d4cRSNgfABU3WX6lPV6k2mYex7fPVOSBAWERVqTcGSFJ4a/6BGpZGd3w15iKanXzv5qLqEvlONTFzPE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex-team.ru; spf=pass smtp.mailfrom=yandex-team.ru; dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b=YdrDG6Nv; arc=none smtp.client-ip=178.154.239.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex-team.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex-team.ru
-Received: from mail-nwsmtp-smtp-corp-main-56.klg.yp-c.yandex.net (mail-nwsmtp-smtp-corp-main-56.klg.yp-c.yandex.net [IPv6:2a02:6b8:c42:d42b:0:640:f3fc:0])
-	by forwardcorp1d.mail.yandex.net (Yandex) with ESMTPS id 5A3C060AFE;
-	Wed, 16 Jul 2025 19:22:56 +0300 (MSK)
-Received: from kniv-nix.yandex-team.ru (unknown [2a02:6bf:8080:a75::1:7])
-	by mail-nwsmtp-smtp-corp-main-56.klg.yp-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id nMP7Db0GwW20-oO643L00;
-	Wed, 16 Jul 2025 19:22:55 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
-	s=default; t=1752682975;
-	bh=/lRCgvKC2NqnnCP6neakgrl2Mgl3BpNaQQjJ8bFZqVM=;
-	h=Message-Id:Date:Cc:Subject:To:From;
-	b=YdrDG6NvtUApDy+jUsqDv7peLcj/w2Jxu3hDLFaZWAk1fINhDPP+RynnBH4Z/MdKI
-	 Kmm90wBRxeiJWZCCI+UmC06pOQVwG+qJSQjZtw2ks8bNqWeqo22q3diIWf5R/HvODm
-	 XoJC15jJgqoVUVeAhtnCNdOpPxpbG6+jCjup6MHw=
-Authentication-Results: mail-nwsmtp-smtp-corp-main-56.klg.yp-c.yandex.net; dkim=pass header.i=@yandex-team.ru
-From: Nikolay Kuratov <kniv@yandex-team.ru>
-To: linux-kernel@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	virtualization@lists.linux.dev,
+	s=arc-20240116; t=1752684509; c=relaxed/simple;
+	bh=XCVfG6ZkyVEDKGlKSVWf2BHFHJKjwS7JtldMWSV4aFE=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=a9yteIXOeHCJtIDF4gSh/JUG7dlx2E9i/NyxZToPeGSvL5WxyFJBcj1MxDTMMQBP6NG79wPxuvGt99465smCdIwMvVioecBInPbHLPYsCu391Qt8ZdjPerAdq+lboOyktil0v8S61KeY0SxEMUYLUAYNlPCvQZidMbtdCI6GV8I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=XdKcKA4x; arc=none smtp.client-ip=95.215.58.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1752684491;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PwYPcyN5ffSu6lALOEsqaBZ3FmFPW1VuXsd8RNbGzSg=;
+	b=XdKcKA4xgGAt3A6fo5ngf0BR2gFrXXau0lYlMPXtXv9fYNMeizRPx3BtirSZpS3Fzgynj7
+	94v5kU/L4aZtL1RqBkHuVCRMQfi+xtp5en5lP2iI/fY8rneDjz1X5UlO8r7p6GHre0GYWb
+	eXt/1pnHJ1oMb5UESn8dFTRn4WUa3So=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
 	kvm@vger.kernel.org,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-	Nikolay Kuratov <kniv@yandex-team.ru>,
-	stable@vger.kernel.org,
-	Andrey Ryabinin <arbn@yandex-team.com>,
-	Andrey Smetanin <asmetanin@yandex-team.ru>
-Subject: [PATCH] vhost/net: Replace wait_queue with completion in ubufs reference
-Date: Wed, 16 Jul 2025 19:22:43 +0300
-Message-Id: <20250716162243.1401676-1-kniv@yandex-team.ru>
-X-Mailer: git-send-email 2.34.1
+	Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH 00/11] KVM: arm64: nv: Userspace register visibility fixes
+Date: Wed, 16 Jul 2025 09:47:53 -0700
+Message-Id: <175268446557.2457435.15867128559478190522.b4-ty@linux.dev>
+In-Reply-To: <20250714122634.3334816-1-maz@kernel.org>
+References: <20250714122634.3334816-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-When operating on struct vhost_net_ubuf_ref, the following execution
-sequence is theoretically possible:
-CPU0 is finalizing DMA operation                   CPU1 is doing VHOST_NET_SET_BACKEND
-                             // &ubufs->refcount == 2
-vhost_net_ubuf_put()                               vhost_net_ubuf_put_wait_and_free(oldubufs)
-                                                     vhost_net_ubuf_put_and_wait()
-                                                       vhost_net_ubuf_put()
-                                                         int r = atomic_sub_return(1, &ubufs->refcount);
-                                                         // r = 1
-int r = atomic_sub_return(1, &ubufs->refcount);
-// r = 0
-                                                      wait_event(ubufs->wait, !atomic_read(&ubufs->refcount));
-                                                      // no wait occurs here because condition is already true
-                                                    kfree(ubufs);
-if (unlikely(!r))
-  wake_up(&ubufs->wait);  // use-after-free
+On Mon, 14 Jul 2025 13:26:23 +0100, Marc Zyngier wrote:
+> Peter recently pointed out that we don't expose the EL2 GICv3
+> registers in a consistent manner, as they are presented through the
+> ONE_REG interface instead of KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS, despite
+> the latter already exposing the EL1 GICv3 regs.
+> 
+> While I was looking at this, I ended up finding a small number of
+> equally small problems:
+> 
+> [...]
 
-This leads to use-after-free on ubufs access. This happens because CPU1
-skips waiting for wake_up() when refcount is already zero.
+Applied to next, thanks!
 
-To prevent that use a completion instead of wait_queue as the ubufs
-notification mechanism. wait_for_completion() guarantees that there will
-be complete() call prior to its return.
+[01/11] KVM: arm64: Make RVBAR_EL2 accesses UNDEF
+        https://git.kernel.org/kvmarm/kvmarm/c/1095b32665cf
+[02/11] KVM: arm64: Don't advertise ICH_*_EL2 registers through GET_ONE_REG
+        https://git.kernel.org/kvmarm/kvmarm/c/c70a4027f5f3
+[03/11] KVM: arm64: Define constant value for ICC_SRE_EL2
+        https://git.kernel.org/kvmarm/kvmarm/c/c6ef46861080
+[04/11] KVM: arm64: Define helper for ICH_VTR_EL2
+        https://git.kernel.org/kvmarm/kvmarm/c/ce7a1cff2e4c
+[05/11] KVM: arm64: Let GICv3 save/restore honor visibility attribute
+        https://git.kernel.org/kvmarm/kvmarm/c/1d14c9714562
+[06/11] KVM: arm64: Expose GICv3 EL2 registers via KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS
+        https://git.kernel.org/kvmarm/kvmarm/c/9fe9663e47e2
+[07/11] KVM: arm64: Condition FGT registers on feature availability
+        https://git.kernel.org/kvmarm/kvmarm/c/72c62700b279
+[08/11] KVM: arm64: Advertise FGT2 registers to userspace
+        https://git.kernel.org/kvmarm/kvmarm/c/a0aae0a9a70e
+[09/11] KVM: arm64: selftests: get-reg-list: Simplify feature dependency
+        https://git.kernel.org/kvmarm/kvmarm/c/9a4071807909
+[10/11] KVM: arm64: selftests: get-reg-list: Add base EL2 registers
+        https://git.kernel.org/kvmarm/kvmarm/c/3a90b6f27964
+[11/11] KVM: arm64: Document registers exposed via KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS
+        https://git.kernel.org/kvmarm/kvmarm/c/f68df3aee7d1
 
-We also need to reinit completion because refcnt == 0 does not mean
-freeing in case of vhost_net_flush() - it then sets refcnt back to 1.
-AFAIK concurrent calls to vhost_net_ubuf_put_and_wait() with the same
-ubufs object aren't possible since those calls (through vhost_net_flush()
-or vhost_net_set_backend()) are protected by the device mutex.
-So reinit_completion() right after wait_for_completion() should be fine.
-
-Cc: stable@vger.kernel.org
-Fixes: 0ad8b480d6ee9 ("vhost: fix ref cnt checking deadlock")
-Reported-by: Andrey Ryabinin <arbn@yandex-team.com>
-Suggested-by: Andrey Smetanin <asmetanin@yandex-team.ru>
-Signed-off-by: Nikolay Kuratov <kniv@yandex-team.ru>
----
- drivers/vhost/net.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index 7cbfc7d718b3..454d179fffeb 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -94,7 +94,7 @@ struct vhost_net_ubuf_ref {
- 	 * >1: outstanding ubufs
- 	 */
- 	atomic_t refcount;
--	wait_queue_head_t wait;
-+	struct completion wait;
- 	struct vhost_virtqueue *vq;
- };
- 
-@@ -240,7 +240,7 @@ vhost_net_ubuf_alloc(struct vhost_virtqueue *vq, bool zcopy)
- 	if (!ubufs)
- 		return ERR_PTR(-ENOMEM);
- 	atomic_set(&ubufs->refcount, 1);
--	init_waitqueue_head(&ubufs->wait);
-+	init_completion(&ubufs->wait);
- 	ubufs->vq = vq;
- 	return ubufs;
- }
-@@ -249,14 +249,15 @@ static int vhost_net_ubuf_put(struct vhost_net_ubuf_ref *ubufs)
- {
- 	int r = atomic_sub_return(1, &ubufs->refcount);
- 	if (unlikely(!r))
--		wake_up(&ubufs->wait);
-+		complete_all(&ubufs->wait);
- 	return r;
- }
- 
- static void vhost_net_ubuf_put_and_wait(struct vhost_net_ubuf_ref *ubufs)
- {
- 	vhost_net_ubuf_put(ubufs);
--	wait_event(ubufs->wait, !atomic_read(&ubufs->refcount));
-+	wait_for_completion(&ubufs->wait);
-+	reinit_completion(&ubufs->wait);
- }
- 
- static void vhost_net_ubuf_put_wait_and_free(struct vhost_net_ubuf_ref *ubufs)
--- 
-2.34.1
-
+--
+Best,
+Oliver
 
