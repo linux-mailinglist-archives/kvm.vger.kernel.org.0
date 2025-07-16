@@ -1,100 +1,244 @@
-Return-Path: <kvm+bounces-52585-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52586-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3624B06FE9
-	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 10:08:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55EF8B06FFA
+	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 10:12:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E447A3A6912
-	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 08:08:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B97C4A557C
+	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 08:12:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5484290D95;
-	Wed, 16 Jul 2025 08:08:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5A3A28ECD7;
+	Wed, 16 Jul 2025 08:12:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="clYWrTZk"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HAt6/zdp"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E34526E6F9;
-	Wed, 16 Jul 2025 08:08:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C3762882C1
+	for <kvm@vger.kernel.org>; Wed, 16 Jul 2025 08:12:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752653319; cv=none; b=Z6Na83kA4xNk4y0/GeH58R07Vd9khlhwMVVajcVMVnA8GgBTM2ZvJ1RkJd8uPJ6WKOwC4HixLFweX8o/f/5LEpX7eksKq1GUhq6wcsPqYUKiV3JJxGzXa+LuyvUE6IPordBpnkcBggXbj3aF7AiDRLtIvmKBCmhnUyilqpOzZo8=
+	t=1752653541; cv=none; b=cn+5c/69zRbBrfkG5orPfLLwdqPX1iyF+Cgizuk9C6/uHoijxZUtu6QyEzfH7Cmf/Uw123GF8PCDx3/jgCjwKJO6XKclmI4QzlpZHA9RNWTw0R1So8kTjMLXlsCaKEIE7e5N1y33ThsAMmooEM63H4E1BjdXJmR5xs3F6/azqi4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752653319; c=relaxed/simple;
-	bh=HIfZ2WyLhan5ssXSdB5gQZDLA9YqfEoaAfStUdGlXFQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cUsXuo4TWuekW6cR9sPNd3vEYNXFhgrpXzqeDoQ2G1ZMJ94IxAm9cOI6elJg9wxNTDxuIsiLyBm5UdStHlDxZH9OErn/taC1FLqMhjvOAm5hvUZsaNojjS/4eTrBqAj6LCVBC4CZn3L7jveeMWT3Mk8NCC10P3RIcafbatSl2PI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=clYWrTZk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12419C4CEF0;
-	Wed, 16 Jul 2025 08:08:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1752653316;
-	bh=HIfZ2WyLhan5ssXSdB5gQZDLA9YqfEoaAfStUdGlXFQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=clYWrTZkp/rq0rCVhswSXVqfKlXYciP2uM3S5iUrcQP9HIZSlHaFyZZ8e6FhKU9/U
-	 Lh3gBy5Ev81QSMIFUAWFwXwi2wp+9D4NRDiE1O/qfo1Dw1EYsEpURuycj9dvpTzLyL
-	 hncH3tuUa6Vr1A5Z6VLty6GPo6W0f4WqF8Ccqj7s=
-Date: Wed, 16 Jul 2025 10:08:33 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: WangYuli <wangyuli@uniontech.com>
-Cc: airlied@gmail.com, akpm@linux-foundation.org,
-	alison.schofield@intel.com, andrew+netdev@lunn.ch,
-	andriy.shevchenko@linux.intel.com, arend.vanspriel@broadcom.com,
-	bp@alien8.de, brcm80211-dev-list.pdl@broadcom.com,
-	brcm80211@lists.linux.dev, colin.i.king@gmail.com,
-	cvam0000@gmail.com, dan.j.williams@intel.com,
-	dave.hansen@linux.intel.com, dave.jiang@intel.com,
-	dave@stgolabs.net, davem@davemloft.net,
-	dri-devel@lists.freedesktop.org, edumazet@google.com,
-	guanwentao@uniontech.com, hpa@zytor.com,
-	ilpo.jarvinen@linux.intel.com, intel-xe@lists.freedesktop.org,
-	ira.weiny@intel.com, j@jannau.net, jeff.johnson@oss.qualcomm.com,
-	jgross@suse.com, jirislaby@kernel.org, johannes.berg@intel.com,
-	jonathan.cameron@huawei.com, kuba@kernel.org, kvalo@kernel.org,
-	kvm@vger.kernel.org, linux-cxl@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-serial@vger.kernel.org,
-	linux-wireless@vger.kernel.org, linux@treblig.org,
-	lucas.demarchi@intel.com, marcin.s.wojtas@gmail.com,
-	ming.li@zohomail.com, mingo@kernel.org, mingo@redhat.com,
-	netdev@vger.kernel.org, niecheng1@uniontech.com,
-	oleksandr_tyshchenko@epam.com, pabeni@redhat.com,
-	pbonzini@redhat.com, quic_ramess@quicinc.com, ragazenta@gmail.com,
-	rodrigo.vivi@intel.com, seanjc@google.com, shenlichuan@vivo.com,
-	simona@ffwll.ch, sstabellini@kernel.org, tglx@linutronix.de,
-	thomas.hellstrom@linux.intel.com, vishal.l.verma@intel.com,
-	x86@kernel.org, xen-devel@lists.xenproject.org,
-	yujiaoliang@vivo.com, zhanjun@uniontech.com
-Subject: Re: [PATCH v2 6/8] serial: 8250_dw: Fix typo "notifer"
-Message-ID: <2025071607-outbid-heat-b0ba@gregkh>
-References: <BD5C52D2838AEA48+20250715134050.539234-1-wangyuli@uniontech.com>
- <2BF1749F02ADE664+20250715134407.540483-6-wangyuli@uniontech.com>
+	s=arc-20240116; t=1752653541; c=relaxed/simple;
+	bh=akkPE8cUwnDaLvvZprEXhA/Rq+qpzs+cyaTCQNnKx+I=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QxYNAT/PVR/kbRH3NaGG/o9mL+6tSQNYFfiGhQHnUSB2ll10tYjFplNTsLN2fTdhBqLYUkUDExjwRHuKnv/jI7ZO5jzGdg7umROz340Hl/VP878FdRmU/RHsly26KlTXEQ67E/n7GKYqL2Z2vJeblMY44P6bUxKfyWNIDLexMGc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HAt6/zdp; arc=none smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-4ab3ad4c61fso347741cf.0
+        for <kvm@vger.kernel.org>; Wed, 16 Jul 2025 01:12:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1752653538; x=1753258338; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=9lXG3S9BZe4HTILb/Bnao5N33QhAfEHK8ncuEoyNOSE=;
+        b=HAt6/zdpt3seAtS7/cvUkdP2eO3naoP1/7a4kwRfemkRlXrErtvmMghZotVwSVJCzY
+         lMRNoIUaP+shoNYaFs9cOG+dq7If/iNQ5t1zo/rphtNl+IoUcQsvjNb1Lf4g5yOCcH92
+         hz9jRhXpiPqb2Qrn5GzWyja0iLVjH33/U64+VI5PvRIQ85/AYHqn3jXa3RcroKhId2di
+         VMnzbXg+QpD6gm0c9xpgaHFpgVdRtyEUdv21ckcJfyx6ajHZP45+59SVDozJSura+xX+
+         BnByY/2399uECq91ciKEbwSmDeig/UtnwLhQdQTZOvj/eqxObEdgorzNUi9LoyCfG7iy
+         3n1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752653538; x=1753258338;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9lXG3S9BZe4HTILb/Bnao5N33QhAfEHK8ncuEoyNOSE=;
+        b=ZYbh9x4BLS25daNyuOxzUJUvO5f2naXmH8QEYVreMsRO6il+IpjuWEGp1ESy5fynNT
+         EatoFHF5CqsesNDw7+ZZTabA6B0zJMGy5ui0nXCAfAvpbkVqlO1mLRjBcVNW+SJl2gRm
+         p2jTb1f4Ih014+hLKbRJud97kOWsoOfIYi3kigH9HThVON8t4vxHmQdKkart0vkm/SQH
+         u0gCkZx7ahq8NUREaN4CGFzaLsa9kHbDKHQpZiKZJe2izMiHYUKOtf7is5eh1ClPKZsK
+         I3Asva/Sp2WB8gzj7MFo5aS38f5xNJelmRhDYJvXXzSIK1LbM9NnbYXC6awEsyHf4E5d
+         pYgg==
+X-Gm-Message-State: AOJu0YzBQZFG31tRB2yNVkTUzCJ9opsyG3NRte1PQzJSCGvQ8xDi/Mre
+	XezpN6PY483lvPHeKA4barD+ExmfQe6EyjjQnI7zBRLRRMRsp93ctmWg6RVz3AkBgGs9xt5H2co
+	uCwAFhzMtX6OKxKgr0tT6JLlPgE3XEmWwtlRlGM/q
+X-Gm-Gg: ASbGnctwga5nW1nlF8q3agSPJDw3RdZyXzf1S9GeZj2XsbXA/SDDswG+T4HlWFHceVC
+	sEke4XzvshBYKs3tbEwr/eSomPwlgBpR6oaZVxvA+OnFJthjNqWMdHeXLMrYXL41Z/s3FYm80kP
+	Ipgjy+um1HfPsh+QVHYGtYzhUbyiW8ixWqQlHik0vt+H7840tZltmOHau2VcZj2BCri7W+gN308
+	qPUfjgFlmPuyaAj0XDiwx/7Tp4dPo4nC8UV
+X-Google-Smtp-Source: AGHT+IGBOCxJ/Qm9HEzyLGT9rdfHPf0UnzAM8lyi0X0Lv1v93DUUc8uHVzmb4HnCFFNKyy0ua3P+EnrBZKtAIViOZ5A=
+X-Received: by 2002:a05:622a:1a9a:b0:4a5:9b0f:a150 with SMTP id
+ d75a77b69052e-4ab953d76admr1899631cf.16.1752653537471; Wed, 16 Jul 2025
+ 01:12:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2BF1749F02ADE664+20250715134407.540483-6-wangyuli@uniontech.com>
+References: <20250715093350.2584932-1-tabba@google.com> <20250715093350.2584932-3-tabba@google.com>
+ <a4091b13-9c3b-48bf-a7f6-f56868224cf5@intel.com>
+In-Reply-To: <a4091b13-9c3b-48bf-a7f6-f56868224cf5@intel.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Wed, 16 Jul 2025 09:11:40 +0100
+X-Gm-Features: Ac12FXywDVFBk8xIRrEGHJ76oUEfDIBGYlNiYZT2NsSZ7eZhzD9_CXX8jGKmVsI
+Message-ID: <CA+EHjTy5zUJt5n5N1tRyHUQN6-P6CPqyC7+6Zqhokx-3=mvx+A@mail.gmail.com>
+Subject: Re: [PATCH v14 02/21] KVM: Rename CONFIG_KVM_GENERIC_PRIVATE_MEM to CONFIG_KVM_GENERIC_GMEM_POPULATE
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
+	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, 
+	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
+	palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com, 
+	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
+	akpm@linux-foundation.org, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
+	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
+	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
+	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
+	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
+	ira.weiny@intel.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Jul 15, 2025 at 09:44:05PM +0800, WangYuli wrote:
-> There is a spelling mistake of 'notifer' in the comment which
-> should be 'notifier'.
-> 
-> Link: https://lore.kernel.org/all/B3C019B63C93846F+20250715071245.398846-1-wangyuli@uniontech.com/
-> Signed-off-by: WangYuli <wangyuli@uniontech.com>
+Hi Xiaoyao,
 
-Is your name all one word like that, or should there be a " " between
-them?
+On Wed, 16 Jul 2025 at 05:09, Xiaoyao Li <xiaoyao.li@intel.com> wrote:
+>
+> On 7/15/2025 5:33 PM, Fuad Tabba wrote:
+> > The original name was vague regarding its functionality. This Kconfig
+> > option specifically enables and gates the kvm_gmem_populate() function,
+> > which is responsible for populating a GPA range with guest data.
+>
+> Well, I disagree.
+>
+> The config KVM_GENERIC_PRIVATE_MEM was introduced by commit 89ea60c2c7b5
+> ("KVM: x86: Add support for "protected VMs" that can utilize private
+> memory"), which is a convenient config for vm types that requires
+> private memory support, e.g., SNP, TDX, and KVM_X86_SW_PROTECTED_VM.
+>
+> It was commit e4ee54479273 ("KVM: guest_memfd: let kvm_gmem_populate()
+> operate only on private gfns") that started to use
+> CONFIG_KVM_GENERIC_PRIVATE_MEM gates kvm_gmem_populate() function. But
+> CONFIG_KVM_GENERIC_PRIVATE_MEM is not for kvm_gmem_populate() only.
+>
+> If using CONFIG_KVM_GENERIC_PRIVATE_MEM to gate kvm_gmem_populate() is
+> vague and confusing, we can introduce KVM_GENERIC_GMEM_POPULATE to gate
+> kvm_gmem_populate() and select KVM_GENERIC_GMEM_POPULATE under
+> CONFIG_KVM_GENERIC_PRIVATE_MEM.
+>
+> Directly replace CONFIG_KVM_GENERIC_PRIVATE_MEM with
+> KVM_GENERIC_GMEM_POPULATE doesn't look correct to me.
 
-Also, as others said, don't link to your own patch.
+I'll quote David's reply to an earlier version of this patch [*]:
 
-thanks,
+> > I'm curious what generic means in this name?
+>
+> That an architecture wants to use the generic version and not provide
+> it's own alternative implementation.
+>
+> We frequently use that term in this context, see GENERIC_IOREMAP as one
+> example.
 
-greg k-h
+[*] https://lore.kernel.org/all/b6355951-5f9d-4ca9-850f-79e767d8caa2@redhat.com/
+
+Thanks,
+/fuad
+
+> > The new name, KVM_GENERIC_GMEM_POPULATE, describes the purpose of the
+> > option: to enable generic guest_memfd population mechanisms. This
+> > improves clarity for developers and ensures the name accurately reflects
+> > the functionality it controls, especially as guest_memfd support expands
+> > beyond purely "private" memory scenarios.
+> >
+> > Reviewed-by: Ira Weiny <ira.weiny@intel.com>
+> > Reviewed-by: Gavin Shan <gshan@redhat.com>
+> > Reviewed-by: Shivank Garg <shivankg@amd.com>
+> > Reviewed-by: Vlastimil Babka <vbabka@suse.cz>
+> > Co-developed-by: David Hildenbrand <david@redhat.com>
+> > Signed-off-by: David Hildenbrand <david@redhat.com>
+> > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > ---
+> >   arch/x86/kvm/Kconfig     | 6 +++---
+> >   include/linux/kvm_host.h | 2 +-
+> >   virt/kvm/Kconfig         | 2 +-
+> >   virt/kvm/guest_memfd.c   | 2 +-
+> >   4 files changed, 6 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+> > index 2eeffcec5382..df1fdbb4024b 100644
+> > --- a/arch/x86/kvm/Kconfig
+> > +++ b/arch/x86/kvm/Kconfig
+> > @@ -46,7 +46,7 @@ config KVM_X86
+> >       select HAVE_KVM_PM_NOTIFIER if PM
+> >       select KVM_GENERIC_HARDWARE_ENABLING
+> >       select KVM_GENERIC_PRE_FAULT_MEMORY
+> > -     select KVM_GENERIC_PRIVATE_MEM if KVM_SW_PROTECTED_VM
+> > +     select KVM_GENERIC_GMEM_POPULATE if KVM_SW_PROTECTED_VM
+> >       select KVM_WERROR if WERROR
+> >
+> >   config KVM
+> > @@ -95,7 +95,7 @@ config KVM_SW_PROTECTED_VM
+> >   config KVM_INTEL
+> >       tristate "KVM for Intel (and compatible) processors support"
+> >       depends on KVM && IA32_FEAT_CTL
+> > -     select KVM_GENERIC_PRIVATE_MEM if INTEL_TDX_HOST
+> > +     select KVM_GENERIC_GMEM_POPULATE if INTEL_TDX_HOST
+> >       select KVM_GENERIC_MEMORY_ATTRIBUTES if INTEL_TDX_HOST
+> >       help
+> >         Provides support for KVM on processors equipped with Intel's VT
+> > @@ -157,7 +157,7 @@ config KVM_AMD_SEV
+> >       depends on KVM_AMD && X86_64
+> >       depends on CRYPTO_DEV_SP_PSP && !(KVM_AMD=y && CRYPTO_DEV_CCP_DD=m)
+> >       select ARCH_HAS_CC_PLATFORM
+> > -     select KVM_GENERIC_PRIVATE_MEM
+> > +     select KVM_GENERIC_GMEM_POPULATE
+> >       select HAVE_KVM_ARCH_GMEM_PREPARE
+> >       select HAVE_KVM_ARCH_GMEM_INVALIDATE
+> >       help
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index 755b09dcafce..359baaae5e9f 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -2556,7 +2556,7 @@ static inline int kvm_gmem_get_pfn(struct kvm *kvm,
+> >   int kvm_arch_gmem_prepare(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn, int max_order);
+> >   #endif
+> >
+> > -#ifdef CONFIG_KVM_GENERIC_PRIVATE_MEM
+> > +#ifdef CONFIG_KVM_GENERIC_GMEM_POPULATE
+> >   /**
+> >    * kvm_gmem_populate() - Populate/prepare a GPA range with guest data
+> >    *
+> > diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+> > index 49df4e32bff7..559c93ad90be 100644
+> > --- a/virt/kvm/Kconfig
+> > +++ b/virt/kvm/Kconfig
+> > @@ -116,7 +116,7 @@ config KVM_GMEM
+> >          select XARRAY_MULTI
+> >          bool
+> >
+> > -config KVM_GENERIC_PRIVATE_MEM
+> > +config KVM_GENERIC_GMEM_POPULATE
+> >          select KVM_GENERIC_MEMORY_ATTRIBUTES
+> >          select KVM_GMEM
+> >          bool
+> > diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+> > index b2aa6bf24d3a..befea51bbc75 100644
+> > --- a/virt/kvm/guest_memfd.c
+> > +++ b/virt/kvm/guest_memfd.c
+> > @@ -638,7 +638,7 @@ int kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
+> >   }
+> >   EXPORT_SYMBOL_GPL(kvm_gmem_get_pfn);
+> >
+> > -#ifdef CONFIG_KVM_GENERIC_PRIVATE_MEM
+> > +#ifdef CONFIG_KVM_GENERIC_GMEM_POPULATE
+> >   long kvm_gmem_populate(struct kvm *kvm, gfn_t start_gfn, void __user *src, long npages,
+> >                      kvm_gmem_populate_cb post_populate, void *opaque)
+> >   {
+>
+>
 
