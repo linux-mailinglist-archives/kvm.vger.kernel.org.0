@@ -1,193 +1,143 @@
-Return-Path: <kvm+bounces-52646-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52647-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 881E3B079B4
-	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 17:25:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72D75B079C2
+	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 17:27:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E4BCC7BCA66
-	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 15:23:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5843A43D52
+	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 15:25:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 587FF2F546C;
-	Wed, 16 Jul 2025 15:23:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AAAD2F4A1E;
+	Wed, 16 Jul 2025 15:24:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MighXWEU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eXV0vx9q"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11AF3291C3B
-	for <kvm@vger.kernel.org>; Wed, 16 Jul 2025 15:23:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90394288CAF;
+	Wed, 16 Jul 2025 15:24:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752679393; cv=none; b=hZ3+RtE8OorNKbVMER8akNMMv32ms7utCMDn83uJC3va2kBrMbgCJWPni6WnSX2zG2frG0ez6SiJnTa3m+TSeCcRdiSdnYuzX6K7aJ+i7ybcw3DGaHiVBxkBBcRjCtbk/O4JpXcYeUHCjN8pw5HjsLW0DuGYiJIz4iwrfEKkDAQ=
+	t=1752679467; cv=none; b=OVMI6W7KKKqxk/HfuMUbdTEDjYWZK7A5vbMrIU2en1zEWDtCYzVDvliokVjcmLH0JXOR46+YuLdAn+icn/vJ5dLInsPvOZ4KYV5DTponitw5xeOT/l4y+bWP/MpOLSoghQiHWgit+vJBoIJJAOE77AICowCcHlaWn80Np14IB+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752679393; c=relaxed/simple;
-	bh=vMTqPP+6hRnC8KSmRmuaiUDWv7LwGHOKrFpBtQvXb0Y=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=OBtpLOZMpXrU3hRstY2u+YiCNhQgMlLyaUWGX9aaXbWNF+EqqWqyKUZNvPFNzaQw3bt9ieSUjiGoaKpIJ5Dn0YBOSXjm85OqhwR7+6ncf4aYvoeItGfOaNaekjxxOgsfy6Wbu0ehrUjtB6sICns/kTldhbHx+px86HLd/0Z0J0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MighXWEU; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-31366819969so44045a91.0
-        for <kvm@vger.kernel.org>; Wed, 16 Jul 2025 08:23:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752679390; x=1753284190; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WwpljzDZuqwMskm2tic+OBYPfr5JC6dHkTuTGvwL8MI=;
-        b=MighXWEUjurE3gLc5KZNGxCvC4owfeYJQ+951nqO9HmpU8ee+sYUYjqoHKj7uuPDzS
-         n7I159/PguWQwVoezSZKeNPTvOv8Bolw7sJX5G7td4eMSWTiGdfiSuA/sqIsmPVPrr7j
-         pbqNiPwGSnKLCIJhmTcryWE9vk0rowQrWXlIcnCvqZycSLhdaJcQncQjo0bH1XP77M8F
-         0VB8cfn5JzKx+Z9tCzZXnvH5Q46yLM9u4ecbnCAUD/GcoUigglKYPUffmCGLLBraW5TS
-         RVMTvh1sLvVzH8bXD8gFR0fBOarn6D09XepkHu56/IFhJGgY1TZrm4Jw45BBZStpYwAk
-         YIew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752679390; x=1753284190;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WwpljzDZuqwMskm2tic+OBYPfr5JC6dHkTuTGvwL8MI=;
-        b=Lgm6nSICUD2gpKU3q4tN0D1tP8aLTOoXjJbQbaPvkFNV7Xf4+7ZH3dcpw+YHBcNnY2
-         bF0HZr6vjaz8jNCUCGPpfZX4EugjSAuAfCq6aEJox2R6obwWrOGMFRL9qJ+LTUJwp5Y3
-         AX/v9k2ZS1+NvtM11HoN4qk+m287l4FWhyE+e1TKWQP3pOyiu6ImXAhXrf/OnI9kwCVD
-         CJYF/nzrPFwiijVJBaJJYje4r3jlEIxonmFh50dAIl64laLOALdy0F2tSa82T54dd3WR
-         8IiNDnMfPu7CvnQZtiG4Hkgv2yM4uXKFtOQLo4D9eRhaenTfYX7IN7Bm9GxQb6KnAybT
-         Etbg==
-X-Gm-Message-State: AOJu0YyyWui+S/tfm7gm0gaUkn2vfCeRGPQDKeAYkVqu5aeHPVsoItIE
-	2AhW+d7XPh4TENU7reLF8KYuxwExWbLjTFUap9M3glj99zN1fqxcvm/cdrfn5HMos2JP7PhDNUQ
-	AglzJMg==
-X-Google-Smtp-Source: AGHT+IFmGBmTlWKZZF0mdM3myKSr0azToc5tQH6o7fqNOcb7x4qSKMo3FJ0Wc56gzWm7MYI9bYn2QWmmSbg=
-X-Received: from pjh16.prod.google.com ([2002:a17:90b:3f90:b0:312:eaf7:aa0d])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1c89:b0:313:2768:3f6b
- with SMTP id 98e67ed59e1d1-31c9e77ce91mr5085592a91.27.1752679390400; Wed, 16
- Jul 2025 08:23:10 -0700 (PDT)
-Date: Wed, 16 Jul 2025 08:23:08 -0700
-In-Reply-To: <6877331d.a00a0220.3af5df.000c.GAE@google.com>
+	s=arc-20240116; t=1752679467; c=relaxed/simple;
+	bh=LAicS+pihtv9EEihexoFYLo1L3pM9ZqAXYRukX438Nw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uINzc62rXn4EpAkJ3LS4mW2ssoPAUxhvgU5KsdG5LdCwUzFfjv735sldHs26nQFoXaW45TIvYXbbXwNLpU1V6g9FBHPIId3F+n+sTiPEgePy+yRJBIMKEs43iF4qL9CzGjxm5YTxeC0WXfWWS6DYq3122dXL7bj6IuxKwvc5OMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eXV0vx9q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5741BC4CEF0;
+	Wed, 16 Jul 2025 15:24:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752679467;
+	bh=LAicS+pihtv9EEihexoFYLo1L3pM9ZqAXYRukX438Nw=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=eXV0vx9qsPrkBBLAYy4/BJFyqFKY7mfLVIIl/hUHZBRcBi1p1i6xoMoDMgFTiDcsV
+	 MVBJDfF+6g2FvAvMAt0V8p0+SxYErYjU4HcK2UM0oiqt4PSzCpPNxGIZVYqIx0ivDs
+	 c0huQIb6tjN3KkM2uKjEqN7BVSSZoHZIaZonZbGPViwBo9SG6hayKuMuS+LSyuhFvM
+	 bOYzJWOWLGEspFmpulKbFJoyvEkfovtHTDN4qRg3zoNLQuNwJ4hyqMzUvs7GLBL49Z
+	 rR2DpPB6jo2d1Dew+8bEJ6F4aQ8FtryO+uO3Xb+jgh380PaOaULW6g5H0RVSmHdK9P
+	 Szcu9EgUZpT9w==
+Message-ID: <051e5c07-f012-44b1-8e6b-ef9c13ee7177@kernel.org>
+Date: Wed, 16 Jul 2025 10:24:24 -0500
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <6877331d.a00a0220.3af5df.000c.GAE@google.com>
-Message-ID: <aHfD3MczrDpzDX9O@google.com>
-Subject: Re: [syzbot] [kvm?] WARNING in kvm_read_guest_offset_cached
-From: Sean Christopherson <seanjc@google.com>
-To: syzbot <syzbot+bc0e18379a290e5edfe4@syzkaller.appspotmail.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 9/9] PCI: Add a new 'boot_display' attribute
+To: Maxime Ripard <mripard@kernel.org>
+Cc: David Airlie <airlied@gmail.com>, Bjorn Helgaas <bhelgaas@google.com>,
+ Alex Deucher <alexander.deucher@amd.com>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ Simona Vetter <simona@ffwll.ch>, Lukas Wunner <lukas@wunner.de>,
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Thomas Zimmermann <tzimmermann@suse.de>,
+ David Woodhouse <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>,
+ Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+ Robin Murphy <robin.murphy@arm.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+ "open list:DRM DRIVERS" <dri-devel@lists.freedesktop.org>,
+ open list <linux-kernel@vger.kernel.org>,
+ "open list:INTEL IOMMU (VT-d)" <iommu@lists.linux.dev>,
+ "open list:PCI SUBSYSTEM" <linux-pci@vger.kernel.org>,
+ "open list:VFIO DRIVER" <kvm@vger.kernel.org>,
+ "open list:SOUND" <linux-sound@vger.kernel.org>,
+ Daniel Dadap <ddadap@nvidia.com>,
+ Mario Limonciello <mario.limonciello@amd.com>
+References: <20250714212147.2248039-1-superm1@kernel.org>
+ <20250714212147.2248039-10-superm1@kernel.org>
+ <20250716-upbeat-tody-of-psychology-93e2a2@houat>
+Content-Language: en-US
+From: Mario Limonciello <superm1@kernel.org>
+In-Reply-To: <20250716-upbeat-tody-of-psychology-93e2a2@houat>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jul 15, 2025, syzbot wrote:
-> Hello,
+On 7/16/25 3:22 AM, Maxime Ripard wrote:
+> Hi Mario,
 > 
-> syzbot found the following issue on:
+> On Mon, Jul 14, 2025 at 04:21:46PM -0500, Mario Limonciello wrote:
+>> From: Mario Limonciello <mario.limonciello@amd.com>
+>>
+>> On systems with multiple GPUs there can be uncertainty which GPU is the
+>> primary one used to drive the display at bootup. In order to disambiguate
+>> this add a new sysfs attribute 'boot_display' that uses the output of
+>> video_is_primary_device() to populate whether a PCI device was used for
+>> driving the display.
+>>
+>> Reviewed-by: Thomas Zimmermann <tzimmermann@suse.de>
+>> Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
+>> ---
+>> v7:
+>>   * fix lkp failure
+>>   * Add tag
+>> v6:
+>>   * Only show for the device that is boot display
+>>   * Only create after PCI device sysfs files are initialized to ensure
+>>     that resources are ready.
+>> v4:
+>>   * new patch
+>> ---
+>>   Documentation/ABI/testing/sysfs-bus-pci |  8 +++++
+>>   drivers/pci/pci-sysfs.c                 | 46 +++++++++++++++++++++++++
+>>   2 files changed, 54 insertions(+)
+>>
+>> diff --git a/Documentation/ABI/testing/sysfs-bus-pci b/Documentation/ABI/testing/sysfs-bus-pci
+>> index 69f952fffec72..8b455b1a58852 100644
+>> --- a/Documentation/ABI/testing/sysfs-bus-pci
+>> +++ b/Documentation/ABI/testing/sysfs-bus-pci
+>> @@ -612,3 +612,11 @@ Description:
+>>   
+>>   		  # ls doe_features
+>>   		  0001:01        0001:02        doe_discovery
+>> +
+>> +What:		/sys/bus/pci/devices/.../boot_display
+>> +Date:		October 2025
+>> +Contact:	Linux PCI developers <linux-pci@vger.kernel.org>
+>> +Description:
+>> +		This file indicates the device was used as a boot
+>> +		display. If the device was used as the boot display, the file
+>> +		will be present and contain "1".
 > 
-> HEAD commit:    155a3c003e55 Merge tag 'for-6.16/dm-fixes-2' of git://git...
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=103e858c580000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=8d5ef2da1e1c848
-> dashboard link: https://syzkaller.appspot.com/bug?extid=bc0e18379a290e5edfe4
-> compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=153188f0580000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16f6198c580000
+> It would probably be a good idea to define what a "boot display" here
+> is. I get what you mean, but it's pretty vague and could easily be
+> misunderstood.
 > 
-> Downloadable assets:
-> disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-155a3c00.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/725a320dfe66/vmlinux-155a3c00.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/9f06899bb6f3/bzImage-155a3c00.xz
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+bc0e18379a290e5edfe4@syzkaller.appspotmail.com
-> 
-> ------------[ cut here ]------------
-> WARNING: CPU: 0 PID: 6107 at arch/x86/kvm/../../../virt/kvm/kvm_main.c:3459 kvm_read_guest_offset_cached+0x3f5/0x4b0 virt/kvm/kvm_main.c:3459
-> Modules linked in:
-> CPU: 0 UID: 0 PID: 6107 Comm: syz.0.16 Not tainted 6.16.0-rc6-syzkaller-00002-g155a3c003e55 #0 PREEMPT(full) 
-> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-> RIP: 0010:kvm_read_guest_offset_cached+0x3f5/0x4b0 virt/kvm/kvm_main.c:3459
-> Code: 0f 01 e8 3e 6c 61 00 e9 9b fc ff ff e8 14 25 85 00 48 8b 3c 24 31 d2 48 89 ee e8 16 bf fa 00 e9 2e fe ff ff e8 fc 24 85 00 90 <0f> 0b 90 bb ea ff ff ff e9 4d fe ff ff e8 e9 24 85 00 48 8b 74 24
-> RSP: 0018:ffffc9000349f960 EFLAGS: 00010293
-> RAX: 0000000000000000 RBX: ffff888050329898 RCX: ffffffff8136ca66
-> RDX: ffff88803cfa8000 RSI: ffffffff8136cd84 RDI: 0000000000000006
-> RBP: 0000000000000004 R08: 0000000000000006 R09: 0000000000000008
-> R10: 0000000000000000 R11: 0000000000000001 R12: 0000000000000004
-> R13: ffffc90003921000 R14: 0000000000000000 R15: ffffc900039215a0
-> FS:  000055558378f500(0000) GS:ffff8880d6713000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000000000000000 CR3: 0000000025de6000 CR4: 0000000000352ef0
-> Call Trace:
->  <TASK>
->  apf_pageready_slot_free arch/x86/kvm/x86.c:13452 [inline]
+> Maxime
 
-kvm_pv_enable_async_pf() sets vcpu->arch.apf.msr_en_val even if the gpa is bad,
-which leaves the cache in an empty state.  Something like so over a few patches
-fixes the problem:
+Here's my proposal for updated text, can you please bikeshed or propose 
+an alternative?
 
----
- arch/x86/kvm/x86.c | 32 ++++++++++++++++++--------------
- 1 file changed, 18 insertions(+), 14 deletions(-)
+This file indicates that displays connected to the device were used to 
+display the boot sequence.  If a display connected to the device was
+used to display the boot sequence the file will be present and contain "1".
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index a1c49bc681c4..0fbbf297b3c8 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3547,11 +3547,16 @@ static int set_msr_mce(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 	return 0;
- }
- 
--static inline bool kvm_pv_async_pf_enabled(struct kvm_vcpu *vcpu)
-+static bool __kvm_pv_async_pf_enabled(u64 msr_en_val)
- {
- 	u64 mask = KVM_ASYNC_PF_ENABLED | KVM_ASYNC_PF_DELIVERY_AS_INT;
- 
--	return (vcpu->arch.apf.msr_en_val & mask) == mask;
-+	return (msr_en_val & mask) == mask;
-+}
-+
-+static inline bool kvm_pv_async_pf_enabled(struct kvm_vcpu *vcpu)
-+{
-+	return __kvm_pv_async_pf_enabled(vcpu->arch.apf.msr_en_val);
- }
- 
- static int kvm_pv_enable_async_pf(struct kvm_vcpu *vcpu, u64 data)
-@@ -3573,22 +3578,21 @@ static int kvm_pv_enable_async_pf(struct kvm_vcpu *vcpu, u64 data)
- 	if (!lapic_in_kernel(vcpu))
- 		return data ? 1 : 0;
- 
-+	if (__kvm_pv_async_pf_enabled(data) &&
-+	    kvm_gfn_to_hva_cache_init(vcpu->kvm, &vcpu->arch.apf.data, gpa,
-+				      sizeof(u64)))
-+		return 1;
-+
- 	vcpu->arch.apf.msr_en_val = data;
--
--	if (!kvm_pv_async_pf_enabled(vcpu)) {
--		kvm_clear_async_pf_completion_queue(vcpu);
--		kvm_async_pf_hash_reset(vcpu);
--		return 0;
--	}
--
--	if (kvm_gfn_to_hva_cache_init(vcpu->kvm, &vcpu->arch.apf.data, gpa,
--					sizeof(u64)))
--		return 1;
--
- 	vcpu->arch.apf.send_always = (data & KVM_ASYNC_PF_SEND_ALWAYS);
- 	vcpu->arch.apf.delivery_as_pf_vmexit = data & KVM_ASYNC_PF_DELIVERY_AS_PF_VMEXIT;
- 
--	kvm_async_pf_wakeup_all(vcpu);
-+	if (kvm_pv_async_pf_enabled(vcpu)) {
-+		kvm_clear_async_pf_completion_queue(vcpu);
-+		kvm_async_pf_hash_reset(vcpu);
-+	} else {
-+		kvm_async_pf_wakeup_all(vcpu);
-+	}
- 
- 	return 0;
- }
 
-base-commit: 2a046f6a4ecce47ada50dba529ec726dd0d34351
---
 
