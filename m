@@ -1,93 +1,105 @@
-Return-Path: <kvm+bounces-52575-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52577-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 921EFB06DAE
-	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 08:11:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DC2DB06DEA
+	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 08:27:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D7AC65628EC
-	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 06:11:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9344C5650AB
+	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 06:27:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 039F229B77A;
-	Wed, 16 Jul 2025 06:11:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D72BE2877D9;
+	Wed, 16 Jul 2025 06:27:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DCh6an8D"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BnB2HHdo"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28E7B8634A;
-	Wed, 16 Jul 2025 06:11:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD1EC2874FF
+	for <kvm@vger.kernel.org>; Wed, 16 Jul 2025 06:27:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752646285; cv=none; b=Lk5kbMdTfg6mJryXCUmZsE628CY6NTiDuykKM2igTitg/LfPk8QBmcn+FELSxN1cZ9DFpIiZcwXg158Lg0mZnSi3g4etRC6WasqDDBgLCd/0O2pP2wx2rTljD4xq7u3BvQBy2RXR1vw6YMuRNKK305Qe+so9euj52OTtCHn9m+g=
+	t=1752647260; cv=none; b=JtCsfowcIe8SLZtaHl4clmqZNHoY27s6kQ9d/ER6BSSG/1ddxQ8JYVxyR4M9h9QV9ZeRmWjBgcZsQlxRzL+GkCrBkcN8lPvpoRF40Phhm0bf09aySlh5mt1oQbDSNm/6F+kKfqhkVcY4XEQa3iR3shQyeMEctgmwyFPE8Z08hQk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752646285; c=relaxed/simple;
-	bh=UVJe3el9jbj4WjVeMJzLRr38mWDTucXHPmi9EtpiP/k=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SSiduzijMMTpjaNq1p2xdZjoQYSzeLnc2xR+uW49jg7fqkLBA5TNSrlTq608SZdz/y0TtXk/Vi44G7eFRo0IUK6DbzLXyjvh1FqE7ZRtGzA0haP42yp9CkRlD6l6/Z6/dPD1FW6YnOJoUFyuTs5tZ9bdit0iFC4b/2Cexf7AYcg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DCh6an8D; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BD4CC4CEF0;
-	Wed, 16 Jul 2025 06:11:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752646284;
-	bh=UVJe3el9jbj4WjVeMJzLRr38mWDTucXHPmi9EtpiP/k=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=DCh6an8DZXMymHh90s9hI078GBvkLPqFI9WeE0gMO8YnOVueYVnBgIha6pjBo9Au/
-	 z2fdf8E1h3Wa4zxWYlJnaoNhDEZ7DuyNNwiPVF141rpzSKd95K2GSp+0MLd9kHEJfL
-	 vB/n7PNKVCjGrZD2wCjOPIOQwHnCxByJ7D9alYH/GFfFVUyn1reZ14JiaETuL6/Csy
-	 38Us//BTeuFIf/xJ8z0zdk0bKRYedHF5pZfV+WVuaWWkuPemssm8s92pMzjPlH1N7W
-	 a/UFQMQn4Eduyz35cSSX/qiVFVbfrupObmUen+Vs9fdMl6Xyk364e7gi/is6MoGkc/
-	 1hHKwyEy3eK0g==
-Date: Wed, 16 Jul 2025 08:11:17 +0200
-From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, Jonathan Cameron
- <Jonathan.Cameron@huawei.com>, Shiju Jose <shiju.jose@huawei.com>,
- qemu-arm@nongnu.org, qemu-devel@nongnu.org, Philippe =?UTF-8?B?TWF0aGll?=
- =?UTF-8?B?dS1EYXVkw6k=?= <philmd@linaro.org>, Ani Sinha
- <anisinha@redhat.com>, Dongjiu Geng <gengdongjiu1@gmail.com>, Paolo Bonzini
- <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Shannon
- Zhao <shannon.zhaosl@gmail.com>, Yanan Wang <wangyanan55@huawei.com>, Zhao
- Liu <zhao1.liu@intel.com>, kvm@vger.kernel.org, Cleber Rosa
- <crosa@redhat.com>, Eduardo Habkost <eduardo@habkost.net>, Eric Blake
- <eblake@redhat.com>, John Snow <jsnow@redhat.com>, Marcel Apfelbaum
- <marcel.apfelbaum@gmail.com>, Markus Armbruster <armbru@redhat.com>,
- Michael Roth <michael.roth@amd.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v10 (RESEND) 00/20] Change ghes to use HEST-based
- offsets and add support for error inject
-Message-ID: <20250716081117.4b89570a@foz.lan>
-In-Reply-To: <20250715133423-mutt-send-email-mst@kernel.org>
-References: <cover.1749741085.git.mchehab+huawei@kernel.org>
-	<20250715133423-mutt-send-email-mst@kernel.org>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1752647260; c=relaxed/simple;
+	bh=Nm6wYWpaUTxUQrksbS/WulWRPA20L3tmmXTPB37k/8A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MMsZBWs57d3DochfxGse/bUvvDQUv/RO9REgtvvFAi3ql+peuuwiq0b5PwYveFQXVYA68195fB5nq3HKppERY10ZiqrSZm0ufSu4ilzbsPpKoEiYecZi6PwfNu7Q8ecLhCuYEA6jk7ODsSS5VgUmGWRtKWny9f62ygKHwMBXSmY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BnB2HHdo; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1752647258; x=1784183258;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=Nm6wYWpaUTxUQrksbS/WulWRPA20L3tmmXTPB37k/8A=;
+  b=BnB2HHdoklSgjiDPuTUbYQhPmfUCh5xJ8Y7zuh8lGkyorFFeWbLVawES
+   yd8Pkp4VNlj51hOxHpyUXdnIeBOLCcyQoNiutNHLRUGwipSKpJch3DyoZ
+   t4Ot2ynJd2a3Z3U7rwhmjro9mV/qu5HtMkmNRJkyIMa87afeg1qJ7B0tQ
+   I8lol3t9zAY7ORkMKFdJgx8UoFQHH4JEh4VHQRNR4AybI+/yppmcXCTx6
+   Yx1zDckQ4hseuiwFsK07/RSKE7+RfzM3I3U6ClllSmQFBvSGNjLo5cD/V
+   bwVfGhDWbBLG5OZHWqAqyUs8Yn6Yan/f/mLCV3iyIYILYUEjVE0N/NKjB
+   A==;
+X-CSE-ConnectionGUID: DVE1nbp5SsWWUhb6MHffQA==
+X-CSE-MsgGUID: 5A/zYoquQSSZLQqVX0hBzA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11493"; a="54819074"
+X-IronPort-AV: E=Sophos;i="6.16,315,1744095600"; 
+   d="scan'208";a="54819074"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2025 23:27:37 -0700
+X-CSE-ConnectionGUID: cHc9Z1nyT8Gr5uQWj6iK0Q==
+X-CSE-MsgGUID: 35RxXw/uRlak7L5rmo3dsQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,315,1744095600"; 
+   d="scan'208";a="158145049"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
+  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2025 23:27:35 -0700
+Message-ID: <59ec573d-c489-4008-ac87-6d8c207b7e4c@intel.com>
+Date: Wed, 16 Jul 2025 14:27:32 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/2] target/i386: Add TSA attack variants TSA-SQ and
+ TSA-L1
+To: Babu Moger <babu.moger@amd.com>, pbonzini@redhat.com,
+ zhao1.liu@intel.com, bp@alien8.de
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org
+References: <12881b2c03fa351316057ddc5f39c011074b4549.1752176771.git.babu.moger@amd.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <12881b2c03fa351316057ddc5f39c011074b4549.1752176771.git.babu.moger@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Em Tue, 15 Jul 2025 13:36:26 -0400
-"Michael S. Tsirkin" <mst@redhat.com> escreveu:
-
-> On Thu, Jun 12, 2025 at 05:17:24PM +0200, Mauro Carvalho Chehab wrote:
-> > Hi Michael,
-> > 
-> > This is v10 of the patch series, rebased to apply after release
-> > 10.0. The only difference against v9 is a minor confict resolution.  
+On 7/11/2025 3:46 AM, Babu Moger wrote:
+> Transient Scheduler Attacks (TSA) are new speculative side channel attacks
+> related to the execution timing of instructions under specific
+> microarchitectural conditions. In some cases, an attacker may be able to
+> use this timing information to infer data from other contexts, resulting in
+> information leakage.
 > 
-> Unfortunately, this needs a rebase on top of latest PCIHP
-> changes in my tree.  The changes are non trivial, too.
-> I should have let you know more early, sorry :(
+> AMD has identified two sub-variants two variants of TSA.
+> CPUID Fn8000_0021 ECX[1] (TSA_SQ_NO).
+> 	If this bit is 1, the CPU is not vulnerable to TSA-SQ.
+> 
+> CPUID Fn8000_0021 ECX[2] (TSA_L1_NO).
+> 	If this bit is 1, the CPU is not vulnerable to TSA-L1.
+> 
+> Add the new feature word FEAT_8000_0021_ECX and corresponding bits to
+> detect TSA variants.
+> 
+> Link: https://www.amd.com/content/dam/amd/en/documents/resources/bulletin/technical-guidance-for-mitigating-transient-scheduler-attacks.pdf
+> Co-developed-by: Borislav Petkov (AMD) <bp@alien8.de>
+> Signed-off-by: Borislav Petkov (AMD) <bp@alien8.de>
+> Signed-off-by: Babu Moger <babu.moger@amd.com>
 
-If you still accept merging it, I can quickly rebase and send you.
-Just let me know about what branch you want the rebase.
-
-Regards,
-Mauro
+Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
 
