@@ -1,122 +1,138 @@
-Return-Path: <kvm+bounces-52655-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52656-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B086BB07BCE
-	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 19:12:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 067A5B07C07
+	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 19:29:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A71B01AA502B
-	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 17:12:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 54A207B7285
+	for <lists+kvm@lfdr.de>; Wed, 16 Jul 2025 17:28:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C88722F5C2E;
-	Wed, 16 Jul 2025 17:12:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8C242F6F83;
+	Wed, 16 Jul 2025 17:29:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b="OAHyp/E6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Uwl0O+8P"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 158EF17ADF8
-	for <kvm@vger.kernel.org>; Wed, 16 Jul 2025 17:11:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A79C8262FF0;
+	Wed, 16 Jul 2025 17:29:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752685923; cv=none; b=DaxwXLwA6Ro+ZLSqblJwKdjHMFDIPmvC9jBXBVRnjmt1+B6+TkVUUIHOPjKciybcIBu47c8AatMQXkCTInvzQb0T0fxQ8YFmcjRlNVEgm15fhUeHqehbvdcZoNjEopmeBxEC5tAH7LaRZHZm4t+3eH0F2mSZ8do2Yrg5aLYyHSQ=
+	t=1752686965; cv=none; b=Bk+ifki/OuEqWkTffiy0PKF9aVmVt4Fu7BX9DZFHZVYBObuWxYVhYUu4WsZsU3by80yG9iWwus/KSJCXvfAAymvz/7+Aai0Nw90WOSzueDzsHBDd1PRkDlr1J7m6xcbSRboe/SdiuVaCP6mOEsOGZRqZF1ZogTRksiEAx4CWRCI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752685923; c=relaxed/simple;
-	bh=l/nemJ4sgngnNXz5xHvyPBYXJczxoOk9SGrbKk1fbqs=;
-	h=From:To:Subject:CC:Date:Message-ID:MIME-Version:Content-Type; b=WVfoJAckF0k7WEVACcZg4PtZwTomTtXrm4E9I6xhmVDOOWOkY2YrrAEVO+w6ZFNu3KW1m0Jn8UdgceySbiR0dGopOwAbWCj/4mhEIT9lT2vZzt1D8vdMQZ2YMhdZ8vGoJtHLYrQVSX8wYy8kRmsWcIPoidbv4MTDzQMaRqYBsSs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b=OAHyp/E6; arc=none smtp.client-ip=99.78.197.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
+	s=arc-20240116; t=1752686965; c=relaxed/simple;
+	bh=/CRxn40u4I7Y3Igo8F7RLHEk9wLiNnQv+7XGP+TdYDw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lArrFvjkfAnu6RhT/AnmzEZpH1yX4MRObqLpGQGOxec4xHqYNCm4HoehV5Y+b/EUSEZPLFalDSBIUUEzuxabqqVrVO3FA4pH74ZVeoEih7wQBM47eH1IUbpCz5eFjGpoBIQbw54Uok9hk45OgMxcMwnvZd5SS0A2PrtnT1ynYKU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Uwl0O+8P; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-234d3261631so568345ad.1;
+        Wed, 16 Jul 2025 10:29:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazoncorp2;
-  t=1752685919; x=1784221919;
-  h=from:to:subject:cc:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=l/nemJ4sgngnNXz5xHvyPBYXJczxoOk9SGrbKk1fbqs=;
-  b=OAHyp/E6TWK581jsQR9EWyAPa8phpVDK4+UowN57PhqY8kjp4Sl4Y5bm
-   CtRRbm+763eQ0eXtS/HgCfPXbqI0CqQ5TNKjczhjR3WYH4JP/sSkPDbtg
-   tXXyBZUqSuCBFKxJezDL1tVJrIrv1lEJou8qca/hUGZALwtExeUgRySMc
-   GDCvl7CRwWkM8zG91KqfMxIgFlhY1ljlxHarGs6VhcM7qxbogJiQ5I4S0
-   7Y/wldysCGGWXQ5/BaNMWHjs5uP2k0/QsqxeIquhHNxFS1p+FwKsrqhLc
-   WDSZUIDd0ID3v/rZLCxqdYdRtNBTznSMgktGW3DrjvBK31boA18qR8vHW
-   g==;
-X-IronPort-AV: E=Sophos;i="6.16,316,1744070400"; 
-   d="scan'208";a="423949776"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jul 2025 17:11:57 +0000
-Received: from EX19MTAEUC002.ant.amazon.com [10.0.17.79:23882]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.15.222:2525] with esmtp (Farcaster)
- id 2aad4cec-6dfd-47f5-8c0a-fb3af5b9b4dd; Wed, 16 Jul 2025 17:11:56 +0000 (UTC)
-X-Farcaster-Flow-ID: 2aad4cec-6dfd-47f5-8c0a-fb3af5b9b4dd
-Received: from EX19D039EUC004.ant.amazon.com (10.252.61.190) by
- EX19MTAEUC002.ant.amazon.com (10.252.51.181) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 16 Jul 2025 17:11:55 +0000
-Received: from dev-dsk-mngyadam-1c-cb3f7548.eu-west-1.amazon.com.amazon.de
- (10.253.107.175) by EX19D039EUC004.ant.amazon.com (10.252.61.190) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14; Wed, 16 Jul 2025
- 17:11:53 +0000
-From: Mahmoud Nagy Adam <mngyadam@amazon.de>
-To: <kvm@vger.kernel.org>
-Subject: Revisiting WC mmap Support for VFIO PCI
-CC: Jason Gunthorpe <jgg@ziepe.ca>, Alex Williamson
-	<alex.williamson@redhat.com>, Praveen Kumar <pravkmr@amazon.de>,
-	<nagy@khwaternagy.com>
-Date: Wed, 16 Jul 2025 19:11:50 +0200
-Message-ID: <lrkyq4ivccb6x.fsf@dev-dsk-mngyadam-1c-cb3f7548.eu-west-1.amazon.com>
+        d=gmail.com; s=20230601; t=1752686963; x=1753291763; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=EeNLgPU1RuJx4DVnlAIwci5Aq29THoN9KPCiSfsR7Ek=;
+        b=Uwl0O+8PTuGxtmurFJNVw3vjvtqDDNdkuSfsO2fT6RcEzlB/Gw7H9qC7YL0X8YAhJs
+         RuzgINL0wphT9AW0iRFIbzhB5bRNbwWEz562q7Q05wIDftJa5lGHa5eiE+dPqR5oVtVD
+         OVu6UuqfQRGmDBHF01F0xKPZRkiJf4VTBqVPj4ErDYuSnZsiHdtbglCxNc7/S/SOwyTR
+         gNKB4DNi67VXM4lELv/XNMM4F71CNh53nmrpsKFofK0ud6F7lQ6Dz+5je6l52YG1uyix
+         lmGm26RaBAP+318ox5oblmRjJqX2AWjxn2lFPilzJkvxx1fnrfGj7af+Web8oVcRNqFX
+         rfHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752686963; x=1753291763;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=EeNLgPU1RuJx4DVnlAIwci5Aq29THoN9KPCiSfsR7Ek=;
+        b=cqCorNpTIdiu+qJ/OYsWmVs3W8n8c5LLdDmkrKbU5HWgIdHRGiFT1AO5tRzlX9BTZe
+         TbSYw2ezl3G/QVAj1VLdmLB4bLOT9w0ko2rhDyiEouWOiH7DYuUbBCdh47iY9xnfZsB2
+         e+Aj6nbJrEUNXYsQDtxWUT8CzChPCKYrfb6C7LbViGENwaBywJglWsf1pZy7GrLgqjmN
+         g/l/61APTDeXms/YYGLh5yQKT1ylsax8JPk1wUWy+udI0fIJU/XIIR4kmXR33NPzSb3T
+         fP9QOg68sPSaZXIay2TYM0DcIUe9+VDjN2NBqLTOjAR/561WhIq6cQKzJu+fMrG4zayE
+         xxCQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUpDHMpHoppTYNwUbFdegtinUh3XfpW6c/GaIlK3c20jruF1+RtsR6/4Stux0x9sBWPJYo=@vger.kernel.org, AJvYcCUvvadx7wSByJXa8BcGdKt2RuUKn67V3BO3zMgFG57fHQrcOVcwIvP5WFdm1kijUymbOi3vcf3TFkhhZA==@vger.kernel.org, AJvYcCXSrlx0b39z/07vfSz6Miz98wSI24YFVf9ZSlcD2G8H79ijNOTEB+DBhFMQ3d52vfxebbc8d2G3Xa3xB9z0@vger.kernel.org
+X-Gm-Message-State: AOJu0YyX5Xz79StCa2b9P6cBhgDM7CrRccfwLYVT5cKdCAAr+IQFnI3P
+	BjFwest/lezc2jH6nDjOCyIdlLYNAsVKurfop+AIAtBXpaUSQujQ68ir
+X-Gm-Gg: ASbGnct9u1fj2UF+yVmV8L3ymdWaxH1vTKWdtq3iYrdQwArreV2lDF/olBIaVG0Y5DP
+	JkbyXh+hXL8caSfCLVKmrFMEAa3AUbTKdZ78mCFSm6Clt1KPvGOfPYSLRa2p5wIZkl8Nn/0AL9D
+	Yp2LFkEd7Ghw7Ef1OhGr1OzUtoOIiG50xnACxMc4iqDhPlzVJG+a2Of7OLgoABxuJO2Nd+Jop2r
+	DV7z/7V6Os7U8JmyJV1RHgErBAsbLP+eg1HQadzmJwj50i7UDEWcUQu+gh04IN6Eo4Nf1PEXa+q
+	9c5V0pdawzppmuW9Qsr81dc51VMLFpVCJN145sVsiTY+JaeqSoYGFCQMl8kBgmmw3rs2afzKF87
+	k8duR3NX6woiLOYQ7q2Db5g==
+X-Google-Smtp-Source: AGHT+IFrla4A/7rNoDTY22sMyvGzQlh9NwucP/BhuoqqwEBTVe8gcRHnNT5E8Q/CYhCQFDV2lZpm2w==
+X-Received: by 2002:a17:903:2a88:b0:235:655:11aa with SMTP id d9443c01a7336-23e24f522dbmr46832995ad.39.1752686962871;
+        Wed, 16 Jul 2025 10:29:22 -0700 (PDT)
+Received: from localhost ([216.228.127.129])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23de4359b2dsm130406275ad.206.2025.07.16.10.29.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Jul 2025 10:29:22 -0700 (PDT)
+From: Yury Norov <yury.norov@gmail.com>
+To: Huacai Chen <chenhuacai@kernel.org>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	linux-mips@vger.kernel.org,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Yury Norov <yury.norov@gmail.com>
+Subject: [PATCH] mips: kvm: simplify kvm_mips_deliver_interrupts()
+Date: Wed, 16 Jul 2025 13:29:17 -0400
+Message-ID: <20250716172918.26468-1-yury.norov@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-ClientProxiedBy: EX19D042UWA003.ant.amazon.com (10.13.139.44) To
- EX19D039EUC004.ant.amazon.com (10.252.61.190)
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 8bit
 
-CkhpIGFsbCwKCknigJlkIGxpa2UgdG8gcmV2aXNpdCB0aGUgdG9waWMgb2YgYWRkaW5nIFdyaXRl
-IENvbWJpbmluZyAoV0MpIG1tYXAKc3VwcG9ydCBmb3IgVkZJTyBQQ0kuIFdlIChBbWF6b24gTGlu
-dXgpIGFyZSBjdXJyZW50bHkgd29ya2luZyBvbgphbGxvd2luZyB0aGlzIGZlYXR1cmUsIGFuZCBJ
-IHdhbnRlZCB0byBzaGFyZSB0aGUgY3VycmVudCBhcHByb2FjaCBhbmQKZ2F0aGVyIGZlZWRiYWNr
-IGZyb20gdGhlIGNvbW11bml0eS4KCkZyb20gZWFybGllciBkaXNjdXNzaW9ucyBhbmQgUkZDcywg
-dGhlcmUgYXJlIHNldmVyYWwgY29uc2lkZXJhdGlvbnMgdGhhdApuZWVkIHRvIGJlIGFkZHJlc3Nl
-ZCBmb3IgYSBjbGVhbiBpbXBsZW1lbnRhdGlvbiwgd2hpY2ggaW5jbHVkZXM6CgotIFJlY2Vpdmlu
-ZyBtbWFwIGZsYWdzIGZyb20gdXNlcnNwYWNlIHdoaWNoIHdhcyBwcmV2aW91c2x5IGV4cGxvcmVk
-WzBdLAogIGFuZCBwcm9wb3NlZCBhcHByb2FjaCBpcyB0byBleHBvc2UgYW4gaW9jdGwgdUFQSSB0
-byBhbGxvdyB1c2Vyc3BhY2UgdG8KICBzZXQgZmxhZ3MgZm9yIGEgcmFuZ2UuIFRoZXJlIHdhcyBh
-bHNvIGRpc2N1c3Npb24gYXJvdW5kCiAgZGlmZmVyZW50aWF0aW5nIFdDIGZyb20gcHJlZmV0Y2hh
-YmxlIG1lbW9yeSDigJQgd2hpY2ggbWFrZXMgc2Vuc2Ug4oCUIGFuZAogIGxldHRpbmcgdXNlcnNw
-YWNlIGV4cGxpY2l0bHkgY2hvb3NlIHdoaWNoIHJlZ2lvbiB0byB1c2UgV0MuCiAgCi0gRGVhbGlu
-ZyB3aXRoIGxlZ2FjeSByZWdpb25zICYgZHJpdmVycyBjcmVhdGVkIHJlZ2lvbnMsIHRoaXMgY291
-bGQgYmUKICBoYW5kbGVkIGFzIHN1Z2dlc3RlZFsxXSBmcm9tIEphc29uIHVzaW5nIG1hcGxlIHRy
-ZWUsIHdoaWNoIEknbQogIGltcGxlbWVudGluZyB0byBpbnNlcnQgZmxhZ3MgZW50cnkgb2YgdGhl
-IHJhbmdlIHRvIGJlIG1tYXBwZWQsIHNpbmNlCiAgdGhpcyB3b3VsZCBnaXZlIHVzIHRoZSBmbGV4
-aWJpbGl0eSB0byBzZXQgdGhlIGZsYWdzIG9mIGFueSByYW5nZXMuCgotIFNjb3BpbmcgdGhlIG1t
-YXAgZmxhZ3MgbG9jYWxseSBwZXIgcmVxdWVzdCBpbnN0ZWFkIG9mIGRlZmluaW5nIGl0CiAgZ2xv
-YmFsbHkgb24gdmZpb19kZXZpY2UvdmZpb19wY2lfY29yZV9kZXZpY2UuIFRoaXMgYWZhaWN0IGZy
-b20gdGhlCiAgY29kZSBjb3VsZCBiZSBoYW5kbGVkIGlmIHZmaW9fZGV2aWNlX2ZpbGUgc3RydWN0
-IGlzIHVzZWQgd2l0aCB0aGUKICB2ZmlvX2RldmljZV9vcHMgaW5zdGVhZCBvZiB0aGUgdmZpb19k
-ZXZpY2UsIHNwZWNpZmljYWxseSB0aGUgbW1hcCAmCiAgaW9jdGwgc2luY2UgdGhlc2UgdGhlIG9w
-cyBvZiBpbnRlcmVzdCBoZXJlLCBzbyB0aGF0IHdlIGNvdWxkIGFjY2VzcyBpdAogIHRoZXJlIGFu
-ZCBoYXZlIGEgcGVyIGZkIG1hcGxlIHRyZWUgdG8ga2VlcCB0aGUgZmxhZ3MgaW4uIFRoaXMgd2ls
-bAogIGFsc28ga2VlcCB0aGUgbGlmZSB0aW1lIG9mIHRoZSBmbGFncyB0byB0aGUgRkQgbm90IHRv
-IHRoZSBkZXZpY2Ugd2hpY2gKICBJIHRoaW5rIGlzIGJldHRlciBpbiB0aGlzIGNhc2UuCgpTaW5j
-ZSBJJ20gaW4gdGhlIG1pZGRsZSBvZiBpbnZlc3RpZ2F0aW5nICYgaW1wbGVtZW50aW5nIHRoaXMg
-dG9waWMsIEkKd291bGQgbGlrZSB0byBjb2xsZWN0IG9waW5pb25zIG9uIHRoZSBhcHByb2FjaCBz
-byBmYXIsIHNwZWNpYWxseSB0aGUKbGFzdCBwb2ludC4gYmV0dGVyIGlkZWFzIG9yIG9iamVjdGlv
-bnMgd2l0aCBkZWFsaW5nIHdpdGggbG9jYWwgZmxhZ3MKdXNpbmcgdmZpb19kZXZpY2VfZmlsZSBv
-ciBvdGhlciBwb2ludHMgd291bGQgYmUgYXBwcmVjaWF0ZWQuCgpbMF06IGh0dHBzOi8vbG9yZS5r
-ZXJuZWwub3JnL2t2bS8yMDI0MDczMTE1NTM1Mi4zOTczODU3LTEta2J1c2NoQG1ldGEuY29tLwpb
-MV06IGh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL2t2bS8yMDI0MDgwMTE0MTkxNC5HQzMwMzA3NjFA
-emllcGUuY2EvCgpSZWdhcmRzLApNTkFkYW0KCgoKQW1hem9uIFdlYiBTZXJ2aWNlcyBEZXZlbG9w
-bWVudCBDZW50ZXIgR2VybWFueSBHbWJIClRhbWFyYS1EYW56LVN0ci4gMTMKMTAyNDMgQmVybGlu
-Ckdlc2NoYWVmdHNmdWVocnVuZzogQ2hyaXN0aWFuIFNjaGxhZWdlciwgSm9uYXRoYW4gV2Vpc3MK
-RWluZ2V0cmFnZW4gYW0gQW10c2dlcmljaHQgQ2hhcmxvdHRlbmJ1cmcgdW50ZXIgSFJCIDI1Nzc2
-NCBCClNpdHo6IEJlcmxpbgpVc3QtSUQ6IERFIDM2NSA1MzggNTk3Cg==
+The function opencodes for_each_set_bit() macro, which makes it bulky.
+Using the proper API makes all the housekeeping code go away.
+
+Signed-off-by: Yury Norov <yury.norov@gmail.com>
+---
+ arch/mips/kvm/interrupt.c | 20 ++------------------
+ 1 file changed, 2 insertions(+), 18 deletions(-)
+
+diff --git a/arch/mips/kvm/interrupt.c b/arch/mips/kvm/interrupt.c
+index 0277942279ea..895a6f1781fd 100644
+--- a/arch/mips/kvm/interrupt.c
++++ b/arch/mips/kvm/interrupt.c
+@@ -27,27 +27,11 @@ void kvm_mips_deliver_interrupts(struct kvm_vcpu *vcpu, u32 cause)
+ 	unsigned long *pending_clr = &vcpu->arch.pending_exceptions_clr;
+ 	unsigned int priority;
+ 
+-	if (!(*pending) && !(*pending_clr))
+-		return;
+-
+-	priority = __ffs(*pending_clr);
+-	while (priority <= MIPS_EXC_MAX) {
++	for_each_set_bit(priority, pending_clr, MIPS_EXC_MAX + 1)
+ 		kvm_mips_callbacks->irq_clear(vcpu, priority, cause);
+ 
+-		priority = find_next_bit(pending_clr,
+-					 BITS_PER_BYTE * sizeof(*pending_clr),
+-					 priority + 1);
+-	}
+-
+-	priority = __ffs(*pending);
+-	while (priority <= MIPS_EXC_MAX) {
++	for_each_set_bit(priority, pending, MIPS_EXC_MAX + 1)
+ 		kvm_mips_callbacks->irq_deliver(vcpu, priority, cause);
+-
+-		priority = find_next_bit(pending,
+-					 BITS_PER_BYTE * sizeof(*pending),
+-					 priority + 1);
+-	}
+-
+ }
+ 
+ int kvm_mips_pending_timer(struct kvm_vcpu *vcpu)
+-- 
+2.43.0
 
 
