@@ -1,322 +1,276 @@
-Return-Path: <kvm+bounces-52682-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52683-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3F16B08238
-	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 03:17:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF2F6B08241
+	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 03:28:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 16F18581737
-	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 01:17:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D2571A619D4
+	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 01:28:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A84721DACA1;
-	Thu, 17 Jul 2025 01:17:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7E461DBB2E;
+	Thu, 17 Jul 2025 01:27:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Sa24ydfb"
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B03F13B58A;
-	Thu, 17 Jul 2025 01:17:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29EB210A1F;
+	Thu, 17 Jul 2025 01:27:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752715023; cv=none; b=CYPh1mEFDOS9ozdk48cU2w+DPyodKdr0o6alTm42WJ9ekTUk/xZOSUrhywQqEQ+1qrNebT+gXsYqq7lmyywdoUaUgT4XkPAshxft/IMMGJ0jwCaKKGwLxOb3b1wuVF2KKrYqyf525IjbovZicRaUKnjBfH+1YOZMwkKkBVUBNhs=
+	t=1752715675; cv=none; b=rM1Mkay0ahciLWAIiMQVNJKrNBl/XFbk7pOaWOQKP86z1EtBGZg+Tp6yQEkxtAJ4GJQiQCkOsQDAtcDMg6Ntpeh86czFZz3l7YS+N4gdPA66ryupg7sKOOo8f01glyHG4L8Ya/wEvYd83/tA1kvXwJdIFEeudYzK9A0S6KgiENY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752715023; c=relaxed/simple;
-	bh=krV+cjz7l7jsfLQ9rfyn2rPvAGrWOQ0VGovQAoqupuM=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ix9XNv3rXWGUWvJs2G7FMlZeyWUd8T+ck5uY4aT/zxfomsRu+fbCy7u7WyvgyauelfXKbZbOaDxvcfLJtjmo5b+6f2JkRd9lR+U1DPGNQnqxdUd9KK3kKuWxEPAuDiA3lhdN3qWzgq7Vz7OAe57DKg8zfv/Mq33nxdkatwmaQBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4bjFKG47l9zdbwt;
-	Thu, 17 Jul 2025 09:12:50 +0800 (CST)
-Received: from dggpemf500015.china.huawei.com (unknown [7.185.36.143])
-	by mail.maildlp.com (Postfix) with ESMTPS id 1F399140132;
-	Thu, 17 Jul 2025 09:16:58 +0800 (CST)
-Received: from huawei.com (10.50.165.33) by dggpemf500015.china.huawei.com
- (7.185.36.143) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Thu, 17 Jul
- 2025 09:16:57 +0800
-From: Longfang Liu <liulongfang@huawei.com>
-To: <alex.williamson@redhat.com>, <jgg@nvidia.com>,
-	<herbert@gondor.apana.org.au>, <shameerali.kolothum.thodi@huawei.com>,
-	<jonathan.cameron@huawei.com>
-CC: <linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linuxarm@openeuler.org>,
-	<liulongfang@huawei.com>
-Subject: [PATCH v6 3/3] migration: adapt to new migration configuration
-Date: Thu, 17 Jul 2025 09:15:02 +0800
-Message-ID: <20250717011502.16050-4-liulongfang@huawei.com>
-X-Mailer: git-send-email 2.24.0
-In-Reply-To: <20250717011502.16050-1-liulongfang@huawei.com>
-References: <20250717011502.16050-1-liulongfang@huawei.com>
+	s=arc-20240116; t=1752715675; c=relaxed/simple;
+	bh=bH78hp3R6n3DKw5HO88BlvlyXjAwSoCV5hGl6uuBB88=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HEi43/jkniiaDMnbK3awlYXSWhOxBg+sCY/Y49Rh6sw+MxSvmonVi2swtZuXqcH28TLC9k994WWlPiiMnE+7xZoJWTa9Lu6FUS8TcwsT7kRCFv1Y/qyccnzSu/fWYZKX/Jvqw0w7LYWj1K7l4hyGpSWOlvZSzwiP5ryEQiniH2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Sa24ydfb; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1752715674; x=1784251674;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=bH78hp3R6n3DKw5HO88BlvlyXjAwSoCV5hGl6uuBB88=;
+  b=Sa24ydfbI57zORt4yscIOeJlylb+FrCHpU61+4HbmKlqjZ05WCstvFzJ
+   SRVnLzD9LsX9SNq3csGdqSTIe+wNLh6m/4JBKr2XHL2nd233JwuuGVfZ+
+   unVDGpKNA0by9Y7x5GqaPInSsruL72nQpFsXhpFSCbklZoURv8hri0BLu
+   9j3KhIpXNmgAz6oSyTfC1Ls8AygmpAlCfVDxoU7BlVFXynD14DqnZ16dP
+   uvLCya9aVLcGeAtunpWdr2yFYWHRafMu420PCLhiJOe1Z6MJkGtayq+qU
+   7ulOcY3G2d/VN5gIgQEAs0/SL+Pu5mci5+UvgIwhO1CApEu9P+9oHU1eG
+   Q==;
+X-CSE-ConnectionGUID: KQF4EqLUQ9ifjwl8R3D0dw==
+X-CSE-MsgGUID: Fr4r+TteQK+KE8RQcC/zxw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11493"; a="54193307"
+X-IronPort-AV: E=Sophos;i="6.16,317,1744095600"; 
+   d="scan'208";a="54193307"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jul 2025 18:27:53 -0700
+X-CSE-ConnectionGUID: jSx3NzMcTHudbSFGjLmckw==
+X-CSE-MsgGUID: v9byWzS1QXyEA+aDSbHwnw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,317,1744095600"; 
+   d="scan'208";a="161966049"
+Received: from unknown (HELO [10.238.3.238]) ([10.238.3.238])
+  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jul 2025 18:27:49 -0700
+Message-ID: <4475637c-4d34-4037-8f43-8b8280617554@linux.intel.com>
+Date: Thu, 17 Jul 2025 09:27:46 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- dggpemf500015.china.huawei.com (7.185.36.143)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 3/4] x86/tdx: Rename TDX_ATTR_* to TDX_TD_ATTR_*
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: "Kirill A. Shutemov" <kas@kernel.org>,
+ Dave Hansen <dave.hansen@linux.intel.com>,
+ Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
+ Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+ "H. Peter Anvin" <hpa@zytor.com>, linux-coco@lists.linux.dev,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
+ Rick Edgecombe <rick.p.edgecombe@intel.com>, Kai Huang
+ <kai.huang@intel.com>, yan.y.zhao@intel.com, reinette.chatre@intel.com,
+ adrian.hunter@intel.com, tony.lindgren@intel.com
+References: <20250715091312.563773-1-xiaoyao.li@intel.com>
+ <20250715091312.563773-4-xiaoyao.li@intel.com>
+Content-Language: en-US
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20250715091312.563773-4-xiaoyao.li@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On new platforms greater than QM_HW_V3, the migration region has been
-relocated from the VF to the PF. The driver must also be modified
-accordingly to adapt to the new hardware device.
 
-Utilize the PF's I/O base directly on the new hardware platform,
-and no mmap operation is required. If it is on an old platform,
-the driver needs to be compatible with the old solution.
 
-Signed-off-by: Longfang Liu <liulongfang@huawei.com>
----
- .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 164 ++++++++++++------
- .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |   7 +
- 2 files changed, 118 insertions(+), 53 deletions(-)
+On 7/15/2025 5:13 PM, Xiaoyao Li wrote:
+> The macros TDX_ATTR_* and DEF_TDX_ATTR_* are related to TD attributes,
+> which are TD-scope attributes. Naming them as TDX_ATTR_* can be somewhat
+> confusing and might mislead people into thinking they are TDX global
+> things.
+It seems that tdx_attributes is limited to hold td attributes.
+For the same reason, is it better to rename tdx_attributes to tdx_td_attributes?
 
-diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-index 515ff87f9ed9..bf4a7468bca0 100644
---- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-+++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-@@ -125,6 +125,72 @@ static int qm_get_cqc(struct hisi_qm *qm, u64 *addr)
- 	return 0;
- }
- 
-+static int qm_get_xqc_regs(struct hisi_acc_vf_core_device *hisi_acc_vdev,
-+			   struct acc_vf_data *vf_data)
-+{
-+	struct hisi_qm *qm = &hisi_acc_vdev->vf_qm;
-+	struct device *dev = &qm->pdev->dev;
-+	u32 eqc_addr, aeqc_addr;
-+	int ret;
-+
-+	if (qm->ver == QM_HW_V3) {
-+		eqc_addr = QM_EQC_DW0;
-+		aeqc_addr = QM_AEQC_DW0;
-+	} else {
-+		eqc_addr = QM_EQC_PF_DW0;
-+		aeqc_addr = QM_AEQC_PF_DW0;
-+	}
-+
-+	/* QM_EQC_DW has 7 regs */
-+	ret = qm_read_regs(qm, eqc_addr, vf_data->qm_eqc_dw, 7);
-+	if (ret) {
-+		dev_err(dev, "failed to read QM_EQC_DW\n");
-+		return ret;
-+	}
-+
-+	/* QM_AEQC_DW has 7 regs */
-+	ret = qm_read_regs(qm, aeqc_addr, vf_data->qm_aeqc_dw, 7);
-+	if (ret) {
-+		dev_err(dev, "failed to read QM_AEQC_DW\n");
-+		return ret;
-+	}
-+
-+	return 0;
-+}
-+
-+static int qm_set_xqc_regs(struct hisi_acc_vf_core_device *hisi_acc_vdev,
-+			   struct acc_vf_data *vf_data)
-+{
-+	struct hisi_qm *qm = &hisi_acc_vdev->vf_qm;
-+	struct device *dev = &qm->pdev->dev;
-+	u32 eqc_addr, aeqc_addr;
-+	int ret;
-+
-+	if (qm->ver == QM_HW_V3) {
-+		eqc_addr = QM_EQC_DW0;
-+		aeqc_addr = QM_AEQC_DW0;
-+	} else {
-+		eqc_addr = QM_EQC_PF_DW0;
-+		aeqc_addr = QM_AEQC_PF_DW0;
-+	}
-+
-+	/* QM_EQC_DW has 7 regs */
-+	ret = qm_write_regs(qm, eqc_addr, vf_data->qm_eqc_dw, 7);
-+	if (ret) {
-+		dev_err(dev, "failed to write QM_EQC_DW\n");
-+		return ret;
-+	}
-+
-+	/* QM_AEQC_DW has 7 regs */
-+	ret = qm_write_regs(qm, aeqc_addr, vf_data->qm_aeqc_dw, 7);
-+	if (ret) {
-+		dev_err(dev, "failed to write QM_AEQC_DW\n");
-+		return ret;
-+	}
-+
-+	return 0;
-+}
-+
- static int qm_get_regs(struct hisi_qm *qm, struct acc_vf_data *vf_data)
- {
- 	struct device *dev = &qm->pdev->dev;
-@@ -167,20 +233,6 @@ static int qm_get_regs(struct hisi_qm *qm, struct acc_vf_data *vf_data)
- 		return ret;
- 	}
- 
--	/* QM_EQC_DW has 7 regs */
--	ret = qm_read_regs(qm, QM_EQC_DW0, vf_data->qm_eqc_dw, 7);
--	if (ret) {
--		dev_err(dev, "failed to read QM_EQC_DW\n");
--		return ret;
--	}
--
--	/* QM_AEQC_DW has 7 regs */
--	ret = qm_read_regs(qm, QM_AEQC_DW0, vf_data->qm_aeqc_dw, 7);
--	if (ret) {
--		dev_err(dev, "failed to read QM_AEQC_DW\n");
--		return ret;
--	}
--
- 	return 0;
- }
- 
-@@ -239,20 +291,6 @@ static int qm_set_regs(struct hisi_qm *qm, struct acc_vf_data *vf_data)
- 		return ret;
- 	}
- 
--	/* QM_EQC_DW has 7 regs */
--	ret = qm_write_regs(qm, QM_EQC_DW0, vf_data->qm_eqc_dw, 7);
--	if (ret) {
--		dev_err(dev, "failed to write QM_EQC_DW\n");
--		return ret;
--	}
--
--	/* QM_AEQC_DW has 7 regs */
--	ret = qm_write_regs(qm, QM_AEQC_DW0, vf_data->qm_aeqc_dw, 7);
--	if (ret) {
--		dev_err(dev, "failed to write QM_AEQC_DW\n");
--		return ret;
--	}
--
- 	return 0;
- }
- 
-@@ -522,6 +560,10 @@ static int vf_qm_load_data(struct hisi_acc_vf_core_device *hisi_acc_vdev,
- 		return ret;
- 	}
- 
-+	ret = qm_set_xqc_regs(hisi_acc_vdev, vf_data);
-+	if (ret)
-+		return ret;
-+
- 	ret = hisi_qm_mb(qm, QM_MB_CMD_SQC_BT, qm->sqc_dma, 0, 0);
- 	if (ret) {
- 		dev_err(dev, "set sqc failed\n");
-@@ -589,6 +631,10 @@ static int vf_qm_state_save(struct hisi_acc_vf_core_device *hisi_acc_vdev,
- 	vf_data->vf_qm_state = QM_READY;
- 	hisi_acc_vdev->vf_qm_state = vf_data->vf_qm_state;
- 
-+	ret = qm_get_xqc_regs(hisi_acc_vdev, vf_data);
-+	if (ret)
-+		return ret;
-+
- 	ret = vf_qm_read_data(vf_qm, vf_data);
- 	if (ret)
- 		return ret;
-@@ -1186,34 +1232,45 @@ static int hisi_acc_vf_qm_init(struct hisi_acc_vf_core_device *hisi_acc_vdev)
- {
- 	struct vfio_pci_core_device *vdev = &hisi_acc_vdev->core_device;
- 	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
-+	struct hisi_qm *pf_qm = hisi_acc_vdev->pf_qm;
- 	struct pci_dev *vf_dev = vdev->pdev;
- 
--	/*
--	 * ACC VF dev BAR2 region consists of both functional register space
--	 * and migration control register space. For migration to work, we
--	 * need access to both. Hence, we map the entire BAR2 region here.
--	 * But unnecessarily exposing the migration BAR region to the Guest
--	 * has the potential to prevent/corrupt the Guest migration. Hence,
--	 * we restrict access to the migration control space from
--	 * Guest(Please see mmap/ioctl/read/write override functions).
--	 *
--	 * Please note that it is OK to expose the entire VF BAR if migration
--	 * is not supported or required as this cannot affect the ACC PF
--	 * configurations.
--	 *
--	 * Also the HiSilicon ACC VF devices supported by this driver on
--	 * HiSilicon hardware platforms are integrated end point devices
--	 * and the platform lacks the capability to perform any PCIe P2P
--	 * between these devices.
--	 */
--
--	vf_qm->io_base =
--		ioremap(pci_resource_start(vf_dev, VFIO_PCI_BAR2_REGION_INDEX),
--			pci_resource_len(vf_dev, VFIO_PCI_BAR2_REGION_INDEX));
--	if (!vf_qm->io_base)
--		return -EIO;
-+	if (pf_qm->ver == QM_HW_V3) {
-+		/*
-+		 * ACC VF dev BAR2 region consists of both functional register space
-+		 * and migration control register space. For migration to work, we
-+		 * need access to both. Hence, we map the entire BAR2 region here.
-+		 * But unnecessarily exposing the migration BAR region to the Guest
-+		 * has the potential to prevent/corrupt the Guest migration. Hence,
-+		 * we restrict access to the migration control space from
-+		 * Guest(Please see mmap/ioctl/read/write override functions).
-+		 *
-+		 * Please note that it is OK to expose the entire VF BAR if migration
-+		 * is not supported or required as this cannot affect the ACC PF
-+		 * configurations.
-+		 *
-+		 * Also the HiSilicon ACC VF devices supported by this driver on
-+		 * HiSilicon hardware platforms are integrated end point devices
-+		 * and the platform lacks the capability to perform any PCIe P2P
-+		 * between these devices.
-+		 */
- 
-+		vf_qm->io_base =
-+			ioremap(pci_resource_start(vf_dev, VFIO_PCI_BAR2_REGION_INDEX),
-+				pci_resource_len(vf_dev, VFIO_PCI_BAR2_REGION_INDEX));
-+		if (!vf_qm->io_base)
-+			return -EIO;
-+	} else {
-+		/*
-+		 * On hardware platforms greater than QM_HW_V3, the migration function
-+		 * register is placed in the BAR2 configuration region of the PF,
-+		 * and each VF device occupies 8KB of configuration space.
-+		 */
-+		vf_qm->io_base = pf_qm->io_base + QM_MIG_REGION_OFFSET +
-+				 hisi_acc_vdev->vf_id * QM_MIG_REGION_SIZE;
-+	}
- 	vf_qm->fun_type = QM_HW_VF;
-+	vf_qm->ver = pf_qm->ver;
- 	vf_qm->pdev = vf_dev;
- 	mutex_init(&vf_qm->mailbox_lock);
- 
-@@ -1539,7 +1596,8 @@ static void hisi_acc_vfio_pci_close_device(struct vfio_device *core_vdev)
- 	hisi_acc_vf_disable_fds(hisi_acc_vdev);
- 	mutex_lock(&hisi_acc_vdev->open_mutex);
- 	hisi_acc_vdev->dev_opened = false;
--	iounmap(vf_qm->io_base);
-+	if (vf_qm->ver == QM_HW_V3)
-+		iounmap(vf_qm->io_base);
- 	mutex_unlock(&hisi_acc_vdev->open_mutex);
- 	vfio_pci_core_close_device(core_vdev);
- }
-diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-index 91002ceeebc1..348f8bb5b42c 100644
---- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-+++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-@@ -59,6 +59,13 @@
- #define ACC_DEV_MAGIC_V1	0XCDCDCDCDFEEDAACC
- #define ACC_DEV_MAGIC_V2	0xAACCFEEDDECADEDE
- 
-+#define QM_MIG_REGION_OFFSET		0x180000
-+#define QM_MIG_REGION_SIZE		0x2000
-+
-+#define QM_SUB_VERSION_ID		0x100210
-+#define QM_EQC_PF_DW0			0x1c00
-+#define QM_AEQC_PF_DW0			0x1c20
-+
- struct acc_vf_data {
- #define QM_MATCH_SIZE offsetofend(struct acc_vf_data, qm_rsv_state)
- 	/* QM match information */
--- 
-2.24.0
+Otherwise,
+Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
+
+> Rename TDX_ATTR_* to TDX_TD_ATTR_* to explicitly clarify they are
+> TD-scope things.
+>
+> Suggested-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> ---
+>   arch/x86/coco/tdx/debug.c         | 26 ++++++++--------
+>   arch/x86/coco/tdx/tdx.c           |  8 ++---
+>   arch/x86/include/asm/shared/tdx.h | 50 +++++++++++++++----------------
+>   arch/x86/kvm/vmx/tdx.c            |  4 +--
+>   4 files changed, 44 insertions(+), 44 deletions(-)
+>
+> diff --git a/arch/x86/coco/tdx/debug.c b/arch/x86/coco/tdx/debug.c
+> index 28990c2ab0a1..8e477db4ce0a 100644
+> --- a/arch/x86/coco/tdx/debug.c
+> +++ b/arch/x86/coco/tdx/debug.c
+> @@ -7,21 +7,21 @@
+>   #include <linux/printk.h>
+>   #include <asm/tdx.h>
+>   
+> -#define DEF_TDX_ATTR_NAME(_name) [TDX_ATTR_##_name##_BIT] = __stringify(_name)
+> +#define DEF_TDX_TD_ATTR_NAME(_name) [TDX_TD_ATTR_##_name##_BIT] = __stringify(_name)
+>   
+>   static __initdata const char *tdx_attributes[] = {
+> -	DEF_TDX_ATTR_NAME(DEBUG),
+> -	DEF_TDX_ATTR_NAME(HGS_PLUS_PROF),
+> -	DEF_TDX_ATTR_NAME(PERF_PROF),
+> -	DEF_TDX_ATTR_NAME(PMT_PROF),
+> -	DEF_TDX_ATTR_NAME(ICSSD),
+> -	DEF_TDX_ATTR_NAME(LASS),
+> -	DEF_TDX_ATTR_NAME(SEPT_VE_DISABLE),
+> -	DEF_TDX_ATTR_NAME(MIGRATABLE),
+> -	DEF_TDX_ATTR_NAME(PKS),
+> -	DEF_TDX_ATTR_NAME(KL),
+> -	DEF_TDX_ATTR_NAME(TPA),
+> -	DEF_TDX_ATTR_NAME(PERFMON),
+> +	DEF_TDX_TD_ATTR_NAME(DEBUG),
+> +	DEF_TDX_TD_ATTR_NAME(HGS_PLUS_PROF),
+> +	DEF_TDX_TD_ATTR_NAME(PERF_PROF),
+> +	DEF_TDX_TD_ATTR_NAME(PMT_PROF),
+> +	DEF_TDX_TD_ATTR_NAME(ICSSD),
+> +	DEF_TDX_TD_ATTR_NAME(LASS),
+> +	DEF_TDX_TD_ATTR_NAME(SEPT_VE_DISABLE),
+> +	DEF_TDX_TD_ATTR_NAME(MIGRATABLE),
+> +	DEF_TDX_TD_ATTR_NAME(PKS),
+> +	DEF_TDX_TD_ATTR_NAME(KL),
+> +	DEF_TDX_TD_ATTR_NAME(TPA),
+> +	DEF_TDX_TD_ATTR_NAME(PERFMON),
+>   };
+>   
+>   #define DEF_TD_CTLS_NAME(_name) [TD_CTLS_##_name##_BIT] = __stringify(_name)
+> diff --git a/arch/x86/coco/tdx/tdx.c b/arch/x86/coco/tdx/tdx.c
+> index 7b2833705d47..186915a17c50 100644
+> --- a/arch/x86/coco/tdx/tdx.c
+> +++ b/arch/x86/coco/tdx/tdx.c
+> @@ -238,14 +238,14 @@ static void __noreturn tdx_panic(const char *msg)
+>    *
+>    * TDX 1.0 does not allow the guest to disable SEPT #VE on its own. The VMM
+>    * controls if the guest will receive such #VE with TD attribute
+> - * TDX_ATTR_SEPT_VE_DISABLE.
+> + * TDX_TD_ATTR_SEPT_VE_DISABLE.
+>    *
+>    * Newer TDX modules allow the guest to control if it wants to receive SEPT
+>    * violation #VEs.
+>    *
+>    * Check if the feature is available and disable SEPT #VE if possible.
+>    *
+> - * If the TD is allowed to disable/enable SEPT #VEs, the TDX_ATTR_SEPT_VE_DISABLE
+> + * If the TD is allowed to disable/enable SEPT #VEs, the TDX_TD_ATTR_SEPT_VE_DISABLE
+>    * attribute is no longer reliable. It reflects the initial state of the
+>    * control for the TD, but it will not be updated if someone (e.g. bootloader)
+>    * changes it before the kernel starts. Kernel must check TDCS_TD_CTLS bit to
+> @@ -254,14 +254,14 @@ static void __noreturn tdx_panic(const char *msg)
+>   static void disable_sept_ve(u64 td_attr)
+>   {
+>   	const char *msg = "TD misconfiguration: SEPT #VE has to be disabled";
+> -	bool debug = td_attr & TDX_ATTR_DEBUG;
+> +	bool debug = td_attr & TDX_TD_ATTR_DEBUG;
+>   	u64 config, controls;
+>   
+>   	/* Is this TD allowed to disable SEPT #VE */
+>   	tdg_vm_rd(TDCS_CONFIG_FLAGS, &config);
+>   	if (!(config & TDCS_CONFIG_FLEXIBLE_PENDING_VE)) {
+>   		/* No SEPT #VE controls for the guest: check the attribute */
+> -		if (td_attr & TDX_ATTR_SEPT_VE_DISABLE)
+> +		if (td_attr & TDX_TD_ATTR_SEPT_VE_DISABLE)
+>   			return;
+>   
+>   		/* Relax SEPT_VE_DISABLE check for debug TD for backtraces */
+> diff --git a/arch/x86/include/asm/shared/tdx.h b/arch/x86/include/asm/shared/tdx.h
+> index 11f3cf30b1ac..049638e3da74 100644
+> --- a/arch/x86/include/asm/shared/tdx.h
+> +++ b/arch/x86/include/asm/shared/tdx.h
+> @@ -20,31 +20,31 @@
+>   #define TDG_VM_RD			7
+>   #define TDG_VM_WR			8
+>   
+> -/* TDX attributes */
+> -#define TDX_ATTR_DEBUG_BIT		0
+> -#define TDX_ATTR_DEBUG			BIT_ULL(TDX_ATTR_DEBUG_BIT)
+> -#define TDX_ATTR_HGS_PLUS_PROF_BIT	4
+> -#define TDX_ATTR_HGS_PLUS_PROF		BIT_ULL(TDX_ATTR_HGS_PLUS_PROF_BIT)
+> -#define TDX_ATTR_PERF_PROF_BIT		5
+> -#define TDX_ATTR_PERF_PROF		BIT_ULL(TDX_ATTR_PERF_PROF_BIT)
+> -#define TDX_ATTR_PMT_PROF_BIT		6
+> -#define TDX_ATTR_PMT_PROF		BIT_ULL(TDX_ATTR_PMT_PROF_BIT)
+> -#define TDX_ATTR_ICSSD_BIT		16
+> -#define TDX_ATTR_ICSSD			BIT_ULL(TDX_ATTR_ICSSD_BIT)
+> -#define TDX_ATTR_LASS_BIT		27
+> -#define TDX_ATTR_LASS			BIT_ULL(TDX_ATTR_LASS_BIT)
+> -#define TDX_ATTR_SEPT_VE_DISABLE_BIT	28
+> -#define TDX_ATTR_SEPT_VE_DISABLE	BIT_ULL(TDX_ATTR_SEPT_VE_DISABLE_BIT)
+> -#define TDX_ATTR_MIGRATABLE_BIT		29
+> -#define TDX_ATTR_MIGRATABLE		BIT_ULL(TDX_ATTR_MIGRATABLE_BIT)
+> -#define TDX_ATTR_PKS_BIT		30
+> -#define TDX_ATTR_PKS			BIT_ULL(TDX_ATTR_PKS_BIT)
+> -#define TDX_ATTR_KL_BIT			31
+> -#define TDX_ATTR_KL			BIT_ULL(TDX_ATTR_KL_BIT)
+> -#define TDX_ATTR_TPA_BIT		62
+> -#define TDX_ATTR_TPA			BIT_ULL(TDX_ATTR_TPA_BIT)
+> -#define TDX_ATTR_PERFMON_BIT		63
+> -#define TDX_ATTR_PERFMON		BIT_ULL(TDX_ATTR_PERFMON_BIT)
+> +/* TDX TD attributes */
+> +#define TDX_TD_ATTR_DEBUG_BIT		0
+> +#define TDX_TD_ATTR_DEBUG		BIT_ULL(TDX_TD_ATTR_DEBUG_BIT)
+> +#define TDX_TD_ATTR_HGS_PLUS_PROF_BIT	4
+> +#define TDX_TD_ATTR_HGS_PLUS_PROF	BIT_ULL(TDX_TD_ATTR_HGS_PLUS_PROF_BIT)
+> +#define TDX_TD_ATTR_PERF_PROF_BIT	5
+> +#define TDX_TD_ATTR_PERF_PROF		BIT_ULL(TDX_TD_ATTR_PERF_PROF_BIT)
+> +#define TDX_TD_ATTR_PMT_PROF_BIT	6
+> +#define TDX_TD_ATTR_PMT_PROF		BIT_ULL(TDX_TD_ATTR_PMT_PROF_BIT)
+> +#define TDX_TD_ATTR_ICSSD_BIT		16
+> +#define TDX_TD_ATTR_ICSSD		BIT_ULL(TDX_TD_ATTR_ICSSD_BIT)
+> +#define TDX_TD_ATTR_LASS_BIT		27
+> +#define TDX_TD_ATTR_LASS		BIT_ULL(TDX_TD_ATTR_LASS_BIT)
+> +#define TDX_TD_ATTR_SEPT_VE_DISABLE_BIT	28
+> +#define TDX_TD_ATTR_SEPT_VE_DISABLE	BIT_ULL(TDX_TD_ATTR_SEPT_VE_DISABLE_BIT)
+> +#define TDX_TD_ATTR_MIGRATABLE_BIT	29
+> +#define TDX_TD_ATTR_MIGRATABLE		BIT_ULL(TDX_TD_ATTR_MIGRATABLE_BIT)
+> +#define TDX_TD_ATTR_PKS_BIT		30
+> +#define TDX_TD_ATTR_PKS			BIT_ULL(TDX_TD_ATTR_PKS_BIT)
+> +#define TDX_TD_ATTR_KL_BIT		31
+> +#define TDX_TD_ATTR_KL			BIT_ULL(TDX_TD_ATTR_KL_BIT)
+> +#define TDX_TD_ATTR_TPA_BIT		62
+> +#define TDX_TD_ATTR_TPA			BIT_ULL(TDX_TD_ATTR_TPA_BIT)
+> +#define TDX_TD_ATTR_PERFMON_BIT		63
+> +#define TDX_TD_ATTR_PERFMON		BIT_ULL(TDX_TD_ATTR_PERFMON_BIT)
+>   
+>   /* TDX TD-Scope Metadata. To be used by TDG.VM.WR and TDG.VM.RD */
+>   #define TDCS_CONFIG_FLAGS		0x1110000300000016
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> index efb7d589b672..c539c2e6109f 100644
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -62,7 +62,7 @@ void tdh_vp_wr_failed(struct vcpu_tdx *tdx, char *uclass, char *op, u32 field,
+>   	pr_err("TDH_VP_WR[%s.0x%x]%s0x%llx failed: 0x%llx\n", uclass, field, op, val, err);
+>   }
+>   
+> -#define KVM_SUPPORTED_TD_ATTRS (TDX_ATTR_SEPT_VE_DISABLE)
+> +#define KVM_SUPPORTED_TD_ATTRS (TDX_TD_ATTR_SEPT_VE_DISABLE)
+>   
+>   static __always_inline struct kvm_tdx *to_kvm_tdx(struct kvm *kvm)
+>   {
+> @@ -700,7 +700,7 @@ int tdx_vcpu_create(struct kvm_vcpu *vcpu)
+>   	vcpu->arch.l1_tsc_scaling_ratio = kvm_tdx->tsc_multiplier;
+>   
+>   	vcpu->arch.guest_state_protected =
+> -		!(to_kvm_tdx(vcpu->kvm)->attributes & TDX_ATTR_DEBUG);
+> +		!(to_kvm_tdx(vcpu->kvm)->attributes & TDX_TD_ATTR_DEBUG);
+>   
+>   	if ((kvm_tdx->xfam & XFEATURE_MASK_XTILE) == XFEATURE_MASK_XTILE)
+>   		vcpu->arch.xfd_no_write_intercept = true;
 
 
