@@ -1,188 +1,155 @@
-Return-Path: <kvm+bounces-52792-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52793-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8FC1B094F8
-	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 21:25:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A9FCB0951A
+	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 21:40:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CE753AE139
-	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 19:25:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 87E81177F64
+	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 19:40:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A2112FC3C9;
-	Thu, 17 Jul 2025 19:25:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 680692FE36F;
+	Thu, 17 Jul 2025 19:40:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nz/+92uI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RY/BBTxk"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B1992EBDD0
-	for <kvm@vger.kernel.org>; Thu, 17 Jul 2025 19:25:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E61C21A314E
+	for <kvm@vger.kernel.org>; Thu, 17 Jul 2025 19:40:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752780343; cv=none; b=aRscKrOkWQy3XG8XF7SRE4i0+tBoNsM99740p5ZWmKP15jfzsuCLuc25JrHTkt2IODlmcP0og7txqn4KFKSEvn/tkYOpuGv2qqq2MjSu8CvzrAAGHkv34eGt/ZjYh7S6jytiLUj17MTSbTZ4empzEPvOQXgt93SWNfNFIVPna7Y=
+	t=1752781222; cv=none; b=cT1XYL0islJ16eU0QyIdn6iWbOtB4jrrWwvF9YJ8G7H/5JC+g8LxkBsOUfAyB1fMnv3P0bISC3GabIUE+z2/6kep1skg/3IASQ6y12QUSxNUVEgTWfMvTLpvO4LXc5yTnhcD5gxTl+f9NLzZMRcAW3+ZfLy14KD9XGkE0w/42aw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752780343; c=relaxed/simple;
-	bh=02CBJpA30ZmYUrtaYuKhiq5fm/WwvrZXQ7YWNnmbFHw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UyQFPCUHOiabiTwvaieIDPqPM+FGv0IVXG9xmlOWm3eRbsuegdOGN7oTTgJ/jKtVgDgce2tXKncbiVASFDGdfM0jUyLz9b5U4SU1lt7BY789CMN5qKaZELh60LRnKYAtIM8q7pIL78zra7CHjwlPXaFD0Gnmr6HEqTnNB5aeF4w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Nz/+92uI; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1752781222; c=relaxed/simple;
+	bh=AliCz80P40/+u4uyNacd4d5aJesJDRNV1iyzNivQibw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=krrP2XwCAhL0Ys5Y5r7p7S2q0ZeG/5wT7lvJQUge6kh3U6uYWiaN2An2xkEQeiYpBprBSn5+2EqMzXcoF6zy7SlPM3jx8HzaTIDoRYJ8R4Y/c32r5eskzkmSXlmkcOE54WXdgc2bmi7NsJ+u690SHzi3oRLh4U6bpIK3uyhjUjo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RY/BBTxk; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752780341;
+	s=mimecast20190719; t=1752781219;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=7cjM6leMNWJaFyvB8pUYw1XsGkeqyh24r2b2Mr0FYMs=;
-	b=Nz/+92uIUhJt2HaC2XEF397dllZTerlkuD9MHzMUkuDTSoRiqMQJNSt+BOEMMxSzQFqp/M
-	OIE57t4E4TAmeUlkDwAM+RpmcAp0EihsoazzLfIBiZaZBRicIEW11jXf9BfdRQveoQThu1
-	9YUBjakjCcgO9+SADlPC2J/M77f21kc=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=z/2+uUVHwQq1KQQUsEuaD+AV1NGVtRzgW4E0uexw5t0=;
+	b=RY/BBTxkGBRnxJ2vccJqRZMg1HdHGrUJ+YoT/++9YiOAzCjZjJAmraNIMKcqp/0i1iY77u
+	WMtgJs0r/rFq0BHwEgxyCs+tZoz+gth3w7gCzK76nrX+LQieuR+yVEXEvB1lR7VXAGKdiu
+	Z9xYp/248D1MbPCA57nwKOOZmEWMyBE=
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
+ [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-633-a3FMxjQlOLK3GrcVDbQuEg-1; Thu, 17 Jul 2025 15:25:40 -0400
-X-MC-Unique: a3FMxjQlOLK3GrcVDbQuEg-1
-X-Mimecast-MFC-AGG-ID: a3FMxjQlOLK3GrcVDbQuEg_1752780339
-Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-6fad8b4c92cso32584196d6.0
-        for <kvm@vger.kernel.org>; Thu, 17 Jul 2025 12:25:40 -0700 (PDT)
+ us-mta-561-HZlnA-yTPwKs7Fbt6oCQ_A-1; Thu, 17 Jul 2025 15:40:18 -0400
+X-MC-Unique: HZlnA-yTPwKs7Fbt6oCQ_A-1
+X-Mimecast-MFC-AGG-ID: HZlnA-yTPwKs7Fbt6oCQ_A_1752781217
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3ddd689c2b8so1542735ab.1
+        for <kvm@vger.kernel.org>; Thu, 17 Jul 2025 12:40:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752780339; x=1753385139;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7cjM6leMNWJaFyvB8pUYw1XsGkeqyh24r2b2Mr0FYMs=;
-        b=SYm/JO3flysAK4/CvswmiXRxcVIAq8WfUhE++r7abBPIAhD84K2hefVYKd+qWgG8io
-         6qV12ovr4cYzw05QVuUxnLRGyBHK+7s/slZg0EfJHvAQ3/2K/N191lQfb0NYRTXbPM1+
-         w60ORbxTQqPQtGnEB86aU1YZSwpqCH7603xB1DSH2p4ybLLpeHyFvltqjPyfBK32LUtQ
-         PGgm336zSzO4J8zQFy/Qtc7+RszgBkQCUkC87g0Hb3EPy0/LfH1CTdov1ZAi2Yb66j8Y
-         QCi3yEC7L86+cV2EK1mrCsWnZYGuxjMaRIa4aD6nlVsFX7YfkCmGA+NjarIFDHXLChiK
-         0bQg==
-X-Forwarded-Encrypted: i=1; AJvYcCU3WnWOnEEoIRnzrpET6FnnMHoSU91tjpOsSi7gBDjBP6ipEA6gUm0GbFeU2sj5IJ/2NhM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw23/DarB23Us3HiKdsNBUff0nN9FgRbWGBMJIHVuqQGbRPzJSe
-	pN8oIK+3S/NiV0IASQLWpgw6g5qlyErMJ/UKwehiGFr3qT7l480Z4IK4CgpOUBicCASbLZ82ao4
-	nWsgmLHU1g/7mPX9AfJic8eqLbelusHKMQp7Cm1/7qtO2TjNKbSG3Dg==
-X-Gm-Gg: ASbGncseYevG4ZGzD42Vxo2j1e5PPZRSO92wbAAE/OiP6WgETFmCzu0Z0/Y3fRRYpZK
-	yRLg4UGj7N3x+aKWnv+4B8RqkPa4ALtu1ui40uS3BVDVcFmHjUrgaUIIZ84vtXimIT9s0VppoWm
-	Q75T/0jkYzh1K9H5JlAynTohOHkbGUy0flpeJ4QyHvGDNq285chIopxkskHEkPzMlfABhjX1aCv
-	HFWAjP+V5+eqml9zIfsCJbuT6AacHdcLS7TNgzYXVLpEUffqUM5YieTtwei16BgpGcrq3sAFusZ
-	/3+7xBNOChBUC5kUXwNuGp8xbjMKVD1zJikPcFl8
-X-Received: by 2002:a05:6214:3d0f:b0:704:a0be:87e9 with SMTP id 6a1803df08f44-7051a114f9bmr2753546d6.27.1752780339394;
-        Thu, 17 Jul 2025 12:25:39 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFnouXokKlyOlp4XW8RUcaaVzppnw9rpmDfmEo0M//qCUQGk6pO2DfCJ8LdT9+rTbiA9leEEA==
-X-Received: by 2002:a05:6214:3d0f:b0:704:a0be:87e9 with SMTP id 6a1803df08f44-7051a114f9bmr2752986d6.27.1752780338822;
-        Thu, 17 Jul 2025 12:25:38 -0700 (PDT)
-Received: from [192.168.40.164] ([70.105.235.240])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-704979b48bdsm88133626d6.28.2025.07.17.12.25.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 17 Jul 2025 12:25:38 -0700 (PDT)
-Message-ID: <c05104a1-7c8e-4ce9-bfa3-bcbc8c9e0ef5@redhat.com>
-Date: Thu, 17 Jul 2025 15:25:35 -0400
+        d=1e100.net; s=20230601; t=1752781217; x=1753386017;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=z/2+uUVHwQq1KQQUsEuaD+AV1NGVtRzgW4E0uexw5t0=;
+        b=jLIdOd/SuWiH0YE6knVTFlAAAw3e2OOML0dABIxIdV3f7NPZmVZ5cgAp8OORwS4kbh
+         YHOJlPUe2dDH/4+nzoRvvwOz69lpHM9f4iKshgUg7MZuWoVPoySrwdcd7eDewPagzJht
+         zztdHD/+nke6Sl/kELTT8Iq0DSD87R8RKQL01PnRgs7One7EUo5EkpD7ufMChekaZILs
+         OSrim+SZG1TN5KgE324swikco77aAF8hwrOvmx+TEAWR9VWt6DiVP+LhsmUOQQIwbtkV
+         9H7DKeeloom+ysanIj96pRSNjV+ZMjyuXFWzKmflotcaDfY9W0VugmFBFBvza0KDDa6C
+         OE/g==
+X-Forwarded-Encrypted: i=1; AJvYcCXyNAJ9T6bx+2hYFc/DhMLMsOhJAE+fdL7waCaQ4ccuxXo9xCtcQR9+Uc00dbKxrdrho/I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzPOvqUWDLOH2ncQVUBhrKCVfdbSqoPAYVLj7aZc9xjlqm3lCYj
+	IRuesbFFW9+Esep2eAxk7exgd0mwnVoicrONWQiIdXLOKKFJeXtq3x92lL7sKzFOQ23bnO9Ox5F
+	GKxR2Al+X1NCRVrEcL64kKOwtz7MYlUCAq6hyNw13bQ1MmgONHem+dWdxTinm6g==
+X-Gm-Gg: ASbGncs1u0/JyQoJWwe6CTc8zDG/abRNfJiJHTLZjyjDfRXmof0sZHJ08YoR6Hwdut0
+	/g9DupE1U1GpUHr451JnZ9PsNx1YSRWGtJFyhyg9C14L/U4bRxQvqFYcx6nL4HVryS7nzzEwRbv
+	2cH1Bu71tDUF0gP03TAhnc/j1MBBdHhOpLJsBf6wGc+LJTGwdW9WUPvosjniMtWbc9IHzijNrLq
+	TT+wlBDG+qZl8QxE9KXO+CpMPFOpTDNp+Xav0HCwRqbf5Tw448SzlMhXnOLcmXWRi/JSDrJ+RTK
+	1XO7Mex7ZTQl4XtR6nGKbMVVJ2gfea8mXIyDy87PHjY=
+X-Received: by 2002:a05:6e02:3113:b0:3dc:87c7:a5a5 with SMTP id e9e14a558f8ab-3e28245f8e8mr24903995ab.5.1752781216868;
+        Thu, 17 Jul 2025 12:40:16 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGV+0O7JW3kdwf9CMHiAKbvK9a8rLbbPPt/Na4CzthvG+duCf1EvXTna86WdjzvTwHw9uYkCw==
+X-Received: by 2002:a05:6e02:3113:b0:3dc:87c7:a5a5 with SMTP id e9e14a558f8ab-3e28245f8e8mr24903925ab.5.1752781216429;
+        Thu, 17 Jul 2025 12:40:16 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3e2462299c0sm53651965ab.48.2025.07.17.12.40.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Jul 2025 12:40:15 -0700 (PDT)
+Date: Thu, 17 Jul 2025 13:40:14 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: Nipun Gupta <nipun.gupta@amd.com>, Nikhil Agarwal
+ <nikhil.agarwal@amd.com>, Pieter Jansen van Vuuren
+ <pieter.jansen-van-vuuren@amd.com>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>,
+ stable@vger.kernel.org
+Subject: Re: [PATCH] vfio: cdx: Fix missing GENERIC_MSI_IRQ on compile test
+Message-ID: <20250717134014.16b97da5.alex.williamson@redhat.com>
+In-Reply-To: <20250717091053.129175-2-krzysztof.kozlowski@linaro.org>
+References: <20250717091053.129175-2-krzysztof.kozlowski@linaro.org>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 03/11] iommu: Compute iommu_groups properly for PCIe
- switches
-Content-Language: en-US
-To: Jason Gunthorpe <jgg@nvidia.com>,
- Alex Williamson <alex.williamson@redhat.com>
-Cc: Bjorn Helgaas <bhelgaas@google.com>, iommu@lists.linux.dev,
- Joerg Roedel <joro@8bytes.org>, linux-pci@vger.kernel.org,
- Robin Murphy <robin.murphy@arm.com>, Will Deacon <will@kernel.org>,
- Lu Baolu <baolu.lu@linux.intel.com>, galshalom@nvidia.com,
- Joerg Roedel <jroedel@suse.de>, Kevin Tian <kevin.tian@intel.com>,
- kvm@vger.kernel.org, maorg@nvidia.com, patches@lists.linux.dev,
- tdave@nvidia.com, Tony Zhu <tony.zhu@intel.com>
-References: <0-v1-74184c5043c6+195-pcie_switch_groups_jgg@nvidia.com>
- <3-v1-74184c5043c6+195-pcie_switch_groups_jgg@nvidia.com>
- <20250701132905.67d29191.alex.williamson@redhat.com>
- <20250702010407.GB1051729@nvidia.com>
-From: Donald Dutile <ddutile@redhat.com>
-In-Reply-To: <20250702010407.GB1051729@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, 17 Jul 2025 11:10:54 +0200
+Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org> wrote:
 
+> VFIO_CDX driver uses msi_domain_alloc_irqs() which is provided by
+> non-user-visible GENERIC_MSI_IRQ, thus it should select that option
+> directly.
+>=20
+> VFIO_CDX depends on CDX_BUS, which also will select GENERIC_MSI_IRQ
+> (separate fix), nevertheless driver should poll what is being used there
+> instead of relying on bus Kconfig.
 
-On 7/1/25 9:04 PM, Jason Gunthorpe wrote:
-> On Tue, Jul 01, 2025 at 01:29:05PM -0600, Alex Williamson wrote:
->> On Mon, 30 Jun 2025 19:28:33 -0300
->> Jason Gunthorpe <jgg@nvidia.com> wrote:
->>> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
->>> index d265de874b14b6..f4584ffacbc03d 100644
->>> --- a/drivers/iommu/iommu.c
->>> +++ b/drivers/iommu/iommu.c
->>> @@ -65,8 +65,16 @@ struct iommu_group {
->>>   	struct list_head entry;
->>>   	unsigned int owner_cnt;
->>>   	void *owner;
->>> +
->>> +	/* Used by the device_group() callbacks */
->>> +	u32 bus_data;
->>>   };
->>>   
->>> +/*
->>> + * Everything downstream of this group should share it.
->>> + */
->>> +#define BUS_DATA_PCI_UNISOLATED BIT(0)
->>
->> NON_ISOLATED for consistency w/ enum from the previous patch?
-> 
-> Yes
-> 
->>> -	/* No shared group found, allocate new */
->>> -	return iommu_group_alloc();
->>> +	switch (pci_bus_isolated(pdev->bus)) {
->>> +	case PCIE_ISOLATED:
->>> +		/* Check multi-function groups and same-bus devfn aliases */
->>> +		group = pci_get_alias_group(pdev);
->>> +		if (group)
->>> +			return group;
->>> +
->>> +		/* No shared group found, allocate new */
->>> +		return iommu_group_alloc();
->>
->> I'm not following how we'd handle a multi-function root port w/o
->> consistent ACS isolation here.  How/where does the resulting group get
->> the UNISOLATED flag set?
-> 
-> Still wobbly on the root port/root bus.. So the answer is probably
-> that it doesn't.
-> 
-> What does a multi-function root port with different ACS flags even
-> mean and how should we treat it? I had in mind that the first root
-> port is the TA and immediately goes the IOMMU.
-> 
-I'm looking for clarification what you are asking...
+This seems like a recipe for an explosion of Kconfig noise.  If the bus
+fundamentally depends on a config option, as proposed in the separate
+fix, I don't see that a driver dependent on that bus needs to duplicate
+the config selections.  IMO this is sufficiently fixed updating
+drivers/cdx/{Kconfig,Makefile}.  Thanks,
 
-when you say 'multi-function root port', do you mean an RP that is a function
-in a MFD in an RC ?  other?  A more explicit (complex?) example be given to
-clarify?
-
-IMO, the rule of MFD in an RC applies here, and that means the per-function ACS rules
-for an MFD apply -- well, that's how I read section 6.12 (PCIe 7.0.-1.0-PUB).
-This may mean checking ACS P2P Egress Control.  Table 6-11 may help wrt Egress control bits & RPs & Fcns.
-
-If no (optional) ACS P2P Egress control, and no other ACS control, then I read/decode
-the spec to mean no p2p btwn functions is possible, b/c if it is possible, by spec,
-it must have an ACS cap to control it; ergo, no ACS cap, no p2p capability/routing.
-
-- Don
-> If you can explain a bit more about how you see the root ports working
-> I can try to make an implementation.
-> 
-> AFAICT the spec sort of says 'implementation defined' for ACS on root
-> ports??
-> 
-> Thanks,
-> Jason
-> 
+Alex
+=20
+> Without the fix on CDX_BUS compile test fails:
+>=20
+>   drivers/vfio/cdx/intr.c: In function =E2=80=98vfio_cdx_msi_enable=E2=80=
+=99:
+>   drivers/vfio/cdx/intr.c:41:15: error: implicit declaration of function =
+=E2=80=98msi_domain_alloc_irqs=E2=80=99;
+>     did you mean =E2=80=98irq_domain_alloc_irqs=E2=80=99? [-Wimplicit-fun=
+ction-declaration]
+>=20
+> Reported-by: Randy Dunlap <rdunlap@infradead.org>
+> Closes: https://lore.kernel.org/r/4a6fd102-f8e0-42f3-b789-6e3340897032@in=
+fradead.org/
+> Fixes: 848e447e000c ("vfio/cdx: add interrupt support")
+> Cc: <stable@vger.kernel.org>
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> ---
+>  drivers/vfio/cdx/Kconfig | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/drivers/vfio/cdx/Kconfig b/drivers/vfio/cdx/Kconfig
+> index e6de0a0caa32..90cf3dee5dba 100644
+> --- a/drivers/vfio/cdx/Kconfig
+> +++ b/drivers/vfio/cdx/Kconfig
+> @@ -9,6 +9,7 @@ config VFIO_CDX
+>  	tristate "VFIO support for CDX bus devices"
+>  	depends on CDX_BUS
+>  	select EVENTFD
+> +	select GENERIC_MSI_IRQ
+>  	help
+>  	  Driver to enable VFIO support for the devices on CDX bus.
+>  	  This is required to make use of CDX devices present in
 
 
