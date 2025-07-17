@@ -1,132 +1,166 @@
-Return-Path: <kvm+bounces-52720-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52721-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93241B088B2
-	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 11:01:04 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DF47B088D3
+	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 11:05:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A01A6189930C
-	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 09:00:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6A9277B6CFE
+	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 09:03:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DDBF288517;
-	Thu, 17 Jul 2025 09:00:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3051F289E0F;
+	Thu, 17 Jul 2025 09:03:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="STr+G78o"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OP8S5NDp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3C1D1FC0EF;
-	Thu, 17 Jul 2025 09:00:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 861EC287269;
+	Thu, 17 Jul 2025 09:03:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752742822; cv=none; b=cFnRhan18Yir1G+/8gJvy0igzG2D0QJsP0Ef0/ke6j3ZhJ5FTWQSrzUoFBxwF8A86JVeZa3Y82p8hajilVwZbxSlmEeahi7jsQKM8C0HWFy2F8iT6u/2/4rB2yNTTAbBdGeRGUqMRA6fY7ru+NOCmN3L2h2/PV7iQtkKaH3gOsw=
+	t=1752743036; cv=none; b=UuFYmkeYX08SZHHnGraYQAWUyHDGSw2cDWFNyOyDevoSn3xvvEtahPcbn+zpYy2MYQ2OgA25N6bJVlrzP0xd3trZdIrtd4sBdyswp3+BHS2esb3DEI0/JAG/z0yziQzDcFYjwb2yOAorQ9QXygqzM/2L8Pm4jpJYKiDirSZf+wY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752742822; c=relaxed/simple;
-	bh=aGbM7IqfeuS/6bF/kHs79qT5aNiBDtA03RdS80GdaYQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SKHg3heoJuTzPZftZcGKhEF/TQFf0HMj/XB/xFulAVC9w46qfQC3lbFb41shION8on6bBKosxOLzVxMtm/sGOfON7RtA9Dx5EDxA1T9RAhtsXXDsYCmc9rQ0UlelxrogWK+f09G4BwEHt1YZEcgZQq6x7yrwa/FHx0R+NEQatVM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=STr+G78o; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1752743036; c=relaxed/simple;
+	bh=yHsAHKTe/LT2XVTGbt4c9MxoJAn5NuMjTXmAhbh6i1I=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=tfOlY6BP6risBD8F3k4yWTcXPnHisHutm/5H8InUn+o8dUGXqvZSrEjJwEo3JbuKCOdNIQvxJ13bphVvaknmOlTHe/5vNsqdzxgGuBfaaMFzkKRfIKFUxv+LS+PAAuhDv/FhRADHM50a7fWyTHmPSakhg/+cGqVX0kfszTYMtvI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OP8S5NDp; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752742821; x=1784278821;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=aGbM7IqfeuS/6bF/kHs79qT5aNiBDtA03RdS80GdaYQ=;
-  b=STr+G78oxikYynwrPScHa6W1Y5ozyRXDiqW6zUvCZ18B4Y1Tabk+woRv
-   4JJrYVM43XniWn23dyQ/8WV2x9cQ0B+qes3SSK7NajqYWZcA7SxgJFyL6
-   +tDkOeYRCBbSUIjpwXPXrHb4iaAWANrO6HPnycTUFyqFlj2wx+l9rxBh0
-   qvSr43XfzNaVyUiH1z7TCERJ7HxNn/7U8egMzznVCkeuvjCp1faymzliG
-   QESDobelImHn9pRYzV66HUA4rSIOlBuloJdoFDyUQqF5H2gegPn8nZZq6
-   RoCOWuCZyf1ghFG2lhb62cfCgOwrYZBFIkAm4DWloNQz7SvTtRed3Tk02
+  t=1752743034; x=1784279034;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=yHsAHKTe/LT2XVTGbt4c9MxoJAn5NuMjTXmAhbh6i1I=;
+  b=OP8S5NDpoP6Rlh/useaBWUyNPsbEj7P1ARlQKipru2KDkBzzc5Y8qa4u
+   L3nZ+O0vCucppFYQsT+W/MHiNC97tCJMY32+ZFz/ipk5k7Ma1NNAqe5UZ
+   AfktzmCP+RfSSp3p+lNx5oMThuiyhOWrY7LPv7HxrQ9PeJR7o7j1yziWq
+   VSaO0hmV+UpkMDgbGk8UC9SGJZmh4XulyxEX8TZI+jhYWuDGIsUxTOMN3
+   N/VSfEFijv7i27pZyut2we3dYsnW0j0p7pzRcYXeD5csT8fix0F1AbU72
+   jcmSrOI9AC0Twf6vnTo8sqPWY/B3VAQ3mpEm/zu2I0pROhhZ8EN65Hqz3
    g==;
-X-CSE-ConnectionGUID: tsC018F6S4iDt7it1N4k6g==
-X-CSE-MsgGUID: 3+9gkivSSHqyAEriQxDcgA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11493"; a="54947369"
+X-CSE-ConnectionGUID: TZpIHp1ZQzeczbcFTzG1JA==
+X-CSE-MsgGUID: DwkY0XBUTR6k40y6mbznpA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11493"; a="77546769"
 X-IronPort-AV: E=Sophos;i="6.16,318,1744095600"; 
-   d="scan'208";a="54947369"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 02:00:20 -0700
-X-CSE-ConnectionGUID: grRhNT59TOae6QFdno4wGg==
-X-CSE-MsgGUID: /gOPa19PR0iPIjZ0z+7J7A==
+   d="scan'208";a="77546769"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 02:03:54 -0700
+X-CSE-ConnectionGUID: p9+G4bpnQTalvtvbS4llTg==
+X-CSE-MsgGUID: XwjslSNQR5SvUeY/panbaw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,318,1744095600"; 
-   d="scan'208";a="158292638"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
-  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 02:00:06 -0700
-Message-ID: <dbf3313e-3328-485c-9a77-2f853ad22525@intel.com>
-Date: Thu, 17 Jul 2025 17:00:03 +0800
+   d="scan'208";a="161773965"
+Received: from spr.sh.intel.com ([10.112.229.196])
+  by fmviesa003.fm.intel.com with ESMTP; 17 Jul 2025 02:03:50 -0700
+From: Dapeng Mi <dapeng1.mi@linux.intel.com>
+To: Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Namhyung Kim <namhyung@kernel.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Ian Rogers <irogers@google.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Kan Liang <kan.liang@linux.intel.com>,
+	Andi Kleen <ak@linux.intel.com>,
+	Eranian Stephane <eranian@google.com>
+Cc: kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-perf-users@vger.kernel.org,
+	Dapeng Mi <dapeng1.mi@intel.com>,
+	Dapeng Mi <dapeng1.mi@linux.intel.com>,
+	Yi Lai <yi1.lai@intel.com>
+Subject: [PATCH 1/3] perf/x86: Add PERF_CAP_PEBS_TIMING_INFO flag
+Date: Thu, 17 Jul 2025 17:03:00 +0800
+Message-Id: <20250717090302.11316-1-dapeng1.mi@linux.intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v14 04/21] KVM: x86: Introduce kvm->arch.supports_gmem
-To: Fuad Tabba <tabba@google.com>
-Cc: Ackerley Tng <ackerleytng@google.com>, kvm@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev,
- pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
- anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
- aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk,
- brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
- yilun.xu@intel.com, chao.p.peng@linux.intel.com, jarkko@kernel.org,
- amoorthy@google.com, dmatlack@google.com, isaku.yamahata@intel.com,
- mic@digikod.net, vbabka@suse.cz, vannapurve@google.com,
- mail@maciej.szmigiero.name, david@redhat.com, michael.roth@amd.com,
- wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com,
- kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com,
- steven.price@arm.com, quic_eberman@quicinc.com, quic_mnalajal@quicinc.com,
- quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com,
- quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com,
- quic_pheragu@quicinc.com, catalin.marinas@arm.com, james.morse@arm.com,
- yuzenghui@huawei.com, oliver.upton@linux.dev, maz@kernel.org,
- will@kernel.org, qperret@google.com, keirf@google.com, roypat@amazon.co.uk,
- shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, rientjes@google.com,
- jhubbard@nvidia.com, fvdl@google.com, hughd@google.com,
- jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com,
- ira.weiny@intel.com
-References: <20250715093350.2584932-1-tabba@google.com>
- <20250715093350.2584932-5-tabba@google.com>
- <b5fe8f54-64df-4cfa-b86f-eed1cbddca7a@intel.com>
- <diqzwm87fzfc.fsf@ackerleytng-ctop.c.googlers.com>
- <fef1d856-8c13-4d97-ba8b-f443edb9beac@intel.com>
- <CA+EHjTzZH2NN31ZfTg0NX_o3dryqbkmR4s8Y47eFJ1TcO1kiDA@mail.gmail.com>
-Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <CA+EHjTzZH2NN31ZfTg0NX_o3dryqbkmR4s8Y47eFJ1TcO1kiDA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 7/17/2025 4:49 PM, Fuad Tabba wrote:
-> On Thu, 17 Jul 2025 at 02:48, Xiaoyao Li<xiaoyao.li@intel.com> wrote:
->> On 7/17/2025 8:12 AM, Ackerley Tng wrote:
->>> Xiaoyao Li<xiaoyao.li@intel.com> writes:
->>>
+IA32_PERF_CAPABILITIES.PEBS_TIMING_INFO[bit 17] is introduced to
+indicate whether timed PEBS is supported. Timed PEBS adds a new "retired
+latency" field in basic info group to show the timing info. Please find
+detailed information about timed PEBS in section 8.4.1 "Timed Processor
+Event Based Sampling" of "Intel Architecture Instruction Set Extensions
+and Future Features".
 
-...
+This patch adds PERF_CAP_PEBS_TIMING_INFO flag and KVM module leverages
+this flag to expose timed PEBS feature to guest.
 
->>>>
->>>> Btw, it seems that supports_gmem can be enabled for all the types of VM?
->>>>
->>> For now, not really, because supports_gmem allows mmap support, and mmap
->>> support enables KVM_MEMSLOT_GMEM_ONLY, and KVM_MEMSLOT_GMEM_ONLY will
->>> mean that shared faults also get faulted from guest_memfd.
->> No, mmap support is checked by kvm_arch_supports_gmem_mmap() which is
->> independent to whether gmem is supported.
-> It is dependent on gmem support:
-> 
-> kvm_arch_supports_gmem_mmap(kvm) depends on
-> CONFIG_KVM_GMEM_SUPPORTS_MMAP, which in turn selects KVM_GMEM.
+Moreover, opportunistically refine the indents and make the macros
+share consistent indents.
 
-My bad that my words leads to misunderstanding.
+Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+Tested-by: Yi Lai <yi1.lai@intel.com>
+---
+ arch/x86/include/asm/msr-index.h       | 14 ++++++++------
+ tools/arch/x86/include/asm/msr-index.h | 14 ++++++++------
+ 2 files changed, 16 insertions(+), 12 deletions(-)
 
-What I wanted to express it that support_gmem doesn't mean mmap support 
-is allowed, there is additional specific guard for mmap support via 
-kvm_arch_supports_gmem_mmap().
+diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
+index b7dded3c8113..48b7ed28718c 100644
+--- a/arch/x86/include/asm/msr-index.h
++++ b/arch/x86/include/asm/msr-index.h
+@@ -315,12 +315,14 @@
+ #define PERF_CAP_PT_IDX			16
+ 
+ #define MSR_PEBS_LD_LAT_THRESHOLD	0x000003f6
+-#define PERF_CAP_PEBS_TRAP             BIT_ULL(6)
+-#define PERF_CAP_ARCH_REG              BIT_ULL(7)
+-#define PERF_CAP_PEBS_FORMAT           0xf00
+-#define PERF_CAP_PEBS_BASELINE         BIT_ULL(14)
+-#define PERF_CAP_PEBS_MASK	(PERF_CAP_PEBS_TRAP | PERF_CAP_ARCH_REG | \
+-				 PERF_CAP_PEBS_FORMAT | PERF_CAP_PEBS_BASELINE)
++#define PERF_CAP_PEBS_TRAP		BIT_ULL(6)
++#define PERF_CAP_ARCH_REG		BIT_ULL(7)
++#define PERF_CAP_PEBS_FORMAT		0xf00
++#define PERF_CAP_PEBS_BASELINE		BIT_ULL(14)
++#define PERF_CAP_PEBS_TIMING_INFO	BIT_ULL(17)
++#define PERF_CAP_PEBS_MASK		(PERF_CAP_PEBS_TRAP | PERF_CAP_ARCH_REG | \
++					 PERF_CAP_PEBS_FORMAT | PERF_CAP_PEBS_BASELINE | \
++					 PERF_CAP_PEBS_TIMING_INFO)
+ 
+ #define MSR_IA32_RTIT_CTL		0x00000570
+ #define RTIT_CTL_TRACEEN		BIT(0)
+diff --git a/tools/arch/x86/include/asm/msr-index.h b/tools/arch/x86/include/asm/msr-index.h
+index b7dded3c8113..48b7ed28718c 100644
+--- a/tools/arch/x86/include/asm/msr-index.h
++++ b/tools/arch/x86/include/asm/msr-index.h
+@@ -315,12 +315,14 @@
+ #define PERF_CAP_PT_IDX			16
+ 
+ #define MSR_PEBS_LD_LAT_THRESHOLD	0x000003f6
+-#define PERF_CAP_PEBS_TRAP             BIT_ULL(6)
+-#define PERF_CAP_ARCH_REG              BIT_ULL(7)
+-#define PERF_CAP_PEBS_FORMAT           0xf00
+-#define PERF_CAP_PEBS_BASELINE         BIT_ULL(14)
+-#define PERF_CAP_PEBS_MASK	(PERF_CAP_PEBS_TRAP | PERF_CAP_ARCH_REG | \
+-				 PERF_CAP_PEBS_FORMAT | PERF_CAP_PEBS_BASELINE)
++#define PERF_CAP_PEBS_TRAP		BIT_ULL(6)
++#define PERF_CAP_ARCH_REG		BIT_ULL(7)
++#define PERF_CAP_PEBS_FORMAT		0xf00
++#define PERF_CAP_PEBS_BASELINE		BIT_ULL(14)
++#define PERF_CAP_PEBS_TIMING_INFO	BIT_ULL(17)
++#define PERF_CAP_PEBS_MASK		(PERF_CAP_PEBS_TRAP | PERF_CAP_ARCH_REG | \
++					 PERF_CAP_PEBS_FORMAT | PERF_CAP_PEBS_BASELINE | \
++					 PERF_CAP_PEBS_TIMING_INFO)
+ 
+ #define MSR_IA32_RTIT_CTL		0x00000570
+ #define RTIT_CTL_TRACEEN		BIT(0)
+
+base-commit: 829f5a6308ce11c3edaa31498a825f8c41b9e9aa
+-- 
+2.34.1
+
 
