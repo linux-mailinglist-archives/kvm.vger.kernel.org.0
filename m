@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-52770-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52771-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE463B091D4
-	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 18:30:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20D37B091DA
+	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 18:30:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ACD0A4A10D9
-	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 16:29:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 39B43189B515
+	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 16:30:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEEA32FF499;
-	Thu, 17 Jul 2025 16:27:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CDE4301123;
+	Thu, 17 Jul 2025 16:27:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CC/GuS0X"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="c0INOb+r"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48C452FF469
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E10692FF477
 	for <kvm@vger.kernel.org>; Thu, 17 Jul 2025 16:27:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752769674; cv=none; b=TBIsuo5U3GsXygQKUy2bKuMSTCwPP3BIp/cXv3aroOnpCSGvw7th5MPe8daOBupR3Wbk4LZevPh35GLTrmJlKWfrNh7Mh/bf688PMi8mUvR6wKjShBBylxGBzvqEDPNfTm+1B85gaLGU7uUOLmFAbrLT6mNFvvximlAXKP9FeEw=
+	t=1752769674; cv=none; b=IFramAoDfwdUxDRz8cQFPD32z8YNQamX42O/dbZc61Mz+8j4VpWnDmYUY/6VWl9jvmH2GwFA7tOMt2EFfNdEBscG9yrM7a1H0S/Jy9qcE9HaNBr2HHKxkeS4BrkXZOSIx4zgvw+AYhnPB1tU9kTtBwToLSNQDapnYvGcrLUBuPM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1752769674; c=relaxed/simple;
-	bh=1w8Rf4FIk8UShH9xK6GMjNGhBeuY0pcttrOoAcb/Rxk=;
+	bh=C3B/tCKG6OjtxxQwarA8/8UYBN4CjZQGHU0NMrczuD4=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=V/5ZwkD9maacicVLsDFUcFno+dqf3FG2ofSqeguRMYcXMiT5xAC2U07Oa9OYvSFctnNf1jm4limEeibvkozSaqDW1bGGQrBc2IzwPH+LCVNDZW/atcMqqXWjt+ZgFKuw4YduOiiJaal2c07Hux1daEVuKt11Eb/sIbwhT45CjUs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CC/GuS0X; arc=none smtp.client-ip=209.85.221.74
+	 To:Cc:Content-Type; b=VlB0TU1LZMUeiz3uCfpPy0/c/JV7Otb0DEtTMge9rEo+YNkptZ46RnXNOHQP8WwN5j4+l6dPGLbyDyMSARan++L9ztmpo/s+e3JrnZ3vdnZ2qzKnqZz81wkhfU9pRwe2agwlY5AdKMqBpSicncC7DoAAsmLrrANQ1F3aBfgeq0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=c0INOb+r; arc=none smtp.client-ip=209.85.221.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
-Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-3a4eee2398bso555240f8f.1
+Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-3b39cc43f15so605119f8f.2
         for <kvm@vger.kernel.org>; Thu, 17 Jul 2025 09:27:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752769670; x=1753374470; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1752769671; x=1753374471; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ed5EKdzH3JskFWB3i3+fISnWrXK1xmjcG1/JKwjT7fs=;
-        b=CC/GuS0XJHYakQWggwFikhqw+1eueHYqfYIIfWMC4Hyp8DSEybYoh735extcv32V68
-         kq05v6nDx7saMHUP8bZzeB0YaES78Hm63PvS5Jt6dDarIsEIfIMmT1VHdDmCLVYavEwU
-         zYN+IfGoofq2DXeTg9L2BM6yHKhhbaggUVT40F2ewfOYPRl5RLpw8FshXeSrotG10ef9
-         4NJi1lxkeZuFWvMQwWawlJYOdrYxGYgV5KsmZ7pDIk8GvISwf/12x14deDi3CwYqnyb8
-         9ACwqFm0+BBRg2g+jGGtJqly/mDQAf4dduZmfNJgx5WQjNSjP1JQ33xUsjLS9nmUAGM2
-         OWdw==
+        bh=47rVlr8Uc/SdJ5Y2yETdFZUDua/sXacoe643TNgwpkI=;
+        b=c0INOb+r6ydH2AES7vz6VQb/KJ57I4nkPi/8j7kIYjSVQjjyRxbiEkSYL/wbx9asWv
+         WMWteXaXVdHMdxF+LHxr7/1iMmNcHB5YQPqimuXJ1gfBsAwzQJj0B+RzqbgSrVsJfrT2
+         9OiY/P6II5o172pzq+zr/SHKELYBMdvkEkAJzWjH8e5HdZhSJX3dgHbSKqgXVkfIVZxM
+         BUx1tOT86n1aA4cGglgsnvG48CaSn034CV0NnFSMAUyIyUOoeUrgZzqu+UErfPIz5aqE
+         WSlykx3D3soNrRYhIO4MWMYTuMUYBXJrsCOaiPwdupPW+BP3xJnr2eKmT4vPhjCIjFLc
+         DOpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752769670; x=1753374470;
+        d=1e100.net; s=20230601; t=1752769671; x=1753374471;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ed5EKdzH3JskFWB3i3+fISnWrXK1xmjcG1/JKwjT7fs=;
-        b=TXBIM0k/KgxBh/mUFgZoNe+EVtSspBUsy0KSsmc3M0cIaaM1q7+LGoLSBh7rDOzvEt
-         rndsCRmFOcuIGsXreW+yrdMd8SXKv64q/ZGQP6z361ICgwsFiWieJodb3WdXe5XVeNsT
-         Okr/ip1PmfXEK31Q4xN9aVPVHCxUU1oRx2044+O4+21sJgZZcVLHulBSn8l+NZ/1tB5x
-         pOOdYb+JqQ1F89WjSkPWNz42GGFsDx5g2jc5reiY9odSVUk0FisM2D/hRaJPxg3ejrSQ
-         hFB6AkJv5T21ffVni69Or8OJG0pdz0BO5cf2gmCatqPNEfNF4cp+T87wLQcj0weWRjiH
-         EbLg==
-X-Gm-Message-State: AOJu0YwTOdTQjUrim1IjYrm5FDWxAqPhOvGb8ZyeHOQCuaKsDm9ZUk3C
-	McLtvjVjgLBUfGDxRGMjhaewrhdRGcKuHkalJBZ1/rJpbvsdH+yiVnAYPKYkxKivLlPaWOasxY9
-	xL+ckBPOUVXkXJof6scUrKhejKJeTIE/Q17/IVr0Byh4yOnRJzq4TURsWEWKFn7qrYkC1VcUraK
-	1tdYrsOPde+nC/Zh3W0VXre+CF9ZY=
-X-Google-Smtp-Source: AGHT+IGrLJKVjEgj1SDZnlDcjyoevRtzuYkOn+gCuJEKU5WteK+MJa4KEFRnnHxiW/w0ZR9dr94c/ATmfw==
-X-Received: from wrus4.prod.google.com ([2002:a5d:6a84:0:b0:3a4:eeba:2067])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6000:4305:b0:3a4:d0dc:184d
- with SMTP id ffacd0b85a97d-3b60dd95c4dmr6783204f8f.27.1752769670073; Thu, 17
- Jul 2025 09:27:50 -0700 (PDT)
-Date: Thu, 17 Jul 2025 17:27:27 +0100
+        bh=47rVlr8Uc/SdJ5Y2yETdFZUDua/sXacoe643TNgwpkI=;
+        b=afWd9teVi2dY2rps6wbF7RrG4uS91QBANLw2OpfUAYMcsJUyaVpMCwulT2zqgktFE+
+         PHBcOjACCgZXETPtjmlE26+T5kwx8soA2ewe2/KZdAmpyycJHSqk4+XrYsvxcFk28PP7
+         SNYSKlcU+As4FK5oSidDqKs+KOHx5hVS+lDxHeDP8/H7/YUpgXObOe8SYBqOxuJ5XtFL
+         XSYRAm6e+4hfyl6gRqGXXZbWK91y247BRwA6E5dzRTa7ZRWE24/UbB9QusY5/EYLEIOH
+         3PZow80hyrsGJ5DiC6VAppsumWXly/Enz62Q+YcxJgNKsjCwGkT1Gv4o4FSmlCzOo02J
+         6zHw==
+X-Gm-Message-State: AOJu0YxkvrCU6PwxxtNq6Nxaawbu8l42eSAyzvMbS6dnJ28Us09FdoJy
+	bEDhpoGPEDADGDoK3LRRWEnnU1nRgTtADwibWWOaxqFipRERTjv48TJg9klo2PlEbl491KhKCgm
+	+4NVjLkN4hN/zxDTIsS5XWlFh4Esp6H51MJmGK+jkW+nhmuMwG2q7dqUSl9ml/q00OK8Ij7ki1W
+	U0XPEKawqLxfSqrxk3bLYiORg1N0A=
+X-Google-Smtp-Source: AGHT+IFE+Yh1vUPuBTGkmn7aSiu0B0g40KDhnFsxHr96JF67lwRCADpGBuJJ9OSA14pLB/Lgj/5KyihDXQ==
+X-Received: from wmbel5.prod.google.com ([2002:a05:600c:3e05:b0:456:e1f:751a])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6000:40ce:b0:3b5:e2ca:1c2
+ with SMTP id ffacd0b85a97d-3b60e4be28fmr5622341f8f.2.1752769671044; Thu, 17
+ Jul 2025 09:27:51 -0700 (PDT)
+Date: Thu, 17 Jul 2025 17:27:28 +0100
 In-Reply-To: <20250717162731.446579-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,9 +74,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250717162731.446579-1-tabba@google.com>
 X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Message-ID: <20250717162731.446579-18-tabba@google.com>
-Subject: [PATCH v15 17/21] KVM: arm64: nv: Handle VNCR_EL2-triggered faults
- backed by guest_memfd
+Message-ID: <20250717162731.446579-19-tabba@google.com>
+Subject: [PATCH v15 18/21] KVM: arm64: Enable host mapping of shared
+ guest_memfd memory
 From: Fuad Tabba <tabba@google.com>
 To: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
 	kvmarm@lists.linux.dev
@@ -102,107 +102,86 @@ Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
 	ira.weiny@intel.com, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-Handle faults for memslots backed by guest_memfd in arm64 nested
-virtualization triggerred by VNCR_EL2.
+Enable host userspace mmap support for guest_memfd-backed memory on
+arm64. This change provides arm64 with the capability to map guest
+memory at the host directly from guest_memfd:
 
-* Introduce is_gmem output parameter to kvm_translate_vncr(), indicating
-  whether the faulted memory slot is backed by guest_memfd.
+* Define kvm_arch_supports_gmem_mmap() for arm64: The
+  kvm_arch_supports_gmem_mmap() macro is defined for arm64 to be true if
+  CONFIG_KVM_GMEM_SUPPORTS_MMAP is enabled. For existing arm64 KVM VM
+  types that support guest_memfd, this enables them to use guest_memfd
+  with host userspace mappings. This provides a consistent behavior as
+  there are currently no arm64 CoCo VMs that rely on guest_memfd solely
+  for private, non-mappable memory. Future arm64 VM types can override
+  or restrict this behavior via the kvm_arch_supports_gmem_mmap() hook
+  if needed.
 
-* Dispatch faults backed by guest_memfd to kvm_gmem_get_pfn().
+* Select CONFIG_KVM_GMEM_SUPPORTS_MMAP in arm64 Kconfig.
 
-* Update kvm_handle_vncr_abort() to handle potential guest_memfd errors.
-  Some of the guest_memfd errors need to be handled by userspace,
-  instead of attempting to (implicitly) retry by returning to the guest.
+* Enforce KVM_MEMSLOT_GMEM_ONLY for guest_memfd on arm64: Checks are
+  added to ensure that if guest_memfd is enabled on arm64,
+  KVM_GMEM_SUPPORTS_MMAP must also be enabled. This means
+  guest_memfd-backed memory slots on arm64 are currently only supported
+  if they are intended for shared memory use cases (i.e.,
+  kvm_memslot_is_gmem_only() is true). This design reflects the current
+  arm64 KVM ecosystem where guest_memfd is primarily being introduced
+  for VMs that support shared memory.
 
-Suggested-by: Marc Zyngier <maz@kernel.org>
+Reviewed-by: James Houghton <jthoughton@google.com>
+Reviewed-by: Gavin Shan <gshan@redhat.com>
+Acked-by: David Hildenbrand <david@redhat.com>
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/nested.c | 41 +++++++++++++++++++++++++++++++++++------
- 1 file changed, 35 insertions(+), 6 deletions(-)
+ arch/arm64/include/asm/kvm_host.h | 4 ++++
+ arch/arm64/kvm/Kconfig            | 2 ++
+ arch/arm64/kvm/mmu.c              | 7 +++++++
+ 3 files changed, 13 insertions(+)
 
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index dc1d26559bfa..b3edd7f7c8cd 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -1172,8 +1172,9 @@ static u64 read_vncr_el2(struct kvm_vcpu *vcpu)
- 	return (u64)sign_extend64(__vcpu_sys_reg(vcpu, VNCR_EL2), 48);
- }
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 3e41a880b062..63f7827cfa1b 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -1674,5 +1674,9 @@ void compute_fgu(struct kvm *kvm, enum fgt_group_id fgt);
+ void get_reg_fixed_bits(struct kvm *kvm, enum vcpu_sysreg reg, u64 *res0, u64 *res1);
+ void check_feature_map(void);
  
--static int kvm_translate_vncr(struct kvm_vcpu *vcpu)
-+static int kvm_translate_vncr(struct kvm_vcpu *vcpu, bool *is_gmem)
- {
-+	struct kvm_memory_slot *memslot;
- 	bool write_fault, writable;
- 	unsigned long mmu_seq;
- 	struct vncr_tlb *vt;
-@@ -1216,10 +1217,25 @@ static int kvm_translate_vncr(struct kvm_vcpu *vcpu)
- 	smp_rmb();
++#ifdef CONFIG_KVM_GMEM
++#define kvm_arch_supports_gmem(kvm) true
++#define kvm_arch_supports_gmem_mmap(kvm) IS_ENABLED(CONFIG_KVM_GMEM_SUPPORTS_MMAP)
++#endif
  
- 	gfn = vt->wr.pa >> PAGE_SHIFT;
--	pfn = kvm_faultin_pfn(vcpu, gfn, write_fault, &writable, &page);
--	if (is_error_noslot_pfn(pfn) || (write_fault && !writable))
-+	memslot = gfn_to_memslot(vcpu->kvm, gfn);
-+	if (!memslot)
+ #endif /* __ARM64_KVM_HOST_H__ */
+diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+index 713248f240e0..323b46b7c82f 100644
+--- a/arch/arm64/kvm/Kconfig
++++ b/arch/arm64/kvm/Kconfig
+@@ -37,6 +37,8 @@ menuconfig KVM
+ 	select HAVE_KVM_VCPU_RUN_PID_CHANGE
+ 	select SCHED_INFO
+ 	select GUEST_PERF_EVENTS if PERF_EVENTS
++	select KVM_GMEM
++	select KVM_GMEM_SUPPORTS_MMAP
+ 	help
+ 	  Support hosting virtualized guest machines.
+ 
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 8c82df80a835..85559b8a0845 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -2276,6 +2276,13 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+ 	if ((new->base_gfn + new->npages) > (kvm_phys_size(&kvm->arch.mmu) >> PAGE_SHIFT))
  		return -EFAULT;
  
-+	*is_gmem = kvm_slot_has_gmem(memslot);
-+	if (!*is_gmem) {
-+		pfn = __kvm_faultin_pfn(memslot, gfn, write_fault ? FOLL_WRITE : 0,
-+					&writable, &page);
-+		if (is_error_noslot_pfn(pfn) || (write_fault && !writable))
-+			return -EFAULT;
-+	} else {
-+		ret = kvm_gmem_get_pfn(vcpu->kvm, memslot, gfn, &pfn, &page, NULL);
-+		if (ret) {
-+			kvm_prepare_memory_fault_exit(vcpu, vt->wr.pa, PAGE_SIZE,
-+					      write_fault, false, false);
-+			return ret;
-+		}
-+	}
++	/*
++	 * Only support guest_memfd backed memslots with mappable memory, since
++	 * there aren't any CoCo VMs that support only private memory on arm64.
++	 */
++	if (kvm_slot_has_gmem(new) && !kvm_memslot_is_gmem_only(new))
++		return -EINVAL;
 +
- 	scoped_guard(write_lock, &vcpu->kvm->mmu_lock) {
- 		if (mmu_invalidate_retry(vcpu->kvm, mmu_seq))
- 			return -EAGAIN;
-@@ -1292,23 +1308,36 @@ int kvm_handle_vncr_abort(struct kvm_vcpu *vcpu)
- 	if (esr_fsc_is_permission_fault(esr)) {
- 		inject_vncr_perm(vcpu);
- 	} else if (esr_fsc_is_translation_fault(esr)) {
--		bool valid;
-+		bool valid, is_gmem = false;
- 		int ret;
+ 	hva = new->userspace_addr;
+ 	reg_end = hva + (new->npages << PAGE_SHIFT);
  
- 		scoped_guard(read_lock, &vcpu->kvm->mmu_lock)
- 			valid = kvm_vncr_tlb_lookup(vcpu);
- 
- 		if (!valid)
--			ret = kvm_translate_vncr(vcpu);
-+			ret = kvm_translate_vncr(vcpu, &is_gmem);
- 		else
- 			ret = -EPERM;
- 
- 		switch (ret) {
- 		case -EAGAIN:
--		case -ENOMEM:
- 			/* Let's try again... */
- 			break;
-+		case -ENOMEM:
-+			/*
-+			 * For guest_memfd, this indicates that it failed to
-+			 * create a folio to back the memory. Inform userspace.
-+			 */
-+			if (is_gmem)
-+				return 0;
-+			/* Otherwise, let's try again... */
-+			break;
- 		case -EFAULT:
-+		case -EIO:
-+		case -EHWPOISON:
-+			if (is_gmem)
-+				return 0;
-+			fallthrough;
- 		case -EINVAL:
- 		case -ENOENT:
- 		case -EACCES:
 -- 
 2.50.0.727.gbf7dc18ff4-goog
 
