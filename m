@@ -1,46 +1,46 @@
-Return-Path: <kvm+bounces-52781-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52782-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDE47B09367
-	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 19:39:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F8A8B09366
+	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 19:39:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2AC6A1C47CA5
-	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 17:39:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0933A473A3
+	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 17:39:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDC1530114A;
-	Thu, 17 Jul 2025 17:38:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C09BB302059;
+	Thu, 17 Jul 2025 17:38:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ickK1lBa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p+DaYnpi"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 056A030112B;
-	Thu, 17 Jul 2025 17:38:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D76FB30115E;
+	Thu, 17 Jul 2025 17:38:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752773910; cv=none; b=hhPZH5TaEow+cvwS83jHTRcZqAfVv4t7Nb3UlKqES9KHoZ/wAreY6Qtfz9mxPVKh2UMFApYRVJ7pxFhh/tPdMnpygl79PRY4jSgVbhiBi7fhtElX10cMPDhn9x8KtaRgEXKCi7oCbowA4ydlfWkCp7JhoDYhojABcXd4mUN9Pds=
+	t=1752773913; cv=none; b=AqT6IBXMT2xiw4m0FJQQo9IsULyez3gmG7Ozn4LJZkhPK1+2IApJOB6TZ5d8mxI5wvup3v0v23mez6LNsCA1zC38IkEHroD77WFeXGviBnT92fVgF+nI7xJMnaitP3qw+hzmVQbN1yxsq2KnOeMADqBM0M9N+yooopghw4CJJBM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752773910; c=relaxed/simple;
-	bh=LQvOsrvAxtIF9zfBp3smdp/HiFPvr9jOTvuEZPP26Xw=;
+	s=arc-20240116; t=1752773913; c=relaxed/simple;
+	bh=wZDfgswU2/pwcpS3H3uILO4jDTDnQH15cewPVoii5Es=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=D9a1JVLLqYQJRdFI5nFDBk+IJzD+AVVsWjjkQH+f1/n7YK2LAJU4DoLIts6TaHISMcAfIX4Mp1heOiUS7kzcNt1rfHLo20zaFiLyaZ1heh0+U7+/qwQeAP1A9/crvxlhaPaxlhzkNH9MEkFi2uOaaqWM/tMXI6lzM+PRy4tfGv0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ickK1lBa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70CB2C4CEE3;
-	Thu, 17 Jul 2025 17:38:27 +0000 (UTC)
+	 MIME-Version; b=Hjomrt+jBcE+yGGbC+Ec4rDhkwfYmEzGFK5nrd7LArJuK3x/o/N+0AbatRP5bIZrQ9/vKBOlCmi38bagGi93XJcCUyphipJljivVXRx+1v6cktMKUYpazFNv0/xWjdtxLmAd/SwVVO4uyQzYLSP5wcjjMbSguXtOddthABJbI94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p+DaYnpi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2486EC4CEF5;
+	Thu, 17 Jul 2025 17:38:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752773909;
-	bh=LQvOsrvAxtIF9zfBp3smdp/HiFPvr9jOTvuEZPP26Xw=;
+	s=k20201202; t=1752773912;
+	bh=wZDfgswU2/pwcpS3H3uILO4jDTDnQH15cewPVoii5Es=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ickK1lBad5bTYIvdilgPat1k8N9oKeb1NbYjhSUVYnAOFktqRVsV3Eqsxs009WcrI
-	 VD+qqU7PTnzjhRMkjHGZlC5ppIFXjV5LgDW6VbDpHRxlWy4gIEmOlwqyAlphwci7JG
-	 vol3NQ40MQLvFkWY73Jqp154KlYGzLUXdDdjdTwke35qzGbHXsGCnXpQElwsnjj+zq
-	 GWrDM0AcpRdrMq/teioONtW7MtVyDKmXgin+U/n+QY2iksKI2nZR65Hka+i60UFp6h
-	 CPjhDj4lI9RrjxtZMbaHluswv5aMPn/SYxkSyDi7tSHWPzaD0ChurH2gNk0X2jO77r
-	 lzPJ7LL1lD6Zg==
+	b=p+DaYnpi70Lt2MtzM8YaWKYHHUBdCgnvhTTgtm73exhs9Mn3b+6hmFITHqv0+ZvJi
+	 pDnPOnggRnvlkChq/yGWc4+gjU5E2tZvdNha1pu3NB10GgCwnMUiSWJvsy3WUuXtEc
+	 8orPRtp/q8m0JzErTQp3pi6guOkUUSDZ9mwa0G/pk6FOvUVW7bnYk+Eo1OauHBvmZx
+	 gVkL+J98IF7V2tyMLOJTHLgcEgR6gMsqvosTrLBYhCRwtsGain0t+7SCkbYl9UDiL4
+	 HhNZ+NvxXnVt8PyA9oiZPkMwujUocLNZ/83t2J2iYnbB54hAcAi6xpLRDFhlJQj622
+	 XNowdQjx0pbnA==
 From: Mario Limonciello <superm1@kernel.org>
 To: David Airlie <airlied@gmail.com>,
 	Bjorn Helgaas <bhelgaas@google.com>
@@ -69,9 +69,9 @@ Cc: Alex Deucher <alexander.deucher@amd.com>,
 	Mario Limonciello <mario.limonciello@amd.com>,
 	Simona Vetter <simona.vetter@ffwll.ch>,
 	Bjorn Helgaas <helgaas@kernel.org>
-Subject: [PATCH v9 3/9] vga_switcheroo: Use pci_is_display()
-Date: Thu, 17 Jul 2025 12:38:06 -0500
-Message-ID: <20250717173812.3633478-4-superm1@kernel.org>
+Subject: [PATCH v9 4/9] iommu/vt-d: Use pci_is_display()
+Date: Thu, 17 Jul 2025 12:38:07 -0500
+Message-ID: <20250717173812.3633478-5-superm1@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250717173812.3633478-1-superm1@kernel.org>
 References: <20250717173812.3633478-1-superm1@kernel.org>
@@ -87,27 +87,28 @@ From: Mario Limonciello <mario.limonciello@amd.com>
 
 The inline pci_is_display() helper does the same thing.  Use it.
 
+Reviewed-by: Lu Baolu <baolu.lu@linux.intel.com>
 Reviewed-by: Daniel Dadap <ddadap@nvidia.com>
 Reviewed-by: Simona Vetter <simona.vetter@ffwll.ch>
 Suggested-by: Bjorn Helgaas <helgaas@kernel.org>
 Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
 ---
- drivers/gpu/vga/vga_switcheroo.c | 2 +-
+ drivers/iommu/intel/iommu.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/gpu/vga/vga_switcheroo.c b/drivers/gpu/vga/vga_switcheroo.c
-index 18f2c92beff8e..68e45a26e85f7 100644
---- a/drivers/gpu/vga/vga_switcheroo.c
-+++ b/drivers/gpu/vga/vga_switcheroo.c
-@@ -437,7 +437,7 @@ find_active_client(struct list_head *head)
-  */
- bool vga_switcheroo_client_probe_defer(struct pci_dev *pdev)
- {
--	if ((pdev->class >> 16) == PCI_BASE_CLASS_DISPLAY) {
-+	if (pci_is_display(pdev)) {
- 		/*
- 		 * apple-gmux is needed on pre-retina MacBook Pro
- 		 * to probe the panel if pdev is the inactive GPU.
+diff --git a/drivers/iommu/intel/iommu.c b/drivers/iommu/intel/iommu.c
+index 148b944143b81..cad9ed1016cfc 100644
+--- a/drivers/iommu/intel/iommu.c
++++ b/drivers/iommu/intel/iommu.c
+@@ -34,7 +34,7 @@
+ #define ROOT_SIZE		VTD_PAGE_SIZE
+ #define CONTEXT_SIZE		VTD_PAGE_SIZE
+ 
+-#define IS_GFX_DEVICE(pdev) ((pdev->class >> 16) == PCI_BASE_CLASS_DISPLAY)
++#define IS_GFX_DEVICE(pdev) pci_is_display(pdev)
+ #define IS_USB_DEVICE(pdev) ((pdev->class >> 8) == PCI_CLASS_SERIAL_USB)
+ #define IS_ISA_DEVICE(pdev) ((pdev->class >> 8) == PCI_CLASS_BRIDGE_ISA)
+ #define IS_AZALIA(pdev) ((pdev)->vendor == 0x8086 && (pdev)->device == 0x3a3e)
 -- 
 2.43.0
 
