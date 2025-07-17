@@ -1,62 +1,63 @@
-Return-Path: <kvm+bounces-52798-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52799-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6141CB09679
-	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 23:47:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F9C5B0967B
+	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 23:47:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5312D3BAE6B
-	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 21:46:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D54CF4E035B
+	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 21:47:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A4BC2356BE;
-	Thu, 17 Jul 2025 21:47:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A98223AB95;
+	Thu, 17 Jul 2025 21:47:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mgLVdxQI"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="B9nzEE7Y"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 119DA12C544;
-	Thu, 17 Jul 2025 21:47:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9182238C03;
+	Thu, 17 Jul 2025 21:47:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752788834; cv=none; b=tZ92HhGpQAUh6VPM3th+eySarVIrqlaUfgHOeuLHlaep1UfWr2UwH+s8J9yTSGhjzGfMcPWZmkO2omnLOYMaEni57wRDOiRwOvnooCcqvMCYYRs5fJf/N1PoLQJMohSRtIvlow14EQ2KUL66/VKnlfcOaZ6S8OPRF5snSjizhTQ=
+	t=1752788838; cv=none; b=c0Xoga4q3BwDUjUhSLkx4NbS/VHEdzrEgb6HDMj6S8DVlXgf0ILWWQNYh8wj+3YCk65nOCui9GFl+iwABcWtFfVDOIw49W7l87nZPT50aFEotp5h0fvOTP+IpPMKGKq5pLDT3Uh+7J9OozBOISGEQ9d/R4lJ0vUgKVs8AOTzHtE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752788834; c=relaxed/simple;
-	bh=GeBjQgp4CQ51rAjMKKw1UHa/3iVrylWuqhz/SLl9yW8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mzpO8YzJD96nEdpq4eP9kXkT3tk2e8I+a3ZFpIW2/yqKZPZcw41/AoN0Bpswj/KGDnCh1jHmPCRqytYOQIg7YvJZYbF424zYxlGPoLGwSPP1m0xDHAw8HDfOQeFZVahKayVEKDRyjSaUZu5mwKjh+2vbQQPU0XZ81fI89S5QAjk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mgLVdxQI; arc=none smtp.client-ip=198.175.65.12
+	s=arc-20240116; t=1752788838; c=relaxed/simple;
+	bh=AQB7uaY3nELi1IdocCyuttY1/dmXgSGH8VCBnE5Obzc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=AJclVMwosCnHFGsFuYYJImSBmk1oI6gmDrISohegeSY0C8Kz1n1tem8Plf+FXrcz3NeaA1ePh7OJC1zdb3SR6AVR4FPf/cy4Ji3YFNMvUTZ1NQqP3wIRkK/YFpqsEXv8yazUUeHvxdZqmdRTNcJVf0y2J7hyxeKtRXSl04fZV7I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=B9nzEE7Y; arc=none smtp.client-ip=198.175.65.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752788832; x=1784324832;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=GeBjQgp4CQ51rAjMKKw1UHa/3iVrylWuqhz/SLl9yW8=;
-  b=mgLVdxQItNyld4Rb/gwo0VmGIFJ86xh2UTMn69jowNoM37oJ4ynyVsAA
-   uK8T/ZO6Lt+kWOPFxjja1V8WeamJW9FA0vGtMqTAnRJmiuo8/sBlbgeUo
-   aRRbexRnx8Y7dnPKlCQMkqq3272J3WBYH4tM4JtGv7Iy1TWr+mEfmnnod
-   oCnhyajbwejFBAoggf16xQziysEu4/hg6wmXySAAqbFVaq/8puGyOK8sU
-   DVtYVc0aAowPTDO1aXCnFBOgjv+dq8x+MqJTvvMst+lbHnFmjtvvyLDne
-   boMfes2T2PRPVm+3vr46N72xI9/zEoPh52p+Cp+ohpsEEml/Hwc8yFVHs
-   g==;
-X-CSE-ConnectionGUID: 4YkX+8c2Rw69HxEk/p9njw==
-X-CSE-MsgGUID: G+2jPjG5R8CP99Uw6eB9qg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11495"; a="66527737"
+  t=1752788837; x=1784324837;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=AQB7uaY3nELi1IdocCyuttY1/dmXgSGH8VCBnE5Obzc=;
+  b=B9nzEE7YbcWXsDmAW5cKcaWGWc199+ic0RHST3B7YsdEG9dwvDZNgpGj
+   4aFhUdrBW9c5RQmmn1qZQSvOk/XM1MDVtsNZ/RIxkKXvWSjJVHpyX0u4m
+   W86pCgQ5bcBGr1vGGIA9fhCB9ZQwjpv9sqEebgFfHMfYopYBwFoBIh8vv
+   7meNW/KOEdidpFgnmKakQs6hErwCpF+66b3YBA7ziPisfuht33V5Efo4Z
+   fCW9E/NMH0FI3QbT2aaaBCIvfWhjsBc8oam85OMGefogq/saEyx+as2ls
+   W2cxqWpjMh4qsEJiT9FhKJN5t2HRQaeMiI+bTaHPcQZSyyCK+cotwPX3s
+   Q==;
+X-CSE-ConnectionGUID: /1UdWB5GT/qkvKG2DcldhQ==
+X-CSE-MsgGUID: 6P8CiQbhSrWB76tfIU1maw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11495"; a="66527750"
 X-IronPort-AV: E=Sophos;i="6.16,319,1744095600"; 
-   d="scan'208";a="66527737"
+   d="scan'208";a="66527750"
 Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 14:47:11 -0700
-X-CSE-ConnectionGUID: QB0xRGOjTxulF9AV/YJHiw==
-X-CSE-MsgGUID: CHggClCeQWqKgbsdbbXIjw==
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 14:47:17 -0700
+X-CSE-ConnectionGUID: zirE5pgfRmGXjMIZxb21Pw==
+X-CSE-MsgGUID: dZUPBrNtQpCTyf4Gx6Tm6A==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,319,1744095600"; 
-   d="scan'208";a="157295485"
+   d="scan'208";a="157295500"
 Received: from vverma7-mobl3.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.124.221.39])
-  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 14:47:06 -0700
+  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 14:47:11 -0700
 From: Kai Huang <kai.huang@intel.com>
 To: dave.hansen@intel.com,
 	bp@alien8.de,
@@ -80,10 +81,12 @@ Cc: x86@kernel.org,
 	nik.borisov@suse.com,
 	chao.gao@intel.com,
 	sagis@google.com
-Subject: [PATCH v4 0/7] TDX host: kexec/kdump support
-Date: Fri, 18 Jul 2025 09:46:37 +1200
-Message-ID: <cover.1752730040.git.kai.huang@intel.com>
+Subject: [PATCH v4 1/7] x86/kexec: Consolidate relocate_kernel() function parameters
+Date: Fri, 18 Jul 2025 09:46:38 +1200
+Message-ID: <c7356a40384a70b853b6913921f88e69e0337dd8.1752730040.git.kai.huang@intel.com>
 X-Mailer: git-send-email 2.50.1
+In-Reply-To: <cover.1752730040.git.kai.huang@intel.com>
+References: <cover.1752730040.git.kai.huang@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -92,170 +95,190 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This series is the latest attempt to support kexec on TDX host following
-Dave's suggestion to use a percpu boolean to control WBINVD during
-kexec.
+During kexec, the kernel jumps to the new kernel in relocate_kernel(),
+which is implemented in assembly and both 32-bit and 64-bit have their
+own version.
 
-Hi Boris/Tom,
+Currently, for both 32-bit and 64-bit, the last two parameters of the
+relocate_kernel() are both 'unsigned int' but actually they only convey
+a boolean, i.e., one bit information.  The 'unsigned int' has enough
+space to carry two bits information therefore there's no need to pass
+the two booleans in two separate 'unsigned int'.
 
-As requested, I added the first patch to cleanup the last two 'unsigned
-int' parameters of the relocate_kernel() into one 'unsigned int' and pass
-flags instead.  The patch 2 (patch 1 in v3) also gets updated based on
-that.  Would you help to review?  Thanks.
+Consolidate the last two function parameters of relocate_kernel() into a
+single 'unsigned int' and pass flags instead.
 
-I tested that both normal kexec and preserve_context kexec works (using
-the tools/testing/selftests/kexec/test_kexec_jump.sh).  But I don't have
-SME capable machine to test.
+Only consolidate the 64-bit version albeit the similar optimization can
+be done for the 32-bit version too.  Don't bother changing the 32-bit
+version while it is working (since assembly code change is required).
 
-Hi Tom, I added your Reviewed-by and Tested-by in the patch 2 anyway
-since I believe the change is trivial and straightforward).  But due to
-the cleanup patch, I appreciate if you can help to test the first two
-patches again.  Thanks a lot!
+Signed-off-by: Kai Huang <kai.huang@intel.com>
+---
+ arch/x86/include/asm/kexec.h         | 12 ++++++++++--
+ arch/x86/kernel/machine_kexec_64.c   | 22 +++++++++++++---------
+ arch/x86/kernel/relocate_kernel_64.S | 19 +++++++++----------
+ 3 files changed, 32 insertions(+), 21 deletions(-)
 
-v3 -> v4:
- - Rebase to latest tip/master.
- - Add a cleanup patch to consolidate relocate_kernel()'s last two
-   function parameters -- Boris.
- - Address comments received -- please see individual patches.
- - Collect tags (Tom, Rick, binbin).
-
- v3: https://lore.kernel.org/kvm/cover.1750934177.git.kai.huang@intel.com/
-
-v2 -> v3 (all trivial changes):
-
- - Rebase on latest tip/master
-   - change to use __always_inline for do_seamcall() in patch 2
- - Update patch 2 (changelog and code comment) to remove the sentence
-   which says "not all SEAMCALLs generate dirty cachelines of TDX
-   private memory but just treat all of them do."  -- Dave.
- - Add Farrah's Tested-by for all TDX patches.
-
-The v2 had one informal RFC patch appended to show "some optimization"
-which can move WBINVD from the kexec phase to an early stage in KVM.
-Paolo commented and Acked that patch (thanks!), so this v3 made that
-patch as a formal one (patch 6).  But technically it is not absolutely
-needed in this series but can be done in the future.
-
-More history info can be found in v2:
-
- https://lore.kernel.org/lkml/cover.1746874095.git.kai.huang@intel.com/
-
-=== More information ===
-
-TDX private memory is memory that is encrypted with private Host Key IDs
-(HKID).  If the kernel has ever enabled TDX, part of system memory
-remains TDX private memory when kexec happens.  E.g., the PAMT (Physical
-Address Metadata Table) pages used by the TDX module to track each TDX
-memory page's state are never freed once the TDX module is initialized.
-TDX guests also have guest private memory and secure-EPT pages.
-
-After kexec, the new kernel will have no knowledge of which memory page
-was used as TDX private page and can use all memory as regular memory.
-
-1) Cache flush
-
-Per TDX 1.5 base spec "8.6.1.Platforms not Using ACT: Required Cache
-Flush and Initialization by the Host VMM", to support kexec for TDX, the
-kernel needs to flush cache to make sure there's no dirty cachelines of
-TDX private memory left over to the new kernel (when the TDX module
-reports TDX_FEATURES.CLFLUSH_BEFORE_ALLOC as 1 in the global metadata for
-the platform).  The kernel also needs to make sure there's no more TDX
-activity (no SEAMCALL) after cache flush so that no new dirty cachelines
-of TDX private memory are generated.
-
-SME has similar requirement.  SME kexec support uses WBINVD to do the
-cache flush.  WBINVD is able to flush cachelines associated with any
-HKID.  Reuse the WBINVD introduced by SME to flush cache for TDX.
-
-Currently the kernel explicitly checks whether the hardware supports SME
-and only does WBINVD if true.  Instead of adding yet another TDX
-specific check, this series uses a percpu boolean to indicate whether
-WBINVD is needed on that CPU during kexec.
-
-2) Reset TDX private memory using MOVDIR64B
-
-The TDX spec (the aforementioned section) also suggests the kernel
-*should* use MOVDIR64B to clear TDX private page before the kernel
-reuses it as regular one.
-
-However, in reality the situation can be more flexible.  Per TDX 1.5
-base spec ("Table 16.2: Non-ACT Platforms Checks on Memory Reads in Ci
-Mode" and "Table 16.3: Non-ACT Platforms Checks on Memory Reads in Li
-Mode"), the read/write to TDX private memory using shared KeyID without
-integrity check enabled will not poison the memory and cause machine
-check.
-
-Note on the platforms with ACT (Access Control Table), there's no
-integrity check involved thus no machine check is possible to happen due
-to memory read/write using different KeyIDs.
-
-KeyID 0 (TME key) doesn't support integrity check.  This series chooses
-to NOT reset TDX private memory but leave TDX private memory as-is to the
-new kernel.  As mentioned above, in practice it is safe to do so.
-
-3) One limitation
-
-If the kernel has ever enabled TDX, after kexec the new kernel won't be
-able to use TDX anymore.  This is because when the new kernel tries to
-initialize TDX module it will fail on the first SEAMCALL due to the
-module has already been initialized by the old kernel.
-
-More (non-trivial) work will be needed for the new kernel to use TDX,
-e.g., one solution is to just reload the TDX module from the location
-where BIOS loads the TDX module (/boot/efi/EFI/TDX/).  This series
-doesn't cover this, but leave this as future work.
-
-4) Kdump support
-
-This series also enables kdump with TDX, but no special handling is
-needed for crash kexec (except turning on the Kconfig option):
-
- - kdump kernel uses reserved memory from the old kernel as system ram,
-   and the old kernel will never use the reserved memory as TDX memory.
- - /proc/vmcore contains TDX private memory pages.  It's meaningless to
-   read them, but it doesn't do any harm either.
-
-5) TDX "partial write machine check" erratum
-
-On the platform with TDX erratum, a partial write (a write transaction
-of less than a cacheline lands at memory controller) to TDX private
-memory poisons that memory, and a subsequent read triggers machine
-check.  On those platforms, the kernel needs to reset TDX private memory
-before jumping to the new kernel otherwise the new kernel may see
-unexpected machine check.
-
-The kernel currently doesn't track which page is TDX private memory.
-It's not trivial to reset TDX private memory.  For simplicity, this
-series simply disables kexec/kdump for such platforms.  This can be
-enhanced in the future.
-
-
-
-Kai Huang (7):
-  x86/kexec: Consolidate relocate_kernel() function parameters
-  x86/sme: Use percpu boolean to control WBINVD during kexec
-  x86/virt/tdx: Mark memory cache state incoherent when making SEAMCALL
-  x86/kexec: Disable kexec/kdump on platforms with TDX partial write
-    erratum
-  x86/virt/tdx: Remove the !KEXEC_CORE dependency
-  x86/virt/tdx: Update the kexec section in the TDX documentation
-  KVM: TDX: Explicitly do WBINVD when no more TDX SEAMCALLs
-
- Documentation/arch/x86/tdx.rst       | 14 ++++-----
- arch/x86/Kconfig                     |  1 -
- arch/x86/include/asm/kexec.h         | 12 ++++++--
- arch/x86/include/asm/processor.h     |  2 ++
- arch/x86/include/asm/tdx.h           | 31 +++++++++++++++++++-
- arch/x86/kernel/cpu/amd.c            | 17 +++++++++++
- arch/x86/kernel/machine_kexec_64.c   | 43 ++++++++++++++++++++++------
- arch/x86/kernel/process.c            | 24 +++++++---------
- arch/x86/kernel/relocate_kernel_64.S | 30 +++++++++++--------
- arch/x86/kvm/vmx/tdx.c               | 12 ++++++++
- arch/x86/virt/vmx/tdx/tdx.c          | 16 +++++++++--
- 11 files changed, 155 insertions(+), 47 deletions(-)
-
-
-base-commit: e180b3a224cb519388c2f61ca7bc1eaf94cec1fb
+diff --git a/arch/x86/include/asm/kexec.h b/arch/x86/include/asm/kexec.h
+index f2ad77929d6e..5f09791dc4e9 100644
+--- a/arch/x86/include/asm/kexec.h
++++ b/arch/x86/include/asm/kexec.h
+@@ -13,6 +13,15 @@
+ # define KEXEC_DEBUG_EXC_HANDLER_SIZE	6 /* PUSHI, PUSHI, 2-byte JMP */
+ #endif
+ 
++#ifdef CONFIG_X86_64
++
++#include <linux/bits.h>
++
++#define RELOC_KERNEL_PRESERVE_CONTEXT	BIT(0)
++#define RELOC_KERNEL_HOST_MEM_ACTIVE	BIT(1)
++
++#endif
++
+ # define KEXEC_CONTROL_PAGE_SIZE	4096
+ # define KEXEC_CONTROL_CODE_MAX_SIZE	2048
+ 
+@@ -121,8 +130,7 @@ typedef unsigned long
+ relocate_kernel_fn(unsigned long indirection_page,
+ 		   unsigned long pa_control_page,
+ 		   unsigned long start_address,
+-		   unsigned int preserve_context,
+-		   unsigned int host_mem_enc_active);
++		   unsigned int flags);
+ #endif
+ extern relocate_kernel_fn relocate_kernel;
+ #define ARCH_HAS_KIMAGE_ARCH
+diff --git a/arch/x86/kernel/machine_kexec_64.c b/arch/x86/kernel/machine_kexec_64.c
+index 697fb99406e6..25cff38f5e60 100644
+--- a/arch/x86/kernel/machine_kexec_64.c
++++ b/arch/x86/kernel/machine_kexec_64.c
+@@ -384,16 +384,10 @@ void __nocfi machine_kexec(struct kimage *image)
+ {
+ 	unsigned long reloc_start = (unsigned long)__relocate_kernel_start;
+ 	relocate_kernel_fn *relocate_kernel_ptr;
+-	unsigned int host_mem_enc_active;
++	unsigned int relocate_kernel_flags;
+ 	int save_ftrace_enabled;
+ 	void *control_page;
+ 
+-	/*
+-	 * This must be done before load_segments() since if call depth tracking
+-	 * is used then GS must be valid to make any function calls.
+-	 */
+-	host_mem_enc_active = cc_platform_has(CC_ATTR_HOST_MEM_ENCRYPT);
+-
+ #ifdef CONFIG_KEXEC_JUMP
+ 	if (image->preserve_context)
+ 		save_processor_state();
+@@ -427,6 +421,17 @@ void __nocfi machine_kexec(struct kimage *image)
+ 	 */
+ 	relocate_kernel_ptr = control_page + (unsigned long)relocate_kernel - reloc_start;
+ 
++	relocate_kernel_flags = 0;
++	if (image->preserve_context)
++		relocate_kernel_flags |= RELOC_KERNEL_PRESERVE_CONTEXT;
++
++	/*
++	 * This must be done before load_segments() since if call depth tracking
++	 * is used then GS must be valid to make any function calls.
++	 */
++	if (cc_platform_has(CC_ATTR_HOST_MEM_ENCRYPT))
++		relocate_kernel_flags |= RELOC_KERNEL_HOST_MEM_ACTIVE;
++
+ 	/*
+ 	 * The segment registers are funny things, they have both a
+ 	 * visible and an invisible part.  Whenever the visible part is
+@@ -443,8 +448,7 @@ void __nocfi machine_kexec(struct kimage *image)
+ 	image->start = relocate_kernel_ptr((unsigned long)image->head,
+ 					   virt_to_phys(control_page),
+ 					   image->start,
+-					   image->preserve_context,
+-					   host_mem_enc_active);
++					   relocate_kernel_flags);
+ 
+ #ifdef CONFIG_KEXEC_JUMP
+ 	if (image->preserve_context)
+diff --git a/arch/x86/kernel/relocate_kernel_64.S b/arch/x86/kernel/relocate_kernel_64.S
+index ea604f4d0b52..1dfa323b33d5 100644
+--- a/arch/x86/kernel/relocate_kernel_64.S
++++ b/arch/x86/kernel/relocate_kernel_64.S
+@@ -66,8 +66,7 @@ SYM_CODE_START_NOALIGN(relocate_kernel)
+ 	 * %rdi indirection_page
+ 	 * %rsi pa_control_page
+ 	 * %rdx start address
+-	 * %rcx preserve_context
+-	 * %r8  host_mem_enc_active
++	 * %rcx flags: RELOC_KERNEL_*
+ 	 */
+ 
+ 	/* Save the CPU context, used for jumping back */
+@@ -111,7 +110,7 @@ SYM_CODE_START_NOALIGN(relocate_kernel)
+ 	/* save indirection list for jumping back */
+ 	movq	%rdi, pa_backup_pages_map(%rip)
+ 
+-	/* Save the preserve_context to %r11 as swap_pages clobbers %rcx. */
++	/* Save the flags to %r11 as swap_pages clobbers %rcx. */
+ 	movq	%rcx, %r11
+ 
+ 	/* setup a new stack at the end of the physical control page */
+@@ -129,9 +128,8 @@ SYM_CODE_START_LOCAL_NOALIGN(identity_mapped)
+ 	/*
+ 	 * %rdi	indirection page
+ 	 * %rdx start address
+-	 * %r8 host_mem_enc_active
+ 	 * %r9 page table page
+-	 * %r11 preserve_context
++	 * %r11 flags: RELOC_KERNEL_*
+ 	 * %r13 original CR4 when relocate_kernel() was invoked
+ 	 */
+ 
+@@ -204,7 +202,7 @@ SYM_CODE_START_LOCAL_NOALIGN(identity_mapped)
+ 	 * entries that will conflict with the now unencrypted memory
+ 	 * used by kexec. Flush the caches before copying the kernel.
+ 	 */
+-	testq	%r8, %r8
++	testq	$RELOC_KERNEL_HOST_MEM_ACTIVE, %r11
+ 	jz .Lsme_off
+ 	wbinvd
+ .Lsme_off:
+@@ -220,7 +218,7 @@ SYM_CODE_START_LOCAL_NOALIGN(identity_mapped)
+ 	movq	%cr3, %rax
+ 	movq	%rax, %cr3
+ 
+-	testq	%r11, %r11	/* preserve_context */
++	testq	$RELOC_KERNEL_PRESERVE_CONTEXT, %r11
+ 	jnz .Lrelocate
+ 
+ 	/*
+@@ -273,7 +271,7 @@ SYM_CODE_START_LOCAL_NOALIGN(identity_mapped)
+ 	ANNOTATE_NOENDBR
+ 	andq	$PAGE_MASK, %r8
+ 	lea	PAGE_SIZE(%r8), %rsp
+-	movl	$1, %r11d	/* Ensure preserve_context flag is set */
++	movl	$RELOC_KERNEL_PRESERVE_CONTEXT, %r11d	/* Ensure preserve_context flag is set */
+ 	call	swap_pages
+ 	movq	kexec_va_control_page(%rip), %rax
+ 0:	addq	$virtual_mapped - 0b, %rax
+@@ -321,7 +319,7 @@ SYM_CODE_START_LOCAL_NOALIGN(swap_pages)
+ 	UNWIND_HINT_END_OF_STACK
+ 	/*
+ 	 * %rdi indirection page
+-	 * %r11 preserve_context
++	 * %r11 flags: RELOC_KERNEL_*
+ 	 */
+ 	movq	%rdi, %rcx	/* Put the indirection_page in %rcx */
+ 	xorl	%edi, %edi
+@@ -357,7 +355,8 @@ SYM_CODE_START_LOCAL_NOALIGN(swap_pages)
+ 	movq	%rdi, %rdx    /* Save destination page to %rdx */
+ 	movq	%rsi, %rax    /* Save source page to %rax */
+ 
+-	testq	%r11, %r11    /* Only actually swap for ::preserve_context */
++	/* Only actually swap for ::preserve_context */
++	testq	$RELOC_KERNEL_PRESERVE_CONTEXT, %r11
+ 	jz	.Lnoswap
+ 
+ 	/* copy source page to swap page */
 -- 
 2.50.0
 
