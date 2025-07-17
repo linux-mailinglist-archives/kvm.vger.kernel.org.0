@@ -1,166 +1,149 @@
-Return-Path: <kvm+bounces-52724-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52725-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52E58B088FF
-	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 11:11:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18259B08904
+	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 11:11:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F164718817B0
-	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 09:10:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 67C5856602F
+	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 09:11:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3056C28A1FB;
-	Thu, 17 Jul 2025 09:09:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A09F428850C;
+	Thu, 17 Jul 2025 09:11:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KjfkpI/W"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UqJA9841"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABC382C18A;
-	Thu, 17 Jul 2025 09:09:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 029872C18A
+	for <kvm@vger.kernel.org>; Thu, 17 Jul 2025 09:11:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752743355; cv=none; b=mxd6uBGt0HhLHUXHhZd0eDu4oacVqEyidvndLO/3yc4IrTQgsqiAP7MeDwRgGP6bwXsz34CtybN5RICbTQT4jB2dlP62MpoyJ8Z2+Zi7kulb+/oUBjM7i4PFysWoqz6qY3McBQQMm+sec8TmGUHeQXoY3JMv3w4d5AOsXZkHpYc=
+	t=1752743465; cv=none; b=Jvh/bjZrnVO01Mv3FYNI1WVf191tHVLmhCJoJGfEIi5w7O8yGXHDxDLOKj0Ojd5fFNde7xU/kJ7agPuOWuNjCWzWp19nKtQalVjvbnyTNxfznS6SVmnzo2LCosR1ZOcvimoNsKCdX2sBn5zZfamA1Iq4fuOGnhuUA7U3pTUdOis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752743355; c=relaxed/simple;
-	bh=hSFoy5VqyrudHZ6R4bwcXEN9ZOwY5A2qYXTuyDbMPio=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=e5eN8lK7rv1xzHmk1ee2KB5Jse7/dJUctCM5F8hazuQ2M0X/WBlg+uO21dwrmzIeMjeb6hkZ4UwFQkejf0aq2LWCbzCnBMqsnSeD9AiFnlEj1BF0qF+1UJ7KakO6+0VNGv/CwvcbFwgsHoYds1nto2M9Pb462s2/6vwgmoPs8r4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KjfkpI/W; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752743353; x=1784279353;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=hSFoy5VqyrudHZ6R4bwcXEN9ZOwY5A2qYXTuyDbMPio=;
-  b=KjfkpI/WApoMiG18hvPxh02/WpJ9RxaeCfNAbrMK6o/VJ5UFWSDR1dCN
-   QjToXzXQU8aKEDub2lVSjYdR5somLKB/kjIczmT33C/0WyonfmQ7IokU4
-   o+V+IVjTB3MPY59Y5Du/GIS39lU2lYZd7cmG6iVyKCsRdHq3EytttR1dR
-   uPCc9qhhLD13rHVpMcBzHIl1uYtWezQTPIqtMWHN8Y+v4AAXQNJX7f6Zu
-   Eqg7dTBwpJno2aTM9jROFCedgNaSrQGyNbAhvQwbGFrHG6ShMS6GJq5Ku
-   Kce3DmtNgmqG/S0QKht/l1lZFmHPbbGyqDVdI+vdyEoqIFZNAevWQqmxs
-   w==;
-X-CSE-ConnectionGUID: mzcO15uFTJKsyC/H2Remuw==
-X-CSE-MsgGUID: yepIYSuDSg+Drfe2s9/ySA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11493"; a="55129590"
-X-IronPort-AV: E=Sophos;i="6.16,318,1744095600"; 
-   d="scan'208";a="55129590"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 02:09:13 -0700
-X-CSE-ConnectionGUID: ul3g2CwIRfKNsnRjN5KzcQ==
-X-CSE-MsgGUID: Fdi5OaeJQzWjtXyohyk6XQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,318,1744095600"; 
-   d="scan'208";a="188683008"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.240.106]) ([10.124.240.106])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 02:09:09 -0700
-Message-ID: <9b4651bf-20e4-406f-ba41-9f67515e5bea@linux.intel.com>
-Date: Thu, 17 Jul 2025 17:09:05 +0800
+	s=arc-20240116; t=1752743465; c=relaxed/simple;
+	bh=/8oQPYYz6cHSNYNwym9xwEu6RpZClPerPGm665iJk6s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=igFmXrFd5m3dfyLV0yAeRBpYRsTGS0O6Ki/7PD87dG1g0jWD/GQ/fZA93Zta6080q+uBI7Gh4JxnG2fvtXBF5nCqnpFtCuftGYlz/BikUxYA/aR9a0LG7gYEMu/XaFKeVJRdQLNAbxXNOtvTgUXL4CMG8APKqFtlpApBQ90YjV8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=UqJA9841; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-3a577ab8c34so90042f8f.3
+        for <kvm@vger.kernel.org>; Thu, 17 Jul 2025 02:11:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1752743462; x=1753348262; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=HyhBoxrCNtsTMaq/ZkCXVp9e8dnMJwhtRa7CTroNyu4=;
+        b=UqJA9841YGmp3b1DmzBZMKxbCOn7lw/Alv6kqdBDhCNgl8crteibLLII7hHyFAi8A5
+         DdUUzBHTweeCYOA4JuFYJQnPeryjc6IGSxnUpg3Z7QlwDyGrCxatDcsE2CCV7XJevMGD
+         k7iAgIIpPwS+JvAd/0FuNvCz3RWY2UO3Lfs+9hVxyiARutTwtLFTVO/nSgmQcniv1QbA
+         HYhzZZkrxwbKWYSu5aw86NZ/pgIkmwXE9yUa0ceMsqlw5DqVKJaxMe3fQMkVwttO1Llz
+         lyN4ZrVvztoFH2DkZHYEZOr8Q7BJuR9hQK9te/geSMbUKR3DY3XkVjSj4ji7movJ/Cl3
+         +mjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752743462; x=1753348262;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HyhBoxrCNtsTMaq/ZkCXVp9e8dnMJwhtRa7CTroNyu4=;
+        b=cHKuNJCCRdG75oBSZ0oobz84SMEUkZBdvHx9mVyRYjt2eAqVmJSy3TOXm5ip/kasd/
+         w6zrSko2a2CGFdh4l46WlRxIJfPpuKo+DPiKtiNoffZ5pmlXPq7R+yJu8U3Ct6EBVroW
+         LWNIH2qraW1C6DYTyEcaypZ1VTqKspyRUytU0c5oSUvmB7F/T4uuMQ1oKGJEvovgRmi2
+         16wftUfQ4u2StuXNDXWUk2N2sesOdF7P2jQmCf+Psj/JqoOi/OzRMFgw+kjL4ARASKdI
+         IILM9vSYT9W7df52KcF6gT+qA3YUUecliH8x+FtaxCJxbk9btaikNZv4x9nZL38lRj/r
+         wB1Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXSAh9dXhkebOsGD4f73fKhwO1sQPi2BD2eD3IFY3jEhM+qXZDAdx6V1sx2bOgQQyTz4j8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxR/U2VZ8qkoH02hs1/hGN4t7aMkCzgZs599/crPwETPMq7PoL6
+	gKlh/aq4xc26RjcVJpyeuQ6LYg+N0SsEG32jS7uBFALR7fJhvTzkwHRHWV3eMUoFV1Y=
+X-Gm-Gg: ASbGnctPpMMQj5tfG81MxIdsOrPPR12OWqp4Xtq8hFBS+Hmgk+KRtk/rRT9883Fc58L
+	L59hfE75Jsrq6GAaVrDbEs2CSmZdrCFEVLgG9wObyFE+qJgAn6A74MtA1FVRrpcMhUFlbYJUHES
+	uOIJ8Vb3DGoDbyAWqYgzg7PEA3rHdU++LsVDI51+oa9Il9eKoGgv2JncezE7Ns9ndGm3eRhj0jF
+	VffHVqsFNbMx2KVmag5S7fBqSPRAXz+FJHpDjIG78CFrdk9V9dz1dIfp6PeFpFzFC2YDilYQd6Q
+	ATG+viz/5Jm7CRxgCiI5dIjdwehBVWnDEHrpl3Khous9qfgYA8f+4TC54kreF2T7lCnIvgSb0bV
+	CQS0MQ1QVOFMD8szSfywhQilkOoY9js0B
+X-Google-Smtp-Source: AGHT+IHrFGe3+kv5nwJd+XNeEujKS3DRWXLY9Byhf8ifVc9w27qoxH+x6Sv5cjsnKuMJ4OhTyD8jIg==
+X-Received: by 2002:a05:6000:2103:b0:3a3:584b:f5d7 with SMTP id ffacd0b85a97d-3b60dd52d9cmr1905603f8f.5.1752743462195;
+        Thu, 17 Jul 2025 02:11:02 -0700 (PDT)
+Received: from kuoka.. ([178.197.222.89])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b5e8e1e8cfsm19737019f8f.80.2025.07.17.02.11.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Jul 2025 02:11:01 -0700 (PDT)
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+To: Nipun Gupta <nipun.gupta@amd.com>,
+	Nikhil Agarwal <nikhil.agarwal@amd.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Pieter Jansen van Vuuren <pieter.jansen-van-vuuren@amd.com>,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	stable@vger.kernel.org
+Subject: [PATCH] vfio: cdx: Fix missing GENERIC_MSI_IRQ on compile test
+Date: Thu, 17 Jul 2025 11:10:54 +0200
+Message-ID: <20250717091053.129175-2-krzysztof.kozlowski@linaro.org>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/3] perf/x86: Add PERF_CAP_PEBS_TIMING_INFO flag
-To: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
- Arnaldo Carvalho de Melo <acme@kernel.org>,
- Namhyung Kim <namhyung@kernel.org>, Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Ian Rogers <irogers@google.com>,
- Adrian Hunter <adrian.hunter@intel.com>,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Kan Liang <kan.liang@linux.intel.com>, Andi Kleen <ak@linux.intel.com>,
- Eranian Stephane <eranian@google.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-perf-users@vger.kernel.org, Dapeng Mi <dapeng1.mi@intel.com>,
- Yi Lai <yi1.lai@intel.com>
-References: <20250717090302.11316-1-dapeng1.mi@linux.intel.com>
-Content-Language: en-US
-From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <20250717090302.11316-1-dapeng1.mi@linux.intel.com>
 Content-Type: text/plain; charset=UTF-8
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1461; i=krzysztof.kozlowski@linaro.org;
+ h=from:subject; bh=/8oQPYYz6cHSNYNwym9xwEu6RpZClPerPGm665iJk6s=;
+ b=owEBbQKS/ZANAwAKAcE3ZuaGi4PXAcsmYgBoeL4d8/4TGosHV8mie+xfGtqZiciWrgzgpC30w
+ na+ERnoJQaJAjMEAAEKAB0WIQTd0mIoPREbIztuuKjBN2bmhouD1wUCaHi+HQAKCRDBN2bmhouD
+ 1/zjD/0cJyPefGWza0F69QVCLfsnnCijvT/geB45kgr+TLK3lnT9lyLubK2hUCjwlKCFtiH8tz8
+ wNeof8YKDcnPrBqyG4EGIOmfMhI+ijZ61jNFiTu4+gj7tVZ0dHqYx8MFtRjyDnjrTpdx0mBx0lg
+ rSyaosVWs629AWEV9j2AapeB9gtgNQJnfhCyyoigze5uc1x6qAz2FPuShy5yfnJYTaglvbToCsM
+ ncptmAomgrda477zTKNEmlvgdNnxNi86vmEZR0Vf6LWJHwj6gi/3vJKtj15M1OB4KCcT93QDlF9
+ SmXfiLUozswlyVsrUicJV3l8OI2LKFviq1Lj2h/PdbTTLmFVUVtmYAYBhYqUDtnL+5h7XFGXFar
+ 0J0x0ZyYrViyo8XnNUc9vG3bN1xTGKNXMmPcZdw0RIfTNnclNmxbtoIOWUl9FfhCTmjatxxQAjk
+ 0aLfWgBslzg0FDl8tux9KXwJ5Vn+gjN3NwFa/U4lQ8BzYP+pkOTmKJJCs1naLhXCsfvPXPjz4bm
+ lNvQEACOEtxjPDhc/2F1kdjetaBbmRtWhCf0iBR2K1pIFYSmrj20/jkSq5cuBpd4PDwRawqjNfA
+ AWHelP78g1MBkw48ndHMh93lNulCY8IB8SHMxoQ7meVMeykTZmhNixthKHVcJEnjnYkdP5/AhRg wo8dIEv8fqBUaqQ==
+X-Developer-Key: i=krzysztof.kozlowski@linaro.org; a=openpgp; fpr=9BD07E0E0C51F8D59677B7541B93437D3B41629B
 Content-Transfer-Encoding: 8bit
 
-Run basic perf  counting, PMI based sampling and PEBS based sampling on
-Intel Sapphire Rapids, Granite Rapids and Sierra Forest platforms, no issue
-is found.
+VFIO_CDX driver uses msi_domain_alloc_irqs() which is provided by
+non-user-visible GENERIC_MSI_IRQ, thus it should select that option
+directly.
 
-On 7/17/2025 5:03 PM, Dapeng Mi wrote:
-> IA32_PERF_CAPABILITIES.PEBS_TIMING_INFO[bit 17] is introduced to
-> indicate whether timed PEBS is supported. Timed PEBS adds a new "retired
-> latency" field in basic info group to show the timing info. Please find
-> detailed information about timed PEBS in section 8.4.1 "Timed Processor
-> Event Based Sampling" of "Intel Architecture Instruction Set Extensions
-> and Future Features".
->
-> This patch adds PERF_CAP_PEBS_TIMING_INFO flag and KVM module leverages
-> this flag to expose timed PEBS feature to guest.
->
-> Moreover, opportunistically refine the indents and make the macros
-> share consistent indents.
->
-> Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
-> Tested-by: Yi Lai <yi1.lai@intel.com>
-> ---
->  arch/x86/include/asm/msr-index.h       | 14 ++++++++------
->  tools/arch/x86/include/asm/msr-index.h | 14 ++++++++------
->  2 files changed, 16 insertions(+), 12 deletions(-)
->
-> diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
-> index b7dded3c8113..48b7ed28718c 100644
-> --- a/arch/x86/include/asm/msr-index.h
-> +++ b/arch/x86/include/asm/msr-index.h
-> @@ -315,12 +315,14 @@
->  #define PERF_CAP_PT_IDX			16
->  
->  #define MSR_PEBS_LD_LAT_THRESHOLD	0x000003f6
-> -#define PERF_CAP_PEBS_TRAP             BIT_ULL(6)
-> -#define PERF_CAP_ARCH_REG              BIT_ULL(7)
-> -#define PERF_CAP_PEBS_FORMAT           0xf00
-> -#define PERF_CAP_PEBS_BASELINE         BIT_ULL(14)
-> -#define PERF_CAP_PEBS_MASK	(PERF_CAP_PEBS_TRAP | PERF_CAP_ARCH_REG | \
-> -				 PERF_CAP_PEBS_FORMAT | PERF_CAP_PEBS_BASELINE)
-> +#define PERF_CAP_PEBS_TRAP		BIT_ULL(6)
-> +#define PERF_CAP_ARCH_REG		BIT_ULL(7)
-> +#define PERF_CAP_PEBS_FORMAT		0xf00
-> +#define PERF_CAP_PEBS_BASELINE		BIT_ULL(14)
-> +#define PERF_CAP_PEBS_TIMING_INFO	BIT_ULL(17)
-> +#define PERF_CAP_PEBS_MASK		(PERF_CAP_PEBS_TRAP | PERF_CAP_ARCH_REG | \
-> +					 PERF_CAP_PEBS_FORMAT | PERF_CAP_PEBS_BASELINE | \
-> +					 PERF_CAP_PEBS_TIMING_INFO)
->  
->  #define MSR_IA32_RTIT_CTL		0x00000570
->  #define RTIT_CTL_TRACEEN		BIT(0)
-> diff --git a/tools/arch/x86/include/asm/msr-index.h b/tools/arch/x86/include/asm/msr-index.h
-> index b7dded3c8113..48b7ed28718c 100644
-> --- a/tools/arch/x86/include/asm/msr-index.h
-> +++ b/tools/arch/x86/include/asm/msr-index.h
-> @@ -315,12 +315,14 @@
->  #define PERF_CAP_PT_IDX			16
->  
->  #define MSR_PEBS_LD_LAT_THRESHOLD	0x000003f6
-> -#define PERF_CAP_PEBS_TRAP             BIT_ULL(6)
-> -#define PERF_CAP_ARCH_REG              BIT_ULL(7)
-> -#define PERF_CAP_PEBS_FORMAT           0xf00
-> -#define PERF_CAP_PEBS_BASELINE         BIT_ULL(14)
-> -#define PERF_CAP_PEBS_MASK	(PERF_CAP_PEBS_TRAP | PERF_CAP_ARCH_REG | \
-> -				 PERF_CAP_PEBS_FORMAT | PERF_CAP_PEBS_BASELINE)
-> +#define PERF_CAP_PEBS_TRAP		BIT_ULL(6)
-> +#define PERF_CAP_ARCH_REG		BIT_ULL(7)
-> +#define PERF_CAP_PEBS_FORMAT		0xf00
-> +#define PERF_CAP_PEBS_BASELINE		BIT_ULL(14)
-> +#define PERF_CAP_PEBS_TIMING_INFO	BIT_ULL(17)
-> +#define PERF_CAP_PEBS_MASK		(PERF_CAP_PEBS_TRAP | PERF_CAP_ARCH_REG | \
-> +					 PERF_CAP_PEBS_FORMAT | PERF_CAP_PEBS_BASELINE | \
-> +					 PERF_CAP_PEBS_TIMING_INFO)
->  
->  #define MSR_IA32_RTIT_CTL		0x00000570
->  #define RTIT_CTL_TRACEEN		BIT(0)
->
-> base-commit: 829f5a6308ce11c3edaa31498a825f8c41b9e9aa
+VFIO_CDX depends on CDX_BUS, which also will select GENERIC_MSI_IRQ
+(separate fix), nevertheless driver should poll what is being used there
+instead of relying on bus Kconfig.
+
+Without the fix on CDX_BUS compile test fails:
+
+  drivers/vfio/cdx/intr.c: In function ‘vfio_cdx_msi_enable’:
+  drivers/vfio/cdx/intr.c:41:15: error: implicit declaration of function ‘msi_domain_alloc_irqs’;
+    did you mean ‘irq_domain_alloc_irqs’? [-Wimplicit-function-declaration]
+
+Reported-by: Randy Dunlap <rdunlap@infradead.org>
+Closes: https://lore.kernel.org/r/4a6fd102-f8e0-42f3-b789-6e3340897032@infradead.org/
+Fixes: 848e447e000c ("vfio/cdx: add interrupt support")
+Cc: <stable@vger.kernel.org>
+Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+---
+ drivers/vfio/cdx/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/vfio/cdx/Kconfig b/drivers/vfio/cdx/Kconfig
+index e6de0a0caa32..90cf3dee5dba 100644
+--- a/drivers/vfio/cdx/Kconfig
++++ b/drivers/vfio/cdx/Kconfig
+@@ -9,6 +9,7 @@ config VFIO_CDX
+ 	tristate "VFIO support for CDX bus devices"
+ 	depends on CDX_BUS
+ 	select EVENTFD
++	select GENERIC_MSI_IRQ
+ 	help
+ 	  Driver to enable VFIO support for the devices on CDX bus.
+ 	  This is required to make use of CDX devices present in
+-- 
+2.48.1
+
 
