@@ -1,254 +1,214 @@
-Return-Path: <kvm+bounces-52775-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52776-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56144B09232
-	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 18:50:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6428B09248
+	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 18:56:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D1515A1271
-	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 16:50:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27BD81AA700A
+	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 16:56:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B48782FCFE9;
-	Thu, 17 Jul 2025 16:50:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D32C42FD589;
+	Thu, 17 Jul 2025 16:56:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CMCwco2v"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="do7rrhQW"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D48F2FCE2E
-	for <kvm@vger.kernel.org>; Thu, 17 Jul 2025 16:50:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4B621F30CC
+	for <kvm@vger.kernel.org>; Thu, 17 Jul 2025 16:56:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752771012; cv=none; b=TKE3h0p5OYdRdYK97KidUf6bzWjrGC/wJQrycYLYuWhRLt+Xw8PHKFScqh1MoxhHJMhw0LoRSFzD6ZDLPGU6KWVeiQcXXl9DmpyvoKxaYhQ/ki7cdzhFcwpGiW3e5iXL3z/nX84aYWOnVDlXRl2nBiBsfJHqi2ygHDYa3f0pfjQ=
+	t=1752771365; cv=none; b=Nr4tl3fJGlYQQ9nIzaAWi8yHxSUzxg4n8FWFWmaasBXJ9Ad0BEoRFHSfZHlyX/PtyZBzyytBnj6dsUr8kUGLvpW3Mhquo7D3BiKADnsWR5Dsi6zGOOWWNjQqb6SzGOI0r1EXtATidwbbZujNFMunRqTnfqI3RQy4vZ0ObBm3WOY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752771012; c=relaxed/simple;
-	bh=TyxGO/XUQe6bmOsTjL4WMUSu82dVkBc++MRqd2R27FY=;
+	s=arc-20240116; t=1752771365; c=relaxed/simple;
+	bh=oiWWGXY/ZhkUfsSKuD6veSuHIoiki619k4jyqYPZ4hY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=d1Y9Lya0O7Qbj83PuM7QE7ODNWIOqga2WBlE7OQyvQYtMaiqFJA3FP7IB2Qv+0BbNM9er335Y58JFbfY5TnZWZojcl6YNQshC6eNJBYfowCSXN3/xpjzrmc/KCknv8FOCY0ue6hD/boUM6s5ION5nr8kRSMSLLA+csVQ862lkEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CMCwco2v; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=L6CX4RP4abMXnmyuaG3/3sNrpAvEDS/oKAAJcBW9NwfF71dZRfTOgPpgc8j7EmSOl7EHXmo80/XxVGT5jn8Z+11Sx19KXTNbzJNexP1JKc+S97xEv26SsPdiX0lWCNdi0fNB2Z3abtUvD1UiQTGnat8GjfmmxnowxbTagpccUhE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=do7rrhQW; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3122368d82bso1613869a91.0
-        for <kvm@vger.kernel.org>; Thu, 17 Jul 2025 09:50:11 -0700 (PDT)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b38ffb62492so1314948a12.0
+        for <kvm@vger.kernel.org>; Thu, 17 Jul 2025 09:56:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752771011; x=1753375811; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WBAzc7UgvLX+B8PzHVBbV8hcGwtUEb1k8RUWx3wr7P8=;
-        b=CMCwco2vY7t1TnhXypTjUWayG18HdccVToPy/mxm7G6XKbWF4afZzO1A6gEb14pGG0
-         foSGxJYsdb/tjqX5Q2GImgP+JqPmh+cE3wfa8QGA1EB9e2WQRKWm/gNQTC8Rh1/gwpfo
-         gjJuLhTIJyJWhd2ntCXB8S0h1g5F1xfhFt9/H/M8H4HVUfnK4SwjVSlMCDU6okM3aD+u
-         saMswYGLBYOoI6tebf6+KwWk/scOYpDWQgU8PgGaqebMc7ZR4JXnORKs5v97JcKAdwqO
-         04rIhq3eKfnFxLZOtNy7ZeMIXTQIHrIkdF/nCYqb281wQ6ldoYBycuIOKcQrcZ3JIefs
-         HAKw==
+        d=google.com; s=20230601; t=1752771363; x=1753376163; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YtKaXiis7X8OUZ8IxU2O9gUN20EGW8+A38M9nr3POFE=;
+        b=do7rrhQWaSACO5YZHj4l754Y4Gq2ijoRB6GT/RMhVTJVRoyXD3Wgr9Eelvop8GU/IO
+         7/qDNfwqKGhAJMioMtz0OLTOYGX8RDRaa9fh4ALvjRzpT8Pyw0OXUOmDe9LkJVdWfqtn
+         ypjAsHgcj08IstV98nbv90ArQvSNelVP+aSDB69xEs2e8eyfZZCxIw+US8dMBRYzeWxw
+         KHw+i4cn1F0wjKJVyStRbCq2BcOejZQWpOqXphvTdSRjjdxqqvN//rQOQC8OMpBXFPut
+         8Bfce7prNrrax/6LYJFy7vX5KHIN902B/FHnhPwBH7e53MplVNvElyrn+gW/bcE26d0Z
+         i8kw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752771011; x=1753375811;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WBAzc7UgvLX+B8PzHVBbV8hcGwtUEb1k8RUWx3wr7P8=;
-        b=N7tZ2Joxrlrdgd2EG7sCNGu/mfLTpSLXGiukkFohddyU4I3Oz50lLu39dYtCMgr1kZ
-         DupkYcMB4NuRcGfIutGi3KNuvYAV6m/V+lFDFE3qXn9B167AhiaDtNRYEfjcY3kIm8UA
-         Pov6hq12Bns0GWqhXQRedzN6uiWs6jTi1GTVyKXBirO2ObVBg+arTkWx1YjpV3gh9jjL
-         6go26KjJX2WBaSk6txKF3lUWlFlaaaSIMtt/IsOd2arUgk3rbNdxhMRaXqB9Blm3J9wB
-         Umk/ZMaro47zeo8qTr8YixsmokEyeixg6nLDNqC6ET3cudisJEtddVinBom5mYKv1aal
-         9hDA==
-X-Forwarded-Encrypted: i=1; AJvYcCWPTcGCi8LnVG/pq4cgqJWZ1MhuObZKP9uviIPcqZYLi/FG95cypXM57sOnH54PDjAVkGA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YznTcXi2hS7X2I/I6IukeqUqU+5J2npOTBdj5SveStp25IVBCTK
-	/InPNgMCK2RD87dQGBJNUoT4sIRtqhTYJahVKW9ovlNaTdu445+HgolKbk824p6zhebBAc8ScXO
-	SKuJ1/WYI9y8X/tp72u2E6XxVpQ==
-X-Google-Smtp-Source: AGHT+IEhDg9xNtK2OOevEaVdQD/8F/x32XlKvxnbxDiNek4tVELQY02FrDg+/mKgpmUj0DqZBQWsfDifCuQhasqQTg==
-X-Received: from pjbqo11.prod.google.com ([2002:a17:90b:3dcb:b0:311:7d77:229f])
+        d=1e100.net; s=20230601; t=1752771363; x=1753376163;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=YtKaXiis7X8OUZ8IxU2O9gUN20EGW8+A38M9nr3POFE=;
+        b=kikj+kCJESUR34YuVO+JApx/qnxtbLlqd3TdYziVq1+UYhFKblbM6vgqJxKjdBw4AC
+         5IXoHrRlW0BBv9hTKipqf04MixnbaulfYFu7EPErBlzVxwlIYQBs1cd+eT8GKxEpfau+
+         tlXdR5iv8MFaUV00Ux9FegZroj+p9rNFSDNDO4EKLZPCpt0RNiVPZgPi/KoMTbEReVoQ
+         qu9i5QB4aK/Z+yj1onxJ3LKxoARxboIsiW06flmy46EWYiJKTr8PCARTPv8GWYyhMoiq
+         Oly4POewd2WQej4su7qGYE9qmJBFD35CS72VReKUFFhvRu7oH8Z7iYd4gqjIVv5ztVCP
+         86aA==
+X-Forwarded-Encrypted: i=1; AJvYcCU8wAyY11hIP/y1ExNtfj5Eovv2slO2oXZX9PjR5Q/gHfZT1FztsXK+pWfNQ+Y83rEzFkY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz3ZneFIhcqYjbBfdQeibLRtJ570edaejli9uyXGm/zzKF/C3La
+	FtoXYZIRKvPMh/NRETHbGBaW/rrah7u37SS3xAxE5lLj/tp8FPrmbZveXCjIidOdNwQsYD2pc6j
+	kWToQhPePlzvSGiohpPy1/jK32A==
+X-Google-Smtp-Source: AGHT+IGT+Ip7MN3kC7WfmhPlW1Zbfs3wNc+DIuzQ2qHyU4q2gnwNyjohySS08EGy0S5iPmKjYIt5Af/xFOvpCcEiDQ==
+X-Received: from pjg12.prod.google.com ([2002:a17:90b:3f4c:b0:312:df0e:5f09])
  (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:270b:b0:311:df4b:4b94 with SMTP id 98e67ed59e1d1-31c9f3ee9dcmr9740819a91.4.1752771010723;
- Thu, 17 Jul 2025 09:50:10 -0700 (PDT)
-Date: Thu, 17 Jul 2025 09:50:09 -0700
-In-Reply-To: <fef1d856-8c13-4d97-ba8b-f443edb9beac@intel.com>
+ 2002:a17:90b:2584:b0:311:df4b:4b81 with SMTP id 98e67ed59e1d1-31caf8ef446mr4773759a91.25.1752771362614;
+ Thu, 17 Jul 2025 09:56:02 -0700 (PDT)
+Date: Thu, 17 Jul 2025 09:56:01 -0700
+In-Reply-To: <aHjDIxxbv0DnqI6S@yilunxu-OptiPlex-7050>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250715093350.2584932-1-tabba@google.com> <20250715093350.2584932-5-tabba@google.com>
- <b5fe8f54-64df-4cfa-b86f-eed1cbddca7a@intel.com> <diqzwm87fzfc.fsf@ackerleytng-ctop.c.googlers.com>
- <fef1d856-8c13-4d97-ba8b-f443edb9beac@intel.com>
-Message-ID: <diqztt3ag3su.fsf@ackerleytng-ctop.c.googlers.com>
-Subject: Re: [PATCH v14 04/21] KVM: x86: Introduce kvm->arch.supports_gmem
+References: <d3832fd95a03aad562705872cbda5b3d248ca321.1747264138.git.ackerleytng@google.com>
+ <CA+EHjTxtHOgichL=UvAzczoqS1608RSUNn5HbmBw2NceO941ng@mail.gmail.com>
+ <CAGtprH8eR_S50xDnnMLHNCuXrN2Lv_0mBRzA_pcTtNbnVvdv2A@mail.gmail.com>
+ <CA+EHjTwjKVkw2_AK0Y0-eth1dVW7ZW2Sk=73LL9NeQYAPpxPiw@mail.gmail.com>
+ <CAGtprH_Evyc7tLhDB0t0fN+BUx5qeqWq8A2yZ5-ijbJ5UJ5f-g@mail.gmail.com>
+ <9502503f-e0c2-489e-99b0-94146f9b6f85@amd.com> <20250624130811.GB72557@ziepe.ca>
+ <CAGtprH_qh8sEY3s-JucW3n1Wvoq7jdVZDDokvG5HzPf0HV2=pg@mail.gmail.com>
+ <aGTvTbPHuXbvj59t@yzhao56-desk.sh.intel.com> <diqz8qknhj3l.fsf@ackerleytng-ctop.c.googlers.com>
+ <aHjDIxxbv0DnqI6S@yilunxu-OptiPlex-7050>
+Message-ID: <diqzqzyeg3j2.fsf@ackerleytng-ctop.c.googlers.com>
+Subject: Re: [RFC PATCH v2 04/51] KVM: guest_memfd: Introduce
+ KVM_GMEM_CONVERT_SHARED/PRIVATE ioctls
 From: Ackerley Tng <ackerleytng@google.com>
-To: Xiaoyao Li <xiaoyao.li@intel.com>, Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev
-Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
-	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
-	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
-	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
-	yilun.xu@intel.com, chao.p.peng@linux.intel.com, jarkko@kernel.org, 
-	amoorthy@google.com, dmatlack@google.com, isaku.yamahata@intel.com, 
-	mic@digikod.net, vbabka@suse.cz, vannapurve@google.com, 
-	mail@maciej.szmigiero.name, david@redhat.com, michael.roth@amd.com, 
-	wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
-	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
-	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
-	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
-	ira.weiny@intel.com
-Content-Type: text/plain; charset="UTF-8"
+To: Xu Yilun <yilun.xu@linux.intel.com>
+Cc: Yan Zhao <yan.y.zhao@intel.com>, Vishal Annapurve <vannapurve@google.com>, 
+	Jason Gunthorpe <jgg@ziepe.ca>, Alexey Kardashevskiy <aik@amd.com>, Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, 
+	linux-mm@kvack.org, linux-kernel@vger.kernel.org, x86@kernel.org, 
+	linux-fsdevel@vger.kernel.org, ajones@ventanamicro.com, 
+	akpm@linux-foundation.org, amoorthy@google.com, anthony.yznaga@oracle.com, 
+	anup@brainfault.org, aou@eecs.berkeley.edu, bfoster@redhat.com, 
+	binbin.wu@linux.intel.com, brauner@kernel.org, catalin.marinas@arm.com, 
+	chao.p.peng@intel.com, chenhuacai@kernel.org, dave.hansen@intel.com, 
+	david@redhat.com, dmatlack@google.com, dwmw@amazon.co.uk, 
+	erdemaktas@google.com, fan.du@intel.com, fvdl@google.com, graf@amazon.com, 
+	haibo1.xu@intel.com, hch@infradead.org, hughd@google.com, ira.weiny@intel.com, 
+	isaku.yamahata@intel.com, jack@suse.cz, james.morse@arm.com, 
+	jarkko@kernel.org, jgowans@amazon.com, jhubbard@nvidia.com, jroedel@suse.de, 
+	jthoughton@google.com, jun.miao@intel.com, kai.huang@intel.com, 
+	keirf@google.com, kent.overstreet@linux.dev, kirill.shutemov@intel.com, 
+	liam.merwick@oracle.com, maciej.wieczor-retman@intel.com, 
+	mail@maciej.szmigiero.name, maz@kernel.org, mic@digikod.net, 
+	michael.roth@amd.com, mpe@ellerman.id.au, muchun.song@linux.dev, 
+	nikunj@amd.com, nsaenz@amazon.es, oliver.upton@linux.dev, palmer@dabbelt.com, 
+	pankaj.gupta@amd.com, paul.walmsley@sifive.com, pbonzini@redhat.com, 
+	pdurrant@amazon.co.uk, peterx@redhat.com, pgonda@google.com, pvorel@suse.cz, 
+	qperret@google.com, quic_cvanscha@quicinc.com, quic_eberman@quicinc.com, 
+	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com, richard.weiyang@gmail.com, 
+	rick.p.edgecombe@intel.com, rientjes@google.com, roypat@amazon.co.uk, 
+	rppt@kernel.org, seanjc@google.com, shuah@kernel.org, steven.price@arm.com, 
+	steven.sistare@oracle.com, suzuki.poulose@arm.com, thomas.lendacky@amd.com, 
+	usama.arif@bytedance.com, vbabka@suse.cz, viro@zeniv.linux.org.uk, 
+	vkuznets@redhat.com, wei.w.wang@intel.com, will@kernel.org, 
+	willy@infradead.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
+	yuzenghui@huawei.com, zhiquan1.li@intel.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-Xiaoyao Li <xiaoyao.li@intel.com> writes:
+Xu Yilun <yilun.xu@linux.intel.com> writes:
 
-> On 7/17/2025 8:12 AM, Ackerley Tng wrote:
->> Xiaoyao Li <xiaoyao.li@intel.com> writes:
->> 
->>> On 7/15/2025 5:33 PM, Fuad Tabba wrote:
->>>> Introduce a new boolean member, supports_gmem, to kvm->arch.
->>>>
->>>> Previously, the has_private_mem boolean within kvm->arch was implicitly
->>>> used to indicate whether guest_memfd was supported for a KVM instance.
->>>> However, with the broader support for guest_memfd, it's not exclusively
->>>> for private or confidential memory. Therefore, it's necessary to
->>>> distinguish between a VM's general guest_memfd capabilities and its
->>>> support for private memory.
->>>>
->>>> This new supports_gmem member will now explicitly indicate guest_memfd
->>>> support for a given VM, allowing has_private_mem to represent only
->>>> support for private memory.
->>>>
->>>> Reviewed-by: Ira Weiny <ira.weiny@intel.com>
->>>> Reviewed-by: Gavin Shan <gshan@redhat.com>
->>>> Reviewed-by: Shivank Garg <shivankg@amd.com>
->>>> Reviewed-by: Vlastimil Babka <vbabka@suse.cz>
->>>> Co-developed-by: David Hildenbrand <david@redhat.com>
->>>> Signed-off-by: David Hildenbrand <david@redhat.com>
->>>> Signed-off-by: Fuad Tabba <tabba@google.com>
->>>
->>> Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
->>>
->>> Btw, it seems that supports_gmem can be enabled for all the types of VM?
->>>
->> 
->> For now, not really, because supports_gmem allows mmap support, and mmap
->> support enables KVM_MEMSLOT_GMEM_ONLY, and KVM_MEMSLOT_GMEM_ONLY will
->> mean that shared faults also get faulted from guest_memfd.
+> On Wed, Jul 16, 2025 at 03:22:06PM -0700, Ackerley Tng wrote:
+>> Yan Zhao <yan.y.zhao@intel.com> writes:
+>>=20
+>> > On Tue, Jun 24, 2025 at 07:10:38AM -0700, Vishal Annapurve wrote:
+>> >> On Tue, Jun 24, 2025 at 6:08=E2=80=AFAM Jason Gunthorpe <jgg@ziepe.ca=
+> wrote:
+>> >> >
+>> >> > On Tue, Jun 24, 2025 at 06:23:54PM +1000, Alexey Kardashevskiy wrot=
+e:
+>> >> >
+>> >> > > Now, I am rebasing my RFC on top of this patchset and it fails in
+>> >> > > kvm_gmem_has_safe_refcount() as IOMMU holds references to all the=
+se
+>> >> > > folios in my RFC.
+>> >> > >
+>> >> > > So what is the expected sequence here? The userspace unmaps a DMA
+>> >> > > page and maps it back right away, all from the userspace? The end
+>> >> > > result will be the exactly same which seems useless. And IOMMU TL=
+B
+>> >>=20
+>> >>  As Jason described, ideally IOMMU just like KVM, should just:
+>> >> 1) Directly rely on guest_memfd for pinning -> no page refcounts take=
+n
+>> >> by IOMMU stack
+>> > In TDX connect, TDX module and TDs do not trust VMM. So, it's the TDs =
+to inform
+>> > TDX module about which pages are used by it for DMAs purposes.
+>> > So, if a page is regarded as pinned by TDs for DMA, the TDX module wil=
+l fail the
+>> > unmap of the pages from S-EPT.
+>> >
+>> > If IOMMU side does not increase refcount, IMHO, some way to indicate t=
+hat
+>> > certain PFNs are used by TDs for DMA is still required, so guest_memfd=
+ can
+>> > reject the request before attempting the actual unmap.
+>> > Otherwise, the unmap of TD-DMA-pinned pages will fail.
+>> >
+>> > Upon this kind of unmapping failure, it also doesn't help for host to =
+retry
+>> > unmapping without unpinning from TD.
+>> >
+>> >
+>>=20
+>> Yan, Yilun, would it work if, on conversion,
+>>=20
+>> 1. guest_memfd notifies IOMMU that a conversion is about to happen for a
+>>    PFN range
 >
-> No, mmap support is checked by kvm_arch_supports_gmem_mmap() which is 
-> independent to whether gmem is supported.
->
->> A TDX VM that wants to use guest_memfd for private memory and some other
->> backing memory for shared memory (let's call this use case "legacy CoCo
->> VMs") will not work if supports_gmem is just enabled for all types of
->> VMs, because then shared faults will also go to kvm_gmem_get_pfn().
->
-> This is not what this patch does. Please go back read this patch.
->
-> This patch sets kvm->arch.supports_gmem to true for 
-> KVM_X86_SNP_VM/tdx/KVM_X86_SW_PROTECTED_VM.
->
-> Further in patch 14, it sets kvm->arch.supports_gmem for KVM_X86_DEFAULT_VM.
->
-> After this series, supports_gmem remains false only for KVM_X86_SEV_VM 
-> and KVM_X86_SEV_ES_VM. And I don't see why cannot enable supports_gmem 
-> for them.
+> It is the Guest fw call to release the pinning.
+
+I see, thanks for explaining.
+
+> By the time VMM get the
+> conversion requirement, the page is already physically unpinned. So I
+> agree with Jason the pinning doesn't have to reach to iommu from SW POV.
 >
 
-My bad, my explanation was actually for
-kvm_arch_supports_gmem_mmap(). Could the confusion on this thread be
-showing that the .supports_gmem is actually kind of confusing?
+If by the time KVM gets the conversion request, the page is unpinned,
+then we're all good, right?
 
-If there's nothing dynamic about .supports_gmem, what have we remove the
-.supports_gmem field and have kvm_arch_supports_gmem_mmap() decide based
-on VM type? 
+When guest_memfd gets the conversion request, as part of conversion
+handling it will request to zap the page from stage-2 page tables. TDX
+module would see that the page is unpinned and the unmapping will
+proceed fine. Is that understanding correct?
 
->> This will be cleaned up when guest_memfd supports conversion
->> (guest_memfd stage 2). There, a TDX VM will have .supports_gmem = true.
->> 
->> With guest_memfd stage-2 there will also be a
->> KVM_CAP_DISABLE_LEGACY_PRIVATE_TRACKING.
->> KVM_CAP_DISABLE_LEGACY_PRIVATE_TRACKING defaults to false, so for legacy
->> CoCo VMs, shared faults will go to the other non-guest_memfd memory
->> source that is configured in userspace_addr as before.
->> 
->> With guest_memfd stage-2, KVM_MEMSLOT_GMEM_ONLY will direct all EPT
->> faults to kvm_gmem_get_pfn(), but KVM_MEMSLOT_GMEM_ONLY will only be
->> allowed if KVM_CAP_DISABLE_LEGACY_PRIVATE_TRACKING is true. TDX VMs
->> wishing to use guest_memfd as the only source of memory for the guest
->> should set KVM_CAP_DISABLE_LEGACY_PRIVATE_TRACKING to true before
->> creating the guest_memfd.
->> 
->>> Even without mmap support, allow all the types of VM to create
->>> guest_memfd seems not something wrong. It's just that the guest_memfd
->>> allocated might not be used, e.g., for KVM_X86_DEFAULT_VM.
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> 
->> p
+>> 2. IOMMU forwards the notification to TDX code in the kernel
+>> 3. TDX code in kernel tells TDX module to stop thinking of any PFNs in
+>>    the range as pinned for DMA?
+>
+> TDX host can't stop the pinning. Actually this mechanism is to prevent
+> host from unpin/unmap the DMA out of Guest expectation.
+>
+
+On this note, I'd also like to check something else. Putting TDX connect
+and IOMMUs aside, if the host unmaps a guest private page today without
+the guest requesting it, the unmapping will work and the guest will be
+broken, right?
+
+> Thanks,
+> Yilun
+>
+>>=20
+>> If the above is possible then by the time we get to unmapping from
+>> S-EPTs, TDX module would already consider the PFNs in the range "not
+>> pinned for DMA".
+
 
