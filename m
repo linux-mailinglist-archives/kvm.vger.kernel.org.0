@@ -1,132 +1,188 @@
-Return-Path: <kvm+bounces-52791-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52792-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B67B9B094F4
-	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 21:25:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8FC1B094F8
+	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 21:25:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E1F081C801E4
-	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 19:25:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CE753AE139
+	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 19:25:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36FBF302044;
-	Thu, 17 Jul 2025 19:24:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A2112FC3C9;
+	Thu, 17 Jul 2025 19:25:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j5h8J5hA"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nz/+92uI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6B1C2F7CEE;
-	Thu, 17 Jul 2025 19:24:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B1992EBDD0
+	for <kvm@vger.kernel.org>; Thu, 17 Jul 2025 19:25:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752780277; cv=none; b=ugxotg+qPedJLukaHjL81BkpFMan3ngzRiyXIgs3hIK5tgbLoTsxk/sbfqEMwVGt9LWtXG18TPuhle56SRE+2YPLKii0vw/Dv15WovyUGLX0uQTxIWb8x3XNHTvfXDpTOpHVKtzIWK9GJE8J8nVEkUcd0nSzmry8Zb0ulRGM/2A=
+	t=1752780343; cv=none; b=aRscKrOkWQy3XG8XF7SRE4i0+tBoNsM99740p5ZWmKP15jfzsuCLuc25JrHTkt2IODlmcP0og7txqn4KFKSEvn/tkYOpuGv2qqq2MjSu8CvzrAAGHkv34eGt/ZjYh7S6jytiLUj17MTSbTZ4empzEPvOQXgt93SWNfNFIVPna7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752780277; c=relaxed/simple;
-	bh=sv4WTZuI911NdE+G2NOTUcKGiBy26of1/QBd7acTr1Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SNALkKdLS9zF8PKxES41nUpiuVPFvVh/71+moLBfLhJB6OzgXh/4DozHdzCl6foou57oDm6Ua4FHKLwJMpyVUkmXmIBwwNk6I0UhAuo1jlO3mAF57TeqYXNfeR0loeyiMYpWgbSnaqJptpbGLe43Pux68p2SFTUxEKlpo1/eeUo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j5h8J5hA; arc=none smtp.client-ip=209.85.210.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-748e63d4b05so940794b3a.2;
-        Thu, 17 Jul 2025 12:24:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752780275; x=1753385075; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Y9F3ssPuPP3VoFXG4eDO52KgRaiof9vnRgeoiSXlcJE=;
-        b=j5h8J5hAvDuh1XgmTUjtaBqpeNMb8dvHDsB/AkpJuXXluxhw8A+nUCpC6xZiO6OqlE
-         IJ5tdOab4agfmJD2ZyBP06TfnncT6wSKr3qzKLAqMbRsoI+3Rpq8uB8Txo+o+2SKwGIN
-         c0hJJs1D7hdjBajvo4WiYOu4Xt/9ewlAiIFJPvfueBT5s0Ie/l9Qbsueup5PxLtLVw5v
-         mCBSgHZoK8E+pN+SiDhSzug8cDTruN3kbRW1e6MP8q4SjSczH13iMPRw0zy0yN6Xveet
-         A+a5gPqqjPjAF0s8rLIRDKbgIaTjPHPDdsp4beZ7qGpZa8DBv6/AZ6A3dJr/dB4+1buo
-         iDJw==
+	s=arc-20240116; t=1752780343; c=relaxed/simple;
+	bh=02CBJpA30ZmYUrtaYuKhiq5fm/WwvrZXQ7YWNnmbFHw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UyQFPCUHOiabiTwvaieIDPqPM+FGv0IVXG9xmlOWm3eRbsuegdOGN7oTTgJ/jKtVgDgce2tXKncbiVASFDGdfM0jUyLz9b5U4SU1lt7BY789CMN5qKaZELh60LRnKYAtIM8q7pIL78zra7CHjwlPXaFD0Gnmr6HEqTnNB5aeF4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Nz/+92uI; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752780341;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7cjM6leMNWJaFyvB8pUYw1XsGkeqyh24r2b2Mr0FYMs=;
+	b=Nz/+92uIUhJt2HaC2XEF397dllZTerlkuD9MHzMUkuDTSoRiqMQJNSt+BOEMMxSzQFqp/M
+	OIE57t4E4TAmeUlkDwAM+RpmcAp0EihsoazzLfIBiZaZBRicIEW11jXf9BfdRQveoQThu1
+	9YUBjakjCcgO9+SADlPC2J/M77f21kc=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-633-a3FMxjQlOLK3GrcVDbQuEg-1; Thu, 17 Jul 2025 15:25:40 -0400
+X-MC-Unique: a3FMxjQlOLK3GrcVDbQuEg-1
+X-Mimecast-MFC-AGG-ID: a3FMxjQlOLK3GrcVDbQuEg_1752780339
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-6fad8b4c92cso32584196d6.0
+        for <kvm@vger.kernel.org>; Thu, 17 Jul 2025 12:25:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752780275; x=1753385075;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Y9F3ssPuPP3VoFXG4eDO52KgRaiof9vnRgeoiSXlcJE=;
-        b=HdxkcX6GdtXsIQNAsQoqB7b4hXABDJfMSs0FJy0YCC93FQYxWYwPXZVYI5w4UwNIGI
-         D6RVcgYGdepqbMyL4J2nTnx1ZvEjBoERamEbSJ9vGuSRnH8I+1kRwfCLFKa9Aedt3zOP
-         rh0Vs3j8ClETIdjIzShVx4381tS2guBmC3aZb+WZR62cM0zEPrBJmb5m5W3dGdKaLxT+
-         q058oeiKu8fHm+UOmt5g35/wiewDTol++mkL0Vk4DKKvyhMzd5OCzJNaeKjKiIK2XQMK
-         SGCPFf/Y++FNmmet8+1lNKIpoPG455UWogt7Iz3O3Sf62iVPzNe0pKANAIAI4bcRcUUp
-         za9g==
-X-Forwarded-Encrypted: i=1; AJvYcCUxKA1uZ814T3fbc30jfBxjZ6udh+BNAwRqGTH/3CjNySkTRj2KfnBWJTLASxKX6YGfUBk=@vger.kernel.org, AJvYcCVLM/74tJSKenzLSN+MyI1kmQJCsYPqNDMpEvuYnr9bUlUBv3hITPCNsngj4+38O2X9uJWr4WxBzS49CRGA@vger.kernel.org
-X-Gm-Message-State: AOJu0YxZNhkHNJn5/lP2ElmSjbn+/Cn2fF5tvj6R3VZvMEMahTxYf2Mg
-	8Z6iTEE/gF8J+vye8Xyx6Er48pqH4FZ3iP1XV9yv/9K4ZKzIcmnnC1fw
-X-Gm-Gg: ASbGncvYV9O+YWN+ZCTDyaDO8xrSUMVwr5DSOyYB+/TrapTiD3KYyH8rWnKw6B4b1BZ
-	wNoQhXOcVdvKYpvKuAXgFgWXwJc9X9f0J+zsfzKxqq0ASNIQKLrvyUwzyj2KVDs9gvrj9YbbB6a
-	g1Xsh7g8LS68jy3lLaxyq2Nshm2SGM5+nc25cYxPS0UfmizvTu+2UfajvXlMrgFGFmIg4DDeoRy
-	y2DxlqSZnQadKIK9TzZMSceIf/BOzpL3hEPRbIwFPYThtxg6oRJojXqJalqp1l3/0mqVemJ5lde
-	SAAekaiz5It5WkBujWg8PP7i/RPyD0JdbphP/mrUD+QmrXxPmguy8W9BaTl2fmZkqZwnwN8gx4V
-	zcy8xAoS+G9rhF3DyUlgsergoumeJY6gO
-X-Google-Smtp-Source: AGHT+IGV3ZbmQI7qK+TZ9Px70PLokdttIlZQa8u/GSYPXu3yqruqG3XYgZr8R3NYQ/dqMtvPkSO9gQ==
-X-Received: by 2002:a05:6a21:e92:b0:232:813b:8331 with SMTP id adf61e73a8af0-23811d5b784mr12685064637.2.1752780275065;
-        Thu, 17 Jul 2025 12:24:35 -0700 (PDT)
-Received: from localhost ([216.228.127.129])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74eb9f1b2f6sm17245711b3a.99.2025.07.17.12.24.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Jul 2025 12:24:34 -0700 (PDT)
-From: Yury Norov <yury.norov@gmail.com>
-To: Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Yury Norov <yury.norov@gmail.com>
-Subject: [PATCH 3/3] KVM: PPC: use for_each_set_bit() in IRQ_check()
-Date: Thu, 17 Jul 2025 15:24:16 -0400
-Message-ID: <20250717192418.207114-4-yury.norov@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250717192418.207114-1-yury.norov@gmail.com>
-References: <20250717192418.207114-1-yury.norov@gmail.com>
+        d=1e100.net; s=20230601; t=1752780339; x=1753385139;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7cjM6leMNWJaFyvB8pUYw1XsGkeqyh24r2b2Mr0FYMs=;
+        b=SYm/JO3flysAK4/CvswmiXRxcVIAq8WfUhE++r7abBPIAhD84K2hefVYKd+qWgG8io
+         6qV12ovr4cYzw05QVuUxnLRGyBHK+7s/slZg0EfJHvAQ3/2K/N191lQfb0NYRTXbPM1+
+         w60ORbxTQqPQtGnEB86aU1YZSwpqCH7603xB1DSH2p4ybLLpeHyFvltqjPyfBK32LUtQ
+         PGgm336zSzO4J8zQFy/Qtc7+RszgBkQCUkC87g0Hb3EPy0/LfH1CTdov1ZAi2Yb66j8Y
+         QCi3yEC7L86+cV2EK1mrCsWnZYGuxjMaRIa4aD6nlVsFX7YfkCmGA+NjarIFDHXLChiK
+         0bQg==
+X-Forwarded-Encrypted: i=1; AJvYcCU3WnWOnEEoIRnzrpET6FnnMHoSU91tjpOsSi7gBDjBP6ipEA6gUm0GbFeU2sj5IJ/2NhM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw23/DarB23Us3HiKdsNBUff0nN9FgRbWGBMJIHVuqQGbRPzJSe
+	pN8oIK+3S/NiV0IASQLWpgw6g5qlyErMJ/UKwehiGFr3qT7l480Z4IK4CgpOUBicCASbLZ82ao4
+	nWsgmLHU1g/7mPX9AfJic8eqLbelusHKMQp7Cm1/7qtO2TjNKbSG3Dg==
+X-Gm-Gg: ASbGncseYevG4ZGzD42Vxo2j1e5PPZRSO92wbAAE/OiP6WgETFmCzu0Z0/Y3fRRYpZK
+	yRLg4UGj7N3x+aKWnv+4B8RqkPa4ALtu1ui40uS3BVDVcFmHjUrgaUIIZ84vtXimIT9s0VppoWm
+	Q75T/0jkYzh1K9H5JlAynTohOHkbGUy0flpeJ4QyHvGDNq285chIopxkskHEkPzMlfABhjX1aCv
+	HFWAjP+V5+eqml9zIfsCJbuT6AacHdcLS7TNgzYXVLpEUffqUM5YieTtwei16BgpGcrq3sAFusZ
+	/3+7xBNOChBUC5kUXwNuGp8xbjMKVD1zJikPcFl8
+X-Received: by 2002:a05:6214:3d0f:b0:704:a0be:87e9 with SMTP id 6a1803df08f44-7051a114f9bmr2753546d6.27.1752780339394;
+        Thu, 17 Jul 2025 12:25:39 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFnouXokKlyOlp4XW8RUcaaVzppnw9rpmDfmEo0M//qCUQGk6pO2DfCJ8LdT9+rTbiA9leEEA==
+X-Received: by 2002:a05:6214:3d0f:b0:704:a0be:87e9 with SMTP id 6a1803df08f44-7051a114f9bmr2752986d6.27.1752780338822;
+        Thu, 17 Jul 2025 12:25:38 -0700 (PDT)
+Received: from [192.168.40.164] ([70.105.235.240])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-704979b48bdsm88133626d6.28.2025.07.17.12.25.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 17 Jul 2025 12:25:38 -0700 (PDT)
+Message-ID: <c05104a1-7c8e-4ce9-bfa3-bcbc8c9e0ef5@redhat.com>
+Date: Thu, 17 Jul 2025 15:25:35 -0400
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 03/11] iommu: Compute iommu_groups properly for PCIe
+ switches
+Content-Language: en-US
+To: Jason Gunthorpe <jgg@nvidia.com>,
+ Alex Williamson <alex.williamson@redhat.com>
+Cc: Bjorn Helgaas <bhelgaas@google.com>, iommu@lists.linux.dev,
+ Joerg Roedel <joro@8bytes.org>, linux-pci@vger.kernel.org,
+ Robin Murphy <robin.murphy@arm.com>, Will Deacon <will@kernel.org>,
+ Lu Baolu <baolu.lu@linux.intel.com>, galshalom@nvidia.com,
+ Joerg Roedel <jroedel@suse.de>, Kevin Tian <kevin.tian@intel.com>,
+ kvm@vger.kernel.org, maorg@nvidia.com, patches@lists.linux.dev,
+ tdave@nvidia.com, Tony Zhu <tony.zhu@intel.com>
+References: <0-v1-74184c5043c6+195-pcie_switch_groups_jgg@nvidia.com>
+ <3-v1-74184c5043c6+195-pcie_switch_groups_jgg@nvidia.com>
+ <20250701132905.67d29191.alex.williamson@redhat.com>
+ <20250702010407.GB1051729@nvidia.com>
+From: Donald Dutile <ddutile@redhat.com>
+In-Reply-To: <20250702010407.GB1051729@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Yury Norov (NVIDIA) <yury.norov@gmail.com>
 
-The function opencodes for_each_set_bit() macro.
 
-Signed-off-by: Yury Norov (NVIDIA) <yury.norov@gmail.com>
----
- arch/powerpc/kvm/mpic.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+On 7/1/25 9:04 PM, Jason Gunthorpe wrote:
+> On Tue, Jul 01, 2025 at 01:29:05PM -0600, Alex Williamson wrote:
+>> On Mon, 30 Jun 2025 19:28:33 -0300
+>> Jason Gunthorpe <jgg@nvidia.com> wrote:
+>>> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+>>> index d265de874b14b6..f4584ffacbc03d 100644
+>>> --- a/drivers/iommu/iommu.c
+>>> +++ b/drivers/iommu/iommu.c
+>>> @@ -65,8 +65,16 @@ struct iommu_group {
+>>>   	struct list_head entry;
+>>>   	unsigned int owner_cnt;
+>>>   	void *owner;
+>>> +
+>>> +	/* Used by the device_group() callbacks */
+>>> +	u32 bus_data;
+>>>   };
+>>>   
+>>> +/*
+>>> + * Everything downstream of this group should share it.
+>>> + */
+>>> +#define BUS_DATA_PCI_UNISOLATED BIT(0)
+>>
+>> NON_ISOLATED for consistency w/ enum from the previous patch?
+> 
+> Yes
+> 
+>>> -	/* No shared group found, allocate new */
+>>> -	return iommu_group_alloc();
+>>> +	switch (pci_bus_isolated(pdev->bus)) {
+>>> +	case PCIE_ISOLATED:
+>>> +		/* Check multi-function groups and same-bus devfn aliases */
+>>> +		group = pci_get_alias_group(pdev);
+>>> +		if (group)
+>>> +			return group;
+>>> +
+>>> +		/* No shared group found, allocate new */
+>>> +		return iommu_group_alloc();
+>>
+>> I'm not following how we'd handle a multi-function root port w/o
+>> consistent ACS isolation here.  How/where does the resulting group get
+>> the UNISOLATED flag set?
+> 
+> Still wobbly on the root port/root bus.. So the answer is probably
+> that it doesn't.
+> 
+> What does a multi-function root port with different ACS flags even
+> mean and how should we treat it? I had in mind that the first root
+> port is the TA and immediately goes the IOMMU.
+> 
+I'm looking for clarification what you are asking...
 
-diff --git a/arch/powerpc/kvm/mpic.c b/arch/powerpc/kvm/mpic.c
-index 23e9c2bd9f27..ae68b213f0f9 100644
---- a/arch/powerpc/kvm/mpic.c
-+++ b/arch/powerpc/kvm/mpic.c
-@@ -290,15 +290,11 @@ static inline void IRQ_resetbit(struct irq_queue *q, int n_IRQ)
- 
- static void IRQ_check(struct openpic *opp, struct irq_queue *q)
- {
--	int irq = -1;
-+	int irq;
- 	int next = -1;
- 	int priority = -1;
- 
--	for (;;) {
--		irq = find_next_bit(q->queue, opp->max_irq, irq + 1);
--		if (irq == opp->max_irq)
--			break;
--
-+	for_each_set_bit(irq, q->queue, opp->max_irq) {
- 		pr_debug("IRQ_check: irq %d set ivpr_pr=%d pr=%d\n",
- 			irq, IVPR_PRIORITY(opp->src[irq].ivpr), priority);
- 
--- 
-2.43.0
+when you say 'multi-function root port', do you mean an RP that is a function
+in a MFD in an RC ?  other?  A more explicit (complex?) example be given to
+clarify?
+
+IMO, the rule of MFD in an RC applies here, and that means the per-function ACS rules
+for an MFD apply -- well, that's how I read section 6.12 (PCIe 7.0.-1.0-PUB).
+This may mean checking ACS P2P Egress Control.  Table 6-11 may help wrt Egress control bits & RPs & Fcns.
+
+If no (optional) ACS P2P Egress control, and no other ACS control, then I read/decode
+the spec to mean no p2p btwn functions is possible, b/c if it is possible, by spec,
+it must have an ACS cap to control it; ergo, no ACS cap, no p2p capability/routing.
+
+- Don
+> If you can explain a bit more about how you see the root ports working
+> I can try to make an implementation.
+> 
+> AFAICT the spec sort of says 'implementation defined' for ACS on root
+> ports??
+> 
+> Thanks,
+> Jason
+> 
 
 
