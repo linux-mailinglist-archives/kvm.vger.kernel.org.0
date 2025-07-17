@@ -1,62 +1,63 @@
-Return-Path: <kvm+bounces-52721-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52722-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DF47B088D3
-	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 11:05:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82639B088DA
+	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 11:05:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6A9277B6CFE
-	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 09:03:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B8749161277
+	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 09:05:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3051F289E0F;
-	Thu, 17 Jul 2025 09:03:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C4E828A408;
+	Thu, 17 Jul 2025 09:04:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OP8S5NDp"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Z26mQW2S"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 861EC287269;
-	Thu, 17 Jul 2025 09:03:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E744228A1C1;
+	Thu, 17 Jul 2025 09:03:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752743036; cv=none; b=UuFYmkeYX08SZHHnGraYQAWUyHDGSw2cDWFNyOyDevoSn3xvvEtahPcbn+zpYy2MYQ2OgA25N6bJVlrzP0xd3trZdIrtd4sBdyswp3+BHS2esb3DEI0/JAG/z0yziQzDcFYjwb2yOAorQ9QXygqzM/2L8Pm4jpJYKiDirSZf+wY=
+	t=1752743039; cv=none; b=cD2/QAlZ2gdIlQ6/0XnMFSKGcwDoR/0wH6fcPBThFhv35ZKl7IRXUfMglda2FU5L2FHFRExZrVFU+EVKXIP935XRr/L5GjdZn0DN65t4e2BH8ZVOOByeoFyFN2QOYTgOJmAjYHOq1Dnu3xaHgs6+cImrd0KtKE3RpTrJfGnH2xA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752743036; c=relaxed/simple;
-	bh=yHsAHKTe/LT2XVTGbt4c9MxoJAn5NuMjTXmAhbh6i1I=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=tfOlY6BP6risBD8F3k4yWTcXPnHisHutm/5H8InUn+o8dUGXqvZSrEjJwEo3JbuKCOdNIQvxJ13bphVvaknmOlTHe/5vNsqdzxgGuBfaaMFzkKRfIKFUxv+LS+PAAuhDv/FhRADHM50a7fWyTHmPSakhg/+cGqVX0kfszTYMtvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OP8S5NDp; arc=none smtp.client-ip=198.175.65.9
+	s=arc-20240116; t=1752743039; c=relaxed/simple;
+	bh=3VbdL1DtRyK163VSM5zT9fJNUPREL57ZbKWaW1boGiQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=mUUzUZ8z2YJLQ9wUAXgRVnlkBO6dWb8i7y7n1pfbacqNpSrprUFXjTL+N9bEWKT3Oxybu4qZKOH+5rFV4J9sttEWUZHi196c5+lbUCoQS5SAXgkzTv0EyzBJjcgVgZfQ8Langgj+N7WPy1YgCE+XuGh6OOZhc4j0j5sntxRFLr4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Z26mQW2S; arc=none smtp.client-ip=198.175.65.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752743034; x=1784279034;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=yHsAHKTe/LT2XVTGbt4c9MxoJAn5NuMjTXmAhbh6i1I=;
-  b=OP8S5NDpoP6Rlh/useaBWUyNPsbEj7P1ARlQKipru2KDkBzzc5Y8qa4u
-   L3nZ+O0vCucppFYQsT+W/MHiNC97tCJMY32+ZFz/ipk5k7Ma1NNAqe5UZ
-   AfktzmCP+RfSSp3p+lNx5oMThuiyhOWrY7LPv7HxrQ9PeJR7o7j1yziWq
-   VSaO0hmV+UpkMDgbGk8UC9SGJZmh4XulyxEX8TZI+jhYWuDGIsUxTOMN3
-   N/VSfEFijv7i27pZyut2we3dYsnW0j0p7pzRcYXeD5csT8fix0F1AbU72
-   jcmSrOI9AC0Twf6vnTo8sqPWY/B3VAQ3mpEm/zu2I0pROhhZ8EN65Hqz3
-   g==;
-X-CSE-ConnectionGUID: TZpIHp1ZQzeczbcFTzG1JA==
-X-CSE-MsgGUID: DwkY0XBUTR6k40y6mbznpA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11493"; a="77546769"
+  t=1752743038; x=1784279038;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=3VbdL1DtRyK163VSM5zT9fJNUPREL57ZbKWaW1boGiQ=;
+  b=Z26mQW2SXCxfW4haT3ovHGFjYQbJsAloVpGnLf+HBXTbh3G45WvnBA8E
+   RYAJNYR7W2Y4jxe/ZfZ/wHicJrB6W1CF/poBdkbHLh9JsgbrqmZNKQW7j
+   XUu/FWQyjIJM94xhCmXCl4gNDBoJUKHnCHGRjGvz4sRHeZ1VXQzKYToi1
+   8Lmy7r2MDnh/9Jw53FNf25mzrl0MEr2C+j6DxidQaq/Pwmd/KJwFXoNBe
+   Q1rxTP4AWpBtfJd04qCOKhimGRlIPDDfY12JzKxQ7BYQ16ko/ZwdBFZOL
+   mlH/G+KJJq+T0uzlvHtHl6zE0tVFw5dmVlW4C/qKK1NvgXm5U1+5Xt+ld
+   w==;
+X-CSE-ConnectionGUID: EXmvc/VlS1qSNmEh0oKv1Q==
+X-CSE-MsgGUID: K4VcdSf6RviryOI28Ams7Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11493"; a="77546775"
 X-IronPort-AV: E=Sophos;i="6.16,318,1744095600"; 
-   d="scan'208";a="77546769"
+   d="scan'208";a="77546775"
 Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 02:03:54 -0700
-X-CSE-ConnectionGUID: p9+G4bpnQTalvtvbS4llTg==
-X-CSE-MsgGUID: XwjslSNQR5SvUeY/panbaw==
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 02:03:57 -0700
+X-CSE-ConnectionGUID: TuaGLopIQCqonIQ4vjo5Bw==
+X-CSE-MsgGUID: FigQ6XyMSwuAufVr+EuSvg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,318,1744095600"; 
-   d="scan'208";a="161773965"
+   d="scan'208";a="161773983"
 Received: from spr.sh.intel.com ([10.112.229.196])
-  by fmviesa003.fm.intel.com with ESMTP; 17 Jul 2025 02:03:50 -0700
+  by fmviesa003.fm.intel.com with ESMTP; 17 Jul 2025 02:03:54 -0700
 From: Dapeng Mi <dapeng1.mi@linux.intel.com>
 To: Peter Zijlstra <peterz@infradead.org>,
 	Ingo Molnar <mingo@redhat.com>,
@@ -76,10 +77,12 @@ Cc: kvm@vger.kernel.org,
 	Dapeng Mi <dapeng1.mi@intel.com>,
 	Dapeng Mi <dapeng1.mi@linux.intel.com>,
 	Yi Lai <yi1.lai@intel.com>
-Subject: [PATCH 1/3] perf/x86: Add PERF_CAP_PEBS_TIMING_INFO flag
-Date: Thu, 17 Jul 2025 17:03:00 +0800
-Message-Id: <20250717090302.11316-1-dapeng1.mi@linux.intel.com>
+Subject: [PATCH 2/3] perf/x86/intel: Change macro GLOBAL_CTRL_EN_PERF_METRICS to BIT_ULL(48)
+Date: Thu, 17 Jul 2025 17:03:01 +0800
+Message-Id: <20250717090302.11316-2-dapeng1.mi@linux.intel.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20250717090302.11316-1-dapeng1.mi@linux.intel.com>
+References: <20250717090302.11316-1-dapeng1.mi@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -88,78 +91,68 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-IA32_PERF_CAPABILITIES.PEBS_TIMING_INFO[bit 17] is introduced to
-indicate whether timed PEBS is supported. Timed PEBS adds a new "retired
-latency" field in basic info group to show the timing info. Please find
-detailed information about timed PEBS in section 8.4.1 "Timed Processor
-Event Based Sampling" of "Intel Architecture Instruction Set Extensions
-and Future Features".
+Macro GLOBAL_CTRL_EN_PERF_METRICS is defined to 48 instead of
+BIT_ULL(48), it's inconsistent with other similar macros. This leads to
+this macro is quite easily used wrongly since users thinks it's a
+bit-mask just like other similar macros.
 
-This patch adds PERF_CAP_PEBS_TIMING_INFO flag and KVM module leverages
-this flag to expose timed PEBS feature to guest.
-
-Moreover, opportunistically refine the indents and make the macros
-share consistent indents.
+Thus change GLOBAL_CTRL_EN_PERF_METRICS to BIT_ULL(48) and eliminate
+this potential misuse.
 
 Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
 Tested-by: Yi Lai <yi1.lai@intel.com>
 ---
- arch/x86/include/asm/msr-index.h       | 14 ++++++++------
- tools/arch/x86/include/asm/msr-index.h | 14 ++++++++------
- 2 files changed, 16 insertions(+), 12 deletions(-)
+ arch/x86/events/intel/core.c      | 8 ++++----
+ arch/x86/include/asm/perf_event.h | 2 +-
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
-index b7dded3c8113..48b7ed28718c 100644
---- a/arch/x86/include/asm/msr-index.h
-+++ b/arch/x86/include/asm/msr-index.h
-@@ -315,12 +315,14 @@
- #define PERF_CAP_PT_IDX			16
+diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
+index c2fb729c270e..1ee4480089aa 100644
+--- a/arch/x86/events/intel/core.c
++++ b/arch/x86/events/intel/core.c
+@@ -5318,9 +5318,9 @@ static void intel_pmu_check_hybrid_pmus(struct x86_hybrid_pmu *pmu)
+ 						0, x86_pmu_num_counters(&pmu->pmu), 0, 0);
  
- #define MSR_PEBS_LD_LAT_THRESHOLD	0x000003f6
--#define PERF_CAP_PEBS_TRAP             BIT_ULL(6)
--#define PERF_CAP_ARCH_REG              BIT_ULL(7)
--#define PERF_CAP_PEBS_FORMAT           0xf00
--#define PERF_CAP_PEBS_BASELINE         BIT_ULL(14)
--#define PERF_CAP_PEBS_MASK	(PERF_CAP_PEBS_TRAP | PERF_CAP_ARCH_REG | \
--				 PERF_CAP_PEBS_FORMAT | PERF_CAP_PEBS_BASELINE)
-+#define PERF_CAP_PEBS_TRAP		BIT_ULL(6)
-+#define PERF_CAP_ARCH_REG		BIT_ULL(7)
-+#define PERF_CAP_PEBS_FORMAT		0xf00
-+#define PERF_CAP_PEBS_BASELINE		BIT_ULL(14)
-+#define PERF_CAP_PEBS_TIMING_INFO	BIT_ULL(17)
-+#define PERF_CAP_PEBS_MASK		(PERF_CAP_PEBS_TRAP | PERF_CAP_ARCH_REG | \
-+					 PERF_CAP_PEBS_FORMAT | PERF_CAP_PEBS_BASELINE | \
-+					 PERF_CAP_PEBS_TIMING_INFO)
+ 	if (pmu->intel_cap.perf_metrics)
+-		pmu->intel_ctrl |= 1ULL << GLOBAL_CTRL_EN_PERF_METRICS;
++		pmu->intel_ctrl |= GLOBAL_CTRL_EN_PERF_METRICS;
+ 	else
+-		pmu->intel_ctrl &= ~(1ULL << GLOBAL_CTRL_EN_PERF_METRICS);
++		pmu->intel_ctrl &= ~GLOBAL_CTRL_EN_PERF_METRICS;
  
- #define MSR_IA32_RTIT_CTL		0x00000570
- #define RTIT_CTL_TRACEEN		BIT(0)
-diff --git a/tools/arch/x86/include/asm/msr-index.h b/tools/arch/x86/include/asm/msr-index.h
-index b7dded3c8113..48b7ed28718c 100644
---- a/tools/arch/x86/include/asm/msr-index.h
-+++ b/tools/arch/x86/include/asm/msr-index.h
-@@ -315,12 +315,14 @@
- #define PERF_CAP_PT_IDX			16
+ 	intel_pmu_check_event_constraints(pmu->event_constraints,
+ 					  pmu->cntr_mask64,
+@@ -5455,7 +5455,7 @@ static void intel_pmu_cpu_starting(int cpu)
+ 		rdmsrq(MSR_IA32_PERF_CAPABILITIES, perf_cap.capabilities);
+ 		if (!perf_cap.perf_metrics) {
+ 			x86_pmu.intel_cap.perf_metrics = 0;
+-			x86_pmu.intel_ctrl &= ~(1ULL << GLOBAL_CTRL_EN_PERF_METRICS);
++			x86_pmu.intel_ctrl &= ~GLOBAL_CTRL_EN_PERF_METRICS;
+ 		}
+ 	}
  
- #define MSR_PEBS_LD_LAT_THRESHOLD	0x000003f6
--#define PERF_CAP_PEBS_TRAP             BIT_ULL(6)
--#define PERF_CAP_ARCH_REG              BIT_ULL(7)
--#define PERF_CAP_PEBS_FORMAT           0xf00
--#define PERF_CAP_PEBS_BASELINE         BIT_ULL(14)
--#define PERF_CAP_PEBS_MASK	(PERF_CAP_PEBS_TRAP | PERF_CAP_ARCH_REG | \
--				 PERF_CAP_PEBS_FORMAT | PERF_CAP_PEBS_BASELINE)
-+#define PERF_CAP_PEBS_TRAP		BIT_ULL(6)
-+#define PERF_CAP_ARCH_REG		BIT_ULL(7)
-+#define PERF_CAP_PEBS_FORMAT		0xf00
-+#define PERF_CAP_PEBS_BASELINE		BIT_ULL(14)
-+#define PERF_CAP_PEBS_TIMING_INFO	BIT_ULL(17)
-+#define PERF_CAP_PEBS_MASK		(PERF_CAP_PEBS_TRAP | PERF_CAP_ARCH_REG | \
-+					 PERF_CAP_PEBS_FORMAT | PERF_CAP_PEBS_BASELINE | \
-+					 PERF_CAP_PEBS_TIMING_INFO)
+@@ -7789,7 +7789,7 @@ __init int intel_pmu_init(void)
+ 	}
  
- #define MSR_IA32_RTIT_CTL		0x00000570
- #define RTIT_CTL_TRACEEN		BIT(0)
-
-base-commit: 829f5a6308ce11c3edaa31498a825f8c41b9e9aa
+ 	if (!is_hybrid() && x86_pmu.intel_cap.perf_metrics)
+-		x86_pmu.intel_ctrl |= 1ULL << GLOBAL_CTRL_EN_PERF_METRICS;
++		x86_pmu.intel_ctrl |= GLOBAL_CTRL_EN_PERF_METRICS;
+ 
+ 	if (x86_pmu.intel_cap.pebs_timing_info)
+ 		x86_pmu.flags |= PMU_FL_RETIRE_LATENCY;
+diff --git a/arch/x86/include/asm/perf_event.h b/arch/x86/include/asm/perf_event.h
+index 70d1d94aca7e..f8247ac276c4 100644
+--- a/arch/x86/include/asm/perf_event.h
++++ b/arch/x86/include/asm/perf_event.h
+@@ -430,7 +430,7 @@ static inline bool is_topdown_idx(int idx)
+ #define GLOBAL_STATUS_TRACE_TOPAPMI		BIT_ULL(GLOBAL_STATUS_TRACE_TOPAPMI_BIT)
+ #define GLOBAL_STATUS_PERF_METRICS_OVF_BIT	48
+ 
+-#define GLOBAL_CTRL_EN_PERF_METRICS		48
++#define GLOBAL_CTRL_EN_PERF_METRICS		BIT_ULL(48)
+ /*
+  * We model guest LBR event tracing as another fixed-mode PMC like BTS.
+  *
 -- 
 2.34.1
 
