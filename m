@@ -1,184 +1,117 @@
-Return-Path: <kvm+bounces-52729-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52730-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 642BBB08984
-	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 11:41:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2925BB08B6B
+	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 12:59:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9BB5F4A308C
-	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 09:41:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95D4BA42ABB
+	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 10:58:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E070428B3F8;
-	Thu, 17 Jul 2025 09:41:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 066B129E101;
+	Thu, 17 Jul 2025 10:56:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WTnqgVgC"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="cZ81kXZK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A93C429D0E;
-	Thu, 17 Jul 2025 09:41:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 309C629C33E;
+	Thu, 17 Jul 2025 10:56:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752745283; cv=none; b=tAo5Qy/ySHDw6dYLNTqgNm/Xma3P1mAAC7m4ZRSZgq1YTNi4p7G2JQCdTdOzsIhrUQUHHqQjbL11JyT2l+lHKhZt9TKT2C/Zy32QQXV0hcDrd+RafIle/QLBuV5yrnrqv8YJcj75Wrb9gW+5h3LF7eHobXf8ULevR+QSWnKVhC0=
+	t=1752749778; cv=none; b=gy/SknQRBKp1K650McLbIMRmgAl8ec1VCgoN7+xMy4iJDklLVegWZFTbMugxAm/7Z1tSnk1aSk4j+9xGzPhSwgs8ZZYPRiMaUQjYUvwu31JqKKi9cx8p6O7Y2n2qDmb9LD090LvRdjJ3X04y8s0WX2OtEJokCa2r8yLq6wSxgT4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752745283; c=relaxed/simple;
-	bh=f158b21SAzsqoT29eGBt9+eUZ2LbMQkUBicROPZ4jXw=;
+	s=arc-20240116; t=1752749778; c=relaxed/simple;
+	bh=3M/AOQVTLSDh5r3YKRTNFCJGSOna/TBA4qCj/m7bPAQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DEGA6iFxb5CufyMNZtB2ozVq3I/YuIX2SbiotLQ+RJ69KTgpV/mlZTlBkvshBjx2RS/7XbMBsnx3esbxepBTuAwm+GIWHph6KekPocdPxPvE0cMBOaeCkx9OZBWVAQS/rw2NHy1NszP5uG1tV7YwZiUFgmua7LHi3kaovXBa9vs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WTnqgVgC; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752745281; x=1784281281;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=f158b21SAzsqoT29eGBt9+eUZ2LbMQkUBicROPZ4jXw=;
-  b=WTnqgVgCB52v+WzvcBNU6gHkE8HFMv/nnj2uQZqDtL9bG37+77L/+MrX
-   IIJ6av1A1Gxe0F3FX+OsMG1HH8JKOWgFAHwpDNE55hCHzpeI/tdNtSW3q
-   lHIjFkAihbGB5+MmOcceWv+VsiDZLPGnx9qZgSwSSnGPlAVPnReG3WiAn
-   vkGP8odtpDQAchPdrMZPhIofvHp1mAZvc69caDnHGd+wZDOY4BchKvEMm
-   sadWc6/tqDGPuX+YRrb7BpD7JDr0e6mt76jqDJHS1zrbzvEM7r4lux8kh
-   632x9gFVSp7d0Y3J4YXYtQ/QIETzYrCMKybgEYzNFhnjjAt7yJ96Nz7jE
-   g==;
-X-CSE-ConnectionGUID: dXyERcIsQdOH7nQ1nKq54A==
-X-CSE-MsgGUID: zSUSpihrSICAlFGcnKbwrg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11493"; a="55162682"
-X-IronPort-AV: E=Sophos;i="6.16,318,1744095600"; 
-   d="scan'208";a="55162682"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 02:41:20 -0700
-X-CSE-ConnectionGUID: mGURc28dR2qraEFpNo381g==
-X-CSE-MsgGUID: UBWhswFOQou9MrnZsXvkkA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,318,1744095600"; 
-   d="scan'208";a="157818401"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by orviesa007.jf.intel.com with ESMTP; 17 Jul 2025 02:41:00 -0700
-Date: Thu, 17 Jul 2025 17:32:19 +0800
-From: Xu Yilun <yilun.xu@linux.intel.com>
-To: Ackerley Tng <ackerleytng@google.com>
-Cc: Yan Zhao <yan.y.zhao@intel.com>,
-	Vishal Annapurve <vannapurve@google.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Alexey Kardashevskiy <aik@amd.com>,
-	Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
-	linux-mm@kvack.org, linux-kernel@vger.kernel.org, x86@kernel.org,
-	linux-fsdevel@vger.kernel.org, ajones@ventanamicro.com,
-	akpm@linux-foundation.org, amoorthy@google.com,
-	anthony.yznaga@oracle.com, anup@brainfault.org,
-	aou@eecs.berkeley.edu, bfoster@redhat.com,
-	binbin.wu@linux.intel.com, brauner@kernel.org,
-	catalin.marinas@arm.com, chao.p.peng@intel.com,
-	chenhuacai@kernel.org, dave.hansen@intel.com, david@redhat.com,
-	dmatlack@google.com, dwmw@amazon.co.uk, erdemaktas@google.com,
-	fan.du@intel.com, fvdl@google.com, graf@amazon.com,
-	haibo1.xu@intel.com, hch@infradead.org, hughd@google.com,
-	ira.weiny@intel.com, isaku.yamahata@intel.com, jack@suse.cz,
-	james.morse@arm.com, jarkko@kernel.org, jgowans@amazon.com,
-	jhubbard@nvidia.com, jroedel@suse.de, jthoughton@google.com,
-	jun.miao@intel.com, kai.huang@intel.com, keirf@google.com,
-	kent.overstreet@linux.dev, kirill.shutemov@intel.com,
-	liam.merwick@oracle.com, maciej.wieczor-retman@intel.com,
-	mail@maciej.szmigiero.name, maz@kernel.org, mic@digikod.net,
-	michael.roth@amd.com, mpe@ellerman.id.au, muchun.song@linux.dev,
-	nikunj@amd.com, nsaenz@amazon.es, oliver.upton@linux.dev,
-	palmer@dabbelt.com, pankaj.gupta@amd.com, paul.walmsley@sifive.com,
-	pbonzini@redhat.com, pdurrant@amazon.co.uk, peterx@redhat.com,
-	pgonda@google.com, pvorel@suse.cz, qperret@google.com,
-	quic_cvanscha@quicinc.com, quic_eberman@quicinc.com,
-	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com,
-	quic_pheragu@quicinc.com, quic_svaddagi@quicinc.com,
-	quic_tsoni@quicinc.com, richard.weiyang@gmail.com,
-	rick.p.edgecombe@intel.com, rientjes@google.com,
-	roypat@amazon.co.uk, rppt@kernel.org, seanjc@google.com,
-	shuah@kernel.org, steven.price@arm.com, steven.sistare@oracle.com,
-	suzuki.poulose@arm.com, thomas.lendacky@amd.com,
-	usama.arif@bytedance.com, vbabka@suse.cz, viro@zeniv.linux.org.uk,
-	vkuznets@redhat.com, wei.w.wang@intel.com, will@kernel.org,
-	willy@infradead.org, xiaoyao.li@intel.com, yilun.xu@intel.com,
-	yuzenghui@huawei.com, zhiquan1.li@intel.com
-Subject: Re: [RFC PATCH v2 04/51] KVM: guest_memfd: Introduce
- KVM_GMEM_CONVERT_SHARED/PRIVATE ioctls
-Message-ID: <aHjDIxxbv0DnqI6S@yilunxu-OptiPlex-7050>
-References: <d3832fd95a03aad562705872cbda5b3d248ca321.1747264138.git.ackerleytng@google.com>
- <CA+EHjTxtHOgichL=UvAzczoqS1608RSUNn5HbmBw2NceO941ng@mail.gmail.com>
- <CAGtprH8eR_S50xDnnMLHNCuXrN2Lv_0mBRzA_pcTtNbnVvdv2A@mail.gmail.com>
- <CA+EHjTwjKVkw2_AK0Y0-eth1dVW7ZW2Sk=73LL9NeQYAPpxPiw@mail.gmail.com>
- <CAGtprH_Evyc7tLhDB0t0fN+BUx5qeqWq8A2yZ5-ijbJ5UJ5f-g@mail.gmail.com>
- <9502503f-e0c2-489e-99b0-94146f9b6f85@amd.com>
- <20250624130811.GB72557@ziepe.ca>
- <CAGtprH_qh8sEY3s-JucW3n1Wvoq7jdVZDDokvG5HzPf0HV2=pg@mail.gmail.com>
- <aGTvTbPHuXbvj59t@yzhao56-desk.sh.intel.com>
- <diqz8qknhj3l.fsf@ackerleytng-ctop.c.googlers.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=sLRmZLMU1ZQp9epqMpExdftFWe9lqIwMcT6g1gIxse0QgDu/9D7L3KK2Up5O2sgLn941xMv1WmawlZXE3JTVmbl6QMX3461I0ws25Qa2H16ivtgawaPVoD1/EToSQ/DO4OV1YQ04tCH7w3S51S7a0CFiV+SJCxCWNHNTGgmE6iY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=cZ81kXZK; arc=none smtp.client-ip=90.155.92.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=BmmpUxNUC6XMNwTNVZDcW7v4Pq1RnOf8oWukxWYtaoU=; b=cZ81kXZKAfh8nI8K2/i7JPNtlU
+	q4+HoNdJwzvH6Rl1w/cf4hP1K9k1Ga+RvuWN3pPd9V0EypsX2RtJpLBtKXE9vWXh84dZNONrlkIJp
+	2Pi1Td3J1hDV3Z3HENRw1wOKcPThj4J7+GOIPnLlW2Q3eu+tJbHNp8Wxne64+Z9kVxCgQKvm/Su89
+	yUNnrNadjFWvecppjK2BFkTyE4J1f2tNRIKzuxg/0FPDwk0ppivY2q387tRbl6uErbXLUKlYB2nfP
+	gSiOv6Gsp04WmUlvkLS9PfiDj8QeVvGB+ZaOJYKbco6eZILxUG4JHLFqOPQ497wyKIaTHe8Xbxqhw
+	h0cvhmRg==;
+Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
+	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1ucMHM-0000000AGIF-0Owe;
+	Thu, 17 Jul 2025 10:55:56 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id 40C35300186; Thu, 17 Jul 2025 12:55:54 +0200 (CEST)
+Date: Thu, 17 Jul 2025 12:55:54 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+To: Bagas Sanjaya <bagasdotme@gmail.com>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Documentation <linux-doc@vger.kernel.org>,
+	Linux RCU <rcu@vger.kernel.org>,
+	Linux CPU Architectures Development <linux-arch@vger.kernel.org>,
+	Linux LKMM <lkmm@lists.linux.dev>, Linux KVM <kvm@vger.kernel.org>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
+	Joel Fernandes <joelagnelf@nvidia.com>,
+	Josh Triplett <josh@joshtriplett.org>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Uladzislau Rezki <urezki@gmail.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Zqiang <qiang.zhang@linux.dev>, Jonathan Corbet <corbet@lwn.net>,
+	Alan Stern <stern@rowland.harvard.edu>,
+	Andrea Parri <parri.andrea@gmail.com>,
+	Will Deacon <will@kernel.org>, Nicholas Piggin <npiggin@gmail.com>,
+	David Howells <dhowells@redhat.com>,
+	Jade Alglave <j.alglave@ucl.ac.uk>,
+	Luc Maranget <luc.maranget@inria.fr>,
+	Akira Yokosawa <akiyks@gmail.com>,
+	Daniel Lustig <dlustig@nvidia.com>,
+	Mark Rutland <mark.rutland@arm.com>, Ingo Molnar <mingo@redhat.com>,
+	Waiman Long <longman@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Tejun Heo <tj@kernel.org>,
+	"Mike Rapoport (Microsoft)" <rppt@kernel.org>,
+	Changyuan Lyu <changyuanl@google.com>,
+	Dan Williams <dan.j.williams@intel.com>, Xavier <xavier_qy@163.com>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Maarten Lankhorst <dev@lankhorst.se>,
+	Christian Brauner <brauner@kernel.org>
+Subject: Re: [PATCH 0/4] Convert atomic_*.txt and memory-barriers.txt to reST
+Message-ID: <20250717105554.GA1479557@noisy.programming.kicks-ass.net>
+References: <20250717080617.35577-1-bagasdotme@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <diqz8qknhj3l.fsf@ackerleytng-ctop.c.googlers.com>
+In-Reply-To: <20250717080617.35577-1-bagasdotme@gmail.com>
 
-On Wed, Jul 16, 2025 at 03:22:06PM -0700, Ackerley Tng wrote:
-> Yan Zhao <yan.y.zhao@intel.com> writes:
+On Thu, Jul 17, 2025 at 03:06:13PM +0700, Bagas Sanjaya wrote:
+> Atomic types, atomic bitops, and memory barriers docs are included in kernel
+> docs build since commit e40573a43d163a ("docs: put atomic*.txt and
+> memory-barriers.txt into the core-api book") as a wrapper stub for
+> corresponding uncoverted txt docs. Let's turn them into full-fledged reST docs. 
 > 
-> > On Tue, Jun 24, 2025 at 07:10:38AM -0700, Vishal Annapurve wrote:
-> >> On Tue, Jun 24, 2025 at 6:08 AM Jason Gunthorpe <jgg@ziepe.ca> wrote:
-> >> >
-> >> > On Tue, Jun 24, 2025 at 06:23:54PM +1000, Alexey Kardashevskiy wrote:
-> >> >
-> >> > > Now, I am rebasing my RFC on top of this patchset and it fails in
-> >> > > kvm_gmem_has_safe_refcount() as IOMMU holds references to all these
-> >> > > folios in my RFC.
-> >> > >
-> >> > > So what is the expected sequence here? The userspace unmaps a DMA
-> >> > > page and maps it back right away, all from the userspace? The end
-> >> > > result will be the exactly same which seems useless. And IOMMU TLB
-> >> 
-> >>  As Jason described, ideally IOMMU just like KVM, should just:
-> >> 1) Directly rely on guest_memfd for pinning -> no page refcounts taken
-> >> by IOMMU stack
-> > In TDX connect, TDX module and TDs do not trust VMM. So, it's the TDs to inform
-> > TDX module about which pages are used by it for DMAs purposes.
-> > So, if a page is regarded as pinned by TDs for DMA, the TDX module will fail the
-> > unmap of the pages from S-EPT.
-> >
-> > If IOMMU side does not increase refcount, IMHO, some way to indicate that
-> > certain PFNs are used by TDs for DMA is still required, so guest_memfd can
-> > reject the request before attempting the actual unmap.
-> > Otherwise, the unmap of TD-DMA-pinned pages will fail.
-> >
-> > Upon this kind of unmapping failure, it also doesn't help for host to retry
-> > unmapping without unpinning from TD.
-> >
-> >
-> 
-> Yan, Yilun, would it work if, on conversion,
-> 
-> 1. guest_memfd notifies IOMMU that a conversion is about to happen for a
->    PFN range
+> Bagas Sanjaya (4):
+>   Documentation: memory-barriers: Convert to reST format
+>   Documentation: atomic_bitops: Convert to reST format
+>   Documentation: atomic_t: Convert to reST format
+>   Documentation: atomic_bitops, atomic_t, memory-barriers: Link to
+>     newly-converted docs
 
-It is the Guest fw call to release the pinning. By the time VMM get the
-conversion requirement, the page is already physically unpinned. So I
-agree with Jason the pinning doesn't have to reach to iommu from SW POV.
+NAK
 
-> 2. IOMMU forwards the notification to TDX code in the kernel
-> 3. TDX code in kernel tells TDX module to stop thinking of any PFNs in
->    the range as pinned for DMA?
-
-TDX host can't stop the pinning. Actually this mechanism is to prevent
-host from unpin/unmap the DMA out of Guest expectation.
-
-Thanks,
-Yilun
-
-> 
-> If the above is possible then by the time we get to unmapping from
-> S-EPTs, TDX module would already consider the PFNs in the range "not
-> pinned for DMA".
+If these are merged I will no longer touch / update these files.
 
