@@ -1,325 +1,165 @@
-Return-Path: <kvm+bounces-52812-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52813-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40BDDB097A7
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 01:27:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1754B0980B
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 01:33:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D26E24A1684
-	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 23:26:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE16B3B5077
+	for <lists+kvm@lfdr.de>; Thu, 17 Jul 2025 23:31:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44D29274FEF;
-	Thu, 17 Jul 2025 23:25:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79EFE24BBEB;
+	Thu, 17 Jul 2025 23:29:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TRbkjAx4"
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="XVBdZ/be"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04olkn2098.outbound.protection.outlook.com [40.92.45.98])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3C622451C8;
-	Thu, 17 Jul 2025 23:25:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752794720; cv=none; b=u1uIcZ2yzvv/lh3vpj1lZ2Ql+50EIZivVnfUn57BPjh3uhrZPtud8wona7ctxq33n6ncROLz/Nt7eI3HXLvg9EBkHOe1j3+iCxaflgcPxItQoMojSdQquAbPkyNfqU6dROxsE5Aj+eVNAqAP3MSUjcfb5e0R5FqjTv1l5KqsGnI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752794720; c=relaxed/simple;
-	bh=h6Zg7bnGhZLJl7gzBxEvRrK024ha+iznbtZZpACm6QM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AHcCK5Zgi+E06i9GUczyx+6SVXu+r61m6FNfj4vDaxv8eLjFswvO7YKpPqgVDiq3NzvtdJono4wml3Rhz/9T2n7aYmAVRdAMlEUgBQPTPm36PXzm4hnfH0WlTkBqjlV3voH5CXHxefXvn047QOrrIVHYctdnII5MaKlhISwfYLw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TRbkjAx4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50E03C4AF0D;
-	Thu, 17 Jul 2025 23:25:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752794720;
-	bh=h6Zg7bnGhZLJl7gzBxEvRrK024ha+iznbtZZpACm6QM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=TRbkjAx4agQoaNgy3gLSJriPgyOo5ZCrhh3RqY0GC546jkLVEZccPCSzF8ie7fy6u
-	 kWfBerRtRzKtuY8tBoSJzz6wpe622Laedp++mPG1+CmC7M1OekiauZqbXDoIfrxwaa
-	 qPbCsHOLWtVOn1W7v9sgTGhxFMBGtrfzn5esRTca8flZAjwNRqLlO5gTyJQnSWnfg+
-	 WJcneUc8gjGzKRoq1g/v/b3UtHPiOO7ErykuiiNNVtdCQC5nlDPHQyvn5pzubaO4HM
-	 NPazOkyKiCZdmzeC3mefEGu+PJePhSvFG4uHATZJqL96ZZJo3iwGb5u8caANyBnlSk
-	 FEC4bFEVGFelQ==
-From: Kees Cook <kees@kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Kees Cook <kees@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Henrique de Moraes Holschuh <hmh@hmh.eng.br>,
-	Hans de Goede <hdegoede@redhat.com>,
-	=?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Len Brown <lenb@kernel.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Mike Rapoport <rppt@kernel.org>,
-	Michal Wilczynski <michal.wilczynski@intel.com>,
-	Juergen Gross <jgross@suse.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-	Roger Pau Monne <roger.pau@citrix.com>,
-	David Woodhouse <dwmw@amazon.co.uk>,
-	Usama Arif <usama.arif@bytedance.com>,
-	"Guilherme G. Piccoli" <gpiccoli@igalia.com>,
-	Thomas Huth <thuth@redhat.com>,
-	Brian Gerst <brgerst@gmail.com>,
-	kvm@vger.kernel.org,
-	ibm-acpi-devel@lists.sourceforge.net,
-	platform-driver-x86@vger.kernel.org,
-	linux-acpi@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	linux-efi@vger.kernel.org,
-	linux-mm@kvack.org,
-	Ingo Molnar <mingo@kernel.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Christoph Hellwig <hch@lst.de>,
-	Andrey Konovalov <andreyknvl@gmail.com>,
-	Andrey Ryabinin <ryabinin.a.a@gmail.com>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nicolas.schier@linux.dev>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	linux-kernel@vger.kernel.org,
-	kasan-dev@googlegroups.com,
-	linux-doc@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-riscv@lists.infradead.org,
-	linux-s390@vger.kernel.org,
-	linux-hardening@vger.kernel.org,
-	linux-kbuild@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	sparclinux@vger.kernel.org,
-	llvm@lists.linux.dev
-Subject: [PATCH v3 04/13] x86: Handle KCOV __init vs inline mismatches
-Date: Thu, 17 Jul 2025 16:25:09 -0700
-Message-Id: <20250717232519.2984886-4-kees@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250717231756.make.423-kees@kernel.org>
-References: <20250717231756.make.423-kees@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D12CA248871
+	for <kvm@vger.kernel.org>; Thu, 17 Jul 2025 23:29:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.45.98
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752794965; cv=fail; b=EBZ3xyCvG2VbaNdPQ7umrLrCjbkklyTmhkRyOi2T1cRrh+Dr7VDyZ6g+/xgO9CsPPGoG2RC2Lpw1AFgVQpZqP8B3lnTpeC8aQxz0vEYaZwrs6hsf1PGlaNYu8V822elPrC9XIjpjfYFFN3035NQxJmgBbeP7EnjwhJchtB0Thdw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752794965; c=relaxed/simple;
+	bh=kiRJqVH++4CLZ5aja6R2Z4b2IiWNV7lbCIhWwxPtiVY=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=NnAG1UFgGxt1pbGcpGhtufH1vDR6go7GiZEkRAzdi0RzhOHcdbpdCaNtFeR19cJkV4HJW6nAmry6/F1yDIHflKpFaagzXBq0iHcpu+Dyj0IpZ2Sc01ZHWac+ocQDMdygDcEzKv346kmHfp6E8bIo+cSsl8QQDDCrZEgUnzATFY4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=XVBdZ/be; arc=fail smtp.client-ip=40.92.45.98
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=LcC/zrbvFQjPW4NdaLwaqLhpCbNvY/aUtyGS1Yxe/NgNwXW+mCp9mx/zYEKQcacu5jaf4MC4EQMkEFY/GybQ1a7kigo5FLXnPqGcGBg9D97A9mQvxfL48RyBUexuwmSUgMTsdRt0NjiEwiVbgXWS+U2MyxOfwDRpSz2+MsfYEAyoFTMNP1MsBMpf+e10HP7fC3dP2SOirGdlopnbwnoRUWATrXyA8hzfPyNwTbtIZMGMhJ9Qt0i9o8wFYeSiDNNVvauCHBmIKIxyZI+IxftKpqz71ymHqp8zdTQJO3w3cefVeMt5p4An4QhDjiTNMVemnTx2a+p8Kr3uum0DEBwOxQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=kiRJqVH++4CLZ5aja6R2Z4b2IiWNV7lbCIhWwxPtiVY=;
+ b=bpksgOthbM6UccCfI1l+yTogR0CxUT3sqgxs+ovD/iuvFOQdaznsyfkI4QLfZMrB7LXDfE0/mPUKnT3eL9ZOQ+VCJL1jVp6g/eTvCDYeli7Pq65UfdbwpWqEr07X/yz9yVcOuLTbg9PQn5P/vd0RD3mN2cz8TyzrvPXMrZ2rVGphO0/IqWNQkat9lLiQdRDjh+zYGDy+9NWMOpvTw0Z9q1GeZ0smNURLm3uoclxao9dWwWTbsMqKxyg99NxDQFzAvXcWrAhT8iN1jFYzienjY32Om+cJXhtXwxFMxzG1bqPiaqQnzdHRPn7S6cNEHsdmE0fBRk+PG0heAl1XIxRq/A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kiRJqVH++4CLZ5aja6R2Z4b2IiWNV7lbCIhWwxPtiVY=;
+ b=XVBdZ/beU/OSZvo7OR/7tE5HS97ZqdKEgY31yoIUdxWB3hFhn7EwcWImrTHtsJfkGTeHKkG7l2r58iTxRVINn9ePYm7N4Plup++TIGaOIrO3pJqLqayGHAbGcpbd85UfQjttwF0l/Ezvrn4QhncEkUjEOmgTh8YkwWDDONOsWrFhZSAflp5wPJgJt2NHXiqSEjiBtLQ2ykOz5vJcFSja6Anwipfzfco9tpRptJi4dJp43Z479BDmuNcXHGTMtu1XlA+tFPfUazkJDfsDWIMdvFFIK7SIELg22behZd+dft6bK0OBr2QzThc0Ut+yqfQgib9c081HTcRQeUrHZ5vSzg==
+Received: from CY4PR03MB3335.namprd03.prod.outlook.com (2603:10b6:910:56::14)
+ by BN5PR03MB8042.namprd03.prod.outlook.com (2603:10b6:408:2aa::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8880.17; Thu, 17 Jul
+ 2025 23:29:21 +0000
+Received: from CY4PR03MB3335.namprd03.prod.outlook.com
+ ([fe80::e8c6:bfb:511d:77d8]) by CY4PR03MB3335.namprd03.prod.outlook.com
+ ([fe80::e8c6:bfb:511d:77d8%7]) with mapi id 15.20.8943.024; Thu, 17 Jul 2025
+ 23:29:21 +0000
+From: Jessica Garcia <jessica.campaigndataleads@outlook.com>
+To: "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Engage your market with GSX 2025 contact list
+Thread-Topic: Engage your market with GSX 2025 contact list
+Thread-Index: Adv3TZQu266CoboZQBqwH2Ujs40TKA==
+Disposition-Notification-To: Jessica Garcia
+	<jessica.campaigndataleads@outlook.com>
+Date: Thu, 17 Jul 2025 23:29:21 +0000
+Message-ID:
+ <CY4PR03MB3335498F0A4F74D3D2A4F35EE751A@CY4PR03MB3335.namprd03.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CY4PR03MB3335:EE_|BN5PR03MB8042:EE_
+x-ms-office365-filtering-correlation-id: 905cf16b-57b9-4905-521b-08ddc589c22b
+x-ms-exchange-slblob-mailprops:
+ Vs63Iqe4sQkhtW6IUZ6WgDqnLPTu9NQEzZTEuYoKQX2QHS1lz+lJ3r0ETzbJJwkIIYenBUI3dM+c1iH48A3mcNJ4wWi0mfVFODPYNHJ0jteUFGRQxEnUrvo6gBmYGz1IMKS7C41HeFK9XZ8atHDKTDqMBDuV4F3aadpVvPLjDQnwA8fKK4zrJCtYjBal3HbQkKjtkyxSyJMUh+ZWxejLzcdKHTshRcqw40vz5tkr+xe0ai9lNknvk1XdYFJViKByw2srHw19dp7H/L9bAmygz7wredBC6qITjO4rkeH10RbYnBKlx3dVwvCRV+6/neWPzx2PCj8ri/3hD2pv09mwSnp6X6QJbf6Oycy+1eUF4/TPDm/mJZhVOuKnEfi0WTTonXKAbxFQc8E6/HoQZrD306Zc6OgwWPthShrXYqpD1k3g1p5IOqmlUFukYLNoAEz1K6BucMTHoJcgaF4QBlAtmtOomUPAmdxJ7zkZlopYcd16u4ZtyX30AdVuFhULZgyBCtAlaMGdQJULZ/99245eVFpE/RBaQCPP6mySkQC/hmSRMLNw6XK25vy6nGq759cdi84nKYkPFxmumA3J330ABemZw8/s07I8n7VSTV7Z3StCc788LNskJ5HWR01rktsDb7hm1lu5g18Aqj5LLk6Ef2pIUIdPGUo0X8pPnCbO7NKURM0mdTsg2GrsU++wWKuJyNzsuBb1co0SxlGmYPf/XLXNZzj1k5ADgDzeCHBvYQo=
+x-microsoft-antispam:
+ BCL:0;ARA:14566002|461199028|15080799012|13031999003|41001999006|40105399003|39105399003|440099028|51005399003|3412199025|19111999003|102099032;
+x-microsoft-antispam-message-info:
+ =?iso-8859-1?Q?Cq0PpRHQFA8ls7ZdmgzmTjt78wMhIUmwvNw5adL1uNkCOJAg19GUUG+8zm?=
+ =?iso-8859-1?Q?ZnzVQ9CNsFk21NBIuYalyqwIEq6XFOOHHd8c4LWo+8r+0H+sDVVndeBYWw?=
+ =?iso-8859-1?Q?e/91nA3YInweUJfOvEpnIMiY6ytpRc8LKBj1fN3f4VyXAn3P4opUVQLl9y?=
+ =?iso-8859-1?Q?0N0arPsdDtRucpOTBTXfVt5Ox6O7ORNBskYulvUmPeOvNCezg+Bs/BOqsG?=
+ =?iso-8859-1?Q?SySNVQmx/bi1o8t4hsBs3XQjlaEmYnft5O91LAoPZTf7bzWyZj5tdo7wMd?=
+ =?iso-8859-1?Q?qwzviUt9bSM5BpEgqNUgB0sJBvo5AVxmMZkWmHxTijczN2avxCyhbv+Qwn?=
+ =?iso-8859-1?Q?mic2EkI3sKLh6HD43FUHTEarn2/js3JV+mMV8vPKAJQaGMQEYWGBr4CJwL?=
+ =?iso-8859-1?Q?7End8h3CLr9WZhDiYg4M/67ehdGzczq0lZ7jD4NFGIxoxkXwumMApI9v5q?=
+ =?iso-8859-1?Q?pZAPHuGGkPljrFRzIr7sCh4mbhUkpCq4jY7Pz4y8z+w0//8AxKGueaN8go?=
+ =?iso-8859-1?Q?RJ2EAAbH1h4heD1Uule9mqVohw/NQ88O3PfMF26S2LZDSdJAQYaVVoYEyt?=
+ =?iso-8859-1?Q?JMh+IA4IQFVVinyuEIa1TtNxeB/4WylzINSRzUK2Cst3ZHfZz1jEnmnn0X?=
+ =?iso-8859-1?Q?OLGDqVjSdO0xi51cYKEcXnTHsbfr/9HdNI9zP7wpzb3p1G8MVx2bj/k/7n?=
+ =?iso-8859-1?Q?YH0HkPp6SlWAnKhLLqVhtRg11zI1u9b3y+beCaVh8dSb0AQCxHQqZTATDw?=
+ =?iso-8859-1?Q?LaEKJsPZPZVsAMljCMv81X2S5P2AaykD8eWr64E6AA9MWc6vQu8CdUJxGz?=
+ =?iso-8859-1?Q?mReY09QlSpMok9IoCXDpf6bEQ5N+QgM3Lqy8oqoRnnJK/6PjkE+N/1rNih?=
+ =?iso-8859-1?Q?SXaFUqjGoLtx9674BA5QXaqenyE8qBCLFiuG/elWZAD2/vMchfr6Q7aiFa?=
+ =?iso-8859-1?Q?w9j2b+DwMjNJlL0Yc2Hn9IRTFlvr0gi5DS2wAj9ZIGZcvEN+HmQg1yksgf?=
+ =?iso-8859-1?Q?Dy9bgNczqFsNEVBYndnTUun0mfAG6Z3DMcM1Y2UeOXP2QzFVsDjMeSVyBH?=
+ =?iso-8859-1?Q?wSKMaKOCnLM0dEx0e3kxcwgJ+b+0TWK4xEjDz2Oy+anFftaR0MZ3C/cXE+?=
+ =?iso-8859-1?Q?VJ6SnZ6h7jiC4W9scysGfIpUwqxNe7hTLJ2LcvAtBxS9dlbIrks4QjIZRP?=
+ =?iso-8859-1?Q?OnE8RW81jrGaMNY2+3XbuLHdeuw7GcdPVb9P19vs8Ry0yQJIwvRWqwsM?=
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?iso-8859-1?Q?vZPfFVNZwhVtoDCix8ZImEsdptrwN6xajuN93kzARQGidKq1zwKeA2OC2C?=
+ =?iso-8859-1?Q?9ZxHBoqQPBffXabx/MTo3XwSAsV2ESYv8Cx+z98Mf4/a0+4qpzsmBfXhXw?=
+ =?iso-8859-1?Q?9DZNOs4tiX54lcYCjBXeMP59Br2+DI8bKJPaTwDrxLJKVQ4ap1cz/MV9i+?=
+ =?iso-8859-1?Q?nYEnPgWhpI+ymPaSzAFhPw1P3ERZPXjWAt0ylgTucbf93ry13fkIs8NsC+?=
+ =?iso-8859-1?Q?AXiwo7k94KFzAD9+dhaIwZ2ORnkhgsRyYNHLK185Jh1tsdLMJYkjFZrMXq?=
+ =?iso-8859-1?Q?Y1gIMlNCDrVXvjDXY1UAPPVPWeP2n8qyu5/67+ZYfY8J9lBej73uvpAn3j?=
+ =?iso-8859-1?Q?fYJ9BbwMC+nAwfBjUygTxGrVFAXoxpQYd80Lg6ACdsjiFsGzhQp4E1o6Y2?=
+ =?iso-8859-1?Q?PKlP7eacHwGtVJ6FLX0izKdauJa9UKv8GopodQMecL4kSFdCnfWqrjoSIh?=
+ =?iso-8859-1?Q?ODDGQBRp1p5yhLaLd8A6ZQA3kQGGj6CiVnEAkTA1LZL3e3M5rzOh7RnqUJ?=
+ =?iso-8859-1?Q?5vAOlN/MsRv/Em7qjxShEoIi+W4xXx4OmZOSzU0rRUp+w6eAnkugbUL/Cl?=
+ =?iso-8859-1?Q?eHlln/FkUVXEuSoj3DnF70lHThAqRTjmcT+jXDxS9tMjME1+uLiCP4OOR0?=
+ =?iso-8859-1?Q?BQAkOkoXCUicbcTvFOrkLVwRNVAyfU4ntIcq5JRt2NkUglXYAyIhqEKS7Z?=
+ =?iso-8859-1?Q?0PJWrhbuIa/bWof0SVAU8CbDSTC/0uRmHN5DazQPozfyC96PE7gGKIx0EE?=
+ =?iso-8859-1?Q?7APz/tK7rkNhC7PkpKbT1h/XsZTVtrdjG+irbitVvOgTOpJSy+4CN083zU?=
+ =?iso-8859-1?Q?p7114jAxXxP2vWVjXINLcq5HwdFW5ZBLLPFj/dVzkP6HyJK6uDWAcEp/uq?=
+ =?iso-8859-1?Q?70ur5IfdGgmDZ/zbs9rxBZOfjwf7kXabraRfGUbg44gwK90+Vx3FaX5yEe?=
+ =?iso-8859-1?Q?L0VhVqPVsFYKn/kdL87HgCUZFft4mshRRSjldcmEcPWpAQCa3BUPXz2m6D?=
+ =?iso-8859-1?Q?yGXx5apElh94SdfkOF+dMt6F6dBOlW6ITOWh8HcyTP939Qp6/A3TXcyz+P?=
+ =?iso-8859-1?Q?+q7tObzGs49uxR6UZe7s0MHs2r3e5u3MZ8pMia3/ryPPpfP83tRJAhRfL0?=
+ =?iso-8859-1?Q?I66CZn2wW1A0F4X8ycm9YoLcteRY0VqCp80Upw3Gw0m3DJyQPdBUEqtmo0?=
+ =?iso-8859-1?Q?09yD6RVWi++YdJKAxTiX3L8cFmrxzTOnUZAZyhRkGXQtgR1peDoFmEEp8O?=
+ =?iso-8859-1?Q?YR8jwjbroB5tB6by+uvtfmASo2QmzFcFFJ2UzxQukOHef7fren858ZM8LL?=
+ =?iso-8859-1?Q?CZElU6A0TWCj+vQ589pokK9P95eT7cX/HKOb7MKehdWZlNaTbaKrfu+PKg?=
+ =?iso-8859-1?Q?1PGlY1Gwo0n/tc40I+vEp/NLoIlvgQ/Q=3D=3D?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=7379; i=kees@kernel.org; h=from:subject; bh=h6Zg7bnGhZLJl7gzBxEvRrK024ha+iznbtZZpACm6QM=; b=owGbwMvMwCVmps19z/KJym7G02pJDBmVbVEsBUWRs14v3rd2ZcSn8mMh7T+55X5XTfK6NfVtU nnon9hnHaUsDGJcDLJiiixBdu5xLh5v28Pd5yrCzGFlAhnCwMUpABPx6WT4n2zhIJZwQbqtV2mf gj9/g5L3r9WHjHc+Olf9QXTtxJXKZYwMuypdt881O3ZGS1GRa0Flo/olSxb117FqYnc5ylXOiL1 mAwA=
-X-Developer-Key: i=kees@kernel.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CY4PR03MB3335.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-Network-Message-Id: 905cf16b-57b9-4905-521b-08ddc589c22b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Jul 2025 23:29:21.5051
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN5PR03MB8042
 
-When KCOV is enabled all functions get instrumented, unless the
-__no_sanitize_coverage attribute is used. To prepare for
-__no_sanitize_coverage being applied to __init functions, we have to
-handle differences in how GCC's inline optimizations get resolved. For
-x86 this means forcing several functions to be inline with
-__always_inline.
-
-Signed-off-by: Kees Cook <kees@kernel.org>
----
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Ingo Molnar <mingo@redhat.com>
-Cc: Borislav Petkov <bp@alien8.de>
-Cc: Dave Hansen <dave.hansen@linux.intel.com>
-Cc: <x86@kernel.org>
-Cc: "H. Peter Anvin" <hpa@zytor.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc: Henrique de Moraes Holschuh <hmh@hmh.eng.br>
-Cc: Hans de Goede <hdegoede@redhat.com>
-Cc: "Ilpo Järvinen" <ilpo.jarvinen@linux.intel.com>
-Cc: "Rafael J. Wysocki" <rafael@kernel.org>
-Cc: Len Brown <lenb@kernel.org>
-Cc: Masami Hiramatsu <mhiramat@kernel.org>
-Cc: Ard Biesheuvel <ardb@kernel.org>
-Cc: Mike Rapoport <rppt@kernel.org>
-Cc: Michal Wilczynski <michal.wilczynski@intel.com>
-Cc: Juergen Gross <jgross@suse.com>
-Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Cc: Roger Pau Monne <roger.pau@citrix.com>
-Cc: David Woodhouse <dwmw@amazon.co.uk>
-Cc: Usama Arif <usama.arif@bytedance.com>
-Cc: "Guilherme G. Piccoli" <gpiccoli@igalia.com>
-Cc: Thomas Huth <thuth@redhat.com>
-Cc: Brian Gerst <brgerst@gmail.com>
-Cc: <kvm@vger.kernel.org>
-Cc: <ibm-acpi-devel@lists.sourceforge.net>
-Cc: <platform-driver-x86@vger.kernel.org>
-Cc: <linux-acpi@vger.kernel.org>
-Cc: <linux-trace-kernel@vger.kernel.org>
-Cc: <linux-efi@vger.kernel.org>
-Cc: <linux-mm@kvack.org>
----
- arch/x86/include/asm/acpi.h     | 4 ++--
- arch/x86/include/asm/realmode.h | 2 +-
- include/linux/acpi.h            | 4 ++--
- include/linux/bootconfig.h      | 2 +-
- include/linux/efi.h             | 2 +-
- include/linux/memblock.h        | 2 +-
- include/linux/smp.h             | 2 +-
- arch/x86/kernel/kvm.c           | 2 +-
- arch/x86/mm/init_64.c           | 2 +-
- kernel/kexec_handover.c         | 4 ++--
- 10 files changed, 13 insertions(+), 13 deletions(-)
-
-diff --git a/arch/x86/include/asm/acpi.h b/arch/x86/include/asm/acpi.h
-index 5ab1a4598d00..a03aa6f999d1 100644
---- a/arch/x86/include/asm/acpi.h
-+++ b/arch/x86/include/asm/acpi.h
-@@ -158,13 +158,13 @@ static inline bool acpi_has_cpu_in_madt(void)
- }
- 
- #define ACPI_HAVE_ARCH_SET_ROOT_POINTER
--static inline void acpi_arch_set_root_pointer(u64 addr)
-+static __always_inline void acpi_arch_set_root_pointer(u64 addr)
- {
- 	x86_init.acpi.set_root_pointer(addr);
- }
- 
- #define ACPI_HAVE_ARCH_GET_ROOT_POINTER
--static inline u64 acpi_arch_get_root_pointer(void)
-+static __always_inline u64 acpi_arch_get_root_pointer(void)
- {
- 	return x86_init.acpi.get_root_pointer();
- }
-diff --git a/arch/x86/include/asm/realmode.h b/arch/x86/include/asm/realmode.h
-index f607081a022a..e406a1e92c63 100644
---- a/arch/x86/include/asm/realmode.h
-+++ b/arch/x86/include/asm/realmode.h
-@@ -78,7 +78,7 @@ extern unsigned char secondary_startup_64[];
- extern unsigned char secondary_startup_64_no_verify[];
- #endif
- 
--static inline size_t real_mode_size_needed(void)
-+static __always_inline size_t real_mode_size_needed(void)
- {
- 	if (real_mode_header)
- 		return 0;	/* already allocated. */
-diff --git a/include/linux/acpi.h b/include/linux/acpi.h
-index 71e692f95290..1c5bb1e887cd 100644
---- a/include/linux/acpi.h
-+++ b/include/linux/acpi.h
-@@ -759,13 +759,13 @@ int acpi_arch_timer_mem_init(struct arch_timer_mem *timer_mem, int *timer_count)
- #endif
- 
- #ifndef ACPI_HAVE_ARCH_SET_ROOT_POINTER
--static inline void acpi_arch_set_root_pointer(u64 addr)
-+static __always_inline void acpi_arch_set_root_pointer(u64 addr)
- {
- }
- #endif
- 
- #ifndef ACPI_HAVE_ARCH_GET_ROOT_POINTER
--static inline u64 acpi_arch_get_root_pointer(void)
-+static __always_inline u64 acpi_arch_get_root_pointer(void)
- {
- 	return 0;
- }
-diff --git a/include/linux/bootconfig.h b/include/linux/bootconfig.h
-index 3f4b4ac527ca..25df9260d206 100644
---- a/include/linux/bootconfig.h
-+++ b/include/linux/bootconfig.h
-@@ -290,7 +290,7 @@ int __init xbc_get_info(int *node_size, size_t *data_size);
- /* XBC cleanup data structures */
- void __init _xbc_exit(bool early);
- 
--static inline void xbc_exit(void)
-+static __always_inline void xbc_exit(void)
- {
- 	_xbc_exit(false);
- }
-diff --git a/include/linux/efi.h b/include/linux/efi.h
-index 7d63d1d75f22..e3776d9cad07 100644
---- a/include/linux/efi.h
-+++ b/include/linux/efi.h
-@@ -1334,7 +1334,7 @@ struct linux_efi_initrd {
- 
- bool xen_efi_config_table_is_usable(const efi_guid_t *guid, unsigned long table);
- 
--static inline
-+static __always_inline
- bool efi_config_table_is_usable(const efi_guid_t *guid, unsigned long table)
- {
- 	if (!IS_ENABLED(CONFIG_XEN_EFI))
-diff --git a/include/linux/memblock.h b/include/linux/memblock.h
-index bb19a2534224..b96746376e17 100644
---- a/include/linux/memblock.h
-+++ b/include/linux/memblock.h
-@@ -463,7 +463,7 @@ static inline void *memblock_alloc_raw(phys_addr_t size,
- 					  NUMA_NO_NODE);
- }
- 
--static inline void *memblock_alloc_from(phys_addr_t size,
-+static __always_inline void *memblock_alloc_from(phys_addr_t size,
- 						phys_addr_t align,
- 						phys_addr_t min_addr)
- {
-diff --git a/include/linux/smp.h b/include/linux/smp.h
-index bea8d2826e09..18e9c918325e 100644
---- a/include/linux/smp.h
-+++ b/include/linux/smp.h
-@@ -221,7 +221,7 @@ static inline void wake_up_all_idle_cpus(void) {  }
- 
- #ifdef CONFIG_UP_LATE_INIT
- extern void __init up_late_init(void);
--static inline void smp_init(void) { up_late_init(); }
-+static __always_inline void smp_init(void) { up_late_init(); }
- #else
- static inline void smp_init(void) { }
- #endif
-diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-index 921c1c783bc1..8ae750cde0c6 100644
---- a/arch/x86/kernel/kvm.c
-+++ b/arch/x86/kernel/kvm.c
-@@ -420,7 +420,7 @@ static u64 kvm_steal_clock(int cpu)
- 	return steal;
- }
- 
--static inline void __set_percpu_decrypted(void *ptr, unsigned long size)
-+static inline __init void __set_percpu_decrypted(void *ptr, unsigned long size)
- {
- 	early_set_memory_decrypted((unsigned long) ptr, size);
- }
-diff --git a/arch/x86/mm/init_64.c b/arch/x86/mm/init_64.c
-index fdb6cab524f0..76e33bd7c556 100644
---- a/arch/x86/mm/init_64.c
-+++ b/arch/x86/mm/init_64.c
-@@ -805,7 +805,7 @@ kernel_physical_mapping_change(unsigned long paddr_start,
- }
- 
- #ifndef CONFIG_NUMA
--static inline void x86_numa_init(void)
-+static __always_inline void x86_numa_init(void)
- {
- 	memblock_set_node(0, PHYS_ADDR_MAX, &memblock.memory, 0);
- }
-diff --git a/kernel/kexec_handover.c b/kernel/kexec_handover.c
-index 49634cc3fb43..e49743ae52c5 100644
---- a/kernel/kexec_handover.c
-+++ b/kernel/kexec_handover.c
-@@ -310,8 +310,8 @@ static int kho_mem_serialize(struct kho_serialization *ser)
- 	return -ENOMEM;
- }
- 
--static void deserialize_bitmap(unsigned int order,
--			       struct khoser_mem_bitmap_ptr *elm)
-+static void __init deserialize_bitmap(unsigned int order,
-+				      struct khoser_mem_bitmap_ptr *elm)
- {
- 	struct kho_mem_phys_bits *bitmap = KHOSER_LOAD_PTR(elm->bitmap);
- 	unsigned long bit;
--- 
-2.34.1
-
+Hi ,=20
+=A0
+Do you need the GSX 2025 attendees list?=20
+=A0
+Expo Name: =A0Global Security Exchange (GSX) 2025=20
+Total Number of records: 17,000 records=20
+List includes: Company Name, Contact Name, Job Title, Mailing Address, Phon=
+e, Emails, etc.=20
+=A0
+Would you like to move forward with purchasing these leads? Let me know, an=
+d I'll share the pricing.=20
+=A0
+Can't wait to hear from you=20
+=A0
+Regards
+Jessica
+Marketing Manager
+Campaign Data Leads.,
+=A0
+Please reply with REMOVE if you don't wish to receive further emails
 
