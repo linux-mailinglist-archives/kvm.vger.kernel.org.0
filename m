@@ -1,119 +1,136 @@
-Return-Path: <kvm+bounces-52867-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52868-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11B45B09D00
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 09:53:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72DADB09DB6
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 10:20:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B1BCB7B0172
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 07:51:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B0058189595D
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 08:20:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA9632951C8;
-	Fri, 18 Jul 2025 07:52:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0B7B221F00;
+	Fri, 18 Jul 2025 08:20:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RPaYuF3h"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gbgwDoye"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CDDC293B49
-	for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 07:52:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 077261CA84;
+	Fri, 18 Jul 2025 08:20:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752825167; cv=none; b=ccZZ1R5Zl7JhghTa/t2j9haOB+kMMl51V22EZMfyHPVHyZXVe45bmjFJuQmRfqAtxdXJn39AbR6DtDEpEPN1y06EwM6n90cUIRJ6vnh8ORNbk8bqLhtNIYNBIsNNXRmLDTfIlHv1JSg1i9x0o5jE4Vn103Q19bgKtSEIlTZflQQ=
+	t=1752826807; cv=none; b=O2y+Khj8vZXV5Hg9TRryDSX+fs/qWknJf0HT07AMsHor5pEJV9OFLqKxP6gfd8MYS7+m9u6o7rH4xzfM6woJpb81ImLRk+Xu4NIY9WvVB0yKDUo9Q3SoeNARXWEmGiBcrpQJ5/eF6m850/QsunIKVeNmnjy+gaH51MBTpSD9A4U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752825167; c=relaxed/simple;
-	bh=2pi8KBcoIPlm4tOCt/inqjOUYuaGd1omaspVeZAZA8w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MXB4oWON1hBfOECCnT+jTYMXO05BmIXNZ+zotC5WafnH/ulAySI5FquyXCSRfOZ2h9POuOE+5ejXfO1uqNhW4CAjhyEITGTSDtWqEFn+F35EwK4GSOSjHJDlG3U4KEdKRnohTLm8EXU2Oij0GBzd+U7ELvse+I9pvLjhMJ4CPl8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RPaYuF3h; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752825164;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2pi8KBcoIPlm4tOCt/inqjOUYuaGd1omaspVeZAZA8w=;
-	b=RPaYuF3h+bcigEPAjovnmbMBqzDoWJ41RVYOQG7XMf5kZXlQpRNIgdx11gDEqRwzJtplKQ
-	tvb7Pg+mm/eBcDaRMipyoZT8AZbszu+/bfJQu8lPL+WX1yUYnz6FKqVgTxjNElI18ZpfQz
-	2xBuUAGGi6u/YYcqSeYb4uFfcu4Wyx4=
-Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
- [209.85.214.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-424-xAwCqZ0xM56WjFOGVrQDWw-1; Fri, 18 Jul 2025 03:52:42 -0400
-X-MC-Unique: xAwCqZ0xM56WjFOGVrQDWw-1
-X-Mimecast-MFC-AGG-ID: xAwCqZ0xM56WjFOGVrQDWw_1752825161
-Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-234f1acc707so19032525ad.3
-        for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 00:52:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752825161; x=1753429961;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2pi8KBcoIPlm4tOCt/inqjOUYuaGd1omaspVeZAZA8w=;
-        b=MAyCv9e4RMkggtXEBnKDvpfh9CxR2oVMbNZ+XT6xn4YmLp2RzN094KIABUE1LWON9x
-         2s6n3/aStdIteGq9PDagkiW9nmxji2adV/J8mEhVDnhni/qo8AwMUvqWnXYX4gKyK0ao
-         N2noj9fvrJ1N9Qkk4bIu3booSK6+FWpI0AM9b9OWdwd57aHrhPzl7lkOmx2uZQWL8y44
-         c1NxWmpqUfjEYh41cg+V81u9CuClHKl5Fpih+X/qIVY5Y+1WuBRNXL6y0L6VXqvbsTLR
-         rUaLuGgMTYirxrB5ugIaMRv4c5Ew2nzVNG2lKfBuZgRGxguWtz1fR9q2z9pliBQJrRWZ
-         CjhA==
-X-Forwarded-Encrypted: i=1; AJvYcCUmMC4S0UNyO+GguxHQHcm8P6HzBF7ZcsgDWKK7FadjWvXUByJdiY6xJJ27FtycRQot084=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxMZNJoRjqkISb6rF8sZxLqb+j5yv7BLWa+I/DpJtgkxSRri0YU
-	JSETXdrwB4OszwOXkgIMS0Ef8E3X3Y8vWC24zFTlCYntHfLBW+2G4G/JO7To1Q6rxadzoeeZUHP
-	rpywJKtVKTIqw9absA/bWwVQvkZ1kVdr0Uve5txiYQGuIJiKtALWNrTwpFDyMoOaI0Du1X9VG1S
-	YwMzAXqr4dSLONxJyz9HZayxd4U5to
-X-Gm-Gg: ASbGncsa4bFAKHfey1XgAbCDXBV30maBRwDcN1Z7jHQrMswAAlfBixSCpGOoON4VpEx
-	pMV8UYfe4794JTsJG+B1fU6dM/0BBI2J8isvtYKsiKpAtulJuyxW3W+T8xtXheiLQzcpP7mzju5
-	Np2fcPWJ0LeblFhEKNXAxNsQ==
-X-Received: by 2002:a17:902:ec8b:b0:235:f3df:bc1f with SMTP id d9443c01a7336-23e257451fdmr133641845ad.36.1752825161540;
-        Fri, 18 Jul 2025 00:52:41 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEczHEQLoKluvpGtGTxZAFG1Ct7SS0ET5wuggRJXsSha+pJGDGNiCavb0Lfm2+EHUkt6UvPo3yU43N4AaOjSqo=
-X-Received: by 2002:a17:902:ec8b:b0:235:f3df:bc1f with SMTP id
- d9443c01a7336-23e257451fdmr133641485ad.36.1752825161093; Fri, 18 Jul 2025
- 00:52:41 -0700 (PDT)
+	s=arc-20240116; t=1752826807; c=relaxed/simple;
+	bh=qAd8ycMee6hRlVYzCSY9mkp/JvxOmUrSY+m6h+PqfWo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dqXvr56UhkOi2Qjl4Vx/+B98geWYIDnIKygxhEEbxL2ryE9FOo2f/WbUKaRdHs5mTyeDoaf98kxNc2SLkMtUgkJygp9Pp1GNKlNlRGFdXJGy8MCeOEys6di/TCoSSDs95vBrUwEQxmH2HvYFdHh7hb21pW28MQw6+acd610aviU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gbgwDoye; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DDD6C4CEEB;
+	Fri, 18 Jul 2025 08:20:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752826806;
+	bh=qAd8ycMee6hRlVYzCSY9mkp/JvxOmUrSY+m6h+PqfWo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gbgwDoye8TT//6qusPYwaUNopxEwBE+zptzh6ApWcWFDXYwAYLvV11xaHil2tpvRL
+	 Xk+Z1A1fSc5vtUFvn7efYpmxYvhhkbNXUOoTcNHqBOpGDxNCEqJpEq2ho+chQmtEH2
+	 ZSOaI7FFLiVxqov0VypsHbclg5Awdmzn5O7+qhXj1hmho7RydueCp76X2tp4fKqjhA
+	 ld7K9T9DWFICKZrSFIG0/ZTPfhC7/jqdLiREvDK3QSUTPajAMjhQAq+VTDSR9HG2Bw
+	 078/gZPndBG2rKtmW3rIhSxy7b5WTsC/hQXdzQf+gfDzvinn42f/ZvnDLOOsY3BREo
+	 F6n2dX1W6yx7g==
+Date: Fri, 18 Jul 2025 13:49:45 +0530
+From: Naveen N Rao <naveen@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: mlevitsk@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Vasant Hegde <vasant.hegde@amd.com>, Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+Subject: Re: [EARLY RFC] KVM: SVM: Enable AVIC by default from Zen 4
+Message-ID: <3xpfs5m5q6o74z5lx3aujdqub6ref2yypwcbz55ec5iefyqoy7@42g5nbgom637>
+References: <20250626145122.2228258-1-naveen@kernel.org>
+ <66bab47847aa378216c39f46e072d1b2039c3e0e.camel@redhat.com>
+ <aF2VCQyeXULVEl7b@google.com>
+ <4ae9c25e0ef8ce3fdd993a9b396183f3953c3de7.camel@redhat.com>
+ <bp7gjrbq2xzgirehv6emtst2kywjgmcee5ktvpiooffhl36stx@bemru6qqrnsf>
+ <aGxWkVu5qnWkZxqz@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250718062429.238723-1-lulu@redhat.com>
-In-Reply-To: <20250718062429.238723-1-lulu@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 18 Jul 2025 15:52:30 +0800
-X-Gm-Features: Ac12FXwBVT6a31yvU0qqbtQu-2z0AJwY7ghH6LYTEkWi9oJSf_Mb34yGWOF4UH0
-Message-ID: <CACGkMEv0yHC7P1CLeB8A1VumWtTF4Bw4eY2_njnPMwT75-EJkg@mail.gmail.com>
-Subject: Re: [PATCH v1] kvm: x86: implement PV send_IPI method
-To: Cindy Lu <lulu@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, 
-	"maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>, 
-	"Peter Zijlstra (Intel)" <peterz@infradead.org>, "Kirill A. Shutemov" <kas@kernel.org>, "Xin Li (Intel)" <xin@zytor.com>, 
-	Rik van Riel <riel@surriel.com>, "Ahmed S. Darwish" <darwi@linutronix.de>, 
-	"open list:KVM PARAVIRT (KVM/paravirt)" <kvm@vger.kernel.org>, 
-	"open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aGxWkVu5qnWkZxqz@google.com>
 
-On Fri, Jul 18, 2025 at 2:25=E2=80=AFPM Cindy Lu <lulu@redhat.com> wrote:
->
-> From: Jason Wang <jasowang@redhat.com>
->
-> We used to have PV version of send_IPI_mask and
-> send_IPI_mask_allbutself. This patch implements PV send_IPI method to
-> reduce the number of vmexits.
->
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
-> Tested-by: Cindy Lu <lulu@redhat.com>
+On Mon, Jul 07, 2025 at 04:21:53PM -0700, Sean Christopherson wrote:
+> On Fri, Jun 27, 2025, Naveen N Rao wrote:
+> > > Back when I implemented this, I just wanted to be a bit safer, a bit more explicit that
+> > > this uses an undocumented feature.
+> > > 
+> > > It doesn't matter much though.
+> > > 
+> > > > 
+> > > > I don't see any reason to do major surgery, just give "avic" auto -1/0/1 behavior:
+> > 
+> > I am wary of breaking existing users/deployments on Zen4/Zen5 enabling 
+> > AVIC by specifying avic=on, or avic=true today. That's primarily the 
+> > reason I chose not to change 'avic' into an integer. Also, post module 
+> > load, sysfs reports the value for 'avic' as a 'Y' or 'N' today. So if 
+> > there are scripts relying on that, those will break if we change 'avic' 
+> > into an integer.
+> 
+> That's easy enough to handle, e.g. see nx_huge_pages_ops for a very similar case
+> where KVM has "auto" behavior (and a "never" case too), but otherwise treats the
+> param like a bool.
 
-I think a question here is are we able to see performance improvement
-in any kind of setup?
+Nice! Looks like I can re-use existing callbacks for this too:
+    static const struct kernel_param_ops avic_ops = {
+	    .flags = KERNEL_PARAM_OPS_FL_NOARG,
+	    .set = param_set_bint,
+	    .get = param_get_bool,
+    };
 
-Thanks
+    /* enable/disable AVIC (-1 = auto) */
+    int avic = -1;
+    module_param_cb(avic, &avic_ops, &avic, 0444);
+    __MODULE_PARM_TYPE(avic, "bool");
+
+> 
+> > For Zen1/Zen2, as I mentioned, it is unlikely that anyone today is 
+> > enabling AVIC and expecting it to work since the workaround is only just 
+> > hitting upstream. So, I'm hoping requiring force_avic=1 should be ok 
+> > with the taint removed.
+> 
+> But if that's the motivation, changing the semantics of force_avic doesn't make
+> any sense.  Once the workaround lands, the only reason for force_avic to exist
+> is to allow forcing KVM to enable AVIC even when it's not supported.
+
+Indeed.
+
+> 
+> > Longer term, once we get wider testing with the workaround on Zen1/Zen2, 
+> > we can consider relaxing the need for force_avic, at which point AVIC 
+> > can be default enabled
+> 
+> I don't see why the default value for "avic" needs to be tied to force_avic.
+> If we're not confident that AVIC is 100% functional and a net positive for the
+> vast majority of setups/workloads on Zen1/Zen2, then simply leave "avic" off by
+> default for those CPUs.  If we ever want to enable AVIC by default across the
+> board, we can simply change the default value of "avic".
+> 
+> But to be honest, I don't see any reason to bother trying to enable AVIC by default
+> for Zen1/Zen2.  There's a very real risk that doing so would regress existing users
+> that have been running setups for ~6 years, and we can't fudge around AVIC being
+> hidden on Zen3 (and the IOMMU not supporting it at all), i.e. enabling AVIC by
+> default only for Zen4+ provides a cleaner story for end users.
+
+Works for me. I completely agree with that.
+
+
+Thanks,
+Naveen
 
 
