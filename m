@@ -1,163 +1,213 @@
-Return-Path: <kvm+bounces-52927-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52928-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 548A5B0AA7D
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 21:00:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 426E0B0AA7F
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 21:00:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 08F8BAA1AEC
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 18:59:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F05FD3AD4D0
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 19:00:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80AAC2E8893;
-	Fri, 18 Jul 2025 18:59:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A61C32E7F33;
+	Fri, 18 Jul 2025 19:00:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AhLtfNvx"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G4Z6UVUU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48D6218E20
-	for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 18:59:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D4A62E36EE
+	for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 19:00:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752865193; cv=none; b=oytxNB3YM4GPT2uwTz9ty18hB7GJePajBo8QT52UKwZhGMIY1hP69X9QehJgohnWBoS/h7+HxszV9emGZg/AsE1aJIYxOYlpA5MwjltEl0AI8ePr3KYqnhWPa3lZUGFIx/MbmSPeQ1sZ6/5RLGa2BYpL1k6/M8KvDgqC63Z8HPY=
+	t=1752865239; cv=none; b=C+NJPEbsCjHpumxH5y78YXJStJ8/QDp8oNTT9LpEaDpIwMSupFM5JBNm0W9tf2mLNG0/byqyDYOLCabOqxezn4dCuDLnoNXwG6vksr60NlEqPkJZt0Yhx/MUv+j1MyjdL9mmPzLCsYbUKeWc9iavLHHzwqPIIPPNV5NAdTvqjxQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752865193; c=relaxed/simple;
-	bh=taE+/ctRGOPew3+5bSYl2Hv+oOd5K+FCRxlMfgVgMuY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=S/KlWS3PhoUOPoj2VO52GLcR2m1ZH2B++5UxfhAV4royQSx2MOUFYZFi2YtqPfzRksL0BhdB9vZh514sJ4pzRCMJK2SWe+336K2l+v4xITkyKXyJjX6JbAOgZlGBb2hZd799WzsnS5+WS68/9AZI9l+ZRyfN5iaJbIfpSuJVg04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AhLtfNvx; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-235e389599fso32925ad.0
-        for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 11:59:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752865191; x=1753469991; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KrROO4+eR6/+Z0KaNlJ044e8PDoospst2QAllWf9w8w=;
-        b=AhLtfNvxtK7cG3XM6ELKoBABQrTllPNpcu94ubGXIu0to9ZZffmzQX8BARS6F0Pu2L
-         5kzg7/oqbbIl4TdCO4vaU2K2DzQrGU3VC6FxP9YkgT54z8Ptto+d4XbTmBYp5tjVnwvP
-         HPkNHnzajZ8+M9f0cbWjEfoTQrVFQGKJb136fqRVg7f982sHAgTUF+p/t0M7nbRQMKcD
-         el25i2iHwSd1VRWCNMOmDmZD7M91ryx4IgCHVO3dlSXm9SrUorqp8jnDzacawm5GZVR6
-         v3615r6CJGuoO/kS+3EQFGtmoauPcwI0Csmss+GVG4EwYLQLviLWsafeLpLwgHzzbKbS
-         6zxg==
+	s=arc-20240116; t=1752865239; c=relaxed/simple;
+	bh=veoWHeeI1Gm+Z/VWrGPVgODw868Qai1kaliqd0AgE/4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tYn3XmrGRzhe/3FiDflSljTd7yKw3GDgLyaYWrzxEfUZ5FUKOaHTUdC00Rn6L9afwdRnv+ylOAkS2/seYWtCGYw3l+1+UxhSbDkRKnVWgY9e93WOiOmNpVTMoXKwFgaqQSSK6Kl1s8dhxjiOq8MNFEl6mVZmNl0FdoSEdwDzcWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=G4Z6UVUU; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752865237;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fuzjkisuZnR7aiSCtO5mtZoLyIN2+57+reZAqeqjfrU=;
+	b=G4Z6UVUUApr4NVUuGh/RIBwoJnvWj5BDahPzvjDKokRLEaA07GZb+eodEOnDhF7SYU7QL5
+	yeHWqdzXcC0dHr+N4+n3Q+PwDuOFC0rFxNhl1iqXNAHfbRATP3UurborM2GTkJMMrJAd4x
+	6Q/8dMOVteN5ThSucLLQpvr3IYNkdmI=
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
+ [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-614-5gk3DwQbOHe_yRhpDrumDQ-1; Fri, 18 Jul 2025 15:00:35 -0400
+X-MC-Unique: 5gk3DwQbOHe_yRhpDrumDQ-1
+X-Mimecast-MFC-AGG-ID: 5gk3DwQbOHe_yRhpDrumDQ_1752865234
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-3138c50d2a0so3527183a91.2
+        for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 12:00:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752865191; x=1753469991;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KrROO4+eR6/+Z0KaNlJ044e8PDoospst2QAllWf9w8w=;
-        b=fMpzmjfsG1RU3DA7/EoofJwJ+D6gDnHkRSoGRVzTKtmAcr1gkgewBtX0V0iFAJoc4l
-         1Q+I5MDGevApFSIfdbWSm+zC1wuklfHqVcEMTE+lTR4WzJPXaS7vT8mAyUn/+soivGYL
-         DHx1tDEPLxM0v+SGYu0C01VwRl2ZGWYOR8ZjsnN/6F+4pbwt7xQ1nBT36PcFix9oMVfp
-         USLEeJPs3bFz2CKl1Yq3pqHwiIQksKyqzcJ5PyXJJ7nD8CM+C25ZIQSw2A0WQMwicXWI
-         RhmLBdhNy+795NfExWvp6goIX7hZ+YlDQyvyhVZYIjI61CoDusSqnqI1U86AGeQX3qJq
-         3L/w==
-X-Forwarded-Encrypted: i=1; AJvYcCV5OOyND3DXS/v7bPHw/zuTc91nKrg2Arnv641Wh0OAxSShwFMJg1ubA5YDpXr2X3zlvmY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YybW4aEoLrqhhbKlF1A3jmwSrCRmADC+tLMqDdBFcmx4F74pP4A
-	WaSnH4nTxVPO+3w4RnM+urQvhqP8UKvaJVKWAOEdNKWGk3bdLutczVXdYY57A309QGjhq3/K6Oh
-	l0j4cB41hKO1aUdNvdXFkqE2/k/cVPM0T762hI5Hf
-X-Gm-Gg: ASbGncsotKvy4HOVKyrO/TNAoQDwGmdYq4B9xFeZ9VM5uS+k25sXodtWMqB1TZN4xBe
-	/0OxnOMxd9JKYPyhouhcjnrFSxKRs01TAo7hW8VSKiMMyBQx59/93CoX+1Kv3gmHqadusaCbUiT
-	HsLm8h/OMoNEHrls+pKzpR4+wYcmo9+yTcbCFnK7fMo5OLbbPfVAGLlcbo8OjGbbM2aGFqoBF3b
-	USQJeo1JcmY71Zb00A9E4nbKtxlG3JRQuPpVToN
-X-Google-Smtp-Source: AGHT+IFpf5quYC1vdY93qwtkt519zsw+ML1HvqAXK+aPQMdz4ELJvbogdmOIVNoHWEPpznqkON8Fny73GNCipKvP1Ig=
-X-Received: by 2002:a17:902:f78c:b0:235:e1d6:5339 with SMTP id
- d9443c01a7336-23f71db7bbdmr323975ad.26.1752865191118; Fri, 18 Jul 2025
- 11:59:51 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1752865234; x=1753470034;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fuzjkisuZnR7aiSCtO5mtZoLyIN2+57+reZAqeqjfrU=;
+        b=m0/llYiL/uq48P5Kl6ArCW9QlLDXTk46MG39s0mlrJL20ahuarclrg5EUR19cZ/Z38
+         wekkNch8bqVLtUcUIz5+qMZqtc3ACp/y/G7vu82pSFn+23AJ9G4YixFfDe3kqj8fEgSr
+         IG39MEsoFFsrA4qLkPJcsUKGN/yw5LAHnQxUbSIpPAyDyYqeD6utAriJLvSeUvPr8uwS
+         YiqUddVnMvQuXtAK6viMBAOzhaW4VU1rK/h/Ktvgg7z3uDNL607hccWOIgITU9bNqj4n
+         JWQhvIyKf3BANx3kCgLGkDzTtDsP/qrKltLdBhOazcmfa4b9gyQvuN4ODl/m0Ls21Qi9
+         GFxg==
+X-Forwarded-Encrypted: i=1; AJvYcCUKc5UosjT2SSf/I0LDeOsAbX63xmo8uO2Puj269p25AOQAfgTDf2KofaiOIfV+sZu4C3k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxoO+oK7ExRVO6InFA0Tk9Lsuw+wxqKeyqVabVefjcLLOwWrCZP
+	DBwvM+J2semxm1AD+7EwHbhqJHffINYDpZoqbJyajoYMCN++/cDbFn1e0NtrajxIm3CUgSBMQ3Z
+	ZJSbeF8xpOc1DX3x3JLFsT6A82TOoUUWkEaG85QvLcWoEfipMMjjGpw==
+X-Gm-Gg: ASbGncu2OUGv5eDmNVhluXvu44YS4c2j8sv2bWb7OsMqCo0fof9t3SuJubG+6AzdY2G
+	m0pZE4pVsWMOVdqBxiUwgh3RqGPTWa7iO6TEdhzYjjiEZ9znlMBHUUy2cModBuEGUUwCvdJoWGZ
+	Vqc+SEhAmyXjPatjFSihkOA0FSQolo1J0sKiUdklqXsZHxGjg9IQn/N/wPybT9OadRjzOB2ErUo
+	567fmOB7yU0/E6Rrtu1hqES+kpHbu+z54cWxdrBhUMNtLalUCgh0TGeebf2+p/yp1fCrHGMQQcG
+	ZV6cdszzw5lGdSfr5o9BJYDd+2BZlIRTynbaU/Qi
+X-Received: by 2002:a17:90b:4ec8:b0:311:c970:c9ce with SMTP id 98e67ed59e1d1-31caf8f0311mr11212464a91.28.1752865234284;
+        Fri, 18 Jul 2025 12:00:34 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEuByiZID+4aMiL/O1DOKL6YE07GBrCSQNpOuPpUzXosmW3/GE0r8YaZaCryfvXqwrxsY8cDg==
+X-Received: by 2002:a17:90b:4ec8:b0:311:c970:c9ce with SMTP id 98e67ed59e1d1-31caf8f0311mr11212413a91.28.1752865233617;
+        Fri, 18 Jul 2025 12:00:33 -0700 (PDT)
+Received: from [192.168.40.164] ([70.105.235.240])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31cc33715b2sm1765550a91.24.2025.07.18.12.00.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 18 Jul 2025 12:00:33 -0700 (PDT)
+Message-ID: <1b47ede0-bd64-46b4-a24f-4b01bbdd9710@redhat.com>
+Date: Fri, 18 Jul 2025 15:00:28 -0400
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250709232103.zwmufocd3l7sqk7y@amd.com> <aG_pLUlHdYIZ2luh@google.com>
- <aHCUyKJ4I4BQnfFP@yzhao56-desk> <20250711151719.goee7eqti4xyhsqr@amd.com>
- <aHEwT4X0RcfZzHlt@google.com> <aHSgdEJpY/JF+a1f@yzhao56-desk>
- <aHUmcxuh0a6WfiVr@google.com> <aHWqkodwIDZZOtX8@yzhao56-desk>
- <aHoQa4dBSi877f1a@yzhao56-desk.sh.intel.com> <CAGtprH9kwV1RCu9j6LqToa5M97_aidGN2Lc2XveQdeR799SK6A@mail.gmail.com>
- <687a959ad915e_3c99a32942b@iweiny-mobl.notmuch>
-In-Reply-To: <687a959ad915e_3c99a32942b@iweiny-mobl.notmuch>
-From: Vishal Annapurve <vannapurve@google.com>
-Date: Fri, 18 Jul 2025 11:59:39 -0700
-X-Gm-Features: Ac12FXxYJMxLN5HPBgnNv0VYOyT__JVaniVIs9JK603HrHK22vQiSEL3DYC88P4
-Message-ID: <CAGtprH-DprCYLCYK3T7fQ23xAkTb9HdMbbp3TJ=-QgenNz8=mg@mail.gmail.com>
-Subject: Re: [RFC PATCH] KVM: TDX: Decouple TDX init mem region from kvm_gmem_populate()
-To: Ira Weiny <ira.weiny@intel.com>
-Cc: Yan Zhao <yan.y.zhao@intel.com>, Sean Christopherson <seanjc@google.com>, 
-	Michael Roth <michael.roth@amd.com>, pbonzini@redhat.com, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, rick.p.edgecombe@intel.com, kai.huang@intel.com, 
-	adrian.hunter@intel.com, reinette.chatre@intel.com, xiaoyao.li@intel.com, 
-	tony.lindgren@intel.com, binbin.wu@linux.intel.com, dmatlack@google.com, 
-	isaku.yamahata@intel.com, david@redhat.com, ackerleytng@google.com, 
-	tabba@google.com, chao.p.peng@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 03/16] iommu: Compute iommu_groups properly for PCIe
+ switches
+Content-Language: en-US
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Bjorn Helgaas <bhelgaas@google.com>, iommu@lists.linux.dev,
+ Joerg Roedel <joro@8bytes.org>, linux-pci@vger.kernel.org,
+ Robin Murphy <robin.murphy@arm.com>, Will Deacon <will@kernel.org>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Lu Baolu <baolu.lu@linux.intel.com>, galshalom@nvidia.com,
+ Joerg Roedel <jroedel@suse.de>, Kevin Tian <kevin.tian@intel.com>,
+ kvm@vger.kernel.org, maorg@nvidia.com, patches@lists.linux.dev,
+ tdave@nvidia.com, Tony Zhu <tony.zhu@intel.com>
+References: <3-v2-4a9b9c983431+10e2-pcie_switch_groups_jgg@nvidia.com>
+ <5b1f12e0-9113-41c4-accb-d8ab755cc7d7@redhat.com>
+ <20250718180947.GB2394663@nvidia.com>
+From: Donald Dutile <ddutile@redhat.com>
+In-Reply-To: <20250718180947.GB2394663@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jul 18, 2025 at 11:41=E2=80=AFAM Ira Weiny <ira.weiny@intel.com> wr=
-ote:
->
-> Vishal Annapurve wrote:
-> > On Fri, Jul 18, 2025 at 2:15=E2=80=AFAM Yan Zhao <yan.y.zhao@intel.com>=
- wrote:
-> > >
-> > > On Tue, Jul 15, 2025 at 09:10:42AM +0800, Yan Zhao wrote:
-> > > > On Mon, Jul 14, 2025 at 08:46:59AM -0700, Sean Christopherson wrote=
-:
-> > > > > > >         folio =3D __kvm_gmem_get_pfn(file, slot, index, &pfn,=
- &is_prepared, &max_order);
-> > > > > > If max_order > 0 is returned, the next invocation of __kvm_gmem=
-_populate() for
-> > > > > > GFN+1 will return is_prepared =3D=3D true.
-> > > > >
-> > > > > I don't see any reason to try and make the current code truly wor=
-k with hugepages.
-> > > > > Unless I've misundertood where we stand, the correctness of hugep=
-age support is
-> > > > Hmm. I thought your stand was to address the AB-BA lock issue which=
- will be
-> > > > introduced by huge pages, so you moved the get_user_pages() from ve=
-ndor code to
-> > > > the common code in guest_memfd :)
-> > > >
-> > > > > going to depend heavily on the implementation for preparedness.  =
-I.e. trying to
-> > > > > make this all work with per-folio granulartiy just isn't possible=
-, no?
-> > > > Ah. I understand now. You mean the right implementation of __kvm_gm=
-em_get_pfn()
-> > > > should return is_prepared at 4KB granularity rather than per-folio =
-granularity.
-> > > >
-> > > > So, huge pages still has dependency on the implementation for prepa=
-redness.
-> > > Looks with [3], is_prepared will not be checked in kvm_gmem_populate(=
-).
-> > >
-> > > > Will you post code [1][2] to fix non-hugepages first? Or can I pull=
- them to use
-> > > > as prerequisites for TDX huge page v2?
-> > > So, maybe I can use [1][2][3] as the base.
-> > >
-> > > > [1] https://lore.kernel.org/all/aG_pLUlHdYIZ2luh@google.com/
-> > > > [2] https://lore.kernel.org/all/aHEwT4X0RcfZzHlt@google.com/
-> >
-> > IMO, unless there is any objection to [1], it's un-necessary to
-> > maintain kvm_gmem_populate for any arch (even for SNP). All the
-> > initial memory population logic needs is the stable pfn for a given
-> > gfn, which ideally should be available using the standard mechanisms
-> > such as EPT/NPT page table walk within a read KVM mmu lock (This patch
-> > already demonstrates it to be working).
-> >
-> > It will be hard to clean-up this logic once we have all the
-> > architectures using this path.
->
-> Did you mean to say 'not hard'?
+Jason,
+Thanks for replies, clarifications...
+Couple questions below.
 
-Let me rephrase my sentence:
-It will be harder to remove kvm_gmem_populate if we punt it to the future.
+On 7/18/25 2:09 PM, Jason Gunthorpe wrote:
+> On Thu, Jul 17, 2025 at 06:03:42PM -0400, Donald Dutile wrote:
+>>> +static struct iommu_group *pci_get_alias_group(struct pci_dev *pdev)
+>> So, the former pci_device_group() is completely re-written below,
+>> and what it use to do is renamed pci_get_alias_group(), which shouldn't be
+>> (easily) confused with ...
+>>
+>>> +{
+>>> +	struct iommu_group *group;
+>>> +	DECLARE_BITMAP(devfns, 256) = {};
+>>>    	/*
+>>>    	 * Look for existing groups on device aliases.  If we alias another
+>>>    	 * device or another device aliases us, use the same group.
+>>>    	 */
+>>> -	group = get_pci_alias_group(pdev, (unsigned long *)devfns);
+>>> +	group = get_pci_alias_group(pdev, devfns);
+>> ... get_pci_alias_group() ?
+>>
+>> ... and it's only used for PCIe case below (in pci_device_group), so
+>> should it be named 'pcie_get_alias_group()' ?
+> 
+> Well, the naming is alot better after this is reworked with the
+> reachable set patch and these two functions are removed.
+> 
+Didn't notice that... will re-look.
+
+> But even then I guess it is not a great name.
+> 
+> How about:
+> 
+> /*
+>   * Return a group if the function has isolation restrictions related to
+>   * aliases or MFD ACS.
+>   */
+> static struct iommu_group *pci_get_function_group(struct pci_dev *pdev)
+> {
+> 
+sure...
+
+>>> +static struct iommu_group *pci_hierarchy_group(struct pci_dev *pdev)
+>> although static, could you provide a function description for its purpose ?
+> 
+> /* Return a group if the upstream hierarchy has isolation restrictions. */
+> 
+>>> +	/*
+>>> +	 * !self is only for SRIOV virtual busses which should have been
+>>> +	 * excluded above.
+>> by pci_is_root_bus() ?? -- that checks if bus->parent exists...
+>> not sure how that excludes the case of !bus->self ...
+> 
+> Should be this:
+> 
+> 	/*
+> 	 * !self is only for SRIOV virtual busses which should have been
+> 	 * excluded by pci_physfn()
+> 	 */
+> 	if (WARN_ON(!bus->self))
+> 
+my Linux tree says its this:
+static inline bool pci_is_root_bus(struct pci_bus *pbus)
+{
+         return !(pbus->parent);
+}
+
+is there a change to pci_is_root_bus() in a -next branch?
+
+>>> +	 */
+>>> +	if (WARN_ON(!bus->self))
+>>> +		return ERR_PTR(-EINVAL);
+>>> +
+>>> +	group = iommu_group_get(&bus->self->dev);
+>>> +	if (!group) {
+>>> +		/*
+>>> +		 * If the upstream bridge needs the same group as pdev then
+>>> +		 * there is no way for it's pci_device_group() to discover it.
+>>> +		 */
+>>> +		dev_err(&pdev->dev,
+>>> +			"PCI device is probing out of order, upstream bridge device of %s is not probed yet\n",
+>>> +			pci_name(bus->self));
+>>> +		return ERR_PTR(-EPROBE_DEFER);
+>>> +	}
+>>> +	if (group->bus_data & BUS_DATA_PCI_NON_ISOLATED)
+>>> +		return group;
+>>> +	iommu_group_put(group);
+>>> +	return NULL;
+>> ... and w/o the function description, I don't follow:
+>> -- rtn an iommu-group if it has NON_ISOLATED property ... but rtn null if all devices below it are isolated?
+> 
+> Yes. For all these internal functions non null means we found a group
+> to join, NULL means to keep checking isolation rules.
+> 
+ah, so !group == keep looking for for non-isolated conditions.. got it.
+Could that lead to two iommu-groups being created that could/should be one larger one?
+
+> Thanks,
+> Jason
+> 
+
 
