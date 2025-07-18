@@ -1,81 +1,57 @@
-Return-Path: <kvm+bounces-52861-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52862-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D1C6B09B4D
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 08:25:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9477AB09BB0
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 08:50:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 288933ADC15
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 06:24:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9FF10168775
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 06:50:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 069A41F4C9F;
-	Fri, 18 Jul 2025 06:25:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96E6E202960;
+	Fri, 18 Jul 2025 06:50:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hTNgh+38"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aWPBmRcU"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7A4319E97C
-	for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 06:25:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF3114689;
+	Fri, 18 Jul 2025 06:50:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752819916; cv=none; b=u8SFj0NVbLFw0+DcBIlRkCl0LMG3BcIZzo9lVQtoe6eIvAjvUCHUkPVQpo71gjCgO5C3qySVcEUbLyanKjAJsuYvlro67uC5W73Rm1WzQRCJ/UicwXfwOLrLM5gse2YcWOC6U+8rLG59nChf2Xl6C50eUdr5lcSCHtgTi9mXyak=
+	t=1752821406; cv=none; b=LyJrPEO6iRCEy7qTF0SaCOzEwugdeHTXe4biWvmkHsq6oH8cOVwoSmeAyu+16SAkXOmhkN/l2juDWzmvMrT+5vYMGdQ7gFD8HcGWnDCoCWpOIxVo3AUhLBQPGNfwyTH6KsR+sJY9AyhAhbJ08cmeKcx6kgmZuMpZcsUbzm5jr2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752819916; c=relaxed/simple;
-	bh=Js+lVIECA+MlpwBwikv6Sh9BN+SgNuc+l3FHZUeQABg=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=t2JgBBZTF2j75FugHJwtO/7s23l5UmIHsM9ku1rOl0X+vx+P7Mp89253kuefo1vqTC8x5a8JGd9Ornhh+Cqddvdl0mQVmyFB26M4F81VOojP0J44MBUPSeeC7owVnTzPoYy34VcIJqA5yuAy9Y7V3vBHwx8126RdMoW4D26vr5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hTNgh+38; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752819912;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=a7673uBYPxlpUD9zTGRiH5JAVGUBZV+mL2ewwlCRHbA=;
-	b=hTNgh+38tV/cvNy3P9FJOU41vSJzB030BcWfVLrsK4l8M7hbRzx+jMFQalRu6dRKd80NVa
-	1l7F0S0uIbhqxEEbYXiEiBtzF+Hp0PyufCb6pcRxMiNTJLSIWrTQZQ4+AIFha756Ji8fw0
-	0Wdk0IKgF4Y3bRITRnsrzH2MQx3a74s=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-444-sUPP16efOQKmySaaf90OyQ-1; Fri,
- 18 Jul 2025 02:25:09 -0400
-X-MC-Unique: sUPP16efOQKmySaaf90OyQ-1
-X-Mimecast-MFC-AGG-ID: sUPP16efOQKmySaaf90OyQ_1752819907
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A71AB1800165;
-	Fri, 18 Jul 2025 06:24:59 +0000 (UTC)
-Received: from server.redhat.com (unknown [10.72.112.34])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id AB44E195608D;
-	Fri, 18 Jul 2025 06:24:50 +0000 (UTC)
-From: Cindy Lu <lulu@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	x86@kernel.org (maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
-	"H. Peter Anvin" <hpa@zytor.com>,
-	"Peter Zijlstra (Intel)" <peterz@infradead.org>,
-	"Kirill A. Shutemov" <kas@kernel.org>,
-	"Xin Li (Intel)" <xin@zytor.com>,
-	Rik van Riel <riel@surriel.com>,
-	Jason Wang <jasowang@redhat.com>,
-	"Ahmed S. Darwish" <darwi@linutronix.de>,
-	kvm@vger.kernel.org (open list:KVM PARAVIRT (KVM/paravirt)),
-	linux-kernel@vger.kernel.org (open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
-	lulu@redhat.com
-Subject: [PATCH v1] kvm: x86: implement PV send_IPI method
-Date: Fri, 18 Jul 2025 14:24:00 +0800
-Message-ID: <20250718062429.238723-1-lulu@redhat.com>
+	s=arc-20240116; t=1752821406; c=relaxed/simple;
+	bh=dNjvBvVDoDotAFqXuu1WvpTaH3Qa0mGPmPm5pFh2/Ak=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NOH0sKb073NFsli47l2TxO4Ow+J3Xpa2EfU2Nh2EXfmAl6Ep0IJ5oub69PiGMjiJgQJzW32vPIfjTvxzSrpr34hHtG8jILzjhX7h0J+6h6IS+8teFUA+qFHBQltL5TO/VoclrL3HZpLIDANMqTHQlYu0ct+kktpTqVKBSdcsnQg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aWPBmRcU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4763C4CEED;
+	Fri, 18 Jul 2025 06:50:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752821406;
+	bh=dNjvBvVDoDotAFqXuu1WvpTaH3Qa0mGPmPm5pFh2/Ak=;
+	h=From:To:Cc:Subject:Date:From;
+	b=aWPBmRcUizrhKxkHZiMJZ3hKRzdlzmVExliBwBmN6rVqFApnfeGNczbG5HjX8GI6T
+	 ubaZAxeKcp/0J3y7q54A34FztCVsI/4wF+WhOX8ar4mf33eG/52eY1LHNJEAjgye3v
+	 8NaEVpVjSydhJ4UaO39nUGiWDcKXeqKesLoxOzqR6ng8Ah3pF8fFPDyO8ExNsUO5RA
+	 XA6zpWqpQIz/7dJBSnvd0X8SznnO4z2jO/QjVd2UDZ0SaiQ7M+a5MlE9DvsYJg/ZAJ
+	 PjET131RzaxjSbiId9I/ICd+DbtyUmKg9xMM6cTQnarS/58VhzT2S/jHqxeqy03v2g
+	 rJ2BheY0edfNA==
+From: "Naveen N Rao (AMD)" <naveen@kernel.org>
+To: Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>
+Cc: <kvm@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>,
+	Maxim Levitsky <mlevitsk@redhat.com>,
+	Vasant Hegde <vasant.hegde@amd.com>,
+	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+Subject: [RFC PATCH 0/3] KVM: SVM: Fix IRQ window inhibit handling
+Date: Fri, 18 Jul 2025 12:13:33 +0530
+Message-ID: <cover.1752819570.git.naveen@kernel.org>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,45 +59,42 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-From: Jason Wang <jasowang@redhat.com>
+Sean, Paolo,
+I have attempted to take the changes discussed in the below thread and 
+to convert them into a patch series:
+http://lkml.kernel.org/r/Z6JoInXNntIoHLQ8@google.com
 
-We used to have PV version of send_IPI_mask and
-send_IPI_mask_allbutself. This patch implements PV send_IPI method to
-reduce the number of vmexits.
+I have tried to describe the changes, but the nested aspects would 
+definitely need a review to ensure correctness and that all aspects are 
+covered there.
 
-Signed-off-by: Jason Wang <jasowang@redhat.com>
-Tested-by: Cindy Lu <lulu@redhat.com>
----
- arch/x86/kernel/kvm.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+None of these patches include patch tags since none were provided in the 
+discussion. I have proposed patch trailers on the individual patches.  
+Please take a look and let me know if that's fine.
 
-diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-index 921c1c783bc1..b920cfd10441 100644
---- a/arch/x86/kernel/kvm.c
-+++ b/arch/x86/kernel/kvm.c
-@@ -557,6 +557,11 @@ static void __send_ipi_mask(const struct cpumask *mask, int vector)
- 	local_irq_restore(flags);
- }
- 
-+static void kvm_send_ipi(int cpu, int vector)
-+{
-+	__send_ipi_mask(cpumask_of(cpu), vector);
-+}
-+
- static void kvm_send_ipi_mask(const struct cpumask *mask, int vector)
- {
- 	__send_ipi_mask(mask, vector);
-@@ -628,6 +633,7 @@ late_initcall(setup_efi_kvm_sev_migration);
-  */
- static __init void kvm_setup_pv_ipi(void)
- {
-+	apic_update_callback(send_IPI, kvm_send_ipi);
- 	apic_update_callback(send_IPI_mask, kvm_send_ipi_mask);
- 	apic_update_callback(send_IPI_mask_allbutself, kvm_send_ipi_mask_allbutself);
- 	pr_info("setup PV IPIs\n");
+I tested this lightly with nested guests as well and it is working fine 
+for me.
+
+
+Thanks,
+Naveen
+
+
+Naveen N Rao (AMD) (3):
+  KVM: SVM: Fix clearing IRQ window inhibit with nested guests
+  KVM: SVM: Fix IRQ window inhibit handling across multiple vCPUs
+  KVM: SVM: Optimize IRQ window inhibit handling
+
+ arch/x86/include/asm/kvm_host.h | 16 +++++++++
+ arch/x86/kvm/svm/svm.h          |  1 +
+ arch/x86/kvm/svm/svm.c          | 60 ++++++++++++++++++++-------------
+ arch/x86/kvm/x86.c              | 45 ++++++++++++++++++++++++-
+ 4 files changed, 98 insertions(+), 24 deletions(-)
+
+
+base-commit: 87198fb0208a774d0cb8844744c67ee8680eafab
 -- 
-2.45.0
+2.50.1
 
 
