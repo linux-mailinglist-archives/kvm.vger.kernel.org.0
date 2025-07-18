@@ -1,46 +1,46 @@
-Return-Path: <kvm+bounces-52863-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52864-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1E98B09BB1
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 08:50:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8FE7B09BB4
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 08:50:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69ACAA651D0
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 06:50:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D41B31C44F43
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 06:51:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2DEC211A35;
-	Fri, 18 Jul 2025 06:50:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CB84218AC4;
+	Fri, 18 Jul 2025 06:50:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q9ugq7bi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z86NTFOB"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 149394689;
-	Fri, 18 Jul 2025 06:50:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75C422165E2;
+	Fri, 18 Jul 2025 06:50:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752821410; cv=none; b=HUZZvtBwW+f996y76nDdtXKXkMfGgFtjEi5IHQVVIvlK2F7VtAKKkL9JOid1MG5wnl20sZyckJFUO4sTruLmqxiTUh0bnvMQuBUryZk3ev+lS14AjwWrKcjnUOZYmKRSMCZfP+IN1OrYBmrsUZOdQOZEIQ+hOOUoiPBirlxrjpE=
+	t=1752821413; cv=none; b=SC/wg9gB0kZ1h+D3H5bg8jDhlh/uDcXsKHTiRYKa4T1rj5rOa2RqU0HHQuywz0qTiWgjT6Bq5+yKMuHx8iQcRm+2aKHDqN6Z90tb29Qu3Pb2JvYg/4K6Zvva1y5xSgC738ZCZK0jGOZOYujAP6QK4WuFM48SRl0PFsxySZAaV4I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752821410; c=relaxed/simple;
-	bh=XrFBk8x+OWa3nl89tWLrZkApIwuYMYk2RcQ5/FWpPdE=;
+	s=arc-20240116; t=1752821413; c=relaxed/simple;
+	bh=az5WShJBzTatj4e1fADgsYjVxGvIrztySJpSGhfMsTw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cJvufDS7T6V6+w50u5lYJGsOJ6Sg/0kXeAr2LgLsqIbrzf40DB/MwcdbYTw51WD1WIHaSK41+PdKpAc1YBbFJ/s3d0RODLzJSSsYls1kgId9Br/+Lx3rM9OCpsInLF+Vtl8Trf5/kqjhQjmOgHYhhs3PU4l5Il2MXVnuo1ZUqRM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q9ugq7bi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28987C4CEED;
-	Fri, 18 Jul 2025 06:50:08 +0000 (UTC)
+	 MIME-Version; b=eYCnW99ptjHdT80iEiMIYlP9lgFhZST4VM6BRICXqa/SFo5VtMydIUHi950jD8b7oDmy8PbKchD6CtCM7ty23Q0U1L95K31pxBcRZ5jrlWgA81E9zItB4aGKJooJ+1e5LEgcrGL3I6/tbYe/F4Zz6CFDh0kDt5j2POahHXOvFZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z86NTFOB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75F21C4CEF1;
+	Fri, 18 Jul 2025 06:50:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752821409;
-	bh=XrFBk8x+OWa3nl89tWLrZkApIwuYMYk2RcQ5/FWpPdE=;
+	s=k20201202; t=1752821413;
+	bh=az5WShJBzTatj4e1fADgsYjVxGvIrztySJpSGhfMsTw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=q9ugq7bijBxQOK9l6vImmigEf+SS722OXKzO/GF77b796++AN7FszwrWYGOqrz2+0
-	 VX+zOxVMv/ucIFZSrfgLT0Pu5A1VU1pu4jfPkbszu7tqBdHeGtZc4iVUMELP6IQT8M
-	 iBOD1sTFsXLGX3PtE4shJNqwdioIE0KBAneUIL/n9XFZ/3haVLJbq6/yTnMwHVOuo/
-	 uuYUckhRQFJ+I4Yuhm12lllxEobymJvlsJDlIg6ROtmwJm7fEP33IANEP+k4YsxhxE
-	 FDtgUfTYrgEs+aldY3t0t+C4gXEjWOOR1Z9gBg5s5rTzMsYsclDgCLE9fgn8uHiDd1
-	 b2nFvaW7yYvwg==
+	b=Z86NTFOBdrdXBhXsplkHCCuStm6qe32seKJiBsueeHRNdm7CVlV1VJdDoC2IbsYvi
+	 e0KmG9wUf1Pqv8/wk4KZblrvuqKuMB0n1bKfoZJmwzJxJsuTcE+jGL3nNicxkJRAsW
+	 bt9HTHA7PeImgD2kdrxN5uPXcXR5SbMV+c4136W8P/2tarNLXVV88o1yw/2r48s8Zy
+	 i9iTb0SR4dZuZgbhOWiSTVsHTjF/QrJgPXTrMvoSkHM/JV7cW8k4E5BMWZn+Hknlml
+	 nI0i5rvIS2ct06Kp5zOXcWHnZ8Fk96BHM3I/sBVtKo71pLqoFuivvOR04Dfr//N8L0
+	 e94C78xhdqAkw==
 From: "Naveen N Rao (AMD)" <naveen@kernel.org>
 To: Sean Christopherson <seanjc@google.com>,
 	Paolo Bonzini <pbonzini@redhat.com>
@@ -49,9 +49,9 @@ Cc: <kvm@vger.kernel.org>,
 	Maxim Levitsky <mlevitsk@redhat.com>,
 	Vasant Hegde <vasant.hegde@amd.com>,
 	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-Subject: [RFC PATCH 2/3] KVM: SVM: Fix IRQ window inhibit handling across multiple vCPUs
-Date: Fri, 18 Jul 2025 12:13:35 +0530
-Message-ID: <26732815475bf1c5ba672bc3b1785265f1a994e6.1752819570.git.naveen@kernel.org>
+Subject: [RFC PATCH 3/3] KVM: SVM: Optimize IRQ window inhibit handling
+Date: Fri, 18 Jul 2025 12:13:36 +0530
+Message-ID: <55adf9e49743b8027231d66d79369b774a353536.1752819570.git.naveen@kernel.org>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <cover.1752819570.git.naveen@kernel.org>
 References: <cover.1752819570.git.naveen@kernel.org>
@@ -63,29 +63,49 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-IRQ window inhibits can be requested by multiple vCPUs at the same time
-for injecting interrupts meant for different vCPUs. However, AVIC
-inhibition is VM-wide and hence it is possible for the inhibition to be
-cleared prematurely by the first vCPU that obtains the IRQ window even
-though a second vCPU is still waiting for its IRQ window. This is likely
-not a functional issue since the other vCPU will again see that
-interrupts are pending to be injected (due to KVM_REQ_EVENT), and will
-again request for an IRQ window inhibition. However, this can result in
-AVIC being rapidly toggled resulting in high contention on
-apicv_update_lock and degrading performance of the guest.
+IRQ windows represent times during which an IRQ can be injected into a
+vCPU, and thus represent times when a vCPU is running with RFLAGS.IF=1
+and GIF enabled (TPR/PPR don't matter since KVM controls interrupt
+injection and it only injects one interrupt at a time). On SVM, when
+emulating the local APIC (i.e., AVIC disabled), KVM detects IRQ windows
+by injecting a dummy virtual interrupt through VMCB.V_IRQ and
+intercepting virtual interrupts (INTERCEPT_VINTR). This intercept
+triggers as soon as the guest enables interrupts and is about to take
+the dummy interrupt, at which point the actual interrupt can be injected
+through VMCB.EVENTINJ.
 
-Address this by maintaining a VM-wide count of the number of vCPUs that
-have requested for an IRQ window. Set/clear the inhibit reason when the
-count transitions between 0 and 1. This ensures that the inhibit reason
-is not cleared as long as there are some vCPUs still waiting for an IRQ
-window.
+When AVIC is enabled, VMCB.V_IRQ is ignored by the hardware and so
+detecting IRQ windows requires AVIC to be inhibited. However, this is
+only necessary for ExtINTs since all other interrupts can be injected
+either by directly setting IRR in the APIC backing page and letting the
+AVIC hardware inject the interrupt into the guest, or via VMCB.V_NMI for
+NMIs.
+
+If AVIC is enabled but inhibited for some other reason, KVM has to
+request for IRQ window inhibits every time it has to inject an interrupt
+into the guest. This is because APICv inhibits are dynamic in nature, so
+KVM has to be sure that AVIC is inhibited for purposes of discovering an
+IRQ window even if the other inhibit is cleared in the meantime.
+
+This is particularly problematic with APICV_INHIBIT_REASON_PIT_REINJ
+which stays set throughout the life of the guest and results in KVM
+rapidly toggling IRQ window inhibit resulting in contention on
+apicv_update_lock.
+
+Address this by setting and clearing APICV_INHIBIT_REASON_PIT_REINJ
+lazily: if some other inhibit reason is already set, just increment the
+IRQ window request count and do not update apicv_inhibit_reasons
+immediately. If any other inhibit reason is set/cleared in the meantime,
+re-evaluate APICV_INHIBIT_REASON_PIT_REINJ by checking the IRQ window
+request count and update apicv_inhibit_reasons appropriately. Otherwise,
+just the IRQ window request count is incremented/decremented each time
+an IRQ window is requested. This reduces much of the contention on the
+apicv_update_lock semaphore and does away with much of the performance
+degradation.
 
 ---
- arch/x86/include/asm/kvm_host.h | 16 +++++++++++++++
- arch/x86/kvm/svm/svm.h          |  1 +
- arch/x86/kvm/svm/svm.c          | 36 +++++++++++++++++++++++----------
- arch/x86/kvm/x86.c              | 19 +++++++++++++++++
- 4 files changed, 61 insertions(+), 11 deletions(-)
+ arch/x86/kvm/x86.c | 26 +++++++++++++++++++++++++-
+ 1 file changed, 25 insertions(+), 1 deletion(-)
 
 I think patch tags for this should be:
 	From: Sean Christopherson <seanjc@google.com>
@@ -98,138 +118,50 @@ I think patch tags for this should be:
 
 - Naveen
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index f19a76d3ca0e..b781b4f1d304 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1395,6 +1395,10 @@ struct kvm_arch {
- 	struct kvm_pit *vpit;
- #endif
- 	atomic_t vapics_in_nmi_mode;
-+
-+	/* Keep this in a cacheline separate from apicv_update_lock */
-+	atomic_t apicv_nr_irq_window_req;
-+
- 	struct mutex apic_map_lock;
- 	struct kvm_apic_map __rcu *apic_map;
- 	atomic_t apic_map_dirty;
-@@ -2263,6 +2267,18 @@ static inline void kvm_clear_apicv_inhibit(struct kvm *kvm,
- 	kvm_set_or_clear_apicv_inhibit(kvm, reason, false);
- }
- 
-+void kvm_inc_or_dec_irq_window_inhibit(struct kvm *kvm, bool inc);
-+
-+static inline void kvm_inc_apicv_irq_window_req(struct kvm *kvm)
-+{
-+	kvm_inc_or_dec_irq_window_inhibit(kvm, true);
-+}
-+
-+static inline void kvm_dec_apicv_irq_window_req(struct kvm *kvm)
-+{
-+	kvm_inc_or_dec_irq_window_inhibit(kvm, false);
-+}
-+
- int kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 error_code,
- 		       void *insn, int insn_len);
- void kvm_mmu_print_sptes(struct kvm_vcpu *vcpu, gpa_t gpa, const char *msg);
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 58b9d168e0c8..9ef6b5494e77 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -331,6 +331,7 @@ struct vcpu_svm {
- 
- 	bool guest_state_loaded;
- 
-+	bool avic_irq_window;
- 	bool x2avic_msrs_intercepted;
- 
- 	/* Guest GIF value, used when vGIF is not enabled */
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index bbe439c0e36a..0211b713174c 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -3681,8 +3681,11 @@ static void svm_inject_irq(struct kvm_vcpu *vcpu, bool reinjected)
- 	 * the case in which the interrupt window was requested while L1 was
- 	 * active (the vCPU was not running nested).
- 	 */
--	if (!kvm_cpu_has_injectable_intr(vcpu) || is_guest_mode(vcpu))
--		kvm_clear_apicv_inhibit(vcpu->kvm, APICV_INHIBIT_REASON_IRQWIN);
-+	if (svm->avic_irq_window &&
-+	    (!kvm_cpu_has_injectable_intr(vcpu) || is_guest_mode(vcpu))) {
-+		svm->avic_irq_window = false;
-+		kvm_dec_apicv_irq_window_req(svm->vcpu.kvm);
-+	}
- 
- 	if (vcpu->arch.interrupt.soft) {
- 		if (svm_update_soft_interrupt_rip(vcpu))
-@@ -3895,17 +3898,28 @@ static void svm_enable_irq_window(struct kvm_vcpu *vcpu)
- 	 */
- 	if (vgif || gif_set(svm)) {
- 		/*
--		 * IRQ window is not needed when AVIC is enabled,
--		 * unless we have pending ExtINT since it cannot be injected
--		 * via AVIC. In such case, KVM needs to temporarily disable AVIC,
--		 * and fallback to injecting IRQ via V_IRQ.
-+		 * KVM only enables IRQ windows when AVIC is enabled if there's
-+		 * pending ExtINT since it cannot be injected via AVIC (ExtINT
-+		 * bypasses the local APIC).  V_IRQ is ignored by hardware when
-+		 * AVIC is enabled, and so KVM needs to temporarily disable
-+		 * AVIC in order to detect when it's ok to inject the ExtINT.
- 		 *
--		 * If running nested, AVIC is already locally inhibited
--		 * on this vCPU, therefore there is no need to request
--		 * the VM wide AVIC inhibition.
-+		 * If running nested, AVIC is already locally inhibited on this
-+		 * vCPU (L2 vCPUs use a different MMU that never maps the AVIC
-+		 * backing page), therefore there is no need to increment the
-+		 * VM-wide AVIC inhibit.  KVM will re-evaluate events when the
-+		 * vCPU exits to L1 and enable an IRQ window if the ExtINT is
-+		 * still pending.
-+		 *
-+		 * Note, the IRQ window inhibit needs to be updated even if
-+		 * AVIC is inhibited for a different reason, as KVM needs to
-+		 * keep AVIC inhibited if the other reason is cleared and there
-+		 * is still an injectable interrupt pending.
- 		 */
--		if (!is_guest_mode(vcpu))
--			kvm_set_apicv_inhibit(vcpu->kvm, APICV_INHIBIT_REASON_IRQWIN);
-+		if (enable_apicv && !svm->avic_irq_window && !is_guest_mode(vcpu)) {
-+			svm->avic_irq_window = true;
-+			kvm_inc_apicv_irq_window_req(vcpu->kvm);
-+		}
- 
- 		svm_set_vintr(svm);
- 	}
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index a1c49bc681c4..216d1801a4f2 100644
+index 216d1801a4f2..845afcf6e85f 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -10575,6 +10575,25 @@ void kvm_set_or_clear_apicv_inhibit(struct kvm *kvm,
- }
- EXPORT_SYMBOL_GPL(kvm_set_or_clear_apicv_inhibit);
+@@ -10534,7 +10534,11 @@ void __kvm_set_or_clear_apicv_inhibit(struct kvm *kvm,
  
-+void kvm_inc_or_dec_irq_window_inhibit(struct kvm *kvm, bool inc)
-+{
-+	int add = inc ? 1 : -1;
+ 	old = new = kvm->arch.apicv_inhibit_reasons;
+ 
+-	set_or_clear_apicv_inhibit(&new, reason, set);
++	if (reason != APICV_INHIBIT_REASON_IRQWIN)
++		set_or_clear_apicv_inhibit(&new, reason, set);
 +
-+	if (!enable_apicv)
-+		return;
-+
++	set_or_clear_apicv_inhibit(&new, APICV_INHIBIT_REASON_IRQWIN,
++				   atomic_read(&kvm->arch.apicv_nr_irq_window_req));
+ 
+ 	if (!!old != !!new) {
+ 		/*
+@@ -10582,6 +10586,26 @@ void kvm_inc_or_dec_irq_window_inhibit(struct kvm *kvm, bool inc)
+ 	if (!enable_apicv)
+ 		return;
+ 
 +	/*
-+	 * Strictly speaking, the lock is only needed if going 0->1 or 1->0,
-+	 * a la atomic_dec_and_mutex_lock.  However, ExtINTs are rare and
-+	 * only target a single CPU, so that is the common case; do not
-+	 * bother eliding the down_write()/up_write() pair.
++	 * IRQ windows are requested either because of ExtINT injections, or
++	 * because APICv is already disabled/inhibited for another reason.
++	 * While ExtINT injections are rare and should not happen while the
++	 * vCPU is running its actual workload, it's worth avoiding thrashing
++	 * if the IRQ window is being requested because APICv is already
++	 * inhibited.  So, toggle the actual inhibit (which requires taking
++	 * the lock for write) if and only if there's no other inhibit.
++	 * kvm_set_or_clear_apicv_inhibit() always evaluates the IRQ window
++	 * count; thus the IRQ window inhibit call _will_ be lazily updated on
++	 * the next call, if it ever happens.
 +	 */
-+	guard(rwsem_write)(&kvm->arch.apicv_update_lock);
-+	if (atomic_add_return(add, &kvm->arch.apicv_nr_irq_window_req) == inc)
-+		__kvm_set_or_clear_apicv_inhibit(kvm, APICV_INHIBIT_REASON_IRQWIN, inc);
-+}
-+EXPORT_SYMBOL_GPL(kvm_inc_or_dec_irq_window_inhibit);
++	if (READ_ONCE(kvm->arch.apicv_inhibit_reasons) & ~BIT(APICV_INHIBIT_REASON_IRQWIN)) {
++		guard(rwsem_read)(&kvm->arch.apicv_update_lock);
++		if (READ_ONCE(kvm->arch.apicv_inhibit_reasons) & ~BIT(APICV_INHIBIT_REASON_IRQWIN)) {
++			atomic_add(add, &kvm->arch.apicv_nr_irq_window_req);
++			return;
++		}
++	}
 +
- static void vcpu_scan_ioapic(struct kvm_vcpu *vcpu)
- {
- 	if (!kvm_apic_present(vcpu))
+ 	/*
+ 	 * Strictly speaking, the lock is only needed if going 0->1 or 1->0,
+ 	 * a la atomic_dec_and_mutex_lock.  However, ExtINTs are rare and
 -- 
 2.50.1
 
