@@ -1,62 +1,63 @@
-Return-Path: <kvm+bounces-52814-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52815-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93DF7B098DF
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 02:20:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8093FB098E1
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 02:20:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 61FE33A4394
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 00:19:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D56351C460E2
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 00:20:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 267BF29CE6;
-	Fri, 18 Jul 2025 00:19:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F73A5695;
+	Fri, 18 Jul 2025 00:20:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KKtgBOzC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="P0g1dfol"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 299E24C6E;
-	Fri, 18 Jul 2025 00:19:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D576D517;
+	Fri, 18 Jul 2025 00:19:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752797997; cv=none; b=VaGKIdreS0Qgpistf6NTypggIGV4NP+sms8zlbF/tP5um4Ikgs0Kag/pRGCvEsnpklQ3izx8k5fAZYHYr+ZojoiDicbc1LY0WwWRbyxnY+10x325t9H8fwWlJqYjAlBzKBn/Pr0GC3kRkOPYT6kQSn9XIBrMzzvGw219gKtRyPU=
+	t=1752797999; cv=none; b=eaUhyip1Ioy5jghKT1bKtSC6yIeOnP+I7UbUp8IXNcHSgEqFaiJiclqPh7fvxi5YsQ382GgeTZKqy2IDVMDVG2kecRRFct9ziL7nFqhgCK/eL4mTa32cq4EqBXyPcBuW8/mHsUA4PhcIaEr2nlEYApNJcSjS9xlUI92dXFXSHvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752797997; c=relaxed/simple;
-	bh=wXuVBFO/hHuSYPGU3psgtXtd9650vEzC7CPCy/E1+F8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jJwEoc8G+LBxYja8sANB6ocKUPWU1EQWF2JLSRH2N/PaPtLy1l8sc0OSbw0vxVqyX0j0QHX4bk0OoEUOb93A908io0KPQBJ1s/vSOhU92+iSvpUHY7LHIJxFr2ovsnJMkoRoJtlVa7qPchE5zW5y1FuTu3Xe2WixqE20X7DwHxg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KKtgBOzC; arc=none smtp.client-ip=192.198.163.9
+	s=arc-20240116; t=1752797999; c=relaxed/simple;
+	bh=0JWpwbk6iPo/36WokS/MZjm06ctYIHkLbqOLqgjG0V4=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=Cn6rx0nc8orLWO04tQEc57HzWKggaizQmaHfcR9GPLi/HOrIjT+9QmYNH+utE/w0J/HLe3ZUeUyVYN4I1VzDcPpgL6+Df6yO9X7PaSrHILYDls6SUT4ban6M4Qx5WEnlKP2R1+AqdANsvCrBv7PBIMBVrSG0zBbnlWBzWwoCsd4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=P0g1dfol; arc=none smtp.client-ip=192.198.163.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752797996; x=1784333996;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=wXuVBFO/hHuSYPGU3psgtXtd9650vEzC7CPCy/E1+F8=;
-  b=KKtgBOzC1C2IY1B2r3ktL76MjrKt/9QkYuJJt6cJxA4vsfAuLVrXHZFd
-   J8/R4DVg5elB4xiDIq6Io/4Coi8mFBTAUI4AsQJBZefGoSLB7L+0c8h+P
-   fgu8ur277F5/kC/z5TrFyfsAk1YXwY75AgdwtPC57+vYQKdnIhqom+3Iq
-   YyOLdbSnhk8/51ebZ2UJtQA7iugIgDcVgLm3YOiZnQOuVRrgzXDSfB2UQ
-   Hfg3STl1WCr4/CeLp44zxzzSytO+6Wl1+AdCXrjUI2E6irdgOfUzFxkSR
-   N8fDuV4eu7buWZE9sCBZyivKs0mKOBAIDlBgSerUUyUo9ryVlsteVD392
+  t=1752797998; x=1784333998;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=0JWpwbk6iPo/36WokS/MZjm06ctYIHkLbqOLqgjG0V4=;
+  b=P0g1dfolfRIHsSxtnfIg7c/ImAgwwaDGoHFlsuacZE0gyUP1pS6YpQ/w
+   mmZuHplA+WtAs9NPE0nMfj9vH7u42cG8jGdAbzVLNseVHc4XVijmIbOd+
+   qOunF9gmmEvWL3Y5a8jmPmFthdDIrM4KQn6HhclkBZbNlKFIRZ3QKkrLY
+   yWaIyOOD3oCMhZTbH7Eh4TUpymDu4qsm8RD2JPLn1pv7qG0y8TnjZLP/n
+   ACUrTBB6MXXIAEKN7sybFMMcvT4R7skoTSxK7dySbSMNtuDCnrutJebEY
+   eem9m2AytrqlITkHbvmCnToobR3qAt4SujLh9Ai7evLydCWZ1Kh5+3PL+
    Q==;
-X-CSE-ConnectionGUID: hmJ5PqTOQWybeAOg/c7XDQ==
-X-CSE-MsgGUID: 3J9v6v9JTQS21W/+j6RKtQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11495"; a="65780084"
+X-CSE-ConnectionGUID: aLyrOix9TqSktNlxqXmyyw==
+X-CSE-MsgGUID: YKThnbbtTuKyW9MU9uiOaw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11495"; a="65780096"
 X-IronPort-AV: E=Sophos;i="6.16,320,1744095600"; 
-   d="scan'208";a="65780084"
+   d="scan'208";a="65780096"
 Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 17:19:55 -0700
-X-CSE-ConnectionGUID: wYJVFfPjQnOyuiZYib+N6A==
-X-CSE-MsgGUID: X8I7RK5+QHWzJNJztQvFtw==
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 17:19:58 -0700
+X-CSE-ConnectionGUID: Nh2+QS2uSa2Zj85Wv8LHUQ==
+X-CSE-MsgGUID: Q01DgBdLRRqJL6/EDYi8JQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,320,1744095600"; 
-   d="scan'208";a="157322769"
+   d="scan'208";a="157322787"
 Received: from spr.sh.intel.com ([10.112.229.196])
-  by orviesa010.jf.intel.com with ESMTP; 17 Jul 2025 17:19:50 -0700
+  by orviesa010.jf.intel.com with ESMTP; 17 Jul 2025 17:19:54 -0700
 From: Dapeng Mi <dapeng1.mi@linux.intel.com>
 To: Sean Christopherson <seanjc@google.com>,
 	Paolo Bonzini <pbonzini@redhat.com>
@@ -70,10 +71,12 @@ Cc: kvm@vger.kernel.org,
 	Yi Lai <yi1.lai@intel.com>,
 	Dapeng Mi <dapeng1.mi@intel.com>,
 	Dapeng Mi <dapeng1.mi@linux.intel.com>
-Subject: [PATCH v2 0/5] Fix PMU kselftests errors on GNR/SRF/CWF
-Date: Fri, 18 Jul 2025 08:19:00 +0800
-Message-Id: <20250718001905.196989-1-dapeng1.mi@linux.intel.com>
+Subject: [PATCH v2 1/5] KVM: x86/pmu: Correct typo "_COUTNERS" to "_COUNTERS"
+Date: Fri, 18 Jul 2025 08:19:01 +0800
+Message-Id: <20250718001905.196989-2-dapeng1.mi@linux.intel.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20250718001905.196989-1-dapeng1.mi@linux.intel.com>
+References: <20250718001905.196989-1-dapeng1.mi@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,81 +85,58 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patch series fixes KVM PMU kselftests errors encountered on Granite
-Rapids (GNR), Sierra Forest (SRF) and Clearwater Forest (CWF).
+Fix typos. "_COUTNERS" -> "_COUNTERS".
 
-GNR and SRF starts to support the timed PEBS. Timed PEBS adds a new
-"retired latency" field in basic info group to show the timing info and
-the PERF_CAPABILITIES[17] called "PEBS_TIMING_INFO" bit is added
-to indicated whether timed PEBS is supported. KVM module doesn't need to
-do any specific change to support timed PEBS except a perf change adding
-PERF_CAP_PEBS_TIMING_INFO flag into PERF_CAP_PEBS_MASK[1]. The patch 2/5
-adds timed PEBS support in vmx_pmu_caps_test and fix the error as the
-PEBS caps field mismatch.
+Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+Tested-by: Yi Lai <yi1.lai@intel.com>
+---
+ arch/x86/include/asm/kvm_host.h | 8 ++++----
+ arch/x86/kvm/vmx/pmu_intel.c    | 6 +++---
+ 2 files changed, 7 insertions(+), 7 deletions(-)
 
-CWF introduces 5 new architectural events (4 level-1 topdown metrics
-events and LBR inserts event). The patch 3/5 adds support for these 5
-arch-events and fixes the error that caused by mismatch between HW real
-supported arch-events number with NR_INTEL_ARCH_EVENTS.
-
-On Intel Atom platforms, the PMU events "Instruction Retired" or
-"Branch Instruction Retired" may be overcounted for some certain
-instructions, like FAR CALL/JMP, RETF, IRET, VMENTRY/VMEXIT/VMPTRLD
-and complex SGX/SMX/CSTATE instructions/flows[2].
-
-In details, for the Atom platforms before Sierra Forest (including
-Sierra Forest), Both 2 events "Instruction Retired" and
-"Branch Instruction Retired" would be overcounted on these certain
-instructions, but for Clearwater Forest only "Instruction Retired" event
-is overcounted on these instructions.
-
-As this overcount issue, pmu_counters_test and pmu_event_filter_test
-would fail on the precise event count validation for these 2 events on
-Atom platforms.
-
-To work around this Atom platform overcount issue, Patches 4-5/5 looses
-the precise count validation separately for pmu_counters_test and
-pmu_event_filter_test.
-
-BTW, this patch series doesn't depend on the mediated vPMU support.
-
-Changes:
-  * Add error fix for vmx_pmu_caps_test on GNR/SRF (patch 2/5).
-  * Opportunistically fix a typo (patch 1/5).
-
-Tests:
-  * PMU kselftests (pmu_counters_test/pmu_event_filter_test/
-    vmx_pmu_caps_test) passed on Intel SPR/GNR/SRF/CWF platforms.
-
-History:
-  * v1: https://lore.kernel.org/all/20250712172522.187414-1-dapeng1.mi@linux.intel.com/
-
-Ref:
-  [1] https://lore.kernel.org/all/20250717090302.11316-1-dapeng1.mi@linux.intel.com/
-  [2] https://edc.intel.com/content/www/us/en/design/products-and-solutions/processors-and-chipsets/sierra-forest/xeon-6700-series-processor-with-e-cores-specification-update/errata-details
-
-Dapeng Mi (4):
-  KVM: x86/pmu: Correct typo "_COUTNERS" to "_COUNTERS"
-  KVM: selftests: Add timing_info bit support in vmx_pmu_caps_test
-  KVM: Selftests: Validate more arch-events in pmu_counters_test
-  KVM: selftests: Relax branches event count check for event_filter test
-
-dongsheng (1):
-  KVM: selftests: Relax precise event count validation as overcount
-    issue
-
- arch/x86/include/asm/kvm_host.h               |  8 ++--
- arch/x86/kvm/vmx/pmu_intel.c                  |  6 +--
- tools/testing/selftests/kvm/include/x86/pmu.h | 19 ++++++++
- .../selftests/kvm/include/x86/processor.h     |  7 ++-
- tools/testing/selftests/kvm/lib/x86/pmu.c     | 43 +++++++++++++++++++
- .../selftests/kvm/x86/pmu_counters_test.c     | 39 ++++++++++++++---
- .../selftests/kvm/x86/pmu_event_filter_test.c |  9 +++-
- .../selftests/kvm/x86/vmx_pmu_caps_test.c     |  3 +-
- 8 files changed, 117 insertions(+), 17 deletions(-)
-
-
-base-commit: 772d50d9b87bec08b56ecee0a880d6b2ee5c7da5
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 46ad65a4d524..0a8010e2859c 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -545,10 +545,10 @@ struct kvm_pmc {
+ #define KVM_MAX_NR_GP_COUNTERS		KVM_MAX(KVM_MAX_NR_INTEL_GP_COUNTERS, \
+ 						KVM_MAX_NR_AMD_GP_COUNTERS)
+ 
+-#define KVM_MAX_NR_INTEL_FIXED_COUTNERS	3
+-#define KVM_MAX_NR_AMD_FIXED_COUTNERS	0
+-#define KVM_MAX_NR_FIXED_COUNTERS	KVM_MAX(KVM_MAX_NR_INTEL_FIXED_COUTNERS, \
+-						KVM_MAX_NR_AMD_FIXED_COUTNERS)
++#define KVM_MAX_NR_INTEL_FIXED_COUNTERS	3
++#define KVM_MAX_NR_AMD_FIXED_COUNTERS	0
++#define KVM_MAX_NR_FIXED_COUNTERS	KVM_MAX(KVM_MAX_NR_INTEL_FIXED_COUNTERS, \
++						KVM_MAX_NR_AMD_FIXED_COUNTERS)
+ 
+ struct kvm_pmu {
+ 	u8 version;
+diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+index 0b173602821b..e8b37a38fbba 100644
+--- a/arch/x86/kvm/vmx/pmu_intel.c
++++ b/arch/x86/kvm/vmx/pmu_intel.c
+@@ -478,8 +478,8 @@ static __always_inline u64 intel_get_fixed_pmc_eventsel(unsigned int index)
+ 	};
+ 	u64 eventsel;
+ 
+-	BUILD_BUG_ON(ARRAY_SIZE(fixed_pmc_perf_ids) != KVM_MAX_NR_INTEL_FIXED_COUTNERS);
+-	BUILD_BUG_ON(index >= KVM_MAX_NR_INTEL_FIXED_COUTNERS);
++	BUILD_BUG_ON(ARRAY_SIZE(fixed_pmc_perf_ids) != KVM_MAX_NR_INTEL_FIXED_COUNTERS);
++	BUILD_BUG_ON(index >= KVM_MAX_NR_INTEL_FIXED_COUNTERS);
+ 
+ 	/*
+ 	 * Yell if perf reports support for a fixed counter but perf doesn't
+@@ -625,7 +625,7 @@ static void intel_pmu_init(struct kvm_vcpu *vcpu)
+ 		pmu->gp_counters[i].current_config = 0;
+ 	}
+ 
+-	for (i = 0; i < KVM_MAX_NR_INTEL_FIXED_COUTNERS; i++) {
++	for (i = 0; i < KVM_MAX_NR_INTEL_FIXED_COUNTERS; i++) {
+ 		pmu->fixed_counters[i].type = KVM_PMC_FIXED;
+ 		pmu->fixed_counters[i].vcpu = vcpu;
+ 		pmu->fixed_counters[i].idx = i + KVM_FIXED_PMC_BASE_IDX;
 -- 
 2.34.1
 
