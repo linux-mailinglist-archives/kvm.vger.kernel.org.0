@@ -1,179 +1,111 @@
-Return-Path: <kvm+bounces-52827-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52828-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33874B09955
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 03:41:59 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA83DB09958
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 03:43:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 62FE55A2BF0
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 01:41:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ED3497A49BD
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 01:41:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DE501F17E8;
-	Fri, 18 Jul 2025 01:40:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8742191F72;
+	Fri, 18 Jul 2025 01:42:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HPA4GaZ9"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GeiZKkhg"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19DE61EDA03;
-	Fri, 18 Jul 2025 01:40:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A94F311712;
+	Fri, 18 Jul 2025 01:42:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752802820; cv=none; b=UugzM6zK4NVpOHXzXDvA04UXcraV3/Mt8K5KNSZWaxNGoCfyVYxRATi7aQqhoVtx8WnxFIy+/VSnAZ1MxcOMPTmpI0n17WnMtIma+oHrrnEeXu22kYSTrqagJom6OjPuF96zQcroJZii6+N2ENzCM4/eNhZHMET0R5y5wQbpYiQ=
+	t=1752802977; cv=none; b=McH/YJ/0hfWK3oeCJDFoPAV4R0dqAqtwfqDARkeI8wf8P+/WjhikG3rylRH7a/s+BeO3wyXkZB98LvxEn/OKtIbHlHq30Msw8l9D4u6uEH1Wdo2DQ3dOQnlnUbB0/ezK2MBgqJiu+V+5INAEB5K0GIfuugZkrDCrmJTTrrlKLA8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752802820; c=relaxed/simple;
-	bh=0hNsv9KESme0CC07v7qNNGShOQXUwWV1Ff+LbnZiLcI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Ku+YRdyd6/VRwfbQBZTzlrYalP6uuYYA9BJHyZo5cjH14582sAATQhYVbftsttcKsVOLm/sEOwmFz8Cb02WXdHrlWFmwqL90YNYNyHSJxUa0iUgheu3lOG1K1v5wEhzZcXnfcOr1s+5ONDN++5pyxrVGLcGXtzMG0zuRKFQ8Jgg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HPA4GaZ9; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1752802977; c=relaxed/simple;
+	bh=nALzQ13/hKtBqXb8rfNtCTmHGGtFpFLO/y5dIAkAQfY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KL8s4feO58b6yW98UR/Fba96jIKcqu2Jk8zM+6/ffNL+9eIrSf00nyXnf3SCJcn3ep7CxBGP2gM/eYtcqqaqybJEC3BC+rI9r2RhGhe52vevR9OVp7NlHYoFDVWY78Pa+xDFbYsiHg2Rj39wYxNaszIX0HnW53Mp+/vYIJ27rE0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GeiZKkhg; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752802820; x=1784338820;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=0hNsv9KESme0CC07v7qNNGShOQXUwWV1Ff+LbnZiLcI=;
-  b=HPA4GaZ9bcleXb/R66S5GTCzhyMb9E5d7FhU8XJLd0dcxmmzHmHfzGbp
-   vLk3R0YMhMaTnkUQY2NZ7mLWuuG8m9kLQEsWhz2/DLdu5Ff3ORGlYdF5/
-   UXE22qwpP7MAdCBXzgGC2vGoWNQB4TVXJ048Px9zkuwyPGH+CSd5w4laL
-   9MUFC+ewIdhbEtMXcd9M//x4XP9fJEh6lGkuq54thQr27vnQutJcnI/W2
-   XvvUT3lljFepVFe1yzTr5JJYwpOp42Ol8GuVFHgavqQtX+E7+/Uu18H8W
-   K/4GCsK7ug7O+aLIyPZSnQGDOlBOJXyD+O8Q/Cc8mHUKTGNIZSxb7M+5o
-   A==;
-X-CSE-ConnectionGUID: FUGX8D11SY2EXSzZUcbJDA==
-X-CSE-MsgGUID: lezntrBPQE+ZYAVEqxaeew==
-X-IronPort-AV: E=McAfee;i="6800,10657,11495"; a="54951531"
+  t=1752802976; x=1784338976;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=nALzQ13/hKtBqXb8rfNtCTmHGGtFpFLO/y5dIAkAQfY=;
+  b=GeiZKkhggLMerCycTOca4mSA4KOxmxrdEONrl2zKF3g3xD4otfEdMle1
+   NIt2nk0haMu/yj1TGz+fh11XWEp4heA6mdfXp+2aLkGjJhNn5iSA0kRIb
+   QXyBWo6FdvAlhXU1qJRzqws7bScOdqZ+MOrvgFjZNYaN7GM5yKQkLPWBS
+   aI4QtGWnBuEGGStLnIl/GVFbUKFr8suKLTp38UgfGW8Vx+c30xm2PilIr
+   xmADptvaG7Yp3hgUDZrDKytnsNw87J+0tzhhISEXsGEz/yUcWdHIM2I25
+   8j1zQgCRm3qnN0S1mkOXhZCPTCDakvIRWFtkg30rbOhZhKJweKIB6QpzR
+   w==;
+X-CSE-ConnectionGUID: OvkIr1KfRUqIchvpcPFIrg==
+X-CSE-MsgGUID: 13pPtwk9SwmOed85rkaa9g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11495"; a="77632278"
 X-IronPort-AV: E=Sophos;i="6.16,320,1744095600"; 
-   d="scan'208";a="54951531"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 18:40:19 -0700
-X-CSE-ConnectionGUID: GuyVw/LERkaYaxvH1lFrmQ==
-X-CSE-MsgGUID: c4oOsBp/Tm6eklQ9uvmY+Q==
+   d="scan'208";a="77632278"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 18:42:55 -0700
+X-CSE-ConnectionGUID: ZkS0VEoES4W3YCuvt7mYLA==
+X-CSE-MsgGUID: koIEcje3TW2XcXgRJ6Mvag==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,320,1744095600"; 
-   d="scan'208";a="188918429"
-Received: from spr.sh.intel.com ([10.112.229.196])
-  by fmviesa001.fm.intel.com with ESMTP; 17 Jul 2025 18:40:15 -0700
-From: Dapeng Mi <dapeng1.mi@linux.intel.com>
-To: Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Jim Mattson <jmattson@google.com>,
-	Mingwei Zhang <mizhang@google.com>,
-	Zide Chen <zide.chen@intel.com>,
-	Das Sandipan <Sandipan.Das@amd.com>,
-	Shukla Manali <Manali.Shukla@amd.com>,
-	Yi Lai <yi1.lai@intel.com>,
-	Xiaoyao Li <xiaoyao.li@intel.com>,
-	Dapeng Mi <dapeng1.mi@intel.com>,
-	Dapeng Mi <dapeng1.mi@linux.intel.com>,
-	Kan Liang <kan.liang@linux.intel.com>
-Subject: [kvm-unit-tests patch v2 7/7] x86: pmu_pebs: Support to validate timed PEBS record on GNR/SRF
-Date: Fri, 18 Jul 2025 09:39:15 +0800
-Message-Id: <20250718013915.227452-8-dapeng1.mi@linux.intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250718013915.227452-1-dapeng1.mi@linux.intel.com>
-References: <20250718013915.227452-1-dapeng1.mi@linux.intel.com>
+   d="scan'208";a="157754551"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 18:42:40 -0700
+Message-ID: <ffb23653-058a-426e-9571-51784a77ad3d@intel.com>
+Date: Fri, 18 Jul 2025 09:42:36 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v15 03/21] KVM: Introduce kvm_arch_supports_gmem()
+To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev
+Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
+ anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
+ aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk,
+ brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
+ yilun.xu@intel.com, chao.p.peng@linux.intel.com, jarkko@kernel.org,
+ amoorthy@google.com, dmatlack@google.com, isaku.yamahata@intel.com,
+ mic@digikod.net, vbabka@suse.cz, vannapurve@google.com,
+ ackerleytng@google.com, mail@maciej.szmigiero.name, david@redhat.com,
+ michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com,
+ isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com,
+ suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com,
+ quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com,
+ quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com,
+ quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com,
+ james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev,
+ maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com,
+ roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com,
+ rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com,
+ jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com,
+ ira.weiny@intel.com
+References: <20250717162731.446579-1-tabba@google.com>
+ <20250717162731.446579-4-tabba@google.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20250717162731.446579-4-tabba@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Intel GNR/SRF platform, timed PEBS is introduced. Timed PEBS adds
-a new "retired latency" field in basic info group to show the timing
-info. IA32_PERF_CAPABILITIES.PEBS_TIMING_INFO[bit 17] is introduced to
-indicate whether timed PEBS is supported.
+On 7/18/2025 12:27 AM, Fuad Tabba wrote:
+> -/* SMM is currently unsupported for guests with private memory. */
+> +/* SMM is currently unsupported for guests with guest_memfd private memory. */
+>   # define kvm_arch_nr_memslot_as_ids(kvm) (kvm_arch_has_private_mem(kvm) ? 1 : 2)
 
-After introducing timed PEBS, the PEBS record format field shrinks to
-bits[31:0] and  the bits[47:32] is used to record retired latency.
+As I commented in the v14, please don't change the comment.
 
-Thus shrink the record format to bits[31:0] accordingly and avoid the
-retired latency field is recognized a part of record format to compare
-and cause failure on GNR/SRF.
-
-Please find detailed information about timed PEBS in section 8.4.1
-"Timed Processor Event Based Sampling" of "Intel Architecture
-Instruction Set Extensions and Future Features".
-
-Reviewed-by: Kan Liang <kan.liang@linux.intel.com>
-Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
-Tested-by: Yi Lai <yi1.lai@intel.com>
----
- lib/x86/pmu.h  | 6 ++++++
- x86/pmu_pebs.c | 8 +++++---
- 2 files changed, 11 insertions(+), 3 deletions(-)
-
-diff --git a/lib/x86/pmu.h b/lib/x86/pmu.h
-index c7dc68c1..86a7a05f 100644
---- a/lib/x86/pmu.h
-+++ b/lib/x86/pmu.h
-@@ -20,6 +20,7 @@
- #define PMU_CAP_LBR_FMT	  0x3f
- #define PMU_CAP_FW_WRITES	(1ULL << 13)
- #define PMU_CAP_PEBS_BASELINE	(1ULL << 14)
-+#define PMU_CAP_PEBS_TIMING_INFO	(1ULL << 17)
- #define PERF_CAP_PEBS_FORMAT           0xf00
- 
- #define EVNSEL_EVENT_SHIFT	0
-@@ -188,4 +189,9 @@ static inline bool pmu_has_pebs_baseline(void)
- 	return pmu.perf_cap & PMU_CAP_PEBS_BASELINE;
- }
- 
-+static inline bool pmu_has_pebs_timing_info(void)
-+{
-+	return pmu.perf_cap & PMU_CAP_PEBS_TIMING_INFO;
-+}
-+
- #endif /* _X86_PMU_H_ */
-diff --git a/x86/pmu_pebs.c b/x86/pmu_pebs.c
-index 2848cc1e..bc37e8e3 100644
---- a/x86/pmu_pebs.c
-+++ b/x86/pmu_pebs.c
-@@ -277,6 +277,7 @@ static void check_pebs_records(u64 bitmask, u64 pebs_data_cfg, bool use_adaptive
- 	unsigned int count = 0;
- 	bool expected, pebs_idx_match, pebs_size_match, data_cfg_match;
- 	void *cur_record;
-+	u64 format_mask;
- 
- 	expected = (ds->pebs_index == ds->pebs_buffer_base) && !pebs_rec->format_size;
- 	if (!(rdmsr(MSR_CORE_PERF_GLOBAL_STATUS) & GLOBAL_STATUS_BUFFER_OVF)) {
-@@ -289,6 +290,8 @@ static void check_pebs_records(u64 bitmask, u64 pebs_data_cfg, bool use_adaptive
- 		return;
- 	}
- 
-+	/* Record format shrinks to bits[31:0] after timed PEBS is introduced. */
-+	format_mask = pmu_has_pebs_timing_info() ? GENMASK_ULL(31, 0) : GENMASK_ULL(47, 0);
- 	expected = ds->pebs_index >= ds->pebs_interrupt_threshold;
- 	cur_record = (void *)pebs_buffer;
- 	do {
-@@ -296,8 +299,7 @@ static void check_pebs_records(u64 bitmask, u64 pebs_data_cfg, bool use_adaptive
- 		pebs_record_size = pebs_rec->format_size >> RECORD_SIZE_OFFSET;
- 		pebs_idx_match = pebs_rec->applicable_counters & bitmask;
- 		pebs_size_match = pebs_record_size == get_pebs_record_size(pebs_data_cfg, use_adaptive);
--		data_cfg_match = (pebs_rec->format_size & GENMASK_ULL(47, 0)) ==
--				 (use_adaptive ? pebs_data_cfg : 0);
-+		data_cfg_match = (pebs_rec->format_size & format_mask) == (use_adaptive ? pebs_data_cfg : 0);
- 		expected = pebs_idx_match && pebs_size_match && data_cfg_match;
- 		report(expected,
- 		       "PEBS record (written seq %d) is verified (including size, counters and cfg).", count);
-@@ -327,7 +329,7 @@ static void check_pebs_records(u64 bitmask, u64 pebs_data_cfg, bool use_adaptive
- 			       pebs_record_size, get_pebs_record_size(pebs_data_cfg, use_adaptive));
- 		if (!data_cfg_match)
- 			printf("FAIL: The pebs_data_cfg (0x%lx) doesn't match with the effective MSR_PEBS_DATA_CFG (0x%lx).\n",
--			       pebs_rec->format_size & 0xffffffffffff, use_adaptive ? pebs_data_cfg : 0);
-+			       pebs_rec->format_size & format_mask, use_adaptive ? pebs_data_cfg : 0);
- 	}
- }
- 
--- 
-2.34.1
+It is checking kvm_arch_has_private_mem(), *not* 
+kvm_arch_supports_gmem(). So why bother mentioning guest_memfd here?
 
 
