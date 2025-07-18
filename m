@@ -1,172 +1,122 @@
-Return-Path: <kvm+bounces-52900-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52901-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8241B0A6AB
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 16:54:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7C73B0A6AE
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 16:54:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7F76A82D6E
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 14:53:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 56391188D498
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 14:55:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A16531B87F0;
-	Fri, 18 Jul 2025 14:53:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1A102DBF46;
+	Fri, 18 Jul 2025 14:54:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DpiZCNOv"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QPw+nkJ0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C6A64503B
-	for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 14:53:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEB4472613
+	for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 14:54:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752850430; cv=none; b=TBODLgoaWKOYmhDg3n9iZeFPP8z6AZcHEzpGGRY8MQLv0wl4WguCQlLg0koJCBAYtEXu/9SIDMLOk8BDg2RYYWMKSAEq4hSeAVEgYVkzAeuQghEYikbrZKYFzk0mSkHsK0tTGG/DM/YCB//SIPCjfSj+aSQNtx83LUxjkOCQChk=
+	t=1752850482; cv=none; b=sEl7M8WriF33KiQwvih41O14iyf2ZjSit9Id2JxIp+tJ/3eATJ/Z3p9W973VtLt2IVzMGivjVntfNORZdOWGGTW5doDxQb+wpIfJurQiolP190UmTNsxfBuXOqskvNC0Pr8BBekPrkVimqV5dXuSxRealm7ZD+V0yFpGeyxZsFs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752850430; c=relaxed/simple;
-	bh=mN3hzgJiNNPNWOhTNaA5bwuVe2pOkU891xX3VE06RGw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VXSX6oEx0ON26zyTABrKBNBHTBOe8L7P9RD97v33ggD0un6SE9rN4zx6RmuRR1YHRzDoBaor7Ur1OSJFB1rarZ50CDDRb5xKGs9zkE2qFizEs8RZ/bcypn2hdnjxMJF7Jt35ua1Dz7AfmZKu5LFIHUsKDozfsdArzejv6tymf9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DpiZCNOv; arc=none smtp.client-ip=209.85.221.54
+	s=arc-20240116; t=1752850482; c=relaxed/simple;
+	bh=R+uHC0rNFoe7/WMDlNej4tXX+jCmeBQ+xIZb2iEFRn0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=QLDakNGiv1T6srmYV0mVDAF22Pq8M4lERqxP+XJRpf0QpTx/DYZ7X15RSGN/18GdwzWMtjQ5sL83eIjkRs/ffDNQpZlrcPuSY7GRpGEp5ivnfTOswCJt7UVD4FdUdqJi0n9PIJRNv/4QpEzWQinCspgQm3euOXpB6Yoo5cXDFmA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QPw+nkJ0; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-3a588da60dfso1359534f8f.1
-        for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 07:53:48 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-31366819969so2135545a91.0
+        for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 07:54:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752850427; x=1753455227; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cRq4mZGW6hHwIgirPnFC0Ellx4rYs15LC6saX2uSxGU=;
-        b=DpiZCNOvhZvyMJVGLNNEhZFz8PHOXuVCCTQ6nFW1m4TxhGl28B1880wvU8aa2150oe
-         VqVXSvYliamqWRqKSpzhnjgG2uVcqBmJltIifj+48weUlnNx+AAj/rJX6q/BNeMFqgwM
-         Nk2ilRx8XxoewyrbBesIhnO2VJRRbvu2bYhSosN+ktzgMVfEVak3YKdynRVqlSGm/oJ5
-         Py2/mmX/R0NtMhQvCHJLZENlyCO5ojQwOGFiJc8rAnzxY2LnnWma2Lf/kI/zINXR6jpO
-         jagHkQzOoemjsjI4Sxo43VKJVaqDRAKdPw2SksrfBGeKbbOdDb8JgOyQaIo1IjjlxZYE
-         hmXg==
+        d=google.com; s=20230601; t=1752850480; x=1753455280; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=N/TCALKPJKMHZD91lUzJU6dW6O+HUemIHHtXfTjzh2o=;
+        b=QPw+nkJ0kv8iwna5Drj2cw1oWXO2i9x761mJemFsZVGnlHJC0ZlzjtZ28bBDoyEwqo
+         WkaMp+cuKttbC0gG3C523ANzkcIpSIPRaNcDpfoB00Pyte4heZQITgjMPHtqj+Nhou9/
+         RPPyJSWMbn5iioQ+tPhF8yfGpu7h4tZGWpGf64+NgL8tAha5k//s7mnide+Ig6h4SpFd
+         LFEhCWxHF5jjZwmpRa8seK9yIPf+kZqEjbZzGjVk1W+AFHQcC19JZBKYF+jCAQew41dd
+         6FImuwZ0slhmxLClSGxw8HpGNP11wWxfjBevnLMzave5RZ6O1VndNOnrytMb/qPMmYGQ
+         iwsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752850427; x=1753455227;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cRq4mZGW6hHwIgirPnFC0Ellx4rYs15LC6saX2uSxGU=;
-        b=taFARFem8lSCeX3885gsahGRRadlscr8Qg8grVgW4YNPLhCHQgXfjuCed2ljuM25/A
-         0RGc3/DwM6Qz2ans/vqt1fSXgzp8wDzS69AB0Q/FZxQ5EBHMP1nYZx2mZHhvmIFBHuwP
-         aFqlC93wcicseDATRvXwkTpf6tButuS5oi5r44zxEoR2vHGQmMUc60TO5fZ6DsdxAd5m
-         kavJLIX07j1v1EwX3AoTDrbXCQVf3SrlPTBW8bAqNHsmD9Q2/HOJXlV3gzX+E/o3RkB3
-         2zybgA21w8/0aV6glUxAN5HHDZ7/4shE/KH9ywrcpf3LO3Fk0KtHF/WfHRUtAIJBZklb
-         X74A==
-X-Forwarded-Encrypted: i=1; AJvYcCXwrh6Ywac6bgmruprp292KV1Cu0bl+6waBx25yczGC85vsMlAltB6KriIX/o2fl6ur95M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxxDxlWME0I9euLt3VsDsvLAeWM+fAGzWNXaR7nPgG9sIYUK2DJ
-	e8M8oMiSbMqX/qnzpsBlIHJsMzKjb1CIv3iPoNVKmpIEJoxsxX6rLwyr9MWLHyz+Zw==
-X-Gm-Gg: ASbGncujRnsX9YwMIoyosxkzULyDfSEPff3bKKtHzpGdK/Pb3aFhYPbwNukKSUGyVjt
-	84/UUrsrGLx6snqjQLZX5pWCosW7OD9wXq8nwzFTMJY8ZxgvVqaWlU/4+0R0UfTnUdS0x95bh4/
-	UNpRTppd0kyZzgONNC6lHY+b7XHhRAoyJBjb96ZFvXre3ERa3ShHw162/EJymBn2TXfwtvuR9Fg
-	WPZCKYJsiFKJWaPqMCi/Ne/6ck3ebi+nmIYNIteodOLkAgX3u6mOt1Vu8fLr2UPQOFK/fvdurBu
-	nh/tvPkuMUlnANLPvJkiBzUMeCmiqyZevRiBqoPq/haroswpw4ANXC2TNn7OKukK14ZvFT80Swy
-	XDCB8mcbPY7HhWCODHFc2xaIIyzkD+eQBqYDaVIsYruy/GygDhGbMMP4gU4LgpXkqJY79PA==
-X-Google-Smtp-Source: AGHT+IHRoLNQ/BOi8gPhfanYsriNie013yEjEncyuc0ze1Z2dpZlN67n7NZfnIUPQdvgGELPGcgEHQ==
-X-Received: by 2002:adf:e193:0:b0:3a3:7987:945f with SMTP id ffacd0b85a97d-3b60e5242a1mr10025699f8f.57.1752850427262;
-        Fri, 18 Jul 2025 07:53:47 -0700 (PDT)
-Received: from google.com (120.142.205.35.bc.googleusercontent.com. [35.205.142.120])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4563f7c88a0sm11817035e9.2.2025.07.18.07.53.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Jul 2025 07:53:46 -0700 (PDT)
-Date: Fri, 18 Jul 2025 14:53:42 +0000
-From: Keir Fraser <keirf@google.com>
-To: Yao Yuan <yaoyuan@linux.alibaba.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2 2/4] KVM: arm64: vgic: Explicitly implement
- vgic_dist::ready ordering
-Message-ID: <aHpf9vuRK691J7HD@google.com>
-References: <20250716110737.2513665-1-keirf@google.com>
- <20250716110737.2513665-3-keirf@google.com>
- <kb7nwrco6s7e6catcareyic72pxvx52jbqbfc5gbqb5zu434kg@w3rrzbut3h34>
+        d=1e100.net; s=20230601; t=1752850480; x=1753455280;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=N/TCALKPJKMHZD91lUzJU6dW6O+HUemIHHtXfTjzh2o=;
+        b=XuiusDhIYC407teaPdP9qChk1pfXgVJ1AOsRi267fCu1SC4RI8Jj+/poN0MpXP/YaD
+         48S5d5cqqoLaHLViOpfkZ1mKxgkPbH+0Ee4zghq8BWEABQPJHahiGefIFmHKiuXifT63
+         8U806WxEdE4bAkZXUif9QmZ1lhwdeW4/plG9rdtczgfhSOkt423wJKDZfOg++yuLioFC
+         b7ok/U32bJqURTheRDTD6a23DQgjTyTL96t2q6OT7u79swR3XtzrQuyKsy+0oUHMM+U4
+         nN0BM+S6f0C3kXoTpMXuSpWI6wGHFGnytRwMtocOOQua7RRqzhwcIBf52FZtdjxzPuYS
+         U2FA==
+X-Forwarded-Encrypted: i=1; AJvYcCUTGQ9e0NeENw6R+dd+049OmbZ3kBOSDUf6wlKdmXsB0E5j/dcykCd9cgQllo9yUK4bhMo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwL45iF96WKEFBfoNGqWpWsV51ORSMAq50bJ2++eKWRFK/IzBjN
+	41kg6fjtApgZQLl7IN5Tkrrk3ILgo6Qwjx7pG7sDdKQV02kbAwKuYvK7GMX58M+sywWg/bAS9nQ
+	9Yw9i4Q==
+X-Google-Smtp-Source: AGHT+IHg7OQ4Sa3hUw44fFRrqCCRNCdoEM6sGbznGmflFsSooOxKsLp700fJMAwy7HaVB0l9Tq8sTcWYBQ4=
+X-Received: from pjxx3.prod.google.com ([2002:a17:90b:58c3:b0:313:2d44:397b])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3d08:b0:311:c93b:3ca2
+ with SMTP id 98e67ed59e1d1-31c9e6e96fdmr15276081a91.6.1752850480100; Fri, 18
+ Jul 2025 07:54:40 -0700 (PDT)
+Date: Fri, 18 Jul 2025 07:54:38 -0700
+In-Reply-To: <ndwhwg4lmy22vnqy3yqnpdqj7o366crbrhgj5py5fm3g3l2ow3@5s24dzpkswa2>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <kb7nwrco6s7e6catcareyic72pxvx52jbqbfc5gbqb5zu434kg@w3rrzbut3h34>
+Mime-Version: 1.0
+References: <20250716110737.2513665-1-keirf@google.com> <20250716110737.2513665-4-keirf@google.com>
+ <ndwhwg4lmy22vnqy3yqnpdqj7o366crbrhgj5py5fm3g3l2ow3@5s24dzpkswa2>
+Message-ID: <aHpgLnfQjp3qdZOL@google.com>
+Subject: Re: [PATCH v2 3/4] KVM: Implement barriers before accessing
+ kvm->buses[] on SRCU read paths
+From: Sean Christopherson <seanjc@google.com>
+To: Yao Yuan <yaoyuan@linux.alibaba.com>
+Cc: Keir Fraser <keirf@google.com>, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	Eric Auger <eric.auger@redhat.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Jul 17, 2025 at 01:44:48PM +0800, Yao Yuan wrote:
-> On Wed, Jul 16, 2025 at 11:07:35AM +0800, Keir Fraser wrote:
-> > In preparation to remove synchronize_srcu() from MMIO registration,
-> > remove the distributor's dependency on this implicit barrier by
-> > direct acquire-release synchronization on the flag write and its
-> > lock-free check.
+On Thu, Jul 17, 2025, Yao Yuan wrote:
+> On Wed, Jul 16, 2025 at 11:07:36AM +0800, Keir Fraser wrote:
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index 3bde4fb5c6aa..9132148fb467 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -965,11 +965,15 @@ static inline bool kvm_dirty_log_manual_protect_and_init_set(struct kvm *kvm)
+> >  	return !!(kvm->manual_dirty_log_protect & KVM_DIRTY_LOG_INITIALLY_SET);
+> >  }
 > >
-> > Signed-off-by: Keir Fraser <keirf@google.com>
-> > ---
-> >  arch/arm64/kvm/vgic/vgic-init.c | 11 ++---------
-> >  1 file changed, 2 insertions(+), 9 deletions(-)
-> >
-> > diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-> > index 502b65049703..bc83672e461b 100644
-> > --- a/arch/arm64/kvm/vgic/vgic-init.c
-> > +++ b/arch/arm64/kvm/vgic/vgic-init.c
-> > @@ -567,7 +567,7 @@ int kvm_vgic_map_resources(struct kvm *kvm)
-> >  	gpa_t dist_base;
-> >  	int ret = 0;
-> >
-> > -	if (likely(dist->ready))
-> > +	if (likely(smp_load_acquire(&dist->ready)))
-> >  		return 0;
-> >
-> >  	mutex_lock(&kvm->slots_lock);
-> > @@ -598,14 +598,7 @@ int kvm_vgic_map_resources(struct kvm *kvm)
-> >  		goto out_slots;
-> >  	}
-> >
-> > -	/*
-> > -	 * kvm_io_bus_register_dev() guarantees all readers see the new MMIO
-> > -	 * registration before returning through synchronize_srcu(), which also
-> > -	 * implies a full memory barrier. As such, marking the distributor as
-> > -	 * 'ready' here is guaranteed to be ordered after all vCPUs having seen
-> > -	 * a completely configured distributor.
-> > -	 */
-> > -	dist->ready = true;
-> > +	smp_store_release(&dist->ready, true);
+> > +/*
+> > + * Get a bus reference under the update-side lock. No long-term SRCU reader
+> > + * references are permitted, to avoid stale reads vs concurrent IO
+> > + * registrations.
+> > + */
+> >  static inline struct kvm_io_bus *kvm_get_bus(struct kvm *kvm, enum kvm_bus idx)
+> >  {
+> > -	return srcu_dereference_check(kvm->buses[idx], &kvm->srcu,
+> > -				      lockdep_is_held(&kvm->slots_lock) ||
+> > -				      !refcount_read(&kvm->users_count));
+> > +	return rcu_dereference_protected(kvm->buses[idx],
+> > +					 lockdep_is_held(&kvm->slots_lock));
 > 
-> No need the store-release and load-acquire for replacing
-> synchronize_srcu_expedited() w/ call_srcu() IIUC:
-> 
-> Tree SRCU on SMP:
-> call_srcu()
->  __call_srcu()
->   srcu_gp_start_if_needed()
->     __srcu_read_unlock_nmisafe()
-> 	 #ifdef	CONFIG_NEED_SRCU_NMI_SAFE
-> 	   	  smp_mb__before_atomic() // __smp_mb() on ARM64, do nothing on x86.
-> 	 #else
->           __srcu_read_unlock()
-> 		   smp_mb()
-> 	 #endif
+> I want to consult the true reason for using protected version here,
+> save unnecessary READ_ONCE() ?
 
-I don't think it's nice to depend on an implementation detail of
-kvm_io_bus_register_dev() and, transitively, on implementation details
-of call_srcu().
+Avoiding the READ_ONCE() is a happy bonus.  The main goal is to help document
+and enforce that kvm_get_bus() can only be used if slots_lock is held.  Keeping
+this as srcu_dereference_check() would result in PROVE_RCU getting a false negative
+if the caller held kvm->srcu but not slots_lock.
 
-kvm_vgic_map_resources() isn't called that often and can afford its
-own synchronization.
-
- -- Keir
-
-> TINY SRCY on UP:
-> Should have no memory ordering issue on UP.
-> 
-> >  	goto out_slots;
-> >  out:
-> >  	mutex_unlock(&kvm->arch.config_lock);
-> > --
-> > 2.50.0.727.gbf7dc18ff4-goog
-> >
+From a documentation perspective, rcu_dereference_protected() (hopefully) helps
+highlight that there's something "special" about this helper, e.g. gives the reader
+a hint that they probably shouldn't be using kvm_get_bus().
 
