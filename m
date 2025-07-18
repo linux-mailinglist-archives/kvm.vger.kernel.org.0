@@ -1,117 +1,150 @@
-Return-Path: <kvm+bounces-52833-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52834-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA952B099B4
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 04:17:02 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB978B099C0
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 04:27:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6B4951C80BE8
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 02:17:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A11287A1AD0
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 02:26:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8BFF189906;
-	Fri, 18 Jul 2025 02:16:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EQPpAGUR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E01E19E7F7;
+	Fri, 18 Jul 2025 02:27:31 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE98C70825;
-	Fri, 18 Jul 2025 02:16:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DAF04C9D;
+	Fri, 18 Jul 2025 02:27:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752805010; cv=none; b=FXw/+HiI4dCr8on8QB84LyPY+eJpTe9S/ETwlFtJg3FhSrA7WgI8QVmheSFGhyaVSSAMdPWC8pxNEJF3dDxwsw0gavfLxMsbVwyB0j4/e413WRZ3hfxnsKrb/2XFclVPSzVbxSRAr1Bl3Yc85U4V2UYznbDR3iEKf8+gscgWV/w=
+	t=1752805651; cv=none; b=UEE8lScVCRQlNwDPkBHCgS4i+rdWxsqJUUe1G/olnoyaEzxIMJ4u0VwnJXe+OlWeztG/X9jQP/3i6JM99fWbIzpHOAjC5vV2djZxHag7/mJT2H4WIyP+jtAZz3me/fSZh/PfgPT2Q40FL+upd0AD494DoDCswxQcvkIN30imBgg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752805010; c=relaxed/simple;
-	bh=VvruBhjiCiVxIuJDIeyL6aRkzsdLfa294STAL3HABG4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Uw+aCfLngamteRKys338kTJIyrffMNJLCwWLkA1xAL79moXdsaKiYdIHXjM+DvYYwTlAWJMPvmX5MCh7jVac6s3AHiqAGWkiEcmIVtDxBzTEmaVa5U75aq0sW1CaQuagT4uJoKHhzZIIiNa42tmvvokig7aN86afGjp91Ncb0iA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EQPpAGUR; arc=none smtp.client-ip=209.85.215.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-b34a78bb6e7so1244231a12.3;
-        Thu, 17 Jul 2025 19:16:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752805008; x=1753409808; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/4cVCy+igKClD91Q0C623JaQKFoi0xlJc0TbgPtXkQo=;
-        b=EQPpAGUR/I49ElHexdYbwg9ZZMc4p/aUIZ4wUlsQ27hUJ9JByGSqLdgHx511ZHqU79
-         XWL6gNqFDpg8DqkEJzwqDKGZHI87XZUWWmiN/KPf873Hq3zlqUnZ+jyvuAmsQEEHw5NY
-         LfkJ/hHPf+MvMW/y9tG0MJq4/7NOQuNGFkeO2dndaKtNtQCFbZd6evLTu+ahGe3zfR04
-         5JbiloDQi3UXuuhlhMjgL+iELnB3HKwoVl2ZkWXZPzOn/qqgoMMydvwMXM9U+Fje2N4v
-         cOYQdGH5Y7uB4KXg9vshUV1hFAVEwGS/bqCpLZKlWZEXTfraBRn41CiZC6TgBowRHLdD
-         KUdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752805008; x=1753409808;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/4cVCy+igKClD91Q0C623JaQKFoi0xlJc0TbgPtXkQo=;
-        b=NJXfI2/U4//Z7P72GylAo9rwrw8HPZi4UkBJS5+XeH+ucritWIKZB4sOzAvcSr9Mhi
-         HRLt9TPjAyuWRf9zD9ggYgKWw4ZB1OJTe7kcDdzmSHq5D1JdWDA/rAEjdRSkSKS5Fc7X
-         D2tex6fzBU38lhGfXnu8hPU74Jj5QwypqwSCjpB8f5CljTV0DWSu5zUJ5hzF8c+BESSq
-         AlA7bvZp92dK9cxZ9E39jOldvPkiBAkbh3e/pManI/OtvcRambBCXkA4rvuhxuWwnyyS
-         Apqgz4kbIueIKjK+jvafPq0R9JVxbGeuB1uzKAB7he9Y07KC7tIN6uM+TwcCsG7Z5edU
-         I6dg==
-X-Forwarded-Encrypted: i=1; AJvYcCUx0WaFw1OUnrJ90KQ5GPVxjwN06U0uvZCY8HOwd8tyCi5egFT72SsK5rwDOyiVlMch75w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzHV2y1KDHf2+t5nURU4tBWzRFn1ufIcQZvufEP/w8NyHcWHR88
-	D0cJJ6TNiac5Y5F+iD9tS08FCZOFU1+z7LBiDAmryD7NiM2t0DduyQJ3jixhUg1sMf7Oh4PizVw
-	pa80FzgzPGa7Cbmd8lh3iIA8XmKvH+ws=
-X-Gm-Gg: ASbGncsAebkSVRCmProP0IyvgJ6JDYcscTtddbqkZwVt04ESHapyPHyTrGPaAtv9Fxn
-	sKYkyqJ2RF1RCxnf3q7CmU7OQ8GSuMknrf6gPXQvpAXYRwU9rvlIJV6UQYrktfkJ023SI04wwPw
-	emF4WmyR+YS2m2Af4/HdxjXgFyprFHUdl3eNkU8ebvLgos3NdCD9/YMcFaHooQ1zBzcJPvxu9K2
-	ahF
-X-Google-Smtp-Source: AGHT+IG5dkHvknOHsiH3gl80hXX/qpto8UyKKqUO8ywyYrqszAloVTmGym/4MmsOqWco1mBL372otu81SQhoXzTKZ0w=
-X-Received: by 2002:a17:90b:1f91:b0:312:da0d:3d85 with SMTP id
- 98e67ed59e1d1-31c9f3c3657mr13189215a91.6.1752805007852; Thu, 17 Jul 2025
- 19:16:47 -0700 (PDT)
+	s=arc-20240116; t=1752805651; c=relaxed/simple;
+	bh=ftURKMxGNqYyR2he5weADE6SNvzMQrh7e4/H/8Bxh0Y=;
+	h=Subject:To:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=hqRGyhXg7bJwDfWcK6i0R69CyWWIuznQNHj8Wm1IcL1C2L62Qi6l4W60jTxVIh/8cgUP7Z2mwrQoBznstVT3d8hvPKFKNFB9nACmaTxDtqd4SH5knVUrTAGwxlRFzcSNqu11guFydNof/f79Dl9RNxkuOjd6CV3rEoWBYrKpbtk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.62])
+	by gateway (Coremail) with SMTP id _____8Cx_eIMsXloNJ0sAQ--.51531S3;
+	Fri, 18 Jul 2025 10:27:24 +0800 (CST)
+Received: from [10.20.42.62] (unknown [10.20.42.62])
+	by front1 (Coremail) with SMTP id qMiowJCxdOQKsXloJcEbAA--.17119S3;
+	Fri, 18 Jul 2025 10:27:24 +0800 (CST)
+Subject: Re: [PATCH 1/2] LoongArch: KVM: rework kvm_send_pv_ipi()
+To: Yury Norov <yury.norov@gmail.com>, Tianrui Zhao
+ <zhaotianrui@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>,
+ WANG Xuerui <kernel@xen0n.name>, kvm@vger.kernel.org,
+ loongarch@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <20250716165929.22386-1-yury.norov@gmail.com>
+ <20250716165929.22386-2-yury.norov@gmail.com>
+From: Bibo Mao <maobibo@loongson.cn>
+Message-ID: <a70dba22-c18e-3b28-6d2e-1eb7a4688a1d@loongson.cn>
+Date: Fri, 18 Jul 2025 10:25:43 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250709033242.267892-1-Neeraj.Upadhyay@amd.com> <20250709033242.267892-27-Neeraj.Upadhyay@amd.com>
-In-Reply-To: <20250709033242.267892-27-Neeraj.Upadhyay@amd.com>
-From: Tianyu Lan <ltykernel@gmail.com>
-Date: Fri, 18 Jul 2025 10:16:11 +0800
-X-Gm-Features: Ac12FXx4-j5t-Wlt-ORWLfXdLOTRGHYgCvA_lqM26BLPXc-phK_PVpOhloCbU-Y
-Message-ID: <CAMvTesAXc_nLKUw9eUBQv=7QCyukFDBOragN3PinpbhyxzuZ5w@mail.gmail.com>
-Subject: Re: [RFC PATCH v8 26/35] x86/sev: Initialize VGIF for secondary VCPUs
- for Secure AVIC
-To: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
-Cc: linux-kernel@vger.kernel.org, bp@alien8.de, tglx@linutronix.de, 
-	mingo@redhat.com, dave.hansen@linux.intel.com, Thomas.Lendacky@amd.com, 
-	nikunj@amd.com, Santosh.Shukla@amd.com, Vasant.Hegde@amd.com, 
-	Suravee.Suthikulpanit@amd.com, David.Kaplan@amd.com, x86@kernel.org, 
-	hpa@zytor.com, peterz@infradead.org, seanjc@google.com, pbonzini@redhat.com, 
-	kvm@vger.kernel.org, kirill.shutemov@linux.intel.com, huibo.wang@amd.com, 
-	naveen.rao@amd.com, kai.huang@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20250716165929.22386-2-yury.norov@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowJCxdOQKsXloJcEbAA--.17119S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoW7CFWUZw1UWF4kJr1xKF4UAwc_yoW8Kry8pw
+	4fCw4agr45GF13Gwn0qayvqF47XF4kKFn3ZrZ7Ja95Wrn0qFn5Xr40kF95Ja4fKa4rAF4S
+	vFy5t3sI9a1DJ3cCm3ZEXasCq-sJn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUv2b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8Jr0_Cr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx
+	1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv
+	67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07
+	AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02
+	F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw
+	1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7Cj
+	xVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r
+	1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU8xu
+	ctUUUUU==
 
-On Wed, Jul 9, 2025 at 11:42=E2=80=AFAM Neeraj Upadhyay <Neeraj.Upadhyay@am=
-d.com> wrote:
->
-> From: Kishon Vijay Abraham I <kvijayab@amd.com>
->
-> Secure AVIC requires VGIF to be configured in VMSA. Configure
-> for secondary CPUs (the configuration for boot CPU is done by
-> the hypervisor).
->
-> Signed-off-by: Kishon Vijay Abraham I <kvijayab@amd.com>
-> Signed-off-by: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
+
+
+On 2025/7/17 上午12:59, Yury Norov wrote:
+> From: "Yury Norov (NVIDIA)" <yury.norov@gmail.com>
+> 
+> The function in fact traverses a "bitmap" stored in GPR regs A1 and A2,
+> but does it in a non-obvious way by creating a single-word bitmap twice.
+> 
+> This patch switches the function to create a single 2-word bitmap, and
+> also employs for_each_set_bit() macro, as it helps to drop most of
+> housekeeping code.
+> 
+> While there, convert the function to return void to not confuse readers
+> with unchecked result.
+> 
+> Signed-off-by: Yury Norov (NVIDIA) <yury.norov@gmail.com>
 > ---
-> Changes since v7:
->  - No change.
+>   arch/loongarch/kvm/exit.c | 31 ++++++++++++-------------------
+>   1 file changed, 12 insertions(+), 19 deletions(-)
+> 
+> diff --git a/arch/loongarch/kvm/exit.c b/arch/loongarch/kvm/exit.c
+> index fa52251b3bf1..359afa909cee 100644
+> --- a/arch/loongarch/kvm/exit.c
+> +++ b/arch/loongarch/kvm/exit.c
+> @@ -821,32 +821,25 @@ static int kvm_handle_lbt_disabled(struct kvm_vcpu *vcpu, int ecode)
+>   	return RESUME_GUEST;
+>   }
+>   
+> -static int kvm_send_pv_ipi(struct kvm_vcpu *vcpu)
+> +static void kvm_send_pv_ipi(struct kvm_vcpu *vcpu)
+>   {
+> -	unsigned int min, cpu, i;
+> -	unsigned long ipi_bitmap;
+> +	DECLARE_BITMAP(ipi_bitmap, BITS_PER_LONG * 2) = {
+> +		kvm_read_reg(vcpu, LOONGARCH_GPR_A1),
+> +		kvm_read_reg(vcpu, LOONGARCH_GPR_A2)
+> +	};
+> +	unsigned int min, cpu;
+>   	struct kvm_vcpu *dest;
+>   
+>   	min = kvm_read_reg(vcpu, LOONGARCH_GPR_A3);
+> -	for (i = 0; i < 2; i++, min += BITS_PER_LONG) {
+> -		ipi_bitmap = kvm_read_reg(vcpu, LOONGARCH_GPR_A1 + i);
+> -		if (!ipi_bitmap)
+> +	for_each_set_bit(cpu, ipi_bitmap, BITS_PER_LONG * 2) {
+> +		dest = kvm_get_vcpu_by_cpuid(vcpu->kvm, cpu + min);
+> +		if (!dest)
+>   			continue;
+>   
+> -		cpu = find_first_bit((void *)&ipi_bitmap, BITS_PER_LONG);
+> -		while (cpu < BITS_PER_LONG) {
+> -			dest = kvm_get_vcpu_by_cpuid(vcpu->kvm, cpu + min);
+> -			cpu = find_next_bit((void *)&ipi_bitmap, BITS_PER_LONG, cpu + 1);
+> -			if (!dest)
+> -				continue;
+> -
+> -			/* Send SWI0 to dest vcpu to emulate IPI interrupt */
+> -			kvm_queue_irq(dest, INT_SWI0);
+> -			kvm_vcpu_kick(dest);
+> -		}
+> +		/* Send SWI0 to dest vcpu to emulate IPI interrupt */
+> +		kvm_queue_irq(dest, INT_SWI0);
+> +		kvm_vcpu_kick(dest);
+>   	}
+> -
+> -	return 0;
+>   }
+>   
+>   /*
+> 
+Reviewed-by: Bibo Mao <maobibo@loongson.cn>
 
-
-Reviewed-by: Tianyu Lan <tiala@microsoft.com>
---
-Thanks
-Tianyu Lan
 
