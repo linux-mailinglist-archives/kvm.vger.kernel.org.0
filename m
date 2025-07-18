@@ -1,252 +1,241 @@
-Return-Path: <kvm+bounces-52878-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52879-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53120B0A0D2
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 12:40:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB828B0A173
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 13:01:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 86FAD5A6A7E
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 10:40:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 316EB3AD3C2
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 11:00:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 997402BCF4D;
-	Fri, 18 Jul 2025 10:40:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98EFF29B23B;
+	Fri, 18 Jul 2025 11:01:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZUo3qd1J"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XkkmxeU+"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA96629B218;
-	Fri, 18 Jul 2025 10:40:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752835206; cv=none; b=Mrnd792VH9n/NUD/zaPKFwqZKRYi9bIzS9aRt/mpfob40OeLJQcyNK45+Tsj0OnpvitqtnaXV9oBxHgL6zBh6G8MvBLjZ0SDv/wtCS4anPTgPVmegpUmNt08VWxtfr/Y664RVYeHDX5XCD31aIu53ZrBADkezDCaDaiJ7bh8sL4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752835206; c=relaxed/simple;
-	bh=XGz8ZhzbTwznyHWED45VJOm5rJlDzZ3hdJbtYJAImLM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qRQbBcidU7h8igOByDWC7mu0JhyTzzyj7mCM3JLI5zqiiiuKG4YqEzOKG0ahrgn+pTPiYmSW+yncDJ/SyOfwaP6P01FNVIxJrKrT0Vn6irAM3rc6now+vCMX9UsPPR2pxPhFqTROg3xt1a+RRsKR3nDTwn26MiRaj8e6+jtIGI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZUo3qd1J; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7656C4CEEB;
-	Fri, 18 Jul 2025 10:40:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752835206;
-	bh=XGz8ZhzbTwznyHWED45VJOm5rJlDzZ3hdJbtYJAImLM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZUo3qd1JztJCCHJFWaXXROHmddmYV1qxfrYVoyzrOagEdm1GMDGKvuRTxevbmf9lP
-	 86f448eq14ml1Qc2prQO2rBZYbZNktJQRxE5tjAd20xj/bHmajArx0QJFfgcxrRTr6
-	 SiqGC9Tn7X3V39pu2V/bx+h7klvwZY7MVNAfLeJcBv0Np7hXch7OpcbC8u3M/R5Ktt
-	 2iALltoPay27sGDsGpVR+5yrNoepamigRdZfrlU10ZmeTrNFpk4Rx9vA/r1bBKj3FQ
-	 fyOLfFixxFtdbIh5cezlGP3nnaFc1pSVmqn49npdSSnUgkq/8wFv7jeNKvVKhnRJIp
-	 p5GIMf8UZkLUA==
-Date: Fri, 18 Jul 2025 16:04:35 +0530
-From: Naveen N Rao <naveen@kernel.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>, Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>, 
-	Vasant Hegde <vasant.hegde@amd.com>
-Subject: Re: [PATCH v3 2/2] KVM: SVM: Limit AVIC physical max index based on
- configured max_vcpu_ids
-Message-ID: <xojzhg3e6czqg6zqyt3wbnzfafwy7bd7fq43b3ttkhfcw3svot@rakzaalsslfz>
-References: <cover.1740036492.git.naveen@kernel.org>
- <f4c832aef2f1bfb0eae314380171ece4693a67b2.1740036492.git.naveen@kernel.org>
- <aFnzf4SQqc9a2KcK@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 676DD23C506;
+	Fri, 18 Jul 2025 11:01:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752836461; cv=fail; b=sOfcXpSHWQwMDBr6EVih/qE9c19x+INsfTuDAglh/OPNtLCAL6iL5HuWuX281TlEpNLjhbUmzeaJvlSOgF1ZwiKecBwiQK/EmPaiHz1TsWqXTD1EDNwG86jAIpYClwm5Zp00wVbGJNHPpOwhMh3VyYP8KpRqfME3LthCcY3FG28=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752836461; c=relaxed/simple;
+	bh=70bpq6oBhapznUK8Uu08XOYncmVjUlC/q0KLjKXjKoM=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=PVjQIgJZLfUcXnaJUVv3VkYCPIsjuSLRwOL/w4LnYkMCwmaNcDwl0+t1GP5oSSYUYonZ53R5KG+5CBaRyPi7I9VTfDHVSj9rwUGPGKaq77T03ne1Nb9+ZG2wnWQ2VqScfEiookDQbDc+U4BbTZZq1rGDUjsGvF+WxLEEUpJGeys=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XkkmxeU+; arc=fail smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1752836460; x=1784372460;
+  h=date:from:to:cc:subject:message-id:references:
+   content-transfer-encoding:in-reply-to:mime-version;
+  bh=70bpq6oBhapznUK8Uu08XOYncmVjUlC/q0KLjKXjKoM=;
+  b=XkkmxeU+NMss5w93St4r+GwIcOdF0k3m//lWHdhuyYfc0rgZf3qT+j44
+   Mf2UcD3hCrBosNN22d+z0yBByhF297+Q2NQy5QmFrWsYPx1Lg5MDh0B6B
+   uytn1PiM2FJaZLjjDcR4OOZi3F91n86xUKHTydt2yn//MK/WUBuTIMC6k
+   ORYuWaJrvyEa/N12+DR2HeVyRahisDneD0Ev20TB+R9tZqbtUyMAqAeQN
+   f/wEKJIkmCxvQpofcNL6aHiNxcd7EGLUz2doaEteWlj3pNNT1csPNqobC
+   593aauvePxPVODlIJ3YwRPOg890FRiKDTvm69bYqF58IkqQiJvtLhy6cg
+   A==;
+X-CSE-ConnectionGUID: UqxjLaouSQiQ6F1igQom3Q==
+X-CSE-MsgGUID: tBOMOFjeRguqTRleSXr7/A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11495"; a="80571783"
+X-IronPort-AV: E=Sophos;i="6.16,321,1744095600"; 
+   d="scan'208";a="80571783"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2025 04:00:59 -0700
+X-CSE-ConnectionGUID: Pl9IyOR9TcmlHrFYJDkBAQ==
+X-CSE-MsgGUID: BGyI87gPSriFOX+Ghf2zBg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,321,1744095600"; 
+   d="scan'208";a="158510309"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by orviesa008.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2025 04:00:59 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26; Fri, 18 Jul 2025 04:00:58 -0700
+Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26 via Frontend Transport; Fri, 18 Jul 2025 04:00:58 -0700
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (40.107.94.45) by
+ edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Fri, 18 Jul 2025 04:00:58 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=zO33y0RPXxHIXaY4pf8r7uIcBhQXVlWKdX9AveKbxahcJQGbtbHGlboz0/MtIlxuW169nrTzVLfDrAdWEJ7Jz9fl00a+2Owdq2B44pQVgacojvrExOFRObJguCWjDS0l6bFsCXasI0ELtss3dl/nu9gENalPGd93U0MiR7TzcHC27rKMx917zEN2gMZv0Ln+mrD6i1zQjm+27DK1QhRkXFh0nwrm2LAg/e6zO8BXkrjxbFVa0VwSpLxXq2aLI8lOAVGRaqoBBCEv1bg1dlxndJZyE52v5C/1Mj/WWzRqjWL1bbjAD4wj31BS6eiltHf2hLC2eSumxsyax/3CY6wFDA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=70bpq6oBhapznUK8Uu08XOYncmVjUlC/q0KLjKXjKoM=;
+ b=WJGsHCatHsGMLk921JsUXlsdVEHNqxUnykre09aDCuHNKa1DErYvH6BBeIrNv3/T3zusUIIXULLyEXIGhisHPj5AtHUJ0viKvZpdGD+1VQNW2KKfodHGLrjhUQNj/oVl2Aj1LLzULy6OPjkm5KuxMGz8qRcLh/uheSOlOMIt9fgS8YOxKABYDC5bOya8jeCHWp8wnPzdhNY+XWF/QfC0nUFGJ5BTyUdwqpl2OuBb0vHMdTj5gRtV8e7C8iF4yX6fKOrwf9QNUft/kFGz6DYPDx1ULgoj9gVgmlgglGLT+PW8+GcQeqIeu3DfN3wYQRXtBPtfdtuIDOWjGDxMrVO6hg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
+ by PH8PR11MB6780.namprd11.prod.outlook.com (2603:10b6:510:1cb::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8922.39; Fri, 18 Jul
+ 2025 11:00:56 +0000
+Received: from CH3PR11MB8660.namprd11.prod.outlook.com
+ ([fe80::cfad:add4:daad:fb9b]) by CH3PR11MB8660.namprd11.prod.outlook.com
+ ([fe80::cfad:add4:daad:fb9b%5]) with mapi id 15.20.8943.027; Fri, 18 Jul 2025
+ 11:00:56 +0000
+Date: Fri, 18 Jul 2025 19:00:44 +0800
+From: Chao Gao <chao.gao@intel.com>
+To: Jason Wang <jasowang@redhat.com>
+CC: Cindy Lu <lulu@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Vitaly
+ Kuznetsov" <vkuznets@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, "Ingo
+ Molnar" <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
+	<dave.hansen@linux.intel.com>, "maintainer:X86 ARCHITECTURE (32-BIT AND
+ 64-BIT)" <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>, "Peter Zijlstra
+ (Intel)" <peterz@infradead.org>, "Kirill A. Shutemov" <kas@kernel.org>, "Xin
+ Li (Intel)" <xin@zytor.com>, Rik van Riel <riel@surriel.com>, "Ahmed S.
+ Darwish" <darwi@linutronix.de>, "open list:KVM PARAVIRT (KVM/paravirt)"
+	<kvm@vger.kernel.org>, "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)"
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v1] kvm: x86: implement PV send_IPI method
+Message-ID: <aHopXN73dHW/uKaT@intel.com>
+References: <20250718062429.238723-1-lulu@redhat.com>
+ <CACGkMEv0yHC7P1CLeB8A1VumWtTF4Bw4eY2_njnPMwT75-EJkg@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACGkMEv0yHC7P1CLeB8A1VumWtTF4Bw4eY2_njnPMwT75-EJkg@mail.gmail.com>
+X-ClientProxiedBy: SG2P153CA0037.APCP153.PROD.OUTLOOK.COM (2603:1096:4:c6::6)
+ To DS0PR11MB8665.namprd11.prod.outlook.com (2603:10b6:8:1b8::6)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aFnzf4SQqc9a2KcK@google.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR11MB8660:EE_|PH8PR11MB6780:EE_
+X-MS-Office365-Filtering-Correlation-Id: 392a01b7-49d9-4922-786e-08ddc5ea5ea8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016|7053199007;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?T1UxMWhpV1REaXRHL3ZHaWlyMGFrdjI5OFgzcWdUQTk5enR5RW1LWVgxOVhr?=
+ =?utf-8?B?b1dxL3dTb004SDQvZzBnMCs3V2IrUGJ2NkUxdXpmTkt4TWRwa2lYYTRIM1Ar?=
+ =?utf-8?B?WnAvV1dzaEgrL240ek5pNGFGYTVvbEd5STk1dE9wMlhHb29yVnlGcVRXSWxS?=
+ =?utf-8?B?UHQzUGdiZnZ0aVdyWFJ3dEY1em14aTFRYWtPQ3ljUHJKekZoNU0xWjZkVW1u?=
+ =?utf-8?B?b3VzRExrT0M1MWpGaWQwZG9Cc09CRXJUQkh3Vi9KVFY5d0w4cjdzYi9yVXJX?=
+ =?utf-8?B?ZFloSXlISXB2ZDhHb1BrTUYrUTlYcGxhQUNFajh4Tk9xemJCWXk0RlQ5WlZY?=
+ =?utf-8?B?aDg0WDd5M015NTFoeEFQdW4xV2g0QXYwcXFJOUZ6NXVNWnVJTDRSVkc3TmJ0?=
+ =?utf-8?B?T1RoSFJ0T0xpVGRNU3FieENaR09MR2o0MzQ5QU5POFlPQzB0SzZSTlY2L1Yy?=
+ =?utf-8?B?WndicmZQUjFBUnJkcHJQekt3aWlQY0VQZVRnSTNXVDRhdmRld2lLREdyN0RL?=
+ =?utf-8?B?Qm9IWnEvTUNjczRiRXcwQUdPdDRkQlY3d253N3RwM1lrbXNieDdGa293Q3ZP?=
+ =?utf-8?B?eWU0cGlhaWNPZk1YbmZ2QlF4N2dVVGtZM3NsaEpMTUlid2NhYmVUZC9kSGQr?=
+ =?utf-8?B?ZzFqWUdEb2xNSm5LQkx4TkRhb01ic1hHeDFpYWY0VUdhSnl2ZFBMRWxGYzJm?=
+ =?utf-8?B?TENLcU5lZFhKbTVmVFhJL1h6Yi93cVpJVHFwY2M1dEVHbGwrRVlod2hIdm1v?=
+ =?utf-8?B?NWRodFliZ01SL0ltZlpXZ052Uy9ZS0FCdjliTDZtejdrVTVSMm5mcGVCbngy?=
+ =?utf-8?B?UUZOS0tsNTAwRW9Eb2dsODBGaFdUam03T3RZZGpaNFZNcXV6M3BLbjE3Rk9H?=
+ =?utf-8?B?Q3Bhck00bXpnVnhyWllkeXhyTWlQM1F1NHc0L1JFcUNkZXhsYndXTC9NdW85?=
+ =?utf-8?B?N00reEJYZkZPYi8wUk1Nbmp4OFZ0WjBqaU9JSmlOY0hLcmpPWEZtYktDck55?=
+ =?utf-8?B?UG4veEp2UjFWTjdnTUxKallGbjR3QlBkTW0vclpqdkFFcG5pMlIyME1pbWdS?=
+ =?utf-8?B?eVFRbFFlbDZBNCtnMnFqd1ZtUzZ6YlJlVEk5L24wREVoK28zOVZqVGxSalVL?=
+ =?utf-8?B?Qy9xb3F2d3BUSGcwTnVTT29uampUSEw4Zi9IdVMwc3hHSUxnSWhYMFF4REJq?=
+ =?utf-8?B?Z2U5QThBeTlGTWJmNkJwWmpFUWtoMy9sNCtBRHA4UVRjQjVrZWZIdGtONHNl?=
+ =?utf-8?B?MS9SQVRxR0lSQVRQa0RaNlNzME1tTXp0ZFBKelVMZFJoRWxsQ0x6blU4OThh?=
+ =?utf-8?B?ME9vZEhIU3BBWjNROWhBWmlnQXBOYjBoOTRRRWpad1BwTnlDNzc1OUpibm4v?=
+ =?utf-8?B?WC9tZjhqUEJGT0VMODM0YUpIK3VGZ05hbHpQQ0pzR1dVVVN5b2VXY1BSZkpF?=
+ =?utf-8?B?YXRxaUY0RThpU2pHanQrZkFYT0J4TGVPS3JWQ2p0N0lyQ3dHcCtzWHpqL3Vu?=
+ =?utf-8?B?ejdpT09QdDNZbXNwbDBoamM1WklrNVJqZHpjWGdxR2lNRmoyU0ROZXFhZlg2?=
+ =?utf-8?B?WWdVZzV0OERPam4rNDFmMjdMRFY3UVB5TUpSeDl0T2FPR2ViUlR0bEtPbDNu?=
+ =?utf-8?B?Ykx0QUdLY1hzbDN0dDZES2Z6V3kyMTVvSkdMUVhRVmlVdGZ5YWZtUXhvWm50?=
+ =?utf-8?B?YXJhZFV0RHhDd1pmVDdHRklCbGdoUERKZThBK3hoc041a2RTSitnbG5qVEpC?=
+ =?utf-8?B?RW9hZS90K2psSTRCajB6eFRKeHFJSnhCMnJuV0xYVGJMZklCSkJJcXg1Wjg5?=
+ =?utf-8?B?UUtpZnRxUFJuS1VWUnBmV3FLb2ZxME9qNUsvcHo3eUZmMzVwQWxRTXcva1RV?=
+ =?utf-8?B?Vnc3dDFCVnllVngwYmZCMUljSWsvOE96dzBhR0dkSUx0V1RxU2kyanlyd0dI?=
+ =?utf-8?Q?OwfW3y9w1M8=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8660.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?U203R2YzK3FObzhBdDlGQ05CZG1pK282b3pvYnZJZUlTRFI1bGJLdVpiWG0r?=
+ =?utf-8?B?QnJNSlFUcTJKNDJCYjNGZExiS2ZVQzMwTXo3bUNvYllVSEJtdVFmbFlxRDVY?=
+ =?utf-8?B?QmlyREVUaVZEOGErNHJYNmhwNUtwY0huOGNpZDZ6TUtTdTFHNGxSdkJuTHg0?=
+ =?utf-8?B?UUNYQU9QZnUwZkQzRjFyMVhuR3VPL0ZhM2FYbGVWWDMrNm1HMndHVkpHRFlw?=
+ =?utf-8?B?OUdTdk14WHNJR1dBQ2NKT2U4amFzeUVKRk9vc0hjU0k3NU1maGk0VGxmUjhi?=
+ =?utf-8?B?NGRqZzdEbTZDQjVZZ0Z3aWFzV0Q0Y2hMQjRJSy9QWUZ4V2grK3cwZENmNkY4?=
+ =?utf-8?B?LzE2alc5cjN2MjEzaU15Q2lUQnE1aTREcE9vUTRSZlk5VStDLzhLd2tORTk5?=
+ =?utf-8?B?VGdKbWZVWEN6Ujd5VlhidEZRQWFGa1A5QUJ1djRGc0hlZjEwWjNRZFBOaEVT?=
+ =?utf-8?B?cGd2UURFNG1qMlJCaXBERXdXVFNmT1pFazcxN3dVUWt6LzNOQUR5OWZvMzky?=
+ =?utf-8?B?QmIvVUh1Qm53R1FqamFZVDFDTHpUQmZsbGRYUWV4TnRsSWdXNHFSUDhYMDFm?=
+ =?utf-8?B?UnJXZGRhT3RSU0owZXpnOGdncmdoY3Era2ZNL2RGMlJ5N1hqaFBHaXEwY01X?=
+ =?utf-8?B?VkJEZWJucUxYU2Q4V1l4anpmNThXeGk1KzFBOFozTXducDZiSEE3OGE5RzZv?=
+ =?utf-8?B?bGNOS29nVFQxUENwV1d5QTB4WStwKzJvWDNVSHkzb3BGNUw4MHdBK3lKWUs5?=
+ =?utf-8?B?MUYySEpGTXFFZEhLZkhFd0xRbndidThiUTFZTjRUOHdHNnp0b1puZ3E5MVh3?=
+ =?utf-8?B?UlVBbG1TSHBITzFMZjM3SjRmREF3WG5GeDZjdmdrZjdmaUJDbS9UQWxNRWdt?=
+ =?utf-8?B?UFpkT2dJVjY5M2VsWW9MaVdCc1oyR1V6d0UrNVdDUFNKVjk5Umd6cUtzUWRN?=
+ =?utf-8?B?N2h3YUM4OW9MQzRPTkc2RVB0V0tsTmQ0Z25BZFRDWTRGRVJyNHdVQUYyTkRN?=
+ =?utf-8?B?VlF4NmoyS0d5OUxwQVdETVV0Rk1KSmRjNGttQ1M2NnFPN1NvVjg2M3NUZERS?=
+ =?utf-8?B?UVhxZzVMQmFJRk14UWllYWF0MFdFOXkzVUpwWjRNZ0Y0bDNtdDhyamNObU9Z?=
+ =?utf-8?B?OG10dUloTU96ZS9HaGY1OFJramFHY2JFQUtNaEY2amNrL0lrOTVIK1o3cmw4?=
+ =?utf-8?B?Z1BBZEU4QWtjSGYxcURCcGgwUkk1VTlZVnZmRW5UcHhKbHdSZnJtTEFuRllI?=
+ =?utf-8?B?aHRzQWdCdWZCUzlUUUg3UVBHQWEyOHdSQkxDKy91K2EvV3pKekgrQmpzc084?=
+ =?utf-8?B?S0NTZ2g0UW1zVzNUOU9OSjVheHhjd2xHYlJqZ1JaVmxMVkhaNTFpOEMyTWxt?=
+ =?utf-8?B?UExzczhjOVhYRnBoZ1JyQzdFQTZYVUdhQUdqTk5BTUNTNHJUd3ozRE04ekhN?=
+ =?utf-8?B?aW1kN1MzTFVsV2xCMmdrTXBlQ3JueEhneHF3UnlZMC9Hc1ZnRUt3YWhLamlQ?=
+ =?utf-8?B?b2UvMGRWYjJldVRoR3RWWlRRbzhuUUpxMXR2MmE4OFp3VGtTQkg3bVVjcUcw?=
+ =?utf-8?B?QlVSUXVGNE5QckM0T2d1OVJxV0w0cXJsbmE0eVAyT3ZEZWJzZ3prSjJpTkdL?=
+ =?utf-8?B?NU9HYm9kMFV0Mkh2Q0JjKytQektGNzA1RDlyQ0ZtR2IraWJsbG96ZVc3VkpP?=
+ =?utf-8?B?WEpjYmU1dStUUWdjbzVCM1kyaEdkeHJOLzUyaEh1NUdPRUZqY2d4VjZhbEF5?=
+ =?utf-8?B?bkE4TVg2WEt5SG5nNGtZZEN1MkZ2WWZJZ3plVkh1bzZEZjFSQ2pzdGxxRC9O?=
+ =?utf-8?B?K1RaRzZ2elhoRGVGNFFWRy80TGJvUEFaa2ZDTWJVYWk5ZGxiaUprVFhRTTla?=
+ =?utf-8?B?a0JVcWkyWVdMUlArYnpvMXp5K2VIeXFlWEhqVmVoWlFQc1IyWXZxNUh1d094?=
+ =?utf-8?B?VzRCQU5lQVgvdkNQVWRKRy91aitaRXgzYlowbUluTTJRR2JFUTFIMVlxUmhZ?=
+ =?utf-8?B?YnFHd1BnVEdYYXpIMG9nVi8xbWsvck9NQyt2dVJJaWxYejE1Um8vRkdHNkl4?=
+ =?utf-8?B?V0gxSmMrSDFnOHVjSkZiSDFGMVAvUStiako3bHZmNlpDUDBCbWhOOTNmMXN0?=
+ =?utf-8?Q?nF5dYgje0ocEsc91TWl1699G+?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 392a01b7-49d9-4922-786e-08ddc5ea5ea8
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8665.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jul 2025 11:00:56.3997
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: PIFlT9/UiFMcGc1k3al9Nha3BRMf//LQrqKYmB3LbYtWIjNc4k4Cnhn2hN8ThRlFeiAOB/pvRUcGNtThfnXP3w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB6780
+X-OriginatorOrg: intel.com
 
-On Mon, Jun 23, 2025 at 05:38:23PM -0700, Sean Christopherson wrote:
-> On Thu, Feb 20, 2025, Naveen N Rao (AMD) wrote:
-> > KVM allows VMMs to specify the maximum possible APIC ID for a virtual
-> > machine through KVM_CAP_MAX_VCPU_ID capability so as to limit data
-> > structures related to APIC/x2APIC. Utilize the same to set the AVIC
-> > physical max index in the VMCB, similar to VMX. This helps hardware
-> > limit the number of entries to be scanned in the physical APIC ID table
-> > speeding up IPI broadcasts for virtual machines with smaller number of
-> > vcpus.
-> > 
-> > The minimum allocation required for the Physical APIC ID table is one 4k
-> > page supporting up to 512 entries. With AVIC support for 4096 vcpus
-> > though, it is sufficient to only allocate memory to accommodate the
-> > AVIC physical max index that will be programmed into the VMCB. Limit
-> > memory allocated for the Physical APIC ID table accordingly.
-> 
-> Can you flip the order of the patches?  This seems like an easy "win" for
-> performance, and so I can see people wanting to backport this to random kernels
-> even if they don't care about running 4k vCPUs.
-> 
-> Speaking of which, is there a measurable performance win?
+On Fri, Jul 18, 2025 at 03:52:30PM +0800, Jason Wang wrote:
+>On Fri, Jul 18, 2025 at 2:25 PM Cindy Lu <lulu@redhat.com> wrote:
+>>
+>> From: Jason Wang <jasowang@redhat.com>
+>>
+>> We used to have PV version of send_IPI_mask and
+>> send_IPI_mask_allbutself. This patch implements PV send_IPI method to
+>> reduce the number of vmexits.
 
-That was my first thought. But for VMs upto 512 vCPUs, I didn't see much 
-of a performance difference with broadcast IPIs at all. But, I guess it 
-shouldn't hurt, so I will prep a smaller patch that can go before the 4k 
-vCPU support patch.
+It won't reduce the number of VM-exits; in fact, it may increase them on CPUs
+that support IPI virtualization.
 
-With 4k vCPU support enabled, yes, this makes a lot of difference. IIRC, 
-ipi-bench for broadcast IPIs went from ~10-15 seconds down to 3 seconds.
+With IPI virtualization enabled, *unicast* and physical-addressing IPIs won't
+cause a VM-exit. Instead, the microcode posts interrupts directly to the target
+vCPU. The PV version always causes a VM-exit.
 
-> 
-> > Signed-off-by: Naveen N Rao (AMD) <naveen@kernel.org>
-> > ---
-> >  arch/x86/kvm/svm/avic.c | 53 ++++++++++++++++++++++++++++++-----------
-> >  arch/x86/kvm/svm/svm.c  |  6 +++++
-> >  arch/x86/kvm/svm/svm.h  |  1 +
-> >  3 files changed, 46 insertions(+), 14 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-> > index 1fb322d2ac18..dac4a6648919 100644
-> > --- a/arch/x86/kvm/svm/avic.c
-> > +++ b/arch/x86/kvm/svm/avic.c
-> > @@ -85,6 +85,17 @@ struct amd_svm_iommu_ir {
-> >  	void *data;		/* Storing pointer to struct amd_ir_data */
-> >  };
-> >  
-> > +static inline u32 avic_get_max_physical_id(struct kvm *kvm, bool is_x2apic)
-> 
-> Formletter incoming...
-> 
-> Do not use "inline" for functions that are visible only to the local compilation
-> unit.  "inline" is just a hint, and modern compilers are smart enough to inline
-> functions when appropriate without a hint.
-> 
-> A longer explanation/rant here: https://lore.kernel.org/all/ZAdfX+S323JVWNZC@google.com
-
-Ack.
-
-> 
-> > +{
-> > +	u32 avic_max_physical_id = is_x2apic ? x2avic_max_physical_id : AVIC_MAX_PHYSICAL_ID;
-> 
-> Don't use a super long local variable.  For a helper like this, it's unnecessary,
-> e.g. if the reader can't understand what arch_max or max_id is, then spelling it
-> out entirely probably won't help them.
-> 
-> And practically, there's a danger to using long names like this: you're much more
-> likely to unintentionally "shadow" a global variable.  Functionally, it won't be
-> a problem, but it can create confusion.  E.g. if we ever added a global
-> avic_max_physical_id, then this code would get rather confusing.
-
-Sure, makes sense.
-
-> 
-> > +
-> > +	/*
-> > +	 * Assume vcpu_id is the same as APIC ID. Per KVM_CAP_MAX_VCPU_ID, max_vcpu_ids
-> > +	 * represents the max APIC ID for this vm, rather than the max vcpus.
-> > +	 */
-> > +	return min(kvm->arch.max_vcpu_ids - 1, avic_max_physical_id);
-> > +}
-> > +
-> >  static void avic_activate_vmcb(struct vcpu_svm *svm)
-> >  {
-> >  	struct vmcb *vmcb = svm->vmcb01.ptr;
-> > @@ -103,7 +114,7 @@ static void avic_activate_vmcb(struct vcpu_svm *svm)
-> >  	 */
-> >  	if (x2avic_enabled && apic_x2apic_mode(svm->vcpu.arch.apic)) {
-> >  		vmcb->control.int_ctl |= X2APIC_MODE_MASK;
-> > -		vmcb->control.avic_physical_id |= x2avic_max_physical_id;
-> > +		vmcb->control.avic_physical_id |= avic_get_max_physical_id(svm->vcpu.kvm, true);
-> 
-> Don't pass hardcoded booleans when it is at all possible to do something else.
-> For this case, I would either do:
-> 
->   static u32 avic_get_max_physical_id(struct kvm_vcpu *vcpu)
->   {
-> 	u32 arch_max;
-> 	
-> 	if (x2avic_enabled && apic_x2apic_mode(vcpu->arch.apic))
-
-This won't work since we want to use this during vCPU init and at that 
-point, I don't think we can rely on the vCPU x2APIC mode to decide the 
-size of the AVIC physical ID table.
-
-> 		arch_max = x2avic_max_physical_id;
-> 	else
-> 		arch_max = AVIC_MAX_PHYSICAL_ID;
-> 
-> 	return min(kvm->arch.max_vcpu_ids - 1, arch_max);
->   }
+>>
+>> Signed-off-by: Jason Wang <jasowang@redhat.com>
+>> Tested-by: Cindy Lu <lulu@redhat.com>
 >
+>I think a question here is are we able to see performance improvement
+>in any kind of setup?
 
-<snip>
+It may result in a negative performance impact.
 
-> 
->   static u32 avic_get_max_physical_id(struct kvm_vcpu *vcpu, u32 arch_max)
->   {
-> 	return min(kvm->arch.max_vcpu_ids - 1, arch_max);
->   }
-> 
->   static void avic_activate_vmcb(struct vcpu_svm *svm)
->   {
-> 	struct vmcb *vmcb = svm->vmcb01.ptr;
-> 	struct kvm_vcpu *vcpu = &svm->vcpu;
-> 	u32 max_id;
-> 
-> 	vmcb->control.int_ctl &= ~(AVIC_ENABLE_MASK | X2APIC_MODE_MASK);
-> 	vmcb->control.int_ctl |= AVIC_ENABLE_MASK;
-> 
-> 	/*
-> 	 * Note: KVM supports hybrid-AVIC mode, where KVM emulates x2APIC MSR
-> 	 * accesses, while interrupt injection to a running vCPU can be
-> 	 * achieved using AVIC doorbell.  KVM disables the APIC access page
-> 	 * (deletes the memslot) if any vCPU has x2APIC enabled, thus 
-> 	 enabling
-> 	 * AVIC in hybrid mode activates only the doorbell mechanism.
-> 	 */
-> 	if (x2avic_enabled && apic_x2apic_mode(vcpu->arch.apic)) {
-> 		vmcb->control.int_ctl |= X2APIC_MODE_MASK;
-> 		max_id = avic_get_max_physical_id(vcpu, x2avic_max_physical_id);
-> 
-> 		/* Disabling MSR intercept for x2APIC registers */
-> 		svm_set_x2apic_msr_interception(svm, false);
-> 	} else {
-> 		max_id = avic_get_max_physical_id(vcpu, 
-> 		AVIC_MAX_PHYSICAL_ID);
-> 		/*
-> 		 * Flush the TLB, the guest may have inserted a non-APIC
-> 		 * mapping into the TLB while AVIC was disabled.
-> 		 */
-> 		kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
-> 
-> 		/* Enabling MSR intercept for x2APIC registers */
-> 		svm_set_x2apic_msr_interception(svm, true);
-> 	}
-> 
-> 	vmcb->control.avic_physical_id &= ~AVIC_PHYSICAL_MAX_INDEX_MASK;
-> 	vmcb->control.avic_physical_id |= max_id;
->   }
-> 
-> 
-> I don't think I have a preference between the two?
-
-I'm thinking of limiting the helper to just x2AVIC mode, since the 
-x1AVIC use is limited to a single place. Let me see what I can come up 
-with.
-
-> > +static int svm_vcpu_precreate(struct kvm *kvm)
-> > +{
-> > +	return avic_alloc_physical_id_table(kvm);
-> 
-> Why is allocation being moved to svm_vcpu_precreate()?
-
-This is because we want KVM_CAP_MAX_VCPU_ID to have been invoked by the 
-VMM, and that is guaranteed to be set by the time the first vCPU is 
-created. We restrict the AVIC physical ID table based on the maximum 
-number of vCPUs set by the VMM.
-
-This mirrors how Intel VMX uses this capability. I will call this out 
-explicitly in the commit log.
-
-
-Thanks,
-Naveen
-
+>
+>Thanks
+>
+>
 
