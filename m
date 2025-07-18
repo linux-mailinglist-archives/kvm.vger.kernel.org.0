@@ -1,176 +1,119 @@
-Return-Path: <kvm+bounces-52866-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52867-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C98DB09CCE
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 09:41:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11B45B09D00
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 09:53:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6DF4B3AC972
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 07:40:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B1BCB7B0172
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 07:51:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D2182698AF;
-	Fri, 18 Jul 2025 07:41:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA9632951C8;
+	Fri, 18 Jul 2025 07:52:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MQ86e6hp"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RPaYuF3h"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 697E82153D8
-	for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 07:41:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CDDC293B49
+	for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 07:52:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752824468; cv=none; b=bG767hjjSyCiVkZu+Fs9OrROiujNki4puCq20DUD/5syaXyED0uo0a088M523JXToBdEM1L2i3ot2eYIMNORNK4+/OAKOJ5+2IlxAlJZU7ggkZWsVcXn1irIM833sKSvad0IIY9xFkc9MOGqSqzNJKdxrq5n4U39Ny9qyzR+gO8=
+	t=1752825167; cv=none; b=ccZZ1R5Zl7JhghTa/t2j9haOB+kMMl51V22EZMfyHPVHyZXVe45bmjFJuQmRfqAtxdXJn39AbR6DtDEpEPN1y06EwM6n90cUIRJ6vnh8ORNbk8bqLhtNIYNBIsNNXRmLDTfIlHv1JSg1i9x0o5jE4Vn103Q19bgKtSEIlTZflQQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752824468; c=relaxed/simple;
-	bh=eH8YRhRJpc6NehW+7nuZDcphdqJ/DUxtYgNbRC6kVF4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=LtQwcqaLVnMw6hMd28DV1Mxx4UHY95YUVOko1FZYxg9loBKz/1Huw9U/TkaYrwwXYbM25DvK0+F6g6tD+r/PMr/MAmOn91WmWZtD1NFQJAe7gNVVVRSUMBCMeWVKhABzsSRjVqRQYxpb087W5HSnV+a1HL9hN5yzff7gk5lbOe8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MQ86e6hp; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1752825167; c=relaxed/simple;
+	bh=2pi8KBcoIPlm4tOCt/inqjOUYuaGd1omaspVeZAZA8w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MXB4oWON1hBfOECCnT+jTYMXO05BmIXNZ+zotC5WafnH/ulAySI5FquyXCSRfOZ2h9POuOE+5ejXfO1uqNhW4CAjhyEITGTSDtWqEFn+F35EwK4GSOSjHJDlG3U4KEdKRnohTLm8EXU2Oij0GBzd+U7ELvse+I9pvLjhMJ4CPl8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RPaYuF3h; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752824465;
+	s=mimecast20190719; t=1752825164;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=IG2eizzZJt3NfPiAIbYJBKp6D6nK5xGpStHjSOOxYBM=;
-	b=MQ86e6hpkKbvhkzOkkpiG5iC8wc9d7zGHS3KyCx35rNxch8dv/9l/rfvwWMyuToB40+xLF
-	S+ONctBUcXQPJpeY2sZekzW35q5PoOPE2t/rV1dozkGD6OVwEZjeQhTi11KDphpENs8JkD
-	hubZdH0tOWkHujkJfr893vslWQl5pTI=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	 in-reply-to:in-reply-to:references:references;
+	bh=2pi8KBcoIPlm4tOCt/inqjOUYuaGd1omaspVeZAZA8w=;
+	b=RPaYuF3h+bcigEPAjovnmbMBqzDoWJ41RVYOQG7XMf5kZXlQpRNIgdx11gDEqRwzJtplKQ
+	tvb7Pg+mm/eBcDaRMipyoZT8AZbszu+/bfJQu8lPL+WX1yUYnz6FKqVgTxjNElI18ZpfQz
+	2xBuUAGGi6u/YYcqSeYb4uFfcu4Wyx4=
+Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
+ [209.85.214.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-538-XGzj-6nPPZyXXERM62dwAA-1; Fri, 18 Jul 2025 03:41:04 -0400
-X-MC-Unique: XGzj-6nPPZyXXERM62dwAA-1
-X-Mimecast-MFC-AGG-ID: XGzj-6nPPZyXXERM62dwAA_1752824463
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3b61e53eea3so104448f8f.0
-        for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 00:41:03 -0700 (PDT)
+ us-mta-424-xAwCqZ0xM56WjFOGVrQDWw-1; Fri, 18 Jul 2025 03:52:42 -0400
+X-MC-Unique: xAwCqZ0xM56WjFOGVrQDWw-1
+X-Mimecast-MFC-AGG-ID: xAwCqZ0xM56WjFOGVrQDWw_1752825161
+Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-234f1acc707so19032525ad.3
+        for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 00:52:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752824463; x=1753429263;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IG2eizzZJt3NfPiAIbYJBKp6D6nK5xGpStHjSOOxYBM=;
-        b=KW3qPFPUUDVF3P1ZU+8lukeYGE/wRBeaRUtDKKd6Pf74aWko20B1NrdnFP9xN14Sd6
-         CgPwluOh9j5eEzlVr59sDzjk1vOlcpA8hKhwaNxjAjtQEh/DFAKKmp+nA2s2IarXXiKC
-         94kaFKmLs5pOjEdKAlwWaMd1lrWDq48yUkKurwfn/t2MzaUJqtNH461rslyO+kJ6u8go
-         QzgTuqlpXx4NILGevi7AE4K2HdcZVVvNV05eCoT5zV8drasJe08DVJhp15IaVZmTaN7y
-         pDFpvSi1yIDkcNWzjTRlwHb0H+DQotysS0Fh9DWhM3gHb3L8VPJkHBQa4oij2k0D4wsd
-         DRiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWqWarVw0zTLd6VmEQn5w6hi0SeN9cakSSI1dHeSedMz1K3XaNyu3DQ+kHQ2h0bmM30vfY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzOqLUjCT45dFoQaByzw8S9kyrn2XXQFPgxl5KxYa5AIEKRUWTH
-	JUIGydeKFY7khPQXWvAIKAf/kcjKB5nM5BgMiEURhY4yZyEW2Tbn7L5qZrf9q6N9vmKHrd7KseK
-	0RrfpYNJFThIOnIijrqBQMMPXk2Opg6WiydE5lNcLVMNgWAiAch1+rQ==
-X-Gm-Gg: ASbGncu8TaW9adDYLMAgRaWZ9m5iFh4Nc/8y1aDMYoK7jy87lc3IzOy65wPKjo8WFiU
-	BNjvASTkOg0xjQabpDAx5R0IY20xsCHsg7ch2VBnxG7rdhKJAy9jnsA7eWx6bR23MJOCq7lUHZ7
-	xE7oMfUM89zVacziCNjxTnbttYZZvbTVVUjBik3zEo8rSplFddtceL6sXOgaNw0A77HaDu3YHKu
-	yctQzpTQO/EhFxMUp6WAYYrp6R5QVQGB+xioOCNyhOsz+lLGp4nCT3g8/hEf466K38jHgzT7ap0
-	KPhdVhEhgfoWVvXV6hvZc7lrfse5ixvZuEnxhY354QR06uTLSRvARrg79nFo6nyBAT4UX1diNoW
-	HxxjoGd3+y6Sr3iQhFs41J67k0AJvhAlJlosVLE51WiZZ/18yPK9lOfZVSd+OsEabBRs=
-X-Received: by 2002:a5d:5d0f:0:b0:3a5:2875:f985 with SMTP id ffacd0b85a97d-3b60e541decmr7571392f8f.59.1752824462692;
-        Fri, 18 Jul 2025 00:41:02 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IErnekwyCHSXJWmPTzAxRnoZcm5grCqfVzyJIN67YcS+CmXYHy9pgpO6xdAp8bqcnJ8yAM8qQ==
-X-Received: by 2002:a5d:5d0f:0:b0:3a5:2875:f985 with SMTP id ffacd0b85a97d-3b60e541decmr7571360f8f.59.1752824462252;
-        Fri, 18 Jul 2025 00:41:02 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f43:8900:f364:1333:2a67:d49e? (p200300d82f438900f36413332a67d49e.dip0.t-ipconnect.de. [2003:d8:2f43:8900:f364:1333:2a67:d49e])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b61ca2bc6fsm1075691f8f.28.2025.07.18.00.41.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 18 Jul 2025 00:41:01 -0700 (PDT)
-Message-ID: <eb6afc50-10e1-4326-95a6-6415f407c887@redhat.com>
-Date: Fri, 18 Jul 2025 09:41:01 +0200
+        d=1e100.net; s=20230601; t=1752825161; x=1753429961;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2pi8KBcoIPlm4tOCt/inqjOUYuaGd1omaspVeZAZA8w=;
+        b=MAyCv9e4RMkggtXEBnKDvpfh9CxR2oVMbNZ+XT6xn4YmLp2RzN094KIABUE1LWON9x
+         2s6n3/aStdIteGq9PDagkiW9nmxji2adV/J8mEhVDnhni/qo8AwMUvqWnXYX4gKyK0ao
+         N2noj9fvrJ1N9Qkk4bIu3booSK6+FWpI0AM9b9OWdwd57aHrhPzl7lkOmx2uZQWL8y44
+         c1NxWmpqUfjEYh41cg+V81u9CuClHKl5Fpih+X/qIVY5Y+1WuBRNXL6y0L6VXqvbsTLR
+         rUaLuGgMTYirxrB5ugIaMRv4c5Ew2nzVNG2lKfBuZgRGxguWtz1fR9q2z9pliBQJrRWZ
+         CjhA==
+X-Forwarded-Encrypted: i=1; AJvYcCUmMC4S0UNyO+GguxHQHcm8P6HzBF7ZcsgDWKK7FadjWvXUByJdiY6xJJ27FtycRQot084=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxMZNJoRjqkISb6rF8sZxLqb+j5yv7BLWa+I/DpJtgkxSRri0YU
+	JSETXdrwB4OszwOXkgIMS0Ef8E3X3Y8vWC24zFTlCYntHfLBW+2G4G/JO7To1Q6rxadzoeeZUHP
+	rpywJKtVKTIqw9absA/bWwVQvkZ1kVdr0Uve5txiYQGuIJiKtALWNrTwpFDyMoOaI0Du1X9VG1S
+	YwMzAXqr4dSLONxJyz9HZayxd4U5to
+X-Gm-Gg: ASbGncsa4bFAKHfey1XgAbCDXBV30maBRwDcN1Z7jHQrMswAAlfBixSCpGOoON4VpEx
+	pMV8UYfe4794JTsJG+B1fU6dM/0BBI2J8isvtYKsiKpAtulJuyxW3W+T8xtXheiLQzcpP7mzju5
+	Np2fcPWJ0LeblFhEKNXAxNsQ==
+X-Received: by 2002:a17:902:ec8b:b0:235:f3df:bc1f with SMTP id d9443c01a7336-23e257451fdmr133641845ad.36.1752825161540;
+        Fri, 18 Jul 2025 00:52:41 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEczHEQLoKluvpGtGTxZAFG1Ct7SS0ET5wuggRJXsSha+pJGDGNiCavb0Lfm2+EHUkt6UvPo3yU43N4AaOjSqo=
+X-Received: by 2002:a17:902:ec8b:b0:235:f3df:bc1f with SMTP id
+ d9443c01a7336-23e257451fdmr133641485ad.36.1752825161093; Fri, 18 Jul 2025
+ 00:52:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Invitation] bi-weekly guest_memfd upstream call on 2025-07-17
-To: Ira Weiny <ira.weiny@intel.com>,
- "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
- "linux-mm@kvack.org" <linux-mm@kvack.org>, KVM <kvm@vger.kernel.org>
-References: <044a8f63-32d9-4c6f-ae3f-79072062d076@redhat.com>
- <687975b253bbf_3c282b2941@iweiny-mobl.notmuch>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- g3eXuA==
-Organization: Red Hat
-In-Reply-To: <687975b253bbf_3c282b2941@iweiny-mobl.notmuch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250718062429.238723-1-lulu@redhat.com>
+In-Reply-To: <20250718062429.238723-1-lulu@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Fri, 18 Jul 2025 15:52:30 +0800
+X-Gm-Features: Ac12FXwBVT6a31yvU0qqbtQu-2z0AJwY7ghH6LYTEkWi9oJSf_Mb34yGWOF4UH0
+Message-ID: <CACGkMEv0yHC7P1CLeB8A1VumWtTF4Bw4eY2_njnPMwT75-EJkg@mail.gmail.com>
+Subject: Re: [PATCH v1] kvm: x86: implement PV send_IPI method
+To: Cindy Lu <lulu@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, 
+	"maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>, 
+	"Peter Zijlstra (Intel)" <peterz@infradead.org>, "Kirill A. Shutemov" <kas@kernel.org>, "Xin Li (Intel)" <xin@zytor.com>, 
+	Rik van Riel <riel@surriel.com>, "Ahmed S. Darwish" <darwi@linutronix.de>, 
+	"open list:KVM PARAVIRT (KVM/paravirt)" <kvm@vger.kernel.org>, 
+	"open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 18.07.25 00:14, Ira Weiny wrote:
-> David Hildenbrand wrote:
->> Hi everybody,
->>
->> I had to move the meeting by one week -- I'll be out the next two days
->> -- and decided to send the invite out already to highlight that :)
->>
->> So, our next guest_memfd upstream call is scheduled for next week,
->> Thursday, 2025-07-17 at 8:00 - 9:00am (GMT-07:00) Pacific Time - Vancouver.
-> 
-> Did I hear correctly?  I thought I heard you mentioned that we are meeting
-> again in a week?  So was today, 7/17, a one off shift of the bi-weekly call?
-> 
-> Or do we now meet 2 weeks from today?
+On Fri, Jul 18, 2025 at 2:25=E2=80=AFPM Cindy Lu <lulu@redhat.com> wrote:
+>
+> From: Jason Wang <jasowang@redhat.com>
+>
+> We used to have PV version of send_IPI_mask and
+> send_IPI_mask_allbutself. This patch implements PV send_IPI method to
+> reduce the number of vmexits.
+>
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
+> Tested-by: Cindy Lu <lulu@redhat.com>
 
-So, the plan was to only move a single meeting (last week to this week) 
-and to continue next week with the ordinary schedule.
+I think a question here is are we able to see performance improvement
+in any kind of setup?
 
-So I am planning on sending out an invite next week for the meeting next 
-week (July 24).
-
--- 
-Cheers,
-
-David / dhildenb
+Thanks
 
 
