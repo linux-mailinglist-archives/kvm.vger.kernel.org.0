@@ -1,128 +1,139 @@
-Return-Path: <kvm+bounces-52897-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52898-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F03DB0A658
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 16:27:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F60AB0A672
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 16:37:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B3471884E13
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 14:25:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC4131C810F1
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 14:37:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B0CB2DCF55;
-	Fri, 18 Jul 2025 14:24:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 537912DCC04;
+	Fri, 18 Jul 2025 14:36:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cG+t1gbV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fHfMt9D9"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED6BE2DCBE2
-	for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 14:24:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 384A72DAFD4
+	for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 14:36:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752848659; cv=none; b=NfqaXsp086Qk1g4am/jCd2FAwFeOarRIYx7YI8xmyFesaZyW8xcH4xVwJEKxbeiGummWU7WC9o6OCM5tNb/g4cUzmOBDRvD+iREj2vBtQ8fwybhYeqhn9RTTouRzZq6490FFW+IVvnqhv1CR7PIGgofhjb6Jz/hD4XYDGccAigw=
+	t=1752849417; cv=none; b=h8iTFPCZ5yy58JWnUmjiOubPzxMVntE6oRYdRLOndkZGxJfWlCfQnB14/uEWz3QWd7RsL0pVV/k48/jo7A6Y7SvUZATLc3N6u0THowDHQSwK08WgItOLYrpXgmB/qyL7IsXy7tc0FwJdA0nlMiTU0VRpwkvTWDL+GKe4s+Ae1Gc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752848659; c=relaxed/simple;
-	bh=FFrCa5VooVpyL6t+rp9PLQD687b0bErglenPWh/5Hpk=;
+	s=arc-20240116; t=1752849417; c=relaxed/simple;
+	bh=3QPhCm1sC1C6ig0Iw4HK9wtVB3WXrHJKElM+ObxU4mI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=qUXkqXR1hFa7ICawGCmmnqoC8ZD/f7EdR538MHwvUTSAvKspo3iRdfBifsUXShPIb3+vu6WT8BAr9sHp38wmZrH0C4ejPnQu7GvjKJdR1WAjTm16hOngYlY2jrnjnb3KXYpGFdjRJojkvnhH6hyNBSUFJVwMxrsw8/ePAfJOuDE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cG+t1gbV; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=CTXaeI7DeBHm59gmeJGgRHOkrR0k8PpkLOMLTzekV1fVNtA8mYVhA2GqW6JGzPtZdiWOw8cKnhRb6AJcONx8LRf1nbJpvhbhWX7VANhRvgPevqM/4RM7gTsleo11XWXDGJWXubYFaH7059ufAIK8D5UNi/t3GOW2gAmrkT7oPPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fHfMt9D9; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3141f9ce4e2so3199327a91.1
-        for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 07:24:17 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-311a6b43ed7so1744532a91.1
+        for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 07:36:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752848657; x=1753453457; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1752849415; x=1753454215; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=bXQCgpJ3ALeYg67rn3jChwNusOdYOZpmwsnTvicwZkE=;
-        b=cG+t1gbViyhf00qEwo9DyL3lrmLpbopjT17JddZ/k5QsbUCEtr1UeIJMkFcsuumZV/
-         zxEILHayN1tQoYztkpj9hbw2/KA6IYdsQA5mBSUIJ5Yvgwe8ntzfqerG/BHfgswx7XcA
-         sRPuDzqb03mWS14XusiXt1WFW2jnhGHlh77dK+E4WD/xZnB29bXYGaqcVu9HxR5EraWB
-         GpwcWLJRmfJQydqkKjXrPzEwdKMF1Ctvt05fxQ3+gcXa/bPo0s2edOt30XX1PNorK8HV
-         1B/FMSlgd4nNaN19xkYJc43OHChRxmBLK7zjWT3ATVoso7G7mihfgIElafMJyQvdSUsR
-         UpPA==
+        bh=L4B72Imjuaymxf5ffOiaUn+eLcRTliNp0eW0wBJCGUQ=;
+        b=fHfMt9D9JHvvGuoU9ojC5r7kVOKutE+V8nBnhSdrLkL99yHuDEkbz/P8+vkCLb3NuW
+         rDRoOYZOHctAJrpHFsnKnUtsaCw3qwOf+XDflSdHJqwdbuv+Qq9mvTzQBrNphwCdHb2S
+         0XhFP6jUcz/1E/p873TTTzS+PvyLiGpeJlp5llKA+KVaroB1tG1vyY64UOiHsQGi+V9W
+         V633z60UMXSMERSmCTHV+ZXU6RZ7fb00Bxd1DSd+EvKWxhfyYSOWxTmLQ7XeIm3HVr21
+         Zon10Gis8xKVhdaUwdWfxLd4Lly03NfceJdoyHsLlcs3u8tXmRQdW5RiXiwd5QQAXkiY
+         YGpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752848657; x=1753453457;
+        d=1e100.net; s=20230601; t=1752849415; x=1753454215;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bXQCgpJ3ALeYg67rn3jChwNusOdYOZpmwsnTvicwZkE=;
-        b=DEDjgDx0pNRToJIoU/rRbNNdEYcfKWZGr1oE6RwAfKI93fpUDcyVTkkBzvXKIHxvK+
-         1cioOdDpvvZtnYgQq9/4jH93+2uJsEocg15mJKdzmWIM6Mi+HioPZOrLNsqtxYv/NtN4
-         VghF1I8RtxlaAmBa6fQ3kk0Yw7kQyjWFOHeOPqmS8eqapqsHVYmC/jN/7xD47pUNLLGk
-         zEeWuIpo90Yu2gGnR3MnKkEbpy+wTjXw7RkDp2lK1TDzdRBpnlvSeK0R1PeTn+11YRH+
-         epX4NBn2mZpuxTcXS0xNIThgkGNzuoelx6RRL6XwKaIak5I7amTZWzZqPHX2bo7zshVR
-         NwCw==
-X-Gm-Message-State: AOJu0Ywdk+1tsQKQ3/FN4vyDq60xL8k+45rXi2u4G8FbQvU3adw08NeG
-	dAi63QidhZTTlT+xQaXFY1mvckd/qPLb5pFqmLcSTGXJCSlCM5XZ0/NEecSNusPDCF3MXZt13PT
-	Vbjn2tA==
-X-Google-Smtp-Source: AGHT+IFMA48gA7eMpiESjVXmxC6/DuagpArlIqkPqyhV38yWM3iTowC/OPY61++IJe7i6kOBC6fMAdYeZUg=
-X-Received: from pjee6.prod.google.com ([2002:a17:90b:5786:b0:312:18d4:6d5e])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5604:b0:31c:38f8:7efb
- with SMTP id 98e67ed59e1d1-31c9f424137mr17837688a91.18.1752848657252; Fri, 18
- Jul 2025 07:24:17 -0700 (PDT)
-Date: Fri, 18 Jul 2025 07:24:15 -0700
-In-Reply-To: <6dl4vsf3k7qhx2aunc5vdhvtxpnwqp45lilpdsp4jksxtgdu6t@kubfenz4bdey>
+        bh=L4B72Imjuaymxf5ffOiaUn+eLcRTliNp0eW0wBJCGUQ=;
+        b=bp6Df5M5BKjlfSwhaLzsdDGeo/YXt/CwNu7Bqb57yhKEmZXvpQvB4i05s9UORq+UhI
+         m43PTIsZb6q+VuJUWFAFE7MqZUr8lNhzpFkj8vB5JYHnAXmy89Frh97iXazis4HTJqP8
+         iSz2FI5StPV2EOSGjhPncFkPfHtGd81bf4u6aGWuayaV23rbIBfY6ji0E4ZCcdr/90NA
+         uCBXo5oKFwcUI6Ym8w37A5ZwkKSq+3g+weunWwYDJ5KdvvEprcJ2Xxw/u1N6GSlDPRPT
+         WN+csG/n8fjA3N2+kt/Reh4d1PWSutNNP4WqNjftnQnnkbK965SwgYyo5e8Zkwkx+SyB
+         yBFg==
+X-Forwarded-Encrypted: i=1; AJvYcCULLKgPeoPCY0qrOTuULO0nzhlyOTozk8OLF+WWqn+QEJumpOY+cObpGJB18n/GruISq8w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwqBGSPCrCe4fJGnzFisj1LIjF++0gAXb/STG4LgMnputTbtns6
+	Egl7hlYM5mwFKFx/yEx9gEcrWGHNWaYesxkgDmObDOcsiAB7aH4KXgX+86zWbRkzUTXFt5y2VH0
+	Q2pV4YQ==
+X-Google-Smtp-Source: AGHT+IF4Yl8Dc5A2WffN2qGYpDxuj7spPBIOKATA0701jf+XNLG/uY9qWbBOxGQCfP/tnJZ9i37+DEhUc0c=
+X-Received: from pjh6.prod.google.com ([2002:a17:90b:3f86:b0:314:29b4:453])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5385:b0:313:d343:4e09
+ with SMTP id 98e67ed59e1d1-31c9f45e1a3mr13104244a91.3.1752849415579; Fri, 18
+ Jul 2025 07:36:55 -0700 (PDT)
+Date: Fri, 18 Jul 2025 07:36:53 -0700
+In-Reply-To: <60d4e55c-2a4f-44b4-9c93-fab97938a19c@suse.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <cover.1740036492.git.naveen@kernel.org> <330d10700c1172982bcb7947a37c0351f7b50958.1740036492.git.naveen@kernel.org>
- <aFngeQ5x6QiP7SsK@google.com> <6dl4vsf3k7qhx2aunc5vdhvtxpnwqp45lilpdsp4jksxtgdu6t@kubfenz4bdey>
-Message-ID: <aHpZD6sKamnPv9BG@google.com>
-Subject: Re: [PATCH v3 1/2] KVM: SVM: Increase X2AVIC limit to 4096 vcpus
+References: <20250611095158.19398-1-adrian.hunter@intel.com>
+ <175088949072.720373.4112758062004721516.b4-ty@google.com>
+ <aF1uNonhK1rQ8ViZ@google.com> <7103b312-b02d-440e-9fa6-ba219a510c2d@intel.com>
+ <aHEMBuVieGioMVaT@google.com> <3989f123-6888-459b-bb65-4571f5cad8ce@intel.com>
+ <aHEdg0jQp7xkOJp5@google.com> <60d4e55c-2a4f-44b4-9c93-fab97938a19c@suse.com>
+Message-ID: <aHpcBYwqhcw14iR1@google.com>
+Subject: Re: [PATCH V4 0/1] KVM: TDX: Decrease TDX VM shutdown time
 From: Sean Christopherson <seanjc@google.com>
-To: Naveen N Rao <naveen@kernel.org>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>, Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>, 
-	Vasant Hegde <vasant.hegde@amd.com>
+To: Nikolay Borisov <nik.borisov@suse.com>
+Cc: Xiaoyao Li <xiaoyao.li@intel.com>, pbonzini@redhat.com, 
+	Adrian Hunter <adrian.hunter@intel.com>, kvm@vger.kernel.org, rick.p.edgecombe@intel.com, 
+	kirill.shutemov@linux.intel.com, kai.huang@intel.com, 
+	reinette.chatre@intel.com, tony.lindgren@linux.intel.com, 
+	binbin.wu@linux.intel.com, isaku.yamahata@intel.com, 
+	linux-kernel@vger.kernel.org, yan.y.zhao@intel.com, chao.gao@intel.com
 Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Jul 18, 2025, Naveen N Rao wrote:
-> On Mon, Jun 23, 2025 at 04:17:13PM -0700, Sean Christopherson wrote:
-> > On Thu, Feb 20, 2025, Naveen N Rao (AMD) wrote:
-> > > +		if (x2avic_4k_vcpu_supported) {
-> > > +			x2avic_max_physical_id = X2AVIC_MAX_PHYSICAL_ID_4K;
-> > > +			avic_physical_max_index_mask = AVIC_PHYSICAL_MAX_INDEX_4K_MASK;
-> > > +		} else {
-> > > +			x2avic_max_physical_id = X2AVIC_MAX_PHYSICAL_ID;
-> > > +			avic_physical_max_index_mask = AVIC_PHYSICAL_MAX_INDEX_MASK;
-> > > +		}
-> > > +
-> > > +		pr_info("x2AVIC enabled%s\n",
-> > > +			x2avic_4k_vcpu_supported ? " (w/ 4K-vcpu)" : "");
-> > 
-> > Maybe print the max number of vCPUs that are supported?  That way there is clear
-> > signal when 4k *isn't* supported (and communicating the max number of vCPUs in
-> > the !4k case would be helpful too).
+On Thu, Jul 17, 2025, Nikolay Borisov wrote:
+> > diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> > index f4d4fd5cc6e8..783b1046f6c1 100644
+> > --- a/arch/x86/kvm/vmx/tdx.c
+> > +++ b/arch/x86/kvm/vmx/tdx.c
+> > @@ -189,6 +189,8 @@ static int init_kvm_tdx_caps(const struct tdx_sys_info_td_conf *td_conf,
+> >          if (!caps->supported_xfam)
+> >                  return -EIO;
+> > +       caps->supported_caps = KVM_TDX_CAP_TERMINATE_VM;
 > 
-> I'm tempted to go the opposite way and not print that 4k vCPUs are 
-> supported by x2AVIC. As it is, there are many reasons AVIC may be 
-> inhibited and lack of 4k vCPU support is just one other reason, but only
-> for large VMs.
+> nit: For the sake of consistency make that a |= so that all subsequent
+> additions to it will be uniform with the first.
 
-This isn't just about AVIC being inhibited though, it's about communicating
-hardware support to the admin/user.  While I usually advocate *against* using
-printk to log information, I find SVM's pr_info()s about what is/isn't enabled
-during module load to be extremely useful, e.g. as sanity checks.  I (re)load
-kvm-amd.ko on various hardware configurations on a regular basis, and more than
-once the prints have helped me "remember" which platforms do/don't have SEV-ES,
-AVIC, etc, and/or detect that I loaded kvm-amd.ko with the wrong overrides.
+Objection, speculation, your honor.  :-D
 
-> Most users shouldn't have to care: where possible, AVIC will be enabled 
-> by default (once that patch series lands). Users who truly care about 
-> AVIC will anyway need to confirm AVIC isn't inhibited since looking at 
-> the kernel log won't be sufficient. Those users can very well use cpuid 
-> to figure out if 4k vCPU support is present.
+That assumes that the predominate pattern will be "|=".  But if we end up with a
+collection of capabilities that are unconditionally enumerated by KVM, then I
+definitely want to express that as:
 
-If there wasn't already an "x2AVIC enabled" print, I would probably lean toward
-doing nothing.  But since pr_info("x2AVIC enabled\n") already exists, and has
-plently of free space for adding extra information, there's basically zero downside
-to printing out the number of supported CPUs.  And it's not just a binary yes/no,
-e.g. I would wager most people couldn't state the number of vCPUs supported by
-the "old" x2AVIC.
+	caps->supported_caps = KVM_TDX_CAP_TERMINATE_VM |
+			       KVM_TDX_CAP_FANCY_THING_1 |
+			       KVM_TDX_CAP_FANCY_THING_2 |
+			       KVM_TDX_CAP_FANCY_THING_3;
+
+not as
+
+	caps->supported_caps |= KVM_TDX_CAP_TERMINATE_VM;
+	caps->supported_caps |= KVM_TDX_CAP_FANCY_THING1;
+	caps->supported_caps |= KVM_TDX_CAP_FANCY_THING2;
+	caps->supported_caps |= KVM_TDX_CAP_FANCY_THING3;
+
+I find the former to be much easier to read, and it provides some amount of
+defense-in-depth against uninitialized data.  The downside is that if there are
+conditional capabilities, then we need to ensure that they are added after the
+unconditional set is initialized.  But we absolutely should be able to detect
+such bugs via selftests.  And again, I find that this:
+
+	caps->supported_caps = KVM_TDX_CAP_TERMINATE_VM |
+			       KVM_TDX_CAP_FANCY_THING_1 |
+			       KVM_TDX_CAP_FANCY_THING_2 |
+			       KVM_TDX_CAP_FANCY_THING_3;
+
+	if (i_can_has_cheezburger())
+		caps->supported_caps |= KVM_TDX_CAP_CHEEZBURGER;
+
+makes it easy to identify which capabilities are unconditional versus those that
+are dependent on something else.
 
