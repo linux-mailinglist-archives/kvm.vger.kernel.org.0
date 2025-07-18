@@ -1,138 +1,211 @@
-Return-Path: <kvm+bounces-52836-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52838-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82779B099DE
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 04:38:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87FD6B099FF
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 04:58:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0CAFD1C448A7
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 02:39:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2C6F4A5363
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 02:57:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EA8F1C5D4B;
-	Fri, 18 Jul 2025 02:38:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B5BF1CAA6D;
+	Fri, 18 Jul 2025 02:58:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dQ/UCmcM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B102E1A9B53;
-	Fri, 18 Jul 2025 02:38:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98542A923;
+	Fri, 18 Jul 2025 02:57:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752806325; cv=none; b=epA9RTKu/1pdnav0LT1SuxDV92Iks07exfY7HMHgCzIKvbb+bntRnI0jW1XuWErRa8RkgZVM+hU+1iFewDPBrpv39oyYeiWWT9WQPxPXWAElHjl/LHYJGEiAlI3BcxttcVLPucFSSFWM0Y6Ieu9EWe0ANKZ1w0rGhqKoqzxyE+g=
+	t=1752807480; cv=none; b=h9PbJZKC0wtdqkWBeYg1fmIW/VYb4/8rIFnTVTuL2UTdtWKZj5UK48dudhTvjUlQJr+f172tA36jy5wSISiD7XWffzZf84tOxvEUgV1EcqHNnp2Udvz6ek+j70CYJXhDCwxOSXvmAcKEWGn1kyagLAk0BJFm8DAsS9BhFeMPwNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752806325; c=relaxed/simple;
-	bh=YZcLFfsFSR5FdKJhywtA6fwgWDEvD/NUMszA99XaFuE=;
-	h=Subject:To:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=fDzqa+3Lp3rFvlyvklRnihAbJMWm5vo9seru3sWWe9B/VY79Kbd682vxHPlW4EVowyTs4byR0B/wc8stJfH5CiDflzYmAkezDgJduJM+IiUDhoEsGNTBYiEbK9tDgi5OzzYNi3O5zBrZVvYlIXBKAUViJSmcb8oZ2/xmcDY98w4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.62])
-	by gateway (Coremail) with SMTP id _____8DxCeGws3lo854sAQ--.50950S3;
-	Fri, 18 Jul 2025 10:38:40 +0800 (CST)
-Received: from [10.20.42.62] (unknown [10.20.42.62])
-	by front1 (Coremail) with SMTP id qMiowJAxT+aus3lo5sMbAA--.16638S3;
-	Fri, 18 Jul 2025 10:38:40 +0800 (CST)
-Subject: Re: [PATCH 2/2] LoongArch: KVM:: simplify kvm_deliver_intr()
-To: Yury Norov <yury.norov@gmail.com>, Tianrui Zhao
- <zhaotianrui@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>,
- WANG Xuerui <kernel@xen0n.name>, kvm@vger.kernel.org,
- loongarch@lists.linux.dev, linux-kernel@vger.kernel.org
-References: <20250716165929.22386-1-yury.norov@gmail.com>
- <20250716165929.22386-3-yury.norov@gmail.com>
-From: Bibo Mao <maobibo@loongson.cn>
-Message-ID: <3b5ad9c2-23ad-4f3b-412a-fe6c1a4c855a@loongson.cn>
-Date: Fri, 18 Jul 2025 10:37:00 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+	s=arc-20240116; t=1752807480; c=relaxed/simple;
+	bh=yQspi0IdSkvFDWpvj8rAaHUF0Fjkr1+s0cusMb2OIWk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=i4WQPt1jAE/HznI3ZjA4ylbyycm2RoNwB4g9fGQ5mF7vL5FmIfTMJFWp35TIQMbMxl9dTNCBUDLIm5H3RbUp1g/NC4tWFPfP8AOvGmJ7ArgpeQ1oCDYc6dRX1Ot5ZPTperMJXRHFUMcz2Bv8hEKOzYOyfUGmg0fAf2mRgkWUp0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dQ/UCmcM; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1752807478; x=1784343478;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=yQspi0IdSkvFDWpvj8rAaHUF0Fjkr1+s0cusMb2OIWk=;
+  b=dQ/UCmcMoQfCS98G2OHdhzJDOU1BJdgwN+WtE9U1y9aYGS6zryYmrHbw
+   HLFIOjckHOBXwgqEtC0UWCEgHKTPTddg6pjqMQ3NTArrhW8VME4cgVRQB
+   W6DS23Va2Go+uvY3a9na/zxP8jyHRTE/DZHl9ukGH6vbpzMPDkJ84AzoV
+   F860TogUyTdpP1fH0j3bg5A31M0+owbOPOAibsyr35PsoXGaq4sfDjK/c
+   s7c4jIoVTUjzzGCVvVcPut/feDkRO+vI96AglO1Y3MnxXi5X/+iflnROW
+   dlwmBRdNLOpQxvY0njZ1pvvsT0uoE11PBX5tpaE98pifhQzeSLN2Rmjob
+   A==;
+X-CSE-ConnectionGUID: +ILYYvB1RoGqZSmDqdGVcQ==
+X-CSE-MsgGUID: TtZ+iYjQR6+15HkFbLp+Yw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11495"; a="72666003"
+X-IronPort-AV: E=Sophos;i="6.16,320,1744095600"; 
+   d="scan'208";a="72666003"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 19:57:57 -0700
+X-CSE-ConnectionGUID: a1mpQy6NQsSBicOKr/urXQ==
+X-CSE-MsgGUID: 4L4luONoSeyCt8ddAZZX9A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,320,1744095600"; 
+   d="scan'208";a="158033113"
+Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
+  by orviesa007.jf.intel.com with ESMTP; 17 Jul 2025 19:57:38 -0700
+Date: Fri, 18 Jul 2025 10:48:55 +0800
+From: Xu Yilun <yilun.xu@linux.intel.com>
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: Yan Zhao <yan.y.zhao@intel.com>,
+	Vishal Annapurve <vannapurve@google.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Alexey Kardashevskiy <aik@amd.com>,
+	Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
+	linux-mm@kvack.org, linux-kernel@vger.kernel.org, x86@kernel.org,
+	linux-fsdevel@vger.kernel.org, ajones@ventanamicro.com,
+	akpm@linux-foundation.org, amoorthy@google.com,
+	anthony.yznaga@oracle.com, anup@brainfault.org,
+	aou@eecs.berkeley.edu, bfoster@redhat.com,
+	binbin.wu@linux.intel.com, brauner@kernel.org,
+	catalin.marinas@arm.com, chao.p.peng@intel.com,
+	chenhuacai@kernel.org, dave.hansen@intel.com, david@redhat.com,
+	dmatlack@google.com, dwmw@amazon.co.uk, erdemaktas@google.com,
+	fan.du@intel.com, fvdl@google.com, graf@amazon.com,
+	haibo1.xu@intel.com, hch@infradead.org, hughd@google.com,
+	ira.weiny@intel.com, isaku.yamahata@intel.com, jack@suse.cz,
+	james.morse@arm.com, jarkko@kernel.org, jgowans@amazon.com,
+	jhubbard@nvidia.com, jroedel@suse.de, jthoughton@google.com,
+	jun.miao@intel.com, kai.huang@intel.com, keirf@google.com,
+	kent.overstreet@linux.dev, kirill.shutemov@intel.com,
+	liam.merwick@oracle.com, maciej.wieczor-retman@intel.com,
+	mail@maciej.szmigiero.name, maz@kernel.org, mic@digikod.net,
+	michael.roth@amd.com, mpe@ellerman.id.au, muchun.song@linux.dev,
+	nikunj@amd.com, nsaenz@amazon.es, oliver.upton@linux.dev,
+	palmer@dabbelt.com, pankaj.gupta@amd.com, paul.walmsley@sifive.com,
+	pbonzini@redhat.com, pdurrant@amazon.co.uk, peterx@redhat.com,
+	pgonda@google.com, pvorel@suse.cz, qperret@google.com,
+	quic_cvanscha@quicinc.com, quic_eberman@quicinc.com,
+	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com,
+	quic_pheragu@quicinc.com, quic_svaddagi@quicinc.com,
+	quic_tsoni@quicinc.com, richard.weiyang@gmail.com,
+	rick.p.edgecombe@intel.com, rientjes@google.com,
+	roypat@amazon.co.uk, rppt@kernel.org, seanjc@google.com,
+	shuah@kernel.org, steven.price@arm.com, steven.sistare@oracle.com,
+	suzuki.poulose@arm.com, thomas.lendacky@amd.com,
+	usama.arif@bytedance.com, vbabka@suse.cz, viro@zeniv.linux.org.uk,
+	vkuznets@redhat.com, wei.w.wang@intel.com, will@kernel.org,
+	willy@infradead.org, xiaoyao.li@intel.com, yilun.xu@intel.com,
+	yuzenghui@huawei.com, zhiquan1.li@intel.com
+Subject: Re: [RFC PATCH v2 04/51] KVM: guest_memfd: Introduce
+ KVM_GMEM_CONVERT_SHARED/PRIVATE ioctls
+Message-ID: <aHm2F95XwzdD7nod@yilunxu-OptiPlex-7050>
+References: <CAGtprH8eR_S50xDnnMLHNCuXrN2Lv_0mBRzA_pcTtNbnVvdv2A@mail.gmail.com>
+ <CA+EHjTwjKVkw2_AK0Y0-eth1dVW7ZW2Sk=73LL9NeQYAPpxPiw@mail.gmail.com>
+ <CAGtprH_Evyc7tLhDB0t0fN+BUx5qeqWq8A2yZ5-ijbJ5UJ5f-g@mail.gmail.com>
+ <9502503f-e0c2-489e-99b0-94146f9b6f85@amd.com>
+ <20250624130811.GB72557@ziepe.ca>
+ <CAGtprH_qh8sEY3s-JucW3n1Wvoq7jdVZDDokvG5HzPf0HV2=pg@mail.gmail.com>
+ <aGTvTbPHuXbvj59t@yzhao56-desk.sh.intel.com>
+ <diqz8qknhj3l.fsf@ackerleytng-ctop.c.googlers.com>
+ <aHjDIxxbv0DnqI6S@yilunxu-OptiPlex-7050>
+ <diqzqzyeg3j2.fsf@ackerleytng-ctop.c.googlers.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20250716165929.22386-3-yury.norov@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowJAxT+aus3lo5sMbAA--.16638S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoW7CFWUGFW8XrWrtF47CrW3urX_yoW8AF4rp3
-	yrC347Zr4rGr17K3s0qan5XF4jqrWkKFs2yrZrC34fKr1aqF1qvFy8CrykXFy7Ca97G3yf
-	Xr1Sk348ua4DXrbCm3ZEXasCq-sJn29KB7ZKAUJUUUU8529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUv2b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r106r15M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-	xVW8Jr0_Cr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx
-	1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r126r1DMcIj6I8E87Iv
-	67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07
-	AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02
-	F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw
-	1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7Cj
-	xVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r
-	1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU8wN
-	VDUUUUU==
+In-Reply-To: <diqzqzyeg3j2.fsf@ackerleytng-ctop.c.googlers.com>
 
-
-
-On 2025/7/17 上午12:59, Yury Norov wrote:
-> From: "Yury Norov (NVIDIA)" <yury.norov@gmail.com>
+On Thu, Jul 17, 2025 at 09:56:01AM -0700, Ackerley Tng wrote:
+> Xu Yilun <yilun.xu@linux.intel.com> writes:
 > 
-> The function opencodes for_each_set_bit() macro, which makes it bulky.
-> Using the proper API makes all the housekeeping code going away.
+> > On Wed, Jul 16, 2025 at 03:22:06PM -0700, Ackerley Tng wrote:
+> >> Yan Zhao <yan.y.zhao@intel.com> writes:
+> >> 
+> >> > On Tue, Jun 24, 2025 at 07:10:38AM -0700, Vishal Annapurve wrote:
+> >> >> On Tue, Jun 24, 2025 at 6:08 AM Jason Gunthorpe <jgg@ziepe.ca> wrote:
+> >> >> >
+> >> >> > On Tue, Jun 24, 2025 at 06:23:54PM +1000, Alexey Kardashevskiy wrote:
+> >> >> >
+> >> >> > > Now, I am rebasing my RFC on top of this patchset and it fails in
+> >> >> > > kvm_gmem_has_safe_refcount() as IOMMU holds references to all these
+> >> >> > > folios in my RFC.
+> >> >> > >
+> >> >> > > So what is the expected sequence here? The userspace unmaps a DMA
+> >> >> > > page and maps it back right away, all from the userspace? The end
+> >> >> > > result will be the exactly same which seems useless. And IOMMU TLB
+> >> >> 
+> >> >>  As Jason described, ideally IOMMU just like KVM, should just:
+> >> >> 1) Directly rely on guest_memfd for pinning -> no page refcounts taken
+> >> >> by IOMMU stack
+> >> > In TDX connect, TDX module and TDs do not trust VMM. So, it's the TDs to inform
+> >> > TDX module about which pages are used by it for DMAs purposes.
+> >> > So, if a page is regarded as pinned by TDs for DMA, the TDX module will fail the
+> >> > unmap of the pages from S-EPT.
+> >> >
+> >> > If IOMMU side does not increase refcount, IMHO, some way to indicate that
+> >> > certain PFNs are used by TDs for DMA is still required, so guest_memfd can
+> >> > reject the request before attempting the actual unmap.
+> >> > Otherwise, the unmap of TD-DMA-pinned pages will fail.
+> >> >
+> >> > Upon this kind of unmapping failure, it also doesn't help for host to retry
+> >> > unmapping without unpinning from TD.
+> >> >
+> >> >
+> >> 
+> >> Yan, Yilun, would it work if, on conversion,
+> >> 
+> >> 1. guest_memfd notifies IOMMU that a conversion is about to happen for a
+> >>    PFN range
+> >
+> > It is the Guest fw call to release the pinning.
 > 
-> Signed-off-by: Yury Norov (NVIDIA) <yury.norov@gmail.com>
-> ---
->   arch/loongarch/kvm/interrupt.c | 25 ++++---------------------
->   1 file changed, 4 insertions(+), 21 deletions(-)
+> I see, thanks for explaining.
 > 
-> diff --git a/arch/loongarch/kvm/interrupt.c b/arch/loongarch/kvm/interrupt.c
-> index 4c3f22de4b40..8462083f0301 100644
-> --- a/arch/loongarch/kvm/interrupt.c
-> +++ b/arch/loongarch/kvm/interrupt.c
-> @@ -83,28 +83,11 @@ void kvm_deliver_intr(struct kvm_vcpu *vcpu)
->   	unsigned long *pending = &vcpu->arch.irq_pending;
->   	unsigned long *pending_clr = &vcpu->arch.irq_clear;
->   
-> -	if (!(*pending) && !(*pending_clr))
-> -		return;
-> -
-> -	if (*pending_clr) {
-> -		priority = __ffs(*pending_clr);
-> -		while (priority <= INT_IPI) {
-> -			kvm_irq_clear(vcpu, priority);
-> -			priority = find_next_bit(pending_clr,
-> -					BITS_PER_BYTE * sizeof(*pending_clr),
-> -					priority + 1);
-> -		}
-> -	}
-> +	for_each_set_bit(priority, pending_clr, INT_IPI + 1)
-> +		kvm_irq_clear(vcpu, priority);
->   
-> -	if (*pending) {
-> -		priority = __ffs(*pending);
-> -		while (priority <= INT_IPI) {
-> -			kvm_irq_deliver(vcpu, priority);
-> -			priority = find_next_bit(pending,
-> -					BITS_PER_BYTE * sizeof(*pending),
-> -					priority + 1);
-> -		}
-> -	}
-> +	for_each_set_bit(priority, pending, INT_IPI + 1)
-> +		kvm_irq_deliver(vcpu, priority);
->   }
->   
->   int kvm_pending_timer(struct kvm_vcpu *vcpu)
+> > By the time VMM get the
+> > conversion requirement, the page is already physically unpinned. So I
+> > agree with Jason the pinning doesn't have to reach to iommu from SW POV.
+> >
 > 
-Hi Yury,
+> If by the time KVM gets the conversion request, the page is unpinned,
+> then we're all good, right?
 
-Thanks for your patch. And it looks good to me.
+Yes, unless guest doesn't unpin the page first by mistake. Guest would
+invoke a fw call tdg.mem.page.release to unpin the page before
+KVM_HC_MAP_GPA_RANGE.
 
-Reviewed-by: Bibo Mao <maobibo@loongson.cn>
+> 
+> When guest_memfd gets the conversion request, as part of conversion
+> handling it will request to zap the page from stage-2 page tables. TDX
+> module would see that the page is unpinned and the unmapping will
+> proceed fine. Is that understanding correct?
 
-Regards
-Bibo Mao
+Yes, again unless guess doesn't unpin.
 
+> 
+> >> 2. IOMMU forwards the notification to TDX code in the kernel
+> >> 3. TDX code in kernel tells TDX module to stop thinking of any PFNs in
+> >>    the range as pinned for DMA?
+> >
+> > TDX host can't stop the pinning. Actually this mechanism is to prevent
+> > host from unpin/unmap the DMA out of Guest expectation.
+> >
+> 
+> On this note, I'd also like to check something else. Putting TDX connect
+> and IOMMUs aside, if the host unmaps a guest private page today without
+> the guest requesting it, the unmapping will work and the guest will be
+> broken, right?
+
+Correct. The unmapping will work, the guest can't continue anymore.
+
+Thanks,
+Yilun
 
