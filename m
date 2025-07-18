@@ -1,119 +1,157 @@
-Return-Path: <kvm+bounces-52910-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52911-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8BF8B0A7B0
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 17:39:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C91F1B0A807
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 17:57:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 89CFF189003B
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 15:39:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B69EC3B6B1F
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 15:57:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A4042E03FC;
-	Fri, 18 Jul 2025 15:35:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A75752E5B1F;
+	Fri, 18 Jul 2025 15:57:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yGnP67TA"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="N8jsL1WH"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 302462DE6E8
-	for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 15:35:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8485D2E06ED
+	for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 15:57:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752852946; cv=none; b=GkTjbm67uo8TOVEs/5Uth0OO5F7Eq/iDR74S3SNz5U2GtJK5jqCNSJ5Naws2Ene3tnx3HkgIAtJAmrv8LYy3GfOxC6AmHlvow7FxyHH8lzM2frPgR4wCEoHYQAsSRxTl0nhtuK+4BeGCecYpMWMGQJhP5bez2ThF0FqZfG8+FEM=
+	t=1752854244; cv=none; b=U/p8kl0QK9SftisV6Zte1T5lwhssIYWuHCj4YQAbVrKdW4hiX2XEpTIjqxMb1I2Yn25lk5Kvz5cPGk460c3gFxFtlBrskVX7fw9MVACu7KZL4Ov7RDHRM1KQIFpsgOnrIvTFQd/QlN+ZYX4i1KXl5lXrD1q4shzrgp3I9XZPz68=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752852946; c=relaxed/simple;
-	bh=4Vfku2YS9tu3aYWTykK4Ku/U89qRWW3/HUMuhIP/xd8=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=lvQpWZYFiDKK50KEJtUFrwvihoY9tFoZi0r6QKd53CtxoV1cfymln47fMHuNX2ABrPbZ10ALllqtDY+6dWvHIqGD/Z7OSAD3H4vvXy08BXElonWd6uox5J+lT62P1FMLc8BiTT8vTdsfuODSyUSSUgtcwIcx9ji0YdnXHJFvXjw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yGnP67TA; arc=none smtp.client-ip=209.85.216.73
+	s=arc-20240116; t=1752854244; c=relaxed/simple;
+	bh=gHGhnpTIs0SlK/0a8FDgsCBiZAOqX7pM8mcEaSxC8dY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BtetbprSfDyrNWoRIcsH2rnUOLxX4Yv9yn0caGBwbKV5ADyC3a+mhT0rdb2JuhE5EipjHuaoyVJ4jFmXeJrfz656W7bCSm99wAMGsxg7C2mmm0/exByKDkHwMtc3EAMAeUbI/ADZnlrE3hRr+NV6QeXPde13jtnjVQxzKUe+AcM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=N8jsL1WH; arc=none smtp.client-ip=209.85.214.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-313f8835f29so3133917a91.3
-        for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 08:35:44 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-235e389599fso260345ad.0
+        for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 08:57:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752852944; x=1753457744; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=FMufa9slHHq3UhWrTz98ZkkB+x6OEpY7SyDzwmKTqZs=;
-        b=yGnP67TA1aeUipLt1QKuhLpnCnv+D1az3GIpyyaq6m2Hbf5N8KDI8i0jrTuThQlJTC
-         zhhNcq0qMC+fj9tw+dmryilRVfbQJbAgqOtzjse4pdWN4l/WqzXl3IGkWcBaAQjXGBgU
-         S84omCGltJrEy1FcJvSHroMAzIzeeDguDVSCde6cKCL8wo6ROLojATx0rS6pLajgr5vY
-         OfB2ZKpXpajdmeOGZlpb45BQF+1RuoKQlOuzeJTYpJX3k5hh1BEG3dMH83ZM2JjB4qOl
-         loGpmqD2uBFii+zb0rTcZvyOEh4osNQeRSWnD1FngsX3X05sL8xkNA38XaPDkbrMQUea
-         V0ug==
+        d=google.com; s=20230601; t=1752854243; x=1753459043; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=h8OwoX5mxh6UvTDR1Yv1NAz1aJQ0CYYYwNtDjaEd3rs=;
+        b=N8jsL1WHZBxFJbQrjjFMXLJg9u1hpdAaHO+l1ztZHn27fp5C4OsW5Fa5EyQlzXA1YT
+         z6JaraXg2VkZajf8pVHuUCKNb754dJpttjFbUlRAUN8/0GIE1kmcX9czrEi7PrYunnK8
+         oZ+Hi33NYKyTgFc4XxSL4ePF7HkLyKiER5yOXDdlsOyXvYm2R2ZikIcusAU8G89Ry8+T
+         JjoE41SUcj1NRQtKhzj/h/GuZT2qaatusf9MDPf3SFa2QqCdBPbZygsH0J0wjIzRTWvD
+         Iv2wQu6RjzYjIbAECIaIVoPN6WA48jbanHpcPvWgZvuijyvrPlFzjMccxN+Xy8892MWy
+         RqKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752852944; x=1753457744;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FMufa9slHHq3UhWrTz98ZkkB+x6OEpY7SyDzwmKTqZs=;
-        b=w0Gi4RRNufqEKSNn+hHIYi7nDBCVaowpbzMByJGGZkwbFmu+wjiMBlDWHGcVpGAaR4
-         d59zN9b0y19jSDAWG4PYz2M/7PjONp/UNwX2w+MTmFs0nTnKNxKwtidYqTM1KQWFnUQt
-         7YovmoyJkof/RT/NvAQpFoDzqi2Hl/uy5tt4Hja1iElocfOkZTyRzsJtHMq4gluhSW6h
-         Pa97tFPeFNGM2GzAvvnKC35ozoc3BBr5NAmiesPi34pBmSn6De+bsNoa9N3M37AfixKr
-         6r2eUP8FcZPbWbNOOb7lL6IpW+ni2daT+atMLE96nYtsgd41Vf/HY5TGEuuvcwj4Sztc
-         IiQA==
-X-Forwarded-Encrypted: i=1; AJvYcCVsUjda6rR6iLinajLJ5XYY8YfzR7dx9JlcWzD9+l/XhtLCKWCW/TD6Xtzlgq1LQkvojcY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxJFCMXQVVKKc21Wu/PJjpeP+kfMwD2Lf162rN/+ijwF9aP3/Y1
-	GLhtf7y/qgVq4ySYXZxUnwFqLCDMh4xq58HufZte2nXcjQBiBP9ocYdUo4v4QM1rHm6rZOpTimj
-	oc6kRSw==
-X-Google-Smtp-Source: AGHT+IH/1HWlOEGTinigbtGS/fI4pZaE0lBuxsB7y4G9gSRNWOYWs+b2FnDCG8rAn4n/EHZZ46lLEQTU4do=
-X-Received: from pjbqa6.prod.google.com ([2002:a17:90b:4fc6:b0:315:f140:91a5])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3511:b0:312:ea46:3e66
- with SMTP id 98e67ed59e1d1-31c9f45e1c5mr12926141a91.21.1752852944417; Fri, 18
- Jul 2025 08:35:44 -0700 (PDT)
-Date: Fri, 18 Jul 2025 08:35:42 -0700
-In-Reply-To: <930ca39f-41a6-44d4-85b1-552c56a417e8@intel.com>
+        d=1e100.net; s=20230601; t=1752854243; x=1753459043;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=h8OwoX5mxh6UvTDR1Yv1NAz1aJQ0CYYYwNtDjaEd3rs=;
+        b=QPRoyQZtiNX4rGPZSstwyImgR4ipB0Sp/mDCX2PBQgo2jRapm4fyzUxcZYdsEuvg/s
+         45PmYZA1PIQorX6AJd4U3U9EL9igyPQuq2wjttf+iuSCWx9ERoAoUiqAIyN4ZZPn6Yur
+         CG+tcTgHhN8NgBmVP8FFAgN1hkdYSs1CNlevRfF8Iv2V3OXay+TZjpRKzyRGJ9GHi2QA
+         Hn8hZ8qyZQgJ49yBzYc5hrk6+5DC4jxQe2NspGhx7SS8EZ9Uih7om/SwARWAVtG0ibq5
+         vLY5hEYPD4mgsb9D7LEMK76cCYA7frTH43z7REObzatrKV1ibMXOziBrGUYpAChEF3pe
+         1eWg==
+X-Forwarded-Encrypted: i=1; AJvYcCXoQd7OfxAaOurzP3eIXTa0U4mva5X+V+QzX8kzjIGPP5kkOFe4wFrCNfxvy9OoEXOhlB4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxnaZPz8ndB9c2TXavNU4aYuw8zET/9t1sWdLK70mHD6XGvKvaz
+	g011SyRUrcxw/zKul6dB5P6gdCWYpR71wFgFtDq2m3WeQF/B84x1wJpifa+aHyaPjbIKe1FKiUr
+	bN53P565SsxuW4K7p3g/+42J2oolflNTn7UL6w5ap
+X-Gm-Gg: ASbGncv8KEvRo1JAbFWZwMdw8+hYcq+m6pC0pXvXK/Bsw6rfynig+GiOHpgS6QqhjjB
+	3AUYlprIpyxcvF5YBh3wdzm5sqmemX0gqW5I1fycHRhFiCl+LPT8XmvoNcfhKOOOHLDSFTNb48Q
+	B8VY7OqMru3YXlU1Jh5qs1+gUHFUKqkpvJ4l6iVlBH89qtRAFRXAsn4KUMABBSqvEKDMnqdia5q
+	1Iaby/cHc06WSWQgY0bcEOg6HQ6ziPDtrMsUnrJSc6v4GZsaE8=
+X-Google-Smtp-Source: AGHT+IFgi72u+XAyFB7UNUnQ78KCwwZ31ziMPnV0eIv4PjDoKng8evgPNW6wi8hbBTzsrhbCEYntoxga6S5rFlzzpxo=
+X-Received: by 2002:a17:903:1986:b0:234:afcf:d9e8 with SMTP id
+ d9443c01a7336-23e39284266mr4452875ad.7.1752854242330; Fri, 18 Jul 2025
+ 08:57:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250611095158.19398-1-adrian.hunter@intel.com>
- <175088949072.720373.4112758062004721516.b4-ty@google.com>
- <aF1uNonhK1rQ8ViZ@google.com> <7103b312-b02d-440e-9fa6-ba219a510c2d@intel.com>
- <aHEMBuVieGioMVaT@google.com> <3989f123-6888-459b-bb65-4571f5cad8ce@intel.com>
- <aHEdg0jQp7xkOJp5@google.com> <930ca39f-41a6-44d4-85b1-552c56a417e8@intel.com>
-Message-ID: <aHppzp0WIbLZfVqu@google.com>
-Subject: Re: [PATCH V4 0/1] KVM: TDX: Decrease TDX VM shutdown time
-From: Sean Christopherson <seanjc@google.com>
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: pbonzini@redhat.com, Adrian Hunter <adrian.hunter@intel.com>, kvm@vger.kernel.org, 
-	rick.p.edgecombe@intel.com, kirill.shutemov@linux.intel.com, 
-	kai.huang@intel.com, reinette.chatre@intel.com, tony.lindgren@linux.intel.com, 
-	binbin.wu@linux.intel.com, isaku.yamahata@intel.com, 
-	linux-kernel@vger.kernel.org, yan.y.zhao@intel.com, chao.gao@intel.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20250703062641.3247-1-yan.y.zhao@intel.com> <20250709232103.zwmufocd3l7sqk7y@amd.com>
+ <aG_pLUlHdYIZ2luh@google.com> <aHCUyKJ4I4BQnfFP@yzhao56-desk>
+ <20250711151719.goee7eqti4xyhsqr@amd.com> <aHEwT4X0RcfZzHlt@google.com>
+ <aHSgdEJpY/JF+a1f@yzhao56-desk> <aHUmcxuh0a6WfiVr@google.com>
+ <aHWqkodwIDZZOtX8@yzhao56-desk> <aHoQa4dBSi877f1a@yzhao56-desk.sh.intel.com>
+In-Reply-To: <aHoQa4dBSi877f1a@yzhao56-desk.sh.intel.com>
+From: Vishal Annapurve <vannapurve@google.com>
+Date: Fri, 18 Jul 2025 08:57:10 -0700
+X-Gm-Features: Ac12FXzIuH1z9pcRagA9yRiVXAqCitoCmPwRxtP18wjCrYHSx6XUN_jtcMtJrnI
+Message-ID: <CAGtprH9kwV1RCu9j6LqToa5M97_aidGN2Lc2XveQdeR799SK6A@mail.gmail.com>
+Subject: Re: [RFC PATCH] KVM: TDX: Decouple TDX init mem region from kvm_gmem_populate()
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Sean Christopherson <seanjc@google.com>, Michael Roth <michael.roth@amd.com>, pbonzini@redhat.com, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, rick.p.edgecombe@intel.com, 
+	kai.huang@intel.com, adrian.hunter@intel.com, reinette.chatre@intel.com, 
+	xiaoyao.li@intel.com, tony.lindgren@intel.com, binbin.wu@linux.intel.com, 
+	dmatlack@google.com, isaku.yamahata@intel.com, ira.weiny@intel.com, 
+	david@redhat.com, ackerleytng@google.com, tabba@google.com, 
+	chao.p.peng@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jul 16, 2025, Xiaoyao Li wrote:
-> On 7/11/2025 10:19 PM, Sean Christopherson wrote:
-> > On Fri, Jul 11, 2025, Xiaoyao Li wrote:
-> ...
-> > > 
-> > > I'm wondering if we need a TDX centralized enumeration interface, e.g., new
-> > > field in struct kvm_tdx_capabilities. I believe there will be more and more
-> > > TDX new features, and assigning each a KVM_CAP seems wasteful.
-> > 
-> > Oh, yeah, that's a much better idea.  In addition to not polluting KVM_CAP,
-> > 
-> > LOL, and we certainly have the capacity in the structure:
-> > 
-> > 	__u64 reserved[250];
-> > 
-> > Sans documentation, something like so?
-> 
-> I suppose it will be squashed into the original patch,
+On Fri, Jul 18, 2025 at 2:15=E2=80=AFAM Yan Zhao <yan.y.zhao@intel.com> wro=
+te:
+>
+> On Tue, Jul 15, 2025 at 09:10:42AM +0800, Yan Zhao wrote:
+> > On Mon, Jul 14, 2025 at 08:46:59AM -0700, Sean Christopherson wrote:
+> > > > >         folio =3D __kvm_gmem_get_pfn(file, slot, index, &pfn, &is=
+_prepared, &max_order);
+> > > > If max_order > 0 is returned, the next invocation of __kvm_gmem_pop=
+ulate() for
+> > > > GFN+1 will return is_prepared =3D=3D true.
+> > >
+> > > I don't see any reason to try and make the current code truly work wi=
+th hugepages.
+> > > Unless I've misundertood where we stand, the correctness of hugepage =
+support is
+> > Hmm. I thought your stand was to address the AB-BA lock issue which wil=
+l be
+> > introduced by huge pages, so you moved the get_user_pages() from vendor=
+ code to
+> > the common code in guest_memfd :)
+> >
+> > > going to depend heavily on the implementation for preparedness.  I.e.=
+ trying to
+> > > make this all work with per-folio granulartiy just isn't possible, no=
+?
+> > Ah. I understand now. You mean the right implementation of __kvm_gmem_g=
+et_pfn()
+> > should return is_prepared at 4KB granularity rather than per-folio gran=
+ularity.
+> >
+> > So, huge pages still has dependency on the implementation for preparedn=
+ess.
+> Looks with [3], is_prepared will not be checked in kvm_gmem_populate().
+>
+> > Will you post code [1][2] to fix non-hugepages first? Or can I pull the=
+m to use
+> > as prerequisites for TDX huge page v2?
+> So, maybe I can use [1][2][3] as the base.
+>
+> > [1] https://lore.kernel.org/all/aG_pLUlHdYIZ2luh@google.com/
+> > [2] https://lore.kernel.org/all/aHEwT4X0RcfZzHlt@google.com/
 
-I dropped the commit from kvm-x86/vmx, and will send a full v5.  There's enough
-moving parts that I don't want to risk going 'round in circles trying to squash
-fixes :-)
+IMO, unless there is any objection to [1], it's un-necessary to
+maintain kvm_gmem_populate for any arch (even for SNP). All the
+initial memory population logic needs is the stable pfn for a given
+gfn, which ideally should be available using the standard mechanisms
+such as EPT/NPT page table walk within a read KVM mmu lock (This patch
+already demonstrates it to be working).
 
-> so just gave
-> 
-> Tested-by: Xiaoyao Li <xiaoyao.li@intel.com>
+It will be hard to clean-up this logic once we have all the
+architectures using this path.
 
-Thanks! 
+[1] https://lore.kernel.org/lkml/CAGtprH8+x5Z=3DtPz=3DNcrQM6Dor2AYBu3jiZdo+=
+Lg4NqAk0pUJ3w@mail.gmail.com/
+
+> [3] https://lore.kernel.org/lkml/20250613005400.3694904-2-michael.roth@am=
+d.com,
 
