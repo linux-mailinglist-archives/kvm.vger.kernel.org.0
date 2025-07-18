@@ -1,123 +1,137 @@
-Return-Path: <kvm+bounces-52844-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52845-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E007B09A32
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 05:33:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97FA8B09A74
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 06:14:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E216D5A33F2
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 03:33:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D38F317E5D3
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 04:14:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1EE01DA617;
-	Fri, 18 Jul 2025 03:33:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12D861DE2C2;
+	Fri, 18 Jul 2025 04:14:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dfr5iBJh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U41mU38G"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7E451C8632;
-	Fri, 18 Jul 2025 03:33:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E8E879CD;
+	Fri, 18 Jul 2025 04:13:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752809609; cv=none; b=bSL8Ro37RQFVwX+JE0zLGqaqyKHRLM5ku1YGRlmUh04zRAbkuIvNoTxFp4BjqN28jgLwbX2XS0/x/m/ltSN4X7W+/2TBYVQJoQTwZWQ8HqA1MYNMoFG3C9tEtmyMHESe8m9wqQxkmM5Oqt3eiF26TbiQ13KYF3m7S/APRZZx1ns=
+	t=1752812040; cv=none; b=EDNuNpLOTul92AASW2Lz1GgX4jjuPGEOvgBZdZI/jp7UokKLoH/55x1H3qiAzeEpe+r3eQTInXWtape0ogaWh0GMQE9gj3ASRDmZPYcX9hEdOmdSE8x1qn6mKLjLz/4cdHZi6s7u2Sp3NsNXrXxo7qL3uGZvT12Po1T0T8u/7+0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752809609; c=relaxed/simple;
-	bh=D8AGor2dq/npc0EvnMPgCs9khQ5Ob0CiUc1XMT/N94M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WBLHq910MsVBfuuAriTLLSExejNpl7mCGXAS6rZD43GJcnRRE9F0f3ufTaXTihoN+xRNy1SXREXT1ok7lNnQnYGIaVntWLCSgFWrGu0U2jl/ehSGReaRL63sunwKigcL1kwCHJYt+ipGxE+99xW1saYAwSRu+fsTeaHiWtTF8pk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dfr5iBJh; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752809607; x=1784345607;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=D8AGor2dq/npc0EvnMPgCs9khQ5Ob0CiUc1XMT/N94M=;
-  b=dfr5iBJhzg50WbAELtF3aK7I4sz042NUKaS9mUbBjIDC0xaBHRGafBEE
-   L2VDHeJRMU+GbVSb1AocPN9QZLoL7DbwWlGjurVg0B+xX5e8BbtDeTWpf
-   w0wHDUjn+hKUAWhiW25VRUAOW8R4g5oV7a9rzKpUZQTmljt6XUYMDEbxq
-   Rq67uWCx9UnSjQFJvv16Ee7bri9jNIK0TpuMHe3rTKrZNC6TCf4aPwppn
-   RzLyDC4Bz99dcDWtcMa7uCyI/IOsT5fwoxvF3Yg8qwuXO5W1aeTOy0r0X
-   jEIxoldQaSRmwJoku6b4sDCeMbm3Q7InetmEgiPENWBmt0H5X9BSu8hkC
-   w==;
-X-CSE-ConnectionGUID: emUjhN8OSDe5NzWBQWtqEA==
-X-CSE-MsgGUID: RU7xFwhwQHOi3xceD6CGTw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11495"; a="54313061"
-X-IronPort-AV: E=Sophos;i="6.16,320,1744095600"; 
-   d="scan'208";a="54313061"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 20:33:26 -0700
-X-CSE-ConnectionGUID: /scvanS6Sx+UV2IV+v5vuQ==
-X-CSE-MsgGUID: JlCfL47DR5aRJITyOXDjvg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,320,1744095600"; 
-   d="scan'208";a="162232198"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
-  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 20:33:12 -0700
-Message-ID: <d8b0fa0f-b9f5-4435-8602-bd6a2d375ca4@intel.com>
-Date: Fri, 18 Jul 2025 11:33:08 +0800
+	s=arc-20240116; t=1752812040; c=relaxed/simple;
+	bh=DHnTfajQCSjlkvREjbmaEy/d/ta4Wp+DnSYxZJdnYw0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=o5OqKG6P9IwlWdEjlcGrlxcmB2mb5a2dJ4MhgBgEpyAx4bnuPZSGCbWWhHHlSQN38SIUEQaJOCJKg91700UQjcL9t6lhGTUnsiOEFamjO3NMn8lQwgaD/sLrnqswAplXAcSFLKfgoqkGw3HLQwIbq0TskBMPtXC9RajOxGaTvco=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U41mU38G; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CEFACC4CEF0;
+	Fri, 18 Jul 2025 04:13:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752812039;
+	bh=DHnTfajQCSjlkvREjbmaEy/d/ta4Wp+DnSYxZJdnYw0=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=U41mU38GA+VlBtnajAa35+hqG/tyMnmjIW1Fe7CKJZ9YtVJ4V9MLHgZLerv/Xz8c/
+	 ZE0wEqeSVCug0Lt4EMgtWffwOrelHEsY7utriP9bseQAP5YkwDSbN9PVM65PGpzqr8
+	 RUKWdQL1o9/Bi6wB+/2pEyhqlmob/WcbqD2lc/5Ad9rb1hgv7c6zgUxf08cOJGggyo
+	 NIL2nps5Z22BC28+W3jrwl6lfxmVKWQh8/Hp0EzUeM+uUy0u65amlnCBS7IYlJwXz2
+	 8dgbDyecqJwKu3xG0gt6G6SlboSHbtxEw5GsVUlWu6hc1IHCJB5FPJtagp3kupFq/r
+	 xxyEzySLUtFcw==
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-60c5b8ee2d9so3378435a12.2;
+        Thu, 17 Jul 2025 21:13:59 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUCjvWq/tNSP3sXH+kT6c5p0JXCsb1TccFfCMD/GKjBlf2IjK7HhY8yGFEpymAafhJDTKc=@vger.kernel.org, AJvYcCWnXqT+BSJJEPe2uKTBMNerlUDIoGODZ9wd2qULOdSP1QuKPx6fgV5beB4nrvVFk2D1CAWDV3Rdp6UYLvU8@vger.kernel.org
+X-Gm-Message-State: AOJu0YyepPnUoDocJ9TGE/8E2gFaod4HaZ3PJtWC5NlU66tMm/gtdCVU
+	Jshlp5jLJ6NEabvgxP520XJ09FkfGcLGRk5azqGMSCqg/BBvWlb2oJg38J9NTkYYLztF9X/GLBp
+	9IcwZKAWN6u+CAFi9PLGLjBLT4Q+lGcE=
+X-Google-Smtp-Source: AGHT+IEAC/CrykqlVUov+EJ/y6QUARM5tA1ycLqUcm4EWLS9EBEJLRu/mhAQR5yZ9JZRh3AJjQcI43NahP6URex6JzI=
+X-Received: by 2002:a17:907:7e81:b0:aec:4aa6:7800 with SMTP id
+ a640c23a62f3a-aec4aa6a010mr634285766b.20.1752812038366; Thu, 17 Jul 2025
+ 21:13:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v15 09/21] KVM: guest_memfd: Track guest_memfd mmap
- support in memslot
-To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev
-Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
- anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
- aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk,
- brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
- yilun.xu@intel.com, chao.p.peng@linux.intel.com, jarkko@kernel.org,
- amoorthy@google.com, dmatlack@google.com, isaku.yamahata@intel.com,
- mic@digikod.net, vbabka@suse.cz, vannapurve@google.com,
- ackerleytng@google.com, mail@maciej.szmigiero.name, david@redhat.com,
- michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com,
- isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com,
- suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com,
- quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com,
- quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com,
- quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com,
- james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev,
- maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com,
- roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com,
- rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com,
- jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com,
- ira.weiny@intel.com
-References: <20250717162731.446579-1-tabba@google.com>
- <20250717162731.446579-10-tabba@google.com>
-Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20250717162731.446579-10-tabba@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250716165929.22386-1-yury.norov@gmail.com> <20250716165929.22386-3-yury.norov@gmail.com>
+In-Reply-To: <20250716165929.22386-3-yury.norov@gmail.com>
+From: Huacai Chen <chenhuacai@kernel.org>
+Date: Fri, 18 Jul 2025 12:13:46 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H729+VA4fAWX1SOhCAptSDSwLDAOp_RwB0hkDtvm0hMLg@mail.gmail.com>
+X-Gm-Features: Ac12FXx3hfpaLFwE6RdiI6R7mON-t5449W1RiBy40PMWcdfNUzWxzQG1L7EcO_o
+Message-ID: <CAAhV-H729+VA4fAWX1SOhCAptSDSwLDAOp_RwB0hkDtvm0hMLg@mail.gmail.com>
+Subject: Re: [PATCH 2/2] LoongArch: KVM:: simplify kvm_deliver_intr()
+To: Yury Norov <yury.norov@gmail.com>
+Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
+	WANG Xuerui <kernel@xen0n.name>, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 7/18/2025 12:27 AM, Fuad Tabba wrote:
-> Add a new internal flag, KVM_MEMSLOT_GMEM_ONLY, to the top half of
-> memslot->flags (which makes it strictly for KVM's internal use). This
-> flag tracks when a guest_memfd-backed memory slot supports host
-> userspace mmap operations, which implies that all memory, not just
-> private memory for CoCo VMs, is consumed through guest_memfd: "gmem
-> only".
-> 
-> This optimization avoids repeatedly checking the underlying guest_memfd
-> file for mmap support, which would otherwise require taking and
-> releasing a reference on the file for each check. By caching this
-> information directly in the memslot, we reduce overhead and simplify the
-> logic involved in handling guest_memfd-backed pages for host mappings.
-> 
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> Reviewed-by: Shivank Garg <shivankg@amd.com>
-> Acked-by: David Hildenbrand <david@redhat.com>
-> Suggested-by: David Hildenbrand <david@redhat.com>
-> Signed-off-by: Fuad Tabba <tabba@google.com>
+Hi, Yury,
 
-Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+On Thu, Jul 17, 2025 at 12:59=E2=80=AFAM Yury Norov <yury.norov@gmail.com> =
+wrote:
+>
+> From: "Yury Norov (NVIDIA)" <yury.norov@gmail.com>
+>
+> The function opencodes for_each_set_bit() macro, which makes it bulky.
+> Using the proper API makes all the housekeeping code going away.
+>
+> Signed-off-by: Yury Norov (NVIDIA) <yury.norov@gmail.com>
+> ---
+>  arch/loongarch/kvm/interrupt.c | 25 ++++---------------------
+>  1 file changed, 4 insertions(+), 21 deletions(-)
+>
+> diff --git a/arch/loongarch/kvm/interrupt.c b/arch/loongarch/kvm/interrup=
+t.c
+> index 4c3f22de4b40..8462083f0301 100644
+> --- a/arch/loongarch/kvm/interrupt.c
+> +++ b/arch/loongarch/kvm/interrupt.c
+> @@ -83,28 +83,11 @@ void kvm_deliver_intr(struct kvm_vcpu *vcpu)
+>         unsigned long *pending =3D &vcpu->arch.irq_pending;
+>         unsigned long *pending_clr =3D &vcpu->arch.irq_clear;
+>
+> -       if (!(*pending) && !(*pending_clr))
+> -               return;
+Is it necessary to keep these two lines?
+
+Huacai
+
+> -
+> -       if (*pending_clr) {
+> -               priority =3D __ffs(*pending_clr);
+> -               while (priority <=3D INT_IPI) {
+> -                       kvm_irq_clear(vcpu, priority);
+> -                       priority =3D find_next_bit(pending_clr,
+> -                                       BITS_PER_BYTE * sizeof(*pending_c=
+lr),
+> -                                       priority + 1);
+> -               }
+> -       }
+> +       for_each_set_bit(priority, pending_clr, INT_IPI + 1)
+> +               kvm_irq_clear(vcpu, priority);
+>
+> -       if (*pending) {
+> -               priority =3D __ffs(*pending);
+> -               while (priority <=3D INT_IPI) {
+> -                       kvm_irq_deliver(vcpu, priority);
+> -                       priority =3D find_next_bit(pending,
+> -                                       BITS_PER_BYTE * sizeof(*pending),
+> -                                       priority + 1);
+> -               }
+> -       }
+> +       for_each_set_bit(priority, pending, INT_IPI + 1)
+> +               kvm_irq_deliver(vcpu, priority);
+>  }
+>
+>  int kvm_pending_timer(struct kvm_vcpu *vcpu)
+> --
+> 2.43.0
+>
+>
 
