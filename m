@@ -1,156 +1,128 @@
-Return-Path: <kvm+bounces-52896-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52897-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1833B0A5FA
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 16:16:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F03DB0A658
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 16:27:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 23F831C805E5
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 14:16:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B3471884E13
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 14:25:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC96D2DAFD2;
-	Fri, 18 Jul 2025 14:16:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B0CB2DCF55;
+	Fri, 18 Jul 2025 14:24:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="mjuTHAEj"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cG+t1gbV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 700893398B
-	for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 14:16:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED6BE2DCBE2
+	for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 14:24:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752848164; cv=none; b=izZGJYH0B2YhH/RFD7WUGMd0UL/BTWdFnlPDZLvDeILMJaz07r7L03fw8uMuYVmh916tvae5/WBmHcU3mBgOj/TPB+emIT0+hhqHnmMx+CM6FCgdUxdyGiXj5nT5AhAvZJyt/UnbJmbauBvOBZF6/dCtcr51713OphpvULdwpbs=
+	t=1752848659; cv=none; b=NfqaXsp086Qk1g4am/jCd2FAwFeOarRIYx7YI8xmyFesaZyW8xcH4xVwJEKxbeiGummWU7WC9o6OCM5tNb/g4cUzmOBDRvD+iREj2vBtQ8fwybhYeqhn9RTTouRzZq6490FFW+IVvnqhv1CR7PIGgofhjb6Jz/hD4XYDGccAigw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752848164; c=relaxed/simple;
-	bh=5XaE7447C9RAX+GCeN/Jf+zei+sDppnkuDDAOZmhiks=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s7FKayYxzxgdwwYsvgSxihJKVJLwmCA1teZnYDNDOM4k++IM72Jgh0MAg2/ZG5h9Klb2K/cVeH/aK/WOZ+qWTP5/boVVWcQ9YjdMASigzezdkHvcFDr0S/HrNXx1QV3o1DOo+Z9O0bA1oElp3/9XGEGUK3oGqQwPz7KccbvtCOs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=mjuTHAEj; arc=none smtp.client-ip=209.85.222.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-7e346ab52e9so265534185a.2
-        for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 07:16:02 -0700 (PDT)
+	s=arc-20240116; t=1752848659; c=relaxed/simple;
+	bh=FFrCa5VooVpyL6t+rp9PLQD687b0bErglenPWh/5Hpk=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=qUXkqXR1hFa7ICawGCmmnqoC8ZD/f7EdR538MHwvUTSAvKspo3iRdfBifsUXShPIb3+vu6WT8BAr9sHp38wmZrH0C4ejPnQu7GvjKJdR1WAjTm16hOngYlY2jrnjnb3KXYpGFdjRJojkvnhH6hyNBSUFJVwMxrsw8/ePAfJOuDE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cG+t1gbV; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3141f9ce4e2so3199327a91.1
+        for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 07:24:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1752848161; x=1753452961; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hJjLE0UVkZ2mMP5n5MQpEv3lHcI2vw7mI8TTF/9jzI8=;
-        b=mjuTHAEjVq9p5tT8aL15EowHfiE0HRBl1kHUhR4vjvid5WGvdE1A4t0A5Z8qr6I6QW
-         /z/f7E3OQ32u+SyRmENMHHZzyOTH7GxekIJw3eirlyDwQEPXOFZ6qJFrSddBUIxLNOyM
-         +vZpu1BZ/94olJTltKu1beswOjBohsX3XseZnNgakttKudd1QONXGAwPoc4sVMsh12qy
-         lfoQeA67xQlCaOJboBLwqomDfcqvggK31eJGO1RKMlCd5WA0UNbLZ8rcLmVhYXE6ivU1
-         bEz518hj1PxuEOCjb9CZe4MvyWIrsNgzCQ6gQPaTrglgCIVPIAAbQQIQaWoAutow7MPV
-         hfFw==
+        d=google.com; s=20230601; t=1752848657; x=1753453457; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=bXQCgpJ3ALeYg67rn3jChwNusOdYOZpmwsnTvicwZkE=;
+        b=cG+t1gbViyhf00qEwo9DyL3lrmLpbopjT17JddZ/k5QsbUCEtr1UeIJMkFcsuumZV/
+         zxEILHayN1tQoYztkpj9hbw2/KA6IYdsQA5mBSUIJ5Yvgwe8ntzfqerG/BHfgswx7XcA
+         sRPuDzqb03mWS14XusiXt1WFW2jnhGHlh77dK+E4WD/xZnB29bXYGaqcVu9HxR5EraWB
+         GpwcWLJRmfJQydqkKjXrPzEwdKMF1Ctvt05fxQ3+gcXa/bPo0s2edOt30XX1PNorK8HV
+         1B/FMSlgd4nNaN19xkYJc43OHChRxmBLK7zjWT3ATVoso7G7mihfgIElafMJyQvdSUsR
+         UpPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752848161; x=1753452961;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hJjLE0UVkZ2mMP5n5MQpEv3lHcI2vw7mI8TTF/9jzI8=;
-        b=vTr1NvKM0/gdZ7uXQN9qZF6aTErmtj7Y6I2kHUteWSoOV6Y1oRodZQLF/3oDlkwpmM
-         mDx3C645HlYI8iFfFSljWar7eAtNnxZaQIzACi/aqQCBIMRAQnttyUVEgCPlgFm2rrzn
-         Y5mBYlf2F+FSQ9VKq4vFwtzjUUehx6tTTpEn4dJDUjVzy5RxeVhbw/aX5d6hek5kzU/R
-         3fRggdwOxpmt7DWP0u3d1LMRzxz6iOgi28p583XfITXKfm7dM5CiLUrPQJWf8iH1rypl
-         QF844dkY6AmX1ndxW/GEgxrjwZNZ9lHBTvfDWIvR3/fQE+OzR5NxTeVPFou1utv0QFF2
-         LJUw==
-X-Forwarded-Encrypted: i=1; AJvYcCUUxxdmuSHHbMR2DaAJnnpi8/JV1ni14XKnd14Q9fPFWeeqem3MnFKhbXLl5FhrHJ/P+2A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzVYF4+lNk1/F6EnbBzJbE8N7EvY2OIhk9Scn8Xzss/EuCfQfVJ
-	x3hHWdWgqVtWCPNiz6rx8QFbYo1iZFkLinv+vyDiqfAZWagj3aw1a6Y93okQg0gsoz4=
-X-Gm-Gg: ASbGnctNEp0lZV2//MBbl86v72/lw09xVoTkgG+zuxOD2qxxfA4tDAqGCbDkBwUjjag
-	HNWdUo8RMnuUzEQonjMzSUrz5MDhLgY2LCVaY7GJs5d2HcrLLdgmUEqcfRz4NWEm8CieTGyCTLr
-	VeNO3HZElKRzyxjn6J4KGrJqWF/aRYIb6I0aFvRIoKbj0+t34uiUUGGZDP0WlbiNI9VuxiZe4SK
-	k5ZlIS2JpUC01PTdwSJTol78sS881ytbWa7pzWlVTnRd2ulrw8cDFJi4rNot+cJbFWeD6j0MTQO
-	IYirtCATMWr/1GcT3jVjl9APbq1ihvSFGrcTTteZTO0bSmuVLbh6Ec5lAUWv3CPhhRypfE9sp0S
-	ckJlsl1+OPU2UOes/hbKpkhTJd1zPYZdGskUMzWnXIwDSprSFAhd+YYS2ttQ2OKahjLNzuamtfQ
-	==
-X-Google-Smtp-Source: AGHT+IH83itoUa8qKHB+I069li42G5fh0+8tV6hdT0Ya4bqMV1JxQTP8HGjKpE/oLQZTw/kkZxIAXw==
-X-Received: by 2002:a05:620a:4410:b0:7e1:9769:97c4 with SMTP id af79cd13be357-7e343613265mr1502291985a.47.1752848160939;
-        Fri, 18 Jul 2025 07:16:00 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-167-56-70.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.167.56.70])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7e356c649c0sm91045985a.73.2025.07.18.07.16.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Jul 2025 07:16:00 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1uclsV-00000009zBs-2Dun;
-	Fri, 18 Jul 2025 11:15:59 -0300
-Date: Fri, 18 Jul 2025 11:15:59 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Xu Yilun <yilun.xu@linux.intel.com>
-Cc: Ackerley Tng <ackerleytng@google.com>, Yan Zhao <yan.y.zhao@intel.com>,
-	Vishal Annapurve <vannapurve@google.com>,
-	Alexey Kardashevskiy <aik@amd.com>, Fuad Tabba <tabba@google.com>,
-	kvm@vger.kernel.org, linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org, x86@kernel.org,
-	linux-fsdevel@vger.kernel.org, ajones@ventanamicro.com,
-	akpm@linux-foundation.org, amoorthy@google.com,
-	anthony.yznaga@oracle.com, anup@brainfault.org,
-	aou@eecs.berkeley.edu, bfoster@redhat.com,
-	binbin.wu@linux.intel.com, brauner@kernel.org,
-	catalin.marinas@arm.com, chao.p.peng@intel.com,
-	chenhuacai@kernel.org, dave.hansen@intel.com, david@redhat.com,
-	dmatlack@google.com, dwmw@amazon.co.uk, erdemaktas@google.com,
-	fan.du@intel.com, fvdl@google.com, graf@amazon.com,
-	haibo1.xu@intel.com, hch@infradead.org, hughd@google.com,
-	ira.weiny@intel.com, isaku.yamahata@intel.com, jack@suse.cz,
-	james.morse@arm.com, jarkko@kernel.org, jgowans@amazon.com,
-	jhubbard@nvidia.com, jroedel@suse.de, jthoughton@google.com,
-	jun.miao@intel.com, kai.huang@intel.com, keirf@google.com,
-	kent.overstreet@linux.dev, kirill.shutemov@intel.com,
-	liam.merwick@oracle.com, maciej.wieczor-retman@intel.com,
-	mail@maciej.szmigiero.name, maz@kernel.org, mic@digikod.net,
-	michael.roth@amd.com, mpe@ellerman.id.au, muchun.song@linux.dev,
-	nikunj@amd.com, nsaenz@amazon.es, oliver.upton@linux.dev,
-	palmer@dabbelt.com, pankaj.gupta@amd.com, paul.walmsley@sifive.com,
-	pbonzini@redhat.com, pdurrant@amazon.co.uk, peterx@redhat.com,
-	pgonda@google.com, pvorel@suse.cz, qperret@google.com,
-	quic_cvanscha@quicinc.com, quic_eberman@quicinc.com,
-	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com,
-	quic_pheragu@quicinc.com, quic_svaddagi@quicinc.com,
-	quic_tsoni@quicinc.com, richard.weiyang@gmail.com,
-	rick.p.edgecombe@intel.com, rientjes@google.com,
-	roypat@amazon.co.uk, rppt@kernel.org, seanjc@google.com,
-	shuah@kernel.org, steven.price@arm.com, steven.sistare@oracle.com,
-	suzuki.poulose@arm.com, thomas.lendacky@amd.com,
-	usama.arif@bytedance.com, vbabka@suse.cz, viro@zeniv.linux.org.uk,
-	vkuznets@redhat.com, wei.w.wang@intel.com, will@kernel.org,
-	willy@infradead.org, xiaoyao.li@intel.com, yilun.xu@intel.com,
-	yuzenghui@huawei.com, zhiquan1.li@intel.com
-Subject: Re: [RFC PATCH v2 04/51] KVM: guest_memfd: Introduce
- KVM_GMEM_CONVERT_SHARED/PRIVATE ioctls
-Message-ID: <20250718141559.GF2206214@ziepe.ca>
-References: <CA+EHjTwjKVkw2_AK0Y0-eth1dVW7ZW2Sk=73LL9NeQYAPpxPiw@mail.gmail.com>
- <CAGtprH_Evyc7tLhDB0t0fN+BUx5qeqWq8A2yZ5-ijbJ5UJ5f-g@mail.gmail.com>
- <9502503f-e0c2-489e-99b0-94146f9b6f85@amd.com>
- <20250624130811.GB72557@ziepe.ca>
- <CAGtprH_qh8sEY3s-JucW3n1Wvoq7jdVZDDokvG5HzPf0HV2=pg@mail.gmail.com>
- <aGTvTbPHuXbvj59t@yzhao56-desk.sh.intel.com>
- <diqz8qknhj3l.fsf@ackerleytng-ctop.c.googlers.com>
- <aHjDIxxbv0DnqI6S@yilunxu-OptiPlex-7050>
- <diqzqzyeg3j2.fsf@ackerleytng-ctop.c.googlers.com>
- <aHm2F95XwzdD7nod@yilunxu-OptiPlex-7050>
+        d=1e100.net; s=20230601; t=1752848657; x=1753453457;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=bXQCgpJ3ALeYg67rn3jChwNusOdYOZpmwsnTvicwZkE=;
+        b=DEDjgDx0pNRToJIoU/rRbNNdEYcfKWZGr1oE6RwAfKI93fpUDcyVTkkBzvXKIHxvK+
+         1cioOdDpvvZtnYgQq9/4jH93+2uJsEocg15mJKdzmWIM6Mi+HioPZOrLNsqtxYv/NtN4
+         VghF1I8RtxlaAmBa6fQ3kk0Yw7kQyjWFOHeOPqmS8eqapqsHVYmC/jN/7xD47pUNLLGk
+         zEeWuIpo90Yu2gGnR3MnKkEbpy+wTjXw7RkDp2lK1TDzdRBpnlvSeK0R1PeTn+11YRH+
+         epX4NBn2mZpuxTcXS0xNIThgkGNzuoelx6RRL6XwKaIak5I7amTZWzZqPHX2bo7zshVR
+         NwCw==
+X-Gm-Message-State: AOJu0Ywdk+1tsQKQ3/FN4vyDq60xL8k+45rXi2u4G8FbQvU3adw08NeG
+	dAi63QidhZTTlT+xQaXFY1mvckd/qPLb5pFqmLcSTGXJCSlCM5XZ0/NEecSNusPDCF3MXZt13PT
+	Vbjn2tA==
+X-Google-Smtp-Source: AGHT+IFMA48gA7eMpiESjVXmxC6/DuagpArlIqkPqyhV38yWM3iTowC/OPY61++IJe7i6kOBC6fMAdYeZUg=
+X-Received: from pjee6.prod.google.com ([2002:a17:90b:5786:b0:312:18d4:6d5e])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5604:b0:31c:38f8:7efb
+ with SMTP id 98e67ed59e1d1-31c9f424137mr17837688a91.18.1752848657252; Fri, 18
+ Jul 2025 07:24:17 -0700 (PDT)
+Date: Fri, 18 Jul 2025 07:24:15 -0700
+In-Reply-To: <6dl4vsf3k7qhx2aunc5vdhvtxpnwqp45lilpdsp4jksxtgdu6t@kubfenz4bdey>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aHm2F95XwzdD7nod@yilunxu-OptiPlex-7050>
+Mime-Version: 1.0
+References: <cover.1740036492.git.naveen@kernel.org> <330d10700c1172982bcb7947a37c0351f7b50958.1740036492.git.naveen@kernel.org>
+ <aFngeQ5x6QiP7SsK@google.com> <6dl4vsf3k7qhx2aunc5vdhvtxpnwqp45lilpdsp4jksxtgdu6t@kubfenz4bdey>
+Message-ID: <aHpZD6sKamnPv9BG@google.com>
+Subject: Re: [PATCH v3 1/2] KVM: SVM: Increase X2AVIC limit to 4096 vcpus
+From: Sean Christopherson <seanjc@google.com>
+To: Naveen N Rao <naveen@kernel.org>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Paolo Bonzini <pbonzini@redhat.com>, Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>, 
+	Vasant Hegde <vasant.hegde@amd.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Jul 18, 2025 at 10:48:55AM +0800, Xu Yilun wrote:
-> > If by the time KVM gets the conversion request, the page is unpinned,
-> > then we're all good, right?
+On Fri, Jul 18, 2025, Naveen N Rao wrote:
+> On Mon, Jun 23, 2025 at 04:17:13PM -0700, Sean Christopherson wrote:
+> > On Thu, Feb 20, 2025, Naveen N Rao (AMD) wrote:
+> > > +		if (x2avic_4k_vcpu_supported) {
+> > > +			x2avic_max_physical_id = X2AVIC_MAX_PHYSICAL_ID_4K;
+> > > +			avic_physical_max_index_mask = AVIC_PHYSICAL_MAX_INDEX_4K_MASK;
+> > > +		} else {
+> > > +			x2avic_max_physical_id = X2AVIC_MAX_PHYSICAL_ID;
+> > > +			avic_physical_max_index_mask = AVIC_PHYSICAL_MAX_INDEX_MASK;
+> > > +		}
+> > > +
+> > > +		pr_info("x2AVIC enabled%s\n",
+> > > +			x2avic_4k_vcpu_supported ? " (w/ 4K-vcpu)" : "");
+> > 
+> > Maybe print the max number of vCPUs that are supported?  That way there is clear
+> > signal when 4k *isn't* supported (and communicating the max number of vCPUs in
+> > the !4k case would be helpful too).
 > 
-> Yes, unless guest doesn't unpin the page first by mistake. Guest would
-> invoke a fw call tdg.mem.page.release to unpin the page before
-> KVM_HC_MAP_GPA_RANGE.
+> I'm tempted to go the opposite way and not print that 4k vCPUs are 
+> supported by x2AVIC. As it is, there are many reasons AVIC may be 
+> inhibited and lack of 4k vCPU support is just one other reason, but only
+> for large VMs.
 
-What does guest pinning mean?
+This isn't just about AVIC being inhibited though, it's about communicating
+hardware support to the admin/user.  While I usually advocate *against* using
+printk to log information, I find SVM's pr_info()s about what is/isn't enabled
+during module load to be extremely useful, e.g. as sanity checks.  I (re)load
+kvm-amd.ko on various hardware configurations on a regular basis, and more than
+once the prints have helped me "remember" which platforms do/don't have SEV-ES,
+AVIC, etc, and/or detect that I loaded kvm-amd.ko with the wrong overrides.
 
-Jason
+> Most users shouldn't have to care: where possible, AVIC will be enabled 
+> by default (once that patch series lands). Users who truly care about 
+> AVIC will anyway need to confirm AVIC isn't inhibited since looking at 
+> the kernel log won't be sufficient. Those users can very well use cpuid 
+> to figure out if 4k vCPU support is present.
+
+If there wasn't already an "x2AVIC enabled" print, I would probably lean toward
+doing nothing.  But since pr_info("x2AVIC enabled\n") already exists, and has
+plently of free space for adding extra information, there's basically zero downside
+to printing out the number of supported CPUs.  And it's not just a binary yes/no,
+e.g. I would wager most people couldn't state the number of vCPUs supported by
+the "old" x2AVIC.
 
