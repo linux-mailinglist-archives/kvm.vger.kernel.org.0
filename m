@@ -1,174 +1,252 @@
-Return-Path: <kvm+bounces-52876-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52878-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A2C0B0A09B
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 12:27:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53120B0A0D2
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 12:40:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4653D3BCEA0
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 10:26:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 86FAD5A6A7E
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 10:40:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EDE62BD00C;
-	Fri, 18 Jul 2025 10:27:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 997402BCF4D;
+	Fri, 18 Jul 2025 10:40:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="dUTptwpj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZUo3qd1J"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88115221297
-	for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 10:26:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA96629B218;
+	Fri, 18 Jul 2025 10:40:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752834419; cv=none; b=blmKb2ZGGQ2nu5pwHuDIbSOMRmBndHmQt+QjKwFcEuRNeLAn/ppqCL+BzaNq73/9SU6x/aqwvT6NIKiHcQotbGVK8rt5O6TwwoIBKnRsbl7coouE7TIOfpTUHEHwz5Od5micuJBK0qtt+rzXdY0473mSNVBCEbmpN9Bs5rwzccw=
+	t=1752835206; cv=none; b=Mrnd792VH9n/NUD/zaPKFwqZKRYi9bIzS9aRt/mpfob40OeLJQcyNK45+Tsj0OnpvitqtnaXV9oBxHgL6zBh6G8MvBLjZ0SDv/wtCS4anPTgPVmegpUmNt08VWxtfr/Y664RVYeHDX5XCD31aIu53ZrBADkezDCaDaiJ7bh8sL4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752834419; c=relaxed/simple;
-	bh=iOuJFTTwJt339tYjnwcMIWFz/RUheBu5DfdHuCk8cH8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BRacoMBMgS3ExfOwra0lwhhoJKF9WxE3EGcUUYwx5oCnFBQ5B5LLNXbE07our6kDGKHd/Al9bUbdAOZP0yDVaw9JDDFohhYn4f8ymnWaUx0EalkVqUt6ApiIZB1U8fZVt4kek/njIlo0sbJegZxlCXuUB7h+GklJk+uOQCV8A0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=dUTptwpj; arc=none smtp.client-ip=209.85.222.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-7e29616cc4fso190047585a.0
-        for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 03:26:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1752834415; x=1753439215; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Tceb6O3nBrebvy+ZDwLDwrGTRdGaZ8naYMQfV4XKrrU=;
-        b=dUTptwpjD2CfWgUwDgumV9Tyfz2J3Z3D//IIMS18fws4cPiZA2fx1VBTwps4t/jEb9
-         ce4d7Y/dZsDx1GP27VILaf+yJECvizSWN3gLf0cOGptwlnblfGiDp0ATqNAVB2t4PDu1
-         Zha58DZmeXu/50FEdP6btJbsGdAIM/+Ufh8uU=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752834415; x=1753439215;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Tceb6O3nBrebvy+ZDwLDwrGTRdGaZ8naYMQfV4XKrrU=;
-        b=LlcCkXaNvLiExeMHpRniERI/p+CBFxe1orAz5HFhipkv70hUVvzjNseiO3VRlYiJgE
-         GbYzN+S5QGSRR3XqIsKC9ljtJ/dXDJJZn7vOFKHnnHo3B+g6afDKERgsdWo2RCbH+ZD5
-         1Msk6tuwVSuIIRhaEWWDJxv5v/8Gnb/7yOKLbMkujl67fnF3musHkgkRiKrcEPeS5YC7
-         uDNQEzEkiMLJ1xLo93Bu91inTbzcfntTgXORz8ya4a9N9VsV+Dw539VzQ20rSVd/Fi4D
-         6hfMe09iHVTAG8irLCRK1BHszz+adg98CQUMLeVmzS4QkuVvpQkomlnb4A6ghi6hXvk6
-         srJA==
-X-Forwarded-Encrypted: i=1; AJvYcCXJc8+08o0KXvVt3foHtiTBCr6NCyTrnLmut/wGsRvcu5e3+XIYm0Ic/6WBTrBncHgMAMY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzlgHQujjdOdW6NbHRp9mZiiHScJhI1fowujda5aDBRSGKmtNtt
-	0rRTQ/pxhEpOlv5Mi/w0KpCvRSvjZM6uzzxJzqGYyavkIh/hDdAljWKDs/2FZVh2UQ==
-X-Gm-Gg: ASbGncvo0L27dRQginQ16B5AHO4BNqSb+QAIa+ic2soUuO1ANggmhEjCFumZWwVV3G8
-	W02CEu9S+ndjPW7qfhLv/HE+TBRHq60ofUuDGG40fE6s/Onjs6WjGb714iKtze0A7q2EpkfWS7i
-	03bpJPmof9yB+Ewk9qwXuSUHtpY20OGGARtH5tHahopOV2/dK0zUNrFTdrcUxn9wyM+/OShwFG1
-	Pll+JV2Fgw77llP+mlTGTVZEIKNULOU/JjRYpbXP0pYCbQ0HLpmTBxkyNzfPkNSv1Mr/20XIfyd
-	hKU8ZY3pHvfaBiq2aLlBqdbPogU0C3Dbl082wecLti5s7STc1jrzC1/bbra/e/gN53P/Y9z6L6W
-	bCzdrJm12kVYI8HDQbS5H1vw/NFNq8tNAz/S4CdQtGCx4FVA+dCs=
-X-Google-Smtp-Source: AGHT+IEqo4UAFanleVPdYl4dXVyU1lZnXf1z6whg+8xWt/p2QDWx5PJ8H+d/5db0hyJyi9WF5q8VPA==
-X-Received: by 2002:a05:620a:19a5:b0:7e3:52f6:66e5 with SMTP id af79cd13be357-7e352f6672amr568859885a.35.1752834415217;
-        Fri, 18 Jul 2025 03:26:55 -0700 (PDT)
-Received: from [10.229.41.1] ([192.19.176.250])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7e356b46814sm68537885a.30.2025.07.18.03.26.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 18 Jul 2025 03:26:54 -0700 (PDT)
-Message-ID: <4445c7ec-a580-4c28-89cf-2df5790de6ac@broadcom.com>
-Date: Fri, 18 Jul 2025 12:26:43 +0200
+	s=arc-20240116; t=1752835206; c=relaxed/simple;
+	bh=XGz8ZhzbTwznyHWED45VJOm5rJlDzZ3hdJbtYJAImLM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qRQbBcidU7h8igOByDWC7mu0JhyTzzyj7mCM3JLI5zqiiiuKG4YqEzOKG0ahrgn+pTPiYmSW+yncDJ/SyOfwaP6P01FNVIxJrKrT0Vn6irAM3rc6now+vCMX9UsPPR2pxPhFqTROg3xt1a+RRsKR3nDTwn26MiRaj8e6+jtIGI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZUo3qd1J; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7656C4CEEB;
+	Fri, 18 Jul 2025 10:40:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752835206;
+	bh=XGz8ZhzbTwznyHWED45VJOm5rJlDzZ3hdJbtYJAImLM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ZUo3qd1JztJCCHJFWaXXROHmddmYV1qxfrYVoyzrOagEdm1GMDGKvuRTxevbmf9lP
+	 86f448eq14ml1Qc2prQO2rBZYbZNktJQRxE5tjAd20xj/bHmajArx0QJFfgcxrRTr6
+	 SiqGC9Tn7X3V39pu2V/bx+h7klvwZY7MVNAfLeJcBv0Np7hXch7OpcbC8u3M/R5Ktt
+	 2iALltoPay27sGDsGpVR+5yrNoepamigRdZfrlU10ZmeTrNFpk4Rx9vA/r1bBKj3FQ
+	 fyOLfFixxFtdbIh5cezlGP3nnaFc1pSVmqn49npdSSnUgkq/8wFv7jeNKvVKhnRJIp
+	 p5GIMf8UZkLUA==
+Date: Fri, 18 Jul 2025 16:04:35 +0530
+From: Naveen N Rao <naveen@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Paolo Bonzini <pbonzini@redhat.com>, Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>, 
+	Vasant Hegde <vasant.hegde@amd.com>
+Subject: Re: [PATCH v3 2/2] KVM: SVM: Limit AVIC physical max index based on
+ configured max_vcpu_ids
+Message-ID: <xojzhg3e6czqg6zqyt3wbnzfafwy7bd7fq43b3ttkhfcw3svot@rakzaalsslfz>
+References: <cover.1740036492.git.naveen@kernel.org>
+ <f4c832aef2f1bfb0eae314380171ece4693a67b2.1740036492.git.naveen@kernel.org>
+ <aFnzf4SQqc9a2KcK@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 5/8] wifi: brcmfmac: Fix typo "notifer"
-To: WangYuli <wangyuli@uniontech.com>
-Cc: airlied@gmail.com, akpm@linux-foundation.org, alison.schofield@intel.com,
- andrew+netdev@lunn.ch, andriy.shevchenko@linux.intel.com, bp@alien8.de,
- brcm80211-dev-list.pdl@broadcom.com, brcm80211@lists.linux.dev,
- colin.i.king@gmail.com, cvam0000@gmail.com, dan.j.williams@intel.com,
- dave.hansen@linux.intel.com, dave.jiang@intel.com, dave@stgolabs.net,
- davem@davemloft.net, dri-devel@lists.freedesktop.org, edumazet@google.com,
- gregkh@linuxfoundation.org, guanwentao@uniontech.com, hpa@zytor.com,
- ilpo.jarvinen@linux.intel.com, intel-xe@lists.freedesktop.org,
- ira.weiny@intel.com, j@jannau.net, jeff.johnson@oss.qualcomm.com,
- jgross@suse.com, jirislaby@kernel.org, johannes.berg@intel.com,
- jonathan.cameron@huawei.com, kuba@kernel.org, kvalo@kernel.org,
- kvm@vger.kernel.org, linux-cxl@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-serial@vger.kernel.org,
- linux-wireless@vger.kernel.org, linux@treblig.org, lucas.demarchi@intel.com,
- marcin.s.wojtas@gmail.com, ming.li@zohomail.com, mingo@kernel.org,
- mingo@redhat.com, netdev@vger.kernel.org, niecheng1@uniontech.com,
- oleksandr_tyshchenko@epam.com, pabeni@redhat.com, pbonzini@redhat.com,
- quic_ramess@quicinc.com, ragazenta@gmail.com, rodrigo.vivi@intel.com,
- seanjc@google.com, shenlichuan@vivo.com, simona@ffwll.ch,
- sstabellini@kernel.org, tglx@linutronix.de,
- thomas.hellstrom@linux.intel.com, vishal.l.verma@intel.com, x86@kernel.org,
- xen-devel@lists.xenproject.org, yujiaoliang@vivo.com, zhanjun@uniontech.com
-References: <BD5C52D2838AEA48+20250715134050.539234-1-wangyuli@uniontech.com>
- <F92035B0A9123150+20250715134407.540483-5-wangyuli@uniontech.com>
-Content-Language: en-US
-From: Arend van Spriel <arend.vanspriel@broadcom.com>
-Autocrypt: addr=arend.vanspriel@broadcom.com; keydata=
- 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
-In-Reply-To: <F92035B0A9123150+20250715134407.540483-5-wangyuli@uniontech.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aFnzf4SQqc9a2KcK@google.com>
 
-On 7/15/2025 3:44 PM, WangYuli wrote:
-> There is a spelling mistake of 'notifer' in the comment which
-> should be 'notifier'.
+On Mon, Jun 23, 2025 at 05:38:23PM -0700, Sean Christopherson wrote:
+> On Thu, Feb 20, 2025, Naveen N Rao (AMD) wrote:
+> > KVM allows VMMs to specify the maximum possible APIC ID for a virtual
+> > machine through KVM_CAP_MAX_VCPU_ID capability so as to limit data
+> > structures related to APIC/x2APIC. Utilize the same to set the AVIC
+> > physical max index in the VMCB, similar to VMX. This helps hardware
+> > limit the number of entries to be scanned in the physical APIC ID table
+> > speeding up IPI broadcasts for virtual machines with smaller number of
+> > vcpus.
+> > 
+> > The minimum allocation required for the Physical APIC ID table is one 4k
+> > page supporting up to 512 entries. With AVIC support for 4096 vcpus
+> > though, it is sufficient to only allocate memory to accommodate the
+> > AVIC physical max index that will be programmed into the VMCB. Limit
+> > memory allocated for the Physical APIC ID table accordingly.
 > 
-> Link:https://lore.kernel.org/all/B3C019B63C93846F+20250715071245.398846-1- 
-> wangyuli@uniontech.com/
+> Can you flip the order of the patches?  This seems like an easy "win" for
+> performance, and so I can see people wanting to backport this to random kernels
+> even if they don't care about running 4k vCPUs.
+> 
+> Speaking of which, is there a measurable performance win?
 
-I think it has been said on other patches but it is not common to link 
-to obsolete version of the patch series. Apart from that:
+That was my first thought. But for VMs upto 512 vCPUs, I didn't see much 
+of a performance difference with broadcast IPIs at all. But, I guess it 
+shouldn't hurt, so I will prep a smaller patch that can go before the 4k 
+vCPU support patch.
 
-Acked-by: Arend van Spriel <arend.vanspriel@broadcom.com>> 
-Signed-off-by: WangYuli<wangyuli@uniontech.com>
-> ---
->   drivers/net/wireless/broadcom/brcm80211/brcmfmac/cfg80211.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+With 4k vCPU support enabled, yes, this makes a lot of difference. IIRC, 
+ipi-bench for broadcast IPIs went from ~10-15 seconds down to 3 seconds.
+
+> 
+> > Signed-off-by: Naveen N Rao (AMD) <naveen@kernel.org>
+> > ---
+> >  arch/x86/kvm/svm/avic.c | 53 ++++++++++++++++++++++++++++++-----------
+> >  arch/x86/kvm/svm/svm.c  |  6 +++++
+> >  arch/x86/kvm/svm/svm.h  |  1 +
+> >  3 files changed, 46 insertions(+), 14 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+> > index 1fb322d2ac18..dac4a6648919 100644
+> > --- a/arch/x86/kvm/svm/avic.c
+> > +++ b/arch/x86/kvm/svm/avic.c
+> > @@ -85,6 +85,17 @@ struct amd_svm_iommu_ir {
+> >  	void *data;		/* Storing pointer to struct amd_ir_data */
+> >  };
+> >  
+> > +static inline u32 avic_get_max_physical_id(struct kvm *kvm, bool is_x2apic)
+> 
+> Formletter incoming...
+> 
+> Do not use "inline" for functions that are visible only to the local compilation
+> unit.  "inline" is just a hint, and modern compilers are smart enough to inline
+> functions when appropriate without a hint.
+> 
+> A longer explanation/rant here: https://lore.kernel.org/all/ZAdfX+S323JVWNZC@google.com
+
+Ack.
+
+> 
+> > +{
+> > +	u32 avic_max_physical_id = is_x2apic ? x2avic_max_physical_id : AVIC_MAX_PHYSICAL_ID;
+> 
+> Don't use a super long local variable.  For a helper like this, it's unnecessary,
+> e.g. if the reader can't understand what arch_max or max_id is, then spelling it
+> out entirely probably won't help them.
+> 
+> And practically, there's a danger to using long names like this: you're much more
+> likely to unintentionally "shadow" a global variable.  Functionally, it won't be
+> a problem, but it can create confusion.  E.g. if we ever added a global
+> avic_max_physical_id, then this code would get rather confusing.
+
+Sure, makes sense.
+
+> 
+> > +
+> > +	/*
+> > +	 * Assume vcpu_id is the same as APIC ID. Per KVM_CAP_MAX_VCPU_ID, max_vcpu_ids
+> > +	 * represents the max APIC ID for this vm, rather than the max vcpus.
+> > +	 */
+> > +	return min(kvm->arch.max_vcpu_ids - 1, avic_max_physical_id);
+> > +}
+> > +
+> >  static void avic_activate_vmcb(struct vcpu_svm *svm)
+> >  {
+> >  	struct vmcb *vmcb = svm->vmcb01.ptr;
+> > @@ -103,7 +114,7 @@ static void avic_activate_vmcb(struct vcpu_svm *svm)
+> >  	 */
+> >  	if (x2avic_enabled && apic_x2apic_mode(svm->vcpu.arch.apic)) {
+> >  		vmcb->control.int_ctl |= X2APIC_MODE_MASK;
+> > -		vmcb->control.avic_physical_id |= x2avic_max_physical_id;
+> > +		vmcb->control.avic_physical_id |= avic_get_max_physical_id(svm->vcpu.kvm, true);
+> 
+> Don't pass hardcoded booleans when it is at all possible to do something else.
+> For this case, I would either do:
+> 
+>   static u32 avic_get_max_physical_id(struct kvm_vcpu *vcpu)
+>   {
+> 	u32 arch_max;
+> 	
+> 	if (x2avic_enabled && apic_x2apic_mode(vcpu->arch.apic))
+
+This won't work since we want to use this during vCPU init and at that 
+point, I don't think we can rely on the vCPU x2APIC mode to decide the 
+size of the AVIC physical ID table.
+
+> 		arch_max = x2avic_max_physical_id;
+> 	else
+> 		arch_max = AVIC_MAX_PHYSICAL_ID;
+> 
+> 	return min(kvm->arch.max_vcpu_ids - 1, arch_max);
+>   }
+>
+
+<snip>
+
+> 
+>   static u32 avic_get_max_physical_id(struct kvm_vcpu *vcpu, u32 arch_max)
+>   {
+> 	return min(kvm->arch.max_vcpu_ids - 1, arch_max);
+>   }
+> 
+>   static void avic_activate_vmcb(struct vcpu_svm *svm)
+>   {
+> 	struct vmcb *vmcb = svm->vmcb01.ptr;
+> 	struct kvm_vcpu *vcpu = &svm->vcpu;
+> 	u32 max_id;
+> 
+> 	vmcb->control.int_ctl &= ~(AVIC_ENABLE_MASK | X2APIC_MODE_MASK);
+> 	vmcb->control.int_ctl |= AVIC_ENABLE_MASK;
+> 
+> 	/*
+> 	 * Note: KVM supports hybrid-AVIC mode, where KVM emulates x2APIC MSR
+> 	 * accesses, while interrupt injection to a running vCPU can be
+> 	 * achieved using AVIC doorbell.  KVM disables the APIC access page
+> 	 * (deletes the memslot) if any vCPU has x2APIC enabled, thus 
+> 	 enabling
+> 	 * AVIC in hybrid mode activates only the doorbell mechanism.
+> 	 */
+> 	if (x2avic_enabled && apic_x2apic_mode(vcpu->arch.apic)) {
+> 		vmcb->control.int_ctl |= X2APIC_MODE_MASK;
+> 		max_id = avic_get_max_physical_id(vcpu, x2avic_max_physical_id);
+> 
+> 		/* Disabling MSR intercept for x2APIC registers */
+> 		svm_set_x2apic_msr_interception(svm, false);
+> 	} else {
+> 		max_id = avic_get_max_physical_id(vcpu, 
+> 		AVIC_MAX_PHYSICAL_ID);
+> 		/*
+> 		 * Flush the TLB, the guest may have inserted a non-APIC
+> 		 * mapping into the TLB while AVIC was disabled.
+> 		 */
+> 		kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
+> 
+> 		/* Enabling MSR intercept for x2APIC registers */
+> 		svm_set_x2apic_msr_interception(svm, true);
+> 	}
+> 
+> 	vmcb->control.avic_physical_id &= ~AVIC_PHYSICAL_MAX_INDEX_MASK;
+> 	vmcb->control.avic_physical_id |= max_id;
+>   }
+> 
+> 
+> I don't think I have a preference between the two?
+
+I'm thinking of limiting the helper to just x2AVIC mode, since the 
+x1AVIC use is limited to a single place. Let me see what I can come up 
+with.
+
+> > +static int svm_vcpu_precreate(struct kvm *kvm)
+> > +{
+> > +	return avic_alloc_physical_id_table(kvm);
+> 
+> Why is allocation being moved to svm_vcpu_precreate()?
+
+This is because we want KVM_CAP_MAX_VCPU_ID to have been invoked by the 
+VMM, and that is guaranteed to be set by the time the first vCPU is 
+created. We restrict the AVIC physical ID table based on the maximum 
+number of vCPUs set by the VMM.
+
+This mirrors how Intel VMX uses this capability. I will call this out 
+explicitly in the commit log.
+
+
+Thanks,
+Naveen
 
 
