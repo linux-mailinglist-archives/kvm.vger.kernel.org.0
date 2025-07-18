@@ -1,266 +1,185 @@
-Return-Path: <kvm+bounces-52906-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52907-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27268B0A6F0
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 17:16:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B76CB0A6F4
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 17:17:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5D9F3BA430
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 15:15:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E243B5A506B
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 15:17:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A5EF2DCBF7;
-	Fri, 18 Jul 2025 15:15:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25A682DCBF7;
+	Fri, 18 Jul 2025 15:17:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MmFqV9jS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yteaprA6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27D4C171CD;
-	Fri, 18 Jul 2025 15:15:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752851742; cv=fail; b=F53biyUSiZ6UquUbAukwM5NAMA605MPiO3E5CLGm/mj9rBfkD+MdK3v2YZmTd3DP8lDlOvji5ui49N7FLUjziFl1ltHhMVgmMiQ5uERSO18QTInUo84a1WzeQ9AYgyvrlbIXdq7IA/YXdVMwby0rKEtu21tJzkhySwcjKngi9lQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752851742; c=relaxed/simple;
-	bh=y3a0mXq1AhEjsjb+UeTwuzP+8WBO7TYeJjFEG8/fznI=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=TWCFFrQTkLfd5ddUTYMHXoO7V4O3m0lYbNcs+WVJAZxigYMPhOQHYOlfRzMZ0KwqVB2974rOEOzfvehTYpOr0D0JrNNZx/AQBhpNJWjzbSQ0J6BeScpoGpv708c18BrY5wgIOM1nfFQGyg5dqKB5+KlPxGfR0R91+uMsnClP7XU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MmFqV9jS; arc=fail smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752851741; x=1784387741;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=y3a0mXq1AhEjsjb+UeTwuzP+8WBO7TYeJjFEG8/fznI=;
-  b=MmFqV9jSogWB8v70dYpKXovYuAn7weZQSMryg9PLUqGGyGpALlpeYMpn
-   m4Dd8947lS2xd/oDzMLO1u5TOTG7p5/w5C9Ua8p64p14mnSrsmLX4zQPA
-   E+kA5Cu2yppn9ehMFV4HB/GGjsEshurT8kDtC4NxpObZlGQrPsk0fjg22
-   zsKiufj1gjcFsGHNZKKkq2WYZU06g/fiondgXO3O2hD1WBIPxFoLLvFng
-   gKFhVy/1PgU6wdKopf51WHCh89ShqAnEKu3Ku9aTstLkiBxn4XnctNOSR
-   eaPFyoZWxdU7sypG1VOLivq9PqGthuKcRz1dr//dAyCbNb3x7tOjQeMGh
-   g==;
-X-CSE-ConnectionGUID: Pi4B+qClRKyKanCCtF5Kxw==
-X-CSE-MsgGUID: hbhT7jsoTZqFtXf6WzTYRg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11496"; a="72715103"
-X-IronPort-AV: E=Sophos;i="6.16,321,1744095600"; 
-   d="scan'208";a="72715103"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2025 08:15:39 -0700
-X-CSE-ConnectionGUID: ag6VMur8QxmPZJm60ipXsw==
-X-CSE-MsgGUID: wmd3Ipx4SOqt+cCVuR6cdw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,321,1744095600"; 
-   d="scan'208";a="163604635"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by fmviesa004.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2025 08:15:38 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26; Fri, 18 Jul 2025 08:15:37 -0700
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26 via Frontend Transport; Fri, 18 Jul 2025 08:15:37 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (40.107.92.45) by
- edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26; Fri, 18 Jul 2025 08:15:37 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=QLKA4P6VRLkY0y4oTGz1vlYXEWX3P+Hw27rPHaqdIXXt2N8oPWD60fgrF1nCoFqFnDcTSsoCTXF93I8sIKK3fLpA8YQKyw/2qRohgPqhl2A3x179qGvuNJ0gnKsAKw4Im+6EFepKXs6eAgBAt4jfdv6RIcoEy3Lk3bimv+UFl95qJCBIujl6Glggy1BC4cjYri1MAlw4VILTgMAkdL353hVkDwGrvfSYV36/CXcuf48ZmB5x9g7fcD81Se0V3+inciLvFPTmaYVFsjzJpvVaXEiOMp7o+A7dHNO11FrogWX6mfDvZucqfWdwKWVnSsrVnkWxiEBB2SpJBuFkKNn8JA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=sJrQw5PKYDgnqZNASrjepWyJz2Znmwh60YuWgTE8SHY=;
- b=QHuYQF7s+WoAhceQY2yn4eteGDDCm0kmgOmZlU20+lLt2/d0OOpk0C3i04zwPmvFkGvGa30dICOl9t51f4eccMHFR7tcPrd702GgbwR5LCK9Ugp88HpvDFUT90Xqbo+7I/CvAriSv9cuvi3x4RqEy7PlwSIBODlcIQJR9qxWiHhAy3xiMlbTR7M0F+4XsWyhiNlQEZv9q8ZZUlNk+SdxMLC4H4jU/E0eS/iyUdE9NJm5uxPqWGDW8czUxNqCgoNIpvVX7E+OfoJaexIeBbE/bl9GdPwM+rNYIXmvd+G1KYEWssTYWoG3HAO+NqKjRz4Pl7IDfsMmNz6O+7HNlHverg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
- by IA3PR11MB9136.namprd11.prod.outlook.com (2603:10b6:208:574::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.25; Fri, 18 Jul
- 2025 15:15:34 +0000
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::cfad:add4:daad:fb9b]) by CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::cfad:add4:daad:fb9b%5]) with mapi id 15.20.8943.027; Fri, 18 Jul 2025
- 15:15:33 +0000
-Date: Fri, 18 Jul 2025 23:15:20 +0800
-From: Chao Gao <chao.gao@intel.com>
-To: Sean Christopherson <seanjc@google.com>
-CC: Jason Wang <jasowang@redhat.com>, Cindy Lu <lulu@redhat.com>, "Paolo
- Bonzini" <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
-	"Thomas Gleixner" <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
-	"Borislav Petkov" <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
-	"maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>, "H. Peter
- Anvin" <hpa@zytor.com>, "Peter Zijlstra (Intel)" <peterz@infradead.org>,
-	"Kirill A. Shutemov" <kas@kernel.org>, "Xin Li (Intel)" <xin@zytor.com>, "Rik
- van Riel" <riel@surriel.com>, "Ahmed S. Darwish" <darwi@linutronix.de>, "open
- list:KVM PARAVIRT (KVM/paravirt)" <kvm@vger.kernel.org>, "open list:X86
- ARCHITECTURE (32-BIT AND 64-BIT)" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v1] kvm: x86: implement PV send_IPI method
-Message-ID: <aHplCKOxhBL0O4xr@intel.com>
-References: <20250718062429.238723-1-lulu@redhat.com>
- <CACGkMEv0yHC7P1CLeB8A1VumWtTF4Bw4eY2_njnPMwT75-EJkg@mail.gmail.com>
- <aHopXN73dHW/uKaT@intel.com>
- <CACGkMEvNaKgF7bOPUahaYMi6n2vijAXwFvAhQ22LecZGSC-_bg@mail.gmail.com>
- <aHo7vRrul0aQqrpK@intel.com>
- <aHpTuFweA5YFskuC@google.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <aHpTuFweA5YFskuC@google.com>
-X-ClientProxiedBy: SG2PR02CA0036.apcprd02.prod.outlook.com
- (2603:1096:3:18::24) To CH3PR11MB8660.namprd11.prod.outlook.com
- (2603:10b6:610:1ce::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E05D5171CD
+	for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 15:17:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752851826; cv=none; b=X8srX7N4poEyt0VeC7kIwVx/Fi8jPh2+O6MJ2VIUvyaCMvsU1ktiSmaNiukwwgkSZUCyIPJzPPqyLNiSIDqUVRzx8bLbFOAfrMfTfdnNjFDpsopFlw6mtBKAEajDMsSVIt9egkkR6MrpZimY2jkmeLcXhaLoLiJFKmY6Yog9F14=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752851826; c=relaxed/simple;
+	bh=8eDdgWLC+QIReMatPvM0XTGT4Sm31nC4WBC0WmvOhpI=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=QJxRDTFL7zVFn0aqbJHvALutknd591ZXnE4Xp+JYIPxFSDym5VTmTF+8y+kkXFheHj1uO6tGpkV+DR7QCUQXGNmcgnN/Nfq60CfRdgdfYLDpQoBxxJ4h+vtPBLTt50Bqujnc5nIo8C/qp/nJ1LwbYE2NlpLTzxsDED4132Q8Atg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yteaprA6; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-313d6d671ffso2337615a91.2
+        for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 08:17:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1752851824; x=1753456624; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=1L+XboiYZgwrDs9t+19i/kb8Oa/gCwS5XH8+lxsNAlM=;
+        b=yteaprA63Q3LLOnoz5Bd1LS5ShP6wDmEi9D1KaH1eeIFzDp7tQ/YL4o79SPIsOwomM
+         Lf5iO7hGuaLNP1xG69zc3HDjeq3SZ4Sc92Khw4eGQVbnGnJm9YWW7jnWFx8icoPyfeD7
+         GTVG0jQbrH3haFP4U3qwCx1Kl2RiwWabPI0Tc+/AXBJHw2sIfcx7lnL6+f1h2hodKaZP
+         SfejvRTd5URbfDzWoZeC6cKKU3iPD/MIE9TP2qXGz9D0Z6mBR5qMv6Xq8aU+vYH8Bb5r
+         gQoJhe2Du02VIy4ZecJzbaWmRSjCU9PemLGYsWxGbeH3ukTF4aKD0dqH4mTTHWrNscDT
+         T5yg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752851824; x=1753456624;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1L+XboiYZgwrDs9t+19i/kb8Oa/gCwS5XH8+lxsNAlM=;
+        b=Fw+gk7p/x3nxlcXkO7vy6/zDQ0pmrxBe6I+07XkNTeme07bdzfTdoxzYap7eJ0tgF+
+         TxtmQ/wLht6I8SUCRe1BsutgunXYElPq7axwDqb5+ONk8+/uvy0sFedkjqjgovQ0MjQw
+         POmdBj6Iz5dB1Hy1ONkXA4ZbzLjn/SLSrQSreqldqvoRI56+P7lRuvqG4vZieMcICFvL
+         MBNGJydlkeVabl/OZQtSR+NcuEqcOcbhCu0s9LT3sVtTWHFCb8fkf9MZWlOInEKX84ZX
+         O0ajxM5H6GeGDnozCwfuGhIpBNSrnMji5O7RXLQPNtZz4WUdbQfOIkZE8WZcdGfIdXxH
+         pFRQ==
+X-Gm-Message-State: AOJu0Yxz6Senl0ShypqbgIDVheNg1MIVXvDpL02UkSS5414M8s596Pd6
+	9mYYLzId66LX2aHYjFMF5bEOrZPPD+BLbseJiLPS6rv02p0H7+hWz1TLnxmAD7VZZFFnIhVEnCA
+	6w2K0Eg==
+X-Google-Smtp-Source: AGHT+IEe6NhIMjl0qrBNjltCkK4Og0mX2axMMJY80bqLmgjowcFokCH2aOrFBc4AM2tL6CqFHB1He0/dHrY=
+X-Received: from pjkk15.prod.google.com ([2002:a17:90b:57ef:b0:31c:2fe4:33b8])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:c2d0:b0:313:176b:7384
+ with SMTP id 98e67ed59e1d1-31c9e6fbb16mr15962881a91.11.1752851824229; Fri, 18
+ Jul 2025 08:17:04 -0700 (PDT)
+Date: Fri, 18 Jul 2025 08:17:02 -0700
+In-Reply-To: <xojzhg3e6czqg6zqyt3wbnzfafwy7bd7fq43b3ttkhfcw3svot@rakzaalsslfz>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR11MB8660:EE_|IA3PR11MB9136:EE_
-X-MS-Office365-Filtering-Correlation-Id: 69fa7e9c-7f51-49e5-bda9-08ddc60df092
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?y6UdF76+eewA2Zdpec0MYnji7PUrYr7aRh5UiwFNyhzwu1ZCNxeZLTeIophP?=
- =?us-ascii?Q?f5zzfNE1m6acJgLIBkw6VYQm9BVyYVFehuc+zsx2zWnX5TuNJnC06natNAWO?=
- =?us-ascii?Q?1DwKN7P1OZQnJHLluUAPotVE4OQGRWoVf+6SnJKh75cJ0iERFeTziKRhWGGD?=
- =?us-ascii?Q?35Xr840L0+az4OH0LblbrVFWvkH8PxATJhc0NYCFEYvK6T2i3rtZroX+2iYL?=
- =?us-ascii?Q?OxgQnLAXpfvy7gAubeh1waCyi29AENMAwHojI92Kg8p83I5Uj9Dfd4YiM8gE?=
- =?us-ascii?Q?MsQ+weNgzy2x2rtl83nZMTXoy6HF7Y5ibt21LppxEbPDr//exw00Ln/jFOVf?=
- =?us-ascii?Q?jGrgCJ7dPNkvts2bGqHiz+VDeAIgBEle9Fhwqn2x3GKFhKs6VlBLKgK5hVQY?=
- =?us-ascii?Q?qOWCFLUCPXick2/p6vysucdCx6oi8M+gs/0NvOXowzub3EbuHLN9J2YpZkw/?=
- =?us-ascii?Q?/8C5pZ0NJjn1cUbgd9XbTZuGES42FNoxbMaREVtvLDOKWotTFyJYXTcGHaDD?=
- =?us-ascii?Q?83jyeKF+8FdU8fHvt128EHzhibZs5pNAXF+meTFQeQuwMtdi9lNnArzEvyb5?=
- =?us-ascii?Q?Siav5hFRxUC2IGg45qEpt6KVS53H9vlGVYTuricwhDHLQuKTdcfZoRL31dRO?=
- =?us-ascii?Q?fKObg4Ga/uwJiI8GkFcHFIJ4jsXiZLFc0jf5dgA/FFs9CHrOKe61jNvKDNkP?=
- =?us-ascii?Q?wIkRwx5Die+HpDGJo2AYB49GLbv0/L2AgSVoNDCrPBnW9SuO6jTbf/g7b0zi?=
- =?us-ascii?Q?tIB6Ik9n2H+Pxi8JjWP9UhRKpsbmIRAhBFbMRboVHtfdd9y5JAIgWNPKkM2y?=
- =?us-ascii?Q?7AlAjLz6iXSBSIniHcnEU4VwjeQlUgqrTIFjC5BkjRq9GOnL7z6b7LKU8Ml4?=
- =?us-ascii?Q?oDCi8W1iMvytg67JA2H5kL3533J4q0tyoEXtCTHDHZf/pIaPbfm6VCBzqViN?=
- =?us-ascii?Q?EYhAFjTn7OOlCMm2o2UumZZDCUNBHOjrcTki2WK/fDPsLLnmtppOxbBEc75J?=
- =?us-ascii?Q?u8kuJr0CeMplRest0f6SZaNMZgbOHwygtTK3HOgXwq0HbbWNFKvV59jcVKku?=
- =?us-ascii?Q?arIJL5Ar4LNfQtKktN08nKGfw5vW0J8sCGRCxkSPfDjC+972wh2dkGlDBzBL?=
- =?us-ascii?Q?roPgE9FgYHWFW0Ye4zbAGyH7Y8n4EhyNrm2ApujUkfY1FBoiX+xf4OT/VfXZ?=
- =?us-ascii?Q?GAclevourzOxGyxrt1WkJDdnp5xwNFQfnpa3QJcNH40sktjYrpK67ziM3ni5?=
- =?us-ascii?Q?q8eB63s20gM2pz9JnfigLcWh6q7NtdF+n0sUZaga45LKI3JnajVJqk7uCDde?=
- =?us-ascii?Q?cRhMuyqp6djyEIhGh6g5gGm809aZs9PXnHTrMiV8cUylziWfzAVbskcReCml?=
- =?us-ascii?Q?8MFfKfilxkYOcHmLv4RASk+CT9XPUR8pBm5iUt0/pAAjhPofrEQsBwiT8gXt?=
- =?us-ascii?Q?63uKVgtv2Ug=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8660.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?ZvhfR3gxfzY720Hk5jN10+kD13K6OlQSgZLPatvvhuFF+RJG2O1tRf83/fFg?=
- =?us-ascii?Q?KO+K2w47uqsSzdt192mMt7T1i5X05ijPM8W3T+Uf38cZP5IygvD/r39/2Ddo?=
- =?us-ascii?Q?VMJ1LSwSF67SmNZ7KXdy3RGNCGH61zwULvyRQY8pvzYRn5bxeDUaOxUQdOkZ?=
- =?us-ascii?Q?ZPz3ACJ8u7nX6ck4adti/+qn9noJ3Hly9y85la7rGBS9mb3VvEII+lwX0Fy1?=
- =?us-ascii?Q?sP7mecZkfxSOUJC4A4/XNaL71mxiZPG4PPTvk80QNU0PS5lQFYaJhTCo7v8M?=
- =?us-ascii?Q?6gwx02GIE5UKzY2sWcGcfS609Hkt8i1I0DR8PuZgFEzPuYgaLGhMnApCZA+9?=
- =?us-ascii?Q?zs/a3l3OHNHJI1BHecrUWzqVAVa4Fmo5pZPYIthZcTTgyPPPe+nCf+NZFp71?=
- =?us-ascii?Q?PpLDF+tf+5o8EP1wEk2OAbZmf04/OT49DMT5JpOdsqjyKL3dQFTOIDGzzhBe?=
- =?us-ascii?Q?xzh0UdJ33T8clOpe0BPIULoCO+yaMXNaLMpYDysJNiWvRdG8n6PPoXQHTwGz?=
- =?us-ascii?Q?4sC7t7cG58SdC2Y2DbaJ4hOpmxHDtntUR6dhTJnzl48N+LQlYbYW1oXSdwGc?=
- =?us-ascii?Q?mfxXjrizYGLFZWV6rU2eJvshNZxSbsuDJDLoLMZmj3dFhPqEurQpCcx7Z8ge?=
- =?us-ascii?Q?1XCO9afxJYRN7wdYfqjY4v1T3mI8Y/I/th1alfoDsB3vmIkTRW+GbRHRv3Im?=
- =?us-ascii?Q?tRCK/kDAxtuH5xUH2kFuauI7t6WEyQqVy0D8GfWpOK7UFLJh7hBFyUVtTKw1?=
- =?us-ascii?Q?FNBzIuj23hjERTEn4LxDheLaVkwmsyiPFelryKO2iiaSuozyhWac13Dy4CaU?=
- =?us-ascii?Q?D8XPORK5mhiFsC91ReloB1Md/q1GU0S8Hk2mnqj21sYBY9Hl5baPd+4Dh7uI?=
- =?us-ascii?Q?rQNLtBgbqQXT1m9ViHwle5ktByugsbzEg7CIg5xUjlek/fKmgKopiMiqmM9v?=
- =?us-ascii?Q?+ChBkobsoLGEwy7cyGdgqz7Fd9QKbGxcHqz5bcOVN0LRyLNQlklwahoh58bL?=
- =?us-ascii?Q?+e0GERj/J0XXXcuUv+AMNJgaLuSmlUWv+LJlfi/ufodlNJcerA6XMLnaGZQa?=
- =?us-ascii?Q?w7TWvdGlg2anaH3GABGBKVzv8/1JFcExRUpG6PEEvbg+/TzvyjSQSIe4Ou75?=
- =?us-ascii?Q?3zzKNEWkzCCRDK0j98Rj0dGGXzDd84XWTNT62WCFeqtEYiK1M07PELFCDlh0?=
- =?us-ascii?Q?MZ0PR3WGOF/4UuLVlhweEA/udiYNJ4Dcm0Xb8qsIDw/0jj4vkfVr1aveav2R?=
- =?us-ascii?Q?bkbhOa+KcJ0kecpRvu498lb1luaWTu3y2KgCUVA0ufm0YjvmjTgkSpopw0Pp?=
- =?us-ascii?Q?HWLD4c68LWYk6pbLhTIMTnzn0+D0uPcjGILj/2bYTeo7k/oXUn9oq/Z/3QFi?=
- =?us-ascii?Q?xIUksYMJr6ywsaBieNBvIJQpaZil4ZFH+4ZKKRwwcz/AKkD3wAoNtXVHaoFG?=
- =?us-ascii?Q?UpqtdboVYPI3waRyl4QvyzgOXfk37D8IYe9OxuY7lCRecbOATBHuwV2xTTuI?=
- =?us-ascii?Q?S+2vxdG4yU5zg/Jj8/Hf4FvDZPEiDMBrJoSFomtyG1ipdirB8SL0rOeR/fgS?=
- =?us-ascii?Q?8Z2z6swuVqHxwPcoCEdjfDMVYtr7tE8dFUdiLRz5?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 69fa7e9c-7f51-49e5-bda9-08ddc60df092
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8660.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jul 2025 15:15:33.1527
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Oc4e0Xtko04mKYDYipcuU54e3pHRYHjNczD4ymgsjv7OzcvV3F2sO7uP3j2I0dil8Wqe+nq+7QcUt3KFg1tO4A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA3PR11MB9136
-X-OriginatorOrg: intel.com
+Mime-Version: 1.0
+References: <cover.1740036492.git.naveen@kernel.org> <f4c832aef2f1bfb0eae314380171ece4693a67b2.1740036492.git.naveen@kernel.org>
+ <aFnzf4SQqc9a2KcK@google.com> <xojzhg3e6czqg6zqyt3wbnzfafwy7bd7fq43b3ttkhfcw3svot@rakzaalsslfz>
+Message-ID: <aHplblJxJ-7FuaTH@google.com>
+Subject: Re: [PATCH v3 2/2] KVM: SVM: Limit AVIC physical max index based on
+ configured max_vcpu_ids
+From: Sean Christopherson <seanjc@google.com>
+To: Naveen N Rao <naveen@kernel.org>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Paolo Bonzini <pbonzini@redhat.com>, Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>, 
+	Vasant Hegde <vasant.hegde@amd.com>
+Content-Type: text/plain; charset="us-ascii"
 
->> >> >> From: Jason Wang <jasowang@redhat.com>
->> >> >>
->> >> >> We used to have PV version of send_IPI_mask and
->> >> >> send_IPI_mask_allbutself. This patch implements PV send_IPI method to
->> >> >> reduce the number of vmexits.
->> >>
->> >> It won't reduce the number of VM-exits; in fact, it may increase them on CPUs
->> >> that support IPI virtualization.
->> >
->> >Sure, but I wonder if it reduces the vmexits when there's no APICV or
->> >L2 VM. I thought it can reduce the 2 vmexits to 1?
->> 
->> Even without APICv, there is just 1 vmexit due to APIC write (xAPIC mode)
->> or MSR write (x2APIC mode).
->
->xAPIC will have two exits: ICR2 and then ICR.
+On Fri, Jul 18, 2025, Naveen N Rao wrote:
+> On Mon, Jun 23, 2025 at 05:38:23PM -0700, Sean Christopherson wrote:
+> > > @@ -103,7 +114,7 @@ static void avic_activate_vmcb(struct vcpu_svm *svm)
+> > >  	 */
+> > >  	if (x2avic_enabled && apic_x2apic_mode(svm->vcpu.arch.apic)) {
+> > >  		vmcb->control.int_ctl |= X2APIC_MODE_MASK;
+> > > -		vmcb->control.avic_physical_id |= x2avic_max_physical_id;
+> > > +		vmcb->control.avic_physical_id |= avic_get_max_physical_id(svm->vcpu.kvm, true);
+> > 
+> > Don't pass hardcoded booleans when it is at all possible to do something else.
+> > For this case, I would either do:
+> > 
+> >   static u32 avic_get_max_physical_id(struct kvm_vcpu *vcpu)
+> >   {
+> > 	u32 arch_max;
+> > 	
+> > 	if (x2avic_enabled && apic_x2apic_mode(vcpu->arch.apic))
+> 
+> This won't work since we want to use this during vCPU init and at that 
+> point, I don't think we can rely on the vCPU x2APIC mode to decide the 
+> size of the AVIC physical ID table.
 
-ah, yes.
+Ah, I missed that this is used by avic_get_physical_id_table_order().  How about
+this?
 
->If xAPIC vs. x2APIC is stable when
->kvm_setup_pv_ipi() runs, maybe key off of that?
+static u32 __avic_get_max_physical_id(struct kvm *kvm, struct kvm_vcpu *vcpu)
+{
+	u32 arch_max;
 
-But the guest doesn't know if APICv is enabled or even IPI virtualization
-is enabled.
+	if (x2avic_enabled && (!vcpu || apic_x2apic_mode(vcpu->arch.apic)))
+		arch_max = x2avic_max_physical_id;
+	else
+		arch_max = AVIC_MAX_PHYSICAL_ID;
 
->
->> >> With IPI virtualization enabled, *unicast* and physical-addressing IPIs won't
->> >> cause a VM-exit.
->> >
->> >Right.
->> >
->> >> Instead, the microcode posts interrupts directly to the target
->> >> vCPU. The PV version always causes a VM-exit.
->> >
->> >Yes, but it applies to all PV IPI I think.
->> 
->> For multi-cast IPIs, a single hypercall (PV IPI) outperforms multiple ICR
->> writes, even when IPI virtualization is enabled.
->
->FWIW, I doubt _all_ multi-cast IPIs outperform IPI virtualization.  My guess is
->there's a threshold in the number of targets where the cost of sending multiple
->virtual IPIs becomes more expensive than the VM-Exit and software processing,
->and I assume/hope that threshold isn't '2'.
+	return min(kvm->arch.max_vcpu_ids - 1, arch_max);
+}
 
-Yes. Determining the threshold is tricky, and it's likely not a constant value
-across different CPU generations.
+static u32 avic_get_max_physical_id(struct kvm_vcpu *vcpu)
+{
+	return __avic_get_max_physical_id(vcpu->kvm, vcpu);
+}
 
->
->> >> >> Signed-off-by: Jason Wang <jasowang@redhat.com>
->> >> >> Tested-by: Cindy Lu <lulu@redhat.com>
->> >> >
->> >> >I think a question here is are we able to see performance improvement
->> >> >in any kind of setup?
->> >>
->> >> It may result in a negative performance impact.
->> >
->> >Userspace can check and enable PV IPI for the case where it suits.
->> 
->> Yeah, we need to identify the cases. One example may be for TDX guests, using
->> a PV approach (TDVMCALL) can avoid the #VE cost.
->
->TDX doesn't need a PV approach.  Or rather, TDX already has an "architectural"
->PV approach.  Make a TDVMCALL to request emulation of WRMSR(ICR).  Don't plumb
->more KVM logic into it.
+static void avic_activate_vmcb(struct vcpu_svm *svm)
+{
+	struct vmcb *vmcb = svm->vmcb01.ptr;
+	struct kvm_vcpu *vcpu = &svm->vcpu;
 
-Agree. It should be an optimization for TDX guests, regardless of the
-underlying hypervisor.
+	vmcb->control.int_ctl &= ~(AVIC_ENABLE_MASK | X2APIC_MODE_MASK);
+
+	vmcb->control.avic_physical_id &= ~AVIC_PHYSICAL_MAX_INDEX_MASK;
+	vmcb->control.avic_physical_id |= avic_get_max_physical_id(vcpu);
+
+	vmcb->control.int_ctl |= AVIC_ENABLE_MASK;
+
+	/*
+	 * Note: KVM supports hybrid-AVIC mode, where KVM emulates x2APIC MSR
+	 * accesses, while interrupt injection to a running vCPU can be
+	 * achieved using AVIC doorbell.  KVM disables the APIC access page
+	 * (deletes the memslot) if any vCPU has x2APIC enabled, thus enabling
+	 * AVIC in hybrid mode activates only the doorbell mechanism.
+	 */
+	if (x2avic_enabled && apic_x2apic_mode(vcpu->arch.apic)) {
+		vmcb->control.int_ctl |= X2APIC_MODE_MASK;
+		/* Disabling MSR intercept for x2APIC registers */
+		svm_set_x2apic_msr_interception(svm, false);
+	} else {
+		/*
+		 * Flush the TLB, the guest may have inserted a non-APIC
+		 * mapping into the TLB while AVIC was disabled.
+		 */
+		kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
+
+		/* Enabling MSR intercept for x2APIC registers */
+		svm_set_x2apic_msr_interception(svm, true);
+	}
+}
+
+static int avic_get_physical_id_table_order(struct kvm *kvm)
+{
+	/* Limit to the maximum physical ID supported in x2avic mode */
+	return get_order((__avic_get_max_physical_id(kvm, NULL) + 1) * sizeof(u64));
+}
+
+> > > +static int svm_vcpu_precreate(struct kvm *kvm)
+> > > +{
+> > > +	return avic_alloc_physical_id_table(kvm);
+> > 
+> > Why is allocation being moved to svm_vcpu_precreate()?
+> 
+> This is because we want KVM_CAP_MAX_VCPU_ID to have been invoked by the 
+> VMM, and that is guaranteed to be set by the time the first vCPU is 
+> created. We restrict the AVIC physical ID table based on the maximum 
+> number of vCPUs set by the VMM.
+> 
+> This mirrors how Intel VMX uses this capability. I will call this out 
+> explicitly in the commit log.
+
+Do it as a separate patch.  Then you pretty much *have* to write a changelog,
+and the changes that are specific to 4k support are even more isolated.
 
