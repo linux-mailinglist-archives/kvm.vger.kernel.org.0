@@ -1,161 +1,156 @@
-Return-Path: <kvm+bounces-52895-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52896-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F79AB0A5E8
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 16:12:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1833B0A5FA
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 16:16:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3834C5A5C79
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 14:12:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 23F831C805E5
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 14:16:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B06B2DAFCC;
-	Fri, 18 Jul 2025 14:12:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC96D2DAFD2;
+	Fri, 18 Jul 2025 14:16:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZCdFg+RO"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="mjuTHAEj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 156F315E5C2
-	for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 14:12:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 700893398B
+	for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 14:16:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752847967; cv=none; b=qu75cqh6xZF2rIBPwuYGO2i0EZek4urZvuxVI99jn/H4cgFizxELKTO4NciGN+DIN8R4hkhMms7wRiqX4wBJPvv1Cj6yV1AsooRNEJoeQvnKNnV6/4ldUD4QBBtKdGSzpe/kbGiqL0qjBKst2rSHzgT9YVoExiWECgCq/rxQGgc=
+	t=1752848164; cv=none; b=izZGJYH0B2YhH/RFD7WUGMd0UL/BTWdFnlPDZLvDeILMJaz07r7L03fw8uMuYVmh916tvae5/WBmHcU3mBgOj/TPB+emIT0+hhqHnmMx+CM6FCgdUxdyGiXj5nT5AhAvZJyt/UnbJmbauBvOBZF6/dCtcr51713OphpvULdwpbs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752847967; c=relaxed/simple;
-	bh=TRsnlJOPX7jCuAnxZwxDgaXcSECNuOkl4qnz6n2qg90=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Hp1UvdLZMDMdi8+qqoIvtpZ82zRb/Aa4l7XqMlQSW5GjvbfkUcurifYbDj4wT8nFk2L7P+7HNLFkxOaiYvxgA2ay/F4iXbw6KpFv9WU1XjW4UPpSPssNMEBF+e4KZayA7DG38pWOqj15uweDZNrPFIJ/bfBZgn87WfTOTj9y6js=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZCdFg+RO; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-31327b2f8e4so1945868a91.1
-        for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 07:12:45 -0700 (PDT)
+	s=arc-20240116; t=1752848164; c=relaxed/simple;
+	bh=5XaE7447C9RAX+GCeN/Jf+zei+sDppnkuDDAOZmhiks=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=s7FKayYxzxgdwwYsvgSxihJKVJLwmCA1teZnYDNDOM4k++IM72Jgh0MAg2/ZG5h9Klb2K/cVeH/aK/WOZ+qWTP5/boVVWcQ9YjdMASigzezdkHvcFDr0S/HrNXx1QV3o1DOo+Z9O0bA1oElp3/9XGEGUK3oGqQwPz7KccbvtCOs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=mjuTHAEj; arc=none smtp.client-ip=209.85.222.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-7e346ab52e9so265534185a.2
+        for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 07:16:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752847965; x=1753452765; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=KOmjp1uxaXV9NwwZtk4ium+A2qkDcoP/OhzCbXJxhdo=;
-        b=ZCdFg+ROnfm3lSU2AfhwS6v42FClEuM7y4mHTNQzbcff0jqEa5ONrchysMTnm/qWHz
-         y22AtQGhn07zHw8Yg/275/K4qEhaG0t6/TvDY4d3ayoFQgNGJ+GMEFnc1zu35p8K2SEE
-         /Ppgr/YEcu2t2okJ5foEEJxqXC0IZhDPO0o9EtI90Tl3qVIJSllE4mTQdAV9nKSfMUs6
-         ky/K15S2Lwd85Ct1i7TCw/eO5j0bOACWRpm1E3qqb6dS3C54f/jv9zeJM3eO9MOO74Lj
-         jk2SyWYqeU0q69F02fJvgfkOh0Bg4injdmMYYUbGxVkDVd6Ktk4Hkie1cQrM9zr+5o4M
-         NLbA==
+        d=ziepe.ca; s=google; t=1752848161; x=1753452961; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=hJjLE0UVkZ2mMP5n5MQpEv3lHcI2vw7mI8TTF/9jzI8=;
+        b=mjuTHAEjVq9p5tT8aL15EowHfiE0HRBl1kHUhR4vjvid5WGvdE1A4t0A5Z8qr6I6QW
+         /z/f7E3OQ32u+SyRmENMHHZzyOTH7GxekIJw3eirlyDwQEPXOFZ6qJFrSddBUIxLNOyM
+         +vZpu1BZ/94olJTltKu1beswOjBohsX3XseZnNgakttKudd1QONXGAwPoc4sVMsh12qy
+         lfoQeA67xQlCaOJboBLwqomDfcqvggK31eJGO1RKMlCd5WA0UNbLZ8rcLmVhYXE6ivU1
+         bEz518hj1PxuEOCjb9CZe4MvyWIrsNgzCQ6gQPaTrglgCIVPIAAbQQIQaWoAutow7MPV
+         hfFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752847965; x=1753452765;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KOmjp1uxaXV9NwwZtk4ium+A2qkDcoP/OhzCbXJxhdo=;
-        b=K1hG8G+YLxDQokXSn6IYCuqHFmveNiu0O5Se3I+llmracws/jX0oEwEKrY4PPfJaQ+
-         A62efOWIQ3kx2zMpadKbwLBwRpWqbcJYF4n4fZh5+z5xj672960xFD9GcTIr089a56DL
-         5L2hR5uow/aje/TZcIv092nWIi2vDIa8QYabndJh3Y46oybt3+jRFTPL0T/8D+KwwQ8i
-         /cV3x31uvjNB4PukOdElBE6/YcW16DOCGpR9JQNlIYi69ZMiQ+O97tlaFQ2xZWDfLQ5f
-         HTPa5tH3+DlKYuIHNB/78FT0SH4AwOHhuTRCGzXNmFgd+yDSURKjWM0/K9nIA8vJsOmW
-         QjAw==
-X-Forwarded-Encrypted: i=1; AJvYcCWcV8V733rASS8T+Fh5kY0srcRWuJqEIgITI1eloGdJRbghbTxwjl5fAxtXYTMzyLuHHeA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxiB1YnmLs9TQ3bNTCC1un9GT8+ZJrEy8xfNjc9mTz0PwFeLu3k
-	CtsW9xcslh7uLwCqx9j8qAJp+4bb64RNAwj0b3F1IuI9i7dbsh5p0pCBRTUiQwNQNppySrrMHJD
-	mAEBXlg==
-X-Google-Smtp-Source: AGHT+IFB5nkXPUyu2pYjwVK7IdJa8WggIY0+Fxvu5N89HC12/p5Z2za6gUbziFQbMNmw/LiH0Z6X1QOb+qg=
-X-Received: from pjk3.prod.google.com ([2002:a17:90b:5583:b0:31c:2fe4:33be])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2e46:b0:313:2754:5910
- with SMTP id 98e67ed59e1d1-31c9f3eea5amr15716875a91.15.1752847965493; Fri, 18
- Jul 2025 07:12:45 -0700 (PDT)
-Date: Fri, 18 Jul 2025 07:12:43 -0700
-In-Reply-To: <20250718094936.5283-1-lirongqing@baidu.com>
+        d=1e100.net; s=20230601; t=1752848161; x=1753452961;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hJjLE0UVkZ2mMP5n5MQpEv3lHcI2vw7mI8TTF/9jzI8=;
+        b=vTr1NvKM0/gdZ7uXQN9qZF6aTErmtj7Y6I2kHUteWSoOV6Y1oRodZQLF/3oDlkwpmM
+         mDx3C645HlYI8iFfFSljWar7eAtNnxZaQIzACi/aqQCBIMRAQnttyUVEgCPlgFm2rrzn
+         Y5mBYlf2F+FSQ9VKq4vFwtzjUUehx6tTTpEn4dJDUjVzy5RxeVhbw/aX5d6hek5kzU/R
+         3fRggdwOxpmt7DWP0u3d1LMRzxz6iOgi28p583XfITXKfm7dM5CiLUrPQJWf8iH1rypl
+         QF844dkY6AmX1ndxW/GEgxrjwZNZ9lHBTvfDWIvR3/fQE+OzR5NxTeVPFou1utv0QFF2
+         LJUw==
+X-Forwarded-Encrypted: i=1; AJvYcCUUxxdmuSHHbMR2DaAJnnpi8/JV1ni14XKnd14Q9fPFWeeqem3MnFKhbXLl5FhrHJ/P+2A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzVYF4+lNk1/F6EnbBzJbE8N7EvY2OIhk9Scn8Xzss/EuCfQfVJ
+	x3hHWdWgqVtWCPNiz6rx8QFbYo1iZFkLinv+vyDiqfAZWagj3aw1a6Y93okQg0gsoz4=
+X-Gm-Gg: ASbGnctNEp0lZV2//MBbl86v72/lw09xVoTkgG+zuxOD2qxxfA4tDAqGCbDkBwUjjag
+	HNWdUo8RMnuUzEQonjMzSUrz5MDhLgY2LCVaY7GJs5d2HcrLLdgmUEqcfRz4NWEm8CieTGyCTLr
+	VeNO3HZElKRzyxjn6J4KGrJqWF/aRYIb6I0aFvRIoKbj0+t34uiUUGGZDP0WlbiNI9VuxiZe4SK
+	k5ZlIS2JpUC01PTdwSJTol78sS881ytbWa7pzWlVTnRd2ulrw8cDFJi4rNot+cJbFWeD6j0MTQO
+	IYirtCATMWr/1GcT3jVjl9APbq1ihvSFGrcTTteZTO0bSmuVLbh6Ec5lAUWv3CPhhRypfE9sp0S
+	ckJlsl1+OPU2UOes/hbKpkhTJd1zPYZdGskUMzWnXIwDSprSFAhd+YYS2ttQ2OKahjLNzuamtfQ
+	==
+X-Google-Smtp-Source: AGHT+IH83itoUa8qKHB+I069li42G5fh0+8tV6hdT0Ya4bqMV1JxQTP8HGjKpE/oLQZTw/kkZxIAXw==
+X-Received: by 2002:a05:620a:4410:b0:7e1:9769:97c4 with SMTP id af79cd13be357-7e343613265mr1502291985a.47.1752848160939;
+        Fri, 18 Jul 2025 07:16:00 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-167-56-70.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.167.56.70])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7e356c649c0sm91045985a.73.2025.07.18.07.16.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 18 Jul 2025 07:16:00 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1uclsV-00000009zBs-2Dun;
+	Fri, 18 Jul 2025 11:15:59 -0300
+Date: Fri, 18 Jul 2025 11:15:59 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Xu Yilun <yilun.xu@linux.intel.com>
+Cc: Ackerley Tng <ackerleytng@google.com>, Yan Zhao <yan.y.zhao@intel.com>,
+	Vishal Annapurve <vannapurve@google.com>,
+	Alexey Kardashevskiy <aik@amd.com>, Fuad Tabba <tabba@google.com>,
+	kvm@vger.kernel.org, linux-mm@kvack.org,
+	linux-kernel@vger.kernel.org, x86@kernel.org,
+	linux-fsdevel@vger.kernel.org, ajones@ventanamicro.com,
+	akpm@linux-foundation.org, amoorthy@google.com,
+	anthony.yznaga@oracle.com, anup@brainfault.org,
+	aou@eecs.berkeley.edu, bfoster@redhat.com,
+	binbin.wu@linux.intel.com, brauner@kernel.org,
+	catalin.marinas@arm.com, chao.p.peng@intel.com,
+	chenhuacai@kernel.org, dave.hansen@intel.com, david@redhat.com,
+	dmatlack@google.com, dwmw@amazon.co.uk, erdemaktas@google.com,
+	fan.du@intel.com, fvdl@google.com, graf@amazon.com,
+	haibo1.xu@intel.com, hch@infradead.org, hughd@google.com,
+	ira.weiny@intel.com, isaku.yamahata@intel.com, jack@suse.cz,
+	james.morse@arm.com, jarkko@kernel.org, jgowans@amazon.com,
+	jhubbard@nvidia.com, jroedel@suse.de, jthoughton@google.com,
+	jun.miao@intel.com, kai.huang@intel.com, keirf@google.com,
+	kent.overstreet@linux.dev, kirill.shutemov@intel.com,
+	liam.merwick@oracle.com, maciej.wieczor-retman@intel.com,
+	mail@maciej.szmigiero.name, maz@kernel.org, mic@digikod.net,
+	michael.roth@amd.com, mpe@ellerman.id.au, muchun.song@linux.dev,
+	nikunj@amd.com, nsaenz@amazon.es, oliver.upton@linux.dev,
+	palmer@dabbelt.com, pankaj.gupta@amd.com, paul.walmsley@sifive.com,
+	pbonzini@redhat.com, pdurrant@amazon.co.uk, peterx@redhat.com,
+	pgonda@google.com, pvorel@suse.cz, qperret@google.com,
+	quic_cvanscha@quicinc.com, quic_eberman@quicinc.com,
+	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com,
+	quic_pheragu@quicinc.com, quic_svaddagi@quicinc.com,
+	quic_tsoni@quicinc.com, richard.weiyang@gmail.com,
+	rick.p.edgecombe@intel.com, rientjes@google.com,
+	roypat@amazon.co.uk, rppt@kernel.org, seanjc@google.com,
+	shuah@kernel.org, steven.price@arm.com, steven.sistare@oracle.com,
+	suzuki.poulose@arm.com, thomas.lendacky@amd.com,
+	usama.arif@bytedance.com, vbabka@suse.cz, viro@zeniv.linux.org.uk,
+	vkuznets@redhat.com, wei.w.wang@intel.com, will@kernel.org,
+	willy@infradead.org, xiaoyao.li@intel.com, yilun.xu@intel.com,
+	yuzenghui@huawei.com, zhiquan1.li@intel.com
+Subject: Re: [RFC PATCH v2 04/51] KVM: guest_memfd: Introduce
+ KVM_GMEM_CONVERT_SHARED/PRIVATE ioctls
+Message-ID: <20250718141559.GF2206214@ziepe.ca>
+References: <CA+EHjTwjKVkw2_AK0Y0-eth1dVW7ZW2Sk=73LL9NeQYAPpxPiw@mail.gmail.com>
+ <CAGtprH_Evyc7tLhDB0t0fN+BUx5qeqWq8A2yZ5-ijbJ5UJ5f-g@mail.gmail.com>
+ <9502503f-e0c2-489e-99b0-94146f9b6f85@amd.com>
+ <20250624130811.GB72557@ziepe.ca>
+ <CAGtprH_qh8sEY3s-JucW3n1Wvoq7jdVZDDokvG5HzPf0HV2=pg@mail.gmail.com>
+ <aGTvTbPHuXbvj59t@yzhao56-desk.sh.intel.com>
+ <diqz8qknhj3l.fsf@ackerleytng-ctop.c.googlers.com>
+ <aHjDIxxbv0DnqI6S@yilunxu-OptiPlex-7050>
+ <diqzqzyeg3j2.fsf@ackerleytng-ctop.c.googlers.com>
+ <aHm2F95XwzdD7nod@yilunxu-OptiPlex-7050>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250718094936.5283-1-lirongqing@baidu.com>
-Message-ID: <aHpWW0ZPuI5thDqZ@google.com>
-Subject: Re: [PATCH] x86/kvm: Reorder PV spinlock checks for dedicated CPU case
-From: Sean Christopherson <seanjc@google.com>
-To: lirongqing <lirongqing@baidu.com>
-Cc: pbonzini@redhat.com, vkuznets@redhat.com, tglx@linutronix.de, 
-	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, 
-	hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aHm2F95XwzdD7nod@yilunxu-OptiPlex-7050>
 
-On Fri, Jul 18, 2025, lirongqing wrote:
-> From: Li RongQing <lirongqing@baidu.com>
+On Fri, Jul 18, 2025 at 10:48:55AM +0800, Xu Yilun wrote:
+> > If by the time KVM gets the conversion request, the page is unpinned,
+> > then we're all good, right?
 > 
-> When a vCPU has a dedicated physical CPU, typically, the hypervisor
-> disables the HLT exit too, 
+> Yes, unless guest doesn't unpin the page first by mistake. Guest would
+> invoke a fw call tdg.mem.page.release to unpin the page before
+> KVM_HC_MAP_GPA_RANGE.
 
-But certainly not always.  E.g. the hypervisor may disable MWAIT exiting but not
-HLT exiting, so that the hypervisor can take action if a guest kernel refuses to
-use MWAIT for whatever reason.
+What does guest pinning mean?
 
-I assume native qspinlocks outperform virt_spin_lock() irrespective of HLT exiting
-when the vCPU has a dedicated pCPU?  If so, it's probably worth calling that out
-in the changelog, e.g. to assuage any fears/concerns about this being undesirable
-for setups with KVM_HINTS_REALTIME *and* KVM_FEATURE_PV_UNHALT.
-
-> rendering the KVM_FEATURE_PV_UNHALT feature unavailable, and
-> virt_spin_lock_key is expected to be disabled in this configuration, but:
-> 
-> The problematic execution flow caused the enabled virt_spin_lock_key:
-> - First check PV_UNHALT
-> - Then check dedicated CPUs
-> 
-> So change the order:
-> - First check dedicated CPUs
-> - Then check PV_UNHALT
-> 
-> This ensures virt_spin_lock_key is disable when dedicated physical
-> CPUs are available and HLT exit is disabled, and this will gives a
-> pretty performance boost at high contention level
-> 
-> Signed-off-by: Li RongQing <lirongqing@baidu.com>
-> ---
->  arch/x86/kernel/kvm.c | 20 ++++++++++----------
->  1 file changed, 10 insertions(+), 10 deletions(-)
-> 
-> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-> index 921c1c7..9cda79f 100644
-> --- a/arch/x86/kernel/kvm.c
-> +++ b/arch/x86/kernel/kvm.c
-> @@ -1073,16 +1073,6 @@ static void kvm_wait(u8 *ptr, u8 val)
->  void __init kvm_spinlock_init(void)
->  {
->  	/*
-> -	 * In case host doesn't support KVM_FEATURE_PV_UNHALT there is still an
-> -	 * advantage of keeping virt_spin_lock_key enabled: virt_spin_lock() is
-> -	 * preferred over native qspinlock when vCPU is preempted.
-> -	 */
-> -	if (!kvm_para_has_feature(KVM_FEATURE_PV_UNHALT)) {
-> -		pr_info("PV spinlocks disabled, no host support\n");
-> -		return;
-> -	}
-> -
-> -	/*
->  	 * Disable PV spinlocks and use native qspinlock when dedicated pCPUs
->  	 * are available.
->  	 */
-> @@ -1101,6 +1091,16 @@ void __init kvm_spinlock_init(void)
->  		goto out;
->  	}
->  
-> +	/*
-> +	 * In case host doesn't support KVM_FEATURE_PV_UNHALT there is still an
-> +	 * advantage of keeping virt_spin_lock_key enabled: virt_spin_lock() is
-> +	 * preferred over native qspinlock when vCPU is preempted.
-> +	 */
-> +	if (!kvm_para_has_feature(KVM_FEATURE_PV_UNHALT)) {
-> +		pr_info("PV spinlocks disabled, no host support\n");
-> +		return;
-> +	}
-> +
->  	pr_info("PV spinlocks enabled\n");
->  
->  	__pv_init_lock_hash();
-> -- 
-> 2.9.4
-> 
+Jason
 
