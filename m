@@ -1,87 +1,88 @@
-Return-Path: <kvm+bounces-52841-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52842-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 015E0B09A08
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 05:01:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B365B09A10
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 05:08:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 43D66178CA2
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 03:01:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E0394A480B
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 03:08:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13B651C862D;
-	Fri, 18 Jul 2025 03:01:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8E951D5CE8;
+	Fri, 18 Jul 2025 03:08:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ddJLyyWx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TrpFSv4A"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA3B21400C;
-	Fri, 18 Jul 2025 03:01:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAC0B17A2E3;
+	Fri, 18 Jul 2025 03:08:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752807664; cv=none; b=nyMNb1BeMhsJVa5pNIXFqCwXLybMt+V0O8yEJb559x7v3PyGOM4/IkHbrCBJ3Wizi1CgvocwiJqYzxCP5qO35OELeM0qaAKzxOBytFXHuHblgPXu6a7XRo4zxJIFiT2tqUyqt5zol1NV98txM5+G1FEN/j3LqJ5nPhVcunNLXZE=
+	t=1752808120; cv=none; b=INR3SU1JyShFGB6+2wN3OVEcH4n8y0jFaxgp+AcayxZsu32IWQ0FfZwFhfiKLVEtp6q4ndyNRdFWo9vTeF32iNC+hQduvLwCbu/AF+v1vE9/jgWfsXDT+vHGLJkEVaBEX/wLfQJC7vaWx8cTIwMML0a87n686cfIcaTz5D1IBRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752807664; c=relaxed/simple;
-	bh=Za0zigQw41dhaLna7U8uhwpKysbTlyw5OLA2b/m2NTU=;
+	s=arc-20240116; t=1752808120; c=relaxed/simple;
+	bh=ZuOcg5SVGCFyCtl8pLbBlIoQjdtWxJDnT+ksRDlr/d0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Rra9NAD1hrx6cOAsWdytSKNB51cLsGbcXS0V6eUZiVG4+roq9yxjPFQMQVrQXJnXRk88QS7WMO87KcwKDqth1sOViJb837RGfZdx3qr4A7H9aZx0W9ZL9PogQLc9WU1z+/Ev0a8Hu8rde/6oxyXlBsXRDnIvh7UoDuxa8aCVxdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ddJLyyWx; arc=none smtp.client-ip=209.85.214.176
+	 To:Cc:Content-Type; b=k3dAP2EaOaNcV4W4EWCZXgUj32WaDgDHDkTN5WVb0hVbKuSx6J8V9mFtOMKE4i2b0c/O8GWB5DS1A0PO2/jWn4kQamNw8Wyp43+vvIPIgjv75/uPLdQyx6aSdy4JtmhHICP/jv2xfkznI/psIYJniIfREwcOFlhBurm4nXy+dpE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TrpFSv4A; arc=none smtp.client-ip=209.85.214.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-235ef62066eso21165955ad.3;
-        Thu, 17 Jul 2025 20:01:02 -0700 (PDT)
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-235ea292956so15758195ad.1;
+        Thu, 17 Jul 2025 20:08:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752807662; x=1753412462; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1752808117; x=1753412917; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Dvd6aXGHQkXaHkQ7TKm1HstTmx2BHwwhF0e3QqMyYSA=;
-        b=ddJLyyWxu46sqlzcZQLHJYKuLm2QXrI0S6h9bQPZE3IeMqLx443OG0yjmSWKTnJ+P4
-         QvKAG+PDsg/W0HjmJc7ccB6uIjiWNDiCWMfcL8m8OfOsyO3R5vAT/RM313pQOwicQXN7
-         vWIqbb+cbrhPKbaQ3jYdfStseOCQQ/3cQbg8i2O/Hi5ZxFa74AnwXzfPf2znmD+K7jef
-         7v5ncsL7AcMCRqO83G6Dqj/mSpbNYx2/3IH3z9l5tPwVyUWfpOpBf0Y3db5kH4VMOreC
-         4MvumpDj4IlW+OLUrEDh6SMplr3uN6icuDhOeQjuoapZoKBdkwD+l+S+CJsziBB05MfG
-         pFLg==
+        bh=9qTFhR+y2NYI+ue6IgzVayF+O7CfTXTBkStoCWaRrQI=;
+        b=TrpFSv4ASCTothXhpISmeBbmVAPsIXHYgyegcGWfasfMu8CiboZqKJzIlxykDhR6Nt
+         Z7H1KXDkvNoQHX6udXq5SWgq9cRFZ7MBxhB4hWhX40Mh2Pk05C1CygoX94Um289BpTf1
+         dIzf2riSdF/ln4NzqSGnMTeJlB3JhTigsppO++pfw96GP4B/sy6bsEEd+txbsn/JH2Rd
+         R54nuQhB656ZkAlqiEVfsJUkV9Y5zmqXOHOkyu8CF4+c9V0EoCX0E4MyU15YeTrkqWVr
+         wL/X5Uzg7vhXc43FG+vQCdQ0TrW8eVbhzxAOIAFc2wHVWor0uQ/KqmkVyE+IVFsJgsHb
+         21iw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752807662; x=1753412462;
+        d=1e100.net; s=20230601; t=1752808117; x=1753412917;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Dvd6aXGHQkXaHkQ7TKm1HstTmx2BHwwhF0e3QqMyYSA=;
-        b=In11MRgdu/07wluNQsvqUCK+wK3qHWoyITDY4G990+/MWuLGprcqLs+GlR1PIhNyzS
-         tmtbLx0B+kfGL2OkHGHUVJB0ue1QAHFW41JZPP+Y6s/vlxz+VgAmG37qZ+cWTAS7z8XV
-         n/GKgoQn1WcpBe8xysz4PZXuaLfHMPEWRasF95E+pY8+bnFaFdRdv+95QmrZUfSzmRrw
-         AX5lwslMxgLMEL+4etblFXcPInUkyx5O3qQbbwBQbsKijOTlDNDkIAL+uhggBwcGHMDP
-         a9FB0COpSCdZ4ISnZk9OrJF9oixOmj0y68idnmaUNWVWlVQq/qpTVELIcdGYCIjVzdgu
-         V/VA==
-X-Forwarded-Encrypted: i=1; AJvYcCWrDk+IHbMuRdRl0j/hpa/WbSreyhxMApchRzWLvg5c3EQmxKDy11XNcz/oSIupSsmUpI4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzlZPmyoT5PbSAd+cqvkRJ0532VQhYnv0JAbyE0PEtWX/nCFVQX
-	ih4Fk4IES/CQLea6GAnMJxzK/zef+R2x2DlXlXqo+o8lKtHF5jtWy4cyepPRHeL2rAAHsXBlAvy
-	VxX4pWQzliBeAK5b0t779OjGH6Dr9VAc=
-X-Gm-Gg: ASbGncvv8JjuIXLVRuBgECctwVwoDu9CY2/HQ3DR9H7KDVL4W/PbgQ+UkHV00oCCK4V
-	a0fpZRj80vDX0ZEf9Do4qozPYk0nCSrSF8tMeG2kiK2KiSI43uC1N3MZRB3/XxpMY7QftVMkmG9
-	TG5Dt2Fm3wnHIDI6J6qq+NQVnhs2TS2BQpVc4Z5/Ia7xlkbmRtGalDRGTLxsrXgar04LCDP7rCT
-	/l8
-X-Google-Smtp-Source: AGHT+IEvE8yh3sg/OHvEoFG/uAp4Y0DWzGpfpsXGNyNRJ7ffnqbWWfrKE/MieXHpu89fSVDeFfLkbw73s91SBIl4OCY=
-X-Received: by 2002:a17:903:230d:b0:234:e3b7:5ce0 with SMTP id
- d9443c01a7336-23e30384570mr63626075ad.47.1752807662088; Thu, 17 Jul 2025
- 20:01:02 -0700 (PDT)
+        bh=9qTFhR+y2NYI+ue6IgzVayF+O7CfTXTBkStoCWaRrQI=;
+        b=pPNKOZ6guc+ZjlRYiyhYSsKIqPGWmfB+b/QrSgooegS6lKYE3eckwu6wrD8L7Bhgxs
+         43R6Xuqsw+8gJyrcQcumgru76w2QiDUQvckW0WA9x8IrMOYUGtUxn7zaeS7QITvz6xxV
+         X757F04T4AUGFRqa0cYIl7FbfHE4sfbDtUHK7wpKve1YJttrpkufaz+ldlc7kDzOQvGB
+         lE0hHE9VXtOjeue28cZgi4Dz9zhEc4dZG9yXnqftg5UIJRaPunDtm01A6GqfGBz4PdaK
+         CDZBiDVJdzdxe/T3TJmDEUWodvUQa0peTY/n4wo5F2T0FBYI8EkdwK8j8V3o+SB/eZQ4
+         CoBg==
+X-Forwarded-Encrypted: i=1; AJvYcCU0UUKgUKbad4uQBVgo97YAMMetTOR7+BuMb8G3rPxNAhVpQpSPsqsKwhjqUc8VRIEHpgY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YziBGNckQ2HLTfxv7tJSeY6mCRAbMaJPCKnPMynidZ/B16fRgHZ
+	d+imA3Ca4BOOedOmQ+HOlzCW/L4QQ3yhUa76hKlmlV0xRQrJ32pkPhxcZw5Y6twkzh98oiM+h96
+	j7Zg1oVSe59wANCSebCfe0ipk33SSwoI=
+X-Gm-Gg: ASbGncu2HRvULbI6BpFEui86uE9sr3GUK/2gN+4nCj6Wib4zFE4E0vRUMqBhOTVWuAb
+	MrEpfM164nDGCG7GogTxewSl2kXnUNKNNAVuU3TsBOQ7qYvHEvzayXiw8xdH6vDCAxeRarm2G/p
+	ofHVBpRqjxwLLxkC4Zy3A4M3T7dGZDY7X3aL5nlGHzNpPoaJMGFwUKlYC25pCqaPxccgkga1QEl
+	Ln8
+X-Google-Smtp-Source: AGHT+IEf5jhJXQQa2v56cx/P3iSB4mh63ZbdHJKMxov/5hFVjsv5Um5P2ZE93DJBDqhqY3/KnijE2jMlavrFVIb9Wa0=
+X-Received: by 2002:a17:902:da8b:b0:235:1706:2002 with SMTP id
+ d9443c01a7336-23e2551de02mr144449935ad.0.1752808116987; Thu, 17 Jul 2025
+ 20:08:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250709033242.267892-1-Neeraj.Upadhyay@amd.com> <20250709033242.267892-30-Neeraj.Upadhyay@amd.com>
-In-Reply-To: <20250709033242.267892-30-Neeraj.Upadhyay@amd.com>
+References: <20250709033242.267892-1-Neeraj.Upadhyay@amd.com> <20250709033242.267892-31-Neeraj.Upadhyay@amd.com>
+In-Reply-To: <20250709033242.267892-31-Neeraj.Upadhyay@amd.com>
 From: Tianyu Lan <ltykernel@gmail.com>
-Date: Fri, 18 Jul 2025 11:00:26 +0800
-X-Gm-Features: Ac12FXxzE_sqppZnZ_H83WBaxjsUusiyVeEqTm7Ac1K9rtfrr9Krd5_Y1_sE2q8
-Message-ID: <CAMvTesAspapFco-1Xu+LF=WnMTyp6i1ftF0+R1m1J-WsHGvdPQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v8 29/35] x86/sev: Enable NMI support for Secure AVIC
+Date: Fri, 18 Jul 2025 11:08:00 +0800
+X-Gm-Features: Ac12FXz93-TrG7aATQgB9scdjslYFg7l0mfCh9e3Qy0ag_S03jRXGzxOAjgj0ZU
+Message-ID: <CAMvTesA6os01N+mQqrhx_gMqxbCrVAJVOowJmv6unGV5ZzwnYQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v8 30/35] x86/apic: Read and write LVT* APIC registers
+ from HV for SAVIC guests
 To: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
 Cc: linux-kernel@vger.kernel.org, bp@alien8.de, tglx@linutronix.de, 
 	mingo@redhat.com, dave.hansen@linux.intel.com, Thomas.Lendacky@amd.com, 
@@ -96,13 +97,10 @@ Content-Transfer-Encoding: quoted-printable
 On Wed, Jul 9, 2025 at 11:43=E2=80=AFAM Neeraj Upadhyay <Neeraj.Upadhyay@am=
 d.com> wrote:
 >
-> From: Kishon Vijay Abraham I <kvijayab@amd.com>
+> Hypervisor need information about the current state of LVT registers
+> for device emulation and NMI. So, forward reads and write of these
+> registers to the hypervisor for Secure AVIC enabled guests.
 >
-> Now that support to send NMI IPI and support to inject NMI from
-> the hypervisor has been added, set V_NMI_ENABLE in VINTR_CTRL
-> field of VMSA to enable NMI for Secure AVIC guests.
->
-> Signed-off-by: Kishon Vijay Abraham I <kvijayab@amd.com>
 > Signed-off-by: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
 > ---
 > Changes since v7:
