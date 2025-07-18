@@ -1,136 +1,204 @@
-Return-Path: <kvm+bounces-52868-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52869-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72DADB09DB6
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 10:20:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7F82B09E1C
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 10:33:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B0058189595D
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 08:20:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2A6EF16D1DD
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 08:33:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0B7B221F00;
-	Fri, 18 Jul 2025 08:20:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED35A294A1B;
+	Fri, 18 Jul 2025 08:32:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gbgwDoye"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="haoHkUvx"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 077261CA84;
-	Fri, 18 Jul 2025 08:20:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BDC6293C6A
+	for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 08:32:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752826807; cv=none; b=O2y+Khj8vZXV5Hg9TRryDSX+fs/qWknJf0HT07AMsHor5pEJV9OFLqKxP6gfd8MYS7+m9u6o7rH4xzfM6woJpb81ImLRk+Xu4NIY9WvVB0yKDUo9Q3SoeNARXWEmGiBcrpQJ5/eF6m850/QsunIKVeNmnjy+gaH51MBTpSD9A4U=
+	t=1752827556; cv=none; b=Ywr2AAq9nkF5oVuJopo5CTdPPmZl3XXRATQL/mrRWm5xwPhmVIHJlyMWIh9kUX8PpsWWE81SFQZtqCEEeBKFr8SfQ5LqxGOkGQEax4dw8DjKyBq6AfzTpxN0KbqSKMPf33kQmyt3MvzowMtuFvL8OmsbAB9JMCMDe2Xz2VeYs8I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752826807; c=relaxed/simple;
-	bh=qAd8ycMee6hRlVYzCSY9mkp/JvxOmUrSY+m6h+PqfWo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dqXvr56UhkOi2Qjl4Vx/+B98geWYIDnIKygxhEEbxL2ryE9FOo2f/WbUKaRdHs5mTyeDoaf98kxNc2SLkMtUgkJygp9Pp1GNKlNlRGFdXJGy8MCeOEys6di/TCoSSDs95vBrUwEQxmH2HvYFdHh7hb21pW28MQw6+acd610aviU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gbgwDoye; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DDD6C4CEEB;
-	Fri, 18 Jul 2025 08:20:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752826806;
-	bh=qAd8ycMee6hRlVYzCSY9mkp/JvxOmUrSY+m6h+PqfWo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gbgwDoye8TT//6qusPYwaUNopxEwBE+zptzh6ApWcWFDXYwAYLvV11xaHil2tpvRL
-	 Xk+Z1A1fSc5vtUFvn7efYpmxYvhhkbNXUOoTcNHqBOpGDxNCEqJpEq2ho+chQmtEH2
-	 ZSOaI7FFLiVxqov0VypsHbclg5Awdmzn5O7+qhXj1hmho7RydueCp76X2tp4fKqjhA
-	 ld7K9T9DWFICKZrSFIG0/ZTPfhC7/jqdLiREvDK3QSUTPajAMjhQAq+VTDSR9HG2Bw
-	 078/gZPndBG2rKtmW3rIhSxy7b5WTsC/hQXdzQf+gfDzvinn42f/ZvnDLOOsY3BREo
-	 F6n2dX1W6yx7g==
-Date: Fri, 18 Jul 2025 13:49:45 +0530
-From: Naveen N Rao <naveen@kernel.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: mlevitsk@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Vasant Hegde <vasant.hegde@amd.com>, Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-Subject: Re: [EARLY RFC] KVM: SVM: Enable AVIC by default from Zen 4
-Message-ID: <3xpfs5m5q6o74z5lx3aujdqub6ref2yypwcbz55ec5iefyqoy7@42g5nbgom637>
-References: <20250626145122.2228258-1-naveen@kernel.org>
- <66bab47847aa378216c39f46e072d1b2039c3e0e.camel@redhat.com>
- <aF2VCQyeXULVEl7b@google.com>
- <4ae9c25e0ef8ce3fdd993a9b396183f3953c3de7.camel@redhat.com>
- <bp7gjrbq2xzgirehv6emtst2kywjgmcee5ktvpiooffhl36stx@bemru6qqrnsf>
- <aGxWkVu5qnWkZxqz@google.com>
+	s=arc-20240116; t=1752827556; c=relaxed/simple;
+	bh=u+hOpWXYGqQzlXztN0daxiDWMdTwEOshtpHvQqgxZTU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Sycs8ZWvnZ4BTQDJGpFoxnZpsdLWy4EjYToFWEUTVMvzhHqXGMNqrCw8WeRmXgkegb02uXI5p6BBuiayRruXd208BRmdaF5KDz9DSIxlP0JjfGSs+Wxv0pruBUh6RT7WCLXAexsQIuF9KigqFR/7Ca5Xc4wyRxzUnMT7Y+kPKC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=haoHkUvx; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752827553;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ClO7vf6ZBePINFWsPRFr/+WGIgiWW+sfd60JVlzDBe8=;
+	b=haoHkUvxI6bcfR/AWTtNCKE7sBZiqfoKHsHMI5UOT7ka6y3o4jsxNeZlIzTKdKDANCw1GP
+	g5SQCH4lZOT9qK+5JItYdbahX2sRhkHbfHrbf8D9Enl20BV7sYK5MAMqjQuBEc4/X0d8zu
+	6QyVV3G4RmwLBWQVddqfDCtuCfygDEU=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-360-64vbc6fsOlq-gCB48pFqbQ-1; Fri, 18 Jul 2025 04:32:30 -0400
+X-MC-Unique: 64vbc6fsOlq-gCB48pFqbQ-1
+X-Mimecast-MFC-AGG-ID: 64vbc6fsOlq-gCB48pFqbQ_1752827550
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-ae0c11adcd2so131444266b.3
+        for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 01:32:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752827549; x=1753432349;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ClO7vf6ZBePINFWsPRFr/+WGIgiWW+sfd60JVlzDBe8=;
+        b=km8R8ue9WOhFbr0GGHCsahAhOnVy1qu8niqtNjVUZtaT/lSPxwHaCTRs/2KR3NFu/o
+         GhMEQRaHXlviTHzBHDUpNiW8gmRgJ/+gH/XEyfweCvAI5Z1OkdSSA9VFnQVlJQ9E5+0c
+         Pjth9U+6EmddxerG20NDWbyxBUNMAldAQDB01k18q8A1m7lzIDbf/2FjyqY57tiQGnBo
+         eH7qnBtnOSD97VPFE0Zp2BV6SiIstNibN85QzBzBrNxlxRglJUJt+uV02uaRw0nEOdXP
+         vC7V9x6blI2+FnTc1uV9M3i/s2YLICzlRTV7HIirBAF7JJHoMAZoJ8N1ozOmP7tkZuz7
+         fOyw==
+X-Forwarded-Encrypted: i=1; AJvYcCX1fW2v3JM7jY6Qzsoh4XLtyC6Dy76js1WaR5iwqOmSzjez+hBEaFxWdl3hUn+DJQZ1YRg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwwdRsvNj/R6uRj94MqBWnK59y4D3nU5xTxbbciLghVZO68CW3j
+	m/qLvLJbBiHmFpei2M3Tpelnz2XP8P0xErIYlab6Ey0wxqk6YQybSDrRaI6IG2/yYxlFCktE2Nv
+	de1oPP/zZV87smrHzeGgSeUtnS5w9v5XY6prhQHojCk2qEwMH7HZ/9kXFnhHD57m1saD1WPk6J3
+	NN5KR+HhhrtP2jcSOw8/0G0K1rHivq
+X-Gm-Gg: ASbGncumcpdjluBm3Ocv6QKD8bMepBe7xdnLBQu1gPnqan4BaTl2OpeVl2O+ePMWN55
+	wKUVb+26ZuJ3wuevdD4ZTs5QN1+TBysWTyCbs4pJUdkPZih4TxtY1WjaSVkhYADC9jV7n90hyO4
+	193e8KStoGlTQVrUrYUg2Uhw==
+X-Received: by 2002:a17:907:da4:b0:aec:5a33:1573 with SMTP id a640c23a62f3a-aec5a3354femr462488166b.41.1752827549548;
+        Fri, 18 Jul 2025 01:32:29 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEZRbZf1CSxDdcr2KaS1fw9e3BgI0jPEf8QS4qDJaocQ3CHMAkyjsYYe2SLqnUm1+1w/XSVLxztz/eFpNmyZDs=
+X-Received: by 2002:a17:907:da4:b0:aec:5a33:1573 with SMTP id
+ a640c23a62f3a-aec5a3354femr462485166b.41.1752827549130; Fri, 18 Jul 2025
+ 01:32:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aGxWkVu5qnWkZxqz@google.com>
+References: <20250716162243.1401676-1-kniv@yandex-team.ru>
+In-Reply-To: <20250716162243.1401676-1-kniv@yandex-team.ru>
+From: Lei Yang <leiyang@redhat.com>
+Date: Fri, 18 Jul 2025 16:31:52 +0800
+X-Gm-Features: Ac12FXz3P7sVlSAVAM9be3FkuV1rX0FLSe-KqiVKeDU_xg3yE_St4sNLJJ0dYVg
+Message-ID: <CAPpAL=xE4ZCyAhc+fkZwREo-cDHS4CG4fq4+sebazJgRzZoDHg@mail.gmail.com>
+Subject: Re: [PATCH] vhost/net: Replace wait_queue with completion in ubufs reference
+To: Nikolay Kuratov <kniv@yandex-team.ru>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	virtualization@lists.linux.dev, kvm@vger.kernel.org, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, stable@vger.kernel.org, 
+	Andrey Ryabinin <arbn@yandex-team.com>, Andrey Smetanin <asmetanin@yandex-team.ru>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 07, 2025 at 04:21:53PM -0700, Sean Christopherson wrote:
-> On Fri, Jun 27, 2025, Naveen N Rao wrote:
-> > > Back when I implemented this, I just wanted to be a bit safer, a bit more explicit that
-> > > this uses an undocumented feature.
-> > > 
-> > > It doesn't matter much though.
-> > > 
-> > > > 
-> > > > I don't see any reason to do major surgery, just give "avic" auto -1/0/1 behavior:
-> > 
-> > I am wary of breaking existing users/deployments on Zen4/Zen5 enabling 
-> > AVIC by specifying avic=on, or avic=true today. That's primarily the 
-> > reason I chose not to change 'avic' into an integer. Also, post module 
-> > load, sysfs reports the value for 'avic' as a 'Y' or 'N' today. So if 
-> > there are scripts relying on that, those will break if we change 'avic' 
-> > into an integer.
-> 
-> That's easy enough to handle, e.g. see nx_huge_pages_ops for a very similar case
-> where KVM has "auto" behavior (and a "never" case too), but otherwise treats the
-> param like a bool.
+Tested this patch with virtio-net regression tests, everything works fine.
 
-Nice! Looks like I can re-use existing callbacks for this too:
-    static const struct kernel_param_ops avic_ops = {
-	    .flags = KERNEL_PARAM_OPS_FL_NOARG,
-	    .set = param_set_bint,
-	    .get = param_get_bool,
-    };
-
-    /* enable/disable AVIC (-1 = auto) */
-    int avic = -1;
-    module_param_cb(avic, &avic_ops, &avic, 0444);
-    __MODULE_PARM_TYPE(avic, "bool");
-
-> 
-> > For Zen1/Zen2, as I mentioned, it is unlikely that anyone today is 
-> > enabling AVIC and expecting it to work since the workaround is only just 
-> > hitting upstream. So, I'm hoping requiring force_avic=1 should be ok 
-> > with the taint removed.
-> 
-> But if that's the motivation, changing the semantics of force_avic doesn't make
-> any sense.  Once the workaround lands, the only reason for force_avic to exist
-> is to allow forcing KVM to enable AVIC even when it's not supported.
-
-Indeed.
-
-> 
-> > Longer term, once we get wider testing with the workaround on Zen1/Zen2, 
-> > we can consider relaxing the need for force_avic, at which point AVIC 
-> > can be default enabled
-> 
-> I don't see why the default value for "avic" needs to be tied to force_avic.
-> If we're not confident that AVIC is 100% functional and a net positive for the
-> vast majority of setups/workloads on Zen1/Zen2, then simply leave "avic" off by
-> default for those CPUs.  If we ever want to enable AVIC by default across the
-> board, we can simply change the default value of "avic".
-> 
-> But to be honest, I don't see any reason to bother trying to enable AVIC by default
-> for Zen1/Zen2.  There's a very real risk that doing so would regress existing users
-> that have been running setups for ~6 years, and we can't fudge around AVIC being
-> hidden on Zen3 (and the IOMMU not supporting it at all), i.e. enabling AVIC by
-> default only for Zen4+ provides a cleaner story for end users.
-
-Works for me. I completely agree with that.
+Tested-by: Lei Yang <leiyang@redhat.com>
 
 
-Thanks,
-Naveen
+On Thu, Jul 17, 2025 at 12:24=E2=80=AFAM Nikolay Kuratov <kniv@yandex-team.=
+ru> wrote:
+>
+> When operating on struct vhost_net_ubuf_ref, the following execution
+> sequence is theoretically possible:
+> CPU0 is finalizing DMA operation                   CPU1 is doing VHOST_NE=
+T_SET_BACKEND
+>                              // &ubufs->refcount =3D=3D 2
+> vhost_net_ubuf_put()                               vhost_net_ubuf_put_wai=
+t_and_free(oldubufs)
+>                                                      vhost_net_ubuf_put_a=
+nd_wait()
+>                                                        vhost_net_ubuf_put=
+()
+>                                                          int r =3D atomic=
+_sub_return(1, &ubufs->refcount);
+>                                                          // r =3D 1
+> int r =3D atomic_sub_return(1, &ubufs->refcount);
+> // r =3D 0
+>                                                       wait_event(ubufs->w=
+ait, !atomic_read(&ubufs->refcount));
+>                                                       // no wait occurs h=
+ere because condition is already true
+>                                                     kfree(ubufs);
+> if (unlikely(!r))
+>   wake_up(&ubufs->wait);  // use-after-free
+>
+> This leads to use-after-free on ubufs access. This happens because CPU1
+> skips waiting for wake_up() when refcount is already zero.
+>
+> To prevent that use a completion instead of wait_queue as the ubufs
+> notification mechanism. wait_for_completion() guarantees that there will
+> be complete() call prior to its return.
+>
+> We also need to reinit completion because refcnt =3D=3D 0 does not mean
+> freeing in case of vhost_net_flush() - it then sets refcnt back to 1.
+> AFAIK concurrent calls to vhost_net_ubuf_put_and_wait() with the same
+> ubufs object aren't possible since those calls (through vhost_net_flush()
+> or vhost_net_set_backend()) are protected by the device mutex.
+> So reinit_completion() right after wait_for_completion() should be fine.
+>
+> Cc: stable@vger.kernel.org
+> Fixes: 0ad8b480d6ee9 ("vhost: fix ref cnt checking deadlock")
+> Reported-by: Andrey Ryabinin <arbn@yandex-team.com>
+> Suggested-by: Andrey Smetanin <asmetanin@yandex-team.ru>
+> Signed-off-by: Nikolay Kuratov <kniv@yandex-team.ru>
+> ---
+>  drivers/vhost/net.c | 9 +++++----
+>  1 file changed, 5 insertions(+), 4 deletions(-)
+>
+> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+> index 7cbfc7d718b3..454d179fffeb 100644
+> --- a/drivers/vhost/net.c
+> +++ b/drivers/vhost/net.c
+> @@ -94,7 +94,7 @@ struct vhost_net_ubuf_ref {
+>          * >1: outstanding ubufs
+>          */
+>         atomic_t refcount;
+> -       wait_queue_head_t wait;
+> +       struct completion wait;
+>         struct vhost_virtqueue *vq;
+>  };
+>
+> @@ -240,7 +240,7 @@ vhost_net_ubuf_alloc(struct vhost_virtqueue *vq, bool=
+ zcopy)
+>         if (!ubufs)
+>                 return ERR_PTR(-ENOMEM);
+>         atomic_set(&ubufs->refcount, 1);
+> -       init_waitqueue_head(&ubufs->wait);
+> +       init_completion(&ubufs->wait);
+>         ubufs->vq =3D vq;
+>         return ubufs;
+>  }
+> @@ -249,14 +249,15 @@ static int vhost_net_ubuf_put(struct vhost_net_ubuf=
+_ref *ubufs)
+>  {
+>         int r =3D atomic_sub_return(1, &ubufs->refcount);
+>         if (unlikely(!r))
+> -               wake_up(&ubufs->wait);
+> +               complete_all(&ubufs->wait);
+>         return r;
+>  }
+>
+>  static void vhost_net_ubuf_put_and_wait(struct vhost_net_ubuf_ref *ubufs=
+)
+>  {
+>         vhost_net_ubuf_put(ubufs);
+> -       wait_event(ubufs->wait, !atomic_read(&ubufs->refcount));
+> +       wait_for_completion(&ubufs->wait);
+> +       reinit_completion(&ubufs->wait);
+>  }
+>
+>  static void vhost_net_ubuf_put_wait_and_free(struct vhost_net_ubuf_ref *=
+ubufs)
+> --
+> 2.34.1
+>
+>
 
 
