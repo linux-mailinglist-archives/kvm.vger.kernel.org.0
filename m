@@ -1,225 +1,225 @@
-Return-Path: <kvm+bounces-52915-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52916-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0122B0A811
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 17:59:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FA88B0A8F5
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 18:58:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 57D17A829C0
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 15:58:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EA1D11C808DD
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 16:58:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F9242E5B14;
-	Fri, 18 Jul 2025 15:58:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AED6B2E6D23;
+	Fri, 18 Jul 2025 16:57:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dqxXXKMW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="D9kR2Z0S"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CE3B2BD00C
-	for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 15:58:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 622CF1C862C
+	for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 16:57:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752854332; cv=none; b=avzK4dbkHQ0uiS+2MUXZrK9cZrJ1ZKvAeQ7cwaDlLpzE3mhqqgYO190dSZ+hQlyRBP2qg7k6cjo18RtcTAAYbOjpTDU9c9UWIzT3d/77u1FmgCiFnR9ulmn2emfPn4vbI7VneAGGU1GJ6Lbo2+LvyL+5N0lXd+NEOTRB8+CEBiQ=
+	t=1752857875; cv=none; b=lXJAk5y6IX/1XGdDvl4wCzWKNaIhmn1V9l47cWAe9i4V9HWVQc9sJZMmc++Zz9Edx7m2tO/sXQgq7EjkplWWKHg6j/t3GwVVdoWzilwMOfYNqd8HLJ/oBu7TO++7FghnrlcIgsaJ/60EgvUp8DfA4/YE7HDggGXGdB4QvvOjvKk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752854332; c=relaxed/simple;
-	bh=dTYH/eJYeZBuDbF+VAdUex9P3+NR6a4FiYzeb/LInYw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EAjCmTT4RmGWsZ2uWM6e5ownBdkbYdsZ/dl9uNcINW46Z3s7BPHDpgRyIewpvR9oktPvZ14L8Yn13DUOuoySU+e5rNJOd/5AMMM6mYUDLK9+b8T/BhEcWXVhcX5Z37Mkr5aR4GJNzyjtYDMQ1iA9BawDZ/DNXW5SecD/v89Q7KU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dqxXXKMW; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752854329;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nBlFU/X/HLQucSGWnkd4l+ol6MCJiBi4KvDOy83SR6Q=;
-	b=dqxXXKMWKlhBmfNDIEVE1hzifIkyH+gGRFHURjiYD2Y+PfS34CpzEoyRS5dqZLTIoBxgP+
-	ruciZJMO+uoG5/SKEwIpvpy2GDEud/mYvmMYfwJs+MC5YjlgZYPokDs1u46ft8i6GvVFol
-	DrlxYGWoYbEX2vbICsTOdECgJf6MHZQ=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-214-FKsy2prjONKD8Xnyh0kS1Q-1; Fri, 18 Jul 2025 11:58:48 -0400
-X-MC-Unique: FKsy2prjONKD8Xnyh0kS1Q-1
-X-Mimecast-MFC-AGG-ID: FKsy2prjONKD8Xnyh0kS1Q_1752854327
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3a6d1394b07so1454410f8f.3
-        for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 08:58:47 -0700 (PDT)
+	s=arc-20240116; t=1752857875; c=relaxed/simple;
+	bh=HFE0w/88w1Lyl/K2smHXTTk3UtGuRTe8feXkgJ+2eSc=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=uxfuZqh5FxDAcBs4cjK0WlVaI299MUKE1Yz6MOr6UqitUeyE5+th17DNfquOqJA+a2Cq5WiP2XALYOySBWgXvO+/uI7SNIl80N6f8Ra46a61Ul1SsWuYWe5hTx0i6cqpwPm5E/DQfVXOYgvK0wvG5s1eYnAG2weyy8Dr2sde/5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=D9kR2Z0S; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-23692793178so18930205ad.0
+        for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 09:57:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1752857874; x=1753462674; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=a8JmAFoZFmFF4VrncsXMPRkgu6iDWk7fhLl780SkJ+c=;
+        b=D9kR2Z0SyVzKS4u22m8ZGDVCXqJtGjtcXM9vX0M/KCus153itQsYi5eu3C8c2goFUc
+         CFTs7ASFR1YHrGH2UeL/7eZfMPeXqRdUQiW4PtYwF8DACnxeoW3xlbVv7xeap1Nz/z2b
+         TXg2FW8SUGjHehI1BWABvt3wrZd0s6sbxPhZxU7rVuPu00ZTxq2xC0Z0lDVglsZmP23s
+         +zgQ33eXMPOF2oi6l11vjhTQJC3hufrm1wZ8mLJ0IKoAHTH6CrOM23y6QOTuIFhu9CqT
+         Ht+40KpO1sC5kaVe3zdv395qJoEGE8TO0vB9heFueyw82BaNMp1IrTTow2PmTFpovkPK
+         cBnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752854326; x=1753459126;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nBlFU/X/HLQucSGWnkd4l+ol6MCJiBi4KvDOy83SR6Q=;
-        b=jAQxM7vIX7TPET53/2lQ4VV9/3HYaNkpeu5r/5GyF+4u+kpoC9gqqUIqw/E+Ar/CX0
-         JeOThZ4qHqXw/KpAVc214jVvz+TNntwCRXiJEXJfDDbtWfXcvt0RkgggP/BFuqnvEFXD
-         oKT59eyhBcS/ecszN75ciq29Mw0TjXHuh/61S+rfaiceGBanO2qq7EHO+WTwgqs57e6I
-         DTOFTtDmV8cf0RhreSk8s9ex1yZJm/Ly4oVL/5wx0LGDwqtmQGJMvipjpNro4V4wHFmI
-         4sdn2NDAL+H730eUFUNbip85FfTgJRUZMrqkoNfKwgqrvDSGOmfFPrNhXVGHEI2A5qaY
-         VQXw==
-X-Gm-Message-State: AOJu0YwzGLl1fjcEM2OZO42K3aKPeLY27yARMPyw6SXQqhj19ozLLyZR
-	p3FgmlGLD7/c9fiEQpVGy7ArWrzsu1X1lemWpZhxhTc9JGxpvV3TGPjoPKwnn9+raCUg1Ty5E3+
-	GXSSmUzY8CD9ZfbmvLMK9/A9UfY27sTloq7ICmhiy/kKlaFKeP0+fshPqL1AKXStqGEapyVkWvm
-	PsUek/6phjtZhmgXC2fR/zyagICoFLCQDnTEC4vA==
-X-Gm-Gg: ASbGnctp26DVoc3epyIxmY0PW/KWHx/xAvoY0NBnhkHRFLO/tjm/i7w//NC98jcPSXD
-	7427ZVWuyaL/tPL+/32XQSoWgbdB8i9r7XtJ6yUWEkrI5pagiDmW9p/iV3wTe3zM0iVLjIlRk/4
-	QEVj3l2x9R2HaZFN0NCS/363xJoYXICKrbNy+cUGLvw8iA6JsUjlCwi00c7lI1+G1F9jz4mXb1C
-	iGwqI4vKy6HKTw4SP0zs97Kw3KfiPGGN3zbiPQ+Dh4y7isJs9fmvYASDwzBV9Bbbus3NQRxanxr
-	O9xl3tj7tCwSHvS7ndYPvV7mxo1RQQ==
-X-Received: by 2002:a05:6000:290b:b0:3a4:e56a:48c1 with SMTP id ffacd0b85a97d-3b60dd887c5mr10728667f8f.55.1752854326558;
-        Fri, 18 Jul 2025 08:58:46 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEG8eY3l3bMRx0VqYEgweG61pYJg4M8/p/TELUj2kaHQMcDh4bYCTNo/yMtn+9jQFTN/z3lIQ==
-X-Received: by 2002:a05:6000:290b:b0:3a4:e56a:48c1 with SMTP id ffacd0b85a97d-3b60dd887c5mr10728634f8f.55.1752854326038;
-        Fri, 18 Jul 2025 08:58:46 -0700 (PDT)
-Received: from fedora ([85.93.96.130])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b61ca254d9sm2195509f8f.17.2025.07.18.08.58.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Jul 2025 08:58:45 -0700 (PDT)
-Date: Fri, 18 Jul 2025 17:58:43 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: kvm@vger.kernel.org
-Cc: pbonzini@redhat.com
-Subject: Re: [PATCH v2] x86: add HPET counter read micro benchmark and
- enable/disable torture tests
-Message-ID: <20250718175843.316cb351@fedora>
-In-Reply-To: <20250714145055.1487738-1-imammedo@redhat.com>
-References: <20250714145055.1487738-1-imammedo@redhat.com>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-redhat-linux-gnu)
+        d=1e100.net; s=20230601; t=1752857874; x=1753462674;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=a8JmAFoZFmFF4VrncsXMPRkgu6iDWk7fhLl780SkJ+c=;
+        b=iL7ClTIOJwYHMOwLoW6ANptUhvlZ5xlBZq0ly0hvcWYFvE3DgTWbnZgqMnW1GMrJJA
+         PWfkXnUP5qrpzaHBkzchPn8EyVTxOt7MzLoXBwkXC4qrKPDSBqr7w/t52whdHZxdkrur
+         /8fWkko12tPmIMm9Mzka/+DWEs0/vlOhI0VnmfTdOqF+7slZduoeC4dIeULa2qMH4OHs
+         yPX5nHhsOX3g+E9P7e2yj8DsT/Oib1tSZ+yZ2dK59w2X2+uRXUA5FSt3qERG8qWLHhKP
+         oSLj0csnPoqbUuDkTGjqhBaq/WDPWXJ//VCz3DIoN8EQYwjWpz1i/rISNQqOT5v1hnoW
+         VdBw==
+X-Forwarded-Encrypted: i=1; AJvYcCVt8+peTCTmhbIdgHwiHlLAux7mQbNIW9wadh4x4v7eor4BRXmj6fgLk7jCJk4RzQ7e5IA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwpmQbln+yr4uhS0KApyA24i+vmaEYfcJ+YerKpRGPzQWRDij87
+	84aNOoWCzgz/sS5Jow6f2IzOQmkZNNrdKBn/wnB4tmChim40cPJ16Vv0emk/MBxmrHJKizraypd
+	42HuD2w==
+X-Google-Smtp-Source: AGHT+IF7xn00jpbk8G2lQKjDoF2AXEZJ1VQJGfmVYlK0/PKYwzHv3a1zuyVCPoIwNei98xvSRwV+sSXMHSM=
+X-Received: from pjyr8.prod.google.com ([2002:a17:90a:e188:b0:311:4bc2:3093])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:84c:b0:23e:3c33:6be8
+ with SMTP id d9443c01a7336-23e3c336f4bmr36340205ad.8.1752857873730; Fri, 18
+ Jul 2025 09:57:53 -0700 (PDT)
+Date: Fri, 18 Jul 2025 09:57:52 -0700
+In-Reply-To: <2d787a83-8440-adb1-acbd-0a68358e817d@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20250716055604.2229864-1-nikunj@amd.com> <2d787a83-8440-adb1-acbd-0a68358e817d@amd.com>
+Message-ID: <aHp9EGExmlq9Kx9T@google.com>
+Subject: Re: [PATCH v2] KVM: SEV: Enforce minimum GHCB version requirement for
+ SEV-SNP guests
+From: Sean Christopherson <seanjc@google.com>
+To: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: Nikunj A Dadhania <nikunj@amd.com>, pbonzini@redhat.com, kvm@vger.kernel.org, 
+	santosh.shukla@amd.com, bp@alien8.de, Michael Roth <michael.roth@amd.com>, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Mon, 14 Jul 2025 16:50:55 +0200
-Igor Mammedov <imammedo@redhat.com> wrote:
-
-> test is to be used for benchmarking/validating HPET main counter reading
-
-ignore this one as well, I've just sent v3 with a few fixes
-
+On Wed, Jul 16, 2025, Tom Lendacky wrote:
+> On 7/16/25 00:56, Nikunj A Dadhania wrote:
+> > ---
+> >  arch/x86/kvm/svm/sev.c | 8 ++++++--
+> >  1 file changed, 6 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> > index 95668e84ab86..fdc1309c68cb 100644
+> > --- a/arch/x86/kvm/svm/sev.c
+> > +++ b/arch/x86/kvm/svm/sev.c
+> > @@ -406,6 +406,7 @@ static int __sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp,
+> >  	struct kvm_sev_info *sev = to_kvm_sev_info(kvm);
+> >  	struct sev_platform_init_args init_args = {0};
+> >  	bool es_active = vm_type != KVM_X86_SEV_VM;
+> > +	bool snp_active = vm_type == KVM_X86_SNP_VM;
+> >  	u64 valid_vmsa_features = es_active ? sev_supported_vmsa_features : 0;
+> >  	int ret;
+> >  
+> > @@ -424,6 +425,9 @@ static int __sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp,
+> >  	if (unlikely(sev->active))
+> >  		return -EINVAL;
+> >  
+> > +	if (snp_active && data->ghcb_version && data->ghcb_version < 2)
+> > +		return -EINVAL;
+> > +
 > 
-> how to run:
->    QEMU=/foo/qemu-system-x86_64 x86/run x86/hpet_read_test.flat -smp X
-> where X is desired (max) number of logical CPUs on host
-> 
-> it will 1st execute concurrent read benchmark
-> and after that it will run torture test enabling/disabling HPET counter,
-> while running readers in parallel. Goal is to verify counter that always
-> goes up.
-> 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> ---
-> v2:
->    * fix broken timer going backwards check
->    * report # of fails
->    * warn if number of vcpus is not sufficient for torture test and skip
->      it
->    * style fixups
-> ---
->  x86/Makefile.common  |  2 ++
->  x86/hpet_read_test.c | 73 ++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 75 insertions(+)
->  create mode 100644 x86/hpet_read_test.c
-> 
-> diff --git a/x86/Makefile.common b/x86/Makefile.common
-> index 5663a65d..ef0e09a6 100644
-> --- a/x86/Makefile.common
-> +++ b/x86/Makefile.common
-> @@ -101,6 +101,8 @@ tests-common += $(TEST_DIR)/realmode.$(exe) \
->  realmode_bits := $(if $(call cc-option,-m16,""),16,32)
->  endif
->  
-> +tests-common += $(TEST_DIR)/hpet_read_test.$(exe)
-> +
->  test_cases: $(tests-common) $(tests)
->  
->  $(TEST_DIR)/%.o: CFLAGS += -std=gnu99 -ffreestanding -I $(SRCDIR)/lib -I $(SRCDIR)/lib/x86 -I lib
-> diff --git a/x86/hpet_read_test.c b/x86/hpet_read_test.c
-> new file mode 100644
-> index 00000000..a14194e6
-> --- /dev/null
-> +++ b/x86/hpet_read_test.c
-> @@ -0,0 +1,73 @@
-> +#include "libcflat.h"
-> +#include "smp.h"
-> +#include "asm/barrier.h"
-> +#include "x86/atomic.h"
-> +
-> +#define HPET_ADDR         0xFED00000L
-> +#define HPET_COUNTER_ADDR ((uint8_t *)HPET_ADDR + 0xF0UL)
-> +#define HPET_CONFIG_ADDR  ((uint8_t *)HPET_ADDR + 0x10UL)
-> +#define HPET_ENABLE_BIT   0x01UL
-> +#define HPET_CLK_PERIOD   10
-> +
-> +static atomic_t fail;
-> +
-> +static void hpet_reader(void *data)
-> +{
-> +	uint64_t old_counter = 0, new_counter;
-> +	long cycles = (long)data;
-> +
-> +	while (cycles--) {
-> +		new_counter = *(volatile uint64_t *)HPET_COUNTER_ADDR;
-> +		if (new_counter < old_counter) {
-> +			atomic_inc(&fail);
-> +		}
-> +		old_counter = new_counter;
-> +	}
-> +}
-> +
-> +static void hpet_writer(void *data)
-> +{
-> +	int i;
-> +	long cycles = (long)data;
-> +
-> +	for (i = 0; i < cycles; ++i)
-> +		if (i % 2)
-> +			*(volatile uint64_t *)HPET_CONFIG_ADDR |= HPET_ENABLE_BIT;
-> +		else
-> +			*(volatile uint64_t *)HPET_CONFIG_ADDR &= ~HPET_ENABLE_BIT;
-> +}
-> +
-> +int main(void)
-> +{
-> +	long cycles = 100000;
-> +	int i;
-> +	int ncpus;
-> +	uint64_t start, end, time_ns;
-> +
-> +	ncpus = cpu_count();
-> +	do {
-> +		printf("* starting concurrent read bench on %d cpus\n", ncpus);
-> +		*(volatile uint64_t *)HPET_CONFIG_ADDR |= HPET_ENABLE_BIT;
-> +		start = *(volatile uint64_t *)HPET_COUNTER_ADDR;
-> +		on_cpus(hpet_reader, (void *)cycles);
-> +		end = (*(volatile uint64_t *)HPET_COUNTER_ADDR);
-> +		time_ns = (end - start) * HPET_CLK_PERIOD;
-> +		report(time_ns && !atomic_read(&fail),
-> +			"read test took %lu ms, avg read: %lu ns\n", time_ns/1000000,  time_ns/cycles);
-> +	} while (0);
-> +
-> +	do {
-> +		printf("* starting enable/disable with concurent readers torture\n");
-> +		if (ncpus > 2) {
-> +			for (i = 2; i < ncpus; i++)
-> +			    on_cpu_async(i, hpet_reader, (void *)cycles);
-> +
-> +			on_cpu(1, hpet_writer, (void *)cycles);
-> +			report(!atomic_read(&fail), "torture test, fails: %u\n", atomic_read(&fail));
-> +		} else {
-> +			printf("SKIP: torture test: '-smp X' should be greater than 2\n");
-> +	}
-> +	} while (0);
-> +
-> +	return report_summary();
-> +}
+> Would it make sense to move this up a little bit so that it follows the
+> other ghcb_version check? This way the checks are grouped.
 
+Yes, because there's a lot going on here, and this:
+
+  data->ghcb_version && data->ghcb_version < 2
+
+is an unnecesarily bizarre way of writing
+
+  data->ghcb_version == 1
+
+And *that* is super confusing because it begs the question of why version 0 is
+ok, but version 1 is not.  And then further down I see this: 
+
+	/*
+	 * Currently KVM supports the full range of mandatory features defined
+	 * by version 2 of the GHCB protocol, so default to that for SEV-ES
+	 * guests created via KVM_SEV_INIT2.
+	 */
+	if (sev->es_active && !sev->ghcb_version)
+		sev->ghcb_version = GHCB_VERSION_DEFAULT;
+
+Rather than have a funky sequence with odd logic, set data->ghcb_version before
+the SNP check.  We should also tweak the comment, because "Currently" implies
+that KVM might *drop* support for mandatory features, and that definitely isn't
+going to happen.  And because the reader shouldn't have to go look at sev_guest_init()
+to understand what's special about KVM_SEV_INIT2.
+
+Lastly, I think we should open code '2' and drop GHCB_VERSION_DEFAULT, because:
+
+ - it's a conditional default
+ - is not enumerated to userspace
+ - changing GHCB_VERSION_DEFAULT will impact ABI and could break existing setups
+ - will result in a stale if GHCB_VERSION_DEFAULT is modified
+ - this new check makes me want to assert GHCB_VERSION_DEFAULT > 2
+
+As a result, if we combine all of the above, then we effectively end up with:
+
+	if (es_active && !data->ghcb_version)
+		data->ghcb_version = GHCB_VERSION_DEFAULT;
+
+	BUILD_BUG_ON(GHCB_VERSION_DEFAULT != 2);
+
+which is quite silly.
+
+So this?  Completely untested, and should probably be split over 2-3 patches.
+
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 2fbdebf79fbb..f068cd466ae3 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -37,7 +37,6 @@
+ #include "trace.h"
+ 
+ #define GHCB_VERSION_MAX       2ULL
+-#define GHCB_VERSION_DEFAULT   2ULL
+ #define GHCB_VERSION_MIN       1ULL
+ 
+ #define GHCB_HV_FT_SUPPORTED   (GHCB_HV_FT_SNP | GHCB_HV_FT_SNP_AP_CREATION)
+@@ -405,6 +404,7 @@ static int __sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp,
+ {
+        struct kvm_sev_info *sev = to_kvm_sev_info(kvm);
+        struct sev_platform_init_args init_args = {0};
++       bool snp_active = vm_type == KVM_X86_SNP_VM;
+        bool es_active = vm_type != KVM_X86_SEV_VM;
+        u64 valid_vmsa_features = es_active ? sev_supported_vmsa_features : 0;
+        int ret;
+@@ -418,7 +418,18 @@ static int __sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp,
+        if (data->vmsa_features & ~valid_vmsa_features)
+                return -EINVAL;
+ 
+-       if (data->ghcb_version > GHCB_VERSION_MAX || (!es_active && data->ghcb_version))
++       if (!es_active && data->ghcb_version)
++               return -EINVAL;
++
++       /*
++        * KVM supports the full range of mandatory features defined by version
++        * 2 of the GHCB protocol, so default to that for SEV-ES guests created
++        * via KVM_SEV_INIT2 (KVM_SEV_INIT forces version 1).
++        */
++       if (es_active && !data->ghcb_version)
++               data->ghcb_version = 2;
++
++       if (snp_active && data->ghcb_version < 2)
+                return -EINVAL;
+ 
+        if (unlikely(sev->active))
+@@ -429,15 +440,7 @@ static int __sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp,
+        sev->vmsa_features = data->vmsa_features;
+        sev->ghcb_version = data->ghcb_version;
+ 
+-       /*
+-        * Currently KVM supports the full range of mandatory features defined
+-        * by version 2 of the GHCB protocol, so default to that for SEV-ES
+-        * guests created via KVM_SEV_INIT2.
+-        */
+-       if (sev->es_active && !sev->ghcb_version)
+-               sev->ghcb_version = GHCB_VERSION_DEFAULT;
+-
+-       if (vm_type == KVM_X86_SNP_VM)
++       if (snp_active)
+                sev->vmsa_features |= SVM_SEV_FEAT_SNP_ACTIVE;
+ 
+        ret = sev_asid_new(sev);
+@@ -455,7 +458,7 @@ static int __sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp,
+        }
+ 
+        /* This needs to happen after SEV/SNP firmware initialization. */
+-       if (vm_type == KVM_X86_SNP_VM) {
++       if (snp_active) {
+                ret = snp_guest_req_init(kvm);
+                if (ret)
+                        goto e_free;
 
