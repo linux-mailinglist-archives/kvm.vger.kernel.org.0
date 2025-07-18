@@ -1,52 +1,52 @@
-Return-Path: <kvm+bounces-52882-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52883-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47EC7B0A1A6
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 13:12:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A2F0B0A1A4
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 13:12:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE3F04E5145
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 11:12:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E4525879D5
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 11:12:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2502E2C158E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C35E2C158F;
 	Fri, 18 Jul 2025 11:12:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jJ7kTBPR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R33nzHIy"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 480CF28B41A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4814E2BF011;
 	Fri, 18 Jul 2025 11:12:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752837137; cv=none; b=LmVOzniMAYP09OSUQN+RDKYQ0znGuTPGZ3OeB2VFS/IJMpykp0zOsS+/I/M0TbaU3ZjANT27p+9EU/EuacWtnHJVFcSCSzcm9Z2bbm/eFer13eSFE6wBOnFIaU+gZHvZbfSZmUGjuSPTMxmNi8Yif9XWDGGD9Ntef1A4ZfCM7kw=
+	t=1752837137; cv=none; b=ClnMpzHqOFIfWu8evvUnCCFL85MMTRnOqXuuIyRFrkJzutBkc2hYxSCTKXo6oI9dhSdzaPZcSscD3dVxvHYZTxK6uX6/GVqHWPfKY4CcEH5YFJXAuwQVGtFHkThTqOyFp60EGtsDf+98FN2wk9MzTqRSqRQUpB8pUuYnICRfMl4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1752837137; c=relaxed/simple;
-	bh=cX7YrwMk2OOPZPPCwE1KB9e5hHTXFD0hbpP7g6YdzPw=;
+	bh=24+36KjjrD0NWHFuhivqLnbkQAQ1TArPFkrRpr8pj5g=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=W0eEhP9hVlVXWtc711w6qZIHQvzI3K4ojiGqHIHJ+R0goB0BR+dEYUdgKYIeZqJFRqGKOM9wO57y0tmD1aUsCahuz7s0+I/CpmHPatJK03ym2smQJPiTTp3YgVo3hbgPmxsO4PJQECcsxzsNeOE+C6YoiMUESrXNFl26JA/KOWE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jJ7kTBPR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB32AC4CEF4;
+	 MIME-Version; b=hBJS5UDfUdNCbDc5uIb+KHxvHlpFd5HPI3Mvz4wBWb0BIvb/mFV+j520SAk2Vdv9KJuVDvsM0Pjjgsn1Y/njcl+jfQ4yTnTkNIsqZkIKRsjDPv4IFAy8D4wwA8H+RA+oO36DCpUDcCNyhGlWfAZQGq8taC6gPO6ajuC5h8S6w8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R33nzHIy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFF00C4CEF6;
 	Fri, 18 Jul 2025 11:12:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1752837136;
-	bh=cX7YrwMk2OOPZPPCwE1KB9e5hHTXFD0hbpP7g6YdzPw=;
+	bh=24+36KjjrD0NWHFuhivqLnbkQAQ1TArPFkrRpr8pj5g=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=jJ7kTBPRDROH/KI3582LtM6d9J6KQ0gQsSxx3MEZetOTzsOg8oOzKErcFR6QkQGk8
-	 hLzsoTnLHdc68T4VFoAYv9u8ncqD0Zrp7UQ+/HyTlXn4+xOVs7eDjhGg1ixVWUAPj+
-	 nlPtloQbq5RXpXPPRG+MGtUkiRgBruqMnvmFN5c9g4eLDEkig+6qp8KPUBQlIDrU/U
-	 3kihL/fkb6zb3c7cXhmhgx8TUBx+gJsS4OwphygGGba/tThOxRHhjjBTvIBacVUiKt
-	 8YVYNcjrlTmDl1a5UHdXhSSCXgQOB5j5hbAoYVbknDgzUK4a844w5FjPVG0a4N1t1P
-	 HaV8jY9Cks8Ng==
+	b=R33nzHIyLv9AcgRjbXDMPz6PgR+4A1Li7+48f5b1sAgJYu9/fWJTkOu53F9AZePSv
+	 3jRSnNtZimbz4wu22en5eZD9jqnCbx5kYs+DpL0PwVw9KNzM+sTPwjMHbT/DggAbv/
+	 AvnC3S1suKWCtQrtvgdtASh5w+uk3IggRNy4ocLiWQVEwDO55/++6On1RjzoWNw/XS
+	 szI4BdxAbeTGEIqebNZH6JEH5K/jhpEVGaG5taxhjY2Jc3RrLh5kH+CFuiQH4iBsCn
+	 UhJ5aRXpIe0X+WG5LIPfXLk2x87z/a8nA/IjHqkajkdDvNFEFljagNaxCu5Zuydao8
+	 EqXL3ZWhQ3giw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1ucj0g-00Gt2B-Nu;
-	Fri, 18 Jul 2025 12:12:14 +0100
+	id 1ucj0g-00Gt2B-UD;
+	Fri, 18 Jul 2025 12:12:15 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -56,9 +56,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH 1/4] KVM: arm64: vgic-v3: Fix ordering of ICH_HCR_EL2
-Date: Fri, 18 Jul 2025 12:11:51 +0100
-Message-Id: <20250718111154.104029-2-maz@kernel.org>
+Subject: [PATCH 2/4] KVM: arm64: Clarify the check for reset callback in check_sysreg_table()
+Date: Fri, 18 Jul 2025 12:11:52 +0100
+Message-Id: <20250718111154.104029-3-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250718111154.104029-1-maz@kernel.org>
 References: <20250718111154.104029-1-maz@kernel.org>
@@ -74,32 +74,55 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-The sysreg tables are supposed to be sorted so that a binary search
-can easily find them. However, ICH_HCR_EL2 is obviously at the wrong
-spot.
+check_sysreg_table() has a wonky 'is_32" parameter, which is really
+an indication that we should enforce the presence of a reset helper.
 
-Move it where it belongs.
+Clean this up by naming the variable accordingly and inverting the
+condition. Contrary to popular belief, system instructions don't
+have a reset value (duh!), and therefore do not need to be checked
+for reset (they escaped the check through luck...).
 
-Fixes: 9fe9663e47e21 ("KVM: arm64: Expose GICv3 EL2 registers via KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS")
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/vgic-sys-reg-v3.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/arm64/kvm/sys_regs.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/arch/arm64/kvm/vgic-sys-reg-v3.c b/arch/arm64/kvm/vgic-sys-reg-v3.c
-index 75aee0148936f..1850f1727eb93 100644
---- a/arch/arm64/kvm/vgic-sys-reg-v3.c
-+++ b/arch/arm64/kvm/vgic-sys-reg-v3.c
-@@ -421,8 +421,8 @@ static const struct sys_reg_desc gic_v3_icc_reg_descs[] = {
- 	EL2_REG(ICH_AP1R1_EL2, ich_apr),
- 	EL2_REG(ICH_AP1R2_EL2, ich_apr),
- 	EL2_REG(ICH_AP1R3_EL2, ich_apr),
--	EL2_REG(ICH_HCR_EL2, ich_reg),
- 	EL2_REG_RO(ICC_SRE_EL2, icc_sre),
-+	EL2_REG(ICH_HCR_EL2, ich_reg),
- 	EL2_REG_RO(ICH_VTR_EL2, ich_vtr),
- 	EL2_REG(ICH_VMCR_EL2, ich_reg),
- 	EL2_REG(ICH_LR0_EL2, ich_reg),
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index af743494538a2..f8b10966d0c3e 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -4335,12 +4335,12 @@ static const struct sys_reg_desc cp15_64_regs[] = {
+ };
+ 
+ static bool check_sysreg_table(const struct sys_reg_desc *table, unsigned int n,
+-			       bool is_32)
++			       bool reset_check)
+ {
+ 	unsigned int i;
+ 
+ 	for (i = 0; i < n; i++) {
+-		if (!is_32 && table[i].reg && !table[i].reset) {
++		if (reset_check && table[i].reg && !table[i].reset) {
+ 			kvm_err("sys_reg table %pS entry %d (%s) lacks reset\n",
+ 				&table[i], i, table[i].name);
+ 			return false;
+@@ -5334,11 +5334,11 @@ int __init kvm_sys_reg_table_init(void)
+ 	int ret = 0;
+ 
+ 	/* Make sure tables are unique and in order. */
+-	valid &= check_sysreg_table(sys_reg_descs, ARRAY_SIZE(sys_reg_descs), false);
+-	valid &= check_sysreg_table(cp14_regs, ARRAY_SIZE(cp14_regs), true);
+-	valid &= check_sysreg_table(cp14_64_regs, ARRAY_SIZE(cp14_64_regs), true);
+-	valid &= check_sysreg_table(cp15_regs, ARRAY_SIZE(cp15_regs), true);
+-	valid &= check_sysreg_table(cp15_64_regs, ARRAY_SIZE(cp15_64_regs), true);
++	valid &= check_sysreg_table(sys_reg_descs, ARRAY_SIZE(sys_reg_descs), true);
++	valid &= check_sysreg_table(cp14_regs, ARRAY_SIZE(cp14_regs), false);
++	valid &= check_sysreg_table(cp14_64_regs, ARRAY_SIZE(cp14_64_regs), false);
++	valid &= check_sysreg_table(cp15_regs, ARRAY_SIZE(cp15_regs), false);
++	valid &= check_sysreg_table(cp15_64_regs, ARRAY_SIZE(cp15_64_regs), false);
+ 	valid &= check_sysreg_table(sys_insn_descs, ARRAY_SIZE(sys_insn_descs), false);
+ 
+ 	if (!valid)
 -- 
 2.39.2
 
