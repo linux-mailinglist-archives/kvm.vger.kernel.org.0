@@ -1,134 +1,173 @@
-Return-Path: <kvm+bounces-52855-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52856-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 785A4B09B0D
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 07:57:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB7AEB09B1B
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 08:07:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 737067AE556
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 05:56:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 24CA95877FF
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 06:07:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 433D71E835D;
-	Fri, 18 Jul 2025 05:57:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C85E1F0E55;
+	Fri, 18 Jul 2025 06:06:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="g/yu3qE0"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fJwpnpFA"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA0251DE4E1;
-	Fri, 18 Jul 2025 05:57:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93B2D1DE2C9
+	for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 06:06:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752818266; cv=none; b=YS8Jvp348/D8jdsRKxpHwLw+b9eXyZ4K0b/As8ADyKdcsjePoiCcpI/vzpRumKy0qGolCbcGvVZCwTaA7YlxB5Em2vcBaGRu2K27IOU7KKUD1fGqpSxtIJUj8eWH8HG1bKgf8+i4GAra2fVC86o9o+59ztbUN2SWzMLOBjeDdpg=
+	t=1752818814; cv=none; b=YLstXUQJ9WBPjbnF8OdVggY0/I/FBDni/fDIYx/GdUkeZT+gg+w35zo4Bt3oiArRkKSRaF2/7kJys1I4Zd5yj0aguhDeffyckz8zGysMlbV4mo6lEHaIVwjXJT7atAYljs/Ku/lm3SLbcoXM+PsSZPXk/2mzKPCa3DRfTbxNA/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752818266; c=relaxed/simple;
-	bh=6HyipH6ZGn2eTCwtX/8w8N8MbCivU7M119JVojMbDow=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=UMStaDm6g7+EtD7TXGsmhf1CAh4IkGvxgjr128OELegC4cWrUnf1NaZq4erHA2Pyyr6pek2j9wVJcPmoK/kcPCprUaeQixPOR1iMMOw+nQKC8mDvEVfs96H5bfk8H/YIdGoK2+srDBmBOpKW4mr29gonQrEiyt8v2I94SIo6nhc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=g/yu3qE0; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752818264; x=1784354264;
-  h=message-id:date:mime-version:subject:from:to:cc:
-   references:in-reply-to:content-transfer-encoding;
-  bh=6HyipH6ZGn2eTCwtX/8w8N8MbCivU7M119JVojMbDow=;
-  b=g/yu3qE005OQnYf9YgH/Z1RaiMHznwySxFQmv10EQJUBtjktnx+UNhvH
-   wzrnh/lXVeszP3TKacpkmTTkwhABckWrS606oQgaUzTi9Eb0rRKDaoRj5
-   IBz9TfJT0dVlc2JNA1Gu/6PL0MKl8nbqqq6wIByqpTcNU+4tOUXnmNSOU
-   /K2cgdaf7kXyAzYLc6gFNBk2UAFMfdSQ1YWjEPZlwek5UYo7KAf/ORBli
-   8nzhgAmzqB482spHtNl/34JzM48M7WU75CMHDpMzkAFRPWnQ14oWOUJ8o
-   cfBVW7I/KNAodnVD/78zGx+6ucA7A0Q9tyQWgmHnbsN5Mre39Oy9Z4tKW
-   A==;
-X-CSE-ConnectionGUID: jfvhYIWFSme1khIB3xWuNA==
-X-CSE-MsgGUID: 3UIL3NaPRvK54yyC6iUi/g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11495"; a="54963627"
-X-IronPort-AV: E=Sophos;i="6.16,320,1744095600"; 
-   d="scan'208";a="54963627"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 22:57:43 -0700
-X-CSE-ConnectionGUID: gGSQjf1oTiKmkpHzD1CHqg==
-X-CSE-MsgGUID: 7MpZdOhSSiy/G0j+1Lk4Jw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,320,1744095600"; 
-   d="scan'208";a="188960541"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 22:57:28 -0700
-Message-ID: <8db83e78-8e18-4cdb-b8eb-80351c5273fc@intel.com>
-Date: Fri, 18 Jul 2025 13:57:25 +0800
+	s=arc-20240116; t=1752818814; c=relaxed/simple;
+	bh=AoH2pIUWrD5MbUepOmIQK6BEXrzdiV0jm/OvN5qurII=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=BVDlmLkj8M7eBumSImYSM5c0itqHyOZ0jLEBJ5Yp1jE+fUNTg4skPmu05nRhJk/0jmnIGKlfadoPaB2BPPmcQ9WLhgA8Gz66QaSfjkPFe9Zb8IoL8Ljiq/a/yPNkgkFJhjM5Ikyj67Yx2V/9Z1N1b6/j+bfG26HT1i1AwE077NQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fJwpnpFA; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752818811;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=2I8jDNCG0L+52nyGGUbEIAwL2BkN8wDU3xL1GQ5jtVg=;
+	b=fJwpnpFAGkpyUOgjTWuLsBbrygFgEIV8QNvSiy8FSk5rN55oivGLRzQS7oiTOlco+0DAW4
+	fXLPt+mvil90fDDnYsCCN1z8cBMY9FB3Ld+xDbxquNB8g1BNFk/jTVkR2LTjrKaLegNSW8
+	n/S3KUA15JDwhN+LUPVfWlgfp3Ijf8k=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-556-PuYEbrd0MPGTriYeRTD4gQ-1; Fri,
+ 18 Jul 2025 02:06:48 -0400
+X-MC-Unique: PuYEbrd0MPGTriYeRTD4gQ-1
+X-Mimecast-MFC-AGG-ID: PuYEbrd0MPGTriYeRTD4gQ_1752818806
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A614819560B3;
+	Fri, 18 Jul 2025 06:06:45 +0000 (UTC)
+Received: from server.redhat.com (unknown [10.72.112.34])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7B5D4180045B;
+	Fri, 18 Jul 2025 06:06:37 +0000 (UTC)
+From: Cindy Lu <lulu@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org (maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
+	"H. Peter Anvin" <hpa@zytor.com>,
+	"Peter Zijlstra (Intel)" <peterz@infradead.org>,
+	"Kirill A. Shutemov" <kas@kernel.org>,
+	"Xin Li (Intel)" <xin@zytor.com>,
+	Rik van Riel <riel@surriel.com>,
+	"Ahmed S. Darwish" <darwi@linutronix.de>,
+	kvm@vger.kernel.org (open list:KVM PARAVIRT (KVM/paravirt)),
+	linux-kernel@vger.kernel.org (open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
+	lulu@redhat.com
+Subject: [PATCH] netvsc: transfer lower device max tso size
+Date: Fri, 18 Jul 2025 14:06:15 +0800
+Message-ID: <20250718060615.237986-1-lulu@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v15 12/21] KVM: x86/mmu: Consult guest_memfd when
- computing max_mapping_level
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev
-Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
- anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
- aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk,
- brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
- yilun.xu@intel.com, chao.p.peng@linux.intel.com, jarkko@kernel.org,
- amoorthy@google.com, dmatlack@google.com, isaku.yamahata@intel.com,
- mic@digikod.net, vbabka@suse.cz, vannapurve@google.com,
- ackerleytng@google.com, mail@maciej.szmigiero.name, david@redhat.com,
- michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com,
- isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com,
- suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com,
- quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com,
- quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com,
- quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com,
- james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev,
- maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com,
- roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com,
- rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com,
- jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com,
- ira.weiny@intel.com
-References: <20250717162731.446579-1-tabba@google.com>
- <20250717162731.446579-13-tabba@google.com>
- <9b425918-1858-47d6-a1cd-1b44d5898ab4@intel.com>
-Content-Language: en-US
-In-Reply-To: <9b425918-1858-47d6-a1cd-1b44d5898ab4@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On 7/18/2025 1:32 PM, Xiaoyao Li wrote:
-> On 7/18/2025 12:27 AM, Fuad Tabba wrote:
->> From: Ackerley Tng <ackerleytng@google.com>
->>
->> Modify kvm_mmu_max_mapping_level() to consult guest_memfd for memory
->> regions backed by it when computing the maximum mapping level,
->> especially during huge page recovery.
-> 
-> IMHO, we need integrate the consultation of guest_memfd into 
-> __kvm_mmu_max_mapping_level, not kvm_mmu_max_mapping_level().
-> 
-> __kvm_mmu_max_mapping_level() (called by kvm_mmu_hugepage_adjust()) is 
-> the function KVM X86 uses to determine the final mapping level,
-> fault->goal_level.
-> 
+From: Jason Wang <jasowang@redhat.com>
 
-I think I can understand the patch now.
+When netvsc is accelerated by the lower device, we can advertise the
+lower device max tso size in order to get better performance.
 
-For normal TDP page fault that requires KVM to setup the TDP page table 
-to map the guest memory. The max page level of guest memfd is consulted 
-when faulting in the pfn in kvm_mmu_faultin_pfn_private() and update 
-fault->max_level accordingly. So skip consultation in 
-__kvm_mmu_max_mapping_level() is OK.
+One example is that when 802.3ad encap is enabled by netvsc, it has a
+lower max tso size than 64K. This will lead to software segmentation
+of forwarding GSO packet (e.g the one from VM/tap).
 
-But for recover_huge_pages_range() and kvm_mmu_zap_collapsible_spte() 
-(this patch misses this case) which call kvm_mmu_max_mapping_level() and 
-without information of the max page level of guest memfd. So we need to 
-consult guest memfd separately.
+This patch help to recover the performance.
 
-But the changelog doesn't clarify it such way.
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+Tested-by: Cindy Lu <lulu@redhat.com>
+---
+ drivers/net/hyperv/netvsc_drv.c |  2 +-
+ include/linux/netdevice.h       |  4 ++++
+ net/core/dev.c                  | 18 ++++++++++++++++++
+ 3 files changed, 23 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/hyperv/netvsc_drv.c b/drivers/net/hyperv/netvsc_drv.c
+index c41a025c66f0..7af4aa4f4abe 100644
+--- a/drivers/net/hyperv/netvsc_drv.c
++++ b/drivers/net/hyperv/netvsc_drv.c
+@@ -2440,7 +2440,7 @@ static int netvsc_vf_changed(struct net_device *vf_netdev, unsigned long event)
+ 		 * switched over to the VF
+ 		 */
+ 		if (vf_is_up)
+-			netif_set_tso_max_size(ndev, vf_netdev->tso_max_size);
++			netif_stacked_transfer_tso_max_size(vf_netdev, ndev);
+ 		else
+ 			netif_set_tso_max_size(ndev, netvsc_dev->netvsc_gso_max_size);
+ 	}
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index adb14db25798..c695a3ffecd8 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -5275,6 +5275,9 @@ void netdev_change_features(struct net_device *dev);
+ void netif_stacked_transfer_operstate(const struct net_device *rootdev,
+ 					struct net_device *dev);
+ 
++void netif_stacked_transfer_tso_max_size(const struct net_device *rootdev,
++					 struct net_device *dev);
++
+ netdev_features_t passthru_features_check(struct sk_buff *skb,
+ 					  struct net_device *dev,
+ 					  netdev_features_t features);
+@@ -5326,6 +5329,7 @@ static inline bool netif_needs_gso(struct sk_buff *skb,
+ }
+ 
+ void netif_set_tso_max_size(struct net_device *dev, unsigned int size);
++
+ void netif_set_tso_max_segs(struct net_device *dev, unsigned int segs);
+ void netif_inherit_tso_max(struct net_device *to,
+ 			   const struct net_device *from);
+diff --git a/net/core/dev.c b/net/core/dev.c
+index be97c440ecd5..3bec4284adff 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -3306,6 +3306,24 @@ void netif_set_tso_max_size(struct net_device *dev, unsigned int size)
+ }
+ EXPORT_SYMBOL(netif_set_tso_max_size);
+ 
++/**
++ *	netif_stacked_transfer_tso_max_size - transfer tso max size
++ *	@rootdev: the root or lower level device to transfer tso max size from
++ *	@dev: the device to transfer operstate to
++ *
++ *	Transfer tso max size from root to device. This is normally
++ *	called when a stacking relationship exists between the root
++ *	device and the device(a leaf device).
++ */
++void netif_stacked_transfer_tso_max_size(const struct net_device *rootdev,
++					 struct net_device *dev)
++{
++	dev->tso_max_size = rootdev->tso_max_size;
++	netif_set_gso_max_size(dev, READ_ONCE(rootdev->gso_max_size));
++	netif_set_gso_ipv4_max_size(dev, READ_ONCE(rootdev->gso_ipv4_max_size));
++}
++EXPORT_SYMBOL(netif_stacked_transfer_tso_max_size);
++
+ /**
+  * netif_set_tso_max_segs() - set the max number of segs supported for TSO
+  * @dev:	netdev to update
+-- 
+2.45.0
 
 
