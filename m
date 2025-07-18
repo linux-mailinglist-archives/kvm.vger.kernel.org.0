@@ -1,86 +1,86 @@
-Return-Path: <kvm+bounces-52928-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52929-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 426E0B0AA7F
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 21:00:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95326B0AA8E
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 21:11:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F05FD3AD4D0
-	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 19:00:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3004A1AA5090
+	for <lists+kvm@lfdr.de>; Fri, 18 Jul 2025 19:11:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A61C32E7F33;
-	Fri, 18 Jul 2025 19:00:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35EC02E88AB;
+	Fri, 18 Jul 2025 19:10:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G4Z6UVUU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U4OPixDo"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D4A62E36EE
-	for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 19:00:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB8A62E7BB5
+	for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 19:10:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752865239; cv=none; b=C+NJPEbsCjHpumxH5y78YXJStJ8/QDp8oNTT9LpEaDpIwMSupFM5JBNm0W9tf2mLNG0/byqyDYOLCabOqxezn4dCuDLnoNXwG6vksr60NlEqPkJZt0Yhx/MUv+j1MyjdL9mmPzLCsYbUKeWc9iavLHHzwqPIIPPNV5NAdTvqjxQ=
+	t=1752865853; cv=none; b=omP5bt2N9Kv7y5ikaGQ9t///6Dnp0DFG+0H8zD67jc4b3Cgi8G+/TC+1rOVU9gk6+xVod7GwWhl7lZ9cQaHvoH60Yr2lO9lAXS8rj9qrNf7wphzgundTmIKmJFPoyjdFSM1/hAAon/0H6FUd4iGLXESNjGICZCl8RLh3v/lMfn4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752865239; c=relaxed/simple;
-	bh=veoWHeeI1Gm+Z/VWrGPVgODw868Qai1kaliqd0AgE/4=;
+	s=arc-20240116; t=1752865853; c=relaxed/simple;
+	bh=12HnDqMeVgttmuY8covfcXjk4vazl0YNAz1/AvqhAPg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tYn3XmrGRzhe/3FiDflSljTd7yKw3GDgLyaYWrzxEfUZ5FUKOaHTUdC00Rn6L9afwdRnv+ylOAkS2/seYWtCGYw3l+1+UxhSbDkRKnVWgY9e93WOiOmNpVTMoXKwFgaqQSSK6Kl1s8dhxjiOq8MNFEl6mVZmNl0FdoSEdwDzcWE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=G4Z6UVUU; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=fj7lO+cdUQTelqTE0Y1XtkOIqCaMNVIS29Lm+4Upd6xPdIw3FDHoRMK3R6JWKalrlti3zEFUVHoA50W8OngThOGEHbFDmRWOBblYXC6FTq3rSLsI3XbQQCkgryfLtTaZJyGMKrmGn2iOMaoxlgWw3VyBINWE7iX9McO4yEspdr8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=U4OPixDo; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752865237;
+	s=mimecast20190719; t=1752865850;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=fuzjkisuZnR7aiSCtO5mtZoLyIN2+57+reZAqeqjfrU=;
-	b=G4Z6UVUUApr4NVUuGh/RIBwoJnvWj5BDahPzvjDKokRLEaA07GZb+eodEOnDhF7SYU7QL5
-	yeHWqdzXcC0dHr+N4+n3Q+PwDuOFC0rFxNhl1iqXNAHfbRATP3UurborM2GTkJMMrJAd4x
-	6Q/8dMOVteN5ThSucLLQpvr3IYNkdmI=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=V8D+e9uBJDRczJqfQeOvVP8ReNAlQCGSx/AVjBJK5K4=;
+	b=U4OPixDo99XEoKetVRKVG2YJam5jUsmiV4prbphLgxV1pRllsMd+TNXxPM5BBiQ9T1o9mX
+	jKvKvq5DYc9H4o7N/NMc6/fgYn3PWhwUihypOv2qdbFkoCcr/mQkt7w7yCXVaeeZmjMCYC
+	7/W0PK1O3SJGFGlJAadqnrMvj92OqN4=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-614-5gk3DwQbOHe_yRhpDrumDQ-1; Fri, 18 Jul 2025 15:00:35 -0400
-X-MC-Unique: 5gk3DwQbOHe_yRhpDrumDQ-1
-X-Mimecast-MFC-AGG-ID: 5gk3DwQbOHe_yRhpDrumDQ_1752865234
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-3138c50d2a0so3527183a91.2
-        for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 12:00:35 -0700 (PDT)
+ us-mta-350-CZl-Mn3RPUazgXhPmQfxZg-1; Fri, 18 Jul 2025 15:10:49 -0400
+X-MC-Unique: CZl-Mn3RPUazgXhPmQfxZg-1
+X-Mimecast-MFC-AGG-ID: CZl-Mn3RPUazgXhPmQfxZg_1752865848
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-313fb0ec33bso2520189a91.2
+        for <kvm@vger.kernel.org>; Fri, 18 Jul 2025 12:10:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752865234; x=1753470034;
+        d=1e100.net; s=20230601; t=1752865848; x=1753470648;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fuzjkisuZnR7aiSCtO5mtZoLyIN2+57+reZAqeqjfrU=;
-        b=m0/llYiL/uq48P5Kl6ArCW9QlLDXTk46MG39s0mlrJL20ahuarclrg5EUR19cZ/Z38
-         wekkNch8bqVLtUcUIz5+qMZqtc3ACp/y/G7vu82pSFn+23AJ9G4YixFfDe3kqj8fEgSr
-         IG39MEsoFFsrA4qLkPJcsUKGN/yw5LAHnQxUbSIpPAyDyYqeD6utAriJLvSeUvPr8uwS
-         YiqUddVnMvQuXtAK6viMBAOzhaW4VU1rK/h/Ktvgg7z3uDNL607hccWOIgITU9bNqj4n
-         JWQhvIyKf3BANx3kCgLGkDzTtDsP/qrKltLdBhOazcmfa4b9gyQvuN4ODl/m0Ls21Qi9
-         GFxg==
-X-Forwarded-Encrypted: i=1; AJvYcCUKc5UosjT2SSf/I0LDeOsAbX63xmo8uO2Puj269p25AOQAfgTDf2KofaiOIfV+sZu4C3k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxoO+oK7ExRVO6InFA0Tk9Lsuw+wxqKeyqVabVefjcLLOwWrCZP
-	DBwvM+J2semxm1AD+7EwHbhqJHffINYDpZoqbJyajoYMCN++/cDbFn1e0NtrajxIm3CUgSBMQ3Z
-	ZJSbeF8xpOc1DX3x3JLFsT6A82TOoUUWkEaG85QvLcWoEfipMMjjGpw==
-X-Gm-Gg: ASbGncu2OUGv5eDmNVhluXvu44YS4c2j8sv2bWb7OsMqCo0fof9t3SuJubG+6AzdY2G
-	m0pZE4pVsWMOVdqBxiUwgh3RqGPTWa7iO6TEdhzYjjiEZ9znlMBHUUy2cModBuEGUUwCvdJoWGZ
-	Vqc+SEhAmyXjPatjFSihkOA0FSQolo1J0sKiUdklqXsZHxGjg9IQn/N/wPybT9OadRjzOB2ErUo
-	567fmOB7yU0/E6Rrtu1hqES+kpHbu+z54cWxdrBhUMNtLalUCgh0TGeebf2+p/yp1fCrHGMQQcG
-	ZV6cdszzw5lGdSfr5o9BJYDd+2BZlIRTynbaU/Qi
-X-Received: by 2002:a17:90b:4ec8:b0:311:c970:c9ce with SMTP id 98e67ed59e1d1-31caf8f0311mr11212464a91.28.1752865234284;
-        Fri, 18 Jul 2025 12:00:34 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEuByiZID+4aMiL/O1DOKL6YE07GBrCSQNpOuPpUzXosmW3/GE0r8YaZaCryfvXqwrxsY8cDg==
-X-Received: by 2002:a17:90b:4ec8:b0:311:c970:c9ce with SMTP id 98e67ed59e1d1-31caf8f0311mr11212413a91.28.1752865233617;
-        Fri, 18 Jul 2025 12:00:33 -0700 (PDT)
+        bh=V8D+e9uBJDRczJqfQeOvVP8ReNAlQCGSx/AVjBJK5K4=;
+        b=uTkGvPo3JxT/+Hf1kTyaTiJeGmVaD2RiyCkz069QIW+eQrKrju3HFP9SfXW8DAay6T
+         PZe+Hr6Gc0thhRQ90YXD4KM38QkTX/47D+8qfRcb1Gbtgbc61VmJsOoSPqmuLvAzbrTs
+         bTsfPMXQMLFmFMdFrNoX1dHj5/Ba4SB4GkmuLIoPo/3uxHdtq7rYwO7qwImJYr+Lt0I4
+         GBH1uIiOx48dIhtRT8YHgUI8btygBG+1cQbNc+++Ngg+q5OyGDj8XxGHc/C8hUMa0eSE
+         AZf3pcDcJUAMOR97OLfRlVag/dU0nFOeyAsfyvRXBg/8OI6jQGRQ/OxTXwvQQ7dRv+Qi
+         IoFA==
+X-Forwarded-Encrypted: i=1; AJvYcCUcV9dYffXS5AjvFl2853iGTkRWn+Nw2AddS+m3WVsNISxPZX3W9jpVEOKhFSAU2mqnJ8c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxoyXPt2AbSNr5NVh0SKfTqC7X6YqPCLu5W0m8L189XkLGJy6MC
+	9wanYEA+ETxRvi0RpdLzq0SO1ncuEhl2HmhyZmX6zZILbZPsTXBweMZ1nf4mrCm3VUjLwnCKgIq
+	RNm59kwrMQ+Vl9IoCmmrvFia09Tvapbe9X8MmdtvoP2xCwI0WgCgBNQ==
+X-Gm-Gg: ASbGncu2T+k4xRiyCWu3bg8kuZ0RUj5pxpuKoFYLRdspY722uNRAoO/Tqv/UjPheaeW
+	u8wR3qeaUC4CkGbu6Z8fHgiai8im3MvouddsBKu07rml+Pcq3WSsmAh4f/7vG4ONf2iUhuEKvxu
+	s9+6+L5LL5xU+n2mRoeWIVEyGT4bWEuTIrGvizzvJv8KAayWjcniP9aL3Y9SFFv798pTj9txUmq
+	PCx5vQrIa++oSkUPDQptd3JewVeIIXqov5b7SFJZn7/QlmIYhcI5bhUVdKC+Tzphe3CcxAacgSz
+	Pyv8KOEu1fPs89IlrV14lFMUjsFvTzjf5ftpNKq5
+X-Received: by 2002:a17:90b:6ce:b0:311:b5ac:6f6b with SMTP id 98e67ed59e1d1-31cc253d5c7mr6000473a91.9.1752865848244;
+        Fri, 18 Jul 2025 12:10:48 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEIqj9LP2vHBGP1tqCvOrWc8j8Q/BDtDPfNNbouKYvr5XMtLMkhhPcn26wkmN3ctBxthZr59g==
+X-Received: by 2002:a17:90b:6ce:b0:311:b5ac:6f6b with SMTP id 98e67ed59e1d1-31cc253d5c7mr6000449a91.9.1752865847822;
+        Fri, 18 Jul 2025 12:10:47 -0700 (PDT)
 Received: from [192.168.40.164] ([70.105.235.240])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31cc33715b2sm1765550a91.24.2025.07.18.12.00.29
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31c9f1e6a68sm5667046a91.19.2025.07.18.12.10.43
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 18 Jul 2025 12:00:33 -0700 (PDT)
-Message-ID: <1b47ede0-bd64-46b4-a24f-4b01bbdd9710@redhat.com>
-Date: Fri, 18 Jul 2025 15:00:28 -0400
+        Fri, 18 Jul 2025 12:10:47 -0700 (PDT)
+Message-ID: <519d8178-4cec-44c2-8b24-cc9ae9dbd221@redhat.com>
+Date: Fri, 18 Jul 2025 15:10:42 -0400
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -88,8 +88,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 03/16] iommu: Compute iommu_groups properly for PCIe
- switches
+Subject: Re: [PATCH v2 05/16] PCI: Add pci_reachable_set()
 Content-Language: en-US
 To: Jason Gunthorpe <jgg@nvidia.com>
 Cc: Bjorn Helgaas <bhelgaas@google.com>, iommu@lists.linux.dev,
@@ -100,113 +99,56 @@ Cc: Bjorn Helgaas <bhelgaas@google.com>, iommu@lists.linux.dev,
  Joerg Roedel <jroedel@suse.de>, Kevin Tian <kevin.tian@intel.com>,
  kvm@vger.kernel.org, maorg@nvidia.com, patches@lists.linux.dev,
  tdave@nvidia.com, Tony Zhu <tony.zhu@intel.com>
-References: <3-v2-4a9b9c983431+10e2-pcie_switch_groups_jgg@nvidia.com>
- <5b1f12e0-9113-41c4-accb-d8ab755cc7d7@redhat.com>
- <20250718180947.GB2394663@nvidia.com>
+References: <5-v2-4a9b9c983431+10e2-pcie_switch_groups_jgg@nvidia.com>
+ <3bf0f555-535d-4e47-8ff1-f31b561a188c@redhat.com>
+ <20250718174921.GA2393667@nvidia.com>
 From: Donald Dutile <ddutile@redhat.com>
-In-Reply-To: <20250718180947.GB2394663@nvidia.com>
+In-Reply-To: <20250718174921.GA2393667@nvidia.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Jason,
-Thanks for replies, clarifications...
-Couple questions below.
 
-On 7/18/25 2:09 PM, Jason Gunthorpe wrote:
-> On Thu, Jul 17, 2025 at 06:03:42PM -0400, Donald Dutile wrote:
->>> +static struct iommu_group *pci_get_alias_group(struct pci_dev *pdev)
->> So, the former pci_device_group() is completely re-written below,
->> and what it use to do is renamed pci_get_alias_group(), which shouldn't be
->> (easily) confused with ...
+
+On 7/18/25 1:49 PM, Jason Gunthorpe wrote:
+> On Thu, Jul 17, 2025 at 06:04:04PM -0400, Donald Dutile wrote:
+>>> Implement pci_reachable_set() to efficiently compute a set of devices on
+>>> the same bus that are "reachable" from a starting device. The meaning of
+>>> reachability is defined by the caller through a callback function.
+>>>
+>> This comment made me review get_pci_alias_group(), which states in its description:
+>> * Look for aliases to or from the given device for existing groups. DMA
+>>   * aliases are only supported on the same bus, therefore the search
+>>   * space is quite small
 >>
->>> +{
->>> +	struct iommu_group *group;
->>> +	DECLARE_BITMAP(devfns, 256) = {};
->>>    	/*
->>>    	 * Look for existing groups on device aliases.  If we alias another
->>>    	 * device or another device aliases us, use the same group.
->>>    	 */
->>> -	group = get_pci_alias_group(pdev, (unsigned long *)devfns);
->>> +	group = get_pci_alias_group(pdev, devfns);
->> ... get_pci_alias_group() ?
+>> So why does it do the for loop:
+>>    for_each_pci_dev(tmp) {
 >>
->> ... and it's only used for PCIe case below (in pci_device_group), so
->> should it be named 'pcie_get_alias_group()' ?
+>> vs getting the pdev->bus->devices -- list of devices on that bus, and only
+>> scan that smaller list, vs all pci devices on the system?
 > 
-> Well, the naming is alot better after this is reworked with the
-> reachable set patch and these two functions are removed.
-> 
-Didn't notice that... will re-look.
+> Because it can't access the required lock pci_bus_sem to use that
+> list.
+ah, i see; it's only declared in drivers/pci/search.c, and it isn't
+a semaphone in a per-bus struct. :-/
+... so move the function to search.c ? /me runs...
+I know, not worth the churn; already have 'polluted' iommu w/pci, but not vice-versa.
+(although iommu-groups is really a bus-op (would be a different op, for say, platform devices going through another iommu).
 
-> But even then I guess it is not a great name.
 > 
-> How about:
+> The lock is only available within the PCI core itself which is why I
+> moved a few functions over there so they can use the lock.
 > 
-> /*
->   * Return a group if the function has isolation restrictions related to
->   * aliases or MFD ACS.
->   */
-> static struct iommu_group *pci_get_function_group(struct pci_dev *pdev)
-> {
+>> Could we move this to just before patch 11 where it is used?
 > 
-sure...
+> Yes
+> 
+>> or could this be used to improve get_pci_alias_group() and get_pci_function_alias_group() ?
+> 
+> IMHO it is not really worth the churn
+> 
+Hey, your churning at the moment, so I figured you may want to churn some more! ;-)
+just a comment/suggestion; not required.
 
->>> +static struct iommu_group *pci_hierarchy_group(struct pci_dev *pdev)
->> although static, could you provide a function description for its purpose ?
-> 
-> /* Return a group if the upstream hierarchy has isolation restrictions. */
-> 
->>> +	/*
->>> +	 * !self is only for SRIOV virtual busses which should have been
->>> +	 * excluded above.
->> by pci_is_root_bus() ?? -- that checks if bus->parent exists...
->> not sure how that excludes the case of !bus->self ...
-> 
-> Should be this:
-> 
-> 	/*
-> 	 * !self is only for SRIOV virtual busses which should have been
-> 	 * excluded by pci_physfn()
-> 	 */
-> 	if (WARN_ON(!bus->self))
-> 
-my Linux tree says its this:
-static inline bool pci_is_root_bus(struct pci_bus *pbus)
-{
-         return !(pbus->parent);
-}
-
-is there a change to pci_is_root_bus() in a -next branch?
-
->>> +	 */
->>> +	if (WARN_ON(!bus->self))
->>> +		return ERR_PTR(-EINVAL);
->>> +
->>> +	group = iommu_group_get(&bus->self->dev);
->>> +	if (!group) {
->>> +		/*
->>> +		 * If the upstream bridge needs the same group as pdev then
->>> +		 * there is no way for it's pci_device_group() to discover it.
->>> +		 */
->>> +		dev_err(&pdev->dev,
->>> +			"PCI device is probing out of order, upstream bridge device of %s is not probed yet\n",
->>> +			pci_name(bus->self));
->>> +		return ERR_PTR(-EPROBE_DEFER);
->>> +	}
->>> +	if (group->bus_data & BUS_DATA_PCI_NON_ISOLATED)
->>> +		return group;
->>> +	iommu_group_put(group);
->>> +	return NULL;
->> ... and w/o the function description, I don't follow:
->> -- rtn an iommu-group if it has NON_ISOLATED property ... but rtn null if all devices below it are isolated?
-> 
-> Yes. For all these internal functions non null means we found a group
-> to join, NULL means to keep checking isolation rules.
-> 
-ah, so !group == keep looking for for non-isolated conditions.. got it.
-Could that lead to two iommu-groups being created that could/should be one larger one?
-
-> Thanks,
 > Jason
 > 
 
