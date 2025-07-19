@@ -1,171 +1,275 @@
-Return-Path: <kvm+bounces-52942-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52943-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 742ACB0AE80
-	for <lists+kvm@lfdr.de>; Sat, 19 Jul 2025 09:58:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEA6BB0AFA8
+	for <lists+kvm@lfdr.de>; Sat, 19 Jul 2025 14:04:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13EABAA7324
-	for <lists+kvm@lfdr.de>; Sat, 19 Jul 2025 07:58:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1CF251AA4A71
+	for <lists+kvm@lfdr.de>; Sat, 19 Jul 2025 12:05:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E3652343AE;
-	Sat, 19 Jul 2025 07:58:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39A362264B0;
+	Sat, 19 Jul 2025 12:04:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vODRF+kC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SE4leeio"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7BE422D9EB
-	for <kvm@vger.kernel.org>; Sat, 19 Jul 2025 07:58:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BCC32629C;
+	Sat, 19 Jul 2025 12:04:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752911907; cv=none; b=Up5DWgHjGaQO6LsOTnoSA0QX1tFYu0TKaEPJN0BqrTvDOy7fOdklTfZfQwXgBnViBNSfOATSau0ub7KipDAUhMPGi5BrKJXiEZs/23l6dMPp1BjJveO0aZNkFIbpRgIC6gSqZUxM0iy0pLJ/5pqHciNSwoerS8f5VE35cGYuI/I=
+	t=1752926688; cv=none; b=iAQ4xaweYhurLzjQsb1JTHnIMbC80CvB+dAuIErTDSraCHZbq5Fr6uIg4QrTeHvlVDSYjvYdvCqOR6LC3mRFX9ZbXKc8H/ltYAyF+xWgOQ90tSJ3Aizzv/KkoJNjvpLCqwmFpMVSWJdzDJUEVGwQiEd6YkDPuY+ks3jF5jRkXck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752911907; c=relaxed/simple;
-	bh=tJ1uWbUjnxLlGM3QoOhkMA4nYAs8lfUm3ulVKnjtvSU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=In1zsrOL6Ok8U8Y0cfxTrrtIHvh9c99sX40qDJS5hryEV3fk9TkIQ82+ICRlYgK1p6zCY03DlWd7m0o1bnUhxiaWKkHYKt5LwmkZXiv232Zs/fae90JdtE3XGJPQ3JXSgnKsBHzPJV3WZSZ7MJiUePzdZiU+2J3YFaq2HEsxaJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vODRF+kC; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-3a548a73ff2so2567342f8f.0
-        for <kvm@vger.kernel.org>; Sat, 19 Jul 2025 00:58:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752911904; x=1753516704; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=TfRByUZViUlkhtvwbgJ9kqHK2zRV37bvsO8dM/mnyeg=;
-        b=vODRF+kC95FT79zjGsl+L9B3K1IsbTrfSFnd7wsYCj/GmlykdgMt4NaRn3GYHZtrRr
-         pskjfi6iMiM4SZKN6xu7/4E4L8Mf08++LLxiZv3dMYrY+GGNClqi4kfp7VbKGKLyK+9F
-         NMNR73ak2Ui35J5ouqolASqhz6CQxK2lAyzkYKq25vdNSO6AZASgG8/0OZ3XYzDoIjV9
-         GOaPdMvOhsalcO17ySnZXpwAbtNDCzR8T+Ezw+Yry+42pjftTAdM331+GXnBfjVgFqXB
-         NGQyxWtAbgmnt18+m/VR4Vd4dePGXURR9gtCBF2381pKASSgUWS8RrgXjmxOpWjrMwsy
-         QsSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752911904; x=1753516704;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TfRByUZViUlkhtvwbgJ9kqHK2zRV37bvsO8dM/mnyeg=;
-        b=b+bwgobzInA4XqOMWY35hxp3tE03U/igzjshTzYciwfSvGEICcIEzdF0Cw12gWCO8x
-         0w/F7nkH9XyH4Qdd+/khtjd6Oll2BRJK0cFTjr/CmVHAcZ1W6rEIVEsLpEI2SuFwWnLj
-         ok80i5tlz/muNFpGeHz+mA0/t5xvC99eEwpDxD6VwTgTrU95h8Hl0P+WXm2aGgAfav8M
-         PwoP3bwOap2MBzkGvueS77Gy5FbzhlWN4McdFGuS0s1WEyQ2JpvZoCpReX8VArmizqUz
-         ZGTevB18bp/AgeMoVMjzbwUx4IVEVRL+6ByVSCP8yNiXWkQRJx72MJcOKwZISrp08Mb2
-         Lb/g==
-X-Forwarded-Encrypted: i=1; AJvYcCVUhtt5P4mBHCJ9sLcPqIG07QR3fK07baiDWkfeyvHVbeFu858wMs4XvzF+UvvKsJhooB0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yysm40TFQo7+/GlNdMoYbmcOLoe/rbBd9LrFuGbyDQCLukOpb5m
-	FuJ/vcGJkDIuaF0bQSHLWfDaCgTJ2vLoF3ysy5G8Lnvb6QSXqoV5V5lwdcc4XCCTvg==
-X-Gm-Gg: ASbGncve2fVmnKInk2I4YY6v9LLkf9j9nbiDctc99wXuVIkmMQFywqJ42GadCn9KCOU
-	LNvlzxfGIHf7MH9orLcIm59Z7XfvS/4UA6UUxdIOw4lcUMte8ctwfuU+ppa72USoEWV1Yq+PDt9
-	jNW52IvoilaeVxfibiFnmHQdeHvc7tzT1KRuzikggw7tAAdVRFFTXY9KkbGsC1eQcTDaZn7iKvp
-	tq2OGDRDPlT0VmqhuB4q/nufRRbzUdXQ4z7ggtFLpwHI8lybQ1HlpRejsWokPsXw4j5j1rRGACJ
-	EHTBaFIqqz6H4sHTuL2wsavQitLJlJEYgrfa4oYe5sU6mFT4npo3ysg6f0LNue4Ushsb5cREN+z
-	IqdbB0AUjPCCUHLfBrpuvIAVV3ZNg/a7vYzLp54oHOFvLOqzV1u3wNiPlG5CXCJbWE392Vg==
-X-Google-Smtp-Source: AGHT+IH9Zj8Sie+1djBoT8jRSDy8Q+NDwYSbOAjVh0kWnwssstjjIHWaSUiNz3Ecv1vUll7ozzg2eA==
-X-Received: by 2002:a05:6000:42c6:b0:3a3:7115:5e7a with SMTP id ffacd0b85a97d-3b60dd7b0dbmr8359452f8f.42.1752911903972;
-        Sat, 19 Jul 2025 00:58:23 -0700 (PDT)
-Received: from google.com (120.142.205.35.bc.googleusercontent.com. [35.205.142.120])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b61ca2b803sm3923821f8f.19.2025.07.19.00.58.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 19 Jul 2025 00:58:23 -0700 (PDT)
-Date: Sat, 19 Jul 2025 07:58:19 +0000
-From: Keir Fraser <keirf@google.com>
-To: Yao Yuan <yaoyuan0329os@gmail.com>
-Cc: Sean Christopherson <seanjc@google.com>,
-	Yao Yuan <yaoyuan@linux.alibaba.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, Eric Auger <eric.auger@redhat.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2 2/4] KVM: arm64: vgic: Explicitly implement
- vgic_dist::ready ordering
-Message-ID: <aHtQG_k_1q3862s3@google.com>
-References: <20250716110737.2513665-1-keirf@google.com>
- <20250716110737.2513665-3-keirf@google.com>
- <kb7nwrco6s7e6catcareyic72pxvx52jbqbfc5gbqb5zu434kg@w3rrzbut3h34>
- <aHphgd0fOjHXjPCI@google.com>
- <5zpxxmymnyzncdnewdonnglvmvbtggjyxyqvkf6yars2bbyr4b@gottasrtoq2s>
+	s=arc-20240116; t=1752926688; c=relaxed/simple;
+	bh=ke51KIB9NWjtgPYjsJ/LrpJY5gyL7OuTgeKtaW3v/T8=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=NGG9wBu3JlglawZdQWvXxIiTCs67bIdyN+EwneQBB0ohEAULheogvnSzU3Udx2+ALaRtYtMp7PogV3OXwtyVz0nFzIqIFsO7eQ/UunaWwkHwwVxalYBWUa+bl3OC0idROf/NH7QiSONsvSestjdGopMdMLp4D5EmBZYBmGTaO/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SE4leeio; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1694C4CEE3;
+	Sat, 19 Jul 2025 12:04:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752926687;
+	bh=ke51KIB9NWjtgPYjsJ/LrpJY5gyL7OuTgeKtaW3v/T8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=SE4leeiozu7wB4uf4WqS2CUXxWLMC46HIkpRRltIUxVkCTlDEVoC1emo8Xo8yIsAy
+	 0dhrfhlDgucjyo13+4A49w6RsFVfaW7PwljA/NbhufsFEcZMPpV4u9C7wBzNyGn5im
+	 e3B76R4WFhG9XuxEsssZ6J+II07LE/RlfJ1a3ZRcreSLLX00u5j00qfIyU/LwWvxyM
+	 j6BgZfya5faxu+q8PrREUmgfG+bHiO3nduIEXWtw++LKup78baY9tzTGIiDypNe6hH
+	 PzKLe5z6zCzBwaMHJKMbqvGIzYvT7egJ6ZnEcVonRtppAfOixezVLXqPE9TvqXcV4w
+	 sauzbq+Q+F9tw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1ud6J3-00H8ep-6T;
+	Sat, 19 Jul 2025 13:04:45 +0100
+Date: Sat, 19 Jul 2025 13:04:43 +0100
+Message-ID: <87zfd0e690.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Zenghui Yu <yuzenghui@huawei.com>
+Cc: <kvmarm@lists.linux.dev>,
+	<kvm@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton
+	<oliver.upton@linux.dev>,
+	Ricardo Koller <ricarkol@google.com>,
+	Simon Veith
+	<sveith@amazon.de>,
+	Reiji Watanabe <reijiw@google.com>,
+	Colton Lewis
+	<coltonlewis@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	<dwmw2@infradead.org>
+Subject: Re: [PATCH v4 05/20] KVM: arm64: timers: Allow physical offset without CNTPOFF_EL2
+In-Reply-To: <460258be-0102-e922-c342-4e87cd94b9e5@huawei.com>
+References: <20230330174800.2677007-1-maz@kernel.org>
+	<20230330174800.2677007-6-maz@kernel.org>
+	<460258be-0102-e922-c342-4e87cd94b9e5@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5zpxxmymnyzncdnewdonnglvmvbtggjyxyqvkf6yars2bbyr4b@gottasrtoq2s>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, ricarkol@google.com, sveith@amazon.de, reijiw@google.com, coltonlewis@google.com, joey.gouly@arm.com, dwmw2@infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sat, Jul 19, 2025 at 10:15:56AM +0800, Yao Yuan wrote:
-> On Fri, Jul 18, 2025 at 08:00:17AM -0700, Sean Christopherson wrote:
-> > On Thu, Jul 17, 2025, Yao Yuan wrote:
-> > > On Wed, Jul 16, 2025 at 11:07:35AM +0800, Keir Fraser wrote:
-> > > > In preparation to remove synchronize_srcu() from MMIO registration,
-> > > > remove the distributor's dependency on this implicit barrier by
-> > > > direct acquire-release synchronization on the flag write and its
-> > > > lock-free check.
-> > > >
-> > > > Signed-off-by: Keir Fraser <keirf@google.com>
-> > > > ---
-> > > >  arch/arm64/kvm/vgic/vgic-init.c | 11 ++---------
-> > > >  1 file changed, 2 insertions(+), 9 deletions(-)
-> > > >
-> > > > diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-> > > > index 502b65049703..bc83672e461b 100644
-> > > > --- a/arch/arm64/kvm/vgic/vgic-init.c
-> > > > +++ b/arch/arm64/kvm/vgic/vgic-init.c
-> > > > @@ -567,7 +567,7 @@ int kvm_vgic_map_resources(struct kvm *kvm)
-> > > >  	gpa_t dist_base;
-> > > >  	int ret = 0;
-> > > >
-> > > > -	if (likely(dist->ready))
-> > > > +	if (likely(smp_load_acquire(&dist->ready)))
-> > > >  		return 0;
-> > > >
-> > > >  	mutex_lock(&kvm->slots_lock);
-> > > > @@ -598,14 +598,7 @@ int kvm_vgic_map_resources(struct kvm *kvm)
-> > > >  		goto out_slots;
-> > > >  	}
-> > > >
-> > > > -	/*
-> > > > -	 * kvm_io_bus_register_dev() guarantees all readers see the new MMIO
-> > > > -	 * registration before returning through synchronize_srcu(), which also
-> > > > -	 * implies a full memory barrier. As such, marking the distributor as
-> > > > -	 * 'ready' here is guaranteed to be ordered after all vCPUs having seen
-> > > > -	 * a completely configured distributor.
-> > > > -	 */
-> > > > -	dist->ready = true;
-> > > > +	smp_store_release(&dist->ready, true);
-> > >
-> > > No need the store-release and load-acquire for replacing
-> > > synchronize_srcu_expedited() w/ call_srcu() IIUC:
-> >
-> > This isn't about using call_srcu(), because it's not actually about kvm->buses.
-> > This code is concerned with ensuring that all stores to kvm->arch.vgic are ordered
-> > before the store to set kvm->arch.vgic.ready, so that vCPUs never see "ready==true"
-> > with a half-baked distributor.
-> >
-> > In the current code, kvm_vgic_map_resources() relies on the synchronize_srcu() in
-> > kvm_io_bus_register_dev() to provide the ordering guarantees.  Switching to
-> > smp_store_release() + smp_load_acquire() removes the dependency on the
-> > synchronize_srcu() so that the synchronize_srcu() call can be safely removed.
+On Wed, 09 Jul 2025 09:12:18 +0100,
+Zenghui Yu <yuzenghui@huawei.com> wrote:
 > 
-> Yes, I understand this and agree with your point.
+> [ Record some interesting bits noticed while testing
+>   arch_timer_edge_cases. ]
 > 
-> Just for discusstion: I thought it should also work even w/o
-> introduce the load acqure + store release after switch to
-> call_srcu(): The smp_mb() in call_srcu() order the all store
-> to kvm->arch.vgic before store kvm->arch.vgic.ready in
-> current implementation.
+> On 2023/3/31 1:47, Marc Zyngier wrote:
+> > CNTPOFF_EL2 is awesome, but it is mostly vapourware, and no publicly
+> > available implementation has it. So for the common mortals, let's
+> > implement the emulated version of this thing.
+> > 
+> > It means trapping accesses to the physical counter and timer, and
+> > emulate some of it as necessary.
+> > 
+> > As for CNTPOFF_EL2, nobody sets the offset yet.
+> > 
+> > Reviewed-by: Colton Lewis <coltonlewis@google.com>
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/sysreg.h    |  2 +
+> >  arch/arm64/kvm/arch_timer.c        | 98 +++++++++++++++++++++++-------
+> >  arch/arm64/kvm/hyp/nvhe/timer-sr.c | 18 ++++--
+> >  arch/arm64/kvm/sys_regs.c          |  9 +++
+> >  4 files changed, 98 insertions(+), 29 deletions(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> > index 9e3ecba3c4e6..f8da9e1b0c11 100644
+> > --- a/arch/arm64/include/asm/sysreg.h
+> > +++ b/arch/arm64/include/asm/sysreg.h
+> > @@ -388,6 +388,7 @@
+> >  
+> >  #define SYS_CNTFRQ_EL0			sys_reg(3, 3, 14, 0, 0)
+> >  
+> > +#define SYS_CNTPCT_EL0			sys_reg(3, 3, 14, 0, 1)
+> >  #define SYS_CNTPCTSS_EL0		sys_reg(3, 3, 14, 0, 5)
+> >  #define SYS_CNTVCTSS_EL0		sys_reg(3, 3, 14, 0, 6)
+> >  
+> > @@ -400,6 +401,7 @@
+> >  
+> >  #define SYS_AARCH32_CNTP_TVAL		sys_reg(0, 0, 14, 2, 0)
+> >  #define SYS_AARCH32_CNTP_CTL		sys_reg(0, 0, 14, 2, 1)
+> > +#define SYS_AARCH32_CNTPCT		sys_reg(0, 0, 0, 14, 0)
+> >  #define SYS_AARCH32_CNTP_CVAL		sys_reg(0, 2, 0, 14, 0)
+> >  
+> >  #define __PMEV_op2(n)			((n) & 0x7)
+> > diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> > index 3118ea0a1b41..bb64a71ae193 100644
+> > --- a/arch/arm64/kvm/arch_timer.c
+> > +++ b/arch/arm64/kvm/arch_timer.c
+> > @@ -458,6 +458,8 @@ static void timer_save_state(struct arch_timer_context *ctx)
+> >  		goto out;
+> >  
+> >  	switch (index) {
+> > +		u64 cval;
+> > +
+> >  	case TIMER_VTIMER:
+> >  		timer_set_ctl(ctx, read_sysreg_el0(SYS_CNTV_CTL));
+> >  		timer_set_cval(ctx, read_sysreg_el0(SYS_CNTV_CVAL));
+> > @@ -485,7 +487,12 @@ static void timer_save_state(struct arch_timer_context *ctx)
+> >  		break;
+> >  	case TIMER_PTIMER:
+> >  		timer_set_ctl(ctx, read_sysreg_el0(SYS_CNTP_CTL));
+> > -		timer_set_cval(ctx, read_sysreg_el0(SYS_CNTP_CVAL));
+> > +		cval = read_sysreg_el0(SYS_CNTP_CVAL);
+> > +
+> > +		if (!has_cntpoff())
+> > +			cval -= timer_get_offset(ctx);
+> > +
+> > +		timer_set_cval(ctx, cval);
+> >  
+> >  		/* Disable the timer */
+> >  		write_sysreg_el0(0, SYS_CNTP_CTL);
+> > @@ -555,6 +562,8 @@ static void timer_restore_state(struct arch_timer_context *ctx)
+> >  		goto out;
+> >  
+> >  	switch (index) {
+> > +		u64 cval, offset;
+> > +
+> >  	case TIMER_VTIMER:
+> >  		set_cntvoff(timer_get_offset(ctx));
+> >  		write_sysreg_el0(timer_get_cval(ctx), SYS_CNTV_CVAL);
+> > @@ -562,8 +571,12 @@ static void timer_restore_state(struct arch_timer_context *ctx)
+> >  		write_sysreg_el0(timer_get_ctl(ctx), SYS_CNTV_CTL);
+> >  		break;
+> >  	case TIMER_PTIMER:
+> > -		set_cntpoff(timer_get_offset(ctx));
+> > -		write_sysreg_el0(timer_get_cval(ctx), SYS_CNTP_CVAL);
+> > +		cval = timer_get_cval(ctx);
+> > +		offset = timer_get_offset(ctx);
+> > +		set_cntpoff(offset);
+> > +		if (!has_cntpoff())
+> > +			cval += offset;
+> > +		write_sysreg_el0(cval, SYS_CNTP_CVAL);
+> >  		isb();
+> >  		write_sysreg_el0(timer_get_ctl(ctx), SYS_CNTP_CTL);
+> >  		break;
+> 
+> I tested arch_timer_edge_cases on my Kunpeng920 (has VHE, doesn't have
+> ECV) and noticed that the test_timer_cval() below takes a long period to
+> return when testing the _physical_ timer.
+> 
+> static void test_timers_in_the_past(enum arch_timer timer)
+> {
+> 	[...]
+> 
+> 	for (i = 0; i < ARRAY_SIZE(irq_wait_method); i++) {
+> 		irq_wait_method_t wm = irq_wait_method[i];
+> 
+> 		[...]
+> 
+> 		/* Set a timer to counter=0 (in the past) */
+> 		test_timer_cval(timer, 0, wm, DEF_CNT);
+> 
+> The comment is obviously wrong. It should say "Set a timer to CVAL=0".
+> 
+> No physical timer interrupt ("kvm guest ptimer") was triggered when I
+> executed it separately.
+> 
+> Let me try to explain _this_ test_timer_cval() in a bit more detail.
+> 
+> |Guest					KVM
+> |-----					---
+> |local_irq_disable()
+> |
+> |reset_timer_state()
+> |   set_counter()			// SET_ONE_REG via user-space
+> |					// for KVM_REG_ARM_PTIMER_CNT
+> |					kvm_arm_timer_set_reg()
+> |					   timer_set_offset()      [1]
+> |   timer_set_ctl()
+> |      MSR CNTP_CTL_EL0, IMASK
+> |
+> |set_xval_irq()
+> |   timer_set_cval()
+> |      MSR CNTP_CVAL_EL0, cval=0
+> |   timer_set_ctl()
+> |      MSR CNTP_CTL_EL0, ENABLE		// trap
+> |					kvm_arm_timer_write_sysreg()
+> |					   timer_save_state()
+> |					   kvm_arm_timer_write()
+> |					   timer_restore_state()   [2]
+> |
+> |/* This method re-enables IRQs to handle the one we're looking for. */
+> |wm()
+> |
+> |assert_irqs_handled(1)
+> |local_irq_enable()
+> 
+> [1] kvm_phys_timer_read()			= 0x7895c0ab2
+>     value					= 0x7fffffffffffff
+>     offset = kvm_phys_timer_read() - value	= 0xff800007895c0ab3
+> 
+> ... which was observed in my test.
 
-The load-acquire would still be required, to ensure that accesses to
-kvm->arch.vgic do not get reordered earlier than the lock-free check
-of kvm->arch.vgic.ready. Otherwise that CPU could see that the vgic is
-initialised, but then use speculated reads of uninitialised vgic state.
+I think this denotes the same problem that was "fixed" in this test
+recently: the arithmetic in the kernel is done on a 64bit value, while
+we have no idea what the number of significant bits actually is. We
+therefore end-up with some outlandish values, and since the timer is
+more or less emulated, we end-up doing the wrong thing.
 
-> >
+> 
+> [2] cval += offset;			// cval	= 0xff800007895c0ab3
+>     kvm_phys_timer_read()			= 0x7895c1b86
+> 
+> No ptimer interrupt was triggered with that. And we relied on the next
+> kvm_timer_vcpu_load() to catch the timer expiration and inject an
+> interrupt to the guest..
+> 
+> It's apparent that this test case is not a practical use case. Not sure
+> if we should (/can) emulate it properly. Or I may have already missed
+> some obvious points.
+
+Overall, I think the "set a counter value to compute an offset"
+paradigm isn't really practical when we get to the limits. At least,
+the VM_COUNTER_OFFSET approach is consistent, and avoids the above
+calculations.
+
+I really wish someone would teach QEMU to use it (and maybe even add a
+test for it...).
+
+Thanks,
+
+	M.
+
+-- 
+Jazz isn't dead. It just smells funny.
 
