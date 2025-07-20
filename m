@@ -1,97 +1,147 @@
-Return-Path: <kvm+bounces-52952-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52953-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F9C4B0B454
-	for <lists+kvm@lfdr.de>; Sun, 20 Jul 2025 10:51:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EEF9B0B4DF
+	for <lists+kvm@lfdr.de>; Sun, 20 Jul 2025 12:22:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 496883BF8E7
-	for <lists+kvm@lfdr.de>; Sun, 20 Jul 2025 08:50:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8AB983BD3E1
+	for <lists+kvm@lfdr.de>; Sun, 20 Jul 2025 10:22:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 936971E51FA;
-	Sun, 20 Jul 2025 08:51:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30D8F1F1306;
+	Sun, 20 Jul 2025 10:22:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RIRDrwj9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LR/nh38i"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7774125D6;
-	Sun, 20 Jul 2025 08:51:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51F8E3BB48;
+	Sun, 20 Jul 2025 10:22:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753001466; cv=none; b=swhRD+McGWamFnGPyeEHfx9k5oeD3hhXi+GDBY+bwHbC5iDki0CrYsGG//1njU2TAG3xFTDrOAGk0WKqegbH+jNibr7Z14897jGotTQhXHwqkAYSaSQnQu7MbAI1w4hKhFnupJVE+vQXiHT82EA5oh+4UyTj4Nrxl6XqJj4LCsM=
+	t=1753006961; cv=none; b=byP/GDh2KODUdnYLYQGnIw9Lzwq4VfqiefXxDUZZuuVPPRGfeihrPFuEVk7OwiALJPoSvrsWAzuzhCO0cI0nO/iXhgZisG91SSNbXEOKhTJd/hBFHFJMcL+fx0PC4mcF0O5ix99B82XWqW3Kbm2I2nEidWjqv9vutc5ScbMHCJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753001466; c=relaxed/simple;
-	bh=J/rvTA/jVuJbWTmukEQlcZNGdobpB8JKqXpVtDqlIs4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AjDNq+gCOYv8IC0cKUiJMmS9Y9zTw6w/QnPKjkmVwvYW3A/RhrltKKzyuvRGmprDYbL2MHRFeJnyUf4Mpd0EGh3EMco9zY5UxuKQ34RUZIVf4ZB4o8AGMg/Z+HGtkpqNEwshavz4IHsoa59VoR/QPDPyLObBOttWtIvWd/g+kBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RIRDrwj9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A112C4CEE7;
-	Sun, 20 Jul 2025 08:51:06 +0000 (UTC)
+	s=arc-20240116; t=1753006961; c=relaxed/simple;
+	bh=VpZbHWYgkCPsYBiMifOdXB7lfxAfU+gfPFO1mJoJXAI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=KssVlwQOjQx+VttBA3sdgWLyVS1rN87KDEYvPGj6ijjObxbGlVh41oVhcGDN3MFXL6MnyxOFE6EUp4dnhN+kQ6BWSC0ZpuoSl6iyuAIni/Da7DhYBpMgyUB99Tu1DplrIX4A58adVDD7IzCf2EkLjCanDK/mktKuRUYqJbY4++o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LR/nh38i; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 287A9C4CEE7;
+	Sun, 20 Jul 2025 10:22:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753001466;
-	bh=J/rvTA/jVuJbWTmukEQlcZNGdobpB8JKqXpVtDqlIs4=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=RIRDrwj9pdMyhOlDbz+oMbMYScGSjwW6AWvNA49OnBKK1NGliFK/uZAALHCBZpShd
-	 bN1YmhWO5vRqBOg5fyaeTtxwm9kIoiwobFhKwT/HQXpiDe3e9GgCxjWtV2Hu2o8Z+6
-	 nd2aZxG4quV8ngHBa+o+q3it8TiKy5anF7vYZIhMmZVjAOSgYXYzuebE05/7ets7HC
-	 EnP9s0zkDbRhTPQZ5PkyvRxNrL5W1DH/vn07/B7I+cI/eLr4vbpOYaK8cvDVtrgzqH
-	 y9awgRieWZQEqe9hkzAEX4IsZv+pzRqkTbDBoUZo09ktXJucZrWHR2pasMXQFFvY0A
-	 nS0cdcWd3QcYg==
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-6097d144923so7339253a12.1;
-        Sun, 20 Jul 2025 01:51:06 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUaSvwA7rWNw8fw21/VnFlI9vA3H4yXJzHudw57kcVkAd6T8mQ6+0tG7tapOoP1iUyTIEbewevVE7zBYb7h@vger.kernel.org, AJvYcCWlxiEyHIA/pNp9xAKzRSe1zAXsYA7z6dlwSGKb7qHwuUWgi4131GE465ErWZX0rtqm64s=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy68A0R26/lwJWzotlhSlrgdYQOqlo0Iz05PI6MS/WNWVRGFaXH
-	jchcrgEYvpT31U/9ch3TAwr8EDio2dQ6i35utoSUNKLBdFOtFzuDuF3m8y/XQSPNBjYy+Tf7Ng8
-	2hW+RY/Idz/0Hmq2cFOzxHv+8Q771CuA=
-X-Google-Smtp-Source: AGHT+IEekYjhbbbLsayWGO6yVvrLqKRoOKVGGoHcBf1eDQ74XzFA7hmcyVBlCaoveLApmim4pjfmJrwCvzU0OHFsXic=
-X-Received: by 2002:a05:6402:3484:b0:612:b6aa:783e with SMTP id
- 4fb4d7f45d1cf-612b6aa81ddmr9149250a12.11.1753001464967; Sun, 20 Jul 2025
- 01:51:04 -0700 (PDT)
+	s=k20201202; t=1753006961;
+	bh=VpZbHWYgkCPsYBiMifOdXB7lfxAfU+gfPFO1mJoJXAI=;
+	h=From:To:Cc:Subject:Date:From;
+	b=LR/nh38iNvbpoq3ZhjVChs/kEPTbSrQ5C0G6YuoH0DL1QQhe4qvdPu1ZD3SXi7iSQ
+	 y0VWHkw+xBAv+JW3grp5ML+5y17yBTHFvw7Ps7Uhtgs6EK1pe5S8/eJWim+47Z8VRt
+	 dPFBPfM/AICssAE2YuHMStTczw60L0Rggqab1syQJc6BSMfiMn9j7sCaIxXqWYbYO0
+	 2btb6KBWCAXBv6C+c87q5FhC7zWq0jP1EWkjIKwLibcbBWSC1QZpcRgWFjGDjcrgmV
+	 2Ju9M+O7y8I2Ym8CPrfOQK5fBRWIgV3Jgv6U+cHbbOsJND5Ly5biQuc61VOP4LRYnj
+	 cLgI+kEaCueZw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1udRBm-00HIBV-Ox;
+	Sun, 20 Jul 2025 11:22:38 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Mark Brown <broonie@kernel.org>,
+	stable@vger.kernel.org
+Subject: [PATCH] KVM: arm64: Check for SYSREGS_ON_CPU before accessing the CPU state
+Date: Sun, 20 Jul 2025 11:22:29 +0100
+Message-Id: <20250720102229.179114-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250716165929.22386-1-yury.norov@gmail.com>
-In-Reply-To: <20250716165929.22386-1-yury.norov@gmail.com>
-From: Huacai Chen <chenhuacai@kernel.org>
-Date: Sun, 20 Jul 2025 16:50:52 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H4yxH0qHA5V4dwSrU3nTFYBzRVQa2z-a0fScj7pkSesWQ@mail.gmail.com>
-X-Gm-Features: Ac12FXyW1wh1OZXBKreWa8iIshHa85Cc2VH4ySoj1iJikvxE9vBhn9liOhOoTnk
-Message-ID: <CAAhV-H4yxH0qHA5V4dwSrU3nTFYBzRVQa2z-a0fScj7pkSesWQ@mail.gmail.com>
-Subject: Re: [PATCH 0/2] LoongArch: KVM: simplify KVM routines
-To: Yury Norov <yury.norov@gmail.com>
-Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
-	WANG Xuerui <kernel@xen0n.name>, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, broonie@kernel.org, stable@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Applied, thanks.
+Mark Brown reports that since we commit to making exceptions
+visible without the vcpu being loaded, the external abort selftest
+fails.
 
-Huacai
+Upon investigation, it turns out that the code that makes registers
+affected by an exception visible to the guest is completely broken
+on VHE, as we don't check whether the system registers are loaded
+on the CPU at this point. We managed to get away with this so far,
+but that's obviously as bad as it gets,
 
-On Thu, Jul 17, 2025 at 12:59=E2=80=AFAM Yury Norov <yury.norov@gmail.com> =
-wrote:
->
-> From: Yury Norov (NVIDIA) <yury.norov@gmail.com>
->
-> Switch KVM functions to use a proper bitmaps API.
->
-> Yury Norov (NVIDIA) (2):
->   LoongArch: KVM: rework kvm_send_pv_ipi()
->   LoongArch: KVM:: simplify kvm_deliver_intr()
->
->  arch/loongarch/kvm/exit.c      | 31 ++++++++++++-------------------
->  arch/loongarch/kvm/interrupt.c | 23 +++--------------------
->  2 files changed, 15 insertions(+), 39 deletions(-)
->
-> --
-> 2.43.0
->
+Add the required checksm and document the absolute need to check
+for the SYSREGS_ON_CPU flag before calling into any of the
+__vcpu_write_sys_reg_to_cpu()__vcpu_read_sys_reg_from_cpu() helpers.
+
+Reported-by: Mark Brown <broonie@kernel.org>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Cc: stable@vger.kernel.org
+Link: https://lore.kernel.org/r/18535df8-e647-4643-af9a-bb780af03a70@sirena.org.uk
+---
+ arch/arm64/include/asm/kvm_host.h | 4 ++++
+ arch/arm64/kvm/hyp/exception.c    | 6 ++++--
+ 2 files changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index df9c1e1e52025..831cec0e1239e 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -1169,6 +1169,8 @@ static inline bool __vcpu_read_sys_reg_from_cpu(int reg, u64 *val)
+ 	 * System registers listed in the switch are not saved on every
+ 	 * exit from the guest but are only saved on vcpu_put.
+ 	 *
++	 * SYSREGS_ON_CPU *MUST* be checked before using this helper.
++	 *
+ 	 * Note that MPIDR_EL1 for the guest is set by KVM via VMPIDR_EL2 but
+ 	 * should never be listed below, because the guest cannot modify its
+ 	 * own MPIDR_EL1 and MPIDR_EL1 is accessed for VCPU A from VCPU B's
+@@ -1221,6 +1223,8 @@ static inline bool __vcpu_write_sys_reg_to_cpu(u64 val, int reg)
+ 	 * System registers listed in the switch are not restored on every
+ 	 * entry to the guest but are only restored on vcpu_load.
+ 	 *
++	 * SYSREGS_ON_CPU *MUST* be checked before using this helper.
++	 *
+ 	 * Note that MPIDR_EL1 for the guest is set by KVM via VMPIDR_EL2 but
+ 	 * should never be listed below, because the MPIDR should only be set
+ 	 * once, before running the VCPU, and never changed later.
+diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
+index 7dafd10e52e8c..95d186e0bf54f 100644
+--- a/arch/arm64/kvm/hyp/exception.c
++++ b/arch/arm64/kvm/hyp/exception.c
+@@ -26,7 +26,8 @@ static inline u64 __vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
+ 
+ 	if (unlikely(vcpu_has_nv(vcpu)))
+ 		return vcpu_read_sys_reg(vcpu, reg);
+-	else if (__vcpu_read_sys_reg_from_cpu(reg, &val))
++	else if (vcpu_get_flag(vcpu, SYSREGS_ON_CPU) &&
++		 __vcpu_read_sys_reg_from_cpu(reg, &val))
+ 		return val;
+ 
+ 	return __vcpu_sys_reg(vcpu, reg);
+@@ -36,7 +37,8 @@ static inline void __vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
+ {
+ 	if (unlikely(vcpu_has_nv(vcpu)))
+ 		vcpu_write_sys_reg(vcpu, val, reg);
+-	else if (!__vcpu_write_sys_reg_to_cpu(val, reg))
++	else if (!vcpu_get_flag(vcpu, SYSREGS_ON_CPU) ||
++		 !__vcpu_write_sys_reg_to_cpu(val, reg))
+ 		__vcpu_assign_sys_reg(vcpu, reg, val);
+ }
+ 
+-- 
+2.39.2
+
 
