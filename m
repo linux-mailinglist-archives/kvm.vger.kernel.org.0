@@ -1,97 +1,117 @@
-Return-Path: <kvm+bounces-52957-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52958-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1B41B0BE0F
-	for <lists+kvm@lfdr.de>; Mon, 21 Jul 2025 09:49:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F17BB0C0D5
+	for <lists+kvm@lfdr.de>; Mon, 21 Jul 2025 12:07:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A4FE2188E683
-	for <lists+kvm@lfdr.de>; Mon, 21 Jul 2025 07:49:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6ABE8189F289
+	for <lists+kvm@lfdr.de>; Mon, 21 Jul 2025 10:08:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22F3A27F4CE;
-	Mon, 21 Jul 2025 07:49:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E411028D8DD;
+	Mon, 21 Jul 2025 10:07:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KTpHwn2D"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LZmvYwc8"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AB91DF49
-	for <kvm@vger.kernel.org>; Mon, 21 Jul 2025 07:49:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73CCE18FC91;
+	Mon, 21 Jul 2025 10:07:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753084157; cv=none; b=FqAQtzdk4h//TCtrqT7U1UuCy2IPnhShx0LnE9Wen2Mt0qX7pnsMf4X8jA/gV5O+gnU0P4GeEKY8RxbRr1olD9H6ZYpA5swnWYKhIsmSK2Js32OhWAD7uAd4Vf/HavCp8Nd/sop1axAg3Zn5V5MVrJIRTnluy0ywt0rEJ7gl6fI=
+	t=1753092465; cv=none; b=Ta/PfsL3aCv/uCGgKAaI3ZqA+c5W0W4RTwjBXqvNJDAihFuZMeOeF1pBxbWppngSiPvpQMB/k3LZLjfAIBhA9I0IV2nZ/N3+lJVEiD3IcM8AuTH0Vp3fhGoNAJyfpXjFNXlH5MbHxSxjOkgBueMn7ji8ui5JcOPGb0GzJqjjqqk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753084157; c=relaxed/simple;
-	bh=VOtCbcVt0gGNHLvbj63WBHKbZ6X+uMuPLPPZJmm635U=;
+	s=arc-20240116; t=1753092465; c=relaxed/simple;
+	bh=gnT7JnKbIZTs1/DF9F99GY/6ioIc4Qm9hwZlyLDRQAE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E6WuRFc9IInluYMI0gv7aAMdCyNnt3QkdITUcrrVI+qsKK9d8Zjnrh2N0Qlb5fXl/MlcY5XDGnNsnF6dZtZOOjrj2lBw0FaEW7Ic6UeOWm5TC9pBpKya9QUu5Ekp8AOsV53U30nrb/5yH3pcwULMBdyu4vD4bXayjScFHlXi+Co=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KTpHwn2D; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-3a4ef2c2ef3so3001618f8f.2
-        for <kvm@vger.kernel.org>; Mon, 21 Jul 2025 00:49:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753084154; x=1753688954; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=kKg1W6M4USiwNTbJCkdBvx9IOQ14GKTE6DwJxmpiYlk=;
-        b=KTpHwn2D1V731ECf6Svpzs8L3US8IIPvQM7jN5YHCcM4xOnSonU97lkyz66kQ04K+q
-         EZYGMtF3wLuOS/r20L05itNE3IiKgPd3jw0rFCMbqeJTDe8YPaG0i9lfMH0LcGg+d4Vr
-         fdSKAECmCx7xu8EUu7cNG5xVK+IyO8X+tzMhrfDId9yqqee0Z2O+uSFxWdVhOgZgnf1l
-         T9Q/VeHzUvlpk7TMdBDfKzo6BsQI+kuZMR4An5hLjoNbv8hY61hH/yyL01wzxmRZnF18
-         Ni+Ob8IkZmBIOiQUZ54HhaizjqO4kJ8M7GqjHQdd011pQIiFfDkuUZshJakUpoFJZxtO
-         joSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753084154; x=1753688954;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kKg1W6M4USiwNTbJCkdBvx9IOQ14GKTE6DwJxmpiYlk=;
-        b=qsyVBgwgPIYmDCoHvC+ROt1kKVEilBJO0dUmEObUD7FX4YlLj6ZH2ctAFjfjV0cRl2
-         LQyZp4N6pd1/jX6Uld2gFi27bpwaQeEZZQ6GbTvxetFvLYuMOUdMmzNC2VF4b1F+I7O8
-         YNwRX5bx+Dfd4R+pTpnRjnnPJJS0xSfnv3ca34ya6SWAkRU1wacT5S7P90RwAVay0qBE
-         sf27LUyvnVfqHo4Sdeh2XypebK86Ijo7vlDsT4led2yK5PLP+6/GnMTxGGPn0A6OQuO1
-         1cXECGkJBCOrDdggOvL5/OCB4b7zoIg1xZQVwpi+cUixUZVm9uwaM5sfQIx6jpEu4OqM
-         6lYg==
-X-Forwarded-Encrypted: i=1; AJvYcCUx/a0NRY3TYsoK9TTNXPJ1i8hLLVAQW22ecvJ5VpAz6oaDJHc6lnRsm7IFWTMAkVboG9g=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz1P3VKs0Npus6wVx2MmyMKthBmUUd5RDquGX/HQkSUA6lximqw
-	yQJiZbQhiNk26pTF36J3jZ/3U/bOan9kbh0LgrTovYNZWlf07RmZvoL3S7syvLbQUQ==
-X-Gm-Gg: ASbGnctYhrxH8nLBqrvNeHZ+BqF/HFQ8pBtLIdZyV+Bkdnw7A0v/3tMpLcekR3XwfK/
-	g2ONtsUFh+7IHnibRyVWYmIU1nEF+QGEVB3ctBYPIB3pn2C+O3a/2aTEHTvJuf/cTl6U10X/WCZ
-	34ReYlRwi8YVQO+2t2+KtQlLTdK8GwZSAJWejXOj7XG5HFe+8P7kmcO79eqcdCeQmzvtAZ386+y
-	cidKi/CULihkPiH+zWxANcg4c4Rx2TDoesuEvjcP8zGoEWvFoKiEpmmpNCq+OByIlrk7o5wXdET
-	xeMV5oLUHH5+9l9y9VFQ7Ry46GR7QEw86ByKceHGd2vlAs4MlPEQyyXuC+krHY8WSNf922PwbHG
-	BHFxNKZlKQ4VH/ShUQ8AhEQJLBhtiDv0wSmjXivkdExqr53WgXXJQX6HI+tFiwh+lot74IA==
-X-Google-Smtp-Source: AGHT+IHLCPN08G76cpeAjmGFh2SwOYUq7PKTpI10Q0DJaIHMug/5GI7V+ike5MmSquAW5czvaJ/6xw==
-X-Received: by 2002:a05:6000:2902:b0:3a4:f038:af74 with SMTP id ffacd0b85a97d-3b60e518418mr15229224f8f.51.1753084153650;
-        Mon, 21 Jul 2025 00:49:13 -0700 (PDT)
-Received: from google.com (120.142.205.35.bc.googleusercontent.com. [35.205.142.120])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b61ca4894asm9640037f8f.49.2025.07.21.00.49.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Jul 2025 00:49:13 -0700 (PDT)
-Date: Mon, 21 Jul 2025 07:49:10 +0000
-From: Keir Fraser <keirf@google.com>
-To: Yao Yuan <yaoyuan0329os@gmail.com>
-Cc: Sean Christopherson <seanjc@google.com>,
-	Yao Yuan <yaoyuan@linux.alibaba.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, Eric Auger <eric.auger@redhat.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2 2/4] KVM: arm64: vgic: Explicitly implement
- vgic_dist::ready ordering
-Message-ID: <aH3w9t78dvxsDjhV@google.com>
-References: <20250716110737.2513665-1-keirf@google.com>
- <20250716110737.2513665-3-keirf@google.com>
- <kb7nwrco6s7e6catcareyic72pxvx52jbqbfc5gbqb5zu434kg@w3rrzbut3h34>
- <aHphgd0fOjHXjPCI@google.com>
- <5zpxxmymnyzncdnewdonnglvmvbtggjyxyqvkf6yars2bbyr4b@gottasrtoq2s>
- <aHtQG_k_1q3862s3@google.com>
- <4i65mgp4rtfox2ttchamijofcmwjtd6sefmuhdkfdrjwaznhoc@2uhcfv2ziegj>
+	 Content-Type:Content-Disposition:In-Reply-To; b=WgoGoi4PtMkt5JzP9squ9EnYqJ5tmaRV5WdwVcWN8CnZ8NSY84WldjnJ52DxTwzNDaxvqfBsp5fQEfmfSzVAT9h712Z4kOVPWCo76rUFAubE3u4MFU5Dc6wgZLGW5nqsy+QcNsiMRW5mPYP6XS6ar+NFaS3FuYB4MJUdBF+Rt8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LZmvYwc8; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1753092463; x=1784628463;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=gnT7JnKbIZTs1/DF9F99GY/6ioIc4Qm9hwZlyLDRQAE=;
+  b=LZmvYwc8XdoHIpYGcLD0h2L/Hj8hqcTBrUJTu7YmpSsfQw/7/Bj5dsWf
+   FsnlUwyU4ptuarrOMK//1j00VsCFu/6EU14WSFNW4mXTueRUMGfpv9SUg
+   Ov3d6xWfgeW4ErbYMv2WSPjKdkqAwHGFL/D6914z2LCmrQeWIdyZRetFG
+   BqLeIt9D6NJyX2rvwLd4XTF96Dfc6yHqJcEslKqRrWJRuAvZVNV3NKT5g
+   5MC5oniP790LkiCv8kDFZ0nLQgKu6PY4jy259JfhGa+11Ylsdsr6qNxTY
+   c3Upg9TmmsKN/Lb5zaLU7r1MBQHEe7pRLtQGhhkgUSV1KXB529Al/tYX1
+   Q==;
+X-CSE-ConnectionGUID: kInq72B6Qx67LXght0wPKA==
+X-CSE-MsgGUID: ZYosuag7Tnia8xVauTpl7A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11498"; a="66649594"
+X-IronPort-AV: E=Sophos;i="6.16,328,1744095600"; 
+   d="scan'208";a="66649594"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2025 03:07:42 -0700
+X-CSE-ConnectionGUID: lZvV7H2ySFeJpzJ+XwtoCw==
+X-CSE-MsgGUID: n/AN5tG9TNmXrKtBqI9eZg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,328,1744095600"; 
+   d="scan'208";a="158110405"
+Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
+  by orviesa010.jf.intel.com with ESMTP; 21 Jul 2025 03:07:22 -0700
+Date: Mon, 21 Jul 2025 17:58:30 +0800
+From: Xu Yilun <yilun.xu@linux.intel.com>
+To: Ira Weiny <ira.weiny@intel.com>
+Cc: Ackerley Tng <ackerleytng@google.com>, Yan Zhao <yan.y.zhao@intel.com>,
+	Vishal Annapurve <vannapurve@google.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Alexey Kardashevskiy <aik@amd.com>,
+	Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
+	linux-mm@kvack.org, linux-kernel@vger.kernel.org, x86@kernel.org,
+	linux-fsdevel@vger.kernel.org, ajones@ventanamicro.com,
+	akpm@linux-foundation.org, amoorthy@google.com,
+	anthony.yznaga@oracle.com, anup@brainfault.org,
+	aou@eecs.berkeley.edu, bfoster@redhat.com,
+	binbin.wu@linux.intel.com, brauner@kernel.org,
+	catalin.marinas@arm.com, chao.p.peng@intel.com,
+	chenhuacai@kernel.org, dave.hansen@intel.com, david@redhat.com,
+	dmatlack@google.com, dwmw@amazon.co.uk, erdemaktas@google.com,
+	fan.du@intel.com, fvdl@google.com, graf@amazon.com,
+	haibo1.xu@intel.com, hch@infradead.org, hughd@google.com,
+	isaku.yamahata@intel.com, jack@suse.cz, james.morse@arm.com,
+	jarkko@kernel.org, jgowans@amazon.com, jhubbard@nvidia.com,
+	jroedel@suse.de, jthoughton@google.com, jun.miao@intel.com,
+	kai.huang@intel.com, keirf@google.com, kent.overstreet@linux.dev,
+	kirill.shutemov@intel.com, liam.merwick@oracle.com,
+	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name,
+	maz@kernel.org, mic@digikod.net, michael.roth@amd.com,
+	mpe@ellerman.id.au, muchun.song@linux.dev, nikunj@amd.com,
+	nsaenz@amazon.es, oliver.upton@linux.dev, palmer@dabbelt.com,
+	pankaj.gupta@amd.com, paul.walmsley@sifive.com, pbonzini@redhat.com,
+	pdurrant@amazon.co.uk, peterx@redhat.com, pgonda@google.com,
+	pvorel@suse.cz, qperret@google.com, quic_cvanscha@quicinc.com,
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com,
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com,
+	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com,
+	richard.weiyang@gmail.com, rick.p.edgecombe@intel.com,
+	rientjes@google.com, roypat@amazon.co.uk, rppt@kernel.org,
+	seanjc@google.com, shuah@kernel.org, steven.price@arm.com,
+	steven.sistare@oracle.com, suzuki.poulose@arm.com,
+	thomas.lendacky@amd.com, usama.arif@bytedance.com, vbabka@suse.cz,
+	viro@zeniv.linux.org.uk, vkuznets@redhat.com, wei.w.wang@intel.com,
+	will@kernel.org, willy@infradead.org, xiaoyao.li@intel.com,
+	yilun.xu@intel.com, yuzenghui@huawei.com, zhiquan1.li@intel.com
+Subject: Re: [RFC PATCH v2 04/51] KVM: guest_memfd: Introduce
+ KVM_GMEM_CONVERT_SHARED/PRIVATE ioctls
+Message-ID: <aH4PRnuztKTqgEYo@yilunxu-OptiPlex-7050>
+References: <CAGtprH_Evyc7tLhDB0t0fN+BUx5qeqWq8A2yZ5-ijbJ5UJ5f-g@mail.gmail.com>
+ <9502503f-e0c2-489e-99b0-94146f9b6f85@amd.com>
+ <20250624130811.GB72557@ziepe.ca>
+ <CAGtprH_qh8sEY3s-JucW3n1Wvoq7jdVZDDokvG5HzPf0HV2=pg@mail.gmail.com>
+ <aGTvTbPHuXbvj59t@yzhao56-desk.sh.intel.com>
+ <diqz8qknhj3l.fsf@ackerleytng-ctop.c.googlers.com>
+ <aHjDIxxbv0DnqI6S@yilunxu-OptiPlex-7050>
+ <diqzqzyeg3j2.fsf@ackerleytng-ctop.c.googlers.com>
+ <aHm2F95XwzdD7nod@yilunxu-OptiPlex-7050>
+ <687a6483506f2_3c6f1d2945a@iweiny-mobl.notmuch>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -100,91 +120,42 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4i65mgp4rtfox2ttchamijofcmwjtd6sefmuhdkfdrjwaznhoc@2uhcfv2ziegj>
+In-Reply-To: <687a6483506f2_3c6f1d2945a@iweiny-mobl.notmuch>
 
-On Sun, Jul 20, 2025 at 08:08:30AM +0800, Yao Yuan wrote:
-> On Sat, Jul 19, 2025 at 07:58:19AM +0000, Keir Fraser wrote:
-> > On Sat, Jul 19, 2025 at 10:15:56AM +0800, Yao Yuan wrote:
-> > > On Fri, Jul 18, 2025 at 08:00:17AM -0700, Sean Christopherson wrote:
-> > > > On Thu, Jul 17, 2025, Yao Yuan wrote:
-> > > > > On Wed, Jul 16, 2025 at 11:07:35AM +0800, Keir Fraser wrote:
-> > > > > > In preparation to remove synchronize_srcu() from MMIO registration,
-> > > > > > remove the distributor's dependency on this implicit barrier by
-> > > > > > direct acquire-release synchronization on the flag write and its
-> > > > > > lock-free check.
-> > > > > >
-> > > > > > Signed-off-by: Keir Fraser <keirf@google.com>
-> > > > > > ---
-> > > > > >  arch/arm64/kvm/vgic/vgic-init.c | 11 ++---------
-> > > > > >  1 file changed, 2 insertions(+), 9 deletions(-)
-> > > > > >
-> > > > > > diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-> > > > > > index 502b65049703..bc83672e461b 100644
-> > > > > > --- a/arch/arm64/kvm/vgic/vgic-init.c
-> > > > > > +++ b/arch/arm64/kvm/vgic/vgic-init.c
-> > > > > > @@ -567,7 +567,7 @@ int kvm_vgic_map_resources(struct kvm *kvm)
-> > > > > >  	gpa_t dist_base;
-> > > > > >  	int ret = 0;
-> > > > > >
-> > > > > > -	if (likely(dist->ready))
-> > > > > > +	if (likely(smp_load_acquire(&dist->ready)))
-> > > > > >  		return 0;
-> > > > > >
-> > > > > >  	mutex_lock(&kvm->slots_lock);
-> > > > > > @@ -598,14 +598,7 @@ int kvm_vgic_map_resources(struct kvm *kvm)
-> > > > > >  		goto out_slots;
-> > > > > >  	}
-> > > > > >
-> > > > > > -	/*
-> > > > > > -	 * kvm_io_bus_register_dev() guarantees all readers see the new MMIO
-> > > > > > -	 * registration before returning through synchronize_srcu(), which also
-> > > > > > -	 * implies a full memory barrier. As such, marking the distributor as
-> > > > > > -	 * 'ready' here is guaranteed to be ordered after all vCPUs having seen
-> > > > > > -	 * a completely configured distributor.
-> > > > > > -	 */
-> > > > > > -	dist->ready = true;
-> > > > > > +	smp_store_release(&dist->ready, true);
-> > > > >
-> > > > > No need the store-release and load-acquire for replacing
-> > > > > synchronize_srcu_expedited() w/ call_srcu() IIUC:
+> > > >> Yan, Yilun, would it work if, on conversion,
+> > > >> 
+> > > >> 1. guest_memfd notifies IOMMU that a conversion is about to happen for a
+> > > >>    PFN range
 > > > >
-> > > > This isn't about using call_srcu(), because it's not actually about kvm->buses.
-> > > > This code is concerned with ensuring that all stores to kvm->arch.vgic are ordered
-> > > > before the store to set kvm->arch.vgic.ready, so that vCPUs never see "ready==true"
-> > > > with a half-baked distributor.
+> > > > It is the Guest fw call to release the pinning.
+> > > 
+> > > I see, thanks for explaining.
+> > > 
+> > > > By the time VMM get the
+> > > > conversion requirement, the page is already physically unpinned. So I
+> > > > agree with Jason the pinning doesn't have to reach to iommu from SW POV.
 > > > >
-> > > > In the current code, kvm_vgic_map_resources() relies on the synchronize_srcu() in
-> > > > kvm_io_bus_register_dev() to provide the ordering guarantees.  Switching to
-> > > > smp_store_release() + smp_load_acquire() removes the dependency on the
-> > > > synchronize_srcu() so that the synchronize_srcu() call can be safely removed.
-> > >
-> > > Yes, I understand this and agree with your point.
-> > >
-> > > Just for discusstion: I thought it should also work even w/o
-> > > introduce the load acqure + store release after switch to
-> > > call_srcu(): The smp_mb() in call_srcu() order the all store
-> > > to kvm->arch.vgic before store kvm->arch.vgic.ready in
-> > > current implementation.
-> >
-> > The load-acquire would still be required, to ensure that accesses to
-> > kvm->arch.vgic do not get reordered earlier than the lock-free check
-> > of kvm->arch.vgic.ready. Otherwise that CPU could see that the vgic is
-> > initialised, but then use speculated reads of uninitialised vgic state.
-> >
+> > > 
+> > > If by the time KVM gets the conversion request, the page is unpinned,
+> > > then we're all good, right?
+> > 
+> > Yes, unless guest doesn't unpin the page first by mistake.
 > 
-> Thanks for your explanation.
-> 
-> I see. But there's "mutex_lock(&kvm->slot_lock);" before later
-> acccessing to the kvm->arch.vgic, so I think the order can be
-> guaranteed. Of cause as you said a explicitly acquire-load +
-> store-release is better than before implicitly implementation.
+> Or maliciously?  :-(
 
-If vgic_dist::ready is observed true by the lock-free read (the one
-which is turned into load-acquire by this patch) then the function
-immediately returns with no mutex_lock() executed. It is reads of
-vgic_dist *after* return from kvm_vgic_map_resources() that you have
-to worry about, and which require load-acquire semantics.
+Yes.
 
 > 
-> > > >
+> My initial response to this was that this is a bug and we don't need to be
+> concerned with it.  However, can't this be a DOS from one TD to crash the
+> system if the host uses the private page for something else and the
+> machine #MC's?
+
+I think we are already doing something to prevent vcpus from executing
+then destroy VM, so no further TD accessing. But I assume there is
+concern a TD could just leak a lot of resources, and we are
+investigating if host can reclaim them.
+
+Thanks,
+Yilun
 
