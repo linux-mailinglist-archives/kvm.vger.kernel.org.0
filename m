@@ -1,182 +1,184 @@
-Return-Path: <kvm+bounces-53004-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53005-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0571B0C78D
-	for <lists+kvm@lfdr.de>; Mon, 21 Jul 2025 17:26:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41747B0C7B0
+	for <lists+kvm@lfdr.de>; Mon, 21 Jul 2025 17:35:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 889E41AA54D9
-	for <lists+kvm@lfdr.de>; Mon, 21 Jul 2025 15:27:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DCBE61AA5AA3
+	for <lists+kvm@lfdr.de>; Mon, 21 Jul 2025 15:36:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1701B2DFA37;
-	Mon, 21 Jul 2025 15:26:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 776862DECB1;
+	Mon, 21 Jul 2025 15:35:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NcOMATBv"
+	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="Qk5npGY6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A85D42DEA9E
-	for <kvm@vger.kernel.org>; Mon, 21 Jul 2025 15:26:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85BDD28F95E
+	for <kvm@vger.kernel.org>; Mon, 21 Jul 2025 15:35:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753111602; cv=none; b=YtECJm+sBAtBFddF7ToehxNOnlMdTxp/CCEw1FCmV/+RwUd3Rfn2ir3Vmlbu4COXkDbZSUjAV+oHfj0MyRl9C5zuJPiZvp8W1+sFC11vZtk7aKyskvrEdSsP5hf15pPUUKZwWaMTG4kSKj9TTjIdunUpBTGFQX5dJHPFFJehIEs=
+	t=1753112144; cv=none; b=El05ioTScDUbHlnv6Olr8XHtIuxyvbsPyAhzpWuWAKBehQL8ElSyjPkyDOeqBbhrjuI+VqKj4K6gjLK48s4JYyFYPePUhd2JB5ytHiZnurh6C5SOmS0Rjyd87214e9s3qftnrrgNvo8fNDOHfnXORN49Qx9d+K5ILp0mb+O2JEg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753111602; c=relaxed/simple;
-	bh=8DwP3omhkAVQqs7IffAT+dALozWU0wdNIC142sQ97Ro=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=StqBJ3XJd+v6yttI7EzD7Yq5ciqXTsP8gN/S5/MQWeDylILHjuKZ07p4cmvN3NgLVRIIuJ8cG7H4cOuXN8BhJterTEHJMpdxrqTPdilarz+anlNhg1SuitddwnhT65eE0/TOGAsBr0UyNuz6ZDcLbZ4ck7yxQebjv0rmUQ638cA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NcOMATBv; arc=none smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4ab3ad4c61fso809981cf.0
-        for <kvm@vger.kernel.org>; Mon, 21 Jul 2025 08:26:40 -0700 (PDT)
+	s=arc-20240116; t=1753112144; c=relaxed/simple;
+	bh=9Iz7gkMAHFXR6uNekq+ZozZJoRu2xaFgWGWBCJlun8g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=niXG2ZTFB+ku+OpXmvglpn1u94dz5e/FQPQAaFJnBjMX07zHxz+CzCEUno4gTzQnnrXc3dY2YGFIimHeMyFfnnvEGdYzfbhLrVRp7zx1yipnp32FAdER/5vk5phJNhZ4mc9YQoj/fP6T8U7HZsauII61apo5kjpPReGhgYgeJL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=Qk5npGY6; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensrcsec.com
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-451dbe494d6so49271865e9.1
+        for <kvm@vger.kernel.org>; Mon, 21 Jul 2025 08:35:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753111599; x=1753716399; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=+zXX1Cs6v+OQFAHcUcXiOun/0OGx+sBx9HWHDVkm/fI=;
-        b=NcOMATBv9IB8+ioYrYRklZgPjNH7tFX7gmzzsrhT0cPTt/gZzNDsVCZxpIOxbp3ltD
-         pU8yWN53p4AFCeT9Ryg7h1fyhiLjlqKLoArNPK7UvvxZXejk+TrZwRNDQH8bee7nTMwZ
-         I/zNb9OTZ31MNF+ejdOPWtxUWBkm94qOMJnRu2YN46PDi95osOSFCPzbTPngU5e5PeqI
-         +yr0jfEyPR90t1EBMcCYXOWu+7yydOJglxbSbRaRceA3XntXYzRZDpQe2PLf6IJZKP4l
-         NwsIYu4YuhTYhWlnQXFfZ1+OIncK31RWh1ohqwNCV8CXw0CwsTVQguvUdnMmCsgbNmGr
-         6odA==
+        d=grsecurity.net; s=grsec; t=1753112140; x=1753716940; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=0H9/WAmc1ldaaydaa5FydGQck3U4b6Spe4cq3sfvtO0=;
+        b=Qk5npGY69p6bcLi4QglRn0mmtf/wh4ru0FxRDakHK7nZErsZTBbF2HL0sL/PjKt2Lc
+         /T6pdj6dbHMOUQOuTz7GXG5KYj05cxNxGWwq9bhqDfQhYHVxPjDJhdF4dpkvufOStJiU
+         FtnS8qu+Xw5Q6wjrJqp0fN4IVFkje6VeujJna5QeWtEKBWY44G3AvtiXOkjphvzOZGZc
+         XVaAHn8Xp6rykD4q9nzBlyidDjr0JmFzoSbaP6WOK/36hPyLq26ZFC9IV+PKqKsWGSVS
+         HEmlantW8ns4Ec3YQ+dGCtiUM5ikvtBWo7EMVDQHNPTOSba/k8fp+R3ddu9jhjaKnULm
+         2fCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753111599; x=1753716399;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+zXX1Cs6v+OQFAHcUcXiOun/0OGx+sBx9HWHDVkm/fI=;
-        b=cb0ZA/zFgjzHsaCcujEhp962obNcDuMlE4j26Qs9bR2mhtYYfexm/hpkb0yruOVoQ4
-         Qe3CsxfHXQTrzCCen2R4if2rnVq/qR57eeX/eh8UI96bkUTKmmH7gKEFU/TQXfmJ+y1T
-         PqfhOAhPAvHY92ruAnENuM/VtjvxgJ4Fn8jaduGnR7qaXS8XWNYnc1yWXDgYNT8J3asH
-         bV8PtTFfJXYusuNqdsvJng6SnjgcAfhW1hyVu6df/GQUeMqq4LQXmBxcBVV43S8fwld9
-         3bDjAxKH0ic/+4N9RmffJsWLcA3DXMqqb/f5YsXqV1SNaKFaXD3s0Tq8gYqlP7UAgSzE
-         0lBg==
-X-Gm-Message-State: AOJu0YyLK4LC4XOjPTmFCi1JoFLhSCbx92CUExrqMlgi9PTAoCbEDiuj
-	gVBoRpWnX1MS+RwXKiSZ34nSWm1VZlltzeqJNUrD6ogZmIpfqqSNcxMUZUKkNsSKSbYbVMlLPpf
-	EyEKX0347qP2yB+h1EEPLFAE1G+7XP66sbvjONqzk
-X-Gm-Gg: ASbGncteUM20GZjxtfHs2itxljSfNW3cmzFO+Mi9gkQIDy7UNsOYi3ugaU1DlJQCMX2
-	O1kAuSTXZXsWiWq+NLmUfHoaxxGe0IMhy44h7qYjCDi2avvzfiDK7GS67P6xe4SD7OjxqTt1hEx
-	slAqecYxfIaSzxYLRYkDD5uHJqD3mdBbUbV5wRIZSwP1wImucGR/kzhol03DnrkfnEBo8XP4sGD
-	/21vm4=
-X-Google-Smtp-Source: AGHT+IEJ1agfPLztb2zu+kNSQrf+HNQSH/8YBV9oHV+GLXju3loOkIiAuNIEAfRphTYzBRJ1wUQtlA8Dhv1rRae6lKk=
-X-Received: by 2002:a05:622a:a18d:b0:494:4aa0:ad5b with SMTP id
- d75a77b69052e-4ae5ad66634mr161081cf.2.1753111599011; Mon, 21 Jul 2025
- 08:26:39 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1753112140; x=1753716940;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0H9/WAmc1ldaaydaa5FydGQck3U4b6Spe4cq3sfvtO0=;
+        b=wy8Hsy/EyILr36vRmURxd/LZzfrGvNJKYyaUakT9s8j3LDSEnfJhqm1Liy+srAR5HL
+         Fl91EDlAvsM6IKdYADAN6c/+7IhUg0qq33LlVttKUdpa65pJpxNACXFIljcxFh0qZb3L
+         7JToJqELDqWd6p/cyzgzzY20EbQhvDR6qhFmylaiGcvQuunDEPbf7NEaV+L0AADuJQzo
+         BZdWTzRxk33U6td6k9YtWQCiYSVutqg4bgHCzFRICGDAvQsMZ4JXZYTQ4JEvvj+vb1o0
+         jWWutCNIygWaSUKxbCItHxIFwIrxobUYjLCZj4gKOTI3jBZJc8pFxiIsy04T89u+zmJo
+         3ZVw==
+X-Forwarded-Encrypted: i=1; AJvYcCVlGYkX4zX0ksDw5ZPMN05KZrNPf48XIazMhZMJU/99zJ6/14UQcBW/EQmbRC0FouiFI+E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyxoCNRZtDg91OrHVntq1/+hN4cLkZerU9qXhmzDxOD83q70XtZ
+	BDjlp0/t5qmXIe/qq2E5pFxuXBVxTLm0rlYSVksesanTmIQl3XE5Fg1WjGpxh84rS30=
+X-Gm-Gg: ASbGncusC95otoXIy+u7w/Ztb5jxvpwPOSn3GIBF3DaLT6oOzUPyT/k92xwkU4lWUJm
+	h8gD77Wnt6Pq2RKKf2teMaNBR0dZYhN6KwrOvMMKNpdcy+Qexa5EWkO1prVfEHVvkzgJulvL4zD
+	Kxnnj4HdsxukGux/Vb2DjozN/HtYJSecu2nln4Gr/C1akz+HLER7W+RQk0544bC/RmBVN3wq8M2
+	QF7koZ5Fy0tTloScWPgZCCF3J4L1/Rv1CvCB17ZWUCsxV+cVs2nmNBZRP5SC1xGwYKXYpWz7gd9
+	mad9XE4n7sgZ9meY+/alDTkrTjkfYEYKFJPAku/GhvSds+ihKVWGD1/AOK35hcf6l9GfkF4oLdV
+	N5eheCt9ETIEIIchzy8rumlXm1JeGm+4XFfyxt+wiHOVKV+eK4FYytT9oyivkNWNiiJL4oUPmPC
+	TOotcl0EOS0wUR6sdIqc4kNjMWkqwnJ7koPx1mopw/lCjBEaz1LcJxYm9719P5kWGlmw==
+X-Google-Smtp-Source: AGHT+IG/1MWVAemebTitOKmZq/g9dMUwTU7pG/CAEZvm3VcvBKvsMMZ7l7bsH2e1kdbTGrcpAq+yvw==
+X-Received: by 2002:a05:600c:5298:b0:456:15c7:ce90 with SMTP id 5b1f17b1804b1-4562e38a72fmr206995605e9.12.1753112139617;
+        Mon, 21 Jul 2025 08:35:39 -0700 (PDT)
+Received: from ?IPV6:2003:fa:af22:cf00:2208:a86d:dff:5ae9? (p200300faaf22cf002208a86d0dff5ae9.dip0.t-ipconnect.de. [2003:fa:af22:cf00:2208:a86d:dff:5ae9])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4562e7f2e8csm163861165e9.5.2025.07.21.08.35.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 21 Jul 2025 08:35:39 -0700 (PDT)
+Message-ID: <9c49bd5f-bf40-4a02-9e91-e499134116c6@grsecurity.net>
+Date: Mon, 21 Jul 2025 17:35:37 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250717162731.446579-1-tabba@google.com> <20250717162731.446579-2-tabba@google.com>
- <aH5Z7edFZSPzmJ5w@google.com>
-In-Reply-To: <aH5Z7edFZSPzmJ5w@google.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Mon, 21 Jul 2025 16:26:02 +0100
-X-Gm-Features: Ac12FXxSI2fqE4AUgjZ2pvOx5zOwfObgBpuUEKoP_2mWQ6ddL7hqgwa3HEbqCBI
-Message-ID: <CA+EHjTzemPVuHnm8vZh2Lh25GpZL-CR3kqtFQ7uktKobkjNDUA@mail.gmail.com>
-Subject: Re: [PATCH v15 01/21] KVM: Rename CONFIG_KVM_PRIVATE_MEM to CONFIG_KVM_GMEM
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
-	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, 
-	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
-	palmer@dabbelt.com, aou@eecs.berkeley.edu, viro@zeniv.linux.org.uk, 
-	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
-	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
-	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
-	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
-	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
-	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
-	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
-	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
-	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
-	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
-	ira.weiny@intel.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v11 00/23] Enable CET Virtualization
+To: Chao Gao <chao.gao@intel.com>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, x86@kernel.org, seanjc@google.com,
+ pbonzini@redhat.com, dave.hansen@intel.com
+Cc: rick.p.edgecombe@intel.com, mlevitsk@redhat.com, john.allen@amd.com,
+ weijiang.yang@intel.com, xin@zytor.com, Borislav Petkov <bp@alien8.de>,
+ Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>,
+ Ingo Molnar <mingo@redhat.com>, Thomas Gleixner <tglx@linutronix.de>
+References: <20250704085027.182163-1-chao.gao@intel.com>
+Content-Language: en-US, de-DE
+From: Mathias Krause <minipli@grsecurity.net>
+Autocrypt: addr=minipli@grsecurity.net; keydata=
+ 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
+ RzDVkdgPJkL/NFTKZHo5foFXNi89kA==
+In-Reply-To: <20250704085027.182163-1-chao.gao@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi Sean,
+On 04.07.25 10:49, Chao Gao wrote:
+> The FPU support for CET virtualization has already been merged into the tip
+> tree. This v11 adds Intel CET virtualization in KVM and is based on
+> tip/master plus Sean's MSR cleanups. For your convenience, it is also
+> available at
+> 
+>   https://github.com/gaochaointel/linux-dev cet-v11
+> 
+> Changes in v11 (Most changes are suggested by Sean. Thanks!):
+> 1. Rebased onto the latest tip tree + Sean's MSR cleanups
+> 2. Made patch 1's shortlog informative and accurate
+> 3. Slotted in two cleanup patches from Sean (patch 3/4)
+> 4. Used KVM_GET/SET_ONE_REG ioctl for userspace to read/write SSP.
+>    still assigned a KVM-defined MSR index for SSP but the index isn't
+>    part of uAPI now.
+> 5. Used KVM_MSR_RET_UNSUPPORTED to reject accesses to unsupported CET MSRs
+> 6. Synthesized triple-fault when reading/writing SSP failed during
+>    entering into SMM or exiting from SMM
+> 7. Removed an inappropriate "quirk" in v10 that advertised IBT to userspace
+>    when the hardware supports it but the host does not enable it.
+> 8. Disabled IBT/SHSTK explicitly for SVM to avoid them being enabled on
+>    AMD CPU accidentally before AMD CET series lands. Because IBT/SHSTK are
+>    advertised in KVM x86 common code but only Intel support is added by
+>    this series.
+> 9. Re-ordered "Don't emulate branch instructions" (patch 18) before
+>    advertising CET support to userspace.
+> 10.Added consistency checks for CR4.CET and other CET MSRs during VM-entry
+>    (patches 22-23)
+> 
+> [...]
 
-On Mon, 21 Jul 2025 at 16:17, Sean Christopherson <seanjc@google.com> wrote:
->
-> On Thu, Jul 17, 2025, Fuad Tabba wrote:
-> > Rename the Kconfig option CONFIG_KVM_PRIVATE_MEM to CONFIG_KVM_GMEM.
->
-> Please name this CONFIG_KVM_GUEST_MEMFD.  I'm a-ok using gmem as the namespace
-> for functions/macros/variables, but there's zero reason to shorten things like
-> Kconfigs.
+I tested this with your work-in-progress QEMU support branch from [1]
+and it worked well on my Alder Lake NUC (i7-1260P).
 
-Ack.
+The host kernel has IBT and user shadow stacks enabled, so does the
+guest kernel. KUT CET tests[2] ran fine on the host as well as in the
+guest, i.e. nested works too.
 
-> > @@ -719,10 +719,10 @@ static inline int kvm_arch_vcpu_memslots_id(struct kvm_vcpu *vcpu)
-> >  #endif
-> >
-> >  /*
-> > - * Arch code must define kvm_arch_has_private_mem if support for private memory
-> > - * is enabled.
-> > + * Arch code must define kvm_arch_has_private_mem if support for guest_memfd is
-> > + * enabled.
->
-> This is undesirable, and the comment is flat out wrong.  As evidenced by the lack
-> of a #define in arm64, arch does NOT need to #define kvm_arch_has_private_mem if
-> CONFIG_KVM_GUEST_MEMFD=y.  It "works" because the sole caller to kvm_arch_has_private_mem()
-> is guarded by CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES=y, and that's never selected
-> by arm64.
->
-> I.e. this needs to key off of CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES=y, not off of
-> CONFIG_KVM_GUEST_MEMFD=y.  And I would just drop the comment altogether at that
-> point, because it's all quite self-explanatory:
->
-> #ifndef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
-> static inline bool kvm_arch_has_private_mem(struct kvm *kvm)
-> {
->         return false;
-> }
-> #endif
+Therefore,
 
-Ack.
+Tested-by: Mathias Krause <minipli@grsecurity.net>
 
->
-> >   */
-> > -#if !defined(kvm_arch_has_private_mem) && !IS_ENABLED(CONFIG_KVM_PRIVATE_MEM)
-> > +#if !defined(kvm_arch_has_private_mem) && !IS_ENABLED(CONFIG_KVM_GMEM)
-> >  static inline bool kvm_arch_has_private_mem(struct kvm *kvm)
-> >  {
-> >       return false;
-> > @@ -2527,7 +2527,7 @@ bool kvm_arch_post_set_memory_attributes(struct kvm *kvm,
-> >
-> >  static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
-> >  {
-> > -     return IS_ENABLED(CONFIG_KVM_PRIVATE_MEM) &&
-> > +     return IS_ENABLED(CONFIG_KVM_GMEM) &&
->
-> And this is equally wrong.  The existing code checked CONFIG_KVM_PRIVATE_MEM,
-> because memory obviously can't be private if private memory is unsupported.
->
-> But that logic chain doesn't work as well for guest_memfd.  In a way, this is a
-> weird semantic change, e.g. it changes from "select guest_memfd if private memory
-> is supported" to "allow private memory if guest_memfd is select".   The former
-> existed because compiling in support for guest_memfd when it coulnd't possibly
-> be used was wasteful, but even then it was somewhat superfluous.
->
-> The latter is an arbitrary requirement that probably shouldn't exist, and if we
-> did want to make it a hard requirement, should be expressed in the Kconfig
-> dependency, not here.
->
-> TL;DR: drop the IS_ENABLED(CONFIG_KVM_GMEM) check.
+[1] https://github.com/gaochaointel/qemu-dev#qemu-cet
+[2]
+https://lore.kernel.org/kvm/20250626073459.12990-1-minipli@grsecurity.net/
 
-Ack.
-
-Thanks!
-/fuad
+Thanks,
+Mathias
 
