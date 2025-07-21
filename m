@@ -1,83 +1,96 @@
-Return-Path: <kvm+bounces-52967-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52968-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B0BAB0C131
-	for <lists+kvm@lfdr.de>; Mon, 21 Jul 2025 12:22:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FCFDB0C38B
+	for <lists+kvm@lfdr.de>; Mon, 21 Jul 2025 13:45:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C026F5402A1
-	for <lists+kvm@lfdr.de>; Mon, 21 Jul 2025 10:22:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E14FA3A5B57
+	for <lists+kvm@lfdr.de>; Mon, 21 Jul 2025 11:44:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BD5128E56B;
-	Mon, 21 Jul 2025 10:22:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FF1D2C1584;
+	Mon, 21 Jul 2025 11:44:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="CkQt5UuQ"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="1Y0U/RV7";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="2shmLIXc";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="ZiNxp/l1";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="X5eysvCX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 743B428DF40
-	for <kvm@vger.kernel.org>; Mon, 21 Jul 2025 10:22:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2FA8290D83
+	for <kvm@vger.kernel.org>; Mon, 21 Jul 2025 11:44:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753093328; cv=none; b=D8vb3cBLRTEFmAeRqjMMHW9UYAunGfUn5tHkqpwrG4zfONib3IETBWBOS0d53nXRqQqIP+rhHs7oR3Plvqq9GONw7hZAp0rrv5MK9Hr23P7izDne/iA4wpUar4hz6Tn1Occ22h/n61OU6RGzGfALP9IK14gEOcSgsViskrPwwds=
+	t=1753098286; cv=none; b=cKS6957xLS039VmsjaoORCot3GSG+ucY0O8trAgNIgVigv5VetTOvLUC9932UrZmn7vBiMqAYBncdG0Ap2xXXWFRXdBoCaf8Bx8giNIuwa/9iuBS3vuPOTpOKbV5wTemdLTFEAmZXmzrdB3/K0iJDWzuDrF3DCzcmQB7clZDBcA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753093328; c=relaxed/simple;
-	bh=nVwYFgotNO/Cq0mrpzMa1wiIn9v3YCrvCMraTiJ7EeA=;
+	s=arc-20240116; t=1753098286; c=relaxed/simple;
+	bh=y2ZY6q5DHvBrjnCU7EvVvqgu4wCoeygwatNPsmLRFaA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qyi1CDWaxMUbBsx/1iIde6rUsm9hwjqIO5BLJUKGaQfgpx5qwyPh/4/c0aP6fthU8GBmyKC3WsHUHN04w79457WjtszfM6ESYIH3qUCmRmiDh6rySslSoe4GUOqrZHqN+9s71aPEA33HmANty1r3VRE1pSPO/Jr8xaSzKgd3cFk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=CkQt5UuQ; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensrcsec.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4560d176f97so44920985e9.0
-        for <kvm@vger.kernel.org>; Mon, 21 Jul 2025 03:22:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=grsecurity.net; s=grsec; t=1753093324; x=1753698124; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Bs6CUOQhP2HN4VAhC6GZsaqDgzaMmNd1xy/hvQVUxSg=;
-        b=CkQt5UuQEopdI4tQFs6nuP567EHkxAMPx7DZm/Qo/f0e/EMC2ZBtwdmp7Nd0k96sHp
-         zp+3PT/VQ2j19I6WJhygdy79xzZGA/duht6Gk/CYc7dx+vfCTp2EpsTl3DmtHOuRG0Tw
-         eioEK3zUL+c1nUvnGSmMW6Qv5wEjHFulJYh0ZO5B/NkiG4W6alzP2Kkc4FMl7vQXqDbz
-         Y/4567zk2lzt45N3WLT1yeRCa0mt68Y/UT9Z/PzdVi6EcnBIRIaRk7v5jGvtqeafHZBP
-         /woEiOLcwjdDXqQigNXBi7JMypYambzhu1WTbRpEsUVzaF6guoriJvUtMf0c/HxDN6Lm
-         Bc4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753093324; x=1753698124;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Bs6CUOQhP2HN4VAhC6GZsaqDgzaMmNd1xy/hvQVUxSg=;
-        b=n2l2tQu+pv2mn9SqLTjlqgyGg34Va1hg4ta3Z7qNWCmJYQg0byUO7VpGnKp2vJNAgI
-         WChzyV4QG7xqSbZfuROTpGo/3UBxv/jWEilP0xYS4uveKT1pCd+nmgj0WjkelbMWi/2b
-         PSopDUsRbC55K93jz80/uZMfJxtvBeGNzkpy1jk0X3j0FJZPNJYNhE0fT0UVnfFZp+1l
-         gHyV29TQbp9+3aGCEQ1k9j0e9nzFsZm/uwUwMip3E/LIuDIo+O+cCBR4F1Mi/c9Bvshn
-         ZGxuZlAC/ExZqU1luDHxSMCuitNDzmuOXhsGhgli2QWsxUR7zyd0C+51TdHZpXP7pP1i
-         L4CA==
-X-Forwarded-Encrypted: i=1; AJvYcCXQXCx/7NNB0/I+nAeT/MiIDpVq52fC80chr6G+QSXzvhVUjknkQ8tev1+OeN4CfvbRcok=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxpmKCJV+pv06myMumfpJfGhRWrlsKI3dx+BucciYtrh8IhM1sB
-	YpAxNylGXPcl21vbzFLNTD3Z0KMGfD+ejhYwMMg/pISoIoN1YzPxl9lP8J9azvPFYTXmbc8u4nH
-	F0Z/7
-X-Gm-Gg: ASbGncvIy6eB7BBislZhzzUXTgmaftcSmwPI3WETS6+ylHqavGpi1EXQkwkXQYDEvJV
-	jOtuKZI0CPRCc5Wz5j49RK60ith90IpYDx+wERlJpzXb71snVR5YNhuwwFZqj3cl0s74pyaXEyQ
-	JST9/9t6uDOGi/0u74vdVqjE4ASlVkFGBzi57y9pruJLVV3KvNBnUETEAPwibUhZXmRk3pyFb/q
-	y1J2XNyfYH7dlXm3afhbW0D1C/tA5qV4MIMl63PXpYbC+0xTEXs43Wqfb2LV1nKaTitFA3ZoSAU
-	j/wffgpuYDUb2ppN5i4u9zm1QqLKkkKfLOJOXIbJgLPVGqBJQGONo8Br95GkjofnwObUmiRL0PW
-	Q4Lp+KzIs1iGI0LrONrnLxNld1FSpTeiptej9TXGcSmcQsSkSG/9kGn0MQykneidAEUHVuJnP5G
-	cTaiyfz6a62cCFMMUVzyAjiuK7IJVuB1yrPRHQiykNwKONAQt/nz31Mls=
-X-Google-Smtp-Source: AGHT+IFJ12ln2DajC3mWzxtg70/U/jCAohWMv5KpU68asn0tgc9rJobZSeGAuDtfpY0bL1P69I8OuA==
-X-Received: by 2002:a05:600c:4e0a:b0:453:483b:626c with SMTP id 5b1f17b1804b1-456340b94c8mr130683705e9.23.1753093324302;
-        Mon, 21 Jul 2025 03:22:04 -0700 (PDT)
-Received: from ?IPV6:2003:fa:af22:cf00:2208:a86d:dff:5ae9? (p200300faaf22cf002208a86d0dff5ae9.dip0.t-ipconnect.de. [2003:fa:af22:cf00:2208:a86d:dff:5ae9])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4563b75e9e9sm96775905e9.34.2025.07.21.03.22.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 21 Jul 2025 03:22:03 -0700 (PDT)
-Message-ID: <97730a3d-a5e7-45b3-9340-740ba33e3b9f@grsecurity.net>
-Date: Mon, 21 Jul 2025 12:22:02 +0200
+	 In-Reply-To:Content-Type; b=qPswc5yw1nzbzQv5IJDjaToJWuu+8iczsu4+ylWsDUzgx/4IQvFrom+KcbcQaMhDlFJZhRQkiuM8e3gL3Y7aLyKigScHQSvZE8zoGU5kg2T7G0c/mdHqO8XbQ+M4Vf8EdwbjZ2GcjkkDPM8FATUa09XS77Qxpykhqi+dgJn0VT4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=1Y0U/RV7; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=2shmLIXc; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=ZiNxp/l1; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=X5eysvCX; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id DC56C21B43;
+	Mon, 21 Jul 2025 11:44:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1753098283; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=NUmNYP0zD96NJMt2QiJF3yH4rGim2UQsUeVCtMOyHVk=;
+	b=1Y0U/RV7y6jdLP39ld2T8fNtJm+RxB2r5KWi4u6f3i9FKz0/m+UqO5x+6ljcTc8SLLFC+N
+	fswGbzhRxaU5AldqhJbY4bJg6Bpt2nTbWar2tbpkLM0ZX+uAs5b3VW5pjGWdQgugTJhesP
+	9porNnODmkQBr/jpgB1JUihfnMYSxfk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1753098283;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=NUmNYP0zD96NJMt2QiJF3yH4rGim2UQsUeVCtMOyHVk=;
+	b=2shmLIXcpt9sF7Gt05RDg5czHIluPVLQifJKYHwvlyvefDzErx5HKJh6cq4MpMOzfLO5OT
+	h8TO/AohfNI3FhCg==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b="ZiNxp/l1";
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=X5eysvCX
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1753098282; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=NUmNYP0zD96NJMt2QiJF3yH4rGim2UQsUeVCtMOyHVk=;
+	b=ZiNxp/l1ik8lvzeCSoaGr/IzgCefVwK2VlvCYGdFMoEyTbfIaODdp3+z92+wGWZYZAYbEx
+	8T3k/Tsh0SfiuLyfJ5m6n9PLCbVG9ANUT8qS9v9MUGfl0O4jCmT9MbwV8ZSLILVcGN8sRf
+	A570qiXiMTa2Hguvs3tzK3kLMR1oosg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1753098282;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=NUmNYP0zD96NJMt2QiJF3yH4rGim2UQsUeVCtMOyHVk=;
+	b=X5eysvCXZRU7ogAWyK98TQUiKwA56IzcSvOJO9ZMkfcYWm4BFBhRZjf8LxR8pPClwbLFA9
+	XdraXbSvp72r9tBQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 71EF813A88;
+	Mon, 21 Jul 2025 11:44:42 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id nelPGyoofmjUMgAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Mon, 21 Jul 2025 11:44:42 +0000
+Message-ID: <78f3032d-dfa4-4907-be42-6a7e8a34371e@suse.cz>
+Date: Mon, 21 Jul 2025 13:44:42 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -85,206 +98,216 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] i386/kvm: Disable hypercall patching quirk by default
-To: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
- Sean Christopherson <seanjc@google.com>, qemu-devel@nongnu.org,
- kvm@vger.kernel.org
-References: <20250619194204.1089048-1-minipli@grsecurity.net>
-Content-Language: en-US, de-DE
-From: Mathias Krause <minipli@grsecurity.net>
-Autocrypt: addr=minipli@grsecurity.net; keydata=
- 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
- RzDVkdgPJkL/NFTKZHo5foFXNi89kA==
-In-Reply-To: <20250619194204.1089048-1-minipli@grsecurity.net>
+Subject: Re: [PATCH V9 5/7] KVM: guest_memfd: Add slab-allocated inode cache
+Content-Language: en-US
+To: Shivank Garg <shivankg@amd.com>, seanjc@google.com, david@redhat.com,
+ willy@infradead.org, akpm@linux-foundation.org, shuah@kernel.org,
+ pbonzini@redhat.com, brauner@kernel.org, viro@zeniv.linux.org.uk
+Cc: ackerleytng@google.com, paul@paul-moore.com, jmorris@namei.org,
+ serge@hallyn.com, pvorel@suse.cz, bfoster@redhat.com, tabba@google.com,
+ vannapurve@google.com, chao.gao@intel.com, bharata@amd.com, nikunj@amd.com,
+ michael.day@amd.com, shdhiman@amd.com, yan.y.zhao@intel.com,
+ Neeraj.Upadhyay@amd.com, thomas.lendacky@amd.com, michael.roth@amd.com,
+ aik@amd.com, jgg@nvidia.com, kalyazin@amazon.com, peterx@redhat.com,
+ jack@suse.cz, rppt@kernel.org, hch@infradead.org, cgzones@googlemail.com,
+ ira.weiny@intel.com, rientjes@google.com, roypat@amazon.co.uk,
+ ziy@nvidia.com, matthew.brost@intel.com, joshua.hahnjy@gmail.com,
+ rakie.kim@sk.com, byungchul@sk.com, gourry@gourry.net,
+ kent.overstreet@linux.dev, ying.huang@linux.alibaba.com, apopple@nvidia.com,
+ chao.p.peng@intel.com, amit@infradead.org, ddutile@redhat.com,
+ dan.j.williams@intel.com, ashish.kalra@amd.com, gshan@redhat.com,
+ jgowans@amazon.com, pankaj.gupta@amd.com, papaluri@amd.com,
+ yuzhao@google.com, suzuki.poulose@arm.com, quic_eberman@quicinc.com,
+ aneeshkumar.kizhakeveetil@arm.com, linux-fsdevel@vger.kernel.org,
+ linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+ linux-security-module@vger.kernel.org, kvm@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-coco@lists.linux.dev
+References: <20250713174339.13981-2-shivankg@amd.com>
+ <20250713174339.13981-8-shivankg@amd.com>
+From: Vlastimil Babka <vbabka@suse.cz>
+Autocrypt: addr=vbabka@suse.cz; keydata=
+ xsFNBFZdmxYBEADsw/SiUSjB0dM+vSh95UkgcHjzEVBlby/Fg+g42O7LAEkCYXi/vvq31JTB
+ KxRWDHX0R2tgpFDXHnzZcQywawu8eSq0LxzxFNYMvtB7sV1pxYwej2qx9B75qW2plBs+7+YB
+ 87tMFA+u+L4Z5xAzIimfLD5EKC56kJ1CsXlM8S/LHcmdD9Ctkn3trYDNnat0eoAcfPIP2OZ+
+ 9oe9IF/R28zmh0ifLXyJQQz5ofdj4bPf8ecEW0rhcqHfTD8k4yK0xxt3xW+6Exqp9n9bydiy
+ tcSAw/TahjW6yrA+6JhSBv1v2tIm+itQc073zjSX8OFL51qQVzRFr7H2UQG33lw2QrvHRXqD
+ Ot7ViKam7v0Ho9wEWiQOOZlHItOOXFphWb2yq3nzrKe45oWoSgkxKb97MVsQ+q2SYjJRBBH4
+ 8qKhphADYxkIP6yut/eaj9ImvRUZZRi0DTc8xfnvHGTjKbJzC2xpFcY0DQbZzuwsIZ8OPJCc
+ LM4S7mT25NE5kUTG/TKQCk922vRdGVMoLA7dIQrgXnRXtyT61sg8PG4wcfOnuWf8577aXP1x
+ 6mzw3/jh3F+oSBHb/GcLC7mvWreJifUL2gEdssGfXhGWBo6zLS3qhgtwjay0Jl+kza1lo+Cv
+ BB2T79D4WGdDuVa4eOrQ02TxqGN7G0Biz5ZLRSFzQSQwLn8fbwARAQABzSBWbGFzdGltaWwg
+ QmFia2EgPHZiYWJrYUBzdXNlLmN6PsLBlAQTAQoAPgIbAwULCQgHAwUVCgkICwUWAgMBAAIe
+ AQIXgBYhBKlA1DSZLC6OmRA9UCJPp+fMgqZkBQJnyBr8BQka0IFQAAoJECJPp+fMgqZkqmMQ
+ AIbGN95ptUMUvo6aAdhxaOCHXp1DfIBuIOK/zpx8ylY4pOwu3GRe4dQ8u4XS9gaZ96Gj4bC+
+ jwWcSmn+TjtKW3rH1dRKopvC07tSJIGGVyw7ieV/5cbFffA8NL0ILowzVg8w1ipnz1VTkWDr
+ 2zcfslxJsJ6vhXw5/npcY0ldeC1E8f6UUoa4eyoskd70vO0wOAoGd02ZkJoox3F5ODM0kjHu
+ Y97VLOa3GG66lh+ZEelVZEujHfKceCw9G3PMvEzyLFbXvSOigZQMdKzQ8D/OChwqig8wFBmV
+ QCPS4yDdmZP3oeDHRjJ9jvMUKoYODiNKsl2F+xXwyRM2qoKRqFlhCn4usVd1+wmv9iLV8nPs
+ 2Db1ZIa49fJet3Sk3PN4bV1rAPuWvtbuTBN39Q/6MgkLTYHb84HyFKw14Rqe5YorrBLbF3rl
+ M51Dpf6Egu1yTJDHCTEwePWug4XI11FT8lK0LNnHNpbhTCYRjX73iWOnFraJNcURld1jL1nV
+ r/LRD+/e2gNtSTPK0Qkon6HcOBZnxRoqtazTU6YQRmGlT0v+rukj/cn5sToYibWLn+RoV1CE
+ Qj6tApOiHBkpEsCzHGu+iDQ1WT0Idtdynst738f/uCeCMkdRu4WMZjteQaqvARFwCy3P/jpK
+ uvzMtves5HvZw33ZwOtMCgbpce00DaET4y/UzsBNBFsZNTUBCACfQfpSsWJZyi+SHoRdVyX5
+ J6rI7okc4+b571a7RXD5UhS9dlVRVVAtrU9ANSLqPTQKGVxHrqD39XSw8hxK61pw8p90pg4G
+ /N3iuWEvyt+t0SxDDkClnGsDyRhlUyEWYFEoBrrCizbmahOUwqkJbNMfzj5Y7n7OIJOxNRkB
+ IBOjPdF26dMP69BwePQao1M8Acrrex9sAHYjQGyVmReRjVEtv9iG4DoTsnIR3amKVk6si4Ea
+ X/mrapJqSCcBUVYUFH8M7bsm4CSxier5ofy8jTEa/CfvkqpKThTMCQPNZKY7hke5qEq1CBk2
+ wxhX48ZrJEFf1v3NuV3OimgsF2odzieNABEBAAHCwXwEGAEKACYCGwwWIQSpQNQ0mSwujpkQ
+ PVAiT6fnzIKmZAUCZ8gcVAUJFhTonwAKCRAiT6fnzIKmZLY8D/9uo3Ut9yi2YCuASWxr7QQZ
+ lJCViArjymbxYB5NdOeC50/0gnhK4pgdHlE2MdwF6o34x7TPFGpjNFvycZqccSQPJ/gibwNA
+ zx3q9vJT4Vw+YbiyS53iSBLXMweeVV1Jd9IjAoL+EqB0cbxoFXvnjkvP1foiiF5r73jCd4PR
+ rD+GoX5BZ7AZmFYmuJYBm28STM2NA6LhT0X+2su16f/HtummENKcMwom0hNu3MBNPUOrujtW
+ khQrWcJNAAsy4yMoJ2Lw51T/5X5Hc7jQ9da9fyqu+phqlVtn70qpPvgWy4HRhr25fCAEXZDp
+ xG4RNmTm+pqorHOqhBkI7wA7P/nyPo7ZEc3L+ZkQ37u0nlOyrjbNUniPGxPxv1imVq8IyycG
+ AN5FaFxtiELK22gvudghLJaDiRBhn8/AhXc642/Z/yIpizE2xG4KU4AXzb6C+o7LX/WmmsWP
+ Ly6jamSg6tvrdo4/e87lUedEqCtrp2o1xpn5zongf6cQkaLZKQcBQnPmgHO5OG8+50u88D9I
+ rywqgzTUhHFKKF6/9L/lYtrNcHU8Z6Y4Ju/MLUiNYkmtrGIMnkjKCiRqlRrZE/v5YFHbayRD
+ dJKXobXTtCBYpLJM4ZYRpGZXne/FAtWNe4KbNJJqxMvrTOrnIatPj8NhBVI0RSJRsbilh6TE
+ m6M14QORSWTLRg==
+In-Reply-To: <20250713174339.13981-8-shivankg@amd.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Rspamd-Queue-Id: DC56C21B43
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-3.01 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	TAGGED_RCPT(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	ARC_NA(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	RCVD_TLS_ALL(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[google.com,paul-moore.com,namei.org,hallyn.com,suse.cz,redhat.com,intel.com,amd.com,nvidia.com,amazon.com,kernel.org,infradead.org,googlemail.com,amazon.co.uk,gmail.com,sk.com,gourry.net,linux.dev,linux.alibaba.com,arm.com,quicinc.com,vger.kernel.org,kvack.org,lists.linux.dev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_MATCH_ENVRCPT_SOME(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[66];
+	RCVD_COUNT_TWO(0.00)[2];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	DKIM_TRACE(0.00)[suse.cz:+]
+X-Spam-Score: -3.01
 
-On 19.06.25 21:42, Mathias Krause wrote:
-> KVM has a weird behaviour when a guest executes VMCALL on an AMD system
-> or VMMCALL on an Intel CPU. Both naturally generate an invalid opcode
-> exception (#UD) as they are just the wrong instruction for the CPU
-> given. But instead of forwarding the exception to the guest, KVM tries
-> to patch the guest instruction to match the host's actual hypercall
-> instruction. That is doomed to fail as read-only code is rather the
-> standard these days. But, instead of letting go the patching attempt and
-> falling back to #UD injection, KVM injects the page fault instead.
+On 7/13/25 19:43, Shivank Garg wrote:
+> Add dedicated inode structure (kvm_gmem_inode_info) and slab-allocated
+> inode cache for guest memory backing, similar to how shmem handles inodes.
 > 
-> That's wrong on multiple levels. Not only isn't that a valid exception
-> to be generated by these instructions, confusing attempts to handle
-> them. It also destroys guest state by doing so, namely the value of CR2.
+> This adds the necessary allocation/destruction functions and prepares
+> for upcoming guest_memfd NUMA policy support changes.
 > 
-> Sean attempted to fix that in KVM[1] but the patch was never applied.
-> 
-> Later, Oliver added a quirk bit in [2] so the behaviour can, at least,
-> conceptually be disabled. Paolo even called out to add this very
-> functionality to disable the quirk in QEMU[3]. So lets just do it.
-> 
-> A new property 'hypercall-patching=on|off' is added, for the very
-> unlikely case that there are setups that really need the patching.
-> However, these would be vulnerable to memory corruption attacks freely
-> overwriting code as they please. So, my guess is, there are exactly 0
-> systems out there requiring this quirk.
-> 
-> [1] https://lore.kernel.org/kvm/20211210222903.3417968-1-seanjc@google.com/
-> [2] https://lore.kernel.org/kvm/20220316005538.2282772-2-oupton@google.com/
-> [3] https://lore.kernel.org/kvm/80e1f1d2-2d79-22b7-6665-c00e4fe9cb9c@redhat.com/
-> 
-> Cc: Oliver Upton <oliver.upton@linux.dev>
-> Cc: Sean Christopherson <seanjc@google.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Mathias Krause <minipli@grsecurity.net>
+> Signed-off-by: Shivank Garg <shivankg@amd.com>
 > ---
->  include/system/kvm_int.h |  1 +
->  qemu-options.hx          | 10 ++++++++++
->  target/i386/kvm/kvm.c    | 38 ++++++++++++++++++++++++++++++++++++++
->  3 files changed, 49 insertions(+)
+>  virt/kvm/guest_memfd.c | 58 ++++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 56 insertions(+), 2 deletions(-)
 > 
-> diff --git a/include/system/kvm_int.h b/include/system/kvm_int.h
-> index 756a3c0a250e..fd7129824429 100644
-> --- a/include/system/kvm_int.h
-> +++ b/include/system/kvm_int.h
-> @@ -159,6 +159,7 @@ struct KVMState
->      uint64_t kvm_eager_split_size;  /* Eager Page Splitting chunk size */
->      struct KVMDirtyRingReaper reaper;
->      struct KVMMsrEnergy msr_energy;
-> +    bool hypercall_patching_enabled;
->      NotifyVmexitOption notify_vmexit;
->      uint32_t notify_window;
->      uint32_t xen_version;
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 1f862b19a676..c2e232649c19 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -231,6 +231,7 @@ DEF("accel", HAS_ARG, QEMU_OPTION_accel,
->      "                dirty-ring-size=n (KVM dirty ring GFN count, default 0)\n"
->      "                eager-split-size=n (KVM Eager Page Split chunk size, default 0, disabled. ARM only)\n"
->      "                notify-vmexit=run|internal-error|disable,notify-window=n (enable notify VM exit and set notify window, x86 only)\n"
-> +    "                hypercall-patching=on|off (enable KVM's VMCALL/VMMCALL hypercall patching quirk, x86 only)\n"
->      "                thread=single|multi (enable multi-threaded TCG)\n"
->      "                device=path (KVM device path, default /dev/kvm)\n", QEMU_ARCH_ALL)
->  SRST
-> @@ -313,6 +314,15 @@ SRST
->          open up for a specified of time (i.e. notify-window).
->          Default: notify-vmexit=run,notify-window=0.
+> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+> index dabcc2317291..989e2b26b344 100644
+> --- a/virt/kvm/guest_memfd.c
+> +++ b/virt/kvm/guest_memfd.c
+> @@ -17,6 +17,15 @@ struct kvm_gmem {
+>  	struct list_head entry;
+>  };
 >  
-> +    ``hypercall-patching=on|off``
-> +        KVM tries to recover from the wrong hypercall instruction being used by
-> +        a guest by attempting to rewrite it to the one supported natively by
-> +        the host CPU (VMCALL on Intel, VMMCALL for AMD systems). However, this
-> +        patching may fail if the guest memory is write protected, leading to a
-> +        page fault getting propagated to the guest instead of an illegal
-> +        instruction exception. As this may confuse guests, it gets disabled by
-> +        default (x86 only).
+> +struct kvm_gmem_inode_info {
+> +	struct inode vfs_inode;
+> +};
 > +
->      ``device=path``
->          Sets the path to the KVM device node. Defaults to ``/dev/kvm``. This
->          option can be used to pass the KVM device to use via a file descriptor
-> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-> index 56a6b9b6381a..6f5f3b95e553 100644
-> --- a/target/i386/kvm/kvm.c
-> +++ b/target/i386/kvm/kvm.c
-> @@ -3224,6 +3224,19 @@ static int kvm_vm_enable_energy_msrs(KVMState *s)
->      return 0;
->  }
->  
-> +static int kvm_vm_disable_hypercall_patching(KVMState *s)
+> +static inline struct kvm_gmem_inode_info *KVM_GMEM_I(struct inode *inode)
 > +{
-> +    int valid_quirks = kvm_vm_check_extension(s, KVM_CAP_DISABLE_QUIRKS2);
-> +
-> +    if (valid_quirks & KVM_X86_QUIRK_FIX_HYPERCALL_INSN) {
-> +        return kvm_vm_enable_cap(s, KVM_CAP_DISABLE_QUIRKS2, 0,
-> +                                 KVM_X86_QUIRK_FIX_HYPERCALL_INSN);
-> +    }
-> +
-> +    warn_report("kvm: disabling hypercall patching not supported");
-> +    return 0;
+> +	return container_of(inode, struct kvm_gmem_inode_info, vfs_inode);
 > +}
 > +
->  int kvm_arch_init(MachineState *ms, KVMState *s)
->  {
->      int ret;
-> @@ -3363,6 +3376,12 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
->          }
->      }
+>  /**
+>   * folio_file_pfn - like folio_file_page, but return a pfn.
+>   * @folio: The folio which contains this index.
+> @@ -392,8 +401,33 @@ static struct file_operations kvm_gmem_fops = {
+>  	.fallocate	= kvm_gmem_fallocate,
+>  };
 >  
-> +    if (s->hypercall_patching_enabled == false) {
-> +        if (kvm_vm_disable_hypercall_patching(s)) {
-> +            warn_report("kvm: failed to disable hypercall patching quirk");
-> +        }
-> +    }
+> +static struct kmem_cache *kvm_gmem_inode_cachep;
 > +
->      return 0;
->  }
->  
-> @@ -6456,6 +6475,19 @@ void kvm_request_xsave_components(X86CPU *cpu, uint64_t mask)
->      }
->  }
->  
-> +static bool kvm_arch_get_hypercall_patching(Object *obj, Error **errp)
+> +static struct inode *kvm_gmem_alloc_inode(struct super_block *sb)
 > +{
-> +    KVMState *s = KVM_STATE(obj);
-> +    return s->hypercall_patching_enabled;
+> +	struct kvm_gmem_inode_info *info;
+> +
+> +	info = alloc_inode_sb(sb, kvm_gmem_inode_cachep, GFP_KERNEL);
+> +	if (!info)
+> +		return NULL;
+> +
+> +	return &info->vfs_inode;
 > +}
 > +
-> +static void kvm_arch_set_hypercall_patching(Object *obj, bool value,
-> +                                            Error **errp)
+> +static void kvm_gmem_destroy_inode(struct inode *inode)
 > +{
-> +    KVMState *s = KVM_STATE(obj);
-> +    s->hypercall_patching_enabled = value;
 > +}
 > +
->  static int kvm_arch_get_notify_vmexit(Object *obj, Error **errp)
->  {
->      KVMState *s = KVM_STATE(obj);
-> @@ -6589,6 +6621,12 @@ static void kvm_arch_set_xen_evtchn_max_pirq(Object *obj, Visitor *v,
->  
->  void kvm_arch_accel_class_init(ObjectClass *oc)
->  {
-> +    object_class_property_add_bool(oc, "hypercall-patching",
-> +                                   kvm_arch_get_hypercall_patching,
-> +                                   kvm_arch_set_hypercall_patching);
-> +    object_class_property_set_description(oc, "hypercall-patching",
-> +                                          "Enable hypercall patching quirk");
+> +static void kvm_gmem_free_inode(struct inode *inode)
+> +{
+> +	kmem_cache_free(kvm_gmem_inode_cachep, KVM_GMEM_I(inode));
+> +}
 > +
->      object_class_property_add_enum(oc, "notify-vmexit", "NotifyVMexitOption",
->                                     &NotifyVmexitOption_lookup,
->                                     kvm_arch_get_notify_vmexit,
+>  static const struct super_operations kvm_gmem_super_operations = {
+>  	.statfs		= simple_statfs,
+> +	.alloc_inode	= kvm_gmem_alloc_inode,
+> +	.destroy_inode	= kvm_gmem_destroy_inode,
+> +	.free_inode	= kvm_gmem_free_inode,
+>  };
+>  
+>  static int kvm_gmem_init_fs_context(struct fs_context *fc)
+> @@ -426,17 +460,37 @@ static int kvm_gmem_init_mount(void)
+>  	return 0;
+>  }
+>  
+> +static void kvm_gmem_init_inode(void *foo)
+> +{
+> +	struct kvm_gmem_inode_info *info = foo;
+> +
+> +	inode_init_once(&info->vfs_inode);
+> +}
+> +
+>  int kvm_gmem_init(struct module *module)
+>  {
+> -	kvm_gmem_fops.owner = module;
+> +	int ret;
+>  
+> -	return kvm_gmem_init_mount();
+> +	kvm_gmem_fops.owner = module;
+> +	kvm_gmem_inode_cachep = kmem_cache_create("kvm_gmem_inode_cache",
+> +						  sizeof(struct kvm_gmem_inode_info),
+> +						  0, SLAB_ACCOUNT,
+> +						  kvm_gmem_init_inode);
 
-Ping! Paolo, can we get this weird and unexpected behaviour of KVM get
-disabled by default, please?
+Since this is new code, please use the new variant of kmem_cache_create()
+that takes the args parameter.
 
-Thanks,
-Mathias
+> +	if (!kvm_gmem_inode_cachep)
+> +		return -ENOMEM;
+> +	ret = kvm_gmem_init_mount();
+> +	if (ret) {
+> +		kmem_cache_destroy(kvm_gmem_inode_cachep);
+> +		return ret;
+> +	}
+> +	return 0;
+>  }
+>  
+>  void kvm_gmem_exit(void)
+>  {
+>  	kern_unmount(kvm_gmem_mnt);
+>  	kvm_gmem_mnt = NULL;
+> +	kmem_cache_destroy(kvm_gmem_inode_cachep);
+>  }
+>  
+>  static int kvm_gmem_migrate_folio(struct address_space *mapping,
+
 
