@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-52963-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52966-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9CFCB0C128
-	for <lists+kvm@lfdr.de>; Mon, 21 Jul 2025 12:20:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F99FB0C12B
+	for <lists+kvm@lfdr.de>; Mon, 21 Jul 2025 12:20:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B33616CA89
-	for <lists+kvm@lfdr.de>; Mon, 21 Jul 2025 10:20:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E8DB16F678
+	for <lists+kvm@lfdr.de>; Mon, 21 Jul 2025 10:20:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 350B328EBFE;
-	Mon, 21 Jul 2025 10:20:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03F8328F527;
+	Mon, 21 Jul 2025 10:20:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QZCrWDO1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ATtVxx+Q"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5765428DF31;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5DB928E5F3;
 	Mon, 21 Jul 2025 10:20:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753093208; cv=none; b=iiuvvkQhT9p7xhaeo919g6ID6IOf17tD1u5MPfuudr32QXjShgK6YjElonR9LjDY0mnxX0OvkzQ2DkLvKdreyCZQtOdgi3hvV/vBOTdeOiQG7/s8vMzmyecygDB62osZdlL/9j/ODW00OUHD9kvW63r97HCTC8xnInUhhe/KtkM=
+	t=1753093208; cv=none; b=Zk3VvhOg35peqL8f5Kh8zX+aZt8qmtnfL8yVbztGsAz6DjRVlAk9usahYnD7HhWbolIe2X4bSNWeapx9+n7iFkf17LLOovxT7ys9/mEBVMGmTk+5ub4e5Aqv/IDwZCYlY2J6/+nzJBhp/z2/j9he0GUIRBk1fwji+TnprB41S1U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1753093208; c=relaxed/simple;
-	bh=BquqU5n/Nne4PARiM5JWa12LO6qSYywpm9CHk+avLmc=;
+	bh=eANUx6yTarI1XjY5Wc/aBHqOLih6GMKUKHwFun94n8E=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=DMtZtJIr0WDJaQ5a4Els8q+/m9hcq7VhjsNZ7MSGCf1ZN4o7V419SB12atOTMquIfIH931n2gbU2WVz70o+2LMxepAbXEczu5YqTPlW4s90zrkilfAuPGWj8YHaz7CP+6SL1rcZK5K6bcQgmTGT75vs1eO14HpkGogJ/lV68g28=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QZCrWDO1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23070C4CEED;
+	 MIME-Version; b=AAO2vnzb2OEwpE+jDjjSfiaMxwCI0+VfV3isXpcKXc76hqcpBm3Zoi/8PZ9jqY19TZxP+q3hUwGYr2kUa0Q3lfS4N68YO3VP93LLO2JdrL9/gbyFKOnJSO2RlOh7V7hITAvJ9PqrDxqY+/l3Lu+mhvsuo7SsvI4OhVbKVcRez5M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ATtVxx+Q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E203C4CEF4;
 	Mon, 21 Jul 2025 10:20:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1753093208;
-	bh=BquqU5n/Nne4PARiM5JWa12LO6qSYywpm9CHk+avLmc=;
+	bh=eANUx6yTarI1XjY5Wc/aBHqOLih6GMKUKHwFun94n8E=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=QZCrWDO1mVtsgH3lTu7bcej0ZzWTfLjnD3GIyZo7vbsDoHb3m7VSFAzZSOjT8oEWf
-	 cd7oXZKAnZEfxT37mSdC3KrMmqK5k+MJSD7ZQiutyCAS6hO/2s9JT+KDWOKhm0eGL1
-	 t2wx8LQJXRlcFeE3XWD+4rdit3AqDM/qkBDxmQsZPuHWv+YQp1xoE6FQPqpcJaF3HJ
-	 pa9wsO3rwHoncZwWD4h4JwANq7MbdoiwVobTowIPTmj0LUv01pazpFRCEsY0M3fQfv
-	 fEOTnJKckFHMk2iLbN2zKjrYnSXVPKBhZi2IGCh0foka5IXE3PC5p0RhFwHZET5yrO
-	 utfwY8+eTWJlQ==
+	b=ATtVxx+QilGd5YPeJZNWCLGmEkqrFGbNjANZg5mXUmT586Kq+YAs81ewdQv5IIo7E
+	 WXJPrus7nFJlEz4IGyI4GUedH6EMglFYEij+Z4rOdr2c7nnIFkoBDW2YwDV3anHqd2
+	 clETiOjjA2krM5XOsW4E7YfyoWDzx4WKGSjO7c0WjICffaTGDFsknPhsIci2+zIpva
+	 dXyHRh6cnPhl7PVokgMTQUb3ktqZSgX4FZHzYUu4xqqEuWIhOQ4ev2L2g/5XGUCue7
+	 zhf5w5a7VATgSHzgEBQwtxO6Tr4BBZ4qkUgC1wJIDtE8XBzF8p3X+MQBBbO0QwX75T
+	 NHhabJ3lOZhVQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1udncs-00HZDF-7U;
+	id 1udncs-00HZDF-Dc;
 	Mon, 21 Jul 2025 11:20:06 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -57,9 +57,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Will Deacon <will@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>
-Subject: [PATCH 4/7] KVM: arm64: Handle RASv1p1 registers
-Date: Mon, 21 Jul 2025 11:19:52 +0100
-Message-Id: <20250721101955.535159-5-maz@kernel.org>
+Subject: [PATCH 5/7] KVM: arm64: Ignore HCR_EL2.FIEN set by L1 guest's EL2
+Date: Mon, 21 Jul 2025 11:19:53 +0100
+Message-Id: <20250721101955.535159-6-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250721101955.535159-1-maz@kernel.org>
 References: <20250721101955.535159-1-maz@kernel.org>
@@ -75,49 +75,35 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-FEAT_RASv1p1 system registeres are not handled at all so far.
-KVM will give an embarassed warning on the console and inject
-an UNDEF, despite RASv1p1 being exposed to the guest on suitable HW.
+An EL2 guest can set HCR_EL2.FIEN, which gives access to the RASv1p1
+fault injection mechanism. This would allow an EL1 guest to inject
+error records into the system, which does sound like a terrible idea.
 
-Handle these registers similarly to FEAT_RAS, with the added fun
-that there are *two* way to indicate the presence of FEAT_RASv1p1.
+Prevent this situation by added FIEN to the list of bits we silently
+exclude from being inserted into the host configuration.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ arch/arm64/kvm/hyp/vhe/switch.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index aea50870d9f11..9fb2812106cb0 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2695,6 +2695,16 @@ static bool access_ras(struct kvm_vcpu *vcpu,
- 	struct kvm *kvm = vcpu->kvm;
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index e482181c66322..0998ad4a25524 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -43,8 +43,11 @@ DEFINE_PER_CPU(unsigned long, kvm_hyp_vector);
+  *
+  * - API/APK: they are already accounted for by vcpu_load(), and can
+  *   only take effect across a load/put cycle (such as ERET)
++ *
++ * - FIEN: no way we let a guest have access to the RAS "Common Fault
++ *   Injection" thing, whatever that does
+  */
+-#define NV_HCR_GUEST_EXCLUDE	(HCR_TGE | HCR_API | HCR_APK)
++#define NV_HCR_GUEST_EXCLUDE	(HCR_TGE | HCR_API | HCR_APK | HCR_FIEN)
  
- 	switch(reg_to_encoding(r)) {
-+	case SYS_ERXPFGCDN_EL1:
-+	case SYS_ERXPFGCTL_EL1:
-+	case SYS_ERXPFGF_EL1:
-+		if (!(kvm_has_feat(kvm, ID_AA64PFR0_EL1, RAS, V1P1) ||
-+		      (kvm_has_feat_enum(kvm, ID_AA64PFR0_EL1, RAS, IMP) &&
-+		       kvm_has_feat(kvm, ID_AA64PFR1_EL1, RAS_frac, RASv1p1)))) {
-+			kvm_inject_undefined(vcpu);
-+			return false;
-+		}
-+		break;
- 	default:
- 		if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, RAS, IMP)) {
- 			kvm_inject_undefined(vcpu);
-@@ -3058,6 +3068,9 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_ERXCTLR_EL1), access_ras },
- 	{ SYS_DESC(SYS_ERXSTATUS_EL1), access_ras },
- 	{ SYS_DESC(SYS_ERXADDR_EL1), access_ras },
-+	{ SYS_DESC(SYS_ERXPFGF_EL1), access_ras },
-+	{ SYS_DESC(SYS_ERXPFGCTL_EL1), access_ras },
-+	{ SYS_DESC(SYS_ERXPFGCDN_EL1), access_ras },
- 	{ SYS_DESC(SYS_ERXMISC0_EL1), access_ras },
- 	{ SYS_DESC(SYS_ERXMISC1_EL1), access_ras },
- 
+ static u64 __compute_hcr(struct kvm_vcpu *vcpu)
+ {
 -- 
 2.39.2
 
