@@ -1,153 +1,92 @@
-Return-Path: <kvm+bounces-52994-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52995-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39546B0C645
-	for <lists+kvm@lfdr.de>; Mon, 21 Jul 2025 16:27:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5E02B0C67B
+	for <lists+kvm@lfdr.de>; Mon, 21 Jul 2025 16:36:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C7F33188C600
-	for <lists+kvm@lfdr.de>; Mon, 21 Jul 2025 14:28:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 042A917E5B2
+	for <lists+kvm@lfdr.de>; Mon, 21 Jul 2025 14:36:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A96962DAFC4;
-	Mon, 21 Jul 2025 14:27:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C45C32D3EFC;
+	Mon, 21 Jul 2025 14:36:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BpUZhmBJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rpAoRXNz"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 105352D9EF2;
-	Mon, 21 Jul 2025 14:27:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0E9F298255
+	for <kvm@vger.kernel.org>; Mon, 21 Jul 2025 14:36:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753108052; cv=none; b=Jpc0JjNMK/ltrB9xxTTyaUnml2Jsc+XtXW1aYM1aMa4akiowNtSdXMPMCFx2gXad9n0xDhzgz93+skFfWObytcv5+xWTHbgWsEqmAUAGCDOTFRYoejOMAXBlUyhozCz5ma916e/xlHUCpf3sm5kIhOzeME4+sbvIvKLRmxG4Lfw=
+	t=1753108563; cv=none; b=C5omzfi73Xfdjw7RwkblsURbVI55xKhWWR1wEB4OxDdb6rB731ZWpfxUObsXWYSXjTKZGu1QuLAdVZj4o0Gk8UZZDa/MmOgziNSoInLHBtmH98wcLNo47kzRA3/Eqr5Vsl6aH2Ycz8dN73vUo2JFgeJRE2YYKS4/t1naSDcwXfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753108052; c=relaxed/simple;
-	bh=PNJKS+TVTTfsECa7XS5I8d4xMGqWb4m/BU6pFdO60nA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tKca9n07agi3zxkWYcKtHnQUucoTw34Aii+3/7S0MBVKzWokMnfnxK8yKKZq5/1S8S+rbUY5je0CYhjNJAzQkXbyWNXV/86N+c/QIkES0GzJRKmVg/oLOkjcz0TWYAeWYLQWOLT243dt7QxVuoeNv9uNfsscuJdf34+9q/BcwHA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BpUZhmBJ; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1753108051; x=1784644051;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=PNJKS+TVTTfsECa7XS5I8d4xMGqWb4m/BU6pFdO60nA=;
-  b=BpUZhmBJMvOZjl7A7VmpRjwAhH4R65FAe884t36bYwEXkEdCMtemr/h0
-   o4edBPSccAwiIJjdjJWwiLgT1oUrNBdcWBRDHBaxzzn7Jgwax//9gfyDO
-   VwZvmBr+D2+Su8Xg0/wRJ/W4MyzupRhHxubTEmZ4Q81a/eOfRl34aJXhQ
-   GKcTXZ3dCZplYtKsEYMQtKW9XW8rEIW1Z/TYlQnjOTpof6sKZ3HF+1YD3
-   x6bGISk3LbLs7HuxNbsmceTSWXBp5A95xq7Ey2FGeE5HiZh6KvOOuio1M
-   9SsSsncxcw7TrMbYEOKimDMwR3BUpKtDuy2qEAAEt6ZImR3Kzi9JdZN5y
-   g==;
-X-CSE-ConnectionGUID: 8FZFIA/VTOKBu7+Sy1N04g==
-X-CSE-MsgGUID: UnB9IzYOTWivtOvRrKtzlw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11499"; a="54424867"
-X-IronPort-AV: E=Sophos;i="6.16,329,1744095600"; 
-   d="scan'208";a="54424867"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2025 07:27:30 -0700
-X-CSE-ConnectionGUID: z23pwguhRCq0pG2C6uHt2g==
-X-CSE-MsgGUID: R04oqIF4Qc+jd/Sk1KqXag==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,329,1744095600"; 
-   d="scan'208";a="162898084"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by fmviesa003.fm.intel.com with ESMTP; 21 Jul 2025 07:27:11 -0700
-Date: Mon, 21 Jul 2025 22:18:18 +0800
-From: Xu Yilun <yilun.xu@linux.intel.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Ackerley Tng <ackerleytng@google.com>, Yan Zhao <yan.y.zhao@intel.com>,
-	Vishal Annapurve <vannapurve@google.com>,
-	Alexey Kardashevskiy <aik@amd.com>, Fuad Tabba <tabba@google.com>,
-	kvm@vger.kernel.org, linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org, x86@kernel.org,
-	linux-fsdevel@vger.kernel.org, ajones@ventanamicro.com,
-	akpm@linux-foundation.org, amoorthy@google.com,
-	anthony.yznaga@oracle.com, anup@brainfault.org,
-	aou@eecs.berkeley.edu, bfoster@redhat.com,
-	binbin.wu@linux.intel.com, brauner@kernel.org,
-	catalin.marinas@arm.com, chao.p.peng@intel.com,
-	chenhuacai@kernel.org, dave.hansen@intel.com, david@redhat.com,
-	dmatlack@google.com, dwmw@amazon.co.uk, erdemaktas@google.com,
-	fan.du@intel.com, fvdl@google.com, graf@amazon.com,
-	haibo1.xu@intel.com, hch@infradead.org, hughd@google.com,
-	ira.weiny@intel.com, isaku.yamahata@intel.com, jack@suse.cz,
-	james.morse@arm.com, jarkko@kernel.org, jgowans@amazon.com,
-	jhubbard@nvidia.com, jroedel@suse.de, jthoughton@google.com,
-	jun.miao@intel.com, kai.huang@intel.com, keirf@google.com,
-	kent.overstreet@linux.dev, kirill.shutemov@intel.com,
-	liam.merwick@oracle.com, maciej.wieczor-retman@intel.com,
-	mail@maciej.szmigiero.name, maz@kernel.org, mic@digikod.net,
-	michael.roth@amd.com, mpe@ellerman.id.au, muchun.song@linux.dev,
-	nikunj@amd.com, nsaenz@amazon.es, oliver.upton@linux.dev,
-	palmer@dabbelt.com, pankaj.gupta@amd.com, paul.walmsley@sifive.com,
-	pbonzini@redhat.com, pdurrant@amazon.co.uk, peterx@redhat.com,
-	pgonda@google.com, pvorel@suse.cz, qperret@google.com,
-	quic_cvanscha@quicinc.com, quic_eberman@quicinc.com,
-	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com,
-	quic_pheragu@quicinc.com, quic_svaddagi@quicinc.com,
-	quic_tsoni@quicinc.com, richard.weiyang@gmail.com,
-	rick.p.edgecombe@intel.com, rientjes@google.com,
-	roypat@amazon.co.uk, rppt@kernel.org, seanjc@google.com,
-	shuah@kernel.org, steven.price@arm.com, steven.sistare@oracle.com,
-	suzuki.poulose@arm.com, thomas.lendacky@amd.com,
-	usama.arif@bytedance.com, vbabka@suse.cz, viro@zeniv.linux.org.uk,
-	vkuznets@redhat.com, wei.w.wang@intel.com, will@kernel.org,
-	willy@infradead.org, xiaoyao.li@intel.com, yilun.xu@intel.com,
-	yuzenghui@huawei.com, zhiquan1.li@intel.com
-Subject: Re: [RFC PATCH v2 04/51] KVM: guest_memfd: Introduce
- KVM_GMEM_CONVERT_SHARED/PRIVATE ioctls
-Message-ID: <aH5MKseUAGFFWc8T@yilunxu-OptiPlex-7050>
-References: <CAGtprH_Evyc7tLhDB0t0fN+BUx5qeqWq8A2yZ5-ijbJ5UJ5f-g@mail.gmail.com>
- <9502503f-e0c2-489e-99b0-94146f9b6f85@amd.com>
- <20250624130811.GB72557@ziepe.ca>
- <CAGtprH_qh8sEY3s-JucW3n1Wvoq7jdVZDDokvG5HzPf0HV2=pg@mail.gmail.com>
- <aGTvTbPHuXbvj59t@yzhao56-desk.sh.intel.com>
- <diqz8qknhj3l.fsf@ackerleytng-ctop.c.googlers.com>
- <aHjDIxxbv0DnqI6S@yilunxu-OptiPlex-7050>
- <diqzqzyeg3j2.fsf@ackerleytng-ctop.c.googlers.com>
- <aHm2F95XwzdD7nod@yilunxu-OptiPlex-7050>
- <20250718141559.GF2206214@ziepe.ca>
+	s=arc-20240116; t=1753108563; c=relaxed/simple;
+	bh=rlH7iw2AQ4NXWC3JEMs+IHGjz7Kw8qUdjjubzoZ/yWE=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=dMDGP56MkVX5j0/XxMgAYNSFSq1mYs4KQbAz10/8u6quhz7YPO9KPHoqnAZMd73m3SpCf0NoSrpLVlwQTZzQAviUk9GRHRH4iOuFHtZmzpP4eMHmSzlPDvo6HgISimT0CPU6ME8w0xBfTcquA+O2lEqWK03Xzim88zs0M5hU3HM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rpAoRXNz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74848C4CEED;
+	Mon, 21 Jul 2025 14:36:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753108562;
+	bh=rlH7iw2AQ4NXWC3JEMs+IHGjz7Kw8qUdjjubzoZ/yWE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=rpAoRXNzS09YtYZHmv7t6ur4sVnFAGYey4yvZZNy+N3c+Cs267M4vFZHbJRfXSeJP
+	 VQzfbcRLbrNhSu55y0n+hGbt7iNguxAuZSE51oKaDnPNyoF1y8DT9oIqLIZ/JpS3yw
+	 tGB6X+6fY6Lb15ziub0Lhi7qptkYmhobt5fz2ih5XV3IsapGth+AApjntNi1lt565/
+	 ZwIyLWhi2nmxrx4xMCRAMgpN/KYDo4BgYT8A/RM8tTxWqGme0dGMhnW9PRtXUb0s3n
+	 7e8f1hS1y35z7xQtnwWOAGwnNJ1PLyC5MQvpEgayZW3OYQUuy02Bk5muXjnnt1JOVp
+	 oW3VBYre8phCQ==
+From: Will Deacon <will@kernel.org>
+To: kvm@vger.kernel.org,
+	Thomas Perale <thomas.perale@mind.be>
+Cc: catalin.marinas@arm.com,
+	kernel-team@android.com,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH kvmtool] vfio: include libgen.h (for musl compatibility)
+Date: Mon, 21 Jul 2025 15:35:51 +0100
+Message-Id: <175309922953.3722631.3586573998054640008.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250629202221.893360-1-thomas.perale@mind.be>
+References: <20250629202221.893360-1-thomas.perale@mind.be>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250718141559.GF2206214@ziepe.ca>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jul 18, 2025 at 11:15:59AM -0300, Jason Gunthorpe wrote:
-> On Fri, Jul 18, 2025 at 10:48:55AM +0800, Xu Yilun wrote:
-> > > If by the time KVM gets the conversion request, the page is unpinned,
-> > > then we're all good, right?
-> > 
-> > Yes, unless guest doesn't unpin the page first by mistake. Guest would
-> > invoke a fw call tdg.mem.page.release to unpin the page before
-> > KVM_HC_MAP_GPA_RANGE.
+On Sun, 29 Jun 2025 22:22:21 +0200, Thomas Perale wrote:
+> Starting GCC14 'implicit-function-declaration' are treated as errors by
+> default. When building kvmtool with musl libc, the following error
+> occurs due to missing declaration of 'basename':
 > 
-> What does guest pinning mean?
-
-TDX firmware provides a mode, that host can't block the S-EPT mapping
-after TD accepts the mapping. Guest 'pins' the private mapping (KVM &
-IOMMU).
-
-TD should explicitly unaccept the page by tdg.mem.page.release, then
-host could successfully block/unmap the S-EPT. This is necessary when
-shared <-> private conversion.
-
-When TDX Connect is enabled, this mode is enforced.
-
-Thanks,
-Yilun
-
+> vfio/core.c:537:22: error: implicit declaration of function ‘basename’ [-Wimplicit-function-declaration]
+>   537 |         group_name = basename(group_path);
+>       |                      ^~~~~~~~
+> vfio/core.c:537:22: warning: nested extern declaration of ‘basename’ [-Wnested-externs]
+> vfio/core.c:537:20: error: assignment to ‘char *’ from ‘int’ makes pointer from integer without a cast [-Wint-conversion]
+>   537 |         group_name = basename(group_path);
+>       |                    ^
 > 
-> Jason
-> 
+> [...]
+
+Applied to kvmtool (master), thanks!
+
+[1/1] vfio: include libgen.h (for musl compatibility)
+      https://git.kernel.org/will/kvmtool/c/ba6830eec0f5
+
+Cheers,
+-- 
+Will
+
+https://fixes.arm64.dev
+https://next.arm64.dev
+https://will.arm64.dev
 
