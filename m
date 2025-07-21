@@ -1,166 +1,123 @@
-Return-Path: <kvm+bounces-53042-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53043-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E628B0CD76
-	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 01:00:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1327CB0CD85
+	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 01:05:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2BBCE6C373E
-	for <lists+kvm@lfdr.de>; Mon, 21 Jul 2025 23:00:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DC7131C226AA
+	for <lists+kvm@lfdr.de>; Mon, 21 Jul 2025 23:06:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 590E92459D8;
-	Mon, 21 Jul 2025 23:00:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 577BA24397A;
+	Mon, 21 Jul 2025 23:05:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y3/h5a43"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="XxoJdyWH"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CF1E242D7F;
-	Mon, 21 Jul 2025 23:00:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2479241665;
+	Mon, 21 Jul 2025 23:05:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753138815; cv=none; b=TmKYnL5z7R8yiY6dSJUHGBnqf/lx1euQjlltCKE8kHaawDhwVjQtXt0HMF7is7MW6D6cjNJzyZqZ5C3x5XHXaEC4u4u36oMpZ9C2gWagNQZApCqW1L6DWc6wwpT0dBcm3dKxlrcfGx2cyOw/xAVR0BTOJgbXkMVlWQU2MrkIocI=
+	t=1753139148; cv=none; b=gRL+h2jtsSSs74YZcHfwyqORlmrOeiyZm2+YmpaOhzeeL1Y2lrt1BQYggUtshXh5UgTBPUmn4rmmn1XFruRVVaZbkJojkMoszve/DAgyZ7LVPZ6sfy7gRfXnAUAwmyrzxAeKSOXybLPtQhl4q3f1bHpGZSpIedQuDGwMBm8SqVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753138815; c=relaxed/simple;
-	bh=SnHb5Ff2Sxs8l3uYD7IYErUPUDBONk0p5oJ0NjX4EOs=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=s1I4U+G/9pd+cJpt/sHrYjNGSkQE+imAMzBHIJDwQCb5747to2+ZggiIf5MUHETPHVtu0oqf6PkJEzQ1ZlLSqHa6tJsxnJpaX3UYBwcN2xisY/C/iTSdO037XjGbIP0/zsePwgV+EI50p1gHjW+fdDy4obI3QYuzNb2ohZviS7s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y3/h5a43; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B47ADC4CEED;
-	Mon, 21 Jul 2025 23:00:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753138814;
-	bh=SnHb5Ff2Sxs8l3uYD7IYErUPUDBONk0p5oJ0NjX4EOs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=Y3/h5a43DOytbrvY/BlcgPbSMxWUB93+MZtw+hgxr0Imk3Lm4UBoCF5wPCnSH+91C
-	 Xasgl3FtnWEB0ajbTTPnoxXchSdPm+ZiC5yhv2oFrr3MWTfbU3peH+EbNRQkC6rawc
-	 +/p3ygrqSZ86w0UJS3eZ0NkdoPPmdpiCenB+WbQWxh5n/SgMtXx8y0e9Za0PIKcc4x
-	 gOnUwYkBZappo9o59gUPFNzB9zoUK22nmMZAxkvE3ygWgfT8hirYcVGihGaX4sJThI
-	 HdMhfeLwpibSU83+rDUDmWk0M4Lh6h67rag2NDwbE/1tylJAk9Zl2WEsp5cSKqRUk7
-	 vf1DiAByuE14w==
-Date: Mon, 21 Jul 2025 18:00:13 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Mario Limonciello <superm1@kernel.org>
-Cc: David Airlie <airlied@gmail.com>, Bjorn Helgaas <bhelgaas@google.com>,
-	Alex Deucher <alexander.deucher@amd.com>,
-	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-	Simona Vetter <simona@ffwll.ch>, Lukas Wunner <lukas@wunner.de>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Lu Baolu <baolu.lu@linux.intel.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	"open list:DRM DRIVERS" <dri-devel@lists.freedesktop.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:INTEL IOMMU (VT-d)" <iommu@lists.linux.dev>,
-	"open list:PCI SUBSYSTEM" <linux-pci@vger.kernel.org>,
-	"open list:VFIO DRIVER" <kvm@vger.kernel.org>,
-	"open list:SOUND" <linux-sound@vger.kernel.org>,
-	Daniel Dadap <ddadap@nvidia.com>,
-	Mario Limonciello <mario.limonciello@amd.com>
-Subject: Re: [PATCH v9 9/9] PCI: Add a new 'boot_display' attribute
-Message-ID: <20250721230013.GA2759370@bhelgaas>
+	s=arc-20240116; t=1753139148; c=relaxed/simple;
+	bh=sH/j7jC8YD3T7eROXTCNl+TXagdKPgArZMgaaYWQ9f4=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=QoLrk4giUa7/hZ21B5SM7OTwWDJ73zm3EOdLiKGH4mLhOGiidz56KX7HcP3ndzItPI70pNLoihT3tkdmvhIdsIuzk463/ELNveAdvmqee8Goo5rDVLLtDYUwf2YPkLvzoro87Cf273lCIMxqF8TIT5EsQRGoPFEdKI1ZL7s9Kf0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=XxoJdyWH; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [127.0.0.1] (c-76-133-66-138.hsd1.ca.comcast.net [76.133.66.138])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 56LN552p262172
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Mon, 21 Jul 2025 16:05:05 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 56LN552p262172
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025062101; t=1753139106;
+	bh=IcSLGI+UscM41aBN5mpfNQZiC0pJ8b3fxaE2PLwPgtk=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+	b=XxoJdyWH7fCFOedARIMot9FsHxXuzObxbi41yIhvDbjS6dbakJfYr0AXF+PeEKEid
+	 R1blE0LIaFBQS0HjY6fxlqMaMu9fqg5gNFF6u648Tud3zaBOm/6iMx3r2Txo+5F6Sb
+	 2N3XSZxfl13vhQlws9+AUS28ptk48mc9wb2eiIJ87F/Ui7EpxGb7CwC17vnuTD8RyB
+	 YLoraNVjNTUr/tWYquA4pFk9eqQ+bZMV9WkMPeOkaxmS11lmkpYPMwzG5AwZNBWP8+
+	 ow+RFhQZ2ujsw4p061qQypByGVudGXjGXof/aKFys9iuCpyWERla3z2JyinT5mi9fS
+	 zFBCKCfa2j47g==
+Date: Mon, 21 Jul 2025 16:05:04 -0700
+From: "H. Peter Anvin" <hpa@zytor.com>
+To: "Huang, Kai" <kai.huang@intel.com>,
+        "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "Hansen, Dave" <dave.hansen@intel.com>,
+        "mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>
+CC: "Gao, Chao" <chao.gao@intel.com>,
+        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "x86@kernel.org" <x86@kernel.org>, "kas@kernel.org" <kas@kernel.org>,
+        "sagis@google.com" <sagis@google.com>,
+        "Chatre, Reinette" <reinette.chatre@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Williams, Dan J" <dan.j.williams@intel.com>,
+        "nik.borisov@suse.com" <nik.borisov@suse.com>,
+        "ashish.kalra@amd.com" <ashish.kalra@amd.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "dwmw@amazon.co.uk" <dwmw@amazon.co.uk>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>
+Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v4_1/7=5D_x86/kexec=3A_Consolida?=
+ =?US-ASCII?Q?te_relocate=5Fkernel=28=29_function_parameters?=
+User-Agent: K-9 Mail for Android
+In-Reply-To: <1d2956ba8c7f0198ed76e09e2f1540d53c96815b.camel@intel.com>
+References: <cover.1752730040.git.kai.huang@intel.com> <c7356a40384a70b853b6913921f88e69e0337dd8.1752730040.git.kai.huang@intel.com> <5dc4745c-4608-a070-d8a8-6afb6f9b14a9@amd.com> <45ecb02603958fa6b741a87bc415ec2639604faa.camel@intel.com> <7eb254a7-473a-94c6-8dd5-24377ed67a34@amd.com> <1d2956ba8c7f0198ed76e09e2f1540d53c96815b.camel@intel.com>
+Message-ID: <38C8C851-8533-4F1E-B047-5DD55C123CD1@zytor.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c7c8b0bf-8602-4030-acbe-ac56678b633c@kernel.org>
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jul 18, 2025 at 12:44:11PM -0500, Mario Limonciello wrote:
-> On 7/18/2025 12:36 PM, Bjorn Helgaas wrote:
-> > On Fri, Jul 18, 2025 at 12:29:05PM -0500, Mario Limonciello wrote:
-> > > On 7/18/2025 12:25 PM, Bjorn Helgaas wrote:
-> > > > On Thu, Jul 17, 2025 at 12:38:12PM -0500, Mario Limonciello wrote:
-> > > > > From: Mario Limonciello <mario.limonciello@amd.com>
-> > > > > 
-> > > > > On systems with multiple GPUs there can be uncertainty which GPU is the
-> > > > > primary one used to drive the display at bootup. In some desktop
-> > > > > environments this can lead to increased power consumption because
-> > > > > secondary GPUs may be used for rendering and never go to a low power
-> > > > > state. In order to disambiguate this add a new sysfs attribute
-> > > > > 'boot_display' that uses the output of video_is_primary_device() to
-> > > > > populate whether a PCI device was used for driving the display.
-> > > > 
-> > > > > +What:		/sys/bus/pci/devices/.../boot_display
-> > > > > +Date:		October 2025
-> > > > > +Contact:	Linux PCI developers <linux-pci@vger.kernel.org>
-> > > > > +Description:
-> > > > > +		This file indicates that displays connected to the device were
-> > > > > +		used to display the boot sequence.  If a display connected to
-> > > > > +		the device was used to display the boot sequence the file will
-> > > > > +		be present and contain "1".
-> > > > 
-> > > > >    int __must_check pci_create_sysfs_dev_files(struct pci_dev *pdev)
-> > > > >    {
-> > > > > +	int retval;
-> > > > > +
-> > > > >    	if (!sysfs_initialized)
-> > > > >    		return -EACCES;
-> > > > > +	retval = pci_create_boot_display_file(pdev);
-> > > > 
-> > > > In addition to Mani's question about whether /sys/bus/pci/ is
-> > > > the right place for this (which is a very good question), it's
-> > > > also been pointed out to me that we've been trying to get rid
-> > > > of pci_create_sysfs_dev_files() for years.
-> > > > 
-> > > > If it's possible to make this a static attribute that would be
-> > > > much, much cleaner.
-> > > 
-> > > Right - I tried to do this, but the problem is at the time the
-> > > PCI device is created the information needed to make the
-> > > judgement isn't ready.  The options end up being:
-> > > * a sysfs file for every display device with 0/1
-> > > * a sysfs file that is not accurate until later in the boot
-> > 
-> > What's missing?  The specifics might be helpful if someone has
-> > another crack at getting rid of pci_create_sysfs_dev_files() in
-> > the future.
-> 
-> The underlying SCREEN_INFO code tries to walk through all the PCI
-> devices in a loop, but at the time all the devices are walked the
-> memory regions associated with the device weren't populated.
+On July 21, 2025 2:36:48 PM PDT, "Huang, Kai" <kai=2Ehuang@intel=2Ecom> wro=
+te:
+>On Mon, 2025-07-21 at 16:27 -0500, Tom Lendacky wrote:
+>> > > > @@ -204,7 +202,7 @@ SYM_CODE_START_LOCAL_NOALIGN(identity_mapped)
+>> > > > =C2=A0=C2=A0	 * entries that will conflict with the now unencrypt=
+ed memory
+>> > > > =C2=A0=C2=A0	 * used by kexec=2E Flush the caches before copying =
+the kernel=2E
+>> > > > =C2=A0=C2=A0	 */
+>> > > > -	testq	%r8, %r8
+>> > > > +	testq	$RELOC_KERNEL_HOST_MEM_ACTIVE, %r11
+>> > >=20
+>> > > Hmmm=2E=2E=2E can't both bits be set at the same time? If so, then =
+this will
+>> > > fail=2E This should be doing bit tests now=2E
+>> >=20
+>> > TEST instruction performs logical AND of the two operands, therefore =
+the
+>> > above equals to:
+>> >=20
+>> > =C2=A0	set ZF if "R11 AND BIT(1) =3D=3D 0"=2E
+>> >=20
+>> > Whether there's any other bits set in R11 doesn't impact the above, r=
+ight?
+>> > =C2=A0=20
+>>=20
+>> Doh! My bad, yes, not sure what I was thinking there=2E
+>>=20
+>
+>Np and thanks! I'll address your other comments but I'll see whether Bori=
+s
+>has any other comments first=2E
+>
 
-Which loop are you referring to that walks through all the PCI
-devices?  I see this:
-
-  efifb_set_system
-    for_each_pci_dev(dev)
-
-but that only looks at VGA devices and IIUC you also want to look at
-non-VGA GPUs.
-
-I don't see a loop in *this* series, where the screen_info path looks
-like this:
-
-  pci_create_boot_display_file
-    video_is_primary_device
-      screen_info_pci_dev      # added by "fbcon: Use screen info to find primary device"
-        screen_info_resources
-        __screen_info_pci_dev
-
-and we're basically matching the screen_info base/address with BAR
-values.
-
-The usual problem is that BARs may not have been assigned by the time
-pci_device_add() -> device_add() creates the static attributes.
-
-So we call pci_assign_unassigned_root_bus_resources() to assign all
-the BARs.  Then we call pci_create_sysfs_dev_files(), where
-pci_create_resource_files() creates a "resource%d" file for each BAR.
-
-But since we're trying to find the GPU that was used by BIOS, I assume
-its BARs were programmed by BIOS and we shouldn't have to wait until
-after pci_assign_unassigned_root_bus_resources().
-
-Bjorn
+You can use testb in this case to save 3 bytes, too=2E
 
