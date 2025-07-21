@@ -1,155 +1,190 @@
-Return-Path: <kvm+bounces-52956-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52957-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A481B0BACB
-	for <lists+kvm@lfdr.de>; Mon, 21 Jul 2025 04:29:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B1B41B0BE0F
+	for <lists+kvm@lfdr.de>; Mon, 21 Jul 2025 09:49:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 57AC1189F09B
-	for <lists+kvm@lfdr.de>; Mon, 21 Jul 2025 02:29:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A4FE2188E683
+	for <lists+kvm@lfdr.de>; Mon, 21 Jul 2025 07:49:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D4EA2236FC;
-	Mon, 21 Jul 2025 02:27:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22F3A27F4CE;
+	Mon, 21 Jul 2025 07:49:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KTpHwn2D"
 X-Original-To: kvm@vger.kernel.org
-Received: from baidu.com (mx22.baidu.com [220.181.50.185])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11A8F1F4289;
-	Mon, 21 Jul 2025 02:27:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.181.50.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AB91DF49
+	for <kvm@vger.kernel.org>; Mon, 21 Jul 2025 07:49:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753064867; cv=none; b=LgSQjazyPnlnNB8qzsfe1VCx7e+fDKR5RbMHK6Zmv3+TpoxadFniAv36yTWfP6shUkULpZyghz+7ZeUW6o9fcTVM/TiViqIP9wC7PkwF8EpdNfjRNOOiDTF3cRsf7hIdmfCEqPUCRwAjJ5A+c8IkqOkzMYN83fEN/irLGjlB8og=
+	t=1753084157; cv=none; b=FqAQtzdk4h//TCtrqT7U1UuCy2IPnhShx0LnE9Wen2Mt0qX7pnsMf4X8jA/gV5O+gnU0P4GeEKY8RxbRr1olD9H6ZYpA5swnWYKhIsmSK2Js32OhWAD7uAd4Vf/HavCp8Nd/sop1axAg3Zn5V5MVrJIRTnluy0ywt0rEJ7gl6fI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753064867; c=relaxed/simple;
-	bh=x+zj8fFpS5eWHmQYb3/NsvA8xbXRIWkSvclvHT/Xf3g=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=rFZNTJvHWI8oXt/daeBjS/2/OBZ7vow4/585JFwn2Auqy5EQTl/Uu6c77qNxvNiPUsfT5LWgBGyFe/a/cIy+3uSuPaDj9IlUNmkWsmkaEUat3H/Qn1izuEFU3JHQkhv5WT73eTiwDrnA6hMLnP1EaTuolL6DwNgFKDl4gMK1HC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com; spf=pass smtp.mailfrom=baidu.com; arc=none smtp.client-ip=220.181.50.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baidu.com
-From: "Li,Rongqing" <lirongqing@baidu.com>
-To: Sean Christopherson <seanjc@google.com>
-CC: "pbonzini@redhat.com" <pbonzini@redhat.com>, "vkuznets@redhat.com"
-	<vkuznets@redhat.com>, "tglx@linutronix.de" <tglx@linutronix.de>,
-	"mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>,
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "x86@kernel.org"
-	<x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Subject: =?gb2312?B?tPC4tDogWz8/Pz9dIFJlOiBbUEFUQ0hdIHg4Ni9rdm06IFJlb3JkZXIgUFYg?=
- =?gb2312?Q?spinlock_checks_for_dedicated_CPU_case?=
-Thread-Topic: [????] Re: [PATCH] x86/kvm: Reorder PV spinlock checks for
- dedicated CPU case
-Thread-Index: AQHb+ebbkcsK2yip8kqdhSixfTeD3A==
-Date: Mon, 21 Jul 2025 02:26:25 +0000
-Message-ID: <c985fbdb96aa44cdb9788d92046b958e@baidu.com>
-References: <20250718094936.5283-1-lirongqing@baidu.com>
- <aHpWW0ZPuI5thDqZ@google.com>
-In-Reply-To: <aHpWW0ZPuI5thDqZ@google.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1753084157; c=relaxed/simple;
+	bh=VOtCbcVt0gGNHLvbj63WBHKbZ6X+uMuPLPPZJmm635U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=E6WuRFc9IInluYMI0gv7aAMdCyNnt3QkdITUcrrVI+qsKK9d8Zjnrh2N0Qlb5fXl/MlcY5XDGnNsnF6dZtZOOjrj2lBw0FaEW7Ic6UeOWm5TC9pBpKya9QUu5Ekp8AOsV53U30nrb/5yH3pcwULMBdyu4vD4bXayjScFHlXi+Co=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KTpHwn2D; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-3a4ef2c2ef3so3001618f8f.2
+        for <kvm@vger.kernel.org>; Mon, 21 Jul 2025 00:49:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1753084154; x=1753688954; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=kKg1W6M4USiwNTbJCkdBvx9IOQ14GKTE6DwJxmpiYlk=;
+        b=KTpHwn2D1V731ECf6Svpzs8L3US8IIPvQM7jN5YHCcM4xOnSonU97lkyz66kQ04K+q
+         EZYGMtF3wLuOS/r20L05itNE3IiKgPd3jw0rFCMbqeJTDe8YPaG0i9lfMH0LcGg+d4Vr
+         fdSKAECmCx7xu8EUu7cNG5xVK+IyO8X+tzMhrfDId9yqqee0Z2O+uSFxWdVhOgZgnf1l
+         T9Q/VeHzUvlpk7TMdBDfKzo6BsQI+kuZMR4An5hLjoNbv8hY61hH/yyL01wzxmRZnF18
+         Ni+Ob8IkZmBIOiQUZ54HhaizjqO4kJ8M7GqjHQdd011pQIiFfDkuUZshJakUpoFJZxtO
+         joSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753084154; x=1753688954;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kKg1W6M4USiwNTbJCkdBvx9IOQ14GKTE6DwJxmpiYlk=;
+        b=qsyVBgwgPIYmDCoHvC+ROt1kKVEilBJO0dUmEObUD7FX4YlLj6ZH2ctAFjfjV0cRl2
+         LQyZp4N6pd1/jX6Uld2gFi27bpwaQeEZZQ6GbTvxetFvLYuMOUdMmzNC2VF4b1F+I7O8
+         YNwRX5bx+Dfd4R+pTpnRjnnPJJS0xSfnv3ca34ya6SWAkRU1wacT5S7P90RwAVay0qBE
+         sf27LUyvnVfqHo4Sdeh2XypebK86Ijo7vlDsT4led2yK5PLP+6/GnMTxGGPn0A6OQuO1
+         1cXECGkJBCOrDdggOvL5/OCB4b7zoIg1xZQVwpi+cUixUZVm9uwaM5sfQIx6jpEu4OqM
+         6lYg==
+X-Forwarded-Encrypted: i=1; AJvYcCUx/a0NRY3TYsoK9TTNXPJ1i8hLLVAQW22ecvJ5VpAz6oaDJHc6lnRsm7IFWTMAkVboG9g=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz1P3VKs0Npus6wVx2MmyMKthBmUUd5RDquGX/HQkSUA6lximqw
+	yQJiZbQhiNk26pTF36J3jZ/3U/bOan9kbh0LgrTovYNZWlf07RmZvoL3S7syvLbQUQ==
+X-Gm-Gg: ASbGnctYhrxH8nLBqrvNeHZ+BqF/HFQ8pBtLIdZyV+Bkdnw7A0v/3tMpLcekR3XwfK/
+	g2ONtsUFh+7IHnibRyVWYmIU1nEF+QGEVB3ctBYPIB3pn2C+O3a/2aTEHTvJuf/cTl6U10X/WCZ
+	34ReYlRwi8YVQO+2t2+KtQlLTdK8GwZSAJWejXOj7XG5HFe+8P7kmcO79eqcdCeQmzvtAZ386+y
+	cidKi/CULihkPiH+zWxANcg4c4Rx2TDoesuEvjcP8zGoEWvFoKiEpmmpNCq+OByIlrk7o5wXdET
+	xeMV5oLUHH5+9l9y9VFQ7Ry46GR7QEw86ByKceHGd2vlAs4MlPEQyyXuC+krHY8WSNf922PwbHG
+	BHFxNKZlKQ4VH/ShUQ8AhEQJLBhtiDv0wSmjXivkdExqr53WgXXJQX6HI+tFiwh+lot74IA==
+X-Google-Smtp-Source: AGHT+IHLCPN08G76cpeAjmGFh2SwOYUq7PKTpI10Q0DJaIHMug/5GI7V+ike5MmSquAW5czvaJ/6xw==
+X-Received: by 2002:a05:6000:2902:b0:3a4:f038:af74 with SMTP id ffacd0b85a97d-3b60e518418mr15229224f8f.51.1753084153650;
+        Mon, 21 Jul 2025 00:49:13 -0700 (PDT)
+Received: from google.com (120.142.205.35.bc.googleusercontent.com. [35.205.142.120])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b61ca4894asm9640037f8f.49.2025.07.21.00.49.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Jul 2025 00:49:13 -0700 (PDT)
+Date: Mon, 21 Jul 2025 07:49:10 +0000
+From: Keir Fraser <keirf@google.com>
+To: Yao Yuan <yaoyuan0329os@gmail.com>
+Cc: Sean Christopherson <seanjc@google.com>,
+	Yao Yuan <yaoyuan@linux.alibaba.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, Eric Auger <eric.auger@redhat.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v2 2/4] KVM: arm64: vgic: Explicitly implement
+ vgic_dist::ready ordering
+Message-ID: <aH3w9t78dvxsDjhV@google.com>
+References: <20250716110737.2513665-1-keirf@google.com>
+ <20250716110737.2513665-3-keirf@google.com>
+ <kb7nwrco6s7e6catcareyic72pxvx52jbqbfc5gbqb5zu434kg@w3rrzbut3h34>
+ <aHphgd0fOjHXjPCI@google.com>
+ <5zpxxmymnyzncdnewdonnglvmvbtggjyxyqvkf6yars2bbyr4b@gottasrtoq2s>
+ <aHtQG_k_1q3862s3@google.com>
+ <4i65mgp4rtfox2ttchamijofcmwjtd6sefmuhdkfdrjwaznhoc@2uhcfv2ziegj>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-FEAS-Client-IP: 172.31.50.46
-X-FE-Policy-ID: 52:10:53:SYSTEM
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4i65mgp4rtfox2ttchamijofcmwjtd6sefmuhdkfdrjwaznhoc@2uhcfv2ziegj>
 
-DQo+IA0KPiBPbiBGcmksIEp1bCAxOCwgMjAyNSwgbGlyb25ncWluZyB3cm90ZToNCj4gPiBGcm9t
-OiBMaSBSb25nUWluZyA8bGlyb25ncWluZ0BiYWlkdS5jb20+DQo+ID4NCj4gPiBXaGVuIGEgdkNQ
-VSBoYXMgYSBkZWRpY2F0ZWQgcGh5c2ljYWwgQ1BVLCB0eXBpY2FsbHksIHRoZSBoeXBlcnZpc29y
-DQo+ID4gZGlzYWJsZXMgdGhlIEhMVCBleGl0IHRvbywNCj4gDQo+IEJ1dCBjZXJ0YWlubHkgbm90
-IGFsd2F5cy4gIEUuZy4gdGhlIGh5cGVydmlzb3IgbWF5IGRpc2FibGUgTVdBSVQgZXhpdGluZyBi
-dXQNCj4gbm90IEhMVCBleGl0aW5nLCBzbyB0aGF0IHRoZSBoeXBlcnZpc29yIGNhbiB0YWtlIGFj
-dGlvbiBpZiBhIGd1ZXN0IGtlcm5lbCByZWZ1c2VzDQo+IHRvIHVzZSBNV0FJVCBmb3Igd2hhdGV2
-ZXIgcmVhc29uLg0KPiANCj4gSSBhc3N1bWUgbmF0aXZlIHFzcGlubG9ja3Mgb3V0cGVyZm9ybSB2
-aXJ0X3NwaW5fbG9jaygpIGlycmVzcGVjdGl2ZSBvZiBITFQNCj4gZXhpdGluZyB3aGVuIHRoZSB2
-Q1BVIGhhcyBhIGRlZGljYXRlZCBwQ1BVPyANCg0KIkkgdGhpbmsgdGhpcyBpcyB0cnVlLiBBcyB0
-aGUgY29tbWVudCAoS1ZNOiBYODY6IENob29zZSBxc3BpbmxvY2sgd2hlbiBkZWRpY2F0ZWQgcGh5
-c2ljYWwgQ1BVcyBhcmUgYXZhaWxhYmxlKSBzYXlzOg0KJ1BWX0RFRElDQVRFRCA9IDEsIFBWX1VO
-SEFMVCA9IGFueXRoaW5nOiBkZWZhdWx0IGlzIHFzcGlubG9jaycuIA0KSG93ZXZlciwgdGhlIGN1
-cnJlbnQgY29kZSBkb2Vzbid0IHJlZmxlY3QgdGhpcy4gV2hlbiBQVl9VTkhBTFQ9MCwgaXQgc3Rp
-bGwgdXNlcyB2aXJ0X3NwaW5fbG9jaygpLiBNeSBwYXRjaCBpcyBmaXhpbmcgdGhpcyBpbmNvbnNp
-c3RlbmN5Lg0KDQpjb21taXQgYjI3OThiYTBiODc2OWI0MmYwMDg5OWI0NGE1MzhiNWZjZWNiNDgw
-ZA0KQXV0aG9yOiBXYW5wZW5nIExpIDx3YW5wZW5nbGlAdGVuY2VudC5jb20+DQpEYXRlOiAgIFR1
-ZSBGZWIgMTMgMDk6MDU6NDEgMjAxOCArMDgwMA0KDQogICAgS1ZNOiBYODY6IENob29zZSBxc3Bp
-bmxvY2sgd2hlbiBkZWRpY2F0ZWQgcGh5c2ljYWwgQ1BVcyBhcmUgYXZhaWxhYmxlDQoNCiAgICBX
-YWltYW4gTG9uZyBtZW50aW9uZWQgdGhhdDoNCiAgICA+IEdlbmVyYWxseSBzcGVha2luZywgdW5m
-YWlyIGxvY2sgcGVyZm9ybXMgd2VsbCBmb3IgVk1zIHdpdGggYSBzbWFsbA0KICAgID4gbnVtYmVy
-IG9mIHZDUFVzLiBOYXRpdmUgcXNwaW5sb2NrIG1heSBwZXJmb3JtIGJldHRlciB0aGFuIHB2cXNw
-aW5sb2NrDQogICAgPiBpZiB0aGVyZSBpcyB2Q1BVIHBpbm5pbmcgYW5kIHRoZXJlIGlzIG5vIHZD
-UFUgb3Zlci1jb21taXRtZW50Lg0KDQogICAgVGhpcyBwYXRjaCB1c2VzIHRoZSBLVk1fSElOVFNf
-REVESUNBVEVEIHBlcmZvcm1hbmNlIGhpbnQsIHdoaWNoIGlzDQogICAgcHJvdmlkZWQgYnkgdGhl
-IGh5cGVydmlzb3IgYWRtaW4sIHRvIGNob29zZSB0aGUgcXNwaW5sb2NrIGFsZ29yaXRobQ0KICAg
-IHdoZW4gYSBkZWRpY2F0ZWQgcGh5c2ljYWwgQ1BVIGlzIGF2YWlsYWJsZS4NCg0KICAgIFBWX0RF
-RElDQVRFRCA9IDEsIFBWX1VOSEFMVCA9IGFueXRoaW5nOiBkZWZhdWx0IGlzIHFzcGlubG9jaw0K
-ICAgIFBWX0RFRElDQVRFRCA9IDAsIFBWX1VOSEFMVCA9IDE6IGRlZmF1bHQgaXMgSHlicmlkIFBW
-IHF1ZXVlZC91bmZhaXIgbG9jaw0KICAgIFBWX0RFRElDQVRFRCA9IDAsIFBWX1VOSEFMVCA9IDA6
-IGRlZmF1bHQgaXMgdGFzDQoNCg0KDQo+IElmIHNvLCBpdCdzIHByb2JhYmx5IHdvcnRoIGNhbGxp
-bmcNCj4gdGhhdCBvdXQgaW4gdGhlIGNoYW5nZWxvZywgZS5nLiB0byBhc3N1YWdlIGFueSBmZWFy
-cy9jb25jZXJucyBhYm91dCB0aGlzIGJlaW5nDQo+IHVuZGVzaXJhYmxlIGZvciBzZXR1cHMgd2l0
-aCBLVk1fSElOVFNfUkVBTFRJTUUgKmFuZCoNCj4gS1ZNX0ZFQVRVUkVfUFZfVU5IQUxULg0KPiAN
-Ck9rLCBJIHdpbGwgcmV3cml0ZSB0aGUgY2hhbmdlbG9nDQoNCklmIHlvdSBzdGlsbCBoYXZlIGNv
-bmNlcm5zLCBJIHRoaW5rIHdlIGNhbiBjaGFuZ2UgdGhlIGNvZGUgYXMgYmVsb3cNCg0KZGlmZiAt
-LWdpdCBhL2FyY2gveDg2L2tlcm5lbC9rdm0uYyBiL2FyY2gveDg2L2tlcm5lbC9rdm0uYw0KaW5k
-ZXggOTIxYzFjNy4uNjI3NWQ3OCAxMDA2NDQNCi0tLSBhL2FyY2gveDg2L2tlcm5lbC9rdm0uYw0K
-KysrIGIvYXJjaC94ODYva2VybmVsL2t2bS5jDQpAQCAtMTA3OCw4ICsxMDc4LDE0IEBAIHZvaWQg
-X19pbml0IGt2bV9zcGlubG9ja19pbml0KHZvaWQpDQogICAgICAgICAqIHByZWZlcnJlZCBvdmVy
-IG5hdGl2ZSBxc3BpbmxvY2sgd2hlbiB2Q1BVIGlzIHByZWVtcHRlZC4NCiAgICAgICAgICovDQog
-ICAgICAgIGlmICgha3ZtX3BhcmFfaGFzX2ZlYXR1cmUoS1ZNX0ZFQVRVUkVfUFZfVU5IQUxUKSkg
-ew0KLSAgICAgICAgICAgICAgIHByX2luZm8oIlBWIHNwaW5sb2NrcyBkaXNhYmxlZCwgbm8gaG9z
-dCBzdXBwb3J0XG4iKTsNCi0gICAgICAgICAgICAgICByZXR1cm47DQorICAgICAgICAgICAgICAg
-aWYgKGt2bV9wYXJhX2hhc19oaW50KEtWTV9ISU5UU19SRUFMVElNRSkpIHsNCisgICAgICAgICAg
-ICAgICAgICAgICAgIHByX2luZm8oIlBWIHNwaW5sb2NrcyBkaXNhYmxlZCB3aXRoIEtWTV9ISU5U
-U19SRUFMVElNRSBoaW50c1xuIik7DQorICAgICAgICAgICAgICAgICAgICAgICBnb3RvIG91dDsN
-CisgICAgICAgICAgICAgICB9DQorICAgICAgICAgICAgICAgZWxzZSB7DQorICAgICAgICAgICAg
-ICAgICAgICAgICBwcl9pbmZvKCJQViBzcGlubG9ja3MgZGlzYWJsZWQsIG5vIGhvc3Qgc3VwcG9y
-dFxuIik7DQorICAgICAgICAgICAgICAgICAgICAgICByZXR1cm47DQorICAgICAgICAgICAgICAg
-fQ0KICAgICAgICB9DQoNCiAgICAgICAgLyoNCg0KVGhhbmtzDQoNCi1MaQ0KDQoNCj4gPiByZW5k
-ZXJpbmcgdGhlIEtWTV9GRUFUVVJFX1BWX1VOSEFMVCBmZWF0dXJlIHVuYXZhaWxhYmxlLCBhbmQN
-Cj4gPiB2aXJ0X3NwaW5fbG9ja19rZXkgaXMgZXhwZWN0ZWQgdG8gYmUgZGlzYWJsZWQgaW4gdGhp
-cyBjb25maWd1cmF0aW9uLCBidXQ6DQo+ID4NCj4gPiBUaGUgcHJvYmxlbWF0aWMgZXhlY3V0aW9u
-IGZsb3cgY2F1c2VkIHRoZSBlbmFibGVkIHZpcnRfc3Bpbl9sb2NrX2tleToNCj4gPiAtIEZpcnN0
-IGNoZWNrIFBWX1VOSEFMVA0KPiA+IC0gVGhlbiBjaGVjayBkZWRpY2F0ZWQgQ1BVcw0KPiA+DQo+
-ID4gU28gY2hhbmdlIHRoZSBvcmRlcjoNCj4gPiAtIEZpcnN0IGNoZWNrIGRlZGljYXRlZCBDUFVz
-DQo+ID4gLSBUaGVuIGNoZWNrIFBWX1VOSEFMVA0KPiA+DQo+ID4gVGhpcyBlbnN1cmVzIHZpcnRf
-c3Bpbl9sb2NrX2tleSBpcyBkaXNhYmxlIHdoZW4gZGVkaWNhdGVkIHBoeXNpY2FsDQo+ID4gQ1BV
-cyBhcmUgYXZhaWxhYmxlIGFuZCBITFQgZXhpdCBpcyBkaXNhYmxlZCwgYW5kIHRoaXMgd2lsbCBn
-aXZlcyBhDQo+ID4gcHJldHR5IHBlcmZvcm1hbmNlIGJvb3N0IGF0IGhpZ2ggY29udGVudGlvbiBs
-ZXZlbA0KPiA+DQo+ID4gU2lnbmVkLW9mZi1ieTogTGkgUm9uZ1FpbmcgPGxpcm9uZ3FpbmdAYmFp
-ZHUuY29tPg0KPiA+IC0tLQ0KPiA+ICBhcmNoL3g4Ni9rZXJuZWwva3ZtLmMgfCAyMCArKysrKysr
-KysrLS0tLS0tLS0tLQ0KPiA+ICAxIGZpbGUgY2hhbmdlZCwgMTAgaW5zZXJ0aW9ucygrKSwgMTAg
-ZGVsZXRpb25zKC0pDQo+ID4NCj4gPiBkaWZmIC0tZ2l0IGEvYXJjaC94ODYva2VybmVsL2t2bS5j
-IGIvYXJjaC94ODYva2VybmVsL2t2bS5jIGluZGV4DQo+ID4gOTIxYzFjNy4uOWNkYTc5ZiAxMDA2
-NDQNCj4gPiAtLS0gYS9hcmNoL3g4Ni9rZXJuZWwva3ZtLmMNCj4gPiArKysgYi9hcmNoL3g4Ni9r
-ZXJuZWwva3ZtLmMNCj4gPiBAQCAtMTA3MywxNiArMTA3Myw2IEBAIHN0YXRpYyB2b2lkIGt2bV93
-YWl0KHU4ICpwdHIsIHU4IHZhbCkgIHZvaWQNCj4gPiBfX2luaXQga3ZtX3NwaW5sb2NrX2luaXQo
-dm9pZCkgIHsNCj4gPiAgCS8qDQo+ID4gLQkgKiBJbiBjYXNlIGhvc3QgZG9lc24ndCBzdXBwb3J0
-IEtWTV9GRUFUVVJFX1BWX1VOSEFMVCB0aGVyZSBpcyBzdGlsbCBhbg0KPiA+IC0JICogYWR2YW50
-YWdlIG9mIGtlZXBpbmcgdmlydF9zcGluX2xvY2tfa2V5IGVuYWJsZWQ6IHZpcnRfc3Bpbl9sb2Nr
-KCkgaXMNCj4gPiAtCSAqIHByZWZlcnJlZCBvdmVyIG5hdGl2ZSBxc3BpbmxvY2sgd2hlbiB2Q1BV
-IGlzIHByZWVtcHRlZC4NCj4gPiAtCSAqLw0KPiA+IC0JaWYgKCFrdm1fcGFyYV9oYXNfZmVhdHVy
-ZShLVk1fRkVBVFVSRV9QVl9VTkhBTFQpKSB7DQo+ID4gLQkJcHJfaW5mbygiUFYgc3BpbmxvY2tz
-IGRpc2FibGVkLCBubyBob3N0IHN1cHBvcnRcbiIpOw0KPiA+IC0JCXJldHVybjsNCj4gPiAtCX0N
-Cj4gPiAtDQo+ID4gLQkvKg0KPiA+ICAJICogRGlzYWJsZSBQViBzcGlubG9ja3MgYW5kIHVzZSBu
-YXRpdmUgcXNwaW5sb2NrIHdoZW4gZGVkaWNhdGVkIHBDUFVzDQo+ID4gIAkgKiBhcmUgYXZhaWxh
-YmxlLg0KPiA+ICAJICovDQo+ID4gQEAgLTExMDEsNiArMTA5MSwxNiBAQCB2b2lkIF9faW5pdCBr
-dm1fc3BpbmxvY2tfaW5pdCh2b2lkKQ0KPiA+ICAJCWdvdG8gb3V0Ow0KPiA+ICAJfQ0KPiA+DQo+
-ID4gKwkvKg0KPiA+ICsJICogSW4gY2FzZSBob3N0IGRvZXNuJ3Qgc3VwcG9ydCBLVk1fRkVBVFVS
-RV9QVl9VTkhBTFQgdGhlcmUgaXMgc3RpbGwgYW4NCj4gPiArCSAqIGFkdmFudGFnZSBvZiBrZWVw
-aW5nIHZpcnRfc3Bpbl9sb2NrX2tleSBlbmFibGVkOiB2aXJ0X3NwaW5fbG9jaygpIGlzDQo+ID4g
-KwkgKiBwcmVmZXJyZWQgb3ZlciBuYXRpdmUgcXNwaW5sb2NrIHdoZW4gdkNQVSBpcyBwcmVlbXB0
-ZWQuDQo+ID4gKwkgKi8NCj4gPiArCWlmICgha3ZtX3BhcmFfaGFzX2ZlYXR1cmUoS1ZNX0ZFQVRV
-UkVfUFZfVU5IQUxUKSkgew0KPiA+ICsJCXByX2luZm8oIlBWIHNwaW5sb2NrcyBkaXNhYmxlZCwg
-bm8gaG9zdCBzdXBwb3J0XG4iKTsNCj4gPiArCQlyZXR1cm47DQo+ID4gKwl9DQo+ID4gKw0KPiA+
-ICAJcHJfaW5mbygiUFYgc3BpbmxvY2tzIGVuYWJsZWRcbiIpOw0KPiA+DQo+ID4gIAlfX3B2X2lu
-aXRfbG9ja19oYXNoKCk7DQo+ID4gLS0NCj4gPiAyLjkuNA0KPiA+DQo=
+On Sun, Jul 20, 2025 at 08:08:30AM +0800, Yao Yuan wrote:
+> On Sat, Jul 19, 2025 at 07:58:19AM +0000, Keir Fraser wrote:
+> > On Sat, Jul 19, 2025 at 10:15:56AM +0800, Yao Yuan wrote:
+> > > On Fri, Jul 18, 2025 at 08:00:17AM -0700, Sean Christopherson wrote:
+> > > > On Thu, Jul 17, 2025, Yao Yuan wrote:
+> > > > > On Wed, Jul 16, 2025 at 11:07:35AM +0800, Keir Fraser wrote:
+> > > > > > In preparation to remove synchronize_srcu() from MMIO registration,
+> > > > > > remove the distributor's dependency on this implicit barrier by
+> > > > > > direct acquire-release synchronization on the flag write and its
+> > > > > > lock-free check.
+> > > > > >
+> > > > > > Signed-off-by: Keir Fraser <keirf@google.com>
+> > > > > > ---
+> > > > > >  arch/arm64/kvm/vgic/vgic-init.c | 11 ++---------
+> > > > > >  1 file changed, 2 insertions(+), 9 deletions(-)
+> > > > > >
+> > > > > > diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+> > > > > > index 502b65049703..bc83672e461b 100644
+> > > > > > --- a/arch/arm64/kvm/vgic/vgic-init.c
+> > > > > > +++ b/arch/arm64/kvm/vgic/vgic-init.c
+> > > > > > @@ -567,7 +567,7 @@ int kvm_vgic_map_resources(struct kvm *kvm)
+> > > > > >  	gpa_t dist_base;
+> > > > > >  	int ret = 0;
+> > > > > >
+> > > > > > -	if (likely(dist->ready))
+> > > > > > +	if (likely(smp_load_acquire(&dist->ready)))
+> > > > > >  		return 0;
+> > > > > >
+> > > > > >  	mutex_lock(&kvm->slots_lock);
+> > > > > > @@ -598,14 +598,7 @@ int kvm_vgic_map_resources(struct kvm *kvm)
+> > > > > >  		goto out_slots;
+> > > > > >  	}
+> > > > > >
+> > > > > > -	/*
+> > > > > > -	 * kvm_io_bus_register_dev() guarantees all readers see the new MMIO
+> > > > > > -	 * registration before returning through synchronize_srcu(), which also
+> > > > > > -	 * implies a full memory barrier. As such, marking the distributor as
+> > > > > > -	 * 'ready' here is guaranteed to be ordered after all vCPUs having seen
+> > > > > > -	 * a completely configured distributor.
+> > > > > > -	 */
+> > > > > > -	dist->ready = true;
+> > > > > > +	smp_store_release(&dist->ready, true);
+> > > > >
+> > > > > No need the store-release and load-acquire for replacing
+> > > > > synchronize_srcu_expedited() w/ call_srcu() IIUC:
+> > > >
+> > > > This isn't about using call_srcu(), because it's not actually about kvm->buses.
+> > > > This code is concerned with ensuring that all stores to kvm->arch.vgic are ordered
+> > > > before the store to set kvm->arch.vgic.ready, so that vCPUs never see "ready==true"
+> > > > with a half-baked distributor.
+> > > >
+> > > > In the current code, kvm_vgic_map_resources() relies on the synchronize_srcu() in
+> > > > kvm_io_bus_register_dev() to provide the ordering guarantees.  Switching to
+> > > > smp_store_release() + smp_load_acquire() removes the dependency on the
+> > > > synchronize_srcu() so that the synchronize_srcu() call can be safely removed.
+> > >
+> > > Yes, I understand this and agree with your point.
+> > >
+> > > Just for discusstion: I thought it should also work even w/o
+> > > introduce the load acqure + store release after switch to
+> > > call_srcu(): The smp_mb() in call_srcu() order the all store
+> > > to kvm->arch.vgic before store kvm->arch.vgic.ready in
+> > > current implementation.
+> >
+> > The load-acquire would still be required, to ensure that accesses to
+> > kvm->arch.vgic do not get reordered earlier than the lock-free check
+> > of kvm->arch.vgic.ready. Otherwise that CPU could see that the vgic is
+> > initialised, but then use speculated reads of uninitialised vgic state.
+> >
+> 
+> Thanks for your explanation.
+> 
+> I see. But there's "mutex_lock(&kvm->slot_lock);" before later
+> acccessing to the kvm->arch.vgic, so I think the order can be
+> guaranteed. Of cause as you said a explicitly acquire-load +
+> store-release is better than before implicitly implementation.
+
+If vgic_dist::ready is observed true by the lock-free read (the one
+which is turned into load-acquire by this patch) then the function
+immediately returns with no mutex_lock() executed. It is reads of
+vgic_dist *after* return from kvm_vgic_map_resources() that you have
+to worry about, and which require load-acquire semantics.
+
+> 
+> > > >
 
