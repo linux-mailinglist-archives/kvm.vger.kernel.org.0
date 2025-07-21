@@ -1,73 +1,68 @@
-Return-Path: <kvm+bounces-52974-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-52975-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24CC4B0C499
-	for <lists+kvm@lfdr.de>; Mon, 21 Jul 2025 14:58:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C595FB0C4E6
+	for <lists+kvm@lfdr.de>; Mon, 21 Jul 2025 15:10:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD3B24E3C89
-	for <lists+kvm@lfdr.de>; Mon, 21 Jul 2025 12:57:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3901A543707
+	for <lists+kvm@lfdr.de>; Mon, 21 Jul 2025 13:09:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 713A72D663F;
-	Mon, 21 Jul 2025 12:55:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A0AF283FE1;
+	Mon, 21 Jul 2025 13:08:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bck23HC/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pkqG/l1Z"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93CC22D6630;
-	Mon, 21 Jul 2025 12:55:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 296012D6617;
+	Mon, 21 Jul 2025 13:08:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753102540; cv=none; b=FteO3ibgyCXpheyXdEUA2bjhqBXUH4QJVrKuC3QdCobHEG/8ZTzkwbnnxklmIzVmCWLjgsVcgKU3+c0Ok2oi7e9E43Kud/NXmd06ZUKF/JXzXQ7EpbWp1bROVjAiv0LFYxR54jx1UIN5PHkukI8nLYDLqmWDB/WfboSmJPNscWU=
+	t=1753103297; cv=none; b=kPN/v7HXjqe6W/47mrBoJ62Owok8TQ0KhyvJJ5MQW7Vk9LZoZhptZxeZ7HUvcATEpeBB51yjcgPOzCfbqEPaVcRhrPVAnn0RAzgRVXyYgv2f7veVUEwWYYyMe+lERqkQJ+rpN8lwj/w9v3sLQibfCnnumRX7hVOPC+nXenuKlMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753102540; c=relaxed/simple;
-	bh=N1lImdMNi0LkLe+iyg+EaG1byDnMalM2Uunw/8j+1FQ=;
+	s=arc-20240116; t=1753103297; c=relaxed/simple;
+	bh=2BOOQpaqd3T/K9munHgevbSZGIufTpM5Kwk8FYNDjm4=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dLwqN38S+xtXAfuF+d3gmJNmu6KuEv4a33OTi/5FPAVfEsYgFxcVGxbq6i1HmDg8YHirNCV/l7maLdYkWFGBhwVsAYAD3maTAOSJ5Gp7M/AOoc/wTgqGwuKqW2VvXBz6X8yaGLmWyfOpAw3lSS7PIB0r5sE0qwAd3V6n1amsg4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bck23HC/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71E12C4CEED;
-	Mon, 21 Jul 2025 12:55:40 +0000 (UTC)
+	 MIME-Version:Content-Type; b=snR3yusHP1NTOxEcEyuJi+WY+jE4MdTXmVMwmhLPhz1fxkzea1Rk7OM0ESeUAsoYWIASu0157fz/liCr8Oz6uzEZ7FFLj9CWWeXaMwSCYp6NQjJ13yO9pHl3OGMqGXrRS6W5fLIRrgn0E2hUUbBThjO5e9cZRExUzpGIMTaaY8w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pkqG/l1Z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A16EC4CEED;
+	Mon, 21 Jul 2025 13:08:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753102540;
-	bh=N1lImdMNi0LkLe+iyg+EaG1byDnMalM2Uunw/8j+1FQ=;
+	s=k20201202; t=1753103296;
+	bh=2BOOQpaqd3T/K9munHgevbSZGIufTpM5Kwk8FYNDjm4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=bck23HC/cMT/XHViqTB4pFBKeWj5JKEBoM3YuQGtlAaPyTrWcRx52PL19UYI3HFKb
-	 qhwZiszHf78d33M0HMhNsDZhAZAJ0NXeNI69A8++EYMsmK/kS90y1+b15ktEF3MR8O
-	 PEYvAeG6XhlyerdD+McSfBsyetfYrLhXjxFmgYi/ea5Zqx7pI+txWesnGeq96xg+de
-	 WeRG7Q5pFfdAyMZ8z1DQd+++PXZTKl/ZvgPdv3Z5K2cZVMSeAqVOQQlZUeZb6FXN8p
-	 NFT0+j9y9qhkFvVwDHm36SwRpbrAjVZDQ555DtIsF2GHUkxDgYmXUa2j3+8SaAupYa
-	 6kzKVUtZ6R0Sw==
+	b=pkqG/l1Z1XlZMdwY5kVQVzqBNStrRr93vvyj9XKH4l0oj28Rb20RtsPMMxbBLW7et
+	 437IJr5NK/bMYleqJfiYypNDb5vHn6Y858Nnsz8aGpeakhgHNpMKDbhxlWHDBSIkgL
+	 5nHuXcDv0ioqzAFXjw7pQ7MYVaCWXgn/8CzUChHpzE2bOqvW9QmMyWbdHAYLz+r1ix
+	 T/j3MpEAJxYD/gh4K7WD1PUD9ZdW/xqiY1YFd1GgVcv5UP2iK2ObladvCXXR59HD7G
+	 zvfqZ4QbQrCA33YJeYCbyXxlyPi3DWdKurpcmZ5ExDu0COEn0fYvNYWvypRDNhfv9D
+	 ICefUSV2hanZQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1udq3O-0000qr-3t;
-	Mon, 21 Jul 2025 13:55:38 +0100
-Date: Mon, 21 Jul 2025 13:55:37 +0100
-Message-ID: <86o6td8zzq.wl-maz@kernel.org>
+	id 1udqFa-0001EV-5I;
+	Mon, 21 Jul 2025 14:08:14 +0100
+Date: Mon, 21 Jul 2025 14:08:13 +0100
+Message-ID: <86ms8x8zeq.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: kvmarm@lists.linux.dev,
+To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose
- <suzuki.poulose@arm.com>,
+	kvm@vger.kernel.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui
- Yu <yuzenghui@huawei.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
 	Will Deacon <will@kernel.org>,
-	Catalin Marinas
- <catalin.marinas@arm.com>
-Subject: Re: [PATCH 6/7] KVM: arm64: Expose FEAT_RASv1p1 in a canonical manner
-In-Reply-To: <87seip67xz.fsf@redhat.com>
+	Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH 4/7] KVM: arm64: Handle RASv1p1 registers
+In-Reply-To: <20250721101955.535159-5-maz@kernel.org>
 References: <20250721101955.535159-1-maz@kernel.org>
-	<20250721101955.535159-7-maz@kernel.org>
-	<87seip67xz.fsf@redhat.com>
+	<20250721101955.535159-5-maz@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -79,33 +74,60 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: cohuck@redhat.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 21 Jul 2025 13:32:08 +0100,
-Cornelia Huck <cohuck@redhat.com> wrote:
+On Mon, 21 Jul 2025 11:19:52 +0100,
+Marc Zyngier <maz@kernel.org> wrote:
 > 
-> On Mon, Jul 21 2025, Marc Zyngier <maz@kernel.org> wrote:
+> FEAT_RASv1p1 system registeres are not handled at all so far.
+> KVM will give an embarassed warning on the console and inject
+> an UNDEF, despite RASv1p1 being exposed to the guest on suitable HW.
 > 
-> > If we have RASv1p1 on the host, advertise it to the guest in the
-> > "canonical way", by setting ID_AA64PFR0_EL1 to V1P1, rather than
-> > the convoluted RAS+RAS_frac method.
+> Handle these registers similarly to FEAT_RAS, with the added fun
+> that there are *two* way to indicate the presence of FEAT_RASv1p1.
 > 
-> Don't the two methods have slightly different semantics with RAS == V1P1
-> possibly implying FEAT_DoubleFault, and RAS+RAS_frac not?
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index aea50870d9f11..9fb2812106cb0 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -2695,6 +2695,16 @@ static bool access_ras(struct kvm_vcpu *vcpu,
+>  	struct kvm *kvm = vcpu->kvm;
+>  
+>  	switch(reg_to_encoding(r)) {
+> +	case SYS_ERXPFGCDN_EL1:
+> +	case SYS_ERXPFGCTL_EL1:
+> +	case SYS_ERXPFGF_EL1:
+> +		if (!(kvm_has_feat(kvm, ID_AA64PFR0_EL1, RAS, V1P1) ||
+> +		      (kvm_has_feat_enum(kvm, ID_AA64PFR0_EL1, RAS, IMP) &&
+> +		       kvm_has_feat(kvm, ID_AA64PFR1_EL1, RAS_frac, RASv1p1)))) {
+> +			kvm_inject_undefined(vcpu);
+> +			return false;
+> +		}
+> +		break;
+>  	default:
+>  		if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, RAS, IMP)) {
+>  			kvm_inject_undefined(vcpu);
+> @@ -3058,6 +3068,9 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	{ SYS_DESC(SYS_ERXCTLR_EL1), access_ras },
+>  	{ SYS_DESC(SYS_ERXSTATUS_EL1), access_ras },
+>  	{ SYS_DESC(SYS_ERXADDR_EL1), access_ras },
+> +	{ SYS_DESC(SYS_ERXPFGF_EL1), access_ras },
+> +	{ SYS_DESC(SYS_ERXPFGCTL_EL1), access_ras },
+> +	{ SYS_DESC(SYS_ERXPFGCDN_EL1), access_ras },
+>  	{ SYS_DESC(SYS_ERXMISC0_EL1), access_ras },
+>  	{ SYS_DESC(SYS_ERXMISC1_EL1), access_ras },
+>  
 
-Ah, that's an interesting point -- I definitely had glanced over that.
-
-But I'm not sure a guest can actually distinguish between these two
-configurations, given that FEAT_DoubleFault is essentially an EL3
-feature (as indicated in the RAS == V1P1 section, and further
-confirmed in R_GRJVN), making it invisible to the guest.
-
-FEAT_DoubleFault2 is, on the contrary, totally visible from the guest,
-and independent of EL3.
-
-Does this make sense to you?
+This is obviously missing the ERXMISC{2,3}_EL1 registers, which I have
+now added as a fixup on top of the current series. I'll squash that
+before reposting.
 
 Thanks,
 
