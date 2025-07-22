@@ -1,71 +1,63 @@
-Return-Path: <kvm+bounces-53052-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53053-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40C29B0CF73
-	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 03:59:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56B43B0CF7A
+	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 04:01:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 635C96C647C
-	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 01:59:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5692F5401A9
+	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 02:01:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4F271DD88F;
-	Tue, 22 Jul 2025 01:59:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0ABA1D7E35;
+	Tue, 22 Jul 2025 02:01:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EWC0dAlh"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="FCwsnUrR"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9C2A469D;
-	Tue, 22 Jul 2025 01:59:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D64918E25;
+	Tue, 22 Jul 2025 02:01:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753149580; cv=none; b=MsG2tHqZ4pEHvTCV8VizobZJ8NfLaw9Fu87xQtLik2ez3xt/4cD5Tb227ABUiT4EbNbef5bjsosHwTo98p5Cy6hbBvr0m8Ym9Iig4vktHAPWiJQMfliOO/K5gMUMrUcN4ATx2INj5GUfN3S5kl+d7OCALRn+RPs5GCRRcGKEUHM=
+	t=1753149700; cv=none; b=ADr7J57u0UDSneLMOhH5Oykk+4w063aEIzhYt8D7mcQngcDjKdos425IMpkLTAyTRqw70xK0bKVckJnHoQwytjF89LMkVfTXpHseaZiiQKZWTFafqFZrHsqeqiR87jFhRGLaPQZ0abt73YdTbBZqnzXjx6TxwFzu1RRpl0FlN84=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753149580; c=relaxed/simple;
-	bh=bm0m4nJCJwr818tAwn/pFGu42E+zoi1w1iM6fehYaY4=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=DYaOQtddDmMUkfOYfdOesNhD9pSxqE4hC0CSZ6M+1f2PkKAWwifEidv7/txoQgeMYyek2QcSIg8O4IuiCaB3Bb/c02gIpkNMd7B/cZdsZLC+l046/liNIDQyUuWFAtAFdXs1Gje70YZqcSiGRbwEz2F5G2yK4vERx2nm63nA0ok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EWC0dAlh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31C6EC4CEF1;
-	Tue, 22 Jul 2025 01:59:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753149576;
-	bh=bm0m4nJCJwr818tAwn/pFGu42E+zoi1w1iM6fehYaY4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=EWC0dAlhj3RGOrRbeKwXNZEQj7dwLpmNlpJMJOGQFJE85GZ+moiEa1Lo5iMos3Qjr
-	 P9nKYIeDLQ4eZy0j7EiIWFsHjBTwjNESgh3OSUPqB7N7PW7quWVlVHqlONZtK0g8lF
-	 KJ1oidnQYnfWv7Q8vIVp65CV6DUkdL+QnxJfOZXNcw3OSkjTFxFXT1rr0R8rsDpY2K
-	 ucJCsndqhKZW8W29Y/taeY0dH/RYfm1yodHowS3LRR9UKf92hKqZPyPhytsK3OFjLD
-	 v1k5RcwtfMZ6LCbEpQGU4fldzhk5SDEE8kKB4AqQrAUPuZEs1TypBGhJ9m7qreBZG5
-	 Xs6Eq5MSZ11og==
-Date: Mon, 21 Jul 2025 20:59:34 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Mario Limonciello <superm1@kernel.org>
-Cc: David Airlie <airlied@gmail.com>, Bjorn Helgaas <bhelgaas@google.com>,
-	Alex Deucher <alexander.deucher@amd.com>,
-	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-	Simona Vetter <simona@ffwll.ch>, Lukas Wunner <lukas@wunner.de>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Lu Baolu <baolu.lu@linux.intel.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	"open list:DRM DRIVERS" <dri-devel@lists.freedesktop.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:INTEL IOMMU (VT-d)" <iommu@lists.linux.dev>,
-	"open list:PCI SUBSYSTEM" <linux-pci@vger.kernel.org>,
-	"open list:VFIO DRIVER" <kvm@vger.kernel.org>,
-	"open list:SOUND" <linux-sound@vger.kernel.org>,
-	Daniel Dadap <ddadap@nvidia.com>,
-	Mario Limonciello <mario.limonciello@amd.com>
-Subject: Re: [PATCH v9 9/9] PCI: Add a new 'boot_display' attribute
-Message-ID: <20250722015934.GA2763711@bhelgaas>
+	s=arc-20240116; t=1753149700; c=relaxed/simple;
+	bh=zadc3FUqslMHFJYHO8aC1wjvFGNjIULcllHpfpeN+2E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=h5ac0BFt8qmuePlqxpzsfDpcPKSRCwJGyDcH+EmRezlZVyzYln6RVXKR0TKYSFRb8h2QylSuhkaqvS5reimBc38rOPp+SkcpCAZOLf5qdo13eUmZMCCmHzTCw9cd8cQe6SBV4lpUXxhIcW2BOGdY8030KJpXZEzMghc5YDLjPaQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=FCwsnUrR; arc=none smtp.client-ip=115.124.30.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1753149688; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=JXNM3pwI7U37QIp2W81rPzC0o3Xw9VVk8ohyCB9V5Ac=;
+	b=FCwsnUrRJxgiweJJ11fjW4DGMy5PY0FPxwOwx5lg0WNpYURHuMYejaXD2jNdZjx9JOxLojoipIWoTveyWwa7d4p+46wGWFzt3dJrBKhC1Dn88RPYoS4EjfLq5CVseZdk6LSlk+v59RTVsfRBJrE7TaKI97ySJP/6rOQkG+Bzyh4=
+Received: from localhost(mailfrom:yaoyuan@linux.alibaba.com fp:SMTPD_---0WjTepwY_1753149687 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Tue, 22 Jul 2025 10:01:27 +0800
+Date: Tue, 22 Jul 2025 10:01:27 +0800
+From: Yao Yuan <yaoyuan@linux.alibaba.com>
+To: Keir Fraser <keirf@google.com>
+Cc: Yao Yuan <yaoyuan0329os@gmail.com>, 
+	Sean Christopherson <seanjc@google.com>, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, Eric Auger <eric.auger@redhat.com>, 
+	Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v2 2/4] KVM: arm64: vgic: Explicitly implement
+ vgic_dist::ready ordering
+Message-ID: <lb3i3h2rwq3kvm6tqoiiyrqcpqe2ctxcwmapgifii3dzqzfuqh@eqcqeudpfjlg>
+References: <20250716110737.2513665-1-keirf@google.com>
+ <20250716110737.2513665-3-keirf@google.com>
+ <kb7nwrco6s7e6catcareyic72pxvx52jbqbfc5gbqb5zu434kg@w3rrzbut3h34>
+ <aHphgd0fOjHXjPCI@google.com>
+ <5zpxxmymnyzncdnewdonnglvmvbtggjyxyqvkf6yars2bbyr4b@gottasrtoq2s>
+ <aHtQG_k_1q3862s3@google.com>
+ <4i65mgp4rtfox2ttchamijofcmwjtd6sefmuhdkfdrjwaznhoc@2uhcfv2ziegj>
+ <aH3w9t78dvxsDjhV@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -74,156 +66,104 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <860bcc59-f0d0-4c8d-865c-89127c213cdf@kernel.org>
+In-Reply-To: <aH3w9t78dvxsDjhV@google.com>
 
-On Mon, Jul 21, 2025 at 07:28:07PM -0500, Mario Limonciello wrote:
-> On 7/21/25 6:00 PM, Bjorn Helgaas wrote:
-> > On Fri, Jul 18, 2025 at 12:44:11PM -0500, Mario Limonciello wrote:
-> > > On 7/18/2025 12:36 PM, Bjorn Helgaas wrote:
-> > > > On Fri, Jul 18, 2025 at 12:29:05PM -0500, Mario Limonciello wrote:
-> > > > > On 7/18/2025 12:25 PM, Bjorn Helgaas wrote:
-> > > > > > On Thu, Jul 17, 2025 at 12:38:12PM -0500, Mario Limonciello wrote:
-> > > > > > > From: Mario Limonciello <mario.limonciello@amd.com>
-> > > > > > > 
-> > > > > > > On systems with multiple GPUs there can be uncertainty which GPU is the
-> > > > > > > primary one used to drive the display at bootup. In some desktop
-> > > > > > > environments this can lead to increased power consumption because
-> > > > > > > secondary GPUs may be used for rendering and never go to a low power
-> > > > > > > state. In order to disambiguate this add a new sysfs attribute
-> > > > > > > 'boot_display' that uses the output of video_is_primary_device() to
-> > > > > > > populate whether a PCI device was used for driving the display.
-> > > > > > 
-> > > > > > > +What:		/sys/bus/pci/devices/.../boot_display
-> > > > > > > +Date:		October 2025
-> > > > > > > +Contact:	Linux PCI developers <linux-pci@vger.kernel.org>
-> > > > > > > +Description:
-> > > > > > > +		This file indicates that displays connected to the device were
-> > > > > > > +		used to display the boot sequence.  If a display connected to
-> > > > > > > +		the device was used to display the boot sequence the file will
-> > > > > > > +		be present and contain "1".
-> > > > > > 
-> > > > > > >     int __must_check pci_create_sysfs_dev_files(struct pci_dev *pdev)
-> > > > > > >     {
-> > > > > > > +	int retval;
-> > > > > > > +
-> > > > > > >     	if (!sysfs_initialized)
-> > > > > > >     		return -EACCES;
-> > > > > > > +	retval = pci_create_boot_display_file(pdev);
-> > > > > > 
-> > > > > > In addition to Mani's question about whether /sys/bus/pci/ is
-> > > > > > the right place for this (which is a very good question), it's
-> > > > > > also been pointed out to me that we've been trying to get rid
-> > > > > > of pci_create_sysfs_dev_files() for years.
-> > > > > > 
-> > > > > > If it's possible to make this a static attribute that would be
-> > > > > > much, much cleaner.
-> > > > > 
-> > > > > Right - I tried to do this, but the problem is at the time the
-> > > > > PCI device is created the information needed to make the
-> > > > > judgement isn't ready.  The options end up being:
-> > > > > * a sysfs file for every display device with 0/1
-> > > > > * a sysfs file that is not accurate until later in the boot
-> > > > 
-> > > > What's missing?  The specifics might be helpful if someone has
-> > > > another crack at getting rid of pci_create_sysfs_dev_files() in
-> > > > the future.
-> > > 
-> > > The underlying SCREEN_INFO code tries to walk through all the PCI
-> > > devices in a loop, but at the time all the devices are walked the
-> > > memory regions associated with the device weren't populated.
-> > 
-> > Which loop are you referring to that walks through all the PCI
-> > devices?  I see this:
-> > 
-> >    efifb_set_system
-> >      for_each_pci_dev(dev)
-> > 
-> > but that only looks at VGA devices and IIUC you also want to look at
-> > non-VGA GPUs.
-
-[I assume the loop is the "while (pdev =
-pci_get_base_class(PCI_BASE_CLASS_DISPLAY))" in
-__screen_info_pci_dev(), which indeed walks through all known PCI
-devices]
-
-> > I don't see a loop in *this* series, where the screen_info path looks
-> > like this:
-> > 
-> >    pci_create_boot_display_file
-> >      video_is_primary_device
-> >        screen_info_pci_dev      # added by "fbcon: Use screen info to find primary device"
-> >          screen_info_resources
-> >          __screen_info_pci_dev
-> > 
-> > and we're basically matching the screen_info base/address with BAR
-> > values.
-> > 
-> > The usual problem is that BARs may not have been assigned by the
-> > time pci_device_add() -> device_add() creates the static
-> > attributes.
-> > 
-> > So we call pci_assign_unassigned_root_bus_resources() to assign
-> > all the BARs.  Then we call pci_create_sysfs_dev_files(), where
-> > pci_create_resource_files() creates a "resource%d" file for each
-> > BAR.
-> > 
-> > But since we're trying to find the GPU that was used by BIOS, I
-> > assume its BARs were programmed by BIOS and we shouldn't have to
-> > wait until after pci_assign_unassigned_root_bus_resources().
-> 
-> Yes it was screen_info_pci_dev() and __screen_info_pci_dev().  The
-> resources weren't ready on the first call into
-> __screen_info_pci_dev().
+On Mon, Jul 21, 2025 at 07:49:10AM +0800, Keir Fraser wrote:
+> On Sun, Jul 20, 2025 at 08:08:30AM +0800, Yao Yuan wrote:
+> > On Sat, Jul 19, 2025 at 07:58:19AM +0000, Keir Fraser wrote:
+> > > On Sat, Jul 19, 2025 at 10:15:56AM +0800, Yao Yuan wrote:
+> > > > On Fri, Jul 18, 2025 at 08:00:17AM -0700, Sean Christopherson wrote:
+> > > > > On Thu, Jul 17, 2025, Yao Yuan wrote:
+> > > > > > On Wed, Jul 16, 2025 at 11:07:35AM +0800, Keir Fraser wrote:
+> > > > > > > In preparation to remove synchronize_srcu() from MMIO registration,
+> > > > > > > remove the distributor's dependency on this implicit barrier by
+> > > > > > > direct acquire-release synchronization on the flag write and its
+> > > > > > > lock-free check.
+> > > > > > >
+> > > > > > > Signed-off-by: Keir Fraser <keirf@google.com>
+> > > > > > > ---
+> > > > > > >  arch/arm64/kvm/vgic/vgic-init.c | 11 ++---------
+> > > > > > >  1 file changed, 2 insertions(+), 9 deletions(-)
+> > > > > > >
+> > > > > > > diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+> > > > > > > index 502b65049703..bc83672e461b 100644
+> > > > > > > --- a/arch/arm64/kvm/vgic/vgic-init.c
+> > > > > > > +++ b/arch/arm64/kvm/vgic/vgic-init.c
+> > > > > > > @@ -567,7 +567,7 @@ int kvm_vgic_map_resources(struct kvm *kvm)
+> > > > > > >  	gpa_t dist_base;
+> > > > > > >  	int ret = 0;
+> > > > > > >
+> > > > > > > -	if (likely(dist->ready))
+> > > > > > > +	if (likely(smp_load_acquire(&dist->ready)))
+> > > > > > >  		return 0;
+> > > > > > >
+> > > > > > >  	mutex_lock(&kvm->slots_lock);
+> > > > > > > @@ -598,14 +598,7 @@ int kvm_vgic_map_resources(struct kvm *kvm)
+> > > > > > >  		goto out_slots;
+> > > > > > >  	}
+> > > > > > >
+> > > > > > > -	/*
+> > > > > > > -	 * kvm_io_bus_register_dev() guarantees all readers see the new MMIO
+> > > > > > > -	 * registration before returning through synchronize_srcu(), which also
+> > > > > > > -	 * implies a full memory barrier. As such, marking the distributor as
+> > > > > > > -	 * 'ready' here is guaranteed to be ordered after all vCPUs having seen
+> > > > > > > -	 * a completely configured distributor.
+> > > > > > > -	 */
+> > > > > > > -	dist->ready = true;
+> > > > > > > +	smp_store_release(&dist->ready, true);
+> > > > > >
+> > > > > > No need the store-release and load-acquire for replacing
+> > > > > > synchronize_srcu_expedited() w/ call_srcu() IIUC:
+> > > > >
+> > > > > This isn't about using call_srcu(), because it's not actually about kvm->buses.
+> > > > > This code is concerned with ensuring that all stores to kvm->arch.vgic are ordered
+> > > > > before the store to set kvm->arch.vgic.ready, so that vCPUs never see "ready==true"
+> > > > > with a half-baked distributor.
+> > > > >
+> > > > > In the current code, kvm_vgic_map_resources() relies on the synchronize_srcu() in
+> > > > > kvm_io_bus_register_dev() to provide the ordering guarantees.  Switching to
+> > > > > smp_store_release() + smp_load_acquire() removes the dependency on the
+> > > > > synchronize_srcu() so that the synchronize_srcu() call can be safely removed.
+> > > >
+> > > > Yes, I understand this and agree with your point.
+> > > >
+> > > > Just for discusstion: I thought it should also work even w/o
+> > > > introduce the load acqure + store release after switch to
+> > > > call_srcu(): The smp_mb() in call_srcu() order the all store
+> > > > to kvm->arch.vgic before store kvm->arch.vgic.ready in
+> > > > current implementation.
+> > >
+> > > The load-acquire would still be required, to ensure that accesses to
+> > > kvm->arch.vgic do not get reordered earlier than the lock-free check
+> > > of kvm->arch.vgic.ready. Otherwise that CPU could see that the vgic is
+> > > initialised, but then use speculated reads of uninitialised vgic state.
+> > >
+> >
+> > Thanks for your explanation.
+> >
+> > I see. But there's "mutex_lock(&kvm->slot_lock);" before later
+> > acccessing to the kvm->arch.vgic, so I think the order can be
+> > guaranteed. Of cause as you said a explicitly acquire-load +
+> > store-release is better than before implicitly implementation.
 >
-> That's why the attribute needed to be created later.
+> If vgic_dist::ready is observed true by the lock-free read (the one
+> which is turned into load-acquire by this patch) then the function
+> immediately returns with no mutex_lock() executed. It is reads of
+> vgic_dist *after* return from kvm_vgic_map_resources() that you have
+> to worry about, and which require load-acquire semantics.
 
-I don't understand this.  IIUC, screen_info contains addresses
-programmed by BIOS.  If we want to use that to match with a PCI
-device, we have to compare with the BAR contents *before* Linux does
-any assignments of its own.
+I think this is the main purpose of such lock-free reading
+here, to avoid lock contention on VM w/ large vCPUs for
+vcpus' first time run together.
 
-So the only thing this should depend on is the BAR value at BIOS ->
-Linux handoff, which we know at the time of device_add(), and we
-should be able to do something like this:
+store-release makes sure the changes to vgic_dist::ready
+become visible after the changes to vgic_dist become
+visible, but it doesn't guarantee the vgic_dist::ready
+becomes visible to reader on aother CPU **IMMEDIATELY**,
+thus load-acquire in reader side is request for this.
+Is above understanding correct ?
 
-  bool pci_video_is_primary_device(struct pci_dev *pdev)
-  {
-    struct screen_info *si = &screen_info;
-    struct resource res[SCREEN_INFO_MAX_RESOURCES];
-    ssize_t i, numres;
-
-    numres = screen_info_resources(si, res, ARRAY_SIZE(res));
-    ...
-
-    for (i = 0; i < numres; ++i) {
-      if (pci_find_resource(pdev, &res[i]))
-        return true;
-    }
-
-    return false;
-  }
-
-  static umode_t pci_dev_boot_display_is_visible(...)
-  {
-    struct pci_dev *pdev = to_pci_dev(kobj_to_dev(kobj));
-
-    if (pci_video_is_primary_device(pdev))
-      return a->mode;
-
-    return 0;
-  }
-
-We should be able to check each BAR of each device in this path, with
-no loop through the devices at all:
-
-  pci_device_add
-    device_add
-      device_add_attrs
-        device_add_groups
-          ...
-            create_files
-              grp->is_visible()
-                pci_dev_boot_display_is_visible
-
-Bjorn
+>
+> >
+> > > > >
 
