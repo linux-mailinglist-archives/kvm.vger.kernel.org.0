@@ -1,215 +1,141 @@
-Return-Path: <kvm+bounces-53123-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53124-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AD1EB0DA9A
-	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 15:16:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D56ACB0DA9E
+	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 15:17:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 039B61C25A0D
-	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 13:17:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 17A103A3894
+	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 13:17:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DBBA2EA46D;
-	Tue, 22 Jul 2025 13:16:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D12B05D8F0;
+	Tue, 22 Jul 2025 13:17:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZlJ96AKz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZJNhgn6q"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76A562EA17A;
-	Tue, 22 Jul 2025 13:16:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0028525776;
+	Tue, 22 Jul 2025 13:17:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753190181; cv=none; b=Az96iMRkkKVYrve7j9yNzFUjtVhei1yFM/Ig9NgPpGJCnhjYrnlK2nZNO32WVWfFvcPk5OFnpEKmrWjj3U/l4Ftbkk02u/Wn8ull6FEGPl41JEpRGFAo8GZNWECAPMGm8Yo6G50l+1EV9Pw62y1fAibLfU7KsDEIoN+RbtbYPz4=
+	t=1753190258; cv=none; b=SULFLelkltuow1eagNixkrN4kyqovSXBQhM5Q2RnifDyw+TxLhFMpV9PLM3/jPX6rIm/fPZqtDDyVpl1+1nLmP2cRFnyFVGjN86WnxZhXP7HtFXtZ8V8/lDwN79CoQ1Bk+yu3Oer99KWzOHpPM3Lc0nwnXXlb0fpy0ilbeNklbc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753190181; c=relaxed/simple;
-	bh=ZCKqOeZgCX95f0N937tZyHCVJ9EVfR0tatUJjQoMWBk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TxgazrxEvbGyE5A+XP0WbR2FSuykb064kHGSc5honRJLIcGGIt3YU2q85vdqN5QJafQRTDZAqW/wFd/+hM6SxCOMtEKhkZbfFCq4tVfemCDDNlUOWdT53xE4ILxD/E7akTs1uo8LxNpkPllmJSOKrhf3Y/eZ57FyoMwDPTOS2Ck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZlJ96AKz; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1753190179; x=1784726179;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=ZCKqOeZgCX95f0N937tZyHCVJ9EVfR0tatUJjQoMWBk=;
-  b=ZlJ96AKztU9DpXnZi9u5jALhGnEvGbFonOyqOEoU99MRiBXqZZ4oVl9V
-   DpPktnBZyj+ceBo+y4CVbFdeZqAyvuaNTODuSad+yI/IUYrhn6HYsUoge
-   Zl5uzizy2YRNN17txLCT0w/NRsa0QMy+tTjvmFxGX1DMnoCIk7YqgO6JT
-   h06lmGaqkNRLO7RNXagezdR3dH9VV5uB7FcD1Ke89zWibCVJH4JgQd0Aa
-   bwkI8/GLmv3w2PGDJtbX5v/qaVbR2ufzmsjp8cI82THjvFgXGyIM1Lb0Y
-   fq24yxh1EUlJw8wRMQgN5prPjK/XH6maCfEM8702LoCg1icUK1ox5tvkC
-   g==;
-X-CSE-ConnectionGUID: BUnj+ZXfQ1iMbGPTNDzJFw==
-X-CSE-MsgGUID: h7CzAl0eQXaK30W4mOrwPw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11500"; a="72893149"
-X-IronPort-AV: E=Sophos;i="6.16,331,1744095600"; 
-   d="scan'208";a="72893149"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jul 2025 06:16:06 -0700
-X-CSE-ConnectionGUID: MfKr+99vSHaMQFSTwU0BuQ==
-X-CSE-MsgGUID: NnTEhLMURACYwcE1W62LmQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,331,1744095600"; 
-   d="scan'208";a="163695214"
-Received: from pgcooper-mobl3.ger.corp.intel.com (HELO localhost.localdomain) ([10.245.244.161])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jul 2025 06:16:00 -0700
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Dave Hansen <dave.hansen@linux.intel.com>,
-	pbonzini@redhat.com,
-	seanjc@google.com,
-	vannapurve@google.com
-Cc: Tony Luck <tony.luck@intel.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	x86@kernel.org,
-	H Peter Anvin <hpa@zytor.com>,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	rick.p.edgecombe@intel.com,
-	kas@kernel.org,
-	kai.huang@intel.com,
-	reinette.chatre@intel.com,
-	xiaoyao.li@intel.com,
-	tony.lindgren@linux.intel.com,
-	binbin.wu@linux.intel.com,
-	isaku.yamahata@intel.com,
-	yan.y.zhao@intel.com,
-	chao.gao@intel.com
-Subject: [PATCH V3 2/2] x86/tdx: Skip clearing reclaimed pages unless X86_BUG_TDX_PW_MCE is present
-Date: Tue, 22 Jul 2025 16:15:33 +0300
-Message-ID: <20250722131533.106473-3-adrian.hunter@intel.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250722131533.106473-1-adrian.hunter@intel.com>
-References: <20250722131533.106473-1-adrian.hunter@intel.com>
+	s=arc-20240116; t=1753190258; c=relaxed/simple;
+	bh=3leS8riuCJe+lnyQnQIcRHprkIXpvrMzyIhcjLqEY1w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mrxkruyIx7doW+vfQM4I91fKbhuCDiDi9vaHEKg4RoS+y9S6+b4GM4CimXCAm4l8KlP+BKeKEVOVrNkmpLsl0FwS1repVV+0VNciLQ6po7Dc9GYL3FGfqd5HoMt4nq7oag3JcT9nYrf7ik9HyxlNLICZcRL8SD+Wy7dGdmLWtqc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZJNhgn6q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68EE0C4CEEB;
+	Tue, 22 Jul 2025 13:17:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753190255;
+	bh=3leS8riuCJe+lnyQnQIcRHprkIXpvrMzyIhcjLqEY1w=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ZJNhgn6qehAH7M6iwdt46ZSRtnpNN7QCYzYCFtpxyCOf9hD4MrstgMo6XRuzOF91c
+	 sjv8RgAd4UifKt4aPajQt1uLJIdA0CTSwNfFbDlcF8QJmy0M1E/dH6Wnj4IbwqUdGe
+	 ykJV6IdS8vz+9K5Gck9anM2yCECJ0V9cL76ZDvhaL3VsgFphEVvk35vu854JJEIwlA
+	 mZWzP7DiEysaVcb+3NYpPiKRGR79NaQI9mdGR3PpkUTqTS0UDACcR/srpvBKQCaSpU
+	 pNXOiIOJ9CTniD++dcKH1fM5/oz7ADMNXTsOBMNvN1K4Jc/tbgBPJI1VGCJ8Pig1kl
+	 UZQ70MIhMgvQg==
+Date: Tue, 22 Jul 2025 14:17:30 +0100
+From: Will Deacon <will@kernel.org>
+To: Anup Patel <anup@brainfault.org>
+Cc: Mark Rutland <mark.rutland@arm.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Mayuresh Chitale <mchitale@ventanamicro.com>,
+	linux-riscv@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+	Atish Patra <atishp@rivosinc.com>
+Subject: Re: [PATCH v4 0/9] Add SBI v3.0 PMU enhancements
+Message-ID: <aH-PanNcaHsbSlOd@willie-the-truck>
+References: <20250721-pmu_event_info-v4-0-ac76758a4269@rivosinc.com>
+ <CAAhSdy2XM+3UQD0FZehJnmCbjwRMCZQpt1cEkb4gmJu+LFsaKQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Organization: Intel Finland Oy, Registered Address: c/o Alberga Business Park, 6 krs, Bertel Jungin Aukio 5, 02600 Espoo, Business Identity Code: 0357606 - 4, Domiciled in Helsinki
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAAhSdy2XM+3UQD0FZehJnmCbjwRMCZQpt1cEkb4gmJu+LFsaKQ@mail.gmail.com>
 
-Avoid clearing reclaimed TDX private pages unless the platform is affected
-by the X86_BUG_TDX_PW_MCE erratum. This significantly reduces VM shutdown
-time on unaffected systems.
+On Tue, Jul 22, 2025 at 09:29:40AM +0530, Anup Patel wrote:
+> On Tue, Jul 22, 2025 at 8:45 AM Atish Patra <atishp@rivosinc.com> wrote:
+> >
+> > SBI v3.0 specification[1] added two new improvements to the PMU chaper.
+> > The SBI v3.0 specification is frozen and under public review phase as
+> > per the RISC-V International guidelines.
+> >
+> > 1. Added an additional get_event_info function to query event availablity
+> > in bulk instead of individual SBI calls for each event. This helps in
+> > improving the boot time.
+> >
+> > 2. Raw event width allowed by the platform is widened to have 56 bits
+> > with RAW event v2 as per new clarification in the priv ISA[2].
+> >
+> > Apart from implementing these new features, this series improves the gpa
+> > range check in KVM and updates the kvm SBI implementation to SBI v3.0.
+> >
+> > The opensbi patches have been merged. This series can be found at [3].
+> >
+> > [1] https://github.com/riscv-non-isa/riscv-sbi-doc/releases/download/v3.0-rc7/riscv-sbi.pdf
+> > [2] https://github.com/riscv/riscv-isa-manual/issues/1578
+> > [3] https://github.com/atishp04/linux/tree/b4/pmu_event_info_v4
+> >
+> > Signed-off-by: Atish Patra <atishp@rivosinc.com>
+> > ---
+> > Changes in v4:
+> > - Rebased on top of v6.16-rc7
+> > - Fixed a potential compilation issue in PATCH5.
+> > - Minor typos fixed PATCH2 and PATCH3.
+> > - Fixed variable ordering in PATCH6
+> > - Link to v3: https://lore.kernel.org/r/20250522-pmu_event_info-v3-0-f7bba7fd9cfe@rivosinc.com
+> >
+> > Changes in v3:
+> > - Rebased on top of v6.15-rc7
+> > - Link to v2: https://lore.kernel.org/r/20250115-pmu_event_info-v2-0-84815b70383b@rivosinc.com
+> >
+> > Changes in v2:
+> > - Dropped PATCH 2 to be taken during rcX.
+> > - Improved gpa range check validation by introducing a helper function
+> >   and checking the entire range.
+> > - Link to v1: https://lore.kernel.org/r/20241119-pmu_event_info-v1-0-a4f9691421f8@rivosinc.com
+> >
+> > ---
+> > Atish Patra (9):
+> >       drivers/perf: riscv: Add SBI v3.0 flag
+> >       drivers/perf: riscv: Add raw event v2 support
+> >       RISC-V: KVM: Add support for Raw event v2
+> >       drivers/perf: riscv: Implement PMU event info function
+> >       drivers/perf: riscv: Export PMU event info function
+> >       KVM: Add a helper function to validate vcpu gpa range
+> >       RISC-V: KVM: Use the new gpa range validate helper function
+> >       RISC-V: KVM: Implement get event info function
+> >       RISC-V: KVM: Upgrade the supported SBI version to 3.0
+> >
+> >  arch/riscv/include/asm/kvm_vcpu_pmu.h |   3 +
+> >  arch/riscv/include/asm/kvm_vcpu_sbi.h |   2 +-
+> >  arch/riscv/include/asm/sbi.h          |  13 +++
+> >  arch/riscv/kvm/vcpu_pmu.c             |  75 ++++++++++++-
+> >  arch/riscv/kvm/vcpu_sbi_pmu.c         |   3 +
+> >  arch/riscv/kvm/vcpu_sbi_sta.c         |   6 +-
+> >  drivers/perf/riscv_pmu_sbi.c          | 191 +++++++++++++++++++++++++---------
+> >  include/linux/kvm_host.h              |   2 +
+> >  include/linux/perf/riscv_pmu.h        |   1 +
+> >  virt/kvm/kvm_main.c                   |  21 ++++
+> >  10 files changed, 258 insertions(+), 59 deletions(-)
+> 
+> Are you okay with this series going through the KVM RISC-V tree ?
 
-Background
+The Risc-V PMU stuff usually goes via Palmer, so whatever he reckons.
 
-KVM currently clears reclaimed TDX private pages using MOVDIR64B, which:
-
-   - Clears the TD Owner bit (which identifies TDX private memory) and
-     integrity metadata without triggering integrity violations.
-   - Clears poison from cache lines without consuming it, avoiding MCEs on
-     access (refer TDX Module Base spec. 16.5. Handling Machine Check
-     Events during Guest TD Operation).
-
-The TDX module also uses MOVDIR64B to initialize private pages before use.
-If cache flushing is needed, it sets TDX_FEATURES.CLFLUSH_BEFORE_ALLOC.
-However, KVM currently flushes unconditionally, refer commit 94c477a751c7b
-("x86/virt/tdx: Add SEAMCALL wrappers to add TD private pages")
-
-In contrast, when private pages are reclaimed, the TDX Module handles
-flushing via the TDH.PHYMEM.CACHE.WB SEAMCALL.
-
-Problem
-
-Clearing all private pages during VM shutdown is costly. For guests
-with a large amount of memory it can take minutes.
-
-Solution
-
-TDX Module Base Architecture spec. documents that private pages reclaimed
-from a TD should be initialized using MOVDIR64B, in order to avoid
-integrity violation or TD bit mismatch detection when later being read
-using a shared HKID, refer April 2025 spec. "Page Initialization" in
-section "8.6.2. Platforms not Using ACT: Required Cache Flush and
-Initialization by the Host VMM"
-
-That is an overstatement and will be clarified in coming versions of the
-spec. In fact, as outlined in "Table 16.2: Non-ACT Platforms Checks on
-Memory" and "Table 16.3: Non-ACT Platforms Checks on Memory Reads in Li
-Mode" in the same spec, there is no issue accessing such reclaimed pages
-using a shared key that does not have integrity enabled. Linux always uses
-KeyID 0 which never has integrity enabled. KeyID 0 is also the TME KeyID
-which disallows integrity, refer "TME Policy/Encryption Algorithm" bit
-description in "Intel Architecture Memory Encryption Technologies" spec
-version 1.6 April 2025. So there is no need to clear pages to avoid
-integrity violations.
-
-There remains a risk of poison consumption. However, in the context of
-TDX, it is expected that there would be a machine check associated with the
-original poisoning. On some platforms that results in a panic. However
-platforms may support "SEAM_NR" Machine Check capability, in which case
-Linux machine check handler marks the page as poisoned, which prevents it
-from being allocated anymore, refer commit 7911f145de5fe ("x86/mce:
-Implement recovery for errors in TDX/SEAM non-root mode")
-
-Improvement
-
-By skipping the clearing step on unaffected platforms, shutdown time
-can improve by up to 40%.
-
-On platforms with the X86_BUG_TDX_PW_MCE erratum (SPR and EMR), continue
-clearing because these platforms may trigger poison on partial writes to
-previously-private pages, even with KeyID 0, refer commit 1e536e1068970
-("x86/cpu: Detect TDX partial write machine check erratum")
-
-Reviewed-by: Kirill A. Shutemov <kas@kernel.org>
-Acked-by: Kai Huang <kai.huang@intel.com>
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
----
-
-
-Changes in V3:
-
-	Remove "flush cache" comments (Rick)
-	Update function comment to better relate to "quirk" naming (Rick)
-	Add "via MOVDIR64B" to comment (Xiaoyao)
-	Add Rev'd-by, Ack'd-by tags
-
-Changes in V2:
-
-	Improve the comment
-
-
- arch/x86/virt/vmx/tdx/tdx.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
-
-diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-index 14d93ed05bd2..a542e4fbf5a8 100644
---- a/arch/x86/virt/vmx/tdx/tdx.c
-+++ b/arch/x86/virt/vmx/tdx/tdx.c
-@@ -633,15 +633,19 @@ static int tdmrs_set_up_pamt_all(struct tdmr_info_list *tdmr_list,
- }
- 
- /*
-- * Convert TDX private pages back to normal by using MOVDIR64B to
-- * clear these pages.  Note this function doesn't flush cache of
-- * these TDX private pages.  The caller should make sure of that.
-+ * Convert TDX private pages back to normal by using MOVDIR64B to clear these
-+ * pages. Typically, any write to the page will convert it from TDX private back
-+ * to normal kernel memory. Systems with the X86_BUG_TDX_PW_MCE erratum need to
-+ * do the conversion explicitly via MOVDIR64B.
-  */
- void tdx_quirk_reset_paddr(unsigned long base, unsigned long size)
- {
- 	const void *zero_page = (const void *)page_address(ZERO_PAGE(0));
- 	unsigned long phys, end;
- 
-+	if (!boot_cpu_has_bug(X86_BUG_TDX_PW_MCE))
-+		return;
-+
- 	end = base + size;
- 	for (phys = base; phys < end; phys += 64)
- 		movdir64b(__va(phys), zero_page);
--- 
-2.48.1
-
+Will
 
