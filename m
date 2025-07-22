@@ -1,155 +1,164 @@
-Return-Path: <kvm+bounces-53159-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53160-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67D60B0E125
-	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 18:02:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D629B0E13B
+	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 18:05:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 004077AC898
-	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 16:01:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 132D01707DF
+	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 16:05:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EA1F27A90F;
-	Tue, 22 Jul 2025 16:02:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82F24237717;
+	Tue, 22 Jul 2025 16:05:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VWtbYmBy"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="HX0NggyI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEB5727A47C
-	for <kvm@vger.kernel.org>; Tue, 22 Jul 2025 16:02:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F35F61DE2B5;
+	Tue, 22 Jul 2025 16:05:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753200128; cv=none; b=TXDJ4aOHIRxEPiFn5BT2mznlAvhXXxmOzQMYByAUB33XFngvnHu3q8HZ4CiMx1ZWn/DP+Aj+BwjrwTVGRUtMq/Z3prj1RkE0FgHdm4DjI3tG7jMseBBOwBTXnoNDJl71heJF7FBHwYJbfiHgpX0903dm8cA0OSJfHwfEq51gMg0=
+	t=1753200329; cv=none; b=AqXgbmFc8mKsFrIstNnJRX6d6Kenrp9eVBzuJskF4P1w/jb56o5w6w6EpoW7v0Ftrn0LIuU5vJle1xVmPOv4V7MlfcXABOWayrt+XVDpxtPOToiQBK4WGbLahHERyi+5KMYj1gawbc3GuXU7gYpD4s2oI7TG67saU/jqRCqLB+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753200128; c=relaxed/simple;
-	bh=9LyYeLmky4Pxwkj3LVEv54HpdyvuC1ah0EvaCPHukc0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IS+w9s/P+B8py4IYtOQ/t4jFtXXCsCPB/N3RxawLfcGXmTiS6vGpaYHaAABKJIkYm9prpXikLlHu9FqZ7JC+k9d40uxUPJGXAf07tNSTNLMV/NUh7LLW8HNWY1zhzLU2QHtHMmyMNYuuFgN7O5YNAXTTf4KV3PncnxZc3n/5I24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VWtbYmBy; arc=none smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4aaf43cbbdcso226671cf.1
-        for <kvm@vger.kernel.org>; Tue, 22 Jul 2025 09:02:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753200125; x=1753804925; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=zJ5oDalvHQQyRD506B9hQPa7CZetF/bu3rVEuMz2nko=;
-        b=VWtbYmByN82vJ26Qdvb8YDSRoDqEqlF5QhGIV/RpKoZUJi7ukG9tieq7l/QgatzE3T
-         KHvY4v8VInzOaNDGSnl8eCnZNGHk+QZDxikgeItpSKde4FqfUYfG0q36OT1XTaELN7yx
-         K+1BUS8srqxg+sYZwgak9qCWW3Jb8za/001Ker0sJ4+u1gCqSraklNeEccS1xGeuR6tD
-         gucQuLyYIbcNGP6gNyRC6rRyJ6aHOMN/TeJGQp7nVHlNHS3+zTL+qTFpUhjH7qikyhti
-         ceBf5GzLPawPsqX/DIeub0PA2F1IJesVwR8pOfghAw2nfG3UrJZPEm2QSSgL645J9IW4
-         EY9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753200125; x=1753804925;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zJ5oDalvHQQyRD506B9hQPa7CZetF/bu3rVEuMz2nko=;
-        b=qfa/hwjadUqcIkNVxGm5zJN5IlSZ8XCP5R4h+deEoS6TpWi75V2sooqkNGr5FlmPI1
-         WNA0suOZG5iUlFcqwD8KhK2VMayJVRB1Af0eTKjbsDpZmFauC5xQ4TANmanNi15Ogd8w
-         3l1/BW79urqAkWBFohgHUaKj0DSx3wCU47fz4AKc/1h992Hr+3JOZfd5LtbIUf2pUaFw
-         /u1DXobC+mPdZxgV+MtDYW5PgPcQOXu327rmIN2Rqi6MoVzaNvq2cyUmsvjTJje6OKZ0
-         XlnSCqQ41DMCdtDwLCh3yFaoHSJ4Tc3QplG5yZ4o7+7uIzlC3/FY3CnlVLNuf8xIS9rb
-         lB1A==
-X-Gm-Message-State: AOJu0YyibedWlBJUB4bXrQyfc5G9ZNkQ7IqbX3q/L/mtpLCF56suELF1
-	9a/V9vvKAjONvZPWVWVmV0xOf+NSPcpGyAMg02Kmi/1Y+L/HU7mWylBIsScnbe2kD3EEqzone61
-	wQgARyLGLz9Jl1JcW2pdFxgcwQZ8c2SW9GT3+DDzd
-X-Gm-Gg: ASbGnctaxdHIWE8F3X+WNMdvUV1Ywo4OM7+TYMKyPRPHWGTv5xDHYEdh/eIE9hjuIK3
-	FihgfpAWwXVNS+PbYhaZGZcIFI5S9bjBeM04VIvmvzbjhTSGtALH6LTwx1E98lu0uKgB243lItb
-	xfIKijbdUlLYgpdohcCZs3W7LCrUqemeq2U914Mvyae6dU+GdeAu5PsRakPDy4/b2kEhgpM597B
-	k5bMczeX0V5qrhk3g==
-X-Google-Smtp-Source: AGHT+IHz1Md5CvjkMr0v63+zalLU7h1VJHuKRRiw/5Kb9EG5psNH9QWi7eZC9q9jEanCdF+aUxZTXQqWhAN+64R/RQ8=
-X-Received: by 2002:ac8:628c:0:b0:494:4aa0:ad5b with SMTP id
- d75a77b69052e-4ae5cc6db00mr4063241cf.2.1753200124082; Tue, 22 Jul 2025
- 09:02:04 -0700 (PDT)
+	s=arc-20240116; t=1753200329; c=relaxed/simple;
+	bh=IDAReUlRfn62n+BVcBsyf+oTuWIAfJOOv2SOIpoXlHs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=IOd2/Po0mGJFax1DFbYZF1FP6u8B8+wBul/djPYLRIQOM/4A9uTtaGovbsa1pwddVtNjE6DsFYh6VVxmr3v78+XTDSqXKd1QVnskuDPNsTeUkpfZz/N56TcACPE+qZTywGtSEQKW1jSejLlo2bE6RrxHD1XUd4pNK5RhKtIXUbQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=HX0NggyI; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56MDdMNB013243;
+	Tue, 22 Jul 2025 16:05:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pp1; bh=tEr1bNdXwCNYItpDv36zqKYrjNEC
+	jTMDFSzBOQTt5lo=; b=HX0NggyIgdObJYX6yVsKGusQnbzSxnYqVc+nSmWyaoVJ
+	MVmyxSUVYwgqiWf5rmXtlFiHbe8nhgbZ+bv2d3g637QOYme71xdsIu0sNgmirgcq
+	ojm+YHsUYmnAg9sYpic7bRWgrBK2n4LWTo3hsNezSDzaCT99e1zqNzXh1suPIcKd
+	65B1nua7cxeIZLf2UYoQItjV9Rs0MhPbiFRwe+xLkuCHvqS8Ya1ar230WeHLcCYt
+	JlUB1UYuT19RWKu57MvOGmbfj7++MHfKqcdaH+VfkD56KVl5REFKWlQJAQfJkXeU
+	kFp9vYuyFstFmEMtO26Y9IPYbrm/QcqGe0VJ4riQRA==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 482bqeh5pr-40
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 22 Jul 2025 16:05:24 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 56MFAHsM005747;
+	Tue, 22 Jul 2025 15:54:16 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 480tvqtqvy-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 22 Jul 2025 15:54:16 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 56MFsCcp55443774
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 22 Jul 2025 15:54:12 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3AB6C2004B;
+	Tue, 22 Jul 2025 15:54:12 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 18DEC20043;
+	Tue, 22 Jul 2025 15:54:12 +0000 (GMT)
+Received: from a46lp62.lnxne.boe (unknown [9.152.108.100])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 22 Jul 2025 15:54:12 +0000 (GMT)
+From: Michael Mueller <mimu@linux.ibm.com>
+To: kvm@vger.kernel.org
+Cc: Michael Mueller <mimu@linux.ibm.com>, linux-s390@vger.kernel.org,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Christoph Schlameuss <schlameuss@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Arnaldo Carvalho de Melo <acme@redhat.com>
+Subject: [RFC PATCH] KVM: s390: selftests: work around macro is_signed_type re-definiton
+Date: Tue, 22 Jul 2025 17:53:55 +0200
+Message-ID: <20250722155358.111810-1-mimu@linux.ibm.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250717162731.446579-1-tabba@google.com> <20250717162731.446579-3-tabba@google.com>
- <aH5uY74Uev9hEWbM@google.com> <CA+EHjTxcgCLzwK5k+rTf2v_ufgsX0AcEzhy0EQL-pvmsg9QQeg@mail.gmail.com>
- <aH552woocYo1ueiU@google.com> <CA+EHjTwPnFLZ1OxKkV5gqk_kU_UU_KdupAGDoLbRyK__0J+YeQ@mail.gmail.com>
- <aH-1JeJH2cEvyEei@google.com>
-In-Reply-To: <aH-1JeJH2cEvyEei@google.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Tue, 22 Jul 2025 17:01:27 +0100
-X-Gm-Features: Ac12FXztwmXhhi72jh3H00X5S1zdW7e0Z4aKDTPt7mq7MLiUgNVB0JPJsFGM4PY
-Message-ID: <CA+EHjTw46a+NCcgGXQ1HA+a3MSZD9Q97V8W-Xj5+pYuTh4Z2_w@mail.gmail.com>
-Subject: Re: [PATCH v15 02/21] KVM: Rename CONFIG_KVM_GENERIC_PRIVATE_MEM to CONFIG_KVM_GENERIC_GMEM_POPULATE
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
-	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, 
-	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
-	palmer@dabbelt.com, aou@eecs.berkeley.edu, viro@zeniv.linux.org.uk, 
-	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
-	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
-	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
-	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
-	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
-	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
-	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
-	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
-	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
-	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
-	ira.weiny@intel.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=c+2rQQ9l c=1 sm=1 tr=0 ts=687fb6c4 cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+ a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=VnNF1IyMAAAA:8 a=qEpN5gnUneW78kiv9LgA:9
+ a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: m8QDGNiy19ydczB4IgTPo1mwsRza3AH6
+X-Proofpoint-ORIG-GUID: m8QDGNiy19ydczB4IgTPo1mwsRza3AH6
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzIyMDEzMSBTYWx0ZWRfX1EYDLowSiDCH
+ odrmX+ytO1Yp3lLTJgd2Xz0RlKg1SOXEYQgVunwBlg6MNPIgkKDjfUFrGZewI+RDPRuKsOg/3ge
+ sYFS5ObVR1o6a/udXFW13o6zzUSucdXoJ6h4C8Qi8nDX1kFnorOpa2q8fEv+b7xDhfhPDNVcO3N
+ oyEs0ooSbtoVrSqJVoe3gefb5zoNzdkbM4wc/CTOH+UE51P0CpevymSf54Yj0I1O0P3Vj6BbTsk
+ NuFYe7xl54/KDXOuOHxtMgZUX91QyMEROOEJJuARtscR7+2OugmMlwXspkxPhUKBohn2/vG8UU+
+ kqzgiIexF1KHs+4EMsBZzRnHJY93SNUrkd4O4Wq0BtDQDI4XaO1URfF/4keAqeLj42bO+jgqgiM
+ bWWQKaST+Fr+KGSi1E+1UtJpaGYYKZ7f4nXNWNzRYsS/0Licdo2kHV9Z9u2mPBd7ogf296mB
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-07-22_02,2025-07-21_02,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxscore=0 malwarescore=0 phishscore=0 lowpriorityscore=0 impostorscore=0
+ spamscore=0 priorityscore=1501 mlxlogscore=830 suspectscore=0 adultscore=0
+ bulkscore=0 clxscore=1011 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2507220131
 
-On Tue, 22 Jul 2025 at 16:58, Sean Christopherson <seanjc@google.com> wrote:
->
-> On Tue, Jul 22, 2025, Fuad Tabba wrote:
-> > On Mon, 21 Jul 2025 at 18:33, Sean Christopherson <seanjc@google.com> wrote:
-> > >
-> > > On Mon, Jul 21, 2025, Fuad Tabba wrote:
-> > > > > The below diff applies on top.  I'm guessing there may be some intermediate
-> > > > > ugliness (I haven't mapped out exactly where/how to squash this throughout the
-> > > > > series, and there is feedback relevant to future patches), but IMO this is a much
-> > > > > cleaner resting state (see the diff stats).
-> > > >
-> > > > So just so that I am clear, applying the diff below to the appropriate
-> > > > patches would address all the concerns that you have mentioned in this
-> > > > email?
-> > >
-> > > Yes?  It should, I just don't want to pinky swear in case I botched something.
-> >
-> > Other than this patch not applying, nah, I think it's all good ;P. I
-> > guess base-commit: 9eba3a9ac9cd5922da7f6e966c01190f909ed640 is
-> > somewhere in a local tree of yours. There are quite a few conflicts
-> > and I don't think it would build even if based on the right tree,
-> > e.g.,  KVM_CAP_GUEST_MEMFD_MMAP is a rename of KVM_CAP_GMEM_MMAP,
-> > rather an addition of an undeclared identifier.
-> >
-> > That said, I think I understand what you mean, and I can apply the
-> > spirit of this patch.
-> >
-> > Stay tuned for v16.
->
-> Want to point me at your branch?  I can run it through my battery of tests, and
-> maybe save you/us from having to spin a v17.
+The following commit creates a pre-processor warning during the KVM
+selftest build as it leads to a re-definition of macro is_signed_type().
 
-That would be great. Here it is:
+  commit fc92099902fb ("tools headers: Synchronize linux/bits.h with the kernel sources")
 
-https://android-kvm.googlesource.com/linux/+/refs/heads/tabba/guestmem-basic-6.16-v16
+  $ make -C tools/testing/selftests TARGETS="kvm" all >/dev/null
+  In file included from s390/ucontrol_test.c:11:
+  ../kselftest_harness.h:754:9: warning: ‘is_signed_type’ redefined
+    754 | #define is_signed_type(var)       (!!(((__typeof__(var))(-1)) < (__typeof__(var))1))
+        |         ^~~~~~~~~~~~~~
+  In file included from ./linux/tools/testing/selftests/../../../tools/include/linux/bits.h:34,
+                   from ./linux/tools/testing/selftests/../../../tools/include/linux/bitops.h:14,
+                   from ./linux/tools/testing/selftests/../../../tools/include/linux/hashtable.h:13,
+                   from include/kvm_util.h:11,
+                   from include/s390/debug_print.h:15,
+                   from s390/ucontrol_test.c:10:
+  ./linux/tools/testing/selftests/../../../tools/include/linux/overflow.h:31:9: note: this is the location of the previous definition
+     31 | #define is_signed_type(type)       (((type)(-1)) < (type)1)
+     	|         ^~~~~~~~~~~~~~
+  cc1: note: unrecognized command-line option ‘-Wno-gnu-variable-sized-type-not-at-end’ may have been intended to silence earlier diagnostics
 
-No known issues from my end. But can you have a look at the patch:
+A fix resolving this issue outside this kvm selftest would be preferred.
 
-KVM: guest_memfd: Consolidate Kconfig and guest_memfd enable checks
+Signed-off-by: Michael Mueller <mimu@linux.ibm.com>
+---
+ tools/testing/selftests/kvm/s390/ucontrol_test.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-In that I collected the changes to the config/enable checks that
-didn't seem to fit well in any of the other patches.
+diff --git a/tools/testing/selftests/kvm/s390/ucontrol_test.c b/tools/testing/selftests/kvm/s390/ucontrol_test.c
+index d265b34c54be..d1258c1568db 100644
+--- a/tools/testing/selftests/kvm/s390/ucontrol_test.c
++++ b/tools/testing/selftests/kvm/s390/ucontrol_test.c
+@@ -8,6 +8,16 @@
+  *  Christoph Schlameuss <schlameuss@linux.ibm.com>
+  */
+ #include "debug_print.h"
++
++/*
++ * header debug_print.h leaves macro is_signed_type()
++ * behind which is defined in "linux/overflow.h"
++ * header "kselftest_harness.h" re-defines it.
++ */
++#ifdef is_signed_type
++#undef is_signed_type
++#endif
++
+ #include "kselftest_harness.h"
+ #include "kvm_util.h"
+ #include "processor.h"
+-- 
+2.50.1
 
-Cheers,
-/fuad
 
