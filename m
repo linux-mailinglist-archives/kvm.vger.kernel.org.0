@@ -1,181 +1,218 @@
-Return-Path: <kvm+bounces-53087-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53088-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C67DB0D242
-	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 08:57:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90461B0D2D2
+	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 09:26:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24F743B5663
-	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 06:56:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CEFBD1888CE6
+	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 07:25:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FCF0289E32;
-	Tue, 22 Jul 2025 06:56:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F6912D3757;
+	Tue, 22 Jul 2025 07:23:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CpfcgUnu"
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="pyn8oqxM"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpbguseast2.qq.com (smtpbguseast2.qq.com [54.204.34.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B986288531;
-	Tue, 22 Jul 2025 06:56:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C1AA2D3731;
+	Tue, 22 Jul 2025 07:23:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753167361; cv=none; b=eiblMF0NaWZeKcDKG3HuFak0dGEIvvCBC+0Bt8yAM4gxP7GBhsxU8UJliQnKT0CqE+1yl2XZOTfwsqe+gVU8o81Y9pojwDCMkGpX3WlaM7nDhVToa7uyQHBh+mTrINmoprr7O5aavvbnJCd46PpYC/6n2R5i72IW+RLL2xXLRhA=
+	t=1753169011; cv=none; b=UJb3rj+CS0GeMvKHvwIQoEgTsWMKo5ch9a6cFEjaL9f/BotCiGGV9Yewf22Hs41T1X0qwkcqvV1AHVmbLjZ2p0nmwrTAy9lNj3yzaNevfX12zOoGL58jwI7tn5wLmd2v8SzIMNcAl1s7XSWNC93KHvSKDytyRiz4yzaGHh4GZno=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753167361; c=relaxed/simple;
-	bh=DqE2r+jnLUTL7QjlcN7tboq45VqA22jH4eIVD8o4Gmo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QAJgP20a1duVeppOqeal2e+DlUQ49vNLLuIzhW2wJ9VfGd9Q9ReBA3bS2yIttHRwmIO+oXx5OM3w8k/iMi3VkJ/trhvV8btukQ4rk1T3l5v8yBDll3Vqy3dEgR00YTrNKG/tdXfZhM0zyOjt8wiHo6H9Od/YA+MuTwcte1dhiFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CpfcgUnu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB071C19421;
-	Tue, 22 Jul 2025 06:56:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753167360;
-	bh=DqE2r+jnLUTL7QjlcN7tboq45VqA22jH4eIVD8o4Gmo=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=CpfcgUnuDL0Vl921O+6i/yShR++00pNLOKABN64TGoQv08s4JWDaq5R787TzRwPYd
-	 SOxP3mvcTg3o5UodLqlybzcfO2KW0UIPKod6tyjXn4Q6f0Jg20Bo4EcbVyst6PFIeD
-	 9wwLag5HZhkuEkGdG4rGL0/xDa1dd1XF4wE0tl/b+CrzT64kGYr4RZg1sRlNLV6OW9
-	 D1EcUuEM2t8ys5AutC5biwDJeSbkbVn8adA+/943wMPAxGJivryo7aGbp+SI8Q2V02
-	 kg6rNPNzOZNNl41J5VZzJI8EAO2Ut8rnz8gAHCFuXdd0jodm+XgB+V+DD74LOgNTj5
-	 FmJF7Vu5xhdxg==
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-32b7f41d3e6so48641711fa.1;
-        Mon, 21 Jul 2025 23:56:00 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUX5wKbZm2IOtUum/OGqvpO4z6HuCoB1LDU2yLwkY/f5Plsi8y4zE7js47QLNR0MkFLXMM=@vger.kernel.org, AJvYcCVDFvz1UDnN4bfMZaZgoSiBU61uNCyrxz+1ErMzitvXnzAlZWI9i5+nvxqxh5s7fy2Laa8PrZJbca+7@vger.kernel.org, AJvYcCVXWLC8kFscT4NpsDZZFxDbZ1pu5IWgbTG27fSBGPQgOFAhz6tYiTgQZGgiFozgYMae+vl17pTXVFmX2O5WaB9jXRhz/g==@vger.kernel.org, AJvYcCVfWZPG7npEyTbMf5CuHA0vK3Bh81fIGfE5oziQZ9WMjmNkuKAYdW+D81lLZlHoZy6rErgEY+L/QCHc@vger.kernel.org, AJvYcCVj6WVTPqRmsxR9US0Joe4xnrPVkYsbsYT++zuIpmTRkEHX9xvIqIZ7MyFjVPnW3CqfuvbKMr5vEoLa6A==@vger.kernel.org, AJvYcCWIhHeca4enoslA8mdW5sv2IpglC0O/kcNO1B+dftXygCOgwvIKyfDo3YJI5TkOiCO80vNC+35WXCRown6gjbS4SyGc@vger.kernel.org, AJvYcCWKpdWnXbrCDuydrQBZwMHAUbEn6sGmeLTp+AYxZyVQ+HylMHErW7RpIkJHS8eog07E4je8+5aK+LCcalpzfDgM@vger.kernel.org, AJvYcCWWRMDezKzELWTei7j8lwehVzYU2wXXzGpbEo9LsULQJqvW/sAJPS8rUcyMNoX/SLuhruyJ0kaXOfp1Q1wH@vger.kernel.org, AJvYcCWaFIstkBLEsbsyiPCjVFAr09vbqxYy8dhM+o9xHEbwxdiirKcP4bmleBRy7fZerOWHI+VknG0EVklZ07EU@vger.kernel.org, AJvYcCWwTRRT
- 6vJOEDwauzGDPFuIsF6zvAqUmVu976G21HrW9NMF8co5qYnVLJeRX66VOCgFq0Bw717UdQRQGTUdWBC64c/Try4J@vger.kernel.org, AJvYcCWyes6iceGphS7jGv/ls1AtiWGzyXRtfigL4fqxx/xrf/Sw+WaanLwDyp+k2kIwaF7mtt845IqkLVHm8g==@vger.kernel.org, AJvYcCX8rIOD/qSM4PM4IVveozDj2YjXy0m4kU8jyFdGCHpBY4yFfq0NewdYaQIULZezfmeXafsp/IRUX1DL1wmGhiVp@vger.kernel.org, AJvYcCXcRc3v6VqLNOTSPnRuq5qB7YOR3ONHs/zUFF1SQ6LHMLYPwCyGFQ+xAzBHWMT73HhYpC4LGQp8KHP/Vg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx3Cy5HykqPvtQ5L4xKmkwIDzkKvL6nHs1mHEJ4eifUwYsfa/DJ
-	C+/llk2ypanRlVGw/69/D1y6SVgb4NgL6jYrUBzsTgVraZGV964/HhlSXLoWc2zuCuVkXbH2viD
-	CPk7MY3bCa8axRF4IL3qKDHpWaHWCJ3s=
-X-Google-Smtp-Source: AGHT+IHafl72rt/goLHslFsPSeMLrUwjaR0SoHeFAxURGVfbf4gcV3AlCo9M3FCJzrvPSuMBFqrA7K/+xkn2H/6KxwI=
-X-Received: by 2002:a05:651c:b11:b0:32b:952f:3e0 with SMTP id
- 38308e7fff4ca-330d25506d3mr8241951fa.7.1753167358762; Mon, 21 Jul 2025
- 23:55:58 -0700 (PDT)
+	s=arc-20240116; t=1753169011; c=relaxed/simple;
+	bh=4HhP2iNixfpmY9GA50RldzfymFrP5PRb/ex2XnKjRrQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kUuVR85o9QllVSKZeiybnqBL/B5mWkoxjZMfmZ6IxpJeAEudUQ/SNlwg1h4bXJRwQg/OI91qzwZmUCvQhc/UX+ugatosuP7l4DmsoCtg8BP2rAPaZoqLPM8G2hg0KReitnnJ6oqPtfokj8CkLH9US28Udll32dgDU7iQx3E2Puo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=pyn8oqxM; arc=none smtp.client-ip=54.204.34.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
+	s=onoh2408; t=1753168997;
+	bh=4HhP2iNixfpmY9GA50RldzfymFrP5PRb/ex2XnKjRrQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From;
+	b=pyn8oqxMFVyi5/6u5O+odRk6o68nQVzc/WsLV6rpP1XwkSHdeghCjlBGJ8RN3lpSF
+	 K43Aw/Bx0veG9oUwOUKjGuCFBSP6OWdAIfRtQlZpIztGfODuJwBO6t8aCQlu2ogtXt
+	 FGaywg7Lu9sq115FB56KRtDlohLn9P3ayQOFCz0Y=
+X-QQ-mid: zesmtpip4t1753168943tb2aa8fc1
+X-QQ-Originating-IP: jlkPh//3cQuVzne1YV9Hj8c3k19VYTQ4PPPWu+FTW/A=
+Received: from [IPV6:240e:668:120a::212:232] ( [localhost])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Tue, 22 Jul 2025 15:22:18 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 3880468087656715595
+EX-QQ-RecipientCnt: 62
+Message-ID: <634BA467821D37FE+0b2ace38-07d9-4500-8bb7-5a4fa65c4b9f@uniontech.com>
+Date: Tue, 22 Jul 2025 15:22:18 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250717231756.make.423-kees@kernel.org> <20250717232519.2984886-4-kees@kernel.org>
- <aHoHkDvvp4AHIzU1@kernel.org> <202507181541.B8CFAC7E@keescook>
- <CAMj1kXGAwjChyFvjQcTbL8dFXkFWnn9n47bkN7FP=+EsLNsJdg@mail.gmail.com>
- <aH42--h-ARsvX5Wk@willie-the-truck> <202507211311.8DAC4C7@keescook> <202507211349.D93679FB25@keescook>
-In-Reply-To: <202507211349.D93679FB25@keescook>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Tue, 22 Jul 2025 16:55:47 +1000
-X-Gmail-Original-Message-ID: <CAMj1kXGoy7D+_hKyQrT_uXdjuFMYGUEMDYdRf6mx69PLeuBQQg@mail.gmail.com>
-X-Gm-Features: Ac12FXxN7NYW1J5gsbL-uJ8eWKShqoH6QBvGfux9lCX9EcW_ZhNmDxq92IzpXG0
-Message-ID: <CAMj1kXGoy7D+_hKyQrT_uXdjuFMYGUEMDYdRf6mx69PLeuBQQg@mail.gmail.com>
-Subject: Re: [PATCH v3 04/13] x86: Handle KCOV __init vs inline mismatches
-To: Kees Cook <kees@kernel.org>
-Cc: Will Deacon <will@kernel.org>, Mike Rapoport <rppt@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Vitaly Kuznetsov <vkuznets@redhat.com>, Henrique de Moraes Holschuh <hmh@hmh.eng.br>, 
-	Hans de Goede <hdegoede@redhat.com>, =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
-	"Rafael J. Wysocki" <rafael@kernel.org>, Len Brown <lenb@kernel.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Michal Wilczynski <michal.wilczynski@intel.com>, 
-	Juergen Gross <jgross@suse.com>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, Roger Pau Monne <roger.pau@citrix.com>, 
-	David Woodhouse <dwmw@amazon.co.uk>, Usama Arif <usama.arif@bytedance.com>, 
-	"Guilherme G. Piccoli" <gpiccoli@igalia.com>, Thomas Huth <thuth@redhat.com>, Brian Gerst <brgerst@gmail.com>, 
-	kvm@vger.kernel.org, ibm-acpi-devel@lists.sourceforge.net, 
-	platform-driver-x86@vger.kernel.org, linux-acpi@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org, linux-efi@vger.kernel.org, 
-	linux-mm@kvack.org, Ingo Molnar <mingo@kernel.org>, 
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>, Christoph Hellwig <hch@lst.de>, 
-	Andrey Konovalov <andreyknvl@gmail.com>, Andrey Ryabinin <ryabinin.a.a@gmail.com>, 
-	Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Nicolas Schier <nicolas.schier@linux.dev>, 
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, linux-kernel@vger.kernel.org, 
-	kasan-dev@googlegroups.com, linux-doc@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org, 
-	linux-hardening@vger.kernel.org, linux-kbuild@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	sparclinux@vger.kernel.org, llvm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 6/8] serial: 8250_dw: Fix typo "notifer"
+To: Greg KH <gregkh@linuxfoundation.org>
+Cc: airlied@gmail.com, akpm@linux-foundation.org, alison.schofield@intel.com,
+ andrew+netdev@lunn.ch, andriy.shevchenko@linux.intel.com,
+ arend.vanspriel@broadcom.com, bp@alien8.de,
+ brcm80211-dev-list.pdl@broadcom.com, brcm80211@lists.linux.dev,
+ colin.i.king@gmail.com, cvam0000@gmail.com, dan.j.williams@intel.com,
+ dave.hansen@linux.intel.com, dave.jiang@intel.com, dave@stgolabs.net,
+ davem@davemloft.net, dri-devel@lists.freedesktop.org, edumazet@google.com,
+ guanwentao@uniontech.com, hpa@zytor.com, ilpo.jarvinen@linux.intel.com,
+ intel-xe@lists.freedesktop.org, ira.weiny@intel.com, j@jannau.net,
+ jeff.johnson@oss.qualcomm.com, jgross@suse.com, jirislaby@kernel.org,
+ johannes.berg@intel.com, jonathan.cameron@huawei.com, kuba@kernel.org,
+ kvalo@kernel.org, kvm@vger.kernel.org, linux-cxl@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-serial@vger.kernel.org,
+ linux-wireless@vger.kernel.org, linux@treblig.org, lucas.demarchi@intel.com,
+ marcin.s.wojtas@gmail.com, ming.li@zohomail.com, mingo@kernel.org,
+ mingo@redhat.com, netdev@vger.kernel.org, niecheng1@uniontech.com,
+ oleksandr_tyshchenko@epam.com, pabeni@redhat.com, pbonzini@redhat.com,
+ quic_ramess@quicinc.com, ragazenta@gmail.com, rodrigo.vivi@intel.com,
+ seanjc@google.com, shenlichuan@vivo.com, simona@ffwll.ch,
+ sstabellini@kernel.org, tglx@linutronix.de,
+ thomas.hellstrom@linux.intel.com, vishal.l.verma@intel.com, x86@kernel.org,
+ xen-devel@lists.xenproject.org, yujiaoliang@vivo.com, zhanjun@uniontech.com
+References: <BD5C52D2838AEA48+20250715134050.539234-1-wangyuli@uniontech.com>
+ <2BF1749F02ADE664+20250715134407.540483-6-wangyuli@uniontech.com>
+ <2025071607-outbid-heat-b0ba@gregkh>
+Content-Language: en-US
+From: WangYuli <wangyuli@uniontech.com>
+Autocrypt: addr=wangyuli@uniontech.com; keydata=
+ xjMEZoEsiBYJKwYBBAHaRw8BAQdAyDPzcbPnchbIhweThfNK1tg1imM+5kgDBJSKP+nX39DN
+ IVdhbmdZdWxpIDx3YW5neXVsaUB1bmlvbnRlY2guY29tPsKJBBMWCAAxFiEEa1GMzYeuKPkg
+ qDuvxdofMEb0C+4FAmaBLIgCGwMECwkIBwUVCAkKCwUWAgMBAAAKCRDF2h8wRvQL7g0UAQCH
+ 3mrGM0HzOaARhBeA/Q3AIVfhS010a0MZmPTRGVfPbwD/SrncJwwPAL4GiLPEC4XssV6FPUAY
+ 0rA68eNNI9cJLArOOARmgSyJEgorBgEEAZdVAQUBAQdA88W4CTLDD9fKwW9PB5yurCNdWNS7
+ VTL0dvPDofBTjFYDAQgHwngEGBYIACAWIQRrUYzNh64o+SCoO6/F2h8wRvQL7gUCZoEsiQIb
+ DAAKCRDF2h8wRvQL7sKvAP4mBvm7Zn1OUjFViwkma8IGRGosXAvMUFyOHVcl1RTgFQEAuJkU
+ o9ERi7qS/hbUdUgtitI89efbY0TVetgDsyeQiwU=
+In-Reply-To: <2025071607-outbid-heat-b0ba@gregkh>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------1TBt0IFfjz321DLdIVEctMps"
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpip:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: MVMPUihGUVea5jC3xP71FloNgLs8c4GIbCy1lVegKOJGtyiH/TtMX/UO
+	5TjeFrsS0OTJUZa6dpCWlkanhO5MPxx9iMnxogCbZfODUw+ib83N47qt29EpEG8Krd6tKIR
+	FJTnraw/TquVA9OP3CmZUx8xIKgFUX4/1YZ+IJE88UcpS2W5wmhdW2//7czYTQzafSpYgxW
+	XE4xJC2ukspya/nvLIOUfxdrj54Lt4DSzPUy5xO4ylS8K3J0PkjbCTMo7dvByLIjp41vwVe
+	DsToiutuoxZEWKhrAnrG2jp4YhgVSYWEingT2tw1mTRHcCoJPIGNPlaLlczLmI4uu5vddgb
+	ZYNjWakNh0yxkNmU/0TsAflRRlVBhKjDClQosa+htxmarTLE7imj6YmEykr5fj1kGnYt2Vq
+	mqsrpEpwoES4bUcM6H1AzLAUijkizu0mUEVB+fxEVdrOB8iQe6xkDkodf2PlbQaAH3Ca/wz
+	Y2Q6VhC1L47CvMeMK5qAJ7SD473Gsc3bezOfo7WFS8Ez5lu7Gh8Elu5GsWFXdhH9eShp3L8
+	Fohcycdr8WjvxakwXIj7LupCwM2zytQQ9LqajGpKRJgJs3HVspzutijsVzwoCD1shfI+WAM
+	X0oLSTTeJjvFyELfZy8YkyJq3k6n67CMQ0vknFXTUwtgIQbk9YHI2ScEg4Xd40GovymLubn
+	bXp+aLh4o39SCjTTxt41RChCfUZHVsgVwbW6w68G9XnPojegPOe5Z6TYCvM/TVPnaZKWoeS
+	PTxWgREgrmjejdqSc5J9O+OhouoVgw5EG7RHm4hwIaCgRx2hpXIGlYjkz/3Pd0UtdJ2ryFH
+	Ytxmd2kqCiZ5PDah7j3W/oqLoD5c/YwIPRKWDWnX2hsKWo3LwBCHiOdirphtdazK64oywSy
+	GUV1D68DYcMBcagXma4UBx8o4WBHko9Mij75waKlNdehxEgDHuESjcm4rUGm5ywAnaN8fjk
+	VgOzj5ff6Wg9yxrf0dWtIcwNI6N88u0jfDrJWjyNnqbofuJAbudmmEhNphPpLfhf/zn9kPF
+	aarl2LPW/rtiHIgPqPdYfLOrFdtTVjR0Uch9gvPRRKIgRIEMafbhGxUFc2viKZvB1GA1mOc
+	ag52OeWY+km5YpVFUwDHLr0BSsN9SiKI083dmne+7JQ
+X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
+X-QQ-RECHKSPAM: 0
 
-On Tue, 22 Jul 2025 at 06:49, Kees Cook <kees@kernel.org> wrote:
->
-> On Mon, Jul 21, 2025 at 01:14:36PM -0700, Kees Cook wrote:
-> > On Mon, Jul 21, 2025 at 01:47:55PM +0100, Will Deacon wrote:
-> > > On Sun, Jul 20, 2025 at 04:10:01PM +1000, Ard Biesheuvel wrote:
-> > > > On Sat, 19 Jul 2025 at 08:51, Kees Cook <kees@kernel.org> wrote:
-> > > > > On Fri, Jul 18, 2025 at 11:36:32AM +0300, Mike Rapoport wrote:
-> > > > > > On Thu, Jul 17, 2025 at 04:25:09PM -0700, Kees Cook wrote:
-> > > > > > > When KCOV is enabled all functions get instrumented, unless the
-> > > > > > > __no_sanitize_coverage attribute is used. To prepare for
-> > > > > > > __no_sanitize_coverage being applied to __init functions, we have to
-> > > > > > > handle differences in how GCC's inline optimizations get resolved. For
-> > > > > > > x86 this means forcing several functions to be inline with
-> > > > > > > __always_inline.
-> > > > > > >
-> > > > > > > Signed-off-by: Kees Cook <kees@kernel.org>
-> > > > > >
-> > > > > > ...
-> > > > > >
-> > > > > > > diff --git a/include/linux/memblock.h b/include/linux/memblock.h
-> > > > > > > index bb19a2534224..b96746376e17 100644
-> > > > > > > --- a/include/linux/memblock.h
-> > > > > > > +++ b/include/linux/memblock.h
-> > > > > > > @@ -463,7 +463,7 @@ static inline void *memblock_alloc_raw(phys_addr_t size,
-> > > > > > >                                       NUMA_NO_NODE);
-> > > > > > >  }
-> > > > > > >
-> > > > > > > -static inline void *memblock_alloc_from(phys_addr_t size,
-> > > > > > > +static __always_inline void *memblock_alloc_from(phys_addr_t size,
-> > > > > > >                                             phys_addr_t align,
-> > > > > > >                                             phys_addr_t min_addr)
-> > > > > >
-> > > > > > I'm curious why from all memblock_alloc* wrappers this is the only one that
-> > > > > > needs to be __always_inline?
-> > > > >
-> > > > > Thread-merge[1], adding Will Deacon, who was kind of asking the same
-> > > > > question.
-> > > > >
-> > > > > Based on what I can tell, GCC has kind of fragile inlining logic, in the
-> > > > > sense that it can change whether or not it inlines something based on
-> > > > > optimizations. It looks like the kcov instrumentation being added (or in
-> > > > > this case, removed) from a function changes the optimization results,
-> > > > > and some functions marked "inline" are _not_ inlined. In that case, we end up
-> > > > > with __init code calling a function not marked __init, and we get the
-> > > > > build warnings I'm trying to eliminate.
-> > >
-> > > Got it, thanks for the explanation!
-> > >
-> > > > > So, to Will's comment, yes, the problem is somewhat fragile (though
-> > > > > using either __always_inline or __init will deterministically solve it).
-> > > > > We've tripped over this before with GCC and the solution has usually
-> > > > > been to just use __always_inline and move on.
-> > > > >
-> > > >
-> > > > Given that 'inline' is already a macro in the kernel, could we just
-> > > > add __attribute__((__always_inline__)) to it when KCOV is enabled?
-> > >
-> > > That sounds like a more robust approach and, by the sounds of it, we
-> > > could predicate it on GCC too. That would also provide a neat place for
-> > > a comment describing the problem.
-> > >
-> > > Kees, would that work for you?
-> >
-> > That seems like an extremely large hammer for this problem, IMO. It
-> > feels like it could cause new strange corner cases. I'd much prefer the
-> > small fixes I've currently got since it keeps it focused. KCOV is
-> > already enabled for "allmodconfig", so any new instances would be found
-> > very quickly, etc. (And GCC's fragility in this regard has already been
-> > exposed to these cases -- it's just that I changed one of the
-> > combinations of __init vs inline vs instrumentation.
-> >
-> > I could give it a try, if you really prefer the big hammer approach...
->
-> I gave it a try -- it fails spectacularly. ;) Let's stick to my small
-> fixes instead?
->
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------1TBt0IFfjz321DLdIVEctMps
+Content-Type: multipart/mixed; boundary="------------7NzxUd2CIcc1X22DyUWciByd";
+ protected-headers="v1"
+From: WangYuli <wangyuli@uniontech.com>
+To: Greg KH <gregkh@linuxfoundation.org>
+Cc: airlied@gmail.com, akpm@linux-foundation.org, alison.schofield@intel.com,
+ andrew+netdev@lunn.ch, andriy.shevchenko@linux.intel.com,
+ arend.vanspriel@broadcom.com, bp@alien8.de,
+ brcm80211-dev-list.pdl@broadcom.com, brcm80211@lists.linux.dev,
+ colin.i.king@gmail.com, cvam0000@gmail.com, dan.j.williams@intel.com,
+ dave.hansen@linux.intel.com, dave.jiang@intel.com, dave@stgolabs.net,
+ davem@davemloft.net, dri-devel@lists.freedesktop.org, edumazet@google.com,
+ guanwentao@uniontech.com, hpa@zytor.com, ilpo.jarvinen@linux.intel.com,
+ intel-xe@lists.freedesktop.org, ira.weiny@intel.com, j@jannau.net,
+ jeff.johnson@oss.qualcomm.com, jgross@suse.com, jirislaby@kernel.org,
+ johannes.berg@intel.com, jonathan.cameron@huawei.com, kuba@kernel.org,
+ kvalo@kernel.org, kvm@vger.kernel.org, linux-cxl@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-serial@vger.kernel.org,
+ linux-wireless@vger.kernel.org, linux@treblig.org, lucas.demarchi@intel.com,
+ marcin.s.wojtas@gmail.com, ming.li@zohomail.com, mingo@kernel.org,
+ mingo@redhat.com, netdev@vger.kernel.org, niecheng1@uniontech.com,
+ oleksandr_tyshchenko@epam.com, pabeni@redhat.com, pbonzini@redhat.com,
+ quic_ramess@quicinc.com, ragazenta@gmail.com, rodrigo.vivi@intel.com,
+ seanjc@google.com, shenlichuan@vivo.com, simona@ffwll.ch,
+ sstabellini@kernel.org, tglx@linutronix.de,
+ thomas.hellstrom@linux.intel.com, vishal.l.verma@intel.com, x86@kernel.org,
+ xen-devel@lists.xenproject.org, yujiaoliang@vivo.com, zhanjun@uniontech.com
+Message-ID: <0b2ace38-07d9-4500-8bb7-5a4fa65c4b9f@uniontech.com>
+Subject: Re: [PATCH v2 6/8] serial: 8250_dw: Fix typo "notifer"
+References: <BD5C52D2838AEA48+20250715134050.539234-1-wangyuli@uniontech.com>
+ <2BF1749F02ADE664+20250715134407.540483-6-wangyuli@uniontech.com>
+ <2025071607-outbid-heat-b0ba@gregkh>
+In-Reply-To: <2025071607-outbid-heat-b0ba@gregkh>
 
-Fair enough :-)
+--------------7NzxUd2CIcc1X22DyUWciByd
+Content-Type: multipart/mixed; boundary="------------3ELnNhbpHyc90r6KiSkcbbdY"
+
+--------------3ELnNhbpHyc90r6KiSkcbbdY
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
+
+SGkgZ3JlZyBrLWgsDQoNCk9uIDIwMjUvNy8xNiAxNjowOCwgR3JlZyBLSCB3cm90ZToNCj4+
+IFNpZ25lZC1vZmYtYnk6IFdhbmdZdWxpIDx3YW5neXVsaUB1bmlvbnRlY2guY29tPg0KPiBJ
+cyB5b3VyIG5hbWUgYWxsIG9uZSB3b3JkIGxpa2UgdGhhdCwgb3Igc2hvdWxkIHRoZXJlIGJl
+IGEgIiAiIGJldHdlZW4NCj4gdGhlbT8NCg0KSWYgSSB3ZXJlIHRvIGZvbGxvdyBXZXN0ZXJu
+IG5hbWluZyBjb252ZW50aW9ucywgbXkgbmFtZSB3b3VsZCBiZSB3cml0dGVuIA0KYXMgJ1l1
+bGkgV2FuZycuDQoNCkhvd2V2ZXIsIGZyYW5rbHksIEkgZmluZCBpdCB1bm5lY2Vzc2FyeSBh
+bmQgY2FuJ3QgYmUgYm90aGVyZWQgdG8gZm9sbG93IA0KdGhlaXIgY3VzdG9tcywgdW5sZXNz
+IGEgbWFpbnRhaW5lciBzdHJvbmdseSBpbnNpc3RzLiAoRm9yIGV4YW1wbGUsIHlvdSANCmNh
+biBzZWUgdGhhdCBteSBzaWduYXR1cmUgb24gY29tbWl0cyBmb3IgdGhlIExvb25nQXJjaCBz
+dWJzeXN0ZW0gaXMgDQpkaWZmZXJlbnQgZnJvbSBteSBvdGhlciBjb250cmlidXRpb25zKS4N
+Cg0KU2luY2UgQ2hpbmVzZSBuYW1lcyBhcmUgd3JpdHRlbiB3aXRob3V0IGFueSBzcGFjZXMg
+aW4gQ2hpbmVzZSANCmNoYXJhY3RlcnMsIEkgZG9uJ3QgdGhpbmsgaXQgbWF0dGVycy4NCg0K
+PiBBbHNvLCBhcyBvdGhlcnMgc2FpZCwgZG9uJ3QgbGluayB0byB5b3VyIG93biBwYXRjaC4N
+Ck9LLCBJJ2xsIHNlbmQgdGhlIHBhdGNoc2V0IHYzLg0KDQoNClRoYW5rcywNCg0KLS0gDQrn
+jovmmLHlipsNCg==
+--------------3ELnNhbpHyc90r6KiSkcbbdY
+Content-Type: application/pgp-keys; name="OpenPGP_0xC5DA1F3046F40BEE.asc"
+Content-Disposition: attachment; filename="OpenPGP_0xC5DA1F3046F40BEE.asc"
+Content-Description: OpenPGP public key
+Content-Transfer-Encoding: quoted-printable
+
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+xjMEZoEsiBYJKwYBBAHaRw8BAQdAyDPzcbPnchbIhweThfNK1tg1imM+5kgDBJSK
+P+nX39DNIVdhbmdZdWxpIDx3YW5neXVsaUB1bmlvbnRlY2guY29tPsKJBBMWCAAx
+FiEEa1GMzYeuKPkgqDuvxdofMEb0C+4FAmaBLIgCGwMECwkIBwUVCAkKCwUWAgMB
+AAAKCRDF2h8wRvQL7g0UAQCH3mrGM0HzOaARhBeA/Q3AIVfhS010a0MZmPTRGVfP
+bwD/SrncJwwPAL4GiLPEC4XssV6FPUAY0rA68eNNI9cJLArOOARmgSyJEgorBgEE
+AZdVAQUBAQdA88W4CTLDD9fKwW9PB5yurCNdWNS7VTL0dvPDofBTjFYDAQgHwngE
+GBYIACAWIQRrUYzNh64o+SCoO6/F2h8wRvQL7gUCZoEsiQIbDAAKCRDF2h8wRvQL
+7sKvAP4mBvm7Zn1OUjFViwkma8IGRGosXAvMUFyOHVcl1RTgFQEAuJkUo9ERi7qS
+/hbUdUgtitI89efbY0TVetgDsyeQiwU=3D
+=3DBlkq
+-----END PGP PUBLIC KEY BLOCK-----
+
+--------------3ELnNhbpHyc90r6KiSkcbbdY--
+
+--------------7NzxUd2CIcc1X22DyUWciByd--
+
+--------------1TBt0IFfjz321DLdIVEctMps
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+wnsEABYIACMWIQRrUYzNh64o+SCoO6/F2h8wRvQL7gUCaH88KgUDAAAAAAAKCRDF2h8wRvQL7pms
+AP9jnuV1Ar3880YbizkuBFljgc3bOdOu/RxLmWu2LJmNBAD/S6F38qLfKIrdjJNkNGO7V3LvW7p0
+ssmAK5aDMMRZzAI=
+=fJ9f
+-----END PGP SIGNATURE-----
+
+--------------1TBt0IFfjz321DLdIVEctMps--
 
