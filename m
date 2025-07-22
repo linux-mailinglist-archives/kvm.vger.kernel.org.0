@@ -1,55 +1,52 @@
-Return-Path: <kvm+bounces-53118-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53117-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27D97B0D8CD
-	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 14:03:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DD12B0D8A7
+	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 13:58:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 044B27A5B0B
-	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 12:01:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E95C86C2C9A
+	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 11:57:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C9F42E3B0F;
-	Tue, 22 Jul 2025 12:02:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD2C92E424D;
+	Tue, 22 Jul 2025 11:58:16 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16AAA238D5A;
-	Tue, 22 Jul 2025 12:02:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0682A920;
+	Tue, 22 Jul 2025 11:58:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753185773; cv=none; b=hg4l/LhBCojWQWFNRkUB0jgxzvK77LzQXWpjU7u+qf9HnWqckNfTSP3V62VZCjFCBgxYBKgYVmClLH1njarbfwjGCuVCig21mEkdMONFMYHH79zrxHPtYVuKq/RuwTL8jvXO4V8p5PBnHbfonC9YwVTb5B1Ip+5A7//RQ/w70Ws=
+	t=1753185496; cv=none; b=tTN+nzROB9P7CxhtE0CuDCh3ENG6g0pRu5YTloUm7eETyzAEycC+pp+/rE2chDB+N9duehZg2xa7+CmjlCEa6SiQkZZDR3g+2vl8z5MOD87s43QA5XdqvtuZKib0mzPgCG6TkvkQhWyWwMpdWm9R12xVC2PcQttn8mYxbB7QXbg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753185773; c=relaxed/simple;
-	bh=tS+oyFiKULziXi6kE9tTCrN/rFgvZ1uqe7kGi9KMqQ0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BNCLUBClu+4TQPhpM2VAiINZADVSuPl9AXweT0V+XdhFLvDfbyTFoj7xtxugo2c9ZmVn1BihAEsosI/wxmIiBImVQBO8nKbNBAt/23tbEl9cPlgTNZmH6tlPd/kJ62P8BgIVyj6yiiId6Dlnac1KHY5iDviqVUPBZUJoWUoZ8E4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4bmbRn5c4Rz1R8gj;
-	Tue, 22 Jul 2025 20:00:05 +0800 (CST)
-Received: from dggpemf100009.china.huawei.com (unknown [7.185.36.128])
-	by mail.maildlp.com (Postfix) with ESMTPS id D970E140118;
-	Tue, 22 Jul 2025 20:02:45 +0800 (CST)
-Received: from huawei.com (10.67.175.29) by dggpemf100009.china.huawei.com
- (7.185.36.128) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 22 Jul
- 2025 20:02:45 +0800
-From: Wang Tao <wangtao554@huawei.com>
-To: <graf@amazon.com>
-CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <mingo@redhat.com>,
-	<nh-open-source@amazon.com>, <peterz@infradead.org>, <sieberf@amazon.com>,
-	<vincent.guittot@linaro.org>, <tanghui20@huawei.com>
-Subject: [PATCH] Re: [PATCH] sched/fair: Only increment deadline once on yield
-Date: Tue, 22 Jul 2025 11:46:54 +0000
-Message-ID: <20250722114654.2620626-1-wangtao554@huawei.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <7eed0c3d-6a78-4724-b204-a3b99764d839@amazon.com>
-References: <7eed0c3d-6a78-4724-b204-a3b99764d839@amazon.com>
+	s=arc-20240116; t=1753185496; c=relaxed/simple;
+	bh=FYFNJZU/pShI/0xENZjgDKpYDZJS22uxFteKyrwwyQY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IIaq0KNylRtbcacV/BFrhjwrVAlwfuwmYEnV0HxIaJSqySADWQOsTs7plIgkdBTUvBWS5DyzQHKxLmcirha/jok+BsGjlDvlypH4ibaApGk1zjftBMiyiCFBdj2ETu8hbl6w0T3P0XAlUo4NGDNGf9Najs0P+QdGt/S7vmtZCNg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [223.64.69.45])
+	by gateway (Coremail) with SMTP id _____8BxnmtqfH9o5pIvAQ--.56009S3;
+	Tue, 22 Jul 2025 19:56:26 +0800 (CST)
+Received: from localhost.localdomain (unknown [223.64.69.45])
+	by front1 (Coremail) with SMTP id qMiowJDxscJlfH9oBdYhAA--.19687S2;
+	Tue, 22 Jul 2025 19:56:25 +0800 (CST)
+From: Huacai Chen <chenhuacai@loongson.cn>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Tianrui Zhao <zhaotianrui@loongson.cn>,
+	Bibo Mao <maobibo@loongson.cn>
+Cc: kvm@vger.kernel.org,
+	loongarch@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Xuerui Wang <kernel@xen0n.name>,
+	Jiaxun Yang <jiaxun.yang@flygoat.com>,
+	Huacai Chen <chenhuacai@loongson.cn>
+Subject: [GIT PULL] LoongArch KVM changes for v6.17
+Date: Tue, 22 Jul 2025 19:56:09 +0800
+Message-ID: <20250722115609.3754289-1-chenhuacai@loongson.cn>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -57,57 +54,72 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
- dggpemf100009.china.huawei.com (7.185.36.128)
+X-CM-TRANSID:qMiowJDxscJlfH9oBdYhAA--.19687S2
+X-CM-SenderInfo: hfkh0x5xdftxo6or00hjvr0hdfq/
+X-Coremail-Antispam: 1Uk129KBj93XoW7CFWrZF1kCw4DKFW3Kr4fCrX_yoW8ZrWxpr
+	13urnrJFs8GrZ5Jryqq343uwnrAFn7CryxXF4UKFW8ur4UZr1UXry8Xrn3JFy5C3yrJry0
+	vr1rGw1jqF1UAacCm3ZEXasCq-sJn29KB7ZKAUJUUUUr529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUvEb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v2
+	6rxl6s0DM2kKe7AKxVWUXVWUAwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYI
+	kI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUXVWU
+	AwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI4
+	8JMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMxCIbckI1I0E14v26r1Y
+	6r17MI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7
+	AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE
+	2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcV
+	C2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73
+	UjIFyTuYvjxU2MKZDUUUU
 
->> On 01/04/25 18:06, Fernand Sieber wrote:
->> If a task yields, the scheduler may decide to pick it again. The task in
->> turn may decide to yield immediately or shortly after, leading to a tight
->> loop of yields.
->>
->> If there's another runnable task as this point, the deadline will be
->> increased by the slice at each loop. This can cause the deadline to runaway
->> pretty quickly, and subsequent elevated run delays later on as the task
->> doesn't get picked again. The reason the scheduler can pick the same task
->> again and again despite its deadline increasing is because it may be the
->> only eligible task at that point.
->>
->> Fix this by updating the deadline only to one slice ahead.
->>
->> Note, we might want to consider iterating on the implementation of yield as
->> follow up:
->> * the yielding task could be forfeiting its remaining slice by
->>    incrementing its vruntime correspondingly
->> * in case of yield_to the yielding task could be donating its remaining
->>    slice to the target task
->>
->> Signed-off-by: Fernand Sieber <sieberf@amazon.com>
+The following changes since commit 89be9a83ccf1f88522317ce02f854f30d6115c41:
 
+  Linux 6.16-rc7 (2025-07-20 15:18:33 -0700)
 
->IMHO it's worth noting that this is not a theoretical issue. We have 
->seen this in real life: A KVM virtual machine's vCPU which runs into a 
->busy guest spin lock calls kvm_vcpu_yield_to() which eventually ends up 
->in the yield_task_fair() function. We have seen such spin locks due to 
->guest contention rather than host overcommit, which means we go into a 
->loop of vCPU execution and spin loop exit, which results in an 
->undesirable increase in the vCPU thread's deadline.
+are available in the Git repository at:
 
->Given this impacts real workloads and is a bug present since the 
->introduction of EEVDF, I would say it warrants a
+  git://git.kernel.org/pub/scm/linux/kernel/git/chenhuacai/linux-loongson.git tags/loongarch-kvm-6.17
 
->Fixes: 147f3efaa24182 ("sched/fair: Implement an EEVDF-like scheduling 
->policy")
+for you to fetch changes up to 36d09b96d3e79518e2be31fc7960cc694702afb8:
 
->tag.
+  LoongArch: KVM: Add tracepoints for CPUCFG and CSR emulation exits (2025-07-21 09:26:35 +0800)
 
+----------------------------------------------------------------
+LoongArch KVM changes for v6.17
 
->Alex
+1. Simplify some KVM routines.
+2. Enhance in-kernel irqchip emulation.
+3. Add stat information with kernel irqchip.
+4. Add tracepoints for CPUCFG and CSR emulation exits.
 
-Actually, as Alex described, we encountered the same issue in this 
-testing scenario: starting qemu, binding cores to the cpuset group, 
-setting cpuset.cpus=1-3 for stress testing in qemu, 
-running taskset -c 1-3 ./stress-ng -c 20, and then encountering an error where qemu freezes, 
-reporting a soft lockup issue in qemu. After applying this patch, the problem was resolved.
-Do we have plans to merge this patch into the mainline?
+----------------------------------------------------------------
+Bibo Mao (8):
+      LoongArch: KVM: Remove unnecessary local variable
+      LoongArch: KVM: Remove unused parameter len
+      LoongArch: KVM: Remove never called default case statement
+      LoongArch: KVM: Use standard bitops API with eiointc
+      LoongArch: KVM: Use generic function loongarch_eiointc_read()
+      LoongArch: KVM: Use generic function loongarch_eiointc_write()
+      LoongArch: KVM: Replace eiointc_enable_irq() with eiointc_update_irq()
+      LoongArch: KVM: Add stat information with kernel irqchip
+
+Yulong Han (1):
+      LoongArch: KVM: Add tracepoints for CPUCFG and CSR emulation exits
+
+Yury Norov (NVIDIA) (2):
+      LoongArch: KVM: Rework kvm_send_pv_ipi()
+      LoongArch: KVM: Simplify kvm_deliver_intr()
+
+ arch/loongarch/include/asm/kvm_host.h |  12 +-
+ arch/loongarch/kvm/exit.c             |  33 +-
+ arch/loongarch/kvm/intc/eiointc.c     | 553 +++++-----------------------------
+ arch/loongarch/kvm/intc/ipi.c         |  28 +-
+ arch/loongarch/kvm/intc/pch_pic.c     |   4 +-
+ arch/loongarch/kvm/interrupt.c        |  25 +-
+ arch/loongarch/kvm/trace.h            |  14 +-
+ arch/loongarch/kvm/vcpu.c             |   8 +-
+ 8 files changed, 132 insertions(+), 545 deletions(-)
+
 
