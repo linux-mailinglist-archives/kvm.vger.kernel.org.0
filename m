@@ -1,149 +1,232 @@
-Return-Path: <kvm+bounces-53152-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53153-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20A1AB0E0BC
-	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 17:39:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C652B0E0DD
+	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 17:47:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 334BEAC1F9F
-	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 15:38:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C65D316D09A
+	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 15:47:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C70427932E;
-	Tue, 22 Jul 2025 15:39:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAEC5279DAE;
+	Tue, 22 Jul 2025 15:47:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R7Pltk+9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U3eI/avi"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAA2725C833;
-	Tue, 22 Jul 2025 15:39:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB9432236E8;
+	Tue, 22 Jul 2025 15:47:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753198751; cv=none; b=No8haoM6cK7VBh5tN47d4kw6tyl5lnlrmrqS0dKMeuR4csSrmi4KjlgnX09Fq30Xq6+dlQWRUJweUKdDi2otl6g/7lk2+zP2PgSV9AGYDBMwSrCyYlqIWd5DONeuyxxu7uC68lzm0Z3e3bD6Efz5p1wwwhtWPXc6+fk9K8Kk/lU=
+	t=1753199249; cv=none; b=GhdNUl6EoCT7oqH5t8+v6KB1BZHfU8jlUyiEqdKqSJntJFng1fVF0oOvF2+JXNlwn/TKTkWkaI7waNbhbqi1vE7yw5H64jGm9+nKCuCtQvQM3nE4DJ/qsoTLwT/O4A/xNWHBqzF8i3DCpVmHelnLf+jZuSpeZ5+JLSQUxdxA3do=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753198751; c=relaxed/simple;
-	bh=/Gjkuw+5Y7LJ0hoFeke0nCDcX+sNxHdnXykOv3WdwLI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NNuiMxXM3yq6hbsGT5zVsAH2yfGgG8efLSPptsCGlbipSUyk9M1mV6MCZNv8YdVahv55WWFe4oKdyUAg/C/uWjDNCFKpuRR0aJTH3MB+1PshhpwrUKMBctumCTJ4TlfIpAssQxgzcbHKEKlWvyz+0bq3sSOlkmBbX2NltshhFm4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R7Pltk+9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E0C0C4CEF1;
-	Tue, 22 Jul 2025 15:39:09 +0000 (UTC)
+	s=arc-20240116; t=1753199249; c=relaxed/simple;
+	bh=M3Mc51dw7b8Gz9b/pdMV6wSzhw/d2UXhK7/Q+XXRt9c=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=l9IzjQRXImSQCGmUqIqgSFPU/RsuyZAOZbeW4UuSrsw7XIhkgGsD5EcyxkUUz+RYaQpgiJrxwEhPjC2pzORjcIHORJia8q0dXyQPzJ7HjX3Pv343bKARcjQ8xmht9GTFeMSFja7MP6chkebxqzyHCAkHWQvoGgZ//47zO/bfIVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U3eI/avi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BBC1C4CEEB;
+	Tue, 22 Jul 2025 15:47:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753198751;
-	bh=/Gjkuw+5Y7LJ0hoFeke0nCDcX+sNxHdnXykOv3WdwLI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=R7Pltk+9rewNqhHJrfLjs8QVOCuOal4FZD8jjgzvt+aAdMBSsX0KA/oG4AVdfnOE7
-	 CDtUTsFpa7w/LRaxgrBzDbhFbV7u7RmMpz3Tp4PQZ13+bwBGmTm0FS50D2Ullb7MOZ
-	 6twI50kQ0hUpFsdvBEKDXmItWkIW4Qjymiv96G70JOHSatn0Dv6NKWFT+7UCAG/QC5
-	 IfZqHlByrcE4HaeSViJU8fEKUgXYxVBnXz0XBtWUh4aUokxQ+LEUJOZVM2xtjaSsUy
-	 5swpx0d9Rg0QGKxoNsbVN6oKtNsh6565sqhioEC0+lVfveb2WqK04ENVtQQ0UgMgcB
-	 /8/aLpaVhX0BQ==
-Message-ID: <93253093-f6a8-4c34-988d-bdc9489cf4f0@kernel.org>
-Date: Tue, 22 Jul 2025 10:39:08 -0500
+	s=k20201202; t=1753199249;
+	bh=M3Mc51dw7b8Gz9b/pdMV6wSzhw/d2UXhK7/Q+XXRt9c=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=U3eI/aviIJXp8gXKT1xbu+rMiWmUs7riUKvyqXgOQ+FepLvXOfJPUAtaeByyVeygF
+	 kxYHkSq9sEubs3CmSIQ4L8sUo08d7jLBwKQX9gM1C0hjs8oTyb/dLu3WVQK25AUNWe
+	 /DbCBI3o6o1qcXSKoeSr1MapTL4L5ANg8tC2x8e37JEqPwJRCwQV+0QN0KXwwQpbDK
+	 UijxJh72OZFEhsu4YCP4o4gtBhTpRD6LRXe0XvB9XOdvzqFB8XDbJpFk1xCxGoy+bA
+	 oPEkQxjUulFPw2ZrCzLBiJTbNUOlZLVpqMsBOzRpLd0VSxTzQNLx9c2fTGZ7Sil44k
+	 8TjrJJCjgHx8Q==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1ueFDD-000P2e-0K;
+	Tue, 22 Jul 2025 16:47:27 +0100
+Date: Tue, 22 Jul 2025 16:47:26 +0100
+Message-ID: <86h5z48bxt.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Andrew Jones <ajones@ventanamicro.com>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	jackabt@amazon.com
+Subject: Re: [PATCH] KVM: arm64: selftest: Add standalone test checking for KVM's own UUID
+In-Reply-To: <20250722-87ac9d7e0b27cf7c67a4fbd3@orel>
+References: <20250721155136.892255-1-maz@kernel.org>
+	<20250722-87ac9d7e0b27cf7c67a4fbd3@orel>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 8/9] fbcon: Use screen info to find primary device
-To: Bjorn Helgaas <helgaas@kernel.org>
-Cc: David Airlie <airlied@gmail.com>, Bjorn Helgaas <bhelgaas@google.com>,
- Alex Deucher <alexander.deucher@amd.com>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Simona Vetter <simona@ffwll.ch>, Lukas Wunner <lukas@wunner.de>,
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
- Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
- David Woodhouse <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>,
- Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
- Robin Murphy <robin.murphy@arm.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
- "open list:DRM DRIVERS" <dri-devel@lists.freedesktop.org>,
- open list <linux-kernel@vger.kernel.org>,
- "open list:INTEL IOMMU (VT-d)" <iommu@lists.linux.dev>,
- "open list:PCI SUBSYSTEM" <linux-pci@vger.kernel.org>,
- "open list:VFIO DRIVER" <kvm@vger.kernel.org>,
- "open list:SOUND" <linux-sound@vger.kernel.org>,
- Daniel Dadap <ddadap@nvidia.com>,
- Mario Limonciello <mario.limonciello@amd.com>
-References: <20250722153322.GA2785882@bhelgaas>
-Content-Language: en-US
-From: Mario Limonciello <superm1@kernel.org>
-In-Reply-To: <20250722153322.GA2785882@bhelgaas>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: ajones@ventanamicro.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, will@kernel.org, mark.rutland@arm.com, jackabt@amazon.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 7/22/25 10:33 AM, Bjorn Helgaas wrote:
-> On Tue, Jul 22, 2025 at 09:45:28AM -0500, Mario Limonciello wrote:
->> On 7/22/25 9:38 AM, Bjorn Helgaas wrote:
->>> On Thu, Jul 17, 2025 at 12:38:11PM -0500, Mario Limonciello wrote:
->>>> From: Mario Limonciello <mario.limonciello@amd.com>
->>>>
->>>> On systems with non VGA GPUs fbcon can't find the primary GPU because
->>>> video_is_primary_device() only checks the VGA arbiter.
->>>>
->>>> Add a screen info check to video_is_primary_device() so that callers
->>>> can get accurate data on such systems.
->>>
->>> This relies on screen_info, which I think is an x86 BIOS-ism.  Isn't
->>> there a UEFI console path?  How does that compare with this?  Is that
->>> relevant or is it something completely different?
->>
->> When I created and tested this I actually did this on a UEFI system (which
->> provides a UEFI GOP driver).
+On Tue, 22 Jul 2025 10:18:10 +0100,
+Andrew Jones <ajones@ventanamicro.com> wrote:
 > 
-> I guess screen_info is actually *not* an x86 BIOS-ism, and on UEFI
-> systems, we do actually rely on UEFI, e.g., in efi_setup_gop(),
-> alloc_screen_info(), init_screen_info()?
+> Hi Marc,
+> 
+> On Mon, Jul 21, 2025 at 04:51:36PM +0100, Marc Zyngier wrote:
+> > Tinkering with UUIDs is a perilious task, and the KVM UUID gets
+> > broken at times. In order to spot this early enough, add a selftest
+> > that will shout if the expected value isn't found.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > Link: https://lore.kernel.org/r/20250721130558.50823-1-jackabt.amazon@gmail.com
+> > ---
+> >  tools/testing/selftests/kvm/Makefile.kvm     |  1 +
+> >  tools/testing/selftests/kvm/arm64/kvm-uuid.c | 67 ++++++++++++++++++++
+> >  2 files changed, 68 insertions(+)
+> >  create mode 100644 tools/testing/selftests/kvm/arm64/kvm-uuid.c
+> > 
+> > diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
+> > index ce817a975e50a..e1eb1ba238a2a 100644
+> > --- a/tools/testing/selftests/kvm/Makefile.kvm
+> > +++ b/tools/testing/selftests/kvm/Makefile.kvm
+> > @@ -167,6 +167,7 @@ TEST_GEN_PROGS_arm64 += arm64/vgic_irq
+> >  TEST_GEN_PROGS_arm64 += arm64/vgic_lpi_stress
+> >  TEST_GEN_PROGS_arm64 += arm64/vpmu_counter_access
+> >  TEST_GEN_PROGS_arm64 += arm64/no-vgic-v3
+> > +TEST_GEN_PROGS_arm64 += arm64/kvm-uuid
+> >  TEST_GEN_PROGS_arm64 += access_tracking_perf_test
+> >  TEST_GEN_PROGS_arm64 += arch_timer
+> >  TEST_GEN_PROGS_arm64 += coalesced_io_test
+> > diff --git a/tools/testing/selftests/kvm/arm64/kvm-uuid.c b/tools/testing/selftests/kvm/arm64/kvm-uuid.c
+> > new file mode 100644
+> > index 0000000000000..89d9c8b182ae5
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/kvm/arm64/kvm-uuid.c
+> > @@ -0,0 +1,67 @@
+> > +#include <errno.h>
+> > +#include <linux/arm-smccc.h>
+> > +#include <asm/kvm.h>
+> > +#include <kvm_util.h>
+> > +
+> > +#include "processor.h"
+> > +
+> > +/*
+> > + * Do NOT redefine these constants, or try to replace them with some
+> > + * "common" version. They are hardcoded here to detect any potential
+> > + * breakage happening in the rest of the kernel.
+> > + *
+> > + * KVM UID value: 28b46fb6-2ec5-11e9-a9ca-4b564d003a74
+> > + */
+> > +#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_0	0xb66fb428U
+> > +#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_1	0xe911c52eU
+> > +#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_2	0x564bcaa9U
+> > +#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_3	0x743a004dU
+> > +
+> > +static void guest_code(void)
+> > +{
+> > +	struct arm_smccc_res res = {};
+> > +
+> > +	smccc_hvc(ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID, 0, 0, 0, 0, 0, 0, 0, &res);
+> > +
+> > +	__GUEST_ASSERT(res.a0 != SMCCC_RET_NOT_SUPPORTED, "a0 = %lx\n", res.a0);
+> 
+> Should this check res.a0 == SMCCC_RET_SUCCESS instead?
 
-Right.  This all works because of the framebuffer allocated pre-boot and 
-reused by the kernel.
+Yeah, probably.
 
 > 
-> But this patch is x86-specific, so I'm guessing the same problem could
-> occur on arm64, Loongson, or other UEFI platforms, and this series
-> doesn't address those?
-
-I've never seen a multi GPU solution on another architecture, but that 
-of course doesn't preclude one being created some day.
-
-The series lays the groundwork that if it happens on another 
-architecture we can easily add an architecture specific solution for 
-those.  If the solution is the same we could switch to a common helper.
-
+> > +	__GUEST_ASSERT(res.a0 == ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_0 &&
+> > +		       res.a1 == ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_1 &&
+> > +		       res.a2 == ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_2 &&
+> > +		       res.a3 == ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_3,
+> > +		       "Unexpected KVM-specific UID %lx %lx %lx %lx\n", res.a0, res.a1, res.a2, res.a3);
+> > +	GUEST_DONE();
+> > +}
+> > +
+> > +int main (int argc, char *argv[])
+> > +{
+> > +	struct kvm_vcpu *vcpu;
+> > +	struct kvm_vm *vm;
+> > +	struct ucall uc;
+> > +	bool guest_done = false;
+> > +
+> > +	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
+> > +
+> > +	while (!guest_done) {
+> > +		vcpu_run(vcpu);
+> > +
+> > +		switch (get_ucall(vcpu, &uc)) {
+> > +		case UCALL_SYNC:
+> > +			break;
+> > +		case UCALL_DONE:
+> > +			guest_done = true;
+> > +			break;
+> > +		case UCALL_ABORT:
+> > +			REPORT_GUEST_ASSERT(uc);
+> > +			break;
+> > +		case UCALL_PRINTF:
+> > +			printf("%s", uc.buffer);
+> > +			break;
+> > +		default:
+> > +			TEST_FAIL("Unexpected guest exit");
+> > +		}
+> > +	}
 > 
->>>>    bool video_is_primary_device(struct device *dev)
->>>>    {
->>>> +#ifdef CONFIG_SCREEN_INFO
->>>> +	struct screen_info *si = &screen_info;
->>>> +#endif
->>>>    	struct pci_dev *pdev;
->>>>    	if (!dev_is_pci(dev))
->>>> @@ -34,7 +38,18 @@ bool video_is_primary_device(struct device *dev)
->>>>    	pdev = to_pci_dev(dev);
->>>> -	return (pdev == vga_default_device());
->>>> +	if (!pci_is_display(pdev))
->>>> +		return false;
->>>> +
->>>> +	if (pdev == vga_default_device())
->>>> +		return true;
->>>> +
->>>> +#ifdef CONFIG_SCREEN_INFO
->>>> +	if (pdev == screen_info_pci_dev(si))
->>>> +		return true;
->>>> +#endif
->>>> +
->>>> +	return false;
->>>>    }
->>>>    EXPORT_SYMBOL(video_is_primary_device);
->>>> -- 
->>>> 2.43.0
->>>>
->>
+> This is becoming a very common and useful pattern. I wonder if it's time
+> for a ucall helper
+> 
+> static void ucall_vcpu_run(struct kvm_vcpu *vcpu,
+>                            void (*sync_func)(struct kvm_vcpu *, void *),
+>                            void *sync_data)
+> {
+>         bool guest_done = false;
+>         struct ucall uc;
+> 
+>         while (!guest_done) {
+>                 vcpu_run(vcpu);
+> 
+>                 switch (get_ucall(vcpu, &uc)) {
+>                 case UCALL_SYNC:
+>                         if (sync_func)
+>                                 sync_func(vcpu, sync_data);
+>                         break;
+>                 case UCALL_DONE:
+>                         guest_done = true;
+>                         break;
+>                 case UCALL_ABORT:
+>                         REPORT_GUEST_ASSERT(uc);
+>                         break;
+>                 case UCALL_PRINTF:
+>                         printf("%s", uc.buffer);
+>                         break;
+>                 default:
+>                         TEST_FAIL("Unexpected guest exit");
+>                 }
+>         }
+> }
 
+Honestly, I don't know. My understanding is that the common kvm
+selftest code is now mostly a pile of x86-specific stuff, and I've
+made it a goal not to touch any of it.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
