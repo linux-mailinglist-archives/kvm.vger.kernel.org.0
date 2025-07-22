@@ -1,174 +1,83 @@
-Return-Path: <kvm+bounces-53097-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53098-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF5EEB0D39E
-	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 09:43:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35555B0D3EF
+	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 09:54:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 122E7AA07CD
-	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 07:40:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 754163ACC06
+	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 07:50:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A8B62E3373;
-	Tue, 22 Jul 2025 07:36:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="G8PLRas7"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D40A28DEE4;
+	Tue, 22 Jul 2025 07:51:04 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtpbgeu2.qq.com (smtpbgeu2.qq.com [18.194.254.142])
+Received: from baidu.com (mx22.baidu.com [220.181.50.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF8FD2E267C;
-	Tue, 22 Jul 2025 07:36:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.194.254.142
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57B3628A1D0;
+	Tue, 22 Jul 2025 07:50:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.181.50.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753169803; cv=none; b=rppzZGTNAh1R0mVSYFxqa7LeMuCxNNva7gcNUHXDyKlQEJUA51mKIQSi21w0z9/uapSXZE3Fhnlo02Ggfdq2CmrJ8pztYKAKtKqnvWbw0W1pH4kg4aOjcGCk0HTXuM52M9YEQCgnaX0nZa8ZSCAmgF/77D7WWKLnGXLyMA1osAA=
+	t=1753170664; cv=none; b=ojTiIf5PE8NoYexMRDC3V8oC4vIKe8S8FgT0XVgIJtVdEWRiGgibJKf0odMTNDoh5kGnJ1FOPRGXNXCzLM4dyMGg6yMJRCwQEM7Z5Gkwt6pzY3KNcSUs/4HcuDMOcPeO0jrXmOf4d/e1rTvzTW6XdEIqOLKLvqp2uiPl3wXUetI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753169803; c=relaxed/simple;
-	bh=Mse6PLszhO3cdngmicTOnCA0f5skvbJPHBfXnrnGxpw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AH4BM/9w5twKvuA+vLyn8vIgP9R/mNT5yvfI63G5WJJNypITrNWOQkXCtuW8vwvvhEin2t6vrbQznWmORfpDv1+p6zZLpkQJ4PCsOWh+AACaOqBAWCRHK/yaKl3jecfIOIHc53aihaGeTjSu0JskI67PCl/nrsZWNFgmSEhyaJY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=G8PLRas7; arc=none smtp.client-ip=18.194.254.142
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1753169796;
-	bh=Ln6z5UMdHfy09BVb3ISvR9kteELxlxv1r4Jb0WU5wac=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=G8PLRas7qKBE3FwocDAWOZIqW604sBKmiQqhP4JIpufmY1QoGYABgK1G40TUOEmFt
-	 CurwW5rrg/OgCSCOX9U6H25bB6cJTuGZDNHejBN34/IGpljWdcaBKPRzLfiVgLiY4E
-	 TXNnaCWIOVPNMgFgIroKh99fqoudchDSNIQ8eils=
-X-QQ-mid: zesmtpip2t1753169738t55bf3778
-X-QQ-Originating-IP: KSjByG7dJMLO7TG5I1iv5PR6js3yTNO4FTwwtL4j6qI=
-Received: from avenger-e500 ( [localhost])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 22 Jul 2025 15:35:33 +0800 (CST)
-X-QQ-SSF: 0002000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 10523341223142092495
-EX-QQ-RecipientCnt: 64
-From: WangYuli <wangyuli@uniontech.com>
-To: wangyuli@uniontech.com
-Cc: airlied@gmail.com,
-	akpm@linux-foundation.org,
-	alison.schofield@intel.com,
-	andrew+netdev@lunn.ch,
-	andriy.shevchenko@linux.intel.com,
-	arend.vanspriel@broadcom.com,
-	bp@alien8.de,
-	brcm80211-dev-list.pdl@broadcom.com,
-	brcm80211@lists.linux.dev,
-	colin.i.king@gmail.com,
-	cvam0000@gmail.com,
-	dan.j.williams@intel.com,
-	dave.hansen@linux.intel.com,
-	dave.jiang@intel.com,
-	dave@stgolabs.net,
-	davem@davemloft.net,
-	dri-devel@lists.freedesktop.org,
-	edumazet@google.com,
-	gregkh@linuxfoundation.org,
-	guanwentao@uniontech.com,
-	hpa@zytor.com,
-	ilpo.jarvinen@linux.intel.com,
-	intel-xe@lists.freedesktop.org,
-	ira.weiny@intel.com,
-	j@jannau.net,
-	jeff.johnson@oss.qualcomm.com,
-	jgross@suse.com,
-	jirislaby@kernel.org,
-	johannes.berg@intel.com,
-	jonathan.cameron@huawei.com,
-	kuba@kernel.org,
-	kvalo@kernel.org,
-	kvm@vger.kernel.org,
-	linux-cxl@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-serial@vger.kernel.org,
-	linux-wireless@vger.kernel.org,
-	linux@treblig.org,
-	lucas.demarchi@intel.com,
-	marcin.s.wojtas@gmail.com,
-	ming.li@zohomail.com,
-	mingo@kernel.org,
-	mingo@redhat.com,
-	netdev@vger.kernel.org,
-	niecheng1@uniontech.com,
-	oleksandr_tyshchenko@epam.com,
-	pabeni@redhat.com,
-	pbonzini@redhat.com,
-	quic_ramess@quicinc.com,
-	ragazenta@gmail.com,
-	rodrigo.vivi@intel.com,
-	seanjc@google.com,
-	shenlichuan@vivo.com,
-	simona@ffwll.ch,
-	sstabellini@kernel.org,
-	tglx@linutronix.de,
-	thomas.hellstrom@linux.intel.com,
-	vishal.l.verma@intel.com,
-	wangyuli@deepin.org,
-	x86@kernel.org,
-	xen-devel@lists.xenproject.org,
-	yujiaoliang@vivo.com,
-	zhanjun@uniontech.com
-Subject: [PATCH v3 8/8] scripts/spelling.txt: Add notifer||notifier to spelling.txt
-Date: Tue, 22 Jul 2025 15:34:31 +0800
-Message-ID: <02153C05ED7B49B7+20250722073431.21983-8-wangyuli@uniontech.com>
-X-Mailer: git-send-email 2.50.0
-In-Reply-To: <576F0D85F6853074+20250722072734.19367-1-wangyuli@uniontech.com>
-References: <576F0D85F6853074+20250722072734.19367-1-wangyuli@uniontech.com>
+	s=arc-20240116; t=1753170664; c=relaxed/simple;
+	bh=mnkOXBOrzs06Jbo71/4JQf7EhWvlkGynEQoNFZrXMtY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=q47wOV0uOoPxORcZwtDf4bQIO4Y8K12q9F1tu3nwL1xTi0wEFBf7l7mHSrg30xn+Db3NxS5vXcWhh4CNXgc++tiNX23KJ0ULQeLrtIs/V3mMnNjJrsfJvJcCB2N6ze5OhjA2S6cOlVN3NxuGCOLAoGxYjQYGwt4kN8zXSWfB7z8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com; spf=pass smtp.mailfrom=baidu.com; arc=none smtp.client-ip=220.181.50.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baidu.com
+From: lirongqing <lirongqing@baidu.com>
+To: <pbonzini@redhat.com>, <vkuznets@redhat.com>, <tglx@linutronix.de>,
+	<mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
+	<x86@kernel.org>, <hpa@zytor.com>, <kvm@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+CC: Li RongQing <lirongqing@baidu.com>
+Subject: [PATCH] x86/kvm: Downgrade host poll messages to pr_debug_once()
+Date: Tue, 22 Jul 2025 15:49:58 +0800
+Message-ID: <20250722074958.2567-1-lirongqing@baidu.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpip:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: MClLvxZc1QnM/wj2Wk3jR26+OjsxVDiMy0TUPxB/sehera5uDfi+6PDH
-	DKPTpIbyOSUwM9saQbyBWT3OLKm9v2GRNddNkwf/NvPPIA8u8jd2lnl3nugLbG/fjZrTNq9
-	P6LqF3J0YOVfKF/Id+BwrTcipop5Lev8xUcQU16whJxFMaRE4fJICyiFBgaxHHyXGZcZMdh
-	pjg8yeTtLWhLV1KJP2cn8xknaKnUP0ixK4gYJyROGLy0kDB3OtvkWb9mwiR7hF8nDLU6DPW
-	aaNSWWYCTdmdZPULu9S7tH53RiVlCQAUTcvevC+rdoTZEzxgCBye7SiRjp2e16QTBLNzFpN
-	3n0QHhIWRTEb/p3Wo67+SYrS9r2y4g7TPDDJ5FufZHcjS8WNsmmUsho0CVjI5ZesB7JM/O3
-	tfE/NnV1DbpmaXnyJWNHILKKSZuUaA0EFYhtZzJgX2uY/QoAzlZnWF/qKHC4m4LwWO5wTIP
-	b7Xt4ZIyBkQBQX+f3nXDHp4XtKou3Is4C7RytJkHHheG7Fv6vp8GQ+B8a1FihPvp2bMCP6N
-	5aMLqFVhS/vQQKU4hYYX6M4BAk+AWnKWwxusGbHeh/KPw1v2i9IY1/3+vwqc5cx17LLwe+S
-	ox8Cqgyvn+xCwvcEm7GdCMdwkH+m5Fo+ZmBTdHMX1ymwJlLhSoxY6+55tg4pEj5ecuQo/HW
-	k78SBssDXSLTefCwJXyHf6+wKQVH8cdJs0JzP5Vx1Y5C+Y1VF28rakgqvV545c3GnCxYShy
-	i1JNcZIghWkkkmVzhUyjxl6YlsEliKEtGZVw4msKwmwKcS9IPANDg65Vf2TFFL+OUf9UZzb
-	ZjKJuCBJX+JS8OBBYp8IicK0u2Fm+l0/1U7dpdD02x90w6Czdd9wTmk/Lr7+/RPnhtrdr8/
-	J3j+UdgvAiiBWX7uddxUoBgmZcy0kf3oMHTB01g90aJLe106daPQqqgqdaWRhtxYHW6HBme
-	KkOo+R4bQ+/gsbHfVZ6wKBONH070vigYt7a+tlGef+Asdf/giXAj8LioRHVNncucLLFsaL3
-	d6wjz5Ihc59ytyIDfghqDdND6XUKrQe6/tX9VFwFrhKrfbF2TV5Chkvuzkr574EYF7qL4Fq
-	OHA1PKS1Pf124UfX7wm96iuOaeRsXzHrkS4SYJ1qR/qM47q7bzIgMY=
-X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
-X-QQ-RECHKSPAM: 0
+Content-Type: text/plain
+X-ClientProxiedBy: bjkjy-exc5.internal.baidu.com (172.31.50.49) To
+ bjkjy-exc3.internal.baidu.com (172.31.50.47)
+X-FEAS-Client-IP: 172.31.50.47
+X-FE-Policy-ID: 52:10:53:SYSTEM
 
-This typo was not listed in scripts/spelling.txt, thus it was more
-difficult to detect. Add it for convenience.
+From: Li RongQing <lirongqing@baidu.com>
 
-Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
-Signed-off-by: WangYuli <wangyuli@uniontech.com>
+The current host-side polling messages are misleading, as they will be
+printed when the hypervisor intentionally disables polling (by providing
+MWAIT to the guest) rather than due to version incompatibility. so
+Downgrade to pr_debug_once() to prevent spurious log messages.
+
+Signed-off-by: Li RongQing <lirongqing@baidu.com>
 ---
- scripts/spelling.txt | 1 +
- 1 file changed, 1 insertion(+)
+ arch/x86/kernel/kvm.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/spelling.txt b/scripts/spelling.txt
-index c9a6df5be281..d824c4b17390 100644
---- a/scripts/spelling.txt
-+++ b/scripts/spelling.txt
-@@ -1099,6 +1099,7 @@ notication||notification
- notications||notifications
- notifcations||notifications
- notifed||notified
-+notifer||notifier
- notity||notify
- notfify||notify
- nubmer||number
+diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+index 9cda79f..c5f96ee 100644
+--- a/arch/x86/kernel/kvm.c
++++ b/arch/x86/kernel/kvm.c
+@@ -1136,8 +1136,8 @@ static void kvm_enable_host_haltpoll(void *i)
+ void arch_haltpoll_enable(unsigned int cpu)
+ {
+ 	if (!kvm_para_has_feature(KVM_FEATURE_POLL_CONTROL)) {
+-		pr_err_once("host does not support poll control\n");
+-		pr_err_once("host upgrade recommended\n");
++		pr_debug_once("host does not support poll control\n");
++		pr_debug_once("host upgrade recommended\n");
+ 		return;
+ 	}
+ 
 -- 
-2.50.0
+2.9.4
 
 
