@@ -1,305 +1,321 @@
-Return-Path: <kvm+bounces-53079-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53080-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D38F6B0D1F9
-	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 08:37:55 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C695B0D224
+	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 08:55:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 00FD517DB25
-	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 06:37:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7B86D7AAE02
+	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 06:53:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9C4B2BE65A;
-	Tue, 22 Jul 2025 06:37:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C1B728A700;
+	Tue, 22 Jul 2025 06:55:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iGEvkXK0"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="pZ7G4WLz";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="oPCmik58"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 174241C84DE;
-	Tue, 22 Jul 2025 06:37:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753166266; cv=fail; b=Ikd5E4gv/a5YniQy6NhGmMPFQg2HwpfS/PLEgUAwUeTzzaR9SOWXNaZKhuMVybVl9Fy1W20MBeg12jA5A31ZzGvGA+cvpPjuC/uQ8whG2yKx16jY3AHXxZDszs1YGc5miiLZd+Ef/16OJICIdyE3d+ci/CYwOdnR0Seq7RBgt/U=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753166266; c=relaxed/simple;
-	bh=oT1HtAqT8ZAtKjLcxXVrig/9k3uJtGcqkv/OrnUoBjs=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=nGCg7BmJrlNOPtpNaYNgm0xeg6648sHOOWSBKp8oyaymDT2pe7iwEKuy0KB7BuBmCJwt+rkyhMUw51aOrx+cxSLqLKK7CY+aP53UvhLqk2DS7HzTeVJUTzxhld62/qyyGULL0CnSAU6K/Tu1FyJ0VJ/sh10BChBNsLKqce9NeSk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iGEvkXK0; arc=fail smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1753166265; x=1784702265;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   in-reply-to:mime-version;
-  bh=oT1HtAqT8ZAtKjLcxXVrig/9k3uJtGcqkv/OrnUoBjs=;
-  b=iGEvkXK0M5YL+L9PfWN+yt8Ow+xdkaSHsyB7WUZm+j/MtjQOYkZZ+f5r
-   0Og71BaWiRgZERwKbbkPxnxaG3pJjNfVorhLe8zsdFjMVt7T8kohOZQ4r
-   sE1NS/FoE/WKT0i8XsggMCOsoJd/aGN1gvMJk+MD3S7q+mF45qL0IaUE4
-   DMXZb2Zp38O2zEB2GREJJR5tIiwOi9DegBmqYp9qhFln5Nugrci9xooRW
-   AZWhLfIvOFA6i/FB+VFkPSgAAN3FLlI8s/+qZTfrqvwNi2SYkmC9Dwne/
-   Ds8HAYbKmqDZnEjD88tuy2/tTp+4NYj7D9XxkDU4nIbnEPDmFSXF8DMga
-   A==;
-X-CSE-ConnectionGUID: H0oarQqOQDS7Porf4vAJXw==
-X-CSE-MsgGUID: cJQSSgslSDeqNVJCDWO8Mg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11499"; a="72855087"
-X-IronPort-AV: E=Sophos;i="6.16,330,1744095600"; 
-   d="scan'208";a="72855087"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2025 23:37:45 -0700
-X-CSE-ConnectionGUID: TX1FYQuSS1uGlpRW0XakrA==
-X-CSE-MsgGUID: 749Zay5ERRafrQz6EebLzA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,330,1744095600"; 
-   d="scan'208";a="164533391"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by fmviesa004.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2025 23:37:44 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26; Mon, 21 Jul 2025 23:37:43 -0700
-Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26 via Frontend Transport; Mon, 21 Jul 2025 23:37:43 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (40.107.92.77) by
- edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Mon, 21 Jul 2025 23:37:43 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=liWCfMdhmrzvOKEUvxNJ52PLJVFiMALsdBd00+OmEtkinKO/LvHAwHA/uq7Xt5xiMRDYI1C7cNhzB0DeQCel11ZW4xLPi3Z/c3lf49T+QJkVybAZf0XNAUalYxKCvRYLe2pskNfTSRiUH/vk6YrE2n6VMXboMsrGtz9Cdzbd4EA/BANNEI9WaqcfWWr0G9KnBc4AMBrTSO7ZVtCEnLN6rKd6nyhmJoKeMOLZEQDmrQdrQkhUsK/bCbJBFfQx3Cf0TdgMLg7Cm8OofiLIRRal9FeTp9JtSvJGOeiFykIX9tDAY/2ecgUuW8Cm3aeh/S4WeBURlkHzvrTHz2pHuXVmNg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=k2MKAt9fneD9/kCppFwm6FetDwTVi6i2lX/03pzvB/o=;
- b=UEkd9zQ4jU4A1RjP3BpZH0TeAByOs8ae5iCqVUcvdqgtMleh+kktJK3jxErEX0SSkY/hFh9rvDnTM3ln9d7AuIEmRFRKRBmeOWnastU+v8RKR0X1pM4yw/N9mNVy8FesTnf2PG08g1HgX95xWrC9eaAl674r19K5MtUmEY3fS7zR7D6ci6F6g+8fLqPjeLEt+f9qul7tJ2GSNjFIf1sPYBZrnE+6xegq6V+Tz0dR9IiptTL2Jp0NbJUFaMVo+HQLm3eYWSo1vLsENcRfqM94VJKi5CxJGCj7+nCyQVy8y53ldShwL+Gcnr8XrbTKJn+tstw4jtWZNLI+u4vdxZvOFg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
- BL3PR11MB6337.namprd11.prod.outlook.com (2603:10b6:208:3b1::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8943.30; Tue, 22 Jul
- 2025 06:37:38 +0000
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::e971:d8f4:66c4:12ca]) by DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::e971:d8f4:66c4:12ca%5]) with mapi id 15.20.8943.029; Tue, 22 Jul 2025
- 06:37:38 +0000
-Date: Tue, 22 Jul 2025 14:37:06 +0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Ackerley Tng <ackerleytng@google.com>
-CC: <vannapurve@google.com>, <pbonzini@redhat.com>, <seanjc@google.com>,
-	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>, <x86@kernel.org>,
-	<rick.p.edgecombe@intel.com>, <dave.hansen@intel.com>,
-	<kirill.shutemov@intel.com>, <tabba@google.com>, <quic_eberman@quicinc.com>,
-	<michael.roth@amd.com>, <david@redhat.com>, <vbabka@suse.cz>,
-	<jroedel@suse.de>, <thomas.lendacky@amd.com>, <pgonda@google.com>,
-	<zhiquan1.li@intel.com>, <fan.du@intel.com>, <jun.miao@intel.com>,
-	<ira.weiny@intel.com>, <isaku.yamahata@intel.com>, <xiaoyao.li@intel.com>,
-	<binbin.wu@linux.intel.com>, <chao.p.peng@intel.com>
-Subject: Re: [RFC PATCH 08/21] KVM: TDX: Increase/decrease folio ref for huge
- pages
-Message-ID: <aH8xkkArWBrjzYfk@yzhao56-desk.sh.intel.com>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <aCVZIuBHx51o7Pbl@yzhao56-desk.sh.intel.com>
- <diqzfrgfp95d.fsf@ackerleytng-ctop.c.googlers.com>
- <aEEFRXF+HrZVh5He@yzhao56-desk.sh.intel.com>
- <diqzecvxizp5.fsf@ackerleytng-ctop.c.googlers.com>
- <aHb/ETOMSQRm1bMO@yzhao56-desk>
- <diqzfrevhmzw.fsf@ackerleytng-ctop.c.googlers.com>
- <aHnghFAH5N7eiCXo@yzhao56-desk.sh.intel.com>
- <diqz8qkg6b8l.fsf@ackerleytng-ctop.c.googlers.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <diqz8qkg6b8l.fsf@ackerleytng-ctop.c.googlers.com>
-X-ClientProxiedBy: SG2PR04CA0185.apcprd04.prod.outlook.com
- (2603:1096:4:14::23) To DS7PR11MB5966.namprd11.prod.outlook.com
- (2603:10b6:8:71::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B241139D;
+	Tue, 22 Jul 2025 06:54:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753167301; cv=none; b=sIoxhte8QQpWXhP+ynZcxuEjtrPM+XDSY+ymhjkSAE6uxibsFOht9imqzguiefciCLduc04Jn/yAt4BQ3uk9O60VUFW8sNPjFdkkDWIBCFn4IjftX4oWniXrRrSG/XjL4wm1vXmX6zW5vPpe2AMlbNyWvoDyzkgaLKb02QJLKnI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753167301; c=relaxed/simple;
+	bh=wVP22iSZ7dTXs1+LLeDM/qsdnjCUjG7pQJd0/7nWoPU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=WQ2hBwNUiQikE9rs/bSq/olLU28wFsybILP4L3RZvOtaG0Mzz1oe+cgfrj7U/RUiszLXoM90NMycLlwvHod3vUDnS5H6njCvEdL3KkMkFeW6wHrvWNJZltSK7OyiMnnuTESkek77+K1mpCFdFkYZw6wRr7ovzFW/sl3p12frFWA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=pZ7G4WLz; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=oPCmik58; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: "Ahmed S. Darwish" <darwi@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1753167297;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=tOdPyjfiDhYSowi8CMnfw2fyv+3+g4xJlDWvSajUCms=;
+	b=pZ7G4WLzdlJkd5R7gF624yiIgw3OvMpqbWf1jRmm0exL144SMULXA+IYXtfQAZdJgo+4Ya
+	PakjdSMNCQE3r/80COjKfU8DOKMgmuoWHQdu9vfmx/eB0MuKyBTOFzKdkM881vytetYw4k
+	iOG19KcVYAJUpOeYN+1AbwbtHa3QrMXsoxlHb/QaWwXddTA/fR0NeqmnRlrDIGEaC8p38C
+	oyHXkghFBEaZHLF+r3T7u/Cz4A3/DMJFKBQb2PKGgiuPi0D98qBP5SsRMP+ir4a2wZaMC8
+	efsG0t4t+Fcs0s40V4KILdB7Qv9SPOO91zPbGBdtDoce764uT4Tq70gvJ04pxQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1753167297;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=tOdPyjfiDhYSowi8CMnfw2fyv+3+g4xJlDWvSajUCms=;
+	b=oPCmik58AHAmYq9EfXamtPoR23jmv4ylEnri/pEmoiSobE0EkfNoC8Mpsjm3lutaAzOKK3
+	MKSlvm80wmXjegAQ==
+To: Borislav Petkov <bp@alien8.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>,
+	Andrew Cooper <andrew.cooper3@citrix.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Juergen Gross <jgross@suse.com>,
+	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	John Ogness <john.ogness@linutronix.de>,
+	x86@kernel.org,
+	kvm@vger.kernel.org,
+	x86-cpuid@lists.linux.dev,
+	LKML <linux-kernel@vger.kernel.org>,
+	"Ahmed S. Darwish" <darwi@linutronix.de>
+Subject: [PATCH v3 0/6] x86: Disentangle <asm/processor.h> dependency on CPUID headers
+Date: Tue, 22 Jul 2025 08:54:25 +0200
+Message-ID: <20250722065448.413503-1-darwi@linutronix.de>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|BL3PR11MB6337:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3338b5d4-4bb7-4a8d-6863-08ddc8ea4024
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024|13003099007;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?LLqSCv8SUPq8pejJPPuTw7xo+lCTeuhX/YCGh1B3kJ2hLiLnnxCvqwonUSqO?=
- =?us-ascii?Q?1b0mKiu1rz/+kXnIPFC4Wez+ZC1p0niNDOwd/nRevEr5NJutr30OiRKaQFII?=
- =?us-ascii?Q?7NzH//ZMnCXE0NPgvOqi1tAjiql/uDiW8Ru9+/IXeUzi5rgnNOfRCAZD+BAz?=
- =?us-ascii?Q?0+afVCceBpMNvHPveCyya115bZcyOarlcJoArsRRQKgjeVf6swX0/jd04ciR?=
- =?us-ascii?Q?zvIxkzEmJpCjy9PIbfhm3rPx1KI0gkfUKM5gJXOzEmjtTHftX7g7F2G/hVF3?=
- =?us-ascii?Q?ukvq6K5BjaqfwPKtnYY17ndsmCMRil21gRmDYAKDyp87AdX21lLRhQpXhEXI?=
- =?us-ascii?Q?ts+e5jveE4jTq6MUSAdL/pnkSDlN2Txly6wCAbtBNXJQk1SfhiDfAwJXyR1n?=
- =?us-ascii?Q?D/lv0k52L5M+86exTJueeKzRfKLnAqs2Wbfzg+Q5WHzJQiOTLX5QeKP9Tcf+?=
- =?us-ascii?Q?Dx+Wf5NRo7QLPkX0Y8gK0qUMF+/Iugj0hFkqZTsExu8pMsPFBLB+Ij30cUsR?=
- =?us-ascii?Q?YA/JpOeyV8yC009PENQh2WBMSDJnKCnAYBEJh8ZMlJ550HKEzlX2J67zM+6z?=
- =?us-ascii?Q?54tsP66CRkjnEk8hPVmmkw1B8edHbJ2xDmN5jv/x9O2A7KthFXI1Ws97/n0/?=
- =?us-ascii?Q?zyzndV9VnTXAnaaIaLQVG3BUUA+4alt1Y5npSN+elpIXQcpu1eJ2MJ3TPRkg?=
- =?us-ascii?Q?xFJLqHylsEV57ipJHrk0X0/a0IEoWALbd0ijeeP2QBtgF1KjCg3p+KRQKgAE?=
- =?us-ascii?Q?vLRI6lS66vEmSAdrKO7HYexYUFNewvr7LSZdPjnbgKWrv7bkOX+ocmi44nJT?=
- =?us-ascii?Q?NOJtkBQh+U02JrCdwvn1T5C4VG515lu2HpBa8fpRsjQ1uPQqE59J1dTRetip?=
- =?us-ascii?Q?bJBBSt6ObVHNG5wt+Z/dHczaNDjuTemOkC5Elv2aEuTUQzIoixLbGeuNbs6F?=
- =?us-ascii?Q?O3Q2low/NfRjiyRMxaPk1IrAMnKahOhoLGmviWG6W8gtu7og9wibD6QnUx6t?=
- =?us-ascii?Q?I+zZ0MioKjNPhV7FRizn0I9eLRz1T3dKoGQgazSGPn2L1d7Y5zO+spniEAST?=
- =?us-ascii?Q?mHCaBfSuEl/bxhwIFv9i3G9vmUhcU/QzrMCgoGvRTleAG368qxxT2mEH0i7/?=
- =?us-ascii?Q?JyQJakmz7udNNCS17B8uLwn0kVHd4IOjCu7Pir/9PhE5S37tCcfoKxFtEDDC?=
- =?us-ascii?Q?I/u9pzlEIfmE18knoYTlE/uenPx6rY5m2YO1f0n6sXGSNpoZtLyFT0pun4zR?=
- =?us-ascii?Q?TLE5yzHZoMC8I0BKyPLcgd65Sr7icIquILUEHI8ViRFaz3aZVXkG8FFJ9DbS?=
- =?us-ascii?Q?51Jfn8Huee3v7/JynkL6CkndLRXmFuRpVfH1KEZicv3HvigPnVc4XVkJ1ewP?=
- =?us-ascii?Q?4UCw/ElZ8v1oJZC0G37PT8leX32A+zQPkOsC7A6OxxvRGKjX2pCKPgryDpBS?=
- =?us-ascii?Q?dD9aSZUKMnI=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(13003099007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Vwed1+SxAFSyu1NOeMIEopOFu+qcTeMIz+SLdwITzXKpYM0CdBThpeSBKaf7?=
- =?us-ascii?Q?ssrKD3iVuizqanwtBpYc/ks0yWibUc6iDahbhFciXyDlCWfqB6R8+ReSXqxt?=
- =?us-ascii?Q?Y0+GCNGOlmYjLq7Cxm/K3JN35QFFXjYws7KOtsJtPOdWV0JJp8F2PxnTDSQn?=
- =?us-ascii?Q?mU1dNjrZ7KowvfS/GIl8JYYC206NfFkUbEkSaSNXAYLiBP5x/IWRjG90+XYX?=
- =?us-ascii?Q?3uK3Vg2kG3MSt+BKUR+g2tFqfl7pZIK05ZhF7MMBNDWyiFqkOETDN5DdGfGJ?=
- =?us-ascii?Q?A5Nr5v4Cd8apbAMf09x2MipSfGh6JkmzuH55tNuOaGaBSjdjshgLnzGr73yL?=
- =?us-ascii?Q?PQpmB0qL+twcflzEDK7jUB/IIZiAFWWKeprWFXp8OwAwRBfv70HgKN/l8ncx?=
- =?us-ascii?Q?6itBvSgjM1Etr1uCH1F858+ZBEsYMV1PgtEZ8D28wF+kkfh7srFtplB+S0qU?=
- =?us-ascii?Q?TZ84Rbdd6HkzY7M25CMdGdFOEwr8Okb9JS8KJ19SybbErLlv81pVZaDlFSYr?=
- =?us-ascii?Q?XabVF6G4Bd88v5sGt6+hzqyJhXEe5ooJml1owJXzQ52lqTk3XQkyQD2hv+vB?=
- =?us-ascii?Q?uLPgrgAkEz54SRspJlnkyh8IfhAYUEmKmUFAWaOjcfB0dScDlDksAACH3wbp?=
- =?us-ascii?Q?jVQKY/aPp+YoP/z0QB4znLlLjkMpI005ZC77+POlLGhRiPusWSvNApBD3xea?=
- =?us-ascii?Q?EWTkW2Gjz8rLxtFaJ79iXKQH+NGksMyhP/tpR6JZTXz4lqtERkRTjyTl9uTU?=
- =?us-ascii?Q?YFFjXn4tDjmGU2aOkpkUXUHy54Qm/DU09WYLfQwyg7W9Owcg5yB4m2fxSjay?=
- =?us-ascii?Q?fxHiX+dIrms51Ul4NNNt3Id+TCjZvVhQUuk/5AAHIp/B2C0+0IgIpxh12Mfd?=
- =?us-ascii?Q?tuVuYx0Pp/y1AdPyuOmqVuysj8DE7Xk/CiGDAQRnJ/Ib9PIVgeOhVpKxuHBC?=
- =?us-ascii?Q?KMYxXJPgM0bXz+cAzL/vGWjHIOOdr5IZTb2Kmoy8NH6AbF89LQQerJL1pXsO?=
- =?us-ascii?Q?umNdh8fqyMUc4HWRTJK1+UbQIsVwg716TkhGHhWUlren3zyGyYgurJV+qUVm?=
- =?us-ascii?Q?OEdUpR7tt1v7tV15B7kbokV008zSzLmjQfAcBHsVQQYTZdbsaInnyTxbbcel?=
- =?us-ascii?Q?lO9vojd1bQh2UFcWZon34XoZ/MnIXfkK/9oVPtGcdWU2p4QH/AkJLakAKa4s?=
- =?us-ascii?Q?FiG++LqpQQRf0v4gcmpgVe0ZjqvurqfzS2z5Kl0gNdq8lnjC9N1MABZ7HcLX?=
- =?us-ascii?Q?DlofcoxXzmPpNURqnbz04BC+v/3iQKRDY0UNYIDMQFzqoHftA4qDxK2QPK3l?=
- =?us-ascii?Q?R3qAcsl6FGyMqjqY0PZ9x5YZZCDq8TBbfkbRFoMgkNqjy07d2rbGQ9leD26m?=
- =?us-ascii?Q?O+bhyqU6/EEawZhbgS4WGHNcPu8k/tOQJLTH5NkBDiwDTBjFJrEeGmun5bML?=
- =?us-ascii?Q?4TyauYtTOCGaqSmrl2VbM8dfCcAjJzGniNGn1WupoTEjOox9dcp1uy+rmhvI?=
- =?us-ascii?Q?H4Pe+k+wcedH0p7liZEEBkx4Y8tJptoatZgfohQiha1jLbOXbXqRwYNXsXnD?=
- =?us-ascii?Q?25N6hmtoyhnccf95L7YlPp9bJyV7Hz4lEUlaNhiw?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3338b5d4-4bb7-4a8d-6863-08ddc8ea4024
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jul 2025 06:37:38.2287
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Vku09x/ZZg2doKT6EgYlrqejsKkrIHXHphHGTQyIDHjbIZcj5P4Q22MQQ/yN7lzBTV3WtQxeMHIhoRFZsrHzqw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR11MB6337
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jul 21, 2025 at 10:33:14PM -0700, Ackerley Tng wrote:
-> Yan Zhao <yan.y.zhao@intel.com> writes:
-> 
-> > On Wed, Jul 16, 2025 at 01:57:55PM -0700, Ackerley Tng wrote:
-> >> Yan Zhao <yan.y.zhao@intel.com> writes:
-> >> 
-> >> > On Thu, Jun 05, 2025 at 03:35:50PM -0700, Ackerley Tng wrote:
-> >> >> Yan Zhao <yan.y.zhao@intel.com> writes:
-> >> >> 
-> >> >> > On Wed, Jun 04, 2025 at 01:02:54PM -0700, Ackerley Tng wrote:
-> >> >> >> Hi Yan,
-> >> >> >> 
-> >> >> >> While working on the 1G (aka HugeTLB) page support for guest_memfd
-> >> >> >> series [1], we took into account conversion failures too. The steps are
-> >> >> >> in kvm_gmem_convert_range(). (It might be easier to pull the entire
-> >> >> >> series from GitHub [2] because the steps for conversion changed in two
-> >> >> >> separate patches.)
-> >> >> > ...
-> >> >> >> [2] https://github.com/googleprodkernel/linux-cc/tree/gmem-1g-page-support-rfc-v2
-> >> >> >
-> >> >> > Hi Ackerley,
-> >> >> > Thanks for providing this branch.
-> >> >> 
-> >> >> Here's the WIP branch [1], which I initially wasn't intending to make
-> >> >> super public since it's not even RFC standard yet and I didn't want to
-> >> >> add to the many guest_memfd in-flight series, but since you referred to
-> >> >> it, [2] is a v2 of the WIP branch :)
-> >> >> 
-> >> >> [1] https://github.com/googleprodkernel/linux-cc/commits/wip-tdx-gmem-conversions-hugetlb-2mept
-> >> >> [2] https://github.com/googleprodkernel/linux-cc/commits/wip-tdx-gmem-conversions-hugetlb-2mept-v2
-> >> > Hi Ackerley,
-> >> >
-> >> > I'm working on preparing TDX huge page v2 based on [2] from you. The current
-> >> > decision is that the code base of TDX huge page v2 needs to include DPAMT
-> >> > and VM shutdown optimization as well.
-> >> >
-> >> > So, we think kvm-x86/next is a good candidate for us.
-> >> > (It is in repo https://github.com/kvm-x86/linux.git
-> >> >  commit 87198fb0208a (tag: kvm-x86-next-2025.07.15, kvm-x86/next) Merge branch 'vmx',
-> >> >  which already includes code for VM shutdown optimization).
-> >> > I still need to port DPAMT + gmem 1G + TDX huge page v2 on top it.
-> >> >
-> >> > Therefore, I'm wondering if the rebase of [2] onto kvm-x86/next can be done
-> >> > from your side. A straightforward rebase is sufficient, with no need for
-> >> > any code modification. And it's better to be completed by the end of next
-> >> > week.
-> >> >
-> >> > We thought it might be easier for you to do that (but depending on your
-> >> > bandwidth), allowing me to work on the DPAMT part for TDX huge page v2 in
-> >> > parallel.
-> >> >
-> >> 
-> >> I'm a little tied up with some internal work, is it okay if, for the
-> > No problem.
-> >
-> >> next RFC, you base the changes that you need to make for TDX huge page
-> >> v2 and DPAMT on the base of [2]?
-> >
-> >> That will save both of us the rebasing. [2] was also based on (some
-> >> other version of) kvm/next.
-> >> 
-> >> I think it's okay since the main goal is to show that it works. I'll
-> >> let you know when I can get to a guest_memfd_HugeTLB v3 (and all the
-> >> other patches that go into [2]).
-> > Hmm, the upstream practice is to post code based on latest version, and
-> > there're lots TDX relates fixes in latest kvm-x86/next.
-> >
-> 
-> Yup I understand.
-> 
-> For guest_memfd//HugeTLB I'm still waiting for guest_memfd//mmap
-> (managed by Fuad) to settle, and there are plenty of comments for the
-> guest_memfd//conversion component to iron out still, so the full update
-> to v3 will take longer than I think you want to wait.
-> 
-> I'd say for RFCs it's okay to post patch series based on some snapshot,
-> since there are so many series in flight?
-> 
-> To unblock you, if posting based on a snapshot is really not okay, here
-> are some other options I can think of:
-> 
-> a. Use [2] and posting a link to a WIP tree, similar to how [2] was
->    done
-> b. Use some placeholder patches, assuming some interfaces to
->    guest_memfd//HugeTLB, like how the first few patches in this series
->    assumes some interfaces of guest_memfd with THP support, and post a
->    series based on assumed interfaces
-> 
-> Please let me know if one of those options allow you to proceed, thanks!
-Do you see any issues with directly rebasing [2] onto 6.16.0-rc6?
+Hi,
 
-We currently prefer this approach. We have tested [2] for some time, and TDX
-huge page series doesn't rely on the implementation details of guest_memfd.
+This series stops <asm/processor.h> from including <asm/cpuid/api.h>
+since the former has no need for the latter.
 
-It's ok if you are currently occupied by Google's internal tasks. No worries.
+For this to work, modify all CPUID call sites which implicitly include
+the CPUID <asm/cpuid/api.h> header to explicitly include it instead.
 
-> >> [2] https://github.com/googleprodkernel/linux-cc/commits/wip-tdx-gmem-conversions-hugetlb-2mept-v2
-> >> 
-> >> > However, if it's difficult for you, please feel free to let us know.
-> >> >
-> >> > Thanks
-> >> > Yan
+Note, this allows the CPUID API header to include <asm/processor.h>
+without inducing a circular dependency — which is needed for the upcoming
+CPUID model and parser.
+
+
+Changelog v3
+~~~~~~~~~~~~
+
+* For the KVM CPUID call sites:
+
+    arch/x86/kvm/mmu/mmu.c
+    arch/x86/kvm/svm/sev.c
+    arch/x86/kvm/svm/svm.c
+    arch/x86/kvm/vmx/pmu_intel.c
+    arch/x86/kvm/vmx/sgx.c
+    arch/x86/kvm/vmx/vmx.c
+
+  Let them explicitly include <asm/cpuid/api.h> instead of letting their
+  internal arch/x86/kvm/cpuid.h header does it.  The latter header does
+  not need the former, so making it include a itnot just for the sake of
+  its call sites was not correct.
+
+* While at it, modify /all/ call sites that use the CPUID API to
+  explicitly include <asm/cpuid/api.h>.
+
+  Previous iterations only modified the CPUID call sites which implicitly
+  included the CPUID headers through <asm/processor.h>.  Since we're at
+  it anyway, there's no reason not to complete the task across the whole
+  kernel tree.
+
+  Thus, also convert below arch/x86/ sites:
+
+    arch/x86/kernel/apic/apic.c
+    arch/x86/kernel/cpu/sgx/driver.c
+    arch/x86/kernel/cpu/vmware.c
+    arch/x86/kernel/jailhouse.c
+    arch/x86/kernel/kvm.c
+    arch/x86/mm/pti.c
+    arch/x86/pci/xen.c
+    arch/x86/xen/enlighten_hvm.c
+    arch/x86/xen/pmu.c
+    arch/x86/xen/time.c
+
+  and below drivers/ sites:
+
+    drivers/gpu/drm/gma500/mmu.c
+    drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+    drivers/ras/amd/fmpm.c
+    drivers/virt/acrn/hsm.c
+    drivers/xen/events/events_base.c
+    drivers/xen/grant-table.c
+    drivers/xen/xenbus/xenbus_xs.c
+
+  to explicitly include the CPUID API header.
+
+* Fix the v2 i386 compilation error:
+
+    https://lore.kernel.org/x86-cpuid/202507150403.hKKg9xjJ-lkp@intel.com
+
+  by making drivers/char/agp/efficeon-agp.c explicitly include the CPUID
+  API.
+
+* Make sure that an "i386 allyesconfig" build is successful this time.
+
+* Based on v6.16-rc7.
+
+
+Changelog v2
+~~~~~~~~~~~~
+
+( [PATCH v2 0/6] x86: Disentangle <asm/processor.h> dependency on CPUID headers
+  https://lore.kernel.org/lkml/20250709203033.90125-1-darwi@linutronix.de )
+
+Remove the <asm/cpuid/types.h> include from <asm/processor.h> since only
+the upcoming CPUID model needed that — not current mainline code.  That
+include was kept in v1, by mistake, because this series was originally
+part of the CPUID model patch queue.
+
+Due to the CPUID types include remove above, let
+arch/x86/kvm/reverse_cpuid.h include <asm/cpuid/types.h> since it
+references the CPUID_EAX..EDX macros.  At this series v1, the KVM header
+implicitly included such CPUID types header through <asm/cpufeature.h>,
+through <asm/processor.h>.
+
+Drop the "x86/cpuid: Rename cpuid_leaf()/cpuid_subleaf() APIs" patch from
+this series.  After a second look, it should be part of the CPUID model
+PQ instead.
+
+
+Changelog v1
+~~~~~~~~~~~~
+
+( [PATCH v1 0/7] x86: Disentangle <asm/processor.h> dependency on CPUID APIs
+  https://lore.kernel.org/lkml/20250612234010.572636-1-darwi@linutronix.de )
+
+This series avoids including the full CPUID API from <asm/processor.h>.
+That header only needs the CPUID data types and not the full API.
+
+Let <asm/processor.h> include <asm/cpuid/types.h> instead of
+<asm/cpuid/api.h>.
+
+Modify all CPUID call sites which implicitly included the CPUID API
+though <asm/processor.h> to explicitly include <asm/cpuid/api.h> instead.
+
+This work prepares for an upcoming v4 of the CPUID model:
+
+    [PATCH v3 00/44] x86: Introduce a centralized CPUID data model
+    https://lore.kernel.org/lkml/20250612234010.572636-1-darwi@linutronix.de
+
+where <asm/cpuid/api.h> needs to include <asm/processor.h>, thus creating
+a circular dependency if not resolved beforehand…  Patches 1->19 of the
+v3 above had parts of this series circular dependency disentanglement.
+
+Per Boris' remarks above, merge the header includes reorderings into two
+patches only: one patch for x86 and one for drivers.
+
+The 0-day bot x86-32 compilation error:
+
+    Re: [PATCH v3 41/44] x86/cpu: <asm/processor.h>: Do not include CPUID…
+    https://lore.kernel.org/lkml/202506132039.imS2Pflx-lkp@intel.com
+
+is also fixed in this series.
+
+Beside the call sites converted at CPUID model v3 above, this series also
+switches below files:
+
+    arch/x86/kernel/cpu/microcode/core.c
+    arch/x86/kernel/cpu/microcode/intel.c
+    arch/x86/kernel/cpu/mshyperv.c
+    drivers/cpufreq/longrun.c
+    drivers/cpufreq/powernow-k7.c
+    drivers/cpufreq/powernow-k8.c
+
+to explicitly include <asm/cpuid/api.h>.
+
+Based on v6.16-rc5.
+
+Thanks!
+
+
+8<----
+
+Ahmed S. Darwish (6):
+  x86/cpuid: Remove transitional <asm/cpuid.h> header
+  ASoC: Intel: avs: Include CPUID header at file scope
+  x86: Reorder headers alphabetically
+  drivers: Reorder headers alphabetically
+  treewide: Explicitly include the x86 CPUID headers
+  x86/cpu: <asm/processor.h>: Do not include the CPUID API header
+
+ arch/x86/boot/compressed/pgtable_64.c         |  1 +
+ arch/x86/boot/startup/sme.c                   |  9 +--
+ arch/x86/coco/tdx/tdx.c                       |  6 +-
+ arch/x86/events/amd/core.c                    |  2 +
+ arch/x86/events/amd/ibs.c                     |  1 +
+ arch/x86/events/amd/lbr.c                     |  2 +
+ arch/x86/events/amd/power.c                   |  3 +
+ arch/x86/events/amd/uncore.c                  | 15 ++--
+ arch/x86/events/intel/core.c                  |  1 +
+ arch/x86/events/intel/lbr.c                   |  1 +
+ arch/x86/events/zhaoxin/core.c                | 12 ++--
+ arch/x86/include/asm/acrn.h                   |  2 +
+ arch/x86/include/asm/cpuid.h                  |  8 ---
+ arch/x86/include/asm/microcode.h              |  1 +
+ arch/x86/include/asm/processor.h              |  1 -
+ arch/x86/include/asm/xen/hypervisor.h         |  1 +
+ arch/x86/kernel/apic/apic.c                   | 71 ++++++++++---------
+ arch/x86/kernel/cpu/amd.c                     | 26 +++----
+ arch/x86/kernel/cpu/centaur.c                 |  1 +
+ arch/x86/kernel/cpu/hygon.c                   |  1 +
+ arch/x86/kernel/cpu/mce/core.c                | 63 ++++++++--------
+ arch/x86/kernel/cpu/mce/inject.c              |  1 +
+ arch/x86/kernel/cpu/microcode/amd.c           | 13 ++--
+ arch/x86/kernel/cpu/microcode/core.c          | 23 +++---
+ arch/x86/kernel/cpu/microcode/intel.c         | 12 ++--
+ arch/x86/kernel/cpu/mshyperv.c                | 29 ++++----
+ arch/x86/kernel/cpu/resctrl/core.c            |  6 +-
+ arch/x86/kernel/cpu/resctrl/monitor.c         |  1 +
+ arch/x86/kernel/cpu/scattered.c               |  3 +-
+ arch/x86/kernel/cpu/sgx/driver.c              |  3 +
+ arch/x86/kernel/cpu/sgx/main.c                |  3 +
+ arch/x86/kernel/cpu/topology_amd.c            |  1 +
+ arch/x86/kernel/cpu/topology_common.c         |  3 +-
+ arch/x86/kernel/cpu/topology_ext.c            |  1 +
+ arch/x86/kernel/cpu/transmeta.c               |  3 +
+ arch/x86/kernel/cpu/vmware.c                  | 14 ++--
+ arch/x86/kernel/cpu/zhaoxin.c                 |  1 +
+ arch/x86/kernel/cpuid.c                       |  1 +
+ arch/x86/kernel/jailhouse.c                   | 10 +--
+ arch/x86/kernel/kvm.c                         | 36 +++++-----
+ arch/x86/kernel/paravirt.c                    | 29 ++++----
+ arch/x86/kvm/mmu/mmu.c                        | 57 +++++++--------
+ arch/x86/kvm/mmu/spte.c                       |  1 +
+ arch/x86/kvm/reverse_cpuid.h                  |  2 +
+ arch/x86/kvm/svm/sev.c                        | 26 +++----
+ arch/x86/kvm/svm/svm.c                        | 51 ++++++-------
+ arch/x86/kvm/vmx/pmu_intel.c                  |  7 +-
+ arch/x86/kvm/vmx/sgx.c                        |  3 +-
+ arch/x86/kvm/vmx/vmx.c                        | 19 ++---
+ arch/x86/mm/pti.c                             | 22 +++---
+ arch/x86/pci/xen.c                            | 23 +++---
+ arch/x86/xen/enlighten_hvm.c                  | 13 ++--
+ arch/x86/xen/pmu.c                            | 13 ++--
+ arch/x86/xen/time.c                           | 23 +++---
+ drivers/char/agp/efficeon-agp.c               | 11 +--
+ drivers/cpufreq/longrun.c                     |  7 +-
+ drivers/cpufreq/powernow-k7.c                 | 14 ++--
+ drivers/cpufreq/powernow-k8.c                 | 17 ++---
+ drivers/cpufreq/speedstep-lib.c               |  6 +-
+ drivers/firmware/efi/libstub/x86-5lvl.c       |  1 +
+ drivers/gpu/drm/gma500/mmu.c                  |  2 +
+ drivers/hwmon/fam15h_power.c                  | 14 ++--
+ drivers/hwmon/k10temp.c                       |  2 +
+ drivers/hwmon/k8temp.c                        | 12 ++--
+ .../net/ethernet/stmicro/stmmac/dwmac-intel.c |  5 +-
+ drivers/ras/amd/fmpm.c                        |  3 +-
+ drivers/thermal/intel/intel_hfi.c             |  1 +
+ drivers/thermal/intel/x86_pkg_temp_thermal.c  | 15 ++--
+ drivers/virt/acrn/hsm.c                       |  1 +
+ drivers/xen/events/events_base.c              | 28 ++++----
+ drivers/xen/grant-table.c                     | 15 ++--
+ drivers/xen/xenbus/xenbus_xs.c                | 23 +++---
+ sound/soc/intel/avs/tgl.c                     | 25 ++++---
+ 73 files changed, 496 insertions(+), 387 deletions(-)
+ delete mode 100644 arch/x86/include/asm/cpuid.h
+
+base-commit: 89be9a83ccf1f88522317ce02f854f30d6115c41
+-- 
+2.50.1
+
 
