@@ -1,276 +1,175 @@
-Return-Path: <kvm+bounces-53114-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53115-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 411D5B0D7D4
-	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 13:09:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8454EB0D7FC
+	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 13:15:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0821E1C25562
-	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 11:09:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 712A47AEF01
+	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 11:14:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB3F51E2858;
-	Tue, 22 Jul 2025 11:08:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10A622E2F1C;
+	Tue, 22 Jul 2025 11:15:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ciQcnyqT"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="En2X7Xyr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 008F828B3FD
-	for <kvm@vger.kernel.org>; Tue, 22 Jul 2025 11:08:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 786EB2E1C4E
+	for <kvm@vger.kernel.org>; Tue, 22 Jul 2025 11:15:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753182526; cv=none; b=jHLAYc0qgufBWvgUV1VldZRWBDKuo2TeYzjgtZJpHvftlhFnyf+lV2b8ZSTvRIeDJYSsXNP6D0gVHNR2NCkgVWN+eg1C9yBqMYo/LemAyb/41/KuXby5HE/8NL17GkNhv+XMdNMUbVqmqz1GXOopZbUgs5t0/n+uSAvnee3XSNo=
+	t=1753182920; cv=none; b=sxj48MHFGUnaVpbgdXm1EF0le/UV6UsLtAKYHCqLzUXE2SV/BUxagKmggmKEF5E5UBYg4R0mCP4DgUNGpSUddLJHuGfx6ob9NLujKYgmAysTvJZ40KqnXu3cY96HyD9fStUrRMzxcTCtNbrc6XCWSOvFmTi+vYo0SRmr4FLTHSI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753182526; c=relaxed/simple;
-	bh=FWIv3x+7jARtSRUKIBRPksekNnDXxImW3zaETxfIwrE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XP609NV6tDSsKw7Pj72CPRYBqy1V2QiFa/MYxfHEXAMuYWcCzvTJVbyCCwNuTSY7HPrwdkTPpTpPJsmY49ahNhpxQulSYK9bUStmU7Qchy7Gx3SSPgHbTM5FDUp+ed5iK8Ve2Q+r01PzmhGctSq6TOdO6+tXYNwceiM3dj4enXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ciQcnyqT; arc=none smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-4ab3ad4c61fso401941cf.0
-        for <kvm@vger.kernel.org>; Tue, 22 Jul 2025 04:08:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753182524; x=1753787324; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q4OlHSsQD8Q3GzLrFxGBtNoCw1qRv1k2dQlrD5QI9ZA=;
-        b=ciQcnyqTtE+eotCSMBBFWpQaHqu7eZIFaBwvyHrPSWyiL9a+gvNkhFo6wpNw+BotI5
-         DQxIDfuKUD3K6s2atblH+W0pKt2YUCtGWXSQT+OtgMU++2HNolmE2c25cU8HRUZ+vHcI
-         1rEztbKrh5bT9HzwDgdHWnxOXfMcO3BNgLrhIAC/F2+qKMbZVqvAwgU8YIoxOv3en0bS
-         UhnkG2hn9LsRcvWkrQ+1dP9eKivCKiScwyjmXVYNcyfCnvR3eg/LNTuFzS91DuipYuZO
-         hnarU/X95kvHP//+1x2OqU+9dvYszQWY96qvGIHjnHrUG0QqKINFLXdF7j4J/+cQZkDG
-         Yqlg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753182524; x=1753787324;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Q4OlHSsQD8Q3GzLrFxGBtNoCw1qRv1k2dQlrD5QI9ZA=;
-        b=eTb/6d4DmfAUrujRdNwmVFs7Mpdk1wwwUFI2NKhKo1scE2WwHukFKy+C4LqKMdiQo1
-         Ppa7WieRQSr6O7ZWKD8vcKxFAYPkOhJ/FeizEXnlIxXgkJ4EKfDCD4NfmkDKj/uUTxVY
-         8j7PdrW9Xc5kOrX//hx+tdCc7+358V7F6uBglr19c2CQVs7uNhi2ZMGVDN79y3jud50B
-         yKMR9KcJEbW7RPU8l8CeVzJMsOMjljp7ENz6OYqTxPyWkuLALXWhHA9E0P+vMtFOLkAZ
-         su6JbfM7zaqI4o7BuMSSxRaFIredlPTSvv8thCxT5EhA57S6L6dyeXNnVwVx6aKAScFO
-         btig==
-X-Forwarded-Encrypted: i=1; AJvYcCWKdy40sEOKRBZzzMd5z5Xh43VHUz4P7J+Dfm0Usy6zJ88RRFhQsz50qLI1RKSAso6R66k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzvxnBr3V6MTw2eHnr0Cjnwq6eBxpzR/5jd3Cry5xR8w13kXY2Z
-	0n9WWuEJBcx0kg5VjoqrRzF+5Yda1/ZAXdmISbfy2slvppe9PLMDgwS5SkmoKunEHLFKO9+nDmF
-	25NQulhiROb4NtUgg1KFwkyFw+t1A3fUptpQZRv9j
-X-Gm-Gg: ASbGncv0fdmawnDZRoA/jh2Dmd1a8HJZCEhEAmBPdAXkSUIAFRQh11vT/UiVRZy7L4+
-	MSjxFtvF5PosVwaGDjRW+wN5UUPWLv0Aug4gNw9LsqKWP7BUgbDw1QNaWj++ITKMjgdSg75zADs
-	STqFIfP6zQQLx9hX2FZW4E+Q59DYZ13sggtp85YSlzdNDLHdrSPWAJDe7RjGtybBgzdB8Dhd1Gg
-	rbq31rZN8NYcAjnLPiFbDnBM+y4J+xc+wvV
-X-Google-Smtp-Source: AGHT+IGUb3iz4a5qMCYNx1u6U7GTJFpP1c5NB9X/RTiomiZ52K/XsGtaFjte5gDNRBdO8xNk6Dmgs2XbsK+QW4EU7aI=
-X-Received: by 2002:a05:622a:8359:b0:494:b4dd:befd with SMTP id
- d75a77b69052e-4ae5e2ca83dmr2714601cf.8.1753182523270; Tue, 22 Jul 2025
- 04:08:43 -0700 (PDT)
+	s=arc-20240116; t=1753182920; c=relaxed/simple;
+	bh=aLEJ6ZqhoL5hlEo6stfb7Q4Ui+vudmOYpxZgDNt9whI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XV62fPijqJfhXkfoRUVSFwdW5vlJA3XDnRkxpyCiuf9qPdXnjvwDH9542IrjO1MIPY7VoNSkB6kQFfTjlY0Uw2r2GuUPDeHj8H0l27wHdUDE8PPtZ+Cp60RScvwfbf1XiC17s7Er5o4KvRqRtHAO9Vf6PRLPzxrfN3Ovue/ySvs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=En2X7Xyr; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1753182915;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:in-reply-to:in-reply-to:  references:references;
+	bh=mt8jXBBN3/FYmXBz7vV+NEqaPPHu8BExBrX0Pgzpuc0=;
+	b=En2X7XyrdsBaohEQhYrICd4tbqBSUE6hqM3dufjzbWplc/HdfN2JTCG06Kh7aTgc7cdCeA
+	IXXBCZZWoAXM31xQxznUC4//GxCaIphxLLNgSQufTQQ579JtJsLgYvBBG3flWOCqW4UEZX
+	Z9Yrz6eJSA/lPfdXO636Y2vBmhmO2cs=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-487-2pTsa4eXMcO-_W4FgJzQLQ-1; Tue,
+ 22 Jul 2025 07:15:13 -0400
+X-MC-Unique: 2pTsa4eXMcO-_W4FgJzQLQ-1
+X-Mimecast-MFC-AGG-ID: 2pTsa4eXMcO-_W4FgJzQLQ_1753182912
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F1DB11800C3F;
+	Tue, 22 Jul 2025 11:15:11 +0000 (UTC)
+Received: from redhat.com (dhcp-16-135.lcy.redhat.com [10.42.16.135])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7FB3E180035E;
+	Tue, 22 Jul 2025 11:15:09 +0000 (UTC)
+Date: Tue, 22 Jul 2025 12:15:05 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: Mathias Krause <minipli@grsecurity.net>, qemu-devel@nongnu.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH] i386/kvm: Disable hypercall patching quirk by default
+Message-ID: <aH9yuVcUJQc4_-vP@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20250619194204.1089048-1-minipli@grsecurity.net>
+ <41a5767e-42d7-4877-9bc8-aa8eca6dd3e3@intel.com>
+ <b8336828-ce72-4567-82df-b91d3670e26c@grsecurity.net>
+ <3f58125c-183f-49e0-813e-d4cb1be724e8@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250717162731.446579-1-tabba@google.com> <20250717162731.446579-12-tabba@google.com>
- <8340ec70-1c44-47a7-8c48-89e175501e89@intel.com> <aH7KghhsjaiIL3En@google.com>
- <c35b8c34-2736-45fe-8a97-bfedbf72537e@intel.com>
-In-Reply-To: <c35b8c34-2736-45fe-8a97-bfedbf72537e@intel.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Tue, 22 Jul 2025 12:08:06 +0100
-X-Gm-Features: Ac12FXz9tmJwpwAgcImOsShRgOCpw0ZxfeluqVRurIjOexvh31HNQ0n432YkfPI
-Message-ID: <CA+EHjTzNDrwzdpoEuiqvzk3-A7LAsdJ-6y-Gcj7h7+dUTh=6pw@mail.gmail.com>
-Subject: Re: [PATCH v15 11/21] KVM: x86/mmu: Allow NULL-able fault in kvm_max_private_mapping_level
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-mm@kvack.org, kvmarm@lists.linux.dev, pbonzini@redhat.com, 
-	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
-	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
-	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
-	akpm@linux-foundation.org, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
-	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
-	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
-	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
-	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
-	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
-	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
-	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
-	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
-	ira.weiny@intel.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <3f58125c-183f-49e0-813e-d4cb1be724e8@intel.com>
+User-Agent: Mutt/2.2.14 (2025-02-20)
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Tue, 22 Jul 2025 at 06:36, Xiaoyao Li <xiaoyao.li@intel.com> wrote:
->
-> On 7/22/2025 7:17 AM, Sean Christopherson wrote:
-> > On Fri, Jul 18, 2025, Xiaoyao Li wrote:
-> >> On 7/18/2025 12:27 AM, Fuad Tabba wrote:
-> >>> From: Ackerley Tng <ackerleytng@google.com>
-> >>>
-> >>> Refactor kvm_max_private_mapping_level() to accept a NULL kvm_page_fault
-> >>> pointer and rename it to kvm_gmem_max_mapping_level().
-> >>>
-> >>> The max_mapping_level x86 operation (previously private_max_mapping_level)
-> >>> is designed to potentially be called without an active page fault, for
-> >>> instance, when kvm_mmu_max_mapping_level() is determining the maximum
-> >>> mapping level for a gfn proactively.
-> >>>
-> >>> Allow NULL fault pointer: Modify kvm_max_private_mapping_level() to
-> >>> safely handle a NULL fault argument. This aligns its interface with the
-> >>> kvm_x86_ops.max_mapping_level operation it wraps, which can also be
-> >>> called with NULL.
-> >>
-> >> are you sure of it?
-> >>
-> >> The patch 09 just added the check of fault->is_private for TDX and SEV.
-> >
-> > +1, this isn't quite right.  That's largely my fault (no pun intended) though, as
-> > I suggested the basic gist of the NULL @fault handling, and it's a mess.  More at
-> > the bottom.
-> >
-> >>> Rename function to kvm_gmem_max_mapping_level(): This reinforces that
-> >>> the function's scope is for guest_memfd-backed memory, which can be
-> >>> either private or non-private, removing any remaining "private"
-> >>> connotation from its name.
-> >>>
-> >>> Optimize max_level checks: Introduce a check in the caller to skip
-> >>> querying for max_mapping_level if the current max_level is already
-> >>> PG_LEVEL_4K, as no further reduction is possible.
-> >>>
-> >>> Acked-by: David Hildenbrand <david@redhat.com>
-> >>> Suggested-by: Sean Christoperson <seanjc@google.com>
-> >>> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
-> >>> Signed-off-by: Fuad Tabba <tabba@google.com>
-> >>> ---
-> >>>    arch/x86/kvm/mmu/mmu.c | 16 +++++++---------
-> >>>    1 file changed, 7 insertions(+), 9 deletions(-)
-> >>>
-> >>> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> >>> index bb925994cbc5..6bd28fda0fd3 100644
-> >>> --- a/arch/x86/kvm/mmu/mmu.c
-> >>> +++ b/arch/x86/kvm/mmu/mmu.c
-> >>> @@ -4467,17 +4467,13 @@ static inline u8 kvm_max_level_for_order(int order)
-> >>>     return PG_LEVEL_4K;
-> >>>    }
-> >>> -static u8 kvm_max_private_mapping_level(struct kvm *kvm,
-> >>> -                                   struct kvm_page_fault *fault,
-> >>> -                                   int gmem_order)
-> >>> +static u8 kvm_gmem_max_mapping_level(struct kvm *kvm, int order,
-> >>> +                                struct kvm_page_fault *fault)
-> >>>    {
-> >>> -   u8 max_level = fault->max_level;
-> >>>     u8 req_max_level;
-> >>> +   u8 max_level;
-> >>> -   if (max_level == PG_LEVEL_4K)
-> >>> -           return PG_LEVEL_4K;
-> >>> -
-> >>> -   max_level = min(kvm_max_level_for_order(gmem_order), max_level);
-> >>> +   max_level = kvm_max_level_for_order(order);
-> >>>     if (max_level == PG_LEVEL_4K)
-> >>>             return PG_LEVEL_4K;
-> >>> @@ -4513,7 +4509,9 @@ static int kvm_mmu_faultin_pfn_private(struct kvm_vcpu *vcpu,
-> >>>     }
-> >>>     fault->map_writable = !(fault->slot->flags & KVM_MEM_READONLY);
-> >>> -   fault->max_level = kvm_max_private_mapping_level(vcpu->kvm, fault, max_order);
-> >>> +   if (fault->max_level >= PG_LEVEL_4K)
-> >>> +           fault->max_level = kvm_gmem_max_mapping_level(vcpu->kvm,
-> >>> +                                                         max_order, fault);
-> >>
-> >> I cannot understand why this change is required. In what case will
-> >> fault->max_level < PG_LEVEL_4K?
-> >
-> > Yeah, I don't get this code either.  I also don't think KVM should call
-> > kvm_gmem_max_mapping_level() *here*.  That's mostly a problem with my suggested
-> > NULL @fault handling.  Dealing with kvm_gmem_max_mapping_level() here leads to
-> > weirdness, because kvm_gmem_max_mapping_level() also needs to be invoked for the
-> > !fault path, and then we end up with multiple call sites and the potential for a
-> > redundant call (gmem only, is private).
-> >
-> > Looking through surrounding patches, the ordering of things is also "off".
-> > "Generalize private_max_mapping_level x86 op to max_mapping_level" should just
-> > rename the helper; reacting to !is_private memory in TDX belongs in "Consult
-> > guest_memfd when computing max_mapping_level", because that's where KVM plays
-> > nice with non-private memory.
-> >
-> > But that patch is also doing too much, e.g. shuffling code around and short-circuting
-> > the non-fault case, which makes it confusing and hard to review.  Extending gmem
-> > hugepage support to shared memory should be "just" this:
-> >
-> > @@ -3335,8 +3336,9 @@ int kvm_mmu_max_mapping_level(struct kvm *kvm, struct kvm_page_fault *fault,
-> >          if (max_level == PG_LEVEL_4K)
-> >                  return PG_LEVEL_4K;
-> >
-> > -       if (is_private)
-> > -               host_level = kvm_max_private_mapping_level(kvm, fault, slot, gfn);
-> > +       if (is_private || kvm_memslot_is_gmem_only(slot))
-> > +               host_level = kvm_gmem_max_mapping_level(kvm, fault, slot, gfn,
-> > +                                                       is_private);
-> >          else
-> >                  host_level = host_pfn_mapping_level(kvm, gfn, slot);
-> >          return min(host_level, max_level);
-> >
-> > plus the plumbing and the small TDX change.  All the renames and code shuffling
-> > should be done in prep patches.
-> >
-> > The attached patches are compile-tested only, but I think they get use where we
-> > want to be, and without my confusing suggestion to try and punt on private mappings
-> > in the hugepage recovery paths.  They should slot it at the right patch numbers
-> > (relative to v15).
-> >
-> > Holler if the patches don't work, I'm happy to help sort things out so that v16
-> > is ready to go.
->
-> I have some feedback though the attached patches function well.
->
-> - In 0010-KVM-x86-mmu-Rename-.private_max_mapping_level-to-.gm.patch,
-> there is double gmem in the name of vmx/vt 's callback implementation:
->
->      vt_gmem_gmem_max_mapping_level
->      tdx_gmem_gmem_max_mapping_level
->      vt_op_tdx_only(gmem_gmem_max_mapping_level)
+On Tue, Jul 22, 2025 at 06:27:45PM +0800, Xiaoyao Li wrote:
+> On 7/22/2025 5:21 PM, Mathias Krause wrote:
+> > On 22.07.25 05:45, Xiaoyao Li wrote:
+> > > On 6/20/2025 3:42 AM, Mathias Krause wrote:
+> > > > KVM has a weird behaviour when a guest executes VMCALL on an AMD system
+> > > > or VMMCALL on an Intel CPU. Both naturally generate an invalid opcode
+> > > > exception (#UD) as they are just the wrong instruction for the CPU
+> > > > given. But instead of forwarding the exception to the guest, KVM tries
+> > > > to patch the guest instruction to match the host's actual hypercall
+> > > > instruction. That is doomed to fail as read-only code is rather the
+> > > > standard these days. But, instead of letting go the patching attempt and
+> > > > falling back to #UD injection, KVM injects the page fault instead.
+> > > > 
+> > > > That's wrong on multiple levels. Not only isn't that a valid exception
+> > > > to be generated by these instructions, confusing attempts to handle
+> > > > them. It also destroys guest state by doing so, namely the value of CR2.
+> > > > 
+> > > > Sean attempted to fix that in KVM[1] but the patch was never applied.
+> > > > 
+> > > > Later, Oliver added a quirk bit in [2] so the behaviour can, at least,
+> > > > conceptually be disabled. Paolo even called out to add this very
+> > > > functionality to disable the quirk in QEMU[3]. So lets just do it.
+> > > > 
+> > > > A new property 'hypercall-patching=on|off' is added, for the very
+> > > > unlikely case that there are setups that really need the patching.
+> > > > However, these would be vulnerable to memory corruption attacks freely
+> > > > overwriting code as they please. So, my guess is, there are exactly 0
+> > > > systems out there requiring this quirk.
+> > > 
+> > > The default behavior is patching the hypercall for many years.
+> > > 
+> > > If you desire to change the default behavior, please at least keep it
+> > > unchanged for old machine version. i.e., introduce compat_property,
+> > > which sets KVMState->hypercall_patching_enabled to true.
+> > 
+> > Well, the thing is, KVM's patching is done with the effective
+> > permissions of the guest which means, if the code in question isn't
+> > writable from the guest's point of view, KVM's attempt to modify it will
+> > fail. This failure isn't transparent for the guest as it sees a #PF
+> > instead of a #UD, and that's what I'm trying to fix by disabling the quirk.
+> > 
+> > The hypercall patching was introduced in Linux commit 7aa81cc04781
+> > ("KVM: Refactor hypercall infrastructure (v3)") in v2.6.25. Until then
+> > it was based on a dedicated hypercall page that was handled by KVM to
+> > use the proper instruction of the KVM module in use (VMX or SVM).
+> > 
+> > Patching code was fine back then, but the introduction of DEBUG_RO_DATA
+> > made the patching attempts fail and, ultimately, lead to Paolo handle
+> > this with commit c1118b3602c2 ("x86: kvm: use alternatives for VMCALL
+> > vs. VMMCALL if kernel text is read-only").
+> > 
+> > However, his change still doesn't account for the cross-vendor live
+> > migration case (Intel<->AMD), which will still be broken, causing the
+> > before mentioned bogus #PF, which will just lead to misleading Oops
+> > reports, confusing the poor souls, trying to make sense of it.
+> > 
+> > IMHO, there is no valid reason for still having the patching in place as
+> > the .text of non-ancient kernel's  will be write-protected, making
+> > patching attempts fail. And, as they fail with a #PF instead of #UD, the
+> > guest cannot even handle them appropriately, as there was no memory
+> > write attempt from its point of view. Therefore the default should be to
+> > disable it, IMO. This won't prevent guests making use of the wrong
+> > instruction from trapping, but, at least, now they'll get the correct
+> > exception vector and can handle it appropriately.
+> 
+> But you don't accout for the case that guest kernel is built without
+> CONFIG_STRICT_KERNEL_RWX enabled, or without CONFIG_DEBUG_RO_DATA, or for
+> whatever reason the guest's text is not readonly, and the VM needs to be
+> migrated among different vendors (Intel <-> AMD).
+> 
+> Before this patch, the above usecase works well. But with this patch, the
+> guest will gets #UD after migrated to different vendors.
+> 
+> I heard from some small CSPs that they do want to the ability to live
+> migrate VMs among Intel and AMD host.
 
-Sean's patches do that, then he fixes it in a later patch. I'll fix
-this at the source.
+Usually CSPs don't have full control over what their customers
+are running as a guest. If their customers are running mainstream
+modern guest OS, CONFIG_STRICT_KERNEL_RWX is pretty likely to be
+set, so presumably migration between Intel & AMD will not work
+and this isn't making it worse ?
 
-> - In 0013-KVM-x86-mmu-Extend-guest_memfd-s-max-mapping-level-t.patch,
->    kvm_x86_call(gmem_max_mapping_level)(...) returns 0 for !private case.
->    It's not correct though it works without issue currently.
->
->    Because current gmem doesn't support hugepage so that the max_level
->    gotten from gmem is always PG_LEVEL_4K and it returns early in
->    kvm_gmem_max_mapping_level() on
->
->         if (max_level == PG_LEVEL_4K)
->                 return max_level;
->
->    But just look at the following case:
->
->      return min(max_level,
->         kvm_x86_call(gmem_max_mapping_level)(kvm, pfn, is_private));
->
->    For non-TDX case and non-SNP case, it will return 0, i.e.
->    PG_LEVEL_NONE eventually.
->
->    so either 1) return PG_LEVEL_NUM/PG_LEVEL_1G for the cases where
->    .gmem_max_mapping_level callback doesn't have specific restriction.
->
->    or 2)
->
->         tmp = kvm_x86_call(gmem_max_mapping_level)(kvm, pfn, is_private);
->         if (tmp)
->                 return min(max_level, tmp);
->
->         return max-level;
+With regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
-Sean? What do you think?
-
-Thanks!
-/fuad
 
