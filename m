@@ -1,150 +1,167 @@
-Return-Path: <kvm+bounces-53100-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53101-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B3C8B0D47C
-	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 10:25:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB119B0D492
+	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 10:27:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 09B9D6C0279
-	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 08:23:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 67137167D67
+	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 08:27:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4963B2D3ED0;
-	Tue, 22 Jul 2025 08:24:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 201772D94AD;
+	Tue, 22 Jul 2025 08:27:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qDCYuOjQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ftIKtFsS"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60E722BEFE8;
-	Tue, 22 Jul 2025 08:24:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FBC313B280;
+	Tue, 22 Jul 2025 08:27:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753172643; cv=none; b=DAoX6JDidhykiB4cOF8ncw2EgfoNG5WOARBn8+cWV2igESvw61lsRkRxzE5dcbVsyfXP+Aksa0KEo/a1Ui+BidlK2wUe7We0mFnvJQAX2hVvBqOe+iZAV4g8Kc80+BQQd+8p1a0DwjRH/xZVPR3jpA3wmVBHyD9JITf4FCB8klw=
+	t=1753172826; cv=none; b=cInUyapxyoy424iHD7qa3rodzBZXYp0CBH06Wb9sWfpnarhYQ7j0rpO+zqaXXT2FlXQpzE7dS9wdhaR4synz0FFRBbnRdMtZcMRX4LUJLbaFtkL6TtRUbjZpOK0m9VCQJ6dKEsR8sr3gi8Rsj0ixlTH7/GccBUi4Do2P7MC4hQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753172643; c=relaxed/simple;
-	bh=rAbn1W2T42+hEDaVyaZcCAf8xf0v3e37cobnvY2B8+8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=YCQheIh8832J1smPt3m7/SSZy4bzivqvd4Ss6SJEq6SzcHI3DLwSUliApBF/kuop8pyA0UI9EFeY4LKQevkYkOkQglo4Sa3hvBe1me2+MEOEfhVoxCDD8BJdTh9Im+gbxMkPhwYA/CjQY5+s0LVcWu4ZdxBWy+y9XyVl+DmV3PI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qDCYuOjQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6AC3FC4CEEB;
-	Tue, 22 Jul 2025 08:24:01 +0000 (UTC)
+	s=arc-20240116; t=1753172826; c=relaxed/simple;
+	bh=yGkRA/6qnjLPhMkWmaVYag52FJSXvc8HTUW6Y3Xuzs4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KYRKMBd2RL8BmzrTn5ZGMAYqWd8awu2tWJDNN3Zyp+ilwTip8eDxdrw0ywuEelMRszYD6iX4kW3JLPIDoWH1t3wDPa/o7fykgyLCTUM4hXmJuUu4FbI1riiEtZFOjhXJM18gzuzatMjn3J1qCp4i4LaN3FW/b2VNw9xWPgjagz8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ftIKtFsS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A537C4CEF5;
+	Tue, 22 Jul 2025 08:26:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753172643;
-	bh=rAbn1W2T42+hEDaVyaZcCAf8xf0v3e37cobnvY2B8+8=;
-	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=qDCYuOjQ1Z3sJrBUEl/0mKHhTfxoOJp+YK3gd/KbYWejRcvAdAUnROeavsRpLkHY1
-	 aacJIjH0zYe/gDHlaZYWeO7ZwbbMQ7hYNJieJ6x7mpTAJw9d8UM5eADhwDMkbvuNxF
-	 COjB6sV2A1KSkAKy6P5Vo1pUujJSmM71mWtmFnmpC4pVQW8C1XEFz/tg1RDy7zKaiM
-	 FbQWkFFqWaCU+f1voC2PxIAOeVG4gRp+CMHGCTX1U2npMqrMjr3WUmsDUCp/sk4Opx
-	 VpUmCciEE5pJgLZQ+EBdIFM286nmnK9D+KM31GStAvYfchbe9ejDnH1lTAU4sKYFZo
-	 dsDYzsfNiyGBA==
-Message-ID: <4c7cbd2e-7f94-4f02-b18a-7b2694e93412@kernel.org>
-Date: Tue, 22 Jul 2025 10:23:59 +0200
+	s=k20201202; t=1753172825;
+	bh=yGkRA/6qnjLPhMkWmaVYag52FJSXvc8HTUW6Y3Xuzs4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ftIKtFsS+75DjkESBKR4C/0fTfhjTO5EAQaosz6bDp0SBtC0xu6jrbFmvS+RKsdrx
+	 f4dMY3bCIrRdjzyHRTqQ2IS3DbC0aaJA20FDQXMOHNRYWFh4FtQSBKE6qcpYZfqwwn
+	 EBlY5p7lMzTdcc4tj5YJJGVzamw8NuZS2DY35/I8OtpLoIXd1OL5/ZeHJymCJvh1YO
+	 fQNqEpJ2tIsXeilrIIv/4unMX0gRI4A5tYLUiPoiE/g7dGzpTCnD1Qfrv0OCm/INtf
+	 +6BTjWwe4qdBcxVcEwQyD1qD72/jVzjC0CRHbF2sbB7CBVIvfoxl37x9XjTdsKkyQI
+	 517UWQRiFJG/g==
+Date: Tue, 22 Jul 2025 11:26:46 +0300
+From: Mike Rapoport <rppt@kernel.org>
+To: Kees Cook <kees@kernel.org>
+Cc: Will Deacon <will@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Henrique de Moraes Holschuh <hmh@hmh.eng.br>,
+	Hans de Goede <hdegoede@redhat.com>,
+	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Len Brown <lenb@kernel.org>, Masami Hiramatsu <mhiramat@kernel.org>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Michal Wilczynski <michal.wilczynski@intel.com>,
+	Juergen Gross <jgross@suse.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+	Roger Pau Monne <roger.pau@citrix.com>,
+	David Woodhouse <dwmw@amazon.co.uk>,
+	Usama Arif <usama.arif@bytedance.com>,
+	"Guilherme G. Piccoli" <gpiccoli@igalia.com>,
+	Thomas Huth <thuth@redhat.com>, Brian Gerst <brgerst@gmail.com>,
+	kvm@vger.kernel.org, ibm-acpi-devel@lists.sourceforge.net,
+	platform-driver-x86@vger.kernel.org, linux-acpi@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org, linux-efi@vger.kernel.org,
+	linux-mm@kvack.org, Ingo Molnar <mingo@kernel.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Christoph Hellwig <hch@lst.de>,
+	Andrey Konovalov <andreyknvl@gmail.com>,
+	Andrey Ryabinin <ryabinin.a.a@gmail.com>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nicolas.schier@linux.dev>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>, linux-kernel@vger.kernel.org,
+	kasan-dev@googlegroups.com, linux-doc@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+	linux-hardening@vger.kernel.org, linux-kbuild@vger.kernel.org,
+	linux-security-module@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, sparclinux@vger.kernel.org,
+	llvm@lists.linux.dev
+Subject: Re: [PATCH v3 04/13] x86: Handle KCOV __init vs inline mismatches
+Message-ID: <aH9LRgiiXQdABrd6@kernel.org>
+References: <20250717231756.make.423-kees@kernel.org>
+ <20250717232519.2984886-4-kees@kernel.org>
+ <aHoHkDvvp4AHIzU1@kernel.org>
+ <202507181541.B8CFAC7E@keescook>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/3] KVM: PPC: use for_each_set_bit() in IRQ_check()
-To: Yury Norov <yury.norov@gmail.com>,
- Madhavan Srinivasan <maddy@linux.ibm.com>,
- Nicholas Piggin <npiggin@gmail.com>, Michael Ellerman <mpe@ellerman.id.au>,
- Christophe Leroy <christophe.leroy@csgroup.eu>, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250717192418.207114-1-yury.norov@gmail.com>
- <20250717192418.207114-4-yury.norov@gmail.com>
-Content-Language: en-US
-From: Jiri Slaby <jirislaby@kernel.org>
-Autocrypt: addr=jirislaby@kernel.org; keydata=
- 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
-In-Reply-To: <20250717192418.207114-4-yury.norov@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <202507181541.B8CFAC7E@keescook>
 
-On 17. 07. 25, 21:24, Yury Norov wrote:
-> From: Yury Norov (NVIDIA) <yury.norov@gmail.com>
+On Fri, Jul 18, 2025 at 03:51:28PM -0700, Kees Cook wrote:
+> On Fri, Jul 18, 2025 at 11:36:32AM +0300, Mike Rapoport wrote:
+> > Hi Kees,
+> > 
+> > On Thu, Jul 17, 2025 at 04:25:09PM -0700, Kees Cook wrote:
+> > > When KCOV is enabled all functions get instrumented, unless the
+> > > __no_sanitize_coverage attribute is used. To prepare for
+> > > __no_sanitize_coverage being applied to __init functions, we have to
+> > > handle differences in how GCC's inline optimizations get resolved. For
+> > > x86 this means forcing several functions to be inline with
+> > > __always_inline.
+> > > 
+> > > Signed-off-by: Kees Cook <kees@kernel.org>
+> > 
+> > ...
+> > 
+> > > diff --git a/include/linux/memblock.h b/include/linux/memblock.h
+> > > index bb19a2534224..b96746376e17 100644
+> > > --- a/include/linux/memblock.h
+> > > +++ b/include/linux/memblock.h
+> > > @@ -463,7 +463,7 @@ static inline void *memblock_alloc_raw(phys_addr_t size,
+> > >  					  NUMA_NO_NODE);
+> > >  }
+> > >  
+> > > -static inline void *memblock_alloc_from(phys_addr_t size,
+> > > +static __always_inline void *memblock_alloc_from(phys_addr_t size,
+> > >  						phys_addr_t align,
+> > >  						phys_addr_t min_addr)
+> > 
+> > I'm curious why from all memblock_alloc* wrappers this is the only one that
+> > needs to be __always_inline?
 > 
-> The function opencodes for_each_set_bit() macro.
+> Thread-merge[1], adding Will Deacon, who was kind of asking the same
+> question.
 > 
-> Signed-off-by: Yury Norov (NVIDIA) <yury.norov@gmail.com>
-> ---
->   arch/powerpc/kvm/mpic.c | 8 ++------
->   1 file changed, 2 insertions(+), 6 deletions(-)
+> Based on what I can tell, GCC has kind of fragile inlining logic, in the
+> sense that it can change whether or not it inlines something based on
+> optimizations. It looks like the kcov instrumentation being added (or in
+> this case, removed) from a function changes the optimization results,
+> and some functions marked "inline" are _not_ inlined. In that case, we end up
+> with __init code calling a function not marked __init, and we get the
+> build warnings I'm trying to eliminate.
 > 
-> diff --git a/arch/powerpc/kvm/mpic.c b/arch/powerpc/kvm/mpic.c
-> index 23e9c2bd9f27..ae68b213f0f9 100644
-> --- a/arch/powerpc/kvm/mpic.c
-> +++ b/arch/powerpc/kvm/mpic.c
-> @@ -290,15 +290,11 @@ static inline void IRQ_resetbit(struct irq_queue *q, int n_IRQ)
->   
->   static void IRQ_check(struct openpic *opp, struct irq_queue *q)
->   {
-> -	int irq = -1;
-> +	int irq;
+> So, to Will's comment, yes, the problem is somewhat fragile (though
+> using either __always_inline or __init will deterministically solve it).
+> We've tripped over this before with GCC and the solution has usually
+> been to just use __always_inline and move on.
+> 
+> For memblock_alloc*, it appears to be that the heuristic GCC uses
+> resulted in only memblock_alloc_from() being a problem in this case. I
+> can certainly mark them all as __always_inline if that is preferred.
 
-Can be unsigned now, right?
+We had a few of those already converted to __always_inline, so I'm ok with
+continuing to fix them one at at time. Gives a feeling of job security ;-)
 
->   	int next = -1;
->   	int priority = -1;
->   
-> -	for (;;) {
-> -		irq = find_next_bit(q->queue, opp->max_irq, irq + 1);
-> -		if (irq == opp->max_irq)
-> -			break;
-> -
-> +	for_each_set_bit(irq, q->queue, opp->max_irq) {
->   		pr_debug("IRQ_check: irq %d set ivpr_pr=%d pr=%d\n",
->   			irq, IVPR_PRIORITY(opp->src[irq].ivpr), priority);
->   
+> -- 
+> Kees Cook
 
-thanks,
 -- 
-js
-suse labs
-
+Sincerely yours,
+Mike.
 
