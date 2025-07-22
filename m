@@ -1,201 +1,177 @@
-Return-Path: <kvm+bounces-53165-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53166-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE0E6B0E31B
-	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 19:55:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8CDEB0E358
+	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 20:18:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7874B3A4F2B
-	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 17:55:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6809F1C81FB5
+	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 18:18:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF1FB281369;
-	Tue, 22 Jul 2025 17:55:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97F9B28134C;
+	Tue, 22 Jul 2025 18:17:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="w9gmYeR3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="u93PhvyU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 851A827F4D9
-	for <kvm@vger.kernel.org>; Tue, 22 Jul 2025 17:55:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68B8E2E36FD
+	for <kvm@vger.kernel.org>; Tue, 22 Jul 2025 18:17:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753206925; cv=none; b=XUWUzlom/5GeTcuHQV/Et1bWcqKBQFGnDGPUCVyXEyiO2rmhZ6GBKrm0+h35YeR6ly5wPj8o8oSZOt11UT+ns1Yd6ch1uTOgmdofupd6rhkENFQsDqWwW+UaTGJ7F9OxmppQYP9Z43U9NtEbbkWXDmOPO6q6zcOM3nt+YFLwrik=
+	t=1753208264; cv=none; b=S6/FrekfRdNPaA7MRywJzxDCbQjtYHJbaB1yFpNGi9JvjN5UyHdIin/4qPOmOzozKMlWvsLNpjywH0j/+1Y/eLEW5fNYiRezGL+vQsCloZHnXNmYNw+Wd1Nr5R146nr9kX8yaPNBydeIo2DdrEgjwBkBfgga1qHcUXkcd6X955E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753206925; c=relaxed/simple;
-	bh=iapMhQwsFNjzaVvGUH8EMPUkVK053gLxhxy3z7USMcA=;
+	s=arc-20240116; t=1753208264; c=relaxed/simple;
+	bh=2f+84DwTTfKGBlhXcojMr2iRvuLhc2YGodSIxuLtokw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=I0gBQXwCnrpQb5rfBJu2OErzhFr+d2KF4Iab5RYM1wY55VE291DWN6YbRhkmalNkMbBzLpS/LBycEJ90sHMvumGMiG3+1RVQLsS/pj8dt688NA07+Di3KgD8wvSI/4O2GIUcJPjNVxL1NL96+0qfoM+rai2YBvLJVF1UlitYXrI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=w9gmYeR3; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=tEevuk2pgZmf+OrxkGevg3s03uCq0PUVagj32mJQElu9uhl/RoevTEc2KiHsyY0FCkGMyDN9ecU5RAqT42luXEQwf5y4gt8eMbtIk0U83xpKjRYfwgIHQj008ayWPBH08TW7d2f6TnQyR951dB4NCBMii9YBsz7umaC49BHU9gg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=u93PhvyU; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b2fcbd76b61so6695185a12.3
-        for <kvm@vger.kernel.org>; Tue, 22 Jul 2025 10:55:23 -0700 (PDT)
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-74ea5d9982cso4192156b3a.2
+        for <kvm@vger.kernel.org>; Tue, 22 Jul 2025 11:17:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753206923; x=1753811723; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1753208262; x=1753813062; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3mt3yYglHDnSBdSmPZ1zrcnzwFHve4g2+M6+Jdcn59w=;
-        b=w9gmYeR3OAju33bJ+gdfvERks8vfRW+n9KpV2bD1BmECq2v9o1VfGmhiVBUm9D/BsT
-         Qs+X+ZdlRhXIk83tJx67OPgxqyof3G/iB7QKZ+ESf0ebP4B+0G5R7n0HUZwkelFgaDgc
-         dC+HNpsoJQkzn6QQrMJ2SvKg9R9nLtEYO5dljA1EGmPkYGIzrhwUhefm76jroRcPd5bS
-         2dsoej2FEd62F3oPAZeQmgIBIUf2I7TUR8SXEma2SdxTcsNQ91ZvFfClDadahLvC397N
-         sWi8NWwxTbcZufzZWqHH/VGSMKz+uvumUBf071551CJsCzwtIdsW93ob8AVG2F2g2wPn
-         f2TQ==
+        bh=0uhWfOICElzP/Lw68mkivYLCjTmw/FAHTOP1H5PpS5c=;
+        b=u93PhvyUPJp+PHfG57ulsEHvkXiD3sfyNoTEAjDYa4rmqk9aLV3uHPvrL7/yM4cjf6
+         tm1ZO4Wf1rr+lrMY9r43bEBLQUwlGbBq4PAEtOHW2k/ALGggx3MI0UaQZo7Le/Jk9DOe
+         Hs82G8o/j3QxY85a5NGWeOEr/h05C7ntbyVZlD10sK+fFPYym8r0yEjP4tjR4tLM772m
+         AoJWemZMi3i+0LpAEZqVrNkRKBntuipcjGRB8cciqWlD6U5ALLo+umQDT5gTTtWgjP+u
+         AQAjS/Klx0n1IQJeKGYXaTjNE+RsLXgYwTUr45wWUlgWyHsj32DZAV80STArI3TQQYB2
+         eSJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753206923; x=1753811723;
+        d=1e100.net; s=20230601; t=1753208262; x=1753813062;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3mt3yYglHDnSBdSmPZ1zrcnzwFHve4g2+M6+Jdcn59w=;
-        b=nzpwKU6S0sO3uGNPO/5YZyLmAWqy0/0OzTV/UhQYLGCR2d2GqK111agcIa3bszotzS
-         88fxSzKZG8ePJQT7zXWPCisxQ//tK9qjiiLsPnF2bhnz2BAXeUfc8gLRcOCWUd9uO8f2
-         dVBnA0HB/qiRdmQBaOuLOgIV94ucKc0bOQ5Zt/uODxY8YgenBw2fewosVBi6fA4marI/
-         ni+F7KD2CG2uDtxlk/FW0dl6TeNpgkr6Ya4vsLAfqZdYGnH1AESoRzxTTX53RdI7qLMd
-         ZFdTL6eU2ajhF02ylWkxyx5AoU6CCuUfJE8U2yvR/uLgD+hti+cpGjaSoATrq4cSwS/b
-         BNqg==
-X-Forwarded-Encrypted: i=1; AJvYcCWt8bPzfS4T3p8ZXabwkFfzwlzbXNEk+baPEQdVdDoN8TeTNor3UhSSj8jWIJppT6lfvvw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyE0VDH7jKzhoXsXRMFMBWQpJLnioy7Udxxmr8qHNz6uRiTML1T
-	yuI8x5CzuGlRSUPe+BVZrQ8cPlivpUaTLLiQOrEIfPvzAnwxHBg+UqBVEEbwV2CdRPopD6VFg4m
-	Cq94iRMzlS3kurugVDd/yqJHbKQ==
-X-Google-Smtp-Source: AGHT+IGlFgyTRPkZWoQjbmY7T310OJ1BlWGpJ3/Q2IhMntxDiBOom0S5N+SghsjZY8MWMZqXf+k2KOAttfWZj9n3EQ==
-X-Received: from pfbmc33.prod.google.com ([2002:a05:6a00:76a1:b0:73e:665:360])
+        bh=0uhWfOICElzP/Lw68mkivYLCjTmw/FAHTOP1H5PpS5c=;
+        b=U4Oh+oKIsLlTNoKVYB71H3q9a9kDdTCWD8BKRoH5t2NuGzgfNuFFkeIXY9tfyo7jjH
+         zNerqDmgfHyCqrPv5TWCb9NhjtxUg49ToVxNg3Q5z1QI5R1k5XyDDW3hVJy43sH2xnkJ
+         rSE6tJCO34OHA1SE2DfXTmZQmgOYxEsK0k124WFNGpN5tsr8nmw/8Nfy9iZiM3gD9has
+         vFsxprjMKkcWerFqV8FJ2bmkFlq8drXP2YGuAGBQMorSYkqyD4UI72BRCIgRmWTt0z6o
+         cF8M3oizkguOcBsyy9pJlxVnbEm1LUfEOAaBnaSs3Jo+/wVM71p+NZyuhYKU6A0h1etf
+         uwQg==
+X-Forwarded-Encrypted: i=1; AJvYcCW9LdbN5BljyCYWbpDbwozv/xEORFdrh6ikMYOWgdqSZv1huDws9Y2J2RYTt83P7nBv1zg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzP95rvRLlzXtvHu/cowhOofOd7kBfLO2jkVxlG0WSlywr8qDzB
+	adcjaPShodW6YpEQGqMGpbfNOTSmV54lSsdCDk74x5P9O+CfSRXFBIfaWwIlkPZdWKSt2il8gW7
+	LfJe4K1KtWEZrcvnXeVgqdCxvBA==
+X-Google-Smtp-Source: AGHT+IEZPq9JAZBfv/HDTaiqlxwio+gpwy5VWQkFScjzBWu4+U5mfVT+UUJR8YyZ7zO116a8IO9RMjZ+2gQY1usLMg==
+X-Received: from pfbcj22.prod.google.com ([2002:a05:6a00:2996:b0:747:a9de:9998])
  (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a00:13a0:b0:748:f750:14c6 with SMTP id d2e1a72fcca58-760353db8bbmr218966b3a.14.1753206922841;
- Tue, 22 Jul 2025 10:55:22 -0700 (PDT)
-Date: Tue, 22 Jul 2025 10:55:21 -0700
-In-Reply-To: <aH8xkkArWBrjzYfk@yzhao56-desk.sh.intel.com>
+ 2002:aa7:88c8:0:b0:736:3ea8:4805 with SMTP id d2e1a72fcca58-76034c56938mr377906b3a.7.1753208261268;
+ Tue, 22 Jul 2025 11:17:41 -0700 (PDT)
+Date: Tue, 22 Jul 2025 11:17:39 -0700
+In-Reply-To: <aH4PRnuztKTqgEYo@yilunxu-OptiPlex-7050>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <aCVZIuBHx51o7Pbl@yzhao56-desk.sh.intel.com> <diqzfrgfp95d.fsf@ackerleytng-ctop.c.googlers.com>
- <aEEFRXF+HrZVh5He@yzhao56-desk.sh.intel.com> <diqzecvxizp5.fsf@ackerleytng-ctop.c.googlers.com>
- <aHb/ETOMSQRm1bMO@yzhao56-desk> <diqzfrevhmzw.fsf@ackerleytng-ctop.c.googlers.com>
- <aHnghFAH5N7eiCXo@yzhao56-desk.sh.intel.com> <diqz8qkg6b8l.fsf@ackerleytng-ctop.c.googlers.com>
- <aH8xkkArWBrjzYfk@yzhao56-desk.sh.intel.com>
-Message-ID: <diqz1pq85cvq.fsf@ackerleytng-ctop.c.googlers.com>
-Subject: Re: [RFC PATCH 08/21] KVM: TDX: Increase/decrease folio ref for huge pages
+References: <CAGtprH_Evyc7tLhDB0t0fN+BUx5qeqWq8A2yZ5-ijbJ5UJ5f-g@mail.gmail.com>
+ <9502503f-e0c2-489e-99b0-94146f9b6f85@amd.com> <20250624130811.GB72557@ziepe.ca>
+ <CAGtprH_qh8sEY3s-JucW3n1Wvoq7jdVZDDokvG5HzPf0HV2=pg@mail.gmail.com>
+ <aGTvTbPHuXbvj59t@yzhao56-desk.sh.intel.com> <diqz8qknhj3l.fsf@ackerleytng-ctop.c.googlers.com>
+ <aHjDIxxbv0DnqI6S@yilunxu-OptiPlex-7050> <diqzqzyeg3j2.fsf@ackerleytng-ctop.c.googlers.com>
+ <aHm2F95XwzdD7nod@yilunxu-OptiPlex-7050> <687a6483506f2_3c6f1d2945a@iweiny-mobl.notmuch>
+ <aH4PRnuztKTqgEYo@yilunxu-OptiPlex-7050>
+Message-ID: <diqzwm803xa4.fsf@ackerleytng-ctop.c.googlers.com>
+Subject: Re: [RFC PATCH v2 04/51] KVM: guest_memfd: Introduce
+ KVM_GMEM_CONVERT_SHARED/PRIVATE ioctls
 From: Ackerley Tng <ackerleytng@google.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: vannapurve@google.com, pbonzini@redhat.com, seanjc@google.com, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org, 
-	rick.p.edgecombe@intel.com, dave.hansen@intel.com, kirill.shutemov@intel.com, 
-	tabba@google.com, quic_eberman@quicinc.com, michael.roth@amd.com, 
-	david@redhat.com, vbabka@suse.cz, jroedel@suse.de, thomas.lendacky@amd.com, 
-	pgonda@google.com, zhiquan1.li@intel.com, fan.du@intel.com, 
-	jun.miao@intel.com, ira.weiny@intel.com, isaku.yamahata@intel.com, 
-	xiaoyao.li@intel.com, binbin.wu@linux.intel.com, chao.p.peng@intel.com
+To: Xu Yilun <yilun.xu@linux.intel.com>, Ira Weiny <ira.weiny@intel.com>
+Cc: Yan Zhao <yan.y.zhao@intel.com>, Vishal Annapurve <vannapurve@google.com>, 
+	Jason Gunthorpe <jgg@ziepe.ca>, Alexey Kardashevskiy <aik@amd.com>, Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, 
+	linux-mm@kvack.org, linux-kernel@vger.kernel.org, x86@kernel.org, 
+	linux-fsdevel@vger.kernel.org, ajones@ventanamicro.com, 
+	akpm@linux-foundation.org, amoorthy@google.com, anthony.yznaga@oracle.com, 
+	anup@brainfault.org, aou@eecs.berkeley.edu, bfoster@redhat.com, 
+	binbin.wu@linux.intel.com, brauner@kernel.org, catalin.marinas@arm.com, 
+	chao.p.peng@intel.com, chenhuacai@kernel.org, dave.hansen@intel.com, 
+	david@redhat.com, dmatlack@google.com, dwmw@amazon.co.uk, 
+	erdemaktas@google.com, fan.du@intel.com, fvdl@google.com, graf@amazon.com, 
+	haibo1.xu@intel.com, hch@infradead.org, hughd@google.com, 
+	isaku.yamahata@intel.com, jack@suse.cz, james.morse@arm.com, 
+	jarkko@kernel.org, jgowans@amazon.com, jhubbard@nvidia.com, jroedel@suse.de, 
+	jthoughton@google.com, jun.miao@intel.com, kai.huang@intel.com, 
+	keirf@google.com, kent.overstreet@linux.dev, kirill.shutemov@intel.com, 
+	liam.merwick@oracle.com, maciej.wieczor-retman@intel.com, 
+	mail@maciej.szmigiero.name, maz@kernel.org, mic@digikod.net, 
+	michael.roth@amd.com, mpe@ellerman.id.au, muchun.song@linux.dev, 
+	nikunj@amd.com, nsaenz@amazon.es, oliver.upton@linux.dev, palmer@dabbelt.com, 
+	pankaj.gupta@amd.com, paul.walmsley@sifive.com, pbonzini@redhat.com, 
+	pdurrant@amazon.co.uk, peterx@redhat.com, pgonda@google.com, pvorel@suse.cz, 
+	qperret@google.com, quic_cvanscha@quicinc.com, quic_eberman@quicinc.com, 
+	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com, richard.weiyang@gmail.com, 
+	rick.p.edgecombe@intel.com, rientjes@google.com, roypat@amazon.co.uk, 
+	rppt@kernel.org, seanjc@google.com, shuah@kernel.org, steven.price@arm.com, 
+	steven.sistare@oracle.com, suzuki.poulose@arm.com, thomas.lendacky@amd.com, 
+	usama.arif@bytedance.com, vbabka@suse.cz, viro@zeniv.linux.org.uk, 
+	vkuznets@redhat.com, wei.w.wang@intel.com, will@kernel.org, 
+	willy@infradead.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
+	yuzenghui@huawei.com, zhiquan1.li@intel.com
 Content-Type: text/plain; charset="UTF-8"
 
-Yan Zhao <yan.y.zhao@intel.com> writes:
+Xu Yilun <yilun.xu@linux.intel.com> writes:
 
-> On Mon, Jul 21, 2025 at 10:33:14PM -0700, Ackerley Tng wrote:
->> Yan Zhao <yan.y.zhao@intel.com> writes:
+>> > > >> Yan, Yilun, would it work if, on conversion,
+>> > > >> 
+>> > > >> 1. guest_memfd notifies IOMMU that a conversion is about to happen for a
+>> > > >>    PFN range
+>> > > >
+>> > > > It is the Guest fw call to release the pinning.
+>> > > 
+>> > > I see, thanks for explaining.
+>> > > 
+>> > > > By the time VMM get the
+>> > > > conversion requirement, the page is already physically unpinned. So I
+>> > > > agree with Jason the pinning doesn't have to reach to iommu from SW POV.
+>> > > >
+>> > > 
+>> > > If by the time KVM gets the conversion request, the page is unpinned,
+>> > > then we're all good, right?
+>> > 
+>> > Yes, unless guest doesn't unpin the page first by mistake.
 >> 
->> > On Wed, Jul 16, 2025 at 01:57:55PM -0700, Ackerley Tng wrote:
->> >> Yan Zhao <yan.y.zhao@intel.com> writes:
->> >> 
->> >> > On Thu, Jun 05, 2025 at 03:35:50PM -0700, Ackerley Tng wrote:
->> >> >> Yan Zhao <yan.y.zhao@intel.com> writes:
->> >> >> 
->> >> >> > On Wed, Jun 04, 2025 at 01:02:54PM -0700, Ackerley Tng wrote:
->> >> >> >> Hi Yan,
->> >> >> >> 
->> >> >> >> While working on the 1G (aka HugeTLB) page support for guest_memfd
->> >> >> >> series [1], we took into account conversion failures too. The steps are
->> >> >> >> in kvm_gmem_convert_range(). (It might be easier to pull the entire
->> >> >> >> series from GitHub [2] because the steps for conversion changed in two
->> >> >> >> separate patches.)
->> >> >> > ...
->> >> >> >> [2] https://github.com/googleprodkernel/linux-cc/tree/gmem-1g-page-support-rfc-v2
->> >> >> >
->> >> >> > Hi Ackerley,
->> >> >> > Thanks for providing this branch.
->> >> >> 
->> >> >> Here's the WIP branch [1], which I initially wasn't intending to make
->> >> >> super public since it's not even RFC standard yet and I didn't want to
->> >> >> add to the many guest_memfd in-flight series, but since you referred to
->> >> >> it, [2] is a v2 of the WIP branch :)
->> >> >> 
->> >> >> [1] https://github.com/googleprodkernel/linux-cc/commits/wip-tdx-gmem-conversions-hugetlb-2mept
->> >> >> [2] https://github.com/googleprodkernel/linux-cc/commits/wip-tdx-gmem-conversions-hugetlb-2mept-v2
->> >> > Hi Ackerley,
->> >> >
->> >> > I'm working on preparing TDX huge page v2 based on [2] from you. The current
->> >> > decision is that the code base of TDX huge page v2 needs to include DPAMT
->> >> > and VM shutdown optimization as well.
->> >> >
->> >> > So, we think kvm-x86/next is a good candidate for us.
->> >> > (It is in repo https://github.com/kvm-x86/linux.git
->> >> >  commit 87198fb0208a (tag: kvm-x86-next-2025.07.15, kvm-x86/next) Merge branch 'vmx',
->> >> >  which already includes code for VM shutdown optimization).
->> >> > I still need to port DPAMT + gmem 1G + TDX huge page v2 on top it.
->> >> >
->> >> > Therefore, I'm wondering if the rebase of [2] onto kvm-x86/next can be done
->> >> > from your side. A straightforward rebase is sufficient, with no need for
->> >> > any code modification. And it's better to be completed by the end of next
->> >> > week.
->> >> >
->> >> > We thought it might be easier for you to do that (but depending on your
->> >> > bandwidth), allowing me to work on the DPAMT part for TDX huge page v2 in
->> >> > parallel.
->> >> >
->> >> 
->> >> I'm a little tied up with some internal work, is it okay if, for the
->> > No problem.
->> >
->> >> next RFC, you base the changes that you need to make for TDX huge page
->> >> v2 and DPAMT on the base of [2]?
->> >
->> >> That will save both of us the rebasing. [2] was also based on (some
->> >> other version of) kvm/next.
->> >> 
->> >> I think it's okay since the main goal is to show that it works. I'll
->> >> let you know when I can get to a guest_memfd_HugeTLB v3 (and all the
->> >> other patches that go into [2]).
->> > Hmm, the upstream practice is to post code based on latest version, and
->> > there're lots TDX relates fixes in latest kvm-x86/next.
->> >
->> 
->> Yup I understand.
->> 
->> For guest_memfd//HugeTLB I'm still waiting for guest_memfd//mmap
->> (managed by Fuad) to settle, and there are plenty of comments for the
->> guest_memfd//conversion component to iron out still, so the full update
->> to v3 will take longer than I think you want to wait.
->> 
->> I'd say for RFCs it's okay to post patch series based on some snapshot,
->> since there are so many series in flight?
->> 
->> To unblock you, if posting based on a snapshot is really not okay, here
->> are some other options I can think of:
->> 
->> a. Use [2] and posting a link to a WIP tree, similar to how [2] was
->>    done
->> b. Use some placeholder patches, assuming some interfaces to
->>    guest_memfd//HugeTLB, like how the first few patches in this series
->>    assumes some interfaces of guest_memfd with THP support, and post a
->>    series based on assumed interfaces
->> 
->> Please let me know if one of those options allow you to proceed, thanks!
-> Do you see any issues with directly rebasing [2] onto 6.16.0-rc6?
+>> Or maliciously?  :-(
 >
+> Yes.
+>
+>> 
+>> My initial response to this was that this is a bug and we don't need to be
+>> concerned with it.  However, can't this be a DOS from one TD to crash the
+>> system if the host uses the private page for something else and the
+>> machine #MC's?
+>
+> I think we are already doing something to prevent vcpus from executing
+> then destroy VM, so no further TD accessing. But I assume there is
+> concern a TD could just leak a lot of resources, and we are
+> investigating if host can reclaim them.
+>
+> Thanks,
+> Yilun
 
-Nope I think that should be fine. Thanks for checking!
+Sounds like a malicious guest could skip unpinning private memory, and
+guest_memfd's unmap will fail, leading to a KVM_BUG_ON() as Yan/Rick
+suggested here [1].
 
-> We currently prefer this approach. We have tested [2] for some time, and TDX
-> huge page series doesn't rely on the implementation details of guest_memfd.
->
-> It's ok if you are currently occupied by Google's internal tasks. No worries.
->
->> >> [2] https://github.com/googleprodkernel/linux-cc/commits/wip-tdx-gmem-conversions-hugetlb-2mept-v2
->> >> 
->> >> > However, if it's difficult for you, please feel free to let us know.
->> >> >
->> >> > Thanks
->> >> > Yan
+Actually it seems like a legacy guest would also lead to unmap failures
+and the KVM_BUG_ON(), since when TDX connect is enabled, the pinning
+mode is enforced, even for non-IO private pages?
+
+I hope your team's investigations find a good way for the host to
+reclaim memory, at least from dead TDs! Otherwise this would be an open
+hole for guests to leak a host's memory.
+
+Circling back to the original topic [2], it sounds like we're okay for
+IOMMU to *not* take any refcounts on pages and can rely on guest_memfd
+to keep the page around on behalf of the VM?
+
+[1] https://lore.kernel.org/all/diqzcya13x2j.fsf@ackerleytng-ctop.c.googlers.com/
+[2] https://lore.kernel.org/all/CAGtprH_qh8sEY3s-JucW3n1Wvoq7jdVZDDokvG5HzPf0HV2=pg@mail.gmail.com/
 
