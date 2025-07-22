@@ -1,148 +1,120 @@
-Return-Path: <kvm+bounces-53128-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53129-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A03BB0DE1A
-	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 16:23:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B87A4B0DE33
+	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 16:24:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 98D2E585115
-	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 14:16:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 38A8D1C859FA
+	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 14:18:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30C452EE281;
-	Tue, 22 Jul 2025 14:11:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ACF12EAD1E;
+	Tue, 22 Jul 2025 14:13:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lMXDxgab"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PDQV1Dwf"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E40012EAB79
-	for <kvm@vger.kernel.org>; Tue, 22 Jul 2025 14:11:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08A832EACFB
+	for <kvm@vger.kernel.org>; Tue, 22 Jul 2025 14:13:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753193479; cv=none; b=ML3LC7c0dUldIJ6okzWCcdkPA2lm4bYeaxuwKWCZ/+ZdBRE2hbkAaNxxNS2xHb64ZVsDsruJLkHKaM6tuUaikffNo1MC+q2qzUO0pxaqhFInl4CsAr9qEFEZ4JMu/tExK6tVTehhZTm7Az/3UjbLaSvM/HkUcZe6TrWRazxJ7tA=
+	t=1753193628; cv=none; b=mimzITGyy2ylm4MSVfG1PHRZul34YI+0t9SXuRYCMUbJx4H6og/noQcKvs5Mbnuc35ZIgyiOfROjBz61h3Rr5syTcgkPyAqcpXzzIqQ2FbNq4DVjuOfsfMKNCIlfAmjw/06jKHDs+4+4crZzV89g2YR2+aoBt6zvbkKKF0KP5HE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753193479; c=relaxed/simple;
-	bh=wRwXjhWlbKKzAfQxAC+BDSH/bfNklI92eBAGV10UszE=;
+	s=arc-20240116; t=1753193628; c=relaxed/simple;
+	bh=SIVeV/5x+C+aiI03S1yS9XTn1eCXwkQ8UaH2ikV0LOM=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=DkCoyLtxtHmxFUqmIhhq1/W1usHnn65ZKH2uKyM/wWmypA21yVtz5VOdRa7O+HL9/fvUjx4fSS9Zor1H4n3VjiebzU4qwtsUjp/zAIOPrUnh7bvrpXFFjF/cjxiYPcmafp0kMZc5Abms2zz6JxNBSsEotPrebrdTQH924sK+YYk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lMXDxgab; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=JGpeV8R8uZHXzuPUKzG4EhiWx+MPOxucdb9sOJt0X4NNqu5CFDnVxy9Pq5CEuJLwynTKg4z893D0xCHmqiaeqN9QLa48SnNn6UkXAKsOZw0gvjg3954icWz0a88VADhQz1hv2OsQXzmrJ/sagBCPg+xoKeHDe9gtciqY9ZFNoJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PDQV1Dwf; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-312df02acf5so6378657a91.1
-        for <kvm@vger.kernel.org>; Tue, 22 Jul 2025 07:11:16 -0700 (PDT)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-313ff01d2a6so4485621a91.3
+        for <kvm@vger.kernel.org>; Tue, 22 Jul 2025 07:13:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753193476; x=1753798276; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1753193626; x=1753798426; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Yhr5DdAG1y4qmrkRFBW7TPP793xjLuWMlbUZVYJdXY0=;
-        b=lMXDxgabbUNfLs2Jolc7mh5wCxHRrJaCR0/9UPy7YP89yoMeW8Ps0xtO1gZHZblsYU
-         1yRGwjl5Fks1XpiQa4CewjTo6fFDc/vd84TZoT5XXd8ndogLNivG3luTvy5uXqGgkAEz
-         yM4YGST3KGW/klvgGCgL33wKP6jcWtS0iqqdWnnleb//KqcFkULLs4Vq9rpS32oWPxyk
-         RWxgWUu6/b6/DRkeoa3IJKE03v/SJZJ+nkzOf2e5kybI5VN0Hdqm793PYERRZz6iroOi
-         8IyIELzAbD24KtRLSirUDRQeFc9JGKoxFqbhJFPOlClAMLmlUOc9VIPpl+aVVZsqT1aW
-         0Cmw==
+        bh=20QLCvcSY004GezKtjT3+306FnS1qCy6LGwEuBD+8PQ=;
+        b=PDQV1DwfZmU8I+tEYB/6rFr8+Qw6rWmy+NVOPOo0aZB+O44qLApABV/adtGv75mAq7
+         VaxGD/GhCXpP4AtG+Uqn/SI1qpeDDfdhdY8j9hi7TSRJa2lsrBC+Ig3AxSnTrPJlM7z3
+         l7VRiodD2P1IELY9NSw0Z3VNAF5DJhgW9PznBeEriaYQWrS5NR3wFNTBVEdGWAjcLrR2
+         zmoQY4satICRkCvknv1cVomSxFSA/kNyY57al7XsGsEsl2NbCEeEpkiGqLs/Gx6yNkJH
+         9yCtmJcauJn2Qe5mAPy1vX4P/U8c+PLU43mcm8NAGX+1Kt/+TjPFRwByh94I02dqscOf
+         kl4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753193476; x=1753798276;
+        d=1e100.net; s=20230601; t=1753193626; x=1753798426;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Yhr5DdAG1y4qmrkRFBW7TPP793xjLuWMlbUZVYJdXY0=;
-        b=DiBpSk1trwDqJSsTEbhzBq+I1ZFi51XGaDauv7+onetUfniGx7kJ+B9ug9DRD9LYNQ
-         fyXRa0EL2yWYTtMq7zWXGdjCEOY3VOh49zODicGmDFZnrusrwSLW1USL8Wy7dUg1uyvX
-         2zr3fwIlHkXw+oijvueBewa7qEicM1R3RG5tVC2l8I6+I6j82zJ/awst8itV9TD4Qjsn
-         xMCpB45YKs9bzPh/2ToyvdEBI1Z0uO9dm+bQ2+GcUzbV07fydV2O8sjtRi8kWQ1gLF0M
-         hyXDCF7yp8Iwv+KvmMKuXm9bz9z2CuIgQUKIYrjSGk7sZ/rPbWss9LNiTTETMzh9j854
-         s7hQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVYiHYdW9laxNwh/4NpwZ+RyH4UDJpGCr7zfaHvXEptBXcBngKgW3Zaun7OdwNFMZE698Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz+xLzLs01lOZubBfBKpgTjAgsiSxbR+bg4UjbFWMCgN/f4/6KU
-	xJr0Dkcp4eBLnZFP+6Qj/jBoggLatLFt7GdbYAC0aAPbwEKt8mShKMJUVDmpcrk6HI90IZ8e2lk
-	fxvyj+Q==
-X-Google-Smtp-Source: AGHT+IHz6YqAcopC+P6ScKSU5WWDSjba8vHQ5SgWsdgu/3WXQBnQE+NEWNjk1kKSfQgkq2XdBsLFy0RsPC8=
-X-Received: from pjbrs12.prod.google.com ([2002:a17:90b:2b8c:b0:312:187d:382d])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:350e:b0:315:f6d6:d29c
- with SMTP id 98e67ed59e1d1-31e3e1f12a8mr4913476a91.15.1753193476158; Tue, 22
- Jul 2025 07:11:16 -0700 (PDT)
-Date: Tue, 22 Jul 2025 07:11:14 -0700
-In-Reply-To: <20250722131533.106473-2-adrian.hunter@intel.com>
+        bh=20QLCvcSY004GezKtjT3+306FnS1qCy6LGwEuBD+8PQ=;
+        b=mcuEKq9+UI5PKbPDB4Ir7BJIgW3vPk2k3FIN1e9iO9pplTD5oTbuSgMtApBADC3uwh
+         SiqdG//779CIJoaadwwjj4rjnp4pq/nk1AMx7JPKsSkyrr3S7/4qNrQd120yyf+KdIdC
+         ox1GBbuBci3g8253ybyvMfZkJw4cA+xhp//P9jb5jr7akevrYdEnSl8CCBPgz9hmLfVy
+         7DhLkyULvyYPL2wm6sOEgymWye2TQ1x8suHVEyULPutUkn4BPtVGEC6YEOKQDkZWpmYB
+         +F6CRecP3CikYHFRJQeuNbdMvsr2WixxOKoMCQRcEnn2KnQOwYGGGqWP00HlBHxBdlIg
+         m1Iw==
+X-Forwarded-Encrypted: i=1; AJvYcCXC52wrwyqh4ZcsH/LKDsl6ffvq+H27mkgqi3gEoYSELSdMzm3ZPU+qQjFGe7jR1dioDkE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzxgMtHMhCWGliAP14nUa2gckWsncm5XNRAU6iadtKFTRabJx8X
+	TWR2I6cjDAzNu/90/s5x/ji5qcBUj20ah9H5EH/0Xdv6yf5u/jk7N6UYUbA2TT4tUU2mYB4ENkr
+	XXOg+vw==
+X-Google-Smtp-Source: AGHT+IHfoyKyRi4QOiUDSxvjqgLFDO1L/1RhSMjfXAzLTeEHcAyBHXnbeLhZO6F6DXRrf5fW+BcFtbQoa1I=
+X-Received: from pjh16.prod.google.com ([2002:a17:90b:3f90:b0:312:eaf7:aa0d])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1c04:b0:312:e9bd:5d37
+ with SMTP id 98e67ed59e1d1-31cc2515a29mr24112775a91.6.1753193626228; Tue, 22
+ Jul 2025 07:13:46 -0700 (PDT)
+Date: Tue, 22 Jul 2025 07:13:44 -0700
+In-Reply-To: <96a0a8b2-3ebd-466c-9c6e-8ba63cd4e2e3@grsecurity.net>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250722131533.106473-1-adrian.hunter@intel.com> <20250722131533.106473-2-adrian.hunter@intel.com>
-Message-ID: <aH-b5UAkokFocLvG@google.com>
-Subject: Re: [PATCH V3 1/2] x86/tdx: Eliminate duplicate code in tdx_clear_page()
+References: <20250704085027.182163-1-chao.gao@intel.com> <20250704085027.182163-20-chao.gao@intel.com>
+ <4114d399-8649-41de-97bf-3b63f29ec7e8@grsecurity.net> <aH58w_wHx3Crklp4@google.com>
+ <96a0a8b2-3ebd-466c-9c6e-8ba63cd4e2e3@grsecurity.net>
+Message-ID: <aH-cmDRPPp2X7OxN@google.com>
+Subject: Re: [PATCH v11 19/23] KVM: x86: Enable CET virtualization for VMX and
+ advertise to userspace
 From: Sean Christopherson <seanjc@google.com>
-To: Adrian Hunter <adrian.hunter@intel.com>
-Cc: Dave Hansen <dave.hansen@linux.intel.com>, pbonzini@redhat.com, vannapurve@google.com, 
-	Tony Luck <tony.luck@intel.com>, Borislav Petkov <bp@alien8.de>, Thomas Gleixner <tglx@linutronix.de>, 
-	Ingo Molnar <mingo@redhat.com>, x86@kernel.org, H Peter Anvin <hpa@zytor.com>, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, rick.p.edgecombe@intel.com, 
-	kas@kernel.org, kai.huang@intel.com, reinette.chatre@intel.com, 
-	xiaoyao.li@intel.com, tony.lindgren@linux.intel.com, 
-	binbin.wu@linux.intel.com, isaku.yamahata@intel.com, yan.y.zhao@intel.com, 
-	chao.gao@intel.com
+To: Mathias Krause <minipli@grsecurity.net>
+Cc: Chao Gao <chao.gao@intel.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	x86@kernel.org, pbonzini@redhat.com, dave.hansen@intel.com, 
+	rick.p.edgecombe@intel.com, mlevitsk@redhat.com, john.allen@amd.com, 
+	weijiang.yang@intel.com, xin@zytor.com, Thomas Gleixner <tglx@linutronix.de>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>
 Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Jul 22, 2025, Adrian Hunter wrote:
-> diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
-> index 7ddef3a69866..f66328404724 100644
-> --- a/arch/x86/include/asm/tdx.h
-> +++ b/arch/x86/include/asm/tdx.h
-> @@ -131,6 +131,8 @@ int tdx_guest_keyid_alloc(void);
->  u32 tdx_get_nr_guest_keyids(void);
->  void tdx_guest_keyid_free(unsigned int keyid);
->  
-> +void tdx_quirk_reset_paddr(unsigned long base, unsigned long size);
-> +
->  struct tdx_td {
->  	/* TD root structure: */
->  	struct page *tdr_page;
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index 573d6f7d1694..1b549de6da06 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -283,25 +283,6 @@ static inline void tdx_disassociate_vp(struct kvm_vcpu *vcpu)
->  	vcpu->cpu = -1;
->  }
->  
-> -static void tdx_clear_page(struct page *page)
-> -{
-> -	const void *zero_page = (const void *) page_to_virt(ZERO_PAGE(0));
-> -	void *dest = page_to_virt(page);
-> -	unsigned long i;
-> -
-> -	/*
-> -	 * The page could have been poisoned.  MOVDIR64B also clears
-> -	 * the poison bit so the kernel can safely use the page again.
-> -	 */
-> -	for (i = 0; i < PAGE_SIZE; i += 64)
-> -		movdir64b(dest + i, zero_page);
-> -	/*
-> -	 * MOVDIR64B store uses WC buffer.  Prevent following memory reads
-> -	 * from seeing potentially poisoned cache.
-> -	 */
-> -	__mb();
-> -}
-> -
->  static void tdx_no_vcpus_enter_start(struct kvm *kvm)
->  {
->  	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-> @@ -347,7 +328,7 @@ static int tdx_reclaim_page(struct page *page)
->  
->  	r = __tdx_reclaim_page(page);
->  	if (!r)
-> -		tdx_clear_page(page);
-> +		tdx_quirk_reset_paddr(page_to_phys(page), PAGE_SIZE);
+On Tue, Jul 22, 2025, Mathias Krause wrote:
+> On 21.07.25 19:45, Sean Christopherson wrote:
+> > On Mon, Jul 21, 2025, Mathias Krause wrote:
+> >> Can we please make CR4.CET a guest-owned bit as well (sending a patch in
+> >> a second)? It's a logical continuation to making CR0.WP a guest-owned
+> >> bit just that it's even easier this time, as no MMU role bits are
+> >> involved and it still makes a big difference, at least for grsecurity
+> >> guest kernels.
+> > 
+> > Out of curiosity, what's the use case for toggling CR4.CET at runtime?
+> 
+> Plain and simple: architectural requirements to be able to toggle CR0.WP.
 
-This is silly.  Literally every use in KVM is on a struct page.  I agree with
-Dave that having a wrapper with a completely unrelated name is confusing, but
-that's a naming problem, not a code problem.
+Ugh, right.  That was less fun than I as expecting :-)
 
-And FWIW, I find tdx_quirk_reset_paddr() confusing, because it reads like it's
-resetting the address itself.  But if KVM only ever uses tdx_quirk_reset_page(),
-I don't care what you call the inner helper.
+> > E.g. at one point CR4.LA57 was a guest-owned bit, and the code was buggy.  Fixing
+> > things took far more effort than it should have there was no justification for
+> > the logic (IIRC, it was done purely on the whims of the original developer).
+> > 
+> > KVM has had many such cases, where some weird behavior was never documented/justified,
+> > and I really, really want to avoid committing the same sins that have caused me
+> > so much pain :-)
+> 
+> I totally understand your reasoning, "just because" shouldn't be the
+> justification. In this case, however, not making it a guest-owned bit
+> has a big performance impact for grsecurity, we would like to address.
+
+Oh, I'm not objecting to the change, at all.  I just want to make sure we capture
+the justification in the changelog.
 
