@@ -1,120 +1,245 @@
-Return-Path: <kvm+bounces-53174-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53175-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8911B0E6EB
-	for <lists+kvm@lfdr.de>; Wed, 23 Jul 2025 01:07:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DDD2B0E741
+	for <lists+kvm@lfdr.de>; Wed, 23 Jul 2025 01:42:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09134172FC3
-	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 23:07:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1ABF3AF246
+	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 23:42:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A445028B3FD;
-	Tue, 22 Jul 2025 23:07:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7DAA28C035;
+	Tue, 22 Jul 2025 23:42:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3oBXBwjH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="r8mok+AN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B077288C01
-	for <kvm@vger.kernel.org>; Tue, 22 Jul 2025 23:07:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82CE328AB10
+	for <kvm@vger.kernel.org>; Tue, 22 Jul 2025 23:42:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753225658; cv=none; b=QIMgo096aJrxQEk/3cXR2At0gKb+lDtnZizmpTV7bXyMpfY+r9HTka7InBZxFIvs8430DHai502iHfhpgxOLEb2x2mmFJanNVcoSB5/NnUHoAJdQxkfigC2w2gvHSdvzDqEclNn3ma41DZ+FPRobsH6Y8VqiTlQb3InrsSyUDak=
+	t=1753227747; cv=none; b=DdBMg1pgXQeeroBJLDmOumxA9B6sSwWskhr9CkXZaExhCsEOyzdpgvFOPYDElO53rsyS4UNHoNEdW68VXh6E7OB4aKztNPkbDQ3U8ujVTUYx3dbXtblKJmAnNbJI3PfYU+pat0ebNjvdVwUhoAJkIsh+pptAzjpkmg3MC0hLTbM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753225658; c=relaxed/simple;
-	bh=i9Topy5p8+oRB1ybTn3eGTjAdmW4So/zy81PHcCSQws=;
+	s=arc-20240116; t=1753227747; c=relaxed/simple;
+	bh=KmdfdNUxjHfIoxf80hBqYjQ/1GKN1PEjgM/hjTKhDHc=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=h0FONT6Tf0guroLc43nXpFeS1/4n1j320UJc1uVgf0K0RYN57pZPqrg1gF3v/uDOEAuUy8RwLYLHa0cVQuQ5PVMZCueeqr4M34fm3mbCBsUfAhfABd8zFg7en3g/aBjP5Vm1Up31pXJWZeuyfpSXVTCtxjZp5YChmjckP6jefME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3oBXBwjH; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=C1T6YCX+iqDhj1g8M8j1IljXXO12t33chijJgWZg6Z2nl3nUETwxCD8xbecb9iUbvTGhvrRJ0hKYHeMJjl80TnlTgI8wlXeEBeNBnonbkQaxJRLnEMjwlP9oHtSD/z2ClEloGdi+5GT9jJJqWuIJaKMS8tm/HfM9dXicuowBKCQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=r8mok+AN; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b3f321dc6abso3277676a12.1
-        for <kvm@vger.kernel.org>; Tue, 22 Jul 2025 16:07:37 -0700 (PDT)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b31bc3128fcso7907636a12.0
+        for <kvm@vger.kernel.org>; Tue, 22 Jul 2025 16:42:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753225656; x=1753830456; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1753227745; x=1753832545; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=f+m6qI30JHvrm3ONaGCpQMi0L8lxI7PYDb1Mu/Pb3F4=;
-        b=3oBXBwjHNB/20r0hYHUo9vZehvohDETqWCUjsCDEyL+kRBgH4IOWq6ZyqqnhLOvxXE
-         Ol9d1WAShIZs29mgPsEl2AANInab5X7lTu38QVCnI+8gAdxo4BtQ/mbDzmJUL3PmlYzM
-         3tY29xS1MbB928GRSQSaDAABmfc7vxaAik5oQbM5dsiNMQx6tUZoSlJCusNNJzrsBpKR
-         HiQFpV4DuZastDN6Fqywl1v5FIiC6zu2vbea3np75HcthenrRXt04v1+wDeFE6puqlXY
-         S4lxz9g/X7uGpGABuuT003TMROQDqgCPxScrE+Q9JJBiFkWkUa4n4aboTYaNVQqSyNf3
-         I3ag==
+        bh=C4436MwwaaGsBQYuGwPP46zP65nxhOyA9XxeTVRWwmU=;
+        b=r8mok+AN1/7jbZj2H4ULkhi7/6KIYwT+a+N6KU/ERIGG34delG77iNKrshRCKV7DEf
+         IhyXRb4wyBDDgD1ccJlGIYhCez2R3TAhgDqdPOysjoGSa9k7yOAax8VqRrBiUWXY3f73
+         C5bcHOTMnKyRGOC9DCAx1uNzivP9CGvr4Q4+U1O7Xx0DMRYEpjuJauOuFjIcHur/LuAk
+         6uPIx7Jdt84iF4Te4qEzaHLS6EldQHJPcI2/bNHYv/yRBzpOlMh9zuVwsdKrrCmZG7HX
+         sJiwkH9HsYUoFiXHN5KZFIMKjxUl7pO9KC6081cPx1GW2TGbzV5nNtP1dOVQ0E4OFom+
+         1law==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753225656; x=1753830456;
+        d=1e100.net; s=20230601; t=1753227745; x=1753832545;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=f+m6qI30JHvrm3ONaGCpQMi0L8lxI7PYDb1Mu/Pb3F4=;
-        b=MC+BnWo6uAJvTDKCkK5Wn7ssPZXkQE8BEctZSIXawylDsWQC1Tk44kTQ4hsPRhw3HT
-         aV6alxXrEBeSvntRBkC4j1SvEmp4oif/MqHlHsFY277y1pSgijyKG3IStwkRAd1ZgwWv
-         sU0n8PpC78sm5MjB3oJA/ifbtrM9SnyPql1x1zWFSgWgQB6DG/hA/jht7ATVNGcFFne4
-         IjhoXjgNDiqhe3v4Yei+S5r/4npLbXf8AbjBqGbsNdhCNRJxbDfILbmDuL0CZdQUBhZb
-         zyICt9qjakos3U3ZghC5SkeOi4c3DQNRbxynItDeGfY8Er+9DImnvGx4JytZY+y3p2Lh
-         Zu7A==
-X-Forwarded-Encrypted: i=1; AJvYcCXjd19AcWW+UGyKyxfHIML7NOccJnOG1Uvei6dEVBlqs5iAnn1wopjLqYWOB9NjAYs5USU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyK/nrqfVVozqW4UYv2PwumB0QdMMFZ7OhFKx2jBP9Ts/pb4BP7
-	90zQZmBfMtB0jZjcshL3t/vkt2H5CNMQi7jb4QSeWKz6wG7UuOx7Dnq/VIm3P+uPOqpZnMWjyk6
-	xZUQpZA==
-X-Google-Smtp-Source: AGHT+IFOb8KYXXobVAAvvjW+Fe1YbH8mwfp6V2E801ROWDybd0+20juthdBHS5x4qZEtLjQQN6CpBVqzr4M=
-X-Received: from pjuj4.prod.google.com ([2002:a17:90a:d004:b0:313:242b:1773])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5647:b0:311:fc8b:31b5
- with SMTP id 98e67ed59e1d1-31e507abbc6mr1697551a91.14.1753225656408; Tue, 22
- Jul 2025 16:07:36 -0700 (PDT)
-Date: Tue, 22 Jul 2025 16:07:34 -0700
-In-Reply-To: <80a047e2-e0fb-40cd-bb88-cce05ca017ac@redhat.com>
+        bh=C4436MwwaaGsBQYuGwPP46zP65nxhOyA9XxeTVRWwmU=;
+        b=m5g0ZWiP3dOGoYrdJEbOnIruJABV1vFB1SutqcJhpfTSYsCQ/ru6cptUm4aMOXaQOF
+         /3VrGdYgOMtkSlFZWsea4YEqrvNbnLYJt4sjj0E+nNEfS2e4YQH35fzYxv6S4eFqt2mi
+         FQtMg/ZTlaFPp5aIIK5ci+OGjM0r3zka3P68H256lAzyvvJrwp218RSq5Kbi6RTmTWpS
+         Mmn5tYBYBBKSUvqOdAKr+soB9P2DUwgsweF/crfzhaQ/WxOxmowriucPOfK6CQZP4c+b
+         bQZpnEVaPwTvBBl2tmjYi/ANkVx7bBidhaBYxdMhSnaFAHLtxyjde3V4VlIC92I2EFCj
+         PaoQ==
+X-Gm-Message-State: AOJu0Yy0pkdNf5JFtsi+dwhpoddv84hETR1shzb3VNVy/v56Z9N9XNmO
+	ACwmgIj3KCs1LZ+ZITZ08D87DL4l1htjR8nnNgFH/NstP+b0UAo3w2ha0zFPEDEnMTaNKVRRgoB
+	nZce9VA==
+X-Google-Smtp-Source: AGHT+IHLrCrcEJh1eqR+2A2CsgZBx82DgvNUPV5JtUfEsyEi8WO/Hm3qnM3XnGuN+OWhk9ivI2YtpAQwcFU=
+X-Received: from plbjx8.prod.google.com ([2002:a17:903:1388:b0:234:c2e4:1e08])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:cf09:b0:235:ecf2:393
+ with SMTP id d9443c01a7336-23f981de13dmr10817305ad.53.1753227744705; Tue, 22
+ Jul 2025 16:42:24 -0700 (PDT)
+Date: Tue, 22 Jul 2025 16:42:23 -0700
+In-Reply-To: <CA+EHjTw46a+NCcgGXQ1HA+a3MSZD9Q97V8W-Xj5+pYuTh4Z2_w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250713174339.13981-2-shivankg@amd.com> <bdce1a12-ab73-4de1-892b-f8e849a8ab51@redhat.com>
- <aH-j8bOXMfOKdpHp@google.com> <80a047e2-e0fb-40cd-bb88-cce05ca017ac@redhat.com>
-Message-ID: <aIAZtgtdy5Fw1OOi@google.com>
-Subject: Re: [PATCH V9 0/7] Add NUMA mempolicy support for KVM guest-memfd
+References: <20250717162731.446579-1-tabba@google.com> <20250717162731.446579-3-tabba@google.com>
+ <aH5uY74Uev9hEWbM@google.com> <CA+EHjTxcgCLzwK5k+rTf2v_ufgsX0AcEzhy0EQL-pvmsg9QQeg@mail.gmail.com>
+ <aH552woocYo1ueiU@google.com> <CA+EHjTwPnFLZ1OxKkV5gqk_kU_UU_KdupAGDoLbRyK__0J+YeQ@mail.gmail.com>
+ <aH-1JeJH2cEvyEei@google.com> <CA+EHjTw46a+NCcgGXQ1HA+a3MSZD9Q97V8W-Xj5+pYuTh4Z2_w@mail.gmail.com>
+Message-ID: <aIAh3xkU52Z100xK@google.com>
+Subject: Re: [PATCH v15 02/21] KVM: Rename CONFIG_KVM_GENERIC_PRIVATE_MEM to CONFIG_KVM_GENERIC_GMEM_POPULATE
 From: Sean Christopherson <seanjc@google.com>
-To: David Hildenbrand <david@redhat.com>
-Cc: Shivank Garg <shivankg@amd.com>, vbabka@suse.cz, willy@infradead.org, 
-	akpm@linux-foundation.org, shuah@kernel.org, pbonzini@redhat.com, 
-	brauner@kernel.org, viro@zeniv.linux.org.uk, ackerleytng@google.com, 
-	paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com, pvorel@suse.cz, 
-	bfoster@redhat.com, tabba@google.com, vannapurve@google.com, 
-	chao.gao@intel.com, bharata@amd.com, nikunj@amd.com, michael.day@amd.com, 
-	shdhiman@amd.com, yan.y.zhao@intel.com, Neeraj.Upadhyay@amd.com, 
-	thomas.lendacky@amd.com, michael.roth@amd.com, aik@amd.com, jgg@nvidia.com, 
-	kalyazin@amazon.com, peterx@redhat.com, jack@suse.cz, rppt@kernel.org, 
-	hch@infradead.org, cgzones@googlemail.com, ira.weiny@intel.com, 
-	rientjes@google.com, roypat@amazon.co.uk, ziy@nvidia.com, 
-	matthew.brost@intel.com, joshua.hahnjy@gmail.com, rakie.kim@sk.com, 
-	byungchul@sk.com, gourry@gourry.net, kent.overstreet@linux.dev, 
-	ying.huang@linux.alibaba.com, apopple@nvidia.com, chao.p.peng@intel.com, 
-	amit@infradead.org, ddutile@redhat.com, dan.j.williams@intel.com, 
-	ashish.kalra@amd.com, gshan@redhat.com, jgowans@amazon.com, 
-	pankaj.gupta@amd.com, papaluri@amd.com, yuzhao@google.com, 
-	suzuki.poulose@arm.com, quic_eberman@quicinc.com, 
-	aneeshkumar.kizhakeveetil@arm.com, linux-fsdevel@vger.kernel.org, 
-	linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-coco@lists.linux.dev
+To: Fuad Tabba <tabba@google.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
+	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, 
+	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
+	palmer@dabbelt.com, aou@eecs.berkeley.edu, viro@zeniv.linux.org.uk, 
+	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
+	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
+	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
+	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
+	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
+	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
+	ira.weiny@intel.com
 Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Jul 22, 2025, David Hildenbrand wrote:
-> On 22.07.25 16:45, Sean Christopherson wrote:
-> > On Tue, Jul 22, 2025, David Hildenbrand wrote:
-> > > Just to clarify: this is based on Fuad's stage 1 and should probably still be
-> > > tagged "RFC" until stage-1 is finally upstream.
-> > > 
-> > > (I was hoping stage-1 would go upstream in 6.17, but I am not sure yet if that is
-> > > still feasible looking at the never-ending review)
-> > 
-> > 6.17 is very doable.
+On Tue, Jul 22, 2025, Fuad Tabba wrote:
+> On Tue, 22 Jul 2025 at 16:58, Sean Christopherson <seanjc@google.com> wrote:
+> >
+> > On Tue, Jul 22, 2025, Fuad Tabba wrote:
+> > > On Mon, 21 Jul 2025 at 18:33, Sean Christopherson <seanjc@google.com> wrote:
+> > > >
+> > > > On Mon, Jul 21, 2025, Fuad Tabba wrote:
+> > > > > > The below diff applies on top.  I'm guessing there may be some intermediate
+> > > > > > ugliness (I haven't mapped out exactly where/how to squash this throughout the
+> > > > > > series, and there is feedback relevant to future patches), but IMO this is a much
+> > > > > > cleaner resting state (see the diff stats).
+> > > > >
+> > > > > So just so that I am clear, applying the diff below to the appropriate
+> > > > > patches would address all the concerns that you have mentioned in this
+> > > > > email?
+> > > >
+> > > > Yes?  It should, I just don't want to pinky swear in case I botched something.
+> > >
+> > > Other than this patch not applying, nah, I think it's all good ;P. I
+> > > guess base-commit: 9eba3a9ac9cd5922da7f6e966c01190f909ed640 is
+> > > somewhere in a local tree of yours. There are quite a few conflicts
+> > > and I don't think it would build even if based on the right tree,
+> > > e.g.,  KVM_CAP_GUEST_MEMFD_MMAP is a rename of KVM_CAP_GMEM_MMAP,
+> > > rather an addition of an undeclared identifier.
+> > >
+> > > That said, I think I understand what you mean, and I can apply the
+> > > spirit of this patch.
+> > >
+> > > Stay tuned for v16.
+> >
+> > Want to point me at your branch?  I can run it through my battery of tests, and
+> > maybe save you/us from having to spin a v17.
 > 
-> I like your optimism :)
+> That would be great. Here it is:
+> 
+> https://android-kvm.googlesource.com/linux/+/refs/heads/tabba/guestmem-basic-6.16-v16
+> 
+> No known issues from my end. But can you have a look at the patch:
+> 
+> KVM: guest_memfd: Consolidate Kconfig and guest_memfd enable checks
+> 
+> In that I collected the changes to the config/enable checks that
+> didn't seem to fit well in any of the other patches.
 
-I'm not optimistic, just incompetent.  I forgot what kernel we're on.  **6.18**
-is very doable, 6.17 not so much.
+Regarding config stuff, patch 02, KVM: Rename CONFIG_KVM_GENERIC_PRIVATE_MEM to
+CONFIG_HAVE_KVM_ARCH_GMEM_POPULATE, is missing a KVM_GMEM => KVM_GUEST_MEMFD rename.
+
+While playing with this, I also discovered why this code lives in the KVM_X86 config:
+
+  select KVM_GENERIC_PRIVATE_MEM if KVM_SW_PROTECTED_VM
+
+Commit ea4290d77bda ("KVM: x86: leave kvm.ko out of the build if no vendor module
+is requested") didn't have all the vendor netural configs depend on KVM_X86, and
+so it's possible to end up with unmet dependencies.  E.g. KVM_SW_PROTECTED_VM can
+be selected with KVM_X86=n, and thus with KVM_GUEST_MEMFD=n.
+
+We could punt on that mess until after this series, but that'd be a even more
+churn, and I'm not sure I could stomach giving acks for the continued addition
+of ugly kconfig dependencies. :-)
+
+Lastly, regarding "Consolidate Kconfig and guest_memfd enable checks", that needs
+to land before f6a5f3a22bbe ("KVM: guest_memfd: Allow host to map guest_memfd pages"),
+otherwise KVM will present a weird state where guest_memfd can be used for default
+VMs, but if and only KVM_GUEST_MEMFD happens to be selected by something else.
+That also provides a better shortlog: "KVM: x86: Enable KVM_GUEST_MEMFD for all
+64-bit builds".  The config cleanups and consolidations are a nice side effect,
+but what that patch is really doing is enabling KVM_GUEST_MEMFD more broadly.
+
+Actually, all of the arch patches need to come before f6a5f3a22bbe ("KVM: guest_memfd:
+Allow host to map guest_memfd pages"), otherwise intermediate builds will have
+half-baked support for guest_memfd mmap().  Or rather, KVM shouldn't let userspace
+enable GUEST_MEMFD_FLAG_MMAP until all the plumbing is in place.  I suspect that
+trying to shuffle the full patches around will create cyclical dependency hell.
+It's easy enough to hold off on adding GUEST_MEMFD_FLAG_MMAP until KVM is fully
+ready, so I think it makes sense to just add GUEST_MEMFD_FLAG_MMAP along with the
+capability.
+
+Rather than trying to pass partial patches around, I pushed a branch to:
+
+  https://github.com/sean-jc/linux.git x86/gmem_mmap
+
+Outside of the x86 config crud, and deferring GUEST_MEMFD_FLAG_MMAP until KVM is
+fully prepped, there _shouldn't_ be any changes relatively to what you have.
+
+Note, it's based on:
+
+  https://github.com/kvm-x86/linux.git next
+
+as there are x86 kconfig dependencies/conflicts with changes that are destined
+for 6.17 (and I don't think landing this in 6.17 is realistic, i.e. this series
+will effectively follow kvm-x86/next no matter what).
+
+I haven't done a ton of runtime testing yet, but it passes all of my build tests
+(I have far too many configs), so I'm reasonably confident all the kconfig stuff
+isn't horribly broken.
+
+Oh, and I also squashed this into the very last patch.  The curly braces, line
+wrap, and hardcoded boolean are all superfluous.
+
+diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
+index 4cdccabc160c..a0c5db8fd72d 100644
+--- a/tools/testing/selftests/kvm/guest_memfd_test.c
++++ b/tools/testing/selftests/kvm/guest_memfd_test.c
+@@ -249,8 +249,7 @@ static bool check_vm_type(unsigned long vm_type)
+        return kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(vm_type);
+ }
+ 
+-static void test_with_type(unsigned long vm_type, uint64_t guest_memfd_flags,
+-                          bool expect_mmap_allowed)
++static void test_with_type(unsigned long vm_type, uint64_t guest_memfd_flags)
+ {
+        struct kvm_vm *vm;
+        size_t total_size;
+@@ -272,7 +271,7 @@ static void test_with_type(unsigned long vm_type, uint64_t guest_memfd_flags,
+ 
+        test_file_read_write(fd);
+ 
+-       if (expect_mmap_allowed) {
++       if (guest_memfd_flags & GUEST_MEMFD_FLAG_MMAP) {
+                test_mmap_supported(fd, page_size, total_size);
+                test_fault_overflow(fd, page_size, total_size);
+ 
+@@ -343,13 +342,11 @@ int main(int argc, char *argv[])
+ 
+        test_gmem_flag_validity();
+ 
+-       test_with_type(VM_TYPE_DEFAULT, 0, false);
+-       if (kvm_has_cap(KVM_CAP_GUEST_MEMFD_MMAP)) {
+-               test_with_type(VM_TYPE_DEFAULT, GUEST_MEMFD_FLAG_MMAP,
+-                              true);
+-       }
++       test_with_type(VM_TYPE_DEFAULT, 0);
++       if (kvm_has_cap(KVM_CAP_GUEST_MEMFD_MMAP))
++               test_with_type(VM_TYPE_DEFAULT, GUEST_MEMFD_FLAG_MMAP);
+ 
+ #ifdef __x86_64__
+-       test_with_type(KVM_X86_SW_PROTECTED_VM, 0, false);
++       test_with_type(KVM_X86_SW_PROTECTED_VM, 0);
+ #endif
+ }
 
