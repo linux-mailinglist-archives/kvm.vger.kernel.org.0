@@ -1,171 +1,238 @@
-Return-Path: <kvm+bounces-53067-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53068-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B3D5B0D0BD
-	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 06:00:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18619B0D0C1
+	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 06:01:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 903F1542FED
-	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 04:00:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C052B1AA7D0F
+	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 04:02:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3594228C2D6;
-	Tue, 22 Jul 2025 03:59:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0813528C00B;
+	Tue, 22 Jul 2025 04:01:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="jpw39Ig5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="reloDuwb"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 025AC5223
-	for <kvm@vger.kernel.org>; Tue, 22 Jul 2025 03:59:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FB1F5223;
+	Tue, 22 Jul 2025 04:01:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753156794; cv=none; b=jO6mWrkId0paMWVRn1voryBUV9oQN/FXAQsrZXRGNX12M02HqDInqOKWp3XVavwWLwvo4y6h/MHQSxj2QukVq/76KWJHImu3lIwa3lj6DZYVhbVVKlErb/C+HTGTgBhaja7OT89o1bZboZuD5a/JBM6kFbxdy4b1pNem84pXr3Q=
+	t=1753156895; cv=none; b=KpfzX2FnYAF+e/rVtZJ0Jb0yf4LM4Dm+tijzqgBZbtpJVnZi7TH6zqj7/Bzpxn+z1W58PjO1Fx7EZTNb6jeaQfGBzZMG1TuujWdT3Vtk9Wl0JAY31NvYbIUiKc4DR9N1vB1zgE2HyxJtJZs/VLPqcU5YT9i85+a5C5RiywD+kII=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753156794; c=relaxed/simple;
-	bh=VaDzM9N9oBZ6M6v3zgmJ2Cwq3toByIhtEg86PpE28iw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZHTn8II62rweVmurqDRjLEgRY3rnTbCXZ4pZSmD+JmZYDEz56EujhRlDocfCn2CPjUuLcq7yLj7RaYCzVADm4OpTQOHFejDf30kDD7J7hKRm4n6JzX8r7umEpdlv7ylkfxfq6gr9/lEQppcOYpFQQjIc5buP+LzsFdueVM3+qLA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=jpw39Ig5; arc=none smtp.client-ip=209.85.166.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-3e2a3873132so40696645ab.2
-        for <kvm@vger.kernel.org>; Mon, 21 Jul 2025 20:59:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1753156792; x=1753761592; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=azXxDouz3VhvVI25kVzCdndCbjprC2M8LL1OP84oLB4=;
-        b=jpw39Ig55IgWohtnhEkHGGRxDLGeR6Ob/kTjju0WWjtsZlL2Ae/qE+1QBhLucF22SG
-         TkqaSbemXgQyuI2IpTQczUBpjXTb32DQrqAAWqH9fX/sPLO7U8xFJEuogBlYt2ov0iZa
-         PNHYT+EtlAqaWB3YvT549K4Rc5ydUR5IIJOEUlkBchrJxMMI+WQB07+V38KWdenvhbHL
-         gsbIiSOrXvVv23wKWx2EknpsZgGVsSb/4P8/Y7Eey9d8HvnBG7OaU2YubM2wmrzBU2O3
-         /Z3TvdeDYcMiTA+LgdX94tMuJ/ud3mWIH1+2BeDa1P4cbgeKvQp/Nc4ASX9wFD1CpTXh
-         BudA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753156792; x=1753761592;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=azXxDouz3VhvVI25kVzCdndCbjprC2M8LL1OP84oLB4=;
-        b=jUIaGTXXfZ1e/os+CTMy6Ilh6eD2sWSAL3EWKA/idYVL4YBZxnRtDE4FrCDTjq69Fc
-         PSGwfu4em5el/G9+aIIAWzlDPp7+rJkvrF7TCbsM2sfUYYbTIm/n2T3PHe3d8IGE7g19
-         i6VOg8FC3RmlfAX4kjshg3n/BLjxMUOUc831ctmZXFqpMT+w9/GYrqsTUNTwxErwYCTG
-         we3eLpevuqAPdLWiGFk8X4gqs/ODG5RSqqzFJmJDphafg76fCqGu0kn6pIzKsguyqkQp
-         sBiTpIC0DoQLJeUCqYeQhAN4nLNSJiff88q8OgpHaVWIwEXb642RGpsKWq4rFO30rOMI
-         RdTw==
-X-Forwarded-Encrypted: i=1; AJvYcCWPal3kg26fvjYE+sG+ZCFxmJbVZN+Y7DMvswKvqZ5MPIM8sBLA+pBC4ayrRTXQR/9sCo4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxhrte0bAyhIVcutu8eJXwKcafn0i6JoJUSYS124/5lPoegfbzA
-	wN5o8rD6wsQDlBPnFw1fm80NF5lpDX51r0JncWG3UIv02Ke5ozGfF6JvKFW6uIp2URueX9SBgGC
-	bqNnOj3eBniVnhZN8I/sQSkJr7Brd58O+t9Ew72v76g==
-X-Gm-Gg: ASbGncvclLAEmRDxSySXw43N+6nSwsjzFjydhKbgsx1IUY2lMjON74UadSYtM8mIxKZ
-	mTyc9eLW8moSzg4SPC+mLJYyGgb3vm6aKV5UJPnjo/uqRAKwh1D0T4MPYH5mOphAMJ4mVuw+4tT
-	MkbPsi8U5FiU17cmyld12GEDOlDQ/zO5r5y7wnPMQ8rEEsKLC+0WTgDaIJvLWLnBY3JD96GcxJX
-	iKEf/sF
-X-Google-Smtp-Source: AGHT+IHpX4gv3L9qRgmkg5vRrd6Bn1uOwCgW3ASTBkfj3oy85sashnMtNel4xRNvCLmx3HyMPs1rhWWMG3wCUitrJq8=
-X-Received: by 2002:a05:6e02:1a2d:b0:3e2:9f01:a87f with SMTP id
- e9e14a558f8ab-3e29f01aacamr172092815ab.22.1753156791976; Mon, 21 Jul 2025
- 20:59:51 -0700 (PDT)
+	s=arc-20240116; t=1753156895; c=relaxed/simple;
+	bh=hd0DO3IvY7D/o1H3RXDIIZ4Xokoc9Zt5xzE9us69fXY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ipbBJjIDkuC68cfvBRhT8SJcER1ZeKt7MGApu7LqSqsjD7ebgSYZSfz9Z3drwltPM7mYnyb42njyeU34qcag793yI5rSjFVbCczh7pfjMcEE7fHqHu1nlcnrW/2m5Pg3WQ96MKah/vBY2Vc2Pgsf6rmcjgz2Y80DQUBWgDp0w3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=reloDuwb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67DFFC4CEEB;
+	Tue, 22 Jul 2025 04:01:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753156894;
+	bh=hd0DO3IvY7D/o1H3RXDIIZ4Xokoc9Zt5xzE9us69fXY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=reloDuwbj2E9SGlqgx3RNS2JkQMF8PnexnGVFb3EyMPAGubdZEPBzWjfNMR2JJE7A
+	 m5+plSlsZ6v2KtLe1nv0cFa6klRySzyZteUvEg+eUW81dZc8JZDb+ApCHlWe/4N20+
+	 H2Cwcq7yDorGXCvfuLuXKfejMcaxZx585LbYr8v8WrLr0tt77eW8ZqTbAyglzRFJ6J
+	 F433LzMIsrGKIjxjZPFqCQvUDBuKnCg5nuakM6GUwiDrtCJcc3poZwWeiqndTOjapr
+	 GqJLiHmsxN3tilTLBeCkP89xf0FrGZLsGWTHyMW/IlghGaOiv4T0jtLm5mtNPVM9gx
+	 HGfciKJSMpQ5Q==
+Message-ID: <577c103b-f68f-4748-a7ba-3e88fc71f8d7@kernel.org>
+Date: Mon, 21 Jul 2025 23:01:31 -0500
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250721-pmu_event_info-v4-0-ac76758a4269@rivosinc.com>
-In-Reply-To: <20250721-pmu_event_info-v4-0-ac76758a4269@rivosinc.com>
-From: Anup Patel <anup@brainfault.org>
-Date: Tue, 22 Jul 2025 09:29:40 +0530
-X-Gm-Features: Ac12FXzjUPyCjGixcXNmSF9Z7RGo8cjqQ1deNGPVZVPzKJzPPazl7D1wVYDTxbU
-Message-ID: <CAAhSdy2XM+3UQD0FZehJnmCbjwRMCZQpt1cEkb4gmJu+LFsaKQ@mail.gmail.com>
-Subject: Re: [PATCH v4 0/9] Add SBI v3.0 PMU enhancements
-To: Will Deacon <will@kernel.org>
-Cc: Mark Rutland <mark.rutland@arm.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Mayuresh Chitale <mchitale@ventanamicro.com>, 
-	linux-riscv@lists.infradead.org, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org, Atish Patra <atishp@rivosinc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v9 9/9] PCI: Add a new 'boot_display' attribute
+To: Bjorn Helgaas <helgaas@kernel.org>
+Cc: David Airlie <airlied@gmail.com>, Bjorn Helgaas <bhelgaas@google.com>,
+ Alex Deucher <alexander.deucher@amd.com>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ Simona Vetter <simona@ffwll.ch>, Lukas Wunner <lukas@wunner.de>,
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
+ David Woodhouse <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>,
+ Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+ Robin Murphy <robin.murphy@arm.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+ "open list:DRM DRIVERS" <dri-devel@lists.freedesktop.org>,
+ open list <linux-kernel@vger.kernel.org>,
+ "open list:INTEL IOMMU (VT-d)" <iommu@lists.linux.dev>,
+ "open list:PCI SUBSYSTEM" <linux-pci@vger.kernel.org>,
+ "open list:VFIO DRIVER" <kvm@vger.kernel.org>,
+ "open list:SOUND" <linux-sound@vger.kernel.org>,
+ Daniel Dadap <ddadap@nvidia.com>,
+ Mario Limonciello <mario.limonciello@amd.com>
+References: <20250722015934.GA2763711@bhelgaas>
+Content-Language: en-US
+From: Mario Limonciello <superm1@kernel.org>
+In-Reply-To: <20250722015934.GA2763711@bhelgaas>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Will,
 
-On Tue, Jul 22, 2025 at 8:45=E2=80=AFAM Atish Patra <atishp@rivosinc.com> w=
-rote:
->
-> SBI v3.0 specification[1] added two new improvements to the PMU chaper.
-> The SBI v3.0 specification is frozen and under public review phase as
-> per the RISC-V International guidelines.
->
-> 1. Added an additional get_event_info function to query event availablity
-> in bulk instead of individual SBI calls for each event. This helps in
-> improving the boot time.
->
-> 2. Raw event width allowed by the platform is widened to have 56 bits
-> with RAW event v2 as per new clarification in the priv ISA[2].
->
-> Apart from implementing these new features, this series improves the gpa
-> range check in KVM and updates the kvm SBI implementation to SBI v3.0.
->
-> The opensbi patches have been merged. This series can be found at [3].
->
-> [1] https://github.com/riscv-non-isa/riscv-sbi-doc/releases/download/v3.0=
--rc7/riscv-sbi.pdf
-> [2] https://github.com/riscv/riscv-isa-manual/issues/1578
-> [3] https://github.com/atishp04/linux/tree/b4/pmu_event_info_v4
->
-> Signed-off-by: Atish Patra <atishp@rivosinc.com>
-> ---
-> Changes in v4:
-> - Rebased on top of v6.16-rc7
-> - Fixed a potential compilation issue in PATCH5.
-> - Minor typos fixed PATCH2 and PATCH3.
-> - Fixed variable ordering in PATCH6
-> - Link to v3: https://lore.kernel.org/r/20250522-pmu_event_info-v3-0-f7bb=
-a7fd9cfe@rivosinc.com
->
-> Changes in v3:
-> - Rebased on top of v6.15-rc7
-> - Link to v2: https://lore.kernel.org/r/20250115-pmu_event_info-v2-0-8481=
-5b70383b@rivosinc.com
->
-> Changes in v2:
-> - Dropped PATCH 2 to be taken during rcX.
-> - Improved gpa range check validation by introducing a helper function
->   and checking the entire range.
-> - Link to v1: https://lore.kernel.org/r/20241119-pmu_event_info-v1-0-a4f9=
-691421f8@rivosinc.com
->
-> ---
-> Atish Patra (9):
->       drivers/perf: riscv: Add SBI v3.0 flag
->       drivers/perf: riscv: Add raw event v2 support
->       RISC-V: KVM: Add support for Raw event v2
->       drivers/perf: riscv: Implement PMU event info function
->       drivers/perf: riscv: Export PMU event info function
->       KVM: Add a helper function to validate vcpu gpa range
->       RISC-V: KVM: Use the new gpa range validate helper function
->       RISC-V: KVM: Implement get event info function
->       RISC-V: KVM: Upgrade the supported SBI version to 3.0
->
->  arch/riscv/include/asm/kvm_vcpu_pmu.h |   3 +
->  arch/riscv/include/asm/kvm_vcpu_sbi.h |   2 +-
->  arch/riscv/include/asm/sbi.h          |  13 +++
->  arch/riscv/kvm/vcpu_pmu.c             |  75 ++++++++++++-
->  arch/riscv/kvm/vcpu_sbi_pmu.c         |   3 +
->  arch/riscv/kvm/vcpu_sbi_sta.c         |   6 +-
->  drivers/perf/riscv_pmu_sbi.c          | 191 +++++++++++++++++++++++++---=
-------
->  include/linux/kvm_host.h              |   2 +
->  include/linux/perf/riscv_pmu.h        |   1 +
->  virt/kvm/kvm_main.c                   |  21 ++++
->  10 files changed, 258 insertions(+), 59 deletions(-)
 
-Are you okay with this series going through the KVM RISC-V tree ?
+On 7/21/25 8:59 PM, Bjorn Helgaas wrote:
+> On Mon, Jul 21, 2025 at 07:28:07PM -0500, Mario Limonciello wrote:
+>> On 7/21/25 6:00 PM, Bjorn Helgaas wrote:
+>>> On Fri, Jul 18, 2025 at 12:44:11PM -0500, Mario Limonciello wrote:
+>>>> On 7/18/2025 12:36 PM, Bjorn Helgaas wrote:
+>>>>> On Fri, Jul 18, 2025 at 12:29:05PM -0500, Mario Limonciello wrote:
+>>>>>> On 7/18/2025 12:25 PM, Bjorn Helgaas wrote:
+>>>>>>> On Thu, Jul 17, 2025 at 12:38:12PM -0500, Mario Limonciello wrote:
+>>>>>>>> From: Mario Limonciello <mario.limonciello@amd.com>
+>>>>>>>>
+>>>>>>>> On systems with multiple GPUs there can be uncertainty which GPU is the
+>>>>>>>> primary one used to drive the display at bootup. In some desktop
+>>>>>>>> environments this can lead to increased power consumption because
+>>>>>>>> secondary GPUs may be used for rendering and never go to a low power
+>>>>>>>> state. In order to disambiguate this add a new sysfs attribute
+>>>>>>>> 'boot_display' that uses the output of video_is_primary_device() to
+>>>>>>>> populate whether a PCI device was used for driving the display.
+>>>>>>>
+>>>>>>>> +What:		/sys/bus/pci/devices/.../boot_display
+>>>>>>>> +Date:		October 2025
+>>>>>>>> +Contact:	Linux PCI developers <linux-pci@vger.kernel.org>
+>>>>>>>> +Description:
+>>>>>>>> +		This file indicates that displays connected to the device were
+>>>>>>>> +		used to display the boot sequence.  If a display connected to
+>>>>>>>> +		the device was used to display the boot sequence the file will
+>>>>>>>> +		be present and contain "1".
+>>>>>>>
+>>>>>>>>      int __must_check pci_create_sysfs_dev_files(struct pci_dev *pdev)
+>>>>>>>>      {
+>>>>>>>> +	int retval;
+>>>>>>>> +
+>>>>>>>>      	if (!sysfs_initialized)
+>>>>>>>>      		return -EACCES;
+>>>>>>>> +	retval = pci_create_boot_display_file(pdev);
+>>>>>>>
+>>>>>>> In addition to Mani's question about whether /sys/bus/pci/ is
+>>>>>>> the right place for this (which is a very good question), it's
+>>>>>>> also been pointed out to me that we've been trying to get rid
+>>>>>>> of pci_create_sysfs_dev_files() for years.
+>>>>>>>
+>>>>>>> If it's possible to make this a static attribute that would be
+>>>>>>> much, much cleaner.
+>>>>>>
+>>>>>> Right - I tried to do this, but the problem is at the time the
+>>>>>> PCI device is created the information needed to make the
+>>>>>> judgement isn't ready.  The options end up being:
+>>>>>> * a sysfs file for every display device with 0/1
+>>>>>> * a sysfs file that is not accurate until later in the boot
+>>>>>
+>>>>> What's missing?  The specifics might be helpful if someone has
+>>>>> another crack at getting rid of pci_create_sysfs_dev_files() in
+>>>>> the future.
+>>>>
+>>>> The underlying SCREEN_INFO code tries to walk through all the PCI
+>>>> devices in a loop, but at the time all the devices are walked the
+>>>> memory regions associated with the device weren't populated.
+>>>
+>>> Which loop are you referring to that walks through all the PCI
+>>> devices?  I see this:
+>>>
+>>>     efifb_set_system
+>>>       for_each_pci_dev(dev)
+>>>
+>>> but that only looks at VGA devices and IIUC you also want to look at
+>>> non-VGA GPUs.
+> 
+> [I assume the loop is the "while (pdev =
+> pci_get_base_class(PCI_BASE_CLASS_DISPLAY))" in
+> __screen_info_pci_dev(), which indeed walks through all known PCI
+> devices]
+> 
+>>> I don't see a loop in *this* series, where the screen_info path looks
+>>> like this:
+>>>
+>>>     pci_create_boot_display_file
+>>>       video_is_primary_device
+>>>         screen_info_pci_dev      # added by "fbcon: Use screen info to find primary device"
+>>>           screen_info_resources
+>>>           __screen_info_pci_dev
+>>>
+>>> and we're basically matching the screen_info base/address with BAR
+>>> values.
+>>>
+>>> The usual problem is that BARs may not have been assigned by the
+>>> time pci_device_add() -> device_add() creates the static
+>>> attributes.
+>>>
+>>> So we call pci_assign_unassigned_root_bus_resources() to assign
+>>> all the BARs.  Then we call pci_create_sysfs_dev_files(), where
+>>> pci_create_resource_files() creates a "resource%d" file for each
+>>> BAR.
+>>>
+>>> But since we're trying to find the GPU that was used by BIOS, I
+>>> assume its BARs were programmed by BIOS and we shouldn't have to
+>>> wait until after pci_assign_unassigned_root_bus_resources().
+>>
+>> Yes it was screen_info_pci_dev() and __screen_info_pci_dev().  The
+>> resources weren't ready on the first call into
+>> __screen_info_pci_dev().
+>>
+>> That's why the attribute needed to be created later.
+> 
+> I don't understand this.  IIUC, screen_info contains addresses
+> programmed by BIOS.  If we want to use that to match with a PCI
+> device, we have to compare with the BAR contents *before* Linux does
+> any assignments of its own.
+> 
+> So the only thing this should depend on is the BAR value at BIOS ->
+> Linux handoff, which we know at the time of device_add(), and we
+> should be able to do something like this:
+> 
+>    bool pci_video_is_primary_device(struct pci_dev *pdev)
+>    {
+>      struct screen_info *si = &screen_info;
+>      struct resource res[SCREEN_INFO_MAX_RESOURCES];
+>      ssize_t i, numres;
+> 
+>      numres = screen_info_resources(si, res, ARRAY_SIZE(res));
+>      ...
+> 
+>      for (i = 0; i < numres; ++i) {
+>        if (pci_find_resource(pdev, &res[i]))
+>          return true;
+>      }
+> 
+>      return false;
+>    }
+> 
+>    static umode_t pci_dev_boot_display_is_visible(...)
+>    {
+>      struct pci_dev *pdev = to_pci_dev(kobj_to_dev(kobj));
+> 
+>      if (pci_video_is_primary_device(pdev))
+>        return a->mode;
+> 
+>      return 0;
+>    }
+> 
+> We should be able to check each BAR of each device in this path, with
+> no loop through the devices at all:
+> 
+>    pci_device_add
+>      device_add
+>        device_add_attrs
+>          device_add_groups
+>            ...
+>              create_files
+>                grp->is_visible()
+>                  pci_dev_boot_display_is_visible
+> 
+> Bjorn
 
-Regards,
-Anup
+You're spot on, I did a test and this works.  I'll clean it up and put 
+it on the list and we can decide between this way and moving to drm.
+
 
