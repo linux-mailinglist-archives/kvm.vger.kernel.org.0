@@ -1,219 +1,240 @@
-Return-Path: <kvm+bounces-53102-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53103-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42C9FB0D4E2
-	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 10:45:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 928E4B0D5AA
+	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 11:18:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F01D547B39
-	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 08:44:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4832B188367E
+	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 09:18:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E5282D8DA0;
-	Tue, 22 Jul 2025 08:44:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 728E02DAFB8;
+	Tue, 22 Jul 2025 09:18:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YkUBD3Iu"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="Fx0ixECH"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20CD72D46A3
-	for <kvm@vger.kernel.org>; Tue, 22 Jul 2025 08:44:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE21C227E8F
+	for <kvm@vger.kernel.org>; Tue, 22 Jul 2025 09:18:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753173876; cv=none; b=rEYmcrWHZd6SjniC4w3XAj7/muY+NJ7hTSxxq7wE0lpv1EabCAlw37/cwQ9/RDRV6VVcB3ZJsdCrlqqI13gxoa5AsvIbN5YivHo/CbNpV6JBhOxPJRw2GIHr7IzA51RRBGInlawjgb/Ughz4y3Jg/FiPqZBW1vyG91AbdaYpQ9U=
+	t=1753175895; cv=none; b=oitPZHYIcvFzp9iPTmOr4vIfJw7CKpBCYqbYgrbejrXrEWPTRd+CZPXlTvjhnrSnI2Xskm8P9V//VmHSzOfobNfBTXzElfV7RjwpngDW5s0RxOOA8jtK/lDvDZjeaZ8TTsWaH+8kJHMVeo39iImgKZnefEHlsqsmIHGFzd71+PA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753173876; c=relaxed/simple;
-	bh=oG+uGXiayq3wi+MQ+WXlyYFLXj87LJort2kb/5ueY80=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QQRoClmmjiF1PwVpdGX3kqz2XsHIHQWP9MPfyzcbUSBtbYmwvBru+iCwxgEDjIl3PEnlzt5z8h8MRoBaO6rdMpXEafv/GUrHq5WJIfCI8aJAl4QImUrHOF4b/3rm+niwzKW4huutlDNOfiERxo6JqvkdyzTKPbqotbNafio6Irc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YkUBD3Iu; arc=none smtp.client-ip=209.85.160.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4ab3855fca3so185521cf.1
-        for <kvm@vger.kernel.org>; Tue, 22 Jul 2025 01:44:34 -0700 (PDT)
+	s=arc-20240116; t=1753175895; c=relaxed/simple;
+	bh=hhQufx2HD4Ts5oBIe9054Ablz+7kZBZZDBYP7X7WX8w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VaybuvNXo6ASlVDMynnONodak4wIDLc4eS7MvulEshEExHrmV9BI+hYxqFYm2kg6ZkP6gKt+V3QdBM7yZkExJ4GjRPSJ+5Yd63hnbCr2QXhgBjPSEssRJWkYogoHI4sjjXmCHiQ81omQijxkokYtDQDYgibNZGaCmAzn3HdVPNo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=Fx0ixECH; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3a503d9ef59so3755471f8f.3
+        for <kvm@vger.kernel.org>; Tue, 22 Jul 2025 02:18:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753173874; x=1753778674; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=dPBkvCcfAeL2dNZt7wG4lYGcQyDWbM6vpCIRnJhXb7E=;
-        b=YkUBD3IuiLqdEIpnIC0UDpZTxYwx63bVCcQYJlaUJaw5STnK8JsfD8gOYlMGSTTjKX
-         xnO6RFsOmJ87kyYj8Y9eu896s2O7bqe4w62EL+ac0CPOTAtjkGgZ2qacXL4dm4pKRSpr
-         PCUMwm8u3moKBKEr7QGaEmQJlKpMh0mCEseXF7I11XTqaJbiGFSPKJESfMmZodu2i/oR
-         QYPqmRpBaZLHkN20bhpxBG+/+Rq5KxXF0Q01AjgtpNMsgdi1YUBU1YzDCsLV1ar+U9cl
-         syRAU3zym8gVBhGwJjtPPEPFJxN2lZ/HWuTwPtQe0MsVZJdo5TYgkHsh6MKr4Y9P7sit
-         CF7g==
+        d=ventanamicro.com; s=google; t=1753175892; x=1753780692; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=PHFy2ib8R7VJ1RgEKC7LoLc8P9a6wfUZ5RjA5auf7Xg=;
+        b=Fx0ixECHumfJi5nWtnbjmk+Af60kjKKZDYiDS7KVN/ewMRwgEdsb5MoNOFHwpX/aCx
+         UKY+/h+GP5Hj3Ifl9afnojyNnHuSvxkmpr5yx6TXD9wmoQt/zGUuEvgRvP7UQfi7My8l
+         nINTP52B7rtB8y8yAnmlDT5HD4mloYAPq+SkSwRcobdM6uqhp5krJVKysIRWzhC/7Mk1
+         RcDAwX7qORZObPLsD6yz2jcbxErG66sN/MGuzzPPsua00sSpVPHQ7YMGRQbgwhZ2a2hN
+         OadDxfk69nCfuqbY6HKmUoWmk5CBE+oZGTftm09m2cr7CmPZKwTofz1K2xfC7xzroPZe
+         xzyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753173874; x=1753778674;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=dPBkvCcfAeL2dNZt7wG4lYGcQyDWbM6vpCIRnJhXb7E=;
-        b=YJDoYXOIu9BwKTwjrI/JYN4TUwYr06rmPZ/uJd0+jAn3k//awa/bklHsM1eNCYilQK
-         INK8v5KAA6cA0RcSLaPm/WYwW4n4rmdb/E1fnndq8jznqK0ojYl/vu4hgDbaTmkxT6L1
-         rSWn/eqhY2KcGTaHvPQlCT8wHnQ5sYGv/2FnfawtZJQRllHaKLaMV3IG/Ca0i4OZgSMz
-         ReHHdfpnQ4CQ7EwFj+WIAOYjJl6qmLSPGyafj/xJi/plRCZ1+rQg2NYAq5T8Y+LVXe5s
-         zjAe0+lTJsFJ/C5m2o1GxLeUSNLoUSF7ZM54KNdzBDwVegTKFpm3XVKxmenVr2rT/v2U
-         7QIA==
-X-Forwarded-Encrypted: i=1; AJvYcCWR81uCWkYm3EeKNNFByoXWhO7R9DlvROaHsGKFUmh/YmhZ1ZmrXn8lyZHKd4xZYqKO17w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxAdotvYRpCq5airrypiNMqw1S2MnV365/kUCD3gutlSAeIRsxh
-	hJTrALgg3VXxXNCzVKdxYelboyyj6V1Xx3dJU/8VwbnqGyZPpBJTl55EMQxLfWoihSShI6oAvqu
-	9AlZnYPsF/3av/jUgJDv0TKZo9T3CHt7V1TiNnngw
-X-Gm-Gg: ASbGncvrKtCXmmHYxw7AfC13b1hUMKjRPXB3j1jS77yUgpskkpSTS7bXNvS7Xz6sIc0
-	7aEkuoqNZq272Jf96cXPFPT3UBPcNxj4vGDN/DaP3YLkzgIvsccE4qg8lxuWd2tX/4qkcLJFKNo
-	JOFqRILUWiKhxC/0PJ/nhj9ny6Lxwuq9Sn35m/SUiJTwErO6AJen4uA5DdgbuloLZVh4OQKJrXj
-	QF9ZCW9/HJtjTMXaU6g0dLkE6KksTyv/hTM
-X-Google-Smtp-Source: AGHT+IHY1bLajV8cSDSr07UxvUVPof2BdmEX/z7/v1iwlDELsaBXQa7JYlT3T+HwWsQDpoA/9fVIqN/RA0gQKf3OZbM=
-X-Received: by 2002:a05:622a:a916:b0:4aa:cba2:2e67 with SMTP id
- d75a77b69052e-4ae5f1c81b8mr2062111cf.21.1753173873334; Tue, 22 Jul 2025
- 01:44:33 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1753175892; x=1753780692;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PHFy2ib8R7VJ1RgEKC7LoLc8P9a6wfUZ5RjA5auf7Xg=;
+        b=rR8TysMJWDTbFOlrJvb48P1vIob7ooRQ8fI2kf2fCIOtRGZG+063ja2yxTvMMMKc16
+         kRUcvsGaRN/sME3nn3mdbl3bJulpsvYfJJi8dAEfRr994VQOMsD2wAE+QK4DRJch7i7V
+         NN7CciCjRPO5IJt+FqlTnz+du3ylRtYFXJ8ymYuUIQSF0WQiDt39uEzwoGM/Q4745y7s
+         Jz8d9W0DMKJeqmO9YUHdgAmHbvcaCaS+QQ3Yglesq3Kdh+dpu+i7oU/8Lrwi94v9PfOZ
+         2+5kRh2WaW6mquzTdaCl/gmMw4j7onDcSHhaxcsTKUyC4DW6gfslb6XYaBTHWz2PDCZh
+         WTug==
+X-Forwarded-Encrypted: i=1; AJvYcCVIsr8euUmMH3nGN8DizHILhffJi7fMpcGHYMyDBwq8io7Y9f3E4UnsAfhDkut7lfTi2o0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzXSNJ46jgyd78G5+l8+E2ZxZ32fVRD1jIGVm0EdJU7n9Sw4JeZ
+	GmUN/bLcoEYfDZyt89XYCpRnaQ7xY77k2JZNdTCKjbR8MZeRkouyvH31UMYa9wa6YUk=
+X-Gm-Gg: ASbGnctbbFAE/XLGZZ407Yi9SPLf9iUVDn5fsH31k5QFe7dmMzg3RBtTEKxmqpGg+Jw
+	ffLdbzdYMMbf2jtLzyhuDBo+Vw4vIMqHwKiCBC2mSWT/QpXM7HnNefL0CzcsW/s5FH0SopdabGy
+	39y1MGvgiYgreRE6PkrNSDFBGBdpvBDZCIRKr4KQ0ktC2Hvk65aYoVnssyOoRksiMQ9q2imu/VC
+	0HAwgPDFIBMJIjrIIEvuOWd+n//eDqsO87ATQKkMe+/MwpOZ8cu4fBRB560BzpmC/ZjKZJWm8YU
+	VN4EyaNwoW96aKdw1eDtY54HPNZ7qb34DEbmkEj7ZvO4mw4IofN92bRQOUxtj+fytkM2WHp1QUU
+	u1X6dFndnjA==
+X-Google-Smtp-Source: AGHT+IHQBAZgY70xI+dtP0yh6yvLOKV0BlM/uTMSPEIciqVVZwMQSsJNaHFcQVjMoLC9XYi1w0Ju7g==
+X-Received: by 2002:a05:6000:2892:b0:3a4:f379:65bc with SMTP id ffacd0b85a97d-3b60e523efamr18492284f8f.40.1753175891891;
+        Tue, 22 Jul 2025 02:18:11 -0700 (PDT)
+Received: from localhost ([2a02:8308:a00c:e200::f15c])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b61ca48a2esm12946678f8f.51.2025.07.22.02.18.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Jul 2025 02:18:11 -0700 (PDT)
+Date: Tue, 22 Jul 2025 11:18:10 +0200
+From: Andrew Jones <ajones@ventanamicro.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, jackabt@amazon.com
+Subject: Re: [PATCH] KVM: arm64: selftest: Add standalone test checking for
+ KVM's own UUID
+Message-ID: <20250722-87ac9d7e0b27cf7c67a4fbd3@orel>
+References: <20250721155136.892255-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250717162731.446579-1-tabba@google.com> <20250717162731.446579-14-tabba@google.com>
- <aH5vNqPrUFgtZCqU@google.com> <27ac6ed0-f58a-4926-a069-8d9d7d61a41c@intel.com>
-In-Reply-To: <27ac6ed0-f58a-4926-a069-8d9d7d61a41c@intel.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Tue, 22 Jul 2025 09:43:56 +0100
-X-Gm-Features: Ac12FXwo4G2roOXpkeQ9Jh58vNuaACeOHbQjO2y_a9aub1RVWWMkoayleVat1V8
-Message-ID: <CA+EHjTzUr4K8SsvwANTkg7yd5mFZLbY1aSUB85zvd7wooizf_A@mail.gmail.com>
-Subject: Re: [PATCH v15 13/21] KVM: x86/mmu: Handle guest page faults for
- guest_memfd with shared memory
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-mm@kvack.org, kvmarm@lists.linux.dev, pbonzini@redhat.com, 
-	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
-	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
-	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
-	akpm@linux-foundation.org, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
-	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
-	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
-	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
-	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
-	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
-	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
-	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
-	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
-	ira.weiny@intel.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250721155136.892255-1-maz@kernel.org>
 
-On Tue, 22 Jul 2025 at 06:41, Xiaoyao Li <xiaoyao.li@intel.com> wrote:
->
-> On 7/22/2025 12:47 AM, Sean Christopherson wrote:
-> > On Thu, Jul 17, 2025, Fuad Tabba wrote:
-> >> From: Ackerley Tng <ackerleytng@google.com>
-> >>
-> >> Update the KVM MMU fault handler to service guest page faults
-> >> for memory slots backed by guest_memfd with mmap support. For such
-> >> slots, the MMU must always fault in pages directly from guest_memfd,
-> >> bypassing the host's userspace_addr.
-> >>
-> >> This ensures that guest_memfd-backed memory is always handled through
-> >> the guest_memfd specific faulting path, regardless of whether it's for
-> >> private or non-private (shared) use cases.
-> >>
-> >> Additionally, rename kvm_mmu_faultin_pfn_private() to
-> >> kvm_mmu_faultin_pfn_gmem(), as this function is now used to fault in
-> >> pages from guest_memfd for both private and non-private memory,
-> >> accommodating the new use cases.
-> >>
-> >> Co-developed-by: David Hildenbrand <david@redhat.com>
-> >> Signed-off-by: David Hildenbrand <david@redhat.com>
-> >> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
-> >> Co-developed-by: Fuad Tabba <tabba@google.com>
-> >> Signed-off-by: Fuad Tabba <tabba@google.com>
-> >> ---
-> >>   arch/x86/kvm/mmu/mmu.c | 13 +++++++++----
-> >>   1 file changed, 9 insertions(+), 4 deletions(-)
-> >>
-> >> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> >> index 94be15cde6da..ad5f337b496c 100644
-> >> --- a/arch/x86/kvm/mmu/mmu.c
-> >> +++ b/arch/x86/kvm/mmu/mmu.c
-> >> @@ -4511,8 +4511,8 @@ static void kvm_mmu_finish_page_fault(struct kvm_vcpu *vcpu,
-> >>                               r == RET_PF_RETRY, fault->map_writable);
-> >>   }
-> >>
-> >> -static int kvm_mmu_faultin_pfn_private(struct kvm_vcpu *vcpu,
-> >> -                                   struct kvm_page_fault *fault)
-> >> +static int kvm_mmu_faultin_pfn_gmem(struct kvm_vcpu *vcpu,
-> >> +                                struct kvm_page_fault *fault)
-> >>   {
-> >>      int max_order, r;
-> >>
-> >> @@ -4536,13 +4536,18 @@ static int kvm_mmu_faultin_pfn_private(struct kvm_vcpu *vcpu,
-> >>      return RET_PF_CONTINUE;
-> >>   }
-> >>
-> >> +static bool fault_from_gmem(struct kvm_page_fault *fault)
-> >
-> > Drop the helper.  It has exactly one caller, and it makes the code *harder* to
-> > read, e.g. raises the question of what "from gmem" even means.  If a separate
-> > series follows and needs/justifies this helper, then it can/should be added then.
->
-> there is another place requires the same check introduced by your
-> "KVM: x86/mmu: Extend guest_memfd's max mapping level to shared
-> mappings" provided in [*]
->
-> [*] https://lore.kernel.org/kvm/aH7KghhsjaiIL3En@google.com/
+Hi Marc,
 
-I guess this is meant for the patch [*], which as far as I could tell,
-isn't in the latest (-rc7) yet.
+On Mon, Jul 21, 2025 at 04:51:36PM +0100, Marc Zyngier wrote:
+> Tinkering with UUIDs is a perilious task, and the KVM UUID gets
+> broken at times. In order to spot this early enough, add a selftest
+> that will shout if the expected value isn't found.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Link: https://lore.kernel.org/r/20250721130558.50823-1-jackabt.amazon@gmail.com
+> ---
+>  tools/testing/selftests/kvm/Makefile.kvm     |  1 +
+>  tools/testing/selftests/kvm/arm64/kvm-uuid.c | 67 ++++++++++++++++++++
+>  2 files changed, 68 insertions(+)
+>  create mode 100644 tools/testing/selftests/kvm/arm64/kvm-uuid.c
+> 
+> diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
+> index ce817a975e50a..e1eb1ba238a2a 100644
+> --- a/tools/testing/selftests/kvm/Makefile.kvm
+> +++ b/tools/testing/selftests/kvm/Makefile.kvm
+> @@ -167,6 +167,7 @@ TEST_GEN_PROGS_arm64 += arm64/vgic_irq
+>  TEST_GEN_PROGS_arm64 += arm64/vgic_lpi_stress
+>  TEST_GEN_PROGS_arm64 += arm64/vpmu_counter_access
+>  TEST_GEN_PROGS_arm64 += arm64/no-vgic-v3
+> +TEST_GEN_PROGS_arm64 += arm64/kvm-uuid
+>  TEST_GEN_PROGS_arm64 += access_tracking_perf_test
+>  TEST_GEN_PROGS_arm64 += arch_timer
+>  TEST_GEN_PROGS_arm64 += coalesced_io_test
+> diff --git a/tools/testing/selftests/kvm/arm64/kvm-uuid.c b/tools/testing/selftests/kvm/arm64/kvm-uuid.c
+> new file mode 100644
+> index 0000000000000..89d9c8b182ae5
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/arm64/kvm-uuid.c
+> @@ -0,0 +1,67 @@
+> +#include <errno.h>
+> +#include <linux/arm-smccc.h>
+> +#include <asm/kvm.h>
+> +#include <kvm_util.h>
+> +
+> +#include "processor.h"
+> +
+> +/*
+> + * Do NOT redefine these constants, or try to replace them with some
+> + * "common" version. They are hardcoded here to detect any potential
+> + * breakage happening in the rest of the kernel.
+> + *
+> + * KVM UID value: 28b46fb6-2ec5-11e9-a9ca-4b564d003a74
+> + */
+> +#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_0	0xb66fb428U
+> +#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_1	0xe911c52eU
+> +#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_2	0x564bcaa9U
+> +#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_3	0x743a004dU
+> +
+> +static void guest_code(void)
+> +{
+> +	struct arm_smccc_res res = {};
+> +
+> +	smccc_hvc(ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID, 0, 0, 0, 0, 0, 0, 0, &res);
+> +
+> +	__GUEST_ASSERT(res.a0 != SMCCC_RET_NOT_SUPPORTED, "a0 = %lx\n", res.a0);
+
+Should this check res.a0 == SMCCC_RET_SUCCESS instead?
+
+> +	__GUEST_ASSERT(res.a0 == ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_0 &&
+> +		       res.a1 == ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_1 &&
+> +		       res.a2 == ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_2 &&
+> +		       res.a3 == ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_3,
+> +		       "Unexpected KVM-specific UID %lx %lx %lx %lx\n", res.a0, res.a1, res.a2, res.a3);
+> +	GUEST_DONE();
+> +}
+> +
+> +int main (int argc, char *argv[])
+> +{
+> +	struct kvm_vcpu *vcpu;
+> +	struct kvm_vm *vm;
+> +	struct ucall uc;
+> +	bool guest_done = false;
+> +
+> +	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
+> +
+> +	while (!guest_done) {
+> +		vcpu_run(vcpu);
+> +
+> +		switch (get_ucall(vcpu, &uc)) {
+> +		case UCALL_SYNC:
+> +			break;
+> +		case UCALL_DONE:
+> +			guest_done = true;
+> +			break;
+> +		case UCALL_ABORT:
+> +			REPORT_GUEST_ASSERT(uc);
+> +			break;
+> +		case UCALL_PRINTF:
+> +			printf("%s", uc.buffer);
+> +			break;
+> +		default:
+> +			TEST_FAIL("Unexpected guest exit");
+> +		}
+> +	}
+
+This is becoming a very common and useful pattern. I wonder if it's time
+for a ucall helper
+
+static void ucall_vcpu_run(struct kvm_vcpu *vcpu,
+                           void (*sync_func)(struct kvm_vcpu *, void *),
+                           void *sync_data)
+{
+        bool guest_done = false;
+        struct ucall uc;
+
+        while (!guest_done) {
+                vcpu_run(vcpu);
+
+                switch (get_ucall(vcpu, &uc)) {
+                case UCALL_SYNC:
+                        if (sync_func)
+                                sync_func(vcpu, sync_data);
+                        break;
+                case UCALL_DONE:
+                        guest_done = true;
+                        break;
+                case UCALL_ABORT:
+                        REPORT_GUEST_ASSERT(uc);
+                        break;
+                case UCALL_PRINTF:
+                        printf("%s", uc.buffer);
+                        break;
+                default:
+                        TEST_FAIL("Unexpected guest exit");
+                }
+        }
+}
 
 Thanks,
-/fuad
+drew
 
-> ---
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 1ff7582d5fae..2d1894ed1623 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
->
-> @@ -3335,8 +3336,9 @@ int kvm_mmu_max_mapping_level(struct kvm *kvm,
-> struct kvm_page_fault *fault,
->          if (max_level == PG_LEVEL_4K)
->                  return PG_LEVEL_4K;
->
-> -       if (is_private)
-> -               host_level = kvm_max_private_mapping_level(kvm, fault,
-> slot, gfn);
-> +       if (is_private || kvm_memslot_is_gmem_only(slot))
-> +               host_level = kvm_gmem_max_mapping_level(kvm, fault,
-> slot, gfn,
-> +                                                       is_private);
->          else
->                  host_level = host_pfn_mapping_level(kvm, gfn, slot);
->          return min(host_level, max_level);
->
-> >> +{
-> >> +    return fault->is_private || kvm_memslot_is_gmem_only(fault->slot);
-> >> +}
-> >> +
-> >>   static int __kvm_mmu_faultin_pfn(struct kvm_vcpu *vcpu,
-> >>                               struct kvm_page_fault *fault)
-> >>   {
-> >>      unsigned int foll = fault->write ? FOLL_WRITE : 0;
-> >>
-> >> -    if (fault->is_private)
-> >> -            return kvm_mmu_faultin_pfn_private(vcpu, fault);
-> >> +    if (fault_from_gmem(fault))
-> >> +            return kvm_mmu_faultin_pfn_gmem(vcpu, fault);
-> >>
-> >>      foll |= FOLL_NOWAIT;
-> >>      fault->pfn = __kvm_faultin_pfn(fault->slot, fault->gfn, foll,
-> >> --
-> >> 2.50.0.727.gbf7dc18ff4-goog
-> >>
->
->
+> +
+> +	kvm_vm_free(vm);
+> +
+> +	return 0;
+> +}
+> -- 
+> 2.39.2
+> 
 
