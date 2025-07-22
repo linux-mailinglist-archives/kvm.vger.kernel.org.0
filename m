@@ -1,232 +1,273 @@
-Return-Path: <kvm+bounces-53153-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53154-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C652B0E0DD
-	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 17:47:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57C20B0E0E1
+	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 17:50:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C65D316D09A
-	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 15:47:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 581173B829E
+	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 15:49:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAEC5279DAE;
-	Tue, 22 Jul 2025 15:47:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5556127A112;
+	Tue, 22 Jul 2025 15:50:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U3eI/avi"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="wgB2oVdy"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2054.outbound.protection.outlook.com [40.107.244.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB9432236E8;
-	Tue, 22 Jul 2025 15:47:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753199249; cv=none; b=GhdNUl6EoCT7oqH5t8+v6KB1BZHfU8jlUyiEqdKqSJntJFng1fVF0oOvF2+JXNlwn/TKTkWkaI7waNbhbqi1vE7yw5H64jGm9+nKCuCtQvQM3nE4DJ/qsoTLwT/O4A/xNWHBqzF8i3DCpVmHelnLf+jZuSpeZ5+JLSQUxdxA3do=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753199249; c=relaxed/simple;
-	bh=M3Mc51dw7b8Gz9b/pdMV6wSzhw/d2UXhK7/Q+XXRt9c=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=l9IzjQRXImSQCGmUqIqgSFPU/RsuyZAOZbeW4UuSrsw7XIhkgGsD5EcyxkUUz+RYaQpgiJrxwEhPjC2pzORjcIHORJia8q0dXyQPzJ7HjX3Pv343bKARcjQ8xmht9GTFeMSFja7MP6chkebxqzyHCAkHWQvoGgZ//47zO/bfIVM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U3eI/avi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BBC1C4CEEB;
-	Tue, 22 Jul 2025 15:47:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753199249;
-	bh=M3Mc51dw7b8Gz9b/pdMV6wSzhw/d2UXhK7/Q+XXRt9c=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=U3eI/aviIJXp8gXKT1xbu+rMiWmUs7riUKvyqXgOQ+FepLvXOfJPUAtaeByyVeygF
-	 kxYHkSq9sEubs3CmSIQ4L8sUo08d7jLBwKQX9gM1C0hjs8oTyb/dLu3WVQK25AUNWe
-	 /DbCBI3o6o1qcXSKoeSr1MapTL4L5ANg8tC2x8e37JEqPwJRCwQV+0QN0KXwwQpbDK
-	 UijxJh72OZFEhsu4YCP4o4gtBhTpRD6LRXe0XvB9XOdvzqFB8XDbJpFk1xCxGoy+bA
-	 oPEkQxjUulFPw2ZrCzLBiJTbNUOlZLVpqMsBOzRpLd0VSxTzQNLx9c2fTGZ7Sil44k
-	 8TjrJJCjgHx8Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1ueFDD-000P2e-0K;
-	Tue, 22 Jul 2025 16:47:27 +0100
-Date: Tue, 22 Jul 2025 16:47:26 +0100
-Message-ID: <86h5z48bxt.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Andrew Jones <ajones@ventanamicro.com>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	jackabt@amazon.com
-Subject: Re: [PATCH] KVM: arm64: selftest: Add standalone test checking for KVM's own UUID
-In-Reply-To: <20250722-87ac9d7e0b27cf7c67a4fbd3@orel>
-References: <20250721155136.892255-1-maz@kernel.org>
-	<20250722-87ac9d7e0b27cf7c67a4fbd3@orel>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EC81156228;
+	Tue, 22 Jul 2025 15:49:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753199401; cv=fail; b=Eb1PX7/DhiqNqGoQtuGNPqT7BEDPo4yYf87fguURwgTB2DXxCHfqXkXrYv+AGesg1G4QRXu752du69lcvjCbOTTx/hhU8JGJSTiUUEUwKKVpZioquXIgJtriMxUol7B0NbziT/MWjSzWLpfyBptgptWfCJ5We3ypPLyr3H8PBls=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753199401; c=relaxed/simple;
+	bh=5tVfwIZAc5vMjGHdz/25lf0+H7NlQ97gsF6O8Hfz63k=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=UVqUDAozHE2YUyVPfrRleOl+DFucjq96dT0vZ1BfXh2xLOxUIHiiAwNFgtTvvlBXYF8ZgxnHCgT/gyFXeFV8RKbwAHOw0mZmhkdPrf7ImHLy5YmD4nLV3LFjU7QOJSbBdvVia/r/1KpsXiLm9fymCiE0brO2cx4mm3lw6S4Xpk0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=wgB2oVdy; arc=fail smtp.client-ip=40.107.244.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=F4F83gkWSew0RnPA5hCv7rYHs4NVKuY52Er0u+G2GFdlHg3TER5QkMnotlgP3VZruB9shCf+AIKiwRoUW73K6SjcJcEvgyYjU248GkO9+jobzdMs3WL9V/+yaqccLV92aYcYYAo7F98OuSN+gg0MS526lMAKOE53579ooo5l0ETVjJremDf2LYpu3yCmDVTZxhsNv5ZE4I6b8dPJ/11LAWUeUEnp7yPYLabQTzWsMd/tYleHg86FTmT0vvEUc+1U4ULcFzpSoqPhoSA9jZHesjsx6OZ71WyEQKGTJtVCJQW8Idqeow0xJt2CeHJ8S9nSpIrtFl4tTCkEfSusivBc1A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ttTtSFwOOSjtkAYK4J6wDUfcEM67+Jzr5qnUBviQmiM=;
+ b=NGk0pP0z/3Z+DppxET1JxxpqzSHm75GYM4FmdECgqES5vwdvltjWvxsng9sNMjj4aW4aAAw0i8f/aVmHvJhfM1agnxX4jnw+GguxC8ggqK2uxaaq4zfYzC7hok20DkHF2ZejN3L2BptObxso5XTYcyMRJmwV6/nAH3dDwcfjl9fOSLvC2mQEBrZYcI7T63PcrNcSEyxi3WjN/UVJ4vH72vETibIA+Sh99d1w3F8arTfB/6DF/DJgq7E0jMaFdVysE79EarwzcQF3ai0262xFsKpIZCmvagVT34BChSqhoW23gxWuGTFa64lxZ08k3unjUfU61hObPOgNOvEeMCCcNA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ttTtSFwOOSjtkAYK4J6wDUfcEM67+Jzr5qnUBviQmiM=;
+ b=wgB2oVdyIPKJWGAohQyAtzZVo30kqhNYzwnHN2z6Qyi5ARJXAltYjgl25hmdsahiTSl5CemfMZrl6m5KD+l6/I/OB4bb4L8mLKKCy6YxNxEc8g9V9R2U41uBjLlB5rhNxffo6b4e97lANsZw37+/aR1vlMa2Sgdg76x4cdEt6AE=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from SJ5PPFF6E64BC2C.namprd12.prod.outlook.com
+ (2603:10b6:a0f:fc02::9aa) by CYYPR12MB8937.namprd12.prod.outlook.com
+ (2603:10b6:930:cb::15) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8943.29; Tue, 22 Jul
+ 2025 15:49:57 +0000
+Received: from SJ5PPFF6E64BC2C.namprd12.prod.outlook.com
+ ([fe80::40bb:ae48:4c30:c3bf]) by SJ5PPFF6E64BC2C.namprd12.prod.outlook.com
+ ([fe80::40bb:ae48:4c30:c3bf%8]) with mapi id 15.20.8722.031; Tue, 22 Jul 2025
+ 15:49:57 +0000
+Message-ID: <ba19f253-e46f-4cb4-9681-fa1d0b43bc31@amd.com>
+Date: Tue, 22 Jul 2025 21:19:31 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V9 0/7] Add NUMA mempolicy support for KVM guest-memfd
+To: David Hildenbrand <david@redhat.com>, seanjc@google.com, vbabka@suse.cz,
+ willy@infradead.org, akpm@linux-foundation.org, shuah@kernel.org,
+ pbonzini@redhat.com, brauner@kernel.org, viro@zeniv.linux.org.uk
+Cc: ackerleytng@google.com, paul@paul-moore.com, jmorris@namei.org,
+ serge@hallyn.com, pvorel@suse.cz, bfoster@redhat.com, tabba@google.com,
+ vannapurve@google.com, chao.gao@intel.com, bharata@amd.com, nikunj@amd.com,
+ michael.day@amd.com, shdhiman@amd.com, yan.y.zhao@intel.com,
+ Neeraj.Upadhyay@amd.com, thomas.lendacky@amd.com, michael.roth@amd.com,
+ aik@amd.com, jgg@nvidia.com, kalyazin@amazon.com, peterx@redhat.com,
+ jack@suse.cz, rppt@kernel.org, hch@infradead.org, cgzones@googlemail.com,
+ ira.weiny@intel.com, rientjes@google.com, roypat@amazon.co.uk,
+ ziy@nvidia.com, matthew.brost@intel.com, joshua.hahnjy@gmail.com,
+ rakie.kim@sk.com, byungchul@sk.com, gourry@gourry.net,
+ kent.overstreet@linux.dev, ying.huang@linux.alibaba.com, apopple@nvidia.com,
+ chao.p.peng@intel.com, amit@infradead.org, ddutile@redhat.com,
+ dan.j.williams@intel.com, ashish.kalra@amd.com, gshan@redhat.com,
+ jgowans@amazon.com, pankaj.gupta@amd.com, papaluri@amd.com,
+ yuzhao@google.com, suzuki.poulose@arm.com, quic_eberman@quicinc.com,
+ aneeshkumar.kizhakeveetil@arm.com, linux-fsdevel@vger.kernel.org,
+ linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+ linux-security-module@vger.kernel.org, kvm@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-coco@lists.linux.dev
+References: <20250713174339.13981-2-shivankg@amd.com>
+ <bdce1a12-ab73-4de1-892b-f8e849a8ab51@redhat.com>
+Content-Language: en-US
+From: Shivank Garg <shivankg@amd.com>
+In-Reply-To: <bdce1a12-ab73-4de1-892b-f8e849a8ab51@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: PN3PR01CA0161.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:c8::17) To SJ5PPFF6E64BC2C.namprd12.prod.outlook.com
+ (2603:10b6:a0f:fc02::9aa)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: ajones@ventanamicro.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, will@kernel.org, mark.rutland@arm.com, jackabt@amazon.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ5PPFF6E64BC2C:EE_|CYYPR12MB8937:EE_
+X-MS-Office365-Filtering-Correlation-Id: af2fd44f-bb57-4afa-d969-08ddc9376881
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?ek5FajlYd01JTWtub1Z1czhhdU5Uc20vQXNZOXh6OGFQK2xoMmNHVmdKTk5h?=
+ =?utf-8?B?TmQ2M0xseVJCL2FGRllDNktLbE10UVpsR05kRWxyUktkVWk1UENxd0J4VGlk?=
+ =?utf-8?B?ekZmdFhZZmNaWU5kYkk0UFl3MURoWkgxdjgwUkdFWUhNay8wcVM0RW9ERTVl?=
+ =?utf-8?B?K3AySFhLb1k2YXJLTmk2by9makc5eEwwU2t1VGQ4bi85ejkwVFFLTVE0V25N?=
+ =?utf-8?B?ZGY3aE04VFRReGRrN0FxOE5zbFhKM0JOZVhzNGJVcStad2F6dDA4V3pucjVt?=
+ =?utf-8?B?YW1rc0p0YzNXZzFRYUpwL0U5UDExRkpKWHdzVitYTVlPbjBTVEdmTWtOT2Nq?=
+ =?utf-8?B?RHJTUGVuS0kvQlNXeXRMZmNyaTBLTFNUOUJ4NU1tMjlIV2NZeVdTMnhPTmUx?=
+ =?utf-8?B?d0xodXZ6QmlMaHRaQ2Q3NE03MjdNTGVOb3Y0eWU0V0VEQkEwL0FBZm1EZGJB?=
+ =?utf-8?B?R3MrWHVrWnpzZkdMNFZFVWJaOXpHR3pxWUR1WmQxQ2M4OEh1bGdPaVcyZlpu?=
+ =?utf-8?B?Wm04bmU0S0V3L0poUWJlVTNCMGRnMUQ1V3EySDFEeGlYY2tOeERTQ3ZkakFH?=
+ =?utf-8?B?ZjZ0SnFCVDJBVXZaNWkyS2NEcnFSaStyOElvRktmODZrQVljbXJ5UUp0VmJ0?=
+ =?utf-8?B?UFNRdGFHeVVkMC9GNHUyWWFWMmJubmtTOFFFaFl4cm5QOE1QQ2hEMHd6WVdP?=
+ =?utf-8?B?U1p6Z1c5K3ovRU5XT0IvcXVZek5ETkNoWjFmZmd3WGdWVDFaSC9zazBPVW1N?=
+ =?utf-8?B?Q0hET2g0eXJ4U0ZlZFdOczZpTDkwVi9qV1o3VDMydHltT1V3bDVra2hKWHZp?=
+ =?utf-8?B?RWRXQ201cnJvWVc1QWZCVnV2RHNNdGwwRDVRRWVFSCtrY05ieTU5NmRQd21n?=
+ =?utf-8?B?ay92NzlxNXVLaVUyenpaU29iaEZ2MUxJSXNtUDF2UC9LZXBwWWM4Sk9PcXMz?=
+ =?utf-8?B?aGpPY2N1YUNLTGdybUwxZWYzQjB3OW1XUkU2QmREenhtZlVtYzVvczNIeGpo?=
+ =?utf-8?B?cG1yRHdxRE1DZThGc1RCK3pWVEpJVm9MRGEzWGdOeDBXR2RNeEdPQ3JyWSto?=
+ =?utf-8?B?YVFSV1F2RmVWNVZUMWw0UlJ2Y2o3Zm1BaW92VkY4RTV5aWltR3hXTkp0UzI5?=
+ =?utf-8?B?cHFCekkzZlhqdXBtbHdGckhwcnVOYkl4Vzc5bjZabkdTR0dzUHZuempMSGEx?=
+ =?utf-8?B?TjJ1Z2VmcEVCUW4xZUdTLzNJL2ZjY1h0RVEwYmtNZ0t0eC9sKy9ic3d1ZjVx?=
+ =?utf-8?B?dXpkb29icHpiS21jU081dEl6S1BkRGc3RWNMY1R3bC9BdWk4dTNWZURCVUNu?=
+ =?utf-8?B?ZS8yRXRqY284WlBBQ0NndmtZT05MV2dPcklaSmlaMmlQVG00TkszNjNNNFFX?=
+ =?utf-8?B?azkrU2I4OW9sdkN4emhQdnM4bDlOUlpsNWgyNk9rcXR3bjUreS93RW92d0Jv?=
+ =?utf-8?B?cnVvcExla0Q0bktFcHhpdllwcWlDVktRZHFVZFc0MDQ4REtoSVlPSTllZWM0?=
+ =?utf-8?B?VnZha2pra1pYaFBrcjMvSE1IQ1lnMGx1NkdIek8ydGJhRkhzRTlPTkhHNGJa?=
+ =?utf-8?B?VW1RRlUwQkJPa0s1T1hKOERZRFViRnBtODZ6bFM4YTF4ZGFyREo4RTRuNUpN?=
+ =?utf-8?B?dUhHOW9FSGVSazViTHJEdTZJeHc2VzhnQjZEc0lxNGYrZ0E3Wk5uMU1lWkVa?=
+ =?utf-8?B?RElkak1pOFdjSUkzWmhraFhQREtteGE1M25KNGV2eXpGZ0JyaFp4MjFvOXZB?=
+ =?utf-8?B?K3FtRDk0aEZ1Y29BVTJSTlVrblBHd1FRQjRXZ2tINkpwa2s4ZUZOaWJiVnVC?=
+ =?utf-8?B?QXJaUnUxb0t3Ky9MUUlIVkRKSUtxbEZNSUIydFlBbEhKWlpmSnBLVGFYS3hJ?=
+ =?utf-8?B?OVNia0dzeThRNW52bnhNWWJiQTk0aWJmZXByUGF0UkxQU3ZSYWdkSG5xREg5?=
+ =?utf-8?Q?y52ryvtO3cY=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ5PPFF6E64BC2C.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?V21tUXp0SWtuWWJaYkhqU05lT3ljS1JzbEM4OWU1SWlzU0RZV0FxK09kc3FL?=
+ =?utf-8?B?MEVMRmt0QUJ1MFo3QXFGSWY0VTZ1Nk9sKzJoT01XYXJHQlNUUmlxRm5MZG0y?=
+ =?utf-8?B?NFNiTEtUMkYzWHRiR1hzY3FMNUNHdHp1WXJtejg3dE11RHN6clFMN0taTklR?=
+ =?utf-8?B?Ui8xUzJCcmd3S2l0b1BBcDM5WDlNZTBxMk5ySkpUdUhMdW8vSWs0dlRFQ3Vx?=
+ =?utf-8?B?T1hRV3hSTy9sd2RjWFVTcCtFSEpRdFd1QnpNQjlaY1d5S1FKN0RVdGVKQVEy?=
+ =?utf-8?B?Q2k5YWhwb293bmQ4dzhPSkI5ZGdiUW9GNlNHenl6SmQySkcxNzJWY0VvMzFr?=
+ =?utf-8?B?cU9hcmE5ZUtNSkJ1ZWZwTnkzeElXWDl3THpYZ2hnbitJNE0zRUNLM1RDdmoz?=
+ =?utf-8?B?RHJuejc4QXlnSHAvdVl6cW0yK1VpcUdaejdnOVFkNGlkNWV3UUljNi9ydkln?=
+ =?utf-8?B?TzBCWTBURldyRS9tZURHeUFSVXU5cFBnVm5KZTZHSXZRU1Y5a2I3Z3o5Ri9y?=
+ =?utf-8?B?NTRYSTBQS0x5M0Q5RW44a1NSck5FTDFTc0JPcHlTdWdIZzdRcUU2VEYwRTdt?=
+ =?utf-8?B?WlV4TzdRenp6ZTFFdDZ0RTJPc1RTN092RUF5U2VQU3ZqcWpYT0JFalBoMlMr?=
+ =?utf-8?B?T2lTT0pwMHBDdUNJMTVqWi92UzRpcys3VjZORzlmMzhCaTFDRC9SanYwTUly?=
+ =?utf-8?B?ZWZ1cXprR0U1VWtxT0dhVHo0WHNMTVp5VHhyNHdqVC9LcDM3bmtpRmRiRmcx?=
+ =?utf-8?B?RkEzcU81b3FON2hVNFY5S3l4MGpGSWtwZ0pvd2xqZVpHZzljRWVpWG1pRUdq?=
+ =?utf-8?B?L042SzRQbE0zYmRFcEQ1SHNXZ2Nwc3diSnc3K00wWlZFQ2F6QWlBQXFDdWht?=
+ =?utf-8?B?aUdNUk8vZ2w1aGZ1Y2k5WDFTN3plVGtpdWJBY0l4eHZwVFZFNFhpTm9FTkJS?=
+ =?utf-8?B?NFNlRFVOV05ESXFlbkI5YWE4RzF4WWpwdll2R3RRKzdQWWIzemhiUEozOEhw?=
+ =?utf-8?B?VGJGbzZGNVhxcEN1WGt4a1JhUW9rK1c4Qkk2SXl2TnJ1dS9VYkxJM255d29p?=
+ =?utf-8?B?bEhNZXZTMDd3N2p1bFY4SHN5R0xGdEVJZWdLWndnVFFOK3EvM2ZyUks1akxO?=
+ =?utf-8?B?am82bTQ4UTZKVXZGKzIyTkFxMVB3dmE0NlMvd0F4ZEpPaVJXaSsyazdrN0wy?=
+ =?utf-8?B?bUNHaGh3MmFTSUdLMFBxZk5od1Q3QzB6dElXeHRkM0xQUTF4L0ZwdXd1d0ZD?=
+ =?utf-8?B?QUVOUjEzb1dVdkJZOXRPa3huYnFNeDFOTmhVVW9LMjZYYzZMVWZKbGFWU3Uz?=
+ =?utf-8?B?MXpEYXRMV1ZzK2UxN0RDN0pnWXVGSEg1VG5senQydStjdzlSVzJnNlU3djhW?=
+ =?utf-8?B?Mkc3bWFTQkh2dEdwMS9tQ2RUeVljUWdjeUZ3UXJxT3VhK3JtY0JFRFBWUUJ5?=
+ =?utf-8?B?eTEzM1VyNFdyc1ZZOE9LTmlzdTROa3BCdStKNUE2OEFyNE9QYjRUblp6N3pM?=
+ =?utf-8?B?MmhMUTl4ZThEWFNjMzlVOHFpS2oxbkxkb05rZVN3czVrNG1sYzJjb1drZHo4?=
+ =?utf-8?B?ckZ4c1k0MjYyQmQ4WGJFMXRwZXBLNE5DajFpd0h1V2ovNWxidndHMGdrSk1t?=
+ =?utf-8?B?cXZQVHl3bWRhNHppbkVBanh4alFkanRQWEJVTzNCOEdKVTJ5S2RyNjFVdEht?=
+ =?utf-8?B?Q3RORkJaUDkrSlFmbHpUUGxYL3RsQ21Wcm9kalA3dEpFcEtWWi9ycVdSQlY1?=
+ =?utf-8?B?SWpncTdaR0k5VU12UkphdWsvRlMwNDhxRjFFUzFjTE1HSlZDUUVSVjhRakRx?=
+ =?utf-8?B?QmxHa0NGSmFKMDB0Y0MzVEIzY1ZiMlg3WWl1VUpRbFZabytUbTd1RW8ySWJB?=
+ =?utf-8?B?UXpzdi9aSUtSR2pEclpqU2wzQnpHaDdOdXlXMG9jLzBMNUJreTNRa1d1cDE4?=
+ =?utf-8?B?MmN2WWd5YUNHdnl6eVVWQ0FDRDhRQkJ6QTlhQWx4RFQycGNFOFVBMldIUDVm?=
+ =?utf-8?B?N0YrRTFoUGQ0NHI3d1I3T1JjcE5jUEJVL290M0dXOXFjNS8ycFVJdjFNS2ZG?=
+ =?utf-8?B?MFU4VnJmN2RTQjFKTTNBVTdST0J0RkhFL3E2UGVqOU4yNkJoSXJmTDBLV1kx?=
+ =?utf-8?Q?6aLKb+LZt7etYFayM0OgerO2S?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: af2fd44f-bb57-4afa-d969-08ddc9376881
+X-MS-Exchange-CrossTenant-AuthSource: SJ5PPFF6E64BC2C.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jul 2025 15:49:57.4780
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Q+ARh/LcN5iGQ8QuWM8aZxksP1tfxBATZFa6yOj4oglBYfnK3NdI8ZJ8xRraOIdq0xMezRM4fFnQVXVk2l3EPA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR12MB8937
 
-On Tue, 22 Jul 2025 10:18:10 +0100,
-Andrew Jones <ajones@ventanamicro.com> wrote:
-> 
-> Hi Marc,
-> 
-> On Mon, Jul 21, 2025 at 04:51:36PM +0100, Marc Zyngier wrote:
-> > Tinkering with UUIDs is a perilious task, and the KVM UUID gets
-> > broken at times. In order to spot this early enough, add a selftest
-> > that will shout if the expected value isn't found.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > Link: https://lore.kernel.org/r/20250721130558.50823-1-jackabt.amazon@gmail.com
-> > ---
-> >  tools/testing/selftests/kvm/Makefile.kvm     |  1 +
-> >  tools/testing/selftests/kvm/arm64/kvm-uuid.c | 67 ++++++++++++++++++++
-> >  2 files changed, 68 insertions(+)
-> >  create mode 100644 tools/testing/selftests/kvm/arm64/kvm-uuid.c
-> > 
-> > diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-> > index ce817a975e50a..e1eb1ba238a2a 100644
-> > --- a/tools/testing/selftests/kvm/Makefile.kvm
-> > +++ b/tools/testing/selftests/kvm/Makefile.kvm
-> > @@ -167,6 +167,7 @@ TEST_GEN_PROGS_arm64 += arm64/vgic_irq
-> >  TEST_GEN_PROGS_arm64 += arm64/vgic_lpi_stress
-> >  TEST_GEN_PROGS_arm64 += arm64/vpmu_counter_access
-> >  TEST_GEN_PROGS_arm64 += arm64/no-vgic-v3
-> > +TEST_GEN_PROGS_arm64 += arm64/kvm-uuid
-> >  TEST_GEN_PROGS_arm64 += access_tracking_perf_test
-> >  TEST_GEN_PROGS_arm64 += arch_timer
-> >  TEST_GEN_PROGS_arm64 += coalesced_io_test
-> > diff --git a/tools/testing/selftests/kvm/arm64/kvm-uuid.c b/tools/testing/selftests/kvm/arm64/kvm-uuid.c
-> > new file mode 100644
-> > index 0000000000000..89d9c8b182ae5
-> > --- /dev/null
-> > +++ b/tools/testing/selftests/kvm/arm64/kvm-uuid.c
-> > @@ -0,0 +1,67 @@
-> > +#include <errno.h>
-> > +#include <linux/arm-smccc.h>
-> > +#include <asm/kvm.h>
-> > +#include <kvm_util.h>
-> > +
-> > +#include "processor.h"
-> > +
-> > +/*
-> > + * Do NOT redefine these constants, or try to replace them with some
-> > + * "common" version. They are hardcoded here to detect any potential
-> > + * breakage happening in the rest of the kernel.
-> > + *
-> > + * KVM UID value: 28b46fb6-2ec5-11e9-a9ca-4b564d003a74
-> > + */
-> > +#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_0	0xb66fb428U
-> > +#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_1	0xe911c52eU
-> > +#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_2	0x564bcaa9U
-> > +#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_3	0x743a004dU
-> > +
-> > +static void guest_code(void)
-> > +{
-> > +	struct arm_smccc_res res = {};
-> > +
-> > +	smccc_hvc(ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID, 0, 0, 0, 0, 0, 0, 0, &res);
-> > +
-> > +	__GUEST_ASSERT(res.a0 != SMCCC_RET_NOT_SUPPORTED, "a0 = %lx\n", res.a0);
-> 
-> Should this check res.a0 == SMCCC_RET_SUCCESS instead?
 
-Yeah, probably.
 
+On 7/22/2025 8:10 PM, David Hildenbrand wrote:
+> On 13.07.25 19:43, Shivank Garg wrote:
+>> This series introduces NUMA-aware memory placement support for KVM guests
+>> with guest_memfd memory backends. It builds upon Fuad Tabba's work that
+>> enabled host-mapping for guest_memfd memory [1].
+>>
+>> == Background ==
+>> KVM's guest-memfd memory backend currently lacks support for NUMA policy
+>> enforcement, causing guest memory allocations to be distributed across host
+>> nodes  according to kernel's default behavior, irrespective of any policy
+>> specified by the VMM. This limitation arises because conventional userspace
+>> NUMA control mechanisms like mbind(2) don't work since the memory isn't
+>> directly mapped to userspace when allocations occur.
+>> Fuad's work [1] provides the necessary mmap capability, and this series
+>> leverages it to enable mbind(2).
+>>
+>> == Implementation ==
+>>
+>> This series implements proper NUMA policy support for guest-memfd by:
+>>
+>> 1. Adding mempolicy-aware allocation APIs to the filemap layer.
+>> 2. Introducing custom inodes (via a dedicated slab-allocated inode cache,
+>>     kvm_gmem_inode_info) to store NUMA policy and metadata for guest memory.
+>> 3. Implementing get/set_policy vm_ops in guest_memfd to support NUMA
+>>     policy.
+>>
+>> With these changes, VMMs can now control guest memory placement by mapping
+>> guest_memfd file descriptor and using mbind(2) to specify:
+>> - Policy modes: default, bind, interleave, or preferred
+>> - Host NUMA nodes: List of target nodes for memory allocation
+>>
+>> These Policies affect only future allocations and do not migrate existing
+>> memory. This matches mbind(2)'s default behavior which affects only new
+>> allocations unless overridden with MPOL_MF_MOVE/MPOL_MF_MOVE_ALL flags (Not
+>> supported for guest_memfd as it is unmovable by design).
+>>
+>> == Upstream Plan ==
+>> Phased approach as per David's guest_memfd extension overview [2] and
+>> community calls [3]:
+>>
+>> Phase 1 (this series):
+>> 1. Focuses on shared guest_memfd support (non-CoCo VMs).
+>> 2. Builds on Fuad's host-mapping work.
 > 
-> > +	__GUEST_ASSERT(res.a0 == ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_0 &&
-> > +		       res.a1 == ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_1 &&
-> > +		       res.a2 == ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_2 &&
-> > +		       res.a3 == ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_3,
-> > +		       "Unexpected KVM-specific UID %lx %lx %lx %lx\n", res.a0, res.a1, res.a2, res.a3);
-> > +	GUEST_DONE();
-> > +}
-> > +
-> > +int main (int argc, char *argv[])
-> > +{
-> > +	struct kvm_vcpu *vcpu;
-> > +	struct kvm_vm *vm;
-> > +	struct ucall uc;
-> > +	bool guest_done = false;
-> > +
-> > +	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
-> > +
-> > +	while (!guest_done) {
-> > +		vcpu_run(vcpu);
-> > +
-> > +		switch (get_ucall(vcpu, &uc)) {
-> > +		case UCALL_SYNC:
-> > +			break;
-> > +		case UCALL_DONE:
-> > +			guest_done = true;
-> > +			break;
-> > +		case UCALL_ABORT:
-> > +			REPORT_GUEST_ASSERT(uc);
-> > +			break;
-> > +		case UCALL_PRINTF:
-> > +			printf("%s", uc.buffer);
-> > +			break;
-> > +		default:
-> > +			TEST_FAIL("Unexpected guest exit");
-> > +		}
-> > +	}
+> Just to clarify: this is based on Fuad's stage 1 and should probably still be
+> tagged "RFC" until stage-1 is finally upstream.
 > 
-> This is becoming a very common and useful pattern. I wonder if it's time
-> for a ucall helper
-> 
-> static void ucall_vcpu_run(struct kvm_vcpu *vcpu,
->                            void (*sync_func)(struct kvm_vcpu *, void *),
->                            void *sync_data)
-> {
->         bool guest_done = false;
->         struct ucall uc;
-> 
->         while (!guest_done) {
->                 vcpu_run(vcpu);
-> 
->                 switch (get_ucall(vcpu, &uc)) {
->                 case UCALL_SYNC:
->                         if (sync_func)
->                                 sync_func(vcpu, sync_data);
->                         break;
->                 case UCALL_DONE:
->                         guest_done = true;
->                         break;
->                 case UCALL_ABORT:
->                         REPORT_GUEST_ASSERT(uc);
->                         break;
->                 case UCALL_PRINTF:
->                         printf("%s", uc.buffer);
->                         break;
->                 default:
->                         TEST_FAIL("Unexpected guest exit");
->                 }
->         }
-> }
 
-Honestly, I don't know. My understanding is that the common kvm
-selftest code is now mostly a pile of x86-specific stuff, and I've
-made it a goal not to touch any of it.
+Sure.
 
-Thanks,
+> (I was hoping stage-1 would go upstream in 6.17, but I am not sure yet if that is
+> still feasible looking at the never-ending review)
+> 
+> I'm surprised to see that
+> 
+> commit cbe4134ea4bc493239786220bd69cb8a13493190
+> Author: Shivank Garg <shivankg@amd.com>
+> Date:   Fri Jun 20 07:03:30 2025 +0000
+> 
+>     fs: export anon_inode_make_secure_inode() and fix secretmem LSM bypass
+>     was merged with the kvm export
+> 
+>     EXPORT_SYMBOL_GPL_FOR_MODULES(anon_inode_make_secure_inode, "kvm");
+> 
+> I thought I commented that this is something to done separately and not really
+> "fix" material.
+> 
+> Anyhow, good for this series, no need to touch that.
+> 
 
-	M.
+Yeah, V2 got merged instead of V3.
+https://lore.kernel.org/all/1ab3381b-1620-485d-8e1b-fff2c48d45c3@amd.com
+but backporting did not give issues either.
 
--- 
-Without deviation from the norm, progress is not possible.
+Thank you for the reviews :)
+
+Best Regards,
+Shivank
 
