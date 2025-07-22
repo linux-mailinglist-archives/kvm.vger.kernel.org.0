@@ -1,232 +1,142 @@
-Return-Path: <kvm+bounces-53120-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53121-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CFA9B0D9AE
-	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 14:32:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70C8DB0DA96
+	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 15:16:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 353BD1886B0C
-	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 12:33:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 73806546428
+	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 13:16:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5E52288518;
-	Tue, 22 Jul 2025 12:32:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91D3828C2DE;
+	Tue, 22 Jul 2025 13:16:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="WeLHgmXx"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MtrjH8Wp"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8835BDDC3
-	for <kvm@vger.kernel.org>; Tue, 22 Jul 2025 12:32:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00E8A3B19A;
+	Tue, 22 Jul 2025 13:16:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753187563; cv=none; b=NfOOsb2b3VzbVjneJgkiSRObSGXj7cm8RzfE30mO4l7ERJOUQDoUUdQSBHCX98qPw2HdvOFN9UaHshciS9+WuE8g0C4VH0aCpzhtfqnfyO3EOuN4vZmYoy6MLIcfsRfxO/uTCffD6WbEvgBeN9fT//acbqO1/xqJbkDxaclLd/4=
+	t=1753190171; cv=none; b=lgVnicm94IbdR9lzsyHBIl04xVUjjZYsY9QTs9lG052Hm7rU8h0ba/mjgBSTqZJzI02PN3ICdfAGPZ/kksjEH1fUzn6S9miHhVwKQO0FxkXySGw7JkHIdqEuDc38ha2kT5Ph0rPRe1AC/33F4T46bs3GOMFt235bBbIYLB9nvCc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753187563; c=relaxed/simple;
-	bh=kfXCFB4M4r9Eu+Ta6xP8Saq4J9ai+mgIIVpmeC+Orzo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=l40nrtKcJRbBuUOfEZLGlcry70YGjIpKsJDL7v+KQlO8ggZ2rMrwjNo2pIkrXDRsUM11TPKI/ibJVrYgyKvi8XcnKe972N06nNW8cLcqE29IfIYyJGrrlrApASO49fgNiOl7mEKNE89fhMIxV1fL/SBJbauT/eWBbImg8lP7HMc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=WeLHgmXx; arc=none smtp.client-ip=95.215.58.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <07976427-e5a4-4ca4-93e9-a428a962b0b2@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1753187549;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7MMMOAOPjOBlhMHrulLMPV/ml/XegyxT79zgI8vdaQc=;
-	b=WeLHgmXx0r97gR/zn1eWenIdriuOSpYVj9Enitmu+wk6hPYUCHXPbtDMke+K2iZ8CfIEli
-	L2PPPUlUHtpcnh+fY+glHgeelj+WuvAribXpZM+k/8swY851tIbGWUVGWzbcfzmko35xvp
-	bSykaR5ROyJfWZ7ZJwWd2TTVDWbPsEs=
-Date: Tue, 22 Jul 2025 20:31:34 +0800
+	s=arc-20240116; t=1753190171; c=relaxed/simple;
+	bh=2ur+ftjY34EO8tfo3ES9C3DWlfzYj9Fk8ptTogFmi1A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=O+B72NJ5AddVnP5wpDmi/77lcvbkSFNOvm4SVNU1huIU6nYTEBQwas7m2d3oy6toWhpj+xUzs9rFwXP5jGKQBmiuydZu9sum9lBYyANWHJDuHzyx11mHYxqiCZBF762vo0Y/VgsITuWDwSGwCC/t1ma4SZuOWsyyMLtMy9SyoIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MtrjH8Wp; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1753190170; x=1784726170;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=2ur+ftjY34EO8tfo3ES9C3DWlfzYj9Fk8ptTogFmi1A=;
+  b=MtrjH8WpD4glPakZQiR+Sb/FEZVSfStV2+IdmzAEQnTHRO3eXJoaNDf3
+   +6xJCO+R9sX2Hti1W4ErDU9KewfcV1MzN3tSts3aMoLmhpjFmD6wXxQIZ
+   NZzpgDO3yNyRKf95rnp7ipSt3fCL1+5YlGmu8SE3Nl9Eb4BOgDZf7DTrg
+   D3Kej8EVULXTOchU54bFBbYjNdhcO0s2ncojX+7NgAx0JunFm0P3/UBIR
+   FbT1V7Nu5yqUk3CbFVbDslBY+/ZVcaoOpZmJY4ta6/8P0xb9FV9Gfm3gz
+   wc1mH62I/KTTrhFq/ay3lSs8FaDh3Bxaw3XDHAaeFBiBUe+dPB188NhDO
+   w==;
+X-CSE-ConnectionGUID: ssW2ilLuQKyhXtDN2ltk6Q==
+X-CSE-MsgGUID: OlgZtIr/RlSiH1UNXPyNRQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11500"; a="72893078"
+X-IronPort-AV: E=Sophos;i="6.16,331,1744095600"; 
+   d="scan'208";a="72893078"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jul 2025 06:15:54 -0700
+X-CSE-ConnectionGUID: QwNXoEkaQLyJ79Y1adJ/bQ==
+X-CSE-MsgGUID: 5Dn9xFp9TuiNoX2nzDz5gA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,331,1744095600"; 
+   d="scan'208";a="163695133"
+Received: from pgcooper-mobl3.ger.corp.intel.com (HELO localhost.localdomain) ([10.245.244.161])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jul 2025 06:15:48 -0700
+From: Adrian Hunter <adrian.hunter@intel.com>
+To: Dave Hansen <dave.hansen@linux.intel.com>,
+	pbonzini@redhat.com,
+	seanjc@google.com,
+	vannapurve@google.com
+Cc: Tony Luck <tony.luck@intel.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	x86@kernel.org,
+	H Peter Anvin <hpa@zytor.com>,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	rick.p.edgecombe@intel.com,
+	kas@kernel.org,
+	kai.huang@intel.com,
+	reinette.chatre@intel.com,
+	xiaoyao.li@intel.com,
+	tony.lindgren@linux.intel.com,
+	binbin.wu@linux.intel.com,
+	isaku.yamahata@intel.com,
+	yan.y.zhao@intel.com,
+	chao.gao@intel.com
+Subject: [PATCH V3 0/2] x86/tdx: Skip clearing reclaimed pages unless X86_BUG_TDX_PW_MCE is present
+Date: Tue, 22 Jul 2025 16:15:31 +0300
+Message-ID: <20250722131533.106473-1-adrian.hunter@intel.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v15 16/21] KVM: arm64: Handle guest_memfd-backed guest
- page faults
-Content-Language: en-US
-To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev
-Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
- anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
- aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk,
- brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
- xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com,
- jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com,
- isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz,
- vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name,
- david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com,
- liam.merwick@oracle.com, isaku.yamahata@gmail.com,
- kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com,
- steven.price@arm.com, quic_eberman@quicinc.com, quic_mnalajal@quicinc.com,
- quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com,
- quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com,
- quic_pheragu@quicinc.com, catalin.marinas@arm.com, james.morse@arm.com,
- yuzenghui@huawei.com, oliver.upton@linux.dev, maz@kernel.org,
- will@kernel.org, qperret@google.com, keirf@google.com, roypat@amazon.co.uk,
- shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, rientjes@google.com,
- jhubbard@nvidia.com, fvdl@google.com, hughd@google.com,
- jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com,
- ira.weiny@intel.com
-References: <20250717162731.446579-1-tabba@google.com>
- <20250717162731.446579-17-tabba@google.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Kunwu Chan <kunwu.chan@linux.dev>
-In-Reply-To: <20250717162731.446579-17-tabba@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Organization: Intel Finland Oy, Registered Address: c/o Alberga Business Park, 6 krs, Bertel Jungin Aukio 5, 02600 Espoo, Business Identity Code: 0357606 - 4, Domiciled in Helsinki
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-On 2025/7/18 00:27, Fuad Tabba wrote:
-> Add arm64 architecture support for handling guest page faults on memory
-> slots backed by guest_memfd.
->
-> This change introduces a new function, gmem_abort(), which encapsulates
-> the fault handling logic specific to guest_memfd-backed memory. The
-> kvm_handle_guest_abort() entry point is updated to dispatch to
-> gmem_abort() when a fault occurs on a guest_memfd-backed memory slot (as
-> determined by kvm_slot_has_gmem()).
->
-> Until guest_memfd gains support for huge pages, the fault granule for
-> these memory regions is restricted to PAGE_SIZE.
+Hi
 
-Since huge pages are not currently supported, would it be more friendly 
-to define  sth like
+Here are 2 small self-explanatory patches related to clearing TDX private
+pages.
 
-"#define GMEM_PAGE_GRANULE PAGE_SIZE" at the top (rather than hardcoding 
-PAGE_SIZE)
+Patch 1 is a minor tidy-up.
 
-  and make it easier to switch to huge page support later?
+In patch 2, by skipping the clearing step, shutdown time can improve by
+up to 40%.
 
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> Reviewed-by: James Houghton <jthoughton@google.com>
-> Signed-off-by: Fuad Tabba <tabba@google.com>
-> ---
->   arch/arm64/kvm/mmu.c | 86 ++++++++++++++++++++++++++++++++++++++++++--
->   1 file changed, 83 insertions(+), 3 deletions(-)
->
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index b3eacb400fab..8c82df80a835 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1512,6 +1512,82 @@ static void adjust_nested_fault_perms(struct kvm_s2_trans *nested,
->   	*prot |= kvm_encode_nested_level(nested);
->   }
->   
-> +#define KVM_PGTABLE_WALK_MEMABORT_FLAGS (KVM_PGTABLE_WALK_HANDLE_FAULT | KVM_PGTABLE_WALK_SHARED)
-> +
-> +static int gmem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> +		      struct kvm_s2_trans *nested,
-> +		      struct kvm_memory_slot *memslot, bool is_perm)
-> +{
-> +	bool write_fault, exec_fault, writable;
-> +	enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_MEMABORT_FLAGS;
-> +	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
-> +	struct kvm_pgtable *pgt = vcpu->arch.hw_mmu->pgt;
-> +	unsigned long mmu_seq;
-> +	struct page *page;
-> +	struct kvm *kvm = vcpu->kvm;
-> +	void *memcache;
-> +	kvm_pfn_t pfn;
-> +	gfn_t gfn;
-> +	int ret;
-> +
-> +	ret = prepare_mmu_memcache(vcpu, true, &memcache);
-> +	if (ret)
-> +		return ret;
-> +
-> +	if (nested)
-> +		gfn = kvm_s2_trans_output(nested) >> PAGE_SHIFT;
-> +	else
-> +		gfn = fault_ipa >> PAGE_SHIFT;
-> +
-> +	write_fault = kvm_is_write_fault(vcpu);
-> +	exec_fault = kvm_vcpu_trap_is_exec_fault(vcpu);
-> +
-> +	VM_WARN_ON_ONCE(write_fault && exec_fault);
-> +
-> +	mmu_seq = kvm->mmu_invalidate_seq;
-> +	/* Pairs with the smp_wmb() in kvm_mmu_invalidate_end(). */
-> +	smp_rmb();
-> +
-> +	ret = kvm_gmem_get_pfn(kvm, memslot, gfn, &pfn, &page, NULL);
-> +	if (ret) {
-> +		kvm_prepare_memory_fault_exit(vcpu, fault_ipa, PAGE_SIZE,
-> +					      write_fault, exec_fault, false);
-> +		return ret;
-> +	}
-> +
-> +	writable = !(memslot->flags & KVM_MEM_READONLY);
-> +
-> +	if (nested)
-> +		adjust_nested_fault_perms(nested, &prot, &writable);
-> +
-> +	if (writable)
-> +		prot |= KVM_PGTABLE_PROT_W;
-> +
-> +	if (exec_fault ||
-> +	    (cpus_have_final_cap(ARM64_HAS_CACHE_DIC) &&
-> +	     (!nested || kvm_s2_trans_executable(nested))))
-> +		prot |= KVM_PGTABLE_PROT_X;
-> +
-> +	kvm_fault_lock(kvm);
-> +	if (mmu_invalidate_retry(kvm, mmu_seq)) {
-> +		ret = -EAGAIN;
-> +		goto out_unlock;
-> +	}
-> +
-> +	ret = KVM_PGT_FN(kvm_pgtable_stage2_map)(pgt, fault_ipa, PAGE_SIZE,
-> +						 __pfn_to_phys(pfn), prot,
-> +						 memcache, flags);
-> +
-> +out_unlock:
-> +	kvm_release_faultin_page(kvm, page, !!ret, writable);
-> +	kvm_fault_unlock(kvm);
-> +
-> +	if (writable && !ret)
-> +		mark_page_dirty_in_slot(kvm, memslot, gfn);
-> +
-> +	return ret != -EAGAIN ? ret : 0;
-> +}
-> +
->   static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->   			  struct kvm_s2_trans *nested,
->   			  struct kvm_memory_slot *memslot, unsigned long hva,
-> @@ -1536,7 +1612,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->   	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
->   	struct kvm_pgtable *pgt;
->   	struct page *page;
-> -	enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_HANDLE_FAULT | KVM_PGTABLE_WALK_SHARED;
-> +	enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_MEMABORT_FLAGS;
->   
->   	if (fault_is_perm)
->   		fault_granule = kvm_vcpu_trap_get_perm_fault_granule(vcpu);
-> @@ -1961,8 +2037,12 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
->   	VM_WARN_ON_ONCE(kvm_vcpu_trap_is_permission_fault(vcpu) &&
->   			!write_fault && !kvm_vcpu_trap_is_exec_fault(vcpu));
->   
-> -	ret = user_mem_abort(vcpu, fault_ipa, nested, memslot, hva,
-> -			     esr_fsc_is_permission_fault(esr));
-> +	if (kvm_slot_has_gmem(memslot))
-> +		ret = gmem_abort(vcpu, fault_ipa, nested, memslot,
-> +				 esr_fsc_is_permission_fault(esr));
-> +	else
-> +		ret = user_mem_abort(vcpu, fault_ipa, nested, memslot, hva,
-> +				     esr_fsc_is_permission_fault(esr));
->   	if (ret == 0)
->   		ret = 1;
->   out:
-LGTM!
 
--- 
-Thanks,
-   Kunwu.Chan(Tao.Chan)
+Changes in V3:
 
+      x86/tdx: Eliminate duplicate code in tdx_clear_page()
+	Explain "quirk" rename in commit message (Rick)
+	Explain mb() change in commit message  (Rick)
+	Add Rev'd-by, Ack'd-by tags
+
+      x86/tdx: Skip clearing reclaimed pages unless X86_BUG_TDX_PW_MCE is present
+	Remove "flush cache" comments (Rick)
+	Update function comment to better relate to "quirk" naming (Rick)
+	Add "via MOVDIR64B" to comment (Xiaoyao)
+	Add Rev'd-by, Ack'd-by tags
+
+Changes in V2 (as requested by Dave):
+
+      x86/tdx: Eliminate duplicate code in tdx_clear_page()
+	Rename reset_tdx_pages() to tdx_quirk_reset_paddr()
+	Call tdx_quirk_reset_paddr() directly
+
+      x86/tdx: Skip clearing reclaimed pages unless X86_BUG_TDX_PW_MCE is present
+	Improve the comment
+
+
+Adrian Hunter (2):
+      x86/tdx: Eliminate duplicate code in tdx_clear_page()
+      x86/tdx: Skip clearing reclaimed pages unless X86_BUG_TDX_PW_MCE is present
+
+ arch/x86/include/asm/tdx.h  |  2 ++
+ arch/x86/kvm/vmx/tdx.c      | 25 +++----------------------
+ arch/x86/virt/vmx/tdx/tdx.c | 15 ++++++++++-----
+ 3 files changed, 15 insertions(+), 27 deletions(-)
+
+
+Regards
+Adrian
 
