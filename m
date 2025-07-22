@@ -1,130 +1,201 @@
-Return-Path: <kvm+bounces-53164-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53165-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9355AB0E294
-	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 19:27:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE0E6B0E31B
+	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 19:55:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F6FE1C8551E
-	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 17:28:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7874B3A4F2B
+	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 17:55:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B39B27FB18;
-	Tue, 22 Jul 2025 17:27:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF1FB281369;
+	Tue, 22 Jul 2025 17:55:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Q45HmErC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="w9gmYeR3"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8DC34685
-	for <kvm@vger.kernel.org>; Tue, 22 Jul 2025 17:27:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 851A827F4D9
+	for <kvm@vger.kernel.org>; Tue, 22 Jul 2025 17:55:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753205264; cv=none; b=Nk0nSkGlFn1EXmmfznjAavZM5JEZ989vJcmRmWHeNMZI433fer4jF7zRWoBqI8kRRnAjMepWV5q+kAw4Y6oJ0wuuinbh3BAqS3M6H6lz2TIrBNdRjXILc+8ZaPlIFP7tSNaPj/EXgb5n/Sz8iVlhtJBSLklyGQ3WyETo8MM2ma8=
+	t=1753206925; cv=none; b=XUWUzlom/5GeTcuHQV/Et1bWcqKBQFGnDGPUCVyXEyiO2rmhZ6GBKrm0+h35YeR6ly5wPj8o8oSZOt11UT+ns1Yd6ch1uTOgmdofupd6rhkENFQsDqWwW+UaTGJ7F9OxmppQYP9Z43U9NtEbbkWXDmOPO6q6zcOM3nt+YFLwrik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753205264; c=relaxed/simple;
-	bh=syxL5yFIfrXhC+h4Uv6eBBsalk6IqK7By/q7/N6YndA=;
+	s=arc-20240116; t=1753206925; c=relaxed/simple;
+	bh=iapMhQwsFNjzaVvGUH8EMPUkVK053gLxhxy3z7USMcA=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=hmpDL1M3jiC7HHz0SzZAiRS6dziklj3srSQYvYjLceE9DMojztC80Xycbz7/Wryg2Xnr2BbOkOwG9+tlNTY7IqV5T5EGPyC80/bK2EHrYVyKwk1ZAXX+ogi0d7Sq5Hjjz96PBzJ6aLgHG5QR6vKD5vVTRJomHXbY0gTmJB3v/Yc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Q45HmErC; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=I0gBQXwCnrpQb5rfBJu2OErzhFr+d2KF4Iab5RYM1wY55VE291DWN6YbRhkmalNkMbBzLpS/LBycEJ90sHMvumGMiG3+1RVQLsS/pj8dt688NA07+Di3KgD8wvSI/4O2GIUcJPjNVxL1NL96+0qfoM+rai2YBvLJVF1UlitYXrI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=w9gmYeR3; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-237f8d64263so55392885ad.1
-        for <kvm@vger.kernel.org>; Tue, 22 Jul 2025 10:27:42 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b2fcbd76b61so6695185a12.3
+        for <kvm@vger.kernel.org>; Tue, 22 Jul 2025 10:55:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753205262; x=1753810062; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1753206923; x=1753811723; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gNuep+WR+auVA36XZo3u/qqPdLw6h3Tg29vPjRH6q58=;
-        b=Q45HmErC57yTnIxKh43vbtFhCuYSIO86jfWOqskujsasYE5v5NWqQp/ZV8BfiAHy4I
-         KlU0vvyZqPIVgHQlHT9d9yjC17Pw+VLtjIwPiIQLf7Opxpw4AYh/g+BWFSV/nShYpCLa
-         CoE2bHjodyqbblCnxV6a1XYG15e8xoV0Sq/40NekF9+W3dF0yek3f92dR6F3742eSHkb
-         5pqB1YdpgIVgx4jC7rtyIheMPCQiv1ND462D0m9z1rDiqq+VNjOc1Up/zRy3YFgNyOhj
-         MqJl5wFWIXPVWJrxaVxLFR5Zm2DAu7frTdh+6qHsChmr+7+JKBwt9dL97hw6wd3r8oFg
-         KpJg==
+        bh=3mt3yYglHDnSBdSmPZ1zrcnzwFHve4g2+M6+Jdcn59w=;
+        b=w9gmYeR3OAju33bJ+gdfvERks8vfRW+n9KpV2bD1BmECq2v9o1VfGmhiVBUm9D/BsT
+         Qs+X+ZdlRhXIk83tJx67OPgxqyof3G/iB7QKZ+ESf0ebP4B+0G5R7n0HUZwkelFgaDgc
+         dC+HNpsoJQkzn6QQrMJ2SvKg9R9nLtEYO5dljA1EGmPkYGIzrhwUhefm76jroRcPd5bS
+         2dsoej2FEd62F3oPAZeQmgIBIUf2I7TUR8SXEma2SdxTcsNQ91ZvFfClDadahLvC397N
+         sWi8NWwxTbcZufzZWqHH/VGSMKz+uvumUBf071551CJsCzwtIdsW93ob8AVG2F2g2wPn
+         f2TQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753205262; x=1753810062;
+        d=1e100.net; s=20230601; t=1753206923; x=1753811723;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gNuep+WR+auVA36XZo3u/qqPdLw6h3Tg29vPjRH6q58=;
-        b=WHWjOIubwto8Z/3Ui2q4bjfPnjMAFsCq8niqAsFnyU3p2coGuErqPnlDjPoIY5Og3s
-         qa3hY8GqoxkcOr7Dk8ljQ2rJCV02OQPNYJXl5XpmQRwn7tmTXhHOVqnD5folQh/a75n0
-         pGCMjtyiscr33Y4wlwHZQ0k3VEc/sNH4m+xZunHOFWIelnevulki8XO9EOeuqcR138NL
-         xpIFsKsJNt1i56nSGS/siAd9lHd1nswIPRi788SqcvOlmnY0e3DUjBZs31u7jSGcwSkU
-         wTbIdzxptnzmrRz8Dyt6LJ1pZiKv0jSDuw+RG7TFMqvkDYDMk28JPh3hrWccpyi4Yu1k
-         O+kg==
-X-Forwarded-Encrypted: i=1; AJvYcCVZb8DDn/Zi1edBXlbl43VTPYN+IqSzMMJ8dSBkWGSHk6oPlecXgTpACUWqVPJWGmwZuBQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yytrd6tISXnoxYcTTLPmVe0w/QspbhkIbM1qTdNc4ZMvBHEikKa
-	vSMud2G26oB+ICaevSShJCjZF8FZy21rUVqpF0QXf+Nig1+yX8juMmTTGUm29gVTbfnQ8FS6CGx
-	zz2UGfw==
-X-Google-Smtp-Source: AGHT+IGlPsKj2kXWks86x+28HfdK7Z/QqkDwZwVYgVnNVIpsClfKH/9J41q2BYHdfvNQBrCCOD4NuTpzbJE=
-X-Received: from pjbcz15.prod.google.com ([2002:a17:90a:d44f:b0:312:f650:c7aa])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:3c6c:b0:235:f51f:c9e4
- with SMTP id d9443c01a7336-23e24f49430mr394121175ad.12.1753205262126; Tue, 22
- Jul 2025 10:27:42 -0700 (PDT)
-Date: Tue, 22 Jul 2025 10:27:40 -0700
-In-Reply-To: <20250722074958.2567-1-lirongqing@baidu.com>
+        bh=3mt3yYglHDnSBdSmPZ1zrcnzwFHve4g2+M6+Jdcn59w=;
+        b=nzpwKU6S0sO3uGNPO/5YZyLmAWqy0/0OzTV/UhQYLGCR2d2GqK111agcIa3bszotzS
+         88fxSzKZG8ePJQT7zXWPCisxQ//tK9qjiiLsPnF2bhnz2BAXeUfc8gLRcOCWUd9uO8f2
+         dVBnA0HB/qiRdmQBaOuLOgIV94ucKc0bOQ5Zt/uODxY8YgenBw2fewosVBi6fA4marI/
+         ni+F7KD2CG2uDtxlk/FW0dl6TeNpgkr6Ya4vsLAfqZdYGnH1AESoRzxTTX53RdI7qLMd
+         ZFdTL6eU2ajhF02ylWkxyx5AoU6CCuUfJE8U2yvR/uLgD+hti+cpGjaSoATrq4cSwS/b
+         BNqg==
+X-Forwarded-Encrypted: i=1; AJvYcCWt8bPzfS4T3p8ZXabwkFfzwlzbXNEk+baPEQdVdDoN8TeTNor3UhSSj8jWIJppT6lfvvw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyE0VDH7jKzhoXsXRMFMBWQpJLnioy7Udxxmr8qHNz6uRiTML1T
+	yuI8x5CzuGlRSUPe+BVZrQ8cPlivpUaTLLiQOrEIfPvzAnwxHBg+UqBVEEbwV2CdRPopD6VFg4m
+	Cq94iRMzlS3kurugVDd/yqJHbKQ==
+X-Google-Smtp-Source: AGHT+IGlFgyTRPkZWoQjbmY7T310OJ1BlWGpJ3/Q2IhMntxDiBOom0S5N+SghsjZY8MWMZqXf+k2KOAttfWZj9n3EQ==
+X-Received: from pfbmc33.prod.google.com ([2002:a05:6a00:76a1:b0:73e:665:360])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a00:13a0:b0:748:f750:14c6 with SMTP id d2e1a72fcca58-760353db8bbmr218966b3a.14.1753206922841;
+ Tue, 22 Jul 2025 10:55:22 -0700 (PDT)
+Date: Tue, 22 Jul 2025 10:55:21 -0700
+In-Reply-To: <aH8xkkArWBrjzYfk@yzhao56-desk.sh.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250722074958.2567-1-lirongqing@baidu.com>
-Message-ID: <aH_KDFJsH3i7xF-e@google.com>
-Subject: Re: [PATCH] x86/kvm: Downgrade host poll messages to pr_debug_once()
-From: Sean Christopherson <seanjc@google.com>
-To: lirongqing <lirongqing@baidu.com>
-Cc: pbonzini@redhat.com, vkuznets@redhat.com, tglx@linutronix.de, 
-	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, 
-	hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+References: <aCVZIuBHx51o7Pbl@yzhao56-desk.sh.intel.com> <diqzfrgfp95d.fsf@ackerleytng-ctop.c.googlers.com>
+ <aEEFRXF+HrZVh5He@yzhao56-desk.sh.intel.com> <diqzecvxizp5.fsf@ackerleytng-ctop.c.googlers.com>
+ <aHb/ETOMSQRm1bMO@yzhao56-desk> <diqzfrevhmzw.fsf@ackerleytng-ctop.c.googlers.com>
+ <aHnghFAH5N7eiCXo@yzhao56-desk.sh.intel.com> <diqz8qkg6b8l.fsf@ackerleytng-ctop.c.googlers.com>
+ <aH8xkkArWBrjzYfk@yzhao56-desk.sh.intel.com>
+Message-ID: <diqz1pq85cvq.fsf@ackerleytng-ctop.c.googlers.com>
+Subject: Re: [RFC PATCH 08/21] KVM: TDX: Increase/decrease folio ref for huge pages
+From: Ackerley Tng <ackerleytng@google.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: vannapurve@google.com, pbonzini@redhat.com, seanjc@google.com, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org, 
+	rick.p.edgecombe@intel.com, dave.hansen@intel.com, kirill.shutemov@intel.com, 
+	tabba@google.com, quic_eberman@quicinc.com, michael.roth@amd.com, 
+	david@redhat.com, vbabka@suse.cz, jroedel@suse.de, thomas.lendacky@amd.com, 
+	pgonda@google.com, zhiquan1.li@intel.com, fan.du@intel.com, 
+	jun.miao@intel.com, ira.weiny@intel.com, isaku.yamahata@intel.com, 
+	xiaoyao.li@intel.com, binbin.wu@linux.intel.com, chao.p.peng@intel.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Jul 22, 2025, lirongqing wrote:
-> From: Li RongQing <lirongqing@baidu.com>
-> 
-> The current host-side polling messages are misleading, as they will be
-> printed when the hypervisor intentionally disables polling (by providing
-> MWAIT to the guest) rather than due to version incompatibility. so
-> Downgrade to pr_debug_once() to prevent spurious log messages.
+Yan Zhao <yan.y.zhao@intel.com> writes:
 
-I agree the messages are unfortunate, but the guest can't possibly know that the
-host is correctly configured.  E.g. if MWAIT is allowed, but the host is still
-intercepting HLT and the guest happens to choose HLT for idling, then the guest
-is absolutely right to complain.
+> On Mon, Jul 21, 2025 at 10:33:14PM -0700, Ackerley Tng wrote:
+>> Yan Zhao <yan.y.zhao@intel.com> writes:
+>> 
+>> > On Wed, Jul 16, 2025 at 01:57:55PM -0700, Ackerley Tng wrote:
+>> >> Yan Zhao <yan.y.zhao@intel.com> writes:
+>> >> 
+>> >> > On Thu, Jun 05, 2025 at 03:35:50PM -0700, Ackerley Tng wrote:
+>> >> >> Yan Zhao <yan.y.zhao@intel.com> writes:
+>> >> >> 
+>> >> >> > On Wed, Jun 04, 2025 at 01:02:54PM -0700, Ackerley Tng wrote:
+>> >> >> >> Hi Yan,
+>> >> >> >> 
+>> >> >> >> While working on the 1G (aka HugeTLB) page support for guest_memfd
+>> >> >> >> series [1], we took into account conversion failures too. The steps are
+>> >> >> >> in kvm_gmem_convert_range(). (It might be easier to pull the entire
+>> >> >> >> series from GitHub [2] because the steps for conversion changed in two
+>> >> >> >> separate patches.)
+>> >> >> > ...
+>> >> >> >> [2] https://github.com/googleprodkernel/linux-cc/tree/gmem-1g-page-support-rfc-v2
+>> >> >> >
+>> >> >> > Hi Ackerley,
+>> >> >> > Thanks for providing this branch.
+>> >> >> 
+>> >> >> Here's the WIP branch [1], which I initially wasn't intending to make
+>> >> >> super public since it's not even RFC standard yet and I didn't want to
+>> >> >> add to the many guest_memfd in-flight series, but since you referred to
+>> >> >> it, [2] is a v2 of the WIP branch :)
+>> >> >> 
+>> >> >> [1] https://github.com/googleprodkernel/linux-cc/commits/wip-tdx-gmem-conversions-hugetlb-2mept
+>> >> >> [2] https://github.com/googleprodkernel/linux-cc/commits/wip-tdx-gmem-conversions-hugetlb-2mept-v2
+>> >> > Hi Ackerley,
+>> >> >
+>> >> > I'm working on preparing TDX huge page v2 based on [2] from you. The current
+>> >> > decision is that the code base of TDX huge page v2 needs to include DPAMT
+>> >> > and VM shutdown optimization as well.
+>> >> >
+>> >> > So, we think kvm-x86/next is a good candidate for us.
+>> >> > (It is in repo https://github.com/kvm-x86/linux.git
+>> >> >  commit 87198fb0208a (tag: kvm-x86-next-2025.07.15, kvm-x86/next) Merge branch 'vmx',
+>> >> >  which already includes code for VM shutdown optimization).
+>> >> > I still need to port DPAMT + gmem 1G + TDX huge page v2 on top it.
+>> >> >
+>> >> > Therefore, I'm wondering if the rebase of [2] onto kvm-x86/next can be done
+>> >> > from your side. A straightforward rebase is sufficient, with no need for
+>> >> > any code modification. And it's better to be completed by the end of next
+>> >> > week.
+>> >> >
+>> >> > We thought it might be easier for you to do that (but depending on your
+>> >> > bandwidth), allowing me to work on the DPAMT part for TDX huge page v2 in
+>> >> > parallel.
+>> >> >
+>> >> 
+>> >> I'm a little tied up with some internal work, is it okay if, for the
+>> > No problem.
+>> >
+>> >> next RFC, you base the changes that you need to make for TDX huge page
+>> >> v2 and DPAMT on the base of [2]?
+>> >
+>> >> That will save both of us the rebasing. [2] was also based on (some
+>> >> other version of) kvm/next.
+>> >> 
+>> >> I think it's okay since the main goal is to show that it works. I'll
+>> >> let you know when I can get to a guest_memfd_HugeTLB v3 (and all the
+>> >> other patches that go into [2]).
+>> > Hmm, the upstream practice is to post code based on latest version, and
+>> > there're lots TDX relates fixes in latest kvm-x86/next.
+>> >
+>> 
+>> Yup I understand.
+>> 
+>> For guest_memfd//HugeTLB I'm still waiting for guest_memfd//mmap
+>> (managed by Fuad) to settle, and there are plenty of comments for the
+>> guest_memfd//conversion component to iron out still, so the full update
+>> to v3 will take longer than I think you want to wait.
+>> 
+>> I'd say for RFCs it's okay to post patch series based on some snapshot,
+>> since there are so many series in flight?
+>> 
+>> To unblock you, if posting based on a snapshot is really not okay, here
+>> are some other options I can think of:
+>> 
+>> a. Use [2] and posting a link to a WIP tree, similar to how [2] was
+>>    done
+>> b. Use some placeholder patches, assuming some interfaces to
+>>    guest_memfd//HugeTLB, like how the first few patches in this series
+>>    assumes some interfaces of guest_memfd with THP support, and post a
+>>    series based on assumed interfaces
+>> 
+>> Please let me know if one of those options allow you to proceed, thanks!
+> Do you see any issues with directly rebasing [2] onto 6.16.0-rc6?
+>
 
-And there's really no reason for the host to NOT provide KVM_FEATURE_POLL_CONTROL.
-The only thing the guest can do with MSR_KVM_POLL_CONTROL is to disable host-side
-halt-polling, and for a KVM_HINTS_REALTIME vCPU, single_task_running() should hold
-true the vast majority of the time.  I.e. a properly configured host won't actually
-poll anyways, so providing KVM_FEATURE_POLL_CONTROL is basically a nop.
+Nope I think that should be fine. Thanks for checking!
 
-In other words, I agree using pr_err is annoying, but I don't think downgrading
-it is quite right either.
-
-> Signed-off-by: Li RongQing <lirongqing@baidu.com>
-> ---
->  arch/x86/kernel/kvm.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-> index 9cda79f..c5f96ee 100644
-> --- a/arch/x86/kernel/kvm.c
-> +++ b/arch/x86/kernel/kvm.c
-> @@ -1136,8 +1136,8 @@ static void kvm_enable_host_haltpoll(void *i)
->  void arch_haltpoll_enable(unsigned int cpu)
->  {
->  	if (!kvm_para_has_feature(KVM_FEATURE_POLL_CONTROL)) {
-> -		pr_err_once("host does not support poll control\n");
-> -		pr_err_once("host upgrade recommended\n");
-> +		pr_debug_once("host does not support poll control\n");
-> +		pr_debug_once("host upgrade recommended\n");
->  		return;
->  	}
->  
-> -- 
-> 2.9.4
-> 
+> We currently prefer this approach. We have tested [2] for some time, and TDX
+> huge page series doesn't rely on the implementation details of guest_memfd.
+>
+> It's ok if you are currently occupied by Google's internal tasks. No worries.
+>
+>> >> [2] https://github.com/googleprodkernel/linux-cc/commits/wip-tdx-gmem-conversions-hugetlb-2mept-v2
+>> >> 
+>> >> > However, if it's difficult for you, please feel free to let us know.
+>> >> >
+>> >> > Thanks
+>> >> > Yan
 
