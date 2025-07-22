@@ -1,219 +1,288 @@
-Return-Path: <kvm+bounces-53073-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53075-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66F5FB0D163
-	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 07:49:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A035B0D16C
+	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 07:51:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8DF86543F51
-	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 05:49:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7C3E17B0B80
+	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 05:49:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F6DA28C87A;
-	Tue, 22 Jul 2025 05:49:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0036328EA5A;
+	Tue, 22 Jul 2025 05:50:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="A1Y3CgrJ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XbgYwlTM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA6701E0E00
-	for <kvm@vger.kernel.org>; Tue, 22 Jul 2025 05:49:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753163370; cv=none; b=ov5slrN8n0V8wfgraKZ1HAvzR9OsSZjHPKiV3hUWDX7cSQAOb50sfoXD0ZOONCrEjiErIRHG9cK3X9qH9fTpSKA132FMf9AUMXsoIF02jCo+5V2vU/9U8AFpEu+6BKIWd56Vs5XQEnUas7xoQL8FzvpKsWMUglZADWtyiBH99Qw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753163370; c=relaxed/simple;
-	bh=EYsiutdD7obro3J8tRqNKcz0V+WlOluUDDcO6lr16h8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MqvgyxMLfURwK9jk13kTTb6+8qggdaxZTck36vYsKJWMmjdY+jzwCirF09WVTMygkQkw1ZifEJfBLIyYd89P2Ut/ptQWVacxKYfIrbB/rm8HOIrbqnW2lKQbq4u+OSx3BgRqJ86hCRP5E+vupkwHGWvhuJNWx/u9UENxFXaqFO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=A1Y3CgrJ; arc=none smtp.client-ip=209.85.215.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensrcsec.com
-Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-b31d489a76dso4326413a12.1
-        for <kvm@vger.kernel.org>; Mon, 21 Jul 2025 22:49:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=grsecurity.net; s=grsec; t=1753163368; x=1753768168; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=AnoJBa5+d/Xeyj/TiIdw33DeMjcCXsPUii0CNLMcpN8=;
-        b=A1Y3CgrJg1GNVLeN1VA+OwPFqp6SjsoOnyY6BWK1yzU8JGWn13fEBl6T1E99ufiqx8
-         51gudzyXKMqejG7uXhsTDvH0igSe+EYeh2QG12vnp8fsiYC5KHOXYioSG3K1GwEk0qAF
-         uNeiLkJODLyYsJjuXIUbeFBSM7dl8/pg53lpgoicCN3BAGwb4a6LsEV7gaYy6nMSumbb
-         pav7m5sFGeG32Q0MzbPuFIpg+2qOn0MU0vnC06T+QMc0vP/goI3zbD5tc7o2FIgBzXjk
-         503+AUZKRu3lvWmlw/wic0p2gjyOswsSFzTn8mG+fjbM4tAxhLZWINUAT2CPH2QbRsBp
-         2V6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753163368; x=1753768168;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AnoJBa5+d/Xeyj/TiIdw33DeMjcCXsPUii0CNLMcpN8=;
-        b=GUMXvrt3AQb8+D/gu2PRCmLTe3VUsICLeBRRx3ofPG1P1gNeyU7WpsR7iqkzq0eEoa
-         mSwCWI9BcAXnTzt42s3m4/TfqW2JAZE4wzBuEVm8VdDqdGXK8/Jfu0bO4tZYvCHWDF9h
-         2YI0eejN3Xv3CE7qU838tZjqlSPNdggZ4M1A7OFE6IuHpRJ8Oyg7amA88u5HGy/wXFj1
-         JC8Nt9SI7iXt4kwil+pyGLn0ghkCoSm30T3iye7BmjeceaCSb9U1dttoIigFaFS2ibYD
-         /wuPLlIctZnsZkyTm4TZ+R1zCGE9EjqqQrTSuEpeLn6ZBd7AVPsU+hOU791yzHJSP3Xm
-         xeeQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVvomFWrys/Fr2rXD+MWiZrMsxAWWeQKs6Og5QSTKnNBpd5mi13YJZJksuFe4GaAsdyFuo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyPe+kPCDXWZyQGZDgd3tWBDmfioiXaU/UJvUQI9DIe/Jly6ajJ
-	/xuol1//rd9w4NJ/z62jK+ruT5D0RaaKSW2NhatJRnj/vtDZFZx/VKo1YSx/OuJy2Ig=
-X-Gm-Gg: ASbGnctLqmmVs9ON2Co4AX6RGCBa3s0Nek4kiK+nap4TDjCc9Nl3cpgvfnkl4xYdFC8
-	LGcSv+vlJkdacBKllR0qNie+Di8MAJtR1dJxiVdfhLhHbKVJDW29UG0Og9jnZgi4dObbmD7vXIG
-	Rm/fwFYNpzW2D6IIcwnxg51BAK3NW4BWFon3anIsVgQcmQmVmq/6r+GRinovdbebRi1ez/LtXhv
-	sIhfgRNRwgEbBqLGq5clFB60lCoewnqfg33GyqzLZwE30mnxlNjNQ1ZvonZNPohwQl6yi5XnK7r
-	PM9/7HOcvYPlbQRJns7JDVgemC9CHuxMcH+zOSm8up/hyU1yC9wVffEpHqZNtEWspxY4NW3w5ud
-	HOtfqJCIC4PRGE4qmKOY4V9eEBewyKHwsfQ6WZYOQv78WsBuitI8KWEjvn8o/IttHXpDXvBxtLu
-	8rYqAku2vD9c+ZAruN5+CBpE0yT9oYoidAqUOjOPQBgz+oKkRjuB7RzKs=
-X-Google-Smtp-Source: AGHT+IGy7zc48edkju9bcZ32HPIv6nt5zr1Ku2glRdmr2ANOmtNOGOqnrirNkfszas0t7uVz5kPKvg==
-X-Received: by 2002:a05:6a20:12cb:b0:220:78b9:f849 with SMTP id adf61e73a8af0-23812c45ea0mr37911064637.24.1753163368136;
-        Mon, 21 Jul 2025 22:49:28 -0700 (PDT)
-Received: from ?IPV6:2003:fa:af22:cf00:2208:a86d:dff:5ae9? (p200300faaf22cf002208a86d0dff5ae9.dip0.t-ipconnect.de. [2003:fa:af22:cf00:2208:a86d:dff:5ae9])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-759cb76d4e4sm6849616b3a.106.2025.07.21.22.49.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 21 Jul 2025 22:49:27 -0700 (PDT)
-Message-ID: <96a0a8b2-3ebd-466c-9c6e-8ba63cd4e2e3@grsecurity.net>
-Date: Tue, 22 Jul 2025 07:49:21 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C89228D859;
+	Tue, 22 Jul 2025 05:50:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753163446; cv=fail; b=PuyOksvKjhsdbReBS1jxYfqH/P4DWHSfJ+D8Zt5Dh+2Ii+71QYInXB2teDYLeZxLnW4go2jsQxEH2pHweyULsAwohQPoKJtcVdLU4shbDXsA3ictL+xhMnz7nmASLoXs0lJLJB67EWKrO3Fz8SNMeTN3FRYXVeuJoktzAL6f/+o=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753163446; c=relaxed/simple;
+	bh=SRiTlk7K53UyGsMpYgsnRxOAQib0kcyORYl75LYWqAE=;
+	h=Date:From:To:CC:Subject:Message-ID:Content-Type:
+	 Content-Disposition:MIME-Version; b=LqXhbo4MUz8s5UIEKxdGZSq8OmHx0t/DTjPWQVuG7Jqehw5NiG59PJAtfKyD6E8xqcMrs4VApLS6DiuOjfekS8TQQshOTbgyhFG09kU7bP3L7t2nxC0lyEva2kCuA3mRTvFcIiJPWgLUokUspk+MZJ9yX0TZtG8+xz32J7pH45w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XbgYwlTM; arc=fail smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1753163444; x=1784699444;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=SRiTlk7K53UyGsMpYgsnRxOAQib0kcyORYl75LYWqAE=;
+  b=XbgYwlTMuLlkovvNLAYVFuij/MaM6CuZ7ySGOGpETxrUUCUOTglmhNWa
+   nVE5dh7UAs1WBSH6XezkuGB7HYRySAHDwfqFbTJi43axunUF9Cqd/rhz6
+   lfBGZb0qNp8hlk+3dcJXAFxSN+Im8YJXwycvFCoRgbtJmub9KD6SBS8p+
+   L6qX3KHV0IawK9G2Z3KmYYa4YMiPPYqaoGCmFoKFo4CcQeUzs4hGzbq9l
+   sCZ7qC/RmYKJMoGwHkqMWyDPKHozsZ1MaAvnDu/88AmW6CNzNuj3zrUus
+   ATokeqWDIAjl7Kod2a5g1AdIMzL0CAYiGtfe5Y/WOm6Y430k8gdnsz2GP
+   Q==;
+X-CSE-ConnectionGUID: JD83V9XLQx2DPHvfX9I4iA==
+X-CSE-MsgGUID: cjA2X2eJSWiZ6yv99W6z0Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11499"; a="80839604"
+X-IronPort-AV: E=Sophos;i="6.16,330,1744095600"; 
+   d="scan'208";a="80839604"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2025 22:50:44 -0700
+X-CSE-ConnectionGUID: ZiNZeCOLSxahVa99Ttl96Q==
+X-CSE-MsgGUID: 6GTJsky/Sf2p2WUfzXBeZQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,330,1744095600"; 
+   d="scan'208";a="163090965"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by fmviesa003.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2025 22:50:44 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26; Mon, 21 Jul 2025 22:50:43 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26 via Frontend Transport; Mon, 21 Jul 2025 22:50:43 -0700
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (40.107.95.83) by
+ edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26; Mon, 21 Jul 2025 22:50:42 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=pHYFNVR5hhQowp2VfvztAZviB8G/BXbQ36sshrll81MAoluVbwXdU6CdTt4oLO3Vs6qEvelLFijHY41a8sM8vfblTG69hXrJ4kmwP2CDgU0chBCg1L9fUxASthGncQfc4G+68z5WyW1orij3tHnrJA4xCXPaLUO5CYsFhWxXASR7JwJtaUTJoZk2LtGEbEsucYTqhp4VUme+VzI2YIxWm433fA/1M2odto1FVvcNR/07KoDll29Y1hXFiZ3O0Ye/7OezlTREpPLw/D7lHbpBLXGdR3A8doTbRYlqOT6pePC+33G69A0lkhuyicBImcGgvZxJvHn57I9SFx73Knl4yg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=scD8at3w3voXNh/OYIrK4c0qG7iEbVkDEKe6JfzXCqY=;
+ b=jxrdnP9S5j6fqJH3ic9K1wgya/Ekvb0hl320gKAKFnAmCPPoabITpjrRRy1QJ88FkB45JJDVU3evhvDN6Z18SGAlWw5j1VAAmaK43CPSfBjTruKfDIf2VenLZl+umM+ruO24lFU6ua7fkd9JC/d2sAXWtGjrachp/obAKVrjMfJcEIzwOR/L7x3yzmUi0PAgrgbJ9U7WQX+S9am5Zv1ZSBEVM5FuBNnprbXGd7akKN8fpDn78byndq7IgWYiN9iHmQphkbOoO6YYbNY25OusHjIJyTpLENyLvIsImqXV/+UoF7/ZJmFYx3weXMJNwuKeooeDrJ1fyBjzvNsyHQEtDQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from LV3PR11MB8603.namprd11.prod.outlook.com (2603:10b6:408:1b6::9)
+ by LV8PR11MB8533.namprd11.prod.outlook.com (2603:10b6:408:1e5::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8943.30; Tue, 22 Jul
+ 2025 05:49:55 +0000
+Received: from LV3PR11MB8603.namprd11.prod.outlook.com
+ ([fe80::4622:29cf:32b:7e5c]) by LV3PR11MB8603.namprd11.prod.outlook.com
+ ([fe80::4622:29cf:32b:7e5c%3]) with mapi id 15.20.8943.029; Tue, 22 Jul 2025
+ 05:49:55 +0000
+Date: Tue, 22 Jul 2025 13:49:46 +0800
+From: kernel test robot <oliver.sang@intel.com>
+To: Sean Christopherson <seanjc@google.com>
+CC: <oe-lkp@lists.linux.dev>, <lkp@intel.com>, <linux-kernel@vger.kernel.org>,
+	Maxim Levitsky <mlevitsk@redhat.com>, <kvm@vger.kernel.org>,
+	<xudong.hao@intel.com>, <oliver.sang@intel.com>
+Subject: [linus:master] [KVM]  7803339fa9:
+ kernel-selftests.kvm.pmu_counters_test.fail
+Message-ID: <202507220727.f2cbbd0a-lkp@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+X-ClientProxiedBy: SG2PR02CA0069.apcprd02.prod.outlook.com
+ (2603:1096:4:54::33) To LV3PR11MB8603.namprd11.prod.outlook.com
+ (2603:10b6:408:1b6::9)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v11 19/23] KVM: x86: Enable CET virtualization for VMX and
- advertise to userspace
-To: Sean Christopherson <seanjc@google.com>
-Cc: Chao Gao <chao.gao@intel.com>, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, x86@kernel.org, pbonzini@redhat.com,
- dave.hansen@intel.com, rick.p.edgecombe@intel.com, mlevitsk@redhat.com,
- john.allen@amd.com, weijiang.yang@intel.com, xin@zytor.com,
- Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- "H. Peter Anvin" <hpa@zytor.com>
-References: <20250704085027.182163-1-chao.gao@intel.com>
- <20250704085027.182163-20-chao.gao@intel.com>
- <4114d399-8649-41de-97bf-3b63f29ec7e8@grsecurity.net>
- <aH58w_wHx3Crklp4@google.com>
-Content-Language: en-US, de-DE
-From: Mathias Krause <minipli@grsecurity.net>
-Autocrypt: addr=minipli@grsecurity.net; keydata=
- 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
- RzDVkdgPJkL/NFTKZHo5foFXNi89kA==
-In-Reply-To: <aH58w_wHx3Crklp4@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-
-On 21.07.25 19:45, Sean Christopherson wrote:
-> On Mon, Jul 21, 2025, Mathias Krause wrote:
->> Can we please make CR4.CET a guest-owned bit as well (sending a patch in
->> a second)? It's a logical continuation to making CR0.WP a guest-owned
->> bit just that it's even easier this time, as no MMU role bits are
->> involved and it still makes a big difference, at least for grsecurity
->> guest kernels.
-> 
-> Out of curiosity, what's the use case for toggling CR4.CET at runtime?
-
-Plain and simple: architectural requirements to be able to toggle CR0.WP.
-
->> Using the old test from [1] gives the following numbers (perf stat -r 5
->> ssdd 10 50000):
->>
->> * grsec guest on linux-6.16-rc5 + cet patches:
->>   2.4647 +- 0.0706 seconds time elapsed  ( +-  2.86% )
->>
->> * grsec guest on linux-6.16-rc5 + cet patches + CR4.CET guest-owned:
->>   1.5648 +- 0.0240 seconds time elapsed  ( +-  1.53% )
->>
->> Not only is it ~35% faster, it's also more stable, less fluctuation due
->> to less VMEXITs, I believe.
-
-Above test exercises the "pain path" by single-stepping a process and
-constantly switching between tracer and tracee. The scheduling part
-involves a CR0.WP toggle in grsecurity to be able to write to r/o
-memory, which now requires toggling CR4.CET as well.
-
->>
->> Thanks,
->> Mathias
->>
->> [1]
->> https://lore.kernel.org/kvm/20230322013731.102955-1-minipli@grsecurity.net/
-> 
->> From 14ef5d8b952744c46c32f16fea3b29184cde3e65 Mon Sep 17 00:00:00 2001
->> From: Mathias Krause <minipli@grsecurity.net>
->> Date: Mon, 21 Jul 2025 13:45:55 +0200
->> Subject: [PATCH] KVM: VMX: Make CR4.CET a guest owned bit
->>
->> There's no need to intercept changes of CR4.CET, make it a guest-owned
->> bit where possible.
-> 
-> In the changelog, please elaborate on the assertion that CR4.CET doesn't need to
-> be intercepted, and include the motiviation and perf numbers.  KVM's "rule" is
-> to disable interception of something if and only if there is a good reason for
-> doing so, because generally speaking intercepting is safer.  E.g. KVM bugs are
-> less likely to put the host at risk.  "Because we can" isn't not a good reason :-)
-
-Understood, will extend the changelog accordingly.
-
-> 
-> E.g. at one point CR4.LA57 was a guest-owned bit, and the code was buggy.  Fixing
-> things took far more effort than it should have there was no justification for
-> the logic (IIRC, it was done purely on the whims of the original developer).
-> 
-> KVM has had many such cases, where some weird behavior was never documented/justified,
-> and I really, really want to avoid committing the same sins that have caused me
-> so much pain :-)
-
-I totally understand your reasoning, "just because" shouldn't be the
-justification. In this case, however, not making it a guest-owned bit
-has a big performance impact for grsecurity, we would like to address.
-
-The defines and asserts regarding KVM_MMU_CR4_ROLE_BITS and
-KVM_POSSIBLE_CR4_GUEST_BITS (and KVM_MMU_CR0_ROLE_BITS /
-KVM_POSSIBLE_CR0_GUEST_BITS too) should catch future attempts on
-involving CR4.CET in any MMU-related decisions and I found no other use
-of the (nested) guest's CR4.CET value beside for sanity checks to
-prevent invalid architectural state (CR4.CET=1 but CR0.WP=0).
-
-That is, imho, existing documentation regarding the expectations on
-guest-owned bits and, even better, with BUILD_BUG_ON()s enforcing these.
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV3PR11MB8603:EE_|LV8PR11MB8533:EE_
+X-MS-Office365-Filtering-Correlation-Id: cc5af91c-064f-42f0-a067-08ddc8e395c8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?4i4YwKlYu6LQm5vX5TB+/MOOIvQzRTxZaBB/2z4S1Pp4Mc9CTIIyl73zc+Bw?=
+ =?us-ascii?Q?l5+VRQdAlFMH28mRGKXlXAeGKSbm449dbjMl8HpSNlhLZ9tLSyUj1wjo3G2G?=
+ =?us-ascii?Q?q3FPfoVCbsqc3ct/0uvMQmGI0Qjpp3dc5UirxqzfSz+pc/qhzRAbZbbIszlK?=
+ =?us-ascii?Q?dOlahvkuZ5PtTmG5ZdhBwlVz3uwtA4ldX2o1B+TclQmYVTvOzPM+mm1a07fg?=
+ =?us-ascii?Q?t3519YXlmbas/FOmkjsXhy2vh6ZO4KtCLUmKkTDlI4fLq9O/i7ajXmUpZqwL?=
+ =?us-ascii?Q?2uskuyK4Ef1bJYbNBSq30WB9RzxLvOlkXLfsNo6+uELUnXM8PHKGHHK/mRd8?=
+ =?us-ascii?Q?ApmKf6F6nc/MOBe2ECMkB+yX6i3q73pzHcqs5nf5qy7x3whZE7Wvqbcl7NJC?=
+ =?us-ascii?Q?RUUEu6Tjbl7J68RkUavKcODj8XTx+geaa5tzSQmlR87dShdv4VJX8NFIQiVD?=
+ =?us-ascii?Q?VQKB00n6sJpt8NchtlCwWCHEwC9es/pJDR4EuiWgGQ6erpq89kVC6hNKPfZA?=
+ =?us-ascii?Q?BrKIbWDpDNp8htA1UXWHMLR9XJ3S3BEHoI2ItHxYhpynrD9hjx/Fww2r0ftL?=
+ =?us-ascii?Q?RPUx//L7FyfqVFF5lmO0eZxbPXyroEKJA90SmkFr4dY70dlSbed347ZSlc7d?=
+ =?us-ascii?Q?JnQQwyxNr65yWhVtLZo3+GeztOYbPL4tO21eD4sDZ9fejybsCXFLgDtaSzhZ?=
+ =?us-ascii?Q?LdIZ1Jca25hFDrzdBbebVr9olo03Sr25KGMPjZ2xaAjqf3hglAc53sRx05fN?=
+ =?us-ascii?Q?VnQWSYlqH5KosTNdDLrx9sN7U5OPt60+x1VGEKKKtIzTLimH3TPdGGgHslcR?=
+ =?us-ascii?Q?bv0bDp3LiPrY4R/IGJcdbU1vrkR5JobZ7kq0g9xVKvk4ED/yepD1QHyjaeIi?=
+ =?us-ascii?Q?HJcNYz/fd4eAND2orRzRQCLhyZHCn+FzcRPDfQ+mxvd1BgHf0T/vGtpVpr3j?=
+ =?us-ascii?Q?5A0nRZd3wnMxzc7z5kTt8OVBUSJfoaDP6opFMibsxwM0lcSTZP/Lyo5U8EXe?=
+ =?us-ascii?Q?sH+bcTzP0gzOPK40L4fcqUmYoyK2M0otuNSnAlbpGBtUIUTyBisELnB2FdfA?=
+ =?us-ascii?Q?9aFcfRLvNzz+NnOF2syIh+6QzTUl99X8k2elZuUd3m75rCWORQDzLQtZ41UX?=
+ =?us-ascii?Q?Jz1PQ7CZFLsTm+xCiVMeD++BWgURqMfKHwRBytK9XoGtrzDlbZOMau1twbVs?=
+ =?us-ascii?Q?lfh4JPxzPQFB/kEhMl6hfD/oWdStNuD+kxq8WD8aDrC69/eprM0NUPdJg0aY?=
+ =?us-ascii?Q?vB2HHiBGBClMWD98vAPhPcrURyy+e2Rp4gZzVbnHNt+0z9vTGs7fGNY0PzNK?=
+ =?us-ascii?Q?huf+K4HWvo/28x+n7kniYr67JW6ERKiQhweMwhaKKn561x724gJ8hVq1M6ts?=
+ =?us-ascii?Q?eNrPuBHVAa0Yb4YGJ9fYXNM1Y66B?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR11MB8603.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?tGoR61ONY+lOR56UWjJLKO2weOZSG9gHXlL26ijqIClc32/TAOuyi0rsFHRA?=
+ =?us-ascii?Q?lxP5ojYm/NZVkyWmEYOBLFQfwx/dVeG6E6ljiX4u34Tp1qfDaiWm0XcNTA62?=
+ =?us-ascii?Q?uOvGxWAYrZz/r9JvozlZxmvpJ3vjA6mysCnxrAevFsFVegaUMg1GPFo2vq7C?=
+ =?us-ascii?Q?VcKCVkUXseKJRzp0zDq3lBNbHaNgFxydFGgfV5sBblZFf/y6YnG7Ws9KN+rW?=
+ =?us-ascii?Q?ziB+mQnyffmxah/kkXmKy+sBddvjELhZ6ZUQigvd0zKhnyzed7/ADBzMgMu0?=
+ =?us-ascii?Q?X8XuDn/aHhm7apbqBRoqn3x8377LRhK0DZu9LoXKToEfL+fcGkxsLpPpL3Xz?=
+ =?us-ascii?Q?kggD3rdY0Dy6igA5yI4Ci16mDKjg8vU9r0fdYR+bLEcab3cLxCTEItmhq9ov?=
+ =?us-ascii?Q?JywJUXFNv4CKMNKgxApsR0emSNiJNKcPgqx1fvCF2TDIRxJrS2fYfCwLza/V?=
+ =?us-ascii?Q?fiQzvQ5n62B3vNyZjvpP9HhjcqBy5OJrmBQRcPmzdIUTXxirgTIaq06MYnAp?=
+ =?us-ascii?Q?Q/NPPrji/uKcZkFl52Lt/bztyAoT6TCazgw6YUyUPQTcg3WsPqdHNwEcyo20?=
+ =?us-ascii?Q?9Tb6HaIuuVazl13+MHe5YtgN8VluY5bnPepxC+3U8mLe6IbcZU6nGlfSTDli?=
+ =?us-ascii?Q?HC8gtnZQCBV8doDBr8DT+asoah5Zfzj7dm6fmNJZ1Mx2yUgOEBl1fNjuqvoj?=
+ =?us-ascii?Q?rxTBafR8tH66bjo2r34kHKFWu96kZCduin/qG2cgP+2bNKT6zJuo2gMmvEuF?=
+ =?us-ascii?Q?JSugRb02ES4Ac884eKeWLSeSSl7AeP8Vjgnx3Ux7crBMtLj4n0Ei7spdSTx6?=
+ =?us-ascii?Q?lTwVxQgkMKPv2IlGApITSG16DOhxrQT3qpG5JTT61I7+hgzXCHPfJiobBqD5?=
+ =?us-ascii?Q?8RiiB5okDec5JA+oYhBYumKWBke4RzPq55tI0ZpVkRTc6mt7gkX4USLIB7PR?=
+ =?us-ascii?Q?8Gv0ePiNOvg0ckinMWIaY5HjTmH3PjfZVJk6OUJTOVf882U35HTQt9tMjqAf?=
+ =?us-ascii?Q?AyvDDkE95OOeiSV3tHLk46cwyhCoVcHoBh+aVYG5bPVXGX2t4MjZH1rUaIke?=
+ =?us-ascii?Q?OOxQJKDIJ3UrlFH1FxiGUDI9KSdChlw5kzSgO6oA8TCCM4SbgU0o/x4F1mk2?=
+ =?us-ascii?Q?yVwIIrPh4kIwi39g1uHKUDzw1GYob5SpeVn/ESTptFlLBRnJMCLsjbbi5WJL?=
+ =?us-ascii?Q?qXEV1+SGzY+xTyEj527GWyTSgSk47pEt/HNltaizoA2KX3V4+smWwR24ZdBT?=
+ =?us-ascii?Q?xi6I726G6FXvnl2ZeQR4YgYkJWIg1lXzBYL3bYnbHi7rYSQgyhEuUqiETFNM?=
+ =?us-ascii?Q?mKX37gGD6+NKmZjy5N+g/n9eNqfwzYPCTLDIFoBXSWU0eGZI832170CjGVYr?=
+ =?us-ascii?Q?RW8qg/EifgHyjvO5m7hmOT3XNVFE5zR0RoITRrbfRrPn/NekSsN15A13tAHW?=
+ =?us-ascii?Q?SXZ+ywvy1c3fAJDj/SX6FOPPBx8kFP/lAKdz/zgITcT1KkD+CRu4yaAD5Vry?=
+ =?us-ascii?Q?QCw2xtgf92odWiVKN1ooNmkRwFMxMXxJ0ZilckggCpHzCHDW125R7ugeK6Xh?=
+ =?us-ascii?Q?K1a+72EnHrMo+Nfc296Tlri/SDTidIwr2kSe8p5mV9l2N/vivC808QapPJ+0?=
+ =?us-ascii?Q?lw=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: cc5af91c-064f-42f0-a067-08ddc8e395c8
+X-MS-Exchange-CrossTenant-AuthSource: LV3PR11MB8603.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jul 2025 05:49:55.3657
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: kjfykk8Q9Cv2MeWS4Pn2MswpfH2ZG5b6Stn10XQm/RvZSM3DvnNutdPnLUeVm+UDm9cHmAkiSHq7Aa8GoehoOQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR11MB8533
+X-OriginatorOrg: intel.com
 
 
-Thanks,
-Mathias
+Hello,
+
+
+we reported
+"[linux-next:master] [KVM]  7803339fa9: kernel-selftests.kvm.pmu_counters_test.fail"
+in
+https://lore.kernel.org/all/202501141009.30c629b4-lkp@intel.com/
+
+we noticed there are some discussion there about the issue and fix.
+
+this commit is in mainline now, and we captured the same issue again on a
+Ice Lake platform. another thing is we found the issue is random. as below,
+2 times failure out of 6 runs for 7803339fa9. for parent, all 9 runs pass.
+
+so we make out this report for this commit again FYI.
+
+
+=========================================================================================
+tbox_group/testcase/rootfs/kconfig/compiler/group:
+  lkp-icl-2sp9/kernel-selftests/debian-12-x86_64-20240206.cgz/x86_64-rhel-9.4-kselftests/gcc-12/kvm
+
+bd7791078ac223f5 7803339fa929387bbc66479532a
+---------------- ---------------------------
+       fail:runs  %reproduction    fail:runs
+           |             |             |
+           :9           22%           2:6     kernel-selftests.kvm.pmu_counters_test.fail
+
+
+
+kernel test robot noticed "kernel-selftests.kvm.pmu_counters_test.fail" on:
+
+commit: 7803339fa929387bbc66479532afbaf8cbebb41b ("KVM: selftests: Use data load to trigger LLC references/misses in Intel PMU")
+https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git master
+
+[test failed on linus/master      6832a9317eee280117cd695fa885b2b7a7a38daf]
+[test failed on linux-next/master d086c886ceb9f59dea6c3a9dae7eb89e780a20c9]
+
+in testcase: kernel-selftests
+version: kernel-selftests-x86_64-7ff71e6d9239-1_20250215
+with following parameters:
+
+	group: kvm
+
+
+
+config: x86_64-rhel-9.4-kselftests
+compiler: gcc-12
+test machine: 64 threads 2 sockets Intel(R) Xeon(R) Gold 6346 CPU @ 3.10GHz (Ice Lake) with 256G memory
+
+(please refer to attached dmesg/kmsg for entire log/backtrace)
+
+
+
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <oliver.sang@intel.com>
+| Closes: https://lore.kernel.org/oe-lkp/202507220727.f2cbbd0a-lkp@intel.com
+
+
+The kernel config and materials to reproduce are available at:
+https://download.01.org/0day-ci/archive/20250722/202507220727.f2cbbd0a-lkp@intel.com
+
+
+# timeout set to 120
+# selftests: kvm: pmu_counters_test
+# Random seed: 0x6b8b4567
+# Testing arch events, PMU version 0, perf_caps = 0
+# Testing GP counters, PMU version 0, perf_caps = 0
+# Testing fixed counters, PMU version 0, perf_caps = 0
+# Testing arch events, PMU version 0, perf_caps = 2000
+# Testing GP counters, PMU version 0, perf_caps = 2000
+# Testing fixed counters, PMU version 0, perf_caps = 2000
+# Testing arch events, PMU version 1, perf_caps = 0
+# Testing GP counters, PMU version 1, perf_caps = 0
+# Testing fixed counters, PMU version 1, perf_caps = 0
+# Testing arch events, PMU version 1, perf_caps = 2000
+# Testing GP counters, PMU version 1, perf_caps = 2000
+# Testing fixed counters, PMU version 1, perf_caps = 2000
+# Testing arch events, PMU version 2, perf_caps = 0
+# ==== Test Assertion Failure ====
+#   x86/pmu_counters_test.c:126: count != 0
+#   pid=11038 tid=11038 errno=4 - Interrupted system call
+#      1        0x0000000000411281: assert_on_unhandled_exception at processor.c:625
+#      2        0x00000000004075d4: _vcpu_run at kvm_util.c:1652
+#      3         (inlined by) vcpu_run at kvm_util.c:1663
+#      4        0x0000000000402c5e: run_vcpu at pmu_counters_test.c:62
+#      5        0x0000000000402e4d: test_arch_events at pmu_counters_test.c:315
+#      6        0x000000000040283e: test_arch_events at pmu_counters_test.c:599
+#      7         (inlined by) test_intel_counters at pmu_counters_test.c:599
+#      8         (inlined by) main at pmu_counters_test.c:642
+#      9        0x00007fb974a65249: ?? ??:0
+#     10        0x00007fb974a65304: ?? ??:0
+#     11        0x0000000000402900: _start at ??:?
+#   0x0 == 0x0 (count == 0)
+not ok 21 selftests: kvm: pmu_counters_test # exit=254
+
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
+
 
