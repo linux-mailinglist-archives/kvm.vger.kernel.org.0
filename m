@@ -1,178 +1,171 @@
-Return-Path: <kvm+bounces-53054-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53056-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9B4FB0CF9C
-	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 04:22:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 88C33B0D01C
+	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 05:15:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C40A3B2990
-	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 02:22:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C655E3A8ABA
+	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 03:15:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 390171DFE0B;
-	Tue, 22 Jul 2025 02:22:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E1E028C2BE;
+	Tue, 22 Jul 2025 03:15:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="NYydIyw+"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="vX5ZPBpF"
 X-Original-To: kvm@vger.kernel.org
-Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8899AE573;
-	Tue, 22 Jul 2025 02:22:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.110
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB1022222D7
+	for <kvm@vger.kernel.org>; Tue, 22 Jul 2025 03:15:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753150952; cv=none; b=MIcibHe7dhN9K6+20BMboABEvJMY0jn5nlU7AVbnIZ3aF1gluT6UgoFdnPS5goN6nBoLm7s0bXVFB9jprRXwgKDQmjqbe6WNo9TraZcmPzqKe2FerFej0ekzZ5zynCTJE7P/yQwm1tCAmx+paS3qOm8/LrFovm2rB58Z4hdXJj4=
+	t=1753154128; cv=none; b=orQGmOjsbdkzadylXRd1sROk2oji7b1i4u7n3ZjrG2uqCC0ZC2R9rc0uubuey4oyQ23yaAjvdt3ghLEOJaiKIASIicf3X7HzKi6MNUsQC9dAQZcolM9vY3BVlzESbAeMqxtHNDW5oYRPEu+aJvOfr9eOEwnDxDfn2dEkL/rEmng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753150952; c=relaxed/simple;
-	bh=QbTtBiEuTKJxsVRJATE0jtxPRwX8pZR6yE5+I+zORZA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F17xt5xqLm//r3hE5rm0VjIk1YO+QfKLK/64PaaJwO9htZfulRFD4a7Kz/BQn6ZH4gx/CcDka9FEqFabhYPyvPoQMC9oIElNPnqGu3OPkJo3FfccWoKIfXehO/KLTzRaB8GzebB0uflqWZJhuFnDudC9PMMOa4fCAUNE5ckCW+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=NYydIyw+; arc=none smtp.client-ip=115.124.30.110
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1753150947; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=rnddjr1TA6eWUS4Z0+c9ZMpNcvutQ6Idh5vDJofAMV4=;
-	b=NYydIyw+h0Efb4xeksI1MwNI9i8Y+FVFfwE729kHrzJZEUV9/FY/fnq6pjfKz/b5o1UFKxmrNn9YEPsrh7wlFj1MUq9/KRhk0DEpVKyRx8fH0czaT3EJmeqQGpi4aVitS/N5oZvoLA1P5zVoPUIOPyx9lHXDkblMeijCqlWzLTg=
-Received: from localhost(mailfrom:yaoyuan@linux.alibaba.com fp:SMTPD_---0WjTxcb9_1753150945 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Tue, 22 Jul 2025 10:22:26 +0800
-Date: Tue, 22 Jul 2025 10:22:25 +0800
-From: Yao Yuan <yaoyuan@linux.alibaba.com>
-To: Keir Fraser <keirf@google.com>
-Cc: Yao Yuan <yaoyuan0329os@gmail.com>, 
-	Sean Christopherson <seanjc@google.com>, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, Eric Auger <eric.auger@redhat.com>, 
-	Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2 2/4] KVM: arm64: vgic: Explicitly implement
- vgic_dist::ready ordering
-Message-ID: <icgg7uqbhoj674wjhngwf3svbvikofjgubtgcua64epaf4kxil@oyjyydk7asxp>
-References: <20250716110737.2513665-1-keirf@google.com>
- <20250716110737.2513665-3-keirf@google.com>
- <kb7nwrco6s7e6catcareyic72pxvx52jbqbfc5gbqb5zu434kg@w3rrzbut3h34>
- <aHphgd0fOjHXjPCI@google.com>
- <5zpxxmymnyzncdnewdonnglvmvbtggjyxyqvkf6yars2bbyr4b@gottasrtoq2s>
- <aHtQG_k_1q3862s3@google.com>
- <4i65mgp4rtfox2ttchamijofcmwjtd6sefmuhdkfdrjwaznhoc@2uhcfv2ziegj>
- <aH3w9t78dvxsDjhV@google.com>
- <lb3i3h2rwq3kvm6tqoiiyrqcpqe2ctxcwmapgifii3dzqzfuqh@eqcqeudpfjlg>
+	s=arc-20240116; t=1753154128; c=relaxed/simple;
+	bh=JzkBOKAgWdiUJQ2g/MaoHxtIyReucIXiIAdcpENkXdg=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=GPBrc8AdWGqXO3NemLKhsco0wB74SWwSFoHKLq1NA2W8m1BflZSoVMlar6z3wwDLvTKXSkGOaDH18s0/X8T5nMtdxafudwMMQCnEwHhpIySakqsiORmGkAoi4Q0P5FPgaG5Nt9QJGoerAuONkPMizXFil09PAWiK8AaMI1IxOhI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=vX5ZPBpF; arc=none smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-749248d06faso4227533b3a.2
+        for <kvm@vger.kernel.org>; Mon, 21 Jul 2025 20:15:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1753154125; x=1753758925; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=N3ro4Yyao5uXofBVuxsMuyd3IafrNj++K0PwR4Tt2N0=;
+        b=vX5ZPBpFcQlouuvkn+JhlTYT+QKdqXD0kYgt2NV2gvr+PVMCIPJJl5ibjRFpcAukZs
+         SgfJPkzjekrNSlKeeyy+Oh0iD1bPnnHltkgFTbyc9N/B/Fvp0U/LURfqQQhj4rE1eiAW
+         krvNRoVg/M5P5EO4y3MZzSEjGV748i9ewk2Dm4v2vUPVS3fpHP+9wlu3W91p4WsIM0/8
+         InEkAPPFgvf9qXJPiY/Xk3EdhqcLGwMFeg+wejJrqVyvrZWRMw4rDdplK/v0900BeTKA
+         tgw2rsa/Zlv/ZVfCN445OHQ1dI3jpTcd8sr17IRcGSztBPzPy9cfCD0dRjrY+nb7bhF8
+         +l0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753154125; x=1753758925;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=N3ro4Yyao5uXofBVuxsMuyd3IafrNj++K0PwR4Tt2N0=;
+        b=Q/JGTFHyQtxMMJiZHOGDv5y/PtQXxXM6rerw8QboHGo4UiigoN2ZmmUDyjpPzgSbwa
+         8VbWPaKE5nFgi5/nWVKxw++nyQ+NSDqpdKh7bhqJ4S3LWUAeUnokklsCh2mu1er2+v47
+         0vu6UHSZtVmlS9kNylETjB4yWD8JsXFrHB//qYIMEp1qJzQjWJA4DqyrSfqegv77cXIb
+         AofELiMBSw5o6t7Xhwhaoh1NzZcOaSQdcFMZdx8s3MeXcHkDH19WVB3qCOl07DlVGMwJ
+         0tsl3e1qbr71zCak8GuxStOF0SFZnTDryEpvwQfNH2vWcCAeq78u7+dlqgkUKs21+4im
+         jeQQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV+byNnR5fX6rt6Uh1XBypp0O6ZCel0nNcHWECOGbJiyjBqf5Ok5Wn3sD083YZXeGN6CAc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKIjOpfe2PAoBnRFe7fn/b8b6WM38rzTfOUaJpsCV2zL5JnRhY
+	QU+ZZ3vVq4OWKDvXnukZbB6rGYUAT2qeY8XCk1jE76YPHwYhTxiXePj0oNexzergbsQ=
+X-Gm-Gg: ASbGnctCeJgJtl0EDqNKXdJpKZJWKpIrVWApwHRxcYnblmdY3j3Ig/Aemj3jQ0HyA0m
+	avjrI94oBilGLT/0L2qW2NdQJlOdaeLQxclkpHdNr6BK31a5wFvPr0IKfLkn7wX3W/R3iXCCPJe
+	fSckcv8Cq1LC6pMqV4BQc9CzZxQY2FjyLb8ceyyzsQw3wXfVVnhsbe2kcCxcB/3b6ni0lRLhZHF
+	6WWwj/0yx/UaogenbDnkhHqop2r4VMHc4y4wbZL19FjKx5B0RlATQ4MYo0vTLihZxG4Mn8g1bsg
+	o2ns5kp+5A21IqjxIFWexuuicKlGO98zTttTdCMk1oGFKzaZP4SM6Jho25Pcw379bgxYrxan1ZI
+	+QbDeK8ymi9WYwB5Zoz56aTg6FirPE2n2lyo=
+X-Google-Smtp-Source: AGHT+IE5Vc7OGRx4QhLjcitwZKIWZGvajhiltbo4bWSxvPQDoCrplva3mLaEOWP7EA2twj6pT6oskw==
+X-Received: by 2002:a05:6a21:6b02:b0:21f:5598:4c2c with SMTP id adf61e73a8af0-2390db673cfmr29574196637.13.1753154125053;
+        Mon, 21 Jul 2025 20:15:25 -0700 (PDT)
+Received: from atishp.ba.rivosinc.com ([64.71.180.162])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b3f2feac065sm6027612a12.33.2025.07.21.20.15.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Jul 2025 20:15:24 -0700 (PDT)
+From: Atish Patra <atishp@rivosinc.com>
+Subject: [PATCH v4 0/9] Add SBI v3.0 PMU enhancements
+Date: Mon, 21 Jul 2025 20:15:16 -0700
+Message-Id: <20250721-pmu_event_info-v4-0-ac76758a4269@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <lb3i3h2rwq3kvm6tqoiiyrqcpqe2ctxcwmapgifii3dzqzfuqh@eqcqeudpfjlg>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAEQCf2gC/23Q3U7EIBAF4FdpuJZNB/oDjTG+hzFNoYPLRekKX
+ aLZ7Ls7bWPUXS8PCR+cc2EJo8fEuuLCImaf/BwoVA8Fs8chvCH3I2UmSlFBCYqfpnOPGcPS++B
+ mrlWDAiw2ZpSMLp0iOv+xgS+vlI8+LXP83PwM6+lOAehbKgMv+VA53WioBDj1HH2ekw/2YOeJr
+ VoW30JdAtR3giBBVQpq05ZSSfOPIH+EWog7QZLgWmOG1o3aOrwRrnvFiO9nmmrZe7IJUxq2qbr
+ icasn4De9LdLT7/YPgkRFPWvdiD/80zqgGRJyCpNfuiI3B5A8WkEvX78A6qJO7qwBAAA=
+X-Change-ID: 20241018-pmu_event_info-986e21ce6bd3
+To: Anup Patel <anup@brainfault.org>, Will Deacon <will@kernel.org>, 
+ Mark Rutland <mark.rutland@arm.com>, 
+ Paul Walmsley <paul.walmsley@sifive.com>, 
+ Palmer Dabbelt <palmer@dabbelt.com>, 
+ Mayuresh Chitale <mchitale@ventanamicro.com>
+Cc: linux-riscv@lists.infradead.org, linux-arm-kernel@lists.infradead.org, 
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+ kvm-riscv@lists.infradead.org, Atish Patra <atishp@rivosinc.com>
+X-Mailer: b4 0.15-dev-42535
 
-On Tue, Jul 22, 2025 at 10:01:27AM +0800, Yao Yuan wrote:
-> On Mon, Jul 21, 2025 at 07:49:10AM +0800, Keir Fraser wrote:
-> > On Sun, Jul 20, 2025 at 08:08:30AM +0800, Yao Yuan wrote:
-> > > On Sat, Jul 19, 2025 at 07:58:19AM +0000, Keir Fraser wrote:
-> > > > On Sat, Jul 19, 2025 at 10:15:56AM +0800, Yao Yuan wrote:
-> > > > > On Fri, Jul 18, 2025 at 08:00:17AM -0700, Sean Christopherson wrote:
-> > > > > > On Thu, Jul 17, 2025, Yao Yuan wrote:
-> > > > > > > On Wed, Jul 16, 2025 at 11:07:35AM +0800, Keir Fraser wrote:
-> > > > > > > > In preparation to remove synchronize_srcu() from MMIO registration,
-> > > > > > > > remove the distributor's dependency on this implicit barrier by
-> > > > > > > > direct acquire-release synchronization on the flag write and its
-> > > > > > > > lock-free check.
-> > > > > > > >
-> > > > > > > > Signed-off-by: Keir Fraser <keirf@google.com>
-> > > > > > > > ---
-> > > > > > > >  arch/arm64/kvm/vgic/vgic-init.c | 11 ++---------
-> > > > > > > >  1 file changed, 2 insertions(+), 9 deletions(-)
-> > > > > > > >
-> > > > > > > > diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-> > > > > > > > index 502b65049703..bc83672e461b 100644
-> > > > > > > > --- a/arch/arm64/kvm/vgic/vgic-init.c
-> > > > > > > > +++ b/arch/arm64/kvm/vgic/vgic-init.c
-> > > > > > > > @@ -567,7 +567,7 @@ int kvm_vgic_map_resources(struct kvm *kvm)
-> > > > > > > >  	gpa_t dist_base;
-> > > > > > > >  	int ret = 0;
-> > > > > > > >
-> > > > > > > > -	if (likely(dist->ready))
-> > > > > > > > +	if (likely(smp_load_acquire(&dist->ready)))
-> > > > > > > >  		return 0;
-> > > > > > > >
-> > > > > > > >  	mutex_lock(&kvm->slots_lock);
-> > > > > > > > @@ -598,14 +598,7 @@ int kvm_vgic_map_resources(struct kvm *kvm)
-> > > > > > > >  		goto out_slots;
-> > > > > > > >  	}
-> > > > > > > >
-> > > > > > > > -	/*
-> > > > > > > > -	 * kvm_io_bus_register_dev() guarantees all readers see the new MMIO
-> > > > > > > > -	 * registration before returning through synchronize_srcu(), which also
-> > > > > > > > -	 * implies a full memory barrier. As such, marking the distributor as
-> > > > > > > > -	 * 'ready' here is guaranteed to be ordered after all vCPUs having seen
-> > > > > > > > -	 * a completely configured distributor.
-> > > > > > > > -	 */
-> > > > > > > > -	dist->ready = true;
-> > > > > > > > +	smp_store_release(&dist->ready, true);
-> > > > > > >
-> > > > > > > No need the store-release and load-acquire for replacing
-> > > > > > > synchronize_srcu_expedited() w/ call_srcu() IIUC:
-> > > > > >
-> > > > > > This isn't about using call_srcu(), because it's not actually about kvm->buses.
-> > > > > > This code is concerned with ensuring that all stores to kvm->arch.vgic are ordered
-> > > > > > before the store to set kvm->arch.vgic.ready, so that vCPUs never see "ready==true"
-> > > > > > with a half-baked distributor.
-> > > > > >
-> > > > > > In the current code, kvm_vgic_map_resources() relies on the synchronize_srcu() in
-> > > > > > kvm_io_bus_register_dev() to provide the ordering guarantees.  Switching to
-> > > > > > smp_store_release() + smp_load_acquire() removes the dependency on the
-> > > > > > synchronize_srcu() so that the synchronize_srcu() call can be safely removed.
-> > > > >
-> > > > > Yes, I understand this and agree with your point.
-> > > > >
-> > > > > Just for discusstion: I thought it should also work even w/o
-> > > > > introduce the load acqure + store release after switch to
-> > > > > call_srcu(): The smp_mb() in call_srcu() order the all store
-> > > > > to kvm->arch.vgic before store kvm->arch.vgic.ready in
-> > > > > current implementation.
-> > > >
-> > > > The load-acquire would still be required, to ensure that accesses to
-> > > > kvm->arch.vgic do not get reordered earlier than the lock-free check
-> > > > of kvm->arch.vgic.ready. Otherwise that CPU could see that the vgic is
-> > > > initialised, but then use speculated reads of uninitialised vgic state.
-> > > >
-> > >
-> > > Thanks for your explanation.
-> > >
-> > > I see. But there's "mutex_lock(&kvm->slot_lock);" before later
-> > > acccessing to the kvm->arch.vgic, so I think the order can be
-> > > guaranteed. Of cause as you said a explicitly acquire-load +
-> > > store-release is better than before implicitly implementation.
-> >
-> > If vgic_dist::ready is observed true by the lock-free read (the one
-> > which is turned into load-acquire by this patch) then the function
-> > immediately returns with no mutex_lock() executed. It is reads of
-> > vgic_dist *after* return from kvm_vgic_map_resources() that you have
-> > to worry about, and which require load-acquire semantics.
->
-> I think this is the main purpose of such lock-free reading
-> here, to avoid lock contention on VM w/ large vCPUs for
-> vcpus' first time run together.
->
-> store-release makes sure the changes to vgic_dist::ready
-> become visible after the changes to vgic_dist become
-> visible, but it doesn't guarantee the vgic_dist::ready
-> becomes visible to reader on aother CPU **IMMEDIATELY**,
-> thus load-acquire in reader side is request for this.
-> Is above understanding correct ?
+SBI v3.0 specification[1] added two new improvements to the PMU chaper.
+The SBI v3.0 specification is frozen and under public review phase as
+per the RISC-V International guidelines. 
 
-No. I get your point, the load-acuqire here for:
+1. Added an additional get_event_info function to query event availablity
+in bulk instead of individual SBI calls for each event. This helps in
+improving the boot time.
 
-There's code path that the cpu read the vgic_dist reorder
-before the vgic_dist::ready in case of the cpu get
-vgic_dist::ready is true w/o the load_acquire here.
+2. Raw event width allowed by the platform is widened to have 56 bits
+with RAW event v2 as per new clarification in the priv ISA[2].
 
->
-> >
-> > >
-> > > > > >
+Apart from implementing these new features, this series improves the gpa
+range check in KVM and updates the kvm SBI implementation to SBI v3.0.
+
+The opensbi patches have been merged. This series can be found at [3].
+
+[1] https://github.com/riscv-non-isa/riscv-sbi-doc/releases/download/v3.0-rc7/riscv-sbi.pdf 
+[2] https://github.com/riscv/riscv-isa-manual/issues/1578
+[3] https://github.com/atishp04/linux/tree/b4/pmu_event_info_v4
+
+Signed-off-by: Atish Patra <atishp@rivosinc.com>
+---
+Changes in v4:
+- Rebased on top of v6.16-rc7 
+- Fixed a potential compilation issue in PATCH5.
+- Minor typos fixed PATCH2 and PATCH3.
+- Fixed variable ordering in PATCH6 
+- Link to v3: https://lore.kernel.org/r/20250522-pmu_event_info-v3-0-f7bba7fd9cfe@rivosinc.com
+
+Changes in v3:
+- Rebased on top of v6.15-rc7 
+- Link to v2: https://lore.kernel.org/r/20250115-pmu_event_info-v2-0-84815b70383b@rivosinc.com
+
+Changes in v2:
+- Dropped PATCH 2 to be taken during rcX.
+- Improved gpa range check validation by introducing a helper function
+  and checking the entire range.
+- Link to v1: https://lore.kernel.org/r/20241119-pmu_event_info-v1-0-a4f9691421f8@rivosinc.com
+
+---
+Atish Patra (9):
+      drivers/perf: riscv: Add SBI v3.0 flag
+      drivers/perf: riscv: Add raw event v2 support
+      RISC-V: KVM: Add support for Raw event v2
+      drivers/perf: riscv: Implement PMU event info function
+      drivers/perf: riscv: Export PMU event info function
+      KVM: Add a helper function to validate vcpu gpa range
+      RISC-V: KVM: Use the new gpa range validate helper function
+      RISC-V: KVM: Implement get event info function
+      RISC-V: KVM: Upgrade the supported SBI version to 3.0
+
+ arch/riscv/include/asm/kvm_vcpu_pmu.h |   3 +
+ arch/riscv/include/asm/kvm_vcpu_sbi.h |   2 +-
+ arch/riscv/include/asm/sbi.h          |  13 +++
+ arch/riscv/kvm/vcpu_pmu.c             |  75 ++++++++++++-
+ arch/riscv/kvm/vcpu_sbi_pmu.c         |   3 +
+ arch/riscv/kvm/vcpu_sbi_sta.c         |   6 +-
+ drivers/perf/riscv_pmu_sbi.c          | 191 +++++++++++++++++++++++++---------
+ include/linux/kvm_host.h              |   2 +
+ include/linux/perf/riscv_pmu.h        |   1 +
+ virt/kvm/kvm_main.c                   |  21 ++++
+ 10 files changed, 258 insertions(+), 59 deletions(-)
+---
+base-commit: e32a80927434907f973f38a88cd19d7e51991d24
+change-id: 20241018-pmu_event_info-986e21ce6bd3
+--
+Regards,
+Atish patra
+
 
