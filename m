@@ -1,241 +1,209 @@
-Return-Path: <kvm+bounces-53281-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53284-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94182B0F98F
-	for <lists+kvm@lfdr.de>; Wed, 23 Jul 2025 19:48:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 155A6B0F9A7
+	for <lists+kvm@lfdr.de>; Wed, 23 Jul 2025 19:55:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 53FE5160F9A
-	for <lists+kvm@lfdr.de>; Wed, 23 Jul 2025 17:48:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4CB321CC038C
+	for <lists+kvm@lfdr.de>; Wed, 23 Jul 2025 17:55:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 105EC218584;
-	Wed, 23 Jul 2025 17:48:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2DC422CBC6;
+	Wed, 23 Jul 2025 17:54:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xZ0e1Yx4"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="V0OFeYK7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5289C2E0
-	for <kvm@vger.kernel.org>; Wed, 23 Jul 2025 17:48:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EBD9218584;
+	Wed, 23 Jul 2025 17:54:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753292890; cv=none; b=p+/wk6rhsAwtLXQTNwZa9V2dy4gLzQt2q0gavlptonVE35aUr+tllIOMToglPnQQELBL+nNcptmqh3H1EaEcKjx8+iEOBprz4K/kTOBbu5WA2b1zcC3sHP1lLnAblDaVl+lVNttbftL/kz73BXOCrj8ngftaSfgJOhqN29OCNSw=
+	t=1753293259; cv=none; b=rA0V8REuji2nWIFRrVxNd8ejOtpzBmeu/WgjTRmyzoe1joS0tQUIXtPR3deO5T6E+60DBIvBgsNASAehCDX4HxLFzWWvWxqzhDR8zYM3qxMDELFVHE0dTmWgPHJCUIthjpvidN8/D7y9QlDkJ33iBJuvHVnzq6lqxd+A2ph4/Wg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753292890; c=relaxed/simple;
-	bh=7ZDsF+RzE2dg/23aYgkjRXFwK+8IUwygnYna1KJWmTA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=aNAn+nmY822Qmry54+UixFStERSCtkX2Nhi/PMx2QYTgSFsFMXTCmsvAmVW7M18PEv9VqhluPBSCIuViDrv2YZvLhvWmzNo7UGeD2Q0Re+pSIVbeW/RR4nohwf0jUjA/HrFDyJfYkFeMvw90MIEOlm4RErseYtHXyAzelhUSlB8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xZ0e1Yx4; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-311a6b43ed7so97082a91.1
-        for <kvm@vger.kernel.org>; Wed, 23 Jul 2025 10:48:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753292888; x=1753897688; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=uaYBRl0EE4KRkLgolaKNDBtU6vVnp/5Paw/stFPZacI=;
-        b=xZ0e1Yx4z12f5reqCUmxKYYhNKBF7Gy6yDRVrihBmvFIPQ1AtUU1EaflyFatT/DBaj
-         1iibSJReVpJiENqU1p8QLTcZ11qIn4SiQNcRe4HBdMQfvQaESq/RXWGoemy0HmOsTOM9
-         N5Wf77fzRehqrI/CcAolkfhhVaOBqh/V9q6DFlHvn0JYNI3NN6QEpyVG6hSMNIDv/ibk
-         TQNWGApFSNt3UG8AwaDNwNi/D/F9CdoliPdkyaSBxbSd/Wtup+3HDRqp8WRxtgChTixp
-         NqIKtG6otSde+qVgVX6hg12mi7MqFIby8dBuOrCkNyNAPEBnWDa5gv72xWmyRghO03yc
-         ITxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753292888; x=1753897688;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uaYBRl0EE4KRkLgolaKNDBtU6vVnp/5Paw/stFPZacI=;
-        b=q3cOzbab0BzjYpbBOIh/kbySLaTzZ7vtM2Q/Pv/Qz3+XSCGYv2j5Yfzm57Crpcblek
-         rjLe8dW7CgTUXzrGm60Vb+FZJHXlodL8hy7/ccoijfloKFBwYJpkmhUzFI9v37ANczRk
-         6J51G/Mstt3WI+nKBhMhv7IS0dggXpLh1525fszeCxHi4mmYas+m1T4LTqY+VJMzRjcg
-         otM9ScKL/MhFIuHuqoQqJdz2Ueu5Cu7Z68KmpSQtA6JGb4l6t1rbYFxWUHf6edexAf8N
-         qZyV7LDBtg9NMbSdKqWWdPmoRaWm+Pt7WtUkgQlQyaKbNPxi4goYgeOliFz2UCN/ldT9
-         zMiw==
-X-Forwarded-Encrypted: i=1; AJvYcCXN93ABAmJBfBaniKcr9miXK62P5V3FP04PI+9rry1GEFbO3n8gvK89jPQIsncvQX8YNs4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8NdsmxUNFH5V/BLxBIwF+Sbn1jwurJmHMOI2r/RcLcBbyK2D9
-	CK+W2fP4tuXJYg43yEIPcM2GuNzfBKeVmYwVO6rtHainPU/AzZp/GsY2kb7Kcgj7Ecxtmctgbqh
-	ILCZVNA==
-X-Google-Smtp-Source: AGHT+IEATEGW2kmWHPmig6zPQ7Er+eTMngsfX//TWVAGu1HfHbe2AgPbsCxKvxu3rVqMiRcwPfBUdtVKczQ=
-X-Received: from pjbsh5.prod.google.com ([2002:a17:90b:5245:b0:311:e71e:3fb9])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2f10:b0:31e:4111:fd8c
- with SMTP id 98e67ed59e1d1-31e50818accmr6212363a91.16.1753292887969; Wed, 23
- Jul 2025 10:48:07 -0700 (PDT)
-Date: Wed, 23 Jul 2025 10:48:06 -0700
-In-Reply-To: <20250422161304.579394-2-zack.rusin@broadcom.com>
+	s=arc-20240116; t=1753293259; c=relaxed/simple;
+	bh=yQkEfxoenUmhxgI7VLYtzPw3odwMvv56S7bLfBNUK6k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WRWTyWTzOCsK4JSbqe/ob+ITTJLHXgZOp6+gsJ4dn/NKyxfga7KppC3wirh3phZxaAKqO719KYCOOlXHKkUmgnQSsiF3R2msTIInbsgbwzqn+WtyisFCTe+g2N2395jWmdTAJhkLmRyyDRddZAJ57MBqlHKAY4UKHOgG2E/86o4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=V0OFeYK7; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from terminus.zytor.com (terminus.zytor.com [IPv6:2607:7c80:54:3:0:0:0:136])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 56NHrfxo1284522
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
+	Wed, 23 Jul 2025 10:53:45 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 56NHrfxo1284522
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025072201; t=1753293226;
+	bh=RBpu9UxYIY7sFXZkWWL+W3qlrNiXhPBrNrbgAfhMyE0=;
+	h=From:To:Cc:Subject:Date:From;
+	b=V0OFeYK7rzBeqaeT6RSxr6U0E9HoBELhIDDGsQv3PLdvvvcPKu0diCyLn0DLO1XG8
+	 1JDNocrCikUD2GLkTiGuPwARrhBShMmVq3UJ4dPw16dQnTynUfb7eMFnPp7jTU1OC5
+	 q5uSXNggajupLbn8QCowIJ2cbhZsIm8+oFsJgnP1AFh6gut5FUUY3Ak9U0jh8+i3no
+	 YxSMznelQbz5du7zSc8vE6mj5hUkuMOgf2roECdjt3Ix/24FtHwFttlPmt2maliS5O
+	 2jiMW7jcGEql7ONK6D8oCeEvgMv6wqsuJ6M5Tn7+PXkFsCssr/QXf/LgGrgsrtLu6c
+	 lZfus7o/aQuNQ==
+From: "Xin Li (Intel)" <xin@zytor.com>
+To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org
+Cc: pbonzini@redhat.com, seanjc@google.com, corbet@lwn.net, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        x86@kernel.org, hpa@zytor.com, xin@zytor.com, luto@kernel.org,
+        peterz@infradead.org, andrew.cooper3@citrix.com, chao.gao@intel.com,
+        hch@infradead.org
+Subject: [PATCH v5 00/23] Enable FRED with KVM VMX
+Date: Wed, 23 Jul 2025 10:53:18 -0700
+Message-ID: <20250723175341.1284463-1-xin@zytor.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250422161304.579394-1-zack.rusin@broadcom.com> <20250422161304.579394-2-zack.rusin@broadcom.com>
-Message-ID: <aIEgVpjXDR0BXgHq@google.com>
-Subject: Re: [PATCH v2 1/5] KVM: x86: Centralize KVM's VMware code
-From: Sean Christopherson <seanjc@google.com>
-To: Zack Rusin <zack.rusin@broadcom.com>
-Cc: linux-kernel@vger.kernel.org, Doug Covelli <doug.covelli@broadcom.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Tue, Apr 22, 2025, Zack Rusin wrote:
-> Centralize KVM's VMware specific code and introduce CONFIG_KVM_VMWARE to
-> isolate all of it.
+This patch set enables the Intel flexible return and event delivery
+(FRED) architecture with KVM VMX to allow guests to utilize FRED.
 
-I think it makes sense to split this into two patches: one to move code around,
-and then one to add CONFIG_KVM_VMWARE.  And move _all_ of the code at once, e.g.
-enable_vmware_backdoor should be moved to vmware.c along with all the other code
-shuffling, not as part of "Allow enabling of the vmware backdoor via a cap".
+The FRED architecture defines simple new transitions that change
+privilege level (ring transitions). The FRED architecture was
+designed with the following goals:
 
-> Code used to support VMware backdoor has been scattered around the KVM
-> codebase making it difficult to reason about, maintain it and change
-> it. Introduce CONFIG_KVM_VMWARE which, much like CONFIG_KVM_XEN and
-> CONFIG_KVM_VMWARE for Xen and Hyper-V, abstracts away VMware specific
-> parts.
-> 
-> In general CONFIG_KVM_VMWARE should be set to y and to preserve the
-> current behavior it defaults to Y.
-> 
-> Signed-off-by: Zack Rusin <zack.rusin@broadcom.com>
-> Cc: Doug Covelli <doug.covelli@broadcom.com>
-> Cc: Sean Christopherson <seanjc@google.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Ingo Molnar <mingo@redhat.com>
-> Cc: Borislav Petkov <bp@alien8.de>
-> Cc: Dave Hansen <dave.hansen@linux.intel.com>
-> Cc: x86@kernel.org
-> Cc: "H. Peter Anvin" <hpa@zytor.com>
-> Cc: Zack Rusin <zack.rusin@broadcom.com>
-> Cc: linux-kernel@vger.kernel.org
-> Cc: kvm@vger.kernel.org
-> ---
->  MAINTAINERS               |   9 +++
->  arch/x86/kvm/Kconfig      |  13 ++++
->  arch/x86/kvm/emulate.c    |  11 ++--
->  arch/x86/kvm/kvm_vmware.h | 127 ++++++++++++++++++++++++++++++++++++++
+1) Improve overall performance and response time by replacing event
+   delivery through the interrupt descriptor table (IDT event
+   delivery) and event return by the IRET instruction with lower
+   latency transitions.
 
-My vote is to drop the "kvm" from the file name.  We have kvm_onhyperv.{c,h} to
-identify the case where KVM is running as a Hyper-V guest, but for the case where
-KVM is emulating Hyper-V, we use arch/x86/kvm/hyperv.{c,h}.
+2) Improve software robustness by ensuring that event delivery
+   establishes the full supervisor context and that event return
+   establishes the full user context.
 
->  arch/x86/kvm/pmu.c        |  39 +-----------
->  arch/x86/kvm/pmu.h        |   4 --
->  arch/x86/kvm/svm/svm.c    |   7 ++-
->  arch/x86/kvm/vmx/vmx.c    |   5 +-
->  arch/x86/kvm/x86.c        |  34 +---------
->  arch/x86/kvm/x86.h        |   2 -
->  10 files changed, 166 insertions(+), 85 deletions(-)
->  create mode 100644 arch/x86/kvm/kvm_vmware.h
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 00e94bec401e..9e38103ac2bb 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -13051,6 +13051,15 @@ F:	arch/x86/kvm/svm/hyperv.*
->  F:	arch/x86/kvm/svm/svm_onhyperv.*
->  F:	arch/x86/kvm/vmx/hyperv.*
->  
-> +KVM X86 VMware (KVM/VMware)
-> +M:	Zack Rusin <zack.rusin@broadcom.com>
-> +M:	Doug Covelli <doug.covelli@broadcom.com>
-> +M:	Paolo Bonzini <pbonzini@redhat.com>
-> +L:	kvm@vger.kernel.org
-> +S:	Supported
-> +T:	git git://git.kernel.org/pub/scm/virt/kvm/kvm.git
-> +F:	arch/x86/kvm/kvm_vmware.*
-> +
->  KVM X86 Xen (KVM/Xen)
->  M:	David Woodhouse <dwmw2@infradead.org>
->  M:	Paul Durrant <paul@xen.org>
-> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-> index ea2c4f21c1ca..9e3be87fc82b 100644
-> --- a/arch/x86/kvm/Kconfig
-> +++ b/arch/x86/kvm/Kconfig
-> @@ -178,6 +178,19 @@ config KVM_HYPERV
->  
->  	  If unsure, say "Y".
->  
-> +config KVM_VMWARE
-> +	bool "Features needed for VMware guests support"
-> +	depends on KVM
+The new transitions defined by the FRED architecture are FRED event
+delivery and, for returning from events, two FRED return instructions.
+FRED event delivery can effect a transition from ring 3 to ring 0, but
+it is used also to deliver events incident to ring 0. One FRED
+instruction (ERETU) effects a return from ring 0 to ring 3, while the
+other (ERETS) returns while remaining in ring 0. Collectively, FRED
+event delivery and the FRED return instructions are FRED transitions.
 
-Make this depend on KVM_x86.  See:
+Intel VMX architecture is extended to run FRED guests, and the major
+changes are:
 
-https://lore.kernel.org/all/20250723104714.1674617-3-tabba@google.com
+1) New VMCS fields for FRED context management, which includes two new
+event data VMCS fields, eight new guest FRED context VMCS fields and
+eight new host FRED context VMCS fields.
 
-> +	default y
-> +	help
-> +	  Provides KVM support for hosting VMware guests. Adds support for
-> +	  VMware legacy backdoor interface: VMware tools and various userspace
-> +	  utilities running in VMware guests sometimes utilize specially
-> +	  formatted IN, OUT and RDPMC instructions which need to be
-> +	  intercepted.
-> +
-> +	  If unsure, say "Y".
-> +
->  config KVM_XEN
->  	bool "Support for Xen hypercall interface"
->  	depends on KVM
-> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-> index 60986f67c35a..b42988ce8043 100644
-> --- a/arch/x86/kvm/emulate.c
-> +++ b/arch/x86/kvm/emulate.c
-> @@ -26,6 +26,7 @@
->  #include <asm/debugreg.h>
->  #include <asm/nospec-branch.h>
->  #include <asm/ibt.h>
-> +#include "kvm_vmware.h"
+2) VMX nested-exception support for proper virtualization of stack
+levels introduced with FRED architecture.
 
-Please sort includes as best as possible.  KVM's loose rule is to organize by
-linux => asm => local, and sort alphabetically within each section, e.g.
+Search for the latest FRED spec in most search engines with this search
+pattern:
 
-#include <linux/aaaa.h>
-#include <linux/blah.h>
+  site:intel.com FRED (flexible return and event delivery) specification
 
-#include <asm/aaaa.h>
-#include <asm/blah.h>
 
-#include "aaaa.h"
-#include "blah.h"
+Following is the link to the v4 of this patch set:
+https://lore.kernel.org/lkml/20250328171205.2029296-1-xin@zytor.com/
 
-> @@ -2565,8 +2563,8 @@ static bool emulator_io_port_access_allowed(struct x86_emulate_ctxt *ctxt,
->  	 * VMware allows access to these ports even if denied
->  	 * by TSS I/O permission bitmap. Mimic behavior.
->  	 */
-> -	if (enable_vmware_backdoor &&
-> -	    ((port == VMWARE_PORT_VMPORT) || (port == VMWARE_PORT_VMRPC)))
-> +	if (kvm_vmware_backdoor_enabled(ctxt->vcpu) &&
 
-Maybe kvm_is_vmware_backdoor_enabled()?  To make it super clear it's a predicate.
+Although FRED and CET supervisor shadow stacks are independent CPU
+features, FRED unconditionally includes FRED shadow stack pointer
+MSRs IA32_FRED_SSP[0123], and IA32_FRED_SSP0 is just an alias of the
+CET MSR IA32_PL0_SSP.  IOW, the state management of MSR IA32_PL0_SSP
+becomes an overlap area, and Sean requested that FRED virtualization
+to land after CET virtualization [1].
 
-Regarding namespacing, I think for the "is" predicates, the code reads better if
-it's kvm_is_vmware_xxx versus kvm_vware_is_xxx.  E.g. is the VMware backdoor
-enabled vs. VMware is the backdoor enabled.  Either way is fine for me if someone
-has a strong preference though.
+With the native CET patches now merged into the tip tree, the KVM CET
+patch set is approaching maturity and is expected to be merged soon.
 
-> +	    kvm_vmware_io_port_allowed(port))
+This v5 patch set is based on the kvm-x86-next-2025.07.21 tag of the
+kvm-x86 repo.  Note that a few changes related to IA32_PL0_SSP are still
+pending and are not included in this version.
 
-Please separate the addition of helpers from the code movement.  That way the
-code movement patch can be acked/reviewed super easily, and then we can focus on
-the helpers (and it also makes it much easier to review the helpers changes).
 
-E.g.
+Changes in v5:
 
-  patch 1: move code to vmware.{c,h}
-  patch 2: introduce wrappers and bury variables/#defines in vmware.c
-  patch 3: introduce CONFIG_KVM_VMWARE to disasble VMware emulation
+1) Addressed review comments/feedbacks from Chao Gao, Christoph Hellwig,
+   Dave Hansen, and Sean.
 
-I mention that here, because kvm_vmware_io_port_allowed() doesn't seem like the
-right name.  kvm_is_vmware_io_port() seems more appropriate.
+2) Added back a patch that checks before accessing VMCS fields via
+   SHADOW_FIELD_R[OW] macros to avoid VMREAD/VMWRITE warnings, as some
+   fields may not be supported on all CPUs.
 
-Oh, and also relevant.  For this and kvm_vmware_is_backdoor_pmc(), put the
-kvm_vmware_backdoor_enabled() check inside kvm_is_vmware_io_port() and
-kvm_is_vmware_backdoor_pmc().
+3) Added "Tested-by: Xuelian Guo <xuelian.guo@intel.com>" to all patches.
+
+
+[1]: https://lore.kernel.org/kvm/ZvQaNRhrsSJTYji3@google.com/
+
+
+Sean Christopherson (1):
+  KVM: VMX: Add host MSR read/write helpers to streamline preemption
+    logic
+
+Xin Li (18):
+  KVM: VMX: Add support for the secondary VM exit controls
+  KVM: VMX: Initialize VM entry/exit FRED controls in vmcs_config
+  KVM: VMX: Disable FRED if FRED consistency checks fail
+  KVM: VMX: Initialize VMCS FRED fields
+  KVM: VMX: Set FRED MSR intercepts
+  KVM: VMX: Save/restore guest FRED RSP0
+  KVM: VMX: Add support for FRED context save/restore
+  KVM: x86: Add a helper to detect if FRED is enabled for a vCPU
+  KVM: VMX: Virtualize FRED event_data
+  KVM: VMX: Virtualize FRED nested exception tracking
+  KVM: x86: Mark CR4.FRED as not reserved
+  KVM: VMX: Dump FRED context in dump_vmcs()
+  KVM: x86: Advertise support for FRED
+  KVM: nVMX: Add support for the secondary VM exit controls
+  KVM: nVMX: Add FRED VMCS fields to nested VMX context handling
+  KVM: nVMX: Add FRED-related VMCS field checks
+  KVM: nVMX: Allow VMX FRED controls
+  KVM: nVMX: Add prerequisites to SHADOW_FIELD_R[OW] macros
+
+Xin Li (Intel) (4):
+  x86/cea: Export an API to get per CPU exception stacks for KVM to use
+  KVM: VMX: Fix an indentation
+  Documentation: kvm: Fix a section number typo
+  KVM: x86: Save/restore the nested flag of an exception
+
+ Documentation/virt/kvm/api.rst            |  21 +-
+ Documentation/virt/kvm/x86/nested-vmx.rst |  19 ++
+ arch/x86/coco/sev/sev-nmi.c               |   4 +-
+ arch/x86/coco/sev/vc-handle.c             |   2 +-
+ arch/x86/include/asm/cpu_entry_area.h     |  17 +-
+ arch/x86/include/asm/kvm_host.h           |   8 +-
+ arch/x86/include/asm/msr-index.h          |   1 +
+ arch/x86/include/asm/vmx.h                |  48 +++-
+ arch/x86/include/uapi/asm/kvm.h           |   4 +-
+ arch/x86/kernel/cpu/common.c              |  10 +-
+ arch/x86/kernel/fred.c                    |   6 +-
+ arch/x86/kernel/traps.c                   |   2 +-
+ arch/x86/kvm/cpuid.c                      |   1 +
+ arch/x86/kvm/kvm_cache_regs.h             |  15 ++
+ arch/x86/kvm/svm/svm.c                    |   2 +-
+ arch/x86/kvm/vmx/capabilities.h           |  25 +-
+ arch/x86/kvm/vmx/nested.c                 | 271 +++++++++++++++++++---
+ arch/x86/kvm/vmx/nested.h                 |  22 ++
+ arch/x86/kvm/vmx/vmcs.h                   |   1 +
+ arch/x86/kvm/vmx/vmcs12.c                 |  19 ++
+ arch/x86/kvm/vmx/vmcs12.h                 |  38 +++
+ arch/x86/kvm/vmx/vmcs_shadow_fields.h     |  37 ++-
+ arch/x86/kvm/vmx/vmx.c                    | 263 +++++++++++++++++++--
+ arch/x86/kvm/vmx/vmx.h                    |  13 +-
+ arch/x86/kvm/x86.c                        |  88 ++++++-
+ arch/x86/kvm/x86.h                        |   8 +-
+ arch/x86/mm/cpu_entry_area.c              |  21 ++
+ arch/x86/mm/fault.c                       |   2 +-
+ include/uapi/linux/kvm.h                  |   1 +
+ 29 files changed, 872 insertions(+), 97 deletions(-)
+
+
+base-commit: 33f843444e28920d6e624c6c24637b4bb5d3c8de
+-- 
+2.50.1
 
 
