@@ -1,169 +1,455 @@
-Return-Path: <kvm+bounces-53262-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53263-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36455B0F6A5
-	for <lists+kvm@lfdr.de>; Wed, 23 Jul 2025 17:12:13 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2817CB0F692
+	for <lists+kvm@lfdr.de>; Wed, 23 Jul 2025 17:09:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6B70F5A1720
-	for <lists+kvm@lfdr.de>; Wed, 23 Jul 2025 15:07:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 157287BCCE4
+	for <lists+kvm@lfdr.de>; Wed, 23 Jul 2025 15:07:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 848642F5C49;
-	Wed, 23 Jul 2025 15:05:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 674D32E9EAC;
+	Wed, 23 Jul 2025 15:09:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KTSZPMQe"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="xmL8YpUt";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="xVNA/Ds4"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2C802F5080
-	for <kvm@vger.kernel.org>; Wed, 23 Jul 2025 15:05:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98A512E542A
+	for <kvm@vger.kernel.org>; Wed, 23 Jul 2025 15:09:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753283126; cv=none; b=pwiCGUAMQFuW0Qy/gWlbPKarO0gjwd603J6bRKo9hKdX0DeRljW/PjKZVqk1WExdyzsszYSryegZw9RYeEBSjVao0N601ObZMXdv3GqC2wv0892pC4DcYx/r0QlaEcXyyNBQs7Z9bENmLLH/TEuTRnoj7w88qg1enTufmYtQXPI=
+	t=1753283343; cv=none; b=s8xrsC4+UeyFw1/rGWHZ9dpF2Ht7JAk8BIE/T8XFZuGE/TZFeMRhssmb8mrUJ90KC64RItMyvrNRBCGrgTG3TT1RGDMg7DmZOIlw3Z0v5qnhV2KcEEgS0qPZa23b3kX1x0ooP+/dJX61KMu7ODJ8Tp5GvHA/ICoFlquVokNkFMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753283126; c=relaxed/simple;
-	bh=yv5nB3643mwqFffYhxn7JpZMpQCIFo0F3qmPkPIlgM0=;
-	h=Message-ID:Date:MIME-Version:From:To:Subject:Content-Type; b=joLGcyXQwomZa0HuKx1NFUmxIDFRR2OZRIIKHiRbkZorFEphP/KkhQlVCtzQjKQeW0Bb4XNtQoO0b9xlP+kDl75HysH6SYLtOkdRsxpR7/LWMdODcvFJ2Kn2g7N9usrBxNp+WhBsCQOgmh2GjMfU678nm0ylPAHUvQWNUYbdyPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KTSZPMQe; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1753283124;
+	s=arc-20240116; t=1753283343; c=relaxed/simple;
+	bh=QA43XiEfOaFgJTirqmi+IbEJSZKoHJdK9IvdLikTk/4=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=MNN9HmkS3jUxOHCZ2a5GUB+QRnPb2KBmsE0hJWyA4A3D0jgSpakzR/XYC5LYjHKvyBfbJDxTzdJ7yx7uD10pZett0kav6gIHoI/OCeiZtPOzHQAgi40rHXnHAvIp19BaJdlTubwVNB6faQcypv5eLURmq/m8Eb+Ax6NRXww4Otg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=xmL8YpUt; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=xVNA/Ds4; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1753283339;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:autocrypt:autocrypt;
-	bh=yv5nB3643mwqFffYhxn7JpZMpQCIFo0F3qmPkPIlgM0=;
-	b=KTSZPMQeQ3Lb1ja302xUWmi99AX9QJjJzh3cN2X4Bo7kCqa8WMLIWX/sgsYv20ofLVvKS0
-	xNxLKZV4mqSdBN/0k08krmWjHuP7VtbkC/Px1W9SXbTiDS4Yac9tQaZkwRmBUJ3crkaWBE
-	4qoh3roPx6TqC5hk7USb4O91ppPyvb0=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-673-HnbUuTwWPLSskZe-i04VpA-1; Wed, 23 Jul 2025 11:05:22 -0400
-X-MC-Unique: HnbUuTwWPLSskZe-i04VpA-1
-X-Mimecast-MFC-AGG-ID: HnbUuTwWPLSskZe-i04VpA_1753283121
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-451d7de4ae3so39158495e9.2
-        for <kvm@vger.kernel.org>; Wed, 23 Jul 2025 08:05:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753283121; x=1753887921;
-        h=content-transfer-encoding:organization:autocrypt:subject:to:from
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yv5nB3643mwqFffYhxn7JpZMpQCIFo0F3qmPkPIlgM0=;
-        b=VYx8KqlOMC+oN8a4hLJa/AWrzFRFxuCA/KD+S6v1Sz1yY2UzTtg5yzdaX0h5iUI42I
-         9RiiudNkbYnkbf6zYphLhj3KGpW2ZDH5t/dKgCyHxve45qv03gNyB5um9Hjdu1npTm+z
-         06nvM9ngASsSBxzy3CKyn08uH8WWT7JHTq61ctJj+Av0mAySfXP+0xijW2Z/SxWXkxrR
-         ca44OGVxClHE3fmEu9HvHwHdTQOwJjG8BVrhD8+txsMGTgjCpChiW8Ow/xlkiwZVIOB+
-         bUdqcT//4mvjwwRUTxrMbkoaagC7mxwXg+ONa79aVAmxQCA8djE0shaQtKyveYdxaIyI
-         2ekw==
-X-Forwarded-Encrypted: i=1; AJvYcCUhjkH2fH5OmLSX6y8AgtdBUGylkG+SomCE/vRd3G1/IkbEgObnu+mxdWHtnpZmTbKuEek=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwGI3xEvckAd6yVitOLqKvi30/MjpwaXHny73dhRNuUZpbmOysh
-	e2B8isAqEjYP/kTfTrmPs3T+fkspcr+InoxCf+T45w08lCv1zJ08cGnuxwu6dxKD1xqDvuGHXRn
-	MzaPkwBphXSP2jEWtwFJnHqaauZa9r6F58UHvQ6OIMq2aNScOgg76Pg==
-X-Gm-Gg: ASbGncvs0Sgoy+qySYd/GPE8hJeTCNR/XK9uSLdodCT6x++PPUehVyX2vF7U1ti8Itx
-	ptPUIrK5SwToRciiB5FTf+RgTU0cTWNhsiRIhZsA+zzVSj72dm/y9uXDzx6rO/rxjTGzusOjqmd
-	Qn0/6WxZgyxr2Y/uh+3jX3ZXf9HJo65AzrJZk5U+RIzwILRdvODAABizAPIlsPJaRfeC+reoenC
-	ftYLqHOGQE+9Gd1XyLmsSPorpbK7zVUnVM4jZtuKQPslFfgPFpI3/2WvAQk9RuiFY8GrneVbzYL
-	k274njW2RMIH/EcwcDGgRpBwQtDk9C6Ly7AYQopu7vtDLWrVkM46YGEGjRi2MwFIrr5Fsr2mACw
-	GdmzCIp3WqQswTR6a3syQoSUbfsKBTMA6td2FDzn23y5drE7OjcnRCBcf3LUlRDVK1aY=
-X-Received: by 2002:a05:600c:6992:b0:43d:46de:b0eb with SMTP id 5b1f17b1804b1-45868c99c85mr30116305e9.12.1753283119423;
-        Wed, 23 Jul 2025 08:05:19 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE2F5mSqLZEunEzF7urtX2WBp8ykNV6oKnn0wFMx2cm8cOAKr3D8at2B+ii/3mueYJl1zKZiQ==
-X-Received: by 2002:a05:600c:6992:b0:43d:46de:b0eb with SMTP id 5b1f17b1804b1-45868c99c85mr30113555e9.12.1753283117177;
-        Wed, 23 Jul 2025 08:05:17 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f00:4000:a438:1541:1da1:723a? (p200300d82f004000a43815411da1723a.dip0.t-ipconnect.de. [2003:d8:2f00:4000:a438:1541:1da1:723a])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b61ca2cc06sm16564115f8f.35.2025.07.23.08.05.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Jul 2025 08:05:16 -0700 (PDT)
-Message-ID: <37a930a0-e1ba-4be7-8b0a-4fb5409131d4@redhat.com>
-Date: Wed, 23 Jul 2025 17:05:15 +0200
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8r9riMhOFfZQys+a565Pp4aGUvRMuwebbmYjY7dm5NA=;
+	b=xmL8YpUt0xweFK60hqW5u0dyeONYsxRCihqLFYQovaX6yzPrc2HFHrITfPUblzXiWPfFUj
+	49AjIl0SSAV1gbDCDnDbTvNlpG20xz2takmkIrSOvdgW7gvzzmtJm+ABLhnG3MRy7uLr5a
+	fMjV/ScxEKka9d2ePCpUoUJc6j8/uwbeHZ7uQvZcPyTPkvbE9dzhTY61pGrPNbNGRHurYf
+	IbMFzOdBDEEO63c8tyXi1spQt6MwSQAXtUV2LPm71fo1lrRX+VvoIibflElzGZjxuXkQHp
+	IAbNUWdrdEwlrXOEsn/2uL3LQ4eJo7gnqQjVKmnDIbChZc5jOkNaAJE1lOPp+A==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1753283339;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8r9riMhOFfZQys+a565Pp4aGUvRMuwebbmYjY7dm5NA=;
+	b=xVNA/Ds4SCgnZOX6T9E+4P7A00ZasEiys4vFDern/sjSyagjAhopri+/A1ttzI5GFK/gIm
+	xbP98ogl9Zjyj2Dw==
+To: Hogan Wang <hogan.wang@huawei.com>, x86@kernel.org,
+ dave.hansen@linux.intel.com, kvm@vger.kernel.org,
+ alex.williamson@redhat.com
+Cc: weidong.huang@huawei.com, yechuan@huawei.com, hogan.wang@huawei.com,
+ wangxinxin.wang@huawei.com, jianjay.zhou@huawei.com, wangjie88@huawei.com,
+ Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH] x86/irq: introduce repair_irq try to repair CPU vector
+In-Reply-To: <20250723015045.1701-1-hogan.wang@huawei.com>
+References: <20250723015045.1701-1-hogan.wang@huawei.com>
+Date: Wed, 23 Jul 2025 17:08:59 +0200
+Message-ID: <87frenrlkk.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-From: David Hildenbrand <david@redhat.com>
-To: "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
- "linux-mm@kvack.org" <linux-mm@kvack.org>, KVM <kvm@vger.kernel.org>
-Subject: [Invitation] bi-weekly guest_memfd upstream call on 2025-07-24
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- g3eXuA==
-Organization: Red Hat
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
-Hi everybody,
+On Wed, Jul 23 2025 at 09:50, Hogan Wang wrote:
 
-whoops, I almost forgot.
+I have no idea what that subject line means.
 
-Our next guest_memfd upstream call is scheduled for tomorrow,
-Thursday, 2025-07-24 at 8:00 - 9:00am (GMT-07:00) Pacific Time - Vancouver.
+> When the VM irqbalance service adjusts interrupt affinity
+> frequently, the VM repeatedly masks MSI-x interrupts.
 
-We'll be using the following Google meet:
-http://meet.google.com/wxp-wtju-jzw
+What has this to do with frequently? The point is that the interrupt is
+masked at the PCI level for changing the affinity, which causes a VMEXIT
+and activates the VFIO horrorshow vai QEMU.
 
-The meeting notes can be found at [1], where we also link recordings and
-collect current guest_memfd upstream proposals. If you want an google
-calendar invitation that also covers all future meetings, just write me
-a mail.
+> During the guest kernel masking MSI-x interrupts, VM exits
+> to the Hypervisor.
+>
+> The Qemu emulator implements the switching between
+> kvm_interrupt and qemu_interrupt to achieve MSI-x PBA
+> capability.
 
-To put something to discuss onto the agenda, reply to this mail or add
-them to the "Topics/questions for next meeting(s)" section in the
-meeting notes as a comment.
+What's achieved here?
 
-Cheers,
+> When the Qemu emulator calls the vfio_msi_set_vector_signal
+> interface to switch the kvm_interrupt and qemu_interrupt
+> eventfd, it releases and requests IRQs, and correspondingly
+> clears and initializes the CPU Vector.
+>
+> When initializing the CPU Vector, if an unhandled interrupt
+> in the APIC is delivered to the kernel, the __common_interrupt
+> function is called to handle the interrupt.
 
-David
+I really don't know what that means. Documentation clearly asks you to
+provide a proper description of multi-CPU race conditions.
 
-[1]
-https://docs.google.com/document/d/1M6766BzdY1Lhk7LiR5IqVR8B8mG3cr-cxTxOrAosPOk/edit?usp=sharing
+https://www.kernel.org/doc/html/latest/process/maintainer-tip.html#patch-submission-notes
 
+I've reverse engineered this word salad and I have to tell you that this
+is not a completely VFIO specific problem. VFIO just makes it more
+likely to trigger and adds some VFIO specific twist on top.
+
+> Since the call_irq_handler function assigns vector_irq[vector]
+
+Please use proper function annotation, i.e.:
+
+  Since call_irq_handler() assigns...
+
+> to VECTOR_UNUSED without lock protection, the assignment of
+> vector_irq[vector] and the initialization of the CPU Vector
+> are concurrent, leading to vector_irq[vector] being mistakenly
+> set to VECTOR_UNUSED.
+
+It's not mistakenly. It's the obvious consequence.
+
+As you pointed out correctly there is no lock protection, so why not
+fixing that in the first place?
+
+> This ultimately results in the inability of VFIO passthrough
+> device interrupts to be delivered, causing packet loss in
+> network devices or IO hangs in disk devices.
+>
+> This patch detects and repairs vector_irq[vector] after the
+
+# git grep 'This patch' Documentation/process/
+
+> interrupt initialization is completed, ensuring that
+> vector_irq[vector] can be corrected if it is mistakenly set
+> to VECTOR_UNUSED.
+
+That's a patently bad idea and does not even work under all
+circumstances. See below.
+
+> +static void x86_vector_repair(struct irq_domain *dom, struct irq_data *irqd)
+> +{
+> +	struct apic_chip_data *apicd = apic_chip_data(irqd);
+> +	struct irq_desc *desc = irq_data_to_desc(irqd);
+> +	unsigned int vector = apicd->vector;
+> +	unsigned int cpu = apicd->cpu;
+> +	unsigned long flags;
+> +
+> +	raw_spin_lock_irqsave(&vector_lock, flags);
+> +	if (per_cpu(vector_irq, cpu)[vector] != desc) {
+> +		per_cpu(vector_irq, cpu)[vector] = desc;
+> +		pr_warn("irq %u: repair vector %u.%u\n",
+> +			irqd->irq, cpu, vector);
+> +	}
+> +	raw_spin_unlock_irqrestore(&vector_lock, flags);
+> +}
+
+> --- a/drivers/vfio/pci/vfio_pci_intrs.c
+> +++ b/drivers/vfio/pci/vfio_pci_intrs.c
+> @@ -517,6 +517,8 @@ static int vfio_msi_set_vector_signal(struct vfio_pci_core_device *vdev,
+>  	}
+>  	ctx->trigger = trigger;
+>  
+> +	repair_irq(irq);
+> +
+
+How is that supposed to cure the problem completely?
+
+Let me reverse engineer the actual problem you are trying to solve from
+the breadcrumbs you provided:
+
+	CPU0
+	vmenter(vCPU0)
+   	....
+         msi_set_affinity()
+           mask(MSI-X)
+             vmexit()
+        ...
+
+        free_irq()
+1         mask();        
+
+2         __synchronize_irq()
+
+          msi_domain_deactivate()
+3           write_msg(0);
+          x86_vector_deactivate()
+4           per_cpu(vector_irq, cpu)[vector] = VECTOR_SHUTDOWN;
+       
+        request_irq()
+          x86_vector_activate()
+5           per_cpu(vector_irq, cpu)[vector] = desc;
+	  msi_domain_deactivate()
+6           write_msg(msg);
+7         unmask();
+
+After #1 the device _cannot_ raise the original vector anymore.
+
+After #7 the device _can_ raise an interrupt on the new vector/target
+         CPU pair, which might be the same as the previous one.
+
+So the only case where this causes the problem you describe is when
+
+  A) the device raises the old vector _before_ #1. If it raises the
+     interrupt _after_ #1, the device is broken.
+
+  B) the old target CPU is delayed handling the interrupt (interrupts
+     disabled, NMI, ....)
+
+  C) As a consequence #2 - __synchronize_irq() - cannot observe the
+     interrupt handler being executed on the target CPU and x86 has no
+     way to query the APIC IRR of a remote CPU to detect the delayed
+     case.
+
+  D) x86_vector_deactivate() sets vector_irq to VECTOR_SHUTDOWN
+
+  E) the old target CPU handles the interrupt and observes
+     VECTOR_SHUTDOWN and is delayed again
+
+  F) request_irq() gets the same vector/target CPU combo back and writes
+     the descriptor into vector_irq
+
+  G) the old target CPU writes VECTOR_UNUSED
+
+In a proper side by side flow the broken case looks like this:
+
+	CPU0				CPU1
+	vmenter(vCPU0)
+   	....
+         msi_set_affinity()
+           mask(MSI-X)
+             vmexit()
+        ...                             interrupt is raised in APIC
+                                        but not handled
+        free_irq()
+          mask();        
+
+          __synchronize_irq()
+
+          msi_domain_deactivate()
+            write_msg(0);
+          x86_vector_deactivate()
+            per_cpu(vector_irq, cpu)[vector] = VECTOR_SHUTDOWN;
+       
+        request_irq()                   interrupt is handled and
+                                        observes VECTOR_SHUTDOWN
+          x86_vector_activate()
+            per_cpu(vector_irq, cpu)[vector] = desc;
+
+                                        writes VECTOR_UNUSED
+
+	  msi_domain_deactivate()
+            write_msg(msg);
+          unmask();
+
+That's the kind of analysis, which needs to be provided and is required
+to understand the root cause. And if you look carefully at that
+analysis, then this is even a problem for regular host side device
+drivers:
+
+	CPU0				CPU1
+                                        interrupt is raised in APIC
+                                        but not handled
+        disable_irq_in_device();
+        free_irq()
+          mask();
+
+          __synchronize_irq()
+
+          msi_domain_deactivate()
+            write_msg(0);
+          x86_vector_deactivate()
+            per_cpu(vector_irq, cpu)[vector] = VECTOR_SHUTDOWN;
+       
+        request_irq()                   interrupt is handled and
+                                        observes VECTOR_SHUTDOWN
+          x86_vector_activate()
+            per_cpu(vector_irq, cpu)[vector] = desc;
+
+                                        writes VECTOR_UNUSED
+
+	  msi_domain_deactivate()
+            write_msg(msg);
+          unmask();
+        enable_irq_in_device();
+
+See?
+
+Now what to do about that?
+
+Definitely not hacking some ill defined repair function into the code,
+which is neither guaranteed to work nor fixes the general problem.
+
+Worse it exposes a functionality which should not be there in the first
+place to drivers, which then go and invoke it randomly and for the very
+wrong reasons.
+
+As you described correctly, there is a lack of locking in the x86
+interrupt entry code. That's the obvious thing to fix. See uncompiled
+and untested patch below.
+
+That solves the general overwrite problem _and_ does not rely on an
+interrupt sent by the device right afterwards.
+
+But it does not and _cannot_ solve the other VFIO specific problem,
+which comes with free_irq()/request_irq() on an active device:
+
+	CPU0				CPU1
+	vmenter(vCPU0)
+   	....
+         msi_set_affinity()
+           mask(MSI-X)
+             vmexit()
+#1      ...                             interrupt is raised in APIC
+                                        but not handled
+        free_irq()
+          mask();        
+
+          __synchronize_irq()
+
+          msi_domain_deactivate()
+            write_msg(0);
+          x86_vector_deactivate()
+            per_cpu(vector_irq, cpu)[vector] = VECTOR_SHUTDOWN;
+       
+#2                                      interrupt is handled and
+                                        observes VECTOR_SHUTDOWN
+                                        writes VECTOR_UNUSED
+       request_irq()
+         x86_vector_activate()
+            per_cpu(vector_irq, cpu)[vector] = desc;
+
+	  msi_domain_deactivate()
+            write_msg(msg);
+          unmask();
+
+#2 discards the interrupt as spurious _after_ shutdown and acknowledges
+the APIC with EOI. That means the interrupt is lost.
+
+So when the device logic is:
+
+        raise_interrupt()
+          if (!wait_for_driver_ack)
+             wait_for_driver_ack = true;
+             send_msi_message();
+
+then the device waits forever or in the best case until timeout / driver
+interaction that something handles the interrupt and reads the device
+status register, which clears 'wait_for_driver_ack'.
+
+That's not a theoretical case, that's what real world hardware devices
+implement. If it does not apply to your device, that does not mean that
+the problem does not exist.
+
+For a regular device driver this is a non-problem once the locking fix
+is applied. But for VFIO this _is_ an unfixable problem and the magic
+repair hack can't fix it either.
+
+I've pointed out a gazillion times before, that freeing an interrupt
+without quiescing the device interrupt before that, is a patently bad
+idea.
+
+Unless VFIO/QEMU has some secret magic to handle that particular case,
+the brute force workaround for this is to unconditionaly inject the
+interrupt in QEMU after returning from the VFIO syscall. Maybe that's
+the case today already, but I can't be bothered to stare at that
+code. That's an exercise left for the virt folks. If that exists, then
+this want's to be explained in the change log for completeness sake and
+ideally in a comment in that VFIO function.
+
+As the fix here is x86 specific, I looked at other architectures as
+well. AFAICT on a quick skim, it seems (no guarantee though) none of
+them is affected by the generic issue, but _all_ of them are affected by
+the VFIO specific one.
+
+Thanks,
+
+        tglx
+
+---
+--- a/arch/x86/kernel/irq.c
++++ b/arch/x86/kernel/irq.c
+@@ -256,26 +256,46 @@ static __always_inline void handle_irq(s
+ 		__handle_irq(desc, regs);
+ }
+ 
+-static __always_inline int call_irq_handler(int vector, struct pt_regs *regs)
++static struct irq_desc *reevaluate_vector(int vector)
+ {
+-	struct irq_desc *desc;
+-	int ret = 0;
++	struct irq_desc *desc = __this_cpu_read(vector_irq[vector]);
++
++	if (!IS_ERR_OR_NULL(desc))
++		return desc;
++
++	if (desc == VECTOR_UNUSED) {
++		pr_emerg_ratelimited("%d.%u No irq handler for vector\n",
++				     smp_processor_id(), vector);
++	} else {
++		__this_cpu_write(vector_irq[vector], VECTOR_UNUSED);
++	}
++	return NULL;
++}
++
++static __always_inline bool call_irq_handler(int vector, struct pt_regs *regs)
++{
++	struct irq_desc *desc = __this_cpu_read(vector_irq[vector]);
+ 
+-	desc = __this_cpu_read(vector_irq[vector]);
+ 	if (likely(!IS_ERR_OR_NULL(desc))) {
+ 		handle_irq(desc, regs);
+-	} else {
+-		ret = -EINVAL;
+-		if (desc == VECTOR_UNUSED) {
+-			pr_emerg_ratelimited("%s: %d.%u No irq handler for vector\n",
+-					     __func__, smp_processor_id(),
+-					     vector);
+-		} else {
+-			__this_cpu_write(vector_irq[vector], VECTOR_UNUSED);
+-		}
++		return true;
+ 	}
+ 
+-	return ret;
++	/*
++	 * Reevaluate with vector_lock held.
++	 *
++	 * FIXME: Add a big fat comment explaining the problem
++	 */
++	lock_vector_lock();
++	desc = reevaluate_vector(vector);
++	unlock_vector_lock();
++
++	if (!desc)
++		return false;
++
++	/* Using @desc is safe here as it is RCU protected */
++	handle_irq(desc, regs);
++	return true;
+ }
+ 
+ /*
+@@ -289,7 +309,7 @@ DEFINE_IDTENTRY_IRQ(common_interrupt)
+ 	/* entry code tells RCU that we're not quiescent.  Check it. */
+ 	RCU_LOCKDEP_WARN(!rcu_is_watching(), "IRQ failed to wake up RCU");
+ 
+-	if (unlikely(call_irq_handler(vector, regs)))
++	if (unlikely(!call_irq_handler(vector, regs)))
+ 		apic_eoi();
+ 
+ 	set_irq_regs(old_regs);
 
