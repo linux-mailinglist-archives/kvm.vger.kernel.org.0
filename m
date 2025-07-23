@@ -1,245 +1,273 @@
-Return-Path: <kvm+bounces-53175-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53176-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DDD2B0E741
-	for <lists+kvm@lfdr.de>; Wed, 23 Jul 2025 01:42:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF827B0E850
+	for <lists+kvm@lfdr.de>; Wed, 23 Jul 2025 03:51:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1ABF3AF246
-	for <lists+kvm@lfdr.de>; Tue, 22 Jul 2025 23:42:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F9121C84C92
+	for <lists+kvm@lfdr.de>; Wed, 23 Jul 2025 01:51:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7DAA28C035;
-	Tue, 22 Jul 2025 23:42:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="r8mok+AN"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D35018FDD2;
+	Wed, 23 Jul 2025 01:50:54 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82CE328AB10
-	for <kvm@vger.kernel.org>; Tue, 22 Jul 2025 23:42:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F02BC1FB3
+	for <kvm@vger.kernel.org>; Wed, 23 Jul 2025 01:50:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753227747; cv=none; b=DdBMg1pgXQeeroBJLDmOumxA9B6sSwWskhr9CkXZaExhCsEOyzdpgvFOPYDElO53rsyS4UNHoNEdW68VXh6E7OB4aKztNPkbDQ3U8ujVTUYx3dbXtblKJmAnNbJI3PfYU+pat0ebNjvdVwUhoAJkIsh+pptAzjpkmg3MC0hLTbM=
+	t=1753235453; cv=none; b=GChONFiL6CUgc7mfFmYpzhPRqp3ER5S6Y+7YLND8svkRynsPq9tJ8dL5Ti1R1tu5HZ8NEmP1Buh6f8TfBHc6K1jGiVd2EH7opGdcqwJJdFwBmNfGfgkp/NjftDkDo0duRlst6rYCbWXq8JjWbMX1p5haK3sgowtu+XOc/6i3M3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753227747; c=relaxed/simple;
-	bh=KmdfdNUxjHfIoxf80hBqYjQ/1GKN1PEjgM/hjTKhDHc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=C1T6YCX+iqDhj1g8M8j1IljXXO12t33chijJgWZg6Z2nl3nUETwxCD8xbecb9iUbvTGhvrRJ0hKYHeMJjl80TnlTgI8wlXeEBeNBnonbkQaxJRLnEMjwlP9oHtSD/z2ClEloGdi+5GT9jJJqWuIJaKMS8tm/HfM9dXicuowBKCQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=r8mok+AN; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b31bc3128fcso7907636a12.0
-        for <kvm@vger.kernel.org>; Tue, 22 Jul 2025 16:42:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753227745; x=1753832545; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=C4436MwwaaGsBQYuGwPP46zP65nxhOyA9XxeTVRWwmU=;
-        b=r8mok+AN1/7jbZj2H4ULkhi7/6KIYwT+a+N6KU/ERIGG34delG77iNKrshRCKV7DEf
-         IhyXRb4wyBDDgD1ccJlGIYhCez2R3TAhgDqdPOysjoGSa9k7yOAax8VqRrBiUWXY3f73
-         C5bcHOTMnKyRGOC9DCAx1uNzivP9CGvr4Q4+U1O7Xx0DMRYEpjuJauOuFjIcHur/LuAk
-         6uPIx7Jdt84iF4Te4qEzaHLS6EldQHJPcI2/bNHYv/yRBzpOlMh9zuVwsdKrrCmZG7HX
-         sJiwkH9HsYUoFiXHN5KZFIMKjxUl7pO9KC6081cPx1GW2TGbzV5nNtP1dOVQ0E4OFom+
-         1law==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753227745; x=1753832545;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=C4436MwwaaGsBQYuGwPP46zP65nxhOyA9XxeTVRWwmU=;
-        b=m5g0ZWiP3dOGoYrdJEbOnIruJABV1vFB1SutqcJhpfTSYsCQ/ru6cptUm4aMOXaQOF
-         /3VrGdYgOMtkSlFZWsea4YEqrvNbnLYJt4sjj0E+nNEfS2e4YQH35fzYxv6S4eFqt2mi
-         FQtMg/ZTlaFPp5aIIK5ci+OGjM0r3zka3P68H256lAzyvvJrwp218RSq5Kbi6RTmTWpS
-         Mmn5tYBYBBKSUvqOdAKr+soB9P2DUwgsweF/crfzhaQ/WxOxmowriucPOfK6CQZP4c+b
-         bQZpnEVaPwTvBBl2tmjYi/ANkVx7bBidhaBYxdMhSnaFAHLtxyjde3V4VlIC92I2EFCj
-         PaoQ==
-X-Gm-Message-State: AOJu0Yy0pkdNf5JFtsi+dwhpoddv84hETR1shzb3VNVy/v56Z9N9XNmO
-	ACwmgIj3KCs1LZ+ZITZ08D87DL4l1htjR8nnNgFH/NstP+b0UAo3w2ha0zFPEDEnMTaNKVRRgoB
-	nZce9VA==
-X-Google-Smtp-Source: AGHT+IHLrCrcEJh1eqR+2A2CsgZBx82DgvNUPV5JtUfEsyEi8WO/Hm3qnM3XnGuN+OWhk9ivI2YtpAQwcFU=
-X-Received: from plbjx8.prod.google.com ([2002:a17:903:1388:b0:234:c2e4:1e08])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:cf09:b0:235:ecf2:393
- with SMTP id d9443c01a7336-23f981de13dmr10817305ad.53.1753227744705; Tue, 22
- Jul 2025 16:42:24 -0700 (PDT)
-Date: Tue, 22 Jul 2025 16:42:23 -0700
-In-Reply-To: <CA+EHjTw46a+NCcgGXQ1HA+a3MSZD9Q97V8W-Xj5+pYuTh4Z2_w@mail.gmail.com>
+	s=arc-20240116; t=1753235453; c=relaxed/simple;
+	bh=aM2fsrHv8BfNI2bw0i/Hi2e08V87NtEJ2/MKjGRUvWY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=VLAzw9fcPziZ3aoP/TgxLuRq0kpNnnkPEkYGxum3M3nY3BsjB6bvLlV9oZ9Sj7X7Sg4yM0K5ksdQdidaIK0y6XU8DfyRe5KHSNWFOECv8MsKboliWJzqeCZ2ocPg+EO4OQJsTHfckx9MJI9gEUzOWt1RpvpI0gH1Y1v6VPz7jS8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.234])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4bmxnT66Mzz2Cfv6;
+	Wed, 23 Jul 2025 09:46:37 +0800 (CST)
+Received: from kwepemf200012.china.huawei.com (unknown [7.202.181.238])
+	by mail.maildlp.com (Postfix) with ESMTPS id D4155140257;
+	Wed, 23 Jul 2025 09:50:47 +0800 (CST)
+Received: from localhost (10.173.124.246) by kwepemf200012.china.huawei.com
+ (7.202.181.238) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Wed, 23 Jul
+ 2025 09:50:47 +0800
+From: Hogan Wang <hogan.wang@huawei.com>
+To: <x86@kernel.org>, <dave.hansen@linux.intel.com>, <kvm@vger.kernel.org>,
+	<alex.williamson@redhat.com>
+CC: <weidong.huang@huawei.com>, <yechuan@huawei.com>, <hogan.wang@huawei.com>,
+	<wangxinxin.wang@huawei.com>, <jianjay.zhou@huawei.com>,
+	<wangjie88@huawei.com>
+Subject: [PATCH] x86/irq: introduce repair_irq try to repair CPU vector
+Date: Wed, 23 Jul 2025 09:50:45 +0800
+Message-ID: <20250723015045.1701-1-hogan.wang@huawei.com>
+X-Mailer: git-send-email 2.45.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250717162731.446579-1-tabba@google.com> <20250717162731.446579-3-tabba@google.com>
- <aH5uY74Uev9hEWbM@google.com> <CA+EHjTxcgCLzwK5k+rTf2v_ufgsX0AcEzhy0EQL-pvmsg9QQeg@mail.gmail.com>
- <aH552woocYo1ueiU@google.com> <CA+EHjTwPnFLZ1OxKkV5gqk_kU_UU_KdupAGDoLbRyK__0J+YeQ@mail.gmail.com>
- <aH-1JeJH2cEvyEei@google.com> <CA+EHjTw46a+NCcgGXQ1HA+a3MSZD9Q97V8W-Xj5+pYuTh4Z2_w@mail.gmail.com>
-Message-ID: <aIAh3xkU52Z100xK@google.com>
-Subject: Re: [PATCH v15 02/21] KVM: Rename CONFIG_KVM_GENERIC_PRIVATE_MEM to CONFIG_KVM_GENERIC_GMEM_POPULATE
-From: Sean Christopherson <seanjc@google.com>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
-	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, 
-	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
-	palmer@dabbelt.com, aou@eecs.berkeley.edu, viro@zeniv.linux.org.uk, 
-	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
-	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
-	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
-	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
-	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
-	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
-	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
-	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
-	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
-	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
-	ira.weiny@intel.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
+ kwepemf200012.china.huawei.com (7.202.181.238)
 
-On Tue, Jul 22, 2025, Fuad Tabba wrote:
-> On Tue, 22 Jul 2025 at 16:58, Sean Christopherson <seanjc@google.com> wrote:
-> >
-> > On Tue, Jul 22, 2025, Fuad Tabba wrote:
-> > > On Mon, 21 Jul 2025 at 18:33, Sean Christopherson <seanjc@google.com> wrote:
-> > > >
-> > > > On Mon, Jul 21, 2025, Fuad Tabba wrote:
-> > > > > > The below diff applies on top.  I'm guessing there may be some intermediate
-> > > > > > ugliness (I haven't mapped out exactly where/how to squash this throughout the
-> > > > > > series, and there is feedback relevant to future patches), but IMO this is a much
-> > > > > > cleaner resting state (see the diff stats).
-> > > > >
-> > > > > So just so that I am clear, applying the diff below to the appropriate
-> > > > > patches would address all the concerns that you have mentioned in this
-> > > > > email?
-> > > >
-> > > > Yes?  It should, I just don't want to pinky swear in case I botched something.
-> > >
-> > > Other than this patch not applying, nah, I think it's all good ;P. I
-> > > guess base-commit: 9eba3a9ac9cd5922da7f6e966c01190f909ed640 is
-> > > somewhere in a local tree of yours. There are quite a few conflicts
-> > > and I don't think it would build even if based on the right tree,
-> > > e.g.,  KVM_CAP_GUEST_MEMFD_MMAP is a rename of KVM_CAP_GMEM_MMAP,
-> > > rather an addition of an undeclared identifier.
-> > >
-> > > That said, I think I understand what you mean, and I can apply the
-> > > spirit of this patch.
-> > >
-> > > Stay tuned for v16.
-> >
-> > Want to point me at your branch?  I can run it through my battery of tests, and
-> > maybe save you/us from having to spin a v17.
-> 
-> That would be great. Here it is:
-> 
-> https://android-kvm.googlesource.com/linux/+/refs/heads/tabba/guestmem-basic-6.16-v16
-> 
-> No known issues from my end. But can you have a look at the patch:
-> 
-> KVM: guest_memfd: Consolidate Kconfig and guest_memfd enable checks
-> 
-> In that I collected the changes to the config/enable checks that
-> didn't seem to fit well in any of the other patches.
+When the VM irqbalance service adjusts interrupt affinity
+frequently, the VM repeatedly masks MSI-x interrupts.
+During the guest kernel masking MSI-x interrupts, VM exits
+to the Hypervisor.
 
-Regarding config stuff, patch 02, KVM: Rename CONFIG_KVM_GENERIC_PRIVATE_MEM to
-CONFIG_HAVE_KVM_ARCH_GMEM_POPULATE, is missing a KVM_GMEM => KVM_GUEST_MEMFD rename.
-
-While playing with this, I also discovered why this code lives in the KVM_X86 config:
-
-  select KVM_GENERIC_PRIVATE_MEM if KVM_SW_PROTECTED_VM
-
-Commit ea4290d77bda ("KVM: x86: leave kvm.ko out of the build if no vendor module
-is requested") didn't have all the vendor netural configs depend on KVM_X86, and
-so it's possible to end up with unmet dependencies.  E.g. KVM_SW_PROTECTED_VM can
-be selected with KVM_X86=n, and thus with KVM_GUEST_MEMFD=n.
-
-We could punt on that mess until after this series, but that'd be a even more
-churn, and I'm not sure I could stomach giving acks for the continued addition
-of ugly kconfig dependencies. :-)
-
-Lastly, regarding "Consolidate Kconfig and guest_memfd enable checks", that needs
-to land before f6a5f3a22bbe ("KVM: guest_memfd: Allow host to map guest_memfd pages"),
-otherwise KVM will present a weird state where guest_memfd can be used for default
-VMs, but if and only KVM_GUEST_MEMFD happens to be selected by something else.
-That also provides a better shortlog: "KVM: x86: Enable KVM_GUEST_MEMFD for all
-64-bit builds".  The config cleanups and consolidations are a nice side effect,
-but what that patch is really doing is enabling KVM_GUEST_MEMFD more broadly.
-
-Actually, all of the arch patches need to come before f6a5f3a22bbe ("KVM: guest_memfd:
-Allow host to map guest_memfd pages"), otherwise intermediate builds will have
-half-baked support for guest_memfd mmap().  Or rather, KVM shouldn't let userspace
-enable GUEST_MEMFD_FLAG_MMAP until all the plumbing is in place.  I suspect that
-trying to shuffle the full patches around will create cyclical dependency hell.
-It's easy enough to hold off on adding GUEST_MEMFD_FLAG_MMAP until KVM is fully
-ready, so I think it makes sense to just add GUEST_MEMFD_FLAG_MMAP along with the
+The Qemu emulator implements the switching between
+kvm_interrupt and qemu_interrupt to achieve MSI-x PBA
 capability.
 
-Rather than trying to pass partial patches around, I pushed a branch to:
+When the Qemu emulator calls the vfio_msi_set_vector_signal
+interface to switch the kvm_interrupt and qemu_interrupt
+eventfd, it releases and requests IRQs, and correspondingly
+clears and initializes the CPU Vector.
 
-  https://github.com/sean-jc/linux.git x86/gmem_mmap
+When initializing the CPU Vector, if an unhandled interrupt
+in the APIC is delivered to the kernel, the __common_interrupt
+function is called to handle the interrupt.
 
-Outside of the x86 config crud, and deferring GUEST_MEMFD_FLAG_MMAP until KVM is
-fully prepped, there _shouldn't_ be any changes relatively to what you have.
+Since the call_irq_handler function assigns vector_irq[vector]
+to VECTOR_UNUSED without lock protection, the assignment of
+vector_irq[vector] and the initialization of the CPU Vector
+are concurrent, leading to vector_irq[vector] being mistakenly
+set to VECTOR_UNUSED.
 
-Note, it's based on:
+This ultimately results in the inability of VFIO passthrough
+device interrupts to be delivered, causing packet loss in
+network devices or IO hangs in disk devices.
 
-  https://github.com/kvm-x86/linux.git next
+This patch detects and repairs vector_irq[vector] after the
+interrupt initialization is completed, ensuring that
+vector_irq[vector] can be corrected if it is mistakenly set
+to VECTOR_UNUSED.
 
-as there are x86 kconfig dependencies/conflicts with changes that are destined
-for 6.17 (and I don't think landing this in 6.17 is realistic, i.e. this series
-will effectively follow kvm-x86/next no matter what).
+Signed-off-by: Hogan Wang <hogan.wang@huawei.com>
+---
+ arch/x86/kernel/apic/vector.c     | 18 ++++++++++++++++++
+ drivers/vfio/pci/vfio_pci_intrs.c |  2 ++
+ include/linux/interrupt.h         |  3 +++
+ include/linux/irqdomain.h         |  3 +++
+ kernel/irq/irqdomain.c            | 27 +++++++++++++++++++++++++++
+ kernel/irq/manage.c               | 18 ++++++++++++++++++
+ 6 files changed, 71 insertions(+)
 
-I haven't done a ton of runtime testing yet, but it passes all of my build tests
-(I have far too many configs), so I'm reasonably confident all the kconfig stuff
-isn't horribly broken.
-
-Oh, and I also squashed this into the very last patch.  The curly braces, line
-wrap, and hardcoded boolean are all superfluous.
-
-diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
-index 4cdccabc160c..a0c5db8fd72d 100644
---- a/tools/testing/selftests/kvm/guest_memfd_test.c
-+++ b/tools/testing/selftests/kvm/guest_memfd_test.c
-@@ -249,8 +249,7 @@ static bool check_vm_type(unsigned long vm_type)
-        return kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(vm_type);
+diff --git a/arch/x86/kernel/apic/vector.c b/arch/x86/kernel/apic/vector.c
+index 93069b13d3af..20164a9ce63b 100644
+--- a/arch/x86/kernel/apic/vector.c
++++ b/arch/x86/kernel/apic/vector.c
+@@ -396,6 +396,23 @@ static void x86_vector_deactivate(struct irq_domain *dom, struct irq_data *irqd)
+ 	raw_spin_unlock_irqrestore(&vector_lock, flags);
  }
  
--static void test_with_type(unsigned long vm_type, uint64_t guest_memfd_flags,
--                          bool expect_mmap_allowed)
-+static void test_with_type(unsigned long vm_type, uint64_t guest_memfd_flags)
++static void x86_vector_repair(struct irq_domain *dom, struct irq_data *irqd)
++{
++	struct apic_chip_data *apicd = apic_chip_data(irqd);
++	struct irq_desc *desc = irq_data_to_desc(irqd);
++	unsigned int vector = apicd->vector;
++	unsigned int cpu = apicd->cpu;
++	unsigned long flags;
++
++	raw_spin_lock_irqsave(&vector_lock, flags);
++	if (per_cpu(vector_irq, cpu)[vector] != desc) {
++		per_cpu(vector_irq, cpu)[vector] = desc;
++		pr_warn("irq %u: repair vector %u.%u\n",
++			irqd->irq, cpu, vector);
++	}
++	raw_spin_unlock_irqrestore(&vector_lock, flags);
++}
++
+ static int activate_reserved(struct irq_data *irqd)
  {
-        struct kvm_vm *vm;
-        size_t total_size;
-@@ -272,7 +271,7 @@ static void test_with_type(unsigned long vm_type, uint64_t guest_memfd_flags,
- 
-        test_file_read_write(fd);
- 
--       if (expect_mmap_allowed) {
-+       if (guest_memfd_flags & GUEST_MEMFD_FLAG_MMAP) {
-                test_mmap_supported(fd, page_size, total_size);
-                test_fault_overflow(fd, page_size, total_size);
- 
-@@ -343,13 +342,11 @@ int main(int argc, char *argv[])
- 
-        test_gmem_flag_validity();
- 
--       test_with_type(VM_TYPE_DEFAULT, 0, false);
--       if (kvm_has_cap(KVM_CAP_GUEST_MEMFD_MMAP)) {
--               test_with_type(VM_TYPE_DEFAULT, GUEST_MEMFD_FLAG_MMAP,
--                              true);
--       }
-+       test_with_type(VM_TYPE_DEFAULT, 0);
-+       if (kvm_has_cap(KVM_CAP_GUEST_MEMFD_MMAP))
-+               test_with_type(VM_TYPE_DEFAULT, GUEST_MEMFD_FLAG_MMAP);
- 
- #ifdef __x86_64__
--       test_with_type(KVM_X86_SW_PROTECTED_VM, 0, false);
-+       test_with_type(KVM_X86_SW_PROTECTED_VM, 0);
+ 	struct apic_chip_data *apicd = apic_chip_data(irqd);
+@@ -703,6 +720,7 @@ static const struct irq_domain_ops x86_vector_domain_ops = {
+ 	.free		= x86_vector_free_irqs,
+ 	.activate	= x86_vector_activate,
+ 	.deactivate	= x86_vector_deactivate,
++	.repair		= x86_vector_repair,
+ #ifdef CONFIG_GENERIC_IRQ_DEBUGFS
+ 	.debug_show	= x86_vector_debug_show,
  #endif
+diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
+index 565966351dfa..6ea34a52878c 100644
+--- a/drivers/vfio/pci/vfio_pci_intrs.c
++++ b/drivers/vfio/pci/vfio_pci_intrs.c
+@@ -517,6 +517,8 @@ static int vfio_msi_set_vector_signal(struct vfio_pci_core_device *vdev,
+ 	}
+ 	ctx->trigger = trigger;
+ 
++	repair_irq(irq);
++
+ 	return 0;
+ 
+ out_put_eventfd_ctx:
+diff --git a/include/linux/interrupt.h b/include/linux/interrupt.h
+index 51b6484c0493..c5f6172ae1cd 100644
+--- a/include/linux/interrupt.h
++++ b/include/linux/interrupt.h
+@@ -203,6 +203,9 @@ extern void free_percpu_irq(unsigned int, void __percpu *);
+ extern const void *free_nmi(unsigned int irq, void *dev_id);
+ extern void free_percpu_nmi(unsigned int irq, void __percpu *percpu_dev_id);
+ 
++extern void repair_irq(unsigned int irq);
++
++
+ struct device;
+ 
+ extern int __must_check
+diff --git a/include/linux/irqdomain.h b/include/linux/irqdomain.h
+index 7387d183029b..10538a13addc 100644
+--- a/include/linux/irqdomain.h
++++ b/include/linux/irqdomain.h
+@@ -69,6 +69,7 @@ void of_phandle_args_to_fwspec(struct device_node *np, const u32 *args,
+  * @translate:	Given @fwspec, decode the hardware irq number (@out_hwirq) and
+  *		linux irq type value (@out_type). This is a generalised @xlate
+  *		(over struct irq_fwspec) and is preferred if provided.
++ * @repair: repair one interrupt (@irqd).
+  * @debug_show:	For domains to show specific data for an interrupt in debugfs.
+  *
+  * Functions below are provided by the driver and called whenever a new mapping
+@@ -96,6 +97,7 @@ struct irq_domain_ops {
+ 	void	(*deactivate)(struct irq_domain *d, struct irq_data *irq_data);
+ 	int	(*translate)(struct irq_domain *d, struct irq_fwspec *fwspec,
+ 			     unsigned long *out_hwirq, unsigned int *out_type);
++	void (*repair)(struct irq_domain *d, struct irq_data *irqd);
+ #endif
+ #ifdef CONFIG_GENERIC_IRQ_DEBUGFS
+ 	void	(*debug_show)(struct seq_file *m, struct irq_domain *d,
+@@ -563,6 +565,7 @@ int __irq_domain_alloc_irqs(struct irq_domain *domain, int irq_base, unsigned in
+ void irq_domain_free_irqs(unsigned int virq, unsigned int nr_irqs);
+ int irq_domain_activate_irq(struct irq_data *irq_data, bool early);
+ void irq_domain_deactivate_irq(struct irq_data *irq_data);
++void irq_domain_repair_irq(struct irq_data *irq_data);
+ 
+ /**
+  * irq_domain_alloc_irqs - Allocate IRQs from domain
+diff --git a/kernel/irq/irqdomain.c b/kernel/irq/irqdomain.c
+index c8b6de09047b..d9c2aaa6247d 100644
+--- a/kernel/irq/irqdomain.c
++++ b/kernel/irq/irqdomain.c
+@@ -1921,6 +1921,18 @@ void irq_domain_free_irqs_parent(struct irq_domain *domain,
  }
+ EXPORT_SYMBOL_GPL(irq_domain_free_irqs_parent);
+ 
++static void __irq_domain_repair_irq(struct irq_data *irq_data)
++{
++	if (irq_data && irq_data->domain) {
++		struct irq_domain *domain = irq_data->domain;
++
++		if (domain->ops->repair)
++			domain->ops->repair(domain, irq_data);
++		if (irq_data->parent_data)
++			__irq_domain_repair_irq(irq_data->parent_data);
++	}
++}
++
+ static void __irq_domain_deactivate_irq(struct irq_data *irq_data)
+ {
+ 	if (irq_data && irq_data->domain) {
+@@ -1989,6 +2001,21 @@ void irq_domain_deactivate_irq(struct irq_data *irq_data)
+ 	}
+ }
+ 
++/**
++ * irq_domain_repair_irq - Call domain_ops->repair recursively to
++ *			       repair interrupt
++ * @irq_data: outermost irq_data associated with interrupt
++ *
++ * It calls domain_ops->repair to program interrupt controllers to repair
++ * interrupt delivery.
++ */
++void irq_domain_repair_irq(struct irq_data *irq_data)
++{
++	if (irqd_is_activated(irq_data))
++		__irq_domain_repair_irq(irq_data);
++}
++
++
+ static void irq_domain_check_hierarchy(struct irq_domain *domain)
+ {
+ 	/* Hierarchy irq_domains must implement callback alloc() */
+diff --git a/kernel/irq/manage.c b/kernel/irq/manage.c
+index c94837382037..f2e6bed02f98 100644
+--- a/kernel/irq/manage.c
++++ b/kernel/irq/manage.c
+@@ -1418,6 +1418,24 @@ setup_irq_thread(struct irqaction *new, unsigned int irq, bool secondary)
+ 	return 0;
+ }
+ 
++
++void repair_irq(unsigned int irq)
++{
++	struct irq_desc *desc = irq_to_desc(irq);
++	unsigned long flags;
++
++	mutex_lock(&desc->request_mutex);
++	chip_bus_lock(desc);
++	raw_spin_lock_irqsave(&desc->lock, flags);
++
++	irq_domain_repair_irq(irq_desc_get_irq_data(desc));
++
++	raw_spin_unlock_irqrestore(&desc->lock, flags);
++	chip_bus_sync_unlock(desc);
++	mutex_unlock(&desc->request_mutex);
++}
++EXPORT_SYMBOL(repair_irq);
++
+ /*
+  * Internal function to register an irqaction - typically used to
+  * allocate special interrupts that are part of the architecture.
+-- 
+2.45.1
+
 
