@@ -1,88 +1,88 @@
-Return-Path: <kvm+bounces-53239-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53240-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB287B0F3CA
-	for <lists+kvm@lfdr.de>; Wed, 23 Jul 2025 15:20:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72F02B0F3C4
+	for <lists+kvm@lfdr.de>; Wed, 23 Jul 2025 15:20:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2E7CF1AA2951
-	for <lists+kvm@lfdr.de>; Wed, 23 Jul 2025 13:15:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 52F19566C6F
+	for <lists+kvm@lfdr.de>; Wed, 23 Jul 2025 13:15:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F05F72E6D1C;
-	Wed, 23 Jul 2025 13:13:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F7672E7632;
+	Wed, 23 Jul 2025 13:13:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z1VNro3x"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VtOYgYQY"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F0732E762C
-	for <kvm@vger.kernel.org>; Wed, 23 Jul 2025 13:13:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FD162E88AA
+	for <kvm@vger.kernel.org>; Wed, 23 Jul 2025 13:13:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753276409; cv=none; b=BgBtaRimr/rbtuEhqnkcf8P1DWI7RuHIGPyMyg2JdlAWOOqPYJziYDsEdY8sOncrWnyiEgmfU+qRDVhe3v+M1vKz+QDnikeiItUJD3CjjfytHCrdxHrTQ62GNDnL162YgZLrcqdlKV0uzGsJ71MS0jgeWiLgKzWSAEMfR8Yww1E=
+	t=1753276427; cv=none; b=K45hyWv9hrMi8S6W6AXSy2ct3yiJUIYyOg9TvQE9GVIJzTcwcSmPXgkvg1ZZrvzJoh55u2ABLFdYwGVHhWfKJNoau4q8JgYJ5v3NVeLz3hnpZ3k7OBEwj3bykGJve8dS671SRRQc0KSFU8gkmgaWG3sthxfHA8ZKTqEGVEmwUZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753276409; c=relaxed/simple;
-	bh=1nhW6Qz5AlpL1YL2TcZATob6zcwJqABv9nOfJywG9DA=;
+	s=arc-20240116; t=1753276427; c=relaxed/simple;
+	bh=BuVlQiw4YuqhoCqbfyooddTKxtWiLyTZIS234B2Orvg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RUUPylDzMeaAOQnBhtaSqDBy4DcY+rpV6f3aZjA30Gw0q01NGO9umGZ6Oaq9y8R2+XUstS0rpa+GKqwnmTNNZ6scvvxvqqeTbYPtaq5OPqYEPhdTnZ7bni4oZrqfb11UsVfFsKOXJluoqK2aEnEEOo281oxTzErItJI7TpCWhAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Z1VNro3x; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=LRyqI6Oh4cTGKiOPQZ8e/NIiX2Yym1tKsNeHndx2yQl3nSmmlfuQUs8T6wcmp2zPyOOrKBo+JlYc+NG7sDP+FvHNio4bCmkVOHT2DE8VeB73LRh2pK9Db6rR07whprAifkDjXlJS1QodkHXQC9Lj2l9MzNXbGmPNL249yFs1bKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VtOYgYQY; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1753276406;
+	s=mimecast20190719; t=1753276424;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=PkGqZ8JTssF0YzydRjjtp+oOG9qCACMEtFEOJw0JFJE=;
-	b=Z1VNro3xoaCFi2s2MggOlOaCl9o1S5XcZRfsEEBOB954vtHZVgwolqp82QXAi9DESRBqME
-	YaS5GyvLGi8SqaTRligFrqRKVWtrVOvfhyLJYjvwL/zB+b3Ooup5vo65msdJfV1Rp0kzbs
-	z3jk4w3n45vcVH/LlwpUgrf6hf3zHQI=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=WNsTttpzXt7BuB19w//5WAeWR9PeTbGdvwXUZjkwb7o=;
+	b=VtOYgYQY28x2A7bSkTwSlx0VXEBeYm6yVLhGBA41qHQqqQvTb1pBQ9/ruJvhPLqaSKJBsI
+	idyRoHO62fcQN+HBN0ZE0uvBirznREMLi5oK/mQtm7aRP5GVgkaf1qCowYTj2WxSropID7
+	1suu+3Lgvs4SAoeCBdxId9wNcGlZSuA=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-194-YYH_b42mPa2TiIyk0EqmrQ-1; Wed, 23 Jul 2025 09:13:23 -0400
-X-MC-Unique: YYH_b42mPa2TiIyk0EqmrQ-1
-X-Mimecast-MFC-AGG-ID: YYH_b42mPa2TiIyk0EqmrQ_1753276402
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3a50049f8eeso3780601f8f.3
-        for <kvm@vger.kernel.org>; Wed, 23 Jul 2025 06:13:23 -0700 (PDT)
+ us-mta-99-pUo1LRlCOf2ySv7NGepkFA-1; Wed, 23 Jul 2025 09:13:43 -0400
+X-MC-Unique: pUo1LRlCOf2ySv7NGepkFA-1
+X-Mimecast-MFC-AGG-ID: pUo1LRlCOf2ySv7NGepkFA_1753276422
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-45626e0d3e1so53839765e9.1
+        for <kvm@vger.kernel.org>; Wed, 23 Jul 2025 06:13:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753276402; x=1753881202;
+        d=1e100.net; s=20230601; t=1753276422; x=1753881222;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :content-language:from:references:cc:to:subject:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=PkGqZ8JTssF0YzydRjjtp+oOG9qCACMEtFEOJw0JFJE=;
-        b=HqPyDZk81H/Un61f6dVJ6WcmZdlq88WzCvO4rJX+gWKttdvVQUNFIZPq+aS8KGjSug
-         bQerfA6WSTjALaT6vCVOx8rgkk6R+4MkBTTlQYzB6S0ckSQb2+YFkIhQgz4eveo/wnFu
-         EGowzhSzD0doRCVwRG5sBoZkZ707VdNhW1VSp3N1pijE2JJZjM0Vvt4hKvaUNJqjpL6E
-         4clqfXX7cL1GIqgtl4HGNO6We2sqWMsSXzxfjRLOQ45qoIpqlBwVFKVnvvUktvCAFAr6
-         4AuIpWFsd2c8vIWsxyiraSeSGL8amf/8E96NGWa9EItIjtqPKVBUVZF+ZPmR+FwIzQUM
-         fhDg==
-X-Forwarded-Encrypted: i=1; AJvYcCW39URgjwwiVX3mo0PHktj14Q3gZAiJ3uAXLYHI0HKO71/I5pFhSME8laSlNE+VWSRzCrU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyCkgeP37efk+5aicDszyba4MpIo801VTidbKb63xDSfW1ADj8a
-	y3AcCSsFEeA6/A6jdCA4UcTb1vyVrXuzNKOOLaZmw5axV99wnF3F9SCVwSndREqnNSgvhctsiEX
-	fT3/csKx3jen2hSkJJBGrk2WPamWicCvbeZ1u9O6YDMGxvD8TmGMn+g==
-X-Gm-Gg: ASbGncv5xGoNCH7wYOYmV3mthD3e6INl4CafoI1WdWmszUJBhY3OJ81mh80RK/KRfOr
-	CIBexQfsb48BHOm1r4PJdxMVZ1kOlSBg8p21rRO5x5Bo5B+y611wR4qDwlukowXxHoSYHfBPU1Z
-	TuuJkgMUZS3ld/jazUlwNcVf/C5BKiQigWWd4pUlkFQLx2Oo+cIHc6BnHf4lSFGgcKJRhzjhuuY
-	wEy1Zk3Mk0qrdofgJru9jAdBFgJy7XlT+mvuCf0Xmd/DBDnhghuZsRgpWqZrZkPF3Xbue38fvx/
-	mr2U5kRccHzCAQnINhYULhOfOSA0Mo2hh2C5lMhY8Bsj+/g3C6lIe37WMM0Q+3B2gty4L9HBZ5n
-	v1jDU3G756isseTAPSLBU6IDxCVF8ZN2bx+BfHgI9KASWDhgXR228S4mHEWvQOXVpAdA=
-X-Received: by 2002:a05:6000:1449:b0:3a5:1c71:432a with SMTP id ffacd0b85a97d-3b768ee0916mr2667038f8f.14.1753276401664;
-        Wed, 23 Jul 2025 06:13:21 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEiGgfuAiG7DvLalGHgIdNEGZ+PeSURlzaRdInzruKq5epLrE3jgqXNVzpaLmRjogyYfeJ3eQ==
-X-Received: by 2002:a05:6000:1449:b0:3a5:1c71:432a with SMTP id ffacd0b85a97d-3b768ee0916mr2666979f8f.14.1753276400856;
-        Wed, 23 Jul 2025 06:13:20 -0700 (PDT)
+        bh=WNsTttpzXt7BuB19w//5WAeWR9PeTbGdvwXUZjkwb7o=;
+        b=T5lpjNudjdXvrOXsELeO1+mqW0zu2CjI/zBD0TJ0KrgD/Z70CxrP2N0RZc2wLB9292
+         LUZxOt9RHBphefwzG1A76H+paHkbst1dxan/MPypM4NWghP1zgMeugZjVG/EkThqbugM
+         OnO/rg8uDmcXtYCfDLEno9p4kfDxQzPeXHMHsza1lyLNLtsKUr2F9yQIQAffXSQdKcWI
+         68ChTlrsEIunBf0aqhdWtjs8MH282P1ktQ20QZp+yQeNk7uQifKcu4Pjbx/S5h2GP9Sj
+         Ui2CTaFN0GyfAhQC44Q5UnpdsFabGWqx47lpEu/KX1ZvgHbGGomB8wa1FJ7We4Vjzuoi
+         qpoA==
+X-Forwarded-Encrypted: i=1; AJvYcCUEmyrR3+SPByQSnGwse9erMHfTWi2iG7lZY43Ojig+CIVph/e+cKsohynB349NWRIEWac=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy44x02SzufOb/14q4LmLN8etvTy37MOiE8fy/qPLfA/nwPeGFo
+	BMmGnqfw7W2eKfzlfyn7irCQdWlm6PU+nW0COt/JlZFHATtpS2QAnFYFXMazWL5E2kc4NsbvEBa
+	/OfElZgMqIlS9vLhQivHWxxEt5q+nK0gsTH9Zu7IZs3W67znIi73ovA==
+X-Gm-Gg: ASbGncs9Du0CfHX2BqZR4RNcu4UwhCqC5rTKj+fLSsAoF2RUCAPXBpzV1NDAilY6KND
+	H0DnkkxODnw6qKrOV96AyVy0T9s8TanO3jV+dJZHcxMdt1aZNnZzxmoackmbThs84XimtH41Lbc
+	BumKzs3wTn//zOC0mHzWxSD+MQDkwF9M5oN+gSbFvj5AxDxnfNDqmRtg9XOeX8GxDdUSkugyc17
+	oWkONkncFN+iMplbXOluoCgmHyn6KJ7wAoQma2qZs2vgf6p6On/CdO99rPlX/oAG11LDPHR4/ba
+	AQTb9esjPJL3WRHyUK0hSJwqd68hgCMduLGvtSUBEA5PNfgoZolCdh2wpJqSL+C2Zx6c+Mfeblo
+	XbcoFOBVfKIBCg7rJI5fBYsBSp60ME/rpdjZYmMGRmUpUE8D/N52/SgfWZBXrenQyS90=
+X-Received: by 2002:a05:600c:6992:b0:43c:f8fe:dd82 with SMTP id 5b1f17b1804b1-45869580b01mr25222175e9.18.1753276421882;
+        Wed, 23 Jul 2025 06:13:41 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHwYuDSBLOTHiVj0Wh3MHPmxHxu71mfC5e5j46cSfr2H+W9gY9MEaPOPTTU3x+pnNaIDwBYvQ==
+X-Received: by 2002:a05:600c:6992:b0:43c:f8fe:dd82 with SMTP id 5b1f17b1804b1-45869580b01mr25221575e9.18.1753276421277;
+        Wed, 23 Jul 2025 06:13:41 -0700 (PDT)
 Received: from ?IPV6:2003:d8:2f00:4000:a438:1541:1da1:723a? (p200300d82f004000a43815411da1723a.dip0.t-ipconnect.de. [2003:d8:2f00:4000:a438:1541:1da1:723a])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b61ca2bf99sm16333740f8f.32.2025.07.23.06.13.17
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b61ca5d266sm16226012f8f.91.2025.07.23.06.13.38
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Jul 2025 06:13:20 -0700 (PDT)
-Message-ID: <45083a21-c7e5-481e-8e01-d50c6259b2ee@redhat.com>
-Date: Wed, 23 Jul 2025 15:13:17 +0200
+        Wed, 23 Jul 2025 06:13:40 -0700 (PDT)
+Message-ID: <22b2f715-c64b-4c08-bdf9-10655a7791e2@redhat.com>
+Date: Wed, 23 Jul 2025 15:13:37 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -90,8 +90,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v16 02/22] KVM: x86: Have all vendor neutral sub-configs
- depend on KVM_X86, not just KVM
+Subject: Re: [PATCH v16 03/22] KVM: x86: Select KVM_GENERIC_PRIVATE_MEM
+ directly from KVM_SW_PROTECTED_VM
 To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
  linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev
 Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
@@ -115,7 +115,7 @@ Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
  jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com,
  ira.weiny@intel.com
 References: <20250723104714.1674617-1-tabba@google.com>
- <20250723104714.1674617-3-tabba@google.com>
+ <20250723104714.1674617-4-tabba@google.com>
 From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=david@redhat.com; keydata=
@@ -163,30 +163,19 @@ Autocrypt: addr=david@redhat.com; keydata=
  WBe5lqcozu9LpNDH/brVSzHCSb7vjNGvvSVESDuoiHK8gNlf0v+epy5WYd7CGAgODPvDShGN
  g3eXuA==
 Organization: Red Hat
-In-Reply-To: <20250723104714.1674617-3-tabba@google.com>
+In-Reply-To: <20250723104714.1674617-4-tabba@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 23.07.25 12:46, Fuad Tabba wrote:
 > From: Sean Christopherson <seanjc@google.com>
 > 
-> Make all vendor neutral KVM x86 configs depend on KVM_X86, not just KVM,
-> i.e. gate them on at least one vendor module being enabled and thus on
-> kvm.ko actually being built.  Depending on just KVM allows the user to
-> select the configs even though they won't actually take effect, and more
-> importantly, makes it all too easy to create unmet dependencies.  E.g.
-> KVM_GENERIC_PRIVATE_MEM can't be selected by KVM_SW_PROTECTED_VM, because
-> the KVM_GENERIC_MMU_NOTIFIER dependency is select by KVM_X86.
+> Now that KVM_SW_PROTECTED_VM doesn't have a hidden dependency on KVM_X86,
+> select KVM_GENERIC_PRIVATE_MEM from within KVM_SW_PROTECTED_VM instead of
+> conditionally selecting it from KVM_X86.
 > 
-> Hiding all sub-configs when neither KVM_AMD nor KVM_INTEL is selected also
-> helps communicate to the user that nothing "interesting" is going on, e.g.
+> No functional change intended.
 > 
->    --- Virtualization
->    <M>   Kernel-based Virtual Machine (KVM) support
->    < >   KVM for Intel (and compatible) processors support
->    < >   KVM for AMD processors support
-> 
-> Fixes: ea4290d77bda ("KVM: x86: leave kvm.ko out of the build if no vendor module is requested")
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 > Signed-off-by: Fuad Tabba <tabba@google.com>
 > ---
