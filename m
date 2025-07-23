@@ -1,52 +1,52 @@
-Return-Path: <kvm+bounces-53282-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53289-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30A70B0F9A3
-	for <lists+kvm@lfdr.de>; Wed, 23 Jul 2025 19:54:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC53AB0F9B5
+	for <lists+kvm@lfdr.de>; Wed, 23 Jul 2025 19:56:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 793521CC08FD
-	for <lists+kvm@lfdr.de>; Wed, 23 Jul 2025 17:54:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D3975674E6
+	for <lists+kvm@lfdr.de>; Wed, 23 Jul 2025 17:56:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2C59224B07;
-	Wed, 23 Jul 2025 17:54:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C10023AB8B;
+	Wed, 23 Jul 2025 17:54:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="gG3vQoKN"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="vqCMaCrf"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50787C2E0;
-	Wed, 23 Jul 2025 17:54:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4CC32367CB;
+	Wed, 23 Jul 2025 17:54:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753293257; cv=none; b=B6zGKagJZVw5jBcnr5DlC7Z5n3DI8nb2Sras7nB4XY7as8lGgUIt0yW8zFwgGOCc3GjQMF235lfRP50HQEhxenk6M7oR6Z1vY8e0K/GfGHGI3sJO58/nDYlFOinsR6eYm0iFYj+u6lGN2PNIkVVfCC7T0M3uhqRfmEMVwSP93Bg=
+	t=1753293264; cv=none; b=Ke/g1Q5AwiXytz0xjOyCz1KIrXcVhdajyW0qGK/Aw4pvhI32p/wlct7zxaieeQFB5p3/0uhIRBv0QFPkKDPSObtLcSIwM4+nyoLIY4ebEo5pLJpP2JhWJjTZHsCTVw5uZLzzisgnFSEhAN1wDF1jXAVrsPwt0dBjnsjMIeOcsc0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753293257; c=relaxed/simple;
-	bh=bN6iMZJxULyWw8fM0bBE7z0gcBIpEuKUfw8wO8UJldY=;
+	s=arc-20240116; t=1753293264; c=relaxed/simple;
+	bh=nx+dM1oAmgKShxYD34/rKstbrQTJJ02Iouc+nLSEfzk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tbzHaFRtQI8AILzV2xLlGqohXCbsdEkaFhDh9PcYZzr+S47IxNiFQQ11GpGrocQY9l8WVDK61LB7qceZwnohWYkG4GNjNDb9dX/XSCm69fHj8lriQinWONUxzmVx2VUbv4+JwZL3fn0SWoN0gnWMgo9sjxoZO45HqISIYc4r3lI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=gG3vQoKN; arc=none smtp.client-ip=198.137.202.136
+	 MIME-Version; b=WpmfBU0dQl8QXzwVTx+XiY+NOnzNFzXCIn34/MTmqNlg9D4P0iUUmtEHtLzLWAj39YD6gc5Lye0Uc6cY+A8haU1iW+aEiVauMCiVlPXmLt3mKMD752aU/oLavfujcKeWis7rZkNJ8Dyt0i5jkBrXDnbtjc/K4F7Hfr4fd99dcJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=vqCMaCrf; arc=none smtp.client-ip=198.137.202.136
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
 Received: from terminus.zytor.com (terminus.zytor.com [IPv6:2607:7c80:54:3:0:0:0:136])
 	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 56NHrfxw1284522
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 56NHrfxx1284522
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
-	Wed, 23 Jul 2025 10:53:52 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 56NHrfxw1284522
+	Wed, 23 Jul 2025 10:53:53 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 56NHrfxx1284522
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025072201; t=1753293233;
-	bh=DKIu6ocFBDeeS216dlD/91z8SZPrsdeaVqLdFbg9kFY=;
+	s=2025072201; t=1753293234;
+	bh=i+ns0F2Ex+xQMQzvK4DIkApu0w0I3TMwsyhuQp7IOIY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=gG3vQoKNXNW+sikXSNjgLOXOmPsiJVr2hOKuBgnfmuQDHB0jMx1LHze4QvL6W2Gi0
-	 7uuwExpSHTPCP4NfTa9qp7zw4+/vkWHiBIGSi9pIz4WCg+suGQFb+TFbMA6p2sCoaP
-	 9qIA8j8JyNICPY1A4946Ct0Lz7WsvSq8KUDDgH7U/BPxiKkUWt+oqLzQVaqa291+jF
-	 qJ04V6lIqsqw81msQ2m1LGyajeLY10fEvxxdY9NcDwl1RASTeKKz65UOrfpbQD5GQt
-	 TsrjfI7LEaG0cPjDSEiBR9ZdSB13NSTAeBnOmsHu6GY8Q4IHjeRsqSv8MESEw7W3la
-	 0nYvV39u7StMg==
+	b=vqCMaCrfuK3EFBb44a6prpg8hUMjSWnSTZOAmZS6HL+dFxlE42uMGgCrBbVJiGWiv
+	 qNJqZQ81Etg6DF4y51EGvp97F/8suMJKDu1hDoh2+5KpKHb6ut5nbpznXoenVXZgqa
+	 DKlEis3ly8fec0DXDBB/q3frl8dRGOtgKlHiQn6G7iagDUvr7lbKKFZYdcrOMYtnV+
+	 ETkU3ASxbPwn9qMAXncgiB5qBo3Hy2PPXc/22wFVUAWateG5kWomd319cKX/o9Fup+
+	 XhsmunL4UmzU3rh5MuidZio1RlK59vSRLodD1KJGEhMwXYt36COyZ73yRMY6yaSB6L
+	 /qQIcT52trHfw==
 From: "Xin Li (Intel)" <xin@zytor.com>
 To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         linux-doc@vger.kernel.org
@@ -55,9 +55,9 @@ Cc: pbonzini@redhat.com, seanjc@google.com, corbet@lwn.net, tglx@linutronix.de,
         x86@kernel.org, hpa@zytor.com, xin@zytor.com, luto@kernel.org,
         peterz@infradead.org, andrew.cooper3@citrix.com, chao.gao@intel.com,
         hch@infradead.org
-Subject: [PATCH v5 08/23] KVM: VMX: Save/restore guest FRED RSP0
-Date: Wed, 23 Jul 2025 10:53:26 -0700
-Message-ID: <20250723175341.1284463-9-xin@zytor.com>
+Subject: [PATCH v5 09/23] KVM: VMX: Add host MSR read/write helpers to streamline preemption logic
+Date: Wed, 23 Jul 2025 10:53:27 -0700
+Message-ID: <20250723175341.1284463-10-xin@zytor.com>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20250723175341.1284463-1-xin@zytor.com>
 References: <20250723175341.1284463-1-xin@zytor.com>
@@ -69,86 +69,65 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Xin Li <xin3.li@intel.com>
+From: Sean Christopherson <seanjc@google.com>
 
-Save guest FRED RSP0 in vmx_prepare_switch_to_host() and restore it
-in vmx_prepare_switch_to_guest() because MSR_IA32_FRED_RSP0 is passed
-through to the guest, thus is volatile/unknown.
+Introduce helper functions for host MSR access to centralize and simplify
+preemption handling.  This improves code readability and reduces duplication,
+laying the groundwork for a cleaner implementation of FRED RSP0 access
+functions in the following patch.
 
-Note, host FRED RSP0 is restored in arch_exit_to_user_mode_prepare(),
-regardless of whether it is modified in KVM.
-
-Signed-off-by: Xin Li <xin3.li@intel.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Xin Li (Intel) <xin@zytor.com>
-Tested-by: Shan Kang <shan.kang@intel.com>
-Tested-by: Xuelian Guo <xuelian.guo@intel.com>
 ---
-
-Changes in v5:
-* Remove the cpu_feature_enabled() check when set/get guest
-  MSR_IA32_FRED_RSP0, as guest_cpu_cap_has() should suffice (Sean).
-* Add a comment when synchronizing current MSR_IA32_FRED_RSP0 MSR to
-  the kernel's local cache, because its handling is different from
-  the MSR_KERNEL_GS_BASE handling (Sean).
-* Add TB from Xuelian Guo.
-
-Changes in v3:
-* KVM only needs to save/restore guest FRED RSP0 now as host FRED RSP0
-  is restored in arch_exit_to_user_mode_prepare() (Sean Christopherson).
-
-Changes in v2:
-* Don't use guest_cpuid_has() in vmx_prepare_switch_to_{host,guest}(),
-  which are called from IRQ-disabled context (Chao Gao).
-* Reset msr_guest_fred_rsp0 in __vmx_vcpu_reset() (Chao Gao).
----
- arch/x86/kvm/vmx/vmx.c | 14 ++++++++++++++
- arch/x86/kvm/vmx/vmx.h |  1 +
- 2 files changed, 15 insertions(+)
+ arch/x86/kvm/vmx/vmx.c | 25 +++++++++++++++++++------
+ 1 file changed, 19 insertions(+), 6 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 4cdc2a0c1465..1e58d61dc021 100644
+index 1e58d61dc021..53dce136e24b 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1293,6 +1293,10 @@ void vmx_prepare_switch_to_guest(struct kvm_vcpu *vcpu)
- 	}
+@@ -1358,22 +1358,35 @@ static void vmx_prepare_switch_to_host(struct vcpu_vmx *vmx)
+ }
  
- 	wrmsrq(MSR_KERNEL_GS_BASE, vmx->msr_guest_kernel_gs_base);
-+
-+	if (guest_cpu_cap_has(vcpu, X86_FEATURE_FRED))
-+		wrmsrns(MSR_IA32_FRED_RSP0, vmx->msr_guest_fred_rsp0);
-+
- #else
- 	savesegment(fs, fs_sel);
- 	savesegment(gs, gs_sel);
-@@ -1337,6 +1341,16 @@ static void vmx_prepare_switch_to_host(struct vcpu_vmx *vmx)
- 	invalidate_tss_limit();
  #ifdef CONFIG_X86_64
- 	wrmsrq(MSR_KERNEL_GS_BASE, vmx->vt.msr_host_kernel_gs_base);
+-static u64 vmx_read_guest_kernel_gs_base(struct vcpu_vmx *vmx)
++static u64 vmx_read_guest_host_msr(struct vcpu_vmx *vmx, u32 msr, u64 *cache)
+ {
+ 	preempt_disable();
+ 	if (vmx->vt.guest_state_loaded)
+-		rdmsrq(MSR_KERNEL_GS_BASE, vmx->msr_guest_kernel_gs_base);
++		*cache = read_msr(msr);
+ 	preempt_enable();
+-	return vmx->msr_guest_kernel_gs_base;
++	return *cache;
+ }
+ 
+-static void vmx_write_guest_kernel_gs_base(struct vcpu_vmx *vmx, u64 data)
++static void vmx_write_guest_host_msr(struct vcpu_vmx *vmx, u32 msr, u64 data,
++				     u64 *cache)
+ {
+ 	preempt_disable();
+ 	if (vmx->vt.guest_state_loaded)
+-		wrmsrq(MSR_KERNEL_GS_BASE, data);
++		wrmsrns(msr, data);
+ 	preempt_enable();
+-	vmx->msr_guest_kernel_gs_base = data;
++	*cache = data;
++}
 +
-+	if (guest_cpu_cap_has(&vmx->vcpu, X86_FEATURE_FRED)) {
-+		vmx->msr_guest_fred_rsp0 = read_msr(MSR_IA32_FRED_RSP0);
-+		/*
-+		 * Synchronize the current value in hardware to the kernel's
-+		 * local cache.  The desired host RSP0 will be set when the
-+		 * CPU exits to userspace (RSP0 is a per-task value).
-+		 */
-+		fred_sync_rsp0(vmx->msr_guest_fred_rsp0);
-+	}
- #endif
- 	load_fixmap_gdt(raw_smp_processor_id());
- 	vmx->vt.guest_state_loaded = false;
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index 32829f98af2f..617cbec5c9b3 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -224,6 +224,7 @@ struct vcpu_vmx {
- 	bool                  guest_uret_msrs_loaded;
- #ifdef CONFIG_X86_64
- 	u64		      msr_guest_kernel_gs_base;
-+	u64		      msr_guest_fred_rsp0;
++static u64 vmx_read_guest_kernel_gs_base(struct vcpu_vmx *vmx)
++{
++	return vmx_read_guest_host_msr(vmx, MSR_KERNEL_GS_BASE,
++				       &vmx->msr_guest_kernel_gs_base);
++}
++
++static void vmx_write_guest_kernel_gs_base(struct vcpu_vmx *vmx, u64 data)
++{
++	vmx_write_guest_host_msr(vmx, MSR_KERNEL_GS_BASE, data,
++				 &vmx->msr_guest_kernel_gs_base);
+ }
  #endif
  
- 	u64		      spec_ctrl;
 -- 
 2.50.1
 
