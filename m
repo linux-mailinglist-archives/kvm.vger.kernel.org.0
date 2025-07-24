@@ -1,124 +1,166 @@
-Return-Path: <kvm+bounces-53386-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53387-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5281B1109A
-	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 20:02:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46F1DB110BF
+	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 20:18:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B1ED73B63F7
-	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 18:01:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 69D915879D0
+	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 18:18:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 160A02EBDEB;
-	Thu, 24 Jul 2025 18:02:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82F7A2ECD06;
+	Thu, 24 Jul 2025 18:18:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="ZxpMU2FO"
+	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="AQfPCnxa"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B70241FC3;
-	Thu, 24 Jul 2025 18:02:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB41654723
+	for <kvm@vger.kernel.org>; Thu, 24 Jul 2025 18:18:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753380127; cv=none; b=pe7TOe7PX7dfXHUlwvbT5N2RakeLSPiQEXOJepQzqN7P6wfOqKUp9gBDQWebjIOVqbJOgiRLOxiEZn3jPBZRGIwjQX2oK+n+KzWcLuu/PWPw9p1ctFYwSaohAjD8VegdB1Z7sjvNLLgxZX3jUuJ8O8+hY5V2whBqf98E0JTHkIQ=
+	t=1753381086; cv=none; b=AEccn0r9pi2n+ll8iPMFUpouSugkYKkWnwuOadDK9VB17NTqvzdfelSgqjiBZdhu+GRaPgKjGSISOVxrL+SOWOy2TpjgwMjyag/rw0luqMQKdzgZM7HXk+PTQD3WW6Nfx60j/IsTCOUlkZmNHEbBeIGO3UmK20Twkm/Rf8Z5Ym4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753380127; c=relaxed/simple;
-	bh=K46N/RkLXTjsu22KwI1QBUebUQNK6aUebeMAEs7aweQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MTuHXLOfzgL/DGJxxHHjQHc4UTCZsNEeimdfWggKSmq4PFoRZGhmziLv9ebZQYMksk6JY3Kvh7kp4kbuPb9zrnBojGJkPKMUldAj8xt/3HUEVuV1G9eZDojDMNIkkDq2P0bO16ux4O0cfPlTxkXrlPuAkXvOuHp4O7Ig7jAIYNE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=ZxpMU2FO; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [192.168.7.202] ([71.202.166.45])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 56OI1RcN1945701
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Thu, 24 Jul 2025 11:01:28 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 56OI1RcN1945701
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025072201; t=1753380090;
-	bh=/R6a2t6be9ZExo3hjeBfmN+CWL6D7t+8l/XWG6pMQxg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ZxpMU2FOHI5kwr5hhlmJDoZKpepmrE+lP6xSpTW1O/SF9wEut5DlTE2HzEBncQz32
-	 yOhcNbzh7Z6YJyM6GWnN5iT6JN++VbMDo21mkOGxk3R5SdVtxHVurIQjCNYDBFP3C9
-	 qEOjSIV/G/PzgGQOCpMhqiWMXxaQo3uSg2rK0Mh7AbnrihvD+yI7oGV4bkBwH5fpLC
-	 qjvImIcE/qBhXgQj6iUq1Z8vz9859ulM01EL5+F80VHWxr77hkPDE8OXJ7wmTCZhQW
-	 lSkjhXibc+j05Bbk+hgwy+XbGx+q/qYxvjHV0sdivSB2kTZJzcuGIwZvabMI4rdIEV
-	 EGI2SEw65dD7A==
-Message-ID: <5a001c2b-eb59-487e-bf4a-0447af42829c@zytor.com>
-Date: Thu, 24 Jul 2025 11:01:26 -0700
+	s=arc-20240116; t=1753381086; c=relaxed/simple;
+	bh=ayGbx13v+9wyiJFyZgKtZbtzL6Qe6KW/T2nqoD3yEUs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=aDAnI8keSzUAxUPpvgQU5dJijte6G0F3SCwW/CXU6Bk56B2oMxGIr5Pjit4cX4qB6ubvI0lGPyyp3/eMZE2qXujKbQWKEO36EixBPvsrHH/ZxiErN/FeD9McqlkwBWD8nf8cW9uDMtHvv/i7+f8EXu3YwtEeFIWVgtH+j26sNMw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=AQfPCnxa; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensrcsec.com
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4561607166aso9462545e9.2
+        for <kvm@vger.kernel.org>; Thu, 24 Jul 2025 11:18:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=grsecurity.net; s=grsec; t=1753381083; x=1753985883; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=m/RrNuFXbE40XjM6zt9eoa2dkUsnTE1Y+0Y04nkx42o=;
+        b=AQfPCnxaNou8M3bf0xUHaQF+PLL3RIdCse8LSJcHKzyNdrylrYPpFOKc3Xtl71diup
+         MxN9N4a6Zdn+BYhvZKeC02t7D/+KLS8EUI9+iwGk7QhXAph+43h0hjOffH4HpXJe1aMq
+         Mx2ZGlIjSagRCVPlHhkSHStpGYfhSJmfm9MIO6aJzLjrc2s8V4fCeaiwb/k1p9kkneQh
+         bdbFIDGxxeZrzb57fbczZ1WcvXCld2cOxSvl58vtUBN5jB5w6jMx9rzop9TJHGJHCGQT
+         mCrA5FNgGINMBSR6mRijUBainZsDaorHIKJZIUZ6B+zp+V/sneoGijJRExjHuoU3Bt64
+         p2fg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753381083; x=1753985883;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=m/RrNuFXbE40XjM6zt9eoa2dkUsnTE1Y+0Y04nkx42o=;
+        b=pkPRUX3z1wCZoW1leTO3MAaWZfSNRYHeLFs63IDXagSLtSKFwN9swBKMmNhTtz2nIa
+         l7TFJJQ1gaStY1d04BrRO/S0xI5tEn5QYgMcCIdgP465FzrXAaG5iyApmqB1h+agxYq+
+         dlJk0adqdmeL2bk5HOvZ9B/YkWPwyTWQY3DXVwUsRHFK8kt6e+IKUwcuJMNUT7PZlpwT
+         h1n01j1U7WexXX560/gwdmCBs8rHDIpSri2mLhOLfyYCZ46+OZS6CSb6jdEnkwo3te/D
+         icG/CR5nptyBkLryqO7slx2dOCWWx5MsagjP6PHMJeirMHDsFmAeEoD3OToN5m+fUnbQ
+         vd3g==
+X-Forwarded-Encrypted: i=1; AJvYcCUkWwEy7z0jO+Uk5NctsE4AeSa7HIa+JUTQQzuLIN9sd7dnlLt/Q/KeC2Ug1sn34RUxCW4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx/4UyzkCHA5lJSs7XUNhTFmcOJSe0kPK5MLPvLjrLy90CXvwYz
+	d8MbjXFgbm95ek8dRhodbc7iENZOLD9Uao+QmK1Mlb4VvEKKgoEQocZKc9Avz7cDTdjH5Gt1eZS
+	qRfuT
+X-Gm-Gg: ASbGnctdvR1/3txq4gx0nFaBurn7LOMkaHy+soTNEzR8VMS0dCC2lluRp5b/HE8y/i0
+	SPgUowcwZOWr/NvD+xFPxP7qeyyspEksGq/+diaQf/j1xNWWqsk74JmVDLt0/knlmlfTvbTh9Gx
+	Kzu+tdLhJ/1QpeSaKGN6gEJ6cGdq1vKtkkeInCZCPj0AEq8vMOOTS07mGBqmWbSKxvojUavuLar
+	hYJ5qratq0V7tPHrFofyuWsJ2dA+0A5P9lIveUOfIgqygIY9+zEbgbNGY23IT2KB/NFbkvk1cI4
+	7l4csIi3Bp35Zv/npJ1SmyBJ2eWk9pSuSHC1uy6JwV1dgiYnSC0OQO8KwFBgh9cMLXTdhl/Hv0D
+	ulj1o+b9pFWYakPY4BZVRnnJ/2uoMSkRfgF/+xLzAjTL+QmllgfaEeNUcu0rPnu6MdH7gtU6T4u
+	QtmAmKn/cXvi7nfNV+
+X-Google-Smtp-Source: AGHT+IEFIqdC/DervVfOQuN1Xm3D/gRAa6GskNkCV8xsFysh42xUkmrjGWURkVuDPd4UAq7cXcPvQg==
+X-Received: by 2002:a05:600c:3f07:b0:456:1d61:b0f2 with SMTP id 5b1f17b1804b1-45868d80dd4mr83290375e9.30.1753381082825;
+        Thu, 24 Jul 2025 11:18:02 -0700 (PDT)
+Received: from bell.fritz.box (p200300faaf22cf002208a86d0dff5ae9.dip0.t-ipconnect.de. [2003:fa:af22:cf00:2208:a86d:dff:5ae9])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-458704aaf20sm29701035e9.0.2025.07.24.11.18.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Jul 2025 11:18:02 -0700 (PDT)
+From: Mathias Krause <minipli@grsecurity.net>
+To: Andrew Jones <andrew.jones@linux.dev>,
+	Thomas Huth <thuth@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	kvm@vger.kernel.org
+Cc: Mathias Krause <minipli@grsecurity.net>
+Subject: [kvm-unit-tests PATCH] Better backtraces for leaf functions
+Date: Thu, 24 Jul 2025 20:17:59 +0200
+Message-Id: <20250724181759.1974692-1-minipli@grsecurity.net>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 10/23] KVM: VMX: Add support for FRED context
- save/restore
-To: Chao Gao <chao.gao@intel.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        corbet@lwn.net, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        luto@kernel.org, peterz@infradead.org, andrew.cooper3@citrix.com,
-        hch@infradead.org
-References: <20250723175341.1284463-1-xin@zytor.com>
- <20250723175341.1284463-11-xin@zytor.com> <aIHGFpKfkyDisYaZ@intel.com>
-Content-Language: en-US
-From: Xin Li <xin@zytor.com>
-Autocrypt: addr=xin@zytor.com; keydata=
- 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
- l75w1xInsg==
-In-Reply-To: <aIHGFpKfkyDisYaZ@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 7/23/2025 10:35 PM, Chao Gao wrote:
-> Return KVM_MSR_RET_UNSUPPORTED instead of 1.
-> 
-> KVM's uAPI allows userspace to read MSRs and write 0 to MSRs even if an MSR
-> isn't supported according to guest CPUIDs. Returning KVM_MSR_RET_UNSUPPORTED
-> allows kvm_do_msr_access() to suppress the failure when needed to comply with
-> the uAPI.
-> 
-> For more details, see kvm_do_msr_access().
+Leaf functions are problematic for backtraces as they lack the frame
+pointer setup epilogue. If such a function causes a fault, the original
+caller won't be part of the backtrace. That's problematic if, for
+example, memcpy() is failing because it got passed a bad pointer. The
+generated backtrace will look like this, providing no clue what the
+issue may be:
 
-You're right; I missed the API improvement.
+	STACK: @401b31 4001ad
+  0x0000000000401b31: memcpy at lib/string.c:136 (discriminator 3)
+        	for (i = 0; i < n; ++i)
+      > 		a[i] = b[i];
 
-Thanks!
-     Xin
+  0x00000000004001ac: gdt32_end at x86/cstart64.S:127
+        	lea __environ(%rip), %rdx
+      > 	call main
+        	mov %eax, %edi
+
+By abusing profiling, we can force the compiler to emit a frame pointer
+setup epilogue even for leaf functions, making the above backtrace
+change like this:
+
+	STACK: @401c21 400512 4001ad
+  0x0000000000401c21: memcpy at lib/string.c:136 (discriminator 3)
+        	for (i = 0; i < n; ++i)
+      > 		a[i] = b[i];
+
+  0x0000000000400511: main at x86/hypercall.c:91 (discriminator 24)
+
+      > 	memcpy((void *)~0xbadc0de, (void *)0xdeadbeef, 42);
+
+  0x00000000004001ac: gdt32_end at x86/cstart64.S:127
+        	lea __environ(%rip), %rdx
+      > 	call main
+        	mov %eax, %edi
+
+Above backtrace includes the failing memcpy() call, making it much
+easier to spot the bug.
+
+Enable "fake profiling" if supported by the compiler to get better
+backtraces. The runtime overhead should be negligible for the gained
+debugability as the profiling call is actually a NOP.
+
+Signed-off-by: Mathias Krause <minipli@grsecurity.net>
+---
+ Makefile | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/Makefile b/Makefile
+index 9dc5d2234e2a..470da8f5e625 100644
+--- a/Makefile
++++ b/Makefile
+@@ -95,6 +95,17 @@ CFLAGS += $(wmissing_parameter_type)
+ CFLAGS += $(wold_style_declaration)
+ CFLAGS += -Woverride-init -Wmissing-prototypes -Wstrict-prototypes
+ 
++ifneq ($(KEEP_FRAME_POINTER),)
++# Fake profiling to force the compiler to emit a frame pointer setup also in
++# leaf function (-mno-omit-leaf-frame-pointer doesn't work, unfortunately).
++#
++# Note:
++# We need to defer the cc-option test until -fno-pic or -no-pie have been
++# added to CFLAGS as -mnop-mcount needs it. The lazy evaluation of CFLAGS
++# during compilation makes this do "The Right Thing."
++fomit_frame_pointer += $(call cc-option, -pg -mnop-mcount, "")
++endif
++
+ autodepend-flags = -MMD -MP -MF $(dir $*).$(notdir $*).d
+ 
+ LDFLAGS += -nostdlib $(no_pie) -z noexecstack
+-- 
+2.30.2
+
 
