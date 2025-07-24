@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-53406-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53407-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F556B11328
-	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 23:31:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDF0AB11327
+	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 23:31:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C90C3A699D
-	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 21:31:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 031625A6BCF
+	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 21:31:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D834B239E7E;
-	Thu, 24 Jul 2025 21:31:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49D0223A997;
+	Thu, 24 Jul 2025 21:31:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ElEtGwEl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="s0QKqhZT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CEA7238D5A
-	for <kvm@vger.kernel.org>; Thu, 24 Jul 2025 21:31:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E848D239E8D
+	for <kvm@vger.kernel.org>; Thu, 24 Jul 2025 21:31:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753392699; cv=none; b=RUYBO2aqnanOXJc6z5X0oKszDBGIgynib2HJR4vC33tUVGADrnQO1hMnF0Xlsj0CLIAgAoOEJ7aqP1l7HAz0V3Wylsf9gHbUfV0HZnVJ6TRIyzs/41mU186r9y38ljQTSfcuOnuy0SZyHh2TXYGoINmjtCaMdBnjdbJIcOSfkFQ=
+	t=1753392701; cv=none; b=pBb+1e5U7TToA3DdmTZWzKmvoTI5wAlwdN+pgBQPNMACNwm2X1WXTJSS9UcL2p+NcaBMaoy3PBBBo41igOyV7lFbvmqscw5EK3ZLbDLXAWJw7P/vim+wHX1s3QfU4qOOL0C2zArqmb/6OEZj1z3jHw8VmNjpIbL72mop3JUAO24=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753392699; c=relaxed/simple;
-	bh=CcMQesfCJBwPrJckuYkYkYqXUS3yf3NuqZ/LGh7bw0I=;
+	s=arc-20240116; t=1753392701; c=relaxed/simple;
+	bh=fPBDK1Pb01xY3o+AzsWHtdEJpvtaRS6ST0yKdiJ32js=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=BEYF8ItOxoHC/p7aILDZldpyYhIXnNul6zbOGJjedm2zdIo+gCO75lH9BYyj4NtjNQvtv7Fq1xFgqGVivgh7dROB4V0EFVRQN9gxUxkwkN7SYGFqu+GloMhejEHBAS18e26p2m+5TnIN0FuagHOk16e604K16TfQN5H8Rs7ldfk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--dmatlack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ElEtGwEl; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=QRarRnXs25SE1BVHbpNIhFgA/PKS8b76hEUkIq/9zPcLl05454joyt89x86lAdjtty78bWHFn0ift49Pct9GVsfB203NcShKSpf9hAkv/O1IozmxFAzrL01mSm/lS7lE+CUJL1QJuuvUL4ha9mwACt6d9ilzlcTACyTcl9JWe/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--dmatlack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=s0QKqhZT; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--dmatlack.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b0e0c573531so1043307a12.3
-        for <kvm@vger.kernel.org>; Thu, 24 Jul 2025 14:31:36 -0700 (PDT)
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-74943a7cd9aso2524796b3a.3
+        for <kvm@vger.kernel.org>; Thu, 24 Jul 2025 14:31:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753392696; x=1753997496; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1753392697; x=1753997497; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EF9sxiK3Xy/PXVuW+exVELSMPBsoTeCFIahlM0k1Eq0=;
-        b=ElEtGwElPPI5IUiAm/nCr3+6O1OltxBXtfvaSMiQ0DCqclY4IcA2bUuYnFPgJJ1Bsm
-         zMvHx6NSjUSeLuwfQ2exSV5Z3r0dJxoz+dF4CV48ox0q9nDy+PXZO9v70jSde/ryNFuE
-         f1HB9WAr58gN5zbQWWWzUoT/sHXaT2KA10R6eSHIcAIGiU4u7ruFfL8yAspaaFH9J3Sm
-         /2I46H2DUbm/4mJf5jS7xb128itFf0WVBtB3h5pRUa8ynksDJfttmi9yOm0r0QU9NYYQ
-         jxP+2RSknzF6riVJvj6LDxfSzh8yz8+dNiZOVwwTXg2c9L0SE/TxpzAREo2kAvMCPPte
-         Hsag==
+        bh=GNn2q0Z8fFnvvjG2A8fpdx/gfmHIZHIsS4NnWlZQeUk=;
+        b=s0QKqhZTxhcNuIyw8rmMm9Tun149cEgIYz42YTLe1+qgDsvo5aNXGNjshRWSj2b1Cv
+         j+ijyIVlhEIgL29WvhypFlbZRJ5MwEunE8BaYw1YXiBXpJ18T8xdlS7A8/he9SaYHszV
+         Oscbbfe5EKMAzrFy417BZsRnuVY4b4R5p/H/vCL9d6XBWe1CV218TIvJSCzXRKudehid
+         eNmz9EVSF6y9aHkXx8q+GxFW7prQ3JnVnAdjJbej4ioRVikJNZZA+/O8/Lep0TcqUweD
+         nZJQEO+pe6bvEvodmgGmTLF/ep9nqZA6+gyXJLgrB9DkfYvkndlonegee1X6/9S+NCJl
+         FrgQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753392696; x=1753997496;
+        d=1e100.net; s=20230601; t=1753392697; x=1753997497;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EF9sxiK3Xy/PXVuW+exVELSMPBsoTeCFIahlM0k1Eq0=;
-        b=GC4+4eS4rT3QoNf3gAA2edFDGoSsLxxqeDEy47NGk9omFM6BZWbWQimxaMFDGoGzHG
-         Xv3YXO1bkSyJCRU1Ddb3S5l0pn5suQWRnpIqPG4YaePpeJaV4xkHEDUMMQ+pUnA2WkVi
-         4+6BB7dIyrCSEFstjqIE+awzjQwQsisW9wkcg5h2pMMtP0k7K0j5meR13h5QJhDqphqS
-         7JPkN5oD5TVFCZwICmxVXy/C2aynFE+pSTNhuLNTvpYanjCxmVmCypYLzRRu/lPzbN/Y
-         kTiWmjEcYX6VCJ4evo97ADxrvl1pgq/vUw5GWZa3ETOjS7au4bSkx9ho4opus8tRbzbH
-         fAAA==
-X-Forwarded-Encrypted: i=1; AJvYcCXjAYLRJHCmynf4RHdBN1UA+q/duxDmd3eqTuFmHq0OBLlSkB1+rLD3qFiPmgyt5hJ4g8Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx5eFwbb2kH3nzxWRzApYfjLd8sxZ8sRnRHfFPIR7yDFluCHBbU
-	49RKYILmrwUC+lyR1A+n/Vbf//fB80yEfIlsZ1xBatB1i607zvndch2GF70CCFhp+IWu2aG9AXH
-	fURi3bkJljGlVEg==
-X-Google-Smtp-Source: AGHT+IEVnap/eu9Dz2ddWw4wyMBOt0WtnZUh233sGTHqAfXQEwS/hWW2xddcmUxipaoBtbgbu5pOyoCLHXoZEA==
-X-Received: from pfbct19.prod.google.com ([2002:a05:6a00:f93:b0:73c:26eb:39b0])
+        bh=GNn2q0Z8fFnvvjG2A8fpdx/gfmHIZHIsS4NnWlZQeUk=;
+        b=Q9czrbj4rqYO3DwS4XnXWSv2HzXPRDKW0/42OKKeMNDfyMtXTBlLYx1FtXFlvtOHbj
+         CgiRbx9lve47UWOHayNh8ogUNauc/AkZVKEN9ey40YszbLR4qlDGMNOqNiZH7sBcKLot
+         x5+zIJMqo9HUUODeBv/xfMCcwlcIRNUm9DScWfLpmvub+47WN3jFrQC4KZnRKK3qA6Eb
+         aPU7Hi4vDD4WBdCyfoQotAdOtgQxk6EiIIYlTbUuYlKJeEEXoxyNMFTgmE8fJA+3p2zj
+         VHUBILYufz0/NJxKm/AQQLdwxTpQelMd8KjG83ZNl2vQYvKOQEc+2KcQsNoE/xgrQ9la
+         UFRg==
+X-Forwarded-Encrypted: i=1; AJvYcCWIq2SP/SnUqbDBolcBGJctx2PQ3o+H5Sdh2RfiwLsRlBlTG3sUk2Yk1hXUdTjcUSOCqNs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy3oDhKI0WgMgTtVS1EmPVEDViPvpCKSSSOFlTRDxmZbvREmoyW
+	6uNRb6q5UQsGm1yPZwYnyjPv7Ku1NXmt5M0MusvwpDm1VKtcKHN4IdkZY77FSgjgFETIsQ8cZpu
+	oXeNCZDBM7jx/6w==
+X-Google-Smtp-Source: AGHT+IFvUnez9Bkuwx2pMJHu6VcnoXxwXp4RquHl0WtbI1rpTaCty2K5T3a3JzCxfErZmH7ew+8CdlnN0ixiJg==
+X-Received: from pfbjr14.prod.google.com ([2002:a05:6a00:914e:b0:747:a8ac:ca05])
  (user=dmatlack job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a21:a346:b0:215:df3d:d56 with SMTP id adf61e73a8af0-23d490e7f2dmr13646377637.21.1753392695802;
- Thu, 24 Jul 2025 14:31:35 -0700 (PDT)
-Date: Thu, 24 Jul 2025 21:31:29 +0000
+ 2002:a05:6a00:2315:b0:748:2ac2:f8c3 with SMTP id d2e1a72fcca58-76035bfa5ebmr11692206b3a.24.1753392697163;
+ Thu, 24 Jul 2025 14:31:37 -0700 (PDT)
+Date: Thu, 24 Jul 2025 21:31:30 +0000
 In-Reply-To: <20250724213130.3374922-1-dmatlack@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,9 +74,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250724213130.3374922-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.50.1.470.g6ba607880d-goog
-Message-ID: <20250724213130.3374922-2-dmatlack@google.com>
-Subject: [PATCH v2 1/2] Revert "KVM: selftests: Override ARCH for x86_64
- instead of using ARCH_DIR"
+Message-ID: <20250724213130.3374922-3-dmatlack@google.com>
+Subject: [PATCH v2 2/2] KVM: selftests: Rename $(ARCH_DIR) to $(SRCARCH)
 From: David Matlack <dmatlack@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>, kvm@vger.kernel.org, 
@@ -86,50 +85,65 @@ Cc: Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>, kvm@vger
 	David Matlack <dmatlack@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-This reverts commit 9af04539d474dda4984ff4909d4568e6123c8cba.
+Rename $(ARCH_DIR) to $(SRCARCH) to match the top-level kernel Makefile
+which uses $(SRCARCH) to represent the same thing that $(ARCH_DIR)
+represents in the KVM selftests.
 
-If ARCH is set on the command line then Make will skip the variable
-assignment to convert x86_64 to x86. i.e. Revert this commit because it
-breaks builds where ARCH=x86_64 is specified on the command line.
+This change also paves the way for eventually sharing the code construct
+$(SRCARCH) with the top-level kernel Makefile instead of KVM having its
+own logic e.g. to convert x86_64 to x86.
 
-Fixes: 9af04539d474 ("KVM: selftests: Override ARCH for x86_64 instead of using ARCH_DIR")
+While here, drop the comment about the top-level selftests allowing
+ARCH=x86_64. The kernel itself allows/expects ARCH=x86_64 so it's
+reasonable to expect the KVM selftests to handle it as well.
+
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- tools/testing/selftests/kvm/Makefile     |  4 +++-
+ tools/testing/selftests/kvm/Makefile     | 10 ++++-----
  tools/testing/selftests/kvm/Makefile.kvm | 26 ++++++++++++------------
- 2 files changed, 16 insertions(+), 14 deletions(-)
+ 2 files changed, 18 insertions(+), 18 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index d9fffe06d3ea..7aad782aeb1d 100644
+index 7aad782aeb1d..340657052fc3 100644
 --- a/tools/testing/selftests/kvm/Makefile
 +++ b/tools/testing/selftests/kvm/Makefile
-@@ -6,7 +6,9 @@ ARCH            ?= $(SUBARCH)
- ifeq ($(ARCH),$(filter $(ARCH),arm64 s390 riscv x86 x86_64 loongarch))
- # Top-level selftests allows ARCH=x86_64 :-(
+@@ -1,15 +1,15 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+ top_srcdir = ../../../..
++
+ include $(top_srcdir)/scripts/subarch.include
+ ARCH            ?= $(SUBARCH)
++SRCARCH := $(ARCH)
+ 
+-ifeq ($(ARCH),$(filter $(ARCH),arm64 s390 riscv x86 x86_64 loongarch))
+-# Top-level selftests allows ARCH=x86_64 :-(
  ifeq ($(ARCH),x86_64)
--	ARCH := x86
-+	ARCH_DIR := x86
-+else
-+	ARCH_DIR := $(ARCH)
+-	ARCH_DIR := x86
+-else
+-	ARCH_DIR := $(ARCH)
++        SRCARCH := x86
  endif
++
++ifeq ($(SRCARCH),$(filter $(SRCARCH),arm64 s390 riscv x86 loongarch))
  include Makefile.kvm
  else
+ # Empty targets for unsupported architectures
 diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index e11ed9e59ab5..d770c2f244da 100644
+index d770c2f244da..d2729e678025 100644
 --- a/tools/testing/selftests/kvm/Makefile.kvm
 +++ b/tools/testing/selftests/kvm/Makefile.kvm
 @@ -215,10 +215,10 @@ TEST_GEN_PROGS_loongarch += set_memory_region_test
  SPLIT_TESTS += arch_timer
  SPLIT_TESTS += get-reg-list
  
--TEST_PROGS += $(TEST_PROGS_$(ARCH))
--TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(ARCH))
--TEST_GEN_PROGS_EXTENDED += $(TEST_GEN_PROGS_EXTENDED_$(ARCH))
--LIBKVM += $(LIBKVM_$(ARCH))
-+TEST_PROGS += $(TEST_PROGS_$(ARCH_DIR))
-+TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(ARCH_DIR))
-+TEST_GEN_PROGS_EXTENDED += $(TEST_GEN_PROGS_EXTENDED_$(ARCH_DIR))
-+LIBKVM += $(LIBKVM_$(ARCH_DIR))
+-TEST_PROGS += $(TEST_PROGS_$(ARCH_DIR))
+-TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(ARCH_DIR))
+-TEST_GEN_PROGS_EXTENDED += $(TEST_GEN_PROGS_EXTENDED_$(ARCH_DIR))
+-LIBKVM += $(LIBKVM_$(ARCH_DIR))
++TEST_PROGS += $(TEST_PROGS_$(SRCARCH))
++TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(SRCARCH))
++TEST_GEN_PROGS_EXTENDED += $(TEST_GEN_PROGS_EXTENDED_$(SRCARCH))
++LIBKVM += $(LIBKVM_$(SRCARCH))
  
  OVERRIDE_TARGETS = 1
  
@@ -137,29 +151,29 @@ index e11ed9e59ab5..d770c2f244da 100644
  INSTALL_HDR_PATH = $(top_srcdir)/usr
  LINUX_HDR_PATH = $(INSTALL_HDR_PATH)/include/
  LINUX_TOOL_INCLUDE = $(top_srcdir)/tools/include
--LINUX_TOOL_ARCH_INCLUDE = $(top_srcdir)/tools/arch/$(ARCH)/include
-+LINUX_TOOL_ARCH_INCLUDE = $(top_srcdir)/tools/arch/$(ARCH_DIR)/include
+-LINUX_TOOL_ARCH_INCLUDE = $(top_srcdir)/tools/arch/$(ARCH_DIR)/include
++LINUX_TOOL_ARCH_INCLUDE = $(top_srcdir)/tools/arch/$(SRCARCH)/include
  CFLAGS += -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=gnu99 \
  	-Wno-gnu-variable-sized-type-not-at-end -MD -MP -DCONFIG_64BIT \
  	-fno-builtin-memcmp -fno-builtin-memcpy \
  	-fno-builtin-memset -fno-builtin-strnlen \
  	-fno-stack-protector -fno-PIE -fno-strict-aliasing \
  	-I$(LINUX_TOOL_INCLUDE) -I$(LINUX_TOOL_ARCH_INCLUDE) \
--	-I$(LINUX_HDR_PATH) -Iinclude -I$(<D) -Iinclude/$(ARCH) \
-+	-I$(LINUX_HDR_PATH) -Iinclude -I$(<D) -Iinclude/$(ARCH_DIR) \
+-	-I$(LINUX_HDR_PATH) -Iinclude -I$(<D) -Iinclude/$(ARCH_DIR) \
++	-I$(LINUX_HDR_PATH) -Iinclude -I$(<D) -Iinclude/$(SRCARCH) \
  	-I ../rseq -I.. $(EXTRA_CFLAGS) $(KHDR_INCLUDES)
--ifeq ($(ARCH),s390)
-+ifeq ($(ARCH_DIR),s390)
+-ifeq ($(ARCH_DIR),s390)
++ifeq ($(SRCARCH),s390)
  	CFLAGS += -march=z10
  endif
--ifeq ($(ARCH),x86)
-+ifeq ($(ARCH_DIR),x86)
+-ifeq ($(ARCH_DIR),x86)
++ifeq ($(SRCARCH),x86)
  ifeq ($(shell echo "void foo(void) { }" | $(CC) -march=x86-64-v2 -x c - -c -o /dev/null 2>/dev/null; echo "$$?"),0)
  	CFLAGS += -march=x86-64-v2
  endif
  endif
--ifeq ($(ARCH),arm64)
-+ifeq ($(ARCH_DIR),arm64)
+-ifeq ($(ARCH_DIR),arm64)
++ifeq ($(SRCARCH),arm64)
  tools_dir := $(top_srcdir)/tools
  arm64_tools_dir := $(tools_dir)/arch/arm64/tools/
  
@@ -167,8 +181,8 @@ index e11ed9e59ab5..d770c2f244da 100644
  LIBKVM_STRING_OBJ := $(patsubst %.c, $(OUTPUT)/%.o, $(LIBKVM_STRING))
  LIBKVM_OBJS = $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ) $(LIBKVM_STRING_OBJ) $(LIBCGROUP_O)
  SPLIT_TEST_GEN_PROGS := $(patsubst %, $(OUTPUT)/%, $(SPLIT_TESTS))
--SPLIT_TEST_GEN_OBJ := $(patsubst %, $(OUTPUT)/$(ARCH)/%.o, $(SPLIT_TESTS))
-+SPLIT_TEST_GEN_OBJ := $(patsubst %, $(OUTPUT)/$(ARCH_DIR)/%.o, $(SPLIT_TESTS))
+-SPLIT_TEST_GEN_OBJ := $(patsubst %, $(OUTPUT)/$(ARCH_DIR)/%.o, $(SPLIT_TESTS))
++SPLIT_TEST_GEN_OBJ := $(patsubst %, $(OUTPUT)/$(SRCARCH)/%.o, $(SPLIT_TESTS))
  
  TEST_GEN_OBJ = $(patsubst %, %.o, $(TEST_GEN_PROGS))
  TEST_GEN_OBJ += $(patsubst %, %.o, $(TEST_GEN_PROGS_EXTENDED))
@@ -176,8 +190,8 @@ index e11ed9e59ab5..d770c2f244da 100644
  TEST_DEP_FILES += $(patsubst %.o, %.d, $(SPLIT_TEST_GEN_OBJ))
  -include $(TEST_DEP_FILES)
  
--$(shell mkdir -p $(sort $(OUTPUT)/$(ARCH) $(dir $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ))))
-+$(shell mkdir -p $(sort $(OUTPUT)/$(ARCH_DIR) $(dir $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ))))
+-$(shell mkdir -p $(sort $(OUTPUT)/$(ARCH_DIR) $(dir $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ))))
++$(shell mkdir -p $(sort $(OUTPUT)/$(SRCARCH) $(dir $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ))))
  
  $(filter-out $(SPLIT_TEST_GEN_PROGS), $(TEST_GEN_PROGS)) \
  $(TEST_GEN_PROGS_EXTENDED): %: %.o
@@ -185,11 +199,11 @@ index e11ed9e59ab5..d770c2f244da 100644
  $(TEST_GEN_OBJ): $(OUTPUT)/%.o: %.c
  	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
  
--$(SPLIT_TEST_GEN_PROGS): $(OUTPUT)/%: $(OUTPUT)/%.o $(OUTPUT)/$(ARCH)/%.o
-+$(SPLIT_TEST_GEN_PROGS): $(OUTPUT)/%: $(OUTPUT)/%.o $(OUTPUT)/$(ARCH_DIR)/%.o
+-$(SPLIT_TEST_GEN_PROGS): $(OUTPUT)/%: $(OUTPUT)/%.o $(OUTPUT)/$(ARCH_DIR)/%.o
++$(SPLIT_TEST_GEN_PROGS): $(OUTPUT)/%: $(OUTPUT)/%.o $(OUTPUT)/$(SRCARCH)/%.o
  	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH) $^ $(LDLIBS) -o $@
--$(SPLIT_TEST_GEN_OBJ): $(OUTPUT)/$(ARCH)/%.o: $(ARCH)/%.c
-+$(SPLIT_TEST_GEN_OBJ): $(OUTPUT)/$(ARCH_DIR)/%.o: $(ARCH_DIR)/%.c
+-$(SPLIT_TEST_GEN_OBJ): $(OUTPUT)/$(ARCH_DIR)/%.o: $(ARCH_DIR)/%.c
++$(SPLIT_TEST_GEN_OBJ): $(OUTPUT)/$(SRCARCH)/%.o: $(SRCARCH)/%.c
  	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
  
  EXTRA_CLEAN += $(GEN_HDRS) \
