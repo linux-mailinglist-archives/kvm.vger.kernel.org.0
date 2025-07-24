@@ -1,120 +1,123 @@
-Return-Path: <kvm+bounces-53391-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53392-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C236B1115A
-	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 21:04:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9282B1116E
+	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 21:11:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 83C115A73C4
-	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 19:04:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC8F8AC697D
+	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 19:10:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A14B23F41F;
-	Thu, 24 Jul 2025 19:04:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 232E02ECD2B;
+	Thu, 24 Jul 2025 19:10:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Gt+5XrEP"
+	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="Jop5invP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA04F1F4C99
-	for <kvm@vger.kernel.org>; Thu, 24 Jul 2025 19:04:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62DCA2E8DED
+	for <kvm@vger.kernel.org>; Thu, 24 Jul 2025 19:10:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753383863; cv=none; b=SNqOToFWbRLZZ5USELzyUjIpbVe/lp/tAeUntrZhxgB7Fq60yOahBx7EAT4heh+9z7Jh0GqHBLzyU6EgP3QDruAeKtNN0D1g6PqRR7FDz8Sux1WD9T2BzveOTkvIpTzauvpzJh+Rs4l7uhasQuBF6+NrF/zN+JnQvkjoVvUCvqc=
+	t=1753384257; cv=none; b=j+dXGWwPba1yZbAzhhGTpPUn+Rjl3S9ild5ZOw3Xm4lMtgwvqKpRheA4acqAJXC7Svtw/3SwoO7yXdJpRbZpD5+itXKNdJIRtuzP9vfryCHOCXqnVBf8MNPdMJRcb4GwuAiN6XQCgQmcPIDIQgqaFAqYpTcJpYEE/SKzcY/T1bE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753383863; c=relaxed/simple;
-	bh=77VL7y4orPyPDwVVBdslEyUFCNhMKPh1m2rvHd+AdTc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=OMbTmQ1ggLukz0BKLMWvrSnap2cHJce79gKFO9gyWaXTwBasSiW/StMR4aJePLCEr1iyLgIL07BDfsDlHxDoE/FCmUQD+aNR3QuLfIXP6QaJbrICR2j9uC51eap6i1qNmUqkSCoR20jY8lRxvQ0rZaQTj3blFAeu1Ho6UTpRMBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Gt+5XrEP; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-311d670ad35so1199597a91.3
-        for <kvm@vger.kernel.org>; Thu, 24 Jul 2025 12:04:17 -0700 (PDT)
+	s=arc-20240116; t=1753384257; c=relaxed/simple;
+	bh=pf6NOAe17j3kacmhzwEJH069n5WGjPZ2XP3sZlmlSjg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=JpamOjUw6YsdPbr3SYLF9gthLwfhMvBSCvZPu4sA167SdhDretR8xpPimEvNKW7rY5QfvgPSdHMuFeEW7nvbqOWte2MTHznD7+42Ber2vgZpkLd/kU5X9EjDI1dAgHXDEW0onbgdJ2/CPYw7lCpx91TYdfug/4rKGUt/ppG8akg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=Jop5invP; arc=none smtp.client-ip=209.85.221.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensrcsec.com
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-3a53359dea5so739306f8f.0
+        for <kvm@vger.kernel.org>; Thu, 24 Jul 2025 12:10:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753383857; x=1753988657; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=zJyCIzUqeve9JsPqtXqjY52deoOozt0NyyCd1G6236M=;
-        b=Gt+5XrEPfD6TO6AHBecksXOl6q7HkNp55JhtBwl0fNgxe+uAMspIgszMMhVXMZQiIg
-         CTFJ8rEH0zdfHGbWZ7RXm9TYN+M2VYwMqbJeRCPJ5R5BbKxmF7XHSEERkK6XstPiP6/w
-         oqSYHttx/nKwEZFogJ/tu/y2gCSJoB2WDUbwhPCnyr0VmMjphhDUKEP6JztfHJ6cejji
-         iEtKgQxAumME9xNRmUNWQdici9khSE0kc9gB5LxyH90XWGELh8s3g+xy4ToN283adUJI
-         cDvCT0ZpMrDk6yUjmC99q2O1btvpaxkudFen2xMfr5vvMQvFUIJkFQlBvJhiGmJJCGix
-         hpgQ==
+        d=grsecurity.net; s=grsec; t=1753384253; x=1753989053; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=QHWpD0i339PEcT5T5XARaFD7WcNyfAtByLV5e3Xqky4=;
+        b=Jop5invPoALmbJYvGeBqwNysjU0SyrGDDTJ3DDSC8haTozHxhdmytL+QLoSMmVLLLL
+         LCMVTva9ftA58Fgo2NiAUyTB2AvJqarnKsAIMoiha/LqeD+j0XspOhAbRMjmHkoy6JLR
+         juxATz2okV0a73qQkhTmpsJ+IVHASqO0+Oyb08LJKXMV7tmT/LmRInRoIxhk27SUSEfO
+         SbHzNbzJRGKhh+wFXQ1Fw6q1JVJ5HOm8ynzDvCzmFad9nB8/B279+v6llE9NImGfMFv4
+         7fczyju+5fSVZdY3GENSSLpPLmCyb2aFqKqJ+k3cFJJnQPY0BPntRKj1dBJcRKq5fY0q
+         bf5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753383857; x=1753988657;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zJyCIzUqeve9JsPqtXqjY52deoOozt0NyyCd1G6236M=;
-        b=gwVi49qSpKWI80C53U8C3jgBBMD5IjpThD19n3dThjJyIpo+ku6DFwXYd34c0RPpCK
-         ywq+BjqUkuYVKPiGl0geUAi7dOXryNj/iJWfaduqF7vJ6tzNbdMQu4mkqWWG9K6dNTsR
-         mDZJQ/wlsTqz5v2QaCO11+KtNpc54o2YbjjbtQlNQBx4O1AiL9RAOlH6tuscygGW0pdQ
-         3TsYJZfF7QVv8H6L08rjbazGCyGQLBd2LaMrPNGH6W134eZYnk7IquDtrr6T2Y6rrUem
-         FBF0O57JjOj8k3kNmOwQh2iKLMYGSJ12hXL0eu+DN3/0BmOAG26yX9E/GDSAuiA1NCzH
-         7tcg==
-X-Forwarded-Encrypted: i=1; AJvYcCVhwPCT0G6wpTxkUfOAPubAYsfkdziJrM1hQlnQSu04B189EzTjo/GxAOjvPOTAxyyHezo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx/U01yducE/fe6aQDhoLYd67MAftpIDRBaWkKw+0o3NheiHLxR
-	rtIun/3DetCQvnrUpwxxt4TTFtPVVXhloVFud+NbGawKshBNygnsTpY7Nv+i3NZ5KqUj/bpYYhs
-	DKlfH+w==
-X-Google-Smtp-Source: AGHT+IEe6+6fR9gO5Nl0Xt/yeEjity2RKdtTyWI1KTrUYedXflcE9z6fhLr5gE2QJHjWu7/9QdOuheoivLE=
-X-Received: from pjd16.prod.google.com ([2002:a17:90b:54d0:b0:315:b7f8:7ff])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:582e:b0:313:14b5:2538
- with SMTP id 98e67ed59e1d1-31e50859d80mr10487542a91.35.1753383857192; Thu, 24
- Jul 2025 12:04:17 -0700 (PDT)
-Date: Thu, 24 Jul 2025 12:04:15 -0700
-In-Reply-To: <2025072441-degrease-skipping-bbc8@gregkh>
+        d=1e100.net; s=20230601; t=1753384253; x=1753989053;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QHWpD0i339PEcT5T5XARaFD7WcNyfAtByLV5e3Xqky4=;
+        b=OIDewNQT7GkVjCcZp6sW1WJSsOPz0R5aJnjLqCHuyxwleM3cfu5c1dN6Mj5D6jhS65
+         F4lGzxpaodIQAj5PQ/gvaZhOIdzBAk80TlcxO7iIVJOUOnYJ5QW8Kp8vMny0IGjkoHI7
+         sHnNHqRBDOsV9VtYKR2naHXhxzWnDpKL+JVOYfC3CVB+a8VsoUR2CxgzUr3opv9s7TsX
+         BDEP1UOzaUZ1ktMeI2lPU1qN21wWLB/W1XizqpOakulO7LJ3UjOezVTbhCQ0WfvXlD9g
+         qwPvwFDMuipcoj2oCNge47w8xU6EHi+9NxMHxFOe9FcXRwfNXmEyallE/Hc2AALPPaCL
+         9wRA==
+X-Forwarded-Encrypted: i=1; AJvYcCWg77dDwR2xkPxG1TJ9hoLQuI8xMcN+/sRXo/O+3BGXMuuC/USD7oASXXyjC5CPaR5SCmI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxd/8KqaKJZWESKWJFrdMnYcab/JI5FpP2Ru/RHy0w8uQcHl0c9
+	skXR5HAtfHaaV3RV7rXIEC5wqHb2DpHRBV4+7H2cEijmkvMzocAGbcgXfJybkOZkN/wlYuqsnoD
+	mIAZZ
+X-Gm-Gg: ASbGncsZp1IPZWQ0ITNqEbKd+q/4ESho1vS0WC+wyREItDN1tOfTPdpcykO7LEC6C7S
+	ebQY98tlbvxPccupRnK99Lra3crtFi0QWiLgvA+Q/vJLjlVB0bw7U3MnCh2EtspukiY0Gl07ZsR
+	LkxRXmSfQXwxwVbitWFkWqr3cHNuwkUICKd/Nl4IfXVINGVMe458H3acXrAkW+1sNGiQbo6EZAV
+	CzBoJV7pC60PKCjlgsIa5pR+MtdogRoB5sSws+DB5QuM6fmEs3g77GXBOOXEgMioBOuoNuJaLk+
+	DQG988+9gZFvwdZP+xM1NHLXfkllVQZjlJCI/g0D9rkvkagj98mgMbJZBBHO0KqHYEzUutFqUmb
+	fPRuFasfzZ3mtmPx2Wm9tlEvGygv3wHuYHDM3NGxqtZRKpHhTLqJCPOySz3aqyLIehGUxmwOWZd
+	5CiFAsqkHZj9XdvWu/lxvq3E5RTBI=
+X-Google-Smtp-Source: AGHT+IHSuHSpBOl1szOURAphdfh0yaIMfj7iqWnPderN6iEVaIL9mLy/9POb1HskEJTkAZKqZKaJMg==
+X-Received: by 2002:a5d:5d88:0:b0:3b6:deb:1b43 with SMTP id ffacd0b85a97d-3b768f01432mr6716317f8f.41.1753384253377;
+        Thu, 24 Jul 2025 12:10:53 -0700 (PDT)
+Received: from bell.fritz.box (p200300faaf22cf002208a86d0dff5ae9.dip0.t-ipconnect.de. [2003:fa:af22:cf00:2208:a86d:dff:5ae9])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-458705378f4sm31118955e9.2.2025.07.24.12.10.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Jul 2025 12:10:53 -0700 (PDT)
+From: Mathias Krause <minipli@grsecurity.net>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+	kvm@vger.kernel.org
+Cc: Mathias Krause <minipli@grsecurity.net>
+Subject: [kvm-unit-tests PATCH 0/3] x86 hypercall spring^W summer cleanup
+Date: Thu, 24 Jul 2025 21:10:47 +0200
+Message-Id: <20250724191050.1988675-1-minipli@grsecurity.net>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <aII3WuhvJb3sY8HG@google.com> <20250724142227.61337-1-thijs@raymakers.nl>
- <2025072441-degrease-skipping-bbc8@gregkh>
-Message-ID: <aIKDr_kVpUjC8924@google.com>
-Subject: Re: [PATCH v2] KVM: x86: use array_index_nospec with indices that
- come from guest
-From: Sean Christopherson <seanjc@google.com>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Thijs Raymakers <thijs@raymakers.nl>, kvm@vger.kernel.org, stable <stable@kernel.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jul 24, 2025, Greg Kroah-Hartman wrote:
-> On Thu, Jul 24, 2025 at 04:22:27PM +0200, Thijs Raymakers wrote:
-> > min and dest_id are guest-controlled indices. Using array_index_nospec()
-> > after the bounds checks clamps these values to mitigate speculative execution
-> > side-channels.
-> > 
-> > Signed-off-by: Thijs Raymakers <thijs@raymakers.nl>
-> > Cc: stable <stable@kernel.org>
-> > Cc: Sean Christopherson <seanjc@google.com>
-> > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> 
-> Nit, you shouldn't have added my signed off on a new version, but that's
-> ok, I'm fine with it.
+This little series cleans up the x86 hypercall tests by making them no
+longer rely on KVM's hypercall patching to change a non-native
+instruction to the native one.
 
-Want me to keep your SoB when applying, or drop it?
+There are attempts[1] to disable KVM's default behaviour regarding
+hypercall patching, actually requiring executing the native hypercall
+instruction.
 
-> > ---
-> >  arch/x86/kvm/lapic.c | 2 ++
-> >  arch/x86/kvm/x86.c   | 7 +++++--
-> >  2 files changed, 7 insertions(+), 2 deletions(-)
-> 
-> You also forgot to say what changed down here.
-> 
-> Don't know how strict the KVM maintainers are, I know I require these
-> things fixed up...
+The last patch is also a general cleanup of the x86/hypercall test.
 
-I require the same things, but I also don't mind doing fixup when applying if
-that's the path of least resistance (and it's not a recurring problem).
+Please apply!
 
-I also strongly dislike using In-Reply-To for new versions, as it tends to confuse
-b4, and often confuses me as well.
+Thanks,
+Mathias
 
-But for this, I don't see any reason to send a v3.
+[1] https://lore.kernel.org/kvm/20250722204316.1186096-1-minipli@grsecurity.net/
+
+Mathias Krause (3):
+  x86: Don't rely on KVM's hypercall patching
+  x86: Provide a macro for extable handling
+  x86/hypercall: Simplify and increase coverage
+
+ lib/x86/desc.h  |   9 ++--
+ x86/apic.c      |   5 +-
+ x86/hypercall.c | 131 +++++++++++++++++++++++-------------------------
+ x86/vmexit.c    |   5 +-
+ 4 files changed, 77 insertions(+), 73 deletions(-)
+
+-- 
+2.30.2
+
 
