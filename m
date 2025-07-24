@@ -1,410 +1,231 @@
-Return-Path: <kvm+bounces-53419-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53420-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 723FFB1146D
-	for <lists+kvm@lfdr.de>; Fri, 25 Jul 2025 01:21:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EC86B11482
+	for <lists+kvm@lfdr.de>; Fri, 25 Jul 2025 01:30:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF7BCAA60DC
-	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 23:20:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5D68E188F04A
+	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 23:31:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AAA82417C6;
-	Thu, 24 Jul 2025 23:21:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DAA8242936;
+	Thu, 24 Jul 2025 23:30:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KLp4cCAj"
+	dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b="uuIkmGxr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93ACE23D2A8
-	for <kvm@vger.kernel.org>; Thu, 24 Jul 2025 23:21:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE8BA1553A3
+	for <kvm@vger.kernel.org>; Thu, 24 Jul 2025 23:30:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753399279; cv=none; b=jWlX989SnjKjY4eGYKu4eFYqm7hk2mPFm1by88FZ6dNlreAM5gOonlR2J1iKIiG7+LssYe85i4Anf78TXTXPBBqfxtp+3Xd9gPdUGZBa3wRIOGrp1j5I5kHcafTfIpEMz6L0PrvoyFKeN+zG0/54Ynd4bd/kPZDNakkSoAo7oNE=
+	t=1753399837; cv=none; b=JM9NTBUNdKmWLfqZXv+IBbAA4l1DXt5t2b/Qw4Zq9DY2rz4U2vLDJZtepw12mqtrvotGEVu7MRJ0+iEhT4bTjarAEx9M+3ZEQjNeaPo+N0V0nZnDXZtIglb4TIAqqgnqbe+UiZMczgQbzHj2JTBnnlUhbehtqKZD84/TAF4NLSQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753399279; c=relaxed/simple;
-	bh=nRx3RFXHUqR7Ciit3VSL86wmsvHp7n4T/LtSMoMBre4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=u9lSy8LcbgX/zGHOWgSoLnIF1rssRHsh+NJ9SyLhMzOsOGobP9ri5IGAZ0nV7TAA6nWewma+IwWQKnxHz54OBoHyeSexqeL9+FsUc8z6GI3MynwcNMse4YuwEbHasnbCjOfSSyWsY6ISde9ThCqvlr44/QzpYZMgBFVO42RGwUA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KLp4cCAj; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-747ddba7c90so1379066b3a.0
-        for <kvm@vger.kernel.org>; Thu, 24 Jul 2025 16:21:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753399277; x=1754004077; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=FtxjXfgxpDTfPuT5P5fzUWtA1Sv02FqXCCsZ6XDi+Ns=;
-        b=KLp4cCAj7mG4EyhUnxpM/Nn658tdXgj+MEXmL86qXnptO+BYYYZw5aP1FTA4DDywPQ
-         qotnzZ7qOFLPQ/dbkFUqpPl6AGR+I9nkeX1/8TAgZWXuJ7WW3VctyPLzLDp8njjbbWRa
-         D+pQegY/jyYgu/CRQChN+QRkhZLEDlb+VTEXJ3zj9+xWcFNYdG23APqjmOl6kwn+Snbl
-         EqPBcgaZEXDddcpLNsyUVWThAYlh/le7QUx3LwRjpcWpMcPzRkUsN7I5j8uTr5vGtqMW
-         ZPNQVCnKnyY88vtt2SOim6R+RGU0Opgtno6/zXLBzQ7Qu+15vKpTkn6OwMpldnrZ3Azb
-         tTXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753399277; x=1754004077;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FtxjXfgxpDTfPuT5P5fzUWtA1Sv02FqXCCsZ6XDi+Ns=;
-        b=bpLpvNeVlwo+9CTLY3YM1jWHWbzrTMzDEYhSnpeOUI8jMsqD5mIwqxuZo0ShYMvqcw
-         s4Cs1E26iEa/eBpGQs41zfKmumrHKReQxQ+V1f1kRZQ+iqtK44TQBQdSk0ADLeffjjyb
-         zIq/qH79w0WTT30AT6t8FEmejJQe1N4RCprgCet0Q4hOZUJAPa5T/ndMYB0pLfam/2rj
-         mNlSGAtQfw4Nb1+Nubo0Zbh0Z7en/g/71z31jkszcLCP91jc+CFq0dYXOC0fqOrZ0C7D
-         XjJM5ekXmjHejUSz/qklwcuYF7l0DgzVwVRODA/fc3VcnpuIGUY4WBvGD7MMQrNcZ5Ox
-         1yDQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU/fBHnCNL9fN+jdTcmee/4yPCSkt+VxSSmQtBMt+1nfaVHDk6NftD1ZrNfPj9K6ISZAME=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzK93fWSmL9q2kCg2EE3qXhxRdQe+Ako5zElFpS/OvTb/5ZZriD
-	QBRuUSQsUwE7UDl0v97Fd/72BqlBUEhLlI9KyN8eTbWMkKXOS27kF8UZTNMD9S/k5AG4H0VeCEy
-	SUj419OMspnYejuNllXmkFmbyDQ==
-X-Google-Smtp-Source: AGHT+IHB77mlV+C/lxJnFswBhZIBjpoebt2RisPAbpgmjhqANzR11md/pPeaB4Bg/c91nZg90YvmvN58T9blmmYEFg==
-X-Received: from pfjj11.prod.google.com ([2002:a05:6a00:234b:b0:746:30f0:9b33])
- (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:aa7:88ce:0:b0:75d:8e1a:6db9 with SMTP id d2e1a72fcca58-76034012811mr12157154b3a.7.1753399276748;
- Thu, 24 Jul 2025 16:21:16 -0700 (PDT)
-Date: Thu, 24 Jul 2025 16:21:15 -0700
-In-Reply-To: <aIK0ZcTJC96XNPvj@google.com>
+	s=arc-20240116; t=1753399837; c=relaxed/simple;
+	bh=cm9lVkdrUaYvDK0DlFW5HCcydFsq2T/oMNAihmb5fXw=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=dFu5jvDuyCFls14KwJJfvd0pQAAlmIBCvVnltRVx/q0Ai9oTD301znjETwfpe0SdFynExfpyzwDoqYDUkxa4oHnDhurpLTtOR4sZEpBzBVsZ109snXlFnZ8Olu8I7p4zxxkvSCxO5NvdlgnB/16cnSOUwYKwtsqwavghx6wkEIA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b=uuIkmGxr; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0148460.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56ONKCAn017310
+	for <kvm@vger.kernel.org>; Thu, 24 Jul 2025 16:30:34 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=s2048-2025-q2; bh=nZZNbGXUGDCX5BH39w
+	vpoe5DEFL6K8f/ETWeCvWR+lI=; b=uuIkmGxr/sNYS30iOYBeqsTPx5/WjPjtPb
+	TrNSj+jd4GtQ8blC/N/Qt+mffY/y1wyrjqtdyGtZmLRpmcpJwEfA1mirJmm3QLjI
+	UM4CpzbkWxXBi2u++gwzYm4p06OAFl9XiuSPeVgABQ7oHIWaIZvsLYy7Q9NIQh28
+	RQBSYOdHVcunijqyfJM51uudA0dip8PiG1fNrtowGyc6mBO+MSHLYovdPpUFM+po
+	amYhU+LXJBF2jOuK6Z05bCErMFbOtogMbQyfoqAC0rQEYqMEqLcoWmS8n9F9TThR
+	7wB11fEOPTCVijhE1wzJh+1wDgn8sfbt6JVwCS1I4cdD9McyIW+A==
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 483w39rk8h-3
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <kvm@vger.kernel.org>; Thu, 24 Jul 2025 16:30:34 -0700 (PDT)
+Received: from twshared28243.32.prn2.facebook.com (2620:10d:c085:208::7cb7) by
+ mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.17; Thu, 24 Jul 2025 23:30:31 +0000
+Received: by devgpu007.eag1.facebook.com (Postfix, from userid 199522)
+	id 4DB7626DE84; Thu, 24 Jul 2025 16:30:18 -0700 (PDT)
+From: Alex Mastro <amastro@fb.com>
+Date: Thu, 24 Jul 2025 16:29:53 -0700
+Subject: [PATCH v2] vfio/pci: print vfio-device syspath to fdinfo
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250723104714.1674617-1-tabba@google.com> <20250723104714.1674617-15-tabba@google.com>
- <1ff6a90a-3e03-4104-9833-4b07bb84831f@intel.com> <aIK0ZcTJC96XNPvj@google.com>
-Message-ID: <diqzcy9pdvkk.fsf@ackerleytng-ctop.c.googlers.com>
-Subject: Re: [PATCH v16 14/22] KVM: x86/mmu: Enforce guest_memfd's max order
- when recovering hugepages
-From: Ackerley Tng <ackerleytng@google.com>
-To: Sean Christopherson <seanjc@google.com>, Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-mm@kvack.org, kvmarm@lists.linux.dev, pbonzini@redhat.com, 
-	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
-	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
-	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
-	akpm@linux-foundation.org, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
-	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
-	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
-	vannapurve@google.com, mail@maciej.szmigiero.name, david@redhat.com, 
-	michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com, 
-	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com, 
-	suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com, 
-	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, 
-	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
-	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, 
-	oliver.upton@linux.dev, maz@kernel.org, will@kernel.org, qperret@google.com, 
-	keirf@google.com, roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, 
-	jgg@nvidia.com, rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, 
-	hughd@google.com, jthoughton@google.com, peterx@redhat.com, 
-	pankaj.gupta@amd.com, ira.weiny@intel.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-ID: <20250724-show-fdinfo-v2-1-2952115edc10@fb.com>
+X-B4-Tracking: v=1; b=H4sIAPDBgmgC/5XOQQ6CMBCF4auQrh1DRympK+5hWNQytbOAmpZUD
+ eHuFhLj2uW/eF/eIhJFpiQu1SIiZU4cphJ4qIT1ZroT8FBaYI1N3eIZkg9PcANPLoA2Wiqr2la
+ 7RpTFI5Lj165d+9IuhhFmH8n8DIUnyI7D18gSJFhtyarGoEbs3O1ow7h5ntMc4ns/l+Wm/mn06
+ 7p+AEi5k0zjAAAA
+To: <alex.williamson@redhat.com>
+CC: <kvm@vger.kernel.org>, <peterx@redhat.com>, <kbusch@kernel.org>,
+        <jgg@ziepe.ca>, Alex Mastro <amastro@fb.com>
+X-Mailer: b4 0.13.0
+X-FB-Internal: Safe
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzI0MDE4NiBTYWx0ZWRfX5iMpiCHvs0ST 42j8WaVB5AYja2mklOS6o08j+s08CuzjqdaN9Ah87jOBm0tamgL3eBuiv1kSIM9Gg8hPm5GbpGF dk6Tno8wtUT2zazDMb/X7UfG/q2D8Tb+XCpwRYNYx6lFHZt9BuheSe8l0onu/QGIhIJ/nxkT2If
+ XDYJvs+dzD96/W1fTBO/c65MuRLoaiCzVod3fq2JEflnBN4W0JUqPgUnoyT7rGryGFbqInKURo0 MN8hmT7L6LTA1wXmlylFt+wufNrNVPK1pjXWMauAXeiH1Yq7hH7Lu1ccnQ49TVJXUl4XOxnQk8z 4GOK+AKgCHaID/kjnwvl3EeBD6UKVyupx6P4Xu0O9QOAW0TDBjqu1trrMO3NsT37slIJIEaPIih
+ /IXXhIDcPP+vg6v6pFg+rydkjScAKSDx97umAo0J5E6wSJQgUXW1OSbeUeqFOB8lITr9uzQ1
+X-Authority-Analysis: v=2.4 cv=HoF2G1TS c=1 sm=1 tr=0 ts=6882c21a cx=c_pps a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17 a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=VwQbUJbxAAAA:8 a=FOH2dFAWAAAA:8 a=HenG7Eq3vJZAMZ7HSsMA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: KYJL-MeYQT7qweGH3rM01OXg3z6Fi6Zo
+X-Proofpoint-ORIG-GUID: KYJL-MeYQT7qweGH3rM01OXg3z6Fi6Zo
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-07-24_06,2025-07-24_01,2025-03-28_01
 
-Sean Christopherson <seanjc@google.com> writes:
+Print the PCI device syspath to a vfio device's fdinfo. This enables tools
+to query which device is associated with a given vfio device fd.
 
-> On Wed, Jul 23, 2025, Xiaoyao Li wrote:
->> On 7/23/2025 6:47 PM, Fuad Tabba wrote:
->
-> ...
->
->> > +	if (max_level == PG_LEVEL_4K)
->> > +		return max_level;
->> > +
->> > +	return min(max_level,
->> > +		   kvm_x86_call(gmem_max_mapping_level)(kvm, pfn));
->> >   }
->> 
->> I don't mean to want a next version.
->> 
->> But I have to point it out that, the coco_level stuff in the next patch
->> should be put in this patch actually. Because this patch does the wrong
->> thing to change from
->> 
->> 	req_max_level = kvm_x86_call(gmem_max_mapping_level)(kvm, pfn);
->> 	if (req_max_level)
->> 		max_level = min(max_level, req_max_level);
->> 
->> to
->> 
->> 	return min(max_level,
->> 		   kvm_x86_call(gmem_max_mapping_level)(kvm, pfn));
->
-> Gah, nice catch.  Let's do one more version (knock wood).  I have no objection
-> to fixing up my own goof, but the selftest needs to be reworked too, and I think
-> it makes sense for Paolo to grab this directly.  The fewer "things" we need to
-> handoff to Paolo, the better.
->
-> The fixup will generate a minor conflict, but it's trivial to resolve, and the
-> resting state should end up identical.
->
-> As fixup:
->
-> ---
->  arch/x86/kvm/mmu/mmu.c | 14 +++++++++++---
->  1 file changed, 11 insertions(+), 3 deletions(-)
->
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 6148cc96f7d4..c4ff8b4028df 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -3305,9 +3305,9 @@ static u8 kvm_max_level_for_order(int order)
->  static u8 kvm_max_private_mapping_level(struct kvm *kvm, struct kvm_page_fault *fault,
->  					const struct kvm_memory_slot *slot, gfn_t gfn)
->  {
-> +	u8 max_level, coco_level;
->  	struct page *page;
->  	kvm_pfn_t pfn;
-> -	u8 max_level;
->  
->  	/* For faults, use the gmem information that was resolved earlier. */
->  	if (fault) {
-> @@ -3331,8 +3331,16 @@ static u8 kvm_max_private_mapping_level(struct kvm *kvm, struct kvm_page_fault *
->  	if (max_level == PG_LEVEL_4K)
->  		return max_level;
->  
-> -	return min(max_level,
-> -		   kvm_x86_call(gmem_max_mapping_level)(kvm, pfn));
-> +	/*
-> +	 * CoCo may influence the max mapping level, e.g. due to RMP or S-EPT
-> +	 * restrictions.  A return of '0' means "no additional restrictions", to
-> +	 * allow for using an optional "ret0" static call.
-> +	 */
-> +	coco_level = kvm_x86_call(gmem_max_mapping_level)(kvm, pfn);
-> +	if (coco_level)
-> +		max_level = min(max_level, coco_level);
-> +
-> +	return max_level;
->  }
->  
->  int kvm_mmu_max_mapping_level(struct kvm *kvm, struct kvm_page_fault *fault,
->
-> base-commit: f937c99dad18339773f18411f2a0193b5db8b581
-> -- 
->
-> Or a full patch:
->
-> From: Sean Christopherson <seanjc@google.com>
-> Date: Wed, 23 Jul 2025 11:47:06 +0100
-> Subject: [PATCH] KVM: x86/mmu: Enforce guest_memfd's max order when recovering
->  hugepages
->
-> Rework kvm_mmu_max_mapping_level() to consult guest_memfd (and relevant)
-> vendor code when recovering hugepages, e.g. after disabling live migration.
-> The flaw has existed since guest_memfd was originally added, but has gone
-> unnoticed due to lack of guest_memfd hugepage support.
->
-> Get all information on-demand from the memslot and guest_memfd instance,
-> even though KVM could pull the pfn from the SPTE.  However, the max
-> order/level needs to come from guest_memfd, and using kvm_gmem_get_pfn()
-> avoids adding a new gmem API, and avoids having to retrieve the pfn and
-> plumb it into kvm_mmu_max_mapping_level() (the pfn is needed for SNP to
-> consult the RMP).
->
-> Note, calling kvm_mem_is_private() in the non-fault path is safe, so long
-> as mmu_lock is held, as hugepage recovery operates on shadow-present SPTEs,
-> i.e. calling kvm_mmu_max_mapping_level() with @fault=NULL is mutually
-> exclusive with kvm_vm_set_mem_attributes() changing the PRIVATE attribute
-> of the gfn.
->
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/mmu/mmu.c          | 91 ++++++++++++++++++++-------------
->  arch/x86/kvm/mmu/mmu_internal.h |  2 +-
->  arch/x86/kvm/mmu/tdp_mmu.c      |  2 +-
->  3 files changed, 58 insertions(+), 37 deletions(-)
->
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 20dd9f64156e..c4ff8b4028df 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -3302,31 +3302,63 @@ static u8 kvm_max_level_for_order(int order)
->  	return PG_LEVEL_4K;
->  }
->  
-> -static u8 kvm_max_private_mapping_level(struct kvm *kvm, kvm_pfn_t pfn,
-> -					u8 max_level, int gmem_order)
-> +static u8 kvm_max_private_mapping_level(struct kvm *kvm, struct kvm_page_fault *fault,
-> +					const struct kvm_memory_slot *slot, gfn_t gfn)
+This results in output like below:
 
-Would you consider renaming this kvm_max_gmem_mapping_level()? Or
-something that doesn't limit the use of this function to private memory?
+$ cat /proc/"$SOME_PID"/fdinfo/"$VFIO_FD" | grep vfio
+vfio-device-syspath: /sys/devices/pci0000:e0/0000:e0:01.1/0000:e1:00.0/0000:e2:05.0/0000:e8:00.0
 
->  {
-> -	u8 req_max_level;
-> +	u8 max_level, coco_level;
-> +	struct page *page;
-> +	kvm_pfn_t pfn;
->  
-> -	if (max_level == PG_LEVEL_4K)
-> -		return PG_LEVEL_4K;
-> +	/* For faults, use the gmem information that was resolved earlier. */
-> +	if (fault) {
-> +		pfn = fault->pfn;
-> +		max_level = fault->max_level;
-> +	} else {
-> +		/* TODO: Constify the guest_memfd chain. */
-> +		struct kvm_memory_slot *__slot = (struct kvm_memory_slot *)slot;
-> +		int max_order, r;
-> +
-> +		r = kvm_gmem_get_pfn(kvm, __slot, gfn, &pfn, &page, &max_order);
-> +		if (r)
-> +			return PG_LEVEL_4K;
-> +
-> +		if (page)
-> +			put_page(page);
+Signed-off-by: Alex Mastro <amastro@fb.com>
+---
+Based on the feedback received from Jason G. and Alex W. in v1, print
+the PCI device syspath to fdinfo instead of the BDF. This provides a
+more specific waypoint for user space to query for any other relevant
+information about the device.
 
-When I was working on this, I added a kvm_gmem_mapping_order() [1] where
-guest_memfd could return the order that this gfn would be allocated at
-without actually doing the allocation. Is it okay that an
-allocation may be performed here?
+There was discussion about removing vfio_device_ops callbacks, and
+relying on just dev_name() in vfio_main.c, but since the concept of PCI
+syspath is implementation-specific, I think we need to keep some form
+of callback.
 
-[1] https://lore.kernel.org/all/20250717162731.446579-13-tabba@google.com/
+Signed-off-by: Alex Mastro <amastro@fb.com>
 
-> +
-> +		max_level = kvm_max_level_for_order(max_order);
-> +	}
->  
-> -	max_level = min(kvm_max_level_for_order(gmem_order), max_level);
->  	if (max_level == PG_LEVEL_4K)
-> -		return PG_LEVEL_4K;
-> +		return max_level;
+Changes in v2:
+- Instead of PCI bdf, print the fully-qualified syspath (prefixed by
+  /sys) to fdinfo.
+- Rename the field to "vfio-device-syspath". The term "syspath" was
+  chosen for consistency e.g. libudev's usage of the term.
+- Link to v1: https://lore.kernel.org/r/20250623-vfio-fdinfo-v1-1-c9cec65a2922@fb.com
+---
+ drivers/vfio/pci/vfio_pci.c | 21 +++++++++++++++++++++
+ drivers/vfio/vfio_main.c    | 14 ++++++++++++++
+ include/linux/vfio.h        |  2 ++
+ 3 files changed, 37 insertions(+)
 
-I think the above line is a git-introduced issue, there probably
-shouldn't be a return here.
+diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+index 5ba39f7623bb..bf3e7d873990 100644
+--- a/drivers/vfio/pci/vfio_pci.c
++++ b/drivers/vfio/pci/vfio_pci.c
+@@ -17,10 +17,12 @@
+ #include <linux/file.h>
+ #include <linux/interrupt.h>
+ #include <linux/iommu.h>
++#include <linux/kobject.h>
+ #include <linux/module.h>
+ #include <linux/mutex.h>
+ #include <linux/notifier.h>
+ #include <linux/pm_runtime.h>
++#include <linux/seq_file.h>
+ #include <linux/slab.h>
+ #include <linux/types.h>
+ #include <linux/uaccess.h>
+@@ -125,6 +127,22 @@ static int vfio_pci_open_device(struct vfio_device *core_vdev)
+ 	return 0;
+ }
+ 
++#ifdef CONFIG_PROC_FS
++static void vfio_pci_core_show_fdinfo(struct vfio_device *core_vdev, struct seq_file *m)
++{
++	char *path;
++	struct vfio_pci_core_device *vdev =
++		container_of(core_vdev, struct vfio_pci_core_device, vdev);
++
++	path = kobject_get_path(&vdev->pdev->dev.kobj, GFP_KERNEL);
++	if (!path)
++		return;
++
++	seq_printf(m, "vfio-device-syspath: /sys%s\n", path);
++	kfree(path);
++}
++#endif
++
+ static const struct vfio_device_ops vfio_pci_ops = {
+ 	.name		= "vfio-pci",
+ 	.init		= vfio_pci_core_init_dev,
+@@ -138,6 +156,9 @@ static const struct vfio_device_ops vfio_pci_ops = {
+ 	.mmap		= vfio_pci_core_mmap,
+ 	.request	= vfio_pci_core_request,
+ 	.match		= vfio_pci_core_match,
++#ifdef CONFIG_PROC_FS
++	.show_fdinfo	= vfio_pci_core_show_fdinfo,
++#endif
+ 	.bind_iommufd	= vfio_iommufd_physical_bind,
+ 	.unbind_iommufd	= vfio_iommufd_physical_unbind,
+ 	.attach_ioas	= vfio_iommufd_physical_attach_ioas,
+diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+index 1fd261efc582..6e883c0c320b 100644
+--- a/drivers/vfio/vfio_main.c
++++ b/drivers/vfio/vfio_main.c
+@@ -1354,6 +1354,17 @@ static int vfio_device_fops_mmap(struct file *filep, struct vm_area_struct *vma)
+ 	return device->ops->mmap(device, vma);
+ }
+ 
++#ifdef CONFIG_PROC_FS
++static void vfio_device_show_fdinfo(struct seq_file *m, struct file *filep)
++{
++	struct vfio_device_file *df = filep->private_data;
++	struct vfio_device *device = df->device;
++
++	if (device->ops->show_fdinfo)
++		device->ops->show_fdinfo(device, m);
++}
++#endif
++
+ const struct file_operations vfio_device_fops = {
+ 	.owner		= THIS_MODULE,
+ 	.open		= vfio_device_fops_cdev_open,
+@@ -1363,6 +1374,9 @@ const struct file_operations vfio_device_fops = {
+ 	.unlocked_ioctl	= vfio_device_fops_unl_ioctl,
+ 	.compat_ioctl	= compat_ptr_ioctl,
+ 	.mmap		= vfio_device_fops_mmap,
++#ifdef CONFIG_PROC_FS
++	.show_fdinfo	= vfio_device_show_fdinfo,
++#endif
+ };
+ 
+ static struct vfio_device *vfio_device_from_file(struct file *file)
+diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+index 707b00772ce1..54076045a44f 100644
+--- a/include/linux/vfio.h
++++ b/include/linux/vfio.h
+@@ -16,6 +16,7 @@
+ #include <linux/cdev.h>
+ #include <uapi/linux/vfio.h>
+ #include <linux/iova_bitmap.h>
++#include <linux/seq_file.h>
+ 
+ struct kvm;
+ struct iommufd_ctx;
+@@ -135,6 +136,7 @@ struct vfio_device_ops {
+ 	void	(*dma_unmap)(struct vfio_device *vdev, u64 iova, u64 length);
+ 	int	(*device_feature)(struct vfio_device *device, u32 flags,
+ 				  void __user *arg, size_t argsz);
++	void	(*show_fdinfo)(struct vfio_device *device, struct seq_file *m);
+ };
+ 
+ #if IS_ENABLED(CONFIG_IOMMUFD)
 
->  
-> -	req_max_level = kvm_x86_call(gmem_max_mapping_level)(kvm, pfn);
-> -	if (req_max_level)
-> -		max_level = min(max_level, req_max_level);
-> +	/*
-> +	 * CoCo may influence the max mapping level, e.g. due to RMP or S-EPT
-> +	 * restrictions.  A return of '0' means "no additional restrictions", to
-> +	 * allow for using an optional "ret0" static call.
-> +	 */
-> +	coco_level = kvm_x86_call(gmem_max_mapping_level)(kvm, pfn);
-> +	if (coco_level)
-> +		max_level = min(max_level, coco_level);
->  
+---
+base-commit: c1d9dac0db168198b6f63f460665256dedad9b6e
+change-id: 20250724-show-fdinfo-9a916c6779f5
 
-This part makes sense :)
+Best regards,
+-- 
+Alex Mastro <amastro@fb.com>
 
->  	return max_level;
->  }
->  
-> -static int __kvm_mmu_max_mapping_level(struct kvm *kvm,
-> -				       const struct kvm_memory_slot *slot,
-> -				       gfn_t gfn, int max_level, bool is_private)
-> +int kvm_mmu_max_mapping_level(struct kvm *kvm, struct kvm_page_fault *fault,
-> +			      const struct kvm_memory_slot *slot, gfn_t gfn)
->  {
->  	struct kvm_lpage_info *linfo;
-> -	int host_level;
-> +	int host_level, max_level;
-> +	bool is_private;
-> +
-> +	lockdep_assert_held(&kvm->mmu_lock);
-> +
-> +	if (fault) {
-> +		max_level = fault->max_level;
-> +		is_private = fault->is_private;
-> +	} else {
-> +		max_level = PG_LEVEL_NUM;
-> +		is_private = kvm_mem_is_private(kvm, gfn);
-> +	}
->  
->  	max_level = min(max_level, max_huge_page_level);
->  	for ( ; max_level > PG_LEVEL_4K; max_level--) {
-> @@ -3335,25 +3367,16 @@ static int __kvm_mmu_max_mapping_level(struct kvm *kvm,
->  			break;
->  	}
->  
-> +	if (max_level == PG_LEVEL_4K)
-> +		return PG_LEVEL_4K;
-> +
->  	if (is_private)
-> -		return max_level;
-> -
-> -	if (max_level == PG_LEVEL_4K)
-> -		return PG_LEVEL_4K;
-> -
-> -	host_level = host_pfn_mapping_level(kvm, gfn, slot);
-> +		host_level = kvm_max_private_mapping_level(kvm, fault, slot, gfn);
-> +	else
-> +		host_level = host_pfn_mapping_level(kvm, gfn, slot);
->  	return min(host_level, max_level);
->  }
->  
-> -int kvm_mmu_max_mapping_level(struct kvm *kvm,
-> -			      const struct kvm_memory_slot *slot, gfn_t gfn)
-> -{
-> -	bool is_private = kvm_slot_has_gmem(slot) &&
-> -			  kvm_mem_is_private(kvm, gfn);
-> -
-> -	return __kvm_mmu_max_mapping_level(kvm, slot, gfn, PG_LEVEL_NUM, is_private);
-> -}
-> -
->  void kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
->  {
->  	struct kvm_memory_slot *slot = fault->slot;
-> @@ -3374,9 +3397,8 @@ void kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
->  	 * Enforce the iTLB multihit workaround after capturing the requested
->  	 * level, which will be used to do precise, accurate accounting.
->  	 */
-> -	fault->req_level = __kvm_mmu_max_mapping_level(vcpu->kvm, slot,
-> -						       fault->gfn, fault->max_level,
-> -						       fault->is_private);
-> +	fault->req_level = kvm_mmu_max_mapping_level(vcpu->kvm, fault,
-> +						     fault->slot, fault->gfn);
->  	if (fault->req_level == PG_LEVEL_4K || fault->huge_page_disallowed)
->  		return;
->  
-> @@ -4564,8 +4586,7 @@ static int kvm_mmu_faultin_pfn_private(struct kvm_vcpu *vcpu,
->  	}
->  
->  	fault->map_writable = !(fault->slot->flags & KVM_MEM_READONLY);
-> -	fault->max_level = kvm_max_private_mapping_level(vcpu->kvm, fault->pfn,
-> -							 fault->max_level, max_order);
-> +	fault->max_level = kvm_max_level_for_order(max_order);
->  
->  	return RET_PF_CONTINUE;
->  }
-> @@ -7165,7 +7186,7 @@ static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
->  		 * mapping if the indirect sp has level = 1.
->  		 */
->  		if (sp->role.direct &&
-> -		    sp->role.level < kvm_mmu_max_mapping_level(kvm, slot, sp->gfn)) {
-> +		    sp->role.level < kvm_mmu_max_mapping_level(kvm, NULL, slot, sp->gfn)) {
->  			kvm_zap_one_rmap_spte(kvm, rmap_head, sptep);
->  
->  			if (kvm_available_flush_remote_tlbs_range())
-> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-> index 65f3c89d7c5d..b776be783a2f 100644
-> --- a/arch/x86/kvm/mmu/mmu_internal.h
-> +++ b/arch/x86/kvm/mmu/mmu_internal.h
-> @@ -411,7 +411,7 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
->  	return r;
->  }
->  
-> -int kvm_mmu_max_mapping_level(struct kvm *kvm,
-> +int kvm_mmu_max_mapping_level(struct kvm *kvm, struct kvm_page_fault *fault,
->  			      const struct kvm_memory_slot *slot, gfn_t gfn);
->  void kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault);
->  void disallowed_hugepage_adjust(struct kvm_page_fault *fault, u64 spte, int cur_level);
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 7f3d7229b2c1..740cb06accdb 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -1813,7 +1813,7 @@ static void recover_huge_pages_range(struct kvm *kvm,
->  		if (iter.gfn < start || iter.gfn >= end)
->  			continue;
->  
-> -		max_mapping_level = kvm_mmu_max_mapping_level(kvm, slot, iter.gfn);
-> +		max_mapping_level = kvm_mmu_max_mapping_level(kvm, NULL, slot, iter.gfn);
->  		if (max_mapping_level < iter.level)
->  			continue;
->  
->
-> base-commit: 84ca709e4f4d54aae3b8d4df74490d8d3d2b1272
-> --
 
