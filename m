@@ -1,272 +1,275 @@
-Return-Path: <kvm+bounces-53354-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53355-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8EDAB1054F
-	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 11:12:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B66D3B105B1
+	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 11:22:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5D6941CC2D87
-	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 09:12:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D8EED16F4D4
+	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 09:22:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3537C278E6A;
-	Thu, 24 Jul 2025 09:12:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 481AE259C9A;
+	Thu, 24 Jul 2025 09:22:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mmKlWA48"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="SXvfgVNV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2062.outbound.protection.outlook.com [40.107.223.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61B07278E77;
-	Thu, 24 Jul 2025 09:12:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753348332; cv=none; b=lcEFRy/O1khCS/mM7dbgcz3Rc3Svc+puARaRY3xfh0yk6TClSqcmZ+r+BddG02wjeIkfhJJEgs5cDhgduz4L7GCoTu0+luSVNo44QpWV//Hsc+/KTUihlL4Vut0zo3mJU+eXpw1bXZ5ApjyaUCYShKD6cmUE0iGV2L0R63P2eGM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753348332; c=relaxed/simple;
-	bh=2D/eWy3V/JwWoNG/RE9YfWlQJ4L8lzp60VYkFuCkQcQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sxCoDBSiyPKrqpLDyicqyATmpZeHoS02ifvczPV5yBb/uC7aQfapgFXxULVHeaXaPpEy0JBgVdNnuKYFetqz1LHHWo1M+E992r8tTFi0li7hmoeitXpeWytjcJLt4eEUw0zPnXWqeCH/G0HXEXEV0bxETlHplyISvcz9au2KrGc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mmKlWA48; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1753348328; x=1784884328;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=2D/eWy3V/JwWoNG/RE9YfWlQJ4L8lzp60VYkFuCkQcQ=;
-  b=mmKlWA48r9vnRv4YuJ27EQ4rWpg0QvPhwvaMI68YTZeGDEuZHyvtLkM6
-   ABe2eARLmGMfVw9KvbC+qtUevkWPKuqBK1La51Cs8XQMu/2BNuPq+eD6u
-   ti3QbpNOyRXuBl/WcVSYfJxFFyNWurujBfEegVIoEICEq3DeymfNl7jkz
-   sHj7idJQxTWQS5rORhZniaf0yrESVExklp2N72T63//h7KYQOOScQoYFR
-   lGHy3gDtSLM74VCT7phiZq9EA1ZPT8Ov2oUnhBK/0XFB2EYQszhvtnndP
-   TKFeO2Bb7dt2SrC2rF/xoKy4TzQU0h3BMGWoKAFPVtgI7DBsLUWm2Hz34
-   g==;
-X-CSE-ConnectionGUID: +2Tc+MQDTEq/e+qRWJM7gg==
-X-CSE-MsgGUID: 7Lhh9Fs6Q5aAO0/jcnOOsQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11501"; a="66349627"
-X-IronPort-AV: E=Sophos;i="6.16,336,1744095600"; 
-   d="scan'208";a="66349627"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jul 2025 02:12:06 -0700
-X-CSE-ConnectionGUID: nHWgODuEQsqM30KDtuYtLA==
-X-CSE-MsgGUID: hjW/Vu/FQrW8mJrYU/Fv+w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,336,1744095600"; 
-   d="scan'208";a="160219169"
-Received: from lkp-server01.sh.intel.com (HELO 9ee84586c615) ([10.239.97.150])
-  by orviesa007.jf.intel.com with ESMTP; 24 Jul 2025 02:12:04 -0700
-Received: from kbuild by 9ee84586c615 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uerzd-000KGT-15;
-	Thu, 24 Jul 2025 09:12:01 +0000
-Date: Thu, 24 Jul 2025 17:11:28 +0800
-From: kernel test robot <lkp@intel.com>
-To: "Ahmed S. Darwish" <darwi@linutronix.de>,
-	Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Andrew Cooper <andrew.cooper3@citrix.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Juergen Gross <jgross@suse.com>,
-	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	John Ogness <john.ogness@linutronix.de>, x86@kernel.org,
-	kvm@vger.kernel.org, x86-cpuid@lists.linux.dev,
-	LKML <linux-kernel@vger.kernel.org>,
-	"Ahmed S. Darwish" <darwi@linutronix.de>
-Subject: Re: [PATCH v4 4/4] x86/cpu: <asm/processor.h>: Do not include the
- CPUID API header
-Message-ID: <202507241752.gju4meHj-lkp@intel.com>
-References: <20250723173644.33568-5-darwi@linutronix.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D20C7153BE9;
+	Thu, 24 Jul 2025 09:22:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.62
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753348955; cv=fail; b=se8BhRrIaO+IlfcwJBxt843WpOHn3ADix07qxtFurf33vj8vmxuJbplPETPOPbZ8s1nmoY6Bo+Wn89+RxFzXIb+nWS9ukLwyFVOgVkeVavS10fW9P4HXSmljulPJlPoTuJg39wmvtKmpPZyHgTH2I+maBCr6ljsp63SJ9EflP2I=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753348955; c=relaxed/simple;
+	bh=XWGD/wTU2khfbzBAhrQg1tF3auPTCePuzXBPbSZ/YRs=;
+	h=From:To:CC:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=QKEBxYfDkh1joUzoLT0N2d7cdkpJ8P4buO4m5P2f1pcjt0YbuRPT6pyqJApnEOCyubIM5bePxYwgEhunfMHI/shnYrfh2ykmR7WScdDlr59X1DzOPlc4iLS8dLMldEi0bkCnyVvSJ6j9tnGuRFgmZY9HcFAk7s5YIRaUtAjh1Is=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=SXvfgVNV; arc=fail smtp.client-ip=40.107.223.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=lo+xOpdsOuMTbW+f+GG+VAQ6HhlQrkoloGskRLGeilAKZc71YKYomINqxBmH0rJHOJtN+13gq8cUqLHjyhJJmZ9tmFgHXQ24MKIItbU0zAraMYOZ/d729LhRUrlNTPJOvsAbiZ+YHvEkbpMWXGAUo44s21uc/a1Oj9g/ALLEu3HmTOer4TkwrLpLR4J0yA6Xa+bahE7BdO6w/dXWAuFXrG1isZ1XnDDlQi4nvEoEgNMKGK/KPEHnDxFhaEq5WQWnnAKrloIr9LFBKvLIUP7vi/xWvh+U1CIj21FSmMZtov3x/zF4bSewI0+409jPjT3rczimgqWDRhrl76BIOv+S3w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=WVzKfd5Ezyn+oYkiu+h0sM+Iu/lduRUCYGgBwgRbRww=;
+ b=MueLpkkpzfPW848B0jJFK5XR+K5rWsItxBKWtlF4k0CCAi+bqkUxxlLpXont2gqNCaFk96570cT2wYzd7kKV36gGacLsieM6/QohaO4ORSUXYUZeFwQujNhfliv48lUvSi+VtQjPZ0RCv4T8aBxsSpWrH7+IvJOKZWOBns3QadsRsspmex8Ex4U2t7cf8T/XYO0SE+H1ZwPINm5a5eWGZ6GjdInOpivUYUCQKG51ODNNiDszQHX1CmjTO8Xl48VlO2FvwdUYBhmKcNIyMMJZVxHCPRs9n7G7YVDBcDVY1u1sTI3TM+bmQlNGFLoEh52vfMziLwx3CVfNCEdUmRhIsA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WVzKfd5Ezyn+oYkiu+h0sM+Iu/lduRUCYGgBwgRbRww=;
+ b=SXvfgVNVCRhlw0++rR6mMWMpw2x+//6CpgTjkec55o26SMZ1jF/P/PSS4+PH6xYEyURrt9IqEtK8+P9GbX/Pxfxj12OLCQcNqtxoppga+JQyNwI0Hx5oxNTtM+aFbn3f1BEFYMk2wURxtL+MNWiVEspC/bzZsbkd5T/+0NHRiwA=
+Received: from MW4PR03CA0025.namprd03.prod.outlook.com (2603:10b6:303:8f::30)
+ by LV8PR12MB9272.namprd12.prod.outlook.com (2603:10b6:408:201::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8943.29; Thu, 24 Jul
+ 2025 09:22:30 +0000
+Received: from MWH0EPF000971E5.namprd02.prod.outlook.com
+ (2603:10b6:303:8f:cafe::7e) by MW4PR03CA0025.outlook.office365.com
+ (2603:10b6:303:8f::30) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8922.25 via Frontend Transport; Thu,
+ 24 Jul 2025 09:22:29 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ MWH0EPF000971E5.mail.protection.outlook.com (10.167.243.73) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.8964.20 via Frontend Transport; Thu, 24 Jul 2025 09:22:29 +0000
+Received: from BLR-L1-NDADHANI (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 24 Jul
+ 2025 04:20:26 -0500
+From: Nikunj A Dadhania <nikunj@amd.com>
+To: Sean Christopherson <seanjc@google.com>, Tom Lendacky
+	<thomas.lendacky@amd.com>
+CC: <pbonzini@redhat.com>, <kvm@vger.kernel.org>, <santosh.shukla@amd.com>,
+	<bp@alien8.de>, Michael Roth <michael.roth@amd.com>, <stable@vger.kernel.org>
+Subject: Re: [PATCH v2] KVM: SEV: Enforce minimum GHCB version requirement
+ for SEV-SNP guests
+In-Reply-To: <aHp9EGExmlq9Kx9T@google.com>
+References: <20250716055604.2229864-1-nikunj@amd.com>
+ <2d787a83-8440-adb1-acbd-0a68358e817d@amd.com>
+ <aHp9EGExmlq9Kx9T@google.com>
+Date: Thu, 24 Jul 2025 09:20:18 +0000
+Message-ID: <85ikji9c8d.fsf@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250723173644.33568-5-darwi@linutronix.de>
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MWH0EPF000971E5:EE_|LV8PR12MB9272:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7aacac74-2dd0-433e-f9cc-08ddca939cee
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|36860700013|376014|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?jgXstgZCYNxEVaoeyOgJjt/EVRjkI1vpTuLpb0Yuf/pEK7l9pRxEP3gAJQZH?=
+ =?us-ascii?Q?hIo+RQyRTlfc85lN0BkSze6WvqSXFNbr/AjXm/tRd6ouGx4uoQsSd+O2WxgC?=
+ =?us-ascii?Q?MD4FIgfoaxYohvtho0yeQhCp+GqxGByv7+2H1Te9LPSQlI6V/ywWHI91TQq7?=
+ =?us-ascii?Q?V0hiYJdAo0e3pwhpPaaHDTRmjmHEe/CWbtNdXGvTf8A6BTpGh9b6q1PH7s6Z?=
+ =?us-ascii?Q?30LctMH7ZTFAjNv/sjnz+fJhYcTXT2BNe+eGfRpm47kphJD1W56oITHc61oF?=
+ =?us-ascii?Q?zQCur04otaP+fIdAhPQ1BA1g33ZafBMsRwBQIVa/AeByeYJEFL4Y8Ko7aYRh?=
+ =?us-ascii?Q?hGc71cStLKNXyAvb39JNHPTvM0nmbHt1KwnXC/O0u6vDl1SXQBKVVBPak2I0?=
+ =?us-ascii?Q?FQ6xLV7Zt1XNmzW/s/IzBe7po0hzCe5N4hAxDkT0IGmTSre7ZDiS1ty87LIY?=
+ =?us-ascii?Q?x8VMh+KT0u1yLlKP9HZQES4rgx5tCvTOlSg9OM204AxteG6fcvwRbN3PlDoV?=
+ =?us-ascii?Q?5OqIPUAimsU9v0mtdtbIuJc6meBLKWdAseErvvT3+8U2GWtsyh7Jg3mTR4v1?=
+ =?us-ascii?Q?ifyQUMDr2SIA6N0CnnkizA8gcJOCGMwIm0kKI74fHISp9pP2oaGOfcHNp1K8?=
+ =?us-ascii?Q?nEBVspUPuaXHAX/7OKMW0O4mhBqZGCjeTAUGHdzcZAhXE+PtDyP1fw7u53dJ?=
+ =?us-ascii?Q?Op9RWEIPi9cII1uAGaDrnk+vUk9nRC76nDeF61KeWzAONFpPodwmHnlzXHg6?=
+ =?us-ascii?Q?Z0zb2n8XjkqHQemb40U4e4AJphkFT8jW+xDSY0a99DLPoB9p/UMnzaW6yl9x?=
+ =?us-ascii?Q?VfGx9o3n1xSsPRjJeMjrLcFSixHa3zQSfjkIKafPdG4nyXML6QLAZt6g8EH/?=
+ =?us-ascii?Q?xETasLlCQVJ5mUbAOgRxTCJLU9Xg4KzuFIbXv8IOFPm8HiOanaHU2KdBuhnE?=
+ =?us-ascii?Q?p2tzU1u1qgSVsK8bM+izYg6o6k6zXrBGqZJXnr4mc6FFGOcwpmVhTMHOXPi5?=
+ =?us-ascii?Q?+UN5Hjw92wzdQdNzgyw4mFz+DDKrsHeuBPUz8HX9ClZw0RgiWoJAeIvJjnnf?=
+ =?us-ascii?Q?HelXdKdyHIYR3bEjEAGhW8WMLVFvU7AE35wXhARfb5oXEVUSthRK6soQ5Oc4?=
+ =?us-ascii?Q?dJ56MiSNQQEPLUiKFt5s2cJVrIxMPb0XCIowbfSGnxHSP9b8D+W/vjMciol1?=
+ =?us-ascii?Q?oQmJxa+ikbzB/vhp6AvgYeufZqV7VEBwBDl4xZTvDxBSEhUBnKjRmM5GTnyn?=
+ =?us-ascii?Q?zLPmbB7l9H3lqb0z7XdhOAQd2LZbsgISj7SNiPAJiVeHhRZwx6nYmIjuIIW0?=
+ =?us-ascii?Q?3LhEjXkTLCm0AobM/6cUeT8qjMzk1jxHlQy+iVdqaXTumO6NIg+dnnnxs9Sa?=
+ =?us-ascii?Q?ewFZteAdCivL5a8logzRP5aQVEcfYJXqCS8BKB44CGNQSuMjFq5X7iaLNoAD?=
+ =?us-ascii?Q?QxguPxd5azxc1HaiHgPKalPhFT2bCcf0P1Ed+ZF0fIGd++S3gIDK4oZsx2sD?=
+ =?us-ascii?Q?qOm63YDcF+kIEI+Da+IkNgtRIntpskEI20DO?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(376014)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jul 2025 09:22:29.7660
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7aacac74-2dd0-433e-f9cc-08ddca939cee
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	MWH0EPF000971E5.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR12MB9272
 
-Hi Ahmed,
+Sean Christopherson <seanjc@google.com> writes:
 
-kernel test robot noticed the following build errors:
+> On Wed, Jul 16, 2025, Tom Lendacky wrote:
+>> On 7/16/25 00:56, Nikunj A Dadhania wrote:
+>> > ---
+>> >  arch/x86/kvm/svm/sev.c | 8 ++++++--
+>> >  1 file changed, 6 insertions(+), 2 deletions(-)
+>> > 
+>> > diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+>> > index 95668e84ab86..fdc1309c68cb 100644
+>> > --- a/arch/x86/kvm/svm/sev.c
+>> > +++ b/arch/x86/kvm/svm/sev.c
+>> > @@ -406,6 +406,7 @@ static int __sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp,
+>> >  	struct kvm_sev_info *sev = to_kvm_sev_info(kvm);
+>> >  	struct sev_platform_init_args init_args = {0};
+>> >  	bool es_active = vm_type != KVM_X86_SEV_VM;
+>> > +	bool snp_active = vm_type == KVM_X86_SNP_VM;
+>> >  	u64 valid_vmsa_features = es_active ? sev_supported_vmsa_features : 0;
+>> >  	int ret;
+>> >  
+>> > @@ -424,6 +425,9 @@ static int __sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp,
+>> >  	if (unlikely(sev->active))
+>> >  		return -EINVAL;
+>> >  
+>> > +	if (snp_active && data->ghcb_version && data->ghcb_version < 2)
+>> > +		return -EINVAL;
+>> > +
+>> 
+>> Would it make sense to move this up a little bit so that it follows the
+>> other ghcb_version check? This way the checks are grouped.
+>
+> Yes, because there's a lot going on here, and this:
+>
+>   data->ghcb_version && data->ghcb_version < 2
+>
+> is an unnecesarily bizarre way of writing
+>
+>   data->ghcb_version == 1
+>
+> And *that* is super confusing because it begs the question of why version 0 is
+> ok, but version 1 is not.
 
-[auto build test ERROR on 89be9a83ccf1f88522317ce02f854f30d6115c41]
+Yes, and had done the previous version because that.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Ahmed-S-Darwish/x86-cpuid-Remove-transitional-asm-cpuid-h-header/20250724-014828
-base:   89be9a83ccf1f88522317ce02f854f30d6115c41
-patch link:    https://lore.kernel.org/r/20250723173644.33568-5-darwi%40linutronix.de
-patch subject: [PATCH v4 4/4] x86/cpu: <asm/processor.h>: Do not include the CPUID API header
-config: x86_64-rhel-9.4-rust (https://download.01.org/0day-ci/archive/20250724/202507241752.gju4meHj-lkp@intel.com/config)
-compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
-rustc: rustc 1.88.0 (6b00bc388 2025-06-23)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250724/202507241752.gju4meHj-lkp@intel.com/reproduce)
+> And then further down I see this:
+>
+> 	/*
+> 	 * Currently KVM supports the full range of mandatory features defined
+> 	 * by version 2 of the GHCB protocol, so default to that for SEV-ES
+> 	 * guests created via KVM_SEV_INIT2.
+> 	 */
+> 	if (sev->es_active && !sev->ghcb_version)
+> 		sev->ghcb_version = GHCB_VERSION_DEFAULT;
+>
+> Rather than have a funky sequence with odd logic, set data->ghcb_version before
+> the SNP check.  We should also tweak the comment, because "Currently" implies
+> that KVM might *drop* support for mandatory features, and that definitely isn't
+> going to happen.  And because the reader shouldn't have to go look at sev_guest_init()
+> to understand what's special about KVM_SEV_INIT2.
+>
+> Lastly, I think we should open code '2' and drop GHCB_VERSION_DEFAULT, because:
+>
+>  - it's a conditional default
+>  - is not enumerated to userspace
+>  - changing GHCB_VERSION_DEFAULT will impact ABI and could break existing setups
+>  - will result in a stale if GHCB_VERSION_DEFAULT is modified
+>  - this new check makes me want to assert GHCB_VERSION_DEFAULT > 2
+>
+> As a result, if we combine all of the above, then we effectively end up with:
+>
+> 	if (es_active && !data->ghcb_version)
+> 		data->ghcb_version = GHCB_VERSION_DEFAULT;
+>
+> 	BUILD_BUG_ON(GHCB_VERSION_DEFAULT != 2);
+>
+> which is quite silly.
+>
+> So this?  Completely untested, and should probably be split over 2-3 patches.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202507241752.gju4meHj-lkp@intel.com/
+Sure, will test and send updated patches.
 
-All errors (new ones prefixed by >>):
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 2fbdebf79fbb..f068cd466ae3 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -37,7 +37,6 @@
+>  #include "trace.h"
+>  
+>  #define GHCB_VERSION_MAX       2ULL
+> -#define GHCB_VERSION_DEFAULT   2ULL
+>  #define GHCB_VERSION_MIN       1ULL
+>  
+>  #define GHCB_HV_FT_SUPPORTED   (GHCB_HV_FT_SNP | GHCB_HV_FT_SNP_AP_CREATION)
+> @@ -405,6 +404,7 @@ static int __sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp,
+>  {
+>         struct kvm_sev_info *sev = to_kvm_sev_info(kvm);
+>         struct sev_platform_init_args init_args = {0};
+> +       bool snp_active = vm_type == KVM_X86_SNP_VM;
+>         bool es_active = vm_type != KVM_X86_SEV_VM;
+>         u64 valid_vmsa_features = es_active ? sev_supported_vmsa_features : 0;
+>         int ret;
+> @@ -418,7 +418,18 @@ static int __sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp,
+>         if (data->vmsa_features & ~valid_vmsa_features)
+>                 return -EINVAL;
+>  
+> -       if (data->ghcb_version > GHCB_VERSION_MAX || (!es_active &&
+> data->ghcb_version))
 
->> arch/x86/kvm/svm/sev.c:2939:2: error: call to undeclared function 'cpuid'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-    2939 |         cpuid(0x8000001f, &eax, &ebx, &ecx, &edx);
-         |         ^
-   1 error generated.
+Any specific reason to get rid of the first check for GHCB_VERSION_MAX ?
 
+Newer QEMU with support for ghcb_version = 3 and older KVM hypervisor
+that still does not have say version 3 supported ?
 
-vim +/cpuid +2939 arch/x86/kvm/svm/sev.c
+> +       if (!es_active && data->ghcb_version)
+> +               return -EINVAL;
+> +
+> +       /*
+> +        * KVM supports the full range of mandatory features defined by version
+> +        * 2 of the GHCB protocol, so default to that for SEV-ES guests created
+> +        * via KVM_SEV_INIT2 (KVM_SEV_INIT forces version 1).
+> +        */
+> +       if (es_active && !data->ghcb_version)
+> +               data->ghcb_version = 2;
+> +
+> +       if (snp_active && data->ghcb_version < 2)
+>                 return -EINVAL;
 
-179a8427fcbffe Ashish Kalra          2025-05-12  2904  
-916391a2d1dc22 Tom Lendacky          2020-12-10  2905  void __init sev_hardware_setup(void)
-eaf78265a4ab33 Joerg Roedel          2020-03-24  2906  {
-7aef27f0b2a8a5 Vipin Sharma          2021-03-29  2907  	unsigned int eax, ebx, ecx, edx, sev_asid_count, sev_es_asid_count;
-6f1d5a3513c237 Ashish Kalra          2025-03-24  2908  	struct sev_platform_init_args init_args = {0};
-1dfe571c12cf99 Brijesh Singh         2024-05-01  2909  	bool sev_snp_supported = false;
-916391a2d1dc22 Tom Lendacky          2020-12-10  2910  	bool sev_es_supported = false;
-916391a2d1dc22 Tom Lendacky          2020-12-10  2911  	bool sev_supported = false;
-916391a2d1dc22 Tom Lendacky          2020-12-10  2912  
-80d0f521d59e08 Sean Christopherson   2023-08-24  2913  	if (!sev_enabled || !npt_enabled || !nrips)
-e8126bdaf19400 Sean Christopherson   2021-04-21  2914  		goto out;
-e8126bdaf19400 Sean Christopherson   2021-04-21  2915  
-c532f2903b69b7 Sean Christopherson   2022-01-20  2916  	/*
-c532f2903b69b7 Sean Christopherson   2022-01-20  2917  	 * SEV must obviously be supported in hardware.  Sanity check that the
-c532f2903b69b7 Sean Christopherson   2022-01-20  2918  	 * CPU supports decode assists, which is mandatory for SEV guests to
-770d6aa2e416fd Sean Christopherson   2023-10-18  2919  	 * support instruction emulation.  Ditto for flushing by ASID, as SEV
-770d6aa2e416fd Sean Christopherson   2023-10-18  2920  	 * guests are bound to a single ASID, i.e. KVM can't rotate to a new
-770d6aa2e416fd Sean Christopherson   2023-10-18  2921  	 * ASID to effect a TLB flush.
-c532f2903b69b7 Sean Christopherson   2022-01-20  2922  	 */
-c532f2903b69b7 Sean Christopherson   2022-01-20  2923  	if (!boot_cpu_has(X86_FEATURE_SEV) ||
-770d6aa2e416fd Sean Christopherson   2023-10-18  2924  	    WARN_ON_ONCE(!boot_cpu_has(X86_FEATURE_DECODEASSISTS)) ||
-770d6aa2e416fd Sean Christopherson   2023-10-18  2925  	    WARN_ON_ONCE(!boot_cpu_has(X86_FEATURE_FLUSHBYASID)))
-916391a2d1dc22 Tom Lendacky          2020-12-10  2926  		goto out;
-916391a2d1dc22 Tom Lendacky          2020-12-10  2927  
-44e70718df4fc2 Sean Christopherson   2025-02-10  2928  	/*
-44e70718df4fc2 Sean Christopherson   2025-02-10  2929  	 * The kernel's initcall infrastructure lacks the ability to express
-44e70718df4fc2 Sean Christopherson   2025-02-10  2930  	 * dependencies between initcalls, whereas the modules infrastructure
-44e70718df4fc2 Sean Christopherson   2025-02-10  2931  	 * automatically handles dependencies via symbol loading.  Ensure the
-44e70718df4fc2 Sean Christopherson   2025-02-10  2932  	 * PSP SEV driver is initialized before proceeding if KVM is built-in,
-44e70718df4fc2 Sean Christopherson   2025-02-10  2933  	 * as the dependency isn't handled by the initcall infrastructure.
-44e70718df4fc2 Sean Christopherson   2025-02-10  2934  	 */
-44e70718df4fc2 Sean Christopherson   2025-02-10  2935  	if (IS_BUILTIN(CONFIG_KVM_AMD) && sev_module_init())
-44e70718df4fc2 Sean Christopherson   2025-02-10  2936  		goto out;
-44e70718df4fc2 Sean Christopherson   2025-02-10  2937  
-916391a2d1dc22 Tom Lendacky          2020-12-10  2938  	/* Retrieve SEV CPUID information */
-916391a2d1dc22 Tom Lendacky          2020-12-10 @2939  	cpuid(0x8000001f, &eax, &ebx, &ecx, &edx);
-916391a2d1dc22 Tom Lendacky          2020-12-10  2940  
-1edc14599e06fd Tom Lendacky          2020-12-10  2941  	/* Set encryption bit location for SEV-ES guests */
-1edc14599e06fd Tom Lendacky          2020-12-10  2942  	sev_enc_bit = ebx & 0x3f;
-1edc14599e06fd Tom Lendacky          2020-12-10  2943  
-eaf78265a4ab33 Joerg Roedel          2020-03-24  2944  	/* Maximum number of encrypted guests supported simultaneously */
-916391a2d1dc22 Tom Lendacky          2020-12-10  2945  	max_sev_asid = ecx;
-8cb756b7bdcc6e Sean Christopherson   2021-04-21  2946  	if (!max_sev_asid)
-916391a2d1dc22 Tom Lendacky          2020-12-10  2947  		goto out;
-eaf78265a4ab33 Joerg Roedel          2020-03-24  2948  
-eaf78265a4ab33 Joerg Roedel          2020-03-24  2949  	/* Minimum ASID value that should be used for SEV guest */
-916391a2d1dc22 Tom Lendacky          2020-12-10  2950  	min_sev_asid = edx;
-d3d1af85e2c75b Brijesh Singh         2021-04-15  2951  	sev_me_mask = 1UL << (ebx & 0x3f);
-eaf78265a4ab33 Joerg Roedel          2020-03-24  2952  
-bb2baeb214a71c Mingwei Zhang         2021-08-02  2953  	/*
-bb2baeb214a71c Mingwei Zhang         2021-08-02  2954  	 * Initialize SEV ASID bitmaps. Allocate space for ASID 0 in the bitmap,
-bb2baeb214a71c Mingwei Zhang         2021-08-02  2955  	 * even though it's never used, so that the bitmap is indexed by the
-bb2baeb214a71c Mingwei Zhang         2021-08-02  2956  	 * actual ASID.
-bb2baeb214a71c Mingwei Zhang         2021-08-02  2957  	 */
-bb2baeb214a71c Mingwei Zhang         2021-08-02  2958  	nr_asids = max_sev_asid + 1;
-bb2baeb214a71c Mingwei Zhang         2021-08-02  2959  	sev_asid_bitmap = bitmap_zalloc(nr_asids, GFP_KERNEL);
-eaf78265a4ab33 Joerg Roedel          2020-03-24  2960  	if (!sev_asid_bitmap)
-916391a2d1dc22 Tom Lendacky          2020-12-10  2961  		goto out;
-eaf78265a4ab33 Joerg Roedel          2020-03-24  2962  
-bb2baeb214a71c Mingwei Zhang         2021-08-02  2963  	sev_reclaim_asid_bitmap = bitmap_zalloc(nr_asids, GFP_KERNEL);
-f31b88b35f90f6 Sean Christopherson   2021-04-21  2964  	if (!sev_reclaim_asid_bitmap) {
-f31b88b35f90f6 Sean Christopherson   2021-04-21  2965  		bitmap_free(sev_asid_bitmap);
-f31b88b35f90f6 Sean Christopherson   2021-04-21  2966  		sev_asid_bitmap = NULL;
-916391a2d1dc22 Tom Lendacky          2020-12-10  2967  		goto out;
-f31b88b35f90f6 Sean Christopherson   2021-04-21  2968  	}
-eaf78265a4ab33 Joerg Roedel          2020-03-24  2969  
-0aa6b90ef9d75b Ashish Kalra          2024-01-31  2970  	if (min_sev_asid <= max_sev_asid) {
-7aef27f0b2a8a5 Vipin Sharma          2021-03-29  2971  		sev_asid_count = max_sev_asid - min_sev_asid + 1;
-106ed2cad9f7bd Sean Christopherson   2023-06-06  2972  		WARN_ON_ONCE(misc_cg_set_capacity(MISC_CG_RES_SEV, sev_asid_count));
-0aa6b90ef9d75b Ashish Kalra          2024-01-31  2973  	}
-916391a2d1dc22 Tom Lendacky          2020-12-10  2974  	sev_supported = true;
-eaf78265a4ab33 Joerg Roedel          2020-03-24  2975  
-916391a2d1dc22 Tom Lendacky          2020-12-10  2976  	/* SEV-ES support requested? */
-8d364a0792dd95 Sean Christopherson   2021-04-21  2977  	if (!sev_es_enabled)
-916391a2d1dc22 Tom Lendacky          2020-12-10  2978  		goto out;
-916391a2d1dc22 Tom Lendacky          2020-12-10  2979  
-0c29397ac1fdd6 Sean Christopherson   2022-08-03  2980  	/*
-0c29397ac1fdd6 Sean Christopherson   2022-08-03  2981  	 * SEV-ES requires MMIO caching as KVM doesn't have access to the guest
-0c29397ac1fdd6 Sean Christopherson   2022-08-03  2982  	 * instruction stream, i.e. can't emulate in response to a #NPF and
-0c29397ac1fdd6 Sean Christopherson   2022-08-03  2983  	 * instead relies on #NPF(RSVD) being reflected into the guest as #VC
-0c29397ac1fdd6 Sean Christopherson   2022-08-03  2984  	 * (the guest can then do a #VMGEXIT to request MMIO emulation).
-0c29397ac1fdd6 Sean Christopherson   2022-08-03  2985  	 */
-0c29397ac1fdd6 Sean Christopherson   2022-08-03  2986  	if (!enable_mmio_caching)
-0c29397ac1fdd6 Sean Christopherson   2022-08-03  2987  		goto out;
-0c29397ac1fdd6 Sean Christopherson   2022-08-03  2988  
-916391a2d1dc22 Tom Lendacky          2020-12-10  2989  	/* Does the CPU support SEV-ES? */
-916391a2d1dc22 Tom Lendacky          2020-12-10  2990  	if (!boot_cpu_has(X86_FEATURE_SEV_ES))
-916391a2d1dc22 Tom Lendacky          2020-12-10  2991  		goto out;
-916391a2d1dc22 Tom Lendacky          2020-12-10  2992  
-d922056215617e Ravi Bangoria         2024-05-31  2993  	if (!lbrv) {
-d922056215617e Ravi Bangoria         2024-05-31  2994  		WARN_ONCE(!boot_cpu_has(X86_FEATURE_LBRV),
-d922056215617e Ravi Bangoria         2024-05-31  2995  			  "LBRV must be present for SEV-ES support");
-d922056215617e Ravi Bangoria         2024-05-31  2996  		goto out;
-d922056215617e Ravi Bangoria         2024-05-31  2997  	}
-d922056215617e Ravi Bangoria         2024-05-31  2998  
-916391a2d1dc22 Tom Lendacky          2020-12-10  2999  	/* Has the system been allocated ASIDs for SEV-ES? */
-916391a2d1dc22 Tom Lendacky          2020-12-10  3000  	if (min_sev_asid == 1)
-916391a2d1dc22 Tom Lendacky          2020-12-10  3001  		goto out;
-916391a2d1dc22 Tom Lendacky          2020-12-10  3002  
-7aef27f0b2a8a5 Vipin Sharma          2021-03-29  3003  	sev_es_asid_count = min_sev_asid - 1;
-106ed2cad9f7bd Sean Christopherson   2023-06-06  3004  	WARN_ON_ONCE(misc_cg_set_capacity(MISC_CG_RES_SEV_ES, sev_es_asid_count));
-916391a2d1dc22 Tom Lendacky          2020-12-10  3005  	sev_es_supported = true;
-1dfe571c12cf99 Brijesh Singh         2024-05-01  3006  	sev_snp_supported = sev_snp_enabled && cc_platform_has(CC_ATTR_HOST_SEV_SNP);
-916391a2d1dc22 Tom Lendacky          2020-12-10  3007  
-916391a2d1dc22 Tom Lendacky          2020-12-10  3008  out:
-179a8427fcbffe Ashish Kalra          2025-05-12  3009  	if (sev_enabled) {
-179a8427fcbffe Ashish Kalra          2025-05-12  3010  		init_args.probe = true;
-179a8427fcbffe Ashish Kalra          2025-05-12  3011  		if (sev_platform_init(&init_args))
-179a8427fcbffe Ashish Kalra          2025-05-12  3012  			sev_supported = sev_es_supported = sev_snp_supported = false;
-179a8427fcbffe Ashish Kalra          2025-05-12  3013  		else if (sev_snp_supported)
-179a8427fcbffe Ashish Kalra          2025-05-12  3014  			sev_snp_supported = is_sev_snp_initialized();
-179a8427fcbffe Ashish Kalra          2025-05-12  3015  	}
-179a8427fcbffe Ashish Kalra          2025-05-12  3016  
-6d1bc9754b0407 Alexander Mikhalitsyn 2023-05-22  3017  	if (boot_cpu_has(X86_FEATURE_SEV))
-6d1bc9754b0407 Alexander Mikhalitsyn 2023-05-22  3018  		pr_info("SEV %s (ASIDs %u - %u)\n",
-0aa6b90ef9d75b Ashish Kalra          2024-01-31  3019  			sev_supported ? min_sev_asid <= max_sev_asid ? "enabled" :
-0aa6b90ef9d75b Ashish Kalra          2024-01-31  3020  								       "unusable" :
-0aa6b90ef9d75b Ashish Kalra          2024-01-31  3021  								       "disabled",
-6d1bc9754b0407 Alexander Mikhalitsyn 2023-05-22  3022  			min_sev_asid, max_sev_asid);
-6d1bc9754b0407 Alexander Mikhalitsyn 2023-05-22  3023  	if (boot_cpu_has(X86_FEATURE_SEV_ES))
-6d1bc9754b0407 Alexander Mikhalitsyn 2023-05-22  3024  		pr_info("SEV-ES %s (ASIDs %u - %u)\n",
-800173cf7560e0 Thorsten Blum         2024-12-27  3025  			str_enabled_disabled(sev_es_supported),
-6d1bc9754b0407 Alexander Mikhalitsyn 2023-05-22  3026  			min_sev_asid > 1 ? 1 : 0, min_sev_asid - 1);
-1dfe571c12cf99 Brijesh Singh         2024-05-01  3027  	if (boot_cpu_has(X86_FEATURE_SEV_SNP))
-1dfe571c12cf99 Brijesh Singh         2024-05-01  3028  		pr_info("SEV-SNP %s (ASIDs %u - %u)\n",
-800173cf7560e0 Thorsten Blum         2024-12-27  3029  			str_enabled_disabled(sev_snp_supported),
-1dfe571c12cf99 Brijesh Singh         2024-05-01  3030  			min_sev_asid > 1 ? 1 : 0, min_sev_asid - 1);
-6d1bc9754b0407 Alexander Mikhalitsyn 2023-05-22  3031  
-8d364a0792dd95 Sean Christopherson   2021-04-21  3032  	sev_enabled = sev_supported;
-8d364a0792dd95 Sean Christopherson   2021-04-21  3033  	sev_es_enabled = sev_es_supported;
-1dfe571c12cf99 Brijesh Singh         2024-05-01  3034  	sev_snp_enabled = sev_snp_supported;
-1dfe571c12cf99 Brijesh Singh         2024-05-01  3035  
-d1f85fbe836e61 Alexey Kardashevskiy  2023-06-15  3036  	if (!sev_es_enabled || !cpu_feature_enabled(X86_FEATURE_DEBUG_SWAP) ||
-d1f85fbe836e61 Alexey Kardashevskiy  2023-06-15  3037  	    !cpu_feature_enabled(X86_FEATURE_NO_NESTED_DATA_BP))
-d1f85fbe836e61 Alexey Kardashevskiy  2023-06-15  3038  		sev_es_debug_swap_enabled = false;
-ac5c48027bacb1 Paolo Bonzini         2024-04-04  3039  
-ac5c48027bacb1 Paolo Bonzini         2024-04-04  3040  	sev_supported_vmsa_features = 0;
-ac5c48027bacb1 Paolo Bonzini         2024-04-04  3041  	if (sev_es_debug_swap_enabled)
-ac5c48027bacb1 Paolo Bonzini         2024-04-04  3042  		sev_supported_vmsa_features |= SVM_SEV_FEAT_DEBUG_SWAP;
-eaf78265a4ab33 Joerg Roedel          2020-03-24  3043  }
-eaf78265a4ab33 Joerg Roedel          2020-03-24  3044  
+Makes sense and is clear.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Thanks
+Nikunj
 
