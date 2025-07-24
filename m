@@ -1,128 +1,112 @@
-Return-Path: <kvm+bounces-53377-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53378-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43B9BB10B6D
-	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 15:31:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 827E0B10B71
+	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 15:31:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F050216FDEA
-	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 13:31:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D3D7188185B
+	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 13:32:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC3DD2D8DAF;
-	Thu, 24 Jul 2025 13:31:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B911726059F;
+	Thu, 24 Jul 2025 13:31:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KgeSm1Z7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4sBckWNT"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F31A28A405
-	for <kvm@vger.kernel.org>; Thu, 24 Jul 2025 13:31:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 958DC224F6
+	for <kvm@vger.kernel.org>; Thu, 24 Jul 2025 13:31:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753363874; cv=none; b=gReMr29LQ80xLx/n1jv1ujY+lSafwVesbKS1NmxZZe+aqpHyI/5QT81sZBo/BkHBVvuULZUQRbb3zRccB3lo7qUByFQGK3iEtGwny6jJ3zuxarCEEtchfTy8KCbT9rEWdHwFe+Xf12qvTgEwK5qpKdACRq8wlSas3I1C4+4d4T0=
+	t=1753363910; cv=none; b=m2Nc6jT2gfDSYzt579loXwz6X0xKXEoHeKVb09tmqKvtuBQUujumFLUDs6ZCea+xw8wmWLn9rUErFp4cwF55w86I9LERkTif15kvBltkzqYi0vUAhJNEjFHRbc1Jdjvm1ugN5vl8RI/XrzTN3BFE3NDJvmNIbfcAKJgGqF7OmD4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753363874; c=relaxed/simple;
-	bh=4pAtAMRcs6w3yL3fzNMtx8tTCvPRhIm4nLAtOrCeJrU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=i/PqN1/msVSo9H8wnXtP2UDt8rmvDn3737biOcUyfuDNOvosRxxhIrjdO3mcrnRZr+Uxp+5mtCKi65fpmWV+iKQgPuXd8gcq5SGp4pRyX6WdxbHuvmsho/PmGY6DPGAYLJS1StM0h3rn7fDkJj/rRmlvWb8Kgc2WtSB1vewKs7k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KgeSm1Z7; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1753363871;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4ujYQlYhO82BU6zkmwhTrZ/y116O7NG9CBxQOBqYTlY=;
-	b=KgeSm1Z7IXIhUxxlg0uxKRvxRlcc/SVfUo3JerhxERI5gkzqJf/1CDwsl5nd2y7ofdGa8g
-	n+wBxtTw2v9P/K4+koVeXa/zy4xg9Yq49kTHRETgeX6CpJLIgIFcCoNWEfT1G11aBux1rr
-	JnF6H9Y3qEDZbYIgj/cfo2GnXFN8PM4=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-149-WzBztbmQNo-W6YSnw81fBg-1; Thu,
- 24 Jul 2025 09:31:07 -0400
-X-MC-Unique: WzBztbmQNo-W6YSnw81fBg-1
-X-Mimecast-MFC-AGG-ID: WzBztbmQNo-W6YSnw81fBg_1753363865
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B691719560AA;
-	Thu, 24 Jul 2025 13:31:05 +0000 (UTC)
-Received: from thuth-p1g4.redhat.com (unknown [10.45.224.82])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E6E4430002C8;
-	Thu, 24 Jul 2025 13:31:02 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: kvm@vger.kernel.org,
-	=?UTF-8?q?Nico=20B=C3=B6hr?= <nrb@linux.ibm.com>
-Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	David Hildenbrand <david@redhat.com>,
-	linux-s390@vger.kernel.org
-Subject: [kvm-unit-tests RFC PATCH 3/3] scripts/arch-run.bash: Drop the dependency on "jq"
-Date: Thu, 24 Jul 2025 15:30:51 +0200
-Message-ID: <20250724133051.44045-4-thuth@redhat.com>
-In-Reply-To: <20250724133051.44045-1-thuth@redhat.com>
-References: <20250724133051.44045-1-thuth@redhat.com>
+	s=arc-20240116; t=1753363910; c=relaxed/simple;
+	bh=gJVEnKD+m86/Uy00KKGOC2HsXj1DksP0pHClj72P4RI=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=ghR3t/hZ4sOv2KSwQ0tvdZPRsAderG0wF3aZyjIGaBajz4JGdChZ1QIE7/KPgwYBM66WsrNM/ZPEQEbGCqEn4rVfE4DKrURRBIMdG9XHy+FLANBiujEGiNxJxo0K9eQpRbxzcezuo1onzMgAvOahIaisJaQkGkGAMLme2GMU/0k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4sBckWNT; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-740774348f6so1048910b3a.1
+        for <kvm@vger.kernel.org>; Thu, 24 Jul 2025 06:31:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1753363909; x=1753968709; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=n+//CxCRIZc81uvnzJthipR4khrLAZAMHtnmjaKkETc=;
+        b=4sBckWNTMET7dm4fucNTlZXCkUi0DMq+yr/O+N0Y3JVgx31NxhQTzktadiEzZV4V1k
+         jzAk3zEQsaX+s5P2g0at/p/Ym8d8nY064n9sVmZ5JdXKb521ER7Nqq1/cjQZWwyE+c+T
+         oTAEyeJz3oFT/LrxChc6z8hpFvzJ/IK2t6dPnAjtk7P5rvv7e6VAEbgTjtjV159L0DdX
+         e7UcKQkcEscPm/G88kkERgIo9sKjP93yaH8e09gZ6EVNuEgV15IJSSzvF4yrzpm1WvYh
+         cCvcsmfrXV+JCEb6CJ0Eu7y6sv7988vFS3M6yJ3f7kmAQHhEkdE5qPctz6kmmKVciDDH
+         7vWg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753363909; x=1753968709;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=n+//CxCRIZc81uvnzJthipR4khrLAZAMHtnmjaKkETc=;
+        b=YqDd77lUKHZhQeuvvrQ7CgUprAOeMFKTfkKi+HT2+RXch9+j6fFNUNKg9UlstnaYux
+         x4No6tLG8DaXa8kshKjW5rxXHjwjYBo9ZtSmkJ3K/0wfJFuuwtA6o/gozp5WazSv5lUp
+         /hapZRUYr/z4WUy+yLm1mJBHTClzqVjpiel/cejL+k33fj0HJkKH+l0WLbgG+FlnkCkf
+         zkUpCzFkFeGoR4CdYubtEcnzzgpO/oaneo/Q6yftr0uwRn4ob7eOTM6ESVy3ynNiQ0LW
+         nZeu+2fPmOSkRWtzeGDqxRo+9VavgTdA53HIQK7Q3k9qP96dS5bs7ymBgXMUQk/le3Of
+         mFzQ==
+X-Gm-Message-State: AOJu0Yy9bYmmPjwmgZoOJd5weESfqwatPNfCV2maJQ53JCIAiKl5SC1t
+	WmitSSvMh+nEfYWaWveXlpUOG1eAu1E37smrzdWFZ1B2Guklwkf260/Cgw2rHtVuJ8J9/lE8R+Z
+	hRVjIsQ==
+X-Google-Smtp-Source: AGHT+IHhPfyTLkgtMrtOM72kSjVGgRr+PyxLdwXo7qRQAzq2mFsE6l1xZorbTdGGRX+gMDUp6XZbhD1GIX0=
+X-Received: from pfbil10.prod.google.com ([2002:a05:6a00:8d4a:b0:746:1857:3be6])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:3a1c:b0:746:2591:e531
+ with SMTP id d2e1a72fcca58-760353f447fmr8854470b3a.12.1753363908737; Thu, 24
+ Jul 2025 06:31:48 -0700 (PDT)
+Date: Thu, 24 Jul 2025 06:31:47 -0700
+In-Reply-To: <eeec8f7d96b9dd9482a314b8ed81d3e26f6f6b9d.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Mime-Version: 1.0
+References: <20250704085027.182163-1-chao.gao@intel.com> <20250704085027.182163-2-chao.gao@intel.com>
+ <eeec8f7d96b9dd9482a314b8ed81d3e26f6f6b9d.camel@intel.com>
+Message-ID: <aII1w2zfPHN9yUwM@google.com>
+Subject: Re: [PATCH v11 01/23] KVM: x86: Rename kvm_{g,s}et_msr()* to show
+ that they emulate guest accesses
+From: Sean Christopherson <seanjc@google.com>
+To: Kai Huang <kai.huang@intel.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
+	Dave Hansen <dave.hansen@intel.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Chao Gao <chao.gao@intel.com>, 
+	"x86@kernel.org" <x86@kernel.org>, Weijiang Yang <weijiang.yang@intel.com>, 
+	Rick P Edgecombe <rick.p.edgecombe@intel.com>, "bp@alien8.de" <bp@alien8.de>, 
+	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "hpa@zytor.com" <hpa@zytor.com>, 
+	"john.allen@amd.com" <john.allen@amd.com>, "mingo@redhat.com" <mingo@redhat.com>, 
+	"tglx@linutronix.de" <tglx@linutronix.de>, "minipli@grsecurity.net" <minipli@grsecurity.net>, 
+	"mlevitsk@redhat.com" <mlevitsk@redhat.com>, "xin@zytor.com" <xin@zytor.com>
+Content-Type: text/plain; charset="us-ascii"
 
-From: Thomas Huth <thuth@redhat.com>
+On Thu, Jul 24, 2025, Kai Huang wrote:
+> On Fri, 2025-07-04 at 01:49 -0700, Chao Gao wrote:
+> > From: Yang Weijiang <weijiang.yang@intel.com>
+> > 
+> > Rename kvm_{g,s}et_msr()* to kvm_emulate_msr_{read,write}()* to make it
+> > more obvious that KVM uses these helpers to emulate guest behaviors,
+> > i.e., host_initiated == false in these helpers.
+> > 
+> > Suggested-by: Sean Christopherson <seanjc@google.com>
+> > Suggested-by: Chao Gao <chao.gao@intel.com>
+> > Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+> > Signed-off-by: Chao Gao <chao.gao@intel.com>
+> > Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > Reviewed-by: Chao Gao <chao.gao@intel.com>
+> 
+> Nit: I don't think your Reviewed-by is needed if the chain already has
+> your SoB?
 
-For checking whether a panic event occurred, a simple "grep"
-for the related text in the output is enough - it's very unlikely
-that the output of QEMU will change. This way we can drop the
-dependency on the program "jq" which might not be installed on
-some systems.
-
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- Marked as "RFC" since I'm a little bit torn here - on the one side,
- it's great to get rid of a dependency, on the other side, using
- grep might be a little bit less robust in case QEMU ever changes
- the layout of it's QMP output...
-
- scripts/arch-run.bash | 8 +-------
- 1 file changed, 1 insertion(+), 7 deletions(-)
-
-diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
-index 58e4f93f..5abf2626 100644
---- a/scripts/arch-run.bash
-+++ b/scripts/arch-run.bash
-@@ -287,11 +287,6 @@ do_migration ()
- 
- run_panic ()
- {
--	if ! command -v jq >/dev/null 2>&1; then
--		echo "${FUNCNAME[0]} needs jq" >&2
--		return 77
--	fi
--
- 	trap 'trap - TERM ; kill 0 ; exit 2' INT TERM
- 	trap 'rm -f ${qmp}.in ${qmp}.out' RETURN EXIT
- 
-@@ -303,8 +298,7 @@ run_panic ()
- 		-mon chardev=mon,mode=control -S &
- 	echo '{ "execute": "qmp_capabilities" }{ "execute": "cont" }' > ${qmp}.in
- 
--	panic_event_count=$(jq -c 'select(.event == "GUEST_PANICKED")' < ${qmp}.out | wc -l)
--	if [ "$panic_event_count" -lt 1 ]; then
-+	if ! grep -q '"event": "GUEST_PANICKED"' ${qmp}.out ; then
- 		echo "FAIL: guest did not panic"
- 		ret=3
- 	else
--- 
-2.50.1
-
+Keep the Reviewed-by, it's still useful, e.g. to communicate that Chao has done
+more than just shepherd the patch along.
 
