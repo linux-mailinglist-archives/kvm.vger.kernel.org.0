@@ -1,56 +1,59 @@
-Return-Path: <kvm+bounces-53398-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53399-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BE99B111CB
-	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 21:37:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FEFEB111CE
+	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 21:37:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D8F4545DBE
-	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 19:37:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D04A85462E4
+	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 19:37:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 819C12ED878;
-	Thu, 24 Jul 2025 19:37:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABDE52EE5FF;
+	Thu, 24 Jul 2025 19:37:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="cYl1dvB1";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="EvmjGrF6"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Mrh5O04f";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="1NzEzFLO"
 X-Original-To: kvm@vger.kernel.org
 Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEA202222D2;
-	Thu, 24 Jul 2025 19:37:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67B7D2EE27C;
+	Thu, 24 Jul 2025 19:37:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753385833; cv=none; b=XlKyOv+awwU34IDPsAMWl3csIiR9eOPqlQJyUY+TT5COFbE92D33UfUDILSd+wiwWBHQ6E9osKGpRe4fQw7krV9m+YdVPqV84IUuQVIskCIcR5QDptaKiz+G5ZGk8ALuHNW6K4fqvVf2oOotD/Gfao5WVRwutIDZ48g8dZWGKfI=
+	t=1753385836; cv=none; b=ABWzjYbE1libtTBjoLgl/flFjk53wsVzcowr/jm23xgPAQAbWth6w8PgcLPeL+TcW9BGRqgf9z6cNXuvCUYpBhvhRlJqLoYl+k84h188JCG4BrrtfAjsz6tqXMRNFlUp5E6F5ryXVNnhq7Utw+/mBlVKdg9kJ9MX7f7f9s0Q1cE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753385833; c=relaxed/simple;
-	bh=rimyPGOBMM+/dAxSAXftc1FyEGAkBQzHcsks5F+tNPo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=q+jmfvO4+0nSFO/Nc0QqVsMs2Ftg7Ta2XUCNJ3XfuOovfOHGA8Jb5Yi8wMqam7KUN/HTGM8N9scoaPVSjAJYysueXGyWriYmPKR9V83QQIcz4FbzIs4sOqrRkxhC5OVFJnRsbe+H8ZYAzNr7d/04Oo3w6SCgBP2wcZ/R58IaR0c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=cYl1dvB1; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=EvmjGrF6; arc=none smtp.client-ip=193.142.43.55
+	s=arc-20240116; t=1753385836; c=relaxed/simple;
+	bh=SYRZmFM3Ioa0y0H9EeRaz2/V19DLQSJh6KQlg7ks8hM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=qJSt6RtEXTJL78l3Xm2Gmuhob3W23AoBNtSr7uRUQ3iKACPFQc0W/f+AzupEue7z0SbX3CPRf3k/TA8i9z1CQI19scTlH+g8jztlVWBdwG09U0/PrbdJ18f7VI7KecGs4BhXz5Mfe1huU1RnDXDmzKrgaP82kOsIMQJsRBC1MXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Mrh5O04f; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=1NzEzFLO; arc=none smtp.client-ip=193.142.43.55
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 From: "Ahmed S. Darwish" <darwi@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1753385829;
+	s=2020; t=1753385833;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=eHQ2RHfcvwxy8vm9mbxCQ6Vn2x/jJIz20zqmzhWlW6g=;
-	b=cYl1dvB1zaJq0SPOQiY0MyuvCzKF8midYXBjUCkvMuUJMV44NWKHdIeHCJV8c5NzFiJpFb
-	4xpiXbbzmmaD62WjVFK4xwKYj9qlUqorMKrj9noVVrNp3mtNFe5w21pkqn1Q1f44evoJm0
-	ENO0ASeEU2bteb/UwsJtaRTpaOixZdgvJ/bx7sNZctxj8lTrXTNJ/uqTCjuQs7qD49LFrI
-	N8YOykM44Rhhd0MSnR8PJVYszaIhNj+olF2vXo3OS5UvIH3FNabYB6Zy7KP+6SlXYmfbeX
-	u7h4NG18ynM0LeSjc/KWiMoux9d3Bh7jtIVOYfFKONJzDR4kU/8y+N+Varukow==
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=d8Xp1mFPuuaOTq+ytYDakiRoJMAib8ShAL5vVh6jiIQ=;
+	b=Mrh5O04fdrJojbS6a5+KI0UYwEDw0aKCClaOxLP6ncoAntRTT8JLB97iIpcHaOyf304HlF
+	t/7SSiHm3LFgrte61IqSy2FC7JfWR10wypsCMrxYp2HVzpL7M/wSG0TJGiOfDLxAQD5G3o
+	+6IeLWujv7hknrUwrXbq+qLPxf61OKw8psv8iGw+DjjO2emAnW2DFrvz4cMdgCK1wReFbX
+	v/jEDA/VnfEvewDR2Yy1Ek6HXKAGHc1cgiZpPkDY8R0Zd7df675i0kukzW6sNpWu6YDLE0
+	RAdkA0S8x0ghwwemX4XfSzb6wsEZJkNQwSWCQfQoDIHSrxzyXclEat40GA2rgA==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1753385829;
+	s=2020e; t=1753385833;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=eHQ2RHfcvwxy8vm9mbxCQ6Vn2x/jJIz20zqmzhWlW6g=;
-	b=EvmjGrF6ylqITuhL2McCod39r3h4iApN7PGlJtmp6j4QZnyzClZH/ma7oc4B4Ni8tMuB+g
-	1Kkl+LQBtVkvX7CA==
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=d8Xp1mFPuuaOTq+ytYDakiRoJMAib8ShAL5vVh6jiIQ=;
+	b=1NzEzFLOT5f3Hs14tWbBaRXmf9yVLEejoJJXYuk9itDRRk6OPujSMvyfBPH5+JUZqtaKpu
+	KKCpz2Sj3P4gbDAw==
 To: Borislav Petkov <bp@alien8.de>,
 	Ingo Molnar <mingo@redhat.com>,
 	Dave Hansen <dave.hansen@linux.intel.com>
@@ -68,278 +71,49 @@ Cc: Thomas Gleixner <tglx@linutronix.de>,
 	x86-cpuid@lists.linux.dev,
 	LKML <linux-kernel@vger.kernel.org>,
 	"Ahmed S. Darwish" <darwi@linutronix.de>
-Subject: [PATCH v5 0/4] x86: Disentangle <asm/processor.h> dependency on CPUID headers
-Date: Thu, 24 Jul 2025 21:37:01 +0200
-Message-ID: <20250724193706.35896-1-darwi@linutronix.de>
+Subject: [PATCH v5 1/4] x86/cpuid: Remove transitional <asm/cpuid.h> header
+Date: Thu, 24 Jul 2025 21:37:02 +0200
+Message-ID: <20250724193706.35896-2-darwi@linutronix.de>
+In-Reply-To: <20250724193706.35896-1-darwi@linutronix.de>
+References: <20250724193706.35896-1-darwi@linutronix.de>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Hi,
+All CPUID call sites were updated at commit:
 
-This series stops <asm/processor.h> from including <asm/cpuid/api.h>
-since there is no code at the former which needs the latter.
+    968e30006807 ("x86/cpuid: Set <asm/cpuid/api.h> as the main CPUID header")
 
-For this to work, modify all CPUID call sites that implicitly include the
-CPUID <asm/cpuid/api.h> header to explicitly include it instead.
+to include <asm/cpuid/api.h> instead of <asm/cpuid.h>.
 
-Note, this allows the CPUID API header to include <asm/processor.h>
-without inducing a circular dependency — which is needed for the upcoming
-CPUID model and parser.
+The <asm/cpuid.h> header was still retained as a wrapper, just in case
+some new code in -next started using it.  Now that everything is merged
+to Linus' tree, remove the header.
 
-
-Changelog v5
-~~~~~~~~~~~~
-
-Fix a left-over call-site (arch/x86/kvm/svm/sev.c) after the alphabetical
-reorderings removal.
-
-
-Changelog v4
-~~~~~~~~~~~~
-
-( [PATCH v4 0/4] x86: Disentangle <asm/processor.h> dependency on CPUID headers
-  https://lore.kernel.org/lkml/20250723173644.33568-1-darwi@linutronix.de )
-
-Per feedback at:
-
-    https://lore.kernel.org/lkml/aH-dqcMWj3cFDos2@google.com
-
-Remove the two patches doing the include lines alphabetical and section
-reorderings.
-
-I leave it to the maintainers to merge this version or v3: highest
-priority is to just disentangle the headers dependency, to keep the CPUID
-work going.
-
-
-Changelog v3
-~~~~~~~~~~~~
-
-( [PATCH v3 0/6] x86: Disentangle <asm/processor.h> dependency on CPUID headers
-  https://lore.kernel.org/lkml/20250722065448.413503-1-darwi@linutronix.de )
-
-* For the KVM CPUID call sites:
-
-    arch/x86/kvm/mmu/mmu.c
-    arch/x86/kvm/svm/sev.c
-    arch/x86/kvm/svm/svm.c
-    arch/x86/kvm/vmx/pmu_intel.c
-    arch/x86/kvm/vmx/sgx.c
-    arch/x86/kvm/vmx/vmx.c
-
-  Let them explicitly include <asm/cpuid/api.h> instead of letting their
-  internal arch/x86/kvm/cpuid.h header does it.  The latter header does
-  not need the former, so making it include a itnot just for the sake of
-  its call sites was not correct.
-
-* While at it, modify /all/ call sites that use the CPUID API to
-  explicitly include <asm/cpuid/api.h>.
-
-  Previous iterations only modified the CPUID call sites which implicitly
-  included the CPUID headers through <asm/processor.h>.  Since we're at
-  it anyway, there's no reason not to complete the task across the whole
-  kernel tree.
-
-  Thus, also convert below arch/x86/ sites:
-
-    arch/x86/kernel/apic/apic.c
-    arch/x86/kernel/cpu/sgx/driver.c
-    arch/x86/kernel/cpu/vmware.c
-    arch/x86/kernel/jailhouse.c
-    arch/x86/kernel/kvm.c
-    arch/x86/mm/pti.c
-    arch/x86/pci/xen.c
-    arch/x86/xen/enlighten_hvm.c
-    arch/x86/xen/pmu.c
-    arch/x86/xen/time.c
-
-  and below drivers/ sites:
-
-    drivers/gpu/drm/gma500/mmu.c
-    drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
-    drivers/ras/amd/fmpm.c
-    drivers/virt/acrn/hsm.c
-    drivers/xen/events/events_base.c
-    drivers/xen/grant-table.c
-    drivers/xen/xenbus/xenbus_xs.c
-
-  to explicitly include the CPUID API header.
-
-* Fix the v2 i386 compilation error:
-
-    https://lore.kernel.org/x86-cpuid/202507150403.hKKg9xjJ-lkp@intel.com
-
-  by making drivers/char/agp/efficeon-agp.c explicitly include the CPUID
-  API.
-
-* Make sure that an "i386 allyesconfig" build is successful this time.
-
-* Based on v6.16-rc7.
-
-
-Changelog v2
-~~~~~~~~~~~~
-
-( [PATCH v2 0/6] x86: Disentangle <asm/processor.h> dependency on CPUID headers
-  https://lore.kernel.org/lkml/20250709203033.90125-1-darwi@linutronix.de )
-
-Remove the <asm/cpuid/types.h> include from <asm/processor.h> since only
-the upcoming CPUID model needed that — not current mainline code.  That
-include was kept in v1, by mistake, because this series was originally
-part of the CPUID model patch queue.
-
-Due to the CPUID types include remove above, let
-arch/x86/kvm/reverse_cpuid.h include <asm/cpuid/types.h> since it
-references the CPUID_EAX..EDX macros.  At this series v1, the KVM header
-implicitly included such CPUID types header through <asm/cpufeature.h>,
-through <asm/processor.h>.
-
-Drop the "x86/cpuid: Rename cpuid_leaf()/cpuid_subleaf() APIs" patch from
-this series.  After a second look, it should be part of the CPUID model
-PQ instead.
-
-
-Changelog v1
-~~~~~~~~~~~~
-
-( [PATCH v1 0/7] x86: Disentangle <asm/processor.h> dependency on CPUID APIs
-  https://lore.kernel.org/lkml/20250612234010.572636-1-darwi@linutronix.de )
-
-This series avoids including the full CPUID API from <asm/processor.h>.
-That header only needs the CPUID data types and not the full API.
-
-Let <asm/processor.h> include <asm/cpuid/types.h> instead of
-<asm/cpuid/api.h>.
-
-Modify all CPUID call sites which implicitly included the CPUID API
-though <asm/processor.h> to explicitly include <asm/cpuid/api.h> instead.
-
-This work prepares for an upcoming v4 of the CPUID model:
-
-    [PATCH v3 00/44] x86: Introduce a centralized CPUID data model
-    https://lore.kernel.org/lkml/20250612234010.572636-1-darwi@linutronix.de
-
-where <asm/cpuid/api.h> needs to include <asm/processor.h>, thus creating
-a circular dependency if not resolved beforehand…  Patches 1->19 of the
-v3 above had parts of this series circular dependency disentanglement.
-
-Per Boris' remarks above, merge the header includes reorderings into two
-patches only: one patch for x86 and one for drivers.
-
-The 0-day bot x86-32 compilation error:
-
-    Re: [PATCH v3 41/44] x86/cpu: <asm/processor.h>: Do not include CPUID…
-    https://lore.kernel.org/lkml/202506132039.imS2Pflx-lkp@intel.com
-
-is also fixed in this series.
-
-Beside the call sites converted at CPUID model v3 above, this series also
-switches below files:
-
-    arch/x86/kernel/cpu/microcode/core.c
-    arch/x86/kernel/cpu/microcode/intel.c
-    arch/x86/kernel/cpu/mshyperv.c
-    drivers/cpufreq/longrun.c
-    drivers/cpufreq/powernow-k7.c
-    drivers/cpufreq/powernow-k8.c
-
-to explicitly include <asm/cpuid/api.h>.
-
-Based on v6.16-rc5.
-
-Thanks!
-
-8<----
-
-Ahmed S. Darwish (4):
-  x86/cpuid: Remove transitional <asm/cpuid.h> header
-  ASoC: Intel: avs: Include CPUID header at file scope
-  treewide: Explicitly include the x86 CPUID headers
-  x86/cpu: <asm/processor.h>: Do not include the CPUID API header
-
- arch/x86/boot/compressed/pgtable_64.c         |  1 +
- arch/x86/boot/startup/sme.c                   |  1 +
- arch/x86/coco/tdx/tdx.c                       |  1 +
- arch/x86/events/amd/core.c                    |  2 ++
- arch/x86/events/amd/ibs.c                     |  1 +
- arch/x86/events/amd/lbr.c                     |  2 ++
- arch/x86/events/amd/power.c                   |  3 +++
- arch/x86/events/amd/uncore.c                  |  1 +
- arch/x86/events/intel/core.c                  |  1 +
- arch/x86/events/intel/lbr.c                   |  1 +
- arch/x86/events/zhaoxin/core.c                |  1 +
- arch/x86/include/asm/acrn.h                   |  2 ++
- arch/x86/include/asm/cpuid.h                  |  8 ------
- arch/x86/include/asm/microcode.h              |  1 +
- arch/x86/include/asm/processor.h              |  1 -
- arch/x86/include/asm/xen/hypervisor.h         |  1 +
- arch/x86/kernel/apic/apic.c                   |  1 +
- arch/x86/kernel/cpu/amd.c                     |  1 +
- arch/x86/kernel/cpu/centaur.c                 |  1 +
- arch/x86/kernel/cpu/hygon.c                   |  1 +
- arch/x86/kernel/cpu/mce/core.c                |  1 +
- arch/x86/kernel/cpu/mce/inject.c              |  1 +
- arch/x86/kernel/cpu/microcode/amd.c           |  1 +
- arch/x86/kernel/cpu/microcode/core.c          |  1 +
- arch/x86/kernel/cpu/microcode/intel.c         |  1 +
- arch/x86/kernel/cpu/mshyperv.c                |  1 +
- arch/x86/kernel/cpu/resctrl/core.c            |  1 +
- arch/x86/kernel/cpu/resctrl/monitor.c         |  1 +
- arch/x86/kernel/cpu/scattered.c               |  1 +
- arch/x86/kernel/cpu/sgx/driver.c              |  3 +++
- arch/x86/kernel/cpu/sgx/main.c                |  3 +++
- arch/x86/kernel/cpu/topology_amd.c            |  1 +
- arch/x86/kernel/cpu/topology_common.c         |  1 +
- arch/x86/kernel/cpu/topology_ext.c            |  1 +
- arch/x86/kernel/cpu/transmeta.c               |  3 +++
- arch/x86/kernel/cpu/vmware.c                  |  1 +
- arch/x86/kernel/cpu/zhaoxin.c                 |  1 +
- arch/x86/kernel/cpuid.c                       |  1 +
- arch/x86/kernel/jailhouse.c                   |  1 +
- arch/x86/kernel/kvm.c                         |  1 +
- arch/x86/kernel/paravirt.c                    |  1 +
- arch/x86/kvm/mmu/mmu.c                        |  1 +
- arch/x86/kvm/mmu/spte.c                       |  1 +
- arch/x86/kvm/reverse_cpuid.h                  |  2 ++
- arch/x86/kvm/svm/sev.c                        |  1 +
- arch/x86/kvm/svm/svm.c                        |  1 +
- arch/x86/kvm/vmx/pmu_intel.c                  |  1 +
- arch/x86/kvm/vmx/sgx.c                        |  1 +
- arch/x86/kvm/vmx/vmx.c                        |  1 +
- arch/x86/mm/pti.c                             |  1 +
- arch/x86/pci/xen.c                            |  2 +-
- arch/x86/xen/enlighten_hvm.c                  |  1 +
- arch/x86/xen/pmu.c                            |  1 +
- arch/x86/xen/time.c                           |  1 +
- drivers/char/agp/efficeon-agp.c               |  1 +
- drivers/cpufreq/longrun.c                     |  1 +
- drivers/cpufreq/powernow-k7.c                 |  2 +-
- drivers/cpufreq/powernow-k8.c                 |  1 +
- drivers/cpufreq/speedstep-lib.c               |  1 +
- drivers/firmware/efi/libstub/x86-5lvl.c       |  1 +
- drivers/gpu/drm/gma500/mmu.c                  |  2 ++
- drivers/hwmon/fam15h_power.c                  |  1 +
- drivers/hwmon/k10temp.c                       |  2 ++
- drivers/hwmon/k8temp.c                        |  1 +
- .../net/ethernet/stmicro/stmmac/dwmac-intel.c |  1 +
- drivers/ras/amd/fmpm.c                        |  1 +
- drivers/thermal/intel/intel_hfi.c             |  1 +
- drivers/thermal/intel/x86_pkg_temp_thermal.c  |  1 +
- drivers/virt/acrn/hsm.c                       |  1 +
- drivers/xen/events/events_base.c              |  1 +
- drivers/xen/grant-table.c                     |  1 +
- drivers/xen/xenbus/xenbus_xs.c                |  3 +++
- sound/soc/intel/avs/tgl.c                     | 25 ++++++++++++-------
- 73 files changed, 102 insertions(+), 20 deletions(-)
+Signed-off-by: Ahmed S. Darwish <darwi@linutronix.de>
+---
+ arch/x86/include/asm/cpuid.h | 8 --------
+ 1 file changed, 8 deletions(-)
  delete mode 100644 arch/x86/include/asm/cpuid.h
 
-base-commit: 89be9a83ccf1f88522317ce02f854f30d6115c41
+diff --git a/arch/x86/include/asm/cpuid.h b/arch/x86/include/asm/cpuid.h
+deleted file mode 100644
+index d5749b25fa10..000000000000
+--- a/arch/x86/include/asm/cpuid.h
++++ /dev/null
+@@ -1,8 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-
+-#ifndef _ASM_X86_CPUID_H
+-#define _ASM_X86_CPUID_H
+-
+-#include <asm/cpuid/api.h>
+-
+-#endif /* _ASM_X86_CPUID_H */
 -- 
 2.50.1
 
