@@ -1,84 +1,94 @@
-Return-Path: <kvm+bounces-53373-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53374-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F2D4B10B54
-	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 15:25:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B890B10B68
+	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 15:31:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F72D3A38F3
-	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 13:24:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 88245176BB4
+	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 13:31:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FCBA2D9783;
-	Thu, 24 Jul 2025 13:24:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EBA32D5C6B;
+	Thu, 24 Jul 2025 13:31:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iXMPixcq"
 X-Original-To: kvm@vger.kernel.org
-Received: from relay.hostedemail.com (smtprelay0017.hostedemail.com [216.40.44.17])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76EA92D641C;
-	Thu, 24 Jul 2025 13:24:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AF32262FE9
+	for <kvm@vger.kernel.org>; Thu, 24 Jul 2025 13:31:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753363494; cv=none; b=i8S3jL4l4Y/Ow+d2AAyoyNluhc07oUpSNBDi46opsj42VIVUWtsIiOXGpuwenyTWhNvYUo4uye9yeleUChGBdQxw3MMhWHVPeGhAdyofXqORlN49P1AuQL8/Abnl9zVit7XoCtmrNlFw4+11RK6G74n9imtf7Sz+JHr3X4I3ltQ=
+	t=1753363866; cv=none; b=LpNIK/gGc0eqix3G0n4UBRnPxV/jv4SbFQUOVMN6ZhSLrk0R+AasKKPUY8LSK0tDGqOYJY0N5KEQaDR5T23/nVcEPG4iadyaNFksX/HbmbYkW299Z10ad3AcLnqc1tCjwNWcbgKJ67zSoZqVDURch9SNgxRySc2ScNU5tWiLjSY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753363494; c=relaxed/simple;
-	bh=T0NQMfH/DqrpVZn61hgP3A1tKXJJh/zk0upUoo9/olU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BGL8eOBd62QseHStQWgbQjUhDmjAxzI6l84pugzq0swfAzaXx4BvWAqwsyBdiI7hkWRu7g95BYQ44bxi9pG9bqQfkcIoM7BeCN7EMlC9VcKgcseCuQo6bnPmjXyGqjqBNC7OZgIG4W/ubPOqBIrJsQ+ZdI6snICfjZsVs/f8pXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=goodmis.org; spf=pass smtp.mailfrom=goodmis.org; arc=none smtp.client-ip=216.40.44.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=goodmis.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=goodmis.org
-Received: from omf08.hostedemail.com (a10.router.float.18 [10.200.18.1])
-	by unirelay05.hostedemail.com (Postfix) with ESMTP id B2CBA57998;
-	Thu, 24 Jul 2025 13:24:50 +0000 (UTC)
-Received: from [HIDDEN] (Authenticated sender: rostedt@goodmis.org) by omf08.hostedemail.com (Postfix) with ESMTPA id 862D820027;
-	Thu, 24 Jul 2025 13:24:48 +0000 (UTC)
-Date: Thu, 24 Jul 2025 09:24:48 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-To: Huacai Chen <chenhuacai@kernel.org>
-Cc: Bibo Mao <maobibo@loongson.cn>, LKML <linux-kernel@vger.kernel.org>,
- Linux Trace Kernel <linux-trace-kernel@vger.kernel.org>,
- kvm@vger.kernel.org, loongarch@lists.linux.dev, Tianrui Zhao
- <zhaotianrui@loongson.cn>, Paolo Bonzini <pbonzini@redhat.com>, Masami
- Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers
- <mathieu.desnoyers@efficios.com>
-Subject: Re: [PATCH] LoongArch: KVM: Move kvm_iocsr tracepoint out of
- generic code
-Message-ID: <20250724092448.4e84a589@batman.local.home>
-In-Reply-To: <CAAhV-H4TGus35B6ONdkSOMwWw+H6NRmHStV-Xu7vUYYrkDGfUQ@mail.gmail.com>
-References: <20250722094734.4920545b@gandalf.local.home>
-	<2c2f5036-c3ae-3904-e940-8a8b71a65957@loongson.cn>
-	<20250723214659.064b5d4a@gandalf.local.home>
-	<15e46f69-f270-0520-1ad4-874448439d2b@loongson.cn>
-	<CAAhV-H4TGus35B6ONdkSOMwWw+H6NRmHStV-Xu7vUYYrkDGfUQ@mail.gmail.com>
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1753363866; c=relaxed/simple;
+	bh=k9gAyqzok4sTUtsAlTBlX+YJidX+nmDzcjoqbBXlurs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=a/CM/Kfuso/4zHd7XIqIZO8kNuk2lzYzVIQKm5xuT9vGBRUEBs1ZFp8XQWRazVrxKnxA55Wj8KOUpwcRCN8mpbvQnMbOJTGOx8c7gFYvDPg7JHEOl/u07a8opo3swRJXLta8FCXP1dkmJQw6WvE+KHBkPsW/Qil6llkM09VisPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iXMPixcq; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1753363860;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=uh6BZwyJXcSYQ1q1apdUOd5VW0oyNqWbdqse1odGKyE=;
+	b=iXMPixcqtcSsX7KYGh96K8rVIIJI6DZeJqf7JCvET4G6KduuzwBCRachZzcqP1JmxAOEof
+	0fguVJo9U7IiPyH0hoRKgEcGYAe4az7W9ZzJZW9/voLVeVtKURwumQBrF5VrLWJRSxssRV
+	d7+chZ3csSXzIXy/cRPgu6guhQmAGHw=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-33-eOIwZvrxM1merg-WiKMiDA-1; Thu,
+ 24 Jul 2025 09:30:58 -0400
+X-MC-Unique: eOIwZvrxM1merg-WiKMiDA-1
+X-Mimecast-MFC-AGG-ID: eOIwZvrxM1merg-WiKMiDA_1753363856
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9145D1800446;
+	Thu, 24 Jul 2025 13:30:56 +0000 (UTC)
+Received: from thuth-p1g4.redhat.com (unknown [10.45.224.82])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 82693300018D;
+	Thu, 24 Jul 2025 13:30:53 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: kvm@vger.kernel.org,
+	=?UTF-8?q?Nico=20B=C3=B6hr?= <nrb@linux.ibm.com>
+Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	David Hildenbrand <david@redhat.com>,
+	linux-s390@vger.kernel.org
+Subject: [kvm-unit-tests PATCH 0/3] Improvements for the s390x panic-loop tests
+Date: Thu, 24 Jul 2025 15:30:48 +0200
+Message-ID: <20250724133051.44045-1-thuth@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Stat-Signature: fsfq8fom3zkmdm9cdzbnigwb7rn7crff
-X-Rspamd-Server: rspamout05
-X-Rspamd-Queue-Id: 862D820027
-X-Session-Marker: 726F737465647440676F6F646D69732E6F7267
-X-Session-ID: U2FsdGVkX185VQoLRm2vHT9R8dOyJNENrA6l4lO0Hn8=
-X-HE-Tag: 1753363488-726373
-X-HE-Meta: U2FsdGVkX1/2c1GOg2tcWnG2jdUemls9M8cVSFYKczaUEjC/q8AVOj0+I1EaJa1zGAru4N2VRbp6kPuVtaXrjRsBPYiReIutr9e/nimNwRf9tFn2cTbWfqJazdFSrE1wEaWMB32p27VQ9AfcmbYT6ODMFZpyNXvb8ToR8QsdFxdFXStDla55hnSA7S9KQiZYRDbcxGx2CmQLdqHSiN2wcfQAcLoZXXEyqZHFNa+zLEd2ZE0ksbsJk97OeVkyuKQEA9ZBJmhx8kIZOOsRP/8hMePRZNWH5BR3wgn0E6GmNc1h69TrTntsBdt4AskxGwYhMdZr7ppp9s1SjbOs6hHv75EPs7Fbpkv0TrrVCPLNAMjUSajsXnnzCA==
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Thu, 24 Jul 2025 19:56:42 +0800
-Huacai Chen <chenhuacai@kernel.org> wrote:
+The panic-loop tests sometimes fail in our downstream CI. The first
+patch fixes this issue. While we're at it, add the tests to the
+upstream CI, too (second patch). The third patch is a RFC: Is it ok
+to drop our dependecy on "jq" for these tests by replacing it with "grep"?
 
-> > > Should this go through the loongarch tree or should I take it?  
-> > Huacai,
-> >
-> > What is your point about this?  
-> I will take it, thanks.
+Thomas Huth (3):
+  s390x: Fix unreliable panic-loop tests
+  .gitlab-ci.yml: Add the s390x panic-loop tests to the CI
+  scripts/arch-run.bash: Drop the dependency on "jq"
 
-Great! Thanks Huacai and Bibo,
+ .gitlab-ci.yml        |  2 ++
+ scripts/arch-run.bash | 27 +++++----------------------
+ 2 files changed, 7 insertions(+), 22 deletions(-)
 
--- Steve
+-- 
+2.50.1
+
 
