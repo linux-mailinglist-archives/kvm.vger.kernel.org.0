@@ -1,184 +1,120 @@
-Return-Path: <kvm+bounces-53390-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53391-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91E79B1110C
-	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 20:42:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C236B1115A
+	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 21:04:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6796B1890B2E
-	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 18:42:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 83C115A73C4
+	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 19:04:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D31AB2EBDD5;
-	Thu, 24 Jul 2025 18:41:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A14B23F41F;
+	Thu, 24 Jul 2025 19:04:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eTEI8MNE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Gt+5XrEP"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8DFB26CE2A;
-	Thu, 24 Jul 2025 18:41:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA04F1F4C99
+	for <kvm@vger.kernel.org>; Thu, 24 Jul 2025 19:04:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753382500; cv=none; b=jsKZbllEe/TZatBzXw1xXnZg2Keb76xMahTmaC4XkCUgBaS8de+3Z5yPXiVUgziIPacG03J9a7J/3OMtBA3y0L+vMPiK90pA7rPFt7a7RPzQsWEeTSnbVXsxXIG7vdjQtSI5OvmUYgvZoqgjBnYEAm3eHnRFQ4kWwZpH2EnJzPA=
+	t=1753383863; cv=none; b=SNqOToFWbRLZZ5USELzyUjIpbVe/lp/tAeUntrZhxgB7Fq60yOahBx7EAT4heh+9z7Jh0GqHBLzyU6EgP3QDruAeKtNN0D1g6PqRR7FDz8Sux1WD9T2BzveOTkvIpTzauvpzJh+Rs4l7uhasQuBF6+NrF/zN+JnQvkjoVvUCvqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753382500; c=relaxed/simple;
-	bh=IrAJV8qmnHwIF1sbkngYGyar5n5RP/TH+eX8V1mvAyQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lG6t81Pp2ykgChYpq8dqZd5Wzf76tb5PjzMOTKDh2GIeYN/DBhTEP5FJ+yf8p1APRcDd1D/XKuPLIA9ublyWFF4PrXyZUqLF8wunDS0DNS9r3+ysQHmB2JFXMDwLzC/7Xdlk3OWWoeRA9uHsY9BQZ8BWAR8qBBVJ5AvO9SPbRRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eTEI8MNE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16D57C4CEF1;
-	Thu, 24 Jul 2025 18:41:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753382498;
-	bh=IrAJV8qmnHwIF1sbkngYGyar5n5RP/TH+eX8V1mvAyQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=eTEI8MNEcMLUiF9MvBHkxWp18WyWAhuc5fcBUfimgY/kfxfBF2v0Xu0Wn5c8UBGTU
-	 Dl5S8WhUNQJZe7UBmc+zpyLO6k0ytQJcQHQeC1VDQSV0DbXu0SPivY/IvbnsgLjfY4
-	 xyV3DvXUavRxjsuIRd7XmIu/TndUSNQa3mT6I5l/SlKm865bJsOcg3a5OzG52eGKLC
-	 nmgXctPiTouYH3nsCIbaaFbtC3AJnp0zaCJWQCkOGuj1wWE+/Ugy1aNRYpqYyJKJf6
-	 mlCGIwtJF+JLqCgrs+lAZo7DH3pmPIGyj0J67jCMnmmTNvJgg93ynFD+UBome6K4hj
-	 Tm1/DAY78iGSw==
-Message-ID: <75172a8b-c398-4646-86d6-5912cad9a48c@kernel.org>
-Date: Thu, 24 Jul 2025 13:41:33 -0500
+	s=arc-20240116; t=1753383863; c=relaxed/simple;
+	bh=77VL7y4orPyPDwVVBdslEyUFCNhMKPh1m2rvHd+AdTc=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=OMbTmQ1ggLukz0BKLMWvrSnap2cHJce79gKFO9gyWaXTwBasSiW/StMR4aJePLCEr1iyLgIL07BDfsDlHxDoE/FCmUQD+aNR3QuLfIXP6QaJbrICR2j9uC51eap6i1qNmUqkSCoR20jY8lRxvQ0rZaQTj3blFAeu1Ho6UTpRMBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Gt+5XrEP; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-311d670ad35so1199597a91.3
+        for <kvm@vger.kernel.org>; Thu, 24 Jul 2025 12:04:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1753383857; x=1753988657; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=zJyCIzUqeve9JsPqtXqjY52deoOozt0NyyCd1G6236M=;
+        b=Gt+5XrEPfD6TO6AHBecksXOl6q7HkNp55JhtBwl0fNgxe+uAMspIgszMMhVXMZQiIg
+         CTFJ8rEH0zdfHGbWZ7RXm9TYN+M2VYwMqbJeRCPJ5R5BbKxmF7XHSEERkK6XstPiP6/w
+         oqSYHttx/nKwEZFogJ/tu/y2gCSJoB2WDUbwhPCnyr0VmMjphhDUKEP6JztfHJ6cejji
+         iEtKgQxAumME9xNRmUNWQdici9khSE0kc9gB5LxyH90XWGELh8s3g+xy4ToN283adUJI
+         cDvCT0ZpMrDk6yUjmC99q2O1btvpaxkudFen2xMfr5vvMQvFUIJkFQlBvJhiGmJJCGix
+         hpgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753383857; x=1753988657;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zJyCIzUqeve9JsPqtXqjY52deoOozt0NyyCd1G6236M=;
+        b=gwVi49qSpKWI80C53U8C3jgBBMD5IjpThD19n3dThjJyIpo+ku6DFwXYd34c0RPpCK
+         ywq+BjqUkuYVKPiGl0geUAi7dOXryNj/iJWfaduqF7vJ6tzNbdMQu4mkqWWG9K6dNTsR
+         mDZJQ/wlsTqz5v2QaCO11+KtNpc54o2YbjjbtQlNQBx4O1AiL9RAOlH6tuscygGW0pdQ
+         3TsYJZfF7QVv8H6L08rjbazGCyGQLBd2LaMrPNGH6W134eZYnk7IquDtrr6T2Y6rrUem
+         FBF0O57JjOj8k3kNmOwQh2iKLMYGSJ12hXL0eu+DN3/0BmOAG26yX9E/GDSAuiA1NCzH
+         7tcg==
+X-Forwarded-Encrypted: i=1; AJvYcCVhwPCT0G6wpTxkUfOAPubAYsfkdziJrM1hQlnQSu04B189EzTjo/GxAOjvPOTAxyyHezo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx/U01yducE/fe6aQDhoLYd67MAftpIDRBaWkKw+0o3NheiHLxR
+	rtIun/3DetCQvnrUpwxxt4TTFtPVVXhloVFud+NbGawKshBNygnsTpY7Nv+i3NZ5KqUj/bpYYhs
+	DKlfH+w==
+X-Google-Smtp-Source: AGHT+IEe6+6fR9gO5Nl0Xt/yeEjity2RKdtTyWI1KTrUYedXflcE9z6fhLr5gE2QJHjWu7/9QdOuheoivLE=
+X-Received: from pjd16.prod.google.com ([2002:a17:90b:54d0:b0:315:b7f8:7ff])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:582e:b0:313:14b5:2538
+ with SMTP id 98e67ed59e1d1-31e50859d80mr10487542a91.35.1753383857192; Thu, 24
+ Jul 2025 12:04:17 -0700 (PDT)
+Date: Thu, 24 Jul 2025 12:04:15 -0700
+In-Reply-To: <2025072441-degrease-skipping-bbc8@gregkh>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 0/9] Adjust fbcon console device detection
-To: Bjorn Helgaas <helgaas@kernel.org>
-Cc: David Airlie <airlied@gmail.com>, Bjorn Helgaas <bhelgaas@google.com>,
- Alex Deucher <alexander.deucher@amd.com>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Simona Vetter <simona@ffwll.ch>, Lukas Wunner <lukas@wunner.de>,
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
- Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
- David Woodhouse <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>,
- Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
- Robin Murphy <robin.murphy@arm.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
- "open list:DRM DRIVERS" <dri-devel@lists.freedesktop.org>,
- open list <linux-kernel@vger.kernel.org>,
- "open list:INTEL IOMMU (VT-d)" <iommu@lists.linux.dev>,
- "open list:PCI SUBSYSTEM" <linux-pci@vger.kernel.org>,
- "open list:VFIO DRIVER" <kvm@vger.kernel.org>,
- "open list:SOUND" <linux-sound@vger.kernel.org>,
- Daniel Dadap <ddadap@nvidia.com>,
- Mario Limonciello <mario.limonciello@amd.com>
-References: <20250724183623.GA2947098@bhelgaas>
-Content-Language: en-US
-From: Mario Limonciello <superm1@kernel.org>
-In-Reply-To: <20250724183623.GA2947098@bhelgaas>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <aII3WuhvJb3sY8HG@google.com> <20250724142227.61337-1-thijs@raymakers.nl>
+ <2025072441-degrease-skipping-bbc8@gregkh>
+Message-ID: <aIKDr_kVpUjC8924@google.com>
+Subject: Re: [PATCH v2] KVM: x86: use array_index_nospec with indices that
+ come from guest
+From: Sean Christopherson <seanjc@google.com>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Thijs Raymakers <thijs@raymakers.nl>, kvm@vger.kernel.org, stable <stable@kernel.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On 7/24/2025 1:36 PM, Bjorn Helgaas wrote:
-> On Thu, Jul 17, 2025 at 03:56:58PM -0500, Bjorn Helgaas wrote:
->> On Thu, Jul 17, 2025 at 12:38:03PM -0500, Mario Limonciello wrote:
->>> From: Mario Limonciello <mario.limonciello@amd.com>
->>>
->>> Systems with more than one GPU userspace doesn't know which one to be
->>> used to treat as primary.  The concept of primary is important to be
->>> able to decide which GPU is used for display and  which is used for
->>> rendering.  If it's guessed wrong then both GPUs will be kept awake
->>> burning a lot of power.
->>>
->>> Historically it would use the "boot_vga" attribute but this isn't
->>> present on modern GPUs.
->>>
->>> This series started out as changes to VGA arbiter to try to handle a case
->>> of a system with 2 GPUs that are not VGA devices and avoid changes to
->>> userspace.  This was discussed but decided not to overload the VGA arbiter
->>> for non VGA devices.
->>>
->>> Instead move the x86 specific detection of framebuffer resources into x86
->>> specific code that the fbcon can use to properly identify the primary
->>> device. This code is still called from the VGA arbiter, and the logic does
->>> not change there. To avoid regression default to VGA arbiter and only fall
->>> back to looking up with x86 specific detection method.
->>>
->>> In order for userspace to also be able to discover which device was the
->>> primary video display device create a new sysfs file 'boot_display'.
->>>
->>> A matching userspace implementation for this file is available here:
->>> Link: https://gitlab.freedesktop.org/xorg/lib/libpciaccess/-/merge_requests/39
->>> Link: https://gitlab.freedesktop.org/xorg/xserver/-/merge_requests/2038
->>>
->>> Dave Airlie has been pinged for a comment on this approach.
->>> Dave had suggested in the past [1]:
->>>
->>> "
->>>   But yes if that doesn't work, then maybe we need to make the boot_vga
->>>   flag mean boot_display_gpu, and fix it in the kernel
->>> "
->>>
->>> This was one of the approached tried in earlier revisions and it was
->>> rejected in favor of creating a new sysfs file (which is what this
->>> version does).
->>>
->>> It is suggested that this series merge entirely through the PCI tree.
->>>
->>> Link: https://gitlab.freedesktop.org/xorg/lib/libpciaccess/-/merge_requests/37#note_2938602 [1]
->>>
->>> v9:
->>>   * Add more to cover letter
->>>   * Add bug link to last patch
->>>   * Update commit message for last patch
->>>   * Update boot_display documentation description
->>>
->>> Mario Limonciello (9):
->>>    PCI: Add helper for checking if a PCI device is a display controller
->>>    vfio/pci: Use pci_is_display()
->>>    vga_switcheroo: Use pci_is_display()
->>>    iommu/vt-d: Use pci_is_display()
->>>    ALSA: hda: Use pci_is_display()
->>>    Fix access to video_is_primary_device() when compiled without
->>>      CONFIG_VIDEO
->>>    PCI/VGA: Replace vga_is_firmware_default() with a screen info check
->>>    fbcon: Use screen info to find primary device
->>>    PCI: Add a new 'boot_display' attribute
->>>
->>>   Documentation/ABI/testing/sysfs-bus-pci |  9 +++++
->>>   arch/parisc/include/asm/video.h         |  2 +-
->>>   arch/sparc/include/asm/video.h          |  2 ++
->>>   arch/x86/include/asm/video.h            |  2 ++
->>>   arch/x86/video/video-common.c           | 17 ++++++++-
->>>   drivers/gpu/vga/vga_switcheroo.c        |  2 +-
->>>   drivers/iommu/intel/iommu.c             |  2 +-
->>>   drivers/pci/pci-sysfs.c                 | 46 +++++++++++++++++++++++++
->>>   drivers/pci/vgaarb.c                    | 31 +++--------------
->>>   drivers/vfio/pci/vfio_pci_igd.c         |  3 +-
->>>   include/linux/pci.h                     | 15 ++++++++
->>>   sound/hda/hdac_i915.c                   |  2 +-
->>>   sound/pci/hda/hda_intel.c               |  4 +--
->>>   13 files changed, 102 insertions(+), 35 deletions(-)
->>
->> Applied to pci/boot-display for v6.17, thanks!
+On Thu, Jul 24, 2025, Greg Kroah-Hartman wrote:
+> On Thu, Jul 24, 2025 at 04:22:27PM +0200, Thijs Raymakers wrote:
+> > min and dest_id are guest-controlled indices. Using array_index_nospec()
+> > after the bounds checks clamps these values to mitigate speculative execution
+> > side-channels.
+> > 
+> > Signed-off-by: Thijs Raymakers <thijs@raymakers.nl>
+> > Cc: stable <stable@kernel.org>
+> > Cc: Sean Christopherson <seanjc@google.com>
+> > Cc: Paolo Bonzini <pbonzini@redhat.com>
+> > Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 > 
-> I kept the pci_is_display() changes but deferred the following for now:
-> 
->    Fix access to video_is_primary_device() when compiled without CONFIG_VIDEO
->    PCI/VGA: Replace vga_is_firmware_default() with a screen info check
->    fbcon: Use screen info to find primary device
->    PCI: Add a new 'boot_display' attribute
-> 
-> I think the boot_display attribute isn't quite baked yet and I don't
-> want to add something when it looks like we're immediately going to
-> change the implementation and maybe the sysfs location.
-> 
-> Bjorn
+> Nit, you shouldn't have added my signed off on a new version, but that's
+> ok, I'm fine with it.
 
-Thanks for the update.
+Want me to keep your SoB when applying, or drop it?
 
-The patch moving to DRM does have an Acked-by.
+> > ---
+> >  arch/x86/kvm/lapic.c | 2 ++
+> >  arch/x86/kvm/x86.c   | 7 +++++--
+> >  2 files changed, 7 insertions(+), 2 deletions(-)
+> 
+> You also forgot to say what changed down here.
+> 
+> Don't know how strict the KVM maintainers are, I know I require these
+> things fixed up...
 
-At this point do you think there is still a shot at a squashed/rebased 
-version of those for 6.17, or should I rebase and submit the outcome for 
-discussion targeting 6.18 after the merge window?
+I require the same things, but I also don't mind doing fixup when applying if
+that's the path of least resistance (and it's not a recurring problem).
+
+I also strongly dislike using In-Reply-To for new versions, as it tends to confuse
+b4, and often confuses me as well.
+
+But for this, I don't see any reason to send a v3.
 
