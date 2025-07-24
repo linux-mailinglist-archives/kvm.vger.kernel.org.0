@@ -1,225 +1,229 @@
-Return-Path: <kvm+bounces-53365-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53361-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6891B10A99
-	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 14:50:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76FE9B10A8F
+	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 14:48:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F493AE6301
-	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 12:49:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF8911C20E7F
+	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 12:48:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A9042D6604;
-	Thu, 24 Jul 2025 12:48:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DA+SOkCw"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE7462D46DC;
+	Thu, 24 Jul 2025 12:48:21 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A86652D4B52;
-	Thu, 24 Jul 2025 12:48:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 623542D0C9F;
+	Thu, 24 Jul 2025 12:48:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753361327; cv=none; b=X0tzmIooBIwK6czIAfbT96zDNdfPsthUWL2kueLV4hRM1sfDVdXzwnC9GGKCiVafGRwN1fq3MFcSWN31A28WlfLTXxlk1Fx+59wrO0k6/rukiaiUnA2dPM+mwQZQwBgrCuBZI2eXQXniNplO2XXJCNYjcMRPYQJHg9U61PXV0bM=
+	t=1753361301; cv=none; b=RjtmU+D0urDr28+qiCveeSpWrlyA3+bJHxb7SdI5lyCwhO8cukADXB0pQ3jOjQ6JCp//RKeEb1MhZTpyZ/3ofyz7n2veVlyCNicNo83ckBmBn+9H16XklIg6eWMVtR3wfMWKY91uqH7HanM0UL4RRGoLZh2bH18QV0q1Qnx6rh0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753361327; c=relaxed/simple;
-	bh=gT0aSf/vSJWkSaOXPn4Oic8ZFf63JZ6lQBA3Y2666zc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=L3jtljoPVV7nYiUHAELOKgX9FwyfK+W+AKJHdmz3DammjBtobz6Q9LxTG70tGox8uOudYr8xYdIVMcK/aPYBptQR7MeQ1a1wG7I332jCDJbaNwuuZwOdEqJdRVs0D4uvhVQ4gaz2XX24vGXI2ktx0/Y/qeUsFd8sMWK5mU2hPOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DA+SOkCw; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1753361326; x=1784897326;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=gT0aSf/vSJWkSaOXPn4Oic8ZFf63JZ6lQBA3Y2666zc=;
-  b=DA+SOkCwntiaZb43gtcjHMzLlwCmb7HEdtJQrErGLO1PrRPVeaJjwBYc
-   o4GBssL5fwXcJs18vljtPv35nsCiyH+H7sSsxNouelgwad2JqyiEe3BTJ
-   IKDLlT3jLGP5iO+UvqFqshtuR9r/N1GxM9RPs2ne/tl0GqRNzI4AjEJMO
-   4ThXmoA2D8PSufHKUwqR4iRYPIlaEHhsOtwkm70Wq4TfS5HxBJCQkr343
-   pzQsdXWA98FFi1X6jFrxINDPdLj3wQVGQMhr08bUrwxPeJ7b35QRv43vF
-   qz7w3KcjC5s70jgTG1GjOjnXUELTFe5gPPXF0JuhC8q6nkN2o/gGNm6fb
-   w==;
-X-CSE-ConnectionGUID: s42crpVGTTqOlLAbCjHKKA==
-X-CSE-MsgGUID: PBJpoofrTw6pw5ZsY3Hwhw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11501"; a="73253673"
-X-IronPort-AV: E=Sophos;i="6.16,337,1744095600"; 
-   d="scan'208";a="73253673"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jul 2025 05:48:46 -0700
-X-CSE-ConnectionGUID: GIE0D98mQTGqaZKZIFxwDA==
-X-CSE-MsgGUID: FQsJeLuOQA2sJtDkbs+qzQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,337,1744095600"; 
-   d="scan'208";a="159460454"
-Received: from sschumil-mobl2.ger.corp.intel.com (HELO localhost.localdomain) ([10.245.244.21])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jul 2025 05:48:40 -0700
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Dave Hansen <dave.hansen@linux.intel.com>,
-	pbonzini@redhat.com,
-	seanjc@google.com,
-	vannapurve@google.com
-Cc: Tony Luck <tony.luck@intel.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	x86@kernel.org,
-	H Peter Anvin <hpa@zytor.com>,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	rick.p.edgecombe@intel.com,
-	kas@kernel.org,
-	kai.huang@intel.com,
-	reinette.chatre@intel.com,
-	xiaoyao.li@intel.com,
-	tony.lindgren@linux.intel.com,
-	binbin.wu@linux.intel.com,
-	isaku.yamahata@intel.com,
-	yan.y.zhao@intel.com,
-	chao.gao@intel.com
-Subject: [PATCH V5 3/3] x86/tdx: Skip clearing reclaimed pages unless X86_BUG_TDX_PW_MCE is present
-Date: Thu, 24 Jul 2025 15:48:11 +0300
-Message-ID: <20250724124811.78326-4-adrian.hunter@intel.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250724124811.78326-1-adrian.hunter@intel.com>
-References: <20250724124811.78326-1-adrian.hunter@intel.com>
+	s=arc-20240116; t=1753361301; c=relaxed/simple;
+	bh=2pOinwFKTPOVT8F1u++D9KxadeDnVsNoR6DYvnHouIA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nTJ8r5yzXpo2O3Ibfbu8Ly0Bu9+S2e9132Ler2NYUEal9+8m3mlNzDtir79soCPGYRFZP4j/wKA1iNg75b9MWs/m9HuoBgfdYRmvk1nb8m6JmNdR0iz2NDLIkoj0Tz4Vn79ZfN2cxdfVD8EddcL1ol3Pu1VFWAZSeURaU1kTKsM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-60c60f7eeaaso1715425a12.0;
+        Thu, 24 Jul 2025 05:48:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753361298; x=1753966098;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Feu4TUEkDrcgiJgcCEsLW4qWTUbzwEUwHnHWizBP17Y=;
+        b=ZHAyLCwQTJ2OvNLAd7g8UQboRDASJJP0VuQTCMkkS1scpDijLQ1vC6NTvQPDj6u4sn
+         ya7So2pYpTlI5WKQIcOl0swGVvz0MmmQZmyTgDAnWd03qCPtXoEb8S3l0MY2ptqxMBPC
+         QbnSln+rKNCTfJ2VWPcGJTVjhnw6I2oFXl8pIt83/IR74YcNST2zuEpVzZyNlqJSZbgN
+         jHDSK91XBDyy3zcNrUnd83agnFPWPRVcGys0c8YJgLvnDAcMTu2B5/VGWt8qo91J3TW/
+         VSlAd9KrxLTs2zCaWykFFeYgsTczI/AblYXwmSIZ8XXp7isUWCQ0jtmiCX20J+l0CIva
+         O8xQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUPHsxay2vwFHPq2w1yGVwyyL6IiZvJe4MLMq+u1FGfNbdyIABWHz1TX58AysCk6RGsdFmbuzMm@vger.kernel.org, AJvYcCUWdgIqKIYzajK0TGIDnINJVJay9KyC4wPsiqdG8MrGYfkblXPl/1+IzLLVraaL+zN4a4o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzRai+DratsA3V5gwv5HjwItYl0J5wibyoJDadvT/i4+jre+Hay
+	C2inUu6cGOEC8QWnTtMkcpGug2cicA6+Ij2w/UWCA7oFgZNODwzvMQp6
+X-Gm-Gg: ASbGnculFuinFeqMvX/E4yOODGqPFHA+ZvnPXTSqbERKbJvtVbNaC+cfJIPQnKqwB07
+	adYekQbpY+OJwEJTmN/rcs32s8EyD6NjNqqy0r0n4dRTPqvgHjMxjqax1tUwxd8gqrwXYMborsj
+	Tlk2odKRxjZ8WoXx4H+lsgdLLe8vyUq1Wq1Net1caPWk8kcm4kOYDEdCEQZkwHm2HajOpNfufd6
+	2u3MgByaRsVnd6Go2H7d6nXo9wD5tw7fC44xDyy8ZuhxXuR1kMtEAtgqA19dkiE5bZ+4jYiIdV1
+	KaefdoIkYFsYHUKx6/mM20AtPwnmz1EOj559WRlzmu4UNeK3acLD1Yp/PugMXzdbMb1PuA8awk5
+	bUqEa1180yMMk
+X-Google-Smtp-Source: AGHT+IEpgmL75h5XRByfhF1cN65WzfkmI6mjL+e3dUN6+a65wBrMlTwG/dW8M2hhwpz+R9FZegUIfw==
+X-Received: by 2002:a17:907:948b:b0:ae0:abec:dc13 with SMTP id a640c23a62f3a-af2f8f7c16fmr689339766b.53.1753361297391;
+        Thu, 24 Jul 2025 05:48:17 -0700 (PDT)
+Received: from gmail.com ([2a03:2880:30ff:6::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-af47c58bb50sm109688166b.27.2025.07.24.05.48.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Jul 2025 05:48:16 -0700 (PDT)
+Date: Thu, 24 Jul 2025 05:48:14 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Will Deacon <will@kernel.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, 
+	Stefano Garzarella <sgarzare@redhat.com>, jasowang@redhat.com, eperezma@redhat.com, 
+	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Stefan Hajnoczi <stefanha@redhat.com>, 
+	netdev@vger.kernel.org
+Subject: Re: vhost: linux-next: crash at vhost_dev_cleanup()
+Message-ID: <fv6uhq6lcgjwrdp7fcxmokczjmavbc37ikrqz7zpd7puvrbsml@zkt2lidjrqm6>
+References: <vosten2rykookljp6u6qc4hqhsqb6uhdy2iuhpl54plbq2tkr4@kphfpgst3e7c>
+ <20250724034659-mutt-send-email-mst@kernel.org>
+ <CAGxU2F76ueKm3H30vXL+jxMVsiQBuRkDN9NRfVU8VeTXzTVAWg@mail.gmail.com>
+ <20250724042100-mutt-send-email-mst@kernel.org>
+ <aIHydjBEnmkTt-P-@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Organization: Intel Finland Oy, Registered Address: c/o Alberga Business Park, 6 krs, Bertel Jungin Aukio 5, 02600 Espoo, Business Identity Code: 0357606 - 4, Domiciled in Helsinki
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aIHydjBEnmkTt-P-@willie-the-truck>
 
-Avoid clearing reclaimed TDX private pages unless the platform is affected
-by the X86_BUG_TDX_PW_MCE erratum. This significantly reduces VM shutdown
-time on unaffected systems.
+On Thu, Jul 24, 2025 at 09:44:38AM +0100, Will Deacon wrote:
+> > > On Thu, 24 Jul 2025 at 09:48, Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > >
+> > > > On Wed, Jul 23, 2025 at 08:04:42AM -0700, Breno Leitao wrote:
+> > > > > Hello,
+> > > > >
+> > > > > I've seen a crash in linux-next for a while on my arm64 server, and
+> > > > > I decided to report.
+> > > > >
+> > > > > While running stress-ng on linux-next, I see the crash below.
+> > > > >
+> > > > > This is happening in a kernel configure with some debug options (KASAN,
+> > > > > LOCKDEP and KMEMLEAK).
+> > > > >
+> > > > > Basically running stress-ng in a loop would crash the host in 15-20
+> > > > > minutes:
+> > > > >       # while (true); do stress-ng -r 10 -t 10; done
+> > > > >
+> > > > > >From the early warning "virt_to_phys used for non-linear address",
+> > > 
+> > > mmm, we recently added nonlinear SKBs support in vhost-vsock [1],
+> > > @Will can this issue be related?
+> > 
+> > Good point.
+> > 
+> > Breno, if bisecting is too much trouble, would you mind testing the commits
+> > c76f3c4364fe523cd2782269eab92529c86217aa
+> > and
+> > c7991b44d7b44f9270dec63acd0b2965d29aab43
+> > and telling us if this reproduces?
+> 
+> That's definitely worth doing, but we should be careful not to confuse
+> the "non-linear address" from the warning (which refers to virtual
+> addresses that lie outside of the linear mapping of memory, e.g. in the
+> vmalloc space) and "non-linear SKBs" which refer to SKBs with fragment
+> pages.
 
-Background
-
-KVM currently clears reclaimed TDX private pages using MOVDIR64B, which:
-
-   - Clears the TD Owner bit (which identifies TDX private memory) and
-     integrity metadata without triggering integrity violations.
-   - Clears poison from cache lines without consuming it, avoiding MCEs on
-     access (refer TDX Module Base spec. 1348549-006US section 6.5.
-     Handling Machine Check Events during Guest TD Operation).
-
-The TDX module also uses MOVDIR64B to initialize private pages before use.
-If cache flushing is needed, it sets TDX_FEATURES.CLFLUSH_BEFORE_ALLOC.
-However, KVM currently flushes unconditionally, refer commit 94c477a751c7b
-("x86/virt/tdx: Add SEAMCALL wrappers to add TD private pages")
-
-In contrast, when private pages are reclaimed, the TDX Module handles
-flushing via the TDH.PHYMEM.CACHE.WB SEAMCALL.
-
-Problem
-
-Clearing all private pages during VM shutdown is costly. For guests
-with a large amount of memory it can take minutes.
-
-Solution
-
-TDX Module Base Architecture spec. documents that private pages reclaimed
-from a TD should be initialized using MOVDIR64B, in order to avoid
-integrity violation or TD bit mismatch detection when later being read
-using a shared HKID, refer April 2025 spec. "Page Initialization" in
-section "8.6.2. Platforms not Using ACT: Required Cache Flush and
-Initialization by the Host VMM"
-
-That is an overstatement and will be clarified in coming versions of the
-spec. In fact, as outlined in "Table 16.2: Non-ACT Platforms Checks on
-Memory" and "Table 16.3: Non-ACT Platforms Checks on Memory Reads in Li
-Mode" in the same spec, there is no issue accessing such reclaimed pages
-using a shared key that does not have integrity enabled. Linux always uses
-KeyID 0 which never has integrity enabled. KeyID 0 is also the TME KeyID
-which disallows integrity, refer "TME Policy/Encryption Algorithm" bit
-description in "Intel Architecture Memory Encryption Technologies" spec
-version 1.6 April 2025. So there is no need to clear pages to avoid
-integrity violations.
-
-There remains a risk of poison consumption. However, in the context of
-TDX, it is expected that there would be a machine check associated with the
-original poisoning. On some platforms that results in a panic. However
-platforms may support "SEAM_NR" Machine Check capability, in which case
-Linux machine check handler marks the page as poisoned, which prevents it
-from being allocated anymore, refer commit 7911f145de5fe ("x86/mce:
-Implement recovery for errors in TDX/SEAM non-root mode")
-
-Improvement
-
-By skipping the clearing step on unaffected platforms, shutdown time
-can improve by up to 40%.
-
-On platforms with the X86_BUG_TDX_PW_MCE erratum (SPR and EMR), continue
-clearing because these platforms may trigger poison on partial writes to
-previously-private pages, even with KeyID 0, refer commit 1e536e1068970
-("x86/cpu: Detect TDX partial write machine check erratum")
-
-Reviewed-by: Kirill A. Shutemov <kas@kernel.org>
-Acked-by: Kai Huang <kai.huang@intel.com>
-Reviewed-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
----
+I've tested both commits above, and I see the crash on both commits
+above, thus, the problem reproduces in both cases. The only difference
+I noted is the fact that I haven't seen the warning before the crash.
 
 
-Changes in V5:
+Log against c76f3c4364fe ("vhost/vsock: Avoid allocating
+arbitrarily-sized SKBs")
 
-	None
+	 Unable to handle kernel paging request at virtual address 0000001fc0000048
+	 Mem abort info:
+	   ESR = 0x0000000096000005
+	   EC = 0x25: DABT (current EL), IL = 32 bits
+	   SET = 0, FnV = 0
+	   EA = 0, S1PTW = 0
+	   FSC = 0x05: level 1 translation fault
+	 Data abort info:
+	   ISV = 0, ISS = 0x00000005, ISS2 = 0x00000000
+	   CM = 0, WnR = 0, TnD = 0, TagAccess = 0
+	   GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
+	 user pgtable: 64k pages, 48-bit VAs, pgdp=0000000cdcf2da00
+	 [0000001fc0000048] pgd=0000000000000000, p4d=0000000000000000, pud=0000000000000000
+	 Internal error: Oops: 0000000096000005 [#1]  SMP
+	 Modules linked in: vfio_iommu_type1 vfio md4 crc32_cryptoapi ghash_generic unix_diag vhost_net tun vhost vhost_iotlb tap mpls_gso mpls_iptunnel mpls_router fou sch_fq ghes_edac tls tcp_diag inet_diag act_gact cls_bpf nvidia_c
+	 CPU: 34 UID: 0 PID: 1727297 Comm: stress-ng-dev Kdump: loaded Not tainted 6.16.0-rc6-upstream-00027-gc76f3c4364fe #19 NONE
+	 pstate: 23401009 (nzCv daif +PAN -UAO +TCO +DIT +SSBS BTYPE=--)
+	 pc : kfree+0x48/0x2a8
+	 lr : vhost_dev_cleanup+0x138/0x2b8 [vhost]
+	 sp : ffff80013a0cfcd0
+	 x29: ffff80013a0cfcd0 x28: ffff0008fd0b6240 x27: 0000000000000000
+	 x26: 0000000000000000 x25: 0000000000000000 x24: 0000000000000000
+	 x23: 00000000040e001f x22: ffffffffffffffff x21: ffff00014f1d4ac0
+	 x20: 0000000000000001 x19: ffff00014f1d0000 x18: 0000000000000000
+	 x17: 0000000000000000 x16: 0000000000000000 x15: 0000000000000000
+	 x14: 000000000000001f x13: 000000000000000f x12: 0000000000000001
+	 x11: 0000000000000000 x10: 0000000000000402 x9 : ffffffdfc0000000
+	 x8 : 0000001fc0000040 x7 : 0000000000000000 x6 : 0000000000000000
+	 x5 : ffff000141931840 x4 : 0000000000000000 x3 : 0000000000000008
+	 x2 : ffffffffffffffff x1 : ffffffffffffffff x0 : 0000000000010000
+	 Call trace:
+	  kfree+0x48/0x2a8 (P)
+	  vhost_dev_cleanup+0x138/0x2b8 [vhost]
+	  vhost_net_release+0xa0/0x1a8 [vhost_net]
+	  __fput+0xfc/0x2f0
+	  fput_close_sync+0x38/0xc8
+	  __arm64_sys_close+0xb4/0x108
+	  invoke_syscall+0x4c/0xd0
+	  do_el0_svc+0x80/0xb0
+	  el0_svc+0x3c/0xd0
+	  el0t_64_sync_handler+0x70/0x100
+	  el0t_64_sync+0x170/0x178
+	 Code: 8b080008 f2dffbe9 d350fd08 8b081928 (f9400509)
 
-Changes in V4:
+Log against c7991b44d7b4 ("vsock/virtio: Allocate nonlinear SKBs for
+handling large transmit buffers")
 
-	Add TDX Module Base spec. version (Rick)
-	Add Rick's Rev'd-by
+	Unable to handle kernel paging request at virtual address 0010502f8f8f4f08
+	Mem abort info:
+	  ESR = 0x0000000096000004
+	  EC = 0x25: DABT (current EL), IL = 32 bits
+	  SET = 0, FnV = 0
+	  EA = 0, S1PTW = 0
+	  FSC = 0x04: level 0 translation fault
+	Data abort info:
+	  ISV = 0, ISS = 0x00000004, ISS2 = 0x00000000
+	  CM = 0, WnR = 0, TnD = 0, TagAccess = 0
+	  GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
+	[0010502f8f8f4f08] address between user and kernel address ranges
+	Internal error: Oops: 0000000096000004 [#1]  SMP
+	Modules linked in: vhost_vsock vfio_iommu_type1 vfio md4 crc32_cryptoapi ghash_generic vhost_net tun vhost vhost_iotlb tap mpls_gso mpls_iptunnel mpls_router fou sch_fq ghes_edac tls tcp_diag inet_diag act_gact cls_bpf ipmi_s
+	CPU: 47 UID: 0 PID: 1239699 Comm: stress-ng-dev Kdump: loaded Tainted: G        W           6.16.0-rc6-upstream-00035-gc7991b44d7b4 #18 NONE
+	Tainted: [W]=WARN
+	pstate: 23401009 (nzCv daif +PAN -UAO +TCO +DIT +SSBS BTYPE=--)
+	pc : kfree+0x48/0x2a8
+	lr : vhost_dev_cleanup+0x138/0x2b8 [vhost]
+	sp : ffff80016c0cfcd0
+	x29: ffff80016c0cfcd0 x28: ffff001ad6210d80 x27: 0000000000000000
+	x26: 0000000000000000 x25: 0000000000000000 x24: 0000000000000000
+	x23: 00000000040e001f x22: ffffffffffffffff x21: ffff001bb76f00c0
+	x20: 0000000000000000 x19: ffff001bb76f0000 x18: 0000000000000000
+	x17: 0000000000000000 x16: 0000000000000000 x15: 0000000000000000
+	x14: 000000000000001f x13: 000000000000000f x12: 0000000000000001
+	x11: 0000000000000000 x10: 0000000000000402 x9 : ffffffdfc0000000
+	x8 : 0010502f8f8f4f00 x7 : 0000000000000000 x6 : 0000000000000000
+	x5 : ffff00012e7e2128 x4 : 0000000000000000 x3 : 0000000000000008
+	x2 : ffffffffffffffff x1 : ffffffffffffffff x0 : 41403f3e3d3c3b3a
+	Call trace:
+	 kfree+0x48/0x2a8 (P)
+	 vhost_dev_cleanup+0x138/0x2b8 [vhost]
+	 vhost_net_release+0xa0/0x1a8 [vhost_net]
+	 __fput+0xfc/0x2f0
+	 fput_close_sync+0x38/0xc8
+	 __arm64_sys_close+0xb4/0x108
+	 invoke_syscall+0x4c/0xd0
+	 do_el0_svc+0x80/0xb0
+	 el0_svc+0x3c/0xd0
+	 el0t_64_sync_handler+0x70/0x100
+	 el0t_64_sync+0x170/0x178
+	Code: 8b080008 f2dffbe9 d350fd08 8b081928 (f9400509)
 
-Changes in V3:
 
-	Remove "flush cache" comments (Rick)
-	Update function comment to better relate to "quirk" naming (Rick)
-	Add "via MOVDIR64B" to comment (Xiaoyao)
-	Add Rev'd-by, Ack'd-by tags
+> Breno -- when you say you've been seeing this "for a while", what's the
+> earliest kernel you know you saw it on?
 
-Changes in V2:
-
-	Improve the comment
-
-
- arch/x86/virt/vmx/tdx/tdx.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
-
-diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-index 9e4638f68ba0..823850399bb7 100644
---- a/arch/x86/virt/vmx/tdx/tdx.c
-+++ b/arch/x86/virt/vmx/tdx/tdx.c
-@@ -633,15 +633,19 @@ static int tdmrs_set_up_pamt_all(struct tdmr_info_list *tdmr_list,
- }
- 
- /*
-- * Convert TDX private pages back to normal by using MOVDIR64B to
-- * clear these pages.  Note this function doesn't flush cache of
-- * these TDX private pages.  The caller should make sure of that.
-+ * Convert TDX private pages back to normal by using MOVDIR64B to clear these
-+ * pages. Typically, any write to the page will convert it from TDX private back
-+ * to normal kernel memory. Systems with the X86_BUG_TDX_PW_MCE erratum need to
-+ * do the conversion explicitly via MOVDIR64B.
-  */
- static void tdx_quirk_reset_paddr(unsigned long base, unsigned long size)
- {
- 	const void *zero_page = (const void *)page_address(ZERO_PAGE(0));
- 	unsigned long phys, end;
- 
-+	if (!boot_cpu_has_bug(X86_BUG_TDX_PW_MCE))
-+		return;
-+
- 	end = base + size;
- 	for (phys = base; phys < end; phys += 64)
- 		movdir64b(__va(phys), zero_page);
--- 
-2.48.1
-
+Looking at my logs, the older kernel that I saw it was net-next from
+20250717, which was around the time I decided to test net-next in
+preparation for 6.17, so, not very helpful. Sorry.
 
