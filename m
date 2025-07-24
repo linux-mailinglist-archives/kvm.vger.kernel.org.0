@@ -1,112 +1,151 @@
-Return-Path: <kvm+bounces-53359-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53360-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDDDEB109B3
-	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 13:57:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9247AB109D0
+	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 14:00:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 156027B4F56
-	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 11:55:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 135EA1CE31BF
+	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 12:00:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74B3A2BE7B0;
-	Thu, 24 Jul 2025 11:56:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2E1D2C325F;
+	Thu, 24 Jul 2025 12:00:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O+B52w/E"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="No4s5Z+m"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 967642BE642;
-	Thu, 24 Jul 2025 11:56:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D714F2C08DD;
+	Thu, 24 Jul 2025 12:00:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753358217; cv=none; b=CI0WMPxfzzCS8gfxzygPy5qYdCo526uo9NuBA+sXLnQzhTQNqNUw3qMBgnRqC0iwGz3BvoN4QL+x89swrWm0icjMkEEcBvjqdAgTDR8aEt38VZLSHY09u2Ag9wLWPcNevCPtv+tQJw95pukqcLqJ9ewsX1gRFIVifGEzFNtEthk=
+	t=1753358425; cv=none; b=Vqc7EtOkrUDTWK+Lps4QbcWmc1v/wVlZVWbMxP0sWD8CCYy93FreyBNOzQDTKYM0U/HuuMy9Vdit3q8oDnGw+vUckgP5KBUFhcHMVq3KyIFvPFPMcgYvpmoYFi3PkpfohcqWiKechr6yNHMY55o7zueyd2G0prdRN87IJsOXjSo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753358217; c=relaxed/simple;
-	bh=UbnLPvlzvaF+TASrvQ8CvSyZzrgpblIXwom2xhrfV3w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IekphqaWKxDdjCFSxrhyd74nYunndzwjA5JM1M/cfJPx8TeAGzauSEWVlZxFBtSvILg4Mk09WfHB181d4lOTUZPqggNdo7fde5rR+47Shk6x6624KuipisVvVqa3JGcXX8tktMpIAQzyeNQjTHljUB4/oizKvpKpFslCQQxhipU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O+B52w/E; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45B35C4AF0B;
-	Thu, 24 Jul 2025 11:56:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753358217;
-	bh=UbnLPvlzvaF+TASrvQ8CvSyZzrgpblIXwom2xhrfV3w=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=O+B52w/ETUfu8M3TbhhmtQI4auBK/DIqAXLehkKPeIzJZceUdaIMxnchkcAGo3BCL
-	 qyNaX/RK4vJjIepty7runayUuhdbjpnNeVymdMYsgbGFf3wqxVDebd0nnm7z9ndq0H
-	 H3QKmjpAaAHZt0a135Uka+4lJqOXO9/K6AoyYKoyCi7TFOBkYdT8rRtV7KMMhoskFO
-	 0SCpi/CPt3Yvwq/Ao8W+MQ9oHqoDjD6tLafEiOWB8DhNooTvtb+0HlKJnw1DpWSvI9
-	 9hBIFFqvBGxOW4An2DoHrj4ppsSLymhvfa+5St3IUdEs/TmOtZG7sRN3c5PWpGNiPZ
-	 0aNa1E7OIUxdQ==
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-607cc1a2bd8so1532057a12.2;
-        Thu, 24 Jul 2025 04:56:57 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCURjVHwh7pIp7JcklmC/C31YPZNgy8r5gR39dLhNfACi/FO8iqPQcrOeNw3vfTe6Et6P1xatT6K706610ro@vger.kernel.org, AJvYcCV3WXZFU8ZtIFceeMUNlDwvr1XC1BcEvihisn5YGzKEXtV+qxSSJh06DHxRNkv4LJ5r8soSl92W00JMhEZJWrNUxhJH@vger.kernel.org, AJvYcCW6kLruEJRPR9RiqDaF+bSXOORT4WijT33IxfY9GVeFFmLlFnnFlzGkIaFC0Zf00SeFqEc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyR+IwvK5wjEA+x6KCQEEg05hBtHoVkpRKtfAJE0iKsyhkDOmNZ
-	cT1wxYHFiSPvWvOZ/wz+7i/qIdDmdA1Rp2TIbO24v0Av+v3/6WcYaNOgFpTylwPAr047s8YhZoi
-	CNN4RMqColZN9iCVk4WsPqvWAib1xryA=
-X-Google-Smtp-Source: AGHT+IHyudkQ+ID0bU15SK7aT9+KIcppMZFHtN6CrQ6Dtu9svcp+0ZZ1xB7ZVtW72pZg9dG9fKgoM+SEjXsylHLj50I=
-X-Received: by 2002:a05:6402:1d52:b0:5f7:f55a:e5e1 with SMTP id
- 4fb4d7f45d1cf-6149b596728mr5451665a12.24.1753358215740; Thu, 24 Jul 2025
- 04:56:55 -0700 (PDT)
+	s=arc-20240116; t=1753358425; c=relaxed/simple;
+	bh=E959aFyB7Fz7wM1ihx+E3PvvcL2j2BmEZFA2aVmLOhc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AIvqom2jDgMcY+9SlOyel/4UKeKgxK+bbVyz8nSC3rb6oh/wlZ4bYRL744ZHawP652N7vdkNP0gwT9Qdnn8rXqZuvMxItT9R2HW7wNAcNA1g25H8T7uPFfUWQWPyTbVSu2zYsTPxP6dKYE5wV2a5Kx7dJFbDrgGgJp8yu+eccsU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=No4s5Z+m; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1753358423; x=1784894423;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=E959aFyB7Fz7wM1ihx+E3PvvcL2j2BmEZFA2aVmLOhc=;
+  b=No4s5Z+muSMzeoJ0O9Dp2FEtkbJDVvTWxK7YSvSmcBnfzna6LO6RiHjE
+   lCMucQTcanfVIF75dXcB7lE6dmwV4Ir017eVlrADMztQtHFRkyOAn7QeE
+   0jO23TprDZW5vVrifOQcPReT66MtbjattOzdj7Am8ifoUp970YjsZ8B9e
+   DtZUwQ0HSmCYIE9hgtAGLCnJcPSvViaaNCQbgxrqG5UZeZDuoK83r6QsS
+   RV9KSrz21de+Jg3z4EOR2v6iYL3Tmi+j7CFBM/x5knfKRRimvygBMusTE
+   xqUqfybuQAozHBJDSuS1pf6h3YDEJxt0iPI2CJAFRsEpjp59HwePSJYc3
+   w==;
+X-CSE-ConnectionGUID: q3b+T8ZHSOep4WtSK2bwqA==
+X-CSE-MsgGUID: fESbx4CKTva3Wt3/d3YATA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11501"; a="55635948"
+X-IronPort-AV: E=Sophos;i="6.16,337,1744095600"; 
+   d="scan'208";a="55635948"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jul 2025 05:00:22 -0700
+X-CSE-ConnectionGUID: um94yLrvQkeieesPNbWB8Q==
+X-CSE-MsgGUID: 58mHhrkeTRuAwGrnTU6UFw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,337,1744095600"; 
+   d="scan'208";a="165734118"
+Received: from lkp-server01.sh.intel.com (HELO 9ee84586c615) ([10.239.97.150])
+  by orviesa005.jf.intel.com with ESMTP; 24 Jul 2025 05:00:19 -0700
+Received: from kbuild by 9ee84586c615 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1ueucS-000KP7-03;
+	Thu, 24 Jul 2025 12:00:16 +0000
+Date: Thu, 24 Jul 2025 20:00:01 +0800
+From: kernel test robot <lkp@intel.com>
+To: Ashish Kalra <Ashish.Kalra@amd.com>, joro@8bytes.org,
+	suravee.suthikulpanit@amd.com, thomas.lendacky@amd.com,
+	Sairaj.ArunKodilkar@amd.com, Vasant.Hegde@amd.com,
+	herbert@gondor.apana.org.au
+Cc: oe-kbuild-all@lists.linux.dev, seanjc@google.com, pbonzini@redhat.com,
+	will@kernel.org, robin.murphy@arm.com, john.allen@amd.com,
+	davem@davemloft.net, michael.roth@amd.com, iommu@lists.linux.dev,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH v4 1/4] iommu/amd: Add support to remap/unmap IOMMU
+ buffers for kdump
+Message-ID: <202507241929.76UExdsw-lkp@intel.com>
+References: <6a48567cd99a0ef915862b3c6590d1415d287870.1753133022.git.ashish.kalra@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250722094734.4920545b@gandalf.local.home> <2c2f5036-c3ae-3904-e940-8a8b71a65957@loongson.cn>
- <20250723214659.064b5d4a@gandalf.local.home> <15e46f69-f270-0520-1ad4-874448439d2b@loongson.cn>
-In-Reply-To: <15e46f69-f270-0520-1ad4-874448439d2b@loongson.cn>
-From: Huacai Chen <chenhuacai@kernel.org>
-Date: Thu, 24 Jul 2025 19:56:42 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H4TGus35B6ONdkSOMwWw+H6NRmHStV-Xu7vUYYrkDGfUQ@mail.gmail.com>
-X-Gm-Features: Ac12FXyEIVNP2UDQDr7DKqNUOZbuTtFEVDCtic-VwJB5VQ3JEknFoA6_p-1cdZw
-Message-ID: <CAAhV-H4TGus35B6ONdkSOMwWw+H6NRmHStV-Xu7vUYYrkDGfUQ@mail.gmail.com>
-Subject: Re: [PATCH] LoongArch: KVM: Move kvm_iocsr tracepoint out of generic code
-To: Bibo Mao <maobibo@loongson.cn>
-Cc: Steven Rostedt <rostedt@goodmis.org>, LKML <linux-kernel@vger.kernel.org>, 
-	Linux Trace Kernel <linux-trace-kernel@vger.kernel.org>, kvm@vger.kernel.org, 
-	loongarch@lists.linux.dev, Tianrui Zhao <zhaotianrui@loongson.cn>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Masami Hiramatsu <mhiramat@kernel.org>, 
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6a48567cd99a0ef915862b3c6590d1415d287870.1753133022.git.ashish.kalra@amd.com>
 
-On Thu, Jul 24, 2025 at 9:51=E2=80=AFAM Bibo Mao <maobibo@loongson.cn> wrot=
-e:
->
->
->
-> On 2025/7/24 =E4=B8=8A=E5=8D=889:46, Steven Rostedt wrote:
-> > On Thu, 24 Jul 2025 09:39:40 +0800
-> > Bibo Mao <maobibo@loongson.cn> wrote:
-> >
-> >>>    #define kvm_fpu_load_symbol      \
-> >>>     {0, "unload"},          \
-> >>>     {1, "load"}
-> >>>
-> >> Reviewed-by: Bibo Mao <maobibo@loongson.cn>
-> >
-> > Thanks,
-> >
-> > Should this go through the loongarch tree or should I take it?
-> Huacai,
->
-> What is your point about this?
-I will take it, thanks.
+Hi Ashish,
 
-Huacai
+kernel test robot noticed the following build warnings:
 
->
-> Regards
-> Bibo Mao
-> >
-> > Either way works for me.
-> >
-> > -- Steve
-> >
->
+[auto build test WARNING on herbert-cryptodev-2.6/master]
+[also build test WARNING on herbert-crypto-2.6/master linus/master v6.16-rc7 next-20250724]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Ashish-Kalra/iommu-amd-Add-support-to-remap-unmap-IOMMU-buffers-for-kdump/20250722-055642
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+patch link:    https://lore.kernel.org/r/6a48567cd99a0ef915862b3c6590d1415d287870.1753133022.git.ashish.kalra%40amd.com
+patch subject: [PATCH v4 1/4] iommu/amd: Add support to remap/unmap IOMMU buffers for kdump
+config: x86_64-randconfig-r133-20250724 (https://download.01.org/0day-ci/archive/20250724/202507241929.76UExdsw-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14+deb12u1) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250724/202507241929.76UExdsw-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202507241929.76UExdsw-lkp@intel.com/
+
+sparse warnings: (new ones prefixed by >>)
+>> drivers/iommu/amd/init.c:723:41: sparse: sparse: incorrect type in return expression (different address spaces) @@     expected void * @@     got void [noderef] __iomem * @@
+   drivers/iommu/amd/init.c:723:41: sparse:     expected void *
+   drivers/iommu/amd/init.c:723:41: sparse:     got void [noderef] __iomem *
+>> drivers/iommu/amd/init.c:723:41: sparse: sparse: incorrect type in return expression (different address spaces) @@     expected void * @@     got void [noderef] __iomem * @@
+   drivers/iommu/amd/init.c:723:41: sparse:     expected void *
+   drivers/iommu/amd/init.c:723:41: sparse:     got void [noderef] __iomem *
+>> drivers/iommu/amd/init.c:723:41: sparse: sparse: incorrect type in return expression (different address spaces) @@     expected void * @@     got void [noderef] __iomem * @@
+   drivers/iommu/amd/init.c:723:41: sparse:     expected void *
+   drivers/iommu/amd/init.c:723:41: sparse:     got void [noderef] __iomem *
+
+vim +723 drivers/iommu/amd/init.c
+
+   707	
+   708	static inline void *iommu_memremap(unsigned long paddr, size_t size)
+   709	{
+   710		phys_addr_t phys;
+   711	
+   712		if (!paddr)
+   713			return NULL;
+   714	
+   715		/*
+   716		 * Obtain true physical address in kdump kernel when SME is enabled.
+   717		 * Currently, previous kernel with SME enabled and kdump kernel
+   718		 * with SME support disabled is not supported.
+   719		 */
+   720		phys = __sme_clr(paddr);
+   721	
+   722		if (cc_platform_has(CC_ATTR_HOST_MEM_ENCRYPT))
+ > 723			return ioremap_encrypted(phys, size);
+   724		else
+   725			return memremap(phys, size, MEMREMAP_WB);
+   726	}
+   727	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
