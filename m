@@ -1,112 +1,144 @@
-Return-Path: <kvm+bounces-53378-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53379-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 827E0B10B71
-	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 15:31:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AA3FB10BB2
+	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 15:39:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D3D7188185B
-	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 13:32:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F1A6B583DA9
+	for <lists+kvm@lfdr.de>; Thu, 24 Jul 2025 13:38:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B911726059F;
-	Thu, 24 Jul 2025 13:31:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0C032D9EF3;
+	Thu, 24 Jul 2025 13:38:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4sBckWNT"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jeH0vze7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 958DC224F6
-	for <kvm@vger.kernel.org>; Thu, 24 Jul 2025 13:31:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B2C113BC0C
+	for <kvm@vger.kernel.org>; Thu, 24 Jul 2025 13:38:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753363910; cv=none; b=m2Nc6jT2gfDSYzt579loXwz6X0xKXEoHeKVb09tmqKvtuBQUujumFLUDs6ZCea+xw8wmWLn9rUErFp4cwF55w86I9LERkTif15kvBltkzqYi0vUAhJNEjFHRbc1Jdjvm1ugN5vl8RI/XrzTN3BFE3NDJvmNIbfcAKJgGqF7OmD4=
+	t=1753364317; cv=none; b=XVACH/Cl/qGGTL65lr8ldlu26V+RkKokKCwYv0633ZcEmtw7uFjZOlSbWiVAufZ/UMovXysjLQFOZg59xrKoFCzo9G4lSRafN4C5TplJKcXXOyebhOg0ys0oGulTbDXGqLzXWcYtnY1NxTNdgyhvgpZYkf1EPq03IXCTaijrleE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753363910; c=relaxed/simple;
-	bh=gJVEnKD+m86/Uy00KKGOC2HsXj1DksP0pHClj72P4RI=;
+	s=arc-20240116; t=1753364317; c=relaxed/simple;
+	bh=m/wAqpkQt/2RUTnKv++HTuPYU+CI570SgF46+i7FkLY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ghR3t/hZ4sOv2KSwQ0tvdZPRsAderG0wF3aZyjIGaBajz4JGdChZ1QIE7/KPgwYBM66WsrNM/ZPEQEbGCqEn4rVfE4DKrURRBIMdG9XHy+FLANBiujEGiNxJxo0K9eQpRbxzcezuo1onzMgAvOahIaisJaQkGkGAMLme2GMU/0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4sBckWNT; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=GY7K/gAx/tWqnQGfXGZgvZSPVvL3ny/6zm3mF7DRNthb2x+wqbgyEPJLRFy24T2EuLr+JXfTMSxEGH/kVVZqafsYi3U6KUaiZl4TunudnAQpPVAvMNKW62Hy3DYUc/LDgjvr0YbbSFLVVhYB38rZuu+EOmnqYTYXYlBEizGw3Wk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jeH0vze7; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-740774348f6so1048910b3a.1
-        for <kvm@vger.kernel.org>; Thu, 24 Jul 2025 06:31:49 -0700 (PDT)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-313ff01d2a6so1089817a91.3
+        for <kvm@vger.kernel.org>; Thu, 24 Jul 2025 06:38:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753363909; x=1753968709; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1753364316; x=1753969116; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=n+//CxCRIZc81uvnzJthipR4khrLAZAMHtnmjaKkETc=;
-        b=4sBckWNTMET7dm4fucNTlZXCkUi0DMq+yr/O+N0Y3JVgx31NxhQTzktadiEzZV4V1k
-         jzAk3zEQsaX+s5P2g0at/p/Ym8d8nY064n9sVmZ5JdXKb521ER7Nqq1/cjQZWwyE+c+T
-         oTAEyeJz3oFT/LrxChc6z8hpFvzJ/IK2t6dPnAjtk7P5rvv7e6VAEbgTjtjV159L0DdX
-         e7UcKQkcEscPm/G88kkERgIo9sKjP93yaH8e09gZ6EVNuEgV15IJSSzvF4yrzpm1WvYh
-         cCvcsmfrXV+JCEb6CJ0Eu7y6sv7988vFS3M6yJ3f7kmAQHhEkdE5qPctz6kmmKVciDDH
-         7vWg==
+        bh=pnOCmnwynw18L73v17uRUHZaF/x2KzABpPPoldpodcM=;
+        b=jeH0vze79ZWziYZ2+7EE4fA/JYOyHvotSa2STb9WnotJEN4A4DpILMP2bXuucR43Ho
+         VrzEWYRWoAveqWWY6MfpSJbs5IBUcQJz2hAnZETbS1SCd2pVEM8udbHVksVRTiQmLvwh
+         KSeGa2KgKql9XdBTgUo26bXhAvPC+Bbq9Yf8yIKQCK5lXWwLfYfzTnzj3JdYkTsE9uhU
+         RQF1EC0B7H6MF2zCaLJBeR77LErE8a5hsOMi44DGGZDdzn2q/WOyUB+SIyYEn/CgZfeQ
+         pul/a4xdu7p35kEsmhmJqT5vzbysv3ef6U/nmUqx6R/CZn9IrwVXZq2Qs1zh5C1G3Uk2
+         /BDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753363909; x=1753968709;
+        d=1e100.net; s=20230601; t=1753364316; x=1753969116;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=n+//CxCRIZc81uvnzJthipR4khrLAZAMHtnmjaKkETc=;
-        b=YqDd77lUKHZhQeuvvrQ7CgUprAOeMFKTfkKi+HT2+RXch9+j6fFNUNKg9UlstnaYux
-         x4No6tLG8DaXa8kshKjW5rxXHjwjYBo9ZtSmkJ3K/0wfJFuuwtA6o/gozp5WazSv5lUp
-         /hapZRUYr/z4WUy+yLm1mJBHTClzqVjpiel/cejL+k33fj0HJkKH+l0WLbgG+FlnkCkf
-         zkUpCzFkFeGoR4CdYubtEcnzzgpO/oaneo/Q6yftr0uwRn4ob7eOTM6ESVy3ynNiQ0LW
-         nZeu+2fPmOSkRWtzeGDqxRo+9VavgTdA53HIQK7Q3k9qP96dS5bs7ymBgXMUQk/le3Of
-         mFzQ==
-X-Gm-Message-State: AOJu0Yy9bYmmPjwmgZoOJd5weESfqwatPNfCV2maJQ53JCIAiKl5SC1t
-	WmitSSvMh+nEfYWaWveXlpUOG1eAu1E37smrzdWFZ1B2Guklwkf260/Cgw2rHtVuJ8J9/lE8R+Z
-	hRVjIsQ==
-X-Google-Smtp-Source: AGHT+IHhPfyTLkgtMrtOM72kSjVGgRr+PyxLdwXo7qRQAzq2mFsE6l1xZorbTdGGRX+gMDUp6XZbhD1GIX0=
-X-Received: from pfbil10.prod.google.com ([2002:a05:6a00:8d4a:b0:746:1857:3be6])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:3a1c:b0:746:2591:e531
- with SMTP id d2e1a72fcca58-760353f447fmr8854470b3a.12.1753363908737; Thu, 24
- Jul 2025 06:31:48 -0700 (PDT)
-Date: Thu, 24 Jul 2025 06:31:47 -0700
-In-Reply-To: <eeec8f7d96b9dd9482a314b8ed81d3e26f6f6b9d.camel@intel.com>
+        bh=pnOCmnwynw18L73v17uRUHZaF/x2KzABpPPoldpodcM=;
+        b=ltA3Wug1NxSS7PVkw1doaj83SiBJ2j9nk1FPQcPf41kM5GiyTcQ88wRaY8OKaJqIn7
+         teIxojyI1H7xfm0W95h1Rllu30SyGJS02bkQSL1nuMXvbwIR7queWAOQYbu3iBZ7V2y5
+         ROX4XprJMFV69rKzlO3G78F/g5biKKkoh1gaDNLo2yR+a7OX32KYcE8Uq1XC6k6QM+SL
+         2iQ4tmbHMje5PdfWXbXGzVC/Twq4tWcQE4Lr9knRZClN8j55Pom8P/MKzb5oKOMasCf/
+         LxiRFl4Y/BWQ5MTGSpfEGcdSSImNr6kyFYa/MdSGt5aBn0R6DpcWNXnII/9k0TXutkcZ
+         eabQ==
+X-Gm-Message-State: AOJu0Yy/XWYQhNZJpyXJqW8SV95OHdqS1pGEnA5XGb01NQuiBoj3Qk5U
+	8BCH5nZraLsfx6MsROsgLyvJFQm5d1ycxIt/ZTT/eTJxbfRgiT9fx6tB0/hhj0S3SHI8hScTqFB
+	pFbQDzA==
+X-Google-Smtp-Source: AGHT+IHKP5c6zCcsaBVGeUC9JnWHdf7x1ONH0Dz2EiRHoSL15bjGbff8VU+lzJo4qe+hePB23V/EWsWs/xc=
+X-Received: from pji5.prod.google.com ([2002:a17:90b:3fc5:b0:312:3b05:5f44])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:e184:b0:311:a314:c2dc
+ with SMTP id 98e67ed59e1d1-31e507484acmr10767595a91.14.1753364315840; Thu, 24
+ Jul 2025 06:38:35 -0700 (PDT)
+Date: Thu, 24 Jul 2025 06:38:34 -0700
+In-Reply-To: <2025072400-amendment-thieving-675f@gregkh>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250704085027.182163-1-chao.gao@intel.com> <20250704085027.182163-2-chao.gao@intel.com>
- <eeec8f7d96b9dd9482a314b8ed81d3e26f6f6b9d.camel@intel.com>
-Message-ID: <aII1w2zfPHN9yUwM@google.com>
-Subject: Re: [PATCH v11 01/23] KVM: x86: Rename kvm_{g,s}et_msr()* to show
- that they emulate guest accesses
+References: <2025072400-amendment-thieving-675f@gregkh>
+Message-ID: <aII3WuhvJb3sY8HG@google.com>
+Subject: Re: [PATCH] KVM: x86: use array_index_nospec with indices that come
+ from guest
 From: Sean Christopherson <seanjc@google.com>
-To: Kai Huang <kai.huang@intel.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
-	Dave Hansen <dave.hansen@intel.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Chao Gao <chao.gao@intel.com>, 
-	"x86@kernel.org" <x86@kernel.org>, Weijiang Yang <weijiang.yang@intel.com>, 
-	Rick P Edgecombe <rick.p.edgecombe@intel.com>, "bp@alien8.de" <bp@alien8.de>, 
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "hpa@zytor.com" <hpa@zytor.com>, 
-	"john.allen@amd.com" <john.allen@amd.com>, "mingo@redhat.com" <mingo@redhat.com>, 
-	"tglx@linutronix.de" <tglx@linutronix.de>, "minipli@grsecurity.net" <minipli@grsecurity.net>, 
-	"mlevitsk@redhat.com" <mlevitsk@redhat.com>, "xin@zytor.com" <xin@zytor.com>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: kvm@vger.kernel.org, Thijs Raymakers <thijs@raymakers.nl>, stable <stable@kernel.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>
 Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Jul 24, 2025, Kai Huang wrote:
-> On Fri, 2025-07-04 at 01:49 -0700, Chao Gao wrote:
-> > From: Yang Weijiang <weijiang.yang@intel.com>
-> > 
-> > Rename kvm_{g,s}et_msr()* to kvm_emulate_msr_{read,write}()* to make it
-> > more obvious that KVM uses these helpers to emulate guest behaviors,
-> > i.e., host_initiated == false in these helpers.
-> > 
-> > Suggested-by: Sean Christopherson <seanjc@google.com>
-> > Suggested-by: Chao Gao <chao.gao@intel.com>
-> > Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-> > Signed-off-by: Chao Gao <chao.gao@intel.com>
-> > Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > Reviewed-by: Chao Gao <chao.gao@intel.com>
+On Thu, Jul 24, 2025, Greg Kroah-Hartman wrote:
+> From: Thijs Raymakers <thijs@raymakers.nl>
 > 
-> Nit: I don't think your Reviewed-by is needed if the chain already has
-> your SoB?
+> min and dest_id are guest-controlled indices. Using array_index_nospec()
+> after the bounds checks clamps these values to mitigate speculative
+> execution side-channels.
+> 
+> Signed-off-by: Thijs Raymakers <thijs@raymakers.nl>
+> Cc: stable <stable@kernel.org>
+> Cc: Sean Christopherson <seanjc@google.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> ---
+>  arch/x86/kvm/lapic.c | 2 ++
+>  arch/x86/kvm/x86.c   | 7 +++++--
+>  2 files changed, 7 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index 73418dc0ebb2..e10d6ad236c9 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -852,6 +852,8 @@ static int __pv_send_ipi(unsigned long *ipi_bitmap, struct kvm_apic_map *map,
+>  	if (min > map->max_apic_id)
+>  		return 0;
+>  
+> +	min = array_index_nospec(min, map->max_apic_id);
 
-Keep the Reviewed-by, it's still useful, e.g. to communicate that Chao has done
-more than just shepherd the patch along.
+This is wrong, max_apic_id is inclusive, whereas array_index_nospec() takes a
+size/length as the second argument.  I.e. this needs to be:
+
+	min = array_index_nospec(min, map->max_apic_id + 1);
+
+> +
+>  	for_each_set_bit(i, ipi_bitmap,
+>  		min((u32)BITS_PER_LONG, (map->max_apic_id - min + 1))) {
+>  		if (map->phys_map[min + i]) {
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 93636f77c42d..872e43defa67 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -10051,8 +10051,11 @@ static void kvm_sched_yield(struct kvm_vcpu *vcpu, unsigned long dest_id)
+>  	rcu_read_lock();
+>  	map = rcu_dereference(vcpu->kvm->arch.apic_map);
+>  
+> -	if (likely(map) && dest_id <= map->max_apic_id && map->phys_map[dest_id])
+> -		target = map->phys_map[dest_id]->vcpu;
+> +	if (likely(map) && dest_id <= map->max_apic_id) {
+> +		dest_id = array_index_nospec(dest_id, map->max_apic_id);
+
+Same thing here.
+
+> +		if (map->phys_map[dest_id])
+> +			target = map->phys_map[dest_id]->vcpu;
+> +	}
+>  
+>  	rcu_read_unlock();
+>  
+> -- 
+> 2.50.1
+> 
 
