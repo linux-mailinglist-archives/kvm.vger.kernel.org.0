@@ -1,38 +1,38 @@
-Return-Path: <kvm+bounces-53454-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53455-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB8D5B12048
-	for <lists+kvm@lfdr.de>; Fri, 25 Jul 2025 16:42:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C2135B12049
+	for <lists+kvm@lfdr.de>; Fri, 25 Jul 2025 16:42:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8EF9B1C2311B
-	for <lists+kvm@lfdr.de>; Fri, 25 Jul 2025 14:42:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0FD071C21B35
+	for <lists+kvm@lfdr.de>; Fri, 25 Jul 2025 14:42:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C68CD2ED87D;
-	Fri, 25 Jul 2025 14:41:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 575ED2EE275;
+	Fri, 25 Jul 2025 14:41:42 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC79A2ED861
-	for <kvm@vger.kernel.org>; Fri, 25 Jul 2025 14:41:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 730392ED856
+	for <kvm@vger.kernel.org>; Fri, 25 Jul 2025 14:41:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753454500; cv=none; b=Rg1rc69U9Wi+De60g5XaiAYLAmF2XOWbiqxbL8znooyg8qm9FLoMDDSJij3ibd1wFUvJ55LvOAd6LjyPEFUjUZyfFcxiDg3Zt8LNIOARLWCVqL7xOz/VoCV4dF7SmrKlXUgckgAxhppKymlrgD46HEO4/XgV/p4PM7sIjqasdxQ=
+	t=1753454501; cv=none; b=K4YHccu90CFACY1x+HWGMVW8jQxslJyPN0sINUGR50ZbCqLfdUZgtWPcng2FTrbuJ8vLA1Y5a7qJjZJ0+Jv84kEz0J+aRL7pBlj0QwsPNlbkn8SN6V0UJMCHAr0KrGyhanrDlEas29aAL/0AF2+Kkt36anqlAcfTf2P/FCZhv7I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753454500; c=relaxed/simple;
-	bh=Bay1h8sFietdUU6dT1FCyCCmF0oEuT6HEaVA7bzKyYo=;
+	s=arc-20240116; t=1753454501; c=relaxed/simple;
+	bh=qO7Oxu4MghnFe89SQZSfyy3L7Fji0ufbNWOYNTXTM5c=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=HeVtkkP4CYaE0MicIVPO8W+4C+4FvZERF6oYaIHiSkwP+XSr16vkLlJX4EmlvIIFMBXRvQWU2iu5LlIpnnRoaCK57Bk+ULCiieFFipdhNbz91AZO/A51tzEYhr2RetTFKBucgHKLz1ALyz+GKU4dyqgdGi5/uENw++nUgRr8BDo=
+	 MIME-Version; b=IdcFk7a+7gl7LKh7hFVVjfWeGHiZuN8rCQ06d0bynDPrrmfzTxHnoeLepI4gFapeexC9txe/svmXOdoN1JGwqrQc+5CYpY8DhjPXRjBpOLdtm98AKBcWtWv50Ae2zididZlM6vatTahNE266HNzhsn4jfmqIVUdbUX0obWTXvu0=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 01E6F176C;
-	Fri, 25 Jul 2025 07:41:32 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 778752C27;
+	Fri, 25 Jul 2025 07:41:33 -0700 (PDT)
 Received: from donnerap.arm.com (donnerap.manchester.arm.com [10.32.101.27])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8F8143F6A8;
-	Fri, 25 Jul 2025 07:41:37 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 10E843F778;
+	Fri, 25 Jul 2025 07:41:38 -0700 (PDT)
 From: Andre Przywara <andre.przywara@arm.com>
 To: Will Deacon <will@kernel.org>,
 	Julien Thierry <julien.thierry.kdev@gmail.com>,
@@ -40,9 +40,9 @@ To: Will Deacon <will@kernel.org>,
 Cc: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev,
 	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: [PATCH kvmtool v2 5/6] arm64: add FEAT_E2H0 support (TBC)
-Date: Fri, 25 Jul 2025 15:40:59 +0100
-Message-Id: <20250725144100.2944226-6-andre.przywara@arm.com>
+Subject: [PATCH kvmtool v2 6/6] arm64: Generate HYP timer interrupt specifiers
+Date: Fri, 25 Jul 2025 15:41:00 +0100
+Message-Id: <20250725144100.2944226-7-andre.przywara@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20250725144100.2944226-1-andre.przywara@arm.com>
 References: <20250725144100.2944226-1-andre.przywara@arm.com>
@@ -56,61 +56,99 @@ Content-Transfer-Encoding: 8bit
 
 From: Marc Zyngier <maz@kernel.org>
 
-To reduce code complexity, KVM only supports nested virtualisation in
-VHE mode. So to allow recursive nested virtualisation, and be able to
-expose FEAT_NV2 to a guest, we must prevent a guest from turning off
-HCR_EL2.E2H, which is covered by not advertising the FEAT_E2H0 architecture
-feature.
+FEAT_VHE introduced a non-secure EL2 virtual timer, along with its
+interrupt line. Consequently the arch timer DT binding introduced a fifth
+interrupt to communicate this interrupt number.
 
-To allow people to run a guest in non-VHE mode, KVM introduced the
-KVM_ARM_VCPU_HAS_EL2_E2H0 feature flag, which will allow control over
-HCR_EL2.E2H, but at the cost of turning off FEAT_NV2.
-
-Add a kvmtool command line option "--e2h0" to set that feature bit when
-creating a guest, to gain non-VHE, but lose recursive nested virt.
+Refactor the interrupts property generation code to deal with a variable
+number of interrupts, and forward five interrupts instead of four in case
+nested virt is enabled.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- arm64/include/kvm/kvm-config-arch.h | 5 ++++-
- arm64/kvm-cpu.c                     | 2 ++
- 2 files changed, 6 insertions(+), 1 deletion(-)
+ arm64/arm-cpu.c           |  4 +---
+ arm64/include/kvm/timer.h |  2 +-
+ arm64/timer.c             | 29 ++++++++++++-----------------
+ 3 files changed, 14 insertions(+), 21 deletions(-)
 
-diff --git a/arm64/include/kvm/kvm-config-arch.h b/arm64/include/kvm/kvm-config-arch.h
-index 44c43367b..73bf4211a 100644
---- a/arm64/include/kvm/kvm-config-arch.h
-+++ b/arm64/include/kvm/kvm-config-arch.h
-@@ -11,6 +11,7 @@ struct kvm_config_arch {
- 	bool		has_pmuv3;
- 	bool		mte_disabled;
- 	bool		nested_virt;
-+	bool		e2h0;
- 	u64		kaslr_seed;
- 	enum irqchip_type irqchip;
- 	u64		fw_addr;
-@@ -63,6 +64,8 @@ int sve_vl_parser(const struct option *opt, const char *arg, int unset);
- 	OPT_U64('\0', "counter-offset", &(cfg)->counter_offset,			\
- 		"Specify the counter offset, defaulting to 0"),			\
- 	OPT_BOOLEAN('\0', "nested", &(cfg)->nested_virt,			\
--		    "Start VCPUs in EL2 (for nested virt)"),
-+		    "Start VCPUs in EL2 (for nested virt)"),			\
-+	OPT_BOOLEAN('\0', "e2h0", &(cfg)->e2h0,					\
-+		    "Create guest without VHE support"),
+diff --git a/arm64/arm-cpu.c b/arm64/arm-cpu.c
+index 1e456f2c6..abdd6324f 100644
+--- a/arm64/arm-cpu.c
++++ b/arm64/arm-cpu.c
+@@ -12,11 +12,9 @@
  
- #endif /* ARM_COMMON__KVM_CONFIG_ARCH_H */
-diff --git a/arm64/kvm-cpu.c b/arm64/kvm-cpu.c
-index 42dc11dad..6eb76dff4 100644
---- a/arm64/kvm-cpu.c
-+++ b/arm64/kvm-cpu.c
-@@ -76,6 +76,8 @@ static void kvm_cpu__select_features(struct kvm *kvm, struct kvm_vcpu_init *init
- 		if (!kvm__supports_extension(kvm, KVM_CAP_ARM_EL2))
- 			die("EL2 (nested virt) is not supported");
- 		init->features[0] |= 1UL << KVM_ARM_VCPU_HAS_EL2;
-+		if (kvm->cfg.arch.e2h0)
-+			init->features[0] |= 1UL << KVM_ARM_VCPU_HAS_EL2_E2H0;
- 	}
+ static void generate_fdt_nodes(void *fdt, struct kvm *kvm)
+ {
+-	int timer_interrupts[4] = {13, 14, 11, 10};
+-
+ 	gic__generate_fdt_nodes(fdt, kvm->cfg.arch.irqchip,
+ 				kvm->cfg.arch.nested_virt);
+-	timer__generate_fdt_nodes(fdt, kvm, timer_interrupts);
++	timer__generate_fdt_nodes(fdt, kvm);
+ 	pmu__generate_fdt_nodes(fdt, kvm);
  }
  
+diff --git a/arm64/include/kvm/timer.h b/arm64/include/kvm/timer.h
+index 928e9ea7a..81e093e46 100644
+--- a/arm64/include/kvm/timer.h
++++ b/arm64/include/kvm/timer.h
+@@ -1,6 +1,6 @@
+ #ifndef ARM_COMMON__TIMER_H
+ #define ARM_COMMON__TIMER_H
+ 
+-void timer__generate_fdt_nodes(void *fdt, struct kvm *kvm, int *irqs);
++void timer__generate_fdt_nodes(void *fdt, struct kvm *kvm);
+ 
+ #endif /* ARM_COMMON__TIMER_H */
+diff --git a/arm64/timer.c b/arm64/timer.c
+index 861f2d994..2ac6144f9 100644
+--- a/arm64/timer.c
++++ b/arm64/timer.c
+@@ -5,31 +5,26 @@
+ #include "kvm/timer.h"
+ #include "kvm/util.h"
+ 
+-void timer__generate_fdt_nodes(void *fdt, struct kvm *kvm, int *irqs)
++void timer__generate_fdt_nodes(void *fdt, struct kvm *kvm)
+ {
+ 	const char compatible[] = "arm,armv8-timer\0arm,armv7-timer";
+ 	u32 cpu_mask = gic__get_fdt_irq_cpumask(kvm);
+-	u32 irq_prop[] = {
+-		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI),
+-		cpu_to_fdt32(irqs[0]),
+-		cpu_to_fdt32(cpu_mask | IRQ_TYPE_LEVEL_LOW),
++	int irqs[5] = {13, 14, 11, 10, 12};
++	int nr = ARRAY_SIZE(irqs);
++	u32 irq_prop[nr * 3];
+ 
+-		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI),
+-		cpu_to_fdt32(irqs[1]),
+-		cpu_to_fdt32(cpu_mask | IRQ_TYPE_LEVEL_LOW),
++	if (!kvm->cfg.arch.nested_virt)
++		nr--;
+ 
+-		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI),
+-		cpu_to_fdt32(irqs[2]),
+-		cpu_to_fdt32(cpu_mask | IRQ_TYPE_LEVEL_LOW),
+-
+-		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI),
+-		cpu_to_fdt32(irqs[3]),
+-		cpu_to_fdt32(cpu_mask | IRQ_TYPE_LEVEL_LOW),
+-	};
++	for (int i = 0; i < nr; i++) {
++		irq_prop[i * 3 + 0] = cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI);
++		irq_prop[i * 3 + 1] = cpu_to_fdt32(irqs[i]);
++		irq_prop[i * 3 + 2] = cpu_to_fdt32(cpu_mask | IRQ_TYPE_LEVEL_LOW);
++	}
+ 
+ 	_FDT(fdt_begin_node(fdt, "timer"));
+ 	_FDT(fdt_property(fdt, "compatible", compatible, sizeof(compatible)));
+-	_FDT(fdt_property(fdt, "interrupts", irq_prop, sizeof(irq_prop)));
++	_FDT(fdt_property(fdt, "interrupts", irq_prop, nr * 3 * sizeof(irq_prop[0])));
+ 	_FDT(fdt_property(fdt, "always-on", NULL, 0));
+ 	if (kvm->cfg.arch.force_cntfrq > 0)
+ 		_FDT(fdt_property_cell(fdt, "clock-frequency", kvm->cfg.arch.force_cntfrq));
 -- 
 2.25.1
 
