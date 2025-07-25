@@ -1,173 +1,184 @@
-Return-Path: <kvm+bounces-53461-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53462-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDF2FB12222
-	for <lists+kvm@lfdr.de>; Fri, 25 Jul 2025 18:37:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99DDBB1222E
+	for <lists+kvm@lfdr.de>; Fri, 25 Jul 2025 18:41:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E0D201CC7F6D
-	for <lists+kvm@lfdr.de>; Fri, 25 Jul 2025 16:37:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C422A5809A5
+	for <lists+kvm@lfdr.de>; Fri, 25 Jul 2025 16:41:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07C9E2EE983;
-	Fri, 25 Jul 2025 16:37:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 767352EF2B0;
+	Fri, 25 Jul 2025 16:40:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rfCzr7Z4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xgZGKxZD"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32C3A3BBF2;
-	Fri, 25 Jul 2025 16:37:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 383813BBF2
+	for <kvm@vger.kernel.org>; Fri, 25 Jul 2025 16:40:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753461437; cv=none; b=eUVoR2d6VvLnjuCvzmTuixhOPw65IqPiFm1SISKFud5dHybilMchOd6WLm8YWoYVknW65/XZFAueDQ1WcllK2BDdJpyxj7pypktZj63DMNCtTli12j/D8LnkkFWFpz86mL1klju7Zu+qgELMnJ7QSDuoD9rj2x1S3H4JeBHanqQ=
+	t=1753461652; cv=none; b=Postgqmgh8BZmud/CoQegS/52uJbWAd552uUdXsf3v+8pJl1fQ/sgDjN39u46+T8yKL9xfhJ6evIWmRShcLiZdIbcRKJ2MAvde4qSsPmeEaBPucJBzP7uIbWBUnMftEW61srdEj/d4VayP9kSa6Elr2j2pC3ddWT+5E6sTOAAmY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753461437; c=relaxed/simple;
-	bh=/oqgJIktBRx2Oetz49goPLT+JAoQFBLCRGikSQW8otY=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mC9YlJqQG8dcw9i8eBUYkIJvE+e7DGBXAXfIdzMsP6pxbxKr7QC93sa/xLIaf32F/iG9eLmMAbpHMS7w1rozvWnR5Gv4neqsiD2wmecBY0kWgH1JukWk8EkWefmQV+q/m8AxJhOP4tquB4XWPhqi7+IsB9nmkp6ClbSpuoj1qAg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rfCzr7Z4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6F7EC4CEE7;
-	Fri, 25 Jul 2025 16:37:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753461434;
-	bh=/oqgJIktBRx2Oetz49goPLT+JAoQFBLCRGikSQW8otY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=rfCzr7Z4iV0PdLQHU/zwAIaTWQnwdpZD9/MTiLT1U4pF96dV4Qznl1FlxOU1YUONG
-	 wMKgjmPP9D7Bv3qewXR+KCO0hlZF8AnG4CLl8ufSVF69CkPO5Lb5GNx1OuKLWuUH1e
-	 gUNLRC516FlK4pZ0P0vPU5yjuAe6m2CusWoY3DganhyaBDqA3vRnszEidwJOcFMEuZ
-	 uCpjU+i4a29fpRATUoyNHP9bDPYkZzM9QYV1cdi8PgQugVIKsMq7pVKAyCklSac/Xc
-	 SqS7X4EWJs8L9iCdc7SkNvUHeeBvOVbtW7n1neBeN6n30dqiXEVOdtlh4Ko2f5psS/
-	 txDcdbNyqIn+g==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1ufLQ0-001OXY-Bd;
-	Fri, 25 Jul 2025 17:37:12 +0100
-Date: Fri, 25 Jul 2025 17:37:12 +0100
-Message-ID: <86cy9o8bwn.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: Will Deacon <will@kernel.org>,
-	Julien Thierry <julien.thierry.kdev@gmail.com>,
-	kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH kvmtool v2 5/6] arm64: add FEAT_E2H0 support (TBC)
-In-Reply-To: <20250725144100.2944226-6-andre.przywara@arm.com>
-References: <20250725144100.2944226-1-andre.przywara@arm.com>
-	<20250725144100.2944226-6-andre.przywara@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1753461652; c=relaxed/simple;
+	bh=P3KVaroHnVD42PfWcaEs1jq2NjLZSICPGWqBQDxF3M8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=cDhw0xOdWZBMdpSj4h6/k5fgMDK/zZ157TBLU4UMNZ73fk1JcF3vZ4Q+kMBuvIa4nIBvXCc42zrjZV/OnJK6Uvifl0C3VcvBoY295v/gxAESJKWQQVwuyUVPeX4RDZlhr+RiW86SndVvHCHYYZr6wmcQvTU3VdKggkrJyXP7pjw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xgZGKxZD; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b39280167fdso1958968a12.0
+        for <kvm@vger.kernel.org>; Fri, 25 Jul 2025 09:40:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1753461650; x=1754066450; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=h0vJgkAubMXXN6o65VTnm8PRheVkeM5gEkAdD1H4GYM=;
+        b=xgZGKxZDSLgj9Is8vdoMh+jwRJWfQ2FO568xrPIhLktuCLA9N6+16AzyKf7yx2REDs
+         hjboYZLbGGW403oyP3wLK0K4FkbZJb+dx/OIU0AQcPflxrCK9x6XK0+WSW8+xJjx+f1a
+         sEsE1WRLqImoAwBSyMuQkeQ2v3HhO8bziFy7C5n7dUg9uVu6Vici6t7lmNGWy8Cov3db
+         giIVp9mA3pOs8R2mV38ZRfOa1DFKqc1BpKYoN4RMl4jECXmk8TkL+MJxbswdF1F6hWdx
+         i52PuYNGqmhOTx+TsbWpVbMwkWygifWvjA++Bq/onqpmtHondH5qqLmOyVDVpuPnLLd2
+         7yBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753461650; x=1754066450;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=h0vJgkAubMXXN6o65VTnm8PRheVkeM5gEkAdD1H4GYM=;
+        b=h3WuaTy4eyGTNVu/wWo+hwPlkU4DnLexBgDqTN6xkVHv9WIx8dWnFSLvVkslTMKA1i
+         pP07K6wFHQUuy4PHIr53TPb/bW4nPMAmWqLw2Bi4OHLq8d7ittu0wDLW4hubUkIOum5z
+         3mqD4Na+DTUn69pdy861sVuNquQs5LcUsw4PmgOlJkPvN9qzQjhnW/h9tvKpHChQYd67
+         Qo+mkze/Pk57HMARCwoDUml8XiyCwQDeXR55OBLpigMCASzI5yy7OtgCHDlRyOg6G4nD
+         atorki7uGx1ZwassfzVdT65eA/Inl1lnGuQ+BRfNQnn3wG0cAWsBakt1P4D994TxynaF
+         /aRw==
+X-Forwarded-Encrypted: i=1; AJvYcCVFOdp2WZpaqUczV4fiCgPrefB7s/jcYxItmjU7Zw2t3GboJ9VUBiBvPvYw1n471hbKT48=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyt47Lne7wLkEIZ76zirFank25Lpgcovlo2mJWVknVRsySmMuC9
+	M48opeHFJo5VMN1WPeI2+fJwwl5DEvYPrFIcVz1V9HUqk2ebSfCBYs53dal8W2lrJncdABRHzVy
+	e4pO3k7n924vUW54ZEcnAUunVJA==
+X-Google-Smtp-Source: AGHT+IESSUb5A7ox/0yy/1EortQTdLaTQG/uMcj33CzvrGYLDRDtIu6A1gNBwhWuX15U4LdcnVba587BKC1ItwdU2g==
+X-Received: from pjbqc8.prod.google.com ([2002:a17:90b:2888:b0:312:26c4:236])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90a:e185:b0:31c:bfb9:fca0 with SMTP id 98e67ed59e1d1-31e77a18508mr3602768a91.4.1753461650340;
+ Fri, 25 Jul 2025 09:40:50 -0700 (PDT)
+Date: Fri, 25 Jul 2025 09:40:48 -0700
+In-Reply-To: <aIOMPpTWKWoM_O5J@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: andre.przywara@arm.com, will@kernel.org, julien.thierry.kdev@gmail.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, alexandru.elisei@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+References: <20250723104714.1674617-1-tabba@google.com> <20250723104714.1674617-16-tabba@google.com>
+ <diqza54tdv3p.fsf@ackerleytng-ctop.c.googlers.com> <aIOMPpTWKWoM_O5J@google.com>
+Message-ID: <diqzy0sccjfz.fsf@ackerleytng-ctop.c.googlers.com>
+Subject: Re: [PATCH v16 15/22] KVM: x86/mmu: Extend guest_memfd's max mapping
+ level to shared mappings
+From: Ackerley Tng <ackerleytng@google.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-mm@kvack.org, kvmarm@lists.linux.dev, pbonzini@redhat.com, 
+	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
+	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
+	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
+	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, 
+	dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net, 
+	vbabka@suse.cz, vannapurve@google.com, mail@maciej.szmigiero.name, 
+	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
+	ira.weiny@intel.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Andre,
+Sean Christopherson <seanjc@google.com> writes:
 
-Thanks for picking this. A few nits below.
+> On Thu, Jul 24, 2025, Ackerley Tng wrote:
+>> Fuad Tabba <tabba@google.com> writes:
+>> >  int kvm_mmu_max_mapping_level(struct kvm *kvm, struct kvm_page_fault =
+*fault,
+>> > @@ -3362,8 +3371,9 @@ int kvm_mmu_max_mapping_level(struct kvm *kvm, s=
+truct kvm_page_fault *fault,
+>> >  	if (max_level =3D=3D PG_LEVEL_4K)
+>> >  		return PG_LEVEL_4K;
+>> > =20
+>> > -	if (is_private)
+>> > -		host_level =3D kvm_max_private_mapping_level(kvm, fault, slot, gfn)=
+;
+>> > +	if (is_private || kvm_memslot_is_gmem_only(slot))
+>> > +		host_level =3D kvm_gmem_max_mapping_level(kvm, fault, slot, gfn,
+>> > +							is_private);
+>> >  	else
+>> >  		host_level =3D host_pfn_mapping_level(kvm, gfn, slot);
+>>=20
+>> No change required now, would like to point out that in this change
+>> there's a bit of an assumption if kvm_memslot_is_gmem_only(), even for
+>> shared pages, guest_memfd will be the only source of truth.
+>
+> It's not an assumption, it's a hard requirement.
+>
+>> This holds now because shared pages are always split to 4K, but if
+>> shared pages become larger, might mapping in the host actually turn out
+>> to be smaller?
+>
+> Yes, the host userspace mappens could be smaller, and supporting that sce=
+nario is
+> very explicitly one of the design goals of guest_memfd.  From commit a780=
+0aa80ea4
+> ("KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for guest-specific backing memo=
+ry"):
+>
+>  : A guest-first memory subsystem allows for optimizations and enhancemen=
+ts
+>  : that are kludgy or outright infeasible to implement/support in a gener=
+ic
+>  : memory subsystem.  With guest_memfd, guest protections and mapping siz=
+es
+>  : are fully decoupled from host userspace mappings.   E.g. KVM currently
+>  : doesn't support mapping memory as writable in the guest without it als=
+o
+>  : being writable in host userspace, as KVM's ABI uses VMA protections to
+>  : define the allow guest protection.  Userspace can fudge this by
+>  : establishing two mappings, a writable mapping for the guest and readab=
+le
+>  : one for itself, but that=E2=80=99s suboptimal on multiple fronts.
+>  :=20
+>  : Similarly, KVM currently requires the guest mapping size to be a stric=
+t
+>  : subset of the host userspace mapping size, e.g. KVM doesn=E2=80=99t su=
+pport
+>  : creating a 1GiB guest mapping unless userspace also has a 1GiB guest
+>  : mapping.  Decoupling the mappings sizes would allow userspace to preci=
+sely
+>  : map only what is needed without impacting guest performance, e.g. to
+>  : harden against unintentional accesses to guest memory.
 
-On Fri, 25 Jul 2025 15:40:59 +0100,
-Andre Przywara <andre.przywara@arm.com> wrote:
-> 
-> From: Marc Zyngier <maz@kernel.org>
-> 
-> To reduce code complexity, KVM only supports nested virtualisation in
-> VHE mode. So to allow recursive nested virtualisation, and be able to
-> expose FEAT_NV2 to a guest, we must prevent a guest from turning off
-> HCR_EL2.E2H, which is covered by not advertising the FEAT_E2H0 architecture
-> feature.
-> 
-> To allow people to run a guest in non-VHE mode, KVM introduced the
-> KVM_ARM_VCPU_HAS_EL2_E2H0 feature flag, which will allow control over
-> HCR_EL2.E2H, but at the cost of turning off FEAT_NV2.
+Let me try to understand this better. If/when guest_memfd supports
+larger folios for shared pages, and guest_memfd returns a 2M folio from
+kvm_gmem_fault_shared(), can the mapping in host userspace turn out
+to be 4K?
 
-All of that has been captured at length in the kernel code, and I
-think this is "too much information" for userspace. I'd rather we
-stick to a pure description of what the various options mean to the
-user.
+If that happens, should kvm_gmem_max_mapping_level() return 4K for a
+memslot with kvm_memslot_is_gmem_only() =3D=3D true?
 
-> Add a kvmtool command line option "--e2h0" to set that feature bit when
-> creating a guest, to gain non-VHE, but lose recursive nested virt.
+The above code would skip host_pfn_mapping_level() and return just what
+guest_memfd reports, which is 2M.
 
-How about:
-
-"The --nested option allows a guest to boot at EL2 without FEAT_E2H0
- (i.e. mandating VHE support). While this is great for "modern"
- operating systems and hypervisors, a few legacy guests are stuck in a
- distant past.
-
- To support those, the --e2h0 option exposes FEAT_E2H0 to the guest,
- at the expense of a number of other features, such as FEAT_NV2. This
- is conditioned on the host itself supporting FEAT_E2H0."
-
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> ---
->  arm64/include/kvm/kvm-config-arch.h | 5 ++++-
->  arm64/kvm-cpu.c                     | 2 ++
->  2 files changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arm64/include/kvm/kvm-config-arch.h b/arm64/include/kvm/kvm-config-arch.h
-> index 44c43367b..73bf4211a 100644
-> --- a/arm64/include/kvm/kvm-config-arch.h
-> +++ b/arm64/include/kvm/kvm-config-arch.h
-> @@ -11,6 +11,7 @@ struct kvm_config_arch {
->  	bool		has_pmuv3;
->  	bool		mte_disabled;
->  	bool		nested_virt;
-> +	bool		e2h0;
->  	u64		kaslr_seed;
->  	enum irqchip_type irqchip;
->  	u64		fw_addr;
-> @@ -63,6 +64,8 @@ int sve_vl_parser(const struct option *opt, const char *arg, int unset);
->  	OPT_U64('\0', "counter-offset", &(cfg)->counter_offset,			\
->  		"Specify the counter offset, defaulting to 0"),			\
->  	OPT_BOOLEAN('\0', "nested", &(cfg)->nested_virt,			\
-> -		    "Start VCPUs in EL2 (for nested virt)"),
-> +		    "Start VCPUs in EL2 (for nested virt)"),			\
-> +	OPT_BOOLEAN('\0', "e2h0", &(cfg)->e2h0,					\
-> +		    "Create guest without VHE support"),
->  
->  #endif /* ARM_COMMON__KVM_CONFIG_ARCH_H */
-> diff --git a/arm64/kvm-cpu.c b/arm64/kvm-cpu.c
-> index 42dc11dad..6eb76dff4 100644
-> --- a/arm64/kvm-cpu.c
-> +++ b/arm64/kvm-cpu.c
-> @@ -76,6 +76,8 @@ static void kvm_cpu__select_features(struct kvm *kvm, struct kvm_vcpu_init *init
->  		if (!kvm__supports_extension(kvm, KVM_CAP_ARM_EL2))
->  			die("EL2 (nested virt) is not supported");
->  		init->features[0] |= 1UL << KVM_ARM_VCPU_HAS_EL2;
-> +		if (kvm->cfg.arch.e2h0)
-> +			init->features[0] |= 1UL << KVM_ARM_VCPU_HAS_EL2_E2H0;
-
-This really should also check the capability in order to fail
-gracefully on system that have no E2H0 support at all (or have it so
-buggy that it is permanently disabled by the kernel):
-
-+		if (kvm->cfg.arch.e2h0) {
-+	  		if (!kvm__supports_extension(kvm, KVM_CAP_ARM_EL2_E2H0))
-+				die("FEAT_E2H0 is not supported");
-+			init->features[0] |= 1UL << KVM_ARM_VCPU_HAS_EL2_E2H0;
-+		}
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Or do you mean that guest_memfd will be the source of truth in that it
+must also know/control, in the above scenario, that the host mapping is
+also 2M?
 
