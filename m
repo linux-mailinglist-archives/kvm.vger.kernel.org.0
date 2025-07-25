@@ -1,233 +1,138 @@
-Return-Path: <kvm+bounces-53440-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53441-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19239B11B47
-	for <lists+kvm@lfdr.de>; Fri, 25 Jul 2025 11:55:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 36593B11C44
+	for <lists+kvm@lfdr.de>; Fri, 25 Jul 2025 12:25:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B00E177536
-	for <lists+kvm@lfdr.de>; Fri, 25 Jul 2025 09:55:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A690564191
+	for <lists+kvm@lfdr.de>; Fri, 25 Jul 2025 10:25:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25D6E2D3A85;
-	Fri, 25 Jul 2025 09:54:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7673C2DE712;
+	Fri, 25 Jul 2025 10:25:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EVyzFiFq"
+	dkim=pass (2048-bit key) header.d=raymakers.nl header.i=@raymakers.nl header.b="FDfbOLPt"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from dane.soverin.net (dane.soverin.net [185.233.34.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 905ED2D59E3
-	for <kvm@vger.kernel.org>; Fri, 25 Jul 2025 09:54:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE0922DC348
+	for <kvm@vger.kernel.org>; Fri, 25 Jul 2025 10:24:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.233.34.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753437287; cv=none; b=XWqtz4FBxprdRfFS55kGfKNtn5twQuTyauLHlgTyzgMSRQFV1yCmMygOfiwOZlHJlRfQu5wkm3GTf8xRZS+JyYVoIFw6DIAqfrl2aGs/EFjqKCa+MOL/muSz+R1Z7nNlUrG7ZOaG4nVl4wFEAKGJ9TEYOOyCL8qqKPUX9bOnUbM=
+	t=1753439102; cv=none; b=C7PlUPnFNqk1kLnYFfvpMCTzFhXN7qmhNY2U9+TgM1+TM8WsI/ILEPcYg4Zzoa84pvJPF/VwUrLtA5i27QK0UgzePw2BNllssbJUtglVCwPtVDi4rk0YZ4GGioU33lt48tiEx2rdO/+ULqqedYtUcz3EXzq49ZuEOvVO2HAMYV4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753437287; c=relaxed/simple;
-	bh=KQiWoYwE4DtgGub2KVDrTmPEBdDunx+CvhNc03f/X8c=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DWUBtPBVDXbeEG29zGrBuDI7a3Q3bZedlxmd68sJofnyrqaRCe7egmXZfcHw9soNa5N9LSn2z8fmjW2xbClMRZlZcrTqEtuS1QwGIoiFj168ETS2ORJ0xUE2HSPERm5Q7w1eIMiD0+28LoC8gouGgjnYzH9KH1MlF0EVSywY0Ak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EVyzFiFq; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1753437284;
+	s=arc-20240116; t=1753439102; c=relaxed/simple;
+	bh=wuGhjS5e4r6kwMpZoARntB0hKB+IVvKoz++SaVJBTro=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Tu87i4r4trb+bpkvDHtxoId70VIXxf5oEQBaWuEv/XWCYAdlFFZ89HjxNQZnphbF+K5a2t7ocrNrhdgBkd9TJ46CGAgsygG5Kr3nRZC45NwWv6fiUHTxUwtoOZDDHK5ZLYVaXpe91cUh4PSER1CrY89BOBR793Vmg754RYaDURg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=raymakers.nl; spf=pass smtp.mailfrom=raymakers.nl; dkim=pass (2048-bit key) header.d=raymakers.nl header.i=@raymakers.nl header.b=FDfbOLPt; arc=none smtp.client-ip=185.233.34.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=raymakers.nl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=raymakers.nl
+Received: from smtp.soverin.net (unknown [10.10.4.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
+	(No client certificate requested)
+	by dane.soverin.net (Postfix) with ESMTPS id 4bpPBd37Dkz13MJ;
+	Fri, 25 Jul 2025 10:24:57 +0000 (UTC)
+Received: from smtp.soverin.net (smtp.soverin.net [10.10.4.100]) by soverin.net (Postfix) with ESMTPSA id 4bpPBc4fw9zNG;
+	Fri, 25 Jul 2025 10:24:56 +0000 (UTC)
+Authentication-Results: smtp.soverin.net;
+	dkim=pass (2048-bit key; unprotected) header.d=raymakers.nl header.i=@raymakers.nl header.a=rsa-sha256 header.s=soverin1 header.b=FDfbOLPt;
+	dkim-atps=neutral
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=raymakers.nl;
+	s=soverin1; t=1753439097;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=PgepI28mSFaDGrO5jO+/MtZDNqSsfZIqo5y5RNjR59U=;
-	b=EVyzFiFqHAycMlKrLj2KqB4npWTVp1YNMT+0dPDJXgTWVtyyZyaDuI6D+z8y+DsCBI1spe
-	rbvupyP3dNwKmlxjAfISFtukObJasZfOzXBXKTNpAIeSfceokRl+YuNGP+/gL0RP3WOlZj
-	mFPr81RxjoftgRfUHXj8V9hfZWR6x5w=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-520-B8Wjw5u7PF29wgmtWrU0zg-1; Fri,
- 25 Jul 2025 05:54:41 -0400
-X-MC-Unique: B8Wjw5u7PF29wgmtWrU0zg-1
-X-Mimecast-MFC-AGG-ID: B8Wjw5u7PF29wgmtWrU0zg_1753437280
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0A2DE1800873
-	for <kvm@vger.kernel.org>; Fri, 25 Jul 2025 09:54:40 +0000 (UTC)
-Received: from dell-r430-03.lab.eng.brq2.redhat.com (dell-r430-03.lab.eng.brq2.redhat.com [10.37.153.18])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0E5E019560AA;
-	Fri, 25 Jul 2025 09:54:38 +0000 (UTC)
-From: Igor Mammedov <imammedo@redhat.com>
-To: kvm@vger.kernel.org
-Cc: pbonzini@redhat.com,
-	peterx@redhat.com
-Subject: [kvm-unit-tests PATCH v4 5/5] x86: add HPET counter read micro benchmark and enable/disable torture tests
-Date: Fri, 25 Jul 2025 11:54:29 +0200
-Message-ID: <20250725095429.1691734-6-imammedo@redhat.com>
-In-Reply-To: <20250725095429.1691734-1-imammedo@redhat.com>
-References: <20250725095429.1691734-1-imammedo@redhat.com>
+	bh=JwGBKoGSK5hyhrXBFhC000DvuldOUGiw3VO4vaObOn8=;
+	b=FDfbOLPtQAJA+j90HOxJzn6xXRqeaKF1BALyG/yzSFwq7B24NcQG0BClde3TCfFUls1rQl
+	KEDFT2qhJimNGXjJ17CoOVKLdBD9wkgJC25kh47leJM7s0Ir05BhcztpNcLKmP07vYYaw2
+	4kixUgzz5h+kJyMIIszCirHMjtztQjJkvHRT2LP0/6F1FQeNHpoTuUYNatGWrmKQt3usHd
+	bEfmVqDX6lITg3agShXonT2gNTlPuT2WPBrtNDVFDo2M+o/P55VQwE/E/aE5NspQ11uu9D
+	Ll05KZIAgcjIAbmMGkzyIpH0n0Su/wKCGy97/4GX1eHtzaQ94RNSKXxDYJCZ3A==
+X-CM-Envelope: MS4xfLSOwqEs7vPO8vLGkdw3VVXIL7sFXZzQZprzYM9VIZ/gw57aWVBgiUw9DRRyu7M0mk0NaZqvZta/iretyDeIV5vE6+cAMDfoSyNJxuuK92AWZL7T18uA 5xqUqkXH1tMZPyVmAQd5JQ2IuAiaYbec8O00/bvKQo+6p9+HXS1470+4jJfavQYQ14POi8U8a+QCH3byX8N7Uc9nRb+he00tdqScFu2q8eVZHO25J4kknK22 EqetgNLaas5ofCwTFa+BjqpBHxl5XX83WMkfvT6ao4zhmn2d3HtQ72U2cBpAriV58Jke/VhSlp8+DYXl+iJfoA==
+X-CM-Analysis: v=2.4 cv=UsCZN/wB c=1 sm=1 tr=0 ts=68835b79 a=XOmTiIAKWumpY28wnlWq/Q==:117 a=XOmTiIAKWumpY28wnlWq/Q==:17 a=IkcTkHD0fZMA:10 a=VwQbUJbxAAAA:8 a=eMcEbXDZAAAA:8 a=1XWaLZrsAAAA:8 a=20KFwNOVAAAA:8 a=ag1SF4gXAAAA:8 a=UVw58GM76ilsUMV6UqoA:9 a=QEXdDO2ut3YA:10 a=Ff6uVGclmHxgYidJvOUY:22 a=Yupwre4RP9_Eg_Bd0iYG:22
+Message-ID: <8743b6be-3c28-43c0-aec7-948ae1d2d026@raymakers.nl>
+Date: Fri, 25 Jul 2025 12:24:54 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+Subject: Re: [PATCH v2] KVM: x86: use array_index_nospec with indices that
+ come from guest
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, stable <stable@kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
+References: <aII3WuhvJb3sY8HG@google.com>
+ <20250724142227.61337-1-thijs@raymakers.nl>
+ <2025072441-degrease-skipping-bbc8@gregkh> <aIKDr_kVpUjC8924@google.com>
+ <2025072540-eggbeater-crate-50af@gregkh>
+Content-Language: en-US
+From: Thijs Raymakers <thijs@raymakers.nl>
+In-Reply-To: <2025072540-eggbeater-crate-50af@gregkh>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spampanel-Class: ham
 
-test is to be used for benchmarking/validating HPET main counter reading
 
-how to run:
-   QEMU=/foo/qemu-system-x86_64 x86/run x86/hpet_read_test.flat -smp X
-where X is desired number of logical CPUs to test with
+On 7/25/25 6:42 AM, Greg Kroah-Hartman wrote:
+> On Thu, Jul 24, 2025 at 12:04:15PM -0700, Sean Christopherson wrote:
+>> On Thu, Jul 24, 2025, Greg Kroah-Hartman wrote:
+>>> On Thu, Jul 24, 2025 at 04:22:27PM +0200, Thijs Raymakers wrote:
+>>>> min and dest_id are guest-controlled indices. Using array_index_nospec()
+>>>> after the bounds checks clamps these values to mitigate speculative execution
+>>>> side-channels.
+>>>>
+>>>> Signed-off-by: Thijs Raymakers <thijs@raymakers.nl>
+>>>> Cc: stable <stable@kernel.org>
+>>>> Cc: Sean Christopherson <seanjc@google.com>
+>>>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>>>> Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+>>> Nit, you shouldn't have added my signed off on a new version, but that's
+>>> ok, I'm fine with it.
+>> Want me to keep your SoB when applying, or drop it?
+> Keep it please, I was just letting Thijs know.
+Sorry about that. I was not entirely sure whether tags like Signed-Off 
+should
+be kept or removed in a new revision. Thanks for the feedback.
+>>>> ---
+>>>>   arch/x86/kvm/lapic.c | 2 ++
+>>>>   arch/x86/kvm/x86.c   | 7 +++++--
+>>>>   2 files changed, 7 insertions(+), 2 deletions(-)
+>>> You also forgot to say what changed down here.
+>>>
+>>> Don't know how strict the KVM maintainers are, I know I require these
+>>> things fixed up...
+>> I require the same things, but I also don't mind doing fixup when applying if
+>> that's the path of least resistance (and it's not a recurring problem).
 
-it will 1st execute concurrent read benchmark
-and after that it will run torture test enabling/disabling HPET counter,
-while running readers in parallel. Goal is to verify counter that always
-goes up.
+Changes in v2:
+- As noted by Sean Christopherson, max_apic_id is inclusive but array_index_nospec is not.
+   v2 adds one to the array_index_nospec size so the bounds do include max_apic_id
+- Link to v1: https://lore.kernel.org/kvm/2025072540-eggbeater-crate-50af@gregkh/T/#u
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
----
-v4:
-   * use global for test cycles and siplify code a bit
-   * use cpu number instead of APCI ID as index into latency array
-   * report failure if a cpu measured 0 latency
-   * replace on_cpus() with on_cpu_async() to avoid BSP
-     interrupting itself
-   * drop volatile
+>> I also strongly dislike using In-Reply-To for new versions, as it tends to confuse
+>> b4, and often confuses me as well.
 
-v3:
-   * measure lat inside threads so that, threads startup time wouldn't
-     throw off results
-   * fix BSP iterrupting itself by running read test and stalling
-     other cpus as result. (fix it by exiting read test earlier if
-     it's running on BSP)
-v2:
-   * fix broken timer going backwards check
-   * report # of fails
-   * warn if number of vcpus is not sufficient for torture test and skip
-     it
-   * style fixups
----
- x86/Makefile.common  |  2 +
- x86/hpet_read_test.c | 93 ++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 95 insertions(+)
- create mode 100644 x86/hpet_read_test.c
+Noted, will not do it like that next time.
 
-diff --git a/x86/Makefile.common b/x86/Makefile.common
-index 5663a65d..ef0e09a6 100644
---- a/x86/Makefile.common
-+++ b/x86/Makefile.common
-@@ -101,6 +101,8 @@ tests-common += $(TEST_DIR)/realmode.$(exe) \
- realmode_bits := $(if $(call cc-option,-m16,""),16,32)
- endif
- 
-+tests-common += $(TEST_DIR)/hpet_read_test.$(exe)
-+
- test_cases: $(tests-common) $(tests)
- 
- $(TEST_DIR)/%.o: CFLAGS += -std=gnu99 -ffreestanding -I $(SRCDIR)/lib -I $(SRCDIR)/lib/x86 -I lib
-diff --git a/x86/hpet_read_test.c b/x86/hpet_read_test.c
-new file mode 100644
-index 00000000..a44cdac2
---- /dev/null
-+++ b/x86/hpet_read_test.c
-@@ -0,0 +1,93 @@
-+#include "libcflat.h"
-+#include "smp.h"
-+#include "apic.h"
-+#include "asm/barrier.h"
-+#include "x86/atomic.h"
-+#include "vmalloc.h"
-+#include "alloc.h"
-+
-+#define HPET_ADDR         0xFED00000L
-+#define HPET_COUNTER_ADDR ((uint8_t *)HPET_ADDR + 0xF0UL)
-+#define HPET_CONFIG_ADDR  ((uint8_t *)HPET_ADDR + 0x10UL)
-+#define HPET_ENABLE_BIT   0x01UL
-+#define HPET_CLK_PERIOD   10
-+
-+#define TEST_CYCLES 100000
-+
-+static atomic_t fail;
-+static uint64_t latency[MAX_TEST_CPUS];
-+
-+static void hpet_reader(void *data)
-+{
-+	long i;
-+	uint64_t old_counter = 0, new_counter;
-+	long id = (long)data;
-+
-+	latency[id] = *(uint64_t *)HPET_COUNTER_ADDR;
-+	for (i = 0; i < TEST_CYCLES; ++i) {
-+		new_counter = *(uint64_t *)HPET_COUNTER_ADDR;
-+		if (new_counter < old_counter)
-+			atomic_inc(&fail);
-+		old_counter = new_counter;
-+	}
-+	/* claculate job latency in ns */
-+	latency[id] = (*(uint64_t *)HPET_COUNTER_ADDR - latency[id])
-+		* HPET_CLK_PERIOD / TEST_CYCLES;
-+}
-+
-+static void hpet_writer(void *data)
-+{
-+	int i;
-+
-+	for (i = 0; i < TEST_CYCLES; ++i)
-+		if (i % 2)
-+			*(uint64_t *)HPET_CONFIG_ADDR |= HPET_ENABLE_BIT;
-+		else
-+			*(uint64_t *)HPET_CONFIG_ADDR &= ~HPET_ENABLE_BIT;
-+}
-+
-+int main(void)
-+{
-+	unsigned long cpu, time_ns, lat = 0;
-+	uint64_t start, end;
-+	int ncpus = cpu_count();
-+
-+	do {
-+		printf("* starting concurrent read bench on %d cpus\n", ncpus);
-+		*(uint64_t *)HPET_CONFIG_ADDR |= HPET_ENABLE_BIT;
-+		start = *(uint64_t *)HPET_COUNTER_ADDR;
-+
-+		for (cpu = cpu_count() - 1; cpu > 0; --cpu)
-+			on_cpu_async(cpu, hpet_reader, (void *)cpu);
-+		while (cpus_active() > 1)
-+			pause();
-+
-+		end = (*(uint64_t *)HPET_COUNTER_ADDR);
-+		time_ns = (end - start) * HPET_CLK_PERIOD;
-+
-+		for (cpu = 1; cpu < ncpus; cpu++)
-+			if (latency[cpu])
-+				lat += latency[cpu];
-+			else
-+				report_fail("cpu %lu reported invalid latency (0)\n", cpu);
-+		lat = lat / ncpus;
-+
-+		report(time_ns && !atomic_read(&fail),
-+			"read test took %lu ms, avg read: %lu ns\n", time_ns/1000000,  lat);
-+	} while (0);
-+
-+	do {
-+		printf("* starting enable/disable with concurrent readers torture\n");
-+		if (ncpus > 2) {
-+			for (cpu = 2; cpu < ncpus; cpu++)
-+				on_cpu_async(cpu, hpet_reader, (void *)TEST_CYCLES);
-+
-+			on_cpu(1, hpet_writer, (void *)TEST_CYCLES);
-+			report(!atomic_read(&fail), "torture test, fails: %u\n",
-+				atomic_read(&fail));
-+		} else
-+			printf("SKIP: torture test: '-smp X' should be greater than 2\n");
-+	} while (0);
-+
-+	return report_summary();
-+}
--- 
-2.47.1
+>>
+>> But for this, I don't see any reason to send a v3.
+> That's great, thanks.
+
+Thanks. I'm fairly new to the process of submitting patches over email, 
+so apologies for my mistakes. Thank you for your patience and feedback, 
+it is much appreciated. If you do prefer a v3 that does include the 
+change log, just let me know.
+
+- Thijs
+
 
 
