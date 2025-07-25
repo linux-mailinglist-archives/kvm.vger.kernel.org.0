@@ -1,103 +1,110 @@
-Return-Path: <kvm+bounces-53460-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53464-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D94DFB121E3
-	for <lists+kvm@lfdr.de>; Fri, 25 Jul 2025 18:23:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47525B122BA
+	for <lists+kvm@lfdr.de>; Fri, 25 Jul 2025 19:10:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC971545B5B
-	for <lists+kvm@lfdr.de>; Fri, 25 Jul 2025 16:23:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 51F123A67CA
+	for <lists+kvm@lfdr.de>; Fri, 25 Jul 2025 17:09:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1DEE2EF649;
-	Fri, 25 Jul 2025 16:23:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D2F12EF9C4;
+	Fri, 25 Jul 2025 17:10:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tXaNOfpR"
+	dkim=pass (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b="QwPbWJ/O"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A16B32EE615
-	for <kvm@vger.kernel.org>; Fri, 25 Jul 2025 16:22:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E884D2EF647;
+	Fri, 25 Jul 2025 17:10:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=204.191.154.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753460581; cv=none; b=tjgjZxcC6PJmHkgtReb7XQaUgk00CUs1zoOfEpdr6xpUqBSMVnJ12bOK4xMAOpRQkrPTwQ2F23avZuH0y+bJGvsXpAwjQeNkjbRda+KC+G9G/gx3PY7uC/OWqoNeiu7OzvDDSmbAWZEUzCDGk0XevXYz8bQeApk9Ahg4pQb30WY=
+	t=1753463405; cv=none; b=BAnztAuWLs63FTFtTO0lHKwJVL6+pkagiqLz8+p/mRSRrdnKTsrIqF7MW5hxiV94xIw9mfUNUQsSirg4gzf7h7r2kp0PCRAjQG7bhu/poEwy0ysrf7coOlVHURcKPP40ZoXMrLNZ92SIFdXB4efFEkjWPZ4a1EQi8pguSiBLWfY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753460581; c=relaxed/simple;
-	bh=WgMMn6ZE+UO+Db+AMvscSv4rxcyxcz2YSvR/V9F6PT8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=c1rL55BFdYyhHXGNjpTpSHBnK89L0ySjpvgMfoqWKUfdOG3A5DjM5Bc/33voe8os2i11y86sNgpZncpQzggXGY12OqwV4gg/QZfWbYRXmhxch80eFvV5U7JK1GTOesyRD7QAIWGudv2WUyRft3P8bH1dmDQZAIT+Ddyn/HQsGFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tXaNOfpR; arc=none smtp.client-ip=209.85.160.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-4ab86a29c98so359371cf.0
-        for <kvm@vger.kernel.org>; Fri, 25 Jul 2025 09:22:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753460578; x=1754065378; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=u74rPH//c6SnB7FAtWzTEu0clYtboYSpeyULU9wz9Nc=;
-        b=tXaNOfpR9sWnUoUjbkXSln7zcUFDRoi6napO683fjHQjt9bx9ZVAb2O13Dkv37VyMm
-         gdNhpTQ7XQeOVsm/pG5wUgo3J8TuisceHl7BIwrzeWDKb9yEsPoAGjiD9u1foffyOw0h
-         1pe25RqtyfNy68FjfUm5/vDW/uEIklqkUQLdz+xIGpiv/9cusEsE4J5BhVksGx3iE/t8
-         IUGCa1aAFTDtuFH+ij1eH1N82Um9/fkCdmopOWAuAT+N/RzAwwiFdpwSFoLeF8C2ToIi
-         Oz0St4OIuDxzhla93b9WajOTdd58yFQ6BjAtnnzPDsJdb8P9otlqUH1qAoxpeO58k7k9
-         CZDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753460578; x=1754065378;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=u74rPH//c6SnB7FAtWzTEu0clYtboYSpeyULU9wz9Nc=;
-        b=RRkb+Ty8zw3Dq3EaER/hhXD8UVcLNzAjtxrH9CIdOS2QZLvudD3tI9QNALXcBi6J/M
-         zWZkKvLvot33IXIkjj8tKgiFrpnj8qS6ARdtxtu/kglvNc5lk2P4T0WAs+WF2ic9Hzri
-         Ucwl/NHeb8mG9FQj89OB+OOriQ2b0DOQabWRwUFWih/rIFnMIOTzdSeMLHs8FRQjA4pH
-         milMxgDTGDPDZTKg1iW1H0vgjSPT9p3Ma4VoLLyCNaYV/SUneFH0UDggUfXjCzsMZod0
-         H7RoZ4FJP+KDZV8DcF/hjhtif/DXXDtrs8DrQFJuwKgWZ/rswojbcbYjJ+hNoqhNJIXR
-         s5mg==
-X-Forwarded-Encrypted: i=1; AJvYcCV+lmKh6zMKT8vUYpWIFLdeCi4lIuyn4Yard/xZ92xFwPN12vVVjSupkfJTw8JnZDhvkek=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw0ckXUPqooi4dpXHpBywcJ2t0CxQtfdAYvQOjY5juA91uMX+/p
-	i4nZi2vDlgrbKreNtf+YJgRr742ohuniMe5hBcha5EGIRmFIQ/IerGkXZynPRiOjQP2uJ0WlXxJ
-	teopBovEHapBFNUfl2cRcYPhrTc+uz81MzY4BJNWt
-X-Gm-Gg: ASbGncuNaHjZpE1mj+thWMvEtPbR77+Ym56HYFRyb8iu/sHvnflPHoYKemhkVf/VUym
-	KpAHW0EHpaq3ll38hDDMODjJN7RhV9fPDBfj6FraZ6Ta/e7QOXM8LSAFB8qppFkoNkuoa8+BeMT
-	gWu6O1yu2dy0+ZwuQFMeHTRD3CHHJQfqOhqn5iGRb1Xk+QS8CrjA6HWxziJVzbJ7FU5Xq3wXWcW
-	0l0XM4=
-X-Google-Smtp-Source: AGHT+IGD5SL618OivdHgf3YPz/VJY7lvtmasgb/RxMGs4CnSxgWUrrNPAHtyRyqEw8bJFf0csvVrx4dlWjbdmBruZJs=
-X-Received: by 2002:a05:622a:1a9a:b0:4ab:4021:b919 with SMTP id
- d75a77b69052e-4ae89f706d1mr4756631cf.26.1753460578147; Fri, 25 Jul 2025
- 09:22:58 -0700 (PDT)
+	s=arc-20240116; t=1753463405; c=relaxed/simple;
+	bh=oVAaxXaaVQWWWIQFP0Hh2cN/zmIiJIe6UurtigGiPfw=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:From:In-Reply-To:
+	 Content-Type:Subject; b=YjzPXixvijKPa37jLy4uSPfdLFzrMXPiztM9EOHIZ6W6MU3K9AiCsWJ7wq3M8iXEP6cXziVQYEwilkHBY7oljfZBfVonE7RzooQdbuE/D8PHdRHQ/dysJHBGzN1E3iZ9bq1QgaJL5do/M77avwQ/YZPC+0AvbZ8kwPCFbbgfdIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deltatee.com; spf=pass smtp.mailfrom=deltatee.com; dkim=pass (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b=QwPbWJ/O; arc=none smtp.client-ip=204.191.154.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deltatee.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=deltatee.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=deltatee.com; s=20200525; h=Subject:In-Reply-To:From:References:Cc:To:
+	MIME-Version:Date:Message-ID:content-disposition;
+	bh=f47Ky90dFPkL1Ya+qWKSgUqpFHN5ODLjpNudWVSb5u8=; b=QwPbWJ/OWzQX8Q226ojxfza0WS
+	hTwTo6/vPF246VLRi+47uocSVLkOn0eD6rbMZRZD07tT3AUM6z95tZTUeAEDALmOKRCr9SwWCtSWo
+	Vl40IAQDTTCjPykxMQJzgZjUrWmcuoWHdCN8wv2e2ot8dxaFvJW7K4bmnXuC/9eazXKfZuuVimmSg
+	tGZI0VE8yThg0M2uXVwtlJ46NYkhpaiehvoG18/F/CMQ0pf9gs/S0p4bVOocrwE1PtjveEbBVRg1u
+	Kb4oYtEyAdpejHSKoYmOlKpt55+jX9YkR+phKZwkr98AAn+Xl4RiugB4uevi4n7lK1TZ6DnW/l4Ya
+	BaSNp5Dg==;
+Received: from guinness.priv.deltatee.com ([172.16.1.162])
+	by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96)
+	(envelope-from <logang@deltatee.com>)
+	id 1ufLJz-006C5W-2Q;
+	Fri, 25 Jul 2025 10:31:00 -0600
+Message-ID: <b32ae619-6c4a-46fc-a368-6ad4e245d581@deltatee.com>
+Date: Fri, 25 Jul 2025 10:30:46 -0600
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250724235144.2428795-1-rananta@google.com> <20250724235144.2428795-3-rananta@google.com>
- <aIObyUg77Um6VB45@google.com>
-In-Reply-To: <aIObyUg77Um6VB45@google.com>
-From: Raghavendra Rao Ananta <rananta@google.com>
-Date: Fri, 25 Jul 2025 09:22:46 -0700
-X-Gm-Features: Ac12FXwiy_BB8KHm3Sk8akfrBLEAKIqgsoVUrcDSZxShyAtLyS64CyISJLMjXEY
-Message-ID: <CAJHc60y2-NvkyaUEsy4hKnGTwQy1HJSa_Mp08xfyeQkvTKWn2A@mail.gmail.com>
-Subject: Re: [PATCH 2/2] KVM: arm64: Destroy the stage-2 page-table periodically
-To: Sean Christopherson <seanjc@google.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, 
-	Mingwei Zhang <mizhang@google.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+To: Leon Romanovsky <leon@kernel.org>, Christoph Hellwig <hch@lst.de>
+Cc: Alex Williamson <alex.williamson@redhat.com>,
+ Jason Gunthorpe <jgg@nvidia.com>, Andrew Morton <akpm@linux-foundation.org>,
+ Bjorn Helgaas <bhelgaas@google.com>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
+ Jens Axboe <axboe@kernel.dk>, =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?=
+ <jglisse@redhat.com>, Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+ linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-mm@kvack.org, linux-pci@vger.kernel.org,
+ Marek Szyprowski <m.szyprowski@samsung.com>,
+ Robin Murphy <robin.murphy@arm.com>, Sumit Semwal <sumit.semwal@linaro.org>,
+ Vivek Kasireddy <vivek.kasireddy@intel.com>, Will Deacon <will@kernel.org>
+References: <cover.1753274085.git.leonro@nvidia.com>
+ <82e62eb59afcd39b68ae143573d5ed113a92344e.1753274085.git.leonro@nvidia.com>
+ <20250724080313.GA31887@lst.de> <20250724081321.GT402218@unreal>
+Content-Language: en-CA
+From: Logan Gunthorpe <logang@deltatee.com>
+In-Reply-To: <20250724081321.GT402218@unreal>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 172.16.1.162
+X-SA-Exim-Rcpt-To: leon@kernel.org, hch@lst.de, alex.williamson@redhat.com, jgg@nvidia.com, akpm@linux-foundation.org, bhelgaas@google.com, christian.koenig@amd.com, dri-devel@lists.freedesktop.org, iommu@lists.linux.dev, axboe@kernel.dk, jglisse@redhat.com, joro@8bytes.org, kvm@vger.kernel.org, linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, linux-media@vger.kernel.org, linux-mm@kvack.org, linux-pci@vger.kernel.org, m.szyprowski@samsung.com, robin.murphy@arm.com, sumit.semwal@linaro.org, vivek.kasireddy@intel.com, will@kernel.org
+X-SA-Exim-Mail-From: logang@deltatee.com
+X-Spam-Level: 
+Subject: Re: [PATCH 05/10] PCI/P2PDMA: Export pci_p2pdma_map_type() function
+X-SA-Exim-Version: 4.2.1 (built Wed, 06 Jul 2022 17:57:39 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 
-On Fri, Jul 25, 2025 at 7:59=E2=80=AFAM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> Heh, without full conext, the shortlog reads like "destroy stage-2 page t=
-ables
-> from time to time".  Something like this would be more appropriate:
->
->   KVM: arm64: Reschedule as needed when destroying stage-2 page-tables
 
-This definitely sounds better :)
+
+On 2025-07-24 02:13, Leon Romanovsky wrote:
+> On Thu, Jul 24, 2025 at 10:03:13AM +0200, Christoph Hellwig wrote:
+>> On Wed, Jul 23, 2025 at 04:00:06PM +0300, Leon Romanovsky wrote:
+>>> From: Leon Romanovsky <leonro@nvidia.com>
+>>>
+>>> Export the pci_p2pdma_map_type() function to allow external modules
+>>> and subsystems to determine the appropriate mapping type for P2PDMA
+>>> transfers between a provider and target device.
+>>
+>> External modules have no business doing this.
+> 
+> VFIO PCI code is built as module. There is no way to access PCI p2p code
+> without exporting functions in it.
+
+The solution that would make more sense to me would be for either
+dma_iova_try_alloc() or another helper in dma-iommu.c to handle the
+P2PDMA case. dma-iommu.c already uses those same interfaces and thus
+there would be no need to export the low level helpers from the p2pdma code.
+
+Logan
 
