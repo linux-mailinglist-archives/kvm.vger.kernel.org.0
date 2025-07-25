@@ -1,110 +1,173 @@
-Return-Path: <kvm+bounces-53464-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53461-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47525B122BA
-	for <lists+kvm@lfdr.de>; Fri, 25 Jul 2025 19:10:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDF2FB12222
+	for <lists+kvm@lfdr.de>; Fri, 25 Jul 2025 18:37:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 51F123A67CA
-	for <lists+kvm@lfdr.de>; Fri, 25 Jul 2025 17:09:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E0D201CC7F6D
+	for <lists+kvm@lfdr.de>; Fri, 25 Jul 2025 16:37:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D2F12EF9C4;
-	Fri, 25 Jul 2025 17:10:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07C9E2EE983;
+	Fri, 25 Jul 2025 16:37:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b="QwPbWJ/O"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rfCzr7Z4"
 X-Original-To: kvm@vger.kernel.org
-Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E884D2EF647;
-	Fri, 25 Jul 2025 17:10:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=204.191.154.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32C3A3BBF2;
+	Fri, 25 Jul 2025 16:37:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753463405; cv=none; b=BAnztAuWLs63FTFtTO0lHKwJVL6+pkagiqLz8+p/mRSRrdnKTsrIqF7MW5hxiV94xIw9mfUNUQsSirg4gzf7h7r2kp0PCRAjQG7bhu/poEwy0ysrf7coOlVHURcKPP40ZoXMrLNZ92SIFdXB4efFEkjWPZ4a1EQi8pguSiBLWfY=
+	t=1753461437; cv=none; b=eUVoR2d6VvLnjuCvzmTuixhOPw65IqPiFm1SISKFud5dHybilMchOd6WLm8YWoYVknW65/XZFAueDQ1WcllK2BDdJpyxj7pypktZj63DMNCtTli12j/D8LnkkFWFpz86mL1klju7Zu+qgELMnJ7QSDuoD9rj2x1S3H4JeBHanqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753463405; c=relaxed/simple;
-	bh=oVAaxXaaVQWWWIQFP0Hh2cN/zmIiJIe6UurtigGiPfw=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:From:In-Reply-To:
-	 Content-Type:Subject; b=YjzPXixvijKPa37jLy4uSPfdLFzrMXPiztM9EOHIZ6W6MU3K9AiCsWJ7wq3M8iXEP6cXziVQYEwilkHBY7oljfZBfVonE7RzooQdbuE/D8PHdRHQ/dysJHBGzN1E3iZ9bq1QgaJL5do/M77avwQ/YZPC+0AvbZ8kwPCFbbgfdIc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deltatee.com; spf=pass smtp.mailfrom=deltatee.com; dkim=pass (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b=QwPbWJ/O; arc=none smtp.client-ip=204.191.154.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deltatee.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=deltatee.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=deltatee.com; s=20200525; h=Subject:In-Reply-To:From:References:Cc:To:
-	MIME-Version:Date:Message-ID:content-disposition;
-	bh=f47Ky90dFPkL1Ya+qWKSgUqpFHN5ODLjpNudWVSb5u8=; b=QwPbWJ/OWzQX8Q226ojxfza0WS
-	hTwTo6/vPF246VLRi+47uocSVLkOn0eD6rbMZRZD07tT3AUM6z95tZTUeAEDALmOKRCr9SwWCtSWo
-	Vl40IAQDTTCjPykxMQJzgZjUrWmcuoWHdCN8wv2e2ot8dxaFvJW7K4bmnXuC/9eazXKfZuuVimmSg
-	tGZI0VE8yThg0M2uXVwtlJ46NYkhpaiehvoG18/F/CMQ0pf9gs/S0p4bVOocrwE1PtjveEbBVRg1u
-	Kb4oYtEyAdpejHSKoYmOlKpt55+jX9YkR+phKZwkr98AAn+Xl4RiugB4uevi4n7lK1TZ6DnW/l4Ya
-	BaSNp5Dg==;
-Received: from guinness.priv.deltatee.com ([172.16.1.162])
-	by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.96)
-	(envelope-from <logang@deltatee.com>)
-	id 1ufLJz-006C5W-2Q;
-	Fri, 25 Jul 2025 10:31:00 -0600
-Message-ID: <b32ae619-6c4a-46fc-a368-6ad4e245d581@deltatee.com>
-Date: Fri, 25 Jul 2025 10:30:46 -0600
+	s=arc-20240116; t=1753461437; c=relaxed/simple;
+	bh=/oqgJIktBRx2Oetz49goPLT+JAoQFBLCRGikSQW8otY=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mC9YlJqQG8dcw9i8eBUYkIJvE+e7DGBXAXfIdzMsP6pxbxKr7QC93sa/xLIaf32F/iG9eLmMAbpHMS7w1rozvWnR5Gv4neqsiD2wmecBY0kWgH1JukWk8EkWefmQV+q/m8AxJhOP4tquB4XWPhqi7+IsB9nmkp6ClbSpuoj1qAg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rfCzr7Z4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6F7EC4CEE7;
+	Fri, 25 Jul 2025 16:37:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753461434;
+	bh=/oqgJIktBRx2Oetz49goPLT+JAoQFBLCRGikSQW8otY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=rfCzr7Z4iV0PdLQHU/zwAIaTWQnwdpZD9/MTiLT1U4pF96dV4Qznl1FlxOU1YUONG
+	 wMKgjmPP9D7Bv3qewXR+KCO0hlZF8AnG4CLl8ufSVF69CkPO5Lb5GNx1OuKLWuUH1e
+	 gUNLRC516FlK4pZ0P0vPU5yjuAe6m2CusWoY3DganhyaBDqA3vRnszEidwJOcFMEuZ
+	 uCpjU+i4a29fpRATUoyNHP9bDPYkZzM9QYV1cdi8PgQugVIKsMq7pVKAyCklSac/Xc
+	 SqS7X4EWJs8L9iCdc7SkNvUHeeBvOVbtW7n1neBeN6n30dqiXEVOdtlh4Ko2f5psS/
+	 txDcdbNyqIn+g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1ufLQ0-001OXY-Bd;
+	Fri, 25 Jul 2025 17:37:12 +0100
+Date: Fri, 25 Jul 2025 17:37:12 +0100
+Message-ID: <86cy9o8bwn.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Andre Przywara <andre.przywara@arm.com>
+Cc: Will Deacon <will@kernel.org>,
+	Julien Thierry <julien.thierry.kdev@gmail.com>,
+	kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH kvmtool v2 5/6] arm64: add FEAT_E2H0 support (TBC)
+In-Reply-To: <20250725144100.2944226-6-andre.przywara@arm.com>
+References: <20250725144100.2944226-1-andre.przywara@arm.com>
+	<20250725144100.2944226-6-andre.przywara@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: Leon Romanovsky <leon@kernel.org>, Christoph Hellwig <hch@lst.de>
-Cc: Alex Williamson <alex.williamson@redhat.com>,
- Jason Gunthorpe <jgg@nvidia.com>, Andrew Morton <akpm@linux-foundation.org>,
- Bjorn Helgaas <bhelgaas@google.com>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
- Jens Axboe <axboe@kernel.dk>, =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?=
- <jglisse@redhat.com>, Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
- linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
- linux-mm@kvack.org, linux-pci@vger.kernel.org,
- Marek Szyprowski <m.szyprowski@samsung.com>,
- Robin Murphy <robin.murphy@arm.com>, Sumit Semwal <sumit.semwal@linaro.org>,
- Vivek Kasireddy <vivek.kasireddy@intel.com>, Will Deacon <will@kernel.org>
-References: <cover.1753274085.git.leonro@nvidia.com>
- <82e62eb59afcd39b68ae143573d5ed113a92344e.1753274085.git.leonro@nvidia.com>
- <20250724080313.GA31887@lst.de> <20250724081321.GT402218@unreal>
-Content-Language: en-CA
-From: Logan Gunthorpe <logang@deltatee.com>
-In-Reply-To: <20250724081321.GT402218@unreal>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 172.16.1.162
-X-SA-Exim-Rcpt-To: leon@kernel.org, hch@lst.de, alex.williamson@redhat.com, jgg@nvidia.com, akpm@linux-foundation.org, bhelgaas@google.com, christian.koenig@amd.com, dri-devel@lists.freedesktop.org, iommu@lists.linux.dev, axboe@kernel.dk, jglisse@redhat.com, joro@8bytes.org, kvm@vger.kernel.org, linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, linux-media@vger.kernel.org, linux-mm@kvack.org, linux-pci@vger.kernel.org, m.szyprowski@samsung.com, robin.murphy@arm.com, sumit.semwal@linaro.org, vivek.kasireddy@intel.com, will@kernel.org
-X-SA-Exim-Mail-From: logang@deltatee.com
-X-Spam-Level: 
-Subject: Re: [PATCH 05/10] PCI/P2PDMA: Export pci_p2pdma_map_type() function
-X-SA-Exim-Version: 4.2.1 (built Wed, 06 Jul 2022 17:57:39 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: andre.przywara@arm.com, will@kernel.org, julien.thierry.kdev@gmail.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, alexandru.elisei@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+Hi Andre,
 
+Thanks for picking this. A few nits below.
 
-On 2025-07-24 02:13, Leon Romanovsky wrote:
-> On Thu, Jul 24, 2025 at 10:03:13AM +0200, Christoph Hellwig wrote:
->> On Wed, Jul 23, 2025 at 04:00:06PM +0300, Leon Romanovsky wrote:
->>> From: Leon Romanovsky <leonro@nvidia.com>
->>>
->>> Export the pci_p2pdma_map_type() function to allow external modules
->>> and subsystems to determine the appropriate mapping type for P2PDMA
->>> transfers between a provider and target device.
->>
->> External modules have no business doing this.
+On Fri, 25 Jul 2025 15:40:59 +0100,
+Andre Przywara <andre.przywara@arm.com> wrote:
 > 
-> VFIO PCI code is built as module. There is no way to access PCI p2p code
-> without exporting functions in it.
+> From: Marc Zyngier <maz@kernel.org>
+> 
+> To reduce code complexity, KVM only supports nested virtualisation in
+> VHE mode. So to allow recursive nested virtualisation, and be able to
+> expose FEAT_NV2 to a guest, we must prevent a guest from turning off
+> HCR_EL2.E2H, which is covered by not advertising the FEAT_E2H0 architecture
+> feature.
+> 
+> To allow people to run a guest in non-VHE mode, KVM introduced the
+> KVM_ARM_VCPU_HAS_EL2_E2H0 feature flag, which will allow control over
+> HCR_EL2.E2H, but at the cost of turning off FEAT_NV2.
 
-The solution that would make more sense to me would be for either
-dma_iova_try_alloc() or another helper in dma-iommu.c to handle the
-P2PDMA case. dma-iommu.c already uses those same interfaces and thus
-there would be no need to export the low level helpers from the p2pdma code.
+All of that has been captured at length in the kernel code, and I
+think this is "too much information" for userspace. I'd rather we
+stick to a pure description of what the various options mean to the
+user.
 
-Logan
+> Add a kvmtool command line option "--e2h0" to set that feature bit when
+> creating a guest, to gain non-VHE, but lose recursive nested virt.
+
+How about:
+
+"The --nested option allows a guest to boot at EL2 without FEAT_E2H0
+ (i.e. mandating VHE support). While this is great for "modern"
+ operating systems and hypervisors, a few legacy guests are stuck in a
+ distant past.
+
+ To support those, the --e2h0 option exposes FEAT_E2H0 to the guest,
+ at the expense of a number of other features, such as FEAT_NV2. This
+ is conditioned on the host itself supporting FEAT_E2H0."
+
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> ---
+>  arm64/include/kvm/kvm-config-arch.h | 5 ++++-
+>  arm64/kvm-cpu.c                     | 2 ++
+>  2 files changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arm64/include/kvm/kvm-config-arch.h b/arm64/include/kvm/kvm-config-arch.h
+> index 44c43367b..73bf4211a 100644
+> --- a/arm64/include/kvm/kvm-config-arch.h
+> +++ b/arm64/include/kvm/kvm-config-arch.h
+> @@ -11,6 +11,7 @@ struct kvm_config_arch {
+>  	bool		has_pmuv3;
+>  	bool		mte_disabled;
+>  	bool		nested_virt;
+> +	bool		e2h0;
+>  	u64		kaslr_seed;
+>  	enum irqchip_type irqchip;
+>  	u64		fw_addr;
+> @@ -63,6 +64,8 @@ int sve_vl_parser(const struct option *opt, const char *arg, int unset);
+>  	OPT_U64('\0', "counter-offset", &(cfg)->counter_offset,			\
+>  		"Specify the counter offset, defaulting to 0"),			\
+>  	OPT_BOOLEAN('\0', "nested", &(cfg)->nested_virt,			\
+> -		    "Start VCPUs in EL2 (for nested virt)"),
+> +		    "Start VCPUs in EL2 (for nested virt)"),			\
+> +	OPT_BOOLEAN('\0', "e2h0", &(cfg)->e2h0,					\
+> +		    "Create guest without VHE support"),
+>  
+>  #endif /* ARM_COMMON__KVM_CONFIG_ARCH_H */
+> diff --git a/arm64/kvm-cpu.c b/arm64/kvm-cpu.c
+> index 42dc11dad..6eb76dff4 100644
+> --- a/arm64/kvm-cpu.c
+> +++ b/arm64/kvm-cpu.c
+> @@ -76,6 +76,8 @@ static void kvm_cpu__select_features(struct kvm *kvm, struct kvm_vcpu_init *init
+>  		if (!kvm__supports_extension(kvm, KVM_CAP_ARM_EL2))
+>  			die("EL2 (nested virt) is not supported");
+>  		init->features[0] |= 1UL << KVM_ARM_VCPU_HAS_EL2;
+> +		if (kvm->cfg.arch.e2h0)
+> +			init->features[0] |= 1UL << KVM_ARM_VCPU_HAS_EL2_E2H0;
+
+This really should also check the capability in order to fail
+gracefully on system that have no E2H0 support at all (or have it so
+buggy that it is permanently disabled by the kernel):
+
++		if (kvm->cfg.arch.e2h0) {
++	  		if (!kvm__supports_extension(kvm, KVM_CAP_ARM_EL2_E2H0))
++				die("FEAT_E2H0 is not supported");
++			init->features[0] |= 1UL << KVM_ARM_VCPU_HAS_EL2_E2H0;
++		}
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
