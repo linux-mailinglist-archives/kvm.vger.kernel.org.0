@@ -1,210 +1,160 @@
-Return-Path: <kvm+bounces-53446-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53447-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27188B11E1E
-	for <lists+kvm@lfdr.de>; Fri, 25 Jul 2025 14:07:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55C92B11F9D
+	for <lists+kvm@lfdr.de>; Fri, 25 Jul 2025 15:53:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B812E3A4405
-	for <lists+kvm@lfdr.de>; Fri, 25 Jul 2025 12:06:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3FD9C1CE2869
+	for <lists+kvm@lfdr.de>; Fri, 25 Jul 2025 13:53:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2910A24468B;
-	Fri, 25 Jul 2025 12:06:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 910FA1E5701;
+	Fri, 25 Jul 2025 13:53:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="KPXHKSnQ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="b1UeBBQ2"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-io1-f48.google.com (mail-io1-f48.google.com [209.85.166.48])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65DEB242D7F
-	for <kvm@vger.kernel.org>; Fri, 25 Jul 2025 12:06:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 497891D88AC
+	for <kvm@vger.kernel.org>; Fri, 25 Jul 2025 13:53:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753445211; cv=none; b=Gfp19RUCoQYu4EYgoeN7Xx52504B/70A6v6yWSxVQVgLhrwEH5Xf7mf7TkrbBQa5rGUYvkvmSuMnDjh5inoJui99VJC16L/xs+xdgd9eOij5orI9OGu+DnFhqcqJQoM+lgwv6fJzf9FrTT4gmnlFGJbcfblSU/Umr0aj1iObKwk=
+	t=1753451586; cv=none; b=nctrErWP1aL9Q1YIi+qrVPnlr/70jzdu3dm72r/TUCAAWczN6bCTdXlmM8cxdPVPYAXX2uK7vQM4QFAsLBImN4rL7ONGzQgm+cQyIdS0PVgaZ/mA8msBcdaM3Eplp2q/ZopTc7wH8v4aSD30BNI3hcy+CcpaTWYo67RdTYjGASs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753445211; c=relaxed/simple;
-	bh=85E40NLxS2nvmUGFAwKt8WkSlulmZAnqtN+Gr+keAlU=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=PucVwa/s3AAdlmdy0/Zuq0DATQV1p2Lg4Pn1BYWMADau4OzKZuhTt1ypGW29PFmMNot9xPjBqmKoutXP3sHrsWfzrNnHIQuHctmJWa22D8i4YQd9VPmSVaWvTgm7P9vSSfJvH+e9qtJOag2EUXNFYQylbWX28CRwjc5CW/zxUlc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=KPXHKSnQ; arc=none smtp.client-ip=209.85.166.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-io1-f48.google.com with SMTP id ca18e2360f4ac-87c46159b24so74426339f.0
-        for <kvm@vger.kernel.org>; Fri, 25 Jul 2025 05:06:49 -0700 (PDT)
+	s=arc-20240116; t=1753451586; c=relaxed/simple;
+	bh=N87jvq3BUY2gPXiuHgKyY6u8QFonP5K7Oiq3uLPHJa0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=ebWdjn/r8WP1aL+Hp+2PKH3sTNlPGSu9xcQ+2m46BDURZ50Z1M0YCg+YYYqK3HWdSTRAkm1mOyqWYCsTd7eRRqWsa6jY+sPN1PBV739EyV5ekeZTWYeIUESt28lPXGr20gMzWPpQMZNR8go3+MvV4spO1JZD5pMiWyT4YvoGltk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=b1UeBBQ2; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-311ef4fb5fdso2524145a91.1
+        for <kvm@vger.kernel.org>; Fri, 25 Jul 2025 06:53:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1753445208; x=1754050008; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=7Jf1SSxOJbfpQP3N1Q99A6u9zArCFnC+5FZX72Ckuo0=;
-        b=KPXHKSnQAoHM52vMpxYVyR6t6KDRsjZM8KNPaSiI1mP4ZXzXGdQAOdtCJisx9wZDWB
-         harpa9VWeC1miRjDe4vzLuQoNvEZqJ3F0Ib6+vQ6yddY6VqT/rzOO6OgIqnc57jOaGYJ
-         X/2qCxYEt1wYQs+WfoJoJnJqWpWQwKBOyjd9p7MXE0FT5nyKSe52PNSctLS6z+PVSKEk
-         Xnl7LC81OkIlTmhIkLvZRozpmY+HGdnXUyLf/dpWKvABdpnU/r9bcL3hYGbLe8bYbBMy
-         h1oppx8e5K1Ls73VLkJJDQkZb3YpnWvwMUWq0L4y2xsubEGvJ1FogcNOKGWhurQ6E53v
-         dXvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753445208; x=1754050008;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=google.com; s=20230601; t=1753451584; x=1754056384; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=7Jf1SSxOJbfpQP3N1Q99A6u9zArCFnC+5FZX72Ckuo0=;
-        b=WVylntQdbcKg/ZcTDuR6rOl30ElwgGiWnrEYimSB/2RBQ7HTgXWCZHavz4yUj/r4LR
-         3DiviH9mexhcpj6Ham4hZSZzz1uMvIvAB3KjYvwaChNbAR+e7d/PKFZaGzplXRJlRIoD
-         e524tWqXoQb+VQnHe9j5F9nmVE4DVtKoGs4ib2Fsia2M086My1a1rUkvvOjVZMJapOfb
-         4IRCyG/i3SyZjsP5R705kSXfQonwUsHO5JB826kSNeqiFAcehI2/2J/Q/ga2v0w51ygp
-         qEMDh/uDhXY/pwy2lMuN5Xkzv9rj81qH2PUp44VstEN1+CCqwB2KvfeIHeQfb/Rdlkqr
-         ZxSA==
-X-Forwarded-Encrypted: i=1; AJvYcCUpmKkRf5IVRaFTSwURPwgTfj0EyQYoIgcIFWN75xs9DvJRVODvY/8wZLU51D29tReO39c=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz0YekUd8fHhhHJh/EpU3KPqm0Z02zjsWbvFugZuHpAL4m3shds
-	ATiQlyJ8yu7tqysKA+DCUvbZgPs8YiXZkUbnwFCM7WJ/3JPXR7nlZjErffWUoIbdb/r4OjNfZXT
-	U99jFB7sUV7Tm4Z+MHPmA4oh+ypz/wDcMx5ybIIAO4TxzUcBVZy6B
-X-Gm-Gg: ASbGnct6SgQ4glPhw8z0g/r60K8dePkn9ph9/Sq6IDGyHhADAYv6llv1aqFcT+l3ep5
-	H2HIbEIKMbe+XANCtdBQnK2QYIuFJ8D1vcgf1/T9vqGJqXKJ6idu1yC1eG+I9Yh7RBkx50DgFRq
-	LhtjyRSdoA9xg3szUGWtZ3y3duypjvruMhBBEllDrpyPkxZLEuJafGPBlrGzvVFlTaWeqvzi+n+
-	Uo0QCQ=
-X-Google-Smtp-Source: AGHT+IFa4dSsgSpZFYek8uZqLKc9MO74vkbxxoseVsenzFl4oi+CwAq4/ReQu91NZ+euJU2gTyKsu9V2xo8Zu7D9nkI=
-X-Received: by 2002:a05:6602:168c:b0:879:674e:2c73 with SMTP id
- ca18e2360f4ac-8800f0b5176mr284008339f.4.1753445208246; Fri, 25 Jul 2025
- 05:06:48 -0700 (PDT)
+        bh=2IFcEZdb1xoyZWA8WbMS+NhaC+YIouhMl5iAhysDSTg=;
+        b=b1UeBBQ2CWeb3ihttbBMCVPLh4eQYLH7n5cSQDfQlTwnmz7znraryDdcYellm6Cxnh
+         Vja2/Zm61hz3jQ4MJ1Uw19HCXnAbOSTsUMSRpLzmdsFRc9pxRhevGRRiA03ziF2G8Ehg
+         nRqKQIcEP8Cxkr8RVIhSx3BoEpeiZ+09yj0yiEQmpNNv9g2xT1WyOsavPvncZDvZT5tN
+         J7i/Hc+jDywesaVRDi3/8DXtOwRieyuhrPEYnchmKRPTQQwU0R6Hfgk/te2Sx2LoK/xq
+         QBFb9joMAULbu2cRe3UX6k1dZYJKsQfigdAe5eptd5LK6whE80c4WFwLteRrLMLxjf4s
+         +uHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753451585; x=1754056385;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=2IFcEZdb1xoyZWA8WbMS+NhaC+YIouhMl5iAhysDSTg=;
+        b=VEYjHQsxstCK1qaE0jzUMMb+DmyjEwXUmX7TRk+zLrG8SV0y2VVJvVjZZxt9Ks2/fU
+         ZfoNuwMPZxMxBHduaV4pgc+CV6umCAWAGMH9bbBkqZdjDiwHGnNepd9oDJUCKC7N2gBe
+         084QbHgTBPBn5MGxgJzjAYf5Tjf+FweDaNPtENHE30HeBKNmalbpStzTxvLNlP8/z0y6
+         /tnwGLrIwzsCOnONqWQldGvFK/VcT+eAkuNVQIN/TWaREZTExWGL5cCASEOWx16B5NjL
+         HlDwoaVcNgC3ujQu8R5Mx0+rLNxHHOB3trVqvFxfJcWHoXB73ACx05Y0YqLMIhUgweTX
+         y7bw==
+X-Forwarded-Encrypted: i=1; AJvYcCXkUlhKhLY2o7RlK+JHJxCiA6yzs16PTKjo4o/Ol2AxbTqr2E/E5Qq+Aq58wZpIYPG9UJk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy4yX5BHGtgKslby6EXVrxkwJQW/PKXwWNVHxCoJ1cjkaChGUzV
+	apwrZvvvkYAgEx91g65Ug3igTsAwdx6KBzDdNLFjfwJZWQr26PCHBUvU7+nyuC8mJ7E0u9Dp8DJ
+	AEeDJHA==
+X-Google-Smtp-Source: AGHT+IFjGdSbLTJQeXBeF3KPsF2x5fp/wtnoZ2iNYJbBIB/HYs8Zqa8zIKSNCWliwPnicno1k0gnFATv6p4=
+X-Received: from pjbsp12.prod.google.com ([2002:a17:90b:52cc:b0:312:1af5:98c9])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5804:b0:311:f99e:7f4e
+ with SMTP id 98e67ed59e1d1-31e779fa061mr2853030a91.16.1753451584187; Fri, 25
+ Jul 2025 06:53:04 -0700 (PDT)
+Date: Fri, 25 Jul 2025 06:53:02 -0700
+In-Reply-To: <diqza54tdv3p.fsf@ackerleytng-ctop.c.googlers.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: Anup Patel <anup@brainfault.org>
-Date: Fri, 25 Jul 2025 17:36:36 +0530
-X-Gm-Features: Ac12FXwjQXvT4XMofTKJke-pvu4QS2cpuv-CY57HpTPlGzz1oCnc7kjwlss85eA
-Message-ID: <CAAhSdy12xtRRem-AybfymGHh+sj4qSDDG0XL6M6as=cD5Y2tkA@mail.gmail.com>
-Subject: [GIT PULL] KVM/riscv changes for 6.17
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Palmer Dabbelt <palmer@dabbelt.com>, Andrew Jones <ajones@ventanamicro.com>, 
-	Atish Patra <atishp@rivosinc.com>, Atish Patra <atish.patra@linux.dev>, 
-	"open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" <kvm-riscv@lists.infradead.org>, KVM General <kvm@vger.kernel.org>, 
-	linux-riscv <linux-riscv@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+References: <20250723104714.1674617-1-tabba@google.com> <20250723104714.1674617-16-tabba@google.com>
+ <diqza54tdv3p.fsf@ackerleytng-ctop.c.googlers.com>
+Message-ID: <aIOMPpTWKWoM_O5J@google.com>
+Subject: Re: [PATCH v16 15/22] KVM: x86/mmu: Extend guest_memfd's max mapping
+ level to shared mappings
+From: Sean Christopherson <seanjc@google.com>
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-mm@kvack.org, kvmarm@lists.linux.dev, pbonzini@redhat.com, 
+	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
+	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
+	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
+	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, 
+	dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net, 
+	vbabka@suse.cz, vannapurve@google.com, mail@maciej.szmigiero.name, 
+	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
+	ira.weiny@intel.com
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Paolo,
+On Thu, Jul 24, 2025, Ackerley Tng wrote:
+> Fuad Tabba <tabba@google.com> writes:
+> >  int kvm_mmu_max_mapping_level(struct kvm *kvm, struct kvm_page_fault *=
+fault,
+> > @@ -3362,8 +3371,9 @@ int kvm_mmu_max_mapping_level(struct kvm *kvm, st=
+ruct kvm_page_fault *fault,
+> >  	if (max_level =3D=3D PG_LEVEL_4K)
+> >  		return PG_LEVEL_4K;
+> > =20
+> > -	if (is_private)
+> > -		host_level =3D kvm_max_private_mapping_level(kvm, fault, slot, gfn);
+> > +	if (is_private || kvm_memslot_is_gmem_only(slot))
+> > +		host_level =3D kvm_gmem_max_mapping_level(kvm, fault, slot, gfn,
+> > +							is_private);
+> >  	else
+> >  		host_level =3D host_pfn_mapping_level(kvm, gfn, slot);
+>=20
+> No change required now, would like to point out that in this change
+> there's a bit of an assumption if kvm_memslot_is_gmem_only(), even for
+> shared pages, guest_memfd will be the only source of truth.
 
-We have the following KVM RISC-V changes for 6.17:
-1) Enabled ring-based dirty memory tracking
-2) Improved "perf kvm stat" to report interrupt events
-3) Delegate illegal instruction trap to VS-mode
-4) Added SBI FWFT extension for Guest/VM with misaligned
-    delegation and pointer masking PMLEN features
-5) MMU related improvements for KVM RISC-V for the
-    upcoming nested virtualization support
+It's not an assumption, it's a hard requirement.
 
-Please pull.
+> This holds now because shared pages are always split to 4K, but if
+> shared pages become larger, might mapping in the host actually turn out
+> to be smaller?
 
-Regards,
-Anup
+Yes, the host userspace mappens could be smaller, and supporting that scena=
+rio is
+very explicitly one of the design goals of guest_memfd.  From commit a7800a=
+a80ea4
+("KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for guest-specific backing memory=
+"):
 
-The following changes since commit 4cec89db80ba81fa4524c6449c0494b8ae08eeb0=
-:
-
-  RISC-V: KVM: Move HGEI[E|P] CSR access to IMSIC virtualization
-(2025-07-11 18:33:27 +0530)
-
-are available in the Git repository at:
-
-  https://github.com/kvm-riscv/linux.git tags/kvm-riscv-6.17-1
-
-for you to fetch changes up to 583c7288feb43eb8cbb18d08376d328e9a48e72d:
-
-  RISC-V: KVM: Avoid re-acquiring memslot in kvm_riscv_gstage_map()
-(2025-07-23 17:20:41 +0530)
-
-----------------------------------------------------------------
-KVM/riscv changes for 6.17
-
-- Enabled ring-based dirty memory tracking
-- Improved perf kvm stat to report interrupt events
-- Delegate illegal instruction trap to VS-mode
-- Added SBI FWFT extension for Guest/VM with misaligned
-  delegation and pointer masking PMLEN features
-- MMU related improvements for KVM RISC-V for upcoming
-  nested virtualization
-
-----------------------------------------------------------------
-Anup Patel (12):
-      RISC-V: KVM: Check kvm_riscv_vcpu_alloc_vector_context() return value
-      RISC-V: KVM: Drop the return value of kvm_riscv_vcpu_aia_init()
-      RISC-V: KVM: Rename and move kvm_riscv_local_tlb_sanitize()
-      RISC-V: KVM: Replace KVM_REQ_HFENCE_GVMA_VMID_ALL with KVM_REQ_TLB_FL=
-USH
-      RISC-V: KVM: Don't flush TLB when PTE is unchanged
-      RISC-V: KVM: Implement kvm_arch_flush_remote_tlbs_range()
-      RISC-V: KVM: Use ncsr_xyz() in kvm_riscv_vcpu_trap_redirect()
-      RISC-V: KVM: Factor-out MMU related declarations into separate header=
-s
-      RISC-V: KVM: Introduce struct kvm_gstage_mapping
-      RISC-V: KVM: Add vmid field to struct kvm_riscv_hfence
-      RISC-V: KVM: Factor-out g-stage page table management
-      RISC-V: KVM: Pass VMID as parameter to kvm_riscv_hfence_xyz() APIs
-
-Cl=C3=A9ment L=C3=A9ger (4):
-      RISC-V: KVM: add SBI extension init()/deinit() functions
-      RISC-V: KVM: add SBI extension reset callback
-      RISC-V: KVM: add support for FWFT SBI extension
-      RISC-V: KVM: add support for SBI_FWFT_MISALIGNED_DELEG
-
-Quan Zhou (4):
-      RISC-V: KVM: Enable ring-based dirty memory tracking
-      RISC-V: perf/kvm: Add reporting of interrupt events
-      RISC-V: KVM: Use find_vma_intersection() to search for intersecting V=
-MAs
-      RISC-V: KVM: Avoid re-acquiring memslot in kvm_riscv_gstage_map()
-
-Samuel Holland (2):
-      RISC-V: KVM: Fix inclusion of Smnpm in the guest ISA bitmap
-      RISC-V: KVM: Add support for SBI_FWFT_POINTER_MASKING_PMLEN
-
-Xu Lu (1):
-      RISC-V: KVM: Delegate illegal instruction fault to VS mode
-
- Documentation/virt/kvm/api.rst                     |   2 +-
- arch/riscv/include/asm/kvm_aia.h                   |   2 +-
- arch/riscv/include/asm/kvm_gstage.h                |  72 +++
- arch/riscv/include/asm/kvm_host.h                  | 109 +----
- arch/riscv/include/asm/kvm_mmu.h                   |  21 +
- arch/riscv/include/asm/kvm_tlb.h                   |  84 ++++
- arch/riscv/include/asm/kvm_vcpu_sbi.h              |  13 +
- arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h         |  33 ++
- arch/riscv/include/asm/kvm_vmid.h                  |  27 ++
- arch/riscv/include/uapi/asm/kvm.h                  |   2 +
- arch/riscv/kvm/Kconfig                             |   1 +
- arch/riscv/kvm/Makefile                            |   2 +
- arch/riscv/kvm/aia_device.c                        |   6 +-
- arch/riscv/kvm/aia_imsic.c                         |  12 +-
- arch/riscv/kvm/gstage.c                            | 338 ++++++++++++++
- arch/riscv/kvm/main.c                              |   3 +-
- arch/riscv/kvm/mmu.c                               | 509 +++++------------=
-----
- arch/riscv/kvm/tlb.c                               | 110 ++---
- arch/riscv/kvm/vcpu.c                              |  48 +-
- arch/riscv/kvm/vcpu_exit.c                         |  20 +-
- arch/riscv/kvm/vcpu_onereg.c                       |  84 ++--
- arch/riscv/kvm/vcpu_sbi.c                          |  53 +++
- arch/riscv/kvm/vcpu_sbi_fwft.c                     | 338 ++++++++++++++
- arch/riscv/kvm/vcpu_sbi_replace.c                  |  17 +-
- arch/riscv/kvm/vcpu_sbi_sta.c                      |   3 +-
- arch/riscv/kvm/vcpu_sbi_v01.c                      |  25 +-
- arch/riscv/kvm/vm.c                                |   7 +-
- arch/riscv/kvm/vmid.c                              |  25 +
- tools/perf/arch/riscv/util/kvm-stat.c              |   6 +-
- tools/perf/arch/riscv/util/riscv_exception_types.h |  35 --
- tools/perf/arch/riscv/util/riscv_trap_types.h      |  57 +++
- 31 files changed, 1382 insertions(+), 682 deletions(-)
- create mode 100644 arch/riscv/include/asm/kvm_gstage.h
- create mode 100644 arch/riscv/include/asm/kvm_mmu.h
- create mode 100644 arch/riscv/include/asm/kvm_tlb.h
- create mode 100644 arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h
- create mode 100644 arch/riscv/include/asm/kvm_vmid.h
- create mode 100644 arch/riscv/kvm/gstage.c
- create mode 100644 arch/riscv/kvm/vcpu_sbi_fwft.c
- delete mode 100644 tools/perf/arch/riscv/util/riscv_exception_types.h
- create mode 100644 tools/perf/arch/riscv/util/riscv_trap_types.h
+ : A guest-first memory subsystem allows for optimizations and enhancements
+ : that are kludgy or outright infeasible to implement/support in a generic
+ : memory subsystem.  With guest_memfd, guest protections and mapping sizes
+ : are fully decoupled from host userspace mappings.   E.g. KVM currently
+ : doesn't support mapping memory as writable in the guest without it also
+ : being writable in host userspace, as KVM's ABI uses VMA protections to
+ : define the allow guest protection.  Userspace can fudge this by
+ : establishing two mappings, a writable mapping for the guest and readable
+ : one for itself, but that=E2=80=99s suboptimal on multiple fronts.
+ :=20
+ : Similarly, KVM currently requires the guest mapping size to be a strict
+ : subset of the host userspace mapping size, e.g. KVM doesn=E2=80=99t supp=
+ort
+ : creating a 1GiB guest mapping unless userspace also has a 1GiB guest
+ : mapping.  Decoupling the mappings sizes would allow userspace to precise=
+ly
+ : map only what is needed without impacting guest performance, e.g. to
+ : harden against unintentional accesses to guest memory.
 
