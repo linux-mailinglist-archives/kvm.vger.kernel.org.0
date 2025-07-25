@@ -1,38 +1,38 @@
-Return-Path: <kvm+bounces-53453-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53454-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F8B7B1204A
-	for <lists+kvm@lfdr.de>; Fri, 25 Jul 2025 16:42:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB8D5B12048
+	for <lists+kvm@lfdr.de>; Fri, 25 Jul 2025 16:42:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87A893B3DB0
-	for <lists+kvm@lfdr.de>; Fri, 25 Jul 2025 14:41:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8EF9B1C2311B
+	for <lists+kvm@lfdr.de>; Fri, 25 Jul 2025 14:42:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81B582ED874;
-	Fri, 25 Jul 2025 14:41:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C68CD2ED87D;
+	Fri, 25 Jul 2025 14:41:40 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F45B2C3756
-	for <kvm@vger.kernel.org>; Fri, 25 Jul 2025 14:41:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC79A2ED861
+	for <kvm@vger.kernel.org>; Fri, 25 Jul 2025 14:41:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753454498; cv=none; b=PQncCoJB6gcf6XKchTSn/qpD093Fn473wMV4tp7roFl7zu58K78CdT+WQBG7+Uei37ljb7T8rXFPnNOQa5VXamJ/yFrOeSF9jNxMHkQJupf/UfidXN2YaRK4h9dyB3nF4JFCJwLnQgXWmclHyE3uT/on4e5VpEm6odvK/QYirZQ=
+	t=1753454500; cv=none; b=Rg1rc69U9Wi+De60g5XaiAYLAmF2XOWbiqxbL8znooyg8qm9FLoMDDSJij3ibd1wFUvJ55LvOAd6LjyPEFUjUZyfFcxiDg3Zt8LNIOARLWCVqL7xOz/VoCV4dF7SmrKlXUgckgAxhppKymlrgD46HEO4/XgV/p4PM7sIjqasdxQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753454498; c=relaxed/simple;
-	bh=Cm7AodLQjCqZQEuBntxRevi25kytNFL96ocuwxQHjRc=;
+	s=arc-20240116; t=1753454500; c=relaxed/simple;
+	bh=Bay1h8sFietdUU6dT1FCyCCmF0oEuT6HEaVA7bzKyYo=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=N3a3uYmbSnwrCF7hADJ7wh+qIBm6QYBeskKfR4p0icdRssiI6ZwM/pfpd8WH+fcWhp9UCn9pzQaUUjc9I/zBYcDYe8H10hL+6jFjGs5sbGTP93FaB3IM1Wcwcd08wSKnw4LliOJY2a93hRvRpeNWGTM+56uo+pqE2t+ekP0mcIA=
+	 MIME-Version; b=HeVtkkP4CYaE0MicIVPO8W+4C+4FvZERF6oYaIHiSkwP+XSr16vkLlJX4EmlvIIFMBXRvQWU2iu5LlIpnnRoaCK57Bk+ULCiieFFipdhNbz91AZO/A51tzEYhr2RetTFKBucgHKLz1ALyz+GKU4dyqgdGi5/uENw++nUgRr8BDo=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 809621A00;
-	Fri, 25 Jul 2025 07:41:30 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 01E6F176C;
+	Fri, 25 Jul 2025 07:41:32 -0700 (PDT)
 Received: from donnerap.arm.com (donnerap.manchester.arm.com [10.32.101.27])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1A1E13F6A8;
-	Fri, 25 Jul 2025 07:41:35 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8F8143F6A8;
+	Fri, 25 Jul 2025 07:41:37 -0700 (PDT)
 From: Andre Przywara <andre.przywara@arm.com>
 To: Will Deacon <will@kernel.org>,
 	Julien Thierry <julien.thierry.kdev@gmail.com>,
@@ -40,9 +40,9 @@ To: Will Deacon <will@kernel.org>,
 Cc: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev,
 	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: [PATCH kvmtool v2 4/6] arm64: Add counter offset control
-Date: Fri, 25 Jul 2025 15:40:58 +0100
-Message-Id: <20250725144100.2944226-5-andre.przywara@arm.com>
+Subject: [PATCH kvmtool v2 5/6] arm64: add FEAT_E2H0 support (TBC)
+Date: Fri, 25 Jul 2025 15:40:59 +0100
+Message-Id: <20250725144100.2944226-6-andre.przywara@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20250725144100.2944226-1-andre.przywara@arm.com>
 References: <20250725144100.2944226-1-andre.przywara@arm.com>
@@ -56,76 +56,61 @@ Content-Transfer-Encoding: 8bit
 
 From: Marc Zyngier <maz@kernel.org>
 
-KVM now allows to offset the arch timer counter values reported to a
-guest, via a per-VM ioctl. This is conceptually similar to the effects
-of CNTVOFF_EL2, but applies to both the emulated physical and virtual
-counter, and also to all VCPUs.
+To reduce code complexity, KVM only supports nested virtualisation in
+VHE mode. So to allow recursive nested virtualisation, and be able to
+expose FEAT_NV2 to a guest, we must prevent a guest from turning off
+HCR_EL2.E2H, which is covered by not advertising the FEAT_E2H0 architecture
+feature.
 
-Add a command line option to allow setting this value when creating a VM.
+To allow people to run a guest in non-VHE mode, KVM introduced the
+KVM_ARM_VCPU_HAS_EL2_E2H0 feature flag, which will allow control over
+HCR_EL2.E2H, but at the cost of turning off FEAT_NV2.
+
+Add a kvmtool command line option "--e2h0" to set that feature bit when
+creating a guest, to gain non-VHE, but lose recursive nested virt.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- arm64/include/kvm/kvm-config-arch.h |  3 +++
- arm64/kvm.c                         | 17 +++++++++++++++++
- 2 files changed, 20 insertions(+)
+ arm64/include/kvm/kvm-config-arch.h | 5 ++++-
+ arm64/kvm-cpu.c                     | 2 ++
+ 2 files changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/arm64/include/kvm/kvm-config-arch.h b/arm64/include/kvm/kvm-config-arch.h
-index a1dac28e6..44c43367b 100644
+index 44c43367b..73bf4211a 100644
 --- a/arm64/include/kvm/kvm-config-arch.h
 +++ b/arm64/include/kvm/kvm-config-arch.h
-@@ -14,6 +14,7 @@ struct kvm_config_arch {
+@@ -11,6 +11,7 @@ struct kvm_config_arch {
+ 	bool		has_pmuv3;
+ 	bool		mte_disabled;
+ 	bool		nested_virt;
++	bool		e2h0;
  	u64		kaslr_seed;
  	enum irqchip_type irqchip;
  	u64		fw_addr;
-+	u64		counter_offset;
- 	unsigned int	sve_max_vq;
- 	bool		no_pvtime;
- };
-@@ -59,6 +60,8 @@ int sve_vl_parser(const struct option *opt, const char *arg, int unset);
- 		     irqchip_parser, NULL),					\
- 	OPT_U64('\0', "firmware-address", &(cfg)->fw_addr,			\
- 		"Address where firmware should be loaded"),			\
-+	OPT_U64('\0', "counter-offset", &(cfg)->counter_offset,			\
-+		"Specify the counter offset, defaulting to 0"),			\
+@@ -63,6 +64,8 @@ int sve_vl_parser(const struct option *opt, const char *arg, int unset);
+ 	OPT_U64('\0', "counter-offset", &(cfg)->counter_offset,			\
+ 		"Specify the counter offset, defaulting to 0"),			\
  	OPT_BOOLEAN('\0', "nested", &(cfg)->nested_virt,			\
- 		    "Start VCPUs in EL2 (for nested virt)"),
+-		    "Start VCPUs in EL2 (for nested virt)"),
++		    "Start VCPUs in EL2 (for nested virt)"),			\
++	OPT_BOOLEAN('\0', "e2h0", &(cfg)->e2h0,					\
++		    "Create guest without VHE support"),
  
-diff --git a/arm64/kvm.c b/arm64/kvm.c
-index 23b4dab1f..6e971dd78 100644
---- a/arm64/kvm.c
-+++ b/arm64/kvm.c
-@@ -119,6 +119,22 @@ static void kvm__arch_enable_mte(struct kvm *kvm)
- 	pr_debug("MTE capability enabled");
+ #endif /* ARM_COMMON__KVM_CONFIG_ARCH_H */
+diff --git a/arm64/kvm-cpu.c b/arm64/kvm-cpu.c
+index 42dc11dad..6eb76dff4 100644
+--- a/arm64/kvm-cpu.c
++++ b/arm64/kvm-cpu.c
+@@ -76,6 +76,8 @@ static void kvm_cpu__select_features(struct kvm *kvm, struct kvm_vcpu_init *init
+ 		if (!kvm__supports_extension(kvm, KVM_CAP_ARM_EL2))
+ 			die("EL2 (nested virt) is not supported");
+ 		init->features[0] |= 1UL << KVM_ARM_VCPU_HAS_EL2;
++		if (kvm->cfg.arch.e2h0)
++			init->features[0] |= 1UL << KVM_ARM_VCPU_HAS_EL2_E2H0;
+ 	}
  }
  
-+static void kvm__arch_set_counter_offset(struct kvm *kvm)
-+{
-+	struct kvm_arm_counter_offset offset = {
-+		.counter_offset = kvm->cfg.arch.counter_offset,
-+	};
-+
-+	if (!kvm->cfg.arch.counter_offset)
-+		return;
-+
-+	if (!kvm__supports_extension(kvm, KVM_CAP_COUNTER_OFFSET))
-+		die("No support for global counter offset");
-+
-+	if (ioctl(kvm->vm_fd, KVM_ARM_SET_COUNTER_OFFSET, &offset))
-+		die_perror("KVM_ARM_SET_COUNTER_OFFSET");
-+}
-+
- void kvm__arch_init(struct kvm *kvm)
- {
- 	/* Create the virtual GIC. */
-@@ -126,6 +142,7 @@ void kvm__arch_init(struct kvm *kvm)
- 		die("Failed to create virtual GIC");
- 
- 	kvm__arch_enable_mte(kvm);
-+	kvm__arch_set_counter_offset(kvm);
- }
- 
- static u64 kvm__arch_get_payload_region_size(struct kvm *kvm)
 -- 
 2.25.1
 
