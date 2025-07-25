@@ -1,165 +1,139 @@
-Return-Path: <kvm+bounces-53475-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53476-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCB2AB124EC
-	for <lists+kvm@lfdr.de>; Fri, 25 Jul 2025 21:53:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA3A6B124FA
+	for <lists+kvm@lfdr.de>; Fri, 25 Jul 2025 21:56:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 057924E396B
-	for <lists+kvm@lfdr.de>; Fri, 25 Jul 2025 19:52:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F1F505A4C6E
+	for <lists+kvm@lfdr.de>; Fri, 25 Jul 2025 19:56:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF40C24EA9D;
-	Fri, 25 Jul 2025 19:52:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAB9C253356;
+	Fri, 25 Jul 2025 19:56:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MNdOVYhW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="o5mjOzRz"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7EBA24BC0A
-	for <kvm@vger.kernel.org>; Fri, 25 Jul 2025 19:52:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6353D24EAB1
+	for <kvm@vger.kernel.org>; Fri, 25 Jul 2025 19:56:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753473168; cv=none; b=jR3n7/9AbekD2pRb9HIIYLKFpDSkdYgcCogAQHYoMMKbx4AAOtRsUliHIay8PgDM/gF2/kCEwUkivhitSXxDiu3OXlsUAwv2Li0PNOsa54C9ICVcLmNHWDjD1AfpqStCS9qUqMCheOAaXcyv/LgR4GwBDIYYavjX58T/0CZPseo=
+	t=1753473407; cv=none; b=NIRsLRMh2MXDK4fIEMvkrt+DZgZndpZtXlFJzvsxFYpgmf/G+Xk4rAXUGej35DTR5N0lpTulI5iXL2XH7seGxCh0SC1ThxcdLA/5oi30Z0cfDaNEhLgP2OrQzN+6cuXaKnxKRxTB6rre7ytULP51FsOmQBH9mKt4QXAiCl2101E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753473168; c=relaxed/simple;
-	bh=D/BxQwI45NEctT9RKmkNXq7H6TV6FVvhywdeOEV7K08=;
+	s=arc-20240116; t=1753473407; c=relaxed/simple;
+	bh=kMe0ue3soy3FIW1/fW7FKunjVHoomXH+3YQEEOAZOJI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=dRAeb6g4WADIYUQKs6cQD6kU/ZEU0Ogo4omNF3U33zvsWi7l6mcLmyNV5d+EK92aVXGx9aFBg4OoHNIpqsZ4S9Ytnux8j8MgxCxkviWqfET1QSFqMNnJb/Ntb3lsR+QP7e/WYLM9qbPmAAcr8gI9Zf0V32rEOv4aClC8uHEtWYg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MNdOVYhW; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=h/of/BHiB42oCCM46FAn1Yx5f/Kjvn8Nj4dgVv6mFzQ9WBBPlaA2NX72PweE9mPYUjFQNLjkoVSYs+k1wGwlPLO5cdbjEdJXPQnppIGiYEXYYN7Fp7qu7mTIhBH02St6qpvB+kzfs26GchxULKvXVbpyESDr1YO9xquEZXi++Os=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=o5mjOzRz; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-23dc7d3e708so17937765ad.3
-        for <kvm@vger.kernel.org>; Fri, 25 Jul 2025 12:52:46 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-315af0857f2so2196154a91.0
+        for <kvm@vger.kernel.org>; Fri, 25 Jul 2025 12:56:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753473166; x=1754077966; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1753473406; x=1754078206; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=QGGwHKzNdqzja55fvEizh1HPckulPqbm51MIc4WTZ8o=;
-        b=MNdOVYhWreytd/dpsRBCwICFppehR0tFqdpKPXjuC/ahPcH02IaYNvh/P/QlCG3hZQ
-         bHuzFBe3ThTbDLbnzGt6p8D7L8CHzOGVWo65HlFscoSIVEgxthJFTUz/mqYxWBwpiZ2J
-         Sh96tEJ3SggJ398Qspp4Eew4aNbUF/YQNBuJmX/+Iqeg/r63KmHNTYLROHbbWpTABJ13
-         7ynmEz6F/WgSXJYi9RxtQsUI3GPxQvZE8h1M1GukcAWI99adcckXEtczw+feS9/tQOs3
-         6M1n7vzm2isJc7sR1bTz/QwcpQDBMse8K99O16Z69X/rbfg1B6WQObppx6y0n1WoSKTV
-         hGHA==
+        bh=Ii/J/YHUTK4YRW5OzHg9e1xV7PaXyv7CpmlDeDzp5rg=;
+        b=o5mjOzRzO+NlnC6K8tmSMSeTqTEgdFNxwfLjXhv18RBMmOYhM49lZ6gHA8+bXNjNJA
+         5GgwTsNjBwspc9PsAI0myITXoqzBzDiShgi3Eio4l8jKX47ZzyY9CWzpguFVotRwY6Rw
+         XT/Von50p0Zh4Vh7ZQtX8V4xjLDn3l1/6YVK1CDKrjxVqsQ2GCeY/O8y97xot9wzuoz3
+         C7bntlMaTR94Fc7CodE8tW63Fli0efQTjop2rQuZchvHD8foVTBQ3erXnx/qoGgLiuWh
+         uZXB5xn8MaJRL7Vu4HVoAYsazwnz6LLIbUsPcY5ZIOaI3i1MmeDjITI2zMChgZrmY+U/
+         gLVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753473166; x=1754077966;
+        d=1e100.net; s=20230601; t=1753473406; x=1754078206;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QGGwHKzNdqzja55fvEizh1HPckulPqbm51MIc4WTZ8o=;
-        b=LRIucWj7MrRVsM9BjKioEUIBqCYLfAJPm9nOSbG1/OjRagmf3qA9UESN4JEZNMZZ+D
-         oJkTXZ9Si2xzMpm7YVXkdrKbtfPSd0Bes8Vhm0Btlh/I2RMnuVAr8wAdSnePY3xL+fCK
-         C8HrlcUBM1VWswSxB+uso6ukXrFHdcPQgEA7ZGeLg+xalMXqupsgxcr+5NvtwkIqcz4H
-         rjU3TXZh74R5n+ShnPFiQA2lxVn5VKAnRDgZdyEA2OFO2qzsEz84L2bJQsRfUnUcFxNc
-         tkD6Wn8DbcrVJgN7W3Ht1wu36k09dsYqm0QIVDp6QzlNOgJ45UmX7XnnMZlTvCCE3YZ8
-         m/Bw==
-X-Forwarded-Encrypted: i=1; AJvYcCVvNP6RsiXmpu5el2PQejMFOusDbNCZPiG5piWaLizdFsJW6UeQ12QLNiTnk4VjjLLUh4M=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzh/+NFADHmDNsm+mXb4m8SnxFYqsKHOJZ0poh+aQPd3WX+0Vhg
-	y571Y1MN/L7DRh6z/dpp/LGw+9Ks/tXAybbs3G7pbg1CmpMPE8HRZvtoUnTRisFVqDDhiRjNvDQ
-	xERJZww==
-X-Google-Smtp-Source: AGHT+IGKfp2ZEdZFD4nXV8opXXNSrJNr2MwInumKeRrkZ/nbSrnkah7OjJY3KrZp8KeOnG/KWd4mQPv9Jxk=
-X-Received: from pjbqd15.prod.google.com ([2002:a17:90b:3ccf:b0:314:d44:4108])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d414:b0:23f:b4c4:710c
- with SMTP id d9443c01a7336-23fb4c4730amr32702405ad.38.1753473165998; Fri, 25
- Jul 2025 12:52:45 -0700 (PDT)
-Date: Fri, 25 Jul 2025 12:52:44 -0700
-In-Reply-To: <diqzseikcbef.fsf@ackerleytng-ctop.c.googlers.com>
+        bh=Ii/J/YHUTK4YRW5OzHg9e1xV7PaXyv7CpmlDeDzp5rg=;
+        b=WW8mvvC8kT2TP0f+CGx5F1vMlqqve3ygTSFrW3z98sz5e0RNV0qC7zg4+/QzhnRo15
+         UU8LWy7YhAIibXSS359f/o8tgwHy698Q4p+M1gl31WIIDwl3mCmUqFrecSQ29o6d54FB
+         H9VvSlZxiiS/Yy2+08lrwy+G7YuqCz1pu8R8jVDY0O9+cbsgXyRUbxyhuWyI07Tr1Y6o
+         jtGvUBc5o7cnUuBQX5n55YrRMRJvaSY8g/jYtSCMflzq5PzlvusT+R6fzDdCA/QUmwBw
+         ua4QNxUS6viS6FUj5+Q4fF2z2SZPT6be7b5fadvF+yk6tCvYLBIrQALfHu8S556i7OEF
+         ny0A==
+X-Forwarded-Encrypted: i=1; AJvYcCXpbNEGLKJLBpLYfGUOqtt2+Sl+y5/3Lljf4YlpNZ1ZA/HmqH7inIFWYkxwVWfzd5OXZG0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyXtWbCoHVIFkIq4myxluDeOahyjN6nzsX719dts8byhycjqxcM
+	yoY7269rSM0OB/A8tXEuz5ixl0O1Zhm1v+OLKS/weCpwbUSpdHMj/pJTmkpEgK5MMaFxMGEoacg
+	p+3ca5g==
+X-Google-Smtp-Source: AGHT+IHu7FDFnNcTabtdewi4bY3hb/3jyWNKkxkjd+oq4fY81m/OoMs8YEN7TZ8oihNIY3LRn/TzU34UmaY=
+X-Received: from pjuu7.prod.google.com ([2002:a17:90b:5867:b0:31c:160d:e3be])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:d446:b0:311:ba32:164f
+ with SMTP id 98e67ed59e1d1-31e77863e01mr4894272a91.8.1753473405737; Fri, 25
+ Jul 2025 12:56:45 -0700 (PDT)
+Date: Fri, 25 Jul 2025 12:56:44 -0700
+In-Reply-To: <1584052d-4d8c-4b4e-b65b-318296d47636@zytor.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250723104714.1674617-1-tabba@google.com> <20250723104714.1674617-16-tabba@google.com>
- <diqza54tdv3p.fsf@ackerleytng-ctop.c.googlers.com> <aIOMPpTWKWoM_O5J@google.com>
- <diqzy0sccjfz.fsf@ackerleytng-ctop.c.googlers.com> <aIO7PRBzpFqk8D13@google.com>
- <diqzseikcbef.fsf@ackerleytng-ctop.c.googlers.com>
-Message-ID: <aIPgjOLq8erW06gK@google.com>
-Subject: Re: [PATCH v16 15/22] KVM: x86/mmu: Extend guest_memfd's max mapping
- level to shared mappings
+References: <20250714102011.758008629@infradead.org> <20250714103441.496787279@infradead.org>
+ <aIKZnSuTXn9thrf7@google.com> <1584052d-4d8c-4b4e-b65b-318296d47636@zytor.com>
+Message-ID: <aIPhfNxjTL4LiG6Z@google.com>
+Subject: Re: [PATCH v3 16/16] objtool: Validate kCFI calls
 From: Sean Christopherson <seanjc@google.com>
-To: Ackerley Tng <ackerleytng@google.com>
-Cc: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-mm@kvack.org, kvmarm@lists.linux.dev, pbonzini@redhat.com, 
-	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
-	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
-	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
-	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
-	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, 
-	dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net, 
-	vbabka@suse.cz, vannapurve@google.com, mail@maciej.szmigiero.name, 
-	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
-	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
-	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
-	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
-	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
-	ira.weiny@intel.com
+To: Xin Li <xin@zytor.com>
+Cc: Peter Zijlstra <peterz@infradead.org>, x86@kernel.org, kys@microsoft.com, 
+	haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com, 
+	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, hpa@zytor.com, pbonzini@redhat.com, 
+	ardb@kernel.org, kees@kernel.org, Arnd Bergmann <arnd@arndb.de>, 
+	gregkh@linuxfoundation.org, jpoimboe@kernel.org, linux-hyperv@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-efi@vger.kernel.org, 
+	samitolvanen@google.com, ojeda@kernel.org
 Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Jul 25, 2025, Ackerley Tng wrote:
-> Sean Christopherson <seanjc@google.com> writes:
-> > Invoking host_pfn_mapping_level() isn't just undesirable, it's flat out wrong, as
-> > KVM will not verify slot->userspace_addr actually points at the (same) guest_memfd
-> > instance.
-> >
+On Fri, Jul 25, 2025, Xin Li wrote:
+> On 7/24/2025 1:37 PM, Sean Christopherson wrote:
+> > On Mon, Jul 14, 2025, Peter Zijlstra wrote:
+> > > --- a/arch/x86/kvm/vmx/vmenter.S
+> > > +++ b/arch/x86/kvm/vmx/vmenter.S
+> > > @@ -361,6 +361,10 @@ SYM_FUNC_END(vmread_error_trampoline)
+> > >   .section .text, "ax"
+> > > +#ifndef CONFIG_X86_FRED
+> > > +
+> > >   SYM_FUNC_START(vmx_do_interrupt_irqoff)
+> > >   	VMX_DO_EVENT_IRQOFF CALL_NOSPEC _ASM_ARG1
+> > >   SYM_FUNC_END(vmx_do_interrupt_irqoff)
+> > > +
+> > > +#endif
+> > 
+> > This can go in the previous patch, "x86/fred: KVM: VMX: Always use FRED for IRQs
+> > when CONFIG_X86_FRED=y".
+> > 
 > 
-> This is true too, that invoking host_pfn_mapping_level() could return
-> totally wrong information if slot->userspace_addr points somewhere else
-> completely.
+> I'm going to test patch 13~15, plus this change in patch 16.
 > 
-> What if slot->userspace_addr is set up to match the fd+offset in the
-> same guest_memfd, and kvm_gmem_max_mapping_level() returns 2M but it's
-> actually mapped into the host at 4K?
+> BTW, there is a declaration for vmx_do_interrupt_irqoff() in
+> arch/x86/kvm/vmx/vmx.c, so we'd better also do:
 > 
-> A little out of my depth here, but would mappings being recovered to the
-> 2M level be a problem?
-
-No, because again, by design, the host userspace mapping has _zero_ influence on
-the guest mapping.
-
-> For enforcement of shared/private-ness of memory, recovering the
-> mappings to the 2M level is okay since if some part had been private,
-> guest_memfd wouldn't have returned 2M.
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -6945,7 +6945,9 @@ void vmx_load_eoi_exitmap(struct kvm_vcpu *vcpu, u64
+> *eoi_exit_bitmap)
+>         vmcs_write64(EOI_EXIT_BITMAP3, eoi_exit_bitmap[3]);
+>  }
 > 
-> As for alignment, if guest_memfd could return 2M to
-> kvm_gmem_max_mapping_level(), then userspace_addr would have been 2M
-> aligned, which would correctly permit mapping recovery to 2M, so that
-> sounds like it works too.
+> +#ifndef CONFIG_X86_FRED
+>  void vmx_do_interrupt_irqoff(unsigned long entry);
+> +#endif
+
+No, we want to keep the declaration.  Unconditionally decaring the symbol allows
+KVM to use IS_ENABLED():
+
+	if (IS_ENABLED(CONFIG_X86_FRED))
+ 		fred_entry_from_kvm(EVENT_TYPE_EXTINT, vector);
+
+Hiding the declaration would require that to be a "proper" #ifdef, which would
+be a net negative for readability.  The extra declaration won't hurt anything for
+CONFIG_X86_FRED=n, as "bad" usage will still fail at link time.
+
+>  void vmx_do_nmi_irqoff(void);
 > 
-> Maybe the right solution here is that since slot->userspace_addr need
-> not point at the same guest_memfd+offset configured in the memslot, when
-> guest_memfd responds to kvm_gmem_max_mapping_level(), it should check if
-> the requested GFN is mapped in host userspace, and if so, return the
-> smaller of the two mapping levels.
-
-NAK.
-
-I don't understand what problem you're trying to solve, at all.  Setting aside
-guest_memfd for the moment, GFN=>HVA mappings are 100% userspace controlled, via
-memslots.  If userspace is accessing guest memory, it is userspace's responsibility
-to ensure it's accessing the _right_ guest memory.
-
-That doesn't change in any way for guest_memfd.  It is still userspace's
-responsibility to ensure any accesses to guest memory through an HVA access the
-correct GFN.
-
-But for guest_memfd guest mappings, the HVA is irrelevant, period.  The only reason
-we aren't going to kill off slot->userspace_addr entirely is so that _KVM_ accesses
-to guest memory Just Work, without any meaningful changes to (a well-behaved)
-userspace.
-
-For CoCo VMs (including pKVM), guest_memfd needs to ensure it doesn't create a
-hugepage that contains mixed memory, e.g. must not create a 2MiB userspace mapping
-if the 2MiB range contains private memory.  But that is simply a sub-case of the
-generate requirement that untrusted entities don't have access to private memory,
-and that KVM doesn't induce memory corruption due to mapping memory as both shared
-and private. 
+>  static void handle_nm_fault_irqoff(struct kvm_vcpu *vcpu)
 
