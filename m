@@ -1,136 +1,316 @@
-Return-Path: <kvm+bounces-53463-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53465-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7991B12249
-	for <lists+kvm@lfdr.de>; Fri, 25 Jul 2025 18:48:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2113DB122C3
+	for <lists+kvm@lfdr.de>; Fri, 25 Jul 2025 19:13:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B9DD61CE5969
-	for <lists+kvm@lfdr.de>; Fri, 25 Jul 2025 16:48:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8716AA1ACF
+	for <lists+kvm@lfdr.de>; Fri, 25 Jul 2025 17:13:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 738732EF644;
-	Fri, 25 Jul 2025 16:48:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9240C2EF678;
+	Fri, 25 Jul 2025 17:13:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="noJl4hdw"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tTdn1Ccx"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2809C1C1F0D
-	for <kvm@vger.kernel.org>; Fri, 25 Jul 2025 16:48:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F4062EF2B7
+	for <kvm@vger.kernel.org>; Fri, 25 Jul 2025 17:13:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753462099; cv=none; b=aBBvrCFgeNzDTJpVMo+RxXmCY8sSOlT8olvbgakB8m5rrrFBL8Q8lk7B/jAHSPESW8ISWFrxATUUX7CJpO03ThSfRIhcSjC+Rg5WmNyOYEYnCXdnKOPcCE9+wkMRm49nRZ3Qt6czy5Gp4ABG5vgO763L7tsuOITD4wydlYDvEMg=
+	t=1753463617; cv=none; b=RZHJU7jJKK9m4KvB+0k/Hd6MT7Nx1+Qwx1DgcTi2LBOVKTPDs3kH4nBwPSzIL8tQqMyASeyYGHXYKymPtj+Cr8QRtZqp8GL3Zk6igSQKmGqPH7nqs2BT40P9LQwH0Zy+aRM4f2gTEeoZoHkz0c1pwNrvHPFYW+ldn2N0QTYp3uU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753462099; c=relaxed/simple;
-	bh=ppQd582oZginp+3pcQAfvhafTXmi3sug/cDu6IWhOMw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ppRuMdpJrCCMhcvbZzXdtYK1u+3k4RXmLN/DBDH4JZi/wcYG+wGXEnk+YlSBA56qB4KaTNjSlqYUaWmOWbnrQneIgCQBw+wLq3q77RY7eDbGE+ffU+0Iul9Onvh2nd2LjuFjQFbA73ILWQ/EURRJdaNMMEVFdpUC8Z4FGojYPDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=noJl4hdw; arc=none smtp.client-ip=209.85.167.54
+	s=arc-20240116; t=1753463617; c=relaxed/simple;
+	bh=T/M2s2xVlYuh/GfNcs9lDBVRLTMpcwRQnMTAYRlWR5E=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=FCbrMmTiLY7fN1S3WxYgTl2pMEQVB43T6ovFjB+rRcwJ1x0JEe+eDM43NAfAYLdTXQjD2V0JqAftQZwVgZ9AHrlQUp9541PWGVJ/+PJzMTmFnaftRsOAyQfBr8n3x5O1WltVGQJXcAnwbamTLv2VkujhOUxTZbVaceKUd9K9hR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tTdn1Ccx; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-55a25635385so2652370e87.3
-        for <kvm@vger.kernel.org>; Fri, 25 Jul 2025 09:48:17 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-748f3d4c7e7so2148974b3a.3
+        for <kvm@vger.kernel.org>; Fri, 25 Jul 2025 10:13:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753462096; x=1754066896; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ppQd582oZginp+3pcQAfvhafTXmi3sug/cDu6IWhOMw=;
-        b=noJl4hdwx2RCEnbOzgDSRQFrGxhSfQkotnKKfRVP8Qiodk2eN+UWq2+lNgX9915l66
-         RZEBtjt+IpEVCCFDzon++/VNPf68Sg7vF3NlQ1b6W1ULYE3UBTylCZAdc7w2PvZNRrj1
-         p2VK6pB2rCdj8PAvE1BiIaRkdpaEnWqD5k6C6J5R8JtJ37ayISSM5HceuswfsoaZNVew
-         5dw6dYKKIHbmxYG55rqpFuuhCpL5lO1GAbYKRBJTuY+PIi8B5XTofkkSfzeVu9f/8h3e
-         59ACh+6uOpTU603NCQvxKu7hwBz/LBSM21MdLDDys4QmYFBRLCdxlylmeH2bTIn7hnx+
-         r3Hg==
+        d=google.com; s=20230601; t=1753463615; x=1754068415; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=E+f8ECMzvMCzX3pnQxw0jQaX7GgUHjg6TEwrbmrTx8k=;
+        b=tTdn1Ccxnj0an+pmNmWTt6Apg5fMTzOnS28gHbOzQifYTNEk5h4GQIv/vXbY8QS2wV
+         hguwWC557B/Q0ZdYu/3Z9lDsJiog0byR2ouA2ozI3p6BqUvgRq4HNjx1sXeFa1StQDFJ
+         NPyYXJgrluHfn0UEla7SCsTpP0Q0Mzk05DJLF9EppaUc/j776No/8VsOJcQE2GbaqSQD
+         tIIhydnidwvwuLLMz6DsD6lIaGm+c7FZu26CcBrexQiy9cauccyRSwzR2xWG4pr/yw6R
+         ZDMzHyKSzbCu/wMdEkCXnmlR8XpPS9cPzwP81LDCVcyXEywSUYXgiyKqA3ewP6yEZyAj
+         MJ3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753462096; x=1754066896;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ppQd582oZginp+3pcQAfvhafTXmi3sug/cDu6IWhOMw=;
-        b=R3vrlD5Wyu36UY9HLYECDCHQiOD2kpk7p9olaP5vsnueCNabIHWqG0E5izc4511ZGt
-         GDUu330V3JgyknjzGWcMTUraToDYFERCtlDTo5iS2JWvT4oS2vcYwU0Ymke79r2DYjqu
-         dBRQdq59nYP3m8TakYFmaiawFODkSYR0bdN8RcsM7pWhlOyNJCuTscL1FBhFmTV5ZAoy
-         mi5otry6Ft9P60JFUJwCLsItTNy2w31uOWDqp1r7W8pMYorMfZqnKXt8z9nxr0gxGC9n
-         DN7Wv9IJSFA+6Frf2Awl4tPVlmlIK9nvT1DVNAnbZtSXJsSsTMAY3OvtImUTiouiC8M0
-         A4ag==
-X-Forwarded-Encrypted: i=1; AJvYcCUwar6gwj0i1H7w6Hgxe9OvhqKTgA8RaWLN8pSaQSJgtdnRbwpvHx1oNkbaXefb0AlcKrQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxbMc7zcPBnFnzHxtGTLEztLMyONWwugtWoeb0QlcSx0IooDK5Y
-	VzPdETC8oCwQ3FtDdAqiUlJl6+FSQkJ6edR7Iy98jfxAsZ9M40mMwAv31nDPJheF3xgaAqN8TKk
-	4VOUJJJPj3FiNWDVNUhaugmz3SrIVvYthSZoBrN8P
-X-Gm-Gg: ASbGnct1UVxLDNwxT7oyHS6Jg/3BAlmD4a1jJSLyKBIB8nq8chdW+E/ycgJVSbBZrEN
-	r4Nu7DedvyE50W2ClCvfeaXiaiCm4vUubDkS2tqfwEFH/NBgw+AoCvgluMdx1c69tUgbe1PW8Ul
-	JWX886SBuPSwBDuZe31Eun1aKBlY4WebxAnTU9KkFX5D16rVzJLMDuiwfWr9N9Ky6Ldm9xNGAkV
-	4Yd408=
-X-Google-Smtp-Source: AGHT+IHRFHPeqj4nIOtWh6Ys6eD3VO7gQX4V7dsVKR085JKaRqkPB/v1BUD9NdFQ0WfSjcyFuM7LsqS6dpAfH6dAKiQ=
-X-Received: by 2002:a05:6512:3050:b0:553:a632:c7df with SMTP id
- 2adb3069b0e04-55b5f3cf5cfmr661229e87.11.1753462095911; Fri, 25 Jul 2025
- 09:48:15 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1753463615; x=1754068415;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=E+f8ECMzvMCzX3pnQxw0jQaX7GgUHjg6TEwrbmrTx8k=;
+        b=iBP+8yJ9fymq5fYO67vOAvxBw+g1YQHC9hFUWpgfaeqelqTzvU7SBxPUyu+9ONCWp9
+         +d1A0PgA7rXZxZ6p1dUev+OWCgaGBbrpxxq7GICd4a8bejMoXtR6PRLW1BoWx6LiUphJ
+         aHVbQmIwwXUO2e/0NAUCd3XYSnrIAO/ooCR7fNDKIbhJflUtJ3+R3+mvCwueaiJqOlN1
+         PsJ+Y4j5ahCjXtWTMBVdVyuIQ30GF3WxeM7Jr9QVfe/NXYcs1svNK0cH1p7wxj7akUCV
+         ebMt2q3X0cKhWkTUjliJz8VsJ+ckyEsPHTueGJXgfiPnDKl1okpMZYsnOLKRUZM7Eodd
+         dbSQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXdkBOd/YUlXso/w1FZ/hVeoGarbLLqDAIroiXiirzOXWZDwdcEMTQnEUIuE3yol9o06bk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxSfemC7fRsE0WT/z4aBpd5WZmtsu+QOhYtT1XYJCU+WSFG/7pU
+	JGz/p5LM0b7OclBABRgCeaOeR2YJ4mVxbpOqqgWedBnTZx8g6Mxq2xoRqPaBP7/GknlmYc9V8CC
+	7Q7knNw==
+X-Google-Smtp-Source: AGHT+IEe50hQ5xJZE2cI6F06MC+m3pDOUnz2melqMbGj2/g8RniMBVJGng2MMVfHIVNM11FIsL6B6vGVcrc=
+X-Received: from pgbfq25.prod.google.com ([2002:a05:6a02:2999:b0:b31:dbad:8412])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:42a3:b0:234:c6a0:8a0f
+ with SMTP id adf61e73a8af0-23d701cd8b5mr4246329637.41.1753463615402; Fri, 25
+ Jul 2025 10:13:35 -0700 (PDT)
+Date: Fri, 25 Jul 2025 10:13:33 -0700
+In-Reply-To: <diqzy0sccjfz.fsf@ackerleytng-ctop.c.googlers.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250620232031.2705638-1-dmatlack@google.com>
-In-Reply-To: <20250620232031.2705638-1-dmatlack@google.com>
-From: David Matlack <dmatlack@google.com>
-Date: Fri, 25 Jul 2025 09:47:48 -0700
-X-Gm-Features: Ac12FXxyagwElMOCi051dyM63Ch611iKG5b_MU_nG8G_LbqFaLPO58JmZEy3jU8
-Message-ID: <CALzav=dVYqS8oQNbygVjgA69EQMBBP4CyzydyUoAjnN2mb_yUQ@mail.gmail.com>
-Subject: Re: [PATCH 00/33] vfio: Introduce selftests for VFIO
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Aaron Lewis <aaronlewis@google.com>, 
-	Adhemerval Zanella <adhemerval.zanella@linaro.org>, 
-	Adithya Jayachandran <ajayachandra@nvidia.com>, Andrew Jones <ajones@ventanamicro.com>, 
-	Ard Biesheuvel <ardb@kernel.org>, Arnaldo Carvalho de Melo <acme@redhat.com>, Bibo Mao <maobibo@loongson.cn>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Dan Williams <dan.j.williams@intel.com>, 
-	Dave Jiang <dave.jiang@intel.com>, dmaengine@vger.kernel.org, 
-	Huacai Chen <chenhuacai@kernel.org>, James Houghton <jthoughton@google.com>, 
-	Jason Gunthorpe <jgg@nvidia.com>, Joel Granados <joel.granados@kernel.org>, 
-	Josh Hilke <jrhilke@google.com>, Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, 
-	"Mike Rapoport (Microsoft)" <rppt@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Pasha Tatashin <pasha.tatashin@soleen.com>, "Pratik R. Sampat" <prsampat@amd.com>, 
-	Saeed Mahameed <saeedm@nvidia.com>, Sean Christopherson <seanjc@google.com>, Shuah Khan <shuah@kernel.org>, 
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>, Vipin Sharma <vipinsh@google.com>, 
-	Wei Yang <richard.weiyang@gmail.com>, "Yury Norov [NVIDIA]" <yury.norov@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+References: <20250723104714.1674617-1-tabba@google.com> <20250723104714.1674617-16-tabba@google.com>
+ <diqza54tdv3p.fsf@ackerleytng-ctop.c.googlers.com> <aIOMPpTWKWoM_O5J@google.com>
+ <diqzy0sccjfz.fsf@ackerleytng-ctop.c.googlers.com>
+Message-ID: <aIO7PRBzpFqk8D13@google.com>
+Subject: Re: [PATCH v16 15/22] KVM: x86/mmu: Extend guest_memfd's max mapping
+ level to shared mappings
+From: Sean Christopherson <seanjc@google.com>
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-mm@kvack.org, kvmarm@lists.linux.dev, pbonzini@redhat.com, 
+	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
+	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
+	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
+	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, 
+	dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net, 
+	vbabka@suse.cz, vannapurve@google.com, mail@maciej.szmigiero.name, 
+	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
+	ira.weiny@intel.com
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jun 20, 2025 at 4:21=E2=80=AFPM David Matlack <dmatlack@google.com>=
- wrote:
->
-> This series introduces VFIO selftests, located in
-> tools/testing/selftests/vfio/.
+On Fri, Jul 25, 2025, Ackerley Tng wrote:
+> Sean Christopherson <seanjc@google.com> writes:
+>=20
+> > On Thu, Jul 24, 2025, Ackerley Tng wrote:
+> >> Fuad Tabba <tabba@google.com> writes:
+> >> >  int kvm_mmu_max_mapping_level(struct kvm *kvm, struct kvm_page_faul=
+t *fault,
+> >> > @@ -3362,8 +3371,9 @@ int kvm_mmu_max_mapping_level(struct kvm *kvm,=
+ struct kvm_page_fault *fault,
+> >> >  	if (max_level =3D=3D PG_LEVEL_4K)
+> >> >  		return PG_LEVEL_4K;
+> >> > =20
+> >> > -	if (is_private)
+> >> > -		host_level =3D kvm_max_private_mapping_level(kvm, fault, slot, gf=
+n);
+> >> > +	if (is_private || kvm_memslot_is_gmem_only(slot))
+> >> > +		host_level =3D kvm_gmem_max_mapping_level(kvm, fault, slot, gfn,
+> >> > +							is_private);
+> >> >  	else
+> >> >  		host_level =3D host_pfn_mapping_level(kvm, gfn, slot);
+> >>=20
+> >> No change required now, would like to point out that in this change
+> >> there's a bit of an assumption if kvm_memslot_is_gmem_only(), even for
+> >> shared pages, guest_memfd will be the only source of truth.
+> >
+> > It's not an assumption, it's a hard requirement.
+> >
+> >> This holds now because shared pages are always split to 4K, but if
+> >> shared pages become larger, might mapping in the host actually turn ou=
+t
+> >> to be smaller?
+> >
+> > Yes, the host userspace mappens could be smaller, and supporting that s=
+cenario is
+> > very explicitly one of the design goals of guest_memfd.  From commit a7=
+800aa80ea4
+> > ("KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for guest-specific backing me=
+mory"):
+> >
+> >  : A guest-first memory subsystem allows for optimizations and enhancem=
+ents
+> >  : that are kludgy or outright infeasible to implement/support in a gen=
+eric
+> >  : memory subsystem.  With guest_memfd, guest protections and mapping s=
+izes
+> >  : are fully decoupled from host userspace mappings.   E.g. KVM current=
+ly
+> >  : doesn't support mapping memory as writable in the guest without it a=
+lso
+> >  : being writable in host userspace, as KVM's ABI uses VMA protections =
+to
+> >  : define the allow guest protection.  Userspace can fudge this by
+> >  : establishing two mappings, a writable mapping for the guest and read=
+able
+> >  : one for itself, but that=E2=80=99s suboptimal on multiple fronts.
+> >  :=20
+> >  : Similarly, KVM currently requires the guest mapping size to be a str=
+ict
+> >  : subset of the host userspace mapping size, e.g. KVM doesn=E2=80=99t =
+support
+> >  : creating a 1GiB guest mapping unless userspace also has a 1GiB guest
+> >  : mapping.  Decoupling the mappings sizes would allow userspace to pre=
+cisely
+> >  : map only what is needed without impacting guest performance, e.g. to
+> >  : harden against unintentional accesses to guest memory.
+>=20
+> Let me try to understand this better. If/when guest_memfd supports
+> larger folios for shared pages, and guest_memfd returns a 2M folio from
+> kvm_gmem_fault_shared(), can the mapping in host userspace turn out
+> to be 4K?
 
-Hi Alex,
+It can be 2M, 4K, or none.
 
-I wanted to discuss how you would like to proceed with this series.
+> If that happens, should kvm_gmem_max_mapping_level() return 4K for a
+> memslot with kvm_memslot_is_gmem_only() =3D=3D true?
 
-The series is quite large, so one thing I was wondering is if you
-think it should be split up into separate series to make it easier to
-review and merge. Something like this:
+No.
 
- - Patches 01-08 + 30 (VFIO selftests library, some basic tests, and run sc=
-ript)
- - Patches 09-22 (driver framework)
- - Patches 23-28 (iommufd support)
- - Patches 31-33 (integration with KVM selftests)
+> The above code would skip host_pfn_mapping_level() and return just what
+> guest_memfd reports, which is 2M.
 
-I also was curious about your thoughts on maintenance of VFIO
-selftests, since I don't think we discussed that in the RFC. I am
-happy to help maintain VFIO selftests in whatever way makes the most
-sense. For now I added tools/testing/selftests/vfio under the
-top-level VFIO section in MAINTAINERS (so you would be the maintainer)
-and then also added a separate section for VFIO selftests with myself
-as a Reviewer (see PATCH 01). Reviewer felt like a better choice than
-Maintainer for myself since I am new to VFIO upstream (I've primarily
-worked on KVM in the past).
+Yes.
 
-Thanks.
---David
+> Or do you mean that guest_memfd will be the source of truth in that it
+> must also know/control, in the above scenario, that the host mapping is
+> also 2M?
+
+No.  The userspace mapping, _if_ there is one, is completely irrelevant.  T=
+he
+entire point of guest_memfd is eliminate the requirement that memory be map=
+ped
+into host userspace in order for that memory to be mapped into the guest.
+
+Invoking host_pfn_mapping_level() isn't just undesirable, it's flat out wro=
+ng, as
+KVM will not verify slot->userspace_addr actually points at the (same) gues=
+t_memfd
+instance.
+
+To demonstrate, this must pass (and does once "KVM: x86/mmu: Handle guest p=
+age
+faults for guest_memfd with shared memory" is added back).
+
+---
+ .../testing/selftests/kvm/guest_memfd_test.c  | 64 +++++++++++++++++++
+ 1 file changed, 64 insertions(+)
+
+diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing=
+/selftests/kvm/guest_memfd_test.c
+index 088053d5f0f5..b86bf89a71e0 100644
+--- a/tools/testing/selftests/kvm/guest_memfd_test.c
++++ b/tools/testing/selftests/kvm/guest_memfd_test.c
+@@ -13,6 +13,7 @@
+=20
+ #include <linux/bitmap.h>
+ #include <linux/falloc.h>
++#include <linux/sizes.h>
+ #include <setjmp.h>
+ #include <signal.h>
+ #include <sys/mman.h>
+@@ -21,6 +22,7 @@
+=20
+ #include "kvm_util.h"
+ #include "test_util.h"
++#include "ucall_common.h"
+=20
+ static void test_file_read_write(int fd)
+ {
+@@ -298,6 +300,66 @@ static void test_guest_memfd(unsigned long vm_type)
+ 	kvm_vm_free(vm);
+ }
+=20
++static void guest_code(uint8_t *mem, uint64_t size)
++{
++	size_t i;
++
++	for (i =3D 0; i < size; i++)
++		__GUEST_ASSERT(mem[i] =3D=3D 0xaa,
++			       "Guest expected 0xaa at offset %lu, got 0x%x", i, mem[i]);
++
++	memset(mem, 0xff, size);
++	GUEST_DONE();
++}
++
++static void test_guest_memfd_guest(void)
++{
++	/*
++	 * Skip the first 4gb and slot0.  slot0 maps <1gb and is used to back
++	 * the guest's code, stack, and page tables, and low memory contains
++	 * the PCI hole and other MMIO regions that need to be avoided.
++	 */
++	const uint64_t gpa =3D SZ_4G;
++	const int slot =3D 1;
++
++	struct kvm_vcpu *vcpu;
++	struct kvm_vm *vm;
++	uint8_t *mem;
++	size_t size;
++	int fd, i;
++
++	if (!kvm_has_cap(KVM_CAP_GUEST_MEMFD_MMAP))
++		return;
++
++	vm =3D __vm_create_shape_with_one_vcpu(VM_SHAPE_DEFAULT, &vcpu, 1, guest_=
+code);
++
++	TEST_ASSERT(vm_check_cap(vm, KVM_CAP_GUEST_MEMFD_MMAP),
++		    "Default VM type should always support guest_memfd mmap()");
++
++	size =3D vm->page_size;
++	fd =3D vm_create_guest_memfd(vm, size, GUEST_MEMFD_FLAG_MMAP);
++	vm_set_user_memory_region2(vm, slot, KVM_MEM_GUEST_MEMFD, gpa, size, NULL=
+, fd, 0);
++
++	mem =3D mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
++	TEST_ASSERT(mem !=3D MAP_FAILED, "mmap() on guest_memfd failed");
++	memset(mem, 0xaa, size);
++	munmap(mem, size);
++
++	virt_pg_map(vm, gpa, gpa);
++	vcpu_args_set(vcpu, 2, gpa, size);
++	vcpu_run(vcpu);
++
++	TEST_ASSERT_EQ(get_ucall(vcpu, NULL), UCALL_DONE);
++
++	mem =3D mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
++	TEST_ASSERT(mem !=3D MAP_FAILED, "mmap() on guest_memfd failed");
++	for (i =3D 0; i < size; i++)
++		TEST_ASSERT_EQ(mem[i], 0xff);
++
++	close(fd);
++	kvm_vm_free(vm);
++}
++
+ int main(int argc, char *argv[])
+ {
+ 	unsigned long vm_types, vm_type;
+@@ -314,4 +376,6 @@ int main(int argc, char *argv[])
+=20
+ 	for_each_set_bit(vm_type, &vm_types, BITS_PER_TYPE(vm_types))
+ 		test_guest_memfd(vm_type);
++
++	test_guest_memfd_guest();
+ }
+
+base-commit: 9a82b11560044839b10b1fb83ff230d9a88785b8
+--=20
 
