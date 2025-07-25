@@ -1,408 +1,318 @@
-Return-Path: <kvm+bounces-53431-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53432-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54A93B11801
-	for <lists+kvm@lfdr.de>; Fri, 25 Jul 2025 07:35:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A4B1FB118C2
+	for <lists+kvm@lfdr.de>; Fri, 25 Jul 2025 09:00:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 758631C27702
-	for <lists+kvm@lfdr.de>; Fri, 25 Jul 2025 05:35:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DBE461896E8F
+	for <lists+kvm@lfdr.de>; Fri, 25 Jul 2025 07:00:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27DA124503F;
-	Fri, 25 Jul 2025 05:35:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6691428A1D7;
+	Fri, 25 Jul 2025 06:59:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LPdx4nUS"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="dQRsPsFz"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 422371DEFDD;
-	Fri, 25 Jul 2025 05:35:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.10
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753421719; cv=fail; b=RhdYjfgQ8gieYrYaI5Kzk4Iys/Q/hSMZLou3+qIe5MIk3Pn3w/AKI3awMAr/nnEcUnsyJ8mtiaQxeMum7nawkHu79S0V4AgNlRmXpujPXCoUMA3WE5hvACQ84sEgVaWUwfyZqmaHWuAcBXpU8Kn/OiypFddENxBFgBFRqiXZTYs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753421719; c=relaxed/simple;
-	bh=+ykA1GinmkeX9aOrZt0lxJZmMZ/crmGw3BtfXC2U8+g=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=KB7RcXSncZy7PBSbH84aDgv6EYp3KdKufF/4Bb315fBMYq1Qbwpjk5Js1nYTddG+TrFOamKdbNKNZwkRDsPeRPIr6XAXHHImRbi92qw0QetNZ1jSWf4XCfUxTiSVjZN5TZpZx8ziCWSTJfkLTEoisQBMFOZgAvZoWAHmos2IMbo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LPdx4nUS; arc=fail smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1753421717; x=1784957717;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=+ykA1GinmkeX9aOrZt0lxJZmMZ/crmGw3BtfXC2U8+g=;
-  b=LPdx4nUShoiMTQFgC40xQy8vtBTdzTjGQudkXX32caijAiAloJKNZXt6
-   678nrm4AFXZBVlsT4qsu6JO8BLyDlO6nfQiuVoO/AE0a+o3nStjj6+9Eo
-   AjDDZjZ/L0/QMbeiPr65Qy/N4btIj6a+KbbG4AHZJXYj/o1VbwYWXuwg0
-   oWtrXg81TRkgGHqE8zSiqChrTnCVoaBkigmQ4Caw/nAKfGU+LPnV9o+Nz
-   qI4ch5H2ma6HV7Qd30Gq7UFT2PSgMw0KMe9FRd46cQazbMcrhbwnSaxVN
-   tU9AZyI/eWcqniOXoVaC6RHXBciDHYaCREWQYICZE9T58jPE/iMCYCzW+
-   w==;
-X-CSE-ConnectionGUID: hqVNuCZ1RCKPv6U7XnCvbw==
-X-CSE-MsgGUID: zJpnErfKTY6hWHrhbld9+w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11501"; a="67103876"
-X-IronPort-AV: E=Sophos;i="6.16,338,1744095600"; 
-   d="scan'208";a="67103876"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jul 2025 22:35:14 -0700
-X-CSE-ConnectionGUID: NxPhb5t0S7CKlOFCQQZzmg==
-X-CSE-MsgGUID: BtKlH1fcSCapNwi6WZwIIw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,338,1744095600"; 
-   d="scan'208";a="159893247"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by orviesa006.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jul 2025 22:35:14 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26; Thu, 24 Jul 2025 22:35:11 -0700
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26 via Frontend Transport; Thu, 24 Jul 2025 22:35:11 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (40.107.244.43)
- by edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26; Thu, 24 Jul 2025 22:35:09 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=CDUogXIhtZuBt9X873ynjAehD5U77T01uD3bfMBOQMnY7vosShPJsLqhrBBE+9U5wKtrxZa/tHpOF+cLlq3b3bWVsNTyGgJVPxs+1VF6eimvY1MVRP4CWA1dCfrnezCb6qH+rE0kI+sQQkT8m3BxBxqgtNbzDTbATmyNhl9Vsp0LJXCtkHQDFudQTtaHY/gUlB9nyB86SJTd34XslHW62FfzPSt47QSjbONxaTtUkP2SLqhpoFvwg+xKmwXSJ2VukaQU9sxKlfMEFglcVAlD8Yv54BK2eHDl5A0m+qvO+Shejx/n401VMxwc9H/kXwkorAh9K9+klwB+amT+RkPJ9g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6p8xnh5uPIVEHYCep2fbZkINgQ1Sn0UjMAN1emoIDSU=;
- b=l/VRu33yELQmNZA5aSoMtS7m3wMFtbU1TqTXTFF+xitwFYDBGK2j4wheaddOCE5hMrkvunEHVTVTA1X6T+CLaL2PxyMBlB7oXsLKRbasywVQypVkM/GevCROR8UNFzuloO2fJLYO+Uz4HfeIOIOiDAaoLJ1QehEQl+GlyQlLtucxGumXeODORRsQaelW4lOJGL47LT8bf4XpN7r+inqn5VzXVvadwYdm/kwqs0MAp8pACkTdkNIwR+Wg6LwQf1Z/SjBWlyP7QbpMVYs7006cOId3+6OZSKJ5EXBtyvFMKAb7FjtcuHEaBAUkpGq/o4vBWOrHnGSPqK6PWeZSgcIkig==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA0PR11MB7185.namprd11.prod.outlook.com (2603:10b6:208:432::20)
- by LV8PR11MB8608.namprd11.prod.outlook.com (2603:10b6:408:1f0::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8901.28; Fri, 25 Jul
- 2025 05:34:40 +0000
-Received: from IA0PR11MB7185.namprd11.prod.outlook.com
- ([fe80::dd3b:ce77:841a:722b]) by IA0PR11MB7185.namprd11.prod.outlook.com
- ([fe80::dd3b:ce77:841a:722b%3]) with mapi id 15.20.8943.029; Fri, 25 Jul 2025
- 05:34:40 +0000
-From: "Kasireddy, Vivek" <vivek.kasireddy@intel.com>
-To: Leon Romanovsky <leon@kernel.org>
-CC: Alex Williamson <alex.williamson@redhat.com>, Christoph Hellwig
-	<hch@lst.de>, Jason Gunthorpe <jgg@nvidia.com>, Andrew Morton
-	<akpm@linux-foundation.org>, Bjorn Helgaas <bhelgaas@google.com>,
-	=?iso-8859-1?Q?Christian_K=F6nig?= <christian.koenig@amd.com>,
-	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-	"iommu@lists.linux.dev" <iommu@lists.linux.dev>, Jens Axboe
-	<axboe@kernel.dk>, =?iso-8859-1?Q?J=E9r=F4me_Glisse?= <jglisse@redhat.com>,
-	Joerg Roedel <joro@8bytes.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linaro-mm-sig@lists.linaro.org" <linaro-mm-sig@lists.linaro.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>, "linux-pci@vger.kernel.org"
-	<linux-pci@vger.kernel.org>, Logan Gunthorpe <logang@deltatee.com>, "Marek
- Szyprowski" <m.szyprowski@samsung.com>, Robin Murphy <robin.murphy@arm.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>, Will Deacon <will@kernel.org>
-Subject: RE: [PATCH 10/10] vfio/pci: Add dma-buf export support for MMIO
- regions
-Thread-Topic: [PATCH 10/10] vfio/pci: Add dma-buf export support for MMIO
- regions
-Thread-Index: AQHb+9IaqW2aYf5a0kKT+xAFJGMHyLRAkYIggAAy9YCAALri8A==
-Date: Fri, 25 Jul 2025 05:34:40 +0000
-Message-ID: <IA0PR11MB71855A080F43E4D657A70311F859A@IA0PR11MB7185.namprd11.prod.outlook.com>
-References: <cover.1753274085.git.leonro@nvidia.com>
- <aea452cc27ca9e5169f7279d7b524190c39e7260.1753274085.git.leonro@nvidia.com>
- <IA0PR11MB7185E487736B8B4CD70600DEF85EA@IA0PR11MB7185.namprd11.prod.outlook.com>
- <20250724054443.GP402218@unreal>
-In-Reply-To: <20250724054443.GP402218@unreal>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA0PR11MB7185:EE_|LV8PR11MB8608:EE_
-x-ms-office365-filtering-correlation-id: 72a76a66-36f7-4b7c-edc1-08ddcb3cf3dd
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014|38070700018;
-x-microsoft-antispam-message-info: =?iso-8859-1?Q?2V/V0TtdzhZqSO9vdhz+N3JCc40ok7U6BbBdsI8Zq3xGxRO9rKsOMdIRnO?=
- =?iso-8859-1?Q?pRGkSoWCPLWV2SHobXgZV11+CymM1MXgM6MOA/O7lZnlHVVIvPSNjUMKtR?=
- =?iso-8859-1?Q?/4ss0H/629Vgf4g0GsDvHaoedNI1FR70hdiVm8LqhDp1XM8wMhMJ1MjzXX?=
- =?iso-8859-1?Q?morzlcOQdLd1sOxQsgvPvTos7z5gzzI3oEKOK5c2JOs97tZ+4tS20GVYKW?=
- =?iso-8859-1?Q?8VH2KapZFd8MlRgO31MZrD7ve+d1qW+wKdE3tNPWOwkGP8xZjJ2uWu13py?=
- =?iso-8859-1?Q?CfVQa6nnfEbo/ElzuO60jz6v9s8pMM8RN3yddsWnZZWG4x6RoOPzuo7lxb?=
- =?iso-8859-1?Q?S6eMa1tIv7+du+WDLvc5uaIt/WuvQe3DrvN5MR+Wjzk2fl+gtqk0+w9gDl?=
- =?iso-8859-1?Q?SisBNf4/oYrDbUfwPaQj/NocxA69NKOR34h/m6TAa8NOr3Va2A3T1d6++q?=
- =?iso-8859-1?Q?THHS0+vWeCyoIMZizonpCck6oLKmfrlX9jUdrcIxfgQVJbaQC4DaIorjdy?=
- =?iso-8859-1?Q?qmXQ5FCQVtfdQEGZl87CVlkiveavEB+xshnXuZUW8kst5PA+u+8EUYeV6+?=
- =?iso-8859-1?Q?jafCr0gNz5yE1BMxenJ40GdmjLoHNL7hu2f/t3pnw40V6VIQVXXmhLZaAa?=
- =?iso-8859-1?Q?y2evN5I2R8v0jHuiOKaKh7wYjmctzPUmuvQzfS6rSz8ZhMkoS8N+lBRU2Q?=
- =?iso-8859-1?Q?qu2THonbKNXSzBifPaC/dTZDNNmXQJpIOzvpuHzvIwnui0yYUoEg8Gqg/r?=
- =?iso-8859-1?Q?6jnQTjanHI0hUrs0+somAmT1TWZ1bFFPFn6YeKnWyIzgxJlEC4KAdYApn1?=
- =?iso-8859-1?Q?y7UeTmD6/4bx5zsvJ+/rJQ3jbic0XMfsetRpWLBt8dmfWhbliyzFTMyzh9?=
- =?iso-8859-1?Q?Fhv+M2n0nghZF9MISzsuA6lUMXXxG56fBvrvJXEH5ZVwiE0ddp7/DSOeuP?=
- =?iso-8859-1?Q?GFP12oZcQqlHo91BC5E2HdfangJ8l+ZNpEAhxJJ6vULjmXkVZodCNk6hFR?=
- =?iso-8859-1?Q?mWJScbfI4n+QitkGgSRgqvmCVT8Otj4oYFNyJ0KY3dbhRPFyExA79Rkq6/?=
- =?iso-8859-1?Q?UySPqP1liaVsFse/tfnlgsjxhncX6n4n3XsCvY9/rODyzO6RJeUcpxOnDn?=
- =?iso-8859-1?Q?76jGuy1lHl3EkL8GirWkX6W+EuWg+SqZ/x9wDcDMp/oHpdKj3INXgR3U+f?=
- =?iso-8859-1?Q?f5NIud5VoFmHhTgLh1wyuCOoaAUr3Kg0mwNYUDw8NAM8u+Ebfz1AyZKVHD?=
- =?iso-8859-1?Q?JDjVfzgJM9VbFBOXV4+h0RFPf9te4eu5Dlam2JTL8tZnviNyQs/fMInOl4?=
- =?iso-8859-1?Q?6IAf2OMzbN4dEysj59EcORSWKXtXyfLA6j1ZsdZmG7V4Nv2iu31mP21R0B?=
- =?iso-8859-1?Q?psbrEQds59W8W5h77QKH337+L0dGQSRqZadVcjNkSEKaqC0c+gV9/fFJuC?=
- =?iso-8859-1?Q?HfaCZhzS9LuJUXig51aIyWnf9vNoLUr9tZdDFna/H68kUu2QM5ntvXEXBd?=
- =?iso-8859-1?Q?4=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA0PR11MB7185.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?iso-8859-1?Q?jXk/jJ9sXof40pxEqcnaU7MfH0OX7V3yc9p/K8I9Wc4x5LEo8YD00HcYPJ?=
- =?iso-8859-1?Q?79wxK2KbzH842ZywrcEOSgojMxTbLz7kR4F0sy1ZapKe757Op152+0AIRf?=
- =?iso-8859-1?Q?WeXuTEpNODJIDv50NbRvmRwpno3EWf558ebIFkihncoOFDXk19ZjHR4RqT?=
- =?iso-8859-1?Q?NFHe5DJ9x2gyDsdgAKb5x1KmW5GXabscg4AjBQtsBisJvrovhmKW4MyXzt?=
- =?iso-8859-1?Q?mGL6a79sS1zU3Uyg5hNEdWzvsPoIOvqbokE9+0I5ldbZ/toRR738Qi5fgr?=
- =?iso-8859-1?Q?uzrTKil9IiAoDhziv/U0SqPWn9HZPGLIf5pQN9bIzDnXF1OwIedjcByhN4?=
- =?iso-8859-1?Q?a9wljgitQuKV/2fUcC16DlEZuZ8jtqHk54Xzfa2c9jy31Q8HUne9g2Wl2i?=
- =?iso-8859-1?Q?A7Qb3TA9PASW2kfAEEW1VWxS0WD2Fj2oFprHIijl1wbO8b7RmqaCvnijL2?=
- =?iso-8859-1?Q?Tl2PBAFbACxBs9hXZyP9s3DzL+bD+lKY88Znlz3BCAk7coLwzijUwiaIRL?=
- =?iso-8859-1?Q?t3lySr7RdRc6iNkRIcgucMgIw20j8Ezw1v90wcmgZVOhqquWU6CbjnJfse?=
- =?iso-8859-1?Q?hy5iCE6W3rtZQLMb33SjOGrgjfAQOfZ1D2a9hwtTsq5UfA8vsw5ZnYq4AM?=
- =?iso-8859-1?Q?blmkLmLQWdaxCB82tJPmCLl/57Lt67u9U7PXu/BmukqnjL7ChTijwJ8xkw?=
- =?iso-8859-1?Q?xBOhn97jWpuRjoLmYhaLRzW72plLxoEMDtuyen8HZy160aEUJcTr/aBK3C?=
- =?iso-8859-1?Q?01tUSWQrnQRhsAsYJREHgflzKTVntEhcSadBAlDVGLPOfeN0aYP5fV2OxN?=
- =?iso-8859-1?Q?biugPOpMv9J1VtnZfqVOIlg3IzY1qw5S+fDCo/oR2K0AYPYpLt7zdqPqTN?=
- =?iso-8859-1?Q?89Rj6f7yiUbjxHL6lDtblt9O8rumqn0xdWVP0AptA3VqUqs1KTBOs1JFql?=
- =?iso-8859-1?Q?OtSZSl3XFF1yEB0EB9v2ONs5V3HdjLEAciEUzgnoqimDnp0JVVAkQIyUlY?=
- =?iso-8859-1?Q?u/Y2PBbxfNz87Pv9OW4c7h1bAJNPCproda8KhgqxIgRyHxN99uI7Ce1Ptz?=
- =?iso-8859-1?Q?GFYqpalz4iKbrcKBbQN9VF/PO/5cIjC5OGbtE2K8CZZV2B8ei5lo4FhrKe?=
- =?iso-8859-1?Q?uKOMjS7PzZOLS/WpYnfdQtJ/a2qw5BQxOOMHtBCi7z9z5rI3NDEqPyLOKk?=
- =?iso-8859-1?Q?gbkhk8H9iyxdCEa9nowcvMmoiV8gMT2LyOgybxWsMfdjMHTmPPphtsxRlR?=
- =?iso-8859-1?Q?M1gsaym8L+BPPoFWigqJ3YXSvw0KoVCGsEDpJIN72popq+ux5prrvb8xpN?=
- =?iso-8859-1?Q?Ay4UwM7eVWrU/5tbcSENt+KVC6+jJ5fgsfKEurOa4aDRPwxAotGXC2zimH?=
- =?iso-8859-1?Q?zaMEYDRnK/COFQpPreYbVIiP5A/3iO4jOE7jdhi5K9Uvpj3HSLzK38vmeA?=
- =?iso-8859-1?Q?+55s5lOs3+pshCNEiz8MPvQI74c1Hoy/a2OUkGgpA6VDXZ6f45hCSr9Nxc?=
- =?iso-8859-1?Q?tTVxNHgRKi0wo5ebE475Hc7xAlhXnNvwPq4rCOtN+IK5kwnNEKAdu2NXG7?=
- =?iso-8859-1?Q?pnwUWC7eXJBmufzFvjln3g2CUSR6b7rjlg+sS/rQuHWLKWrkouEoUFQxN1?=
- =?iso-8859-1?Q?RQIdHAFwt2wqd7sLX/fgvkR0leITbEx3hn?=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96132274FCB
+	for <kvm@vger.kernel.org>; Fri, 25 Jul 2025 06:59:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753426791; cv=none; b=GRb6QI3+7lJb8zJ4wrVO/yBygg6Wpoh4anpYlt0upnBRb6tKqfmHEJI4JO71oJ6s5kN4WAxALzf8xsjVM2QqytzD2SBY3nlVgHsOkFhswFmr86aGBfxrWWkfog+/y+/R13FeNVQs90RhYDYhKnMca8byj3TeIAg4cBsTATn5mhU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753426791; c=relaxed/simple;
+	bh=M0OXB0ted4yUGEY1m2IRAEhPczqv3B5NhgGPsP0IjHg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=o8jbe+ekNjTU285Ls8UvFzOMPu6whwcGSdy8tMCp+q0NctvMD/XewnT4Utl3G+5EFCvNcAZiZokhODe1HrIuDz3UWOq+CUPbTVMRwHYr3+4UNczEObxYE5AtLbJANnHxhBDRaw8+zIcMHPKTCrbHy9UMhYs8pbLj8ycqCKVasx0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=dQRsPsFz; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-75001b1bd76so1220705b3a.2
+        for <kvm@vger.kernel.org>; Thu, 24 Jul 2025 23:59:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1753426788; x=1754031588; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Tjib0N0C/5W1FPgGnxKMNcyA430T8Vj0E1zwB3+Uks4=;
+        b=dQRsPsFzxbnsuISX614uBcRGDdoge86rSlkKY9WTIU/qsTs5XYIcQP3AOCVxNt1Pys
+         ln+oAicc+AtfJXSF0tmJIvOKmNd/EgWOExbuXVnObwrUtFwcm2Zn2E0xZJiPutfBQlTs
+         dAhvyBrxe85dibRb5NPQd3EVMg8sq9fQmHVdewakaSv2b1NioNxvfiZ5O3FRWQLxS+u5
+         OMZyS5szobRT/4kpPtUbrLVLzxERNGPvxMpMM3T1Q2JKpkzcDsNbCBj9GSVxU51DJ4Jr
+         36s/kBZsVw+AgFlwvHGEeu+f/hLPDzn3DR5wb+RArtFncJgMgKgdZ1U6DdJIdO8SMxS7
+         natg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753426788; x=1754031588;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Tjib0N0C/5W1FPgGnxKMNcyA430T8Vj0E1zwB3+Uks4=;
+        b=S3VVCOZgxujm80Kmg4qtE7FOrorPMBLGrPAM/O+ePICDi8he/HOeQQA1OsDq5P7qHb
+         XZNywOte3s7HoW+emqTTDhC8q5p6Jc2wkrgjENH7/QSaqDeM3ccvgpd4ExG5bryX8VlT
+         f5vzyMzmAGKRWSaIyHzjQgZudj5EcikCRuoLTsXE/JmayUICcKBy9OvgcNx8V5UbjXvu
+         lXDoRRIWf7nycSXkQ9HGRIuYzihyhpXE28SLnKI1IorWGOthEa2jA9aM02VssmFOjRi/
+         wtQaGK5JEvZhT7WcJRUqvasgz+V/xftYXVAnRkVmJ+sLZHxbUqKiTKs0Gb1IoPWJKF99
+         9tGw==
+X-Forwarded-Encrypted: i=1; AJvYcCXkVOFkqVB8QFIjNTjDRmvaFeRahyMOisQWrL02ni3Q475fxIogakLRYAIKNl9egBbuOe0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyoMaeoXiEhznoUaJY2fSqk4lf2Gw1vNEaIquSpryx6B8cdX7FR
+	PZAHkOEvni7IbTc+hJh9JdQ2Jc+h6LDO+cfHOzfIV8rJ+CCFC+ejoF7x0YLWweUD5pyWAYFW+p7
+	JbU2a
+X-Gm-Gg: ASbGncuXHpRQsXKpw/ZzgV7wRJOCXWUUzOJ0hobC8BAF5JCLVafZEqOaMeMbeFj6ALg
+	xkVoEj77m0e2Ftu0HA4RpjuQPzG3c4w5t08+QbcT1+P09K0H5Xo3p2hXiblTUhQM68WSKWqa7Ve
+	UD4aniDzK1jz12TvZECfxEoP2HefzsAKJcSE8JSF7ScOhEQrj/gKMOl5/nPPO/AFUyooI/ZqlQG
+	pgJ2hZSoZ1hHVJLBiSginpBpwT+i6vWTcXY6QtrN3l3tWU2+/e09GSrNRNQZcNsysNL2wGfKDkE
+	kZA2bqckR53B8THdbD/ruJTXFEAdkcSdTPeuAeyoSn7lRc8nOQ9r8W5ULtciJUflw1/dR891Jnu
+	bL/l+x7+lPu7FvuBF7FCgYV752k2xfiPa3yp+yZ0i6qR0aCoI6QI=
+X-Google-Smtp-Source: AGHT+IGDFWL1llphxSV+WXzXHCIbvfIXfDSzx0etwKEoCZ3cJSqZYmwVfE2aHNC7StMOBKVLL67KQQ==
+X-Received: by 2002:a05:6a00:2e1c:b0:739:50c0:b3fe with SMTP id d2e1a72fcca58-763328614ebmr1758142b3a.8.1753426787734;
+        Thu, 24 Jul 2025 23:59:47 -0700 (PDT)
+Received: from localhost.localdomain ([139.177.225.228])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-761b06199a8sm3147099b3a.112.2025.07.24.23.59.41
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Thu, 24 Jul 2025 23:59:47 -0700 (PDT)
+From: lizhe.67@bytedance.com
+To: alex.williamson@redhat.com,
+	farman@linux.ibm.com
+Cc: akpm@linux-foundation.org,
+	david@redhat.com,
+	jgg@ziepe.ca,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	lizhe.67@bytedance.com,
+	peterx@redhat.com
+Subject: Re: [PATCH v4 2/5] vfio/type1: optimize vfio_pin_pages_remote()
+Date: Fri, 25 Jul 2025 14:59:37 +0800
+Message-ID: <20250725065937.65848-1-lizhe.67@bytedance.com>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20250724105608.73b05a24.alex.williamson@redhat.com>
+References: <20250724105608.73b05a24.alex.williamson@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA0PR11MB7185.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 72a76a66-36f7-4b7c-edc1-08ddcb3cf3dd
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Jul 2025 05:34:40.6229
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: vBwOjp45moms5qpvVve6kATdWSQPSuOZxuwWfyj9NGCekgTDWY7piXkkn4Ufl2Re4IB6641yf39VU0lnWOsRH4aoUxIfdaJgIPfG7aUpVu4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR11MB8608
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
 
-Hi Leon,
+On Thu, 24 Jul 2025 10:56:08 -0600, alex.williamson@redhat.com wrote:
+ 
+> On Thu, 24 Jul 2025 10:40:38 +0800
+> lizhe.67@bytedance.com wrote:
+> 
+> > On Wed, 23 Jul 2025 10:41:34 -0400, farman@linux.ibm.com wrote:
+> >  
+> > > On Wed, 2025-07-23 at 15:09 +0800, lizhe.67@bytedance.com wrote:  
+> > > > On Tue, 22 Jul 2025 12:32:59 -0400, farman@linux.ibm.com wrote:
+> > > >    
+> > > > > On Thu, 2025-07-10 at 16:53 +0800, lizhe.67@bytedance.com wrote:  
+> > > > > > From: Li Zhe <lizhe.67@bytedance.com>
+> > > > > > 
+> > > > > > When vfio_pin_pages_remote() is called with a range of addresses that
+> > > > > > includes large folios, the function currently performs individual
+> > > > > > statistics counting operations for each page. This can lead to significant
+> > > > > > performance overheads, especially when dealing with large ranges of pages.
+> > > > > > Batch processing of statistical counting operations can effectively enhance
+> > > > > > performance.
+> > > > > > 
+> > > > > > In addition, the pages obtained through longterm GUP are neither invalid
+> > > > > > nor reserved. Therefore, we can reduce the overhead associated with some
+> > > > > > calls to function is_invalid_reserved_pfn().
+> > > > > > 
+> > > > > > The performance test results for completing the 16G VFIO IOMMU DMA mapping
+> > > > > > are as follows.
+> > > > > > 
+> > > > > > Base(v6.16-rc4):
+> > > > > > ------- AVERAGE (MADV_HUGEPAGE) --------
+> > > > > > VFIO MAP DMA in 0.047 s (340.2 GB/s)
+> > > > > > ------- AVERAGE (MAP_POPULATE) --------
+> > > > > > VFIO MAP DMA in 0.280 s (57.2 GB/s)
+> > > > > > ------- AVERAGE (HUGETLBFS) --------
+> > > > > > VFIO MAP DMA in 0.052 s (310.5 GB/s)
+> > > > > > 
+> > > > > > With this patch:
+> > > > > > ------- AVERAGE (MADV_HUGEPAGE) --------
+> > > > > > VFIO MAP DMA in 0.027 s (602.1 GB/s)
+> > > > > > ------- AVERAGE (MAP_POPULATE) --------
+> > > > > > VFIO MAP DMA in 0.257 s (62.4 GB/s)
+> > > > > > ------- AVERAGE (HUGETLBFS) --------
+> > > > > > VFIO MAP DMA in 0.031 s (517.4 GB/s)
+> > > > > > 
+> > > > > > For large folio, we achieve an over 40% performance improvement.
+> > > > > > For small folios, the performance test results indicate a
+> > > > > > slight improvement.
+> > > > > > 
+> > > > > > Signed-off-by: Li Zhe <lizhe.67@bytedance.com>
+> > > > > > Co-developed-by: Alex Williamson <alex.williamson@redhat.com>
+> > > > > > Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> > > > > > Acked-by: David Hildenbrand <david@redhat.com>
+> > > > > > ---
+> > > > > >  drivers/vfio/vfio_iommu_type1.c | 83 ++++++++++++++++++++++++++++-----
+> > > > > >  1 file changed, 71 insertions(+), 12 deletions(-)  
+> > > > > 
+> > > > > Hi,
+> > > > > 
+> > > > > Our CI started flagging some crashes running vfio-ccw regressions on the -next kernel beginning with
+> > > > > next-20250717, and bisect points to this particular commit.
+> > > > > 
+> > > > > I can reproduce by cherry-picking this series onto 6.16-rc7, so it's not something else lurking.
+> > > > > Without panic_on_warn, I get a handful of warnings from vfio_remove_dma() (after starting/stopping
+> > > > > guests with an mdev attached), before eventually triggering a BUG() in vfio_dma_do_unmap() running a
+> > > > > hotplug test. I've attached an example of a WARNING before the eventual BUG below. I can help debug
+> > > > > this if more doc is needed, but admit I haven't looked at this patch in any detail yet.
+> > > > > 
+> > > > > Thanks,
+> > > > > Eric
+> > > > > 
+> > > > > [  215.671885] ------------[ cut here ]------------
+> > > > > [  215.671893] WARNING: CPU: 10 PID: 6210 at drivers/vfio/vfio_iommu_type1.c:1204
+> > > > > vfio_remove_dma+0xda/0xf0 [vfio_iommu_type1]
+> > > > > [  215.671902] Modules linked in: vhost_vsock vmw_vsock_virtio_transport_common vsock vhost
+> > > > > vhost_iotlb algif_hash af_alg kvm nft_masq nft_ct nft_reject_ipv4 nf_reject_ipv4 nft_reject act_csum
+> > > > > cls_u32 sch_htb nft_chain_nat nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 nf_tables pkey_pckmo
+> > > > > s390_trng pkey_ep11 pkey_cca zcrypt_cex4 zcrypt eadm_sch rng_core vfio_ccw mdev vfio_iommu_type1
+> > > > > vfio drm sch_fq_codel i2c_core drm_panel_orientation_quirks dm_multipath loop nfnetlink ctcm fsm
+> > > > > zfcp scsi_transport_fc mlx5_ib diag288_wdt mlx5_core ghash_s390 prng aes_s390 des_s390 libdes
+> > > > > sha3_512_s390 sha3_256_s390 sha512_s390 sha1_s390 sha_common rpcrdma sunrpc rdma_ucm rdma_cm
+> > > > > configfs iw_cm ib_cm ib_uverbs ib_core scsi_dh_rdac scsi_dh_emc scsi_dh_alua pkey autofs4
+> > > > > [  215.671946] CPU: 10 UID: 107 PID: 6210 Comm: qemu-system-s39 Kdump: loaded Not tainted 6.16.0-
+> > > > > rc7-00005-g4ff8295d8d61 #79 NONE 
+> > > > > [  215.671950] Hardware name: IBM 3906 M05 780 (LPAR)
+> > > > > [  215.671951] Krnl PSW : 0704c00180000000 000002482f7ee55e (vfio_remove_dma+0xde/0xf0
+> > > > > [vfio_iommu_type1])
+> > > > > [  215.671956]            R:0 T:1 IO:1 EX:1 Key:0 M:1 W:0 P:0 AS:3 CC:0 PM:0 RI:0 EA:3
+> > > > > [  215.671959] Krnl GPRS: 006d010100000000 000000009d8a4c40 000000008f3b1c80 0000000092ffad20
+> > > > > [  215.671961]            0000000090b57880 006e010100000000 000000008f3b1c80 000000008f3b1cc8
+> > > > > [  215.671963]            0000000085b3ff00 000000008f3b1cc0 000000008f3b1c80 0000000092ffad20
+> > > > > [  215.671964]            000003ff867acfa8 000000008f3b1ca0 000001c8b36c3be0 000001c8b36c3ba8
+> > > > > [  215.671972] Krnl Code: 000002482f7ee550: c0e53ff9fcc8	brasl	%r14,00000248af72dee0
+> > > > >            000002482f7ee556: a7f4ffcf		brc	15,000002482f7ee4f4
+> > > > >           #000002482f7ee55a: af000000		mc	0,0  
+> > > > >           >000002482f7ee55e: a7f4ffa9		brc	15,000002482f7ee4b0  
+> > > > >            000002482f7ee562: 0707		bcr	0,%r7
+> > > > >            000002482f7ee564: 0707		bcr	0,%r7
+> > > > >            000002482f7ee566: 0707		bcr	0,%r7
+> > > > >            000002482f7ee568: 0707		bcr	0,%r7
+> > > > > [  215.672006] Call Trace:
+> > > > > [  215.672008]  [<000002482f7ee55e>] vfio_remove_dma+0xde/0xf0 [vfio_iommu_type1] 
+> > > > > [  215.672013]  [<000002482f7f03de>] vfio_iommu_type1_detach_group+0x3de/0x5f0 [vfio_iommu_type1] 
+> > > > > [  215.672016]  [<000002482f7d4c4e>] vfio_group_detach_container+0x5e/0x180 [vfio] 
+> > > > > [  215.672023]  [<000002482f7d2ce0>] vfio_group_fops_release+0x50/0x90 [vfio] 
+> > > > > [  215.672027]  [<00000248af25e1ee>] __fput+0xee/0x2e0 
+> > > > > [  215.672031]  [<00000248aef19f18>] task_work_run+0x88/0xd0 
+> > > > > [  215.672036]  [<00000248aeef559a>] do_exit+0x18a/0x4e0 
+> > > > > [  215.672042]  [<00000248aeef5ab0>] do_group_exit+0x40/0xc0 
+> > > > > [  215.672045]  [<00000248aeef5b5e>] __s390x_sys_exit_group+0x2e/0x30 
+> > > > > [  215.672048]  [<00000248afc81e56>] __do_syscall+0x136/0x340 
+> > > > > [  215.672054]  [<00000248afc8da7e>] system_call+0x6e/0x90 
+> > > > > [  215.672058] Last Breaking-Event-Address:
+> > > > > [  215.672059]  [<000002482f7ee4aa>] vfio_remove_dma+0x2a/0xf0 [vfio_iommu_type1]
+> > > > > [  215.672062] ---[ end trace 0000000000000000 ]---
+> > > > > [  219.861940] ------------[ cut here ]------------
+> > > > > 
+> > > > > ...
+> > > > > 
+> > > > > [  241.164333] ------------[ cut here ]------------
+> > > > > [  241.164340] kernel BUG at drivers/vfio/vfio_iommu_type1.c:1480!
+> > > > > [  241.164358] monitor event: 0040 ilc:2 [#1]SMP 
+> > > > > [  241.164363] Modules linked in: vhost_vsock vmw_vsock_virtio_transport_common vsock vhost
+> > > > > vhost_iotlb algif_hash af_alg kvm nft_masq nft_ct nft_reject_ipv4 nf_reject_ipv4 nft_reject act_csum
+> > > > > cls_u32 sch_htb nft_chain_nat nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 nf_tables pkey_pckmo
+> > > > > s390_trng pkey_ep11 pkey_cca zcrypt_cex4 zcrypt eadm_sch rng_core vfio_ccw mdev vfio_iommu_type1
+> > > > > vfio drm sch_fq_codel i2c_core drm_panel_orientation_quirks dm_multipath loop nfnetlink ctcm fsm
+> > > > > zfcp scsi_transport_fc mlx5_ib diag288_wdt mlx5_core ghash_s390 prng aes_s390 des_s390 libdes
+> > > > > sha3_512_s390 sha3_256_s390 sha512_s390 sha1_s390 sha_common rpcrdma sunrpc rdma_ucm rdma_cm
+> > > > > configfs iw_cm ib_cm ib_uverbs ib_core scsi_dh_rdac scsi_dh_emc scsi_dh_alua pkey autofs4
+> > > > > [  241.164399] CPU: 14 UID: 107 PID: 6581 Comm: qemu-system-s39 Kdump: loaded Tainted: G        W  
+> > > > > 6.16.0-rc7-00005-g4ff8295d8d61 #79 NONE 
+> > > > > [  241.164403] Tainted: [W]=WARN
+> > > > > [  241.164404] Hardware name: IBM 3906 M05 780 (LPAR)
+> > > > > [  241.164406] Krnl PSW : 0704e00180000000 000002482f7f132a (vfio_dma_do_unmap+0x4aa/0x4b0
+> > > > > [vfio_iommu_type1])
+> > > > > [  241.164413]            R:0 T:1 IO:1 EX:1 Key:0 M:1 W:0 P:0 AS:3 CC:2 PM:0 RI:0 EA:3
+> > > > > [  241.164415] Krnl GPRS: 0000000000000000 000000000000000b 0000000040000000 000000008cfdcb40
+> > > > > [  241.164418]            0000000000001001 0000000000000001 0000000000000000 0000000040000000
+> > > > > [  241.164419]            0000000000000000 0000000000000000 00000001fbe7f140 000000008cfdcb40
+> > > > > [  241.164421]            000003ff97dacfa8 0000000000000000 00000000871582c0 000001c8b4177cd0
+> > > > > [  241.164428] Krnl Code: 000002482f7f131e: a7890000		lghi	%r8,0
+> > > > >            000002482f7f1322: a7f4feeb		brc	15,000002482f7f10f8
+> > > > >           #000002482f7f1326: af000000		mc	0,0  
+> > > > >           >000002482f7f132a: 0707		bcr	0,%r7  
+> > > > >            000002482f7f132c: 0707		bcr	0,%r7
+> > > > >            000002482f7f132e: 0707		bcr	0,%r7
+> > > > >            000002482f7f1330: c0040000803c	brcl	0,000002482f8013a8
+> > > > >            000002482f7f1336: eb6ff0480024	stmg	%r6,%r15,72(%r15)
+> > > > > [  241.164458] Call Trace:
+> > > > > [  241.164459]  [<000002482f7f132a>] vfio_dma_do_unmap+0x4aa/0x4b0 [vfio_iommu_type1] 
+> > > > > [  241.164463]  [<000002482f7f1d08>] vfio_iommu_type1_ioctl+0x1c8/0x370 [vfio_iommu_type1] 
+> > > > > [  241.164466]  [<00000248af27704e>] vfs_ioctl+0x2e/0x70 
+> > > > > [  241.164471]  [<00000248af278610>] __s390x_sys_ioctl+0xe0/0x100 
+> > > > > [  241.164474]  [<00000248afc81e56>] __do_syscall+0x136/0x340 
+> > > > > [  241.164477]  [<00000248afc8da7e>] system_call+0x6e/0x90 
+> > > > > [  241.164481] Last Breaking-Event-Address:
+> > > > > [  241.164482]  [<000002482f7f1238>] vfio_dma_do_unmap+0x3b8/0x4b0 [vfio_iommu_type1]
+> > > > > [  241.164486] Kernel panic - not syncing: Fatal exception: panic_on_oops  
+> > > > 
+> > > > Thanks for the report. After a review of this commit, it appears that
+> > > > only the changes to vfio_find_vpfn() could plausibly account for the
+> > > > observed issue (I cannot be absolutely certain). Could you kindly test
+> > > > whether the issue persists after applying the following patch?  
+> > > 
+> > > Hi Zhe,
+> > > 
+> > > Thank you for the quick patch! I applied this and ran through a few cycles of the previously-
+> > > problematic tests, and things are holding up great.
+> > > 
+> > > It's probably a fixup to the commit here, but FWIW:
+> > > 
+> > > Tested-by: Eric Farman <farman@linux.ibm.com>
+> > > 
+> > > Thanks,
+> > > Eric  
+> > 
+> > Thank you for your feedback. Also I anticipate that this fix-up patch
+> > will leave the optimizations introduced in the original submission
+> > essentially unaffected.
+> 
+> Hi Zhe,
+> 
+> Thanks for the fix.  Could you please send this as a formal follow-on
+> fix path with Eric's Tested-by and documenting the issue?  Thanks,
 
-> Subject: Re: [PATCH 10/10] vfio/pci: Add dma-buf export support for MMIO
-> regions
->=20
-> > >
-> > > From: Leon Romanovsky <leonro@nvidia.com>
-> > >
-> > > Add support for exporting PCI device MMIO regions through dma-buf,
-> > > enabling safe sharing of non-struct page memory with controlled
-> > > lifetime management. This allows RDMA and other subsystems to
-> import
-> > > dma-buf FDs and build them into memory regions for PCI P2P
-> operations.
-> > >
-> > > The implementation provides a revocable attachment mechanism using
-> > > dma-buf move operations. MMIO regions are normally pinned as BARs
-> > > don't change physical addresses, but access is revoked when the VFIO
-> > > device is closed or a PCI reset is issued. This ensures kernel
-> > > self-defense against potentially hostile userspace.
-> > >
-> > > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> > > Signed-off-by: Vivek Kasireddy <vivek.kasireddy@intel.com>
-> > > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> > > ---
-> > >  drivers/vfio/pci/Kconfig           |  20 ++
-> > >  drivers/vfio/pci/Makefile          |   2 +
-> > >  drivers/vfio/pci/vfio_pci_config.c |  22 +-
-> > >  drivers/vfio/pci/vfio_pci_core.c   |  25 ++-
-> > >  drivers/vfio/pci/vfio_pci_dmabuf.c | 321
-> +++++++++++++++++++++++++++++
-> > >  drivers/vfio/pci/vfio_pci_priv.h   |  23 +++
-> > >  include/linux/dma-buf.h            |   1 +
-> > >  include/linux/vfio_pci_core.h      |   3 +
-> > >  include/uapi/linux/vfio.h          |  19 ++
-> > >  9 files changed, 431 insertions(+), 5 deletions(-)
-> > >  create mode 100644 drivers/vfio/pci/vfio_pci_dmabuf.c
->=20
-> <...>
->=20
-> > > +static int validate_dmabuf_input(struct vfio_pci_core_device *vdev,
-> > > +				 struct vfio_device_feature_dma_buf
-> *dma_buf)
-> > > +{
-> > > +	struct pci_dev *pdev =3D vdev->pdev;
-> > > +	u32 bar =3D dma_buf->region_index;
-> > > +	u64 offset =3D dma_buf->offset;
-> > > +	u64 len =3D dma_buf->length;
-> > > +	resource_size_t bar_size;
-> > > +	u64 sum;
-> > > +
-> > > +	/*
-> > > +	 * For PCI the region_index is the BAR number like  everything else=
-.
-> > > +	 */
-> > > +	if (bar >=3D VFIO_PCI_ROM_REGION_INDEX)
-> > > +		return -ENODEV;
->=20
-> <...>
->=20
-> > > +/**
-> > > + * Upon VFIO_DEVICE_FEATURE_GET create a dma_buf fd for the
-> > > + * regions selected.
-> > > + *
-> > > + * open_flags are the typical flags passed to open(2), eg O_RDWR,
-> > > O_CLOEXEC,
-> > > + * etc. offset/length specify a slice of the region to create the dm=
-abuf
-> from.
-> > > + * nr_ranges is the total number of (P2P DMA) ranges that comprise t=
-he
-> > > dmabuf.
-> > Any particular reason why you dropped the option (nr_ranges) of creatin=
-g
-> a
-> > single dmabuf from multiple ranges of an MMIO region?
->=20
-> I did it for two reasons. First, I wanted to simplify the code in order
-> to speed-up discussion over the patchset itself. Second, I failed to
-> find justification for need of multiple ranges, as the number of BARs
-> are limited by VFIO_PCI_ROM_REGION_INDEX (6) and same functionality
-> can be achieved by multiple calls to DMABUF import.
-I don't think the same functionality can be achieved by multiple calls to
-dmabuf import. AFAIU, a dmabuf (as of today) is backed by a SGL that can
-have multiple entries because it represents a scattered buffer (multiple
-non-contiguous entries in System RAM or an MMIO region). But in this
-patch you are constraining it such that only one entry associated with a
-buffer would be included, which effectively means that we cannot create
-a dmabuf to represent scattered buffers (located in a single MMIO region
-such as VRAM or other device memory) anymore.=20
+Hi Alex,
 
->=20
-> >
-> > Restricting the dmabuf to a single range (or having to create multiple
-> dmabufs
-> > to represent multiple regions/ranges associated with a single scattered
-> buffer)
-> > would be very limiting and may not work in all cases. For instance, in =
-my
-> use-case,
-> > I am trying to share a large (4k mode) framebuffer (FB) located in GPU'=
-s
-> VRAM
-> > between two (p2p compatible) GPU devices. And, this would probably not
-> work
-> > given that allocating a large contiguous FB (nr_ranges =3D 1) in VRAM m=
-ay
-> not be
-> > feasible when there is memory pressure.
->=20
-> Can you please help me and point to the place in the code where this can
-> fail?
-> I'm probably missing something basic as there are no large allocations
-> in the current patchset.
-Sorry, I was not very clear. What I meant is that it is not prudent to assu=
-me that
-there will only be one range associated with an MMIO region which we need t=
-o
-consider while creating a dmabuf. And, I was pointing out my use-case as an
-example where vfio-pci needs to create a dmabuf for a large buffer (FB) tha=
-t
-would likely be scattered (and not contiguous) in an MMIO region (such as V=
-RAM).
+I will prepare and resend a fix-up patch.
 
-Let me further explain with my use-case. Here is a link to my Qemu-based te=
-st:
-https://gitlab.freedesktop.org/Vivek/qemu/-/commit/b2bdb16d9cfaf55384c95b1f=
-060f175ad1c89e95#81dc845f0babf39649c4e086e173375614111b4a_29_46
+In my view, the root cause is not this patchset itself; rather, it
+appears that some kernel-space drivers invoke
+vfio_device_container_pin_pages() with an iova that is not
+PAGE_SIZE-aligned (I am not entirely certain. Hi Eric, could you please
+help verify this?). Our current patchset changes vfio_find_vpfn()
+from exact-iova matching to the interval [iova, iova + PAGE_SIZE).
+When vfio_unpin_page_external() removes a struct vfio_pfn, it may
+locate the wrong vpfn. This leaves the vpfn red-black tree non-empty,
+triggering the WARN and BUG reported in the issue. How about we correct
+this logic first, and then reassess whether an alignment check should
+be added inside vfio_device_container_pin_pages().
 
-While exhaustively testing this case, I noticed that the Guest VM (GPU driv=
-er)
-would occasionally create the buffer (represented by virtio_gpu_simple_reso=
-urce,
-for which we need to create a dmabuf) in such a way that there are multiple
-entries (indicated by res->iov_cnt) that need to be included. This is the m=
-ain
-reason why I added support for nr_ranges > 1 to this patch/feature.
-
-Furthermore, creating multiple dmabufs to represent each range of the same
-buffer, like you suggest IIUC is suboptimal and does not align with how dma=
-buf
-works currently.
-
->=20
-> >
-> > Furthermore, since you are adding a new UAPI with this patch/feature, a=
-s
-> you know,
-> > we cannot go back and tweak it (to add support for nr_ranges > 1) shoul=
-d
-> there
-> > be a need in the future, but you can always use nr_ranges =3D 1 anytime=
-.
-> Therefore,
-> > I think it makes sense to be flexible in terms of the number of ranges =
-to
-> include
-> > while creating a dmabuf instead of restricting ourselves to one range.
->=20
-> I'm not a big fan of over-engineering. Let's first understand if this
-> case is needed.
-As explained above with my use-case, having support for nr_ranges > 1 is no=
-t
-just nice to have but absolutely necessary. Otherwise, this feature would b=
-e
-constrained to creating dmabufs for contiguous buffers (nr_ranges =3D 1) on=
-ly,
-which would limit its effectiveness as most GPU buffers are rarely contiguo=
-us.
+Please correct me if I am wrong.
 
 Thanks,
-Vivek
+Zhe
 
->=20
-> Thanks
->=20
-> >
-> > Thanks,
-> > Vivek
-> >
-> > > + *
-> > > + * Return: The fd number on success, -1 and errno is set on failure.
-> > > + */
-> > > +#define VFIO_DEVICE_FEATURE_DMA_BUF 11
-> > > +
-> > > +struct vfio_device_feature_dma_buf {
-> > > +	__u32	region_index;
-> > > +	__u32	open_flags;
-> > > +	__u64	offset;
-> > > +	__u64	length;
-> > > +};
-> > > +
-> > >  /* -------- API for Type1 VFIO IOMMU -------- */
-> > >
-> > >  /**
-> > > --
-> > > 2.50.1
-> >
+> > > > diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> > > > --- a/drivers/vfio/vfio_iommu_type1.c
+> > > > +++ b/drivers/vfio/vfio_iommu_type1.c
+> > > > @@ -344,7 +344,7 @@ static struct vfio_pfn *vfio_find_vpfn_range(struct vfio_dma *dma,
+> > > >  
+> > > >  static inline struct vfio_pfn *vfio_find_vpfn(struct vfio_dma *dma, dma_addr_t iova)
+> > > >  {
+> > > > -       return vfio_find_vpfn_range(dma, iova, iova + PAGE_SIZE);
+> > > > +       return vfio_find_vpfn_range(dma, iova, iova + 1);
+> > > >  }  
+> > 
 
