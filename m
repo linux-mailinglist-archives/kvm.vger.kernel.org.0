@@ -1,295 +1,327 @@
-Return-Path: <kvm+bounces-53498-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53499-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A607DB12918
-	for <lists+kvm@lfdr.de>; Sat, 26 Jul 2025 07:54:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62FBDB1292A
+	for <lists+kvm@lfdr.de>; Sat, 26 Jul 2025 08:25:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1ECEB1C267DD
-	for <lists+kvm@lfdr.de>; Sat, 26 Jul 2025 05:54:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 006E63BD56B
+	for <lists+kvm@lfdr.de>; Sat, 26 Jul 2025 06:24:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38B37204680;
-	Sat, 26 Jul 2025 05:53:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fdIf8veI"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECF1720459A;
+	Sat, 26 Jul 2025 06:25:14 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A97B92A1AA;
-	Sat, 26 Jul 2025 05:53:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCA5C28682;
+	Sat, 26 Jul 2025 06:25:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753509230; cv=none; b=HSCnv0pisXgwQKUxoH7dUY3seYhmvB5DrDH+Qrr8copoP1ld6AjdpT7B04Cjh2/Ev2dIgAoubalsuDBeN3t7LfXBWPLaf9yI/4YbSoDOpZB2gHaecfzySA/VXFFezDafzTa/ZHq7gjol8nL5g8zRi1Q4tWIt5hdALlZVg0MKs9A=
+	t=1753511114; cv=none; b=b7tX1G7OWYTAeIIbOl6Q55DdtnMfSZzJQ50IbwqNA2e0m4iY/Z5N1XHGOKiuLyqdT85oSfj4Rzmk7lAhbDGX7YqkmGvMQ+QQtCEnItPHJSpY43aohpujc5t5OKzh3z7oMdKlYNHBPQEw0tjJ87X6Aa+nX2FEWWtxIbXV7HO2he0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753509230; c=relaxed/simple;
-	bh=qjAtuM6bjE5YOicSXvKnHeXz95Ueb3CFX9BTvqHz/ec=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hDaCAldpJLJmc6nBiLF0dM/gTF2CPLLPACHkC0vmtrt/2YmBjfbWuB6nyKFmhgfkQ9cBEAf2xmnZst1MTie8TQxBSbHai8aeVT2OUUIc2FeFjpczJMY0gFHSLKdgYZKjxSzhTK6b/mrt6i1Pa8OrtEUHJLA76EgW0P1L254VEVE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fdIf8veI; arc=none smtp.client-ip=209.85.128.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-7183fd8c4c7so30037857b3.3;
-        Fri, 25 Jul 2025 22:53:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753509227; x=1754114027; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fWn+ulxpcv7HdNLVJ+yLthV3Vv9Iaz7WMBgkwYUe3vQ=;
-        b=fdIf8veIBifnc1fNbXFYmsB0WHMGyApvRQd6YZV+A7cQPISmKY4w+gZhBeCW3tJHz3
-         tm3dpb63YglWtF3Qm+ZlzHN7E3OcsIZnwmNhJyRFyGuhvCJVgPPP3dWXnG6GlAw2cuuY
-         7xZ/tdN49sCJ2i1j9Kr4zruaS2U1VAywtIFB2YOJX0QT28t37TPbhHioN4uhcQwW0XYP
-         cdBmRkg95ouqiRS+IVtoTfej2LHKCy+sBUEyabneH/8BCGZUC8n0GIvYxft3TFcZeaZM
-         oqUAGOgquf0Ii7WHkvsfkSgiB/+3DMci5Nw1bF53OfLQDgyzd29SdapSXw+5eLhCD7x6
-         j9TA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753509227; x=1754114027;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fWn+ulxpcv7HdNLVJ+yLthV3Vv9Iaz7WMBgkwYUe3vQ=;
-        b=BvaF4WJWngGkIVA35dvKN3FjmzdS2jXPl0oHnP4/1KwCNaIU+6r9aDkWPVzGwo/gxK
-         TtQrXnggA4RwRvfeBN+W4hb3YKzEnBvXYbupKu6bf6KixMrAa4R6WWXN8Q9pWRTjLxox
-         ZsWJb53QHtQ0QlQD+EfVQGMANYs1cFUUCYfwd3HUT/jJW6jA987qV54DGMOI8f6EQcq6
-         HF1Rn/NrVXD8goNnxYjr9B3kYpAUkTY7UYHvyZakm7yRLRcTxNApOaHX6C75VoeluPwY
-         1DVsHZbn4Qp8qi9kssYvlHitJn37SV9+zQgzSKbgGCiqLZQwZDaQowBUzXmaNQ9cnP01
-         aW6w==
-X-Forwarded-Encrypted: i=1; AJvYcCV0pW6f3O3M6C5Jg8WXMaN6g5YhcOzrVRMMKCmzWdPAUM2aGcVKHvII8lIoDKg6vCnHetK7wB9L@vger.kernel.org, AJvYcCVD9a6Ea2Du/2FmE7UKl/u8HRfR3phFQVXh0GsuyMUbByPyVX1NHn7xYC77hnBVh1EZO7jG@vger.kernel.org, AJvYcCWqSjn+iJP+LQNHKoiNJO4QlXqQ6C6kYSPncgHT6XZu+bTNVlSVUWgIVe8wYhkGBjDlyv0=@vger.kernel.org, AJvYcCWvixmdIhq57KzekA3F3xBegqpZq5HuyQ42dXiZhlljCMbTv9Uwvhi9zo1r4fP0mPzVZF/L/KnSPDaIGtg9@vger.kernel.org, AJvYcCXDsTyQc3a/8bIi1F2zSQbG5GaxU0tcKYvY1uS4asK/xV0ZPjt6UKzBl4J6djJH7BU7eF9GLHO2V8KU1NCB@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyf8kmhuUGZYR7NNO5ygqcYKbw/oOC7F5v6uK199B/N9WYJUg+N
-	wpjspcXUPCubOg2946YUaaUhmKw4dFMV5o+2x4mtVtTT2oOYbEzMwQ7aDTEHllTzEwT/GY0ohml
-	sjaAlZgH/K876d+NBskoaLOlAnNJZhVA=
-X-Gm-Gg: ASbGncvtuOr56OEsB8RbL0p3rNAOfFdcyMAoCmIszuqVbeObXv9kOcRORsRiSnae6vz
-	0H4RjuG79dqmhA8yptGW/9Ey+Uds/4mPVBLegu6zicv96pcz9oMarFGG5dtk0jgIEMGKkzw0JKB
-	d/NRebPah/BF2X7ZEYK1war0gv90jdAo02Nz9aKJhGYQRE/ZuHxtd4GF5rFaiDkwlaRQ2ECdxtI
-	NAKdeGcEiN1cQDL+Q==
-X-Google-Smtp-Source: AGHT+IE0Lg8OC1qQflbm42pTUDEXQn5wEtvjZAGDRpEYT9WPYGJBWJxfXrPWc1WTljH0ya6XcqQMq2gpMQ7Ymg2lRdk=
-X-Received: by 2002:a05:690c:e0a:b0:6ef:6d61:c254 with SMTP id
- 00721157ae682-719e348e675mr51700067b3.38.1753509227288; Fri, 25 Jul 2025
- 22:53:47 -0700 (PDT)
+	s=arc-20240116; t=1753511114; c=relaxed/simple;
+	bh=Qq5s3zN4DcvfK6LHyBQWTHsmzWycy5QWLM7q9gjdyew=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=L7R5BMGZZrgqPHw6D0omWFOx/TRifKKusXCh+s9+IDhMYgkfxuIK3ZZHUQznA/XETDSe5P3n/cROWDZ6stFaWj2Sc2Ex8xmqjBBYohUnUVkHqc3DZk6gb6XCxSL1vaGG6Qp7v1+iNEy/+/uN42FV2RNWB1fYkzgSY0fu0rZCdWs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4bpvjk5SwWz14M16;
+	Sat, 26 Jul 2025 14:20:10 +0800 (CST)
+Received: from dggpemf500015.china.huawei.com (unknown [7.185.36.143])
+	by mail.maildlp.com (Postfix) with ESMTPS id 0440514010D;
+	Sat, 26 Jul 2025 14:25:02 +0800 (CST)
+Received: from [10.67.121.110] (10.67.121.110) by
+ dggpemf500015.china.huawei.com (7.185.36.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Sat, 26 Jul 2025 14:25:01 +0800
+Subject: Re: [PATCH v6 3/3] migration: adapt to new migration configuration
+To: <alex.williamson@redhat.com>, <jgg@nvidia.com>,
+	<herbert@gondor.apana.org.au>, <shameerali.kolothum.thodi@huawei.com>,
+	<jonathan.cameron@huawei.com>
+CC: <linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linuxarm@openeuler.org>
+References: <20250717011502.16050-1-liulongfang@huawei.com>
+ <20250717011502.16050-4-liulongfang@huawei.com>
+From: liulongfang <liulongfang@huawei.com>
+Message-ID: <c3e74996-6188-12c6-b0c5-58d2188c0609@huawei.com>
+Date: Sat, 26 Jul 2025 14:25:00 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240710212555.1617795-1-amery.hung@bytedance.com> <dsamf7k2byoflztkwya3smj7jyczyq7aludvd36lufdrboxdqk@u73iwrcyb5am>
-In-Reply-To: <dsamf7k2byoflztkwya3smj7jyczyq7aludvd36lufdrboxdqk@u73iwrcyb5am>
-From: Amery Hung <ameryhung@gmail.com>
-Date: Fri, 25 Jul 2025 22:53:35 -0700
-X-Gm-Features: Ac12FXyMvpkfh1BVRP1lxRseahm_ttdL_F4ac_DTON4U9vvl5wd6WOkrVb-fPTk
-Message-ID: <CAMB2axNKxW4gnd6qiSNYdm2zPxJkbbLgZz9P-Kh7SS0Sb1Yw=Q@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next v6 00/14] virtio/vsock: support datagrams
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: stefanha@redhat.com, mst@redhat.com, jasowang@redhat.com, 
-	xuanzhuo@linux.alibaba.com, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, kys@microsoft.com, haiyangz@microsoft.com, 
-	wei.liu@kernel.org, decui@microsoft.com, bryantan@vmware.com, 
-	vdasa@vmware.com, pv-drivers@vmware.com, dan.carpenter@linaro.org, 
-	simon.horman@corigine.com, oxffffaa@gmail.com, kvm@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org, 
-	bpf@vger.kernel.org, bobby.eshleman@bytedance.com, jiang.wang@bytedance.com, 
-	amery.hung@bytedance.com, xiyou.wangcong@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20250717011502.16050-4-liulongfang@huawei.com>
+Content-Type: text/plain; charset="gbk"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
+ dggpemf500015.china.huawei.com (7.185.36.143)
 
-On Tue, Jul 22, 2025 at 7:35=E2=80=AFAM Stefano Garzarella <sgarzare@redhat=
-.com> wrote:
->
-> Hi Amery,
->
-> On Wed, Jul 10, 2024 at 09:25:41PM +0000, Amery Hung wrote:
-> >Hey all!
-> >
-> >This series introduces support for datagrams to virtio/vsock.
->
-> any update on v7 of this series?
+On 2025/7/17 9:15, Longfang Liu wrote:
+> On new platforms greater than QM_HW_V3, the migration region has been
+> relocated from the VF to the PF. The driver must also be modified
+> accordingly to adapt to the new hardware device.
+> 
+> Utilize the PF's I/O base directly on the new hardware platform,
+> and no mmap operation is required. If it is on an old platform,
+> the driver needs to be compatible with the old solution.
+> 
+> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
+> ---
+>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 164 ++++++++++++------
+>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |   7 +
+>  2 files changed, 118 insertions(+), 53 deletions(-)
 >
 
-Hi Stefano,
+Hi Alex:
+Please take a look at this set of patches!
+Thank you.
 
-Sorry that I don't have personal time to work on v7. Since I don't
-think people involved in this set are still working on it, I am
-posting my v7 WIP here to see if anyone is interested in finishing it.
-Would greatly appreciate any help.
-
-Link: https://github.com/ameryhung/linux/tree/vsock-dgram-v7
-
-Here are the things that I haven't address in the WIP:
-
-01/14
-- Arseniy suggested doing skb_put(dg->payload_size) and memcpy(dg->payload_=
-size)
-
-07/14
-- Remove the double transport lookup in the send path by passing
-transport to dgram_enqueue
-- Address Arseniy's comment about updating vsock_virtio_transport_common.h
-
-14/14
-- Split test/vsock into smaller patches
-
-Finally the spec change discussion also needs to happen.
-
-
-
-> Thanks,
-> Stefano
->
-> >
-> >It is a spin-off (and smaller version) of this series from the summer:
-> >  https://lore.kernel.org/all/cover.1660362668.git.bobby.eshleman@byteda=
-nce.com/
-> >
-> >Please note that this is an RFC and should not be merged until
-> >associated changes are made to the virtio specification, which will
-> >follow after discussion from this series.
-> >
-> >Another aside, the v4 of the series has only been mildly tested with a
-> >run of tools/testing/vsock/vsock_test. Some code likely needs cleaning
-> >up, but I'm hoping to get some of the design choices agreed upon before
-> >spending too much time making it pretty.
-> >
-> >This series first supports datagrams in a basic form for virtio, and
-> >then optimizes the sendpath for all datagram transports.
-> >
-> >The result is a very fast datagram communication protocol that
-> >outperforms even UDP on multi-queue virtio-net w/ vhost on a variety
-> >of multi-threaded workload samples.
-> >
-> >For those that are curious, some summary data comparing UDP and VSOCK
-> >DGRAM (N=3D5):
-> >
-> >       vCPUS: 16
-> >       virtio-net queues: 16
-> >       payload size: 4KB
-> >       Setup: bare metal + vm (non-nested)
-> >
-> >       UDP: 287.59 MB/s
-> >       VSOCK DGRAM: 509.2 MB/s
-> >
-> >Some notes about the implementation...
-> >
-> >This datagram implementation forces datagrams to self-throttle according
-> >to the threshold set by sk_sndbuf. It behaves similar to the credits
-> >used by streams in its effect on throughput and memory consumption, but
-> >it is not influenced by the receiving socket as credits are.
-> >
-> >The device drops packets silently.
-> >
-> >As discussed previously, this series introduces datagrams and defers
-> >fairness to future work. See discussion in v2 for more context around
-> >datagrams, fairness, and this implementation.
-> >
-> >Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
-> >Signed-off-by: Amery Hung <amery.hung@bytedance.com>
-> >---
-> >Changes in v6:
-> >- allow empty transport in datagram vsock
-> >- add empty transport checks in various paths
-> >- transport layer now saves source cid and port to control buffer of skb
-> >  to remove the dependency of transport in recvmsg()
-> >- fix virtio dgram_enqueue() by looking up the transport to be used when
-> >  using sendto(2)
-> >- fix skb memory leaks in two places
-> >- add dgram auto-bind test
-> >- Link to v5: https://lore.kernel.org/r/20230413-b4-vsock-dgram-v5-0-581=
-bd37fdb26@bytedance.com
-> >
-> >Changes in v5:
-> >- teach vhost to drop dgram when a datagram exceeds the receive buffer
-> >  - now uses MSG_ERRQUEUE and depends on Arseniy's zerocopy patch:
-> >       "vsock: read from socket's error queue"
-> >- replace multiple ->dgram_* callbacks with single ->dgram_addr_init()
-> >  callback
-> >- refactor virtio dgram skb allocator to reduce conflicts w/ zerocopy se=
-ries
-> >- add _fallback/_FALLBACK suffix to dgram transport variables/macros
-> >- add WARN_ONCE() for table_size / VSOCK_HASH issue
-> >- add static to vsock_find_bound_socket_common
-> >- dedupe code in vsock_dgram_sendmsg() using module_got var
-> >- drop concurrent sendmsg() for dgram and defer to future series
-> >- Add more tests
-> >  - test EHOSTUNREACH in errqueue
-> >  - test stream + dgram address collision
-> >- improve clarity of dgram msg bounds test code
-> >- Link to v4: https://lore.kernel.org/r/20230413-b4-vsock-dgram-v4-0-0ce=
-bbb2ae899@bytedance.com
-> >
-> >Changes in v4:
-> >- style changes
-> >  - vsock: use sk_vsock(vsk) in vsock_dgram_recvmsg instead of
-> >    &sk->vsk
-> >  - vsock: fix xmas tree declaration
-> >  - vsock: fix spacing issues
-> >  - virtio/vsock: virtio_transport_recv_dgram returns void because err
-> >    unused
-> >- sparse analysis warnings/errors
-> >  - virtio/vsock: fix unitialized skerr on destroy
-> >  - virtio/vsock: fix uninitialized err var on goto out
-> >  - vsock: fix declarations that need static
-> >  - vsock: fix __rcu annotation order
-> >- bugs
-> >  - vsock: fix null ptr in remote_info code
-> >  - vsock/dgram: make transport_dgram a fallback instead of first
-> >    priority
-> >  - vsock: remove redundant rcu read lock acquire in getname()
-> >- tests
-> >  - add more tests (message bounds and more)
-> >  - add vsock_dgram_bind() helper
-> >  - add vsock_dgram_connect() helper
-> >
-> >Changes in v3:
-> >- Support multi-transport dgram, changing logic in connect/bind
-> >  to support VMCI case
-> >- Support per-pkt transport lookup for sendto() case
-> >- Fix dgram_allow() implementation
-> >- Fix dgram feature bit number (now it is 3)
-> >- Fix binding so dgram and connectible (cid,port) spaces are
-> >  non-overlapping
-> >- RCU protect transport ptr so connect() calls never leave
-> >  a lockless read of the transport and remote_addr are always
-> >  in sync
-> >- Link to v2: https://lore.kernel.org/r/20230413-b4-vsock-dgram-v2-0-079=
-cc7cee62e@bytedance.com
-> >
-> >
-> >Bobby Eshleman (14):
-> >  af_vsock: generalize vsock_dgram_recvmsg() to all transports
-> >  af_vsock: refactor transport lookup code
-> >  af_vsock: support multi-transport datagrams
-> >  af_vsock: generalize bind table functions
-> >  af_vsock: use a separate dgram bind table
-> >  virtio/vsock: add VIRTIO_VSOCK_TYPE_DGRAM
-> >  virtio/vsock: add common datagram send path
-> >  af_vsock: add vsock_find_bound_dgram_socket()
-> >  virtio/vsock: add common datagram recv path
-> >  virtio/vsock: add VIRTIO_VSOCK_F_DGRAM feature bit
-> >  vhost/vsock: implement datagram support
-> >  vsock/loopback: implement datagram support
-> >  virtio/vsock: implement datagram support
-> >  test/vsock: add vsock dgram tests
-> >
-> > drivers/vhost/vsock.c                   |   62 +-
-> > include/linux/virtio_vsock.h            |    9 +-
-> > include/net/af_vsock.h                  |   24 +-
-> > include/uapi/linux/virtio_vsock.h       |    2 +
-> > net/vmw_vsock/af_vsock.c                |  343 ++++++--
-> > net/vmw_vsock/hyperv_transport.c        |   13 -
-> > net/vmw_vsock/virtio_transport.c        |   24 +-
-> > net/vmw_vsock/virtio_transport_common.c |  188 ++++-
-> > net/vmw_vsock/vmci_transport.c          |   61 +-
-> > net/vmw_vsock/vsock_loopback.c          |    9 +-
-> > tools/testing/vsock/util.c              |  177 +++-
-> > tools/testing/vsock/util.h              |   10 +
-> > tools/testing/vsock/vsock_test.c        | 1032 ++++++++++++++++++++---
-> > 13 files changed, 1638 insertions(+), 316 deletions(-)
-> >
-> >--
-> >2.20.1
-> >
->
+> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+> index 515ff87f9ed9..bf4a7468bca0 100644
+> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+> @@ -125,6 +125,72 @@ static int qm_get_cqc(struct hisi_qm *qm, u64 *addr)
+>  	return 0;
+>  }
+>  
+> +static int qm_get_xqc_regs(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+> +			   struct acc_vf_data *vf_data)
+> +{
+> +	struct hisi_qm *qm = &hisi_acc_vdev->vf_qm;
+> +	struct device *dev = &qm->pdev->dev;
+> +	u32 eqc_addr, aeqc_addr;
+> +	int ret;
+> +
+> +	if (qm->ver == QM_HW_V3) {
+> +		eqc_addr = QM_EQC_DW0;
+> +		aeqc_addr = QM_AEQC_DW0;
+> +	} else {
+> +		eqc_addr = QM_EQC_PF_DW0;
+> +		aeqc_addr = QM_AEQC_PF_DW0;
+> +	}
+> +
+> +	/* QM_EQC_DW has 7 regs */
+> +	ret = qm_read_regs(qm, eqc_addr, vf_data->qm_eqc_dw, 7);
+> +	if (ret) {
+> +		dev_err(dev, "failed to read QM_EQC_DW\n");
+> +		return ret;
+> +	}
+> +
+> +	/* QM_AEQC_DW has 7 regs */
+> +	ret = qm_read_regs(qm, aeqc_addr, vf_data->qm_aeqc_dw, 7);
+> +	if (ret) {
+> +		dev_err(dev, "failed to read QM_AEQC_DW\n");
+> +		return ret;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static int qm_set_xqc_regs(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+> +			   struct acc_vf_data *vf_data)
+> +{
+> +	struct hisi_qm *qm = &hisi_acc_vdev->vf_qm;
+> +	struct device *dev = &qm->pdev->dev;
+> +	u32 eqc_addr, aeqc_addr;
+> +	int ret;
+> +
+> +	if (qm->ver == QM_HW_V3) {
+> +		eqc_addr = QM_EQC_DW0;
+> +		aeqc_addr = QM_AEQC_DW0;
+> +	} else {
+> +		eqc_addr = QM_EQC_PF_DW0;
+> +		aeqc_addr = QM_AEQC_PF_DW0;
+> +	}
+> +
+> +	/* QM_EQC_DW has 7 regs */
+> +	ret = qm_write_regs(qm, eqc_addr, vf_data->qm_eqc_dw, 7);
+> +	if (ret) {
+> +		dev_err(dev, "failed to write QM_EQC_DW\n");
+> +		return ret;
+> +	}
+> +
+> +	/* QM_AEQC_DW has 7 regs */
+> +	ret = qm_write_regs(qm, aeqc_addr, vf_data->qm_aeqc_dw, 7);
+> +	if (ret) {
+> +		dev_err(dev, "failed to write QM_AEQC_DW\n");
+> +		return ret;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>  static int qm_get_regs(struct hisi_qm *qm, struct acc_vf_data *vf_data)
+>  {
+>  	struct device *dev = &qm->pdev->dev;
+> @@ -167,20 +233,6 @@ static int qm_get_regs(struct hisi_qm *qm, struct acc_vf_data *vf_data)
+>  		return ret;
+>  	}
+>  
+> -	/* QM_EQC_DW has 7 regs */
+> -	ret = qm_read_regs(qm, QM_EQC_DW0, vf_data->qm_eqc_dw, 7);
+> -	if (ret) {
+> -		dev_err(dev, "failed to read QM_EQC_DW\n");
+> -		return ret;
+> -	}
+> -
+> -	/* QM_AEQC_DW has 7 regs */
+> -	ret = qm_read_regs(qm, QM_AEQC_DW0, vf_data->qm_aeqc_dw, 7);
+> -	if (ret) {
+> -		dev_err(dev, "failed to read QM_AEQC_DW\n");
+> -		return ret;
+> -	}
+> -
+>  	return 0;
+>  }
+>  
+> @@ -239,20 +291,6 @@ static int qm_set_regs(struct hisi_qm *qm, struct acc_vf_data *vf_data)
+>  		return ret;
+>  	}
+>  
+> -	/* QM_EQC_DW has 7 regs */
+> -	ret = qm_write_regs(qm, QM_EQC_DW0, vf_data->qm_eqc_dw, 7);
+> -	if (ret) {
+> -		dev_err(dev, "failed to write QM_EQC_DW\n");
+> -		return ret;
+> -	}
+> -
+> -	/* QM_AEQC_DW has 7 regs */
+> -	ret = qm_write_regs(qm, QM_AEQC_DW0, vf_data->qm_aeqc_dw, 7);
+> -	if (ret) {
+> -		dev_err(dev, "failed to write QM_AEQC_DW\n");
+> -		return ret;
+> -	}
+> -
+>  	return 0;
+>  }
+>  
+> @@ -522,6 +560,10 @@ static int vf_qm_load_data(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+>  		return ret;
+>  	}
+>  
+> +	ret = qm_set_xqc_regs(hisi_acc_vdev, vf_data);
+> +	if (ret)
+> +		return ret;
+> +
+>  	ret = hisi_qm_mb(qm, QM_MB_CMD_SQC_BT, qm->sqc_dma, 0, 0);
+>  	if (ret) {
+>  		dev_err(dev, "set sqc failed\n");
+> @@ -589,6 +631,10 @@ static int vf_qm_state_save(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+>  	vf_data->vf_qm_state = QM_READY;
+>  	hisi_acc_vdev->vf_qm_state = vf_data->vf_qm_state;
+>  
+> +	ret = qm_get_xqc_regs(hisi_acc_vdev, vf_data);
+> +	if (ret)
+> +		return ret;
+> +
+>  	ret = vf_qm_read_data(vf_qm, vf_data);
+>  	if (ret)
+>  		return ret;
+> @@ -1186,34 +1232,45 @@ static int hisi_acc_vf_qm_init(struct hisi_acc_vf_core_device *hisi_acc_vdev)
+>  {
+>  	struct vfio_pci_core_device *vdev = &hisi_acc_vdev->core_device;
+>  	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
+> +	struct hisi_qm *pf_qm = hisi_acc_vdev->pf_qm;
+>  	struct pci_dev *vf_dev = vdev->pdev;
+>  
+> -	/*
+> -	 * ACC VF dev BAR2 region consists of both functional register space
+> -	 * and migration control register space. For migration to work, we
+> -	 * need access to both. Hence, we map the entire BAR2 region here.
+> -	 * But unnecessarily exposing the migration BAR region to the Guest
+> -	 * has the potential to prevent/corrupt the Guest migration. Hence,
+> -	 * we restrict access to the migration control space from
+> -	 * Guest(Please see mmap/ioctl/read/write override functions).
+> -	 *
+> -	 * Please note that it is OK to expose the entire VF BAR if migration
+> -	 * is not supported or required as this cannot affect the ACC PF
+> -	 * configurations.
+> -	 *
+> -	 * Also the HiSilicon ACC VF devices supported by this driver on
+> -	 * HiSilicon hardware platforms are integrated end point devices
+> -	 * and the platform lacks the capability to perform any PCIe P2P
+> -	 * between these devices.
+> -	 */
+> -
+> -	vf_qm->io_base =
+> -		ioremap(pci_resource_start(vf_dev, VFIO_PCI_BAR2_REGION_INDEX),
+> -			pci_resource_len(vf_dev, VFIO_PCI_BAR2_REGION_INDEX));
+> -	if (!vf_qm->io_base)
+> -		return -EIO;
+> +	if (pf_qm->ver == QM_HW_V3) {
+> +		/*
+> +		 * ACC VF dev BAR2 region consists of both functional register space
+> +		 * and migration control register space. For migration to work, we
+> +		 * need access to both. Hence, we map the entire BAR2 region here.
+> +		 * But unnecessarily exposing the migration BAR region to the Guest
+> +		 * has the potential to prevent/corrupt the Guest migration. Hence,
+> +		 * we restrict access to the migration control space from
+> +		 * Guest(Please see mmap/ioctl/read/write override functions).
+> +		 *
+> +		 * Please note that it is OK to expose the entire VF BAR if migration
+> +		 * is not supported or required as this cannot affect the ACC PF
+> +		 * configurations.
+> +		 *
+> +		 * Also the HiSilicon ACC VF devices supported by this driver on
+> +		 * HiSilicon hardware platforms are integrated end point devices
+> +		 * and the platform lacks the capability to perform any PCIe P2P
+> +		 * between these devices.
+> +		 */
+>  
+> +		vf_qm->io_base =
+> +			ioremap(pci_resource_start(vf_dev, VFIO_PCI_BAR2_REGION_INDEX),
+> +				pci_resource_len(vf_dev, VFIO_PCI_BAR2_REGION_INDEX));
+> +		if (!vf_qm->io_base)
+> +			return -EIO;
+> +	} else {
+> +		/*
+> +		 * On hardware platforms greater than QM_HW_V3, the migration function
+> +		 * register is placed in the BAR2 configuration region of the PF,
+> +		 * and each VF device occupies 8KB of configuration space.
+> +		 */
+> +		vf_qm->io_base = pf_qm->io_base + QM_MIG_REGION_OFFSET +
+> +				 hisi_acc_vdev->vf_id * QM_MIG_REGION_SIZE;
+> +	}
+>  	vf_qm->fun_type = QM_HW_VF;
+> +	vf_qm->ver = pf_qm->ver;
+>  	vf_qm->pdev = vf_dev;
+>  	mutex_init(&vf_qm->mailbox_lock);
+>  
+> @@ -1539,7 +1596,8 @@ static void hisi_acc_vfio_pci_close_device(struct vfio_device *core_vdev)
+>  	hisi_acc_vf_disable_fds(hisi_acc_vdev);
+>  	mutex_lock(&hisi_acc_vdev->open_mutex);
+>  	hisi_acc_vdev->dev_opened = false;
+> -	iounmap(vf_qm->io_base);
+> +	if (vf_qm->ver == QM_HW_V3)
+> +		iounmap(vf_qm->io_base);
+>  	mutex_unlock(&hisi_acc_vdev->open_mutex);
+>  	vfio_pci_core_close_device(core_vdev);
+>  }
+> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+> index 91002ceeebc1..348f8bb5b42c 100644
+> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+> @@ -59,6 +59,13 @@
+>  #define ACC_DEV_MAGIC_V1	0XCDCDCDCDFEEDAACC
+>  #define ACC_DEV_MAGIC_V2	0xAACCFEEDDECADEDE
+>  
+> +#define QM_MIG_REGION_OFFSET		0x180000
+> +#define QM_MIG_REGION_SIZE		0x2000
+> +
+> +#define QM_SUB_VERSION_ID		0x100210
+> +#define QM_EQC_PF_DW0			0x1c00
+> +#define QM_AEQC_PF_DW0			0x1c20
+> +
+>  struct acc_vf_data {
+>  #define QM_MATCH_SIZE offsetofend(struct acc_vf_data, qm_rsv_state)
+>  	/* QM match information */
+> 
 
