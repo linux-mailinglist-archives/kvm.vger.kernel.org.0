@@ -1,130 +1,142 @@
-Return-Path: <kvm+bounces-53504-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53502-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6CEEB129F4
-	for <lists+kvm@lfdr.de>; Sat, 26 Jul 2025 11:41:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61593B129D7
+	for <lists+kvm@lfdr.de>; Sat, 26 Jul 2025 11:19:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C47E31C82197
-	for <lists+kvm@lfdr.de>; Sat, 26 Jul 2025 09:41:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 97FA11C23CF9
+	for <lists+kvm@lfdr.de>; Sat, 26 Jul 2025 09:19:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADD69227563;
-	Sat, 26 Jul 2025 09:41:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BB3E225402;
+	Sat, 26 Jul 2025 09:19:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=misterjones.org header.i=@misterjones.org header.b="ZK0kwYO5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xi3PnjbP"
 X-Original-To: kvm@vger.kernel.org
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [217.182.43.188])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 628EB155326;
-	Sat, 26 Jul 2025 09:41:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.182.43.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 281F221A95D;
+	Sat, 26 Jul 2025 09:19:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753522876; cv=none; b=GUP3j3FjSkqb/1Uaw0v/QU8DFKftuv0U6vdS94NKqfVpH4jbtpBafyQgOWyk2echmj4yGerJKDzyLlRFItN2QGRP7Iat3KEV/aMSwqsQW0U4TxEme/gHX0hq9zvbQyUMcgA07Z2FyMhwVo+hR7rPN8V5fA28J4MkdCCsuknel9s=
+	t=1753521562; cv=none; b=Yh6GPGTjj3dFOd0eWAPejDGspyKE/fd/+d1ZSVaAg7AAJDpcg0S93krNFc2lg0zKhm9Me3WT8UTXEuGTDBfazX78Iz5X5ZyrvqFk2OeIubuvGca/ZnuXiAi6k1rQvqYOrs8v+JYhcXanjzmoORAL9TWaWFs7IoLr/zRi1n9kSyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753522876; c=relaxed/simple;
-	bh=iTeOoXqz6aZjo7q4ywLa9JVRykRGRnni71TCrYjwnQ8=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=pQWShrr75BkwpfWMBBU9rHGb2nurZFJuA1M57JR1t76TyODtKmxSHHI3fgOG58N55NQmjMexnmcYzAPkxHA8Gas0UBiID+1sS0ZXZ6PfWezknBW1DZMJiRmD7xJ+iIvLmdEfBJFw1aGFfNsCWj4MGbwcdg0RIg6FrND4P/xF1hE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=misterjones.org; spf=pass smtp.mailfrom=misterjones.org; dkim=pass (2048-bit key) header.d=misterjones.org header.i=@misterjones.org header.b=ZK0kwYO5; arc=none smtp.client-ip=217.182.43.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=misterjones.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=misterjones.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=misterjones.org; s=dkim20211231; h=Content-Transfer-Encoding:Content-Type:
-	Message-ID:References:In-Reply-To:Subject:Cc:To:From:Date:MIME-Version:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=JysWCa0Hqsy7znjssgRaZ1cn+vL8ibKOc18iND2JFrY=; b=ZK0kwYO5YY4YLDT0BwT1S875gy
-	NRuXlWr7xpkliYRfvBMdYaeDsQtOIDE5aXbaxadaK/FfbuLXaUNh2FoH7Sumll3cS/B6H0LTRFzMa
-	PDPOAioxVIFzXAVbt/SokYiOC3N9IMfx8ZExs4rgrVCbZHhPXYnmQL8xB2bEzPHJuaOGro6Nra1AH
-	iJxMP9oOETrmtVEkrpXdDIoLptgCJLotjKC4oXihdeayNnT7AJ4AYA1dh2yta+WHDy58LbsDV47PM
-	jbAiB5OSUeRw7AclawwiAG9L/vpGGAixfJ3owwxHGdkvaOFhlLdmzNtD9MMqOqRTohRgms/iIZ5kV
-	RokT0oIg==;
-Received: from disco-boy.misterjones.org ([217.182.43.188] helo=www.loen.fr)
+	s=arc-20240116; t=1753521562; c=relaxed/simple;
+	bh=fR8rSneR4TZPNfJQOykLBbUsidU/r5Uz5YC6zNAHr2o=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=buERUnEzGy5dNoQ2ltkpm325DzeHqKc5UcIX8mn/eTBcWvhqgFPZm/y7l5GeRb+iPT08fH3PV6aP6yMGipBHdYMbpiNHlwQzLVHq7OYBkaR/aQjvTq9099hsflGCwpNvbrQXXslpz1Gg05Ebp6yWuaiABo8srDtfUXu5lNCSW5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xi3PnjbP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F95CC4CEED;
+	Sat, 26 Jul 2025 09:19:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753521560;
+	bh=fR8rSneR4TZPNfJQOykLBbUsidU/r5Uz5YC6zNAHr2o=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Xi3PnjbPoYkE6hFmmV7xlLdlETPSwi7AYNxBF2RDPKVWFlDtgxxXU+9qiBhK77Lo/
+	 CEyIDpENojBfxRtFhojpzTd7PEVGhSe+y4QLM9395MphdvGY1NiVJ0Afoqn04peF9+
+	 4vgqIo/gZCM1vuYJP2taYQxL9ptitwEs6KU0kGPOrvOBNs6rl2Wrkee1zR9971lAgN
+	 7ui2M82ISQTXlZcQhRHmQK9CBCbQhcAaYXccAZXj/HsH21iR9awW0HXKXGH6IMu1Hj
+	 xD+81P1nCNkUA136liNxanX8rwhUA10gy6ydN+/8h/Ifwruu3NRRGAGMK0HP0t+94u
+	 BNRMob1q0Gqzw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
-	(envelope-from <maz@misterjones.org>)
-	id 1ufb33-001a9E-LL;
-	Sat, 26 Jul 2025 10:18:33 +0100
+	(envelope-from <maz@kernel.org>)
+	id 1ufb3m-001a9m-5j;
+	Sat, 26 Jul 2025 10:19:18 +0100
+Date: Sat, 26 Jul 2025 10:19:11 +0100
+Message-ID: <87jz3vtils.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+Cc: Andre Przywara <andre.przywara@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Julien Thierry <julien.thierry.kdev@gmail.com>,
+	kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH kvmtool v2 5/6] arm64: add FEAT_E2H0 support (TBC)
+In-Reply-To: <zbgu6irpeytcpymaxpg55tvijeppfpdpwcju275g3h6bx4u5qn@35vb5ymt55hx>
+References: <20250725144100.2944226-1-andre.przywara@arm.com>
+	<20250725144100.2944226-6-andre.przywara@arm.com>
+	<86cy9o8bwn.wl-maz@kernel.org>
+	<zbgu6irpeytcpymaxpg55tvijeppfpdpwcju275g3h6bx4u5qn@35vb5ymt55hx>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Date: Sat, 26 Jul 2025 10:18:33 +0100
-From: Marc Zyngier <maz@misterjones.org>
-To: Jiaqi Yan <jiaqiyan@google.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org
-Subject: Re: [Bug Report] external_aborts failure related to efa1368ba9f4
- ("KVM: arm64: Commit exceptions from KVM_SET_VCPU_EVENTS immediately")
-In-Reply-To: <CACw3F50O9Z=hPFNzeatzr2k+1cKX_nnqdzKJOMEdmjmfy3LoUg@mail.gmail.com>
-References: <CACw3F53VTDQeUbj3C75pkjz=iehbFCqbrTjYbUC3ViUbQJAhsg@mail.gmail.com>
- <CACw3F50O9Z=hPFNzeatzr2k+1cKX_nnqdzKJOMEdmjmfy3LoUg@mail.gmail.com>
-User-Agent: Roundcube Webmail/1.4.15
-Message-ID: <18df01493fee0547d8b5902b986a2334@misterjones.org>
-X-Sender: maz@misterjones.org
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 217.182.43.188
-X-SA-Exim-Rcpt-To: jiaqiyan@google.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@misterjones.org
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: r09922117@csie.ntu.edu.tw, andre.przywara@arm.com, will@kernel.org, julien.thierry.kdev@gmail.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, alexandru.elisei@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 2025-07-25 23:38, Jiaqi Yan wrote:
-> On Mon, Jul 21, 2025 at 7:00 AM Jiaqi Yan <jiaqiyan@google.com> wrote:
->> 
->> Hi Oliver,
->> 
->> I was doing some SEA injection dev work and found
->> tools/testing/selftests/kvm/arm64/external_aborts.c is failing at the
->> head of my locally-tracked kvmarm/next, commit 811ec70dcf9cc ("Merge
->> branch 'kvm-arm64/config-masks' into kvmarm/next"):
->> 
->> vobeb33:/export/hda3/tmp/yjq# ./external_aborts
->> Random seed: 0x6b8b4567
->> test_mmio_abort <= fail
->> ==== Test Assertion Failure ====
->>   arm64/external_aborts.c:19: regs->pc == expected_abort_pc
->>   pid=25675 tid=25675 errno=4 - Interrupted system call
->>   (stack trace empty)
->>   0x0 != 0x21ed20 (regs->pc != expected_abort_pc)
->> vobeb33:/export/hda3/tmp/yjq#
->> vobeb33:/export/hda3/tmp/yjq#
->> vobeb33:/export/hda3/tmp/yjq# ./external_aborts
->> Random seed: 0x6b8b4567
->> test_mmio_nisv       <= pass
->> test_mmio_nisv_abort <=fail
->> ==== Test Assertion Failure ====
->>   arm64/external_aborts.c:19: regs->pc == expected_abort_pc
->>   pid=26153 tid=26153 errno=4 - Interrupted system call
->>   (stack trace empty)
->>   0x0 != 0x21eb18 (regs->pc != expected_abort_pc)
->> 
->> It looks like the PC in the guest register is lost / polluted. I only
->> tested test_mmio_abort (fail), test_mmio_nisv (pass), and
->> test_mmio_nisv_abort (fail), but from reading the code of
->> test_mmio_nisv vs test_mmio_nisv_abort, I guess test failure is
->> probably due to some bug in the code kvm injects SEA into guest.
->> 
->> If I revert a single commit efa1368ba9f4 ("KVM: arm64: Commit
->> exceptions from KVM_SET_VCPU_EVENTS immediately"), all tests in
->> tools/testing/selftests/kvm/arm64/external_aborts.c pass. I have not
->> yet figured out the bug tho. Want to report since you are the author
->> maybe you can (or already) spot something.
+On Sat, 26 Jul 2025 10:01:25 +0100,
+Wei-Lin Chang <r09922117@csie.ntu.edu.tw> wrote:
 > 
-> Friendly ping ;)
+> Hi all,
+> 
+> On Fri, Jul 25, 2025 at 05:37:12PM +0100, Marc Zyngier wrote:
+> > Hi Andre,
+> > 
+> > Thanks for picking this. A few nits below.
+> > 
+> > On Fri, 25 Jul 2025 15:40:59 +0100,
+> > Andre Przywara <andre.przywara@arm.com> wrote:
+> > > 
+> > > From: Marc Zyngier <maz@kernel.org>
+> > > 
+> > > To reduce code complexity, KVM only supports nested virtualisation in
+> > > VHE mode. So to allow recursive nested virtualisation, and be able to
+> > > expose FEAT_NV2 to a guest, we must prevent a guest from turning off
+> > > HCR_EL2.E2H, which is covered by not advertising the FEAT_E2H0 architecture
+> > > feature.
+> > > 
+> > > To allow people to run a guest in non-VHE mode, KVM introduced the
+> > > KVM_ARM_VCPU_HAS_EL2_E2H0 feature flag, which will allow control over
+> > > HCR_EL2.E2H, but at the cost of turning off FEAT_NV2.
+> > 
+> > All of that has been captured at length in the kernel code, and I
+> > think this is "too much information" for userspace. I'd rather we
+> > stick to a pure description of what the various options mean to the
+> > user.
+> > 
+> > > Add a kvmtool command line option "--e2h0" to set that feature bit when
+> > > creating a guest, to gain non-VHE, but lose recursive nested virt.
+> > 
+> > How about:
+> > 
+> > "The --nested option allows a guest to boot at EL2 without FEAT_E2H0
+> >  (i.e. mandating VHE support). While this is great for "modern"
+> >  operating systems and hypervisors, a few legacy guests are stuck in a
+> >  distant past.
+> > 
+> >  To support those, the --e2h0 option exposes FEAT_E2H0 to the guest,
+> >  at the expense of a number of other features, such as FEAT_NV2. This
+> 
+> Just a very small thing:
+> 
+> Will only mentioning FEAT_NV2 here lead people to think that FEAT_NV is
+> still available with --e2h0?
+> Maybe s/FEAT_NV2/FEAT_NV/ makes it clearer?
 
-Please check this:
+Maybe. On the other hand, we never advertise the old FEAT_NV as such,
+irrespective of the state of E2H. This is indicated by
+ID_AA64MMFR4_EL1.NV_frac==0b0001 when NV is advertised. So I'm not
+sure this changes anything, really.
 
-https://web.git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git/commit/?h=next&id=c6e35dff58d348c1a9489e9b3b62b3721e62631d
+Thanks,
 
-         M.
+	M.
+
+
 -- 
-Who you jivin' with that Cosmik Debris?
+Jazz isn't dead. It just smells funny.
 
