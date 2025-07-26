@@ -1,115 +1,89 @@
-Return-Path: <kvm+bounces-53500-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53501-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD50EB12934
-	for <lists+kvm@lfdr.de>; Sat, 26 Jul 2025 08:27:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38264B129C6
+	for <lists+kvm@lfdr.de>; Sat, 26 Jul 2025 10:59:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A414C1C2759C
-	for <lists+kvm@lfdr.de>; Sat, 26 Jul 2025 06:27:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D12023A85C0
+	for <lists+kvm@lfdr.de>; Sat, 26 Jul 2025 08:58:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4463B2080C4;
-	Sat, 26 Jul 2025 06:27:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C167121E094;
+	Sat, 26 Jul 2025 08:59:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fq2xnjNp"
+	dkim=pass (2048-bit key) header.d=csie.ntu.edu.tw header.i=@csie.ntu.edu.tw header.b="E2ZYAvTE"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 419F528682;
-	Sat, 26 Jul 2025 06:27:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 568DF19F461
+	for <kvm@vger.kernel.org>; Sat, 26 Jul 2025 08:59:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753511239; cv=none; b=kFDc9yHOe/aM7eBxKJbp2vvZQR1q705ii/YQ4LHSVGmZ9u7lBPNCrv9y9RtR5dedGS22osOdJpmeEZ+NvIwkwd53AeZr5vt2Tv3+qDQdAlEaLXOivh7XCroS3F1T+k/2T5RYsQJMv03BBEeciVQhOFvF4xdTFTGTJK8Cd1QYaD8=
+	t=1753520345; cv=none; b=ciffmrEPOzJ/vsXES4iDgdG23vBoVMzJ+dg57Q5G37YqSCccm2YrLto/dTZYBKylvH/PPF0o4eUAXXy++RoOXnEAoAewpYvPJZLY12uCeQBvx6Np2dAM2mn/9imz71vPeJOpLfKaWIHxE38vkm1I99F5vkLPhTwZOBhoR8ijxNE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753511239; c=relaxed/simple;
-	bh=LlIMTFVzXwdSlzjowza5NRuahl7DloIjtQs9FFDcY/Q=;
+	s=arc-20240116; t=1753520345; c=relaxed/simple;
+	bh=BAlyNZBIlPoNcyJn72zqkAHVHCI4YLaoZhEYbwrktkw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=foF31d4U2s2dtFf3urbsX1QONkjfhjzpLBwitga6igL8LZPHuRw+bPgr3m8T2sTMJH5c19H71m86Vqii0YoHd8k6oF3fZTk+bqBF42nEb0im9wz3FC9B78xY9nyFkrVPFrrPFpEA2zVzqZ1HJX2sggVpqA++f9IZXB+ez/ILHBg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fq2xnjNp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7054C4CEED;
-	Sat, 26 Jul 2025 06:27:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753511238;
-	bh=LlIMTFVzXwdSlzjowza5NRuahl7DloIjtQs9FFDcY/Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fq2xnjNp2Rnf6iAlZuKY1DeL5Taz3Wd30zVOYss8rTdrQFYNsNc7QchDwyboJt8MO
-	 GyBnduAMMlNsE8pFM+5ks4z6k6V1Q2RKNUvUebb8ez9Dk91IZbgcxkBTqATFe8mruT
-	 F99Rn3HFLCaODcvN0/FwBjHEpq31Kn5eyDzW/dj5r5P0sUBxDUJYgOFUF2H+2OXMD+
-	 b0uHv/EensaRP3baa7pQtYIuc8JXI/UQX+u/sHXMOJv7/rcSM6jN0iAiHQTQj5ULlP
-	 XjDMcwoXUT3oMirM6oHEboAxIgl2XJlfJ7zAX534y/jxfcJsjtNnBZ1ScfFvhmh9Hi
-	 n1Xg4NOsRzPeQ==
-Date: Fri, 25 Jul 2025 23:27:18 -0700
-From: Kees Cook <kees@kernel.org>
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: Arnd Bergmann <arnd@arndb.de>, Will Deacon <will@kernel.org>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Gavin Shan <gshan@redhat.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	James Morse <james.morse@arm.com>,
-	Oza Pawandeep <quic_poza@quicinc.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Mike Rapoport <rppt@kernel.org>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Henrique de Moraes Holschuh <hmh@hmh.eng.br>,
-	Hans de Goede <hansg@kernel.org>,
-	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Len Brown <lenb@kernel.org>, Masami Hiramatsu <mhiramat@kernel.org>,
-	Michal Wilczynski <michal.wilczynski@intel.com>,
-	Juergen Gross <jgross@suse.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	"Kirill A. Shutemov" <kas@kernel.org>,
-	Roger Pau Monne <roger.pau@citrix.com>,
-	David Woodhouse <dwmw@amazon.co.uk>,
-	Usama Arif <usama.arif@bytedance.com>,
-	"Guilherme G. Piccoli" <gpiccoli@igalia.com>,
-	Thomas Huth <thuth@redhat.com>, Brian Gerst <brgerst@gmail.com>,
-	Marco Elver <elver@google.com>,
-	Andrey Konovalov <andreyknvl@gmail.com>,
-	Andrey Ryabinin <ryabinin.a.a@gmail.com>,
-	Hou Wenlong <houwenlong.hwl@antgroup.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	"Peter Zijlstra (Intel)" <peterz@infradead.org>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Nicolas Schier <nicolas.schier@linux.dev>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Andy Lutomirski <luto@kernel.org>, Baoquan He <bhe@redhat.com>,
-	Alexander Graf <graf@amazon.com>,
-	Changyuan Lyu <changyuanl@google.com>,
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Jan Beulich <jbeulich@suse.com>, Boqun Feng <boqun.feng@gmail.com>,
-	Viresh Kumar <viresh.kumar@linaro.org>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Bibo Mao <maobibo@loongson.cn>, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, x86@kernel.org,
-	kvm@vger.kernel.org, ibm-acpi-devel@lists.sourceforge.net,
-	platform-driver-x86@vger.kernel.org, linux-acpi@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org, linux-efi@vger.kernel.org,
-	linux-mm@kvack.org, kasan-dev@googlegroups.com,
-	linux-kbuild@vger.kernel.org, linux-hardening@vger.kernel.org,
-	kexec@lists.infradead.org, linux-security-module@vger.kernel.org,
-	llvm@lists.linux.dev
-Subject: Re: [PATCH v4 0/4] stackleak: Support Clang stack depth tracking
-Message-ID: <202507252322.8774CA6FCF@keescook>
-References: <20250724054419.it.405-kees@kernel.org>
- <20250726004313.GA3650901@ax162>
+	 Content-Type:Content-Disposition:In-Reply-To; b=OoJE+jWmivlI72r3IDnT/Dr3yBuN+sTIJSEaTtHff98AXe449mgWl6Ah47JEH3Yg5SptO7EWbBiEvOtLduzZ0T+dP4f1BIXyUiS1ikLfB+Cbh+d1IiISjVpeK9blH/HByuASifiCm6imDezZRAd1GnJrr+OUgAOLhtO6xLdNBA0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.ntu.edu.tw; spf=pass smtp.mailfrom=csie.ntu.edu.tw; dkim=pass (2048-bit key) header.d=csie.ntu.edu.tw header.i=@csie.ntu.edu.tw header.b=E2ZYAvTE; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.ntu.edu.tw
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csie.ntu.edu.tw
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2350b1b9129so20393355ad.0
+        for <kvm@vger.kernel.org>; Sat, 26 Jul 2025 01:59:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=csie.ntu.edu.tw; s=google; t=1753520340; x=1754125140; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=IsSwfYx72SBzxWb7IltAxR/7pX8mu/ij+8zDC/fxnNE=;
+        b=E2ZYAvTE5NTjaik8ICEcC8vs9mEDwedtonIM0Nn70yqutUkIUtLypEhK8J37IXwR+x
+         MuWIYyGBwAuzzOgTVPQCvrK55HQQwixuJ5vs8Dlfc0WFDcogFxlWP72sbpMUkZ6O1qGf
+         m7ScLjuWhoMwhcyC67nIyWdf6DLFutsIkn12LiIej5/ha/o/tzFP1nyH0JKLlGuvgJVh
+         WCSVDptXAhYocqhU1rqk8oleLDLPPI2a92juYBWSbcamOWG6kgv7jzr67mgkTdV9PQ8V
+         sy3QtLq4Nuby8ATK8eR48CBGVvkye2Lhq8mupWOXHBvZeCIgJwts7OGLkqxiydax9pFv
+         DP+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753520340; x=1754125140;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IsSwfYx72SBzxWb7IltAxR/7pX8mu/ij+8zDC/fxnNE=;
+        b=GPuOGrrD2neaRQGOZ9DUO4ABmTkKEsl7uW8TN4ih2sOdOgvxVyIQxkq1C8tjPAKNbw
+         9R5TVzTyHLGPl0QbTZaL5J3TPKfDE4f8nqTk3/tYLQS1pxYyv0On8jPmt2ZlNR7FtGbU
+         p/9kw+QEG2qX0D7TpsvwSv0eBw7RPiQQCmhWyUKPFc10Ux66ammNa79nUjCFlzsWTL2H
+         97xZmDcGGDB0OZ76sRAAw8O6SBvodHwvgcHo+tji+tKYnnIieNT6Gsxpm6NwxyH4QUDj
+         ZFkeLakPSsY16Sbw7J50IVwy7/da9rDnxnE1elLAWnHyvwj2QlrN4Os3uUIIimWJL5JR
+         IUpQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVJQnK+ZkrujfAjOKbo7oEkSuXZoG2q2aXXnX/c7+LY1uMFPTDfJzbk036wm0NiGYsFuWU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyKOrqj4tjm5cDUApl1s6uLBG8AUSnkj9f8BExikkCTSPBXSK69
+	+WlUdGnFBLPXeq0t1DzCtCJKYEBp2j7NTGsh2W9FqrpfMD0mWdWI/jOX03itKi+ptrHQ0a6Cdcd
+	jLx1bgppERm5oXORbqospq+NR2nLr1UuSfJv/TVwWW8SSmDVIXW3ntWNjJcN1reE=
+X-Gm-Gg: ASbGncuOAJgfvWVJFuysSuFclri9lXHn4rMpVhZ7f5C9Dn4DMOo5GGPude46+Zow/92
+	grJwaFQE1ouTO05PnJBijDusUEFRZ2UXcwzG8GEoR02kEGBbGPTwPLt5clUNatVJMkwvLDiS5WD
+	rKNS3bAUG+yDSgnvM/Et33zEpN/o59Avr0QCgL99nrXH2AGP7tsYJ8o2RxfIBdeAMBcLp6MvT93
+	HNUGPdQOj32V/Ld5wQHFlN1oUyenq4K+H1hbGHKw71Ongi01q36wcplBWZ9aiTHkZfcQNLrDmBC
+	75PbaAFLAG7ir438udoadQs3CJcWTXJySGGfdgTG/0Uzl3qIG7iqxLgc0RgMhslPSl+3fIby/mh
+	FeGMO04skOyl5Wm+yvKt2xZIeMYzXszI+a2LMw1wtl/LwaJ9ekdFP2JMDeGTbNEXz2k56Dhs=
+X-Google-Smtp-Source: AGHT+IGSfqKHy9SGFb/1/uiPQ8AY7vue0rGViceJfxWSMYoCR4FrxJn5LaDGauIUCkJl8iR0dcK/wA==
+X-Received: by 2002:a17:903:3bcc:b0:23f:adc0:8ccb with SMTP id d9443c01a7336-23fb3030e96mr62904435ad.16.1753520340556;
+        Sat, 26 Jul 2025 01:59:00 -0700 (PDT)
+Received: from zenbook (1-162-100-110.dynamic-ip.hinet.net. [1.162.100.110])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23fbe4fc7dasm13280705ad.116.2025.07.26.01.58.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 26 Jul 2025 01:59:00 -0700 (PDT)
+Date: Sat, 26 Jul 2025 17:01:25 +0800
+From: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+To: Marc Zyngier <maz@kernel.org>, Andre Przywara <andre.przywara@arm.com>
+Cc: Will Deacon <will@kernel.org>, 
+	Julien Thierry <julien.thierry.kdev@gmail.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH kvmtool v2 5/6] arm64: add FEAT_E2H0 support (TBC)
+Message-ID: <zbgu6irpeytcpymaxpg55tvijeppfpdpwcju275g3h6bx4u5qn@35vb5ymt55hx>
+References: <20250725144100.2944226-1-andre.przywara@arm.com>
+ <20250725144100.2944226-6-andre.przywara@arm.com>
+ <86cy9o8bwn.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -118,54 +92,116 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250726004313.GA3650901@ax162>
+In-Reply-To: <86cy9o8bwn.wl-maz@kernel.org>
+X-Gm-Spam: 0
+X-Gm-Phishy: 0
 
-On Fri, Jul 25, 2025 at 05:43:13PM -0700, Nathan Chancellor wrote:
-> A few build issues that I see when building next-20250725, which seem
-> related to this series.
+Hi all,
 
-AH! Thank you for letting me know!
-
-> 1. I see
+On Fri, Jul 25, 2025 at 05:37:12PM +0100, Marc Zyngier wrote:
+> Hi Andre,
 > 
->   ld.lld: error: undefined symbol: __sanitizer_cov_stack_depth
->   >>> referenced by atags_to_fdt.c
->   >>>               arch/arm/boot/compressed/atags_to_fdt.o:(atags_to_fdt)
->   make[5]: *** [arch/arm/boot/compressed/Makefile:152: arch/arm/boot/compressed/vmlinux] Error 1
+> Thanks for picking this. A few nits below.
 > 
-> when building ARCH=arm allmodconfig on next-20250725. The following diff appears to cure that one.
-
-Ah-ha perfect. Yes, that matches what I was expecting to fix it, I was
-just about to start working on it, but you beat me to it. :) The same
-was reported here:
-https://lore.kernel.org/all/CA+G9fYtBk8qnpWvoaFwymCx5s5i-5KXtPGpmf=_+UKJddCOnLA@mail.gmail.com
-
-> 2. I see
+> On Fri, 25 Jul 2025 15:40:59 +0100,
+> Andre Przywara <andre.przywara@arm.com> wrote:
+> > 
+> > From: Marc Zyngier <maz@kernel.org>
+> > 
+> > To reduce code complexity, KVM only supports nested virtualisation in
+> > VHE mode. So to allow recursive nested virtualisation, and be able to
+> > expose FEAT_NV2 to a guest, we must prevent a guest from turning off
+> > HCR_EL2.E2H, which is covered by not advertising the FEAT_E2H0 architecture
+> > feature.
+> > 
+> > To allow people to run a guest in non-VHE mode, KVM introduced the
+> > KVM_ARM_VCPU_HAS_EL2_E2H0 feature flag, which will allow control over
+> > HCR_EL2.E2H, but at the cost of turning off FEAT_NV2.
 > 
->   kernel/kstack_erase.c:168:2: warning: function with attribute 'no_caller_saved_registers' should only call a function with attribute 'no_caller_saved_registers' or be compiled with '-mgeneral-regs-only' [-Wexcessive-regsave]
-> [...]
-> when building ARCH=i386 allmodconfig.
-
-Oh, hm, I will figure that out.
-
-> 3. I see
+> All of that has been captured at length in the kernel code, and I
+> think this is "too much information" for userspace. I'd rather we
+> stick to a pure description of what the various options mean to the
+> user.
 > 
->   In file included from kernel/fork.c:96:
->   include/linux/kstack_erase.h:29:37: error: passing 'const struct task_struct *' to parameter of type 'struct task_struct *' discards qualifiers [-Werror,-Wincompatible-pointer-types-discards-qualifiers]
->      29 |         return (unsigned long)end_of_stack(tsk) + sizeof(unsigned long);
->         |                                            ^~~
->   include/linux/sched/task_stack.h:56:63: note: passing argument to parameter 'p' here
->      56 | static inline unsigned long *end_of_stack(struct task_struct *p)
->         |                                                               ^
+> > Add a kvmtool command line option "--e2h0" to set that feature bit when
+> > creating a guest, to gain non-VHE, but lose recursive nested virt.
 > 
-> when building ARCH=loongarch allmodconfig, which does not support
-> CONFIG_THREAD_INFO_IN_TASK it seems.
+> How about:
+> 
+> "The --nested option allows a guest to boot at EL2 without FEAT_E2H0
+>  (i.e. mandating VHE support). While this is great for "modern"
+>  operating systems and hypervisors, a few legacy guests are stuck in a
+>  distant past.
+> 
+>  To support those, the --e2h0 option exposes FEAT_E2H0 to the guest,
+>  at the expense of a number of other features, such as FEAT_NV2. This
 
-Oh, eek. Yeah, I'll need to make an explicit dependency I guess? ("How
-did this ever work?")
+Just a very small thing:
 
-Thanks again!
+Will only mentioning FEAT_NV2 here lead people to think that FEAT_NV is
+still available with --e2h0?
+Maybe s/FEAT_NV2/FEAT_NV/ makes it clearer?
 
--- 
-Kees Cook
+Thanks,
+Wei-Lin Chang
+
+>  is conditioned on the host itself supporting FEAT_E2H0."
+> 
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> > ---
+> >  arm64/include/kvm/kvm-config-arch.h | 5 ++++-
+> >  arm64/kvm-cpu.c                     | 2 ++
+> >  2 files changed, 6 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arm64/include/kvm/kvm-config-arch.h b/arm64/include/kvm/kvm-config-arch.h
+> > index 44c43367b..73bf4211a 100644
+> > --- a/arm64/include/kvm/kvm-config-arch.h
+> > +++ b/arm64/include/kvm/kvm-config-arch.h
+> > @@ -11,6 +11,7 @@ struct kvm_config_arch {
+> >  	bool		has_pmuv3;
+> >  	bool		mte_disabled;
+> >  	bool		nested_virt;
+> > +	bool		e2h0;
+> >  	u64		kaslr_seed;
+> >  	enum irqchip_type irqchip;
+> >  	u64		fw_addr;
+> > @@ -63,6 +64,8 @@ int sve_vl_parser(const struct option *opt, const char *arg, int unset);
+> >  	OPT_U64('\0', "counter-offset", &(cfg)->counter_offset,			\
+> >  		"Specify the counter offset, defaulting to 0"),			\
+> >  	OPT_BOOLEAN('\0', "nested", &(cfg)->nested_virt,			\
+> > -		    "Start VCPUs in EL2 (for nested virt)"),
+> > +		    "Start VCPUs in EL2 (for nested virt)"),			\
+> > +	OPT_BOOLEAN('\0', "e2h0", &(cfg)->e2h0,					\
+> > +		    "Create guest without VHE support"),
+> >  
+> >  #endif /* ARM_COMMON__KVM_CONFIG_ARCH_H */
+> > diff --git a/arm64/kvm-cpu.c b/arm64/kvm-cpu.c
+> > index 42dc11dad..6eb76dff4 100644
+> > --- a/arm64/kvm-cpu.c
+> > +++ b/arm64/kvm-cpu.c
+> > @@ -76,6 +76,8 @@ static void kvm_cpu__select_features(struct kvm *kvm, struct kvm_vcpu_init *init
+> >  		if (!kvm__supports_extension(kvm, KVM_CAP_ARM_EL2))
+> >  			die("EL2 (nested virt) is not supported");
+> >  		init->features[0] |= 1UL << KVM_ARM_VCPU_HAS_EL2;
+> > +		if (kvm->cfg.arch.e2h0)
+> > +			init->features[0] |= 1UL << KVM_ARM_VCPU_HAS_EL2_E2H0;
+> 
+> This really should also check the capability in order to fail
+> gracefully on system that have no E2H0 support at all (or have it so
+> buggy that it is permanently disabled by the kernel):
+> 
+> +		if (kvm->cfg.arch.e2h0) {
+> +	  		if (!kvm__supports_extension(kvm, KVM_CAP_ARM_EL2_E2H0))
+> +				die("FEAT_E2H0 is not supported");
+> +			init->features[0] |= 1UL << KVM_ARM_VCPU_HAS_EL2_E2H0;
+> +		}
+> 
+> Thanks,
+> 
+> 	M.
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
 
