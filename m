@@ -1,163 +1,474 @@
-Return-Path: <kvm+bounces-53525-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53526-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 122CAB134E9
-	for <lists+kvm@lfdr.de>; Mon, 28 Jul 2025 08:31:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2369BB13547
+	for <lists+kvm@lfdr.de>; Mon, 28 Jul 2025 09:01:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 223661896E0D
-	for <lists+kvm@lfdr.de>; Mon, 28 Jul 2025 06:32:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E3EA176DE8
+	for <lists+kvm@lfdr.de>; Mon, 28 Jul 2025 07:01:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F322221578;
-	Mon, 28 Jul 2025 06:31:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 613D0221FD2;
+	Mon, 28 Jul 2025 07:01:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="sWeTO7Vl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OFONzjXr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D79202E36E6;
-	Mon, 28 Jul 2025 06:31:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0969C157A55
+	for <kvm@vger.kernel.org>; Mon, 28 Jul 2025 07:01:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753684302; cv=none; b=XQbvWauB5mPHqng02UEoel7qjTyuyWAUrDFIlOJFpV7zUFJj/fvXbd2xOMh3iXYJ4kh6NRo77+B3A5zFreuWXsEa0ruyBRXygXlsfD96Iv1pCvn1NOLW6YEErc1dfXWe6EwfdRrSCIUTojtv2jnZWGlySQAg4PAv8NEvx5j8mOw=
+	t=1753686085; cv=none; b=ieRIeyWT3gu18O7LFYk+Rm74u+exz4Ev5zkjl+I48gnkPmEM+56KpyZwi4FaC+e0KRcmePBHBMDnmIeuhTA3TT/KWJpSWEnbj4uaGYqLxugqP1CGjiWpRzHFHBL3XNbZu9oRq1g2NRbhKAhShdPFv13Bv9XPA/Zt82ik4J5iYww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753684302; c=relaxed/simple;
-	bh=phI48AhMXD/BxUSODMFpthLY09etg9VpnOBNsRs6VIc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=enPccmckZ/E08+mTGMqwsMSApOunczcl/2ofbKMMfjsnct3TMltz9HkftsFDMiGDALdiENf56zLqV8j9/1Du4C4uZ7w6LnwthjaDNZsiKp5Raq5udJMbmgmF8hVqM4IULpRYejPoI6SN/YSytCXvMy2vd6tRyGgVmEdeFseYZ6g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=sWeTO7Vl; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [192.168.7.202] ([71.202.166.45])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 56S6UTQV053138
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Sun, 27 Jul 2025 23:30:30 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 56S6UTQV053138
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025072201; t=1753684232;
-	bh=jDMFGzQKMMeXd6c8aeZfqsxoy83lf5w/1RFASuHFPNc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=sWeTO7VlLiC+WAGj3VjOH0j17gRpBNgtw/9UFqYuFVb+7cv0c0zchg/gymVdAWGGY
-	 zzUIblTEwG+EOsGmrQeONuHzyDqOU1xiKKNMBMdFk/HnCSxXPsAqCStcT3aH90CrZ3
-	 jkisEpxFU0giiBMHhZiu974DUuZ2wx676D38rxrVUR7bKT2Sem3Xwdi4x1svH9JH3v
-	 pHz1spA5bAIP3pQi5A/fFgcxeurOLFAVwGwoW3NnupYTpTE2OuixbCwexSSAazEpH3
-	 w3y080Wy4r3MuwVoWxBj23jckHyQGpJqP9TJ/DF9Qrfu/vKtmQ9EWNVmTYwbJnjXhg
-	 NKxcU6+cNuLqA==
-Message-ID: <c3a54990-9cd6-4d8a-baa0-11b4e8d4a23b@zytor.com>
-Date: Sun, 27 Jul 2025 23:30:28 -0700
+	s=arc-20240116; t=1753686085; c=relaxed/simple;
+	bh=TkENsyGoLcg6stTOlkYyEWir+vNFyCOMGdvcYDfvrT8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=knZiHr34J7hrrdSwVmwMAxpCFN++5X5k6ijN4ATmfAZ4HC4PpniSpWb0Zv+jkL+g+1nj5zH5Gtevz5NOX5MXrFiNTnCgNVz/MLzPKGCf/wcvSokOFyCHKh9uz9ZdK3TM9cOQJDZ8NUi87KpcHBJ8/ZNZOnH56qq5Z/kJTIc8VBs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OFONzjXr; arc=none smtp.client-ip=209.85.160.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4ab86a29c98so475241cf.0
+        for <kvm@vger.kernel.org>; Mon, 28 Jul 2025 00:01:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1753686082; x=1754290882; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=x6gy/S083oOp7naXOo3Q5i84XdGJyyMBuJyqYSqtxDY=;
+        b=OFONzjXrNYpN4rzd1wFA8gtV03yGBzrJTjmXv3V3WjlspiRbICr5XLuYLRcxFThpPt
+         Y8i/AEFXaJ5SvfPn+tDFzMtEjYJ/na50KsA2Mb2F+y0rvvVpmp3gWhH3Dj1YwKUYOlNx
+         khTFyAET/l4m9JCPwc1ZjreGrIKclFpLCQv9GO5q/queak6K12WgZKRAO4U5+dQAKKbE
+         vtPthau053i3fUkOcHOJF/mcuQzlZlL+f2Pd1BlKjZYiTqKbk2D1VD8XHAevgFwVZ6dp
+         VT45U86TbZTc8DkIOnz073f2bR4QCZi94WbbxbZD+o6U/PuK2y9p/ccAKbPgwAJCgxXf
+         QxZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753686082; x=1754290882;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=x6gy/S083oOp7naXOo3Q5i84XdGJyyMBuJyqYSqtxDY=;
+        b=lZfSFiVa+ic4UALswchxwZpNumXZMPxrsEFYFZa2Q0pVhtsxP6GnxXUi3PwLtlrREU
+         vrfLvUNYWqlEkkyMcX4sujSz9/cndcQynTQ1fUs+zokDYCseNn0LE+z+yBnWEHFBH9NO
+         L7Bw9qQA4pvbdZc6N7rSJPVYbRPl/hQ9nkq2OgRBHHTDE3/ebLY5A+egrLkC9ekRf6/J
+         NLs59YWVqJVXvrZp+2DjbP8EsllmQJnmcRGr8W1JDI0Sd/4DsCvbCkmCV/ZLczuSwIrC
+         ab65C1KDu9AEH9wJD2sVFwAJ/XZBnXDRVsuw3Xj/1UVRmIH22RGjj8gYRH+uAkY4iyRW
+         AEzQ==
+X-Gm-Message-State: AOJu0YweGOK8qseBGeQ54w6730TbYwd3J7ZuDnAHOlnBh/MOw4WSlKFW
+	Fmc/Vs3k29Oi0qbwvAnDyHCeovRMoNF/lmcjLyxgTmB0oWjXEYd1VpmSiIzyvm6jf/ZoKztGZTC
+	+Eb49T9bkoDAy25voiXh72owmypRKRNhsNJBfaBnPqEc+a6t32h4ElVV5
+X-Gm-Gg: ASbGncunkq9av7Hl1lu0+oVnsGushXdEvVVbu+LzqM27MrpzrT8nLYPUee4jA7oeiB3
+	yxnBzzX47X44EBTcdqQJ+uIUFUV8d0gtidqDEBZGhF39/vunjOVCP5kavi9S6SEGP7r481wzTVh
+	o2G8Fy1Vi2IjnfcToFnci3QydKSSinXaw1a3kuhR4DYsrwHczjAkK52PZMghdxhHYHlvKVyOKou
+	R9hEVZ5vEB7YLZXJw==
+X-Google-Smtp-Source: AGHT+IHo/G6u2nMtkIfPtbkevqcqZ7X4BURQRMUFMLjjXf7zKPZE/b8nIf9oukwEXh/zdbwxDwboOjUtoMz1guge0+o=
+X-Received: by 2002:ac8:5f87:0:b0:4aa:cba2:2e67 with SMTP id
+ d75a77b69052e-4ae9e86785amr5389561cf.21.1753686081133; Mon, 28 Jul 2025
+ 00:01:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v11 21/23] KVM: nVMX: Enable CET support for nested guest
-To: Chao Gao <chao.gao@intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, x86@kernel.org, seanjc@google.com,
-        pbonzini@redhat.com, dave.hansen@intel.com
-Cc: rick.p.edgecombe@intel.com, mlevitsk@redhat.com, john.allen@amd.com,
-        weijiang.yang@intel.com, minipli@grsecurity.net,
-        Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>
-References: <20250704085027.182163-1-chao.gao@intel.com>
- <20250704085027.182163-22-chao.gao@intel.com>
-Content-Language: en-US
-From: Xin Li <xin@zytor.com>
-Autocrypt: addr=xin@zytor.com; keydata=
- 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
- l75w1xInsg==
-In-Reply-To: <20250704085027.182163-22-chao.gao@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250723104714.1674617-1-tabba@google.com> <20250723104714.1674617-23-tabba@google.com>
+ <aIKwn0RJdEXlu5g3@google.com>
+In-Reply-To: <aIKwn0RJdEXlu5g3@google.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Mon, 28 Jul 2025 08:00:44 +0100
+X-Gm-Features: Ac12FXyhJQxbyI6WOfZQbZ0K7kx93_9s6Ya1Oiw6yJQzulqk-P6xIkqxQE90u38
+Message-ID: <CA+EHjTy_X4Dbfhp91v6D3LZmjqTm=hbn3W83_yg0QPNwBVzsKA@mail.gmail.com>
+Subject: Re: [PATCH v16 22/22] KVM: selftests: guest_memfd mmap() test when
+ mmap is supported
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
+	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, 
+	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
+	palmer@dabbelt.com, aou@eecs.berkeley.edu, viro@zeniv.linux.org.uk, 
+	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
+	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
+	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
+	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
+	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
+	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
+	ira.weiny@intel.com
+Content-Type: text/plain; charset="UTF-8"
 
-> @@ -2515,6 +2537,30 @@ static void prepare_vmcs02_early(struct vcpu_vmx *vmx, struct loaded_vmcs *vmcs0
->   	}
->   }
->   
-> +static inline void cet_vmcs_fields_get(struct kvm_vcpu *vcpu, u64 *ssp,
-> +				       u64 *s_cet, u64 *ssp_tbl)
+Hi Sean,
+
+On Thu, 24 Jul 2025 at 23:16, Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Wed, Jul 23, 2025, Fuad Tabba wrote:
+> > Reviewed-by: James Houghton <jthoughton@google.com>
+> > Reviewed-by: Gavin Shan <gshan@redhat.com>
+> > Reviewed-by: Shivank Garg <shivankg@amd.com>
+>
+> These reviews probably should be dropped given that the test fails...
+
+At least on my setup, these tests passed on x86 and on arm64. Sorry about that.
+
+> > Co-developed-by: Ackerley Tng <ackerleytng@google.com>
+> > Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > ---
+> > +static bool check_vm_type(unsigned long vm_type)
+> >  {
+> > -     size_t page_size;
+> > +     /*
+> > +      * Not all architectures support KVM_CAP_VM_TYPES. However, those that
+> > +      * support guest_memfd have that support for the default VM type.
+> > +      */
+> > +     if (vm_type == VM_TYPE_DEFAULT)
+> > +             return true;
+> > +
+> > +     return kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(vm_type);
+> > +}
+>
+> ...
+>
+> > ++static void test_gmem_flag_validity(void)
+> > +{
+> > +     uint64_t non_coco_vm_valid_flags = 0;
+> > +
+> > +     if (kvm_has_cap(KVM_CAP_GUEST_MEMFD_MMAP))
+> > +             non_coco_vm_valid_flags = GUEST_MEMFD_FLAG_MMAP;
+> > +
+> > +     test_vm_type_gmem_flag_validity(VM_TYPE_DEFAULT, non_coco_vm_valid_flags);
+> > +
+> > +#ifdef __x86_64__
+> > +     test_vm_type_gmem_flag_validity(KVM_X86_SW_PROTECTED_VM, 0);
+> > +     test_vm_type_gmem_flag_validity(KVM_X86_SEV_VM, 0);
+> > +     test_vm_type_gmem_flag_validity(KVM_X86_SEV_ES_VM, 0);
+> > +     test_vm_type_gmem_flag_validity(KVM_X86_SNP_VM, 0);
+> > +     test_vm_type_gmem_flag_validity(KVM_X86_TDX_VM, 0);
+> > +#endif
+>
+> mmap() support has nothing to do with CoCo, it's all about KVM's lack of support
+> for VM types that use guest_memfd  for private memory.  This causes failures on
+> x86 due to MMAP being supported on everything except SNP_VM and TDX_VM.
+>
+> All of this code is quite ridiculous.  KVM allows KVM_CHECK_EXTENSION on a VM FD
+> specifically so that userspace can query whether or not a feature is supported for
+> a given VM.  Just use that, don't hardcode whether or not the flag is valid.
+>
+> If we want to validate that a specific VM type does/doesn't support
+> KVM_CAP_GUEST_MEMFD_MMAP, then we should add a test for _that_ (though IMO it'd
+> be a waste of time).
+
+Ack.
+
+> > +}
+> > +
+> > +int main(int argc, char *argv[])
+> > +{
+> > +     TEST_REQUIRE(kvm_has_cap(KVM_CAP_GUEST_MEMFD));
+> > +
+> > +     test_gmem_flag_validity();
+> > +
+> > +     test_with_type(VM_TYPE_DEFAULT, 0);
+> > +     if (kvm_has_cap(KVM_CAP_GUEST_MEMFD_MMAP))
+> > +             test_with_type(VM_TYPE_DEFAULT, GUEST_MEMFD_FLAG_MMAP);
+> > +
+> > +#ifdef __x86_64__
+> > +     test_with_type(KVM_X86_SW_PROTECTED_VM, 0);
+> > +#endif
+>
+> Similarly, don't hardocde the VM types to test, and then bail if the type isn't
+> supported.  Instead, pull the types from KVM and iterate over them.
+>
+> Do that, and the test can provide better coverage is fewer lines of code.  Oh,
+> and it passes too ;-)
+
+Thanks for that.
+
+Cheers,
+/fuad
+
+> ---
+> From: Fuad Tabba <tabba@google.com>
+> Date: Wed, 23 Jul 2025 11:47:14 +0100
+> Subject: [PATCH] KVM: selftests: guest_memfd mmap() test when mmap is
+>  supported
+>
+> Expand the guest_memfd selftests to comprehensively test host userspace
+> mmap functionality for guest_memfd-backed memory when supported by the
+> VM type.
+>
+> Introduce new test cases to verify the following:
+>
+> * Successful mmap operations: Ensure that MAP_SHARED mappings succeed
+>   when guest_memfd mmap is enabled.
+>
+> * Data integrity: Validate that data written to the mmap'd region is
+>   correctly persistent and readable.
+>
+> * fallocate interaction: Test that fallocate(FALLOC_FL_PUNCH_HOLE)
+>   correctly zeros out mapped pages.
+>
+> * Out-of-bounds access: Verify that accessing memory beyond the
+>   guest_memfd's size correctly triggers a SIGBUS signal.
+>
+> * Unsupported mmap: Confirm that mmap attempts fail as expected when
+>   guest_memfd mmap support is not enabled for the specific guest_memfd
+>   instance or VM type.
+>
+> * Flag validity: Introduce test_vm_type_gmem_flag_validity() to
+>   systematically test that only allowed guest_memfd creation flags are
+>   accepted for different VM types (e.g., GUEST_MEMFD_FLAG_MMAP for
+>   default VMs, no flags for CoCo VMs).
+>
+> The existing tests for guest_memfd creation (multiple instances, invalid
+> sizes), file read/write, file size, and invalid punch hole operations
+> are integrated into the new test_with_type() framework to allow testing
+> across different VM types.
+>
+> Cc: James Houghton <jthoughton@google.com>
+> Cc: Gavin Shan <gshan@redhat.com>
+> Cc: Shivank Garg <shivankg@amd.com>
+> Co-developed-by: Ackerley Tng <ackerleytng@google.com>
+> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> Signed-off-by: Fuad Tabba <tabba@google.com>
+> Co-developed-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  .../testing/selftests/kvm/guest_memfd_test.c  | 162 +++++++++++++++---
+>  1 file changed, 140 insertions(+), 22 deletions(-)
+>
+> diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
+> index 341ba616cf55..e23fbd59890e 100644
+> --- a/tools/testing/selftests/kvm/guest_memfd_test.c
+> +++ b/tools/testing/selftests/kvm/guest_memfd_test.c
+> @@ -13,6 +13,8 @@
+>
+>  #include <linux/bitmap.h>
+>  #include <linux/falloc.h>
+> +#include <setjmp.h>
+> +#include <signal.h>
+>  #include <sys/mman.h>
+>  #include <sys/types.h>
+>  #include <sys/stat.h>
+> @@ -34,12 +36,83 @@ static void test_file_read_write(int fd)
+>                     "pwrite on a guest_mem fd should fail");
+>  }
+>
+> -static void test_mmap(int fd, size_t page_size)
+> +static void test_mmap_supported(int fd, size_t page_size, size_t total_size)
 > +{
-> +	if (guest_cpu_cap_has(vcpu, X86_FEATURE_SHSTK)) {
-> +		*ssp = vmcs_readl(GUEST_SSP);
-> +		*ssp_tbl = vmcs_readl(GUEST_INTR_SSP_TABLE);
-> +	}
-> +	if (guest_cpu_cap_has(vcpu, X86_FEATURE_IBT) ||
-> +	    guest_cpu_cap_has(vcpu, X86_FEATURE_SHSTK))
-> +		*s_cet = vmcs_readl(GUEST_S_CET);
+> +       const char val = 0xaa;
+> +       char *mem;
+> +       size_t i;
+> +       int ret;
+> +
+> +       mem = mmap(NULL, total_size, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0);
+> +       TEST_ASSERT(mem == MAP_FAILED, "Copy-on-write not allowed by guest_memfd.");
+> +
+> +       mem = mmap(NULL, total_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+> +       TEST_ASSERT(mem != MAP_FAILED, "mmap() for guest_memfd should succeed.");
+> +
+> +       memset(mem, val, total_size);
+> +       for (i = 0; i < total_size; i++)
+> +               TEST_ASSERT_EQ(READ_ONCE(mem[i]), val);
+> +
+> +       ret = fallocate(fd, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE, 0,
+> +                       page_size);
+> +       TEST_ASSERT(!ret, "fallocate the first page should succeed.");
+> +
+> +       for (i = 0; i < page_size; i++)
+> +               TEST_ASSERT_EQ(READ_ONCE(mem[i]), 0x00);
+> +       for (; i < total_size; i++)
+> +               TEST_ASSERT_EQ(READ_ONCE(mem[i]), val);
+> +
+> +       memset(mem, val, page_size);
+> +       for (i = 0; i < total_size; i++)
+> +               TEST_ASSERT_EQ(READ_ONCE(mem[i]), val);
+> +
+> +       ret = munmap(mem, total_size);
+> +       TEST_ASSERT(!ret, "munmap() should succeed.");
 > +}
 > +
-> +static inline void cet_vmcs_fields_set(struct kvm_vcpu *vcpu, u64 ssp,
-> +				       u64 s_cet, u64 ssp_tbl)
+> +static sigjmp_buf jmpbuf;
+> +void fault_sigbus_handler(int signum)
 > +{
-> +	if (guest_cpu_cap_has(vcpu, X86_FEATURE_SHSTK)) {
-> +		vmcs_writel(GUEST_SSP, ssp);
-> +		vmcs_writel(GUEST_INTR_SSP_TABLE, ssp_tbl);
-> +	}
-> +	if (guest_cpu_cap_has(vcpu, X86_FEATURE_IBT) ||
-> +	    guest_cpu_cap_has(vcpu, X86_FEATURE_SHSTK))
-> +		vmcs_writel(GUEST_S_CET, s_cet);
+> +       siglongjmp(jmpbuf, 1);
 > +}
 > +
->   static void prepare_vmcs02_rare(struct vcpu_vmx *vmx, struct vmcs12 *vmcs12)
->   {
->   	struct hv_enlightened_vmcs *hv_evmcs = nested_vmx_evmcs(vmx);
-
-
-The order of the arguments is a bit of weird to me, I would move s_cet
-before ssp.  Then it is consistent with the order in
-https://lore.kernel.org/kvm/20250704085027.182163-13-chao.gao@intel.com/
-
-
-> --- a/arch/x86/kvm/vmx/vmx.h
-> +++ b/arch/x86/kvm/vmx/vmx.h
-> @@ -181,6 +181,9 @@ struct nested_vmx {
->   	 */
->   	u64 pre_vmenter_debugctl;
->   	u64 pre_vmenter_bndcfgs;
-> +	u64 pre_vmenter_ssp;
-> +	u64 pre_vmenter_s_cet;
-> +	u64 pre_vmenter_ssp_tbl;
->   
->   	/* to migrate it to L1 if L2 writes to L1's CR8 directly */
->   	int l1_tpr_threshold;
-
-Same here.
+> +static void test_fault_overflow(int fd, size_t page_size, size_t total_size)
+> +{
+> +       struct sigaction sa_old, sa_new = {
+> +               .sa_handler = fault_sigbus_handler,
+> +       };
+> +       size_t map_size = total_size * 4;
+> +       const char val = 0xaa;
+> +       char *mem;
+> +       size_t i;
+> +       int ret;
+> +
+> +       mem = mmap(NULL, map_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+> +       TEST_ASSERT(mem != MAP_FAILED, "mmap() for guest_memfd should succeed.");
+> +
+> +       sigaction(SIGBUS, &sa_new, &sa_old);
+> +       if (sigsetjmp(jmpbuf, 1) == 0) {
+> +               memset(mem, 0xaa, map_size);
+> +               TEST_ASSERT(false, "memset() should have triggered SIGBUS.");
+> +       }
+> +       sigaction(SIGBUS, &sa_old, NULL);
+> +
+> +       for (i = 0; i < total_size; i++)
+> +               TEST_ASSERT_EQ(READ_ONCE(mem[i]), val);
+> +
+> +       ret = munmap(mem, map_size);
+> +       TEST_ASSERT(!ret, "munmap() should succeed.");
+> +}
+> +
+> +static void test_mmap_not_supported(int fd, size_t page_size, size_t total_size)
+>  {
+>         char *mem;
+>
+>         mem = mmap(NULL, page_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+>         TEST_ASSERT_EQ(mem, MAP_FAILED);
+> +
+> +       mem = mmap(NULL, total_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+> +       TEST_ASSERT_EQ(mem, MAP_FAILED);
+>  }
+>
+>  static void test_file_size(int fd, size_t page_size, size_t total_size)
+> @@ -120,26 +193,19 @@ static void test_invalid_punch_hole(int fd, size_t page_size, size_t total_size)
+>         }
+>  }
+>
+> -static void test_create_guest_memfd_invalid(struct kvm_vm *vm)
+> +static void test_create_guest_memfd_invalid_sizes(struct kvm_vm *vm,
+> +                                                 uint64_t guest_memfd_flags,
+> +                                                 size_t page_size)
+>  {
+> -       size_t page_size = getpagesize();
+> -       uint64_t flag;
+>         size_t size;
+>         int fd;
+>
+>         for (size = 1; size < page_size; size++) {
+> -               fd = __vm_create_guest_memfd(vm, size, 0);
+> -               TEST_ASSERT(fd == -1 && errno == EINVAL,
+> +               fd = __vm_create_guest_memfd(vm, size, guest_memfd_flags);
+> +               TEST_ASSERT(fd < 0 && errno == EINVAL,
+>                             "guest_memfd() with non-page-aligned page size '0x%lx' should fail with EINVAL",
+>                             size);
+>         }
+> -
+> -       for (flag = BIT(0); flag; flag <<= 1) {
+> -               fd = __vm_create_guest_memfd(vm, page_size, flag);
+> -               TEST_ASSERT(fd == -1 && errno == EINVAL,
+> -                           "guest_memfd() with flag '0x%lx' should fail with EINVAL",
+> -                           flag);
+> -       }
+>  }
+>
+>  static void test_create_guest_memfd_multiple(struct kvm_vm *vm)
+> @@ -171,30 +237,82 @@ static void test_create_guest_memfd_multiple(struct kvm_vm *vm)
+>         close(fd1);
+>  }
+>
+> -int main(int argc, char *argv[])
+> +static void test_guest_memfd_flags(struct kvm_vm *vm, uint64_t valid_flags)
+>  {
+> -       size_t page_size;
+> -       size_t total_size;
+> +       size_t page_size = getpagesize();
+> +       uint64_t flag;
+>         int fd;
+> +
+> +       for (flag = BIT(0); flag; flag <<= 1) {
+> +               fd = __vm_create_guest_memfd(vm, page_size, flag);
+> +               if (flag & valid_flags) {
+> +                       TEST_ASSERT(fd >= 0,
+> +                                   "guest_memfd() with flag '0x%lx' should succeed",
+> +                                   flag);
+> +                       close(fd);
+> +               } else {
+> +                       TEST_ASSERT(fd < 0 && errno == EINVAL,
+> +                                   "guest_memfd() with flag '0x%lx' should fail with EINVAL",
+> +                                   flag);
+> +               }
+> +       }
+> +}
+> +
+> +static void test_guest_memfd(unsigned long vm_type)
+> +{
+> +       uint64_t flags = 0;
+>         struct kvm_vm *vm;
+> -
+> -       TEST_REQUIRE(kvm_has_cap(KVM_CAP_GUEST_MEMFD));
+> +       size_t total_size;
+> +       size_t page_size;
+> +       int fd;
+>
+>         page_size = getpagesize();
+>         total_size = page_size * 4;
+>
+> -       vm = vm_create_barebones();
+> +       vm = vm_create_barebones_type(vm_type);
+> +
+> +       if (vm_check_cap(vm, KVM_CAP_GUEST_MEMFD_MMAP))
+> +               flags |= GUEST_MEMFD_FLAG_MMAP;
+>
+> -       test_create_guest_memfd_invalid(vm);
+>         test_create_guest_memfd_multiple(vm);
+> +       test_create_guest_memfd_invalid_sizes(vm, flags, page_size);
+>
+> -       fd = vm_create_guest_memfd(vm, total_size, 0);
+> +       fd = vm_create_guest_memfd(vm, total_size, flags);
+>
+>         test_file_read_write(fd);
+> -       test_mmap(fd, page_size);
+> +
+> +       if (flags & GUEST_MEMFD_FLAG_MMAP) {
+> +               test_mmap_supported(fd, page_size, total_size);
+> +               test_fault_overflow(fd, page_size, total_size);
+> +
+> +       } else {
+> +               test_mmap_not_supported(fd, page_size, total_size);
+> +       }
+> +
+>         test_file_size(fd, page_size, total_size);
+>         test_fallocate(fd, page_size, total_size);
+>         test_invalid_punch_hole(fd, page_size, total_size);
+>
+> +       test_guest_memfd_flags(vm, flags);
+> +
+>         close(fd);
+> +       kvm_vm_free(vm);
+> +}
+> +
+> +int main(int argc, char *argv[])
+> +{
+> +       unsigned long vm_types, vm_type;
+> +
+> +       TEST_REQUIRE(kvm_has_cap(KVM_CAP_GUEST_MEMFD));
+> +
+> +       /*
+> +        * Not all architectures support KVM_CAP_VM_TYPES. However, those that
+> +        * support guest_memfd have that support for the default VM type.
+> +        */
+> +       vm_types = kvm_check_cap(KVM_CAP_VM_TYPES);
+> +       if (!vm_types)
+> +               vm_types = VM_TYPE_DEFAULT;
+> +
+> +       for_each_set_bit(vm_type, &vm_types, BITS_PER_TYPE(vm_types))
+> +               test_guest_memfd(vm_type);
+>  }
+>
+> base-commit: 7f4eb3d4fb58f58b3bbe5ab606c4fec8db3b5a3f
+> --
 
