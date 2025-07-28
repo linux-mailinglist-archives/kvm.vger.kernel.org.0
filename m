@@ -1,151 +1,130 @@
-Return-Path: <kvm+bounces-53567-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53568-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C539B14086
-	for <lists+kvm@lfdr.de>; Mon, 28 Jul 2025 18:42:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B57E3B140BB
+	for <lists+kvm@lfdr.de>; Mon, 28 Jul 2025 18:50:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 100773ACF8B
-	for <lists+kvm@lfdr.de>; Mon, 28 Jul 2025 16:41:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E12C65421FA
+	for <lists+kvm@lfdr.de>; Mon, 28 Jul 2025 16:50:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 831E12750ED;
-	Mon, 28 Jul 2025 16:41:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DD1B274B4D;
+	Mon, 28 Jul 2025 16:50:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B+keFTh/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fq5BMh4o"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93AED218ABD;
-	Mon, 28 Jul 2025 16:41:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 904DB273D6E
+	for <kvm@vger.kernel.org>; Mon, 28 Jul 2025 16:50:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753720903; cv=none; b=IrOANAseTZ078tKj5fGWHYFH5lauqmIoNSsQKk0vLbcRCgSZBEyYr+WYN/tyGSxdgB9dFfcElDMZqqVhMLEQlseMD3aodittTyPFrLvmg34fzmDz9JSoeg3WuALLsO1T7YxqhucjErftKZjsAUU0+k9qW/TZ0knWicKnFpnwNLA=
+	t=1753721430; cv=none; b=mgwnmSe6bYTsF10J5XvRfR+fgGhQSHC8/NXuTeTFlqt+GXijdx4NWFqtHoJsSxxD5zbBxFCD8lOjYNVaj4No2nX1EChMyk+hzENCKXVM6yEdbAHwojZGsCipqTEOzmcCpM0Dv4oyt4jZ6uToQge5dYq/aVmh/aNsJ1qGfvw0HlI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753720903; c=relaxed/simple;
-	bh=7x0ZgIgFMhmGblvNn1rp9l0J3jLs/NKo357QqFEU40c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dBOknKt0Tlyw0y72pRRvVlIzOqUJ9DSEwXjKByOC0FHLakpzUXRv+G2hj36n3Anep9plgnL5wufoFfMHOBQzqITVoB4Xiy5jGob0pPwnPbkS+Ml2K5p+S2S66AhnPiwpcUAVsi+IZmqhlhjMby7g+2k2oGD303Cu+BMA46qivKA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B+keFTh/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51E4FC4CEE7;
-	Mon, 28 Jul 2025 16:41:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753720902;
-	bh=7x0ZgIgFMhmGblvNn1rp9l0J3jLs/NKo357QqFEU40c=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=B+keFTh/H3uyJm+2CRXywKicPx1XFBBkxeKmrZZbdSdo7TbhwSKWM+9PVaAkV/Ggd
-	 rdbs8jBkHbT/8OTgeGMPL4gfUOW2ABlcD8WUcg8AnFQUJTXwNmVXpc6MVeqX+1gX/B
-	 Hl4YyyFNqJKjrMehvwoAGQununhgEiDlRgPJ4pHhRsT2e9nnS0dUD7g029zGYqMvz0
-	 +n1X/yXScSmTwLjOGstVCV5NVXNowOdBanEpgP5gJZIZzUwp2PqhdbrI1ndD1ANzQ6
-	 U3SK+z5/iiu7H8t8oy3Nyrh+r+SHqvFdQXzv1CHbtq87l4SZmHe8/P8OoUYzv0vSLF
-	 T/9RjFtCR33XQ==
-Date: Mon, 28 Jul 2025 19:41:36 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Logan Gunthorpe <logang@deltatee.com>
-Cc: Jason Gunthorpe <jgg@nvidia.com>, Christoph Hellwig <hch@lst.de>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
-	Jens Axboe <axboe@kernel.dk>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-	linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
-	linux-mm@kvack.org, linux-pci@vger.kernel.org,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Vivek Kasireddy <vivek.kasireddy@intel.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 05/10] PCI/P2PDMA: Export pci_p2pdma_map_type() function
-Message-ID: <20250728164136.GD402218@unreal>
-References: <cover.1753274085.git.leonro@nvidia.com>
- <82e62eb59afcd39b68ae143573d5ed113a92344e.1753274085.git.leonro@nvidia.com>
- <20250724080313.GA31887@lst.de>
- <20250724081321.GT402218@unreal>
- <b32ae619-6c4a-46fc-a368-6ad4e245d581@deltatee.com>
- <20250727190514.GG7551@nvidia.com>
- <d69e0d74-285e-4cde-a2e4-a803accfa9e1@deltatee.com>
+	s=arc-20240116; t=1753721430; c=relaxed/simple;
+	bh=krd6Kt/L5G0L6bxrRwfmRWwoqSRe3HGaFQKVpx631I4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NOTF1WP5fBpxd0RQxtMOCkmJ4SrVHi0p7VwD5YQEepWQOMXqoo9tQb6uMDPAVuHGsBwLEbpofwmONadDUFMgXXdN6fsbm/Wt4qSUMaeTGlksWqNMuSaRjz9OYbKuT1ftz/FVR13GlkEC4fcchUclcTx7i3L5lWGkUA8B5bFvxEw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fq5BMh4o; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1753721426;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=krd6Kt/L5G0L6bxrRwfmRWwoqSRe3HGaFQKVpx631I4=;
+	b=fq5BMh4oRwRA73VmaNkFYuXBHj/QuSUBOqBdBhaH9gnDKPzprrExtY3VVQXJu/YO8hWuXL
+	o9Oy89NHtdtH5Cv1+xvRhmfoVC+ix1JlTG0t+4xEURwQtRudTP99KTDjzWJBmv1GXHFGTa
+	hiNLcjnH7CYkuwm7bicC4x54W8Vc5OE=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-59-tmojtVXaNPmqPPCoLOH67w-1; Mon, 28 Jul 2025 12:50:24 -0400
+X-MC-Unique: tmojtVXaNPmqPPCoLOH67w-1
+X-Mimecast-MFC-AGG-ID: tmojtVXaNPmqPPCoLOH67w_1753721424
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3b783265641so1663831f8f.1
+        for <kvm@vger.kernel.org>; Mon, 28 Jul 2025 09:50:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753721423; x=1754326223;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=krd6Kt/L5G0L6bxrRwfmRWwoqSRe3HGaFQKVpx631I4=;
+        b=tb2nzFwMvihMArjoPbxbEVbf6+whcVRrv/qXvpW8ch7lkJqCE/47SkDg4eEFFKldpy
+         orh+KfgH3i+kknxjuce3UUuy9qX/I8opJIbN4ORedK5iqCI6xufHKMt5rocg1yWaX+1I
+         bGfh08jCzkjhbZoIe60Vi0c1LG9z+bBHoyJUKhPqt/liqLqThOIhOofZ/6G2z+YIwort
+         rbZdlajRYp77xy17DOk/3FScnrD11CW+U4LBDSvgo7W8ntxOXcUZqk8NdCCBV2+9Duf1
+         IWvm40SjelHQtU9mV4g1/y9USnKlSIowpORo1/sDniYtUWJhhlwy7BFWZtfQ2raZU1IO
+         y0rg==
+X-Forwarded-Encrypted: i=1; AJvYcCWQejnmMhnTkF7/i6ls6pQTCLBWtddAZvr6IhO9gcHf+FuxC/N9dfm8lulVPbz+/YhPU7I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YysWl23e4cS6fvMJLAvBYMnJNxpuRsj+uKeGn2AXwXhv1dc/1Zl
+	GZOKt/2wcIE2OERzUNZW3e1ulSvv/OKH667oTUOko0i0ieU42HQp+OciYV+WA25hUbik+AfZV2i
+	pa3LVVNptb56+XZA6eus4vCYRuDNplXnrXzxG0Z5uDjryih04nkywvKI43yXWeyvxy+svJiDjp+
+	OldFov0ZEdK4SgD48UvHb7FwrV5CjI
+X-Gm-Gg: ASbGnctixTkr273eWQGCgEhlCyzSj6p/18h3YhycdjKYWSEYBM4OoAkj0A0QZ5TNMxZ
+	r0WDL9T9P0SmPayQZJMMf2CYL0ZH3KQ5TXQuxtdWuPhSRERunqk93WhQZnLxqpKJG/jJ+SB1ILG
+	qEK06vtkTnNTWSvWvhT5JFJA==
+X-Received: by 2002:a05:6000:2289:b0:3b4:65d4:8e27 with SMTP id ffacd0b85a97d-3b77664284dmr8049086f8f.29.1753721423483;
+        Mon, 28 Jul 2025 09:50:23 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF9AiNoGh1fFHMtVXbzZwnzqr6JNT8EGrYNFrd7vLtXR4YXPbw8TBf9CBFH0MTT1XEnkoJVr47qarAG9eP/TTs=
+X-Received: by 2002:a05:6000:2289:b0:3b4:65d4:8e27 with SMTP id
+ ffacd0b85a97d-3b77664284dmr8049066f8f.29.1753721423075; Mon, 28 Jul 2025
+ 09:50:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d69e0d74-285e-4cde-a2e4-a803accfa9e1@deltatee.com>
+References: <CAAhSdy12xtRRem-AybfymGHh+sj4qSDDG0XL6M6as=cD5Y2tkA@mail.gmail.com>
+ <CABgObfYEgf9mTLWByDJeqDT+2PukVn3x2S0gu4TZQP6u5dCtoQ@mail.gmail.com>
+ <CAAhSdy3Jr1-8TVcEhiCUrc-DHQSTPE1RjF--marQPtcV6FPjJA@mail.gmail.com>
+ <CABgObfaDkfUa+=Dthqx_ZFy418KLFkqy2+tKLaGEZmbZ6SbhBA@mail.gmail.com> <CAK9=C2VamSz4ySKc6JKjrLv9ugcTOONAL4+NmKAexoUgw7kP6w@mail.gmail.com>
+In-Reply-To: <CAK9=C2VamSz4ySKc6JKjrLv9ugcTOONAL4+NmKAexoUgw7kP6w@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Mon, 28 Jul 2025 18:50:10 +0200
+X-Gm-Features: Ac12FXzkdtm88_4dk2KzyvFSOMEmlVWQkf5aJBT83D16EQ1ktTyFz-doPwtE5M4
+Message-ID: <CABgObfZu2fPFaSy2EHzpD_MUwYYeYMfz6BfXmTw_h3ob1q2=yg@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM/riscv changes for 6.17
+To: Anup Patel <apatel@ventanamicro.com>
+Cc: Anup Patel <anup@brainfault.org>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Andrew Jones <ajones@ventanamicro.com>, Atish Patra <atishp@rivosinc.com>, 
+	Atish Patra <atish.patra@linux.dev>, 
+	"open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" <kvm-riscv@lists.infradead.org>, KVM General <kvm@vger.kernel.org>, 
+	linux-riscv <linux-riscv@lists.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Jul 28, 2025 at 10:12:31AM -0600, Logan Gunthorpe wrote:
-> 
-> 
-> On 2025-07-27 13:05, Jason Gunthorpe wrote:
-> > On Fri, Jul 25, 2025 at 10:30:46AM -0600, Logan Gunthorpe wrote:
-> >>
-> >>
-> >> On 2025-07-24 02:13, Leon Romanovsky wrote:
-> >>> On Thu, Jul 24, 2025 at 10:03:13AM +0200, Christoph Hellwig wrote:
-> >>>> On Wed, Jul 23, 2025 at 04:00:06PM +0300, Leon Romanovsky wrote:
-> >>>>> From: Leon Romanovsky <leonro@nvidia.com>
-> >>>>>
-> >>>>> Export the pci_p2pdma_map_type() function to allow external modules
-> >>>>> and subsystems to determine the appropriate mapping type for P2PDMA
-> >>>>> transfers between a provider and target device.
-> >>>>
-> >>>> External modules have no business doing this.
-> >>>
-> >>> VFIO PCI code is built as module. There is no way to access PCI p2p code
-> >>> without exporting functions in it.
-> >>
-> >> The solution that would make more sense to me would be for either
-> >> dma_iova_try_alloc() or another helper in dma-iommu.c to handle the
-> >> P2PDMA case.
-> > 
-> > This has nothing to do with dma-iommu.c, the decisions here still need
-> > to be made even if dma-iommu.c is not compiled in.
-> 
-> Doesn't it though? Every single call in patch 10 to the newly exported
-> PCI functions calls into the the dma-iommu functions. If there were
-> non-iommu paths then I would expect the code would use the regular DMA
-> api directly which would then call in to dma-iommu.
+Il lun 28 lug 2025, 18:21 Anup Patel <apatel@ventanamicro.com> ha scritto:
+>
+> Currently, userspace only has a way to enable/disable the entire
+> SBI FWFT extension. We definitely need to extend ONE_REG
+> interface to allow userspace save/restore SBI FWFT state. I am
+> sure this will happen pretty soon (probably next merge window).
+>
+> At the moment, I am not sure whether userspace also needs a
+> way to enable/disable individual features of SBI FWFT extension.
+> What do you think ?
 
-If p2p type is PCI_P2PDMA_MAP_BUS_ADDR, there will no dma-iommu and DMA
-at all.
+Yes, you do. FWFT extensions are equivalent to CPU extensions. But all
+this should have been done before including Clement's work. Without it
+userspace has no way to support FWFT.
 
-+static int vfio_pci_dma_buf_attach(struct dma_buf *dmabuf,
-+				   struct dma_buf_attachment *attachment)
-+{
-+	struct vfio_pci_dma_buf *priv = dmabuf->priv;
-+
-+	if (!attachment->peer2peer)
-+		return -EOPNOTSUPP;
-+
-+	if (priv->revoked)
-+		return -ENODEV;
-+
-+	switch (pci_p2pdma_map_type(priv->vdev->provider, attachment->dev)) {
-+	case PCI_P2PDMA_MAP_THRU_HOST_BRIDGE:
-+		break;
-+	case PCI_P2PDMA_MAP_BUS_ADDR:
-+		/*
-+		 * There is no need in IOVA at all for this flow.
-+		 * We rely on attachment->priv == NULL as a marker
-+		 * for this mode.
-+		 */
-+		return 0;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	attachment->priv = kzalloc(sizeof(struct dma_iova_state), GFP_KERNEL);
-+	if (!attachment->priv)
-+		return -ENOMEM;
-+
-+	dma_iova_try_alloc(attachment->dev, attachment->priv, 0, priv->phys_vec.len);
-+	return 0;
-+}
+Drew, I see you have Reviewed-by on the patches; please keep an eye on
+this stuff.
+
+Can you respin with the fix to the SoB line and no FWFT support?
+
+Thanks,
+
+Paolo
+
+>
+> Regards,
+> Anup
+>
+
 
