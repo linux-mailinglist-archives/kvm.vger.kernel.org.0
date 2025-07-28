@@ -1,448 +1,173 @@
-Return-Path: <kvm+bounces-53547-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53548-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A7FCB13D1E
-	for <lists+kvm@lfdr.de>; Mon, 28 Jul 2025 16:28:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0E6FB13DCD
+	for <lists+kvm@lfdr.de>; Mon, 28 Jul 2025 17:01:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E68BD3A9CB5
-	for <lists+kvm@lfdr.de>; Mon, 28 Jul 2025 14:27:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D590A3BEAF6
+	for <lists+kvm@lfdr.de>; Mon, 28 Jul 2025 15:01:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F7A626FD9D;
-	Mon, 28 Jul 2025 14:27:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43A092163B2;
+	Mon, 28 Jul 2025 15:01:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="chqbFK3F"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Cth6wNu2"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F9CB26D4F9
-	for <kvm@vger.kernel.org>; Mon, 28 Jul 2025 14:27:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7AF91EDA0B
+	for <kvm@vger.kernel.org>; Mon, 28 Jul 2025 15:01:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753712860; cv=none; b=ugZ06+HokBPm7kUop80H/qYpxXNG2qj01Lyfp1XYf4xQ2RMfFcbABjY8FQCEIPRoHKqlyQXyaOl5CNxXvhaztDQWeVJGZzraW5YBxkYRVIecRlddvUniAhpL9xy2hRJnQxH7lh69cbm3tKloxzDHYb0ldVxmtuaXhzcwXmp4CEU=
+	t=1753714898; cv=none; b=KWCsfD6bE9IWS6qmN77vq32yz7caV5Uo9+9nKbfq/4Nh7KtR1e4zrCnJIfC9TT9DvMYWPtztIZxKzOhekXFc6IC2Wn9hYyX8G0xGi0OlHU0NdQIWEP1Lzf3TMtXqLxir++Yvt/UMXbVUvXoAI/1I2yVkafh6qEvAfZUNdky/5wk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753712860; c=relaxed/simple;
-	bh=FIz6tbF/4zKwYvK+Wffv/9PVUBHzSHp35+pYXD4XPIk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hzouCy+Gu8CY7JJhRtC2mMTpwr0+zrSgwsWQsaRLN9lDHBrgrKzpU88WL7AoZz8xHUbsIoqZvIFvKaEFbUv1WAREgvvwBhM0LkItO2GEt2oXGO+svKgsVz8PZZ24ADE+xL/e8eAac3vFCh05RPpy8Z8cqm/qYEAjH0/gWIYXIoo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=chqbFK3F; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1753714898; c=relaxed/simple;
+	bh=7q+mdCrRUK3a2L+JV4AdQKnbAn1qhQ+pM8C1q91YFSA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lXFvjy9MQGg5rqfDHsPNW2Ps0mA8MQ+GihQ3M1R838i1PUiX0/N6Kwpgxbcplc1DANqqYpMgiFE7AWYbfuNu0Im0df/bIezKUFKUyTCIU6Wupp/gbEPD/7lFaJp9fzQkatb1GYkoBeev43zJD4jwhWNh21Clw2Qp4EGhR/lSF8Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Cth6wNu2; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1753712857;
+	s=mimecast20190719; t=1753714893;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pWJrD4sOtOT78I0bCqmI6Q0ItpmaIPlep/EDqa/nXBg=;
-	b=chqbFK3FAh0688DOZDIOsZrSDrQT5Hy43L6hRW49zbzW+3g8OXspJvEBAnq2CLxNcDkz8g
-	SM84iqp2QVJmJvN/j6AVteDy6MFXnJF2/8abuJhOQhBOk2S5jf36ioWphCjgzKg7gCB1Er
-	S1spuzEOU+VRC19j1SYqTm/mRj6kT6U=
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
- [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=hoGkAxXm1foHj6xWm9XsuRD1wB+xNHCnssMNSYurlvY=;
+	b=Cth6wNu231YSSQXCToECF5Q//uDz4iEIBRPRZaksE0E3a3r6zorgsnUSIA30w3KkgQLbqe
+	nr36zqsrDpoHxSYgkrTA92+A7/WZNqReW2/RItI2MFl7z17+V6t3VfbQ8UYiN0NlmtLXoJ
+	nTCUtILenM6OwSugeNIt7jnNiTw/lss=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-619-IhIMkYSsPXy-l8RLXCitig-1; Mon, 28 Jul 2025 10:27:35 -0400
-X-MC-Unique: IhIMkYSsPXy-l8RLXCitig-1
-X-Mimecast-MFC-AGG-ID: IhIMkYSsPXy-l8RLXCitig_1753712855
-Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-313d346dc8dso7700455a91.1
-        for <kvm@vger.kernel.org>; Mon, 28 Jul 2025 07:27:35 -0700 (PDT)
+ us-mta-98-XcMlKCJ_M1C19g-THbqDQQ-1; Mon, 28 Jul 2025 11:01:27 -0400
+X-MC-Unique: XcMlKCJ_M1C19g-THbqDQQ-1
+X-Mimecast-MFC-AGG-ID: XcMlKCJ_M1C19g-THbqDQQ_1753714884
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3b7812e887aso1065812f8f.2
+        for <kvm@vger.kernel.org>; Mon, 28 Jul 2025 08:01:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753712855; x=1754317655;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pWJrD4sOtOT78I0bCqmI6Q0ItpmaIPlep/EDqa/nXBg=;
-        b=KBQqje5b5HX/g/fnVXrCM5aRrd7wUZ8dSTqNWoUQoGQcjM1kMoEIC9aZSWi3A1IM9c
-         Gu+3MiO/PuTAxXNDNgHKvdNCKZr+UGmRCqAaiPs6psoD6ccvCqSxx0Wa5eGNlRRBmYLX
-         9SKm6d1Z0mYQgWIFa1l/7OuNXj8VM4uqN50/hhJuEfL/9pBB3REZETWfAhvrS1WDcHab
-         K4lLGfv6JuKCzbJ7I7rUkVHToJM+HxDpQpKmv2AGSR9VgibMEGqIniPflS8uGisiQV/4
-         bDhQX0fD6Tx5dNfVyQThmDBX28FZNFgMFeHp5qHApJjm+se+fdXxpG9QhgRYxo2bnzLJ
-         DAXw==
-X-Forwarded-Encrypted: i=1; AJvYcCXlVyuJiT/sXJNqlOlr/SInXN5Sl0cnzDtJS+ISEpOc4+Ft7pIxmiT9j6XopxntBIN4H70=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz+rgV1veC7hTutTUpsjOVFW52aBNnc6acPJ36Qe6quROHVflH7
-	ix5XPAxgupOLy/Ag28B71aRvvS6bme5H/0ITFZuQlmK8krnrxThC4ze1bnUiVjernMWQ+RnJZth
-	raoF6RE4NBKq9uWVQBs8vj15vu/UhYTSaGrt3PtWyQ6Skn1L+F71hmZFyCTnoZBZTbmChLY+ygd
-	eY3R9GJVQQ9ucETLnrog+2+g7JhKC5
-X-Gm-Gg: ASbGnctaS7Co1VtCpX99WJFKRjpwyE9XQFgW+9wH+rC91LRuCJnC+K8XfBZo02k7EVN
-	d2xv9+tzZsD/gPJCnDklbCas0j+cLVjEAahpj2gMYSBgcHA/voaZgue68jKY11UhYZcnGBNo79T
-	Fm9i6FKVZP4ZHxaaqB/IYk
-X-Received: by 2002:a17:90b:4f46:b0:31f:3c3:947c with SMTP id 98e67ed59e1d1-31f03c395camr3237817a91.10.1753712854596;
-        Mon, 28 Jul 2025 07:27:34 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEq0NOPfenE+AwlEIxYIR7tX4RNIhhvrLhaR0YjnMFL5P+k6b8VHjPuy4E6vWNbGei3GliqSTc0RpqEkI/k0fw=
-X-Received: by 2002:a17:90b:4f46:b0:31f:3c3:947c with SMTP id
- 98e67ed59e1d1-31f03c395camr3237763a91.10.1753712853953; Mon, 28 Jul 2025
- 07:27:33 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1753714884; x=1754319684;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hoGkAxXm1foHj6xWm9XsuRD1wB+xNHCnssMNSYurlvY=;
+        b=QeXjPiTKoMU+BvPf0ZYkxbcdQFWs6rBknzWr12O2a/1jIGPxvH4YwuXAXYfViyWcRQ
+         l0qLydCpgynQgbdLQsD6xoMKxi6XkeI6AVO9Rp9XyVsYJ3sRfuXc+Mr+DcQLhkg1FOfl
+         +xAnUeJq4N+yjy1VL2NNfHWsXU2O985+62xIp/bBMGSllv+6mXILpVGwMP3WIYWc57Z/
+         a/i3ooKOECyJFerUnHvwKnR8pPsx5FJ6dM8CNkgRqZfF04TP3TmU80pI0XYnNYq7c8Ld
+         YiFa+ky3ar2WICj+i5PCp1OttI8TQQae7ghxM87VvwjmIVd/+BfCpJeK8kiIoGoiX9Cs
+         TdmA==
+X-Forwarded-Encrypted: i=1; AJvYcCWMX1XwSvbRREEGpFHBeR0Qn4Dtxa43XMPGhofuBTs2Ma1o87sdr5pMmyfZW5I8QdizuiI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyVFvY4dDPoziNuJuIyimOQM+QOxLzjOwA49ITm2LYgLhoOqQS3
+	ZIDkDAw0e1XkBLmQdDJpFccnQgN9qWEHQGghzcUZXOrx49TQV3i7+zVok0kSztPxFvIl/oCZa3x
+	qL1c1XFchY7GPzqH4MDttC5wltX0TgvnqY1wVK3VNh+m+ZYKvo7ZJ9A==
+X-Gm-Gg: ASbGncsXlbhXQlQR4ADvUnTAUJGXFLywf1u7H/C/h1v/WMj7dhRZ95BoBhbz+znPl08
+	0mlEBoMvKHl4TBJRLbBiZwZwq2Wo06WXguJxLx87EJn0m2AWLohN4K7OtWW//7PUoeY1TZ7oEyJ
+	Saoh7uzpx8QX7BPCz8ELLLmVAM1XNFmOsWri/89yxVsuDLMQk3b1xAAptWECj8FIFsmknrhTOhA
+	sPTFmq+Xjxk3SLFYfPcZdk/ATC5e4ld6YL9S6gXILIHdbgZ2CvgtlI8As4g+Tt7zHhGa2lhy7ps
+	bUweIK9GlLjVL7k7uOr27Uehjkfi/gnT1IT5aLw5zxAkXQovnZZgFyLX1G+jZU2Ajyklt2ev4Ch
+	syOHo
+X-Received: by 2002:a05:6000:2013:b0:3a4:eef9:818a with SMTP id ffacd0b85a97d-3b776645908mr9420575f8f.27.1753714882259;
+        Mon, 28 Jul 2025 08:01:22 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFd7yVm4QGCNzRqYrPivqsW5+pncr7pQjlQLfbdFwZvxJAkgI4Xd9pNJtfXTFIlg0QxgQUxmg==
+X-Received: by 2002:a05:6000:2013:b0:3a4:eef9:818a with SMTP id ffacd0b85a97d-3b776645908mr9420488f8f.27.1753714881418;
+        Mon, 28 Jul 2025 08:01:21 -0700 (PDT)
+Received: from [192.168.0.6] (ltea-047-064-113-169.pools.arcor-ip.net. [47.64.113.169])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b7816e3641sm7311451f8f.73.2025.07.28.08.01.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 28 Jul 2025 08:01:20 -0700 (PDT)
+Message-ID: <f0845cc1-7fd9-48b8-8925-af12b6166edc@redhat.com>
+Date: Mon, 28 Jul 2025 17:01:17 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250714084755.11921-1-jasowang@redhat.com> <20250714084755.11921-3-jasowang@redhat.com>
-In-Reply-To: <20250714084755.11921-3-jasowang@redhat.com>
-From: Eugenio Perez Martin <eperezma@redhat.com>
-Date: Mon, 28 Jul 2025 16:26:56 +0200
-X-Gm-Features: Ac12FXx3yPOz5-IObuxoTbOiDP301Ft2YtXt7fINo6iR8-0FWHKBtt29lQ7Bmmc
-Message-ID: <CAJaqyWfJQEdXg=5Nj=fBj_nRj4RogeeO8LAp3dAkSAyXhMN0Kw@mail.gmail.com>
-Subject: Re: [PATCH net-next V2 2/3] vhost: basic in order support
-To: Jason Wang <jasowang@redhat.com>
-Cc: mst@redhat.com, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, jonah.palmer@oracle.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] arch/x86/kvm/ioapic: Remove license boilerplate with bad
+ FSF address
+To: "Marc-Etienne Vargenau (Nokia)" <marc-etienne.vargenau@nokia.com>,
+ Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+ Dave Hansen <dave.hansen@linux.intel.com>, "x86@kernel.org"
+ <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-spdx@vger.kernel.org" <linux-spdx@vger.kernel.org>
+References: <20250728141540.296816-1-thuth@redhat.com>
+ <PR3PR07MB81837F4778329A2270CC9318AC5AA@PR3PR07MB8183.eurprd07.prod.outlook.com>
+From: Thomas Huth <thuth@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=thuth@redhat.com; keydata=
+ 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
+In-Reply-To: <PR3PR07MB81837F4778329A2270CC9318AC5AA@PR3PR07MB8183.eurprd07.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jul 14, 2025 at 10:48=E2=80=AFAM Jason Wang <jasowang@redhat.com> w=
-rote:
->
-> This patch adds basic in order support for vhost. Two optimizations
-> are implemented in this patch:
->
-> 1) Since driver uses descriptor in order, vhost can deduce the next
->    avail ring head by counting the number of descriptors that has been
->    used in next_avail_head. This eliminate the need to access the
->    available ring in vhost.
->
-> 2) vhost_add_used_and_singal_n() is extended to accept the number of
->    batched buffers per used elem. While this increases the times of
->    userspace memory access but it helps to reduce the chance of
->    used ring access of both the driver and vhost.
->
-> Vhost-net will be the first user for this.
->
-> Acked-by: Jonah Palmer <jonah.palmer@oracle.com>
+On 28/07/2025 16.59, Marc-Etienne Vargenau (Nokia) wrote:
+> Hello,
+> 
+> That should be:
+> 
+> // SPDX-License-Identifier: LGPL-2.1-or-later
+> 
+> not
+> 
+> // SPDX-License-Identifier: LGPL-2.1+
+> 
+> « LGPL-2.1+ » is deprecated
 
-Acked-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
+Ah, stupid me, I copied it from the wrong file! Thanks for the hint, I'll 
+send a v2!
 
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
-> ---
->  drivers/vhost/net.c   |   6 ++-
->  drivers/vhost/vhost.c | 120 ++++++++++++++++++++++++++++++++++--------
->  drivers/vhost/vhost.h |   8 ++-
->  3 files changed, 109 insertions(+), 25 deletions(-)
->
-> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> index 9dbd88eb9ff4..2199ba3b191e 100644
-> --- a/drivers/vhost/net.c
-> +++ b/drivers/vhost/net.c
-> @@ -374,7 +374,8 @@ static void vhost_zerocopy_signal_used(struct vhost_n=
-et *net,
->         while (j) {
->                 add =3D min(UIO_MAXIOV - nvq->done_idx, j);
->                 vhost_add_used_and_signal_n(vq->dev, vq,
-> -                                           &vq->heads[nvq->done_idx], ad=
-d);
-> +                                           &vq->heads[nvq->done_idx],
-> +                                           NULL, add);
->                 nvq->done_idx =3D (nvq->done_idx + add) % UIO_MAXIOV;
->                 j -=3D add;
->         }
-> @@ -457,7 +458,8 @@ static void vhost_net_signal_used(struct vhost_net_vi=
-rtqueue *nvq)
->         if (!nvq->done_idx)
->                 return;
->
-> -       vhost_add_used_and_signal_n(dev, vq, vq->heads, nvq->done_idx);
-> +       vhost_add_used_and_signal_n(dev, vq, vq->heads, NULL,
-> +                                   nvq->done_idx);
->         nvq->done_idx =3D 0;
->  }
->
-> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> index d1d3912f4804..dd7963eb6cf0 100644
-> --- a/drivers/vhost/vhost.c
-> +++ b/drivers/vhost/vhost.c
-> @@ -364,6 +364,7 @@ static void vhost_vq_reset(struct vhost_dev *dev,
->         vq->avail =3D NULL;
->         vq->used =3D NULL;
->         vq->last_avail_idx =3D 0;
-> +       vq->next_avail_head =3D 0;
->         vq->avail_idx =3D 0;
->         vq->last_used_idx =3D 0;
->         vq->signalled_used =3D 0;
-> @@ -455,6 +456,8 @@ static void vhost_vq_free_iovecs(struct vhost_virtque=
-ue *vq)
->         vq->log =3D NULL;
->         kfree(vq->heads);
->         vq->heads =3D NULL;
-> +       kfree(vq->nheads);
-> +       vq->nheads =3D NULL;
->  }
->
->  /* Helper to allocate iovec buffers for all vqs. */
-> @@ -472,7 +475,9 @@ static long vhost_dev_alloc_iovecs(struct vhost_dev *=
-dev)
->                                         GFP_KERNEL);
->                 vq->heads =3D kmalloc_array(dev->iov_limit, sizeof(*vq->h=
-eads),
->                                           GFP_KERNEL);
-> -               if (!vq->indirect || !vq->log || !vq->heads)
-> +               vq->nheads =3D kmalloc_array(dev->iov_limit, sizeof(*vq->=
-nheads),
-> +                                          GFP_KERNEL);
-> +               if (!vq->indirect || !vq->log || !vq->heads || !vq->nhead=
-s)
->                         goto err_nomem;
->         }
->         return 0;
-> @@ -1990,14 +1995,15 @@ long vhost_vring_ioctl(struct vhost_dev *d, unsig=
-ned int ioctl, void __user *arg
->                         break;
->                 }
->                 if (vhost_has_feature(vq, VIRTIO_F_RING_PACKED)) {
-> -                       vq->last_avail_idx =3D s.num & 0xffff;
-> +                       vq->next_avail_head =3D vq->last_avail_idx =3D
-> +                                             s.num & 0xffff;
->                         vq->last_used_idx =3D (s.num >> 16) & 0xffff;
->                 } else {
->                         if (s.num > 0xffff) {
->                                 r =3D -EINVAL;
->                                 break;
->                         }
-> -                       vq->last_avail_idx =3D s.num;
-> +                       vq->next_avail_head =3D vq->last_avail_idx =3D s.=
-num;
->                 }
->                 /* Forget the cached index value. */
->                 vq->avail_idx =3D vq->last_avail_idx;
-> @@ -2590,11 +2596,12 @@ int vhost_get_vq_desc(struct vhost_virtqueue *vq,
->                       unsigned int *out_num, unsigned int *in_num,
->                       struct vhost_log *log, unsigned int *log_num)
->  {
-> +       bool in_order =3D vhost_has_feature(vq, VIRTIO_F_IN_ORDER);
->         struct vring_desc desc;
->         unsigned int i, head, found =3D 0;
->         u16 last_avail_idx =3D vq->last_avail_idx;
->         __virtio16 ring_head;
-> -       int ret, access;
-> +       int ret, access, c =3D 0;
->
->         if (vq->avail_idx =3D=3D vq->last_avail_idx) {
->                 ret =3D vhost_get_avail_idx(vq);
-> @@ -2605,17 +2612,21 @@ int vhost_get_vq_desc(struct vhost_virtqueue *vq,
->                         return vq->num;
->         }
->
-> -       /* Grab the next descriptor number they're advertising, and incre=
-ment
-> -        * the index we've seen. */
-> -       if (unlikely(vhost_get_avail_head(vq, &ring_head, last_avail_idx)=
-)) {
-> -               vq_err(vq, "Failed to read head: idx %d address %p\n",
-> -                      last_avail_idx,
-> -                      &vq->avail->ring[last_avail_idx % vq->num]);
-> -               return -EFAULT;
-> +       if (in_order)
-> +               head =3D vq->next_avail_head & (vq->num - 1);
-> +       else {
-> +               /* Grab the next descriptor number they're
-> +                * advertising, and increment the index we've seen. */
-> +               if (unlikely(vhost_get_avail_head(vq, &ring_head,
-> +                                                 last_avail_idx))) {
-> +                       vq_err(vq, "Failed to read head: idx %d address %=
-p\n",
-> +                               last_avail_idx,
-> +                               &vq->avail->ring[last_avail_idx % vq->num=
-]);
-> +                       return -EFAULT;
-> +               }
-> +               head =3D vhost16_to_cpu(vq, ring_head);
->         }
->
-> -       head =3D vhost16_to_cpu(vq, ring_head);
-> -
->         /* If their number is silly, that's an error. */
->         if (unlikely(head >=3D vq->num)) {
->                 vq_err(vq, "Guest says index %u > %u is available",
-> @@ -2658,6 +2669,7 @@ int vhost_get_vq_desc(struct vhost_virtqueue *vq,
->                                                 "in indirect descriptor a=
-t idx %d\n", i);
->                                 return ret;
->                         }
-> +                       ++c;
->                         continue;
->                 }
->
-> @@ -2693,10 +2705,12 @@ int vhost_get_vq_desc(struct vhost_virtqueue *vq,
->                         }
->                         *out_num +=3D ret;
->                 }
-> +               ++c;
->         } while ((i =3D next_desc(vq, &desc)) !=3D -1);
->
->         /* On success, increment avail index. */
->         vq->last_avail_idx++;
-> +       vq->next_avail_head +=3D c;
->
->         /* Assume notifications from guest are disabled at this point,
->          * if they aren't we would need to update avail_event index. */
-> @@ -2720,8 +2734,9 @@ int vhost_add_used(struct vhost_virtqueue *vq, unsi=
-gned int head, int len)
->                 cpu_to_vhost32(vq, head),
->                 cpu_to_vhost32(vq, len)
->         };
-> +       u16 nheads =3D 1;
->
-> -       return vhost_add_used_n(vq, &heads, 1);
-> +       return vhost_add_used_n(vq, &heads, &nheads, 1);
->  }
->  EXPORT_SYMBOL_GPL(vhost_add_used);
->
-> @@ -2757,10 +2772,9 @@ static int __vhost_add_used_n(struct vhost_virtque=
-ue *vq,
->         return 0;
->  }
->
-> -/* After we've used one of their buffers, we tell them about it.  We'll =
-then
-> - * want to notify the guest, using eventfd. */
-> -int vhost_add_used_n(struct vhost_virtqueue *vq, struct vring_used_elem =
-*heads,
-> -                    unsigned count)
-> +static int vhost_add_used_n_ooo(struct vhost_virtqueue *vq,
-> +                               struct vring_used_elem *heads,
-> +                               unsigned count)
->  {
->         int start, n, r;
->
-> @@ -2773,7 +2787,69 @@ int vhost_add_used_n(struct vhost_virtqueue *vq, s=
-truct vring_used_elem *heads,
->                 heads +=3D n;
->                 count -=3D n;
->         }
-> -       r =3D __vhost_add_used_n(vq, heads, count);
-> +       return __vhost_add_used_n(vq, heads, count);
-> +}
-> +
-> +static int vhost_add_used_n_in_order(struct vhost_virtqueue *vq,
-> +                                    struct vring_used_elem *heads,
-> +                                    const u16 *nheads,
-> +                                    unsigned count)
-> +{
-> +       vring_used_elem_t __user *used;
-> +       u16 old, new =3D vq->last_used_idx;
-> +       int start, i;
-> +
-> +       if (!nheads)
-> +               return -EINVAL;
-> +
-> +       start =3D vq->last_used_idx & (vq->num - 1);
-> +       used =3D vq->used->ring + start;
-> +
-> +       for (i =3D 0; i < count; i++) {
-> +               if (vhost_put_used(vq, &heads[i], start, 1)) {
-> +                       vq_err(vq, "Failed to write used");
-> +                       return -EFAULT;
-> +               }
-> +               start +=3D nheads[i];
-> +               new +=3D nheads[i];
-> +               if (start >=3D vq->num)
-> +                       start -=3D vq->num;
-> +       }
-> +
-> +       if (unlikely(vq->log_used)) {
-> +               /* Make sure data is seen before log. */
-> +               smp_wmb();
-> +               /* Log used ring entry write. */
-> +               log_used(vq, ((void __user *)used - (void __user *)vq->us=
-ed),
-> +                        (vq->num - start) * sizeof *used);
-> +               if (start + count > vq->num)
-> +                       log_used(vq, 0,
-> +                                (start + count - vq->num) * sizeof *used=
-);
-> +       }
-> +
-> +       old =3D vq->last_used_idx;
-> +       vq->last_used_idx =3D new;
-> +       /* If the driver never bothers to signal in a very long while,
-> +        * used index might wrap around. If that happens, invalidate
-> +        * signalled_used index we stored. TODO: make sure driver
-> +        * signals at least once in 2^16 and remove this. */
-> +       if (unlikely((u16)(new - vq->signalled_used) < (u16)(new - old)))
-> +               vq->signalled_used_valid =3D false;
-> +       return 0;
-> +}
-> +
-> +/* After we've used one of their buffers, we tell them about it.  We'll =
-then
-> + * want to notify the guest, using eventfd. */
-> +int vhost_add_used_n(struct vhost_virtqueue *vq, struct vring_used_elem =
-*heads,
-> +                    u16 *nheads, unsigned count)
-> +{
-> +       bool in_order =3D vhost_has_feature(vq, VIRTIO_F_IN_ORDER);
-> +       int r;
-> +
-> +       if (!in_order || !nheads)
-> +               r =3D vhost_add_used_n_ooo(vq, heads, count);
-> +       else
-> +               r =3D vhost_add_used_n_in_order(vq, heads, nheads, count)=
-;
->
->         if (r < 0)
->                 return r;
-> @@ -2856,9 +2932,11 @@ EXPORT_SYMBOL_GPL(vhost_add_used_and_signal);
->  /* multi-buffer version of vhost_add_used_and_signal */
->  void vhost_add_used_and_signal_n(struct vhost_dev *dev,
->                                  struct vhost_virtqueue *vq,
-> -                                struct vring_used_elem *heads, unsigned =
-count)
-> +                                struct vring_used_elem *heads,
-> +                                u16 *nheads,
-> +                                unsigned count)
->  {
-> -       vhost_add_used_n(vq, heads, count);
-> +       vhost_add_used_n(vq, heads, nheads, count);
->         vhost_signal(dev, vq);
->  }
->  EXPORT_SYMBOL_GPL(vhost_add_used_and_signal_n);
-> diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
-> index bb75a292d50c..e714ebf9da57 100644
-> --- a/drivers/vhost/vhost.h
-> +++ b/drivers/vhost/vhost.h
-> @@ -103,6 +103,8 @@ struct vhost_virtqueue {
->          * Values are limited to 0x7fff, and the high bit is used as
->          * a wrap counter when using VIRTIO_F_RING_PACKED. */
->         u16 last_avail_idx;
-> +       /* Next avail ring head when VIRTIO_F_IN_ORDER is negoitated */
-> +       u16 next_avail_head;
->
->         /* Caches available index value from user. */
->         u16 avail_idx;
-> @@ -129,6 +131,7 @@ struct vhost_virtqueue {
->         struct iovec iotlb_iov[64];
->         struct iovec *indirect;
->         struct vring_used_elem *heads;
-> +       u16 *nheads;
->         /* Protected by virtqueue mutex. */
->         struct vhost_iotlb *umem;
->         struct vhost_iotlb *iotlb;
-> @@ -213,11 +216,12 @@ bool vhost_vq_is_setup(struct vhost_virtqueue *vq);
->  int vhost_vq_init_access(struct vhost_virtqueue *);
->  int vhost_add_used(struct vhost_virtqueue *, unsigned int head, int len)=
-;
->  int vhost_add_used_n(struct vhost_virtqueue *, struct vring_used_elem *h=
-eads,
-> -                    unsigned count);
-> +                    u16 *nheads, unsigned count);
->  void vhost_add_used_and_signal(struct vhost_dev *, struct vhost_virtqueu=
-e *,
->                                unsigned int id, int len);
->  void vhost_add_used_and_signal_n(struct vhost_dev *, struct vhost_virtqu=
-eue *,
-> -                              struct vring_used_elem *heads, unsigned co=
-unt);
-> +                                struct vring_used_elem *heads, u16 *nhea=
-ds,
-> +                                unsigned count);
->  void vhost_signal(struct vhost_dev *, struct vhost_virtqueue *);
->  void vhost_disable_notify(struct vhost_dev *, struct vhost_virtqueue *);
->  bool vhost_vq_avail_empty(struct vhost_dev *, struct vhost_virtqueue *);
-> --
-> 2.39.5
->
+  Thomas
 
 
