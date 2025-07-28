@@ -1,74 +1,74 @@
-Return-Path: <kvm+bounces-53573-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53574-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D10DBB141BC
-	for <lists+kvm@lfdr.de>; Mon, 28 Jul 2025 20:08:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E4FCB141CC
+	for <lists+kvm@lfdr.de>; Mon, 28 Jul 2025 20:17:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EAF5A162F4F
-	for <lists+kvm@lfdr.de>; Mon, 28 Jul 2025 18:08:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14D663A7EF0
+	for <lists+kvm@lfdr.de>; Mon, 28 Jul 2025 18:17:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BA2C272817;
-	Mon, 28 Jul 2025 18:08:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC4F3275873;
+	Mon, 28 Jul 2025 18:17:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="03bCLprC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OKBLeMi/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com [209.85.219.172])
+Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF4261C1F0C
-	for <kvm@vger.kernel.org>; Mon, 28 Jul 2025 18:08:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 587C1213E85
+	for <kvm@vger.kernel.org>; Mon, 28 Jul 2025 18:17:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753726096; cv=none; b=pvLYfFvkeircs77L2MsWha5E2PaZluM+Xdbu4svBuuttgo9yZ4g0VbAj895WTMCQ3MCvEvkVIShcjl42k353VRkywdgcTPKnGjqB3H/l4fHogAXLoptvq6bgZqlbx2/Kut4W3CCKjFPUCBBxYJ0UUUsPpgDt6H7v/kT8qZ4rooo=
+	t=1753726660; cv=none; b=HqMOYQ48z9MQPNklIGNcLLBTjtHyYO8bErvZx64MHnozJaZzTk+y7zmPHRB3FldCYCitOMzQkH3aCMq2CvrME34AmrIeo/m419jCLqw5JufoMmjn3N67wEhJkMNHj8h9t/HZMITk3LYq4aLl+zn0M2FRj2iLDs+p08UFHhq1F4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753726096; c=relaxed/simple;
-	bh=EVc0iEknCF3Ka4SHyQNJqg8MLMtEG5JaIjGM3psiOjg=;
+	s=arc-20240116; t=1753726660; c=relaxed/simple;
+	bh=VDlEiwovForUKX6glMaAfiqHDQdEgC9cj1h8O6kYSlM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cs1Bp9s/mgA1HE7u+0t5ui/B8A+rf+4VxJWGbGa2CjT5QQbdsgsKsoZo17ZdNhlX3XWCuhj1f32cpGOq2cikljmp2ws7jNvX7AA2rOxpJaLKGnZDqNvAnyrZHK/MYQyLEQ4xS7VzsFisN1TABHTgj0fMv7Bv4oGw8vGdB4gpcx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=03bCLprC; arc=none smtp.client-ip=209.85.219.172
+	 To:Cc:Content-Type; b=VT+yABSh+oNbe6J6RNX2RDnddQ9HzWw9DD325UFaijCjydsJ3B5qgm9LSVxzsvEBfZjQa5hJ/unBcjQ2+UZAmE/QqUzhDlq3x5iXqeV8sgc67eIsV7yBMnoYTTuPEDRPYmw0taKcdE0S69Ovz9vPaK2HXH3DZYUnSQ5F8MERvzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OKBLeMi/; arc=none smtp.client-ip=209.85.208.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-yb1-f172.google.com with SMTP id 3f1490d57ef6-e8bbb605530so162619276.0
-        for <kvm@vger.kernel.org>; Mon, 28 Jul 2025 11:08:14 -0700 (PDT)
+Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-32e14cf205cso46992901fa.1
+        for <kvm@vger.kernel.org>; Mon, 28 Jul 2025 11:17:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753726094; x=1754330894; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1753726655; x=1754331455; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=2gmrGvfylvw3ZgqzNbgUCIxZfOpxfy+MGSCTqwUJs5I=;
-        b=03bCLprC2Ls4UHUjZucCW8ZWhm8QnJTnU9jR/2u2U7HYhFN70q5vhsQ2Lgmbm/MTNy
-         NcItjzDtdg1JwVb/5CSXUgpsSAQQPOGpIhb1euuyIpxLa5VKPrN7FcbjZ+E5rUd5Xrrg
-         m8oUi2qYCbFWecQBjkK9X/TVSb+k0hcCvfzjxAmQhAViu5Asq/WIHT/7+HBC/RRuwFaE
-         dTvlhIh/69CI8ejhvrYHVu2DIamtNiylE5DpgT0cHoCnXD6JGsXE9YEe9iXN11ADFdos
-         JumYHY5SyDvebXK4nkrDGrz9CoakRyMOxuVekd8w7Ru+UFwlc2fDwPAAv5A8WlMAm4pO
-         0uag==
+        bh=abFGoaaLKyanJnlZpRo9hB7o79m3CiWoXYjYW1q8YQk=;
+        b=OKBLeMi/ccC0b1loNQeMVtjw8/uQlxvqMTlA6IijIOXjrl9Aeqjvv8ZDmslOrLtK+B
+         H8Re38ERV0cU/Kd8OSmQrl0Gr+fifUTvp/RSBtY7kNsMRvldvUs280PgesF7AaJ5yWrX
+         TByzddGUFmEkFT9FRxxuTY3uFKz1wKUYhSkj8qBPNu+61ZAx4BXkIDmFntDFbwDElFzO
+         S8AoIoQUSfsg/pLE/rwLm/c0dvI+QKZ0q8z+mKcXPYa7Ef3ppwsXFrK/0kDB2coAtSIz
+         iyZQz09ZNH1PCkBmb8IF6iwrknppdWSK6f7OtcYxuPCWnPp6cmRkQAJTWM9CA8zWY3/H
+         vtKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753726094; x=1754330894;
+        d=1e100.net; s=20230601; t=1753726655; x=1754331455;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=2gmrGvfylvw3ZgqzNbgUCIxZfOpxfy+MGSCTqwUJs5I=;
-        b=DO4mQduCTOveVWBIJUFPxZRCdtOs/iK95xt4NuYJXc1gJGysEWr/1KS+CtRebimqFp
-         KV92mAmB/FqXhEGQ3LgUBxq+QSIdsyRJW+Jf/MMQ2BXN1vp2tziETg0O2JZ+/m1mQ+Jj
-         aVcBsaJWgDrJdu4RoNqY3oKYZwWn8UV/wFHVnnjXP8ACNDuElZWFjk9SjmrlQauS25w1
-         /kCXRsns0fDPKQZBcqS0sPla+o0e3P+wQwYNn3pPiBzXyy0+0Hd0MvVWuqjraI/i1mWw
-         Yyz+WdWLLETPhAxlWHsavN8np7xSc8jv2zg+S1EWZafNxfzk7FNuweM3KYcPnYhvhUXO
-         y+8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUCwJ7chPb8RbG0GtztHeG3/i3lkeGahc8Z+D8uhyglc98ovgwLYf2II496jAktWZyjrzY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy57V6kobVjlMM8lFCKkr4Uh1FufUbONUl5JVW21dqGNcJFZp/u
-	YK2lO7vc7364m7G4I4cN4wA2b9VHYus+I1vfFFmTpCBAnBsLQKmw4Ic/d2M9EjY+MVXx1X1657m
-	eKI861mpEEVmfOlDCGgVyKnk2T4oIrXitqT6ZcMjWzsYegTkljuuoPuJW
-X-Gm-Gg: ASbGncuG6hng2uVyemaaKyf+Ki0Bled5qi8+cQRyOgK9oQpzbpM4OXpxDF8uNwCwG5H
-	O59Xow7ZG6BIy3fZvTIj28Im3SSYe3GtS6lTsYP3Carj+myngaDrs/wVFedIxXqQFK0d/qw5rkt
-	P+zzUAFLlNnmNVD98ea4KSlSnX/3Q2PPQYI1pt+ZrY/rK2nrMbCVb1rFYnjUZY2qTFVR0sgclHj
-	1MTcEYxYbnQX9Nkcf5JhHl+Gh01sqZEqMlIW7l6upxrfrc=
-X-Google-Smtp-Source: AGHT+IHjjBEZToln1GUKdNiNA5i+48eLmqUyHE2lIco0fXmKeAo87dihQyms53696HZtftCNENAtjjy50jxrFh37csY=
-X-Received: by 2002:a05:6902:2192:b0:e8e:16d9:8f09 with SMTP id
- 3f1490d57ef6-e8e2512a762mr683908276.17.1753726093352; Mon, 28 Jul 2025
- 11:08:13 -0700 (PDT)
+        bh=abFGoaaLKyanJnlZpRo9hB7o79m3CiWoXYjYW1q8YQk=;
+        b=gMsZfuYBf5Px5hqIlvEXvQMO5uDU6gt5mn8LGWdQUZ+W73S04oB2OheVmD7e1FVR5h
+         vEmHErcGhQJc04pyiPd2oUTzEi7dj76NddO3dJDcaAcgCRtpUJFqo7qDwJF+ClUCYuBU
+         TWUSAeAxLMMDljq4BR6XbKnUNQ8IqNr3gr6jSikSW/WCp+++993lj0FgHK0KchAAWeu9
+         pOgH+mxR0P/vZ0wKb78W/Q5YNBLHUZ2nq7ls4Z657bHgKlNErtqHuLUFSwjlLJQvboNJ
+         DDgg8cMIq746JMMyLcaLIui/2+0w2cT9N34ZHQfRymeE/azKheYm2LW7FaCCyYcOl/Pw
+         CCOQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXkdygejUGGWHuJA82WhISihGmLZc1hyVyYXcLJj0p4rtTuLJr9oeYartBIfka0C3kaXH0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyXlJjgSpoXnc8DHKEQFK64F2PjKrQN5johAMBUOZdMhXBj073Z
+	WkdWA41xcZymDEB73z+WxysiqAAY52a2CPxfrf/HWth1ViwWktpi1RGkUvGKtG7ktMmDKD7Fz1+
+	XSFDWH4L2P69N4Kqm1TfuiHaQag8+ChhhdEd/wKseqOXBrZyj5Yf4NBaInfQ=
+X-Gm-Gg: ASbGncuAX4ppLmtxSf256PITqiU6HFRIHH3I/z9KZu+kT5u8D4BLGbrtEyLJLCrtfyC
+	ee952hUUtw0F8XkAd2c7QjS4yzj9O+tCRbGjXfgb2MqvzCNQv3lMzH6bVToEsMW8aJ4/4ZbHjvD
+	z6eWeVUD9z/0azbJcCR3pmFi8E24vJPDMN0P5VCOalgw5W2AdwBARXmJPpO9yX3nlKDrgrttjFv
+	x+Aawg=
+X-Google-Smtp-Source: AGHT+IEJHS852UVpU5vL94onuZIrwp0eDPbW78u4HdyCQoNEd/oAvT0Y7thZ3sQ9bQLlq2pDNmOPdGs27+Yzee4LzYg=
+X-Received: by 2002:a05:6512:3d2a:b0:554:f9c5:6b30 with SMTP id
+ 2adb3069b0e04-55b5f4df42dmr3074009e87.38.1753726655095; Mon, 28 Jul 2025
+ 11:17:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -77,223 +77,39 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20250707224720.4016504-1-jthoughton@google.com>
  <20250707224720.4016504-4-jthoughton@google.com> <aIFHc83PtfB9fkKB@google.com>
-In-Reply-To: <aIFHc83PtfB9fkKB@google.com>
-From: James Houghton <jthoughton@google.com>
-Date: Mon, 28 Jul 2025 11:07:37 -0700
-X-Gm-Features: Ac12FXw88v-b_BueYv4w7UAtEPsyh5QQFnvb9K48s-JDnycsPo2ucd7UoV2kjdI
-Message-ID: <CADrL8HW46uQQKYUngYwomzfKWB0Vf4nG1WRjZu84hiXxtHN14Q@mail.gmail.com>
+ <CADrL8HW46uQQKYUngYwomzfKWB0Vf4nG1WRjZu84hiXxtHN14Q@mail.gmail.com>
+In-Reply-To: <CADrL8HW46uQQKYUngYwomzfKWB0Vf4nG1WRjZu84hiXxtHN14Q@mail.gmail.com>
+From: David Matlack <dmatlack@google.com>
+Date: Mon, 28 Jul 2025 11:17:08 -0700
+X-Gm-Features: Ac12FXx3wVXlb41VNkshvgKpI33DjTt3OFbnSm8kispxP2pDqaX0TG1jBjkEzTs
+Message-ID: <CALzav=e0cUTMzox7p3AU37wAFRrOXEDdU24eqe6DX+UZYt9FeQ@mail.gmail.com>
 Subject: Re: [PATCH v5 3/7] KVM: x86/mmu: Recover TDP MMU NX huge pages using
  MMU read lock
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Vipin Sharma <vipinsh@google.com>, 
-	David Matlack <dmatlack@google.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+To: James Houghton <jthoughton@google.com>
+Cc: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Vipin Sharma <vipinsh@google.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jul 23, 2025 at 1:35=E2=80=AFPM Sean Christopherson <seanjc@google.=
+On Mon, Jul 28, 2025 at 11:08=E2=80=AFAM James Houghton <jthoughton@google.=
 com> wrote:
->
-> On Mon, Jul 07, 2025, James Houghton wrote:
-> > From: Vipin Sharma <vipinsh@google.com>
+> On Wed, Jul 23, 2025 at 1:35=E2=80=AFPM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> > > @@ -7559,8 +7590,17 @@ static void kvm_recover_nx_huge_pages(struct k=
+vm *kvm,
+> > >       rcu_read_lock();
+> > >
+> > >       for ( ; to_zap; --to_zap) {
+> > > -             if (list_empty(nx_huge_pages))
+> > > +#ifdef CONFIG_X86_64
 > >
-> > Use MMU read lock to recover TDP MMU NX huge pages. Iterate
+> > These #ifdefs still make me sad, but I also still think they're the lea=
+st awful
+> > solution.  And hopefully we will jettison 32-bit sooner than later :-)
 >
-> Wrap at ~75 chars.
+> Yeah I couldn't come up with anything better. :(
 
-Oh, I did indeed wrap the text pretty aggressively for this patch. Not
-sure why that happened.
-
->
-> > over the huge pages list under tdp_mmu_pages_lock protection and
-> > unaccount the page before dropping the lock.
-> >
-> > We must not zap an SPTE if:
->
-> No pronouns!
-
-Right.
-
->
-> > - The SPTE is a root page.
-> > - The SPTE does not point at the SP's page table.
-> >
-> > If the SPTE does not point at the SP's page table, then something else
-> > has change the SPTE, so we cannot safely zap it.
-> >
-> > Warn if zapping SPTE fails and current SPTE is still pointing to same
-> > page table. This should never happen.
-> >
-> > There is always a race between dirty logging, vCPU faults, and NX huge
-> > page recovery for backing a gfn by an NX huge page or an executable
-> > small page. Unaccounting sooner during the list traversal is increasing
-> > the window of that race. Functionally, it is okay, because accounting
-> > doesn't protect against iTLB multi-hit bug, it is there purely to
-> > prevent KVM from bouncing a gfn between two page sizes. The only
-> > downside is that a vCPU will end up doing more work in tearing down all
-> > the child SPTEs. This should be a very rare race.
-> >
-> > Zapping under MMU read lock unblocks vCPUs which are waiting for MMU
-> > read lock. This optimizaion is done to solve a guest jitter issue on
-> > Windows VM which was observing an increase in network latency.
->
-> With slight tweaking:
->
-> Use MMU read lock to recover TDP MMU NX huge pages.  To prevent
-> concurrent modification of the list of potential huge pages, iterate over
-> the list under tdp_mmu_pages_lock protection and unaccount the page
-> before dropping the lock.
->
-> Zapping under MMU read lock unblocks vCPUs which are waiting for MMU
-> read lock, which solves a guest jitter issue on Windows VMs which were
-> observing an increase in network latency.
->
-> Do not zap an SPTE if:
-> - The SPTE is a root page.
-> - The SPTE does not point at the SP's page table.
->
-> If the SPTE does not point at the SP's page table, then something else
-> has change the SPTE, so KVM cannot safely zap it.
-
-"has changed" (my mistake)
-
->
-> Warn if zapping SPTE fails and current SPTE is still pointing to same
-> page table, as it should be impossible for the CMPXCHG to fail due to all
-> other write scenarios being mutually exclusive.
->
-> There is always a race between dirty logging, vCPU faults, and NX huge
-> page recovery for backing a gfn by an NX huge page or an executable
-> small page.  Unaccounting sooner during the list traversal increases the
-> window of that race, but functionally, it is okay.  Accounting doesn't
-> protect against iTLB multi-hit bug, it is there purely to prevent KVM
-> from bouncing a gfn between two page sizes. The only  downside is that a
-> vCPU will end up doing more work in tearing down all  the child SPTEs.
-> This should be a very rare race.
-
-Thanks, this is much better.
-
->
-> > Suggested-by: Sean Christopherson <seanjc@google.com>
-> > Signed-off-by: Vipin Sharma <vipinsh@google.com>
-> > Co-developed-by: James Houghton <jthoughton@google.com>
-> > Signed-off-by: James Houghton <jthoughton@google.com>
-> > ---
-> >  arch/x86/kvm/mmu/mmu.c     | 107 ++++++++++++++++++++++++-------------
-> >  arch/x86/kvm/mmu/tdp_mmu.c |  42 ++++++++++++---
-> >  2 files changed, 105 insertions(+), 44 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index b074f7bb5cc58..7df1b4ead705b 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -7535,12 +7535,40 @@ static unsigned long nx_huge_pages_to_zap(struc=
-t kvm *kvm,
-> >       return ratio ? DIV_ROUND_UP(pages, ratio) : 0;
-> >  }
-> >
-> > +static bool kvm_mmu_sp_dirty_logging_enabled(struct kvm *kvm,
-> > +                                          struct kvm_mmu_page *sp)
-> > +{
-> > +     struct kvm_memory_slot *slot =3D NULL;
-> > +
-> > +     /*
-> > +      * Since gfn_to_memslot() is relatively expensive, it helps to sk=
-ip it if
-> > +      * it the test cannot possibly return true.  On the other hand, i=
-f any
-> > +      * memslot has logging enabled, chances are good that all of them=
- do, in
-> > +      * which case unaccount_nx_huge_page() is much cheaper than zappi=
-ng the
-> > +      * page.
->
-> And largely irrelevant, because KVM should unaccount the NX no matter wha=
-t.  I
-> kinda get what you're saying, but honestly it adds a lot of confusion, es=
-pecially
-> since unaccount_nx_huge_page() is in the caller.
->
-> > +      *
-> > +      * If a memslot update is in progress, reading an incorrect value=
- of
-> > +      * kvm->nr_memslots_dirty_logging is not a problem: if it is beco=
-ming
-> > +      * zero, gfn_to_memslot() will be done unnecessarily; if it is be=
-coming
-> > +      * nonzero, the page will be zapped unnecessarily.  Either way, t=
-his only
-> > +      * affects efficiency in racy situations, and not correctness.
-> > +      */
-> > +     if (atomic_read(&kvm->nr_memslots_dirty_logging)) {
->
-> Short-circuit the function to decrease indentation, and so that "slot" do=
-esn't
-> need to be NULL-initialized.
->
-> > +             struct kvm_memslots *slots;
-> > +
-> > +             slots =3D kvm_memslots_for_spte_role(kvm, sp->role);
-> > +             slot =3D __gfn_to_memslot(slots, sp->gfn);
->
-> Then this can be:
->
->         slot =3D __gfn_to_memslot(kvm_memslots_for_spte_role(kvm, sp->rol=
-e), sp->gfn);
->
-> without creating a stupid-long line.
->
-> > +             WARN_ON_ONCE(!slot);
->
-> And then:
->
->         if (WARN_ON_ONCE(!slot))
->                 return false;
->
->         return kvm_slot_dirty_track_enabled(slot);
->
-> With a comment cleanup:
->
->         struct kvm_memory_slot *slot;
->
->         /*
->          * Skip the memslot lookup if dirty tracking can't possibly be en=
-abled,
->          * as memslot lookups are relatively expensive.
->          *
->          * If a memslot update is in progress, reading an incorrect value=
- of
->          * kvm->nr_memslots_dirty_logging is not a problem: if it is beco=
-ming
->          * zero, KVM will  do an unnecessary memslot lookup;  if it is be=
-coming
->          * nonzero, the page will be zapped unnecessarily.  Either way, t=
-his
->          * only affects efficiency in racy situations, and not correctnes=
-s.
->          */
->         if (!atomic_read(&kvm->nr_memslots_dirty_logging))
->                 return false;
->
->         slot =3D __gfn_to_memslot(kvm_memslots_for_spte_role(kvm, sp->rol=
-e), sp->gfn);
->         if (WARN_ON_ONCE(!slot))
->                 return false;
->
->         return kvm_slot_dirty_track_enabled(slot);
-
-LGTM, thanks!
-
-> > @@ -7559,8 +7590,17 @@ static void kvm_recover_nx_huge_pages(struct kvm=
- *kvm,
-> >       rcu_read_lock();
-> >
-> >       for ( ; to_zap; --to_zap) {
-> > -             if (list_empty(nx_huge_pages))
-> > +#ifdef CONFIG_X86_64
->
-> These #ifdefs still make me sad, but I also still think they're the least=
- awful
-> solution.  And hopefully we will jettison 32-bit sooner than later :-)
-
-Yeah I couldn't come up with anything better. :(
+Could we just move the definition of tdp_mmu_pages_lock outside of
+CONFIG_X86_64? The only downside I can think of is slightly larger kvm
+structs for 32-bit builds.
 
