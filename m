@@ -1,175 +1,139 @@
-Return-Path: <kvm+bounces-53562-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53563-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06F12B13F48
-	for <lists+kvm@lfdr.de>; Mon, 28 Jul 2025 17:55:57 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95FC0B13FA7
+	for <lists+kvm@lfdr.de>; Mon, 28 Jul 2025 18:14:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2DA3C16CD26
-	for <lists+kvm@lfdr.de>; Mon, 28 Jul 2025 15:55:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 44DFC7A49C3
+	for <lists+kvm@lfdr.de>; Mon, 28 Jul 2025 16:11:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED945272803;
-	Mon, 28 Jul 2025 15:55:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E17402741B6;
+	Mon, 28 Jul 2025 16:12:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="ovS7rFJv"
+	dkim=pass (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b="NuShxQGB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-io1-f49.google.com (mail-io1-f49.google.com [209.85.166.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 773C026CE1C
-	for <kvm@vger.kernel.org>; Mon, 28 Jul 2025 15:55:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75DBB1DE4EF;
+	Mon, 28 Jul 2025 16:12:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=204.191.154.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753718150; cv=none; b=sEVASouZiY4+UJFA3Yu7atCUgcg2YQlyPLVGaImwJnv5cHWOjEfIGgtntIJlbboKRMvytvdvqvyv/t27y8Ini9BrJDI7wKva9ulmtSTH2QYG057m0FvhmnlRdQ65XoVN8dPw01kijJRYAAgX9jSdcVHFSrIyg2oFY8wVmVUnSaY=
+	t=1753719179; cv=none; b=L6P2wcly+3L7QOB2JRl562OHItRyvq5IYLE53a85uq301egSx3hU4WJsCP3zXZp0yET9iVYdANJl6JNWw51YBXmIaiSM09ElCUK92ci7BvMBUz+mk0ENLb2jXLU90X/yQB5AwNNno60T4806K0yNYmVB6RFePo0Ph70Hxt6BsaU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753718150; c=relaxed/simple;
-	bh=9r/Ht2nbV32jM7dP3siYnmI04ELhTd5f0jOF+AM1w8o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=d5xS/EEgiwZY77P0RpuTYfnqcqXCLbmZBWhlEo2xgYrIlV2SbgEcH2e6cggQa57z0FApqNoGqEB1rDVjvPA8NYln4DJIXQGOouUnpRvsoEhA2Fk+13PsOppT0Va8HYpxi408RsV59l8XZ2zGO9BM+67M3PFUW6r5ZnYntQUzzbQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=ovS7rFJv; arc=none smtp.client-ip=209.85.166.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-io1-f49.google.com with SMTP id ca18e2360f4ac-87c04c907eeso399723539f.0
-        for <kvm@vger.kernel.org>; Mon, 28 Jul 2025 08:55:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1753718147; x=1754322947; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QoQc7MqIQDw+6Efs0Tj4gYVMkroavuwmc+QEfRy0pSo=;
-        b=ovS7rFJv+/vAlsSJVwcp9fZrIFSeFUppco8S1Eox0wabi3R4IuKyRicO+oHnrLSpR6
-         mfiiFCZCaPIOFvTnheHkhLwyDckFg7unDpRjcpgwVUDGkZ4jf2K0HTR6Pv3B9t9FhTtK
-         EvdMTt1zhBU1LeUnDSkjvJZqaPrOvYY0gBc9ki5b0SaApkcNvulzRAyVSM1awxqGQDU/
-         oqbgc2TJh3Vhee2DjB2+kp5ypDI1+7jTfNvxs6WaPOPwm9WL+bGn5PU8yUMPsNxlNgyS
-         hC8Vdmz2+vCdL0uOZjDQn2U9n81o2p0ZLrbHYnVlqGe7EE7IkWIx1X9Ks9KnpTP2MwjJ
-         r/uQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753718147; x=1754322947;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QoQc7MqIQDw+6Efs0Tj4gYVMkroavuwmc+QEfRy0pSo=;
-        b=sZNw7cbDCPbHQiHwQglZH7SXrLhf/CbRu9ZRRaxaQnDZl0RJWgAgPrlSZpIMKYOCm+
-         wC46HYwd6OHcjQdOmdLe5aEch2C1cDk+sM0MnpHBnCqsWfvp6FVNVGhp1EAexcHDj+Kp
-         h4iWLV10k+wLVDYXWXZPXbV65Gw9ht33Kvuh/552ZIvMHYSRo0IWNT3hXSoRMO5LNg7M
-         +k35qALheq2eeT0QiKmTJH5EnykgA+HYTj8gMxtLRBNRIZ5O73EA7wdnvmD+QGViE/tI
-         Q0kiKgO3EOAK3Qtur5Jet+3KawLMvqj1EZTwWxjEtoB/Fk7clm+fFks8B3W3CdXAql6E
-         vzOg==
-X-Forwarded-Encrypted: i=1; AJvYcCVnOBbD9RTaB7THiFFUWb15Rv3dSmUZo5I1joLQvJ+sUgL/9SpBPzEVpHDMDAudqx1jCEM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxyKsogZ+YAsue32fPQPQJY9rqYE70tXvKLYntS5/TuH7yRCljl
-	l/wb6JFXYuC9+7uRJqyOuPZg1QpPEEUI7Mwu61h6SaTZ0qILmGOFfCCv+oFDy3PTWUeSVpKZE7+
-	lKONp2s7N/A+ojoKNslDGHGuEX4nkEdzCfBxTTKCpiw==
-X-Gm-Gg: ASbGnct+EFwpgXGrJVuA3UeDcgoMgNVALh+MJpqlKZywV/gsU7FoABWn8qiahMovrIm
-	ddCgNvslTcYRxYwsBBRyRapo/i1Vm3jzhcsC3VMGmf76lfMOgyTAG9rbBO4dvk7KhKlT4UWtZTq
-	byIfF6LLg9bhrOvxD5kAOHLacNpVfadj33zISBkdeM5KksPSY+AcktLN3dmXRS/cduZdkH3cFVN
-	R8ZEuNlWAEsCz8xMg==
-X-Google-Smtp-Source: AGHT+IGtyQUUSJu9cmUvDWm8BQBfdBuhLyQi/GAW+Z9BCrTE0REl/Sb8eIeFDFT/23beG7olLPsjNZMfh1lpKeQ/TI0=
-X-Received: by 2002:a92:c242:0:b0:3e3:b74e:dd1a with SMTP id
- e9e14a558f8ab-3e3c5259f1fmr213615925ab.3.1753718147308; Mon, 28 Jul 2025
- 08:55:47 -0700 (PDT)
+	s=arc-20240116; t=1753719179; c=relaxed/simple;
+	bh=R0FQOHpsHRyxpvqcJA2ITt/gHmHam74Pd/G3iRxqIRA=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:From:In-Reply-To:
+	 Content-Type:Subject; b=G2TJaFP6nzCix3Jbl/SgulMa11AMhmll7uo1ZxTUH07+TGNppNub0ZxUqjaYV9T9FiRQU7J6d3zWPo1Yk1joul8OlvpEqJa4ZxKyaN3nZ77kxL+RReUW6eIy7s0K1DLyvoxnQfMSY4Wjf96KGsJf9VggumpdcN1bgk3XIxng2yE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deltatee.com; spf=pass smtp.mailfrom=deltatee.com; dkim=pass (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b=NuShxQGB; arc=none smtp.client-ip=204.191.154.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deltatee.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=deltatee.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=deltatee.com; s=20200525; h=Subject:In-Reply-To:From:References:Cc:To:
+	MIME-Version:Date:Message-ID:content-disposition;
+	bh=VSF5wX9vjIP6fRF1ybWxqYJSZXcEgqAR8cCPBeo7HdU=; b=NuShxQGBV5IaVLB+r9+8Z5iKvq
+	dFIGr5esAaj+hCO3a4jw+w6/OlzvIoB6kvaxTwpkrr6lmTchzYodZvaI+lNSnKbAzMm0EglMM03Vv
+	crZTKZAcuqrSFjxZewSYCzRT/HYo/mkFbMKO7es26V5QoeFZvRVj7QgbRx/G4WDAZX6VXrq9/YsDD
+	xRRo8ObEJbFOXuNbyFVv5S0ZE/n4R76NpOr3WVRG9mlUx6T3DEJBkwhVcxvUHoaulcQa3MefNqBEW
+	9lVNjow5xoGlNwMQVVuWUtFAwKyMGUtxejZnJC6r2JA2ZkfHlVUptsg1l/w1rFXLBfEBhBC4DZjlx
+	SCCTlj+w==;
+Received: from guinness.priv.deltatee.com ([172.16.1.162])
+	by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96)
+	(envelope-from <logang@deltatee.com>)
+	id 1ugQSy-008Nxz-1h;
+	Mon, 28 Jul 2025 10:12:45 -0600
+Message-ID: <d69e0d74-285e-4cde-a2e4-a803accfa9e1@deltatee.com>
+Date: Mon, 28 Jul 2025 10:12:31 -0600
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAAhSdy12xtRRem-AybfymGHh+sj4qSDDG0XL6M6as=cD5Y2tkA@mail.gmail.com>
- <CABgObfYEgf9mTLWByDJeqDT+2PukVn3x2S0gu4TZQP6u5dCtoQ@mail.gmail.com>
-In-Reply-To: <CABgObfYEgf9mTLWByDJeqDT+2PukVn3x2S0gu4TZQP6u5dCtoQ@mail.gmail.com>
-From: Anup Patel <anup@brainfault.org>
-Date: Mon, 28 Jul 2025 21:25:34 +0530
-X-Gm-Features: Ac12FXyEGCGVkoPimb9v9aLpanQxwX644xefgJ4XRf_NEt1F87U2LZyXgZpr8DU
-Message-ID: <CAAhSdy3Jr1-8TVcEhiCUrc-DHQSTPE1RjF--marQPtcV6FPjJA@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM/riscv changes for 6.17
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Palmer Dabbelt <palmer@dabbelt.com>, Andrew Jones <ajones@ventanamicro.com>, 
-	Atish Patra <atishp@rivosinc.com>, Atish Patra <atish.patra@linux.dev>, 
-	"open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" <kvm-riscv@lists.infradead.org>, KVM General <kvm@vger.kernel.org>, 
-	linux-riscv <linux-riscv@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Leon Romanovsky <leon@kernel.org>, Christoph Hellwig <hch@lst.de>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Bjorn Helgaas <bhelgaas@google.com>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
+ Jens Axboe <axboe@kernel.dk>, =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?=
+ <jglisse@redhat.com>, Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+ linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-mm@kvack.org, linux-pci@vger.kernel.org,
+ Marek Szyprowski <m.szyprowski@samsung.com>,
+ Robin Murphy <robin.murphy@arm.com>, Sumit Semwal <sumit.semwal@linaro.org>,
+ Vivek Kasireddy <vivek.kasireddy@intel.com>, Will Deacon <will@kernel.org>
+References: <cover.1753274085.git.leonro@nvidia.com>
+ <82e62eb59afcd39b68ae143573d5ed113a92344e.1753274085.git.leonro@nvidia.com>
+ <20250724080313.GA31887@lst.de> <20250724081321.GT402218@unreal>
+ <b32ae619-6c4a-46fc-a368-6ad4e245d581@deltatee.com>
+ <20250727190514.GG7551@nvidia.com>
+Content-Language: en-CA
+From: Logan Gunthorpe <logang@deltatee.com>
+In-Reply-To: <20250727190514.GG7551@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 172.16.1.162
+X-SA-Exim-Rcpt-To: jgg@nvidia.com, leon@kernel.org, hch@lst.de, alex.williamson@redhat.com, akpm@linux-foundation.org, bhelgaas@google.com, christian.koenig@amd.com, dri-devel@lists.freedesktop.org, iommu@lists.linux.dev, axboe@kernel.dk, jglisse@redhat.com, joro@8bytes.org, kvm@vger.kernel.org, linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, linux-media@vger.kernel.org, linux-mm@kvack.org, linux-pci@vger.kernel.org, m.szyprowski@samsung.com, robin.murphy@arm.com, sumit.semwal@linaro.org, vivek.kasireddy@intel.com, will@kernel.org
+X-SA-Exim-Mail-From: logang@deltatee.com
+X-Spam-Level: 
+Subject: Re: [PATCH 05/10] PCI/P2PDMA: Export pci_p2pdma_map_type() function
+X-SA-Exim-Version: 4.2.1 (built Wed, 06 Jul 2022 17:57:39 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 
-On Mon, Jul 28, 2025 at 9:22=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.com>=
- wrote:
->
-> On Fri, Jul 25, 2025 at 2:06=E2=80=AFPM Anup Patel <anup@brainfault.org> =
-wrote:
-> >       RISC-V: perf/kvm: Add reporting of interrupt events
->
-> Something here ate Quan Zhou's Signed-off-by line, which is present at
-> https://lore.kernel.org/r/9693132df4d0f857b8be3a75750c36b40213fcc0.172621=
-1632.git.zhouquan@iscas.ac.cn
-> but not in your branch.
 
-There were couple of "---" lines in patch description which
-created problems for me so I tried fixing manually and
-accidentally ate Signed-off-by.
 
-Sorry about that.
+On 2025-07-27 13:05, Jason Gunthorpe wrote:
+> On Fri, Jul 25, 2025 at 10:30:46AM -0600, Logan Gunthorpe wrote:
+>>
+>>
+>> On 2025-07-24 02:13, Leon Romanovsky wrote:
+>>> On Thu, Jul 24, 2025 at 10:03:13AM +0200, Christoph Hellwig wrote:
+>>>> On Wed, Jul 23, 2025 at 04:00:06PM +0300, Leon Romanovsky wrote:
+>>>>> From: Leon Romanovsky <leonro@nvidia.com>
+>>>>>
+>>>>> Export the pci_p2pdma_map_type() function to allow external modules
+>>>>> and subsystems to determine the appropriate mapping type for P2PDMA
+>>>>> transfers between a provider and target device.
+>>>>
+>>>> External modules have no business doing this.
+>>>
+>>> VFIO PCI code is built as module. There is no way to access PCI p2p code
+>>> without exporting functions in it.
+>>
+>> The solution that would make more sense to me would be for either
+>> dma_iova_try_alloc() or another helper in dma-iommu.c to handle the
+>> P2PDMA case.
+> 
+> This has nothing to do with dma-iommu.c, the decisions here still need
+> to be made even if dma-iommu.c is not compiled in.
 
-Regards,
-Anup
+Doesn't it though? Every single call in patch 10 to the newly exported
+PCI functions calls into the the dma-iommu functions. If there were
+non-iommu paths then I would expect the code would use the regular DMA
+api directly which would then call in to dma-iommu.
 
->
-> Paolo
->
-> >       RISC-V: KVM: Use find_vma_intersection() to search for intersecti=
-ng VMAs
-> >       RISC-V: KVM: Avoid re-acquiring memslot in kvm_riscv_gstage_map()
-> >
-> > Samuel Holland (2):
-> >       RISC-V: KVM: Fix inclusion of Smnpm in the guest ISA bitmap
-> >       RISC-V: KVM: Add support for SBI_FWFT_POINTER_MASKING_PMLEN
-> >
-> > Xu Lu (1):
-> >       RISC-V: KVM: Delegate illegal instruction fault to VS mode
-> >
-> >  Documentation/virt/kvm/api.rst                     |   2 +-
-> >  arch/riscv/include/asm/kvm_aia.h                   |   2 +-
-> >  arch/riscv/include/asm/kvm_gstage.h                |  72 +++
-> >  arch/riscv/include/asm/kvm_host.h                  | 109 +----
-> >  arch/riscv/include/asm/kvm_mmu.h                   |  21 +
-> >  arch/riscv/include/asm/kvm_tlb.h                   |  84 ++++
-> >  arch/riscv/include/asm/kvm_vcpu_sbi.h              |  13 +
-> >  arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h         |  33 ++
-> >  arch/riscv/include/asm/kvm_vmid.h                  |  27 ++
-> >  arch/riscv/include/uapi/asm/kvm.h                  |   2 +
-> >  arch/riscv/kvm/Kconfig                             |   1 +
-> >  arch/riscv/kvm/Makefile                            |   2 +
-> >  arch/riscv/kvm/aia_device.c                        |   6 +-
-> >  arch/riscv/kvm/aia_imsic.c                         |  12 +-
-> >  arch/riscv/kvm/gstage.c                            | 338 +++++++++++++=
-+
-> >  arch/riscv/kvm/main.c                              |   3 +-
-> >  arch/riscv/kvm/mmu.c                               | 509 +++++--------=
---------
-> >  arch/riscv/kvm/tlb.c                               | 110 ++---
-> >  arch/riscv/kvm/vcpu.c                              |  48 +-
-> >  arch/riscv/kvm/vcpu_exit.c                         |  20 +-
-> >  arch/riscv/kvm/vcpu_onereg.c                       |  84 ++--
-> >  arch/riscv/kvm/vcpu_sbi.c                          |  53 +++
-> >  arch/riscv/kvm/vcpu_sbi_fwft.c                     | 338 +++++++++++++=
-+
-> >  arch/riscv/kvm/vcpu_sbi_replace.c                  |  17 +-
-> >  arch/riscv/kvm/vcpu_sbi_sta.c                      |   3 +-
-> >  arch/riscv/kvm/vcpu_sbi_v01.c                      |  25 +-
-> >  arch/riscv/kvm/vm.c                                |   7 +-
-> >  arch/riscv/kvm/vmid.c                              |  25 +
-> >  tools/perf/arch/riscv/util/kvm-stat.c              |   6 +-
-> >  tools/perf/arch/riscv/util/riscv_exception_types.h |  35 --
-> >  tools/perf/arch/riscv/util/riscv_trap_types.h      |  57 +++
-> >  31 files changed, 1382 insertions(+), 682 deletions(-)
-> >  create mode 100644 arch/riscv/include/asm/kvm_gstage.h
-> >  create mode 100644 arch/riscv/include/asm/kvm_mmu.h
-> >  create mode 100644 arch/riscv/include/asm/kvm_tlb.h
-> >  create mode 100644 arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h
-> >  create mode 100644 arch/riscv/include/asm/kvm_vmid.h
-> >  create mode 100644 arch/riscv/kvm/gstage.c
-> >  create mode 100644 arch/riscv/kvm/vcpu_sbi_fwft.c
-> >  delete mode 100644 tools/perf/arch/riscv/util/riscv_exception_types.h
-> >  create mode 100644 tools/perf/arch/riscv/util/riscv_trap_types.h
-> >
->
+I can't imagine a use case where someone would want to call the p2pdma
+functions to map p2p memory and not have a similar path to do the exact
+same mapping with vanilla memory and thus call the DMA API. And it seems
+much better to me to export higher level functions to drivers that take
+care of the details correctly than to expose the nuts and bolts to every
+driver.
+
+The thing that seems special to me about VFIO is that it is calling
+directly into dma-iommu code to setup unique mappings as opposed to
+using the higher level DMA API. I don't see in what way it is special
+that it needs to know intimate details of the memory it's mapping and
+have different paths to map different types of memory. That's what the
+dma layer is for.
+
+Logan
+
 
