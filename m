@@ -1,144 +1,97 @@
-Return-Path: <kvm+bounces-53570-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53571-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4524B140F0
-	for <lists+kvm@lfdr.de>; Mon, 28 Jul 2025 19:08:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C0161B14116
+	for <lists+kvm@lfdr.de>; Mon, 28 Jul 2025 19:16:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 497913A3992
-	for <lists+kvm@lfdr.de>; Mon, 28 Jul 2025 17:07:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F0BF53A442B
+	for <lists+kvm@lfdr.de>; Mon, 28 Jul 2025 17:15:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BE52275AF1;
-	Mon, 28 Jul 2025 17:07:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 083742750E5;
+	Mon, 28 Jul 2025 17:16:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b="XHjgXFrK"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="h5llobWT"
 X-Original-To: kvm@vger.kernel.org
-Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D842273D6E;
-	Mon, 28 Jul 2025 17:07:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=204.191.154.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CA982BCFB
+	for <kvm@vger.kernel.org>; Mon, 28 Jul 2025 17:16:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753722466; cv=none; b=ViBdCGHYZ5vY1Qyy5OO8ZffAYnybJlGgYp7jYkyyR2G/1xsMxKhminFVWCx0SeErwoEiL79k2h5+dfBTW7ERGwwX7wBnZ6L+ETLWJ8AHA444MzaIdKe1LO2vNu/puR8vRS//KoCLKOLeMxN9hp4GfUi0s2MJH+NIiM0S0aELTNg=
+	t=1753722979; cv=none; b=ov1iq93timbEQcOBf+gSZZIzBux9CmfBfu+9a8MawV5PJlCFrO6xw9vacsZRrkm+qZsY9MH0UaDONkT88/X66sNFix/V4UrVNMTTnnl1vARju18qu9KCFw9LYI/p7iFhh9dGOMBpSaa+i4J692DnZIx+iM2q7LhA+zjXfD+1Mw0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753722466; c=relaxed/simple;
-	bh=8zF2yMQp+ihqRs6CXyF3EAgjaysxgFn3aji1yds87Gw=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:From:In-Reply-To:
-	 Content-Type:Subject; b=ujaZDjBRkVKbUmLahosWlaRu+SOeEoPRQ13pVaN6y+yK2YZUEEGeIRA8JFe6nBkVlTp4hvxFsxHExAkFlpQRo+YcoYsOB6cqgOGd7m5SLWNYJ7hJxXZIAfOT+j9+sOMuAZRl0gipIz6jq5AaJDDdPX8kL2tbWuzVbJ7SChHAeW0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deltatee.com; spf=pass smtp.mailfrom=deltatee.com; dkim=pass (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b=XHjgXFrK; arc=none smtp.client-ip=204.191.154.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deltatee.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=deltatee.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=deltatee.com; s=20200525; h=Subject:In-Reply-To:From:References:Cc:To:
-	MIME-Version:Date:Message-ID:content-disposition;
-	bh=vCTi7Vmk9aRE1IKFUsfxXldYjrZeeC/iIVRDXKgVHWo=; b=XHjgXFrKuAhiveJ6zCrvJT8Pvw
-	re9J8LZpJpl40TreVfHUPY2lnYVRFy+PufGoNxDVEgTuS0s84xxDxMwecbKLo3UpnvzoMVqFabY5O
-	fns6daDQC4GZzjzk81dgUnIBncap8IUcFBgRQ+FDj7GtQEkK7F51IIrGWpfK4rRTXW5sfS9q1MDKQ
-	6/wNP0s/OHbfhbpmZL9kyyw6F9TOJplnVRRzeSNunWZGOK7MaBeHKnz82mVkMDabojTslET5bVvMG
-	d6AG/BDnrsJDD6etzDoLtYTAaCoD+hgyhnRjFdBQiaqbGi/0dIRgNCr5slZOAZysPyyIWQSEA7f7t
-	Ibk+mOxA==;
-Received: from guinness.priv.deltatee.com ([172.16.1.162])
-	by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.96)
-	(envelope-from <logang@deltatee.com>)
-	id 1ugRK6-008OdV-0r;
-	Mon, 28 Jul 2025 11:07:39 -0600
-Message-ID: <d3c8c573-f201-4450-9400-cc3ccafd2c04@deltatee.com>
-Date: Mon, 28 Jul 2025 11:07:34 -0600
+	s=arc-20240116; t=1753722979; c=relaxed/simple;
+	bh=hq9G439HBT2woUN2wx2peNjXcsT598Lz4KLjZkqLCYo=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=B0IgSF9PLLKyOI/H7A70dYflRdNKArwKouzwG7Qgep+HQqFXNaWf7/4/zEpAz8+SeGvol1dRn/YVGGvbEpbDAzEDazmivU6UBYxHcAD1bi7geevN9wnqE853ohf1AJRoc2c/nAQAQOW/OGlp2CT+Rwctml9Cr9QaqD9Zz4StXi0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=h5llobWT; arc=none smtp.client-ip=91.218.175.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1753722974;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bNIyxQnq4qOIP+xnPLHAwxkA0IPHV/f4fUHTAmQLjuw=;
+	b=h5llobWTLuMaFo5A3Cq7Tjd1EiNa2zYRY3PDfKichyGAgZVwEpoCgvQi0UdUKJdqaHnoNr
+	cG92D+zy7qSmlPnRg2yG6tXu/EFQPKsonVfzgTo8A4vpM6YH991dsU/ADVz40wE5DtTVfP
+	I4QIBRBgnd4wXaQbhhOh+gYkzOPKOCs=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Eric Auger <eric.auger@redhat.com>
+Subject: Re: [PATCH 0/4] KVM: arm64: Userspace GICv3 sysreg access fixes and testing
+Date: Mon, 28 Jul 2025 10:15:49 -0700
+Message-Id: <175372292706.2891555.8608447828922447726.b4-ty@linux.dev>
+In-Reply-To: <20250718111154.104029-1-maz@kernel.org>
+References: <20250718111154.104029-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Jason Gunthorpe <jgg@nvidia.com>, Christoph Hellwig <hch@lst.de>,
- Alex Williamson <alex.williamson@redhat.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Bjorn Helgaas <bhelgaas@google.com>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
- Jens Axboe <axboe@kernel.dk>, =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?=
- <jglisse@redhat.com>, Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
- linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
- linux-mm@kvack.org, linux-pci@vger.kernel.org,
- Marek Szyprowski <m.szyprowski@samsung.com>,
- Robin Murphy <robin.murphy@arm.com>, Sumit Semwal <sumit.semwal@linaro.org>,
- Vivek Kasireddy <vivek.kasireddy@intel.com>, Will Deacon <will@kernel.org>
-References: <cover.1753274085.git.leonro@nvidia.com>
- <82e62eb59afcd39b68ae143573d5ed113a92344e.1753274085.git.leonro@nvidia.com>
- <20250724080313.GA31887@lst.de> <20250724081321.GT402218@unreal>
- <b32ae619-6c4a-46fc-a368-6ad4e245d581@deltatee.com>
- <20250727190514.GG7551@nvidia.com>
- <d69e0d74-285e-4cde-a2e4-a803accfa9e1@deltatee.com>
- <20250728164136.GD402218@unreal>
-Content-Language: en-CA
-From: Logan Gunthorpe <logang@deltatee.com>
-In-Reply-To: <20250728164136.GD402218@unreal>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 172.16.1.162
-X-SA-Exim-Rcpt-To: leon@kernel.org, jgg@nvidia.com, hch@lst.de, alex.williamson@redhat.com, akpm@linux-foundation.org, bhelgaas@google.com, christian.koenig@amd.com, dri-devel@lists.freedesktop.org, iommu@lists.linux.dev, axboe@kernel.dk, jglisse@redhat.com, joro@8bytes.org, kvm@vger.kernel.org, linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, linux-media@vger.kernel.org, linux-mm@kvack.org, linux-pci@vger.kernel.org, m.szyprowski@samsung.com, robin.murphy@arm.com, sumit.semwal@linaro.org, vivek.kasireddy@intel.com, will@kernel.org
-X-SA-Exim-Mail-From: logang@deltatee.com
-X-Spam-Level: 
-Subject: Re: [PATCH 05/10] PCI/P2PDMA: Export pci_p2pdma_map_type() function
-X-SA-Exim-Version: 4.2.1 (built Wed, 06 Jul 2022 17:57:39 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-
-
-On 2025-07-28 10:41, Leon Romanovsky wrote:
-> On Mon, Jul 28, 2025 at 10:12:31AM -0600, Logan Gunthorpe wrote:
->>
->>
->> On 2025-07-27 13:05, Jason Gunthorpe wrote:
->>> On Fri, Jul 25, 2025 at 10:30:46AM -0600, Logan Gunthorpe wrote:
->>>>
->>>>
->>>> On 2025-07-24 02:13, Leon Romanovsky wrote:
->>>>> On Thu, Jul 24, 2025 at 10:03:13AM +0200, Christoph Hellwig wrote:
->>>>>> On Wed, Jul 23, 2025 at 04:00:06PM +0300, Leon Romanovsky wrote:
->>>>>>> From: Leon Romanovsky <leonro@nvidia.com>
->>>>>>>
->>>>>>> Export the pci_p2pdma_map_type() function to allow external modules
->>>>>>> and subsystems to determine the appropriate mapping type for P2PDMA
->>>>>>> transfers between a provider and target device.
->>>>>>
->>>>>> External modules have no business doing this.
->>>>>
->>>>> VFIO PCI code is built as module. There is no way to access PCI p2p code
->>>>> without exporting functions in it.
->>>>
->>>> The solution that would make more sense to me would be for either
->>>> dma_iova_try_alloc() or another helper in dma-iommu.c to handle the
->>>> P2PDMA case.
->>>
->>> This has nothing to do with dma-iommu.c, the decisions here still need
->>> to be made even if dma-iommu.c is not compiled in.
->>
->> Doesn't it though? Every single call in patch 10 to the newly exported
->> PCI functions calls into the the dma-iommu functions. If there were
->> non-iommu paths then I would expect the code would use the regular DMA
->> api directly which would then call in to dma-iommu.
+On Fri, 18 Jul 2025 12:11:50 +0100, Marc Zyngier wrote:
+> As a follow-up to my earlier series at [1], here's a small set of
+> fixes to address an annoying bug that made ICH_HCR_EL2 unreachable
+> from userspace -- not something you'd expect.
 > 
-> If p2p type is PCI_P2PDMA_MAP_BUS_ADDR, there will no dma-iommu and DMA
-> at all.
+> So the first patch fixes the ordering the the sysreg table, which had
+> ICH_HCR_EL2 at the wrong spot. The next two ensure that we now check
+> for the table to be sorted (just like all the other tables). Finally,
+> the last patch augments the vgic_init selftest to actually check that
+> we can access these registers
+> 
+> [...]
 
-I understand that and it is completely beside my point.
+Applied to next, thanks!
 
-If the dma mapping for P2P memory doesn't need to create an iommu
-mapping then that's fine. But it should be the dma-iommu layer to decide
-that. It's not a decision that should be made by every driver doing this
-kind of thing.
+[1/4] KVM: arm64: vgic-v3: Fix ordering of ICH_HCR_EL2
+      https://git.kernel.org/kvmarm/kvmarm/c/0f3046c8f68c
+[2/4] KVM: arm64: Clarify the check for reset callback in check_sysreg_table()
+      https://git.kernel.org/kvmarm/kvmarm/c/f5e6ebf285e1
+[3/4] KVM: arm64: Enforce the sorting of the GICv3 system register table
+      https://git.kernel.org/kvmarm/kvmarm/c/8af3e8ab09d0
+[4/4] KVM: arm64: selftest: vgic-v3: Add basic GICv3 sysreg userspace access test
+      https://git.kernel.org/kvmarm/kvmarm/c/3435bd79ec13
 
-With P2PDMA memory we are still creating a DMA mapping. It's just the
-dma address will be a PCI bus address instead of an IOVA. My opinion
-remains: none of these details should be exposed to the drivers.
-
-Logan
+--
+Best,
+Oliver
 
