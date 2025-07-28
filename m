@@ -1,203 +1,163 @@
-Return-Path: <kvm+bounces-53524-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53525-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC1ABB13176
-	for <lists+kvm@lfdr.de>; Sun, 27 Jul 2025 21:05:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 122CAB134E9
+	for <lists+kvm@lfdr.de>; Mon, 28 Jul 2025 08:31:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0E7F57A7FC1
-	for <lists+kvm@lfdr.de>; Sun, 27 Jul 2025 19:04:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 223661896E0D
+	for <lists+kvm@lfdr.de>; Mon, 28 Jul 2025 06:32:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BAA021D00A;
-	Sun, 27 Jul 2025 19:05:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F322221578;
+	Mon, 28 Jul 2025 06:31:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="At3Osj9o"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="sWeTO7Vl"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2058.outbound.protection.outlook.com [40.107.92.58])
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 099071C5F37;
-	Sun, 27 Jul 2025 19:05:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.58
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753643122; cv=fail; b=No9GETYUsnMvAf14Jquuxre8Nc21fzPiH3gN/g17NIG9OGiAdiCHaDCmPUXOWdOej9DbbPs65Io6n2Fn9dT/aovrLap8lKvfEpbZ6DrpYKhQ1mamM2UDyipcekVHA59s6eiO1cy1ntYHAGkfR65UNOiF8b0UBbp5ptYCww4Hx2M=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753643122; c=relaxed/simple;
-	bh=WWnDTqDHDu7zgX+p5riPOJcA7aVUAlvKrWD+jNbmZoM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=aWRnc6P67JNI197o9EbXY2+iWklyudgl09M02VcmRxleQhnACm2X/BkW7dbhWa4IKATbBNQxcVC+0jdgiZqArFgtX1bDllkR7Mp3HZUnGSbAhWwYbrNloRklqBGOL/3iUTc5cxN5BYrSgQbQsMsc/TdrneZ/yBj0pWA4ejIcA6g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=At3Osj9o; arc=fail smtp.client-ip=40.107.92.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=dg7x66/bUcUMfdR9Ps3MNteFBBiC3RemxRVvCN7U3WeLDf36DDGXpK5koJ1shvLvHZDQUbA02As78VyiX6hVJEkoDV8SUTZWwGubZ8hX98RWPSJhuwd8yeSx/zxYPJJvI5T+yoPGWLv8S6m1tm2I6BULc/jWcri6Ub8avh01HfKinJphsOoHFWtWLppLOdKlgHfqveaOWpX/X4xdp1NB9UvrN2GsGNXf6eq7yySuaxux//xik8Rx/nDPp4OD/s4Jvmt6KWqrHSd7wZZO8FtHkqoJwKk6Kt+Gn+L/ussG4Tvk1FQQ7qUYiOpPoF94hH+twag3H0oFqvB6VNW7EmGXcQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ppkMvIiK/f3S/DEb4c2LCtYu6jIS22VQe6ZJOIk9tGU=;
- b=pk2GxZX8R0zOwxf7+di8N5nGGaHmH2L+dIoKVS5CiXd1iCTmpucchnhNLE7hWbNZHyc0sRzK/pXcxBn3pkcgSs27HTUGTvjMMNCElYwP009lpD8r1qYgh3YSxv5Ytfeo8ds2uFcl0u6ApxTOV48/BB308Ms/HwnMzhlYWGJUMP6Sd5Q1XaKCduEtVXMfIplld0ULYzwoTafq+JvsBRDHXkK3HIHY8ngS2ZB7/3xM92XeyffeMh3X1dGw8dc88I9OFp9XCtYWMTi148+G1Tltmc8jCNLkbhUxwVuiKtreezu80fij/hXf6rtAr5iCNiVIqefYBe6+xg11IPi5VUApcQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ppkMvIiK/f3S/DEb4c2LCtYu6jIS22VQe6ZJOIk9tGU=;
- b=At3Osj9oJSlfdkFNnjFm5o5+UkqYaaS3Xsvs/0KfW3iubsw702+3ToE7RSeT+QjT7+0MxVhkOWNg5nZaeAC8bHuPSj386RktUqoa/iQHbIzeKsQnnx9KQ6sHwD9CcKIxm6GfMwlIlelaEm5QuRPfSvU4d9mOcU73kyq3SiJnqdYsbhhx/DxRTUtzDn2aVkQxjkipq58tmlbNjhZBAa8axgzGidNIykrKdOh44H08P3J9AcX7HuAc1y0pb1v0yd9z3CLgCIvVRcJo4pNi3R1bJps7q1SUgbJeD4qpB13tsPa9z8zlH7Y1NFXAFAoU7o9db1kXbDKDuFD1ZO/W86K2HQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
- by SJ5PPF75EAF8F39.namprd12.prod.outlook.com (2603:10b6:a0f:fc02::999) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8922.42; Sun, 27 Jul
- 2025 19:05:16 +0000
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732%7]) with mapi id 15.20.8964.024; Sun, 27 Jul 2025
- 19:05:16 +0000
-Date: Sun, 27 Jul 2025 16:05:14 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Logan Gunthorpe <logang@deltatee.com>
-Cc: Leon Romanovsky <leon@kernel.org>, Christoph Hellwig <hch@lst.de>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
-	Jens Axboe <axboe@kernel.dk>,
-	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
-	Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-	linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
-	linux-mm@kvack.org, linux-pci@vger.kernel.org,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Vivek Kasireddy <vivek.kasireddy@intel.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 05/10] PCI/P2PDMA: Export pci_p2pdma_map_type() function
-Message-ID: <20250727190514.GG7551@nvidia.com>
-References: <cover.1753274085.git.leonro@nvidia.com>
- <82e62eb59afcd39b68ae143573d5ed113a92344e.1753274085.git.leonro@nvidia.com>
- <20250724080313.GA31887@lst.de>
- <20250724081321.GT402218@unreal>
- <b32ae619-6c4a-46fc-a368-6ad4e245d581@deltatee.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b32ae619-6c4a-46fc-a368-6ad4e245d581@deltatee.com>
-X-ClientProxiedBy: YT4P288CA0031.CANP288.PROD.OUTLOOK.COM
- (2603:10b6:b01:d3::9) To CH3PR12MB8659.namprd12.prod.outlook.com
- (2603:10b6:610:17c::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D79202E36E6;
+	Mon, 28 Jul 2025 06:31:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753684302; cv=none; b=XQbvWauB5mPHqng02UEoel7qjTyuyWAUrDFIlOJFpV7zUFJj/fvXbd2xOMh3iXYJ4kh6NRo77+B3A5zFreuWXsEa0ruyBRXygXlsfD96Iv1pCvn1NOLW6YEErc1dfXWe6EwfdRrSCIUTojtv2jnZWGlySQAg4PAv8NEvx5j8mOw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753684302; c=relaxed/simple;
+	bh=phI48AhMXD/BxUSODMFpthLY09etg9VpnOBNsRs6VIc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=enPccmckZ/E08+mTGMqwsMSApOunczcl/2ofbKMMfjsnct3TMltz9HkftsFDMiGDALdiENf56zLqV8j9/1Du4C4uZ7w6LnwthjaDNZsiKp5Raq5udJMbmgmF8hVqM4IULpRYejPoI6SN/YSytCXvMy2vd6tRyGgVmEdeFseYZ6g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=sWeTO7Vl; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [192.168.7.202] ([71.202.166.45])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 56S6UTQV053138
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Sun, 27 Jul 2025 23:30:30 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 56S6UTQV053138
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025072201; t=1753684232;
+	bh=jDMFGzQKMMeXd6c8aeZfqsxoy83lf5w/1RFASuHFPNc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=sWeTO7VlLiC+WAGj3VjOH0j17gRpBNgtw/9UFqYuFVb+7cv0c0zchg/gymVdAWGGY
+	 zzUIblTEwG+EOsGmrQeONuHzyDqOU1xiKKNMBMdFk/HnCSxXPsAqCStcT3aH90CrZ3
+	 jkisEpxFU0giiBMHhZiu974DUuZ2wx676D38rxrVUR7bKT2Sem3Xwdi4x1svH9JH3v
+	 pHz1spA5bAIP3pQi5A/fFgcxeurOLFAVwGwoW3NnupYTpTE2OuixbCwexSSAazEpH3
+	 w3y080Wy4r3MuwVoWxBj23jckHyQGpJqP9TJ/DF9Qrfu/vKtmQ9EWNVmTYwbJnjXhg
+	 NKxcU6+cNuLqA==
+Message-ID: <c3a54990-9cd6-4d8a-baa0-11b4e8d4a23b@zytor.com>
+Date: Sun, 27 Jul 2025 23:30:28 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|SJ5PPF75EAF8F39:EE_
-X-MS-Office365-Filtering-Correlation-Id: f5e512f2-1f99-4108-b6b3-08ddcd40857c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?0sZO0eH4QB4Ql8XBONCtg7Ik7or2eFuee7p2ESzhrPusQksNWHWS/gwa875x?=
- =?us-ascii?Q?sdraFj13zZiEr948Y75mXCUX7c2F5PBCQ2kUju4JLGU9NFKdFVAmKfnzpcsd?=
- =?us-ascii?Q?02jN8OjbioANuS7C9mzCTvjemjYLOQ1ZT6i440h/8nsemAoHupTd3+VJKKYd?=
- =?us-ascii?Q?ldKA3kMRQ6/FDZzHI4IYxlCQ0ipiWYRwT17Mrhv3mP5mnmhEz81d1yMG5Vks?=
- =?us-ascii?Q?Z3vj4MpzvFBVto6t6eHmgAcdoLsfd4ZOjmsK5riO6viQ6N5SioCdHit4xVZm?=
- =?us-ascii?Q?J+z+ZfPSJ8vZqhNGNnl7mp0Xm+nu6EJEuZaSHqi27+FoA0NT8xBjvuUvEN+E?=
- =?us-ascii?Q?8nTPH13uvQAhKW1FIQbY5AjdfeY0Rm2jFi/AT4P55zbfGt/bH64qo2kydI7U?=
- =?us-ascii?Q?0F4I/i3ySmqENhKiSRHR3Tdpt9F1VnnwPaxCW15Lz3rMRUfQJ9L1t3KAWMem?=
- =?us-ascii?Q?4d/MivYwlW1e8f4SUJyJJZcALD+87DQvRcr4NbGJxn/RtvroX7udE0275f7k?=
- =?us-ascii?Q?vYEsR2eC3tf4oLkvBSCNLIwErnHTsN/3GfUseC0ilZaCEuJNDpwoyi6qMBir?=
- =?us-ascii?Q?vLy3rBWCrJRMfUExQlZxZNLcD8bPtwN/8Ns8lWTLoEY/X/BIKNrWX+azi02q?=
- =?us-ascii?Q?v+Enj29mr8OoAnGMT44251ETU0PeG7R2ozg/EPS4APl7xmtCsTDTpK2lB62q?=
- =?us-ascii?Q?l9QcS1CUD7dzq2jiS1aexgKgttis7qY6OUi53KDmZ7JcqNz0eZ/PJfu/v5IL?=
- =?us-ascii?Q?//P2eMGXgLAultRszhq2aXjU8TvKlI1duxoebU3VRQ7h4ZeAevQCxF+hC+Y+?=
- =?us-ascii?Q?SHMrzuw54CA8RZPBjEg9QEviXlLRFttoNC0fiaewDvUJYLp+T+mN9PEY69FE?=
- =?us-ascii?Q?sdMqIekidVxErIJ22n1FziQ5ADXqrfVsx+7gjpIcbfB6hpUfPhhPvS8M61nt?=
- =?us-ascii?Q?AWSk+te8JDP2MLigCiJTy33n8G/ZaR1TCtpfjWHcWBKAbdwbwanlzkIEd1Jm?=
- =?us-ascii?Q?6x8POPM36QIv8SvHKfGYjAQxYxxaN7qZIYZTYMcA2DHomWSHg6WZ6j5WWEbM?=
- =?us-ascii?Q?l24rUTmVcv3ftpyTEUD9pwdmi6oIKc4NDjqMBshFecqLcn2ocEyArx2j3MHN?=
- =?us-ascii?Q?BKRBeJFhH1pYf+ZAZzWw/YfrYconUsmd3rkPkDlL6mXbcPu+4PpL6tmUnng6?=
- =?us-ascii?Q?gcxVUOhHH8/ywzrS2DT/GI78+85Hbk17pN4BW1hgH2lWFA1PacyoMrtfyUgm?=
- =?us-ascii?Q?gkMckkE4P++cUGAI9s/oLiG9O7mHcU3fRTB+xF6tfhUlMdgfC7+fPBTLtmcp?=
- =?us-ascii?Q?JRgqjgR787IP5jpx1JZf8ByEUG7TCfL2E412JtJ2itQ0mGO3XKj7ee2W4EaP?=
- =?us-ascii?Q?buEyoiIjm79LnAZVZaI6iJZ4qIRhA58X/2o37OA7/ByziXiJ0Wv2EWie1naZ?=
- =?us-ascii?Q?rOLaegPBtS0=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?uiQ2rlnFLT7dJLg9vxrZrNnUHrcNf2Z8aXuh48wc7OxC2k0lh5avwbsdSu2b?=
- =?us-ascii?Q?/24rxDA4oO5IhJDl5yyEREhUcr5/42dsG63IUuqkyTKCAf37P2b1/IQI+VCW?=
- =?us-ascii?Q?rXtEJy10fXFELDOt7ed61iINtQJXAv6b+qNMxOQXw7wqieMErwqEjGBXivST?=
- =?us-ascii?Q?6N55Y9utH9MAjn+aEeU8HAz2F2BQ2e242tCmsahVL2DcEl1X/Vi/fXeefZSy?=
- =?us-ascii?Q?pSz+GsAnNy1iZES7HEkVmT+CJXChHVnsMgR+VKAmETH6DLLsCOoxgQJgY6yv?=
- =?us-ascii?Q?YtPF+ggGmqxE0Ej/cltiRW7MIgr0xC1AWrgxChB7cl1VxrmXf1ZF1l22r0IR?=
- =?us-ascii?Q?8PBeOeTlXSyMmH3b7DSm14M8Is9xsKH55gWlzbfEoCvyZB8myFgrDu15iLhu?=
- =?us-ascii?Q?rkrZ3Gd51qju3ihZfM462LSCpXQT+dPVKSDpg2roQE8Zl41AOLuwSwLspw5C?=
- =?us-ascii?Q?T2m0tIUFQU5mJyt6ttLX7XkBR1jVojnCUVerF8yQDIGjo6vLqbsUEaocXjKR?=
- =?us-ascii?Q?bxfE/KzMM4me2azFZG73dOWa+yDp8JcRzF95Ub5zpM6COABmrxJSxvPkFhnh?=
- =?us-ascii?Q?WhjAlgOO5ESYqZoieez2XAzU/LMpV5BO5aF0OUoySUu38e/arrX65R+K3WkA?=
- =?us-ascii?Q?yYxlFo926FcS+Z9dShpFnI15vw29aFo36nXCEUbu6WqT1OJgWsWkf2+LjWEs?=
- =?us-ascii?Q?6T5wXT7h3d7Eil7k0ycSxrh+MYRF1lMgvM7L5sldfekmS1NouY1+ln5mqSCf?=
- =?us-ascii?Q?98w4pz9l/gr/IM8vgMnuy0Ft6zaoBsN+H4zETBhjFBgKWoVO1D70PozUbQ6Q?=
- =?us-ascii?Q?s2GFZBCIDBmJqTgO4zXUtN23dTxtS9KEApHdmknnIfo4kMtBpo8FvSLzwF1o?=
- =?us-ascii?Q?FBI5ilgZxKZ3HObL6glPzr/tbUqCRpiRU2QgCOTuj+xfMy779y5P0VbyzoJl?=
- =?us-ascii?Q?c8TkeekH+z9DFATYGG1inxbk3LQ9XbP5Yo5V8hdXEKAwzG5G3cXGW0NaZQMS?=
- =?us-ascii?Q?59g9zTUZJbNRBmPRcjWVStq3LRsQKlQPssVGhAJCkAra7dHgfRdQsQ4GFSEV?=
- =?us-ascii?Q?GxboMcvvbk7m8/LEU2AmBxW0HyhSw/yWIOWWFonUX8RqRoNUT5y9Hkic7MNI?=
- =?us-ascii?Q?alJxcX+hHZuFjNKIQeEmxTn0ussJGSVh5oGY/psic9Pw6hBZdqzsD/HGzwoX?=
- =?us-ascii?Q?rJDliIbo1Gl2qszjm7+hhipLPt16Wgnr2ShjwogRFivXQCC/CibXliZCqFz6?=
- =?us-ascii?Q?c6cbo3xjjj4NIL+ffB1VR+chg9D6T8bXs1Sr3W581sVf3k6a49QgJCUpYxH1?=
- =?us-ascii?Q?JTSL0y+iVn/tygp8VHQPUtjIEYMv7yKYbbhUSVjh9NFybgytcdtaKVXeX1nT?=
- =?us-ascii?Q?UrRRdmqjTuVP8u5X/llT+p+rPQo9x6WyQs50Xd4PNlJhSiK46qEaZ/ZsQRdt?=
- =?us-ascii?Q?WzHIjdT3OzL+16T+cNNpBuw4UQqn3ghqbQ3RV1N+ZxFRMomUr/hP/8KfS3R2?=
- =?us-ascii?Q?5cW5FTO1IyikRlSU+wXSuFO/ryXyjnOlO8DVDnjgPSasL0/L9QKwKZSHRJda?=
- =?us-ascii?Q?b+ff1pJxjzusL9paLPM=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f5e512f2-1f99-4108-b6b3-08ddcd40857c
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jul 2025 19:05:15.9272
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: DNBLRbleK40FGh2k8TFQC8W8ccHWZ0ii31199y9cf0Pk4w+l1bvxqaYV40vAkEk4
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ5PPF75EAF8F39
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v11 21/23] KVM: nVMX: Enable CET support for nested guest
+To: Chao Gao <chao.gao@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, x86@kernel.org, seanjc@google.com,
+        pbonzini@redhat.com, dave.hansen@intel.com
+Cc: rick.p.edgecombe@intel.com, mlevitsk@redhat.com, john.allen@amd.com,
+        weijiang.yang@intel.com, minipli@grsecurity.net,
+        Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>
+References: <20250704085027.182163-1-chao.gao@intel.com>
+ <20250704085027.182163-22-chao.gao@intel.com>
+Content-Language: en-US
+From: Xin Li <xin@zytor.com>
+Autocrypt: addr=xin@zytor.com; keydata=
+ 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
+ l75w1xInsg==
+In-Reply-To: <20250704085027.182163-22-chao.gao@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jul 25, 2025 at 10:30:46AM -0600, Logan Gunthorpe wrote:
-> 
-> 
-> On 2025-07-24 02:13, Leon Romanovsky wrote:
-> > On Thu, Jul 24, 2025 at 10:03:13AM +0200, Christoph Hellwig wrote:
-> >> On Wed, Jul 23, 2025 at 04:00:06PM +0300, Leon Romanovsky wrote:
-> >>> From: Leon Romanovsky <leonro@nvidia.com>
-> >>>
-> >>> Export the pci_p2pdma_map_type() function to allow external modules
-> >>> and subsystems to determine the appropriate mapping type for P2PDMA
-> >>> transfers between a provider and target device.
-> >>
-> >> External modules have no business doing this.
-> > 
-> > VFIO PCI code is built as module. There is no way to access PCI p2p code
-> > without exporting functions in it.
-> 
-> The solution that would make more sense to me would be for either
-> dma_iova_try_alloc() or another helper in dma-iommu.c to handle the
-> P2PDMA case.
+> @@ -2515,6 +2537,30 @@ static void prepare_vmcs02_early(struct vcpu_vmx *vmx, struct loaded_vmcs *vmcs0
+>   	}
+>   }
+>   
+> +static inline void cet_vmcs_fields_get(struct kvm_vcpu *vcpu, u64 *ssp,
+> +				       u64 *s_cet, u64 *ssp_tbl)
+> +{
+> +	if (guest_cpu_cap_has(vcpu, X86_FEATURE_SHSTK)) {
+> +		*ssp = vmcs_readl(GUEST_SSP);
+> +		*ssp_tbl = vmcs_readl(GUEST_INTR_SSP_TABLE);
+> +	}
+> +	if (guest_cpu_cap_has(vcpu, X86_FEATURE_IBT) ||
+> +	    guest_cpu_cap_has(vcpu, X86_FEATURE_SHSTK))
+> +		*s_cet = vmcs_readl(GUEST_S_CET);
+> +}
+> +
+> +static inline void cet_vmcs_fields_set(struct kvm_vcpu *vcpu, u64 ssp,
+> +				       u64 s_cet, u64 ssp_tbl)
+> +{
+> +	if (guest_cpu_cap_has(vcpu, X86_FEATURE_SHSTK)) {
+> +		vmcs_writel(GUEST_SSP, ssp);
+> +		vmcs_writel(GUEST_INTR_SSP_TABLE, ssp_tbl);
+> +	}
+> +	if (guest_cpu_cap_has(vcpu, X86_FEATURE_IBT) ||
+> +	    guest_cpu_cap_has(vcpu, X86_FEATURE_SHSTK))
+> +		vmcs_writel(GUEST_S_CET, s_cet);
+> +}
+> +
+>   static void prepare_vmcs02_rare(struct vcpu_vmx *vmx, struct vmcs12 *vmcs12)
+>   {
+>   	struct hv_enlightened_vmcs *hv_evmcs = nested_vmx_evmcs(vmx);
 
-This has nothing to do with dma-iommu.c, the decisions here still need
-to be made even if dma-iommu.c is not compiled in.
 
-It could be exported from the main dma code, but I think it would just
-be a 1 line wrapper around the existing function? I'd rather rename
-the functions and leave them in the p2pdma.c files...
+The order of the arguments is a bit of weird to me, I would move s_cet
+before ssp.  Then it is consistent with the order in
+https://lore.kernel.org/kvm/20250704085027.182163-13-chao.gao@intel.com/
 
-Jason
+
+> --- a/arch/x86/kvm/vmx/vmx.h
+> +++ b/arch/x86/kvm/vmx/vmx.h
+> @@ -181,6 +181,9 @@ struct nested_vmx {
+>   	 */
+>   	u64 pre_vmenter_debugctl;
+>   	u64 pre_vmenter_bndcfgs;
+> +	u64 pre_vmenter_ssp;
+> +	u64 pre_vmenter_s_cet;
+> +	u64 pre_vmenter_ssp_tbl;
+>   
+>   	/* to migrate it to L1 if L2 writes to L1's CR8 directly */
+>   	int l1_tpr_threshold;
+
+Same here.
 
