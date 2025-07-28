@@ -1,191 +1,230 @@
-Return-Path: <kvm+bounces-53579-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53580-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC282B143D0
-	for <lists+kvm@lfdr.de>; Mon, 28 Jul 2025 23:25:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED031B143ED
+	for <lists+kvm@lfdr.de>; Mon, 28 Jul 2025 23:37:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D484189934A
-	for <lists+kvm@lfdr.de>; Mon, 28 Jul 2025 21:25:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42B483B7CAC
+	for <lists+kvm@lfdr.de>; Mon, 28 Jul 2025 21:37:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7178275878;
-	Mon, 28 Jul 2025 21:25:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48A1C275B12;
+	Mon, 28 Jul 2025 21:37:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="AiJGs3Fv"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ei4gDOtX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 786F521C18D;
-	Mon, 28 Jul 2025 21:25:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9760B223710
+	for <kvm@vger.kernel.org>; Mon, 28 Jul 2025 21:37:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753737915; cv=none; b=ZBPw0Pkovl7BSfY/P4zsRyHfCiIKov6HyXwCEjwfg2b6t0+UbtK6k/gRcm2JRiEKfoY/SKAggOjygwc3kH5qL8a8+S5WJCcTJniGpGNjV1uwsi9ypUe+AMuiIscl+2GkzmpBVRDaAgYcBmt7Om0lkpAhxriIl2SRj0dAH35PNMQ=
+	t=1753738652; cv=none; b=i3EJRWeuanDHJDC2aSTwlSo5H+qbNZqfWgDcQhqXutWjBpAOn4/+LJWmA6tRUXs8q+47MP0CVYGOsPT3Eq0f4C5lsJc2XKE0oQfdhOZ9AyCWJCjDZvtjVv+WuWF2YQqj1uChJ0YzLySmWwCroNSCgpVquAc6as6iUJL1qzo9Jd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753737915; c=relaxed/simple;
-	bh=hFGF4ak4iL9Eg7qXDoI/Knr80giZOYy2BcIVSQFdahs=;
-	h=Message-ID:Date:MIME-Version:Subject:References:To:Cc:From:
-	 In-Reply-To:Content-Type; b=k9r3QpkFmhWvXtqULW0inV4HNWKMbm1mbDJ6wTBlxBhsUmLOpZowqtfxQEFDYn3Wn+rLnfL5+nHkgeYhpTcoVV6RroN2y+5IENTuLmoKdoXoz5SiLlDn16zTcGnLjhQo4DpChO/jczMyNQmkxHTwlb7pHM+eRVfFua1jFaH0wGU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=AiJGs3Fv; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56SDBOgI027003;
-	Mon, 28 Jul 2025 21:25:05 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=RsIpm1
-	ZePftr61CV00pezlWbIWceZ1DWlXmXkQqYnbI=; b=AiJGs3Fvcesi9WQsru5oEp
-	mlv3Xk53vRkPhtV8WAHA2L5FvwRemw0lHQCeBV4ifuSKHJoTwq9w0pzaZdVNDeML
-	ZVbVLMbYDmILSsq21Ig5YCc+uNbu5lhXEgDpuNvZ6SX52mtJhHEXjdMO3pfe8nsf
-	mBxFbNZ9Eur0kEckWEbPn7710G11jATj0Clcbb1ezkopZsxM2yt8Im1VLFZ5wOXm
-	dIvuuC/OaVPVhp2/hJNIseI140hbV69NJVWrhnOOg7s8Q0Od153k94+H6SKiNuCt
-	hI29WYghUIa/4zFkJeHHiC740MFD8ODYqC/L4WO288G1p+JyQafZubryoM8Rewlw
-	==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 484qemkayj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 28 Jul 2025 21:25:05 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 56SJAibc018301;
-	Mon, 28 Jul 2025 21:25:04 GMT
-Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 485abnyhhx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 28 Jul 2025 21:25:04 +0000
-Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
-	by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 56SLP3lI58327434
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 28 Jul 2025 21:25:03 GMT
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8E6865805D;
-	Mon, 28 Jul 2025 21:25:03 +0000 (GMT)
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2B91358059;
-	Mon, 28 Jul 2025 21:25:03 +0000 (GMT)
-Received: from [9.24.20.98] (unknown [9.24.20.98])
-	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 28 Jul 2025 21:25:03 +0000 (GMT)
-Message-ID: <c2bba86f-d9d2-4bab-97e4-d983bffbb485@linux.ibm.com>
-Date: Mon, 28 Jul 2025 16:25:02 -0500
+	s=arc-20240116; t=1753738652; c=relaxed/simple;
+	bh=vmK7LuAf2Esv7j9pLWUfBPHqlLS3iMrw6D4xegLhTdk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZjtjUJCNxUOaBV/+gqYt3ZYoorRVhN8Z1RwAgYbYVuc+P7ZIgK82Y/AcdmiYyMahvB5MmlOfpTn+E5iwLS8JJPhPGY7LZyt9qZVGUIA5iLZKp+IA7n9stIr1KvI3jbiPv2rh/VIjTsfZ/2VRTTeWrbD1DfU3CoMVcSHMiPFZ0x8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ei4gDOtX; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1753738649;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WSSUSvYO/OHvphkbSQkQlLCmeUpTcTQ6sJaW2h42KWU=;
+	b=ei4gDOtX8U+LvWyGnEQyiiyzMhImGgyHYtBVFFTu86QwLnHmaAJgj6Zq+Wmjyblw6Z9WeB
+	yZvlXB5OUzIh+wbb6rxwJyk3xTH/0KbE5A64N/1lJ/TYpdtaIYdXLaHHPblaH1RHF9/ngo
+	8Toh2j9yVdJ4Z7lcoSy7W3P2fWFz8uE=
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
+ [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-505-Tn7EATnjPkmgZtfBiqGi4w-1; Mon, 28 Jul 2025 17:37:26 -0400
+X-MC-Unique: Tn7EATnjPkmgZtfBiqGi4w-1
+X-Mimecast-MFC-AGG-ID: Tn7EATnjPkmgZtfBiqGi4w_1753738645
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3df410b6753so6138995ab.2
+        for <kvm@vger.kernel.org>; Mon, 28 Jul 2025 14:37:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753738645; x=1754343445;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WSSUSvYO/OHvphkbSQkQlLCmeUpTcTQ6sJaW2h42KWU=;
+        b=lMGpi0iv25reYN9sf/cxfigrxCICVu0nbufD2DGjS2HGfLd+aCBlBuAVFIbGlMKyhJ
+         DCYVKHY1Ez4ZA817U8d5uhPkq1uk1E8CZ46QoOjNvHzU6l5tUadpeKjVnYkioi4uK9LU
+         9vi8Yu6pWnTHQvErVwAq6Q85kReiOCXl8S9KfR2dns+JcmVrNYzKanQ48+YQWBDrd/5A
+         v5FKaO+UeWF+ieYEitVvUtt9XiUbNEXz6LeOF39TVYr1URUhV1wCJzNnrx2iHOZ75/2w
+         qN2zipkB4E7LiD0wn/bWKZQkey95xL3i4abYsGi6rkVLBAIApNTeQfMXDzsvBoaf85aJ
+         YKlw==
+X-Forwarded-Encrypted: i=1; AJvYcCVzEGgDHdlWQGrNTWPdSjJcJBaInh5nIS689x+TWRMiam4mfdbM6WR+5Xl2zERASpGY8fA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwS0oWmUi8GgnXTmVgaan7j63LwdYQhMSUP491QThUQMa0eAny6
+	THe+1552AnllzwQ3DpM98MHWr6xMUdJqp8jg1h+EnQybHxWXD4PXx+FGnRyztp5ctCzm7uYodI4
+	gRv1x0+DIeKdYnriU8/cYLvkIUaxHrE8XDsy7Py2cJjR80YFOrZ3Fww==
+X-Gm-Gg: ASbGncsbN6rLZeZa8ifOu9iBwwf/KH9jCE9PIQ27i7N7Z2gMiJQJGzrZNpPyiBUG0zR
+	JifyqBog7UAfGzCCgfLDp47ZbTDmY1nrDHqSYgsqUyyLWOLlLI6xK1l6tzuBUR50zH3VcCSQ/Pe
+	qhsb0u5cnY/KVPRcRsjYYVJ9EIU18qD4jDhOdcTv3YDEIPSjv8iJd7UxF5coC1+UCyZmpTPgpUZ
+	0pX+jj5GU4X5BmcLyjW8hf9Mxbq2y+NZw5cU6elO9G0OAIwFCFNXDceKHa+x+g9GHHovPhMUYSf
+	n3/KuPGcDf3btHxuRzgP1XdHPGwH0PpPFLihL9qi+Us=
+X-Received: by 2002:a05:6e02:3704:b0:3e2:94ec:e379 with SMTP id e9e14a558f8ab-3e3c5385e09mr67989285ab.7.1753738645030;
+        Mon, 28 Jul 2025 14:37:25 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IErX+WEsrqeHKni/uNNPldbJZPrUamuSASB+1k/g600fZ+i2JnjVLimIUTw7/v6P5+PLxYaZg==
+X-Received: by 2002:a05:6e02:3704:b0:3e2:94ec:e379 with SMTP id e9e14a558f8ab-3e3c5385e09mr67989095ab.7.1753738644528;
+        Mon, 28 Jul 2025 14:37:24 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-508c91edeb1sm2117893173.35.2025.07.28.14.37.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Jul 2025 14:37:23 -0700 (PDT)
+Date: Mon, 28 Jul 2025 15:37:22 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: lizhe.67@bytedance.com
+Cc: farman@linux.ibm.com, akpm@linux-foundation.org, david@redhat.com,
+ jgg@ziepe.ca, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-mm@kvack.org, peterx@redhat.com
+Subject: Re: [FIXUP] vfio/type1: correct logic of vfio_find_vpfn()
+Message-ID: <20250728153722.4b4c1442.alex.williamson@redhat.com>
+In-Reply-To: <20250725070054.66497-1-lizhe.67@bytedance.com>
+References: <20250724105608.73b05a24.alex.williamson@redhat.com>
+	<20250725070054.66497-1-lizhe.67@bytedance.com>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: vhost: linux-next: kernel crash at vhost_dev_cleanup/kfree
-Content-Language: en-US
-References: <1b28a10e-0cff-405e-9106-0c20e70854f9@linux.ibm.com>
-To: jasowang@redhat.com
-Cc: mst@redhat.com, kvm@vger.kernel.org, virtualization@lists.linux.dev,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        jonah.palmer@oracle.com, Eric Farman <farman@linux.ibm.com>
-From: JAEHOON KIM <jhkim@linux.ibm.com>
-In-Reply-To: <1b28a10e-0cff-405e-9106-0c20e70854f9@linux.ibm.com>
-X-Forwarded-Message-Id: <1b28a10e-0cff-405e-9106-0c20e70854f9@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: JNDVpRasbacsR66uLIqWAC1n7XU-CD_o
-X-Proofpoint-GUID: JNDVpRasbacsR66uLIqWAC1n7XU-CD_o
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzI4MDE1OCBTYWx0ZWRfXwJI2oKzajmWT
- oqxgMxP28FEyAmTx3ojVVGrhRGA2q1xvu6el+2mPwR39gkjXmRa0myhuKm4JzbFGqu5guMyfrSG
- mAUb4tCwCUmKig+6BVrXC3eqzgsTHrV3o6x9ocOUF5GprsdLqxYnDjLQOIffwp/Mt+rUvN3+11f
- IMr+WNPcuQrBuQEVqL+8+LSYmWqiq0kDRgWcL8sgiVcp0cP09ph09B0OkVbRDmYeaMfVfT6BhFf
- vdB2++r+DkjMQeg5Pa7OJv21pyI/S+lBs1EQEgzamDgmELb9emxFOlYyNj2X6xH2kmFJeTMHk98
- v9HEBupywZH7KM2xOV5LVWnXautn2MVv6drfF+1v5u2bjTNAP71S6yTC92pkDJxtGvsk8YD1CPi
- R22E7zwWsf3NnWdxyJBefiSpRoVtjLQ4jDJHBcvH2DE+8YElRjc/D3MJVkm1TQWIMvRQq9E+
-X-Authority-Analysis: v=2.4 cv=BJOzrEQG c=1 sm=1 tr=0 ts=6887eab1 cx=c_pps
- a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
- a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=VwQbUJbxAAAA:8 a=8vsdKcPWeYT-9k0nS1MA:9
- a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-07-28_04,2025-07-28_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 phishscore=0 suspectscore=0 spamscore=0 lowpriorityscore=0
- mlxlogscore=812 priorityscore=1501 malwarescore=0 mlxscore=0 bulkscore=0
- adultscore=0 clxscore=1011 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2507280158
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
+On Fri, 25 Jul 2025 15:00:54 +0800
+lizhe.67@bytedance.com wrote:
 
-Dear Jason Wang,
+> From: Li Zhe <lizhe.67@bytedance.com>
+> 
+> In commit 492d1e9f0df7 ("vfio/type1: optimize vfio_pin_pages_remote()"),
+> we changes vfio_find_vpfn() from exact-iova matching to the interval
+> [iova, iova + PAGE_SIZE), which may cause the following problem.
+> 
+> [  215.671885] ------------[ cut here ]------------
+> [  215.671893] WARNING: CPU: 10 PID: 6210 at drivers/vfio/vfio_iommu_type1.c:1204
+> vfio_remove_dma+0xda/0xf0 [vfio_iommu_type1]
+> [  215.671902] Modules linked in: vhost_vsock vmw_vsock_virtio_transport_common vsock vhost
+> vhost_iotlb algif_hash af_alg kvm nft_masq nft_ct nft_reject_ipv4 nf_reject_ipv4 nft_reject act_csum
+> cls_u32 sch_htb nft_chain_nat nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 nf_tables pkey_pckmo
+> s390_trng pkey_ep11 pkey_cca zcrypt_cex4 zcrypt eadm_sch rng_core vfio_ccw mdev vfio_iommu_type1
+> vfio drm sch_fq_codel i2c_core drm_panel_orientation_quirks dm_multipath loop nfnetlink ctcm fsm
+> zfcp scsi_transport_fc mlx5_ib diag288_wdt mlx5_core ghash_s390 prng aes_s390 des_s390 libdes
+> sha3_512_s390 sha3_256_s390 sha512_s390 sha1_s390 sha_common rpcrdma sunrpc rdma_ucm rdma_cm
+> configfs iw_cm ib_cm ib_uverbs ib_core scsi_dh_rdac scsi_dh_emc scsi_dh_alua pkey autofs4
+> [  215.671946] CPU: 10 UID: 107 PID: 6210 Comm: qemu-system-s39 Kdump: loaded Not tainted 6.16.0-
+> rc7-00005-g4ff8295d8d61 #79 NONE
+> [  215.671950] Hardware name: IBM 3906 M05 780 (LPAR)
+> [  215.671951] Krnl PSW : 0704c00180000000 000002482f7ee55e (vfio_remove_dma+0xde/0xf0
+> [vfio_iommu_type1])
+> [  215.671956]            R:0 T:1 IO:1 EX:1 Key:0 M:1 W:0 P:0 AS:3 CC:0 PM:0 RI:0 EA:3
+> [  215.671959] Krnl GPRS: 006d010100000000 000000009d8a4c40 000000008f3b1c80 0000000092ffad20
+> [  215.671961]            0000000090b57880 006e010100000000 000000008f3b1c80 000000008f3b1cc8
+> [  215.671963]            0000000085b3ff00 000000008f3b1cc0 000000008f3b1c80 0000000092ffad20
+> [  215.671964]            000003ff867acfa8 000000008f3b1ca0 000001c8b36c3be0 000001c8b36c3ba8
+> [  215.671972] Krnl Code: 000002482f7ee550: c0e53ff9fcc8	brasl	%r14,00000248af72dee0
+>            000002482f7ee556: a7f4ffcf		brc	15,000002482f7ee4f4
+>           #000002482f7ee55a: af000000		mc	0,0
+>           >000002482f7ee55e: a7f4ffa9		brc	15,000002482f7ee4b0  
+>            000002482f7ee562: 0707		bcr	0,%r7
+>            000002482f7ee564: 0707		bcr	0,%r7
+>            000002482f7ee566: 0707		bcr	0,%r7
+>            000002482f7ee568: 0707		bcr	0,%r7
+> [  215.672006] Call Trace:
+> [  215.672008]  [<000002482f7ee55e>] vfio_remove_dma+0xde/0xf0 [vfio_iommu_type1]
+> [  215.672013]  [<000002482f7f03de>] vfio_iommu_type1_detach_group+0x3de/0x5f0 [vfio_iommu_type1]
+> [  215.672016]  [<000002482f7d4c4e>] vfio_group_detach_container+0x5e/0x180 [vfio]
+> [  215.672023]  [<000002482f7d2ce0>] vfio_group_fops_release+0x50/0x90 [vfio]
+> [  215.672027]  [<00000248af25e1ee>] __fput+0xee/0x2e0
+> [  215.672031]  [<00000248aef19f18>] task_work_run+0x88/0xd0
+> [  215.672036]  [<00000248aeef559a>] do_exit+0x18a/0x4e0
+> [  215.672042]  [<00000248aeef5ab0>] do_group_exit+0x40/0xc0
+> [  215.672045]  [<00000248aeef5b5e>] __s390x_sys_exit_group+0x2e/0x30
+> [  215.672048]  [<00000248afc81e56>] __do_syscall+0x136/0x340
+> [  215.672054]  [<00000248afc8da7e>] system_call+0x6e/0x90
+> [  215.672058] Last Breaking-Event-Address:
+> [  215.672059]  [<000002482f7ee4aa>] vfio_remove_dma+0x2a/0xf0 [vfio_iommu_type1]
+> [  215.672062] ---[ end trace 0000000000000000 ]---
+> [  219.861940] ------------[ cut here ]------------
+> 
+> ...
+> 
+> [  241.164333] ------------[ cut here ]------------
+> [  241.164340] kernel BUG at drivers/vfio/vfio_iommu_type1.c:1480!
+> [  241.164358] monitor event: 0040 ilc:2 [#1]SMP
+> [  241.164363] Modules linked in: vhost_vsock vmw_vsock_virtio_transport_common vsock vhost
+> vhost_iotlb algif_hash af_alg kvm nft_masq nft_ct nft_reject_ipv4 nf_reject_ipv4 nft_reject act_csum
+> cls_u32 sch_htb nft_chain_nat nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 nf_tables pkey_pckmo
+> s390_trng pkey_ep11 pkey_cca zcrypt_cex4 zcrypt eadm_sch rng_core vfio_ccw mdev vfio_iommu_type1
+> vfio drm sch_fq_codel i2c_core drm_panel_orientation_quirks dm_multipath loop nfnetlink ctcm fsm
+> zfcp scsi_transport_fc mlx5_ib diag288_wdt mlx5_core ghash_s390 prng aes_s390 des_s390 libdes
+> sha3_512_s390 sha3_256_s390 sha512_s390 sha1_s390 sha_common rpcrdma sunrpc rdma_ucm rdma_cm
+> configfs iw_cm ib_cm ib_uverbs ib_core scsi_dh_rdac scsi_dh_emc scsi_dh_alua pkey autofs4
+> [  241.164399] CPU: 14 UID: 107 PID: 6581 Comm: qemu-system-s39 Kdump: loaded Tainted: G        W
+> 6.16.0-rc7-00005-g4ff8295d8d61 #79 NONE
+> [  241.164403] Tainted: [W]=WARN
+> [  241.164404] Hardware name: IBM 3906 M05 780 (LPAR)
+> [  241.164406] Krnl PSW : 0704e00180000000 000002482f7f132a (vfio_dma_do_unmap+0x4aa/0x4b0
+> [vfio_iommu_type1])
+> [  241.164413]            R:0 T:1 IO:1 EX:1 Key:0 M:1 W:0 P:0 AS:3 CC:2 PM:0 RI:0 EA:3
+> [  241.164415] Krnl GPRS: 0000000000000000 000000000000000b 0000000040000000 000000008cfdcb40
+> [  241.164418]            0000000000001001 0000000000000001 0000000000000000 0000000040000000
+> [  241.164419]            0000000000000000 0000000000000000 00000001fbe7f140 000000008cfdcb40
+> [  241.164421]            000003ff97dacfa8 0000000000000000 00000000871582c0 000001c8b4177cd0
+> [  241.164428] Krnl Code: 000002482f7f131e: a7890000		lghi	%r8,0
+>            000002482f7f1322: a7f4feeb		brc	15,000002482f7f10f8
+>           #000002482f7f1326: af000000		mc	0,0
+>           >000002482f7f132a: 0707		bcr	0,%r7  
+>            000002482f7f132c: 0707		bcr	0,%r7
+>            000002482f7f132e: 0707		bcr	0,%r7
+>            000002482f7f1330: c0040000803c	brcl	0,000002482f8013a8
+>            000002482f7f1336: eb6ff0480024	stmg	%r6,%r15,72(%r15)
+> [  241.164458] Call Trace:
+> [  241.164459]  [<000002482f7f132a>] vfio_dma_do_unmap+0x4aa/0x4b0 [vfio_iommu_type1]
+> [  241.164463]  [<000002482f7f1d08>] vfio_iommu_type1_ioctl+0x1c8/0x370 [vfio_iommu_type1]
+> [  241.164466]  [<00000248af27704e>] vfs_ioctl+0x2e/0x70
+> [  241.164471]  [<00000248af278610>] __s390x_sys_ioctl+0xe0/0x100
+> [  241.164474]  [<00000248afc81e56>] __do_syscall+0x136/0x340
+> [  241.164477]  [<00000248afc8da7e>] system_call+0x6e/0x90
+> [  241.164481] Last Breaking-Event-Address:
+> [  241.164482]  [<000002482f7f1238>] vfio_dma_do_unmap+0x3b8/0x4b0 [vfio_iommu_type1]
+> [  241.164486] Kernel panic - not syncing: Fatal exception: panic_on_oops
+> 
+> This patch reverts vfio_find_vpfn() to exact iova matching, thereby
+> resolving the issue.
+> 
+> Fixes: 492d1e9f0df7 ("vfio/type1: optimize vfio_pin_pages_remote()")
+> Tested-by: Eric Farman <farman@linux.ibm.com>
+> Signed-off-by: Li Zhe <lizhe.67@bytedance.com>
+> ---
+>  drivers/vfio/vfio_iommu_type1.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-I would like to kindly report a kernel crash issue on our s390x server 
-which seems to be related to the following patch.
---------------------------------------------------------------------------------------------------------------------------
-   commit 7918bb2d19c9 ("vhost: basic in order support")
-https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git/commit/?id=7918bb2d19c9
---------------------------------------------------------------------------------------------------------------------------
+Applied to vfio next branch for v6.17.  Thanks,
 
-This patch landed in linux-next between July 16th and 17th. Since then,  
-kernel crash have been observed during stress testing.
-The issue can be confirmed using the following command:
--------------------------------------------
-   stress-ng --dev 1 -t 10s
--------------------------------------------
+Alex
 
-Crash log and call stack are as follows.
-Additionally, this crash appears similar to the issue discussed in the 
-following thread:
-https://lore.kernel.org/kvm/bvjomrplpsjklglped5pmwttzmljigasdafjiizt2sfmytc5rr@ljpu455kx52j/
-
-[ 5413.029569] Unable to handle kernel pointer dereference in virtual 
-kernel address space
-[ 5413.029573] Failing address: 00000328856e8000 TEID: 00000328856e8803
-[ 5413.029576] Fault in home space mode while using kernel ASCE.
-[ 5413.029580] AS:0000000371fdc007 R3:0000000000000024
-[ 5413.029607] Oops: 003b ilc:3 [#1]SMP
-   .......
-[ 5413.029655] CPU: 23 UID: 0 PID: 2339 Comm: stress-ng-dev Not tainted 
-6.16.0-rc6-10099-g60a66ed35d6b #63 NONE
-[ 5413.029659] Hardware name: IBM 3906 M05 780 (LPAR)
-[ 5413.029662] Krnl PSW : 0704e00180000000 0000032714b9f156 
-(kfree+0x66/0x340)
-[ 5413.029673]            R:0 T:1 IO:1 EX:1 Key:0 M:1 W:0 P:0 AS:3 CC:2 
-PM:0 RI:0 EA:3
-[ 5413.029677] Krnl GPRS: 0000000000000002 0000008c056e8000 
-0000262500000000 0000000085bf4610
-[ 5413.029681]            0000000085bf4660 0000000085bf4618 
-0000032716402270 0000032694e0391a
-[ 5413.029683]            0000032716402290 0000032714720000 
-00000328856e8000 0000262500000000
-[ 5413.029685]            000003ff8312cfa8 0000000000000000 
-000023015ba00000 000002a71e8d3ba8
-[ 5413.029697] Krnl Code: 0000032714b9f146: e3e060080008 ag %r14,8(%r6)
-[ 5413.029697]            0000032714b9f14c: ec1e06b93a59 risbgn 
-%r1,%r14,6,185,58
-[ 5413.029697]           #0000032714b9f152: b90800a1 agr %r10,%r1
-[ 5413.029697]           >0000032714b9f156: e320a0080004 lg      %r2,8(%r10)
-[ 5413.029697]            0000032714b9f15c: a7210001 tmll    %r2,1
-[ 5413.029697]            0000032714b9f160: a77400e0 brc 7,0000032714b9f320
-[ 5413.029697]            0000032714b9f164: c004000000ca brcl 
-0,0000032714b9f2f8
-[ 5413.029697]            0000032714b9f16a: 95f5a030 cli 48(%r10),245
-[ 5413.029738] Call Trace:
-[ 5413.029741]  [<0000032714b9f156>] kfree+0x66/0x340
-[ 5413.029747]  [<0000032694e0391a>] vhost_dev_free_iovecs+0x9a/0xc0 [vhost]
-[ 5413.029757]  [<0000032694e05406>] vhost_dev_cleanup+0xb6/0x210 [vhost]
-[ 5413.029763]  [<000003269507000a>] vhost_vsock_dev_release+0x1aa/0x1e0 
-[vhost_vsock]
-[ 5413.029768]  [<0000032714c16ece>] __fput+0xee/0x2e0
-[ 5413.029774]  [<00000327148c0488>] task_work_run+0x88/0xd0
-[ 5413.029783]  [<00000327148977aa>] do_exit+0x18a/0x4e0
-[ 5413.029786]  [<0000032714897cf0>] do_group_exit+0x40/0xc0
-[ 5413.029789]  [<0000032714897dce>] __s390x_sys_exit_group+0x2e/0x30
-[ 5413.029792]  [<00000327156519c6>] __do_syscall+0x136/0x340
-[ 5413.029797]  [<000003271565d5de>] system_call+0x6e/0x90
-[ 5413.029802] Last Breaking-Event-Address:
-[ 5413.029803]  [<0000032694e03914>] vhost_dev_free_iovecs+0x94/0xc0 [vhost]
-[ 5413.029811] Kernel panic - not syncing: Fatal exception: panic_on_oops
-
-
-Best regards,
-Jaehoon Kim
+> 
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> index 6909275e46c2..827e0987fab5 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -344,7 +344,7 @@ static struct vfio_pfn *vfio_find_vpfn_range(struct vfio_dma *dma,
+>  
+>  static inline struct vfio_pfn *vfio_find_vpfn(struct vfio_dma *dma, dma_addr_t iova)
+>  {
+> -	return vfio_find_vpfn_range(dma, iova, iova + PAGE_SIZE);
+> +	return vfio_find_vpfn_range(dma, iova, iova + 1);
+>  }
+>  
+>  static void vfio_link_pfn(struct vfio_dma *dma,
 
 
