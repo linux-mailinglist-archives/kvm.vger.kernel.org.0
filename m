@@ -1,234 +1,174 @@
-Return-Path: <kvm+bounces-53582-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53583-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC93CB14409
-	for <lists+kvm@lfdr.de>; Mon, 28 Jul 2025 23:49:13 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03FCEB14465
+	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 00:32:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E6993542087
-	for <lists+kvm@lfdr.de>; Mon, 28 Jul 2025 21:49:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AF5147A9FBE
+	for <lists+kvm@lfdr.de>; Mon, 28 Jul 2025 22:31:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C10C2274671;
-	Mon, 28 Jul 2025 21:49:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EAD722D4C8;
+	Mon, 28 Jul 2025 22:32:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="f3kNuzTP"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="iETs8ZsC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com [209.85.219.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E30A1E5B7E
-	for <kvm@vger.kernel.org>; Mon, 28 Jul 2025 21:49:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5158111A8;
+	Mon, 28 Jul 2025 22:32:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753739345; cv=none; b=YzxzruXzMnXtPeipLQSJrGu4GIv5zKBU/XE+ejIa97qM5tQr2XethodjN0ZlejjQIoUgYsExLJKC3V8WFyhdHlnu6iAhV1nx7OpKTGVcmr+xUPvnawoATBxJC+T5UYPZJnRJQZ1hwOIHZEDIdEbOV7PCwtiW1CpCfrjEbEIQsnI=
+	t=1753741940; cv=none; b=XntcAWKguu51DENYMmIOGSEm2xMq00YRSIBOxtFlDLGi1U9RGZd4rZKwLD4fCZ3rCedN1cwmcVBMwEYNQlDa/dRI1sJoJsumLPY9gKiQA8A6wappHh+63sYZ9KZ+RDVHwNS9vHWFtZDW4kumGWkKdG+Wc2bQkiZB0YXLGE+Twrc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753739345; c=relaxed/simple;
-	bh=8tmNEDk1108qFbcscn3yK9EMsFQJwypelzVi8awwSn0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FhK1k6oroMcFCEaJuhYGKkN+ezxTYozCYbxyjXjgkuzGEi2Jh+aPcOobLDi1MrAJUaqiXn2V8vc2FGgXa+l2s4a4aDti2z5d9VG7FdKZMdKltVRaA2BHsTeE1yHGN+HlAORHU4YqErIl19XqJzOWuJ7+wuWvItZOSC9Jq7XPjLQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=f3kNuzTP; arc=none smtp.client-ip=209.85.219.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-e8e19112e8fso721025276.1
-        for <kvm@vger.kernel.org>; Mon, 28 Jul 2025 14:49:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753739342; x=1754344142; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TNYkKUMqh3Q6zlk7zublZCSOOzAw8JNXG0Uwfynmfio=;
-        b=f3kNuzTPhTA6Wxt2pvE2IbDOhuG99OwMw6b7DluWlujcsO8WiPESWk9O4F1taR2LDi
-         b0iMKhDlpyUARpSHk43H8WLbgFCe/r01XQNdZca2UZcm6PQpjYw3gVqrIPGIbR33zWQc
-         A8PqZGCs9vgvKae6wo2TFjrT7ncuocHBLNJ7OgNYVifQ1xmJ2Heu+a25I+6Lm/VW250Y
-         Qreq5PRJjdP8Knt58GiwvNdcFYekmPEXg7zIY+VpvJjs6iwXcaQ9RX2nMYDvwUvrpEUn
-         Nums49H1XXdWkmkmeDnfHfdZ8PJ3lmmmfkRd7mP0tUS1HyIIJU7SuPdIZZ+GGvYCX2sy
-         ol7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753739342; x=1754344142;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TNYkKUMqh3Q6zlk7zublZCSOOzAw8JNXG0Uwfynmfio=;
-        b=Xza5oZNjaqgwqK7T/qXFcGOEMcNmqxUJD7Iig/eEN/acPPav1OJ/OOODstSt5icdX8
-         YjVdCuwS8J1NWvSqJBpnkAMj9qWUIJacOKI4S7qXu0N65P6tMimh2xxsROSVP+WRWHGa
-         me0uQ5jTjKoOzwPIiKjQ0mzBpfoALSfxCttc1Gr6x8nXQR+Swv1N+NIPjaSqpMbUUr7J
-         evDYv4AiOPAVpRZXlujrD7cgCtxXiJwGQpkwnGH6X6auYmN0dmZmtsHaL1QlOLO9DKEk
-         81Nj8GooG4chEfRRtLpGN7Smz10z9PtuEGyRWdRKLuTOxnCJz7dSUavuEDzq3jbOZRws
-         7aYw==
-X-Forwarded-Encrypted: i=1; AJvYcCV2i3GXjHVIg+PS59PcEtvGuz/nriLZ1SK+hCzmCL6gbn6MzgpS5gIMD2w1USw3mGrpiAM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw7H4yeoXubwBLZbFDtVoMsPoFzlqMHIn76d1zUn7NeBgE7slIC
-	Ah/mwz+rEFa3atNh3N1/2CU2jmCZI47LTRkpDyDIJMkORTyYBmJ5NtPhaLUD7X2rKyi2ACQyMhD
-	FbYs/I4slhE5j4cbWU+yxqBdgWNi1Z2tZtUUlxDWw
-X-Gm-Gg: ASbGncsaJVMup0k6jGfruhwFYklgnfiweRy9hiaxIINENA9ofjrRVJr0gcWEZ2V4IlV
-	R2ZS0W2W9ngG09tMK+01+i3LfiRGq6SdgytlMOqe7A9/3Ib9tPCdygq1gyo4Qsl+HtOhPncfPir
-	jnaTmr5E0XhFSbyoPLw3IUye5X2OGa/iVCTdyLtFAm4A1QcXSyIJjrLACqOc4gHD/SEog5+Eb1D
-	7v3jQoHV+sEPdO+KY3zWuQ79cwR4IF2HagbOs24aWkUwbhx
-X-Google-Smtp-Source: AGHT+IE2mYs4r6noXBQXIYVkMmGAdIWN2/QiECNIyFYTZbPmpXx9oohnPh0CVYDcsueX6RTXa46JQAWjagLlqUnsgYU=
-X-Received: by 2002:a05:6902:158b:b0:e8d:e898:9c46 with SMTP id
- 3f1490d57ef6-e8df11de957mr14432049276.25.1753739342131; Mon, 28 Jul 2025
- 14:49:02 -0700 (PDT)
+	s=arc-20240116; t=1753741940; c=relaxed/simple;
+	bh=Juzzlw4ruO94a0oLs+yzxWxBy3doOd+vJtIDuC6EP18=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ipbt9NpE5G+SKJtAyRtOTqFjOqzmzInB+JRlxPwNRbiteEFdHlU2JVgD4tVn0busxU0+wPy3ED16nnFcBKctpUBVZ4PiH8C8d0D9/aqNC/TroUO9d6GS15fyZjy/yttX2dyqGyHWzSUZNrAuKdEQ03Lo/TGv9iFcv44E0WMzoIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=iETs8ZsC; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [192.168.7.202] ([71.202.166.45])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 56SMVg3E497022
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Mon, 28 Jul 2025 15:31:42 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 56SMVg3E497022
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025072201; t=1753741905;
+	bh=coMKTzy6g47ApZXqvc/T7bzOtLJd9+moHdfS0qdGXkg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=iETs8ZsCBYDItiL/u8alonHtWWOFh06MlK5KoQDP/X+US0e3spgFCE+3W3OpP9HG8
+	 9GMgfewGju5gM/bjuBqg00nOQJoYFJfvmcQJhr0FEdapOYueYwt6Y2QmWet7ChTrRO
+	 CgFehS/x+eeJhosLDipXx0fb2Q7NocFc54Lnl/6H1D3ZP78u38cKzIRsycvlMVlvUV
+	 EapCE+h0K2EKio1pHAjc5eDkMUa5XU35W9Cxh++a/zuRgrvMJDKikRTGxgpc5Wq8VR
+	 /+QeSGaxz6AVvKu1Ko0iWwR4M4dUIxgIcWUMwrGMsJ3L3401Cxzp4IgRN4ADK8HkR0
+	 JKhzwXacQ56Ag==
+Message-ID: <5591ecc4-2383-4804-b3f0-0dcef692e8f6@zytor.com>
+Date: Mon, 28 Jul 2025 15:31:41 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250707224720.4016504-1-jthoughton@google.com>
- <20250707224720.4016504-4-jthoughton@google.com> <aIFHc83PtfB9fkKB@google.com>
- <CADrL8HW46uQQKYUngYwomzfKWB0Vf4nG1WRjZu84hiXxtHN14Q@mail.gmail.com>
- <CALzav=e0cUTMzox7p3AU37wAFRrOXEDdU24eqe6DX+UZYt9FeQ@mail.gmail.com> <aIft7sUk_w8rV2DB@google.com>
-In-Reply-To: <aIft7sUk_w8rV2DB@google.com>
-From: James Houghton <jthoughton@google.com>
-Date: Mon, 28 Jul 2025 14:48:26 -0700
-X-Gm-Features: Ac12FXylAHsC6PnOs8l0sIEXzKpV-hGp0OFEgDGoMNOHrpfgSioRTxQz2Qw5R5w
-Message-ID: <CADrL8HWE+TQ8Vm1a=eb5ZKo2+zeeE-b8-PUXLOS0g5KuJ5kfZQ@mail.gmail.com>
-Subject: Re: [PATCH v5 3/7] KVM: x86/mmu: Recover TDP MMU NX huge pages using
- MMU read lock
-To: Sean Christopherson <seanjc@google.com>
-Cc: David Matlack <dmatlack@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Vipin Sharma <vipinsh@google.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v11 01/23] KVM: x86: Rename kvm_{g,s}et_msr()* to show
+ that they emulate guest accesses
+To: Chao Gao <chao.gao@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, x86@kernel.org, seanjc@google.com,
+        pbonzini@redhat.com, dave.hansen@intel.com
+Cc: rick.p.edgecombe@intel.com, mlevitsk@redhat.com, john.allen@amd.com,
+        weijiang.yang@intel.com, minipli@grsecurity.net,
+        Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>
+References: <20250704085027.182163-1-chao.gao@intel.com>
+ <20250704085027.182163-2-chao.gao@intel.com>
+Content-Language: en-US
+From: Xin Li <xin@zytor.com>
+Autocrypt: addr=xin@zytor.com; keydata=
+ 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
+ l75w1xInsg==
+In-Reply-To: <20250704085027.182163-2-chao.gao@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jul 28, 2025 at 2:38=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> On Mon, Jul 28, 2025, David Matlack wrote:
-> > On Mon, Jul 28, 2025 at 11:08=E2=80=AFAM James Houghton <jthoughton@goo=
-gle.com> wrote:
-> > > On Wed, Jul 23, 2025 at 1:35=E2=80=AFPM Sean Christopherson <seanjc@g=
-oogle.com> wrote:
-> > > > > @@ -7559,8 +7590,17 @@ static void kvm_recover_nx_huge_pages(stru=
-ct kvm *kvm,
-> > > > >       rcu_read_lock();
-> > > > >
-> > > > >       for ( ; to_zap; --to_zap) {
-> > > > > -             if (list_empty(nx_huge_pages))
-> > > > > +#ifdef CONFIG_X86_64
-> > > >
-> > > > These #ifdefs still make me sad, but I also still think they're the=
- least awful
-> > > > solution.  And hopefully we will jettison 32-bit sooner than later =
-:-)
-> > >
-> > > Yeah I couldn't come up with anything better. :(
-> >
-> > Could we just move the definition of tdp_mmu_pages_lock outside of
-> > CONFIG_X86_64? The only downside I can think of is slightly larger kvm
-> > structs for 32-bit builds.
->
-> Hmm, I was going to say "no, because we'd also need to do spin_lock_init(=
-)", but
-> obviously spin_(un)lock() will only ever be invoked for 64-bit kernels.  =
-I still
-> don't love the idea of making tdp_mmu_pages_lock visible outside of CONFI=
-G_X86_64,
-> it feels like we're just asking to introduce (likely benign) bugs.
->
-> Ugh, and I just noticed this as well:
->
->   #ifndef CONFIG_X86_64
->   #define KVM_TDP_MMU -1
->   #endif
->
-> Rather than expose kvm->arch.tdp_mmu_pages_lock, what about using a singl=
-e #ifdef
-> section to bury both is_tdp_mmu and a local kvm->arch.tdp_mmu_pages_lock =
-pointer?
+On 7/4/2025 1:49 AM, Chao Gao wrote:
+> @@ -2764,7 +2764,7 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
+>   
+>   	if ((vmcs12->vm_entry_controls & VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL) &&
+>   	    kvm_pmu_has_perf_global_ctrl(vcpu_to_pmu(vcpu)) &&
+> -	    WARN_ON_ONCE(kvm_set_msr(vcpu, MSR_CORE_PERF_GLOBAL_CTRL,
+> +	    WARN_ON_ONCE(kvm_emulate_msr_write(vcpu, MSR_CORE_PERF_GLOBAL_CTRL,
+>   				     vmcs12->guest_ia32_perf_global_ctrl))) {
 
-SGTM.
+Not sure if the alignment should be adjusted based on the above modified
+line.
 
->
-> Alternatively, we could do:
->
->         const bool is_tdp_mmu =3D IS_ENABLED(CONFIG_X86_64) && mmu_type !=
-=3D KVM_SHADOW_MMU;
+>   		*entry_failure_code = ENTRY_FAIL_DEFAULT;
+>   		return -EINVAL;
+> @@ -4752,8 +4752,9 @@ static void load_vmcs12_host_state(struct kvm_vcpu *vcpu,
+>   	}
+>   	if ((vmcs12->vm_exit_controls & VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL) &&
+>   	    kvm_pmu_has_perf_global_ctrl(vcpu_to_pmu(vcpu)))
+> -		WARN_ON_ONCE(kvm_set_msr(vcpu, MSR_CORE_PERF_GLOBAL_CTRL,
+> -					 vmcs12->host_ia32_perf_global_ctrl));
+> +		WARN_ON_ONCE(kvm_emulate_msr_write(vcpu,
+> +					MSR_CORE_PERF_GLOBAL_CTRL,
+> +					vmcs12->host_ia32_perf_global_ctrl));
 
-I tried something like this before and it didn't work; my compiler
-still complained. Maybe I didn't do it quite right...
+Same here.
 
->
-> to avoid referencing KVM_TDP_MMU, but that's quite ugly.  Overall, I thin=
-k the
-> below strikes the best balance between polluting the code with #ifdefs, a=
-nd
-> generating robust code.
->
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_h=
-ost.h
-> index 52bf6a886bfd..c038d7cd187d 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1372,10 +1372,6 @@ enum kvm_mmu_type {
->         KVM_NR_MMU_TYPES,
->  };
->
-> -#ifndef CONFIG_X86_64
-> -#define KVM_TDP_MMU -1
-> -#endif
-> -
->  struct kvm_arch {
->         unsigned long n_used_mmu_pages;
->         unsigned long n_requested_mmu_pages;
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index a6a1fb42b2d1..e2bde6a5e346 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -7624,8 +7624,14 @@ static bool kvm_mmu_sp_dirty_logging_enabled(struc=
-t kvm *kvm,
->  static void kvm_recover_nx_huge_pages(struct kvm *kvm,
->                                       const enum kvm_mmu_type mmu_type)
->  {
-> +#ifdef CONFIG_X86_64
-> +       const bool is_tdp_mmu =3D mmu_type =3D=3D KVM_TDP_MMU;
-> +       spinlock_t *tdp_mmu_pages_lock =3D &kvm->arch.tdp_mmu_pages_lock;
-> +#else
-> +       const bool is_tdp_mmu =3D false;
-> +       spinlock_t *tdp_mmu_pages_lock =3D NULL;
-> +#endif
->         unsigned long to_zap =3D nx_huge_pages_to_zap(kvm, mmu_type);
-> -       bool is_tdp_mmu =3D mmu_type =3D=3D KVM_TDP_MMU;
->         struct list_head *nx_huge_pages;
->         struct kvm_mmu_page *sp;
->         LIST_HEAD(invalid_list);
-> @@ -7648,15 +7654,12 @@ static void kvm_recover_nx_huge_pages(struct kvm =
-*kvm,
->         rcu_read_lock();
->
->         for ( ; to_zap; --to_zap) {
-> -#ifdef CONFIG_X86_64
->                 if (is_tdp_mmu)
-> -                       spin_lock(&kvm->arch.tdp_mmu_pages_lock);
-> -#endif
-> +                       spin_lock(tdp_mmu_pages_lock);
-> +
->                 if (list_empty(nx_huge_pages)) {
-> -#ifdef CONFIG_X86_64
->                         if (is_tdp_mmu)
-> -                               spin_unlock(&kvm->arch.tdp_mmu_pages_lock=
-);
-> -#endif
-> +                               spin_unlock(tdp_mmu_pages_lock);
->                         break;
->                 }
->
-> @@ -7675,10 +7678,8 @@ static void kvm_recover_nx_huge_pages(struct kvm *=
-kvm,
->
->                 unaccount_nx_huge_page(kvm, sp);
->
-> -#ifdef CONFIG_X86_64
->                 if (is_tdp_mmu)
-> -                       spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
-> -#endif
-> +                       spin_unlock(tdp_mmu_pages_lock);
->
->                 /*
->                  * Do not attempt to recover any NX Huge Pages that are b=
-eing
-> --
+>   
+>   	/* Set L1 segment info according to Intel SDM
+>   	    27.5.2 Loading Host Segment and Descriptor-Table Registers */
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 7543dac7ae70..11d84075cd14 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -1929,33 +1929,35 @@ static int kvm_get_msr_ignored_check(struct kvm_vcpu *vcpu,
+>   				 __kvm_get_msr);
+>   }
+>   
+> -int kvm_get_msr_with_filter(struct kvm_vcpu *vcpu, u32 index, u64 *data)
+> +int kvm_emulate_msr_read_with_filter(struct kvm_vcpu *vcpu, u32 index,
+> +				     u64 *data)
 
-LGTM! Thanks Sean.
+I think the extra new line doesn't improve readability, but it's the
+maintainer's call.
+
+>   {
+>   	if (!kvm_msr_allowed(vcpu, index, KVM_MSR_FILTER_READ))
+>   		return KVM_MSR_RET_FILTERED;
+>   	return kvm_get_msr_ignored_check(vcpu, index, data, false);
+>   }
+> -EXPORT_SYMBOL_GPL(kvm_get_msr_with_filter);
+> +EXPORT_SYMBOL_GPL(kvm_emulate_msr_read_with_filter);
+>   
+> -int kvm_set_msr_with_filter(struct kvm_vcpu *vcpu, u32 index, u64 data)
+> +int kvm_emulate_msr_write_with_filter(struct kvm_vcpu *vcpu, u32 index,
+
+Ditto.
+
+> +				      u64 data)
+>   {
+>   	if (!kvm_msr_allowed(vcpu, index, KVM_MSR_FILTER_WRITE))
+>   		return KVM_MSR_RET_FILTERED;
+
 
