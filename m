@@ -1,611 +1,273 @@
-Return-Path: <kvm+bounces-53531-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53532-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44072B13854
-	for <lists+kvm@lfdr.de>; Mon, 28 Jul 2025 11:54:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0A3EB13865
+	for <lists+kvm@lfdr.de>; Mon, 28 Jul 2025 11:56:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A53BE175B3B
-	for <lists+kvm@lfdr.de>; Mon, 28 Jul 2025 09:50:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35FBB4E079C
+	for <lists+kvm@lfdr.de>; Mon, 28 Jul 2025 09:50:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEABF25B30D;
-	Mon, 28 Jul 2025 09:48:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87FBC2A1BF;
+	Mon, 28 Jul 2025 09:49:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YH0wFo/5"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FhKPZF/O"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7572E259C85
-	for <kvm@vger.kernel.org>; Mon, 28 Jul 2025 09:48:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753696113; cv=none; b=iQt48+ZjyrFg6EK0XvfTKYDWWiNKTtLnhn9q/LFq7HWRJwQbSPww9mTFgB6BAq/AlC5WDTdXmZpVFxU/x2Ext+cFdJbqVmaJDvx6MUqTLKiJW2QfOoWkx5GzI9wEnlZ5+Vt+m1NxUG+XfiCwue4albfWvrodz4IDQPe+XfC6coo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753696113; c=relaxed/simple;
-	bh=Hcp0mvps1beknbM+Gv+c/4V/7RLrjcuPtzxCqZxLi8Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=F8bGP8i/wEHAeUWVmVVdE8tm6Xr4l49pnnfjMfGpouD2nI7+JGPXbo+BY6SpTRG1XFKTZi94+uOkUbqlUoNSBa0C49d58iJzyM2lU2QQHsiaodxVWso/aYS1ZBYwFaE15tTgPrnOYmX0EeWdD5UABZZ7uGWvsfYUuhPQ+hEn6lY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=fail smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YH0wFo/5; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1753696110;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=Tb32ByScpQIehIaZKySMx9AWM1gfTt6mgT4fZGiOxsA=;
-	b=YH0wFo/5m6paHsQP49ecZUO8slTHrso+ectlA+MdqmbsQqna2dFB67ivW96AANSICjg9a9
-	O5Qod9NsZzzVgQ/U1Ud7gTCOGgCHUDSv/HuY7kCWqpESsx+qGals86COe/kDXpknirElB8
-	DW85yjeynH48UB468xYljOyI4bVbKnk=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-671-R7s__RqkMG-aP0dDX_4RMA-1; Mon, 28 Jul 2025 05:48:28 -0400
-X-MC-Unique: R7s__RqkMG-aP0dDX_4RMA-1
-X-Mimecast-MFC-AGG-ID: R7s__RqkMG-aP0dDX_4RMA_1753696107
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3b20f50da27so2194100f8f.0
-        for <kvm@vger.kernel.org>; Mon, 28 Jul 2025 02:48:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753696107; x=1754300907;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Tb32ByScpQIehIaZKySMx9AWM1gfTt6mgT4fZGiOxsA=;
-        b=TwVyFpRu2yiuW+SkdB2Jto3wAmH4kcptuBCFeQWxPpRs0Rn93fbjxkiMbs9hIWkCcZ
-         65Zz1iTrgiuFQGN5q8v3O6JBFwo3YKXuL6x4fBUy8AWGTvU6rr01r748UR1F3vPwL8Lk
-         atyKbzQi7sQ1pyqTBNy2WskbFnF6oL2zv+Rlyfs/d0Ip3XfDyOfHcJz4ClDuuD/GKXR4
-         IL0XxLdn9VUzFK/23eh/wGrOS9FQ0nzoUGPKDpgu69wk8JmYTHqkR9H4Ga7Pjf+ymLwe
-         XloRTO7oY3VFa7s+3vxjs377e7Eoqhn1vEYAy+FoXNX6q5s8nT7Q2ayJ8X0l34Cj9QzH
-         VPkw==
-X-Forwarded-Encrypted: i=1; AJvYcCWjaX8Gs3PoDhql7JmTQXDUs4VEURv1d0pNiqilaJCsRv21Skt/bUSD3yWiHVxdG3YgG/Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx/PWSef4BTE593UepYZz/xb2fntr8ic47bycLJ+Hkiyo+RCF71
-	mEURU4UMt834td1eboQu4ezkVLOE1TnY1Z7DaJXOQl+I/EmNF+wU77yuVxnKOqaMs5RZ39Stgfs
-	Bj31LL+Y+/xXz5df03xbV5UP/QVkOipWg+6kSvmcs2rWHvRKwG0KoYA==
-X-Gm-Gg: ASbGncv3t2qkoUrsuymgxYpeS7kuctX1MzRNmtaT0aVx3QA8vDfxCvLfFVoEyKWd/hA
-	lz9cpOahBEs/heY8fQnJ48HyUwSIegIxeZmv4B3Z9cflspLV2BwE7tqbEwzz3D8haHsbwqt1K/u
-	AI/JC+SKTpQXFnmZSh1H9TO3OPHVLTE/SnY3M0Xpmlf2CfkUgNmkH/AHnSK2doSoUELA7OoJ0Th
-	3+dY235sHuwVZO436738ax3aTWOtHT8/RPPQ6FG6qIeUPaYjI1/huZXjac5h8NGPP2sphdzjaWj
-	qvsUYay377zTa0u0SzI4KE4aRU1m3c8P43aMkt6hyPqCtfdzmsO8G27Xk8joPPN9TCc/wbUapd5
-	iCA==
-X-Received: by 2002:a05:6000:26c6:b0:3a5:8934:4959 with SMTP id ffacd0b85a97d-3b77137c0f0mr12039870f8f.27.1753696107139;
-        Mon, 28 Jul 2025 02:48:27 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHUXRjwOPVbA59nK4v5ianQtoJcvTZGPoentHCek+qAYkv5qFyqsFP1/OpiBjVpvRqU32WS/Q==
-X-Received: by 2002:a05:6000:26c6:b0:3a5:8934:4959 with SMTP id ffacd0b85a97d-3b77137c0f0mr12039832f8f.27.1753696106389;
-        Mon, 28 Jul 2025 02:48:26 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:280:24f0:576b:abc6:6396:ed4a? ([2a01:e0a:280:24f0:576b:abc6:6396:ed4a])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-458705c4cacsm147540415e9.24.2025.07.28.02.47.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 28 Jul 2025 02:47:59 -0700 (PDT)
-Message-ID: <5051c509-75a3-4ab6-bcfb-4610a660a142@redhat.com>
-Date: Mon, 28 Jul 2025 11:47:44 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2E517483;
+	Mon, 28 Jul 2025 09:49:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753696169; cv=fail; b=YjW+cq21vLGLIga8FiQJdHf+671bYc97uHYGE51McBpVAaIcMKOAb4wg8OV57KjsOF+hwfjWvOb+C89IWkUmAT2trm9XvupxC9a7gm5mkH8ySr7cI/uQfmSaTe8Q7rguFJInQF50JCuAqR3u2SBit79yKnQhHoKeRo1CFCBZpHo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753696169; c=relaxed/simple;
+	bh=ej6TI129F5mqL9by6SDI5BkBF2Y4ySiwsl1W04ID4dg=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=XvdXDgcq38iFbqHEhUYV5NCQCobmVHBpzu4MZOU3wBJMtYRPGlZSyCnNQRZA/1EdCwfLKmf+dEpJUmn0stKYjRXPuQ0X5AiuXHpeesTmtgBh/7Jhb0nGDXZwJ889NMFNRNfihRTdVy5ixaVgbkW3a0mOGQaYpr4JdrwMCulYA48=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FhKPZF/O; arc=fail smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1753696168; x=1785232168;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   content-transfer-encoding:in-reply-to:mime-version;
+  bh=ej6TI129F5mqL9by6SDI5BkBF2Y4ySiwsl1W04ID4dg=;
+  b=FhKPZF/ODf2PMCAuW0mjBezAXHIpCeMat4J+I2GlHZO4HpyB9dkSj89h
+   j5yuWEhgN1/a7irYaUeEdgoRWnzPbsbf8W0DA8YNe7X9MvA20G0Dvpggh
+   iH0lEBKeD0EFAbXJF2avUNm/5spYk/2fH6HxsoO8Gb5Msww95XCjuA/1Y
+   XnDtPRZR2b2QEuNyU69XZx6T/94NoFNM11wtavHuGPczbtiL/+hToob/k
+   tI5Vyjm/DNTlwLLcXc68wMR19Sdlv6gLNC6zt5MRz4sShKJW6AHYGGr5f
+   CQTm2IpEMi+4eMD/kwy6xUt8vfCgnS7iPhF55oiWy+iHLNotbVhOmFRK0
+   w==;
+X-CSE-ConnectionGUID: Duoq3ky0S/SSebobufgRfQ==
+X-CSE-MsgGUID: 3IbNotbQTJ2USEr0fWZkcg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11504"; a="66208922"
+X-IronPort-AV: E=Sophos;i="6.16,339,1744095600"; 
+   d="scan'208";a="66208922"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jul 2025 02:49:16 -0700
+X-CSE-ConnectionGUID: OVPVgm/1TOOm1Ort/lU++A==
+X-CSE-MsgGUID: 35OlMWDmTf+gCE+YzA0X1Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,339,1744095600"; 
+   d="scan'208";a="167706721"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by fmviesa004.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jul 2025 02:49:15 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26; Mon, 28 Jul 2025 02:49:14 -0700
+Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26 via Frontend Transport; Mon, 28 Jul 2025 02:49:14 -0700
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (40.107.92.83) by
+ edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26; Mon, 28 Jul 2025 02:49:14 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=D3l+94XSloH90HwkWWmSoLOSDAcBh2bj1ePCkJ/x8FZ7V4lmAL2xXc0QfJmRkiIxi1wWmg/vbXN6aB7k6sGxZUPCz1fEW7LYHwnn3u1zWFpqwlmlZy0zjvhnSRPIG+ND0qJL8qUrVQ8mON/ZXaHetgVxSWrLNkP/paw00dEA2bqpMBgwcjYxD0ZbFLn/nNmYb/STjfKNVHvLte6VhicO+w/hXOzM/K+oEesD7KU6gWv2AUItvpAoozWfZsNiVdYBaaU+WTjLJsWexgLxiCPnSwzGDcsqpeZG3v2iMaEA/h1Xq+ten6WdlGcqNADpGFQZf+GDpjFDfJcvM/LLktLntg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=kA6QiDUjGuIEJsxySbPr+pN+wTnUTKOXLIornjBevgM=;
+ b=ZKK5ZJHswctfP8FSby3Z729zz3FmPDWFq27sgiXRsU5BwnBfv1gO4k8creM568ISkBmQfeRBvu0wI4FAkCEJ14KW7yCQk9F3pvpwJQ7Yf6cpEu/IP3gNdlqxK/SkvCViJoJBefFzsifNeime4XCqcfSWqzamIlvUhLrkg8jrVgOreetva+fTkh82RbgT9P1n5+FU+MNR2BZ9vOS7jhkO1DlIOFzDC2NKmglcgq20iwnAl1g3c6cUMYzIHeXEI6s6ES1uZMygbXWoQI8QR36OmlV6QIuEJQO8uXfG1jai0inhJViiAWAtJ/dRHT3Zyk+ivQyFDuYyGIxib+uJ3kr3jw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
+ SJ0PR11MB4957.namprd11.prod.outlook.com (2603:10b6:a03:2df::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8964.26; Mon, 28 Jul
+ 2025 09:49:11 +0000
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::e971:d8f4:66c4:12ca]) by DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::e971:d8f4:66c4:12ca%5]) with mapi id 15.20.8964.025; Mon, 28 Jul 2025
+ 09:49:11 +0000
+Date: Mon, 28 Jul 2025 17:48:36 +0800
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Vishal Annapurve <vannapurve@google.com>
+CC: Sean Christopherson <seanjc@google.com>, Michael Roth
+	<michael.roth@amd.com>, <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <rick.p.edgecombe@intel.com>,
+	<kai.huang@intel.com>, <adrian.hunter@intel.com>,
+	<reinette.chatre@intel.com>, <xiaoyao.li@intel.com>,
+	<tony.lindgren@intel.com>, <binbin.wu@linux.intel.com>,
+	<dmatlack@google.com>, <isaku.yamahata@intel.com>, <ira.weiny@intel.com>,
+	<david@redhat.com>, <ackerleytng@google.com>, <tabba@google.com>,
+	<chao.p.peng@intel.com>
+Subject: Re: [RFC PATCH] KVM: TDX: Decouple TDX init mem region from
+ kvm_gmem_populate()
+Message-ID: <aIdHdCzhrXtwVqAO@yzhao56-desk.sh.intel.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20250709232103.zwmufocd3l7sqk7y@amd.com>
+ <aG_pLUlHdYIZ2luh@google.com>
+ <aHCUyKJ4I4BQnfFP@yzhao56-desk>
+ <20250711151719.goee7eqti4xyhsqr@amd.com>
+ <aHEwT4X0RcfZzHlt@google.com>
+ <aHSgdEJpY/JF+a1f@yzhao56-desk>
+ <aHUmcxuh0a6WfiVr@google.com>
+ <aHWqkodwIDZZOtX8@yzhao56-desk>
+ <aHoQa4dBSi877f1a@yzhao56-desk.sh.intel.com>
+ <CAGtprH9kwV1RCu9j6LqToa5M97_aidGN2Lc2XveQdeR799SK6A@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAGtprH9kwV1RCu9j6LqToa5M97_aidGN2Lc2XveQdeR799SK6A@mail.gmail.com>
+X-ClientProxiedBy: SI1PR02CA0028.apcprd02.prod.outlook.com
+ (2603:1096:4:1f4::6) To DS7PR11MB5966.namprd11.prod.outlook.com
+ (2603:10b6:8:71::6)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 11/16] iommu: Compute iommu_groups properly for PCIe
- MFDs
-To: Jason Gunthorpe <jgg@nvidia.com>, Bjorn Helgaas <bhelgaas@google.com>,
- iommu@lists.linux.dev, Joerg Roedel <joro@8bytes.org>,
- linux-pci@vger.kernel.org, Robin Murphy <robin.murphy@arm.com>,
- Will Deacon <will@kernel.org>
-Cc: Alex Williamson <alex.williamson@redhat.com>,
- Lu Baolu <baolu.lu@linux.intel.com>, galshalom@nvidia.com,
- Joerg Roedel <jroedel@suse.de>, Kevin Tian <kevin.tian@intel.com>,
- kvm@vger.kernel.org, maorg@nvidia.com, patches@lists.linux.dev,
- tdave@nvidia.com, Tony Zhu <tony.zhu@intel.com>
-References: <11-v2-4a9b9c983431+10e2-pcie_switch_groups_jgg@nvidia.com>
-Content-Language: en-US, fr
-From: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@redhat.com>
-Autocrypt: addr=clg@redhat.com; keydata=
- xsFNBFu8o3UBEADP+oJVJaWm5vzZa/iLgpBAuzxSmNYhURZH+guITvSySk30YWfLYGBWQgeo
- 8NzNXBY3cH7JX3/a0jzmhDc0U61qFxVgrPqs1PQOjp7yRSFuDAnjtRqNvWkvlnRWLFq4+U5t
- yzYe4SFMjFb6Oc0xkQmaK2flmiJNnnxPttYwKBPd98WfXMmjwAv7QfwW+OL3VlTPADgzkcqj
- 53bfZ4VblAQrq6Ctbtu7JuUGAxSIL3XqeQlAwwLTfFGrmpY7MroE7n9Rl+hy/kuIrb/TO8n0
- ZxYXvvhT7OmRKvbYuc5Jze6o7op/bJHlufY+AquYQ4dPxjPPVUT/DLiUYJ3oVBWFYNbzfOrV
- RxEwNuRbycttMiZWxgflsQoHF06q/2l4ttS3zsV4TDZudMq0TbCH/uJFPFsbHUN91qwwaN/+
- gy1j7o6aWMz+Ib3O9dK2M/j/O/Ube95mdCqN4N/uSnDlca3YDEWrV9jO1mUS/ndOkjxa34ia
- 70FjwiSQAsyIwqbRO3CGmiOJqDa9qNvd2TJgAaS2WCw/TlBALjVQ7AyoPEoBPj31K74Wc4GS
- Rm+FSch32ei61yFu6ACdZ12i5Edt+To+hkElzjt6db/UgRUeKfzlMB7PodK7o8NBD8outJGS
- tsL2GRX24QvvBuusJdMiLGpNz3uqyqwzC5w0Fd34E6G94806fwARAQABzSJDw6lkcmljIExl
- IEdvYXRlciA8Y2xnQHJlZGhhdC5jb20+wsGRBBMBCAA7FiEEoPZlSPBIlev+awtgUaNDx8/7
- 7KEFAmTLlVECGwMFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AACgkQUaNDx8/77KG0eg//
- S0zIzTcxkrwJ/9XgdcvVTnXLVF9V4/tZPfB7sCp8rpDCEseU6O0TkOVFoGWM39sEMiQBSvyY
- lHrP7p7E/JYQNNLh441MfaX8RJ5Ul3btluLapm8oHp/vbHKV2IhLcpNCfAqaQKdfk8yazYhh
- EdxTBlzxPcu+78uE5fF4wusmtutK0JG0sAgq0mHFZX7qKG6LIbdLdaQalZ8CCFMKUhLptW71
- xe+aNrn7hScBoOj2kTDRgf9CE7svmjGToJzUxgeh9mIkxAxTu7XU+8lmL28j2L5uNuDOq9vl
- hM30OT+pfHmyPLtLK8+GXfFDxjea5hZLF+2yolE/ATQFt9AmOmXC+YayrcO2ZvdnKExZS1o8
- VUKpZgRnkwMUUReaF/mTauRQGLuS4lDcI4DrARPyLGNbvYlpmJWnGRWCDguQ/LBPpbG7djoy
- k3NlvoeA757c4DgCzggViqLm0Bae320qEc6z9o0X0ePqSU2f7vcuWN49Uhox5kM5L86DzjEQ
- RHXndoJkeL8LmHx8DM+kx4aZt0zVfCHwmKTkSTQoAQakLpLte7tWXIio9ZKhUGPv/eHxXEoS
- 0rOOAZ6np1U/xNR82QbF9qr9TrTVI3GtVe7Vxmff+qoSAxJiZQCo5kt0YlWwti2fFI4xvkOi
- V7lyhOA3+/3oRKpZYQ86Frlo61HU3r6d9wzOwU0EW7yjdQEQALyDNNMw/08/fsyWEWjfqVhW
- pOOrX2h+z4q0lOHkjxi/FRIRLfXeZjFfNQNLSoL8j1y2rQOs1j1g+NV3K5hrZYYcMs0xhmrZ
- KXAHjjDx7FW3sG3jcGjFW5Xk4olTrZwFsZVUcP8XZlArLmkAX3UyrrXEWPSBJCXxDIW1hzwp
- bV/nVbo/K9XBptT/wPd+RPiOTIIRptjypGY+S23HYBDND3mtfTz/uY0Jytaio9GETj+fFis6
- TxFjjbZNUxKpwftu/4RimZ7qL+uM1rG1lLWc9SPtFxRQ8uLvLOUFB1AqHixBcx7LIXSKZEFU
- CSLB2AE4wXQkJbApye48qnZ09zc929df5gU6hjgqV9Gk1rIfHxvTsYltA1jWalySEScmr0iS
- YBZjw8Nbd7SxeomAxzBv2l1Fk8fPzR7M616dtb3Z3HLjyvwAwxtfGD7VnvINPbzyibbe9c6g
- LxYCr23c2Ry0UfFXh6UKD83d5ybqnXrEJ5n/t1+TLGCYGzF2erVYGkQrReJe8Mld3iGVldB7
- JhuAU1+d88NS3aBpNF6TbGXqlXGF6Yua6n1cOY2Yb4lO/mDKgjXd3aviqlwVlodC8AwI0Sdu
- jWryzL5/AGEU2sIDQCHuv1QgzmKwhE58d475KdVX/3Vt5I9kTXpvEpfW18TjlFkdHGESM/Jx
- IqVsqvhAJkalABEBAAHCwV8EGAECAAkFAlu8o3UCGwwACgkQUaNDx8/77KEhwg//WqVopd5k
- 8hQb9VVdk6RQOCTfo6wHhEqgjbXQGlaxKHoXywEQBi8eULbeMQf5l4+tHJWBxswQ93IHBQjK
- yKyNr4FXseUI5O20XVNYDJZUrhA4yn0e/Af0IX25d94HXQ5sMTWr1qlSK6Zu79lbH3R57w9j
- hQm9emQEp785ui3A5U2Lqp6nWYWXz0eUZ0Tad2zC71Gg9VazU9MXyWn749s0nXbVLcLS0yop
- s302Gf3ZmtgfXTX/W+M25hiVRRKCH88yr6it+OMJBUndQVAA/fE9hYom6t/zqA248j0QAV/p
- LHH3hSirE1mv+7jpQnhMvatrwUpeXrOiEw1nHzWCqOJUZ4SY+HmGFW0YirWV2mYKoaGO2YBU
- wYF7O9TI3GEEgRMBIRT98fHa0NPwtlTktVISl73LpgVscdW8yg9Gc82oe8FzU1uHjU8b10lU
- XOMHpqDDEV9//r4ZhkKZ9C4O+YZcTFu+mvAY3GlqivBNkmYsHYSlFsbxc37E1HpTEaSWsGfA
- HQoPn9qrDJgsgcbBVc1gkUT6hnxShKPp4PlsZVMNjvPAnr5TEBgHkk54HQRhhwcYv1T2QumQ
- izDiU6iOrUzBThaMhZO3i927SG2DwWDVzZltKrCMD1aMPvb3NU8FOYRhNmIFR3fcalYr+9gD
- uVKe8BVz4atMOoktmt0GWTOC8P4=
-In-Reply-To: <11-v2-4a9b9c983431+10e2-pcie_switch_groups_jgg@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|SJ0PR11MB4957:EE_
+X-MS-Office365-Filtering-Correlation-Id: 49d19088-8e26-43ea-dc15-08ddcdbc0119
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?NzdnU29HQkdjTFJJUkJqOUJwNCsrN2tCTkFzSENMS3kvSmdUZ0hnV2RzbXlD?=
+ =?utf-8?B?NXJQSjJ4S01mcHRRTmUycGdBLzRLb0FpNUNneGtFeXdITlI4TUVHdENETWtj?=
+ =?utf-8?B?UGVZcDk4UVJXYUxSYnBtWDFBSnlFOU9pc0dsRkc4RzAzUlhXb2RnYm44OHRt?=
+ =?utf-8?B?N0p2THVkMnhaTWMrb1VmSncwN1RCR2F1MGp0Y255SlR2VHlNamkrR24vd0to?=
+ =?utf-8?B?cmdsamV2ekh2WFpWTGxLcUtXbzFWTjE2ME5BNEc4MWp3VmU1WDlBaHNVbWQ5?=
+ =?utf-8?B?QTRRYzJuM2NnL3lwemRYUmVhMzljYTNDb3pXT0xFblliK0pLN1J1WDNPVUk0?=
+ =?utf-8?B?eWVqTHNkdmI3S2sxK1I3aElRamVWZy9sL1pmSVFYampjZjZmSEY4N1doSDRM?=
+ =?utf-8?B?dXdjVGM4TCtKK1czNFZEVy9ZaVhjUlJZMXhZa3NTcm95b29rRTFCY1JmOHJa?=
+ =?utf-8?B?Tk9ieG9FTXZ5RXl4Q1FNY21uV0J3dEtiTVd5RjE1UmdaRGt4SWVzelduM1Nx?=
+ =?utf-8?B?Z3ZnbkpYeUJiWFV2bWRJS05yUU84RVRpZE9scmFLaW42QU96UUUyTHpVOS9Z?=
+ =?utf-8?B?cUhTRTUzTFl0R0dYbG14aTdObDhBOUgxeUZaY0dLblhHRmZYcU9ZeWorbUpJ?=
+ =?utf-8?B?UGptT2lDOWhDeS91Tmd5Vjc0MGZIdStoL1FBeGJIWGs4b1RtVnFybGF0bHlL?=
+ =?utf-8?B?TmtwWElrc0JnRUoxREp5VzVTYllwZ1BpU1pPQ1dDL1ppNks0N3NXSWFvbUVP?=
+ =?utf-8?B?dDVObDkxb1Y2WjRFMWdQUmtrN1ZWNHV2aG1ZYTF1SEhZNm9PeDBSWVVOMnZB?=
+ =?utf-8?B?ZllvYVc2YWswaFRnS3J4SFpMa3BVVUNoaXREM0VwUWM3aFdHVk84RFRIZitX?=
+ =?utf-8?B?QzlhK3o5RlpCbG1KRDdPaHhSOHhzQ1FvenVWS1BRNnZSNzNpcTI1NUcwWDJK?=
+ =?utf-8?B?bnlteUx4WjlPY3BDS3E1bnpXeGc4akRlVkFoaWF2dXNtVW8rU2FBVFY0K0VK?=
+ =?utf-8?B?RkR6VGdwK1FXL05KMVVpc0ZkbEJSMzlCTXl0VnhUTjZFT3Azb3pvL0xvYnhw?=
+ =?utf-8?B?dlRFSGlCVU5vbDk3eHRqc1BkM1dtU3FrQ1hqREcrclNZOXFaY25US1VIbmVu?=
+ =?utf-8?B?U2xYOGNtUWNqdVZIcU5DL0UvTjhYNGxpbnJ0RDVkYjR4YXBMT2JjZ3E0ZXNQ?=
+ =?utf-8?B?VlQzcG1kZGNoSFlPNDNjbWJVdnlCQk5pd3BBK0JHRXB6U2xRZUpCZGRZU0hs?=
+ =?utf-8?B?VTFZYmFpUFdyNHBLZ2pVK1RQKytsbVZMYU5kTm90SUpvTWZhUjQ1dEZPdGVX?=
+ =?utf-8?B?dmM2UmRGM3lXYzRJenVvWW9UdmJRR2Q5bnpYZ0s2d3E3a29oMDI3cmJ4ckxU?=
+ =?utf-8?B?ak5UWVY5K1E3WUpzQkhlYmExenJKcWU1MXJxSDFQQ3g5VTdWU3k5c1NudldF?=
+ =?utf-8?B?eU4vOHZsSHVyTDRlVGVWcGpJbVJQNmpRL3h4WnZEaXh2VGJsUm5oT0VVa1pK?=
+ =?utf-8?B?V3BvTExMbEdST0htcUsrZmV3R083VkkzM00zaVk5K0lLS004bmpVU1hiVzVr?=
+ =?utf-8?B?RGxvRXIzYTkvZGhzeWxzSWZRb25ueCs4S3FWVUtxSENVY3VxZVF2ZmRtbm14?=
+ =?utf-8?B?bWdiQ1VDdzNFT3BCa0Y4Q2tRWWo4ZDJSZXBNYVRzK3cvNkFxaXA2bUQ0cmM4?=
+ =?utf-8?B?UndIRkd5OTVDVk11RDhJd0J6M1BLUzNSdGt3Q2J3YUF6QlVqN2s0bWl0eXBD?=
+ =?utf-8?B?TVhUUFdSN3FaTE1qZ3ZURkIwTkU0OEUrZ1dBVXRweGxJNCtHdG5WbHVsK2c2?=
+ =?utf-8?B?NUs0aTlhY1BGQ2c0K1dJWTFUNjJtTFllaXdxTVpsMEJYa05NdE9ZdTZUdUZi?=
+ =?utf-8?B?YWJyWU94bENLSExEQVAraThvclZQcG40MWF0WTFrd2Vrdlh0Mm1SUHROQlFC?=
+ =?utf-8?Q?CN5PHAfg5JI=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?akF1SFlZTUI4MmUxMXlBVmdRNTdQRytFSWhIL0U4RDMzWUlHcFNpTDd0QWpz?=
+ =?utf-8?B?RkN2U2t2MHp0S0J4dGc5c2hlendwTy9EbzFRd2VuOVY1eEVkUlVDL3JENXJG?=
+ =?utf-8?B?NElhckNrN2xxbzFJUVcreHNzSDVtNVRlY0NlcEtENTByalR3MDBXVStxRUF3?=
+ =?utf-8?B?MDB6Nk8wZ0dUTVZOb1RQakNGR24wQng2VnBnSlRzTU0rOWl3d3cvbDdHNmxK?=
+ =?utf-8?B?S0hVL2VnWkI2Nkl3bE5pVFdnaUdOeDNCekpMK0c4ZTNDLzg2anF4ckhxOVo4?=
+ =?utf-8?B?ZGhCdU1MNURzWG1FVzduSE9SN2pqbkVnV3hKRWZCTnR5N3pEdHBlM1YwaE9a?=
+ =?utf-8?B?QllIV09ZMUNsWkVSemhSa1ZnUWtHVFBZbFBmbVFIN21tclUzTHhOUG82Z3h5?=
+ =?utf-8?B?VHV0eWQzbGNRV2hPY0s2UHlUNHZ1bkhZMDkyNXp0N3NxeVVONHJJa0MzKzZ6?=
+ =?utf-8?B?eWlNZElyNlQwZ21pK1k3cGJjMGpQenFIOTZaYWRKQm9iS2lGL01kc25iZTZS?=
+ =?utf-8?B?cUNVQXhNWUhnMmIvT2RXcjkvSE9JWUs1MTR0am1QN1J3aHlhd0FzNlNVcGd2?=
+ =?utf-8?B?ZExldzErYmlpTHBQVjBFT1VlWXdTVDQ4SDh3MXJQcEVUUVpzemJ1YW1RRitp?=
+ =?utf-8?B?b09JelI3Zmp5YllXaitTcC9GV3VmaW5ZZVRER2ZIZGJ6VkJBZVVQNy9WSHJI?=
+ =?utf-8?B?Y3lsK292Y01udEpOMks0aXA0R0dJZTlYOGlUZllnbzkzcW11bTRVRUM0b05J?=
+ =?utf-8?B?VVhXVnhSYWt3WHNET0h0Tml3LzB3QUNGRTYzcldDeHlzTm4vTlhMZHVHU0dM?=
+ =?utf-8?B?ajl4cFdUTlA0aTk3MnJkT0ZpdFlDUUZOMlZoNnkxcXhmcEJ1S0srbUlzYWdl?=
+ =?utf-8?B?RUdTNXBJWnFYSHRta1drdlUrZjRsVWl5Vy9nSDhlS1ArYXd6UXRHekRBakVR?=
+ =?utf-8?B?WG9rcFVHbXUzazZpVDNEa2Qzd0xwaWExTFkxVUwvd1k5NVZXOE40SzhOTEx2?=
+ =?utf-8?B?OWxsc0NHdWg0em1YU1lyOEtKRzBBejdDSUNDeVFvQmNjS2poMHJld0hDY0hE?=
+ =?utf-8?B?T0MwRVAxZ0ZvUUwxam1ML0RpdGtkcjhZWnVDN2xFeGR0S3NMUGVROENlVlNx?=
+ =?utf-8?B?YzNGb1B2d3NxeFhDYWJuNlkwb0xuM3FoOXdydEp5M0RBcVpRQ2txNDh1a0Rz?=
+ =?utf-8?B?dHhmczdES3A0Um00dm9pUnJBYThxU2FWbE85cEpOK01VWW05aC9SSTJrU2hC?=
+ =?utf-8?B?U005Mzg2cytic1VxZWx3by9Fd3lzZ3NsdG5NUDhqQkdOdEZZd0k1MmhUOVUw?=
+ =?utf-8?B?R2JiVER2cHNsakU2b0RLMlNBUFRTazI1eW1mNDNsaFdSakFDVU5uL2hjNkNI?=
+ =?utf-8?B?VTYxYmdZWjR2Nm5wTTBsS2lud21YMGJjYVMvN3kyamNwSzF2dnJ6R0ZRTGtS?=
+ =?utf-8?B?eHJOb0YwYnNqZWpVdUZ1L1Qwb1ptN1ZEMngwR3RtZDBZaHJUY2hncmpaOWNB?=
+ =?utf-8?B?UXdhd2F0WVpJN2dkU2FpVkJPTnI0YjJoTnBDNVVwcFBSTlRQcjUrbmNBTTJH?=
+ =?utf-8?B?MnJGdXFBSjFRUFlKd0VvOVhkK2FVK25ZR0p5cDhhL2tWWUN0Nk1SN0w1Z2wr?=
+ =?utf-8?B?V2hNbWc2YndNY3lQRi9XYm94RThOdW1McHVjNTlsVU85M1RRaU9MMDJiemk5?=
+ =?utf-8?B?TEpCM0VVT0dKMUI3VHltU0krQ1JlL1ZZOUJZSGJVRVlVRmFrcGtjckhCaGZk?=
+ =?utf-8?B?UmlNSkNIR2tFdkd6emxxbDRkT09nMTIvMnQ1bFF0dWtzSlNhOWFsci90MVdD?=
+ =?utf-8?B?SXBpd0o3MEhxajQwZkVIbnBoSmJSZUExbWl4amhJaVBIbEk3T1ZXODNmbEJK?=
+ =?utf-8?B?VnV6UmRsV0dHakhDZEVZU0VIWDNjTmZuU2k1UjVjN0kwSWUvYnV5Q0w3STJO?=
+ =?utf-8?B?MkFrSXA1TUtvQWl0dVFJZGNLSGFmYkNWT0lsYVpMRHVla3h0T2UzVzNVWURx?=
+ =?utf-8?B?dXM0Vm1vaWlQK24zdVhhMG9HNkdwTG9od2QwdmowdjRpQVh0dWg5dXhyWnpV?=
+ =?utf-8?B?T1A0K2ZyMWNlczUzSjBpbHNSMmNMV3FDWTZPWUxVRW1oK3pUc0k2OGh2ZmNT?=
+ =?utf-8?Q?LizuiIZKXmfE2nG/nX8rauPAc?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 49d19088-8e26-43ea-dc15-08ddcdbc0119
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jul 2025 09:49:11.4662
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 8GtysIGTsqOckZeCzJkkZPXVmXhmuOjId+GCdKPZriFMiPHmrZMwbjksocrM6egbavYqsFuchrwssb2fVb2B4g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB4957
+X-OriginatorOrg: intel.com
 
-Hello Jason,
+On Fri, Jul 18, 2025 at 08:57:10AM -0700, Vishal Annapurve wrote:
+> On Fri, Jul 18, 2025 at 2:15 AM Yan Zhao <yan.y.zhao@intel.com> wrote:
+> >
+> > On Tue, Jul 15, 2025 at 09:10:42AM +0800, Yan Zhao wrote:
+> > > On Mon, Jul 14, 2025 at 08:46:59AM -0700, Sean Christopherson wrote:
+> > > > > >         folio = __kvm_gmem_get_pfn(file, slot, index, &pfn, &is_prepared, &max_order);
+> > > > > If max_order > 0 is returned, the next invocation of __kvm_gmem_populate() for
+> > > > > GFN+1 will return is_prepared == true.
+> > > >
+> > > > I don't see any reason to try and make the current code truly work with hugepages.
+> > > > Unless I've misundertood where we stand, the correctness of hugepage support is
+> > > Hmm. I thought your stand was to address the AB-BA lock issue which will be
+> > > introduced by huge pages, so you moved the get_user_pages() from vendor code to
+> > > the common code in guest_memfd :)
+> > >
+> > > > going to depend heavily on the implementation for preparedness.  I.e. trying to
+> > > > make this all work with per-folio granulartiy just isn't possible, no?
+> > > Ah. I understand now. You mean the right implementation of __kvm_gmem_get_pfn()
+> > > should return is_prepared at 4KB granularity rather than per-folio granularity.
+> > >
+> > > So, huge pages still has dependency on the implementation for preparedness.
+> > Looks with [3], is_prepared will not be checked in kvm_gmem_populate().
+> >
+> > > Will you post code [1][2] to fix non-hugepages first? Or can I pull them to use
+> > > as prerequisites for TDX huge page v2?
+> > So, maybe I can use [1][2][3] as the base.
+> >
+> > > [1] https://lore.kernel.org/all/aG_pLUlHdYIZ2luh@google.com/
+> > > [2] https://lore.kernel.org/all/aHEwT4X0RcfZzHlt@google.com/
 
-On 7/9/25 16:52, Jason Gunthorpe wrote:
-> The current algorithm does not work if the ACS is not uniform across the
-> entire MFD. This seems to mostly happen in the real world because of
-> Linux's quirk systems that sometimes quirks only one function in a MFD,
-> creating an asymmetric situation.
+From the PUCK, looks Sean said he'll post [1][2] for 6.18 and Michael will post
+[3] soon.
+
+hi, Sean, is this understanding correct?
+
+> IMO, unless there is any objection to [1], it's un-necessary to
+> maintain kvm_gmem_populate for any arch (even for SNP). All the
+> initial memory population logic needs is the stable pfn for a given
+> gfn, which ideally should be available using the standard mechanisms
+> such as EPT/NPT page table walk within a read KVM mmu lock (This patch
+> already demonstrates it to be working).
 > 
-> For discussion let's consider a simple MFD topology like the below:
+> It will be hard to clean-up this logic once we have all the
+> architectures using this path.
 > 
->                        -- MFD 00:1f.0 ACS != REQ_ACS_FLAGS
->        Root 00:00.00 --|- MFD 00:1f.2 ACS != REQ_ACS_FLAGS
->                        |- MFD 00:1f.6 ACS = REQ_ACS_FLAGS
-> 
-> This asymmetric ACS could be created using the config_acs kernel command
-> line parameter, from quirks, or from a poorly thought out device that has
-> ACS flags only on some functions.
-> 
-> Since ACS is an egress property the asymmetric flags allow for 00:1f.0 to
-> do memory acesses into 00:1f.6's BARs, but 00:1f.6 cannot reach any other
-> function. Thus we expect an iommu_group to contain all three
-> devices. Instead the current algorithm gives a group of [1f.0, 1f.2] and a
-> single device group of 1f.6.
-> 
-> The current algorithm sees the good ACS flags on 00:1f.6 and does not
-> consider ACS on any other MFD functions.
-> 
-> For path properties the ACS flags say that 00:1f.6 is safe to use with
-> PASID and supports SVA as it will not have any portions of its address
-> space routed away from the IOMMU, this part of the ACS system is working
-> correctly.
-> 
-> This is a problematic fix because this historical mistake has created an
-> ecosystem around it. We now have quirks that assume single function is
-> enough to quirk and it seems there are PCI root complexes that make the
-> same non-compliant assumption.
-> 
-> The new helper pci_mfd_isolation() retains the existing quirks and we
-> will probably need to add additional HW quirks for PCI root complexes that
-> have not followed the spec but have been silently working today.
-> 
-> Use pci_reachable_set() in pci_device_group() to make the resulting
-> algorithm faster and easier to understand.
-> 
-> Add pci_mfds_are_same_group() which specifically looks pair-wise at all
-> functions in the MFDs. Any function without ACS isolation will become
-> reachable to all other functions.
-> 
-> pci_reachable_set() does the calculations for figuring out the set of
-> devices under the pci_bus_sem, which is better than repeatedly searching
-> across all PCI devices.
-> 
-> Once the set of devices is determined and the set has more than one device
-> use pci_get_slot() to search for any existing groups in the reachable set.
-> 
-> Fixes: 104a1c13ac66 ("iommu/core: Create central IOMMU group lookup/creation interface")
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> ---
->   drivers/iommu/iommu.c | 173 +++++++++++++++++-------------------------
->   1 file changed, 71 insertions(+), 102 deletions(-)
-> 
-> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-> index 7b407065488296..cd26b43916e8be 100644
-> --- a/drivers/iommu/iommu.c
-> +++ b/drivers/iommu/iommu.c
-> @@ -1413,85 +1413,6 @@ int iommu_group_id(struct iommu_group *group)
->   }
->   EXPORT_SYMBOL_GPL(iommu_group_id);
->   
-> -static struct iommu_group *get_pci_alias_group(struct pci_dev *pdev,
-> -					       unsigned long *devfns);
-> -
-> -/*
-> - * For multifunction devices which are not isolated from each other, find
-> - * all the other non-isolated functions and look for existing groups.  For
-> - * each function, we also need to look for aliases to or from other devices
-> - * that may already have a group.
-> - */
-> -static struct iommu_group *get_pci_function_alias_group(struct pci_dev *pdev,
-> -							unsigned long *devfns)
-> -{
-> -	struct pci_dev *tmp = NULL;
-> -	struct iommu_group *group;
-> -
-> -	if (!pdev->multifunction || pci_acs_enabled(pdev, PCI_ACS_ISOLATED))
-> -		return NULL;
-> -
-> -	for_each_pci_dev(tmp) {
-> -		if (tmp == pdev || tmp->bus != pdev->bus ||
-> -		    PCI_SLOT(tmp->devfn) != PCI_SLOT(pdev->devfn) ||
-> -		    pci_acs_enabled(tmp, PCI_ACS_ISOLATED))
-> -			continue;
-> -
-> -		group = get_pci_alias_group(tmp, devfns);
-> -		if (group) {
-> -			pci_dev_put(tmp);
-> -			return group;
-> -		}
-> -	}
-> -
-> -	return NULL;
-> -}
-> -
-> -/*
-> - * Look for aliases to or from the given device for existing groups. DMA
-> - * aliases are only supported on the same bus, therefore the search
-> - * space is quite small (especially since we're really only looking at pcie
-> - * device, and therefore only expect multiple slots on the root complex or
-> - * downstream switch ports).  It's conceivable though that a pair of
-> - * multifunction devices could have aliases between them that would cause a
-> - * loop.  To prevent this, we use a bitmap to track where we've been.
-> - */
-> -static struct iommu_group *get_pci_alias_group(struct pci_dev *pdev,
-> -					       unsigned long *devfns)
-> -{
-> -	struct pci_dev *tmp = NULL;
-> -	struct iommu_group *group;
-> -
-> -	if (test_and_set_bit(pdev->devfn & 0xff, devfns))
-> -		return NULL;
-> -
-> -	group = iommu_group_get(&pdev->dev);
-> -	if (group)
-> -		return group;
-> -
-> -	for_each_pci_dev(tmp) {
-> -		if (tmp == pdev || tmp->bus != pdev->bus)
-> -			continue;
-> -
-> -		/* We alias them or they alias us */
-> -		if (pci_devs_are_dma_aliases(pdev, tmp)) {
-> -			group = get_pci_alias_group(tmp, devfns);
-> -			if (group) {
-> -				pci_dev_put(tmp);
-> -				return group;
-> -			}
-> -
-> -			group = get_pci_function_alias_group(tmp, devfns);
-> -			if (group) {
-> -				pci_dev_put(tmp);
-> -				return group;
-> -			}
-> -		}
-> -	}
-> -
-> -	return NULL;
-> -}
-> -
->   /*
->    * Generic device_group call-back function. It just allocates one
->    * iommu-group per device.
-> @@ -1534,40 +1455,88 @@ static struct iommu_group *pci_group_alloc_non_isolated(void)
->   	return group;
->   }
->   
-> +/*
-> + * Ignoring quirks, all functions in the MFD need to be isolated from each other
-> + * and get their own groups, otherwise the whole MFD will share a group. Any
-> + * function that lacks explicit ACS isolation is assumed to be able to P2P
-> + * access any other function in the MFD.
-> + */
-> +static bool pci_mfds_are_same_group(struct pci_dev *deva, struct pci_dev *devb)
-> +{
-> +	/* Are deva/devb functions in the same MFD? */
-> +	if (PCI_SLOT(deva->devfn) != PCI_SLOT(devb->devfn))
-> +		return false;
-> +	/* Don't understand what is happening, be conservative */
-> +	if (deva->multifunction != devb->multifunction)
-> +		return true;
-> +	if (!deva->multifunction)
-> +		return false;
-> +
-> +	/* Quirks can inhibit single MFD functions from combining into groups */
-> +	if (pci_mfd_isolated(deva) || pci_mfd_isolated(devb))
-> +		return false;
-> +
-> +	/* Can they reach each other's MMIO through P2P? */
-> +	return !pci_acs_enabled(deva, PCI_ACS_ISOLATED) ||
-> +	       !pci_acs_enabled(devb, PCI_ACS_ISOLATED);
-> +}
-> +
-> +static bool pci_devs_are_same_group(struct pci_dev *deva, struct pci_dev *devb)
-> +{
-> +	/*
-> +	 * This is allowed to return cycles: a,b -> b,c -> c,a can be aliases.
-> +	 */
-> +	if (pci_devs_are_dma_aliases(deva, devb))
-> +		return true;
-> +
-> +	return pci_mfds_are_same_group(deva, devb);
-> +}
-> +
->   static struct iommu_group *pci_get_alias_group(struct pci_dev *pdev)
->   {
-> -	struct iommu_group *group;
-> -	DECLARE_BITMAP(devfns, 256) = {};
-> +	struct pci_reachable_set devfns;
-> +	const unsigned int NR_DEVFNS = sizeof(devfns.devfns) * BITS_PER_BYTE;
-> +	unsigned int devfn;
->   
->   	/*
-> -	 * Look for existing groups on device aliases.  If we alias another
-> -	 * device or another device aliases us, use the same group.
-> +	 * Look for existing groups on device aliases and multi-function ACS. If
-> +	 * we alias another device or another device aliases us, use the same
-> +	 * group.
-> +	 *
-> +	 * pci_reachable_set() should return the same bitmap if called for any
-> +	 * device in the set and we want all devices in the set to have the same
-> +	 * group.
->   	 */
-> -	group = get_pci_alias_group(pdev, devfns);
-> -	if (group)
-> -		return group;
-> +	pci_reachable_set(pdev, &devfns, pci_devs_are_same_group);
-> +	/* start is known to have iommu_group_get() == NULL */
-> +	__clear_bit(pdev->devfn, devfns.devfns);
->   
->   	/*
-> -	 * Look for existing groups on non-isolated functions on the same
-> -	 * slot and aliases of those funcions, if any.  No need to clear
-> -	 * the search bitmap, the tested devfns are still valid.
-> -	 */
-> -	group = get_pci_function_alias_group(pdev, devfns);
-> -	if (group)
-> -		return group;
-> -
-> -	/*
-> -	 * When MFD's are included in the set due to ACS we assume that if ACS
-> -	 * permits an internal loopback between functions it also permits the
-> -	 * loopback to go downstream if a function is a bridge.
-> +	 * When MFD functions are included in the set due to ACS we assume that
-> +	 * if ACS permits an internal loopback between functions it also permits
-> +	 * the loopback to go downstream if any function is a bridge.
->   	 *
->   	 * It is less clear what aliases mean when applied to a bridge. For now
->   	 * be conservative and also propagate the group downstream.
->   	 */
-> -	__clear_bit(pdev->devfn & 0xFF, devfns);
-> -	if (!bitmap_empty(devfns, sizeof(devfns) * BITS_PER_BYTE))
-> -		return pci_group_alloc_non_isolated();
-> -	return NULL;
-> +	if (bitmap_empty(devfns.devfns, NR_DEVFNS))
-> +		return NULL;
-> +
-> +	for_each_set_bit(devfn, devfns.devfns, NR_DEVFNS) {
-> +		struct iommu_group *group;
-> +		struct pci_dev *pdev_slot;
-> +
-> +		pdev_slot = pci_get_slot(pdev->bus, devfn);
-> +		group = iommu_group_get(&pdev_slot->dev);
-> +		pci_dev_put(pdev_slot);
-> +		if (group) {
-> +			if (WARN_ON(!(group->bus_data &
-> +				      BUS_DATA_PCI_NON_ISOLATED)))
-> +				group->bus_data |= BUS_DATA_PCI_NON_ISOLATED;
-> +			return group;
-> +		}
-> +	}
-> +	return pci_group_alloc_non_isolated();
->   }
->   
->   static struct iommu_group *pci_hierarchy_group(struct pci_dev *pdev)
+> [1] https://lore.kernel.org/lkml/CAGtprH8+x5Z=tPz=NcrQM6Dor2AYBu3jiZdo+Lg4NqAk0pUJ3w@mail.gmail.com/
+IIUC, the suggestion in the link is to abandon kvm_gmem_populate().
+For TDX, it means adopting the approach in this RFC patch, right?
 
-
-I am seeing this WARN_ON when creating VFs of a CX-7 adapter :
-
-[   31.436294] pci 0000:b1:00.2: enabling Extended Tags
-[   31.448767] ------------[ cut here ]------------
-[   31.453392] WARNING: CPU: 47 PID: 1673 at drivers/iommu/iommu.c:1533 pci_device_group+0x307/0x3b0
-....
-[   31.869174]  </TASK>
-[   31.871373] ---[ end trace 0000000000000000 ]---
-[   31.876020] pci 0000:b1:00.2: Adding to iommu group 11
-[   31.883572] mlx5_core 0000:b1:00.2: enabling device (0000 -> 0002)
-[   31.889846] mlx5_core 0000:b1:00.2: firmware version: 28.40.1000
-
-Some more info on the system below,
-
-b1:00.1 Ethernet controller: Mellanox Technologies MT2910 Family [ConnectX-7]
-	Subsystem: Mellanox Technologies Device 0026
-	Control: I/O- Mem+ BusMaster+ SpecCycle- MemWINV- VGASnoop- ParErr- Stepping- SERR- FastB2B- DisINTx+
-	Status: Cap+ 66MHz- UDF- FastB2B- ParErr- DEVSEL=fast >TAbort- <TAbort- <MAbort- >SERR- <PERR- INTx-
-	Latency: 0
-	Interrupt: pin B routed to IRQ 17
-	NUMA node: 1
-	IOMMU group: 12
-	Region 0: Memory at dc000000 (64-bit, prefetchable) [size=32M]
-	Expansion ROM at dbd00000 [disabled] [size=1M]
-	Capabilities: [60] Express (v2) Endpoint, MSI 00
-		DevCap:	MaxPayload 512 bytes, PhantFunc 0, Latency L0s unlimited, L1 unlimited
-			ExtTag+ AttnBtn- AttnInd- PwrInd- RBE+ FLReset+ SlotPowerLimit 75.000W
-		DevCtl:	CorrErr- NonFatalErr+ FatalErr+ UnsupReq+
-			RlxdOrd+ ExtTag+ PhantFunc- AuxPwr- NoSnoop+ FLReset-
-			MaxPayload 512 bytes, MaxReadReq 4096 bytes
-		DevSta:	CorrErr+ NonFatalErr- FatalErr- UnsupReq+ AuxPwr- TransPend-
-		LnkCap:	Port #0, Speed 32GT/s, Width x16, ASPM not supported
-			ClockPM- Surprise- LLActRep- BwNot- ASPMOptComp+
-		LnkCtl:	ASPM Disabled; RCB 64 bytes, Disabled- CommClk+
-			ExtSynch- ClockPM- AutWidDis- BWInt- AutBWInt-
-		LnkSta:	Speed 16GT/s (downgraded), Width x8 (downgraded)
-			TrErr- Train- SlotClk+ DLActive- BWMgmt- ABWMgmt-
-		DevCap2: Completion Timeout: Range ABC, TimeoutDis+ NROPrPrP- LTR-
-			 10BitTagComp+ 10BitTagReq+ OBFF Not Supported, ExtFmt- EETLPPrefix-
-			 EmergencyPowerReduction Not Supported, EmergencyPowerReductionInit-
-			 FRS- TPHComp- ExtTPHComp-
-			 AtomicOpsCap: 32bit+ 64bit+ 128bitCAS+
-		DevCtl2: Completion Timeout: 65ms to 210ms, TimeoutDis- LTR- OBFF Disabled,
-			 AtomicOpsCtl: ReqEn+
-		LnkSta2: Current De-emphasis Level: -6dB, EqualizationComplete- EqualizationPhase1-
-			 EqualizationPhase2- EqualizationPhase3- LinkEqualizationRequest-
-			 Retimer- 2Retimers- CrosslinkRes: unsupported
-	Capabilities: [48] Vital Product Data
-		Product Name: NVIDIA ConnectX-7 Ethernet adapter card, 200 GbE , Dual-port QSFP112, PCIe 5.0 x16, Crypto and Secure Boot
-		Read-only fields:
-			[PN] Part number: MCX713106AC-VEAT
-			[EC] Engineering changes: A5
-			[V2] Vendor specific: MCX713106AC-VEAT
-			[SN] Serial number: MT2304XZ02VD
-			[V3] Vendor specific: 6e988f87fb9ced118000946dae47a24a
-			[VA] Vendor specific: MLX:MN=MLNX:CSKU=V2:UUID=V3:PCI=V0:MODL=CX713106A
-			[V0] Vendor specific: PCIeGen5 x16
-			[VU] Vendor specific: MT2304XZ02VDMLNXS0D0F1
-			[RV] Reserved: checksum good, 1 byte(s) reserved
-		End
-	Capabilities: [9c] MSI-X: Enable+ Count=64 Masked-
-		Vector table: BAR=0 offset=00002000
-		PBA: BAR=0 offset=00003000
-	Capabilities: [c0] Vendor Specific Information: Len=18 <?>
-	Capabilities: [40] Power Management version 3
-		Flags: PMEClk- DSI- D1- D2- AuxCurrent=375mA PME(D0-,D1-,D2-,D3hot-,D3cold+)
-		Status: D0 NoSoftRst+ PME-Enable- DSel=0 DScale=0 PME-
-	Capabilities: [100 v1] Advanced Error Reporting
-		UESta:	DLP- SDES- TLP- FCP- CmpltTO- CmpltAbrt- UnxCmplt- RxOF- MalfTLP- ECRC- UnsupReq- ACSViol-
-		UEMsk:	DLP- SDES- TLP- FCP- CmpltTO- CmpltAbrt- UnxCmplt+ RxOF- MalfTLP- ECRC- UnsupReq- ACSViol-
-		UESvrt:	DLP+ SDES- TLP+ FCP+ CmpltTO+ CmpltAbrt+ UnxCmplt- RxOF+ MalfTLP+ ECRC+ UnsupReq- ACSViol-
-		CESta:	RxErr- BadTLP- BadDLLP- Rollover- Timeout- AdvNonFatalErr+
-		CEMsk:	RxErr- BadTLP+ BadDLLP+ Rollover+ Timeout+ AdvNonFatalErr+
-		AERCap:	First Error Pointer: 04, ECRCGenCap+ ECRCGenEn+ ECRCChkCap+ ECRCChkEn+
-			MultHdrRecCap- MultHdrRecEn- TLPPfxPres- HdrLogCap-
-		HeaderLog: 00000000 00000000 00000000 00000000
-	Capabilities: [150 v1] Alternative Routing-ID Interpretation (ARI)
-		ARICap:	MFVC- ACS-, Next Function: 0
-		ARICtl:	MFVC- ACS-, Function Group: 0
-	Capabilities: [180 v1] Single Root I/O Virtualization (SR-IOV)
-		IOVCap:	Migration-, Interrupt Message Number: 000
-		IOVCtl:	Enable- Migration- Interrupt- MSE- ARIHierarchy-
-		IOVSta:	Migration-
-		Initial VFs: 8, Total VFs: 8, Number of VFs: 0, Function Dependency Link: 01
-		VF offset: 9, stride: 1, Device ID: 101e
-		Supported Page Size: 000007ff, System Page Size: 00000001
-		Region 0: Memory at 00000000e0000000 (64-bit, prefetchable)
-		VF Migration: offset: 00000000, BIR: 0
-	Capabilities: [230 v1] Access Control Services
-		ACSCap:	SrcValid- TransBlk- ReqRedir- CmpltRedir- UpstreamFwd- EgressCtrl- DirectTrans-
-		ACSCtl:	SrcValid- TransBlk- ReqRedir- CmpltRedir- UpstreamFwd- EgressCtrl- DirectTrans-
-	Capabilities: [420 v1] Data Link Feature <?>
-	Kernel driver in use: mlx5_core
-	Kernel modules: mlx5_core
-b1:00.2 Ethernet controller: Mellanox Technologies ConnectX Family mlx5Gen Virtual Function
-	Subsystem: Mellanox Technologies Device 0026
-	Control: I/O- Mem- BusMaster- SpecCycle- MemWINV- VGASnoop- ParErr- Stepping- SERR- FastB2B- DisINTx-
-	Status: Cap+ 66MHz- UDF- FastB2B- ParErr- DEVSEL=fast >TAbort- <TAbort- <MAbort- >SERR- <PERR- INTx-
-	NUMA node: 1
-	IOMMU group: 11
-	Region 0: Memory at e0800000 (64-bit, prefetchable) [virtual] [size=1M]
-	Capabilities: [60] Express (v2) Endpoint, MSI 00
-		DevCap:	MaxPayload 512 bytes, PhantFunc 0, Latency L0s unlimited, L1 unlimited
-			ExtTag+ AttnBtn- AttnInd- PwrInd- RBE+ FLReset+ SlotPowerLimit 0.000W
-		DevCtl:	CorrErr- NonFatalErr- FatalErr- UnsupReq-
-			RlxdOrd- ExtTag- PhantFunc- AuxPwr- NoSnoop- FLReset-
-			MaxPayload 128 bytes, MaxReadReq 128 bytes
-		DevSta:	CorrErr- NonFatalErr- FatalErr- UnsupReq- AuxPwr- TransPend-
-		LnkCap:	Port #0, Speed 32GT/s, Width x16, ASPM not supported
-			ClockPM- Surprise- LLActRep- BwNot- ASPMOptComp+
-		LnkCtl:	ASPM Disabled; RCB 64 bytes, Disabled- CommClk-
-			ExtSynch- ClockPM- AutWidDis- BWInt- AutBWInt-
-		LnkSta:	Speed unknown (downgraded), Width x0 (downgraded)
-			TrErr- Train- SlotClk- DLActive- BWMgmt- ABWMgmt-
-		DevCap2: Completion Timeout: Range ABC, TimeoutDis+ NROPrPrP- LTR-
-			 10BitTagComp+ 10BitTagReq+ OBFF Not Supported, ExtFmt- EETLPPrefix-
-			 EmergencyPowerReduction Not Supported, EmergencyPowerReductionInit-
-			 FRS- TPHComp- ExtTPHComp-
-			 AtomicOpsCap: 32bit+ 64bit+ 128bitCAS+
-		DevCtl2: Completion Timeout: 50us to 50ms, TimeoutDis- LTR- OBFF Disabled,
-			 AtomicOpsCtl: ReqEn-
-		LnkSta2: Current De-emphasis Level: -6dB, EqualizationComplete- EqualizationPhase1-
-			 EqualizationPhase2- EqualizationPhase3- LinkEqualizationRequest-
-			 Retimer- 2Retimers- CrosslinkRes: unsupported
-	Capabilities: [9c] MSI-X: Enable- Count=12 Masked-
-		Vector table: BAR=0 offset=00002000
-		PBA: BAR=0 offset=00003000
-	Capabilities: [100 v1] Vendor Specific Information: ID=0000 Rev=0 Len=00c <?>
-	Capabilities: [150 v1] Alternative Routing-ID Interpretation (ARI)
-		ARICap:	MFVC- ACS-, Next Function: 0
-		ARICtl:	MFVC- ACS-, Function Group: 0
-	Kernel driver in use: mlx5_vfio_pci
-	Kernel modules: mlx5_core
-
-
-  +-[0000:b0]-+-00.0  Intel Corporation Ice Lake Memory Map/VT-d
-  |           +-00.1  Intel Corporation Ice Lake Mesh 2 PCIe
-  |           +-00.2  Intel Corporation Ice Lake RAS
-  |           +-00.4  Intel Corporation Ice Lake IEH
-  |           \-04.0-[b1-b2]--+-00.0  Mellanox Technologies MT2910 Family [ConnectX-7]
-  |                           +-00.1  Mellanox Technologies MT2910 Family [ConnectX-7]
-  |                           +-00.2  Mellanox Technologies ConnectX Family mlx5Gen Virtual Function
-  |                           +-00.3  Mellanox Technologies ConnectX Family mlx5Gen Virtual Function
-  |                           +-00.4  Mellanox Technologies ConnectX Family mlx5Gen Virtual Function
-  |                           +-00.5  Mellanox Technologies ConnectX Family mlx5Gen Virtual Function
-  |                           +-00.6  Mellanox Technologies ConnectX Family mlx5Gen Virtual Function
-  |                           +-00.7  Mellanox Technologies ConnectX Family mlx5Gen Virtual Function
-  |                           +-01.0  Mellanox Technologies ConnectX Family mlx5Gen Virtual Function
-  |                           \-01.1  Mellanox Technologies ConnectX Family mlx5Gen Virtual Function
-
-
-IOMMU groups are baroque :
-
-
-  *IOMMU Group 11 :
-	b1:00.0 Ethernet controller: Mellanox Technologies MT2910 Family [ConnectX-7]
-	b1:00.2 Ethernet controller: Mellanox Technologies ConnectX Family mlx5Gen Virtual Function
-	b1:00.3 Ethernet controller: Mellanox Technologies ConnectX Family mlx5Gen Virtual Function
-	b1:00.4 Ethernet controller: Mellanox Technologies ConnectX Family mlx5Gen Virtual Function
-	b1:00.5 Ethernet controller: Mellanox Technologies ConnectX Family mlx5Gen Virtual Function
-	b1:00.6 Ethernet controller: Mellanox Technologies ConnectX Family mlx5Gen Virtual Function
-	b1:00.7 Ethernet controller: Mellanox Technologies ConnectX Family mlx5Gen Virtual Function
-  *IOMMU Group 12 :
-	b1:00.1 Ethernet controller: Mellanox Technologies MT2910 Family [ConnectX-7]
-  *IOMMU Group 184 :
-	b1:01.0 Ethernet controller: Mellanox Technologies ConnectX Family mlx5Gen Virtual Function
-  *IOMMU Group 185 :
-	b1:01.1 Ethernet controller: Mellanox Technologies ConnectX Family mlx5Gen Virtual Function
-
-
-
-Other differences are on the onboard graphic card:
-
-  *IOMMU Group 26 :
-	02:00.0 PCI bridge: PLDA PCI Express Bridge (rev 02)
-	03:00.0 VGA compatible controller: Matrox Electronics Systems Ltd. Integrated Matrox G200eW3 Graphics Controller (rev 04)
-
-becomes :
-
-  *IOMMU Group 26 :
-	02:00.0 PCI bridge: PLDA PCI Express Bridge (rev 02)
-  *IOMMU Group 27 :
-	03:00.0 VGA compatible controller: Matrox Electronics Systems Ltd. Integrated Matrox G200eW3 Graphics Controller (rev 04)
-
-I guess that's unrelated
-
-
-Thanks,
-
-C.
-
-
+> > [3] https://lore.kernel.org/lkml/20250613005400.3694904-2-michael.roth@amd.com,
 
