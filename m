@@ -1,196 +1,131 @@
-Return-Path: <kvm+bounces-53545-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53546-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E791B13CA6
-	for <lists+kvm@lfdr.de>; Mon, 28 Jul 2025 16:14:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9806B13CBD
+	for <lists+kvm@lfdr.de>; Mon, 28 Jul 2025 16:16:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 45FDD1C2030E
-	for <lists+kvm@lfdr.de>; Mon, 28 Jul 2025 14:08:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DC9D27A6AD4
+	for <lists+kvm@lfdr.de>; Mon, 28 Jul 2025 14:14:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C6A6262FF0;
-	Mon, 28 Jul 2025 14:07:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F099626E707;
+	Mon, 28 Jul 2025 14:16:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="BXWmZLVp"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DsnB2J8R"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D6EF43147;
-	Mon, 28 Jul 2025 14:07:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92EB826C3A7
+	for <kvm@vger.kernel.org>; Mon, 28 Jul 2025 14:16:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753711673; cv=none; b=gokDw+runI4ADZaZrH4omv/eSmpfSclAd86DVvB3n8Scwt4ioPe4b5zidV7PtiICYDBoUOSmFXTfgzCAUdZOjiCUvxBRpQV/vVqpGZNkKAj33oJ/awcVD/BbIskSS167m9rJtUC8VdQmep3h91gYYhfaI7XML2467STdltXx0pg=
+	t=1753712166; cv=none; b=m6PGVvgN/g2sQPGOP5EQcVw2QcoKKyYz6lHH6d6gjk9vRSQ4HSJqb6ZgmmqARTL4XIwyuW/3KbrT33KLl2m81cqolTHBemJhlFFjOislHFz6MbR4zj7ow0KzbLy2R+H/DMffbh84j3iWEiq75wstC0FbGJNYDLt+QsNEAZQtopQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753711673; c=relaxed/simple;
-	bh=/eTJHbqadWj+e6DakVytqC2l+wi+xUljkFbhSTEiZGc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lc9aHLvsl2HJJEr5iNOrgLHcnDdfuJ2vFjp2WRT65b6Z8z0PZRoDcqy4UX85Zn2M4tJjDApjEGFbAFCOokKTd15xjBCs2D6y5cbcE/F5b0/gMiGM2aX5DNWCUIobJtXh8aqYh1pryUFNUQCAZslS29qnqR/QM/JzMK5eU5vcQfA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=BXWmZLVp; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56S53wgb031518;
-	Mon, 28 Jul 2025 14:07:46 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=t3dnnl
-	K9jBt+h2Lo3A605+oeZBvObRMVCDQh4GRyKzI=; b=BXWmZLVpj+RS2YtYKbJXhR
-	lnmqpEUnod5B/nGmqzSDLP8DxXPamQQRIWVKDHo/sTFN70Vc8vkUPnJxbSjzLDcK
-	qM56r0xTPwgM0DGP2mzBeCHYJI/VOTdDe7taseFNmozkar8rsHtBYGx1yVQ1XBNJ
-	/9vXZi+E9MywtXanB5/h1Wqi1LUqyzT1vOGgY21citRTfYlU9DJhN5ntW+8D7AZ5
-	ox/6kKD/t+ffwLqbLdlB4ZaMOerbNOlrYJq3u7muLb1yg2QWgUxMoYz4pjdcwIQl
-	6k4v1EKUDO4RFAWYvTV4PIICf/N2MqWC4oUXnCg0POA+RzjB/+G93DfDshlnM7OQ
-	==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 484qd59dwu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 28 Jul 2025 14:07:46 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 56SBXiJZ028748;
-	Mon, 28 Jul 2025 14:07:45 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 485c22dsq7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 28 Jul 2025 14:07:45 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 56SE7gm711993360
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 28 Jul 2025 14:07:42 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0C8412004B;
-	Mon, 28 Jul 2025 14:07:42 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DD95A20043;
-	Mon, 28 Jul 2025 14:07:41 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.66])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 28 Jul 2025 14:07:41 +0000 (GMT)
-Date: Mon, 28 Jul 2025 16:03:45 +0200
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: Thomas Huth <thuth@redhat.com>
-Cc: kvm@vger.kernel.org, Nico =?UTF-8?B?QsO2aHI=?= <nrb@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand
- <david@redhat.com>, linux-s390@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH 1/3] s390x: Fix unreliable panic-loop
- tests
-Message-ID: <20250728160345.54c4abfb@p-imbrenda>
-In-Reply-To: <20250724133051.44045-2-thuth@redhat.com>
-References: <20250724133051.44045-1-thuth@redhat.com>
-	<20250724133051.44045-2-thuth@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1753712166; c=relaxed/simple;
+	bh=TMBZw7T+2p4yueLnp9qiicCf6eojz8Xmv4qYvT7W0jA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lpGaE69epmrXmKvYfXG+c4J2ge3L8dNtU2XGVPYSXNY7hM3gGM+mMayntgoz6MFoKDcPQidmNYnEyCt4D43yHk4EXODiYj2tf7gi2Us+iIDM7DtdsSuc/AIy1+NApk+B2m4esQm+E632Th/bMIau0XsP1hsNeITTttS87Vr0Afg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DsnB2J8R; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1753712160;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=cBPoAPqURQrafwJDrZiP8f1JT2Q39loHMmrjHy+nrEw=;
+	b=DsnB2J8RIdgtqSgRKZoZ19Fop617sEC0WyYKShbM8+UTg7JeLBSgvsqHkNiiLw3XFiACeC
+	9JKbYwIVMOiEQb6RRSe0jBm4j6LCKXeWWMS6mVGo8cVXbBALpaA6arv9l0UTRAhjFwljUB
+	3IV9AVJBPfsAcizxW4gRWkdMG3SFYuE=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-204-ObA72KOAORKge1j9rPd6lQ-1; Mon,
+ 28 Jul 2025 10:15:48 -0400
+X-MC-Unique: ObA72KOAORKge1j9rPd6lQ-1
+X-Mimecast-MFC-AGG-ID: ObA72KOAORKge1j9rPd6lQ_1753712146
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0D3861800876;
+	Mon, 28 Jul 2025 14:15:46 +0000 (UTC)
+Received: from thuth-p1g4.redhat.com (unknown [10.45.224.117])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 94FC21955F24;
+	Mon, 28 Jul 2025 14:15:41 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-spdx@vger.kernel.org
+Subject: [PATCH] arch/x86/kvm/ioapic: Remove license boilerplate with bad FSF address
+Date: Mon, 28 Jul 2025 16:15:40 +0200
+Message-ID: <20250728141540.296816-1-thuth@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzI4MDEwMSBTYWx0ZWRfX4oEb6tjgdd/J
- 1kdvIBZf9nTYH5EjPtrDdWDOSSBma7EUF8biz8eo4usAdQGgDlRswaKSkbJ8nWj+tl5RG0d7zlI
- 0n/jOmM9x9HmnlpdRj++rdgGHXYVHoz3TnD3bCDbU3pJ+Fo7yNqCPQckGg89CqP5/YAuISZDDn0
- esBETZFM4ssim2JZtM8stV4cby05x1+Ia0+L2b8AXKkMFRi2r2UjS/x0VLL/FNxwDusw28a5k7P
- BKU7tsPm9hHl65OVuo8RzQI8ltUOYqlZdsMZrW8Di/P2CzwnjISpkpvzTZicJB5adB+b4xh4Gol
- yJUtd70/3Xxln9PrbduiOP96pXI7sXzXHxPRyQ0P3UlVwzk5qy3Z9jTAnoyFbd6HmbRA0LD2Mcr
- oofQDUBqXegzEwM4iDg9pef7WVsMSBiO16O/awipt6GdHJEdIDl1vOV8ciR01OmYgGJn6ESy
-X-Proofpoint-ORIG-GUID: tQfXON3I9u5G-Y8h8Exw29_zyNAhUAFu
-X-Authority-Analysis: v=2.4 cv=B9q50PtM c=1 sm=1 tr=0 ts=68878432 cx=c_pps
- a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
- a=kj9zAlcOel0A:10 a=Wb1JkmetP80A:10 a=20KFwNOVAAAA:8 a=VnNF1IyMAAAA:8
- a=KoHlIcV0PfifoefMnzEA:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-GUID: tQfXON3I9u5G-Y8h8Exw29_zyNAhUAFu
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-07-28_03,2025-07-28_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 priorityscore=1501 mlxscore=0 spamscore=0 mlxlogscore=999
- suspectscore=0 clxscore=1015 impostorscore=0 bulkscore=0 lowpriorityscore=0
- malwarescore=0 adultscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2507280101
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Thu, 24 Jul 2025 15:30:49 +0200
-Thomas Huth <thuth@redhat.com> wrote:
+From: Thomas Huth <thuth@redhat.com>
 
-> From: Thomas Huth <thuth@redhat.com>
-> 
-> In our CI, the s390x panic-loop-extint and panic-loop-pgm tests
-> are sometimes failing. Having a closer look, this seems to be caused
-> by ncat sometimes complaining about "Connection reset by peer" on stderr,
-> likely because QEMU terminated (due to the panic) before ncat could
-> properly tear down the connection. But having some output on stderr is
-> interpreted as test failure in qemu_fixup_return_code(), so the test is
-> marked as failed, even though the panic event occurred as expected.
-> 
-> To fix it, drop the usage of ncat here and simply handle the QMP
-> input and output via normal fifos instead. This has also the advantage
-> that we do not need an additional program for these tests anymore
-> that might not be available in the installation.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+The Free Software Foundation does not reside in "59 Temple Place"
+anymore, so we should not mention that address in the source code here.
+But instead of updating the address to their current location, let's
+rather drop the license boilerplate text here and use a proper SPDX
+license identifier instead. The text talks about the "GNU *Lesser*
+General Public License" and "any later version", so LGPL-2.1+ is the
+right choice here.
 
-Acked-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ arch/x86/kvm/ioapic.c | 15 +--------------
+ 1 file changed, 1 insertion(+), 14 deletions(-)
 
-> ---
->  scripts/arch-run.bash | 21 +++++----------------
->  1 file changed, 5 insertions(+), 16 deletions(-)
-> 
-> diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
-> index c440f216..58e4f93f 100644
-> --- a/scripts/arch-run.bash
-> +++ b/scripts/arch-run.bash
-> @@ -63,14 +63,6 @@ qmp ()
->  	echo '{ "execute": "qmp_capabilities" }{ "execute":' "$2" '}' | ncat -U $1
->  }
->  
-> -qmp_events ()
-> -{
-> -	while ! test -S "$1"; do sleep 0.1; done
-> -	echo '{ "execute": "qmp_capabilities" }{ "execute": "cont" }' |
-> -		ncat --no-shutdown -U $1 |
-> -		jq -c 'select(has("event"))'
-> -}
-> -
->  filter_quiet_msgs ()
->  {
->  	grep -v "Now migrate the VM (quiet)" |
-> @@ -295,26 +287,23 @@ do_migration ()
->  
->  run_panic ()
->  {
-> -	if ! command -v ncat >/dev/null 2>&1; then
-> -		echo "${FUNCNAME[0]} needs ncat (netcat)" >&2
-> -		return 77
-> -	fi
-> -
->  	if ! command -v jq >/dev/null 2>&1; then
->  		echo "${FUNCNAME[0]} needs jq" >&2
->  		return 77
->  	fi
->  
->  	trap 'trap - TERM ; kill 0 ; exit 2' INT TERM
-> -	trap 'rm -f ${qmp}' RETURN EXIT
-> +	trap 'rm -f ${qmp}.in ${qmp}.out' RETURN EXIT
->  
->  	qmp=$(mktemp -u -t panic-qmp.XXXXXXXXXX)
-> +	mkfifo ${qmp}.in ${qmp}.out
->  
->  	# start VM stopped so we don't miss any events
-> -	"$@" -chardev socket,id=mon,path=${qmp},server=on,wait=off \
-> +	"$@" -chardev pipe,id=mon,path=${qmp} \
->  		-mon chardev=mon,mode=control -S &
-> +	echo '{ "execute": "qmp_capabilities" }{ "execute": "cont" }' > ${qmp}.in
->  
-> -	panic_event_count=$(qmp_events ${qmp} | jq -c 'select(.event == "GUEST_PANICKED")' | wc -l)
-> +	panic_event_count=$(jq -c 'select(.event == "GUEST_PANICKED")' < ${qmp}.out | wc -l)
->  	if [ "$panic_event_count" -lt 1 ]; then
->  		echo "FAIL: guest did not panic"
->  		ret=3
+diff --git a/arch/x86/kvm/ioapic.c b/arch/x86/kvm/ioapic.c
+index 45dae2d5d2f1f..e81f08c98e2f9 100644
+--- a/arch/x86/kvm/ioapic.c
++++ b/arch/x86/kvm/ioapic.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: LGPL-2.1+
+ /*
+  *  Copyright (C) 2001  MandrakeSoft S.A.
+  *  Copyright 2010 Red Hat, Inc. and/or its affiliates.
+@@ -8,20 +9,6 @@
+  *    http://www.linux-mandrake.com/
+  *    http://www.mandrakesoft.com/
+  *
+- *  This library is free software; you can redistribute it and/or
+- *  modify it under the terms of the GNU Lesser General Public
+- *  License as published by the Free Software Foundation; either
+- *  version 2 of the License, or (at your option) any later version.
+- *
+- *  This library is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- *  Lesser General Public License for more details.
+- *
+- *  You should have received a copy of the GNU Lesser General Public
+- *  License along with this library; if not, write to the Free Software
+- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+- *
+  *  Yunhong Jiang <yunhong.jiang@intel.com>
+  *  Yaozu (Eddie) Dong <eddie.dong@intel.com>
+  *  Based on Xen 3.1 code.
+-- 
+2.50.1
 
 
