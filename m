@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-53539-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53540-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01298B13A86
-	for <lists+kvm@lfdr.de>; Mon, 28 Jul 2025 14:31:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 413FEB13A89
+	for <lists+kvm@lfdr.de>; Mon, 28 Jul 2025 14:32:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25BF517CB3E
-	for <lists+kvm@lfdr.de>; Mon, 28 Jul 2025 12:30:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 17343189D56C
+	for <lists+kvm@lfdr.de>; Mon, 28 Jul 2025 12:31:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 167C126A0C5;
-	Mon, 28 Jul 2025 12:29:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E0A026AAB5;
+	Mon, 28 Jul 2025 12:29:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="U9K+8wtr"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="W5X4L7zx"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2D5F264627;
-	Mon, 28 Jul 2025 12:29:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD3E3264A60;
+	Mon, 28 Jul 2025 12:29:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753705770; cv=none; b=IfdX/zQ9JLq0cgsMNb66fJF5JsR5l0DmiuDwlK1bbFyGXK625OvL5MwLcZ0abvokNDoX+ddK2ix0aUTKAZVIro3teB8q67oEa7HzeTRDlF28Wvs4zXCNfmqZp4v3iwGr7oJhXIAR488ujJpCO/z/kVBNX7T1zdAImjWggu7X6YM=
+	t=1753705776; cv=none; b=BwFFRikpo6SnU8gdoRlO372mbych8tOShnnCsAqLqEYD/65Cbddm+OVcDfKAbpDeDiOuAR6tQctirB22mc3xoB36q1zkObkRSzbTP3st4LCF0LQ+iRr963GrYXmCSWHRCvXZaO/R7FcY98R5rm9M00G5N6Y398LkG79UAfIcHO4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753705770; c=relaxed/simple;
-	bh=WUHLDpzN4yyBJ03WNWSWNPYEC4Nh6LTe3WOYShwnaxQ=;
+	s=arc-20240116; t=1753705776; c=relaxed/simple;
+	bh=2i8R7WqbMuksduAgSp+rs6HAumU9dIeQQFpDSr5corI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=j8xgPMwItp5C38CO3EPRT+KXMu5Q+Z1/tAinIuKtrRr1nrKDyfPpZsBZEPJOFOJeHLZ2ffQG5xvbIXd7HIdSFdM16AK4UMtxjJDu7poVOukmWsG2dtBb384g7jgFKnkUPiEDdpDpbsx7DR+/WRhAqvBOV1vzx1Q+nh+6Wy/u1Yk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=U9K+8wtr; arc=none smtp.client-ip=198.175.65.18
+	 MIME-Version; b=PqlWVZQeSn+xVOwcdlqxUXdCs5dY4Pmf7AvewaEqrHdg36S1CPVA9POO2HZ20eV8igvL9kSquQ5CZSP02dNixPhOlaqA7P+BnIg7Vy3kr+y67N/VPjPv5mjybKHbi8aLEvXlgqCUdvgfBGc2gfiRmIIm9c2Q+OU31R+jtl10MxA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=W5X4L7zx; arc=none smtp.client-ip=198.175.65.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1753705769; x=1785241769;
+  t=1753705775; x=1785241775;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=WUHLDpzN4yyBJ03WNWSWNPYEC4Nh6LTe3WOYShwnaxQ=;
-  b=U9K+8wtryLGrGgaTqaAAlSx7UOllZzT9DvTAxtm5UMlPF1FO0OOtp78S
-   IWUWtIUx8RbklExJrZ66smBRQrUaBmcntOGTZ/r+LvteafHn3AvOevMU4
-   iTVQrtQYcJ802ZHGFsk47H5xeAiOV2tkCn+W5ibD8Djli3q7DdN2+yZkq
-   MNrIA/QzEGICofY4z81QF567N05Sc1zbFU2ElxaAHGwnWu09J89um/0DH
-   9VHOoYFhTTddYPiUqPr7UpdUU6cN9mF0cv7nLZp9h2YCUizW+t0aFDVO8
-   hrfQ+Abijc/GK/VVtZ3AGWRS0OzMDVy9opUQ20WdlBXbV0dkwtyMMZyxF
-   Q==;
-X-CSE-ConnectionGUID: I2tbL9XAQXCkyR9u0TVveQ==
-X-CSE-MsgGUID: HXBD05M+SjWeof4ouOJwng==
-X-IronPort-AV: E=McAfee;i="6800,10657,11504"; a="56043376"
+  bh=2i8R7WqbMuksduAgSp+rs6HAumU9dIeQQFpDSr5corI=;
+  b=W5X4L7zxU49C2o0nHm62T9m0NLQC2m1pMHuvdQJGFDC4BEwNI5dDHJA4
+   bnIL7+bk++4kbnGp4PGsAMWxi5TrjZKwlYvpFRaLQyMIOXx3m4lbx9NR4
+   qjLIu2w8AlvMwUQMGHHhHRuVQcp5vnMoHvcKw0o47yOFAoE2vmneXrGNX
+   x97hIpTr4TRz1tUE/kvu8FNs71xZuYfpJhO/8X0RMWgpYEvTbm4jV3n5i
+   v/KX64FhKlCLqjoE/uuwKG+1arpvdBCJu944mM8s5sAzeg+06Z8WAnNkf
+   PbntSD9nWov5/s0V1NLki42FJA9By6x7AC4SsIFt0gp+vUx/fUdT56f4Q
+   A==;
+X-CSE-ConnectionGUID: AZe8YjvlRKq5LJFupNPvnw==
+X-CSE-MsgGUID: VRFdJ4iYTH+kSFM3Jq8wMg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11504"; a="56043393"
 X-IronPort-AV: E=Sophos;i="6.16,339,1744095600"; 
-   d="scan'208";a="56043376"
+   d="scan'208";a="56043393"
 Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jul 2025 05:29:29 -0700
-X-CSE-ConnectionGUID: d7G9FBOjQwiZUQsKMc37cQ==
-X-CSE-MsgGUID: e6FbP7+tSmWLcIICkPmEXw==
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jul 2025 05:29:35 -0700
+X-CSE-ConnectionGUID: qs8xHEBNRYCb/4dCnrX/+g==
+X-CSE-MsgGUID: jnsd1L3ATpmUrz8Xn9BvVw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,339,1744095600"; 
-   d="scan'208";a="193375648"
+   d="scan'208";a="193375653"
 Received: from dnelso2-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.124.220.205])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jul 2025 05:29:24 -0700
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jul 2025 05:29:29 -0700
 From: Kai Huang <kai.huang@intel.com>
 To: dave.hansen@intel.com,
 	bp@alien8.de,
@@ -81,10 +81,11 @@ Cc: x86@kernel.org,
 	nik.borisov@suse.com,
 	chao.gao@intel.com,
 	sagis@google.com,
-	Farrah Chen <farrah.chen@intel.com>
-Subject: [PATCH v5 6/7] x86/virt/tdx: Update the kexec section in the TDX documentation
-Date: Tue, 29 Jul 2025 00:28:40 +1200
-Message-ID: <3389378e2e239e4067294b1ae05b0dde65cb5bba.1753679792.git.kai.huang@intel.com>
+	Farrah Chen <farrah.chen@intel.com>,
+	Binbin Wu <binbin.wu@linux.intel.com>
+Subject: [PATCH v5 7/7] KVM: TDX: Explicitly do WBINVD when no more TDX SEAMCALLs
+Date: Tue, 29 Jul 2025 00:28:41 +1200
+Message-ID: <c29f7a3348a95f687c83ac965ebc92ff5f253e87.1753679792.git.kai.huang@intel.com>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <cover.1753679792.git.kai.huang@intel.com>
 References: <cover.1753679792.git.kai.huang@intel.com>
@@ -96,52 +97,125 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-TDX host kernel now supports kexec/kdump.  Update the documentation to
-reflect that.
+On TDX platforms, during kexec, the kernel needs to make sure there are
+no dirty cachelines of TDX private memory before booting to the new
+kernel to avoid silent memory corruption to the new kernel.
 
-Opportunistically, remove the parentheses in "Kexec()" and move this
-section under the "Erratum" section because the updated "Kexec" section
-now refers to that erratum.
+During kexec, the kexec-ing CPU firstly invokes native_stop_other_cpus()
+to stop all remote CPUs before booting to the new kernel.  The remote
+CPUs will then execute stop_this_cpu() to stop themselves.
+
+The kernel has a percpu boolean to indicate whether the cache of a CPU
+may be in incoherent state.  In stop_this_cpu(), the kernel does WBINVD
+if that percpu boolean is true.
+
+TDX turns on that percpu boolean on a CPU when the kernel does SEAMCALL.
+This makes sure the caches will be flushed during kexec.
+
+However, the native_stop_other_cpus() and stop_this_cpu() have a "race"
+which is extremely rare to happen but could cause the system to hang.
+
+Specifically, the native_stop_other_cpus() firstly sends normal reboot
+IPI to remote CPUs and waits one second for them to stop.  If that times
+out, native_stop_other_cpus() then sends NMIs to remote CPUs to stop
+them.
+
+The aforementioned race happens when NMIs are sent.  Doing WBINVD in
+stop_this_cpu() makes each CPU take longer time to stop and increases
+the chance of the race happening.
+
+Explicitly flush cache in tdx_disable_virtualization_cpu() after which
+no more TDX activity can happen on this cpu.  This moves the WBINVD to
+an earlier stage than stop_this_cpus(), avoiding a possibly lengthy
+operation at a time where it could cause this race.
 
 Signed-off-by: Kai Huang <kai.huang@intel.com>
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 Tested-by: Farrah Chen <farrah.chen@intel.com>
-Reviewed-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
 ---
- Documentation/arch/x86/tdx.rst | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/Documentation/arch/x86/tdx.rst b/Documentation/arch/x86/tdx.rst
-index 719043cd8b46..61670e7df2f7 100644
---- a/Documentation/arch/x86/tdx.rst
-+++ b/Documentation/arch/x86/tdx.rst
-@@ -142,13 +142,6 @@ but depends on the BIOS to behave correctly.
- Note TDX works with CPU logical online/offline, thus the kernel still
- allows to offline logical CPU and online it again.
+v4 -> v5:
+ - No change
+
+v3 -> v4:
+ - Change doing wbinvd() from rebooting notifier to
+   tdx_disable_virtualization_cpu() to cover the case where more
+   SEAMCALL can be made after cache flush, i.e., doing kexec when
+   there's TD alive.  - Chao.
+ - Add check to skip wbinvd if the boolean is false. -- Chao
+ - Fix typo in the comment -- Binbin.
+
+
+---
+ arch/x86/include/asm/tdx.h  |  2 ++
+ arch/x86/kvm/vmx/tdx.c      | 12 ++++++++++++
+ arch/x86/virt/vmx/tdx/tdx.c | 12 ++++++++++++
+ 3 files changed, 26 insertions(+)
+
+diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
+index 488274959cd5..b7c978281934 100644
+--- a/arch/x86/include/asm/tdx.h
++++ b/arch/x86/include/asm/tdx.h
+@@ -217,6 +217,7 @@ u64 tdh_mem_page_remove(struct tdx_td *td, u64 gpa, u64 level, u64 *ext_err1, u6
+ u64 tdh_phymem_cache_wb(bool resume);
+ u64 tdh_phymem_page_wbinvd_tdr(struct tdx_td *td);
+ u64 tdh_phymem_page_wbinvd_hkid(u64 hkid, struct page *page);
++void tdx_cpu_flush_cache(void);
+ #else
+ static inline void tdx_init(void) { }
+ static inline int tdx_cpu_enable(void) { return -ENODEV; }
+@@ -224,6 +225,7 @@ static inline int tdx_enable(void)  { return -ENODEV; }
+ static inline u32 tdx_get_nr_guest_keyids(void) { return 0; }
+ static inline const char *tdx_dump_mce_info(struct mce *m) { return NULL; }
+ static inline const struct tdx_sys_info *tdx_get_sysinfo(void) { return NULL; }
++static inline void tdx_cpu_flush_cache(void) { }
+ #endif	/* CONFIG_INTEL_TDX_HOST */
  
--Kexec()
--~~~~~~~
--
--TDX host support currently lacks the ability to handle kexec.  For
--simplicity only one of them can be enabled in the Kconfig.  This will be
--fixed in the future.
--
- Erratum
- ~~~~~~~
- 
-@@ -171,6 +164,13 @@ If the platform has such erratum, the kernel prints additional message in
- machine check handler to tell user the machine check may be caused by
- kernel bug on TDX private memory.
- 
-+Kexec
-+~~~~~~~
+ #endif /* !__ASSEMBLER__ */
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+index ec79aacc446f..93477233baae 100644
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -442,6 +442,18 @@ void tdx_disable_virtualization_cpu(void)
+ 		tdx_flush_vp(&arg);
+ 	}
+ 	local_irq_restore(flags);
 +
-+Currently kexec doesn't work on the TDX platforms with the aforementioned
-+erratum.  It fails when loading the kexec kernel image.  Otherwise it
-+works normally.
-+
- Interaction vs S3 and deeper states
- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++	/*
++	 * No more TDX activity on this CPU from here.  Flush cache to
++	 * avoid having to do WBINVD in stop_this_cpu() during kexec.
++	 *
++	 * Kexec calls native_stop_other_cpus() to stop remote CPUs
++	 * before booting to new kernel, but that code has a "race"
++	 * when the normal REBOOT IPI times out and NMIs are sent to
++	 * remote CPUs to stop them.  Doing WBINVD in stop_this_cpu()
++	 * could potentially increase the possibility of the "race".
++	 */
++	tdx_cpu_flush_cache();
+ }
  
+ #define TDX_SEAMCALL_RETRIES 10000
+diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
+index d6ee4e5a75d2..c098a6e0382b 100644
+--- a/arch/x86/virt/vmx/tdx/tdx.c
++++ b/arch/x86/virt/vmx/tdx/tdx.c
+@@ -1870,3 +1870,15 @@ u64 tdh_phymem_page_wbinvd_hkid(u64 hkid, struct page *page)
+ 	return seamcall(TDH_PHYMEM_PAGE_WBINVD, &args);
+ }
+ EXPORT_SYMBOL_GPL(tdh_phymem_page_wbinvd_hkid);
++
++void tdx_cpu_flush_cache(void)
++{
++	lockdep_assert_preemption_disabled();
++
++	if (!this_cpu_read(cache_state_incoherent))
++		return;
++
++	wbinvd();
++	this_cpu_write(cache_state_incoherent, false);
++}
++EXPORT_SYMBOL_GPL(tdx_cpu_flush_cache);
 -- 
 2.50.1
 
