@@ -1,225 +1,326 @@
-Return-Path: <kvm+bounces-53671-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53672-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB1E3B1542F
-	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 22:14:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 213F8B15475
+	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 22:55:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E4E053B520B
-	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 20:13:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A1FEC7ABF97
+	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 20:53:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D873C2BDC2B;
-	Tue, 29 Jul 2025 20:13:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F633279DA0;
+	Tue, 29 Jul 2025 20:54:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="EDU3OhL8"
+	dkim=pass (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b="ShHf+ekc"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2074.outbound.protection.outlook.com [40.107.101.74])
+Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D1351F956;
-	Tue, 29 Jul 2025 20:13:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.74
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753820037; cv=fail; b=pKMruV/IX4occSdM7XjDbR0x51hxho8rw/ZzMz359xix7m/TTPGB6tVIKGOB3ZlJuVHZAUsQaiPuzd2bhWYg9SVhh6suZG+wBpEGTiarld7428F03SCpR8bzkcy2w1lEsov0QYPwQ47UMsqFweSlYwpnw7X+TQw9lX4zQR1NOXw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753820037; c=relaxed/simple;
-	bh=pdpWG6I6TIMroFV7kgKu4Ptkskn+vh5rvIkAfXnnLZ8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=t5p995tPoeONx7LHAFqURca33EeAhcLaT48jFKXs1WPXLxlDs+5TOlAi91UvVmXsd/4ddn62So6jJn3t5cqXJMGY00lLLqCIvK09/dlSGRBZ+aeV8nFlBbY7NUo6l5IrUXmbQSKKpp8943GKnUerixZ5scaKHgBbGuk/dslKo5w=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=EDU3OhL8; arc=fail smtp.client-ip=40.107.101.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=tramFC/OL+oYCppWW3kAgqgJkHjIXLWFHHE1TsUDcDzVupMvMcFU48YVFaa4XpEMcDWag+/XcXtwnF2YSjwM8p/a2y67XcFcQ+rxIDfCB8yV9rWz8mkiM1Z791b+5AwCcKgnoAqrj820WqgidusN10MfYAFNGjZv2b/vBqldiVl9x+SdbgI3fZ+s2lEb3BHZcfaoVEiGGiFddzQQrJey8ylcQldLbH9LSCFTvyFz3C6Z+MkWRw8Vi84EfifV4a2s2IBm9bYT+iLIO/DhHPn9izDdmFjGyowAlpTOSOszHgkt2PVaTJI54NuBp+wHLohBg6KoErVrwl2LzsepPuUQfA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=q7vuiFpU2nPlxsusQCMZdYV/HJy8gelk99LSQtjeaOA=;
- b=u5jlr0J0lD8rlHjqks/2u3Ez50hp8CaveUf6kYjowOWCr5dPmrsU7RzpLEwBMvSGf/Pvr8zFAJhcypNYC2Ny8yFJnqkWfjqjsF220H1JLW6c+BwEkMHYCeW/e0k/w2tfbgmCIl7hEdLoEPOgyejN2OTuFCu5DxIF2MYYVNqcKzFUKFRX4fwJku4yT9sn0szgCrr1AlXvYdlnD3C7gqmjdP0bjbtSDZlYOxQAseH1bU7TxhG9Z5Uscp6nTG+P/sgn8XlyCXPu+iFmmZhx9G57un6JWFKpWFw2eKUa8nmnRv+qLRyLqv1XvNKi9ybegbO1hbT3Gb5m1CA5XWkbkNCeJA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=q7vuiFpU2nPlxsusQCMZdYV/HJy8gelk99LSQtjeaOA=;
- b=EDU3OhL8pjTyWF34J1N/GvZ/2gdy4ThE9h4a5osI+yrQtt10/sMXopQ0IybOH5Y6A6c0L/GNsJ7Vb6TmcEJKL0+T67HNksanJE/HyIxu8LqYGKwGqpiZuQmZTe7Le3c/P/MuSDsmLTpuLvoR5/AwrRxjDE5E3KPEXRLufdqMWx8LJhCCl5udx00rGykVWoGj3H/mAYh6HpjBeNQ/Ilq/RKAjsGsXSuFH5OEJJ5p8+vzIOPzfDuWI0T4EPVui0WsKGRAXGV7x0F3MBx38LttR5zAvBJSP2v4GwibkN1mpVWyxKhe7Fx2rUENtOt7MyKZIAQsuKHSy2jBzi61G8FTjzw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
- by DS5PPFDB3A23D1A.namprd12.prod.outlook.com (2603:10b6:f:fc00::663) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8943.25; Tue, 29 Jul
- 2025 20:13:52 +0000
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732%7]) with mapi id 15.20.8964.024; Tue, 29 Jul 2025
- 20:13:52 +0000
-Date: Tue, 29 Jul 2025 17:13:51 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Robin Murphy <robin.murphy@arm.com>
-Cc: Leon Romanovsky <leon@kernel.org>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Leon Romanovsky <leonro@nvidia.com>, Christoph Hellwig <hch@lst.de>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
-	Jens Axboe <axboe@kernel.dk>,
-	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
-	Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-	linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
-	linux-mm@kvack.org, linux-pci@vger.kernel.org,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Vivek Kasireddy <vivek.kasireddy@intel.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 10/10] vfio/pci: Add dma-buf export support for MMIO
- regions
-Message-ID: <20250729201351.GA82395@nvidia.com>
-References: <cover.1753274085.git.leonro@nvidia.com>
- <aea452cc27ca9e5169f7279d7b524190c39e7260.1753274085.git.leonro@nvidia.com>
- <8f912671-f1d9-4f73-9c1d-e39938bfc09f@arm.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8f912671-f1d9-4f73-9c1d-e39938bfc09f@arm.com>
-X-ClientProxiedBy: YT3PR01CA0058.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:b01:82::7) To CH3PR12MB8659.namprd12.prod.outlook.com
- (2603:10b6:610:17c::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C37932777EA;
+	Tue, 29 Jul 2025 20:54:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=204.191.154.188
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753822481; cv=none; b=nso9+MOP9Cv0yxMcqQJWht57EAJNeg5IQyIsZIhe1178fFpg/sIO9aVtyPs19DJFw1VQokfgNUXmqPKjDjVx1JxN26ggsLm3FfI5Z0435xG5EI83DGl/2yEmnWzlt/wsNLishQVZV4N2cTsFePRKqOQXgAURdRSi718vPw6r7F8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753822481; c=relaxed/simple;
+	bh=xiSBce8M3qwbOSe7BecatNeL5QmxrnKF1dSV1338vfE=;
+	h=Message-ID:Date:MIME-Version:From:To:Cc:References:In-Reply-To:
+	 Content-Type:Subject; b=pe3ABQFUUX78bBIXw2/fe7/Y2DgIv6i+zmziZgltUToJHsNKHDWndv2jYilsRQerx/gaYM7spkjBz4hZ0CKAo3YLWifpUbVS2yvImc+tN30+eQFg9dCtYGHiNg/JZEgla4ElEM5+lf4DxoJPqBO7kJhBEM7myr7EfmWmKcm9oqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deltatee.com; spf=pass smtp.mailfrom=deltatee.com; dkim=pass (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b=ShHf+ekc; arc=none smtp.client-ip=204.191.154.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deltatee.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=deltatee.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=deltatee.com; s=20200525; h=Subject:In-Reply-To:References:Cc:To:From:
+	MIME-Version:Date:Message-ID:content-disposition;
+	bh=NNh1yThG7TvPWKpLvY5OC7tLgkYClB2Gxhne1Vp0HTw=; b=ShHf+ekceHcINuu8D0K30j3qUO
+	L9xqTvYP9Zh8bk//ApqFzejUahb6bACPQNlM5iV2A1IRyuDGPfzEQSqmXhx/bf9dL9cTxYDN4p1dO
+	50kSae/x3VuYLc4DSVcE7A32AkN9a8vnc7cWq76JX7ZFC29ItBPasnUx2PUIOypT5NvQJIqqQpb+A
+	hKS/mcRzJw9NmBzbYunfCu5/y6lbCyBnLxF5fuWkORd2HDquxo3R8hxzx9e/Jxu7yv1HNrpU9R5TP
+	HOqWZkyevVjQIYp4dmyfA+4gv+aeKblKfLpxMhglWKNR2gAcipr0qNsWYlfNjGHBFoQ3Nad1bjaCo
+	0fckrAUw==;
+Received: from guinness.priv.deltatee.com ([172.16.1.162])
+	by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96)
+	(envelope-from <logang@deltatee.com>)
+	id 1ugrL8-009DTi-1i;
+	Tue, 29 Jul 2025 14:54:27 -0600
+Message-ID: <f332e2b9-151f-49ca-ac0c-8c9494c38027@deltatee.com>
+Date: Tue, 29 Jul 2025 14:54:13 -0600
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|DS5PPFDB3A23D1A:EE_
-X-MS-Office365-Filtering-Correlation-Id: e18af587-585b-4bcd-0efd-08ddcedc6fcf
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|366016|376014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?bkXJciCWyei9fNzRl68RjmW+hQwIatuDwiprnOZWe+TdUHVCHg+gitVGY7O9?=
- =?us-ascii?Q?axa0zbm6pMMAnZC9nBAhSfZT0vce9IFH0Q2EiaW5kMaRk2JZ/gtLP89kPYL0?=
- =?us-ascii?Q?fm3hCCQZQtHJGmBtMuZ1PoJw/WPEqc6kzqkl7OtleVNg5dZPcPI5rOtCIZXP?=
- =?us-ascii?Q?TGF/m6K5eHYpUDIyoRqvamREu5TWHCh9imFlsO+fcfJVybDEoIrk9viKWQWu?=
- =?us-ascii?Q?SiMwINOrUkJv6d8fLaY7icN69i7JzJnQf682d5ueU0luIT8ShIGpqdeGAvd0?=
- =?us-ascii?Q?n3TvOQYOb4TRISigfBK8g3H7fY1br+SRix58GasP/9UEh7HM3l9j0vPRHKRk?=
- =?us-ascii?Q?TC6MJnSEOlMQPtK+xIM+YvNpGHGhkDgMjXPCI1IbNl7XAblAEWmqSRNbXhGN?=
- =?us-ascii?Q?8Kq18oz3wShGBEOeKWkJIEK2mJN7Pl3Hq+mCmESUfS3CRAHKn+l1I9+sAkxf?=
- =?us-ascii?Q?9K3Uy0LOz1BEtpzqwiGPspnculOfYa+0HbSTt63QByxF7aELJjMc6Patex3e?=
- =?us-ascii?Q?7RfCRWtXTeS1G5mXwFzCeYPsK6Px00JPhnUm57Qm5/4a7VWVmzouNEIeMloB?=
- =?us-ascii?Q?cGzWn6HiwDY38Bhc/dBHoC6R63shfayQEMUPPnAESuCZ0Y/w0shRlmvAkVQr?=
- =?us-ascii?Q?x8s6Dv4rl3ms+GSj5EI4zb2A7qJLvThm84eqWWvjWGn56dsAP+mNM4FTuebs?=
- =?us-ascii?Q?506dEDihfxO4VWHhTTlMev6l9XGVevvGYLhwfBVVtyi76Kryg0pT8iNf4rBP?=
- =?us-ascii?Q?MLQ7Z7D03tnlFmqf90PzJFQPd5TayxQ08wSiQtxDGPKiLsim8rADaksUTn3K?=
- =?us-ascii?Q?pW08dblmm+Fil6UH+wrQGDNrOE4usop/Qeq+zUHrk5XhRFvI+9zq6NdZ2eNu?=
- =?us-ascii?Q?C0t0MpmhENMBhVOJaDI5jRJJCyfTpp9CsFZHYF2XbJzMJGWv2EbvTWe0LeFH?=
- =?us-ascii?Q?B5eVRyEhQisnoaBaW9KSI3TJQ5n8VGwfJs67OowjASV64N2iS10naSp0cxuh?=
- =?us-ascii?Q?AX51MLuics4lXQ2qWb4b34IJAQYwJOiAP+vrqPUBko7oHZCHgWPR3G43+rhG?=
- =?us-ascii?Q?jnRcszmqIPfToYtGBAvXyNnMN00IvyJFIGl72QFCuxzczgFH3ybA8kdoPlmv?=
- =?us-ascii?Q?VGGdY6J01ZIvyZ4yl4Iu3R816NFghmlGAojS9D05aoFljWg8+S58GJin7ejV?=
- =?us-ascii?Q?QMPcWKYskR8uFqoTPSsx4TYL+yBa9yRlmJOdzfvfeGV5WAc55XBnNhniXhfY?=
- =?us-ascii?Q?wm/u4ULw6k1cIfbR68TQMpmQeiGkijq08VpUfTftYkzEzGTcZCApS80gXnUF?=
- =?us-ascii?Q?K4QVDCZp/0CMvG2IXs8OIJVVwXtRrEpPOOEADppIiDySmZ8HyD/nVBzPd6zJ?=
- =?us-ascii?Q?NfK5lNtJn4vmF7mSTz66qRARborfFL331bVeZtEFCmkvx30ONa6Q9STGub21?=
- =?us-ascii?Q?XqclvQ7C8nE=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?bj1p8qsMr/ajXJmglGGGPl0TRWuHpahBE1P6hV3y7H3Zbz1A1Dvr8U4MD6mN?=
- =?us-ascii?Q?4NeRCsiltckRovk4cH/tFc8HwuzJj3BO7bDBbkrROOHcXYM/ptbj4EDtsya3?=
- =?us-ascii?Q?LC5P5PFOuaERGT8IDsFZwI8e2g1SsX67UTEs3L6GduOKb4gpHy3ehPz42ffo?=
- =?us-ascii?Q?NykcMTO06W28GlZqzE/YJvENemIPcz38P/rVMxBoyGAvkpNbsEHC4zQMMgdw?=
- =?us-ascii?Q?6rs7YCN/ZzDG3peGDBY5rHexqqiysf9ZSQy6Kna1g3iGR+0w3eovRcl9i5rS?=
- =?us-ascii?Q?F85s7Zp+V7UpkSEMkRdGcDFX9ysMsFeAV725tNrWWHeYDGyGNa+6KumDsdK8?=
- =?us-ascii?Q?sCaPU6vTTjoHRPjv/oabdI3I2fIwgICeEuxetosN9/GoqiDDACrmoiLOXUsE?=
- =?us-ascii?Q?Arh74ugTofVg41qktslDV/3avm572Ls77GtQ4kb0gyQzUuGgtbTR6THEzI3q?=
- =?us-ascii?Q?p8qXsoAl+sskKWIbkuN9ya0949LZHMT3yYW2HTDNHxsWkPppdYMBkfNM3qON?=
- =?us-ascii?Q?NBKH6iwEuK85Zjkth8+z28u4mZPQYCJTant14gFPmo7puFUXyl/Fdm6+LbQT?=
- =?us-ascii?Q?psyTrf+fJkyGCUAZlMBuTJosL9iVczx8H8cuy3in/n1Si30czww4ok+t3dKD?=
- =?us-ascii?Q?HA2HJS7/3t89f4hGsDqYuwrT+Gu+YstxXcu1BCm0W4/kIS6GeO3zdRnzjx9s?=
- =?us-ascii?Q?y1L2uRCXIBddHjLu3wK6XaBPs9w3sNL6+OzYkVmxbKr1WnXVzp+BAS6nYWZX?=
- =?us-ascii?Q?dXF1AOwnQ6Nk7ZMk0L8WG0QDBAvFHJywADGTbfw1g2P23/JlBjoF9BjrzZgz?=
- =?us-ascii?Q?kCS8Mm5cztIZZcH9WGe7v5Ak7m2p4eQyf/2LcYk6cic4iNvXU3VXNndGWG85?=
- =?us-ascii?Q?vQ/1Z7pdyRM3bV2y/IkSa+7X4KXstRnskvYziOUf1TEIfQKj4hakSbl/e/lD?=
- =?us-ascii?Q?jDJA4sEHoLvEEL1q05EOiVFMuE3mDN+tmwfFurU6bgZJYLDBAjtkC/kf+2KH?=
- =?us-ascii?Q?PCfQgcQyfK3iRtZRBkrv5VYh0yX0MMgDNeRe/HZl7KSlAL0Go/x+WCf7bWWa?=
- =?us-ascii?Q?BnYBEKoDOyIdODnpDnNb658du9nFXmVZ/IfkivEUwdXxaU9IXds70VYahfkl?=
- =?us-ascii?Q?8Ma5olMP3Zac+mK/3NkFIxvDpXysvj6wv4u8vIIJoE+I5SpA9TA6SzV2/R5E?=
- =?us-ascii?Q?j2f9YlXtoF/95mgoSZdBj74vlVGF9NCKA3axz6Ns/6KieSFjYhGhC31AeUt9?=
- =?us-ascii?Q?NKaoaMA8FMDYucXjegfre/2rkXYO8JByB5LJl/jpaP25tuNyKhBVQYc0mgn3?=
- =?us-ascii?Q?g5Q+PaZLlp6eLxTvw030wsBckIPKaKd2Sdnie+pE0aSVfNIf6r89R5Skq/d3?=
- =?us-ascii?Q?FqplykYPg/xqUBhSgsjIV5s9Cdoocd2Rl4IfDKxph1dN8ELQ/yIVdfBgZqRh?=
- =?us-ascii?Q?/rq10rVVp0AAXvY+hdBnPzEBx2+X69FcU4h3H7MrO8K6iuMrPDktdKm+oTE8?=
- =?us-ascii?Q?Wy2pALz0WeinADVleNF9wEDSzQWXaSr/VZYpr4pZ546QZB8xQFFZnCMOy3+3?=
- =?us-ascii?Q?ww0t9j6/gkn9w0A3xZk=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e18af587-585b-4bcd-0efd-08ddcedc6fcf
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jul 2025 20:13:52.2045
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: vUxTpo/zHIlJAHDHH3TnwZkVdtExbipYoaNW5mR6DmYFt30ySRqTjN7Y+dZZapxZ
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS5PPFDB3A23D1A
+User-Agent: Mozilla Thunderbird
+From: Logan Gunthorpe <logang@deltatee.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Leon Romanovsky <leon@kernel.org>, Christoph Hellwig <hch@lst.de>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Bjorn Helgaas <bhelgaas@google.com>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
+ Jens Axboe <axboe@kernel.dk>, =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?=
+ <jglisse@redhat.com>, Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+ linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-mm@kvack.org, linux-pci@vger.kernel.org,
+ Marek Szyprowski <m.szyprowski@samsung.com>,
+ Robin Murphy <robin.murphy@arm.com>, Sumit Semwal <sumit.semwal@linaro.org>,
+ Vivek Kasireddy <vivek.kasireddy@intel.com>, Will Deacon <will@kernel.org>
+References: <cover.1753274085.git.leonro@nvidia.com>
+ <82e62eb59afcd39b68ae143573d5ed113a92344e.1753274085.git.leonro@nvidia.com>
+ <20250724080313.GA31887@lst.de> <20250724081321.GT402218@unreal>
+ <b32ae619-6c4a-46fc-a368-6ad4e245d581@deltatee.com>
+ <20250727190514.GG7551@nvidia.com>
+ <d69e0d74-285e-4cde-a2e4-a803accfa9e1@deltatee.com>
+ <20250728164136.GD402218@unreal>
+ <d3c8c573-f201-4450-9400-cc3ccafd2c04@deltatee.com>
+ <20250728231107.GE36037@nvidia.com>
+Content-Language: en-CA
+In-Reply-To: <20250728231107.GE36037@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 172.16.1.162
+X-SA-Exim-Rcpt-To: jgg@nvidia.com, leon@kernel.org, hch@lst.de, alex.williamson@redhat.com, akpm@linux-foundation.org, bhelgaas@google.com, christian.koenig@amd.com, dri-devel@lists.freedesktop.org, iommu@lists.linux.dev, axboe@kernel.dk, jglisse@redhat.com, joro@8bytes.org, kvm@vger.kernel.org, linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, linux-media@vger.kernel.org, linux-mm@kvack.org, linux-pci@vger.kernel.org, m.szyprowski@samsung.com, robin.murphy@arm.com, sumit.semwal@linaro.org, vivek.kasireddy@intel.com, will@kernel.org
+X-SA-Exim-Mail-From: logang@deltatee.com
+X-Spam-Level: 
+Subject: Re: [PATCH 05/10] PCI/P2PDMA: Export pci_p2pdma_map_type() function
+X-SA-Exim-Version: 4.2.1 (built Wed, 06 Jul 2022 17:57:39 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 
-On Tue, Jul 29, 2025 at 08:44:21PM +0100, Robin Murphy wrote:
 
-> In this case with just one single
-> contiguous mapping, it is clearly objectively worse to have to bounce in and
-> out of the IOMMU layer 3 separate times and store a dma_map_state,
 
-The non-contiguous mappings are comming back, it was in earlier drafts
-of this. Regardless, the point is to show how to use the general API
-that we would want to bring into the DRM drivers that don't have
-contiguity even though VFIO is a bit special.
+On 2025-07-28 17:11, Jason Gunthorpe wrote:
+>> If the dma mapping for P2P memory doesn't need to create an iommu
+>> mapping then that's fine. But it should be the dma-iommu layer to decide
+>> that.
+> 
+> So above, we can't use dma-iommu.c, it might not be compiled into the
+> kernel but the dma_map_phys() path is still valid.
 
-> Oh yeah, and mapping MMIO with regular memory attributes (IOMMU_CACHE)
-> rather than appropriate ones (IOMMU_MMIO), as this will end up doing, isn't
-> guaranteed not to end badly either (e.g. if the system interconnect ends up
-> merging consecutive write bursts and exceeding the target root port's MPS.)
+This is an easily solved problem. I did a very rough sketch below to say
+it's really not that hard. (Note it has some rough edges that could be
+cleaned up and I based it off Leon's git repo which appears to not be
+the same as what was posted, but the core concept is sound).
 
-Yes, I recently noticed this too, it should be fixed..
+Logan
 
-But so we are all on the same page, alot of the PCI P2P systems are
-setup so P2P does not transit through the iommu. It either takes the
-ACS path through a switch or it uses ATS and takes a different ACS
-path through a switch. It only transits through the iommu in
-misconfigured systems or in the rarer case of P2P between root ports.
 
-> And again, if the IOMMU is in bypass (the idea of P2P with vfio-noiommu simply
-> isn't worth entertaining) 
+diff --git a/drivers/iommu/dma-iommu.c b/drivers/iommu/dma-iommu.c
+index 1853a969e197..da1a6003620a 100644
+--- a/drivers/iommu/dma-iommu.c
++++ b/drivers/iommu/dma-iommu.c
+@@ -1806,6 +1806,22 @@ bool dma_iova_try_alloc(struct device *dev,
+struct dma_iova_state *state,
+ }
+ EXPORT_SYMBOL_GPL(dma_iova_try_alloc);
+ +void dma_iova_try_alloc_p2p(struct p2pdma_provider *provider, struct
+device *dev,
++		struct dma_iova_state *state, phys_addr_t phys, size_t size)
++{
++	switch (pci_p2pdma_map_type(provider, dev)) {
++	case PCI_P2PDMA_MAP_THRU_HOST_BRIDGE:
++		dma_iova_try_alloc(dev, state, phys, size);
++		return;
++	case PCI_P2PDMA_MAP_BUS_ADDR:
++		state->bus_addr = true;
++		return;
++	default:
++		return;
++	}
++}
++EXPORT_SYMBOL_GPL(dma_iova_try_alloc_p2p);
++
+ /**
+  * dma_iova_free - Free an IOVA space
+  * @dev: Device to free the IOVA space for
+diff --git a/drivers/vfio/pci/vfio_pci_dmabuf.c
+b/drivers/vfio/pci/vfio_pci_dmabuf.c
+index 455541d21538..5749be3a9b58 100644
+--- a/drivers/vfio/pci/vfio_pci_dmabuf.c
++++ b/drivers/vfio/pci/vfio_pci_dmabuf.c
+@@ -30,25 +30,12 @@ static int vfio_pci_dma_buf_attach(struct dma_buf
+*dmabuf,
+ 	if (priv->revoked)
+ 		return -ENODEV;
+ -	switch (pci_p2pdma_map_type(priv->vdev->provider, attachment->dev)) {
+-	case PCI_P2PDMA_MAP_THRU_HOST_BRIDGE:
+-		break;
+-	case PCI_P2PDMA_MAP_BUS_ADDR:
+-		/*
+-		 * There is no need in IOVA at all for this flow.
+-		 * We rely on attachment->priv == NULL as a marker
+-		 * for this mode.
+-		 */
+-		return 0;
+-	default:
+-		return -EINVAL;
+-	}
+-
+ 	attachment->priv = kzalloc(sizeof(struct dma_iova_state), GFP_KERNEL);
+ 	if (!attachment->priv)
+ 		return -ENOMEM;
+ -	dma_iova_try_alloc(attachment->dev, attachment->priv, 0, priv->size);
++	dma_iova_try_alloc_p2p(priv->vdev->provider, attachment->dev,
++			       attachment->priv, 0, priv->size);
+ 	return 0;
+ }
+ @@ -98,26 +85,11 @@ vfio_pci_dma_buf_map(struct dma_buf_attachment
+*attachment,
+ 	sgl = sgt->sgl;
+  	for (i = 0; i < priv->nr_ranges; i++) {
+-		if (!state) {
+-			addr = pci_p2pdma_bus_addr_map(provider,
+-						       phys_vec[i].paddr);
+-		} else if (dma_use_iova(state)) {
+-			ret = dma_iova_link(attachment->dev, state,
+-					    phys_vec[i].paddr, 0,
+-					    phys_vec[i].len, dir, attrs);
+-			if (ret)
+-				goto err_unmap_dma;
+-
+-			mapped_len += phys_vec[i].len;
+-		} else {
+-			addr = dma_map_phys(attachment->dev, phys_vec[i].paddr,
+-					    phys_vec[i].len, dir, attrs);
+-			ret = dma_mapping_error(attachment->dev, addr);
+-			if (ret)
+-				goto err_unmap_dma;
+-		}
++		addr = dma_map_phys_prealloc(attachment->dev, phys_vec[i].paddr,
++					     phys_vec[i].len, dir, attrs, state,
++					     provider);
+ -		if (!state || !dma_use_iova(state)) {
++		if (addr != DMA_MAPPING_USE_IOVA) {
+ 			/*
+ 			 * In IOVA case, there is only one SG entry which spans
+ 			 * for whole IOVA address space. So there is no need
+@@ -128,7 +100,7 @@ vfio_pci_dma_buf_map(struct dma_buf_attachment
+*attachment,
+ 		}
+ 	}
+ -	if (state && dma_use_iova(state)) {
++	if (addr == DMA_MAPPING_USE_IOVA) {
+ 		WARN_ON_ONCE(mapped_len != priv->size);
+ 		ret = dma_iova_sync(attachment->dev, state, 0, mapped_len);
+ 		if (ret)
+@@ -139,7 +111,7 @@ vfio_pci_dma_buf_map(struct dma_buf_attachment
+*attachment,
+ 	return sgt;
+  err_unmap_dma:
+-	if (!i || !state)
++	if (!i || state->bus_addr)
+ 		; /* Do nothing */
+ 	else if (dma_use_iova(state))
+ 		dma_iova_destroy(attachment->dev, state, mapped_len, dir,
+@@ -164,7 +136,7 @@ static void vfio_pci_dma_buf_unmap(struct
+dma_buf_attachment *attachment,
+ 	struct scatterlist *sgl;
+ 	int i;
+ -	if (!state)
++	if (state->bus_addr)
+ 		; /* Do nothing */
+ 	else if (dma_use_iova(state))
+ 		dma_iova_destroy(attachment->dev, state, priv->size, dir,
+diff --git a/include/linux/dma-mapping.h b/include/linux/dma-mapping.h
+index ba54bbeca861..675e5ac13265 100644
+--- a/include/linux/dma-mapping.h
++++ b/include/linux/dma-mapping.h
+@@ -70,11 +70,14 @@
+  */
+ #define DMA_MAPPING_ERROR		(~(dma_addr_t)0)
+ +#define DMA_MAPPING_USE_IOVA		((dma_addr_t)-2)
++
+ #define DMA_BIT_MASK(n)	(((n) == 64) ? ~0ULL : ((1ULL<<(n))-1))
+  struct dma_iova_state {
+ 	dma_addr_t addr;
+ 	u64 __size;
++	bool bus_addr;
+ };
+  /*
+@@ -120,6 +123,12 @@ void dma_unmap_page_attrs(struct device *dev,
+dma_addr_t addr, size_t size,
+ 		enum dma_data_direction dir, unsigned long attrs);
+ dma_addr_t dma_map_phys(struct device *dev, phys_addr_t phys, size_t size,
+ 		enum dma_data_direction dir, unsigned long attrs);
++
++struct p2pdma_provider;
++dma_addr_t dma_map_phys_prealloc(struct device *dev, phys_addr_t phys,
+size_t size,
++		enum dma_data_direction dir, unsigned long attrs,
++		struct dma_iova_state *state, struct p2pdma_provider *provider);
++
+ void dma_unmap_phys(struct device *dev, dma_addr_t addr, size_t size,
+ 		enum dma_data_direction dir, unsigned long attrs);
+ unsigned int dma_map_sg_attrs(struct device *dev, struct scatterlist *sg,
+@@ -321,6 +330,8 @@ static inline bool dma_use_iova(struct
+dma_iova_state *state)
+  bool dma_iova_try_alloc(struct device *dev, struct dma_iova_state *state,
+ 		phys_addr_t phys, size_t size);
++void dma_iova_try_alloc_p2p(struct p2pdma_provider *provider, struct
+device *dev,
++		struct dma_iova_state *state, phys_addr_t phys, size_t size);
+ void dma_iova_free(struct device *dev, struct dma_iova_state *state);
+ void dma_iova_destroy(struct device *dev, struct dma_iova_state *state,
+ 		size_t mapped_len, enum dma_data_direction dir,
+@@ -343,6 +354,11 @@ static inline bool dma_iova_try_alloc(struct device
+*dev,
+ {
+ 	return false;
+ }
++static inline void dma_iova_try_alloc_p2p(struct p2pdma_provider *provider,
++		struct device *dev, struct dma_iova_state *state, phys_addr_t phys,
++		size_t size)
++{
++}
+ static inline void dma_iova_free(struct device *dev,
+ 		struct dma_iova_state *state)
+ {
+diff --git a/kernel/dma/mapping.c b/kernel/dma/mapping.c
+index e1586eb52ab3..b2110098a29b 100644
+--- a/kernel/dma/mapping.c
++++ b/kernel/dma/mapping.c
+@@ -13,6 +13,7 @@
+ #include <linux/iommu-dma.h>
+ #include <linux/kmsan.h>
+ #include <linux/of_device.h>
++#include <linux/pci-p2pdma.h>
+ #include <linux/slab.h>
+ #include <linux/vmalloc.h>
+ #include "debug.h"
+@@ -202,6 +203,27 @@ dma_addr_t dma_map_phys(struct device *dev,
+phys_addr_t phys, size_t size,
+ }
+ EXPORT_SYMBOL_GPL(dma_map_phys);
+ +dma_addr_t dma_map_phys_prealloc(struct device *dev, phys_addr_t phys,
+size_t size,
++		enum dma_data_direction dir, unsigned long attrs,
++		struct dma_iova_state *state, struct p2pdma_provider *provider)
++{
++	int ret;
++
++	if (state->bus_addr)
++		return pci_p2pdma_bus_addr_map(provider, phys);
++
++	if (dma_use_iova(state)) {
++		ret = dma_iova_link(dev, state, phys, 0, size, dir, attrs);
++		if (ret)
++			return DMA_MAPPING_ERROR;
++
++		return DMA_MAPPING_USE_IOVA;
++	}
++
++	return dma_map_phys(dev, phys, size, dir, attrs);
++}
++EXPORT_SYMBOL_GPL(dma_map_phys_prealloc);
++
+ dma_addr_t dma_map_page_attrs(struct device *dev, struct page *page,
+ 		size_t offset, size_t size, enum dma_data_direction dir,
+ 		unsigned long attrs)
 
-Not quite. DMABUF is sort of upside down.
 
-For example if we are exporting a DMABUF from VFIO and importing it to
-RDMA then RDMA will call VFIO to make an attachment and the above VFIO
-code will perform the DMA map to the RDMA struct device. DMABUF
-returns a dma mapped scatterlist back to the RDMA driver.
-
-The above dma_map_phys(rdma_dev,...) can be in bypass because the rdma
-device can legitimately be in bypass, or not have a iommu, or
-whatever.
-
-> AFAICS you're *depending* on this call being an effective no-op, and thus
-> only demonstrating that the dma_map_phys() idea is still entirely
-> unnecessary.
-
-It should not be a full no-op, and it should be closer to
-dma map resource to avoid the mmio issues.
-
-It should be failing for cases where it is not supported (ie
-swiotlb=force), it should still be calling the legacy dma_ops, and it
-should be undoing any CC mangling with the address. (also the
-pci_p2pdma_bus_addr_map() needs to deal with any CC issues too)
-
-Jason
 
