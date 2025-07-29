@@ -1,129 +1,136 @@
-Return-Path: <kvm+bounces-53620-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53621-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EA4BB14B88
-	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 11:43:28 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B49CB14BBE
+	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 11:57:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB4E63A36F6
-	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 09:42:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1B84C7A9B08
+	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 09:55:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 291E52882D0;
-	Tue, 29 Jul 2025 09:43:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07FAB28852B;
+	Tue, 29 Jul 2025 09:56:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MJPv58gI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cXNIE86Z"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADA611624E1
-	for <kvm@vger.kernel.org>; Tue, 29 Jul 2025 09:43:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6A481DED5C
+	for <kvm@vger.kernel.org>; Tue, 29 Jul 2025 09:56:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753782203; cv=none; b=TIdyESYeDa5/avMh5ri/liwrlE4XB8Jz1/0asKF/h/VD5GuGJ8kAZszGpeA5/IXAEDNuOO72v9xQz3HiFC/qJvcMfhFH+310uNHNgy2/XNYakVvKkV6BiJtDtthOhQbBk0zcu72ABrKL7NQLToNx+vQIJ4JbWcLwYTC2ae8BBgM=
+	t=1753783010; cv=none; b=k8VjRfYO/MZjETGzS8UejUAjPExqIySW6bFmeRs/l7oZjhwyjvdKORAG6Tm/sHZ2QTVaP8pF9R0NXQP7TOOjow+REXs30bsFAmX2iytd3ty7l2qVO84M0kOhc7Qtgmd+D0NCA+H2RVai92rP/HAV/7Qze31hd6xPJGJ4ZwIDeKY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753782203; c=relaxed/simple;
-	bh=0bD2+OWtX15JO3/cWHqoWANhRWODiM9cluWkkflGAq4=;
+	s=arc-20240116; t=1753783010; c=relaxed/simple;
+	bh=zs5ODgjq88Dh/p97NrIETQcV4sqEQTVPW1IHpVCIj5Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cd5/wbOtFsxqHbkkTIvrsY0XB4N7eIrZVUWY0ftT8LDxbyHDE+M6jrhjDfRkIVQ0AsmRPHNqE+Z9HTVIM3jFquJxz+sdjCrYiGSgM/fScuwH/8Wtn5Kgxp47IRlE3f9lo1wOB66kwlbDSopnwAruqwyuZeEAC+HkBpwGGiQ5QmE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MJPv58gI; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-456007cfcd7so49775e9.1
-        for <kvm@vger.kernel.org>; Tue, 29 Jul 2025 02:43:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753782199; x=1754386999; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=1rI/78m+XwnktafE+ygrVP+MfYIVlmgGuVpeyq9N6L0=;
-        b=MJPv58gIhAxmqfyuEMAItdyonKHqjpgXINtXt3rQfxQ/3i/n5PsHBmez52tJp+8Y5q
-         4NIdobPa/dmfqeDtlE+LAGWFoTIVfuzsthAhhx3FgXdaVKwwZhYwUMeCN5Ozs2s+CY1N
-         uj2evHIKjDzhVHaQZ8Hjun+CZERMvlul4U0J1KZ30hSAoz1p/Aa4CslP0EkxnJuiGNcV
-         0hYpnY/us+5mO91OP82/oprZf/0Qd1ThbiWLSMJMKwbTAiYgbBkUDcbfVNnb11sZ/d1Y
-         TTnWp1+d0BAlsKqIhaXx0qnT48EJdAmdWiNNa6Ysk9j8I45eNc09q6frIrUWUj45NSBQ
-         Hsww==
+	 Content-Type:Content-Disposition:In-Reply-To; b=OUB/UhiTitqjw/pJFetMRichonSiVSTLgGC+usmI4tGQAfVt4Ns5DWpx1dyfifCoWbzsO1uLq8z0Mu6jIX5f6pshWeewZwhxolg415OgLiCj0FOafV57vzYJfKXlp4JQyw7bct9cJDwoyN14Sw/iu6Wmz0jv2q1O8TqNjSJ4IuQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cXNIE86Z; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1753783007;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=v9Q72PwGeVTj3y8z/xg+PR9uIGfJgkCfjcqVd6z2uJw=;
+	b=cXNIE86Zcy7SZMXeY209e6lf4p+0ZiAe5fbXpyXJNVDwgHEcKCCM9qGYKQ5Zofdgt7dREU
+	IgE4pqFEoN5/+3uEZe/CMrYmWNvWIr0WC/d002sxwqk50mzhULDBny5D5Kw4r64YidCh7R
+	UQVcxy4VzLvzzOMXo/5NbVaJlxOBY4w=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-610-f4XZAQALOci_z2CO0XlEew-1; Tue, 29 Jul 2025 05:56:46 -0400
+X-MC-Unique: f4XZAQALOci_z2CO0XlEew-1
+X-Mimecast-MFC-AGG-ID: f4XZAQALOci_z2CO0XlEew_1753783005
+Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-6149374a4c8so732136a12.0
+        for <kvm@vger.kernel.org>; Tue, 29 Jul 2025 02:56:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753782199; x=1754386999;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1rI/78m+XwnktafE+ygrVP+MfYIVlmgGuVpeyq9N6L0=;
-        b=Ox3i4sC54YVy0NfMenBCOKysCwK6fBB1KySCmKLCCv5cdRFufwwtEHg6eBilNdLlKQ
-         wW9U4fpojJr5TowdjhqBw4QpgwhGSE8smIxh7vUQEYawGfBGeKPpdgu6N16hLOoiM45p
-         QSiqvRt9xwhBDQEuOBFLhF8ow9XbJjJ3d1GxIv8SE/FGhm/pycC8P3CrjdQRbHHJchf/
-         sWqFWl/2ipy2rf8nZlK6NgaBkbvGHJchIW+/0kVW8SI2acrE213X9kbi5olIQAunnYWf
-         ut5d6sf17AM+lxUMCRRnta5IOef3JBSILRyj+rnHuQ5VzBM2qG0sYLJlCyIRo7Dyfrpv
-         1L/Q==
-X-Gm-Message-State: AOJu0YxHJDSjmM0B6+b4KNJ7s2xfbWFr1LKLE8VcCLZ3r84GFuHWUoxU
-	+mP3wHUKX3RaEuud9N2LDBoF/yvSahpG1fzwIO4RfW8MHq0mZbbvG2Z/X4MOM2TIQw==
-X-Gm-Gg: ASbGncucnFeqnJYJfxKtLaXQnrHMrb7cPqzpSS6TbG3myIcYLw0jivyA3Q9t9O/7zjU
-	YBfe14p7gFcRj9eGmq7igig81EnphpOZPD5wsrKDkS0LzLwGCbvvI3rgGD4N4D38awetnsjFJIk
-	SKdL98Ctxp9Tu2n+H6Xmcit01l8pSgop0bgh3qUct8hzg837wpPZrzAZOPrW7G2q3sMNv7cxp7c
-	V/l/lrliP6WYjXZa5YwVPqZoefim16DPRBFLRTgg4eQR2FBZqhGDugsZCkFWZ4LVVC6rjID1HFR
-	Lfmra2sFCZ7PTm+ShAyPJRNKlPED2xY41Q+VCk8gwuBFDIvOL6E39zom8I0JDzLrUp4X079nx5p
-	IY0kE6tgL+1oXzK5eYqHaz/s3Fyee2lwx7F7HgwhPf8Z/apfF1+RpPJQlSg==
-X-Google-Smtp-Source: AGHT+IFC68faYj/oMpI20JVx1LDKHgPfTHmPFgujxw6yI6+QGVOqecwGVCYY2/jj6/JRPGf8lVZ7mQ==
-X-Received: by 2002:a05:600c:4e8d:b0:455:fd3e:4e12 with SMTP id 5b1f17b1804b1-4588d646f0bmr458835e9.4.1753782198603;
-        Tue, 29 Jul 2025 02:43:18 -0700 (PDT)
-Received: from google.com (88.140.78.34.bc.googleusercontent.com. [34.78.140.88])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b778eb27f8sm11743653f8f.16.2025.07.29.02.43.17
+        d=1e100.net; s=20230601; t=1753783005; x=1754387805;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=v9Q72PwGeVTj3y8z/xg+PR9uIGfJgkCfjcqVd6z2uJw=;
+        b=VVNT0Jl8P4Ag8dTN+ZbHLnhr67/StEjlxh2fkXWC5JNG0QpUIBeWaG6hOzxLxokhwG
+         be8UR96rvZ5dlcKrtGKZMq9VQtSfxSxwNaM687jNElkPFw6JYnfnUQKLUpAZ9H8/uswI
+         5PcVse2kJ+f7uMn2Y96eImiwTR82i4kWge5BnnHediGs/a80rKZWGjjZi/zOI4lJY9ef
+         Ay4gIVAneUjXsZvd948YhdW0MrU1lDLfOjq9raeKyvY9WiQQhXacDQS1eAgYeiPwldaV
+         q9JAhdca3CZSX8AcvXvWH/MxwD25PX6xrIAAipFC3DqrIAqLMSyjf3nd5oNY8T2n+gOC
+         wdAg==
+X-Forwarded-Encrypted: i=1; AJvYcCV9AXG6HLjLufMZ648bQuAHzSvihiuUBpmphsISmyoz/hkSK4APLY6MHcyfOu5ctOzeuMA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyyJwLICcBQ+RVT1HCc5N+EEpmz4RZfJg99jaPYoNxjUfO3RwdG
+	R0uYN7HmN3BimaGJFX6nDXJpH+wW5K2NlR3G3hSYQr2xQZowVECoZCj58ur/VkqrzWX5ofKQTjG
+	TXWlz2TM1WONBo0HNp9l2EErev5gZtl2HtgHnSCjvcGvjQXY1d7TRfw==
+X-Gm-Gg: ASbGncuBv52DreN0/2yOn6v5LcdFlSymdqIs/NDWZgPnbYSvu7VRtocm5WnN7M+77mZ
+	RvZf+T/ZAQ2vhMs9caq9jKz66QbgRPc1E14TirSTES0sdRrru3s0uF2RQ2c46c0X+Pas2GbMwzg
+	BhybGDWnRBkKoEvLqOOAnQErQOtzyyCOvQs7eDene8FVkcOWksuVMTVX00ssKVLm91LfwW5yhWx
+	VLnR9bxnPfVU4Vn/vf8teA6xHaDwargfpea6vzGZC/gn7KK2xmvUitTgddlQB+wu2FRIyVA735I
+	RMwERnaNy38l4YF8hr2Ay5HH/kZPVcgbAyov4WClvyq87MQk5RCeGFPxWpXYCjE07+SShrxGKVd
+	E5w3Jh0V//gIeKqo=
+X-Received: by 2002:a17:907:3da1:b0:af2:4690:9df3 with SMTP id a640c23a62f3a-af7bfd85f30mr309160866b.14.1753783004781;
+        Tue, 29 Jul 2025 02:56:44 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGikTxgu8BzOOJSc5KnbVu6iBWvoq2vv43KLwCvZ/Y6ueWN7/Ah83jj2TRypRMINdlKpJ2KOA==
+X-Received: by 2002:a17:907:3da1:b0:af2:4690:9df3 with SMTP id a640c23a62f3a-af7bfd85f30mr309159366b.14.1753783004396;
+        Tue, 29 Jul 2025 02:56:44 -0700 (PDT)
+Received: from sgarzare-redhat (host-79-45-205-118.retail.telecomitalia.it. [79.45.205.118])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-61500addc6asm4421025a12.53.2025.07.29.02.56.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Jul 2025 02:43:18 -0700 (PDT)
-Date: Tue, 29 Jul 2025 09:43:14 +0000
-From: Mostafa Saleh <smostafa@google.com>
-To: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>
-Cc: kvm@vger.kernel.org, Suzuki K Poulose <Suzuki.Poulose@arm.com>,
-	Steven Price <steven.price@arm.com>, Will Deacon <will@kernel.org>,
-	Julien Thierry <julien.thierry.kdev@gmail.com>
-Subject: Re: [RFC PATCH kvmtool 08/10] vfio/iommufd: Move the hwpt allocation
- to helper
-Message-ID: <aIiXshblqd5GwpIF@google.com>
-References: <20250525074917.150332-1-aneesh.kumar@kernel.org>
- <20250525074917.150332-8-aneesh.kumar@kernel.org>
- <aIZw0DnAniP5G6KG@google.com>
- <yq5abjp3bmu1.fsf@kernel.org>
+        Tue, 29 Jul 2025 02:56:43 -0700 (PDT)
+Date: Tue, 29 Jul 2025 11:56:40 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: mst@redhat.com, eperezma@redhat.com, kvm@vger.kernel.org, 
+	virtualization@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	will@kernel.org, JAEHOON KIM <jhkim@linux.ibm.com>, 
+	Breno Leitao <leitao@debian.org>
+Subject: Re: [PATCH] vhost: initialize vq->nheads properly
+Message-ID: <6yp7ww6misiazdkeumkklrds2e7s3cmgf42lafvukhhqtopby4@ex6h5km4hq5y>
+References: <20250729073916.80647-1-jasowang@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <yq5abjp3bmu1.fsf@kernel.org>
+In-Reply-To: <20250729073916.80647-1-jasowang@redhat.com>
 
-On Tue, Jul 29, 2025 at 10:44:14AM +0530, Aneesh Kumar K.V wrote:
-> Mostafa Saleh <smostafa@google.com> writes:
-> 
-> > On Sun, May 25, 2025 at 01:19:14PM +0530, Aneesh Kumar K.V (Arm) wrote:
-> >> alloc_hwpt.flags = 0; implies we prefer stage1 translation. Hence name
-> >> the helper iommufd_alloc_s2bypass_hwpt().
-> >
-> > This patch moves the recently added code into a new function,
-> > can't this be squashed?
-> >
-> 
-> Yes. Will update the patch.
-> 
-> > Also, I believe that with “IOMMU_HWPT_DATA_NONE”, we shouldn’t make
-> > any assumptions in userspace about which stage is used.
-> >
-> > The only guarantee is that IOMMU_IOAS_MAP/IOMMU_IOAS_UNMAP works.
-> >
-> > So, I believe the naming for "s2bypass" is not accurate.
-> >
-> 
-> Any suggestion w.r.t helper function name?
+On Tue, Jul 29, 2025 at 03:39:16PM +0800, Jason Wang wrote:
+>Commit 7918bb2d19c9 ("vhost: basic in order support") introduces
+>vq->nheads to store the number of batched used buffers per used elem
+>but it forgets to initialize the vq->nheads to NULL in
+>vhost_dev_init() this will cause kfree() that would try to free it
+>without be allocated if SET_OWNER is not called.
+>
+>Reported-by: JAEHOON KIM <jhkim@linux.ibm.com>
+>Reported-by: Breno Leitao <leitao@debian.org>
+>Fixes: 7918bb2d19c9 ("vhost: basic in order support")
+>Signed-off-by: Jason Wang <jasowang@redhat.com>
+>---
+> drivers/vhost/vhost.c | 1 +
+> 1 file changed, 1 insertion(+)
 
-Maybe just "iommufd_alloc_hwpt"?
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
-Thanks,
-Mostafa
+>
+>diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+>index a4873d116df1..b4dfe38c7008 100644
+>--- a/drivers/vhost/vhost.c
+>+++ b/drivers/vhost/vhost.c
+>@@ -615,6 +615,7 @@ void vhost_dev_init(struct vhost_dev *dev,
+> 		vq->log = NULL;
+> 		vq->indirect = NULL;
+> 		vq->heads = NULL;
+>+		vq->nheads = NULL;
+> 		vq->dev = dev;
+> 		mutex_init(&vq->mutex);
+> 		vhost_vq_reset(dev, vq);
+>-- 
+>2.39.5
+>
 
-> 
-> -aneesh
 
