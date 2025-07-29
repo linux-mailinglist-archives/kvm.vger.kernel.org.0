@@ -1,150 +1,199 @@
-Return-Path: <kvm+bounces-53661-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53662-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72FD0B152DA
-	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 20:33:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BE8DB152F2
+	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 20:41:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA45716B343
-	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 18:33:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 836875A0208
+	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 18:39:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 759F923B629;
-	Tue, 29 Jul 2025 18:33:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39861296160;
+	Tue, 29 Jul 2025 18:39:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qD2NuYn5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NKD71RjS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E779E1A0B08
-	for <kvm@vger.kernel.org>; Tue, 29 Jul 2025 18:33:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A098F2512FC;
+	Tue, 29 Jul 2025 18:39:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753814017; cv=none; b=l5rRDVoQtwia84Z9rivexIYlU9He8b4O8LxJFLMIJcErSMCkqjTZjV/hUxX3G9xfor93XeIy0ddHHhUpDf7RjrbEeNCE/HmOQM+06BfLolmzJ+TI6g7ZWujm0WEUGZidBqBE5T9p0cAt9rhPAbCFYMdAvKjMnN1yqLWb59cv6b4=
+	t=1753814350; cv=none; b=Ed+BaaqKX354sS7GTKESdpb6+Pew3IgXMlPhfTQEybQe78HzMGDiA0yy+Ck2v8pjPDmZeaC+1e09TfzF6m78NmWH96GeFSyw7OzdyHtN6c8kxAoohvdZGKQr06zX1w8ruhUIIGRMoJkrmFWVOzNx1jqiAhOC0rM1lmwJEoEpJcg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753814017; c=relaxed/simple;
-	bh=zhhsN1AqU60iSsHthAP5HUoMBvOnju18nFxPG9F76EM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=s6avxPYvTwzFkhMoGqUxZzMwePckldyBA4s136cnWVE7iBMi3mruYm7XWA9bkrnS2gDkuzWg+eDTD28c8qB7NbVMD8by+XtclOghzbC7sNBCJ5Fc3DkrugfVis7EBSXxlS4wfdbBI0GNuw4sCmvDAnRwGkwWgYvztU2ttg5RxvM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qD2NuYn5; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4562b2d98bcso7285e9.1
-        for <kvm@vger.kernel.org>; Tue, 29 Jul 2025 11:33:35 -0700 (PDT)
+	s=arc-20240116; t=1753814350; c=relaxed/simple;
+	bh=K0MGb4ayzYxYJZKg1HWu8KpfAsEMhfWFw3xLTjemhe4=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=O0wxXbYPDf4qe3QnA7aZ37GmQ0TQy8ZitdH0gW2zxPt5KhR7kD/WqyGm59PRG68l89NixYmiWEzEjNldezOal7IR0+R1X2l590IabEksIYD+zmGX6PgG/fIay31CmHNAC1Gkjxd3vF8oEDfhw7jhq7kr4L+WdAxaBIr3fUBxq8I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NKD71RjS; arc=none smtp.client-ip=209.85.208.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-3321296ad03so14875391fa.3;
+        Tue, 29 Jul 2025 11:39:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753814014; x=1754418814; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7IB94kLTsbGsiDgptDqLFiCExxMxuJKtjoAOZzmwaM4=;
-        b=qD2NuYn5ukpw1lRu+hfpW6YZ1vrrabjONtMt17EZwCHvEv+dx/KrHNrhiSEXWMFVZu
-         dXySqlfOsXIfVQBveYbHi6ZkD6MgkmcDX9+IpTTAiq/WcZRe8w88Qb0ojJLPnfVta/f/
-         oupNmSJiNajruIxiqYEtjKXu4Y+pypIgWbsWVjyfxabcLJPikWP+mHoZd5JESQg7qaTf
-         FT+3+OWCVcRX0EbcMUysN7618Pl0WfMJtzpr2XMr7j0MugZt2cpcsq3V53HDUDcp1OnS
-         u1WgTZfn7WZEnULwrLghklsuYLh8OPUMat0RrWtrAmfBQjpF1IxJmpXVxZp1EayjEF7H
-         1zEQ==
+        d=gmail.com; s=20230601; t=1753814347; x=1754419147; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=GYRfCV3hbQi5DsgzlDild2w/1OeWF4e+oM87WSvfwwM=;
+        b=NKD71RjSND1rXmAnXQfIgEf/HiGuyRbmfQkAATxvz+XDc3wuAS4PYMTAnFTc+hOFBB
+         jFfTAut7lO3fvht+3On5gRaIfl+2JUu+C2CyqgxTS8W35LGqMXdhSUjejCV9hA/o8SY3
+         0PSeXZbieKdSiw5El+lB3jlElLjLihmZthWvrMhStg80B4X/+WwjaahcIn6GBi4Qcplc
+         7DOUDEExmM8rm8f+iQ5+1OL4gAnBtqzmlfM/R2yn2i3XNKsLWCbKBBoyp47IhnsZEusl
+         BN9pcQGornc7ZtX5pT62Tk+O+efm5f0pzlCljOdXohw3AYM1UNB3P3sLQR1I5+qIVlUx
+         Ejdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753814014; x=1754418814;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7IB94kLTsbGsiDgptDqLFiCExxMxuJKtjoAOZzmwaM4=;
-        b=WgMnTjPd4rlVc+RT+xE2ID8sz9IgRqZP4HMCuCvog/tGN0EfW1xLOmpzH8uWj37XoF
-         PWXs/gDbKNaK47vA3IrS5cYhbTU1AgOoeTc3vr86tn4v6cY7R0AmQ/G0HKPN1m3gxzqo
-         vaf5Zllk2xeNnhJoBVggWRFKHqqgfyMLRwKIEIDaEA2HV9ySPwiEZdZSU1CiyloAVCP6
-         FmAR8JENJ8VFEPkhy0NsANSM+z4CVJQhFR+ybreHOkIR0duu/YyrE8tazj+E8RWMXjmL
-         ttcTAUUl7Khob0sTrKzXWpGBje4Kq4OVEO8XSVeXGRk2VTyX06Ckg1m/RS/S04FT81/j
-         yLvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXBoMkWOkQj+HD4Y+k3OG6wf4Ohdb2r/wTwBdjr1CT351aBT9C0NKXqixR7N5j5Clq7ARM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwP3w5vjYW9ODh7MqNhHUb7qPkxPfj2h7PBIaExZO03ziFsoder
-	ZagQHZNVmXK4hkoBftXEVG2tFfE08Hm+V0+8ghQAQu44cLLxABz7aDpFN8iGuQaw8+lAFCoV1nV
-	Wi0bEmu1Kfue/sfDGqQC8CPdk2OZ6H0QlDSmEdsKkFSIISYexIiWGOOqd
-X-Gm-Gg: ASbGncsbzrVdsgaXb9X9DxYqQC7SLu8o3qp+SeDyeCHld9FxrScpaqj6FUlGi79JFnY
-	7z/rgROdwK58swI4C1i1vZ6WykYsxZsWQkFRT9zmv8CRJlB2J/ibzJqONvuOIAR9E3idtuWaECa
-	JSsiGVKkupt4SUbWpahB9K+7qJHuLOSnpTB9NExRjwokzwOBAOxLxn0UWrkpwph4QSUYYmTXhKm
-	yyOz3dzNVSZoD07kZQpQpjzBWaYQCRBMhnDLQ==
-X-Google-Smtp-Source: AGHT+IGKAkWetZ1FvQ3c2TR9sQ5wbErOwg/m1YLthxVSeCgARrfvYFD3xx1XvoVEZiCGve6ALl+xhDJWyNwcPNrcTPo=
-X-Received: by 2002:a05:600c:859c:b0:453:5ffb:e007 with SMTP id
- 5b1f17b1804b1-45893a9b7f3mr63305e9.4.1753814013998; Tue, 29 Jul 2025 11:33:33
- -0700 (PDT)
+        d=1e100.net; s=20230601; t=1753814347; x=1754419147;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GYRfCV3hbQi5DsgzlDild2w/1OeWF4e+oM87WSvfwwM=;
+        b=ETVj2lztD/LuqAtTkiKADtNHw4Q05ZsmQHRw2PfE8PioK+rCQtRMNWSFrrfbJvYg7z
+         yXRmJVzVlryxeBfl9Wjy6LiSSBP2n1Y4jvtotrvRwkZBK/LmnuxPBfGYYgI1QzV3qSxO
+         uiw8sjGT7Wa/JBqentDjhBYcLWLHaY1zwuuh5Pzrropba0vzam+jLwaA3lRhEm71xBuu
+         /fyKJdilhXPNZFR4MG5sOuqa+BU19MuE737r5wI+vU5aezSKSJQ7Qwidf3KZcjZTAYhY
+         oXVtAZktdJmFMFdgqby9ZMTjlIs9tv5xAVBDXvKkutoouH/niCvCDm9s0opY2KOEYe5z
+         nUVA==
+X-Forwarded-Encrypted: i=1; AJvYcCUEeTIxbUN2CE4tUJnrmqEQFxQHf1uZauPv8SXH8X0ghrgmrLGHIla6QoShg0pXfvPfPgSFiNMD/c+fZadKdiRIMrr1@vger.kernel.org, AJvYcCUyamA+dDJFs+Gt5I97dmtdIlstFucMr54YDE5QByl7ACLKp0oBVJ19+nIrkXHiFQS5HbJEi5jd7xfE3w==@vger.kernel.org, AJvYcCWkT1IgC3VG91RjSdJMFzqqK4E8v4wvNmAROFhZrUxPH3v2UkelvSmGI4t9w342WTybEKnHTV8F/BxW@vger.kernel.org, AJvYcCWz/Wm1TtJzQejTERj4aS627Iv40fp656dSi4LyMJoYBbnv8bVVXTAB1OKQzsGzFl2/elUtClpXLwf6lthY@vger.kernel.org, AJvYcCX3uv/CC6AuisHfr0+afv3eMKAK3LKvGKei7ZJJLWYQTu6S9/zFG4MD8w2DWAaaZX8IN9I=@vger.kernel.org, AJvYcCXKzSDjDDuvTo97HgVYICke64JFan/hUVRZPFof1kgZ1jCIT4Wgz6+JqNHrz5wY3qR8mWmxzer23nM7QcRocA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyuTdNZwefZStZbNrgd3WMdamCOz2MJV+yvWB6mBvx6R0qaMmp6
+	9SqSXYLpmSA5xQ7xhuN1Ay4Qi3dRJU9Fw0OtWE/gMSugHzYXHIjbZ7AU
+X-Gm-Gg: ASbGncvgm47JZ0K/0uVnx0Ig1KIcA6t2OJx8xHF5d5Q5y34tQMfUUZ0+FxMDYKNZtzX
+	/JT1Z5/lfU0l0j1VePujvsEBkS+sNjTFsmqvAB5x7bvAYwQ+D2GQG5URpzdP3vv4jScz0DYmx6f
+	h650+jK1UQC3xPzgX7swzmOMB18Ssdbq+xu2Wc19pbWPJ31eFTIwrgo71iUOo0YlXWFQH939At1
+	8tuFtLoi4kVGhMJ7iGpHq4sa6frFdcWm3jKThEOoEWiCcfKS+QTOn75Komw4uGe157VIWOgbgMA
+	Y53AB8IqlGKk5cdwyYeHiVMV0soCfNfoXfP0r3gX/Crj8d3D2Hm18+LloVlJaaGw
+X-Google-Smtp-Source: AGHT+IF9yvJyPiTzwXfrNX8PT/G9myfdCCK3lbY+TklU3bxii0UFYjkiLDeONxAItTuHZBzIFqK+RA==
+X-Received: by 2002:a05:6512:3414:b0:553:241d:4e77 with SMTP id 2adb3069b0e04-55b7c011afdmr184040e87.22.1753814346295;
+        Tue, 29 Jul 2025 11:39:06 -0700 (PDT)
+Received: from pc636 ([2001:9b1:d5a0:a500::800])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-332219ce7aesm832441fa.34.2025.07.29.11.39.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Jul 2025 11:39:04 -0700 (PDT)
+From: Uladzislau Rezki <urezki@gmail.com>
+X-Google-Original-From: Uladzislau Rezki <urezki@pc636>
+Date: Tue, 29 Jul 2025 20:39:01 +0200
+To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
+Cc: Harry Yoo <harry.yoo@oracle.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	"David S . Miller" <davem@davemloft.net>,
+	Andreas Larsson <andreas@gaisler.com>,
+	Jarkko Sakkinen <jarkko@kernel.org>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	"H . Peter Anvin" <hpa@zytor.com>,
+	Andy Lutomirski <luto@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+	Kees Cook <kees@kernel.org>, Peter Xu <peterx@redhat.com>,
+	David Hildenbrand <david@redhat.com>, Zi Yan <ziy@nvidia.com>,
+	Baolin Wang <baolin.wang@linux.alibaba.com>,
+	"Liam R . Howlett" <Liam.Howlett@oracle.com>,
+	Nico Pache <npache@redhat.com>, Ryan Roberts <ryan.roberts@arm.com>,
+	Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>,
+	Xu Xin <xu.xin16@zte.com.cn>,
+	Chengming Zhou <chengming.zhou@linux.dev>,
+	Hugh Dickins <hughd@google.com>, Vlastimil Babka <vbabka@suse.cz>,
+	Mike Rapoport <rppt@kernel.org>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Michal Hocko <mhocko@suse.com>, Rik van Riel <riel@surriel.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Matthew Wilcox <willy@infradead.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>, John Hubbard <jhubbard@nvidia.com>,
+	Muchun Song <muchun.song@linux.dev>,
+	Oscar Salvador <osalvador@suse.de>, Jann Horn <jannh@google.com>,
+	Pedro Falcato <pfalcato@suse.de>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Qi Zheng <zhengqi.arch@bytedance.com>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Uladzislau Rezki <urezki@gmail.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+	sparclinux@vger.kernel.org, linux-sgx@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	nvdimm@lists.linux.dev, linux-trace-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/3] mm: update core kernel code to use vm_flags_t
+ consistently
+Message-ID: <aIkVRTouPqhcxOes@pc636>
+References: <cover.1750274467.git.lorenzo.stoakes@oracle.com>
+ <d1588e7bb96d1ea3fe7b9df2c699d5b4592d901d.1750274467.git.lorenzo.stoakes@oracle.com>
+ <aIgSpAnU8EaIcqd9@hyeyoo>
+ <73764aaa-2186-4c8e-8523-55705018d842@lucifer.local>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CACw3F53VTDQeUbj3C75pkjz=iehbFCqbrTjYbUC3ViUbQJAhsg@mail.gmail.com>
- <CACw3F50O9Z=hPFNzeatzr2k+1cKX_nnqdzKJOMEdmjmfy3LoUg@mail.gmail.com> <18df01493fee0547d8b5902b986a2334@misterjones.org>
-In-Reply-To: <18df01493fee0547d8b5902b986a2334@misterjones.org>
-From: Jiaqi Yan <jiaqiyan@google.com>
-Date: Tue, 29 Jul 2025 11:33:22 -0700
-X-Gm-Features: Ac12FXyam7bjtry9Vixp29M5W0s0neJG-QDbW5LkEpRdu8HEgX8jGbg9nB_4Esc
-Message-ID: <CACw3F53j60QSz=D0HozuazCSaKoOWmODZuydC8152rdxT-fRAQ@mail.gmail.com>
-Subject: Re: [Bug Report] external_aborts failure related to efa1368ba9f4
- ("KVM: arm64: Commit exceptions from KVM_SET_VCPU_EVENTS immediately")
-To: Marc Zyngier <maz@misterjones.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <73764aaa-2186-4c8e-8523-55705018d842@lucifer.local>
 
-That commit fixed my issue, thanks a lot Marc!
+On Tue, Jul 29, 2025 at 06:25:39AM +0100, Lorenzo Stoakes wrote:
+> Andrew - FYI there's nothing to worry about here, the type remains
+> precisely the same, and I'll send a patch to fix this trivial issue so when
+> later this type changes vmalloc will be uaffected.
+> 
+> On Tue, Jul 29, 2025 at 09:15:51AM +0900, Harry Yoo wrote:
+> > [Adding Uladzislau to Cc]
+> 
+> Ulad - could we PLEASE get rid of 'vm_flags' in vmalloc? It's the precise
+> same name and (currently) type as vma->vm_flags and is already the source
+> of confusion.
+> 
+You mean all "vm_flags" variable names? "vm_struct" has flags as a
+member. So you want:
 
-On Sat, Jul 26, 2025 at 2:18=E2=80=AFAM Marc Zyngier <maz@misterjones.org> =
-wrote:
->
-> On 2025-07-25 23:38, Jiaqi Yan wrote:
-> > On Mon, Jul 21, 2025 at 7:00=E2=80=AFAM Jiaqi Yan <jiaqiyan@google.com>=
- wrote:
-> >>
-> >> Hi Oliver,
-> >>
-> >> I was doing some SEA injection dev work and found
-> >> tools/testing/selftests/kvm/arm64/external_aborts.c is failing at the
-> >> head of my locally-tracked kvmarm/next, commit 811ec70dcf9cc ("Merge
-> >> branch 'kvm-arm64/config-masks' into kvmarm/next"):
-> >>
-> >> vobeb33:/export/hda3/tmp/yjq# ./external_aborts
-> >> Random seed: 0x6b8b4567
-> >> test_mmio_abort <=3D fail
-> >> =3D=3D=3D=3D Test Assertion Failure =3D=3D=3D=3D
-> >>   arm64/external_aborts.c:19: regs->pc =3D=3D expected_abort_pc
-> >>   pid=3D25675 tid=3D25675 errno=3D4 - Interrupted system call
-> >>   (stack trace empty)
-> >>   0x0 !=3D 0x21ed20 (regs->pc !=3D expected_abort_pc)
-> >> vobeb33:/export/hda3/tmp/yjq#
-> >> vobeb33:/export/hda3/tmp/yjq#
-> >> vobeb33:/export/hda3/tmp/yjq# ./external_aborts
-> >> Random seed: 0x6b8b4567
-> >> test_mmio_nisv       <=3D pass
-> >> test_mmio_nisv_abort <=3Dfail
-> >> =3D=3D=3D=3D Test Assertion Failure =3D=3D=3D=3D
-> >>   arm64/external_aborts.c:19: regs->pc =3D=3D expected_abort_pc
-> >>   pid=3D26153 tid=3D26153 errno=3D4 - Interrupted system call
-> >>   (stack trace empty)
-> >>   0x0 !=3D 0x21eb18 (regs->pc !=3D expected_abort_pc)
-> >>
-> >> It looks like the PC in the guest register is lost / polluted. I only
-> >> tested test_mmio_abort (fail), test_mmio_nisv (pass), and
-> >> test_mmio_nisv_abort (fail), but from reading the code of
-> >> test_mmio_nisv vs test_mmio_nisv_abort, I guess test failure is
-> >> probably due to some bug in the code kvm injects SEA into guest.
-> >>
-> >> If I revert a single commit efa1368ba9f4 ("KVM: arm64: Commit
-> >> exceptions from KVM_SET_VCPU_EVENTS immediately"), all tests in
-> >> tools/testing/selftests/kvm/arm64/external_aborts.c pass. I have not
-> >> yet figured out the bug tho. Want to report since you are the author
-> >> maybe you can (or already) spot something.
-> >
-> > Friendly ping ;)
->
-> Please check this:
->
-> https://web.git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git/com=
-mit/?h=3Dnext&id=3Dc6e35dff58d348c1a9489e9b3b62b3721e62631d
->
->          M.
-> --
-> Who you jivin' with that Cosmik Debris?
+urezki@pc638:~/data/backup/coding/linux-not-broken.git$ grep -rn vm_flags mm/execmem.c
+29:                          pgprot_t pgprot, unsigned long vm_flags)
+39:             vm_flags |= VM_DEFER_KMEMLEAK;
+41:     if (vm_flags & VM_ALLOW_HUGE_VMAP)
+45:                              pgprot, vm_flags, NUMA_NO_NODE,
+51:                                      pgprot, vm_flags, NUMA_NO_NODE,
+85:                          pgprot_t pgprot, unsigned long vm_flags)
+259:    unsigned long vm_flags = VM_ALLOW_HUGE_VMAP;
+266:    p = execmem_vmalloc(range, alloc_size, PAGE_KERNEL, vm_flags);
+376:    unsigned long vm_flags = VM_FLUSH_RESET_PERMS;
+385:            p = execmem_vmalloc(range, size, pgprot, vm_flags);
+urezki@pc638:~/data/backup/coding/linux-not-broken.git$ grep -rn vm_flags mm/vmalloc.c
+3853: * @vm_flags:                additional vm area flags (e.g. %VM_NO_GUARD)
+3875:                   pgprot_t prot, unsigned long vm_flags, int node,
+3894:   if (vmap_allow_huge && (vm_flags & VM_ALLOW_HUGE_VMAP)) {
+3912:                             VM_UNINITIALIZED | vm_flags, start, end, node,
+3977:   if (!(vm_flags & VM_DEFER_KMEMLEAK))
+4621:   vm_flags_set(vma, VM_DONTEXPAND | VM_DONTDUMP);
+urezki@pc638:~/data/backup/coding/linux-not-broken.git$ grep -rn vm_flags mm/execmem.c
+29:                          pgprot_t pgprot, unsigned long vm_flags)
+39:             vm_flags |= VM_DEFER_KMEMLEAK;
+41:     if (vm_flags & VM_ALLOW_HUGE_VMAP)
+45:                              pgprot, vm_flags, NUMA_NO_NODE,
+51:                                      pgprot, vm_flags, NUMA_NO_NODE,
+85:                          pgprot_t pgprot, unsigned long vm_flags)
+259:    unsigned long vm_flags = VM_ALLOW_HUGE_VMAP;
+266:    p = execmem_vmalloc(range, alloc_size, PAGE_KERNEL, vm_flags);
+376:    unsigned long vm_flags = VM_FLUSH_RESET_PERMS;
+385:            p = execmem_vmalloc(range, size, pgprot, vm_flags);
+urezki@pc638:~/data/backup/coding/linux-not-broken.git$ grep -rn vm_flags ./include/linux/vmalloc.h
+172:                    pgprot_t prot, unsigned long vm_flags, int node,
+urezki@pc638:~/data/backup/coding/linux-not-broken.git$
+
+to rename all those "vm_flags" to something, for example, like "flags"?
+
+Thanks!
+
+--
+Uladzislau Rezki
 
