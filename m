@@ -1,138 +1,109 @@
-Return-Path: <kvm+bounces-53643-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53644-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F35AB1504A
-	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 17:41:07 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A273B15089
+	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 17:57:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 215AB18A4F21
-	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 15:40:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1AB627A4F9F
+	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 15:56:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82DF12951CE;
-	Tue, 29 Jul 2025 15:39:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CF0D2980A8;
+	Tue, 29 Jul 2025 15:57:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JGQyaGNm"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qDhRQfbv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45F7E2951A0
-	for <kvm@vger.kernel.org>; Tue, 29 Jul 2025 15:39:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CCED81749
+	for <kvm@vger.kernel.org>; Tue, 29 Jul 2025 15:57:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753803545; cv=none; b=JiGuMLrYkp3nwBmNfUoDBtLuYU3/lMlC2ESYtXCSNOpPr6Iz+qv3kLrVlEDLTupN0RNxRC8p3VaoUYhdUvjeXGKWjDFLVYqzJLf+MHnDJQIUPBM7f99VopiOM4gkNVs9P37V02h21IampIkXZ4IB8gNT5di0+9l1hvqpfgixDrc=
+	t=1753804666; cv=none; b=huoeD5/Ln1rOtEiO9tCOmnCaFAER5cmzNhgJOSdf5cD5GRpKRf3rSQNYIhWdrbIuoacoG1xZPG//c0wrMYwXXx6T5Bb6a6F82KqHhr2oW+UiJon3SqUjjE2bpYUN0Lobn8xM1MWx3lfqXKPb47txm48xKJUmkeoWB/UNEhUQEOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753803545; c=relaxed/simple;
-	bh=OfOL42eD9JTUc+4eGZAYldNVEOn18zoOKYFUTi9OmhY=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=FEctBp9fcA8B0O5O1xUrdxL1BLgHLvU39C6BpAbwERVOtDgW3gWKNGaNy1YURtn6x0MJxe8JONhRrxY+5ocqMLiO7WFS0bpEngwjf7V64gMqy6y4lKpMSvifPIt+bv+3tif4wZF803/UN3t/hJDw95n6d9g/5CbC82d11YDzROk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JGQyaGNm; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-31f3b65ce07so867344a91.1
-        for <kvm@vger.kernel.org>; Tue, 29 Jul 2025 08:39:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753803543; x=1754408343; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Glsh0iAv4o3uNk39nP/OoAS1uxmDAWFJSCvfZQY8U3w=;
-        b=JGQyaGNm3fzX9r8HveAMNMyGM1Y8v90TYKyNm6RoQGeYx1pVL3pIAjrlb5Za/4iMG6
-         y8VCW7iD464VUFx/wFJ9wx3lslCr87y1a8BU2BUTR/sJm0c+6Kpo2QMkvVSO2tT7h0uJ
-         SqkpsuUd5aB9RF5+xQzP/va+FkUtjm9+AW0CH75P1kcMdMc4HfkqYcB76IY6P56W6Zg7
-         FMfJodDfRnen80P7GFTdj0+pxTThmx6KJaiJ6E8XwcrUEeL1unF0KRqTgVnF3x+KQuNL
-         cw5ktlfdMK/Fs/EMRXf4XZc0ZcOKtuejsmQPskUzCLX8jPMEkVYFPnuxwuuAiHm5YSfK
-         sSNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753803543; x=1754408343;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Glsh0iAv4o3uNk39nP/OoAS1uxmDAWFJSCvfZQY8U3w=;
-        b=GHfWQXXRs6uhaMX2CFzwVi/oJVYtNIQ+srLQmzEODho/tdSTOdhRfU4sMBsNssmJDu
-         Ej04SMeYtP/yp3o1nwO2GfQhqWjT07ugiNO6vV0GhDMlLBV1vRp7qBXKzBrbBNqeWtLv
-         eZ5AgmPDkuuY9hHCHH7xqh+oMAAIW6vEO5Xncro5WZdByZmz8Y564uXHvf5fXBHOSy+o
-         bGIj7UmbOkRD2kxmJWACPBUetwI1uOiHbWZNYz8nEEFZE9T6tg/QRB0I1g6aEkGEEzoR
-         RSkdnZvkZxM3q2Y9l0YHJQqNPIoEB9xMiccpyWGxBGo/uYoi3zKpfsZhTCYnpCxlIHhS
-         vDuw==
-X-Gm-Message-State: AOJu0YznpbcAx+K7BwbzSlg8u5wBKVqy/1yJ+qJyfL53NMOOTBH4MwaY
-	4RoNGPDoYHd5BWlp72TXkY/eoBtISzr8OBxa30Mjqr/5VBcZoSg0IJuUWcRD9vVRRXJrUdFtJfW
-	cYMpNYA==
-X-Google-Smtp-Source: AGHT+IF+TXpdC+oVnYt+YHocSx/QqcMuplDXaRRM2xGX1W6yq4xq1t881NAizm2HIeClnrMQru1DE3cPUfk=
-X-Received: from pjbsr11.prod.google.com ([2002:a17:90b:4e8b:b0:31e:cee1:4d04])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:240b:b0:31e:ebb6:6499
- with SMTP id 98e67ed59e1d1-31eebb6657emr9096042a91.24.1753803543611; Tue, 29
- Jul 2025 08:39:03 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 29 Jul 2025 08:39:01 -0700
+	s=arc-20240116; t=1753804666; c=relaxed/simple;
+	bh=YXXZKgxOwczQAtO2pLH8Ur8i1n4oleBXkSrXNhgJ48g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=igwP2vmtTvVuswAStbg7wAeUKGI81k921Gg9PfEyn7fNSm/l8nytqIZlgL83jpjtYXdwuDRtQrtjkMmUz/Bl8gnlMqLk6V3aK+1iy/VHCG9+fJryFY+a+YZTUgTmcftyoIIIhh7He/k0K6KA19FicgUC5zVdiJ1emMcOVhYg24Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qDhRQfbv; arc=none smtp.client-ip=95.215.58.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Tue, 29 Jul 2025 08:57:22 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1753804650;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Wlri4TImGK2Nq390bQXaKqOdz2FIIALuCIDn8HJtVIo=;
+	b=qDhRQfbvrQnB679V2u+y99NiCS4UGBDkb4hEi9ISnukmWBAlHwk4ngyyadfiZN6JcuEl2g
+	4TyqTbHXhqxPDRTeuhIgq71qJUptKzeOs9D52DBosEAlZs1O8d6w454t2nd7vEqRhBZ4mD
+	E5xPMb3TNhQ32Wwtr0RlB8jimsDkfhc=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Raghavendra Rao Ananta <rananta@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Mingwei Zhang <mizhang@google.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH 1/2] KVM: arm64: Split kvm_pgtable_stage2_destroy()
+Message-ID: <aIjvYl474_6F9d9P@linux.dev>
+References: <20250724235144.2428795-1-rananta@google.com>
+ <20250724235144.2428795-2-rananta@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.50.1.487.gc89ff58d15-goog
-Message-ID: <20250729153901.564123-1-seanjc@google.com>
-Subject: [PATCH] x86/kvm: Make kvm_async_pf_task_wake() a local static helper
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250724235144.2428795-2-rananta@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-Make kvm_async_pf_task_wake() static and drop its export, as the symbol is
-only referenced from within kvm.c.
+On Thu, Jul 24, 2025 at 11:51:43PM +0000, Raghavendra Rao Ananta wrote:
+> Split kvm_pgtable_stage2_destroy() into two:
+>   - kvm_pgtable_stage2_destroy_range(), that performs the
+>     page-table walk and free the entries over a range of addresses.
+>   - kvm_pgtable_stage2_destroy_pgd(), that frees the PGD.
+> 
+> This refactoring enables subsequent patches to free large page-tables
+> in chunks, calling cond_resched() between each chunk, to yield the CPU
+> as necessary.
+> 
+> Direct callers of kvm_pgtable_stage2_destroy() will continue to walk
+> the entire range of the VM as before, ensuring no functional changes.
+> 
+> Also, add equivalent pkvm_pgtable_stage2_*() stubs to maintain 1:1
+> mapping of the page-table functions.
 
-No functional change intended.
+Uhh... We can't stub these functions out for protected mode, we already
+have a load-bearing implementation of pkvm_pgtable_stage2_destroy().
+Just reuse what's already there and provide a NOP for
+pkvm_pgtable_stage2_destroy_pgd().
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/include/asm/kvm_para.h | 2 --
- arch/x86/kernel/kvm.c           | 3 +--
- 2 files changed, 1 insertion(+), 4 deletions(-)
+> +void kvm_pgtable_stage2_destroy_pgd(struct kvm_pgtable *pgt)
+> +{
+> +	/*
+> +	 * We aren't doing a pgtable walk here, but the walker struct is needed
+> +	 * for kvm_dereference_pteref(), which only looks at the ->flags.
+> +	 */
+> +	struct kvm_pgtable_walker walker = {0};
 
-diff --git a/arch/x86/include/asm/kvm_para.h b/arch/x86/include/asm/kvm_para.h
-index 57bc74e112f2..4a47c16e2df8 100644
---- a/arch/x86/include/asm/kvm_para.h
-+++ b/arch/x86/include/asm/kvm_para.h
-@@ -124,7 +124,6 @@ bool kvm_para_available(void);
- unsigned int kvm_arch_para_features(void);
- unsigned int kvm_arch_para_hints(void);
- void kvm_async_pf_task_wait_schedule(u32 token);
--void kvm_async_pf_task_wake(u32 token);
- u32 kvm_read_and_reset_apf_flags(void);
- bool __kvm_handle_async_pf(struct pt_regs *regs, u32 token);
- 
-@@ -148,7 +147,6 @@ static inline void kvm_spinlock_init(void)
- 
- #else /* CONFIG_KVM_GUEST */
- #define kvm_async_pf_task_wait_schedule(T) do {} while(0)
--#define kvm_async_pf_task_wake(T) do {} while(0)
- 
- static inline bool kvm_para_available(void)
- {
-diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-index 921c1c783bc1..180a8c146846 100644
---- a/arch/x86/kernel/kvm.c
-+++ b/arch/x86/kernel/kvm.c
-@@ -190,7 +190,7 @@ static void apf_task_wake_all(void)
- 	}
- }
- 
--void kvm_async_pf_task_wake(u32 token)
-+static void kvm_async_pf_task_wake(u32 token)
- {
- 	u32 key = hash_32(token, KVM_TASK_SLEEP_HASHBITS);
- 	struct kvm_task_sleep_head *b = &async_pf_sleepers[key];
-@@ -241,7 +241,6 @@ void kvm_async_pf_task_wake(u32 token)
- 	/* A dummy token might be allocated and ultimately not used.  */
- 	kfree(dummy);
- }
--EXPORT_SYMBOL_GPL(kvm_async_pf_task_wake);
- 
- noinstr u32 kvm_read_and_reset_apf_flags(void)
- {
+This feels subtle and prone for error. I'd rather we have something that
+boils down to rcu_dereference_raw() (with the appropriate n/hVHE awareness)
+and add a comment why it is safe.
 
-base-commit: 038d61fd642278bab63ee8ef722c50d10ab01e8f
--- 
-2.50.1.487.gc89ff58d15-goog
+> +void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt)
+> +{
+> +	kvm_pgtable_stage2_destroy_range(pgt, 0, BIT(pgt->ia_bits));
+> +	kvm_pgtable_stage2_destroy_pgd(pgt);
+> +}
+> +
 
+Move this to mmu.c as a static function and use KVM_PGT_FN()
+
+Thanks,
+Oliver
 
