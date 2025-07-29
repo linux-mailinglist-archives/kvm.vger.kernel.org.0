@@ -1,79 +1,83 @@
-Return-Path: <kvm+bounces-53663-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53664-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E7DBB15372
-	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 21:34:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE423B15375
+	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 21:34:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B9D6B4E6EA9
-	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 19:33:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A84F18940C8
+	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 19:34:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C69EB256C87;
-	Tue, 29 Jul 2025 19:33:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3EF925743D;
+	Tue, 29 Jul 2025 19:33:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RTCJuEL9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aF0imTjn"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6583124DCEA
-	for <kvm@vger.kernel.org>; Tue, 29 Jul 2025 19:33:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57A2E255F4C
+	for <kvm@vger.kernel.org>; Tue, 29 Jul 2025 19:33:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753817628; cv=none; b=P5nXm0XDzS4T+2PWJQXUfpoamiBsw+k1ZN0yKi577C4sq9zQORMTIKLQqi/F4ufcvtWsmk90IGbO8BLKIgpNP7OvlcCcf6a3uwJpT1s1umexftcdcqws67XCCZwNum3CuYt3/z4tClmKk1qWwluUrItqCdX0lrgwr3lUwg1y8PY=
+	t=1753817630; cv=none; b=aE800SVaxBlmQdNQj7pOTSUVGaEnjjVyd7rraT2Bt1DsPW9rXZ9xESsE8v2Ry43NiY8jazL3qBTmcOfHyras0I4CaCbbCWwHVTyg+rRQP7ttyX4WsRLSeDeIkhxYIPKm9mSJ29g0sZhULc/FAhFy0DArWHE2+QYxYDw0YkcWNgA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753817628; c=relaxed/simple;
-	bh=uRUA1Dw0gwf9VF6IMVv4hpWTJUqHYnh2F1froOP8Hrc=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=TfkJ/8qOa2bGKZ1GSTdV8SKUJAbdXTKd9iTCw6JRvJBEcTof4DaGq8yVVm6/J6xAe7eQt0FIOdvkN+auZ2gDwx+sNbWxUy4xBWXxl7lBnVSYDy1qAADin9ZX+Q+9ek0NSVmw6eojtRgZNBfpS/gMfVT4DH/t0s3Uk7mazu1bycM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RTCJuEL9; arc=none smtp.client-ip=209.85.216.74
+	s=arc-20240116; t=1753817630; c=relaxed/simple;
+	bh=L+2rXbfnP5UHLH6J8UIbSI41QWjZkhL1tyySVaOK3Ek=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=TFdPNAewlDoJtzCCEQOGkVTig1Nij9nqPcj5AoGfH0PBQDq1Yo+nOZd/blhTQc5nPdevtFRpLdrhbNksB8LDEnPzPg6fXciS3npS4M8hE7PUpZkqf6NBfIZvZa45BO+9Hwcdyx1cklKPAgu/+ue9Ro2GGR/SHD4kcB+ahvcmfWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aF0imTjn; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3132e7266d3so6508634a91.2
-        for <kvm@vger.kernel.org>; Tue, 29 Jul 2025 12:33:47 -0700 (PDT)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-74ae13e99d6so140342b3a.0
+        for <kvm@vger.kernel.org>; Tue, 29 Jul 2025 12:33:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753817627; x=1754422427; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vr2NEPUlMUbu3MZ3j1bjKONtMkJFv/DS/JUFQy2VOuc=;
-        b=RTCJuEL9f+92rDm2buaQuHMMJ67iHkIYX+w7AUGtBtZnpXIRTQXEmhmlHg2l+M5X1J
-         Caud07uDbRM+9403SQKh5ScunyRzi9+72T1P6LtpdH91A3Wmi4nmWW2CVYBg8qyzahr8
-         Y7VqdUq+lY/E4ptgLNH9mEPWuMy22+gW5QCL8CJmP0q3zl3reMryInccmb2zZMWwzqrZ
-         Mui7+DyifxTDhDDXnMZVhc71Ef2H67S/30nECuxkHQg2DiGw1eSDS+mcn56v08uu2kiF
-         PNbunFKg/SlQUUc+3Mu7eJB/4S9e25+BcakkgKUDHEvwXvCbGzSBhx4XN9l5Da/1yAgc
-         5RGQ==
+        d=google.com; s=20230601; t=1753817628; x=1754422428; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=nK97iU3U8P3+PseGfflZpbVtPQJIWPB5aDB6ZsfbPi4=;
+        b=aF0imTjn57YwtK6ZKrdRX892cJI6z8AqiFq1g5lWuJIMh5txSlRk3FCYtZgBVCxF2N
+         1eq64SbtpOeHXEuOAduiKpQaDb3+1adcMfz0Ob9ARRdBraY1eFG2iM1Sm17CnAcZTBZD
+         HN25bAGZj7NJJFF9CvU+WSpibp+nRUvHf5GmoSByPOz2chILHn7iDe1BLBiU2irRxJMq
+         2WLPj7Z/c7HmevVjvX03vQzakP6LA4DszLTLicVbwzaxqwSpCRiEJsKWPRpTVWYN1aYQ
+         BIv30ucL8hasY+wFzMC3YRI3cY5K/GtQBzugKVBvJL94+kNH8XVpPgLchRpaqlJhuCfZ
+         vSjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753817627; x=1754422427;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vr2NEPUlMUbu3MZ3j1bjKONtMkJFv/DS/JUFQy2VOuc=;
-        b=h1SYR/0uYPOU6OlwGdbl5frGrGQFY3rCMDyy3zzCv0ZbhWK+Z5S2Npiu1AUrVSk8bj
-         K+VlZ1IgMneza4GKyQQcubP+1lT7YWZpTLTtzz8csTLfhb9q5CRqc3MoqfPZ2OIzcNKZ
-         +AiHh990JhELJfW2xH02WbD43VkchyY9htVVZ6hsikt0lRPYFAuJ2X4aR18x5PhZZOe9
-         EFamPQfHQRzzsZorCgt9EOZ+TtLcoiJz6ufEn5JhFy7ae6zofw8/HktH5oKCSBjh6iYh
-         Qgp86FN7g42RW5WMTnPfoMlJhAMnit4ZGU8aJ50979XwHBbuzmKLrdlts/5Oc7pz9CxQ
-         DbYA==
-X-Forwarded-Encrypted: i=1; AJvYcCUWsbJWgnCe8KYnH6zD/gWf9CfUJQeDII18L3CdZdrO8HbySJ/MbPueVCc1Z9j2wjRmyzc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwZgsx6051NoKdAumzCBEyQSN0SBSNulIh/cbTXOQx7XEy2W9VQ
-	My9OnLNttLIzKAiQT2ZBHMHBevSN0VxIjNCT1fG+oj+0U3SCQQz9firAOVh/fUwEQ+VgUfQc171
-	bcZLzyQ==
-X-Google-Smtp-Source: AGHT+IEpCUyIaefYP0YL7w8y1faaEZii0WVM++l9+v+mc/1ojeZtttZMEz40RX0OKzEWa3Hqy78BV9878sU=
-X-Received: from pja11.prod.google.com ([2002:a17:90b:548b:b0:313:17cf:434f])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:562b:b0:31e:d9f0:9b96
- with SMTP id 98e67ed59e1d1-31f5ddb6641mr902917a91.14.1753817626768; Tue, 29
- Jul 2025 12:33:46 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1753817629; x=1754422429;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=nK97iU3U8P3+PseGfflZpbVtPQJIWPB5aDB6ZsfbPi4=;
+        b=kVYjsOqIDsqpgxu4UIr4W13dLJRwCGKI8Tv3ESW4FJaILROVobbph7ppEBnjEQrfb9
+         qkckW+pVLq5ExgxUmgJDeq8X4DrXevtm3gvPRYh5ayJF/2A54p5nKDlEvhi2YnmOEJeI
+         IU//BxTdm338EPEWaXakoqCb0nsPMl3IUh+RTDXHd4b+oAMzcGLMi4c8Izol9C/TLZh9
+         XBPxfsagCadPZ1WCn7X3QKS3cuhSh+PWQsLxw+4GSYwbolAsCdoYpt5e9PyfjckCieIA
+         Oka1YPQTIzcKJLy/b0kLxuR2DSg42UaylWJ9PCdnX9Y7SeMAUBR+Qjh0Yzk4w5cXlxaW
+         0NcA==
+X-Forwarded-Encrypted: i=1; AJvYcCUiLK+cZRtnxDOiHSiDRXH+62YOJMXeN+WCpmHtfEcHanXg9AOiY5qBkMMUwJNgudnfCjg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzGPZRT+EDv3lZlHdN/V9j/DKzzW3+MwLV1nEHl5DJkYLvseWyz
+	tzmMC3R6soeVNRtgGvj8+IjzRJVhycPmtwnrzc640EuAz+BlVuUET8ChbnKXc7sKPoMLbKZ+NnA
+	vuMvZqQ==
+X-Google-Smtp-Source: AGHT+IH4QbqgK/rjqLq7feIazM0nAtyNNAHCeByH/06YNfkwg9k7lbaoNX81vVU/L2yD55+9XIqmw/waN38=
+X-Received: from pgac7.prod.google.com ([2002:a05:6a02:2947:b0:b36:36f4:9862])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:914f:b0:23d:659c:aadd
+ with SMTP id adf61e73a8af0-23dadeb68c0mr7268679637.22.1753817628625; Tue, 29
+ Jul 2025 12:33:48 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 29 Jul 2025 12:33:35 -0700
+Date: Tue, 29 Jul 2025 12:33:36 -0700
+In-Reply-To: <20250729193341.621487-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20250729193341.621487-1-seanjc@google.com>
 X-Mailer: git-send-email 2.50.1.552.g942d659e1b-goog
-Message-ID: <20250729193341.621487-1-seanjc@google.com>
-Subject: [PATCH 0/5] KVM: Drop vm_dead, pivot on vm_bugged for -EIO
+Message-ID: <20250729193341.621487-2-seanjc@google.com>
+Subject: [PATCH 1/5] KVM: Never clear KVM_REQ_VM_DEAD from a vCPU's requests
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
@@ -84,44 +88,104 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	Nikolay Borisov <nik.borisov@suse.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Drop vm_dead and instead reject ioctls based only on vm_bugged.  Checking
-vm_dead (or vm_bugged) is inherently racy due as it's not protected by any
-locks.  For vm_bugged, imperfection is a-ok as the goal is purely to limit
-the damage done by a kernel/hardware bug.  But rejecting ioclts based on
-vm_dead is dangerous as it gives us a false sense of security, e.g. see the
-race found by syzbot in commit ecf371f8b02d ("KVM: SVM: Reject SEV{-ES}
-intra host migration if vCPU creation is in-flight").
+Use kvm_test_request() instead of kvm_check_request() when querying
+KVM_REQ_VM_DEAD, i.e. don't clear KVM_REQ_VM_DEAD, as the entire purpose
+of KVM_REQ_VM_DEAD is to prevent the vCPU from enterring the guest ever
+again, even if userspace insists on redoing KVM_RUN.
 
-This series was motivated by the last patch, a.k.a. KVM_TDX_TERMINATE_VM.
-I applied a slightly different version of that patch for 6.17[*], but I'm
-reposting it with the vm_dead changes due to Paolo's question about whether
-or not we should have a generic KVM_TERMINATE_VM; dropping vm_dead doesn't
-make much sense if we want to add KVM_TERMINATE_VM.
+Ensuring KVM_REQ_VM_DEAD is never cleared will allow relaxing KVM's rule
+that ioctls can't be invoked on dead VMs, to only disallow ioctls if the
+VM is bugged, i.e. if KVM hit a KVM_BUG_ON().
 
-[*] https://lore.kernel.org/all/20250725220713.264711-13-seanjc@google.com
+Opportunistically add compile-time assertions to guard against clearing
+KVM_REQ_VM_DEAD through the standard APIs.
 
-Sean Christopherson (5):
-  KVM: Never clear KVM_REQ_VM_DEAD from a vCPU's requests
-  KVM: TDX: Exit with MEMORY_FAULT on unexpected pending S-EPT Violation
-  KVM: Reject ioctls only if the VM is bugged, not simply marked dead
-  KVM: selftests: Use for-loop to handle all successful SEV migrations
-  KVM: TDX: Add sub-ioctl KVM_TDX_TERMINATE_VM
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/arm64/kvm/arm.c     | 2 +-
+ arch/x86/kvm/mmu/mmu.c   | 2 +-
+ arch/x86/kvm/vmx/tdx.c   | 2 +-
+ arch/x86/kvm/x86.c       | 2 +-
+ include/linux/kvm_host.h | 9 +++++++--
+ 5 files changed, 11 insertions(+), 6 deletions(-)
 
- Documentation/virt/kvm/x86/intel-tdx.rst      | 22 ++++++++-
- arch/arm64/kvm/arm.c                          |  2 +-
- arch/arm64/kvm/vgic/vgic-init.c               |  2 +-
- arch/x86/include/uapi/asm/kvm.h               |  7 ++-
- arch/x86/kvm/mmu/mmu.c                        |  2 +-
- arch/x86/kvm/vmx/tdx.c                        | 45 +++++++++++++------
- arch/x86/kvm/vmx/tdx.h                        |  1 +
- arch/x86/kvm/x86.c                            |  2 +-
- include/linux/kvm_host.h                      | 11 +++--
- .../selftests/kvm/x86/sev_migrate_tests.c     | 34 ++++++--------
- virt/kvm/kvm_main.c                           | 10 ++---
- 11 files changed, 90 insertions(+), 48 deletions(-)
-
-
-base-commit: beafd7ecf2255e8b62a42dc04f54843033db3d24
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index f946926716b0..2fdc48c0fc4d 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1013,7 +1013,7 @@ static int kvm_vcpu_suspend(struct kvm_vcpu *vcpu)
+ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
+ {
+ 	if (kvm_request_pending(vcpu)) {
+-		if (kvm_check_request(KVM_REQ_VM_DEAD, vcpu))
++		if (kvm_test_request(KVM_REQ_VM_DEAD, vcpu))
+ 			return -EIO;
+ 
+ 		if (kvm_check_request(KVM_REQ_SLEEP, vcpu))
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 6e838cb6c9e1..d09bd236a92d 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -4915,7 +4915,7 @@ int kvm_tdp_map_page(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code, u8 *level
+ 		if (signal_pending(current))
+ 			return -EINTR;
+ 
+-		if (kvm_check_request(KVM_REQ_VM_DEAD, vcpu))
++		if (kvm_test_request(KVM_REQ_VM_DEAD, vcpu))
+ 			return -EIO;
+ 
+ 		cond_resched();
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+index 66744f5768c8..3e0d4edee849 100644
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -2010,7 +2010,7 @@ static int tdx_handle_ept_violation(struct kvm_vcpu *vcpu)
+ 		if (kvm_vcpu_has_events(vcpu) || signal_pending(current))
+ 			break;
+ 
+-		if (kvm_check_request(KVM_REQ_VM_DEAD, vcpu)) {
++		if (kvm_test_request(KVM_REQ_VM_DEAD, vcpu)) {
+ 			ret = -EIO;
+ 			break;
+ 		}
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index a1c49bc681c4..1700df68f12a 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -10649,7 +10649,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 	bool req_immediate_exit = false;
+ 
+ 	if (kvm_request_pending(vcpu)) {
+-		if (kvm_check_request(KVM_REQ_VM_DEAD, vcpu)) {
++		if (kvm_test_request(KVM_REQ_VM_DEAD, vcpu)) {
+ 			r = -EIO;
+ 			goto out;
+ 		}
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 15656b7fba6c..627054d27222 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -2261,13 +2261,18 @@ static inline bool kvm_test_request(int req, struct kvm_vcpu *vcpu)
+ 	return test_bit(req & KVM_REQUEST_MASK, (void *)&vcpu->requests);
+ }
+ 
+-static inline void kvm_clear_request(int req, struct kvm_vcpu *vcpu)
++static __always_inline void kvm_clear_request(int req, struct kvm_vcpu *vcpu)
+ {
++	BUILD_BUG_ON(req == KVM_REQ_VM_DEAD);
++
+ 	clear_bit(req & KVM_REQUEST_MASK, (void *)&vcpu->requests);
+ }
+ 
+-static inline bool kvm_check_request(int req, struct kvm_vcpu *vcpu)
++static __always_inline bool kvm_check_request(int req, struct kvm_vcpu *vcpu)
+ {
++	/* Once a VM is dead, it needs to stay dead. */
++	BUILD_BUG_ON(req == KVM_REQ_VM_DEAD);
++
+ 	if (kvm_test_request(req, vcpu)) {
+ 		kvm_clear_request(req, vcpu);
+ 
 -- 
 2.50.1.552.g942d659e1b-goog
 
