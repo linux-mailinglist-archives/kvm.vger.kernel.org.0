@@ -1,188 +1,191 @@
-Return-Path: <kvm+bounces-53669-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53670-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CEEFB153C1
-	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 21:44:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FEA5B153CB
+	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 21:45:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4BC1A5A2C19
-	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 19:44:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7046A5A2DBC
+	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 19:45:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27208254AE1;
-	Tue, 29 Jul 2025 19:44:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kMTF12wc"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6690B2989A2;
+	Tue, 29 Jul 2025 19:44:51 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D97BB254876
-	for <kvm@vger.kernel.org>; Tue, 29 Jul 2025 19:44:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D588255F4C;
+	Tue, 29 Jul 2025 19:44:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753818261; cv=none; b=EyVMa201h9bhhkcJzHDuT1mlKo766vrP9oJPYRTwL0q6xq/wdufhfCEmLEBPEpS144lf6mLv2uW+WCKKpz5AA8UPmEtC5ctLRUUEaXgdePQ6nWzTsBnYnk8RvjxoSdtq/5jXxTabf9kkOY53DkIROayLnA1IEVzlHY+lBD6lrys=
+	t=1753818290; cv=none; b=rRo8yYS9vYlQymjdZTePXsMXo4hA0p3khAVaflL9fiCQQRaEQO5P2zFG+B7ewy3MhD2AxKgtfMx8jBvj9qYwrZATwrLGw9LvFBM6zwaYFD7EcxXS7gwFwCyR9m3CD67N2kNUFD1tbFZ9z5lFoPxslLXsbF54U5dE7HRsLcIWhTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753818261; c=relaxed/simple;
-	bh=4NhlkQG5nwfS/M+XM7YALx4FrZl/obGidC+Z8jkLhZE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=CGaF1nqnl1v3IDqZqJ/tC00hyUHy7fmSVlZwnpqGy3PnZvogkpvsS2uIWs8JpP2Rp2fdDHaUg35uQh52yOnzT3LQ0dOBDudBm1BUIo/hzvWlC6YgWzzc1npgTG2wygMWdM3i5ZecQ/hWDaPYtBbKCXgYv2Py+3p76wAm3wK1v5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kMTF12wc; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b3928ad6176so102424a12.3
-        for <kvm@vger.kernel.org>; Tue, 29 Jul 2025 12:44:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753818259; x=1754423059; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=eVG8KH1bhcF8abnqt3jf4aA5/80VQ7aWwN+Mg1mK9eE=;
-        b=kMTF12wcbu2OwFgglDZ207JD29OJ7e7QaoRal8valC9XRKwQgJ/zK5VpXmYhEHzIxB
-         JFpQKmP9pdtrzKun43unC5XXiXcfdrvPf1RBFNFjXZicRQ5Mo69McMCKeRj9keqyOriD
-         mCpfnDHgimhZHLkMP9aTHDU3UVaszgyP8jYvEZx6FnvoNMaWl0fmnV80Qw4W9+Ymz7Ha
-         CW7rszlX6xqf3p1MZE7ELRwZoQ9A5y5UtHBuda15WPapflkLmR7afDkDRZclFJU/AeGR
-         G9Gh7exuEWa5njItMqMYeW8s3vZFx9wqjjCv8Vdr7lB1LalRjcHV46mPgsCH1i2hd55Q
-         blxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753818259; x=1754423059;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=eVG8KH1bhcF8abnqt3jf4aA5/80VQ7aWwN+Mg1mK9eE=;
-        b=ODShCiJF/Xcq3YPeg5lnEzG5MK50DBSi/OInc6qoGBOT2P31KP18bH7mNFdWH4wi93
-         +GTQtqz5myvcCaJYH/e8hXoW/OfMK+ZwbVJACjyDEAMO591uoTUkqiwMl/j0Uem4jmh2
-         fQ3oHlOrFSTnBRelW8yGD351yvignqjuY3FH/PP7Cq9cGAZ3o7HJWstiEoanu1t9bp8x
-         Sqp7/QFfyfO7dkM/73jQ0VYsRJ1M3FLPDIVXdjjz5hDUhWDHPZivBykKJKZeI/ApSyA2
-         F4e/3Ac1OKSHlqxGbh4jyBuxtCxEaMDfrYpkh6k3+GdppMpWrDyxNnL/df+SGQnZvMzp
-         T4pQ==
-X-Gm-Message-State: AOJu0YwiDiQdxvEpbAaJcvGlyA/3MJyAQX9rSDrQFBC/FIl3Zi1+ee42
-	z5UB5jzx7hznmnTB3gH/S3m8bMSYA+BJOpOA9FlBEhgeTv7Lp+HKEbR4udgl/ybyCjbJWXjs9B2
-	3pOrFNQ==
-X-Google-Smtp-Source: AGHT+IEleXU6AO56sL1Ffo3R7yl8PCA/VHXbTByIKMTDyDAdpjv6mAuy4Yn1q8GPIS+x/U/g0Sv32OU9yJ8=
-X-Received: from pjvf8.prod.google.com ([2002:a17:90a:da88:b0:31c:2fe4:33be])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:48cf:b0:2fe:85f0:e115
- with SMTP id 98e67ed59e1d1-31f5de6c834mr785000a91.26.1753818259287; Tue, 29
- Jul 2025 12:44:19 -0700 (PDT)
-Date: Tue, 29 Jul 2025 12:44:17 -0700
-In-Reply-To: <CABgObfZWvtskg-m94LRHqN=_FtJpFtTzOi3sEhiAKZx1rzr=ng@mail.gmail.com>
+	s=arc-20240116; t=1753818290; c=relaxed/simple;
+	bh=cLeGkoZ1o66QsDAu3N0MCy3ZSDycTm5w1m7Jh7XwB88=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oLaolphE68attqI+n4GdXT0/6MQNXQ3l2kvxfi5IgCKIiLVzI2d74Nzq/UcWInj8GclTr3lbli/uTNxL80lpwqW55qx0dT5EQVtZBceWD9cqXFndcZXXvn0kqOhxKhtoiCjzXKYUuXJtoIbH8t8rSEMpyvOINklBupe4imQ3WIY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BA8F71516;
+	Tue, 29 Jul 2025 12:44:39 -0700 (PDT)
+Received: from [10.57.1.109] (unknown [10.57.1.109])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C2D313F66E;
+	Tue, 29 Jul 2025 12:44:43 -0700 (PDT)
+Message-ID: <8f912671-f1d9-4f73-9c1d-e39938bfc09f@arm.com>
+Date: Tue, 29 Jul 2025 20:44:21 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250725220713.264711-1-seanjc@google.com> <20250725220713.264711-13-seanjc@google.com>
- <CABgObfZWvtskg-m94LRHqN=_FtJpFtTzOi3sEhiAKZx1rzr=ng@mail.gmail.com>
-Message-ID: <aIkkkaqTbc9vG_x3@google.com>
-Subject: Re: [GIT PULL] KVM: x86: VMX changes for 6.17
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 10/10] vfio/pci: Add dma-buf export support for MMIO
+ regions
+To: Leon Romanovsky <leon@kernel.org>,
+ Alex Williamson <alex.williamson@redhat.com>
+Cc: Leon Romanovsky <leonro@nvidia.com>, Christoph Hellwig <hch@lst.de>,
+ Jason Gunthorpe <jgg@nvidia.com>, Andrew Morton <akpm@linux-foundation.org>,
+ Bjorn Helgaas <bhelgaas@google.com>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
+ Jens Axboe <axboe@kernel.dk>, =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?=
+ <jglisse@redhat.com>, Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+ linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-mm@kvack.org, linux-pci@vger.kernel.org,
+ Logan Gunthorpe <logang@deltatee.com>,
+ Marek Szyprowski <m.szyprowski@samsung.com>,
+ Sumit Semwal <sumit.semwal@linaro.org>,
+ Vivek Kasireddy <vivek.kasireddy@intel.com>, Will Deacon <will@kernel.org>
+References: <cover.1753274085.git.leonro@nvidia.com>
+ <aea452cc27ca9e5169f7279d7b524190c39e7260.1753274085.git.leonro@nvidia.com>
+From: Robin Murphy <robin.murphy@arm.com>
+Content-Language: en-GB
+In-Reply-To: <aea452cc27ca9e5169f7279d7b524190c39e7260.1753274085.git.leonro@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jul 28, 2025, Paolo Bonzini wrote:
-> On Sat, Jul 26, 2025 at 12:07=E2=80=AFAM Sean Christopherson <seanjc@goog=
-le.com> wrote:
-> >
-> > Add a sub-ioctl to allow getting TDX VMs into TEARDOWN before the last =
-reference
-> > to the VM is put, so that reclaiming the VM's memory doesn't have to ju=
-mp
-> > through all the hoops needed to reclaim memory from a live TD, which ar=
-e quite
-> > costly, especially for large VMs.
-> >
-> > The following changes since commit 347e9f5043c89695b01e66b3ed111755afcf=
-1911:
-> >
-> >   Linux 6.16-rc6 (2025-07-13 14:25:58 -0700)
-> >
-> > are available in the Git repository at:
-> >
-> >   https://github.com/kvm-x86/linux.git tags/kvm-x86-vmx-6.17
-> >
-> > for you to fetch changes up to dcab95e533642d8f733e2562b8bfa5715541e0cf=
-:
-> >
-> >   KVM: TDX: Add sub-ioctl KVM_TDX_TERMINATE_VM (2025-07-21 16:23:02 -07=
-00)
->=20
-> I haven't pulled this for now because I wonder if it's better to make
-> this a general-purpose ioctl and cap (plus a kvm_x86_ops hook).  The
-> faster teardown is a TDX module quirk, but for example would it be
-> useful if you could trigger kvm_vm_dead() in the selftests?
+On 2025-07-23 2:00 pm, Leon Romanovsky wrote:
+[...]
+> +static struct sg_table *
+> +vfio_pci_dma_buf_map(struct dma_buf_attachment *attachment,
+> +		     enum dma_data_direction dir)
+> +{
+> +	struct vfio_pci_dma_buf *priv = attachment->dmabuf->priv;
+> +	struct p2pdma_provider *provider = priv->vdev->provider;
+> +	struct dma_iova_state *state = attachment->priv;
+> +	struct phys_vec *phys_vec = &priv->phys_vec;
+> +	struct scatterlist *sgl;
+> +	struct sg_table *sgt;
+> +	dma_addr_t addr;
+> +	int ret;
+> +
+> +	dma_resv_assert_held(priv->dmabuf->resv);
+> +
+> +	sgt = kzalloc(sizeof(*sgt), GFP_KERNEL);
+> +	if (!sgt)
+> +		return ERR_PTR(-ENOMEM);
+> +
+> +	ret = sg_alloc_table(sgt, 1, GFP_KERNEL | __GFP_ZERO);
+> +	if (ret)
+> +		goto err_kfree_sgt;
+> +
+> +	sgl = sgt->sgl;
+> +
+> +	if (!state) {
+> +		addr = pci_p2pdma_bus_addr_map(provider, phys_vec->paddr);
+> +	} else if (dma_use_iova(state)) {
+> +		ret = dma_iova_link(attachment->dev, state, phys_vec->paddr, 0,
+> +				    phys_vec->len, dir, DMA_ATTR_SKIP_CPU_SYNC);
 
-I'm leaning "no" (leaning is probably an understatement).
+The supposed benefits of this API are only for replacing scatterlists 
+where multiple disjoint pages are being mapped. In this case with just 
+one single contiguous mapping, it is clearly objectively worse to have 
+to bounce in and out of the IOMMU layer 3 separate times and store a 
+dma_map_state, to achieve the exact same operations that a single call 
+to iommu_dma_map_resource() will perform more efficiently and with no 
+external state required.
 
-Mainly because I think the current behavior of vm_dead is a mistake.  Rejec=
-ting
-all ioctls if kvm->vm_dead is true sounds nice on paper, but in practice it=
- gives
-us a false sense of security due to the check happening before acquiring kv=
-m->lock,
-e.g. see the SEV-ES migration bug found by syzbot.
+Oh yeah, and mapping MMIO with regular memory attributes (IOMMU_CACHE) 
+rather than appropriate ones (IOMMU_MMIO), as this will end up doing, 
+isn't guaranteed not to end badly either (e.g. if the system 
+interconnect ends up merging consecutive write bursts and exceeding the 
+target root port's MPS.)
 
-Enforcing vm_dead with 100% accuracy would be painful given that there are =
-ioctls
-that deliberately avoid kvm->lock (vCPU ioctls could simply check KVM_REQ_V=
-M_DEAD),
-and I'm not at all convinced that truly making the VM off-limits is actuall=
-y
-desirable.  E.g. it prevents quickly freeing resources by nuking memslots.
+> +		if (ret)
+> +			goto err_free_table;
+> +
+> +		ret = dma_iova_sync(attachment->dev, state, 0, phys_vec->len);
+> +		if (ret)
+> +			goto err_unmap_dma;
+> +
+> +		addr = state->addr;
+> +	} else {
+> +		addr = dma_map_phys(attachment->dev, phys_vec->paddr,
+> +				    phys_vec->len, dir, DMA_ATTR_SKIP_CPU_SYNC);
 
-I do think it makes sense to reject ioctls if vm_bugged is set, because vm_=
-bugged
-is all about limiting the damage when something has already gone wrong, i.e=
-.
-providing any kind of ABI is very much a non-goal.
+And again, if the IOMMU is in bypass (the idea of P2P with vfio-noiommu 
+simply isn't worth entertaining) then what purpose do you imagine this 
+call serves at all, other than to hilariously crash under 
+"swiotlb=force"? Even in the case that phys_to_dma(phys_vec->paddr) != 
+phys_vec->paddr, in almost all circumstances (both hardware offsets and 
+CoCo environments with address-based aliasing), it is more likely than 
+not that the latter is still the address you want and the former is 
+wrong (and liable to lead to corruption or fatal system errors), because 
+MMIO and memory remain fundamentally different things.
 
-And if the vm_dead behavior is gone, I don't think a generic KVM_TERMINATE_=
-VM
-adds much, if any value.  Blocking KVM_RUN isn't terribly interesting, beca=
-use
-VMMs can already accomplish that with signals+immediate_exit, and AFAIK, re=
-al-world
-use cases don't have problems with KVM_RUN being called at unexpected times=
-.
+AFAICS you're *depending* on this call being an effective no-op, and 
+thus only demonstrating that the dma_map_phys() idea is still entirely 
+unnecessary.
 
-One thing that we've discussed internally (though not in much depth) is a w=
-ay to
-block accesses to guest memory, e.g. to guard against accesses to guest mem=
-ory
-while saving vCPU state during live migration, when the VMM might expect th=
-at
-guest memory is frozen, i.e. can't be dirtied.  But we wouldn't want to ter=
-minate
-the VM in that case, e.g. so that the VM could be resumed if the migration =
-is
-aborted at the last minute.
+> +		ret = dma_mapping_error(attachment->dev, addr);
+> +		if (ret)
+> +			goto err_free_table;
+> +	}
+> +
+> +	fill_sg_entry(sgl, phys_vec->len, addr);
+> +	return sgt;
+> +
+> +err_unmap_dma:
+> +	dma_iova_destroy(attachment->dev, state, phys_vec->len, dir,
+> +			 DMA_ATTR_SKIP_CPU_SYNC);
+> +err_free_table:
+> +	sg_free_table(sgt);
+> +err_kfree_sgt:
+> +	kfree(sgt);
+> +	return ERR_PTR(ret);
+> +}
+> +
+> +static void vfio_pci_dma_buf_unmap(struct dma_buf_attachment *attachment,
+> +				   struct sg_table *sgt,
+> +				   enum dma_data_direction dir)
+> +{
+> +	struct vfio_pci_dma_buf *priv = attachment->dmabuf->priv;
+> +	struct dma_iova_state *state = attachment->priv;
+> +	struct scatterlist *sgl;
+> +	int i;
+> +
+> +	if (!state)
+> +		; /* Do nothing */
+> +	else if (dma_use_iova(state))
+> +		dma_iova_destroy(attachment->dev, state, priv->phys_vec.len,
+> +				 dir, DMA_ATTR_SKIP_CPU_SYNC);
+> +	else
+> +		for_each_sgtable_dma_sg(sgt, sgl, i)
 
-So I think we want something more along the lines of KVM_PAUSE_VM, with spe=
-cific
-semantics and guarantees.
+The table always has exactly one entry...
 
-As for this pull request, I vote to drop it for 6.17 and give ourselves tim=
-e to
-figure out what we want to do with vm_dead.  I want to land "terminate VM" =
-in
-some form by 6.18 (as the next LTS), but AFAIK there's no rush to get it in=
-to
-6.17.
+Thanks,
+Robin.
 
-I posted a series with a slightly modified version of the KVM_TDX_TERMINATE=
-_VM
-patch[1] to show where I think we should go.  We discussed the topic in v4 =
-of the
-KVM_TDX_TERMINATE_VM patch[2], but I opted to post it separate (at the time=
-)
-because there wasn't a strict dependency.
-
-[1] https://lore.kernel.org/all/20250729193341.621487-1-seanjc@google.com
-[2] https://lore.kernel.org/all/aFNa7L74tjztduT-@google.com
-
-> As a side effect it would remove the supported_caps field and separate
-> namespace for KVM_TDX_CAP_* capabilities, at least for now.
+> +			dma_unmap_phys(attachment->dev, sg_dma_address(sgl),
+> +				       sg_dma_len(sgl), dir,
+> +				       DMA_ATTR_SKIP_CPU_SYNC);
+> +
+> +	sg_free_table(sgt);
+> +	kfree(sgt);
+> +}
 
