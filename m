@@ -1,323 +1,188 @@
-Return-Path: <kvm+bounces-53668-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53669-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDB78B1537D
-	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 21:35:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CEEFB153C1
+	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 21:44:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19BB34E7161
-	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 19:35:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4BC1A5A2C19
+	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 19:44:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6992D29A9FE;
-	Tue, 29 Jul 2025 19:33:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27208254AE1;
+	Tue, 29 Jul 2025 19:44:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JXE87pYp"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kMTF12wc"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB9DD29993E
-	for <kvm@vger.kernel.org>; Tue, 29 Jul 2025 19:33:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D97BB254876
+	for <kvm@vger.kernel.org>; Tue, 29 Jul 2025 19:44:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753817637; cv=none; b=UqguF9xDGRxJOz9gcm9GMp0RdPTE/Cfkgbfvz+WuQkNWOzrJWNoo7fA9sANDeU9owg8t/AOHWflZHYvv1wbPbCXmz5TGMj0HbqRs2AyPJseKBqEzrRIrrNRXGRxWYQWohHD5bgjDNx0v3FhxZLp67Lo04D/3fC3uPkti8HfWcyU=
+	t=1753818261; cv=none; b=EyVMa201h9bhhkcJzHDuT1mlKo766vrP9oJPYRTwL0q6xq/wdufhfCEmLEBPEpS144lf6mLv2uW+WCKKpz5AA8UPmEtC5ctLRUUEaXgdePQ6nWzTsBnYnk8RvjxoSdtq/5jXxTabf9kkOY53DkIROayLnA1IEVzlHY+lBD6lrys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753817637; c=relaxed/simple;
-	bh=GezEG6D+dGW2ASk1t1mkWRtt3ji/dNz8mwQjkZHk1gk=;
+	s=arc-20240116; t=1753818261; c=relaxed/simple;
+	bh=4NhlkQG5nwfS/M+XM7YALx4FrZl/obGidC+Z8jkLhZE=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=WSEKsgLBFfU1PtzXhoPPUXFCnDYFOxOtBK9fbmrblio2E1u3ygozhKTbgCJKSrI83UL35a0Dry8QYHohdVqjU6NTaJI0YOUTT+Io2KGM3vw/FH8MBPpt097KOivDapIQa6kXeFFXGxaYqgSI/whufI2WjZE0/MrhehfuYtBCJiA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JXE87pYp; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=CGaF1nqnl1v3IDqZqJ/tC00hyUHy7fmSVlZwnpqGy3PnZvogkpvsS2uIWs8JpP2Rp2fdDHaUg35uQh52yOnzT3LQ0dOBDudBm1BUIo/hzvWlC6YgWzzc1npgTG2wygMWdM3i5ZecQ/hWDaPYtBbKCXgYv2Py+3p76wAm3wK1v5k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kMTF12wc; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-315af08594fso5826277a91.2
-        for <kvm@vger.kernel.org>; Tue, 29 Jul 2025 12:33:55 -0700 (PDT)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b3928ad6176so102424a12.3
+        for <kvm@vger.kernel.org>; Tue, 29 Jul 2025 12:44:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753817635; x=1754422435; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=LRgTVb6HxivGsODMp4kE86IHTk8ygg+wPbdHcPP2xOg=;
-        b=JXE87pYphuTyhvNjf1jT2DbiwheL7uzaf7PQ1fnD0sQZ27L0EVodT+iOz7M+5njpZr
-         aqTOfS7al0xe4aph6tcM7+bIF2lB7k5i9PvI7Z993z6m7s2yL13ghoejYGtTngonEPew
-         xUpSPTtzv93Xph8wEtVeLRC9GvBXeWY02Cp4kzQTj+bkdx2EjfDPWHqD7iCco2BP+L86
-         48/lzoXXGopOD23gc8veDndoiG9b56WS4fsbPO2eoUnrACMhpkiwjQtnEnZSpb8PFqvo
-         lSbnSVCDKj6VIXRKGzg10Tjj0KpnTwh7fT1Km0gwrU+Jg/vSx3fc1bi0Ffz142QbZizF
-         0WCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753817635; x=1754422435;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=google.com; s=20230601; t=1753818259; x=1754423059; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=LRgTVb6HxivGsODMp4kE86IHTk8ygg+wPbdHcPP2xOg=;
-        b=sfy8MjxxNZ147AoEItXg4CNnHVWDH8HJKwqcaYvOvv2GN1HpyqFSxEdHG/6HleuMXK
-         vTGYSKbGK6K1txGTpX4UuzRn2dcv3uaF0whd4pc3i4DtFG1o3M6cAOKCYYgyFw5M4vRU
-         +v3unaUJXdEO58C/LdwIDlEa50wuEMX6T5UgKFN1Bgat38ihpBoCBhCMYdl+bk9kxCom
-         TBHIXuvQdF2sQzT7vUEESjfUnD0R3FYVBfnOTgEATOJTQHw8PM9w96XyCbC6Rf9TJL4P
-         TPE+Mv6z9F5QwH+szRoxOaIagWZ5jKEpwZ1TOroXtbg8eiQ5eNek+aKclaOEGpWZO7ff
-         Vizg==
-X-Forwarded-Encrypted: i=1; AJvYcCUCQwPOeCKDP5Um6K1wAeRSQXgjH3JskhhwJSGuAyacdzDtHcxnO+6awfF9NETvFXq/oLM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yybo2ov22pCfVFVZ5sjZzEivc/FWWxMXOpOBg0F3qXQqx71fdMe
-	XMddFIN2ohrKHkPfayVGFyyARaK7YWNk7Swnp3HCAD1sLtG9x+qXcwI7rlFFyVCUhng8FIR7tLP
-	ru0oqLA==
-X-Google-Smtp-Source: AGHT+IG/gL3d24hNw5SUEuxjxjut5eSNrEkkhi5cedOb5e+QFzIszFgoNw0OLcITFvyVJnRdvLf93b3+R4g=
-X-Received: from pjqo23.prod.google.com ([2002:a17:90a:ac17:b0:31f:f3:f8c3])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5285:b0:312:f650:c795
- with SMTP id 98e67ed59e1d1-31f5de54b6dmr784023a91.21.1753817635200; Tue, 29
- Jul 2025 12:33:55 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 29 Jul 2025 12:33:40 -0700
-In-Reply-To: <20250729193341.621487-1-seanjc@google.com>
+        bh=eVG8KH1bhcF8abnqt3jf4aA5/80VQ7aWwN+Mg1mK9eE=;
+        b=kMTF12wcbu2OwFgglDZ207JD29OJ7e7QaoRal8valC9XRKwQgJ/zK5VpXmYhEHzIxB
+         JFpQKmP9pdtrzKun43unC5XXiXcfdrvPf1RBFNFjXZicRQ5Mo69McMCKeRj9keqyOriD
+         mCpfnDHgimhZHLkMP9aTHDU3UVaszgyP8jYvEZx6FnvoNMaWl0fmnV80Qw4W9+Ymz7Ha
+         CW7rszlX6xqf3p1MZE7ELRwZoQ9A5y5UtHBuda15WPapflkLmR7afDkDRZclFJU/AeGR
+         G9Gh7exuEWa5njItMqMYeW8s3vZFx9wqjjCv8Vdr7lB1LalRjcHV46mPgsCH1i2hd55Q
+         blxw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753818259; x=1754423059;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=eVG8KH1bhcF8abnqt3jf4aA5/80VQ7aWwN+Mg1mK9eE=;
+        b=ODShCiJF/Xcq3YPeg5lnEzG5MK50DBSi/OInc6qoGBOT2P31KP18bH7mNFdWH4wi93
+         +GTQtqz5myvcCaJYH/e8hXoW/OfMK+ZwbVJACjyDEAMO591uoTUkqiwMl/j0Uem4jmh2
+         fQ3oHlOrFSTnBRelW8yGD351yvignqjuY3FH/PP7Cq9cGAZ3o7HJWstiEoanu1t9bp8x
+         Sqp7/QFfyfO7dkM/73jQ0VYsRJ1M3FLPDIVXdjjz5hDUhWDHPZivBykKJKZeI/ApSyA2
+         F4e/3Ac1OKSHlqxGbh4jyBuxtCxEaMDfrYpkh6k3+GdppMpWrDyxNnL/df+SGQnZvMzp
+         T4pQ==
+X-Gm-Message-State: AOJu0YwiDiQdxvEpbAaJcvGlyA/3MJyAQX9rSDrQFBC/FIl3Zi1+ee42
+	z5UB5jzx7hznmnTB3gH/S3m8bMSYA+BJOpOA9FlBEhgeTv7Lp+HKEbR4udgl/ybyCjbJWXjs9B2
+	3pOrFNQ==
+X-Google-Smtp-Source: AGHT+IEleXU6AO56sL1Ffo3R7yl8PCA/VHXbTByIKMTDyDAdpjv6mAuy4Yn1q8GPIS+x/U/g0Sv32OU9yJ8=
+X-Received: from pjvf8.prod.google.com ([2002:a17:90a:da88:b0:31c:2fe4:33be])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:48cf:b0:2fe:85f0:e115
+ with SMTP id 98e67ed59e1d1-31f5de6c834mr785000a91.26.1753818259287; Tue, 29
+ Jul 2025 12:44:19 -0700 (PDT)
+Date: Tue, 29 Jul 2025 12:44:17 -0700
+In-Reply-To: <CABgObfZWvtskg-m94LRHqN=_FtJpFtTzOi3sEhiAKZx1rzr=ng@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250729193341.621487-1-seanjc@google.com>
-X-Mailer: git-send-email 2.50.1.552.g942d659e1b-goog
-Message-ID: <20250729193341.621487-6-seanjc@google.com>
-Subject: [PATCH 5/5] KVM: TDX: Add sub-ioctl KVM_TDX_TERMINATE_VM
+References: <20250725220713.264711-1-seanjc@google.com> <20250725220713.264711-13-seanjc@google.com>
+ <CABgObfZWvtskg-m94LRHqN=_FtJpFtTzOi3sEhiAKZx1rzr=ng@mail.gmail.com>
+Message-ID: <aIkkkaqTbc9vG_x3@google.com>
+Subject: Re: [GIT PULL] KVM: x86: VMX changes for 6.17
 From: Sean Christopherson <seanjc@google.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Adrian Hunter <adrian.hunter@intel.com>, Vishal Annapurve <vannapurve@google.com>, 
-	Xiaoyao Li <xiaoyao.li@intel.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
-	Nikolay Borisov <nik.borisov@suse.com>
-Content-Type: text/plain; charset="UTF-8"
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add sub-ioctl KVM_TDX_TERMINATE_VM to release the HKID prior to shutdown,
-which enables more efficient reclaim of private memory.
+On Mon, Jul 28, 2025, Paolo Bonzini wrote:
+> On Sat, Jul 26, 2025 at 12:07=E2=80=AFAM Sean Christopherson <seanjc@goog=
+le.com> wrote:
+> >
+> > Add a sub-ioctl to allow getting TDX VMs into TEARDOWN before the last =
+reference
+> > to the VM is put, so that reclaiming the VM's memory doesn't have to ju=
+mp
+> > through all the hoops needed to reclaim memory from a live TD, which ar=
+e quite
+> > costly, especially for large VMs.
+> >
+> > The following changes since commit 347e9f5043c89695b01e66b3ed111755afcf=
+1911:
+> >
+> >   Linux 6.16-rc6 (2025-07-13 14:25:58 -0700)
+> >
+> > are available in the Git repository at:
+> >
+> >   https://github.com/kvm-x86/linux.git tags/kvm-x86-vmx-6.17
+> >
+> > for you to fetch changes up to dcab95e533642d8f733e2562b8bfa5715541e0cf=
+:
+> >
+> >   KVM: TDX: Add sub-ioctl KVM_TDX_TERMINATE_VM (2025-07-21 16:23:02 -07=
+00)
+>=20
+> I haven't pulled this for now because I wonder if it's better to make
+> this a general-purpose ioctl and cap (plus a kvm_x86_ops hook).  The
+> faster teardown is a TDX module quirk, but for example would it be
+> useful if you could trigger kvm_vm_dead() in the selftests?
 
-Private memory is removed from MMU/TDP when guest_memfds are closed.  If
-the HKID has not been released, the TDX VM is still in the RUNNABLE state,
-and so pages must be removed using "Dynamic Page Removal" procedure (refer
-to the TDX Module Base spec) which involves a number of steps:
-	Block further address translation
-	Exit each VCPU
-	Clear Secure EPT entry
-	Flush/write-back/invalidate relevant caches
+I'm leaning "no" (leaning is probably an understatement).
 
-However, when the HKID is released, the TDX VM moves to TD_TEARDOWN state,
-where all TDX VM pages are effectively unmapped, so pages can be reclaimed
-directly.
+Mainly because I think the current behavior of vm_dead is a mistake.  Rejec=
+ting
+all ioctls if kvm->vm_dead is true sounds nice on paper, but in practice it=
+ gives
+us a false sense of security due to the check happening before acquiring kv=
+m->lock,
+e.g. see the SEV-ES migration bug found by syzbot.
 
-Reclaiming TD Pages in TD_TEARDOWN State was seen to decrease the total
-reclaim time.  For example:
+Enforcing vm_dead with 100% accuracy would be painful given that there are =
+ioctls
+that deliberately avoid kvm->lock (vCPU ioctls could simply check KVM_REQ_V=
+M_DEAD),
+and I'm not at all convinced that truly making the VM off-limits is actuall=
+y
+desirable.  E.g. it prevents quickly freeing resources by nuking memslots.
 
-  VCPUs    Size (GB)    Before (secs)    After (secs)
-      4           18		   72              24
-     32          107		  517             134
-     64          400		 5539             467
+I do think it makes sense to reject ioctls if vm_bugged is set, because vm_=
+bugged
+is all about limiting the damage when something has already gone wrong, i.e=
+.
+providing any kind of ABI is very much a non-goal.
 
-Add kvm_tdx_capabilities.supported_caps along with KVM_TDX_CAP_TERMINATE_VM
-to advertise support to userspace.  Use a new field in kvm_tdx_capabilities
-instead of adding yet another generic KVM_CAP to avoid bleeding TDX details
-into common code (and #ifdefs), and so that userspace can query TDX
-capabilities in one shot.  Enumerating capabilities as a mask of bits does
-limit supported_caps to 64 capabilities, but in the unlikely event KVM
-needs to enumerate more than 64 TDX capabilities, there are another 249
-u64 entries reserved for future expansion.
+And if the vm_dead behavior is gone, I don't think a generic KVM_TERMINATE_=
+VM
+adds much, if any value.  Blocking KVM_RUN isn't terribly interesting, beca=
+use
+VMMs can already accomplish that with signals+immediate_exit, and AFAIK, re=
+al-world
+use cases don't have problems with KVM_RUN being called at unexpected times=
+.
 
-To preserve the KVM_BUG_ON() sanity check that deals with HKID assignment,
-track if a TD is terminated and assert that, when an S-EPT entry is
-removed, either the TD has an assigned HKID or the TD was explicitly
-terminated.
+One thing that we've discussed internally (though not in much depth) is a w=
+ay to
+block accesses to guest memory, e.g. to guard against accesses to guest mem=
+ory
+while saving vCPU state during live migration, when the VMM might expect th=
+at
+guest memory is frozen, i.e. can't be dirtied.  But we wouldn't want to ter=
+minate
+the VM in that case, e.g. so that the VM could be resumed if the migration =
+is
+aborted at the last minute.
 
-Link: https://lore.kernel.org/r/Z-V0qyTn2bXdrPF7@google.com
-Link: https://lore.kernel.org/r/aAL4dT1pWG5dDDeo@google.com
-Co-developed-by: Adrian Hunter <adrian.hunter@intel.com>
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
-Acked-by: Vishal Annapurve <vannapurve@google.com>
-Tested-by: Vishal Annapurve <vannapurve@google.com>
-Tested-by: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: Rick Edgecombe <rick.p.edgecombe@intel.com>
-Cc: Nikolay Borisov <nik.borisov@suse.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- Documentation/virt/kvm/x86/intel-tdx.rst | 22 +++++++++++++-
- arch/x86/include/uapi/asm/kvm.h          |  7 ++++-
- arch/x86/kvm/vmx/tdx.c                   | 37 +++++++++++++++++++-----
- arch/x86/kvm/vmx/tdx.h                   |  1 +
- 4 files changed, 57 insertions(+), 10 deletions(-)
+So I think we want something more along the lines of KVM_PAUSE_VM, with spe=
+cific
+semantics and guarantees.
 
-diff --git a/Documentation/virt/kvm/x86/intel-tdx.rst b/Documentation/virt/kvm/x86/intel-tdx.rst
-index 5efac62c92c7..bcfa97e0c9e7 100644
---- a/Documentation/virt/kvm/x86/intel-tdx.rst
-+++ b/Documentation/virt/kvm/x86/intel-tdx.rst
-@@ -38,6 +38,7 @@ ioctl with TDX specific sub-ioctl() commands.
-           KVM_TDX_INIT_MEM_REGION,
-           KVM_TDX_FINALIZE_VM,
-           KVM_TDX_GET_CPUID,
-+          KVM_TDX_TERMINATE_VM,
- 
-           KVM_TDX_CMD_NR_MAX,
-   };
-@@ -92,7 +93,10 @@ to be configured to the TDX guest.
-         __u64 kernel_tdvmcallinfo_1_r12;
-         __u64 user_tdvmcallinfo_1_r12;
- 
--        __u64 reserved[250];
-+        /* Misc capabilities enumerated via the KVM_TDX_CAP_* namespace. */
-+        __u64 supported_caps;
-+
-+        __u64 reserved[249];
- 
-         /* Configurable CPUID bits for userspace */
-         struct kvm_cpuid2 cpuid;
-@@ -227,6 +231,22 @@ struct kvm_cpuid2.
- 	  __u32 padding[3];
-   };
- 
-+KVM_TDX_TERMINATE_VM
-+--------------------
-+:Capability: KVM_TDX_CAP_TERMINATE_VM
-+:Type: vm ioctl
-+:Returns: 0 on success, <0 on error
-+
-+Release Host Key ID (HKID) to allow more efficient reclaim of private memory.
-+After this, the TD is no longer in a runnable state.
-+
-+Using KVM_TDX_TERMINATE_VM is optional.
-+
-+- id: KVM_TDX_TERMINATE_VM
-+- flags: must be 0
-+- data: must be 0
-+- hw_error: must be 0
-+
- KVM TDX creation flow
- =====================
- In addition to the standard KVM flow, new TDX ioctls need to be called.  The
-diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-index 0f15d683817d..e019111e2150 100644
---- a/arch/x86/include/uapi/asm/kvm.h
-+++ b/arch/x86/include/uapi/asm/kvm.h
-@@ -940,6 +940,7 @@ enum kvm_tdx_cmd_id {
- 	KVM_TDX_INIT_MEM_REGION,
- 	KVM_TDX_FINALIZE_VM,
- 	KVM_TDX_GET_CPUID,
-+	KVM_TDX_TERMINATE_VM,
- 
- 	KVM_TDX_CMD_NR_MAX,
- };
-@@ -962,6 +963,8 @@ struct kvm_tdx_cmd {
- 	__u64 hw_error;
- };
- 
-+#define KVM_TDX_CAP_TERMINATE_VM       _BITULL(0)
-+
- struct kvm_tdx_capabilities {
- 	__u64 supported_attrs;
- 	__u64 supported_xfam;
-@@ -971,7 +974,9 @@ struct kvm_tdx_capabilities {
- 	__u64 kernel_tdvmcallinfo_1_r12;
- 	__u64 user_tdvmcallinfo_1_r12;
- 
--	__u64 reserved[250];
-+	__u64 supported_caps;
-+
-+	__u64 reserved[249];
- 
- 	/* Configurable CPUID bits for userspace */
- 	struct kvm_cpuid2 cpuid;
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index c2ef03f39c32..ae059daf1a20 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -188,6 +188,8 @@ static int init_kvm_tdx_caps(const struct tdx_sys_info_td_conf *td_conf,
- 	if (!caps->supported_xfam)
- 		return -EIO;
- 
-+	caps->supported_caps = KVM_TDX_CAP_TERMINATE_VM;
-+
- 	caps->cpuid.nent = td_conf->num_cpuid_config;
- 
- 	caps->user_tdvmcallinfo_1_r11 =
-@@ -520,6 +522,7 @@ void tdx_mmu_release_hkid(struct kvm *kvm)
- 		goto out;
- 	}
- 
-+	write_lock(&kvm->mmu_lock);
- 	for_each_online_cpu(i) {
- 		if (packages_allocated &&
- 		    cpumask_test_and_set_cpu(topology_physical_package_id(i),
-@@ -544,7 +547,7 @@ void tdx_mmu_release_hkid(struct kvm *kvm)
- 	} else {
- 		tdx_hkid_free(kvm_tdx);
- 	}
--
-+	write_unlock(&kvm->mmu_lock);
- out:
- 	mutex_unlock(&tdx_lock);
- 	cpus_read_unlock();
-@@ -1884,13 +1887,13 @@ static int tdx_sept_remove_private_spte(struct kvm *kvm, gfn_t gfn,
- 	struct page *page = pfn_to_page(pfn);
- 	int ret;
- 
--	/*
--	 * HKID is released after all private pages have been removed, and set
--	 * before any might be populated. Warn if zapping is attempted when
--	 * there can't be anything populated in the private EPT.
--	 */
--	if (KVM_BUG_ON(!is_hkid_assigned(to_kvm_tdx(kvm)), kvm))
--		return -EINVAL;
-+	if (!is_hkid_assigned(to_kvm_tdx(kvm))) {
-+		KVM_BUG_ON(!to_kvm_tdx(kvm)->vm_terminated, kvm);
-+		ret = tdx_reclaim_page(page);
-+		if (!ret)
-+			tdx_unpin(kvm, page);
-+		return ret;
-+	}
- 
- 	ret = tdx_sept_zap_private_spte(kvm, gfn, level, page);
- 	if (ret <= 0)
-@@ -2884,6 +2887,21 @@ static int tdx_td_finalize(struct kvm *kvm, struct kvm_tdx_cmd *cmd)
- 	return 0;
- }
- 
-+static int tdx_terminate_vm(struct kvm *kvm)
-+{
-+	if (kvm_trylock_all_vcpus(kvm))
-+		return -EBUSY;
-+
-+	kvm_vm_dead(kvm);
-+	to_kvm_tdx(kvm)->vm_terminated = true;
-+
-+	kvm_unlock_all_vcpus(kvm);
-+
-+	tdx_mmu_release_hkid(kvm);
-+
-+	return 0;
-+}
-+
- int tdx_vm_ioctl(struct kvm *kvm, void __user *argp)
- {
- 	struct kvm_tdx_cmd tdx_cmd;
-@@ -2911,6 +2929,9 @@ int tdx_vm_ioctl(struct kvm *kvm, void __user *argp)
- 	case KVM_TDX_FINALIZE_VM:
- 		r = tdx_td_finalize(kvm, &tdx_cmd);
- 		break;
-+	case KVM_TDX_TERMINATE_VM:
-+		r = tdx_terminate_vm(kvm);
-+		break;
- 	default:
- 		r = -EINVAL;
- 		goto out;
-diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
-index ca39a9391db1..0abe70aa1644 100644
---- a/arch/x86/kvm/vmx/tdx.h
-+++ b/arch/x86/kvm/vmx/tdx.h
-@@ -45,6 +45,7 @@ struct kvm_tdx {
- 	 * Set/unset is protected with kvm->mmu_lock.
- 	 */
- 	bool wait_for_sept_zap;
-+	bool vm_terminated;
- };
- 
- /* TDX module vCPU states */
--- 
-2.50.1.552.g942d659e1b-goog
+As for this pull request, I vote to drop it for 6.17 and give ourselves tim=
+e to
+figure out what we want to do with vm_dead.  I want to land "terminate VM" =
+in
+some form by 6.18 (as the next LTS), but AFAIK there's no rush to get it in=
+to
+6.17.
 
+I posted a series with a slightly modified version of the KVM_TDX_TERMINATE=
+_VM
+patch[1] to show where I think we should go.  We discussed the topic in v4 =
+of the
+KVM_TDX_TERMINATE_VM patch[2], but I opted to post it separate (at the time=
+)
+because there wasn't a strict dependency.
+
+[1] https://lore.kernel.org/all/20250729193341.621487-1-seanjc@google.com
+[2] https://lore.kernel.org/all/aFNa7L74tjztduT-@google.com
+
+> As a side effect it would remove the supported_caps field and separate
+> namespace for KVM_TDX_CAP_* capabilities, at least for now.
 
