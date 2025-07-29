@@ -1,372 +1,183 @@
-Return-Path: <kvm+bounces-53650-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53651-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BDA4B151FB
-	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 19:18:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAC82B15231
+	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 19:42:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 29ACA18A2664
-	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 17:18:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E04BE17CB7C
+	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 17:42:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 845FD298981;
-	Tue, 29 Jul 2025 17:18:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE86129993E;
+	Tue, 29 Jul 2025 17:42:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Pbp+1c7l"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XqoIF3wN"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5D2F23DE
-	for <kvm@vger.kernel.org>; Tue, 29 Jul 2025 17:18:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46CCA221FDA
+	for <kvm@vger.kernel.org>; Tue, 29 Jul 2025 17:42:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753809498; cv=none; b=PUdIqZjbZ5d5b7k2DX0A/7ahuTrOXSTvbmf2TV4CoQ0cZ9Xjdhv99Z53glqIlg71CWNCG55b8wNmei/EGgmCRsvj0Z+m+zF4K9aOqyFBO8hL5LJsaZ81EchQxPx16QokfQtdjb8Yl7wMUpjJV33XX3NVUI6THT+AzZo/sGR3en4=
+	t=1753810965; cv=none; b=LEh5x3HAMPY7ing3CGe4LGPD4V8CUKP2lVAvEgSoXaj0RAbKRP8xPK5FDLatKiCqMgehNyvmqooHtGUMj4Vhsgtxk3nGpLQvRVgv9/v6OO6ZfUUGt3f5++o2DjmUxLZN+4/vjKvfycXq/FQ3VW0skdivuv2n2aC9GjAHGOhTum8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753809498; c=relaxed/simple;
-	bh=GWDWhdH26Caylm1v2ivtBYL6rXFywuaUee8O1raNKSM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pJZkAYJBL/UoFOlam3XRs21L31gpp+NqslPXM/MVgtPxXldB8uuAqr8+8DCY0RPni3tIQezqvLmrQpUz95D+17vQnQm3slIade6no6D9pxmHFwDFU3wHa1lRMVJo52JUM8aO3GTaJ340RV3+iiWH5AubSKD2PqXanKTMMoS9kJ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Pbp+1c7l; arc=none smtp.client-ip=91.218.175.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Tue, 29 Jul 2025 10:17:55 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1753809480;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RWmyWk3UH2r2gU8pWV2PhLYcz/11nNhygdaQYB9c3fc=;
-	b=Pbp+1c7lkbRxJOEkHSEm5J4fvAE1azx9VoonNKoGbDcX7IlD3ihyXY5fX8DrVFtc4d/eWu
-	VivsC2PhUMHY4lfmRO0HfuT/07o1uOBdcX3eM7mnuQhkzr/ywzCkGRT1glpTJFU434gKNP
-	+h0XQHEFfTbAyYUivZgXvV92dhtQ82o=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
-	kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [GIT PULL] KVM/arm64 changes for 6.17, round #1
-Message-ID: <aIkCQyKd7Ua0mNHX@linux.dev>
-References: <aIe-v1QP-VvaOONC@linux.dev>
- <CABgObfZZxW2seq+B9OdSPG71-SywbTkmUEw1xKONX73QLjDTjQ@mail.gmail.com>
+	s=arc-20240116; t=1753810965; c=relaxed/simple;
+	bh=e7H65OUTTySjbVhc8bnRw+W3Xmwc3ESREGLczzyVkRw=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ifSG+XGRSI7eh/GCLCNtSNuiWeURjpgER13Cnmeez0ne7YHn1RYDjQ9lWaPKxhAF5TA97duKS9rMoMogeBxitLpdyqBcx9OVETkf9KZiWA/gy1GqJw9ATW9RqhYv9x2aqUd1FmErkj7j86YFV1jQo8v77tESVWG5+mCYEPec/k8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XqoIF3wN; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-31eac278794so3294054a91.3
+        for <kvm@vger.kernel.org>; Tue, 29 Jul 2025 10:42:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1753810961; x=1754415761; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=82FN5fIR/hwkzJS9jFM+jcYFsAggMEElUtfqK1j0Xxw=;
+        b=XqoIF3wNBNXflx66ataHWznDp2fURzByURZid/z1hQt5FuBQmx6cNCRiOcgAWDPzSO
+         R6/k0GVWZePqYmVc+pJeRZRDiVdAKoRQr7fgwX7olNm9tu2iLaNT/PHae5V1shBhiWeb
+         U3wflnnHUCN9BN+9DDfIblw2QIPtBRcmedDYBKadi2kwppStXrvhmEyeOTqVuZnkiw5x
+         3YU4aCCWMlsB1uTQ0HrombvUqmWl+IFpxraxqnYJd2VYyCFkeZqJCwcPkIsFD+bAkMbP
+         gjQ61f/iqhv9gk4OygRbmzT9K+fE9QJSvrvjUzkjvrg1Q2XaiND9wsbRIjml9A0lJ6Hj
+         Zkgw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753810961; x=1754415761;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=82FN5fIR/hwkzJS9jFM+jcYFsAggMEElUtfqK1j0Xxw=;
+        b=c+mYXUNlAZVf8/ObDYoSCUS2bgZNFKRI2PAFo5oAWDhsArnL33yZriwPZrkc6U0Seq
+         RQXnk1XD+EYpkVfg375A9Hvcx4rcP0uIIxYeWNCXvPP/HubTYrP5bnqscTRgFIGMeqci
+         2HGMWL90PULDP/mIzlA+Pd38VfE29mWdaVAcBClEUaNwSKi+vQDYIf7vjdC1FOSKRvGt
+         d8Q34LrZNDRiJz6w7r8SDApurGCMCIvkWxGb332s+Ixql2HP82e1BXLJ2CktSOm1kcs8
+         ox1SvUVv4d5CWotkpm364bz87p7E94gvoXZWSGyTelQLrC4udyxWWD/YcESEh91vy8FJ
+         TW6g==
+X-Forwarded-Encrypted: i=1; AJvYcCXdO2aPoqTmx1T6/ZpWNTu3TnBrRrP+SU4c0DDFMY3Xuvd1PZ3thtTW43oqx+NoGktTbxw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxACWIKncjaNH+cp2EkxdIQ8RvtLysjJrjb07vimXIVrT9EJ0uH
+	k1vB/CfOh7V2eVu7vntadxO4qjD5hZQCohgiDsgIqe68FtK9c3WwcZkIvJqavdQHHCWSmAJU7Iv
+	Gq/pEJQ==
+X-Google-Smtp-Source: AGHT+IHL9uyOCJhKfXzpWPYdk2ktpEDltn10+YA1InNR0RiEZWVGuenP/JjoNtMCTI8JhTdD+YDYzrbjaOw=
+X-Received: from pjv8.prod.google.com ([2002:a17:90b:5648:b0:31f:37f:d381])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:e706:b0:312:daf3:bac9
+ with SMTP id 98e67ed59e1d1-31f5de69a49mr434036a91.34.1753810961444; Tue, 29
+ Jul 2025 10:42:41 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Tue, 29 Jul 2025 10:42:32 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CABgObfZZxW2seq+B9OdSPG71-SywbTkmUEw1xKONX73QLjDTjQ@mail.gmail.com>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.50.1.552.g942d659e1b-goog
+Message-ID: <20250729174238.593070-1-seanjc@google.com>
+Subject: [PATCH 0/6] KVM: Export KVM-internal symbols for sub-modules only
+From: Sean Christopherson <seanjc@google.com>
+To: Madhavan Srinivasan <maddy@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
+	Andy Lutomirski <luto@kernel.org>, Xin Li <xin@zytor.com>, "H. Peter Anvin" <hpa@zytor.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
+	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, Josh Poimboeuf <jpoimboe@kernel.org>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, "Kirill A. Shutemov" <kas@kernel.org>, 
+	Tony Krowiak <akrowiak@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, 
+	Jason Herne <jjherne@linux.ibm.com>, Harald Freudenberger <freude@linux.ibm.com>, 
+	Holger Dengler <dengler@linux.ibm.com>
+Cc: linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, 
+	linux-sgx@vger.kernel.org, x86@kernel.org, linux-coco@lists.linux.dev, 
+	linux-s390@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Jul 29, 2025 at 07:12:07PM +0200, Paolo Bonzini wrote:
-> On Mon, Jul 28, 2025 at 8:17 PM Oliver Upton <oliver.upton@linux.dev> wrote:
-> >
-> > Hi Paolo,
-> >
-> > Here's the first round of changes for 6.17.
-> >
-> > A very unusual inclusion that you should know about is the GICv5 host driver.
-> > Thomas was OK with the driver going through the kvmarm tree [*] as there aren't
-> > any conflicts and Sascha's series adds some KVM support on top.
-> >
-> > Otherwise, we've got the usual mix (details in the tag) with some reduction
-> > of the NV v. non-NV feature gap.
-> 
-> Pulled, thanks.
+Use the newfangled EXPORT_SYMBOL_GPL_FOR_MODULES() along with some macro
+shenanigans to export KVM-internal symbols if and only if KVM has one or
+more sub-modules, and only for those sub-modules, e.g. x86's kvm-amd.ko
+and/or kvm-intel.ko.
 
-Thanks!
+Patch 5 gives KVM x86 the full treatment.  If anyone wants to tackle PPC,
+it should be doable to restrict KVM PPC's exports as well.
 
-Can you apply this patch on top [*]? Mistake in documentation markup
-that broke docs builds in -next.
+Patch 6 is essentially an RFC; it compiles and is tested, but it probably
+should be chunked into multiple patches.  The main reason I included it
+here is to get feedback on using kvm_types.h to define the "for KVM" macros.
+For KVM itself, kvm_types.h is a solid choice, but it feels a bit awkward
+for non-KVM usage, and including linux/kvm_types.h in non-KVM generic code,
+e.g. in kernel/, isn't viable at the moment because asm/kvm_types.h is only
+provided by architectures that actually support KVM.
 
-Otherwise I can send you another pull if you prefer.
+Based on kvm/queue.
 
-[*]: https://lore.kernel.org/kvmarm/20250729152242.3232229-1-oliver.upton@linux.dev/
+Sean Christopherson (6):
+  KVM: s390/vfio-ap: Use kvm_is_gpa_in_memslot() instead of open coded
+    equivalent
+  KVM: Export KVM-internal symbols for sub-modules only
+  KVM: x86: Move kvm_intr_is_single_vcpu() to lapic.c
+  KVM: x86: Drop pointless exports of kvm_arch_xxx() hooks
+  KVM: x86: Export KVM-internal symbols for sub-modules only
+  x86: Restrict KVM-induced symbol exports to KVM modules where
+    obvious/possible
 
-Thanks,
-Oliver
+ arch/powerpc/include/asm/kvm_types.h |  15 ++
+ arch/s390/include/asm/kvm_host.h     |   2 +
+ arch/s390/kvm/priv.c                 |   8 +
+ arch/x86/entry/entry.S               |   7 +-
+ arch/x86/entry/entry_64_fred.S       |   3 +-
+ arch/x86/events/amd/core.c           |   5 +-
+ arch/x86/events/core.c               |   7 +-
+ arch/x86/events/intel/lbr.c          |   3 +-
+ arch/x86/events/intel/pt.c           |   7 +-
+ arch/x86/include/asm/kvm_host.h      |   3 -
+ arch/x86/include/asm/kvm_types.h     |  15 ++
+ arch/x86/kernel/apic/apic.c          |   3 +-
+ arch/x86/kernel/apic/apic_common.c   |   3 +-
+ arch/x86/kernel/cpu/amd.c            |   4 +-
+ arch/x86/kernel/cpu/bugs.c           |  17 +--
+ arch/x86/kernel/cpu/bus_lock.c       |   3 +-
+ arch/x86/kernel/cpu/common.c         |   7 +-
+ arch/x86/kernel/cpu/sgx/main.c       |   3 +-
+ arch/x86/kernel/cpu/sgx/virt.c       |   5 +-
+ arch/x86/kernel/e820.c               |   3 +-
+ arch/x86/kernel/fpu/core.c           |  21 +--
+ arch/x86/kernel/fpu/xstate.c         |   7 +-
+ arch/x86/kernel/hw_breakpoint.c      |   3 +-
+ arch/x86/kernel/irq.c                |   3 +-
+ arch/x86/kernel/kvm.c                |   5 +-
+ arch/x86/kernel/nmi.c                |   5 +-
+ arch/x86/kernel/process_64.c         |   5 +-
+ arch/x86/kernel/reboot.c             |   5 +-
+ arch/x86/kernel/tsc.c                |   1 +
+ arch/x86/kvm/cpuid.c                 |  10 +-
+ arch/x86/kvm/hyperv.c                |   4 +-
+ arch/x86/kvm/irq.c                   |  34 +----
+ arch/x86/kvm/kvm_onhyperv.c          |   6 +-
+ arch/x86/kvm/lapic.c                 |  70 ++++++---
+ arch/x86/kvm/lapic.h                 |   4 +-
+ arch/x86/kvm/mmu/mmu.c               |  36 ++---
+ arch/x86/kvm/mmu/spte.c              |  10 +-
+ arch/x86/kvm/mmu/tdp_mmu.c           |   2 +-
+ arch/x86/kvm/pmu.c                   |   8 +-
+ arch/x86/kvm/smm.c                   |   2 +-
+ arch/x86/kvm/x86.c                   | 211 +++++++++++++--------------
+ arch/x86/lib/cache-smp.c             |   9 +-
+ arch/x86/lib/msr.c                   |   5 +-
+ arch/x86/mm/pat/memtype.c            |   3 +-
+ arch/x86/mm/tlb.c                    |   5 +-
+ arch/x86/virt/vmx/tdx/tdx.c          |  65 +++++----
+ drivers/s390/crypto/vfio_ap_ops.c    |   2 +-
+ include/linux/kvm_types.h            |  39 ++++-
+ virt/kvm/eventfd.c                   |   2 +-
+ virt/kvm/guest_memfd.c               |   4 +-
+ virt/kvm/kvm_main.c                  | 126 ++++++++--------
+ 51 files changed, 457 insertions(+), 378 deletions(-)
+ create mode 100644 arch/powerpc/include/asm/kvm_types.h
 
-> > Please pull.
-> >
-> > Thanks,
-> > Oliver
-> >
-> > [*]: https://lore.kernel.org/all/87y0slur4t.ffs@tglx/
-> >
-> > The following changes since commit 86731a2a651e58953fc949573895f2fa6d456841:
-> >
-> >   Linux 6.16-rc3 (2025-06-22 13:30:08 -0700)
-> >
-> > are available in the Git repository at:
-> >
-> >   https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git/ tags/kvmarm-6.17
-> >
-> > for you to fetch changes up to 18ec25dd0e97653cdb576bb1750c31acf2513ea7:
-> >
-> >   KVM: arm64: selftests: Add FEAT_RAS EL2 registers to get-reg-list (2025-07-28 08:28:05 -0700)
-> >
-> > ----------------------------------------------------------------
-> > KVM/arm64 changes for 6.17, round #1
-> >
-> >  - Host driver for GICv5, the next generation interrupt controller for
-> >    arm64, including support for interrupt routing, MSIs, interrupt
-> >    translation and wired interrupts.
-> >
-> >  - Use FEAT_GCIE_LEGACY on GICv5 systems to virtualize GICv3 VMs on
-> >    GICv5 hardware, leveraging the legacy VGIC interface.
-> >
-> >  - Userspace control of the 'nASSGIcap' GICv3 feature, allowing
-> >    userspace to disable support for SGIs w/o an active state on hardware
-> >    that previously advertised it unconditionally.
-> >
-> >  - Map supporting endpoints with cacheable memory attributes on systems
-> >    with FEAT_S2FWB and DIC where KVM no longer needs to perform cache
-> >    maintenance on the address range.
-> >
-> >  - Nested support for FEAT_RAS and FEAT_DoubleFault2, allowing the guest
-> >    hypervisor to inject external aborts into an L2 VM and take traps of
-> >    masked external aborts to the hypervisor.
-> >
-> >  - Convert more system register sanitization to the config-driven
-> >    implementation.
-> >
-> >  - Fixes to the visibility of EL2 registers, namely making VGICv3 system
-> >    registers accessible through the VGIC device instead of the ONE_REG
-> >    vCPU ioctls.
-> >
-> >  - Various cleanups and minor fixes.
-> >
-> > ----------------------------------------------------------------
-> > Ankit Agrawal (5):
-> >       KVM: arm64: Rename the device variable to s2_force_noncacheable
-> >       KVM: arm64: Assume non-PFNMAP/MIXEDMAP VMAs can be mapped cacheable
-> >       KVM: arm64: Block cacheable PFNMAP mapping
-> >       KVM: arm64: Allow cacheable stage 2 mapping using VMA flags
-> >       KVM: arm64: Expose new KVM cap for cacheable PFNMAP
-> >
-> > David Woodhouse (1):
-> >       KVM: arm64: vgic-its: Return -ENXIO to invalid KVM_DEV_ARM_VGIC_GRP_CTRL attrs
-> >
-> > Kuninori Morimoto (2):
-> >       arm64: kvm: sys_regs: use string choices helper
-> >       arm64: kvm: trace_handle_exit: use string choices helper
-> >
-> > Lorenzo Pieralisi (30):
-> >       dt-bindings: interrupt-controller: Add Arm GICv5
-> >       arm64/sysreg: Add GCIE field to ID_AA64PFR2_EL1
-> >       arm64/sysreg: Add ICC_PPI_PRIORITY<n>_EL1
-> >       arm64/sysreg: Add ICC_ICSR_EL1
-> >       arm64/sysreg: Add ICC_PPI_HMR<n>_EL1
-> >       arm64/sysreg: Add ICC_PPI_ENABLER<n>_EL1
-> >       arm64/sysreg: Add ICC_PPI_{C/S}ACTIVER<n>_EL1
-> >       arm64/sysreg: Add ICC_PPI_{C/S}PENDR<n>_EL1
-> >       arm64/sysreg: Add ICC_CR0_EL1
-> >       arm64/sysreg: Add ICC_PCR_EL1
-> >       arm64/sysreg: Add ICC_IDR0_EL1
-> >       arm64/sysreg: Add ICH_HFGRTR_EL2
-> >       arm64/sysreg: Add ICH_HFGWTR_EL2
-> >       arm64/sysreg: Add ICH_HFGITR_EL2
-> >       arm64: Disable GICv5 read/write/instruction traps
-> >       arm64: cpucaps: Rename GICv3 CPU interface capability
-> >       arm64: cpucaps: Add GICv5 CPU interface (GCIE) capability
-> >       arm64: Add support for GICv5 GSB barriers
-> >       irqchip/gic-v5: Add GICv5 PPI support
-> >       irqchip/gic-v5: Add GICv5 IRS/SPI support
-> >       irqchip/gic-v5: Add GICv5 LPI/IPI support
-> >       irqchip/gic-v5: Enable GICv5 SMP booting
-> >       of/irq: Add of_msi_xlate() helper function
-> >       PCI/MSI: Add pci_msi_map_rid_ctlr_node() helper function
-> >       irqchip/gic-v3: Rename GICv3 ITS MSI parent
-> >       irqchip/msi-lib: Add IRQ_DOMAIN_FLAG_FWNODE_PARENT handling
-> >       irqchip/gic-v5: Add GICv5 ITS support
-> >       irqchip/gic-v5: Add GICv5 IWB support
-> >       docs: arm64: gic-v5: Document booting requirements for GICv5
-> >       arm64: Kconfig: Enable GICv5
-> >
-> > Marc Zyngier (28):
-> >       arm64: smp: Support non-SGIs for IPIs
-> >       KVM: arm64: Add helper to identify a nested context
-> >       arm64: smp: Fix pNMI setup after GICv5 rework
-> >       KVM: arm64: Make RVBAR_EL2 accesses UNDEF
-> >       KVM: arm64: Don't advertise ICH_*_EL2 registers through GET_ONE_REG
-> >       KVM: arm64: Define constant value for ICC_SRE_EL2
-> >       KVM: arm64: Define helper for ICH_VTR_EL2
-> >       KVM: arm64: Let GICv3 save/restore honor visibility attribute
-> >       KVM: arm64: Expose GICv3 EL2 registers via KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS
-> >       KVM: arm64: Condition FGT registers on feature availability
-> >       KVM: arm64: Advertise FGT2 registers to userspace
-> >       KVM: arm64: selftests: get-reg-list: Simplify feature dependency
-> >       KVM: arm64: selftests: get-reg-list: Add base EL2 registers
-> >       KVM: arm64: Document registers exposed via KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS
-> >       arm64: sysreg: Add THE/ASID2 controls to TCR2_ELx
-> >       KVM: arm64: Convert TCR2_EL2 to config-driven sanitisation
-> >       KVM: arm64: Convert SCTLR_EL1 to config-driven sanitisation
-> >       KVM: arm64: Convert MDCR_EL2 to config-driven sanitisation
-> >       KVM: arm64: Tighten the definition of FEAT_PMUv3p9
-> >       KVM: arm64: Check for SYSREGS_ON_CPU before accessing the CPU state
-> >       KVM: arm64: Filter out HCR_EL2 bits when running in hypervisor context
-> >       KVM: arm64: Make RAS registers UNDEF when RAS isn't advertised
-> >       KVM: arm64: Remove the wi->{e0,}poe vs wr->{p,u}ov confusion
-> >       KVM: arm64: Follow specification when implementing WXN
-> >       KVM: arm64: vgic-v3: Fix ordering of ICH_HCR_EL2
-> >       KVM: arm64: Clarify the check for reset callback in check_sysreg_table()
-> >       KVM: arm64: Enforce the sorting of the GICv3 system register table
-> >       KVM: arm64: selftest: vgic-v3: Add basic GICv3 sysreg userspace access test
-> >
-> > Oliver Upton (42):
-> >       arm64: Detect FEAT_SCTLR2
-> >       arm64: Detect FEAT_DoubleFault2
-> >       KVM: arm64: Treat vCPU with pending SError as runnable
-> >       KVM: arm64: nv: Respect exception routing rules for SEAs
-> >       KVM: arm64: nv: Honor SError exception routing / masking
-> >       KVM: arm64: nv: Add FEAT_RAS vSError sys regs to table
-> >       KVM: arm64: nv: Use guest hypervisor's vSError state
-> >       KVM: arm64: nv: Advertise support for FEAT_RAS
-> >       KVM: arm64: nv: Describe trap behavior of SCTLR2_EL1
-> >       KVM: arm64: Wire up SCTLR2_ELx sysreg descriptors
-> >       KVM: arm64: Context switch SCTLR2_ELx when advertised to the guest
-> >       KVM: arm64: Enable SCTLR2 when advertised to the guest
-> >       KVM: arm64: Describe SCTLR2_ELx RESx masks
-> >       KVM: arm64: Factor out helper for selecting exception target EL
-> >       KVM: arm64: nv: Ensure Address size faults affect correct ESR
-> >       KVM: arm64: Route SEAs to the SError vector when EASE is set
-> >       KVM: arm64: nv: Take "masked" aborts to EL2 when HCRX_EL2.TMEA is set
-> >       KVM: arm64: nv: Honor SError routing effects of SCTLR2_ELx.NMEA
-> >       KVM: arm64: nv: Enable vSErrors when HCRX_EL2.TMEA is set
-> >       KVM: arm64: Advertise support for FEAT_SCTLR2
-> >       KVM: arm64: Advertise support for FEAT_DoubleFault2
-> >       KVM: arm64: Don't retire MMIO instruction w/ pending (emulated) SError
-> >       KVM: arm64: selftests: Add basic SError injection test
-> >       KVM: arm64: selftests: Test SEAs are taken to SError vector when EASE=1
-> >       KVM: arm64: selftests: Add SCTLR2_EL1 to get-reg-list
-> >       KVM: arm64: selftests: Catch up set_id_regs with the kernel
-> >       KVM: arm64: Populate ESR_ELx.EC for emulated SError injection
-> >       KVM: arm64: selftests: Test ESR propagation for vSError injection
-> >       KVM: arm64: Commit exceptions from KVM_SET_VCPU_EVENTS immediately
-> >       KVM: arm64: Disambiguate support for vSGIs v. vLPIs
-> >       KVM: arm64: vgic-v3: Consolidate MAINT_IRQ handling
-> >       KVM: arm64: vgic-v3: Allow access to GICD_IIDR prior to initialization
-> >       Documentation: KVM: arm64: Describe VGICv3 registers writable pre-init
-> >       Merge branch 'kvm-arm64/cacheable-pfnmap' into kvmarm/next
-> >       Merge branch 'kvm-arm64/doublefault2' into kvmarm/next
-> >       Merge tag 'irqchip-gic-v5-host' into kvmarm/next
-> >       Merge branch 'kvm-arm64/gcie-legacy' into kvmarm/next
-> >       Merge branch 'kvm-arm64/misc' into kvmarm/next
-> >       Merge branch 'kvm-arm64/config-masks' into kvmarm/next
-> >       Merge branch 'kvm-arm64/el2-reg-visibility' into kvmarm/next
-> >       Merge branch 'kvm-arm64/vgic-v4-ctl' into kvmarm/next
-> >       KVM: arm64: selftests: Add FEAT_RAS EL2 registers to get-reg-list
-> >
-> > Raghavendra Rao Ananta (2):
-> >       KVM: arm64: vgic-v3: Allow userspace to write GICD_TYPER2.nASSGIcap
-> >       KVM: arm64: selftests: Add test for nASSGIcap attribute
-> >
-> > Sascha Bischoff (5):
-> >       irqchip/gic-v5: Skip deactivate for forwarded PPI interrupts
-> >       irqchip/gic-v5: Populate struct gic_kvm_info
-> >       arm64/sysreg: Add ICH_VCTLR_EL2
-> >       KVM: arm64: gic-v5: Support GICv3 compat
-> >       KVM: arm64: gic-v5: Probe for GICv5
-> >
-> >  Documentation/arch/arm64/booting.rst               |   41 +
-> >  .../interrupt-controller/arm,gic-v5-iwb.yaml       |   78 ++
-> >  .../bindings/interrupt-controller/arm,gic-v5.yaml  |  267 +++++
-> >  Documentation/virt/kvm/api.rst                     |   13 +-
-> >  Documentation/virt/kvm/devices/arm-vgic-v3.rst     |   80 +-
-> >  MAINTAINERS                                        |   10 +
-> >  arch/arm64/Kconfig                                 |    1 +
-> >  arch/arm64/include/asm/barrier.h                   |    3 +
-> >  arch/arm64/include/asm/el2_setup.h                 |   45 +
-> >  arch/arm64/include/asm/kvm_emulate.h               |   51 +-
-> >  arch/arm64/include/asm/kvm_host.h                  |   36 +-
-> >  arch/arm64/include/asm/kvm_mmu.h                   |   18 +
-> >  arch/arm64/include/asm/kvm_nested.h                |    2 +
-> >  arch/arm64/include/asm/smp.h                       |   24 +-
-> >  arch/arm64/include/asm/sysreg.h                    |   71 +-
-> >  arch/arm64/include/asm/vncr_mapping.h              |    2 +
-> >  arch/arm64/kernel/cpufeature.c                     |   26 +-
-> >  arch/arm64/kernel/smp.c                            |  142 ++-
-> >  arch/arm64/kvm/Makefile                            |    3 +-
-> >  arch/arm64/kvm/arch_timer.c                        |    2 +-
-> >  arch/arm64/kvm/arm.c                               |   16 +-
-> >  arch/arm64/kvm/at.c                                |   80 +-
-> >  arch/arm64/kvm/config.c                            |  255 +++-
-> >  arch/arm64/kvm/emulate-nested.c                    |   49 +-
-> >  arch/arm64/kvm/guest.c                             |   62 +-
-> >  arch/arm64/kvm/handle_exit.c                       |   24 +-
-> >  arch/arm64/kvm/hyp/exception.c                     |   16 +-
-> >  arch/arm64/kvm/hyp/include/hyp/switch.h            |   53 +-
-> >  arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h         |   49 +-
-> >  arch/arm64/kvm/hyp/vgic-v3-sr.c                    |   53 +-
-> >  arch/arm64/kvm/hyp/vhe/switch.c                    |   14 +-
-> >  arch/arm64/kvm/hyp/vhe/sysreg-sr.c                 |    6 +
-> >  arch/arm64/kvm/inject_fault.c                      |  235 ++--
-> >  arch/arm64/kvm/mmio.c                              |   12 +-
-> >  arch/arm64/kvm/mmu.c                               |  105 +-
-> >  arch/arm64/kvm/nested.c                            |  109 +-
-> >  arch/arm64/kvm/sys_regs.c                          |  207 +++-
-> >  arch/arm64/kvm/sys_regs.h                          |    2 +-
-> >  arch/arm64/kvm/trace_handle_exit.h                 |    2 +-
-> >  arch/arm64/kvm/vgic-sys-reg-v3.c                   |  127 +-
-> >  arch/arm64/kvm/vgic/vgic-init.c                    |   30 +-
-> >  arch/arm64/kvm/vgic/vgic-its.c                     |    3 +
-> >  arch/arm64/kvm/vgic/vgic-kvm-device.c              |   70 +-
-> >  arch/arm64/kvm/vgic/vgic-mmio-v3.c                 |   33 +-
-> >  arch/arm64/kvm/vgic/vgic-v3-nested.c               |    2 +-
-> >  arch/arm64/kvm/vgic/vgic-v4.c                      |    4 +-
-> >  arch/arm64/kvm/vgic/vgic-v5.c                      |   52 +
-> >  arch/arm64/kvm/vgic/vgic.c                         |    4 +-
-> >  arch/arm64/kvm/vgic/vgic.h                         |   48 +
-> >  arch/arm64/tools/cpucaps                           |    4 +-
-> >  arch/arm64/tools/sysreg                            |  514 +++++++-
-> >  drivers/irqchip/Kconfig                            |   12 +
-> >  drivers/irqchip/Makefile                           |    5 +-
-> >  drivers/irqchip/irq-gic-common.h                   |    2 -
-> >  ...3-its-msi-parent.c => irq-gic-its-msi-parent.c} |  168 ++-
-> >  drivers/irqchip/irq-gic-its-msi-parent.h           |   12 +
-> >  drivers/irqchip/irq-gic-v3-its.c                   |    1 +
-> >  drivers/irqchip/irq-gic-v5-irs.c                   |  822 +++++++++++++
-> >  drivers/irqchip/irq-gic-v5-its.c                   | 1228 ++++++++++++++++++++
-> >  drivers/irqchip/irq-gic-v5-iwb.c                   |  284 +++++
-> >  drivers/irqchip/irq-gic-v5.c                       | 1137 ++++++++++++++++++
-> >  drivers/irqchip/irq-gic.c                          |    2 +-
-> >  drivers/irqchip/irq-msi-lib.c                      |    5 +-
-> >  drivers/of/irq.c                                   |   22 +-
-> >  drivers/pci/msi/irqdomain.c                        |   20 +
-> >  include/asm-generic/msi.h                          |    1 +
-> >  include/kvm/arm_vgic.h                             |    9 +-
-> >  include/linux/irqchip/arm-gic-v5.h                 |  394 +++++++
-> >  include/linux/irqchip/arm-vgic-info.h              |    4 +
-> >  include/linux/irqdomain.h                          |    3 +
-> >  include/linux/msi.h                                |    1 +
-> >  include/linux/of_irq.h                             |    5 +
-> >  include/uapi/linux/kvm.h                           |    1 +
-> >  tools/testing/selftests/kvm/Makefile.kvm           |    2 +-
-> >  .../testing/selftests/kvm/arm64/external_aborts.c  |  330 ++++++
-> >  tools/testing/selftests/kvm/arm64/get-reg-list.c   |  203 +++-
-> >  tools/testing/selftests/kvm/arm64/mmio_abort.c     |  159 ---
-> >  tools/testing/selftests/kvm/arm64/set_id_regs.c    |   14 +-
-> >  tools/testing/selftests/kvm/arm64/vgic_init.c      |  259 ++++-
-> >  .../selftests/kvm/include/arm64/processor.h        |   10 +
-> >  80 files changed, 7589 insertions(+), 681 deletions(-)
-> >  create mode 100644 Documentation/devicetree/bindings/interrupt-controller/arm,gic-v5-iwb.yaml
-> >  create mode 100644 Documentation/devicetree/bindings/interrupt-controller/arm,gic-v5.yaml
-> >  create mode 100644 arch/arm64/kvm/vgic/vgic-v5.c
-> >  rename drivers/irqchip/{irq-gic-v3-its-msi-parent.c => irq-gic-its-msi-parent.c} (59%)
-> >  create mode 100644 drivers/irqchip/irq-gic-its-msi-parent.h
-> >  create mode 100644 drivers/irqchip/irq-gic-v5-irs.c
-> >  create mode 100644 drivers/irqchip/irq-gic-v5-its.c
-> >  create mode 100644 drivers/irqchip/irq-gic-v5-iwb.c
-> >  create mode 100644 drivers/irqchip/irq-gic-v5.c
-> >  create mode 100644 include/linux/irqchip/arm-gic-v5.h
-> >  create mode 100644 tools/testing/selftests/kvm/arm64/external_aborts.c
-> >  delete mode 100644 tools/testing/selftests/kvm/arm64/mmio_abort.c
-> >
-> 
+
+base-commit: beafd7ecf2255e8b62a42dc04f54843033db3d24
+-- 
+2.50.1.552.g942d659e1b-goog
+
 
