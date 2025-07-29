@@ -1,140 +1,143 @@
-Return-Path: <kvm+bounces-53595-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53596-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 911B3B146E3
-	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 05:29:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38868B14757
+	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 06:53:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C82373AA27E
-	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 03:29:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5174D540BD1
+	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 04:53:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B196218AC1;
-	Tue, 29 Jul 2025 03:29:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55ACF22AE76;
+	Tue, 29 Jul 2025 04:53:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HKki5wkZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZLlNA4VJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B0502045B6;
-	Tue, 29 Jul 2025 03:29:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8066378F5E
+	for <kvm@vger.kernel.org>; Tue, 29 Jul 2025 04:53:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753759765; cv=none; b=uxtMbjDzUxFi2S729uHfxCDxS5UouiG3gpfn+X6UPqNi7qjxOgV1ycxX4I/GLrCK00Clfxclg8dZ89NOw2NSmwb7xK35yVpCcHcbsZpH2XEjIdIvat2WL40A+al0RAgVJvfHA0DlBHLvY7FZhyCt538aXzo2Pxml7EQc2KQGkkY=
+	t=1753764790; cv=none; b=lu0KvYDNtO9+GZ3THEz/gKlPArzG1g+f2m/mP6o9jo8l9dflXSnsbHAq6PBLkhy8bNdQEISmPsn8PncTn7uoDKGYvlvIeCNh9rnpYXijar33hj/ce1Bn+aykuxDpd0Jj/1R4nk+1RByikxmbnvykvPS1gElBk2j0EcJMtEJXtxM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753759765; c=relaxed/simple;
-	bh=ANZkbK817MFJd1tmvTvtQznG5aURBb6fkvguPdy8/Rk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FHqfvUIrE98eRPAoCS18VhhxiuE7YPCTnlrFKxnZTNoOCDrjSpnrpFKZORm7o0sso0lcJX1VohJyV70lIyqn4u/RQ82uxE8tLdr9/0qiHZ1T6JAJ8pcv1n2SgB9azeYJrOBix0UPkWknDlMLEVObbRXe0D+GFRmPIh6rJM3u3NI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HKki5wkZ; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1753759764; x=1785295764;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=ANZkbK817MFJd1tmvTvtQznG5aURBb6fkvguPdy8/Rk=;
-  b=HKki5wkZU9EjhOGwr9/HgpdZ9L8MEyWhhIWXGhqj/0uDR+VjMTogN45k
-   KV2Wsqz0YHM8zAkNBzvqE2xvysg8PZItlaTfCGgJdl9+R/f/IErv6a7AB
-   tE3Aeq3vKYTbE2YYY/UY4nTDuuHbrDM3IyOsyb4BO2ZWKqaXVQXqsKhfN
-   4lbKtRNvD4HnGJABsvHheUgaQqfUUwddgUdjwvu+B3UPDoRkehuzFj7IM
-   mr/8F5dMfWkwuQFxzDDh0YAp7cr9wLxoFfLKExp1qGRpE2UvvH4sGJzu7
-   mz3/t8rw/tXflDcak56in5UA+kB7SPYLzQcbzvweDx1i7OAjYUvR4ByQT
-   Q==;
-X-CSE-ConnectionGUID: k7lGRyVnShKiR6+RJvZB3Q==
-X-CSE-MsgGUID: A6i+33SaSriJtrQH7aVXVQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11505"; a="66291914"
-X-IronPort-AV: E=Sophos;i="6.16,348,1744095600"; 
-   d="scan'208";a="66291914"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jul 2025 20:29:23 -0700
-X-CSE-ConnectionGUID: dmmLKCIFQpqYNDG5hHfwEw==
-X-CSE-MsgGUID: 2RK1eSy1Q3a6Klp6VpNCRw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,348,1744095600"; 
-   d="scan'208";a="193570153"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.240.106]) ([10.124.240.106])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jul 2025 20:29:17 -0700
-Message-ID: <7dc97db7-5eea-4b65-aed3-4fc2846e13a6@linux.intel.com>
-Date: Tue, 29 Jul 2025 11:29:14 +0800
+	s=arc-20240116; t=1753764790; c=relaxed/simple;
+	bh=JeIzu/vv0Xyf6BMdhzq1eRIZbdak9DThRpsJxiByLDs=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=TsCbFz9du2aneYefhOgqLyIXO78cMe7CDpUsMMOsUbubsXgTRz24Rc4UVd5dJybBt4NdI8JTocMo2uFv7yOxbyWrUjQ4WahiJ2eNEPcmGvO51P0d+IjCQHrmL5S7wmADiauODhmQ9pQ58T3WVyAjaNo0DNhWphRSOA+cw6wAAtc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZLlNA4VJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E170C4CEEF;
+	Tue, 29 Jul 2025 04:53:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753764790;
+	bh=JeIzu/vv0Xyf6BMdhzq1eRIZbdak9DThRpsJxiByLDs=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=ZLlNA4VJJ0ExQdkEY2SMmvHnMS7henZTELiiB/kSahqFh8FCjBKhMleEjphF72EKw
+	 ptBuKUovecKvqUIjbIQc4DcnE6WVm3KvjN4yA2MktjTZJPGRldsN6E5weDBopebooz
+	 JiG6qjdk/caWPuN1/B2yqM45wciGTInirEB6S5oLErvV5CvjjGPcFLuv8T9EPXYAx5
+	 wFig01D+DwfavhyYRGlQpeto+A4ZWa44YpIfnkKSFjaxwAb8HuqOiyyiWmGXNdlrij
+	 MQoqr6tlAFdpB/IzmmQVFJiiOefEPIgRKzmXv2Bl2mTYLhTMIl3cjJqSAyObn9AQoI
+	 xVtwZvof4yWIw==
+X-Mailer: emacs 30.1 (via feedmail 11-beta-1 I)
+From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
+To: Mostafa Saleh <smostafa@google.com>
+Cc: kvm@vger.kernel.org, Suzuki K Poulose <Suzuki.Poulose@arm.com>,
+	Steven Price <steven.price@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Julien Thierry <julien.thierry.kdev@gmail.com>
+Subject: Re: [RFC PATCH kvmtool 02/10] vfio: Rename some functions
+In-Reply-To: <aIZuAlHQRdi5PUqY@google.com>
+References: <20250525074917.150332-1-aneesh.kumar@kernel.org>
+ <20250525074917.150332-2-aneesh.kumar@kernel.org>
+ <aIZuAlHQRdi5PUqY@google.com>
+Date: Tue, 29 Jul 2025 10:23:03 +0530
+Message-ID: <yq5ams8nbntc.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 20/38] KVM: x86/pmu: Check if mediated vPMU can
- intercept rdpmc
-To: Sean Christopherson <seanjc@google.com>,
- Sandipan Das <sandipan.das@amd.com>
-Cc: Mingwei Zhang <mizhang@google.com>, Peter Zijlstra
- <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
- Arnaldo Carvalho de Melo <acme@kernel.org>,
- Namhyung Kim <namhyung@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
- Mark Rutland <mark.rutland@arm.com>,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
- Adrian Hunter <adrian.hunter@intel.com>, Liang@google.com,
- Kan <kan.liang@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>,
- linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
- Yongwei Ma <yongwei.ma@intel.com>,
- Xiong Zhang <xiong.y.zhang@linux.intel.com>,
- Jim Mattson <jmattson@google.com>, Zide Chen <zide.chen@intel.com>,
- Eranian Stephane <eranian@google.com>, Shukla Manali
- <Manali.Shukla@amd.com>, Nikunj Dadhania <nikunj.dadhania@amd.com>
-References: <20250324173121.1275209-1-mizhang@google.com>
- <20250324173121.1275209-21-mizhang@google.com>
- <a700ab4c-0e8d-499d-be71-f24c4a6439cf@amd.com> <aG6QeTXrd7Can8PK@google.com>
-Content-Language: en-US
-From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <aG6QeTXrd7Can8PK@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
+Mostafa Saleh <smostafa@google.com> writes:
 
-On 7/9/2025 11:53 PM, Sean Christopherson wrote:
-> On Mon, May 26, 2025, Sandipan Das wrote:
->>> @@ -212,6 +212,18 @@ static void amd_pmu_refresh(struct kvm_vcpu *vcpu)
->>>  	bitmap_set(pmu->all_valid_pmc_idx, 0, pmu->nr_arch_gp_counters);
->>>  }
->>>  
->>> +static void amd_pmu_refresh(struct kvm_vcpu *vcpu)
->>> +{
->>> +	struct vcpu_svm *svm = to_svm(vcpu);
->>> +
->>> +	__amd_pmu_refresh(vcpu);
->>> +
->>> +	if (kvm_rdpmc_in_guest(vcpu))
->>> +		svm_clr_intercept(svm, INTERCEPT_RDPMC);
->>> +	else
->>> +		svm_set_intercept(svm, INTERCEPT_RDPMC);
->>> +}
->>> +
->> After putting kprobes on kvm_pmu_rdpmc(), I noticed that RDPMC instructions were
->> getting intercepted for the secondary vCPUs. This happens because when secondary
->> vCPUs come up, kvm_vcpu_reset() gets called after guest CPUID has been updated.
->> While RDPMC interception is initially disabled in the kvm_pmu_refresh() path, it
->> gets re-enabled in the kvm_vcpu_reset() path as svm_vcpu_reset() calls init_vmcb().
->> We should consider adding the following change to avoid that.
-> Revisiting this code after the MSR interception rework, I think we should go for
-> a more complete, big-hammer solution.  Rather than manipulate intercepts during
-> kvm_pmu_refresh(), do the updates as part of the "common" recalc intercepts flow.
-> And then to trigger recalc on PERF_CAPABILITIES writes, turn KVM_REQ_MSR_FILTER_CHANGED
-> into a generic KVM_REQ_RECALC_INTERCEPTS.
+> On Sun, May 25, 2025 at 01:19:08PM +0530, Aneesh Kumar K.V (Arm) wrote:
+>> We will add iommufd support in later patches. Rename the old vfio
+>> method as legacy vfio.
+>> 
+>> Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
+>> ---
+>>  vfio/core.c | 31 ++++++++++++++++---------------
+>>  1 file changed, 16 insertions(+), 15 deletions(-)
+>> 
+>> diff --git a/vfio/core.c b/vfio/core.c
+>> index c6b305c30cf7..424dc4ed3aef 100644
+>> --- a/vfio/core.c
+>> +++ b/vfio/core.c
+>> @@ -282,7 +282,7 @@ void vfio_unmap_region(struct kvm *kvm, struct vfio_region *region)
+>>  	}
+>>  }
+>>  
+>> -static int vfio_configure_device(struct kvm *kvm, struct vfio_device *vdev)
+>> +static int legacy_vfio_configure_device(struct kvm *kvm, struct vfio_device *vdev)
+>>  {
+>>  	int ret;
+>>  	struct vfio_group *group = vdev->group;
+>> @@ -340,12 +340,12 @@ err_close_device:
+>>  	return ret;
+>>  }
+>>  
+>> -static int vfio_configure_devices(struct kvm *kvm)
+>> +static int legacy_vfio_configure_devices(struct kvm *kvm)
+>>  {
+>>  	int i, ret;
+>>  
+>>  	for (i = 0; i < kvm->cfg.num_vfio_devices; ++i) {
+>> -		ret = vfio_configure_device(kvm, &vfio_devices[i]);
+>> +		ret = legacy_vfio_configure_device(kvm, &vfio_devices[i]);
+>>  		if (ret)
+>>  			return ret;
+>>  	}
+>> @@ -429,7 +429,7 @@ static int vfio_configure_reserved_regions(struct kvm *kvm,
+>>  	return ret;
+>>  }
+>>  
+>> -static int vfio_configure_groups(struct kvm *kvm)
+>> +static int legacy_vfio_configure_groups(struct kvm *kvm)
+>>  {
+>>  	int ret;
+>>  	struct vfio_group *group;
+>> @@ -454,7 +454,7 @@ static int vfio_configure_groups(struct kvm *kvm)
+>>  	return 0;
+>>  }
+>>  
+>> -static struct vfio_group *vfio_group_create(struct kvm *kvm, unsigned long id)
+>> +static struct vfio_group *legacy_vfio_group_create(struct kvm *kvm, unsigned long id)
+>>  {
+>>  	int ret;
+>>  	struct vfio_group *group;
+>> @@ -512,10 +512,11 @@ static void vfio_group_exit(struct kvm *kvm, struct vfio_group *group)
+>>  	if (--group->refs != 0)
+>>  		return;
+>>  
+>> -	ioctl(group->fd, VFIO_GROUP_UNSET_CONTAINER);
+>> -
+>>  	list_del(&group->list);
+>> -	close(group->fd);
+>> +	if (group->fd != -1) {
+>> +		ioctl(group->fd, VFIO_GROUP_UNSET_CONTAINER);
+>> +		close(group->fd);
+>> +	}
 >
-> That way there's one path for calculating dynamic intercepts, which should make it
-> much more difficult for us to screw up things like reacting to MSR filter changes.
-> And providing a single path avoids needing to have a series of back-and-forth calls
-> between common x86 code, PMU code, and vendor code.
+> That seems unrelated to the rename, maybe it's better to move that when
+> IOMMUFD is supported as it's related to it.
+>
 
-Sounds good to me.
+Sure. Will make the change as part of iommufd patch.
 
-BTW, Sean, may I know your plan about the mediated vPMU v5 patch set? Thanks.
-
-
+-aneesh
 
