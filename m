@@ -1,206 +1,150 @@
-Return-Path: <kvm+bounces-53660-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53661-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61378B15292
-	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 20:20:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72FD0B152DA
+	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 20:33:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4965D189CF35
-	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 18:20:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA45716B343
+	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 18:33:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFB5423A9B0;
-	Tue, 29 Jul 2025 18:19:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 759F923B629;
+	Tue, 29 Jul 2025 18:33:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kzdKmxk8"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qD2NuYn5"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D4AF23535A
-	for <kvm@vger.kernel.org>; Tue, 29 Jul 2025 18:19:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E779E1A0B08
+	for <kvm@vger.kernel.org>; Tue, 29 Jul 2025 18:33:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753813186; cv=none; b=amI8RmJEuHG6U4MZJsfs3PV47tUoicLTFYyF1hPXy0Vj7xQBWpTUl+b28GVkJ1QKoAyJTJBEC+6EeQrnIfe6HYmmEnrDsDmFzpX16Zl71D4qGGVc90GAmHKTGImX/DoHocdneufx5zMfxsCqYiSy0Bh/7m+y/0Y+5355nUKVnuE=
+	t=1753814017; cv=none; b=l5rRDVoQtwia84Z9rivexIYlU9He8b4O8LxJFLMIJcErSMCkqjTZjV/hUxX3G9xfor93XeIy0ddHHhUpDf7RjrbEeNCE/HmOQM+06BfLolmzJ+TI6g7ZWujm0WEUGZidBqBE5T9p0cAt9rhPAbCFYMdAvKjMnN1yqLWb59cv6b4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753813186; c=relaxed/simple;
-	bh=Zl7KLWafk74sQL+8j6ytR4kxPDeV/QUPEgtH+rTuR6I=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=eiLoQBrtz5QXbE6nsjrOpYFPzB9ecgnOO9uOnPdkO1dXUHKI0C9geXtJzhvuJnqZxM9rNgEypfni2xx+6hnv5TDTeK9IHNDSxf4Mskhtrzvbf2EEQeGOZVfg04PWOkFXSQyvg3obhoLovL1PVLMy4gUcKzRzzRSpH8Bdn5LtAy8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kzdKmxk8; arc=none smtp.client-ip=209.85.215.201
+	s=arc-20240116; t=1753814017; c=relaxed/simple;
+	bh=zhhsN1AqU60iSsHthAP5HUoMBvOnju18nFxPG9F76EM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=s6avxPYvTwzFkhMoGqUxZzMwePckldyBA4s136cnWVE7iBMi3mruYm7XWA9bkrnS2gDkuzWg+eDTD28c8qB7NbVMD8by+XtclOghzbC7sNBCJ5Fc3DkrugfVis7EBSXxlS4wfdbBI0GNuw4sCmvDAnRwGkwWgYvztU2ttg5RxvM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qD2NuYn5; arc=none smtp.client-ip=209.85.128.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b31c38d4063so4456606a12.3
-        for <kvm@vger.kernel.org>; Tue, 29 Jul 2025 11:19:44 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4562b2d98bcso7285e9.1
+        for <kvm@vger.kernel.org>; Tue, 29 Jul 2025 11:33:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753813184; x=1754417984; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wn3gJxWA3uJgeB3JDV1mVkQm4z7b+VZjhC6w+XYIxiA=;
-        b=kzdKmxk8tSA7DBr9QUp/GkWWJL22OhWDEbKgyO60D2RBtMCy6KBcc4JgvmuZcpWQTj
-         jElkLmcmdz1OHKrX4x6AbvSXBAnvRhK+fVFi82KWd2sxZxcAm/qqq+ITXmt0M/xljV33
-         D0woaLvIqpz6rWSzw5h4oIAO5DQ2mI9mPrfaCwHB1Fz1hDjkY+W9UOMK0DmIKHdsld3e
-         9wCL9B023KbAGN+NbUvR4mg/7ly3+RDx3+wgYKa+IkDZJCiYZFa2/RHY1IFa8LcKoAEI
-         EgDHcEuL02952wLtduOBOh6Bcl7JGZVKCTyMBBZHs5shNvQZIp7GIjt1tZPwV1/OuvhK
-         QOpw==
+        d=google.com; s=20230601; t=1753814014; x=1754418814; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7IB94kLTsbGsiDgptDqLFiCExxMxuJKtjoAOZzmwaM4=;
+        b=qD2NuYn5ukpw1lRu+hfpW6YZ1vrrabjONtMt17EZwCHvEv+dx/KrHNrhiSEXWMFVZu
+         dXySqlfOsXIfVQBveYbHi6ZkD6MgkmcDX9+IpTTAiq/WcZRe8w88Qb0ojJLPnfVta/f/
+         oupNmSJiNajruIxiqYEtjKXu4Y+pypIgWbsWVjyfxabcLJPikWP+mHoZd5JESQg7qaTf
+         FT+3+OWCVcRX0EbcMUysN7618Pl0WfMJtzpr2XMr7j0MugZt2cpcsq3V53HDUDcp1OnS
+         u1WgTZfn7WZEnULwrLghklsuYLh8OPUMat0RrWtrAmfBQjpF1IxJmpXVxZp1EayjEF7H
+         1zEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753813184; x=1754417984;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wn3gJxWA3uJgeB3JDV1mVkQm4z7b+VZjhC6w+XYIxiA=;
-        b=Htyn28qEhXI0ZGDYWwaV8RnUBdgxarp6pRgZdBMyjZxUP4d/vSLwanYpQpnbyghlRF
-         Gj7XOB6YpScAr/PUu/SaXWRKjcrcFjqEvPO7pLyl21gSqK5UdBrluRH0eRc1vMsq99CQ
-         /+sagNX6/lAd/687H4o9ZDZWZoy80lKfGQNrkbTAEIBHpwK7YJAtYpGcN6ZZ9gkPRdLx
-         ZYqG6x2Y2DNpqPmv7F+6ibGzADAqFWTcZPGws5xsPbuRiziesW1LeV3lMUQ/vbVhEpvm
-         VBmuAQ5m/e2wFZa4lMdJnSlHRefz4Hbm/0VGqPC0h/Y/piPrqZSGZ34XqI2MEKvq+MVh
-         rsNA==
-X-Forwarded-Encrypted: i=1; AJvYcCUeaotgmX9VQX5vCt4sXAPxmFP4xCqgxOKQl1sUyL5jJurUsRaBcP0XRRArAp6fmpLxkTo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzdy7ehfht8Bwcrt6z4n+pKY3DyuLMkvPh5qiTS2hYNfqvvZuVF
-	1VAnj+26CZMYA2BHHMc6uEBvtZKrwCubodnpEX9pIvGiTNnNrGdR11RnIykxeObBpJny6dsYk9x
-	7+exHfw==
-X-Google-Smtp-Source: AGHT+IHEpLXvt767w0GL4NtfNvD307U11Z/kcZVZLSuSK0JImdMWtTujcBTE1fUybj6KQU1bt7BHRbDk8u4=
-X-Received: from pjxx5.prod.google.com ([2002:a17:90b:58c5:b0:312:15b:e5d1])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:e7d2:b0:311:c1ec:7d0a
- with SMTP id 98e67ed59e1d1-31f5de47ef7mr544335a91.25.1753813183765; Tue, 29
- Jul 2025 11:19:43 -0700 (PDT)
-Date: Tue, 29 Jul 2025 11:19:42 -0700
-In-Reply-To: <aIgZjW2PZEdR/DYr@intel.com>
+        d=1e100.net; s=20230601; t=1753814014; x=1754418814;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7IB94kLTsbGsiDgptDqLFiCExxMxuJKtjoAOZzmwaM4=;
+        b=WgMnTjPd4rlVc+RT+xE2ID8sz9IgRqZP4HMCuCvog/tGN0EfW1xLOmpzH8uWj37XoF
+         PWXs/gDbKNaK47vA3IrS5cYhbTU1AgOoeTc3vr86tn4v6cY7R0AmQ/G0HKPN1m3gxzqo
+         vaf5Zllk2xeNnhJoBVggWRFKHqqgfyMLRwKIEIDaEA2HV9ySPwiEZdZSU1CiyloAVCP6
+         FmAR8JENJ8VFEPkhy0NsANSM+z4CVJQhFR+ybreHOkIR0duu/YyrE8tazj+E8RWMXjmL
+         ttcTAUUl7Khob0sTrKzXWpGBje4Kq4OVEO8XSVeXGRk2VTyX06Ckg1m/RS/S04FT81/j
+         yLvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXBoMkWOkQj+HD4Y+k3OG6wf4Ohdb2r/wTwBdjr1CT351aBT9C0NKXqixR7N5j5Clq7ARM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwP3w5vjYW9ODh7MqNhHUb7qPkxPfj2h7PBIaExZO03ziFsoder
+	ZagQHZNVmXK4hkoBftXEVG2tFfE08Hm+V0+8ghQAQu44cLLxABz7aDpFN8iGuQaw8+lAFCoV1nV
+	Wi0bEmu1Kfue/sfDGqQC8CPdk2OZ6H0QlDSmEdsKkFSIISYexIiWGOOqd
+X-Gm-Gg: ASbGncsbzrVdsgaXb9X9DxYqQC7SLu8o3qp+SeDyeCHld9FxrScpaqj6FUlGi79JFnY
+	7z/rgROdwK58swI4C1i1vZ6WykYsxZsWQkFRT9zmv8CRJlB2J/ibzJqONvuOIAR9E3idtuWaECa
+	JSsiGVKkupt4SUbWpahB9K+7qJHuLOSnpTB9NExRjwokzwOBAOxLxn0UWrkpwph4QSUYYmTXhKm
+	yyOz3dzNVSZoD07kZQpQpjzBWaYQCRBMhnDLQ==
+X-Google-Smtp-Source: AGHT+IGKAkWetZ1FvQ3c2TR9sQ5wbErOwg/m1YLthxVSeCgARrfvYFD3xx1XvoVEZiCGve6ALl+xhDJWyNwcPNrcTPo=
+X-Received: by 2002:a05:600c:859c:b0:453:5ffb:e007 with SMTP id
+ 5b1f17b1804b1-45893a9b7f3mr63305e9.4.1753814013998; Tue, 29 Jul 2025 11:33:33
+ -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250704085027.182163-1-chao.gao@intel.com> <20250704085027.182163-2-chao.gao@intel.com>
- <5591ecc4-2383-4804-b3f0-0dcef692e8f6@zytor.com> <aIgZjW2PZEdR/DYr@intel.com>
-Message-ID: <aIkQvhGhRKisonmh@google.com>
-Subject: Re: [PATCH v11 01/23] KVM: x86: Rename kvm_{g,s}et_msr()* to show
- that they emulate guest accesses
-From: Sean Christopherson <seanjc@google.com>
-To: Chao Gao <chao.gao@intel.com>
-Cc: Xin Li <xin@zytor.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	x86@kernel.org, pbonzini@redhat.com, dave.hansen@intel.com, 
-	rick.p.edgecombe@intel.com, mlevitsk@redhat.com, john.allen@amd.com, 
-	weijiang.yang@intel.com, minipli@grsecurity.net, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <CACw3F53VTDQeUbj3C75pkjz=iehbFCqbrTjYbUC3ViUbQJAhsg@mail.gmail.com>
+ <CACw3F50O9Z=hPFNzeatzr2k+1cKX_nnqdzKJOMEdmjmfy3LoUg@mail.gmail.com> <18df01493fee0547d8b5902b986a2334@misterjones.org>
+In-Reply-To: <18df01493fee0547d8b5902b986a2334@misterjones.org>
+From: Jiaqi Yan <jiaqiyan@google.com>
+Date: Tue, 29 Jul 2025 11:33:22 -0700
+X-Gm-Features: Ac12FXyam7bjtry9Vixp29M5W0s0neJG-QDbW5LkEpRdu8HEgX8jGbg9nB_4Esc
+Message-ID: <CACw3F53j60QSz=D0HozuazCSaKoOWmODZuydC8152rdxT-fRAQ@mail.gmail.com>
+Subject: Re: [Bug Report] external_aborts failure related to efa1368ba9f4
+ ("KVM: arm64: Commit exceptions from KVM_SET_VCPU_EVENTS immediately")
+To: Marc Zyngier <maz@misterjones.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jul 29, 2025, Chao Gao wrote:
-> On Mon, Jul 28, 2025 at 03:31:41PM -0700, Xin Li wrote:
-> >>   	/* Set L1 segment info according to Intel SDM
-> >>   	    27.5.2 Loading Host Segment and Descriptor-Table Registers */
-> >> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> >> index 7543dac7ae70..11d84075cd14 100644
-> >> --- a/arch/x86/kvm/x86.c
-> >> +++ b/arch/x86/kvm/x86.c
-> >> @@ -1929,33 +1929,35 @@ static int kvm_get_msr_ignored_check(struct kvm_vcpu *vcpu,
-> >>   				 __kvm_get_msr);
-> >>   }
-> >> -int kvm_get_msr_with_filter(struct kvm_vcpu *vcpu, u32 index, u64 *data)
-> >> +int kvm_emulate_msr_read_with_filter(struct kvm_vcpu *vcpu, u32 index,
-> >> +				     u64 *data)
+That commit fixed my issue, thanks a lot Marc!
+
+On Sat, Jul 26, 2025 at 2:18=E2=80=AFAM Marc Zyngier <maz@misterjones.org> =
+wrote:
+>
+> On 2025-07-25 23:38, Jiaqi Yan wrote:
+> > On Mon, Jul 21, 2025 at 7:00=E2=80=AFAM Jiaqi Yan <jiaqiyan@google.com>=
+ wrote:
+> >>
+> >> Hi Oliver,
+> >>
+> >> I was doing some SEA injection dev work and found
+> >> tools/testing/selftests/kvm/arm64/external_aborts.c is failing at the
+> >> head of my locally-tracked kvmarm/next, commit 811ec70dcf9cc ("Merge
+> >> branch 'kvm-arm64/config-masks' into kvmarm/next"):
+> >>
+> >> vobeb33:/export/hda3/tmp/yjq# ./external_aborts
+> >> Random seed: 0x6b8b4567
+> >> test_mmio_abort <=3D fail
+> >> =3D=3D=3D=3D Test Assertion Failure =3D=3D=3D=3D
+> >>   arm64/external_aborts.c:19: regs->pc =3D=3D expected_abort_pc
+> >>   pid=3D25675 tid=3D25675 errno=3D4 - Interrupted system call
+> >>   (stack trace empty)
+> >>   0x0 !=3D 0x21ed20 (regs->pc !=3D expected_abort_pc)
+> >> vobeb33:/export/hda3/tmp/yjq#
+> >> vobeb33:/export/hda3/tmp/yjq#
+> >> vobeb33:/export/hda3/tmp/yjq# ./external_aborts
+> >> Random seed: 0x6b8b4567
+> >> test_mmio_nisv       <=3D pass
+> >> test_mmio_nisv_abort <=3Dfail
+> >> =3D=3D=3D=3D Test Assertion Failure =3D=3D=3D=3D
+> >>   arm64/external_aborts.c:19: regs->pc =3D=3D expected_abort_pc
+> >>   pid=3D26153 tid=3D26153 errno=3D4 - Interrupted system call
+> >>   (stack trace empty)
+> >>   0x0 !=3D 0x21eb18 (regs->pc !=3D expected_abort_pc)
+> >>
+> >> It looks like the PC in the guest register is lost / polluted. I only
+> >> tested test_mmio_abort (fail), test_mmio_nisv (pass), and
+> >> test_mmio_nisv_abort (fail), but from reading the code of
+> >> test_mmio_nisv vs test_mmio_nisv_abort, I guess test failure is
+> >> probably due to some bug in the code kvm injects SEA into guest.
+> >>
+> >> If I revert a single commit efa1368ba9f4 ("KVM: arm64: Commit
+> >> exceptions from KVM_SET_VCPU_EVENTS immediately"), all tests in
+> >> tools/testing/selftests/kvm/arm64/external_aborts.c pass. I have not
+> >> yet figured out the bug tho. Want to report since you are the author
+> >> maybe you can (or already) spot something.
 > >
-> >I think the extra new line doesn't improve readability, but it's the
-> >maintainer's call.
-> >
-> 
-> Sure. Seems "let it poke out" is Sean's preference. I saw he made similar
-> requests several times. e.g.,
-
-Depends on the situation.  I'd probably mentally flip a coin in this case.
-
-But what I'd actually do here is choose names that are (a) less verbose and (b)
-capture the relationship between the APIs.  Instead of:
-
-  int kvm_emulate_msr_read_with_filter(struct kvm_vcpu *vcpu, u32 index, u64 *data);
-  int kvm_emulate_msr_write_with_filter(struct kvm_vcpu *vcpu, u32 index, u64 data);
-  int kvm_emulate_msr_read(struct kvm_vcpu *vcpu, u32 index, u64 *data);
-  int kvm_emulate_msr_write(struct kvm_vcpu *vcpu, u32 index, u64 data);
-
-rename to:
-
-  int kvm_emulate_msr_read(struct kvm_vcpu *vcpu, u32 index, u64 *data);
-  int kvm_emulate_msr_write(struct kvm_vcpu *vcpu, u32 index, u64 data);
-  int __kvm_emulate_msr_read(struct kvm_vcpu *vcpu, u32 index, u64 *data);
-  int __kvm_emulate_msr_write(struct kvm_vcpu *vcpu, u32 index, u64 data);
-
-And then we can do a follow-up patch to solidify the relationship:
-
---
-From: Sean Christopherson <seanjc@google.com>
-Date: Tue, 29 Jul 2025 11:13:48 -0700
-Subject: [PATCH] KVM: x86: Use double-underscore read/write MSR helpers as
- appropriate
-
-Use the double-underscore helpers for emulating MSR reads and writes in
-he no-underscore versions to better capture the relationship between the
-two sets of APIs (the double-underscore versions don't honor userspace MSR
-filters).
-
-No functional change intended.
-
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/x86.c | 29 ++++++++++++++++-------------
- 1 file changed, 16 insertions(+), 13 deletions(-)
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 09b106a5afdf..65c787bcfe8b 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -1932,11 +1932,24 @@ static int kvm_get_msr_ignored_check(struct kvm_vcpu *vcpu,
- 				 __kvm_get_msr);
- }
- 
-+int __kvm_emulate_msr_read(struct kvm_vcpu *vcpu, u32 index, u64 *data)
-+{
-+	return kvm_get_msr_ignored_check(vcpu, index, data, false);
-+}
-+EXPORT_SYMBOL_GPL(__kvm_emulate_msr_read);
-+
-+int __kvm_emulate_msr_write(struct kvm_vcpu *vcpu, u32 index, u64 data)
-+{
-+	return kvm_set_msr_ignored_check(vcpu, index, data, false);
-+}
-+EXPORT_SYMBOL_GPL(__kvm_emulate_msr_write);
-+
- int kvm_emulate_msr_read(struct kvm_vcpu *vcpu, u32 index, u64 *data)
- {
- 	if (!kvm_msr_allowed(vcpu, index, KVM_MSR_FILTER_READ))
- 		return KVM_MSR_RET_FILTERED;
--	return kvm_get_msr_ignored_check(vcpu, index, data, false);
-+
-+	return __kvm_emulate_msr_read(vcpu, index, data);
- }
- EXPORT_SYMBOL_GPL(kvm_emulate_msr_read);
- 
-@@ -1944,21 +1957,11 @@ int kvm_emulate_msr_write(struct kvm_vcpu *vcpu, u32 index, u64 data)
- {
- 	if (!kvm_msr_allowed(vcpu, index, KVM_MSR_FILTER_WRITE))
- 		return KVM_MSR_RET_FILTERED;
--	return kvm_set_msr_ignored_check(vcpu, index, data, false);
-+
-+	return __kvm_emulate_msr_write(vcpu, index, data);
- }
- EXPORT_SYMBOL_GPL(kvm_emulate_msr_write);
- 
--int __kvm_emulate_msr_read(struct kvm_vcpu *vcpu, u32 index, u64 *data)
--{
--	return kvm_get_msr_ignored_check(vcpu, index, data, false);
--}
--EXPORT_SYMBOL_GPL(__kvm_emulate_msr_read);
--
--int __kvm_emulate_msr_write(struct kvm_vcpu *vcpu, u32 index, u64 data)
--{
--	return kvm_set_msr_ignored_check(vcpu, index, data, false);
--}
--EXPORT_SYMBOL_GPL(__kvm_emulate_msr_write);
- 
- static void complete_userspace_rdmsr(struct kvm_vcpu *vcpu)
- {
-
-base-commit: 1877e7b0749cbaa2d2ba4056eeda93adb373f7d4
---
+> > Friendly ping ;)
+>
+> Please check this:
+>
+> https://web.git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git/com=
+mit/?h=3Dnext&id=3Dc6e35dff58d348c1a9489e9b3b62b3721e62631d
+>
+>          M.
+> --
+> Who you jivin' with that Cosmik Debris?
 
