@@ -1,79 +1,84 @@
-Return-Path: <kvm+bounces-53651-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53652-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAC82B15231
-	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 19:42:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3E59B15234
+	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 19:43:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E04BE17CB7C
-	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 17:42:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E32794E52DA
+	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 17:42:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE86129993E;
-	Tue, 29 Jul 2025 17:42:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 904C6299A90;
+	Tue, 29 Jul 2025 17:42:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XqoIF3wN"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ngM5zMq6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46CCA221FDA
-	for <kvm@vger.kernel.org>; Tue, 29 Jul 2025 17:42:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E33F0298CB1
+	for <kvm@vger.kernel.org>; Tue, 29 Jul 2025 17:42:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753810965; cv=none; b=LEh5x3HAMPY7ing3CGe4LGPD4V8CUKP2lVAvEgSoXaj0RAbKRP8xPK5FDLatKiCqMgehNyvmqooHtGUMj4Vhsgtxk3nGpLQvRVgv9/v6OO6ZfUUGt3f5++o2DjmUxLZN+4/vjKvfycXq/FQ3VW0skdivuv2n2aC9GjAHGOhTum8=
+	t=1753810965; cv=none; b=YZhSaM5MUcn+yrkDkBZOE7WOdpVOrIOxH7iNBHvrH7cL6YQ8ZrvPLSNimbJlo7Fa8LVVBSIJLTCCukSDt2TGihvYrW2Ng07NSwjVpOuhvFsX4KzH8l0Nj7xB4dT1m3VkV8AiVZmnGWA6kfEAZHaIaDSCWEXRWEmlmUNlhocOI34=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1753810965; c=relaxed/simple;
-	bh=e7H65OUTTySjbVhc8bnRw+W3Xmwc3ESREGLczzyVkRw=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ifSG+XGRSI7eh/GCLCNtSNuiWeURjpgER13Cnmeez0ne7YHn1RYDjQ9lWaPKxhAF5TA97duKS9rMoMogeBxitLpdyqBcx9OVETkf9KZiWA/gy1GqJw9ATW9RqhYv9x2aqUd1FmErkj7j86YFV1jQo8v77tESVWG5+mCYEPec/k8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XqoIF3wN; arc=none smtp.client-ip=209.85.216.73
+	bh=Tw3eT5+iSuoQ8qKLRQi8HnYPIAcfpsKb0i0ErGvCLhc=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=M7GHf1xNEmShFbXvpxAZT2G1D9sE5cfW/KcGPhbstJRkVG/JzOYyxBI2JmwZDmqVe2/aTcfZcqExfBEsgwzTwQo730ZMYVKr5sVY3Bbx8fprKpLRmx60jI5AmCRsY/+7jLQ2hatIWWmD+rQdxAl29LNoPicdrOOs397pyagmkZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ngM5zMq6; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-31eac278794so3294054a91.3
-        for <kvm@vger.kernel.org>; Tue, 29 Jul 2025 10:42:42 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-31f322718faso864850a91.0
+        for <kvm@vger.kernel.org>; Tue, 29 Jul 2025 10:42:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753810961; x=1754415761; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=82FN5fIR/hwkzJS9jFM+jcYFsAggMEElUtfqK1j0Xxw=;
-        b=XqoIF3wNBNXflx66ataHWznDp2fURzByURZid/z1hQt5FuBQmx6cNCRiOcgAWDPzSO
-         R6/k0GVWZePqYmVc+pJeRZRDiVdAKoRQr7fgwX7olNm9tu2iLaNT/PHae5V1shBhiWeb
-         U3wflnnHUCN9BN+9DDfIblw2QIPtBRcmedDYBKadi2kwppStXrvhmEyeOTqVuZnkiw5x
-         3YU4aCCWMlsB1uTQ0HrombvUqmWl+IFpxraxqnYJd2VYyCFkeZqJCwcPkIsFD+bAkMbP
-         gjQ61f/iqhv9gk4OygRbmzT9K+fE9QJSvrvjUzkjvrg1Q2XaiND9wsbRIjml9A0lJ6Hj
-         Zkgw==
+        d=google.com; s=20230601; t=1753810963; x=1754415763; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=28d3iRVWXUX6sIuoOntS0GSvjTzmcc+IeE+Mf6uMd/w=;
+        b=ngM5zMq6YKJIGjfoPeb4omh4kIgptqTb9R3/bxZIf8O2iWTPT5yetDDFSR5hDZ1JMH
+         yT57duoRh4RGl3IvP+hE0QxZ7dInYPoX3xFdiKCFg9YkaNVPwD8JM5fsFu9DJ5BAgXTr
+         Ug9Xb0rBpnJI1E4e4fZc13uFj+HV3RrwI2lbfY+62GNO2qRe8hoo1BanZBx4UuREFFH9
+         EcROBLPS6yDJT/ssLExYzyjsnWd6ZYlC0nC78Adl5Qnd8TVlhACJ19+/qIZOJYL0DwLA
+         X0kgOypBwrjuOiT/BYAQNhaYg7v9E5uKcx9zqN3Rnjc6ELZ+VhUOKU2nmnr7hT+brk0u
+         zLLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753810961; x=1754415761;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=82FN5fIR/hwkzJS9jFM+jcYFsAggMEElUtfqK1j0Xxw=;
-        b=c+mYXUNlAZVf8/ObDYoSCUS2bgZNFKRI2PAFo5oAWDhsArnL33yZriwPZrkc6U0Seq
-         RQXnk1XD+EYpkVfg375A9Hvcx4rcP0uIIxYeWNCXvPP/HubTYrP5bnqscTRgFIGMeqci
-         2HGMWL90PULDP/mIzlA+Pd38VfE29mWdaVAcBClEUaNwSKi+vQDYIf7vjdC1FOSKRvGt
-         d8Q34LrZNDRiJz6w7r8SDApurGCMCIvkWxGb332s+Ixql2HP82e1BXLJ2CktSOm1kcs8
-         ox1SvUVv4d5CWotkpm364bz87p7E94gvoXZWSGyTelQLrC4udyxWWD/YcESEh91vy8FJ
-         TW6g==
-X-Forwarded-Encrypted: i=1; AJvYcCXdO2aPoqTmx1T6/ZpWNTu3TnBrRrP+SU4c0DDFMY3Xuvd1PZ3thtTW43oqx+NoGktTbxw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxACWIKncjaNH+cp2EkxdIQ8RvtLysjJrjb07vimXIVrT9EJ0uH
-	k1vB/CfOh7V2eVu7vntadxO4qjD5hZQCohgiDsgIqe68FtK9c3WwcZkIvJqavdQHHCWSmAJU7Iv
-	Gq/pEJQ==
-X-Google-Smtp-Source: AGHT+IHL9uyOCJhKfXzpWPYdk2ktpEDltn10+YA1InNR0RiEZWVGuenP/JjoNtMCTI8JhTdD+YDYzrbjaOw=
-X-Received: from pjv8.prod.google.com ([2002:a17:90b:5648:b0:31f:37f:d381])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:e706:b0:312:daf3:bac9
- with SMTP id 98e67ed59e1d1-31f5de69a49mr434036a91.34.1753810961444; Tue, 29
- Jul 2025 10:42:41 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1753810963; x=1754415763;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=28d3iRVWXUX6sIuoOntS0GSvjTzmcc+IeE+Mf6uMd/w=;
+        b=CM2REp2c3oHgCSta9T50zz6Ir1+qLgBXtXmxCeVuYwb+oB5hH3kxdD2Pwj9jPIHIDM
+         paVuSEOK6ymB3QaUGqvmylhk312YmHJPXSnDPXuFsaUrGZMqdEMGDGdxjNBsqE1YQJus
+         0BYMz0t7nOieem/8p+rxaT0XHQsl6l04y79gr8QUxchRmu8anZvvNmPhVwB+dsBxxG2c
+         jE2S2U/95j14Oftm/EBIBJhXPNQf1iA5KMDYQIS+/qqxU17lrnlTxjV616thczIWOpyY
+         AqSz37ViXVhWinyIWJP/XcqHgCi3sDN5hvmMHZ+dnD+ZQgymvyCcc7wQrjRZpqoKbKO3
+         sXrQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXF05ZTuKSm2BNEvLJLAKQVf2xeoS49nv8cFalePzFagRfjr446eJtkdgGeEwUS6sKuNjw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzp9G35XBRCNLAPjjK8l/SNoSJPWw23z9jCjA69UZER+iBjjvYx
+	hMRGOjNeOjBH7Kz1T4kipkxuJzol/oVq8kCOep4otaIhiFyzCGIn41bjIRFsW7AnuEwwJz/HImm
+	Vd02MNg==
+X-Google-Smtp-Source: AGHT+IGrgXqonk21Zb71xxleI4T0pEaWNxg21m5l9HHcgxwGP0sMZOCP8Yhgfitp+Fk5/XHGu56nse7Bq+I=
+X-Received: from pjsc23.prod.google.com ([2002:a17:90a:bf17:b0:2e0:915d:d594])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4ac5:b0:31f:2efe:ced3
+ with SMTP id 98e67ed59e1d1-31f5de2f623mr482833a91.5.1753810963229; Tue, 29
+ Jul 2025 10:42:43 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 29 Jul 2025 10:42:32 -0700
+Date: Tue, 29 Jul 2025 10:42:33 -0700
+In-Reply-To: <20250729174238.593070-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20250729174238.593070-1-seanjc@google.com>
 X-Mailer: git-send-email 2.50.1.552.g942d659e1b-goog
-Message-ID: <20250729174238.593070-1-seanjc@google.com>
-Subject: [PATCH 0/6] KVM: Export KVM-internal symbols for sub-modules only
+Message-ID: <20250729174238.593070-2-seanjc@google.com>
+Subject: [PATCH 1/6] KVM: s390/vfio-ap: Use kvm_is_gpa_in_memslot() instead of
+ open coded equivalent
 From: Sean Christopherson <seanjc@google.com>
 To: Madhavan Srinivasan <maddy@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
 	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
@@ -93,90 +98,77 @@ Cc: linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
 	linux-s390@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Use the newfangled EXPORT_SYMBOL_GPL_FOR_MODULES() along with some macro
-shenanigans to export KVM-internal symbols if and only if KVM has one or
-more sub-modules, and only for those sub-modules, e.g. x86's kvm-amd.ko
-and/or kvm-intel.ko.
+Use kvm_is_gpa_in_memslot() to check the validity of the notification
+indicator byte address instead of open coding equivalent logic in the VFIO
+AP driver.
 
-Patch 5 gives KVM x86 the full treatment.  If anyone wants to tackle PPC,
-it should be doable to restrict KVM PPC's exports as well.
+Opportunistically use a dedicated wrapper that exists and is exported
+expressly for the VFIO AP module.  kvm_is_gpa_in_memslot() is generally
+unsuitable for use outside of KVM; other drivers typically shouldn't rely
+on KVM's memslots, and using the API requires kvm->srcu (or slots_lock) to
+be held for the entire duration of the usage, e.g. to avoid TOCTOU bugs.
+handle_pqap() is a bit of a special case, as it's explicitly invoked from
+KVM with kvm->srcu already held, and the VFIO AP driver is in many ways an
+extension of KVM that happens to live in a separate module.
 
-Patch 6 is essentially an RFC; it compiles and is tested, but it probably
-should be chunked into multiple patches.  The main reason I included it
-here is to get feedback on using kvm_types.h to define the "for KVM" macros.
-For KVM itself, kvm_types.h is a solid choice, but it feels a bit awkward
-for non-KVM usage, and including linux/kvm_types.h in non-KVM generic code,
-e.g. in kernel/, isn't viable at the moment because asm/kvm_types.h is only
-provided by architectures that actually support KVM.
+Providing a dedicated API for the VFIO AP driver will allow restricting
+the vast majority of generic KVM's exports to KVM submodules (e.g. to x86's
+kvm-{amd,intel}.ko vendor mdoules).
 
-Based on kvm/queue.
+No functional change intended.
 
-Sean Christopherson (6):
-  KVM: s390/vfio-ap: Use kvm_is_gpa_in_memslot() instead of open coded
-    equivalent
-  KVM: Export KVM-internal symbols for sub-modules only
-  KVM: x86: Move kvm_intr_is_single_vcpu() to lapic.c
-  KVM: x86: Drop pointless exports of kvm_arch_xxx() hooks
-  KVM: x86: Export KVM-internal symbols for sub-modules only
-  x86: Restrict KVM-induced symbol exports to KVM modules where
-    obvious/possible
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/s390/include/asm/kvm_host.h  | 2 ++
+ arch/s390/kvm/priv.c              | 8 ++++++++
+ drivers/s390/crypto/vfio_ap_ops.c | 2 +-
+ 3 files changed, 11 insertions(+), 1 deletion(-)
 
- arch/powerpc/include/asm/kvm_types.h |  15 ++
- arch/s390/include/asm/kvm_host.h     |   2 +
- arch/s390/kvm/priv.c                 |   8 +
- arch/x86/entry/entry.S               |   7 +-
- arch/x86/entry/entry_64_fred.S       |   3 +-
- arch/x86/events/amd/core.c           |   5 +-
- arch/x86/events/core.c               |   7 +-
- arch/x86/events/intel/lbr.c          |   3 +-
- arch/x86/events/intel/pt.c           |   7 +-
- arch/x86/include/asm/kvm_host.h      |   3 -
- arch/x86/include/asm/kvm_types.h     |  15 ++
- arch/x86/kernel/apic/apic.c          |   3 +-
- arch/x86/kernel/apic/apic_common.c   |   3 +-
- arch/x86/kernel/cpu/amd.c            |   4 +-
- arch/x86/kernel/cpu/bugs.c           |  17 +--
- arch/x86/kernel/cpu/bus_lock.c       |   3 +-
- arch/x86/kernel/cpu/common.c         |   7 +-
- arch/x86/kernel/cpu/sgx/main.c       |   3 +-
- arch/x86/kernel/cpu/sgx/virt.c       |   5 +-
- arch/x86/kernel/e820.c               |   3 +-
- arch/x86/kernel/fpu/core.c           |  21 +--
- arch/x86/kernel/fpu/xstate.c         |   7 +-
- arch/x86/kernel/hw_breakpoint.c      |   3 +-
- arch/x86/kernel/irq.c                |   3 +-
- arch/x86/kernel/kvm.c                |   5 +-
- arch/x86/kernel/nmi.c                |   5 +-
- arch/x86/kernel/process_64.c         |   5 +-
- arch/x86/kernel/reboot.c             |   5 +-
- arch/x86/kernel/tsc.c                |   1 +
- arch/x86/kvm/cpuid.c                 |  10 +-
- arch/x86/kvm/hyperv.c                |   4 +-
- arch/x86/kvm/irq.c                   |  34 +----
- arch/x86/kvm/kvm_onhyperv.c          |   6 +-
- arch/x86/kvm/lapic.c                 |  70 ++++++---
- arch/x86/kvm/lapic.h                 |   4 +-
- arch/x86/kvm/mmu/mmu.c               |  36 ++---
- arch/x86/kvm/mmu/spte.c              |  10 +-
- arch/x86/kvm/mmu/tdp_mmu.c           |   2 +-
- arch/x86/kvm/pmu.c                   |   8 +-
- arch/x86/kvm/smm.c                   |   2 +-
- arch/x86/kvm/x86.c                   | 211 +++++++++++++--------------
- arch/x86/lib/cache-smp.c             |   9 +-
- arch/x86/lib/msr.c                   |   5 +-
- arch/x86/mm/pat/memtype.c            |   3 +-
- arch/x86/mm/tlb.c                    |   5 +-
- arch/x86/virt/vmx/tdx/tdx.c          |  65 +++++----
- drivers/s390/crypto/vfio_ap_ops.c    |   2 +-
- include/linux/kvm_types.h            |  39 ++++-
- virt/kvm/eventfd.c                   |   2 +-
- virt/kvm/guest_memfd.c               |   4 +-
- virt/kvm/kvm_main.c                  | 126 ++++++++--------
- 51 files changed, 457 insertions(+), 378 deletions(-)
- create mode 100644 arch/powerpc/include/asm/kvm_types.h
-
-
-base-commit: beafd7ecf2255e8b62a42dc04f54843033db3d24
+diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+index cb89e54ada25..449bc34e7cc3 100644
+--- a/arch/s390/include/asm/kvm_host.h
++++ b/arch/s390/include/asm/kvm_host.h
+@@ -719,6 +719,8 @@ bool kvm_s390_pv_cpu_is_protected(struct kvm_vcpu *vcpu);
+ extern int kvm_s390_gisc_register(struct kvm *kvm, u32 gisc);
+ extern int kvm_s390_gisc_unregister(struct kvm *kvm, u32 gisc);
+ 
++bool kvm_s390_is_gpa_in_memslot(struct kvm *kvm, gpa_t gpa);
++
+ static inline void kvm_arch_free_memslot(struct kvm *kvm,
+ 					 struct kvm_memory_slot *slot) {}
+ static inline void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen) {}
+diff --git a/arch/s390/kvm/priv.c b/arch/s390/kvm/priv.c
+index 9253c70897a8..7773e1e323bc 100644
+--- a/arch/s390/kvm/priv.c
++++ b/arch/s390/kvm/priv.c
+@@ -605,6 +605,14 @@ static int handle_io_inst(struct kvm_vcpu *vcpu)
+ 	}
+ }
+ 
++#if IS_ENABLED(CONFIG_VFIO_AP)
++bool kvm_s390_is_gpa_in_memslot(struct kvm *kvm, gpa_t gpa)
++{
++	return kvm_is_gpa_in_memslot(kvm, gpa);
++}
++EXPORT_SYMBOL_GPL_FOR_MODULES(kvm_s390_is_gpa_in_memslot, "vfio_ap");
++#endif
++
+ /*
+  * handle_pqap: Handling pqap interception
+  * @vcpu: the vcpu having issue the pqap instruction
+diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+index 766557547f83..eb5ff49f6fe7 100644
+--- a/drivers/s390/crypto/vfio_ap_ops.c
++++ b/drivers/s390/crypto/vfio_ap_ops.c
+@@ -354,7 +354,7 @@ static int vfio_ap_validate_nib(struct kvm_vcpu *vcpu, dma_addr_t *nib)
+ 
+ 	if (!*nib)
+ 		return -EINVAL;
+-	if (kvm_is_error_hva(gfn_to_hva(vcpu->kvm, *nib >> PAGE_SHIFT)))
++	if (!kvm_s390_is_gpa_in_memslot(vcpu->kvm, *nib))
+ 		return -EINVAL;
+ 
+ 	return 0;
 -- 
 2.50.1.552.g942d659e1b-goog
 
