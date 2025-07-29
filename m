@@ -1,199 +1,123 @@
-Return-Path: <kvm+bounces-53634-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53635-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8E3FB14D0F
-	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 13:34:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20702B14D10
+	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 13:37:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B1062543F97
-	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 11:34:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34BAF3AEA18
+	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 11:36:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A06ED28DB78;
-	Tue, 29 Jul 2025 11:34:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23E6828DF0C;
+	Tue, 29 Jul 2025 11:37:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="zMVcsQ+S"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="mXOPsRtM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14342287244
-	for <kvm@vger.kernel.org>; Tue, 29 Jul 2025 11:34:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94827254841
+	for <kvm@vger.kernel.org>; Tue, 29 Jul 2025 11:37:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753788875; cv=none; b=PahpTuIwEJPuVBDde4Jr7RTcOOdOFhGSAag33iiBtNYiD27+U62nUyN9teY0XQl+FmHEi5TV27K+f9PCvlyMFOY6CiJMFpEy90rqeofauD2EkHZoRUkS2WhAR6XxaHSxakrb8FEQhsoFZH1+lKMZAppb0iXYywECh5h6ZSp++Dg=
+	t=1753789032; cv=none; b=TAKkzAUD9SsK9yYCOCPCVBREic2Zkq9ev+p7Lal9aRRFrTKW35jI0vA9V2dHYT9iYmrLuFRQ/B5h6VdtWJ11/fGEDZ/lQkqWfXLzPVwPPJdPl4NvA/xSkXrO0PINJ89PAVXipU4wAsfEYuenJuoE8gQMNkoV4gZLiBi3ZBL8pok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753788875; c=relaxed/simple;
-	bh=4bTmZMAxGYLZsOLEqyqLPYL1rn8WS8uLfgweifnVPPg=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=k7eoiL19GlZAs7m8iXE0Wc+wh8H7SBOj4qSej1N+PFQfSvrqK7rL65xPZ+Evpe4Nxx9k55FeZWgm/cpFXUfNTDOkyWEoQxjuQ7kedTW3xAn/4jiZeq35pHJ2y+V9G8NYSgY0IOIkW/XXN9++iuCE6RYmNRQAm9EUtMNROGgraWk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=zMVcsQ+S; arc=none smtp.client-ip=209.85.166.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-3e3f0287842so2192245ab.3
-        for <kvm@vger.kernel.org>; Tue, 29 Jul 2025 04:34:33 -0700 (PDT)
+	s=arc-20240116; t=1753789032; c=relaxed/simple;
+	bh=mNd74IQITEorMs9LyfvIzBFQmBs+koTjl7VxtOqVCCw=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
+	 References:In-Reply-To; b=K8ekqI//6bqBb3QZuiPjlpcbhr3UgXTne49oWfaEMqy9fCreihxX/RaOHIWLKO85N46wFj6dKzHo1yx/WT7Uurg03yyw6jsr40u8BUQMd4Tb3fQXu6+JdNeu0J1BFN6kEVO2kgu7GybkTgfBUlol5Fu/f7QRPA/aYGjQeC3+MFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=mXOPsRtM; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-456133b8d47so3229355e9.2
+        for <kvm@vger.kernel.org>; Tue, 29 Jul 2025 04:37:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1753788873; x=1754393673; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=daOYCtHcKqTfbTy+/LedurRo3q87yoM5HXRvS7LIiGg=;
-        b=zMVcsQ+SPYhIMGYFUsuBVOFd0op5weSd8d/cyGrDXCC5TMdZGWsKwzCgHPeHSJ3s8f
-         KmarqTucKfhVE3S0gQXK/COeh44U0SvIwhQX7D4rEGguBlvS6j5SUeECtzjFrUvRjqOY
-         8wAW5aPP/K4EADGQ+EvVfJ7Xr1/+OdJ1dAbkv1lwkRlExIfcApsS81fFVHrR045tu11e
-         DjS1gNKLfanEptvq6DaiRUt1NWf4v8hozSW4l3Cx7e7WWGdYf4WzPaBoJnF0ZZPhi1zi
-         ycA41YB2CeZC2I9GDW8Zj/EX3d/OiVXyndaq6S4CSWkT6m2Vq5rpuO2ZIrVKh+Mh6c65
-         JIbg==
+        d=ventanamicro.com; s=google; t=1753789029; x=1754393829; darn=vger.kernel.org;
+        h=in-reply-to:references:from:to:cc:subject:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mNd74IQITEorMs9LyfvIzBFQmBs+koTjl7VxtOqVCCw=;
+        b=mXOPsRtMnNqvlz0Pnkb6JB9WLnCCGl41bH9J5DbczE4MMvssYeg1Y+5g1IjL2/iHZx
+         LhLlfiAhE0gYr0oD0+C/9xSB4wDSzPpc0D2j31kdXxVbVwcXqyVezfLrFcRHQ7SZkYje
+         chBsgBT3LYF+cPPK7dGedkwny8G/s8Mk73fWjhwdS5bu3ug/5Y3Ys+5j4FeJYsVm0hJK
+         UH1HhIAgCIOjspezwM7sIHvhTMi0vJqKWQNHZp0pKnRbwCi44UHURHmMFXOL7CB/GeSi
+         FRURq5qFL4mItjE9OoMwzwgm58yZAZT1LlP33eWDCSlLnQ9gPgJFydB81mj7y+06tE5q
+         Ld9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753788873; x=1754393673;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=daOYCtHcKqTfbTy+/LedurRo3q87yoM5HXRvS7LIiGg=;
-        b=TpGx/h7eMjCgQ4Hg9upGVWzsZbi5IkZ2RGTT7HLYht7K9Gt2zkbv0/rlKZdF4iiKxW
-         2gyZMfBxQRc0Du6jES93QGHV9Nlx0T36bzkzciaOocYnI7lardO2zwengUoia4cGjXoz
-         6Xi7jnAYzJLDoB+5UspCwbclaUZwSvt7yXKR6lVMY9QwHSmxQodUflfCFRLhIISuO8ki
-         fPeE7uN7TM/dR6sdorN59XKLW3+saXrETHFLou9GWJ1v9ttYSioqfOOTPafz5qAaG7qe
-         eL7XGBEwKGtB9JYsL6I9a3cU81RRGgyv0ny1p3luaLy0FQjYmPg9co/MRpzluORZ/xZ4
-         3JXA==
-X-Forwarded-Encrypted: i=1; AJvYcCWRdqY9hFbYJ61IqMupoEqBS97evaNTjk0vHg44XXmm7bYwilqtwUwH/qrjj2ita7PZeck=@vger.kernel.org
-X-Gm-Message-State: AOJu0YysLV9HXAnD8sCeRw9OPJCD6aM6TY3S+hFCld9vg0PAv5wpHMmt
-	lUIWS4Vqdh58ax0Yc+yTWiDPz2l2Jyfi1+E7h7gvjxCEH36CMRt0ckGCvQEHgkfHAIRpYzu7fMm
-	UyIz1CV6gBLjQx51GpzYLHzNZR7FmfsciobfN5tmRCQ==
-X-Gm-Gg: ASbGncsjhqQhXOiXi5goQ6+sW4iPncvfc3VKbdEqVRV2FK/cdvFz+DQ0sTzQ1SKAZui
-	lSNdyYgziP+Tb/yYgFbxCeXTtfgXIfu0rFza5jWUZkJphwvMTOLJcAJo9Z8VrBm/OURncICQybB
-	SJ3Uz8omxcgJdpj+Y6NwoBnh/expHooBhKglSUxIU78nlByUR+5qbv1915lF9rBWQgQNxq595ek
-	VdFReNf
-X-Google-Smtp-Source: AGHT+IH917iBY708672C0730m2YYQWRgPPgotTyiQjMZA+uT5bjdUy+2BAMZX5F3xAV3M5Bh9YYEvBdXL3KqtNWqFkA=
-X-Received: by 2002:a05:6e02:310d:b0:3e0:4f66:310a with SMTP id
- e9e14a558f8ab-3e3c52c5597mr251835775ab.16.1753788873090; Tue, 29 Jul 2025
- 04:34:33 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1753789029; x=1754393829;
+        h=in-reply-to:references:from:to:cc:subject:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=mNd74IQITEorMs9LyfvIzBFQmBs+koTjl7VxtOqVCCw=;
+        b=hek5SOt8wPgfsGnuHNfIyCRfLNROHfqUweUIihI7pZ32qgT25GtjnF9k/JP9YEzywL
+         d29R9i7RQxgeD/KUGUXnEgQjvXJyDQQI0fI3ccdSDx1AeCW0YKOTIpwN3i+gECW0M1ne
+         +gC1fNu+huAhA8MhNIkMpZiRq7PjZOKY3FTTG/xlHYX3ujQBUD16x4j7Vuvxfzatyspw
+         0cqn/UlWeEkp0aan219OAcK3qXC6255b9Uw2t6njsAKRKG2uUkMr4ZckNuu/w7cKSPku
+         MTxzwZ+W4cGXoJUloSYet/U72L5nwzj4F3WozOusEw0M+gFYovD5X4gtsgrkcZWXA9Zv
+         pyoQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVPmGsS5b9tEg6UQ/CIkqNYCyclzaulRtl/1+xdbMvbxpSOv0HJdMciQ+6sFYcCsY6uUkM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxCLZBnkBdf7a29p/QoZEoqgWJMNzIQh81nyRtVH8438x5+0558
+	R5+TjVQc2sMjN6tFDUwRm6UWEFrhN7ync2A6Mkg3eO+9dYiPUJykU7HCUN5gPYYNjuY=
+X-Gm-Gg: ASbGncvQ90gRPWuPqoz8zEWjs/bKu8bS4YL/wBY8A/dtZgHN23XjdF7h/jbGus4HUSE
+	9yCUatVc9peTENVKrJtpZTX58YHavjHzktXLu9Ln6xf/82Br7qR7ez8C7LBZwbGZR+3t62VEI6c
+	t+e7mDJRXOhNeVgJyk7oIwnV3ULmtx+VcV4lBs5xkVFWTpjpgChnuBuQrZi6mycu3LmxmB36l+4
+	TSczLXEfI3YNNo1/IpaegEhhe1iyZn7DsuBmRkE+xjg3kh2EgSXqhln2fobWS2hakkp7w4lnVRP
+	DGFxIpzUmKDWVhHKO0thMeowQpF7aNBBn6qiPJ6FPB7Z8JBDwB6TXJa+lc24JAYn1dJhHKfIhqv
+	NXSA4pq401VqmPMmdoBdiWOlJSOcroqymPrn7Qv2F
+X-Google-Smtp-Source: AGHT+IGx/xqumpoXOavJf3Q9WFPJjniNReIvUAgEgTBSvd6YC7kBN//pTA0UjL3asQ8LZFYOCaj+XA==
+X-Received: by 2002:a05:600c:46ce:b0:43b:c844:a4ba with SMTP id 5b1f17b1804b1-4587654b656mr47415595e9.3.1753789028662;
+        Tue, 29 Jul 2025 04:37:08 -0700 (PDT)
+Received: from localhost ([2a02:8308:a00c:e200:293e:b70a:263b:689c])
+        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-4588e5cc2aasm22325705e9.16.2025.07.29.04.37.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Jul 2025 04:37:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: Anup Patel <anup@brainfault.org>
-Date: Tue, 29 Jul 2025 17:04:22 +0530
-X-Gm-Features: Ac12FXwcgbzb8N18xeNkH61ZYMQ1LhG1RslkelEOomjsJCdwTCoc3-pvkEBepOY
-Message-ID: <CAAhSdy1084USuM+k9T-AP7X_=s7x+WFv++U0PkjVojbPbjRCrw@mail.gmail.com>
-Subject: [GIT PULL v2] KVM/riscv changes for 6.17
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Palmer Dabbelt <palmer@dabbelt.com>, Andrew Jones <ajones@ventanamicro.com>, 
-	Atish Patra <atishp@rivosinc.com>, Atish Patra <atish.patra@linux.dev>, 
-	"open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" <kvm-riscv@lists.infradead.org>, KVM General <kvm@vger.kernel.org>, 
-	linux-riscv <linux-riscv@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Tue, 29 Jul 2025 13:37:07 +0200
+Message-Id: <DBOIBORLK6YM.7SND5YPEJR60@ventanamicro.com>
+Subject: Re: [GIT PULL] KVM/riscv changes for 6.17
+Cc: "Anup Patel" <anup@brainfault.org>, "Palmer Dabbelt"
+ <palmer@dabbelt.com>, "Andrew Jones" <ajones@ventanamicro.com>, "Atish
+ Patra" <atishp@rivosinc.com>, "Atish Patra" <atish.patra@linux.dev>, "open
+ list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)"
+ <kvm-riscv@lists.infradead.org>, "KVM General" <kvm@vger.kernel.org>,
+ "linux-riscv" <linux-riscv@lists.infradead.org>, "linux-riscv"
+ <linux-riscv-bounces@lists.infradead.org>
+To: "Paolo Bonzini" <pbonzini@redhat.com>, "Anup Patel"
+ <apatel@ventanamicro.com>
+From: =?utf-8?q?Radim_Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@ventanamicro.com>
+References: <CAAhSdy12xtRRem-AybfymGHh+sj4qSDDG0XL6M6as=cD5Y2tkA@mail.gmail.com> <CABgObfYEgf9mTLWByDJeqDT+2PukVn3x2S0gu4TZQP6u5dCtoQ@mail.gmail.com> <CAAhSdy3Jr1-8TVcEhiCUrc-DHQSTPE1RjF--marQPtcV6FPjJA@mail.gmail.com> <CABgObfaDkfUa+=Dthqx_ZFy418KLFkqy2+tKLaGEZmbZ6SbhBA@mail.gmail.com> <CAK9=C2VamSz4ySKc6JKjrLv9ugcTOONAL4+NmKAexoUgw7kP6w@mail.gmail.com> <CABgObfZu2fPFaSy2EHzpD_MUwYYeYMfz6BfXmTw_h3ob1q2=yg@mail.gmail.com>
+In-Reply-To: <CABgObfZu2fPFaSy2EHzpD_MUwYYeYMfz6BfXmTw_h3ob1q2=yg@mail.gmail.com>
 
-Hi Paolo,
-
-We have the following KVM RISC-V changes for 6.17:
-1) Enabled ring-based dirty memory tracking
-2) Improved "perf kvm stat" to report interrupt events
-3) Delegate illegal instruction trap to VS-mode
-4) MMU related improvements for KVM RISC-V for the
-    upcoming nested virtualization support
-
-Please pull.
-
-Regards,
-Anup
-
-The following changes since commit 4cec89db80ba81fa4524c6449c0494b8ae08eeb0=
+2025-07-28T18:50:10+02:00, Paolo Bonzini <pbonzini@redhat.com>:
+> Il lun 28 lug 2025, 18:21 Anup Patel <apatel@ventanamicro.com> ha scritto=
 :
+>> Currently, userspace only has a way to enable/disable the entire
+>> SBI FWFT extension. We definitely need to extend ONE_REG
+>> interface to allow userspace save/restore SBI FWFT state. I am
+>> sure this will happen pretty soon (probably next merge window).
+>>
+>> At the moment, I am not sure whether userspace also needs a
+>> way to enable/disable individual features of SBI FWFT extension.
+>> What do you think ?
+>
+> Yes, you do. FWFT extensions are equivalent to CPU extensions. But all
+> this should have been done before including Clement's work. Without it
+> userspace has no way to support FWFT.
+>
+> Drew, I see you have Reviewed-by on the patches; please keep an eye on
+> this stuff.
 
-  RISC-V: KVM: Move HGEI[E|P] CSR access to IMSIC virtualization
-(2025-07-11 18:33:27 +0530)
-
-are available in the Git repository at:
-
-  https://github.com/kvm-riscv/linux.git tags/kvm-riscv-6.17-2
-
-for you to fetch changes up to 07a289a031404ec583c01d8e87680d434fc62c1f:
-
-  RISC-V: KVM: Avoid re-acquiring memslot in kvm_riscv_gstage_map()
-(2025-07-28 22:28:31 +0530)
-
-----------------------------------------------------------------
-KVM/riscv changes for 6.17
-
-- Enabled ring-based dirty memory tracking
-- Improved perf kvm stat to report interrupt events
-- Delegate illegal instruction trap to VS-mode
-- MMU related improvements for KVM RISC-V for upcoming
-  nested virtualization
-
-----------------------------------------------------------------
-Anup Patel (12):
-      RISC-V: KVM: Check kvm_riscv_vcpu_alloc_vector_context() return value
-      RISC-V: KVM: Drop the return value of kvm_riscv_vcpu_aia_init()
-      RISC-V: KVM: Rename and move kvm_riscv_local_tlb_sanitize()
-      RISC-V: KVM: Replace KVM_REQ_HFENCE_GVMA_VMID_ALL with KVM_REQ_TLB_FL=
-USH
-      RISC-V: KVM: Don't flush TLB when PTE is unchanged
-      RISC-V: KVM: Implement kvm_arch_flush_remote_tlbs_range()
-      RISC-V: KVM: Use ncsr_xyz() in kvm_riscv_vcpu_trap_redirect()
-      RISC-V: KVM: Factor-out MMU related declarations into separate header=
-s
-      RISC-V: KVM: Introduce struct kvm_gstage_mapping
-      RISC-V: KVM: Add vmid field to struct kvm_riscv_hfence
-      RISC-V: KVM: Factor-out g-stage page table management
-      RISC-V: KVM: Pass VMID as parameter to kvm_riscv_hfence_xyz() APIs
-
-Cl=C3=A9ment L=C3=A9ger (2):
-      RISC-V: KVM: add SBI extension init()/deinit() functions
-      RISC-V: KVM: add SBI extension reset callback
-
-Quan Zhou (4):
-      RISC-V: KVM: Enable ring-based dirty memory tracking
-      RISC-V: perf/kvm: Add reporting of interrupt events
-      RISC-V: KVM: Use find_vma_intersection() to search for intersecting V=
-MAs
-      RISC-V: KVM: Avoid re-acquiring memslot in kvm_riscv_gstage_map()
-
-Samuel Holland (1):
-      RISC-V: KVM: Fix inclusion of Smnpm in the guest ISA bitmap
-
-Xu Lu (1):
-      RISC-V: KVM: Delegate illegal instruction fault to VS mode
-
- Documentation/virt/kvm/api.rst                     |   2 +-
- arch/riscv/include/asm/kvm_aia.h                   |   2 +-
- arch/riscv/include/asm/kvm_gstage.h                |  72 +++
- arch/riscv/include/asm/kvm_host.h                  | 105 +----
- arch/riscv/include/asm/kvm_mmu.h                   |  21 +
- arch/riscv/include/asm/kvm_tlb.h                   |  84 ++++
- arch/riscv/include/asm/kvm_vcpu_sbi.h              |  12 +
- arch/riscv/include/asm/kvm_vmid.h                  |  27 ++
- arch/riscv/include/uapi/asm/kvm.h                  |   1 +
- arch/riscv/kvm/Kconfig                             |   1 +
- arch/riscv/kvm/Makefile                            |   1 +
- arch/riscv/kvm/aia_device.c                        |   6 +-
- arch/riscv/kvm/aia_imsic.c                         |  12 +-
- arch/riscv/kvm/gstage.c                            | 338 ++++++++++++++
- arch/riscv/kvm/main.c                              |   3 +-
- arch/riscv/kvm/mmu.c                               | 509 +++++------------=
-----
- arch/riscv/kvm/tlb.c                               | 110 ++---
- arch/riscv/kvm/vcpu.c                              |  48 +-
- arch/riscv/kvm/vcpu_exit.c                         |  20 +-
- arch/riscv/kvm/vcpu_onereg.c                       |  83 ++--
- arch/riscv/kvm/vcpu_sbi.c                          |  49 ++
- arch/riscv/kvm/vcpu_sbi_replace.c                  |  17 +-
- arch/riscv/kvm/vcpu_sbi_sta.c                      |   3 +-
- arch/riscv/kvm/vcpu_sbi_v01.c                      |  25 +-
- arch/riscv/kvm/vm.c                                |   7 +-
- arch/riscv/kvm/vmid.c                              |  25 +
- tools/perf/arch/riscv/util/kvm-stat.c              |   6 +-
- tools/perf/arch/riscv/util/riscv_exception_types.h |  35 --
- tools/perf/arch/riscv/util/riscv_trap_types.h      |  57 +++
- 29 files changed, 1000 insertions(+), 681 deletions(-)
- create mode 100644 arch/riscv/include/asm/kvm_gstage.h
- create mode 100644 arch/riscv/include/asm/kvm_mmu.h
- create mode 100644 arch/riscv/include/asm/kvm_tlb.h
- create mode 100644 arch/riscv/include/asm/kvm_vmid.h
- create mode 100644 arch/riscv/kvm/gstage.c
- delete mode 100644 tools/perf/arch/riscv/util/riscv_exception_types.h
- create mode 100644 tools/perf/arch/riscv/util/riscv_trap_types.h
+Sorry, I didn't try too hard to convince others after noticing it, and
+planned to fix the most significant breakage in later rcs.
+(If FWFT wasn't enabled by default, sane userspace just wouldn't expose
+ FWFT to the guest until a proper KVM configuration was added).
 
