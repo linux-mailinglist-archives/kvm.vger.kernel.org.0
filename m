@@ -1,90 +1,90 @@
-Return-Path: <kvm+bounces-53619-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53620-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3F52B14B7F
-	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 11:41:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EA4BB14B88
+	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 11:43:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D2BE916CF21
-	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 09:41:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB4E63A36F6
+	for <lists+kvm@lfdr.de>; Tue, 29 Jul 2025 09:42:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 262382877EF;
-	Tue, 29 Jul 2025 09:41:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 291E52882D0;
+	Tue, 29 Jul 2025 09:43:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pum9zC7Q"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MJPv58gI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B27DC27057D
-	for <kvm@vger.kernel.org>; Tue, 29 Jul 2025 09:41:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADA611624E1
+	for <kvm@vger.kernel.org>; Tue, 29 Jul 2025 09:43:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753782096; cv=none; b=I3hnkPOeB1JxdU9mkovUhyCQs5x/9uFWw+IEf5WbTxs+/aWJTjGT3g6URw9VF+u0d8Mcl1sXfbSXItd9Jf8avf4D09ejLzXF0J2NI7C0wEvV//6yYJS4q8Vm+bMahmMOFSK1FN3AVBblxod8j30H8IKx16mxCbRZRAVYdcAlDeg=
+	t=1753782203; cv=none; b=TIdyESYeDa5/avMh5ri/liwrlE4XB8Jz1/0asKF/h/VD5GuGJ8kAZszGpeA5/IXAEDNuOO72v9xQz3HiFC/qJvcMfhFH+310uNHNgy2/XNYakVvKkV6BiJtDtthOhQbBk0zcu72ABrKL7NQLToNx+vQIJ4JbWcLwYTC2ae8BBgM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753782096; c=relaxed/simple;
-	bh=pze3g9I9ImuGvTuwzZt8zseQTd+y8AdIlBz7EqtXCT8=;
+	s=arc-20240116; t=1753782203; c=relaxed/simple;
+	bh=0bD2+OWtX15JO3/cWHqoWANhRWODiM9cluWkkflGAq4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Tgc/F03NhWHyFWtMhMVsHdt60D7SwfuiRcvGO6JF+3ZXSOk6dwb5hgsgjV0KzI8HMk/3+tX0knYnQLz3CI8O6DDiUrM6DPcrnuYmN3g6H2GovK8/Wnppl/REWafnBvITXsC+vxSzl0/pWoySmJG1ejxTBmO0LbbpII342DvcSOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pum9zC7Q; arc=none smtp.client-ip=209.85.128.42
+	 Content-Type:Content-Disposition:In-Reply-To; b=cd5/wbOtFsxqHbkkTIvrsY0XB4N7eIrZVUWY0ftT8LDxbyHDE+M6jrhjDfRkIVQ0AsmRPHNqE+Z9HTVIM3jFquJxz+sdjCrYiGSgM/fScuwH/8Wtn5Kgxp47IRlE3f9lo1wOB66kwlbDSopnwAruqwyuZeEAC+HkBpwGGiQ5QmE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MJPv58gI; arc=none smtp.client-ip=209.85.128.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4561b43de62so70315e9.0
-        for <kvm@vger.kernel.org>; Tue, 29 Jul 2025 02:41:34 -0700 (PDT)
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-456007cfcd7so49775e9.1
+        for <kvm@vger.kernel.org>; Tue, 29 Jul 2025 02:43:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753782093; x=1754386893; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1753782199; x=1754386999; darn=vger.kernel.org;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=PWTS5n1O4Ix3VKY86VLEWfgQ1N+O8NpWBxk8Bg9O6vI=;
-        b=pum9zC7Qswq2ca5gLqRsOx0EsSHJhz9cLQltcnIeH2gEahWHJ0lviG2Rjb1qWhO3Vq
-         vCUgQ2NCeRMr5flMnt2vgnogLiFBg76P5FnLzoCe0ypDf21+g/RTwHbCzchyxDNnanfT
-         7SvlSGrtSWNwV3htCtLgIqysmXtY8K3+eCrEiLuDw121ObYoC/8eqywnNRDl3let2k2V
-         oz9T1CxiQR52z0HZBfb5aJzlNe7GMjdvs3l7fJ6Z07ip+weyKjX8uKQsHDydSZVnhnvf
-         98azS2czIs0EzWy7VNY3v6hJECyXRP3/adK7Cm6W0DAsbwft0LKAts6hbLlI1eiTiz8E
-         ADKQ==
+        bh=1rI/78m+XwnktafE+ygrVP+MfYIVlmgGuVpeyq9N6L0=;
+        b=MJPv58gIhAxmqfyuEMAItdyonKHqjpgXINtXt3rQfxQ/3i/n5PsHBmez52tJp+8Y5q
+         4NIdobPa/dmfqeDtlE+LAGWFoTIVfuzsthAhhx3FgXdaVKwwZhYwUMeCN5Ozs2s+CY1N
+         uj2evHIKjDzhVHaQZ8Hjun+CZERMvlul4U0J1KZ30hSAoz1p/Aa4CslP0EkxnJuiGNcV
+         0hYpnY/us+5mO91OP82/oprZf/0Qd1ThbiWLSMJMKwbTAiYgbBkUDcbfVNnb11sZ/d1Y
+         TTnWp1+d0BAlsKqIhaXx0qnT48EJdAmdWiNNa6Ysk9j8I45eNc09q6frIrUWUj45NSBQ
+         Hsww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753782093; x=1754386893;
+        d=1e100.net; s=20230601; t=1753782199; x=1754386999;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PWTS5n1O4Ix3VKY86VLEWfgQ1N+O8NpWBxk8Bg9O6vI=;
-        b=imK/LvfK4xBCg41rhVKgdVso6AS1EIKCkFogT2yZtdZHKDlXHgR92hRlfdUcE61CCd
-         fPGGd65OdrtcT4NGUANkaj14Jntt8V1IShUHOdytT33jTTEFz8P/Yk23NvrpqDeWS56u
-         a/HjY1HV05BOg5YTplCUXk18CODdNDTjdClJBaOGN2MQYxIGQr3HZ5RJxmReMx71eGw2
-         nJZ+J5zzg3dV43qh3cTJrJxbld/fHlioXwcQsAj36yNkQVEQhFSMSmTNgqU214RSrQqO
-         k8KMYSeU2SNRtG+Os5klkoL/IBVCG8m2/Gk06RV1sif0G3+PSRFuZdT6C4tvxRuwvBKn
-         3kVg==
-X-Gm-Message-State: AOJu0YzW1m584rR0L/fT9FfFG54BBfZtWMA1z3wmMa0pbtLFXUwBw5L0
-	qDbgXQai9LNwYSscDEc/DMTibw1EBvvyIGouBDqa8/ngGprM50epIP7QbJdTKxXzVA==
-X-Gm-Gg: ASbGncuqhDN9LT5uXKecKoY/8M9fn8yxZcFXRXT57oQsGiiVBXxje3Py/VGXGfqS7ID
-	CE0Ud0QQOU3SPYyg+0DXzyrdAYddI7+bZq5SRGQ1zaNiaxOjWq7JleADPcr6GrWIHIxjWevLQ/I
-	OdN6TZE2YM4MXgUHR4OyHTLCPP8kqGGZ2DDUTh1cTq3Hvc876El9CI6jeeaxpn4xKj1rKTHvnMj
-	iTuGyTGI0bYCdQnr2nAvgkpD6e+XEqLp2qzvcRUHepQiTCe4FiyhNRjjjvrs34BTHyt1VbRF40s
-	5t3jTKfgT5TDKqTqSJzke5+tRW3+khvBl1mKucXsxgWdrLrvcvfjYGXp7e+f1LFR4XlbSA56Ywf
-	57WzEC6gPxPLehbzI4R0H/B66OqzxFLSRJuwRmgaFlNU4dE2RrEAgu0Q2JA==
-X-Google-Smtp-Source: AGHT+IG+EszVU09J5v67ER0JFc89U/ZUSQqu+XR8lc75vInQ0L2VoR6ijmMaOHoO1vTppC5NJCkyIQ==
-X-Received: by 2002:a05:600d:17:b0:453:6133:2e96 with SMTP id 5b1f17b1804b1-4588d58f585mr1042605e9.0.1753782092753;
-        Tue, 29 Jul 2025 02:41:32 -0700 (PDT)
+        bh=1rI/78m+XwnktafE+ygrVP+MfYIVlmgGuVpeyq9N6L0=;
+        b=Ox3i4sC54YVy0NfMenBCOKysCwK6fBB1KySCmKLCCv5cdRFufwwtEHg6eBilNdLlKQ
+         wW9U4fpojJr5TowdjhqBw4QpgwhGSE8smIxh7vUQEYawGfBGeKPpdgu6N16hLOoiM45p
+         QSiqvRt9xwhBDQEuOBFLhF8ow9XbJjJ3d1GxIv8SE/FGhm/pycC8P3CrjdQRbHHJchf/
+         sWqFWl/2ipy2rf8nZlK6NgaBkbvGHJchIW+/0kVW8SI2acrE213X9kbi5olIQAunnYWf
+         ut5d6sf17AM+lxUMCRRnta5IOef3JBSILRyj+rnHuQ5VzBM2qG0sYLJlCyIRo7Dyfrpv
+         1L/Q==
+X-Gm-Message-State: AOJu0YxHJDSjmM0B6+b4KNJ7s2xfbWFr1LKLE8VcCLZ3r84GFuHWUoxU
+	+mP3wHUKX3RaEuud9N2LDBoF/yvSahpG1fzwIO4RfW8MHq0mZbbvG2Z/X4MOM2TIQw==
+X-Gm-Gg: ASbGncucnFeqnJYJfxKtLaXQnrHMrb7cPqzpSS6TbG3myIcYLw0jivyA3Q9t9O/7zjU
+	YBfe14p7gFcRj9eGmq7igig81EnphpOZPD5wsrKDkS0LzLwGCbvvI3rgGD4N4D38awetnsjFJIk
+	SKdL98Ctxp9Tu2n+H6Xmcit01l8pSgop0bgh3qUct8hzg837wpPZrzAZOPrW7G2q3sMNv7cxp7c
+	V/l/lrliP6WYjXZa5YwVPqZoefim16DPRBFLRTgg4eQR2FBZqhGDugsZCkFWZ4LVVC6rjID1HFR
+	Lfmra2sFCZ7PTm+ShAyPJRNKlPED2xY41Q+VCk8gwuBFDIvOL6E39zom8I0JDzLrUp4X079nx5p
+	IY0kE6tgL+1oXzK5eYqHaz/s3Fyee2lwx7F7HgwhPf8Z/apfF1+RpPJQlSg==
+X-Google-Smtp-Source: AGHT+IFC68faYj/oMpI20JVx1LDKHgPfTHmPFgujxw6yI6+QGVOqecwGVCYY2/jj6/JRPGf8lVZ7mQ==
+X-Received: by 2002:a05:600c:4e8d:b0:455:fd3e:4e12 with SMTP id 5b1f17b1804b1-4588d646f0bmr458835e9.4.1753782198603;
+        Tue, 29 Jul 2025 02:43:18 -0700 (PDT)
 Received: from google.com (88.140.78.34.bc.googleusercontent.com. [34.78.140.88])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b7842a3e59sm8156053f8f.44.2025.07.29.02.41.32
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b778eb27f8sm11743653f8f.16.2025.07.29.02.43.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Jul 2025 02:41:32 -0700 (PDT)
-Date: Tue, 29 Jul 2025 09:41:28 +0000
+        Tue, 29 Jul 2025 02:43:18 -0700 (PDT)
+Date: Tue, 29 Jul 2025 09:43:14 +0000
 From: Mostafa Saleh <smostafa@google.com>
 To: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>
 Cc: kvm@vger.kernel.org, Suzuki K Poulose <Suzuki.Poulose@arm.com>,
 	Steven Price <steven.price@arm.com>, Will Deacon <will@kernel.org>,
 	Julien Thierry <julien.thierry.kdev@gmail.com>
-Subject: Re: [RFC PATCH kvmtool 09/10] vfio/iommufd: Add viommu and vdevice
- objects
-Message-ID: <aIiXSNgqt_6xuaRD@google.com>
+Subject: Re: [RFC PATCH kvmtool 08/10] vfio/iommufd: Move the hwpt allocation
+ to helper
+Message-ID: <aIiXshblqd5GwpIF@google.com>
 References: <20250525074917.150332-1-aneesh.kumar@kernel.org>
- <20250525074917.150332-9-aneesh.kumar@kernel.org>
- <aIZxadj3-uxSwaUu@google.com>
- <yq5a8qk7bml8.fsf@kernel.org>
+ <20250525074917.150332-8-aneesh.kumar@kernel.org>
+ <aIZw0DnAniP5G6KG@google.com>
+ <yq5abjp3bmu1.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -94,41 +94,35 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <yq5a8qk7bml8.fsf@kernel.org>
+In-Reply-To: <yq5abjp3bmu1.fsf@kernel.org>
 
-On Tue, Jul 29, 2025 at 10:49:31AM +0530, Aneesh Kumar K.V wrote:
+On Tue, Jul 29, 2025 at 10:44:14AM +0530, Aneesh Kumar K.V wrote:
 > Mostafa Saleh <smostafa@google.com> writes:
 > 
-> > On Sun, May 25, 2025 at 01:19:15PM +0530, Aneesh Kumar K.V (Arm) wrote:
-> >> This also allocates a stage1 bypass and stage2 translate table.
+> > On Sun, May 25, 2025 at 01:19:14PM +0530, Aneesh Kumar K.V (Arm) wrote:
+> >> alloc_hwpt.flags = 0; implies we prefer stage1 translation. Hence name
+> >> the helper iommufd_alloc_s2bypass_hwpt().
 > >
-> > So this makes IOMMUFD only working with SMMUv3?
-> >
-> > I don’t understand what is the point of this configuration? It seems to add
-> > extra complexity and extra hw constraints and no extra value.
-> >
-> > Not related to this patch, do you have plans to add some of the other iommufd
-> > features, I think things such as page faults might be useful?
+> > This patch moves the recently added code into a new function,
+> > can't this be squashed?
 > >
 > 
-> The primary goal of adding viommu/vdevice support is to enable kvmtool
-> to serve as the VMM for ARM CCA secure device development. This requires
-> a viommu implementation so that a KVM file descriptor can be associated
-> with the corresponding viommu.
+> Yes. Will update the patch.
 > 
-> The full set of related patches is available here:
-> https://gitlab.arm.com/linux-arm/kvmtool-cca/-/tree/cca/tdisp-upstream-post-v1
+> > Also, I believe that with “IOMMU_HWPT_DATA_NONE”, we shouldn’t make
+> > any assumptions in userspace about which stage is used.
+> >
+> > The only guarantee is that IOMMU_IOAS_MAP/IOMMU_IOAS_UNMAP works.
+> >
+> > So, I believe the naming for "s2bypass" is not accurate.
+> >
+> 
+> Any suggestion w.r.t helper function name?
 
-I see, but I don't understand why we need a nested setup in that case?
-How would having bypassed stage-1 change things?
-
-Also, In case we do something like this, I'd suggest to make it clear
-for the command line that this is SMMUv3/CCA only, and maybe move
-some of the code to arm64/
+Maybe just "iommufd_alloc_hwpt"?
 
 Thanks,
 Mostafa
-
 
 > 
 > -aneesh
