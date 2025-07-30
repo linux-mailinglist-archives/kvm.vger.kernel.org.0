@@ -1,190 +1,216 @@
-Return-Path: <kvm+bounces-53737-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53738-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F4035B16322
-	for <lists+kvm@lfdr.de>; Wed, 30 Jul 2025 16:50:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 520E1B163EB
+	for <lists+kvm@lfdr.de>; Wed, 30 Jul 2025 17:52:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 32027172497
-	for <lists+kvm@lfdr.de>; Wed, 30 Jul 2025 14:50:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 84AA6566E8E
+	for <lists+kvm@lfdr.de>; Wed, 30 Jul 2025 15:52:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEC652DC329;
-	Wed, 30 Jul 2025 14:49:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9CBA2DCF74;
+	Wed, 30 Jul 2025 15:52:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dCWabnPP"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7359F2798E5;
-	Wed, 30 Jul 2025 14:49:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55BF72D97BB
+	for <kvm@vger.kernel.org>; Wed, 30 Jul 2025 15:52:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753886994; cv=none; b=Uc2EsqSerAcC1Wvx8Xi57vfkeHy+3O/ZSLNnguviSbATYquK5fYGIziUWz5SxTTCXmWw8VqExhwmwf/T551MpIwGfhUiL9xScyjxZVdkhNPIPMFchFx6Dcrpmu6z/krV2zI46zgN/sWYc0XlxQog4zvHu+4kHBxZO1hbP/geA8w=
+	t=1753890746; cv=none; b=fmPhe3Pvuke8jizCb0naDj54Dm2kwN3VwzWWz2PUHcvvG3gYWF7aLuT3yBIPvMgt91jfmCu0o/zn96hzpeVY0AU9Rx8MRO4mkW1Ha6Ani0fzH3WzkPE/U49An6U5GmXKDUVJaQA7pNeuxGeEW3/6cs+7bbH/tk4xJGKRhws0sIU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753886994; c=relaxed/simple;
-	bh=kiil3a12z0g8EHN6aN3WXtdYZoEr8JUmTMUWd7FUTPs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cdjqx5BJ5LTLFTxu7PW31fMFrvNXIxs3T0I/tqzCaj0DlwmqZJgUDK9kpjM9JEdE0LTJCL4QPw23LScgiDEryC/nciPq7cM8ePBxIzYEjFPHISbimHIDICOSUo57uNUzTjr2Ez8WrIrW8eKr346BYZxWlX6ofe04OaVZWMkt5BQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A671E1BC0;
-	Wed, 30 Jul 2025 07:49:43 -0700 (PDT)
-Received: from [10.57.3.116] (unknown [10.57.3.116])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9B8B53F673;
-	Wed, 30 Jul 2025 07:49:47 -0700 (PDT)
-Message-ID: <6c5fb9f0-c608-4e19-8c60-5d8cef3efbdf@arm.com>
-Date: Wed, 30 Jul 2025 15:49:45 +0100
+	s=arc-20240116; t=1753890746; c=relaxed/simple;
+	bh=KaUzYMzqAKDKj1Ugou6j/Gy3Is2HqkyvG79qzuUKqs0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EhlznyRy1J1U3ClNn6bBBwMH5J+QnOCMj4BbHhrAiPhDVTyLXYfaxelt77S+Gr3y1bD5JBdF344+XexW1Z5gXPnKOJiCGRwmAZ1kEhbGjX8pDS5xu6gsarDJlmGkjIaYNBY8kdTxpfRgh5x8sf3uICvSgCKrFjgTv1C9BTZ8+YU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dCWabnPP; arc=none smtp.client-ip=209.85.160.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4ab3ad4c61fso514621cf.0
+        for <kvm@vger.kernel.org>; Wed, 30 Jul 2025 08:52:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1753890744; x=1754495544; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=J5S/gfwjHD+oJdrQWb3m/7MfRXYBPvNIQcNwOPtzGuc=;
+        b=dCWabnPPp0lAqZHAMM2DDMbLTP9xYeXNnWuoEpaaIXtEvPn3SdXzAUPhkLlpYokPlC
+         RTSqP5pAmaqhgK0qsoVs0JJsful5WoOMjvZSyk2o01yVS2866xPMtOKfbhg5Ncl/IjBR
+         ntHNIHoxuHT8Boe1XELkNV5t7n6xiLE3I1yMRdhiOUC/HzcDwpV310KR4vEF48h0q3zq
+         13MWjECitoyQaJRtR9llJ5HbkKxBkJhGpNijMI040KpTLTWotyGQI8l7qZWGYJI+u9bE
+         Yl3qCbpd7Weu605VtJ/huXkOPQOdJ6zU/PT46Q4NCUcWqsqz647VM9ygx3rRU7Dp8zG7
+         uTEw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753890744; x=1754495544;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=J5S/gfwjHD+oJdrQWb3m/7MfRXYBPvNIQcNwOPtzGuc=;
+        b=LeBsRSzci1vg/43BU4R6Sd+h/miJx/JK7QwS7nTDBzYzBMTaKKcjmqfhNPJZCZZ2UG
+         A+jU6DYfbectESZVDdEx+0TiXWF/XNlPLrt+RVVEs+QQgpym6YvtffkGiCPzGIqLGDna
+         4yf1TPrUwbB+F0wgSQJ6gLL2E+7lSxdvKF86mIU3FtApC3RLsmd70HPCDTnEW+uQJpDd
+         gQgubB2v2uvE10b1wcR0Kn5NAm8rc7UNvTVdhSgLoQL4ifrHuEdP3AE09PnP6eKPIPfV
+         8L7EOKBhXNAYjHRXnKyuHR14PJ6RFqc7kYuYuceGVCQ+t4n4GWLRjmJq6FX1itTMfsQz
+         WnqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXDRs9rpnk7J5gOKfjaS3iym7OltPozd62hv56CIgfsLSUt/6lijVwk/V6LZjiziijhkCw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy2Og9iDjqoV/AAFUcJj4u0Yn+Txm1FVLMamAPoOCr82CFb6PRN
+	3VKVBCk0AuI8erblrMYwap1uD0M5NfbNQC7fOSs5ClYebUTws670MijVqf/3wl5IvUsmUz9XYG7
+	w/3iGIhfizeWiHybfG0f1QMTGg65GAMaL4JUV4o4F
+X-Gm-Gg: ASbGnct9q3IoWAlVatzYID3wyYoAXnvEldFO1lT5PCPZOFhYjGAsp4ZFpgE0hA5cCQO
+	7jops2PppX6nAd6ocpMdw0O8xtydgoTBgW51pL9X1pHMEIHistju9e0I02rZakODYmqMy0iDSeB
+	NTdgGTgSMASt5eXYO/maU+QHZc3NPlQsiRQpSo+tHqiVNHl4iZApqfk35Fn4x8IXN0s9WKfkWKJ
+	LjG5tw=
+X-Google-Smtp-Source: AGHT+IHCoggrbKuqrS/V3GqDELMmyPu68zQZy/cgUabllEs7qJ283gO9wOXP3Z6D76RtekV7nYcliE9mbdlhJ89jyUs=
+X-Received: by 2002:a05:622a:b:b0:4a6:f525:e35a with SMTP id
+ d75a77b69052e-4aedf608f0emr3661281cf.9.1753890743755; Wed, 30 Jul 2025
+ 08:52:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 10/10] vfio/pci: Add dma-buf export support for MMIO
- regions
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Leon Romanovsky <leon@kernel.org>,
- Alex Williamson <alex.williamson@redhat.com>,
- Leon Romanovsky <leonro@nvidia.com>, Christoph Hellwig <hch@lst.de>,
- Andrew Morton <akpm@linux-foundation.org>,
- Bjorn Helgaas <bhelgaas@google.com>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
- Jens Axboe <axboe@kernel.dk>, =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?=
- <jglisse@redhat.com>, Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
- linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
- linux-mm@kvack.org, linux-pci@vger.kernel.org,
- Logan Gunthorpe <logang@deltatee.com>,
- Marek Szyprowski <m.szyprowski@samsung.com>,
- Sumit Semwal <sumit.semwal@linaro.org>,
- Vivek Kasireddy <vivek.kasireddy@intel.com>, Will Deacon <will@kernel.org>
-References: <cover.1753274085.git.leonro@nvidia.com>
- <aea452cc27ca9e5169f7279d7b524190c39e7260.1753274085.git.leonro@nvidia.com>
- <8f912671-f1d9-4f73-9c1d-e39938bfc09f@arm.com>
- <20250729201351.GA82395@nvidia.com>
-From: Robin Murphy <robin.murphy@arm.com>
-Content-Language: en-GB
-In-Reply-To: <20250729201351.GA82395@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250729225455.670324-1-seanjc@google.com> <20250729225455.670324-25-seanjc@google.com>
+In-Reply-To: <20250729225455.670324-25-seanjc@google.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Wed, 30 Jul 2025 16:51:47 +0100
+X-Gm-Features: Ac12FXzaE318ERqLrJiYydulNyZlDipqqavrDa-QlTdUT7g8r8Yi-Dt4-p51ElI
+Message-ID: <CA+EHjTx7V=bHZ3HTN+gK+MzNhwDehiqQXG2r4AYmMKDufYGOww@mail.gmail.com>
+Subject: Re: [PATCH v17 24/24] KVM: selftests: Add guest_memfd testcase to
+ fault-in on !mmap()'d memory
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, Ira Weiny <ira.weiny@intel.com>, 
+	Gavin Shan <gshan@redhat.com>, Shivank Garg <shivankg@amd.com>, Vlastimil Babka <vbabka@suse.cz>, 
+	Xiaoyao Li <xiaoyao.li@intel.com>, David Hildenbrand <david@redhat.com>, 
+	Ackerley Tng <ackerleytng@google.com>, Tao Chan <chentao@kylinos.cn>, 
+	James Houghton <jthoughton@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 2025-07-29 9:13 pm, Jason Gunthorpe wrote:
-> On Tue, Jul 29, 2025 at 08:44:21PM +0100, Robin Murphy wrote:
-> 
->> In this case with just one single
->> contiguous mapping, it is clearly objectively worse to have to bounce in and
->> out of the IOMMU layer 3 separate times and store a dma_map_state,
-> 
-> The non-contiguous mappings are comming back, it was in earlier drafts
-> of this. Regardless, the point is to show how to use the general API
-> that we would want to bring into the DRM drivers that don't have
-> contiguity even though VFIO is a bit special.
-> 
->> Oh yeah, and mapping MMIO with regular memory attributes (IOMMU_CACHE)
->> rather than appropriate ones (IOMMU_MMIO), as this will end up doing, isn't
->> guaranteed not to end badly either (e.g. if the system interconnect ends up
->> merging consecutive write bursts and exceeding the target root port's MPS.)
-> 
-> Yes, I recently noticed this too, it should be fixed..
-> 
-> But so we are all on the same page, alot of the PCI P2P systems are
-> setup so P2P does not transit through the iommu. It either takes the
-> ACS path through a switch or it uses ATS and takes a different ACS
-> path through a switch. It only transits through the iommu in
-> misconfigured systems or in the rarer case of P2P between root ports.
+On Tue, 29 Jul 2025 at 23:56, Sean Christopherson <seanjc@google.com> wrote:
+>
+> Add a guest_memfd testcase to verify that a vCPU can fault-in guest_memfd
+> memory that supports mmap(), but that is not currently mapped into host
+> userspace and/or has a userspace address (in the memslot) that points at
+> something other than the target guest_memfd range.  Mapping guest_memfd
+> memory into the guest is supposed to operate completely independently from
+> any userspace mappings.
+>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-For non-ATS (and ATS Untranslated traffic), my understanding is that we 
-rely on ACS upstream redirect to send transactions all the way up to the 
-root port for translation (and without that then they are indeed pure 
-bus addresses, take the pci_p2pdma_bus_addr_map() case, and the rest of 
-this is all irrelevant). In Arm system terms, simpler root ports may 
-well have to run that traffic out to an external SMMU TBU, at which 
-point any P2P would loop back externally through the memory space window 
-in the system interconnect PA space, as opposed to DTI-ATS root 
-complexes that effectively implement their own internal translation 
-agent on the PCIe side. Thus on some systems, even P2P behind a single 
-root port may end up looking functionally the same as the cross-RP case, 
-but in general cross-RP *is* something that people seem to care about as 
-well. We're seeing more and more systems where each slot has its own RP 
-as a separate segment, rather than giant root complexes with a host 
-bridge and everyone on one big happy root bus together.
+Reviewed-by: Fuad Tabba <tabba@google.com>
+Tested-by: Fuad Tabba <tabba@google.com>
 
->> And again, if the IOMMU is in bypass (the idea of P2P with vfio-noiommu simply
->> isn't worth entertaining)
-> 
-> Not quite. DMABUF is sort of upside down.
-> 
-> For example if we are exporting a DMABUF from VFIO and importing it to
-> RDMA then RDMA will call VFIO to make an attachment and the above VFIO
-> code will perform the DMA map to the RDMA struct device. DMABUF
-> returns a dma mapped scatterlist back to the RDMA driver.
-> 
-> The above dma_map_phys(rdma_dev,...) can be in bypass because the rdma
-> device can legitimately be in bypass, or not have a iommu, or
-> whatever.
+Cheers,
+/fuad
 
-I understand how dma-buf works - obviously DMA mapping for the VFIO 
-device itself while it's not even attached to its default domain would 
-be silly. I mean that any system that has 64-bit coherent PCIe behind an 
-IOMMU such that this VFIO exporter could exist, is realistically going 
-to have the same (or equivalent) IOMMU in front of any potential 
-importers as well. *Especially* if you expect the normal case for P2P to 
-be within a single hierarchy. Thus I was simply commenting that 
-IOMMU_DOMAIN_IDENTITY is the *only* realistic reason to actually expect 
-to interact with dma-direct here.
 
-But of course, if it's not dma-direct because we're on POWER with TCE, 
-rather than VFIO Type1 implying an iommu-dma/dma-direct arch, then who 
-knows? I imagine the complete absence of any mention means this hasn't 
-been tried, or possibly even considered?
 
->> AFAICS you're *depending* on this call being an effective no-op, and thus
->> only demonstrating that the dma_map_phys() idea is still entirely
->> unnecessary.
-> 
-> It should not be a full no-op, and it should be closer to
-> dma map resource to avoid the mmio issues.
-
-I don't get what you mean by "not be a full no-op", can you clarify 
-exactly what you think it should be doing? Even if it's just the 
-dma_capable() mask check equivalent to dma_direct_map_resource(), you 
-don't actually want that here either - in that case you'd want to fail 
-the entire attachment to begin with since it can never work.
-
-> It should be failing for cases where it is not supported (ie
-> swiotlb=force), it should still be calling the legacy dma_ops, and it
-> should be undoing any CC mangling with the address. (also the
-> pci_p2pdma_bus_addr_map() needs to deal with any CC issues too)
-
-Um, my whole point is that the "legacy DMA ops" cannot be called, 
-because they still assume page-backed memory, so at best are guaranteed 
-to fail; any "CC mangling" assumed for memory is most likely wrong for 
-MMIO, and there simply is no "deal with" at this point.
-
-A device BAR is simply not under control of the trusted hypervisor the 
-same way memory is; whatever (I/G)PA it is at must already be the 
-correct address, if the aliasing scheme even applies at all. Sticking to 
-Arm CCA terminology for example, if a device in shared state tries to 
-import a BAR from a device in locked/private state, there is no notion 
-of touching the shared alias and hoping it somehow magically works (at 
-best it might throw the exporting device into TDISP error state 
-terminally); that attachment simply cannot be allowed. If an shared 
-resource exists in the shared IPA space to begin with, dma_to_phys() 
-will do the wrong thing, and even phys_to_dma() would technically not 
-walk dma_range_map correctly, because both assume "phys" represents 
-kernel memory. However it's also all moot since any attempt at any 
-combination will fail anyway due to SWIOTLB being forced by 
-is_realm_world().
-
-(OK, I admit "crash" wasn't strictly the right word to use there - I 
-keep forgetting that some of the P2P scatterlist support in dma-direct 
-ended up affecting the map_page path too, even though that was never 
-really the functional intent - but hey, the overall result of failing to 
-work as expected is the same.)
-
-Thanks,
-Robin.
+> ---
+>  .../testing/selftests/kvm/guest_memfd_test.c  | 64 +++++++++++++++++++
+>  1 file changed, 64 insertions(+)
+>
+> diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
+> index 088053d5f0f5..b86bf89a71e0 100644
+> --- a/tools/testing/selftests/kvm/guest_memfd_test.c
+> +++ b/tools/testing/selftests/kvm/guest_memfd_test.c
+> @@ -13,6 +13,7 @@
+>
+>  #include <linux/bitmap.h>
+>  #include <linux/falloc.h>
+> +#include <linux/sizes.h>
+>  #include <setjmp.h>
+>  #include <signal.h>
+>  #include <sys/mman.h>
+> @@ -21,6 +22,7 @@
+>
+>  #include "kvm_util.h"
+>  #include "test_util.h"
+> +#include "ucall_common.h"
+>
+>  static void test_file_read_write(int fd)
+>  {
+> @@ -298,6 +300,66 @@ static void test_guest_memfd(unsigned long vm_type)
+>         kvm_vm_free(vm);
+>  }
+>
+> +static void guest_code(uint8_t *mem, uint64_t size)
+> +{
+> +       size_t i;
+> +
+> +       for (i = 0; i < size; i++)
+> +               __GUEST_ASSERT(mem[i] == 0xaa,
+> +                              "Guest expected 0xaa at offset %lu, got 0x%x", i, mem[i]);
+> +
+> +       memset(mem, 0xff, size);
+> +       GUEST_DONE();
+> +}
+> +
+> +static void test_guest_memfd_guest(void)
+> +{
+> +       /*
+> +        * Skip the first 4gb and slot0.  slot0 maps <1gb and is used to back
+> +        * the guest's code, stack, and page tables, and low memory contains
+> +        * the PCI hole and other MMIO regions that need to be avoided.
+> +        */
+> +       const uint64_t gpa = SZ_4G;
+> +       const int slot = 1;
+> +
+> +       struct kvm_vcpu *vcpu;
+> +       struct kvm_vm *vm;
+> +       uint8_t *mem;
+> +       size_t size;
+> +       int fd, i;
+> +
+> +       if (!kvm_has_cap(KVM_CAP_GUEST_MEMFD_MMAP))
+> +               return;
+> +
+> +       vm = __vm_create_shape_with_one_vcpu(VM_SHAPE_DEFAULT, &vcpu, 1, guest_code);
+> +
+> +       TEST_ASSERT(vm_check_cap(vm, KVM_CAP_GUEST_MEMFD_MMAP),
+> +                   "Default VM type should always support guest_memfd mmap()");
+> +
+> +       size = vm->page_size;
+> +       fd = vm_create_guest_memfd(vm, size, GUEST_MEMFD_FLAG_MMAP);
+> +       vm_set_user_memory_region2(vm, slot, KVM_MEM_GUEST_MEMFD, gpa, size, NULL, fd, 0);
+> +
+> +       mem = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+> +       TEST_ASSERT(mem != MAP_FAILED, "mmap() on guest_memfd failed");
+> +       memset(mem, 0xaa, size);
+> +       munmap(mem, size);
+> +
+> +       virt_pg_map(vm, gpa, gpa);
+> +       vcpu_args_set(vcpu, 2, gpa, size);
+> +       vcpu_run(vcpu);
+> +
+> +       TEST_ASSERT_EQ(get_ucall(vcpu, NULL), UCALL_DONE);
+> +
+> +       mem = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+> +       TEST_ASSERT(mem != MAP_FAILED, "mmap() on guest_memfd failed");
+> +       for (i = 0; i < size; i++)
+> +               TEST_ASSERT_EQ(mem[i], 0xff);
+> +
+> +       close(fd);
+> +       kvm_vm_free(vm);
+> +}
+> +
+>  int main(int argc, char *argv[])
+>  {
+>         unsigned long vm_types, vm_type;
+> @@ -314,4 +376,6 @@ int main(int argc, char *argv[])
+>
+>         for_each_set_bit(vm_type, &vm_types, BITS_PER_TYPE(vm_types))
+>                 test_guest_memfd(vm_type);
+> +
+> +       test_guest_memfd_guest();
+>  }
+> --
+> 2.50.1.552.g942d659e1b-goog
+>
 
