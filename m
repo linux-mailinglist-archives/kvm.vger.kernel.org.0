@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-53717-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53718-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60728B159A6
-	for <lists+kvm@lfdr.de>; Wed, 30 Jul 2025 09:34:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCFCCB159A7
+	for <lists+kvm@lfdr.de>; Wed, 30 Jul 2025 09:34:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 564CF5429DA
-	for <lists+kvm@lfdr.de>; Wed, 30 Jul 2025 07:34:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB4013A9CE6
+	for <lists+kvm@lfdr.de>; Wed, 30 Jul 2025 07:34:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E02328ECE1;
-	Wed, 30 Jul 2025 07:34:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F52128F515;
+	Wed, 30 Jul 2025 07:34:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lPxWuQMt"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="A5/g29fm"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3ED71EEA3C;
-	Wed, 30 Jul 2025 07:34:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A19E92877F4;
+	Wed, 30 Jul 2025 07:34:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753860842; cv=none; b=P2OjOwDaiW00xMpYqvqBAw5LF3eYPMffIn1OqNn9goxJ0e5XH8/QeiQubuhYIZnVgtN2SS3LkrxwlNVjgGXIKdTvppr+ljhIPa1U3fnht1Dx3hkxnV9Ukdj6qzxbE/lYMdlrmbodbZZguosUasVHLE/DYLncllxwhb5RwvJUOvU=
+	t=1753860864; cv=none; b=MO0TIN0DtxBQLzY9lV1mY0GgOoh7+eQXNUioupY4j3CJJJA9iljq7kDoDKiPNRJCwJiEU/hej6eeOqKj24vgQSLBGcbLB1JeX3m/1MjWDZ6rcdDIqBfKY/9qY8+wWklicDU1ayUsTvQ9NvPbv10PiA/zMvouQlNqCVHGZFBikdU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753860842; c=relaxed/simple;
-	bh=2RgN0j+ENwauyGI9Svu9rEjlit08q6gOS10LSTOfkCM=;
+	s=arc-20240116; t=1753860864; c=relaxed/simple;
+	bh=eprvNsAi4IWBabOP6/raDSimBbRu56gi8+Hx+R9MzPo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fnMetgAmf95OCHzTrRsj+kjxtBbr3JziQcZQTy03LrOa2Kk+0+X0Q/jtnmTipMHTopgp9/kacb2nXUHGCLvU84fLZvRnZvCUOvrjGzngj0XYKj+9XaEb3zf0W/m/Cyl82hi9yb0JDAeUfHzIiBDRnqQ8aEzXqA7PTtnRVAjDqAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lPxWuQMt; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	 In-Reply-To:Content-Type; b=jlWJiPuptVToK4HJOj3EIpKKrUt/qYA/gXG9m7ULZMssWMve5Ds0pZ5MtR3loxOGakNE6UG6E7s9Jmzjr6iqKVzC7uZI2e3Lntie82q3Z0ADuKJMQ99pYaxlbaeBzOUfnVZ7/pXFVBjUIqmmNPFGoJTZ3Fcy2GM/vNViQ+tp6nU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=A5/g29fm; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1753860841; x=1785396841;
+  t=1753860863; x=1785396863;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=2RgN0j+ENwauyGI9Svu9rEjlit08q6gOS10LSTOfkCM=;
-  b=lPxWuQMt/s10ym5f0bQaeubszvlX0gYS6Fb/DSPSzrZCoGql5qNxR5UN
-   qi8egKMVb+OFsI15dFx+nMuRG1/QEKb7rNRz38H0PuibmgCalntQyB4JJ
-   MMd1FlF1lhq/98y1Um0yHgrkZ55ccG7vqy4E2Rx+FqW9ZI23Kl7L2tPGp
-   yAVP6OMDd7O3jurz+OpVsIOr1k7o3ufA0Qh2Q33xZaWQVH3eZ1sHCDxij
-   H5NdXBX0z33M0m+POtqu+NA9fryRPdG5aZ2wsWTMSmX6tdEj82zLjAPZ/
-   BHAAHgQ7kAeZN51OUKjvLkPJd0qO3laR/x4wu9Smn6E4zyUfUkVcJbSIa
-   Q==;
-X-CSE-ConnectionGUID: eYbQ83uASP+yqHOq8qPVGw==
-X-CSE-MsgGUID: nOE0tXHWRV6iSQYPawkktw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11506"; a="56240677"
+  bh=eprvNsAi4IWBabOP6/raDSimBbRu56gi8+Hx+R9MzPo=;
+  b=A5/g29fmcKJcEkhFq4q1qZj/I/1vcq4UbcPPzwgl8D0GhKXUH3Q8zyUV
+   nTrrA3T8Fp3PU5btrzSyitay7ptlBRGFPki1ho4KF1VNt8BepdXCBRXqp
+   /VX4IjlQnoYY6e9H6J/O3sAurPD6Rw2rWYw2a0aXZ9b+9cvZMTG2jzetj
+   7TjhZZQDHOiYrgUomYuPrCLfTc0eT4x6ADwfg8sL2dNwptby1SXqQ1a2d
+   qZqcRr5tso09SRTo6xosLwCdpoa8S1N/d3w1TXeJ+YBZNscU8nSxi9i+S
+   kB1I+VsKzPx6qoUfEtv/P7FuEH480TohvuXYkx7WicQKdFSLBsuUSgvhn
+   g==;
+X-CSE-ConnectionGUID: rS+TvGqcQuq+6HOunBpz/g==
+X-CSE-MsgGUID: fj/iwkbDSHWklJ80MEqICQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11506"; a="56240712"
 X-IronPort-AV: E=Sophos;i="6.16,350,1744095600"; 
-   d="scan'208";a="56240677"
+   d="scan'208";a="56240712"
 Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jul 2025 00:34:00 -0700
-X-CSE-ConnectionGUID: H09GH9DDRK6iwMUT5DFTZA==
-X-CSE-MsgGUID: 9J0CZfBtR+i2FENGg5ZkzQ==
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jul 2025 00:34:23 -0700
+X-CSE-ConnectionGUID: 8kTXZKNeSKWoldNGFIDS4w==
+X-CSE-MsgGUID: DTMXKjUwQC2s63Zl1Spn5Q==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,350,1744095600"; 
-   d="scan'208";a="162636483"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jul 2025 00:33:54 -0700
-Message-ID: <e67b0825-abcb-4bac-bc3c-2e8b513f1d57@intel.com>
-Date: Wed, 30 Jul 2025 15:33:51 +0800
+   d="scan'208";a="162636590"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.124.240.26]) ([10.124.240.26])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jul 2025 00:34:18 -0700
+Message-ID: <ad616489-1546-4f6a-9242-a719952e19b6@linux.intel.com>
+Date: Wed, 30 Jul 2025 15:34:02 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,219 +67,234 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v17 14/24] KVM: x86/mmu: Enforce guest_memfd's max order
- when recovering hugepages
-To: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
- Ira Weiny <ira.weiny@intel.com>, Gavin Shan <gshan@redhat.com>,
- Shivank Garg <shivankg@amd.com>, Vlastimil Babka <vbabka@suse.cz>,
- David Hildenbrand <david@redhat.com>, Fuad Tabba <tabba@google.com>,
- Ackerley Tng <ackerleytng@google.com>, Tao Chan <chentao@kylinos.cn>,
- James Houghton <jthoughton@google.com>
-References: <20250729225455.670324-1-seanjc@google.com>
- <20250729225455.670324-15-seanjc@google.com>
+Subject: Re: [PATCH 0/2] x86/kvm: Force legacy PCI hole as WB under SNP/TDX
+To: Sean Christopherson <seanjc@google.com>
+Cc: Nikolay Borisov <nik.borisov@suse.com>, Jianxiong Gao <jxgao@google.com>,
+ "Borislav Petkov (AMD)" <bp@alien8.de>,
+ Dave Hansen <dave.hansen@linux.intel.com>,
+ Dionna Glaze <dionnaglaze@google.com>, "H. Peter Anvin" <hpa@zytor.com>,
+ jgross@suse.com, "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Ingo Molnar <mingo@redhat.com>, pbonzini@redhat.com,
+ Peter Gonda <pgonda@google.com>, Thomas Gleixner <tglx@linutronix.de>,
+ Tom Lendacky <thomas.lendacky@amd.com>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>, x86@kernel.org,
+ Rick Edgecombe <rick.p.edgecombe@intel.com>, jiewen.yao@intel.com
+References: <CAMGD6P1Q9tK89AjaPXAVvVNKtD77-zkDr0Kmrm29+e=i+R+33w@mail.gmail.com>
+ <0dc2b8d2-6e1d-4530-898b-3cb4220b5d42@linux.intel.com>
+ <4acfa729-e0ad-4dc7-8958-ececfae8ab80@suse.com> <aIDzBOmjzveLjhmk@google.com>
+ <550a730d-07db-46d7-ac1a-b5b7a09042a6@linux.intel.com>
+ <aIeX0GQh1Q_4N597@google.com>
 Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20250729225455.670324-15-seanjc@google.com>
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <aIeX0GQh1Q_4N597@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 7/30/2025 6:54 AM, Sean Christopherson wrote:
-> Rework kvm_mmu_max_mapping_level() to provide the plumbing to consult
-> guest_memfd (and relevant vendor code) when recovering hugepages, e.g.
-> after disabling live migration.  The flaw has existed since guest_memfd was
-> originally added, but has gone unnoticed due to lack of guest_memfd support
-> for hugepages or dirty logging.
-> 
-> Don't actually call into guest_memfd at this time, as it's unclear as to
-> what the API should be.  Ideally, KVM would simply use kvm_gmem_get_pfn(),
-> but invoking kvm_gmem_get_pfn() would lead to sleeping in atomic context
-> if guest_memfd needed to allocate memory (mmu_lock is held).  Luckily,
-> the path isn't actually reachable, so just add a TODO and WARN to ensure
-> the functionality is added alongisde guest_memfd hugepage support, and
-> punt the guest_memfd API design question to the future.
-> 
-> Note, calling kvm_mem_is_private() in the non-fault path is safe, so long
-> as mmu_lock is held, as hugepage recovery operates on shadow-present SPTEs,
-> i.e. calling kvm_mmu_max_mapping_level() with @fault=NULL is mutually
-> exclusive with kvm_vm_set_mem_attributes() changing the PRIVATE attribute
-> of the gfn.
-> 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->   arch/x86/kvm/mmu/mmu.c          | 82 +++++++++++++++++++--------------
->   arch/x86/kvm/mmu/mmu_internal.h |  2 +-
->   arch/x86/kvm/mmu/tdp_mmu.c      |  2 +-
->   3 files changed, 49 insertions(+), 37 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 20dd9f64156e..61eb9f723675 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -3302,31 +3302,54 @@ static u8 kvm_max_level_for_order(int order)
->   	return PG_LEVEL_4K;
->   }
->   
-> -static u8 kvm_max_private_mapping_level(struct kvm *kvm, kvm_pfn_t pfn,
-> -					u8 max_level, int gmem_order)
-> +static u8 kvm_max_private_mapping_level(struct kvm *kvm, struct kvm_page_fault *fault,
-> +					const struct kvm_memory_slot *slot, gfn_t gfn)
 
-I don't see why slot and gfn are needed here. Just to keep consistent 
-with host_pfn_mapping_level()?
 
->   {
-> -	u8 req_max_level;
-> +	u8 max_level, coco_level;
-> +	kvm_pfn_t pfn;
->   
-> -	if (max_level == PG_LEVEL_4K)
-> -		return PG_LEVEL_4K;
-> +	/* For faults, use the gmem information that was resolved earlier. */
-> +	if (fault) {
-> +		pfn = fault->pfn;
-> +		max_level = fault->max_level;
-> +	} else {
-> +		/* TODO: Call into guest_memfd once hugepages are supported. */
-> +		WARN_ONCE(1, "Get pfn+order from guest_memfd");
-> +		pfn = KVM_PFN_ERR_FAULT;
-> +		max_level = PG_LEVEL_4K;
-> +	}
->   
-> -	max_level = min(kvm_max_level_for_order(gmem_order), max_level);
->   	if (max_level == PG_LEVEL_4K)
-> -		return PG_LEVEL_4K;
-> +		return max_level;
->   
-> -	req_max_level = kvm_x86_call(gmem_max_mapping_level)(kvm, pfn);
-> -	if (req_max_level)
-> -		max_level = min(max_level, req_max_level);
-> +	/*
-> +	 * CoCo may influence the max mapping level, e.g. due to RMP or S-EPT
-> +	 * restrictions.  A return of '0' means "no additional restrictions", to
-> +	 * allow for using an optional "ret0" static call.
-> +	 */
-> +	coco_level = kvm_x86_call(gmem_max_mapping_level)(kvm, pfn);
-> +	if (coco_level)
-> +		max_level = min(max_level, coco_level);
->   
->   	return max_level;
->   }
->   
-> -static int __kvm_mmu_max_mapping_level(struct kvm *kvm,
-> -				       const struct kvm_memory_slot *slot,
-> -				       gfn_t gfn, int max_level, bool is_private)
-> +int kvm_mmu_max_mapping_level(struct kvm *kvm, struct kvm_page_fault *fault,
-> +			      const struct kvm_memory_slot *slot, gfn_t gfn)
->   {
->   	struct kvm_lpage_info *linfo;
-> -	int host_level;
-> +	int host_level, max_level;
-> +	bool is_private;
-> +
-> +	lockdep_assert_held(&kvm->mmu_lock);
-> +
-> +	if (fault) {
-> +		max_level = fault->max_level;
-> +		is_private = fault->is_private;
-> +	} else {
-> +		max_level = PG_LEVEL_NUM;
-> +		is_private = kvm_mem_is_private(kvm, gfn);
-> +	}
->   
->   	max_level = min(max_level, max_huge_page_level);
->   	for ( ; max_level > PG_LEVEL_4K; max_level--) {
-> @@ -3335,25 +3358,16 @@ static int __kvm_mmu_max_mapping_level(struct kvm *kvm,
->   			break;
->   	}
->   
-> +	if (max_level == PG_LEVEL_4K)
-> +		return PG_LEVEL_4K;
-> +
->   	if (is_private)
-> -		return max_level;
-> -
-> -	if (max_level == PG_LEVEL_4K)
-> -		return PG_LEVEL_4K;
-> -
-> -	host_level = host_pfn_mapping_level(kvm, gfn, slot);
-> +		host_level = kvm_max_private_mapping_level(kvm, fault, slot, gfn);
-> +	else
-> +		host_level = host_pfn_mapping_level(kvm, gfn, slot);
->   	return min(host_level, max_level);
->   }
->   
-> -int kvm_mmu_max_mapping_level(struct kvm *kvm,
-> -			      const struct kvm_memory_slot *slot, gfn_t gfn)
-> -{
-> -	bool is_private = kvm_slot_has_gmem(slot) &&
-> -			  kvm_mem_is_private(kvm, gfn);
-> -
-> -	return __kvm_mmu_max_mapping_level(kvm, slot, gfn, PG_LEVEL_NUM, is_private);
-> -}
-> -
->   void kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
->   {
->   	struct kvm_memory_slot *slot = fault->slot;
-> @@ -3374,9 +3388,8 @@ void kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
->   	 * Enforce the iTLB multihit workaround after capturing the requested
->   	 * level, which will be used to do precise, accurate accounting.
->   	 */
-> -	fault->req_level = __kvm_mmu_max_mapping_level(vcpu->kvm, slot,
-> -						       fault->gfn, fault->max_level,
-> -						       fault->is_private);
-> +	fault->req_level = kvm_mmu_max_mapping_level(vcpu->kvm, fault,
-> +						     fault->slot, fault->gfn);
->   	if (fault->req_level == PG_LEVEL_4K || fault->huge_page_disallowed)
->   		return;
->   
-> @@ -4564,8 +4577,7 @@ static int kvm_mmu_faultin_pfn_private(struct kvm_vcpu *vcpu,
->   	}
->   
->   	fault->map_writable = !(fault->slot->flags & KVM_MEM_READONLY);
-> -	fault->max_level = kvm_max_private_mapping_level(vcpu->kvm, fault->pfn,
-> -							 fault->max_level, max_order);
-> +	fault->max_level = kvm_max_level_for_order(max_order);
->   
->   	return RET_PF_CONTINUE;
->   }
-> @@ -7165,7 +7177,7 @@ static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
->   		 * mapping if the indirect sp has level = 1.
->   		 */
->   		if (sp->role.direct &&
-> -		    sp->role.level < kvm_mmu_max_mapping_level(kvm, slot, sp->gfn)) {
-> +		    sp->role.level < kvm_mmu_max_mapping_level(kvm, NULL, slot, sp->gfn)) {
->   			kvm_zap_one_rmap_spte(kvm, rmap_head, sptep);
->   
->   			if (kvm_available_flush_remote_tlbs_range())
-> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-> index 65f3c89d7c5d..b776be783a2f 100644
-> --- a/arch/x86/kvm/mmu/mmu_internal.h
-> +++ b/arch/x86/kvm/mmu/mmu_internal.h
-> @@ -411,7 +411,7 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
->   	return r;
->   }
->   
-> -int kvm_mmu_max_mapping_level(struct kvm *kvm,
-> +int kvm_mmu_max_mapping_level(struct kvm *kvm, struct kvm_page_fault *fault,
->   			      const struct kvm_memory_slot *slot, gfn_t gfn);
->   void kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault);
->   void disallowed_hugepage_adjust(struct kvm_page_fault *fault, u64 spte, int cur_level);
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 7f3d7229b2c1..740cb06accdb 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -1813,7 +1813,7 @@ static void recover_huge_pages_range(struct kvm *kvm,
->   		if (iter.gfn < start || iter.gfn >= end)
->   			continue;
->   
-> -		max_mapping_level = kvm_mmu_max_mapping_level(kvm, slot, iter.gfn);
-> +		max_mapping_level = kvm_mmu_max_mapping_level(kvm, NULL, slot, iter.gfn);
->   		if (max_mapping_level < iter.level)
->   			continue;
->   
+On 7/28/2025 11:33 PM, Sean Christopherson wrote:
+> +Jiewen
+
+Jiewen is out of the office until August 4th.
+
+>
+> Summary, with the questions at the end.
+>
+> Recent upstream kernels running in GCE SNP/TDX VMs fail to probe the TPM due to
+> the TPM driver's ioremap (with UC) failing because the kernel has already mapped
+> the range using a cachaeable mapping (WB).
+>
+>   ioremap error for 0xfed40000-0xfed45000, requested 0x2, got 0x0
+>   tpm_tis MSFT0101:00: probe with driver tpm_tis failed with error -12
+>
+> The "guilty" commit is 8e690b817e38 ("x86/kvm: Override default caching mode for
+> SEV-SNP and TDX"), which as the subject suggests, forces the kernel's MTRR memtype
+> to WB.  With SNP and TDX, the virtual MTRR state is (a) controlled by the VMM and
+> thus is untrusted, and (b) _should_ be irrelevant because no known hypervisor
+> actually honors the memtypes programmed into the virtual MTRRs.
+>
+> It turns out that the kernel has been relying on the MTRRs to force the TPM TIS
+> region (and potentially other regions) to be UC, so that the kernel ACPI driver's
+> attempts to map of SystemMemory entries as cacheable get forced to UC.  With MTRRs
+> forced WB, x86_acpi_os_ioremap() succeeds in creating a WB mapping, which in turn
+> causes the ioremap infrastructure to reject the TPM driver's UC mapping.
+>
+> IIUC, the TPM entry(s) in the ACPI tables for GCE VMs are derived (built?) from
+> EDK2's TPM ASL.  And (again, IIUC), this code in SecurityPkg/Tcg/Tcg2Acpi/Tpm.asl[1]
+>
+>        //
+>        // Operational region for TPM access
+>        //
+>        OperationRegion (TPMR, SystemMemory, 0xfed40000, 0x5000)
+>
+> generates the problematic SystemMemory entry that triggers the ACPI driver's
+> auto-mapping logic.
+>
+> QEMU-based VMs don't suffer the same fate, as QEMU intentionally[2] doesn't use
+> EDK2's AML for the TPM, and QEMU doesn't define a SystemMemory entry, just a
+> Memory32Fixed entry.
+>
+> Presumably this an EDK2 bug?  If it's not an EDK2 bug, then how is the kernel's
+> ACPI driver supposed to know that some ranges of SystemMemory must be mapped UC?
+According to the ACPI spec 6.6, an operation region of SystemMemory has no
+interface to specify the cacheable attribute.
+
+One solution could be using MTRRs to communicate the memory attribute of legacy
+PCI hole to the kernel. But during the PUCK meeting last week, Sean mentioned
+that "long-term, firmware should not be using MTRRs to communicate anything to
+the kernel." So this solution is not preferred.
+
+If not MTRRs, there should be an alternative way to do the job.
+1. ACPI table
+    According to the ACPI spec, neither operation region nor 32-Bit Fixed Memory
+    Range Descriptor can specify the cacheable attribute.
+    "Address Space Resource Descriptors" could be used to describe a memory range
+    and the they can specify the cacheable attribute via "Type Specific Flags".
+    One of the Address Space Resource Descriptors could be added to the ACPI
+    table as a hint when the kernel do the mapping for operation region.
+    (There is "System Physical Address (SPA) Range Structure", which also can
+    specify the cacheable attribute. But it's should be used for NVDIMMs.)
+2. EFI memory map descriptor
+    EFI memory descriptor can specify the cacheable attribute. Firmware can add
+    a EFI memory descriptor for the TPM TIS device as a hint when the kernel do
+    the mapping for operation region.
+
+Operation region of SystemMemory is still needed if a "Control Method" of APCI
+needs to access a field, e.g., the method _STA. Checking another descriptor for
+cacheable attribute, either "Address Space Resource Descriptor" or "EFI memory
+map descriptor" during the ACPI code doing the mapping for operation region
+makes the code complicated.
+
+Another thing is if long-term firmware should not be using MTRRs to to
+communicate anything to the kernel. It seems it's safer to use ioremap() instead
+of ioremap_cache() for MMIO resource when the kernel do the mapping for the
+operation region access?
+
+>
+> [1] https://github.com/tianocore/edk2/blob/master/SecurityPkg/Tcg/Tcg2Acpi/Tpm.asl#L53
+> [2] https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg03397.html
+>
+> On Thu, Jul 24, 2025, Binbin Wu wrote:
+>> On 7/23/2025 10:34 PM, Sean Christopherson wrote:
+>>> On Mon, Jul 14, 2025, Nikolay Borisov wrote:
+>>>> On 14.07.25 г. 12:06 ч., Binbin Wu wrote:
+>>>>> On 7/10/2025 12:54 AM, Jianxiong Gao wrote:
+>>>>>> I tested this patch on top of commit 8e690b817e38, however we are
+>>>>>> still experiencing the same failure.
+>>>>>>
+>>>>> I didn't reproduce the issue with QEMU.
+>>>>> After some comparison on how QEMU building the ACPI tables for HPET and
+>>>>> TPM,
+>>>>>
+>>>>> - For HPET, the HPET range is added as Operation Region:
+>>>>>        aml_append(dev,
+>>>>>            aml_operation_region("HPTM", AML_SYSTEM_MEMORY,
+>>>>> aml_int(HPET_BASE),
+>>>>>                                 HPET_LEN));
+>>>>>
+>>>>> - For TPM, the range is added as 32-Bit Fixed Memory Range:
+>>>>>        if (TPM_IS_TIS_ISA(tpm_find())) {
+>>>>>            aml_append(crs, aml_memory32_fixed(TPM_TIS_ADDR_BASE,
+>>>>>                       TPM_TIS_ADDR_SIZE, AML_READ_WRITE));
+>>>>>        }
+>>>>>
+>>>>> So, in KVM, the code patch of TPM is different from the trace for HPET in
+>>>>> the patch https://lore.kernel.org/kvm/20250201005048.657470-3-seanjc@google.com/,
+>>>>> HPET will trigger the code path acpi_os_map_iomem(), but TPM doesn't.
+>>> Argh, I was looking at the wrong TPM resource when poking through QEMU.  I peeked
+>>> at TPM_PPI_ADDR_BASE, which gets an AML_SYSTEM_MEMORY entry, not TPM_TIS_ADDR_BASE.
+> ...
+>
+>> I guess google has defined a ACPI method to access the region for TPM TIS during
+>> ACPI device probe.
+>>
+>>> In the meantime, can someone who has reproduced the real issue get backtraces to
+>>> confirm or disprove that acpi_os_map_iomem() is trying to map the TPM TIS range
+>>> as WB?  E.g. with something like so:
+> Got confirmation off-list that Google's ACPI tables due trigger the kernel's
+> cachable mapping logic for SYSTEM_MEMORY.
+>
+>   Mapping TPM TIS with req_type = 0
+>   WARNING: CPU: 22 PID: 1 at arch/x86/mm/pat/memtype.c:530 memtype_reserve+0x2ab/0x460
+>   Modules linked in:
+>   CPU: 22 UID: 0 PID: 1 Comm: swapper/0 Tainted: G        W           6.16.0-rc7+ #2 VOLUNTARY
+>   Tainted: [W]=WARN
+>   Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/29/2025
+>   RIP: 0010:memtype_reserve+0x2ab/0x460
+>    __ioremap_caller+0x16d/0x3d0
+>    ioremap_cache+0x17/0x30
+>    x86_acpi_os_ioremap+0xe/0x20
+>    acpi_os_map_iomem+0x1f3/0x240
+>    acpi_os_map_memory+0xe/0x20
+>    acpi_ex_system_memory_space_handler+0x273/0x440
+>    acpi_ev_address_space_dispatch+0x176/0x4c0
+>    acpi_ex_access_region+0x2ad/0x530
+>    acpi_ex_field_datum_io+0xa2/0x4f0
+>    acpi_ex_extract_from_field+0x296/0x3e0
+>    acpi_ex_read_data_from_field+0xd1/0x460
+>    acpi_ex_resolve_node_to_value+0x2ee/0x530
+>    acpi_ex_resolve_to_value+0x1f2/0x540
+>    acpi_ds_evaluate_name_path+0x11b/0x190
+>    acpi_ds_exec_end_op+0x456/0x960
+>    acpi_ps_parse_loop+0x27a/0xa50
+>    acpi_ps_parse_aml+0x226/0x600
+>    acpi_ps_execute_method+0x172/0x3e0
+>    acpi_ns_evaluate+0x175/0x5f0
+>    acpi_evaluate_object+0x213/0x490
+>    acpi_evaluate_integer+0x6d/0x140
+>    acpi_bus_get_status+0x93/0x150
+>    acpi_add_single_object+0x43a/0x7c0
+>    acpi_bus_check_add+0x149/0x3a0
+>    acpi_bus_check_add_1+0x16/0x30
+>    acpi_ns_walk_namespace+0x22c/0x360
+>    acpi_walk_namespace+0x15c/0x170
+>    acpi_bus_scan+0x1dd/0x200
+>    acpi_scan_init+0xe5/0x2b0
+>    acpi_init+0x264/0x5b0
+>    do_one_initcall+0x5a/0x310
+>    kernel_init_freeable+0x34f/0x4f0
+>    kernel_init+0x1b/0x200
+>    ret_from_fork+0x186/0x1b0
+>    ret_from_fork_asm+0x1a/0x30
+>    </TASK>
+>
+>> I tried to add an AML_SYSTEM_MEMORY entry as operation region in the ACPI
+>> table and modify the _STA method to access the region for TPM TIS in QEMU, then
+>> the issue can be reproduced.
+>>
+>> diff --git a/hw/tpm/tpm_tis_isa.c b/hw/tpm/tpm_tis_isa.c
+>> index 876cb02cb5..aca2b2993f 100644
+>> --- a/hw/tpm/tpm_tis_isa.c
+>> +++ b/hw/tpm/tpm_tis_isa.c
+>> @@ -143,6 +143,9 @@ static void build_tpm_tis_isa_aml(AcpiDevAmlIf *adev, Aml *scope)
+>>       Aml *dev, *crs;
+>>       TPMStateISA *isadev = TPM_TIS_ISA(adev);
+>>       TPMIf *ti = TPM_IF(isadev);
+>> +    Aml *field;
+>> +    Aml *method;
+>> +    Aml *test = aml_local(0);
+>>
+>>       dev = aml_device("TPM");
+>>       if (tpm_tis_isa_get_tpm_version(ti) == TPM_VERSION_2_0) {
+>> @@ -152,7 +155,19 @@ static void build_tpm_tis_isa_aml(AcpiDevAmlIf *adev, Aml *scope)
+>>           aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0C31")));
+>>       }
+>>       aml_append(dev, aml_name_decl("_UID", aml_int(1)));
+>> -    aml_append(dev, aml_name_decl("_STA", aml_int(0xF)));
+>> +
+>> +    aml_append(dev, aml_operation_region("TPMM", AML_SYSTEM_MEMORY, aml_int(TPM_TIS_ADDR_BASE),
+>> +                         TPM_TIS_ADDR_SIZE));
+>> +
+>> +    field = aml_field("TPMM", AML_DWORD_ACC, AML_LOCK, AML_PRESERVE);
+>> +    aml_append(field, aml_named_field("TEST", 32));
+>> +    aml_append(dev, field);
+>> +
+>> +    method = aml_method("_STA", 0, AML_NOTSERIALIZED);
+>> +    aml_append(method, aml_store(aml_name("TEST"), test));
+>> +    aml_append(method, aml_return(aml_int(0xF)));
+>> +    aml_append(dev, method);
+>
+>
 
 
