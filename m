@@ -1,92 +1,92 @@
-Return-Path: <kvm+bounces-53754-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53755-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE5A9B167DA
-	for <lists+kvm@lfdr.de>; Wed, 30 Jul 2025 22:56:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B888CB167DB
+	for <lists+kvm@lfdr.de>; Wed, 30 Jul 2025 22:56:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2413584CC0
-	for <lists+kvm@lfdr.de>; Wed, 30 Jul 2025 20:56:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6CBE3B572A
+	for <lists+kvm@lfdr.de>; Wed, 30 Jul 2025 20:56:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EFCA21CC56;
-	Wed, 30 Jul 2025 20:56:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4B8521CC56;
+	Wed, 30 Jul 2025 20:56:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KZsGpuvW"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dkdfHUFo"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF46E10F1
-	for <kvm@vger.kernel.org>; Wed, 30 Jul 2025 20:56:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E1F910F1
+	for <kvm@vger.kernel.org>; Wed, 30 Jul 2025 20:56:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753908986; cv=none; b=bmo+cg7lrdgJ3VE10ZPqiZfhB5SNJbBDfw6lUvjgB8TrBBVvYbG3Vu5Gxobz9pYVMxtELoMOlwf06wrFFUAtJ6Z7MkDxMW3gRCzIHpZgr+cW3F2zmwvCAT+9cMNywfLtC3aVtYBHXT04SMWg+Q/AfQnmUo0JnjCaDC0NpDHN49g=
+	t=1753908994; cv=none; b=Ux7E5cku26LUYd/KcHCRn0VE+ASsTxP1w+Br9tgvukeRXjmPnsG2T56dEz+VMkdpuyOQbf+XU+I52/buuHFrqEgvSLJd+e7TKXEHj302k1/f7wE8ksWmOiKPIZdcWPsCpSXbqsdtoWyxM7eSN+H1wC1u49/Mm1lSnYCSGdynk0I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753908986; c=relaxed/simple;
-	bh=1RiTgh+rTp729fP0HyFkiy+QB1Ho5fTFXxtMbL6veCw=;
+	s=arc-20240116; t=1753908994; c=relaxed/simple;
+	bh=wvB4IKfv9zLzvYXzHLPNhTYZurYusIAEe15kaHn1//I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BeclzLXUPGDn2F4BOx9dh79lfFHvaQ8nTf6TXX8ApI4pzO79kjdiShwFoc9pV2HZYOsBLYjhU2w8Mfum5IsP+pBQewElVvZfDjAuMrlv8CXHMjj2Uf8bW64mzaGE9+brQwE111I9xGOurdYtvUQ+twzDG6N7KxOmvrZXsDFuN9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KZsGpuvW; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=FPH1loncM724yQjGy4thQ+Rx5WfyTcmBQzuojOu8cePviBa5osdgrrDhkgINr+x2RAc3DL5tN922A32WcXJjCR1Dj029F1Ih857SnDu/SoV62Q9/MuuS2tmIBa2gJUH+M2KdqXZrWvjIIcL4+RZ92iG/yRk8LPo81decx7UFNJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dkdfHUFo; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1753908983;
+	s=mimecast20190719; t=1753908992;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Y5ShZ7n03wwuwmSOflEobOlr4/7+D8Iqn53Z9UWW4Cc=;
-	b=KZsGpuvWSoa0RHG665BkIdH8YLEtdCWm4XmaIlGPtMMCspKpicOLFv8vErZ2ktfKMVsUoh
-	Rjd3B+WBVd8+Xd1nLPVFKW2f6+ZcU6iyPIpu/6RLPHKHueWj20SEdKlPR2xdYZye6avmzX
-	Q+dzuSdhg+4X+AXS6lw26L1VSW2nXTY=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=OsAvW1xbbDY3IL4qeqk3YajzyugYI0d228HyXCGF9Vw=;
+	b=dkdfHUFo2RplwpsdXLJFsj9xO59LLUHkJcH2q9GzsmjJuJhW/FQ474IiRCBqKyTXrJjsl+
+	AjSkeGH6UBcUVg6TDF0aDMFK7UoWyCNpst+fX1tpgOsg1Lbuz4z3cZHdQVTbvqd+y+iB3L
+	2OBWsrRtH28wdJ+jR/8gqRq4vTNmy+4=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-135-3SJpCvZhOfCfWvwvUA9Jyg-1; Wed, 30 Jul 2025 16:56:22 -0400
-X-MC-Unique: 3SJpCvZhOfCfWvwvUA9Jyg-1
-X-Mimecast-MFC-AGG-ID: 3SJpCvZhOfCfWvwvUA9Jyg_1753908982
-Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-4ab5d2f4f29so3545161cf.1
-        for <kvm@vger.kernel.org>; Wed, 30 Jul 2025 13:56:22 -0700 (PDT)
+ us-mta-517-R_axnKO7PiK0g4mG6brHXg-1; Wed, 30 Jul 2025 16:56:30 -0400
+X-MC-Unique: R_axnKO7PiK0g4mG6brHXg-1
+X-Mimecast-MFC-AGG-ID: R_axnKO7PiK0g4mG6brHXg_1753908990
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-70744318bdfso4654306d6.3
+        for <kvm@vger.kernel.org>; Wed, 30 Jul 2025 13:56:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753908981; x=1754513781;
+        d=1e100.net; s=20230601; t=1753908989; x=1754513789;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Y5ShZ7n03wwuwmSOflEobOlr4/7+D8Iqn53Z9UWW4Cc=;
-        b=VatNm84nbc7UPiUsNEAgaE+IewrDM4i7OyGlkK3+J7rsEvBi+ORwtWDr0NcTNu5fEo
-         cFyTeIlVlFfSq6OtOelXP3VKA57MEhFaARZ0fPzErU4P0f+g9fX/WTV939pd12WCX73p
-         app4/MkAzyYhfwh5BVDbS1opwtKAoZ3tOWzHHU1PiMg5k/lkVumtVAzrhYyzNMwccjii
-         JWj5Dm42yQdt/rBa5IERhYI7S0RvvNqhY/RMX5beVhmuXR6GxdvA1MyXsnTrzTvAHovQ
-         Z4aYUan8/RMI1mzaxX7aBIAYqp3YrntvUH490KODdUW+jdBCMxJDObaCWu43xJOS7Yfn
-         z7RA==
-X-Gm-Message-State: AOJu0YzGkn3xncEiwli1KjVa27NH0+j0n3fDWrANjH6EtGyikkVoSBu/
-	0dpKGgJ9ON4s2b7ReqO5pHvRMwT5hkAgz2CoWGqHmciyKn2rvcwfB+hL9n8G+LgosipYSUN41AH
-	pBY4olBHB5d5DrE1GdgTMvdter/vokdjfyG//NTnG/7hJ5KeJ/pKxzQ==
-X-Gm-Gg: ASbGncse65/zpEBI8uZRmqZ8q17YmomZ6ciktuDponKczFjWun3haLWt61KpabWwRG5
-	PBmkEEeLzkbL4R5qy1Ja4zQCtDPCw+1pHrGy+eJNT8YjBIhy4RzAarKe0N7v6XGdSYte2uz4mpq
-	30Dl2RiDW92a+2kt3O1S/LDRPj8tu5snk2wC3mIkSIlXvtwRyWRK5zRGQsQcWnBl0j0BMvlq19E
-	gAVxMGIGVSPMrMd/WG14IAsCTqI8gUdRoQUX/9dU1ydXJ0vXF7QfxJ1+XaPBwklXNbZFtndOS6t
-	9YnlNXqnctx5x42rCPes2Wq6e7i1kxQsdKGAoNv0Nkx9UNxlcyhuSyS6qIk8K54JtfHO932H4VL
-	CKf7e+wMvbEbnk+sAClgn2w==
-X-Received: by 2002:a05:622a:1a01:b0:4ab:377c:b6be with SMTP id d75a77b69052e-4aedb99f6e9mr67514131cf.22.1753908981475;
-        Wed, 30 Jul 2025 13:56:21 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEtAu3dK6KP1W8+5QfFoT3RKxYzS3jPAS7B5XNWZJrJUfrzY4CTFXAhRQmORe4LYPeBsjxFIw==
-X-Received: by 2002:a05:622a:1a01:b0:4ab:377c:b6be with SMTP id d75a77b69052e-4aedb99f6e9mr67513761cf.22.1753908980808;
-        Wed, 30 Jul 2025 13:56:20 -0700 (PDT)
+        bh=OsAvW1xbbDY3IL4qeqk3YajzyugYI0d228HyXCGF9Vw=;
+        b=AnjiECY5nCMRLpS0DLWQDRaeOpxacDldgMAgFo+N/iVZ03WVGj06VSOfx7r6ek5uv2
+         kpurye6CeM7FXhB3cqOrLrB0Jb7SkvS/useJQcFOsgDUgPf5ww6+7k07KVSoWensZvng
+         og5/xkmCNI8XxviI3YvXtq+GKhlJwnt4TuGf3r9gRVq+4DeeYsVxxZRoGOH6i5zsXBrc
+         L9i7rQN45kMDayudh+bh8AgGRbieXpQKa8VqqnJjKpuZ1xI7iyC3BL38xt1KLpoo6++y
+         0z47kSOttUT2KjyN+mCSXg1P7/2K1QqxT6VZkDcjzL0BTXBTfXd/G+n0ZVBifr9VgnF2
+         KFhQ==
+X-Gm-Message-State: AOJu0YwZIXd3wRXqpoKqr4z2S0CGZDSiX8ZcIuze70r+iB6atjMbLp2B
+	YjBP5ws/2ejSikRZ/zi65cTuiCQfJw1r9oYrc1pZ0fsSaq7o4WZMKb+sst1sJf/Bj9c4BbGpV1f
+	n3tdX6CQJg6+8afvLc+tOEMVewAZgjXXFY0eLXRJBtO4DZf6vutoZlPTLctxTyw==
+X-Gm-Gg: ASbGncupz3kprFNJ2c6S6dp7jx7NDC2mqGAqHUkZVDR+EQBCu8iAT79sR6mB6Fr4zSl
+	9xLSubddFIbMPPv+gocGCCH0K+3KZVFHVLAfCXnwAt8ALhlVmDglL/coGrlNg82v+eyVMtOFDfa
+	nFuTyYtbyn0yGjwLxj5LtbgX2OVA1Uzt3zGhl0Kr1+bYV0VSes7DIUrI/Vx+QbGc4l514mVBnA/
+	O1eubmKVzfd/leCkj2S4sZ1jUWnsSdmCgtuSETKouzVYSk6u1hUg4I2mtCW3gBTgUk2TKjZVRV1
+	cItEtJgeicgs4Q+DEsRVr03eX79JTWAoWCLB2cy+f/D+PoyXLylGpbVkrBi3vZoK5tDq74XuM7U
+	GUOuIqIQ6ThPloFbA7IkbSQ==
+X-Received: by 2002:ad4:5763:0:b0:707:5df5:c719 with SMTP id 6a1803df08f44-70767478e57mr81914066d6.17.1753908989485;
+        Wed, 30 Jul 2025 13:56:29 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFfZh3Cs1t3FamufEveCv+4dQA1o0BCFhicNear2tX0jspAPHKZ0DqWSimzrXYSvNNce0e5Nw==
+X-Received: by 2002:ad4:5763:0:b0:707:5df5:c719 with SMTP id 6a1803df08f44-70767478e57mr81913506d6.17.1753908988922;
+        Wed, 30 Jul 2025 13:56:28 -0700 (PDT)
 Received: from x1.local (bras-base-aurron9134w-grc-11-174-89-135-171.dsl.bell.ca. [174.89.135.171])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4aeeebdc99asm1065221cf.12.2025.07.30.13.56.19
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-70729a8302dsm65255146d6.30.2025.07.30.13.56.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Jul 2025 13:56:20 -0700 (PDT)
-Date: Wed, 30 Jul 2025 16:56:18 -0400
+        Wed, 30 Jul 2025 13:56:28 -0700 (PDT)
+Date: Wed, 30 Jul 2025 16:56:27 -0400
 From: Peter Xu <peterx@redhat.com>
 To: Igor Mammedov <imammedo@redhat.com>
 Cc: kvm@vger.kernel.org, pbonzini@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v4 3/5] x86: move USERBASE to 32Mb in
- smap/pku/pks tests
-Message-ID: <aIqG8nAB2kaH3Mjg@x1.local>
+Subject: Re: [kvm-unit-tests PATCH v4 4/5] x86: bump number of max cpus to
+ 1024
+Message-ID: <aIqG-wU2X-Pm6ZVB@x1.local>
 References: <20250725095429.1691734-1-imammedo@redhat.com>
- <20250725095429.1691734-4-imammedo@redhat.com>
+ <20250725095429.1691734-5-imammedo@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -95,62 +95,14 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250725095429.1691734-4-imammedo@redhat.com>
+In-Reply-To: <20250725095429.1691734-5-imammedo@redhat.com>
 
-On Fri, Jul 25, 2025 at 11:54:27AM +0200, Igor Mammedov wrote:
-> If number of CPUs is increased up to 2048, it will push
-> available pages above 16Mb range and make smap/pku/pks
-> tests fail with 'Could not reserve memory' error.
-> 
-> Move pages used by tests to 32Mb to fix it.
+On Fri, Jul 25, 2025 at 11:54:28AM +0200, Igor Mammedov wrote:
+> this should allow run tests with more thatn 256 cpus
 > 
 > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 
 Reviewed-by: Peter Xu <peterx@redhat.com>
-
-> ---
->  x86/pks.c  | 2 +-
->  x86/pku.c  | 2 +-
->  x86/smap.c | 2 +-
->  3 files changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/x86/pks.c b/x86/pks.c
-> index f4d6ac83..9b9519ba 100644
-> --- a/x86/pks.c
-> +++ b/x86/pks.c
-> @@ -6,7 +6,7 @@
->  #include "x86/msr.h"
->  
->  #define PTE_PKEY_BIT     59
-> -#define SUPER_BASE        (1 << 23)
-> +#define SUPER_BASE        (2 << 24)
-
-Nitpick: maybe 1<<25 would be easier to read.
-
-Below are some random thoughts when reading these tests..
-
-I'm not sure whether I understand them correctly here: all of them so far
-depend on the "test" var present in the .bss section, and they all assumed
-that the var's physical address (likely together with the whole .bss) will
-be under SUPER_BASE after loaded in the VM.
-
-Based on that, there's yet another restriction versus the need to reserve
-(SUPER_BASE, SUPER_BASE*2), because the tests want to map the same (0,
-SUPER_BASE) memory twice in that virtual address range, so here the tests
-do not really need the phys pages in the back but kind of a way to reserve
-virtual addresses..
-
-Instead of these tricks, I wonder whether we can do alloc_page() once, then
-put the test var on the page allocated.  Then we can build the required
-PKU/PKS/SMAP special pgtables on top, mapping to the page allocated.  It
-should make sure system changes (like growing num_cpus) never affect it
-anymore.
-
-That (even if feasible.. or maybe I missed something) can definitely
-involve more changes, so not something to ask for on adding the hpet test /
-x2apic support.  Just some pure thoughts when reading it..
-
-Thanks,
 
 -- 
 Peter Xu
