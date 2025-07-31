@@ -1,127 +1,176 @@
-Return-Path: <kvm+bounces-53814-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53815-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA4A5B178E5
-	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 00:11:25 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B37BB17937
+	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 00:56:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 992AB1701D5
-	for <lists+kvm@lfdr.de>; Thu, 31 Jul 2025 22:11:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 440B97AAA49
+	for <lists+kvm@lfdr.de>; Thu, 31 Jul 2025 22:54:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CE5126CE13;
-	Thu, 31 Jul 2025 22:10:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 230B0279DC3;
+	Thu, 31 Jul 2025 22:55:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="SPKx5P98"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YEJ77wkh"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81CE32690D5;
-	Thu, 31 Jul 2025 22:10:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A3082253FD;
+	Thu, 31 Jul 2025 22:55:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753999851; cv=none; b=FFEioqhbVZqbf84NxDBjEu0PA/a4GIfsF8UutIFRLJDtbFf4E3oaerzsVgV0BTc0jYA7FMTF362kM3GUGdIPyUqJj7in+fOD4w5Ron6G054spR3Dgs5AfhuzYUWQdElR0YkrM5BEtcZpWBRo61ZDfbFFoEAhULJ0TfXE8x9THdY=
+	t=1754002547; cv=none; b=FPJj6Uix9OeMb5tmu8MiEE3MH8+EzSMmucMcnHi2XbnT+dBmRseJfoX+Fef7y0VnRy7udzkm599m0SYK0znotI9IwdeMdyn6vLLYvSOBs3tEZAIOiDaL1I/TPTceWkyXpi02sHJ4UkxRvQ/7FP195EtN4xFFq+wT5Wxxdlq07xc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753999851; c=relaxed/simple;
-	bh=cLR/2l8q+/jkqSgO9t5RREAqchO8winRqkNTRw5ruwY=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=EkKr4S2/2zMeKnSWy+YM9SlsfgS6Qyf7DI6fa0ghDtTUzYxCy2WuDignZhP7ra/eD8xDiC5wZ87YdvBReUJhEqsWvCjgadGfm0q6hPu37KYNlXEwWanMWjCvDtpQQvOyOnPNH9xuxWFvd1g3xjOMeLaun6LLlH++rx+2Qh8DkZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=SPKx5P98; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [192.168.7.202] ([71.202.166.45])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 56VMA7L52343656
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Thu, 31 Jul 2025 15:10:07 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 56VMA7L52343656
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025072201; t=1753999808;
-	bh=I9Sh1R4JjqKiRHpW0LVlSWjN+6rOTN1DAIE3pzYv09g=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=SPKx5P98F6w/790PtTfL3Ws4YXExyLlZ59vMjyahTRtJMRCc06KVP+NtefOTwRZWE
-	 BC0Xqruy/7Yme0LTNOITDwK5I80tWpo1cBYwLLbEwgPQ4eAm4z4f84tx17T0H/uxeJ
-	 Den7wEOm15gUGU3msFu1bWb/cm0CaPKg7ylAc9VlXVDNQ7owACrNOZHZXfJw+eRvj6
-	 92XIHyguk/A9dAj10Sy28BpGtvc/Aqd+BY6HVDCTLW7UEEUrP57zjK3c4blqgdsSI3
-	 +MkYqOIX4oMYJ8Z3kZ1RIrODyLtNjgMxezfB4B5XjCatdPtyEQkR6IKxtKjCoSFw7F
-	 mR1uqUo+QhteA==
-Message-ID: <9930f714-4ec8-41be-b9ab-44bac38e0bb7@zytor.com>
-Date: Thu, 31 Jul 2025 15:10:07 -0700
+	s=arc-20240116; t=1754002547; c=relaxed/simple;
+	bh=jVBqTX4LiFX2Ybg1vJa8X7czRMlNlRIvlu0u0+RCFzs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CGH/a1gU8nVu3hwvc48F+OTMiJAkMuzHiquEFvWiBg/IEE+5qZa3ZKv8gFnaTdv2EXjCvKKWnY17WbdoNRlW8I5x2gxvDNQRq1ZgvnrkUf7AR2Jd9s1NibYlIMaH9xkTKe0fwjISR/CO4qXkalexPnl9ibAB7x6uSRGvQgvQ/9g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YEJ77wkh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4D2EC4CEEF;
+	Thu, 31 Jul 2025 22:55:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754002546;
+	bh=jVBqTX4LiFX2Ybg1vJa8X7czRMlNlRIvlu0u0+RCFzs=;
+	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
+	b=YEJ77wkhpCgnUqYn4thx21LhLxcEUT7C/n69VGBJZKMz6aUpmg20i7GjrBXIXHNow
+	 2G8uJWR4Y2sX04OoGVvvM6JM/ke4OV3UisD29+L8lsIzBaPNMcQsaSbOhRABLr9fRh
+	 uUCU+fWOqu6NwLEKRBleld/gZyIec8YiwRaXqvTYJxCdruYE1qvL++W9NCtW3N9lc7
+	 5p9g1S2Yh1o4L7Q8fQRQ5sSF+tvFZ9Zwz9pFEIyzu525Fv4ovd5g5FEbyMXzoTMA9k
+	 otX6mnmTH3uz6rfImCsViA0mQPVNempBBJLm6eqvVdZefuKkrwBjopgPkYs1VHz6oh
+	 AR2PQcf321d1A==
+Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
+	id 5EAA2CE09FA; Thu, 31 Jul 2025 15:55:46 -0700 (PDT)
+Date: Thu, 31 Jul 2025 15:55:46 -0700
+From: "Paul E. McKenney" <paulmck@kernel.org>
+To: Janosch Frank <frankja@linux.ibm.com>
+Cc: pbonzini@redhat.com, kvm@vger.kernel.org, borntraeger@linux.ibm.com,
+	linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+	ajd@linux.ibm.com, sfr@canb.auug.org.au,
+	Mark Rutland <mark.rutland@arm.com>,
+	Andy Lutomirski <luto@kernel.org>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>
+Subject: Re: [GIT PULL 1/2] entry: Add arch_in_rcu_eqs()
+Message-ID: <055235f7-9ea0-4a6d-8386-5893c737a459@paulmck-laptop>
+Reply-To: paulmck@kernel.org
+References: <20250730081224.38778-1-frankja@linux.ibm.com>
+ <20250730081224.38778-2-frankja@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 3/4] KVM: VMX: Handle the immediate form of MSR
- instructions
-From: Xin Li <xin@zytor.com>
-To: Chao Gao <chao.gao@intel.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, pbonzini@redhat.com,
-        seanjc@google.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com
-References: <20250730174605.1614792-1-xin@zytor.com>
- <20250730174605.1614792-4-xin@zytor.com> <aItNtifaItfXhXnu@intel.com>
- <f20842af-2bc1-4002-a6eb-84c33408d0ea@zytor.com>
-Content-Language: en-US
-Autocrypt: addr=xin@zytor.com; keydata=
- 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
- l75w1xInsg==
-In-Reply-To: <f20842af-2bc1-4002-a6eb-84c33408d0ea@zytor.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250730081224.38778-2-frankja@linux.ibm.com>
 
-On 7/31/2025 9:53 AM, Xin Li wrote:
->> The CPUID feature bit also indicates support for the two new VM-exit 
->> reasons.
->> Therefore, KVM needs to reflect EXIT_REASON_MSR_READ/WRITE_IMM VM- 
->> exits to
->> L1 guests in nested cases if KVM claims it supports the new form of MSR
->> instructions.
+On Wed, Jul 30, 2025 at 10:10:32AM +0200, Janosch Frank wrote:
+> From: Mark Rutland <mark.rutland@arm.com>
 > 
-> Damn, forgot about nested...
+> All architectures have an interruptible RCU extended quiescent state
+> (EQS) as part of their idle sequences, where interrupts can occur
+> without RCU watching. Entry code must account for this and wake RCU as
+> necessary; the common entry code deals with this in irqentry_enter() by
+> treating any interrupt from an idle thread as potentially having
+> occurred within an EQS and waking RCU for the duration of the interrupt
+> via rcu_irq_enter() .. rcu_irq_exit().
+> 
+> Some architectures may have other interruptible EQSs which require
+> similar treatment. For example, on s390 it is necessary to enable
+> interrupts around guest entry in the middle of a period where core KVM
+> code has entered an EQS.
+> 
+> So that architectures can wake RCU in these cases, this patch adds a
+> new arch_in_rcu_eqs() hook to the common entry code which is checked in
+> addition to the existing is_idle_thread() check, with RCU woken if
+> either returns true. A default implementation is provided which always
+> returns false, which suffices for most architectures.
+> 
+> As no architectures currently implement arch_in_rcu_eqs(), there should
+> be no functional change as a result of this patch alone. A subsequent
+> patch will add an s390 implementation to fix a latent bug with missing
+> RCU wakeups.
+> 
+> [ajd@linux.ibm.com: rebase, fix commit message]
+> 
+> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+> Cc: Andy Lutomirski <luto@kernel.org>
+> Cc: Christian Borntraeger <borntraeger@linux.ibm.com>
+> Cc: Heiko Carstens <hca@linux.ibm.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Paul E. McKenney <paulmck@kernel.org>
+> Cc: Peter Zijlstra <peterz@infradead.org>
+> Cc: Sven Schnelle <svens@linux.ibm.com>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> Cc: Vasily Gorbik <gor@linux.ibm.com>
+> Cc: Alexander Gordeev <agordeev@linux.ibm.com>
+> Cc: Janosch Frank <frankja@linux.ibm.com>
+> Reviewed-by: Christian Borntraeger <borntraeger@linux.ibm.com>
+> Signed-off-by: Andrew Donnellan <ajd@linux.ibm.com>
+> Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+> Link: https://lore.kernel.org/r/20250708092742.104309-2-ajd@linux.ibm.com
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Message-ID: <20250708092742.104309-2-ajd@linux.ibm.com>
 
-The current nested KVM VMX implementation already handles VM exits
-caused by the immediate form of MSR instructions, forwarding them to L1
-as intended by design.
+Reviewed-by: Paul E. McKenney <paulmck@kernel.org>
 
-I just need to add MSR bitmap checks to nested_vmx_exit_handled_msr().
-
-Thanks!
-     Xin
-
+> ---
+>  include/linux/entry-common.h | 16 ++++++++++++++++
+>  kernel/entry/common.c        |  3 ++-
+>  2 files changed, 18 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/linux/entry-common.h b/include/linux/entry-common.h
+> index f94f3fdf15fc..3bf99cbad8a3 100644
+> --- a/include/linux/entry-common.h
+> +++ b/include/linux/entry-common.h
+> @@ -86,6 +86,22 @@ static __always_inline void arch_enter_from_user_mode(struct pt_regs *regs);
+>  static __always_inline void arch_enter_from_user_mode(struct pt_regs *regs) {}
+>  #endif
+>  
+> +/**
+> + * arch_in_rcu_eqs - Architecture specific check for RCU extended quiescent
+> + * states.
+> + *
+> + * Returns: true if the CPU is potentially in an RCU EQS, false otherwise.
+> + *
+> + * Architectures only need to define this if threads other than the idle thread
+> + * may have an interruptible EQS. This does not need to handle idle threads. It
+> + * is safe to over-estimate at the cost of redundant RCU management work.
+> + *
+> + * Invoked from irqentry_enter()
+> + */
+> +#ifndef arch_in_rcu_eqs
+> +static __always_inline bool arch_in_rcu_eqs(void) { return false; }
+> +#endif
+> +
+>  /**
+>   * enter_from_user_mode - Establish state when coming from user mode
+>   *
+> diff --git a/kernel/entry/common.c b/kernel/entry/common.c
+> index a8dd1f27417c..eb52d38e8099 100644
+> --- a/kernel/entry/common.c
+> +++ b/kernel/entry/common.c
+> @@ -220,7 +220,8 @@ noinstr irqentry_state_t irqentry_enter(struct pt_regs *regs)
+>  	 * TINY_RCU does not support EQS, so let the compiler eliminate
+>  	 * this part when enabled.
+>  	 */
+> -	if (!IS_ENABLED(CONFIG_TINY_RCU) && is_idle_task(current)) {
+> +	if (!IS_ENABLED(CONFIG_TINY_RCU) &&
+> +	    (is_idle_task(current) || arch_in_rcu_eqs())) {
+>  		/*
+>  		 * If RCU is not watching then the same careful
+>  		 * sequence vs. lockdep and tracing is required
+> -- 
+> 2.50.1
+> 
 
