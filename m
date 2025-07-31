@@ -1,54 +1,54 @@
-Return-Path: <kvm+bounces-53797-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53798-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB7DBB17514
-	for <lists+kvm@lfdr.de>; Thu, 31 Jul 2025 18:41:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85139B17555
+	for <lists+kvm@lfdr.de>; Thu, 31 Jul 2025 18:54:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4037E7B047D
-	for <lists+kvm@lfdr.de>; Thu, 31 Jul 2025 16:39:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 748343B2ADC
+	for <lists+kvm@lfdr.de>; Thu, 31 Jul 2025 16:54:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04ABD23D2A9;
-	Thu, 31 Jul 2025 16:41:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EFD328DB77;
+	Thu, 31 Jul 2025 16:54:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="SlRWJFm1"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="nTEEJREF"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79E84BA33;
-	Thu, 31 Jul 2025 16:41:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B8BD241C89;
+	Thu, 31 Jul 2025 16:54:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753980077; cv=none; b=qBWez9CqFpeNNYcZZlFjhLiYWpJVbAB1JnlbatN1KqD6BzFjP04ReGCAM6kubouVcL8pGA2WxUCyYh98DxI1rcHzNWbL6TJvnl82Wvy3IzxilJ3bmt1XikTrfpII6f1EdmX3zT86w3ugbLDMA35l7j0Sg6VHSUsqoVQexPLCJQg=
+	t=1753980865; cv=none; b=GavoWq3mBK4QE6fBpvthyPqUA9FNESvBTiBCMLyZ7CL7xHaUAb94oh/65Oszm4JFe+2yHu9ZTX6/iijnn5uCJlmdH6Ywz2m06Vcnq84QELAxhuicASqZtpCS161IQRs8qPH5eOyn/+iEQQNTZH1UGUaYgbg8QeVgo4C2E1ahqA0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753980077; c=relaxed/simple;
-	bh=m5uXY5lnVsSAB6lYm8kAe3A3pZTyC1KyFFSC8PRe3sc=;
+	s=arc-20240116; t=1753980865; c=relaxed/simple;
+	bh=NGYe/4bHwxEsCtXRlSZjhwJ1rnKJGVKblpFSRZKfBR8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=a/gNf5e4efAcf6FEOi9zLgw/dgxPIO9ntvJSJOyxeTg51L+KJJOhfWTXox80x0izSb8IF2D8wO/n9qn2law+FYxokmt3n7wzfXueBHuH9KyGsH4C37kwZLbxFSfS/hQzgOW8vPjN4I6o9oXokZ2QF0Px4wNNd33wcs4cds6aOXA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=SlRWJFm1; arc=none smtp.client-ip=198.137.202.136
+	 In-Reply-To:Content-Type; b=Qte5CqeuEXYadJIv18tm0vryO6CYprhSM7RpCMMO5mACaUJCqfHjRRxR2eEaO/unF+yh140JrFflJ8rF5FlXnAu0KICTIEupJ9ToXDAiajA/OQldEA5bmTxqnc1zzY5n4WFSGQjtFP402dPhWIK726/QeU7Q0xpCortnZY6hzGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=nTEEJREF; arc=none smtp.client-ip=198.137.202.136
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
 Received: from [192.168.7.202] ([71.202.166.45])
 	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 56VGefKE2183353
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 56VGrvlx2190036
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Thu, 31 Jul 2025 09:40:42 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 56VGefKE2183353
+	Thu, 31 Jul 2025 09:53:58 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 56VGrvlx2190036
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025072201; t=1753980043;
-	bh=llH8Ua0inzYLAWwMznknRFJtwCSgP28lmR1HuFj4h1E=;
+	s=2025072201; t=1753980839;
+	bh=NHqv9gvDFInVKj8zR5ZINGbGJDd8Q9i7tTunKoh0LqQ=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=SlRWJFm18Oh7B4IeeJWqEixiSNCQ8m0ItL44B/KO9AKWD3rDM1zsB/uDBf0/e8cyq
-	 AHaV+rhYSWMxFmPoaj628fAC8ZWrR9Qd8b/73K8ZO4S4M5vFEGAcldxKraTwH6ex3f
-	 RFbJMBmRzkfzBfbalmtGf+qxW1MIud0nrcI2MVA5AoKoBHhdWvD2z8BO2AD2AQM3xO
-	 wVJ02UImGXfLkAc4kJ1kR8QpmwDMJTTKFz0fNtG/Tuh4WHXMk7Y8rK79TJ3AwkFDI8
-	 hLlq8LUf0z/RuqRQ3MtTW2ABWYqFu2PahAi5HZdq4fpyUe763wpo8/z1gMFKq5x32h
-	 m8r3hnl4L/wdg==
-Message-ID: <7af6dcf5-fbcd-4173-a588-38cf6c536282@zytor.com>
-Date: Thu, 31 Jul 2025 09:40:41 -0700
+	b=nTEEJREFOYlhBUz4+HJVKwqjdGT1Rbvbv3lVnp6qg8HLbjNdaU/Qf16FXmD8KqPq4
+	 va4VqywHykDr/Ujx401IzjGVOZeB53blQOX4Sc61ZRp+upWUxUdZjiskeKHK5t1jzz
+	 QIETXcc6xipae6k4FW3sx+TiS9JxfuSgVILd9y/apcEK/+N6nTtUDh3hoZovnguId1
+	 TFqJuAsfCEnbczV7YECkD3VKOv0tfSaB5srDmn1tbViWz2NOsh6Tz+jtKGV+ETYoZl
+	 aW6w4rv2IWvytM8VhLvRsnLsvfH5rZzyTjt4nzyvuRQSUcuqdhU86wsXtGIYc8kMfr
+	 qNFLrZHIZsKng==
+Message-ID: <f20842af-2bc1-4002-a6eb-84c33408d0ea@zytor.com>
+Date: Thu, 31 Jul 2025 09:53:57 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -56,14 +56,14 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 2/4] KVM: x86: Introduce MSR read/write emulation
- helpers
+Subject: Re: [PATCH v1 3/4] KVM: VMX: Handle the immediate form of MSR
+ instructions
 To: Chao Gao <chao.gao@intel.com>
 Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, pbonzini@redhat.com,
         seanjc@google.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
         dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com
 References: <20250730174605.1614792-1-xin@zytor.com>
- <20250730174605.1614792-3-xin@zytor.com> <aItGzjhpfzIbG+Op@intel.com>
+ <20250730174605.1614792-4-xin@zytor.com> <aItNtifaItfXhXnu@intel.com>
 Content-Language: en-US
 From: Xin Li <xin@zytor.com>
 Autocrypt: addr=xin@zytor.com; keydata=
@@ -100,58 +100,30 @@ Autocrypt: addr=xin@zytor.com; keydata=
  PYbAkjBbm+tuJ/Sm+5Yp5T/BnKz21FoCS8uvTiziHj2H7Cuekn6F8EYhegONm+RVg3vikOpn
  gao85i4HwQTK9/D1wgJIQkdwWXVMZ6q/OALaBp82vQ2U9sjTyFXgDjglgh00VRAHP7u1Rcu4
  l75w1xInsg==
-In-Reply-To: <aItGzjhpfzIbG+Op@intel.com>
+In-Reply-To: <aItNtifaItfXhXnu@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 7/31/2025 3:34 AM, Chao Gao wrote:
->> -fastpath_t handle_fastpath_set_msr_irqoff(struct kvm_vcpu *vcpu)
->> +static fastpath_t handle_set_msr_irqoff(struct kvm_vcpu *vcpu, u32 msr, int reg)
-> 
-> How about __handle_fastpath_set_msr_irqoff()? It's better to keep
-> "fastpath" in the function name to convey that this function is for
-> fastpath only.
-
-This is now a static function with return type fastpath_t, so I guess
-it's okay to remove fastpath from its name (It looks that Sean prefers
-shorter function names if they contains enough information).
-
-But if the protocol is to have "fastpath" in all fast path function
-names, I can change it.
-
-> 
->> {
->> -	u32 msr = kvm_rcx_read(vcpu);
->> 	u64 data;
->> 	fastpath_t ret;
->> 	bool handled;
->> @@ -2174,11 +2190,19 @@ fastpath_t handle_fastpath_set_msr_irqoff(struct kvm_vcpu *vcpu)
+On 7/31/2025 4:04 AM, Chao Gao wrote:
+> On Wed, Jul 30, 2025 at 10:46:04AM -0700, Xin Li (Intel) wrote:
+>> Handle two newly introduced VM exit reasons associated with the
+>> immediate form of MSR instructions.
 >>
->> 	switch (msr) {
->> 	case APIC_BASE_MSR + (APIC_ICR >> 4):
->> -		data = kvm_read_edx_eax(vcpu);
->> +		if (reg == VCPU_EXREG_EDX_EAX)
->> +			data = kvm_read_edx_eax(vcpu);
->> +		else
->> +			data = kvm_register_read(vcpu, reg);
+>> For proper virtualization of the immediate form of MSR instructions,
+>> Intel VMX architecture adds the following changes:
 > 
-> ...
-> 
->> +
->> 		handled = !handle_fastpath_set_x2apic_icr_irqoff(vcpu, data);
->> 		break;
->> 	case MSR_IA32_TSC_DEADLINE:
->> -		data = kvm_read_edx_eax(vcpu);
->> +		if (reg == VCPU_EXREG_EDX_EAX)
->> +			data = kvm_read_edx_eax(vcpu);
->> +		else
->> +			data = kvm_register_read(vcpu, reg);
->> +
-> 
-> Hoist this chunk out of the switch clause to avoid duplication.
+> The CPUID feature bit also indicates support for the two new VM-exit reasons.
+> Therefore, KVM needs to reflect EXIT_REASON_MSR_READ/WRITE_IMM VM-exits to
+> L1 guests in nested cases if KVM claims it supports the new form of MSR
+> instructions.
 
-I thought about it, but didn't do so because the original code doesn't 
-read the MSR data from registers when a MSR is not being handled in the
-fast path, which saves some cycles in most cases.
+Damn, forgot about nested...
+
+> 
+> I'm also wondering if the emulator needs to support this new instruction. I
+> suppose it does.
+
+Yes, I thought about it.  However the new instructions use the VEX
+prefix, which KVM doesn't support today.
 
 
