@@ -1,271 +1,294 @@
-Return-Path: <kvm+bounces-53837-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53838-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E5D3B1825E
-	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 15:19:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF43FB18300
+	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 15:57:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 086A83A7532
-	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 13:19:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8ADB35A0348
+	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 13:57:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37FA9255F2B;
-	Fri,  1 Aug 2025 13:19:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11B04261388;
+	Fri,  1 Aug 2025 13:56:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U4i2HfIo"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VluKO3C9"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAA6241C72
-	for <kvm@vger.kernel.org>; Fri,  1 Aug 2025 13:19:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754054369; cv=none; b=hjGyRqzy6W0QIEYrsYEDACmsUq1vGaURRwt5CWc7doxnyPWj4A6jce6h5txB+b/6t2rFt01p4Krgk4NlNHvri240007aMNNtm/AmW8HWo+APVKVYkLj1WErfo5W4augM6PeHFbTbabisda+aT1fSBIdtUipsQgIOSjGUHUwSKco=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754054369; c=relaxed/simple;
-	bh=9NerjbYLuoyk/RKlTefAdXQzfB6NwPQkXItsvzNMysk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Rih3ky3DdvuEPVpw2d07QpPDg/r9cObf1ffjcwq913sDS+x/57bwDuqUOWi/B7jKqnBySZfWKW3qdc0f8v4TpyAz+CUdOAdqE21rnngR6mvefsiytw440d1OUCqN/KLrgWNlSw/Zq/R3SmnMjOqFMXhHoL0QUVAahk28Rc9Wgzw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=U4i2HfIo; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1754054366;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YbLdGk22JzqbKEhu/iJYhhYYSjQLfdAdGKKqzGB0K4Q=;
-	b=U4i2HfIoGVR0/5HlTaQYzCZ7oopzDvjfVRxrbMO8qMmkMI6KDYfrbpebum4lqE/+y7Zfil
-	4vKK653OgWt9A33iLoaYZHAs8x0LaF7A5ttClnFqE5iHxJ3qfRsYRuHIvXAZnbvOAxnyLa
-	0gzK0DnqSfiEx3IYbamU01McHB/I7AU=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-132-stC39Q_IMnuehGNxcuOZxw-1; Fri, 01 Aug 2025 09:19:25 -0400
-X-MC-Unique: stC39Q_IMnuehGNxcuOZxw-1
-X-Mimecast-MFC-AGG-ID: stC39Q_IMnuehGNxcuOZxw_1754054364
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-45359bfe631so9548355e9.0
-        for <kvm@vger.kernel.org>; Fri, 01 Aug 2025 06:19:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754054364; x=1754659164;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YbLdGk22JzqbKEhu/iJYhhYYSjQLfdAdGKKqzGB0K4Q=;
-        b=YHeWQQyihOOy/k3VXmmRkFAbVUocQ5VJ4jDI50TpHJ75qYiFlhDvQHgUUShsV5oUE5
-         oQFd9v++wow7csuf/pvIWdfjbhRUucjr3Q3HPkpHZ/VmciOXG4PqIBHTQ5u5RwaQ+wQ3
-         m3LjHzJEmnhE9NX3PHWQSt+jzY+c3Y9dWR1RCXWvbQlNpuKoyWj7af89q8Ey5LtuuIM3
-         nb+XEJsW6e76V2Lcj2LchrkgixEVEzhM/MjwvPnYq8b7xw19yiyONyxqH3cuOzg36ScC
-         nF6ZaroUk5n22RiLvllTdLGb66ZwNpN5Hv8ziWn0DVJK3bYHoKU/AU/+7Wk5VwWuZGcA
-         JDow==
-X-Gm-Message-State: AOJu0YyaaUaqftYSeABtXHKaEGBsSatrwTx4SlOPrz712bFfhWYtSWdj
-	8U4T/+E7lN4PE7vlSgqvahVhCHWxwQutRUHVDRJMZaOMhJfbdsF5UBuBz30Q2AX7xbC0JCz1pbG
-	/hwZ/cFKePI5hEOabEJVFJcyUcxXgKKeathCQjSiG1eTfWmqY0k9CKQ==
-X-Gm-Gg: ASbGncvLRSm5wdKWq6ElBNxNv+vdEQbfcN6/sy1rtLOK6cK5c2PxJk59KZlfeokDg/Z
-	IDJainCk/VvlFCNVEzW65YTslFUbWIDfbLtfYj2AifCiOqT1U0xp/YAnjKyLnb+JNQeZhmDEzny
-	wZWeX57cIzK9if7/An3RLlf8iH5cB/wTk6PXQIeczKdqnk10EuhELurBUw8+EBGeY5H1wAhMvmi
-	M/fymJADSFLhXNQc8WNiaIpFWshrs8Q7OJONN0Eg1g/W4mJCNoZnsiHPpDS3cZnLieO/8SFXBpB
-	lQx7kFYp6Jny200m1fsuR/OdSP9gft4o
-X-Received: by 2002:a05:600c:3143:b0:458:b2c4:b3df with SMTP id 5b1f17b1804b1-458b2c4b55cmr7065055e9.33.1754054364129;
-        Fri, 01 Aug 2025 06:19:24 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHmZq6SGlI97jjT0xUjwHMnLWo6+mq6NBKRj1ThNjjX/DhoWqBXT6UeApleX2c0S5DJT9fufQ==
-X-Received: by 2002:a05:600c:3143:b0:458:b2c4:b3df with SMTP id 5b1f17b1804b1-458b2c4b55cmr7064765e9.33.1754054363595;
-        Fri, 01 Aug 2025 06:19:23 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc0:1515:7300:62e6:253a:2a96:5e3])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-458af917d20sm11817765e9.2.2025.08.01.06.19.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Aug 2025 06:19:23 -0700 (PDT)
-Date: Fri, 1 Aug 2025 09:19:19 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	acourbot@google.com, alok.a.tiwari@oracle.com,
-	anders.roxell@linaro.org, dtatulea@nvidia.com, eperezma@redhat.com,
-	eric.auger@redhat.com, gnurou@gmail.com, jasowang@redhat.com,
-	jonah.palmer@oracle.com, kraxel@redhat.com, leiyang@redhat.com,
-	linux@treblig.org, lulu@redhat.com, michael.christie@oracle.com,
-	parav@nvidia.com, si-wei.liu@oracle.com, stable@vger.kernel.org,
-	viresh.kumar@linaro.org, wangyuli@uniontech.com, will@kernel.org,
-	wquan@redhat.com, xiaopei01@kylinos.cn
-Subject: Re: [GIT PULL] virtio, vhost: features, fixes
-Message-ID: <20250801091454-mutt-send-email-mst@kernel.org>
-References: <20250801070032-mutt-send-email-mst@kernel.org>
- <20250801090250-mutt-send-email-mst@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88BEC246BB4;
+	Fri,  1 Aug 2025 13:56:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.19
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1754056614; cv=fail; b=ZYoKlnjTA5d9usk2rKrMBfkI28K3IG+33aEMymLyZP9ErUoMRo70hIxeapoQ79olxvAFel8Zbjck6QhX98WlsNeO4V7gqVuNf0wwK3eGB51zL5BfYWgo4pnUPEQp1apJpTIUwlGslTuGXfLfl9Pej617lJBslMPU2Ujq4kYaIkE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1754056614; c=relaxed/simple;
+	bh=XQFhPmTkv9NFaczvFPVXHtFpmFuWAVAt7Hxr3h9DoJY=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=QjXag1+N4adFScy3UpptZ5wJz9nBpQKcZc5mrdf6eaD5o3VVpv35FGcg8BK25hQnreCfhYlUKqKlsos3WP3MdJouNU777ddsIjeTH5KQRnIrJj4V7WtvdgFcTFoZZwBOY5nSj/pob+51G8XI3cBkBsrA3hEbmYyVh0T2xSCIeJk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VluKO3C9; arc=fail smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1754056612; x=1785592612;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=XQFhPmTkv9NFaczvFPVXHtFpmFuWAVAt7Hxr3h9DoJY=;
+  b=VluKO3C9LWgn4DV6hhTn9g/9ZBv5McbYLeN3dp70U6sxVu0QEYnq2cF1
+   nB83a+L1gOU+tditvPZhePioaGBAR31nRCx7PeiEb2648Cxagu5cbNXSm
+   yu0wtxcvYJTdOLMOZDIma+LZXs/FV2HAewxQRuPHQV5xw2iNUbgM3uoQW
+   kAdUousDFEsQD+2vuCfoG+gLp6k9yDxf6fA03p7ZzagQ21BjRK637bwnT
+   72hLDTKtOvoGR6XgUS05iaS06nag3W5oE9xyWOyJCYjKNkeWDEZiHH99s
+   1cSnYOV17fItlpUBmZU3kRS7s9RXcIi01ZMttsNuMUfTK43baOt3Pe8aK
+   w==;
+X-CSE-ConnectionGUID: vINlodq/TFujIB6Iq7pn/g==
+X-CSE-MsgGUID: vUfu2oZ6QdyQ1NyjdiVa5Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11508"; a="56270046"
+X-IronPort-AV: E=Sophos;i="6.17,255,1747724400"; 
+   d="scan'208";a="56270046"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2025 06:56:52 -0700
+X-CSE-ConnectionGUID: mbWEqMjdQNKyuB/9J/LgjA==
+X-CSE-MsgGUID: HpthI29WS9yTOdiA3c7E4g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,255,1747724400"; 
+   d="scan'208";a="200728245"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by orviesa001.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2025 06:56:52 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26; Fri, 1 Aug 2025 06:56:51 -0700
+Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26 via Frontend Transport; Fri, 1 Aug 2025 06:56:51 -0700
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (40.107.94.53) by
+ edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Fri, 1 Aug 2025 06:56:51 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=TN7F3TUXz+8vZVjK1OGBf3g5K744NUxYtlmvUo9/s4x1BSu0T4HSpQP3ZiXLxogEg33CosHmaEwjn1gQfuzfQApB1YdqyH9j3vZddoaSzZMl12TgIAaZIBUvGfVs+UWkP9WgStkv2HxvMSOCNcRAqYZUzCwj9bWtJVAmRlVJEa1jRCwf8LQyGwOg3kfvn+6hjulpEbmI+a5ytxxwP8kvTvZ7RE/UlqmoYxgiesg1dm4jALbv8+CnzdBiIVpHQG1PW4Vrg2O0O64qNv9iT7JbGze0UQBAV64EelsZteBe9hfR75ZyDMRQBS1wHwDIQlXRnVAiP3hkr/Xyxklr2Z10Xw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=gr3ca7+ceYJe3s7/J77zpG69lWP7ynnK0TNyl6hSMWk=;
+ b=onlN0YooRLii9+0emr055ahQY6U9VYPNqlqXTXcy9XskElEI0TIR9FvHfKrVGnz++ZkvxL4I1razu8iwXqKJaE5/7f+DaBy3aT/xWSM/FtpQozyKSZx9jFDDo+iuDzNNRfnlMriPHccduLP5PVhEOQhikFDvXWrDiQlronKdyI+TOzeXEviAMwpTJA+FkZXd49hUvhRx5EQ+MxtKpvmE7UDNdwQCCNapU14Gpeo66l9m8IoIxXnTw0GhdnOQ20baHYN0isuoM2TBmkPFhw5HQ2DflZlA7871fdJawS6qckuq+5jpu9VquKvxiHP/qsXeQe5EP9al6hYDmJ97OcY0rg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from IA1PR11MB7198.namprd11.prod.outlook.com (2603:10b6:208:419::15)
+ by MN0PR11MB6035.namprd11.prod.outlook.com (2603:10b6:208:376::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8989.11; Fri, 1 Aug
+ 2025 13:56:42 +0000
+Received: from IA1PR11MB7198.namprd11.prod.outlook.com
+ ([fe80::eeac:69b0:1990:4905]) by IA1PR11MB7198.namprd11.prod.outlook.com
+ ([fe80::eeac:69b0:1990:4905%5]) with mapi id 15.20.8989.011; Fri, 1 Aug 2025
+ 13:56:41 +0000
+Message-ID: <b27f807e-b04f-487d-be13-74a8b0a61b42@intel.com>
+Date: Fri, 1 Aug 2025 16:56:36 +0300
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 5/5] KVM: TDX: Add sub-ioctl KVM_TDX_TERMINATE_VM
+To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>
+CC: <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+	<kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Vishal Annapurve
+	<vannapurve@google.com>, Xiaoyao Li <xiaoyao.li@intel.com>, Rick Edgecombe
+	<rick.p.edgecombe@intel.com>, Nikolay Borisov <nik.borisov@suse.com>, "Zhao,
+ Yan Y" <yan.y.zhao@intel.com>, "Huang, Kai" <kai.huang@intel.com>,
+	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>
+References: <20250729193341.621487-1-seanjc@google.com>
+ <20250729193341.621487-6-seanjc@google.com>
+Content-Language: en-US
+From: Adrian Hunter <adrian.hunter@intel.com>
+Organization: Intel Finland Oy, Registered Address: c/o Alberga Business Park,
+ 6 krs, Bertel Jungin Aukio 5, 02600 Espoo, Business Identity Code: 0357606 -
+ 4, Domiciled in Helsinki
+In-Reply-To: <20250729193341.621487-6-seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DUZPR01CA0246.eurprd01.prod.exchangelabs.com
+ (2603:10a6:10:4b5::12) To IA1PR11MB7198.namprd11.prod.outlook.com
+ (2603:10b6:208:419::15)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250801090250-mutt-send-email-mst@kernel.org>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: IA1PR11MB7198:EE_|MN0PR11MB6035:EE_
+X-MS-Office365-Filtering-Correlation-Id: 52a24159-c648-4605-1f5f-08ddd1033e1f
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?R3kwUUE5RmwzN0QrazVxa241SEc2SlRJbGllcGRCNzk5d3BXa1ZHaUszK0x1?=
+ =?utf-8?B?TEY5cld0bEFaMEtjQlpsZXhmNUgya3pZMGxGcXl4NjNxMlVPeHNrYURwbkV4?=
+ =?utf-8?B?UkVMNHdqWFNiNDhPSzhjT3hFNEhWaEpNSW9EK3huMFcyNjVLTGdjK0crSVpC?=
+ =?utf-8?B?Y0lqYTVjQ01wdjIxYVFIa1dDRG9OYUJQYVYvWmJyWGE0akphR0FtczVlWUhH?=
+ =?utf-8?B?d3RqVzh2U1oyNEFPeDNPaWRuaTZERnZ2eG9CZ3R1STBudTc3cU9iOURqUHF0?=
+ =?utf-8?B?dldxYU82N2RzcUlpVVUzMEkyUjdvTjllU3dGNmlWTmd6YVI5YzBubURTaGJ0?=
+ =?utf-8?B?aFdLa3c2aDV2RldhTzA4c1VXSUROa25IUW51RmVMUGVsbzIxYlJsS08vcGM2?=
+ =?utf-8?B?WHBueEZaQlZXQlkrbjdXcHRSYSszL0FZbjlYcUEvVEZpUTJtN0tKemtkVUM2?=
+ =?utf-8?B?VHZ3YjFuMTlLNlljb0Q1YXBROUlTUDBMOFhGMFZBS3J1b1lxREdnN01WUnRy?=
+ =?utf-8?B?cGxtYi9LN3FxY3U0K1dSSFpjKzY1NHUxZTZDMGg4eDF3N1h1VVJveWlUVDBC?=
+ =?utf-8?B?MVBMeGJONVZLWmJTTmdWU2t4eTR5VWQ5dUhnZzZHT3oyTzRWQllKM3p2K2dN?=
+ =?utf-8?B?Vm40Rnd1QjU3UWVnYjRrRmpXTnVWejNoLzNIRi9XTWFlV1pHZ1pwRzQwWTFs?=
+ =?utf-8?B?UHh3M0dhVWhFa3Fua1dIVldBSXdSRDV3S2JnWW1zVGEyY3Jsd2NIamVncFdn?=
+ =?utf-8?B?ZmlzbFNhWWVlRXlxM05kQ3NyM1VmMzYrT2pzL0R4UnRsckJtZkZ1VjdFbUpj?=
+ =?utf-8?B?YzdxREtKN3lwYXVEOHhneW1YQ3l6MHkzdVdCd2dtTE92enJzcEt5Yi9Jb2Fz?=
+ =?utf-8?B?amI0L3V2Y0dqRlNnbmwyalBqRzBSQURTSUNpUXlOdklKeTB4V2UzUHg0dHd4?=
+ =?utf-8?B?Ykd6ZXdUSUJrd1phNHJJVmpONXY0ZG1uMEtLT3piUjNZSUlFMFR0VWJHaUJN?=
+ =?utf-8?B?V0trcDNHcjZDb0tmTnR3RmZTbnhoMEROa2JmcUpjS3JpNmxjdFUvRzVDNC9T?=
+ =?utf-8?B?TTB4RU4vS3ljaG1TOEw3TDIxYkNXays3YnAyRXFiRSs2b0o3WFpjRWJNYUpQ?=
+ =?utf-8?B?SGxIckdjaktJUS9TQUtQY0NKemZsd2N5ZTE5cHo2VnZpZjQvRFdkTzRpMFNr?=
+ =?utf-8?B?YU91NUtJeGdmMndSbTdXQ2tkMmV0S0FBaERZckl5dWkwMk9RTHAyRXRDeEVK?=
+ =?utf-8?B?TzQ4RG51bUl5cndpdFpYMjJUOCtpQktMbzBDeC9pdnYrV3VJTVd5WnpleGx2?=
+ =?utf-8?B?ZFZLZDR5NHVaUW9KMVltR0JUbWhMS0VYdC9BcmZLcHVvY1hUdDMvT3k0RGRq?=
+ =?utf-8?B?cUFyR2NoN2tZNG1zdGUwNkNnRk9yMW82SmNOWXdFMnl3Q0x0bFNwVGxCbmp2?=
+ =?utf-8?B?V0lDSWdMRDVaTnMvVW8rR3BsTzRLMUtPWTNKT0JLSU82UE1oTXc5enJuMm1C?=
+ =?utf-8?B?emJla1hPYjRoRUtHckhOdHZzeEppZGxmczMxYU8yMHl2YWJjaWpsQytPc2ZL?=
+ =?utf-8?B?WnZiSFdOT0JwNytLcGxuTFRRUkk4Z1M0ZmkrakRrK3Y4aGhjNEZ0aXFXZTJE?=
+ =?utf-8?B?MWl0Mk9tRjZtaWFZVVhtVFljWnUwbWpMY29iQ2dodmhLSVE4VkZBeWhjdkZm?=
+ =?utf-8?B?cUxRSWxIa0ZYY1pYb09MZkFLaEtOM2ppRGYvN2hjTHRZNktDT0I1eHFmb1dT?=
+ =?utf-8?B?ZWU1OVM1bXRoVzY2ZGtuS0FmMy90TXlyYVhkSVhYeXJKczJzWHdXL0o1MThL?=
+ =?utf-8?B?TlVzdEx5dFIzWlBDd1dIRW5LeGw0cG9qb081Mll6cHpHT01rTHNYaWEwaklB?=
+ =?utf-8?B?ak56OFZoa2luWUxIY2NNSCtIc0RaNTBwb1B1MlhUT2E0TUE9PQ==?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB7198.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?YnE4eVpXYWRzeUhlZFJiK3h1a3JuSkMyMHgyL0VCYnVGRzBGWGpIQnJnWTVS?=
+ =?utf-8?B?a04ydHJoeERNSjVrbWJNVllrSTBLMCt3Z1BlM1hDZ1dyejRGOUw2QmI5R2o4?=
+ =?utf-8?B?WTIzODBiU1c2QjM4c3Yyd2I5OVZsRDFKVGpjcTQ2d0ZXSmhuTTl0UlVsVGlp?=
+ =?utf-8?B?VG1BbzZtb09nYUVEOGxkMXJ1dXVTMURrcVd0RGJDVzlqck16TTJ5ZytscnFL?=
+ =?utf-8?B?MlFWMXhWNXVPdVUwOFhYaXVxbStEcXdkL012ZFUrVU9Gc1FqanpsNDl3dERK?=
+ =?utf-8?B?NGVtTi9kWGNOTUVxT1VWNTN3K0s0YUxTenFlS0tmQklIMGRMTVZSVCtZR0lF?=
+ =?utf-8?B?RDRwdXY2OEFCNXN6VzBVV0hadlRyazBxdERBNXRmT1g0aE92blczdk0rSVdO?=
+ =?utf-8?B?ZmRNZU5Rd1Z0SzNaUnc0L0QyclJSVjFlc3dNU2UzWW5oRFJSdFVXbmNKMDdO?=
+ =?utf-8?B?NEpsU1liMFQ1bWQ4VkFzYWtFK0pLazVlTWR5UXhtV1pMeHdQUTBLUStwZ3o4?=
+ =?utf-8?B?Wlg2ZDFacnB0WWk2MXdyeklaRzJRSVRYeGdFY2xMaHBMak9DK1JGTDVzR0dN?=
+ =?utf-8?B?SURRcXlpWVRENDJqZTNoM0tJYncrNDBQejhVbUtsdGlzVmwvbzAwYVlqR0Nm?=
+ =?utf-8?B?bjIxbnJSNkFkcEV2Wm0wYTR6YnpuYzdBTDl6dGVJd202dU5EYm8yVEsyMVc0?=
+ =?utf-8?B?QlBuL2gxalpTWFBJUFJDZjNzR0JxWlN5cHQ2NkhDamkyd0JITk5xQkRnZXJq?=
+ =?utf-8?B?RG54YkdqTVd2Z0ZFRU9veHlCRkxXajNGSTB0eW02Q0E0aXFRUHFSd2hrUHVp?=
+ =?utf-8?B?ZHFBQWlIdnI4ZzNsQzE2WDdWMlYrMEhSSkpyVFlxT0hiMkJ6Zjc5VVAzbExZ?=
+ =?utf-8?B?TldCWE9WdUFDZFZ1bUVsZEVDbVJCcEFBZUhoNjZRV1RUSWI2a2x5RmNjZDhW?=
+ =?utf-8?B?dERUWnRlRmFCenFOSnI3NG9sMGpKbWhTWlRqeEdzaGo0bEUyUE5QWHBTVzUr?=
+ =?utf-8?B?YWdFU0phWllPalNkU1BodEM1ZUxnc29GL0lIRlh3aGZ1TzdZZjdEc2krSGVX?=
+ =?utf-8?B?WXZ3SUJpSGFORWN2U3h1YlkxbVlLVjJyR3JKWXdhRkQxZ0M5emljcTBEQncy?=
+ =?utf-8?B?UHh1Yit1T2dmY0RZRFVOem1hOEd0bFNmTXl3TXU0Mk5wWkxGYndZZHAzYnJl?=
+ =?utf-8?B?dTlWY1pTdUd6YVlQbHMweWpLcXd1UTJvVDVSQXdaWk1scVgyR3QyTzV4N05i?=
+ =?utf-8?B?S2dMWnRMb29WbWF4Sm9HVUcvOHNLOVJ0YXA4ODFEbVZWSk5GQzA1WEtNMmlw?=
+ =?utf-8?B?U0pWNE1uVzMrVnR3TnB0MlB1UkFvbkw0L21kaytnTFZYekxSUU1jRHovVmRr?=
+ =?utf-8?B?SnVqbXorOWo4MmM4M2xlcjVYYXdMMDEzclQxSkw2UUluVUF4WTc4SHErdjZq?=
+ =?utf-8?B?cE04ZzBwb0twaEJYbzcxY1hiTzZLdGdoOW5OM21vQ3lqcnpiVGNubzRFaVp1?=
+ =?utf-8?B?Mzd3N0JOQTEzaXIyYmRiNUVLYlBVaWJSUnpSa29NVlZvQUgycU56MUs4NEJm?=
+ =?utf-8?B?VHBoS1FDQ29BdXhkbnd0dExPYkd0cnJrVkVpVWk0QTQ2bUpOYUJGNFFxczBE?=
+ =?utf-8?B?cE1kKzhjTVFBSHNmaWpBMmRmZ2pkQkRXR0FtVU5WaWIydzFmamlaUExEVXlx?=
+ =?utf-8?B?bFhVSEFycklIVHQ1NzBwZXhrSlBtRFNIZEJHcVdTbytreFNsblpMQzhVdkE0?=
+ =?utf-8?B?eng1VlRQa3ZvaU0wM3I3cVVGUXVQYkhNUjU5RVZtUktHbS9oNXdUM3NkQnBr?=
+ =?utf-8?B?S3R4M1hSUHZqcEp6eXVmbDV5R1poTVpEQ09oTXlMSDhmSFNUbllwOGVTUVlq?=
+ =?utf-8?B?UlkrVEJKcEVwYldDWE04ejZtbVgvbWxpVmVFRHBiUXdSODJha2VVTHBhbUhS?=
+ =?utf-8?B?ZmxxTTR2QURLbTV0V1kveVdZSzVnaGNMQzV3MHhWc1pqTENMSkhKdGtoNENa?=
+ =?utf-8?B?K295amdGMDlBVXdPWkJ5OXdCb05iaFNjOWVGdjlHZHp0UGl1dkE3MTBIai8v?=
+ =?utf-8?B?U0duN1pzYURHdVpxbXJrNUtLdzdhTW4ySmNmQ1laN2tjQzkzR3pFazA5aHp4?=
+ =?utf-8?B?Yi9vam9WbWpjbDFGK1ZQdm9jUGpreEIwQjM4T2RXWnhXL1UrcVJSNy9BZG0v?=
+ =?utf-8?B?RUE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 52a24159-c648-4605-1f5f-08ddd1033e1f
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB7198.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Aug 2025 13:56:41.8024
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 3v4iH0f3X5+tIRMTRO4BSP2PbistgZykIBghxC1huWvVHIBAI5jbFZ37B9rMI7Njwh13KNxSxXRVtSa8os4UJg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR11MB6035
+X-OriginatorOrg: intel.com
 
-On Fri, Aug 01, 2025 at 09:03:35AM -0400, Michael S. Tsirkin wrote:
-> On Fri, Aug 01, 2025 at 07:00:32AM -0400, Michael S. Tsirkin wrote:
-> > The following changes since commit 347e9f5043c89695b01e66b3ed111755afcf1911:
-> > 
-> >   Linux 6.16-rc6 (2025-07-13 14:25:58 -0700)
-> > 
-> > are available in the Git repository at:
-> > 
-> >   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
-> > 
-> > for you to fetch changes up to c7991b44d7b44f9270dec63acd0b2965d29aab43:
-> > 
-> >   vsock/virtio: Allocate nonlinear SKBs for handling large transmit buffers (2025-07-17 08:33:09 -0400)
-> 
-> Oh no I am sorry! Please ignore, a bad commit snuck in there - it still
-> needs maintainer approval, and I forgot.
-> Will resend.
-> 
+On 29/07/2025 22:33, Sean Christopherson wrote:
+> +static int tdx_terminate_vm(struct kvm *kvm)
+> +{
+> +	if (kvm_trylock_all_vcpus(kvm))
+> +		return -EBUSY;
+> +
+> +	kvm_vm_dead(kvm);
+> +	to_kvm_tdx(kvm)->vm_terminated = true;
+> +
+> +	kvm_unlock_all_vcpus(kvm);
+> +
+> +	tdx_mmu_release_hkid(kvm);
+> +
+> +	return 0;
+> +}
 
-Sent v2 now.
-I wanted to apologize for this. I mistakenly put bad commits on the
-branch called "master" and when looking at "git log" I did not notice
-I was only looking at commits since "master" and not
-"origin/master".
+As I think I mentioned when removing vm_dead first came up,
+I think we need more checks.  I spent some time going through
+the code and came up with what is below:
 
-I should have reviewed the list of changes in the email before
-sending, but as it's autogenerated as opposed the cover letter part
-that I write myself, I was focusing on the latter and missed the
-bad commits in the former. A less for me to remember to pay attention to that
-part, as well.
+First, we need to avoid TDX VCPU sub-IOCTLs from racing with
+tdx_mmu_release_hkid().  But having any TDX sub-IOCTL run after
+KVM_TDX_TERMINATE_VM raises questions of what might happen, so
+it is much simpler to understand, if that is not possible.
+There are 3 options:
 
-Thanks!
+1. Require that KVM_TDX_TERMINATE_VM is valid only if
+kvm_tdx->state == TD_STATE_RUNNABLE.  Since currently all
+the TDX sub-IOCTLs are for initialization, that would block
+the opportunity for any to run after KVM_TDX_TERMINATE_VM.
 
-> > ----------------------------------------------------------------
-> > virtio, vhost: features, fixes
-> > 
-> > vhost can now support legacy threading
-> > 	if enabled in Kconfig
-> > vsock memory allocation strategies for
-> > 	large buffers have been improved,
-> > 	reducing pressure on kmalloc
-> > vhost now supports the in-order feature
-> > 	guest bits missed the merge window
-> > 
-> > fixes, cleanups all over the place
-> > 
-> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > 
-> > ----------------------------------------------------------------
-> > Alexandre Courbot (1):
-> >       media: add virtio-media driver
-> > 
-> > Alok Tiwari (4):
-> >       virtio: Fix typo in register_virtio_device() doc comment
-> >       vhost-scsi: Fix typos and formatting in comments and logs
-> >       vhost: Fix typos
-> >       vhost-scsi: Fix check for inline_sg_cnt exceeding preallocated limit
-> > 
-> > Anders Roxell (1):
-> >       vdpa: Fix IDR memory leak in VDUSE module exit
-> > 
-> > Cindy Lu (1):
-> >       vhost: Reintroduce kthread API and add mode selection
-> > 
-> > Dr. David Alan Gilbert (2):
-> >       vhost: vringh: Remove unused iotlb functions
-> >       vhost: vringh: Remove unused functions
-> > 
-> > Dragos Tatulea (2):
-> >       vdpa/mlx5: Fix needs_teardown flag calculation
-> >       vdpa/mlx5: Fix release of uninitialized resources on error path
-> > 
-> > Gerd Hoffmann (1):
-> >       drm/virtio: implement virtio_gpu_shutdown
-> > 
-> > Jason Wang (3):
-> >       vhost: fail early when __vhost_add_used() fails
-> >       vhost: basic in order support
-> >       vhost_net: basic in_order support
-> > 
-> > Michael S. Tsirkin (6):
-> >       virtio: document ENOSPC
-> >       pci: report surprise removal event
-> >       virtio: fix comments, readability
-> >       virtio: pack config changed flags
-> >       virtio: allow transports to suppress config change
-> >       virtio: support device disconnect
-> > 
-> > Mike Christie (1):
-> >       vhost-scsi: Fix log flooding with target does not exist errors
-> > 
-> > Pei Xiao (1):
-> >       vhost: Use ERR_CAST inlined function instead of ERR_PTR(PTR_ERR(...))
-> > 
-> > Viresh Kumar (2):
-> >       virtio-mmio: Remove virtqueue list from mmio device
-> >       virtio-vdpa: Remove virtqueue list
-> > 
-> > WangYuli (1):
-> >       virtio: virtio_dma_buf: fix missing parameter documentation
-> > 
-> > Will Deacon (9):
-> >       vhost/vsock: Avoid allocating arbitrarily-sized SKBs
-> >       vsock/virtio: Validate length in packet header before skb_put()
-> >       vsock/virtio: Move length check to callers of virtio_vsock_skb_rx_put()
-> >       vsock/virtio: Resize receive buffers so that each SKB fits in a 4K page
-> >       vsock/virtio: Rename virtio_vsock_alloc_skb()
-> >       vsock/virtio: Move SKB allocation lower-bound check to callers
-> >       vhost/vsock: Allocate nonlinear SKBs for handling large receive buffers
-> >       vsock/virtio: Rename virtio_vsock_skb_rx_put()
-> >       vsock/virtio: Allocate nonlinear SKBs for handling large transmit buffers
-> > 
-> >  MAINTAINERS                                |    6 +
-> >  drivers/gpu/drm/virtio/virtgpu_drv.c       |    8 +-
-> >  drivers/media/Kconfig                      |   13 +
-> >  drivers/media/Makefile                     |    2 +
-> >  drivers/media/virtio/Makefile              |    9 +
-> >  drivers/media/virtio/protocol.h            |  288 ++++++
-> >  drivers/media/virtio/scatterlist_builder.c |  563 ++++++++++++
-> >  drivers/media/virtio/scatterlist_builder.h |  111 +++
-> >  drivers/media/virtio/session.h             |  109 +++
-> >  drivers/media/virtio/virtio_media.h        |   93 ++
-> >  drivers/media/virtio/virtio_media_driver.c |  959 ++++++++++++++++++++
-> >  drivers/media/virtio/virtio_media_ioctls.c | 1297 ++++++++++++++++++++++++++++
-> >  drivers/pci/pci.h                          |    6 +
-> >  drivers/vdpa/mlx5/core/mr.c                |    3 +
-> >  drivers/vdpa/mlx5/net/mlx5_vnet.c          |   12 +-
-> >  drivers/vdpa/vdpa_user/vduse_dev.c         |    1 +
-> >  drivers/vhost/Kconfig                      |   18 +
-> >  drivers/vhost/net.c                        |   88 +-
-> >  drivers/vhost/scsi.c                       |   24 +-
-> >  drivers/vhost/vhost.c                      |  377 +++++++-
-> >  drivers/vhost/vhost.h                      |   30 +-
-> >  drivers/vhost/vringh.c                     |  118 ---
-> >  drivers/vhost/vsock.c                      |   15 +-
-> >  drivers/virtio/virtio.c                    |   25 +-
-> >  drivers/virtio/virtio_dma_buf.c            |    2 +
-> >  drivers/virtio/virtio_mmio.c               |   52 +-
-> >  drivers/virtio/virtio_pci_common.c         |   45 +
-> >  drivers/virtio/virtio_pci_common.h         |    3 +
-> >  drivers/virtio/virtio_pci_legacy.c         |    2 +
-> >  drivers/virtio/virtio_pci_modern.c         |    2 +
-> >  drivers/virtio/virtio_ring.c               |    4 +
-> >  drivers/virtio/virtio_vdpa.c               |   44 +-
-> >  include/linux/pci.h                        |   45 +
-> >  include/linux/virtio.h                     |   13 +-
-> >  include/linux/virtio_config.h              |   32 +
-> >  include/linux/virtio_vsock.h               |   46 +-
-> >  include/linux/vringh.h                     |   12 -
-> >  include/uapi/linux/vhost.h                 |   29 +
-> >  include/uapi/linux/virtio_ids.h            |    1 +
-> >  kernel/vhost_task.c                        |    2 +-
-> >  net/vmw_vsock/virtio_transport.c           |   20 +-
-> >  net/vmw_vsock/virtio_transport_common.c    |    3 +-
-> >  42 files changed, 4186 insertions(+), 346 deletions(-)
-> >  create mode 100644 drivers/media/virtio/Makefile
-> >  create mode 100644 drivers/media/virtio/protocol.h
-> >  create mode 100644 drivers/media/virtio/scatterlist_builder.c
-> >  create mode 100644 drivers/media/virtio/scatterlist_builder.h
-> >  create mode 100644 drivers/media/virtio/session.h
-> >  create mode 100644 drivers/media/virtio/virtio_media.h
-> >  create mode 100644 drivers/media/virtio/virtio_media_driver.c
-> >  create mode 100644 drivers/media/virtio/virtio_media_ioctls.c
+2. Check vm_terminated in tdx_vm_ioctl() and tdx_vcpu_ioctl()
+
+3. Test KVM_REQ_VM_DEAD in tdx_vm_ioctl() and tdx_vcpu_ioctl()
+
+[ Note cannot check is_hkid_assigned() because that is racy ]
+
+Secondly, I suggest we avoid SEAMCALLs that will fail and
+result in KVM_BUG_ON() if HKID has been released.
+
+There are 2 groups of those: MMU-related and TDVPS_ACCESSORS.
+
+For the MMU-related, the following 2 functions should return
+an error immediately if vm_terminated:
+
+	tdx_sept_link_private_spt()
+	tdx_sept_set_private_spte()
+
+For that not be racy, extra synchronization is needed so that
+vm_terminated can be reliably checked when holding mmu lock
+i.e.
+
+static int tdx_terminate_vm(struct kvm *kvm)
+{
+	if (kvm_trylock_all_vcpus(kvm))
+		return -EBUSY;
+
+	kvm_vm_dead(kvm);
++
++       write_lock(&kvm->mmu_lock);
+	to_kvm_tdx(kvm)->vm_terminated = true;
++       write_unlock(&kvm->mmu_lock);
+
+	kvm_unlock_all_vcpus(kvm);
+
+	tdx_mmu_release_hkid(kvm);
+
+	return 0;
+}
+
+Finally, there are 2 TDVPS_ACCESSORS that need avoiding:
+
+	tdx_load_mmu_pgd()
+		skip td_vmcs_write64() if vm_terminated
+
+	tdx_protected_apic_has_interrupt()
+		skip td_state_non_arch_read64() if vm_terminated
+
 
 
