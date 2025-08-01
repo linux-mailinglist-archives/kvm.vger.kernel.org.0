@@ -1,142 +1,153 @@
-Return-Path: <kvm+bounces-53842-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53843-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FEA4B18429
-	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 16:48:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D9AAB1844A
+	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 16:56:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39CF73B726E
-	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 14:48:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 179101C820E8
+	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 14:57:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 184912701C5;
-	Fri,  1 Aug 2025 14:48:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="eKuf4Yc4"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B482C26FA77;
+	Fri,  1 Aug 2025 14:56:45 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E1AC26FA7B
-	for <kvm@vger.kernel.org>; Fri,  1 Aug 2025 14:48:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3676022D9ED;
+	Fri,  1 Aug 2025 14:56:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754059685; cv=none; b=lIBCJXBeOCbpL+pdSAc/wGsppOeEvZSOWP6Mvx1AQELdKJJ5PlvBEdzPgUn/4KLaRizJgrcW10vVlDNjVY+V7WNy6gn7nleyzPwYT17Fow7q7XrdQPsRzBhZdhcA+HNe3N7eCwrWQ5qH8uudCpjhZTy0ZtDjHhzgR2k5VZoxpAM=
+	t=1754060205; cv=none; b=UWp15GIkDiV6hABmT0MOkuYZNON/ViYrj0dJMTQu/rrHFIvm/Y8n06/ChKSNVb5cdWoSzyUzyXFDrct6W0xgDK7KJ4b3zNcthS5fev8UvWTofZUgGsM5tVw2b/gA3jUh6ePSyvSb8yphnUej+ACiFv+n7ZNHNC24/Am8Y96r7Mg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754059685; c=relaxed/simple;
-	bh=YZHza/EnmxkcBOGDn7hmlJIwbMxL3JM9EGMYOvHGSg4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e/SeEVSDDR3JTJgCwjtPd0s01cLjQpfcDErjDy4igNlu35+WBr00PjxFWqbNNn5S7gB/VM/ZPmBxEYsdCyD1HFwWhari2+staHNlbqECZjYf9tnxrrxWn2+uUj0krki/VmrSGQThcTGO/ldiF2vm8QH7GRw2uY8Ha+so/tIzrzU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=eKuf4Yc4; arc=none smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4ab63f8fb91so7233571cf.0
-        for <kvm@vger.kernel.org>; Fri, 01 Aug 2025 07:48:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1754059682; x=1754664482; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8XiRDfRvpK/TGGlwkWMQ0+U85MYh7SiuBVb/dOXV04M=;
-        b=eKuf4Yc4TorJbgGykdYoBvaeZqaAyOsgl+nrOfD1b7DHbvX8corhOVkj4BE8EJ38jF
-         Lisl22KdnYGuS4GQq9Z/PVvjFXnyDz5YnhHRTF43Ccu+97c0OvxzTP5wmdsJifBc6MSj
-         Cwfe79ArwyaO/V4RNiDQ+9HmVdgdV5CbIYH3ASPhbJNOnuYlL76vEdLfFc5x8k8PrGyr
-         RHf2z8fzeHoJj5/e4pabvVrr2V3IM0HNHdZHXJmtnFppXUfq4jNULMGhlLA7C2kyUHOB
-         KjVMb5CVwr//aq1RiehWeQsoMKK3clFIFJo1OHt8wAmlpSoPi7JZLRexgpkVz5kdUbot
-         RX1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754059682; x=1754664482;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8XiRDfRvpK/TGGlwkWMQ0+U85MYh7SiuBVb/dOXV04M=;
-        b=wyK/0EBZcaMu0E4aeWiyGsD0IZ7/lx+at4Fsg2wTWzXrJt+PXjf/d2IPEAYF5AeZln
-         eQUTOT5JYsC0i6F9zkggi5GgPIe6/3suc+fuQ+WWmF1JG1QFDcUf/H6CuoANZe3l0ss4
-         zgFbZD9YE7iT9jOHQjYu++VOtdM7ubdGtwJK0IHfdtKX7TshmKwk3ZQDwL9v3sQtfo1a
-         h4ylkYnTdlwGrnaTvlbAPnol6nT3sqVYWcuq0r6pHVdD0DeUzex80Joce/2AzEaFXld2
-         sLqOhMALLTFNugnBygqZ3n9HSq3OotnkPWT2IrlmFy36KSFLDuGTr6wjgp222T4cMnCm
-         hcJg==
-X-Forwarded-Encrypted: i=1; AJvYcCUohkX6cTkzi5xSGMDbIt4W3rM9I5g4ZOkLqJTfh1G+rlp9Qyl4Vm/d6kBT/0qBEaH9oGU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywp6ARU5N6L1ASaKKTbgtBu5XuWaii76BfKMmh7EOyapgjf7NRf
-	DmBQvg7LjZ5AYoeO9Bkjob7hhMZkD0Huod842nb/mQBPaV19/ixCthSoIlTHpLd86R8=
-X-Gm-Gg: ASbGncsyWaBMMkaKNLMUwj29HiN2bINEiduXz3Ue/FsLUvfgvvHcRS58mnI6oYNfKFr
-	sKNA4Wsza87BfkJJOWF2amk95fJWcAvvjhucnnDYxeLGhzwKbh5m4nT9nHn+5VDRzkZIce6ti2U
-	P/gyc3l8y4gr4H33uctYC0vKGL3/Y3yKuq+UdcWB8lfPLBYN31+JygDSo7MdNJSztRJyYyxtkut
-	SbOQZQMZExTwFZLH8rk4cnH3Gp2WGMZ3+wBOxh5rzjrHlEIHvSsGNKSGBnrGQe27Q08Kq63ImUc
-	f642HXU5Cd+sxbMttI69H1gkzEVgqOj0ppVHL/S8W3F3xaYkjJK70axSOYNr9rFRXsEpuOGlcon
-	/gXb3fAtXs2Kbp9AQmHTWpPBh3vE4dos7ByAYbt99d4wL5sZHaTWVZYz81buSuMvNtwKoMezFjS
-	VqUdg=
-X-Google-Smtp-Source: AGHT+IHuruq8e4nOotgiFQqAg6PBap8xAM5qGI7N6LDcn+/UHmrffFvYqn7c/dW/3W+MAg6BCfHAoQ==
-X-Received: by 2002:ac8:5d4f:0:b0:4a8:1841:42ff with SMTP id d75a77b69052e-4af1099c444mr665711cf.8.1754059681970;
-        Fri, 01 Aug 2025 07:48:01 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-47-55-120-4.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.120.4])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4aeeee21d29sm20498461cf.64.2025.08.01.07.48.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Aug 2025 07:48:01 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1uhr3A-000000012U6-3dEE;
-	Fri, 01 Aug 2025 11:48:00 -0300
-Date: Fri, 1 Aug 2025 11:48:00 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Alex Mastro <amastro@fb.com>
-Cc: alex.williamson@redhat.com, kvm@vger.kernel.org, peterx@redhat.com,
-	kbusch@kernel.org
-Subject: Re: [PATCH v2] vfio/pci: print vfio-device syspath to fdinfo
-Message-ID: <20250801144800.GA26511@ziepe.ca>
-References: <20250724-show-fdinfo-v2-1-2952115edc10@fb.com>
+	s=arc-20240116; t=1754060205; c=relaxed/simple;
+	bh=N8mt0CeZ+jpyRoE3MYFXrL2J5GTr3fT8urbv+hG3NTA=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SkjxHO/AjpLHPNamPG5XpD4V8DFJdt8n8WB8r71wFeNFlHzyicXoqCz2+biGEq6PzktGLh0wKVuZOLI2aYBCIWIcBC4LUnWzS5XcT17yt2FkAxjI8h1QsAf4XRZrykFevWrjKMlvwl7X2x8VGotMzAgUCQzhZ1f9uaGgIPgEL8E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.112])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4btpr56h0Cz23jcP;
+	Fri,  1 Aug 2025 22:54:13 +0800 (CST)
+Received: from kwepemf200012.china.huawei.com (unknown [7.202.181.238])
+	by mail.maildlp.com (Postfix) with ESMTPS id 972C514027A;
+	Fri,  1 Aug 2025 22:56:38 +0800 (CST)
+Received: from localhost (10.173.124.246) by kwepemf200012.china.huawei.com
+ (7.202.181.238) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Fri, 1 Aug
+ 2025 22:56:38 +0800
+From: Hogan Wang <hogan.wang@huawei.com>
+To: <tglx@linutronix.de>, <x86@kernel.org>, <dave.hansen@linux.intel.com>,
+	<kvm@vger.kernel.org>, <alex.williamson@redhat.com>
+CC: <weidong.huang@huawei.com>, <yechuan@huawei.com>, <hogan.wang@huawei.com>,
+	<wangxinxin.wang@huawei.com>, <jianjay.zhou@huawei.com>,
+	<wangjie88@huawei.com>, <maz@kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] x86/irq: Plug vector setup race
+Date: Fri, 1 Aug 2025 22:56:33 +0800
+Message-ID: <20250801145633.2412-1-hogan.wang@huawei.com>
+X-Mailer: git-send-email 2.45.1
+In-Reply-To: <87a54kil52.ffs@tglx>
+References: <87a54kil52.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250724-show-fdinfo-v2-1-2952115edc10@fb.com>
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
+ kwepemf200012.china.huawei.com (7.202.181.238)
 
-On Thu, Jul 24, 2025 at 04:29:53PM -0700, Alex Mastro wrote:
-> Print the PCI device syspath to a vfio device's fdinfo. This enables tools
-> to query which device is associated with a given vfio device fd.
-> 
-> This results in output like below:
-> 
-> $ cat /proc/"$SOME_PID"/fdinfo/"$VFIO_FD" | grep vfio
-> vfio-device-syspath: /sys/devices/pci0000:e0/0000:e0:01.1/0000:e1:00.0/0000:e2:05.0/0000:e8:00.0
-> 
-> Signed-off-by: Alex Mastro <amastro@fb.com>
-> ---
-> Based on the feedback received from Jason G. and Alex W. in v1, print
-> the PCI device syspath to fdinfo instead of the BDF. This provides a
-> more specific waypoint for user space to query for any other relevant
-> information about the device.
-> 
-> There was discussion about removing vfio_device_ops callbacks, and
-> relying on just dev_name() in vfio_main.c, but since the concept of PCI
-> syspath is implementation-specific, I think we need to keep some form
-> of callback.
-
-??
-
-> +static void vfio_pci_core_show_fdinfo(struct vfio_device *core_vdev, struct seq_file *m)
-> +{
-> +	char *path;
-> +	struct vfio_pci_core_device *vdev =
-> +		container_of(core_vdev, struct vfio_pci_core_device, vdev);
-> +
-> +	path = kobject_get_path(&vdev->pdev->dev.kobj, GFP_KERNEL);
-                                 ^^^^^^^^^^^^^
-
-vdev->pdev == core_vdev->dev 
-
-int vfio_pci_core_init_dev(struct vfio_device *core_vdev)
-{
-	vdev->pdev = to_pci_dev(core_vdev->dev);
-
-It is the right thing to just make this generic and use
-core_dev->dev.kobj
-
-Every vfio parent device has a sysfs path.
-
-Jason
+> On Thu, Jul 24 2025 at 12:49, Thomas Gleixner wrote:=0D
+> =0D
+=0D
+Thank you very much for your professional, friendly, and detailed response.=
+=0D
+Based on the clear modification suggestions you provided, I conducted=0D
+retesting and validation using the following methods:=0D
+=0D
+1) Start a virtual machine with 192U384G specification, and configure=0D
+   one VirtioNet network card and one VirtioSCSI disk.=0D
+2) After the virtual machine starts successfully, execute the following=0D
+   script inside the virtual machine. The interrupt number 30 is the=0D
+   VirtioNet MSI-x interrupt.=0D
+=0D
+for((;;))=0D
+    do (for((i=3D0;i<192;i++))=0D
+	    do echo $i > /proc/irq/30/smp_affinity_list=0D
+		sleep 0.1=0D
+	done)=0D
+done=0D
+=0D
+After a 7x24-hour test, no error logs of the type "No irq handler for=0D
+vector" were found, I believe this issue should have already been=0D
+resolved. =0D
+=0D
+As you said, this fix cannot solve the problem of lost interrupts.=0D
+=0D
+I believe an effective solution to the issue of lost interrupts=0D
+might be to modify the vifo module to avoid un-plug/plug irq,=0D
+and instead use a more lightweight method to switch interrupt=0D
+modes. Just like:=0D
+=0D
+vfio_irq_handler()=0D
+	if kvm_mode=0D
+		vfio_send_eventfd(kvm_irq_fd);=0D
+	else=0D
+		vfio_send_eventfd(qemu_irq_fd);=0D
+=0D
+However, this will bring about some troubles:=0D
+1) The kvm_mode variable should be protected, leading to performance loss. =
+=0D
+2) The VFIO interface requires the passing of two eventfds. =0D
+3) Add another interface to implement mode switching. =0D
+=0D
+Do you have a better solution to fix this interrupt loss issue? =0D
+	=0D
+There is a question that has been troubling me: Why are interrupts=0D
+still reported after they have been masked and the interrupt remapping=0D
+table entries have been disabled? Is this interrupt cached somewhere?=0D
+=0D
+> Hogan!=0D
+> =0D
+> > Hogan reported a vector setup race, which overwrites the interrupt =0D
+> > descriptor in the per CPU vector array resulting in a disfunctional dev=
+ice.=0D
+> >=0D
+> > CPU0				CPU1=0D
+> > 				interrupt is raised in APIC IRR=0D
+> > 				but not handled=0D
+> >   free_irq()=0D
+> >     per_cpu(vector_irq, CPU1)[vector] =3D VECTOR_SHUTDOWN;=0D
+> >=0D
+> >   request_irq()			common_interrupt()=0D
+> >   				  d =3D this_cpu_read(vector_irq[vector]);=0D
+> >=0D
+> >     per_cpu(vector_irq, CPU1)[vector] =3D desc;=0D
+> >=0D
+> >     				  if (d =3D=3D VECTOR_SHUTDOWN)=0D
+> > 				    this_cpu_write(vector_irq[vector], VECTOR_UNUSED);=0D
+> >=0D
+> > free_irq() cannot observe the pending vector in the CPU1 APIC as there =
+=0D
+> > is no way to query the remote CPUs APIC IRR.=0D
+> >=0D
+> > This requires that request_irq() uses the same vector/CPU as the one =0D
+> > which was freed, but this also can be triggered by a spurious interrupt=
+.=0D
+> >=0D
+> > Prevent this by reevaluating vector_irq under the vector lock, which =0D
+> > is held by the interrupt activation code when vector_irq is updated.=0D
+> =0D
+> Does this fix your problem?=0D
+=0D
+Thanks,=0D
+=0D
+		Hogan=0D
+-- =0D
+2.45.1=0D
 
