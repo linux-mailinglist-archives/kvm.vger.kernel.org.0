@@ -1,116 +1,215 @@
-Return-Path: <kvm+bounces-53853-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53854-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C621B18831
-	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 22:36:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 593EDB1884F
+	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 22:51:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B8C7116F924
-	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 20:36:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2602AA3E3A
+	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 20:51:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 826A220B7EC;
-	Fri,  1 Aug 2025 20:36:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B7AB248873;
+	Fri,  1 Aug 2025 20:51:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="TkdlXd+q"
+	dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b="3vSHthdp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 964A015539A
-	for <kvm@vger.kernel.org>; Fri,  1 Aug 2025 20:36:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97C5B1DE4DC
+	for <kvm@vger.kernel.org>; Fri,  1 Aug 2025 20:51:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754080607; cv=none; b=l5RqrM5+k14oLBWziN74Eb/rcAt81bJBySIU/ReJD0dPq4cHXrpDp2XPQh/qsBeFnp/VdjkBL83edh6iAs6tyDO1SjAMO9JS6v9ioHlV+uhfYopsz3Go/E0NhwCSmyg0MzkenVBF+lOceA/6yDhPpFEcRc0tJ66chkT8vvw5G2c=
+	t=1754081479; cv=none; b=BGxgG9DIAkyenSqoI6TM3by5C7gUIP9tslD98HtVNq1xBwP1MRu4u5m7in50YxYwvk99VLYdbvev4htrLISx7EOBG96xcK4tFd8c369IESWTBTXp2Dw+/TAmcJWnwF4euLoUOR+SLQcPV+zPQZrgiQBkR/zKM/sWevWh5LQ0ICI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754080607; c=relaxed/simple;
-	bh=ft1GtVlHTumH5n9zAoqypec1LBFsX5MTL+yaj3JjcSc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=U5rTrHm3J7QfuimLR8kFdfwEE9nWUdcwdlqRGrOcS4Mpz9vgwJ4JILy2FyEy82ZYMdolIl5tejIHCrNw7u/AkWcYyCKvL66E9P1Qh2+gyuseiNfdQTw1q/x3H2oE4hsc5q+QbgeQOottfuUSVYSHYHhOYa8Shp3VZskDW63N9Es=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=TkdlXd+q; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-61592ff5ebbso4343094a12.3
-        for <kvm@vger.kernel.org>; Fri, 01 Aug 2025 13:36:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1754080603; x=1754685403; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=QXkdEcm3dcCFEHiiyHz9se6bX6iRUxFV0EivrOFS6/U=;
-        b=TkdlXd+qNWy1ZqEENZcuxY10mbd9g87g0MFrtrVNH5XCP+JBm9itWNeC6coJY6cvkq
-         l3ChH2+vFmr3DuEiHgOMXbrahIH0D4u33UZC+IVmFQy0eJ7bEAaU994OCV1PGkG5IIfu
-         jI6qbu1XG4h39nZ/mChGwldCuRZUtEOwBVb1s=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754080603; x=1754685403;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=QXkdEcm3dcCFEHiiyHz9se6bX6iRUxFV0EivrOFS6/U=;
-        b=u6047/e696+FA0jHn+FzBXbO/YPy+4N8ZGZFO6WVC5McV4tiZgQIZqd9uVpoYRtxMq
-         DODds9OawYjP+RnBSZ9b90nI7y/q++vGlSiiY4vxYCjJxMGiA6CtBKMhumddcD2ydnLX
-         Qthr84ejefR49w5LNQWLnFmYlSoYy3eDHxcq8IfInOcnw1ULAaY7wadytRDZtvNN6f3W
-         963SiXNywrRWxMlKLlp8zsGkVMlJ5r1U9a1V/aGODuc4ZcHduQFyL13rY55Ax/0u+/5W
-         iAaEoKziTLtZA5RX+PTLiSs7q4mMzNt6//rAB6Aj7/ZdAPj2pzef9nhEPTlM0SHMrPkS
-         3YCQ==
-X-Gm-Message-State: AOJu0Yy37zoPWn5QmPIk73Zg6K8pDyqh3fGx2QG1qjggrYjn2Xe9NBbC
-	YO/TMHCZWzySlTILNfMJvZOYORak8sO4bQgeH78wKou7DplK6y3l6czGBsRTZp/dr7cnRHsYDQv
-	3L9GFdKk=
-X-Gm-Gg: ASbGncuYTee1XcocgjDSRO5jM0Uv/7TOmVAGGKUoBusXi/uoJrUpR++yJQ56+Yuq/uk
-	tjhWGuaaCBvqJWYfyJQcqr32PI1c80Qv1+BaFGZDsEelPv3LpS0DlMf7mDct1S4WazUexR1m6Ku
-	7Jl7zn6RcqxffzVKleyR58K4lIzQuXA7SsfytYmqacvcaPjd2SN5RYUBV7vFNOcgayzAMXiOMQd
-	Uq/wWKYDndogCLwiuUJKfKNGIDwaHJrsdr+Xvl7xaJng8isAu0F0K8XKHWYBboCEI/mXoIEO7r8
-	c9JGkyCPthq6b6kJkiEjpIG5q+Pxa3wDtMDFXlwo24HhTJ9emV4LuOh0W5fBb8J91fB/uww7LSp
-	MC0xSWu964S4Q4OfTXr8wzCv+qrUYOspGZf+iTN57liZ4V4DSrXgMnsiVitqTZClHPdmKYSvM
-X-Google-Smtp-Source: AGHT+IFck6LFGilIHZubNhURHVrswTQrAGo2WUbQpj3lZXvHuIqoDLDq6gzwlA2epxBctZ3khoGjcQ==
-X-Received: by 2002:a05:6402:2790:b0:615:cc03:e6a2 with SMTP id 4fb4d7f45d1cf-615e6ebec77mr580802a12.1.1754080602768;
-        Fri, 01 Aug 2025 13:36:42 -0700 (PDT)
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com. [209.85.218.44])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-615cc38ae55sm1699313a12.10.2025.08.01.13.36.42
-        for <kvm@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 01 Aug 2025 13:36:42 -0700 (PDT)
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-adfb562266cso414876966b.0
-        for <kvm@vger.kernel.org>; Fri, 01 Aug 2025 13:36:42 -0700 (PDT)
-X-Received: by 2002:aa7:cb0d:0:b0:615:8012:a365 with SMTP id
- 4fb4d7f45d1cf-615e715f7a6mr469886a12.25.1754080158122; Fri, 01 Aug 2025
- 13:29:18 -0700 (PDT)
+	s=arc-20240116; t=1754081479; c=relaxed/simple;
+	bh=xlUOQJI0xX3aYBcyXPghiHPXjSV2N2PF1hyKruz+imM=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=dfXu946xBCjeI+awyiphjinvA+J/mwSTRPW4hR4JBNs79AyXf/XABBUF6x77DgUAXqjUJvx3/WyqO0fCozQy70vOWj6EPq8fOZ4nSHQ320mIBLGo/w7b7vkZxmotr9xBWeX1qABzdRUibU1bvis9xZbkK+OaLTsoWYpVXZKdAO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b=3vSHthdp; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0109332.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 571JmsCw032016
+	for <kvm@vger.kernel.org>; Fri, 1 Aug 2025 13:51:16 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=s2048-2025-q2; bh=Jb4LS8ieZ/yMT4TW1d
+	HPQYW0A8QAnqTZwf9KjQDya2Q=; b=3vSHthdpJebEzHzwWUTidFd1HPt9R9Hipm
+	2+Hak+Y5X/SXomoOcgMc3LGCU1mo7kbP/EeJY3AYhCheoFgUSe6Iv3DNviT86/rk
+	gl1MQtEhE3vJt1HWouZw132deOgvTkfJqSQpiRRJx5dPHjiPQ5UmLwTfxEzdATXi
+	PYp64YbzMgFUKsdcnQFDMmV1Kr0dlM9BtraIb4Im9cZeV9GLAeIxPfpXlJqRYj/k
+	NYnW6Y7F7y0S4tXW6w38hdQS8O8QnzF68ce1HJM3biDiW/MWThgWhm5NLKVpVp5Q
+	1CuaWsqf9ZW17eAMi7mtfWKnSKt6YqvN9elBAIpAyaAa9nchmZ2g==
+Received: from maileast.thefacebook.com ([163.114.135.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 488rn2mr35-2
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <kvm@vger.kernel.org>; Fri, 01 Aug 2025 13:51:16 -0700 (PDT)
+Received: from twshared24438.15.frc2.facebook.com (2620:10d:c0a8:1b::2d) by
+ mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.17; Fri, 1 Aug 2025 20:51:15 +0000
+Received: by devgpu013.nha3.facebook.com (Postfix, from userid 199522)
+	id 1BB5D4A4CD7; Fri,  1 Aug 2025 13:51:07 -0700 (PDT)
+From: Alex Mastro <amastro@fb.com>
+Date: Fri, 1 Aug 2025 13:50:56 -0700
+Subject: [PATCH v3] vfio/pci: print vfio-device syspath to fdinfo
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250801091318-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20250801091318-mutt-send-email-mst@kernel.org>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Fri, 1 Aug 2025 13:29:01 -0700
-X-Gmail-Original-Message-ID: <CAHk-=whgYijnRXoAxbYLsceWFWC8B8in17WOws5-ojsAkdrqTg@mail.gmail.com>
-X-Gm-Features: Ac12FXxywlhxHC92NneGnmmt5Hm9rlPrKO5mJOfIsb2I5ZMf5olIOr9KL1pDLfc
-Message-ID: <CAHk-=whgYijnRXoAxbYLsceWFWC8B8in17WOws5-ojsAkdrqTg@mail.gmail.com>
-Subject: Re: [GIT PULL v2] virtio, vhost: features, fixes
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	alok.a.tiwari@oracle.com, anders.roxell@linaro.org, dtatulea@nvidia.com, 
-	eperezma@redhat.com, eric.auger@redhat.com, jasowang@redhat.com, 
-	jonah.palmer@oracle.com, kraxel@redhat.com, leiyang@redhat.com, 
-	linux@treblig.org, lulu@redhat.com, michael.christie@oracle.com, 
-	parav@nvidia.com, si-wei.liu@oracle.com, stable@vger.kernel.org, 
-	viresh.kumar@linaro.org, wangyuli@uniontech.com, will@kernel.org, 
-	wquan@redhat.com, xiaopei01@kylinos.cn
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-ID: <20250801-show-fdinfo-v3-1-165dfcab89b9@fb.com>
+X-B4-Tracking: v=1; b=H4sIAK8ojWgC/1XMsQ7CIBCA4VdpbvYMRyVtnfoexgHhThgKBkw1a
+ fruEhfj+A3/v0HlErnCudug8BprzKmhP3Tggk13xuibQStt1KgIa8gvFB+TZGQhNTk79KMTaMW
+ jsMT393a5NkvJCz5DYft7DPr091g1EurJaCLD3pGa5XZ0eYF9/wBbhsvZnQAAAA==
+To: Alex Williamson <alex.williamson@redhat.com>,
+        Jonathan Corbet
+	<corbet@lwn.net>
+CC: Jason Gunthorpe <jgg@ziepe.ca>, Keith Busch <kbusch@kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+        <linux-doc@vger.kernel.org>, <kvm@vger.kernel.org>,
+        Alex Mastro
+	<amastro@fb.com>
+X-Mailer: b4 0.13.0
+X-FB-Internal: Safe
+X-Proofpoint-ORIG-GUID: 89bd_ObXnmjZTOcanDonlEbBDyXJnPpG
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODAxMDE2NiBTYWx0ZWRfX3SgLcI0riR8Q ypLWowFejRi+GghfAzKZBY3FPuoegD9wOwDcHM5LOlwuh75+688jah7AvNzZCfhkLPYlvSq6hh0 lNje0Yv7S8xh8DreZqY+4P+1yURLJ90YUd7huragZmlXSa1DoQcN6MvhFjgfGegfEg7LYWxlAKt
+ s/O34BjGyy+cl7vtaAfhx+xYm7W1bfMFxEsjbxzbHsR+IbOxr0eXNyyVlGSg5uCE2XYTZu0s0c9 C/f5EfZEO4rsxqldMMNe/hxrsWkIzlKTk5ug9ejwZTMHjWN23wkNRwH1DdnyPxaflO5rLyRpAVT zKMxbvplsS1ORGqvbGJTQUIv1rpE9iSWgEyDG20acSzGD6b4FWsrnZE06s2TwiLL8S31x8Jb9dC
+ c2nHawhxCdQugeXRzwAjD6RsscpMPwdcuErzeoXzGIPLVj7ZWsgUIMpePtroZzG0+hJp/tvk
+X-Authority-Analysis: v=2.4 cv=HOnDFptv c=1 sm=1 tr=0 ts=688d28c4 cx=c_pps a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17 a=IkcTkHD0fZMA:10 a=2OwXVqhp2XgA:10 a=VwQbUJbxAAAA:8 a=FOH2dFAWAAAA:8 a=DFnZXp7rDhDadfPsBKIA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: 89bd_ObXnmjZTOcanDonlEbBDyXJnPpG
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-01_07,2025-08-01_01,2025-03-28_01
 
-On Fri, 1 Aug 2025 at 06:13, Michael S. Tsirkin <mst@redhat.com> wrote:
->
->         drop commits that I put in there by mistake. Sorry!
+Print the PCI device syspath to a vfio device's fdinfo. This enables tools
+to query which device is associated with a given vfio device fd.
 
-Not only does this mean they were all recently rebased, absolutely
-*NONE* of this has been in linux-next as fat as I can tell. Not in a
-rebased form _or_ in the pre-rebased form.
+This results in output like below:
 
-So no. This is not acceptable, you can try again next time when you do
-it properly.
+$ cat /proc/"$SOME_PID"/fdinfo/"$VFIO_FD" | grep vfio
+vfio-device-syspath: /sys/devices/pci0000:e0/0000:e0:01.1/0000:e1:00.0/0000:e2:05.0/0000:e8:00.0
 
-            Linus
+Signed-off-by: Alex Mastro <amastro@fb.com>
+---
+Changes in v3:
+- Remove changes to vfio_pci.c
+- Add section to Documentation/filesystems/proc.rst
+- Link to v2: https://lore.kernel.org/all/20250724-show-fdinfo-v2-1-2952115edc10@fb.com
+Changes in v2:
+- Instead of PCI bdf, print the fully-qualified syspath (prefixed by
+  /sys) to fdinfo.
+- Rename the field to "vfio-device-syspath". The term "syspath" was
+  chosen for consistency e.g. libudev's usage of the term.
+- Link to v1: https://lore.kernel.org/r/20250623-vfio-fdinfo-v1-1-c9cec65a2922@fb.com
+---
+ Documentation/filesystems/proc.rst | 14 ++++++++++++++
+ drivers/vfio/vfio_main.c           | 20 ++++++++++++++++++++
+ include/linux/vfio.h               |  2 ++
+ 3 files changed, 36 insertions(+)
+
+diff --git a/Documentation/filesystems/proc.rst b/Documentation/filesystems/proc.rst
+index 2a17865dfe39..fc5ed3117834 100644
+--- a/Documentation/filesystems/proc.rst
++++ b/Documentation/filesystems/proc.rst
+@@ -2162,6 +2162,20 @@ DMA Buffer files
+ where 'size' is the size of the DMA buffer in bytes. 'count' is the file count of
+ the DMA buffer file. 'exp_name' is the name of the DMA buffer exporter.
+ 
++VFIO Device files
++~~~~~~~~~~~~~~~~
++
++::
++
++	pos:    0
++	flags:  02000002
++	mnt_id: 17
++	ino:    5122
++	vfio-device-syspath: /sys/devices/pci0000:e0/0000:e0:01.1/0000:e1:00.0/0000:e2:05.0/0000:e8:00.0
++
++where 'vfio-device-syspath' is the sysfs path corresponding to the VFIO device
++file.
++
+ 3.9	/proc/<pid>/map_files - Information about memory mapped files
+ ---------------------------------------------------------------------
+ This directory contains symbolic links which represent memory mapped files
+diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+index 1fd261efc582..37a39cee10ed 100644
+--- a/drivers/vfio/vfio_main.c
++++ b/drivers/vfio/vfio_main.c
+@@ -28,6 +28,7 @@
+ #include <linux/pseudo_fs.h>
+ #include <linux/rwsem.h>
+ #include <linux/sched.h>
++#include <linux/seq_file.h>
+ #include <linux/slab.h>
+ #include <linux/stat.h>
+ #include <linux/string.h>
+@@ -1354,6 +1355,22 @@ static int vfio_device_fops_mmap(struct file *filep, struct vm_area_struct *vma)
+ 	return device->ops->mmap(device, vma);
+ }
+ 
++#ifdef CONFIG_PROC_FS
++static void vfio_device_show_fdinfo(struct seq_file *m, struct file *filep)
++{
++	char *path;
++	struct vfio_device_file *df = filep->private_data;
++	struct vfio_device *device = df->device;
++
++	path = kobject_get_path(&device->dev->kobj, GFP_KERNEL);
++	if (!path)
++		return;
++
++	seq_printf(m, "vfio-device-syspath: /sys%s\n", path);
++	kfree(path);
++}
++#endif
++
+ const struct file_operations vfio_device_fops = {
+ 	.owner		= THIS_MODULE,
+ 	.open		= vfio_device_fops_cdev_open,
+@@ -1363,6 +1380,9 @@ const struct file_operations vfio_device_fops = {
+ 	.unlocked_ioctl	= vfio_device_fops_unl_ioctl,
+ 	.compat_ioctl	= compat_ptr_ioctl,
+ 	.mmap		= vfio_device_fops_mmap,
++#ifdef CONFIG_PROC_FS
++	.show_fdinfo	= vfio_device_show_fdinfo,
++#endif
+ };
+ 
+ static struct vfio_device *vfio_device_from_file(struct file *file)
+diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+index 707b00772ce1..54076045a44f 100644
+--- a/include/linux/vfio.h
++++ b/include/linux/vfio.h
+@@ -16,6 +16,7 @@
+ #include <linux/cdev.h>
+ #include <uapi/linux/vfio.h>
+ #include <linux/iova_bitmap.h>
++#include <linux/seq_file.h>
+ 
+ struct kvm;
+ struct iommufd_ctx;
+@@ -135,6 +136,7 @@ struct vfio_device_ops {
+ 	void	(*dma_unmap)(struct vfio_device *vdev, u64 iova, u64 length);
+ 	int	(*device_feature)(struct vfio_device *device, u32 flags,
+ 				  void __user *arg, size_t argsz);
++	void	(*show_fdinfo)(struct vfio_device *device, struct seq_file *m);
+ };
+ 
+ #if IS_ENABLED(CONFIG_IOMMUFD)
+
+---
+base-commit: 4518e5a60c7fbf0cdff393c2681db39d77b4f87e
+change-id: 20250801-show-fdinfo-ef109ca738cf
+
+Best regards,
+-- 
+Alex Mastro <amastro@fb.com>
+
 
