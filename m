@@ -1,82 +1,82 @@
-Return-Path: <kvm+bounces-53856-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53857-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A753B18895
-	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 23:15:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACA84B188CE
+	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 23:34:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8BDE2179A56
-	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 21:15:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BA4FB7A40D6
+	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 21:33:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BC2A28E574;
-	Fri,  1 Aug 2025 21:15:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2464A28F524;
+	Fri,  1 Aug 2025 21:34:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="ed3tS5hV"
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="ZJk/CQkN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 811531E32D7
-	for <kvm@vger.kernel.org>; Fri,  1 Aug 2025 21:15:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 672EC1A0712
+	for <kvm@vger.kernel.org>; Fri,  1 Aug 2025 21:34:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754082928; cv=none; b=WYLoJnvXpMzW+r0nmFUabEYN82eJHERgIqjKXt2gQZIVY/SSJ/T2orXB35K9swDgxArx0/DIBkMFeiI9COqMYpS0a5M8be+pDv3+0kwiRgAOfcap+jHqrCuX84tVVuXAiW3Lv7LHt8EnL6SeUklAC6zwo/G2cRLISuWCzlwfpho=
+	t=1754084078; cv=none; b=en+0265tTuGOb0lil0LPrliwdaO0zniOpzF0ytkXbXb9CVSGUuHXL2ztjYYsuP4v/zqr5Z+Jg4ewpw3u5JLvcHEO4wnto1KaL0Z/mIM0SfbHKKk5QwUh+7bhWk4UwhqPWXWUC/mnpzqH+x9/MwPZQWROtSdZoDExK3f+r75h2vA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754082928; c=relaxed/simple;
-	bh=8Kri1HoPuh6lwB0F7qiPiOrJzYKY+av4+R1JiwsLGGY=;
+	s=arc-20240116; t=1754084078; c=relaxed/simple;
+	bh=IZkwXQkh8YxYF6KhegHig00grekwiuruDFNARhibles=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GzLPm5hmJqLVFLZcv8cIKmettt7kQKu5o2V3ojD+dDCKwkVvWY+tdgtf/B7wliUwUUVUs1JRJBb6dHbYB1V29JGIc+vbKlA7sbpjjC2ic0UxpeWN9i2AezaXi84kBMsEotED/Su37oWBOcBMSrq/ESqqI4PO0UCHPTgJUZsELoE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=ed3tS5hV; arc=none smtp.client-ip=209.85.208.49
+	 To:Cc:Content-Type; b=T1Nq8AJvu1iqTLTT5YtD7B55+pG5Rjg6Bzt2JY6awfgkvmRIwtFdOlKhZpMg6PPRNB4kz5zLIoSDL0MZQI/zhhjNV6cbbvakHGMPYa66VJLQa392KP3dnAbENpXAFFzFlqRdpPdZbI5rraMkzVkqB0JtaspIakMF0yP1W/xmqHU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=ZJk/CQkN; arc=none smtp.client-ip=209.85.218.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-61592ff5ebbso4387013a12.3
-        for <kvm@vger.kernel.org>; Fri, 01 Aug 2025 14:15:26 -0700 (PDT)
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-af93381a1d2so188483366b.3
+        for <kvm@vger.kernel.org>; Fri, 01 Aug 2025 14:34:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1754082924; x=1754687724; darn=vger.kernel.org;
+        d=linux-foundation.org; s=google; t=1754084074; x=1754688874; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=BOAZkZ18mJY5AP4pAaTQp2Y2a24YFEEDzHLPHw5UlIc=;
-        b=ed3tS5hVmqg27kcwp9asyn8v6l8kjsZbFtV+T/31MD/k+8EI8GJab5hp0BiLkK67Jw
-         /JGfBr2tm9hlPX8uLLEANRha18elStyH2x8Y0ayiNjPefui5stg4D8CobI3v5UMqvqb6
-         9wzLq52cMIgUVO7W1+9G/LhRjXzuVqDZAiWoE=
+        bh=WLFHL6fOZFPNrc7teT5UWCBGBPE4FkQnF2Ru0J7QGa4=;
+        b=ZJk/CQkNn759zW48a2JZ+wnGAeFYF/65D4MSSLPZwRDZrb4H2z29VBipHbl/UpS9qM
+         zM/NJ2LyQta0RPM94ipgCU7SJ6pKOHzTcl10VrKjt9Tua628qDUKWg7ZiVjYmaEZeSD6
+         +MdGPgCmO1YSZCIMlC9v6WH/bJ3tyyR2voquc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754082924; x=1754687724;
+        d=1e100.net; s=20230601; t=1754084074; x=1754688874;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=BOAZkZ18mJY5AP4pAaTQp2Y2a24YFEEDzHLPHw5UlIc=;
-        b=oNdrXimnWo7i2iNaZj8k4D6Rk5k5QAZ0QAFzxZB00n8M7wMXo6BdlZcjVITg3t2MlP
-         z+z7TJHCgsX/1wyrWUBeEVa3V85c3Pfl87mZ1mKI713KiJjXMbJFdtlFsxyrHVt+RmhR
-         +ZIDLkofS3Lril8t+xFaohWBC5KK7tuCoLOqfYtW2UzK5jEjonjxTm17DazVY7wJOghi
-         14zrz5AHauTQK0jH2J5ebeuKO8qJO/K1UUJyKyOjSqvQACenqcb8/W+nvswUj1xEg+/X
-         yklOgKRCdH8yf2j3s01Lh0zB3ecfgiPxYaAgS7EcH2z5Kyx1invapcII9WOArPd5+kEf
-         sj8A==
-X-Forwarded-Encrypted: i=1; AJvYcCV0Xlcg8MHJ+i+q6Cagt5Ugia2tg9xyTuZnUHClK1DLh1CH3eM+ORepmPsCyvvHnJALn0g=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yytn2rQj/trAX9V+HI++9NLwRKxe+ZgiJ1fezDGYmKRmoaLIGYA
-	ii2FcFNahLJG9h0JKSST7LDIUsvbaSuDlhLxRYXgXIOF/SXdgHzEK3LkCSvbmFaQ2b3lYUTrt2u
-	CRXYT33o=
-X-Gm-Gg: ASbGncvts53SUtO8wgRJvd1lKaxEMl8BC+8iWwiUZszvSDX9lZaGyWMNvBaQ/fST6iT
-	d2CDAGUYQv/95AnXCmkNAEYENEjeWQwt2NQn/7sjovL3GORfpXPOmZ0RIKJXrS3RYsZ85PLYLyh
-	JdZCeKT+GnnTCB+T4F0SAVATRKUd04a8WtuxjxP8FKUQQEJ2dRmIz75oWwmZQm6TqlPum/eB+bp
-	oZI+zwtzU44c+am8KIp3DytYJAx8q6bfC+jN9WgyYpngHrzRZqnm/qXzXGmN2sSPKvJBVSv0oEi
-	88iy4gDYtXewzh0YH5z7hxeLHBjmzhwLh1iAgRoZ9L2HwrzdQpb9ENIg9ZWtSOSaHXcBbzbQiAu
-	jfeVcQRNoEelqb7hYL7aNpFVVyQuRIeS0IPnekxL1u8X75l3EdVZ90kLijVblTw/upIosHzfT
-X-Google-Smtp-Source: AGHT+IEsLgae0KkIawVhGRJBRqFBAVHp4XKm8hsXefBqs6bS6Dl1pu1dOW5dTi9b9iCcQEm9/hLUQQ==
-X-Received: by 2002:a05:6402:4305:b0:615:7fd8:d959 with SMTP id 4fb4d7f45d1cf-615e6edf033mr652070a12.10.1754082924431;
-        Fri, 01 Aug 2025 14:15:24 -0700 (PDT)
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com. [209.85.218.54])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-615a8fe7995sm3207590a12.36.2025.08.01.14.15.23
+        bh=WLFHL6fOZFPNrc7teT5UWCBGBPE4FkQnF2Ru0J7QGa4=;
+        b=fJMZH6uKL3BfxuT/CwTdSLf67ron4UG4rRNIwnztf/oUV7ynUtXt9BwEXe+4XK1W/F
+         Y1YwGX0FjK2Vi6QRwrPgfbyf5liikr09j99R0sQEAP2DpjaSnYnDEZBajBbQTfJVQtBO
+         qVTjPXoCAyGzmcU1Wf77jbWYWhltTp/DtIX0oBe/1R7AyqgT02NXN+WvyV7MeZ6Tz+ri
+         WixPmfWHQsM+TkD1wMnn7Hl4CSILSZcwyQg7kn/hjwNOJycBUy6LPsnT2nSjqnZhLliR
+         9ny7stFX/pn1tfcXKc064UXylptUOiAGLyMVcBpHIs11sPGlFq5XKZsMD0LhNDn4Z6PB
+         x6aw==
+X-Forwarded-Encrypted: i=1; AJvYcCWElH+s9XvB2IPURJoL0+c2JCRs2mInNEOPUFOSv9uVm5Z6QRdtqIxAQ61U52PttFS7Mq8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQp5cRrauK57kRR4itK7UsxOBUXAI/kpifCKrqOoXkP3OCkKi1
+	gjAPQhQihoGvUqblvu6t3JNup3aQH/BzlC4GwwEIl8mYmaSJ/ZaaOMjibQSEuPEGLPLzWPle6hP
+	nrMXaeRw=
+X-Gm-Gg: ASbGncthpMTVjfE8dYjbHVl5neg3mW+VxifqmVJ773SLxiNxZ6J3nAvZf87rovZrnLh
+	mds8tSIuvM2OfdzX/Uh0FEHlWzgFQNQq4vdEmiJSJnUOHwH7IfiQZNBmUC5+d0ng+2FedLIP/mt
+	v/AACobfMb/EXJsshFMNyRbhEZgXem3Fif39Gq+/mWnPWwnyZSDksJqtqfSq8bAtPjsfWtOm799
+	XUtOejMzaGGIYH0GqWGOJWawrweWDQs1H7nkE24bvB1h6Sc+QKUP9m8+FftxkmfxK1vPU2e2C3K
+	sGaPZbrA33aLnrZx7H9W0OZKx9FgkKi1eGT4O2P93E0vtNXtxne0VUXNpWyMWHLow55wi9XpH6Z
+	HDe0RGBw1whiK5Ywrvkke45KbDmYnqCH5ksEiXHLbtS2YiqVEcT3/2bmFzAZcCy7F83hkkhJf
+X-Google-Smtp-Source: AGHT+IFBlFPQslrQULcVVih42VvNVh3bIhDsPLVRRaer64M936z21wqtjoXbNG2TdDlYSS7mPHGMuQ==
+X-Received: by 2002:a17:906:6a11:b0:ae0:b3be:f214 with SMTP id a640c23a62f3a-af940032f88mr135558866b.9.1754084074584;
+        Fri, 01 Aug 2025 14:34:34 -0700 (PDT)
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com. [209.85.208.42])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-af91a243644sm341608866b.139.2025.08.01.14.34.32
         for <kvm@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 01 Aug 2025 14:15:23 -0700 (PDT)
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-ae360b6249fso469798166b.1
-        for <kvm@vger.kernel.org>; Fri, 01 Aug 2025 14:15:23 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCWl2dJmz9H6xCp1o/7fxTo2kHH0Brauc8eGf3nyjwg9BZuhSpUGQtMLT2fLi54CxTMeU/U=@vger.kernel.org
-X-Received: by 2002:a17:907:3f99:b0:ae3:6657:9e73 with SMTP id
- a640c23a62f3a-af9400844fbmr144333466b.20.1754082923387; Fri, 01 Aug 2025
- 14:15:23 -0700 (PDT)
+        Fri, 01 Aug 2025 14:34:32 -0700 (PDT)
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-615622ed677so3640160a12.1
+        for <kvm@vger.kernel.org>; Fri, 01 Aug 2025 14:34:32 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCWvwp1cTilCNaVKcXG+wVA9GC/EDA0YHA/FZ9cJdG2eqV+MoLt1LEcuQLCbJk5g2hnE7O4=@vger.kernel.org
+X-Received: by 2002:a05:6402:2790:b0:615:cc03:e6a2 with SMTP id
+ 4fb4d7f45d1cf-615e6ebec77mr689309a12.1.1754084072420; Fri, 01 Aug 2025
+ 14:34:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -84,13 +84,14 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20250801091318-mutt-send-email-mst@kernel.org>
- <CAHk-=whgYijnRXoAxbYLsceWFWC8B8in17WOws5-ojsAkdrqTg@mail.gmail.com> <aI0rDljG8XYyiSvv@gallifrey>
-In-Reply-To: <aI0rDljG8XYyiSvv@gallifrey>
+ <CAHk-=whgYijnRXoAxbYLsceWFWC8B8in17WOws5-ojsAkdrqTg@mail.gmail.com>
+ <aI0rDljG8XYyiSvv@gallifrey> <CAHk-=wi1sKCKxzrrCKii9zjQiTAcChWpOCrBCASwRRi3KKXH3g@mail.gmail.com>
+In-Reply-To: <CAHk-=wi1sKCKxzrrCKii9zjQiTAcChWpOCrBCASwRRi3KKXH3g@mail.gmail.com>
 From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Fri, 1 Aug 2025 14:15:07 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wi1sKCKxzrrCKii9zjQiTAcChWpOCrBCASwRRi3KKXH3g@mail.gmail.com>
-X-Gm-Features: Ac12FXxTQNyMa37gD218OICz8yv-5X8AXqC2OjqDUUC5iyMABu84wbERpHpCWcY
-Message-ID: <CAHk-=wi1sKCKxzrrCKii9zjQiTAcChWpOCrBCASwRRi3KKXH3g@mail.gmail.com>
+Date: Fri, 1 Aug 2025 14:34:16 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wgRtKY+tk0mhnHzrC0YMXef0GtVUFQ6cGW0-4XS30mQ5A@mail.gmail.com>
+X-Gm-Features: Ac12FXyaANs0webz-gagQ0r78-lvtho7QphOSO_s_LZu61Rm94DR5P3bHuE7Emw
+Message-ID: <CAHk-=wgRtKY+tk0mhnHzrC0YMXef0GtVUFQ6cGW0-4XS30mQ5A@mail.gmail.com>
 Subject: Re: [GIT PULL v2] virtio, vhost: features, fixes
 To: "Dr. David Alan Gilbert" <linux@treblig.org>
 Cc: "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org, 
@@ -104,20 +105,15 @@ Cc: "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org,
 	will@kernel.org, wquan@redhat.com, xiaopei01@kylinos.cn
 Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 1 Aug 2025 at 14:01, Dr. David Alan Gilbert <linux@treblig.org> wrote:
+On Fri, 1 Aug 2025 at 14:15, Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
 >
-> My notes say that I saw my two vhost: vringh  deadcode patches in -next
-> on 2025-07-17.
+> My apologies - they are indeed there, and I was simply looking at stale state.
+>
+> So while it's recently rebased, the commits have been in linux-next
+> and I was just wrong.
 
-Oh. My bad.
+Pulled and pushed out. Sorry again for blaming Michael for my own incompetence.
 
-My linux-next head was not up-to-date: I had fetched the new state,
-but the branch was still pointing to the previous one.
-
-My apologies - they are indeed there, and I was simply looking at stale state.
-
-So while it's recently rebased, the commits have been in linux-next
-and I was just wrong.
-
-                Linus
+            Linus
 
