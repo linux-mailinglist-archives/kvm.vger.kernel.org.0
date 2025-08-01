@@ -1,191 +1,143 @@
-Return-Path: <kvm+bounces-53820-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53821-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5BB3B17AA5
-	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 02:47:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA4D7B17ADF
+	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 03:36:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F31C81C2647D
-	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 00:47:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EF5667AEF55
+	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 01:35:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C3253596D;
-	Fri,  1 Aug 2025 00:47:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2A2778F5D;
+	Fri,  1 Aug 2025 01:36:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qRKo60MQ"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="a1fJcoiR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 030C42E370E
-	for <kvm@vger.kernel.org>; Fri,  1 Aug 2025 00:47:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47B0923AD;
+	Fri,  1 Aug 2025 01:36:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754009244; cv=none; b=g2+iZsL+i++mobZ/Yyx+YL/I1hGh3H/LLQjOtgsFUICvjZCHfGPE5i8oWrBh+2ca3sFFxuFk+eo+P3Ck5tXz5oDHd3+YfOWzVs7tcc/2FZPLyfdqQF/WoQxuK4LfA8Nh5QXZC8RtbI2v8SjYEEP8obghZLbMiALoOPD5LKC7qEk=
+	t=1754012181; cv=none; b=U3dPGYVo14h6/Cm6cRHp9KE61r4Vz1bPvQdHqiXp1c3GllFxq16H7zkoTRWaGZRiQ1x9PfhQ2RaVwgasFUJTA2ih6Jr+10vLIWd9JEmcfr7qdOeQWcphEe6HPCeyetNV4uSU2Jssvo3nvJyi5Axm6lDINFazpA5EcKREj3AWuzs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754009244; c=relaxed/simple;
-	bh=gR5Al1D4+reUnTE7Wgb+7b9ojBWrqnfN4+NskzNJwcI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=kcl1otyuuz92hS4LHEEXqvfpcVX3pSUTIMq1xCmSEqDp69o4E5DeDC1QWN1J9Dx6FXrCA2Bz+VFYC6fJZgf74kG6kVhxSO6Ti+2rmzjhdc2fIljjEQzyVt/+3Zdx9/jbF/4MkOr/pDbzaD0H7R+MYpSAYCiGLP1ii2cAdpx1nBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qRKo60MQ; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3132c1942a1so512815a91.2
-        for <kvm@vger.kernel.org>; Thu, 31 Jul 2025 17:47:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754009242; x=1754614042; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hRXNszbxlUTyYnGSQYO+PKslDvhns5dMJJ1svuzzpJM=;
-        b=qRKo60MQIHwcbKWWwNc9DpzS1++nsKIJald+RTSmN4G3ExQTAHt/u5oAtFbnVGdJ8D
-         KPbbU0TcAULsT1WSrjZIrTsdoNBFUKAxTrm/5mydd/3yuOSIcMRmqMYpts+t5mS8FBvr
-         L3IPc4c7/510dzzd1O+2Fl4F90Sroz5T4kNKQUBzP3LRkphkcFAPHBbZa3bZgNxuigab
-         RKSNH4OmAI0H3PYCT/npB4FWKpC13QZv0S+RQ7kCflHad/AMQnoymJ5WfMneogUWQvws
-         NVfhpkrr92M9DNDJ/aMmfsRKGeAaVS3cZb16U8IVjDZ1V8JzZr7L2v8a69JtRAFSqEAY
-         8brQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754009242; x=1754614042;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hRXNszbxlUTyYnGSQYO+PKslDvhns5dMJJ1svuzzpJM=;
-        b=fLLele2KAiLNCbjJggXs3vdzIKadkB4eSVPkbsRahSPV+lYTjTITEW5fg8ngIJ4qYC
-         9HgiPnw4s2pPjnCiWtLu6CQ9nfitYwWnShcPDSQywuxsqKFGFANaRQ6pTp1Vhb+95jP7
-         E+c0nj0a5CodeveZ+S5QeFWJtyijFLhWO31JKeIuzdQos8HwBTWhvw3rSI3upH7ulnZu
-         C20LuULeEftOi1i8ystpgActZtVYAvN0czHe8bDtnYGPr6ZBCeCc1TZztwd9AGmFuURv
-         ++oJVhFbaNw9kolJ0nfv7nH6Tq4oHkzjNShGM/hQaIwdb8WhLoWoseFlsrQnjRU2ibUf
-         auGg==
-X-Forwarded-Encrypted: i=1; AJvYcCX2qPjcqkcKIxDNCo6V9ksznUe7VW/+vUWddPEn87npHib4NbiNHTJIBYbtNtpMOk/CU6c=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxd+AitnLsiWbNhaapASAzLuHEwnamu9rzSXodbI9FxZ63koqix
-	sIjpBp8AFRNozEEF7O7VaPF7ydpDXDU2WknTJUIn2tTRGG32r3yPqchRSPYVgDBgyBjWMood0wP
-	yTqQojw==
-X-Google-Smtp-Source: AGHT+IHab78F9llFKocoU6Zco0XzsmHDLGvQFwwdKJOwxALK9bUIf6goRjRbc/mZgc6P3+1lXC9qojGXeOI=
-X-Received: from pjbpd2.prod.google.com ([2002:a17:90b:1dc2:b0:312:187d:382d])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3d0a:b0:31f:42e8:a896
- with SMTP id 98e67ed59e1d1-31f5ea4ca0bmr11613681a91.34.1754009242279; Thu, 31
- Jul 2025 17:47:22 -0700 (PDT)
-Date: Thu, 31 Jul 2025 17:47:20 -0700
-In-Reply-To: <7af6dcf5-fbcd-4173-a588-38cf6c536282@zytor.com>
+	s=arc-20240116; t=1754012181; c=relaxed/simple;
+	bh=5SNsFNLVWYOZFqNAoOz9IHjAl8j+Cg/aGn2QpUZyKgA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RLiS/3nLFwQ76NLOFjIk6yIC3lAwQwFf1PPxcV3Jms6kKmZoNOClJuDk7PGD2dBf2fs7i4UaSmEcoKCBRpc2swAn4DttHhcFmq1FNeOzmyq0eiMFWQlBTPtIwBnMQCOMU9kVZ7D8TdG+JPfgaGyGU+2YczgP/i4jFzJ7SNwxi08=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=a1fJcoiR; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [192.168.7.202] ([71.202.166.45])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 5711ZkZT2441379
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Thu, 31 Jul 2025 18:35:47 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 5711ZkZT2441379
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025072201; t=1754012148;
+	bh=EgWSSRCbXkSWBQ/z1xshtc+sAmsdQQ8TiuhWS5SqWjQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=a1fJcoiRdAaGnQhMvG9bBK1PxYIUehGfoar3etETXoVw8UJRsCeCFzZZIwz0cfSAI
+	 9Y5TmH+7PQSJenuuJffwyliLOwPhRNLHdrGTeAtUNCrxvhNj9x4zjPU9HZd67yXRzk
+	 alUmQcrhpFhtWtJgnqWW2W+Gq8VNkGLHqUwrnpZuade2NPjfcc47S60YtFn669i5XF
+	 I8fwtC57UpJairG5ZDMvdc9xtIORBuiSJDOQZcTmWe9IXMXcS+Slffu5DFViUciJTr
+	 sDW9WMfbMMzNiizYfdpPFHJund1KA3lMYHI+dhW6VyriP051L1nHIqJSI1Wxsy/He6
+	 n+QR4Rmtiv2dQ==
+Message-ID: <b3774d86-5589-4b01-a633-ae28794a4cfd@zytor.com>
+Date: Thu, 31 Jul 2025 18:35:46 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250730174605.1614792-1-xin@zytor.com> <20250730174605.1614792-3-xin@zytor.com>
- <aItGzjhpfzIbG+Op@intel.com> <7af6dcf5-fbcd-4173-a588-38cf6c536282@zytor.com>
-Message-ID: <aIwOmEzLgkP-9ZDE@google.com>
-Subject: Re: [PATCH v1 2/4] KVM: x86: Introduce MSR read/write emulation helpers
-From: Sean Christopherson <seanjc@google.com>
-To: Xin Li <xin@zytor.com>
-Cc: Chao Gao <chao.gao@intel.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
-	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 2/4] KVM: x86: Introduce MSR read/write emulation
+ helpers
+To: Sean Christopherson <seanjc@google.com>
+Cc: Chao Gao <chao.gao@intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, pbonzini@redhat.com, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        x86@kernel.org, hpa@zytor.com
+References: <20250730174605.1614792-1-xin@zytor.com>
+ <20250730174605.1614792-3-xin@zytor.com> <aItGzjhpfzIbG+Op@intel.com>
+ <7af6dcf5-fbcd-4173-a588-38cf6c536282@zytor.com>
+ <aIwOmEzLgkP-9ZDE@google.com>
+Content-Language: en-US
+From: Xin Li <xin@zytor.com>
+Autocrypt: addr=xin@zytor.com; keydata=
+ xsDNBGUPz1cBDACS/9yOJGojBFPxFt0OfTWuMl0uSgpwk37uRrFPTTLw4BaxhlFL0bjs6q+0
+ 2OfG34R+a0ZCuj5c9vggUMoOLdDyA7yPVAJU0OX6lqpg6z/kyQg3t4jvajG6aCgwSDx5Kzg5
+ Rj3AXl8k2wb0jdqRB4RvaOPFiHNGgXCs5Pkux/qr0laeFIpzMKMootGa4kfURgPhRzUaM1vy
+ bsMsL8vpJtGUmitrSqe5dVNBH00whLtPFM7IbzKURPUOkRRiusFAsw0a1ztCgoFczq6VfAVu
+ raTye0L/VXwZd+aGi401V2tLsAHxxckRi9p3mc0jExPc60joK+aZPy6amwSCy5kAJ/AboYtY
+ VmKIGKx1yx8POy6m+1lZ8C0q9b8eJ8kWPAR78PgT37FQWKYS1uAroG2wLdK7FiIEpPhCD+zH
+ wlslo2ETbdKjrLIPNehQCOWrT32k8vFNEMLP5G/mmjfNj5sEf3IOKgMTMVl9AFjsINLHcxEQ
+ 6T8nGbX/n3msP6A36FDfdSEAEQEAAc0WWGluIExpIDx4aW5Aenl0b3IuY29tPsLBDQQTAQgA
+ NxYhBIUq/WFSDTiOvUIqv2u9DlcdrjdRBQJlD89XBQkFo5qAAhsDBAsJCAcFFQgJCgsFFgID
+ AQAACgkQa70OVx2uN1HUpgv/cM2fsFCQodLArMTX5nt9yqAWgA5t1srri6EgS8W3F+3Kitge
+ tYTBKu6j5BXuXaX3vyfCm+zajDJN77JHuYnpcKKr13VcZi1Swv6Jx1u0II8DOmoDYLb1Q2ZW
+ v83W55fOWJ2g72x/UjVJBQ0sVjAngazU3ckc0TeNQlkcpSVGa/qBIHLfZraWtdrNAQT4A1fa
+ sWGuJrChBFhtKbYXbUCu9AoYmmbQnsx2EWoJy3h7OjtfFapJbPZql+no5AJ3Mk9eE5oWyLH+
+ QWqtOeJM7kKvn/dBudokFSNhDUw06e7EoVPSJyUIMbYtUO7g2+Atu44G/EPP0yV0J4lRO6EA
+ wYRXff7+I1jIWEHpj5EFVYO6SmBg7zF2illHEW31JAPtdDLDHYcZDfS41caEKOQIPsdzQkaQ
+ oW2hchcjcMPAfyhhRzUpVHLPxLCetP8vrVhTvnaZUo0xaVYb3+wjP+D5j/3+hwblu2agPsaE
+ vgVbZ8Fx3TUxUPCAdr/p73DGg57oHjgezsDNBGUPz1gBDAD4Mg7hMFRQqlzotcNSxatlAQNL
+ MadLfUTFz8wUUa21LPLrHBkUwm8RujehJrzcVbPYwPXIO0uyL/F///CogMNx7Iwo6by43KOy
+ g89wVFhyy237EY76j1lVfLzcMYmjBoTH95fJC/lVb5Whxil6KjSN/R/y3jfG1dPXfwAuZ/4N
+ cMoOslWkfZKJeEut5aZTRepKKF54T5r49H9F7OFLyxrC/uI9UDttWqMxcWyCkHh0v1Di8176
+ jjYRNTrGEfYfGxSp+3jYL3PoNceIMkqM9haXjjGl0W1B4BidK1LVYBNov0rTEzyr0a1riUrp
+ Qk+6z/LHxCM9lFFXnqH7KWeToTOPQebD2B/Ah5CZlft41i8L6LOF/LCuDBuYlu/fI2nuCc8d
+ m4wwtkou1Y/kIwbEsE/6RQwRXUZhzO6llfoN96Fczr/RwvPIK5SVMixqWq4QGFAyK0m/1ap4
+ bhIRrdCLVQcgU4glo17vqfEaRcTW5SgX+pGs4KIPPBE5J/ABD6pBnUUAEQEAAcLA/AQYAQgA
+ JhYhBIUq/WFSDTiOvUIqv2u9DlcdrjdRBQJlD89ZBQkFo5qAAhsMAAoJEGu9DlcdrjdR4C0L
+ /RcjolEjoZW8VsyxWtXazQPnaRvzZ4vhmGOsCPr2BPtMlSwDzTlri8BBG1/3t/DNK4JLuwEj
+ OAIE3fkkm+UG4Kjud6aNeraDI52DRVCSx6xff3bjmJsJJMb12mWglN6LjdF6K+PE+OTJUh2F
+ dOhslN5C2kgl0dvUuevwMgQF3IljLmi/6APKYJHjkJpu1E6luZec/lRbetHuNFtbh3xgFIJx
+ 2RpgVDP4xB3f8r0I+y6ua+p7fgOjDLyoFjubRGed0Be45JJQEn7A3CSb6Xu7NYobnxfkwAGZ
+ Q81a2XtvNS7Aj6NWVoOQB5KbM4yosO5+Me1V1SkX2jlnn26JPEvbV3KRFcwV5RnDxm4OQTSk
+ PYbAkjBbm+tuJ/Sm+5Yp5T/BnKz21FoCS8uvTiziHj2H7Cuekn6F8EYhegONm+RVg3vikOpn
+ gao85i4HwQTK9/D1wgJIQkdwWXVMZ6q/OALaBp82vQ2U9sjTyFXgDjglgh00VRAHP7u1Rcu4
+ l75w1xInsg==
+In-Reply-To: <aIwOmEzLgkP-9ZDE@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jul 31, 2025, Xin Li wrote:
-> On 7/31/2025 3:34 AM, Chao Gao wrote:
-> > > -fastpath_t handle_fastpath_set_msr_irqoff(struct kvm_vcpu *vcpu)
-> > > +static fastpath_t handle_set_msr_irqoff(struct kvm_vcpu *vcpu, u32 msr, int reg)
-> > 
-> > How about __handle_fastpath_set_msr_irqoff()? It's better to keep
-> > "fastpath" in the function name to convey that this function is for
-> > fastpath only.
+>>>> +
+>>>> 		handled = !handle_fastpath_set_x2apic_icr_irqoff(vcpu, data);
+>>>> 		break;
+>>>> 	case MSR_IA32_TSC_DEADLINE:
+>>>> -		data = kvm_read_edx_eax(vcpu);
+>>>> +		if (reg == VCPU_EXREG_EDX_EAX)
+>>>> +			data = kvm_read_edx_eax(vcpu);
+>>>> +		else
+>>>> +			data = kvm_register_read(vcpu, reg);
+>>>> +
+>>>
+>>> Hoist this chunk out of the switch clause to avoid duplication.
+>>
+>> I thought about it, but didn't do so because the original code doesn't read
+>> the MSR data from registers when a MSR is not being handled in the
+>> fast path, which saves some cycles in most cases.
 > 
-> This is now a static function with return type fastpath_t, so I guess
-> it's okay to remove fastpath from its name (It looks that Sean prefers
-> shorter function names if they contains enough information).
+> Can you hold off on doing anything with this series?  Mostly to save your time.
+
+Sure.
+
 > 
-> But if the protocol is to have "fastpath" in all fast path function
-> names, I can change it.
-
-I'm also greedy and want it both ways :-)
-
-Spoiler alert, this is what I ended up with (completely untested at this point):
-
-static fastpath_t __handle_fastpath_wrmsr(struct kvm_vcpu *vcpu, u32 msr,
-					  u64 data)
-
-	switch (msr) {
-	case APIC_BASE_MSR + (APIC_ICR >> 4):
-		if (!lapic_in_kernel(vcpu) || !apic_x2apic_mode(vcpu->arch.apic) ||
-		    kvm_x2apic_icr_write_fast(vcpu->arch.apic, data))
-			return EXIT_FASTPATH_NONE;
-		break;
-	case MSR_IA32_TSC_DEADLINE:
-		if (!kvm_can_use_hv_timer(vcpu))
-			return EXIT_FASTPATH_NONE;
-
-		kvm_set_lapic_tscdeadline_msr(vcpu, data);
-		break;
-	default:
-		return EXIT_FASTPATH_NONE;
-	}
-
-	trace_kvm_msr_write(msr, data);
-
-	if (!kvm_skip_emulated_instruction(vcpu))
-		return EXIT_FASTPATH_EXIT_USERSPACE;
-
-	return EXIT_FASTPATH_REENTER_GUEST;
-}
-
-fastpath_t handle_fastpath_wrmsr(struct kvm_vcpu *vcpu)
-{
-	return __handle_fastpath_wrmsr(vcpu, kvm_rcx_read(vcpu),
-				       kvm_read_edx_eax(vcpu));
-}
-EXPORT_SYMBOL_GPL(handle_fastpath_set_msr_irqoff);
-
-fastpath_t handle_fastpath_wrmsr_imm(struct kvm_vcpu *vcpu, u32 msr, int reg)
-{
-	return __handle_fastpath_wrmsr(vcpu, msr, kvm_register_read(vcpu, reg));
-}
-EXPORT_SYMBOL_GPL(handle_fastpath_set_msr_imm_irqoff);
-
-
-> > > {
-> > > -	u32 msr = kvm_rcx_read(vcpu);
-> > > 	u64 data;
-> > > 	fastpath_t ret;
-> > > 	bool handled;
-> > > @@ -2174,11 +2190,19 @@ fastpath_t handle_fastpath_set_msr_irqoff(struct kvm_vcpu *vcpu)
-> > > 
-> > > 	switch (msr) {
-> > > 	case APIC_BASE_MSR + (APIC_ICR >> 4):
-> > > -		data = kvm_read_edx_eax(vcpu);
-> > > +		if (reg == VCPU_EXREG_EDX_EAX)
-> > > +			data = kvm_read_edx_eax(vcpu);
-> > > +		else
-> > > +			data = kvm_register_read(vcpu, reg);
-> > 
-> > ...
-> > 
-> > > +
-> > > 		handled = !handle_fastpath_set_x2apic_icr_irqoff(vcpu, data);
-> > > 		break;
-> > > 	case MSR_IA32_TSC_DEADLINE:
-> > > -		data = kvm_read_edx_eax(vcpu);
-> > > +		if (reg == VCPU_EXREG_EDX_EAX)
-> > > +			data = kvm_read_edx_eax(vcpu);
-> > > +		else
-> > > +			data = kvm_register_read(vcpu, reg);
-> > > +
-> > 
-> > Hoist this chunk out of the switch clause to avoid duplication.
+> Long story short, I unexpectedly dove into the fastpath code this week while sorting
+> out an issue with the mediated PMU series, and I ended up with a series of patches
+> to clean things up for both the mediated PMU series and for this series.
 > 
-> I thought about it, but didn't do so because the original code doesn't read
-> the MSR data from registers when a MSR is not being handled in the
-> fast path, which saves some cycles in most cases.
+> With luck, I'll get the cleanups, the mediated PMU series, and a v2 of this series
+> posted tomorrow (I also have some feedback on VCPU_EXREG_EDX_EAX; we can avoid it
+> entirely without much fuss).
+> 
 
-Can you hold off on doing anything with this series?  Mostly to save your time.
-
-Long story short, I unexpectedly dove into the fastpath code this week while sorting
-out an issue with the mediated PMU series, and I ended up with a series of patches
-to clean things up for both the mediated PMU series and for this series.
-
-With luck, I'll get the cleanups, the mediated PMU series, and a v2 of this series
-posted tomorrow (I also have some feedback on VCPU_EXREG_EDX_EAX; we can avoid it
-entirely without much fuss).
+Will wait and take a look when you post them.
 
 
