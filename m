@@ -1,143 +1,275 @@
-Return-Path: <kvm+bounces-53821-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53822-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA4D7B17ADF
-	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 03:36:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABA9FB17B07
+	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 03:57:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EF5667AEF55
-	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 01:35:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 01CEE1AA54F3
+	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 01:57:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2A2778F5D;
-	Fri,  1 Aug 2025 01:36:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CB2715442C;
+	Fri,  1 Aug 2025 01:56:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="a1fJcoiR"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="a0ceuMaI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47B0923AD;
-	Fri,  1 Aug 2025 01:36:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F61E13AD05
+	for <kvm@vger.kernel.org>; Fri,  1 Aug 2025 01:56:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754012181; cv=none; b=U3dPGYVo14h6/Cm6cRHp9KE61r4Vz1bPvQdHqiXp1c3GllFxq16H7zkoTRWaGZRiQ1x9PfhQ2RaVwgasFUJTA2ih6Jr+10vLIWd9JEmcfr7qdOeQWcphEe6HPCeyetNV4uSU2Jssvo3nvJyi5Axm6lDINFazpA5EcKREj3AWuzs=
+	t=1754013413; cv=none; b=AH5h/sT+vlyw8zNW0AsxO6s2Vhlv5uVpOxHK+FCqbppfx9HslVW2hVBOfR8du91zcmEQ7hO8xw5XB3zr6cVExZukooj2KBiFBQvr569+Ls7EzXPi4CEVFVdnSPO5VYZeao+bwzYVSgyrgqT4pLhvc7/7kcmTQ7pDgW0yP4C43GI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754012181; c=relaxed/simple;
-	bh=5SNsFNLVWYOZFqNAoOz9IHjAl8j+Cg/aGn2QpUZyKgA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RLiS/3nLFwQ76NLOFjIk6yIC3lAwQwFf1PPxcV3Jms6kKmZoNOClJuDk7PGD2dBf2fs7i4UaSmEcoKCBRpc2swAn4DttHhcFmq1FNeOzmyq0eiMFWQlBTPtIwBnMQCOMU9kVZ7D8TdG+JPfgaGyGU+2YczgP/i4jFzJ7SNwxi08=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=a1fJcoiR; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [192.168.7.202] ([71.202.166.45])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 5711ZkZT2441379
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Thu, 31 Jul 2025 18:35:47 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 5711ZkZT2441379
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025072201; t=1754012148;
-	bh=EgWSSRCbXkSWBQ/z1xshtc+sAmsdQQ8TiuhWS5SqWjQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=a1fJcoiRdAaGnQhMvG9bBK1PxYIUehGfoar3etETXoVw8UJRsCeCFzZZIwz0cfSAI
-	 9Y5TmH+7PQSJenuuJffwyliLOwPhRNLHdrGTeAtUNCrxvhNj9x4zjPU9HZd67yXRzk
-	 alUmQcrhpFhtWtJgnqWW2W+Gq8VNkGLHqUwrnpZuade2NPjfcc47S60YtFn669i5XF
-	 I8fwtC57UpJairG5ZDMvdc9xtIORBuiSJDOQZcTmWe9IXMXcS+Slffu5DFViUciJTr
-	 sDW9WMfbMMzNiizYfdpPFHJund1KA3lMYHI+dhW6VyriP051L1nHIqJSI1Wxsy/He6
-	 n+QR4Rmtiv2dQ==
-Message-ID: <b3774d86-5589-4b01-a633-ae28794a4cfd@zytor.com>
-Date: Thu, 31 Jul 2025 18:35:46 -0700
+	s=arc-20240116; t=1754013413; c=relaxed/simple;
+	bh=1Iwn17Dg8kD3l6fB8LK+OZD/CwFCIbknU2KW6H2btN0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=keMSPv638Stc4JePEENay40CFQmPXsUsoHb1PQOciqSLhhh+3jYLf+sP+XTkgG86HMXSCe4yYQzhYGJ/DORtBtyEwju/cMOhvCHpyySrrYzSt3X0S/rF7IUSyvUag1DXu5kuiIQYMct6j4rAkY72+9tlFX16OrEe4Ztdin53tOo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=a0ceuMaI; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-24070ef9e2eso79065ad.0
+        for <kvm@vger.kernel.org>; Thu, 31 Jul 2025 18:56:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1754013411; x=1754618211; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=73dgZbebrLU8zYg1FAZPFQA33fxb43EZn3LSBSzNaM8=;
+        b=a0ceuMaItdqBARIQmz7q/3FE3NnZkgPIISmPWk9+P2xXfxX4ZesFQmayeBqThOLB57
+         ToOUsS/tAjARlsOSow7Ea2fJ3lm5Y0AuRK3rbOEiDg03mt1tAK+8TqjcOqPB/xa84YT2
+         f9kzJHvfAMGHmiTgp2zE2Md/loJLzukOuqvyKNFSCzgj5i3RJC02NtletSWSvxCMVGTJ
+         +LkXHjxW1938QyUs6EJZASi2SiJs3/AmBoR0ZgHIAnLstPWtD7Dh+tn0VBI0i81161uf
+         LANTaTGFaPdmMK+iC58/juru6R38VqxeTsQqaCB1IVi20BW0fQ1PgqiHFGK62eCGT4PT
+         r2aQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754013411; x=1754618211;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=73dgZbebrLU8zYg1FAZPFQA33fxb43EZn3LSBSzNaM8=;
+        b=Db4AGYHrfCx2jslsoxD026kKatM/mdgEjukNYwIjHkiim1ZdqkJhZfwC0llmscDBjZ
+         pbdK2NBeX61twHdiyciyGaakiCAAV1z+mw4EpGpcCIOXr57dWAGVy7HuimL2xEABUQJb
+         j/9ZmLq9CL/33YRoxu+3EmsNKdZuUIxjblliTDhk4NTx9916K/7+R/6D8D6/SfYBxQrA
+         BlHDhX1GvDnZPg0eaShzrIW0UZT0gygDW+iOLjilCfHpBXFQC6TW0iIQSynd6Jixrtdl
+         xdajhxFV3nE4EqfNOi7gwj+rvPUvFwdCVgGjgR1szUCCUqnbXQjKBV1tADBVM1QFFHwJ
+         wu1g==
+X-Gm-Message-State: AOJu0YzwbdTfql23uMKnwBe7ghVGy9X5oI6slTaElOBXtJhgZ6bXUGcP
+	E7HPGVxB6J1GU4KhpgmbWcle01XDo2J5GkSlpzfCYS/I1VIZ9goHIQsr3DHqONxsKH63El+LGHN
+	l1n3KzgyGktjat11SzGM/XZY1XPh8H6XsQTmJghFc
+X-Gm-Gg: ASbGnctKO5zdrP02jMqpDdt83SybrWieJk8Wh3Vj9RsnhfEQOKOICDOY74/fqfYp2uw
+	x1IH9SlJsnKie0uuLusi/AH5fqRv73q/rR/v720eogHllcaiKvCMFm059p2W45Gqcoxtjh1CVSz
+	AiXEt4Uo+TQ2pLy15I8d8YkA1zlpczRhmk7m4XEPxqsrTf6R5teYk9C/FkVI+xgEoHNPY2mqgJA
+	gesR3L9jNgXCm4/HxFIIAFONRjdTl6y3+tDTg==
+X-Google-Smtp-Source: AGHT+IGvZgypmLXLSq3N1f77JjImJFtH643iQZJ6JC8/AqrHkOHoDRMIuJnZGr/f0hMyS1/ZxzAo17cEHgxEVEja0es=
+X-Received: by 2002:a17:902:d490:b0:240:48f4:40fd with SMTP id
+ d9443c01a7336-2422a435a05mr1308475ad.19.1754013410954; Thu, 31 Jul 2025
+ 18:56:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 2/4] KVM: x86: Introduce MSR read/write emulation
- helpers
-To: Sean Christopherson <seanjc@google.com>
-Cc: Chao Gao <chao.gao@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, pbonzini@redhat.com, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        x86@kernel.org, hpa@zytor.com
-References: <20250730174605.1614792-1-xin@zytor.com>
- <20250730174605.1614792-3-xin@zytor.com> <aItGzjhpfzIbG+Op@intel.com>
- <7af6dcf5-fbcd-4173-a588-38cf6c536282@zytor.com>
- <aIwOmEzLgkP-9ZDE@google.com>
-Content-Language: en-US
-From: Xin Li <xin@zytor.com>
-Autocrypt: addr=xin@zytor.com; keydata=
- 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
- l75w1xInsg==
-In-Reply-To: <aIwOmEzLgkP-9ZDE@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250611104844.245235-1-steven.price@arm.com> <20250611104844.245235-20-steven.price@arm.com>
+In-Reply-To: <20250611104844.245235-20-steven.price@arm.com>
+From: Vishal Annapurve <vannapurve@google.com>
+Date: Thu, 31 Jul 2025 18:56:38 -0700
+X-Gm-Features: Ac12FXzyEE-6rAkSbBh6dTxzQhEIIz_vo5j0_DPiuqgwWpPvKvjM24zs36qca7o
+Message-ID: <CAGtprH-on3JdsHx-DyjN_z_5Z6HJoSQjJpA5o5_V6=rygMSbtQ@mail.gmail.com>
+Subject: Re: [PATCH v9 19/43] arm64: RME: Allow populating initial contents
+To: Steven Price <steven.price@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, 
+	James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
+	Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev, 
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, Gavin Shan <gshan@redhat.com>, 
+	Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun <alpergun@google.com>, 
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
->>>> +
->>>> 		handled = !handle_fastpath_set_x2apic_icr_irqoff(vcpu, data);
->>>> 		break;
->>>> 	case MSR_IA32_TSC_DEADLINE:
->>>> -		data = kvm_read_edx_eax(vcpu);
->>>> +		if (reg == VCPU_EXREG_EDX_EAX)
->>>> +			data = kvm_read_edx_eax(vcpu);
->>>> +		else
->>>> +			data = kvm_register_read(vcpu, reg);
->>>> +
->>>
->>> Hoist this chunk out of the switch clause to avoid duplication.
->>
->> I thought about it, but didn't do so because the original code doesn't read
->> the MSR data from registers when a MSR is not being handled in the
->> fast path, which saves some cycles in most cases.
-> 
-> Can you hold off on doing anything with this series?  Mostly to save your time.
+On Wed, Jun 11, 2025 at 3:59=E2=80=AFAM Steven Price <steven.price@arm.com>=
+ wrote:
+>
+> +static int realm_create_protected_data_page(struct realm *realm,
+> +                                           unsigned long ipa,
+> +                                           kvm_pfn_t dst_pfn,
+> +                                           kvm_pfn_t src_pfn,
+> +                                           unsigned long flags)
+> +{
+> +       unsigned long rd =3D virt_to_phys(realm->rd);
+> +       phys_addr_t dst_phys, src_phys;
+> +       bool undelegate_failed =3D false;
+> +       int ret, offset;
+> +
+> +       dst_phys =3D __pfn_to_phys(dst_pfn);
+> +       src_phys =3D __pfn_to_phys(src_pfn);
+> +
+> +       for (offset =3D 0; offset < PAGE_SIZE; offset +=3D RMM_PAGE_SIZE)=
+ {
+> +               ret =3D realm_create_protected_data_granule(realm,
+> +                                                         ipa,
+> +                                                         dst_phys,
+> +                                                         src_phys,
+> +                                                         flags);
+> +               if (ret)
+> +                       goto err;
+> +
+> +               ipa +=3D RMM_PAGE_SIZE;
+> +               dst_phys +=3D RMM_PAGE_SIZE;
+> +               src_phys +=3D RMM_PAGE_SIZE;
+> +       }
+> +
+> +       return 0;
+> +
+> +err:
+> +       if (ret =3D=3D -EIO) {
+> +               /* current offset needs undelegating */
+> +               if (WARN_ON(rmi_granule_undelegate(dst_phys)))
+> +                       undelegate_failed =3D true;
+> +       }
+> +       while (offset > 0) {
+> +               ipa -=3D RMM_PAGE_SIZE;
+> +               offset -=3D RMM_PAGE_SIZE;
+> +               dst_phys -=3D RMM_PAGE_SIZE;
+> +
+> +               rmi_data_destroy(rd, ipa, NULL, NULL);
+> +
+> +               if (WARN_ON(rmi_granule_undelegate(dst_phys)))
+> +                       undelegate_failed =3D true;
+> +       }
+> +
+> +       if (undelegate_failed) {
+> +               /*
+> +                * A granule could not be undelegated,
+> +                * so the page has to be leaked
+> +                */
+> +               get_page(pfn_to_page(dst_pfn));
 
-Sure.
+I would like to point out that the support for in-place conversion
+with guest_memfd using hugetlb pages [1] is under discussion.
 
-> 
-> Long story short, I unexpectedly dove into the fastpath code this week while sorting
-> out an issue with the mediated PMU series, and I ended up with a series of patches
-> to clean things up for both the mediated PMU series and for this series.
-> 
-> With luck, I'll get the cleanups, the mediated PMU series, and a v2 of this series
-> posted tomorrow (I also have some feedback on VCPU_EXREG_EDX_EAX; we can avoid it
-> entirely without much fuss).
-> 
+As part of the in-place conversion, the policy we are routing for is
+to avoid any "refcounts" from KVM on folios supplied by guest_memfd as
+in-place conversion works by splitting and merging folios during
+memory conversion as per discussion at LPC [2].
 
-Will wait and take a look when you post them.
+The best way to avoid further use of this page with huge page support
+around would be either:
+1) Explicitly Inform guest_memfd of a particular pfn being in use by
+KVM without relying on page refcounts or
+2) Set the page as hwpoisoned. (Needs further discussion)
 
+This page refcounting strategy will have to be revisited depending on
+which series lands first. That being said, it would be great if ARM
+could review/verify if the series [1] works for backing CCA VMs with
+huge pages.
+
+[1] https://lore.kernel.org/kvm/cover.1747264138.git.ackerleytng@google.com=
+/
+[2] https://lpc.events/event/18/contributions/1764/
+
+> +       }
+> +
+> +       return -ENXIO;
+> +}
+> +
+> +static int populate_region(struct kvm *kvm,
+> +                          phys_addr_t ipa_base,
+> +                          phys_addr_t ipa_end,
+> +                          unsigned long data_flags)
+> +{
+> +       struct realm *realm =3D &kvm->arch.realm;
+> +       struct kvm_memory_slot *memslot;
+> +       gfn_t base_gfn, end_gfn;
+> +       int idx;
+> +       phys_addr_t ipa =3D ipa_base;
+> +       int ret =3D 0;
+> +
+> +       base_gfn =3D gpa_to_gfn(ipa_base);
+> +       end_gfn =3D gpa_to_gfn(ipa_end);
+> +
+> +       idx =3D srcu_read_lock(&kvm->srcu);
+> +       memslot =3D gfn_to_memslot(kvm, base_gfn);
+> +       if (!memslot) {
+> +               ret =3D -EFAULT;
+> +               goto out;
+> +       }
+> +
+> +       /* We require the region to be contained within a single memslot =
+*/
+> +       if (memslot->base_gfn + memslot->npages < end_gfn) {
+> +               ret =3D -EINVAL;
+> +               goto out;
+> +       }
+> +
+> +       if (!kvm_slot_can_be_private(memslot)) {
+> +               ret =3D -EPERM;
+> +               goto out;
+> +       }
+> +
+> +       while (ipa < ipa_end) {
+> +               struct vm_area_struct *vma;
+> +               unsigned long hva;
+> +               struct page *page;
+> +               bool writeable;
+> +               kvm_pfn_t pfn;
+> +               kvm_pfn_t priv_pfn;
+> +               struct page *gmem_page;
+> +
+> +               hva =3D gfn_to_hva_memslot(memslot, gpa_to_gfn(ipa));
+> +               vma =3D vma_lookup(current->mm, hva);
+> +               if (!vma) {
+> +                       ret =3D -EFAULT;
+> +                       break;
+> +               }
+> +
+> +               pfn =3D __kvm_faultin_pfn(memslot, gpa_to_gfn(ipa), FOLL_=
+WRITE,
+> +                                       &writeable, &page);
+
+Is this assuming double backing of guest memory ranges? Is this logic
+trying to simulate a shared fault?
+
+Does memory population work with CCA if priv_pfn and pfn are the same?
+I am curious how the memory population will work with in-place
+conversion support available for guest_memfd files.
+
+> +
+> +               if (is_error_pfn(pfn)) {
+> +                       ret =3D -EFAULT;
+> +                       break;
+> +               }
+> +
+> +               ret =3D kvm_gmem_get_pfn(kvm, memslot,
+> +                                      ipa >> PAGE_SHIFT,
+> +                                      &priv_pfn, &gmem_page, NULL);
+> +               if (ret)
+> +                       break;
+> +
+> +               ret =3D realm_create_protected_data_page(realm, ipa,
+> +                                                      priv_pfn,
+> +                                                      pfn,
+> +                                                      data_flags);
+> +
+> +               kvm_release_page_clean(page);
+> +
+> +               if (ret)
+> +                       break;
+> +
+> +               ipa +=3D PAGE_SIZE;
+> +       }
+> +
+> +out:
+> +       srcu_read_unlock(&kvm->srcu, idx);
+> +       return ret;
+> +}
+> +
 
