@@ -1,236 +1,355 @@
-Return-Path: <kvm+bounces-53828-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53829-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C05CAB17E4F
-	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 10:31:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DCACB17F65
+	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 11:34:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D344B565CC6
-	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 08:31:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 190F5A83D50
+	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 09:34:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E45DB21E097;
-	Fri,  1 Aug 2025 08:31:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A575233736;
+	Fri,  1 Aug 2025 09:33:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eFcZHkdc"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="3HfPrbpx"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2046.outbound.protection.outlook.com [40.107.92.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88EAB1FA859;
-	Fri,  1 Aug 2025 08:31:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BD68231856;
+	Fri,  1 Aug 2025 09:33:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.46
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754037078; cv=fail; b=kduAjHHnV/kRY/+E0x5pJs9eZ/x7LU2uDmEg7ftvWCdsqU6lDC7tOsKVyn+pw6b5SNlMohl82jbnX596qzolu+biIrcO865F0MTThxXbpx0jkRv8dU9dKGPGT2hqgixEGcVFBaup+ZL1NaFhNFFTklutkUUChywZT88znbyRSfg=
+	t=1754040800; cv=fail; b=OZrwzBoJLBSoFNyFrCvgarn+UABa652nq+lrvS8SU8bmcQP9JB/j2Mxfq1Yr7R1pXCiLBDQW2mHl0cc9qimE68/YUnDSsCVwAm9pUbECDDMVnrQKGvR4agpZT30w/gwBQBzX1fJubBqbxqDYivPnivPwPrY0jmXK1NQzFgsc4JY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754037078; c=relaxed/simple;
-	bh=BrPY3SkrxtkqnlPR1CYwPTYoCShVALatcTYRWtYhbmY=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=Hs7PyVw2DdhtdVx9bqx2Vr4I59xwrX/ObTWfLOxb2wnvaUIunQAAD/7bwmliCa+ExgMyOvSlcCbCrWEs0BL8QiyF7zipdnsfLkgmzqDQF2phpeuB3vuMDA3Uq9aStWsNyGOBQLWhjlUeaUztca4nZccEg9hmI4jUMXzV47Xjt+g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eFcZHkdc; arc=fail smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1754037076; x=1785573076;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=BrPY3SkrxtkqnlPR1CYwPTYoCShVALatcTYRWtYhbmY=;
-  b=eFcZHkdcDBHppGWg2y6V2VJu53ynV4bfXwofK58dOfYPsjOd+9uFXa1Y
-   JbSe+tIqrT2US1IQcgMpyxwApsM3FqizAEu1VnnfLLq59R0x8nF3VQ6Wv
-   YQEAyhVuStyHAETjdp8c1FF7wpzLLe+HqtLxQi0qrN9BlMXg2u3T8Bycf
-   /g2cRmPGh0IQcBDe9Sl2+dJZz7qxs/oq7KEe0V00GqP2N3D27hWNyjVFq
-   aNmLk7QatmPcZZGTxAa8Szcby2BSARLIyCZX2tWUHeSPPaQXYD1iTcV8k
-   xQGOdk3IHmRFYpq9mmuANRArxjdAuYBHYQfS9z3AWmENbpA8ciGv/gk1g
-   Q==;
-X-CSE-ConnectionGUID: KvDIeKDlQMGDZcAuIkmwLg==
-X-CSE-MsgGUID: Ckav9eM5SbKdG4g+s6KsKA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11508"; a="66647914"
-X-IronPort-AV: E=Sophos;i="6.17,255,1747724400"; 
-   d="scan'208";a="66647914"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2025 01:31:16 -0700
-X-CSE-ConnectionGUID: 0cxzPqDqSB+EQ+Q1pMpqHg==
-X-CSE-MsgGUID: n0V0RrkhTvyxAG424wZREw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,255,1747724400"; 
-   d="scan'208";a="162784282"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by orviesa006.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2025 01:31:16 -0700
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26; Fri, 1 Aug 2025 01:31:15 -0700
-Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26 via Frontend Transport; Fri, 1 Aug 2025 01:31:15 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (40.107.94.51) by
- edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Fri, 1 Aug 2025 01:31:15 -0700
+	s=arc-20240116; t=1754040800; c=relaxed/simple;
+	bh=Wh1yqcs3ZhFiZjuvB2hjB1t3WdowtuzYCejMrgV7o5A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=N2NZKzZmJOx47tMYqzSJITKY8/QoDnJ90nKhIhwqx/pewhelwNnHbrBsZ9IGepIAeyT8v/k6K39YO6VKTIcha6dtfShIgwrHIBBahiK2Ew+D8jsEy3ZotS86M6JRWTghzkji+pWmevdw9GNRnMv8Sz/heypN0bAaFGhCM1IXi+Y=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=3HfPrbpx; arc=fail smtp.client-ip=40.107.92.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=N3HDIxrdwpEKxoRGRKvRycmsNnKyguFPvRNfT9QYST0vCYaiIUGmitsS8YnOQQLF6AO6lW7VtWTzbhjCC4/CynIh15CYaylp31+mVP4h0q/Qg7HA+K0RiS1pBY76tdjkSumTpOacRIsOpdwQ6Dj39iSywO11zYWoEYq1TYPoVlRsZlyPu2UMaKD0kkk9wNOVfdkZsL1GC2Kdg03Sn2CMSyG+8u9zapDXsYk8t7t6kYaQdb3W1DCbQQNTaus02dG0E789F+h1JC2pTmr/NwFNkp7n4fvYKcQTiKJK8yukG8nfFNT+xAl0lGlnj9y9PAPKggcfXq5N7SjenxBIWjBQtw==
+ b=ngwVmWQN1ndjkmT8cnF/Fg0vDrSzkjE3hZ9tYZRExde55ybdAnEHWUYJOljgOGjbe2ecbtD2U58Dbb5WkK/U8AniLGXmRRXjbQJRjDGDkpT3PHJmcqdHa3o5SzCxYCKkDsn4DLLnjvzR/9ZpeFWyyfvJeI7GDjpiYV2xKvRHrj/aCHR3jkh474J5NvXlD6WvPoiVHIThP6EjnOZZ3ZzqVaxeL2p9diYLuiaNHhhmhT+uoG8HP5B8Q88H+mnnDlXF5pOcfZxkYzfUMh1CfBiAevcXPqzsBzNFiUYoxowrj3u+QcsBrj3OJcbHhhuuiHTxFvOeoz2+4qYFhZx8BkiWug==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=FAyDYVXu22a5erLK7mfdUQKzTiTb4xUXZJYuM3RpnIQ=;
- b=mvW6qwlx21YTJ9Kts4Yj85a5XqQ9dAHroSlYTVTkBsJVLsVjfPbnzbvEmp1pLPb8aul8gF3jpDf7mOcTowzyFNwOPOCCfo2OjfgWy4e3sDnxS4+QH7kQlGdXgAug1m5xhC+NxJIIzgw7B3kuwGYMSuE7AWBqe3It3iazIzUrjmQCs0wiBtO41v3SAJIfqfO/IrwHRF/CsGQWyzgFChSd0u/X2Cef4fkwD6zMQG/y0P/B6OYMt1BUsy4f2YfAH/M5h8drUp8vp7obNI7h/+AVoksE5Ts2iFw13Ex/IM6uszA4J1Cw+F6M5XuzzAh4qPfLnqhADj3YxYaZ0eB54c3S9g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
- by SN7PR11MB7540.namprd11.prod.outlook.com (2603:10b6:806:340::7) with
+ bh=Vf1muetZ2fAmDm2VuEcVYsMLtvwmn7pxUuosq04nEyc=;
+ b=kZhDUZU4i4zJuewmTCbmtKSEiW2RDgMl/E6xZ4bBGWGur+9lzRti3wijU10wLy/SQ4KfR6EdrEI7nGuzDlQOURqDXJiBCW/Gdietn2UXE4eRtgfhEyuem1QdQ0UgxtNZ4o8k5jWVqEDnUp+n8ehnpEJVj5nxKKkU//nIT26U8ZM40w7YogyJF30pVGTHwCPhubX6H0OwYtiQxZ8ntrUU7gnOkrVxIwRXIwYEN19h/irPy3QZ4tJ0475KERhbOOaqHm2ZAsQQrv6a63KM1KGiVAqMpcAhkkEJTNh64aIMgKD4/Ebg7qpNDKFDbss9vz8e//nkRAKq2oLrPLT3RSovIw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=linux.intel.com smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Vf1muetZ2fAmDm2VuEcVYsMLtvwmn7pxUuosq04nEyc=;
+ b=3HfPrbpxCsZl8Kyy3siZCOKmczHrNW0EIvHY3QtNFCel2KabgQ/huN3DfNFNql7oR3m+VspXZdM0R6w6Fd1WKuxEq/W651CQnVFOKl+udAc4p3qal0fPTMbH4+VeOoq5/mFCr4goTfKTYFAQvCk+vDE6KPH9NEwpjZ8aSt3PeYA=
+Received: from MW4PR03CA0178.namprd03.prod.outlook.com (2603:10b6:303:8d::33)
+ by DM4PR12MB6231.namprd12.prod.outlook.com (2603:10b6:8:a6::18) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8989.14; Fri, 1 Aug
- 2025 08:31:12 +0000
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::cfad:add4:daad:fb9b]) by CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::cfad:add4:daad:fb9b%4]) with mapi id 15.20.8989.013; Fri, 1 Aug 2025
- 08:31:12 +0000
-Date: Fri, 1 Aug 2025 16:30:58 +0800
-From: Chao Gao <chao.gao@intel.com>
-To: Kai Huang <kai.huang@intel.com>
-CC: <dave.hansen@intel.com>, <bp@alien8.de>, <tglx@linutronix.de>,
-	<peterz@infradead.org>, <mingo@redhat.com>, <hpa@zytor.com>,
-	<thomas.lendacky@amd.com>, <x86@kernel.org>, <kas@kernel.org>,
-	<rick.p.edgecombe@intel.com>, <dwmw@amazon.co.uk>,
-	<linux-kernel@vger.kernel.org>, <pbonzini@redhat.com>, <seanjc@google.com>,
-	<kvm@vger.kernel.org>, <reinette.chatre@intel.com>,
-	<isaku.yamahata@intel.com>, <dan.j.williams@intel.com>,
-	<ashish.kalra@amd.com>, <nik.borisov@suse.com>, <sagis@google.com>, "Farrah
- Chen" <farrah.chen@intel.com>, Binbin Wu <binbin.wu@linux.intel.com>
-Subject: Re: [PATCH v5 7/7] KVM: TDX: Explicitly do WBINVD when no more TDX
- SEAMCALLs
-Message-ID: <aIx7Qlpi1Y/VsRVY@intel.com>
-References: <cover.1753679792.git.kai.huang@intel.com>
- <c29f7a3348a95f687c83ac965ebc92ff5f253e87.1753679792.git.kai.huang@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <c29f7a3348a95f687c83ac965ebc92ff5f253e87.1753679792.git.kai.huang@intel.com>
-X-ClientProxiedBy: SG2PR03CA0121.apcprd03.prod.outlook.com
- (2603:1096:4:91::25) To CH3PR11MB8660.namprd11.prod.outlook.com
- (2603:10b6:610:1ce::13)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8989.12; Fri, 1 Aug
+ 2025 09:33:14 +0000
+Received: from CY4PEPF0000E9CD.namprd03.prod.outlook.com
+ (2603:10b6:303:8d:cafe::a9) by MW4PR03CA0178.outlook.office365.com
+ (2603:10b6:303:8d::33) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8964.27 via Frontend Transport; Fri,
+ 1 Aug 2025 09:33:13 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
+Received: from SATLEXMB03.amd.com (165.204.84.17) by
+ CY4PEPF0000E9CD.mail.protection.outlook.com (10.167.241.132) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.9009.8 via Frontend Transport; Fri, 1 Aug 2025 09:33:12 +0000
+Received: from SATLEXMB06.amd.com (10.181.40.147) by SATLEXMB03.amd.com
+ (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Fri, 1 Aug
+ 2025 04:33:12 -0500
+Received: from SATLEXMB03.amd.com (10.181.40.144) by SATLEXMB06.amd.com
+ (10.181.40.147) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Fri, 1 Aug
+ 2025 04:33:11 -0500
+Received: from [10.252.219.240] (10.180.168.240) by SATLEXMB03.amd.com
+ (10.181.40.144) with Microsoft SMTP Server id 15.1.2507.39 via Frontend
+ Transport; Fri, 1 Aug 2025 04:33:08 -0500
+Message-ID: <e0af8ca8-c7ad-4ef9-a8eb-554593e07139@amd.com>
+Date: Fri, 1 Aug 2025 15:03:07 +0530
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 04/11] KVM: x86: Add emulation support for Extented LVT
+ registers
+To: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>, <kvm@vger.kernel.org>,
+	<linux-perf-users@vger.kernel.org>, <linux-doc@vger.kernel.org>
+CC: <seanjc@google.com>, <pbonzini@redhat.com>, <nikunj@amd.com>,
+	<bp@alien8.de>, <peterz@infradead.org>, <mingo@redhat.com>,
+	<mizhang@google.com>, <thomas.lendacky@amd.com>, <ravi.bangoria@amd.com>,
+	<Sandipan.Das@amd.com>
+References: <20250627162550.14197-1-manali.shukla@amd.com>
+ <20250627162550.14197-5-manali.shukla@amd.com>
+ <3b37d820-12cd-4f33-b059-66e12693b779@linux.intel.com>
+ <afafc865-b42f-4a9d-82d7-a72de16bb47b@amd.com>
+ <71d741d1-9250-4a64-b695-16f8bdc338e7@linux.intel.com>
+Content-Language: en-US
+From: Manali Shukla <manali.shukla@amd.com>
+In-Reply-To: <71d741d1-9250-4a64-b695-16f8bdc338e7@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR11MB8660:EE_|SN7PR11MB7540:EE_
-X-MS-Office365-Filtering-Correlation-Id: 666905e6-a59c-4c0a-59e1-08ddd0d5c589
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9CD:EE_|DM4PR12MB6231:EE_
+X-MS-Office365-Filtering-Correlation-Id: db14f8fd-4dcd-4ff5-fb72-08ddd0de6fa0
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?ROsrew2QROa1DgV+blS035IElN/57eaK9k09DUM15UDMMrVd1SIsdW8+o42f?=
- =?us-ascii?Q?9YukVuawYS4TN0OxdfiHOQicB6QxDvvCDv8hV+C6Vd5KWHC2o9HAPw0Q2IKk?=
- =?us-ascii?Q?hQfccaBQ8/rAhkMNi2TShva+iBfgvmtX6wSU5tCLn70wQFFGxMMurbJgU2Yr?=
- =?us-ascii?Q?lCk3Dlt/kUITQmHLWEQdgyE8a3AbbFrgIskHu4cK9EX9Fru2JVyN+aQiralm?=
- =?us-ascii?Q?mNXforrJ+wDj9DDjeJwcXaxch74RK5PzF4lIA0fHQrw6VvGcezsXiaQUSImJ?=
- =?us-ascii?Q?+7tsKkEwPzWyjKOWbUy2+STGtCylfMdJtykxgoEVvJ5baibE1fbxaTOzgoZz?=
- =?us-ascii?Q?xLN/zTfThbnP7PNCWoIZAFDUt7y7vltzMWiP+AQ6WcQbnDg8O38S53vp0bYu?=
- =?us-ascii?Q?//1Ck47X8Agd77VTK0nwHPK7ONOdS1FhSHo9YeWwBglTam5xkFOAzZErGkVa?=
- =?us-ascii?Q?xWG6834XEAm+ubwx4xshOjsubWgwPBNP39ZJA9gBBpwIhNKJ2FW3uEq5jfKW?=
- =?us-ascii?Q?nzK1FMRGrups5etzEuZsLtUCIaZvP3ADAFUkZ+GyuOJ+7HPNmjEJE/tS0W8j?=
- =?us-ascii?Q?67uCmfnnDxS7iNudOP5HIHgfWhJmGcz3Bo/ohR0bDkWnXpJ0xTvp+JCylUKx?=
- =?us-ascii?Q?2ZB4aQgU2fKwQIfRRALgjjXG7yPTGLg3gNNyp4NpEDdF9j6NMI+WEi/e2NJj?=
- =?us-ascii?Q?VjT23/AYLpUgig6l1EhXLzN8qD3m/S2xbxs2Hc/zPcZMvXiGHTnTUChwrLPy?=
- =?us-ascii?Q?4RSxFtC1JoCOEehWukb8RXDi+K3XlAtobsRbKAiQf6ncH4xJo+ih+7hUmKXA?=
- =?us-ascii?Q?Sr71+663mTariVdZr4duO5/8sKoJD3ut6bqRgzpsEyTHJTWssD9Eyn+LvjKQ?=
- =?us-ascii?Q?ACf8RztNZaTF8YbOsFD2RgcqVJsQnwIop8a1VvFX6GWE5v3RKJV/5aiWeEYV?=
- =?us-ascii?Q?S4VceHWE2Vm6G41rBLZ/p0xi7OMpjDOx3Mi+AoflxOeSVe+cTNB3iW+wF+cE?=
- =?us-ascii?Q?LPw91x80tE/icp/6Q2zjT5pxnUGXmw446gKpTWdgrchnQofez/p0X2Gh4BCc?=
- =?us-ascii?Q?Wbizdtbe242q8WpgfMfsrur0/g2ADQ9/Fgkn5jEQI0Rq/U3+Xj4pLJnYYC4X?=
- =?us-ascii?Q?FgSaExVnuVVn+ZhQoDVcZhuulV9kPuCswl4wXvdzCFztFyQuxwYcXz34ak0L?=
- =?us-ascii?Q?7w4dABK/x42uDZ6t9Ek4SRfQwRZXGuOIuzfBtbSy0rXP7lSMbC0RX9tOywFg?=
- =?us-ascii?Q?coJadQ56n6JvH451oGNqPsLIBxyyqqKDRrV2p373Q9p13suFlRsWr75c9dzi?=
- =?us-ascii?Q?HB5AoFuwCaoA6VOqLgZmzQO7XiBe4cKCtVGLPzDY6j3joUfnMR41gyhLt7xR?=
- =?us-ascii?Q?iCqy/8Rg2BZDlJxSBNyED8AQmBydtRbO8vLlRef41uWTHsnb5h94DncyNVFh?=
- =?us-ascii?Q?tvcg9fe3xyo=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8660.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?gzLj1DQxKPF6XUWAt09hM390sFchOmk/awDWTrGmn59DTBZGnOMADRdYqrIO?=
- =?us-ascii?Q?/rkr4yfn8VznMNbhP/jd7q0xxfmUBNS+ZrkDiDPrTl3qSR0VBHdtRQgDRu7M?=
- =?us-ascii?Q?rw5lFucab5XJ4NNOk9OPm9wvXV5HyY46mXLoo7tvFfKNWee7lqqg95lSyUKF?=
- =?us-ascii?Q?UfFTlSkREmssc2BIhcymE5alQiqixkG9YJuLl58KPMITnkYTsAxNPR2S9FYN?=
- =?us-ascii?Q?lczadzLeuJZ8qJ+XzrcZ622idjjmXQ+CdedGBURDgBLMJtlKowS+yNGESIyV?=
- =?us-ascii?Q?d6C5hHTaLfbYWl4jlxz4pP9s2A+7ItPuBu7Cs/qvVNVFx8B2BUzRw4nv7J1U?=
- =?us-ascii?Q?jRtTQhxYXkACBLOM4XsgN3CtESxYV/qCQwvHmQjoBWtvl96tyOe8+JGP5pcP?=
- =?us-ascii?Q?7tCKw/OzjzCr/CIVTjBtkQTikOxqP/Kz6ue2BQbNXkfTiUALwMzjyWuDejhA?=
- =?us-ascii?Q?dgcRRy1Vjb1mAW34ZNk0/VWT/90yRq51j9/DHeQKMaCj/Zkw1dgQ9kkl/Szp?=
- =?us-ascii?Q?P3ZKl/nE6zLLUGHKdeZ6qVXF2fdro8zd4NQf079qAqpzrmu84by8+h1aXaYf?=
- =?us-ascii?Q?xyakJff2CV5FZ0+iaHIYN4nWQYm7X7J+aiKlYYTVi3DkjVlChrIiQsfV13TR?=
- =?us-ascii?Q?Q5ANA4owUgcpR+hPaXSjtn0Oz/HF/7oVF2cuj+MPOP8TorOE3MuZ41gKzspx?=
- =?us-ascii?Q?oXvFy+8EcDHUAP9gwo5j0S7eSifqMY3QiullTm+DlSPzwkFQz/Er02aCHf4B?=
- =?us-ascii?Q?MAD0QndQB2RhOaTEx3CQwrd40Ir3uGmpM86QkN6bMatSAAzqlBG2DBq5avYt?=
- =?us-ascii?Q?ul7uiGGL7umXzTFsRR2qubOpJTMqvmIBNIbeGjkIlqaj7IzAd8W73T4SeU4U?=
- =?us-ascii?Q?8WZzFWvTHYU3nF6MBNBFYrIYLXd5gAnCDxUzA2Tmd8648kjEnoQFgz3Q/pGU?=
- =?us-ascii?Q?1xSFExy6jFPwd+5dpVjadAfQAd5SWlL/t3kHOLH+vpQ4LWGchSp7ZIxZkWXj?=
- =?us-ascii?Q?mTNe+SnmASriLjq2SpSqvbrPghENJo98cNfmXW4tQ7AELfvVKgE3V7LZ466u?=
- =?us-ascii?Q?ScvyAbyKe04uIA3Ir9w9nZnvgGQtutiqfxRwAp3WYHwCklE2nSBE9+gdJHms?=
- =?us-ascii?Q?vWI1pwQTJHbdHhNpZVihzXjRF8sQQeF8BBdglgZpZfv+dwzIy4gONu7UwGmE?=
- =?us-ascii?Q?38uZS09bF2Ef75D9HFG/XvUB6bq2gFad1afK0Jw89LVnlT6z8Y6BP02gG8rg?=
- =?us-ascii?Q?wsYSCxm0KVgpKBWV8zFgLdJK8HpsyA0W7tT7+/DuHhvJhAP8+QssE8geWw0f?=
- =?us-ascii?Q?r25WeyBeO/oyaUNmlkjonmYbhD20VwzeZGxQU5Dy7/utK1rFxFGsGQWNaAhj?=
- =?us-ascii?Q?Rd5oxSJr+KT1DHTsgAaUmW7mwLKlXu+HxVA8YLskKLACxzzQqyoC9mMstY4J?=
- =?us-ascii?Q?/d1nY1gHbcLOrjTBQEO+x/RhDvzItwmpzMpBJPYCtJAhJNVabmBZWd6n7C51?=
- =?us-ascii?Q?heAYqydAKJWHbKLrQDZ1LqO/PIQqj9Xl3f8lECrIIAdEgxpgnwVbEp32/gFZ?=
- =?us-ascii?Q?kKLuUAiaG80DaL2OPCTZmKecsQ5g1gS2WlV3lAFw?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 666905e6-a59c-4c0a-59e1-08ddd0d5c589
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8660.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Aug 2025 08:31:11.9368
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|1800799024|7416014|376014|36860700013|13003099007;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?SXZaVlZLc2JhUFpVYVJBL2c4Z0tvZktPa3I1SmFIMnBBRXpFaEJGcXAxOTg3?=
+ =?utf-8?B?Y3dLSlNIZUMvcTlWTDRibDRFTmk4SFpyeTEyS0dVZE0wQ2JPS29UV09NWDNp?=
+ =?utf-8?B?eEJCdFNYSmRLaHFwa0RDSjNMTVJFc0F3L1FZZEV3WURTMkd4NUprQkFGd0Nx?=
+ =?utf-8?B?TnBteHB5dkVmRGlWaG9RNDVxZXFwV1lZM3FwOTZrSHNKMm9QaU1oSTZIT2Z0?=
+ =?utf-8?B?TExXQTU0elkyZlFZMk5jRHhoLzg5SGhVZTRKT0pXQU56RW8wUloyZXJDY3J3?=
+ =?utf-8?B?dEJ6bWxtTFJYYVlRTnhpVjdvUUZ0a1dqNEs3aFhLQzNKSzZsdGRvelc2Wk5v?=
+ =?utf-8?B?c3FzTkloWGdJODJ3YTZhTEdSRmovVlhYdG1LMG9rN0N2cTRwZVIwQTluRlIz?=
+ =?utf-8?B?V3VFbFNZM2IzNFlLZ2p6a3F4Z1Q5YWdUUzZNcGRScXVtK1g3MkpOT3UwWFhW?=
+ =?utf-8?B?NUhWbmQ1STBzTHR3SVZOb0JOYUhBaDVEVStxWDV3SVFuMFd0T0dkVHlyT3I5?=
+ =?utf-8?B?UlBIeHpIZnBIT0wzNis1UDdDQ3VOMEt3c1VHalZEeXpPV3dwYjlzVFRSTW5I?=
+ =?utf-8?B?VUk4SzV5UGN3MmhtYzhmeWJtVnJNMjhoWGhpejBob29CbTMxYWxnWXh6M093?=
+ =?utf-8?B?YmtMNHFvUDFKVjFJR3JraXc0M3JZMU9XSEVhdHFIc2lsVHg5UEplVStQaXZN?=
+ =?utf-8?B?bUVSVDY1cXhtRmZSTzBLNlVpenVCL1BnUnJPQkYrMGtSSkJoN09HOUFjUHBH?=
+ =?utf-8?B?Wk1GNXZFeXFPVnFXa0lZVTArV1RXcU53b2xkQU5ORnB6VnNadnI4ZGJndjFE?=
+ =?utf-8?B?aHJVTVN3dkRwVEVVaUh1YXBWcU96QUVlb3hEZ2tuc0htcGZFZjB4azZaYVFJ?=
+ =?utf-8?B?c0tkbDNiZEp5KzByYlRGSXl6VU1maTVKenQydjUvTHRCL2Z1ejg3Z3R2RC9q?=
+ =?utf-8?B?U1V4UVRoN1JhK3Z1SHFXbDM0UlByUys5TG4zTndWakNzNTlodUxocUdVNkxH?=
+ =?utf-8?B?WjcxZWNZTHdDSWNQRW5aQkZTWERZVmJzT3ZuVXZNdkpnZTJMWkhCUGk3S3No?=
+ =?utf-8?B?NGF0SWFiaWRjOFVDcXk5UHpyMWZLUXVRMmRheXdXUnhNVVdwV1NyQVptdVJx?=
+ =?utf-8?B?RFN6bHNwWnkvQldrSk5uZkhqZXBhd29FOG85RnkzSXB4Yk5RQWtBSXJHUExh?=
+ =?utf-8?B?MEJST0gxMko3RGErN2c1LzZWK00rZWphQ1I3Wll0RzR4NVE5Y3IzbmRncTN6?=
+ =?utf-8?B?eE9tVXpxZlN2Q2QvYWluSktjd2xsd1kyc01XQXdsQWtvUUlLN3pDUEc0ZC9C?=
+ =?utf-8?B?S3A0dDlxZU16N3BUNWVDWkpoS1Q3WkFuSTZSQnFRb0RydkdZNFhHL1NWaG56?=
+ =?utf-8?B?WjFydmpoNTZlUUZGSXhlSU1WanRwK3NJcEdVU2FoK2drbWFBRERTZ1hBMlBu?=
+ =?utf-8?B?MGRQNnNpVk1lRlJhdmtFTG9TdGlDM3hYdWhuVWVYZnk3c0FEZ2wrZlo5Y3Rn?=
+ =?utf-8?B?OVlOYmRwM2FhUVVPcytKZlFqS1NpSU55RTdMTk1MYWQrc1g5SGxRWXh4R2oz?=
+ =?utf-8?B?NWw1TUxhVTQzYW5pWlQ0enk1cU91eFF5TjNHMVI1cEVIWm1DbWd3ZUorOXhu?=
+ =?utf-8?B?VUoyQVRVUTRTd05hMmhNdm1XNWpndFhla1VaakVlcFhCVWcrSm9CaHpEa0Yz?=
+ =?utf-8?B?WkdIaWhNMjBCaXk1MFRRZXhtc1R3a3JYdHNNRTJNbmxIU05tbFd6Y09QaEY5?=
+ =?utf-8?B?VFZaUU9hUlBnbnkrd05lbmp3Z01QWEVRN0w0NWJIOW1jYTQxT2FoeEdBVkN3?=
+ =?utf-8?B?YUYxOTY2bWZHelpwZlh5UjdoY21ZOUZBOUxCM2F6VzBwUnlkd2MxdDRNYTRy?=
+ =?utf-8?B?K0QvWGw0V1Y0UXNvQTQySFRzMkdIZkdsSmc5MEkyZ3BNcEdMbjU1eU5hcGZT?=
+ =?utf-8?B?eUVlR0tFUzVxb2RJZ0Ftdm9ZdkQxM3p1OW5HQVgvTXFWK1FKU0JhNnRtdVNh?=
+ =?utf-8?B?N0N2RUpGQTZRPT0=?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(7416014)(376014)(36860700013)(13003099007);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Aug 2025 09:33:12.9743
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: T/6vkzKuKSbgG6FLbSS2IbsZ6AYZk3dzO47n+0YYO8GQOAkVE1uoyBDFvkIY2vkNsdfYpzNLwDHmO5kV1arD4g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB7540
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: db14f8fd-4dcd-4ff5-fb72-08ddd0de6fa0
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000E9CD.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6231
 
-On Tue, Jul 29, 2025 at 12:28:41AM +1200, Kai Huang wrote:
->On TDX platforms, during kexec, the kernel needs to make sure there are
->no dirty cachelines of TDX private memory before booting to the new
->kernel to avoid silent memory corruption to the new kernel.
->
->During kexec, the kexec-ing CPU firstly invokes native_stop_other_cpus()
->to stop all remote CPUs before booting to the new kernel.  The remote
->CPUs will then execute stop_this_cpu() to stop themselves.
->
->The kernel has a percpu boolean to indicate whether the cache of a CPU
->may be in incoherent state.  In stop_this_cpu(), the kernel does WBINVD
->if that percpu boolean is true.
->
->TDX turns on that percpu boolean on a CPU when the kernel does SEAMCALL.
->This makes sure the caches will be flushed during kexec.
->
->However, the native_stop_other_cpus() and stop_this_cpu() have a "race"
->which is extremely rare to happen but could cause the system to hang.
->
->Specifically, the native_stop_other_cpus() firstly sends normal reboot
->IPI to remote CPUs and waits one second for them to stop.  If that times
->out, native_stop_other_cpus() then sends NMIs to remote CPUs to stop
->them.
->
->The aforementioned race happens when NMIs are sent.  Doing WBINVD in
->stop_this_cpu() makes each CPU take longer time to stop and increases
->the chance of the race happening.
->
->Explicitly flush cache in tdx_disable_virtualization_cpu() after which
->no more TDX activity can happen on this cpu.  This moves the WBINVD to
->an earlier stage than stop_this_cpus(), avoiding a possibly lengthy
->operation at a time where it could cause this race.
->
->Signed-off-by: Kai Huang <kai.huang@intel.com>
->Acked-by: Paolo Bonzini <pbonzini@redhat.com>
->Tested-by: Farrah Chen <farrah.chen@intel.com>
->Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
+On 7/17/2025 7:32 AM, Mi, Dapeng wrote:
+> 
+> On 7/16/2025 6:10 PM, Manali Shukla wrote:
+>> Hi Dapeng Mi,
+>>
+>> Thanks for reviewing my patches.
+>>
+>> On 7/15/2025 8:28 AM, Mi, Dapeng wrote:
+>>> On 6/28/2025 12:25 AM, Manali Shukla wrote:
+>>>> From: Santosh Shukla <santosh.shukla@amd.com>
+>>>>
+>>>> The local interrupts are extended to include more LVT registers in
+>>>> order to allow additional interrupt sources, like Instruction Based
+>>>> Sampling (IBS) and many more.
+>>>>
+>>>> Currently there are four additional LVT registers defined and they are
+>>>> located at APIC offsets 400h-530h.
+>>>>
+>>>> AMD IBS driver is designed to use EXTLVT (Extended interrupt local
+>>>> vector table) by default for driver initialization.
+>>>>
+>>>> Extended LVT registers are required to be emulated to initialize the
+>>>> guest IBS driver successfully.
+>>>>
+>>>> Please refer to Section 16.4.5 in AMD Programmer's Manual Volume 2 at
+>>>> https://bugzilla.kernel.org/attachment.cgi?id=306250 for more details
+>>>> on Extended LVT.
+>>>>
+>>>> Signed-off-by: Santosh Shukla <santosh.shukla@amd.com>
+>>>> Co-developed-by: Manali Shukla <manali.shukla@amd.com>
+>>>> Signed-off-by: Manali Shukla <manali.shukla@amd.com>
+>>>> ---
+>>>>  arch/x86/include/asm/apicdef.h | 17 +++++++++
+>>>>  arch/x86/kvm/cpuid.c           |  6 +++
+>>>>  arch/x86/kvm/lapic.c           | 69 +++++++++++++++++++++++++++++++++-
+>>>>  arch/x86/kvm/lapic.h           |  1 +
+>>>>  arch/x86/kvm/svm/avic.c        |  4 ++
+>>>>  arch/x86/kvm/svm/svm.c         |  4 ++
+>>>>  6 files changed, 99 insertions(+), 2 deletions(-)
+>>>>
+>>>> diff --git a/arch/x86/include/asm/apicdef.h b/arch/x86/include/asm/apicdef.h
+>>>> index 094106b6a538..4c0f580578aa 100644
+>>>> --- a/arch/x86/include/asm/apicdef.h
+>>>> +++ b/arch/x86/include/asm/apicdef.h
+>>>> @@ -146,6 +146,23 @@
+>>>>  #define		APIC_EILVT_MSG_EXT	0x7
+>>>>  #define		APIC_EILVT_MASKED	(1 << 16)
+>>>>  
+>>>> +/*
+>>>> + * Initialize extended APIC registers to the default value when guest
+>>>> + * is started and EXTAPIC feature is enabled on the guest.
+>>>> + *
+>>>> + * APIC_EFEAT is a read only Extended APIC feature register, whose
+>>>> + * default value is 0x00040007. However, bits 0, 1, and 2 represent
+>>>> + * features that are not currently emulated by KVM. Therefore, these
+>>>> + * bits must be cleared during initialization. As a result, the
+>>>> + * default value used for APIC_EFEAT in KVM is 0x00040000.
+>>>> + *
+>>>> + * APIC_ECTRL is a read-write Extended APIC control register, whose
+>>>> + * default value is 0x0.
+>>>> + */
+>>>> +
+>>>> +#define		APIC_EFEAT_DEFAULT	0x00040000
+>>>> +#define		APIC_ECTRL_DEFAULT	0x0
+>>>> +
+>>>>  #define APIC_BASE (fix_to_virt(FIX_APIC_BASE))
+>>>>  #define APIC_BASE_MSR		0x800
+>>>>  #define APIC_X2APIC_ID_MSR	0x802
+>>>> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+>>>> index eb7be340138b..7270d22fbf31 100644
+>>>> --- a/arch/x86/kvm/cpuid.c
+>>>> +++ b/arch/x86/kvm/cpuid.c
+>>>> @@ -458,6 +458,12 @@ void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+>>>>  	/* Invoke the vendor callback only after the above state is updated. */
+>>>>  	kvm_x86_call(vcpu_after_set_cpuid)(vcpu);
+>>>>  
+>>>> +	/*
+>>>> +	 * Initialize extended LVT registers at guest startup to support delivery
+>>>> +	 * of interrupts via the extended APIC space (offsets 0x400–0x530).
+>>>> +	 */
+>>>> +	kvm_apic_init_eilvt_regs(vcpu);
+>>>> +
+>>>>  	/*
+>>>>  	 * Except for the MMU, which needs to do its thing any vendor specific
+>>>>  	 * adjustments to the reserved GPA bits.
+>>>> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+>>>> index 00ca2b0faa45..cffe44eb3f2b 100644
+>>>> --- a/arch/x86/kvm/lapic.c
+>>>> +++ b/arch/x86/kvm/lapic.c
+>>>> @@ -1624,9 +1624,13 @@ static inline struct kvm_lapic *to_lapic(struct kvm_io_device *dev)
+>>>>  }
+>>>>  
+>>>>  #define APIC_REG_MASK(reg)	(1ull << ((reg) >> 4))
+>>>> +#define APIC_REG_EXT_MASK(reg)	(1ull << (((reg) >> 4) - 0x40))
+>>> It seems there is no difference on the MASK definition between
+>>> APIC_REG_MASK() and APIC_REG_EXT_MASK(). Why not directly use the original
+>>> APIC_REG_MASK()?
+>>>
+>> The Extended LVT registers range from 0x400 to 0x530. When using
+>> APIC_REG_MASK(reg) with reg = 0x400 (as an example), the operation
+>> results in a right shift of 64(0x40) bits, causing an overflow. This was
+>> the actual reason of creating a new macro for extended APIC register space.
+> 
+> I see. Just ignored that the bit could extend 64 bits.
+> 
+> 
+>>
+>>> BTW, If we indeed need to define this new macro, could we define the macro
+>>> like blow?
+>>>
+>>> #define APIC_REG_EXT_MASK(reg)	(1ull << (((reg) - 0x400) >> 4))
+>>>
+>>> It's more easily to understand. 
+>>>
+>> I can define the macro in this way.
+>>
+>>>>  #define APIC_REGS_MASK(first, count) \
+>>>>  	(APIC_REG_MASK(first) * ((1ull << (count)) - 1))
+>>>>  
+>>>> +#define APIC_LAST_REG_OFFSET		0x3f0
+>>>> +#define APIC_EXT_LAST_REG_OFFSET	0x530
+>>>> +
+>>>>  u64 kvm_lapic_readable_reg_mask(struct kvm_lapic *apic)
+>>>>  {
+>>>>  	/* Leave bits '0' for reserved and write-only registers. */
+>>>> @@ -1668,6 +1672,8 @@ EXPORT_SYMBOL_GPL(kvm_lapic_readable_reg_mask);
+>>>>  static int kvm_lapic_reg_read(struct kvm_lapic *apic, u32 offset, int len,
+>>>>  			      void *data)
+>>>>  {
+>>>> +	u64 valid_reg_ext_mask = 0;
+>>>> +	unsigned int last_reg = APIC_LAST_REG_OFFSET;
+>>>>  	unsigned char alignment = offset & 0xf;
+>>>>  	u32 result;
+>>>>  
+>>>> @@ -1677,13 +1683,44 @@ static int kvm_lapic_reg_read(struct kvm_lapic *apic, u32 offset, int len,
+>>>>  	 */
+>>>>  	WARN_ON_ONCE(apic_x2apic_mode(apic) && offset == APIC_ICR);
+>>>>  
+>>>> +	/*
+>>>> +	 * The local interrupts are extended to include LVT registers to allow
+>>>> +	 * additional interrupt sources when the EXTAPIC feature bit is enabled.
+>>>> +	 * The Extended Interrupt LVT registers are located at APIC offsets 400-530h.
+>>>> +	 */
+>>>> +	if (guest_cpu_cap_has(apic->vcpu, X86_FEATURE_EXTAPIC)) {
+>>>> +		valid_reg_ext_mask =
+>>>> +			APIC_REG_EXT_MASK(APIC_EFEAT) |
+>>>> +			APIC_REG_EXT_MASK(APIC_ECTRL) |
+>>>> +			APIC_REG_EXT_MASK(APIC_EILVTn(0)) |
+>>>> +			APIC_REG_EXT_MASK(APIC_EILVTn(1)) |
+>>>> +			APIC_REG_EXT_MASK(APIC_EILVTn(2)) |
+>>>> +			APIC_REG_EXT_MASK(APIC_EILVTn(3));
+>>>> +		last_reg = APIC_EXT_LAST_REG_OFFSET;
+>>>> +	}
+>>> Why not move this code piece into kvm_lapic_readable_reg_mask() and
+>>> directly use APIC_REG_MASK() for these extended regs? Then we don't need to
+>>> modify the below code. 
+> 
+> I still think we should get a unified APIC reg mask even for the extended
+> APIC with kvm_lapic_readable_reg_mask() helper. We can extend current
+> kvm_lapic_readable_reg_mask() and let it return a 128 bits bitmap, maybe
+> like this,
+> 
+> void kvm_lapic_readable_reg_mask(struct kvm_lapic *apic, u64 *mask)
+> 
+> This makes code more easily maintain. 
+> 
+> 
 
-Flushing cache after disabling virtualization looks clean. So,
+Sorry for the delay.
 
-Reviewed-by: Chao Gao <chao.gao@intel.com>
+The reason why I am wary of this approach is because
+kvm_lapic_readable_reg_mask() is currently being used in
+vmx_update_msr_bitmap_x2apic(), where we directly use its return value:
+
+    if (mode & MSR_BITMAP_MODE_X2APIC_APICV)
+        msr_bitmap[read_idx] =
+~kvm_lapic_readable_reg_mask(vcpu->arch.apic);
+    else
+        msr_bitmap[read_idx] = ~0ull;
+    msr_bitmap[write_idx] = ~0ull;
+
+Where msr_bitmap is a u64 array.
+
+Changing kvm_lapic_readable_reg_mask() to return a 128-bit mask would
+require changes in vmx_update_msr_bitmap_x2apic() too.
+
+- Manali
+
+>>>
+>>
+
 
