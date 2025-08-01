@@ -1,225 +1,255 @@
-Return-Path: <kvm+bounces-53833-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53834-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B58DB181BC
-	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 14:26:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E4478B18214
+	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 15:03:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3F0FA85479
-	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 12:26:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E36D627DEC
+	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 13:03:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEFA923BCE3;
-	Fri,  1 Aug 2025 12:26:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B14F624728A;
+	Fri,  1 Aug 2025 13:03:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="U4GACaKs"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EBOC5j/I"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26ED72441B8;
-	Fri,  1 Aug 2025 12:25:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EC3A1798F
+	for <kvm@vger.kernel.org>; Fri,  1 Aug 2025 13:03:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754051159; cv=none; b=A30hVFOWl3oJ8Y1ViTI8YbSB035M226lbe07Wp7vzuudWxfPxydReOp2QAm6x1en4Gkcr89DlUUBNEty90eVM20vIiVXdDiurwBFV3FfEFQyRg7vQsOZ3EXY6EpvrRr7hJO42pA6I8za6eCqZ1rXf4Q/VTN5nugJ5lUL0bleWU0=
+	t=1754053421; cv=none; b=TbQvlqZq7q4HCa//E76b6lsQQbLB8FBOKy5E8+ytr7aZKMM0emnTtsrHO1DSuPnuo4UWs3FcqsN0wvCr4PwMpNE34+WSiCCdFN3O4l3Sz8I3tkgZehaM+M8G2QyflfZxtKOH8ei/JQP9IoEGmppMx05G9SHSRc9znB4cpCxe/2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754051159; c=relaxed/simple;
-	bh=+Ltd4Hy3tdsuA5Vc2mPQHqD/Wg7sA0TicSGOKBy5Rpk=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=OaT4GPgkM7BlVw7P9LdH/mhdHmphVua0tpVn63kRi0fmzxUJQafB0wEi/mSa/sAD8WEztHlKHfvPHv13b/kilWsap839H84KZb06zmD+D5NmEkKOU0u58DHuC6BsZbGgzZN+DbsUt9ubqY5ImPSqA7EOHmpvSs47HJq6lbHM9Y4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=U4GACaKs; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=+Ltd4Hy3tdsuA5Vc2mPQHqD/Wg7sA0TicSGOKBy5Rpk=; b=U4GACaKsgynZ6ANU/dUYe0WO9B
-	HqZjffV8Z+YKe7oAyOvYfE4OXc+Tp3guH5IQ3bOT/NTHN6EX3gzv88hkJEvWA1triNTC+jCVKsmuO
-	ceIbz4xWOhlCiNxRX7/HxEv4zTy6SC+JvMl8MCNHsL4MxvJOkdcwtOXwxDkucj5X4vjWhLpUDVRel
-	rUMuAxgeUQIxSuYIF6XTym15EPB10OefYNbY4r5DDq0nd1suq51reXMZr2j9Jqa5s7L2L3yA0pMHR
-	TF3yFX26DG54wZP9CI3+zV28zxdaw3orGuQ+tAvHeOD8mhFGMvbWTlPVP4Qjs7K5A7JttrigDkEa1
-	RvdLI+PQ==;
-Received: from 54-240-197-232.amazon.com ([54.240.197.232] helo=edge-m2-r3-179.e-iad50.amazon.com)
-	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uhopV-0000000E6LM-42Z2;
-	Fri, 01 Aug 2025 12:25:47 +0000
-Message-ID: <2700e50c6ca07b58c4a4a0c219815cf3e1319f35.camel@infradead.org>
-Subject: Re: [RFC PATCH 06/34] KVM: gunyah: Add initial Gunyah backend
- support
-From: David Woodhouse <dwmw2@infradead.org>
-To: Karim Manaouil <karim.manaouil@linaro.org>,
- linux-kernel@vger.kernel.org,  kvm@vger.kernel.org,
- linux-arm-msm@vger.kernel.org,  linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, Steven Price <steven.price@arm.com>, Gavin Shan
- <gshan@redhat.com>, Suzuki Poulose's avatarSuzuki K Poulose
- <suzuki.poulose@arm.com>, "Usug, Ugur" <ugurus@amazon.co.uk>
-Cc: Alexander Graf <graf@amazon.com>, Alex Elder <elder@kernel.org>, Catalin
- Marinas <catalin.marinas@arm.com>, Fuad Tabba <tabba@google.com>, Joey
- Gouly <joey.gouly@arm.com>,  Jonathan Corbet <corbet@lwn.net>, Marc Zyngier
- <maz@kernel.org>, Mark Brown <broonie@kernel.org>,  Mark Rutland
- <mark.rutland@arm.com>, Oliver Upton <oliver.upton@linux.dev>, Paolo
- Bonzini <pbonzini@redhat.com>, Prakruthi Deepak Heragu
- <quic_pheragu@quicinc.com>,  Quentin Perret <qperret@google.com>, Rob
- Herring <robh@kernel.org>, Srinivas Kandagatla <srini@kernel.org>, 
- Srivatsa Vaddagiri <quic_svaddagi@quicinc.com>, Will Deacon
- <will@kernel.org>, Haripranesh S <haripran@qti.qualcomm.com>,  Carl van
- Schaik <cvanscha@qti.qualcomm.com>, Murali Nalajala <mnalajal@quicinc.com>,
- Sreenivasulu Chalamcharla <sreeniva@qti.qualcomm.com>, Trilok Soni
- <tsoni@quicinc.com>, Stefan Schmidt <stefan.schmidt@linaro.org>
-Date: Fri, 01 Aug 2025 13:25:43 +0100
-In-Reply-To: <20250424141341.841734-7-karim.manaouil@linaro.org>
-References: <20250424141341.841734-1-karim.manaouil@linaro.org>
-	 <20250424141341.841734-7-karim.manaouil@linaro.org>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-kuiyOGxGFoDOQHVFJxGm"
-User-Agent: Evolution 3.52.3-0ubuntu1 
+	s=arc-20240116; t=1754053421; c=relaxed/simple;
+	bh=LGAFsaZhZE9+YVDjSQvh4z1jMFg+F2jCvZkkxWqWe4E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cnQ/iGYBPb8ufdsWd0U80wPmU37rASPh7csaj44VGiC9/gcGZxpTU0QPV0z7AdvtT9NDXqemdRWo14RrAmmieGZsLKcbVmz2lTb4gFSBlMFiI3Hi21aQnzTzQhoKVSZTX97Zo7kqNaMpyvgWps5v58xYFCugz5tVomNT50S1WP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EBOC5j/I; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1754053419;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wRQvRY1Ic3xqYJoWjzoX1AeSxDMgzF+1WipYbCuWjwo=;
+	b=EBOC5j/I6YIV0+ey76MP0svdOAiMYfZqh+YnSZh1BIXV1qn5H0KivhklrQvtMPZ4AqggHY
+	ZaKfiE2GbSk1UufBxz6h4mTZifEwaYpvOY9lkD7pAl6sbhFIdSMwddxFNgH0M0hOnphZSq
+	mX00aohxkbCne8sKk4ILHmUF6eD5Mvs=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-217-c3GGB3_aMc-6o5anH1dUNA-1; Fri, 01 Aug 2025 09:03:37 -0400
+X-MC-Unique: c3GGB3_aMc-6o5anH1dUNA-1
+X-Mimecast-MFC-AGG-ID: c3GGB3_aMc-6o5anH1dUNA_1754053417
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-458a321153dso4204055e9.0
+        for <kvm@vger.kernel.org>; Fri, 01 Aug 2025 06:03:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754053417; x=1754658217;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wRQvRY1Ic3xqYJoWjzoX1AeSxDMgzF+1WipYbCuWjwo=;
+        b=vO8O0nlMW73MP4OJzahTMNKGqi1fZ1XvnlQBYE08m9rYG7wwbkCkA45JvSC1gpBsN+
+         tZyEpnlXy4JmZtKeaZNwjoot/7aZLhdXgz1TesfeIaNwGqmVpoVHOFjslIIwHrjJtxJp
+         VxLSSzdpkKTJ1GSnOW5IHnCxzF9752AWCNgEW5nJWRcKUk4XihiN3GsWDyaB4kf9d2BA
+         rjslqto7JA7tbTd4FEgJI3EQFWgmy/racNu2ZOSYlW3AND+0ax9H+S9beA7IV7LzLmiD
+         ZzSUMR1NTcn/OPFZVxw/TTUCgi4Lk8HyNIj+bq2K0z8IqhlCrvkzsGcIDF2YW66qZZDI
+         Wm5w==
+X-Gm-Message-State: AOJu0Yylxxyqisywmpw4+Sq1ID2t96bckdwWCG61zIO2ROWtn4y433dR
+	O2n4hDwXfLdO869rzT3xAbnxxxrJkTiuc1HLuIFJp7ZU592yJKY2ZO4D27FYZCe7Qs1Pw9/rJm6
+	suT3WmQehRqpeIpkG6UeatVb42jAnLL1W9zCem32onloPhp62ouSd8A==
+X-Gm-Gg: ASbGnctpDnhao7kS19ZgLgvnP79MH8ZayGW6F6L5Dr+VPy6m1Zgoc66MUlx3xUo2IO1
+	34DoIR9ugXlWNoxyxXrnwN2KECFKvB7rfFmuKEmwmjgv4ejnAFhvBAn7Hs5Rvs502SewB+xD5iE
+	NDWkgQOSf4gaAndVNWyU9fGCPIWDDKli/8nslO+d9d/FA1f7vkv5AuRKoZIlmT9LxMwZQLSqNlq
+	PvO7v/9UkSeTOlNpaUwGWNHxCga8t9185RHtgrgQjx8YJs/SZ6ttppgagPtRToIjYoYF/EpKvJz
+	6SEuzPs4jv24VffbHpghHwJjXOsN6Iu8
+X-Received: by 2002:a05:6000:2481:b0:3b8:bb8b:6b05 with SMTP id ffacd0b85a97d-3b8bb8b6deemr4345590f8f.29.1754053416402;
+        Fri, 01 Aug 2025 06:03:36 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHjHiezwm6gooBQWulD3psAw7200KYzsNILZaaeqjUjY2ZWI9IK3v40njhdn3wBHktdq15jSA==
+X-Received: by 2002:a05:6000:2481:b0:3b8:bb8b:6b05 with SMTP id ffacd0b85a97d-3b8bb8b6deemr4345535f8f.29.1754053415774;
+        Fri, 01 Aug 2025 06:03:35 -0700 (PDT)
+Received: from redhat.com ([2a0d:6fc0:1515:7300:62e6:253a:2a96:5e3])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b79c45346asm5907298f8f.39.2025.08.01.06.03.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 Aug 2025 06:03:35 -0700 (PDT)
+Date: Fri, 1 Aug 2025 09:03:31 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	acourbot@google.com, alok.a.tiwari@oracle.com,
+	anders.roxell@linaro.org, dtatulea@nvidia.com, eperezma@redhat.com,
+	eric.auger@redhat.com, gnurou@gmail.com, jasowang@redhat.com,
+	jonah.palmer@oracle.com, kraxel@redhat.com, leiyang@redhat.com,
+	linux@treblig.org, lulu@redhat.com, michael.christie@oracle.com,
+	parav@nvidia.com, si-wei.liu@oracle.com, stable@vger.kernel.org,
+	viresh.kumar@linaro.org, wangyuli@uniontech.com, will@kernel.org,
+	wquan@redhat.com, xiaopei01@kylinos.cn
+Subject: Re: [GIT PULL] virtio, vhost: features, fixes
+Message-ID: <20250801090250-mutt-send-email-mst@kernel.org>
+References: <20250801070032-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250801070032-mutt-send-email-mst@kernel.org>
+
+On Fri, Aug 01, 2025 at 07:00:32AM -0400, Michael S. Tsirkin wrote:
+> The following changes since commit 347e9f5043c89695b01e66b3ed111755afcf1911:
+> 
+>   Linux 6.16-rc6 (2025-07-13 14:25:58 -0700)
+> 
+> are available in the Git repository at:
+> 
+>   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+> 
+> for you to fetch changes up to c7991b44d7b44f9270dec63acd0b2965d29aab43:
+> 
+>   vsock/virtio: Allocate nonlinear SKBs for handling large transmit buffers (2025-07-17 08:33:09 -0400)
+
+Oh no I am sorry! Please ignore, a bad commit snuck in there - it still
+needs maintainer approval, and I forgot.
+Will resend.
 
 
---=-kuiyOGxGFoDOQHVFJxGm
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+> ----------------------------------------------------------------
+> virtio, vhost: features, fixes
+> 
+> vhost can now support legacy threading
+> 	if enabled in Kconfig
+> vsock memory allocation strategies for
+> 	large buffers have been improved,
+> 	reducing pressure on kmalloc
+> vhost now supports the in-order feature
+> 	guest bits missed the merge window
+> 
+> fixes, cleanups all over the place
+> 
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> 
+> ----------------------------------------------------------------
+> Alexandre Courbot (1):
+>       media: add virtio-media driver
+> 
+> Alok Tiwari (4):
+>       virtio: Fix typo in register_virtio_device() doc comment
+>       vhost-scsi: Fix typos and formatting in comments and logs
+>       vhost: Fix typos
+>       vhost-scsi: Fix check for inline_sg_cnt exceeding preallocated limit
+> 
+> Anders Roxell (1):
+>       vdpa: Fix IDR memory leak in VDUSE module exit
+> 
+> Cindy Lu (1):
+>       vhost: Reintroduce kthread API and add mode selection
+> 
+> Dr. David Alan Gilbert (2):
+>       vhost: vringh: Remove unused iotlb functions
+>       vhost: vringh: Remove unused functions
+> 
+> Dragos Tatulea (2):
+>       vdpa/mlx5: Fix needs_teardown flag calculation
+>       vdpa/mlx5: Fix release of uninitialized resources on error path
+> 
+> Gerd Hoffmann (1):
+>       drm/virtio: implement virtio_gpu_shutdown
+> 
+> Jason Wang (3):
+>       vhost: fail early when __vhost_add_used() fails
+>       vhost: basic in order support
+>       vhost_net: basic in_order support
+> 
+> Michael S. Tsirkin (6):
+>       virtio: document ENOSPC
+>       pci: report surprise removal event
+>       virtio: fix comments, readability
+>       virtio: pack config changed flags
+>       virtio: allow transports to suppress config change
+>       virtio: support device disconnect
+> 
+> Mike Christie (1):
+>       vhost-scsi: Fix log flooding with target does not exist errors
+> 
+> Pei Xiao (1):
+>       vhost: Use ERR_CAST inlined function instead of ERR_PTR(PTR_ERR(...))
+> 
+> Viresh Kumar (2):
+>       virtio-mmio: Remove virtqueue list from mmio device
+>       virtio-vdpa: Remove virtqueue list
+> 
+> WangYuli (1):
+>       virtio: virtio_dma_buf: fix missing parameter documentation
+> 
+> Will Deacon (9):
+>       vhost/vsock: Avoid allocating arbitrarily-sized SKBs
+>       vsock/virtio: Validate length in packet header before skb_put()
+>       vsock/virtio: Move length check to callers of virtio_vsock_skb_rx_put()
+>       vsock/virtio: Resize receive buffers so that each SKB fits in a 4K page
+>       vsock/virtio: Rename virtio_vsock_alloc_skb()
+>       vsock/virtio: Move SKB allocation lower-bound check to callers
+>       vhost/vsock: Allocate nonlinear SKBs for handling large receive buffers
+>       vsock/virtio: Rename virtio_vsock_skb_rx_put()
+>       vsock/virtio: Allocate nonlinear SKBs for handling large transmit buffers
+> 
+>  MAINTAINERS                                |    6 +
+>  drivers/gpu/drm/virtio/virtgpu_drv.c       |    8 +-
+>  drivers/media/Kconfig                      |   13 +
+>  drivers/media/Makefile                     |    2 +
+>  drivers/media/virtio/Makefile              |    9 +
+>  drivers/media/virtio/protocol.h            |  288 ++++++
+>  drivers/media/virtio/scatterlist_builder.c |  563 ++++++++++++
+>  drivers/media/virtio/scatterlist_builder.h |  111 +++
+>  drivers/media/virtio/session.h             |  109 +++
+>  drivers/media/virtio/virtio_media.h        |   93 ++
+>  drivers/media/virtio/virtio_media_driver.c |  959 ++++++++++++++++++++
+>  drivers/media/virtio/virtio_media_ioctls.c | 1297 ++++++++++++++++++++++++++++
+>  drivers/pci/pci.h                          |    6 +
+>  drivers/vdpa/mlx5/core/mr.c                |    3 +
+>  drivers/vdpa/mlx5/net/mlx5_vnet.c          |   12 +-
+>  drivers/vdpa/vdpa_user/vduse_dev.c         |    1 +
+>  drivers/vhost/Kconfig                      |   18 +
+>  drivers/vhost/net.c                        |   88 +-
+>  drivers/vhost/scsi.c                       |   24 +-
+>  drivers/vhost/vhost.c                      |  377 +++++++-
+>  drivers/vhost/vhost.h                      |   30 +-
+>  drivers/vhost/vringh.c                     |  118 ---
+>  drivers/vhost/vsock.c                      |   15 +-
+>  drivers/virtio/virtio.c                    |   25 +-
+>  drivers/virtio/virtio_dma_buf.c            |    2 +
+>  drivers/virtio/virtio_mmio.c               |   52 +-
+>  drivers/virtio/virtio_pci_common.c         |   45 +
+>  drivers/virtio/virtio_pci_common.h         |    3 +
+>  drivers/virtio/virtio_pci_legacy.c         |    2 +
+>  drivers/virtio/virtio_pci_modern.c         |    2 +
+>  drivers/virtio/virtio_ring.c               |    4 +
+>  drivers/virtio/virtio_vdpa.c               |   44 +-
+>  include/linux/pci.h                        |   45 +
+>  include/linux/virtio.h                     |   13 +-
+>  include/linux/virtio_config.h              |   32 +
+>  include/linux/virtio_vsock.h               |   46 +-
+>  include/linux/vringh.h                     |   12 -
+>  include/uapi/linux/vhost.h                 |   29 +
+>  include/uapi/linux/virtio_ids.h            |    1 +
+>  kernel/vhost_task.c                        |    2 +-
+>  net/vmw_vsock/virtio_transport.c           |   20 +-
+>  net/vmw_vsock/virtio_transport_common.c    |    3 +-
+>  42 files changed, 4186 insertions(+), 346 deletions(-)
+>  create mode 100644 drivers/media/virtio/Makefile
+>  create mode 100644 drivers/media/virtio/protocol.h
+>  create mode 100644 drivers/media/virtio/scatterlist_builder.c
+>  create mode 100644 drivers/media/virtio/scatterlist_builder.h
+>  create mode 100644 drivers/media/virtio/session.h
+>  create mode 100644 drivers/media/virtio/virtio_media.h
+>  create mode 100644 drivers/media/virtio/virtio_media_driver.c
+>  create mode 100644 drivers/media/virtio/virtio_media_ioctls.c
 
-On Thu, 2025-04-24 at 15:13 +0100, Karim Manaouil wrote:
->=20
-> - Introduces a new Kconfig split: `CONFIG_KVM_ARM` for native support,
-> =C2=A0 and a variant for Gunyah-backed virtualization.
-> - Adds `gunyah.c`, a new arch backend file that implements the minimal
-> =C2=A0 KVM architecture callbacks and stub interfaces required by the KVM
-> =C2=A0 core to build and boot.
-> - Refactors Makefile and build rules to support mutually exclusive
-> =C2=A0 builds of `CONFIG_KVM_ARM` and `CONFIG_GUNYAH`.
-> - Introduces a dummy implementation of required KVM stubs such as:
-> =C2=A0 `kvm_arch_init_vm()`, `kvm_arch_vcpu_create()`, `kvm_age_gfn()`, e=
-tc.
-
-I quite like this, conceptually. I do think it's important for the
-kernel to provide a generic virtualization API regardless of the
-underlying hardware/firmware =E2=80=94 that is, after all, what an OS kerne=
-l is
-*for*. So the answer "not in KVM" is just fundamentally not realistic.
-
-I'd like to see fewer #ifdefs though. The model we have on x86 with
-static_calls for the AMD vs. Intel back ends seems to work out OK.
-
-We ought to be able to come up with a model inspired by x86 where we
-allow certain methods to be provided by one of many sets of 'lowvisor'
-ops or whatever we want to call them:
-
- =E2=80=A2 Native KVM (at EL2)
- =E2=80=A2 pKVM
- =E2=80=A2 Gunyah
- =E2=80=A2 CCA
- =E2=80=A2 ... and potentially one or two others.
-
-Currently we have completely separate work on some of those; can we
-combine at least the basic hooks/operations and come up with something
-which is minimally intrusive where each one just plugs in its own
-implementation but the KVM userspace API is as unified as possible?
-
---=-kuiyOGxGFoDOQHVFJxGm
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
-ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
-AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
-BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
-MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
-a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
-jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
-GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
-aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
-nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
-8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
-HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
-IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
-KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
-BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
-QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
-QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
-ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
-/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
-uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
-xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
-W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
-c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
-VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
-NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
-DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
-sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
-w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
-i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
-kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
-0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
-ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
-blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
-hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
-VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
-HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
-ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
-AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
-cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
-cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
-AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
-aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
-hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
-iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
-8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
-JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
-xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
-EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
-B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
-MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
-KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
-Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
-nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
-WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
-W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
-nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
-g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
-9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
-9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
-sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
-a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
-ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
-AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
-dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
-MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
-YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
-4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
-6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
-QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
-nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
-MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
-VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
-ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDgwMTEyMjU0
-M1owLwYJKoZIhvcNAQkEMSIEIOCh638+fg6HH0s6fKaXunZT8sKstrN7UYcBZ1ogkLEEMGQGCSsG
-AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
-cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
-VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
-cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIASdHLiVQmlr6W
-jlNNL+KtVJ+ZydQztNDdK3u1lkYjE9evUTAnQtuA9hOtD+VfuBi/e1lZinYZqLUJKDoFf96ery5i
-ACKJPCmpW4tfgkDHPPGscM6J7kKP+OIhDv5rKd/i61jXZsQQ6f1sGAcGWUluNzdrAfuB1ycvAtjr
-IEqvfmRtAN3MxORUMabjkzHuYJG5FvTSGtyYhpcMbjpBhD4/petj3DdoQvyVkH0QFnH+Fy8D5VDo
-mgbDKWmlK//4sIceKkc0dBBoLm9i2B8UsQ76oREiWM/zRcQGGuJ1tiiBx2iTucIXh91QCR/RHB0M
-SqUuSCIhPjOkt4xpv6CRr4rgNRVN1RnZto+nBaHsp6NNVht9Mxep61y3nlh5hAJ9LcGQcZOUFhir
-fSUZ1qkN3RfbsJSjrDJUpMeFi+gHECitcp1jMiFr+g+WbIfsDzFzfoOVOL4zhEpd45A3IN5+6RI8
-9FABy/Otw1m92tDtJJgvnqw0OdkqrdEZRWTBsrJg6JLdzZnNRLWDoedzEkE/LL++7PuhaSy+6BXt
-mqid7HxGosGrFHZGxxf3k1WfMxQQdiICaTOkV+O72ZEdvJ62rsnuiFZOIsw/xxAxhqGrvaMNzhWx
-syhYmPopOYx0BLpEMj2kFDO9jqHDjRt8sReAu6sl1/o5LKAWlWXxU6jmpLvSx5MAAAAAAAA=
-
-
---=-kuiyOGxGFoDOQHVFJxGm--
 
