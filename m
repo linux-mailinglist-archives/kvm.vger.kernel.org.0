@@ -1,306 +1,232 @@
-Return-Path: <kvm+bounces-53848-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53849-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D58BAB185C8
-	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 18:28:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FB0EB185F4
+	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 18:44:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC1BF581AF1
-	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 16:28:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 38FDC188718F
+	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 16:44:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECE8C28CF5C;
-	Fri,  1 Aug 2025 16:28:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B6181AA7BF;
+	Fri,  1 Aug 2025 16:44:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="v321MfF2"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4Ejh3A8f"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3929C1F2C45;
-	Fri,  1 Aug 2025 16:28:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D77961A0730
+	for <kvm@vger.kernel.org>; Fri,  1 Aug 2025 16:44:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754065705; cv=none; b=us0N9iUL2Secm3/oMjEQQcfrqaFNf/KlNq85z7YDReTwGsgUtjqlrzTzCxcaX5jcl/Hi4C/HcmTIvcEXahQeevMEGEilvM4fhGh0mDMmrag3tnMGORCB8CiKEVnQvYxdTdt2S5fRlDTYf/TgRYm2AzFEMalJBMu/6oN2ijb7gc8=
+	t=1754066662; cv=none; b=os6rhGP+gfJRUafgaPMqmcyUiDVquTOWXJGuyGDmk8f8rDLDMJja+wKiPQG5BYBJ2pMyzhN9v2OWf0xLSDH8Bg+tvIozig+ohug0n9GGLF0O46rypxuSnP2lVpIkaY47WrhHzPPGe0d/3JaSX6PLssLOo+t8P9kpPwyuuEPFOto=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754065705; c=relaxed/simple;
-	bh=7KN7jxN1xhOuuMgct4p3MSXPg+2R2mCAvX5lQLKS+wI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ToGgHlklueDDWKHK86BE2DjXKEUGs5gUUZhR31erGoeAJRbLQ6V8Ot+xHM4cV8t+A+JEvJznABoZao/7jPjSYDVIi/tHg9P9Y7DRPH3fS9hSaBbZcJG01sXgGI1q/LHQW16R1S2AxI9NHsRu5y3vXByH24uJHiWjl+2+9O+6Lg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=v321MfF2; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [192.168.7.202] ([71.202.166.45])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 571GRqDD2947859
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Fri, 1 Aug 2025 09:27:53 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 571GRqDD2947859
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025072201; t=1754065674;
-	bh=OLtNWbgnEawrqTKJxWuW7Pqkf2cPjeHWlfO8F9mfG3Q=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=v321MfF2NHtBPo6fPuxU8Iyzhcc/zIbyXRhZnIKDCVwfrpo6yeTXZtA3gbXBgg8GK
-	 Wn2AWemVe3iM3El1/xKU7O9umGCcdETZdJQvh4tASwD6Zw5l6AH/7q+0ySgezDZiRs
-	 cYCHcDh7HJhJx5ENZHuiRM9IaGMJOGEOXqk0WTiF/AAh0/EkXDjXVEAVi0YUJA2GGv
-	 1/zZKdyyNc+WOdIEyQY6bbyU5PNCxQjHU/JEHWoZS2JZ/22cn4GJ0h90FnRzgG5sLo
-	 /0hweQXLFvvWxoxqvCOKh0snH8LJ6xkwuoFnG2neawVX5M3QlpxpTMqiNVpTrymrZZ
-	 qo7KJuLhUdObA==
-Message-ID: <72a0c74e-529a-4b1e-bf9c-07468caa24d4@zytor.com>
-Date: Fri, 1 Aug 2025 09:27:52 -0700
+	s=arc-20240116; t=1754066662; c=relaxed/simple;
+	bh=igrMx6iFIDdFmFIB8l2bfoLXUmpgB2zic38Ft4a8CSI=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=nz3lZHGHWqppcP/vYXb7S6ZD4tH8thefV0DT7YesJye9SlUdrZKBE2y1Z0/HO/HgYmv9gojIPbS+eAa6i1OAwxZdJouuFqwl8w+eY+VyDrfBaHty45bBGmvzo99sZdYfl+GACBx0hClk7pplIZbWKb5aAJ4xJKU74MZ4hg01mNM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4Ejh3A8f; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-31f65d519d3so3135567a91.2
+        for <kvm@vger.kernel.org>; Fri, 01 Aug 2025 09:44:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1754066660; x=1754671460; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=cmFw3mXH/exEQe+/QLbl03MUiMl4ucnB+5XoLqj1sUc=;
+        b=4Ejh3A8fdkDUKLKlRPnnC1YrywmY11XvMTj90HdjGak46bdvxa81tCQG+o/lnQb0lE
+         v1KcGTvEIg0zMb1PoSeZs43EN2QFhO4VKTh5IR+2jJTHSjSJpSM2yKljw6Y3BJR2ZYY6
+         2F4AQSHJp1LaDlFMzTeLscpJi9Qf8+TL2mWvSYCheYNSHW12rFd6ozH2L3Xd/hMIOWUp
+         xoZuktkj8+by2DRXGdd+022IPE+V5idgrppkYF3taP7zGnal36J6uqRT4INz+PdyQj8s
+         CF8lq4KLd3YGKqD1jvpkeZ4BLCyckSYwJsWlK5wahh+VB8kXJUe+FVvESp+0iw4etRRS
+         XJGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754066660; x=1754671460;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cmFw3mXH/exEQe+/QLbl03MUiMl4ucnB+5XoLqj1sUc=;
+        b=NZ8F76utPc2CFpRo707Kg73T5JJiwuZawEGjPs2Ot7FMhDfgGYIWcryTX89j2OWM3h
+         aqyp9ozB/u3GHq7uZ/ikJdpzmIfE2RW3QbxAuq1EyCEDpWQ5axdX3KwSWs0kxEgFb5pu
+         Y3ZNJ6i2fVdLF4ChYDd8pMN/FFAp8de+GSWC+fofnnhGeEl1goy5ICku9s+B3qmKcgVw
+         +u1g5Ju8IEB59XvnZVR1QYtJdkBO+YKd56zxhS5bfbBr/j4540KGR/N0Lc5Q/k0aSxnp
+         rP9eO6tUHMe8BhnFffJD2E5emg9Vtvx6OYarmTUuAZMzHcTs1R850A7rCUJhTAU5J8qz
+         SQWQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWaPPDUWZfA6wjalDN3AwS4kj1BSFdEk5LUd0noR/wFGwsDgRm4HYVArqUZmBk/UIQTGsM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxzeM38yrIKA647Xm5MU02bnaYWCzU2dXV+JURdQsTmguaxo8XX
+	RssheIzhQH3rcDgn48nmzjQGQCcuJAswOew9I1Dql07rCSdmYAWlXv7Iexms1wqKcOzlasLHlBf
+	3Lmv2fQ==
+X-Google-Smtp-Source: AGHT+IHTCPWlBsVY++6yRHnsFzrU+E4U0uWTRC0q7DUxzgBPU0wzo6RMGy3C5kq+eZLK/o+LJzUMjGasNMs=
+X-Received: from pjf12.prod.google.com ([2002:a17:90b:3f0c:b0:311:462d:cb60])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1812:b0:311:da03:3437
+ with SMTP id 98e67ed59e1d1-321162b44b8mr568364a91.27.1754066660052; Fri, 01
+ Aug 2025 09:44:20 -0700 (PDT)
+Date: Fri, 1 Aug 2025 09:44:18 -0700
+In-Reply-To: <b27f807e-b04f-487d-be13-74a8b0a61b42@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 2/4] KVM: x86: Introduce MSR read/write emulation
- helpers
-To: Sean Christopherson <seanjc@google.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, pbonzini@redhat.com,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        chao.gao@intel.com
-References: <20250730174605.1614792-1-xin@zytor.com>
- <20250730174605.1614792-3-xin@zytor.com> <aIzROnILlYuaE2FB@google.com>
-Content-Language: en-US
-From: Xin Li <xin@zytor.com>
-Autocrypt: addr=xin@zytor.com; keydata=
- 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
- l75w1xInsg==
-In-Reply-To: <aIzROnILlYuaE2FB@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20250729193341.621487-1-seanjc@google.com> <20250729193341.621487-6-seanjc@google.com>
+ <b27f807e-b04f-487d-be13-74a8b0a61b42@intel.com>
+Message-ID: <aIzu4q_7yBmCIOWK@google.com>
+Subject: Re: [PATCH 5/5] KVM: TDX: Add sub-ioctl KVM_TDX_TERMINATE_VM
+From: Sean Christopherson <seanjc@google.com>
+To: Adrian Hunter <adrian.hunter@intel.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Paolo Bonzini <pbonzini@redhat.com>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Vishal Annapurve <vannapurve@google.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	Rick Edgecombe <rick.p.edgecombe@intel.com>, Nikolay Borisov <nik.borisov@suse.com>, 
+	Yan Y Zhao <yan.y.zhao@intel.com>, Kai Huang <kai.huang@intel.com>, 
+	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On 8/1/2025 7:37 AM, Sean Christopherson wrote:
-> On Wed, Jul 30, 2025, Xin Li (Intel) wrote:
->> Add helper functions to centralize guest MSR read and write emulation.
->> This change consolidates the MSR emulation logic and makes it easier
->> to extend support for new MSR-related VM exit reasons introduced with
->> the immediate form of MSR instructions.
->>
->> Signed-off-by: Xin Li (Intel) <xin@zytor.com>
->> ---
->>   arch/x86/include/asm/kvm_host.h |  1 +
->>   arch/x86/kvm/x86.c              | 67 +++++++++++++++++++++++----------
->>   2 files changed, 49 insertions(+), 19 deletions(-)
->>
->> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
->> index f19a76d3ca0e..a854d9a166fe 100644
->> --- a/arch/x86/include/asm/kvm_host.h
->> +++ b/arch/x86/include/asm/kvm_host.h
->> @@ -201,6 +201,7 @@ enum kvm_reg {
->>   	VCPU_EXREG_SEGMENTS,
->>   	VCPU_EXREG_EXIT_INFO_1,
->>   	VCPU_EXREG_EXIT_INFO_2,
->> +	VCPU_EXREG_EDX_EAX,
-> 
-> I really, really don't want to add a "reg" for this.  It's not an actual register,
-> and bleeds details of one specific flow throughout KVM.
++Chao
 
-Sure.
-
+On Fri, Aug 01, 2025, Adrian Hunter wrote:
+> On 29/07/2025 22:33, Sean Christopherson wrote:
+> > +static int tdx_terminate_vm(struct kvm *kvm)
+> > +{
+> > +	if (kvm_trylock_all_vcpus(kvm))
+> > +		return -EBUSY;
+> > +
+> > +	kvm_vm_dead(kvm);
+> > +	to_kvm_tdx(kvm)->vm_terminated = true;
+> > +
+> > +	kvm_unlock_all_vcpus(kvm);
+> > +
+> > +	tdx_mmu_release_hkid(kvm);
+> > +
+> > +	return 0;
+> > +}
 > 
-> The only path where KVM _needs_ to differentiate between the "legacy" instructions
-> and the immediate variants instruction is in the inner RDMSR helper.
+> As I think I mentioned when removing vm_dead first came up,
+> I think we need more checks.  I spent some time going through
+> the code and came up with what is below:
 > 
-> For the WRMSR helper, KVM can and should simply pass in @data, not pass in a reg
-> and then have the helper do an if-else on the reg:
-
-My initial patch passes @data in the WRMSR path, but to make it 
-consistent with the handling of RDMSR I changed it to @reg.
-
-Yes, passing @data makes more sense because it hides unneccesary details.
-
+> First, we need to avoid TDX VCPU sub-IOCTLs from racing with
+> tdx_mmu_release_hkid().  But having any TDX sub-IOCTL run after
+> KVM_TDX_TERMINATE_VM raises questions of what might happen, so
+> it is much simpler to understand, if that is not possible.
+> There are 3 options:
 > 
->    int kvm_emulate_wrmsr(struct kvm_vcpu *vcpu)
->    {
->    	return __kvm_emulate_wrmsr(vcpu, kvm_rcx_read(vcpu),
->    				   kvm_read_edx_eax(vcpu));
->    }
->    EXPORT_SYMBOL_GPL(kvm_emulate_wrmsr);
->    
->    int kvm_emulate_wrmsr_imm(struct kvm_vcpu *vcpu, u32 msr, int reg)
->    {
->    	return __kvm_emulate_wrmsr(vcpu, msr, kvm_register_read(vcpu, reg));
->    }
->    EXPORT_SYMBOL_GPL(kvm_emulate_wrmsr_imm);
+> 1. Require that KVM_TDX_TERMINATE_VM is valid only if
+> kvm_tdx->state == TD_STATE_RUNNABLE.  Since currently all
+> the TDX sub-IOCTLs are for initialization, that would block
+> the opportunity for any to run after KVM_TDX_TERMINATE_VM.
 > 
-> And for the RDMSR userspace completion, KVM is already eating an indirect function
-> call, so the wrappers can simply pass in the appropriate completion helper.  It
-> does mean having to duplicate the vcpu->run->msr.error check, but we'd have to
-> duplicate the "r == VCPU_EXREG_EDX_EAX" by sharing a callback, *and* we'd also
-> need to be very careful about setting the effective register in the other existing
-> flows that utilize complete_fast_rdmsr.
+> 2. Check vm_terminated in tdx_vm_ioctl() and tdx_vcpu_ioctl()
 > 
-> Then to communicate that the legacy form with implicit destination operands is
-> being emulated, pass -1 for the register.  It's not the prettiest, but I do like
-> using "reg invalid" to communicate that the destination is implicit.
+> 3. Test KVM_REQ_VM_DEAD in tdx_vm_ioctl() and tdx_vcpu_ioctl()
 > 
->    static int __kvm_emulate_rdmsr(struct kvm_vcpu *vcpu, u32 msr, int reg,
->    			       int (*complete_rdmsr)(struct kvm_vcpu *))
-
-Yeah, it is a clean way to pass a userspace completion callback.
-
->    {
->    	u64 data;
->    	int r;
->    
->    	r = kvm_get_msr_with_filter(vcpu, msr, &data);
->    	if (!r) {
->    		trace_kvm_msr_read(msr, data);
->    
->    		if (reg < 0) {
->    			kvm_rax_write(vcpu, data & -1u);
->    			kvm_rdx_write(vcpu, (data >> 32) & -1u);
->    		} else {
->    			kvm_register_write(vcpu, reg, data);
->    		}
->    	} else {
->    		/* MSR read failed? See if we should ask user space */
->    		if (kvm_msr_user_space(vcpu, msr, KVM_EXIT_X86_RDMSR, 0,
->    				       complete_rdmsr, r))
->    			return 0;
->    		trace_kvm_msr_read_ex(msr);
->    	}
->    
->    	return kvm_x86_call(complete_emulated_msr)(vcpu, r);
->    }
->    
->    int kvm_emulate_rdmsr(struct kvm_vcpu *vcpu)
->    {
->    	return __kvm_emulate_rdmsr(vcpu, kvm_rcx_read(vcpu), -1,
->    				   complete_fast_rdmsr);
->    }
->    EXPORT_SYMBOL_GPL(kvm_emulate_rdmsr);
->    
->    int kvm_emulate_rdmsr_imm(struct kvm_vcpu *vcpu, u32 msr, int reg)
->    {
->    	vcpu->arch.cui_rdmsr_imm_reg = reg;
->    
->    	return __kvm_emulate_rdmsr(vcpu, msr, reg, complete_fast_rdmsr_imm);
->    }
->    EXPORT_SYMBOL_GPL(kvm_emulate_rdmsr_imm);
+> [ Note cannot check is_hkid_assigned() because that is racy ]
 > 
->>   };
->>   
->>   enum {
->> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->> index a1c49bc681c4..5086c3b30345 100644
->> --- a/arch/x86/kvm/x86.c
->> +++ b/arch/x86/kvm/x86.c
->> @@ -2024,54 +2024,71 @@ static int kvm_msr_user_space(struct kvm_vcpu *vcpu, u32 index,
->>   	return 1;
->>   }
->>   
->> -int kvm_emulate_rdmsr(struct kvm_vcpu *vcpu)
->> +static int kvm_emulate_get_msr(struct kvm_vcpu *vcpu, u32 msr, int reg)
+> Secondly, I suggest we avoid SEAMCALLs that will fail and
+> result in KVM_BUG_ON() if HKID has been released.
 > 
-> Please keep "rdmsr" and "wrmsr" when dealing emulation of those instructions to
-> help differentiate from the many other MSR get/set paths.  (ignore the actual
-> emulator hooks; that code is crusty, but not worth the churn to clean up).
-
-Once the rules are laid out, it's easy to act :)
-
+> There are 2 groups of those: MMU-related and TDVPS_ACCESSORS.
 > 
->> @@ -2163,9 +2180,8 @@ static int handle_fastpath_set_tscdeadline(struct kvm_vcpu *vcpu, u64 data)
->>   	return 0;
->>   }
->>   
->> -fastpath_t handle_fastpath_set_msr_irqoff(struct kvm_vcpu *vcpu)
->> +static fastpath_t handle_set_msr_irqoff(struct kvm_vcpu *vcpu, u32 msr, int reg)
+> For the MMU-related, the following 2 functions should return
+> an error immediately if vm_terminated:
 > 
-> I think it makes sense to (a) add the x86.c code and the vmx.c code in the same
-> patch, and then (b) add fastpath support in a separate patch to make the initial
-> (combined x86.c + vmx.c) patch easier to review.  Adding the x86.c plumbing/logic
-> before the VMX support makes the x86.c change difficult to review, as there are
-> no users of the new paths, and the VMX changes are quite tiny.  Ignoring the arch
-> boilerplate, the VMX changes barely add anything relative to the x86.c changes.
-
-Will do.
-
+> 	tdx_sept_link_private_spt()
+> 	tdx_sept_set_private_spte()
 > 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index ae2c8c10e5d2..757e4bb89f36 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -6003,6 +6003,23 @@ static int handle_notify(struct kvm_vcpu *vcpu)
->          return 1;
->   }
->   
-> +static int vmx_get_msr_imm_reg(struct kvm_vcpu *vcpu)
-> +{
-> +       return vmx_get_instr_info_reg(vmcs_read32(VMX_INSTRUCTION_INFO))
-> +}
+> For that not be racy, extra synchronization is needed so that
+> vm_terminated can be reliably checked when holding mmu lock
+> i.e.
+> 
+> static int tdx_terminate_vm(struct kvm *kvm)
+> {
+> 	if (kvm_trylock_all_vcpus(kvm))
+> 		return -EBUSY;
+> 
+> 	kvm_vm_dead(kvm);
 > +
-> +static int handle_rdmsr_imm(struct kvm_vcpu *vcpu)
-> +{
-> +       return kvm_emulate_rdmsr_imm(vcpu, vmx_get_exit_qual(vcpu),
-> +                                    vmx_get_msr_imm_reg(vcpu));
-> +}
-> +
-> +static int handle_wrmsr_imm(struct kvm_vcpu *vcpu)
-> +{
-> +       return kvm_emulate_wrmsr_imm(vcpu, vmx_get_exit_qual(vcpu),
-> +                                    vmx_get_msr_imm_reg(vcpu));
-> +}
-> +
->   /*
->    * The exit handlers return 1 if the exit was handled fully and guest execution
->    * may resume.  Otherwise they set the kvm_run parameter to indicate what needs
-> @@ -6061,6 +6078,8 @@ static int (*kvm_vmx_exit_handlers[])(struct kvm_vcpu *vcpu) = {
->          [EXIT_REASON_ENCLS]                   = handle_encls,
->          [EXIT_REASON_BUS_LOCK]                = handle_bus_lock_vmexit,
->          [EXIT_REASON_NOTIFY]                  = handle_notify,
-> +       [EXIT_REASON_MSR_READ_IMM]            = handle_rdmsr_imm,
-> +       [EXIT_REASON_MSR_WRITE_IMM]           = handle_wrmsr_imm,
->   };
->   
->   static const int kvm_vmx_max_exit_handlers =
-> @@ -6495,6 +6514,8 @@ static int __vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
->   #ifdef CONFIG_MITIGATION_RETPOLINE
->          if (exit_reason.basic == EXIT_REASON_MSR_WRITE)
->                  return kvm_emulate_wrmsr(vcpu);
-> +       else if (exit_reason.basic == EXIT_REASON_MSR_WRITE_IMM)
-> +               return handle_wrmsr_imm(vcpu);
->          else if (exit_reason.basic == EXIT_REASON_PREEMPTION_TIMER)
->                  return handle_preemption_timer(vcpu);
->          else if (exit_reason.basic == EXIT_REASON_INTERRUPT_WINDOW)
+> +       write_lock(&kvm->mmu_lock);
+> 	to_kvm_tdx(kvm)->vm_terminated = true;
+> +       write_unlock(&kvm->mmu_lock);
 > 
+> 	kvm_unlock_all_vcpus(kvm);
+> 
+> 	tdx_mmu_release_hkid(kvm);
+> 
+> 	return 0;
+> }
+> 
+> Finally, there are 2 TDVPS_ACCESSORS that need avoiding:
+> 
+> 	tdx_load_mmu_pgd()
+> 		skip td_vmcs_write64() if vm_terminated
+> 
+> 	tdx_protected_apic_has_interrupt()
+> 		skip td_state_non_arch_read64() if vm_terminated
 
-Thanks!
-     Xin
+Oof.  And as Chao pointed out[*], removing the vm_dead check would allow creating
+and running vCPUs in a dead VM, which is most definitely not desirable.  Squashing
+the vCPU creation case is easy enough if we keep vm_dead but still generally allow
+ioctls, and it's probably worth doing that no matter what (to plug the hole where
+pending vCPU creations could succeed):
+
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index d477a7fda0ae..941d2c32b7dc 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -4207,6 +4207,11 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
+ 
+        mutex_lock(&kvm->lock);
+ 
++       if (kvm->vm_dead) {
++               r = -EIO;
++               goto unlock_vcpu_destroy;
++       }
++
+        if (kvm_get_vcpu_by_id(kvm, id)) {
+                r = -EEXIST;
+                goto unlock_vcpu_destroy;
+
+And then to ensure vCPUs can't do anything, check KVM_REQ_VM_DEAD after acquiring
+vcpu->mutex.
+
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 6c07dd423458..883077eee4ce 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -4433,6 +4433,12 @@ static long kvm_vcpu_ioctl(struct file *filp,
+ 
+        if (mutex_lock_killable(&vcpu->mutex))
+                return -EINTR;
++
++       if (kvm_test_request(KVM_REQ_VM_DEAD, vcpu)) {
++               r = -EIO;
++               goto out;
++       }
++
+        switch (ioctl) {
+        case KVM_RUN: {
+                struct pid *oldpid;
+
+
+That should address all TDVPS paths (I hope), and I _think_ would address all
+MMU-related paths as well?  E.g. prefault requires a vCPU.
+
+Disallowing (most) vCPU ioctls but not all VM ioctls on vm_dead isn't great ABI
+(understatement), but I think we need/want the above changes even if we keep the
+general vm_dead restriction.  And given the extremely ad hoc behavior of taking
+kvm->lock for VM ioctls, trying to enforce vm_dead for "all" VM ioctls seems like
+a fool's errand.
+
+So I'm leaning toward keeping "KVM: Reject ioctls only if the VM is bugged, not
+simply marked dead" (with a different shortlog+changelog), but keeping vm_dead
+(and not introducing kvm_tdx.vm_terminated).
+
+Thoughts?
+
+[*] https://lore.kernel.org/all/aIlzeT+yFG2Tvb3%2F@intel.com
 
