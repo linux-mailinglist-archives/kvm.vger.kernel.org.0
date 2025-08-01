@@ -1,161 +1,96 @@
-Return-Path: <kvm+bounces-53851-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53852-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D0E2B18774
-	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 20:46:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01486B187E9
+	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 21:59:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C5BAA872CC
-	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 18:46:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8FD9F1AA385F
+	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 19:59:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91B8B28D8E2;
-	Fri,  1 Aug 2025 18:46:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F31228D8C7;
+	Fri,  1 Aug 2025 19:59:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1rUUtcq0"
+	dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b="F0HMak6z"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 425E623AB95
-	for <kvm@vger.kernel.org>; Fri,  1 Aug 2025 18:46:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DD0E6F53E
+	for <kvm@vger.kernel.org>; Fri,  1 Aug 2025 19:59:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754073994; cv=none; b=W2pmOhnvJO3QFBFpYd/Gc9Uct0dzCCcexXMsP51t6MMNhI7Ll9nv4YhPo0cP3LhOhxUTk8O/+Xzws4wIiZpmTBkUj/tKSyXnfszzBKj4VWpSv7YZp1oasUrvpu+o+F9BOSM6co+kOd6L7sEDM+af3r3RwsUyFse0ezhmTbwlg7w=
+	t=1754078352; cv=none; b=ZffSZAsSY+OngRmBRRLB0g9MGkHaTHOPV6XkqpUO4nfel/gnGogoiMdjNzMzn1d9te5oaivjdr9YrAPD7HtOWKq4ukyB/delf1JQOBrYy9moRIPX1WNHzvdfuFJhylk8x2kMfr8D2THGK1v/4gavkvQV3gIIeOJp3bGr/mhAzCQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754073994; c=relaxed/simple;
-	bh=iuTKwx1riuuxhY/5J2mFsDhn7XxA9QAIr/JvJhOy0OY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=g2wpkV3XLOyspH3bak/5TLNHmUZ9WLykTPVEGBNLMu98HZKNWyeZDY2YKyFSme5XMeRbH6arsq3qzE9HBzgsljyWKKM+Qg8nJiEwXxrhQzVDjt/XI4JKCXtYBbXZ4V+kAwf580aBWavoEll3FNlv1sTAMYxbqNNPzKTdgQvQ33I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1rUUtcq0; arc=none smtp.client-ip=209.85.128.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-71a455096e0so8265167b3.0
-        for <kvm@vger.kernel.org>; Fri, 01 Aug 2025 11:46:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754073992; x=1754678792; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=w2c7bQ162dhyffr+C2PMoaAl+4J9FXAI9hIAhBblIgs=;
-        b=1rUUtcq0/jAohKC9WR77PEEg71ubNE7baLWFQA7l+IZJRitNLpOYHJeDaKq4178Tlg
-         g8cKYCOL7bwP6S7UyKhC+API+vmHb09NTd5wCC3ZlyO3nAZbMEm9AHtc9T4xbCAGQRbE
-         caL9xJ5glxWH5ynyPgVuFDVtgF3zfGW2qXmyW0w8+Ny52I09HyMAr8D0It94L/68sBSw
-         Ib9q97yjjdjn+DHE/LTgnpcDcFzjwzGc+nD6KNfT9SpfVpOhoUkNT9IOZsEKpfyrDiqK
-         NQ5rgBbHikQ4pdfQ7AKcK+6cQYZmyJyENNy+bOYr8c/Vqf2Yfq2RQNJM+Rfyk6FMf/6n
-         iwbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754073992; x=1754678792;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=w2c7bQ162dhyffr+C2PMoaAl+4J9FXAI9hIAhBblIgs=;
-        b=XVVXK53an4eSji7MzgDuDCQwMxsDuMsAZBbiYBwED1gnmYbdUB1dyj4eijMFUpXXkC
-         5LoEypvjJhPfBiIBP4MQ3UCKfk91aUjFKk0qTGVDHMh2dr/oBSuqvUo+vRCOc9Ez/NjV
-         4zEZvgp2BOSH01zsp7LAZy47rLK78qvWaLUOGJSjDtxSV2NEX6PnA4AF8950rcnSSz1k
-         ZXboD/eC7c2fx3gJSxmlKGf14VAT/yHgBt4cGSH0Lwl86p0Dqbw/U6qua9eplt8uSF0l
-         WZq2l2+DlwMQKiGF/yJl81KPA129MIWrocns+kQdd/JhD7XZy9JGOVU/Vt0o2GKd0Jhk
-         bRXg==
-X-Forwarded-Encrypted: i=1; AJvYcCXaQJjxHbnbEOUqMrsC98pE5KEOQMY+2zQAFL2EP+gFOWkkk0PS0P6Mbvg2nhKFU3q3/vQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwIuLIHuXESS25gAWd317BMYE3D9PzbHNFWFwwJrq1R+4Fjdy/M
-	nlZoqKGmD8WVA5vj4BcupwJ2b5dzHvNgQALpd4xWUqUJtVaBW+PEP/gfPPIWtkLTPmLwIIMXsL/
-	W37Dou+SWVsGkcucUvpDpUpvboqgj5dVX7VDjqTb4
-X-Gm-Gg: ASbGncskIHmQwPBb8BZD8JLxKp4EH5oZX41hGaibu9xKABGQEbW+eOeoglpJObiwheT
-	5GaP5+wVrWVbDmWWKLhX+VUFVg9TztlUIG63MxXhXaMgkQuoR2PCJ6g7yri9uZ0EQF7Ab15E7Sg
-	BPqt2LVQ7vz2w/5vgXpNPQOECvMatZUEVlCqYDYBEWXozhuzsaTnzjc3KHxdP8uO1+foQoOKleM
-	vUu8QYByRZZPa9DiP1/u9FIY5PLKaOoVmwEZw==
-X-Google-Smtp-Source: AGHT+IEl9yX593jURawHLWbkAVgQAYSYsMpaUOTywvKTzCY1mB223Rq26/uhMv+My9oQ9rjrYGf4rC+/HsCsxlqvW3Y=
-X-Received: by 2002:a05:690c:488a:b0:70c:c013:f26 with SMTP id
- 00721157ae682-71b7ef7b402mr11188117b3.33.1754073991958; Fri, 01 Aug 2025
- 11:46:31 -0700 (PDT)
+	s=arc-20240116; t=1754078352; c=relaxed/simple;
+	bh=qQDPBYpTKtjZAvUgkS6YEnyxF+oCioRSoLiXTFwQ3H0=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BYylOJQcDwyXdbX3htBBD71cmfrOue+54i8l/RXMcpAXut0uEjrFSg4l73l/Wyyuvi0bNjPzkS0HQqxDYw9rjwZETgBg9MMMhITe4Yj0jarUN6OLHbJsrk+sLvoMuW6vV5QxaJsvrb/opsoijuEm2ZHB15rX2mmol/5YKgdfJNg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b=F0HMak6z; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0148460.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 571Jn8h0009620
+	for <kvm@vger.kernel.org>; Fri, 1 Aug 2025 12:59:10 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=s2048-2025-q2; bh=BU1cxiUGdi+AyNrYPU4S
+	Daom2YUAeQkF9Gt6mdofMQg=; b=F0HMak6zeCC+6+/IKyU+U6Tet1Q1EFLvVLIM
+	7d2ftnDFL3CYH82FZGqaqNmjshs7o0y2Q96GDQodJlWCQ8LbOuUqWOHIMOmGL7CO
+	RXR5Rq3mwI0GHWIpYQ08D+/4fC6/7mTZNxGTP2NA29PxCl+0kjZWiRqcZbBOpd2O
+	aGdDqfekjjSBkbGEPFXVnfctVHgyT+NaH1ndIGe8+iu7hgfaPK1ffgoEa6EMDNX4
+	jT42op6UU7DcvzO2PHwmVVTkrumsmZnILov+Aoj4aRq37YPN8nYs0SH3o6BCseFt
+	Gp4hAE5L+/ACxQ03U1z6k4bV/LhwLBzlBFtRVpaN+20I6IYGKg==
+Received: from maileast.thefacebook.com ([163.114.135.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 488rmrvbaw-2
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <kvm@vger.kernel.org>; Fri, 01 Aug 2025 12:59:09 -0700 (PDT)
+Received: from twshared52133.15.frc2.facebook.com (2620:10d:c0a8:1b::2d) by
+ mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.17; Fri, 1 Aug 2025 19:59:09 +0000
+Received: by devgpu013.nha3.facebook.com (Postfix, from userid 199522)
+	id 63B0149F1E1; Fri,  1 Aug 2025 12:58:55 -0700 (PDT)
+Date: Fri, 1 Aug 2025 12:58:55 -0700
+From: Alex Mastro <amastro@fb.com>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+CC: <alex.williamson@redhat.com>, <kvm@vger.kernel.org>, <peterx@redhat.com>,
+        <kbusch@kernel.org>
+Subject: Re: [PATCH v2] vfio/pci: print vfio-device syspath to fdinfo
+Message-ID: <aI0cf000fXWFlF9B@devgpu013.nha3.facebook.com>
+References: <20250724-show-fdinfo-v2-1-2952115edc10@fb.com>
+ <20250801144800.GA26511@ziepe.ca>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250707224720.4016504-1-jthoughton@google.com>
- <20250707224720.4016504-8-jthoughton@google.com> <aIFOV4ydqsyDH72G@google.com>
- <CADrL8HVJrHrb3AJV5wYtL9x0XHx+-bNFreO4-OyztFOrupE5eg@mail.gmail.com> <aIzLBWqImtgtztOH@google.com>
-In-Reply-To: <aIzLBWqImtgtztOH@google.com>
-From: James Houghton <jthoughton@google.com>
-Date: Fri, 1 Aug 2025 11:45:56 -0700
-X-Gm-Features: Ac12FXxAU2RUoTM8vbbi5zAcMiC3jCiOxjwk0GR-osMUp_HPSvA3qzKWlQIC99M
-Message-ID: <CADrL8HX11ee3R9HXexk3PbhFRKoOPfW6_=c+OOcaWE=0WJ7K4g@mail.gmail.com>
-Subject: Re: [PATCH v5 7/7] KVM: selftests: Add an NX huge pages jitter test
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Vipin Sharma <vipinsh@google.com>, 
-	David Matlack <dmatlack@google.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20250801144800.GA26511@ziepe.ca>
+X-FB-Internal: Safe
+X-Proofpoint-ORIG-GUID: fiU5MlWDLCBV74dXnbVgTrkfM7vHecpx
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODAxMDE1OCBTYWx0ZWRfXxPVugvlru/yT d8bAxe+swSWKQwW0o9Tqb9eNZrGOg8ZcfLGEgMbuXfF4225BmjNDYHIdEr5l07IoLbG0Nx/eYuF eH89JrUlkxPLqqO0gw/Djx7p4iPKm9CHIFJC2ClTLsTzqLeAqUGzW8+jXTVzL0obFQ/jg0B3leQ
+ agSqrF1kAQx37gFlL8CTerIBzpglWomQcWGjzFhIxsflcYrmC6ov/wV8qu1fGlqAV1D6htjiB5b 9ULHA+zbSNjdQbUoR3oA2rQCfJf9UPBIhWbHlc7+nNOnHh6sFYNuWgfMwgMJx4LH7pQ+HPwFr7u FnXqDFg+k4rPcm05ZK4oXczMPseB8sG6LONQpb/kT0Vtq51ICtswIl/owXAEJ1uy8XAQzBYhOfg
+ 8GV/aRjwkjXdJhDh3T1KrlllRD8auHV80eNJI3323/jYDp+wQRSzj1K+1CYaXImToViJmv6F
+X-Authority-Analysis: v=2.4 cv=a+Iw9VSF c=1 sm=1 tr=0 ts=688d1c8e cx=c_pps a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17 a=kj9zAlcOel0A:10 a=2OwXVqhp2XgA:10 a=Pn7XcPFJ1egebTjzJtwA:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-GUID: fiU5MlWDLCBV74dXnbVgTrkfM7vHecpx
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-01_06,2025-08-01_01,2025-03-28_01
 
-On Fri, Aug 1, 2025 at 7:11=E2=80=AFAM Sean Christopherson <seanjc@google.c=
-om> wrote:
->
-> On Mon, Jul 28, 2025, James Houghton wrote:
-> > On Wed, Jul 23, 2025 at 2:04=E2=80=AFPM Sean Christopherson <seanjc@goo=
-gle.com> wrote:
-> > > On Mon, Jul 07, 2025, James Houghton wrote:
-> > > Right, but we also don't want to wait for the initial fault-in either=
-, no?  I.e.
-> > > plumbing in MAP_POPULATE only fixes the worst of the delay, and maybe=
- only with
-> > > the TDP MMU enabled.
-> > >
-> > > In other words, it seems like we need a helper (option?) to excplitly=
- "prefault",
-> > > all memory from within the guest, not the ability to specify MAP_POPU=
-LATE.
-> >
-> > I don't want the EPT to be populated.
-> >
-> > In the event of a hugepage being executed, consider another memory
-> > access. The access can either (1) be in the executed-from hugepage or
-> > (2) be somewhere else.
-> >
-> > For (1), the optimization in this series doesn't help; we will often
-> > be stuck behind the hugepage either being destroyed or reconstructed.
-> >
-> > For (2), the optimization in this series is an improvement, and that's
-> > what this test is trying to demonstrate. But this is only true if the
-> > EPT does not have a valid mapping for the GPA we tried to use. If it
-> > does, the access will just proceed like normal.
-> >
-> > This test only times these "case 2" accesses. Now if we didn't have
-> > MAP_POPULATE, then (non-fast) GUP time appears in these results, which
-> > (IIRC) adds so much noise that the improvement is difficult to
-> > ascertain. But with MAP_POPULATE, the difference is very clear.
->
-> Oh, right, the whole point is to measure fault-in performance.
->
-> In that case, rather than MAP_POPULATE, can we do the slightly more stand=
-ard (for
-> VMMs) thing of writing (or reading) memory from host userspace?  I don't =
-think it's
-> worth plumbing in extra_mmap_flags just for MAP_POPULATE, in no small par=
-t because
-> MAP_POPULATE is effectively best effort, and doesn't work for VM_PFNMAP (=
-or VM_IO).
->
-> Those quirks shouldn't matter for this case, and _probably_ won't ever ma=
-tter for
-> any KVM selftest, but it's enough to make me think MAP_POPULATE is a patt=
-ern we
-> don't want to encourage.
+On Fri, Aug 01, 2025 at 11:48:00AM -0300, Jason Gunthorpe wrote:
+> ??
+<...>
+> vdev->pdev == core_vdev->dev 
+<...>
+> Every vfio parent device has a sysfs path.
 
-What if vm_mem_add() just returned the VA of the added region, and
-then the test could call mlock() on it? That's actually closer to what
-I want; I want to avoid slow GUP as much as I can (though mlock()
-isn't perfect, it's pretty much as good as we can do). So we can
-write:
-
-  char *mem =3D vm_mem_add(...);
-  mlock(mem, size);
-
-instead of
-
-  char *mem =3D vm_mem_add(...);
-  for (tmp =3D mem; tmp < mem + size; tmp +=3D backing_src_pagesz)
-       *(volatile char *)tmp =3D 0;
+Hi Jason, thanks for bearing with me. I lacked some fundamental understandings
+here. This suggestion makes sense, and is simpler and more to the point. I'll
+address this in v3, and also add the documentation for this new behavior to
+proc.rst.
 
