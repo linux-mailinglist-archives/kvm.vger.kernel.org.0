@@ -1,255 +1,288 @@
-Return-Path: <kvm+bounces-53834-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53835-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4478B18214
-	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 15:03:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CA39B18231
+	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 15:12:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E36D627DEC
-	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 13:03:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 562A8621CBF
+	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 13:12:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B14F624728A;
-	Fri,  1 Aug 2025 13:03:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3055B248F61;
+	Fri,  1 Aug 2025 13:12:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EBOC5j/I"
+	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="uxgiSGhd"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EC3A1798F
-	for <kvm@vger.kernel.org>; Fri,  1 Aug 2025 13:03:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0DDF22069E
+	for <kvm@vger.kernel.org>; Fri,  1 Aug 2025 13:12:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754053421; cv=none; b=TbQvlqZq7q4HCa//E76b6lsQQbLB8FBOKy5E8+ytr7aZKMM0emnTtsrHO1DSuPnuo4UWs3FcqsN0wvCr4PwMpNE34+WSiCCdFN3O4l3Sz8I3tkgZehaM+M8G2QyflfZxtKOH8ei/JQP9IoEGmppMx05G9SHSRc9znB4cpCxe/2s=
+	t=1754053959; cv=none; b=QZYPFvOYhkEpzycPwmele8ZzNZ520qXWJzG1jpr1GoF6rXloTkBsqVeEZ5yRWtisKQ5v6/W9LHZRenI/uDCTLHwdzoMZTWP++LpL3hZe0a1mTZ3ufY2bKCdDEt7UdRwSLTvg70U31n9H1zf/DT7GTkoiMDwf3IlfqSntxxoFtuM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754053421; c=relaxed/simple;
-	bh=LGAFsaZhZE9+YVDjSQvh4z1jMFg+F2jCvZkkxWqWe4E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cnQ/iGYBPb8ufdsWd0U80wPmU37rASPh7csaj44VGiC9/gcGZxpTU0QPV0z7AdvtT9NDXqemdRWo14RrAmmieGZsLKcbVmz2lTb4gFSBlMFiI3Hi21aQnzTzQhoKVSZTX97Zo7kqNaMpyvgWps5v58xYFCugz5tVomNT50S1WP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EBOC5j/I; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1754053419;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wRQvRY1Ic3xqYJoWjzoX1AeSxDMgzF+1WipYbCuWjwo=;
-	b=EBOC5j/I6YIV0+ey76MP0svdOAiMYfZqh+YnSZh1BIXV1qn5H0KivhklrQvtMPZ4AqggHY
-	ZaKfiE2GbSk1UufBxz6h4mTZifEwaYpvOY9lkD7pAl6sbhFIdSMwddxFNgH0M0hOnphZSq
-	mX00aohxkbCne8sKk4ILHmUF6eD5Mvs=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-217-c3GGB3_aMc-6o5anH1dUNA-1; Fri, 01 Aug 2025 09:03:37 -0400
-X-MC-Unique: c3GGB3_aMc-6o5anH1dUNA-1
-X-Mimecast-MFC-AGG-ID: c3GGB3_aMc-6o5anH1dUNA_1754053417
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-458a321153dso4204055e9.0
-        for <kvm@vger.kernel.org>; Fri, 01 Aug 2025 06:03:37 -0700 (PDT)
+	s=arc-20240116; t=1754053959; c=relaxed/simple;
+	bh=TC1rMiVJgWvePH17F3ge3obVFOlkxp5gBEdkzNXbX70=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=cGgmHkjct5ogUVFgB9tODqYvwVYDDbKLRpA+gO0QZxibFG/lsq6DtfS66gX7FtsF/pIUORz+rNvkkRmNel9DR1qNoH74jNBgCJmWN1BjnuMdDw5WS+yZQFy9yW4JAxgTgaXlwAhFYfc4aHdiIC/S7KuJLkKDYpp/IZZpyxT6Ir0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=uxgiSGhd; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensrcsec.com
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-45617887276so5494175e9.2
+        for <kvm@vger.kernel.org>; Fri, 01 Aug 2025 06:12:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=grsecurity.net; s=grsec; t=1754053954; x=1754658754; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=QZFBl3XMjqJs9ITIs0pTTYPqn0HayVowzZGxu1QTQLM=;
+        b=uxgiSGhdYXDkZs7QxcHCIYZpxnstyQEZxnGF3VVjMkCn0TLKrFa1/a2KBTuO52Xkb7
+         lubkck8gAiiEJA/G+TaKEwMF8GAKSmgLBjPJGkelgrQ2fAR4F9UXlkDyDIzrl/lteuIV
+         CBLuI6SxPJmE1TzYP5P6qYkb1yH0xYoG66bZjMeYyG9MMdp72GJ6S3/Ob4l0K263ayQR
+         gjkSYlh65o9CJgMuGBoLDixZmXZmY2v+zPSiDWR4U1cavM/qgw82lUo/55SpSf2qFJob
+         B2HURqC4TZTQ7JBdZpWyM/QDM3t+AEjlkvtfFWw7ymRzHM4+UN1HpOWXve4s9z38vUin
+         wPwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754053417; x=1754658217;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wRQvRY1Ic3xqYJoWjzoX1AeSxDMgzF+1WipYbCuWjwo=;
-        b=vO8O0nlMW73MP4OJzahTMNKGqi1fZ1XvnlQBYE08m9rYG7wwbkCkA45JvSC1gpBsN+
-         tZyEpnlXy4JmZtKeaZNwjoot/7aZLhdXgz1TesfeIaNwGqmVpoVHOFjslIIwHrjJtxJp
-         VxLSSzdpkKTJ1GSnOW5IHnCxzF9752AWCNgEW5nJWRcKUk4XihiN3GsWDyaB4kf9d2BA
-         rjslqto7JA7tbTd4FEgJI3EQFWgmy/racNu2ZOSYlW3AND+0ax9H+S9beA7IV7LzLmiD
-         ZzSUMR1NTcn/OPFZVxw/TTUCgi4Lk8HyNIj+bq2K0z8IqhlCrvkzsGcIDF2YW66qZZDI
-         Wm5w==
-X-Gm-Message-State: AOJu0Yylxxyqisywmpw4+Sq1ID2t96bckdwWCG61zIO2ROWtn4y433dR
-	O2n4hDwXfLdO869rzT3xAbnxxxrJkTiuc1HLuIFJp7ZU592yJKY2ZO4D27FYZCe7Qs1Pw9/rJm6
-	suT3WmQehRqpeIpkG6UeatVb42jAnLL1W9zCem32onloPhp62ouSd8A==
-X-Gm-Gg: ASbGnctpDnhao7kS19ZgLgvnP79MH8ZayGW6F6L5Dr+VPy6m1Zgoc66MUlx3xUo2IO1
-	34DoIR9ugXlWNoxyxXrnwN2KECFKvB7rfFmuKEmwmjgv4ejnAFhvBAn7Hs5Rvs502SewB+xD5iE
-	NDWkgQOSf4gaAndVNWyU9fGCPIWDDKli/8nslO+d9d/FA1f7vkv5AuRKoZIlmT9LxMwZQLSqNlq
-	PvO7v/9UkSeTOlNpaUwGWNHxCga8t9185RHtgrgQjx8YJs/SZ6ttppgagPtRToIjYoYF/EpKvJz
-	6SEuzPs4jv24VffbHpghHwJjXOsN6Iu8
-X-Received: by 2002:a05:6000:2481:b0:3b8:bb8b:6b05 with SMTP id ffacd0b85a97d-3b8bb8b6deemr4345590f8f.29.1754053416402;
-        Fri, 01 Aug 2025 06:03:36 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHjHiezwm6gooBQWulD3psAw7200KYzsNILZaaeqjUjY2ZWI9IK3v40njhdn3wBHktdq15jSA==
-X-Received: by 2002:a05:6000:2481:b0:3b8:bb8b:6b05 with SMTP id ffacd0b85a97d-3b8bb8b6deemr4345535f8f.29.1754053415774;
-        Fri, 01 Aug 2025 06:03:35 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc0:1515:7300:62e6:253a:2a96:5e3])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b79c45346asm5907298f8f.39.2025.08.01.06.03.33
+        d=1e100.net; s=20230601; t=1754053954; x=1754658754;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QZFBl3XMjqJs9ITIs0pTTYPqn0HayVowzZGxu1QTQLM=;
+        b=Oi2kLxv3kCQhCL6LmKxb2QsYCsMu1DedFaI3MPOaEhftFq/nKm5vCBM0bnQIB53fqP
+         U2mcxdSY2THY3zFosLuzFPbeRIVObUtwBCyyz2s58AkXOAOE04f1EanyqryqOxFPgpOk
+         hydsXbELb53++4CdEv5dvnOS0JMd9D4wuAYELVQxIFfOyDerHrGufC9dbeXBREEeNDNT
+         sB3uaCP55D7ZWFrasP02HrfHTpkJA33Suv1dIEvz31ioNqwNA2mfjm+7nc53x/+sglLA
+         Todv+MboUeOTDpVi6NxBTSza2yCT3UdDMde9Bs5VMHU5K4LH0D2V9oYh3X3DwarNS/FR
+         H4/g==
+X-Forwarded-Encrypted: i=1; AJvYcCUDnKAbCcZEiefo/yMr2dWoo8eNEjhoBhtt8dWJn01w28apSDfkLrBQdOBcSSZvDZJN8ZQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxaKKwmVWtAWRIeLaTk3yGI3avc87nLXBXDcDGZrwZrOs9a3kRz
+	P6/CVQgvNA5kCuZQ4PBG1Sbq9T+HXZ8jEF8loPOFvjXOfDiRwUMzIt0X1jm32PTYbl8=
+X-Gm-Gg: ASbGncuH5emLWm78c8E/xXhJV0U8IZk6BMsMVCRyPkilgjNhuF5SY20hTyffnHR2UXJ
+	jUXJx4pKqJDhzdScpEnT5CC/B04HCRE4tUUqWxRVXBopXKrQFqwF4Uf7K0isYA6ariwW/5RocLM
+	92Jae5/hYFU0978190rBZEGFyB94XYJIxtDYhuVPtUSL8+Dv8LTusmtvvNZfb0Vpgs+ScIGk/LD
+	fabhgV4NjkjcvJvbNybKMc48ikVi6pPzHz0+NISEzfkYr15R6YsSZOFxmeZEkl9Xu6heMDxoKjO
+	7FSXkc0tLMbt5elJbwpgujuEdTOCMaPSc6VxVsV1T/3SY20NY0SH2A8dCxG3arI2KJA6fa57vyV
+	DfmTljyzMVz+f4MZcJ4MDe9GjFbvQYAHSAnMVrKqHRXTt4XYiXWHGVDodfJwN2RW9OL4bNur3gN
+	wH3Ynu37wU1CneygmNUU/CzczCw/E=
+X-Google-Smtp-Source: AGHT+IGF6VUXkzxD7jTuxQEPCnB97q/5xT9nU/mIsWmCe9cFXTD3T+xOCGKrQdXxLGO2MM7wP3o9Aw==
+X-Received: by 2002:a05:600c:3ba3:b0:456:1abd:fcfc with SMTP id 5b1f17b1804b1-45893943cc5mr81413845e9.25.1754053953969;
+        Fri, 01 Aug 2025 06:12:33 -0700 (PDT)
+Received: from bell.fritz.box (p200300faaf22cf002208a86d0dff5ae9.dip0.t-ipconnect.de. [2003:fa:af22:cf00:2208:a86d:dff:5ae9])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-458b0a55c92sm6475175e9.4.2025.08.01.06.12.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Aug 2025 06:03:35 -0700 (PDT)
-Date: Fri, 1 Aug 2025 09:03:31 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	acourbot@google.com, alok.a.tiwari@oracle.com,
-	anders.roxell@linaro.org, dtatulea@nvidia.com, eperezma@redhat.com,
-	eric.auger@redhat.com, gnurou@gmail.com, jasowang@redhat.com,
-	jonah.palmer@oracle.com, kraxel@redhat.com, leiyang@redhat.com,
-	linux@treblig.org, lulu@redhat.com, michael.christie@oracle.com,
-	parav@nvidia.com, si-wei.liu@oracle.com, stable@vger.kernel.org,
-	viresh.kumar@linaro.org, wangyuli@uniontech.com, will@kernel.org,
-	wquan@redhat.com, xiaopei01@kylinos.cn
-Subject: Re: [GIT PULL] virtio, vhost: features, fixes
-Message-ID: <20250801090250-mutt-send-email-mst@kernel.org>
-References: <20250801070032-mutt-send-email-mst@kernel.org>
+        Fri, 01 Aug 2025 06:12:33 -0700 (PDT)
+From: Mathias Krause <minipli@grsecurity.net>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+	qemu-devel@nongnu.org
+Cc: Marcelo Tosatti <mtosatti@redhat.com>,
+	Xiaoyao Li <xiaoyao.li@intel.com>,
+	kvm@vger.kernel.org,
+	Mathias Krause <minipli@grsecurity.net>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Sean Christopherson <seanjc@google.com>
+Subject: [PATCH v3] i386/kvm: Provide knob to disable hypercall patching quirk
+Date: Fri,  1 Aug 2025 15:12:26 +0200
+Message-Id: <20250801131226.2729893-1-minipli@grsecurity.net>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250801070032-mutt-send-email-mst@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Aug 01, 2025 at 07:00:32AM -0400, Michael S. Tsirkin wrote:
-> The following changes since commit 347e9f5043c89695b01e66b3ed111755afcf1911:
-> 
->   Linux 6.16-rc6 (2025-07-13 14:25:58 -0700)
-> 
-> are available in the Git repository at:
-> 
->   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
-> 
-> for you to fetch changes up to c7991b44d7b44f9270dec63acd0b2965d29aab43:
-> 
->   vsock/virtio: Allocate nonlinear SKBs for handling large transmit buffers (2025-07-17 08:33:09 -0400)
+KVM has a weird behaviour when a guest executes VMCALL on an AMD system
+or VMMCALL on an Intel CPU. Both naturally generate an invalid opcode
+exception (#UD) as they are just the wrong instruction for the CPU
+given. But instead of forwarding the exception to the guest, KVM tries
+to patch the guest instruction to match the host's actual hypercall
+instruction. That is doomed to fail for regular operating systems, as
+read-only code is rather the standard these days. But, instead of
+letting go the patching attempt and falling back to #UD injection, KVM
+propagates its failure and injects the page fault instead.
 
-Oh no I am sorry! Please ignore, a bad commit snuck in there - it still
-needs maintainer approval, and I forgot.
-Will resend.
+That's wrong on multiple levels. Not only isn't that a valid exception
+to be generated by these instructions, confusing attempts to handle
+them. It also destroys guest state by doing so, namely the value of CR2.
 
+Sean attempted to fix that in KVM[1] but the patch was never applied.
 
-> ----------------------------------------------------------------
-> virtio, vhost: features, fixes
-> 
-> vhost can now support legacy threading
-> 	if enabled in Kconfig
-> vsock memory allocation strategies for
-> 	large buffers have been improved,
-> 	reducing pressure on kmalloc
-> vhost now supports the in-order feature
-> 	guest bits missed the merge window
-> 
-> fixes, cleanups all over the place
-> 
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> 
-> ----------------------------------------------------------------
-> Alexandre Courbot (1):
->       media: add virtio-media driver
-> 
-> Alok Tiwari (4):
->       virtio: Fix typo in register_virtio_device() doc comment
->       vhost-scsi: Fix typos and formatting in comments and logs
->       vhost: Fix typos
->       vhost-scsi: Fix check for inline_sg_cnt exceeding preallocated limit
-> 
-> Anders Roxell (1):
->       vdpa: Fix IDR memory leak in VDUSE module exit
-> 
-> Cindy Lu (1):
->       vhost: Reintroduce kthread API and add mode selection
-> 
-> Dr. David Alan Gilbert (2):
->       vhost: vringh: Remove unused iotlb functions
->       vhost: vringh: Remove unused functions
-> 
-> Dragos Tatulea (2):
->       vdpa/mlx5: Fix needs_teardown flag calculation
->       vdpa/mlx5: Fix release of uninitialized resources on error path
-> 
-> Gerd Hoffmann (1):
->       drm/virtio: implement virtio_gpu_shutdown
-> 
-> Jason Wang (3):
->       vhost: fail early when __vhost_add_used() fails
->       vhost: basic in order support
->       vhost_net: basic in_order support
-> 
-> Michael S. Tsirkin (6):
->       virtio: document ENOSPC
->       pci: report surprise removal event
->       virtio: fix comments, readability
->       virtio: pack config changed flags
->       virtio: allow transports to suppress config change
->       virtio: support device disconnect
-> 
-> Mike Christie (1):
->       vhost-scsi: Fix log flooding with target does not exist errors
-> 
-> Pei Xiao (1):
->       vhost: Use ERR_CAST inlined function instead of ERR_PTR(PTR_ERR(...))
-> 
-> Viresh Kumar (2):
->       virtio-mmio: Remove virtqueue list from mmio device
->       virtio-vdpa: Remove virtqueue list
-> 
-> WangYuli (1):
->       virtio: virtio_dma_buf: fix missing parameter documentation
-> 
-> Will Deacon (9):
->       vhost/vsock: Avoid allocating arbitrarily-sized SKBs
->       vsock/virtio: Validate length in packet header before skb_put()
->       vsock/virtio: Move length check to callers of virtio_vsock_skb_rx_put()
->       vsock/virtio: Resize receive buffers so that each SKB fits in a 4K page
->       vsock/virtio: Rename virtio_vsock_alloc_skb()
->       vsock/virtio: Move SKB allocation lower-bound check to callers
->       vhost/vsock: Allocate nonlinear SKBs for handling large receive buffers
->       vsock/virtio: Rename virtio_vsock_skb_rx_put()
->       vsock/virtio: Allocate nonlinear SKBs for handling large transmit buffers
-> 
->  MAINTAINERS                                |    6 +
->  drivers/gpu/drm/virtio/virtgpu_drv.c       |    8 +-
->  drivers/media/Kconfig                      |   13 +
->  drivers/media/Makefile                     |    2 +
->  drivers/media/virtio/Makefile              |    9 +
->  drivers/media/virtio/protocol.h            |  288 ++++++
->  drivers/media/virtio/scatterlist_builder.c |  563 ++++++++++++
->  drivers/media/virtio/scatterlist_builder.h |  111 +++
->  drivers/media/virtio/session.h             |  109 +++
->  drivers/media/virtio/virtio_media.h        |   93 ++
->  drivers/media/virtio/virtio_media_driver.c |  959 ++++++++++++++++++++
->  drivers/media/virtio/virtio_media_ioctls.c | 1297 ++++++++++++++++++++++++++++
->  drivers/pci/pci.h                          |    6 +
->  drivers/vdpa/mlx5/core/mr.c                |    3 +
->  drivers/vdpa/mlx5/net/mlx5_vnet.c          |   12 +-
->  drivers/vdpa/vdpa_user/vduse_dev.c         |    1 +
->  drivers/vhost/Kconfig                      |   18 +
->  drivers/vhost/net.c                        |   88 +-
->  drivers/vhost/scsi.c                       |   24 +-
->  drivers/vhost/vhost.c                      |  377 +++++++-
->  drivers/vhost/vhost.h                      |   30 +-
->  drivers/vhost/vringh.c                     |  118 ---
->  drivers/vhost/vsock.c                      |   15 +-
->  drivers/virtio/virtio.c                    |   25 +-
->  drivers/virtio/virtio_dma_buf.c            |    2 +
->  drivers/virtio/virtio_mmio.c               |   52 +-
->  drivers/virtio/virtio_pci_common.c         |   45 +
->  drivers/virtio/virtio_pci_common.h         |    3 +
->  drivers/virtio/virtio_pci_legacy.c         |    2 +
->  drivers/virtio/virtio_pci_modern.c         |    2 +
->  drivers/virtio/virtio_ring.c               |    4 +
->  drivers/virtio/virtio_vdpa.c               |   44 +-
->  include/linux/pci.h                        |   45 +
->  include/linux/virtio.h                     |   13 +-
->  include/linux/virtio_config.h              |   32 +
->  include/linux/virtio_vsock.h               |   46 +-
->  include/linux/vringh.h                     |   12 -
->  include/uapi/linux/vhost.h                 |   29 +
->  include/uapi/linux/virtio_ids.h            |    1 +
->  kernel/vhost_task.c                        |    2 +-
->  net/vmw_vsock/virtio_transport.c           |   20 +-
->  net/vmw_vsock/virtio_transport_common.c    |    3 +-
->  42 files changed, 4186 insertions(+), 346 deletions(-)
->  create mode 100644 drivers/media/virtio/Makefile
->  create mode 100644 drivers/media/virtio/protocol.h
->  create mode 100644 drivers/media/virtio/scatterlist_builder.c
->  create mode 100644 drivers/media/virtio/scatterlist_builder.h
->  create mode 100644 drivers/media/virtio/session.h
->  create mode 100644 drivers/media/virtio/virtio_media.h
->  create mode 100644 drivers/media/virtio/virtio_media_driver.c
->  create mode 100644 drivers/media/virtio/virtio_media_ioctls.c
+Later, Oliver added a quirk bit in [2] so the behaviour can, at least,
+conceptually be disabled. Paolo even called out to add this very
+functionality to disable the quirk in QEMU[3]. So lets just do it.
+
+Add a new property 'hypercall-patching=on|off' to the KVM accelerator
+but keep the default behaviour as-is as there are, unfortunately,
+systems out there relying on the patching, e.g. KUT[4,5].
+
+For regular operating systems, however, the patching wouldn't be needed,
+nor work at all. If it would, these systrems would be vulnerable to
+memory corruption attacks, freely overwriting kernel code as they
+please.
+
+[1] https://lore.kernel.org/kvm/20211210222903.3417968-1-seanjc@google.com/
+[2] https://lore.kernel.org/kvm/20220316005538.2282772-2-oupton@google.com/
+[3] https://lore.kernel.org/kvm/80e1f1d2-2d79-22b7-6665-c00e4fe9cb9c@redhat.com/
+[4] https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/blob/f045ea5627a3/x86/apic.c#L644
+[5] https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/blob/f045ea5627a3/x86/vmexit.c#L36
+
+Cc: Oliver Upton <oliver.upton@linux.dev>
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Xiaoyao Li <xiaoyao.li@intel.com>
+Signed-off-by: Mathias Krause <minipli@grsecurity.net>
+---
+Xiaoyao, I left out your Tested-by and Reviewed-by as I changed the code
+(slightly) and it didn't felt right to pick these up. However, as only
+the default value changed, the functionality would be the same if you
+tested both cases explicitly (-accel kvm,hypercall-patching={on,off}).
+
+v3:
+- switch default to 'on' to not change the default behaviour
+- reference KUT tests relying on hypercall patching
+
+v2:
+- rename hypercall_patching_enabled to hypercall_patching (Xiaoyao Li)
+- make use of error_setg*() (Xiaoyao Li)
+
+ accel/kvm/kvm-all.c      |  1 +
+ include/system/kvm_int.h |  1 +
+ qemu-options.hx          | 10 +++++++++
+ target/i386/kvm/kvm.c    | 45 ++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 57 insertions(+)
+
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index 890d5ea9f865..a68f779b6c1c 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -3997,6 +3997,7 @@ static void kvm_accel_instance_init(Object *obj)
+     s->kvm_dirty_ring_size = 0;
+     s->kvm_dirty_ring_with_bitmap = false;
+     s->kvm_eager_split_size = 0;
++    s->hypercall_patching = true;
+     s->notify_vmexit = NOTIFY_VMEXIT_OPTION_RUN;
+     s->notify_window = 0;
+     s->xen_version = 0;
+diff --git a/include/system/kvm_int.h b/include/system/kvm_int.h
+index 9247493b0299..ec891ca8e302 100644
+--- a/include/system/kvm_int.h
++++ b/include/system/kvm_int.h
+@@ -160,6 +160,7 @@ struct KVMState
+     uint64_t kvm_eager_split_size;  /* Eager Page Splitting chunk size */
+     struct KVMDirtyRingReaper reaper;
+     struct KVMMsrEnergy msr_energy;
++    bool hypercall_patching;
+     NotifyVmexitOption notify_vmexit;
+     uint32_t notify_window;
+     uint32_t xen_version;
+diff --git a/qemu-options.hx b/qemu-options.hx
+index ab23f14d2178..98af1a91e6e6 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -236,6 +236,7 @@ DEF("accel", HAS_ARG, QEMU_OPTION_accel,
+     "                dirty-ring-size=n (KVM dirty ring GFN count, default 0)\n"
+     "                eager-split-size=n (KVM Eager Page Split chunk size, default 0, disabled. ARM only)\n"
+     "                notify-vmexit=run|internal-error|disable,notify-window=n (enable notify VM exit and set notify window, x86 only)\n"
++    "                hypercall-patching=on|off (disable KVM's VMCALL/VMMCALL hypercall patching quirk, x86 only)\n"
+     "                thread=single|multi (enable multi-threaded TCG)\n"
+     "                device=path (KVM device path, default /dev/kvm)\n", QEMU_ARCH_ALL)
+ SRST
+@@ -318,6 +319,15 @@ SRST
+         open up for a specified of time (i.e. notify-window).
+         Default: notify-vmexit=run,notify-window=0.
+ 
++    ``hypercall-patching=on|off``
++        KVM tries to recover from the wrong hypercall instruction being used by
++        a guest by attempting to rewrite it to the one supported natively by
++        the host CPU (VMCALL on Intel, VMMCALL for AMD systems). However, this
++        patching may fail if the guest memory is write protected, leading to a
++        page fault getting propagated to the guest instead of an illegal
++        instruction exception. As this may confuse guests, this option allows
++        disabling it (x86 only, enabled by default).
++
+     ``device=path``
+         Sets the path to the KVM device node. Defaults to ``/dev/kvm``. This
+         option can be used to pass the KVM device to use via a file descriptor
+diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+index 369626f8c8d7..a841d53c240f 100644
+--- a/target/i386/kvm/kvm.c
++++ b/target/i386/kvm/kvm.c
+@@ -3228,6 +3228,26 @@ static int kvm_vm_enable_energy_msrs(KVMState *s)
+     return 0;
+ }
+ 
++static int kvm_vm_disable_hypercall_patching(KVMState *s, Error **errp)
++{
++    int valid_quirks = kvm_vm_check_extension(s, KVM_CAP_DISABLE_QUIRKS2);
++    int ret = -1;
++
++    if (valid_quirks & KVM_X86_QUIRK_FIX_HYPERCALL_INSN) {
++        ret = kvm_vm_enable_cap(s, KVM_CAP_DISABLE_QUIRKS2, 0,
++                                KVM_X86_QUIRK_FIX_HYPERCALL_INSN);
++        if (ret) {
++            error_setg_errno(errp, -ret, "kvm: failed to disable "
++                             "hypercall patching quirk: %s",
++                             strerror(-ret));
++        }
++    } else {
++        error_setg(errp, "kvm: disabling hypercall patching not supported");
++    }
++
++    return ret;
++}
++
+ int kvm_arch_init(MachineState *ms, KVMState *s)
+ {
+     int ret;
+@@ -3367,6 +3387,12 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+         }
+     }
+ 
++    if (!s->hypercall_patching) {
++        if (kvm_vm_disable_hypercall_patching(s, &local_err)) {
++            error_report_err(local_err);
++        }
++    }
++
+     return 0;
+ }
+ 
+@@ -6478,6 +6504,19 @@ void kvm_request_xsave_components(X86CPU *cpu, uint64_t mask)
+     }
+ }
+ 
++static bool kvm_arch_get_hypercall_patching(Object *obj, Error **errp)
++{
++    KVMState *s = KVM_STATE(obj);
++    return s->hypercall_patching;
++}
++
++static void kvm_arch_set_hypercall_patching(Object *obj, bool value,
++                                            Error **errp)
++{
++    KVMState *s = KVM_STATE(obj);
++    s->hypercall_patching = value;
++}
++
+ static int kvm_arch_get_notify_vmexit(Object *obj, Error **errp)
+ {
+     KVMState *s = KVM_STATE(obj);
+@@ -6611,6 +6650,12 @@ static void kvm_arch_set_xen_evtchn_max_pirq(Object *obj, Visitor *v,
+ 
+ void kvm_arch_accel_class_init(ObjectClass *oc)
+ {
++    object_class_property_add_bool(oc, "hypercall-patching",
++                                   kvm_arch_get_hypercall_patching,
++                                   kvm_arch_set_hypercall_patching);
++    object_class_property_set_description(oc, "hypercall-patching",
++                                          "Disable hypercall patching quirk");
++
+     object_class_property_add_enum(oc, "notify-vmexit", "NotifyVMexitOption",
+                                    &NotifyVmexitOption_lookup,
+                                    kvm_arch_get_notify_vmexit,
+-- 
+2.30.2
 
 
