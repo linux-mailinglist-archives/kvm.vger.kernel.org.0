@@ -1,232 +1,247 @@
-Return-Path: <kvm+bounces-53849-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53850-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FB0EB185F4
-	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 18:44:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3DB5B18743
+	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 20:18:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 38FDC188718F
-	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 16:44:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 64C9D3B1998
+	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 18:18:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B6181AA7BF;
-	Fri,  1 Aug 2025 16:44:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DC08288C37;
+	Fri,  1 Aug 2025 18:18:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4Ejh3A8f"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tYqCwjCG"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D77961A0730
-	for <kvm@vger.kernel.org>; Fri,  1 Aug 2025 16:44:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDD291B4F0E
+	for <kvm@vger.kernel.org>; Fri,  1 Aug 2025 18:18:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754066662; cv=none; b=os6rhGP+gfJRUafgaPMqmcyUiDVquTOWXJGuyGDmk8f8rDLDMJja+wKiPQG5BYBJ2pMyzhN9v2OWf0xLSDH8Bg+tvIozig+ohug0n9GGLF0O46rypxuSnP2lVpIkaY47WrhHzPPGe0d/3JaSX6PLssLOo+t8P9kpPwyuuEPFOto=
+	t=1754072286; cv=none; b=NC9P5rIuASxumZG+3B65xELgHFczQfpiCKFoxIwSN9t14TRp7vf29Ak1kk43fGonCfIIee8VDfYx5x71jtrmihwwLAKe8juTyBrHs6mRwSelDQjHREovrpsQo1DKuQPT3K92ely2HIW1xalsUO90i+4ikpsugtePcAZAD3dqg34=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754066662; c=relaxed/simple;
-	bh=igrMx6iFIDdFmFIB8l2bfoLXUmpgB2zic38Ft4a8CSI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=nz3lZHGHWqppcP/vYXb7S6ZD4tH8thefV0DT7YesJye9SlUdrZKBE2y1Z0/HO/HgYmv9gojIPbS+eAa6i1OAwxZdJouuFqwl8w+eY+VyDrfBaHty45bBGmvzo99sZdYfl+GACBx0hClk7pplIZbWKb5aAJ4xJKU74MZ4hg01mNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4Ejh3A8f; arc=none smtp.client-ip=209.85.216.74
+	s=arc-20240116; t=1754072286; c=relaxed/simple;
+	bh=YL2B6gEXrJOvRYYui6bt3ppoA05sAipcf7SBVn38r3s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=W9woRrbTXN05KSy1qw1dscSWH9VB9CKKwBwBQuXHdNc8pnhG6l0cJ1jiN1AKQVCQZBFxCZWLI3w6k0Ny65yJH1YKRhXkiIOXiMeg88eP04jO6nEkwc5LPOVVwEqz7ilruuh4dVFVvG0fBGitgKcSa6s/umpm+Rc+p9w4p4VENi4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tYqCwjCG; arc=none smtp.client-ip=209.85.208.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-31f65d519d3so3135567a91.2
-        for <kvm@vger.kernel.org>; Fri, 01 Aug 2025 09:44:20 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-3324e6a27a0so6544421fa.1
+        for <kvm@vger.kernel.org>; Fri, 01 Aug 2025 11:18:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754066660; x=1754671460; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cmFw3mXH/exEQe+/QLbl03MUiMl4ucnB+5XoLqj1sUc=;
-        b=4Ejh3A8fdkDUKLKlRPnnC1YrywmY11XvMTj90HdjGak46bdvxa81tCQG+o/lnQb0lE
-         v1KcGTvEIg0zMb1PoSeZs43EN2QFhO4VKTh5IR+2jJTHSjSJpSM2yKljw6Y3BJR2ZYY6
-         2F4AQSHJp1LaDlFMzTeLscpJi9Qf8+TL2mWvSYCheYNSHW12rFd6ozH2L3Xd/hMIOWUp
-         xoZuktkj8+by2DRXGdd+022IPE+V5idgrppkYF3taP7zGnal36J6uqRT4INz+PdyQj8s
-         CF8lq4KLd3YGKqD1jvpkeZ4BLCyckSYwJsWlK5wahh+VB8kXJUe+FVvESp+0iw4etRRS
-         XJGw==
+        d=google.com; s=20230601; t=1754072283; x=1754677083; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HLBVWalAvcyfl5wmHOrCf7XYp2lIoIUMZMHifMzN82A=;
+        b=tYqCwjCGT+7qjGYk1pjwQMHxd/57ASSoS0Flz0aVyxTqADN7jIWyBZ1CXzWt2NZFCS
+         VgwWJXGutWigkYLvA734hhKAnD7Tw0wKk0sxw1aI6K7q6QUet2LYKdzVTSQApojdIXAL
+         QR9wRScumVpU0Aj2EOIIQrzSfNOd9eCoKDIG1bc3N1h/tExg4dZBntT7s3JJq85fC5Ss
+         OOgEDK3eCV1cjFomGiZ7jZ8m+IG+t+B7JamypUoH3r9YlSMUSfgNChRif7BSwjSzcfHJ
+         5H632KIfrm274Fmy4k4SEMyIhLC68geZN4+tSLN/VDPGF95jUAeTxtLPKyX7eZMU9zTs
+         Hfkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754066660; x=1754671460;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cmFw3mXH/exEQe+/QLbl03MUiMl4ucnB+5XoLqj1sUc=;
-        b=NZ8F76utPc2CFpRo707Kg73T5JJiwuZawEGjPs2Ot7FMhDfgGYIWcryTX89j2OWM3h
-         aqyp9ozB/u3GHq7uZ/ikJdpzmIfE2RW3QbxAuq1EyCEDpWQ5axdX3KwSWs0kxEgFb5pu
-         Y3ZNJ6i2fVdLF4ChYDd8pMN/FFAp8de+GSWC+fofnnhGeEl1goy5ICku9s+B3qmKcgVw
-         +u1g5Ju8IEB59XvnZVR1QYtJdkBO+YKd56zxhS5bfbBr/j4540KGR/N0Lc5Q/k0aSxnp
-         rP9eO6tUHMe8BhnFffJD2E5emg9Vtvx6OYarmTUuAZMzHcTs1R850A7rCUJhTAU5J8qz
-         SQWQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWaPPDUWZfA6wjalDN3AwS4kj1BSFdEk5LUd0noR/wFGwsDgRm4HYVArqUZmBk/UIQTGsM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxzeM38yrIKA647Xm5MU02bnaYWCzU2dXV+JURdQsTmguaxo8XX
-	RssheIzhQH3rcDgn48nmzjQGQCcuJAswOew9I1Dql07rCSdmYAWlXv7Iexms1wqKcOzlasLHlBf
-	3Lmv2fQ==
-X-Google-Smtp-Source: AGHT+IHTCPWlBsVY++6yRHnsFzrU+E4U0uWTRC0q7DUxzgBPU0wzo6RMGy3C5kq+eZLK/o+LJzUMjGasNMs=
-X-Received: from pjf12.prod.google.com ([2002:a17:90b:3f0c:b0:311:462d:cb60])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1812:b0:311:da03:3437
- with SMTP id 98e67ed59e1d1-321162b44b8mr568364a91.27.1754066660052; Fri, 01
- Aug 2025 09:44:20 -0700 (PDT)
-Date: Fri, 1 Aug 2025 09:44:18 -0700
-In-Reply-To: <b27f807e-b04f-487d-be13-74a8b0a61b42@intel.com>
+        d=1e100.net; s=20230601; t=1754072283; x=1754677083;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HLBVWalAvcyfl5wmHOrCf7XYp2lIoIUMZMHifMzN82A=;
+        b=iqIbT/vO4rZUFun7XcXgcVsn+g3msCyYw9EUfrnR9fTOxJzIMMmxgKeqEB2iMTAHwa
+         ET8rCwd1kc0cXBq+hcY4TIqKjAsBKAw63FENutT4IUcbrZM5zjqYZBzgx/ceUzI1YuEN
+         MlXf+/15cFfJMwQE4BkMVgJBoKLcLyKHrcrtZ7EsutIX7zAiganPZsCrLmJ0f4aBarb5
+         H8gQqK+yE+8EaiDB52AGbqSQA9sCRBkJ85hhAIVnuKzgb1D+pQ8/7qMORd6MFg4lvwIP
+         fp0Kns5CYgXkcAPjuGV3YEw/jPGlJtgIbd8pYr1UqBjJi/x/kzZuBLkxNKVOUBs4NQF1
+         Yomg==
+X-Forwarded-Encrypted: i=1; AJvYcCV2MMlkfsuBDQATESPMsXF3p9rmLWH8LW2jHnuOqBezfNlNmZ8YbKzc1Zgb/WoIltKOpo0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy51ylccd0GJRiWQvY1AeR5y8GhNeqBGqJcwPle9u/yns8KsN2j
+	8REDnf1MaayIkld7z8/iVBcvJ236ZRYdaEm5EiO2nZ6C+RSBCyIv6tT39S8zbcLwITt4betvtSE
+	GemlaLcDp2ezYaJfc1BDxQdjH7jdz4zPtxqfAbQFp
+X-Gm-Gg: ASbGnctZRARKe775cHSm5E4AVOnr/Ugp+d6glEQp8dcohuaew5UCUxjDz6cKsSnvEWV
+	xMAcz8P9hgm73PORbjjNcwNosOjDBWNvPjLraZshOIHi62iCzpw7WLqILUaloSkYEhxTuHpJoA1
+	bWxExSY2xRzjut/JToscWd1+CUKTPqHE9q/MhLaHfTYD/IpzZF3IqaB+i6D6Gc6wfLKyouqcKuE
+	/z++XU=
+X-Google-Smtp-Source: AGHT+IGEfUaghABA5DNvg5gyW3d2855oZuYkBZv3LcxmE/vVGwOdccz+q+H6M6wVnet9p88MTN4WT+jz1gEyz4s2QSY=
+X-Received: by 2002:a2e:b531:0:b0:332:133b:1513 with SMTP id
+ 38308e7fff4ca-33256796e05mr766051fa.30.1754072282670; Fri, 01 Aug 2025
+ 11:18:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250729193341.621487-1-seanjc@google.com> <20250729193341.621487-6-seanjc@google.com>
- <b27f807e-b04f-487d-be13-74a8b0a61b42@intel.com>
-Message-ID: <aIzu4q_7yBmCIOWK@google.com>
-Subject: Re: [PATCH 5/5] KVM: TDX: Add sub-ioctl KVM_TDX_TERMINATE_VM
-From: Sean Christopherson <seanjc@google.com>
-To: Adrian Hunter <adrian.hunter@intel.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Paolo Bonzini <pbonzini@redhat.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Vishal Annapurve <vannapurve@google.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	Rick Edgecombe <rick.p.edgecombe@intel.com>, Nikolay Borisov <nik.borisov@suse.com>, 
-	Yan Y Zhao <yan.y.zhao@intel.com>, Kai Huang <kai.huang@intel.com>, 
-	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20250707224720.4016504-1-jthoughton@google.com>
+ <20250707224720.4016504-4-jthoughton@google.com> <aIFHc83PtfB9fkKB@google.com>
+ <CADrL8HW46uQQKYUngYwomzfKWB0Vf4nG1WRjZu84hiXxtHN14Q@mail.gmail.com>
+ <CALzav=e0cUTMzox7p3AU37wAFRrOXEDdU24eqe6DX+UZYt9FeQ@mail.gmail.com>
+ <aIft7sUk_w8rV2DB@google.com> <CADrL8HWE+TQ8Vm1a=eb5ZKo2+zeeE-b8-PUXLOS0g5KuJ5kfZQ@mail.gmail.com>
+In-Reply-To: <CADrL8HWE+TQ8Vm1a=eb5ZKo2+zeeE-b8-PUXLOS0g5KuJ5kfZQ@mail.gmail.com>
+From: David Matlack <dmatlack@google.com>
+Date: Fri, 1 Aug 2025 11:17:34 -0700
+X-Gm-Features: Ac12FXyG-livDFOfmfOOHNKjIHeLx2MQ0V7JxyxWoRrLh7_sfVekRt_nK9TcnqU
+Message-ID: <CALzav=eQWJ-97T7YPt2ikFJ+hPqUSqQ+U_spq8M4vMaQWfasWQ@mail.gmail.com>
+Subject: Re: [PATCH v5 3/7] KVM: x86/mmu: Recover TDP MMU NX huge pages using
+ MMU read lock
+To: James Houghton <jthoughton@google.com>
+Cc: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Vipin Sharma <vipinsh@google.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-+Chao
-
-On Fri, Aug 01, 2025, Adrian Hunter wrote:
-> On 29/07/2025 22:33, Sean Christopherson wrote:
-> > +static int tdx_terminate_vm(struct kvm *kvm)
-> > +{
-> > +	if (kvm_trylock_all_vcpus(kvm))
-> > +		return -EBUSY;
+On Mon, Jul 28, 2025 at 2:49=E2=80=AFPM James Houghton <jthoughton@google.c=
+om> wrote:
+>
+> On Mon, Jul 28, 2025 at 2:38=E2=80=AFPM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> >
+> > On Mon, Jul 28, 2025, David Matlack wrote:
+> > > On Mon, Jul 28, 2025 at 11:08=E2=80=AFAM James Houghton <jthoughton@g=
+oogle.com> wrote:
+> > > > On Wed, Jul 23, 2025 at 1:35=E2=80=AFPM Sean Christopherson <seanjc=
+@google.com> wrote:
+> > > > > > @@ -7559,8 +7590,17 @@ static void kvm_recover_nx_huge_pages(st=
+ruct kvm *kvm,
+> > > > > >       rcu_read_lock();
+> > > > > >
+> > > > > >       for ( ; to_zap; --to_zap) {
+> > > > > > -             if (list_empty(nx_huge_pages))
+> > > > > > +#ifdef CONFIG_X86_64
+> > > > >
+> > > > > These #ifdefs still make me sad, but I also still think they're t=
+he least awful
+> > > > > solution.  And hopefully we will jettison 32-bit sooner than late=
+r :-)
+> > > >
+> > > > Yeah I couldn't come up with anything better. :(
+> > >
+> > > Could we just move the definition of tdp_mmu_pages_lock outside of
+> > > CONFIG_X86_64? The only downside I can think of is slightly larger kv=
+m
+> > > structs for 32-bit builds.
+> >
+> > Hmm, I was going to say "no, because we'd also need to do spin_lock_ini=
+t()", but
+> > obviously spin_(un)lock() will only ever be invoked for 64-bit kernels.=
+  I still
+> > don't love the idea of making tdp_mmu_pages_lock visible outside of CON=
+FIG_X86_64,
+> > it feels like we're just asking to introduce (likely benign) bugs.
+> >
+> > Ugh, and I just noticed this as well:
+> >
+> >   #ifndef CONFIG_X86_64
+> >   #define KVM_TDP_MMU -1
+> >   #endif
+> >
+> > Rather than expose kvm->arch.tdp_mmu_pages_lock, what about using a sin=
+gle #ifdef
+> > section to bury both is_tdp_mmu and a local kvm->arch.tdp_mmu_pages_loc=
+k pointer?
+>
+> SGTM.
+>
+> >
+> > Alternatively, we could do:
+> >
+> >         const bool is_tdp_mmu =3D IS_ENABLED(CONFIG_X86_64) && mmu_type=
+ !=3D KVM_SHADOW_MMU;
+>
+> I tried something like this before and it didn't work; my compiler
+> still complained. Maybe I didn't do it quite right...
+>
+> >
+> > to avoid referencing KVM_TDP_MMU, but that's quite ugly.  Overall, I th=
+ink the
+> > below strikes the best balance between polluting the code with #ifdefs,=
+ and
+> > generating robust code.
+> >
+> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm=
+_host.h
+> > index 52bf6a886bfd..c038d7cd187d 100644
+> > --- a/arch/x86/include/asm/kvm_host.h
+> > +++ b/arch/x86/include/asm/kvm_host.h
+> > @@ -1372,10 +1372,6 @@ enum kvm_mmu_type {
+> >         KVM_NR_MMU_TYPES,
+> >  };
+> >
+> > -#ifndef CONFIG_X86_64
+> > -#define KVM_TDP_MMU -1
+> > -#endif
+> > -
+> >  struct kvm_arch {
+> >         unsigned long n_used_mmu_pages;
+> >         unsigned long n_requested_mmu_pages;
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index a6a1fb42b2d1..e2bde6a5e346 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -7624,8 +7624,14 @@ static bool kvm_mmu_sp_dirty_logging_enabled(str=
+uct kvm *kvm,
+> >  static void kvm_recover_nx_huge_pages(struct kvm *kvm,
+> >                                       const enum kvm_mmu_type mmu_type)
+> >  {
+> > +#ifdef CONFIG_X86_64
+> > +       const bool is_tdp_mmu =3D mmu_type =3D=3D KVM_TDP_MMU;
+> > +       spinlock_t *tdp_mmu_pages_lock =3D &kvm->arch.tdp_mmu_pages_loc=
+k;
+> > +#else
+> > +       const bool is_tdp_mmu =3D false;
+> > +       spinlock_t *tdp_mmu_pages_lock =3D NULL;
+> > +#endif
+> >         unsigned long to_zap =3D nx_huge_pages_to_zap(kvm, mmu_type);
+> > -       bool is_tdp_mmu =3D mmu_type =3D=3D KVM_TDP_MMU;
+> >         struct list_head *nx_huge_pages;
+> >         struct kvm_mmu_page *sp;
+> >         LIST_HEAD(invalid_list);
+> > @@ -7648,15 +7654,12 @@ static void kvm_recover_nx_huge_pages(struct kv=
+m *kvm,
+> >         rcu_read_lock();
+> >
+> >         for ( ; to_zap; --to_zap) {
+> > -#ifdef CONFIG_X86_64
+> >                 if (is_tdp_mmu)
+> > -                       spin_lock(&kvm->arch.tdp_mmu_pages_lock);
+> > -#endif
+> > +                       spin_lock(tdp_mmu_pages_lock);
 > > +
-> > +	kvm_vm_dead(kvm);
-> > +	to_kvm_tdx(kvm)->vm_terminated = true;
-> > +
-> > +	kvm_unlock_all_vcpus(kvm);
-> > +
-> > +	tdx_mmu_release_hkid(kvm);
-> > +
-> > +	return 0;
-> > +}
-> 
-> As I think I mentioned when removing vm_dead first came up,
-> I think we need more checks.  I spent some time going through
-> the code and came up with what is below:
-> 
-> First, we need to avoid TDX VCPU sub-IOCTLs from racing with
-> tdx_mmu_release_hkid().  But having any TDX sub-IOCTL run after
-> KVM_TDX_TERMINATE_VM raises questions of what might happen, so
-> it is much simpler to understand, if that is not possible.
-> There are 3 options:
-> 
-> 1. Require that KVM_TDX_TERMINATE_VM is valid only if
-> kvm_tdx->state == TD_STATE_RUNNABLE.  Since currently all
-> the TDX sub-IOCTLs are for initialization, that would block
-> the opportunity for any to run after KVM_TDX_TERMINATE_VM.
-> 
-> 2. Check vm_terminated in tdx_vm_ioctl() and tdx_vcpu_ioctl()
-> 
-> 3. Test KVM_REQ_VM_DEAD in tdx_vm_ioctl() and tdx_vcpu_ioctl()
-> 
-> [ Note cannot check is_hkid_assigned() because that is racy ]
-> 
-> Secondly, I suggest we avoid SEAMCALLs that will fail and
-> result in KVM_BUG_ON() if HKID has been released.
-> 
-> There are 2 groups of those: MMU-related and TDVPS_ACCESSORS.
-> 
-> For the MMU-related, the following 2 functions should return
-> an error immediately if vm_terminated:
-> 
-> 	tdx_sept_link_private_spt()
-> 	tdx_sept_set_private_spte()
-> 
-> For that not be racy, extra synchronization is needed so that
-> vm_terminated can be reliably checked when holding mmu lock
-> i.e.
-> 
-> static int tdx_terminate_vm(struct kvm *kvm)
-> {
-> 	if (kvm_trylock_all_vcpus(kvm))
-> 		return -EBUSY;
-> 
-> 	kvm_vm_dead(kvm);
-> +
-> +       write_lock(&kvm->mmu_lock);
-> 	to_kvm_tdx(kvm)->vm_terminated = true;
-> +       write_unlock(&kvm->mmu_lock);
-> 
-> 	kvm_unlock_all_vcpus(kvm);
-> 
-> 	tdx_mmu_release_hkid(kvm);
-> 
-> 	return 0;
-> }
-> 
-> Finally, there are 2 TDVPS_ACCESSORS that need avoiding:
-> 
-> 	tdx_load_mmu_pgd()
-> 		skip td_vmcs_write64() if vm_terminated
-> 
-> 	tdx_protected_apic_has_interrupt()
-> 		skip td_state_non_arch_read64() if vm_terminated
+> >                 if (list_empty(nx_huge_pages)) {
+> > -#ifdef CONFIG_X86_64
+> >                         if (is_tdp_mmu)
+> > -                               spin_unlock(&kvm->arch.tdp_mmu_pages_lo=
+ck);
+> > -#endif
+> > +                               spin_unlock(tdp_mmu_pages_lock);
+> >                         break;
+> >                 }
+> >
+> > @@ -7675,10 +7678,8 @@ static void kvm_recover_nx_huge_pages(struct kvm=
+ *kvm,
+> >
+> >                 unaccount_nx_huge_page(kvm, sp);
+> >
+> > -#ifdef CONFIG_X86_64
+> >                 if (is_tdp_mmu)
+> > -                       spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
+> > -#endif
+> > +                       spin_unlock(tdp_mmu_pages_lock);
+> >
+> >                 /*
+> >                  * Do not attempt to recover any NX Huge Pages that are=
+ being
+> > --
+>
+> LGTM! Thanks Sean.
 
-Oof.  And as Chao pointed out[*], removing the vm_dead check would allow creating
-and running vCPUs in a dead VM, which is most definitely not desirable.  Squashing
-the vCPU creation case is easy enough if we keep vm_dead but still generally allow
-ioctls, and it's probably worth doing that no matter what (to plug the hole where
-pending vCPU creations could succeed):
+Is the compiler not smart enough to optimize out
+kvm->arch.tdp_mmu_pages_lock? (To avoid needing the extra local
+variable?) I thought there was some other KVM code that relied on
+similar optimizations but I would have to go dig them up to remember.
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index d477a7fda0ae..941d2c32b7dc 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -4207,6 +4207,11 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
- 
-        mutex_lock(&kvm->lock);
- 
-+       if (kvm->vm_dead) {
-+               r = -EIO;
-+               goto unlock_vcpu_destroy;
-+       }
-+
-        if (kvm_get_vcpu_by_id(kvm, id)) {
-                r = -EEXIST;
-                goto unlock_vcpu_destroy;
-
-And then to ensure vCPUs can't do anything, check KVM_REQ_VM_DEAD after acquiring
-vcpu->mutex.
-
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 6c07dd423458..883077eee4ce 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -4433,6 +4433,12 @@ static long kvm_vcpu_ioctl(struct file *filp,
- 
-        if (mutex_lock_killable(&vcpu->mutex))
-                return -EINTR;
-+
-+       if (kvm_test_request(KVM_REQ_VM_DEAD, vcpu)) {
-+               r = -EIO;
-+               goto out;
-+       }
-+
-        switch (ioctl) {
-        case KVM_RUN: {
-                struct pid *oldpid;
-
-
-That should address all TDVPS paths (I hope), and I _think_ would address all
-MMU-related paths as well?  E.g. prefault requires a vCPU.
-
-Disallowing (most) vCPU ioctls but not all VM ioctls on vm_dead isn't great ABI
-(understatement), but I think we need/want the above changes even if we keep the
-general vm_dead restriction.  And given the extremely ad hoc behavior of taking
-kvm->lock for VM ioctls, trying to enforce vm_dead for "all" VM ioctls seems like
-a fool's errand.
-
-So I'm leaning toward keeping "KVM: Reject ioctls only if the VM is bugged, not
-simply marked dead" (with a different shortlog+changelog), but keeping vm_dead
-(and not introducing kvm_tdx.vm_terminated).
-
-Thoughts?
-
-[*] https://lore.kernel.org/all/aIlzeT+yFG2Tvb3%2F@intel.com
+Either way, this LGTM!
 
