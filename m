@@ -1,96 +1,116 @@
-Return-Path: <kvm+bounces-53852-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53853-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01486B187E9
-	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 21:59:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C621B18831
+	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 22:36:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8FD9F1AA385F
-	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 19:59:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B8C7116F924
+	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 20:36:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F31228D8C7;
-	Fri,  1 Aug 2025 19:59:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 826A220B7EC;
+	Fri,  1 Aug 2025 20:36:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b="F0HMak6z"
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="TkdlXd+q"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DD0E6F53E
-	for <kvm@vger.kernel.org>; Fri,  1 Aug 2025 19:59:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 964A015539A
+	for <kvm@vger.kernel.org>; Fri,  1 Aug 2025 20:36:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754078352; cv=none; b=ZffSZAsSY+OngRmBRRLB0g9MGkHaTHOPV6XkqpUO4nfel/gnGogoiMdjNzMzn1d9te5oaivjdr9YrAPD7HtOWKq4ukyB/delf1JQOBrYy9moRIPX1WNHzvdfuFJhylk8x2kMfr8D2THGK1v/4gavkvQV3gIIeOJp3bGr/mhAzCQ=
+	t=1754080607; cv=none; b=l5RqrM5+k14oLBWziN74Eb/rcAt81bJBySIU/ReJD0dPq4cHXrpDp2XPQh/qsBeFnp/VdjkBL83edh6iAs6tyDO1SjAMO9JS6v9ioHlV+uhfYopsz3Go/E0NhwCSmyg0MzkenVBF+lOceA/6yDhPpFEcRc0tJ66chkT8vvw5G2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754078352; c=relaxed/simple;
-	bh=qQDPBYpTKtjZAvUgkS6YEnyxF+oCioRSoLiXTFwQ3H0=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BYylOJQcDwyXdbX3htBBD71cmfrOue+54i8l/RXMcpAXut0uEjrFSg4l73l/Wyyuvi0bNjPzkS0HQqxDYw9rjwZETgBg9MMMhITe4Yj0jarUN6OLHbJsrk+sLvoMuW6vV5QxaJsvrb/opsoijuEm2ZHB15rX2mmol/5YKgdfJNg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b=F0HMak6z; arc=none smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0148460.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 571Jn8h0009620
-	for <kvm@vger.kernel.org>; Fri, 1 Aug 2025 12:59:10 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=s2048-2025-q2; bh=BU1cxiUGdi+AyNrYPU4S
-	Daom2YUAeQkF9Gt6mdofMQg=; b=F0HMak6zeCC+6+/IKyU+U6Tet1Q1EFLvVLIM
-	7d2ftnDFL3CYH82FZGqaqNmjshs7o0y2Q96GDQodJlWCQ8LbOuUqWOHIMOmGL7CO
-	RXR5Rq3mwI0GHWIpYQ08D+/4fC6/7mTZNxGTP2NA29PxCl+0kjZWiRqcZbBOpd2O
-	aGdDqfekjjSBkbGEPFXVnfctVHgyT+NaH1ndIGe8+iu7hgfaPK1ffgoEa6EMDNX4
-	jT42op6UU7DcvzO2PHwmVVTkrumsmZnILov+Aoj4aRq37YPN8nYs0SH3o6BCseFt
-	Gp4hAE5L+/ACxQ03U1z6k4bV/LhwLBzlBFtRVpaN+20I6IYGKg==
-Received: from maileast.thefacebook.com ([163.114.135.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 488rmrvbaw-2
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <kvm@vger.kernel.org>; Fri, 01 Aug 2025 12:59:09 -0700 (PDT)
-Received: from twshared52133.15.frc2.facebook.com (2620:10d:c0a8:1b::2d) by
- mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.17; Fri, 1 Aug 2025 19:59:09 +0000
-Received: by devgpu013.nha3.facebook.com (Postfix, from userid 199522)
-	id 63B0149F1E1; Fri,  1 Aug 2025 12:58:55 -0700 (PDT)
-Date: Fri, 1 Aug 2025 12:58:55 -0700
-From: Alex Mastro <amastro@fb.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-CC: <alex.williamson@redhat.com>, <kvm@vger.kernel.org>, <peterx@redhat.com>,
-        <kbusch@kernel.org>
-Subject: Re: [PATCH v2] vfio/pci: print vfio-device syspath to fdinfo
-Message-ID: <aI0cf000fXWFlF9B@devgpu013.nha3.facebook.com>
-References: <20250724-show-fdinfo-v2-1-2952115edc10@fb.com>
- <20250801144800.GA26511@ziepe.ca>
+	s=arc-20240116; t=1754080607; c=relaxed/simple;
+	bh=ft1GtVlHTumH5n9zAoqypec1LBFsX5MTL+yaj3JjcSc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=U5rTrHm3J7QfuimLR8kFdfwEE9nWUdcwdlqRGrOcS4Mpz9vgwJ4JILy2FyEy82ZYMdolIl5tejIHCrNw7u/AkWcYyCKvL66E9P1Qh2+gyuseiNfdQTw1q/x3H2oE4hsc5q+QbgeQOottfuUSVYSHYHhOYa8Shp3VZskDW63N9Es=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=TkdlXd+q; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-61592ff5ebbso4343094a12.3
+        for <kvm@vger.kernel.org>; Fri, 01 Aug 2025 13:36:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1754080603; x=1754685403; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=QXkdEcm3dcCFEHiiyHz9se6bX6iRUxFV0EivrOFS6/U=;
+        b=TkdlXd+qNWy1ZqEENZcuxY10mbd9g87g0MFrtrVNH5XCP+JBm9itWNeC6coJY6cvkq
+         l3ChH2+vFmr3DuEiHgOMXbrahIH0D4u33UZC+IVmFQy0eJ7bEAaU994OCV1PGkG5IIfu
+         jI6qbu1XG4h39nZ/mChGwldCuRZUtEOwBVb1s=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754080603; x=1754685403;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QXkdEcm3dcCFEHiiyHz9se6bX6iRUxFV0EivrOFS6/U=;
+        b=u6047/e696+FA0jHn+FzBXbO/YPy+4N8ZGZFO6WVC5McV4tiZgQIZqd9uVpoYRtxMq
+         DODds9OawYjP+RnBSZ9b90nI7y/q++vGlSiiY4vxYCjJxMGiA6CtBKMhumddcD2ydnLX
+         Qthr84ejefR49w5LNQWLnFmYlSoYy3eDHxcq8IfInOcnw1ULAaY7wadytRDZtvNN6f3W
+         963SiXNywrRWxMlKLlp8zsGkVMlJ5r1U9a1V/aGODuc4ZcHduQFyL13rY55Ax/0u+/5W
+         iAaEoKziTLtZA5RX+PTLiSs7q4mMzNt6//rAB6Aj7/ZdAPj2pzef9nhEPTlM0SHMrPkS
+         3YCQ==
+X-Gm-Message-State: AOJu0Yy37zoPWn5QmPIk73Zg6K8pDyqh3fGx2QG1qjggrYjn2Xe9NBbC
+	YO/TMHCZWzySlTILNfMJvZOYORak8sO4bQgeH78wKou7DplK6y3l6czGBsRTZp/dr7cnRHsYDQv
+	3L9GFdKk=
+X-Gm-Gg: ASbGncuYTee1XcocgjDSRO5jM0Uv/7TOmVAGGKUoBusXi/uoJrUpR++yJQ56+Yuq/uk
+	tjhWGuaaCBvqJWYfyJQcqr32PI1c80Qv1+BaFGZDsEelPv3LpS0DlMf7mDct1S4WazUexR1m6Ku
+	7Jl7zn6RcqxffzVKleyR58K4lIzQuXA7SsfytYmqacvcaPjd2SN5RYUBV7vFNOcgayzAMXiOMQd
+	Uq/wWKYDndogCLwiuUJKfKNGIDwaHJrsdr+Xvl7xaJng8isAu0F0K8XKHWYBboCEI/mXoIEO7r8
+	c9JGkyCPthq6b6kJkiEjpIG5q+Pxa3wDtMDFXlwo24HhTJ9emV4LuOh0W5fBb8J91fB/uww7LSp
+	MC0xSWu964S4Q4OfTXr8wzCv+qrUYOspGZf+iTN57liZ4V4DSrXgMnsiVitqTZClHPdmKYSvM
+X-Google-Smtp-Source: AGHT+IFck6LFGilIHZubNhURHVrswTQrAGo2WUbQpj3lZXvHuIqoDLDq6gzwlA2epxBctZ3khoGjcQ==
+X-Received: by 2002:a05:6402:2790:b0:615:cc03:e6a2 with SMTP id 4fb4d7f45d1cf-615e6ebec77mr580802a12.1.1754080602768;
+        Fri, 01 Aug 2025 13:36:42 -0700 (PDT)
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com. [209.85.218.44])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-615cc38ae55sm1699313a12.10.2025.08.01.13.36.42
+        for <kvm@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 01 Aug 2025 13:36:42 -0700 (PDT)
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-adfb562266cso414876966b.0
+        for <kvm@vger.kernel.org>; Fri, 01 Aug 2025 13:36:42 -0700 (PDT)
+X-Received: by 2002:aa7:cb0d:0:b0:615:8012:a365 with SMTP id
+ 4fb4d7f45d1cf-615e715f7a6mr469886a12.25.1754080158122; Fri, 01 Aug 2025
+ 13:29:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20250801144800.GA26511@ziepe.ca>
-X-FB-Internal: Safe
-X-Proofpoint-ORIG-GUID: fiU5MlWDLCBV74dXnbVgTrkfM7vHecpx
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODAxMDE1OCBTYWx0ZWRfXxPVugvlru/yT d8bAxe+swSWKQwW0o9Tqb9eNZrGOg8ZcfLGEgMbuXfF4225BmjNDYHIdEr5l07IoLbG0Nx/eYuF eH89JrUlkxPLqqO0gw/Djx7p4iPKm9CHIFJC2ClTLsTzqLeAqUGzW8+jXTVzL0obFQ/jg0B3leQ
- agSqrF1kAQx37gFlL8CTerIBzpglWomQcWGjzFhIxsflcYrmC6ov/wV8qu1fGlqAV1D6htjiB5b 9ULHA+zbSNjdQbUoR3oA2rQCfJf9UPBIhWbHlc7+nNOnHh6sFYNuWgfMwgMJx4LH7pQ+HPwFr7u FnXqDFg+k4rPcm05ZK4oXczMPseB8sG6LONQpb/kT0Vtq51ICtswIl/owXAEJ1uy8XAQzBYhOfg
- 8GV/aRjwkjXdJhDh3T1KrlllRD8auHV80eNJI3323/jYDp+wQRSzj1K+1CYaXImToViJmv6F
-X-Authority-Analysis: v=2.4 cv=a+Iw9VSF c=1 sm=1 tr=0 ts=688d1c8e cx=c_pps a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17 a=kj9zAlcOel0A:10 a=2OwXVqhp2XgA:10 a=Pn7XcPFJ1egebTjzJtwA:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-GUID: fiU5MlWDLCBV74dXnbVgTrkfM7vHecpx
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-08-01_06,2025-08-01_01,2025-03-28_01
+References: <20250801091318-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20250801091318-mutt-send-email-mst@kernel.org>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Fri, 1 Aug 2025 13:29:01 -0700
+X-Gmail-Original-Message-ID: <CAHk-=whgYijnRXoAxbYLsceWFWC8B8in17WOws5-ojsAkdrqTg@mail.gmail.com>
+X-Gm-Features: Ac12FXxywlhxHC92NneGnmmt5Hm9rlPrKO5mJOfIsb2I5ZMf5olIOr9KL1pDLfc
+Message-ID: <CAHk-=whgYijnRXoAxbYLsceWFWC8B8in17WOws5-ojsAkdrqTg@mail.gmail.com>
+Subject: Re: [GIT PULL v2] virtio, vhost: features, fixes
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	alok.a.tiwari@oracle.com, anders.roxell@linaro.org, dtatulea@nvidia.com, 
+	eperezma@redhat.com, eric.auger@redhat.com, jasowang@redhat.com, 
+	jonah.palmer@oracle.com, kraxel@redhat.com, leiyang@redhat.com, 
+	linux@treblig.org, lulu@redhat.com, michael.christie@oracle.com, 
+	parav@nvidia.com, si-wei.liu@oracle.com, stable@vger.kernel.org, 
+	viresh.kumar@linaro.org, wangyuli@uniontech.com, will@kernel.org, 
+	wquan@redhat.com, xiaopei01@kylinos.cn
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Aug 01, 2025 at 11:48:00AM -0300, Jason Gunthorpe wrote:
-> ??
-<...>
-> vdev->pdev == core_vdev->dev 
-<...>
-> Every vfio parent device has a sysfs path.
+On Fri, 1 Aug 2025 at 06:13, Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+>         drop commits that I put in there by mistake. Sorry!
 
-Hi Jason, thanks for bearing with me. I lacked some fundamental understandings
-here. This suggestion makes sense, and is simpler and more to the point. I'll
-address this in v3, and also add the documentation for this new behavior to
-proc.rst.
+Not only does this mean they were all recently rebased, absolutely
+*NONE* of this has been in linux-next as fat as I can tell. Not in a
+rebased form _or_ in the pre-rebased form.
+
+So no. This is not acceptable, you can try again next time when you do
+it properly.
+
+            Linus
 
