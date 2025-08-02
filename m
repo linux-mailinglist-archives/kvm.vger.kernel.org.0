@@ -1,118 +1,147 @@
-Return-Path: <kvm+bounces-53862-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53863-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67C23B18982
-	for <lists+kvm@lfdr.de>; Sat,  2 Aug 2025 01:32:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 45DE4B189CE
+	for <lists+kvm@lfdr.de>; Sat,  2 Aug 2025 02:16:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31A9E62189F
-	for <lists+kvm@lfdr.de>; Fri,  1 Aug 2025 23:32:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 059D3626AF2
+	for <lists+kvm@lfdr.de>; Sat,  2 Aug 2025 00:16:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36AA623957D;
-	Fri,  1 Aug 2025 23:32:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0739718B12;
+	Sat,  2 Aug 2025 00:16:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BZSjt7nd"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="uD8mwxkY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10A44B644
-	for <kvm@vger.kernel.org>; Fri,  1 Aug 2025 23:32:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6F5C46BF;
+	Sat,  2 Aug 2025 00:16:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754091132; cv=none; b=YBuHd2I19nZHyGm3E8bJawq7DWRVxD03r0jSJLfFcGjiMo2Mq1xxqCwmZ6R7CeGbMjlBXU0YpvwYxPunaZv852i227aqmyresNvWB5SoggW1S4BKC4dAS7NwdT8IYLSDtlXQGhem+e/LRYEFoT9DHl8pOq03WQo5bsqHkZIQuOs=
+	t=1754093766; cv=none; b=iRllKyYU+x9qFKc741w0kXjpFriRnTctUl/ho2roLEjrEdyWzdjwOfZ0nECsBS+e0708gOF+HBSKL1Jz4HLtzvrggggf3QIny7UVdHSrx2EpBWCyFQYNamEawsroSStB2WoYuJkEcR5buYWpqR1g/v+bPQox7KNr3r1dKxKApc8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754091132; c=relaxed/simple;
-	bh=02BRk3qOj+AXcW6cS1tsqHn8w2sSkZL1ah0aPFZiI64=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ir8H49Q89xUiM7KNLI2GlZUI8Bl1uT48g2JxXQeXW4qCgRhOOHlOuztXU5xYKEL+3/QHLEDp6E6tqtCKqWGZ//Bi9DJwR7GAj/fBvgZGcVUWE7D251Cay5Xra//t/DQZaLnkv7Q+OWGrwxNIMgxaU31lyH+o35TsGuC3mePZJ9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BZSjt7nd; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-31f2dd307d4so1505879a91.0
-        for <kvm@vger.kernel.org>; Fri, 01 Aug 2025 16:32:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754091130; x=1754695930; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PSc5/xHGPO2izKvP398GTrx8yfXFlkYy/vj0X5FEFGU=;
-        b=BZSjt7ndhpZAlU7xJLtztdYs4mtRRBGYnHytQEpXDuyDCruFN2t3pd4m5uRg+Ex4En
-         enEYip+AGoqn1ZiZcwT1nihuENPh6pGQfGl6diNQJ5JQzvHYawsfLLkXe9Bq/yag9iwu
-         QaeoKRcUzBdLuuhrIEGOBhuBF0ti04adGi4zfRXc/J8LA+ZUTWTEWRjE7L0SVIkNBHhw
-         Zbz0j7EHgWYd7MlKUClram8X6JElAN2cWw62/u76O+5AUtMAyvT8lhSn4FQ4XVnmkjRa
-         itjySJxXodEp/G6ZrrvTCRsGE7iJf2+HzJ9JDVyPJtPNR0n+5tkS90OiaXfcu17MRtli
-         +l1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754091130; x=1754695930;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PSc5/xHGPO2izKvP398GTrx8yfXFlkYy/vj0X5FEFGU=;
-        b=CeUKOf1F4hGFe1Mg/0N7vRLWMSY4UkSgFRyJjixdI0IP/pg/okup9YJEerfALiFVwU
-         9laeJaliGb+JE4haw4osLIjFCmMV/zU1gLhxAzFc0314xsFOJoPO8nq3OMh4tdfI2qXP
-         FvEIj1wJdyW5h772hm/LymWgLSya+USmDne8tOT4NwX9zWSxFZyUTUtk/S+CPiWFBR//
-         ya/AStGYDCXaIqoaPJDv/l/EjYeQyAvUHydXs+bt9Ay7dWkbBoJ+sR+LLPE5/ievUWq8
-         6EyPTA/c/6dj2dKmc03aDQBCxQoFmdYf9FZFQcGO3TAUZ5I/trgpHETfIfOqLVo8abSF
-         lQcg==
-X-Forwarded-Encrypted: i=1; AJvYcCVEBJELyr1bAQYYar65TssJh5lU8KexMWTdYZ15Tq4LX5tpmL8UIw3Q8G0gAP7+J5Ib6/c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzXHcidFcqAbGFs4MY/lgDkVliPb2oEWuv05R1IPWF+BNvQJOrl
-	dPpern5Z95CUpSPXbRU+8qQfnZEANoQF/F1wTqRBHtrSDR68Za2xHkCCOoGaBsE+hIbk63IjVrP
-	meLVb9Q==
-X-Google-Smtp-Source: AGHT+IFswYzNJSBzjZEx6753vDf34RgMKloGefTqDtW4F+VAa5PH/hjJaMnf4SfTwiHSsphb9MXAnDq3zbI=
-X-Received: from pjx3.prod.google.com ([2002:a17:90b:5683:b0:31f:26b:cc66])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3ec2:b0:311:ff02:3fcc
- with SMTP id 98e67ed59e1d1-32116210418mr2258056a91.14.1754091130448; Fri, 01
- Aug 2025 16:32:10 -0700 (PDT)
-Date: Fri, 1 Aug 2025 16:32:09 -0700
-In-Reply-To: <7de2b6ed-af39-4434-9ead-5b06ed4761c5@linux.intel.com>
+	s=arc-20240116; t=1754093766; c=relaxed/simple;
+	bh=ZjL6t+ZUQBirgXGjQFRXTNDF/1481sb6+aiNnP+pb6o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JzZB+g5L9aptdcSuiDSWe74K6YpZ/dkHzz10GctuOvIs8ZAtYxR0oyv8iPcTMKtRRzd8Zdsf0tiY3eN3ZIrfbsjYF0yqkguVbBQHyucL4H3VrN0EIRyZ+o3mAnce+qUGTIDg96VSV3x7bB4SJwnAY9xEZNeGVDW+Z+63EsehSMc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=uD8mwxkY; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from terminus.zytor.com (terminus.zytor.com [IPv6:2607:7c80:54:3:0:0:0:136])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 5720FKpF3142596
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
+	Fri, 1 Aug 2025 17:15:27 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 5720FKpF3142596
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025072201; t=1754093728;
+	bh=3rOaNXsSKK6dIAjfdVXW0TCyQmf9B1Fk/MWfWN8qKxg=;
+	h=From:To:Cc:Subject:Date:From;
+	b=uD8mwxkYBkFw2mUdtlog4lLDARVr7Wzci2jspt8yO8Ns+MqtnHoX0IBOsnvIqzzYP
+	 rkQpqwD2chO9mcwJM6qtFhLiB+ukpdGq96bS2TfeyeNkJHZ7nBC40NwFVknPs7imQ4
+	 PQn/rxIVCjcC9FnxiWGlHVCi49B15wiyGRQNrl4zgTkR9gmyZs23xZG0mTlUoqb1a/
+	 oz7+cAVqvDTbQwTZ3yKM0EAiczNRrMnUZZsNyVDWYUIwVuMYTOaq0qgyWdLdeIjZw7
+	 q2DoZsGi5Ixa0npS4LTms5QorBYRWc+4tEqP5i+EXxFc/PsnXNYo/YoI4AM7N5ZJEV
+	 AdsIrSkHEmdtw==
+From: "Xin Li (Intel)" <xin@zytor.com>
+To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc: pbonzini@redhat.com, seanjc@google.com, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        x86@kernel.org, hpa@zytor.com, xin@zytor.com, chao.gao@intel.com
+Subject: [PATCH v2 0/4] KVM: VMX: Handle the immediate form of MSR instructions
+Date: Fri,  1 Aug 2025 17:15:16 -0700
+Message-ID: <20250802001520.3142577-1-xin@zytor.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250324173121.1275209-1-mizhang@google.com> <20250324173121.1275209-21-mizhang@google.com>
- <a700ab4c-0e8d-499d-be71-f24c4a6439cf@amd.com> <aG6QeTXrd7Can8PK@google.com>
- <7dc97db7-5eea-4b65-aed3-4fc2846e13a6@linux.intel.com> <aIlpaL-yEU_0kgrD@google.com>
- <7de2b6ed-af39-4434-9ead-5b06ed4761c5@linux.intel.com>
-Message-ID: <aI1OefS8b9vfHyu9@google.com>
-Subject: Re: [PATCH v4 20/38] KVM: x86/pmu: Check if mediated vPMU can
- intercept rdpmc
-From: Sean Christopherson <seanjc@google.com>
-To: Dapeng Mi <dapeng1.mi@linux.intel.com>
-Cc: Sandipan Das <sandipan.das@amd.com>, Mingwei Zhang <mizhang@google.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Mark Rutland <mark.rutland@arm.com>, 
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Ian Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>, Liang@google.com, 
-	Kan <kan.liang@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, 
-	linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	Yongwei Ma <yongwei.ma@intel.com>, Xiong Zhang <xiong.y.zhang@linux.intel.com>, 
-	Jim Mattson <jmattson@google.com>, Zide Chen <zide.chen@intel.com>, 
-	Eranian Stephane <eranian@google.com>, Shukla Manali <Manali.Shukla@amd.com>, 
-	Nikunj Dadhania <nikunj.dadhania@amd.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jul 30, 2025, Dapeng Mi wrote:
-> 
-> On 7/30/2025 8:38 AM, Sean Christopherson wrote:
-> > On Tue, Jul 29, 2025, Dapeng Mi wrote:
-> >> BTW, Sean, may I know your plan about the mediated vPMU v5 patch set? Thanks.
-> > I'll get it out this week (hopefully tomorrow).
-> 
-> Thumbs up! Thanks.
+This patch set handles two newly introduced VM exit reasons associated
+with the immediate form of MSR instructions to ensure proper
+virtualization of these instructions.
 
-I lied, I'm not going to get it out until Monday.  Figuring out how to deal with
-instruction emulation in the fastpath VM-Exit handlers took me longer than I was
-hoping/expecting.
+The immediate form of MSR access instructions are primarily motivated
+by performance, not code size: by having the MSR number in an immediate,
+it is available *much* earlier in the pipeline, which allows the
+hardware much more leeway about how a particular MSR is handled.
 
-It's fully tested, and I have all but one changelog written, but I'm out of time
-for today (I made a stupid goof (inverted a !) that cost me an ~hour today, *sigh*).
+For proper virtualization of the immediate form of MSR instructions,
+Intel VMX architecture adds the following changes:
 
-Unless I get hit by a meteor, I'll get it out Monday.
+  1) The immediate form of RDMSR uses VM exit reason 84.
 
-Sorry for the delay.  :-/
+  2) The immediate form of WRMSRNS uses VM exit reason 85.
+
+  3) For both VM exit reasons 84 and 85, the exit qualification is set
+     to the MSR address causing the VM exit.
+
+  4) Bits 3 ~ 6 of the VM exit instruction information field represent
+     the operand register used in the immediate form of MSR instruction.
+
+  5) The VM-exit instruction length field records the size of the
+     immediate form of the MSR instruction.
+
+Note: The VMX specification for the immediate form of MSR instructions
+was inadvertently omitted from the last published ISE, but it will be
+included in the upcoming edition.
+
+Linux bare metal support of the immediate form of MSR instructions is
+still under development; however, the KVM support effort is proceeding
+independently of the bare metal implementation.
+
+
+Link to v1:
+https://lore.kernel.org/lkml/20250730174605.1614792-1-xin@zytor.com/
+
+
+Changes in v2:
+*) Added nested MSR bitmap check for the two new MSR-related VM exit
+   reasons (Chao).
+*) Shortened function names that still convey enough information
+   (Chao & Sean).
+*) Removed VCPU_EXREG_EDX_EAX as it unnecessarily exposes details of a
+   specific flow across KVM (Sean).
+*) Implemented a separate userspace completion callback for the
+   immediate form RDMSR (Sean).
+*) Passed MSR data directly to __kvm_emulate_wrmsr() instead of the
+   encoded general-purpose register containing it (Sean).
+*) Merged modifications to x86.c and vmx.c within the same patch to
+   facilitate easier code review (Sean).
+*) Moved fastpath support in a separate patch, i.e., patch 3 (Sean).
+*) Cleared the immediate form MSR capability in SVM in patch 4 (Sean).
+
+
+Xin Li (Intel) (4):
+  x86/cpufeatures: Add a CPU feature bit for MSR immediate form
+    instructions
+  KVM: VMX: Handle the immediate form of MSR instructions
+  KVM: VMX: Support the immediate form WRMSRNS in fastpath
+  KVM: x86: Advertise support for the immediate form of MSR instructions
+
+ arch/x86/include/asm/cpufeatures.h |  1 +
+ arch/x86/include/asm/kvm_host.h    |  4 ++
+ arch/x86/include/uapi/asm/vmx.h    |  6 +-
+ arch/x86/kernel/cpu/scattered.c    |  1 +
+ arch/x86/kvm/cpuid.c               |  6 +-
+ arch/x86/kvm/reverse_cpuid.h       |  5 ++
+ arch/x86/kvm/svm/svm.c             |  8 ++-
+ arch/x86/kvm/vmx/nested.c          | 13 ++++-
+ arch/x86/kvm/vmx/vmx.c             | 26 ++++++++-
+ arch/x86/kvm/vmx/vmx.h             |  5 ++
+ arch/x86/kvm/x86.c                 | 92 ++++++++++++++++++++++--------
+ arch/x86/kvm/x86.h                 |  3 +-
+ 12 files changed, 139 insertions(+), 31 deletions(-)
+
+
+base-commit: 33f843444e28920d6e624c6c24637b4bb5d3c8de
+-- 
+2.50.1
+
 
