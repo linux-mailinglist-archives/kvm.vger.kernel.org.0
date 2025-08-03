@@ -1,1117 +1,363 @@
-Return-Path: <kvm+bounces-53879-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53880-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 692A1B1918D
-	for <lists+kvm@lfdr.de>; Sun,  3 Aug 2025 04:49:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5A55B194A8
+	for <lists+kvm@lfdr.de>; Sun,  3 Aug 2025 19:42:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 839C3174542
-	for <lists+kvm@lfdr.de>; Sun,  3 Aug 2025 02:49:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 402E27A9397
+	for <lists+kvm@lfdr.de>; Sun,  3 Aug 2025 17:40:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1917191F92;
-	Sun,  3 Aug 2025 02:48:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 068B21078F;
+	Sun,  3 Aug 2025 17:41:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="RGvl2xG1"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SO75CQz/"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2062.outbound.protection.outlook.com [40.107.92.62])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A29717A2EB
-	for <kvm@vger.kernel.org>; Sun,  3 Aug 2025 02:48:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26BBA639;
+	Sun,  3 Aug 2025 17:41:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.9
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754189328; cv=fail; b=gS/aA76WPo2C0qmApodXYqYwT2BLxUxT9+AtEzJ0e31NVh/03S68fvvnAmca85vqE06vxJ8SjbeV2cWdYwMbkIFCWYaprgWTnIb/nJeQm2edItdBRLKu0BG/RsXI4My6y/YHfifBsOnlvU5gdUyoWXdlNPiJFcd3fuVSWr6IBn8=
+	t=1754242913; cv=fail; b=rh7A9U749Qh9KaJfRplXDlO7SoMp+3izeKZp76P9vs7dc0MyGPCYw1OuoupQRRTIwKtTdp4etJGkRY7dww3QKZSMW1SIfa9Gh9TEfLfNbiGtVR+us9cSK1SD3IIUoxG2sqfaNxv60cr4iLl63GqL0EWXvkXCJ/9ZW16mG4yPDjc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754189328; c=relaxed/simple;
-	bh=KYQW74MFWzsbEfZJucEPmXqm9cwVwhyd1jmcMCOCw1A=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QlBZ1XwbK4MC0XWsscyw7b+N9AwKVVCgZ+vCpM02/qjIgBlf6/z/dP1KuOEbD12PyK/1NPhcjvEagJYtHz+dC132guyIb0lB6sSIminxErRFYimnDfiz/VXHuUX1QuV9+ZAkz9K5KKqaVubtkmjbujhaP0zA6PxCtpH1+1YLz1s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=RGvl2xG1; arc=fail smtp.client-ip=40.107.92.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	s=arc-20240116; t=1754242913; c=relaxed/simple;
+	bh=vsKO6n8WE/XUdJKCdJjOMvLBggWnwLfVP5RqA+ysdYU=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=GtrZVZ78iWXT+ImpMQk0+oq4djY1IVzg9cuNw40Lo3XVCtP+gr8+k3qpNQ/M87kxiTd48sZS+fsfESer+wcSZ9/BBSnRYCmXiCDRD7S920/CF6Pfbox7vzX0VcOCQl7t6L6F1LTZqgGRLqeWYuhyRzsLAazFf6y9H0DhsBA/rZk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SO75CQz/; arc=fail smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1754242912; x=1785778912;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=vsKO6n8WE/XUdJKCdJjOMvLBggWnwLfVP5RqA+ysdYU=;
+  b=SO75CQz/C3MM0Y+gNTc5Ky7oGvIqDf5eq3NlYSzcI4PJYpx3IRHcpRHI
+   19NH7bXG8nsdXymIwMabPmkwmlML2B9P5LVFsSOCoI2rTQU2DTOLn1bvZ
+   NuCA92XnMdksRKOjwhMi70faDYmU98jFsXIP96gIyRvppMo+s82Rhub/a
+   ihDbqOjOPNPlGnbKWGWR7p4BsEgwfoY9ecwdBtgn5jbFBchvAg5CR3hKT
+   PaEKALv/UpGlCHVFADU4gGsa79jOXFHuvIMICao7cMr2twKBDhIk+uuat
+   TirwEFre4IwEZsioowM/6RCuLx4KdoezeyAaggbMSus+KEfDCAfjYMice
+   g==;
+X-CSE-ConnectionGUID: 7Bw/xP85QUW61iZniNIsOg==
+X-CSE-MsgGUID: R6I6qVk/SC+XHjptGa3ACg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11510"; a="79064595"
+X-IronPort-AV: E=Sophos;i="6.17,258,1747724400"; 
+   d="scan'208";a="79064595"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Aug 2025 10:41:51 -0700
+X-CSE-ConnectionGUID: 4mCMPN8BS4O7xSebv1NLpg==
+X-CSE-MsgGUID: V3UhMGW4Sjm364sRwCyAfw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,258,1747724400"; 
+   d="scan'208";a="201157953"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by orviesa001.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Aug 2025 10:41:50 -0700
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26; Sun, 3 Aug 2025 10:41:50 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26 via Frontend Transport; Sun, 3 Aug 2025 10:41:50 -0700
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (40.107.96.88) by
+ edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26; Sun, 3 Aug 2025 10:41:49 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=WNkY0CtbUhKTFLtK2Y4HDBCNbJX/JMEoxorRuY0t3NvsA0sd/bv6x3shWzIfwIfEQ1H+gdr4eiKTxduBK+QR8oEYO6U+goeoXfYz/6x9FLFAmtlFyDHByGLFURuwN8JLIHi1NG2Jly1KcAya4+TD9o1gw+kjUobtW5XNcDs1kvEOiC46oMFxdaFGFKuJ5YhrX/kGPIf50Z/CHXZkOD84s85iGkGfpvNhx25FEdIYLv6C/XsVXJ9yah7FBqcFpGvomipnHd0RngCMXjLGXeyagxn9igvrK8OcrzoTLnlgYXC2o1AbHNreUfUhVDlwdUzU+4A6M5K2E5godMWxfRG+5Q==
+ b=hLGXJCDniQt6Wh5AX4g7tNNXdLClKt4qm8rmKwmjJ1eBzPfiV1xjJMO6nJ47eBUaH1RkNe6027JAUCaL6Qh29CdUcL9IgzOsSTUhtedKeYsBbeuXM2cdzU9COHLSkrYnl0PJjItbK20d94sorpNKZGs/HE+shazXilDyeaey+o6kfrmwgk/p8OTZUuIRTi2MzSwnzNoOwCs+ScnhsgZxKfiFylAHW+RaIFICkTdYXxAy/AZFK/3NwAcx0u4vuXQttejFl7XdFdrAyIq4nwnTyb7m0hoFFJe7c6NretGm1cHEjSLerA8rZfnEr5NWV/y1rQoBQqGSoTtRYatkCQOL1w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=RGgbZBLUvxRffjmcP2m4nKopQI7bawORaPHwbPpjOf8=;
- b=qDV4P+FZy8g0DLhMht/IsHmLFnLODgmvNnMtRecBTFsvgD2HlOHxR3ilmZunYH6BmuGrY6Ahbb4iO1sN7W57NP2A0ALadLWeS6BEXA++foIL8TOW325uUVnlx/XMGfJQ8Xxh0T8ovWltIsLZjR7LwGpeL+Jfhr5NTVaeXXJ56VI9HP0lx+SxNLKt+UgYj4MUSETQ66ypjgwsaRtcn1k3k+QcXU7qfZOgZbYQT34Y0vg4ds9de1qbkG5OwVydnSRPGZkN1MxFslBbQmdI7oMGAN7F+d9tEEx8YgygUxkCh3qLwQYNwCrtEhrVpra5M7cN6fAetZbjsgwBI9ENtvxO9w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RGgbZBLUvxRffjmcP2m4nKopQI7bawORaPHwbPpjOf8=;
- b=RGvl2xG1UocberebHzLpBkdg4AyYjehOag9m8Tjivuh+nPfDbTyMme34RZlAtEObWc3xokUuXu4VvvVo/Dbfih446u+lBmbup3IG9tldFXhjd/QhFgZvaOnBP51poXuMW6AmyvXEcEizJjnM1TH/UtTzzoDWgM8qauWiSR41gjmPluRbbydod+Mlw9oyIaaaiBKjZ6B59rD6u7DEroigwTuQzWJdMiFRHnamqewulmmczR7DV3L2gYYXK6CIfTb16GanI0ZEd6CBx5wlMIV2dsIqdBlrNgHNRG5wx3JSuWQVgI8TheurDyjGA1R0VXeU8bYz0k6wM6zWhO0wN3BiKA==
-Received: from CH0PR07CA0030.namprd07.prod.outlook.com (2603:10b6:610:32::35)
- by LV2PR12MB5942.namprd12.prod.outlook.com (2603:10b6:408:171::19) with
+ bh=kiUErEqCA3v9gmXTeypINXvolsYPc4WYFjelQKUOBV4=;
+ b=bKZaIKus14ihkYB/awGtsKqJZHpEp5nJkjMEynPkAsN295Sse8yB7IkqVtd+HLKCchYuUqEHplkRdeeJAQ+UWRB//FoLDw8ysLAb49HGrFb/iHQP9UiZulwHAMxkE0l3PZ4f6H9a2Nk9dHLMGhu19HFmiRqhbRh4ybOUpk+hs+iwZUwuB7cci84uD5fX5ohEWgVZnNt3TIwdeQb/XCG6P8C7UHgs2fyHkPBMHecF6YU2Z/2q5o0cUC4caPVPY9ig4k6L7Y6caX4/GMViSuck5pFx/Qk7b1YfsTmFmeQnl1+t/BxqMS3eTQO5SUOcgRm4Zepx1Zj/emGtP5GGjZ2GYQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from IA1PR11MB7198.namprd11.prod.outlook.com (2603:10b6:208:419::15)
+ by PH0PR11MB5143.namprd11.prod.outlook.com (2603:10b6:510:3f::15) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8989.16; Sun, 3 Aug
- 2025 02:48:37 +0000
-Received: from CH2PEPF00000141.namprd02.prod.outlook.com
- (2603:10b6:610:32:cafe::36) by CH0PR07CA0030.outlook.office365.com
- (2603:10b6:610:32::35) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8989.18 via Frontend Transport; Sun,
- 3 Aug 2025 02:48:37 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- CH2PEPF00000141.mail.protection.outlook.com (10.167.244.74) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9009.8 via Frontend Transport; Sun, 3 Aug 2025 02:48:36 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Sat, 2 Aug
- 2025 19:48:10 -0700
-Received: from dev.nvidia.com (10.126.231.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Sat, 2 Aug
- 2025 19:47:58 -0700
-From: Chaitanya Kulkarni <kch@nvidia.com>
-To: <kbusch@kernel.org>, <axboe@fb.com>, <hch@lst.de>, <sagi@grimberg.me>,
-	<alex.williamson@redhat.com>, <cohuck@redhat.com>, <jgg@ziepe.ca>,
-	<yishaih@nvidia.com>, <shameerali.kolothum.thodi@huawei.com>,
-	<kevin.tian@intel.com>, <mjrosato@linux.ibm.com>, <mgurtovoy@nvidia.com>
-CC: <linux-nvme@lists.infradead.org>, <kvm@vger.kernel.org>,
-	<Konrad.wilk@oracle.com>, <martin.petersen@oracle.com>,
-	<jmeneghi@redhat.com>, <arnd@arndb.de>, <schnelle@linux.ibm.com>,
-	<bhelgaas@google.com>, <joao.m.martins@oracle.com>, Chaitanya Kulkarni
-	<kch@nvidia.com>, Lei Rao <lei.rao@intel.com>
-Subject: [RFC PATCH 4/4] vfio-nvme: implement TP4159 live migration cmds
-Date: Sat, 2 Aug 2025 19:47:05 -0700
-Message-ID: <20250803024705.10256-5-kch@nvidia.com>
-X-Mailer: git-send-email 2.40.0
-In-Reply-To: <20250803024705.10256-1-kch@nvidia.com>
-References: <20250803024705.10256-1-kch@nvidia.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8989.20; Sun, 3 Aug
+ 2025 17:41:20 +0000
+Received: from IA1PR11MB7198.namprd11.prod.outlook.com
+ ([fe80::eeac:69b0:1990:4905]) by IA1PR11MB7198.namprd11.prod.outlook.com
+ ([fe80::eeac:69b0:1990:4905%5]) with mapi id 15.20.8989.017; Sun, 3 Aug 2025
+ 17:41:20 +0000
+Message-ID: <4269af34-e606-4096-ac9f-3a958e6983a7@intel.com>
+Date: Sun, 3 Aug 2025 20:41:14 +0300
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 5/5] KVM: TDX: Add sub-ioctl KVM_TDX_TERMINATE_VM
+To: Sean Christopherson <seanjc@google.com>
+CC: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+	Paolo Bonzini <pbonzini@redhat.com>, <linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Vishal Annapurve <vannapurve@google.com>,
+	Xiaoyao Li <xiaoyao.li@intel.com>, Rick Edgecombe
+	<rick.p.edgecombe@intel.com>, Nikolay Borisov <nik.borisov@suse.com>, "Yan Y
+ Zhao" <yan.y.zhao@intel.com>, Kai Huang <kai.huang@intel.com>,
+	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>
+References: <20250729193341.621487-1-seanjc@google.com>
+ <20250729193341.621487-6-seanjc@google.com>
+ <b27f807e-b04f-487d-be13-74a8b0a61b42@intel.com>
+ <aIzu4q_7yBmCIOWK@google.com>
+Content-Language: en-US
+From: Adrian Hunter <adrian.hunter@intel.com>
+Organization: Intel Finland Oy, Registered Address: c/o Alberga Business Park,
+ 6 krs, Bertel Jungin Aukio 5, 02600 Espoo, Business Identity Code: 0357606 -
+ 4, Domiciled in Helsinki
+In-Reply-To: <aIzu4q_7yBmCIOWK@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DUZPR01CA0306.eurprd01.prod.exchangelabs.com
+ (2603:10a6:10:4b7::16) To IA1PR11MB7198.namprd11.prod.outlook.com
+ (2603:10b6:208:419::15)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH2PEPF00000141:EE_|LV2PR12MB5942:EE_
-X-MS-Office365-Filtering-Correlation-Id: 237ae277-3f94-454c-1339-08ddd2383eb9
+X-MS-TrafficTypeDiagnostic: IA1PR11MB7198:EE_|PH0PR11MB5143:EE_
+X-MS-Office365-Filtering-Correlation-Id: eb173d18-f57b-445e-c9dd-08ddd2b4f460
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|1800799024|36860700013|7416014|376014|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?aGlQU3IzRU5kUUlFRHhZL1ZHZ0NJTlhRelV2T3dBcjd4allGSlozdFpTVFpI?=
- =?utf-8?B?TkVvdWdDVE0xanphN2JaQXhwY1JNOENRTmVGdm9Dc1NhVFJkMitoam1LRFZD?=
- =?utf-8?B?OXltOUVnZC9Sc3JMOGVTSGsxS1huSDhHSld4NUZtQUdFUDB2VXhORk1ESlF6?=
- =?utf-8?B?RUl1UVUzdkFDQnV6YUR0Z3k1VnVFbHE1OHJPMzlHaE1JUHI5cVJpcnhRZ1Nz?=
- =?utf-8?B?aGRLVGptOGFvQmphcUNQV2E2cWVhQVpRL3FjTkcrL2ZrTUp0SWpVSXlpZDZn?=
- =?utf-8?B?cnRmaWNJOWZJMTBsMmpvUm5tQXBzdGpQSzQ3YkRUbm9kQTJWTktaMWpWbmNZ?=
- =?utf-8?B?dnlaM1dpTDNDbkhFanVBb2xaV2RNZkx4K0MrOFJnbm5vanBIN00reU1NTitC?=
- =?utf-8?B?UUNRNnRqaCtVeGxKT2JZaVNKeUxXV3NuQ1RGTmVPczkwY2IwaFQ0WW5jLzNy?=
- =?utf-8?B?eFA0a1I2Y1dmajl3WDgyRitNYjhwYlo1WmdWaDhGRWhaclpKM1pkdWtTQVNo?=
- =?utf-8?B?NEJwaHRocEtjbzFpQ1JGbnNyRVNaYnVPTnBaeWkzTWl0WVUzOXBHbzJpY0ZY?=
- =?utf-8?B?YVZQMDA5dGlDeU15V29vdnJCNTk4MWZ0d0hCaXZ3UkZQYXdpS2srY3Q5RTlV?=
- =?utf-8?B?UVlWQmkzbnJWNTYvNkRjMzdROWppcDk3TFRPbG8xL2hWR2JsWjZpejlQaFRE?=
- =?utf-8?B?MnN4djh5YjRIMlZSSmoxVUVBci9FWGsxcUUxa1JlbVR5SVV3cG0zZVkxWVYx?=
- =?utf-8?B?ZnR3T1dJdTM1WGxWVHlyTUxDVFoxUFJraGQ4YTNydklmRVBPNms3cGI1V0dp?=
- =?utf-8?B?K1hsNjA4cm1GSTNsNlJmOUtSZ2lGWUtNUVZDeTI3Z2VVQmp3aDJDSGludnkz?=
- =?utf-8?B?TWZaa05JSlg2RFVrV1VPaS9HMzAyNndWVGQ0blV1QWhvVFJhYjlkVGZ5ZU85?=
- =?utf-8?B?a1lScnR1TTkxWmc1N0k1bE9IWStXNDBnSWIyQ0M2L08rekE1UnFDU0c5b3Rk?=
- =?utf-8?B?QUpkSnd3V1lKR2RkMEsyVmo0SUFHYWdWelFUbUV3UDRDZmtkQkF1Sk44R3Zs?=
- =?utf-8?B?UDJydG5yL0RZNDFNY2J4M3I0OWVsUkV2cW1IZ1hET2pHazNPYlhmT3owck1P?=
- =?utf-8?B?dU1kK0srTVpxR09UQk5ZRmd5T3dWck00UW1QZTVpZ3hsTlF2eVZqRHNmSndi?=
- =?utf-8?B?S3hVZUJ2a2xsYlhvY0dEMjJDK0p3ZldVc05ncGFRNG44R2dkNFI0a1Jpa0RQ?=
- =?utf-8?B?dUJwczhPOHdYUkJaanEzNThEUExXd0svVHR4VEwyYjdVNlpRUGVKNjNnbElU?=
- =?utf-8?B?dExHdFJXMndOcElpcnNIMEwyYktTTmJZaVAxNnVlMTVYMHNhdlJBd0lyUUVO?=
- =?utf-8?B?T3ltNUpsaTdyZktqSEROUlgwcDFiNm1kSE5NaXBIS0NOaVRqcmhteU1iTFRP?=
- =?utf-8?B?OGFoMFc2OWtlSnBUbGZNNWxyNU02Q1pTcCtBaFdmUWVwQXgrYlZBZVRTV3Fw?=
- =?utf-8?B?bEhWN2lOM01YZ29YRFJhK21wUWZTdHovVjNZRSsvL3JJNWQ2UWFVZFdwcytL?=
- =?utf-8?B?TUZCV285dkZNS1lUNG1vdzRLQTYycWE0QnRBM1dxdENsZzdoTzhQTjBRTG1v?=
- =?utf-8?B?Z3B3RHJEbWpsU0hWQjRxWU52WFYyVmhkbW9FZHVwRzhCZk9FdGdwRGRCV3ZY?=
- =?utf-8?B?NFFLeFI1MEFsR3JoRnc3VXFrZ1ZRZnhFaHpBNDQySVdCU1A2S3pnUHRmcEFh?=
- =?utf-8?B?SkJCTFllMlBXWHVkTCthekFHRnBqMnIvYzZvMC9Nb2tPUTZPVEh3OElDOVI4?=
- =?utf-8?B?NXZVZGZLSEtIOFhzamR2bmNjTGNhSjMvWXFNeWc2UlpWQzVWVitGT0RtbTlQ?=
- =?utf-8?B?UXJaa3h5L3UvM3hKV3FYQis4cGVpZEZpeDJwbDMzZWNrVG9EL2ZGb2l2SXB6?=
- =?utf-8?B?R1ltaUZVNTFVTkt3MjBaOWpKMXkwT0JEb3dZTGF1NjYyQ1cvLzVLRUxFeWlE?=
- =?utf-8?B?aEkxTXRiL0V4OVVNYS82Y0F3UmFKQmErdjJvY0tJQWU1SHFlYTB6SW4zRmNl?=
- =?utf-8?B?TTM2NTg2ZXN6OEU2Vjh4L09GT1JPa2NzaHVNZz09?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(36860700013)(7416014)(376014)(921020);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Aug 2025 02:48:36.6162
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?VmNRKzM5OGNYYWY1QjRON2E3cDkzSTJna1hPbXJLalQ4eVZnNE05bFhEb2dQ?=
+ =?utf-8?B?ejc5UnB6bWpnemhLVEJHNjZ0Vm1ncGpaUVJ1aWxoaUg0UUZMSnlaWUttZmpu?=
+ =?utf-8?B?ZlF4RkNkRDJYaE9HemdlTXhoT205b2V6RGUwdVRIUVhmNjVzT1MyTndSVjBO?=
+ =?utf-8?B?OHFRY1BXRlExMllvRE9QWFdSSUMyaUtyRHUwY1VHNHJEOTZsNFhkQzVHTnpD?=
+ =?utf-8?B?Wnd1dCtVMWlMNDRQakhYMytqcnc2bGwzZE5FeXIrRVRTRi9rM3d3OFZIRmFu?=
+ =?utf-8?B?UzhWaXprUG1PSzFOVEZPUDNETXRzaWVpU3crRWxGU1Ryb1Y2Q2RKdnZxOWl1?=
+ =?utf-8?B?RUtSVmR1V1FHdlBZODYrdElQaWFReFh2cjV1Z2pTY0tZMmdNM3RTK3czL0Er?=
+ =?utf-8?B?dVVLTUVySTExVStpc0lWaWt4OG5GdXorNEk5Z2JLQjBnbkFCSGU3S3NTWEhQ?=
+ =?utf-8?B?aDU0b2ZBdFRTZkU0Z0JPaVVVQ3A3S1A5VG52eUM2ZDlnL3JSam1aTVdKUnBY?=
+ =?utf-8?B?REVjNkRaMG1nalI4L2IrRXFheXVjenZwSjhIZlF1VVhPR2ZWREpUUEpoSEZI?=
+ =?utf-8?B?dDFNYlVwWnQwN21nejQvVlVWenJIbXoxd0d5c3FRRngzYmxIbWRVUmNzQmFR?=
+ =?utf-8?B?emFFR09iRXNFS1pSTXpLVmlxUVdQeTNjRktLYTFCMW01UGxmaE9tbGlWRG5u?=
+ =?utf-8?B?V0pMUU9VeG5WSWNla3czRk1JY2p1aW5rZkNUMEgxVnlMSHdrY3VsU0ZUdE9R?=
+ =?utf-8?B?alQrY25MSjhxc0hrdGZFSCtHYnY0MWlXOWZMT0k0aWlEOG1zWVl0cFJLa1lz?=
+ =?utf-8?B?MUxNVlBmZE9BR1VlTGgzbloxb29OWVhPTFVYVWtLbWViM0RweDJqcENIVHNq?=
+ =?utf-8?B?SjB6WmppQ0ZQaEdBaGRqWlovRTdpU1d5WDZ4SUQwQ0tDTUpNeDFXM0ZpNnVN?=
+ =?utf-8?B?WWQ1QVo3dWdLSXhYWXhGQmR3Qi94Y0szZjltSEZXMFpiTkYrZWdJZkdoWm9C?=
+ =?utf-8?B?ZElNTkk5MVV1dk5saGhPMmlSR2l6Q2o5SWp0aytTU3I1TlVxOTh3d3l5S0s1?=
+ =?utf-8?B?ejVDMThMbWU2QlVpWjBpclFjdHU0TERadG9OQVB3TklrRVJRWXA0QkZjZ1c2?=
+ =?utf-8?B?SGd4SDY1S0NVSDdJS2taNmdIOGU3WEdiYmpXRDNORCtEWUxiWWhuOXdmeElF?=
+ =?utf-8?B?Sm9ob25xd0U0YmU1a2lzclRHK3J4cUJma1lnNVZNZWc5dzZPRGlSRjlMQVBF?=
+ =?utf-8?B?QlEzVFRwaStST0tuak9Id0dUR1dsMUZBcTNJWTV1VHNUcWlDN0cxeVhPeVZt?=
+ =?utf-8?B?aXBmMWpYYzdEUjVjS0ZrTjcwRU9MRzBxUmVMM3pJbDlLR2RrVUc3dTFLRHFG?=
+ =?utf-8?B?dURRSm1IbzBZLzVlMEh4R3VZU2tlZDhidFlCRjFMbEpMYmdpUnM0MmJmNEJ6?=
+ =?utf-8?B?RGw3NHN5b2JGczN3ZkdKVzU1UFdxSHY3OWRoMHVHTzEyUjRtTVpBcnpoUXdP?=
+ =?utf-8?B?VzBUTEJ6RHFFOFZnSi91dkFyT2RYa1JxcWtuWWNqRFNYNWFFNVlGRUxaTHdl?=
+ =?utf-8?B?WWxOdWFWaExmb1RxNWcvWFNzV3VETW43blFnaEFjTlNtSDlaYUpBOHJpTXZI?=
+ =?utf-8?B?aFFFblhNT3hzbzdNVmE2aUZtRWkrT0I3aDFBK0VnN0cxQ1pJVjVjSm1vZXkw?=
+ =?utf-8?B?a3pQNFREV1lRcGV5MHBaUkVsTmxENGJBR0tLOU9zTXNsMWFmUDRWTFpHUWxh?=
+ =?utf-8?B?ZjExZVFaK2hmY1NQaWJyUUd2RGx5UU1JMzhnWCtnRytKYVVDTWFGSEc4Uk14?=
+ =?utf-8?B?QTB5TUJYeWNsZ1JVYm9zeDhwZTVpQjBmSXBRdDBwTTMzU0V0d2FjYnVaTTRt?=
+ =?utf-8?B?WDY2QzJKYkx5dk5VVktFZEJhNFFUV2JDK1BCb0NQbGM1KzlwZndjaFRQRS84?=
+ =?utf-8?Q?Sfp6D/Am6Pc=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB7198.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?S2I3MHFzbUJqRHdzckdZanBKWWVUNkxEb3l2OGxJMmRyTkpWenZscmx1M24w?=
+ =?utf-8?B?alRNT0d3cmJsL0ZtaEloaC90b3hWR3hEZG5TWmZCbVhlNi85NFB4ME1Jcmp1?=
+ =?utf-8?B?aHNqQWMwL3FURnNNU2tMSUJXUTR2a3FibktzNnBHOWd4TnRGeWV4Um5mM2Vh?=
+ =?utf-8?B?MkxObXFTMzd4YVpUV2ZLcHh2TXVhaDYya3dHa0YrN1NkR1ZoVllTS0N5NlNN?=
+ =?utf-8?B?d2pCTWxPWWdPdC9Uem1neTVQZzZFZzhmQmF4ajlmQlBhbUlrVWdNSm56c2lj?=
+ =?utf-8?B?SStYbDd4L0tscVBxZUhZMnUwSk5MbC9uNE1yWTZkRHozRHBPWWE1MEdmblJP?=
+ =?utf-8?B?N0lsQWprb2hrTDEzK3pEdnVHNUtKMkl4K1dua2M2T3MwanlkZlZVY1ZQa3o3?=
+ =?utf-8?B?QnByd2gyOE1VcDFwRDliSXZGczlid2RCK3Z2OUdCSHN5bE05MGM0ZWZ0TUVL?=
+ =?utf-8?B?OFJQR2oycEx1MmRKM2hJcndLZnVDTVRqemZwdVNoMHdCbnJSNHNMcG05c2Uy?=
+ =?utf-8?B?QlhWWm9XU1pLdFB1TXl6T1J1VjQwemVjcFgvUEpoQTNhNEtxcGh0OGZaejJu?=
+ =?utf-8?B?cGxvQzhVSG52V3lSbURhckQzRFZPaE5wblZOeG1qZVZQK1JKNW5hVTU3OUR5?=
+ =?utf-8?B?MGp4aldZVnBWS2Ftd3BsUGlmMStBVnpNSnJLYTB6TDh6YUp6L3ZwU0NXWWsr?=
+ =?utf-8?B?TjRkUlFDWkR6NmMxd1NLOFh2bWtPYzBoazQraHM5cEFuV3J2eWNWWEZlRTJ1?=
+ =?utf-8?B?Y2kvWGZIanVGNEczYnpqUHY1anRyWVBXR2VRL0EvSzE0dUV0MTF5a2kxTVhG?=
+ =?utf-8?B?c25QR0todUxnS2RnQjRHb1pFRlpMSWJBbmNiWUVlbHpCZzZXa3ZRMW5GdE5E?=
+ =?utf-8?B?MmcrUGdXODhJK1FkM0IzS2F6Z0JCVmNNcEtuZjlVVjhRL1ZTSXd5V2JIUTN0?=
+ =?utf-8?B?SWlySXYvakVZWXVCU0tLMklXUmJPNW9ZRHp5M3FVK1JqZXdVSWpBY2ROeCsv?=
+ =?utf-8?B?N2RUbTFwMzkwUmNmVHBYREl1TXh3MWpJTEluYmFhaGswakc3azlrL2I5ai80?=
+ =?utf-8?B?YWRtUWxvem5pb2pDUXJ0bDNsN2ZFK2pzdHBhdUk4c1pYUkxydDF6VjhUTG4v?=
+ =?utf-8?B?a2dGcVBvbEVoQTFZYkdoYThmY2liL25hOE1EZ1JjZndlMkVrSHlOQjFtWTdJ?=
+ =?utf-8?B?UFR5Sko3SUhiRXlibys1dG9xRXMxUC9vWk15QXQ5dEhPZkJmSUt0K2dTMDcy?=
+ =?utf-8?B?aW5VTk1Yam55aFVUcERBcms5VGpoN0ZZUjBNcjVMUUExT1JBSllwUEZ3TnZy?=
+ =?utf-8?B?YUFSMmFMT2MwTEFLKzlxbWFpa3B0RVo0UE5hY00rMFZZUFdXRUtCeWNZS2ZG?=
+ =?utf-8?B?QXVCR2x3M2RERXF4Zld3dlFhY0UxWnVIbXdjKzhqcG5QTkNOV2dWQW1pSzAy?=
+ =?utf-8?B?ZUJZTVBFN2dDVGFOUTJ5NUwra0JaaGRDSDBlWUp3S05nZTZaYWpjblZxUGFB?=
+ =?utf-8?B?WWJLMVhCTERLSFJMYmQ2QmtCZ1FJalZXc25ldVQxT2NOeEFLT21zQTYvZGZv?=
+ =?utf-8?B?bWJzT0hSMWZ3Tmo2TUpwU2RaczI5MCs5U1dTc2dRMjIxYzArRGxSSkhITERI?=
+ =?utf-8?B?Mjh6bVdLa1c5WVVWR29oQkN1UVJ5VEZWZko0anEzblZ1bm16NFZlSEw2a2tq?=
+ =?utf-8?B?bzh3ZnJkaEVPWGNZMUFKU2tGcFFXOHNJUXg5RWM0bnVrTmhkZWZpdXI2d1pI?=
+ =?utf-8?B?YStEUE9tWFBqdERsNGcxbXBXd1V3U1NEZFZQQzRTRk1xcW9tU3h5eXlWMHlX?=
+ =?utf-8?B?NEpadWZDTTZaYVk5Z0lHaC9OdnlOR0pkOVJBL2Jhb1MzelRCWFpoR1ovNUx1?=
+ =?utf-8?B?NllkU21BVUxVNDFxSlpkeGZPN1pDbUVJOTVEOHFaVW5Wajk0aVNJbUM1aExh?=
+ =?utf-8?B?L1Uva0Jmd05ZYkU3Mk0yUzRoaVpndzhsQ3A4WmhhREdRK25FUGZnNWJpR2FK?=
+ =?utf-8?B?bUhRd0MrdDEyVm00OHpVSlR1Y054TEdOWU1OSFRQSTN3QWk0UXJ5WjB3QWky?=
+ =?utf-8?B?ZlpZeDZzczFycENCM1R3N3lOa0NVVlJHVDJOdndDOFA2RmRVRmdPSkR5eXhl?=
+ =?utf-8?B?R1hrZVVaQm1qUDZhWVBtcm5RbUdOalF5dFpaRklmNzdFYk80WTdZRVhKWm9G?=
+ =?utf-8?B?OXc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: eb173d18-f57b-445e-c9dd-08ddd2b4f460
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB7198.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Aug 2025 17:41:19.9164
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 237ae277-3f94-454c-1339-08ddd2383eb9
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH2PEPF00000141.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB5942
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: l+owsXmwIrJIxoP/1Y3egE2tjlxME46kXAppSYYN+gf1Mmt2HYAQaHSbBwjAB4q9CY0Ttw7a+QI/ejw2LcQ7eg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB5143
+X-OriginatorOrg: intel.com
 
-Implements TP4159-based live migration support in vfio-nvme
-driver by integrating command execution, controller state handling,
-and vfio migration state transitions.
+On 01/08/2025 19:44, Sean Christopherson wrote:
+> +Chao
+> 
+> On Fri, Aug 01, 2025, Adrian Hunter wrote:
+>> On 29/07/2025 22:33, Sean Christopherson wrote:
+>>> +static int tdx_terminate_vm(struct kvm *kvm)
+>>> +{
+>>> +	if (kvm_trylock_all_vcpus(kvm))
+>>> +		return -EBUSY;
+>>> +
+>>> +	kvm_vm_dead(kvm);
+>>> +	to_kvm_tdx(kvm)->vm_terminated = true;
+>>> +
+>>> +	kvm_unlock_all_vcpus(kvm);
+>>> +
+>>> +	tdx_mmu_release_hkid(kvm);
+>>> +
+>>> +	return 0;
+>>> +}
+>>
+>> As I think I mentioned when removing vm_dead first came up,
+>> I think we need more checks.  I spent some time going through
+>> the code and came up with what is below:
+>>
+>> First, we need to avoid TDX VCPU sub-IOCTLs from racing with
+>> tdx_mmu_release_hkid().  But having any TDX sub-IOCTL run after
+>> KVM_TDX_TERMINATE_VM raises questions of what might happen, so
+>> it is much simpler to understand, if that is not possible.
+>> There are 3 options:
+>>
+>> 1. Require that KVM_TDX_TERMINATE_VM is valid only if
+>> kvm_tdx->state == TD_STATE_RUNNABLE.  Since currently all
+>> the TDX sub-IOCTLs are for initialization, that would block
+>> the opportunity for any to run after KVM_TDX_TERMINATE_VM.
+>>
+>> 2. Check vm_terminated in tdx_vm_ioctl() and tdx_vcpu_ioctl()
+>>
+>> 3. Test KVM_REQ_VM_DEAD in tdx_vm_ioctl() and tdx_vcpu_ioctl()
+>>
+>> [ Note cannot check is_hkid_assigned() because that is racy ]
+>>
+>> Secondly, I suggest we avoid SEAMCALLs that will fail and
+>> result in KVM_BUG_ON() if HKID has been released.
+>>
+>> There are 2 groups of those: MMU-related and TDVPS_ACCESSORS.
+>>
+>> For the MMU-related, the following 2 functions should return
+>> an error immediately if vm_terminated:
+>>
+>> 	tdx_sept_link_private_spt()
+>> 	tdx_sept_set_private_spte()
+>>
+>> For that not be racy, extra synchronization is needed so that
+>> vm_terminated can be reliably checked when holding mmu lock
+>> i.e.
+>>
+>> static int tdx_terminate_vm(struct kvm *kvm)
+>> {
+>> 	if (kvm_trylock_all_vcpus(kvm))
+>> 		return -EBUSY;
+>>
+>> 	kvm_vm_dead(kvm);
+>> +
+>> +       write_lock(&kvm->mmu_lock);
+>> 	to_kvm_tdx(kvm)->vm_terminated = true;
+>> +       write_unlock(&kvm->mmu_lock);
+>>
+>> 	kvm_unlock_all_vcpus(kvm);
+>>
+>> 	tdx_mmu_release_hkid(kvm);
+>>
+>> 	return 0;
+>> }
+>>
+>> Finally, there are 2 TDVPS_ACCESSORS that need avoiding:
+>>
+>> 	tdx_load_mmu_pgd()
+>> 		skip td_vmcs_write64() if vm_terminated
+>>
+>> 	tdx_protected_apic_has_interrupt()
+>> 		skip td_state_non_arch_read64() if vm_terminated
+> 
+> Oof.  And as Chao pointed out[*], removing the vm_dead check would allow creating
+> and running vCPUs in a dead VM, which is most definitely not desirable.  Squashing
+> the vCPU creation case is easy enough if we keep vm_dead but still generally allow
+> ioctls, and it's probably worth doing that no matter what (to plug the hole where
+> pending vCPU creations could succeed):
+> 
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index d477a7fda0ae..941d2c32b7dc 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -4207,6 +4207,11 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
+>  
+>         mutex_lock(&kvm->lock);
+>  
+> +       if (kvm->vm_dead) {
+> +               r = -EIO;
+> +               goto unlock_vcpu_destroy;
+> +       }
+> +
+>         if (kvm_get_vcpu_by_id(kvm, id)) {
+>                 r = -EEXIST;
+>                 goto unlock_vcpu_destroy;
+> 
+> And then to ensure vCPUs can't do anything, check KVM_REQ_VM_DEAD after acquiring
+> vcpu->mutex.
+> 
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 6c07dd423458..883077eee4ce 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -4433,6 +4433,12 @@ static long kvm_vcpu_ioctl(struct file *filp,
+>  
+>         if (mutex_lock_killable(&vcpu->mutex))
+>                 return -EINTR;
+> +
+> +       if (kvm_test_request(KVM_REQ_VM_DEAD, vcpu)) {
+> +               r = -EIO;
+> +               goto out;
+> +       }
+> +
+>         switch (ioctl) {
+>         case KVM_RUN: {
+>                 struct pid *oldpid;
+> 
+> 
+> That should address all TDVPS paths (I hope), and I _think_ would address all
+> MMU-related paths as well?  E.g. prefault requires a vCPU.
+> 
+> Disallowing (most) vCPU ioctls but not all VM ioctls on vm_dead isn't great ABI
+> (understatement), but I think we need/want the above changes even if we keep the
+> general vm_dead restriction.  And given the extremely ad hoc behavior of taking
+> kvm->lock for VM ioctls, trying to enforce vm_dead for "all" VM ioctls seems like
+> a fool's errand.
+> 
+> So I'm leaning toward keeping "KVM: Reject ioctls only if the VM is bugged, not
+> simply marked dead" (with a different shortlog+changelog), but keeping vm_dead
+> (and not introducing kvm_tdx.vm_terminated).
+> 
+> Thoughts?
 
-Key features:
-
-- Use nvme_submit_vf_cmd() and nvme_get_ctrl_id() helpers
-  in the NVMe core PCI driver for submitting admin commands on VFs.
-
-- Implements Migration Send (opcode 0x43) and Receive (opcode 0x42)
-  command handling for suspend, resume, get/set controller state.
-
-  _Remark_:-
-  We are currently in the process of defining the state in TP4193, 
-  so the current state management code will be replaced with TP4193.
-  However, in this patch we include TP4159-compatible state management
-  code for the sake of completeness.
-
-- Adds parsing and serialization of controller state including:
-  - NVMeCS v0 controller state format (SCS-FIG6, FIG7, FIG8)
-  - Supported Controller State Formats (CNS=0x20 response)
-  - Migration file abstraction with read/write fileops
-
-- Adds debug decoders to log IOSQ/IOCQ state during migration save
-
-- Allocates anon inodes to handle save and resume file interfaces
-  exposed via VFIO migration file descriptors
-
-- Adds vfio migration state machine transitions:
-  - RUNNING → STOP: sends suspend command
-  - STOP → STOP_COPY: extracts controller state (save)
-  - STOP_COPY → STOP: disables file and frees buffer
-  - STOP → RESUMING: allocates resume file buffer
-  - RESUMING → STOP: loads controller state via set state
-  - STOP → RUNNING: resumes controller via resume command
-
-- Hooks vfio_migration_ops into vfio_pci_ops using:
-  - `migration_set_state()` and `migration_get_state()`
-  - Uses state_mutex + reset_lock for proper concurrency
-
-- Queries Identify Controller (CNS=01h) to check for HMLMS bit
-  in OACS field, indicating controller migration capability
-
-- Applies runtime checks for buffer alignment, format support,
-  and state size bounds to ensure spec compliance
-
-With this patch, vfio-nvme enables live migration of VF-based
-NVMe devices by implementing TP4159 migration command flows
-and vfio device state transitions required by QEMU/VMM.
-
-Signed-off-by: Lei Rao <lei.rao@intel.com>
-Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
-Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
----
- drivers/vfio/pci/nvme/Makefile |   3 +
- drivers/vfio/pci/nvme/nvme.c   | 840 +++++++++++++++++++++++++++++++++
- drivers/vfio/pci/nvme/nvme.h   |   3 +
- 3 files changed, 846 insertions(+)
-
-diff --git a/drivers/vfio/pci/nvme/Makefile b/drivers/vfio/pci/nvme/Makefile
-index 2f4a0ad3d9cf..d434c943436b 100644
---- a/drivers/vfio/pci/nvme/Makefile
-+++ b/drivers/vfio/pci/nvme/Makefile
-@@ -1,3 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0-only
-+
-+KBUILD_EXTRA_SYMBOLS := $(srctree)/drivers/nvme/Module.symvers
-+
- obj-$(CONFIG_NVME_VFIO_PCI) += nvme-vfio-pci.o
- nvme-vfio-pci-y := nvme.o
-diff --git a/drivers/vfio/pci/nvme/nvme.c b/drivers/vfio/pci/nvme/nvme.c
-index 08bee3274207..5283d6b606dc 100644
---- a/drivers/vfio/pci/nvme/nvme.c
-+++ b/drivers/vfio/pci/nvme/nvme.c
-@@ -19,6 +19,8 @@
- 
- #include "nvme.h"
- 
-+#define MAX_MIGRATION_SIZE (256 * 1024)
-+
- static void nvmevf_disable_fd(struct nvmevf_migration_file *migf)
- {
- 	mutex_lock(&migf->lock);
-@@ -71,6 +73,842 @@ static struct nvmevf_pci_core_device *nvmevf_drvdata(struct pci_dev *pdev)
- 			    core_device);
- }
- 
-+/*
-+ * Convert byte length to nvme's 0-based num dwords
-+ */
-+static inline u32 bytes_to_nvme_numd(size_t len)
-+{
-+	if (len < 4)
-+		return 0;
-+	return (len >> 2) - 1;
-+}
-+
-+static int nvmevf_cmd_suspend_device(struct nvmevf_pci_core_device *nvmevf_dev)
-+{
-+	struct pci_dev *dev = nvmevf_dev->core_device.pdev;
-+	struct nvme_command c = { };
-+	u32 cdw11 = NVME_LM_SUSPEND_TYPE_SUSPEND << 16 | nvme_get_ctrl_id(dev);
-+	int ret;
-+
-+	c.lm.send.opcode = nvme_admin_lm_send;
-+	c.lm.send.cdw10 = cpu_to_le32(NVME_LM_SEND_SEL_SUSPEND);
-+	c.lm.send.cdw11 = cpu_to_le32(cdw11);
-+
-+	ret = nvme_submit_vf_cmd(dev, &c, NULL, NULL, 0);
-+	if (ret) {
-+		dev_warn(&dev->dev,
-+			 "Suspend virtual function failed (ret=0x%x)\n",
-+			 ret);
-+		return ret;
-+	}
-+
-+	dev_dbg(&dev->dev, "Suspend command successful\n");
-+	return 0;
-+}
-+
-+static int nvmevf_cmd_resume_device(struct nvmevf_pci_core_device *nvmevf_dev)
-+{
-+	struct pci_dev *dev = nvmevf_dev->core_device.pdev;
-+	struct nvme_command c = { };
-+	int ret;
-+
-+	c.lm.send.opcode = nvme_admin_lm_send;
-+	c.lm.send.cdw10 = cpu_to_le32(NVME_LM_SEND_SEL_RESUME);
-+	c.lm.send.cdw11 = cpu_to_le32(nvme_get_ctrl_id(dev));
-+
-+	ret = nvme_submit_vf_cmd(dev, &c, NULL, NULL, 0);
-+	if (ret) {
-+		dev_warn(&dev->dev,
-+			 "Resume virtual function failed (ret=0x%x)\n", ret);
-+		return ret;
-+	}
-+	dev_dbg(&dev->dev, "Resume command successful\n");
-+	return 0;
-+}
-+
-+/**
-+ * Figure SCSF-FIG1: Supported Controller State Formats Data Structure
-+ * nvme_lm_get_ctrl_state_fmts - Query and parse CNS=0x20 format list
-+ * @dev:  Controller pci device
-+ * @fmt:  Output struct populated with NV, NUUID, and pointers
-+ *
-+ * Issues Identify CNS=0x20 (Supported Controller State Formats),
-+ * allocates a buffer, and parses the result into the provided struct.
-+ *
-+ * The caller must free fmt->ctrl_state_raw_buf using kfree().
-+ *
-+ * Returns 0 on success, or a negative errno on failure.
-+ */
-+static int nvme_lm_id_ctrl_state(struct pci_dev *dev,
-+				 struct nvme_lm_ctrl_state_fmts_info *fmt)
-+{
-+	struct nvme_command c = { };
-+	void *buf;
-+	int ret;
-+	__u8 nv, nuuid;
-+	size_t len;
-+
-+	if (!fmt)
-+		return -EINVAL;
-+
-+	/* Step 1: Read first 2 bytes to get NV and NUUID */
-+	buf = kzalloc(2, GFP_KERNEL);
-+	if (!buf)
-+		return -ENOMEM;
-+
-+	c.identify.opcode = nvme_admin_identify;
-+	c.identify.cns = NVME_ID_CNS_LM_CTRL_STATE_FMT;
-+	c.identify.nsid = cpu_to_le32(0);
-+
-+	ret = nvme_submit_vf_cmd(dev, &c, NULL, buf, 2);
-+	if (ret)
-+		goto out_free;
-+
-+	nv = ((__u8 *)buf)[0];
-+	nuuid = ((__u8 *)buf)[1];
-+
-+	kfree(buf);
-+
-+	/*
-+	 * Compute total buffer length for the full Identify CNS=0x20 response:
-+	 *
-+	 * - The first 2 bytes hold the header:
-+	 *     * Byte 0: NV     — number of NVMe-defined format versions
-+	 *     * Byte 1: NUUID  — number of vendor-specific UUID entries
-+	 *
-+	 * - Each version entry is 2 bytes (VERSION_ENTRY_SIZE)
-+	 * - Each UUID entry is 16 bytes (UUID_ENTRY_SIZE)
-+	 *
-+	 * Therefore:
-+	 *   Total length = 2 + (NV * 2) + (NUUID * 16)
-+	 */
-+	len = NVME_LM_CTRL_STATE_HDR_SIZE +
-+	nv * NVME_LM_VERSION_ENTRY_SIZE + nuuid * NVME_LM_UUID_ENTRY_SIZE;
-+
-+	buf = kzalloc(len, GFP_KERNEL);
-+	if (!buf)
-+		return -ENOMEM;
-+
-+	memset(&c, 0, sizeof(c));
-+	c.identify.opcode = nvme_admin_identify;
-+	c.identify.cns = NVME_ID_CNS_LM_CTRL_STATE_FMT;
-+	c.identify.nsid = cpu_to_le32(0);
-+
-+	ret = nvme_submit_vf_cmd(dev, &c, NULL, buf, len);
-+	if (ret)
-+		goto out_free;
-+
-+	/* Parse the result in-place */
-+	fmt->nv = nv;
-+	fmt->nuuid = nuuid;
-+	fmt->vers = ((struct nvme_lm_supported_ctrl_state_fmts *)buf)->vers;
-+	fmt->uuids = (const void *)(fmt->vers + nv);
-+	fmt->ctrl_state_raw_buf = buf;
-+	fmt->raw_len = len;
-+
-+	return 0;
-+
-+out_free:
-+	kfree(buf);
-+	return ret;
-+}
-+
-+static int nvme_lm_get_ctrl_state_fmt(struct pci_dev *dev, bool debug,
-+				      struct nvme_lm_ctrl_state_fmts_info *fmt)
-+{
-+	__u8 i;
-+	int ret;
-+
-+	ret = nvme_lm_id_ctrl_state(dev, fmt);
-+	if (ret) {
-+		pr_err("Failed to get ctrl state formats (ret=%d)\n", ret);
-+		return ret;
-+	}
-+
-+	if (debug)
-+		pr_info("NV = %u, NUUID = %u\n", fmt->nv, fmt->nuuid);
-+
-+	if (debug) {
-+		for (i = 0; i < fmt->nv; i++) {
-+			pr_info("  Format[%d] Version = 0x%04x\n",
-+					i, le16_to_cpu(fmt->vers[i]));
-+		}
-+
-+		for (i = 0; i < fmt->nuuid; i++) {
-+			char uuid_str[37]; /* 36 chars + null */
-+
-+			snprintf(uuid_str, sizeof(uuid_str),
-+					"%02x%02x%02x%02x-%02x%02x-%02x%02x-"
-+					"%02x%02x-%02x%02x%02x%02x%02x%02x",
-+					fmt->uuids[i][0], fmt->uuids[i][1],
-+					fmt->uuids[i][2], fmt->uuids[i][3],
-+					fmt->uuids[i][4], fmt->uuids[i][5],
-+					fmt->uuids[i][6], fmt->uuids[i][7],
-+					fmt->uuids[i][8], fmt->uuids[i][9],
-+					fmt->uuids[i][10], fmt->uuids[i][11],
-+					fmt->uuids[i][12], fmt->uuids[i][13],
-+					fmt->uuids[i][14], fmt->uuids[i][15]);
-+
-+			pr_info("  UUID[%d] = %s\n", i, uuid_str);
-+		}
-+	}
-+
-+	return ret;
-+}
-+
-+static void nvmevf_init_get_ctrl_state_cmd(struct nvme_command *c, __u16 cntlid,
-+					   __u8 csvi, __u8 csuuidi,
-+					   __u8 csuidxp, size_t buf_len)
-+{
-+	c->lm.recv.opcode = nvme_admin_lm_recv;
-+	c->lm.recv.sel = NVME_LM_RECV_GET_CTRL_STATE;
-+	/*
-+	 * MOS fields treated as ctrl state version index, Use NVME V1 state.
-+	 */
-+	/*
-+	 * For upstream read the supported controller state formats using
-+	 * identify command with cns value 0x20 and make sure NVME_LM_CSVI
-+	 * matches the on of the reported formats for NVMe states.
-+	 */
-+	c->lm.recv.mos = cpu_to_le16(csvi);
-+	/* Target Controller is this a right way to get the controller ID */
-+	c->lm.recv.cntlid = cpu_to_le16(cntlid);
-+
-+	/*
-+	 * For upstream read the supported controller state formats using
-+	 * identify command with cns value 0x20 and make sure NVME_LM_CSVI
-+	 * matches the on of the reported formats for Vender specific states.
-+	 */
-+	/* adjust the state as per needed by setting the macro values */
-+	c->lm.recv.csuuidi = cpu_to_le32(csuuidi);
-+	c->lm.recv.csuidxp = cpu_to_le32(csuidxp);
-+
-+	/*
-+	 * Associates the Migration Receive command with the correct migration
-+	 * session UUID currently we set to 0. For now asssume that initiaor
-+	 * and target has agreed on the UUIDX 0 for all the live migration
-+	 * sessions.
-+	 */
-+	c->lm.recv.uuid_index = cpu_to_le32(0);
-+
-+	/*
-+	 * Assume that data buffer is big enoough to hold the state,
-+	 * 0-based dword count.
-+	 */
-+	c->lm.recv.numd = cpu_to_le32(bytes_to_nvme_numd(buf_len));
-+}
-+
-+#define NVME_LM_MAX_NVMECS	1024
-+#define NVME_LM_MAX_VSD		1024
-+
-+static int nvmevf_get_ctrl_state(struct pci_dev *dev,
-+				__u8 csvi, __u8 csuuidi, __u8 csuidxp,
-+				struct nvmevf_migration_file *migf,
-+				struct nvme_lm_ctrl_state_info *state)
-+{
-+	struct nvme_command c = { };
-+	struct nvme_lm_ctrl_state *hdr;
-+	/* Make sure hdr_len is a multiple of 4 */
-+	size_t hdr_len = ALIGN(sizeof(*hdr), 4);
-+	__u16 id = nvme_get_ctrl_id(dev);
-+	void *local_buf;
-+	size_t len;
-+	int ret;
-+
-+	/* Step 1: Issue Migration Receive (Select = 0) to get header */
-+	local_buf = kzalloc(hdr_len, GFP_KERNEL);
-+	if (!local_buf)
-+		return -ENOMEM;
-+
-+	nvmevf_init_get_ctrl_state_cmd(&c, id, csvi, csuuidi, csuidxp, hdr_len);
-+	ret = nvme_submit_vf_cmd(dev, &c, NULL, local_buf, hdr_len);
-+	if (ret) {
-+		dev_warn(&dev->dev,
-+			"nvme_admin_lm_recv failed (ret=0x%x)\n", ret);
-+		kfree(local_buf);
-+		return ret;
-+	}
-+
-+	if (le16_to_cpu(hdr->nvmecss) > NVME_LM_MAX_NVMECS ||
-+	    le16_to_cpu(hdr->vss) > NVME_LM_MAX_VSD) {
-+		kfree(local_buf);
-+		return -EINVAL;
-+	}
-+
-+	hdr = local_buf;
-+	len = hdr_len + 4 * (le16_to_cpu(hdr->nvmecss) + le16_to_cpu(hdr->vss));
-+
-+	kfree(local_buf);
-+
-+	if (len == hdr_len)
-+		dev_warn(&dev->dev, "nvmecss == 0 or vss = 0\n");
-+
-+	/* Step 2: Allocate full buffer */
-+	migf->total_length = len;
-+	migf->vf_data = kvzalloc(migf->total_length, GFP_KERNEL);
-+	if (!migf->vf_data)
-+		return -ENOMEM;
-+
-+	memset(&c, 0, sizeof(c));
-+	nvmevf_init_get_ctrl_state_cmd(&c, id, csvi, csuuidi, csuidxp, len);
-+	ret = nvme_submit_vf_cmd(dev, &c, NULL, migf->vf_data, len);
-+	if (ret)
-+		goto free_big;
-+
-+	/* Populate state struct */
-+	hdr = (struct nvme_lm_ctrl_state *)migf->vf_data;
-+	state->raw = hdr;
-+	state->total_len = len;
-+	state->version = hdr->version;
-+	state->csattr = hdr->csattr;
-+	state->nvmecss = hdr->nvmecss;
-+	state->vss = hdr->vss;
-+	state->nvme_cs = hdr->data;
-+	state->vsd = hdr->data + le16_to_cpu(hdr->nvmecss) * 4;
-+
-+	return ret;
-+
-+free_big:
-+	kvfree(migf->vf_data);
-+	return ret;
-+}
-+
-+static const struct nvme_lm_nvme_cs_v0_state *
-+nvme_lm_parse_nvme_cs_v0_state(const void *data, size_t len, u16 *niosq,
-+			       u16 *niocq)
-+{
-+	const struct nvme_lm_nvme_cs_v0_state *hdr = data;
-+	size_t hdr_len = sizeof(*hdr);
-+	size_t iosq_sz, iocq_sz, total;
-+	u16 sq, cq;
-+
-+	if (!data || len < hdr_len)
-+		return NULL;
-+
-+	sq = le16_to_cpu(hdr->niosq);
-+	cq = le16_to_cpu(hdr->niocq);
-+
-+	iosq_sz = sq * sizeof(struct nvme_lm_iosq_state);
-+	iocq_sz = cq * sizeof(struct nvme_lm_iocq_state);
-+	total = hdr_len + iosq_sz + iocq_sz;
-+
-+	if (len < total)
-+		return NULL;
-+
-+	if (niosq)
-+		*niosq = sq;
-+	if (niocq)
-+		*niocq = cq;
-+
-+	return hdr;
-+}
-+
-+static void nvme_lm_debug_ctrl_state(struct nvme_lm_ctrl_state_info *state)
-+{
-+	const struct nvme_lm_nvme_cs_v0_state *cs;
-+	const struct nvme_lm_iosq_state *iosq;
-+	const struct nvme_lm_iocq_state *iocq;
-+	u16 niosq, niocq;
-+	int i;
-+
-+	pr_info("Controller State:\n");
-+	pr_info("Version    : 0x%04x\n", le16_to_cpu(state->version));
-+	pr_info("CSATTR     : 0x%02x\n", state->csattr);
-+	pr_info("NVMECS Len : %u bytes\n", le16_to_cpu(state->nvmecss) * 4);
-+	pr_info("VSD Len    : %u bytes\n", le16_to_cpu(state->vss) * 4);
-+
-+	cs = nvme_lm_parse_nvme_cs_v0_state(state->nvme_cs,
-+					    le16_to_cpu(state->nvmecss) * 4,
-+					    &niosq, &niocq);
-+	if (!cs) {
-+		pr_warn("Failed to parse NVMECS\n");
-+		return;
-+	}
-+
-+	iosq = cs->iosq;
-+	iocq = (const void *)(iosq + niosq);
-+
-+	for (i = 0; i < niosq; i++) {
-+		pr_info("IOSQ[%d]: SIZE=%u QID=%u CQID=%u ATTR=0x%x Head=%u "
-+			"Tail=%u\n", i,
-+			le16_to_cpu(iosq[i].qsize),
-+			le16_to_cpu(iosq[i].qid),
-+			le16_to_cpu(iosq[i].cqid),
-+			le16_to_cpu(iosq[i].attr),
-+			le16_to_cpu(iosq[i].head),
-+			le16_to_cpu(iosq[i].tail));
-+	}
-+
-+	for (i = 0; i < niocq; i++) {
-+		pr_info("IOCQ[%d]: SIZE=%u QID=%u ATTR=%u Head=%u Tail=%u\n", i,
-+			le16_to_cpu(iocq[i].qsize),
-+			le16_to_cpu(iocq[i].qid),
-+			le16_to_cpu(iocq[i].attr),
-+			le16_to_cpu(iocq[i].head),
-+			le16_to_cpu(iocq[i].tail));
-+	}
-+}
-+
-+#define NVME_LM_CSUUIDI	0
-+#define NVME_LM_CSVI	NVME_LM_RECV_CSVI_NVME_V1
-+
-+static int nvmevf_cmd_get_ctrl_state(struct nvmevf_pci_core_device *nvmevf_dev,
-+				     struct nvmevf_migration_file *migf)
-+{
-+	struct pci_dev *dev = nvmevf_dev->core_device.pdev;
-+	struct nvme_lm_ctrl_state_fmts_info fmt = { };
-+	struct nvme_lm_ctrl_state_info state = { };
-+	__u8 csvi = NVME_LM_CSVI;
-+	__u8 csuuidi = NVME_LM_CSUUIDI;
-+	__u8 csuidxp = 0;
-+	int ret;
-+
-+	/*
-+	 * Read the supported controller state formats to make sure they match
-+	 * csvi value specified in vfio-nvme without this check we'd not know
-+	 * which controller state format we are working with.
-+	 */
-+	ret = nvme_lm_get_ctrl_state_fmt(dev, true, &fmt);
-+	if (ret)
-+		return ret;
-+	/*
-+	 * Number of versions NV cannot be less than controller state version
-+	 * index we are using, it's an error. Please note that CSVI is
-+	 * a configurable value user can define this macro at the compile time
-+	 * to select the required NVMe controller state version index from
-+	 * Supported Controller State Formats Data Structure.
-+	 */
-+	if (fmt.nv < csvi) {
-+		dev_warn(&dev->dev,
-+			 "required ctrl state format not found\n");
-+		ret = -EINVAL;
-+		goto out;
-+	}
-+
-+	ret = nvmevf_get_ctrl_state(dev, csvi, csuuidi, csuidxp, migf, &state);
-+	if (ret)
-+		goto out;
-+
-+	if (le16_to_cpu(state.version) != csvi) {
-+		dev_warn(&dev->dev,
-+			 "Unexpected controller state version: 0x%04x\n",
-+			 le16_to_cpu(state.version));
-+		ret = -EINVAL;
-+		goto out;
-+	}
-+
-+	/*
-+	 * Now that we have received the controller state decode the state
-+	 * properly for debugging purpose
-+	 */
-+
-+	nvme_lm_debug_ctrl_state(&state);
-+
-+	dev_info(&dev->dev, "Get controller state successful\n");
-+
-+out:
-+	kfree(fmt.ctrl_state_raw_buf);
-+	return ret;
-+}
-+
-+static int nvmevf_cmd_set_ctrl_state(struct nvmevf_pci_core_device *nvmevf_dev,
-+				     struct nvmevf_migration_file *migf)
-+{
-+	struct pci_dev *dev = nvmevf_dev->core_device.pdev;
-+	struct nvme_command c = { };
-+	u32 sel = NVME_LM_SEND_SEL_SET_CTRL_STATE;
-+	/* assume that data buffer is big enough to hold state in one cmd */
-+	u32 mos = NVME_LM_SEQIND_ONLY;
-+	u32 cntlid = nvme_get_ctrl_id(dev);
-+	u32 csvi = NVME_LM_CSVI;
-+	u32 csuuidi = NVME_LM_CSUUIDI;
-+	int ret;
-+
-+	c.lm.send.opcode = nvme_admin_lm_send;
-+	/* mos = SEQIND = 0b11 (Only) in MOS bits [17:16] */
-+	c.lm.send.cdw10 = cpu_to_le32((mos << 16) | sel);
-+	/*
-+	 * Assume that we are only working on NVMe state and not on vendor
-+	 * specific state.
-+	 */
-+	c.lm.send.cdw11 = cpu_to_le32(csuuidi << 24 | csvi << 16 | cntlid);
-+
-+	/*
-+	 * Associates the Migration Send command with the correct migration
-+	 * session UUID currently we set to 0. For now asssume that initiaor
-+	 * and target has agreed on the UUIDX 0 for all the live migration
-+	 * sessions.
-+	 */
-+	c.lm.send.cdw14 = cpu_to_le32(0);
-+	/*
-+	 * Assume that data buffer is big enoough to hold the state,
-+	 * 0-based dword count.
-+	 */
-+	c.lm.send.cdw15 = cpu_to_le32(bytes_to_nvme_numd(migf->total_length));
-+
-+	ret = nvme_submit_vf_cmd(dev, &c, NULL, migf->vf_data,
-+				 migf->total_length);
-+	if (ret) {
-+		dev_warn(&dev->dev,
-+			 "Load the device states failed (ret=0x%x)\n", ret);
-+		return ret;
-+	}
-+
-+	dev_info(&dev->dev, "Set controller state successful\n");
-+	return 0;
-+}
-+
-+static int nvmevf_release_file(struct inode *inode, struct file *filp)
-+{
-+	struct nvmevf_migration_file *migf = filp->private_data;
-+
-+	nvmevf_disable_fd(migf);
-+	mutex_destroy(&migf->lock);
-+	kfree(migf);
-+	return 0;
-+}
-+
-+static ssize_t nvmevf_resume_write(struct file *filp, const char __user *buf,
-+				   size_t len, loff_t *pos)
-+{
-+	struct nvmevf_migration_file *migf = filp->private_data;
-+	loff_t requested_length;
-+	ssize_t done = 0;
-+	int ret;
-+
-+	if (pos)
-+		return -ESPIPE;
-+	pos = &filp->f_pos;
-+
-+	if (*pos < 0 ||
-+	    check_add_overflow((loff_t)len, *pos, &requested_length))
-+		return -EINVAL;
-+
-+	if (requested_length > MAX_MIGRATION_SIZE)
-+		return -ENOMEM;
-+	mutex_lock(&migf->lock);
-+	if (migf->disabled) {
-+		done = -ENODEV;
-+		goto out_unlock;
-+	}
-+
-+	ret = copy_from_user(migf->vf_data + *pos, buf, len);
-+	if (ret) {
-+		done = -EFAULT;
-+		goto out_unlock;
-+	}
-+	*pos += len;
-+	done = len;
-+	migf->total_length += len;
-+
-+out_unlock:
-+	mutex_unlock(&migf->lock);
-+	return done;
-+}
-+
-+static const struct file_operations nvmevf_resume_fops = {
-+	.owner = THIS_MODULE,
-+	.write = nvmevf_resume_write,
-+	.release = nvmevf_release_file,
-+	.llseek = noop_llseek,
-+};
-+
-+static struct nvmevf_migration_file *
-+nvmevf_pci_resume_device_data(struct nvmevf_pci_core_device *nvmevf_dev)
-+{
-+	struct nvmevf_migration_file *migf;
-+	int ret;
-+
-+	migf = kzalloc(sizeof(*migf), GFP_KERNEL);
-+	if (!migf)
-+		return ERR_PTR(-ENOMEM);
-+
-+	migf->filp = anon_inode_getfile("nvmevf_mig", &nvmevf_resume_fops, migf,
-+					O_WRONLY);
-+	if (IS_ERR(migf->filp)) {
-+		int err = PTR_ERR(migf->filp);
-+
-+		kfree(migf);
-+		return ERR_PTR(err);
-+	}
-+	stream_open(migf->filp->f_inode, migf->filp);
-+	mutex_init(&migf->lock);
-+
-+	/* Allocate buffer to load the device states and max states is 256K */
-+	migf->vf_data = kvzalloc(MAX_MIGRATION_SIZE, GFP_KERNEL);
-+	if (!migf->vf_data) {
-+		ret = -ENOMEM;
-+		goto out_free;
-+	}
-+
-+	return migf;
-+
-+out_free:
-+	fput(migf->filp);
-+	return ERR_PTR(ret);
-+}
-+
-+static ssize_t nvmevf_save_read(struct file *filp, char __user *buf,
-+				size_t len, loff_t *pos)
-+{
-+	struct nvmevf_migration_file *migf = filp->private_data;
-+	ssize_t done = 0;
-+	int ret;
-+
-+	if (pos)
-+		return -ESPIPE;
-+	pos = &filp->f_pos;
-+
-+	mutex_lock(&migf->lock);
-+	if (*pos > migf->total_length) {
-+		done = -EINVAL;
-+		goto out_unlock;
-+	}
-+
-+	if (migf->disabled) {
-+		done = -EINVAL;
-+		goto out_unlock;
-+	}
-+
-+	len = min_t(size_t, migf->total_length - *pos, len);
-+	if (len) {
-+		ret = copy_to_user(buf, migf->vf_data + *pos, len);
-+		if (ret) {
-+			done = -EFAULT;
-+			goto out_unlock;
-+		}
-+		*pos += len;
-+		done = len;
-+	}
-+
-+out_unlock:
-+	mutex_unlock(&migf->lock);
-+	return done;
-+}
-+
-+static const struct file_operations nvmevf_save_fops = {
-+	.owner = THIS_MODULE,
-+	.read = nvmevf_save_read,
-+	.release = nvmevf_release_file,
-+	.llseek = noop_llseek,
-+};
-+
-+static struct nvmevf_migration_file *
-+nvmevf_pci_save_device_data(struct nvmevf_pci_core_device *nvmevf_dev)
-+{
-+	struct nvmevf_migration_file *migf;
-+	int ret;
-+
-+	migf = kzalloc(sizeof(*migf), GFP_KERNEL);
-+	if (!migf)
-+		return ERR_PTR(-ENOMEM);
-+
-+	migf->filp = anon_inode_getfile("nvmevf_mig", &nvmevf_save_fops, migf,
-+					O_RDONLY);
-+	if (IS_ERR(migf->filp)) {
-+		int err = PTR_ERR(migf->filp);
-+
-+		kfree(migf);
-+		return ERR_PTR(err);
-+	}
-+
-+	stream_open(migf->filp->f_inode, migf->filp);
-+	mutex_init(&migf->lock);
-+
-+	ret = nvmevf_cmd_get_ctrl_state(nvmevf_dev, migf);
-+	if (ret)
-+		goto out_free;
-+
-+	return migf;
-+out_free:
-+	fput(migf->filp);
-+	return ERR_PTR(ret);
-+}
-+
-+static struct file *
-+nvmevf_pci_step_device_state_locked(struct nvmevf_pci_core_device *nvmevf_dev,
-+				    u32 new)
-+{
-+	u32 cur = nvmevf_dev->mig_state;
-+	int ret;
-+
-+	if (cur == VFIO_DEVICE_STATE_RUNNING && new == VFIO_DEVICE_STATE_STOP) {
-+		ret = nvmevf_cmd_suspend_device(nvmevf_dev);
-+		if (ret)
-+			return ERR_PTR(ret);
-+		return NULL;
-+	}
-+
-+	if (cur == VFIO_DEVICE_STATE_STOP &&
-+	    new == VFIO_DEVICE_STATE_STOP_COPY) {
-+		struct nvmevf_migration_file *migf;
-+
-+		migf = nvmevf_pci_save_device_data(nvmevf_dev);
-+		if (IS_ERR(migf))
-+			return ERR_CAST(migf);
-+		get_file(migf->filp);
-+		nvmevf_dev->saving_migf = migf;
-+		return migf->filp;
-+	}
-+
-+
-+	if (cur == VFIO_DEVICE_STATE_STOP_COPY &&
-+	    new == VFIO_DEVICE_STATE_STOP) {
-+		nvmevf_disable_fds(nvmevf_dev);
-+		return NULL;
-+	}
-+
-+	if (cur == VFIO_DEVICE_STATE_STOP &&
-+	    new == VFIO_DEVICE_STATE_RESUMING) {
-+		struct nvmevf_migration_file *migf;
-+
-+		migf = nvmevf_pci_resume_device_data(nvmevf_dev);
-+		if (IS_ERR(migf))
-+			return ERR_CAST(migf);
-+		get_file(migf->filp);
-+		nvmevf_dev->resuming_migf = migf;
-+		return migf->filp;
-+	}
-+
-+	if (cur == VFIO_DEVICE_STATE_RESUMING &&
-+	    new == VFIO_DEVICE_STATE_STOP) {
-+		ret = nvmevf_cmd_set_ctrl_state(nvmevf_dev,
-+						nvmevf_dev->resuming_migf);
-+		if (ret)
-+			return ERR_PTR(ret);
-+		nvmevf_disable_fds(nvmevf_dev);
-+		return NULL;
-+	}
-+
-+	if (cur == VFIO_DEVICE_STATE_STOP &&
-+	    new == VFIO_DEVICE_STATE_RUNNING) {
-+		nvmevf_cmd_resume_device(nvmevf_dev);
-+		return NULL;
-+	}
-+
-+	/* vfio_mig_get_next_state() does not use arcs other than the above */
-+	WARN_ON(true);
-+	return ERR_PTR(-EINVAL);
-+}
-+
-+static struct file *
-+nvmevf_pci_set_device_state(struct vfio_device *vdev,
-+			    enum vfio_device_mig_state new_state)
-+{
-+	struct nvmevf_pci_core_device *nvmevf_dev = container_of(vdev,
-+			struct nvmevf_pci_core_device, core_device.vdev);
-+	enum vfio_device_mig_state next_state;
-+	struct file *res = NULL;
-+	int ret;
-+
-+	mutex_lock(&nvmevf_dev->state_mutex);
-+	while (new_state != nvmevf_dev->mig_state) {
-+		ret = vfio_mig_get_next_state(vdev, nvmevf_dev->mig_state,
-+					      new_state, &next_state);
-+		if (ret) {
-+			res = ERR_PTR(-EINVAL);
-+			break;
-+		}
-+
-+		res = nvmevf_pci_step_device_state_locked(nvmevf_dev,
-+							  next_state);
-+		if (IS_ERR(res))
-+			break;
-+		nvmevf_dev->mig_state = next_state;
-+		if (WARN_ON(res && new_state != nvmevf_dev->mig_state)) {
-+			fput(res);
-+			res = ERR_PTR(-EINVAL);
-+			break;
-+		}
-+	}
-+	nvmevf_state_mutex_unlock(nvmevf_dev);
-+	return res;
-+}
-+
-+static int nvmevf_pci_get_device_state(struct vfio_device *vdev,
-+				       enum vfio_device_mig_state *curr_state)
-+{
-+	struct nvmevf_pci_core_device *nvmevf_dev = container_of(
-+			vdev, struct nvmevf_pci_core_device, core_device.vdev);
-+
-+	mutex_lock(&nvmevf_dev->state_mutex);
-+	*curr_state = nvmevf_dev->mig_state;
-+	nvmevf_state_mutex_unlock(nvmevf_dev);
-+	return 0;
-+}
-+
-+static const struct vfio_migration_ops nvmevf_pci_mig_ops = {
-+	.migration_set_state = nvmevf_pci_set_device_state,
-+	.migration_get_state = nvmevf_pci_get_device_state,
-+};
-+
-+static bool nvmevf_migration_supp(struct pci_dev *pdev)
-+{
-+	struct nvme_command c = { };
-+	u8 lm_supported = false;
-+	struct nvme_id_ctrl *id;
-+	__u16 oacs;
-+	int ret;
-+
-+	c.identify.opcode = nvme_admin_identify;
-+	c.identify.cns = NVME_ID_CNS_CTRL;
-+
-+	id = kmalloc(sizeof(struct nvme_id_ctrl), GFP_KERNEL);
-+	if (!id)
-+		return false;
-+
-+	ret = nvme_submit_vf_cmd(pdev, &c, NULL, id,
-+				 sizeof(struct nvme_id_ctrl));
-+	if (ret) {
-+		dev_warn(&pdev->dev, "Get identify ctrl failed (ret=0x%x)\n",
-+			 ret);
-+		lm_supported = false;
-+		goto out;
-+	}
-+
-+	oacs = le16_to_cpu(id->oacs);
-+	lm_supported = oacs & NVME_CTRL_OACS_HMLMS ? true : false;
-+out:
-+	kfree(id);
-+	return lm_supported;
-+}
-+
-+static int nvmevf_migration_init_dev(struct vfio_device *core_vdev)
-+{
-+	struct nvmevf_pci_core_device *nvmevf_dev;
-+	struct pci_dev *pdev;
-+	int vf_id;
-+	int ret = -1;
-+
-+	nvmevf_dev = container_of(core_vdev, struct nvmevf_pci_core_device,
-+				  core_device.vdev);
-+	pdev = to_pci_dev(core_vdev->dev);
-+
-+	if (!pdev->is_virtfn)
-+		return ret;
-+
-+	/*
-+	 * Get the identify controller data structure to check the live
-+	 * migration support.
-+	 */
-+	if (!nvmevf_migration_supp(pdev))
-+		return ret;
-+
-+	nvmevf_dev->migrate_cap = 1;
-+
-+	vf_id = pci_iov_vf_id(pdev);
-+	if (vf_id < 0)
-+		return ret;
-+	nvmevf_dev->vf_id = vf_id + 1;
-+	core_vdev->migration_flags = VFIO_MIGRATION_STOP_COPY;
-+
-+	mutex_init(&nvmevf_dev->state_mutex);
-+	spin_lock_init(&nvmevf_dev->reset_lock);
-+	core_vdev->mig_ops = &nvmevf_pci_mig_ops;
-+
-+	return vfio_pci_core_init_dev(core_vdev);
-+}
-+
- static int nvmevf_pci_open_device(struct vfio_device *core_vdev)
- {
- 	struct nvmevf_pci_core_device *nvmevf_dev;
-@@ -109,6 +947,7 @@ static void nvmevf_pci_close_device(struct vfio_device *core_vdev)
- 
- static const struct vfio_device_ops nvmevf_pci_ops = {
- 	.name = "nvme-vfio-pci",
-+	.init = nvmevf_migration_init_dev,
- 	.release = vfio_pci_core_release_dev,
- 	.open_device = nvmevf_pci_open_device,
- 	.close_device = nvmevf_pci_close_device,
-@@ -193,4 +1032,5 @@ module_pci_driver(nvmevf_pci_driver);
- 
- MODULE_LICENSE("GPL");
- MODULE_AUTHOR("Chaitanya Kulkarni <kch@nvidia.com>");
-+MODULE_AUTHOR("Lei Rao <lei.rao@intel.com>");
- MODULE_DESCRIPTION("NVMe VFIO PCI - VFIO PCI driver with live migration support for NVMe");
-diff --git a/drivers/vfio/pci/nvme/nvme.h b/drivers/vfio/pci/nvme/nvme.h
-index ee602254679e..80dd75d33762 100644
---- a/drivers/vfio/pci/nvme/nvme.h
-+++ b/drivers/vfio/pci/nvme/nvme.h
-@@ -33,4 +33,7 @@ struct nvmevf_pci_core_device {
- 	struct nvmevf_migration_file *saving_migf;
- };
- 
-+extern int nvme_submit_vf_cmd(struct pci_dev *dev, struct nvme_command *cmd,
-+			size_t *result, void *buffer, unsigned int bufflen);
-+extern u16 nvme_get_ctrl_id(struct pci_dev *dev);
- #endif /* NVME_VFIO_PCI_H */
--- 
-2.40.0
+That covers the cases I listed, so it is fine by me.
 
 
