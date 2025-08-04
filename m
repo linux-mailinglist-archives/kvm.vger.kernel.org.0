@@ -1,54 +1,54 @@
-Return-Path: <kvm+bounces-53935-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53936-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7E9FB1A8C6
-	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 19:52:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11288B1A8CC
+	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 19:57:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E5CFC1634DD
-	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 17:52:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1691D18254E
+	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 17:57:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54F8E226D1B;
-	Mon,  4 Aug 2025 17:52:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D64F25B2FC;
+	Mon,  4 Aug 2025 17:57:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FW/9AF6D"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mIbX3pZM"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76C8B86348;
-	Mon,  4 Aug 2025 17:51:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 750BB80B;
+	Mon,  4 Aug 2025 17:57:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754329919; cv=none; b=hFAAZGtAzotyZcxjaZYlSIf445JPgspe71gY38VP6JieT09xSmuyToGJUgw8gJepkftytQjcijO18yZD96h1DhpkCqyGhg+PYsh9DjU44f7JkRMk5Havj2RUG4OiM5719Ic2gN2tDVOf7Ss1wL5ntQ5/sdKRJQnPYFntXsNjcKM=
+	t=1754330230; cv=none; b=bc8SwrZRk4z0kKQFjxdlpPhtjIVZW0DtRVKe+dGH00A/Sm4ro8t5ngFI5MPSx8F6VzeXVjBHtr0rBJxUCsTLKzCMuZ6BqUHNqzJdG3s6LMzyVLDw/kIfs72PxlQlgNlPN6W+oBLTWIqInNNKR6PFRZYqn8iR7j2rpMeGyv8FSCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754329919; c=relaxed/simple;
-	bh=EJzIu1QX0O6qT3aP+utXo337E9JKKXcRcl5UpjqxCMI=;
+	s=arc-20240116; t=1754330230; c=relaxed/simple;
+	bh=/qem5iCywvRMvM7ds4nmEzL1HBs1rvansxua0mtBa5Y=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=m+KUkvdyJr5pjsFjYBQ6u41enH+sbLhOvRcgI0wJs8dQFwqTOGvmOwa7d5nEFlwMkJCiX2ij0+rrBEyb+/r7YKHI2Iq8sZmroRFsu5Y4VE83U696Ie8SatNlptRPdb59iPt89rmuACeSNIVP64k6v7PKedwO9SurpIfJpGZisEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FW/9AF6D; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB6BCC4CEE7;
-	Mon,  4 Aug 2025 17:51:58 +0000 (UTC)
+	 MIME-Version:Content-Type; b=i13ofgpDQh+D4sEA4Z5CHCuuvNJyTqmxDivwS4qAoiNj1tqz8I8b+xkeSwO5P+GJOecZMJJSExLorMESluTQbGys4oYK5ihL6Gfny5ykVYaO8fon3zSGmHOaHci0nF2dTHnKlE1RMdHwmcbJcuMyJRv4CvARhPsPHzOvoxHRJZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mIbX3pZM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09F0EC4CEE7;
+	Mon,  4 Aug 2025 17:57:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754329918;
-	bh=EJzIu1QX0O6qT3aP+utXo337E9JKKXcRcl5UpjqxCMI=;
+	s=k20201202; t=1754330230;
+	bh=/qem5iCywvRMvM7ds4nmEzL1HBs1rvansxua0mtBa5Y=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=FW/9AF6DsVHy9coYZKbXRayDL4YU/gvTvAkDYcBqtuNqrnhtbn5GtKScuZQPr6Tqo
-	 a14co/OXlS5BPzIirpvVxARWKME3mOyU3xPXuVhXul3loZ/F7zXtdmtdsLrRoUFoIx
-	 z4iQ6vrn5gnlaXeb3oSPMhfVSPzTXQ8W0xszdt2JUs59DFzfiG0jBfSJELDWEapfRQ
-	 jI22tpIvSd5Vm/Wd5OgULEWoNbKeUZ8rvOc5slH82aL/xfeaLrGCdubDX+0ccRJLCN
-	 F7jKjtA7eJsKEYtgjyps2ZaAihyftdMYP3Ig8VAmulknirmSDtZCARVEV2mDWlGbxo
-	 ZfYw58glxeCSw==
+	b=mIbX3pZM4w+Y7jzmBB4a4sPYNvP1chCm4qtKtn9cC56lvo5UXweLyhis8E22WFrqz
+	 9FXRpzYS2PmO+ntgzI5uZvy0VMKJ0pErlnLqOMVs61G+YqN4Ovx6hYxwZGnH37/Gty
+	 Lr728Kpowqg37vB5mt2H/i535V9AZpSYifGMEdtOu4SsduEdUWyFfuyM/V62u73dkU
+	 jCqtXfvDVpj342HAcJJ0iIImSENrUEv7jU8J/eOkcK3nN4bGNCf+PFgPTKcjTmzdfa
+	 nOdi8YK7lHAGYi8ngnF3ToMxwhNeVK8nAaOVqzU2DteBnAdxGhPQytdtSZGkRMEik5
+	 gFQGRaC32jPjA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1uizLo-003syH-Qb;
-	Mon, 04 Aug 2025 18:51:56 +0100
-Date: Mon, 04 Aug 2025 18:51:56 +0100
-Message-ID: <87cy9bt1oj.wl-maz@kernel.org>
+	id 1uizQp-003t2I-FJ;
+	Mon, 04 Aug 2025 18:57:07 +0100
+Date: Mon, 04 Aug 2025 18:57:07 +0100
+Message-ID: <87bjovt1fw.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Alexandru Elisei <alexandru.elisei@arm.com>
 Cc: Andre Przywara <andre.przywara@arm.com>,
@@ -56,11 +56,11 @@ Cc: Andre Przywara <andre.przywara@arm.com>,
 	Julien Thierry <julien.thierry.kdev@gmail.com>,
 	kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH kvmtool v3 3/6] arm64: nested: add support for setting maintenance IRQ
-In-Reply-To: <aJDG_YhNKIJBKCyQ@raptor>
+Subject: Re: [PATCH kvmtool v3 4/6] arm64: add counter offset control
+In-Reply-To: <aJDHbClG5MagCCy5@raptor>
 References: <20250729095745.3148294-1-andre.przywara@arm.com>
-	<20250729095745.3148294-4-andre.przywara@arm.com>
-	<aJDG_YhNKIJBKCyQ@raptor>
+	<20250729095745.3148294-5-andre.przywara@arm.com>
+	<aJDHbClG5MagCCy5@raptor>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -76,95 +76,104 @@ X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, andre.przywara@arm.com, will@kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 04 Aug 2025 15:43:09 +0100,
+On Mon, 04 Aug 2025 15:45:00 +0100,
 Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 > 
 > Hi Andre,
 > 
-> 'add' should be capitalized.
+> You might want to capitalize the first letter of the subject line (add->Add).
 > 
-> On Tue, Jul 29, 2025 at 10:57:42AM +0100, Andre Przywara wrote:
-> > Uses the new VGIC KVM device attribute to set the maintenance IRQ.
-> > This is fixed to use PPI 9, as a platform decision made by kvmtool,
-> > matching the SBSA recommendation.
+> On Tue, Jul 29, 2025 at 10:57:43AM +0100, Andre Przywara wrote:
+> > From: Marc Zyngier <maz@kernel.org>
 > > 
+> > KVM allows the offsetting of the global counter in order to help with
+> > migration of a VM. This offset applies cumulatively with the offsets
+> > provided by the architecture.
+> > 
+> > Although kvmtool doesn't provide a way to migrate a VM, controlling
+> > this offset is useful to test the timer subsystem.
+> > 
+> > Add the command line option --counter-offset to allow setting this value
+> > when creating a VM.
+> 
+> Out of curiosity, how is this related to nested virtualization?
+
+Because that's the only way KVM gives you the very much required
+ability to offset the counters when NV is enabled.
+
+> 
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 > > ---
-> >  arm64/arm-cpu.c         |  3 ++-
-> >  arm64/gic.c             | 21 ++++++++++++++++++++-
-> >  arm64/include/kvm/gic.h |  2 +-
-> >  3 files changed, 23 insertions(+), 3 deletions(-)
+> >  arm64/include/kvm/kvm-config-arch.h |  3 +++
+> >  arm64/kvm.c                         | 17 +++++++++++++++++
+> >  2 files changed, 20 insertions(+)
 > > 
-> > diff --git a/arm64/arm-cpu.c b/arm64/arm-cpu.c
-> > index 69bb2cb2c..1e456f2c6 100644
-> > --- a/arm64/arm-cpu.c
-> > +++ b/arm64/arm-cpu.c
-> > @@ -14,7 +14,8 @@ static void generate_fdt_nodes(void *fdt, struct kvm *kvm)
-> >  {
-> >  	int timer_interrupts[4] = {13, 14, 11, 10};
+> > diff --git a/arm64/include/kvm/kvm-config-arch.h b/arm64/include/kvm/kvm-config-arch.h
+> > index a1dac28e6..44c43367b 100644
+> > --- a/arm64/include/kvm/kvm-config-arch.h
+> > +++ b/arm64/include/kvm/kvm-config-arch.h
+> > @@ -14,6 +14,7 @@ struct kvm_config_arch {
+> >  	u64		kaslr_seed;
+> >  	enum irqchip_type irqchip;
+> >  	u64		fw_addr;
+> > +	u64		counter_offset;
+> >  	unsigned int	sve_max_vq;
+> >  	bool		no_pvtime;
+> >  };
+> > @@ -59,6 +60,8 @@ int sve_vl_parser(const struct option *opt, const char *arg, int unset);
+> >  		     irqchip_parser, NULL),					\
+> >  	OPT_U64('\0', "firmware-address", &(cfg)->fw_addr,			\
+> >  		"Address where firmware should be loaded"),			\
+> > +	OPT_U64('\0', "counter-offset", &(cfg)->counter_offset,			\
+> > +		"Specify the counter offset, defaulting to 0"),			\
+> 
+> I'm having a hard time parsing this - if it's zero, then kvmtool leaves it
+> unset, how is the default value 0? Maybe you want to say that if left unset,
+> the counters behaves as if the global offset is zero.
+> 
+> >  	OPT_BOOLEAN('\0', "nested", &(cfg)->nested_virt,			\
+> >  		    "Start VCPUs in EL2 (for nested virt)"),
 > >  
-> > -	gic__generate_fdt_nodes(fdt, kvm->cfg.arch.irqchip);
-> > +	gic__generate_fdt_nodes(fdt, kvm->cfg.arch.irqchip,
-> > +				kvm->cfg.arch.nested_virt);
-> >  	timer__generate_fdt_nodes(fdt, kvm, timer_interrupts);
-> >  	pmu__generate_fdt_nodes(fdt, kvm);
+> > diff --git a/arm64/kvm.c b/arm64/kvm.c
+> > index 23b4dab1f..6e971dd78 100644
+> > --- a/arm64/kvm.c
+> > +++ b/arm64/kvm.c
+> > @@ -119,6 +119,22 @@ static void kvm__arch_enable_mte(struct kvm *kvm)
+> >  	pr_debug("MTE capability enabled");
 > >  }
-> > diff --git a/arm64/gic.c b/arm64/gic.c
-> > index b0d3a1abb..7461b0f3f 100644
-> > --- a/arm64/gic.c
-> > +++ b/arm64/gic.c
-> > @@ -11,6 +11,8 @@
 > >  
-> >  #define IRQCHIP_GIC 0
-> >  
-> > +#define GIC_MAINT_IRQ	9
-> > +
-> >  static int gic_fd = -1;
-> >  static u64 gic_redists_base;
-> >  static u64 gic_redists_size;
-> > @@ -302,10 +304,15 @@ static int gic__init_gic(struct kvm *kvm)
-> >  
-> >  	int lines = irq__get_nr_allocated_lines();
-> >  	u32 nr_irqs = ALIGN(lines, 32) + GIC_SPI_IRQ_BASE;
-> > +	u32 maint_irq = GIC_MAINT_IRQ + 16;			/* PPI */
-> 
-> There's already a define for PPIs:
-> 
-> 	u32 maint_irq = GIC_PPI_IRQ_BASE + GIC_MAINT_IRQ;
-> 
-> >  	struct kvm_device_attr nr_irqs_attr = {
-> >  		.group	= KVM_DEV_ARM_VGIC_GRP_NR_IRQS,
-> >  		.addr	= (u64)(unsigned long)&nr_irqs,
-> >  	};
-> > +	struct kvm_device_attr maint_irq_attr = {
-> > +		.group	= KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ,
-> > +		.addr	= (u64)(unsigned long)&maint_irq,
+> > +static void kvm__arch_set_counter_offset(struct kvm *kvm)
+> > +{
+> > +	struct kvm_arm_counter_offset offset = {
+> > +		.counter_offset = kvm->cfg.arch.counter_offset,
 > > +	};
-> >  	struct kvm_device_attr vgic_init_attr = {
-> >  		.group	= KVM_DEV_ARM_VGIC_GRP_CTRL,
-> >  		.attr	= KVM_DEV_ARM_VGIC_CTRL_INIT,
-> > @@ -325,6 +332,13 @@ static int gic__init_gic(struct kvm *kvm)
-> >  			return ret;
-> >  	}
-> >  
-> > +	if (kvm->cfg.arch.nested_virt &&
-> > +	    !ioctl(gic_fd, KVM_HAS_DEVICE_ATTR, &maint_irq_attr)) {
+> > +
+> > +	if (!kvm->cfg.arch.counter_offset)
+> > +		return;
+> > +
+> > +	if (!kvm__supports_extension(kvm, KVM_CAP_COUNTER_OFFSET))
+> > +		die("No support for global counter offset");
 > 
-> I'm not sure how useful the HAS_DEVICE_ATTR call is here: kvm_cpu__arch_init(),
-> which checks for KVM_CAP_ARM_EL2 capability, is called before gic__init_gic()
-> (base_init() vs late_init()). So at this point we know that KVM supports nested
-> virtualization.
+> What happens when the user sets --counter-offset 0 and KVM doesn't support
+> the capability? Looks to me like instead of getting an error, kvmtool is happy
+> to proceed without actually setting the counter offset to 0. User might then be
+> fooled into thinking that KVM supports KVM_CAP_COUNTER_OFFSET, and when the same
+> user does --counter-offset x, they will get an error saying that there's no
+> support for it in KVM. I would be extremely confused by that.
 
-I disagree. All optional features should be guarded by a check for
-that particular feature. If anything, this serves as validation for
-the kernel side (which is, let's face it, the *only* use-case for
-kvmtool).
+On a system without this extension, there is no global offset at
+all. So setting it to 0 or omitting the option have the exact same
+outcome. Why should the user care?
 
-> Was it that KVM at some point supported nested virtualization but didn't have
-> the KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ device attribute implemented? And if that was
-> the case, do we want to support that version of KVM in kvmtool?
+> If this is something that you want to address, you can do it similar to
+> ram_addr: initialize the offset to something unreasonable before parsing the
+> command line parameters, and then bail early in kvm__arch_set_counter_offset().
 
-Then make kvmtool die in this case. But the check stays.
+This looks positively awful. Not to mention that on a modern system
+(anything >= 8.6), there is no such thing as an "unreasonable" counter
+value.
 
 	M.
 
