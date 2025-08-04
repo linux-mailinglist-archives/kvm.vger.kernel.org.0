@@ -1,54 +1,54 @@
-Return-Path: <kvm+bounces-53934-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53935-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA13FB1A8B9
-	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 19:45:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7E9FB1A8C6
+	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 19:52:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4FB837A67A9
-	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 17:43:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E5CFC1634DD
+	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 17:52:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ED3A23817F;
-	Mon,  4 Aug 2025 17:45:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54F8E226D1B;
+	Mon,  4 Aug 2025 17:52:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F5JV3ymW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FW/9AF6D"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F3E5226177;
-	Mon,  4 Aug 2025 17:45:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76C8B86348;
+	Mon,  4 Aug 2025 17:51:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754329503; cv=none; b=PQTEDwQnyoLbc+Zr+9PnHp6QbH4GGV9fXCRYTU7FeN3T/AdjGKi2wgIbb0qLeOw4gR6b/xIaKoIFKVARg3P6jDEPaypW9t5G0rwMM/HDoxY7E2sKYmRdjvny3ppE+S8On8/RP/YS2x9ncIclwBf8+Y4sE/5mu7CEx41pdLv1Uwg=
+	t=1754329919; cv=none; b=hFAAZGtAzotyZcxjaZYlSIf445JPgspe71gY38VP6JieT09xSmuyToGJUgw8gJepkftytQjcijO18yZD96h1DhpkCqyGhg+PYsh9DjU44f7JkRMk5Havj2RUG4OiM5719Ic2gN2tDVOf7Ss1wL5ntQ5/sdKRJQnPYFntXsNjcKM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754329503; c=relaxed/simple;
-	bh=+6983uikn0yjZmMwTznyxyuaz/i87Agap+CKdQcLC8U=;
+	s=arc-20240116; t=1754329919; c=relaxed/simple;
+	bh=EJzIu1QX0O6qT3aP+utXo337E9JKKXcRcl5UpjqxCMI=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=U/KoJNWhJmNqmVrE7/d3fdxg5B3PyfH6uXFe/CrqC9iJqxh/Tu1eYnAErfnY+TsldCXSOKHJziEwkJEEFaUV7At9lAWH8BNzMjA7S1XxKe5J3MUgMUYLEXt/EgH//cCKDk8eyOrr2FbaIe5iw7kVkX2V34Ri4Zf4KsoWGlBR/cQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F5JV3ymW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03D2CC4CEF0;
-	Mon,  4 Aug 2025 17:45:03 +0000 (UTC)
+	 MIME-Version:Content-Type; b=m+KUkvdyJr5pjsFjYBQ6u41enH+sbLhOvRcgI0wJs8dQFwqTOGvmOwa7d5nEFlwMkJCiX2ij0+rrBEyb+/r7YKHI2Iq8sZmroRFsu5Y4VE83U696Ie8SatNlptRPdb59iPt89rmuACeSNIVP64k6v7PKedwO9SurpIfJpGZisEg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FW/9AF6D; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB6BCC4CEE7;
+	Mon,  4 Aug 2025 17:51:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754329503;
-	bh=+6983uikn0yjZmMwTznyxyuaz/i87Agap+CKdQcLC8U=;
+	s=k20201202; t=1754329918;
+	bh=EJzIu1QX0O6qT3aP+utXo337E9JKKXcRcl5UpjqxCMI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=F5JV3ymWjmg3Ea3MlkksddkwxF+nE7Z/km3GsIUCNhZM3MqqJWA9Q9h55Sj9Ot8Ce
-	 8+tQO2nmRdklfetbKCfJ1XKgKUx4Z99ag2mSu2oXnEBP0EYEaUQBSJV/nCe6+V15Nf
-	 zjZoSzlgRFFoQFJO8Rqtim/WumXcl0Q52iSQgR3SH/IJM0/MPF3Eu+vyfkjJeIHOil
-	 G1DoxiYeLdS5b8aJQAxGLC78cENi9ZIB1pztra4JsBndzBS7fx15BiMA/vcWRH28qF
-	 8y8drtqmjQAxC4ns4el4kdLDYXapxQKSLG8WTiqLoYbwHLKZfBz6CEdGuMZ5dAfRi8
-	 JbOKNpvQ9oWIw==
+	b=FW/9AF6DsVHy9coYZKbXRayDL4YU/gvTvAkDYcBqtuNqrnhtbn5GtKScuZQPr6Tqo
+	 a14co/OXlS5BPzIirpvVxARWKME3mOyU3xPXuVhXul3loZ/F7zXtdmtdsLrRoUFoIx
+	 z4iQ6vrn5gnlaXeb3oSPMhfVSPzTXQ8W0xszdt2JUs59DFzfiG0jBfSJELDWEapfRQ
+	 jI22tpIvSd5Vm/Wd5OgULEWoNbKeUZ8rvOc5slH82aL/xfeaLrGCdubDX+0ccRJLCN
+	 F7jKjtA7eJsKEYtgjyps2ZaAihyftdMYP3Ig8VAmulknirmSDtZCARVEV2mDWlGbxo
+	 ZfYw58glxeCSw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1uizF6-003stC-SL;
-	Mon, 04 Aug 2025 18:45:01 +0100
-Date: Mon, 04 Aug 2025 18:45:00 +0100
-Message-ID: <87ectrt203.wl-maz@kernel.org>
+	id 1uizLo-003syH-Qb;
+	Mon, 04 Aug 2025 18:51:56 +0100
+Date: Mon, 04 Aug 2025 18:51:56 +0100
+Message-ID: <87cy9bt1oj.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Alexandru Elisei <alexandru.elisei@arm.com>
 Cc: Andre Przywara <andre.przywara@arm.com>,
@@ -56,11 +56,11 @@ Cc: Andre Przywara <andre.przywara@arm.com>,
 	Julien Thierry <julien.thierry.kdev@gmail.com>,
 	kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH kvmtool v3 2/6] arm64: Initial nested virt support
-In-Reply-To: <aJDGrFj003YkVVZs@raptor>
+Subject: Re: [PATCH kvmtool v3 3/6] arm64: nested: add support for setting maintenance IRQ
+In-Reply-To: <aJDG_YhNKIJBKCyQ@raptor>
 References: <20250729095745.3148294-1-andre.przywara@arm.com>
-	<20250729095745.3148294-3-andre.przywara@arm.com>
-	<aJDGrFj003YkVVZs@raptor>
+	<20250729095745.3148294-4-andre.przywara@arm.com>
+	<aJDG_YhNKIJBKCyQ@raptor>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -76,69 +76,95 @@ X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, andre.przywara@arm.com, will@kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 04 Aug 2025 15:41:48 +0100,
+On Mon, 04 Aug 2025 15:43:09 +0100,
 Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 > 
 > Hi Andre,
 > 
-> On Tue, Jul 29, 2025 at 10:57:41AM +0100, Andre Przywara wrote:
-> > The ARMv8.3 architecture update includes support for nested
-> > virtualization. Allow the user to specify "--nested" to start a guest in
-> > (virtual) EL2 instead of EL1.
-> > This will also change the PSCI conduit from HVC to SMC in the device
-> > tree.
+> 'add' should be capitalized.
+> 
+> On Tue, Jul 29, 2025 at 10:57:42AM +0100, Andre Przywara wrote:
+> > Uses the new VGIC KVM device attribute to set the maintenance IRQ.
+> > This is fixed to use PPI 9, as a platform decision made by kvmtool,
+> > matching the SBSA recommendation.
 > > 
 > > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 > > ---
-> >  arm64/fdt.c                         |  5 ++++-
-> >  arm64/include/kvm/kvm-config-arch.h |  5 ++++-
-> >  arm64/kvm-cpu.c                     | 12 +++++++++++-
-> >  3 files changed, 19 insertions(+), 3 deletions(-)
+> >  arm64/arm-cpu.c         |  3 ++-
+> >  arm64/gic.c             | 21 ++++++++++++++++++++-
+> >  arm64/include/kvm/gic.h |  2 +-
+> >  3 files changed, 23 insertions(+), 3 deletions(-)
 > > 
-> > diff --git a/arm64/fdt.c b/arm64/fdt.c
-> > index df7775876..98f1dd9d4 100644
-> > --- a/arm64/fdt.c
-> > +++ b/arm64/fdt.c
-> > @@ -205,7 +205,10 @@ static int setup_fdt(struct kvm *kvm)
-> >  		_FDT(fdt_property_string(fdt, "compatible", "arm,psci"));
-> >  		fns = &psci_0_1_fns;
-> >  	}
-> > -	_FDT(fdt_property_string(fdt, "method", "hvc"));
-> > +	if (kvm->cfg.arch.nested_virt)
-> > +		_FDT(fdt_property_string(fdt, "method", "smc"));
-> > +	else
-> > +		_FDT(fdt_property_string(fdt, "method", "hvc"));
-> >  	_FDT(fdt_property_cell(fdt, "cpu_suspend", fns->cpu_suspend));
-> >  	_FDT(fdt_property_cell(fdt, "cpu_off", fns->cpu_off));
-> >  	_FDT(fdt_property_cell(fdt, "cpu_on", fns->cpu_on));
-> > diff --git a/arm64/include/kvm/kvm-config-arch.h b/arm64/include/kvm/kvm-config-arch.h
-> > index ee031f010..a1dac28e6 100644
-> > --- a/arm64/include/kvm/kvm-config-arch.h
-> > +++ b/arm64/include/kvm/kvm-config-arch.h
-> > @@ -10,6 +10,7 @@ struct kvm_config_arch {
-> >  	bool		aarch32_guest;
-> >  	bool		has_pmuv3;
-> >  	bool		mte_disabled;
-> > +	bool		nested_virt;
-> >  	u64		kaslr_seed;
-> >  	enum irqchip_type irqchip;
-> >  	u64		fw_addr;
-> > @@ -57,6 +58,8 @@ int sve_vl_parser(const struct option *opt, const char *arg, int unset);
-> >  		     "Type of interrupt controller to emulate in the guest",	\
-> >  		     irqchip_parser, NULL),					\
-> >  	OPT_U64('\0', "firmware-address", &(cfg)->fw_addr,			\
-> > -		"Address where firmware should be loaded"),
-> > +		"Address where firmware should be loaded"),			\
-> > +	OPT_BOOLEAN('\0', "nested", &(cfg)->nested_virt,			\
+> > diff --git a/arm64/arm-cpu.c b/arm64/arm-cpu.c
+> > index 69bb2cb2c..1e456f2c6 100644
+> > --- a/arm64/arm-cpu.c
+> > +++ b/arm64/arm-cpu.c
+> > @@ -14,7 +14,8 @@ static void generate_fdt_nodes(void *fdt, struct kvm *kvm)
+> >  {
+> >  	int timer_interrupts[4] = {13, 14, 11, 10};
+> >  
+> > -	gic__generate_fdt_nodes(fdt, kvm->cfg.arch.irqchip);
+> > +	gic__generate_fdt_nodes(fdt, kvm->cfg.arch.irqchip,
+> > +				kvm->cfg.arch.nested_virt);
+> >  	timer__generate_fdt_nodes(fdt, kvm, timer_interrupts);
+> >  	pmu__generate_fdt_nodes(fdt, kvm);
+> >  }
+> > diff --git a/arm64/gic.c b/arm64/gic.c
+> > index b0d3a1abb..7461b0f3f 100644
+> > --- a/arm64/gic.c
+> > +++ b/arm64/gic.c
+> > @@ -11,6 +11,8 @@
+> >  
+> >  #define IRQCHIP_GIC 0
+> >  
+> > +#define GIC_MAINT_IRQ	9
+> > +
+> >  static int gic_fd = -1;
+> >  static u64 gic_redists_base;
+> >  static u64 gic_redists_size;
+> > @@ -302,10 +304,15 @@ static int gic__init_gic(struct kvm *kvm)
+> >  
+> >  	int lines = irq__get_nr_allocated_lines();
+> >  	u32 nr_irqs = ALIGN(lines, 32) + GIC_SPI_IRQ_BASE;
+> > +	u32 maint_irq = GIC_MAINT_IRQ + 16;			/* PPI */
 > 
-> --nested sounds a bit vague (what if KVM decides to nest something else in the
-> future?) and the variable that keeps track of the parameter is called
-> 'nested_virt'. Is it too late to rename --nested to --nested-virt for
-> consistency and better clarity?
+> There's already a define for PPIs:
+> 
+> 	u32 maint_irq = GIC_PPI_IRQ_BASE + GIC_MAINT_IRQ;
+> 
+> >  	struct kvm_device_attr nr_irqs_attr = {
+> >  		.group	= KVM_DEV_ARM_VGIC_GRP_NR_IRQS,
+> >  		.addr	= (u64)(unsigned long)&nr_irqs,
+> >  	};
+> > +	struct kvm_device_attr maint_irq_attr = {
+> > +		.group	= KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ,
+> > +		.addr	= (u64)(unsigned long)&maint_irq,
+> > +	};
+> >  	struct kvm_device_attr vgic_init_attr = {
+> >  		.group	= KVM_DEV_ARM_VGIC_GRP_CTRL,
+> >  		.attr	= KVM_DEV_ARM_VGIC_CTRL_INIT,
+> > @@ -325,6 +332,13 @@ static int gic__init_gic(struct kvm *kvm)
+> >  			return ret;
+> >  	}
+> >  
+> > +	if (kvm->cfg.arch.nested_virt &&
+> > +	    !ioctl(gic_fd, KVM_HAS_DEVICE_ATTR, &maint_irq_attr)) {
+> 
+> I'm not sure how useful the HAS_DEVICE_ATTR call is here: kvm_cpu__arch_init(),
+> which checks for KVM_CAP_ARM_EL2 capability, is called before gic__init_gic()
+> (base_init() vs late_init()). So at this point we know that KVM supports nested
+> virtualization.
 
-I disagree. 'nested' is pretty much unambiguous in the context of
-virtualisation. 'nested-virt' is only an overstatement of an idiom
-that anyone playing with kvmtool will understand.
+I disagree. All optional features should be guarded by a check for
+that particular feature. If anything, this serves as validation for
+the kernel side (which is, let's face it, the *only* use-case for
+kvmtool).
+
+> Was it that KVM at some point supported nested virtualization but didn't have
+> the KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ device attribute implemented? And if that was
+> the case, do we want to support that version of KVM in kvmtool?
+
+Then make kvmtool die in this case. But the check stays.
 
 	M.
 
