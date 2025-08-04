@@ -1,155 +1,117 @@
-Return-Path: <kvm+bounces-53884-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53885-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B071B19BF0
-	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 09:10:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F82EB19E7E
+	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 11:09:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DDC2118898CB
-	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 07:10:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56EF53AAB93
+	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 09:08:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3B6F23507E;
-	Mon,  4 Aug 2025 07:10:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E7012459DA;
+	Mon,  4 Aug 2025 09:06:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="X8EFAfPo"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dbvR1xL1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 613451DFE0B;
-	Mon,  4 Aug 2025 07:10:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F12B324887E
+	for <kvm@vger.kernel.org>; Mon,  4 Aug 2025 09:06:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754291422; cv=none; b=ac0r4kHUHOrpG5PYV8m/ycKm0RdLITsSRJDpKQvL1jD2yVjIWgRgww6OkNVRmZRmIHwU6Das5HZtEadzArgPfL8uQTInrg1DeutJuFiliTzbxwvWC/SwUfTI2RIAgC0DMPtzA/4maU628EeLDicD+sV8oyKOnkeep1JtipU9Os8=
+	t=1754298376; cv=none; b=FSBuN82ZyoEJLKaYJ9Ibvt7uRwUmC4ThHJgKisc6RKcDqHOaXx9F6PDJd2SBifXFML6lvYbtKHIHl8YnEv+H/DnUJ9rT+NCTDALK5aZuIoftKWNkVTgBSbuVrCjhx9G7++zoty9TVMvw0Gn0gOyr6TvhExbcj3tY0TVM0l8HdL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754291422; c=relaxed/simple;
-	bh=rZyea0tu1SNXXUMLdNWyhscMNRkf6r3aNbHQWaTsxM0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uD7jM0ajFVXw/J/2HdVIS2RMbxCx1XB89xZdU+9ZdjcbHw6BLqTb9KezMo2j1W328/Knx1O04E6nwuGPQlAEeNslhNjsiUKCp2RIUWkqmJiqHrvgFS6gwIAi8RqpATZxZJWjdSgLLVNq/mMp0EktPvYyxdxDTtI6vcEDEQ1fF9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=X8EFAfPo; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1754291420; x=1785827420;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=rZyea0tu1SNXXUMLdNWyhscMNRkf6r3aNbHQWaTsxM0=;
-  b=X8EFAfPoyAcOkR4pCropi07+O5mz4aDbGdAyySOS+BT2cmvNVBucpi7F
-   B0xAZCLQwZ/nUjp9UAN814OBHu6L0ZxyW0RlPqpajhhz/WtrYnFCRvjAV
-   0h5v7OJauqmavgnc44pQJPl71XXm7ArpTxc/Z+h1G0CiNz9Xgx6Sl6sH8
-   yubWcD4I1pmN+DmaAmAMy4LQnM1ER7OH55zLTq7mTQBZWHOGBgHQXk91D
-   4v6KKp1PQwc5IDxJSvTYvpHpmIgZi6YcvRjv1fH7hQMcgYZawiZX3kMBr
-   Hn4hCqVBDhoeO7cpKS5PzScXBdcbpnOT2FVn795/pDkQMD7MFQjzj8wdO
-   A==;
-X-CSE-ConnectionGUID: 13nw8w5oTWi3FHZUOjioEw==
-X-CSE-MsgGUID: E3NlS4PeSEOYVa9aSEmhBQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11511"; a="74131950"
-X-IronPort-AV: E=Sophos;i="6.17,258,1747724400"; 
-   d="scan'208";a="74131950"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Aug 2025 00:10:20 -0700
-X-CSE-ConnectionGUID: V8xmCoh9RrCcKM/D/dWyaQ==
-X-CSE-MsgGUID: jWFChVK2TZmgrKGwhNDQag==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,258,1747724400"; 
-   d="scan'208";a="164873821"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by fmviesa010.fm.intel.com with ESMTP; 04 Aug 2025 00:10:15 -0700
-Date: Mon, 4 Aug 2025 15:00:42 +0800
-From: Xu Yilun <yilun.xu@linux.intel.com>
-To: dan.j.williams@intel.com
-Cc: Chao Gao <chao.gao@intel.com>, linux-coco@lists.linux.dev,
-	x86@kernel.org, kvm@vger.kernel.org, seanjc@google.com,
-	pbonzini@redhat.com, eddie.dong@intel.com,
-	kirill.shutemov@intel.com, dave.hansen@intel.com,
-	kai.huang@intel.com, isaku.yamahata@intel.com,
-	elena.reshetova@intel.com, rick.p.edgecombe@intel.com,
-	Farrah Chen <farrah.chen@intel.com>,
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	"H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 07/20] x86/virt/tdx: Expose SEAMLDR information via
- sysfs
-Message-ID: <aJBamtHaXpeu+ZR6@yilunxu-OptiPlex-7050>
-References: <20250523095322.88774-1-chao.gao@intel.com>
- <20250523095322.88774-8-chao.gao@intel.com>
- <aIhUVyJVQ+rhRB4r@yilunxu-OptiPlex-7050>
- <688bd9a164334_48e5100f1@dwillia2-xfh.jf.intel.com.notmuch>
- <aIwhUb3z9/cgsMwb@yilunxu-OptiPlex-7050>
- <688cdc169163a_32afb100b3@dwillia2-mobl4.notmuch>
+	s=arc-20240116; t=1754298376; c=relaxed/simple;
+	bh=FC2gKnlK0tlH4AVIjMhG/aH0ST923yLbY61/gTdaWtU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PNIuFRkkfGYInmkuAFTpgnVi7haN3v1t2yWauiGO9osW9IJGbBwkl9oeDrF2hv1bpf+wBZcD/iOB6IWERlpRxEYdSIG0bDUv0PIiauwV0R1apnfyahIfmHMsRfoXqycwy6DV04rTmRBqzA1M8AotlOE4fonpgG4SDdh7It7fr84=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dbvR1xL1; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1754298373;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FC2gKnlK0tlH4AVIjMhG/aH0ST923yLbY61/gTdaWtU=;
+	b=dbvR1xL1qHmdU/YpM0Lsy7XEJd+ZGuGK7D7OOf5JOYgMoITM2+/tgMwUlDlsunMFRef7+L
+	AawHKsVO8aXh8I3kxR9DZxIIcwOFy6ONu0oEkCorGFPpbnwoZelE34nHiWVQb0PcQAK4XK
+	Yd5Jq9iCjMre2I+ImXJen2aSiMa4gcU=
+Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
+ [209.85.215.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-29-RahmBSDfO2yFwRRSulkFVA-1; Mon, 04 Aug 2025 05:06:10 -0400
+X-MC-Unique: RahmBSDfO2yFwRRSulkFVA-1
+X-Mimecast-MFC-AGG-ID: RahmBSDfO2yFwRRSulkFVA_1754298369
+Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-b421b03d498so2129700a12.3
+        for <kvm@vger.kernel.org>; Mon, 04 Aug 2025 02:06:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754298369; x=1754903169;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FC2gKnlK0tlH4AVIjMhG/aH0ST923yLbY61/gTdaWtU=;
+        b=BrNcxlBkISPZTPXq+WyqSYl+o5AYEj76TDSXOHz6CQczgump87zVCemyUQ4Fc9Uykj
+         iqBmUVA6mh2zvc+5Wc/O4yEKstvVJaedwgdT8GaVMZq0Pz9fjK+lP3C4HNluO8ly0nek
+         XNNtKpcG9+I8sh8G9BLCM5Jz6/HCWx6JrhD2K37o8OSbvy4g+8htYs5Ox1QCdvvFrKcS
+         +hsRp7Dp07yD6vB18RhmK1SYRIdm1NL6SoRtAsKzi2PomWAe2uwEX/sGXpFtv/XsW6rK
+         1nThginyscwTNu65BYMzqjQt4JSU/5nzihKSW0MQk2FmkZ/TyAXbSXhsoHGdXe0l6Zbd
+         TuxQ==
+X-Gm-Message-State: AOJu0YyPhRNuHA4f0AMiBh/dOWU/RS5WfQuZN6C9+hxwOMk8hqeCG3VC
+	kZIa+8v7D93vI0qZiDUvrDHtfLgzTOc+om8eiCaTXDygXvwT7DW1I2a00RHV7jrN7r6vClTZO2h
+	3UkY6VqQbpW1OEXsMYIYMAvuDXTozJ6Oyr/MAEcFwb+YA7I7WE3iGOrRke4Wd1cEtPPxrHt4x8b
+	qXUtZoDfPyMeiF+X1F1lgAD/6yBQl9
+X-Gm-Gg: ASbGncvQe8hQfg/pRYOiXbzUOkNwm35gOSOekd23ykll8B3ifGoXhbblUtZnX3ykOTC
+	O94KzZT1Nw+OmJVLpiDmS5tTAaya8v0WqC4GPW3rIUl5RHrzTlzRhQkuKcm8SW9l/wfG/1HGFxj
+	umeC03PbU+6l4XxByGSaHOtA==
+X-Received: by 2002:a17:902:f552:b0:23f:f983:5ca1 with SMTP id d9443c01a7336-24246f5dfb2mr132550195ad.12.1754298369525;
+        Mon, 04 Aug 2025 02:06:09 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFEcYXd+G3MrEs13nVvxY8yeK+0iPt6uzM6BT+j7IwyIkqouuxJCmX+aT/C268Bf+EzVOioFJTajAeAVP8Oj2U=
+X-Received: by 2002:a17:902:f552:b0:23f:f983:5ca1 with SMTP id
+ d9443c01a7336-24246f5dfb2mr132549655ad.12.1754298369069; Mon, 04 Aug 2025
+ 02:06:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <688cdc169163a_32afb100b3@dwillia2-mobl4.notmuch>
+References: <20250729073916.80647-1-jasowang@redhat.com>
+In-Reply-To: <20250729073916.80647-1-jasowang@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Mon, 4 Aug 2025 17:05:57 +0800
+X-Gm-Features: Ac12FXy2PpNcxx7Wuo6WWD9onNx5D2Zc4zo6EJWLkWuf_3KiHYfBpugk7fN5otM
+Message-ID: <CACGkMEuNx_7Q_Jq+xcE83fwbFa2uVZkrqr0Nx=1pxcZuFkO91w@mail.gmail.com>
+Subject: Re: [PATCH] vhost: initialize vq->nheads properly
+To: mst@redhat.com, jasowang@redhat.com, eperezma@redhat.com
+Cc: kvm@vger.kernel.org, virtualization@lists.linux.dev, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, sgarzare@redhat.com, 
+	will@kernel.org, JAEHOON KIM <jhkim@linux.ibm.com>, Breno Leitao <leitao@debian.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> > > - Create drivers/virt/coco/tdx-tsm/bus.c for registering the tdx_subsys.
-> > >   The tdx_subsys has sysfs attributes like "version" (host and guest
-> > >   need this, but have different calls to get at the information) and
-> > >   "firmware" (only host needs that). So the common code will take sysfs
-> > >   groups passed as a parameter.
-> > > 
-> > > - The "tdx_tsm" device which is unused in this patch set can be
-> > 
-> > It is used in this patch, Chao creates tdx module 'version' attr on this
-> > device. But I assume you have different opinion: tdx_subsys represents
-> > the whole tdx_module and should have the 'version', and tdx_tsm is a
-> > sub device dedicate for TDX Connect, is it?
-> 
-> The main reason for a tdx_tsm device in addition to the subsys is to
-> allow for deferred attachment.
+Hi Michael:
 
-I've found another reason, to dynamic control tdx tsm's lifecycle.
-tdx_tsm driver uses seamcalls so its functionality relies on tdx module
-initialization & vmxon. The former is a one way path but vmxon can be
-dynamic off by KVM. vmxoff is fatal to tdx_tsm driver especially on some
-can-not-fail destroy path.
+On Tue, Jul 29, 2025 at 3:39=E2=80=AFPM Jason Wang <jasowang@redhat.com> wr=
+ote:
+>
+> Commit 7918bb2d19c9 ("vhost: basic in order support") introduces
+> vq->nheads to store the number of batched used buffers per used elem
+> but it forgets to initialize the vq->nheads to NULL in
+> vhost_dev_init() this will cause kfree() that would try to free it
+> without be allocated if SET_OWNER is not called.
+>
+> Reported-by: JAEHOON KIM <jhkim@linux.ibm.com>
+> Reported-by: Breno Leitao <leitao@debian.org>
+> Fixes: 7918bb2d19c9 ("vhost: basic in order support")
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
 
-So my idea is to remove tdx_tsm device (thus disables tdx_tsm driver) on
-vmxoff.
+I didn't see this in your pull request.
 
-  KVM                TDX core            TDX TSM driver
-  -----------------------------------------------------
-  tdx_disable()
-                     tdx_tsm dev del
-                                         driver.remove()
-  vmxoff()
+Thanks
 
-An alternative is to move vmxon/off management out of KVM, that requires
-a lot of complex work IMHO, Chao & I both prefer not to touch it.
-
-
-That said, we still want to "deal with bus/driver binding logic" so faux
-is not a good fit.
-
-> 
-> Now, that said, the faux_device infrastructure has arrived since this
-> all started and *could* replace tdx_subsys. The only concern is whether
-> the tdx_tsm driver ever needs to do probe deferral to wait for IOMMU or
-> PCI initialization to happen first.
-
-The tdx_tsm driver needs to wait for IOMMU/PCI initialization...
-
-> 
-> If probe deferral is needed that requires a bus, if probe can always be
-> synchronous with TDX module init then faux_device could work.
-
-... but doesn't see need for TDX Module early init now. Again TDX Module
-init requires vmxon, so it can't be earlier than KVM init, nor the
-IOMMU/PCI init. So probe synchronous with TDX module init should be OK.
-
-But considering the tdx tsm's lifecycle concern, I still don't prefer
-faux.
-
-Thanks,
-Yilun
 
