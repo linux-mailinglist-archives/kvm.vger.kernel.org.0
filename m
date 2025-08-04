@@ -1,54 +1,54 @@
-Return-Path: <kvm+bounces-53937-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53938-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C1C8B1A8FE
-	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 20:11:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 317F1B1A90C
+	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 20:15:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 439481776C5
-	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 18:11:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60C591795E4
+	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 18:15:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69BCF28688C;
-	Mon,  4 Aug 2025 18:11:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0CBB28B4E7;
+	Mon,  4 Aug 2025 18:15:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="py1FbbN0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Mc1diXhX"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FDDB165F13;
-	Mon,  4 Aug 2025 18:11:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 045A228A72E;
+	Mon,  4 Aug 2025 18:15:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754331105; cv=none; b=bDc0hv5FQGodaJefKQAQUob/0UHuztsWzOZrIlzQ/JSlJjHtVqz7BUtDIa8Uo5Qbo4w6fqjGdnVq10x3mVs72J+i++4SpYPsBuxPIwkdHOlg7lAp9nw4y7Ga+Dgo/gLPikiakYDraLYjtBFJNGNCFPj6N5PCUF+TpUur2/NrpSo=
+	t=1754331315; cv=none; b=dlGQgoGG0G0o/AA6qj8zcgfgtcSVGJXtluRSoIqLlcYP1EwcZ7CD62qBEu3QLs/qcoXXNYHbcSR3kyl8uVg3+0B+jslGaPZ0ezU//3DZuPisyekNTnBiPfF8LbDbXV94msz1/ypqDjNw+rNyH0kQOhfCCxRhD8gUNwxsDgWW1R8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754331105; c=relaxed/simple;
-	bh=Y4MjU3Fjaj0Tv+SFyj/T8AR8UY+8XHegmUJ6lI2QLvQ=;
+	s=arc-20240116; t=1754331315; c=relaxed/simple;
+	bh=MfY9E64xozt0VwwpOKv5Ewr0IueeJxAJqTz6huTX3BE=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=I2Bbi5lqN+Tq0aHj1BVbjo7Ey8cPHuPnUJ5D8cKgS+XU0B8T5zMsaiQFm/D5bx6TDPya/ReMXbWA10Ed3DulCS3NFGnIaSTEaWZHOpOI+QWMGLGAA4nXJcC6K4Oj8th/6lscCzcSTQJaJiV8ur9qXECoTGqDxI+P7/EHhYwfXBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=py1FbbN0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 112BDC4CEE7;
-	Mon,  4 Aug 2025 18:11:45 +0000 (UTC)
+	 MIME-Version:Content-Type; b=tOJtRSMlsZOIIydx/VzAji1FqZe6nHKSaNhYBhuB72VDuH/C5h5MUFm926qkU2TDHTTCM5/Kpvaz8thdt4ojDYye/wKO1gmAh3tDNSsGLKHb87biSdWjKd9U1vvMpZbGGEWG1ZvTXRnnsk+XSkf0SRD5YYl+iGDI0xOxxG6/4gY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Mc1diXhX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D167C4CEE7;
+	Mon,  4 Aug 2025 18:15:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754331105;
-	bh=Y4MjU3Fjaj0Tv+SFyj/T8AR8UY+8XHegmUJ6lI2QLvQ=;
+	s=k20201202; t=1754331313;
+	bh=MfY9E64xozt0VwwpOKv5Ewr0IueeJxAJqTz6huTX3BE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=py1FbbN09H/EGHSrQVUPaA5jyBvAMTn3SFzDvvVyBRevm8aINkAhS/WCuv/0T1Igc
-	 SgNFC8eSsWbr0A4buWoKx19YUgO0D0j9ksW9RmbwDBom+ZREBOrUHYqYclygGQHkQE
-	 Fz7I2KpnPVUEN0VePjLEcY3uDFrThg/zdVlxa+7jHLndMLBY2ebx2pJuHKO98uSzj/
-	 D7jp3vZo9Fea00Zqn48wMVs6opZe9cmzxWPOKv1Y2Qdr2YNAk/HNg3bD7H4V62PInf
-	 ImFbFY3dTwRkrm5YMUXgPMQratL+wb4Cm7RqLg8LShutoxL8sbKYbEK3xWy6Ce0YcK
-	 7eqVJ4ushfyzA==
+	b=Mc1diXhXsOE8shBsIj5noHn5zQra9hSnR09Q1Ha4yDsxt/QGHJpgY1Dn4XkfJrfCJ
+	 mTVl0ToZ4nGqN9mHbk/CYrxNEp3wIsyZ830Nf4eK/gJ2xJme1JuRLWpQYTx4iloUFK
+	 A0MzIg2yGrWIqswgv/RQi031Xsu0+Cb5ZW8mBbjTcufDU/O+Oef9CBlSwXb3E4Qpa7
+	 2T19iD0Q+QQUk8YMsT/E98brehYiDsrako8IcgexM7h+I79ITiYanuTDB/4nDyiclk
+	 74fehiMvy52mm9rSc1xjFUOV/t1JYAvg1pXmf5GNQg4V0gu6TESDjCjVuvXkgtvzZZ
+	 02r3U6pcPyeGw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1uizev-003tGL-NY;
-	Mon, 04 Aug 2025 19:11:42 +0100
-Date: Mon, 04 Aug 2025 19:11:41 +0100
-Message-ID: <87a54ft0rm.wl-maz@kernel.org>
+	id 1uiziJ-003tJw-Fg;
+	Mon, 04 Aug 2025 19:15:11 +0100
+Date: Mon, 04 Aug 2025 19:15:10 +0100
+Message-ID: <878qjzt0lt.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Alexandru Elisei <alexandru.elisei@arm.com>
 Cc: Andre Przywara <andre.przywara@arm.com>,
@@ -56,11 +56,11 @@ Cc: Andre Przywara <andre.przywara@arm.com>,
 	Julien Thierry <julien.thierry.kdev@gmail.com>,
 	kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH kvmtool v3 5/6] arm64: add FEAT_E2H0 support
-In-Reply-To: <aJDHoHIeZ5ADqah3@raptor>
+Subject: Re: [PATCH kvmtool v3 6/6] arm64: Generate HYP timer interrupt specifiers
+In-Reply-To: <aJDIG8cJQjzbwj3w@raptor>
 References: <20250729095745.3148294-1-andre.przywara@arm.com>
-	<20250729095745.3148294-6-andre.przywara@arm.com>
-	<aJDHoHIeZ5ADqah3@raptor>
+	<20250729095745.3148294-7-andre.przywara@arm.com>
+	<aJDIG8cJQjzbwj3w@raptor>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -76,109 +76,19 @@ X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, andre.przywara@arm.com, will@kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 04 Aug 2025 15:45:52 +0100,
+On Mon, 04 Aug 2025 15:47:55 +0100,
 Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 > 
-> Hi,
+> KVM doesn't allow FEAT_VHE and FEAT_E2H0 to coexist (in
+> nested.c::limit_nv_id_reg()), to force E2H to be RES0. Assuming my interpretion
+> is correct, shouldn't the check be:
 > 
-> According to the Arm ARM, FEAT_E2H0 can co-exist with FEAT_VHE; KVM implements
-> it differently and disables FEAT_VHE when KVM_ARM_VCPU_HAS_EL2_E2H0. Maybe the
-> subject should be "arm64: Add KVM_ARM_VCPU_HAS_EL2_E2H0 support"?
-
-KVM implements something that is strictly compliant with the
-architecture. Not "differently", whatever you mean by that. And
-FEAT_E2H0 is what you get with this option. The fact that you don't
-get FEAT_VHE in this mode is a behaviour that is also compliant with
-the architecture.
-
-Whatever flag is used at as the backend is not really relevant, and
-describing things in terms of architectural features has the merit of
-being clearly documented.
-
-> Also, 'add' should be capitalized.
-
-I think we all got that particular message...
-
+> 	if (!kvm->cfg.arch.nested_virt || kvm->cfg.arch.e2h0)
+> 		nr--;
 > 
-> On Tue, Jul 29, 2025 at 10:57:44AM +0100, Andre Przywara wrote:
-> > From: Marc Zyngier <maz@kernel.org>
-> > 
-> > The --nested option allows a guest to boot at EL2 without FEAT_E2H0
-> > (i.e. mandating VHE support). While this is great for "modern" operating
-> > systems and hypervisors, a few legacy guests are stuck in a distant past.
-> > 
-> > To support those, add the --e2h0 command line option, that exposes
-> > FEAT_E2H0 to the guest, at the expense of a number of other features, such
-> > as FEAT_NV2. This is conditioned on the host itself supporting FEAT_E2H0.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> > ---
-> >  arm64/include/kvm/kvm-config-arch.h | 5 ++++-
-> >  arm64/kvm-cpu.c                     | 5 +++++
-> >  2 files changed, 9 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/arm64/include/kvm/kvm-config-arch.h b/arm64/include/kvm/kvm-config-arch.h
-> > index 44c43367b..73bf4211a 100644
-> > --- a/arm64/include/kvm/kvm-config-arch.h
-> > +++ b/arm64/include/kvm/kvm-config-arch.h
-> > @@ -11,6 +11,7 @@ struct kvm_config_arch {
-> >  	bool		has_pmuv3;
-> >  	bool		mte_disabled;
-> >  	bool		nested_virt;
-> > +	bool		e2h0;
-> >  	u64		kaslr_seed;
-> >  	enum irqchip_type irqchip;
-> >  	u64		fw_addr;
-> > @@ -63,6 +64,8 @@ int sve_vl_parser(const struct option *opt, const char *arg, int unset);
-> >  	OPT_U64('\0', "counter-offset", &(cfg)->counter_offset,			\
-> >  		"Specify the counter offset, defaulting to 0"),			\
-> >  	OPT_BOOLEAN('\0', "nested", &(cfg)->nested_virt,			\
-> > -		    "Start VCPUs in EL2 (for nested virt)"),
-> > +		    "Start VCPUs in EL2 (for nested virt)"),			\
-> > +	OPT_BOOLEAN('\0', "e2h0", &(cfg)->e2h0,					\
-> > +		    "Create guest without VHE support"),
-> >  
-> >  #endif /* ARM_COMMON__KVM_CONFIG_ARCH_H */
-> > diff --git a/arm64/kvm-cpu.c b/arm64/kvm-cpu.c
-> > index 42dc11dad..5e4f3a7dd 100644
-> > --- a/arm64/kvm-cpu.c
-> > +++ b/arm64/kvm-cpu.c
-> > @@ -76,6 +76,11 @@ static void kvm_cpu__select_features(struct kvm *kvm, struct kvm_vcpu_init *init
-> >  		if (!kvm__supports_extension(kvm, KVM_CAP_ARM_EL2))
-> >  			die("EL2 (nested virt) is not supported");
-> >  		init->features[0] |= 1UL << KVM_ARM_VCPU_HAS_EL2;
-> > +		if (kvm->cfg.arch.e2h0) {
-> > +			if (!kvm__supports_extension(kvm, KVM_CAP_ARM_EL2_E2H0))
-> > +				die("FEAT_E2H0 is not supported");
-> > +			init->features[0] |= 1UL << KVM_ARM_VCPU_HAS_EL2_E2H0;
-> > +		}
-> 
-> From the v6.16 documentation (emphasis added by me):
-> 
-> 	- KVM_ARM_VCPU_HAS_EL2_E2H0: Restrict Nested Virtualisation
-> 	  support to HCR_EL2.E2H being RES0 (non-VHE).
-> 	  Depends on KVM_CAP_ARM_EL2_E2H0.
-> 	  **KVM_ARM_VCPU_HAS_EL2 must also be set**.
-> 
-> But I am able to run a VM with E2H0 set and EL2 unset:
 
-No. You run a guest with *none* of these flags set, as looking at the
-code will tell you.
-
-> 
-> # ./lkvm-static run -c2 -m1024 -k Image-v6.16-rc4-upstream --nodefaults -p "earlycon root=/dev/vda" --e2h0
->   Info: # lkvm run -k Image-v6.16-rc4-upstream -m 1024 -c 2 --name guest-165
-> [    0.000000] Booting Linux on physical CPU 0x0000000000 [0x410fd0f0]
-> ..
-> [    0.390199] kvm [1]: HYP mode not available
-> 
-> If the documentation is correct, I would suggest that you also add a check for
-> nested virtualization being enabled in kvm__arch_validate_cfg().
-
-I think the current behaviour is acceptable. You ask for E2H0 without
---nested, you get something that the guest cannot observe, since it
-boots at EL1. Why should that be a problem?
+And yet KVM exposes that timer, irrespective of FEAT_VHE. Probably
+something that should be addressed.
 
 	M.
 
