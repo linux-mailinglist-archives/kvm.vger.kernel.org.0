@@ -1,202 +1,191 @@
-Return-Path: <kvm+bounces-53890-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53891-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EE44B19ED6
-	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 11:36:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC5F6B19FC9
+	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 12:38:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CBC52189B1F5
-	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 09:36:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9598C167D7D
+	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 10:38:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94457244673;
-	Mon,  4 Aug 2025 09:36:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4DFC24BC0A;
+	Mon,  4 Aug 2025 10:38:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="eZS9zSLF"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="3CMUiUWr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2048.outbound.protection.outlook.com [40.107.92.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29BEF23ABBD
-	for <kvm@vger.kernel.org>; Mon,  4 Aug 2025 09:35:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754300160; cv=none; b=qVE/V967Uc5B79m87GiUd4GXsVM59ICtyqEcry2CFK1HPi/AczypV2jZ2f5v/9+txEcw8MBwgJuxmtqBxfVQ91yk6L4rb6zv5N6jpY2T4c5P+2AQS+sI1zR1Pd/ABsOO2jJFp5prjnQepgfXypQQ/rio+rgKlODyudMtQOIB49E=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754300160; c=relaxed/simple;
-	bh=RSEUUDPk0ivxtKPryYLZckoW5/oxzbqoOUtFYK7FH1w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Bv3fL+dtE/fLNV2YLmVQzgDVKH7pInb/OhtI6+HXSIRDyRVDXlcRJIY97uJIWXs4ckA+a4Zlu8SizrLRPgSPLqNdvlAmlNKMp7wxPepYVtMekxu3fN4BZjtrwmQ3Q5fme/20YhefezPIHIvPx1t3dH+thvXlFmyNwGB/PAVtNx0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=eZS9zSLF; arc=none smtp.client-ip=209.85.222.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensrcsec.com
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-7e691926a6aso213401685a.3
-        for <kvm@vger.kernel.org>; Mon, 04 Aug 2025 02:35:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=grsecurity.net; s=grsec; t=1754300158; x=1754904958; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=sSGViVqk8tYm1Hl4rf3sipWjZp79oeSys3OXdOq7qQ0=;
-        b=eZS9zSLFhjC2fCy8UwDFwaFdpatvwuoEdy4acDKSZ4FqZ+vVqX5lJRmPk513QzFA50
-         JXXN9rJBSkcONN01snAZcd4PHXk5v27xJT29yBrpqoUbkCdS/4DfbBkm2qspFqsvWxW6
-         6QMOtA6oZ9WZoK6o8a3l+Lug5f7tmUs/tfOe4obqKVryecHUgoT5w9gNguotaHRrazuP
-         mxO/pdzjBMW+TSC+X7m12Pdxo+PqWOyY5eas0EMU0n0El2Klow2lZSRRW+PuyP47K7FA
-         8pVUgeVTFd9q/D4u/dOZD0BzJpWCiM8MBRGZ1p+8ZcE0KmojzUwcLaE2Rdt/RUg5Nc+5
-         v5UQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754300158; x=1754904958;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sSGViVqk8tYm1Hl4rf3sipWjZp79oeSys3OXdOq7qQ0=;
-        b=PRbhD5QSFG2RCwzk2Jfd0TaPeaQkmkaO+VLdXRkSSZd0uGwysVe7uwD67TS6spdFgY
-         KYKBbcehlt257g/KGE15YFKQ9mgFxtfahbRfzz+39IkGh+CPyuik5sYX6+2dimkcLfhB
-         xLtgOh9oz6vkm5cvZNVMy14QIIng/ApKeI7DLjdH6QXfK425XoSi5jWzo0B1vVKwvmqK
-         BnjCbyy/1AXWNqrGuo+B54emwfqXRLcOyxUhc+wlJ30AjNDvJdnyTOzMMYGLkH6eh7dd
-         v4Rly+pnoMwBvjrrEcH9DHVgmjwLPlFzGgk6dkkca/z3bO1vLwW1xZM8gnVDseP9OBkN
-         Y0eA==
-X-Forwarded-Encrypted: i=1; AJvYcCUOIvu51/o72C3SOmikFq16KxsW0Eht0e5VcyB4s83veJWQymaKwAeqIDLogeyRC4h2YOE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzsh5S3gLlCdK+/bolna1Aldg8EC2i/WoXJeYopkBr4aCRPCE/J
-	4ovkECzG6itYBtuKmW2B2AqXIgMU4rzJYiinlVaXzXeaR12qsCevzNGGNmqgxwBVp0k=
-X-Gm-Gg: ASbGncumrBYbUJsZjTeYArExGtQSc4kAcFc9aaAkay5SoYjA8yWm2yhLGc0NOhguHib
-	TZ3aIYS3nthCq5LwxYgxdvd2h3zx43XNNjVFpzpv9KOD31fQKKQOooKd3r2CpmSVH0ViHQBMA0O
-	hxdilTTWf3dWIGYPGiqPyxGuMV1xiaPRx5CXZM34mnBnkjf6zxF4hgEdh7DIxxxtSXhuMbxvb35
-	79s2l0SZqplKD2F0TpnbWihm1zVx1rH2hjoTfBdgA5Qc79/iVxerLYu6ql3bj3teuONH6QcRTEL
-	bYRKW8swA+tj4U+spqy+cFbsI5VchNXNf4MbOotxnaHLuZJflHqmx3sZWTp4nV+HZvpLX1Uw5As
-	bvBJBM+OMKniH8O6n0xPap/D3tzdgb3Iixz7lyI32r/JDh5Qa4myOiTgRi8gklRvVlBaIVxot9L
-	wcs3Hm/2Aw9DRQquNY/jEKzARDkfazlTsBzu32VKOSb/Qo0sBrFmifz46Soneg9d/Org==
-X-Google-Smtp-Source: AGHT+IGbM9Mk6uhLMIfQkTcN7oqrD3mx+58S38TYJ9YZp0XYWcvPrm86ys90AFtGU4ZHqA92/ooSxw==
-X-Received: by 2002:a05:620a:21c6:b0:7e3:4678:aae with SMTP id af79cd13be357-7e6963543e9mr973213885a.41.1754300157937;
-        Mon, 04 Aug 2025 02:35:57 -0700 (PDT)
-Received: from ?IPV6:2003:fa:af22:cf00:2208:a86d:dff:5ae9? (p200300faaf22cf002208a86d0dff5ae9.dip0.t-ipconnect.de. [2003:fa:af22:cf00:2208:a86d:dff:5ae9])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7e67f594206sm521802385a.4.2025.08.04.02.35.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 Aug 2025 02:35:57 -0700 (PDT)
-Message-ID: <b0179d3d-d36a-4ae8-b32c-5659794995db@grsecurity.net>
-Date: Mon, 4 Aug 2025 11:35:54 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44A7015DBC1
+	for <kvm@vger.kernel.org>; Mon,  4 Aug 2025 10:38:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.48
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1754303905; cv=fail; b=WhFElFBOio0FkPboUUeQxTPBgDWaP4wiOF66VKJL7sUAMOJQ0A+QffNUnYKf80SQV9DVek22S+w8GM4BSXtqS+WEBGg986K/QjKfR5S/YWtf6RfFA1PgrluyOlxWS5W9fmq5QY2VbicDLa/81WWiljfIaxOESs00SKAT+ItzLdQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1754303905; c=relaxed/simple;
+	bh=OHDKSVH3nJowUfk3etksrRLhyRQQiNzyc01eXcj8yR8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=EZ0bcKrrfaS3pJqlNDGbaHqm+IQ71kieEJxJmWlyPoHzWGVO7eGyZ1tHdqCP+s/RIWp1Ig8M82mu2A0AMrnb13UZFzoN9RvL3S/JzmivexvveH0h/OLPlin8KdKq5J1FPWzPwfKBzLauovAAyCeXq044J1zkMHVRVmUaHUevE+o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=3CMUiUWr; arc=fail smtp.client-ip=40.107.92.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=WVr0sIs/tHDBbOyvUT7aW8P8PkFZl51lAJRJu9pba9iPYLWUOHePdry4RZ+mHZsoSMmy34507O+aoE9deIv6fnIYEW/nAvI3uJwLH+9buYxJUd7q0oxIqIMgwIbgXpaERIF+XZIIREtLDuDdkqHb3K8dRrvvMVPs1FtbF+t0M+uQEC5Ft/y4GGNxT526x9CjKRiOPJVP3uhy7xrvvpJO3llN2/QWgL/nZ9GB521Cg1yZN+WOtPLv6f/gQvYU/OVFv+Oe5gsxihpn3HEkq3UQQJTBiY13DwyG4EfSYjzE9G4EZOjmda47xY6CBroVXpgRi9S+KEAFeDLU0bmjrx/ZRg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xCapequEP3azVt1+Mr/Egtf21HNDt7CWZIh3I/6PNBE=;
+ b=HX12Ta4cy656ibVZmxxJu1NfjJmmZzWPcGZbVaKmNBUKIb95p9SEt+ViBkGcyHDrZeAUBr2KWB75NCBIkX/HAGuR8fe/Jg622cgB/JK7HsxtsKc7Vix+mWmQ8ObwXaYsIf4UX035dpcYj8UV4SA9KOS5V2BMCmQwAUP6A68pWV0WUz9CEq7BhBuheYOD95qWAjJoG3ZHdZ7QdwbEPobtdKpfFhKh/ifSqAWRZZHHn+hSA8TZRcXNsea0YHNhme7hjoG9czc/Is5Gh0gABA5DS8kEFLO9jZVfoBhWIu3vUOJMXlfiYRJ/LKpT3bKaHTVITO/QGo3blygkKMGby45p6g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xCapequEP3azVt1+Mr/Egtf21HNDt7CWZIh3I/6PNBE=;
+ b=3CMUiUWrhQjzJjKuzyUriyo0xIbu4Z7GQ6ukiu80PJ5GpFRrsumfWI5z4JmxFt4AhvAXQeUTbai4TOs/Z8jXRatHcplHIrkXmEue9yvgrEL++GCt8sLPkvpsRkme65Xf+lA51j4GW3QHOoRQqSRIjxQZSa+HKikq4Q/gt71BA24=
+Received: from BLAPR03CA0151.namprd03.prod.outlook.com (2603:10b6:208:32f::15)
+ by SN7PR12MB8772.namprd12.prod.outlook.com (2603:10b6:806:341::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8989.20; Mon, 4 Aug
+ 2025 10:38:20 +0000
+Received: from BL6PEPF00022572.namprd02.prod.outlook.com
+ (2603:10b6:208:32f:cafe::27) by BLAPR03CA0151.outlook.office365.com
+ (2603:10b6:208:32f::15) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8989.21 via Frontend Transport; Mon,
+ 4 Aug 2025 10:38:19 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BL6PEPF00022572.mail.protection.outlook.com (10.167.249.40) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.9009.8 via Frontend Transport; Mon, 4 Aug 2025 10:38:19 +0000
+Received: from gomati.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 4 Aug
+ 2025 05:38:15 -0500
+From: Nikunj A Dadhania <nikunj@amd.com>
+To: <seanjc@google.com>, <pbonzini@redhat.com>, <kvm@vger.kernel.org>
+CC: <thomas.lendacky@amd.com>, <santosh.shukla@amd.com>, <bp@alien8.de>,
+	<nikunj@amd.com>, <isaku.yamahata@intel.com>, <vaishali.thakkar@suse.com>,
+	<kai.huang@intel.com>
+Subject: [PATCH v10 0/2] Enable Secure TSC for SEV-SNP 
+Date: Mon, 4 Aug 2025 16:07:49 +0530
+Message-ID: <20250804103751.7760-1-nikunj@amd.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] i386/kvm: Disable hypercall patching quirk by default
-To: David Woodhouse <dwmw2@infradead.org>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti
- <mtosatti@redhat.com>, kvm@vger.kernel.org,
- Oliver Upton <oliver.upton@linux.dev>,
- Sean Christopherson <seanjc@google.com>
-References: <20250619194204.1089048-1-minipli@grsecurity.net>
- <271351582cbe88731098bd4fbdd8f7ef522f20f6.camel@infradead.org>
-Content-Language: en-US, de-DE
-From: Mathias Krause <minipli@grsecurity.net>
-Autocrypt: addr=minipli@grsecurity.net; keydata=
- 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
- RzDVkdgPJkL/NFTKZHo5foFXNi89kA==
-In-Reply-To: <271351582cbe88731098bd4fbdd8f7ef522f20f6.camel@infradead.org>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL6PEPF00022572:EE_|SN7PR12MB8772:EE_
+X-MS-Office365-Filtering-Correlation-Id: 32e58bd1-2bba-47f9-18df-08ddd3430707
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|376014|1800799024|36860700013;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?1H5JUfhCMETipajuQMWmlXV2YhGY+w05ThcscgccdHpjAIZ/dnLG8om8qwhQ?=
+ =?us-ascii?Q?bYsiOx5SuM9zgtsuvKHsP1p9UXGXVj6MzRlZKoLI8DMSlO8aDxGdYPymufEG?=
+ =?us-ascii?Q?SvLB2lEBE9r4Nk34dFAcWCBAmmyhaTE6uocUiC75AnP0xPrqxjHpXd+zJ1Lh?=
+ =?us-ascii?Q?FC+SXpBWmeZXWIok5vJT3UmwrHT0qRC42MH0dbwm+nAaq/+TyK46bMoD7JXZ?=
+ =?us-ascii?Q?fZttfEO8XUYx3OOpr2VE2Aj+i6Y1whGXRMcpEmPl9FiehgRmqfVpXiMJsqR7?=
+ =?us-ascii?Q?T3AtvPsWPidyfxiPS7YfQIiBd1RiV2GaeVBeP17RneFkElSXEQA9gdwqKCZ+?=
+ =?us-ascii?Q?uBzUfd7oUSUvvM8te0WyltGAHMoxNlxlMWb9rDEG6ngMukYn1n4uI4BlEXt4?=
+ =?us-ascii?Q?jmj7OrsUzI3FF10CTvFmCJHkihz58p4IMxerYn40m/Li7IWSBFiAdDw/SM2w?=
+ =?us-ascii?Q?hM2rDdCMpSba6iclLbj7KhgtzpQ0wYysRjvanEBkUBAVvKMsu3vdthE6Ketd?=
+ =?us-ascii?Q?Xsj+AbwNi8jAXdmvVF0QmvPgv39WwwgGmLDGC2TwbojqGOIRRAMc0qHjtkT7?=
+ =?us-ascii?Q?2NfWBCsajfceZeWRyF9aVfPnkuXIvAQILSZn/GeAQ/8lnos/8ezgZsAxQBp3?=
+ =?us-ascii?Q?5G+mwIulesZEPWYjwl915uk2XpyXyUDUy6yS9MeQB/mdHyvletSV14KVPBW0?=
+ =?us-ascii?Q?zlJA7sq7UbjyXTUZEIE0NEhKtkxtNnM0/dO7BATr6q4XCjLpxFkJkLjC0W2a?=
+ =?us-ascii?Q?XZpe2LsDZHZj2tYqiHV04v7H6ofL/XmsniFQrS8xDfN/nEHGKqEGi97Ky/B+?=
+ =?us-ascii?Q?nRWWNXl/JBctohVKqM/iXvvOTtZOFRbg7QbkobsSGx3WHhDxATROpg6f/VQd?=
+ =?us-ascii?Q?W67A1uniUGq8mIAzSsu08hH052fMlKNo4QsLXH2KR5lmYsUwuzbZZBHf4cfQ?=
+ =?us-ascii?Q?+E4Eakaf0ZJV8y+qYw9EAGmr6/uEeeJrq11YxhouQWNaMhnyg+NrCM4ip7aA?=
+ =?us-ascii?Q?eVJEXeTyrXU6ylGHBjseADKSo1VfSB0MLi23Mx6P0fKmTzaHURJ0QTh/qp89?=
+ =?us-ascii?Q?gI/JwSja5ZVEtKTOPlLbQukY77bgbOxe08kunMP9oREtaJ1gNZP9EuEecMQn?=
+ =?us-ascii?Q?Qzd9KCIw4bjaTQUfmSzmr5nkW1v40a5edxaF+qVoJ6H+ewduBDLQbxc5CRUw?=
+ =?us-ascii?Q?JaAfs5SzZ0xyMnxLBKIR99z09mXfTJ0ERuPB9x8Bp60j5cVWGNBt2qrHLXD1?=
+ =?us-ascii?Q?JaxsYV1KgtCNq1GucB73SALfWo730JytFLxiZuMSSaGRdpevWGy58f1xvgir?=
+ =?us-ascii?Q?K77lcaHmHlBNXIjgjYU1ZUoofLNN/54azBJi89GiFjLsBTV7+GyCbd3rfgCJ?=
+ =?us-ascii?Q?jW5tHmXJz+Suij46EbcE7XTD44wsXjfUV6VBqRxSdzWCy4GQNd+ol8ZKrFvy?=
+ =?us-ascii?Q?vWUgrP9l4+SVITK2I+eSNvxH2ElQXBhcx73+VoU38y52v9iQyhVEkvl7VrjP?=
+ =?us-ascii?Q?Iw7qpwoyJl0SB//cD6OXxy6M2SIlroo767/Sl/qUewfHqbvaOW6ATa8y4Q?=
+ =?us-ascii?Q?=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(376014)(1800799024)(36860700013);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Aug 2025 10:38:19.0218
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 32e58bd1-2bba-47f9-18df-08ddd3430707
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL6PEPF00022572.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB8772
 
-On 23.07.25 11:26, David Woodhouse wrote:
-> On Thu, 2025-06-19 at 21:42 +0200, Mathias Krause wrote:
->> KVM has a weird behaviour when a guest executes VMCALL on an AMD system
->> or VMMCALL on an Intel CPU. Both naturally generate an invalid opcode
->> exception (#UD) as they are just the wrong instruction for the CPU
->> given. But instead of forwarding the exception to the guest, KVM tries
->> to patch the guest instruction to match the host's actual hypercall
->> instruction. That is doomed to fail as read-only code is rather the
->> standard these days. But, instead of letting go the patching attempt and
->> falling back to #UD injection, KVM injects the page fault instead.
->>
->> That's wrong on multiple levels. Not only isn't that a valid exception
->> to be generated by these instructions, confusing attempts to handle
->> them. It also destroys guest state by doing so, namely the value of CR2.
->>
->> Sean attempted to fix that in KVM[1] but the patch was never applied.
->>
->> Later, Oliver added a quirk bit in [2] so the behaviour can, at least,
->> conceptually be disabled. Paolo even called out to add this very
->> functionality to disable the quirk in QEMU[3]. So lets just do it.
->>
->> A new property 'hypercall-patching=on|off' is added, for the very
->> unlikely case that there are setups that really need the patching.
->> However, these would be vulnerable to memory corruption attacks freely
->> overwriting code as they please. So, my guess is, there are exactly 0
->> systems out there requiring this quirk.
-> 
-> I am always wary of making assumptions about how guests behave in the
-> general case. Every time we do so, we seem to find that *some* ancient
-> version of some random network applicance — or FreeBSD — does exactly
-> the thing we considered unlikely. And customers get sad.
-> 
-> As a general rule, before disabling a thing that even *might* have
-> worked for a guest, I'd like to run in a 'warning' mode first. Only
-> after running the whole fleet with such a warning and observing that it
-> *doesn't* trigger, can we actually switch the thing *off*.
+Patches are based on kvm/next with [1] applied
 
-Looks like I was overly optimistic. There are, of course, use cases that
-rely on the hypercall patching, even if it's just for testing purposes.
-One of these are the KUT tests. I tried to fix these[1], however, there
-are probably more such mini-kernels, so I reverted back to not changing
-the default behaviour and only provided a knob to disabled the quirk,
-making users to manually opt-in to it[2].
+Testing Secure TSC
+------------------
 
-> 
-> Can we have 'hypercall-patching=on|off|log' ? 
+Secure TSC guest patches are available as part of v6.14.
 
-I'd like to have the 'log' option as well. But as KVM does the patching
-on its own, this would require QEMU to analyze and react to related #UD
-exceptions (and possibly #PF to handle currently failing uses cases with
-read-only code too) further, I'd rather not want to do.
+QEMU changes:
+https://github.com/AMDESE/qemu/tree/snp-securetsc-latest
 
-Another option would be to do a WARN_ON[_ONCE]() in KVM if it does the
-patching. But, then, existing use cases would suddenly trigger a kernel
-warning, which used to work before. Again, something users probably
-don't want to see. :/
+QEMU command line SEV-SNP with Secure TSC:
 
-I guess, we have to stick around with the default but make users aware
-of the option to disable the patching themselves.
+  qemu-system-x86_64 -cpu EPYC-Milan-v2 -smp 4 \
+    -object memory-backend-memfd,id=ram1,size=1G,share=true,prealloc=false,reserve=false \
+    -object sev-snp-guest,id=sev0,cbitpos=51,reduced-phys-bits=1,secure-tsc=on,stsc-freq=2000000000 \
+    -machine q35,confidential-guest-support=sev0,memory-backend=ram1 \
+    ...
 
-Thanks,
-Mathias
+Changelog:
+----------
+v10:
+* Rebased on kvm/next
+* Collect RB from Kai Huang
 
-[1]
-https://lore.kernel.org/kvm/20250724191050.1988675-1-minipli@grsecurity.net/
-[2]
-https://lore.kernel.org/kvm/20250801131226.2729893-1-minipli@grsecurity.net/
+v9: https://lore.kernel.org/kvm/20250716060836.2231613-1-nikunj@amd.com/
+* Set guest_tsc_protected during guest vCPU creation (Kai Huang)
+* Improve error handling (Kai Huang)
+* Disable MSR_AMD64_GUEST_TSC_FREQ write interception (Sean)
+
+
+1. https://lore.kernel.org/kvm/20250804090945.267199-1-nikunj@amd.com/
+
+Nikunj A Dadhania (2):
+  x86/cpufeatures: Add SNP Secure TSC
+  KVM: SVM: Enable Secure TSC for SNP guests
+
+ arch/x86/include/asm/cpufeatures.h |  1 +
+ arch/x86/include/asm/svm.h         |  1 +
+ arch/x86/kvm/svm/sev.c             | 27 +++++++++++++++++++++++++++
+ arch/x86/kvm/svm/svm.c             |  2 ++
+ arch/x86/kvm/svm/svm.h             |  2 ++
+ 5 files changed, 33 insertions(+)
+
+
+base-commit: 196d9e72c4b0bd68b74a4ec7f52d248f37d0f030
+prerequisite-patch-id: 97788f545096df9ccc70cc99571d545fe4503f01
+prerequisite-patch-id: 7a0edf8fa18231f19c781b4d412df4bafcb3d1ae
+-- 
+2.43.0
+
 
