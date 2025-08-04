@@ -1,117 +1,164 @@
-Return-Path: <kvm+bounces-53885-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53886-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F82EB19E7E
-	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 11:09:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62961B19E85
+	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 11:10:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56EF53AAB93
-	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 09:08:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 58A721890EE1
+	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 09:10:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E7012459DA;
-	Mon,  4 Aug 2025 09:06:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 039B824635E;
+	Mon,  4 Aug 2025 09:10:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dbvR1xL1"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="uKaKVyKq"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2079.outbound.protection.outlook.com [40.107.102.79])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F12B324887E
-	for <kvm@vger.kernel.org>; Mon,  4 Aug 2025 09:06:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754298376; cv=none; b=FSBuN82ZyoEJLKaYJ9Ibvt7uRwUmC4ThHJgKisc6RKcDqHOaXx9F6PDJd2SBifXFML6lvYbtKHIHl8YnEv+H/DnUJ9rT+NCTDALK5aZuIoftKWNkVTgBSbuVrCjhx9G7++zoty9TVMvw0Gn0gOyr6TvhExbcj3tY0TVM0l8HdL0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754298376; c=relaxed/simple;
-	bh=FC2gKnlK0tlH4AVIjMhG/aH0ST923yLbY61/gTdaWtU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PNIuFRkkfGYInmkuAFTpgnVi7haN3v1t2yWauiGO9osW9IJGbBwkl9oeDrF2hv1bpf+wBZcD/iOB6IWERlpRxEYdSIG0bDUv0PIiauwV0R1apnfyahIfmHMsRfoXqycwy6DV04rTmRBqzA1M8AotlOE4fonpgG4SDdh7It7fr84=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dbvR1xL1; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1754298373;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FC2gKnlK0tlH4AVIjMhG/aH0ST923yLbY61/gTdaWtU=;
-	b=dbvR1xL1qHmdU/YpM0Lsy7XEJd+ZGuGK7D7OOf5JOYgMoITM2+/tgMwUlDlsunMFRef7+L
-	AawHKsVO8aXh8I3kxR9DZxIIcwOFy6ONu0oEkCorGFPpbnwoZelE34nHiWVQb0PcQAK4XK
-	Yd5Jq9iCjMre2I+ImXJen2aSiMa4gcU=
-Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
- [209.85.215.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-29-RahmBSDfO2yFwRRSulkFVA-1; Mon, 04 Aug 2025 05:06:10 -0400
-X-MC-Unique: RahmBSDfO2yFwRRSulkFVA-1
-X-Mimecast-MFC-AGG-ID: RahmBSDfO2yFwRRSulkFVA_1754298369
-Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-b421b03d498so2129700a12.3
-        for <kvm@vger.kernel.org>; Mon, 04 Aug 2025 02:06:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754298369; x=1754903169;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FC2gKnlK0tlH4AVIjMhG/aH0ST923yLbY61/gTdaWtU=;
-        b=BrNcxlBkISPZTPXq+WyqSYl+o5AYEj76TDSXOHz6CQczgump87zVCemyUQ4Fc9Uykj
-         iqBmUVA6mh2zvc+5Wc/O4yEKstvVJaedwgdT8GaVMZq0Pz9fjK+lP3C4HNluO8ly0nek
-         XNNtKpcG9+I8sh8G9BLCM5Jz6/HCWx6JrhD2K37o8OSbvy4g+8htYs5Ox1QCdvvFrKcS
-         +hsRp7Dp07yD6vB18RhmK1SYRIdm1NL6SoRtAsKzi2PomWAe2uwEX/sGXpFtv/XsW6rK
-         1nThginyscwTNu65BYMzqjQt4JSU/5nzihKSW0MQk2FmkZ/TyAXbSXhsoHGdXe0l6Zbd
-         TuxQ==
-X-Gm-Message-State: AOJu0YyPhRNuHA4f0AMiBh/dOWU/RS5WfQuZN6C9+hxwOMk8hqeCG3VC
-	kZIa+8v7D93vI0qZiDUvrDHtfLgzTOc+om8eiCaTXDygXvwT7DW1I2a00RHV7jrN7r6vClTZO2h
-	3UkY6VqQbpW1OEXsMYIYMAvuDXTozJ6Oyr/MAEcFwb+YA7I7WE3iGOrRke4Wd1cEtPPxrHt4x8b
-	qXUtZoDfPyMeiF+X1F1lgAD/6yBQl9
-X-Gm-Gg: ASbGncvQe8hQfg/pRYOiXbzUOkNwm35gOSOekd23ykll8B3ifGoXhbblUtZnX3ykOTC
-	O94KzZT1Nw+OmJVLpiDmS5tTAaya8v0WqC4GPW3rIUl5RHrzTlzRhQkuKcm8SW9l/wfG/1HGFxj
-	umeC03PbU+6l4XxByGSaHOtA==
-X-Received: by 2002:a17:902:f552:b0:23f:f983:5ca1 with SMTP id d9443c01a7336-24246f5dfb2mr132550195ad.12.1754298369525;
-        Mon, 04 Aug 2025 02:06:09 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFEcYXd+G3MrEs13nVvxY8yeK+0iPt6uzM6BT+j7IwyIkqouuxJCmX+aT/C268Bf+EzVOioFJTajAeAVP8Oj2U=
-X-Received: by 2002:a17:902:f552:b0:23f:f983:5ca1 with SMTP id
- d9443c01a7336-24246f5dfb2mr132549655ad.12.1754298369069; Mon, 04 Aug 2025
- 02:06:09 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91C652459DC
+	for <kvm@vger.kernel.org>; Mon,  4 Aug 2025 09:10:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.79
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1754298619; cv=fail; b=VP3fTe+tEjd6XvfSMAWP6074ZsFC1lfZlyAiKNuGq3DVY7/eItFyE1fICReeMtoRC0R9mvFYqv985A3imyZ0/DodNes2lCTTKDPcDk6S/zgKAtmyrSGJ8oll8DlK3H1z0QQyj/mhgCDXM0BfwF6Cp2s0W4pJpPEaMO4dnfJYTTs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1754298619; c=relaxed/simple;
+	bh=HzQ1nE7zkPirQVQa6oV9wMXWPTlKUcs2g/Ot/Iq6WR8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=DbMEscPbU9SkAw35G5pcK2UITYwaX9vbRKDyj/zjBwaAJzwUPkuSXwkHNpUAK9t5WA+m5KHqXEsjmYArC59xv1Pn1A3yuJsmXPs+lF1tz5OriXge5DZ771t2iKXZ9Hh5PMZZiyu/Yoe48ah0SofR9tA0CxNlAe2nIulnsxwtMzM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=uKaKVyKq; arc=fail smtp.client-ip=40.107.102.79
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=qLwqsf7X7SAAyRaHrJd31wNJ+8Hju36H2sMo3wmenlwmvq9mFy2QYIK8maxGy3HUxK4ziTHm8oAZGmNRB9VBP4m4I5XtBroypckg/AGItc1ewEKx0l+iBrITOrKd5XPYdnb8OxFSgePp6oggmwGjVUoS0mZJHdiRhjBcff0kR3PC/wmtoLbfsQRNLq4ddI7UreebsbRF9SjGe1uqW5FfABZCdrd1Sr+4FJ/P4P4CGVaL2Rqz3PFdj+0xMl1TETljCgTc1JiW8er3wTo4aa9V3+whlnt0S+3iXOSA7gIFgY4VNiDmzwrDELswNoAGsQxrFwS+v8Ud7pBzhC4uZshjtA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ImscV+O7xRyf9FViPa3M4usgSLuOEjHrCi6UY2i0IuI=;
+ b=EysN2zMGRd0EWsEbYPEt4H1VbbDxY0BxaBEfKZhk5SPcfdCtJUXnGfRji5vuWh9aHGE+4JF7KRMLj2QeMKR5tRJujGr9fFUTp92TIrJAtsC1Z+K9Z73/419TZyTd5+KR4f6cHv+/McbTc0PztV1MtQb9w10g2vi+hgOKEfTY6XRY2n1OEG/7fLzBqJG8+bouWIqUHILTkp+YxU6OROewcF1JVqACvG7MMULnvt/QS4dKEZUZq0YGI7mfi3aPWeW+9CiOiXWBs7bL3kRtT7wqax6+ir9Xze4ujIYKxkbTdHhz0+e+h4B32iwthsS8g1nYegjnH0u1mYRNZ46ARjzgHQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ImscV+O7xRyf9FViPa3M4usgSLuOEjHrCi6UY2i0IuI=;
+ b=uKaKVyKq5Mx6qpeX21vab+TzRtsaNEQdbGc42h4MUsIDqmLGl05PUDU1uODsq2uFBLGP0pdGw5pIZ9qywW8/bBM5eWmXdt06Qj45tLX6ZEz4j8ozOlm6h9/t30ENyeEc7qm7cfQ8oO19huYutTmF0tXGfkCujGrEYVGMlQVsZjc=
+Received: from DM6PR17CA0004.namprd17.prod.outlook.com (2603:10b6:5:1b3::17)
+ by LV8PR12MB9450.namprd12.prod.outlook.com (2603:10b6:408:202::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8989.17; Mon, 4 Aug
+ 2025 09:10:13 +0000
+Received: from CY4PEPF0000EE35.namprd05.prod.outlook.com
+ (2603:10b6:5:1b3:cafe::e9) by DM6PR17CA0004.outlook.office365.com
+ (2603:10b6:5:1b3::17) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8989.20 via Frontend Transport; Mon,
+ 4 Aug 2025 09:10:13 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CY4PEPF0000EE35.mail.protection.outlook.com (10.167.242.41) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.9009.8 via Frontend Transport; Mon, 4 Aug 2025 09:10:13 +0000
+Received: from gomati.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 4 Aug
+ 2025 04:10:05 -0500
+From: Nikunj A Dadhania <nikunj@amd.com>
+To: <seanjc@google.com>, <pbonzini@redhat.com>, <kvm@vger.kernel.org>
+CC: <thomas.lendacky@amd.com>, <santosh.shukla@amd.com>, <nikunj@amd.com>
+Subject: [PATCH v3 0/2] KVM: SEV: Improve GHCB Version Handling for SEV-ES/SEV-SNP
+Date: Mon, 4 Aug 2025 14:39:43 +0530
+Message-ID: <20250804090945.267199-1-nikunj@amd.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250729073916.80647-1-jasowang@redhat.com>
-In-Reply-To: <20250729073916.80647-1-jasowang@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 4 Aug 2025 17:05:57 +0800
-X-Gm-Features: Ac12FXy2PpNcxx7Wuo6WWD9onNx5D2Zc4zo6EJWLkWuf_3KiHYfBpugk7fN5otM
-Message-ID: <CACGkMEuNx_7Q_Jq+xcE83fwbFa2uVZkrqr0Nx=1pxcZuFkO91w@mail.gmail.com>
-Subject: Re: [PATCH] vhost: initialize vq->nheads properly
-To: mst@redhat.com, jasowang@redhat.com, eperezma@redhat.com
-Cc: kvm@vger.kernel.org, virtualization@lists.linux.dev, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, sgarzare@redhat.com, 
-	will@kernel.org, JAEHOON KIM <jhkim@linux.ibm.com>, Breno Leitao <leitao@debian.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE35:EE_|LV8PR12MB9450:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4aa66806-1cd7-40db-438a-08ddd336b879
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|36860700013|1800799024|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?YV6KPzsEfhwvd5Dwtxg2Zh7LTlyQFSF0AHF2h7n69NA6PqZMdc1aHRKorN6+?=
+ =?us-ascii?Q?Y0WCoszOMzI1MTrQ2Seuc45hgLRFoCbJBmgIVKsNPn9I8aiH8pcjwrvuLvgj?=
+ =?us-ascii?Q?GCT7hws6O7om6f5YRewMNIVRWAw1hMS//kuIhDSQduMCqgclZDhbRR27XQMO?=
+ =?us-ascii?Q?g2l6Bdi7ynsrRo4phCRRGfwPpYehuuT6FjGNL0jH4c1qRuc9XLHBB/wkEZ8y?=
+ =?us-ascii?Q?Xdk/+WPaoTYxcAtWCgvaEjWe68kxrbgL1+lCts2s4cToMMEg+vPoOyZCkIUd?=
+ =?us-ascii?Q?9pYMF6yP7ZXsEwvUl5SlWEHSqUftl5KeoiNmBTkrPBaSZUlFQcC0838xaagX?=
+ =?us-ascii?Q?yR5Mage75dUjHSdsA46aW26dNM7CTjTWEMKXS0MBeBgbHx3Hx8QtoIzAZhHM?=
+ =?us-ascii?Q?kHQdTzbUkCUP3F1DizbWF9zckRtYOimw+hon+KO6jM/JhKaIWmKetwMeGd/E?=
+ =?us-ascii?Q?eKn8EQyrAL/aq+67q8ktEwKFiF6ok9KaWWmN043xpX9Njdte+3NkPwMVUV0M?=
+ =?us-ascii?Q?OnnhOkoDfEGJJlgXk/j3z0ct6UKPhJgYfOJkxvAYDfejeR7g/7U8uTLrqvxj?=
+ =?us-ascii?Q?DdcnXWb/34SRnezr5l2zcIax1LIZqY2ZHX6TOA24DUj2N24Uw8eI6jqDa2Ri?=
+ =?us-ascii?Q?byoEmCk1RceQcDEbnV1V3ocEYKhv3sXnkhRcFPzUbNMh+DGZXEUO7uMzspEx?=
+ =?us-ascii?Q?hWA27TkpUeS1/jdxiccs4uDSUkhPntggGBxRFlIVGfEkWWHg21Kwlcz/AVg+?=
+ =?us-ascii?Q?RPkRhsLkN9sJsSxuo52/58AJPG9SEPMZFN3MQE+p1mr8PD8hRZrbKDXIZRG6?=
+ =?us-ascii?Q?50rpIRdCIN80uAiYOYerhAfq7rDIb9y9WCjLvV1EYFAAHT1D7JyC+4YIDqrQ?=
+ =?us-ascii?Q?OUG7TD7sxs7PZtTts/o/tzU0RcUqcyXkdKjvd6xW2fmlTVWZfAr2N7XW0MPS?=
+ =?us-ascii?Q?4aIC16VC1pTy9+2k/9x4eY2IzXKxkVNDZXBgWoC+7hoE3caX3RBYMbPOVADZ?=
+ =?us-ascii?Q?alpFjLkKiAGeJfBqMtRJVnYgzB+aS+lkRbRoCOl8Y/OA50Js1YXgl6te/mJW?=
+ =?us-ascii?Q?HqFfeOcWPgZgKABkGv5eLhiCArK/ZEALNZ5TOJx5ykOHMSkAdbSjnuYLIeNQ?=
+ =?us-ascii?Q?YHKaH4c//FnafwPcR6zyqjK1kg2onTSeTVFZymVTMXbCt7PMO2bt3XgEBrhx?=
+ =?us-ascii?Q?SZZQaI/LHly5w01g7o4jReBZLfBQDSWY+PUgSfMFAYeWd41Qhhr80ObzA8Qq?=
+ =?us-ascii?Q?Sd56J+noLsMt/y35lX9DSxiWSmgm3jUD+CmqiphO6sYKVUoTFLcYkv7x9lJe?=
+ =?us-ascii?Q?EKUELyNC/fKI00tf6NKStdWB00XgviCapPxWhZIlEnlwBt7ZxjKP81ZSOcev?=
+ =?us-ascii?Q?LaE7iDUrHdMqYmmAb981muPrAsZ6Vh0NNNy9PK2HeLZ9Oh9452xlOhC/U98F?=
+ =?us-ascii?Q?cRoOZrJ155KfK5uvJQblLhPI0hGTA8M4ctEz4Zzem1k66xtzD0frJG63syHO?=
+ =?us-ascii?Q?52dC85qI4AWHrqqIWZxTHApmcLXcGV/LYWnn6WvG96DEEK/aYC4WDlnuJQ?=
+ =?us-ascii?Q?=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(36860700013)(1800799024)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Aug 2025 09:10:13.2188
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4aa66806-1cd7-40db-438a-08ddd336b879
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000EE35.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR12MB9450
 
-Hi Michael:
+As discussed here[1]:
 
-On Tue, Jul 29, 2025 at 3:39=E2=80=AFPM Jason Wang <jasowang@redhat.com> wr=
-ote:
->
-> Commit 7918bb2d19c9 ("vhost: basic in order support") introduces
-> vq->nheads to store the number of batched used buffers per used elem
-> but it forgets to initialize the vq->nheads to NULL in
-> vhost_dev_init() this will cause kfree() that would try to free it
-> without be allocated if SET_OWNER is not called.
->
-> Reported-by: JAEHOON KIM <jhkim@linux.ibm.com>
-> Reported-by: Breno Leitao <leitao@debian.org>
-> Fixes: 7918bb2d19c9 ("vhost: basic in order support")
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
+Refactor SEV's GHCB version handling to improve clarity and ABI stability.
+* Set the default GHCB version (2) for SEV-ES guests earlier in the flow
+* Remove the GHCB_VERSION_DEFAULT macro in favor of hardcoded values to
+  prevent potential ABI issues
+* Improve comments to better explain version requirements.
+* Enforce minimum GHCB version for SEV-SNP guests.
 
-I didn't see this in your pull request.
+Patches are based on kvm/next
 
-Thanks
+1. https://lore.kernel.org/kvm/aHp9EGExmlq9Kx9T@google.com/
+
+Nikunj A Dadhania (2):
+  KVM: SEV: Drop GHCB_VERSION_DEFAULT and open code it
+  KVM: SEV: Enforce minimum GHCB version requirement for SEV-SNP guests
+
+ arch/x86/kvm/svm/sev.c | 25 ++++++++++++++-----------
+ 1 file changed, 14 insertions(+), 11 deletions(-)
+
+
+base-commit: 196d9e72c4b0bd68b74a4ec7f52d248f37d0f030
+-- 
+2.43.0
 
 
