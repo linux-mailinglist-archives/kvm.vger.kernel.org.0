@@ -1,74 +1,76 @@
-Return-Path: <kvm+bounces-53898-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53899-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BA3BB19FDA
-	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 12:42:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7E09B19FDD
+	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 12:43:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 45F0218988B2
-	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 10:43:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 911F33B2901
+	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 10:43:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A03724CEEA;
-	Mon,  4 Aug 2025 10:42:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C06124CEEA;
+	Mon,  4 Aug 2025 10:43:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b="FTn+jjL5"
+	dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b="OQAgZ7zB"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
+Received: from fra-out-011.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-011.esa.eu-central-1.outbound.mail-perimeter.amazon.com [52.28.197.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFF0F2494FF
-	for <kvm@vger.kernel.org>; Mon,  4 Aug 2025 10:42:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5985B248F6F
+	for <kvm@vger.kernel.org>; Mon,  4 Aug 2025 10:43:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.28.197.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754304155; cv=none; b=ozDV5OudgFZNbf9hnpIkyhU3uVsRQoI3Ht9zm25lGcMoSYRAWgjWsbZvvJkBw04tGJUOKDVRbMExxDu0sgPRbNb8oSYQU6HIhZnJRBFZXPwuJkaRtm3kpvPc/ow6IhPl+bB+ldAv6kZsEHL3iCLEf+Tn/o0dYsDchM8KSHk72Zg=
+	t=1754304185; cv=none; b=UZ156QfDhObVLZemCRkJbQkcNo9BlH7tFI8f/j65O/m+YgNXpsZg5YChGVz8fIDuigjVq4xfuNWCkm9KiSRcymuPAt0o9tzgbOiXLpUc4mw6tsOuA0foSoknXqS579bsMWFfgD3PLqkfCRyQ/5+osiURyFoEIrUOZg8tqXHGmLg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754304155; c=relaxed/simple;
-	bh=VulvDmwrDA22km2VsZ8Ytv4utsSK79Kfl8hiW0DB0VU=;
+	s=arc-20240116; t=1754304185; c=relaxed/simple;
+	bh=BnLnAvEwvYp4PK7mzhh0NnQL4p4T7IS66WIr3EDJzh4=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hdm5KidMVGf4+Muw5whiLl3poHGXE8VBUmSpG9K/UdZV+a2CM8pyR8cmXI6+dRW11dCnhfdvQhKd1QUpj6UtsTMLk1eUiA09xxe9US710SkH5pFfoiXr8f/yfVBqoa7dHqf9O7WPWBeDJvcbP9pCU/h8pFvJHsiRBKnJ5l+PnyM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b=FTn+jjL5; arc=none smtp.client-ip=207.171.184.29
+	 MIME-Version:Content-Type; b=Fysoj8Afv8dVZ5WzKXjgi/H8pMLWODpbAZfe1JDLBE6AFbIZ8YW44t2MUFkUuGVR/S/Z+myK53Giagfec2fD03zSH1gqhUUxmecAYmd/6PdE/G3+/n3OW05of5DgrOV/xNVfCr5ZpEKDzoxYZO1Nq+G/uHAq5DlG/T72L0WMfDo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b=OQAgZ7zB; arc=none smtp.client-ip=52.28.197.132
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.de; i=@amazon.de; q=dns/txt; s=amazoncorp2;
-  t=1754304154; x=1785840154;
+  t=1754304183; x=1785840183;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=BIm0CFfNto0RblCpatIlKqB03qMjxLChdjkjgVFxIXA=;
-  b=FTn+jjL5UUrbh88CwEaekATzV3ROG9Tluf9b8mEonzxUU+mzNZRc4pr+
-   b5meVtGTpXeRQjLeXWI+xabRpsRuzeU18nCOL3CneD/3SdlWn6cS4ygqb
-   5wyk2auDSxjIc44Cyn8C2f/fORkxY7ktPGTeU40t+C5rwYl7qzg4B231W
-   lBBAeAlL8djiQ/GGdGE97N0JRriH9e2aa9iK/UxxBtQi8A0hFD40S4TWN
-   g7MeVFUCnPEKgjVLWfcx1IoFxaUl/FScHNMaZO9/dzA36Bhvc7IqblMRh
-   M1BoCYrwaj7xrdVgFqcTIRv0B2p9jA1NDfDADFNXJrgH8DatnVYgPop8O
+  bh=d8jQxMMkVLI7pHdsjGlVFTNihflHdlKkMQeNNCSgyJg=;
+  b=OQAgZ7zBP+S93Z/ElwwsMoMMeN/Ic6v8PaQIMRzeh+Ccu0eQGFtGwucb
+   2/G1NDU5l46nuafdOy+KMs5vgrMmbmLH22kLGqpCqkKoFP6S9GUmlD9rM
+   4c40uC5jS1OkkQkWs0LjE9fyS/ZKt8zaK+mMnOLxfRtYhRIabvAp3zXj0
+   Yc5HRvJlLgNSNOG58zuznJ9b9rrusJhjE+JbjuIuILlmN82VQbUXb3cty
+   Eiir9qZ1x29gU2qR2Wpg6BUnb/5EUmH8iNKGasaZYlOK10mNyb1PlPcb6
+   OKghT7ceKmF/rFfH29r8cVifEqx3VERPkJb/IadvgpBZ+dBUXWmBlT/QC
    w==;
+X-CSE-ConnectionGUID: g2mcfmN0TOy/XH7L8/NnqQ==
+X-CSE-MsgGUID: CK24HuzISqyuA4pEV5q8CA==
 X-IronPort-AV: E=Sophos;i="6.17,258,1747699200"; 
-   d="scan'208";a="542599970"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Aug 2025 10:42:29 +0000
-Received: from EX19MTAEUA002.ant.amazon.com [10.0.17.79:4401]
+   d="scan'208";a="423403"
+Received: from ip-10-6-6-97.eu-central-1.compute.internal (HELO smtpout.naws.eu-west-1.prod.farcaster.email.amazon.dev) ([10.6.6.97])
+  by internal-fra-out-011.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Aug 2025 10:42:53 +0000
+Received: from EX19MTAEUB002.ant.amazon.com [10.0.43.254:14543]
  by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.9.131:2525] with esmtp (Farcaster)
- id 382842d4-a2d1-4674-952e-f314fb1bb15c; Mon, 4 Aug 2025 10:42:27 +0000 (UTC)
-X-Farcaster-Flow-ID: 382842d4-a2d1-4674-952e-f314fb1bb15c
+ id 75b28210-16d2-48cd-8d3c-ca145c83854e; Mon, 4 Aug 2025 10:42:52 +0000 (UTC)
+X-Farcaster-Flow-ID: 75b28210-16d2-48cd-8d3c-ca145c83854e
 Received: from EX19D039EUC004.ant.amazon.com (10.252.61.190) by
- EX19MTAEUA002.ant.amazon.com (10.252.50.124) with Microsoft SMTP Server
+ EX19MTAEUB002.ant.amazon.com (10.252.51.59) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Mon, 4 Aug 2025 10:42:27 +0000
+ Mon, 4 Aug 2025 10:42:48 +0000
 Received: from dev-dsk-mngyadam-1c-cb3f7548.eu-west-1.amazon.com
  (10.253.107.175) by EX19D039EUC004.ant.amazon.com (10.252.61.190) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14; Mon, 4 Aug 2025
- 10:42:24 +0000
+ 10:42:45 +0000
 From: Mahmoud Adam <mngyadam@amazon.de>
 To: <kvm@vger.kernel.org>
 CC: <alex.williamson@redhat.com>, <jgg@ziepe.ca>, <benh@kernel.crashing.org>,
 	David Woodhouse <dwmw@amazon.co.uk>, <pravkmr@amazon.de>,
 	<nagy@khwaternagy.com>
-Subject: [RFC PATCH 4/9] vfio-pci-core: remove redundant offset calculations
-Date: Mon, 4 Aug 2025 12:39:57 +0200
-Message-ID: <20250804104012.87915-5-mngyadam@amazon.de>
+Subject: [RFC PATCH 5/9] vfio-pci-core: add vfio_pci_mmap & helpers
+Date: Mon, 4 Aug 2025 12:39:58 +0200
+Message-ID: <20250804104012.87915-6-mngyadam@amazon.de>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20250804104012.87915-1-mngyadam@amazon.de>
 References: <20250804104012.87915-1-mngyadam@amazon.de>
@@ -78,71 +80,111 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ClientProxiedBy: EX19D046UWA002.ant.amazon.com (10.13.139.39) To
+X-ClientProxiedBy: EX19D040UWB001.ant.amazon.com (10.13.138.82) To
  EX19D039EUC004.ant.amazon.com (10.252.61.190)
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 
-all switch cases are calculating the offset similarly, and they are
-not used until the end of the function, just calculate the offset once
-at the end, which makes it simpler to change the offset in one spot in
-the following patch.
+support the new vmmap solution to vfio-pci-core, this adds the
+vfio_pci_mmap struct. the core already keeps the offset and size of
+the region, extend it with bar_index.
+Add alloc helper funciton for vfio_pci, which allocates and insert
+vmmap to the mt, for the transitioning period the mtree_insert_range
+is used with the same offset calculation as the legacy solution, so
+that we don't break VFIO_PCI_OFFSET_TO_INDEX usages, eventually after
+all the vfio_pci_devices are migrated to the new ops, these macros
+will be replaced with mtree_load or similar, then maple tree
+allocation could be used instead of direct insertions.
 
 Signed-off-by: Mahmoud Adam <mngyadam@amazon.de>
 ---
- drivers/vfio/pci/vfio_pci_core.c | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
+ drivers/vfio/pci/vfio_pci_core.c | 44 ++++++++++++++++++++++++++++++++
+ include/linux/vfio_pci_core.h    | 10 ++++++++
+ 2 files changed, 54 insertions(+)
 
 diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-index 9a22969607bfe..467466a0b619f 100644
+index 467466a0b619f..7a431a03bd850 100644
 --- a/drivers/vfio/pci/vfio_pci_core.c
 +++ b/drivers/vfio/pci/vfio_pci_core.c
-@@ -1014,13 +1014,11 @@ static int vfio_pci_ioctl_get_region_info(struct vfio_pci_core_device *vdev,
- 
- 	switch (info.index) {
- 	case VFIO_PCI_CONFIG_REGION_INDEX:
--		info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
- 		info.size = pdev->cfg_size;
- 		info.flags = VFIO_REGION_INFO_FLAG_READ |
- 			     VFIO_REGION_INFO_FLAG_WRITE;
- 		break;
- 	case VFIO_PCI_BAR0_REGION_INDEX ... VFIO_PCI_BAR5_REGION_INDEX:
--		info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
- 		info.size = pci_resource_len(pdev, info.index);
- 		if (!info.size) {
- 			info.flags = 0;
-@@ -1044,7 +1042,6 @@ static int vfio_pci_ioctl_get_region_info(struct vfio_pci_core_device *vdev,
- 		size_t size;
- 		u16 cmd;
- 
--		info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
- 		info.flags = 0;
- 		info.size = 0;
- 
-@@ -1074,7 +1071,6 @@ static int vfio_pci_ioctl_get_region_info(struct vfio_pci_core_device *vdev,
- 		if (!vdev->has_vga)
- 			return -EINVAL;
- 
--		info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
- 		info.size = 0xc0000;
- 		info.flags = VFIO_REGION_INFO_FLAG_READ |
- 			     VFIO_REGION_INFO_FLAG_WRITE;
-@@ -1093,7 +1089,6 @@ static int vfio_pci_ioctl_get_region_info(struct vfio_pci_core_device *vdev,
- 
- 		i = info.index - VFIO_PCI_NUM_REGIONS;
- 
--		info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
- 		info.size = vdev->region[i].size;
- 		info.flags = vdev->region[i].flags;
- 
-@@ -1131,6 +1126,7 @@ static int vfio_pci_ioctl_get_region_info(struct vfio_pci_core_device *vdev,
- 		kfree(caps.buf);
- 	}
- 
-+	info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
- 	return copy_to_user(arg, &info, minsz) ? -EFAULT : 0;
+@@ -882,6 +882,50 @@ static int msix_mmappable_cap(struct vfio_pci_core_device *vdev,
+ 	return vfio_info_add_capability(caps, &header, sizeof(header));
  }
  
++static void vfio_pci_mmap_free(struct vfio_mmap *core_vmmap)
++{
++	struct vfio_pci_mmap *vmmap = container_of(core_vmmap,
++						   struct vfio_pci_mmap,
++						   core);
++	kfree(vmmap);
++}
++
++static struct vfio_mmap_ops vfio_pci_mmap_ops = {
++	.free = vfio_pci_mmap_free,
++};
++
++int vfio_pci_mmap_alloc(struct vfio_pci_core_device *vdev,
++			struct maple_tree *mmap_mt, u32 region_flags,
++			size_t bar_size, unsigned int bar_index,
++			unsigned long *offset)
++{
++	struct vfio_pci_mmap *vmmap;
++	int ret;
++	unsigned long alloc_size;
++	vmmap = kzalloc(sizeof(*vmmap), GFP_KERNEL);
++	if (!vmmap)
++		return -ENOMEM;
++
++	alloc_size = PAGE_ALIGN(bar_size);
++	/* keep the offset aligned to the current usage for now, so we
++	 * don't break VFIO_PCI_OFFSET_TO_INDEX */
++	*offset = VFIO_PCI_INDEX_TO_OFFSET(bar_index);
++	vmmap->bar_index = bar_index;
++	vfio_mmap_init(&vdev->vdev, &vmmap->core, region_flags,
++		       *offset, alloc_size, &vfio_pci_mmap_ops);
++	ret = mtree_insert_range(mmap_mt, *offset,
++				 *offset + alloc_size - 1,
++				 &vmmap->core, GFP_KERNEL);
++	if (ret) {
++		vfio_mmap_free(&vmmap->core);
++		/* for now if it exists reuse it */
++		if (ret != -EEXIST)
++			return ret;
++	}
++	return 0;
++}
++EXPORT_SYMBOL(vfio_pci_mmap_alloc);
++
+ int vfio_pci_core_register_dev_region(struct vfio_pci_core_device *vdev,
+ 				      unsigned int type, unsigned int subtype,
+ 				      const struct vfio_pci_regops *ops,
+diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
+index fbb472dd99b36..532d2914a9c2e 100644
+--- a/include/linux/vfio_pci_core.h
++++ b/include/linux/vfio_pci_core.h
+@@ -49,6 +49,11 @@ struct vfio_pci_region {
+ 	u32				flags;
+ };
+ 
++struct vfio_pci_mmap {
++	struct vfio_mmap	core;
++	unsigned int		bar_index;
++};
++
+ struct vfio_pci_core_device {
+ 	struct vfio_device	vdev;
+ 	struct pci_dev		*pdev;
+@@ -137,6 +142,11 @@ bool vfio_pci_core_range_intersect_range(loff_t buf_start, size_t buf_cnt,
+ 					 loff_t *buf_offset,
+ 					 size_t *intersect_count,
+ 					 size_t *register_offset);
++int vfio_pci_mmap_alloc(struct vfio_pci_core_device *vdev,
++			struct maple_tree *mmap_mt, u32 region_flags,
++			size_t bar_size, unsigned int bar_index,
++			unsigned long *offset);
++
+ #define VFIO_IOWRITE_DECLARATION(size) \
+ int vfio_pci_core_iowrite##size(struct vfio_pci_core_device *vdev,	\
+ 			bool test_mem, u##size val, void __iomem *io);
 -- 
 2.47.3
 
