@@ -1,198 +1,142 @@
-Return-Path: <kvm+bounces-53941-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53942-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7902EB1A9BC
-	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 21:45:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C53D5B1A9FE
+	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 22:10:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0922A189E7A9
-	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 19:45:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D6D36210FF
+	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 20:10:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A18E427057C;
-	Mon,  4 Aug 2025 19:45:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DAAF22D4F9;
+	Mon,  4 Aug 2025 20:09:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b="MQJa0xO1"
+	dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b="QDyJVIRS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41DC81C5F09
-	for <kvm@vger.kernel.org>; Mon,  4 Aug 2025 19:45:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 634992163BD
+	for <kvm@vger.kernel.org>; Mon,  4 Aug 2025 20:09:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754336717; cv=none; b=BCwHE6DZ6vt/i2yrMG37PRkJpzavEXKpqU5PxcgW+g5iY8nv3v+yA92R1VDV1ar4+809gAUN2Ok5ahKPZdKxvBqG9AyAxuUVIHWp1vJNgmkUgP5O9t7ky+alxZeiQylPjhkmng0fzbSikvfrnJ18Bbw/z92fZX+MrACb3P/MVuA=
+	t=1754338196; cv=none; b=ZrOHqlMn2rCHt1RPGhrcexfBiT1JSFwlrmwnFwSuOtrWDQkuMUw+vAdh3LicryNIkdB/7Pd/Sd9SBP4zYHI6Dg6jzvHEL51xvL8yivG5i32aZmcEvAR2tPCRvRAceXgCBNtKwoXh1VEPFO7EKvYtD3Yw8g9fvtpu5BQ+7dF+Bzw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754336717; c=relaxed/simple;
-	bh=c7rbkNvorHYNUyUvX7St0nzo+pvC88RaUChbhCyQ0yY=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=AjGmLeZIbRQ9L/rrFbY8Vn2XJ9Cg6XwDVu/GdPhyibpyWKpnwbfVLfjp77EU/YBWmHuRW5J/J8kuBq6Q1dzsitIDBVpz7rvXvXOWgXlhmAK107GG9ByfuFNSooKZ3nPWgu65P5xHTM+W0zhQlrjtjCXI/WriLO/vLy9usmgxyl4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b=MQJa0xO1; arc=none smtp.client-ip=67.231.145.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0148461.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 574Ja1L9015046
-	for <kvm@vger.kernel.org>; Mon, 4 Aug 2025 12:45:15 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=cc
-	:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=s2048-2025-q2; bh=+vcuCKkE+wWLuNEnWz
-	pUPZk0WUYjifJncgMJPAgYp0M=; b=MQJa0xO1XmjXXk2pxMAEtnn5RhuaKMbtla
-	9ZQd+QrghU9kUyNTi8jK5RDqSOpGneJ/fetT1aqsAnB5sxL2LN37PAeKvDu+1hjO
-	gNLtjUzC8oR67K3TsP6SVdUzrchYOwHaDbE/gxymDLztIp8S5IcAZUSGrMzgzyZQ
-	pDrngouU4eyePBJzKfx02g+Rl16EmodqEDf21TEoxPK+wCJPHc1KZfShB7ZVsgf/
-	kvPuIiSnw6gWEZiVxbobi1ptsYlMGlrnKOKbqVYcNZLHLrqIq4Lfqxzi+EK8D/4U
-	Tc1jM91Wvhh0Q/CVmYvmjdIEi0Nle4WNchnifB/ozeNp+evF69YA==
-Received: from maileast.thefacebook.com ([163.114.135.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 489ftdbn75-2
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <kvm@vger.kernel.org>; Mon, 04 Aug 2025 12:45:15 -0700 (PDT)
-Received: from twshared21625.15.frc2.facebook.com (2620:10d:c0a8:fe::f072) by
- mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.17; Mon, 4 Aug 2025 19:45:13 +0000
-Received: by devgpu013.nha3.facebook.com (Postfix, from userid 199522)
-	id C6C1C65C1FC; Mon,  4 Aug 2025 12:44:57 -0700 (PDT)
-From: Alex Mastro <amastro@fb.com>
-Date: Mon, 4 Aug 2025 12:44:31 -0700
-Subject: [PATCH v4] vfio/pci: print vfio-device syspath to fdinfo
+	s=arc-20240116; t=1754338196; c=relaxed/simple;
+	bh=LlFQt1npKd9E4Y229fB9LDmsb/DxHpM1loy0sxSSBx0=;
+	h=Subject:From:To:CC:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=LndK5apK2miFdYygK4v2LQiSzzHXP6j2UMYeGEOZvHTJCdATK1YAQJpxtYsitZUEzUed8OXC7FTQd5llV3JjbMovYCp41urcYKOf3TTiVBDjHXbg6Vcl3Gynp3fqSSldaUM9FFiAeLGWtxMdudV/A1Ksr4GSJyEiSDmzZG76EPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b=QDyJVIRS; arc=none smtp.client-ip=99.78.197.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazoncorp2;
+  t=1754338194; x=1785874194;
+  h=from:to:cc:in-reply-to:references:date:message-id:
+   mime-version:subject;
+  bh=ujtsu1cKS+pAlUW6T11oIWDs07fg2e8k56UaKs5EiHM=;
+  b=QDyJVIRSjiVz0bS3IWSOHNApIFuaJVv3cpeTlriY6I/xEiH02A8dbyNU
+   o67Bie/QlHOzvfb5W3obh10qfocNgvPwpTmCPXy2W6asJWJwl2Ubul4+w
+   oOID53On1lApN5CAdRm6ugQ6ePU57klooopmm5FVhep5ZEvXCxltMCbje
+   UtJmzidS/lAa2rxxmOMqT971QYJV9UA2xLfHg0Dg/EZaXAI7VHMKCl1j/
+   +vmpMusRvWEj+tNSO1/cXdNIpkHr88Rw6aQm0mJOb2GQBh4YPEHzi1il/
+   2sFzmUHU2KWVdFJuy3fPkNRJx/lGpeeCXMr83CQG4FWJFqtRaa/7bmpXn
+   g==;
+X-IronPort-AV: E=Sophos;i="6.17,265,1747699200"; 
+   d="scan'208";a="219205153"
+Subject: Re: [RFC PATCH 0/9] vfio: Introduce mmap maple tree
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Aug 2025 20:09:52 +0000
+Received: from EX19MTAEUA002.ant.amazon.com [10.0.10.100:3825]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.29.0:2525] with esmtp (Farcaster)
+ id 98e78347-9cd6-4d3e-a348-f584c2a21f08; Mon, 4 Aug 2025 20:09:51 +0000 (UTC)
+X-Farcaster-Flow-ID: 98e78347-9cd6-4d3e-a348-f584c2a21f08
+Received: from EX19D039EUC004.ant.amazon.com (10.252.61.190) by
+ EX19MTAEUA002.ant.amazon.com (10.252.50.126) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Mon, 4 Aug 2025 20:09:50 +0000
+Received: from dev-dsk-mngyadam-1c-cb3f7548.eu-west-1.amazon.com.amazon.de
+ (10.253.107.175) by EX19D039EUC004.ant.amazon.com (10.252.61.190) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14; Mon, 4 Aug 2025
+ 20:09:47 +0000
+From: Mahmoud Nagy Adam <mngyadam@amazon.de>
+To: Alex Williamson <alex.williamson@redhat.com>
+CC: <kvm@vger.kernel.org>, <jgg@ziepe.ca>, <benh@kernel.crashing.org>, "David
+ Woodhouse" <dwmw@amazon.co.uk>, <pravkmr@amazon.de>, <nagy@khwaternagy.com>
+In-Reply-To: <20250804124909.67462343.alex.williamson@redhat.com> (Alex
+	Williamson's message of "Mon, 4 Aug 2025 12:49:09 -0600")
+References: <20250804104012.87915-1-mngyadam@amazon.de>
+	<20250804124909.67462343.alex.williamson@redhat.com>
+Date: Mon, 4 Aug 2025 22:09:44 +0200
+Message-ID: <lrkyq5xf27ss7.fsf@dev-dsk-mngyadam-1c-cb3f7548.eu-west-1.amazon.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-ID: <20250804-show-fdinfo-v4-1-96b14c5691b3@fb.com>
-X-B4-Tracking: v=1; b=H4sIAJ4NkWgC/23OsQ7CIBSF4VdpmMUALbY4+R6mA4V7haHFQIOap
- u8ubWKMieM/nC9nIQmih0TO1UIiZJ98mEo0h4oYp6cbUG9LE8GEZB3jNLnwoGj9hIECcqaMbuv
- OICmLewT0z1279qUxhpHOLoL+Gq1ofowsKKdCScG5BGs4u+BwNGHcPOfTHOJrP5frTf3/I9fF4
- Cdp0eihU4P6GP26rm+VDqTq4wAAAA==
-To: Alex Williamson <alex.williamson@redhat.com>,
-        Jonathan Corbet
-	<corbet@lwn.net>
-CC: Jason Gunthorpe <jgg@ziepe.ca>, Keith Busch <kbusch@kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
-        <linux-doc@vger.kernel.org>, <kvm@vger.kernel.org>,
-        Alex Mastro
-	<amastro@fb.com>
-X-Mailer: b4 0.13.0
-X-FB-Internal: Safe
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODA0MDExNiBTYWx0ZWRfX5kWMPEXyAdlz /ReRc4+pr91PVYwIta5cGGVh441DCNiJ0eiWAIMDmknxkL7WLfE8EPtNluDwjqbndXvsKMFhEYj KROv5eYs5w6Y1nWRs594lFMpnqkG2gS8YYoVHT5H5oHZVlvNLWCsYKgoirCHFzw7qu/k/AzAJXk
- gq+m8/5H96ebynEJ9irFYCvO+Q+na4unzq3LcYISmTJ6x4i7c6gq+WG0YHJMEbwpDfqDyk7Cgpg u8j2S+zn0jAJ14/8Y5uwZNuK9nVCYZSTcWkHWVmAAs3CkupSvePZO4wpj5wmc1s1MFYCZrZkwB9 4sK+hZKGusQU0iq8Jc5EYH5MphDX6hsbwkgU8qCIJxxNSU4LvMEh1aPHLghru74LireZEQsZscw
- UjASn8DSrta6wDO2jo9l2G7tJTuQNkvvZxao+8x92LoQ/RBzcAXDRskqO8qpGqDFpuml7EVw
-X-Authority-Analysis: v=2.4 cv=dOqmmPZb c=1 sm=1 tr=0 ts=68910dcb cx=c_pps a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17 a=IkcTkHD0fZMA:10 a=2OwXVqhp2XgA:10 a=VwQbUJbxAAAA:8 a=FOH2dFAWAAAA:8 a=MILNgg9B0xYF0ryEdecA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-ORIG-GUID: mXEKzAEqQG4HzH_XCWPABm5AYx8jAQZI
-X-Proofpoint-GUID: mXEKzAEqQG4HzH_XCWPABm5AYx8jAQZI
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-08-04_08,2025-08-04_01,2025-03-28_01
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D041UWA001.ant.amazon.com (10.13.139.124) To
+ EX19D039EUC004.ant.amazon.com (10.252.61.190)
 
-Print the PCI device syspath to a vfio device's fdinfo. This enables tools
-to query which device is associated with a given vfio device fd.
+Alex Williamson <alex.williamson@redhat.com> writes:
 
-This results in output like below:
 
-$ cat /proc/"$SOME_PID"/fdinfo/"$VFIO_FD" | grep vfio
-vfio-device-syspath: /sys/devices/pci0000:e0/0000:e0:01.1/0000:e1:00.0/0000:e2:05.0/0000:e8:00.0
+>
+> I'm lost.  AIUI, there was a proposal to manage region offsets via a
+> maple tree, specifically to get a more compact mapping, which I think
+> is meant to allow new regions (mmap cookies) to be created which are
+> effectively aliases to other regions with different mapping attributes.
+>
+> Here we have a partial conversion to a maple tree, but the proposed
+> ioctl is only specifying a mapping attribute for an existing offset.
+> How does this require or take advantage of the maple tree?
+>
 
-Signed-off-by: Alex Mastro <amastro@fb.com>
----
-Changes in v4:
-- Remove changes to vfio.h
-- Link to v3: https://lore.kernel.org/r/20250801-show-fdinfo-v3-1-165dfcab89b9@fb.com
-Changes in v3:
-- Remove changes to vfio_pci.c
-- Add section to Documentation/filesystems/proc.rst
-- Link to v2: https://lore.kernel.org/all/20250724-show-fdinfo-v2-1-2952115edc10@fb.com
-Changes in v2:
-- Instead of PCI bdf, print the fully-qualified syspath (prefixed by
-  /sys) to fdinfo.
-- Rename the field to "vfio-device-syspath". The term "syspath" was
-  chosen for consistency e.g. libudev's usage of the term.
-- Link to v1: https://lore.kernel.org/r/20250623-vfio-fdinfo-v1-1-c9cec65a2922@fb.com
----
- Documentation/filesystems/proc.rst | 14 ++++++++++++++
- drivers/vfio/vfio_main.c           | 20 ++++++++++++++++++++
- 2 files changed, 34 insertions(+)
+I think you are mentioning the vfio-pci-core ioctl implementation, as I
+mentioned in the proposed patch I'm using region insert with mt which is
+using the same offset calculation for the transitioning period, but this
+will change to allocating a free region in maple_tree after moving the
+vfio-pci devices to the new ops and changing the usage of the
+OFFSET_TO_INDEX macros.
 
-diff --git a/Documentation/filesystems/proc.rst b/Documentation/filesystems/proc.rst
-index 2a17865dfe39..fc5ed3117834 100644
---- a/Documentation/filesystems/proc.rst
-+++ b/Documentation/filesystems/proc.rst
-@@ -2162,6 +2162,20 @@ DMA Buffer files
- where 'size' is the size of the DMA buffer in bytes. 'count' is the file count of
- the DMA buffer file. 'exp_name' is the name of the DMA buffer exporter.
- 
-+VFIO Device files
-+~~~~~~~~~~~~~~~~
-+
-+::
-+
-+	pos:    0
-+	flags:  02000002
-+	mnt_id: 17
-+	ino:    5122
-+	vfio-device-syspath: /sys/devices/pci0000:e0/0000:e0:01.1/0000:e1:00.0/0000:e2:05.0/0000:e8:00.0
-+
-+where 'vfio-device-syspath' is the sysfs path corresponding to the VFIO device
-+file.
-+
- 3.9	/proc/<pid>/map_files - Information about memory mapped files
- ---------------------------------------------------------------------
- This directory contains symbolic links which represent memory mapped files
-diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-index 1fd261efc582..37a39cee10ed 100644
---- a/drivers/vfio/vfio_main.c
-+++ b/drivers/vfio/vfio_main.c
-@@ -28,6 +28,7 @@
- #include <linux/pseudo_fs.h>
- #include <linux/rwsem.h>
- #include <linux/sched.h>
-+#include <linux/seq_file.h>
- #include <linux/slab.h>
- #include <linux/stat.h>
- #include <linux/string.h>
-@@ -1354,6 +1355,22 @@ static int vfio_device_fops_mmap(struct file *filep, struct vm_area_struct *vma)
- 	return device->ops->mmap(device, vma);
- }
- 
-+#ifdef CONFIG_PROC_FS
-+static void vfio_device_show_fdinfo(struct seq_file *m, struct file *filep)
-+{
-+	char *path;
-+	struct vfio_device_file *df = filep->private_data;
-+	struct vfio_device *device = df->device;
-+
-+	path = kobject_get_path(&device->dev->kobj, GFP_KERNEL);
-+	if (!path)
-+		return;
-+
-+	seq_printf(m, "vfio-device-syspath: /sys%s\n", path);
-+	kfree(path);
-+}
-+#endif
-+
- const struct file_operations vfio_device_fops = {
- 	.owner		= THIS_MODULE,
- 	.open		= vfio_device_fops_cdev_open,
-@@ -1363,6 +1380,9 @@ const struct file_operations vfio_device_fops = {
- 	.unlocked_ioctl	= vfio_device_fops_unl_ioctl,
- 	.compat_ioctl	= compat_ptr_ioctl,
- 	.mmap		= vfio_device_fops_mmap,
-+#ifdef CONFIG_PROC_FS
-+	.show_fdinfo	= vfio_device_show_fdinfo,
-+#endif
- };
- 
- static struct vfio_device *vfio_device_from_file(struct file *file)
+I wanted first to move all the vfio-pci devices to the new ops first,
+then changing the OFFSET_TO_INDEX macro afterwards, to avoid duplicating
+all the codes that do this calculations which includes page faults code
+etc..
 
----
-base-commit: 4518e5a60c7fbf0cdff393c2681db39d77b4f87e
-change-id: 20250801-show-fdinfo-ef109ca738cf
+But so far we are advantaging from per FD range attributes for mmaping,
+and extra regions can already be used by design.
 
-Best regards,
--- 
-Alex Mastro <amastro@fb.com>
+
+> We should be able to convert to a maple tree without introducing these
+> "legacy" ops.
+
+This technically be done directly by changing the current ops (ioctl,
+mmap, read & write) to add vmmap argument in place and call the ops with
+NULL for vmmap entry if the entry not found in the mt, instead of
+returning -EINVAL in vfio (vfio-devices could check that
+themselves). instead of this transitioning stage that this RFC is
+implementing.
+
+I probably need to also update read & write ops to use the vmmap in the
+same patch as well.
+
+Thanks,
+MNAdam
+
+
+
+Amazon Web Services Development Center Germany GmbH
+Tamara-Danz-Str. 13
+10243 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
+Sitz: Berlin
+Ust-ID: DE 365 538 597
 
 
