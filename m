@@ -1,82 +1,82 @@
-Return-Path: <kvm+bounces-53889-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53890-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F089B19E9E
-	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 11:16:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EE44B19ED6
+	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 11:36:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 90979178766
-	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 09:16:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CBC52189B1F5
+	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 09:36:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7093A23FC66;
-	Mon,  4 Aug 2025 09:16:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94457244673;
+	Mon,  4 Aug 2025 09:36:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="upcHJXwv"
+	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="eZS9zSLF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1D9A2036E9
-	for <kvm@vger.kernel.org>; Mon,  4 Aug 2025 09:16:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29BEF23ABBD
+	for <kvm@vger.kernel.org>; Mon,  4 Aug 2025 09:35:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754298989; cv=none; b=F8H+JRIXx26rb3IaIeE/ZqKS0J8kMehm2LkgpIPmmlPMostNjKFuVZyZ48hUdQjMp+wwb5MDSuTVTaSqFoOimBWrl9DuYHwdDWoB74G0CdOb9gAQu6giZpdDQR5PFzR4IdZJdD7PQB2fWvE0PP4L1sPrI8eSMajZVBsFDeyBm7o=
+	t=1754300160; cv=none; b=qVE/V967Uc5B79m87GiUd4GXsVM59ICtyqEcry2CFK1HPi/AczypV2jZ2f5v/9+txEcw8MBwgJuxmtqBxfVQ91yk6L4rb6zv5N6jpY2T4c5P+2AQS+sI1zR1Pd/ABsOO2jJFp5prjnQepgfXypQQ/rio+rgKlODyudMtQOIB49E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754298989; c=relaxed/simple;
-	bh=6btEnBaLQge5Ota5TiOhwS7x5AH8q2Hq8ygdnvPmMO8=;
+	s=arc-20240116; t=1754300160; c=relaxed/simple;
+	bh=RSEUUDPk0ivxtKPryYLZckoW5/oxzbqoOUtFYK7FH1w=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KTcbC8bfOsAKBI/ViTh0EZn/Gb9xrSuPI02cN8dVkEW+JWNoRBJVNosDbSVWkmKRtZ/H87Y2jXi1gOjhZcvywB/xAUfX1grqTz1yjMd5ofY5ZWJ3TJfaDbqoTl+GxycycRSGYuPTJb7DUaPLOyHLxEao0NnW766BBqdxKbPpgCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=upcHJXwv; arc=none smtp.client-ip=209.85.222.170
+	 In-Reply-To:Content-Type; b=Bv3fL+dtE/fLNV2YLmVQzgDVKH7pInb/OhtI6+HXSIRDyRVDXlcRJIY97uJIWXs4ckA+a4Zlu8SizrLRPgSPLqNdvlAmlNKMp7wxPepYVtMekxu3fN4BZjtrwmQ3Q5fme/20YhefezPIHIvPx1t3dH+thvXlFmyNwGB/PAVtNx0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=eZS9zSLF; arc=none smtp.client-ip=209.85.222.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensrcsec.com
-Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-7e6696eb4bfso309651585a.2
-        for <kvm@vger.kernel.org>; Mon, 04 Aug 2025 02:16:27 -0700 (PDT)
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-7e691926a6aso213401685a.3
+        for <kvm@vger.kernel.org>; Mon, 04 Aug 2025 02:35:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=grsecurity.net; s=grsec; t=1754298986; x=1754903786; darn=vger.kernel.org;
+        d=grsecurity.net; s=grsec; t=1754300158; x=1754904958; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=NSPtN0kwWtvNDBd+lpKApr9yaknC2JKVLS9pzdP+iSI=;
-        b=upcHJXwviUV2OCnU4ndJ9H35xWC9za1s10cwVECaep6Jl/GllAvO/igw2LgmJPyoOE
-         kD8tMjn5v+nr669BFLzGZSwJJB45LuiHQET3s7y++28TAdDJHazrVq7nVI20sXyS1zq1
-         8nKEPwf6VZTxkAI+mi/YFdCkk24eg2DQZZwxme4fMPGnfZLHeZjWThR9YnO3awkl0hNH
-         crFq18SJVZpX8X5J0jhW8PBhjtJrOlDzcOmD2TRv7Bz7i8SLvBze/5acAS0sqakftWRu
-         Tuqb0uPwWHik3BSa/k1g6loyLjJO7YBLKsVSv4T+uwHAOcnmHD9Y1zOc1fQSfe1KxpzO
-         mfOw==
+        bh=sSGViVqk8tYm1Hl4rf3sipWjZp79oeSys3OXdOq7qQ0=;
+        b=eZS9zSLFhjC2fCy8UwDFwaFdpatvwuoEdy4acDKSZ4FqZ+vVqX5lJRmPk513QzFA50
+         JXXN9rJBSkcONN01snAZcd4PHXk5v27xJT29yBrpqoUbkCdS/4DfbBkm2qspFqsvWxW6
+         6QMOtA6oZ9WZoK6o8a3l+Lug5f7tmUs/tfOe4obqKVryecHUgoT5w9gNguotaHRrazuP
+         mxO/pdzjBMW+TSC+X7m12Pdxo+PqWOyY5eas0EMU0n0El2Klow2lZSRRW+PuyP47K7FA
+         8pVUgeVTFd9q/D4u/dOZD0BzJpWCiM8MBRGZ1p+8ZcE0KmojzUwcLaE2Rdt/RUg5Nc+5
+         v5UQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754298986; x=1754903786;
+        d=1e100.net; s=20230601; t=1754300158; x=1754904958;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NSPtN0kwWtvNDBd+lpKApr9yaknC2JKVLS9pzdP+iSI=;
-        b=Z6hhc8/iy+Kym4xn9ZdP1eqWmagn//1aBUBUSd9c4FHG5jhdnyHH6HGUdKeY/gkQLH
-         ambR+5Pclm8DcJQU4+2jT8pPNIsmkpHzBWlS+4m5e1hs8Q1uJn3Z/I9aJzB1BmtQ2RVC
-         8M6gOKzOuBeKNZYpl0mUddBeKUmErTNQMCB9XgHvDz007W5DAxG/jN662BCwJrRMawtL
-         1XLEhst31wRMnFQFQa8OnCID2p8rM4Ah2a7vdFdwd2N3mLQykMoF3nJT/zshWFFqaM4G
-         96cd8qURlbksHZzGwssHHHl6bHxL0969NBWIPFtSCTBW7o99oM4FeITrkxoBkCneyi1M
-         +G/Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUk7wgFIhQZ0blS9McWxXEywNFam6B76tMo4trMvLeUXC0BVV/YcKUQ/5h+HfUUQgJsHEc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxhlA96bM44GsQONE+z4Ds3Z+rWBfwsvKl5Po3TfgW2ApiobiqQ
-	Py5f7gU9iA5lafFaF6moAX5LyCmYn2TM6Lce3F+SE2hSN4o8xXKkBMoorHRrQe6Go1o=
-X-Gm-Gg: ASbGnctXNFEiwDiCPEGbbMdRVv2DkoxTgwzTs23w7ZSlVLgmx4k+Lf/5vneOdEWHd+1
-	9zxn/vWl58kQVD5EzZXpoK7hUOiY5UnMPM5kp27QhXgfiuV661Efky+MRzQhoa1sZdm/vzW8c1v
-	uWSy3Lm2//zmOIUJuwF8ciB4hUWUwtJArCpY3d4JgivXo8sYZK7RZsMVJZThBjeMMNtAUfEyENI
-	AhwdID7FuEas/dixhTQiTv8aZZ2OKe2qJeT1rQ2JOEOPxGqnZSmD892TTCvs+PpD410dbEW+siN
-	73hLn1z1ndxVeybaAQ4zUnBbGIzxQmEW5gBtY9Mdx/bn9N77FMFJGdtv2jnSqFI8aBAlx3ldT7M
-	r9Oqj9P5WxMBTs9d4QQ3rDRNTQ1yeQJFrNtb/h8NAgqV5cMRPtvx56S7groecFEJ5PCrq+bgPuL
-	ltEUCv7kAvUMtBIp7M9jqf0MPOU+n6H8Vz2PLxipz/NAaKjItuhUckRAY=
-X-Google-Smtp-Source: AGHT+IGTopjFjRqcg4szc6xtYjmVRr/+qF9GoJYZct1NGmlBsIGmn39Z+j/4xEoL90Wd9djgyiYXsQ==
-X-Received: by 2002:a05:620a:471f:b0:7e8:48d:85f0 with SMTP id af79cd13be357-7e8048d8bf7mr172974485a.4.1754298986305;
-        Mon, 04 Aug 2025 02:16:26 -0700 (PDT)
+        bh=sSGViVqk8tYm1Hl4rf3sipWjZp79oeSys3OXdOq7qQ0=;
+        b=PRbhD5QSFG2RCwzk2Jfd0TaPeaQkmkaO+VLdXRkSSZd0uGwysVe7uwD67TS6spdFgY
+         KYKBbcehlt257g/KGE15YFKQ9mgFxtfahbRfzz+39IkGh+CPyuik5sYX6+2dimkcLfhB
+         xLtgOh9oz6vkm5cvZNVMy14QIIng/ApKeI7DLjdH6QXfK425XoSi5jWzo0B1vVKwvmqK
+         BnjCbyy/1AXWNqrGuo+B54emwfqXRLcOyxUhc+wlJ30AjNDvJdnyTOzMMYGLkH6eh7dd
+         v4Rly+pnoMwBvjrrEcH9DHVgmjwLPlFzGgk6dkkca/z3bO1vLwW1xZM8gnVDseP9OBkN
+         Y0eA==
+X-Forwarded-Encrypted: i=1; AJvYcCUOIvu51/o72C3SOmikFq16KxsW0Eht0e5VcyB4s83veJWQymaKwAeqIDLogeyRC4h2YOE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzsh5S3gLlCdK+/bolna1Aldg8EC2i/WoXJeYopkBr4aCRPCE/J
+	4ovkECzG6itYBtuKmW2B2AqXIgMU4rzJYiinlVaXzXeaR12qsCevzNGGNmqgxwBVp0k=
+X-Gm-Gg: ASbGncumrBYbUJsZjTeYArExGtQSc4kAcFc9aaAkay5SoYjA8yWm2yhLGc0NOhguHib
+	TZ3aIYS3nthCq5LwxYgxdvd2h3zx43XNNjVFpzpv9KOD31fQKKQOooKd3r2CpmSVH0ViHQBMA0O
+	hxdilTTWf3dWIGYPGiqPyxGuMV1xiaPRx5CXZM34mnBnkjf6zxF4hgEdh7DIxxxtSXhuMbxvb35
+	79s2l0SZqplKD2F0TpnbWihm1zVx1rH2hjoTfBdgA5Qc79/iVxerLYu6ql3bj3teuONH6QcRTEL
+	bYRKW8swA+tj4U+spqy+cFbsI5VchNXNf4MbOotxnaHLuZJflHqmx3sZWTp4nV+HZvpLX1Uw5As
+	bvBJBM+OMKniH8O6n0xPap/D3tzdgb3Iixz7lyI32r/JDh5Qa4myOiTgRi8gklRvVlBaIVxot9L
+	wcs3Hm/2Aw9DRQquNY/jEKzARDkfazlTsBzu32VKOSb/Qo0sBrFmifz46Soneg9d/Org==
+X-Google-Smtp-Source: AGHT+IGbM9Mk6uhLMIfQkTcN7oqrD3mx+58S38TYJ9YZp0XYWcvPrm86ys90AFtGU4ZHqA92/ooSxw==
+X-Received: by 2002:a05:620a:21c6:b0:7e3:4678:aae with SMTP id af79cd13be357-7e6963543e9mr973213885a.41.1754300157937;
+        Mon, 04 Aug 2025 02:35:57 -0700 (PDT)
 Received: from ?IPV6:2003:fa:af22:cf00:2208:a86d:dff:5ae9? (p200300faaf22cf002208a86d0dff5ae9.dip0.t-ipconnect.de. [2003:fa:af22:cf00:2208:a86d:dff:5ae9])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7e7f9d4ea94sm142643385a.89.2025.08.04.02.16.24
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7e67f594206sm521802385a.4.2025.08.04.02.35.55
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 Aug 2025 02:16:26 -0700 (PDT)
-Message-ID: <1bc67fb2-088d-4d6d-838c-d826aa8eb03c@grsecurity.net>
-Date: Mon, 4 Aug 2025 11:16:22 +0200
+        Mon, 04 Aug 2025 02:35:57 -0700 (PDT)
+Message-ID: <b0179d3d-d36a-4ae8-b32c-5659794995db@grsecurity.net>
+Date: Mon, 4 Aug 2025 11:35:54 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -84,15 +84,14 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3] i386/kvm: Provide knob to disable hypercall patching
- quirk
-To: Xiaoyao Li <xiaoyao.li@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
- qemu-devel@nongnu.org
-Cc: Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org,
+Subject: Re: [PATCH] i386/kvm: Disable hypercall patching quirk by default
+To: David Woodhouse <dwmw2@infradead.org>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti
+ <mtosatti@redhat.com>, kvm@vger.kernel.org,
  Oliver Upton <oliver.upton@linux.dev>,
  Sean Christopherson <seanjc@google.com>
-References: <20250801131226.2729893-1-minipli@grsecurity.net>
- <6bcf6108-2d0c-44ae-a9f7-2f53ca23af7a@intel.com>
+References: <20250619194204.1089048-1-minipli@grsecurity.net>
+ <271351582cbe88731098bd4fbdd8f7ef522f20f6.camel@infradead.org>
 Content-Language: en-US, de-DE
 From: Mathias Krause <minipli@grsecurity.net>
 Autocrypt: addr=minipli@grsecurity.net; keydata=
@@ -129,84 +128,75 @@ Autocrypt: addr=minipli@grsecurity.net; keydata=
  zz3lozuC5nsm1nIbY62mR25Kikx7N6uL7TAZQWazURzVRe1xq2MqcF+18JTDdjzn53PEbg7L
  VeNDGqQ5lJk+rATW2VAy8zasP2/aqCPmSjlCogC6vgCot9mj+lmMkRUxspxCHDEms13K41tH
  RzDVkdgPJkL/NFTKZHo5foFXNi89kA==
-In-Reply-To: <6bcf6108-2d0c-44ae-a9f7-2f53ca23af7a@intel.com>
+In-Reply-To: <271351582cbe88731098bd4fbdd8f7ef522f20f6.camel@infradead.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 04.08.25 05:32, Xiaoyao Li wrote:
-> On 8/1/2025 9:12 PM, Mathias Krause wrote:
->> [...]
+On 23.07.25 11:26, David Woodhouse wrote:
+> On Thu, 2025-06-19 at 21:42 +0200, Mathias Krause wrote:
+>> KVM has a weird behaviour when a guest executes VMCALL on an AMD system
+>> or VMMCALL on an Intel CPU. Both naturally generate an invalid opcode
+>> exception (#UD) as they are just the wrong instruction for the CPU
+>> given. But instead of forwarding the exception to the guest, KVM tries
+>> to patch the guest instruction to match the host's actual hypercall
+>> instruction. That is doomed to fail as read-only code is rather the
+>> standard these days. But, instead of letting go the patching attempt and
+>> falling back to #UD injection, KVM injects the page fault instead.
 >>
->> For regular operating systems, however, the patching wouldn't be needed,
->> nor work at all. If it would, these systrems would be vulnerable to
->> memory corruption attacks, freely overwriting kernel code as they
->> please.
+>> That's wrong on multiple levels. Not only isn't that a valid exception
+>> to be generated by these instructions, confusing attempts to handle
+>> them. It also destroys guest state by doing so, namely the value of CR2.
+>>
+>> Sean attempted to fix that in KVM[1] but the patch was never applied.
+>>
+>> Later, Oliver added a quirk bit in [2] so the behaviour can, at least,
+>> conceptually be disabled. Paolo even called out to add this very
+>> functionality to disable the quirk in QEMU[3]. So lets just do it.
+>>
+>> A new property 'hypercall-patching=on|off' is added, for the very
+>> unlikely case that there are setups that really need the patching.
+>> However, these would be vulnerable to memory corruption attacks freely
+>> overwriting code as they please. So, my guess is, there are exactly 0
+>> systems out there requiring this quirk.
 > 
-> For non-coco VMs, the systems are surely vulnerable to memory corruption
-> attacks that the host VMM is free to modify the guest memory. It's
-> irrelevant to whether hypercall patching is needed or works.
-
-Sure, a VMM could mess with the guest's memory as it pleases. However, I
-meant possible attacks from *within* the guest, as in allowing code
-modifications to happen by having W+X mappings, allowing possibly
-malicious modifications of such.
-
->> [...]
->> ---
->> Xiaoyao, I left out your Tested-by and Reviewed-by as I changed the code
->> (slightly) and it didn't felt right to pick these up. However, as only
->> the default value changed, the functionality would be the same if you
->> tested both cases explicitly (-accel kvm,hypercall-patching={on,off}).
+> I am always wary of making assumptions about how guests behave in the
+> general case. Every time we do so, we seem to find that *some* ancient
+> version of some random network applicance — or FreeBSD — does exactly
+> the thing we considered unlikely. And customers get sad.
 > 
-> No problem, I just re-tested it.
+> As a general rule, before disabling a thing that even *might* have
+> worked for a guest, I'd like to run in a 'warning' mode first. Only
+> after running the whole fleet with such a warning and observing that it
+> *doesn't* trigger, can we actually switch the thing *off*.
+
+Looks like I was overly optimistic. There are, of course, use cases that
+rely on the hypercall patching, even if it's just for testing purposes.
+One of these are the KUT tests. I tried to fix these[1], however, there
+are probably more such mini-kernels, so I reverted back to not changing
+the default behaviour and only provided a knob to disabled the quirk,
+making users to manually opt-in to it[2].
+
 > 
-> Tested-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> Can we have 'hypercall-patching=on|off|log' ? 
 
-Thanks!
+I'd like to have the 'log' option as well. But as KVM does the patching
+on its own, this would require QEMU to analyze and react to related #UD
+exceptions (and possibly #PF to handle currently failing uses cases with
+read-only code too) further, I'd rather not want to do.
 
->> [...]
->> diff --git a/qemu-options.hx b/qemu-options.hx
->> index ab23f14d2178..98af1a91e6e6 100644
->> --- a/qemu-options.hx
->> +++ b/qemu-options.hx
->> @@ -236,6 +236,7 @@ DEF("accel", HAS_ARG, QEMU_OPTION_accel,
->>       "                dirty-ring-size=n (KVM dirty ring GFN count,
->> default 0)\n"
->>       "                eager-split-size=n (KVM Eager Page Split chunk
->> size, default 0, disabled. ARM only)\n"
->>       "                notify-vmexit=run|internal-error|
->> disable,notify-window=n (enable notify VM exit and set notify window,
->> x86 only)\n"
->> +    "                hypercall-patching=on|off (disable KVM's VMCALL/
->> VMMCALL hypercall patching quirk, x86 only)\n"
-> 
-> I would like to say "(configure KVM's VMCALL/VMCALL hypercall patching
-> quirk, x86 only)" instead of "disable"
+Another option would be to do a WARN_ON[_ONCE]() in KVM if it does the
+patching. But, then, existing use cases would suddenly trigger a kernel
+warning, which used to work before. Again, something users probably
+don't want to see. :/
 
-That would be technically correct. However, as this quirk is enabled by
-default in KVM and QEMU, the only sensible configuration toggle is to
-disable it. That's why I stated it this way. But I can rephrase it, if
-you prefer it this way.
-
->> [...]
->> @@ -6611,6 +6650,12 @@ static void
->> kvm_arch_set_xen_evtchn_max_pirq(Object *obj, Visitor *v,
->>     void kvm_arch_accel_class_init(ObjectClass *oc)
->>   {
->> +    object_class_property_add_bool(oc, "hypercall-patching",
->> +                                   kvm_arch_get_hypercall_patching,
->> +                                   kvm_arch_set_hypercall_patching);
->> +    object_class_property_set_description(oc, "hypercall-patching",
->> +                                          "Disable hypercall patching
->> quirk");
-> 
-> Ditto, Could we use "Configure hypercall patching quirk"? It's not only
-> to disable it.
-
-Or just "Hypercall patching quirk", as the bool value already reflects
-its state.
+I guess, we have to stick around with the default but make users aware
+of the option to disable the patching themselves.
 
 Thanks,
 Mathias
+
+[1]
+https://lore.kernel.org/kvm/20250724191050.1988675-1-minipli@grsecurity.net/
+[2]
+https://lore.kernel.org/kvm/20250801131226.2729893-1-minipli@grsecurity.net/
 
