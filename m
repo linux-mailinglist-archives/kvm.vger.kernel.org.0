@@ -1,65 +1,54 @@
-Return-Path: <kvm+bounces-53881-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53882-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBB22B19A83
-	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 05:33:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 790AEB19B4B
+	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 08:04:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA619177B9F
-	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 03:33:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 752811770F7
+	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 06:04:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8F6C19B5A7;
-	Mon,  4 Aug 2025 03:33:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC63D22F74D;
+	Mon,  4 Aug 2025 06:04:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EMNvgZdN"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="rFfZBdH1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD8CD2E36F6
-	for <kvm@vger.kernel.org>; Mon,  4 Aug 2025 03:33:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D750218ACA;
+	Mon,  4 Aug 2025 06:04:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754278385; cv=none; b=WdpZi1Gjelmc9W9N0q4El9lfdxPPe3GeiY9wERHiulM5CIHDftGxt2cQIC7vIGrAxz2rsKOMo3DIDMCypZHFJBTGJi15EpLffzS8Asu5vnX8gubUOafyC6WTI2YtT3ChgcqMOJUvPqz0ZnMaePsOPNXpvX3GsEdjs+fujfwFKpw=
+	t=1754287477; cv=none; b=HEV20WTm6GBvANfwqqsgFIZd4prlOgTpcnnm0h4qXhxgVsOqaWaZX7F2VIyhI/v3z+uD+6A4THO6sHry4rKYUDqvUlkF2aGfNMvHIG0ZPhjJmukHKvk6jo++yoIvM0U1lePUxmTao/VLJ8f5zKwuryGRwZoSj6ZtISFkuHu/fwY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754278385; c=relaxed/simple;
-	bh=v7YM17EEoPjCgYVxxeC3VS6wY83XauAuJa+XPjEz01s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sUOdgxBcfpVCHgPgGRYWkwegtQ05Rq4zPd6/gQidN/vYXGuLpA813LYCKbceX168ptC+/qVGdmmM+ortXEHi5oUBS1t74E7si+iCEDcBGQjbsjdLmo9gwq5QHwhOnFf/WcipwG+Nt5M9LtHJhKnyULVLPnktSbYp6gYfpiRUjHE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EMNvgZdN; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1754278383; x=1785814383;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=v7YM17EEoPjCgYVxxeC3VS6wY83XauAuJa+XPjEz01s=;
-  b=EMNvgZdNTSEpTyVu+x4KN1T7JEgySnK+4buQXfNtL9LUKUBalx+Kr++l
-   3gGgYUVVVDdEew43uN0FU4MNdUgTkSNws+1AXoPHfR2inAZUtW5ohFVq0
-   9ZK3SgSa4jqThDIDgMf0paMeMEDAZV/bPSQxT7H+7QAi7/A/d3PLHBhS3
-   Zgra2/4zBSK+lhwqsmYtNFBCvYwrE0wdwlNlBIIu+SeC/BWd8w7A74few
-   aw9dCCcnKYNfhaI2kkkiRS13p6YdxhtijVQCa+3VMS3SQ9jYUu6n1V6xY
-   cbr9Km0luNs8oCsnxkWAeyg324RO8+NytM1JTsELVNCDhlwAAOB7LmWPv
-   g==;
-X-CSE-ConnectionGUID: OueuHW80R9yyYuRVKHneKw==
-X-CSE-MsgGUID: rcd+LhiQR/OuyPNE8ifK4A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11511"; a="73988460"
-X-IronPort-AV: E=Sophos;i="6.17,258,1747724400"; 
-   d="scan'208";a="73988460"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Aug 2025 20:33:00 -0700
-X-CSE-ConnectionGUID: os7HehQUTJ6a0oWTOEyfVw==
-X-CSE-MsgGUID: BYqcN+eCStWfDNDd6q9d0A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,258,1747724400"; 
-   d="scan'208";a="169350591"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
-  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Aug 2025 20:32:58 -0700
-Message-ID: <6bcf6108-2d0c-44ae-a9f7-2f53ca23af7a@intel.com>
-Date: Mon, 4 Aug 2025 11:32:55 +0800
+	s=arc-20240116; t=1754287477; c=relaxed/simple;
+	bh=6Vrhh4CTXewypPsMkw99R7S67HxgozZhczdmjvE6+sA=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=WbxCzmyPfjaxCIwxdfuT9opZF/d8KqdZ7sfv4Axuu58Yr9FUuALKSs8Ulfq1u2QXvDWlzCn2BH8xlKMSFLYnJe8zYA50jRL1krjN6Mj9jTacP6HRARDVQm3WLnwl53sF0XmePgYnLgcG+YwCT2DmxTXgtodIPnmV/GXFw4+nag4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=rFfZBdH1; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [192.168.7.202] ([71.202.166.45])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 57463Gf1685727
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Sun, 3 Aug 2025 23:03:17 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 57463Gf1685727
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025072201; t=1754287400;
+	bh=1UvSEgLS9kHk3uMzku7DKxRmuJ3xE+/qZAFiYECcR3c=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=rFfZBdH1011mTnLueI/EDslLu0GpRaP2Tf/VuxRLEa/LR3j2uQkmtB94yYKQiTIe3
+	 lLnxhbqiK01Pzki3pIoKzKhddPoP8rMnSsX3nfnbuL57st5BBapBV6Lr3hJbBCZ/Ft
+	 vkM9vm6+wMGu3f0/nN8yzKlN2iNieRT6iLObqQD4dR5Vg+xyWLxrTdWp6rvBe1Jrq4
+	 zNmEoaGQx3rEYto24d4FxywDIU9lcSW1W1UCRyLIsjAksWRAJPcvlUtIIsuAyPBVL/
+	 jUz75YkoTxJ9TlmeHXMeJzeDsmK+pFTlVvU9OAZi5eVpCwLKkooioOMmu3HAZnd6/A
+	 AvadKtJCljKgQ==
+Message-ID: <5ca5d98e-6a3c-48fc-8aa2-7db0980543e6@zytor.com>
+Date: Sun, 3 Aug 2025 23:03:16 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,225 +56,169 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3] i386/kvm: Provide knob to disable hypercall patching
- quirk
-To: Mathias Krause <minipli@grsecurity.net>,
- Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org,
- Oliver Upton <oliver.upton@linux.dev>,
- Sean Christopherson <seanjc@google.com>
-References: <20250801131226.2729893-1-minipli@grsecurity.net>
+Subject: Re: [PATCH v5A 20/23] KVM: nVMX: Add FRED VMCS fields to nested VMX
+ context handling
+From: Xin Li <xin@zytor.com>
+To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org
+Cc: pbonzini@redhat.com, seanjc@google.com, corbet@lwn.net, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        x86@kernel.org, hpa@zytor.com, luto@kernel.org, peterz@infradead.org,
+        andrew.cooper3@citrix.com, chao.gao@intel.com, hch@infradead.org
+References: <aIHXngnkcJIY0TUw@intel.com>
+ <20250802171740.3677712-1-xin@zytor.com>
+ <aad3d385-5743-4f81-992a-22d1701c3611@zytor.com>
 Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20250801131226.2729893-1-minipli@grsecurity.net>
+Autocrypt: addr=xin@zytor.com; keydata=
+ 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
+ l75w1xInsg==
+In-Reply-To: <aad3d385-5743-4f81-992a-22d1701c3611@zytor.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 8/1/2025 9:12 PM, Mathias Krause wrote:
-> KVM has a weird behaviour when a guest executes VMCALL on an AMD system
-> or VMMCALL on an Intel CPU. Both naturally generate an invalid opcode
-> exception (#UD) as they are just the wrong instruction for the CPU
-> given. But instead of forwarding the exception to the guest, KVM tries
-> to patch the guest instruction to match the host's actual hypercall
-> instruction. That is doomed to fail for regular operating systems, as
-> read-only code is rather the standard these days. But, instead of
-> letting go the patching attempt and falling back to #UD injection, KVM
-> propagates its failure and injects the page fault instead.
+On 8/2/2025 10:33 AM, Xin Li wrote:
+>> @@ -4531,6 +4593,27 @@ static void sync_vmcs02_to_vmcs12_rare(struct 
+>> kvm_vcpu *vcpu,
+>>       vmcs12->guest_tr_base = vmcs_readl(GUEST_TR_BASE);
+>>       vmcs12->guest_gdtr_base = vmcs_readl(GUEST_GDTR_BASE);
+>>       vmcs12->guest_idtr_base = vmcs_readl(GUEST_IDTR_BASE);
+>> +
+>> +    vmx->nested.pre_vmexit_fred_config = 
+>> vmcs_read64(GUEST_IA32_FRED_CONFIG);
+>> +    vmx->nested.pre_vmexit_fred_rsp1 = 
+>> vmcs_read64(GUEST_IA32_FRED_RSP1);
+>> +    vmx->nested.pre_vmexit_fred_rsp2 = 
+>> vmcs_read64(GUEST_IA32_FRED_RSP2);
+>> +    vmx->nested.pre_vmexit_fred_rsp3 = 
+>> vmcs_read64(GUEST_IA32_FRED_RSP3);
+>> +    vmx->nested.pre_vmexit_fred_stklvls = 
+>> vmcs_read64(GUEST_IA32_FRED_STKLVLS);
+>> +    vmx->nested.pre_vmexit_fred_ssp1 = 
+>> vmcs_read64(GUEST_IA32_FRED_SSP1);
+>> +    vmx->nested.pre_vmexit_fred_ssp2 = 
+>> vmcs_read64(GUEST_IA32_FRED_SSP2);
+>> +    vmx->nested.pre_vmexit_fred_ssp3 = 
+>> vmcs_read64(GUEST_IA32_FRED_SSP3);
 > 
-> That's wrong on multiple levels. Not only isn't that a valid exception
-> to be generated by these instructions, confusing attempts to handle
-> them. It also destroys guest state by doing so, namely the value of CR2.
+> This ...
 > 
-> Sean attempted to fix that in KVM[1] but the patch was never applied.
+>> +
+>> +    if (nested_cpu_save_guest_fred_state(vmcs12)) {
+>> +        vmcs12->guest_ia32_fred_config = vmx- 
+>> >nested.pre_vmexit_fred_config;
+>> +        vmcs12->guest_ia32_fred_rsp1 = vmx->nested.pre_vmexit_fred_rsp1;
+>> +        vmcs12->guest_ia32_fred_rsp2 = vmx->nested.pre_vmexit_fred_rsp2;
+>> +        vmcs12->guest_ia32_fred_rsp3 = vmx->nested.pre_vmexit_fred_rsp3;
+>> +        vmcs12->guest_ia32_fred_stklvls = vmx- 
+>> >nested.pre_vmexit_fred_stklvls;
+>> +        vmcs12->guest_ia32_fred_ssp1 = vmx->nested.pre_vmexit_fred_ssp1;
+>> +        vmcs12->guest_ia32_fred_ssp2 = vmx->nested.pre_vmexit_fred_ssp2;
+>> +        vmcs12->guest_ia32_fred_ssp3 = vmx->nested.pre_vmexit_fred_ssp3;
+>> +    }
+>> +
+>>       vmcs12->guest_pending_dbg_exceptions =
+>>           vmcs_readl(GUEST_PENDING_DBG_EXCEPTIONS);
+>> @@ -4761,6 +4860,26 @@ static void load_vmcs12_host_state(struct 
+>> kvm_vcpu *vcpu,
+>>       vmcs_write32(GUEST_IDTR_LIMIT, 0xFFFF);
+>>       vmcs_write32(GUEST_GDTR_LIMIT, 0xFFFF);
+>> +    if (nested_cpu_load_host_fred_state(vmcs12)) {
+>> +        vmcs_write64(GUEST_IA32_FRED_CONFIG, vmcs12- 
+>> >host_ia32_fred_config);
+>> +        vmcs_write64(GUEST_IA32_FRED_RSP1, vmcs12->host_ia32_fred_rsp1);
+>> +        vmcs_write64(GUEST_IA32_FRED_RSP2, vmcs12->host_ia32_fred_rsp2);
+>> +        vmcs_write64(GUEST_IA32_FRED_RSP3, vmcs12->host_ia32_fred_rsp3);
+>> +        vmcs_write64(GUEST_IA32_FRED_STKLVLS, vmcs12- 
+>> >host_ia32_fred_stklvls);
+>> +        vmcs_write64(GUEST_IA32_FRED_SSP1, vmcs12->host_ia32_fred_ssp1);
+>> +        vmcs_write64(GUEST_IA32_FRED_SSP2, vmcs12->host_ia32_fred_ssp2);
+>> +        vmcs_write64(GUEST_IA32_FRED_SSP3, vmcs12->host_ia32_fred_ssp3);
+>> +    } else {
+>> +        vmcs_write64(GUEST_IA32_FRED_CONFIG, vmx- 
+>> >nested.pre_vmexit_fred_config);
+>> +        vmcs_write64(GUEST_IA32_FRED_RSP1, vmx- 
+>> >nested.pre_vmexit_fred_rsp1);
+>> +        vmcs_write64(GUEST_IA32_FRED_RSP2, vmx- 
+>> >nested.pre_vmexit_fred_rsp2);
+>> +        vmcs_write64(GUEST_IA32_FRED_RSP3, vmx- 
+>> >nested.pre_vmexit_fred_rsp3);
+>> +        vmcs_write64(GUEST_IA32_FRED_STKLVLS, vmx- 
+>> >nested.pre_vmexit_fred_stklvls);
+>> +        vmcs_write64(GUEST_IA32_FRED_SSP1, vmx- 
+>> >nested.pre_vmexit_fred_ssp1);
+>> +        vmcs_write64(GUEST_IA32_FRED_SSP2, vmx- 
+>> >nested.pre_vmexit_fred_ssp2);
+>> +        vmcs_write64(GUEST_IA32_FRED_SSP3, vmx- 
+>> >nested.pre_vmexit_fred_ssp3);
 > 
-> Later, Oliver added a quirk bit in [2] so the behaviour can, at least,
-> conceptually be disabled. Paolo even called out to add this very
-> functionality to disable the quirk in QEMU[3]. So lets just do it.
-> 
-> Add a new property 'hypercall-patching=on|off' to the KVM accelerator
-> but keep the default behaviour as-is as there are, unfortunately,
-> systems out there relying on the patching, e.g. KUT[4,5].
-> 
-> For regular operating systems, however, the patching wouldn't be needed,
-> nor work at all. If it would, these systrems would be vulnerable to
-> memory corruption attacks, freely overwriting kernel code as they
-> please.
+> And this are actually nops. IOW, if I don't add this snippet of code,
+> the CPU still retains the guest FRED MSRs, i.e., using guest FRED state 
+> from vmcs02 as that of vmcs01.
 
-For non-coco VMs, the systems are surely vulnerable to memory corruption 
-attacks that the host VMM is free to modify the guest memory. It's 
-irrelevant to whether hypercall patching is needed or works.
+I confused myself.  They are NOT nops, because __nested_vmx_vmexit()
+switches from vmcs02 to vmcs01.  The code should be (as the patch does):
 
-> [1] https://lore.kernel.org/kvm/20211210222903.3417968-1-seanjc@google.com/
-> [2] https://lore.kernel.org/kvm/20220316005538.2282772-2-oupton@google.com/
-> [3] https://lore.kernel.org/kvm/80e1f1d2-2d79-22b7-6665-c00e4fe9cb9c@redhat.com/
-> [4] https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/blob/f045ea5627a3/x86/apic.c#L644
-> [5] https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/blob/f045ea5627a3/x86/vmexit.c#L36
-> 
-> Cc: Oliver Upton <oliver.upton@linux.dev>
-> Cc: Sean Christopherson <seanjc@google.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Xiaoyao Li <xiaoyao.li@intel.com>
-> Signed-off-by: Mathias Krause <minipli@grsecurity.net>
-> ---
-> Xiaoyao, I left out your Tested-by and Reviewed-by as I changed the code
-> (slightly) and it didn't felt right to pick these up. However, as only
-> the default value changed, the functionality would be the same if you
-> tested both cases explicitly (-accel kvm,hypercall-patching={on,off}).
+__nested_vmx_vmexit()
+{
+	...
 
-No problem, I just re-tested it.
+	/*
+	 * Save guest FRED state of vmcs02 to nested.pre_vmexit_fred
+	 * no matter if SECONDARY_VM_EXIT_SAVE_IA32_FRED is set.
+	 */
+	sync_vmcs02_to_vmcs12();
 
-Tested-by: Xiaoyao Li <xiaoyao.li@intel.com>
-Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+	...
+	vmx_switch_vmcs();
+	...
 
-> v3:
-> - switch default to 'on' to not change the default behaviour
-> - reference KUT tests relying on hypercall patching
-> 
-> v2:
-> - rename hypercall_patching_enabled to hypercall_patching (Xiaoyao Li)
-> - make use of error_setg*() (Xiaoyao Li)
-> 
->   accel/kvm/kvm-all.c      |  1 +
->   include/system/kvm_int.h |  1 +
->   qemu-options.hx          | 10 +++++++++
->   target/i386/kvm/kvm.c    | 45 ++++++++++++++++++++++++++++++++++++++++
->   4 files changed, 57 insertions(+)
-> 
-> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> index 890d5ea9f865..a68f779b6c1c 100644
-> --- a/accel/kvm/kvm-all.c
-> +++ b/accel/kvm/kvm-all.c
-> @@ -3997,6 +3997,7 @@ static void kvm_accel_instance_init(Object *obj)
->       s->kvm_dirty_ring_size = 0;
->       s->kvm_dirty_ring_with_bitmap = false;
->       s->kvm_eager_split_size = 0;
-> +    s->hypercall_patching = true;
->       s->notify_vmexit = NOTIFY_VMEXIT_OPTION_RUN;
->       s->notify_window = 0;
->       s->xen_version = 0;
-> diff --git a/include/system/kvm_int.h b/include/system/kvm_int.h
-> index 9247493b0299..ec891ca8e302 100644
-> --- a/include/system/kvm_int.h
-> +++ b/include/system/kvm_int.h
-> @@ -160,6 +160,7 @@ struct KVMState
->       uint64_t kvm_eager_split_size;  /* Eager Page Splitting chunk size */
->       struct KVMDirtyRingReaper reaper;
->       struct KVMMsrEnergy msr_energy;
-> +    bool hypercall_patching;
->       NotifyVmexitOption notify_vmexit;
->       uint32_t notify_window;
->       uint32_t xen_version;
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index ab23f14d2178..98af1a91e6e6 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -236,6 +236,7 @@ DEF("accel", HAS_ARG, QEMU_OPTION_accel,
->       "                dirty-ring-size=n (KVM dirty ring GFN count, default 0)\n"
->       "                eager-split-size=n (KVM Eager Page Split chunk size, default 0, disabled. ARM only)\n"
->       "                notify-vmexit=run|internal-error|disable,notify-window=n (enable notify VM exit and set notify window, x86 only)\n"
-> +    "                hypercall-patching=on|off (disable KVM's VMCALL/VMMCALL hypercall patching quirk, x86 only)\n"
+	/*
+	 * Load nested.pre_vmexit_fred to guest FRED state of vmcs01
+	 * if SECONDARY_VM_EXIT_LOAD_IA32_FRED is NOT set.
+	 */
+	load_vmcs12_host_state();
 
-I would like to say "(configure KVM's VMCALL/VMCALL hypercall patching 
-quirk, x86 only)" instead of "disable"
+	...
+   }
 
->       "                thread=single|multi (enable multi-threaded TCG)\n"
->       "                device=path (KVM device path, default /dev/kvm)\n", QEMU_ARCH_ALL)
->   SRST
-> @@ -318,6 +319,15 @@ SRST
->           open up for a specified of time (i.e. notify-window).
->           Default: notify-vmexit=run,notify-window=0.
->   
-> +    ``hypercall-patching=on|off``
-> +        KVM tries to recover from the wrong hypercall instruction being used by
-> +        a guest by attempting to rewrite it to the one supported natively by
-> +        the host CPU (VMCALL on Intel, VMMCALL for AMD systems). However, this
-> +        patching may fail if the guest memory is write protected, leading to a
-> +        page fault getting propagated to the guest instead of an illegal
-> +        instruction exception. As this may confuse guests, this option allows
-> +        disabling it (x86 only, enabled by default).
-> +
->       ``device=path``
->           Sets the path to the KVM device node. Defaults to ``/dev/kvm``. This
->           option can be used to pass the KVM device to use via a file descriptor
-> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-> index 369626f8c8d7..a841d53c240f 100644
-> --- a/target/i386/kvm/kvm.c
-> +++ b/target/i386/kvm/kvm.c
-> @@ -3228,6 +3228,26 @@ static int kvm_vm_enable_energy_msrs(KVMState *s)
->       return 0;
->   }
->   
-> +static int kvm_vm_disable_hypercall_patching(KVMState *s, Error **errp)
-> +{
-> +    int valid_quirks = kvm_vm_check_extension(s, KVM_CAP_DISABLE_QUIRKS2);
-> +    int ret = -1;
-> +
-> +    if (valid_quirks & KVM_X86_QUIRK_FIX_HYPERCALL_INSN) {
-> +        ret = kvm_vm_enable_cap(s, KVM_CAP_DISABLE_QUIRKS2, 0,
-> +                                KVM_X86_QUIRK_FIX_HYPERCALL_INSN);
-> +        if (ret) {
-> +            error_setg_errno(errp, -ret, "kvm: failed to disable "
-> +                             "hypercall patching quirk: %s",
-> +                             strerror(-ret));
-> +        }
-> +    } else {
-> +        error_setg(errp, "kvm: disabling hypercall patching not supported");
-> +    }
-> +
-> +    return ret;
-> +}
-> +
->   int kvm_arch_init(MachineState *ms, KVMState *s)
->   {
->       int ret;
-> @@ -3367,6 +3387,12 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
->           }
->       }
->   
-> +    if (!s->hypercall_patching) {
-> +        if (kvm_vm_disable_hypercall_patching(s, &local_err)) {
-> +            error_report_err(local_err);
-> +        }
-> +    }
-> +
->       return 0;
->   }
->   
-> @@ -6478,6 +6504,19 @@ void kvm_request_xsave_components(X86CPU *cpu, uint64_t mask)
->       }
->   }
->   
-> +static bool kvm_arch_get_hypercall_patching(Object *obj, Error **errp)
-> +{
-> +    KVMState *s = KVM_STATE(obj);
-> +    return s->hypercall_patching;
-> +}
-> +
-> +static void kvm_arch_set_hypercall_patching(Object *obj, bool value,
-> +                                            Error **errp)
-> +{
-> +    KVMState *s = KVM_STATE(obj);
-> +    s->hypercall_patching = value;
-> +}
-> +
->   static int kvm_arch_get_notify_vmexit(Object *obj, Error **errp)
->   {
->       KVMState *s = KVM_STATE(obj);
-> @@ -6611,6 +6650,12 @@ static void kvm_arch_set_xen_evtchn_max_pirq(Object *obj, Visitor *v,
->   
->   void kvm_arch_accel_class_init(ObjectClass *oc)
->   {
-> +    object_class_property_add_bool(oc, "hypercall-patching",
-> +                                   kvm_arch_get_hypercall_patching,
-> +                                   kvm_arch_set_hypercall_patching);
-> +    object_class_property_set_description(oc, "hypercall-patching",
-> +                                          "Disable hypercall patching quirk");
 
-Ditto, Could we use "Configure hypercall patching quirk"? It's not only 
-to disable it.
+As not setting any of the two FRED VM-Exit controls are rare cases, we
+need to add KVM tests with L1 that:
+1) doesn't set SECONDARY_VM_EXIT_SAVE_IA32_FRED in VM-Exit controls.
+2) doesn't set SECONDARY_VM_EXIT_LOAD_IA32_FRED in VM-Exit controls.
+3) doesn't set both of the FRED VM-Exit controls.
 
->       object_class_property_add_enum(oc, "notify-vmexit", "NotifyVMexitOption",
->                                      &NotifyVmexitOption_lookup,
->                                      kvm_arch_get_notify_vmexit,
-
+Looks we need a framework for all VM-Exit controls which control whether
+to save/load specific MSRs related to CPU features during VM-Exit?
 
