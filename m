@@ -1,224 +1,137 @@
-Return-Path: <kvm+bounces-53882-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53883-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 790AEB19B4B
-	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 08:04:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BD33B19BAC
+	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 08:45:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 752811770F7
-	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 06:04:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3DE89175ACA
+	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 06:44:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC63D22F74D;
-	Mon,  4 Aug 2025 06:04:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAFF3230BF8;
+	Mon,  4 Aug 2025 06:44:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="rFfZBdH1"
+	dkim=pass (2048-bit key) header.d=raymakers.nl header.i=@raymakers.nl header.b="ljriQIfU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from dane.soverin.net (dane.soverin.net [185.233.34.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D750218ACA;
-	Mon,  4 Aug 2025 06:04:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBCEA22F762
+	for <kvm@vger.kernel.org>; Mon,  4 Aug 2025 06:44:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.233.34.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754287477; cv=none; b=HEV20WTm6GBvANfwqqsgFIZd4prlOgTpcnnm0h4qXhxgVsOqaWaZX7F2VIyhI/v3z+uD+6A4THO6sHry4rKYUDqvUlkF2aGfNMvHIG0ZPhjJmukHKvk6jo++yoIvM0U1lePUxmTao/VLJ8f5zKwuryGRwZoSj6ZtISFkuHu/fwY=
+	t=1754289880; cv=none; b=YRYX/tju1Vwljg9tJGyY9pGoZaDtdy02cmZiPyhQOTmNKSCgp0uEr5FsRifLWj6RUS+RW/cRygepfYhc+gfZEBeIsyL2FbuLRuaUH8v0fVYPLM1vEHE46eLZizGaRm9RlL6GdmSFIXhYQBdJImTOvr5jBM9+HuRF8SGmokgak0s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754287477; c=relaxed/simple;
-	bh=6Vrhh4CTXewypPsMkw99R7S67HxgozZhczdmjvE6+sA=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=WbxCzmyPfjaxCIwxdfuT9opZF/d8KqdZ7sfv4Axuu58Yr9FUuALKSs8Ulfq1u2QXvDWlzCn2BH8xlKMSFLYnJe8zYA50jRL1krjN6Mj9jTacP6HRARDVQm3WLnwl53sF0XmePgYnLgcG+YwCT2DmxTXgtodIPnmV/GXFw4+nag4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=rFfZBdH1; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [192.168.7.202] ([71.202.166.45])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 57463Gf1685727
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Sun, 3 Aug 2025 23:03:17 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 57463Gf1685727
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025072201; t=1754287400;
-	bh=1UvSEgLS9kHk3uMzku7DKxRmuJ3xE+/qZAFiYECcR3c=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=rFfZBdH1011mTnLueI/EDslLu0GpRaP2Tf/VuxRLEa/LR3j2uQkmtB94yYKQiTIe3
-	 lLnxhbqiK01Pzki3pIoKzKhddPoP8rMnSsX3nfnbuL57st5BBapBV6Lr3hJbBCZ/Ft
-	 vkM9vm6+wMGu3f0/nN8yzKlN2iNieRT6iLObqQD4dR5Vg+xyWLxrTdWp6rvBe1Jrq4
-	 zNmEoaGQx3rEYto24d4FxywDIU9lcSW1W1UCRyLIsjAksWRAJPcvlUtIIsuAyPBVL/
-	 jUz75YkoTxJ9TlmeHXMeJzeDsmK+pFTlVvU9OAZi5eVpCwLKkooioOMmu3HAZnd6/A
-	 AvadKtJCljKgQ==
-Message-ID: <5ca5d98e-6a3c-48fc-8aa2-7db0980543e6@zytor.com>
-Date: Sun, 3 Aug 2025 23:03:16 -0700
+	s=arc-20240116; t=1754289880; c=relaxed/simple;
+	bh=wozeUlwN/Lku5dt1tm6eW49oJ+4U8/mgut92ET2TvIA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jyu4ImjujxufLton1gxav8rJj7skv1qUoQ1V6gfD3S3bXnQ/Zi1CMDnUa3M9VwKx3QpZ1VTrKvG6duBygqMcXr0mK0y9vLeVJybd7DoNV1ftQkudZTo2CRmjuLwKP3UDkMrx8T3CooIK1ubkfanad5yQP3rjndPriJFEo5ohV14=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=raymakers.nl; spf=pass smtp.mailfrom=raymakers.nl; dkim=pass (2048-bit key) header.d=raymakers.nl header.i=@raymakers.nl header.b=ljriQIfU; arc=none smtp.client-ip=185.233.34.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=raymakers.nl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=raymakers.nl
+Received: from smtp.soverin.net (unknown [10.10.4.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
+	(No client certificate requested)
+	by dane.soverin.net (Postfix) with ESMTPS id 4bwRqd2kStz1B2Z;
+	Mon,  4 Aug 2025 06:44:29 +0000 (UTC)
+Received: from smtp.soverin.net (smtp.soverin.net [10.10.4.99]) by soverin.net (Postfix) with ESMTPSA id 4bwRqc50Gqz6D;
+	Mon,  4 Aug 2025 06:44:28 +0000 (UTC)
+Authentication-Results: smtp.soverin.net;
+	dkim=pass (2048-bit key; unprotected) header.d=raymakers.nl header.i=@raymakers.nl header.a=rsa-sha256 header.s=soverin1 header.b=ljriQIfU;
+	dkim-atps=neutral
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=raymakers.nl;
+	s=soverin1; t=1754289869;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ifira4om5kYW3pZY0Zj1C+H2aWyqpWnLUsETtTp9N+8=;
+	b=ljriQIfUuzKMmIS4YAO5Jxl5CmAGcTnwzt8IsZMULiKGmlFuPWai7qI7g1rbGpwPDomkz2
+	IqMRdBZGKQmJH55314iQ12mG2xe1uKhu5WjgaIi/X/Vhq04xgzeZW57JQ0uznWP9rtnS9r
+	/3iO8Ni+WgHP9ssP6kb7ZVKc1YsShxxTxet1uejAIEbGO03+Un6W9OOlmIyUmh7GRyR87c
+	APn8n6eGwVc1XzyFUVyRnFJ6ICGiEzmqHQkm+9+wCNqv/ud87O0fO9mlPaB/SkSkzOTQtC
+	MfDy4A1FcWh2KlidQ04mEVi2RcbkPbWZd3oakSAUikfF5aynHmncLdohxSP1hw==
+X-CM-Analysis: v=2.4 cv=I7afRMgg c=1 sm=1 tr=0 ts=689056cd a=eMcEbXDZAAAA:8 a=VwQbUJbxAAAA:8 a=1XWaLZrsAAAA:8 a=20KFwNOVAAAA:8 a=ag1SF4gXAAAA:8 a=POubyX8G1R7Sw8sTc0oA:9 a=Ff6uVGclmHxgYidJvOUY:22 a=Yupwre4RP9_Eg_Bd0iYG:22
+From: Thijs Raymakers <thijs@raymakers.nl>
+To: kvm@vger.kernel.org
+Cc: Thijs Raymakers <thijs@raymakers.nl>,
+	stable <stable@kernel.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: [PATCH v3] KVM: x86: use array_index_nospec with indices that come from guest
+Date: Mon,  4 Aug 2025 08:44:05 +0200
+Message-ID: <20250804064405.4802-1-thijs@raymakers.nl>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5A 20/23] KVM: nVMX: Add FRED VMCS fields to nested VMX
- context handling
-From: Xin Li <xin@zytor.com>
-To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org
-Cc: pbonzini@redhat.com, seanjc@google.com, corbet@lwn.net, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        x86@kernel.org, hpa@zytor.com, luto@kernel.org, peterz@infradead.org,
-        andrew.cooper3@citrix.com, chao.gao@intel.com, hch@infradead.org
-References: <aIHXngnkcJIY0TUw@intel.com>
- <20250802171740.3677712-1-xin@zytor.com>
- <aad3d385-5743-4f81-992a-22d1701c3611@zytor.com>
-Content-Language: en-US
-Autocrypt: addr=xin@zytor.com; keydata=
- xsDNBGUPz1cBDACS/9yOJGojBFPxFt0OfTWuMl0uSgpwk37uRrFPTTLw4BaxhlFL0bjs6q+0
- 2OfG34R+a0ZCuj5c9vggUMoOLdDyA7yPVAJU0OX6lqpg6z/kyQg3t4jvajG6aCgwSDx5Kzg5
- Rj3AXl8k2wb0jdqRB4RvaOPFiHNGgXCs5Pkux/qr0laeFIpzMKMootGa4kfURgPhRzUaM1vy
- bsMsL8vpJtGUmitrSqe5dVNBH00whLtPFM7IbzKURPUOkRRiusFAsw0a1ztCgoFczq6VfAVu
- raTye0L/VXwZd+aGi401V2tLsAHxxckRi9p3mc0jExPc60joK+aZPy6amwSCy5kAJ/AboYtY
- VmKIGKx1yx8POy6m+1lZ8C0q9b8eJ8kWPAR78PgT37FQWKYS1uAroG2wLdK7FiIEpPhCD+zH
- wlslo2ETbdKjrLIPNehQCOWrT32k8vFNEMLP5G/mmjfNj5sEf3IOKgMTMVl9AFjsINLHcxEQ
- 6T8nGbX/n3msP6A36FDfdSEAEQEAAc0WWGluIExpIDx4aW5Aenl0b3IuY29tPsLBDQQTAQgA
- NxYhBIUq/WFSDTiOvUIqv2u9DlcdrjdRBQJlD89XBQkFo5qAAhsDBAsJCAcFFQgJCgsFFgID
- AQAACgkQa70OVx2uN1HUpgv/cM2fsFCQodLArMTX5nt9yqAWgA5t1srri6EgS8W3F+3Kitge
- tYTBKu6j5BXuXaX3vyfCm+zajDJN77JHuYnpcKKr13VcZi1Swv6Jx1u0II8DOmoDYLb1Q2ZW
- v83W55fOWJ2g72x/UjVJBQ0sVjAngazU3ckc0TeNQlkcpSVGa/qBIHLfZraWtdrNAQT4A1fa
- sWGuJrChBFhtKbYXbUCu9AoYmmbQnsx2EWoJy3h7OjtfFapJbPZql+no5AJ3Mk9eE5oWyLH+
- QWqtOeJM7kKvn/dBudokFSNhDUw06e7EoVPSJyUIMbYtUO7g2+Atu44G/EPP0yV0J4lRO6EA
- wYRXff7+I1jIWEHpj5EFVYO6SmBg7zF2illHEW31JAPtdDLDHYcZDfS41caEKOQIPsdzQkaQ
- oW2hchcjcMPAfyhhRzUpVHLPxLCetP8vrVhTvnaZUo0xaVYb3+wjP+D5j/3+hwblu2agPsaE
- vgVbZ8Fx3TUxUPCAdr/p73DGg57oHjgezsDNBGUPz1gBDAD4Mg7hMFRQqlzotcNSxatlAQNL
- MadLfUTFz8wUUa21LPLrHBkUwm8RujehJrzcVbPYwPXIO0uyL/F///CogMNx7Iwo6by43KOy
- g89wVFhyy237EY76j1lVfLzcMYmjBoTH95fJC/lVb5Whxil6KjSN/R/y3jfG1dPXfwAuZ/4N
- cMoOslWkfZKJeEut5aZTRepKKF54T5r49H9F7OFLyxrC/uI9UDttWqMxcWyCkHh0v1Di8176
- jjYRNTrGEfYfGxSp+3jYL3PoNceIMkqM9haXjjGl0W1B4BidK1LVYBNov0rTEzyr0a1riUrp
- Qk+6z/LHxCM9lFFXnqH7KWeToTOPQebD2B/Ah5CZlft41i8L6LOF/LCuDBuYlu/fI2nuCc8d
- m4wwtkou1Y/kIwbEsE/6RQwRXUZhzO6llfoN96Fczr/RwvPIK5SVMixqWq4QGFAyK0m/1ap4
- bhIRrdCLVQcgU4glo17vqfEaRcTW5SgX+pGs4KIPPBE5J/ABD6pBnUUAEQEAAcLA/AQYAQgA
- JhYhBIUq/WFSDTiOvUIqv2u9DlcdrjdRBQJlD89ZBQkFo5qAAhsMAAoJEGu9DlcdrjdR4C0L
- /RcjolEjoZW8VsyxWtXazQPnaRvzZ4vhmGOsCPr2BPtMlSwDzTlri8BBG1/3t/DNK4JLuwEj
- OAIE3fkkm+UG4Kjud6aNeraDI52DRVCSx6xff3bjmJsJJMb12mWglN6LjdF6K+PE+OTJUh2F
- dOhslN5C2kgl0dvUuevwMgQF3IljLmi/6APKYJHjkJpu1E6luZec/lRbetHuNFtbh3xgFIJx
- 2RpgVDP4xB3f8r0I+y6ua+p7fgOjDLyoFjubRGed0Be45JJQEn7A3CSb6Xu7NYobnxfkwAGZ
- Q81a2XtvNS7Aj6NWVoOQB5KbM4yosO5+Me1V1SkX2jlnn26JPEvbV3KRFcwV5RnDxm4OQTSk
- PYbAkjBbm+tuJ/Sm+5Yp5T/BnKz21FoCS8uvTiziHj2H7Cuekn6F8EYhegONm+RVg3vikOpn
- gao85i4HwQTK9/D1wgJIQkdwWXVMZ6q/OALaBp82vQ2U9sjTyFXgDjglgh00VRAHP7u1Rcu4
- l75w1xInsg==
-In-Reply-To: <aad3d385-5743-4f81-992a-22d1701c3611@zytor.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Spampanel-Class: ham
 
-On 8/2/2025 10:33 AM, Xin Li wrote:
->> @@ -4531,6 +4593,27 @@ static void sync_vmcs02_to_vmcs12_rare(struct 
->> kvm_vcpu *vcpu,
->>       vmcs12->guest_tr_base = vmcs_readl(GUEST_TR_BASE);
->>       vmcs12->guest_gdtr_base = vmcs_readl(GUEST_GDTR_BASE);
->>       vmcs12->guest_idtr_base = vmcs_readl(GUEST_IDTR_BASE);
->> +
->> +    vmx->nested.pre_vmexit_fred_config = 
->> vmcs_read64(GUEST_IA32_FRED_CONFIG);
->> +    vmx->nested.pre_vmexit_fred_rsp1 = 
->> vmcs_read64(GUEST_IA32_FRED_RSP1);
->> +    vmx->nested.pre_vmexit_fred_rsp2 = 
->> vmcs_read64(GUEST_IA32_FRED_RSP2);
->> +    vmx->nested.pre_vmexit_fred_rsp3 = 
->> vmcs_read64(GUEST_IA32_FRED_RSP3);
->> +    vmx->nested.pre_vmexit_fred_stklvls = 
->> vmcs_read64(GUEST_IA32_FRED_STKLVLS);
->> +    vmx->nested.pre_vmexit_fred_ssp1 = 
->> vmcs_read64(GUEST_IA32_FRED_SSP1);
->> +    vmx->nested.pre_vmexit_fred_ssp2 = 
->> vmcs_read64(GUEST_IA32_FRED_SSP2);
->> +    vmx->nested.pre_vmexit_fred_ssp3 = 
->> vmcs_read64(GUEST_IA32_FRED_SSP3);
-> 
-> This ...
-> 
->> +
->> +    if (nested_cpu_save_guest_fred_state(vmcs12)) {
->> +        vmcs12->guest_ia32_fred_config = vmx- 
->> >nested.pre_vmexit_fred_config;
->> +        vmcs12->guest_ia32_fred_rsp1 = vmx->nested.pre_vmexit_fred_rsp1;
->> +        vmcs12->guest_ia32_fred_rsp2 = vmx->nested.pre_vmexit_fred_rsp2;
->> +        vmcs12->guest_ia32_fred_rsp3 = vmx->nested.pre_vmexit_fred_rsp3;
->> +        vmcs12->guest_ia32_fred_stklvls = vmx- 
->> >nested.pre_vmexit_fred_stklvls;
->> +        vmcs12->guest_ia32_fred_ssp1 = vmx->nested.pre_vmexit_fred_ssp1;
->> +        vmcs12->guest_ia32_fred_ssp2 = vmx->nested.pre_vmexit_fred_ssp2;
->> +        vmcs12->guest_ia32_fred_ssp3 = vmx->nested.pre_vmexit_fred_ssp3;
->> +    }
->> +
->>       vmcs12->guest_pending_dbg_exceptions =
->>           vmcs_readl(GUEST_PENDING_DBG_EXCEPTIONS);
->> @@ -4761,6 +4860,26 @@ static void load_vmcs12_host_state(struct 
->> kvm_vcpu *vcpu,
->>       vmcs_write32(GUEST_IDTR_LIMIT, 0xFFFF);
->>       vmcs_write32(GUEST_GDTR_LIMIT, 0xFFFF);
->> +    if (nested_cpu_load_host_fred_state(vmcs12)) {
->> +        vmcs_write64(GUEST_IA32_FRED_CONFIG, vmcs12- 
->> >host_ia32_fred_config);
->> +        vmcs_write64(GUEST_IA32_FRED_RSP1, vmcs12->host_ia32_fred_rsp1);
->> +        vmcs_write64(GUEST_IA32_FRED_RSP2, vmcs12->host_ia32_fred_rsp2);
->> +        vmcs_write64(GUEST_IA32_FRED_RSP3, vmcs12->host_ia32_fred_rsp3);
->> +        vmcs_write64(GUEST_IA32_FRED_STKLVLS, vmcs12- 
->> >host_ia32_fred_stklvls);
->> +        vmcs_write64(GUEST_IA32_FRED_SSP1, vmcs12->host_ia32_fred_ssp1);
->> +        vmcs_write64(GUEST_IA32_FRED_SSP2, vmcs12->host_ia32_fred_ssp2);
->> +        vmcs_write64(GUEST_IA32_FRED_SSP3, vmcs12->host_ia32_fred_ssp3);
->> +    } else {
->> +        vmcs_write64(GUEST_IA32_FRED_CONFIG, vmx- 
->> >nested.pre_vmexit_fred_config);
->> +        vmcs_write64(GUEST_IA32_FRED_RSP1, vmx- 
->> >nested.pre_vmexit_fred_rsp1);
->> +        vmcs_write64(GUEST_IA32_FRED_RSP2, vmx- 
->> >nested.pre_vmexit_fred_rsp2);
->> +        vmcs_write64(GUEST_IA32_FRED_RSP3, vmx- 
->> >nested.pre_vmexit_fred_rsp3);
->> +        vmcs_write64(GUEST_IA32_FRED_STKLVLS, vmx- 
->> >nested.pre_vmexit_fred_stklvls);
->> +        vmcs_write64(GUEST_IA32_FRED_SSP1, vmx- 
->> >nested.pre_vmexit_fred_ssp1);
->> +        vmcs_write64(GUEST_IA32_FRED_SSP2, vmx- 
->> >nested.pre_vmexit_fred_ssp2);
->> +        vmcs_write64(GUEST_IA32_FRED_SSP3, vmx- 
->> >nested.pre_vmexit_fred_ssp3);
-> 
-> And this are actually nops. IOW, if I don't add this snippet of code,
-> the CPU still retains the guest FRED MSRs, i.e., using guest FRED state 
-> from vmcs02 as that of vmcs01.
+min and dest_id are guest-controlled indices. Using array_index_nospec()
+after the bounds checks clamps these values to mitigate speculative execution
+side-channels.
 
-I confused myself.  They are NOT nops, because __nested_vmx_vmexit()
-switches from vmcs02 to vmcs01.  The code should be (as the patch does):
+Signed-off-by: Thijs Raymakers <thijs@raymakers.nl>
+Cc: stable <stable@kernel.org>
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+Sean C. correctly pointed out that max_apic_id is inclusive, while
+array_index_nospec is not.
 
-__nested_vmx_vmexit()
-{
-	...
+Changes in v3:
+- Put the diff and the changes to the feedback in a single patch, instead
+  of spreading it out over multiple emails.
+- Remove premature SoB.
+- Not sent as a In-Reply-To the previous version.
 
-	/*
-	 * Save guest FRED state of vmcs02 to nested.pre_vmexit_fred
-	 * no matter if SECONDARY_VM_EXIT_SAVE_IA32_FRED is set.
-	 */
-	sync_vmcs02_to_vmcs12();
+Changes in v2:
+- Add one to the length argument of array_index_nospec, so it becomes
+  inclusive with max_apic_id.
 
-	...
-	vmx_switch_vmcs();
-	...
+---
+ arch/x86/kvm/lapic.c | 2 ++
+ arch/x86/kvm/x86.c   | 7 +++++--
+ 2 files changed, 7 insertions(+), 2 deletions(-)
 
-	/*
-	 * Load nested.pre_vmexit_fred to guest FRED state of vmcs01
-	 * if SECONDARY_VM_EXIT_LOAD_IA32_FRED is NOT set.
-	 */
-	load_vmcs12_host_state();
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 73418dc0ebb2..0725d2cae742 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -852,6 +852,8 @@ static int __pv_send_ipi(unsigned long *ipi_bitmap, struct kvm_apic_map *map,
+ 	if (min > map->max_apic_id)
+ 		return 0;
+ 
++	min = array_index_nospec(min, map->max_apic_id + 1);
++
+ 	for_each_set_bit(i, ipi_bitmap,
+ 		min((u32)BITS_PER_LONG, (map->max_apic_id - min + 1))) {
+ 		if (map->phys_map[min + i]) {
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 93636f77c42d..43b63f1d1594 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -10051,8 +10051,11 @@ static void kvm_sched_yield(struct kvm_vcpu *vcpu, unsigned long dest_id)
+ 	rcu_read_lock();
+ 	map = rcu_dereference(vcpu->kvm->arch.apic_map);
+ 
+-	if (likely(map) && dest_id <= map->max_apic_id && map->phys_map[dest_id])
+-		target = map->phys_map[dest_id]->vcpu;
++	if (likely(map) && dest_id <= map->max_apic_id) {
++		dest_id = array_index_nospec(dest_id, map->max_apic_id + 1);
++		if (map->phys_map[dest_id])
++			target = map->phys_map[dest_id]->vcpu;
++	}
+ 
+ 	rcu_read_unlock();
+ 
+-- 
+2.50.1
 
-	...
-   }
-
-
-As not setting any of the two FRED VM-Exit controls are rare cases, we
-need to add KVM tests with L1 that:
-1) doesn't set SECONDARY_VM_EXIT_SAVE_IA32_FRED in VM-Exit controls.
-2) doesn't set SECONDARY_VM_EXIT_LOAD_IA32_FRED in VM-Exit controls.
-3) doesn't set both of the FRED VM-Exit controls.
-
-Looks we need a framework for all VM-Exit controls which control whether
-to save/load specific MSRs related to CPU features during VM-Exit?
 
