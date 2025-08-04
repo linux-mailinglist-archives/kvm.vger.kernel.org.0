@@ -1,163 +1,144 @@
-Return-Path: <kvm+bounces-53945-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53947-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42FF9B1AB42
-	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 01:10:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93A9AB1AB9E
+	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 01:55:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 64171170F40
-	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 23:10:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BDBEC180FF3
+	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 23:55:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1A62291864;
-	Mon,  4 Aug 2025 23:10:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11E3B28852B;
+	Mon,  4 Aug 2025 23:55:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="X7EiZ6El"
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="AzdEaQL5"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89E83238C08
-	for <kvm@vger.kernel.org>; Mon,  4 Aug 2025 23:10:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90D9D2264B8
+	for <kvm@vger.kernel.org>; Mon,  4 Aug 2025 23:55:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754349003; cv=none; b=AF/2rvCnR24mtkHIV5AgGqAQwEpIcYs/XQEpUuRRkPm6l9E1klgQxtsNcTR+iMVvRBZokXIVLcMleZUWPA+THjEmM9TDRjekNb9G9Ha+MrI4CY66/8bcSH5lGnxPBkLPia+iXNof1IpdOqwASRUnfseVGwgPSIm3MwIlo4f2pYk=
+	t=1754351732; cv=none; b=ag+qOsI2Q+ufuqfsGGMuU9GAXbC2Bp2LEJKa0hLEioAJ8SLb28fsSSCkknm2nlICRoKX1gsHGxORtvL22mpBkn2U1VgWWPPx+ufOj81fx3tvWhnr3j2jbugyhg5LBpGGYEIJWBCD+KbfCPJ1ZzMfPe9CIv1AVedLqao5hq3tjVg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754349003; c=relaxed/simple;
-	bh=jGEm0DtgPk8+RabZ/v6woIGn/2BhjebzCgIbNh+Ac80=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ErSEe8HnI6bUMAaXm81JsucS32pwfnizkEsnM9VOTd5pOIUQG9+DdihYpTHWdVvsBHCtUcLGaOwj2BTf2MH7GPn6hAZEDvR5g9TZFdKNVkwh6VV4G7uQbEB6tZS7DyDwZHZkin3kEV/po9qI2naV4e3FB/YOA8jObAC+W089W04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=X7EiZ6El; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b3f71e509d6so6749946a12.0
-        for <kvm@vger.kernel.org>; Mon, 04 Aug 2025 16:10:01 -0700 (PDT)
+	s=arc-20240116; t=1754351732; c=relaxed/simple;
+	bh=LJa4/RLFYqhpHz6skUkYByaddwTg6kkzYxMQ4jNpMpw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gEKWaXaigcimueW+xNiiBQPH6cauZvjIcU8Y+ckwOCcyeaWRgr4Bu0KtPHqo8xYhWoRtR0bFivGOSrCEUZuLeGfat9KCGALF+43MTBHPBbLl47UHG4PLJbpGzNnI1zOYvVwEQPBdsJx8ULAl/v4v1WClRHWh0ZCOESl6Ecm/VGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=AzdEaQL5; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-af8fd1b80e5so831802766b.2
+        for <kvm@vger.kernel.org>; Mon, 04 Aug 2025 16:55:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754349001; x=1754953801; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tG0zFdwSMEPj6TjvMjIhSWrku59KtpikLJvWaNvieXY=;
-        b=X7EiZ6Elq84ytvAMYbzXAelu/Uvw/oj6a7ydvZlyA2EqZc4Y58MfQ1XFQmZ+w9vrrd
-         AZdSknweCxEO79fSpO0EoFlmEFQAYSCQhjoQFyh+tYr1jbxw4qHF7ejF40jgXKCo0lAH
-         09OmkyQt8RHDP3t57HZ17t25t224yfdOIHULtkuECNsqg44pBW6sEYA7XPAUSwzz5FVO
-         U7ulk5RGtcIIfdYnNXPkRH2hsk0ORyQUWLla1pdrB0HKMVKx7bT6IUTKwBmXHZp32+UF
-         BtoQ9Ve7JvXu7pF6X6WgzkTcnG0vt0uzjgIVq69pf1zg3VPwmbX3Ow4RROtz+yVEYCfR
-         PDPw==
+        d=linux-foundation.org; s=google; t=1754351727; x=1754956527; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=kkOJrgR6AtCFvZcGKn8m61aTsvNmBN6yQcZ7tCaSTKE=;
+        b=AzdEaQL5T1BLS2jVQbL3EndlQMsOXHWxD26AB+YvASRQLElh9ecZWCiQuchnDOSs8J
+         00KqwxAqyyn5/teD+LLIoMhN/dq9Hd/jMO8rfgBRtaMteEOb62ZAhbflzFuOepp62FSB
+         h16EjeHjCWly5esBdRNXZu8mAobUgIyLOGG30=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754349001; x=1754953801;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tG0zFdwSMEPj6TjvMjIhSWrku59KtpikLJvWaNvieXY=;
-        b=XKbel0qcOU+Zjd1cUeboNV92kr2rpyWcsb3xIlHBWjoOxw7d6+TIIEqhxE/ZNzdqOi
-         21maAOtsyDnX5NZxooTc3/S5GJEKgo14L7BiUyOKX5q/A8hT31rfo00EUemGvBWgi8ty
-         DBJfJACREDk3vXigunQ3v13+W7rYkbldBAOaO6hE/BdIq3E2K4Sp64gKHkM7JpMIKQ9J
-         egDu25FhoqRdyo9E5oBDAEWrWCXOX6DRMr2J3XCJNMK5yBf/tEQI86KN+HKIDrh7pb+Y
-         fCd5Yu/Loudc5jjTT55OzWTEVaEgB+UWB9/kRR1s4L+EtqxOTfaeK7vCditVsZMLfRy/
-         daRg==
-X-Forwarded-Encrypted: i=1; AJvYcCXZ6N238qDkK3SCFkO2GqhOUujD+J4WThIZoEEoi9JvpOkgm25WN+/Ub+E66n0E4irFIFU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxtbs0k3xPKWUMky4hh9jfwji6iIXiB/kR6hA20SZ1KHXm74rFO
-	KngI8SZ7fbmUV/iSSQgoxqb7tEznT7aEL+/kgxrHDNBF4ShNUEbN+/m8o/AGkBW6rTWrRrUI2oj
-	v0N3atg==
-X-Google-Smtp-Source: AGHT+IE2NsYRZGLMA0DfVkuf5vaTZrSFR4fZkpJO3aIRBFjVMmkA+JR/oFWBMzx7rkrijiPT3c3wcqzhSlk=
-X-Received: from pjyf7.prod.google.com ([2002:a17:90a:ec87:b0:31f:1707:80f6])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3886:b0:31e:f3b7:49d2
- with SMTP id 98e67ed59e1d1-3211611bdf3mr16662659a91.0.1754349000710; Mon, 04
- Aug 2025 16:10:00 -0700 (PDT)
-Date: Mon, 4 Aug 2025 16:09:59 -0700
-In-Reply-To: <87tt2nm6ie.fsf@redhat.com>
+        d=1e100.net; s=20230601; t=1754351727; x=1754956527;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kkOJrgR6AtCFvZcGKn8m61aTsvNmBN6yQcZ7tCaSTKE=;
+        b=CHFmcD9NOb8nV9adAc8KVv2/ozk5GWgY84HyCyIOQEt3iVUTXSpK/zqKSKxeM1D741
+         FBN2QlYvglnm3oLcsGKRd/M3x0b/ciopQwScAfM9efQcjzHRIhDVsR6QGFA2QlpE0CMc
+         7h6tRiYtDL9o+20RlMSviQ6kwT3R4IT43l+tKsVNEJ/Zkk4yN+fJAbVI3F5n0zqbR98V
+         fqdYKLBlB22USmo+RADWs95BFudMmGVPz3R39eWgR22Jm0bb8tMknqTiHaEF/+rp2Ms8
+         13qFFVDm8ZHecJ4au08flruwne2Dfk1pB4Rd4Y/PBbq/XelQaMgfweIqSaq1eEN1D5E1
+         WyYA==
+X-Gm-Message-State: AOJu0YyW2f66TBPWvpgLs4I5vJMfIWO8SgEM2kGBCwlUyr6c8EbmR+Em
+	CTv7fWh8gK3G5r+E04tdhS5gVy0T3NDzrtICHG7rQUsnnZtH/WrILOqxfg6Ym/20c8VQMrsjFUk
+	NeIOHSvQ=
+X-Gm-Gg: ASbGncu9jBGhqMfQmuRFYauJkRO38hCcHEZhpShYji+Ea2+SyaDdDBPsR/kLCK39U2N
+	bJMS6R/EbCsLp6tj4RQnO9iAgt7OPQbt+a8VzQG5LVhajYM82Y1Pg1DpXOB6icCs/FVE2GEGWaY
+	UrenTM+DpRZKH20HEPa2gBQzObGx4l9oFxFg8xxqIjr6cmUBYr8OPN5PmW7db7BGS8m9FqAPPXZ
+	0CSxrsQugQLfyDpHB57LlVB9YxW451BrJKBRZbpgEmSvj0vX6ccYQPfSnDaxWP8KTUlr1URb1WE
+	Ur3u0sXd5x33lKLbUbeS0sLody/ZrNEseDUDtIYbSEZrCjKuzzdCapHGh7nEy5g4Q6oyyUiRILN
+	aQdDocPW4iV1Q5XkELKxlqUhN0/2400AEW8cLwyHdSTfDExCtO2kwI3LCeuqUI5WFY0St9mPpHB
+	K+Rmw0AVI=
+X-Google-Smtp-Source: AGHT+IFHZiodW12fzXxgBf0YduQcW3CpxdDIERKegxTlbZonWm3VXt/DZml7IgbZPC+O1wEPoHRHjw==
+X-Received: by 2002:a17:907:6d1f:b0:ae0:c539:b89a with SMTP id a640c23a62f3a-af9400844bbmr1151035666b.19.1754351727574;
+        Mon, 04 Aug 2025 16:55:27 -0700 (PDT)
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com. [209.85.218.49])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-af93b4d4c27sm546548066b.66.2025.08.04.16.55.26
+        for <kvm@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 04 Aug 2025 16:55:27 -0700 (PDT)
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-adfb562266cso800151966b.0
+        for <kvm@vger.kernel.org>; Mon, 04 Aug 2025 16:55:26 -0700 (PDT)
+X-Received: by 2002:a17:906:478c:b0:ae9:876a:4f14 with SMTP id
+ a640c23a62f3a-af94024cab6mr1073910366b.59.1754351726564; Mon, 04 Aug 2025
+ 16:55:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <cover.1750432368.git.jpiotrowski@linux.microsoft.com>
- <4266fc8f76c152a3ffcbb2d2ebafd608aa0fb949.1750432368.git.jpiotrowski@linux.microsoft.com>
- <875xghoaac.fsf@redhat.com> <ca26fba1-c2bb-40a1-bb5e-92811c4a6fc6@linux.microsoft.com>
- <87o6tttliq.fsf@redhat.com> <aHWjPSIdp5B-2UBl@google.com> <87tt2nm6ie.fsf@redhat.com>
-Message-ID: <aJE9x_pjBVIdiEJN@google.com>
-Subject: Re: [RFC PATCH 1/1] KVM: VMX: Use Hyper-V EPT flush for local TLB flushes
-From: Sean Christopherson <seanjc@google.com>
-To: Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc: Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, linux-kernel@vger.kernel.org, 
-	alanjiang@microsoft.com, chinang.ma@microsoft.com, 
-	andrea.pellegrini@microsoft.com, Kevin Tian <kevin.tian@intel.com>, 
-	"K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
-	Dexuan Cui <decui@microsoft.com>, linux-hyperv@vger.kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20250804162201.66d196ad.alex.williamson@redhat.com>
+In-Reply-To: <20250804162201.66d196ad.alex.williamson@redhat.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Mon, 4 Aug 2025 16:55:09 -0700
+X-Gmail-Original-Message-ID: <CAHk-=whhYRMS7Xc9k_JBdrGvp++JLmU0T2xXEgn046hWrj7q8Q@mail.gmail.com>
+X-Gm-Features: Ac12FXzNsiXa1g4lLLdotjXwBYpgPqvnDpdKKoggRbJ3KlfhT-2HsnqsEpBMoL8
+Message-ID: <CAHk-=whhYRMS7Xc9k_JBdrGvp++JLmU0T2xXEgn046hWrj7q8Q@mail.gmail.com>
+Subject: Re: [GIT PULL] VFIO updates for v6.17-rc1
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Aug 04, 2025, Vitaly Kuznetsov wrote:
-> Sean Christopherson <seanjc@google.com> writes:
-> > It'll take more work than the below, e.g. to have VMX's construct_eptp() pull the
-> > level and A/D bits from kvm_mmu_page (vendor code can get at the kvm_mmu_page with
-> > root_to_sp()), but for the core concept/skeleton, I think this is it?
-> >
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index 6e838cb6c9e1..298130445182 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -3839,6 +3839,37 @@ void kvm_mmu_free_guest_mode_roots(struct kvm *kvm, struct kvm_mmu *mmu)
-> >  }
-> >  EXPORT_SYMBOL_GPL(kvm_mmu_free_guest_mode_roots);
-> >  
-> > +struct kvm_tlb_flush_root {
-> > +       struct kvm *kvm;
-> > +       hpa_t root;
-> > +};
-> > +
-> > +static void kvm_flush_tlb_root(void *__data)
-> > +{
-> > +       struct kvm_tlb_flush_root *data = __data;
-> > +
-> > +       kvm_x86_call(flush_tlb_root)(data->kvm, data->root);
-> > +}
-> > +
-> > +void kvm_mmu_flush_all_tlbs_root(struct kvm *kvm, struct kvm_mmu_page *root)
-> > +{
-> > +       struct kvm_tlb_flush_root data = {
-> > +               .kvm = kvm,
-> > +               .root = __pa(root->spt),
-> > +       };
-> > +
-> > +       /*
-> > +        * Flush any TLB entries for the new root, the provenance of the root
-> > +        * is unknown.  Even if KVM ensures there are no stale TLB entries
-> > +        * for a freed root, in theory another hypervisor could have left
-> > +        * stale entries.  Flushing on alloc also allows KVM to skip the TLB
-> > +        * flush when freeing a root (see kvm_tdp_mmu_put_root()), and flushing
-> > +        * TLBs on all CPUs allows KVM to elide TLB flushes when a vCPU is
-> > +        * migrated to a different pCPU.
-> > +        */
-> > +       on_each_cpu(kvm_flush_tlb_root, &data, 1);
-> 
-> Would it make sense to complement this with e.g. a CPU mask tracking all
-> the pCPUs where the VM has ever been seen running (+ a flush when a new
-> one is added to it)?
-> 
-> I'm worried about the potential performance impact for a case when a
-> huge host is running a lot of small VMs in 'partitioning' mode
-> (i.e. when all vCPUs are pinned). Additionally, this may have a negative
-> impact on RT use-cases where each unnecessary interruption can be seen
-> problematic. 
+On Mon, 4 Aug 2025 at 15:22, Alex Williamson <alex.williamson@redhat.com> wrote:
+>
+> Li Zhe (6):
+>       mm: introduce num_pages_contiguous()
 
-Oof, right.  And it's not even a VM-to-VM noisy neighbor problem, e.g. a few
-vCPUs using nested TDP could generate a lot of noist IRQs through a VM.  Hrm.
+WHY?
 
-So I think the basic idea is so flawed/garbage that even enhancing it with per-VM
-pCPU tracking wouldn't work.  I do think you've got the right idea with a pCPU mask
-though, but instead of using a mask to scope IPIs, use it to elide TLB flushes.
+There is exactly *ONE* user, why the heck do we introduce this
+completely pointless "helper" function, and put it in a core header
+file like it was worth it?
 
-With the TDP MMU, KVM can have at most 6 non-nested roots active at any given time:
-SMM vs. non-SMM, 4-level vs. 5-level, L1 vs. L2.  Allocating a cpumask for each
-TDP MMU root seems reasonable.  Then on task migration, instead of doing a global
-INVEPT, only INVEPT the current and prev_roots (because getting a new root will
-trigger a flush in kvm_mmu_load()), and skip INVEPT on TDP MMU roots if the pCPU
-has already done a flush for the root.
+And it's not like that code is some kind of work of art that we want
+to expose everybody to *anyway*. It's written in a particularly stupid
+way that means that it's *way* more expensive than it needs to be.
 
-Or we could do the optimized tracking for all roots.  x86 supports at most 8192
-CPUs, which means 1KiB per root.  That doesn't seem at all painful given that
-each shadow pages consumes 4KiB...
+And then it's made "inline" despite the code generation being
+horrible, which makes it all entirely pointless.
+
+Yes, I'm grumpy. This pull request came in late, I'm already
+traveling, and then I look at it and it just makes me *angry* at how
+bad that code is, and how annoying it is.
+
+My builds are already slower than usual because they happen on my
+laptop while traveling, I do *not* need to see this kind of absolutely
+disgusting code that does stupid things that make the build even
+slower.
+
+So I refuse to pull this kind of crap.
+
+If you insist on making my build slower and exposing these kinds of
+helper functions, they had better be *good* helper functions.
+
+Hint: absolutely nobody cares about "the pages crossed a sparsemem
+border. If your driver cares about the number of contiguous pages, it
+might as well say "yeah, they are contiguous, but they are in
+different sparsemem chunks, so we'll break here too".
+
+And at that point all you care about is 'struct page' being
+contiguous, instead of doing that disgusting 'nth_page'.
+
+And then - since there is only *one* single user - you don't put it in
+the most central header file that EVERYBODY ELSE cares about.
+
+And you absolutely don't do it if it generates garbage code for no good reason!
+
+            Linus
 
