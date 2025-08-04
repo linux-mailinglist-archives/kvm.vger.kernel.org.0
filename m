@@ -1,148 +1,239 @@
-Return-Path: <kvm+bounces-53894-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53895-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9715EB19FCC
-	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 12:41:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5D90B19FD6
+	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 12:41:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A02EF1699A2
-	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 10:41:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 065963BA663
+	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 10:41:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0118824BD00;
-	Mon,  4 Aug 2025 10:40:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EB1E252917;
+	Mon,  4 Aug 2025 10:41:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b="IBk8jBGl"
+	dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b="sFnirjUT"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
+Received: from fra-out-005.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-005.esa.eu-central-1.outbound.mail-perimeter.amazon.com [63.176.194.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AA7022D7B6
-	for <kvm@vger.kernel.org>; Mon,  4 Aug 2025 10:40:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0C7724C68D
+	for <kvm@vger.kernel.org>; Mon,  4 Aug 2025 10:41:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=63.176.194.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754304057; cv=none; b=LBY8BtuXWmaz9raTup5FIYOP0jDyQHS8r7813j15JMtGeXbsRGnnucCduE1I3cNa5Iru/1JB9rj7aRsn7IQvtJ9XoT0YPIEp/tME/Q7sx5U0pqZWyKYdbh00en6LoOW+gCmlBe16h1G1UpYm1YPBpPAPik3f51S7kakif2ndjzI=
+	t=1754304095; cv=none; b=JaphNalw5wSLnxnhohuZNthhc9681kk+xKEpWOXSTLn32G2LC+Wg3wopFy4+J0pJI71AfJtuvJoCQnObJtGdsEwFtwDpXgF+4tlgPU4vGySmmlsFkjqXM8lV+nydPioXwqO+eET3Zy0qLZzlNqJeY7ADvsRYj5T4rE/Gs1CQj58=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754304057; c=relaxed/simple;
-	bh=4iz19InG8gndeBe7O2NJqa7sN+JUVe/4L4WpHtJqvf4=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=VLYwiHzHQCT4erPbEKvX5qVUi5Vjq3xuh/fVYMeW+060NF/5Sg0giBQ7zUrsRcRaXjfM9BcYqBH4CIee1+Y1ZGI5lgBylHQqkGcHgjk14HZCvDijE/FIxU3KllHSLSPs0pzcofMss/JTlU8TZbU1n7zBoXBMSn2WJWS8tUW3Fz8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b=IBk8jBGl; arc=none smtp.client-ip=52.119.213.150
+	s=arc-20240116; t=1754304095; c=relaxed/simple;
+	bh=5CxKrs9Yg7JOtPPBLOLEbwTBds1RoSB/ZDLyW3oRzbg=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=meG31ZwX+FBQncRrVeN6VuqDYU6+NEJw6eV52p5pLqN4v3ta5in8H8F6DtPyZCGZ+Te9T67pmJ0p0hSYNf+HOnhtyiifVPYX9H2VyY1xQtjE2w6OqrgrEDe72n/3wPX5qdcfrNVmUPmo2HLI1Tw7zA2ZCUWf24TAoLKypijykZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b=sFnirjUT; arc=none smtp.client-ip=63.176.194.123
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.de; i=@amazon.de; q=dns/txt; s=amazoncorp2;
-  t=1754304055; x=1785840055;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=4iz19InG8gndeBe7O2NJqa7sN+JUVe/4L4WpHtJqvf4=;
-  b=IBk8jBGl2l1X9+W56ofVsRBZhUXA8Ur2LyWPrDVsaSbJSGOchllcMDkJ
-   GKahBgh2/6XyazoFM1KjNFIG+io5yFw6tNNO1ZLyx31+BdjQnjiLyWN7e
-   vVZSRdj4Y2ox/KN7bouQrsVoJ7Na5AlBEWc3jRYnTFTVaV0oLuLkSXsik
-   ftAcOUhtB1ZerFlOy7u0BrF6eBSkxQhboPjmyDaBPJn/JhZsMjdTmCSy9
-   BjhNsejHyF2dDaEUs33Po2J7Chh883dEjP6pZzSkbI9XmOavFyVu9PG57
-   Yo1TYpOdMCroTFrZ1PbVt+vC4DUNz38F9AGlysr0x2d6v81LVqNNfrv4t
-   g==;
+  t=1754304093; x=1785840093;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=YbmtEjbp/iQbkmVpz8Zvkh7EZtXJ2RPf2aWQlqkwa0o=;
+  b=sFnirjUTg/tvQYbRPtlZp26b/8fyhMCaIEFAS/kTAnEsdvkuuTSmONeU
+   0dfZji57TbUwxg6KUjL2LkflRs+dcUTsM2+5Y3ZtzH4bI09B7sCSwmb5R
+   W8JoEHRuHV1kxUuZafmOKn8oV5WKnDscGqR9GfbvUF/MwNtGRWc3E5xX4
+   T9cWwq8j+6rpNcV0fNdqxgQdzj2d5EdQYLNQJ0Ne4sCcy45rSPCcwuHhv
+   nARWLuFFl4YOAxOT+/Eb1bRx2ipfNlsvGXCjXimEavE1wS6fBMYRW2Ith
+   tHa96kV8YnUNa5RBhpLBAsU2KJTdWrHqZXE7CjZMVURM8IF9xh6KBgTLi
+   A==;
+X-CSE-ConnectionGUID: QsbzCHWoRX6LLT1mkzvRyw==
+X-CSE-MsgGUID: jIx61ZYDRL68sbFr9cV7Kw==
 X-IronPort-AV: E=Sophos;i="6.17,258,1747699200"; 
-   d="scan'208";a="745382763"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Aug 2025 10:40:51 +0000
-Received: from EX19MTAEUC002.ant.amazon.com [10.0.10.100:41363]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.17.72:2525] with esmtp (Farcaster)
- id ec89664e-514e-4b62-ac7f-3c175393646f; Mon, 4 Aug 2025 10:40:49 +0000 (UTC)
-X-Farcaster-Flow-ID: ec89664e-514e-4b62-ac7f-3c175393646f
+   d="scan'208";a="529728"
+Received: from ip-10-6-11-83.eu-central-1.compute.internal (HELO smtpout.naws.eu-west-1.prod.farcaster.email.amazon.dev) ([10.6.11.83])
+  by internal-fra-out-005.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Aug 2025 10:41:23 +0000
+Received: from EX19MTAEUC001.ant.amazon.com [10.0.17.79:64644]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.27.198:2525] with esmtp (Farcaster)
+ id b963e06a-288f-472e-ace8-0bce159cbecb; Mon, 4 Aug 2025 10:41:22 +0000 (UTC)
+X-Farcaster-Flow-ID: b963e06a-288f-472e-ace8-0bce159cbecb
 Received: from EX19D039EUC004.ant.amazon.com (10.252.61.190) by
- EX19MTAEUC002.ant.amazon.com (10.252.51.245) with Microsoft SMTP Server
+ EX19MTAEUC001.ant.amazon.com (10.252.51.193) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Mon, 4 Aug 2025 10:40:49 +0000
+ Mon, 4 Aug 2025 10:41:22 +0000
 Received: from dev-dsk-mngyadam-1c-cb3f7548.eu-west-1.amazon.com
  (10.253.107.175) by EX19D039EUC004.ant.amazon.com (10.252.61.190) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14; Mon, 4 Aug 2025
- 10:40:46 +0000
+ 10:41:19 +0000
 From: Mahmoud Adam <mngyadam@amazon.de>
 To: <kvm@vger.kernel.org>
 CC: <alex.williamson@redhat.com>, <jgg@ziepe.ca>, <benh@kernel.crashing.org>,
 	David Woodhouse <dwmw@amazon.co.uk>, <pravkmr@amazon.de>,
 	<nagy@khwaternagy.com>
-Subject: [RFC PATCH 0/9] vfio: Introduce mmap maple tree
-Date: Mon, 4 Aug 2025 12:39:53 +0200
-Message-ID: <20250804104012.87915-1-mngyadam@amazon.de>
+Subject: [RFC PATCH 1/9] vfio: add mmap maple tree to vfio
+Date: Mon, 4 Aug 2025 12:39:54 +0200
+Message-ID: <20250804104012.87915-2-mngyadam@amazon.de>
 X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20250804104012.87915-1-mngyadam@amazon.de>
+References: <20250804104012.87915-1-mngyadam@amazon.de>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ClientProxiedBy: EX19D032UWA003.ant.amazon.com (10.13.139.37) To
+X-ClientProxiedBy: EX19D044UWB002.ant.amazon.com (10.13.139.188) To
  EX19D039EUC004.ant.amazon.com (10.252.61.190)
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 
-VGhpcyBSRkMgc2VyaWVzIHByb3Bvc2VzIHRoZSBpbXBsZW1lbnRhdGlvbiBvZiBhIG5ldyBtZWNo
-YW5pc20gZm9yCnJlZ2lvbiBtbWFwIGF0dHJpYnV0ZXMgdXNpbmcgbWFwbGUgdHJlZXMsIGJhc2Vk
-IG9uIEphc29uJ3Mgc3VnZ2VzdGVkCm1hcGxlIHRyZWUgYW5kIG9mZnNldCBjb29raWUgYXBwcm9h
-Y2hbMF0uIFRoZSBwcmltYXJ5IG1vdGl2YXRpb24gaXMgdG8KZW5hYmxlIHVzZXJzcGFjZSBhcHBs
-aWNhdGlvbnMgdG8gc3BlY2lmeSBtbWFwIGF0dHJpYnV0ZXPigJRzdWNoIGFzIFdyaXRlCkNvbWJp
-bmluZyAoV0Mp4oCUcHJpb3IgdG8gaW52b2tpbmcgbW1hcCBvbiBhIFZGSU8gcmVnaW9uLiBXaGls
-ZSB0aGUKaW5pdGlhbCBmb2N1cyBpcyBvbiBXQyBzdXBwb3J0LCB0aGlzIGZyYW1ld29yayBjYW4g
-YmUgZXh0ZW5kZWQgdG8Kc3VwcG9ydCBhZGRpdGlvbmFsIGF0dHJpYnV0ZXMgKGUuZy4sIGNhY2hh
-YmxlKSBpbiB0aGUgZnV0dXJlLgoKQ29yZSBjb25jZXB0IGlzOiBhIG1hcGxlX3RyZWUgaW5zdGFu
-Y2UgaXMgaW50cm9kdWNlZCBwZXIgZmlsZQpkZXNjcmlwdG9yIHdpdGhpbiB2ZmlvX2RldmljZV9m
-aWxlLCBhbGxvd2luZyBwZXItcmVxdWVzdCBvd25lcnNoaXAgYW5kCmNvbnRyb2wgb2YgbW1hcCBh
-dHRyaWJ1dGVzLiBWaWEgbmV3IFZGSU8gZGV2aWNlIG9wZXJhdGlvbnMgKGlvY3RsICYKbW1hcCks
-IGVhY2ggdmZpbyBkZXZpY2UgcG9wdWxhdGVzIGl0cyBtYXBsZV90cmVlLCBwcmltYXJpbHkgZHVy
-aW5nIHRoZQpERVZJQ0VfR0VUX1JFR0lPTl9JTkZPIGlvY3RsLiBUaGUga2VybmVsIHJldHVybnMg
-YSB1bmlxdWUgb2Zmc2V0IGtleQp0byB1c2Vyc3BhY2U7IHVzZXJzcGFjZSBjYW4gdGhlbiBwYXNz
-IHRoaXMgb2Zmc2V0IHRvIG1tYXAsIGF0IHdoaWNoCnBvaW50IHRoZSBrZXJuZWwgcmV0cmlldmVz
-IHRoZSBjb3JyZWN0IG1hcGxlX3RyZWUgZW50cnkgYW5kIGludm9rZXMKdGhlIG5ldyBtbWFwIG9w
-IG9uIHRoZSB2ZmlvIGRldmljZSB0byBtYXAgdGhlIHJlZ2lvbiB3aXRoIHRoZSBkZXNpcmVkCmF0
-dHJpYnV0ZXMuCgpUaGlzIG1vZGVsIGFsc28gZW5hYmxlcyBhIG5ldyBVQVBJIGZvciB1c2Vyc3Bh
-Y2UgdG8gc2V0IGF0dHJpYnV0ZXMgb24KYSBnaXZlbiBtbWFwIG9mZnNldCwgYWxsb3dpbmcgZmxl
-eGliaWxpdHkgYW5kIHJvb20gZm9yIGZ1dHVyZSBmZWF0dXJlCmV4cGFuc2lvbi4KCkJlY2F1c2Ug
-dGhlc2UgY2hhbmdlcyBhbHRlciBib3RoIGludGVybmFsIHJlZ2lvbiBvZmZzZXQgaGFuZGxpbmcg
-YW5kCnRoZSBpb2N0bC9tbWFwIGludGVyZmFjZXMsIGEgc3RhZ2VkIGFwcHJvYWNoIGlzIG5lY2Vz
-c2FyeSB0byBtYW5hZ2UKdGhlIGxhcmdlIHNjb3BlIG9mIHRoZSB1cGRhdGUuCgpUaGlzIFJGQyBp
-bXBsZW1lbnRzOgogICAgLSBJbnRlZ3JhdGlvbiBvZiB0aGUgbWFwbGVfdHJlZSBtZWNoYW5pc20g
-YW5kIG5ldyBWRklPIG9wcywgYWxvbmcKICAgICAgd2l0aCByZXF1aXJlZCBoZWxwZXJzLgogICAg
-LSBJbml0aWFsIG9uYm9hcmQgc3VwcG9ydCBmb3IgdmZpby1wY2kuCiAgICAtIEludHJvZHVjdGlv
-biBvZiB0aGUgbmV3IFVBUEkgc3VwcG9ydGluZyBXQy4KClBsYW5uZWQgZm9sbG93LXVwIHdvcms6
-CiAgICAtIEV4dGVuZGluZyBuZXcgb3BzIHN1cHBvcnQgdG8gYWxsIHZmaW8tcGNpIGRldmljZXMu
-CiAgICAtIFVwZGF0aW5nIHVzYWdlcyBvZiBWRklPX1BDSV9PRkZTRVRfVE9fSU5ERVggYW5kIFZG
-SU9fUENJX0lOREVYX1RPX09GRlNFVC4KICAgIC0gTWlncmF0aW5nIGFkZGl0aW9uYWwgVkZJTyBk
-ZXZpY2VzIHRvIHRoZSBuZXcgb3BzLgogICAgLSBGdWxseSByZW1vdmluZyBsZWdhY3kgaW9jdGwg
-YW5kIG1tYXAgb3BzLCByZW5hbWluZyB0aGUgbmV3IG9wcwogICAgICBpbiB0aGVpciBwbGFjZSBv
-bmNlIG1pZ3JhdGlvbiBpcyBjb21wbGV0ZS4KCgpGb3Igbm93LCBsZWdhY3kgYW5kIG5ldyBWRklP
-IG9wcyBjb2V4aXN0LiBMZWdhY3kgb3BzIHdpbGwgYmUgcmVtb3ZlZApmb2xsb3dpbmcgZnVsbCBt
-aWdyYXRpb24gYWNyb3NzIGFsbCByZWxldmFudCBkZXZpY2VzLgoKVGhpcyBSRkMgbWFya3MgdGhl
-IHN0YXJ0IG9mIHRoaXMgdHJhbnNpdGlvbi4gSSBhbSBzZWVraW5nIGZlZWRiYWNrIG9uCnRoZSBj
-b3JlIGltcGxlbWVudGF0aW9uIHRvIGVuc3VyZSB0aGUgZGlyZWN0aW9uIGFuZCBkZXNpZ24gYXJl
-IGNvcnJlY3QKYmVmb3JlIHByb2NlZWRpbmcgd2l0aCBmdXJ0aGVyIGNvbnZlcnNpb24gYW5kIGNs
-ZWFudXAgd29yay4gVGhhbmsgeW91CmZvciB5b3VyIHJldmlldyBhbmQgZ3VpZGFuY2UuCgpbMF06
-IGh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL2t2bS8yMDI0MDgwMTE0MTkxNC5HQzMwMzA3NjFAemll
-cGUuY2EvCgpyZWZlcmVuY2VzOgotIGh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL2t2bS8yMDI0MDcz
-MTE1NTM1Mi4zOTczODU3LTEta2J1c2NoQG1ldGEuY29tL1QvI3UKLSBodHRwczovL2xvcmUua2Vy
-bmVsLm9yZy9rdm0vbHJreXE0aXZjY2I2eC5mc2ZAZGV2LWRzay1tbmd5YWRhbS0xYy1jYjNmNzU0
-OC5ldS13ZXN0LTEuYW1hem9uLmNvbS8KCk1haG1vdWQgQWRhbSAoOSk6CiAgdmZpbzogYWRkIG1t
-YXAgbWFwbGUgdHJlZSB0byB2ZmlvCiAgdmZpbzogYWRkIHRyYW5zaWVudCBvcHMgdG8gc3VwcG9y
-dCB2ZmlvIG1tYXAgbXQKICB2ZmlvLXBjaS1jb3JlOiByZW5hbWUgdm0gb3BlcmF0aW9ucwogIHZm
-aW8tcGNpLWNvcmU6IHJlbW92ZSByZWR1bmRhbnQgb2Zmc2V0IGNhbGN1bGF0aW9ucwogIHZmaW8t
-cGNpLWNvcmU6IGFkZCB2ZmlvX3BjaV9tbWFwICYgaGVscGVycwogIHZmaW8tcGNpLWNvcmU6IHN1
-cHBvcnQgdGhlIG5ldyB2ZmlvIG9wcwogIHZmaW8tcGNpOiB1c2UgdGhlIG5ldyB2ZmlvIG9wcwog
-IHZmaW86IFVBUEkgZm9yIHNldHRpbmcgbW1hcCBhdHRyaWJ1dGVzCiAgdmZpb19wY2lfY29yZTog
-c3VwcG9ydCBtbWFwIGF0dHJzIHVhcGkgJiBXQwoKIGRyaXZlcnMvdmZpby9wY2kvdmZpb19wY2ku
-YyAgICAgIHwgICA0ICstCiBkcml2ZXJzL3ZmaW8vcGNpL3ZmaW9fcGNpX2NvcmUuYyB8IDE2NSAr
-KysrKysrKysrKysrKysrKysrKysrKysrKystLS0tCiBkcml2ZXJzL3ZmaW8vdmZpby5oICAgICAg
-ICAgICAgICB8ICAgMSArCiBkcml2ZXJzL3ZmaW8vdmZpb19tYWluLmMgICAgICAgICB8ICA0MiAr
-KysrKysrKwogaW5jbHVkZS9saW51eC92ZmlvLmggICAgICAgICAgICAgfCAgMjIgKysrKysKIGlu
-Y2x1ZGUvbGludXgvdmZpb19wY2lfY29yZS5oICAgIHwgIDE0ICsrKwogaW5jbHVkZS91YXBpL2xp
-bnV4L3ZmaW8uaCAgICAgICAgfCAgMTkgKysrKwogNyBmaWxlcyBjaGFuZ2VkLCAyNDggaW5zZXJ0
-aW9ucygrKSwgMTkgZGVsZXRpb25zKC0pCgotLSAKMi40Ny4zCgp0aGFua3MsCk1OQWRhbQoKCgpB
-bWF6b24gV2ViIFNlcnZpY2VzIERldmVsb3BtZW50IENlbnRlciBHZXJtYW55IEdtYkgKVGFtYXJh
-LURhbnotU3RyLiAxMwoxMDI0MyBCZXJsaW4KR2VzY2hhZWZ0c2Z1ZWhydW5nOiBDaHJpc3RpYW4g
-U2NobGFlZ2VyLCBKb25hdGhhbiBXZWlzcwpFaW5nZXRyYWdlbiBhbSBBbXRzZ2VyaWNodCBDaGFy
-bG90dGVuYnVyZyB1bnRlciBIUkIgMjU3NzY0IEIKU2l0ejogQmVybGluClVzdC1JRDogREUgMzY1
-IDUzOCA1OTcK
+add mmap maple tree for vfio_device_file, this allows vfio devices to
+create per mmap request options. the vfio device needs to
+insert/allocate the region range offset & size and make it accessible
+for the user, probably when the user is calling
+DEVICE_GET_REGION_INFO, and then vfio uses the maple_tree to find the
+entry (vfio_mmap) needed for mmap op, this adds the vfio_mmap_init &
+vfio_mmap_free for initialization and freeing the entry, the freeing
+is done through the free callback in the vfio_mmap_ops, which
+vfio_devices should implement if they are allocating an entry.
+
+Signed-off-by: Mahmoud Adam <mngyadam@amazon.de>
+---
+I didn't find a situation where we would need to use ref counting for
+now, so I didn't implement it, I think most cases are already handled
+by file ref counting, but maybe I'm overlooking something here.
+
+ drivers/vfio/vfio.h      |  1 +
+ drivers/vfio/vfio_main.c | 29 +++++++++++++++++++++++++++++
+ include/linux/vfio.h     | 17 +++++++++++++++++
+ 3 files changed, 47 insertions(+)
+
+diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
+index 50128da18bcaf..3f0cf2dd41116 100644
+--- a/drivers/vfio/vfio.h
++++ b/drivers/vfio/vfio.h
+@@ -19,6 +19,7 @@ struct vfio_container;
+ struct vfio_device_file {
+ 	struct vfio_device *device;
+ 	struct vfio_group *group;
++	struct maple_tree mmap_mt;
+ 
+ 	u8 access_granted;
+ 	u32 devid; /* only valid when iommufd is valid */
+diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+index 1fd261efc582d..4c4af4de60d12 100644
+--- a/drivers/vfio/vfio_main.c
++++ b/drivers/vfio/vfio_main.c
+@@ -39,6 +39,7 @@
+ #include <linux/interval_tree.h>
+ #include <linux/iova_bitmap.h>
+ #include <linux/iommufd.h>
++#include <linux/maple_tree.h>
+ #include "vfio.h"
+ 
+ #define DRIVER_VERSION	"0.3"
+@@ -498,6 +499,7 @@ vfio_allocate_device_file(struct vfio_device *device)
+ 
+ 	df->device = device;
+ 	spin_lock_init(&df->kvm_ref_lock);
++	mt_init_flags(&df->mmap_mt, MT_FLAGS_ALLOC_RANGE);
+ 
+ 	return df;
+ }
+@@ -622,6 +624,25 @@ static inline void vfio_device_pm_runtime_put(struct vfio_device *device)
+ 		pm_runtime_put(dev);
+ }
+ 
++void vfio_mmap_init(struct vfio_device *vdev, struct vfio_mmap *vmmap,
++		    u32 region_flags, u64 offset, u64 size,
++		    struct vfio_mmap_ops *ops)
++{
++	vmmap->owner = vdev;
++	vmmap->offset = offset;
++	vmmap->ops = ops;
++	vmmap->size = size;
++	vmmap->region_flags = region_flags;
++}
++EXPORT_SYMBOL_GPL(vfio_mmap_init);
++
++void vfio_mmap_free(struct vfio_mmap *vmmap)
++{
++	if (vmmap->ops && vmmap->ops->free)
++		vmmap->ops->free(vmmap);
++}
++EXPORT_SYMBOL_GPL(vfio_mmap_free);
++
+ /*
+  * VFIO Device fd
+  */
+@@ -629,14 +650,22 @@ static int vfio_device_fops_release(struct inode *inode, struct file *filep)
+ {
+ 	struct vfio_device_file *df = filep->private_data;
+ 	struct vfio_device *device = df->device;
++	struct vfio_mmap *vmmap;
++	unsigned long index = 0;
+ 
+ 	if (df->group)
+ 		vfio_df_group_close(df);
+ 	else
+ 		vfio_df_unbind_iommufd(df);
+ 
++	mt_for_each(&df->mmap_mt, vmmap, index, ULONG_MAX) {
++		mtree_erase(&df->mmap_mt, index);
++		vfio_mmap_free(vmmap);
++	}
++
+ 	vfio_device_put_registration(device);
+ 
++	mtree_destroy(&df->mmap_mt);
+ 	kfree(df);
+ 
+ 	return 0;
+diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+index 707b00772ce1f..6e0aca05aa406 100644
+--- a/include/linux/vfio.h
++++ b/include/linux/vfio.h
+@@ -80,6 +80,19 @@ struct vfio_device {
+ #endif
+ };
+ 
++struct vfio_mmap {
++	struct vfio_device *owner;
++	u64 offset;
++	u64 size;
++	u32 region_flags;
++	struct vfio_mmap_ops *ops;
++};
++
++struct vfio_mmap_ops {
++	void	(*free)(struct vfio_mmap *vmmap);
++};
++
++
+ /**
+  * struct vfio_device_ops - VFIO bus driver device callbacks
+  *
+@@ -338,6 +351,10 @@ int vfio_pin_pages(struct vfio_device *device, dma_addr_t iova,
+ void vfio_unpin_pages(struct vfio_device *device, dma_addr_t iova, int npage);
+ int vfio_dma_rw(struct vfio_device *device, dma_addr_t iova,
+ 		void *data, size_t len, bool write);
++void vfio_mmap_init(struct vfio_device *vdev, struct vfio_mmap *vmmap,
++		    u32 region_flags, u64 offset, u64 size,
++		    struct vfio_mmap_ops *ops);
++void vfio_mmap_free(struct vfio_mmap *vmmap);
+ 
+ /*
+  * Sub-module helpers
+-- 
+2.47.3
+
+
+
+
+Amazon Web Services Development Center Germany GmbH
+Tamara-Danz-Str. 13
+10243 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
+Sitz: Berlin
+Ust-ID: DE 365 538 597
 
 
