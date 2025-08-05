@@ -1,266 +1,167 @@
-Return-Path: <kvm+bounces-54028-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54029-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61C90B1B830
-	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 18:14:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BC8AB1B9CB
+	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 20:04:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 437593BD362
-	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 16:14:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C5CA718A6873
+	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 18:04:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46749292B35;
-	Tue,  5 Aug 2025 16:14:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA10C295D91;
+	Tue,  5 Aug 2025 18:04:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zu+U3pL5"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="NcWK4Ajs"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A01F61C8603;
-	Tue,  5 Aug 2025 16:14:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B4E811712;
+	Tue,  5 Aug 2025 18:04:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754410445; cv=none; b=sG45V+GdoMCFbtHP7VEmUL6bBUdZbUd8hiDEKg74MKdZBpnjaKs4yu4uwGYiR6Oki7jRfXlLmomHtb53k3HabVuLHE1n1g+c/f9M0z2AziGhIYzH45Q1x7ze7HXsQ/AQg/4CbepgcYz9E6DuE71W0sZqtyuzHlZTzFq8/phv8Dw=
+	t=1754417060; cv=none; b=hT0k1Kdm4sEdFjqT8dQ24JsCrSsT7ozB+oPoJWwMQJZK3rS212Dy3SM0ufzF6r43pgbznLuQ5Pf/8y6LGgek8iKu6ff04kR3xiUODnsuTiRXFB1P/n8cA1+F8it+RZMuqywwhHOoP4x9iLEaQr7LY2l7VDrlW5hPTZqI1mMn78I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754410445; c=relaxed/simple;
-	bh=BglbfbCfxjDdNAl+FJxNAK3U0aRdh/ewx/iXRTko+dM=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bCmNbeoNjxCiJOkQpA5AgctmWxrwYxOk64myWn6QfJKVFwLD9eZPsterRDrBgUAlXvak5oXqwn8pjfSS4/PZlT0jFZsr7WcS4ipaxi4Gn6RXxmjPGjbdu8tB+CBF96xZJ8joZ+Q+aRtuJWOa+31mDqWadGk6qdXVOy0PucI5B+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zu+U3pL5; arc=none smtp.client-ip=209.85.208.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-332631e47afso714441fa.0;
-        Tue, 05 Aug 2025 09:14:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1754410442; x=1755015242; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ut5lsjSSswYnbLzk6rrdmu5+CeAKFhijQRi1rB1wfMg=;
-        b=Zu+U3pL5o4ZPJwIdkXISpU2dyfPB0+TNZSjkYcKaYSD+SRRfTxkyiY1CToGY5wFqXg
-         d8melksPoN+JtITTK/3buDk8xEYbfYAarJDpRVujvYiOcWyWF7oQh2Bih2TJHc50/B2G
-         9ZSAO+oT9l+ky/3GyCE1N/l6yabchtlYwVZ+jVHSjdVj6iebKyEv27RnIb7aN9pPx0JD
-         m4TSkoDO2Yc6tLTV92FnvVCzzvf4ITl6fFll+GlPKPIj/SaRddi5H5EkcddCdZcWoTAi
-         RwT2OhbFiB8+sd9j9pLdRESRxpfojA4PvSkmWNZIRK9A5+KcBdYgxbVvRXdnnlCEuZB6
-         7ptw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754410442; x=1755015242;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ut5lsjSSswYnbLzk6rrdmu5+CeAKFhijQRi1rB1wfMg=;
-        b=wx79USt3Ijrv7F9dJ5zPWyZw9psisLB0mYeorSbrDyQjqfUBf8xXKgZWmCy9+bpmEI
-         NsOQSPKcZhmj5okJHTHaeXJrCjt0+0kEDXMSSCqFF4ypECrAjg9Mqa+uoy6XQW8jMA6Z
-         HhOYGAXrHy+bCSq0JJESfwr/muam04OZYoZLFL4Mw3/dUD+hzWy5Mz70SPM/lGsPlqGR
-         FW9wV55/f5JWjawM1SacamRoVoYwv7sX5bhAWUq4WGl1su2Q/HM2Ix5r+roprpqF1sPH
-         XBRQgUBk5WMsQ6kaxNXK1ylwKYXYSl5+uX46312Actj1UgIG67sg/BcVmq97aabj5nnW
-         Y96Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUBXXl7Ln8ePOt/LelC/47AUjsVXvr3aPHOVL7QwGqVc5pFYT1j1Z2e1MNh3RiYjrnwUBQzS243SljyeA==@vger.kernel.org, AJvYcCUYCQuoHFFsYcLtOpmBwSDPF0KAghyxY5nF8FAvFG4Q+VvV2lijReZePpr67eT/bw/AFL/CTrEMmFo/KilbGE0D5wSK@vger.kernel.org, AJvYcCUa0UAeg0sZyqKo/pYjy0MGDl3e7b/NsFK1EKVj+A2xR4u5QXE9yYMF+ogf3tuqwRaXeCyw8igidhx7IYy3@vger.kernel.org, AJvYcCVRzqnQEWpS4yisO12QA03J8rA0KSLDSkQO9l6MXGLXU1kz2EuLKVXQjReyetwSbyw+eB1rw3Mmqi4WJIUyPg==@vger.kernel.org, AJvYcCVjEelcX7AjVqrAjOGe/iWWj+BaB4QwssPJxvQQRTSUxlrifa0jfXjaHVmeoKISzeZMxgcGPS4E2Om8@vger.kernel.org, AJvYcCWKdVjmu7PtpdRJn0EnQxgGH/0ush9kKfGE1O6tpN/2LAPHeGQ6MMxHWmCHE7vu6cioOgk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxgVvFVN1d7cyE2qfbqHEjKPXhjt7TIYRSMIjSxMUH+zl6P/8El
-	PC34RCwbFvWQEtOmGfQZuUUdqoV9xsgEsXPydgi5zNJ0+eAJ45Zjc7N8
-X-Gm-Gg: ASbGncv2m1NdzzRQhE1BgT7wneFjtgaQUh42bE1MXtBKurH6VPUQM3n7S/FFB7eujIL
-	80Sejdzh4+vE5PRMl3xJVPUWnfk8vKDcXphHC3zUk0g4FtZIcnpYCB9Hzz5XfaiLWosaEnV0fIn
-	/s/gDY+7JkzAQXU6scowMADMhEJPRb+9ZGRGtnETnNmwW5nyQOoNCDCap9+RBTO1KT90DejATDa
-	RZBXMxPEA2BqPI+TTnAEY6w8WiF7ngq+154gH+UZncedd4YGQnFPS796Fl/g3sJX5rLsaOLlBBw
-	JB9VsbWJQaM9wjqYVQ0l62+8xq1jV0UK5JDGiJcmslAc5GtEReC9yiDUOGbJep4F20AZKrEDbyg
-	lrlIOfVOliLyfdhnOD8yMSnqzpAQU0YP0g+rLanYoASb9qPS1XQ==
-X-Google-Smtp-Source: AGHT+IH0xPAx9h/e+86wx2UChAIDs8RS46jNjVMEpxxiiDlgZAALsSVVnEbgPp+pN/RR7dfa5MNCmA==
-X-Received: by 2002:a05:651c:b0f:b0:332:341d:9531 with SMTP id 38308e7fff4ca-3327b9157d5mr10915411fa.12.1754410441379;
-        Tue, 05 Aug 2025 09:14:01 -0700 (PDT)
-Received: from pc636 (host-95-203-18-142.mobileonline.telia.com. [95.203.18.142])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-33238272ff7sm20616811fa.7.2025.08.05.09.13.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Aug 2025 09:14:00 -0700 (PDT)
-From: Uladzislau Rezki <urezki@gmail.com>
-X-Google-Original-From: Uladzislau Rezki <urezki@pc636>
-Date: Tue, 5 Aug 2025 18:13:56 +0200
-To: Mike Rapoport <rppt@kernel.org>
-Cc: Uladzislau Rezki <urezki@gmail.com>,
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	Harry Yoo <harry.yoo@oracle.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	"David S . Miller" <davem@davemloft.net>,
-	Andreas Larsson <andreas@gaisler.com>,
-	Jarkko Sakkinen <jarkko@kernel.org>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	"H . Peter Anvin" <hpa@zytor.com>,
-	Andy Lutomirski <luto@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-	Kees Cook <kees@kernel.org>, Peter Xu <peterx@redhat.com>,
-	David Hildenbrand <david@redhat.com>, Zi Yan <ziy@nvidia.com>,
-	Baolin Wang <baolin.wang@linux.alibaba.com>,
-	"Liam R . Howlett" <Liam.Howlett@oracle.com>,
-	Nico Pache <npache@redhat.com>, Ryan Roberts <ryan.roberts@arm.com>,
-	Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>,
-	Xu Xin <xu.xin16@zte.com.cn>,
-	Chengming Zhou <chengming.zhou@linux.dev>,
-	Hugh Dickins <hughd@google.com>, Vlastimil Babka <vbabka@suse.cz>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Michal Hocko <mhocko@suse.com>, Rik van Riel <riel@surriel.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>, John Hubbard <jhubbard@nvidia.com>,
-	Muchun Song <muchun.song@linux.dev>,
-	Oscar Salvador <osalvador@suse.de>, Jann Horn <jannh@google.com>,
-	Pedro Falcato <pfalcato@suse.de>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Qi Zheng <zhengqi.arch@bytedance.com>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
-	sparclinux@vger.kernel.org, linux-sgx@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	nvdimm@lists.linux.dev, linux-trace-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/3] mm: update core kernel code to use vm_flags_t
- consistently
-Message-ID: <aJItxJNfn8B2JBbn@pc636>
-References: <cover.1750274467.git.lorenzo.stoakes@oracle.com>
- <d1588e7bb96d1ea3fe7b9df2c699d5b4592d901d.1750274467.git.lorenzo.stoakes@oracle.com>
- <aIgSpAnU8EaIcqd9@hyeyoo>
- <73764aaa-2186-4c8e-8523-55705018d842@lucifer.local>
- <aIkVRTouPqhcxOes@pc636>
- <69860c97-8a76-4ce5-b1d6-9d7c8370d9cd@lucifer.local>
- <aJCRXVP-ZFEPtl1Y@pc636>
- <aJHQ9XCLtibFjt93@kernel.org>
+	s=arc-20240116; t=1754417060; c=relaxed/simple;
+	bh=MJtN4k1Nruf/ZmY148j2YWicg+9zvj2TWex6ubyTDM0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=t3mD5JQquoIXjqA1rg0L1xvsfB7ktZdDsouy0tOEO9PSayU1YOzmLm9twt3v9BOWm6Rfd2fHehlDt0jWXxxsLniwcS6ECqXTsFFIR9NRpoGsYcDsKyMiFUyBa5NzWehPouNvB6wvl7MCPlRfK+zvCWDM4KuRUoM0AqVyLv/Aei0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=NcWK4Ajs; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from [100.80.129.135] (unknown [20.107.5.167])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 006A5202189A;
+	Tue,  5 Aug 2025 11:04:10 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 006A5202189A
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1754417053;
+	bh=+X8vGedp4v4FTKCazxcmKil7EM3tRuf78vox+z+LWEc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=NcWK4Ajs8ip8f/wd6l4Riw4CVUwJZsnAhsTtFWBycqrPAezptPWFhwfwaH0muabNQ
+	 C7xp7XdoP7L+MFTs8j78NwlAjXoXuVfjgSOocE1R++moz30hw+R0JiwZyFhuteIdbC
+	 XANK8YLtqqZXHq50O7ys9HYoNFHek0pw3x5+C3fg=
+Message-ID: <ce7ef1f0-c098-4669-85f3-b6ebb437a568@linux.microsoft.com>
+Date: Tue, 5 Aug 2025 20:04:09 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aJHQ9XCLtibFjt93@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 1/1] KVM: VMX: Use Hyper-V EPT flush for local TLB
+ flushes
+To: Sean Christopherson <seanjc@google.com>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: Dave Hansen <dave.hansen@linux.intel.com>, linux-kernel@vger.kernel.org,
+ alanjiang@microsoft.com, chinang.ma@microsoft.com,
+ andrea.pellegrini@microsoft.com, Kevin Tian <kevin.tian@intel.com>,
+ "K. Y. Srinivasan" <kys@microsoft.com>,
+ Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+ Dexuan Cui <decui@microsoft.com>, linux-hyperv@vger.kernel.org,
+ Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+References: <cover.1750432368.git.jpiotrowski@linux.microsoft.com>
+ <4266fc8f76c152a3ffcbb2d2ebafd608aa0fb949.1750432368.git.jpiotrowski@linux.microsoft.com>
+ <875xghoaac.fsf@redhat.com>
+ <ca26fba1-c2bb-40a1-bb5e-92811c4a6fc6@linux.microsoft.com>
+ <87o6tttliq.fsf@redhat.com> <aHWjPSIdp5B-2UBl@google.com>
+ <87tt2nm6ie.fsf@redhat.com> <aJE9x_pjBVIdiEJN@google.com>
+Content-Language: en-US
+From: Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
+In-Reply-To: <aJE9x_pjBVIdiEJN@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Aug 05, 2025 at 12:37:57PM +0300, Mike Rapoport wrote:
-> On Mon, Aug 04, 2025 at 12:54:21PM +0200, Uladzislau Rezki wrote:
-> > Hello, Lorenzo!
-> > 
-> > > So sorry Ulad, I meant to get back to you on this sooner!
-> > > 
-> > > On Tue, Jul 29, 2025 at 08:39:01PM +0200, Uladzislau Rezki wrote:
-> > > > On Tue, Jul 29, 2025 at 06:25:39AM +0100, Lorenzo Stoakes wrote:
-> > > > > Andrew - FYI there's nothing to worry about here, the type remains
-> > > > > precisely the same, and I'll send a patch to fix this trivial issue so when
-> > > > > later this type changes vmalloc will be uaffected.
-> > > > >
-> > > > > On Tue, Jul 29, 2025 at 09:15:51AM +0900, Harry Yoo wrote:
-> > > > > > [Adding Uladzislau to Cc]
-> > > > >
-> > > > > Ulad - could we PLEASE get rid of 'vm_flags' in vmalloc? It's the precise
-> > > > > same name and (currently) type as vma->vm_flags and is already the source
-> > > > > of confusion.
-> > > > >
-> > > > You mean all "vm_flags" variable names? "vm_struct" has flags as a
-> > > > member. So you want:
-> > > >
-> > > > urezki@pc638:~/data/backup/coding/linux-not-broken.git$ grep -rn vm_flags mm/execmem.c
-> > > > 29:                          pgprot_t pgprot, unsigned long vm_flags)
-> > > > 39:             vm_flags |= VM_DEFER_KMEMLEAK;
-> > > > 41:     if (vm_flags & VM_ALLOW_HUGE_VMAP)
-> > > > 45:                              pgprot, vm_flags, NUMA_NO_NODE,
-> > > > 51:                                      pgprot, vm_flags, NUMA_NO_NODE,
-> > > > 85:                          pgprot_t pgprot, unsigned long vm_flags)
-> > > > 259:    unsigned long vm_flags = VM_ALLOW_HUGE_VMAP;
-> > > > 266:    p = execmem_vmalloc(range, alloc_size, PAGE_KERNEL, vm_flags);
-> > > > 376:    unsigned long vm_flags = VM_FLUSH_RESET_PERMS;
-> > > > 385:            p = execmem_vmalloc(range, size, pgprot, vm_flags);
-> > > > urezki@pc638:~/data/backup/coding/linux-not-broken.git$ grep -rn vm_flags mm/vmalloc.c
-> > > > 3853: * @vm_flags:                additional vm area flags (e.g. %VM_NO_GUARD)
-> > > > 3875:                   pgprot_t prot, unsigned long vm_flags, int node,
-> > > > 3894:   if (vmap_allow_huge && (vm_flags & VM_ALLOW_HUGE_VMAP)) {
-> > > > 3912:                             VM_UNINITIALIZED | vm_flags, start, end, node,
-> > > > 3977:   if (!(vm_flags & VM_DEFER_KMEMLEAK))
-> > > > 4621:   vm_flags_set(vma, VM_DONTEXPAND | VM_DONTDUMP);
-> > > > urezki@pc638:~/data/backup/coding/linux-not-broken.git$ grep -rn vm_flags mm/execmem.c
-> > > > 29:                          pgprot_t pgprot, unsigned long vm_flags)
-> > > > 39:             vm_flags |= VM_DEFER_KMEMLEAK;
-> > > > 41:     if (vm_flags & VM_ALLOW_HUGE_VMAP)
-> > > > 45:                              pgprot, vm_flags, NUMA_NO_NODE,
-> > > > 51:                                      pgprot, vm_flags, NUMA_NO_NODE,
-> > > > 85:                          pgprot_t pgprot, unsigned long vm_flags)
-> > > > 259:    unsigned long vm_flags = VM_ALLOW_HUGE_VMAP;
-> > > > 266:    p = execmem_vmalloc(range, alloc_size, PAGE_KERNEL, vm_flags);
-> > > > 376:    unsigned long vm_flags = VM_FLUSH_RESET_PERMS;
-> > > > 385:            p = execmem_vmalloc(range, size, pgprot, vm_flags);
-> > > > urezki@pc638:~/data/backup/coding/linux-not-broken.git$ grep -rn vm_flags ./include/linux/vmalloc.h
-> > > > 172:                    pgprot_t prot, unsigned long vm_flags, int node,
-> > > > urezki@pc638:~/data/backup/coding/linux-not-broken.git$
-> > > >
-> > > > to rename all those "vm_flags" to something, for example, like "flags"?
-> > > 
-> > > Yeah, sorry I know it's a churny pain, but I think it's such a silly source
-> > > of confusion _in general_, not only this series where I made a mistake (of
-> > > course entirely my fault but certainly more understandable given the
-> > > naming), but in the past I've certainly sat there thinking 'hmmm wait' :)
-> > > 
-> > > Really I think we should rename 'vm_struct' too, but if that causes _too
-> > > much_ churn fair enough.
+On 05/08/2025 01:09, Sean Christopherson wrote:
+> On Mon, Aug 04, 2025, Vitaly Kuznetsov wrote:
+>> Sean Christopherson <seanjc@google.com> writes:
+>>> It'll take more work than the below, e.g. to have VMX's construct_eptp() pull the
+>>> level and A/D bits from kvm_mmu_page (vendor code can get at the kvm_mmu_page with
+>>> root_to_sp()), but for the core concept/skeleton, I think this is it?
+>>>
+>>> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+>>> index 6e838cb6c9e1..298130445182 100644
+>>> --- a/arch/x86/kvm/mmu/mmu.c
+>>> +++ b/arch/x86/kvm/mmu/mmu.c
+>>> @@ -3839,6 +3839,37 @@ void kvm_mmu_free_guest_mode_roots(struct kvm *kvm, struct kvm_mmu *mmu)
+>>>  }
+>>>  EXPORT_SYMBOL_GPL(kvm_mmu_free_guest_mode_roots);
+>>>  
+>>> +struct kvm_tlb_flush_root {
+>>> +       struct kvm *kvm;
+>>> +       hpa_t root;
+>>> +};
+>>> +
+>>> +static void kvm_flush_tlb_root(void *__data)
+>>> +{
+>>> +       struct kvm_tlb_flush_root *data = __data;
+>>> +
+>>> +       kvm_x86_call(flush_tlb_root)(data->kvm, data->root);
+>>> +}
+>>> +
+>>> +void kvm_mmu_flush_all_tlbs_root(struct kvm *kvm, struct kvm_mmu_page *root)
+>>> +{
+>>> +       struct kvm_tlb_flush_root data = {
+>>> +               .kvm = kvm,
+>>> +               .root = __pa(root->spt),
+>>> +       };
+>>> +
+>>> +       /*
+>>> +        * Flush any TLB entries for the new root, the provenance of the root
+>>> +        * is unknown.  Even if KVM ensures there are no stale TLB entries
+>>> +        * for a freed root, in theory another hypervisor could have left
+>>> +        * stale entries.  Flushing on alloc also allows KVM to skip the TLB
+>>> +        * flush when freeing a root (see kvm_tdp_mmu_put_root()), and flushing
+>>> +        * TLBs on all CPUs allows KVM to elide TLB flushes when a vCPU is
+>>> +        * migrated to a different pCPU.
+>>> +        */
+>>> +       on_each_cpu(kvm_flush_tlb_root, &data, 1);
+>>
+>> Would it make sense to complement this with e.g. a CPU mask tracking all
+>> the pCPUs where the VM has ever been seen running (+ a flush when a new
+>> one is added to it)?
+>>
+>> I'm worried about the potential performance impact for a case when a
+>> huge host is running a lot of small VMs in 'partitioning' mode
+>> (i.e. when all vCPUs are pinned). Additionally, this may have a negative
+>> impact on RT use-cases where each unnecessary interruption can be seen
+>> problematic. 
 > 
-> Well, it's not that terrible :)
+> Oof, right.  And it's not even a VM-to-VM noisy neighbor problem, e.g. a few
+> vCPUs using nested TDP could generate a lot of noist IRQs through a VM.  Hrm.
 > 
-> ~/git/linux$ git grep -w vm_struct | wc -l
-> 173
+> So I think the basic idea is so flawed/garbage that even enhancing it with per-VM
+> pCPU tracking wouldn't work.  I do think you've got the right idea with a pCPU mask
+> though, but instead of using a mask to scope IPIs, use it to elide TLB flushes.
+
+Sorry for the delay in replying, I've been sidetracked a bit.
+
+I like this idea more, not special casing the TLB flushing approach per hypervisor is
+preferable.
+
 > 
-Indeed :)
+> With the TDP MMU, KVM can have at most 6 non-nested roots active at any given time:
+> SMM vs. non-SMM, 4-level vs. 5-level, L1 vs. L2.  Allocating a cpumask for each
+> TDP MMU root seems reasonable.  Then on task migration, instead of doing a global
+> INVEPT, only INVEPT the current and prev_roots (because getting a new root will
+> trigger a flush in kvm_mmu_load()), and skip INVEPT on TDP MMU roots if the pCPU
+> has already done a flush for the root.
 
+Just to make sure I follow: current+prev_roots do you mean literally those (i.e. cached prev roots)
+or all roots on kvm->arch.tdp_mmu_roots?
 
-> > > I think even though it's long-winded, 'vmalloc_flags' would be good, both
-> > > in fields and local params as it makes things very very clear.
-> > > 
-> > > Equally 'vm_struct' -> 'vmalloc_struct' would be a good change.
+So this would mean: on pCPU migration, check if current mmu has is_tdp_mmu_active()
+and then perform the INVEPT-single over roots instead of INVEPT-global. Otherwise stick
+to the KVM_REQ_TLB_FLUSH.
+
+Would there need to be a check for is_guest_mode(), or that the switch is coming from
+the vmx/nested.c? I suppose not because nested doesn't seem to use TDP MMU.
 > 
-> Do we really need the _struct suffix?
-> How about vmalloc_area?
-> 
-I think, we should not use vmalloc_ prefix here, because vmalloc
-operates within its own range: VMALLOC_START:VMALLOC_END, therefore
-it might be confusing also.
+> Or we could do the optimized tracking for all roots.  x86 supports at most 8192
+> CPUs, which means 1KiB per root.  That doesn't seem at all painful given that
+> each shadow pages consumes 4KiB...
 
-others can use another regions. vmap_mapping?
+Similar question here: which all roots would need to be tracked+flushed for shadow
+paging? pae_roots?
 
->
-> It also seems that struct vmap_area can be made private to mm/.
-> 
-I agree. Also it can be even moved under vmalloc.c. There is only one
-user which needs it globally, it is usercopy.c. It uses find_vmap_area()
-which is wrong. See:
-
-<snip>
-	if (is_vmalloc_addr(ptr) && !pagefault_disabled()) {
-		struct vmap_area *area = find_vmap_area(addr);
-
-		if (!area)
-			usercopy_abort("vmalloc", "no area", to_user, 0, n);
-
-		if (n > area->va_end - addr) {
-			offset = addr - area->va_start;
-			usercopy_abort("vmalloc", NULL, to_user, offset, n);
-		}
-		return;
-	}
-<snip>
-
-we can add a function which just assign va_start, va_end as input
-parameters and use them in the usercopy.c. 
-
-Thanks!
-
---
-Uladzislau Rezki
 
