@@ -1,205 +1,125 @@
-Return-Path: <kvm+bounces-53971-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53972-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECDBEB1B1A5
-	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 12:02:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 83B98B1B252
+	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 12:54:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B50B9188B0F0
-	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 10:02:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D8F6A18A0C79
+	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 10:54:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B87B626CE12;
-	Tue,  5 Aug 2025 10:02:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86DE22441A6;
+	Tue,  5 Aug 2025 10:54:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Htu8OPjR"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="MfB/95/X"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FAB721FF30
-	for <kvm@vger.kernel.org>; Tue,  5 Aug 2025 10:02:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02FEE24291A
+	for <kvm@vger.kernel.org>; Tue,  5 Aug 2025 10:54:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754388134; cv=none; b=MvfbE19cVnjZVBWvxzLMJyzSPw83khyO/EkUgdFia8a9Du/XJoOfAeMHC0WWTrWxUBhqRzuQuH1Bu3+RkBFDhzkjftR9Polq6IhM7McRjrLbX4PAcT68gy4AwIjgzbtiTGgov5eQh5HVQBxRsYb4uys3koPV/tODGvWLq7IikhE=
+	t=1754391249; cv=none; b=FS6mltyE0Nm1fz3iSzSgQpmwpWOrT1AhYBDfLnybJ9O9CETIcmkp8SChONgAItptnv9QXXSMgavRg00Hfs7mvd1rmCPh85ImA+9juS+gR+citfmrR+3ibcdpHXj5XFwLIVx6IL8Jq5RHsIT/ED0iHBH88KxYo2nHXiVHXtGcdBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754388134; c=relaxed/simple;
-	bh=ghVc4jUywvAFQR8Cbgq1AJpVrOuHaExsk9z8LbGUnck=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f4SkLOODYd4L/R1r+mQ++r1jDJxEb0e0aRsfGn+WlXx1ORLMnpBvbFWmdpwCgD405GRILyP/lI63Efk8GbuShEd7TEJ28aEb6lJ+9oimDBbJQMh2ZM7PaWh7wRJT9nJNlqODBtLOzTX6mJ8YE7sVimXhhc9QRNl4zb68b8D8Etw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Htu8OPjR; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1754388132;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=C8iq3DcQDje5KaWsGWyrnSm7HvAQMMkFMgKVgyZHegI=;
-	b=Htu8OPjRr5bBkF38LFbvl+GZ0pjYb46eSN5NmvaAazadzt26NRdx1WEDuRH68LD0BpfNDK
-	uI/8mc499/++6P3Cn/6xnzvuI2K0GqJKRET88Ze2eVVO9ncgQYu/oyD+NQyVQqtDogCVCV
-	DkOEbCUyHvDM53DIykjQbACNwnhLKNg=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-440-tDDLRap0NlSAo0hE6e4WdA-1; Tue, 05 Aug 2025 06:02:10 -0400
-X-MC-Unique: tDDLRap0NlSAo0hE6e4WdA-1
-X-Mimecast-MFC-AGG-ID: tDDLRap0NlSAo0hE6e4WdA_1754388129
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-459d7da3647so13115665e9.0
-        for <kvm@vger.kernel.org>; Tue, 05 Aug 2025 03:02:09 -0700 (PDT)
+	s=arc-20240116; t=1754391249; c=relaxed/simple;
+	bh=j6njE58QFD+zg3/0GPbXJiFfWjG2rF0iiy1yUJKDjrI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=MrD5/0DIGlk86bJhCebaG2Y2vNxJc7AlyeODryVPrc464Odu/rY2oBdUvhoN6YfZXWOBmppZeXuBy7N+sFI7koRYAqcuetYmcRyiAlRiZojQY2nTflz5xsNLqWa3G74HajvqVimHLFYuEj8XWJkwYAxM0hSiAlHenx+SHxME5wE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=MfB/95/X; arc=none smtp.client-ip=209.85.221.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-3b788e02084so283175f8f.3
+        for <kvm@vger.kernel.org>; Tue, 05 Aug 2025 03:54:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1754391245; x=1754996045; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=WUiodtQBvKBTA/iKS7oNMgVKazgBWdic3Ly/8SfR7xc=;
+        b=MfB/95/X6j7hyi4c7mQpUHSGHCFQ+iwVMOhVU76zaZu1/ti6Q7Fsddwq90v7WAby9Z
+         bpQrNgHRQOapowQzdW2rKJND/CykUwh0CHt7OC6y16oXCsqauOJ6Iv+Q+dCZkBRD9TB/
+         ESbOFd/jij75oNWIsHZbATIku4rL7puYnZWQKDwCT9OZSWGKtpVz+4QfrgpGJYkkX2Ns
+         9HGPug2CVmlfubL7YgWML764DvueOgAsDvN2zAn282lf4EuuTU4mX/eDTC67Dnmq2r7e
+         SlANsfpi7uwMevgl1FI631eJEjgOtuMz6XnJKReJp3mdRah9u2Ik5NF6s5Y/vXwPCfgR
+         D06Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754388129; x=1754992929;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=C8iq3DcQDje5KaWsGWyrnSm7HvAQMMkFMgKVgyZHegI=;
-        b=P8FbGFRfHI6QLuKjID/QIc7OH/CqfHME0XUPD5oOPY+9DHgHTywrZP4ZnI9xMljH9v
-         hC2gJgu3s3FvUFT2EW2RC2xmoCAg7qA+Km2hEuOIHYhdf2rullRdoDqZhxmukdQTe5hi
-         H6YkJSH0FYQe5g6+JIH97luZEM09z8Kz6cfcq/t8/JnkR655jnXlWEe6KJe9xgxCggDc
-         ypHnXj0W9S/feVg8Wq+UawKHUZePiKtVP0MWGtiGlX5w02F7HTcVdH3MVTe09WFw23I/
-         UEhvxrOTGMIsK6TCZsNzsY2cd87F3iu5cBjZTI6lWWgoeJTkme0ESgwQy/KxrEgsNsK1
-         H3Hw==
-X-Forwarded-Encrypted: i=1; AJvYcCVSXC9JgzNw+CXBFQXQK/DHbNSC5reavZ8P9pjQk/QlHGtf9RTTDVcuRRpcnAvKBL2GLjY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx2rdtbMO1Ue6KbE9SRJfpQ+zvvyhOsLzCmciSFdHIeinYrQggK
-	u4ojSbzzWa+PeWCeF6TPFXMN87od34f6Ajo2Nsjo5kVtrVz1mS4fbvE/59ytcQbcRHnqIImy2wg
-	IU+7T4p3DDHxKtoe7AHFsTHdpOWJJyw61/lkheBKo+NjUjYfBkPRzNQ==
-X-Gm-Gg: ASbGnctxWFGwuFZrFAv2LWelF/Ivbr9/4Dn5kRUEKDIwtfBG7Ik2EBT2836OBdgU+l8
-	kdl9f2Wew5M8HlgY8CxL5WfEX9a8qkm9yLWVmeJEfuj4jyX0cYZOvQXae/KzrO+uDID0JdE+zhk
-	NQxfbhN/qf2dVEmt30L2/eyoReHNuJPqcMVsiGLarc30FhrdinQmoZX6Nmec1gtlPWBYlZO9FyH
-	77p0OjRYpFRcWRq/g00bSWMBSsuv6nCLful/rzWtfxdZwY4APe6LS+lCyEa8WtdMXdyHtlUgmrQ
-	zyPQp1oLOLKLrxpZ1ObnqYcKxICj33Tc
-X-Received: by 2002:a5d:584b:0:b0:3b7:924a:998f with SMTP id ffacd0b85a97d-3b8d946b3a2mr10486259f8f.5.1754388128672;
-        Tue, 05 Aug 2025 03:02:08 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE0h3EuzIaMa9Wir/mQMI0EF1I5NZk8tEiHqXjJLyBPOFpTj+sXNt2uVT98K1ru7T8YB22hmw==
-X-Received: by 2002:a5d:584b:0:b0:3b7:924a:998f with SMTP id ffacd0b85a97d-3b8d946b3a2mr10486210f8f.5.1754388128107;
-        Tue, 05 Aug 2025 03:02:08 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc0:1515:7300:62e6:253a:2a96:5e3])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b79c48de68sm18532205f8f.67.2025.08.05.03.02.06
+        d=1e100.net; s=20230601; t=1754391245; x=1754996045;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WUiodtQBvKBTA/iKS7oNMgVKazgBWdic3Ly/8SfR7xc=;
+        b=UhPbHaNqrQtEOd9QUt4DNiPtywPF5CyGoms5DgBFloEbUHHyNmJBrg1UjHWDgMB5Uf
+         hYloXtwphTAQWgP18EBO88HuFcvCYYeAo/vXtH5tcSqvJGsnX4xJpy2Pm+SfcrYWgVuU
+         A26pRL7IcAE/DO1ZACY9DJptkXffGjsEAvAmCC2UyCxvTZjKs26U3bsRldr3XRJzr9mu
+         pJAagth1P7NnwMV3syyFqv3VYjg5bUPGnk9QKCb3gYs7BLUMJ5wW+pTA974MyYtTBaM/
+         U2f2S2DcVuNYNFEYa4dTpDOyWbZR8QSdQ6vSr3zTTpMLtzRfRpmNEdU6piNObQBzFcM2
+         7BMg==
+X-Gm-Message-State: AOJu0YzA3YsHpuTWNa74nq81G14rNAlNV9yaHc0v4KzsHPE1nwj7+E8c
+	lAjPylvn2G5FXPZxes2O2e00cg3WAJ4hI66lrb8DuKSGkT2uL/csqButp99e/8ZEi+8=
+X-Gm-Gg: ASbGncs4sXG+yOTsXvETY8kARdpoRuEaLaGdO53JOIzRS04VBP7i4MJ6bgGVh475udd
+	9JWKQ+DbXu9nik9fWUHbycziV2CxY+84A4NB6Q7XMBVftRZZgEUMmQT8xC8r+Xg6YTxePeecCre
+	hcxV3O2/bHrvTI2nuIRdW8oh89AsXbxs7nliPnO6tR+Y7Lf5N+XYKyfVBay9tb7btlpqo/UQ/sD
+	1h/ivRMnfrJeeLgrBu/jec3VLc90tpCSCi0Hdpe3n0E5gGKhE6FfxTIJruuus8DBzRU4h/3kUR+
+	o2Lcjvsm4IxKPQQlpJZqLup2ojD6BX/b7icB1mkUc5mz+6DrhKVVlhNGMsQgx40/g4RZCX2xzKl
+	HWLIMXlpf+t+4VcPTWI2W0AA003EWMad4oXQG6io=
+X-Google-Smtp-Source: AGHT+IEpOsq0FAVja98/mlRReMdSEb+xPNZ7ZEoi0EN4dXoUtDCJVpNHURSd1y/tvYFRXGJZtratYw==
+X-Received: by 2002:a05:6000:1a86:b0:3b7:99a8:bf6d with SMTP id ffacd0b85a97d-3b8d94b6fa0mr3885890f8f.11.1754391245272;
+        Tue, 05 Aug 2025 03:54:05 -0700 (PDT)
+Received: from localhost ([2a02:8308:a00c:e200:d884:b809:d57:1ad7])
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-3b79c3abf0csm18344450f8f.14.2025.08.05.03.54.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Aug 2025 03:02:07 -0700 (PDT)
-Date: Tue, 5 Aug 2025 06:02:04 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Nikolay Kuratov <kniv@yandex-team.ru>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	virtualization@lists.linux.dev, kvm@vger.kernel.org,
-	Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Lei Yang <leiyang@redhat.com>, Hillf Danton <hdanton@sina.com>,
-	stable@vger.kernel.org, Andrey Ryabinin <arbn@yandex-team.com>,
-	Andrey Smetanin <asmetanin@yandex-team.ru>
-Subject: Re: [PATCH v2] vhost/net: Replace wait_queue with completion in
- ubufs reference
-Message-ID: <20250805060149-mutt-send-email-mst@kernel.org>
-References: <20250718110355.1550454-1-kniv@yandex-team.ru>
+        Tue, 05 Aug 2025 03:54:04 -0700 (PDT)
+From: =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@ventanamicro.com>
+To: kvm-riscv@lists.infradead.org
+Cc: kvm@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Anup Patel <anup@brainfault.org>,
+	Atish Patra <atishp@atishpatra.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Alexandre Ghiti <alex@ghiti.fr>,
+	Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] RISC-V: KVM: fix stack overrun when loading vlenb
+Date: Tue,  5 Aug 2025 12:44:21 +0200
+Message-ID: <20250805104418.196023-4-rkrcmar@ventanamicro.com>
+X-Mailer: git-send-email 2.50.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250718110355.1550454-1-kniv@yandex-team.ru>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jul 18, 2025 at 02:03:55PM +0300, Nikolay Kuratov wrote:
-> When operating on struct vhost_net_ubuf_ref, the following execution
-> sequence is theoretically possible:
-> CPU0 is finalizing DMA operation                   CPU1 is doing VHOST_NET_SET_BACKEND
->                              // &ubufs->refcount == 2
-> vhost_net_ubuf_put()                               vhost_net_ubuf_put_wait_and_free(oldubufs)
->                                                      vhost_net_ubuf_put_and_wait()
->                                                        vhost_net_ubuf_put()
->                                                          int r = atomic_sub_return(1, &ubufs->refcount);
->                                                          // r = 1
-> int r = atomic_sub_return(1, &ubufs->refcount);
-> // r = 0
->                                                       wait_event(ubufs->wait, !atomic_read(&ubufs->refcount));
->                                                       // no wait occurs here because condition is already true
->                                                     kfree(ubufs);
-> if (unlikely(!r))
->   wake_up(&ubufs->wait);  // use-after-free
-> 
-> This leads to use-after-free on ubufs access. This happens because CPU1
-> skips waiting for wake_up() when refcount is already zero.
-> 
-> To prevent that use a completion instead of wait_queue as the ubufs
-> notification mechanism. wait_for_completion() guarantees that there will
-> be complete() call prior to its return.
-> 
-> We also need to reinit completion in vhost_net_flush(), because
-> refcnt == 0 does not mean freeing in that case.
-> 
-> Cc: stable@vger.kernel.org
-> Fixes: 0ad8b480d6ee9 ("vhost: fix ref cnt checking deadlock")
-> Reported-by: Andrey Ryabinin <arbn@yandex-team.com>
-> Suggested-by: Andrey Smetanin <asmetanin@yandex-team.ru>
-> Suggested-by: Hillf Danton <hdanton@sina.com>
-> Tested-by: Lei Yang <leiyang@redhat.com> (v1)
-> Signed-off-by: Nikolay Kuratov <kniv@yandex-team.ru>
+The userspace load can put up to 2048 bits into an xlen bit stack
+buffer.  We want only xlen bits, so check the size beforehand.
 
+Fixes: 2fa290372dfe ("RISC-V: KVM: add 'vlenb' Vector CSR")
+Cc: <stable@vger.kernel.org>
+Signed-off-by: Radim Krčmář <rkrcmar@ventanamicro.com>
+---
+ arch/riscv/kvm/vcpu_vector.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Nikolay should I expect v3?
-
-> ---
-> v2:
-> * move reinit_completion() into vhost_net_flush(), thanks
->   to Hillf Danton
-> * add Tested-by: Lei Yang
-> * check that usages of put_and_wait() are consistent across
->   LTS kernels
-> 
->  drivers/vhost/net.c | 9 +++++----
->  1 file changed, 5 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> index 7cbfc7d718b3..69e1bfb9627e 100644
-> --- a/drivers/vhost/net.c
-> +++ b/drivers/vhost/net.c
-> @@ -94,7 +94,7 @@ struct vhost_net_ubuf_ref {
->  	 * >1: outstanding ubufs
->  	 */
->  	atomic_t refcount;
-> -	wait_queue_head_t wait;
-> +	struct completion wait;
->  	struct vhost_virtqueue *vq;
->  };
->  
-> @@ -240,7 +240,7 @@ vhost_net_ubuf_alloc(struct vhost_virtqueue *vq, bool zcopy)
->  	if (!ubufs)
->  		return ERR_PTR(-ENOMEM);
->  	atomic_set(&ubufs->refcount, 1);
-> -	init_waitqueue_head(&ubufs->wait);
-> +	init_completion(&ubufs->wait);
->  	ubufs->vq = vq;
->  	return ubufs;
->  }
-> @@ -249,14 +249,14 @@ static int vhost_net_ubuf_put(struct vhost_net_ubuf_ref *ubufs)
->  {
->  	int r = atomic_sub_return(1, &ubufs->refcount);
->  	if (unlikely(!r))
-> -		wake_up(&ubufs->wait);
-> +		complete_all(&ubufs->wait);
->  	return r;
->  }
->  
->  static void vhost_net_ubuf_put_and_wait(struct vhost_net_ubuf_ref *ubufs)
->  {
->  	vhost_net_ubuf_put(ubufs);
-> -	wait_event(ubufs->wait, !atomic_read(&ubufs->refcount));
-> +	wait_for_completion(&ubufs->wait);
->  }
->  
->  static void vhost_net_ubuf_put_wait_and_free(struct vhost_net_ubuf_ref *ubufs)
-> @@ -1381,6 +1381,7 @@ static void vhost_net_flush(struct vhost_net *n)
->  		mutex_lock(&n->vqs[VHOST_NET_VQ_TX].vq.mutex);
->  		n->tx_flush = false;
->  		atomic_set(&n->vqs[VHOST_NET_VQ_TX].ubufs->refcount, 1);
-> +		reinit_completion(&n->vqs[VHOST_NET_VQ_TX].ubufs->wait);
->  		mutex_unlock(&n->vqs[VHOST_NET_VQ_TX].vq.mutex);
->  	}
->  }
-> -- 
-> 2.34.1
+diff --git a/arch/riscv/kvm/vcpu_vector.c b/arch/riscv/kvm/vcpu_vector.c
+index a5f88cb717f3..05f3cc2d8e31 100644
+--- a/arch/riscv/kvm/vcpu_vector.c
++++ b/arch/riscv/kvm/vcpu_vector.c
+@@ -182,6 +182,8 @@ int kvm_riscv_vcpu_set_reg_vector(struct kvm_vcpu *vcpu,
+ 		struct kvm_cpu_context *cntx = &vcpu->arch.guest_context;
+ 		unsigned long reg_val;
+ 
++		if (reg_size != sizeof(reg_val))
++			return -EINVAL;
+ 		if (copy_from_user(&reg_val, uaddr, reg_size))
+ 			return -EFAULT;
+ 		if (reg_val != cntx->vector.vlenb)
+-- 
+2.50.0
 
 
