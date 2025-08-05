@@ -1,129 +1,187 @@
-Return-Path: <kvm+bounces-54017-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54018-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1B80B1B63E
-	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 16:21:10 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85F86B1B649
+	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 16:22:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B90C27A848F
-	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 14:19:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B67967AC3B7
+	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 14:21:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8A3A278173;
-	Tue,  5 Aug 2025 14:20:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1413B275863;
+	Tue,  5 Aug 2025 14:22:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="bbifF5N6"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dPyjCaNa"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DD50277004;
-	Tue,  5 Aug 2025 14:20:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41AA51448E0
+	for <kvm@vger.kernel.org>; Tue,  5 Aug 2025 14:22:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754403640; cv=none; b=KJvNcMzcyyLjUwtUt+tAZCnmPu9NhEmMRBSMTbZaedQ6sO2HVOglZlJpSix+LMpfFGmxqQxOZE59GdtyM0nzTH1Li8vARs1pbCgg4lqWyeb+CdPGQJl3bi+8hIB4jfdfUQSxD6prUR63Ezi+pN+SrqCLc7glj7GldZS6GFaLR8w=
+	t=1754403760; cv=none; b=fv/z2zsgb60vg55w9GRsBYZ/Mncq8twUbL/0n37YVzqNz1w8XTDqnp+eAHtpXgBqnudIqiqmqPuoZ/DZSFHj3xLRKJphEtQy6W28Im7dec/aacenFd52v66Xpb96/E/mHsfkaxNTUeEi4VDh5MkIWKKrGTlaRxLPjAIcKuB0JUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754403640; c=relaxed/simple;
-	bh=2XZkvqqYubphZbXQsW21xrCmAVLCaWh+sihxqDD/GIE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZPJ+L0sFAiFqmQelM1Qwt3gwTfSrCirhcWyiNuPt/CWCfbmhOJu8c46UqWnYmh1dQN7a3lDBT8gIjbEhwYVxvLptv/Df6rg5tzL5BqwilMw2dK4VjvDBwwlposyHTzhObduK+vJyye9GgLgQb99N2FV56H7ASj7Jd3fOQR0rvPI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=bbifF5N6; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5754tZwj032569;
-	Tue, 5 Aug 2025 14:20:36 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=8v2vvlGen246KV5BIx6EYWMGjt0dVG
-	1M7LiexutSZwg=; b=bbifF5N6JaK65RIxPt7n4JMWRm0mlTZe7friv3E6FRYXQa
-	dQpJOp1A9627iOVswYZ2DSRsyfdJNKVYzN9hgclc6XutJ4e05ssCe0scAaOkHwvD
-	FJmLik3uZfcyzXuNiSQoAfTyUvWuI1b5Pjc1qLEELvWUo0R2CQIX47ZCdMmXuX+/
-	ao8Bx/xD+DxVAyH6xlxMhMrb2g2O157utTfbSsVJDcAze/HiPLnoAOmH32i9Inmp
-	O9BeVLts8HD4qjmdFceKO+ol9wRkZP8zkA3Lfh8pLd0HRt+F9/Ay3i8lmWYlq6qq
-	BQ55o+479kKX6R1/+/cpSU4s9YXT3tYUhZX0Th8g==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48bbbq2fma-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 05 Aug 2025 14:20:36 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 575CjeOX009442;
-	Tue, 5 Aug 2025 14:20:35 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 489w0tjwny-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 05 Aug 2025 14:20:35 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 575EKVRH20513032
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 5 Aug 2025 14:20:31 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8B4E520043;
-	Tue,  5 Aug 2025 14:20:31 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4FE9A2004B;
-	Tue,  5 Aug 2025 14:20:31 +0000 (GMT)
-Received: from osiris (unknown [9.155.199.163])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Tue,  5 Aug 2025 14:20:31 +0000 (GMT)
-Date: Tue, 5 Aug 2025 16:20:30 +0200
-From: Steffen Eiden <seiden@linux.ibm.com>
-To: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc: linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, david@redhat.com, frankja@linux.ibm.com,
-        nsg@linux.ibm.com, nrb@linux.ibm.com, schlameuss@linux.ibm.com,
-        hca@linux.ibm.com, mhartmay@linux.ibm.com, borntraeger@de.ibm.com
-Subject: Re: [PATCH v2 2/2] KVM: s390: Fix FOLL_*/FAULT_FLAG_* confusion
-Message-ID: <20250805142030.61286-A-seiden@linux.ibm.com>
-References: <20250805141746.71267-1-imbrenda@linux.ibm.com>
- <20250805141746.71267-3-imbrenda@linux.ibm.com>
+	s=arc-20240116; t=1754403760; c=relaxed/simple;
+	bh=9gFb6clZPUJZFrqfwi5hiLweZ+qqLDqK7OfEpVXqvik=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=U8dIRZ/28aDfP8hroE+JVzh7n5s1wm6rpiY6S63c7wUYk0kCOfe+iiZP6dYAhYLjjITUMSZJ/SbcAzyL58LhwsjcjrCD96YdU4OZkN5upDEGP8FSIWTEC8GvfpN2LhKpEzBaV+qccsUgQfWetXLuyn5oc0mDBBYy+Moi94oyHR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dPyjCaNa; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1754403756;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=/3xPpIBV/hBiBAcU5/ItEMTEid0VgLtoC+NgACKpt/Y=;
+	b=dPyjCaNaCwnDa4R+PabgOByiFn7cjzSUZ+m51EjvVClqw8NnIQGjOIFn2jtpJQ+hql/Pnc
+	EdNLV4O/gKKmg4Dm6DPoDqTLVcfg/myuZCBXsOMtHE1YGTYJQ/QVRQ6wH/ImrsWk9m2ZkH
+	6OEZ18W5oFpw90UPk5OKW3rEs9LGiKM=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-605-wkDjXMGaOL2DIkaA3yFkpA-1; Tue, 05 Aug 2025 10:22:35 -0400
+X-MC-Unique: wkDjXMGaOL2DIkaA3yFkpA-1
+X-Mimecast-MFC-AGG-ID: wkDjXMGaOL2DIkaA3yFkpA_1754403754
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-459d7da3647so14859105e9.0
+        for <kvm@vger.kernel.org>; Tue, 05 Aug 2025 07:22:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754403754; x=1755008554;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=/3xPpIBV/hBiBAcU5/ItEMTEid0VgLtoC+NgACKpt/Y=;
+        b=VWm4gBBmojQ3T5xJdpMn5Jp2hfQQegFdFYi9z7JNjkzEt9zw9+1tRPJjOQuFC1rna8
+         ariCTVMiC0jRo+w/tTiwwO0crE0vWCL5tTCo23Kpfcp/LBiEj7uZg2WOmLSTtjc6591V
+         ChaYcMZ3NdduDFv1Hcw7BD7puXJQbBOA1tyqMCQm/cusAKwqrPs4omQgFWdmj8DxywB9
+         NXAit97WL2K5F8fDv/5cn44uwdZJR8IRKLMoWrOWCBxhMX3FYqsEqrx6FgiFdjIFCpZY
+         jMyTYlLDJFUqqQdn3s5ZSqPfGGByQrDg83NlaWYd5DCVsnc7LDptpFHfW0nlgnnCp/UK
+         JLoQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWGiJhIDUBPkitBARTWaqFyMgc1r5fXLypx6VzL9vyQE9JsD7+pXBWqWsO6wiLgrMtXEeo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YziOAAqefhPxNPe7IZmBbyGx6kr707ZP+7h2F0kW20rixGR6BGo
+	EnbZzZqyoZgnx1SFisIxX94X5wh3ZOUdOQGrce+MiV0n7QWq5mru237FTCS/2Pg05Ai1NEE5gtB
+	tnVm5ooPkgoRNtP+hP0k4FZYgMLC+GY6/qD1kHQj0jI5JJkrWJNjXJw==
+X-Gm-Gg: ASbGncvyO2Ap9ZaSPCD8bVlf3w6iONJ4A0Dr3S3ld4DzIG10Y/NZJGlquqGL/HAit61
+	2v1eDOCh2wNm4GZLVj+NlQJPRyzUNnxdp2YnQWlKJD15AosVTkOG7lex/AZwGTZsxsa7+Dgot36
+	iC95TQGCDI0jbBchEi+3Yt32tAbpLS5no5+sLE66Rpkmi0VvxNS6MWGRW55rXABfcT5bm98trMV
+	EIKN/TRSrt1LNFD2cI2Z/dNYj3Cf8zvCGTFOQj1/RNpZ/nmtT7WjkSroWpQmEvFOiM+Y14ung33
+	brFCS91d51/5Kh+Qia4TpZNsKcH5PMsh/X+Eo1azl0AB+DEfmMOMaC7ex2a0xsFcXb3LTUpoY9n
+	FCl/bkJQ3mipuSogCXs9Bqegm4ce2fMI2XzrpeGMpq1eIvle+STuvhDr45oYln1v1rts=
+X-Received: by 2002:a05:600c:548a:b0:439:643a:c8d5 with SMTP id 5b1f17b1804b1-458bbf67985mr111520405e9.0.1754403754205;
+        Tue, 05 Aug 2025 07:22:34 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEPLisIYjz4KozcRpExKiSuNlt/PZE8zt18fnhKg9QyKx9ufWqpxNxpVlVvjC1oPSuFzrXXCw==
+X-Received: by 2002:a05:600c:548a:b0:439:643a:c8d5 with SMTP id 5b1f17b1804b1-458bbf67985mr111520055e9.0.1754403753771;
+        Tue, 05 Aug 2025 07:22:33 -0700 (PDT)
+Received: from ?IPV6:2003:d8:2f2b:b200:607d:d3d2:3271:1be0? (p200300d82f2bb200607dd3d232711be0.dip0.t-ipconnect.de. [2003:d8:2f2b:b200:607d:d3d2:3271:1be0])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-459e5868fd7sm6559025e9.18.2025.08.05.07.22.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 05 Aug 2025 07:22:33 -0700 (PDT)
+Message-ID: <57582464-cfd5-47f5-877d-88918ffa2ec0@redhat.com>
+Date: Tue, 5 Aug 2025 16:22:32 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250805141746.71267-3-imbrenda@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 7Q5moSioe_-nQgQkCOndKM5Yay8Wf80v
-X-Authority-Analysis: v=2.4 cv=M65NKzws c=1 sm=1 tr=0 ts=68921334 cx=c_pps
- a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
- a=kj9zAlcOel0A:10 a=2OwXVqhp2XgA:10 a=VnNF1IyMAAAA:8 a=20KFwNOVAAAA:8
- a=hKoHGS1yLziZwobD-tEA:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-ORIG-GUID: 7Q5moSioe_-nQgQkCOndKM5Yay8Wf80v
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODA1MDEwMSBTYWx0ZWRfX68+V3xR9SQlM
- aeOH9dlVsJkqeqA23kLEA6AbG1EfPpQPsC/a9scrgoWz/5IInd6v/FFZjCrhpNL50cejyfjMZd8
- rCugG4mPQVP4+UJKQB6VXge7bAXm5XY+oiaWg3OE9HJ6mbuQfSCzysIhfGSfc5XpuEr9a8VC+RZ
- aeTntrfCgsf7ZfZ9dKSI5xsuNL9deqJf0nfEsWbNFtWYYGFfAjnNYcJ6Oi1xxaw+GKyRrpuc58+
- TSisalXrvgi/a+d03XnkoCPVtqTQqedxA8GKF02vJvVHkshOOPucdA6rkcagwWo0oRR9K8ZnKbE
- FJw4RNmNxkMhVCTuOlc4bide4OtvXSL6EuHjhgcTkUzc6+YPGJ1ph530jDQDql5frdQZ8JeiVPa
- kB03UoKErnN1g6fecjBPgbYiz7QXGDw/BHSBA0sBnn2JwEXSChpONzE9HCAk4jOHuwemYFbZ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-08-05_03,2025-08-04_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 malwarescore=0 spamscore=0 bulkscore=0 lowpriorityscore=0
- suspectscore=0 clxscore=1015 mlxscore=0 phishscore=0 priorityscore=1501
- mlxlogscore=665 adultscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2508050101
+User-Agent: Mozilla Thunderbird
+Subject: Re: [GIT PULL] VFIO updates for v6.17-rc1
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "lizhe.67@bytedance.com" <lizhe.67@bytedance.com>
+References: <20250804162201.66d196ad.alex.williamson@redhat.com>
+ <CAHk-=whhYRMS7Xc9k_JBdrGvp++JLmU0T2xXEgn046hWrj7q8Q@mail.gmail.com>
+ <20250804185306.6b048e7c.alex.williamson@redhat.com>
+ <0a2e8593-47c6-4a17-b7b0-d4cb718b8f88@redhat.com>
+ <CAHk-=wiCYfNp4AJLBORU-c7ZyRBUp66W2-Et6cdQ4REx-GyQ_A@mail.gmail.com>
+ <20250805132558.GA365447@nvidia.com>
+ <00999740-d762-488a-a946-0c10589df146@redhat.com>
+ <20250805135505.GL184255@nvidia.com>
+ <44157147-c424-4cc0-9302-ccf42c648247@redhat.com>
+ <20250805142028.GM184255@nvidia.com>
+From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ g3eXuA==
+Organization: Red Hat
+In-Reply-To: <20250805142028.GM184255@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Aug 05, 2025 at 04:17:46PM +0200, Claudio Imbrenda wrote:
-> Pass the right type of flag to vcpu_dat_fault_handler(); it expects a
-> FOLL_* flag (in particular FOLL_WRITE), but FAULT_FLAG_WRITE is passed
-> instead.
+On 05.08.25 16:20, Jason Gunthorpe wrote:
+> On Tue, Aug 05, 2025 at 04:10:45PM +0200, David Hildenbrand wrote:
+>> There are some weird scenarios where you hotplug memory after boot memory,
+>> and suddenly you can runtime-allocate a gigantic folio that spans both
+>> ranges etc.
 > 
-> This still works because they happen to have the same integer value,
-> but it's a mistake, thus the fix.
+> I was thinking we'd forbid this directly, but yes it is a another new
+> check.
 > 
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> Fixes: 05066cafa925 ("s390/mm/fault: Handle guest-related program interrupts in KVM")
-> Acked-by: Christian Borntraeger <borntraeger@linux.ibm.com>
-> Reviewed-by: David Hildenbrand <david@redhat.com>
+>> So while related, the corner cases are all a bit nasty, and just forbidding
+>> folios to span a memory section on these problematic configs (sparse
+>> !vmemmap) sounds interesting.
+> 
+> Indeed, this just sounds like forcing MAX_ORDER to be no larger than
+> the section size for this old mode?
 
-Reviewed-by: Steffen Eiden <seiden@linux.ibm.com>
+MAX_ORDER is always limited to the section size already.
+
+MAX_ORDER is only about buddy allocations. What hugetlb and dax do is 
+independent of MAX_ORDER.
+
+-- 
+Cheers,
+
+David / dhildenb
 
 
