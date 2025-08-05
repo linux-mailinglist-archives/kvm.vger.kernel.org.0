@@ -1,163 +1,140 @@
-Return-Path: <kvm+bounces-54051-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54052-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57CE4B1BAB9
-	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 21:10:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC498B1BB3A
+	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 21:59:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BAA403A5CE9
-	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 19:10:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5FD781883B75
+	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 19:59:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2645229B217;
-	Tue,  5 Aug 2025 19:06:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C03E9275B02;
+	Tue,  5 Aug 2025 19:59:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QFxEOMC1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SPVwXk9r"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE12C2C158C
-	for <kvm@vger.kernel.org>; Tue,  5 Aug 2025 19:06:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 956FF224B1B
+	for <kvm@vger.kernel.org>; Tue,  5 Aug 2025 19:59:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754420764; cv=none; b=EIwloA+zXvhkcT2Zq7J5LR6XjJRh5r2AJwHg75kPPPVIS0vOpLQVtqGxz6/XKLHY5r0bzmCS7tn2wtaPNAr4NLF1s0sK/oL/TWH+3/78SGbdYFlb6+h/Kr9K9Q/iEtoNfJ6UJbhJFpaXlleQfQSr4zrcAtJJ1ZCNg7Ebcu0pgn8=
+	t=1754423966; cv=none; b=BB2f62ZRM3oc2sFzEFUPplAPtN0wYXWMSr/ZPM1nEszQCWDt08jzX9xn9kyLfGxjvActvxfClEfluNiD6Artu7tA1nLNkz/8VtU9arHiRJM9dBy+ElS8tCDDstu+6xZTcwhyPcC2RnBx1OvIG5YBeltcmN1XfiEv3iIiB1hyHc4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754420764; c=relaxed/simple;
-	bh=6eCmSKhIpszLUkxsSJHASWeflETYxy1FzP1/dimvvmQ=;
+	s=arc-20240116; t=1754423966; c=relaxed/simple;
+	bh=pXhxchSRRgtxWJx8jVY2QY92qQA379bq+J7HbDgvShU=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=e1J/OfwKsc1C/nmk1OXJeTQ9ZkRrn8W6rDOn4qD0V25qeO/B2po0QEZoS0RLPkC25QOVCpKTuu3joeWBU2H+WLVr1c1Ak1LBr+yQ5oWFh0A6b3gtzct6/bQpE8Vu6nfBzRrR8bL8/laMQIri8oXqbuLEJiU+ne6XZbMXMA+nYUc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QFxEOMC1; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=MGki4hJIJl9NY8AUkuufPvv9HDR2XBAkqUiDAnM4jCjAv/knrfzPpGZA8nduMO6o+6ctLVfviMPxTL4dFZNZGTleuxMXlDlanO5yFsHk737f7u/il3cCPkXpIknSYJD9Fn2gmLRnjRRM9oQhpSDsTjTarkFpwbiQucqqfQfJ66Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SPVwXk9r; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-24249098fd0so43427295ad.0
-        for <kvm@vger.kernel.org>; Tue, 05 Aug 2025 12:06:02 -0700 (PDT)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3214765a5b9so3551009a91.3
+        for <kvm@vger.kernel.org>; Tue, 05 Aug 2025 12:59:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754420762; x=1755025562; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=jYPOGKxz/YMagjLqc/SXFdXBFj+5MGEvuF5f/vLTJD0=;
-        b=QFxEOMC1jWlIZ7oAvYjs9TX2WLj4RaTOngtBRRXK1YJbbbvwahutSqPS3Kll1HXCa7
-         11s59NiOKf9bsdsUDpzzUE1/NvWCD+RGu+/mU6Vo0kL2EJKvDIsJAahdPIajDQ2iHAV6
-         UtLtUt5S8+ScV/4O1Bf2X+0lxnR0ulmPvxcJWnRr3qWWsvRBlexaRGkDE54jgCKaiEdO
-         vV7mQy38ltvQ4aDuRHUYqVlfjpu7QYoieo6T6Ui4ZBD6mdUd8ZynnJy+UqcC2etxd4E1
-         l1yVEOZS8avkclYc8hdoYFNdXkF3PUwnK7dqUOJznYv/E/tGOzw9LzFgaQdT+LnQU1pN
-         7P9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754420762; x=1755025562;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=google.com; s=20230601; t=1754423964; x=1755028764; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=jYPOGKxz/YMagjLqc/SXFdXBFj+5MGEvuF5f/vLTJD0=;
-        b=cOTk+bDPNIK9Gmem/QYkpH80W2QQdygJ9m/iBDgPU6E2Zi7IcCJKw7/AWutKA/8wgT
-         aGg05Ql/Wq9nh5ajsiyFPMgUt2/OHxEiw8kFnrVlbc421C9O6XBYGvYCruDfEHDR2wvR
-         NcemWA72RpWAII9eaNGa1abUd0gncAxcUwMr40yXLKnpVqvxQyxAht6qQ7sQM37DUy7t
-         5RTNZ31244iG5YxKOhtYr+I39smq0CaOx6gflL0kdkNJb8z8f4RleAzien5pzM6Wul7W
-         dtrHRoZM53AGIc4oW/oF9RIeyP/xLm+iceUY/UzwiTiycScGsFhI+EwyK4kx6rDuKTft
-         vUUA==
-X-Gm-Message-State: AOJu0YxN/LtfvecJZ0UQGS9pbiw2fmHiTi0H1hg+R7qSmu3s48cotEUP
-	LGjr3WKvYstl4PDmwWdD2X2Iopm7sfS6Z6QJ2dcns1chDA4LwE27HKwt7fDGmziHwCHdD+1avyE
-	vWwbIlA==
-X-Google-Smtp-Source: AGHT+IHbdxTlG7hgheXP+mYT9oIu4lCPyl255ao0Ex9Ybo3KzljkvgO/MKcbZ0k0rRO+Jid7Q1iCdyPOclQ=
-X-Received: from plcx21.prod.google.com ([2002:a17:903:d5:b0:240:8fa2:15c3])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:1b30:b0:240:11be:4dd3
- with SMTP id d9443c01a7336-2429f521ac4mr2366575ad.3.1754420762334; Tue, 05
- Aug 2025 12:06:02 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue,  5 Aug 2025 12:05:26 -0700
-In-Reply-To: <20250805190526.1453366-1-seanjc@google.com>
+        bh=w3Yvf2JfDXGKcx67v9ooLLvg0JCE6s5eg0KrtzPSvSI=;
+        b=SPVwXk9rlSJWnmlbW2bmHhgn1zxdmjolLq9toYnkL9Odbdz6PFCyss55pgh+ACNQ4H
+         I777PmMXBUXYAWa/nQdSh0o34s7qZpy4+v5oKhHw+01mf0ecNLEcbowx9QW2DuwqwKQW
+         TEI0U7nzF5nfKSHPH2SN5G6ICc79DUxWGRmAikcrrdcRG45gGv5EjabaMt7DJEEdU8iT
+         2VRSE/rL0gb6v7O/oHCDC6BAmWQZs2jPCxZXNlp7NVTII1usZPtiHletraIbxFUZBGDs
+         9035KSjs6KHpkuPHWZ8i1g2n/YY0gjLEiapWzwVa5l/xxAHyti25J730jxaEvL07CcDo
+         s9lw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754423964; x=1755028764;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=w3Yvf2JfDXGKcx67v9ooLLvg0JCE6s5eg0KrtzPSvSI=;
+        b=vtYqyD4STr/0xP+hozQRPnElwr5FWpFNKZcVUT4JQw6OprKFulofmaQIUWTV07R5Fm
+         GDYeIJCnsIPNCu0dnpJ4nUDgXIHUkgaNfXr9kJN1MXTMjWnIrwKg/FzjHJTD8CthIbIV
+         mXwS092KlfbTQfcXIBBQ0He1vBrQPVMNw6JajJEAgXhjpJYAGHFZELqQgOhnQpOKg6KI
+         GEcoSKaXkToa6f2+XMVrVCrUI2zcevDCQFaEWXDl/IgAakBrijzTuxd2qdagJoWj2hQ7
+         aMPyqlVWh64Ryk20vfemjaQOED2AoebtVIcDuW6XJfonz9vUKdmMbZgbSme5UBKg+W3o
+         gYTg==
+X-Forwarded-Encrypted: i=1; AJvYcCVOE4eF9Ae+rcQy6QAPUzxNucTuN//5sLdp/O9Tk4LpsFIQq/BwxoiDUXtlNTiL6t2geRU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz5n1y5CXZLULMat0ZeV7veZ1swTSbVESQdEqHKGJ63P0WlkPyz
+	k+sJ07fWXsJNiH7z3zzG9kdWgxFQTnIWNaE4xIfWvuhX1+QnueLdybmGPv5VZYAu4gejOYc/QCM
+	aPlopAA==
+X-Google-Smtp-Source: AGHT+IEuI8KiE77OJVjXZOrcYjc8/vveaA71MtGaUeonbU64/fh8UEXUNZAQbuVlyWgScx/PDrxoAQPbFoQ=
+X-Received: from pjbpx16.prod.google.com ([2002:a17:90b:2710:b0:2e0:915d:d594])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5584:b0:312:51a9:5d44
+ with SMTP id 98e67ed59e1d1-32166c15c64mr147232a91.5.1754423963903; Tue, 05
+ Aug 2025 12:59:23 -0700 (PDT)
+Date: Tue, 5 Aug 2025 12:59:22 -0700
+In-Reply-To: <CAGtprH9ELoYmwA+brSx-kWH5qSK==u8huW=4otEZ5evu_GTvtQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250805190526.1453366-1-seanjc@google.com>
-X-Mailer: git-send-email 2.50.1.565.gc32cd1483b-goog
-Message-ID: <20250805190526.1453366-19-seanjc@google.com>
-Subject: [PATCH 18/18] KVM: x86: Add a fastpath handler for INVD
+References: <aHUmcxuh0a6WfiVr@google.com> <aHWqkodwIDZZOtX8@yzhao56-desk>
+ <aHoQa4dBSi877f1a@yzhao56-desk.sh.intel.com> <CAGtprH9kwV1RCu9j6LqToa5M97_aidGN2Lc2XveQdeR799SK6A@mail.gmail.com>
+ <aIdHdCzhrXtwVqAO@yzhao56-desk.sh.intel.com> <CAGtprH-xGHGfieOCV2xJen+GG66rVrpFw_s9jdWABuLQ2hos5A@mail.gmail.com>
+ <aIgl7pl5ZiEJKpwk@yzhao56-desk.sh.intel.com> <6888f7e4129b9_ec573294fa@iweiny-mobl.notmuch>
+ <aJFOt64k2EFjaufd@google.com> <CAGtprH9ELoYmwA+brSx-kWH5qSK==u8huW=4otEZ5evu_GTvtQ@mail.gmail.com>
+Message-ID: <aJJimk8FnfnYaZ2j@google.com>
+Subject: Re: [RFC PATCH] KVM: TDX: Decouple TDX init mem region from kvm_gmem_populate()
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, Xin Li <xin@zytor.com>, 
-	Dapeng Mi <dapeng1.mi@linux.intel.com>, Sandipan Das <sandipan.das@amd.com>
-Content-Type: text/plain; charset="UTF-8"
+To: Vishal Annapurve <vannapurve@google.com>
+Cc: Ira Weiny <ira.weiny@intel.com>, Yan Zhao <yan.y.zhao@intel.com>, 
+	Michael Roth <michael.roth@amd.com>, pbonzini@redhat.com, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, rick.p.edgecombe@intel.com, kai.huang@intel.com, 
+	adrian.hunter@intel.com, reinette.chatre@intel.com, xiaoyao.li@intel.com, 
+	tony.lindgren@intel.com, binbin.wu@linux.intel.com, dmatlack@google.com, 
+	isaku.yamahata@intel.com, david@redhat.com, ackerleytng@google.com, 
+	tabba@google.com, chao.p.peng@intel.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add a fastpath handler for INVD so that the common fastpath logic can be
-trivially tested on both Intel and AMD.  Under KVM, INVD is always:
-(a) intercepted, (b) available to the guest, and (c) emulated as a nop,
-with no side effects.  Combined with INVD not having any inputs or outputs,
-i.e. no register constraints, INVD is the perfect instruction for
-exercising KVM's fastpath as it can be inserted into practically any
-guest-side code stream.
+On Mon, Aug 04, 2025, Vishal Annapurve wrote:
+> On Mon, Aug 4, 2025 at 5:22=E2=80=AFPM Sean Christopherson <seanjc@google=
+.com> wrote:
+> > : 4) For SNP, if src !=3D null, make the target pfn to be shared, copy
+> > : contents and then make the target pfn back to private.
+> >
+> > Copying from userspace under spinlock (rwlock) is illegal, as accessing=
+ userspace
+> > memory might_fault() and thus might_sleep().
+>=20
+> I would think that a combination of get_user_pages() and
+> kmap_local_pfn() will prevent this situation of might_fault().
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/svm/svm.c | 2 ++
- arch/x86/kvm/vmx/vmx.c | 2 ++
- arch/x86/kvm/x86.c     | 9 +++++++++
- arch/x86/kvm/x86.h     | 1 +
- 4 files changed, 14 insertions(+)
+Yes, but if SNP is using get_user_pages(), then it looks an awful lot like =
+the
+TDX flow, at which point isn't that an argument for keeping populate()?
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 829d9d46718d..f7e1e665a826 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -4200,6 +4200,8 @@ static fastpath_t svm_exit_handlers_fastpath(struct kvm_vcpu *vcpu)
- 		return handle_fastpath_set_msr_irqoff(vcpu);
- 	case SVM_EXIT_HLT:
- 		return handle_fastpath_hlt(vcpu);
-+	case SVM_EXIT_INVD:
-+		return handle_fastpath_invd(vcpu);
- 	default:
- 		break;
- 	}
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index aa157fe5b7b3..95765db52992 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7175,6 +7175,8 @@ static fastpath_t vmx_exit_handlers_fastpath(struct kvm_vcpu *vcpu,
- 		return handle_fastpath_preemption_timer(vcpu, force_immediate_exit);
- 	case EXIT_REASON_HLT:
- 		return handle_fastpath_hlt(vcpu);
-+	case EXIT_REASON_INVD:
-+		return handle_fastpath_invd(vcpu);
- 	default:
- 		return EXIT_FASTPATH_NONE;
- 	}
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index a56f83b40a55..5af2c5aed0f2 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -2086,6 +2086,15 @@ int kvm_emulate_invd(struct kvm_vcpu *vcpu)
- }
- EXPORT_SYMBOL_GPL(kvm_emulate_invd);
- 
-+fastpath_t handle_fastpath_invd(struct kvm_vcpu *vcpu)
-+{
-+	if (!kvm_emulate_invd(vcpu))
-+		return EXIT_FASTPATH_EXIT_USERSPACE;
-+
-+	return EXIT_FASTPATH_REENTER_GUEST;
-+}
-+EXPORT_SYMBOL_GPL(handle_fastpath_invd);
-+
- int kvm_handle_invalid_op(struct kvm_vcpu *vcpu)
- {
- 	kvm_queue_exception(vcpu, UD_VECTOR);
-diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index bcfd9b719ada..46220b04cdf2 100644
---- a/arch/x86/kvm/x86.h
-+++ b/arch/x86/kvm/x86.h
-@@ -439,6 +439,7 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 			    int emulation_type, void *insn, int insn_len);
- fastpath_t handle_fastpath_set_msr_irqoff(struct kvm_vcpu *vcpu);
- fastpath_t handle_fastpath_hlt(struct kvm_vcpu *vcpu);
-+fastpath_t handle_fastpath_invd(struct kvm_vcpu *vcpu);
- 
- extern struct kvm_caps kvm_caps;
- extern struct kvm_host_values kvm_host;
--- 
-2.50.1.565.gc32cd1483b-goog
+> Memory population in my opinion is best solved either by users asserting
+> ownership of the memory and writing to it directly or by using guest_memf=
+d
+> (to be) exposed APIs to populate memory ranges given a source buffer. IMO
+> kvm_gmem_populate() is doing something different than both of these optio=
+ns.
 
+In a perfect world, yes, guest_memfd would provide a clean, well-defined AP=
+I
+without needing a complicated dance between vendor code and guest_memfd.  B=
+ut,
+sadly, the world of CoCo is anything but perfect.  It's not KVM's fault tha=
+t
+every vendor came up with a different CoCo architecture.  I.e. we can't "fi=
+x"
+the underlying issue of SNP and TDX having significantly different ways for
+initializing private memory.
+
+What we can do is shift as much code to common KVM as possible, e.g. to min=
+imize
+maintenance costs, reduce boilerplate and/or copy+paste code, provide a con=
+sistent
+ABI, etc.  Those things always need to be balanced against overall complexi=
+ty, but
+IMO providing a vendor callback doesn't add anywhere near enough complexity=
+ to
+justify open coding the same concept in every vendor implementation.
 
