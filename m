@@ -1,152 +1,170 @@
-Return-Path: <kvm+bounces-54033-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54034-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3904DB1BA95
-	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 21:05:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC6A8B1BA97
+	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 21:05:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4A273B36D2
-	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 19:05:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 27F86161F0C
+	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 19:05:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3749E29A307;
-	Tue,  5 Aug 2025 19:05:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10C6F29ACDA;
+	Tue,  5 Aug 2025 19:05:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ePJFqYae"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MYkhmdjL"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAA1F218AB0
-	for <kvm@vger.kernel.org>; Tue,  5 Aug 2025 19:05:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B93EC2980A4
+	for <kvm@vger.kernel.org>; Tue,  5 Aug 2025 19:05:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754420731; cv=none; b=syLyuQoEsbDDGrLgPzSxcEe+ALBOQHfpoXRfdPzV7k9vWIr12yf86hXmkYXnbwmSaY3Ab2AC4Ky19Heqeu2I/9HloV5wFnYiR48yIwqDaKObyJVFzU2E23lsdO2cLJBU5fN6A5hZgqJ7RsRIW+xrf2DAvItptVAFkOA4Fq9RUIE=
+	t=1754420733; cv=none; b=Fn3UUlmkFgdRj6+byjjztLs/Y+1U6v2mpPvlxhveG9Yr9OWMxHlemgEVyDB7D/tzI/ucWS5l2X/FmS+8r/sZoptkKQehGsew6ecWnpbMzjUG9XxRzu9sQnNvViFAwuoE33KAiV/Ca6q6/RntDmBLhtjAzVNNFVz8vYGPOk29wkc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754420731; c=relaxed/simple;
-	bh=a50FLnYjbryMJmdW+4ZgeVhCMzW50M8NynvFWUpALqc=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=jTFioVq7BmiDxeadZJqhyNsW5jp39X5RKu/5YIYHuXr48yBM/qMkLeil38173YnN7VzSladsfV56wuaPMUuznIjGdptXki9CI+xZ1WWZAmOZzbj4RzvHE5S4+V/4DKoPoZMw7IpagyPebrkSRPMGenp8Ah/xwoBYKN2PaKyRMtg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ePJFqYae; arc=none smtp.client-ip=209.85.216.73
+	s=arc-20240116; t=1754420733; c=relaxed/simple;
+	bh=egmX3I+xWiBArhvmUxzBeMAeu0B5Tb33ykONyOMBO3k=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=YssufpmUMLIcA/uY7JXb7JbemP29AyQzhsQV5GpQu71KC0ixxEASfOb5ALuKNZd3T2tzleng1BmR7n43SFvlUwg9B/7BkttRgR2dsXoiCJXOn28M6pz/F7BMbiJOIKUP85H6hFSDZrtkPF3pA/5MQBZ/sz44WFk9iotUrR2Ou+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MYkhmdjL; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3132c1942a1so8820174a91.2
-        for <kvm@vger.kernel.org>; Tue, 05 Aug 2025 12:05:29 -0700 (PDT)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-76bc511e226so5537256b3a.3
+        for <kvm@vger.kernel.org>; Tue, 05 Aug 2025 12:05:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754420729; x=1755025529; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bS6lzGa+a4UoxmIiZruUwsnBpGjEnGL2s8vnSrdXcIw=;
-        b=ePJFqYaeAa++tFW1n27rn0YtZfQIQKWa4eK/UO/lVxadyWZpfrUx6Sc6RelJIwic5a
-         3y2DJk06gN7+HyLc2D8CMw421kUJS1qytH/Yv17Le9yA2OLo0Y53m+3mEhatwfkt9bAr
-         kyNF8UraEKatezvTfpZsf9wAYKWpleWbqHCoUphn01Nh0OUNNCy5ScMRj4B5aH9rhctw
-         vqVJbl3rj6FzX8H3Y6e4zF2Z8U1EGamF0yhp1EW8h/eRzkMsY9Z7z4mlQvIRMjsRsCik
-         dhcNm2nNSYc06e4hfZWpq3eOVhiZO6CIvpWFklNWzmlYNCtrkGT4E0trfbnusXbOpzZM
-         r2+A==
+        d=google.com; s=20230601; t=1754420731; x=1755025531; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=A1yA3Tox8y0Vt47rQoMx2qI7LaxORtPHP2V794GePOY=;
+        b=MYkhmdjLxjMs1C4gvRLAzni4Um74dQt4qSC0sSl6pfvdK/JtXB4SF9ThcuO8h05rp/
+         9EV2ZdOHNPsJjEgw0nmStFuLt9wjWGHyDxZrdje3wE/IAI6lUwmwN2SuaG6Ei8brhzra
+         YAUn8tsNVUQDdN39Mihuxk1goBLkTtRvd0ihXmewmEgd6vGl2Rkl5uxKJukJOkO95WUP
+         sma1sXwJBU6JmG7Aps+cw7h3trLP2NXBRddUk3hT5nLOSaHMNGq+uzh6o+c7+4cfUvSL
+         kJsvYC4VzDsnuf8TvhLswudpZP55r9uxA4ijicT2v1Gjvc4J+WAnKFLnb0yEjq6aXpgf
+         YE2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754420729; x=1755025529;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bS6lzGa+a4UoxmIiZruUwsnBpGjEnGL2s8vnSrdXcIw=;
-        b=Dv/f3zZmb3al/HtyLrFpibb+cb7K7Bbz3XgnVfK7blAQo/qMbfAlrv02FKZ7F04Ewz
-         QSHsJsyZWpJzH540pAb/WkpUefGJW8Sm1aOZ13XeuKIgvtuPHIXwdsl/KndCAMakLNR6
-         kKb3mtrJAUdHyYP+5wEiSU2ZefAISEVkb4cCp2JCuXhTtX0NLl0V/GH4vAu3WcK1lbGd
-         JrIiS2jz5AETEbwh+LYIg17wT+VXzL9sEgpWg+/fyZ+t8wvHRDyu/ifWsZ8JA9d45B/z
-         yq2euSmXQM5tanwlZLfiiwzxmq0GqoV5D7ecUVJBL9mtffP0XdVmjkcv+wwtYPGOOUg1
-         YEVA==
-X-Gm-Message-State: AOJu0YyBimNswJg9tIwg2vCI4gl8VIVfDwWZEsaE/72tNAs5ooI+CYxV
-	UHH1PdF+dVAfQ6xJqf7p9OfKnmc3ke5QtEYilXBfPwYG9WXfN6TpxEUlSqvjacAvZsiuy/83XV/
-	aadBTmA==
-X-Google-Smtp-Source: AGHT+IHuXgga47QgLpiDcAb7ecTVo2jB0HFPscDo4Uwpkl9uNuR9J8wQh7clBJZ+ZAj0PIKE9mft2wsX57U=
-X-Received: from pjpo11.prod.google.com ([2002:a17:90a:9f8b:b0:31f:6ddd:ef5])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4984:b0:31f:1db2:69b1
- with SMTP id 98e67ed59e1d1-321162b5186mr21688924a91.18.1754420729216; Tue, 05
- Aug 2025 12:05:29 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1754420731; x=1755025531;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=A1yA3Tox8y0Vt47rQoMx2qI7LaxORtPHP2V794GePOY=;
+        b=AcRtkDCI99Jbk4EC8fdJLkjdFBs8tEs4sH04IJtV3AGNBFOZ6ijkjpQli68vWpyVkP
+         +tNYuungvCWlvNHqWWmnYBEZDpqBrSE2sEIDlvxPpv9tWCl5p6nlss9G1D0BubGdIv/o
+         xr/bEtoKiYKvPcnBDfhQWrb7if2s08iFqewDrmh9uakZnk4re+Q+2q6TV8Dr0PM0+LUX
+         qVG7BWLulGNXWTk/GqpLKj08v+BjM/3SGozTFA3sNSd2MYY4MGGQkQnavapZNsMQh67A
+         ibbOcYFeOPPf9DBopBp8rlYCpAWGAUh7LVvLZdwaTG5Q2fV63rAmG+ZW1x/de8vXUemr
+         Otyw==
+X-Gm-Message-State: AOJu0YzTdLB6Su33VIIVpP/eVsUY+DSESNUO+XQMrYWHWXuz105MJtDV
+	v5e2AzCJm8+1qB38FEjfTmPwu4JBomclryt6bjHJdxvvZ/QyhlL4jL9wJnm/tBXAHmR0RaAi8T+
+	/dmCuBQ==
+X-Google-Smtp-Source: AGHT+IHadUAEVDdXXxm0Sgn+N9jgrencXx34zcy0U/IA8j77dHu13CAUEGcxSCQj8cplRDe4BHgnu5bo6FM=
+X-Received: from pgct18.prod.google.com ([2002:a05:6a02:5292:b0:b42:f1d:a69b])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:2444:b0:240:168b:31b
+ with SMTP id adf61e73a8af0-240313ba206mr270310637.16.1754420730960; Tue, 05
+ Aug 2025 12:05:30 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue,  5 Aug 2025 12:05:08 -0700
+Date: Tue,  5 Aug 2025 12:05:09 -0700
+In-Reply-To: <20250805190526.1453366-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20250805190526.1453366-1-seanjc@google.com>
 X-Mailer: git-send-email 2.50.1.565.gc32cd1483b-goog
-Message-ID: <20250805190526.1453366-1-seanjc@google.com>
-Subject: [PATCH 00/18] KVM: x86: Fastpath cleanups and PMU prep work
+Message-ID: <20250805190526.1453366-2-seanjc@google.com>
+Subject: [PATCH 01/18] KVM: SVM: Skip fastpath emulation on VM-Exit if next
+ RIP isn't valid
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, Xin Li <xin@zytor.com>, 
 	Dapeng Mi <dapeng1.mi@linux.intel.com>, Sandipan Das <sandipan.das@amd.com>
 Content-Type: text/plain; charset="UTF-8"
 
-This is a prep series for the mediated PMU, and for Xin's series to add
-support for the immediate forms of RDMSR and WRMSRNS (I'll post a v3 of
-that series on top of this).
+Skip the WRMSR and HLT fastpaths in SVM's VM-Exit handler if the next RIP
+isn't valid, e.g. because KVM is running with nrips=false.  SVM must
+decode and emulate to skip the instruction if the CPU doesn't provide the
+next RIP, and getting the instruction bytes to decode requires reading
+guest memory.  Reading guest memory through the emulator can fault, i.e.
+can sleep, which is disallowed since the fastpath handlers run with IRQs
+disabled.
 
-The first half cleans up a variety of warts and flaws in the VM-Exit fastpath
-handlers.  The second half cleans up the PMU code related to "triggering"
-instruction retired and branches retired events.  The end goal of the two
-halves (other than general cleanup) is to be able bail from the fastpath when
-using the mediated PMU and the guest is counting instructions retired, with
-minimal overhead, e.g. without having to acquire SRCU.
+ BUG: sleeping function called from invalid context at ./include/linux/uaccess.h:106
+ in_atomic(): 1, irqs_disabled(): 1, non_block: 0, pid: 32611, name: qemu
+ preempt_count: 1, expected: 0
+ INFO: lockdep is turned off.
+ irq event stamp: 30580
+ hardirqs last  enabled at (30579): [<ffffffffc08b2527>] vcpu_run+0x1787/0x1db0 [kvm]
+ hardirqs last disabled at (30580): [<ffffffffb4f62e32>] __schedule+0x1e2/0xed0
+ softirqs last  enabled at (30570): [<ffffffffb4247a64>] fpu_swap_kvm_fpstate+0x44/0x210
+ softirqs last disabled at (30568): [<ffffffffb4247a64>] fpu_swap_kvm_fpstate+0x44/0x210
+ CPU: 298 UID: 0 PID: 32611 Comm: qemu Tainted: G     U              6.16.0-smp--e6c618b51cfe-sleep #782 NONE
+ Tainted: [U]=USER
+ Hardware name: Google Astoria-Turin/astoria, BIOS 0.20241223.2-0 01/17/2025
+ Call Trace:
+  <TASK>
+  dump_stack_lvl+0x7d/0xb0
+  __might_resched+0x271/0x290
+  __might_fault+0x28/0x80
+  kvm_vcpu_read_guest_page+0x8d/0xc0 [kvm]
+  kvm_fetch_guest_virt+0x92/0xc0 [kvm]
+  __do_insn_fetch_bytes+0xf3/0x1e0 [kvm]
+  x86_decode_insn+0xd1/0x1010 [kvm]
+  x86_emulate_instruction+0x105/0x810 [kvm]
+  __svm_skip_emulated_instruction+0xc4/0x140 [kvm_amd]
+  handle_fastpath_invd+0xc4/0x1a0 [kvm]
+  vcpu_run+0x11a1/0x1db0 [kvm]
+  kvm_arch_vcpu_ioctl_run+0x5cc/0x730 [kvm]
+  kvm_vcpu_ioctl+0x578/0x6a0 [kvm]
+  __se_sys_ioctl+0x6d/0xb0
+  do_syscall_64+0x8a/0x2c0
+  entry_SYSCALL_64_after_hwframe+0x4b/0x53
+ RIP: 0033:0x7f479d57a94b
+  </TASK>
 
-Because the mediated PMU context switches PMU state _outside_ of the fastpath,
-the mediated PMU won't be able to increment PMCs in the fastpath, and so won't
-be able to skip emulated instructions in the fastpath if the vCPU is counting
-instructions retired.
+Note, this is essentially a reapply of commit 5c30e8101e8d ("KVM: SVM:
+Skip WRMSR fastpath on VM-Exit if next RIP isn't valid"), but with
+different justification (KVM now grabs SRCU when skipping the instruction
+for other reasons).
 
-The last patch to handle INVD in the fastpath is a bit dubious.  It works just
-fine, but it's dangerously close to "just because we can, doesn't mean we
-should" territory.  I added INVD to the fastpath before I realized that
-MSR_IA32_TSC_DEADLINE could be handled in the fastpath irrespective of the
-VMX preemption timer, i.e. on AMD CPUs.  But being able to use INVD to test
-the fastpath is still super convenient, as there are no side effects (unless
-someone ran the test on bare metal :-D), no register constraints, and no
-vCPU model requirements.  So, I kept it, because I couldn't come up with a
-good reason not to.
+Fixes: b439eb8ab578 ("Revert "KVM: SVM: Skip WRMSR fastpath on VM-Exit if next RIP isn't valid"")
+Cc: stable@vger.kernel.org
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/svm/svm.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-Sean Christopherson (18):
-  KVM: SVM: Skip fastpath emulation on VM-Exit if next RIP isn't valid
-  KVM: x86: Add kvm_icr_to_lapic_irq() helper to allow for fastpath IPIs
-  KVM: x86: Only allow "fast" IPIs in fastpath WRMSR(X2APIC_ICR) handler
-  KVM: x86: Drop semi-arbitrary restrictions on IPI type in fastpath
-  KVM: x86: Unconditionally handle MSR_IA32_TSC_DEADLINE in fastpath
-    exits
-  KVM: x86: Acquire SRCU in WRMSR fastpath iff instruction needs to be
-    skipped
-  KVM: x86: Unconditionally grab data from EDX:EAX in WRMSR fastpath
-  KVM: x86: Fold WRMSR fastpath helpers into the main handler
-  KVM: x86/pmu: Move kvm_init_pmu_capability() to pmu.c
-  KVM: x86/pmu: Add wrappers for counting emulated instructions/branches
-  KVM: x86/pmu: Calculate set of to-be-emulated PMCs at time of WRMSRs
-  KVM: x86/pmu: Rename pmc_speculative_in_use() to
-    pmc_is_locally_enabled()
-  KVM: x86/pmu: Open code pmc_event_is_allowed() in its callers
-  KVM: x86/pmu: Drop redundant check on PMC being globally enabled for
-    emulation
-  KVM: x86/pmu: Drop redundant check on PMC being locally enabled for
-    emulation
-  KVM: x86/pmu: Rename check_pmu_event_filter() to
-    pmc_is_event_allowed()
-  KVM: x86: Push acquisition of SRCU in fastpath into
-    kvm_pmu_trigger_event()
-  KVM: x86: Add a fastpath handler for INVD
-
- arch/x86/include/asm/kvm_host.h |   3 +
- arch/x86/kvm/lapic.c            |  59 ++++++++----
- arch/x86/kvm/lapic.h            |   3 +-
- arch/x86/kvm/pmu.c              | 155 +++++++++++++++++++++++++-------
- arch/x86/kvm/pmu.h              |  60 ++-----------
- arch/x86/kvm/svm/svm.c          |  14 ++-
- arch/x86/kvm/vmx/nested.c       |   2 +-
- arch/x86/kvm/vmx/pmu_intel.c    |   2 +-
- arch/x86/kvm/vmx/vmx.c          |   2 +
- arch/x86/kvm/x86.c              |  85 +++++-------------
- arch/x86/kvm/x86.h              |   1 +
- 11 files changed, 218 insertions(+), 168 deletions(-)
-
-
-base-commit: 196d9e72c4b0bd68b74a4ec7f52d248f37d0f030
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index d9931c6c4bc6..829d9d46718d 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -4181,13 +4181,21 @@ static int svm_vcpu_pre_run(struct kvm_vcpu *vcpu)
+ static fastpath_t svm_exit_handlers_fastpath(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
++	struct vmcb_control_area *control = &svm->vmcb->control;
++
++	/*
++	 * Next RIP must be provided as IRQs are disabled, and accessing guest
++	 * memory to decode the instruction might fault, i.e. might sleep.
++	 */
++	if (!nrips || !control->next_rip)
++		return EXIT_FASTPATH_NONE;
+ 
+ 	if (is_guest_mode(vcpu))
+ 		return EXIT_FASTPATH_NONE;
+ 
+-	switch (svm->vmcb->control.exit_code) {
++	switch (control->exit_code) {
+ 	case SVM_EXIT_MSR:
+-		if (!svm->vmcb->control.exit_info_1)
++		if (!control->exit_info_1)
+ 			break;
+ 		return handle_fastpath_set_msr_irqoff(vcpu);
+ 	case SVM_EXIT_HLT:
 -- 
 2.50.1.565.gc32cd1483b-goog
 
