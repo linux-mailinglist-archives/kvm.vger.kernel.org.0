@@ -1,175 +1,177 @@
-Return-Path: <kvm+bounces-53990-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53991-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD199B1B415
-	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 15:07:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D0B2B1B45D
+	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 15:12:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6052D18A18FA
-	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 13:08:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DEE727A63B1
+	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 13:10:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 878D327381B;
-	Tue,  5 Aug 2025 13:07:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60848275AE7;
+	Tue,  5 Aug 2025 13:10:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="qEVkKDC5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sU9gAOCW"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6574F24886C;
-	Tue,  5 Aug 2025 13:07:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78CEE2749DC;
+	Tue,  5 Aug 2025 13:10:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754399253; cv=none; b=VqCp5v5mbaWTl5P5WUchXK4oTNSafZ2WLshvu/qzRYszyDv7Ceiik85fKa5aTgYF6N4m0MVLp1oMHF4tCI6hGYAaKbV6TMpbV44t0xh9TXv43kAuvKur53PkmkPIDr+KGKMyYUyk3HWkdt4ayKc8Ojbx1eNDLVsVcDQeh9cZp5U=
+	t=1754399432; cv=none; b=AdbUjUgM/JPdLcE0NTdSdvrw/kLVEBJMnfNf1L88oEwg8f1VGjByMNFKc7dZ/KdCxRbk99934g5Y+oZK8R5Q2yoOr5VFF5TcVTsRuEcUp0iGBuuCsXGzV2RIXi3ydXkd2eI4wjxd9G+i4JCqFS7QsdkxEsncwyuHEJ1IXACidO8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754399253; c=relaxed/simple;
-	bh=g9lEhynWs3Kft8CeOKPMqaDwpeulVBVMQJFB+D0Cy0M=;
-	h=Mime-Version:Content-Type:Date:Message-Id:From:Cc:To:Subject:
-	 References:In-Reply-To; b=o0MzP5mkPB1S4Q/R4DjXScNthlT4Uz4UIjMjkPLL80fDmjDBFT7uZWm9Gw3Por/0TEV637XuKpsLd3/LMdmNCLhUCZ0sWuka23RRO/2acL6Pcwz8syBQkMoPeJ2BOMjbreFyJ2cmizJyfRWuUY3F9y0bPOP0qNh1gGuoqpWT1+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=qEVkKDC5; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5758b8mx004052;
-	Tue, 5 Aug 2025 13:07:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=VzV7PF
-	zFIbOHkPjW4qrXM1SSsNIh/hPzq8XrRB+YyeM=; b=qEVkKDC5se9HYhraZtG2/o
-	VZaOfu9zBDqekNINzCYqKBNcxO4uJOXuPYkv6o8VBRerJgaQ+unowR3Vpt5nm4Yo
-	M7pd3vz4hx8q1+eO76sstMhL+x6NotnTZ/qBS8MsEIJ4EJyVg+p6Xp6m9JC515gv
-	cYrQPyeZ3x4OwEr6QnttZo28E9pOrM/q4ryKz4I2401petnffevTFr1C85fbCXY5
-	SEFebnPWG3sg4BO3IAS4OjbAsHx/B+YtwexAEHxsWfDzvYZ09r8iZyVmgBMAPf31
-	ybVMLRGoi+S1ktGm/Q2KXEoT364lLKgJc7bN3tJG4xtzsUgrbT1NJuc4RkKpIeNw
-	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 489ac0xhh2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 05 Aug 2025 13:07:29 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5759xO94001597;
-	Tue, 5 Aug 2025 13:07:28 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 489y7ktanr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 05 Aug 2025 13:07:28 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 575D7OFC20447636
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 5 Aug 2025 13:07:25 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DE18220040;
-	Tue,  5 Aug 2025 13:07:24 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B482620043;
-	Tue,  5 Aug 2025 13:07:24 +0000 (GMT)
-Received: from darkmoore (unknown [9.111.40.254])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  5 Aug 2025 13:07:24 +0000 (GMT)
+	s=arc-20240116; t=1754399432; c=relaxed/simple;
+	bh=NQcQvL4WNTHVf5ntRe0Vi/Q6bkjiOxBpxI9KSmmyEc8=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Hr4AR9K0sbAB6WX11xIYyGCsknnZMiUTZ1XUbhzdT47yckHiPKTq4Q9bVMBpa3IzuVwjp+gT72afzRy1esNWvDl9qsFtxvob3G6VPSHPZLTsbMGAiezmJqD0rGChkOPWXKY2dRns/Im7oHYCt9b2Of0duZvqqJZRWJSv9x855ko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sU9gAOCW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8A39C4CEF7;
+	Tue,  5 Aug 2025 13:10:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754399432;
+	bh=NQcQvL4WNTHVf5ntRe0Vi/Q6bkjiOxBpxI9KSmmyEc8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=sU9gAOCWpmMKS06phbsFSzf5qfiudijHofnbyxXMSzgGJo0+cZlFaKWPkegiMFG/U
+	 uEuk/cBSTtYH4v7e6D0Q7AfGM1kqxHXEPymgQvV71d+84vZeVvR1u7tv4tQtOkYNAk
+	 kbYGVN9VDYyN+bwBJ6QhjvCCl0dM5OBo/IhvK95KUcla5lGt48QR/+QtQmypxl0Lue
+	 ECXenflVfJHrgIMi/6RbdzaFlbg+kAwH7P2ii1V0yKf0yLGiWSt8FyZa0JJzdI5W4A
+	 K+1sqRvCrDeJPUzWYxgp+CFAvU79f3xIo/DvrQu2VvQJL4nip+ydkvjKk9vxz2LVJV
+	 PAVVSZotIPzxQ==
+From: Sasha Levin <sashal@kernel.org>
+To: patches@lists.linux.dev,
+	stable@vger.kernel.org
+Cc: Jason Wang <jasowang@redhat.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Lei Yang <leiyang@redhat.com>,
+	Sasha Levin <sashal@kernel.org>,
+	kvm@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.16-5.4] vhost: fail early when __vhost_add_used() fails
+Date: Tue,  5 Aug 2025 09:08:55 -0400
+Message-Id: <20250805130945.471732-20-sashal@kernel.org>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250805130945.471732-1-sashal@kernel.org>
+References: <20250805130945.471732-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Date: Tue, 05 Aug 2025 15:07:19 +0200
-Message-Id: <DBUIMK7LQF7U.22WPRO70LOFHA@linux.ibm.com>
-From: "Christoph Schlameuss" <schlameuss@linux.ibm.com>
-Cc: <linux-s390@vger.kernel.org>, <kvm@vger.kernel.org>, <david@redhat.com>,
-        <frankja@linux.ibm.com>, <seiden@linux.ibm.com>, <nsg@linux.ibm.com>,
-        <nrb@linux.ibm.com>, <hca@linux.ibm.com>, <mhartmay@linux.ibm.com>,
-        <borntraeger@de.ibm.com>
-To: "Claudio Imbrenda" <imbrenda@linux.ibm.com>,
-        <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v1 1/2] KVM: s390: Fix incorrect usage of
- mmu_notifier_register()
-X-Mailer: aerc 0.20.1
-References: <20250805111446.40937-1-imbrenda@linux.ibm.com>
- <20250805111446.40937-2-imbrenda@linux.ibm.com>
-In-Reply-To: <20250805111446.40937-2-imbrenda@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: oRDV_gnKbE7mZw3vqezJdXxrhp2thNv6
-X-Proofpoint-ORIG-GUID: oRDV_gnKbE7mZw3vqezJdXxrhp2thNv6
-X-Authority-Analysis: v=2.4 cv=GNoIEvNK c=1 sm=1 tr=0 ts=68920211 cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=IkcTkHD0fZMA:10 a=2OwXVqhp2XgA:10 a=VnNF1IyMAAAA:8 a=h5QcjqOEMrQRjDIlvBAA:9
- a=QEXdDO2ut3YA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODA1MDA5NCBTYWx0ZWRfX684ZI69VsQ9H
- 1pptpTbs9yjrlLCGJUxnv6z92JtQc4FEWwKGJXjEnyleDH7KfAmEVEvh7TtL+DV6mRRjz9hWc3P
- 4Y+QEqc9LcvDq9Z8OI84U+mpMFTcKgmWzx+HL1VC3p8RFRULbHTS1jrJb4gYj8j/lA1JieNX2WS
- BKM2AsthvvEO7959oTZs5zAPrsiH81xfGOj8WchxV4YRQ5pfNMfEfarYnJiHQXOXJJJypbqwYYn
- lUfOnTwbyoYTgCDmgiL8bXOmpeM7PLfQD7oBWFhLmruAmmwlgiSDYjw3TdgnGvcpangAwxdCNkS
- op79w646B5dWkeOENgdZR7E03jq88vll1WGZh5QQjTodBRlsXQdX/k4obVr1pe2cEqEAb1PXStX
- R/sWIScR67H7fJgeaTt9Lhf61lDtQl+mWtG44IUnf8QPU7wPjoZTR7nXZhP1B/1QGLbgNXDf
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-08-05_03,2025-08-04_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 phishscore=0 adultscore=0 spamscore=0 bulkscore=0 mlxscore=0
- mlxlogscore=999 impostorscore=0 priorityscore=1501 suspectscore=0
- lowpriorityscore=0 clxscore=1011 classifier=spam authscore=0 authtc=n/a
- authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2505280000 definitions=main-2508050094
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.16
+Content-Transfer-Encoding: 8bit
 
-On Tue Aug 5, 2025 at 1:14 PM CEST, Claudio Imbrenda wrote:
-> If mmu_notifier_register() fails, for example because a signal was
-> pending, the mmu_notifier will not be registered. But when the VM gets
-> destroyed, it will get unregistered anyway and that will cause one
-> extra mmdrop(), which will eventually cause the mm of the process to
-> be freed too early, and cause a use-after free.
->
-> This bug happens rarely, and only when secure guests are involved.
->
-> The solution is to check the return value of mmu_notifier_register()
-> and return it to the caller (ultimately it will be propagated all the
-> way to userspace). In case of -EINTR, userspace will try again.
->
-> Fixes: ca2fd0609b5d ("KVM: s390: pv: add mmu_notifier")
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+From: Jason Wang <jasowang@redhat.com>
 
-Reviewed-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
+[ Upstream commit b4ba1207d45adaafa2982c035898b36af2d3e518 ]
 
-> ---
->  arch/s390/kvm/pv.c | 14 +++++++++-----
->  1 file changed, 9 insertions(+), 5 deletions(-)
->
-> diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
-> index 14c330ec8ceb..e85fb3247b0e 100644
-> --- a/arch/s390/kvm/pv.c
-> +++ b/arch/s390/kvm/pv.c
-> @@ -622,6 +622,15 @@ int kvm_s390_pv_init_vm(struct kvm *kvm, u16 *rc, u1=
-6 *rrc)
->  	int cc, ret;
->  	u16 dummy;
-> =20
-> +	/* Add the notifier only once. No races because we hold kvm->lock */
-> +	if (kvm->arch.pv.mmu_notifier.ops !=3D &kvm_s390_pv_mmu_notifier_ops) {
-> +		ret =3D mmu_notifier_register(&kvm->arch.pv.mmu_notifier, kvm->mm);
-> +		if (ret)
-> +			return ret;
-> +		/* The notifier will be unregistered when the VM is destroyed */
-> +		kvm->arch.pv.mmu_notifier.ops =3D &kvm_s390_pv_mmu_notifier_ops;
-> +	}
-> +
->  	ret =3D kvm_s390_pv_alloc_vm(kvm);
->  	if (ret)
->  		return ret;
-> @@ -657,11 +666,6 @@ int kvm_s390_pv_init_vm(struct kvm *kvm, u16 *rc, u1=
-6 *rrc)
->  		return -EIO;
->  	}
->  	kvm->arch.gmap->guest_handle =3D uvcb.guest_handle;
-> -	/* Add the notifier only once. No races because we hold kvm->lock */
-> -	if (kvm->arch.pv.mmu_notifier.ops !=3D &kvm_s390_pv_mmu_notifier_ops) {
-> -		kvm->arch.pv.mmu_notifier.ops =3D &kvm_s390_pv_mmu_notifier_ops;
-> -		mmu_notifier_register(&kvm->arch.pv.mmu_notifier, kvm->mm);
-> -	}
->  	return 0;
->  }
-> =20
+This patch fails vhost_add_used_n() early when __vhost_add_used()
+fails to make sure used idx is not updated with stale used ring
+information.
+
+Reported-by: Eugenio Pérez <eperezma@redhat.com>
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+Message-Id: <20250714084755.11921-2-jasowang@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Tested-by: Lei Yang <leiyang@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+
+LLM Generated explanations, may be completely bogus:
+
+**Backport Status: YES**
+
+This commit should be backported to stable kernel trees. Here's my
+extensive analysis:
+
+## Bug Analysis
+
+The commit fixes a critical error handling bug in `vhost_add_used_n()`
+where the function continues execution even after `__vhost_add_used_n()`
+fails on line 2776. Looking at the code:
+
+1. **The Bug**: In the original code at drivers/vhost/vhost.c:2776, when
+   the second call to `__vhost_add_used_n()` fails and returns an error,
+   the function doesn't immediately return. Instead, it continues to:
+   - Execute memory barrier (`smp_wmb()`) at line 2779
+   - Update the used index via `vhost_put_used_idx()` at line 2780
+   - Potentially log the used index update at lines 2784-2791
+
+2. **Impact**: This means the vhost driver updates the used ring index
+   even when the actual used ring entries weren't successfully written.
+   This creates a **data corruption scenario** where:
+   - The guest sees an updated used index
+   - But the corresponding used ring entries contain stale/invalid data
+   - This can lead to guest crashes, data corruption, or unpredictable
+     behavior
+
+3. **The Fix**: The patch adds a simple but crucial check at lines
+   2778-2779 (after applying):
+  ```c
+  if (r < 0)
+  return r;
+  ```
+  This ensures the function returns immediately upon failure, preventing
+  the index from being updated with invalid ring state.
+
+## Stable Backport Criteria Assessment
+
+1. **Bug Fix**: ✓ This fixes a real bug that can cause data corruption
+   in vhost operations
+2. **Small and Contained**: ✓ The fix is only 3 lines of code -
+   extremely minimal
+3. **No Side Effects**: ✓ The change only adds proper error handling, no
+   behavioral changes for success cases
+4. **No Architectural Changes**: ✓ Simple error check addition, no
+   design changes
+5. **Critical Subsystem**: ✓ vhost is used for virtualization (virtio
+   devices), affecting VMs and containers
+6. **Clear Bug Impact**: ✓ Data corruption in guest-host communication
+   is a serious issue
+7. **Follows Stable Rules**: ✓ Important bugfix with minimal regression
+   risk
+
+## Additional Evidence
+
+- The bug was reported by Eugenio Pérez from Red Hat, indicating it was
+  found in production/testing environments
+- The fix has been tested (as indicated by "Tested-by: Lei Yang")
+- The function `__vhost_add_used_n()` can fail with -EFAULT when
+  `vhost_put_used()` fails (line 2738-2740)
+- The first call to `__vhost_add_used_n()` already has proper error
+  handling (lines 2770-2772), making this an inconsistency bug
+
+This is a textbook example of a stable backport candidate: a small,
+obvious fix for a real bug that can cause data corruption in a critical
+kernel subsystem.
+
+ drivers/vhost/vhost.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+index 3a5ebb973dba..d1d3912f4804 100644
+--- a/drivers/vhost/vhost.c
++++ b/drivers/vhost/vhost.c
+@@ -2775,6 +2775,9 @@ int vhost_add_used_n(struct vhost_virtqueue *vq, struct vring_used_elem *heads,
+ 	}
+ 	r = __vhost_add_used_n(vq, heads, count);
+ 
++	if (r < 0)
++		return r;
++
+ 	/* Make sure buffer is written before we update index. */
+ 	smp_wmb();
+ 	if (vhost_put_used_idx(vq)) {
+-- 
+2.39.5
 
 
