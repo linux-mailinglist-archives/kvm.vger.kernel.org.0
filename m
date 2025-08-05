@@ -1,196 +1,135 @@
-Return-Path: <kvm+bounces-54021-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54022-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 383D2B1B68C
-	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 16:30:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB7ADB1B691
+	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 16:31:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 668C77A392F
-	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 14:29:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5D47F1898821
+	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 14:32:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBE8E277003;
-	Tue,  5 Aug 2025 14:30:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9165277003;
+	Tue,  5 Aug 2025 14:31:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uKLJb00D"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="UNvmmk+N"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-vs1-f44.google.com (mail-vs1-f44.google.com [209.85.217.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DF2A2AE74
-	for <kvm@vger.kernel.org>; Tue,  5 Aug 2025 14:30:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 608F820F067
+	for <kvm@vger.kernel.org>; Tue,  5 Aug 2025 14:31:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754404233; cv=none; b=GrNkLB0WVY4/R1k+nGGCR6XWpyjDH9JvrFlwnZS2dEpnFqIjfx1AJtdfwnuFMINsUVYeJryMf/Rk367qJA2H41jSsIGObrU1MSkbfRFHzbxwimSuCoCReUSjbe9v0f7SzPsFGn+RWqjz8Q0dW1pmawARMqBdftLG0mYJdClIPy8=
+	t=1754404299; cv=none; b=nCwhRkZa12WxcBFKl9rJEz42k3/lqT5GPvo4bs7Z2nWRDbsm5OYP+mciDrBXVYd0lp8UEyohXIq8pQ8XAmFn5ikl/bKqDxnTvjtD0VNAYejmN0hC+ZBBPqOx+yCkl1ds7Ow82Y5krZE3Yzx4VypcmyR7ZMXLdWhZYvRhclBVHsQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754404233; c=relaxed/simple;
-	bh=jvhhtj6TrjlXl4ZoQhwuK/Q/vdS0xxAfIVA7yf0P24w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BVq9Rv2GzsztJIMLcO6nHUM0XBw8VrNaFnfdyvGzH1c0mQlByJcYhkarJPQlyJaOBMOy/P8LsAZWOj4yUCilsJBnAk7Kswa1C6D0aYe2EDvRaGzsJJNNR7+rEJFKWhX0+cjO338GI5oEu/zAMqMl4PPC61mnzSjAUQH1x1Rzh2A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uKLJb00D; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-240708ba498so166145ad.1
-        for <kvm@vger.kernel.org>; Tue, 05 Aug 2025 07:30:31 -0700 (PDT)
+	s=arc-20240116; t=1754404299; c=relaxed/simple;
+	bh=ELWmt2XwMrmxJNrnM0cZ7Lq7yZpEkIkoITwQJHoVNfo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gTKuSEC4X6CA5nV5aVJfYM1UYyBfYIk6QNcIGrDNe2va+hTaxd2IU6vCxeH9jp1l6ka7Yu4FIP1Xn6e4ZYvwsoFfYtNFL1nKDH1bvcP1ysGHIcNu34i3NlD6+2q8mOogIqo7MOCYvr+kQJHM3QPpeEYmHdDhKcAG/jXlsYp2eUA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=UNvmmk+N; arc=none smtp.client-ip=209.85.217.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-vs1-f44.google.com with SMTP id ada2fe7eead31-4fe7712bedaso2713867137.1
+        for <kvm@vger.kernel.org>; Tue, 05 Aug 2025 07:31:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754404231; x=1755009031; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1i2rBdhFSYihK8Kc3DJvKw5YMobx28fVn5y7WwYE/yE=;
-        b=uKLJb00DYAzEMYrJbzjvg1bh5Tvso0Ed1UIQOwCShhKL1blkIWuWB34lW2lloX3ZO8
-         82JuzQX9eqbJiP/7M1cJW1IRviVFtXZuAOnGUrzb8EagkD60JHQuGENGyWt4jnkd+ktC
-         HQlFCerqH4t/FEMn+s2gqSw1PFsH80rS4N0OXBLvzx76ZczMVqzBiczcrEFLCppPO8nF
-         bpMmJ/75tb8ImQ3bZ7WocPGbUOQnoIlF3rk9oG7InkE/G1FHsxxYIga6p67BS4d+J5Qk
-         V7FAils64Go5FF9sSPlorcKcgCXdvov06CV4+LEebIZMk4g4QQTAd/h58O2oktjbNqJv
-         oSGQ==
+        d=ziepe.ca; s=google; t=1754404296; x=1755009096; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=AlTuO/1jl0Qi/PGEdwZcsjPXQoMzQczvkbA6fBL4pq0=;
+        b=UNvmmk+NfdH6jvovyRTWVfUkwwWw5derxEUJkj65BPMqcE5QY1thpOL2xYoR9xywjF
+         R8RtYiO+zL70P2RLqwBnlmCrMOB2nDEIIjLt7sk/OPPTlWSP/jiSS7qeUdUYpeLW5LYf
+         dedfbeZr5wjRbVdY5/s1bgZVVEm/DWA5McjoPFX0veDeOp2zJCF4HYCXyQexdbRUc7g1
+         c6GIgeWJJ2+BjTjAGgBqbi/Y381G2suje1B1AdmDxYvQRa2Cv1MhVxqI3O+tdE9WlPnq
+         5hkmt07XH3NCzCGmv5Kac55f+m5umBH1IGphE9wrffRimix6EMAnzSPDP+ka6MTeJE5E
+         nG7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754404231; x=1755009031;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1i2rBdhFSYihK8Kc3DJvKw5YMobx28fVn5y7WwYE/yE=;
-        b=rD9qMuIKmryYU+h3PNhqwt4uipIPxIaHP22/CPdsRyRDiI/X/ou/GBQltF/v5/f8Ob
-         A9Tsm2ZTiSziDQPphHlBnp0r5MYjL5fJnh2pAvZZz4bjA2NrFDKjKudvZbZRoHRGWFTD
-         WDGDGYsdntiAo3GNPehU5jtDgOgEO8cHiGy+/i4A93s77HzfYnIqIB74AwPNXplqezGq
-         meazJif0iJnP7vVN7nZ3F2sjXpHh+cfwTbPe/PqkoXW0woQkByDzRmuELp4hNz0vkxLg
-         kko4kV3Ntz3u7K5WB6D2+wH8KrLSQT6Pjf8FFJ3c46Jp6qTrJDoXeQbdSscskBpYh/Pc
-         uj1g==
-X-Forwarded-Encrypted: i=1; AJvYcCWG6/Yw5JE1nLgk/GTfi4SY4NQcJEyAwWaLw2yVlvh0JUxGcg2vf6A/+V8jZjtckr0turs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwSPCpKehsaKxKe9c/OUC8nTyHwXNmPIF6CuD11WAfhvgKG3Bsw
-	JDS6uhrNSMxGSnFbjfZaVsdKxi3rD1/CgP/UrvlHJwUXRS9IvCGITvsbrEzF9vlc7fvOvI9B7e2
-	omAF22VeTVdeQwA4ZgBOC1mNU3UMRrREFaaS/fIs4
-X-Gm-Gg: ASbGncsMoibWJuB0FJhrrtjQUf60kpOKuzeJWuwLMpkfthhC1lgw8W/33BHGVUQtMM8
-	0/xu6iJ+RSVi6QeMRmsQZ0Q3tXQuknqdIR39+0DjxFBZ2ZawvNbgTwqRpkvFTa+HbDhfujslb7D
-	mIXKbETpRyI8jKw9wObnU8tBYzNk4gl5Qdlui0u5ak70imBodtaYCrklJxHM570gJZJbUWcq6np
-	pALTPrcIdPUcbB5uSSjRF7HvF6Br6y4ch/YzWwoNlDWT+elkUk=
-X-Google-Smtp-Source: AGHT+IFGBIJJxNfbTEzjP5sTG/ngpGPS905pLSPahMPjbF4yfSdDjgsjpkpPj5UzxYl4JVDbWkCmjVcCGzFqhrKq6lc=
-X-Received: by 2002:a17:902:f552:b0:240:4d65:509d with SMTP id
- d9443c01a7336-2428e724724mr2701805ad.0.1754404230273; Tue, 05 Aug 2025
- 07:30:30 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1754404296; x=1755009096;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AlTuO/1jl0Qi/PGEdwZcsjPXQoMzQczvkbA6fBL4pq0=;
+        b=tEE8q2fvAgMVN/Yu6PJsQItR9SH6O22N5qzMn1QoR3TaWgB1rCBzEZ0w27l3g0JFnt
+         zmf9Grq1E5DbWoW2ciaS2HOIC4s9ncUiCYMGZkrA0svzE7ZPh19YrrkXQ/attD0KQoFf
+         Pw3X5we2KtSAW2R0hgMHecbzwYLFj1FRbbUUpNSGxQDZtGRY4tLqvsQXB3/FlJzILAyh
+         QYDmB2Dj0PBkgNU6xfLFeDRIGX9k4gc/j1lOPEV1s1FQGiDtWSirdJachtK/EcuvbGF/
+         RHrH7WiQzCgz8wxb+F0VigpxiGN9bKfMeBmUWAnlRX+92ViyrnLke/gLxoRlrU6/MO5K
+         Qe7A==
+X-Forwarded-Encrypted: i=1; AJvYcCWa8SXh//ero1fvLvajlw0KVaaAYIoLAL+RBHszjaoWZWGhXqpnUVIcOO4u9yqEayjhxjo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxBmS6AhcTbcgI/tEXn8nlRMFPU0yURM90l+EE3/cswSU7YYglM
+	kknTZCEiQh1pUIzCW5jX07GEz/n228Z1BOIT6k8Y7vAEROI5EI84q+kus/h6Y0LUv34=
+X-Gm-Gg: ASbGncuPaoMYVe1ZnTowPO/maA5RWAa3SlC+oyJ1aBb9F1kH7zhGT+iCSLs1QJhCV/G
+	xjJ/2lPT4RfiZvrVQ8HIC6OoeZCRiPN11iBiARsec4lBR4kcx0rXE5KpIXKa4Kt7qaxj/AiJjgj
+	05CCEP2oDRvf0fBZqIZCRiaJpP9LoUBo6eLJP58Y7z1bLT/Y8ZP4+mIkAzyTYOTOdk+z7fOHP/2
+	zsEuev7aPBnTl/o7J6NHzfdhnxVrcJ1jmTDdurr8kQNi/8rU+I+9smssYd8E4Z5fsqbDJ56fKnR
+	RoPFkZXM3+OUiyF72GffwdXbh1LB1Xivs6OzETFp4lAdsXH5B+aHMLZIktpBvmxWwYZgE4wOZKC
+	zNKNJ3p0RFB7+KEhu8T6K7bA++V2gf/z0zMPeXkc4vTwx7OlqFrqsLXreYKV2tBrejttp
+X-Google-Smtp-Source: AGHT+IHTrZpqFhNaYWp3OobLHpG9cf97WOXgGFMv9akibVpld7o64cnS8mrUbOUHDIlr96qDRpMuFA==
+X-Received: by 2002:a05:6102:4244:b0:4f3:1731:8c01 with SMTP id ada2fe7eead31-4fdc3f1c0dfmr5906902137.19.1754404295882;
+        Tue, 05 Aug 2025 07:31:35 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-47-55-120-4.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.120.4])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7e810a63e84sm51489085a.5.2025.08.05.07.31.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Aug 2025 07:31:35 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1ujIhS-00000001Xjk-307T;
+	Tue, 05 Aug 2025 11:31:34 -0300
+Date: Tue, 5 Aug 2025 11:31:34 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Mahmoud Nagy Adam <mngyadam@amazon.de>
+Cc: Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org,
+	benh@kernel.crashing.org, David Woodhouse <dwmw@amazon.co.uk>,
+	pravkmr@amazon.de, nagy@khwaternagy.com
+Subject: Re: [RFC PATCH 0/9] vfio: Introduce mmap maple tree
+Message-ID: <20250805143134.GP26511@ziepe.ca>
+References: <20250804104012.87915-1-mngyadam@amazon.de>
+ <20250804124909.67462343.alex.williamson@redhat.com>
+ <lrkyq5xf27ss7.fsf@dev-dsk-mngyadam-1c-cb3f7548.eu-west-1.amazon.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <aHEwT4X0RcfZzHlt@google.com> <aHSgdEJpY/JF+a1f@yzhao56-desk>
- <aHUmcxuh0a6WfiVr@google.com> <aHWqkodwIDZZOtX8@yzhao56-desk>
- <aHoQa4dBSi877f1a@yzhao56-desk.sh.intel.com> <CAGtprH9kwV1RCu9j6LqToa5M97_aidGN2Lc2XveQdeR799SK6A@mail.gmail.com>
- <aIdHdCzhrXtwVqAO@yzhao56-desk.sh.intel.com> <CAGtprH-xGHGfieOCV2xJen+GG66rVrpFw_s9jdWABuLQ2hos5A@mail.gmail.com>
- <aIgl7pl5ZiEJKpwk@yzhao56-desk.sh.intel.com> <6888f7e4129b9_ec573294fa@iweiny-mobl.notmuch>
- <aJFOt64k2EFjaufd@google.com> <CAGtprH9ELoYmwA+brSx-kWH5qSK==u8huW=4otEZ5evu_GTvtQ@mail.gmail.com>
-In-Reply-To: <CAGtprH9ELoYmwA+brSx-kWH5qSK==u8huW=4otEZ5evu_GTvtQ@mail.gmail.com>
-From: Vishal Annapurve <vannapurve@google.com>
-Date: Tue, 5 Aug 2025 07:30:17 -0700
-X-Gm-Features: Ac12FXzo1obXx2T2eEnEuW66PcYTBiOTK0DSZ9yVoJ5Lzp8BWhPiYrcn6BBY6yg
-Message-ID: <CAGtprH-VcO4VJkgRZJPS8SEpdO6Xsjmw3CeGYCFchjkdROoMLg@mail.gmail.com>
-Subject: Re: [RFC PATCH] KVM: TDX: Decouple TDX init mem region from kvm_gmem_populate()
-To: Sean Christopherson <seanjc@google.com>
-Cc: Ira Weiny <ira.weiny@intel.com>, Yan Zhao <yan.y.zhao@intel.com>, 
-	Michael Roth <michael.roth@amd.com>, pbonzini@redhat.com, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, rick.p.edgecombe@intel.com, kai.huang@intel.com, 
-	adrian.hunter@intel.com, reinette.chatre@intel.com, xiaoyao.li@intel.com, 
-	tony.lindgren@intel.com, binbin.wu@linux.intel.com, dmatlack@google.com, 
-	isaku.yamahata@intel.com, david@redhat.com, ackerleytng@google.com, 
-	tabba@google.com, chao.p.peng@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <lrkyq5xf27ss7.fsf@dev-dsk-mngyadam-1c-cb3f7548.eu-west-1.amazon.com>
 
-On Mon, Aug 4, 2025 at 6:20=E2=80=AFPM Vishal Annapurve <vannapurve@google.=
-com> wrote:
->
-> On Mon, Aug 4, 2025 at 5:22=E2=80=AFPM Sean Christopherson <seanjc@google=
-.com> wrote:
-> > > > > > IIUC, the suggestion in the link is to abandon kvm_gmem_populat=
-e().
-> > > > > > For TDX, it means adopting the approach in this RFC patch, righ=
-t?
-> > > > > Yes, IMO this RFC is following the right approach as posted.
-> >
-> > I don't think we want to abandon kvm_gmem_populate().  Unless I'm missi=
-ng something,
-> > SNP has the same AB-BA problem as TDX.  The copy_from_user() on @src ca=
-n trigger
-> > a page fault, and resolving the page fault may require taking mm->mmap_=
-lock.
-> >
-> > Fundamentally, TDX and SNP are doing the same thing: copying from sourc=
-e to guest
-> > memory.  The only differences are in the mechanics of the copy+encrypt,=
- everything
-> > else is the same.  I.e. I don't expect that we'll find a magic solution=
- that works
-> > well for one and not the other.
-> >
-> > I also don't want to end up with wildly different ABI for SNP vs. every=
-thing else.
-> > E.g. cond_resched() needs to be called if the to-be-initialzied range i=
-s large,
-> > which means dropping mmu_lock between pages, whereas kvm_gmem_populate(=
-) can
-> > yield without dropping invalidate_lock, which means that the behavior o=
-f populating
-> > guest_memfd memory will be quite different with respect to guest_memfd =
-operations.
->
-> I would think that TDX/CCA VMs [1] will run into the similar behavior
-> of needing to simulate stage2 faults i.e. KVM will end up picking up
-> and dropping mmu_lock for each page anyways at least for these two
-> platforms.
->
-> [1] https://lore.kernel.org/kvm/20250611104844.245235-5-steven.price@arm.=
-com/
-> (rmi_rtt_create())
->
-> >
-> > Pulling in the RFC text:
-> >
-> > : I think the only different scenario is SNP, where the host must write
-> > : initial contents to guest memory.
-> > :
-> > : Will this work for all cases CCA/SNP/TDX during initial memory
-> > : population from within KVM:
-> > : 1) Simulate stage2 fault
-> > : 2) Take a KVM mmu read lock
-> >
-> > Doing all of this under mmu_lock is pretty much a non-starter.
+On Mon, Aug 04, 2025 at 10:09:44PM +0200, Mahmoud Nagy Adam wrote:
+> > We should be able to convert to a maple tree without introducing these
+> > "legacy" ops.
+> 
+> This technically be done directly by changing the current ops (ioctl,
+> mmap, read & write) to add vmmap argument in place and call the ops with
+> NULL for vmmap entry if the entry not found in the mt
 
-Looking closer at CPU <-> PSP communication which is not implemented
-to work within an atomic context, I agree now that this wouldn't work
-for SNP VMs.
+You have gone very far away from my original suggestion:
 
+https://lore.kernel.org/kvm/20250716184028.GA2177603@ziepe.ca/
 
-> >
-> > : 3) Check that the needed gpa is mapped in EPT/NPT entries
-> >
-> > No, KVM's page tables are not the source of truth.  S-EPT is a special =
-snowflake,
-> > and I'd like to avoid foisting the same requirements on NPT.
->
-> I agree this would be a new requirement.
->
-> >
-> > : 4) For SNP, if src !=3D null, make the target pfn to be shared, copy
-> > : contents and then make the target pfn back to private.
-> >
-> > Copying from userspace under spinlock (rwlock) is illegal, as accessing=
- userspace
-> > memory might_fault() and thus might_sleep().
->
-> I would think that a combination of get_user_pages() and
-> kmap_local_pfn() will prevent this situation of might_fault().
->
-> >
-> > : 5) For TDX, if src !=3D null, pass the same address for source and
-> > : target (likely this works for CCA too)
-> > : 6) Invoke appropriate memory encryption operations
-> > : 7) measure contents
-> > : 8) release the KVM mmu read lock
-> > :
-> > : If this scheme works, ideally we should also not call RMP table
-> > : population logic from guest_memfd, but from KVM NPT fault handling
-> > : logic directly (a bit of cosmetic change).
-> >
+map2 should not exist, once you introduced a vfio_mmap_ops for free
+then the mmap op should be placed into that structure.
+
+ioctl2 is nasty, that should be the "new function op for
+VFIO_DEVICE_GET_REGION_INFO" instead. We have been slowly moving
+towards the core code doing more decode and dispatch of ioctls instead
+of duplicating in drivers.
+
+I still stand by the patch plan I gave in the above email. Clean up
+how VFIO_DEVICE_GET_REGION_INFO is handled by drivers and a maple tree
+change will trivially drop on top.
+
+The basic way you've used the maple tree here looks plausible, but I'm
+still against some VFIO_DEVICE_SET_MMAP_ATTRS as a uapi. mmap cookies
+should be immutable, once they are issued they are for a certain thing
+and never change.
+
+The entire point of all this infrastructure is to allow more mmap
+cookies to be issued. The new UAPI should be some
+'VFIO_DEVICE_GET_REGION_INFO2' or whatever that generates an entirely
+new mmap cookie with write combining semantics.
+
+Jason
 
