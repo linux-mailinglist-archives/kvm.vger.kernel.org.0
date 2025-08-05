@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-54037-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54038-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5516B1BA9C
-	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 21:06:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B48EFB1BA9F
+	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 21:07:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0613518A4B57
-	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 19:06:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF1643A351F
+	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 19:06:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2039E29C34B;
-	Tue,  5 Aug 2025 19:05:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1093D29DB9B;
+	Tue,  5 Aug 2025 19:05:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vifgQNSl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Qj7kBf2O"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEF6629B78F
-	for <kvm@vger.kernel.org>; Tue,  5 Aug 2025 19:05:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0D9329C33F
+	for <kvm@vger.kernel.org>; Tue,  5 Aug 2025 19:05:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754420738; cv=none; b=frk6dudICeUWauRIeP4rtu6YBhRg8ylgD9cZ8zkftMdP7IEmwzArCtoWRzhUMEKEurJs4efOCi2ZS7nItqxh+W5cyCQU7nJaEeEvQ5BHdQ61jklUclmPJ5vDdnASuV5tEi8E7rv0lLo0nX6ZFwBw3u9eQDFyJGriFyLgf9hdRcg=
+	t=1754420740; cv=none; b=AV2tdxd6mtTy1Ov4yfZGXYC/PUwJXTzTVBUI9iT1Pfj1NVYSTpX4B5xgSLtR/yX8ENao5YpJRftCTnvO7EoCo8zdvcuyb8iuWIJEsaiJlYheJKoTIVGo2ghdG0mBo5F9VQd4wj4G3RnzR+QwUenPelilPxxHtCq86AoUYHMm4LI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754420738; c=relaxed/simple;
-	bh=EeTLHsTvTDj8Ey13p+W1lWhVKS1l/trEcm4QlAWCCfk=;
+	s=arc-20240116; t=1754420740; c=relaxed/simple;
+	bh=xpuAfe6osI2bpYjxTC/iM3WTy5qqB334ATvjgCjikJg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=EAKLqZTV2tMellBSzn/uQaUeTLlYli50FkrEjRUSGmDp9e1/G3ypO5jKGDkMOOO+h2aeYyIG9Qovpi8SvL2b1aYgC0Xw1E2sU+kPHptWiMzk2DwdJdLgTPgOSk1A9UU1jqJXz9GNSBd1Z7WxVNuZRTSrqChuEqQ2uix/sSnvf3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vifgQNSl; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=qIIAk3PcLIz5fjZUbSsKH/LMP86Rf809BPmyEpDpWiPm5nhyfgtKP3RctH1KhVmte0ESAJCoAH6HrlmoRz2CL6vKUU/VlG3m9Qtpeje2FWyR0vXhgUG2yn65fRXtBr49CPzO0vefyMGvWuXUNRSNVqNYnLBx+9rkHzA3AQO0L1A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Qj7kBf2O; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b2c37558eccso4674239a12.1
-        for <kvm@vger.kernel.org>; Tue, 05 Aug 2025 12:05:36 -0700 (PDT)
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-76bd1cd5ae9so8366092b3a.2
+        for <kvm@vger.kernel.org>; Tue, 05 Aug 2025 12:05:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754420736; x=1755025536; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1754420738; x=1755025538; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZFfqB1AL/AlReFpKct61YHUAJLOWiS9uPENYpzvXzio=;
-        b=vifgQNSlzMOGOuStBxRmuNl0aZUJ10qkAGHDWeaM5yx+IoglD1zhkMxuvWxfMRlDH1
-         MUgb5A0yipp5sWDVicH+EwxKz7KjPxcgXPTuXu/V6qw1xaL1hbjFDdZcgqCdbhaBTDXw
-         shcsj89AKlWuUnJfmu2eJCONQWNSE5pQco8OZYt7a/VR3v8YFK6sixM2go3XO7jXzuoa
-         aN6qDdgRelX/8aIHCZjvNbLSya114K7jYk0GYu8VefdpGXsiiOkUNhFCmPYf9yGc/EbK
-         pADQA4r4eK3qevwGF+LuW+s5ZkRNSspdwy0fxFvJHEGxuDgcTwNfxcCimDtNmqQcDudW
-         yozw==
+        bh=k3BpaAX0seqYxAkXBaAjUiDEESfLKvS8cQgIlkV/n2U=;
+        b=Qj7kBf2OxWGaiN5qyvI6Oqr93NJy7YT6glTmeg/MGRU8aLbYt8lffZyYeSpZXk5sI3
+         0WH0+Iuip0/fnNu8wEeVjGVXFTno5qZt643+UM7WMpMbiHSN84MnZrf5GGConsQC99FX
+         DFH87CCeIlz2+WjTW8ckxzHR6ihONTnzAgZdO+lBTHy2e8Idj3bxL1Dem8H3ltabV3Qq
+         +pBAIDSe7jLSfiZilgffBce8F+XkFEVfzC8MTo6Nj5qZwlCvqM5UeUvFGtgafA/ABF9U
+         0N+xY5Wh2HddoIu/2U0QGSoQZuJUNKcNNZxGdcH2lqsbkNMEfRYy0vBw6KVRPnU4smQB
+         AlGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754420736; x=1755025536;
+        d=1e100.net; s=20230601; t=1754420738; x=1755025538;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=ZFfqB1AL/AlReFpKct61YHUAJLOWiS9uPENYpzvXzio=;
-        b=M24/GNQ1SYwTNxFLPqfFevwiVa18EgR9Xqf8oxSIuemL9oOvwgtxD4sydPiEG+KiNI
-         6pqP+INfFaRGVStw/XJs4h3nWnxmUPk79SMpApsLl4ivU+C6vXvE7ppIq6xVIEF3mP8Q
-         A66A7dWBjvrp9JYV21p3oY6qGhP2PAP1kB2v10eA6MizZ/OLV5NgNWpQR+tj6hKh9TiN
-         syfXyABA4GP+pWLj5kmEgnF94jKa5lvuKnfuhEk1gU8eqeozM3GbmxNYuZs00YaVS6WV
-         b522lng3AEhrILLBwWih4FbVaTldtWru/lp6ObQEPBKnhfePdtBDzsVAqsyzhzFm+CtO
-         9uzw==
-X-Gm-Message-State: AOJu0YwkD54lrC/4QU3JmaGGYoFGjS2H9GY1HIGk68V1J3zSYrT/zgqk
-	KVGrrnYFJB2dxYP8CtUKR892i2gXOomQK+5XsA7rLmZzNAeoopN1+vecVWSZO/ZuwRt/8Gbxx9m
-	jn3Pfug==
-X-Google-Smtp-Source: AGHT+IHBWzHfL+L7GB3q7VFL96dyhmem4ajYx6SknmEz91pFfowhZsGDKVn++VKvzcmUoICFnKZXrj3SyWA=
-X-Received: from pge13.prod.google.com ([2002:a05:6a02:2d0d:b0:b42:3711:3de7])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:6a20:b0:240:1d4f:720b
- with SMTP id adf61e73a8af0-240314553a2mr238202637.23.1754420736287; Tue, 05
- Aug 2025 12:05:36 -0700 (PDT)
+        bh=k3BpaAX0seqYxAkXBaAjUiDEESfLKvS8cQgIlkV/n2U=;
+        b=ST+XU5KeV6EX8wAoQkSML2vOsHyAHYs4yxqSmGqLyOi1oqYcaDE04Fis1zeZvc94rb
+         31cTIdnPhhl5dAZtyXWd1jUefTNaVnQFi5VvqKvB5pOtHPHqfeK30P/1EJelCOz3rO8J
+         mYwV3Nu9sD1z0UcUyzfwQuMWCic/bsITVQHnl+R71TymMyYtK2gNpN24EGQ6iGXmk7oA
+         GXBCXC7ADomA5EBBiSCyhbuPpYFTzsYpbRpJEj/ixUIeFWpcoHT3HAWru6PKatR2aZtc
+         sd3/i8AYB4VdCEZ85lajrBlV6o0XJBAHjOSgFISAPt1kTKyMapiSRrqXUIs9V1tBofA+
+         F+AQ==
+X-Gm-Message-State: AOJu0YzWcMeTs8/tWZo3TqEXVyCkNs6a+9xv4IlLd69x/OZuUBkSPqfC
+	xXRM2ib+T0CXovJ5piWJxQrHskCq7cA9dLjmn2NbbI+UcEWimeq6oEKUzQekcDrkMiOanDX16Fi
+	z10VyaA==
+X-Google-Smtp-Source: AGHT+IE1TxB7aC6rWf+ncWBha/qBhkqCB4f7eWGEN/MljCoe7AxrV10Ivh+oq2kbcx6+avQsLJSNKHHyjOc=
+X-Received: from pgci4.prod.google.com ([2002:a63:6d04:0:b0:b31:dbad:8412])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:3942:b0:23f:f99d:462b
+ with SMTP id adf61e73a8af0-24031455024mr228734637.41.1754420738118; Tue, 05
+ Aug 2025 12:05:38 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue,  5 Aug 2025 12:05:12 -0700
+Date: Tue,  5 Aug 2025 12:05:13 -0700
 In-Reply-To: <20250805190526.1453366-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,49 +75,83 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250805190526.1453366-1-seanjc@google.com>
 X-Mailer: git-send-email 2.50.1.565.gc32cd1483b-goog
-Message-ID: <20250805190526.1453366-5-seanjc@google.com>
-Subject: [PATCH 04/18] KVM: x86: Drop semi-arbitrary restrictions on IPI type
- in fastpath
+Message-ID: <20250805190526.1453366-6-seanjc@google.com>
+Subject: [PATCH 05/18] KVM: x86: Unconditionally handle MSR_IA32_TSC_DEADLINE
+ in fastpath exits
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, Xin Li <xin@zytor.com>, 
 	Dapeng Mi <dapeng1.mi@linux.intel.com>, Sandipan Das <sandipan.das@amd.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Drop the restrictions on fastpath IPIs only working for fixed IRQs with a
-physical destination now that the fastpath is explicitly limited to "fast"
-delivery.  Limiting delivery to a single physical APIC ID guarantees only
-one vCPU will receive the event, but that isn't necessary "fast", e.g. if
-the targeted vCPU is the last of 4096 vCPUs.  And logical destination mode
-or shorthand (to self) can also be fast, e.g. if only a few vCPUs are
-being targeted.  Lastly, there's nothing inherently slow about delivering
-an NMI, INIT, SIPI, SMI, etc., i.e. there's no reason to artificially
-limit fastpath delivery to fixed vector IRQs.
+Drop the fastpath VM-Exit requirement that KVM can use the hypervisor
+timer to emulate the APIC timer in TSC deadline mode.  I.e. unconditionally
+handle MSR_IA32_TSC_DEADLINE WRMSRs in the fastpath.  Restricting the
+fastpath to *maybe* using the VMX preemption timer is ineffective and
+unnecessary.
+
+If the requested deadline can't be programmed into the VMX preemption
+timer, KVM will fall back to hrtimers, i.e. the restriction is ineffective
+as far as preventing any kind of worst case scenario.
+
+But guarding against a worst case scenario is completely unnecessary as
+the "slow" path, start_sw_tscdeadline() => hrtimer_start(), explicitly
+disables IRQs.  In fact, the worst case scenario is when KVM thinks it
+can use the VMX preemption timer, as KVM will eat the overhead of calling
+into vmx_set_hv_timer() and falling back to hrtimers.
+
+Opportunistically limit kvm_can_use_hv_timer() to lapic.c as the fastpath
+code was the only external user.
+
+Stating the obvious, this allows handling MSR_IA32_TSC_DEADLINE writes in
+the fastpath on AMD CPUs.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/x86.c | 8 +-------
- 1 file changed, 1 insertion(+), 7 deletions(-)
+ arch/x86/kvm/lapic.c | 2 +-
+ arch/x86/kvm/lapic.h | 1 -
+ arch/x86/kvm/x86.c   | 3 ---
+ 3 files changed, 1 insertion(+), 5 deletions(-)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 8c8b7d7902a0..ea117c4b20c8 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -2145,13 +2145,7 @@ static int handle_fastpath_set_x2apic_icr_irqoff(struct kvm_vcpu *vcpu, u64 data
- 	if (!lapic_in_kernel(vcpu) || !apic_x2apic_mode(vcpu->arch.apic))
- 		return 1;
- 
--	if (((data & APIC_SHORT_MASK) == APIC_DEST_NOSHORT) &&
--	    ((data & APIC_DEST_MASK) == APIC_DEST_PHYSICAL) &&
--	    ((data & APIC_MODE_MASK) == APIC_DM_FIXED) &&
--	    ((u32)(data >> 32) != X2APIC_BROADCAST))
--		return kvm_x2apic_icr_write_fast(vcpu->arch.apic, data);
--
--	return 1;
-+	return kvm_x2apic_icr_write_fast(vcpu->arch.apic, data);
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index bd3232dd7a63..e19545b8cc98 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -130,7 +130,7 @@ static bool kvm_can_post_timer_interrupt(struct kvm_vcpu *vcpu)
+ 		(kvm_mwait_in_guest(vcpu->kvm) || kvm_hlt_in_guest(vcpu->kvm));
  }
  
+-bool kvm_can_use_hv_timer(struct kvm_vcpu *vcpu)
++static bool kvm_can_use_hv_timer(struct kvm_vcpu *vcpu)
+ {
+ 	return kvm_x86_ops.set_hv_timer
+ 	       && !(kvm_mwait_in_guest(vcpu->kvm) ||
+diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
+index 1b2d408816aa..8b00e29741de 100644
+--- a/arch/x86/kvm/lapic.h
++++ b/arch/x86/kvm/lapic.h
+@@ -249,7 +249,6 @@ void kvm_lapic_switch_to_hv_timer(struct kvm_vcpu *vcpu);
+ void kvm_lapic_expired_hv_timer(struct kvm_vcpu *vcpu);
+ bool kvm_lapic_hv_timer_in_use(struct kvm_vcpu *vcpu);
+ void kvm_lapic_restart_hv_timer(struct kvm_vcpu *vcpu);
+-bool kvm_can_use_hv_timer(struct kvm_vcpu *vcpu);
+ 
+ static inline enum lapic_mode kvm_apic_mode(u64 apic_base)
+ {
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index ea117c4b20c8..63ca9185d133 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -2150,9 +2150,6 @@ static int handle_fastpath_set_x2apic_icr_irqoff(struct kvm_vcpu *vcpu, u64 data
+ 
  static int handle_fastpath_set_tscdeadline(struct kvm_vcpu *vcpu, u64 data)
+ {
+-	if (!kvm_can_use_hv_timer(vcpu))
+-		return 1;
+-
+ 	kvm_set_lapic_tscdeadline_msr(vcpu, data);
+ 	return 0;
+ }
 -- 
 2.50.1.565.gc32cd1483b-goog
 
