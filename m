@@ -1,144 +1,323 @@
-Return-Path: <kvm+bounces-53947-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53948-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93A9AB1AB9E
-	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 01:55:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E18C1B1ABA8
+	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 02:18:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BDBEC180FF3
-	for <lists+kvm@lfdr.de>; Mon,  4 Aug 2025 23:55:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 93E693BE686
+	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 00:18:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11E3B28852B;
-	Mon,  4 Aug 2025 23:55:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF2C472605;
+	Tue,  5 Aug 2025 00:17:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="AzdEaQL5"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lVi7fYCs"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90D9D2264B8
-	for <kvm@vger.kernel.org>; Mon,  4 Aug 2025 23:55:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754351732; cv=none; b=ag+qOsI2Q+ufuqfsGGMuU9GAXbC2Bp2LEJKa0hLEioAJ8SLb28fsSSCkknm2nlICRoKX1gsHGxORtvL22mpBkn2U1VgWWPPx+ufOj81fx3tvWhnr3j2jbugyhg5LBpGGYEIJWBCD+KbfCPJ1ZzMfPe9CIv1AVedLqao5hq3tjVg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754351732; c=relaxed/simple;
-	bh=LJa4/RLFYqhpHz6skUkYByaddwTg6kkzYxMQ4jNpMpw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gEKWaXaigcimueW+xNiiBQPH6cauZvjIcU8Y+ckwOCcyeaWRgr4Bu0KtPHqo8xYhWoRtR0bFivGOSrCEUZuLeGfat9KCGALF+43MTBHPBbLl47UHG4PLJbpGzNnI1zOYvVwEQPBdsJx8ULAl/v4v1WClRHWh0ZCOESl6Ecm/VGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=AzdEaQL5; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-af8fd1b80e5so831802766b.2
-        for <kvm@vger.kernel.org>; Mon, 04 Aug 2025 16:55:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1754351727; x=1754956527; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=kkOJrgR6AtCFvZcGKn8m61aTsvNmBN6yQcZ7tCaSTKE=;
-        b=AzdEaQL5T1BLS2jVQbL3EndlQMsOXHWxD26AB+YvASRQLElh9ecZWCiQuchnDOSs8J
-         00KqwxAqyyn5/teD+LLIoMhN/dq9Hd/jMO8rfgBRtaMteEOb62ZAhbflzFuOepp62FSB
-         h16EjeHjCWly5esBdRNXZu8mAobUgIyLOGG30=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754351727; x=1754956527;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kkOJrgR6AtCFvZcGKn8m61aTsvNmBN6yQcZ7tCaSTKE=;
-        b=CHFmcD9NOb8nV9adAc8KVv2/ozk5GWgY84HyCyIOQEt3iVUTXSpK/zqKSKxeM1D741
-         FBN2QlYvglnm3oLcsGKRd/M3x0b/ciopQwScAfM9efQcjzHRIhDVsR6QGFA2QlpE0CMc
-         7h6tRiYtDL9o+20RlMSviQ6kwT3R4IT43l+tKsVNEJ/Zkk4yN+fJAbVI3F5n0zqbR98V
-         fqdYKLBlB22USmo+RADWs95BFudMmGVPz3R39eWgR22Jm0bb8tMknqTiHaEF/+rp2Ms8
-         13qFFVDm8ZHecJ4au08flruwne2Dfk1pB4Rd4Y/PBbq/XelQaMgfweIqSaq1eEN1D5E1
-         WyYA==
-X-Gm-Message-State: AOJu0YyW2f66TBPWvpgLs4I5vJMfIWO8SgEM2kGBCwlUyr6c8EbmR+Em
-	CTv7fWh8gK3G5r+E04tdhS5gVy0T3NDzrtICHG7rQUsnnZtH/WrILOqxfg6Ym/20c8VQMrsjFUk
-	NeIOHSvQ=
-X-Gm-Gg: ASbGncu9jBGhqMfQmuRFYauJkRO38hCcHEZhpShYji+Ea2+SyaDdDBPsR/kLCK39U2N
-	bJMS6R/EbCsLp6tj4RQnO9iAgt7OPQbt+a8VzQG5LVhajYM82Y1Pg1DpXOB6icCs/FVE2GEGWaY
-	UrenTM+DpRZKH20HEPa2gBQzObGx4l9oFxFg8xxqIjr6cmUBYr8OPN5PmW7db7BGS8m9FqAPPXZ
-	0CSxrsQugQLfyDpHB57LlVB9YxW451BrJKBRZbpgEmSvj0vX6ccYQPfSnDaxWP8KTUlr1URb1WE
-	Ur3u0sXd5x33lKLbUbeS0sLody/ZrNEseDUDtIYbSEZrCjKuzzdCapHGh7nEy5g4Q6oyyUiRILN
-	aQdDocPW4iV1Q5XkELKxlqUhN0/2400AEW8cLwyHdSTfDExCtO2kwI3LCeuqUI5WFY0St9mPpHB
-	K+Rmw0AVI=
-X-Google-Smtp-Source: AGHT+IFHZiodW12fzXxgBf0YduQcW3CpxdDIERKegxTlbZonWm3VXt/DZml7IgbZPC+O1wEPoHRHjw==
-X-Received: by 2002:a17:907:6d1f:b0:ae0:c539:b89a with SMTP id a640c23a62f3a-af9400844bbmr1151035666b.19.1754351727574;
-        Mon, 04 Aug 2025 16:55:27 -0700 (PDT)
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com. [209.85.218.49])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-af93b4d4c27sm546548066b.66.2025.08.04.16.55.26
-        for <kvm@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 Aug 2025 16:55:27 -0700 (PDT)
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-adfb562266cso800151966b.0
-        for <kvm@vger.kernel.org>; Mon, 04 Aug 2025 16:55:26 -0700 (PDT)
-X-Received: by 2002:a17:906:478c:b0:ae9:876a:4f14 with SMTP id
- a640c23a62f3a-af94024cab6mr1073910366b.59.1754351726564; Mon, 04 Aug 2025
- 16:55:26 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DDCAE55A;
+	Tue,  5 Aug 2025 00:17:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.15
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1754353074; cv=fail; b=RcqV+o2Z9pJCuIHm68ffnkRAGitRMezlBlXItqtiQHS1qC9rjvgLA+CC2H7VwfcYWT8d+U4EuPUOPgyNltHGuIGKkHeZvg1z8ucyaTYxJGbD9PAbwKdU9LpvLrXJadn9E6ePCVoOpOV6gaLyxxX8TA5rDD+G2Y44SmI/cUoAR2I=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1754353074; c=relaxed/simple;
+	bh=juSMlthPKG8q1rbf3w+v7eJ+iqvylsUe/eVmq/M5kPA=;
+	h=From:Date:To:CC:Message-ID:In-Reply-To:References:Subject:
+	 Content-Type:MIME-Version; b=W3YwDwpcDsIv8viyByK+2geMk0nhnHJUHIFJURaycOVBd60mmtTfu5Gfzov8WZ3gYGiYcMNchZTim8bDc2yJXIeMLhs1VIKtqv2zue2JSXusZG/uu2Ab3aTQw8RWnBIzc3E2s30rCzGs+SkriqlHCemZLooBhu/INIhBqrNWKR0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lVi7fYCs; arc=fail smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1754353074; x=1785889074;
+  h=from:date:to:cc:message-id:in-reply-to:references:
+   subject:content-transfer-encoding:mime-version;
+  bh=juSMlthPKG8q1rbf3w+v7eJ+iqvylsUe/eVmq/M5kPA=;
+  b=lVi7fYCsWGuKYjwpiY+u2h6NPYatwtxXhDIk32OTp0NBpWBN+8ToqRiS
+   f5AEnXrOTwD71aBmBzvcGFznkZDm0bRXDZq90K8YF5hfYz/cDfEfgw89Q
+   cgbXcmVFPiAP8Cu7Y5aCqr5VGJNkDJD0GIPp5MJ0cZlM0aDTlSiKEZWq8
+   ehszG0NqYD+U7TRZ58F2GxOHqouvIQ65HICP1QZCNSJoUo8XfyRLcvtgk
+   77LFsGGfDQA5U+eXK8G8rH3LobDCIF+4oIGj9163y8eCyUF48GLOrphC5
+   RZhV2DN2qiaveDBIpfJuLEIPSbgtmRJK9TEfRgvPNMbILkdNtEy6uvbag
+   A==;
+X-CSE-ConnectionGUID: h3bsB5uBSEyooEp9UzXcyg==
+X-CSE-MsgGUID: 53JrPUCASG6letjkjz21fA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11512"; a="60270550"
+X-IronPort-AV: E=Sophos;i="6.17,265,1747724400"; 
+   d="scan'208";a="60270550"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Aug 2025 17:17:53 -0700
+X-CSE-ConnectionGUID: 7RzwebaHSXecjhrAxrqs/w==
+X-CSE-MsgGUID: ZCra5yLGT3OeDpDI7DdP5A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,265,1747724400"; 
+   d="scan'208";a="164694851"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by fmviesa009.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Aug 2025 17:17:52 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26; Mon, 4 Aug 2025 17:17:51 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26 via Frontend Transport; Mon, 4 Aug 2025 17:17:51 -0700
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (40.107.237.74)
+ by edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26; Mon, 4 Aug 2025 17:17:50 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ngYOLaMrFO/zXIdVinM4tX8qCdJnnj0E2RQ940rzs/agRA7DJb7Ypsvj6dOoskm65tEwLP76fE0pXuV5Q65z2DcDqWYxurW8o0Uncw+5Sn6EqZM1lvXLbWxsbxqjDBIrpkUc8F08AXT2+XtO8A8GyEgVqeoY1EDQ8q/9N2AlMmNp8mX0wiGLcvjc2yPY3jXtuvtly4J81QBp/VhrPhBS1nhF8JPDc4RhlGChH7FggaQv2xHfDdEnvGymHoOC7HxZyfCgBti0MMrHeWYUZYelRS5B91rq85zVuMaxP193XQSvVxx0DDznnrlqaz1A/AsOUon9V45WaevOJ8bcSJLGVA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=HT8JFwWxdu0CquFvEx0yhiPMQ/8ibdVqOWtTus3FaiU=;
+ b=k71bZ4cHI8mXUQoFnL4/XvvNhsnbL+bBZibWx5f1nPH4kWsUmdFNN3QYgzsD9Ro9HXpYjuSvsyCQGJqxc++cdO76hwF2weapgUJK19Sq2bRqDfEnBZvohaInteoy+QPuIjKHU4wAdQ5zoDZGL3bO/Ze0+qEP+QbKmqtJBkoVsSmlfHfPCBC3cTf6tNfOTFrV/loR8ZOu3N12D7uCvb4WGdp8yJriNvXkhjThtMeFCx+tbrDJJjLRJlO9phgrBAD96A+lfH8/J1sTg9qfyY27WEFKzNzawD9+MnfYKUcJEcvhdo4Xpg2Uz1PJRLA9ZyTswr+Dg6O3V5VrmsvfyJw4UA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH8PR11MB8107.namprd11.prod.outlook.com (2603:10b6:510:256::6)
+ by PH3PPF55C5E51F2.namprd11.prod.outlook.com (2603:10b6:518:1::d20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8989.11; Tue, 5 Aug
+ 2025 00:17:21 +0000
+Received: from PH8PR11MB8107.namprd11.prod.outlook.com
+ ([fe80::6b05:74cf:a304:ecd8]) by PH8PR11MB8107.namprd11.prod.outlook.com
+ ([fe80::6b05:74cf:a304:ecd8%2]) with mapi id 15.20.8989.018; Tue, 5 Aug 2025
+ 00:17:21 +0000
+From: <dan.j.williams@intel.com>
+Date: Mon, 4 Aug 2025 17:17:19 -0700
+To: Xu Yilun <yilun.xu@linux.intel.com>, <dan.j.williams@intel.com>
+CC: Chao Gao <chao.gao@intel.com>, <linux-coco@lists.linux.dev>,
+	<x86@kernel.org>, <kvm@vger.kernel.org>, <seanjc@google.com>,
+	<pbonzini@redhat.com>, <eddie.dong@intel.com>, <kirill.shutemov@intel.com>,
+	<dave.hansen@intel.com>, <kai.huang@intel.com>, <isaku.yamahata@intel.com>,
+	<elena.reshetova@intel.com>, <rick.p.edgecombe@intel.com>, Farrah Chen
+	<farrah.chen@intel.com>, "Kirill A. Shutemov"
+	<kirill.shutemov@linux.intel.com>, Dave Hansen <dave.hansen@linux.intel.com>,
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>,
+	<linux-kernel@vger.kernel.org>
+Message-ID: <68914d8f61c20_55f0910074@dwillia2-xfh.jf.intel.com.notmuch>
+In-Reply-To: <aJBamtHaXpeu+ZR6@yilunxu-OptiPlex-7050>
+References: <20250523095322.88774-1-chao.gao@intel.com>
+ <20250523095322.88774-8-chao.gao@intel.com>
+ <aIhUVyJVQ+rhRB4r@yilunxu-OptiPlex-7050>
+ <688bd9a164334_48e5100f1@dwillia2-xfh.jf.intel.com.notmuch>
+ <aIwhUb3z9/cgsMwb@yilunxu-OptiPlex-7050>
+ <688cdc169163a_32afb100b3@dwillia2-mobl4.notmuch>
+ <aJBamtHaXpeu+ZR6@yilunxu-OptiPlex-7050>
+Subject: Re: [RFC PATCH 07/20] x86/virt/tdx: Expose SEAMLDR information via
+ sysfs
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BYAPR04CA0006.namprd04.prod.outlook.com
+ (2603:10b6:a03:40::19) To PH8PR11MB8107.namprd11.prod.outlook.com
+ (2603:10b6:510:256::6)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250804162201.66d196ad.alex.williamson@redhat.com>
-In-Reply-To: <20250804162201.66d196ad.alex.williamson@redhat.com>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Mon, 4 Aug 2025 16:55:09 -0700
-X-Gmail-Original-Message-ID: <CAHk-=whhYRMS7Xc9k_JBdrGvp++JLmU0T2xXEgn046hWrj7q8Q@mail.gmail.com>
-X-Gm-Features: Ac12FXzNsiXa1g4lLLdotjXwBYpgPqvnDpdKKoggRbJ3KlfhT-2HsnqsEpBMoL8
-Message-ID: <CAHk-=whhYRMS7Xc9k_JBdrGvp++JLmU0T2xXEgn046hWrj7q8Q@mail.gmail.com>
-Subject: Re: [GIT PULL] VFIO updates for v6.17-rc1
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH8PR11MB8107:EE_|PH3PPF55C5E51F2:EE_
+X-MS-Office365-Filtering-Correlation-Id: b32e47de-399b-485d-bfe7-08ddd3b571df
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?WHgwallHZ0l4SGgwcGp4ZkdvamlHY0l4bnZ1Z0hmdWNyc0pVNGMrVE13dGN5?=
+ =?utf-8?B?eUM4TkZvVHRsK2lGTHkySkw0K2VyMU8zcUk3Y1daUXFMaUI2WUlMZjVJeHBH?=
+ =?utf-8?B?SHFIelM4Q2x5WVRCdUJoVFc4N1k4dzdvaHJCVlBoK2d4anczb1dwQllkQVlZ?=
+ =?utf-8?B?dnVFbWh1bmhQWWtEdWxGTnI2OXYxWHEwcld5YzVYejVPMGh6UHhrRFBtKzJr?=
+ =?utf-8?B?TnJ0dzR2UGJ4SjM2V2FZMDlGb2hGb2QyZ1pMZ1Vxa2tUZXFiY0kyaHVvZmVy?=
+ =?utf-8?B?bDlaaTJHU21VeDI3blRyMFFEdmt6aFRTQkJIb0Fibm01NlhXR2UxRkxCZlRD?=
+ =?utf-8?B?UFU0ZWZjL21wenRpbVhWT1VuaERpcWV3TTh5emtMM1FoaFZla3ZtWHIvc2p5?=
+ =?utf-8?B?UVNUdjQ0YjlGNUlEdzZnYXpXdEMvOFNhcjc2a2JvckFpZHlKNEpHK1QzWE5Q?=
+ =?utf-8?B?dEtxcVdJcjJsYUlKakpTd3Vya0NudjRrSUh5SFRmR3lreEZnYjlEVEh5UWd4?=
+ =?utf-8?B?dGV1TWEzQnZzOG9WaVB1eE5YMnJVS25ETi91UHoyNG5nS1MyV2dPbzBQcmo3?=
+ =?utf-8?B?SzZBL0xQajVqYXl5alZIcksvWEFQN0dTbU9Zc1dGM3hndWhLTy9IUlkxY002?=
+ =?utf-8?B?TGdMNEtsWElIVW9weEllamxONFRJTFpLK0FZWXRLQzNaOFk3aG5kZ3pUcU04?=
+ =?utf-8?B?eHlKTGt3MytncFdDNk5mdGROOGtPaXpXQmtFTi9vS3BEUHM3d0FQdXovTG51?=
+ =?utf-8?B?aXF3WmhmeFc5dUpVYkJsd2J4VTNBS2t1eWp3QWF6MXFOck1QeDdqbVc0RGc5?=
+ =?utf-8?B?YzdjLzAvbTFnQXNzWHVRalpnVTlVYXI3b3JMM2IvWGlvd1lLdnlXOHN0N2dE?=
+ =?utf-8?B?MnRtWUJZb201Z2dNaDJUVVVNcy8rRzhoVklzcjRWRVdET2xBZis5NjlWb0cx?=
+ =?utf-8?B?MzRZcXJISVBrNTBlbUpEeFVLcEI2Wk5PaU1QeHRlN3c1VldxaFJVS0lwVVZt?=
+ =?utf-8?B?cExiVUt4eVFBTW90UVhpc21HaE4wMTh5Z1Q2MWNZWjJrdyszdHpjR083QStM?=
+ =?utf-8?B?Y21pNzZFZlozVXJoSTFzR1UrcE14ekpzK251ZWdRWUhQNU5OOTVtRyt2Ulcz?=
+ =?utf-8?B?S01vNnpiV3B6WkQzaEZWNmtUZ0V4Wm9pQ3pSUkZ0emRQVTloUGhZcFlDa3FN?=
+ =?utf-8?B?WFhHUlVJL0kwcTZPS1h6eXVoQ2NEV0kxTm9vS2ZvL1JvZURZR0NKN1dHWWJ6?=
+ =?utf-8?B?MjBCd0d6b1ZuL2VLMy9DTDk5MWVvWWg4ZjJrY1BLb2lkZUVZOTQxZ1dtdUEy?=
+ =?utf-8?B?SkFwNVhXTEg3Z0F1MUxKVmpHbHFPYkJTc2R1WlVqSnNoVjVXYk93OC9NT0Q4?=
+ =?utf-8?B?RDR0QVFnNFVERWVUd0liNlFnSzdYOVpHL1RsMVpuZjhpWDd5N1lpdXRteFZt?=
+ =?utf-8?B?SElOdUtzZzFnTHB6Z3dkSnhzdGcvYVFJTkJzNTFPZ0dLaEdZbjluV2xYRWRu?=
+ =?utf-8?B?M1Q5VS9NaUlxVWErSld5NUxsZHg0T05IaFZVYTRTOWRKSGpzNzNzOEdvSWJu?=
+ =?utf-8?B?cWM2Z1ZQV1pWZ0RURStaR0E4Syt5dHZKVDdidjk3dStUbGo1UE9wa3ZLckpM?=
+ =?utf-8?B?Qjh0NjZ1VFRMemJId3c5RHRDZGVsdS9xeEt0SkdZUFJ4S2E1Rnp2VGNIclJO?=
+ =?utf-8?B?S1VMbElZVUxtOXArRUF1Zmh2T1RzcEM3ZlRNeEdGZEN5Y2NaZ1BmdmUvUDhm?=
+ =?utf-8?B?ZDA5bEE5Zy85aVBzSVdjdDN3d2k4ZGlEeDVkNEtWRWFqTHBZMENqaC9uY3Vt?=
+ =?utf-8?B?ajFxdU9rbU5XK0tpazdGcUxCbU03TTNpTDcwQlUvYzl6V2craWRlWklCdWVZ?=
+ =?utf-8?B?MHVXY2lqNDZkSVg5N2FZSjcxSkp2OC9CMEZxZU1mUmt6QStlS01OQ0I1djZs?=
+ =?utf-8?Q?6phdEuNtFY0=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB8107.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ejRML1R0OVliekU2WkpDallvdU9EQ1BoMEVVNTRTV0Jmb1VaeFh2dDBqK2M0?=
+ =?utf-8?B?MnVvQ0VyQmUzQ2FPMDJrdmxCU0xhbUx5SWVjdzBsTDJ5UGNCQTFkWjNaYTZR?=
+ =?utf-8?B?aDFxQk9zb0ljVW4yTTZrUEdwSmhVQ3JOTWE0SkNZVW85aXoyUjVnQjJnckVz?=
+ =?utf-8?B?ZTUyRzFLTmNkL1Q2WUo5WUFIMXlybnE5b1E0QXpNaTBvcXh0RjV2L21ZOWE2?=
+ =?utf-8?B?S2MraC90cUp3T1JTbVFmL3JRUWZnZ2w2UzNZTUowNmtXRHNTYkZLS2dZVzds?=
+ =?utf-8?B?S1ZFb3dBcVJiQWpkMUF4NFdxRVBmWWx1NEhwQXRFQldZVFVock5SYUROby9R?=
+ =?utf-8?B?TUs4ZWcrUmg1UVZZNHNwVzhDQnowTjc4VkpuK2ZoS0dLbGxINkhwN3lsQ3lk?=
+ =?utf-8?B?aEpFTzJhTldqQXR1WUZTbXc4aUpnckZlWmRTVkFGNGhtWGwxa25BWDZoRkJo?=
+ =?utf-8?B?Tmh2T28xMUtHdHhjMVNTc0dqTHNkN1hlbUhNbWYzRy9aR2xzSUswY2NpNVZH?=
+ =?utf-8?B?cmlndW8yd2NNOCtWTWUrNjJGd1BDZUdnbUVHNWh2MWdjK3o1Nk83azR4WXhu?=
+ =?utf-8?B?bjNrVlFxYmNaTXFBeU8xc0pjeUcrRm1CYnloYUhmeFVBT0x0enRCZkNRTm9R?=
+ =?utf-8?B?R2g5ejl2dHdGajZ2YXJxc0hSdWg2bW5pTkRHN2sxY0dWSHQvcU13UXZrL2li?=
+ =?utf-8?B?enJBWmkxVnVGbXNQazIxSXdja2xtUW0wdWxpR3NwTlFRdW41NEJkWklnZmlT?=
+ =?utf-8?B?OWI2WEY4cW1UVHB2YUhWa09PMTlwYUliSTRESXJrQll1RkhhSWVGY0dXdkU5?=
+ =?utf-8?B?M3lJZUgyYk50OFZtM1dBZ1o5dkxkZDB2L25JTXRxckhrNDhzSmJmWVRQMU9h?=
+ =?utf-8?B?VzhlOFFtWTBlcmd1c1M0SDB3MmZxVm43MmRKN0Zjd0xjWWxxRnhVbFZrTGQy?=
+ =?utf-8?B?cDdoVFhGQSs2SWM2bGprY0EzRFpmVjkyT3lCa1ZocUF6a0dlNEJFQ0JIc2tM?=
+ =?utf-8?B?VERqS1dNd1MzK2NVM3BNYnA4eG9YK2RYNVpMTTY4S1pqV01nOEhDZ1l4RkNJ?=
+ =?utf-8?B?Z1RGa1BXbHFuK2l0ZU5qV0RWbEhhWjZjZm5Kb2VubURkV1VBcWdZN3Z2QS9Z?=
+ =?utf-8?B?TXRmNEhuN3MwZHJoVlVyTERFVGNBUmtVa3BpMzByS1ZyVThXTDArZ0EyeXlG?=
+ =?utf-8?B?d1FpbngyMCtLRHMwQU1JeDBic0R2K0F4KzNyMEdmVHFvcEJEakw1QlNmL0ND?=
+ =?utf-8?B?aWZHLy9xZHlVUFhGeWZGb0pIWkRlWWFOUWd6Q3ViQ2pOc09oT1hraDg5Vmlw?=
+ =?utf-8?B?Q0R5WWo4dGdlYU5ZdWdaUlJUN2lkRXh1V3VFWFhBeURzR3BlN213UVZnSnp6?=
+ =?utf-8?B?ZC93TGJna1c4ZU12NDJMS3VGUXdlV3pRVW9pRWY4a3pJWlMvWXJ3aUx6cmdx?=
+ =?utf-8?B?MU5UK21tbURuRk5DYzZyeXl2VWdRb0NrN29ZK1QvZWpWNnNKTE1QeVFMNXRl?=
+ =?utf-8?B?TVR3SkszalVIMGZudG5Pd2liV2pML2dBZmR6bTdnSEluY2JveFN4WU5QNnpu?=
+ =?utf-8?B?Mkt3MlJEUjRzUm50eWplMlZQZkF2ZzFyWGRCWjV2TDFIbStLUEdENzgxM3I5?=
+ =?utf-8?B?ZlNHNncrblA3VnplbGtyVGtGK0tPSGl6NG1nSXE1VjByZmt6c3BzZlA2NVR2?=
+ =?utf-8?B?RVdLZSsyUFdBYllaUTZXNjRzaFk2QVQwQzVkQURJNytTaG94OTl4bUpXMHlp?=
+ =?utf-8?B?WkpOOHFkb09GYUN4NmprbU1SdEpISW9oZWdLcnFJSjRmazc0cFpRVjFkQ0lP?=
+ =?utf-8?B?Y1RWcTUvbjhDTzBOVFU2amxrL0dadTYrYUJDWmxMMDA1d3ZrWVRzeC81c0li?=
+ =?utf-8?B?R2RqcGlSeURwcU9FajlnNEx3bFN0Nk9WeEU2K2l5TGZ5Z09nakU4alJmcXJp?=
+ =?utf-8?B?bGl2bTJFQzZkSEZnZ0xRckl4Q3dtVGZqYVZJdzFPTVBBeG9IZ1hON3A3aCtR?=
+ =?utf-8?B?ZW1mak05TWJWT01nQ1E0a1V3VHdGRDRkMDVRNnN2T2pGQ0l0R2hUQmhvVXdE?=
+ =?utf-8?B?KzBScFpJVlRSL0pQZGNhenpOVU13a0RHSWMwUlFuUURzdStLRVBhOVF5RmVo?=
+ =?utf-8?B?OHY4M2pJQjN2ek9WRlcva2RTcFhlT2RzaHVqY3I1Q2hMYXI3V0grODhlWU1s?=
+ =?utf-8?B?RWc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: b32e47de-399b-485d-bfe7-08ddd3b571df
+X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB8107.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Aug 2025 00:17:21.1373
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: lyzHBlpQid8L/e+4zy/loPWkzRcDT+4CAszXUL8d71SUjUY1Vsh8meTN50oLm+tGPWghbyhH3QPYfDFE1rg7cw8iwKsEi4V9Qqf7Sqq8fKE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH3PPF55C5E51F2
+X-OriginatorOrg: intel.com
 
-On Mon, 4 Aug 2025 at 15:22, Alex Williamson <alex.williamson@redhat.com> wrote:
->
-> Li Zhe (6):
->       mm: introduce num_pages_contiguous()
+Xu Yilun wrote:
+> > > > - Create drivers/virt/coco/tdx-tsm/bus.c for registering the tdx_subsys.
+> > > >   The tdx_subsys has sysfs attributes like "version" (host and guest
+> > > >   need this, but have different calls to get at the information) and
+> > > >   "firmware" (only host needs that). So the common code will take sysfs
+> > > >   groups passed as a parameter.
+> > > > 
+> > > > - The "tdx_tsm" device which is unused in this patch set can be
+> > > 
+> > > It is used in this patch, Chao creates tdx module 'version' attr on this
+> > > device. But I assume you have different opinion: tdx_subsys represents
+> > > the whole tdx_module and should have the 'version', and tdx_tsm is a
+> > > sub device dedicate for TDX Connect, is it?
+> > 
+> > The main reason for a tdx_tsm device in addition to the subsys is to
+> > allow for deferred attachment.
+> 
+> I've found another reason, to dynamic control tdx tsm's lifecycle.
+> tdx_tsm driver uses seamcalls so its functionality relies on tdx module
+> initialization & vmxon. The former is a one way path but vmxon can be
+> dynamic off by KVM. vmxoff is fatal to tdx_tsm driver especially on some
+> can-not-fail destroy path.
+> 
+> So my idea is to remove tdx_tsm device (thus disables tdx_tsm driver) on
+> vmxoff.
+> 
+>   KVM                TDX core            TDX TSM driver
+>   -----------------------------------------------------
+>   tdx_disable()
+>                      tdx_tsm dev del
+>                                          driver.remove()
+>   vmxoff()
+> 
+> An alternative is to move vmxon/off management out of KVM, that requires
+> a lot of complex work IMHO, Chao & I both prefer not to touch it.
 
-WHY?
+It is fine to require that vmxon/off management remain within KVM, and
+tie the lifetime of the device to the lifetime of the kvm_intel module*.
 
-There is exactly *ONE* user, why the heck do we introduce this
-completely pointless "helper" function, and put it in a core header
-file like it was worth it?
+However, I think it is too violent to add/remove the device on async
+vmxon/vmxoff.
 
-And it's not like that code is some kind of work of art that we want
-to expose everybody to *anyway*. It's written in a particularly stupid
-way that means that it's *way* more expensive than it needs to be.
+Are there more sources of async vmxoff besides CPU offline, system
+suspend, or system shutdown?
 
-And then it's made "inline" despite the code generation being
-horrible, which makes it all entirely pointless.
+The suspend and shutdown cases can be handled with suspend and shutdown
+callbacks in the tdx_tsm driver. Those will be called before KVM's
+vmxoff. For CPU offline, is it safe to assume that the driver will not
+be invoked from those CPUs?
 
-Yes, I'm grumpy. This pull request came in late, I'm already
-traveling, and then I look at it and it just makes me *angry* at how
-bad that code is, and how annoying it is.
+Are there other sources of vmxoff?
 
-My builds are already slower than usual because they happen on my
-laptop while traveling, I do *not* need to see this kind of absolutely
-disgusting code that does stupid things that make the build even
-slower.
+> That said, we still want to "deal with bus/driver binding logic" so faux
+> is not a good fit.
 
-So I refuse to pull this kind of crap.
+Faux device gives you a bus / driver-binding flow, it just expects that
+the driver is always ready to bind immediately upon device create.
 
-If you insist on making my build slower and exposing these kinds of
-helper functions, they had better be *good* helper functions.
+> > Now, that said, the faux_device infrastructure has arrived since this
+> > all started and *could* replace tdx_subsys. The only concern is whether
+> > the tdx_tsm driver ever needs to do probe deferral to wait for IOMMU or
+> > PCI initialization to happen first.
+> 
+> The tdx_tsm driver needs to wait for IOMMU/PCI initialization...
 
-Hint: absolutely nobody cares about "the pages crossed a sparsemem
-border. If your driver cares about the number of contiguous pages, it
-might as well say "yeah, they are contiguous, but they are in
-different sparsemem chunks, so we'll break here too".
+Intel IOMMU can not be modular and arrives at rootfs_initcall(). PCI
+arrives at subsys_initcall(). The earliest that KVM arrives is
+late_initcall() when it is built-in.
 
-And at that point all you care about is 'struct page' being
-contiguous, instead of doing that disgusting 'nth_page'.
+Hmm, so faux_device could work, all dependencies are resolved before the
+device is created.
 
-And then - since there is only *one* single user - you don't put it in
-the most central header file that EVERYBODY ELSE cares about.
+> > If probe deferral is needed that requires a bus, if probe can always be
+> > synchronous with TDX module init then faux_device could work.
+> 
+> ... but doesn't see need for TDX Module early init now. Again TDX Module
+> init requires vmxon, so it can't be earlier than KVM init, nor the
+> IOMMU/PCI init. So probe synchronous with TDX module init should be OK.
+> 
+> But considering the tdx tsm's lifecycle concern, I still don't prefer
+> faux.
 
-And you absolutely don't do it if it generates garbage code for no good reason!
+If there are other sources of async vmxoff that are not handled by
+'suspend' and 'shutdown' handlers in the tdx_tsm driver, then perhaps a
+flag that gets toggled to fail requests. Otherwise it feels like the
+tdx_tsm device should only end life at vt_exit() / tdx_cleanup().
 
-            Linus
+> Thanks,
+> Yilun
+
+* It would be unfortunate if userspace needed to manually probe for TDX
+  Connect when KVM is not built-in. We might add a simple module that
+  requests kvm_intel in that case:
+
+static const struct x86_cpu_id tdx_connect_autoprobe_ids[] = {
+        X86_MATCH_FEATURE(X86_FEATURE_TDX_HOST_PLATFORM, NULL),
+        {}
+};
+MODULE_DEVICE_TABLE(x86cpu, tdx_connect_autoprobe_ids);
+
+...to allow for userspace to have dependencies on TDX Connect services
+arriving automatically without needing to manually demand load
+kvm_intel. That module would just immediately exit if TDX Connect
+capability is not found.
 
