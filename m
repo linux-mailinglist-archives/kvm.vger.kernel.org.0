@@ -1,159 +1,135 @@
-Return-Path: <kvm+bounces-53955-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53956-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B12BB1ABFE
-	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 03:25:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F38FBB1ACDA
+	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 05:43:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 746451888825
-	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 01:25:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D4B86207D8
+	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 03:43:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ADDE194C75;
-	Tue,  5 Aug 2025 01:25:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6E641E834E;
+	Tue,  5 Aug 2025 03:43:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UaQ8rYRz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fhFoVy1Q"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f67.google.com (mail-ej1-f67.google.com [209.85.218.67])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0BDB189905
-	for <kvm@vger.kernel.org>; Tue,  5 Aug 2025 01:25:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 483481DD525;
+	Tue,  5 Aug 2025 03:43:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.67
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754357113; cv=none; b=Wqb9rx68jPQH0G7cAzbAH00hPwn+tpgSWKxnQrij2b0eaHuoyaijSphmMwCiEf/T/2XVkHPjP0U6vgGKnnxzEKhdu1Msuk5ncz5u/plMcv1z0aexcNDEaJxghECuZhLzK36beJScrhAYPGPPzfxshNSYDyljzIvCDLxQ0tAjvhQ=
+	t=1754365418; cv=none; b=Mj8bIDqsGsXynxklj/QrPsFN7117mAe92/B3SPTqWlKBeXoxxA3Zy0/cLWAvS1p/YX8/CSv9T20mhU4azVy4cy5SAfJ7FOM//9FyRFQ1vDxZFK2vspw1EdozubMQSd4gMUs46fE4IlR7RYnVXcgYokSaRCPrKZV+clKTNMCJ4xo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754357113; c=relaxed/simple;
-	bh=KxHd8+9CWHQ2ZbmxWgo7OCrgPV8lKqKLLboCnpHUBZo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CPGo6M1WWv76FOy9XKtYlwq+M70se7NfIksIkWsjuqSRkPFlKMA6Z36NTpTQyhTxZDuuV7mN/kJM98umjt1X1mw8U/b7vHcPPD46AJlv9r3olidF3ORLJDU0cnFAAGueXgONY5GKVNvBK+zPy3nOPXl5f32hWP4P4xXwGRHl04M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UaQ8rYRz; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1754357110;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=lxi9BkaMKXEnw5UUlY0VTlyL8QHOke3LrCc4LhFY+dU=;
-	b=UaQ8rYRzWXG8vxk5nHO8rFBYF2IlBA/SMEz+yj7FdYws0SLKbTbMCMBSNm0HAF5GY4K50u
-	rGGpgJ81gSbUZrW5a0fG4c1rxXnm+mwRQnonheQsQq/QbF5+GoA/vuC4LL/jgzAiskh0It
-	2/Dgk0aiXL4m4u2Rs/tVkROSpnZGFF8=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-660-LZC_2HJINLaOFmRGnQdpPQ-1; Mon,
- 04 Aug 2025 21:25:09 -0400
-X-MC-Unique: LZC_2HJINLaOFmRGnQdpPQ-1
-X-Mimecast-MFC-AGG-ID: LZC_2HJINLaOFmRGnQdpPQ_1754357108
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4278D19560B5;
-	Tue,  5 Aug 2025 01:25:08 +0000 (UTC)
-Received: from omen.home.shazbot.org (unknown [10.22.66.8])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id BC76B1800D84;
-	Tue,  5 Aug 2025 01:25:06 +0000 (UTC)
-From: Alex Williamson <alex.williamson@redhat.com>
-To: alex.williamson@redhat.com,
-	kvm@vger.kernel.org
-Cc: David Hildenbrand <david@redhat.com>,
-	Jason Gunthorpe <jgg@nvidia.com>,
-	Li Zhe <lizhe.67@bytedance.com>
-Subject: [PATCH] vfio/type1: Absorb num_pages_contiguous()
-Date: Mon,  4 Aug 2025 19:24:40 -0600
-Message-ID: <20250805012442.3285276-1-alex.williamson@redhat.com>
+	s=arc-20240116; t=1754365418; c=relaxed/simple;
+	bh=ZniYHKY8QuSd7kXt4f9NMukHnaBfrOkk5MNpA7EfaWg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kSCmo8qd5G9VKfHgr+bwHTR9Ayvha7g+SkjZzqhEkO5otn/64WSXVvBVkpCYSRP751JdqqseE8weTL6YRAGh+3u3q+tN8aMEszaav4TQQHrj2851aNACkdOuuwEElPko1as6uaq2FrgzfaDIURmOnXNKAbe2jyvKbrWuvi7x/Pc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fhFoVy1Q; arc=none smtp.client-ip=209.85.218.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f67.google.com with SMTP id a640c23a62f3a-af967835d0aso278938766b.0;
+        Mon, 04 Aug 2025 20:43:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1754365416; x=1754970216; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8WbAm5nExTQIfe1sqlUAgj5NdK4GQb4TTe8phjhgS70=;
+        b=fhFoVy1QCqYbF30A0gmnkPPxzB/F/lQCOjIy91Dv+QhZAtnVsHMR2WETvdDRBFooVm
+         GRa/jfexETV2wqh1cuOAhKdHe/CauSi308778Y6TBtu3mraVzdZtux6yRjXv6IVBAruZ
+         NOez25bUSw5p+NhuoetTV+J+MRxaPf8bgUGYLKy19LJycRDH8Q0MevPxvCjxRUmOJizB
+         ygwI2WmLrnIVsHy+JVZbueR+mhKAQiVPwNGBhM5CsFuOXpdwWAvNGJJPrJoO+eVzssmK
+         9IpihGQ+r1uL6KsIhOJAigIvZs+To2wWcOsO6ZquGYGLNiYyWVnWUBFfNmTFl1j9tHXG
+         9/kA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754365416; x=1754970216;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8WbAm5nExTQIfe1sqlUAgj5NdK4GQb4TTe8phjhgS70=;
+        b=hDgp0f1D4nHYapAEBpcTqvYHMJ8HlQgUSfXmFfJyyr7cDpT/IdzSuteLxVl8cTu2UW
+         wes3nilh8i5YiyXxQ/MIJe24n5HtbgeHVcEii52x/guUGR/AXebNWqvT4w+va8XpzxRD
+         QTAp3k9uQfAXwBblP/LXUT7hzuVNiqUnCQVS0kosJdnF86/+YUNoORffb5oQq59jVaez
+         3EC9qKw/NCzcEMSFZmI3wsf00ICGFzanQfbjgsRTSftIYdn6TooIUQlItQZHqYQD3OyZ
+         cBMKJbvkSMnnSXyKTpjobW9HWP+E/hRSnKbmpV9yw9eCAAM4k3HEm/vA5eu1tRtawUd+
+         mKKg==
+X-Forwarded-Encrypted: i=1; AJvYcCU6ep5lN6y9eTNTPo8P9z+ZzCNYSvFv1z65coFkxR0Aanfr1otwe/W/AVj81yYA2Kd3cAk=@vger.kernel.org, AJvYcCXEQ4eEmAS5FT371QWYeuLpeo2UzxM7QkSYDvn3AFnvlc8fe2u/O/Eq6pEswFHAV0nIPMWS7E3Pj9x2@vger.kernel.org
+X-Gm-Message-State: AOJu0YzeHbecpwKl1og/GAImilECmq6h3HheY5k1RGSwoF9ukOcagPJt
+	RUVPnz9SDi2UV8ZVG7+KylUDrrwBSPz7HIi0Yyh5KYNcfYIDMi6260IB
+X-Gm-Gg: ASbGncuAq9y1yUtj2VT9za4l9bxu0NWzRviDTPiOp9s8FIGVmgcl8jdTpwoCx3010oI
+	H7qa0+Wi6JVSLD1uA82R7LoZ1alZ19zqCLTWOdTpyZZpeG/hijMdn13PVWD9dkfusYGHEg88u5a
+	18EOOCiQKvv4Ik/Lc8jUu4ncJQ6T3KoLKu7vop1skcu09xDRT3aU3/SywkeqJ8K5F1my9lPWAVf
+	3duk9U7RoDI+W22DpkheUuwJ/3oRlNmbiYICl4S79KMr1+hE1GNecel44fL/oA46XMkaXYQQRE1
+	qGl1xyzHuDfXrLLorNBB5Qdl4EtlK/ljPhAvUuF2l1WuasEa0aM5qNxAtGFfZMyOOzCPJ57dQmc
+	dUAs45+iomHacAPLQEBt4LD74TntVDiggo3zskhA5obLRHVU6Jz+wriQFJhbZ5Qkzz54iLKxYFh
+	/jLjs7UlgepzuGbxwXEub1C8FXgLRbe02oaRg=
+X-Google-Smtp-Source: AGHT+IEjmKLsdjb2ZjdT33M1Kp092lXe481aQZe89Govc26G8aNvSHe8HQJ6UUJmTxXI+6BFVbhvGw==
+X-Received: by 2002:a17:907:6d04:b0:ae0:d804:236a with SMTP id a640c23a62f3a-af93ffcaddemr1330563966b.3.1754365415456;
+        Mon, 04 Aug 2025 20:43:35 -0700 (PDT)
+Received: from [26.26.26.1] (ec2-3-126-215-244.eu-central-1.compute.amazonaws.com. [3.126.215.244])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-af91ee3c1f7sm772698966b.68.2025.08.04.20.43.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 04 Aug 2025 20:43:34 -0700 (PDT)
+Message-ID: <1684792a-97d6-4383-a0d2-f342e69c91ff@gmail.com>
+Date: Tue, 5 Aug 2025 11:43:29 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 00/16] Fix incorrect iommu_groups with PCIe ACS
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Bjorn Helgaas <bhelgaas@google.com>, iommu@lists.linux.dev,
+ Joerg Roedel <joro@8bytes.org>, linux-pci@vger.kernel.org,
+ Robin Murphy <robin.murphy@arm.com>, Will Deacon <will@kernel.org>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Lu Baolu <baolu.lu@linux.intel.com>, galshalom@nvidia.com,
+ Joerg Roedel <jroedel@suse.de>, Kevin Tian <kevin.tian@intel.com>,
+ kvm@vger.kernel.org, maorg@nvidia.com, patches@lists.linux.dev,
+ tdave@nvidia.com, Tony Zhu <tony.zhu@intel.com>
+References: <0-v2-4a9b9c983431+10e2-pcie_switch_groups_jgg@nvidia.com>
+ <a692448d-48b8-4af3-bf88-2cc913a145ca@gmail.com>
+ <20250802151816.GC184255@nvidia.com>
+Content-Language: en-US
+From: Ethan Zhao <etzhao1900@gmail.com>
+In-Reply-To: <20250802151816.GC184255@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Objections were raised to adding this helper to common code with only a
-single user and dubious generalism.  Pull it back into subsystem code.
 
-Link: https://lore.kernel.org/all/CAHk-=whhYRMS7Xc9k_JBdrGvp++JLmU0T2xXEgn046hWrj7q8Q@mail.gmail.com/
-Cc: David Hildenbrand <david@redhat.com>
-Cc: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Li Zhe <lizhe.67@bytedance.com>
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
----
- drivers/vfio/vfio_iommu_type1.c | 22 ++++++++++++++++++++++
- include/linux/mm.h              | 23 -----------------------
- 2 files changed, 22 insertions(+), 23 deletions(-)
 
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 33384a8c152d..3f06a8d937fa 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -659,6 +659,28 @@ static long vpfn_pages(struct vfio_dma *dma,
- 	return ret;
- }
- 
-+/*
-+ * num_pages_contiguous() - determine the number of contiguous pages
-+ * starting from the first page.
-+ *
-+ * Pages are contiguous if they represent contiguous PFNs. Depending on
-+ * the memory model, this can mean that the addresses of the "struct page"s
-+ * are not contiguous.
-+ *
-+ * @pages: an array of page pointers
-+ * @nr_pages: length of the array
-+ */
-+static unsigned long num_pages_contiguous(struct page **pages, size_t nr_pages)
-+{
-+	size_t i;
-+
-+	for (i = 1; i < nr_pages; i++)
-+		if (pages[i] != nth_page(pages[0], i))
-+			break;
-+
-+	return i;
-+}
-+
- /*
-  * Attempt to pin pages.  We really don't want to track all the pfns and
-  * the iommu can only map chunks of consecutive pfns anyway, so get the
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index fae82df6d7d7..0ef2ba0c667a 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -1761,29 +1761,6 @@ static inline unsigned long page_to_section(const struct page *page)
- }
- #endif
- 
--/*
-- * num_pages_contiguous() - determine the number of contiguous pages
-- * starting from the first page.
-- *
-- * Pages are contiguous if they represent contiguous PFNs. Depending on
-- * the memory model, this can mean that the addresses of the "struct page"s
-- * are not contiguous.
-- *
-- * @pages: an array of page pointers
-- * @nr_pages: length of the array
-- */
--static inline unsigned long num_pages_contiguous(struct page **pages,
--						 size_t nr_pages)
--{
--	size_t i;
--
--	for (i = 1; i < nr_pages; i++)
--		if (pages[i] != nth_page(pages[0], i))
--			break;
--
--	return i;
--}
--
- /**
-  * folio_pfn - Return the Page Frame Number of a folio.
-  * @folio: The folio.
--- 
-2.50.1
+On 8/2/2025 11:18 PM, Jason Gunthorpe wrote:
+> On Sat, Aug 02, 2025 at 09:45:08AM +0800, Ethan Zhao wrote:
+>>
+>>
+>> On 7/9/2025 10:52 PM, Jason Gunthorpe wrote:
+>>> The series patches have extensive descriptions as to the problem and
+>>> solution, but in short the ACS flags are not analyzed according to the
+>>> spec to form the iommu_groups that VFIO is expecting for security.
+>>>
+>>> ACS is an egress control only. For a path the ACS flags on each hop only
+>>> effect what other devices the TLP is allowed to reach. It does not prevent
+>>> other devices from reaching into this path.
+> 
+>> Perhaps I was a little confused here, the egress control vector on the
+> 
+> Linux does not support egress control vector. Enabling that is a
+> different project and we would indeed need to introduce different
+> logic.
+My understanding, iommu has no logic yet to handle the egress control
+vector configuration case, the static groups were created according to
+FW DRDB tables, also not the case handled by notifiers for Hot-plug
+events (BUS_NOTIFY_ADD_DEVICE etc). iommu groups need some kind of {
+add, remove etc } per egress control vector configuration operation.
+
+Thanks,
+Ethan>
+> Jason
 
 
