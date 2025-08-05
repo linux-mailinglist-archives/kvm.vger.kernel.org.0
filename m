@@ -1,171 +1,133 @@
-Return-Path: <kvm+bounces-53982-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53983-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9133EB1B322
-	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 14:12:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36F8AB1B32D
+	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 14:16:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6DC251895236
-	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 12:12:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D80313AAFD7
+	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 12:16:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A448E27056B;
-	Tue,  5 Aug 2025 12:12:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0814F26FD9D;
+	Tue,  5 Aug 2025 12:16:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DJOQYUM5"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="m36KnNQk"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68DCD26B74F
-	for <kvm@vger.kernel.org>; Tue,  5 Aug 2025 12:12:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C48EF1DFDE;
+	Tue,  5 Aug 2025 12:16:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754395925; cv=none; b=sz+GsuI1SVwxtYdmqEWtv/Rrfp77AUtmWdWv9JrzjGLg+IjXCgXIN5BCWQd7JgCIkL9WlgvKP6MATDJy1581sPV0BPLH3ZMhsQp7X6WKHQdt2+FCUhdWUgWtvUK7Ab31xxtm5wvUaW1Ky1v2KeRUUHkrkD//ks/YWSPmUbc+ATA=
+	t=1754396190; cv=none; b=RDZ9xkAXxp3tJc/x+jTRxN/aa4FJMWwDYE0CoA5TQ7DOWH8j/CwPNUetqpn2K1Dk7D6INzhWVj1xUZqhEDPa+bpDIdB9683yCp0KDZAs5HkBJRkWDlELYQmHs242XMd53O1O2LsPDWgp3Q4yur/Bmewg6hoQ7IVeUSrB9Ua3oAE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754395925; c=relaxed/simple;
-	bh=PkN2XX7pLKcIUWqfRErxMi4SNlpWdneWn9/g4TS296g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RvMkMq5EeWzAE0owSZBIqtx7gwSf4ZquwPGww1D6foAeu6ArvihySeK+4ZOmqYeB6VidnbWTpAlkSZ6YP2+S0v9fLhBJgzS6UFMSHjLWQaEF6p4mhscCu/7vKiJXLidmD7GUgzgCDLr2D9s70SKXs7qu9I80tyb7ptf9f+qpTeU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DJOQYUM5; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1754395923;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=SILdafDIUq6T1vxmByNHoLz/yQ+KxKADC56XxDUmCig=;
-	b=DJOQYUM5Xu9AHqE5egi088TrqRL+1n/HP+sa96HIG7HMYHFGcc3NQQJgvsCX1X2sYENhZ4
-	RBJeEPSB5L5gB01oDf56c+O8JkaP1NlSEEpLiVZ/IHjXQpTj3Ih5kD0LeVYzQ5gFHij18H
-	pYR2F2eQZAZjy12TD0sR8SNraKcilrc=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-355-kpfI8XHcMMitQkxCHIOOYA-1; Tue, 05 Aug 2025 08:12:00 -0400
-X-MC-Unique: kpfI8XHcMMitQkxCHIOOYA-1
-X-Mimecast-MFC-AGG-ID: kpfI8XHcMMitQkxCHIOOYA_1754395919
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-459d5f50a07so11784275e9.3
-        for <kvm@vger.kernel.org>; Tue, 05 Aug 2025 05:11:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754395919; x=1755000719;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=SILdafDIUq6T1vxmByNHoLz/yQ+KxKADC56XxDUmCig=;
-        b=uEUH+UaJNaPi+pqQpcUEDrHOSQ+GJAI6X5dBNK6yGyTAgpCBmnyRG9yxcTvWNEkjoV
-         0DqDRoiN9vGwmowWk0Qdo1+X/7r6SxMIpLYUgVDDPA8dS63f7j8mTOhjdtKCCWSC4V/W
-         CG5HKoN8VOCpWXMLrJVijIOTmwBgNPEuMJS+mTmXCEmwIT0xE/NBdfhI9UEkXfcHlcpj
-         jvvBonlHnBxGU1PEBnVmnuGODO7qAhQUfG3Czbsjq15fPm0ZgxBGom4XTM398GdVy7Qi
-         C44dc0shliu9PDF2dccygjl+P0H8EeaWIKHWkNkjO239qYA+zij3HObkRMM5/E4y0yX/
-         /Gdw==
-X-Forwarded-Encrypted: i=1; AJvYcCUMXbg+RSMfkuNSe0/OUkBNn5KsebzdvU0pZg5Ye8ioM2rmDcjsZSzr2jWPT1u7ZVw4KqI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzXWhqpo/hbA1JJoaiPQk2ZgnmLByPofcf+KAAs8XeUYUPBDEb3
-	jjpRLELJbV1CmG8QI5y2lCDR49a4RP8qwCdO3Yrk4+mZG+LzCsLzndGxIsiYs/LU0vLiUIq5oyM
-	mLYQgv7cHOVV6nqkNQ6hcAo3+BtvYLrOrNv1bWQGkPTtrBPZw43XCqA==
-X-Gm-Gg: ASbGnct0NnGNajf8lAKahtf8SilSX8ec8h9fPs39VpL5TQqOZIMwiCCMMjqWo0QrRfi
-	PbVWJd0KxxlyE/F0foFOwhtKS9zqG/qzQ/LpxzSNPUb+PBD/EaNdxEAGekH0TeDgdcGd2fgNyiU
-	D8W/uOAs191uhdGonosg7766i8eVDuveV7cRiHX606msmAR03XDG6tOaDkBASKB7EpA/8CBuuq0
-	p1PAw17ZjgyJU6fmHrLIvgO45o/834bMZfRmzsoVHZEX37sbobA7GgAzkcoOVlT2P0rEl3+4nNi
-	lZPxDaXkU5bNI97yWZQLKaECNkb2Fon/VCUsQdOIHvCt8MphEyxzmy+JMZTP/sIU95oDuQE3J4L
-	uyy4ltoF5cRUYXmQYkz2PkYVJjkWtyQndkgh7oSil6SZleog4rWyc9eDPmOVnV8K5f1w=
-X-Received: by 2002:a05:600c:1d08:b0:459:db5a:b0b9 with SMTP id 5b1f17b1804b1-459db5ab3a2mr48234285e9.28.1754395918801;
-        Tue, 05 Aug 2025 05:11:58 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGxZPzHZOSJwMEcCot86poc9UZ/c44aOsLDwgU/vzU4XSjaGj8F0yKq7r0fWaYJ4jtRH1ng3A==
-X-Received: by 2002:a05:600c:1d08:b0:459:db5a:b0b9 with SMTP id 5b1f17b1804b1-459db5ab3a2mr48233995e9.28.1754395918402;
-        Tue, 05 Aug 2025 05:11:58 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f2b:b200:607d:d3d2:3271:1be0? (p200300d82f2bb200607dd3d232711be0.dip0.t-ipconnect.de. [2003:d8:2f2b:b200:607d:d3d2:3271:1be0])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b79c3c4d02sm18618858f8f.33.2025.08.05.05.11.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 Aug 2025 05:11:57 -0700 (PDT)
-Message-ID: <0c778373-3805-4dd2-b8ac-97d5ce77235f@redhat.com>
-Date: Tue, 5 Aug 2025 14:11:56 +0200
+	s=arc-20240116; t=1754396190; c=relaxed/simple;
+	bh=KFrpmjqJcSzak1HC9W2MECHBSmh0TpqG0WwlqJ/kEmU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LghET0JPS98yP26EgqZBbPbfVAQP8YdnD2hBgGWRy6MSEMhGLxBAtz0hlnQlGI6nO/mwgDu6ZG0q8lrHrf55MdVBDiflBSYCh95+c04o8G91dKc2g8RzQsUHuUsueCRMWBnvqn40gc1hVfSNqzPzQoIuaR9mUwhAR1ZWtEFdL48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=m36KnNQk; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5754uWSP001514;
+	Tue, 5 Aug 2025 12:16:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=Y51xMbqWTj2ncKK76hliRTwgibDSl9
+	9x17Gk7Vdc1Zg=; b=m36KnNQkh1ZjOl2toGsQOGfLxbYbhx4XUdTitD0HtZMB4V
+	KYDBEPv21MSYDtCg4lMNVkz1qEhsentckRgaezp09FUtUQ6d/NVRQe+K4O6ffQK9
+	bo7A3yCBsmMpO4IDF6ZUj2mRgeyLm0z+ScXoJ0kmEpaIaery70UMgdDiHJ3rd3Fa
+	du0gatdaP4vSCCicJt3glRV5Ppou2dnEatAznnPW5rOyDZq6tikjA9Se4Qx8fbtI
+	rouaekhEiAza1Vw9Jlas2sN8rsHhhG4k9vf6jK7liFhSRvsgWb0XuX/0rex1Wxeq
+	7t8FDWUeLWNs8jxRBicmYS84teKGT6MWqv+t1u3w==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48bbbq1tk7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 05 Aug 2025 12:16:26 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5759ekXO001936;
+	Tue, 5 Aug 2025 12:16:25 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 489y7kt50m-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 05 Aug 2025 12:16:25 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 575CGLLG52691230
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 5 Aug 2025 12:16:21 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C5B1620040;
+	Tue,  5 Aug 2025 12:16:21 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 92C4920043;
+	Tue,  5 Aug 2025 12:16:21 +0000 (GMT)
+Received: from osiris (unknown [9.155.199.163])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Tue,  5 Aug 2025 12:16:21 +0000 (GMT)
+Date: Tue, 5 Aug 2025 14:16:20 +0200
+From: Steffen Eiden <seiden@linux.ibm.com>
+To: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc: linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, david@redhat.com, frankja@linux.ibm.com,
+        nsg@linux.ibm.com, nrb@linux.ibm.com, schlameuss@linux.ibm.com,
+        hca@linux.ibm.com, mhartmay@linux.ibm.com, borntraeger@de.ibm.com
+Subject: Re: [PATCH v1 1/2] KVM: s390: Fix incorrect usage of
+ mmu_notifier_register()
+Message-ID: <20250805121620.40333-A-seiden@linux.ibm.com>
+References: <20250805111446.40937-1-imbrenda@linux.ibm.com>
+ <20250805111446.40937-2-imbrenda@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 2/2] KVM: s390: Fix FOLL_*/FAULT_FLAG_* confusion
-To: Claudio Imbrenda <imbrenda@linux.ibm.com>, linux-kernel@vger.kernel.org
-Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org, frankja@linux.ibm.com,
- seiden@linux.ibm.com, nsg@linux.ibm.com, nrb@linux.ibm.com,
- schlameuss@linux.ibm.com, hca@linux.ibm.com, mhartmay@linux.ibm.com,
- borntraeger@de.ibm.com
-References: <20250805111446.40937-1-imbrenda@linux.ibm.com>
- <20250805111446.40937-3-imbrenda@linux.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- g3eXuA==
-Organization: Red Hat
-In-Reply-To: <20250805111446.40937-3-imbrenda@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250805111446.40937-2-imbrenda@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: WMQjuGt9IewnMUVoGm2uYs9iMyWuKIB5
+X-Authority-Analysis: v=2.4 cv=M65NKzws c=1 sm=1 tr=0 ts=6891f61a cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+ a=kj9zAlcOel0A:10 a=2OwXVqhp2XgA:10 a=VnNF1IyMAAAA:8 a=K31ow5K9QUr3fs6wkioA:9
+ a=CjuIK1q_8ugA:10
+X-Proofpoint-ORIG-GUID: WMQjuGt9IewnMUVoGm2uYs9iMyWuKIB5
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODA1MDA4NiBTYWx0ZWRfX98l0a9BTBrvt
+ G6+ZQ+ZA9iKFK+ixC4IN1UycxlhCq3vLHvRvpqFO9HdEoDFTjCbdJBwcNR87dAZ0C02di6hQKcO
+ 5e/wicD6JvW0q/+WzPz9MmbyZhK/TEzTjkIXUh8vDHyFJT+KF1dHJD5jsjDMyrEnFlFHoX7r6O/
+ E4d9fw10Mh0SAqjhmGpbjwf+CT55tlSEod0G8Cgrzr11j3KCf4Vp1hPv4BVBNPEwcEbD/iYSoum
+ 7B1JLgg1BUc9iWToNVptM/VPuh7EGHlATlj7Xer6Tgh3AyaAK07murJkpaDEdcFN4yK7ZvRmnv8
+ RW3CScoADwC7hNpl80ud9cjaC+yQcAWiQFosVonuCXNe0Hk1RiYllzEEnewHGM0izJEDu40ozVs
+ fUM/BA7/8hUQNAMlXQlt2O49uBDPbXja1djvmPjhp0XGFsLR6i42acrZ5L1+RzZqSZMsMtL0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-05_03,2025-08-04_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 malwarescore=0 spamscore=0 bulkscore=0 lowpriorityscore=0
+ suspectscore=0 clxscore=1011 mlxscore=0 phishscore=0 priorityscore=1501
+ mlxlogscore=882 adultscore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2508050086
 
-On 05.08.25 13:14, Claudio Imbrenda wrote:
-> Pass the right type of flag to vcpu_dat_fault_handler(); it expects a
-> FOLL_* flag (in particular FOLL_WRITE), but FAULT_FLAG_WRITE is passed
-> instead.
+On Tue, Aug 05, 2025 at 01:14:45PM +0200, Claudio Imbrenda wrote:
+> If mmu_notifier_register() fails, for example because a signal was
+> pending, the mmu_notifier will not be registered. But when the VM gets
+> destroyed, it will get unregistered anyway and that will cause one
+> extra mmdrop(), which will eventually cause the mm of the process to
+> be freed too early, and cause a use-after free.
 > 
-> This still works because they happen to have the same integer value,
-> but it's a mistake, thus the fix.
+> This bug happens rarely, and only when secure guests are involved.
 > 
+> The solution is to check the return value of mmu_notifier_register()
+> and return it to the caller (ultimately it will be propagated all the
+> way to userspace). In case of -EINTR, userspace will try again.
+> 
+> Fixes: ca2fd0609b5d ("KVM: s390: pv: add mmu_notifier")
 > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> Fixes: 05066cafa925 ("s390/mm/fault: Handle guest-related program interrupts in KVM")
-> ---
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
-
--- 
-Cheers,
-
-David / dhildenb
+Reviewed-by: Steffen Eiden <seiden@linux.ibm.com>
 
 
