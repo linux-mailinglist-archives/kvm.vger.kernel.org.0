@@ -1,188 +1,156 @@
-Return-Path: <kvm+bounces-53987-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53988-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B03CB1B3DC
-	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 14:57:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7484B1B3EB
+	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 15:01:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0BB0B7AB113
-	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 12:55:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 64CAF3B788C
+	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 13:01:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEC19271A9A;
-	Tue,  5 Aug 2025 12:56:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44321272E5A;
+	Tue,  5 Aug 2025 13:01:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="mGMwyyrn"
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="hLE7vWa3"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2069.outbound.protection.outlook.com [40.107.93.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 761172264DB;
-	Tue,  5 Aug 2025 12:56:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.69
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754398608; cv=fail; b=khGnLUX+9kFYj8VxGhzI139H0L6hFBia5pP8vgu4tA6/VkYgzaCE8YOsvSGbLmtvgzTM6AwpWD7fCAd+Uk/wOj4eTD7hpifG6fTIGZ3j359KUkG1lvmLRQJPK0Mlze2kqnFiMGKL0KB6b+0rN9n5aSXvNbnRhETGXcOv1W8SWKI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754398608; c=relaxed/simple;
-	bh=o4Gk0VIkI+GjVLBdfXRrI2iWoYBv0vqItNRuIvw2MB0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=tUJxzpAlhOJ+pbYW+P3TwaA+90kNeO0pxl7GKjngDrLKMoCkb3+Iy3rHhvtig6VkRIwQs4gl+nXk1WwYOMbJpO9CDz4Me7edCJKQ8ZTvcL1mP938JBcM/piwt8uOTnbdXPrIXRTMd+M+m+0fPOlnwGPvCpP+DVMWclIytb8AnDI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=mGMwyyrn; arc=fail smtp.client-ip=40.107.93.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=WWYkAK8gJDTN9hCwYq0/O1x7D81KTZQ6hBl8h4QcGPq4ub8DMdemRCTumf96e8qUk6mkM2KXGnHZjqf7n4pctqGK5UnjFhWyr73PbFwOMV+C3kNL3dBHICCGymIMLSgfRa6l0yIKTU9ZWIvOoL6+RTwwn0AgvPQbxx9G3yg8zPA0gLXsTZTAp+y7DS/msnM8POHWbo+p0xVnNJwdz4vSB+xITluAIK5K52dkkAPLgT/TEve/ElyPMQcVu5R3v8O56SlfABTeOn7v+ppTnXbQHzL91wFJv1lxcacin6dez4nwmiXqumKQkreqX5Z84meOuPPhmCr9yQjHtIvQQmbweA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=S2uaVV+TTu5pFGSwsNlD82BKS97YA4icw22fCfszKQI=;
- b=JFNyZK9SymuKsVYGgmTuWALEd+PjKaK13mb+RFE32NykLFnhzS69iY8uJ8zYfSazWwRXFDeeAF77S/zohfX8BL0PF/xkID8oCKOy689cgBvLE/BKfZQHeK1LotvvkNo2cXqi6KQ9M/edaGv3oJOrjGg0H/gypiDLQI4VG+K6cMR7oREanhPMa3Nip8RW+Voryq3DyqHITGxst0B4tA+RyZtC3CjQDXU1LqoUJcmyjnpybvbWApjpeGxdfU16YcHb4MAihsmmP/DKtyO+VUOoFCYAm++EhdUv18TRW8zao8meEgaVZ5vlGQF4n3JNPCNmSIa37/Q2p+DvlYgjovT32g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=S2uaVV+TTu5pFGSwsNlD82BKS97YA4icw22fCfszKQI=;
- b=mGMwyyrnO36Ed+dbMCpEWhVu3SRR/Uldm0cv3vYfozZbGajIu+RblAY9TMzfjmHEpdeWR9b3tf//F/LMZxH7l5FqVSxKYgi20w/jxsaVFJVmx3dU8gisvZi4pfAdFc4xFeXYaaC0xdgCq6zxmz1jG9wITXNzAIWti0zHr8z4B5EUfU6VwqXtkLdqo9pc+3wylzuM8XsPqcHE9JCmPgJlCm7kbwSzlhkijKMi+HPOPFXvEBNDULM3qQIyzhiolGK1ft8n2X/OnD/iltl8KtgZGy2yY6WkJAf87/oxzK3yG+Qllt7T8Da0jNo5XzdakCUhdUuieU8O3v1jv8w3EgcYGQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
- by DS2PR12MB9591.namprd12.prod.outlook.com (2603:10b6:8:27c::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8989.22; Tue, 5 Aug
- 2025 12:56:44 +0000
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732%4]) with mapi id 15.20.9009.013; Tue, 5 Aug 2025
- 12:56:44 +0000
-Date: Tue, 5 Aug 2025 09:56:43 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: David Hildenbrand <david@redhat.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"lizhe.67@bytedance.com" <lizhe.67@bytedance.com>
-Subject: Re: [GIT PULL] VFIO updates for v6.17-rc1
-Message-ID: <20250805125643.GK184255@nvidia.com>
-References: <20250804162201.66d196ad.alex.williamson@redhat.com>
- <CAHk-=whhYRMS7Xc9k_JBdrGvp++JLmU0T2xXEgn046hWrj7q8Q@mail.gmail.com>
- <20250804185306.6b048e7c.alex.williamson@redhat.com>
- <0a2e8593-47c6-4a17-b7b0-d4cb718b8f88@redhat.com>
- <20250805114908.GE184255@nvidia.com>
- <9b447a66-7dcb-442b-9d45-f0b14688aa8c@redhat.com>
- <20250805123858.GJ184255@nvidia.com>
- <db30f547-ba98-490c-aaf7-6b141bb1b52a@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <db30f547-ba98-490c-aaf7-6b141bb1b52a@redhat.com>
-X-ClientProxiedBy: YT1PR01CA0038.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:b01:2e::7) To CH3PR12MB8659.namprd12.prod.outlook.com
- (2603:10b6:610:17c::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48ABF21D3CA
+	for <kvm@vger.kernel.org>; Tue,  5 Aug 2025 13:01:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1754398879; cv=none; b=LWUa4h5t7MVu/+p9R7DQ0ooVl1vlzFTAVMjV2xBmEUlM231p9bryXl7Zxls4MDZ5s5A7KxMezhbquvWkyMOAWmq8L0Jz0KUfJOH46Xe2O1o2luExd8eMLtdDusC4lPBh4QXSwqpmrD9uLR3c88l0mOaUZGnSL3aBOHzOd6KTxpk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1754398879; c=relaxed/simple;
+	bh=jCINSY02b3VcKaYR8JyLD/p2mOf2EtH7q4vBP76L8iU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TTDKHWk/Fg+o2lcTaMuSNQ+962cxPn8rr0p2E3TV6wIwze9uP96qzba4CJLZtyMtOVBOUJyWgIFGoHv6dgCzT1J5ekhtKj8Y1YhTdvrI7xT5PAWqdVqyD1GZO2V3vma1W4OL76uhbikPro7/2hfNrXVE8WItpVAwAjOLGlH2wBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=hLE7vWa3; arc=none smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-615aa7de35bso11734006a12.2
+        for <kvm@vger.kernel.org>; Tue, 05 Aug 2025 06:01:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1754398874; x=1755003674; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=fjxzM+Wf4qtRYVaNCOW0++JtZ+DW7avxmv36rBvNzbg=;
+        b=hLE7vWa3MJrOwJvt9i03WIhL8Iuua/dcqiqTYLFQwTWI6/34BXJZcdfZ5hY97Wa6AP
+         sQft/YpIJA5RWYJDKutxow7mS4M4KiM1CSKJbu8np9YdDk4lnNSNZZDl10IE+hk/3xmz
+         1GrSa+8eB5nYMrzdphnSFB4wHXXyTPwzXD0QI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754398874; x=1755003674;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fjxzM+Wf4qtRYVaNCOW0++JtZ+DW7avxmv36rBvNzbg=;
+        b=maGBWUUwNQcDwefEfXVLuE1cHGyfD+lNDuYIk9+ev9mlaQknERj0XzXzxsisDBYn7E
+         EZP0qATQhGI+otVyx9lbgzHEVVLsbV4IALqcHATsoG5TEPFk6W/8YYwjnT7jE3UIfrsE
+         7rJhzhHXOoDFpb+gCRMognSoGa6Je8Wr7HWy/TbSzbbi7+M5y1v9C6IGRSRS7I5YCp5B
+         Hnyiq0n8IUDO4t+2mDc8ja6VK8iV419nvgA6/W6lR0+vypfMUuIQqFHqBf40bPkYi6F5
+         J67XtdxuUW7M+L8GcsRHMQuagR9uru45g3NAQ9owWqAIcQHulvovPsUNZsEEedPa+UbL
+         eOvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVsVTwts2nNTr242oA6lGA8xvCClIFwNNTLPgF/pHQHlI3XIWQ8Y6q6dn/T5Mvt5Q9sXxs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YweRfE8ID9XrP9b9fEMEfyeS6hoPqdV5W7IHPqvOrHoJg3DGV3P
+	3qIGh8f/I8sQNI1+KYXQCJi3BH4kV0FIQ+FL8z2Mx/dXa4wQOyGl05OfZrsGrxsMS8YtoOynWsv
+	0UP3MMSqrwA==
+X-Gm-Gg: ASbGncsBAZIB3x/rSrqXIkHMvylYWJqWwEwBp3I3P++9thJWX3vlF8AXngNrreYfSsL
+	FkumiuK29D9td9lt4RjpEHLcCnMQfGyG4MFZOJljh1vw9ZxQ+bzGY99TSVmHag570rLNE06n29e
+	JY+eIv4d6YJlgNwiPQnUQKymE9lp0pUcn+TQ6DeLTK2cN7DEKTfTusAkJVk61aqw57OI7YNCGZJ
+	czd8VQMs7HYsmlYNAGGT4Fe/UIBWAvGQOWoT/1pwDlk7eQIXfigFootkD9pCkjrFPSb+qEI7OMw
+	ghT3VQXQSecdiXlhKO89UXSrFYETDW4eipSD0IfOQiUSgxfWlcBo1WJ6R0l+blAGllmWmhajKD5
+	4tQtslrWyh0pthVikrA5b1z+1Y8nLPNRak+DyU1L/ISn/W4c9EKtCDpqgJkQEnvESOMqY0165Z+
+	8NiZHeJUs=
+X-Google-Smtp-Source: AGHT+IF9KWwfXrL5KRMdjxfv1vG91VwvqmsKTwU9BnfWqymBzNhY20zWhXzUetenbY/C7SY9z4WYJA==
+X-Received: by 2002:a17:907:c13:b0:ae0:a483:7b29 with SMTP id a640c23a62f3a-af94020a369mr1348972766b.49.1754398872304;
+        Tue, 05 Aug 2025 06:01:12 -0700 (PDT)
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com. [209.85.208.41])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-615a8f2c265sm8335214a12.26.2025.08.05.06.01.10
+        for <kvm@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 05 Aug 2025 06:01:10 -0700 (PDT)
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-615aa7de35bso11733784a12.2
+        for <kvm@vger.kernel.org>; Tue, 05 Aug 2025 06:01:10 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVHMCO7ZDu9k8jFiqNk1nTU+GI2XcOztJJ7gF96KEU5cC5UK3E47LBIH6nC4drciyHNZT8=@vger.kernel.org
+X-Received: by 2002:a05:6402:35c9:b0:615:9fe5:f9b4 with SMTP id
+ 4fb4d7f45d1cf-615e6f51419mr10235333a12.20.1754398870074; Tue, 05 Aug 2025
+ 06:01:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|DS2PR12MB9591:EE_
-X-MS-Office365-Filtering-Correlation-Id: c95fddb1-d656-48db-655a-08ddd41f87e9
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?sSOk6KmqOi0xZ/TXgRKLGBjqOwhVPkLFwFKemCDo5Or6ZSE+FmZxd0RoDrXu?=
- =?us-ascii?Q?L+d5i4usoM3Apia3q7NiKS6u3rUu65WUojOAL0b4pqoP9Q1ZzWEwUGtBxzEi?=
- =?us-ascii?Q?ZTclJJT+RyasEar7kbJHPEB82w8g7OxIPPhqFIAQ5MWsESN21sw++SaClS1m?=
- =?us-ascii?Q?9oMH3E/Dig9Gs3aFJznIwhXb20oAWAAsL7r7J/c5eeGChfn8gocZW2LLb/ad?=
- =?us-ascii?Q?uGDbMcCF8rCPa58V4GGkdjV9YkhcSQs+euT539NLrs8JJ+9BMuuJZaPyYMnX?=
- =?us-ascii?Q?5QvI6EUf4ym27yKLpEHxkdCzKa2NYqQOFCj8Q1AD7saVMQ5BGqiTh+sxglxw?=
- =?us-ascii?Q?x3RmGfBbE8uxt3U+0oymnGZLbUCs9wJUApw0cXuwR+ZhkptwqsSNE8S+envG?=
- =?us-ascii?Q?7NQbZ+3jQLF9pZycjmLz0SorZ0MuwQSWmdGdLrE/uTlyDHto6VTIyCNkFgyf?=
- =?us-ascii?Q?xkJmB1VRQqZA5MReybkqZEXuhK089svSni4bc4faRnFoizaVbNlt1myIVWZL?=
- =?us-ascii?Q?E/JOoJmzBpNR2SHOSCVUbcglJJ3P8Bqdvax/hPU9J0uaeNXE4bZ4N1qvNr7L?=
- =?us-ascii?Q?fHChtxXozBQj8Fbmb7lcBr3P0pcvlVf/5R9liNHpOECONNmeFiuOsPMx4J74?=
- =?us-ascii?Q?lV9uphHdQ8GE0pDL7bUEtZQdFJpLgnkTBIxv2K/aJwwrbYQwPdn/4U29Rl6B?=
- =?us-ascii?Q?9Pe8OuQ/Fi/H3hUnanYBINb0KsSbeTEUw3uSTG5qRW2le0P1j4bBZsE+FLPB?=
- =?us-ascii?Q?fS4Jx7NnRi3shDsMmS2qN0ii33zkjBk+eNPcn0w6SkgLm8qfK3tiDPwbtqr2?=
- =?us-ascii?Q?iidpthq8j6vFADYEXF/hZ5mH5eCLf2oZs0Nqp2jgjmbKHZqazQpIPefPONQx?=
- =?us-ascii?Q?nDgn+R8ssjmu2mw+3gAZn4HNv1DPT9hEnXsBRItyFMKwPnkm/Ughyr3+Hxw5?=
- =?us-ascii?Q?zSsSZrqeHKayb1I5Scgs6MVIx0NImjAiMFSmIxgA6a5NImaWE4JbQUDaKkmF?=
- =?us-ascii?Q?r5z3l1ILYl015TZDee1rNxLo0S109FZm94oA5Tr9TtFEv30ja+5LUR/wfBaj?=
- =?us-ascii?Q?epdUYYONx0gguDzehgL0HLMMLftV1GFWfj0xO4RCGIrxjVUQi9ziJAittIYk?=
- =?us-ascii?Q?xsld1ipAlQ2A3vDAzp+JO8iWO6zhQ2zDJwIdrPli/ZbVFxWfQiMOnvW9Z6TG?=
- =?us-ascii?Q?hf86B3qMFuQWO7gLy8KRdMsGF0mt5hLLMbqnOemuSxs+5NZQMsDggvXSIubn?=
- =?us-ascii?Q?qnvw/AZjqR7cYMWtfpNUcSgaWQSoFXS3zH7ts77oez+loYaK5M3g8DBKJLSN?=
- =?us-ascii?Q?/bvQn0FEjciVGSQW+I3de47dKhq6Ezbb8fz+kJtwnucWJaADbVoq/k1IySwE?=
- =?us-ascii?Q?4Yr/z19yFgaiTb02Mu4Vb7vzQhhtNfMlBNk2Kic3hLB6XVvYSA=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?HZ8KIdGFrihR1N0K+zy83fT84e9Af2f4MT2G4Hk6Y0EK2Y3FLVGPBANY13wR?=
- =?us-ascii?Q?5W0fORrHLK1IWmUamWMcYWeUEl+/wKLWFXxIImgmUDfdKNZYFPffGVrWsBEb?=
- =?us-ascii?Q?a7PcH7Z5bLcS4YZQFCQXK7iUSbYXZln6OqTkiLSz2ZCOBwrRTSUX4R8nONR4?=
- =?us-ascii?Q?OUP8/QpIGY1t1KrxnbfDHB/acScQ4NKD+AOxIj0AQN7ewyYl7FXHZzlir6Jg?=
- =?us-ascii?Q?6YEcxlfLtr9/BD58fr6Pumh2hrxCERzOwAhKwurUUCwqRrHjf/++DgV4VE/9?=
- =?us-ascii?Q?oEjSUie/8S6B10fz4GHqu+CYvu4tn7Vl1XhZGPaJ95t2LTBKj5UBVkdTXvn1?=
- =?us-ascii?Q?uSODrNniR1R9E7iihWAusYIvuCg2QtZYwebc8To4jdASHnF6N+E/EPqQL/gb?=
- =?us-ascii?Q?ZJ/WUfZobuZ+VxPEDTj3P3ICporUPNAE1RDeOzBz/X43qFcq/QWp6yj9737/?=
- =?us-ascii?Q?mp4KRXqHaYh+AiUp7fq2XuiXnYRkGEwHqif4EXeWGARBtgsIXtWthjmLbcMT?=
- =?us-ascii?Q?UaBKZKYWFtGImxLcjY1/qhktSV8ulvorJt9DEMujOWoIg2VIVgaYpBiJpsmR?=
- =?us-ascii?Q?IfKbTTLOKR4WWKk4lcz+FkFoWhdC86pppf5iZBZntvFhOAibTtQIZ1ose9iz?=
- =?us-ascii?Q?ZaDb304PT+ItxrUTqKhHpKmGAteSUI2b3Zb/CLyDxNQlnlXcvc/mk2FYSwoq?=
- =?us-ascii?Q?nq/3jD6io5AUPc6qCksKbe5VWXL1c8VseTBzTSfY7LCIA676mW5W5f20pM9+?=
- =?us-ascii?Q?24APOrnQDxtAmk3LuNGd4smDPhKnprsQTZ+wluHLf4Q4XPQ37FFCvwMAjjMP?=
- =?us-ascii?Q?N9/qxg0w4Xsb4JNrpTM3VeDpzwBtZIgBC0ciKi05XhYQDGjvnIcHVXdzFB79?=
- =?us-ascii?Q?vFmpgq/2IgeVk+E81I6h8FeDBvziN/2GJLVIABtty4+dGiewCoveI0jMTv3P?=
- =?us-ascii?Q?YslcATl+j0zGmc5L6TlgSoOGdFxF6qOGErVoS54XucWaGUp5cqOO81/EgZgB?=
- =?us-ascii?Q?4LB1VNxeDWgzcBa7qVxXqX1zuXpZSuSGYZGPRl059yyFyuOn1Xj7U+kW+hFj?=
- =?us-ascii?Q?w5WoDyPL61Kq3/Kgfje1OpQQlOKQFMpbEa7TrxAiNccnenAaxuzPJJ8bplGB?=
- =?us-ascii?Q?7EMuLndprg0mzjRLpdc2Wpx7FblJNtWTQpS6Qgpon8wXZXzxojKyi6MBK9JT?=
- =?us-ascii?Q?LRYHS7R7HHwcVGDgbico9cAjBYoIPPbH5K2FcVmi0kI+jOYzrDvg7zIyYE7r?=
- =?us-ascii?Q?vJCCG7m3hQ7tZZQ4jYl2YtNN4uD87I6nDl81z86+vTEQALyRfjtiDgRif0dB?=
- =?us-ascii?Q?AXVpHOMxp8MFdgsmMj8kPI7F8hb/XYVVENFO4S4YdF1N0p6g+bTC/LI7Zq0n?=
- =?us-ascii?Q?oHZNAg0x7y/HV82TQ/GcticPbhryChgqvxLGvdXm/DelsYd+3tSrVQpPBA/Y?=
- =?us-ascii?Q?Qw1/fcHGMjlWsT2JPDpA1z8Yysl/2BKVxBooRdT4e/pst2917/B6VESmn86R?=
- =?us-ascii?Q?E7oYfaWSbssOoLt1A8nr1KvECejgafyiZ1sheRQT7F+C/NrZay3TUi8gpjY3?=
- =?us-ascii?Q?xbFF2YSME6UrOTq/HKQ=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c95fddb1-d656-48db-655a-08ddd41f87e9
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Aug 2025 12:56:44.7023
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 6zJsd227fFkNRUT4KGhlHNwAZMBDsrZZ97g1a/Jz6IvcDgXE/jpw7sj1GrjH/5j2
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS2PR12MB9591
+References: <20250804162201.66d196ad.alex.williamson@redhat.com>
+ <CAHk-=whhYRMS7Xc9k_JBdrGvp++JLmU0T2xXEgn046hWrj7q8Q@mail.gmail.com>
+ <20250804185306.6b048e7c.alex.williamson@redhat.com> <0a2e8593-47c6-4a17-b7b0-d4cb718b8f88@redhat.com>
+In-Reply-To: <0a2e8593-47c6-4a17-b7b0-d4cb718b8f88@redhat.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Tue, 5 Aug 2025 16:00:53 +0300
+X-Gmail-Original-Message-ID: <CAHk-=wiCYfNp4AJLBORU-c7ZyRBUp66W2-Et6cdQ4REx-GyQ_A@mail.gmail.com>
+X-Gm-Features: Ac12FXxoX_CjIAKtjLryo0sCU8BxLl8OrhQv0TcPGjBq_s03leh63xL_WcFm2cw
+Message-ID: <CAHk-=wiCYfNp4AJLBORU-c7ZyRBUp66W2-Et6cdQ4REx-GyQ_A@mail.gmail.com>
+Subject: Re: [GIT PULL] VFIO updates for v6.17-rc1
+To: David Hildenbrand <david@redhat.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"lizhe.67@bytedance.com" <lizhe.67@bytedance.com>, Jason Gunthorpe <jgg@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Aug 05, 2025 at 02:41:38PM +0200, David Hildenbrand wrote:
-> On 05.08.25 14:38, Jason Gunthorpe wrote:
-> > On Tue, Aug 05, 2025 at 02:07:49PM +0200, David Hildenbrand wrote:
-> > > I don't see an easy way to guarantee that. E.g., populate_section_memmap
-> > > really just does a kvmalloc_node() and
-> > > __populate_section_memmap()->memmap_alloc() a memblock_alloc().
-> > 
-> > Well, it is really easy, if you do the kvmalloc_node and you get the
-> > single unwanted struct page value, then call it again and free the
-> > first one. The second call is guarenteed to not return the unwanted
-> > value because the first call has it allocated.
-> 
-> So you want to walk all existing sections to check that? :)
+On Tue, 5 Aug 2025 at 10:47, David Hildenbrand <david@redhat.com> wrote:
+>
+> The concern is rather false positives, meaning, you want consecutive
+> PFNs (just like within a folio), but -- because the stars aligned --
+> you get consecutive "struct page" that do not translate to consecutive PFNs.
 
-We don't need to walk, compute the page-1 and carefully run that
-through page_to_pfn algorithm.
+So I don't think that can happen with a valid 'struct page', because
+if the 'struct page's are in different sections, they will have been
+allocated separately too.
 
-> That's the kind of approach I would describe with the words Linus used.
+So you can't have two consecutive 'struct page' things without them
+being consecutive pages.
 
-Its some small boot time nastyness, we do this all the time messing up
-the slow path so the fast paths can be simple
+But by all means, if you want to make sure, just compare the page
+sections. But converting them to a PFN and then converting back is
+just crazy.
 
-Jason
- 
+IOW, the logic would literally be something like (this assumes there
+is always at least *one* page):
+
+        struct page *page = *pages++;
+        int section = page_to_section(page);
+
+        for (size_t nr = 1; nr < nr_pages; nr++) {
+                if (*pages++ != ++page)
+                        break;
+                if (page_to_section(page) != section)
+                        break;
+        }
+        return nr;
+
+and yes, I think we only define page_to_section() for
+SECTION_IN_PAGE_FLAGS, but we should fix that and just have a
+
+  #define page_to_section(pg) 0
+
+for the other cases, and the compiler will happily optimize away the
+"oh, it's always zero" case.
+
+So something like that should actually generate reasonable code. It
+*really* shouldn't try to generate a pfn (or, like that horror that I
+didn't pull did, then go *back* from pfn to page)
+
+That 'nth_page()' thing is just crazy garbage.
+
+And even when fixed to not be garbage, I'm not convinced this needs to
+be in <linux/mm.h>.
+
+              Linus
+
+PS. No - I didn't test the above trivial loop. It may be trivial, but
+it may be buggy. Think of it as "something like this" rather than
+"this is tested and does the right thing"
 
