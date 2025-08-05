@@ -1,145 +1,168 @@
-Return-Path: <kvm+bounces-53968-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-53969-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53C98B1B04B
-	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 10:40:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BCFCB1B082
+	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 10:53:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF2091893862
-	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 08:40:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 95E877AA571
+	for <lists+kvm@lfdr.de>; Tue,  5 Aug 2025 08:52:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19385256C9F;
-	Tue,  5 Aug 2025 08:39:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B14B52594B7;
+	Tue,  5 Aug 2025 08:53:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IM+SVRXP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YZ5BFIPc"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+Received: from mail-lj1-f195.google.com (mail-lj1-f195.google.com [209.85.208.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F00D21858A;
-	Tue,  5 Aug 2025 08:39:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C7E025394C;
+	Tue,  5 Aug 2025 08:53:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754383191; cv=none; b=NiiUmFQmar4ilWPyh7Zk58xnPThG/d89oSF+NHILvEO3huGAlKK/Mews/UBajOXSQHObw04xZLvp68tQXkzweQroZ0zVwf701TgJe3RLwGXdZo5qm7lFVnhtCNuTfqe5j00vv1EgWmJSzC1G5p/k/PLbnsSBWI7ZixAkBp56Qa0=
+	t=1754383998; cv=none; b=Wa5Dv2EgJtu98DCxACd1uEwscPRjJd/1vPP0jMW2qOEFf3Dap40TOU/QaL6D2pcXz5eiYawo7ZNyZmsUVv/4ShGn2KMDdg8PPIpea+wXZfu8v2vBZNJDudnBxilkCv/h2qoTaFCjVK+LWfcmFNlhiAj+P+/ZrdDFTc8vjG4NBsg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754383191; c=relaxed/simple;
-	bh=8dCG009f28I/T5bh9HQ/pnDB0yMf2J3CDokXMRqyBlY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sMZhvliQqxImHPZuTPTRyrSthNnU3lo2RH/tVg1zL/2ywChOPi+BlN87yTSWKkAIyKzEcHtomN3fg3BAd1PmdxSoRrgaFxhwC2KxHx+ErMARStYJFMwhsLbONRiKgGic+/D+G9CsqWoBiyFcALKHuGIrhoqRasSAZDVPWikL9tw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IM+SVRXP; arc=none smtp.client-ip=209.85.221.52
+	s=arc-20240116; t=1754383998; c=relaxed/simple;
+	bh=bmc3fqkz5l4aFYJYtB/WgxFSjibZd7amLkHxt3HSOPY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KD45cNW4rz5ihR4Urxrc2E2kxGkpVy73R5W7GxW1Rnno9QadHdN0gXYRT4Y1c+aj9VyQ9u+1kaPfjgKIAhVpWAEm5RiZBU50LcudsQmqIk1c3DUxEljQT8h+RVMqR0+2S8KeCyPEQWNLZy+MpI5z9/pxhgtNLQV+lkt2v7pRYr0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YZ5BFIPc; arc=none smtp.client-ip=209.85.208.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-3b7910123a0so5195483f8f.1;
-        Tue, 05 Aug 2025 01:39:48 -0700 (PDT)
+Received: by mail-lj1-f195.google.com with SMTP id 38308e7fff4ca-33229f67729so45065341fa.1;
+        Tue, 05 Aug 2025 01:53:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1754383187; x=1754987987; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ckg82r4yV+jVyEN6/rbJQCfYznBxYrDG5d0BRS6lfPA=;
-        b=IM+SVRXP8ZSLnb2XuwdPrp572BhQZ2smXtf35kH87yuMAXq26aga/4Te9d7Zj/9f6w
-         q3kJ16R9ACEKWlU/rQ3JKrkwg5ZBblZBckaaV858u06HlzY3OQ5jom9IZ6z7JwZSqTVS
-         HULnjMAZhmwOpQgEmRt2Ej+9kCb7qqXAvOBnLVi4qlFnvgiKZs/Q4srjNNw6znJPNkGd
-         pxVpBofE80hTr0h005JREFIG0g3wJuinx/UiT6HaSHXx5YzYMs39+DS4SUJDUP7kTdfC
-         2r5ptWwY0EEpFmVcwYKi2jgX3M7f4iQE8pFALKb+7XdVIwrDVSfkIdWCRyvJ3EORPe/c
-         8Luw==
+        d=gmail.com; s=20230601; t=1754383995; x=1754988795; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ibHjp0RKgyKqNDDPGolCzlUBv8FDlz7MwKF0ZylR1+w=;
+        b=YZ5BFIPcd3WD/WadFtOv28wKsaALh7Dbmvlx21qsBOm/mdmWlS++Lqy8R5lB3FyaJI
+         P0PgRF/Tx1R+6REmJF89tKKPUVy3Q+PvubLnaNwClMPkiKPV6r1nNGOm7nshaFhRs0lZ
+         k/NSTAO3f9stoPSLwWH9EH8D6nmfDHP8kAg012pJ2OG2Oq3VuM8wTKVKK3+Z+5WSSjch
+         3nA0pudgxJAqtXJmWTQcd8h63RZZ+9Fght6bx0fAj9wepyWu2iVD27QaSSedyhQIAXJA
+         qZfHfgDZKdc6xXTNukBDQGs7X8JeLZ4IW8jxtNsclmSJLkx+JKA1oWo4KNCXAqTYtDFs
+         gmfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754383187; x=1754987987;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Ckg82r4yV+jVyEN6/rbJQCfYznBxYrDG5d0BRS6lfPA=;
-        b=kmyozib2Fn9GheLd5IGsgMmk//+JJSg5dTQ6o9I/tchB/WVH+/2HCI2ZtQcV9gZzpb
-         LBAR5BOyjIxjzleR7+k4f74ybLgG6JQqtxntq9tOFqq6ekPE8rWcjud259ng+qwxT8Tm
-         HCa5N2cCJpbJT3C2v4B/K3UvAOSvltkjhQNf5ORmAF0aKbcyiW4vhtC2NzO6i2ToQ5tm
-         c81z6QKWZMXacrb0xHVLiIk/G2DzmkLoaXXdq9Oi20Uj5d0uBG4heEOTzje2FIbrR6Fb
-         HDGhlaFNobIpOZ3Ua+FW2KnGp4MJmog+RpCl817CSioHCaDigh/sgTPfYObr4dbqMMsq
-         4ClA==
-X-Forwarded-Encrypted: i=1; AJvYcCVRR8isWlVYt7QFKzz9DHFl+woKTH/X8uvlMdLPZHO3BCpJ1qf3x8oBn6fftjZnaKLxaZg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzESb/r2mNOb5Wy3h9sFhEu56zHaQGnCsl4rKXXt752qcWKFPU5
-	G448gpP5pJ5ACZpLEj5XYWaayL77Z1ktz7TDqvjoR/yrCcGY5kD+0tfzLTVk4A==
-X-Gm-Gg: ASbGncvKhT1/dS4GEWt6lTuEqDA6aaA6GIhTtAIkItpaIUW4YBdZPfTRiF+u8cpoOpG
-	Y10frlphD8nsIfBi6u0/N6aEUyLMwEJ9yxsgtzJ63RWsktv8xliQLlXinuGoVv9tn5WK9sEGpN0
-	QeuaD9rHKsQsy6/o0GBVhMxPVpH+2bNxi/vsAPb6wiZuq8v+MhOUUwdPp+lskox33z0PjZ9PdkI
-	qMYeuV1J3jB0sWqYWKAPZGdGH3hTUSYttjoYueKsYnVtfsIKeNsgWJ1eNzwS0Gr74QpRuK/tXs3
-	3WkUR2hI+01DvC0+TZEnWTgYr+QyznpZj9076ejqK1stNSA/hNOve0y4DfEEqhMus7cpCFkicdg
-	hyrIEkNvGtpz6CQMrLG5aes4Dwpy/MV5p4w==
-X-Google-Smtp-Source: AGHT+IGUQ1CC3wGSqX3n2PthCP5i+TNxzdsTjL4pSdzIgtsPUjcOZd6wwrDmOy2lPNXfqcrUwsVwCA==
-X-Received: by 2002:a5d:5f4d:0:b0:3a5:2ef8:34f9 with SMTP id ffacd0b85a97d-3b8d94b9fb6mr8792134f8f.27.1754383186844;
-        Tue, 05 Aug 2025 01:39:46 -0700 (PDT)
-Received: from shameer-ubuntu ([195.11.233.227])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-459e00187f7sm39201055e9.15.2025.08.05.01.39.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Aug 2025 01:39:46 -0700 (PDT)
-From: Shameer Kolothum <shameerkolothum@gmail.com>
-To: linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Cc: alex.williamson@redhat.com,
-	wangzhou1@hisilicon.com,
-	liulongfang@huawei.com,
-	jonathan.cameron@huawei.com,
-	linuxarm@huawei.com,
-	shameerkolothum@gmail.com,
-	shameerali.kolothum.thodi@huawei.com
-Subject: [PATCH] MAINTAINERS: Update Shameer Kolothum's email address
-Date: Tue,  5 Aug 2025 09:39:13 +0100
-Message-ID: <20250805083913.55863-1-shameerkolothum@gmail.com>
-X-Mailer: git-send-email 2.50.1
+        d=1e100.net; s=20230601; t=1754383995; x=1754988795;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ibHjp0RKgyKqNDDPGolCzlUBv8FDlz7MwKF0ZylR1+w=;
+        b=ksMKhuHL70+yoOVCHihnLqJ9+/ImpHNjaPn98mHNxKKKJPnFeuf4FEMvBOOtZ6v2iz
+         SKor8+xK/JOn67wlBV+qxwnKPW60TBVUOBBlao1gXOKo+aXhHeHcoiKb8rvdUvwpe68H
+         MpWekvYAonrKIamYy9WMFIxL1Ujk6PaAYqCeNm+oeswDRXt9S8joeOr3Eq79WCKb2Tk4
+         DzAGduCw0ScQD4ZydNa6ZUdIob2Z2ZqkDD7gKFSJXuyRpHUIVCBU5KpQWomEnO4+k/ab
+         7U7qEndC9DCFWDRwW+VL487sEs20TvElcBiMtJ6QHMbBhqxzu0u6NyPIHdJvYs7gQIJR
+         MFUQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV0vy6YLwxlsBnftv9EEaUIDrpimRXYcRTX7K3dgaPZOYryYa74dtOAeiZdHEqq9jRRSRc5G19FM26Md6m5@vger.kernel.org, AJvYcCW2GhBZYWRNioOOFHItVIFmkFt0HkxbpKBgwvJfia27smjIRYds2xIstHR182b5aDTPKtCwqYBA@vger.kernel.org, AJvYcCXtWjgLdDs9ddhys7LEWXGlS6TFDzH68iDrnuvkTG/A+uCb+ZhEJhG+ih2Qh/ZqHoVApjA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxLeFvJCp/IMN0xoZoWFWStZZZ3Z3m57HKtHqMJW9+NtvMtksfN
+	MToALQ/XPEBtn4lQ9UFMP6F3mqOr93f4Qb+hKu5xrslREswjWhkB3BdAvlsbKrEviIdyMJYrork
+	+5nLiOtDfMnV2XaQnThAgYKiRAuj56DM=
+X-Gm-Gg: ASbGnctc/wCODsv3S6mL6Vyfud/miYKoKC8UvxwWuBY17rsOtgR8Fa4l0VoLSJ/LDVN
+	bzwdOl2Cx4Mt3YXnyh8jN5oRalOrdiOER2C7yQJoowfDeyGpennYvm21YO89vJ0Oytux0Y+WZBn
+	4vECUd19aE0we8ZV8eAeMktn4P44/YECjiBZwNCiSX2I9fD7yDkK3UA/fNXU7uqhEJxswdSlXEL
+	EeZPNo=
+X-Google-Smtp-Source: AGHT+IFD5XNw8cP384FaLMCLrTz2I87FHqRB6f/qwltp9qO9etEP6nue9QDshjhDWfCXFPjNxtkFMqihQ3uLrVpxQEI=
+X-Received: by 2002:a2e:a54f:0:b0:332:45b5:d665 with SMTP id
+ 38308e7fff4ca-33256709372mr32288541fa.11.1754383994891; Tue, 05 Aug 2025
+ 01:53:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250805051009.1766587-1-tcs_kernel@tencent.com> <4sbamls46k3dxlqgreifhhhd66iaosbeoxgbpyvwaipwlnwiba@dep4mseknust>
+In-Reply-To: <4sbamls46k3dxlqgreifhhhd66iaosbeoxgbpyvwaipwlnwiba@dep4mseknust>
+From: henry martin <bsdhenrymartin@gmail.com>
+Date: Tue, 5 Aug 2025 16:53:03 +0800
+X-Gm-Features: Ac12FXzozgbryRFZfZ8Jbwl1TrTa0Ad2T4Xt810HLdQs9hEAdhKtjpUCUff4i9Y
+Message-ID: <CAEnQdOr+Gnk7MW3di-=EDD92BR1C1m0P5pK=Fz6ov5iUH+=u2w@mail.gmail.com>
+Subject: Re: [PATCH v1] VSOCK: fix Information Leak in virtio_transport_shutdown()
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: huntazhang@tencent.com, jitxie@tencent.com, landonsun@tencent.com, 
+	stefanha@redhat.com, mst@redhat.com, jasowang@redhat.com, 
+	xuanzhuo@linux.alibaba.com, eperezma@redhat.com, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	kvm@vger.kernel.org, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Henry Martin <bsdhenryma@tencent.com>, 
+	TCS Robot <tcs_robot@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-My Huawei email will soon bounce and hence change to my personal
-email for now.
+Thanks for the quick review. You're right=E2=80=94this patch is a false
+positive. Modern compilers zero out the remaining fields, so the fix
+isn't needed.
 
-Also, since I no longer have access to HiSilicon hardware, remove
-myself from HISILICON PCI DRIVER maintainer entry.
+I'll be withdrawing all the patches and will ensure we more carefully
+evaluate our robot's findings before submitting in the future.
 
-Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Signed-off-by: Shameer Kolothum <shameerkolothum@gmail.com>
----
- .mailmap    | 1 +
- MAINTAINERS | 3 +--
- 2 files changed, 2 insertions(+), 2 deletions(-)
+Thanks for your help!
 
-diff --git a/.mailmap b/.mailmap
-index 4bb3a7f253b9..0d0f689e0912 100644
---- a/.mailmap
-+++ b/.mailmap
-@@ -700,6 +700,7 @@ Sergey Senozhatsky <senozhatsky@chromium.org> <sergey.senozhatsky@mail.by>
- Sergey Senozhatsky <senozhatsky@chromium.org> <senozhatsky@google.com>
- Seth Forshee <sforshee@kernel.org> <seth.forshee@canonical.com>
- Shakeel Butt <shakeel.butt@linux.dev> <shakeelb@google.com>
-+Shameer Kolothum <shameerkolothum@gmail.com> <shameerali.kolothum.thodi@huawei.com>
- Shannon Nelson <sln@onemain.com> <shannon.nelson@amd.com>
- Shannon Nelson <sln@onemain.com> <snelson@pensando.io>
- Shannon Nelson <sln@onemain.com> <shannon.nelson@intel.com>
-diff --git a/MAINTAINERS b/MAINTAINERS
-index c0b444e5fd5a..424cb734215b 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -26038,7 +26038,6 @@ F:	drivers/vfio/fsl-mc/
- 
- VFIO HISILICON PCI DRIVER
- M:	Longfang Liu <liulongfang@huawei.com>
--M:	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
- L:	kvm@vger.kernel.org
- S:	Maintained
- F:	drivers/vfio/pci/hisilicon/
-@@ -26067,7 +26066,7 @@ F:	drivers/vfio/pci/nvgrace-gpu/
- VFIO PCI DEVICE SPECIFIC DRIVERS
- R:	Jason Gunthorpe <jgg@nvidia.com>
- R:	Yishai Hadas <yishaih@nvidia.com>
--R:	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-+R:	Shameer Kolothum <shameerkolothum@gmail.com>
- R:	Kevin Tian <kevin.tian@intel.com>
- L:	kvm@vger.kernel.org
- S:	Maintained
--- 
-2.50.1
-
+Stefano Garzarella <sgarzare@redhat.com> =E4=BA=8E2025=E5=B9=B48=E6=9C=885=
+=E6=97=A5=E5=91=A8=E4=BA=8C 15:01=E5=86=99=E9=81=93=EF=BC=9A
+>
+> On Tue, Aug 05, 2025 at 01:10:09PM +0800, bsdhenrymartin@gmail.com wrote:
+> >From: Henry Martin <bsdhenryma@tencent.com>
+> >
+> >The `struct virtio_vsock_pkt_info` is declared on the stack but only
+> >partially initialized (only `op`, `flags`, and `vsk` are set)
+> >
+> >The uninitialized fields (including `pkt_len`, `remote_cid`,
+> >`remote_port`, etc.) contain residual kernel stack data. This structure
+> >is passed to `virtio_transport_send_pkt_info()`, which uses the
+> >uninitialized fields.
+> >
+> >Fixes: 06a8fc78367d ("VSOCK: Introduce virtio_vsock_common.ko")
+> >Reported-by: TCS Robot <tcs_robot@tencent.com>
+> >Signed-off-by: Henry Martin <bsdhenryma@tencent.com>
+> >---
+> > net/vmw_vsock/virtio_transport_common.c | 15 +++++++--------
+> > 1 file changed, 7 insertions(+), 8 deletions(-)
+> >
+> >diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/vir=
+tio_transport_common.c
+> >index fe92e5fa95b4..cb391a98d025 100644
+> >--- a/net/vmw_vsock/virtio_transport_common.c
+> >+++ b/net/vmw_vsock/virtio_transport_common.c
+> >@@ -1073,14 +1073,14 @@ EXPORT_SYMBOL_GPL(virtio_transport_connect);
+> >
+> > int virtio_transport_shutdown(struct vsock_sock *vsk, int mode)
+> > {
+> >-      struct virtio_vsock_pkt_info info =3D {
+> >-              .op =3D VIRTIO_VSOCK_OP_SHUTDOWN,
+> >-              .flags =3D (mode & RCV_SHUTDOWN ?
+> >-                        VIRTIO_VSOCK_SHUTDOWN_RCV : 0) |
+> >-                       (mode & SEND_SHUTDOWN ?
+> >-                        VIRTIO_VSOCK_SHUTDOWN_SEND : 0),
+> >-              .vsk =3D vsk,
+> >-      };
+>
+> The compiler sets all other fields to 0, so I don't understand what this
+> patch solves.
+> Can you give an example of the problem you found?
+>
+> Furthermore, even if this fix were valid, why do it for just one
+> function?
+>
+> Stefano
+>
+> >+      struct virtio_vsock_pkt_info info =3D {0};
+> >+
+> >+      info.op =3D VIRTIO_VSOCK_OP_SHUTDOWN;
+> >+      info.flags =3D (mode & RCV_SHUTDOWN ?
+> >+                      VIRTIO_VSOCK_SHUTDOWN_RCV : 0) |
+> >+                      (mode & SEND_SHUTDOWN ?
+> >+                      VIRTIO_VSOCK_SHUTDOWN_SEND : 0);
+> >+      info.vsk =3D vsk;
+> >
+> >       return virtio_transport_send_pkt_info(vsk, &info);
+> > }
+> >--
+> >2.41.3
+> >
+>
 
