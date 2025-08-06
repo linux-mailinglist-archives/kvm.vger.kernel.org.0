@@ -1,117 +1,216 @@
-Return-Path: <kvm+bounces-54207-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54208-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8378CB1CF2B
-	for <lists+kvm@lfdr.de>; Thu,  7 Aug 2025 00:47:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55A77B1CF2E
+	for <lists+kvm@lfdr.de>; Thu,  7 Aug 2025 00:52:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 52254562EE9
-	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 22:47:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 06AAF18C4F4F
+	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 22:52:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A56523507F;
-	Wed,  6 Aug 2025 22:47:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49B00230BF6;
+	Wed,  6 Aug 2025 22:52:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vljKhkOF"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rW7oFrSm"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 583491DED4A
-	for <kvm@vger.kernel.org>; Wed,  6 Aug 2025 22:47:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E752522AE7A
+	for <kvm@vger.kernel.org>; Wed,  6 Aug 2025 22:52:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754520458; cv=none; b=QamKqq0yVv/IaEDgI1u05WklA/6hI6BzMVUvJKWf/x8IgmPlVAmrxocbwpEtQF70y+u2aqowKXK7yaBFf9CS0OixgS2noX4FSv0AsD2OYskb9zbQT2cRnusEkxI7lyuqap+/9vNUKjlG7iokIT6t1sxSa5GOi8scNrfYk3xpHnw=
+	t=1754520723; cv=none; b=lpUMCkbz7TcJpohD8ieC3Xju3r+aNFFrhzZGF1f16iZ+w6wh+sCd2r8lTY/TQ4pLG+f2M/UcA6Hl3yryDyboUa6i4Es3MrNWWC4yIU75DCZsRmfWey41xGvOW6uCC+LEsKjTNs+H1aJc/9VwmkzHqnmtbgRapoIj/u3GPUq0pJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754520458; c=relaxed/simple;
-	bh=AQSRozzfLJWej5BeMHOzT/S5S6HIv/rXKAySkyRLD1E=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=iXQSC33pAHvFtJok9L+7UqWDynONajFF3gevosod0UU1PVzlQVaQwLOlTC/XgEsMGZrD8jwBE+7972TAKm5QJtDml+DiLJd9lz2j3yQ+l99izbe6YXvxrFmmQI4A9JADg2rI49DP+vOa6QNZW1B+6SIFO4p6natEFup+Uqz9tKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vljKhkOF; arc=none smtp.client-ip=209.85.216.74
+	s=arc-20240116; t=1754520723; c=relaxed/simple;
+	bh=S0khaiV2Yjbn0vrnETjyIgfSHs7y3d46GzkAPO4gkk8=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=N8axAwbG7AlBrXc/Wwt2IRnsimGrMsVh1WCCt2iWf2XjE0NK3qeAOX87S1QaJCkMQYFcJ35IWQ7FcOyfPxO7PdfEP/SOqZTbZgN03oLqykZpaGeI44YGI6PSLf6HaNAdWH1BZqpByGIMrPEJYmcia9xzEOhEMyFaKHeS5iuP6kg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rW7oFrSm; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3211b736a11so805382a91.0
-        for <kvm@vger.kernel.org>; Wed, 06 Aug 2025 15:47:37 -0700 (PDT)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-31f5f70a07bso565426a91.3
+        for <kvm@vger.kernel.org>; Wed, 06 Aug 2025 15:52:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754520457; x=1755125257; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YHuoViYMSI0OwpL/rmjNIjufy/Pt0O/UUqyfzafEkIk=;
-        b=vljKhkOFP0+Dnn6a/wAKqRTRW5x7jDhcMpasNhkWGbPQ8odOuI2eHHPGcWRtofpndv
-         gy4jRZYZ880WHMc9lf+PoYYHuD5fdeF/iKev7G551ojiSwZFpeF43IYzq8lOLYVOfcO8
-         cIG1eyhYktRfOrud2j4fK0aqg3/U+4/NRKUaO+4JZQZvxklEOTtE+JjpkYZWyS0pP5FO
-         HmrE0IVVG5pLGG8UYISTBuV0knVRW0NFUS4vxOA1cRYn4BjnIhouEHLHrBfzs9Y00H3C
-         7xDJkqruWF1WSlpCVQvfNL7vV4s5/ZwW+5vJ2JyLtp20GYWvPimNcBfFsWuLfOxHEzOd
-         sJag==
+        d=google.com; s=20230601; t=1754520721; x=1755125521; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Nb/+hiSIBqzVp6CSex90Vi5aXgUoBso6lv3HIdZ3rLE=;
+        b=rW7oFrSmwKPZEvrLM7LNn25xNZlRuAPz73NkK8FexQPbl2SBYUfz2sU2xlfLiEYHiq
+         HuIdeYMfqJoZHOfWgfQl7ViUXDu1Mtl6SNmPw+evMTFXBNfEWoly+X7lS1/WpLAD4qSY
+         Cj1CTw8ctWHj9Fwv5PKvnTqY+VOyAy+5/dQ6F426+DoS7UFXtOQ6f3K9CElmIccHhQdG
+         glpt0v3hPNqi07yj5TOMPY+7V6thOizbSm4PzWQ72GVhVrUmcPD6bGzkl6NGFN3iA1TH
+         DUiBJDbyqOWFBz6Cy2ZSNUjP3mhlxuVOmON2+xwmSXDc10cMNoY8hxF/LjsJszLZYTvy
+         pQhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754520457; x=1755125257;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YHuoViYMSI0OwpL/rmjNIjufy/Pt0O/UUqyfzafEkIk=;
-        b=vK50qHCsGPTZqg2bfYpksd31w33n+9n+tSi7x1jfNE/M8da07+PvElZ0NHEpV2TVjY
-         +V65U17V4pvgpP/nylCp5tDU4/8ywVha+xUn/bblqgIFSwan0a50EmiU97iazG9F4wv3
-         e4L4+JCQkTtq7zgj0GtnAz0jZLIP5wo5d5snsb7qyrrUvf9OnUlWDYI3DpcOAqUElUbJ
-         8AzcdsRnydhli/PPcvVCBZs0zbwKuiLEMbal1q8A/HvSKo7w34Y9efSnT0Ykq2Okytds
-         p/JFjnysFFR7AX9lL5xE7+m3zWTibo5c6E+AJN/qKcjQY1lOyuFGep11W9AsaA6e5iu8
-         llbw==
-X-Forwarded-Encrypted: i=1; AJvYcCWuIryXuFY2lU6Vzifjy5b6Cp1DSFCHt2xXO3RwQ9MPrZxdV5IoREMljQVlHnR6D/456eQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzOcfDm9emGHlJC2CZqrLhxsg+v57nGJLY6AKkkCiw7zlaYRBir
-	jj4IMpGN+fvnUsXBXwCOImieyGFNUfxmfz+UioLmXN3B+E7Ttg+HUB1kc3mOW03BZqj/X2DbVaG
-	hy3figg==
-X-Google-Smtp-Source: AGHT+IGfo0LH0u9LLu+2LfR4YNdq8y3iK3kQ7GzClkjVpHjdIOTwgrMX1KG0BkHCERAjRISf43ptQ7wrFiI=
-X-Received: from pjov3.prod.google.com ([2002:a17:90a:9603:b0:31c:2fe4:33b6])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:d2d0:b0:321:6e1a:1b71
- with SMTP id 98e67ed59e1d1-3216e1a254fmr4076071a91.29.1754520456741; Wed, 06
- Aug 2025 15:47:36 -0700 (PDT)
-Date: Wed, 6 Aug 2025 15:47:35 -0700
-In-Reply-To: <aJPB8Jd5AFKdIua3@AUSJOHALLEN.amd.com>
+        d=1e100.net; s=20230601; t=1754520721; x=1755125521;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Nb/+hiSIBqzVp6CSex90Vi5aXgUoBso6lv3HIdZ3rLE=;
+        b=LjKGbLXYAXP3TWS0CnUwJN1P3DIkSGpIQ6XsY2t6spI1dGdPCtL6Suqw1SdGXCJvfi
+         wwel4D8Kw38R4GmL+GQkSTZ6e8cwulwo2lj9PKZAA9UHwkJgfiDduMHckebRySrquIzg
+         RlYNCg7vOkyjMwQlxlf8vHL8TxSvCa8CUghMNR2AMsIBQ0r2EKPb4rqzhssS75PrxPuf
+         IQm5Y/aNd84C/jbGNE7GXjDbuM5u6SGxFR57NwkNEx8lLdDDOVq9mM7zg6ZR9itX2sZ/
+         VPjTuiHa2AihtvEOPrDnCrnTsAfLw1OOT9MJu1GyXornOc7STQkBy9RwgqYSYM3IZqxg
+         CWXg==
+X-Gm-Message-State: AOJu0YzysARIOQYrb3bUN40Z2eCl1SiG14gS4Zu0NdNxVr2b5yuaQIMQ
+	DGPDweze60hi6ZVCNgwC/XIYZgZTs/X0PlsuV7364C3gYJd+RU8YVy8HTGgXXDrM2J7YVFjUuX6
+	rwIixxw==
+X-Google-Smtp-Source: AGHT+IEW0Iq87ZeOVm0vGfsBGLoOolJN4ayD/9hByHJThL7Q0jxR2SZQ2q7ZCQ+ffQ8GezO+fBMLEhiVT8U=
+X-Received: from pjpq9.prod.google.com ([2002:a17:90a:a009:b0:31e:cee1:4d04])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4cc1:b0:31f:59d1:85be
+ with SMTP id 98e67ed59e1d1-3216756d193mr5768264a91.24.1754520721324; Wed, 06
+ Aug 2025 15:52:01 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Wed,  6 Aug 2025 15:51:59 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250704085027.182163-1-chao.gao@intel.com> <20250704085027.182163-20-chao.gao@intel.com>
- <aJPB8Jd5AFKdIua3@AUSJOHALLEN.amd.com>
-Message-ID: <aJPbh_2VZWXbqYcs@google.com>
-Subject: Re: [PATCH v11 19/23] KVM: x86: Enable CET virtualization for VMX and
- advertise to userspace
+X-Mailer: git-send-email 2.50.1.565.gc32cd1483b-goog
+Message-ID: <20250806225159.1687326-1-seanjc@google.com>
+Subject: [PATCH] KVM: selftests: Move Intel and AMD module param helpers to x86/processor.h
 From: Sean Christopherson <seanjc@google.com>
-To: John Allen <john.allen@amd.com>
-Cc: Chao Gao <chao.gao@intel.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	x86@kernel.org, pbonzini@redhat.com, dave.hansen@intel.com, 
-	rick.p.edgecombe@intel.com, mlevitsk@redhat.com, weijiang.yang@intel.com, 
-	minipli@grsecurity.net, xin@zytor.com, Thomas Gleixner <tglx@linutronix.de>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>
-Content-Type: text/plain; charset="us-ascii"
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Aug 06, 2025, John Allen wrote:
-> On Fri, Jul 04, 2025 at 01:49:50AM -0700, Chao Gao wrote:
-> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> > index 803574920e41..6375695ce285 100644
-> > --- a/arch/x86/kvm/svm/svm.c
-> > +++ b/arch/x86/kvm/svm/svm.c
-> > @@ -5223,6 +5223,10 @@ static __init void svm_set_cpu_caps(void)
-> >  	kvm_caps.supported_perf_cap = 0;
-> >  	kvm_caps.supported_xss = 0;
-> >  
-> > +	/* KVM doesn't yet support CET virtualization for SVM. */
-> > +	kvm_cpu_cap_clear(X86_FEATURE_SHSTK);
-> > +	kvm_cpu_cap_clear(X86_FEATURE_IBT);
-> > +
-> 
-> Since AMD isn't supporting IBT, 
+Move the x86 specific helpers for getting kvm_{amd,intel} module params to
+x86 where they belong.  Expose the module-agnostic helpers globally, there
+is nothing secret about the logic.
 
-Isn't supporting IBT, yet.  :-)
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ .../testing/selftests/kvm/include/kvm_util.h  | 17 ++++++----
+ .../selftests/kvm/include/x86/processor.h     | 20 +++++++++++
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 34 ++-----------------
+ 3 files changed, 33 insertions(+), 38 deletions(-)
 
-I totally believe that AMD doesn't have any plans to support IBT, but unless
-IBT virtualization would Just Work (would it?), we should leave this in, because
-being paranoid is basically free. 
+diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+index 23a506d7eca3..652ac01e1adc 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util.h
++++ b/tools/testing/selftests/kvm/include/kvm_util.h
+@@ -260,13 +260,18 @@ int __open_path_or_exit(const char *path, int flags, const char *enoent_help);
+ int open_path_or_exit(const char *path, int flags);
+ int open_kvm_dev_path_or_exit(void);
+ 
+-bool get_kvm_param_bool(const char *param);
+-bool get_kvm_intel_param_bool(const char *param);
+-bool get_kvm_amd_param_bool(const char *param);
++int kvm_get_module_param_integer(const char *module_name, const char *param);
++bool kvm_get_module_param_bool(const char *module_name, const char *param);
+ 
+-int get_kvm_param_integer(const char *param);
+-int get_kvm_intel_param_integer(const char *param);
+-int get_kvm_amd_param_integer(const char *param);
++static inline bool get_kvm_param_bool(const char *param)
++{
++	return kvm_get_module_param_bool("kvm", param);
++}
++
++static inline int get_kvm_param_integer(const char *param)
++{
++	return kvm_get_module_param_integer("kvm", param);
++}
+ 
+ unsigned int kvm_check_cap(long cap);
+ 
+diff --git a/tools/testing/selftests/kvm/include/x86/processor.h b/tools/testing/selftests/kvm/include/x86/processor.h
+index 2efb05c2f2fb..488d516c4f6f 100644
+--- a/tools/testing/selftests/kvm/include/x86/processor.h
++++ b/tools/testing/selftests/kvm/include/x86/processor.h
+@@ -1314,6 +1314,26 @@ static inline uint8_t xsetbv_safe(uint32_t index, uint64_t value)
+ 
+ bool kvm_is_tdp_enabled(void);
+ 
++static inline bool get_kvm_intel_param_bool(const char *param)
++{
++	return kvm_get_module_param_bool("kvm_intel", param);
++}
++
++static inline bool get_kvm_amd_param_bool(const char *param)
++{
++	return kvm_get_module_param_bool("kvm_amd", param);
++}
++
++static inline int get_kvm_intel_param_integer(const char *param)
++{
++	return kvm_get_module_param_integer("kvm_intel", param);
++}
++
++static inline int get_kvm_amd_param_integer(const char *param)
++{
++	return kvm_get_module_param_integer("kvm_amd", param);
++}
++
+ static inline bool kvm_is_pmu_enabled(void)
+ {
+ 	return get_kvm_param_bool("enable_pmu");
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index c3f5142b0a54..b20d242ddcbe 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -95,7 +95,7 @@ static ssize_t get_module_param(const char *module_name, const char *param,
+ 	return bytes_read;
+ }
+ 
+-static int get_module_param_integer(const char *module_name, const char *param)
++int kvm_get_module_param_integer(const char *module_name, const char *param)
+ {
+ 	/*
+ 	 * 16 bytes to hold a 64-bit value (1 byte per char), 1 byte for the
+@@ -119,7 +119,7 @@ static int get_module_param_integer(const char *module_name, const char *param)
+ 	return atoi_paranoid(value);
+ }
+ 
+-static bool get_module_param_bool(const char *module_name, const char *param)
++bool kvm_get_module_param_bool(const char *module_name, const char *param)
+ {
+ 	char value;
+ 	ssize_t r;
+@@ -135,36 +135,6 @@ static bool get_module_param_bool(const char *module_name, const char *param)
+ 	TEST_FAIL("Unrecognized value '%c' for boolean module param", value);
+ }
+ 
+-bool get_kvm_param_bool(const char *param)
+-{
+-	return get_module_param_bool("kvm", param);
+-}
+-
+-bool get_kvm_intel_param_bool(const char *param)
+-{
+-	return get_module_param_bool("kvm_intel", param);
+-}
+-
+-bool get_kvm_amd_param_bool(const char *param)
+-{
+-	return get_module_param_bool("kvm_amd", param);
+-}
+-
+-int get_kvm_param_integer(const char *param)
+-{
+-	return get_module_param_integer("kvm", param);
+-}
+-
+-int get_kvm_intel_param_integer(const char *param)
+-{
+-	return get_module_param_integer("kvm_intel", param);
+-}
+-
+-int get_kvm_amd_param_integer(const char *param)
+-{
+-	return get_module_param_integer("kvm_amd", param);
+-}
+-
+ /*
+  * Capability
+  *
 
-> not sure if it makes sense to clear IBT here since it doesn't look like we're
-> clearing other features that we don't support in hardware. For compatibility,
-> my series just removes both lines here, but the IBT clearing is probably not
-> needed in this series.
+base-commit: 196d9e72c4b0bd68b74a4ec7f52d248f37d0f030
+-- 
+2.50.1.565.gc32cd1483b-goog
+
 
