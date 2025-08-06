@@ -1,191 +1,183 @@
-Return-Path: <kvm+bounces-54196-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54198-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAFB6B1CE23
-	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 22:58:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05B58B1CE74
+	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 23:31:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A69D318C693F
-	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 20:59:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3E07624A00
+	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 21:31:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73CE22206AF;
-	Wed,  6 Aug 2025 20:58:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F3C522FF35;
+	Wed,  6 Aug 2025 21:31:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mjn/KwJD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h8GGiY0d"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05FEB1FF7C8
-	for <kvm@vger.kernel.org>; Wed,  6 Aug 2025 20:58:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 132DD22D793;
+	Wed,  6 Aug 2025 21:31:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754513913; cv=none; b=MZoSvo49kLRwtOMCZL2Ksw4FjpXStI/9b9C2D+MJj4yaSQAzKhKWOXpUC4PEpUiVflX59XKPlDSd3dksyNskJScmh/jgDKml2gIH9k4fN5/DVyRTAZXsy9Wo9vNBOcwZ8xobYLPqtowGJj3LnUYvmQghR1ecF1pJIPSXxUunVP0=
+	t=1754515877; cv=none; b=inLfciEcJOTKEqlefkBAffrwKLHaSDNWdZ63FcPHnuc8UnKkfTsLMdTa3/hqm1rXpe5X/Q8LpD02DU/h/UMZrvRBunKSXhWnbPajUoL7rjR9/tLtG8Acsn+0bmDgW3AmQOwvAzAZ1tkH0bXnZxHz4O4VX6PEfYNr275Gy+D4G+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754513913; c=relaxed/simple;
-	bh=U1FeQRtLiG+q4sfmdpJ9bCgp5uUUcwrffLKyNe3Rxms=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cuPyF32K0X8YMZbRsh8mUvFV+GfECTrGX+/K/IE5z1oDD7B32wWSa9mBk2KEnHTPgqmQBgNyhCsgWcW3+3rYGorXv8zhVmGWiQdAtkXV9ywG9hyPeHxn/dBpeAaoi+eAy0LV1pG0qLXiJ4YOC8t5Jlw1eDW13Tv1qfApB1GTXCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Mjn/KwJD; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1754513911;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XL3JtSDnypcZCdbt3A90Mr99TpavO/k4/VrpLyiBez8=;
-	b=Mjn/KwJDx4NWLHwmUop1Nqv4WAyrfRGGPQ6VLWLppjTzE2fHxEDvXhWKsDEjLYkfuCFLbn
-	AjIl1GJZS0YnG13/Xqcrhdvw0jy+6kR8Pn5RnfUDpi25BypfqRn7oCyHUidd0u0p1gFlYn
-	ROE/bZzCah4n6hvqXHras3zGrMdDY0Q=
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
- [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-470-xq1-H0HjPS6JasJe4cAbQA-1; Wed, 06 Aug 2025 16:58:29 -0400
-X-MC-Unique: xq1-H0HjPS6JasJe4cAbQA-1
-X-Mimecast-MFC-AGG-ID: xq1-H0HjPS6JasJe4cAbQA_1754513909
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3e3fdd9298eso727775ab.3
-        for <kvm@vger.kernel.org>; Wed, 06 Aug 2025 13:58:29 -0700 (PDT)
+	s=arc-20240116; t=1754515877; c=relaxed/simple;
+	bh=SL3DNkvGy6rcQuP9q4xv+WVd9ByB3rzfEVd4866Pia0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=M3PORVkflIoI2G5BcwfRua3PI5BvBLem1W3ip1N4FmtGzMHuO73EdTju1ORPyZyGP4kze8gtS+69KH5xS1WMqsrPnu76mgcqye9ya5E6krTJpro7hgaHk3f/FCwJfKoLQDpm5Px3fb6ZhTUSdoPXefmzYZB/yUp+s85ciJyyz5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h8GGiY0d; arc=none smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-76bd041c431so397755b3a.2;
+        Wed, 06 Aug 2025 14:31:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1754515875; x=1755120675; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=CTYKRqC2i2Nuv0ETOsJWl2NT52kw5MEfkUb+WVewcSg=;
+        b=h8GGiY0d4e4LovbhhgLckD+TfdQ5w8VEHwuwrfw8B6nAGouliflFkBmdtj0333KUI1
+         GI7cOIBAQUwHWvcgqHvpfyecRGmGRzKYQqLfdVl35Ki7vIWSEvvOZ2jHlJhCpMLPjNKP
+         hcGJVkK0yCdXZBU1glSz9xl2DnnOlrcKboXWPVM1XK5Xy4hDRgHhKILMhibvTy8ADw/Q
+         EA2kkdGAzLLtMxJC2XavhxEZf/aEQSCDuP49NblaIlyRqdQxssh9KPuocv6RM6wbWKMS
+         SUiF4/fV8TXeQPA9lROdud4K9Q39BY+vS+g4zM6DlVWXIYX5YHoXlUjlHnx+P1EtyEzp
+         IbFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754513909; x=1755118709;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=XL3JtSDnypcZCdbt3A90Mr99TpavO/k4/VrpLyiBez8=;
-        b=ntnpreKHnYAerf995ngRT9KyrYgKTjNKaLaAs2BlIWCIw1x9HpjTpSrWz4AFOkxH5h
-         Fu8bKcmQ3j4nQK7K9NJBDx4UK23FgfhADyE82rno9Lf9Xgt3a3Nb3jKN2/RORu/oh49V
-         oqVftKC4T3Vdd6bpkNk845ZqJBZu6tn6/wDp8Y6ripG1JPfVyjGaFYAKUdW6J/zZF+gi
-         U2HYOcaPfeJ6e5/ta2/QDGe9e1CSZN4JhslbCJ/E36ZUp6nPFfLRPqsBj7/7ym2yzFyW
-         Hm+gc6h7rNc3P/9NGDA52CKmX6d5OeWozpq3+ySbbU8pISFymfjRQTDhfip1jqnGxYTT
-         PDqA==
-X-Forwarded-Encrypted: i=1; AJvYcCU0IINihEgKxC4iO/+mXcXKrJ/aUJ+9Xya7fFf4AHb4+XADbMia6Olhyav2NUcxG33jMPw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxP2mk7DUROGQI2wWGTFaNMrH03MvtshpBxIQc45M4GKFRbXiPM
-	RWuouXdrcDFjcFEfke7u1Xmz93ldbQD9uNECxcWZoxGQpEoHX24s/9q/v+mOXZhluj/XvHMgdKu
-	JAfvksSJBXEhrh8S3mEYEi0YZbSZhlIelnlQ83cl1dGy0fjqDq2oNSw==
-X-Gm-Gg: ASbGnctA8eI0M7iWOJKKswIBp21cXZeeBELP2qrLIcW73K1fujhpyqgdRbVVxHr+jlt
-	eOyYgaDjWYZPPncqjoZ6MvchBwjvbPoCRPuxG8/YD10z6y/kUigMBggI4ByitEefA3k11m4eA4i
-	4HqJ6f2j1D2waUT+p6PLilDoFt8f51f0llgqS4DUM1+EU5JOK6Ew/DnWR8eJ311BGvQi1hCNKJt
-	pWliHM/4fnbCSEItas8HJAWBpTH+02FELnqlc/oMCF84PHxTV7ANgH0mEQ+4jULH0SUAu19W3xE
-	QY6FSva6+TI1dexiA7wPEpIbsT57rmxldOPpgElI3ss=
-X-Received: by 2002:a05:6e02:152e:b0:3e3:d2eb:52db with SMTP id e9e14a558f8ab-3e51b79eae2mr20687245ab.0.1754513909049;
-        Wed, 06 Aug 2025 13:58:29 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEvMHObcGautLtJ7984K/wyyriLvMdPXmyUUT5V0nwJ7vFbNm7fOcxZIXtiLyBYuGHd6raZZQ==
-X-Received: by 2002:a05:6e02:152e:b0:3e3:d2eb:52db with SMTP id e9e14a558f8ab-3e51b79eae2mr20686945ab.0.1754513908609;
-        Wed, 06 Aug 2025 13:58:28 -0700 (PDT)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-50ab01e84desm2049992173.51.2025.08.06.13.58.26
+        d=1e100.net; s=20230601; t=1754515875; x=1755120675;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CTYKRqC2i2Nuv0ETOsJWl2NT52kw5MEfkUb+WVewcSg=;
+        b=F5073IbOmVGkre2YY9js0/DOlBzM+MAyYbRKAj3CArdJxR6xOIlhd+9LpdDnB8Yr9g
+         NxGZHrbBmhuonRPkBa+VZ0U4uLVCGvNNu7c1943UVN6VfAe4xodsAzdR3xa9gn3+V+Qo
+         ZFs681xCrENeBg7G5/FkeZCBGiDkMLZTnm8Glu7/G7+5nPeFG+GR+LLWHoNw0vzWpTxK
+         K+06vnlQShxe2qD9YfcGxAriiRkGkwFLpILjeilt3beVYH2W5GcSYVkpwq+2WM3eM6rY
+         mdDMm5KbeOik7IIzyH973vl3IjDTvistTDZfHQjTHPzCdXU4rFe35JVb+XemYw0+bcGS
+         pvRQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUeNpZDO/bpI2P4EN3/s1EBYaU+EXfx5TTozoXqaXYOJbWsW8oyQ55cEccNjgM/l4JeQ30/HtpMAqc1+EGh@vger.kernel.org, AJvYcCV/slk8Ys5kMxzMpjc0u5vkc6p1iNPARHP7oxIZNzUGq1au9TOuplXYRMIlILmdf5ApXCk=@vger.kernel.org, AJvYcCWgu0yEzf+VYMUBHB50QZdGoUvCQDVFUV+DSeeEhHUhj8sDqSIrycF3Ipf7rbXz5mHJmEw2tXHrjpumphd6@vger.kernel.org, AJvYcCX7RrR4QbnbAHWych9I16qvwYm/0Vbsf3E+3/OVJLotc8L0kswTr8+mSGhZH4juO0LsndWuKc9SvdX2MjADNt0U@vger.kernel.org, AJvYcCXMX9ZmJqSJCDQEJuw5e7d20tf274YsicDG8791itvCneJUfzURUxu5k8gDzJHDYmia6CXko6e7@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKmtU+hmkjHb6wS1glkzHjs7uyeJcO32hehkU8z452Wjwg9pl+
+	nMBo0SuPBdnKErK2WdOeSdKhEK40nb+Iv0xZQ5LXIsodonx7PRGoHdJk
+X-Gm-Gg: ASbGncuhQrM8xNN3/WaTriGYcObbrEQMKeydd1TC+HPHhr4NCJ8uceoh6ATZkeGsmGh
+	E4QVju9MU8FZ798R+NnfMxiF3sdh12r5Sou5fhzJ8CuOlGa9S8MC/MrKy0BmZILVfZRH+p4GfS4
+	G58iGptYyLP/X2XnOOzBWZCHkSwKqA9S7wZQQQ4nYmFQRSAu8bqawyspVQxGVl+7RVjzqnbhvsx
+	aFfJo5d4S9CEo6Rn3BBGhMXmZVpHp4B3hmweW/q9tE2H2uBlni90/CyAC+bi8KY3eE2MgFJVU52
+	JjWLVTB8vHgsqNKzADHib+KBinxrrom5sbX1fcxnzU8DOG9V8aW0C0RQa+VRB4fDizcTEZAuKng
+	3XW6Dxu/VFxbMwkaUKCqABeWGQnMZ3Ege5nzNEnM+yf//
+X-Google-Smtp-Source: AGHT+IFZpVrG9s5vc20jurJQK7sMSyb7Prr6yRfhujcvSVJBKuiNDMVhVBLsWkgkXXUuyjwA2eVNOg==
+X-Received: by 2002:a17:902:e88c:b0:240:3c51:1063 with SMTP id d9443c01a7336-242b19c7519mr7983495ad.23.1754515875138;
+        Wed, 06 Aug 2025 14:31:15 -0700 (PDT)
+Received: from devvm6216.cco0.facebook.com ([2a03:2880:2ff:43::])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2423783a84bsm134870185ad.51.2025.08.06.14.31.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Aug 2025 13:58:27 -0700 (PDT)
-Date: Wed, 6 Aug 2025 14:58:25 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Leon Romanovsky <leonro@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>,
- Andrew Morton <akpm@linux-foundation.org>, Bjorn Helgaas
- <bhelgaas@google.com>, Christian =?UTF-8?B?S8O2bmln?=
- <christian.koenig@amd.com>, Christoph Hellwig <hch@lst.de>,
- dri-devel@lists.freedesktop.org, iommu@lists.linux.dev, Jens Axboe
- <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
- linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
- linux-mm@kvack.org, linux-pci@vger.kernel.org, Logan Gunthorpe
- <logang@deltatee.com>, Marek Szyprowski <m.szyprowski@samsung.com>, Robin
- Murphy <robin.murphy@arm.com>, Sumit Semwal <sumit.semwal@linaro.org>,
- Vivek Kasireddy <vivek.kasireddy@intel.com>, Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v1 01/10] PCI/P2PDMA: Remove redundant bus_offset from
- map state
-Message-ID: <20250806145825.2654ee59.alex.williamson@redhat.com>
-In-Reply-To: <c9b6237964b9606418af400bb6bec5178fcffff2.1754311439.git.leon@kernel.org>
-References: <cover.1754311439.git.leon@kernel.org>
-	<c9b6237964b9606418af400bb6bec5178fcffff2.1754311439.git.leon@kernel.org>
-Organization: Red Hat
+        Wed, 06 Aug 2025 14:31:14 -0700 (PDT)
+Date: Wed, 6 Aug 2025 14:31:12 -0700
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Simon Horman <horms@kernel.org>
+Cc: Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Bryan Tan <bryan-bt.tan@broadcom.com>,
+	Vishnu Dasa <vishnu.dasa@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	berrange@redhat.com, Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH RFC net-next v4 09/12] vsock/loopback: add netns support
+Message-ID: <aJPJoDo/0MS+thcl@devvm6216.cco0.facebook.com>
+References: <20250805-vsock-vmtest-v4-0-059ec51ab111@meta.com>
+ <20250805-vsock-vmtest-v4-9-059ec51ab111@meta.com>
+ <20250806191239.GF61519@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250806191239.GF61519@horms.kernel.org>
 
-On Mon,  4 Aug 2025 16:00:36 +0300
-Leon Romanovsky <leon@kernel.org> wrote:
+On Wed, Aug 06, 2025 at 08:12:39PM +0100, Simon Horman wrote:
+> On Tue, Aug 05, 2025 at 02:49:17PM -0700, Bobby Eshleman wrote:
+> > From: Bobby Eshleman <bobbyeshleman@meta.com>
+> > 
 
-> From: Leon Romanovsky <leonro@nvidia.com>
->=20
-> Remove the bus_off field from pci_p2pdma_map_state since it duplicates
-> information already available in the pgmap structure. The bus_offset
-> is only used in one location (pci_p2pdma_bus_addr_map) and is always
-> identical to pgmap->bus_offset.
->=20
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> ---
->  drivers/pci/p2pdma.c       | 1 -
->  include/linux/pci-p2pdma.h | 3 +--
->  2 files changed, 1 insertion(+), 3 deletions(-)
->=20
-> diff --git a/drivers/pci/p2pdma.c b/drivers/pci/p2pdma.c
-> index da5657a020074..274bb7bcc0bc5 100644
-> --- a/drivers/pci/p2pdma.c
-> +++ b/drivers/pci/p2pdma.c
-> @@ -1009,7 +1009,6 @@ void __pci_p2pdma_update_state(struct pci_p2pdma_ma=
-p_state *state,
->  {
->  	state->pgmap =3D page_pgmap(page);
->  	state->map =3D pci_p2pdma_map_type(state->pgmap, dev);
-> -	state->bus_off =3D to_p2p_pgmap(state->pgmap)->bus_offset;
->  }
-> =20
->  /**
-> diff --git a/include/linux/pci-p2pdma.h b/include/linux/pci-p2pdma.h
-> index 075c20b161d98..b502fc8b49bf9 100644
-> --- a/include/linux/pci-p2pdma.h
-> +++ b/include/linux/pci-p2pdma.h
-> @@ -146,7 +146,6 @@ enum pci_p2pdma_map_type {
->  struct pci_p2pdma_map_state {
->  	struct dev_pagemap *pgmap;
->  	enum pci_p2pdma_map_type map;
-> -	u64 bus_off;
->  };
-> =20
->  /* helper for pci_p2pdma_state(), do not use directly */
-> @@ -186,7 +185,7 @@ static inline dma_addr_t
->  pci_p2pdma_bus_addr_map(struct pci_p2pdma_map_state *state, phys_addr_t =
-paddr)
->  {
->  	WARN_ON_ONCE(state->map !=3D PCI_P2PDMA_MAP_BUS_ADDR);
-> -	return paddr + state->bus_off;
-> +	return paddr + to_p2p_pgmap(state->pgmap)->bus_offsetf;
->  }
-> =20
->  #endif /* _LINUX_PCI_P2P_H */
+...
 
-Looks like you're relying on this bogus code getting resolved in the
-next patch...
+> 
+> This change needs to be squashed into
+> PATCH 3/12 vsock: add netns to af_vsock core
+> 
+> To avoid build breakage.
+> 
+> Likewise with the other change to vsock_loopback_seqpacket_allow below.
+> And I think also for a number of other changes made by PATCH 3/12.
+> 
+> Please make sure that patches don't introduce transient build failures.
+> It breaks bisection.
 
-In file included from kernel/dma/direct.c:16:
-./include/linux/pci-p2pdma.h: In function =E2=80=98pci_p2pdma_bus_addr_map=
-=E2=80=99:
-./include/linux/pci-p2pdma.h:188:24: error: implicit declaration of functio=
-n =E2=80=98to_p2p_pgmap=E2=80=99 [-Wimplicit-function-declaration]
-  188 |         return paddr + to_p2p_pgmap(state->pgmap)->bus_offsetf;
-      |                        ^~~~~~~~~~~~
-./include/linux/pci-p2pdma.h:188:50: error: invalid type argument of =E2=80=
-=98->=E2=80=99 (have =E2=80=98int=E2=80=99)
-  188 |         return paddr + to_p2p_pgmap(state->pgmap)->bus_offsetf;
-      |                                                  ^~
-./include/linux/pci-p2pdma.h:189:1: error: control reaches end of non-void =
-function [-Werror=3Dreturn-type]
-  189 | }
-      | ^
+Will do, thanks!
 
-to_p2p_pgmap() is a static function and struct pci_p2pdma_pagemap
-doesn't have a bus_offsetf member.  Thanks,
+> 
+> 
+> On the topic of vsock_loopback_seqpacket_allow, also:
+> 
+> * Please line wrap this so that the code is 80 columns wide or less,
+>   as is still preferred for Networking code.
+> 
+>   Flagged by checkpatch.pl --max-line-length=80
+> 
+> * Can we move the definition of vsock_loopback_seqpacket_allow() here?
+>   The function itself is is trivial. And doing so would avoid a forward
+>   declaration.
+> 
+> >  static bool vsock_loopback_msgzerocopy_allow(void)
+> >  {
+> >  	return true;
+> 
+> ...
+> 
+> > +int vsock_loopback_init_net(struct net *net)
+> > +{
+> > +	net->vsock.loopback = kmalloc(GFP_KERNEL, sizeof(struct vsock_loopback));
+> > +	if (!net->vsock.loopback)
+> > +		return -ENOMEM;
+> > +
+> > +	return vsock_loopback_init_vsock(net->vsock.loopback);
+> > +}
+> > +
+> > +void vsock_loopback_exit_net(struct net *net)
+> > +{
+> > +	vsock_loopback_deinit_vsock(net->vsock.loopback);
+> > +	kfree(net->vsock.loopback);
+> > +}
+> 
+> I think EXPORT_SYMBOL_GPL is needed for both vsock_loopback_exit_net and
+> vsock_loopback_init_net for the case where CONFIG_VSOCKETS=m
+> 
+> Also, in Kconfig VSOCKETS_LOOPBACK depends on VSOCKETS. But this code adds
+> a reverse dependency. As it stands it's possible to configure VSOCKETS
+> without VSOCKETS_LOOPBACK, which will not compile.
+> 
+> Perhaps stub implementations of vsock_loopback_init_net and
+> vsock_loopback_exit_net should be implemented in af_vsock.h if
+> VSOCKETS_LOOPBACK is not enabled?
+> 
 
-Alex
+Roger that, makes sense. Thanks for the review!
 
+Best,
+Bobby
 
