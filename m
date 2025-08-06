@@ -1,163 +1,131 @@
-Return-Path: <kvm+bounces-54077-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54078-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94A47B1BDBD
-	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 02:10:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F8F1B1BE07
+	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 02:50:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9B3327A84DE
-	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 00:08:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D931118A1593
+	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 00:51:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34A8E749C;
-	Wed,  6 Aug 2025 00:09:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C08114B953;
+	Wed,  6 Aug 2025 00:50:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="juTmG/Vo"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KL7wxIz8"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08D64136E
-	for <kvm@vger.kernel.org>; Wed,  6 Aug 2025 00:09:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37574AD2C
+	for <kvm@vger.kernel.org>; Wed,  6 Aug 2025 00:50:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754438995; cv=none; b=nqDQRazR7jbL+aXg/5Ix9Oq3LxlGEsZC2bdU9IBCzvDGWZwIwz9Nk8WP3J7t2SPI6iP4pWZgQ913XAOpOrtiR1PH1Dwt+5cLxgwcoakBBGCIFcKXfxNfOklEoH86FE6xBzez2/3ev1470V+G77sG2NRXVeSNilVVUyqU6jlfa7U=
+	t=1754441442; cv=none; b=gXArO9O/C9GfSWorKVUPUostVwIcKwplMDgRsdfOUJnFBU9UZtsBPkzNzYstiKQBJzFWWwT9C+W9b3wMd6BHqF9o9ALKqtPPsrGqFYSEFg98g4zIpg4en565ZPV1BHHtsY7uYWlzw+Gf7RdVFQ8ICC7z5uOCz15cdYPL19XdBBM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754438995; c=relaxed/simple;
-	bh=ZOQsJI4hllbXPJNAkCrOFd9A4zdldwqNbRW4Sk03H0k=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gcb3vgTIjRrsxI6JKVI4q4hPINkYY7jAed8z8qvsLtd5INLeqavEBNARhTzJ8AiQOYfsnIYO/OaShCTRnIC8ur3obFpGkhIB9J5qRe+IPbd1pVJoFMoiUPpyonAiIPn8B1BOCxYB3Im08B9DTXfVrYEpm2A1SbRGrSHKjomj8qA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=juTmG/Vo; arc=none smtp.client-ip=209.85.214.180
+	s=arc-20240116; t=1754441442; c=relaxed/simple;
+	bh=IeVA0NaJz5e3d8CujHkpUIBK8kfZWpMLR45yOgnHLRA=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=ISq3sFp+48PIou2HK+V7fB/ShfUFgM3zf/EJfMSoVRbepks+js8kxIkMO53RzDTZgO4y8U5PMAKQp0uMYkMr+UecZ4YHmdHWWp4G/sd9dlguMf95ahyfiu0qcaptFyDv7sAgh6peTaNJMA1Krlx05AKjOSN44RgJiCAm6u1fgTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KL7wxIz8; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-240708ba498so53625ad.1
-        for <kvm@vger.kernel.org>; Tue, 05 Aug 2025 17:09:53 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-31f32271a1fso502459a91.0
+        for <kvm@vger.kernel.org>; Tue, 05 Aug 2025 17:50:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754438993; x=1755043793; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6I8HsqNpJhHWG5dLzFn7X6r6TawwSMkwMRxzvdZ6JwA=;
-        b=juTmG/VoaZF8EpHaHwk1AiWvBGC/rsx7tFmWuvUXqYEfEQrGC8HvultKusfcXDK3U+
-         t112rf225YJWYw+8GDIgQXq+PKw1cyoGJ6OYjvca94a7EnmbaN17rUK9+z3LMDG+5g6K
-         5MXXvMc7MVVdCNQdW/tUfDS7SrekjUNbzIv79d4YhgFQIj9zArBTqkDrGtc8ykDN8+eg
-         lIBjXtj2ol+h0UP2BfuBDydTLg1QsOLd2lirCDNKeCmWdGa4JLHi/YH6oQfg17A5Pb2v
-         6U6wBgkfjhVJO8BP8DZZhFbP1PB7ecdIbMIgJ3+RFhn8lnN1RWmcLXZnn1aXynHj3lTK
-         T2WA==
+        d=google.com; s=20230601; t=1754441440; x=1755046240; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=wkVY/voLoVdW57wTp815+eh0ROGJmnXwTEje5ztA/CM=;
+        b=KL7wxIz8Hw//BJ6zUTYP6gAHaJY8+v7hHdSfNE+UFyeLo2LxPpT32laO2S4SbKJuHe
+         1KTdeepe5HfNaESlgRyhBii1e8Cbw+ivPXqyXRB3yjDWrI9ozzlaAzbtF/3u037pVyTZ
+         6Fme2APVbmU0Mnz3YWYjMY58FEVsxg8yOH7XEvTfoLZ0FChj0qJTzbxL9j1hAKaakpeV
+         tNsPcUVVLOnkMcBVXnjlovtRhPBwShjgzai2WhhI1D0vwTxX6rc2zCbqeRoIcRxUycGq
+         1/OVBU2rO1068itXLCkxpJ+6zA0wsI+RsnR5YgWefKdgawpH0i6Z3HX2ffvGbpXRFLCA
+         4RQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754438993; x=1755043793;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6I8HsqNpJhHWG5dLzFn7X6r6TawwSMkwMRxzvdZ6JwA=;
-        b=UHwsQibL3wnXF68k1hkix6zMxRWkQjf5IhPK6hSeotqtKU0WHRrEj/JyXTu9zkFUAQ
-         w0EyryNmGkB/czGfaAnxHkr4O+CXka2bW48mRg6aSDp4kv5NfD6xD9L/2F1cFxCaC2/X
-         xvslfcVf6STPC8Gzfhd7bKb5CtbZTVqtFTqci7q2ly5StBFYmRUcBWY4f5a55ZZ6xwIF
-         DFcosBg9W3sHmZA7IH8zhrLPDz9TzQmEkFTwPTg44jTqUSZL8hoxmyNXb7o14jsOzfsi
-         5Cdp5lw0oI6sXOds6n3S7BPDewe/Ha75XJZGBGH8soxvpXuxiGY8Kaqy3RF9s70+CcQx
-         Nmqg==
-X-Forwarded-Encrypted: i=1; AJvYcCW28Y9bQ50BRCXEKjJouL+SEr9xIxPPOq53u1eg1wqENeXBLlpX8dKnblm2MRXrgVm2zxo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz0OQbbc7RNcVVXzgNdYz4QdHxh2THlA0froys9qWPslkAwgZUM
-	4T0Fx34CdwAhCg8W7h4I8c6WJWn/3Oif4pBeXuZ7aRk3sqAMtmMBZTUST6SRwd+R/9gFYcGgBCs
-	q/gTFTwUWHtpWEoQVXxka4Yt+fkQlTzct/IRn4pXg
-X-Gm-Gg: ASbGncs63C6RdpCItQkH6YP+V7ChBu+G2d6Qevrle891vZxSf2s3NNhvqE3sCEwVwVZ
-	5x0BOGOfDZdqEAUc2GAp84US6Zb7fX1NQ8ACy43nySnXPdOBnYTt3cfz6vT5oO2gbSZfmeVdrcn
-	7wGxqiZLMwdfgqSz3U/xieKPbJpkWyWYaUsZMwFnxxfncVqHgDkFy1e/OSuFXZed5X6CdLQ5yH1
-	hHkjd38x82I/5hmFBCAiq3J1P5SyOfcQG5iog==
-X-Google-Smtp-Source: AGHT+IFgK86TDS44ZXL6s1kOzOAnW/EHzdJN0Sj3gIaGmBtwp+yGICBZG/enSUARPg61J2n1DVpx5A/bVG/pmazuRVg=
-X-Received: by 2002:a17:902:f70e:b0:240:469a:7e23 with SMTP id
- d9443c01a7336-2429ecf9ec0mr1693505ad.20.1754438992714; Tue, 05 Aug 2025
- 17:09:52 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1754441440; x=1755046240;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wkVY/voLoVdW57wTp815+eh0ROGJmnXwTEje5ztA/CM=;
+        b=VH7vVlx0xU0+x7Y2UeX4Nz5v3k68pokKh6zfqjFz64LXfJyhN7uuPDghX9h8XPydYk
+         j7HMC5t79XzeUXYv/pbRUsVvocnDwKEUdt+AZilfkr0fu0k1fr4F7BbxofSyDaNuRAZu
+         TwGtqSpSUdHu4mRDXc8kOSdjVmXwxkBcpRWFFaDF3nzY9SjSJdH54p3TV25REwdEDfpt
+         BqW31LOFJFb/4zOBR7zHff1+deg7QHJoOtUeVAi/4XN5zt9fIgCoS8BWGKZ66eV87Yv0
+         00TUiqERjzrvW5taI118Dc/O/JzHjExRDZ3hz5R0Yz9huYhNGf3rmrwfKoNXqVSbA+BB
+         vZiw==
+X-Forwarded-Encrypted: i=1; AJvYcCV7/rl92w/cDkvYpSxgHeo1bXXKeO/Xu2vWJ9NndLhhqX+tsfy88UZBy0GEtN/cSqbJf+w=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyb7O66bu+jNiIuLp1hQUg4xUdFfLE3wX+qwoP0wI1YnqqJuNIi
+	h0e3lZ0GJ7M2DTZhNNODKIbIcsDY7FPC4i6shDGgE+fjZfvdBwQu8wyqX43vYa1N4eJNpdl+07Q
+	hxMRjew==
+X-Google-Smtp-Source: AGHT+IHwbSUlGzQdJh5v7u8nF3mi6DLtG6ynJApkXTSM8sjtJ0k70c50LW/04rw/1spWGkR16CWnSmVQgAk=
+X-Received: from pjbsg14.prod.google.com ([2002:a17:90b:520e:b0:31e:cdb5:aa34])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:d606:b0:321:1348:4438
+ with SMTP id 98e67ed59e1d1-32166969b3amr1026957a91.7.1754441440558; Tue, 05
+ Aug 2025 17:50:40 -0700 (PDT)
+Date: Tue, 5 Aug 2025 17:50:39 -0700
+In-Reply-To: <aJFWK-EiGgH5aiw1@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <aHUmcxuh0a6WfiVr@google.com> <aHWqkodwIDZZOtX8@yzhao56-desk>
- <aHoQa4dBSi877f1a@yzhao56-desk.sh.intel.com> <CAGtprH9kwV1RCu9j6LqToa5M97_aidGN2Lc2XveQdeR799SK6A@mail.gmail.com>
- <aIdHdCzhrXtwVqAO@yzhao56-desk.sh.intel.com> <CAGtprH-xGHGfieOCV2xJen+GG66rVrpFw_s9jdWABuLQ2hos5A@mail.gmail.com>
- <aIgl7pl5ZiEJKpwk@yzhao56-desk.sh.intel.com> <6888f7e4129b9_ec573294fa@iweiny-mobl.notmuch>
- <aJFOt64k2EFjaufd@google.com> <CAGtprH9ELoYmwA+brSx-kWH5qSK==u8huW=4otEZ5evu_GTvtQ@mail.gmail.com>
- <aJJimk8FnfnYaZ2j@google.com>
-In-Reply-To: <aJJimk8FnfnYaZ2j@google.com>
-From: Vishal Annapurve <vannapurve@google.com>
-Date: Tue, 5 Aug 2025 17:09:39 -0700
-X-Gm-Features: Ac12FXymbfJdEF0wBMOYP6-B3-5IXJh93gxKyNMf-PV_-6yUB3ZSwu9ht5Cy8wI
-Message-ID: <CAGtprH9JifhhmTdseXLi9ax_imnY5b=K_+_bhkTXKSaW8VMFRQ@mail.gmail.com>
-Subject: Re: [RFC PATCH] KVM: TDX: Decouple TDX init mem region from kvm_gmem_populate()
-To: Sean Christopherson <seanjc@google.com>
-Cc: Ira Weiny <ira.weiny@intel.com>, Yan Zhao <yan.y.zhao@intel.com>, 
-	Michael Roth <michael.roth@amd.com>, pbonzini@redhat.com, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, rick.p.edgecombe@intel.com, kai.huang@intel.com, 
-	adrian.hunter@intel.com, reinette.chatre@intel.com, xiaoyao.li@intel.com, 
-	tony.lindgren@intel.com, binbin.wu@linux.intel.com, dmatlack@google.com, 
-	isaku.yamahata@intel.com, david@redhat.com, ackerleytng@google.com, 
-	tabba@google.com, chao.p.peng@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20250324173121.1275209-1-mizhang@google.com> <20250324173121.1275209-21-mizhang@google.com>
+ <a700ab4c-0e8d-499d-be71-f24c4a6439cf@amd.com> <aG6QeTXrd7Can8PK@google.com>
+ <7dc97db7-5eea-4b65-aed3-4fc2846e13a6@linux.intel.com> <aIlpaL-yEU_0kgrD@google.com>
+ <7de2b6ed-af39-4434-9ead-5b06ed4761c5@linux.intel.com> <aI1OefS8b9vfHyu9@google.com>
+ <aJFWK-EiGgH5aiw1@google.com>
+Message-ID: <aJKm3zawEkrHT6Ms@google.com>
+Subject: Re: [PATCH v4 20/38] KVM: x86/pmu: Check if mediated vPMU can
+ intercept rdpmc
+From: Sean Christopherson <seanjc@google.com>
+To: Dapeng Mi <dapeng1.mi@linux.intel.com>
+Cc: Sandipan Das <sandipan.das@amd.com>, Mingwei Zhang <mizhang@google.com>, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Aug 5, 2025 at 12:59=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> On Mon, Aug 04, 2025, Vishal Annapurve wrote:
-> > On Mon, Aug 4, 2025 at 5:22=E2=80=AFPM Sean Christopherson <seanjc@goog=
-le.com> wrote:
-> > > : 4) For SNP, if src !=3D null, make the target pfn to be shared, cop=
-y
-> > > : contents and then make the target pfn back to private.
-> > >
-> > > Copying from userspace under spinlock (rwlock) is illegal, as accessi=
-ng userspace
-> > > memory might_fault() and thus might_sleep().
-> >
-> > I would think that a combination of get_user_pages() and
-> > kmap_local_pfn() will prevent this situation of might_fault().
->
-> Yes, but if SNP is using get_user_pages(), then it looks an awful lot lik=
-e the
-> TDX flow, at which point isn't that an argument for keeping populate()?
+Trimmed the Cc substantially, I'm guessing most folks don't need a play-by-play
+update of misguided optimism. 
 
-Ack, I agree we can't ditch kvm_gmem_populate() for SNP VMs. I am ok
-with using it for TDX/CCA VMs with the fixes discussed in this RFC.
+On Mon, Aug 04, 2025, Sean Christopherson wrote:
+> On Fri, Aug 01, 2025, Sean Christopherson wrote:
+> > On Wed, Jul 30, 2025, Dapeng Mi wrote:
+> > > 
+> > > On 7/30/2025 8:38 AM, Sean Christopherson wrote:
+> > > > On Tue, Jul 29, 2025, Dapeng Mi wrote:
+> > > >> BTW, Sean, may I know your plan about the mediated vPMU v5 patch set? Thanks.
+> > > > I'll get it out this week (hopefully tomorrow).
+> > > 
+> > > Thumbs up! Thanks.
+> > 
+> > I lied, I'm not going to get it out until Monday.  Figuring out how to deal with
+> > instruction emulation in the fastpath VM-Exit handlers took me longer than I was
+> > hoping/expecting.
+> > 
+> > It's fully tested, and I have all but one changelog written, but I'm out of time
+> > for today (I made a stupid goof (inverted a !) that cost me an ~hour today, *sigh*).
+> > 
+> > Unless I get hit by a meteor, I'll get it out Monday.
+> 
+> *sigh*
+> 
+> Wrong again (fortunately, I didn't get hit by a meteor).  Long story short, I
+> revisited (yet again) how to deal with enabling the mediated PMU.  I had been
+> doing almost all of my testing with a hack to force-enable a mediated PMU, and
+> when it came time to rip that out, I just couldn't convince myself that requiring
+> userspace to enable KVM_CAP_PMU_CAPABILITY was the best behavior (I especially
+> hated that PMU support would silently disappear).
+> 
+> So, bad news is, v5 isn't happening today.  Good news is that I think I figured
+> out a not-awful solution for enabling the mediated PMU.  I'll post details (and
+> hopefully v5) tomorrow.
 
->
-> > Memory population in my opinion is best solved either by users assertin=
-g
-> > ownership of the memory and writing to it directly or by using guest_me=
-mfd
-> > (to be) exposed APIs to populate memory ranges given a source buffer. I=
-MO
-> > kvm_gmem_populate() is doing something different than both of these opt=
-ions.
->
-> In a perfect world, yes, guest_memfd would provide a clean, well-defined =
-API
-> without needing a complicated dance between vendor code and guest_memfd. =
- But,
-> sadly, the world of CoCo is anything but perfect.  It's not KVM's fault t=
-hat
-> every vendor came up with a different CoCo architecture.  I.e. we can't "=
-fix"
-> the underlying issue of SNP and TDX having significantly different ways f=
-or
-> initializing private memory.
->
-> What we can do is shift as much code to common KVM as possible, e.g. to m=
-inimize
-> maintenance costs, reduce boilerplate and/or copy+paste code, provide a c=
-onsistent
-> ABI, etc.  Those things always need to be balanced against overall comple=
-xity, but
-> IMO providing a vendor callback doesn't add anywhere near enough complexi=
-ty to
-> justify open coding the same concept in every vendor implementation.
+Too hopeful yet again.  I realized at the last minute that I neglected to add
+support for disabling PMU MSR interception for L2 after rebasing on the MSR
+interception cleanups.  Adding the code back was easy, but I need to test it.
 
-Ack. My goal was to steer this implementation towards reusing existing
-KVM synchronization to protect guest memory population within KVM
-vendor logic rather than relying on guest_memfd filemap lock to
-provide the needed protection here. That being said, I agree that we
-can't solve this problem cleanly in a manner that works for all
-architectures.
+I'm buried in meetings tomorrow, but there's a small chance I'll be able to squeak
+out v5.
 
