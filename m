@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-54153-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54155-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9860EB1CCDE
-	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 22:01:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 44658B1CCE1
+	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 22:01:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B2B67234B7
-	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 20:01:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A519E620445
+	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 20:01:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DE4D2D375F;
-	Wed,  6 Aug 2025 19:57:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B9D12D3A70;
+	Wed,  6 Aug 2025 19:57:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pGBJ+uSW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sKnxSDF6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9087B2D239B
-	for <kvm@vger.kernel.org>; Wed,  6 Aug 2025 19:57:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 435772D29CA
+	for <kvm@vger.kernel.org>; Wed,  6 Aug 2025 19:57:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754510274; cv=none; b=fKd1dP2OoAkIW+uCdwTWzVRxvhvHvihfpM5tOMqUW5AxG7UN9JwbAsrNyZoRDus8L+GRVfrKPOwh3NpsdvN6RHRB91zuzYlDcONxgcC4I/r0dM7RZsmFhu6k2M5mLznbtiJUXu84ctehF/S6vbUuZwdlDF1N4IktHXhV55moA7Y=
+	t=1754510275; cv=none; b=Pnht8U4rxM3sSmdplWZxxASdIMY2SGhgPErASBfE0lSNHoBpffPrK+KQW3CrQMRRtB9VUlCPlFmdomR/FI5KjNKzBS1QUL7FdbJgKIJkL9XbnB8bafuL+xB+vLCzRyAzaUAKZAbDcgiqrBMIarh26PHqJ3gx8y9fhzmss4Ax4II=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754510274; c=relaxed/simple;
-	bh=Bb1MCKlidS4HUVTcCu642tswWStbNqiXpa6NcxDtYbk=;
+	s=arc-20240116; t=1754510275; c=relaxed/simple;
+	bh=jdq1crWcKn8y7XDSp99YavaEpnm3s9VMlFDhCc8MHB4=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=QSxj2CVBKd6mGFEPT9wTWvip6u/v7C8Hjczv0QfwX3p30F2wz0BKhDJyh4zVixh2pn1+dhlEfFg9MHFLiXi0dfGrUWiEG0w28jiTXACHbfiwc094GWrMQJqkn5RNh6Cm6h06vkXJlf3G+WQMKAk1R7NYmkpu1G8Mxy9jM79HExM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pGBJ+uSW; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=BPNY3+2Wa9MmwujUd6/sTrTL7ID2P05m2oZX/o2cJdtmvWaEjv42wGG0a903cusGi2if8Rj1upXMhQ7G6AwDOduFjixMEUcgXSfIUbhd+MNzb93lM2dtA65vCYl40NXHSA5tj7tBBgEzF97bSrjOg/T54NcZToz+2+8yoh5ZibA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sKnxSDF6; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-31f65d519d3so468875a91.2
-        for <kvm@vger.kernel.org>; Wed, 06 Aug 2025 12:57:51 -0700 (PDT)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b4227538a47so134678a12.1
+        for <kvm@vger.kernel.org>; Wed, 06 Aug 2025 12:57:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754510270; x=1755115070; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1754510272; x=1755115072; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=P+6kUSR5aBTgNcunERrWOcQMCZiG0moZeRQ0turCJ94=;
-        b=pGBJ+uSWmY4u2nY77yBijaQ3pMQAq32EqtGrVokpellFCEw6GPtef9oej+go+VN3I3
-         Sq5svNwPiH82SYrZeJinnAa2YMkUdBujXyglUR2OImyeJBRhKpQQpG9py2/v+3G+ncOF
-         7Rf40w9xO1TFBSjh0FXPu0hKqPe2JyHd65kH9G131jwI3FhQBBCyM4hJ0Ta6e80/z12d
-         fhLNiCtFwFINpHkrfbI9nghTiO+tUfM+UnARDMfORgb4jyveWWhsAOcuMIaFmVAk54QK
-         /k9KAWqE/sn93EILPowyW2z9Ir91XNmlVpr+XHtFxbpxWP4gWBn6Ik31zh4M8hY1uDwi
-         qRQA==
+        bh=YZMeMFDLZr+yCjindHzAam67OkhMlNf3hlQ7J9N+n2w=;
+        b=sKnxSDF6OzUh1O9m+DYJ84S2phrfAp9JUuB4ymZSub5iyiXZPwdD9+IbR2QFOZBYxD
+         vhJbTii22o6Wo1vGPh4cm1O3YetTXyoXrKOP3k1HTndboNPVO909lBkA+/pq9vNsvZKo
+         PgjMTdMNx9il0FdTnhxGhMUZcpNbFDfPjPAhOCj7WYSbGgMuzDooW4giPYpLxETuL5w3
+         /HtC4trCo/9jY6SSalI+/37npQ5ZXErfi5ahnGlWevemkZHGbaHH+YB6onilxP70llNQ
+         lhtWVmA3bK4Qxxe/xQRV7LsbLGXqnnWRCRkBU1BC9Z3q43WdnWisiyieuThBh7Bo5WTb
+         1ugw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754510270; x=1755115070;
+        d=1e100.net; s=20230601; t=1754510272; x=1755115072;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=P+6kUSR5aBTgNcunERrWOcQMCZiG0moZeRQ0turCJ94=;
-        b=pGL2Cjc0guUhLSRwUO2Y3yLm8gQEXptM7dIRoT6b3BM8Wp2yuBnYyHjyA4Sg3obkcc
-         eRRSHsUc7Hz7ieuwKbqebVzeIrDT6RpEwLUE11Bh25+PXFLRCE0E/3Dl80aWc6hNhP2C
-         U5jlES3JkrWl1Qcnv5BfDTWJp9jAixSL5M3nKzK2zEYemtDKFnZHLqRCE/UvIgM4bOQu
-         o63LHQhpsTIHcLVTpczgzoFje5k7Lqi2cu1y9Vuo+zvszw+JkCCWiHsql9wxOCOZFT4g
-         CHXFOszTo6GIGUBMe+PAA2oml9XJR+XEEUKeAFu/pwvraViL3M7SB2/Ky+w/QgFYOTPk
-         kYAg==
-X-Forwarded-Encrypted: i=1; AJvYcCWq8NCIATX2b0OnWeSNARIpj3zXsSlNgtsjuYv7EgUQkrqoeBARj9O1YIELyZeYu6YfEsA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwUdBLJ2FV+QTHOVe5oe/nkFDZucjWbqmE+ySNs3fO2Nn8HcFNP
-	8wkvFnWfTFm6Mg1v1Xm+upbSEbg2mkPB0NXCHBDuKC6UfhWgIPhL2AJAD2oIjE64Vy7wXNTo1iY
-	GjkqRaA==
-X-Google-Smtp-Source: AGHT+IF3NS6j+zPTC7HBpb/PhEo054/sULoDCrTNDdSbB3JBoD67HO9NJP/SyaYTvqhMXFbG0IGQUgBSmnM=
-X-Received: from pjbeu16.prod.google.com ([2002:a17:90a:f950:b0:31f:28cf:d340])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:e7d0:b0:312:ea46:3e66
- with SMTP id 98e67ed59e1d1-32166ca3f0bmr5365514a91.21.1754510270478; Wed, 06
- Aug 2025 12:57:50 -0700 (PDT)
+        bh=YZMeMFDLZr+yCjindHzAam67OkhMlNf3hlQ7J9N+n2w=;
+        b=pCpEDWBrSoPqLieV5wa5rTa3/+MMWxcmyaRc4Gv3tPXI8Cx4OIS4iz4PN/iYGibY0d
+         ZrcjeTuqykpttLwkbVGlK9clcf8s5+oZabD50cvNl6IL6DAzqmQx99B2NjCyIw81W4Bp
+         7Ou2GTKOXAwhjhDL/3698kh4mcZDKNxSaWhL6ycHnMqPcWO6ZjdejaTbbKgc5PHFJnO6
+         j1gQ6voOIlLrl9mH1tEtzIhmqC9NwlchyBVNWo0QAWj6LbVlk2Dyaj7n4dea3GNsrRf2
+         TS2f9GhbdbKVJImtBOpdwwC7uYRdBBniNXpISuelODh2K39LajdXSSiOc9sLdOEycRbk
+         pCwA==
+X-Forwarded-Encrypted: i=1; AJvYcCUDwGPqWFyDXxuXcCiwYik1LOvCCU1rfAPISFEVyoEmyUqAiRvNDYmM3e4rfrvetuiHyd4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz63ojbMJg7ChODIOUOZYTkL2WK4A/DhMxcVyzgOQ0J/i8emSwV
+	HMPS2fZOaCdx+QZ1vXPi3dCDrCePTZNmxFHVljlM2uuNnH3ORRthyfFFWS03ofPK5V+t0ndTRmm
+	Kpq30hg==
+X-Google-Smtp-Source: AGHT+IFt32OpTUGU6us4Rz359zlOuJVL+j3ifqAbqQAET68s3resGqbQqEcv8vf6Ss5FatBMSRwumXjkA8M=
+X-Received: from pjbso3.prod.google.com ([2002:a17:90b:1f83:b0:311:1a09:11ff])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:e784:b0:240:9f9:46a0
+ with SMTP id d9443c01a7336-242b1aa312cmr4180365ad.38.1754510272385; Wed, 06
+ Aug 2025 12:57:52 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed,  6 Aug 2025 12:56:34 -0700
+Date: Wed,  6 Aug 2025 12:56:35 -0700
 In-Reply-To: <20250806195706.1650976-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -76,8 +76,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250806195706.1650976-1-seanjc@google.com>
 X-Mailer: git-send-email 2.50.1.565.gc32cd1483b-goog
-Message-ID: <20250806195706.1650976-13-seanjc@google.com>
-Subject: [PATCH v5 12/44] perf/x86/intel: Support PERF_PMU_CAP_MEDIATED_VPMU
+Message-ID: <20250806195706.1650976-14-seanjc@google.com>
+Subject: [PATCH v5 13/44] perf/x86/amd: Support PERF_PMU_CAP_MEDIATED_VPMU for
+ AMD host
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
@@ -96,45 +97,38 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	Dapeng Mi <dapeng1.mi@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"
 
-From: Kan Liang <kan.liang@linux.intel.com>
+From: Sandipan Das <sandipan.das@amd.com>
 
-Apply the PERF_PMU_CAP_MEDIATED_VPMU for Intel core PMU. It only indicates
-that the perf side of core PMU is ready to support the mediated vPMU.
-Besides the capability, the hypervisor, a.k.a. KVM, still needs to check
-the PMU version and other PMU features/capabilities to decide whether to
-enable support mediated vPMUs.
+Apply the PERF_PMU_CAP_MEDIATED_VPMU flag for version 2 and later
+implementations of the core PMU. Aside from having Global Control and
+Status registers, virtualizing the PMU using the mediated model requires
+an interface to set or clear the overflow bits in the Global Status MSRs
+while restoring or saving the PMU context of a vCPU.
 
-Signed-off-by: Kan Liang <kan.liang@linux.intel.com>
+PerfMonV2-capable hardware has additional MSRs for this purpose, namely
+PerfCntrGlobalStatusSet and PerfCntrGlobalStatusClr, thereby making it
+suitable for use with mediated vPMU.
+
+Signed-off-by: Sandipan Das <sandipan.das@amd.com>
 Signed-off-by: Mingwei Zhang <mizhang@google.com>
-[sean: massage changelog]
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/events/intel/core.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ arch/x86/events/amd/core.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
-index c2fb729c270e..3d93fcf8b650 100644
---- a/arch/x86/events/intel/core.c
-+++ b/arch/x86/events/intel/core.c
-@@ -5322,6 +5322,8 @@ static void intel_pmu_check_hybrid_pmus(struct x86_hybrid_pmu *pmu)
- 	else
- 		pmu->intel_ctrl &= ~(1ULL << GLOBAL_CTRL_EN_PERF_METRICS);
+diff --git a/arch/x86/events/amd/core.c b/arch/x86/events/amd/core.c
+index b20661b8621d..8179fb5f1ee3 100644
+--- a/arch/x86/events/amd/core.c
++++ b/arch/x86/events/amd/core.c
+@@ -1433,6 +1433,8 @@ static int __init amd_core_pmu_init(void)
  
-+	pmu->pmu.capabilities |= PERF_PMU_CAP_MEDIATED_VPMU;
-+
- 	intel_pmu_check_event_constraints(pmu->event_constraints,
- 					  pmu->cntr_mask64,
- 					  pmu->fixed_cntr_mask64,
-@@ -6939,6 +6941,9 @@ __init int intel_pmu_init(void)
- 			pr_cont(" AnyThread deprecated, ");
- 	}
+ 		amd_pmu_global_cntr_mask = x86_pmu.cntr_mask64;
  
-+	/* The perf side of core PMU is ready to support the mediated vPMU. */
-+	x86_get_pmu(smp_processor_id())->capabilities |= PERF_PMU_CAP_MEDIATED_VPMU;
++		x86_get_pmu(smp_processor_id())->capabilities |= PERF_PMU_CAP_MEDIATED_VPMU;
 +
- 	/*
- 	 * Many features on and after V6 require dynamic constraint,
- 	 * e.g., Arch PEBS, ACR.
+ 		/* Update PMC handling functions */
+ 		x86_pmu.enable_all = amd_pmu_v2_enable_all;
+ 		x86_pmu.disable_all = amd_pmu_v2_disable_all;
 -- 
 2.50.1.565.gc32cd1483b-goog
 
