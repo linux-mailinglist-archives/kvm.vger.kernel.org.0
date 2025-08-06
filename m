@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-54165-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54167-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F984B1CCF5
-	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 22:05:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48622B1CCF6
+	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 22:05:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2A61117A45B
-	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 20:05:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 04E98188611B
+	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 20:05:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 404912D94A7;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0D892D9787;
 	Wed,  6 Aug 2025 19:58:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mp40kJwt"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XWXz4ill"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A28672D59E5
-	for <kvm@vger.kernel.org>; Wed,  6 Aug 2025 19:58:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28DCC2D837E
+	for <kvm@vger.kernel.org>; Wed,  6 Aug 2025 19:58:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754510299; cv=none; b=R6L5EelyBFWqMqwRsVamXs9Nfc9/48ol4/jad6BKE4FZXtJj847kvhup62h3fh42x3o4dWZ2I6Vdtbb7ki0LKqCgDoZLaqhgqF/3uwvmT5heu+zP/GfXFzV4nD9bi3agvFye4wZjHpZQm8bsGe0fj/keqgTm36qkBiLrE6y0xi4=
+	t=1754510299; cv=none; b=JfWPNFA4T56yBAfm9c82JsB0MNRT+YGA4bAJEhfsbY/qYv+jyMpmDMuD2SPA7WZHX8LIkvAUkzq3A+n5YjF6UFZWPmvmpEPMdneJEGmfLE2eRLIDHVmahZGZASD3HWivEd46st5tatD0WI/CvM70tnXpt9EGLTZBjqutCd6K0WA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1754510299; c=relaxed/simple;
-	bh=HjF6VqOOZUHrkl/7iev8rEDWaKamWaXyDUM+ISWFM5M=;
+	bh=byG6xS28Uf7b/R4Aqls1ih01tm3g3UFbLNRST2TR/5c=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=CC4AOKY/Ydz02KD0+1jW1cHRbXT7P1MV68E6u5bRdAdT7Sv3ncz3Y8/vgJ7X2Mjiqpsxa8WFTc7q/8Yuy54ormivDRBn2OdUDNme+ouadDGLSS3/+Oa9Vwxyz3CSxJ2qwdh3E5x2bSPXOYycq/UcUGZTtSKj8OKDXa8dwNJmuy4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mp40kJwt; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=t8LSivJ4OiLPiHw9UjBTocxyhFLrmsz5wU3Z+zC5JCgBYRX9DlUSDY7pSOBTPlYGsa6rCIH3cD+xso6PJhUgoxcMLUUInKmQde4jYM1Zf6bYiV66QaV1OjdriPxyzAwoJ1/vPBgev9XCV+2wqERfif3WbYSkZm8pb0TKlbSz1Ic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XWXz4ill; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2400a0ad246so1472805ad.2
-        for <kvm@vger.kernel.org>; Wed, 06 Aug 2025 12:58:12 -0700 (PDT)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2400a0ad246so1472915ad.2
+        for <kvm@vger.kernel.org>; Wed, 06 Aug 2025 12:58:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754510291; x=1755115091; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1754510293; x=1755115093; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=/FX2+DfXNwgRGe/WbgJvV/8z8g7IlIB9y4b49oQ5nSU=;
-        b=mp40kJwttBkOnbdJqg+ZIXn87T5lnBzz+UDT//G0D1jdpLHYc1pMDbv5CIKfZUJz3n
-         QYriK5s4sfB1ZFLX4YZvZmRhKKRnXe3Edi+wIaaHH1zhPpj6+97rPxWh3C0hmfBSM0KP
-         YEQK2tikqxcgPjpDTFRXvVFB81LqhfngPbgHVakAoT205J5ygdHa/PJl6INv9Cvt9M0V
-         Y76LOcH5/ik2zmA1BJ7NIMAvlGMXakmrHhUdIZJ+YtZt82RiCeW52xe2Uh4BPsdbOhj6
-         nbVqqRnp6osme26eR66rcqCzS1nt7bs/cwvuQnWt/cEFeNEqeMtrtkKW4uq4ikcdBSAh
-         EPQw==
+        bh=Xgsu0fWGzXM1P0ieUy8M+NNgbe9X2+RcO7orAU+l0hA=;
+        b=XWXz4illZG+jNmDDjzIFMe1K6RKAAsAOg4ZY+lniQAtDlFJDh5wZqhT+AGop63xHxy
+         cl98U1Sr1vFAKdz98qWjmpsCLCdw6HPRoyjJaUZT02l0cqYWUFyjYnChifbLgBDIYL9C
+         uBNM0e7n00Mcc+FE+TbAqd9XTdcWE8NkyYgZknJ+dmTJGHF0Xz/fN13nmLl0DqlQNL41
+         J7MmjjK6tWNWNGnX6u83pnyiPact62OIJfmHNu3JBn1hRy2v+xaNxizA7WLkngRkUfo5
+         VuKd93w6gNen7N+ClJO0CBk9TapSZJttQjgf+CGxFjbzGbkd4YCopETY72hIqWbATOI/
+         IIOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754510291; x=1755115091;
+        d=1e100.net; s=20230601; t=1754510293; x=1755115093;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=/FX2+DfXNwgRGe/WbgJvV/8z8g7IlIB9y4b49oQ5nSU=;
-        b=sACpkVMKk1xP8VKBCGbcmVYHUu6D6cnTaYAtMP25Akw4DZLTk5+TlYglfXL8nkdp0w
-         ros07KH1YKwZ9F1QXIkxqhpfxjJo74Sg4RqfhF9z/X+z0yzVO7A6nXBxe2c6ihfmTxpy
-         KHn2cOZJTV+J6uTL2IDXizTbUMDb4pGK0Cr57i+/d/JvAn4m8Rw3DslE6uOggRnIKHWG
-         /YBzNf9VPCCCcINzeX2678oZUXi8ScWYBHa9gKvq9n46jI1Y5IYxYHfUnxv8J2zq0Igu
-         7KGfbl44Cs+hOUk9UbhqdjJIidcI2v7oxeq6UB2DFItJt9/QZsQCw1Od7QkkpZSG8YbR
-         x1GQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUY/0d2pukUvBKByEjyIfegAo9WBm9KBVlq/vBsV6vWJfUq6YY2dKHog97tUu6KYiTASMU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzhgP4xnKFW6UEqbU0aZQrsfydKFVi27muAy1zDBDDhqnCzOVaV
-	NGwgH8EAvXY592uGgofDmTaRay1u7/PqgwCUQKX/ziDXFyn724Nx6K9SWUlURGCjL+XmFtSTJAk
-	p0SM9yQ==
-X-Google-Smtp-Source: AGHT+IGe4jBR2KHz8e2goINgF4EUoH0wWvJHG6ysYfktepmzpkGXYfj1vM33eEgiesUpU8kg3lcTp4Ph7gE=
-X-Received: from plbmv16.prod.google.com ([2002:a17:903:b90:b0:231:de34:f9f6])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:98d:b0:240:417d:8115
- with SMTP id d9443c01a7336-2429ee89eb4mr58062565ad.16.1754510291288; Wed, 06
- Aug 2025 12:58:11 -0700 (PDT)
+        bh=Xgsu0fWGzXM1P0ieUy8M+NNgbe9X2+RcO7orAU+l0hA=;
+        b=T5sVPr61Mp/8pySvRLRD+Q3FOO2Uc5is2LBG40pe8DUDBg7FRqwEmIoaYvFV/4FTVx
+         UxK9HKpVJ37hYieU1azJ4fGk5mUv8+A3wQ5O595RvR2K2c6Pu7ygwgM1HerNkBysLEm7
+         M+h0iF+ATp2zJ1dzpWoOUjT/+a6/BGDBWSKZX//nEKUtzAl1MPdLG2aA82kmYw9G61ta
+         LUVrtvsB9N3Bg/AVfk6jaeuTcichT2C1d4s0JXW7R9zr0MMrVcUNwCIVHAzBwgIAj7T4
+         47xpYdQ+QIAvu8D/ciyluA+I63EBN3ckejOAMjBWauZ6tAKSYA3TOQwinZ1I1Zme4HHL
+         p4AA==
+X-Forwarded-Encrypted: i=1; AJvYcCUAccd5U8XCwPEdPQltqhlr7VFQXIx0G1JjVZfyZ4h4MzwzMMbNzHZAUgs90ShJhfx+3fw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKNtsYnxh04OPyFNWjO8XPzbf/sJN7RQ1K6VYgDjul0KfR4iSr
+	qdMgQ9goY3LsTEzKDC8OKwkMYfwGVmWigbu7iqww61iw65KUZIEAqUIdvWb6F0PflQDfqS9AmOK
+	sbKwO8g==
+X-Google-Smtp-Source: AGHT+IGjOVjMJgLz2fS/cn5FiFF0L2j0BQ8Kgspjt+cfMRIO/JKDaNYzPFPk3n1FGowkS6X5Jtr/S5JnoBk=
+X-Received: from pjbgf4.prod.google.com ([2002:a17:90a:c7c4:b0:312:ea08:fa64])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:3504:b0:240:3e72:efb3
+ with SMTP id d9443c01a7336-2429f42fa4cmr56513685ad.43.1754510293150; Wed, 06
+ Aug 2025 12:58:13 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed,  6 Aug 2025 12:56:45 -0700
+Date: Wed,  6 Aug 2025 12:56:46 -0700
 In-Reply-To: <20250806195706.1650976-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -76,9 +76,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250806195706.1650976-1-seanjc@google.com>
 X-Mailer: git-send-email 2.50.1.565.gc32cd1483b-goog
-Message-ID: <20250806195706.1650976-24-seanjc@google.com>
-Subject: [PATCH v5 23/44] KVM: x86/pmu: Move PMU_CAP_{FW_WRITES,LBR_FMT} into
- msr-index.h header
+Message-ID: <20250806195706.1650976-25-seanjc@google.com>
+Subject: [PATCH v5 24/44] KVM: x86: Rework KVM_REQ_MSR_FILTER_CHANGED into a
+ generic RECALC_INTERCEPTS
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
@@ -97,138 +97,226 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	Dapeng Mi <dapeng1.mi@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"
 
-From: Dapeng Mi <dapeng1.mi@linux.intel.com>
+Rework the MSR_FILTER_CHANGED request into a more generic RECALC_INTERCEPTS
+request, and expand the responsibilities of vendor code to recalculate all
+intercepts that vary based on userspace input, e.g. instruction intercepts
+that are tied to guest CPUID.
 
-Move PMU_CAP_{FW_WRITES,LBR_FMT} into msr-index.h and rename them with
-PERF_CAP prefix to keep consistent with other perf capabilities macros.
+Providing a generic recalc request will allow the upcoming mediated PMU
+support to trigger a recalc when PMU features, e.g. PERF_CAPABILITIES, are
+set by userspace, without having to make multiple calls to/from PMU code.
+As a bonus, using a request will effectively coalesce recalcs, e.g. will
+reduce the number of recalcs for normal usage from 3+ to 1 (vCPU create,
+set CPUID, set PERF_CAPABILITIES (Intel only), set filter).
 
-No functional change intended.
+The downside is that MSR filter changes that are done in isolation will do
+a small amount of unnecessary work, but that's already a relatively slow
+path, and the cost of recalculating instruction intercepts is negligible.
 
-Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
-Signed-off-by: Mingwei Zhang <mizhang@google.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/include/asm/msr-index.h | 15 +++++++++------
- arch/x86/kvm/vmx/capabilities.h  |  3 ---
- arch/x86/kvm/vmx/pmu_intel.c     |  6 +++---
- arch/x86/kvm/vmx/vmx.c           | 12 ++++++------
- 4 files changed, 18 insertions(+), 18 deletions(-)
+ arch/x86/include/asm/kvm-x86-ops.h |  2 +-
+ arch/x86/include/asm/kvm_host.h    |  4 ++--
+ arch/x86/kvm/svm/svm.c             |  8 ++++----
+ arch/x86/kvm/vmx/main.c            | 14 +++++++-------
+ arch/x86/kvm/vmx/vmx.c             |  9 +++++++--
+ arch/x86/kvm/vmx/x86_ops.h         |  2 +-
+ arch/x86/kvm/x86.c                 | 15 +++++++--------
+ 7 files changed, 29 insertions(+), 25 deletions(-)
 
-diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
-index c29127ac626a..f19d1ee9a396 100644
---- a/arch/x86/include/asm/msr-index.h
-+++ b/arch/x86/include/asm/msr-index.h
-@@ -315,12 +315,15 @@
- #define PERF_CAP_PT_IDX			16
+diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+index 18a5c3119e1a..7c240e23bd52 100644
+--- a/arch/x86/include/asm/kvm-x86-ops.h
++++ b/arch/x86/include/asm/kvm-x86-ops.h
+@@ -138,7 +138,7 @@ KVM_X86_OP(check_emulate_instruction)
+ KVM_X86_OP(apic_init_signal_blocked)
+ KVM_X86_OP_OPTIONAL(enable_l2_tlb_flush)
+ KVM_X86_OP_OPTIONAL(migrate_timers)
+-KVM_X86_OP(recalc_msr_intercepts)
++KVM_X86_OP(recalc_intercepts)
+ KVM_X86_OP(complete_emulated_msr)
+ KVM_X86_OP(vcpu_deliver_sipi_vector)
+ KVM_X86_OP_OPTIONAL_RET0(vcpu_get_apicv_inhibit_reasons);
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index ff0d753e2b07..b891bd92fc83 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -120,7 +120,7 @@
+ #define KVM_REQ_TLB_FLUSH_GUEST \
+ 	KVM_ARCH_REQ_FLAGS(27, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+ #define KVM_REQ_APF_READY		KVM_ARCH_REQ(28)
+-#define KVM_REQ_MSR_FILTER_CHANGED	KVM_ARCH_REQ(29)
++#define KVM_REQ_RECALC_INTERCEPTS	KVM_ARCH_REQ(29)
+ #define KVM_REQ_UPDATE_CPU_DIRTY_LOGGING \
+ 	KVM_ARCH_REQ_FLAGS(30, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+ #define KVM_REQ_MMU_FREE_OBSOLETE_ROOTS \
+@@ -1912,7 +1912,7 @@ struct kvm_x86_ops {
+ 	int (*enable_l2_tlb_flush)(struct kvm_vcpu *vcpu);
  
- #define MSR_PEBS_LD_LAT_THRESHOLD	0x000003f6
--#define PERF_CAP_PEBS_TRAP             BIT_ULL(6)
--#define PERF_CAP_ARCH_REG              BIT_ULL(7)
--#define PERF_CAP_PEBS_FORMAT           0xf00
--#define PERF_CAP_PEBS_BASELINE         BIT_ULL(14)
--#define PERF_CAP_PEBS_MASK	(PERF_CAP_PEBS_TRAP | PERF_CAP_ARCH_REG | \
--				 PERF_CAP_PEBS_FORMAT | PERF_CAP_PEBS_BASELINE)
-+
-+#define PERF_CAP_LBR_FMT		0x3f
-+#define PERF_CAP_PEBS_TRAP		BIT_ULL(6)
-+#define PERF_CAP_ARCH_REG		BIT_ULL(7)
-+#define PERF_CAP_PEBS_FORMAT		0xf00
-+#define PERF_CAP_FW_WRITES		BIT_ULL(13)
-+#define PERF_CAP_PEBS_BASELINE		BIT_ULL(14)
-+#define PERF_CAP_PEBS_MASK		(PERF_CAP_PEBS_TRAP | PERF_CAP_ARCH_REG | \
-+					 PERF_CAP_PEBS_FORMAT | PERF_CAP_PEBS_BASELINE)
+ 	void (*migrate_timers)(struct kvm_vcpu *vcpu);
+-	void (*recalc_msr_intercepts)(struct kvm_vcpu *vcpu);
++	void (*recalc_intercepts)(struct kvm_vcpu *vcpu);
+ 	int (*complete_emulated_msr)(struct kvm_vcpu *vcpu, int err);
  
- #define MSR_IA32_RTIT_CTL		0x00000570
- #define RTIT_CTL_TRACEEN		BIT(0)
-diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
-index 854e54c352f8..26ff606ff139 100644
---- a/arch/x86/kvm/vmx/capabilities.h
-+++ b/arch/x86/kvm/vmx/capabilities.h
-@@ -20,9 +20,6 @@ extern int __read_mostly pt_mode;
- #define PT_MODE_SYSTEM		0
- #define PT_MODE_HOST_GUEST	1
+ 	void (*vcpu_deliver_sipi_vector)(struct kvm_vcpu *vcpu, u8 vector);
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index f7e1e665a826..3d9dcc66a407 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -1077,7 +1077,7 @@ static void svm_recalc_instruction_intercepts(struct kvm_vcpu *vcpu)
+ 	}
+ }
  
--#define PMU_CAP_FW_WRITES	(1ULL << 13)
--#define PMU_CAP_LBR_FMT		0x3f
--
- struct nested_vmx_msrs {
- 	/*
- 	 * We only store the "true" versions of the VMX capability MSRs. We
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index 8df8d7b4f212..7ab35ef4a3b1 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -138,7 +138,7 @@ static inline u64 vcpu_get_perf_capabilities(struct kvm_vcpu *vcpu)
- 
- static inline bool fw_writes_is_enabled(struct kvm_vcpu *vcpu)
+-static void svm_recalc_intercepts_after_set_cpuid(struct kvm_vcpu *vcpu)
++static void svm_recalc_intercepts(struct kvm_vcpu *vcpu)
  {
--	return (vcpu_get_perf_capabilities(vcpu) & PMU_CAP_FW_WRITES) != 0;
-+	return (vcpu_get_perf_capabilities(vcpu) & PERF_CAP_FW_WRITES) != 0;
+ 	svm_recalc_instruction_intercepts(vcpu);
+ 	svm_recalc_msr_intercepts(vcpu);
+@@ -1225,7 +1225,7 @@ static void init_vmcb(struct kvm_vcpu *vcpu)
+ 
+ 	svm_hv_init_vmcb(vmcb);
+ 
+-	svm_recalc_intercepts_after_set_cpuid(vcpu);
++	svm_recalc_intercepts(vcpu);
+ 
+ 	vmcb_mark_all_dirty(vmcb);
+ 
+@@ -4479,7 +4479,7 @@ static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+ 	if (sev_guest(vcpu->kvm))
+ 		sev_vcpu_after_set_cpuid(svm);
+ 
+-	svm_recalc_intercepts_after_set_cpuid(vcpu);
++	svm_recalc_intercepts(vcpu);
  }
  
- static inline struct kvm_pmc *get_fw_gp_pmc(struct kvm_pmu *pmu, u32 msr)
-@@ -588,7 +588,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+ static bool svm_has_wbinvd_exit(void)
+@@ -5181,7 +5181,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
  
- 	perf_capabilities = vcpu_get_perf_capabilities(vcpu);
- 	if (intel_pmu_lbr_is_compatible(vcpu) &&
--	    (perf_capabilities & PMU_CAP_LBR_FMT))
-+	    (perf_capabilities & PERF_CAP_LBR_FMT))
- 		memcpy(&lbr_desc->records, &vmx_lbr_caps, sizeof(vmx_lbr_caps));
- 	else
- 		lbr_desc->records.nr = 0;
-@@ -787,7 +787,7 @@ static bool intel_pmu_is_mediated_pmu_supported(struct x86_pmu_capability *host_
- 	 * Require v4+ for MSR_CORE_PERF_GLOBAL_STATUS_SET, and full-width
- 	 * writes so that KVM can precisely load guest counter values.
+ 	.apic_init_signal_blocked = svm_apic_init_signal_blocked,
+ 
+-	.recalc_msr_intercepts = svm_recalc_msr_intercepts,
++	.recalc_intercepts = svm_recalc_intercepts,
+ 	.complete_emulated_msr = svm_complete_emulated_msr,
+ 
+ 	.vcpu_deliver_sipi_vector = svm_vcpu_deliver_sipi_vector,
+diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+index dbab1c15b0cd..68dcafd177a8 100644
+--- a/arch/x86/kvm/vmx/main.c
++++ b/arch/x86/kvm/vmx/main.c
+@@ -188,18 +188,18 @@ static int vt_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 	return vmx_get_msr(vcpu, msr_info);
+ }
+ 
+-static void vt_recalc_msr_intercepts(struct kvm_vcpu *vcpu)
++static void vt_recalc_intercepts(struct kvm_vcpu *vcpu)
+ {
+ 	/*
+-	 * TDX doesn't allow VMM to configure interception of MSR accesses.
+-	 * TDX guest requests MSR accesses by calling TDVMCALL.  The MSR
+-	 * filters will be applied when handling the TDVMCALL for RDMSR/WRMSR
+-	 * if the userspace has set any.
++	 * TDX doesn't allow VMM to configure interception of instructions or
++	 * MSR accesses.  TDX guest requests MSR accesses by calling TDVMCALL.
++	 * The MSR filters will be applied when handling the TDVMCALL for
++	 * RDMSR/WRMSR if the userspace has set any.
  	 */
--	return host_pmu->version >= 4 && host_perf_cap & PMU_CAP_FW_WRITES;
-+	return host_pmu->version >= 4 && host_perf_cap & PERF_CAP_FW_WRITES;
+ 	if (is_td_vcpu(vcpu))
+ 		return;
+ 
+-	vmx_recalc_msr_intercepts(vcpu);
++	vmx_recalc_intercepts(vcpu);
  }
  
- struct kvm_pmu_ops intel_pmu_ops __initdata = {
+ static int vt_complete_emulated_msr(struct kvm_vcpu *vcpu, int err)
+@@ -995,7 +995,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 	.apic_init_signal_blocked = vt_op(apic_init_signal_blocked),
+ 	.migrate_timers = vmx_migrate_timers,
+ 
+-	.recalc_msr_intercepts = vt_op(recalc_msr_intercepts),
++	.recalc_intercepts = vt_op(recalc_intercepts),
+ 	.complete_emulated_msr = vt_op(complete_emulated_msr),
+ 
+ 	.vcpu_deliver_sipi_vector = kvm_vcpu_deliver_sipi_vector,
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 7b0b51809f0e..93b87f9e6dfd 100644
+index 93b87f9e6dfd..2244ca074e9d 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -2127,7 +2127,7 @@ u64 vmx_get_supported_debugctl(struct kvm_vcpu *vcpu, bool host_initiated)
- 	    (host_initiated || guest_cpu_cap_has(vcpu, X86_FEATURE_BUS_LOCK_DETECT)))
- 		debugctl |= DEBUGCTLMSR_BUS_LOCK_DETECT;
- 
--	if ((kvm_caps.supported_perf_cap & PMU_CAP_LBR_FMT) &&
-+	if ((kvm_caps.supported_perf_cap & PERF_CAP_LBR_FMT) &&
- 	    (host_initiated || intel_pmu_lbr_is_enabled(vcpu)))
- 		debugctl |= DEBUGCTLMSR_LBR | DEBUGCTLMSR_FREEZE_LBRS_ON_PMI;
- 
-@@ -2412,9 +2412,9 @@ int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 			vmx->pt_desc.guest.addr_a[index / 2] = data;
- 		break;
- 	case MSR_IA32_PERF_CAPABILITIES:
--		if (data & PMU_CAP_LBR_FMT) {
--			if ((data & PMU_CAP_LBR_FMT) !=
--			    (kvm_caps.supported_perf_cap & PMU_CAP_LBR_FMT))
-+		if (data & PERF_CAP_LBR_FMT) {
-+			if ((data & PERF_CAP_LBR_FMT) !=
-+			    (kvm_caps.supported_perf_cap & PERF_CAP_LBR_FMT))
- 				return 1;
- 			if (!cpuid_model_is_consistent(vcpu))
- 				return 1;
-@@ -7786,7 +7786,7 @@ void vmx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
- 
- static __init u64 vmx_get_perf_capabilities(void)
- {
--	u64 perf_cap = PMU_CAP_FW_WRITES;
-+	u64 perf_cap = PERF_CAP_FW_WRITES;
- 	u64 host_perf_cap = 0;
- 
- 	if (!enable_pmu)
-@@ -7807,7 +7807,7 @@ static __init u64 vmx_get_perf_capabilities(void)
- 		if (!vmx_lbr_caps.has_callstack)
- 			memset(&vmx_lbr_caps, 0, sizeof(vmx_lbr_caps));
- 		else if (vmx_lbr_caps.nr)
--			perf_cap |= host_perf_cap & PMU_CAP_LBR_FMT;
-+			perf_cap |= host_perf_cap & PERF_CAP_LBR_FMT;
+@@ -4068,7 +4068,7 @@ void pt_update_intercept_for_msr(struct kvm_vcpu *vcpu)
  	}
+ }
  
- 	if (vmx_pebs_supported()) {
+-void vmx_recalc_msr_intercepts(struct kvm_vcpu *vcpu)
++static void vmx_recalc_msr_intercepts(struct kvm_vcpu *vcpu)
+ {
+ 	if (!cpu_has_vmx_msr_bitmap())
+ 		return;
+@@ -4121,6 +4121,11 @@ void vmx_recalc_msr_intercepts(struct kvm_vcpu *vcpu)
+ 	 */
+ }
+ 
++void vmx_recalc_intercepts(struct kvm_vcpu *vcpu)
++{
++	vmx_recalc_msr_intercepts(vcpu);
++}
++
+ static int vmx_deliver_nested_posted_interrupt(struct kvm_vcpu *vcpu,
+ 						int vector)
+ {
+@@ -7778,7 +7783,7 @@ void vmx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+ 			~FEAT_CTL_SGX_LC_ENABLED;
+ 
+ 	/* Recalc MSR interception to account for feature changes. */
+-	vmx_recalc_msr_intercepts(vcpu);
++	vmx_recalc_intercepts(vcpu);
+ 
+ 	/* Refresh #PF interception to account for MAXPHYADDR changes. */
+ 	vmx_update_exception_bitmap(vcpu);
+diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+index 2b3424f638db..2c590ff44ced 100644
+--- a/arch/x86/kvm/vmx/x86_ops.h
++++ b/arch/x86/kvm/vmx/x86_ops.h
+@@ -52,7 +52,7 @@ void vmx_deliver_interrupt(struct kvm_lapic *apic, int delivery_mode,
+ 			   int trig_mode, int vector);
+ void vmx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu);
+ bool vmx_has_emulated_msr(struct kvm *kvm, u32 index);
+-void vmx_recalc_msr_intercepts(struct kvm_vcpu *vcpu);
++void vmx_recalc_intercepts(struct kvm_vcpu *vcpu);
+ void vmx_prepare_switch_to_guest(struct kvm_vcpu *vcpu);
+ void vmx_update_exception_bitmap(struct kvm_vcpu *vcpu);
+ int vmx_get_feature_msr(u32 msr, u64 *data);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 2c34dd3f0222..69f5d9deb75f 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -6742,7 +6742,11 @@ static int kvm_vm_ioctl_set_msr_filter(struct kvm *kvm,
+ 
+ 	kvm_free_msr_filter(old_filter);
+ 
+-	kvm_make_all_cpus_request(kvm, KVM_REQ_MSR_FILTER_CHANGED);
++	/*
++	 * Recalc MSR intercepts as userspace may want to intercept accesses to
++	 * MSRs that KVM would otherwise pass through to the guest.
++	 */
++	kvm_make_all_cpus_request(kvm, KVM_REQ_RECALC_INTERCEPTS);
+ 
+ 	return 0;
+ }
+@@ -10765,13 +10769,8 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 		if (kvm_check_request(KVM_REQ_APF_READY, vcpu))
+ 			kvm_check_async_pf_completion(vcpu);
+ 
+-		/*
+-		 * Recalc MSR intercepts as userspace may want to intercept
+-		 * accesses to MSRs that KVM would otherwise pass through to
+-		 * the guest.
+-		 */
+-		if (kvm_check_request(KVM_REQ_MSR_FILTER_CHANGED, vcpu))
+-			kvm_x86_call(recalc_msr_intercepts)(vcpu);
++		if (kvm_check_request(KVM_REQ_RECALC_INTERCEPTS, vcpu))
++			kvm_x86_call(recalc_intercepts)(vcpu);
+ 
+ 		if (kvm_check_request(KVM_REQ_UPDATE_CPU_DIRTY_LOGGING, vcpu))
+ 			kvm_x86_call(update_cpu_dirty_logging)(vcpu);
 -- 
 2.50.1.565.gc32cd1483b-goog
 
