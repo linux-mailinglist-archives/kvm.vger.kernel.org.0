@@ -1,54 +1,54 @@
-Return-Path: <kvm+bounces-54118-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54119-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 865B4B1C8DC
-	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 17:38:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 55B23B1C923
+	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 17:46:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9583D189620F
-	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 15:38:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 79CE618C568B
+	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 15:44:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8013293C45;
-	Wed,  6 Aug 2025 15:38:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74E0F295DBC;
+	Wed,  6 Aug 2025 15:42:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="ZEB97zWZ"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="l8kzJkYr"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA4CC28DF0B;
-	Wed,  6 Aug 2025 15:38:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4284292912;
+	Wed,  6 Aug 2025 15:42:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754494702; cv=none; b=FzLH4hM32LcjQQcmySKBYnJGSbjrreGbdzRqikdw0U7wF1m36BU95/PwvIXoDJ122vlfDsKa06I1ZRvQKuoxAn8GWEvoNvM+TStfkkFTnUmRgk1WHo/7g8U8MMRfiHNyg12kQSDmN6RQE25a70pJVwyKr2CanSHeJ7qa9FwseU4=
+	t=1754494965; cv=none; b=qKoN8/6jpyio5NokuqlAyDizfx2izinkwmgJJeMotYpV0BpNNJW2cnA3ghEJME1Jh36BcasDPrW6B48TitJVXfNf+jQ594CKQfCG6YMXk6RCH8R9axMSlNoFc+8WHF0p5WNw6YT2j/tYmlXdd/duke0ziWwcCPVD7uw2gKaPfSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754494702; c=relaxed/simple;
-	bh=PEoUnt4AgnR6Fd7v85MjBEM/E5KRwOYJgA/4ocwPaxo=;
+	s=arc-20240116; t=1754494965; c=relaxed/simple;
+	bh=hQY01D+CkvdQ5UpzQB945COXMwhCqpks6WOovLnwqiI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iaMucUtNQE/GE810eNq9+5zGTi2xiAVLTDCEmRtP2tPM4/AVtAp8b0Jw1/Sw+hImBX6O+LDgStgKXzvJpWN4ZEnLXpMM3wdWr2rVkJa785gzrYt+IQIs0CXAmQB6EUnSOMKvHOhOceAxGzx8F/tl4vKMYZSd2JsKY3ROD9NC1qU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=ZEB97zWZ; arc=none smtp.client-ip=198.137.202.136
+	 In-Reply-To:Content-Type; b=JtpHX1cRsa+mktKioBEx6crDJw2p26RnMJGaZKCkw2/XEAFcriK9/0eksjgyqEwZ4bvcGLjpb69HZMuZRBzQ84u+dP8odMxdCNVmPwAWJT3K/1HxIvnXggQZeWbPH77ET4KHu8xgh1O9iYiA/h5sX5bjbqt2dl7wjqPmb06HHOE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=l8kzJkYr; arc=none smtp.client-ip=198.137.202.136
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
 Received: from [192.168.7.202] ([71.202.166.45])
 	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 576Fc7252816231
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 576FgKG22818472
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Wed, 6 Aug 2025 08:38:07 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 576Fc7252816231
+	Wed, 6 Aug 2025 08:42:20 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 576FgKG22818472
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025072201; t=1754494687;
-	bh=BwMz/a6HBP1jRXFSy336gRq7UYAGQsyc1ISSrTWV42I=;
+	s=2025072201; t=1754494941;
+	bh=Cu6nYIqOjNNZN1HG8Wb/aQbNQeeUIBc488HsBkA4clw=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ZEB97zWZsdVR5Irot5pYTKakb3p2t6F3lQt0omGJt+HfSEoUswGO70MQAVPZAw0+1
-	 UPSY1IHdOGT0n/SCZibm7+G1m0xNDEvqIE82qLcIoLaPqRVmOP2/Su7G/z+0C2T1Cs
-	 zgPx8XsZiXpwZNQ3yy3dw35wX9a/P2dmZtvdzeMc9cxazkb8fUq1xLWuU2P+O05IHY
-	 nq+pvRT30Vs5yE12Wdz0bkStObHpuasGG5Mwo2+LywPQt/ZkbcoY8rb3ONNKHspw+o
-	 hPYfuMtUe2xYOciZWobWD1TraFQE+WInZ4MLDHNfPSfo7ooISaI86IHzrBrMBzbl+e
-	 gntoI0UsgLklA==
-Message-ID: <cb16c839-a281-488b-bfe4-98c9d0b150e2@zytor.com>
-Date: Wed, 6 Aug 2025 08:38:06 -0700
+	b=l8kzJkYrgjwABfXPVYE9DIRHWTOYPkV0A6e8wvF9zAw+xNfeEhrsjXaOiE09ZlbHo
+	 skTH5R05BXXrpS9Lfep0/LzJ6lnGnTOUHi3FinohGdVcYkSVjMrwRlpcSWo+XLdeBw
+	 CDnGcvtdYIsCpSIqcAVfPWCqsN0IKP2latoVZH0GkXoBsbvQU+MFQDNG4N4vmtelsA
+	 z5/UEritZa6/EpVKTOeIGfkjGdPyxdY6hoYnlRqLlNSFFUGycms8hc9XsQC9s6uyQx
+	 oghU38JOQgn/jWAjy1ddCoq9pugxYXV/gbukZaRQc8xXN0LMyqLqAH+BUmx6BmIRX/
+	 gmOVqwenV6GRg==
+Message-ID: <0edf127d-204d-43d3-81d3-3769179c8d1b@zytor.com>
+Date: Wed, 6 Aug 2025 08:42:20 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -56,13 +56,14 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 0/6] KVM: VMX: Handle the immediate form of MSR
- instructions
+Subject: Re: [PATCH v3 2/6] KVM: x86: Rename local "ecx" variables to "msr"
+ and "pmc" as appropriate
 To: Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Borislav Petkov <bp@alien8.de>
 References: <20250805202224.1475590-1-seanjc@google.com>
+ <20250805202224.1475590-3-seanjc@google.com>
 Content-Language: en-US
 From: Xin Li <xin@zytor.com>
 Autocrypt: addr=xin@zytor.com; keydata=
@@ -99,23 +100,20 @@ Autocrypt: addr=xin@zytor.com; keydata=
  PYbAkjBbm+tuJ/Sm+5Yp5T/BnKz21FoCS8uvTiziHj2H7Cuekn6F8EYhegONm+RVg3vikOpn
  gao85i4HwQTK9/D1wgJIQkdwWXVMZ6q/OALaBp82vQ2U9sjTyFXgDjglgh00VRAHP7u1Rcu4
  l75w1xInsg==
-In-Reply-To: <20250805202224.1475590-1-seanjc@google.com>
+In-Reply-To: <20250805202224.1475590-3-seanjc@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 8/5/2025 1:22 PM, Sean Christopherson wrote:
-> On behalf of Xin, to avoid having to resolve conflicts when applying.
-> This applies on the fastpath cleanup series:
-> https://lore.kernel.org/all/20250805190526.1453366-1-seanjc@google.com
->
+> Rename "ecx" variables in {RD,WR}MSR and RDPMC helpers to "msr" and "pmc"
+> respectively, in anticipation of adding support for the immediate variants
+> of RDMSR and WRMSRNS, and to better document what the variables hold
+> (versus where the data originated).
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Sean Christopherson<seanjc@google.com>
 
-Thanks for being considerate, and this is a much better use of time :)
-> v3:
->   - Rebase on the fastpath cleanups.
->   - Split patches to better isolate the functional changes.
->   - Massage and expand on a changelogs.
->   - Make a handful of (mostly) stylistic changes (shouldn't affect
->     functionality, key word "should").
-
-Tested after applying both patch sets, it works well.
+Yeah, this makes the immediate MSR handling changes in the following 
+patches prominent.
 
