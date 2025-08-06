@@ -1,184 +1,191 @@
-Return-Path: <kvm+bounces-54197-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54196-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41FE3B1CE25
-	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 22:59:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EAFB6B1CE23
+	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 22:58:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5FFD6627D27
-	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 20:59:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A69D318C693F
+	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 20:59:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49C9522422D;
-	Wed,  6 Aug 2025 20:58:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73CE22206AF;
+	Wed,  6 Aug 2025 20:58:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Eg+ryKK9"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mjn/KwJD"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2045.outbound.protection.outlook.com [40.107.212.45])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E81821CC64;
-	Wed,  6 Aug 2025 20:58:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.45
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754513915; cv=fail; b=TGWK51qBfARKZah7ehuL7YRacjj0cl9zMrQaJ7J0tjEdL2Ra5MpElHoXeMoWiRLWBry/vWoEHgX0GubjES58kjfyWYSKp5JcTQrdJJ9KbkHRk3dKS7KI38KpRqxXJx1WasLIgskpiaIaWa9JLINXp10qrzvD1OH9vsuMoqeRS7I=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754513915; c=relaxed/simple;
-	bh=ktRJRBq5SbaIGxFutR22jMTT4kI/M5SWUBM5rra62Ps=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=p+DebKtf6+ACEOBxo9IPHr+Cp2LbPRyQVisvT0a0EOeoSCQPjkSXXC158ywDIunFrYGiSzudO91YkHRRBVFGYAZtQrQJjhIkso7wEQbBnJEkqolebQ4CFXTrnNxYyHhg1S6G0//UFRpOBtFVbHDHSi02X4/g85ELZQfSiT4NYRc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Eg+ryKK9; arc=fail smtp.client-ip=40.107.212.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Ty7MFck0xN2E23T3u/T2j0sSaWTWmJWJPseHUdTVcMhH8/4X8qnGuqsXbDrKkBTF4LVxEsRNCGGbPSoB/GKpG4PAYUUkvOZpC4dF8CxgmrFxLFpVv3MdJLzq0HueM2bRitWJhrUh0Obp3BX6ukeHwjiOLAGtV7xOdssQMU79aB1exWRJSegZn8tv2nDeqFNXg28uQlrTO0Bq36lXLYkUV20bca26joy+bLlcEVGBhy5AkbdoP9NNzaq6iwt0Xd2OhjcFcl7MmPPCdJjcsN7a/aoX9QGaE61skLJCgqYZjEEiZ0aGb979zAfdPkVPFjkAxSrbn1qfqkfiKAkQJUbp4Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xsiDGmJ5UkBmdWMPnXu5ZHNwCefF6FbGwfd04cc+QuM=;
- b=DdDApl9y0G4nIcN75VVLIDkgelYi/JbBgQbjf7Sly0uYAZdLr4aVTCtp4K+LLa3nmmCM7YLb0gbMLWIl+D/+YbcvtRnm4gvMuuvlchnuZtRX1veB1Pcio64M06aGIOqBTyT6GMmBCtQ2bPfDUsWOuug8Y/aGDbJjl9o3UkX68xRsgmuMmNTiyH/wXGQ/CdTjq0nZ/yOf/Vw/MtLTKxXHj6C9YvDpSaS+Rx6tNi9ylxkxK5fr8goatbAz85JSWCA4jyHO/NgIzr9tlB8lhiLjioGcIeszDneVTp806v90qZJBqie+CWM+1IttMPpr2V7m9ZbRV3eQ5fQxqoElTqIKiQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xsiDGmJ5UkBmdWMPnXu5ZHNwCefF6FbGwfd04cc+QuM=;
- b=Eg+ryKK90V4prhBZiukJiDU/QPWI/0TdASG+IGmRiH583TO63Kd5NuBjdbSSOnHd5joftXfyjoEpTYXT2UdYySlOizON6hH5rx0wmJf77rksd5PAfXGLvy73xW2+0b0IHwMBy0WAIc78LQXbxPBYeARJ/briZzYKAYB3YtCbkeQ=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from BL1PR12MB5995.namprd12.prod.outlook.com (2603:10b6:208:39b::20)
- by SA1PR12MB8119.namprd12.prod.outlook.com (2603:10b6:806:337::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8989.18; Wed, 6 Aug
- 2025 20:58:30 +0000
-Received: from BL1PR12MB5995.namprd12.prod.outlook.com
- ([fe80::7298:510:d37d:fa92]) by BL1PR12MB5995.namprd12.prod.outlook.com
- ([fe80::7298:510:d37d:fa92%3]) with mapi id 15.20.9009.013; Wed, 6 Aug 2025
- 20:58:30 +0000
-Date: Wed, 6 Aug 2025 15:58:24 -0500
-From: John Allen <john.allen@amd.com>
-To: Chao Gao <chao.gao@intel.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
-	seanjc@google.com, pbonzini@redhat.com, dave.hansen@intel.com,
-	rick.p.edgecombe@intel.com, mlevitsk@redhat.com,
-	weijiang.yang@intel.com, minipli@grsecurity.net, xin@zytor.com,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>
-Subject: Re: [PATCH v11 19/23] KVM: x86: Enable CET virtualization for VMX
- and advertise to userspace
-Message-ID: <aJPB8Jd5AFKdIua3@AUSJOHALLEN.amd.com>
-References: <20250704085027.182163-1-chao.gao@intel.com>
- <20250704085027.182163-20-chao.gao@intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250704085027.182163-20-chao.gao@intel.com>
-X-ClientProxiedBy: SJ0PR13CA0058.namprd13.prod.outlook.com
- (2603:10b6:a03:2c2::33) To BL1PR12MB5995.namprd12.prod.outlook.com
- (2603:10b6:208:39b::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05FEB1FF7C8
+	for <kvm@vger.kernel.org>; Wed,  6 Aug 2025 20:58:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1754513913; cv=none; b=MZoSvo49kLRwtOMCZL2Ksw4FjpXStI/9b9C2D+MJj4yaSQAzKhKWOXpUC4PEpUiVflX59XKPlDSd3dksyNskJScmh/jgDKml2gIH9k4fN5/DVyRTAZXsy9Wo9vNBOcwZ8xobYLPqtowGJj3LnUYvmQghR1ecF1pJIPSXxUunVP0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1754513913; c=relaxed/simple;
+	bh=U1FeQRtLiG+q4sfmdpJ9bCgp5uUUcwrffLKyNe3Rxms=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cuPyF32K0X8YMZbRsh8mUvFV+GfECTrGX+/K/IE5z1oDD7B32wWSa9mBk2KEnHTPgqmQBgNyhCsgWcW3+3rYGorXv8zhVmGWiQdAtkXV9ywG9hyPeHxn/dBpeAaoi+eAy0LV1pG0qLXiJ4YOC8t5Jlw1eDW13Tv1qfApB1GTXCc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Mjn/KwJD; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1754513911;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XL3JtSDnypcZCdbt3A90Mr99TpavO/k4/VrpLyiBez8=;
+	b=Mjn/KwJDx4NWLHwmUop1Nqv4WAyrfRGGPQ6VLWLppjTzE2fHxEDvXhWKsDEjLYkfuCFLbn
+	AjIl1GJZS0YnG13/Xqcrhdvw0jy+6kR8Pn5RnfUDpi25BypfqRn7oCyHUidd0u0p1gFlYn
+	ROE/bZzCah4n6hvqXHras3zGrMdDY0Q=
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
+ [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-470-xq1-H0HjPS6JasJe4cAbQA-1; Wed, 06 Aug 2025 16:58:29 -0400
+X-MC-Unique: xq1-H0HjPS6JasJe4cAbQA-1
+X-Mimecast-MFC-AGG-ID: xq1-H0HjPS6JasJe4cAbQA_1754513909
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3e3fdd9298eso727775ab.3
+        for <kvm@vger.kernel.org>; Wed, 06 Aug 2025 13:58:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754513909; x=1755118709;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XL3JtSDnypcZCdbt3A90Mr99TpavO/k4/VrpLyiBez8=;
+        b=ntnpreKHnYAerf995ngRT9KyrYgKTjNKaLaAs2BlIWCIw1x9HpjTpSrWz4AFOkxH5h
+         Fu8bKcmQ3j4nQK7K9NJBDx4UK23FgfhADyE82rno9Lf9Xgt3a3Nb3jKN2/RORu/oh49V
+         oqVftKC4T3Vdd6bpkNk845ZqJBZu6tn6/wDp8Y6ripG1JPfVyjGaFYAKUdW6J/zZF+gi
+         U2HYOcaPfeJ6e5/ta2/QDGe9e1CSZN4JhslbCJ/E36ZUp6nPFfLRPqsBj7/7ym2yzFyW
+         Hm+gc6h7rNc3P/9NGDA52CKmX6d5OeWozpq3+ySbbU8pISFymfjRQTDhfip1jqnGxYTT
+         PDqA==
+X-Forwarded-Encrypted: i=1; AJvYcCU0IINihEgKxC4iO/+mXcXKrJ/aUJ+9Xya7fFf4AHb4+XADbMia6Olhyav2NUcxG33jMPw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxP2mk7DUROGQI2wWGTFaNMrH03MvtshpBxIQc45M4GKFRbXiPM
+	RWuouXdrcDFjcFEfke7u1Xmz93ldbQD9uNECxcWZoxGQpEoHX24s/9q/v+mOXZhluj/XvHMgdKu
+	JAfvksSJBXEhrh8S3mEYEi0YZbSZhlIelnlQ83cl1dGy0fjqDq2oNSw==
+X-Gm-Gg: ASbGnctA8eI0M7iWOJKKswIBp21cXZeeBELP2qrLIcW73K1fujhpyqgdRbVVxHr+jlt
+	eOyYgaDjWYZPPncqjoZ6MvchBwjvbPoCRPuxG8/YD10z6y/kUigMBggI4ByitEefA3k11m4eA4i
+	4HqJ6f2j1D2waUT+p6PLilDoFt8f51f0llgqS4DUM1+EU5JOK6Ew/DnWR8eJ311BGvQi1hCNKJt
+	pWliHM/4fnbCSEItas8HJAWBpTH+02FELnqlc/oMCF84PHxTV7ANgH0mEQ+4jULH0SUAu19W3xE
+	QY6FSva6+TI1dexiA7wPEpIbsT57rmxldOPpgElI3ss=
+X-Received: by 2002:a05:6e02:152e:b0:3e3:d2eb:52db with SMTP id e9e14a558f8ab-3e51b79eae2mr20687245ab.0.1754513909049;
+        Wed, 06 Aug 2025 13:58:29 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEvMHObcGautLtJ7984K/wyyriLvMdPXmyUUT5V0nwJ7vFbNm7fOcxZIXtiLyBYuGHd6raZZQ==
+X-Received: by 2002:a05:6e02:152e:b0:3e3:d2eb:52db with SMTP id e9e14a558f8ab-3e51b79eae2mr20686945ab.0.1754513908609;
+        Wed, 06 Aug 2025 13:58:28 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-50ab01e84desm2049992173.51.2025.08.06.13.58.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Aug 2025 13:58:27 -0700 (PDT)
+Date: Wed, 6 Aug 2025 14:58:25 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Leon Romanovsky <leonro@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>,
+ Andrew Morton <akpm@linux-foundation.org>, Bjorn Helgaas
+ <bhelgaas@google.com>, Christian =?UTF-8?B?S8O2bmln?=
+ <christian.koenig@amd.com>, Christoph Hellwig <hch@lst.de>,
+ dri-devel@lists.freedesktop.org, iommu@lists.linux.dev, Jens Axboe
+ <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+ linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-mm@kvack.org, linux-pci@vger.kernel.org, Logan Gunthorpe
+ <logang@deltatee.com>, Marek Szyprowski <m.szyprowski@samsung.com>, Robin
+ Murphy <robin.murphy@arm.com>, Sumit Semwal <sumit.semwal@linaro.org>,
+ Vivek Kasireddy <vivek.kasireddy@intel.com>, Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v1 01/10] PCI/P2PDMA: Remove redundant bus_offset from
+ map state
+Message-ID: <20250806145825.2654ee59.alex.williamson@redhat.com>
+In-Reply-To: <c9b6237964b9606418af400bb6bec5178fcffff2.1754311439.git.leon@kernel.org>
+References: <cover.1754311439.git.leon@kernel.org>
+	<c9b6237964b9606418af400bb6bec5178fcffff2.1754311439.git.leon@kernel.org>
+Organization: Red Hat
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5995:EE_|SA1PR12MB8119:EE_
-X-MS-Office365-Filtering-Correlation-Id: 35d5187a-fc46-4678-ec03-08ddd52bff6a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?Yr0hsoJJEdCeasSH598RrF4kh/l68PU6RTm/DEYkfw9trHnCMIbbazinQphR?=
- =?us-ascii?Q?CnJ8q0V6iUBggVaVO1w3EFti3gyivWhNfAWEVnvuRSJFLJbM3RpQd+Tmc2T9?=
- =?us-ascii?Q?pR2aWTp+drT/zl57gsu/1ZVdGCv7+UN1SLuMT55E8UJtAWMS+qmFMNmHXkc2?=
- =?us-ascii?Q?a6/XDgUhEy4cEKAlv5PZAx3CUF0K+OSWX/AaX5xJ06we0+WJeBtVx59aXlwz?=
- =?us-ascii?Q?YKeNaI1tg4aCb3JwUkH0YTIDeKZfKsee83J17qDdnky7GAMo/q936tSUCqxT?=
- =?us-ascii?Q?mYPcPTDxVb6mSc9vUmTYwebE8WJ6spYHxhtWivs06Klda2MVe6dUGSIYnYpZ?=
- =?us-ascii?Q?Z8N3JtMBuSs2LdV95Y7cFxhU5CmyEBMc1j2AqutokmJRQ3l3AfVowc+CSDrQ?=
- =?us-ascii?Q?UJyXs1Je4FCou3+9g/YekXqmNzfJhSNtPSF86oR0o7BONaTT3d76xqClac/d?=
- =?us-ascii?Q?Z101PxaGJyf7akLJIVbiysdNqRSABHFYc0GXAFHuEORJ3vFiSn+zA/1rijBS?=
- =?us-ascii?Q?1GZ/G/J9+Q583p/XyYQHsd87ifRYW0YjwvmD8rrN0nTy+sQHK/KLacgnZWv+?=
- =?us-ascii?Q?TXCj2HB4P1g92B08sjW88raO+56lrMGwXwHabr9vSb9JdVCigJWUJIC5TD6h?=
- =?us-ascii?Q?haR5wH2tIkciPc5Xi0a6chHNAWVuBcLSjY4F9lVb23B5oZvP/tljr4kD4wAn?=
- =?us-ascii?Q?BjxqC/IbFgqkJtqx1b3fpzFh+IWTFqd96F+7v9RDF6U2/Tzi7Mpwdi7j7i7+?=
- =?us-ascii?Q?p7qYWfnCjgURWaVQbPAfuFVTO3jmwH93UhGmkYlt1MiWer7jhbw9c36NTJze?=
- =?us-ascii?Q?O88PH5/KHRiWyuDqyDd4maCI6U/u3BVrlTK7AB6PGfGTm9h5pSuoh3FZSNsi?=
- =?us-ascii?Q?SKpVJ8RGS4EV1Ie7r5J1aqdzqySMInGtobfjPvtH+QOkiRvSlnIRhG0xVcK1?=
- =?us-ascii?Q?zMnkX935SzNrIcxaWWAIi+GB4qpoq86WynJ1qdU+UgaXBUDXOLtlrtV4hd80?=
- =?us-ascii?Q?qJ/RBjuGYL5tVQuVThUnBUrvGkFP9ZGupxqNJf92SYC8QQ5UMt4cNAsYjkng?=
- =?us-ascii?Q?bX8RyROxgzAXKYte7Q9RCHXORV6WiPHR/CZg3jA68aDQzJvtBXBjM7t+nPXI?=
- =?us-ascii?Q?YI1CeH/8J3eBXf+dL5gF/iVWeZ5A3aHUpVhzPubgCLpiSAQv/FbQJ6OvhryJ?=
- =?us-ascii?Q?jEGC1QaxJIdD4xnouRp9eDVvTQ565fJ7tSw0zm9CjFtPkS2fr7jdUk2gpvFh?=
- =?us-ascii?Q?HiwPhjse8fJNkEWi5i8DRTrd83PIOSvctVH7S0MTThSi5ydN2rz2lxGfmlsv?=
- =?us-ascii?Q?HEQEMQbKvL7KTaYYDTA6A3AaN171zbsQ6xTJ+b4RU1ZUAQBSlJpgCUrijiDW?=
- =?us-ascii?Q?YBwuQovf8uJBLNOyhhRt5kEF0Ftz93F2KQqna43l/x8H9POGaxLSrl+b+pnM?=
- =?us-ascii?Q?b4GHwaxlJp8=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5995.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?ODv5+0t2bkkbYZ6oI1kAAkJOy5MoicveRkIQHLQBMpesy8LjjiUdNani3g8s?=
- =?us-ascii?Q?Uukt5VZ2hF626FiuqndgGjPI4eUFTcS0+l2YMkzEYY4xpZXE0cq6eL2xCZvt?=
- =?us-ascii?Q?zwg8zuUreHE0ISrE0RhN4qNXwXthZh7T+ziA8xi5Aig/p/BERc5V/ER1SB6X?=
- =?us-ascii?Q?fTNOK40XZpxI896H620UzMFGv5ALY69wZJf0ZrG5dS5RQLnww0mrCqIkuzM/?=
- =?us-ascii?Q?D5+tTc0OBSSIstrz9bQGX3BRc2Y4cIIuIUEX0X8JdW0PFTEKFz45tSA5Z/Aq?=
- =?us-ascii?Q?yHQW84pv73v4RfUdW7S8Moop4KjSMpPQoPs2jrb7QOV1JcDt3T8H/DB4YEF9?=
- =?us-ascii?Q?BGCWgqbUgx7q2hBKWlP7FyoT1WDcMXAbZbsOWMSIR1oKOZsEYM3pxnZdfH0p?=
- =?us-ascii?Q?qkrN7DvxjNpjmSPgcTMd8Jx4f1Wnl9GAyrppHc8/o0bUL6LLO7mozxjASaTv?=
- =?us-ascii?Q?HiEzVilA+1PVc0bVi6VuELpVMMsb2RI63rup/9tzuIwu/BMm5R8SvENyMpuo?=
- =?us-ascii?Q?lfiRPrrSGIPnkujmiCdNW/Z2EVhiEwlvgAm6VabIdew48SVqLz3ruTkLDYK3?=
- =?us-ascii?Q?lphaJRK1TB8bZHlpJCMMcINMEdTUiBMAjf6N7k3IGSDHPnaLq7AiEdHRHiy9?=
- =?us-ascii?Q?k29678ovJoICjdwY6eRNkrHHO5HALUCiU3CMst6+IsmLPggygbJTItHQfQVa?=
- =?us-ascii?Q?WpJV7cZ/7eerEz966aOA4e1DYJ3tQ7ZsMCm0Ac6flrGoFRfATPZPNbsRKk6A?=
- =?us-ascii?Q?JVcIF8Blb2E/+vllA5kIspLD3GHZvjQ2sEjtEWHrrXTxjZPqe0kGGKp3PV/D?=
- =?us-ascii?Q?MHEOkdRVIy+tl+U8divWzlfk0TExv7Ng6+ccpyIedpzrgoDqPEyYFjY7VK1Z?=
- =?us-ascii?Q?w+zFUxXyGvmK3z44kBaLSMnI7N7gY+4RIaH3fXBQQJIOXp/8w8yerRvcpuBD?=
- =?us-ascii?Q?WdE0Z+NVq+2G3akp3ayjuUQj8rHGYpmcb0nJ/CnS0K36gKu2zYrr6Iri/sjo?=
- =?us-ascii?Q?OEQDD3JHkxFz8ZD/H1k2Z+q1jBMwBJtRAuXvUVoNwv0d+wveutZD3CFDjCdu?=
- =?us-ascii?Q?77het08G4N7h0qyResD/OZ6sefH3a8devqVJa8+F8BjLKdIheTAFB3H19bxZ?=
- =?us-ascii?Q?yh7M/a149B+bilyUx5Dk+RI/hPAImV/QL5gtthmJY3bhddthI7YiU1990jMQ?=
- =?us-ascii?Q?gel45iU07zH0nnauhujbDjQCU8LWIOLOgwt3o+Bjm2RGyB+B/Pl7S0cr199h?=
- =?us-ascii?Q?zpBkov2kFwtcsHlptDn4fNygBtDwuyb5vtXNIurIy8XbiCwvYtDHWIvmp0fr?=
- =?us-ascii?Q?2F06r8VfRiHLv0tCZBX3dWGjKqeVsXMELkejY5ilYkHWJF0/ryhKGBbUAHSO?=
- =?us-ascii?Q?X0eeniFdkokfAlXzP0q5YhroaFjsNI1LaUEOlK9fF7WYzUmDYYt23Id9jms8?=
- =?us-ascii?Q?ey5easKHFHDtb8HYkWsFjebbG4yBWxH+QdLwWVpLpHswDy8ox4/TD3x2dCEE?=
- =?us-ascii?Q?5TcUODdXI+Uqa5qVuMsjv9htcG/LV1nHwCPgQPxmuf3RVVOIDKVQsy2vIORc?=
- =?us-ascii?Q?HDsZdwz+TH4ZoV94nZAJSBghzK0fkduEXUzlulfl?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 35d5187a-fc46-4678-ec03-08ddd52bff6a
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5995.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Aug 2025 20:58:30.4040
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: jQyj3I4xdDDSR/w9ShZ3I3ZlzdOPQJKIP3+yiteZET/VTAIG3SE3ATHEyU+yDmZpqW8AnK+hiQqVxJ6Ez8Kfcw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8119
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jul 04, 2025 at 01:49:50AM -0700, Chao Gao wrote:
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 803574920e41..6375695ce285 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -5223,6 +5223,10 @@ static __init void svm_set_cpu_caps(void)
->  	kvm_caps.supported_perf_cap = 0;
->  	kvm_caps.supported_xss = 0;
->  
-> +	/* KVM doesn't yet support CET virtualization for SVM. */
-> +	kvm_cpu_cap_clear(X86_FEATURE_SHSTK);
-> +	kvm_cpu_cap_clear(X86_FEATURE_IBT);
-> +
+On Mon,  4 Aug 2025 16:00:36 +0300
+Leon Romanovsky <leon@kernel.org> wrote:
 
-Since AMD isn't supporting IBT, not sure if it makes sense to clear IBT
-here since it doesn't look like we're clearing other features that we
-don't support in hardware. For compatibility, my series just removes
-both lines here, but the IBT clearing is probably not needed in this
-series.
+> From: Leon Romanovsky <leonro@nvidia.com>
+>=20
+> Remove the bus_off field from pci_p2pdma_map_state since it duplicates
+> information already available in the pgmap structure. The bus_offset
+> is only used in one location (pci_p2pdma_bus_addr_map) and is always
+> identical to pgmap->bus_offset.
+>=20
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> ---
+>  drivers/pci/p2pdma.c       | 1 -
+>  include/linux/pci-p2pdma.h | 3 +--
+>  2 files changed, 1 insertion(+), 3 deletions(-)
+>=20
+> diff --git a/drivers/pci/p2pdma.c b/drivers/pci/p2pdma.c
+> index da5657a020074..274bb7bcc0bc5 100644
+> --- a/drivers/pci/p2pdma.c
+> +++ b/drivers/pci/p2pdma.c
+> @@ -1009,7 +1009,6 @@ void __pci_p2pdma_update_state(struct pci_p2pdma_ma=
+p_state *state,
+>  {
+>  	state->pgmap =3D page_pgmap(page);
+>  	state->map =3D pci_p2pdma_map_type(state->pgmap, dev);
+> -	state->bus_off =3D to_p2p_pgmap(state->pgmap)->bus_offset;
+>  }
+> =20
+>  /**
+> diff --git a/include/linux/pci-p2pdma.h b/include/linux/pci-p2pdma.h
+> index 075c20b161d98..b502fc8b49bf9 100644
+> --- a/include/linux/pci-p2pdma.h
+> +++ b/include/linux/pci-p2pdma.h
+> @@ -146,7 +146,6 @@ enum pci_p2pdma_map_type {
+>  struct pci_p2pdma_map_state {
+>  	struct dev_pagemap *pgmap;
+>  	enum pci_p2pdma_map_type map;
+> -	u64 bus_off;
+>  };
+> =20
+>  /* helper for pci_p2pdma_state(), do not use directly */
+> @@ -186,7 +185,7 @@ static inline dma_addr_t
+>  pci_p2pdma_bus_addr_map(struct pci_p2pdma_map_state *state, phys_addr_t =
+paddr)
+>  {
+>  	WARN_ON_ONCE(state->map !=3D PCI_P2PDMA_MAP_BUS_ADDR);
+> -	return paddr + state->bus_off;
+> +	return paddr + to_p2p_pgmap(state->pgmap)->bus_offsetf;
+>  }
+> =20
+>  #endif /* _LINUX_PCI_P2P_H */
 
-Thanks,
-John
+Looks like you're relying on this bogus code getting resolved in the
+next patch...
+
+In file included from kernel/dma/direct.c:16:
+./include/linux/pci-p2pdma.h: In function =E2=80=98pci_p2pdma_bus_addr_map=
+=E2=80=99:
+./include/linux/pci-p2pdma.h:188:24: error: implicit declaration of functio=
+n =E2=80=98to_p2p_pgmap=E2=80=99 [-Wimplicit-function-declaration]
+  188 |         return paddr + to_p2p_pgmap(state->pgmap)->bus_offsetf;
+      |                        ^~~~~~~~~~~~
+./include/linux/pci-p2pdma.h:188:50: error: invalid type argument of =E2=80=
+=98->=E2=80=99 (have =E2=80=98int=E2=80=99)
+  188 |         return paddr + to_p2p_pgmap(state->pgmap)->bus_offsetf;
+      |                                                  ^~
+./include/linux/pci-p2pdma.h:189:1: error: control reaches end of non-void =
+function [-Werror=3Dreturn-type]
+  189 | }
+      | ^
+
+to_p2p_pgmap() is a static function and struct pci_p2pdma_pagemap
+doesn't have a bus_offsetf member.  Thanks,
+
+Alex
+
 
