@@ -1,130 +1,103 @@
-Return-Path: <kvm+bounces-54105-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54106-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2E3DB1C3F9
-	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 12:00:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8485CB1C41A
+	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 12:19:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E059B18C0CF2
-	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 10:00:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C6C2D7A2C20
+	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 10:17:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D3F628AAE3;
-	Wed,  6 Aug 2025 09:59:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9A7528A71C;
+	Wed,  6 Aug 2025 10:19:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="JodVtdKs"
+	dkim=pass (2048-bit key) header.d=lanxincomputing-com.20200927.dkim.feishu.cn header.i=@lanxincomputing-com.20200927.dkim.feishu.cn header.b="TXTmBTe3"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from lf-2-58.ptr.blmpb.com (lf-2-58.ptr.blmpb.com [101.36.218.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D7BC28A725
-	for <kvm@vger.kernel.org>; Wed,  6 Aug 2025 09:59:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED5D21E0DE3
+	for <kvm@vger.kernel.org>; Wed,  6 Aug 2025 10:18:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=101.36.218.58
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754474354; cv=none; b=jiyupdMEWQBhHhbjf9g41ULixc8tdJ2Ta3kmnoVm3pRNnkw8H9KF4o3RpEWx/CiCuGnBfYGuIJr4Kapj8MWHJolJI6rDCpdZLYndzyHEq/qIR5dnEZqYjMuLajTfrPHmc6m6dMhIfUVCjn1MeYBcMwn2jfyGjfLdxOcBxqgkBcQ=
+	t=1754475543; cv=none; b=p8b4bC1sVUqJTsrSOGJzHsSBh92q17RM9mzWzhrhspnqif+3NdcRFCzrwwcL0AdsX/7Xu5scvp6joYRlSKPatAKAWnkdSqpwEIrCRV2w4x3LNAt8bhIue0oowKh8KBMcuehWAHBf53Stw2mft+Jxakl0ZcMqSwLEcJgpbhHqids=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754474354; c=relaxed/simple;
-	bh=IKb5uL5a/Yv1fqtDIHgQ8CxYzBv3w+4eE2yq1mQQMCo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TIb/1yarJlotyu4bbAQQdmXuDI+fDmjrAw8bFDu5ByTWh8lVXD7h9BVnCmRXJmTJJ7Ad6t25I/x+CQv/G8JGi/krS0rqV7CBCm79gjS8DaVP5415GfIuaWzCY+dxz3EMe72qNU2t+vJSlSJb4uE0d3dxFWEJUGFMv1LFpT3Uc7I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=JodVtdKs; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-23636167afeso46693945ad.3
-        for <kvm@vger.kernel.org>; Wed, 06 Aug 2025 02:59:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1754474351; x=1755079151; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=nVGDM3I4SAq4IdauxFBCdAq636kZPPhTHlfXhatdxwg=;
-        b=JodVtdKsakt68yizrYENPkHCaH3/eKoTv0iLPGBcmALd3xSznwfqITVwSooAL5tYTk
-         w7Wgssl02hmfqArrUqCZUqAoGvQ0Ijdd9HPn0VQjBdFEcL117a6gSr2aH+l0KtpVmKuF
-         0Yu3x1xPmp5v8jpqY+nWy6XLZxaEiGJsYtgh5kQQLSnryYTZXbZGB5+o6Zo6KcYonx3B
-         vGagya54iV1VXzwtGf4z1CQ8aBXOqpLuHHYGRxqjlhC3Y7jVxPyf6iAV3QoHlccBCEEm
-         3ZTQnoQl+s8dVJECoS5vmqVFxfPKDf8kJRDrIb8VWukXjFT5tBJzitnHC3AeF/dDNl2r
-         q75g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754474351; x=1755079151;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nVGDM3I4SAq4IdauxFBCdAq636kZPPhTHlfXhatdxwg=;
-        b=LKOO6iF7ZMmrf2Q6ezU/I81NSLPllfMeEPK0uyRcakI2OGqJi32ybHJko5aOXOAkjy
-         vUKxammbdzcb9f2+E13JzuGr0flgayUTUHAK6eV5sSVWr6cd9tgeN+q8VLyUDVf7XsDd
-         MjNdmVOwPqsbW5QJ2yE4ANhC4PmPieu8g9j6xouyfFTO8KsTMh/JjfqDq96UUHkpRmu/
-         QZJilLMdxKdzGOaLsYMz9TvmTPXIsS9T4t8xRT+0IR4N9JVMK/Z2cgWN7cqDpab/3XcM
-         gAIjMwOScMYjqEpq/2uUq6d+JZiZXZiNYfIG5btGchdses0IHI0JkTAmmEan1nqaZTP3
-         EHJw==
-X-Gm-Message-State: AOJu0YxZussnibRkymR5LuPukTc3Uzem3MZc6i10bASnpajtK5MF/NhH
-	aWhSq3/nJN/m9maa9bVWjOyHAgFwnabe8Hy3yFsdcA8/42D6JlPMFuKx8prnzBkdkMw=
-X-Gm-Gg: ASbGncs5d4XDunY9ykJakCPSbqREJYZVfA1PaLHmHse+RCpKBo/TwSCkQs5C6yP+aSy
-	MHCm4QQBCnAY2N8pJ/ZoccwPy4aA8ZoTICvgTya98tn1Yp0Ejhioz/KL0zFDd3oF4HPTA7pXmjs
-	jb+uuhdwM2yB7tMckQ3h6x5kU4FiQq4wK7BiA0+MtstL1cLX0Akc5vpMMrxgdSpPj0jNqt4+jew
-	SGTsOwpGV2jEQKVXEjMIYODJemNltrnRElyws+b9H6evcBaghstyqX2wNF48PqE02NpldC4Lzt2
-	HjQ18P7+zGBwXuZBR5hiNraF+vi1TQaA+5ZtAdEdlkLqZbR8XYCrpNBIYJNFdlL3u+TnYz25oBw
-	qztvGMZM7vF+0wqPI9S6kfqycRKdH9nR0SAI=
-X-Google-Smtp-Source: AGHT+IFDQkiy8dEal9JGcheFb4DCeMC/D2uxTEcourcA4xojZOo5yHWKjW3OBM8sYPB5X5rv1iZYAg==
-X-Received: by 2002:a17:903:2302:b0:240:25f3:211b with SMTP id d9443c01a7336-242a0beacd1mr26147005ad.51.1754474351119;
-        Wed, 06 Aug 2025 02:59:11 -0700 (PDT)
-Received: from [192.168.68.110] ([177.170.244.6])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-241e8975c03sm154551605ad.97.2025.08.06.02.59.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 Aug 2025 02:59:10 -0700 (PDT)
-Message-ID: <953d2f4c-d82f-4e8f-a905-b7dfbf690ef7@ventanamicro.com>
-Date: Wed, 6 Aug 2025 06:59:06 -0300
+	s=arc-20240116; t=1754475543; c=relaxed/simple;
+	bh=B6sQ1NetsPTmtFsLdHDYYBU+L1q12bILqn6b3beWkGs=;
+	h=Cc:From:To:Date:Message-Id:In-Reply-To:Content-Type:Subject:
+	 Mime-Version:References; b=gP9gYr+STUaQ4/Jkrn2t1X/gdBTAYwNBy7YJnh3BXQIEeVmK1D9Qn1J6xZkh9BauBYFHAH5X5BAgu8xMF3SFSRzWtAEKJ72b1sIqmsRohxIROebB2+yIK7My9CoMjo+5zVF5h/6HyGMLxahaKTlpvdmu2IQ9AJgXf60N0lCKlnc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lanxincomputing.com; spf=pass smtp.mailfrom=lanxincomputing.com; dkim=pass (2048-bit key) header.d=lanxincomputing-com.20200927.dkim.feishu.cn header.i=@lanxincomputing-com.20200927.dkim.feishu.cn header.b=TXTmBTe3; arc=none smtp.client-ip=101.36.218.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lanxincomputing.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lanxincomputing.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=s1; d=lanxincomputing-com.20200927.dkim.feishu.cn; t=1754474707;
+  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
+ reply-to:content-type:mime-version:in-reply-to:message-id;
+ bh=HAuif9gFjp03a1ED0sRYhN2Xh+Oo5vYjt6vdU6y4qaw=;
+ b=TXTmBTe33mszmANQficYSPl82udgMtn/ERcp3bvHMULbkLB+iKJfuYQ8Q9FGac5AsEtR3a
+ K6GACDuM8lcDfkiBMHfyQQoKdWjXI5NIT5F97VfnNr30VqCHY5P8N7o6h2KNb4uES9KOGj
+ U9CqhvjdIKvBrxBpFkKLP90Or0vwvgWWuclFafJol5k9B2fnfVwOstmjHY0L6faXSTamF5
+ wVIa2GXEHx0Nn7QYYwPCeIB55n7qgThSfM7PPoehSYdD2hRCXqqAj9PC9uCnEhqfyGGOFh
+ hIDEoQzMGvWqmsVPmct0tQmOGBvQIjcNAHSxhgetQwUmToDE1mnMZDQztODsHw==
+Cc: <kvm@vger.kernel.org>, <linux-riscv@lists.infradead.org>, 
+	<linux-kernel@vger.kernel.org>, "Anup Patel" <anup@brainfault.org>, 
+	"Atish Patra" <atishp@atishpatra.org>, 
+	"Paul Walmsley" <paul.walmsley@sifive.com>, 
+	"Palmer Dabbelt" <palmer@dabbelt.com>, 
+	"Albert Ou" <aou@eecs.berkeley.edu>, "Alexandre Ghiti" <alex@ghiti.fr>, 
+	"Daniel Henrique Barboza" <dbarboza@ventanamicro.com>, 
+	<stable@vger.kernel.org>
+From: "Nutty Liu" <liujingqi@lanxincomputing.com>
+To: =?utf-8?q?Radim_Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@ventanamicro.com>, 
+	<kvm-riscv@lists.infradead.org>
+Date: Wed, 6 Aug 2025 18:05:02 +0800
+Message-Id: <3d7df3b0-27c5-47a2-a4a1-dde168e7848e@lanxincomputing.com>
+X-Lms-Return-Path: <lba+2689328d1+65a5a5+vger.kernel.org+liujingqi@lanxincomputing.com>
+In-Reply-To: <20250805104418.196023-4-rkrcmar@ventanamicro.com>
+Content-Transfer-Encoding: quoted-printable
+Received: from [127.0.0.1] ([116.237.111.137]) by smtp.feishu.cn with ESMTPS; Wed, 06 Aug 2025 18:05:03 +0800
+Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+Subject: Re: [PATCH] RISC-V: KVM: fix stack overrun when loading vlenb
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] RISC-V: KVM: fix stack overrun when loading vlenb
-To: =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@ventanamicro.com>,
- kvm-riscv@lists.infradead.org
-Cc: kvm@vger.kernel.org, linux-riscv@lists.infradead.org,
- linux-kernel@vger.kernel.org, Anup Patel <anup@brainfault.org>,
- Atish Patra <atishp@atishpatra.org>, Paul Walmsley
- <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>,
- Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
- stable@vger.kernel.org
+Mime-Version: 1.0
 References: <20250805104418.196023-4-rkrcmar@ventanamicro.com>
-From: Daniel Henrique Barboza <dbarboza@ventanamicro.com>
-Content-Language: en-US
-In-Reply-To: <20250805104418.196023-4-rkrcmar@ventanamicro.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-Original-From: Nutty Liu <liujingqi@lanxincomputing.com>
 
-
-
-On 8/5/25 7:44 AM, Radim Krčmář wrote:
+On 8/5/2025 6:44 PM, Radim Kr=C4=8Dm=C3=A1=C5=99 wrote:
 > The userspace load can put up to 2048 bits into an xlen bit stack
 > buffer.  We want only xlen bits, so check the size beforehand.
-> 
+>
 > Fixes: 2fa290372dfe ("RISC-V: KVM: add 'vlenb' Vector CSR")
 > Cc: <stable@vger.kernel.org>
-> Signed-off-by: Radim Krčmář <rkrcmar@ventanamicro.com>
+> Signed-off-by: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@ventanamicro.com>
 > ---
+Reviewed-by: Nutty Liu <liujingqi@lanxincomputing.com>
 
-Reviewed-by: Daniel Henrique Barboza <dbarboza@ventanamicro.com>
-
+Thanks,
+Nutty
 >   arch/riscv/kvm/vcpu_vector.c | 2 ++
 >   1 file changed, 2 insertions(+)
-> 
+>
 > diff --git a/arch/riscv/kvm/vcpu_vector.c b/arch/riscv/kvm/vcpu_vector.c
 > index a5f88cb717f3..05f3cc2d8e31 100644
 > --- a/arch/riscv/kvm/vcpu_vector.c
 > +++ b/arch/riscv/kvm/vcpu_vector.c
-> @@ -182,6 +182,8 @@ int kvm_riscv_vcpu_set_reg_vector(struct kvm_vcpu *vcpu,
->   		struct kvm_cpu_context *cntx = &vcpu->arch.guest_context;
+> @@ -182,6 +182,8 @@ int kvm_riscv_vcpu_set_reg_vector(struct kvm_vcpu *vc=
+pu,
+>   		struct kvm_cpu_context *cntx =3D &vcpu->arch.guest_context;
 >   		unsigned long reg_val;
->   
-> +		if (reg_size != sizeof(reg_val))
+>  =20
+> +		if (reg_size !=3D sizeof(reg_val))
 > +			return -EINVAL;
 >   		if (copy_from_user(&reg_val, uaddr, reg_size))
 >   			return -EFAULT;
->   		if (reg_val != cntx->vector.vlenb)
-
+>   		if (reg_val !=3D cntx->vector.vlenb)
 
