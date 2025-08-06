@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-54176-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54177-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 639CDB1CD0A
-	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 22:08:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6595FB1CD0C
+	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 22:08:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8093816D4F2
-	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 20:08:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1BE547B220E
+	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 20:07:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 779562DEA6B;
-	Wed,  6 Aug 2025 19:58:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D14D2DAFDE;
+	Wed,  6 Aug 2025 19:58:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zS05TrY2"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dQ5Dy7OP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 513922DC352
-	for <kvm@vger.kernel.org>; Wed,  6 Aug 2025 19:58:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BA6E2DCC08
+	for <kvm@vger.kernel.org>; Wed,  6 Aug 2025 19:58:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754510314; cv=none; b=SWHnY+DzF0KFY7I2QN+ppCkHb5Hm2OWIZb4n2wAQNDY1eR7HfXGy/HMNtQiXKYiJ3LS89QoD1RTC4TetEjW+riAQYK62t7ddlnrFVjawMw8oiEi6yTFBXW8wFmfEZDNqwFAtBiZgVTp1NvVeB1T14ngIdJJzrSPD9RcLy4NKxzM=
+	t=1754510315; cv=none; b=s//E/TG0gunvuClKJQ/6jZBYRZ0yXyAczhdUGTVevDqliRzBNSiN7cPWFP3nBy9Ea3bYxkGx1JwLqTeLDtT/TooOujQsnZKSBP1OqxFiuvO0Y0Vj1n9hPffPPAyq61BQopGMLsURixYuq0NDAFtP7yufcjpEtFuawiZZXAOy9nY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754510314; c=relaxed/simple;
-	bh=1MpCULgJITNFp8BwtVBageH608sNes8/5DqfGMafEA8=;
+	s=arc-20240116; t=1754510315; c=relaxed/simple;
+	bh=4kQYudPfi5zx6gImzIgwc5QaKlQ7/lxrNTieFP93BO4=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=bdclhOswKlEkbKXwnvGr3FkwZut/saZhWGCCQ1vgL1a6LRM4M8G0iifPpIxypJq5igJ/p8+1krY6nAJICkR9GuXWhNYYlSl0LplUP/QNdYxEVWEnBnk65DkrcjqW4SLP986Nje58+CQmWuGR31jhOfFdfHcZCG8akeXff0e2Kk8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zS05TrY2; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=vAbWcjGF5QXEFJ/p2kPGQBwVxuDToyPCmo8sqAsT8XJK5Xk3JzPOLDrOb65Ld/XDAXE6AFxtUsf1a3t9S8oQht4k4eJR76IiAh25iUfTsrfQLqqxvrrGrVmqwy+8YGcCIGHst3gAdk8YoaHRN7n2CJdalZe0F66l34tglfukKjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dQ5Dy7OP; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b4227538a47so135058a12.1
-        for <kvm@vger.kernel.org>; Wed, 06 Aug 2025 12:58:31 -0700 (PDT)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-31eb41391f3so293883a91.0
+        for <kvm@vger.kernel.org>; Wed, 06 Aug 2025 12:58:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754510310; x=1755115110; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1754510312; x=1755115112; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=0x+D+og4ia0Wyj0NvWobUD8Pzlie97PfvMw2iXhJJfQ=;
-        b=zS05TrY2p0uXrYUpTzHJmueTSc/L/n+Jhjl650tcOgDcU5hmfH0xY/VKREh4axhBCT
-         2XhiRuFcjd0uDfyWVYsWOkjk1m4ddNIbWJof1cwY+dxHEQmNN80sW0+6Az+5BEfQi4b4
-         9NR4k58V0ep2KcL5EPuu1YWTmHMnhPwG7RP9AtCdOR7QNNzCNy9P62kYa5xQeYtPVFqO
-         beSL1xf2e5OKdXuPAJu8sF3WBttALQlDmt6iiEKXnSNzbT3uIc01a9QNziljX73nPQdc
-         UsSiqQFZsKCiWIag0eDBvuzPY02avs1Tt0ZPwV/ugItajeDedRJ4nhVF0pJs02S7jkVo
-         /u3w==
+        bh=xm7g2YivXo6aQ0SA/h1DnHmIX017hVekqEmykFx3Fp8=;
+        b=dQ5Dy7OPBZKOeslU30/Ty2nevmSlbyuAVWGlGPSo8iRtTTdIllWsmpyMaXEiR107Ka
+         5DauRKz0J/vblo45Z7vRb8BjqxivKxH1i+droia/sGoL6swt6gFx4QPi9oudJr0SNldl
+         Dm+njJy/t/t3sLIEhwJn6qYSmq7DNytq3MdfiEwHfpL4no+QiYg/fpm8xm6cZjE/BBLE
+         4AeQVI2mvCtk40pE4TC4ctCmQMdAldCWh8Kl8UX3DTYPPAWKo+qbC927+uKkUF6LEutA
+         I9j0EAp1T/yojeL/Pb1GiPohuhh4WA90MM3CeUaptCKfDqS19xJ1Eb/+ssWnovfSM+Aa
+         lvug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754510310; x=1755115110;
+        d=1e100.net; s=20230601; t=1754510312; x=1755115112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=0x+D+og4ia0Wyj0NvWobUD8Pzlie97PfvMw2iXhJJfQ=;
-        b=SkYHo0Z1aeesHnm14r5a19dJvzou0Srn7rZahAlj3IHwE+dhwqElLtfgNinStLZYvk
-         piTi+JAzEUcIioKw6msSQMaxzWfApJlWJZWMT2yV+VQd8dac/T5pTTilAmWgsMGl9hqd
-         KFol4b+6n+IALquHQCvDVHFjxam8c5WeFv/QkCOfynQFV0k31UiB5tEnvR/WQiVH8rhj
-         rccHlxXMkitSO3SyWOL9cb53K9ILZ8S0Yvr9kOahmcFYu7gr/ScAyMw/5JIDS9SmgTLi
-         sJpjaB0nXD/JvgvODPmVzlf80oy+RoIjgpvVbS4aaFGmhvjXzsM++qGGLMbU6/jxov4t
-         7/Eg==
-X-Forwarded-Encrypted: i=1; AJvYcCUkrShw/hTxKLc458I9gwdRRhZVMECRN57ONClLnPgvAIE3fKYkgGEkc+g8lD2qePJwIR4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyhjziadgU6RdAZAx2Cl/Kn7KHkcHtr6Wx71NlroSoDzp7EI5v/
-	tHyt41XR3g9CC5QYJ8EJ2Rty84Ww8DUTMpl2tT0Q7Jj7zuRHnN8nJ90VxKfp0IcFJ1bqxvJDA1r
-	wn7drpw==
-X-Google-Smtp-Source: AGHT+IHACZSLEKXNmtK1WJ2A5Z4mKbWmXm0xD8HleVhgcyjfcmK2gM+EKW1OlQ2W16ylb8rulTtPFwBYIyI=
-X-Received: from pjoa3.prod.google.com ([2002:a17:90a:8c03:b0:312:14e5:174b])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:98d:b0:225:abd2:5e4b
- with SMTP id d9443c01a7336-242b19acfe4mr5266535ad.16.1754510310549; Wed, 06
- Aug 2025 12:58:30 -0700 (PDT)
+        bh=xm7g2YivXo6aQ0SA/h1DnHmIX017hVekqEmykFx3Fp8=;
+        b=ZNgNj4w8bVyGfzRyTLkECnGW3e3rcCrxd9dI9IxuyA7tAqLDbCa7RPYppKw9tVoS8U
+         o7XxQyVojEhNFwBR1SumYns+9Od7XZK/fwxSx8ZzsmL89LoXX/uqW8umYvazFIpML5/g
+         IOoPCUpsJ4GU9s/yExs+jmBmqw/6b2QQ3X04+edE2mTsGKAnM6Hi4rxaA6glAB9dxee0
+         qVrv8F3vEBXvAvkN6CRDn9rtS+XuHL8dC+hu65W/+4QL50keaWRiv12eKFyrU0qZtFYc
+         nYQceN8P1y5tl50pwo9ipvA+++xH/+arRXZOIKEv39AnJ4NxaIQWFVL/n8XBxVXnw6RN
+         bPug==
+X-Forwarded-Encrypted: i=1; AJvYcCXsHXpsIQJR/ui9Tiw3Q0MJr9rsJeWvBV7uYK4MOsRNlGDC1zF62i7oGCHUlYK6kg/83ek=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxQQv/24ijwpBs+wTvwrlE6Ms8OPN+xv7bDe+MyF6g26jSxrK8H
+	A2ZS9a23scaErrnWtnxwCQz6ZiELnC3/VKZ1yfWTgmckkE9/nPOgA5pk2fVvzNZc5o+co1MJ3n6
+	UHoXLcQ==
+X-Google-Smtp-Source: AGHT+IEYZIIJpt/ZXd2reg+ZYe1ccOM3EaPSbjMXbuV7EDQKePHF+PpZ3A2kJS4xCp7zKjQzYF60hKA/y+o=
+X-Received: from pjbok13.prod.google.com ([2002:a17:90b:1d4d:b0:31c:2fe4:33bc])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2fc4:b0:31f:867:d6b4
+ with SMTP id 98e67ed59e1d1-321694b7c0dmr5279932a91.10.1754510312321; Wed, 06
+ Aug 2025 12:58:32 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed,  6 Aug 2025 12:56:56 -0700
+Date: Wed,  6 Aug 2025 12:56:57 -0700
 In-Reply-To: <20250806195706.1650976-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -76,9 +76,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250806195706.1650976-1-seanjc@google.com>
 X-Mailer: git-send-email 2.50.1.565.gc32cd1483b-goog
-Message-ID: <20250806195706.1650976-35-seanjc@google.com>
-Subject: [PATCH v5 34/44] KVM: x86/pmu: Introduce eventsel_hw to prepare for
- pmu event filtering
+Message-ID: <20250806195706.1650976-36-seanjc@google.com>
+Subject: [PATCH v5 35/44] KVM: x86/pmu: Reprogram mediated PMU event selectors
+ on event filter updates
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
@@ -97,100 +97,68 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	Dapeng Mi <dapeng1.mi@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"
 
-From: Mingwei Zhang <mizhang@google.com>
+From: Dapeng Mi <dapeng1.mi@linux.intel.com>
 
-Introduce eventsel_hw and fixed_ctr_ctrl_hw to store the actual HW value in
-PMU event selector MSRs. In mediated PMU checks events before allowing the
-event values written to the PMU MSRs. However, to match the HW behavior,
-when PMU event checks fails, KVM should allow guest to read the value back.
+Refresh the event selectors that are programmed into hardware when a PMC
+is "reprogrammed" for a mediated PMU, i.e. if userspace changes the PMU
+event filters
 
-This essentially requires an extra variable to separate the guest requested
-value from actual PMU MSR value. Note this only applies to event selectors.
+Note, KVM doesn't utilize the reprogramming infrastructure to handle
+counter overflow for mediated PMUs, as there's no need to reprogram a
+non-existent perf event.
 
-Signed-off-by: Mingwei Zhang <mizhang@google.com>
-Co-developed-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+Co-developed-by: Mingwei Zhang <mizhang@google.com>
+Signed-off-by: Mingwei Zhang <mizhang@google.com>
+[sean: add a helper to document behavior, split patch and rewrite changelog]
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/include/asm/kvm_host.h | 2 ++
- arch/x86/kvm/pmu.c              | 7 +++++--
- arch/x86/kvm/svm/pmu.c          | 1 +
- arch/x86/kvm/vmx/pmu_intel.c    | 2 ++
- 4 files changed, 10 insertions(+), 2 deletions(-)
+ arch/x86/kvm/pmu.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index b891bd92fc83..5512e33db14a 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -528,6 +528,7 @@ struct kvm_pmc {
- 	 */
- 	u64 emulated_counter;
- 	u64 eventsel;
-+	u64 eventsel_hw;
- 	struct perf_event *perf_event;
- 	struct kvm_vcpu *vcpu;
- 	/*
-@@ -556,6 +557,7 @@ struct kvm_pmu {
- 	unsigned nr_arch_fixed_counters;
- 	unsigned available_event_types;
- 	u64 fixed_ctr_ctrl;
-+	u64 fixed_ctr_ctrl_hw;
- 	u64 fixed_ctr_ctrl_rsvd;
- 	u64 global_ctrl;
- 	u64 global_status;
 diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-index 082d2905882b..e39ae37f0280 100644
+index e39ae37f0280..b4c6a7704a01 100644
 --- a/arch/x86/kvm/pmu.c
 +++ b/arch/x86/kvm/pmu.c
-@@ -890,11 +890,14 @@ static void kvm_pmu_reset(struct kvm_vcpu *vcpu)
- 		pmc->counter = 0;
- 		pmc->emulated_counter = 0;
- 
--		if (pmc_is_gp(pmc))
-+		if (pmc_is_gp(pmc)) {
- 			pmc->eventsel = 0;
-+			pmc->eventsel_hw = 0;
-+		}
- 	}
- 
--	pmu->fixed_ctr_ctrl = pmu->global_ctrl = pmu->global_status = 0;
-+	pmu->fixed_ctr_ctrl = pmu->fixed_ctr_ctrl_hw = 0;
-+	pmu->global_ctrl = pmu->global_status = 0;
- 
- 	kvm_pmu_call(reset)(vcpu);
+@@ -518,6 +518,25 @@ static bool pmc_is_event_allowed(struct kvm_pmc *pmc)
+ 	return is_fixed_event_allowed(filter, pmc->idx);
  }
-diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
-index 9ffd44a5d474..9641ef5d0dd7 100644
---- a/arch/x86/kvm/svm/pmu.c
-+++ b/arch/x86/kvm/svm/pmu.c
-@@ -165,6 +165,7 @@ static int amd_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		data &= ~pmu->reserved_bits;
- 		if (data != pmc->eventsel) {
- 			pmc->eventsel = data;
-+			pmc->eventsel_hw = data;
- 			kvm_pmu_request_counter_reprogram(pmc);
- 		}
- 		return 0;
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index 2bdddb95816e..6874c522577e 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -61,6 +61,7 @@ static void reprogram_fixed_counters(struct kvm_pmu *pmu, u64 data)
- 	int i;
  
- 	pmu->fixed_ctr_ctrl = data;
-+	pmu->fixed_ctr_ctrl_hw = data;
- 	for (i = 0; i < pmu->nr_arch_fixed_counters; i++) {
- 		u8 new_ctrl = fixed_ctrl_field(data, i);
- 		u8 old_ctrl = fixed_ctrl_field(old_fixed_ctr_ctrl, i);
-@@ -430,6 +431,7 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
++static void kvm_mediated_pmu_refresh_event_filter(struct kvm_pmc *pmc)
++{
++	bool allowed = pmc_is_event_allowed(pmc);
++	struct kvm_pmu *pmu = pmc_to_pmu(pmc);
++
++	if (pmc_is_gp(pmc)) {
++		pmc->eventsel_hw &= ~ARCH_PERFMON_EVENTSEL_ENABLE;
++		if (allowed)
++			pmc->eventsel_hw |= pmc->eventsel &
++					    ARCH_PERFMON_EVENTSEL_ENABLE;
++	} else {
++		u64 mask = intel_fixed_bits_by_idx(pmc->idx - KVM_FIXED_PMC_BASE_IDX, 0xf);
++
++		pmu->fixed_ctr_ctrl_hw &= ~mask;
++		if (allowed)
++			pmu->fixed_ctr_ctrl_hw |= pmu->fixed_ctr_ctrl & mask;
++	}
++}
++
+ static int reprogram_counter(struct kvm_pmc *pmc)
+ {
+ 	struct kvm_pmu *pmu = pmc_to_pmu(pmc);
+@@ -526,6 +545,11 @@ static int reprogram_counter(struct kvm_pmc *pmc)
+ 	bool emulate_overflow;
+ 	u8 fixed_ctr_ctrl;
  
- 			if (data != pmc->eventsel) {
- 				pmc->eventsel = data;
-+				pmc->eventsel_hw = data;
- 				kvm_pmu_request_counter_reprogram(pmc);
- 			}
- 			break;
++	if (kvm_vcpu_has_mediated_pmu(pmu_to_vcpu(pmu))) {
++		kvm_mediated_pmu_refresh_event_filter(pmc);
++		return 0;
++	}
++
+ 	emulate_overflow = pmc_pause_counter(pmc);
+ 
+ 	if (!pmc_is_globally_enabled(pmc) || !pmc_is_locally_enabled(pmc) ||
 -- 
 2.50.1.565.gc32cd1483b-goog
 
