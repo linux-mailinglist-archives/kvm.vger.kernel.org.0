@@ -1,146 +1,263 @@
-Return-Path: <kvm+bounces-54138-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54139-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFFD0B1CBD9
-	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 20:20:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CED3B1CBE5
+	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 20:25:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE1D456555C
-	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 18:20:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BFF2618C42FD
+	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 18:26:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6732C292B53;
-	Wed,  6 Aug 2025 18:20:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A1B729ACE5;
+	Wed,  6 Aug 2025 18:25:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wKPDXrb1"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b="s0tTe+KM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www3579.sakura.ne.jp (www3579.sakura.ne.jp [49.212.243.89])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 295CA1B5EB5
-	for <kvm@vger.kernel.org>; Wed,  6 Aug 2025 18:20:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAB46273D94;
+	Wed,  6 Aug 2025 18:25:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.243.89
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754504437; cv=none; b=AwMLFKws9iCD51FZKps9W0xhT2kwSk2ukfP1/naG+TvZD1emDvG/Rl6XPECcJr3k56CMg4F3gKNZzSgqsOfDxIITZLrZaGaBks933UXFug0FTTam/KzPXnyt2USYxojC7U7UsK3WvN9Gg2QeJF/K2FxKqx/QjTKJQv0ImUgETn0=
+	t=1754504738; cv=none; b=mdAsH869+dOlcqTxLmD+9SRqfNfbywCO8xeGebWzcN9isHPNT7w7A+YXozBj0n1QhkxWli/LPBt1iAQ7zrOOaz/J54l+MlsZhOSJgvL3xP/yH9CGYQvkyFhd09yhzslVqp7Zi7u9FKnVwcgnb/sswSaCLK9hMJuzDDHXZtU1nYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754504437; c=relaxed/simple;
-	bh=otbA2DBaPpKkc6uRnoJZTfAmFrl25nkaW75pt3VYzgg=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=S3Cg4vyUob+bX78z97yg8CIZwQ9NYIyfmc2HSBDlfNalWd6Owg9y2EOZ3mv14R+HVPW6M2lxSi3/lPscMmyasOYcqp5703bIKlpnkkl4Fn0A5666U87Ll6rTqAYHgxmfQ1Hwebkx2V1CYPQ93TjJ9XxUk+10+yuZgxXXag0Ff7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wKPDXrb1; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b2c36d3f884so64374a12.2
-        for <kvm@vger.kernel.org>; Wed, 06 Aug 2025 11:20:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754504435; x=1755109235; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0FA0pWAS7pKVbwQEHt3LE0txlNynIPpxZJlwpFzkgno=;
-        b=wKPDXrb1JodMIOhA2XJ19nufT9PujZBk4iMX2fIXGYmXXo/0v23FtEo1wIZj+RNqCU
-         7zzRTHe7PXYFAgDWoLMwJntxsqjeTm3SzxP4w9k9VH/d36syg7TbGgD3aPrucugwDMl6
-         9fPIY4gn1TPJMeSY76cV07gTG9Z6mawO7UARx3eudIUcNjIJOj6RkaQFFEof3oVOk5lj
-         Rl4IYsDYxyfom9uz95HDfuaq8W6JDnKVQlaAQxWpA/DaredJu+2m5so34fnBpltNjbtR
-         ivFyPzW25DWqrTMqiXWMp6wT6Q9XZl8wJVerplBeWWUjmkyU0PXvfBo1A4yK6MrejLuk
-         pNcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754504435; x=1755109235;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0FA0pWAS7pKVbwQEHt3LE0txlNynIPpxZJlwpFzkgno=;
-        b=s+Vz/SXNHS61f8G6h0lBcHrUjjq3rxlETCFZiyJSndMfZINa1sAb1sTTN7x0pHXJl8
-         i5Cs5qDWPWbQ+cqTgEGqdmHmXv77Cj6XoH6woaOvWbSeP78U72iOvZ9shtFbl8WNMbTx
-         gFdfu8wybvI52bOoLYcWIi7LaAImSXGYSRExBj1Krt6Ax+pUai0yYj0JK2eyNsG1Vhs1
-         AT4WnwaN0563m9XkvF04viE0ZH+Ses+d97K3uXLhaKCNiByytWszU/zDG1bSJJ1QDOg/
-         Aji/i1H/EOuwYozMbA5K8Ep4RTYufRuvYQEbd9VpB9EOKMMvAVAHDWjh3fUQM6UxJCtD
-         lSdA==
-X-Forwarded-Encrypted: i=1; AJvYcCUX5AvkFVq+wV3izo276nZ2mckdJJD1zA8SKgBkgyPZSfTxvZyAs3GuOfuXtEdINo1yy+w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwFK+x5eUw1lzR8RoehLp9fR+cUNNdodGaUxw1ovChV+4dcwjkk
-	9vUfdMuqpOGzm1akcaMheouA+mwSpoOzYDpgB2Jh59WetUlJ/kBnGsfqfRyVVZnVlbPHDt6Awxu
-	7fn6PfA==
-X-Google-Smtp-Source: AGHT+IFnlU2HwxqSmiqbXbvXranwQEnrrBs3QUOH7DXNJk8uzF5jhChqGI599XzfVoNFPVdM73TZbRC/UOY=
-X-Received: from pjsk12.prod.google.com ([2002:a17:90a:62cc:b0:31f:37f:d381])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:4b43:b0:240:79ef:ae80
- with SMTP id d9443c01a7336-2429f5224f7mr52653655ad.8.1754504435574; Wed, 06
- Aug 2025 11:20:35 -0700 (PDT)
-Date: Wed, 6 Aug 2025 11:20:34 -0700
-In-Reply-To: <20250806081051.3533470-1-hugoolli@tencent.com>
+	s=arc-20240116; t=1754504738; c=relaxed/simple;
+	bh=lLiMUbc8zLGH56UCBmIp7ECag9C43ts/2sCxH5ypZOE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bsfyzGWHucRmWEgQfRqqCikWIH1b+laa0fewnaSrbILqU6p4iFxrcdAs1Cnb0zg/fuv4Jxhr0aOl/trIcnm8oUlOJoggYVmBF0RgjHrm4w1d+GcTj1furOVdAJT4lSSFA7LyWMZtXtiRjkdlqfnOcfAy95iKXmnKHnstkfkFCPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp; dkim=fail (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b=s0tTe+KM reason="key not found in DNS"; arc=none smtp.client-ip=49.212.243.89
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp
+Received: from [192.168.10.111] (p865013-ipoe.ipoe.ocn.ne.jp [153.242.222.12])
+	(authenticated bits=0)
+	by www3579.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 576IOhK2054951
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Thu, 7 Aug 2025 03:24:43 +0900 (JST)
+	(envelope-from odaki@rsg.ci.i.u-tokyo.ac.jp)
+DKIM-Signature: a=rsa-sha256; bh=phX34nUYLjHESXOAqkOcxwCZETbFegwkz1f4cCdWzzU=;
+        c=relaxed/relaxed; d=rsg.ci.i.u-tokyo.ac.jp;
+        h=Message-ID:Date:Subject:To:From;
+        s=rs20250326; t=1754504684; v=1;
+        b=s0tTe+KMI7swBAP+Xt3bupx/k9JygXTou5eGqet3hy78WwzAvwG1SEDUkFmJGKPm
+         Fmt1e2dmZ/6uqTJCyxyx7OKvs+36JfYyb+5vNIrCdRnWbBwiOBsvMo8ip/+h8uUa
+         W9iuQh0EGDAjQ/Kh3yRFezjno6q6ySoWUdO3rBWBtqbFzP1qd42be8gifZ+wE4s1
+         l0st77DdTCQazNwWW4YnxkDeAOHCt7rS3l1EkcErRWYpFE9FniE9fskIAB+mLZAV
+         +SoeBkfdAgu4MxJfQiCaTtgBLsqDSUko1PpPKlXc6EnigstQE8M4uOgF+38XxVnC
+         xxaZlbY4fLVTMYeXJyWZWA==
+Message-ID: <276fdfb8-f1ca-44ad-b310-a811684b265a@rsg.ci.i.u-tokyo.ac.jp>
+Date: Thu, 7 Aug 2025 03:24:43 +0900
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250806081051.3533470-1-hugoolli@tencent.com>
-Message-ID: <aJOc8vIkds_t3e8C@google.com>
-Subject: Re: [PATCH] KVM: x86: Synchronize APIC State with QEMU when irqchip=split
-From: Sean Christopherson <seanjc@google.com>
-To: Yuguo Li <cs.hugolee@gmail.com>
-Cc: pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
-	dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Yuguo Li <hugoolli@tencent.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC v2 1/2] KVM: arm64: PMU: Introduce
+ KVM_ARM_VCPU_PMU_V3_COMPOSITION
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu
+ <yuzenghui@huawei.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Kees Cook <kees@kernel.org>,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+        Shuah Khan <shuah@kernel.org>, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
+        linux-hardening@vger.kernel.org, devel@daynix.com, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20250806-hybrid-v2-0-0661aec3af8c@rsg.ci.i.u-tokyo.ac.jp>
+ <20250806-hybrid-v2-1-0661aec3af8c@rsg.ci.i.u-tokyo.ac.jp>
+ <aJOO99xUrhsrvLwl@linux.dev>
+Content-Language: en-US
+From: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
+In-Reply-To: <aJOO99xUrhsrvLwl@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Aug 06, 2025, Yuguo Li wrote:
-> When using split irqchip mode, IOAPIC is handled by QEMU while the LAPIC is
-> emulated by KVM.  When guest disables LINT0, KVM doesn't exit to QEMU for
-> synchronization, leaving IOAPIC unaware of this change.  This may cause vCPU
-> to be kicked when external devices(e.g. PIT)keep sending interrupts.
-
-I don't entirely follow what the problem is.  Is the issue that QEMU injects an
-IRQ that should have been blocked?  Or is QEMU forcing the vCPU to exit unnecessarily?
-
-> This patch ensure that KVM exits to QEMU for synchronization when the guest
-> disables LINT0.
-
-Please wrap at ~75 characters.
-
-> Signed-off-by: Yuguo Li <hugoolli@tencent.com>
-> ---
->  arch/x86/include/asm/kvm_host.h | 1 +
->  arch/x86/kvm/lapic.c            | 4 ++++
->  arch/x86/kvm/x86.c              | 5 +++++
->  include/uapi/linux/kvm.h        | 1 +
->  4 files changed, 11 insertions(+)
+On 2025/08/07 2:20, Oliver Upton wrote:
+> Hi Akihiko,
 > 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index f19a76d3ca0e..f69ce111bbe0 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -129,6 +129,7 @@
->  	KVM_ARCH_REQ_FLAGS(32, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
->  #define KVM_REQ_UPDATE_PROTECTED_GUEST_STATE \
->  	KVM_ARCH_REQ_FLAGS(34, KVM_REQUEST_WAIT)
-> +#define KVM_REQ_LAPIC_UPDATE              KVM_ARCH_REQ(35)
->  
->  #define CR0_RESERVED_BITS                                               \
->  	(~(unsigned long)(X86_CR0_PE | X86_CR0_MP | X86_CR0_EM | X86_CR0_TS \
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 8172c2042dd6..65ffa89bf8a6 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -2329,6 +2329,10 @@ static int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
->  			val |= APIC_LVT_MASKED;
->  		val &= apic_lvt_mask[index];
->  		kvm_lapic_set_reg(apic, reg, val);
-> +		if (irqchip_split(apic->vcpu->kvm) && (val & APIC_LVT_MASKED)) {
+> This is an unreasonably large patch that needs to be broken down into
+> smaller patches, ideally one functional change per patch. We need this
+> even for an RFC for the sake of reviews.
+> 
+> On Wed, Aug 06, 2025 at 06:09:54PM +0900, Akihiko Odaki wrote:
+>> +static u64 kvm_pmu_get_pmc_value(struct kvm_vcpu *vcpu, u8 idx)
+>>   {
+>> -	struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
+>> +	struct kvm_pmc *pmc = *kvm_vcpu_idx_to_pmc(vcpu, idx);
+>>   	u64 counter, reg, enabled, running;
+>> +	unsigned int i;
+>>   
+>> -	reg = counter_index_to_reg(pmc->idx);
+>> +	reg = counter_index_to_reg(idx);
+>>   	counter = __vcpu_sys_reg(vcpu, reg);
+>>   
+>>   	/*
+>>   	 * The real counter value is equal to the value of counter register plus
+>>   	 * the value perf event counts.
+>>   	 */
+>> -	if (pmc->perf_event)
+>> -		counter += perf_event_read_value(pmc->perf_event, &enabled,
+>> -						 &running);
+>> +	if (pmc)
+>> +		for (i = 0; i < pmc->nr_perf_events; i++)
+>> +			counter += perf_event_read_value(pmc->perf_events[i],
+>> +							 &enabled, &running);
+> 
+> I'm concerned that this array of events concept you're introducing is
+> going to be error-prone. An approach that reallocates a new PMU event in
+> the case of a vCPU migrating to a new PMU implementation would be
+> desirable.
 
-This applies to much more than just LINT0, and for at least LVTPC and LVTCMCI,
-KVM definitely doesn't want to exit on every change.
+I avoided allocation at migration because I was worried with disabled 
+preemption. perf_event_create_kernel_counter() internally takes a mutex 
+so it cannot be used if preemption is disabled.
 
-Even for LINT0, it's not obvious that "pushing" from KVM is a better option than
-having QEMU "pull" as needed.
+I wonder if it is guaranteed that kvm_arch_vcpu_load() executes with 
+preemption. If so, I can add a hook there to call 
+perf_event_create_kernel_counter().
 
-At the very least, this would need to be guarded by a capability, otherwise
-the new userspace exit would confuse existing VMMs (and probably result in the
-VM being terminated).
+> 
+>> +static void reset_sample_period(struct perf_event *perf_event)
+>> +{
+>> +	struct kvm_pmc **pmc = perf_event->overflow_handler_context;
+>> +	struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
+>> +	struct arm_pmu *cpu_pmu = to_arm_pmu(perf_event->pmu);
+>> +	u64 period;
+>> +
+>> +	cpu_pmu->pmu.stop(perf_event, PERF_EF_UPDATE);
+>> +
+>> +	/*
+>> +	 * Reset the sample period to the architectural limit,
+>> +	 * i.e. the point where the counter overflows.
+>> +	 */
+>> +	period = compute_period(pmc, kvm_pmu_get_pmc_value(vcpu, (*pmc)->idx));
+>> +
+>> +	local64_set(&perf_event->hw.period_left, 0);
+>> +	perf_event->attr.sample_period = period;
+>> +	perf_event->hw.sample_period = period;
+>> +
+>> +	cpu_pmu->pmu.start(perf_event, PERF_EF_RELOAD);
+>> +}
+> 
+> No, we can't start calling into the internal driver interfaces. The fact
+> that we have a pointer to the PMU is an ugly hack and shouldn't be used
+> like this.
 
+This function was extracted from kvm_pmu_perf_overflow() and is not a 
+new addition (which should have been clear if I would have split the 
+patch as you noted).
 
-> +			kvm_make_request(KVM_REQ_LAPIC_UPDATE, apic->vcpu);
-> +			kvm_vcpu_kick(apic->vcpu);
+I thought of replacing it with perf_event_period(), but there is a 
+catch: it returns -EINVAL if the 63th bit of the sample period number is 
+set. Perhaps we can just specify ((1ULL << 63) - 1) if the sample period 
+is going to be so long, but I conservatively avoided that. I can change 
+it if you prefer that way or have an alternative idea.
 
-Why kick?  Cross-vCPU writes to LINT0 shouldn't be a thing, i.e. the kick should
-effectivel be a nop.
+> 
+>> @@ -725,8 +729,8 @@ static void kvm_pmu_create_perf_event(struct kvm_pmc *pmc)
+>>   	attr.type = arm_pmu->pmu.type;
+>>   	attr.size = sizeof(attr);
+>>   	attr.pinned = 1;
+>> -	attr.disabled = !kvm_pmu_counter_is_enabled(pmc);
+>> -	attr.exclude_user = !kvm_pmc_counts_at_el0(pmc);
+>> +	attr.disabled = !kvm_pmu_counter_is_enabled(vcpu, (*pmc)->idx);
+>> +	attr.exclude_user = !kvm_pmc_counts_at_el0(vcpu, (*pmc)->idx);
+>>   	attr.exclude_hv = 1; /* Don't count EL2 events */
+>>   	attr.exclude_host = 1; /* Don't count host events */
+>>   	attr.config = eventsel;
+> 
+> Can we just special-case the fixed CPU cycle counter to use
+> PERF_TYPE_HARDWARE / PERF_COUNT_HW_CPU_CYCLES? That _should_ have the
+> intended effect of opening an event on the PMU for this CPU.
+
+I have an impression that perhaps this emulation can be more generic by 
+converting eventsel to PERF_COUNT_HW_* numbers with armv8_pmuv3_perf_map 
+in drivers/perf/arm_pmuv3.c, but it is not in scope of this change. The 
+current code is sufficient for now.
+
+> 
+>> +	/*
+>> +	 * If we have a filter in place and that the event isn't allowed, do
+>> +	 * not install a perf event either.
+>> +	 */
+>> +	if (vcpu->kvm->arch.pmu_filter &&
+>> +	    !test_bit(eventsel, vcpu->kvm->arch.pmu_filter))
+>> +		return;
+>> +
+>> +	if (arm_pmu) {
+>> +		*pmc = kvm_pmu_alloc_pmc(idx, 1);
+>> +		if (!*pmc)
+>> +			goto err;
+>> +
+>> +		kvm_pmu_create_perf_event(pmc, arm_pmu, eventsel);
+>> +	} else {
+>> +		guard(mutex)(&arm_pmus_lock);
+> 
+> This is a system-wide lock, the need for which is eliminated if you go
+> for the reallocation approach I mention.
+> 
+>> +static int kvm_arm_pmu_v3_set_pmu_composition(struct kvm_vcpu *vcpu)
+>> +{
+>> +	struct kvm *kvm = vcpu->kvm;
+>> +	struct arm_pmu_entry *entry;
+>> +	struct arm_pmu *arm_pmu;
+>> +
+>> +	lockdep_assert_held(&kvm->arch.config_lock);
+>> +
+>> +	if (kvm_vm_has_ran_once(kvm) ||
+>> +	    (kvm->arch.pmu_filter && !kvm->arch.nr_composed_host_pmus))
+>> +		return -EBUSY;
+> 
+> I'm not sure there's much value in preventing the user from configuring
+> the PMU event filter. Even in the case of the fixed CPU cycle counter we
+> allow userspace to filter the event.
+
+It is possible to configure the PMU event filter, but it needs to be 
+done after setting the attribute. This behavior is aligned with 
+KVM_ARM_VCPU_PMU_V3_SET_PMU.
+
+> 
+> It is much more important to have mutual exclusion between this UAPI and
+> userspace explicitly selecting a PMU implementation.
+
+They are mutually exclusive and the latest configuration takes effect.
+
+If you set SET_PMU after COMPOSITION, SET_PMU will take effect.
+If you set COMPOSITION after SET_PMU, COMPOSITION will take effect.
+
+I'll note that in the documentation.
+
+> 
+>> @@ -1223,6 +1328,8 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+>>   
+>>   		return kvm_arm_pmu_v3_set_nr_counters(vcpu, n);
+>>   	}
+>> +	case KVM_ARM_VCPU_PMU_V3_COMPOSITION:
+>> +		return kvm_arm_pmu_v3_set_pmu_composition(vcpu);
+> 
+> I'd prefer naming this something like 'KVM_ARM_VCPU_PMU_V3_FIXED_COUNTERS_ONLY'.
+> We will have the fixed instruction counter eventually which is another
+> event we could potentially provide system-wide.
+
+The design decision to expose the cycle counter is driven by the 
+motivation to satisfy FEAT_PMU for the guest rather than the host 
+capability.
+
+When we implement FEAT_PMUv3_ICNTR in the future, I think we will need 
+to add KVM_ARM_VCPU_PMU_V3_COMPOSITION_ICNTR or something. The resultig 
+emulated PMU will work only on host CPUs that have instruction counters; 
+a host CPU may lack one because it doesn't implement FEAT_PMUv3_ICNTR or 
+has a third-party PMU like apple-m1-cpu-pmu (this particular PMU has an 
+instruction counter fortunately).
+
+Regards,
+Akihiko Odaki
 
