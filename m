@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-54091-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54092-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8161FB1C15E
-	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 09:33:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F13CB1C164
+	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 09:35:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35BBD627C30
-	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 07:33:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C7173BC080
+	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 07:35:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0130121146C;
-	Wed,  6 Aug 2025 07:33:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79DF721ABB0;
+	Wed,  6 Aug 2025 07:35:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hqAkMt28"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PWB9qolV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AED80205AA1;
-	Wed,  6 Aug 2025 07:33:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3609F1E1E0B;
+	Wed,  6 Aug 2025 07:35:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754465597; cv=none; b=KCIJ9X2F8LCPFgaYASVnP1FfbFO8JtvhJE/PovhCisNXAhiK9Qw0dvADntjXwSekBrGNjXSdWYHVI9Lbz61Af6MIWZTM0rsIBNwpZpm5XSr9x1BWmcNsqaKXLBDvgNSMPr59ydsE3WPvWzlHNRaDciI87hoORJXHS5ZwqNw+GLI=
+	t=1754465748; cv=none; b=J1+yK3/TnRKvmWYBSVem6ynMXEf8SikYu8DGbSxgjN001bt5OO1ETiaHAnmJteGUr2EAoBtz+I+nWXGy3SLpuYGwZFNYZMMqf/G0G4mhadQH5W84cLyVuQTnVx8zNjrtKH19o++ic05S32MHjfhKdnDfF0C/RF4xH/pKXZpK2i4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754465597; c=relaxed/simple;
-	bh=o9PVVEoNYNKGJdh1oHu9pFfOJ12DLoQyXZyj5y5IlrY=;
+	s=arc-20240116; t=1754465748; c=relaxed/simple;
+	bh=zuHhM0hm0TAVoCSt1vMrFnNsUyF+Cy+CLekCiHSBTv0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=X/dU+wBXBjkrNAegC8h3n2x+ihueLCgULuDRF8MJ+hH8HuVRyZXcKfRfgn/qccyks3trYz3148CgKP+pKh3UtP7mf0V8ceavfRNURXSEHT/vzRhtgyfdJIy8XJAcjbvVmXzLyVP9TxfzgoLTEKJpwPAEZoORB/OomCyOCJcJHF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hqAkMt28; arc=none smtp.client-ip=192.198.163.16
+	 In-Reply-To:Content-Type; b=dlqkqlXrzOS7GLbk6tWiZdoGw9+SdFmoH0yu7hp4nbNf053dNi+KuJjEmPL2oleiu27MJvrj7dj0hp+pbl8v3V/sdFMIvoTiwW3xWDwFez29gl1ozrUGAE5a0QV4slf482WriYoWnG2GvCTZV3wSkUqsi9tqavOUi2/Ntmn3vJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PWB9qolV; arc=none smtp.client-ip=192.198.163.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1754465596; x=1786001596;
+  t=1754465747; x=1786001747;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=o9PVVEoNYNKGJdh1oHu9pFfOJ12DLoQyXZyj5y5IlrY=;
-  b=hqAkMt28tu2CRHUFhg+do1hmZABJ3cDxl+4zH1U6d1z8uLLnDoRo6i/l
-   v2mYIUkmF/oppaLKdpL6zdt96M2fmtcv/ugTKPR3psrKe/taDSKP07B7+
-   ndzktAJKTbgDQgKhkbkTtSUbsbCqPl1JS9QWzpFwz0c7xqjQXO8XVleEo
-   LyZL8rXGdKYY83pxPIfVtCsjDcdgylxX48M7yL3GGcRZ7O+UAEveQqC5x
-   ZxIS0T5lGTnog8HkrUzj9kbiUVV8+jgzPb18XEkEp91FQ0MOPpfsHEBc1
-   HvtyBcHSOULbjie4i9Ddv9I5JzEAj2I/gfpdiSuHaumGOi/jtJOZkGdWQ
-   A==;
-X-CSE-ConnectionGUID: lnmLJ/nJQE6kQH3sbMXbJA==
-X-CSE-MsgGUID: dveH+SWTTTaPxp8peEwhKA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11513"; a="44367442"
+  bh=zuHhM0hm0TAVoCSt1vMrFnNsUyF+Cy+CLekCiHSBTv0=;
+  b=PWB9qolVyT/lw72zjf0oQZmzdXbMJf61m01RvqTFMOMcHBoleWLGVeB2
+   7IzJ7m8vEjIVNLcL7imA/Q112dogGec4hITU6TCdEoF8TpE3eRY2LaG1m
+   SGUaty/oEBfA45H23MKwqrFxoKqi6dBnagmKYjwb/0i/HZE6nOR19/wQv
+   /FMHGS9jD1rse8y5gL4X7CfEPJlNGlLYclfWDXsodhbLEzWllZYdEWEkh
+   76exPdGS0QeeYON5VQo5FDGRWlmXZCMqGMkzSrNHBjLVFHLNxLn7fo8Lv
+   h6sllbHO4NhYINJ0IfWbct1JCUE0b9g98M+AIHNqKyR4qsJMMTutfZF6L
+   w==;
+X-CSE-ConnectionGUID: G2uGS0EYQdygQN58C8zXVg==
+X-CSE-MsgGUID: cGt/0tj/RcqEqv8xFUFs3w==
+X-IronPort-AV: E=McAfee;i="6800,10657,11513"; a="55986542"
 X-IronPort-AV: E=Sophos;i="6.17,268,1747724400"; 
-   d="scan'208";a="44367442"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Aug 2025 00:33:15 -0700
-X-CSE-ConnectionGUID: 5qjtSVW5RwyHOLbFt53LVA==
-X-CSE-MsgGUID: LITql9msSVWQJedGN8jR5w==
+   d="scan'208";a="55986542"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Aug 2025 00:35:46 -0700
+X-CSE-ConnectionGUID: 1xNxjE1FR/qnk7eN+922LA==
+X-CSE-MsgGUID: 50cGG+yVQX2uEWyFyLt4YQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.17,268,1747724400"; 
-   d="scan'208";a="163931487"
+   d="scan'208";a="163956251"
 Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.240.106]) ([10.124.240.106])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Aug 2025 00:33:14 -0700
-Message-ID: <f08123c8-710d-4dba-889f-c178df0ba4a1@linux.intel.com>
-Date: Wed, 6 Aug 2025 15:33:11 +0800
+  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Aug 2025 00:35:45 -0700
+Message-ID: <d97c42ad-79ee-4eb0-ba89-85efdfd2c8f7@linux.intel.com>
+Date: Wed, 6 Aug 2025 15:35:42 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,41 +67,60 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 15/18] KVM: x86/pmu: Drop redundant check on PMC being
- locally enabled for emulation
+Subject: Re: [PATCH 16/18] KVM: x86/pmu: Rename check_pmu_event_filter() to
+ pmc_is_event_allowed()
 To: Sean Christopherson <seanjc@google.com>,
  Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, Xin Li
  <xin@zytor.com>, Sandipan Das <sandipan.das@amd.com>
 References: <20250805190526.1453366-1-seanjc@google.com>
- <20250805190526.1453366-16-seanjc@google.com>
+ <20250805190526.1453366-17-seanjc@google.com>
 Content-Language: en-US
 From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <20250805190526.1453366-16-seanjc@google.com>
+In-Reply-To: <20250805190526.1453366-17-seanjc@google.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 
 On 8/6/2025 3:05 AM, Sean Christopherson wrote:
-> Drop the check on a PMC being locally enabled when triggering emulated
-> events, as the bitmap of passed-in PMCs only contains locally enabled PMCs.
+> Rename check_pmu_event_filter() to make its polarity more obvious, and to
+> connect the dots to is_gp_event_allowed() and is_fixed_event_allowed().
+>
+> No functional change intended.
 >
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->  arch/x86/kvm/pmu.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
+>  arch/x86/kvm/pmu.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 >
 > diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-> index bdcd9c6f0ec0..422af7734846 100644
+> index 422af7734846..e75671b6e88c 100644
 > --- a/arch/x86/kvm/pmu.c
 > +++ b/arch/x86/kvm/pmu.c
-> @@ -969,8 +969,7 @@ static void kvm_pmu_trigger_event(struct kvm_vcpu *vcpu,
+> @@ -476,7 +476,7 @@ static bool is_fixed_event_allowed(struct kvm_x86_pmu_event_filter *filter,
+>  	return true;
+>  }
+>  
+> -static bool check_pmu_event_filter(struct kvm_pmc *pmc)
+> +static bool pmc_is_event_allowed(struct kvm_pmc *pmc)
+>  {
+>  	struct kvm_x86_pmu_event_filter *filter;
+>  	struct kvm *kvm = pmc->vcpu->kvm;
+> @@ -502,7 +502,7 @@ static int reprogram_counter(struct kvm_pmc *pmc)
+>  	emulate_overflow = pmc_pause_counter(pmc);
+>  
+>  	if (!pmc_is_globally_enabled(pmc) || !pmc_is_locally_enabled(pmc) ||
+> -	    !check_pmu_event_filter(pmc))
+> +	    !pmc_is_event_allowed(pmc))
+>  		return 0;
+>  
+>  	if (emulate_overflow)
+> @@ -969,7 +969,7 @@ static void kvm_pmu_trigger_event(struct kvm_vcpu *vcpu,
 >  		return;
 >  
 >  	kvm_for_each_pmc(pmu, pmc, i, bitmap) {
-> -		if (!pmc_is_locally_enabled(pmc) ||
-> -		    !check_pmu_event_filter(pmc) || !cpl_is_matched(pmc))
-> +		if (!check_pmu_event_filter(pmc) || !cpl_is_matched(pmc))
+> -		if (!check_pmu_event_filter(pmc) || !cpl_is_matched(pmc))
+> +		if (!pmc_is_event_allowed(pmc) || !cpl_is_matched(pmc))
 >  			continue;
 >  
 >  		kvm_pmu_incr_counter(pmc);
