@@ -1,141 +1,222 @@
-Return-Path: <kvm+bounces-54186-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54187-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B862AB1CD25
-	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 22:11:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98297B1CE02
+	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 22:48:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4CE2C174716
-	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 20:11:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 166A818C6C79
+	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 20:49:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F40FA2E3AF3;
-	Wed,  6 Aug 2025 19:58:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 205C91A08BC;
+	Wed,  6 Aug 2025 20:45:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4DFPLcrp"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="q8bfvp1y"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2085.outbound.protection.outlook.com [40.107.237.85])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F039B2DECCC
-	for <kvm@vger.kernel.org>; Wed,  6 Aug 2025 19:58:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754510331; cv=none; b=YOD1xj6CNSsoSigu0CTug1GJ73TuickVp5Y619MQLlsBDHvnLuhj7ThM6rANiUcPQXRFOi+n74DLcEjW0TOkqh35Yg6tvsh0nDpBZ550Np8LaFUdB5qyYLQjkTT7OZxeT35DSDgc4tGT2qCa3y1pdppmKMameyoFRxs+IC9evy4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754510331; c=relaxed/simple;
-	bh=UqKbQ/MEitFcIh6oJaDa5iQaYpCTlGUBLK908ME1g4Q=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Li9oUe/0hvFp42x0tjWQQHhOoaTo2rTRTrj6Yxz/m/QZDin1bkPytNRT9dksAKsUBcqv1TK9M1UKUbhdSHH5rMyHdRDz7BwSuA2mwWnLWBpb+6dD7/K/0fln80sEkK29nqt7W4fgg6FLmWy9leKNn6mX4TTIHmpIlrnAgY65pwQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4DFPLcrp; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-24283069a1cso1864875ad.1
-        for <kvm@vger.kernel.org>; Wed, 06 Aug 2025 12:58:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754510328; x=1755115128; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=FEfQdODxvc/WYDgKcBJNCqpRp5QcBVEYBtlnYDr8f+A=;
-        b=4DFPLcrpXC8nzPtT2ABri2kiMNcEVcSAxV5rGGrD+ycZK7+G/xw3XhsrSAq1GUn+KV
-         c3mpEz7/DDiuZDG7GsCIPbif7RO/cx41LAnNr0vTSFC6UyiRf85KJwYiHHN+6gMvD2x3
-         r/KZj9P6pt0zyfbT2R5csi8Lws+uVx2QP1ChHeoVC3qnHlqdtPqLRPMYbMDeSoA+untO
-         RvTmh5AQsiEoV3GWBjr95m3BQ/5EUFHIiRvNkBOZmvg7CjaLz86K424skxFJa2S2WDzF
-         5659bUKO7cI22AYTqU4s+3QVJ2DpO+fanRhX7RIBIsPgxSskBdF4PvKFLbevBywWkkOk
-         jgeg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754510328; x=1755115128;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=FEfQdODxvc/WYDgKcBJNCqpRp5QcBVEYBtlnYDr8f+A=;
-        b=OnBzyn0cK3ds6wro3JoGVF7IBOryfewO2MwOz57BsUkxla0y9Ln5h5Q0K4o6LXuQUn
-         0TQhBpY6NOBKMkiTcxn89eIgN2cxql3U/lV0fho/1BrvskboffVdCmAZV3NPaNutTciU
-         VhzbgwOnCff/A9UbpFoSlxFEgh6qTYgN00OMfWxlqDI3dK6SeC+w3KX9yJnD9Nx+eXB/
-         uhMTCBoO3EIyXX7oDiCKG7zFG/x/SRchFHvpfwhRsbanqvMUsMKsUmjeqawvBkYS55iZ
-         AK/72g758UcG+zWBpk8UrjpS7P70cjoUJhTxGUNY4TAApwo1WVCuLQcb5gvPthaUHFg3
-         glPg==
-X-Forwarded-Encrypted: i=1; AJvYcCXI6I1yufy25/SeGPGky7uzqtZwqyKsJVPKyPYyaqPMiaFIjtwitgUDYHVsUJv8rFKsUYQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyn5wfcjsBM8sT+1wMcmT9iAGLDmz9nSwzNLbwo65HOAHSUc1qD
-	tODbqenuPtVRkebrDxVkcBFWOQone8mQxpAKqU4nkFyBOY6xSOCMsee90EsJRLUdIEJifIeVmEE
-	QIS6+UQ==
-X-Google-Smtp-Source: AGHT+IHKT98t7sh+NJ88sddK4YezK7lHLHfrTfL2AYLv+RO+SAkhLkiCccC37Go9T+seI3ZwHUra06wFxFw=
-X-Received: from plbmp11.prod.google.com ([2002:a17:902:fd0b:b0:23f:fa41:1de3])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:3bcc:b0:234:c8ec:51b5
- with SMTP id d9443c01a7336-242a0bffb31mr47813405ad.53.1754510327813; Wed, 06
- Aug 2025 12:58:47 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed,  6 Aug 2025 12:57:06 -0700
-In-Reply-To: <20250806195706.1650976-1-seanjc@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 016471993B7;
+	Wed,  6 Aug 2025 20:45:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.85
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1754513153; cv=fail; b=dsRTPWD8g6iiVeRyUrRKDEyioRknVBmlRSXQJwxxjK9wq3/JZIiVCAhFfiCtu/lBUL6oihOPnX4qiI41pM/79z5vxXaxUT4/a4pzpFuhu635Ak0XHAoAcuuOi8lFATjHU4G0lzYYjYvDHPk+bYtIotZSt2tEKFzisThfogLBtgg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1754513153; c=relaxed/simple;
+	bh=QOo//FNThZ4of45IVeSXUJ9aTJo9HbVeCQqLg0Efgqo=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=fi3RBe1upgg7mAS02NQMkqiEIicduKcTBoEwbtV0Rbbyh4Fc1bCraEdXcYuGqtpxQN4lPXcgKVp18FkCtdykJAtM+2MNhwX9sHtLJAze2ywhOCoc8/oS8dxiTFxcB5p/V0YOZeQoWRk/RJ+tpmwzmW0WqOBjys/BEuem9CPJ1Ak=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=q8bfvp1y; arc=fail smtp.client-ip=40.107.237.85
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=PywppiWK/jfLoOnAhA0bmPp32I9fr6Hos8eW43MBkwogPol6JdnoNaKow1X/QRUIDbMKOUgPs15xrJOIWst4rRSFl4NB8X6YA7VxQ44hJalKJQNLA85yp8hMZj9dyr3vhvzIAIHM/qGTD88lwdj2Q/nVlyT//dHVe4XxQ6AMJ63yjozSZzHIlBVKMVkqh5SIYGW0yzo21S6G0grlRpaGzDj0K74XgLQZtI1eiX08HWMPDlTatBA+2dZixg72Z96ARbUy1K2oXOfrmXJytdWexMW7ZlJsvPYW8l+Xt4k+IpK8BLs1IhdHggW8Z2s4S63rwjuJX0CspW83zdAC4l8WIQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Iq9WVfFnqo5kmgzoUmO26oxXZQFXG7UXpLk21BQbB+Q=;
+ b=QOLrW0+g4UtphQSTOtLg7xyNMDxSVoD5kPB0zV28zUiobexiQpdsVHCe70jvdEGszRw+eVdrtJvH/TLtdhw+HZ5bvtxtHWubcVUOVuAm1ozRsvlrGEkYYhNb8jsCbhw2GeIxGZQJaGiiYf7Rh7vOVGNJ6eyDvOgQNfMDDQk2jzwOhbPoX7SLJ2gV1Glqu2nITiGcHPuv4g4+mw9Sxsxxy/5OuJM41vbir3OO/P63/0GCLubLCuUhxz7/RjiDKEA7oJ5wYDDYrEwArf9CEqj32wR0VDVgxJoownk4uoGGILpXVHKVdsH+DnZ/84EBkQ8oq0k4Zi+Zn60KB8euih9RMw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Iq9WVfFnqo5kmgzoUmO26oxXZQFXG7UXpLk21BQbB+Q=;
+ b=q8bfvp1ygFRxx/Pk5onE7kOwWqyCbBzfq4lF7/ci/d0UyI022p3wzdsj2ooSYXt4/gNNSSqOK/34qY2m7k8B4poB/Z8tycZ+4jbCfcgNHMLVvDm2JQYqGXh72l1nWPklu69c8fUS3s3koNpmXqI/1vNtP0zKwytktRa0cMNBPTk=
+Received: from BN9PR03CA0911.namprd03.prod.outlook.com (2603:10b6:408:107::16)
+ by CY1PR12MB9652.namprd12.prod.outlook.com (2603:10b6:930:106::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9009.14; Wed, 6 Aug
+ 2025 20:45:47 +0000
+Received: from MN1PEPF0000F0E4.namprd04.prod.outlook.com
+ (2603:10b6:408:107:cafe::34) by BN9PR03CA0911.outlook.office365.com
+ (2603:10b6:408:107::16) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8989.20 via Frontend Transport; Wed,
+ 6 Aug 2025 20:45:46 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ MN1PEPF0000F0E4.mail.protection.outlook.com (10.167.242.42) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.9009.8 via Frontend Transport; Wed, 6 Aug 2025 20:45:46 +0000
+Received: from jallen-jump-host.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 6 Aug
+ 2025 15:45:45 -0500
+From: John Allen <john.allen@amd.com>
+To: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <x86@kernel.org>,
+	<seanjc@google.com>, <pbonzini@redhat.com>, <dave.hansen@intel.com>
+CC: <rick.p.edgecombe@intel.com>, <mlevitsk@redhat.com>,
+	<weijiang.yang@intel.com>, <chao.gao@intel.com>, <bp@alien8.de>,
+	<dave.hansen@linux.intel.com>, <hpa@zytor.com>, <mingo@redhat.com>,
+	<tglx@linutronix.de>, <thomas.lendacky@amd.com>, John Allen
+	<john.allen@amd.com>
+Subject: [PATCH v3 0/5] Enable Shadow Stack Virtualization for SVM
+Date: Wed, 6 Aug 2025 20:45:05 +0000
+Message-ID: <20250806204510.59083-1-john.allen@amd.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250806195706.1650976-1-seanjc@google.com>
-X-Mailer: git-send-email 2.50.1.565.gc32cd1483b-goog
-Message-ID: <20250806195706.1650976-45-seanjc@google.com>
-Subject: [PATCH v5 44/44] KVM: x86/pmu: Elide WRMSRs when loading guest PMCs
- if values already match
-From: Sean Christopherson <seanjc@google.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
-	Huacai Chen <chenhuacai@kernel.org>, Anup Patel <anup@brainfault.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Xin Li <xin@zytor.com>, "H. Peter Anvin" <hpa@zytor.com>, 
-	Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
-	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, loongarch@lists.linux.dev, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org, Kan Liang <kan.liang@linux.intel.com>, 
-	Yongwei Ma <yongwei.ma@intel.com>, Mingwei Zhang <mizhang@google.com>, 
-	Xiong Zhang <xiong.y.zhang@linux.intel.com>, Sandipan Das <sandipan.das@amd.com>, 
-	Dapeng Mi <dapeng1.mi@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN1PEPF0000F0E4:EE_|CY1PR12MB9652:EE_
+X-MS-Office365-Filtering-Correlation-Id: a748d6c2-ace1-4f3f-e686-08ddd52a3847
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|82310400026|7416014|376014|36860700013;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?GMnHonMeNRUG4siVWqqtxJgbu1pg2uq1At8fFnWSDBDoUrFDRy3Fl6Aglztm?=
+ =?us-ascii?Q?8g4gekjJ2Xv78/jS08sShUm/dOikc0zkwLs81q10B+1Y8AlkIP+VHoHrfziW?=
+ =?us-ascii?Q?0P0SFr8d43YoA9KVsJAsfPjFMNYaq/IYabm1qBDm6z+EC/i06gncY/Uq2Fr5?=
+ =?us-ascii?Q?CpmIS+EldUtNNykmGpLvDFpdOWoxwaboLkuWMUWI07tL67giBt2et7tz1FKU?=
+ =?us-ascii?Q?8DhA00KQfkphO1kgW15GhiOc6jOB1xL9QL5hCvJNjVGQv2D+tO887J89mnkx?=
+ =?us-ascii?Q?kl1IY/ee4StTIe01fLSWd5/zu5ybW51+EYJsqGB4BEl0qzKGZ3/wbTnHJiMx?=
+ =?us-ascii?Q?I0u+JV5EApmYmOd0gQOvww1PK2P43LM/Y3Up45mhgkd/h45UGB21Qdtfxb+W?=
+ =?us-ascii?Q?FDR7w+ASBoG0DczW1E381qmXWsXaps2gZdVLScN7tY0DlrKAn3C++ATSh2I0?=
+ =?us-ascii?Q?ho6uJX2+FJWhdfv2SOO4gsCnv81vz6CBadPRq+4NR+xS54r0sQy3USHWEcjo?=
+ =?us-ascii?Q?H8wBRgFAkA700lRcj+yHO6Sc8bEg5RxMxQp7k2PqGBlDP+6ETMZzYPjRgcsC?=
+ =?us-ascii?Q?aTyJp9mrU/XYGwbymWuhNlFFHTSeitRRLb2R59MHUvY5qP+Dprnpxmazt44+?=
+ =?us-ascii?Q?lGWiivdH4lFBfcCtNLGeBHkBqt+fyElyQV8GfIK/MTvMgSWtRzTNM/Wfx6JA?=
+ =?us-ascii?Q?JYXT3PM0ntKB/XyZO17zif24rJcpBEax35n9huZ56+Wc6HBe7GX6MnBIe6RW?=
+ =?us-ascii?Q?ei8rDq2Q3ztN2qY/LsixKflCVk1714zE/IDhqegF/uwVjSLn6TQg44R5jDXA?=
+ =?us-ascii?Q?OhynD5W01ij+5CU9AZNffuezPSHQtwI7Oj3uLbu3LsC3R/knH9ZGZN7iRJgR?=
+ =?us-ascii?Q?lshg2eD48BFEzXTUAE7dvTFxWxWJEh77/K1bkokyQ2e4ZGw2s+qtHpgrZ3gx?=
+ =?us-ascii?Q?XCSoF0uiD1Wvog2B5fJRsEjJ1wj59/iudvGfu9l3WKysfOTE5U/BdZXlfufB?=
+ =?us-ascii?Q?XVVduVzDG5E929vYsA6LXf80VDmACz2NFsgX0I76jnQ0x86oUjVze8sbyEiw?=
+ =?us-ascii?Q?vA9lbainCa4S+B1poGd+VduQa7fzSeQXRl57v7Wmru8EI3/2pyp2GLMsE8Ej?=
+ =?us-ascii?Q?jA39g8j5Yf8yo/uqBepnJWGDrS6P/NFs+LTVpY6yxMuI6d48EqUk9a+GtD7q?=
+ =?us-ascii?Q?sn9KviGd+G4ORHWnv4pcZGoMoUaBUKiBQzRyDH7bw9mvwEGc7wMPVXk6QK5a?=
+ =?us-ascii?Q?s36dT5e1TVFo6//jf5gPG21/jo+IeMgSdwsxhKEJ2onzaMzCfPzATFsPgrJ+?=
+ =?us-ascii?Q?P8TuATqFHZPAsxN6qW3CvzM3GsB3aNauhpeKpbZ/c0N0PfbafE13Wc25ovfC?=
+ =?us-ascii?Q?kouQ3La8a+7XLc3GwZG0MpQ1UG7KeWvW4ODwQpWvpj/vk401+FzAdDLTJhWN?=
+ =?us-ascii?Q?9kB4sm302CNhEthAF5YUKsZZyHmIC0FeqWnR/UpcP1Bjr527RyEWd27PfbH9?=
+ =?us-ascii?Q?j1P7cZKFDH2zbwb2GaIZNjOaQx+7X5kvyrFFvZm2MTLUCOY0Zo93oQy5sQ?=
+ =?us-ascii?Q?=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(7416014)(376014)(36860700013);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Aug 2025 20:45:46.5573
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: a748d6c2-ace1-4f3f-e686-08ddd52a3847
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	MN1PEPF0000F0E4.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY1PR12MB9652
 
-When loading a mediated PMU state, elide the WRMSRs to load PMCs with the
-guest's value if the value in hardware already matches the guest's value.
-For the relatively common case where neither the guest nor the host is
-actively using the PMU, i.e. when all/many counters are '0', eliding the
-WRMSRs reduces the latency of handling VM-Exit by a measurable amount
-(WRMSR is significantly more expensive than RDPMC).
+AMD Zen3 and newer processors support shadow stack, a feature designed
+to protect against ROP (return-oriented programming) attacks in which an
+attacker manipulates return addresses on the call stack in order to
+execute arbitrary code. To prevent this, shadow stacks can be allocated
+that are only used by control transfer and return instructions. When a
+CALL instruction is issued, it writes the return address to both the
+program stack and the shadow stack. When the subsequent RET instruction
+is issued, it pops the return address from both stacks and compares
+them. If the addresses don't match, a control-protection exception is
+raised.
 
-As measured by KVM-Unit-Tests' CPUID VM-Exit testcase, this provides a
-a ~25% reduction in latency (4k => 3k cycles) on Intel Emerald Rapids,
-and a ~13% reduction (6.2k => 5.3k cycles) on AMD Turing.
+Shadow stack and a related feature, Indirect Branch Tracking (IBT), are
+collectively referred to as Control-flow Enforcement Technology (CET).
+However, current AMD processors only support shadow stack and not IBT.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
+This series adds support for shadow stack in SVM guests and builds upon
+the support added in the CET guest support patch series [1]. Additional
+patches are required to support shadow stack enabled guests in qemu [2].
+
+[1]: CET guest support patches (v11)
+https://lore.kernel.org/all/20250704085027.182163-1-chao.gao@intel.com/
+
+[2]: CET qemu patches
+https://lore.kernel.org/all/20230720111445.99509-1-weijiang.yang@intel.com/
+
+[3]:  Previous SVM support patches (v2)
+https://lore.kernel.org/all/20240226213244.18441-1-john.allen@amd.com/
+
 ---
- arch/x86/kvm/pmu.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-index ddab1630a978..0e5048ae86fa 100644
---- a/arch/x86/kvm/pmu.c
-+++ b/arch/x86/kvm/pmu.c
-@@ -1299,13 +1299,15 @@ static void kvm_pmu_load_guest_pmcs(struct kvm_vcpu *vcpu)
- 	for (i = 0; i < pmu->nr_arch_gp_counters; i++) {
- 		pmc = &pmu->gp_counters[i];
- 
--		wrmsrl(gp_counter_msr(i), pmc->counter);
-+		if (pmc->counter != rdpmc(i))
-+			wrmsrl(gp_counter_msr(i), pmc->counter);
- 		wrmsrl(gp_eventsel_msr(i), pmc->eventsel_hw);
- 	}
- 	for (i = 0; i < pmu->nr_arch_fixed_counters; i++) {
- 		pmc = &pmu->fixed_counters[i];
- 
--		wrmsrl(fixed_counter_msr(i), pmc->counter);
-+		if (pmc->counter != rdpmc(INTEL_PMC_FIXED_RDPMC_BASE | i))
-+			wrmsrl(fixed_counter_msr(i), pmc->counter);
- 	}
- }
- 
+RFC v2:
+  - Rebased on v3 of the Intel CET virtualization series, dropping the
+    patch that moved cet_is_msr_accessible to common code as that has
+    been pulled into the Intel series.
+  - Minor change removing curly brackets around if statement introduced
+    in patch 6/6.
+RFC v3:
+  - Rebased on v5 of the Intel CET virtualization series.
+  - Add patch changing the name of vmplX_ssp SEV-ES save area fields to
+    plX_ssp.
+  - Merge this series intended for KVM with the separate guest kernel
+    patch (now patch 7/8).
+  - Update MSR passthrough code to conditionally pass through shadow
+    stack MSRS based on both host and guest support.
+  - Don't save PL0_SSP, PL1_SSP, and PL2_SSP MSRs on SEV-ES VMRUN as
+    these are currently unused.
+v1:
+  - Remove RFC tag from series
+  - Rebase on v6 of the Intel CET virtualization series
+  - Use KVM-governed feature to track SHSTK for SVM
+v2:
+  - Add new patch renaming boot_*msr to raw_*msr. Utilize raw_rdmsr when
+    reading XSS on SEV-ES cpuid instructions.
+  - Omit unnecessary patch for saving shadow stack msrs on SEV-ES VMRUN
+  - Omit passing through of XSS for SEV-ES as support has already been
+    properly implemented in a26b7cd22546 ("KVM: SEV: Do not intercept
+    accesses to MSR_IA32_XSS for SEV-ES guests") 
+v3:
+  - Rebased on v11 of the Intel CET Virtualization series.
+  - Split guest kernel patches into a separate series as these are
+    independent of this series and are needed to support non-KVM
+    hypervisors.
+
+John Allen (5):
+  KVM: x86: SVM: Emulate reads and writes to shadow stack MSRs
+  KVM: x86: SVM: Update dump_vmcb with shadow stack save area additions
+  KVM: x86: SVM: Pass through shadow stack MSRs
+  KVM: SVM: Add MSR_IA32_XSS to the GHCB for hypervisor kernel
+  KVM: SVM: Enable shadow stack virtualization for SVM
+
+ arch/x86/kvm/svm/sev.c |  9 +++++++--
+ arch/x86/kvm/svm/svm.c | 39 ++++++++++++++++++++++++++++++++++-----
+ arch/x86/kvm/svm/svm.h |  1 +
+ 3 files changed, 42 insertions(+), 7 deletions(-)
+
 -- 
-2.50.1.565.gc32cd1483b-goog
+2.34.1
 
 
