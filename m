@@ -1,263 +1,162 @@
-Return-Path: <kvm+bounces-54139-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54140-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CED3B1CBE5
-	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 20:25:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 096DFB1CC59
+	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 21:13:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BFF2618C42FD
-	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 18:26:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 25F0C7A1538
+	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 19:11:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A1B729ACE5;
-	Wed,  6 Aug 2025 18:25:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC9AC2BD029;
+	Wed,  6 Aug 2025 19:12:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b="s0tTe+KM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EJObUTcV"
 X-Original-To: kvm@vger.kernel.org
-Received: from www3579.sakura.ne.jp (www3579.sakura.ne.jp [49.212.243.89])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAB46273D94;
-	Wed,  6 Aug 2025 18:25:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.243.89
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFFE13C01;
+	Wed,  6 Aug 2025 19:12:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754504738; cv=none; b=mdAsH869+dOlcqTxLmD+9SRqfNfbywCO8xeGebWzcN9isHPNT7w7A+YXozBj0n1QhkxWli/LPBt1iAQ7zrOOaz/J54l+MlsZhOSJgvL3xP/yH9CGYQvkyFhd09yhzslVqp7Zi7u9FKnVwcgnb/sswSaCLK9hMJuzDDHXZtU1nYg=
+	t=1754507568; cv=none; b=kZBxGPj3TCGXw4mCHd2DYWU1oSXSYyGIBmHHrYBuvcjgdXQ2a6Jxjxu1wxGWh7tmKSYe8QL33mM/LjgfX1hpKn5y9B6RoL4AU7W5oQvm4H/tmK2rHNOmV1O2AnUZF5PoswbhyZqN7d4IvMAia3xvk3gAMrjNrsFUF5lnsoyLk/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754504738; c=relaxed/simple;
-	bh=lLiMUbc8zLGH56UCBmIp7ECag9C43ts/2sCxH5ypZOE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bsfyzGWHucRmWEgQfRqqCikWIH1b+laa0fewnaSrbILqU6p4iFxrcdAs1Cnb0zg/fuv4Jxhr0aOl/trIcnm8oUlOJoggYVmBF0RgjHrm4w1d+GcTj1furOVdAJT4lSSFA7LyWMZtXtiRjkdlqfnOcfAy95iKXmnKHnstkfkFCPI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp; dkim=fail (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b=s0tTe+KM reason="key not found in DNS"; arc=none smtp.client-ip=49.212.243.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp
-Received: from [192.168.10.111] (p865013-ipoe.ipoe.ocn.ne.jp [153.242.222.12])
-	(authenticated bits=0)
-	by www3579.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 576IOhK2054951
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Thu, 7 Aug 2025 03:24:43 +0900 (JST)
-	(envelope-from odaki@rsg.ci.i.u-tokyo.ac.jp)
-DKIM-Signature: a=rsa-sha256; bh=phX34nUYLjHESXOAqkOcxwCZETbFegwkz1f4cCdWzzU=;
-        c=relaxed/relaxed; d=rsg.ci.i.u-tokyo.ac.jp;
-        h=Message-ID:Date:Subject:To:From;
-        s=rs20250326; t=1754504684; v=1;
-        b=s0tTe+KMI7swBAP+Xt3bupx/k9JygXTou5eGqet3hy78WwzAvwG1SEDUkFmJGKPm
-         Fmt1e2dmZ/6uqTJCyxyx7OKvs+36JfYyb+5vNIrCdRnWbBwiOBsvMo8ip/+h8uUa
-         W9iuQh0EGDAjQ/Kh3yRFezjno6q6ySoWUdO3rBWBtqbFzP1qd42be8gifZ+wE4s1
-         l0st77DdTCQazNwWW4YnxkDeAOHCt7rS3l1EkcErRWYpFE9FniE9fskIAB+mLZAV
-         +SoeBkfdAgu4MxJfQiCaTtgBLsqDSUko1PpPKlXc6EnigstQE8M4uOgF+38XxVnC
-         xxaZlbY4fLVTMYeXJyWZWA==
-Message-ID: <276fdfb8-f1ca-44ad-b310-a811684b265a@rsg.ci.i.u-tokyo.ac.jp>
-Date: Thu, 7 Aug 2025 03:24:43 +0900
+	s=arc-20240116; t=1754507568; c=relaxed/simple;
+	bh=63oiH47TpNrKg8vSfBfA+XroUg56FkruM6tDGJa3KA0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jLeiyRdACzJQVEAwQWLPbDaNJ8g2ZJ29FYdiYZ3+Vqle9Yg9DIWUKijo/mCEhjNIMrm1RYHDj3DFAInyxErmf0Mk2IKfWgAZ/n/r1u++mvLwA+Z6eApgTE+9L9kewli93C6G2HX0kowCdZDyuFXS6k6vkuSeW76ZHzTRnsoU5Bo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EJObUTcV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A5A1C4CEE7;
+	Wed,  6 Aug 2025 19:12:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754507567;
+	bh=63oiH47TpNrKg8vSfBfA+XroUg56FkruM6tDGJa3KA0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=EJObUTcVdLBwCfMCLh2osZjFACQQgVCUtz8cfWIdVaclvA1ChLJlI9I8vLt7nk+92
+	 +WnsMFK5jMNiaUR8sOLGK2iCANup7cRV2gNXt1l9xCJK6Z4eBGmLzgViZG+kKpo9DE
+	 +qtgcGKOs2+HY+OFmuRdJlhFLw3bFAwnKQJDpFREvCy3afbps3P758/e2njEwy9T+t
+	 aIWldOBR/yr52doaCpEpmrBI73snnic5aE/MjnhDCoRZsUL7BMw0Vqn20e/ogLmWIt
+	 E6PDxPBGCqt665IGD99LE5MhtXkuLMk5dMA4Ohxcv8ArnvMTs3uY9+gJgnrq6Fveny
+	 bD9Gv+dSD6h/g==
+Date: Wed, 6 Aug 2025 20:12:39 +0100
+From: Simon Horman <horms@kernel.org>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Bryan Tan <bryan-bt.tan@broadcom.com>,
+	Vishnu Dasa <vishnu.dasa@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	berrange@redhat.com, Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH RFC net-next v4 09/12] vsock/loopback: add netns support
+Message-ID: <20250806191239.GF61519@horms.kernel.org>
+References: <20250805-vsock-vmtest-v4-0-059ec51ab111@meta.com>
+ <20250805-vsock-vmtest-v4-9-059ec51ab111@meta.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v2 1/2] KVM: arm64: PMU: Introduce
- KVM_ARM_VCPU_PMU_V3_COMPOSITION
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu
- <yuzenghui@huawei.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Kees Cook <kees@kernel.org>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
-        Shuah Khan <shuah@kernel.org>, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
-        linux-hardening@vger.kernel.org, devel@daynix.com, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20250806-hybrid-v2-0-0661aec3af8c@rsg.ci.i.u-tokyo.ac.jp>
- <20250806-hybrid-v2-1-0661aec3af8c@rsg.ci.i.u-tokyo.ac.jp>
- <aJOO99xUrhsrvLwl@linux.dev>
-Content-Language: en-US
-From: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
-In-Reply-To: <aJOO99xUrhsrvLwl@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250805-vsock-vmtest-v4-9-059ec51ab111@meta.com>
 
-On 2025/08/07 2:20, Oliver Upton wrote:
-> Hi Akihiko,
+On Tue, Aug 05, 2025 at 02:49:17PM -0700, Bobby Eshleman wrote:
+> From: Bobby Eshleman <bobbyeshleman@meta.com>
 > 
-> This is an unreasonably large patch that needs to be broken down into
-> smaller patches, ideally one functional change per patch. We need this
-> even for an RFC for the sake of reviews.
+> Add NS support to vsock loopback. Sockets in a global mode netns
+> communicate with each other, regardless of namespace. Sockets in a local
+> mode netns may only communicate with other sockets within the same
+> namespace.
 > 
-> On Wed, Aug 06, 2025 at 06:09:54PM +0900, Akihiko Odaki wrote:
->> +static u64 kvm_pmu_get_pmc_value(struct kvm_vcpu *vcpu, u8 idx)
->>   {
->> -	struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
->> +	struct kvm_pmc *pmc = *kvm_vcpu_idx_to_pmc(vcpu, idx);
->>   	u64 counter, reg, enabled, running;
->> +	unsigned int i;
->>   
->> -	reg = counter_index_to_reg(pmc->idx);
->> +	reg = counter_index_to_reg(idx);
->>   	counter = __vcpu_sys_reg(vcpu, reg);
->>   
->>   	/*
->>   	 * The real counter value is equal to the value of counter register plus
->>   	 * the value perf event counts.
->>   	 */
->> -	if (pmc->perf_event)
->> -		counter += perf_event_read_value(pmc->perf_event, &enabled,
->> -						 &running);
->> +	if (pmc)
->> +		for (i = 0; i < pmc->nr_perf_events; i++)
->> +			counter += perf_event_read_value(pmc->perf_events[i],
->> +							 &enabled, &running);
-> 
-> I'm concerned that this array of events concept you're introducing is
-> going to be error-prone. An approach that reallocates a new PMU event in
-> the case of a vCPU migrating to a new PMU implementation would be
-> desirable.
+> Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
 
-I avoided allocation at migration because I was worried with disabled 
-preemption. perf_event_create_kernel_counter() internally takes a mutex 
-so it cannot be used if preemption is disabled.
+...
 
-I wonder if it is guaranteed that kvm_arch_vcpu_load() executes with 
-preemption. If so, I can add a hook there to call 
-perf_event_create_kernel_counter().
+> diff --git a/net/vmw_vsock/vsock_loopback.c b/net/vmw_vsock/vsock_loopback.c
 
-> 
->> +static void reset_sample_period(struct perf_event *perf_event)
->> +{
->> +	struct kvm_pmc **pmc = perf_event->overflow_handler_context;
->> +	struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
->> +	struct arm_pmu *cpu_pmu = to_arm_pmu(perf_event->pmu);
->> +	u64 period;
->> +
->> +	cpu_pmu->pmu.stop(perf_event, PERF_EF_UPDATE);
->> +
->> +	/*
->> +	 * Reset the sample period to the architectural limit,
->> +	 * i.e. the point where the counter overflows.
->> +	 */
->> +	period = compute_period(pmc, kvm_pmu_get_pmc_value(vcpu, (*pmc)->idx));
->> +
->> +	local64_set(&perf_event->hw.period_left, 0);
->> +	perf_event->attr.sample_period = period;
->> +	perf_event->hw.sample_period = period;
->> +
->> +	cpu_pmu->pmu.start(perf_event, PERF_EF_RELOAD);
->> +}
-> 
-> No, we can't start calling into the internal driver interfaces. The fact
-> that we have a pointer to the PMU is an ugly hack and shouldn't be used
-> like this.
+...
 
-This function was extracted from kvm_pmu_perf_overflow() and is not a 
-new addition (which should have been clear if I would have split the 
-patch as you noted).
+> @@ -46,7 +57,7 @@ static int vsock_loopback_cancel_pkt(struct vsock_sock *vsk)
+>  	return 0;
+>  }
+>  
+> -static bool vsock_loopback_seqpacket_allow(u32 remote_cid);
+> +static bool vsock_loopback_seqpacket_allow(struct vsock_sock *vsk, u32 remote_cid);
 
-I thought of replacing it with perf_event_period(), but there is a 
-catch: it returns -EINVAL if the 63th bit of the sample period number is 
-set. Perhaps we can just specify ((1ULL << 63) - 1) if the sample period 
-is going to be so long, but I conservatively avoided that. I can change 
-it if you prefer that way or have an alternative idea.
+This change needs to be squashed into
+PATCH 3/12 vsock: add netns to af_vsock core
 
-> 
->> @@ -725,8 +729,8 @@ static void kvm_pmu_create_perf_event(struct kvm_pmc *pmc)
->>   	attr.type = arm_pmu->pmu.type;
->>   	attr.size = sizeof(attr);
->>   	attr.pinned = 1;
->> -	attr.disabled = !kvm_pmu_counter_is_enabled(pmc);
->> -	attr.exclude_user = !kvm_pmc_counts_at_el0(pmc);
->> +	attr.disabled = !kvm_pmu_counter_is_enabled(vcpu, (*pmc)->idx);
->> +	attr.exclude_user = !kvm_pmc_counts_at_el0(vcpu, (*pmc)->idx);
->>   	attr.exclude_hv = 1; /* Don't count EL2 events */
->>   	attr.exclude_host = 1; /* Don't count host events */
->>   	attr.config = eventsel;
-> 
-> Can we just special-case the fixed CPU cycle counter to use
-> PERF_TYPE_HARDWARE / PERF_COUNT_HW_CPU_CYCLES? That _should_ have the
-> intended effect of opening an event on the PMU for this CPU.
+To avoid build breakage.
 
-I have an impression that perhaps this emulation can be more generic by 
-converting eventsel to PERF_COUNT_HW_* numbers with armv8_pmuv3_perf_map 
-in drivers/perf/arm_pmuv3.c, but it is not in scope of this change. The 
-current code is sufficient for now.
+Likewise with the other change to vsock_loopback_seqpacket_allow below.
+And I think also for a number of other changes made by PATCH 3/12.
 
-> 
->> +	/*
->> +	 * If we have a filter in place and that the event isn't allowed, do
->> +	 * not install a perf event either.
->> +	 */
->> +	if (vcpu->kvm->arch.pmu_filter &&
->> +	    !test_bit(eventsel, vcpu->kvm->arch.pmu_filter))
->> +		return;
->> +
->> +	if (arm_pmu) {
->> +		*pmc = kvm_pmu_alloc_pmc(idx, 1);
->> +		if (!*pmc)
->> +			goto err;
->> +
->> +		kvm_pmu_create_perf_event(pmc, arm_pmu, eventsel);
->> +	} else {
->> +		guard(mutex)(&arm_pmus_lock);
-> 
-> This is a system-wide lock, the need for which is eliminated if you go
-> for the reallocation approach I mention.
-> 
->> +static int kvm_arm_pmu_v3_set_pmu_composition(struct kvm_vcpu *vcpu)
->> +{
->> +	struct kvm *kvm = vcpu->kvm;
->> +	struct arm_pmu_entry *entry;
->> +	struct arm_pmu *arm_pmu;
->> +
->> +	lockdep_assert_held(&kvm->arch.config_lock);
->> +
->> +	if (kvm_vm_has_ran_once(kvm) ||
->> +	    (kvm->arch.pmu_filter && !kvm->arch.nr_composed_host_pmus))
->> +		return -EBUSY;
-> 
-> I'm not sure there's much value in preventing the user from configuring
-> the PMU event filter. Even in the case of the fixed CPU cycle counter we
-> allow userspace to filter the event.
+Please make sure that patches don't introduce transient build failures.
+It breaks bisection.
 
-It is possible to configure the PMU event filter, but it needs to be 
-done after setting the attribute. This behavior is aligned with 
-KVM_ARM_VCPU_PMU_V3_SET_PMU.
 
-> 
-> It is much more important to have mutual exclusion between this UAPI and
-> userspace explicitly selecting a PMU implementation.
+On the topic of vsock_loopback_seqpacket_allow, also:
 
-They are mutually exclusive and the latest configuration takes effect.
+* Please line wrap this so that the code is 80 columns wide or less,
+  as is still preferred for Networking code.
 
-If you set SET_PMU after COMPOSITION, SET_PMU will take effect.
-If you set COMPOSITION after SET_PMU, COMPOSITION will take effect.
+  Flagged by checkpatch.pl --max-line-length=80
 
-I'll note that in the documentation.
+* Can we move the definition of vsock_loopback_seqpacket_allow() here?
+  The function itself is is trivial. And doing so would avoid a forward
+  declaration.
 
-> 
->> @@ -1223,6 +1328,8 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
->>   
->>   		return kvm_arm_pmu_v3_set_nr_counters(vcpu, n);
->>   	}
->> +	case KVM_ARM_VCPU_PMU_V3_COMPOSITION:
->> +		return kvm_arm_pmu_v3_set_pmu_composition(vcpu);
-> 
-> I'd prefer naming this something like 'KVM_ARM_VCPU_PMU_V3_FIXED_COUNTERS_ONLY'.
-> We will have the fixed instruction counter eventually which is another
-> event we could potentially provide system-wide.
+>  static bool vsock_loopback_msgzerocopy_allow(void)
+>  {
+>  	return true;
 
-The design decision to expose the cycle counter is driven by the 
-motivation to satisfy FEAT_PMU for the guest rather than the host 
-capability.
+...
 
-When we implement FEAT_PMUv3_ICNTR in the future, I think we will need 
-to add KVM_ARM_VCPU_PMU_V3_COMPOSITION_ICNTR or something. The resultig 
-emulated PMU will work only on host CPUs that have instruction counters; 
-a host CPU may lack one because it doesn't implement FEAT_PMUv3_ICNTR or 
-has a third-party PMU like apple-m1-cpu-pmu (this particular PMU has an 
-instruction counter fortunately).
+> +int vsock_loopback_init_net(struct net *net)
+> +{
+> +	net->vsock.loopback = kmalloc(GFP_KERNEL, sizeof(struct vsock_loopback));
+> +	if (!net->vsock.loopback)
+> +		return -ENOMEM;
+> +
+> +	return vsock_loopback_init_vsock(net->vsock.loopback);
+> +}
+> +
+> +void vsock_loopback_exit_net(struct net *net)
+> +{
+> +	vsock_loopback_deinit_vsock(net->vsock.loopback);
+> +	kfree(net->vsock.loopback);
+> +}
 
-Regards,
-Akihiko Odaki
+I think EXPORT_SYMBOL_GPL is needed for both vsock_loopback_exit_net and
+vsock_loopback_init_net for the case where CONFIG_VSOCKETS=m
+
+Also, in Kconfig VSOCKETS_LOOPBACK depends on VSOCKETS. But this code adds
+a reverse dependency. As it stands it's possible to configure VSOCKETS
+without VSOCKETS_LOOPBACK, which will not compile.
+
+Perhaps stub implementations of vsock_loopback_init_net and
+vsock_loopback_exit_net should be implemented in af_vsock.h if
+VSOCKETS_LOOPBACK is not enabled?
+
+...
+
+-- 
+pw-bot: changes-requested
 
