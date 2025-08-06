@@ -1,180 +1,92 @@
-Return-Path: <kvm+bounces-54136-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54137-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3B70B1CADD
-	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 19:33:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3215B1CB30
+	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 19:42:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D981C16708F
-	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 17:33:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 29F6C562B45
+	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 17:42:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B2A029C33A;
-	Wed,  6 Aug 2025 17:33:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 554A129C341;
+	Wed,  6 Aug 2025 17:42:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tQY0wjsC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="goQlNm06"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 624A3293C67
-	for <kvm@vger.kernel.org>; Wed,  6 Aug 2025 17:33:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EF2925A2DE
+	for <kvm@vger.kernel.org>; Wed,  6 Aug 2025 17:42:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754501604; cv=none; b=e8qjgRduvRAJDB2Phs7mIdQ1C6OQpn5xIi2FmUvQyGYGR+6wbHjMaK/TBe83oIpYZpWcaNiU9imd5pYQJQ+hDZtqYt34ioJXhlZa4TcAoa8QnEBOsfHFf2VpYGQEHVKKhx7sjPXaTzBiTVAqogkcNKc4zVIjZwlxR1Cdx4bIQkg=
+	t=1754502150; cv=none; b=P6oMbHgC4ydfyk5qk4hwFfJZ6Hytlfa2O0EjK0gAhFTExLnLBXXGfF6OtZDgvRSjKHuJK4q+VFe4ieb1WEV+AOZSKgXLP3IHn1gfDL23Iwd7XUbc1VpEc7AM8jPs32jsseBVYH0KQk3/RT9ba5zKUH9fpWdEC9zwXL1liHK98Ug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754501604; c=relaxed/simple;
-	bh=HFDlB11tURPLQBHaQNMud7q6jwYGLOK7OT6Zg/6s3aU=;
+	s=arc-20240116; t=1754502150; c=relaxed/simple;
+	bh=1CPu9lCy0nvdi/L1p1/8uO3fkzxuerfbGvnecx5wZ3E=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=OCt/TTEhEPjjBzHyf+ExEAMhwGSwSgSCq6XQDlLKLqqI+ZIUMFr9BeNR3UGgngAC9kiVgfkTAcoCYUDiykbKW2aNhk2if02aif2NWOCXR0Sll+ibQwOzl38VpjYpLEeRwSFsOw43UmqUCp26yaUhQ2VodWBZ3IcREY3R+UDX5Uk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tQY0wjsC; arc=none smtp.client-ip=209.85.216.73
+	 To:Content-Type; b=iQd4mUOC7+jJX1k88di1cS2DdX3xUbIAzSy1E1ZUD8+zjMtkEYPPrtbCIYB44BMdYOPByfjw7qtXGaB7XXp7TV/ynda+srQspdEzcENvXk8f4YyUDTM0JDRvYVgh+Jf3pfcfLJ+EuO4is8si5SsihPkniV6MwsNEyDNlqGZRVt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=goQlNm06; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-313d6d671ffso173521a91.2
-        for <kvm@vger.kernel.org>; Wed, 06 Aug 2025 10:33:22 -0700 (PDT)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-315af08594fso211683a91.2
+        for <kvm@vger.kernel.org>; Wed, 06 Aug 2025 10:42:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754501601; x=1755106401; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=LyAOeGFk30dXtQCLyt1rvWsDLNvdp4rxsI4DU4RPNQI=;
-        b=tQY0wjsCwBAQV11z5u48o5QmNHUOEn89qBOczS4Tn8HACJfaj+We8xuPC5LCUeYPOQ
-         dn5vVMa1OEHFgzGjMD35g8n2yjQz7kv04Nx3qliTsS59/QTrrlmKPTt4STmfDapKvsDb
-         jg1Z20oAwo58bCyckiBsuNyDQzLMwehK2DcDxbmDJ8fnduzeUusQcFlNPUMtIRL3v6J/
-         BM40TQCkxQpPqN+dscO5qAG2rVQGWDeW+sFmTF/q054JVEbgKCygrJI5wf3P2u1JLMiH
-         91QgF0vUVzWys+7mg2OhE5Jx2hEF6AXcCr6K9JTLIWNsyrBMhh2cCx7vPdb5p0VnJc5s
-         m3iA==
+        d=google.com; s=20230601; t=1754502148; x=1755106948; darn=vger.kernel.org;
+        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=kF9bpK1qdUp80ZClzRswKI8Qf4Ua9KldMhdifkuZo5A=;
+        b=goQlNm06WHZgJRapjTxt7R/TcRyiYavrMYBtU4hmo4uzkAlMJbeCxB8csRwzAolnN8
+         ZPP9NIY5cRfYYFplGmGxSempalR2O8dG3LqmC9fjh8daHyrXw8lHwdOrOjMyBuBI/z5h
+         URx7jDzp2kDdknl4430tJud1f8asOCruSHZKnZAJg1+lu9Qz8Uo5xrA99PoXRgXUdpB/
+         SJS4aHJcbiMIz61P+Vb76QYkNHL4JKa1GyFQtmVMcTylJmdbsh4hU/9VQzrAJzwaowfA
+         VKd2ilHFkvRAfQA+WlTkCTuxdcwBjnzQGMRzkQX3C9GlTCcH0UH2ZrG3pOJvQppveL7+
+         6mpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754501601; x=1755106401;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=LyAOeGFk30dXtQCLyt1rvWsDLNvdp4rxsI4DU4RPNQI=;
-        b=laQHs2h50u3g+uUWRCOzfanWT4xwUSTlnxdOx1j14sIj9M1FobtmLxfnl8IoJdiKwU
-         db3EeL/APEXs0FO68I5cFGrs4z2PbmNBEVEKSsgigPnrzt2sSX5Zvht5RlG4TQSqxFhd
-         jd8bZXdFPlxg+thk33J3NMgb7f9PuR+yRCyph1t4AoIeOpXwLSqUPlo48txjSJITJeQw
-         iM55eW/qGHmfHd3SCG/+eLXpBHO8ialLQYgQpg7SDUWCKGFu+Ep9kJ5JQHc5scEZQvXp
-         sMnda+we7TSVApQuVVQktWyqgUnzObhr8Vmo9ikq47/jPrevEm7otMSqD3qmIMS6rG42
-         wZrQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX9s/S5aQDd2fNeamIeBBRCOW9hRhyfEVacZkjg0EzHp+NSEZu7Ut74nOBe4gqmc0s9Ins=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyqPQCiD7RygT8dzaCIhvdiNJ34lZBJIhob2s+E06Dtar9/yVCq
-	zAoiro9m4EploMP9I2v6HOtDrJ9VNrFstEQ3scUQ9Vummv4u8XH05/xc1EXXcm7dUaGQhPmZ/f+
-	IKYWl5g==
-X-Google-Smtp-Source: AGHT+IGr5NQ4unyFFD1LCKq5VEbjUEGgPs67kjJYV97puf807pg/ZHj7pgAJv73ef0jkdIubgiWbliotX1Y=
-X-Received: from pjje11.prod.google.com ([2002:a17:90a:630b:b0:31e:998f:7b79])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3a4f:b0:31f:12d:ee4f
- with SMTP id 98e67ed59e1d1-32166cd2f77mr4291258a91.23.1754501601572; Wed, 06
- Aug 2025 10:33:21 -0700 (PDT)
-Date: Wed, 6 Aug 2025 10:33:20 -0700
-In-Reply-To: <e64951b0-4707-42ed-abf4-947def74ea34@linux.intel.com>
+        d=1e100.net; s=20230601; t=1754502148; x=1755106948;
+        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kF9bpK1qdUp80ZClzRswKI8Qf4Ua9KldMhdifkuZo5A=;
+        b=hOP2oDkBLmEi2qrc46x63UpazjyEVXGPdSMLy0nkfngykYhFbvW7OS29+D+DyupVHo
+         VR7nx2Kixv9kuDSpW4AeksGZE4A5/nwitfBuWckdfLqEpgC8RaFM0iVTKUzUZVt9D40D
+         dAVLJbUgvqX/ze92xgN9wwDjTS8gHqvghniWqrW8rdYsh1sEZOs3rBTt9rn+jY/kUKnu
+         WPCFxsegRbyFI6hpNpxjtzHQx4OLAg3NBTVVLO8x/FLc6dCazp2DpkBmFxNJAa5dcKa+
+         6bI+qzX4CPV4PAZH4bb2fenbYa6rlrJTNZOeOClaYoC7akVsTBsYse0RapVP6RRZB7eT
+         If5A==
+X-Forwarded-Encrypted: i=1; AJvYcCUewVLom5gI+gz+hZ2hsAqqGMfIURCZ3wVB5DpQVo4gYC6yecdcyqS1cpoElabfRexjXE8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwjPAaKot7UqDE332sI2GYIKMZKQ2uDPk2wCxyxFH0VofBagq6+
+	bMeYSfsSOFZgDUyEzifn/stNg7CFGMFKWnX7wOFECOVUI9HnNdFx9NIZOU9KMiuVUZxoaqQAylN
+	V9/frkQ==
+X-Google-Smtp-Source: AGHT+IGxbih1aPqy3gB/PvUjHaW+i+ljUGZQWDmJCtPz45aIX373xGbdvRWIDafeWxu+TILTrn0k5Ma/L1w=
+X-Received: from pjg13.prod.google.com ([2002:a17:90b:3f4d:b0:31c:2fe4:33ba])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:52c8:b0:321:1680:e056
+ with SMTP id 98e67ed59e1d1-32166e093f3mr4752885a91.9.1754502148561; Wed, 06
+ Aug 2025 10:42:28 -0700 (PDT)
+Date: Wed, 6 Aug 2025 10:42:27 -0700
+In-Reply-To: <20250805190526.1453366-6-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250805190526.1453366-1-seanjc@google.com> <20250805190526.1453366-18-seanjc@google.com>
- <e64951b0-4707-42ed-abf4-947def74ea34@linux.intel.com>
-Message-ID: <aJOR4Bk3DwKSVdQV@google.com>
-Subject: Re: [PATCH 17/18] KVM: x86: Push acquisition of SRCU in fastpath into kvm_pmu_trigger_event()
+References: <20250805190526.1453366-1-seanjc@google.com> <20250805190526.1453366-6-seanjc@google.com>
+Message-ID: <aJOUA36kOYklPzXt@google.com>
+Subject: Re: [PATCH 05/18] KVM: x86: Unconditionally handle
+ MSR_IA32_TSC_DEADLINE in fastpath exits
 From: Sean Christopherson <seanjc@google.com>
-To: Dapeng Mi <dapeng1.mi@linux.intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Xin Li <xin@zytor.com>, Sandipan Das <sandipan.das@amd.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+To: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Xin Li <xin@zytor.com>, Dapeng Mi <dapeng1.mi@linux.intel.com>, 
+	Sandipan Das <sandipan.das@amd.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Aug 06, 2025, Dapeng Mi wrote:
->=20
-> On 8/6/2025 3:05 AM, Sean Christopherson wrote:
-> > Acquire SRCU in the VM-Exit fastpath if and only if KVM needs to check =
-the
-> > PMU event filter, to further trim the amount of code that is executed w=
-ith
-> > SRCU protection in the fastpath.  Counter-intuitively, holding SRCU can=
- do
-> > more harm than good due to masking potential bugs, and introducing a ne=
-w
-> > SRCU-protected asset to code reachable via kvm_skip_emulated_instructio=
-n()
-> > would be quite notable, i.e. definitely worth auditing.
-> >
-> > E.g. the primary user of kvm->srcu is KVM's memslots, accessing memslot=
-s
-> > all but guarantees guest memory may be accessed, accessing guest memory
-> > can fault, and page faults might sleep, which isn't allowed while IRQs =
-are
-> > disabled.  Not acquiring SRCU means the (hypothetical) illegal sleep wo=
-uld
-> > be flagged when running with PROVE_RCU=3Dy, even if DEBUG_ATOMIC_SLEEP=
-=3Dn.
-> >
-> > Note, performance is NOT a motivating factor, as SRCU lock/unlock only
-> > adds ~15 cycles of latency to fastpath VM-Exits.  I.e. overhead isn't a
-> > concern _if_ SRCU protection needs to be extended beyond PMU events, e.=
-g.
-> > to honor userspace MSR filters.
-> >
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
+On Tue, Aug 05, 2025, Sean Christopherson wrote:
+> Stating the obvious, this allows handling MSR_IA32_TSC_DEADLINE writes in
+> the fastpath on AMD CPUs.
 
-...
-
-> > @@ -968,12 +968,14 @@ static void kvm_pmu_trigger_event(struct kvm_vcpu=
- *vcpu,
-> >  			     (unsigned long *)&pmu->global_ctrl, X86_PMC_IDX_MAX))
-> >  		return;
-> > =20
-> > +	idx =3D srcu_read_lock(&vcpu->kvm->srcu);
->=20
-> It looks the asset what "kvm->srcu" protects here is
-> kvm->arch.pmu_event_filter which is only read by pmc_is_event_allowed().
-> Besides here, pmc_is_event_allowed() is called by reprogram_counter() but
-> without srcu_read_lock()/srcu_read_unlock() protection.
-
-No, reprogram_counter() is only called called in the context of KVM_RUN, i.=
-e. with
-the vCPU loaded and thus with kvm->srcu already head for read (acquired by
-kvm_arch_vcpu_ioctl_run()).
-=20
-> So should we shrink the protection range further and move the
-> srcu_read_lock()/srcu_read_unlock() pair into pmc_is_event_allowed()
-> helper? The side effect is it would bring some extra overhead since
-> srcu_read_lock()/srcu_read_unlock() could be called multiple times.
-
-No, I don't think it's worth getting that precise.  As you note, there will=
- be
-extra overhead, and it could actually become non-trivial amount of overhead=
-,
-albeit in a somewhat pathological scenario.  And cpl_is_matched() is easy t=
-o
-audit, i.e. is very low risk with respect to having "bad" behavior that's h=
-idden
-by virtue of holding SRCU.
-
-E.g. if the guest is using all general purpose PMCs to count instructions
-retired, then KVM would acquire/release SRCU 8+ times.  On Intel, the fastp=
-ath
-can run in <800 cycles.  Adding 8 * 2 full memory barriers (difficult to me=
-asure,
-but somewhere in the neighborhood of ~10 cycles per barrier) would increase=
- the
-latency by 10-20%.
-
-Again, that's an extreme scenario, but since there's almost nothing to gain=
- from
-pushing SRCU acquisition into the filter checks, I don't see any reason to =
-go
-with an approach that we *know* is sub-optimal.
-
-> An alternative could be to add srcu_read_lock()/srcu_read_unlock() around
-> pmc_is_event_allowed() in=C2=A0reprogram_counter() helper as well.
-
-As above, there's no need to modify reprogram_counter().  I don't see any f=
-uture
-where reprogram_counter() would be safe to call in the fastpath, there's si=
-mply
-too much going on, i.e. I think reprogram_counter() will always be a non-is=
-sue.
+Got around to measuring this via the KUT vmexit "tscdeadline_immed" test.  Without
+the mediated PMU, the gains are very modest: ~2550 => ~2400 cycles.  But with the
+mediated PMU and its heavy context switch, the gains are ~6100 => ~2400 cycles.
 
