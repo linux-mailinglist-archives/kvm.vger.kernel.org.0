@@ -1,204 +1,180 @@
-Return-Path: <kvm+bounces-54135-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54136-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2629B1CA97
-	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 19:21:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3B70B1CADD
+	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 19:33:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1DF9B3ACBC0
-	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 17:21:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D981C16708F
+	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 17:33:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1E9428A41C;
-	Wed,  6 Aug 2025 17:21:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B2A029C33A;
+	Wed,  6 Aug 2025 17:33:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="VtkQ++7b"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tQY0wjsC"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F75B2980AC
-	for <kvm@vger.kernel.org>; Wed,  6 Aug 2025 17:21:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 624A3293C67
+	for <kvm@vger.kernel.org>; Wed,  6 Aug 2025 17:33:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754500882; cv=none; b=nWUIGMFBg9vWk4tBXjVNXhWDB4DBeGAcCwdijkjtyWmjFYLrpSYNdp0UDwO/rHVuC5E92Dq7QY52kU3Pzw3Bq8yMK3psujL2mFcWTAvG4HDTGZyuveI8XlaSgf6g3JViyhjxabbS+z3ud9oSieOG7b4bXAFl5NO0flVUTfHXdJQ=
+	t=1754501604; cv=none; b=e8qjgRduvRAJDB2Phs7mIdQ1C6OQpn5xIi2FmUvQyGYGR+6wbHjMaK/TBe83oIpYZpWcaNiU9imd5pYQJQ+hDZtqYt34ioJXhlZa4TcAoa8QnEBOsfHFf2VpYGQEHVKKhx7sjPXaTzBiTVAqogkcNKc4zVIjZwlxR1Cdx4bIQkg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754500882; c=relaxed/simple;
-	bh=kjhnQ5Za+XBsranDfYgw0zRqfwEAy/mULiOdftIXj5Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KrCHiUsqqgZ186z48S34Yjt1zhMJzxxtmwsnMPf6lG9qwMM9mrK/KYoM3tBuUNrpnyMqxUbhkog9zGQAG1cq+5OHc0xAQqH1ANckCzDUHrqN+2xwG5xZmzI66Muk5atkAwF63qayDksuJB7+ajiNlQsCbP2rZ3sqSmGZbaozW9g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=VtkQ++7b; arc=none smtp.client-ip=95.215.58.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Wed, 6 Aug 2025 10:20:55 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1754500867;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LXEzdvjKc1frf74KZZ2Dk9UeoT9Qj8s/haDO00iYsCY=;
-	b=VtkQ++7b2u/bXmsWSk18w3r7GM1P5JVR7OF9qYXkJUdtUAb1xF+174eBKK9E0p7iYnpU9o
-	qMZ/Jn24nSr9r2S/3tLcPCdxS8TX5DhSvQ3mumqS7+RSehNtdiprcMvvWdydZeJAT64sl/
-	DZOMHF4WOTVO1Lqo5qTY5dzVsOhTh5M=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Kees Cook <kees@kernel.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
-	devel@daynix.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH RFC v2 1/2] KVM: arm64: PMU: Introduce
- KVM_ARM_VCPU_PMU_V3_COMPOSITION
-Message-ID: <aJOO99xUrhsrvLwl@linux.dev>
-References: <20250806-hybrid-v2-0-0661aec3af8c@rsg.ci.i.u-tokyo.ac.jp>
- <20250806-hybrid-v2-1-0661aec3af8c@rsg.ci.i.u-tokyo.ac.jp>
+	s=arc-20240116; t=1754501604; c=relaxed/simple;
+	bh=HFDlB11tURPLQBHaQNMud7q6jwYGLOK7OT6Zg/6s3aU=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=OCt/TTEhEPjjBzHyf+ExEAMhwGSwSgSCq6XQDlLKLqqI+ZIUMFr9BeNR3UGgngAC9kiVgfkTAcoCYUDiykbKW2aNhk2if02aif2NWOCXR0Sll+ibQwOzl38VpjYpLEeRwSFsOw43UmqUCp26yaUhQ2VodWBZ3IcREY3R+UDX5Uk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tQY0wjsC; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-313d6d671ffso173521a91.2
+        for <kvm@vger.kernel.org>; Wed, 06 Aug 2025 10:33:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1754501601; x=1755106401; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LyAOeGFk30dXtQCLyt1rvWsDLNvdp4rxsI4DU4RPNQI=;
+        b=tQY0wjsCwBAQV11z5u48o5QmNHUOEn89qBOczS4Tn8HACJfaj+We8xuPC5LCUeYPOQ
+         dn5vVMa1OEHFgzGjMD35g8n2yjQz7kv04Nx3qliTsS59/QTrrlmKPTt4STmfDapKvsDb
+         jg1Z20oAwo58bCyckiBsuNyDQzLMwehK2DcDxbmDJ8fnduzeUusQcFlNPUMtIRL3v6J/
+         BM40TQCkxQpPqN+dscO5qAG2rVQGWDeW+sFmTF/q054JVEbgKCygrJI5wf3P2u1JLMiH
+         91QgF0vUVzWys+7mg2OhE5Jx2hEF6AXcCr6K9JTLIWNsyrBMhh2cCx7vPdb5p0VnJc5s
+         m3iA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754501601; x=1755106401;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=LyAOeGFk30dXtQCLyt1rvWsDLNvdp4rxsI4DU4RPNQI=;
+        b=laQHs2h50u3g+uUWRCOzfanWT4xwUSTlnxdOx1j14sIj9M1FobtmLxfnl8IoJdiKwU
+         db3EeL/APEXs0FO68I5cFGrs4z2PbmNBEVEKSsgigPnrzt2sSX5Zvht5RlG4TQSqxFhd
+         jd8bZXdFPlxg+thk33J3NMgb7f9PuR+yRCyph1t4AoIeOpXwLSqUPlo48txjSJITJeQw
+         iM55eW/qGHmfHd3SCG/+eLXpBHO8ialLQYgQpg7SDUWCKGFu+Ep9kJ5JQHc5scEZQvXp
+         sMnda+we7TSVApQuVVQktWyqgUnzObhr8Vmo9ikq47/jPrevEm7otMSqD3qmIMS6rG42
+         wZrQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX9s/S5aQDd2fNeamIeBBRCOW9hRhyfEVacZkjg0EzHp+NSEZu7Ut74nOBe4gqmc0s9Ins=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyqPQCiD7RygT8dzaCIhvdiNJ34lZBJIhob2s+E06Dtar9/yVCq
+	zAoiro9m4EploMP9I2v6HOtDrJ9VNrFstEQ3scUQ9Vummv4u8XH05/xc1EXXcm7dUaGQhPmZ/f+
+	IKYWl5g==
+X-Google-Smtp-Source: AGHT+IGr5NQ4unyFFD1LCKq5VEbjUEGgPs67kjJYV97puf807pg/ZHj7pgAJv73ef0jkdIubgiWbliotX1Y=
+X-Received: from pjje11.prod.google.com ([2002:a17:90a:630b:b0:31e:998f:7b79])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3a4f:b0:31f:12d:ee4f
+ with SMTP id 98e67ed59e1d1-32166cd2f77mr4291258a91.23.1754501601572; Wed, 06
+ Aug 2025 10:33:21 -0700 (PDT)
+Date: Wed, 6 Aug 2025 10:33:20 -0700
+In-Reply-To: <e64951b0-4707-42ed-abf4-947def74ea34@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250806-hybrid-v2-1-0661aec3af8c@rsg.ci.i.u-tokyo.ac.jp>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+References: <20250805190526.1453366-1-seanjc@google.com> <20250805190526.1453366-18-seanjc@google.com>
+ <e64951b0-4707-42ed-abf4-947def74ea34@linux.intel.com>
+Message-ID: <aJOR4Bk3DwKSVdQV@google.com>
+Subject: Re: [PATCH 17/18] KVM: x86: Push acquisition of SRCU in fastpath into kvm_pmu_trigger_event()
+From: Sean Christopherson <seanjc@google.com>
+To: Dapeng Mi <dapeng1.mi@linux.intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Xin Li <xin@zytor.com>, Sandipan Das <sandipan.das@amd.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Akihiko,
+On Wed, Aug 06, 2025, Dapeng Mi wrote:
+>=20
+> On 8/6/2025 3:05 AM, Sean Christopherson wrote:
+> > Acquire SRCU in the VM-Exit fastpath if and only if KVM needs to check =
+the
+> > PMU event filter, to further trim the amount of code that is executed w=
+ith
+> > SRCU protection in the fastpath.  Counter-intuitively, holding SRCU can=
+ do
+> > more harm than good due to masking potential bugs, and introducing a ne=
+w
+> > SRCU-protected asset to code reachable via kvm_skip_emulated_instructio=
+n()
+> > would be quite notable, i.e. definitely worth auditing.
+> >
+> > E.g. the primary user of kvm->srcu is KVM's memslots, accessing memslot=
+s
+> > all but guarantees guest memory may be accessed, accessing guest memory
+> > can fault, and page faults might sleep, which isn't allowed while IRQs =
+are
+> > disabled.  Not acquiring SRCU means the (hypothetical) illegal sleep wo=
+uld
+> > be flagged when running with PROVE_RCU=3Dy, even if DEBUG_ATOMIC_SLEEP=
+=3Dn.
+> >
+> > Note, performance is NOT a motivating factor, as SRCU lock/unlock only
+> > adds ~15 cycles of latency to fastpath VM-Exits.  I.e. overhead isn't a
+> > concern _if_ SRCU protection needs to be extended beyond PMU events, e.=
+g.
+> > to honor userspace MSR filters.
+> >
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
 
-This is an unreasonably large patch that needs to be broken down into
-smaller patches, ideally one functional change per patch. We need this
-even for an RFC for the sake of reviews.
+...
 
-On Wed, Aug 06, 2025 at 06:09:54PM +0900, Akihiko Odaki wrote:
-> +static u64 kvm_pmu_get_pmc_value(struct kvm_vcpu *vcpu, u8 idx)
->  {
-> -	struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
-> +	struct kvm_pmc *pmc = *kvm_vcpu_idx_to_pmc(vcpu, idx);
->  	u64 counter, reg, enabled, running;
-> +	unsigned int i;
->  
-> -	reg = counter_index_to_reg(pmc->idx);
-> +	reg = counter_index_to_reg(idx);
->  	counter = __vcpu_sys_reg(vcpu, reg);
->  
->  	/*
->  	 * The real counter value is equal to the value of counter register plus
->  	 * the value perf event counts.
->  	 */
-> -	if (pmc->perf_event)
-> -		counter += perf_event_read_value(pmc->perf_event, &enabled,
-> -						 &running);
-> +	if (pmc)
-> +		for (i = 0; i < pmc->nr_perf_events; i++)
-> +			counter += perf_event_read_value(pmc->perf_events[i],
-> +							 &enabled, &running);
+> > @@ -968,12 +968,14 @@ static void kvm_pmu_trigger_event(struct kvm_vcpu=
+ *vcpu,
+> >  			     (unsigned long *)&pmu->global_ctrl, X86_PMC_IDX_MAX))
+> >  		return;
+> > =20
+> > +	idx =3D srcu_read_lock(&vcpu->kvm->srcu);
+>=20
+> It looks the asset what "kvm->srcu" protects here is
+> kvm->arch.pmu_event_filter which is only read by pmc_is_event_allowed().
+> Besides here, pmc_is_event_allowed() is called by reprogram_counter() but
+> without srcu_read_lock()/srcu_read_unlock() protection.
 
-I'm concerned that this array of events concept you're introducing is
-going to be error-prone. An approach that reallocates a new PMU event in
-the case of a vCPU migrating to a new PMU implementation would be
-desirable.
+No, reprogram_counter() is only called called in the context of KVM_RUN, i.=
+e. with
+the vCPU loaded and thus with kvm->srcu already head for read (acquired by
+kvm_arch_vcpu_ioctl_run()).
+=20
+> So should we shrink the protection range further and move the
+> srcu_read_lock()/srcu_read_unlock() pair into pmc_is_event_allowed()
+> helper? The side effect is it would bring some extra overhead since
+> srcu_read_lock()/srcu_read_unlock() could be called multiple times.
 
-> +static void reset_sample_period(struct perf_event *perf_event)
-> +{
-> +	struct kvm_pmc **pmc = perf_event->overflow_handler_context;
-> +	struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
-> +	struct arm_pmu *cpu_pmu = to_arm_pmu(perf_event->pmu);
-> +	u64 period;
-> +
-> +	cpu_pmu->pmu.stop(perf_event, PERF_EF_UPDATE);
-> +
-> +	/*
-> +	 * Reset the sample period to the architectural limit,
-> +	 * i.e. the point where the counter overflows.
-> +	 */
-> +	period = compute_period(pmc, kvm_pmu_get_pmc_value(vcpu, (*pmc)->idx));
-> +
-> +	local64_set(&perf_event->hw.period_left, 0);
-> +	perf_event->attr.sample_period = period;
-> +	perf_event->hw.sample_period = period;
-> +
-> +	cpu_pmu->pmu.start(perf_event, PERF_EF_RELOAD);
-> +}
+No, I don't think it's worth getting that precise.  As you note, there will=
+ be
+extra overhead, and it could actually become non-trivial amount of overhead=
+,
+albeit in a somewhat pathological scenario.  And cpl_is_matched() is easy t=
+o
+audit, i.e. is very low risk with respect to having "bad" behavior that's h=
+idden
+by virtue of holding SRCU.
 
-No, we can't start calling into the internal driver interfaces. The fact
-that we have a pointer to the PMU is an ugly hack and shouldn't be used
-like this.
+E.g. if the guest is using all general purpose PMCs to count instructions
+retired, then KVM would acquire/release SRCU 8+ times.  On Intel, the fastp=
+ath
+can run in <800 cycles.  Adding 8 * 2 full memory barriers (difficult to me=
+asure,
+but somewhere in the neighborhood of ~10 cycles per barrier) would increase=
+ the
+latency by 10-20%.
 
-> @@ -725,8 +729,8 @@ static void kvm_pmu_create_perf_event(struct kvm_pmc *pmc)
->  	attr.type = arm_pmu->pmu.type;
->  	attr.size = sizeof(attr);
->  	attr.pinned = 1;
-> -	attr.disabled = !kvm_pmu_counter_is_enabled(pmc);
-> -	attr.exclude_user = !kvm_pmc_counts_at_el0(pmc);
-> +	attr.disabled = !kvm_pmu_counter_is_enabled(vcpu, (*pmc)->idx);
-> +	attr.exclude_user = !kvm_pmc_counts_at_el0(vcpu, (*pmc)->idx);
->  	attr.exclude_hv = 1; /* Don't count EL2 events */
->  	attr.exclude_host = 1; /* Don't count host events */
->  	attr.config = eventsel;
+Again, that's an extreme scenario, but since there's almost nothing to gain=
+ from
+pushing SRCU acquisition into the filter checks, I don't see any reason to =
+go
+with an approach that we *know* is sub-optimal.
 
-Can we just special-case the fixed CPU cycle counter to use
-PERF_TYPE_HARDWARE / PERF_COUNT_HW_CPU_CYCLES? That _should_ have the
-intended effect of opening an event on the PMU for this CPU.
+> An alternative could be to add srcu_read_lock()/srcu_read_unlock() around
+> pmc_is_event_allowed() in=C2=A0reprogram_counter() helper as well.
 
-> +	/*
-> +	 * If we have a filter in place and that the event isn't allowed, do
-> +	 * not install a perf event either.
-> +	 */
-> +	if (vcpu->kvm->arch.pmu_filter &&
-> +	    !test_bit(eventsel, vcpu->kvm->arch.pmu_filter))
-> +		return;
-> +
-> +	if (arm_pmu) {
-> +		*pmc = kvm_pmu_alloc_pmc(idx, 1);
-> +		if (!*pmc)
-> +			goto err;
-> +
-> +		kvm_pmu_create_perf_event(pmc, arm_pmu, eventsel);
-> +	} else {
-> +		guard(mutex)(&arm_pmus_lock);
-
-This is a system-wide lock, the need for which is eliminated if you go
-for the reallocation approach I mention.
-
-> +static int kvm_arm_pmu_v3_set_pmu_composition(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm *kvm = vcpu->kvm;
-> +	struct arm_pmu_entry *entry;
-> +	struct arm_pmu *arm_pmu;
-> +
-> +	lockdep_assert_held(&kvm->arch.config_lock);
-> +
-> +	if (kvm_vm_has_ran_once(kvm) ||
-> +	    (kvm->arch.pmu_filter && !kvm->arch.nr_composed_host_pmus))
-> +		return -EBUSY;
-
-I'm not sure there's much value in preventing the user from configuring
-the PMU event filter. Even in the case of the fixed CPU cycle counter we
-allow userspace to filter the event.
-
-It is much more important to have mutual exclusion between this UAPI and
-userspace explicitly selecting a PMU implementation.
-
-> @@ -1223,6 +1328,8 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
->  
->  		return kvm_arm_pmu_v3_set_nr_counters(vcpu, n);
->  	}
-> +	case KVM_ARM_VCPU_PMU_V3_COMPOSITION:
-> +		return kvm_arm_pmu_v3_set_pmu_composition(vcpu);
-
-I'd prefer naming this something like 'KVM_ARM_VCPU_PMU_V3_FIXED_COUNTERS_ONLY'.
-We will have the fixed instruction counter eventually which is another
-event we could potentially provide system-wide.
-
-Thanks,
-Oliver
+As above, there's no need to modify reprogram_counter().  I don't see any f=
+uture
+where reprogram_counter() would be safe to call in the fastpath, there's si=
+mply
+too much going on, i.e. I think reprogram_counter() will always be a non-is=
+sue.
 
