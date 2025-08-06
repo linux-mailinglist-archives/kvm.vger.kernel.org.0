@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-54155-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54156-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44658B1CCE1
-	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 22:01:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5786FB1CCE2
+	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 22:02:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A519E620445
-	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 20:01:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 002085612F0
+	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 20:02:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B9D12D3A70;
-	Wed,  6 Aug 2025 19:57:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 308B62D46B1;
+	Wed,  6 Aug 2025 19:58:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sKnxSDF6"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Pl9ZsfmU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 435772D29CA
-	for <kvm@vger.kernel.org>; Wed,  6 Aug 2025 19:57:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EECC92D3226
+	for <kvm@vger.kernel.org>; Wed,  6 Aug 2025 19:57:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754510275; cv=none; b=Pnht8U4rxM3sSmdplWZxxASdIMY2SGhgPErASBfE0lSNHoBpffPrK+KQW3CrQMRRtB9VUlCPlFmdomR/FI5KjNKzBS1QUL7FdbJgKIJkL9XbnB8bafuL+xB+vLCzRyAzaUAKZAbDcgiqrBMIarh26PHqJ3gx8y9fhzmss4Ax4II=
+	t=1754510277; cv=none; b=BXGey7YQ7j+RWSkytM1rRZW8rt0BUDXxmo035TkHHxGhrO/CaMsdkxwGQ0m6GgClbwQo1K725tIK01OHLJfg58Q8tFrC4C1SrVVien8AesYwdocjMVCqNyg3lq+UkH8zrlXdczu+506BDFAUIxi4JeCIBXXUlDOxiFjDwf5VWFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754510275; c=relaxed/simple;
-	bh=jdq1crWcKn8y7XDSp99YavaEpnm3s9VMlFDhCc8MHB4=;
+	s=arc-20240116; t=1754510277; c=relaxed/simple;
+	bh=C4TXme1dQYfX3HBX2bRS9WhICMNyLXZykAhB0txM4zg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=BPNY3+2Wa9MmwujUd6/sTrTL7ID2P05m2oZX/o2cJdtmvWaEjv42wGG0a903cusGi2if8Rj1upXMhQ7G6AwDOduFjixMEUcgXSfIUbhd+MNzb93lM2dtA65vCYl40NXHSA5tj7tBBgEzF97bSrjOg/T54NcZToz+2+8yoh5ZibA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sKnxSDF6; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=ZMhU0Vw0QdfOvBdcs2avRdGNZCXz54juNeOFTJf/ods3iPoouc5bSGorRjCUggvUeYPWR8/i+efbfAUjswUg/TScTl6+ssEFK0MuRg1YxfZ0IbkysLoYms+K1MK0AtxnGCMabbCogoC5wMIFp3pAG1Xmr6GViWGVc0PYlwTsVGQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Pl9ZsfmU; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b4227538a47so134678a12.1
-        for <kvm@vger.kernel.org>; Wed, 06 Aug 2025 12:57:53 -0700 (PDT)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2400a0ad246so1471235ad.2
+        for <kvm@vger.kernel.org>; Wed, 06 Aug 2025 12:57:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754510272; x=1755115072; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1754510274; x=1755115074; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=YZMeMFDLZr+yCjindHzAam67OkhMlNf3hlQ7J9N+n2w=;
-        b=sKnxSDF6OzUh1O9m+DYJ84S2phrfAp9JUuB4ymZSub5iyiXZPwdD9+IbR2QFOZBYxD
-         vhJbTii22o6Wo1vGPh4cm1O3YetTXyoXrKOP3k1HTndboNPVO909lBkA+/pq9vNsvZKo
-         PgjMTdMNx9il0FdTnhxGhMUZcpNbFDfPjPAhOCj7WYSbGgMuzDooW4giPYpLxETuL5w3
-         /HtC4trCo/9jY6SSalI+/37npQ5ZXErfi5ahnGlWevemkZHGbaHH+YB6onilxP70llNQ
-         lhtWVmA3bK4Qxxe/xQRV7LsbLGXqnnWRCRkBU1BC9Z3q43WdnWisiyieuThBh7Bo5WTb
-         1ugw==
+        bh=0uQwWV7lYMOxBil53zyDkn96gfX2tt2/DqWsDrl/9hs=;
+        b=Pl9ZsfmUpZY8vSNBS2r2M3kPAS0csHRRtJ4ESTdtPDF45DJk87cCDv2U+GKR2CsIPZ
+         hI7J/d8Z/XWOb4jxCsjS1esCSyaH4Roo6IYL/tYUG0cdm6NO8iWw6Il3t8M4kukamOs5
+         +cEY+VT2IyVElMw3Rx7+nUmJNpntPf643sujcpHTOPa3gr0kfvu/EIKUJizLABGGqXH/
+         SroNv0EN67ezVFNbOczU1n5JdXtGQQnA5I4aNJnblnabEDq2CHiru8RmLYku3r5PmImT
+         7oYQdkY0iCDteciU2cgemBYp5uPdGamFGlplyPLYPe38aOXzjWExn5UMMJG1EmfYgyR0
+         JFkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754510272; x=1755115072;
+        d=1e100.net; s=20230601; t=1754510274; x=1755115074;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=YZMeMFDLZr+yCjindHzAam67OkhMlNf3hlQ7J9N+n2w=;
-        b=pCpEDWBrSoPqLieV5wa5rTa3/+MMWxcmyaRc4Gv3tPXI8Cx4OIS4iz4PN/iYGibY0d
-         ZrcjeTuqykpttLwkbVGlK9clcf8s5+oZabD50cvNl6IL6DAzqmQx99B2NjCyIw81W4Bp
-         7Ou2GTKOXAwhjhDL/3698kh4mcZDKNxSaWhL6ycHnMqPcWO6ZjdejaTbbKgc5PHFJnO6
-         j1gQ6voOIlLrl9mH1tEtzIhmqC9NwlchyBVNWo0QAWj6LbVlk2Dyaj7n4dea3GNsrRf2
-         TS2f9GhbdbKVJImtBOpdwwC7uYRdBBniNXpISuelODh2K39LajdXSSiOc9sLdOEycRbk
-         pCwA==
-X-Forwarded-Encrypted: i=1; AJvYcCUDwGPqWFyDXxuXcCiwYik1LOvCCU1rfAPISFEVyoEmyUqAiRvNDYmM3e4rfrvetuiHyd4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz63ojbMJg7ChODIOUOZYTkL2WK4A/DhMxcVyzgOQ0J/i8emSwV
-	HMPS2fZOaCdx+QZ1vXPi3dCDrCePTZNmxFHVljlM2uuNnH3ORRthyfFFWS03ofPK5V+t0ndTRmm
-	Kpq30hg==
-X-Google-Smtp-Source: AGHT+IFt32OpTUGU6us4Rz359zlOuJVL+j3ifqAbqQAET68s3resGqbQqEcv8vf6Ss5FatBMSRwumXjkA8M=
-X-Received: from pjbso3.prod.google.com ([2002:a17:90b:1f83:b0:311:1a09:11ff])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:e784:b0:240:9f9:46a0
- with SMTP id d9443c01a7336-242b1aa312cmr4180365ad.38.1754510272385; Wed, 06
- Aug 2025 12:57:52 -0700 (PDT)
+        bh=0uQwWV7lYMOxBil53zyDkn96gfX2tt2/DqWsDrl/9hs=;
+        b=wYF13eUaoyChevNHXxheolBlhzwGvOIxITdb7EK7/Md/CiEKCxO9zrB+KXF3mKb3km
+         NG8/4nzk6sz6Lmmlm41BkWO/1n9q+9VuMWcmBbvKQSHCrvF+HYW4m+IQj2dsQRXBzFua
+         76yKf8g5p2WOlObqmX27mJZZ6yMXr3dNovHVzF/IAjx3EirEreGUJ80J1/385MdPQ9RU
+         3PsJuxu+c/I2aCILIop2/3RmnuPRHG3861Ck9znx76JlcPzWcs+WnvEayp2biHpsrk/k
+         hV/p1z6mkwyCQzDg1WUf1K8Yek8JncodDDuASZdE+8Uni27LvuMCAhaDSuYPb6O05RFM
+         0LoQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVUupAy3jJ16z/B697kVHONazFFjyM4yO2RPeJejkdTE4npFImKg3ODVsV1bOUbzB+TUHg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyAwnPDHBN7PRlYV4trtYvTvw4K9MTv5ntTiA/T0oMjdzaDeDG7
+	/nBJUrHAcEXDwW3j9soxbHqKsR9BEM5nVUBH3SF4oX27VR8k59E3+TtMVxsHCyA7Q8WRlvdQUSF
+	cgMXv8g==
+X-Google-Smtp-Source: AGHT+IGH2b2xUlwmCehGLeN80BLd5ICkd9hx9VxyJMjC6VJA8pJue1wqM8eYOcrMqHKsQHTGrwNwqHX4jyM=
+X-Received: from plkh12.prod.google.com ([2002:a17:903:19ec:b0:240:9ca:fc49])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ce05:b0:240:49d1:6347
+ with SMTP id d9443c01a7336-2429f30b512mr54270245ad.35.1754510274358; Wed, 06
+ Aug 2025 12:57:54 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed,  6 Aug 2025 12:56:35 -0700
+Date: Wed,  6 Aug 2025 12:56:36 -0700
 In-Reply-To: <20250806195706.1650976-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -76,9 +76,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250806195706.1650976-1-seanjc@google.com>
 X-Mailer: git-send-email 2.50.1.565.gc32cd1483b-goog
-Message-ID: <20250806195706.1650976-14-seanjc@google.com>
-Subject: [PATCH v5 13/44] perf/x86/amd: Support PERF_PMU_CAP_MEDIATED_VPMU for
- AMD host
+Message-ID: <20250806195706.1650976-15-seanjc@google.com>
+Subject: [PATCH v5 14/44] KVM: VMX: Setup canonical VMCS config prior to kvm_x86_vendor_init()
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
@@ -97,38 +96,55 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	Dapeng Mi <dapeng1.mi@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"
 
-From: Sandipan Das <sandipan.das@amd.com>
+Setup the golden VMCS config during vmx_init(), before the call to
+kvm_x86_vendor_init(), instead of waiting until the callback to do
+hardware setup.  setup_vmcs_config() only touches VMX state, i.e. doesn't
+poke anything in kvm.ko, and has no runtime dependencies beyond
+hv_init_evmcs().
 
-Apply the PERF_PMU_CAP_MEDIATED_VPMU flag for version 2 and later
-implementations of the core PMU. Aside from having Global Control and
-Status registers, virtualizing the PMU using the mediated model requires
-an interface to set or clear the overflow bits in the Global Status MSRs
-while restoring or saving the PMU context of a vCPU.
+Setting the VMCS config early on will allow referencing VMCS and VMX
+capabilities at any point during setup, e.g. to check for PERF_GLOBAL_CTRL
+save/load support during mediated PMU initialization.
 
-PerfMonV2-capable hardware has additional MSRs for this purpose, namely
-PerfCntrGlobalStatusSet and PerfCntrGlobalStatusClr, thereby making it
-suitable for use with mediated vPMU.
-
-Signed-off-by: Sandipan Das <sandipan.das@amd.com>
-Signed-off-by: Mingwei Zhang <mizhang@google.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/events/amd/core.c | 2 ++
- 1 file changed, 2 insertions(+)
+ arch/x86/kvm/vmx/vmx.c | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/events/amd/core.c b/arch/x86/events/amd/core.c
-index b20661b8621d..8179fb5f1ee3 100644
---- a/arch/x86/events/amd/core.c
-+++ b/arch/x86/events/amd/core.c
-@@ -1433,6 +1433,8 @@ static int __init amd_core_pmu_init(void)
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 95765db52992..ed10013dac95 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -8335,8 +8335,6 @@ __init int vmx_hardware_setup(void)
  
- 		amd_pmu_global_cntr_mask = x86_pmu.cntr_mask64;
+ 	vmx_setup_user_return_msrs();
  
-+		x86_get_pmu(smp_processor_id())->capabilities |= PERF_PMU_CAP_MEDIATED_VPMU;
+-	if (setup_vmcs_config(&vmcs_config, &vmx_capability) < 0)
+-		return -EIO;
+ 
+ 	if (boot_cpu_has(X86_FEATURE_NX))
+ 		kvm_enable_efer_bits(EFER_NX);
+@@ -8560,11 +8558,18 @@ int __init vmx_init(void)
+ 		return -EOPNOTSUPP;
+ 
+ 	/*
+-	 * Note, hv_init_evmcs() touches only VMX knobs, i.e. there's nothing
+-	 * to unwind if a later step fails.
++	 * Note, VMCS and eVMCS configuration only touch VMX knobs/variables,
++	 * i.e. there's nothing to unwind if a later step fails.
+ 	 */
+ 	hv_init_evmcs();
+ 
++	/*
++	 * Parse the VMCS config and VMX capabilities before anything else, so
++	 * that the information is available to all setup flows.
++	 */
++	if (setup_vmcs_config(&vmcs_config, &vmx_capability) < 0)
++		return -EIO;
 +
- 		/* Update PMC handling functions */
- 		x86_pmu.enable_all = amd_pmu_v2_enable_all;
- 		x86_pmu.disable_all = amd_pmu_v2_disable_all;
+ 	r = kvm_x86_vendor_init(&vt_init_ops);
+ 	if (r)
+ 		return r;
 -- 
 2.50.1.565.gc32cd1483b-goog
 
