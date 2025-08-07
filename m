@@ -1,119 +1,136 @@
-Return-Path: <kvm+bounces-54249-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54251-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BF86B1D66E
-	for <lists+kvm@lfdr.de>; Thu,  7 Aug 2025 13:12:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C43E3B1D6D9
+	for <lists+kvm@lfdr.de>; Thu,  7 Aug 2025 13:43:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 24CED164F69
-	for <lists+kvm@lfdr.de>; Thu,  7 Aug 2025 11:12:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D1F7A18C779C
+	for <lists+kvm@lfdr.de>; Thu,  7 Aug 2025 11:43:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79E6226CE20;
-	Thu,  7 Aug 2025 11:12:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 652BD2797BD;
+	Thu,  7 Aug 2025 11:43:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="JwujuNOM"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 089791F4CA4
-	for <kvm@vger.kernel.org>; Thu,  7 Aug 2025 11:12:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E25F10957;
+	Thu,  7 Aug 2025 11:43:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754565156; cv=none; b=UDLRvuQh3l868tysMEkTCIykYtsnL3JxgPzk9TdThge34rb78kbvtv7LXlB5e/C977Wujj3SBXdJjmfuIeXJqYF6LJpP6hixww2i2ZmyzHpuqaXtxc6VZIqLakBulGIt+HJ5FkA6cNU/Tmey37ioztS8NWgqSl28+7pQCxVd2cU=
+	t=1754566986; cv=none; b=Q6z2jAN4bp3nql8EFi1D1OVYw25GAzpo3lATS0GR1DehawmU2a+oo0bYHljjASS3LIXGdsoQ5r78anPp35gYzJ50e3jzvAhfqZHak9K8b/05XyVrgaAS7M3BxgyNckSmtUv19T8L/gsafrPPVJg94phUlLHQFMlYuOuKqVdsnHY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754565156; c=relaxed/simple;
-	bh=q0eCAjoRl5wMkzBKrrEko5BgJj8BUldNECWhkTCWr+w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E93CBzCayOkDx6GO6zD+43i33lsmulKcN/sC8kRLP8WEKHvKvDlVUY3vtI4VlUqv61sK1jjS7z8SFwum1jXUw4lIOsQu+4Gnu5Ne6Xj7IMYaTVJLRhp9VUlIperreNJTa7sJvkeWWJEZmL0T9kzoKcj9leD1jrjbP6x1hKMRmPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5521C302F;
-	Thu,  7 Aug 2025 04:12:25 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A78503F5A1;
-	Thu,  7 Aug 2025 04:12:31 -0700 (PDT)
-Date: Thu, 7 Aug 2025 12:12:26 +0100
-From: Joey Gouly <joey.gouly@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH v2 2/5] KVM: arm64: Handle RASv1p1 registers
-Message-ID: <20250807111226.GA2351327@e124191.cambridge.arm.com>
-References: <20250806165615.1513164-1-maz@kernel.org>
- <20250806165615.1513164-3-maz@kernel.org>
+	s=arc-20240116; t=1754566986; c=relaxed/simple;
+	bh=0vAwBYtiqco7Ej9Yjxjq8k+qOfdHzMmvLHNbpgdBA54=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SzwDyiqGOdPwL8juwXKVFJSVThybrWLqFV+3dxMMmqVbip+MAeEP8I+94tzNHsPjsum4uL/Eq6+zH6PBRENVdEALMg7r+sqfhnYLlFqopwtdAxxzSEF+G4IROTeZlA7qVI1GYofJ9Yf1bRIjJLRvRAqEsUUQG2DZiLNxAJMukdI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=JwujuNOM; arc=none smtp.client-ip=220.197.31.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=PW
+	fzr+zJFrTN7MTaKivF+UZ6XkZSxRB/9DJOS9UoMB8=; b=JwujuNOMcl4UvRSpqf
+	3eT61Q+mXki1B9CRP4j2VycuCRGagDiQWtfVEk0WCi3LLiuqs9S4kBVG2OKbC+iZ
+	G7kibZ4Fv8TVKgPF/EdfamOadLKVcL5si4EMeC8AonvhnOnT+Q996MHLGQsxcoSp
+	8gR5Xqv8D5GwCw2qFihwq6I5A=
+Received: from localhost.localdomain (unknown [])
+	by gzga-smtp-mtada-g1-1 (Coremail) with SMTP id _____wD3H0cfkZRojzptAQ--.275S2;
+	Thu, 07 Aug 2025 19:42:24 +0800 (CST)
+From: Jinyu Tang <tjytimi@163.com>
+To: Anup Patel <anup@brainfault.org>,
+	Atish Patra <atish.patra@linux.dev>,
+	Conor Dooley <conor.dooley@microchip.com>,
+	Yong-Xuan Wang <yongxuan.wang@sifive.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>
+Cc: kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org,
+	linux-riscv@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Jinyu Tang <tjytimi@163.com>
+Subject: [PATCH] riscv: skip csr restore if vcpu preempted reload
+Date: Thu,  7 Aug 2025 19:42:20 +0800
+Message-ID: <20250807114220.559098-1-tjytimi@163.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250806165615.1513164-3-maz@kernel.org>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wD3H0cfkZRojzptAQ--.275S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7KFy8XF47Gr18ZF43Jw17Awb_yoW8tF15pF
+	W7urs09w48JrW7G342qrs5uF4FvrsYgrn3Xr9rXrWfAr15tryFyF4kKa47AFW5GrWrZF1S
+	yF1ktFyxC3Z5ZwUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0piSdgJUUUUU=
+X-CM-SenderInfo: xwm13xlpl6il2tof0z/1tbiZRKieGiUfiGXWQABsB
 
-Hi!
+The kvm_arch_vcpu_load() function is called in two cases for riscv:
+1. When entering KVM_RUN from userspace ioctl.
+2. When a preempted VCPU is scheduled back.
 
-On Wed, Aug 06, 2025 at 05:56:12PM +0100, Marc Zyngier wrote:
-> FEAT_RASv1p1 system registeres are not handled at all so far.
-*registers
-> KVM will give an embarassed warning on the console and inject
-*embarrassed
-> an UNDEF, despite RASv1p1 being exposed to the guest on suitable HW.
-> 
-> Handle these registers similarly to FEAT_RAS, with the added fun
-> that there are *two* way to indicate the presence of FEAT_RASv1p1.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+In the second case, if no other KVM VCPU has run on this CPU since the
+current VCPU was preempted, the guest CSR values are still valid in
+the hardware and do not need to be restored.
 
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+This patch is to skip the CSR write path when:
+1. The VCPU was previously preempted
+(vcpu->scheduled_out == 1).
+2. It is being reloaded on the same physical CPU
+(vcpu->arch.last_exit_cpu == cpu).
+3. No other KVM VCPU has used this CPU in the meantime
+(vcpu == __this_cpu_read(kvm_former_vcpu)).
 
-> ---
->  arch/arm64/kvm/sys_regs.c | 17 +++++++++++++++++
->  1 file changed, 17 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index ad25484772574..1b4114790024e 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -2695,6 +2695,18 @@ static bool access_ras(struct kvm_vcpu *vcpu,
->  	struct kvm *kvm = vcpu->kvm;
->  
->  	switch(reg_to_encoding(r)) {
-> +	case SYS_ERXPFGCDN_EL1:
-> +	case SYS_ERXPFGCTL_EL1:
-> +	case SYS_ERXPFGF_EL1:
-> +	case SYS_ERXMISC2_EL1:
-> +	case SYS_ERXMISC3_EL1:
-> +		if (!(kvm_has_feat(kvm, ID_AA64PFR0_EL1, RAS, V1P1) ||
-> +		      (kvm_has_feat_enum(kvm, ID_AA64PFR0_EL1, RAS, IMP) &&
-> +		       kvm_has_feat(kvm, ID_AA64PFR1_EL1, RAS_frac, RASv1p1)))) {
-> +			kvm_inject_undefined(vcpu);
-> +			return false;
-> +		}
-> +		break;
->  	default:
->  		if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, RAS, IMP)) {
->  			kvm_inject_undefined(vcpu);
-> @@ -3058,8 +3070,13 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	{ SYS_DESC(SYS_ERXCTLR_EL1), access_ras },
->  	{ SYS_DESC(SYS_ERXSTATUS_EL1), access_ras },
->  	{ SYS_DESC(SYS_ERXADDR_EL1), access_ras },
-> +	{ SYS_DESC(SYS_ERXPFGF_EL1), access_ras },
-> +	{ SYS_DESC(SYS_ERXPFGCTL_EL1), access_ras },
-> +	{ SYS_DESC(SYS_ERXPFGCDN_EL1), access_ras },
->  	{ SYS_DESC(SYS_ERXMISC0_EL1), access_ras },
->  	{ SYS_DESC(SYS_ERXMISC1_EL1), access_ras },
-> +	{ SYS_DESC(SYS_ERXMISC2_EL1), access_ras },
-> +	{ SYS_DESC(SYS_ERXMISC3_EL1), access_ras },
->  
->  	MTE_REG(TFSR_EL1),
->  	MTE_REG(TFSRE0_EL1),
-> -- 
-> 2.39.2
-> 
+This reduces many CSR writes with frequent preemption on the same CPU.
+
+Signed-off-by: Jinyu Tang <tjytimi@163.com>
+---
+ arch/riscv/kvm/vcpu.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+index f001e5640..1c6c55ee1 100644
+--- a/arch/riscv/kvm/vcpu.c
++++ b/arch/riscv/kvm/vcpu.c
+@@ -25,6 +25,8 @@
+ #define CREATE_TRACE_POINTS
+ #include "trace.h"
+ 
++static DEFINE_PER_CPU(struct kvm_vcpu *, kvm_former_vcpu);
++
+ const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
+ 	KVM_GENERIC_VCPU_STATS(),
+ 	STATS_DESC_COUNTER(VCPU, ecall_exit_stat),
+@@ -581,6 +583,10 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 	struct kvm_vcpu_csr *csr = &vcpu->arch.guest_csr;
+ 	struct kvm_vcpu_config *cfg = &vcpu->arch.cfg;
+ 
++	if (vcpu->scheduled_out && vcpu == __this_cpu_read(kvm_former_vcpu) &&
++		vcpu->arch.last_exit_cpu == cpu)
++		goto csr_restore_done;
++
+ 	if (kvm_riscv_nacl_sync_csr_available()) {
+ 		nsh = nacl_shmem();
+ 		nacl_csr_write(nsh, CSR_VSSTATUS, csr->vsstatus);
+@@ -624,6 +630,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 
+ 	kvm_riscv_mmu_update_hgatp(vcpu);
+ 
++csr_restore_done:
+ 	kvm_riscv_vcpu_timer_restore(vcpu);
+ 
+ 	kvm_riscv_vcpu_host_fp_save(&vcpu->arch.host_context);
+@@ -645,6 +652,8 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+ 	void *nsh;
+ 	struct kvm_vcpu_csr *csr = &vcpu->arch.guest_csr;
+ 
++	__this_cpu_write(kvm_former_vcpu, vcpu);
++
+ 	vcpu->cpu = -1;
+ 
+ 	kvm_riscv_vcpu_aia_put(vcpu);
+-- 
+2.43.0
+
 
