@@ -1,177 +1,252 @@
-Return-Path: <kvm+bounces-54219-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54220-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6324B1D3F8
-	for <lists+kvm@lfdr.de>; Thu,  7 Aug 2025 10:04:57 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D06ADB1D3FF
+	for <lists+kvm@lfdr.de>; Thu,  7 Aug 2025 10:07:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 795AC188A309
-	for <lists+kvm@lfdr.de>; Thu,  7 Aug 2025 08:05:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AF2B47ACA7B
+	for <lists+kvm@lfdr.de>; Thu,  7 Aug 2025 08:05:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DADD24A04D;
-	Thu,  7 Aug 2025 08:04:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 453E025392C;
+	Thu,  7 Aug 2025 08:06:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GyOFjGsG"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fg1Fplfl"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oo1-f51.google.com (mail-oo1-f51.google.com [209.85.161.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C42762459D2;
-	Thu,  7 Aug 2025 08:04:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC9FE242D8C
+	for <kvm@vger.kernel.org>; Thu,  7 Aug 2025 08:06:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754553851; cv=none; b=Qj0WjTP7qTchff7y9j5vO3tun3LTSyS4h2wJCztVpOlt+XIhx4ghAao384KMWgHLhppBzFooyAwplBksxVwkjGQ/0SV67xYJBbxCB54v0NXP7m3oroi9X1s6PB5EOHloN1/CSMQpbf39PpbHzxXELn7GFw3zu7BEtzPFSMpVdzo=
+	t=1754554017; cv=none; b=dEpCzTJVpwLxOPViMzIPunPLIgsc3hAOZDqB7q1gf9M46gJvOCXmbpa2VZ77Cq8mdO7UYwPalS/DuvjvhRBU8d2fzPWAJjM7mpbnyYXS8gKJJ9sOOmBe3DtFCYQWRkR366WneT3G0Zw4XHx2nzpu3qQZ+D/3gVmrl4NxXqajInQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754553851; c=relaxed/simple;
-	bh=dqc9EFJjG8Mr8IC/9Tl9cIt27Y+U76FKz/aNuKscP3c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=As/JUIggqHzQS4dZiDRYZR3WqouRSgAtzHKG3k62fNAwShZRn7fmNBgg7nBy6PYM40RRNtXCAZYsqUGJ22F+kpiTSc7OlvQBTMbt13wbuTRaFFWtiZ3/Xl1KOlMh1bnEMOlp0FpqV3McV1CKSM2EJ6ZW18dnNvT+PdlMrHC7McE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GyOFjGsG; arc=none smtp.client-ip=209.85.161.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f51.google.com with SMTP id 006d021491bc7-61997c8e2a1so446527eaf.1;
-        Thu, 07 Aug 2025 01:04:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1754553849; x=1755158649; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=8wae+qR5fhE8jQMOdtpw1vQe+BuczBuTenzUdlRZ9tY=;
-        b=GyOFjGsGI5epLdaeSGKkLJOCK2R6BId3OKuY1XJhU6kYclLJ1Gz283KbeUWlf0V7Gs
-         wiPbwfRJFaveRfDwuKRSunbd5bdn0+h9mJOESJh9NdZ7GxpVtjEdVu+kMs8hnbxSunax
-         lQLw5ESOBjJnsazz40fLsMoi6Hh8wRsbs4LI1jKvv5YPbsCbg4HT0rcZoJIfxJPpr/Vj
-         mNYmMgI//ozLl+1sLmn6zchCwhzF1pqmzO5NSFkItyEy3h8jyyzNSELpL1fItoQvhGyc
-         v2BLy4JOhj9ZYwXGYMYCgqlfPd0tTKqTzfvvJ8XqRr6ubVh4/5DOZ7U/Rx3T+VGL14ST
-         sEDw==
+	s=arc-20240116; t=1754554017; c=relaxed/simple;
+	bh=u2Il4zcXlbBWcOa6mv3Dqk2LkCaGUlZ1IGfaEMSMzMQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FpMqzpPqWGdfraXXqzHhUlqUvaPqEQcMwUdmxC8INnhEiyftuERFU+pklnSfzHUxmYvP/6v7+8qCAcMLAMaE1Yk5p8MhaOZFvkpMynZAcT0Cc88nx1SLXwE/NefpK7VdttxLqHPAGKyAt1IRf2DF7cPr+xDZAg4vPQ4vlaD+wtA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Fg1Fplfl; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1754554014;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7F/nfJfc6zfGggUKAtMQtDXDSwk2D4R5Dz6fv6UQzEk=;
+	b=Fg1FplflcZtNXEjYmw7oWR1vzv5DRNWfqnCBrP2ECR2aWSGoPQgRX0p/py8g44sj6PFX+P
+	n/GT8hHhA8T5QyEe0eJiqm6LxVzY7jnHAca9nUptZp5qYGoNp3+oEOkLdoMSn9a3MtHT4Y
+	k7QgDuL24c3WItksK5V/3LRQHjJHO0s=
+Received: from mail-yw1-f198.google.com (mail-yw1-f198.google.com
+ [209.85.128.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-353-fHwIxRvfPHqRtKtBQURXvA-1; Thu, 07 Aug 2025 04:06:53 -0400
+X-MC-Unique: fHwIxRvfPHqRtKtBQURXvA-1
+X-Mimecast-MFC-AGG-ID: fHwIxRvfPHqRtKtBQURXvA_1754554013
+Received: by mail-yw1-f198.google.com with SMTP id 00721157ae682-70e72e81fafso9386077b3.2
+        for <kvm@vger.kernel.org>; Thu, 07 Aug 2025 01:06:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754553849; x=1755158649;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8wae+qR5fhE8jQMOdtpw1vQe+BuczBuTenzUdlRZ9tY=;
-        b=lnlgrkIItMBJahoYXg9y7AQCVNfbdyxPc6DrxuEzZszHyIiLaEt2f/bGHEqasqb+OI
-         fzt38T74D9qNQsuybzIl8p60QImQGEMigJBLzckcTRvfj8kc3rRgC1w0DHwafUFlJdiv
-         ouCsnf5BdHHMazId0390UkOGBpx60V95tPS0HMNGsv00scdSD2oK8blG2mH52tpi3JaZ
-         zfmSqS02W+T1bnGp1f1DAT1NHIo+VCaEKZE0jkdxNk01S4x7ovCUti/EidNIiMzfWDGH
-         3t1DGdT6IZwPrS+rPEDu2T8oNRmJFWhsGDHwt5YhamTLYXxV004ZmnRJslhKkS+2g95R
-         V06A==
-X-Forwarded-Encrypted: i=1; AJvYcCXAnGQhGVK5cGAeaB+QjwL7NRFpEfuqL8xd70aFEqfLEDLtlv2y72q+/rSqrvOq8FJE8MQ=@vger.kernel.org, AJvYcCXu9pGu8MW07ay6rpo3hGSIb8tNubuGXvOzARAxe9ctFsGh5PGVw6o4Vwl8vMIlvtrjmj/z+weCPuj/t3Jh@vger.kernel.org
-X-Gm-Message-State: AOJu0YyBrIMcBCbkuzMfFQfwF3mSopMq/hbB+xmwdSVPt9s9dulSYXXR
-	E9dxxJEyI+bcWOE2HqhQ0oa5qftB93ita8O4uUMW3RG6Av2YPvCH2zJxio/p4rxoI11m1u2Y7GX
-	3jW+gpNC2vwuDjqYgM1lp0rtIpAjWOfU=
-X-Gm-Gg: ASbGncvzrtxcsrv9P+99+cBXehyAX0hGUr01pvQjqwHigUwEF+AeGvfBlSHllI1ilMV
-	dsl8qbQGFdJJ2qEy4yg1dmeQSbORCPshE93aqoHLPSnHacM6shcLG457saXIamHcLs8R4vDFopP
-	GQMsMBTWa54IaE6YSIZbg9EBZLR209NUggBopL85rj1hn+a/PR2wsnIl09JMYvFTA4bC9Y+YFMm
-	2H1LH4=
-X-Google-Smtp-Source: AGHT+IH3rC620Ad0bDM8bPs/dSkuakMXrw+b62dY9ttQbWB+LhmXAlXtlNpoCZtfqdD2ku0pTkueOWNxOghxYLJZQz8=
-X-Received: by 2002:a4a:ee19:0:b0:619:a34b:3e29 with SMTP id
- 006d021491bc7-61b6ed17b1amr1746527eaf.1.1754553848581; Thu, 07 Aug 2025
- 01:04:08 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1754554010; x=1755158810;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7F/nfJfc6zfGggUKAtMQtDXDSwk2D4R5Dz6fv6UQzEk=;
+        b=A9jurgpcWccldnPCp21GrJB5hwyJUYQmvSt0ojXs0Q96e6FtqubGSJuJq+OxqM62gH
+         V9mulyXYUkd1Gx+VP+CVPSZTyojX68DHjea2KKoRe9hA99+ROWfA0tWC0FoZG3EvFxNh
+         k1wajME8zvvXLHHk+4psXDRTAFoio5UOPeY/LuR44rZlOug+asUshfgR0ntI9yW+Z+h0
+         P6wNiO9nHGNNRM4xIjghlyuYqWrNu60CC/glRusA0lo2XTmBtQ4uR6k5wDbE4dWbiQon
+         LUmatttg3UTsfFkZkYe0Hw1cta//U/z+9EIK4npw6JLjG8DpXeKwrhPxO0mYsEBBaq5S
+         +p2w==
+X-Forwarded-Encrypted: i=1; AJvYcCUHuFe96DCn6sdeRhSUsJ3nzPt8pbirHLG7IsIarkPoBfjLCn8sYOJ0dT135a9jKtlu3vA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwbHSLrWdrsS2dDBvBhd0Gho8D6s+xV2IJ/aKU7iMjeEM9zwqhQ
+	dGboclp0GAdyNTwRaAyd3/09UcrYwhVdhX1HlsdMUyQ1CAtIzrTPO1MUNcBRNOFTetnNDiCixSd
+	LDq3gP8RNH9yJ5ESh2zWLCD8LuwfU43oXat+m5bv63ak75STW3GUQsw==
+X-Gm-Gg: ASbGncuTIv+7WjzXK77eMchT6q/3HaqDoANhQnLQT0gi0Q+iBSbNcBi9HPmf/4h3j1g
+	EbrB5Ykaw5thrSRrv0MajnEmF3uzzqrec3b8HXIFEchtwk4h/uuNLO2x9rNuLqb87cS3eexCslM
+	jtl0Rqc3EetGfxuKgDL1aueie+dYoX4Kuq+kFTGCeH4uy4uHfU/9++gbE70bstc51h4IAyMhgY2
+	qLI8mvSwF4DtXwawBeippsZztLg6pENmdztdbRu4dQiTy4aFcpnWnyrWcaR1VYaI3IhXTcNPGiv
+	W6QrMTqsLuuDAFfdMK/cAthLgWpAv6IdtnK/St2SN22X/1XW/t9ZIZN6fl/dVk6XShbvYMmLm2r
+	pr3rb9XEMXPLP/lU=
+X-Received: by 2002:a05:690c:6203:b0:71a:a9c:30dd with SMTP id 00721157ae682-71bcc6d6851mr85321037b3.2.1754554009645;
+        Thu, 07 Aug 2025 01:06:49 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHkk4jVdfxkNS66lXJnELQ1c8i2y7wkD6dlYIhb6ZnK84/IDwj2JHOFZ/v+UaqBfCV8rwA6qA==
+X-Received: by 2002:a05:690c:6203:b0:71a:a9c:30dd with SMTP id 00721157ae682-71bcc6d6851mr85319947b3.2.1754554008050;
+        Thu, 07 Aug 2025 01:06:48 -0700 (PDT)
+Received: from sgarzare-redhat (host-79-45-205-118.retail.telecomitalia.it. [79.45.205.118])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-71b5a3a9110sm44916537b3.4.2025.08.07.01.06.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Aug 2025 01:06:47 -0700 (PDT)
+Date: Thu, 7 Aug 2025 10:06:35 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, "K. Y. Srinivasan" <kys@microsoft.com>, 
+	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
+	Bryan Tan <bryan-bt.tan@broadcom.com>, Vishnu Dasa <vishnu.dasa@broadcom.com>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-hyperv@vger.kernel.org, berrange@redhat.com, Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH RFC net-next v4 00/12] vsock: add namespace support to
+ vhost-vsock
+Message-ID: <27a6zuc6wwuixgozhkxxd2bmpiegiat4bkwghvjz6y3wugtjqm@az7j7et7hzpq>
+References: <20250805-vsock-vmtest-v4-0-059ec51ab111@meta.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250806081051.3533470-1-hugoolli@tencent.com> <aJOc8vIkds_t3e8C@google.com>
-In-Reply-To: <aJOc8vIkds_t3e8C@google.com>
-From: hugo lee <cs.hugolee@gmail.com>
-Date: Thu, 7 Aug 2025 16:03:56 +0800
-X-Gm-Features: Ac12FXxHJZjqVcXiDcK5WpwSoEYWRRNT84CAqoxo1hkGbDkaTZtrLeDUrHvcNo0
-Message-ID: <CAAdeq_+Ppuj8PxABvCT54phuXY021HxdayYyb68G3JjkQE0WQg@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86: Synchronize APIC State with QEMU when irqchip=split
-To: Sean Christopherson <seanjc@google.com>
-Cc: pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
-	dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Yuguo Li <hugoolli@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250805-vsock-vmtest-v4-0-059ec51ab111@meta.com>
 
-On Thu, Aug 7, 2025 Sean Christopherson wrote:
->
-> On Wed, Aug 06, 2025, Yuguo Li wrote:
-> > When using split irqchip mode, IOAPIC is handled by QEMU while the LAPIC is
-> > emulated by KVM.  When guest disables LINT0, KVM doesn't exit to QEMU for
-> > synchronization, leaving IOAPIC unaware of this change.  This may cause vCPU
-> > to be kicked when external devices(e.g. PIT)keep sending interrupts.
->
-> I don't entirely follow what the problem is.  Is the issue that QEMU injects an
-> IRQ that should have been blocked?  Or is QEMU forcing the vCPU to exit unnecessarily?
->
+Hi Bobby,
 
-This issue is about QEMU keeps injecting should-be-blocked
-(blocked by guest and qemu just doesn't know that) IRQs.
-As a result, QEMU forces vCPU to exit unnecessarily.
-
-> > This patch ensure that KVM exits to QEMU for synchronization when the guest
-> > disables LINT0.
+On Tue, Aug 05, 2025 at 02:49:08PM -0700, Bobby Eshleman wrote:
+>This series adds namespace support to vhost-vsock. It does not add
+>namespaces to any of the guest transports (virtio-vsock, hyperv, or
+>vmci).
 >
-> Please wrap at ~75 characters.
-
-Thanks for reminding, will do in the next patch.
-
+>The current revision only supports two modes: local or global. Local
+>mode is complete isolation of namespaces, while global mode is complete
+>sharing between namespaces of CIDs (the original behavior).
 >
-> > Signed-off-by: Yuguo Li <hugoolli@tencent.com>
-> > ---
-> >  arch/x86/include/asm/kvm_host.h | 1 +
-> >  arch/x86/kvm/lapic.c            | 4 ++++
-> >  arch/x86/kvm/x86.c              | 5 +++++
-> >  include/uapi/linux/kvm.h        | 1 +
-> >  4 files changed, 11 insertions(+)
-> >
-> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> > index f19a76d3ca0e..f69ce111bbe0 100644
-> > --- a/arch/x86/include/asm/kvm_host.h
-> > +++ b/arch/x86/include/asm/kvm_host.h
-> > @@ -129,6 +129,7 @@
-> >       KVM_ARCH_REQ_FLAGS(32, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
-> >  #define KVM_REQ_UPDATE_PROTECTED_GUEST_STATE \
-> >       KVM_ARCH_REQ_FLAGS(34, KVM_REQUEST_WAIT)
-> > +#define KVM_REQ_LAPIC_UPDATE              KVM_ARCH_REQ(35)
-> >
-> >  #define CR0_RESERVED_BITS                                               \
-> >       (~(unsigned long)(X86_CR0_PE | X86_CR0_MP | X86_CR0_EM | X86_CR0_TS \
-> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> > index 8172c2042dd6..65ffa89bf8a6 100644
-> > --- a/arch/x86/kvm/lapic.c
-> > +++ b/arch/x86/kvm/lapic.c
-> > @@ -2329,6 +2329,10 @@ static int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
-> >                       val |= APIC_LVT_MASKED;
-> >               val &= apic_lvt_mask[index];
-> >               kvm_lapic_set_reg(apic, reg, val);
-> > +             if (irqchip_split(apic->vcpu->kvm) && (val & APIC_LVT_MASKED)) {
+>Future may include supporting a mixed mode, which I expect to be more
+>complicated because socket lookups will have to include new logic and
+>API changes to behave differently based on if the lookup is part of a
+>mixed mode CID allocation, a global CID allocation, a mixed-to-global
+>connection (allowed), or a global-to-mixed connection (not allowed).
 >
-> This applies to much more than just LINT0, and for at least LVTPC and LVTCMCI,
-> KVM definitely doesn't want to exit on every change.
+>Modes are per-netns and write-once. This allows a system to configure
+>namespaces independently (some may share CIDs, others are completely
+>isolated). This also supports future mixed use cases, where there may 
+>be
+>namespaces in global mode spinning up VMs while there are
+>mixed mode namespaces that provide services to the VMs, but are not
+>allowed to allocate from the global CID pool.
+>
+>Thanks again for everyone's help and reviews!
 
-Actually every masking on LAPIC should be synchronized with IOAPIC.
-Because any desynchronization may cause unnecessary kicks
-which rarely happens due to the well-behaving guests.
-Exits here won't harm, but maybe only exit when LINT0 is being masked?
-Since others unlikely cause exits.
+Thanks for your work!
+
+As I mentioned to you, I'll be off for the next 2 weeks, so I'll take a 
+look when I'm back, but feel free to send new versions if you receive 
+enough comments on this.
+
+Thanks,
+Stefano
 
 >
-> Even for LINT0, it's not obvious that "pushing" from KVM is a better option than
-> having QEMU "pull" as needed.
+>Signed-off-by: Bobby Eshleman <bobbyeshleman@gmail.com>
+>To: Stefano Garzarella <sgarzare@redhat.com>
+>To: Shuah Khan <shuah@kernel.org>
+>To: David S. Miller <davem@davemloft.net>
+>To: Eric Dumazet <edumazet@google.com>
+>To: Jakub Kicinski <kuba@kernel.org>
+>To: Paolo Abeni <pabeni@redhat.com>
+>To: Simon Horman <horms@kernel.org>
+>To: Stefan Hajnoczi <stefanha@redhat.com>
+>To: Michael S. Tsirkin <mst@redhat.com>
+>To: Jason Wang <jasowang@redhat.com>
+>To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+>To: Eugenio Pérez <eperezma@redhat.com>
+>To: K. Y. Srinivasan <kys@microsoft.com>
+>To: Haiyang Zhang <haiyangz@microsoft.com>
+>To: Wei Liu <wei.liu@kernel.org>
+>To: Dexuan Cui <decui@microsoft.com>
+>To: Bryan Tan <bryan-bt.tan@broadcom.com>
+>To: Vishnu Dasa <vishnu.dasa@broadcom.com>
+>To: Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>
+>Cc: virtualization@lists.linux.dev
+>Cc: netdev@vger.kernel.org
+>Cc: linux-kselftest@vger.kernel.org
+>Cc: linux-kernel@vger.kernel.org
+>Cc: kvm@vger.kernel.org
+>Cc: linux-hyperv@vger.kernel.org
+>Cc: berrange@redhat.com
+>
+>Changes in v4:
+>- removed RFC tag
+>- implemented loopback support
+>- renamed new tests to better reflect behavior
+>- completed suite of tests with permutations of ns modes and vsock_test
+>  as guest/host
+>- simplified socat bridging with unix socket instead of tcp + veth
+>- only use vsock_test for success case, socat for failure case (context
+>  in commit message)
+>- lots of cleanup
+>
+>Changes in v3:
+>- add notion of "modes"
+>- add procfs /proc/net/vsock_ns_mode
+>- local and global modes only
+>- no /dev/vhost-vsock-netns
+>- vmtest.sh already merged, so new patch just adds new tests for NS
+>- Link to v2:
+>  https://lore.kernel.org/kvm/20250312-vsock-netns-v2-0-84bffa1aa97a@gmail.com
+>
+>Changes in v2:
+>- only support vhost-vsock namespaces
+>- all g2h namespaces retain old behavior, only common API changes
+>  impacted by vhost-vsock changes
+>- add /dev/vhost-vsock-netns for "opt-in"
+>- leave /dev/vhost-vsock to old behavior
+>- removed netns module param
+>- Link to v1:
+>  https://lore.kernel.org/r/20200116172428.311437-1-sgarzare@redhat.com
+>
+>Changes in v1:
+>- added 'netns' module param to vsock.ko to enable the
+>  network namespace support (disabled by default)
+>- added 'vsock_net_eq()' to check the "net" assigned to a socket
+>  only when 'netns' support is enabled
+>- Link to RFC: https://patchwork.ozlabs.org/cover/1202235/
+>
+>---
+>Bobby Eshleman (12):
+>      vsock: a per-net vsock NS mode state
+>      vsock: add net to vsock skb cb
+>      vsock: add netns to af_vsock core
+>      vsock/virtio: add netns to virtio transport common
+>      vhost/vsock: add netns support
+>      vsock/virtio: use the global netns
+>      hv_sock: add netns hooks
+>      vsock/vmci: add netns hooks
+>      vsock/loopback: add netns support
+>      selftests/vsock: improve logging in vmtest.sh
+>      selftests/vsock: invoke vsock_test through helpers
+>      selftests/vsock: add namespace tests
+>
+> MAINTAINERS                             |    1 +
+> drivers/vhost/vsock.c                   |   48 +-
+> include/linux/virtio_vsock.h            |   12 +
+> include/net/af_vsock.h                  |   59 +-
+> include/net/net_namespace.h             |    4 +
+> include/net/netns/vsock.h               |   21 +
+> net/vmw_vsock/af_vsock.c                |  204 +++++-
+> net/vmw_vsock/hyperv_transport.c        |    2 +-
+> net/vmw_vsock/virtio_transport.c        |    5 +-
+> net/vmw_vsock/virtio_transport_common.c |   14 +-
+> net/vmw_vsock/vmci_transport.c          |    4 +-
+> net/vmw_vsock/vsock_loopback.c          |   59 +-
+> tools/testing/selftests/vsock/vmtest.sh | 1088 ++++++++++++++++++++++++++-----
+> 13 files changed, 1330 insertions(+), 191 deletions(-)
+>---
+>base-commit: dd500e4aecf25e48e874ca7628697969df679493
+>change-id: 20250325-vsock-vmtest-b3a21d2102c2
+>
+>Best regards,
+>-- 
+>Bobby Eshleman <bobbyeshleman@meta.com>
 >
 
-QEMU has no idea when LINT0 is masked by the guest. Then the problem becomes
-when it is needed to "pull". The guess on this could lead to extra costs.
-
-> At the very least, this would need to be guarded by a capability, otherwise
-> the new userspace exit would confuse existing VMMs (and probably result in the
-> VM being terminated).
-
-True, I'll add this protection.
-
->
->
-> > +                     kvm_make_request(KVM_REQ_LAPIC_UPDATE, apic->vcpu);
-> > +                     kvm_vcpu_kick(apic->vcpu);
->
-> Why kick?  Cross-vCPU writes to LINT0 shouldn't be a thing, i.e. the kick should
-> effectivel be a nop.
-
-It is unnecessary, I will fix it in the next version.
 
