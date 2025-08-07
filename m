@@ -1,89 +1,52 @@
-Return-Path: <kvm+bounces-54254-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54255-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED378B1D836
-	for <lists+kvm@lfdr.de>; Thu,  7 Aug 2025 14:47:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40EE5B1D854
+	for <lists+kvm@lfdr.de>; Thu,  7 Aug 2025 14:56:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DFE9B1AA3FCB
-	for <lists+kvm@lfdr.de>; Thu,  7 Aug 2025 12:48:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C23E722D10
+	for <lists+kvm@lfdr.de>; Thu,  7 Aug 2025 12:55:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAE2E2571B0;
-	Thu,  7 Aug 2025 12:47:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F+nGFL1O"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F3342550DD;
+	Thu,  7 Aug 2025 12:55:45 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77AB55695
-	for <kvm@vger.kernel.org>; Thu,  7 Aug 2025 12:47:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFD97252287
+	for <kvm@vger.kernel.org>; Thu,  7 Aug 2025 12:55:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754570850; cv=none; b=mNTKXwIhTivwuDXzpH/wtTywFcV7jbH6h9RS3ocI9LZjXsWLs1nv0D+O/NbiHVhd3yUsUizUaH9aauy5jB3kr4vCr4wnXq/uXR1W5VnGW1jTNq+gEkZ5/tld2LKLMNySBpAdAK4PSRBAB5Nj+h7zfjlgPBn50UXzFe+BtOEiQSA=
+	t=1754571344; cv=none; b=fE9zIatP9BNuVxFwRJjZMJI4ZcJY8c7vb7nPEzpL6H2LT3E7RdfBngFZNbuCCBh1kXXXXgJhxZzPhE+sqyjprOrII5ibts5qB7DnBDqzXtfCNi9coDOr3MSfgKNFkil/+mqYLyQ5miPuVQlPPs2ke0Qj1bJDssA+at/FBUuZF10=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754570850; c=relaxed/simple;
-	bh=un3RrEaBjFQNWnpFNJaSEVX8CHxrowanZGwCtU3ENaQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=nUkQvdJRQOc1JKI/fhjCXpVl/nQw/RfC/IFRBUfQt/QB3L3cwBuJh3AhBDJYQSjrTZo3bb1x7WN/1SsPU+p5rNCIB4MuuG08sCzt8tTfP20r72VsOqlCDz9CRJbyMN2eCLrLnl9l3TNVwu7DLhjGLVt4NO6uInGZLKUJa22AL2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=F+nGFL1O; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1754570847;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=aTK69kQaFZtjtvMSMDYC7o+QFQbEWEankqiOa7dNWH4=;
-	b=F+nGFL1O2otRqpfrcqPVxpXrKDNGDTW1qF14NO5224K5lJR0xcoka33xxsxRTIbaQEDwhJ
-	rEF4CSKWe4kPUOgtFJVpj8wimaGX2Dwxq1mi0kHbL5GTZ6w66S0s8fcECwBB3oSXrS3URO
-	rxWyZ7T3OMJEhZdlDPWUk6FKRnP7JXk=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-634-5HlbJnXXNrasdTgLg6F84g-1; Thu, 07 Aug 2025 08:47:26 -0400
-X-MC-Unique: 5HlbJnXXNrasdTgLg6F84g-1
-X-Mimecast-MFC-AGG-ID: 5HlbJnXXNrasdTgLg6F84g_1754570845
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4538f375e86so8253715e9.3
-        for <kvm@vger.kernel.org>; Thu, 07 Aug 2025 05:47:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754570845; x=1755175645;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aTK69kQaFZtjtvMSMDYC7o+QFQbEWEankqiOa7dNWH4=;
-        b=VYMAkgbzrTcaHYB1VpwBnNhzF7PDE+1OICAdvY6ruqQun8LJzjflNiz/NXnK0THcQO
-         dMuz3SURkM6G6h1tXYmtzwtL3WDXDLMG5296nSJr4Uim0sxhFkPGno5QFHl09XphGSx8
-         HoJQqaqpijFvBEIvaWx86wYjXDF1MPIFT+IrinFruy9EKtAid66DO1wFebKkn5t5zaKe
-         pxfr/8Dbn9mR1ZToa6T24n7uemgWXCjMmwT8mQTdLehUn+0fSGW+FOgpVhGIhc6HRJPK
-         r+6vIxywLIKwNX1pKcO+DBU4kC/Q2v1WncoYy/KCyuGGBjExSlZveR83xwTJiujb1hCK
-         65Hw==
-X-Gm-Message-State: AOJu0Yzm1FOZsUWySaYohEsZRczepuOUkdmtcF/SccOP8l1enPpNcyRN
-	jk9Mz3tVYz6G1eBo4n60oVh7VgJl0g46fm4+XTksl3a8arepztyFvABPfpjV2a7YoR7EpuEZ/eS
-	xWt/kbKdDp5b4J68RYOxxf6lPfX0bDmwAO9ZEtQF5R6YDOiJwU1LM0A==
-X-Gm-Gg: ASbGncsnuFjwIQ1Jh9MMBv5uR9Otk7ZVDDjLDrWuHw5RV2YbQRiElwuXKxGPr3jPhA+
-	GZ3q+lAkGFU3etqy5zrXQR1gNOIGld3D+Vnw5IHyB+m4ZVOa5gaEkon87ygtzXPO47YvRyCQC/E
-	JbkJiVltiDpuiczLeGOxbU/Om0SPjJ/x6bum/IyIUVIU413z43g8ZWe4NY0nqGFI3HPDj7J0PP4
-	4K+mPa8YGT9K4gMlgt/DLzxHmOAJ1nS/ggfFRkZ0aY04wiJzbsTIZY0br6YALXYBp8ACkHRGwMm
-	LcOdQB9lg+W5O9MGjWtSn8ia6Foi8JmQ
-X-Received: by 2002:a05:600c:468b:b0:456:1ac8:cace with SMTP id 5b1f17b1804b1-459ebd12934mr46363025e9.12.1754570845007;
-        Thu, 07 Aug 2025 05:47:25 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG09B4jVXtQ521CCCpSOE6UxD7Ba5Baj1YjRug6kR2oAgnAlGT6bbB3OaejRPpTTtCumhOhhg==
-X-Received: by 2002:a05:600c:468b:b0:456:1ac8:cace with SMTP id 5b1f17b1804b1-459ebd12934mr46362755e9.12.1754570844604;
-        Thu, 07 Aug 2025 05:47:24 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc0:1515:7300:62e6:253a:2a96:5e3])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-459e0a24bf1sm120608885e9.1.2025.08.07.05.47.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Aug 2025 05:47:23 -0700 (PDT)
-Date: Thu, 7 Aug 2025 08:47:21 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	jasowang@redhat.com, jhkim@linux.ibm.com, leitao@debian.org,
-	mst@redhat.com
-Subject: [GIT PULL] vhost: bugfix
-Message-ID: <20250807084721-mutt-send-email-mst@kernel.org>
+	s=arc-20240116; t=1754571344; c=relaxed/simple;
+	bh=h2H0F3yEEGIlcD1VJmopqC8FoJgWxNjjGL9lY6FErqM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PP+1wqf498b+coLRq3E1o/GlciVvWtflQazRsBw8RrpAsvycCxCWhXWCKcsXOeO7k2pcqfdWpW29f4fLRvM5WQtXp8/DRjiKh2Lon5xAes4zg2oOUZ8S4GiP2XKh15OCFcEisPwycyOp7Dvo+Lf/JNDMVlM4lw6T/Y6jQb9X0aE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6C7841713;
+	Thu,  7 Aug 2025 05:55:27 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BCA5A3F5A1;
+	Thu,  7 Aug 2025 05:55:33 -0700 (PDT)
+Date: Thu, 7 Aug 2025 13:55:31 +0100
+From: Joey Gouly <joey.gouly@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Cornelia Huck <cohuck@redhat.com>
+Subject: Re: [PATCH v2 4/5] KVM: arm64: Expose FEAT_RASv1p1 in a canonical
+ manner
+Message-ID: <20250807125531.GB2351327@e124191.cambridge.arm.com>
+References: <20250806165615.1513164-1-maz@kernel.org>
+ <20250806165615.1513164-5-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -92,32 +55,65 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-Mutt-Fcc: =sent
+In-Reply-To: <20250806165615.1513164-5-maz@kernel.org>
 
-The following changes since commit 7e161a991ea71e6ec526abc8f40c6852ebe3d946:
+On Wed, Aug 06, 2025 at 05:56:14PM +0100, Marc Zyngier wrote:
+> If we have RASv1p1 on the host, advertise it to the guest in the
+> "canonical way", by setting ID_AA64PFR0_EL1 to V1P1, rather than
+> the convoluted RAS+RAS_frac method.
+> 
+> Note that this also advertises FEAT_DoubleFault, which doesn't
+> affect the guest at all, as only EL3 is concerned by this.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 1b4114790024e..66e5a733e9628 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1800,6 +1800,18 @@ static u64 sanitise_id_aa64pfr0_el1(const struct kvm_vcpu *vcpu, u64 val)
+>  	if (!vcpu_has_sve(vcpu))
+>  		val &= ~ID_AA64PFR0_EL1_SVE_MASK;
+>  
+> +	/*
+> +	 * Describe RASv1p1 in a canonical way -- ID_AA64PFR1_EL1.RAS_frac
+> +	 * is cleared separately. Note that by advertising RASv1p1 here, we
 
-  Merge tag 'i2c-for-6.17-rc1-part2' of git://git.kernel.org/pub/scm/linux/kernel/git/wsa/linux (2025-08-04 16:37:29 -0700)
+Where is it cleared? __kvm_read_sanitised_id_reg() is where I would have
+expected to see it:
 
-are available in the Git repository at:
+    case SYS_ID_AA64PFR1_EL1:                                                                                                                                                                  
+        if (!kvm_has_mte(vcpu->kvm)) {                                                                                                                                                         
+            val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_MTE);                                                                                                                                   
+            val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_MTE_frac);                                                                                                                              
+        }                                                                                                                                                                                      
+                                                                                                                                                                                               
+        val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_SME);                                                                                                                                       
+        val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_RNDR_trap);                                                                                                                                 
+        val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_NMI);                                                                                                                                       
+        val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_GCS);                                                                                                                                       
+        val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_THE);                                                                                                                                       
+        val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_MTEX);                                                                                                                                      
+        val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_PFAR);                                                                                                                                      
+        val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_MPAM_frac);                                                                                                                                 
+        break;                                                                  
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
-
-for you to fetch changes up to 6a20f9fca30c4047488a616b5225acb82367ef6b:
-
-  vhost: initialize vq->nheads properly (2025-08-05 05:57:40 -0400)
-
-----------------------------------------------------------------
-vhost: bugfix
-
-A single fix for a regression in vhost.
-
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-
-----------------------------------------------------------------
-Jason Wang (1):
-      vhost: initialize vq->nheads properly
-
- drivers/vhost/vhost.c | 1 +
- 1 file changed, 1 insertion(+)
-
+> +	 * implicitly advertise FEAT_DoubleFault. However, since that last
+> +	 * feature is a pure EL3 feature, this is not relevant for the
+> +	 * guest, and we save on the complexity.
+> +	 */
+> +	if (cpus_have_final_cap(ARM64_HAS_RASV1P1_EXTN)) {
+> +		val &= ~ID_AA64PFR0_EL1_RAS;
+> +		val |= SYS_FIELD_PREP_ENUM(ID_AA64PFR0_EL1, RAS, V1P1);
+> +	}
+> +
+>  	/*
+>  	 * The default is to expose CSV2 == 1 if the HW isn't affected.
+>  	 * Although this is a per-CPU feature, we make it global because
+> -- 
+> 2.39.2
+> 
 
