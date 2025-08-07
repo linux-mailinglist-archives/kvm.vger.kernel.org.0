@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-54290-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54291-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E519DB1DE08
-	for <lists+kvm@lfdr.de>; Thu,  7 Aug 2025 22:21:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0CAFB1DE0F
+	for <lists+kvm@lfdr.de>; Thu,  7 Aug 2025 22:22:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A77AA1896FE1
-	for <lists+kvm@lfdr.de>; Thu,  7 Aug 2025 20:21:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54547624CC9
+	for <lists+kvm@lfdr.de>; Thu,  7 Aug 2025 20:21:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5495F27C162;
-	Thu,  7 Aug 2025 20:17:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B26DD27F16F;
+	Thu,  7 Aug 2025 20:17:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CIsxf155"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QBpt/ucI"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F222327CCC7
-	for <kvm@vger.kernel.org>; Thu,  7 Aug 2025 20:17:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5CCD27E070
+	for <kvm@vger.kernel.org>; Thu,  7 Aug 2025 20:17:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754597829; cv=none; b=KWj/mKGRdWtio5bR+dcnxhEzB28mS4HkgjMfbM/Rjr53O3iSRTfXcnGJBjwqA0wS42f3TSBLZhwxjqBtIXMczQlHzfi8DJN3RyEUOj1K2JnedUnM6XSENui4ouzlVlcxB7RH7+jbDjx6iQi5cFMrAUAeXJ2xmakezw0HqjIR1xs=
+	t=1754597830; cv=none; b=MsFLGMSYS92XITlNQT7DnH/A/MrTuZPb3DauqfrjlW9ibfyi2vBznPKuTEnIzdBMWkhMDFEx0ZZCF9S6+DyRI3tRBZ7wk3QpcJLy2ictpu8/qDp/HaFwmHcqGOMsO8/U/G9vQJBnKn5FtXE1OqrGev9G9WZQF9H752TBqTU/Txg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754597829; c=relaxed/simple;
-	bh=NkZ9cw2OQkpKTyBr6XnTKZKOxHkmBwe+wNgxb8ukCTo=;
+	s=arc-20240116; t=1754597830; c=relaxed/simple;
+	bh=xl6zU/zvfsPbrUYNAsccEMJ9PE4FINSoXlDmAhqFRU0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=HFZyUCiSV4qcOlFvIsEgJulfZLH0SYQ3latDAeD0CLc14Pm6mEOFjYLYsgH28xNWXZ3ihkGoX1WW4dmn46+FjBNs80J6Z874YPgcS3/SyABeQH4+Wumi8ltn/V8RDsF/KpF0EopJGXp/GRJDXi4bzIB2xZ4RzcKu0Q5d/V0tRQw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sagis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CIsxf155; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=nppP9yGD+IVbi9PLKwoxWDNcXdeg1b6P3corr4PURl97HPOeCYxzIQGorpts2wqY33am1+velAlvgmtQCA6OrTYxQmXwckF/QS0io+wSKn+V9T69oMxPqyPmVGGakXAWanhBzu+Whw906sLWFayMpZxAg6v5aGt1evlsQqGhNNU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sagis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QBpt/ucI; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sagis.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3217aae3f90so959530a91.0
-        for <kvm@vger.kernel.org>; Thu, 07 Aug 2025 13:17:06 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-31eb41391f3so1433553a91.0
+        for <kvm@vger.kernel.org>; Thu, 07 Aug 2025 13:17:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754597826; x=1755202626; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1754597828; x=1755202628; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=lGXEvvh28CILFU8veFYJPuuhWeDvdlK202GCjoHljc0=;
-        b=CIsxf155Nn4ORlGN3obiaE94G2wj22Vnm3QOGfkzU+dflRorlXhpJj3o4NwdZnUoAI
-         nE0jXotWm++qCYJk1ZzCFZ8hD7zWY4ugI5YNrC1nJgts5hkNij6JGj6U3DUzKpcEs6OW
-         uEtnAW0fsLncJBl61evYtczbH+LIHqWKMhGQFBNg/Tohuo9mek5Lv+xml8bsSGZSZ+bp
-         bbBeIjwZdNeoai28uLAY290UKIdFyaBIkNHwBemAT2bxpUHkqpRPGyJ4K+qMq5djtF50
-         0dgXkMYpoGJLN6tDAb4dh7NfZARWP8o0hmdrobGuRmO+ieHRaxLjR/EcoVomAsUviWnX
-         Zlnw==
+        bh=druJe0O0RVRgmBCK/d78lVDLhUI96RPYL//ATHIqQ7o=;
+        b=QBpt/ucI7IAdNccqbRTrH7rREGi4RTnWrmWgvdsXTKgAXQa3Ay07HpUSbSWKJhZ1Sh
+         ncc3VX6i/6AwDrgK4PrS7tUFXybIBdtx1CytoeL7jSnDn9AxB2U/qgMmLX5iXHJm10+h
+         pmB4LaZLqXd3qY0c9y3tsnP0/K44REyj/MFo+etzAQxI1yrb5/Gn5EPqJvJ+dGKwCRAV
+         G10jVTMtA4QliHC3l79LqyL29OLdYJKPElXpPy2eKpWH9/XEO2HTr8izA3ne53eL+wHv
+         Ke3o3kqZtlb2IO2ztFtwoshPLcUtrn+iCHwW0CNvE9ZsteoNjV/oiy1bh5JVANU7m0N5
+         9+cQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754597826; x=1755202626;
+        d=1e100.net; s=20230601; t=1754597828; x=1755202628;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lGXEvvh28CILFU8veFYJPuuhWeDvdlK202GCjoHljc0=;
-        b=jxxoV9ArH2miUa5FL8KD6tQQR7JdI6tVSNRD1fXvQ+j5NWm6G+Bgu0mYl3viJvxEG6
-         6fvqDelSV7oXz9U0eSqWN7wbILdMUun0+yrGYzddGDbv6q5BOLFK5vojqwCPd7PpQdC7
-         TBo59N2PiLjuHqWLHvrsU77HOp8J8w/SNBlaJNrpj5bQOwgPSbpWrXvvWJ0vupqNTbj/
-         rT69ax3L5hBA1wMJGwt00qiVv8O08LCOs9uPa7loUu2QPIuyeO2Q+aHfW9XD/0t+E9Fv
-         Fs7TqYzV4f6Y6FZgd5VZ91nfz9jNkOxcjmHqkldAnfHLznpvWpUJtdOHmb2xCox92tPF
-         lv2w==
-X-Forwarded-Encrypted: i=1; AJvYcCXU5jIHyJGZr9oo5dpKt4Vu/76ysja7mdqiEddpErRVSDCITIB8jwi+3cwGKGKh6gmt0kY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YygcwpgdeE3ANzJwYd0WWxavub65g+LE+JOKuKjbFV9SEOIeMA9
-	9NqiQnpUe+y8D4+lZ5EXEaadWx71nK+pwYImbPscCnYoSO1rhJy8LG3Y9T1t/E02HaHNxErWHkY
-	SWw==
-X-Google-Smtp-Source: AGHT+IEt1bokf2gwgVn7hdK2GrWh3MEGT0E9AT9JiLMbohoSe5t35nvuUxv5BuJLVfGUiWauYYMf6L5SXw==
-X-Received: from pjph9.prod.google.com ([2002:a17:90a:9c09:b0:320:e3e2:6877])
- (user=sagis job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5249:b0:320:ff84:ceb5
- with SMTP id 98e67ed59e1d1-32183b3f039mr501997a91.16.1754597826341; Thu, 07
- Aug 2025 13:17:06 -0700 (PDT)
-Date: Thu,  7 Aug 2025 13:16:15 -0700
+        bh=druJe0O0RVRgmBCK/d78lVDLhUI96RPYL//ATHIqQ7o=;
+        b=WQ5z4RxGPPTtPxbmNGWeiUN6hnd73TZQewcwxinABFXChHLGBF3oTNjrwHw6lnVQEL
+         r2JNYoWF10cIeeJJ6gs+rmxy11UeckHgJdIl1YaPm8laJqV3DdQWSWZIeQjTmK2yCfP0
+         xkqekqGLjIfIQBreUYzLxXhWqtpho94JFzKN01lbU+1J12y0y3tGZk6aCLus6C4bomv5
+         Gi2kHhEUR1qRIdRDKnp/PhYq2cJCkUm+X4idZqInJYOnSKzrl7a6F0CLOy/DTUinEHts
+         9UazJxwCekDAD6hWoPkEx0JnbwixjdE4gnW2eja0SOHwAeG79DBhBzn4UXnHUKOdqJsB
+         W7tg==
+X-Forwarded-Encrypted: i=1; AJvYcCV7/bEyjZ8I1HmMOcazt9YfDG4H1E0EdydalZo1LEJWcFfnuTtYm5q158bi3NkR5XDdA/Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwyrzEuGkI0Nd4bxrYTxLXk0WUub27KpnV6owvM41FY+tfXF03b
+	0BuOl+IyX4Ha1w9fU9wifDEgVhLH3haNr8ljznGTIupjZtkSkQlhCmigjqy8Xu5PkTil6+3OMaY
+	MLw==
+X-Google-Smtp-Source: AGHT+IGUSVXeE5dAKzb1GPjhE8I5Q7KUcp1AD2kuBLfcvmXIX2vkHNMZ7UR9w2EOlvLEGked2h5t1ulMcQ==
+X-Received: from pjpy17.prod.google.com ([2002:a17:90a:a411:b0:321:370d:cae5])
+ (user=sagis job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4a44:b0:31f:134:94ae
+ with SMTP id 98e67ed59e1d1-321839e516dmr510895a91.11.1754597827850; Thu, 07
+ Aug 2025 13:17:07 -0700 (PDT)
+Date: Thu,  7 Aug 2025 13:16:16 -0700
 In-Reply-To: <20250807201628.1185915-1-sagis@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250807201628.1185915-1-sagis@google.com>
 X-Mailer: git-send-email 2.51.0.rc0.155.g4a0f42376b-goog
-Message-ID: <20250807201628.1185915-20-sagis@google.com>
-Subject: [PATCH v8 19/30] KVM: selftests: TDX: Add TDX MMIO writes test
+Message-ID: <20250807201628.1185915-21-sagis@google.com>
+Subject: [PATCH v8 20/30] KVM: selftests: TDX: Add TDX CPUID TDVMCALL test
 From: Sagi Shahar <sagis@google.com>
 To: linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
 	Shuah Khan <shuah@kernel.org>, Sean Christopherson <seanjc@google.com>, 
@@ -89,135 +89,149 @@ To: linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
 Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-The test verifies MMIO writes of various sizes from the guest to the host.
+This test issues a CPUID TDVMCALL from inside the guest to get the CPUID
+values as seen by KVM.
 
 Co-developed-by: Isaku Yamahata <isaku.yamahata@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 Signed-off-by: Sagi Shahar <sagis@google.com>
 ---
- .../selftests/kvm/include/x86/tdx/tdx.h       |  2 +
- tools/testing/selftests/kvm/lib/x86/tdx/tdx.c | 14 +++
- tools/testing/selftests/kvm/x86/tdx_vm_test.c | 85 ++++++++++++++++++-
- 3 files changed, 100 insertions(+), 1 deletion(-)
+ .../selftests/kvm/include/x86/tdx/tdx.h       |  4 +
+ tools/testing/selftests/kvm/lib/x86/tdx/tdx.c | 25 ++++++
+ tools/testing/selftests/kvm/x86/tdx_vm_test.c | 78 ++++++++++++++++++-
+ 3 files changed, 106 insertions(+), 1 deletion(-)
 
 diff --git a/tools/testing/selftests/kvm/include/x86/tdx/tdx.h b/tools/testing/selftests/kvm/include/x86/tdx/tdx.h
-index fa0b24873a8f..2fd67c3e5128 100644
+index 2fd67c3e5128..060158cb046b 100644
 --- a/tools/testing/selftests/kvm/include/x86/tdx/tdx.h
 +++ b/tools/testing/selftests/kvm/include/x86/tdx/tdx.h
-@@ -25,5 +25,7 @@ uint64_t tdg_vp_vmcall_instruction_wrmsr(uint64_t index, uint64_t value);
- uint64_t tdg_vp_vmcall_instruction_hlt(uint64_t interrupt_blocked_flag);
- uint64_t tdg_vp_vmcall_ve_request_mmio_read(uint64_t address, uint64_t size,
+@@ -9,6 +9,7 @@
+ #define TDG_VP_VMCALL_GET_TD_VM_CALL_INFO 0x10000
+ #define TDG_VP_VMCALL_REPORT_FATAL_ERROR 0x10003
+ 
++#define TDG_VP_VMCALL_INSTRUCTION_CPUID 10
+ #define TDG_VP_VMCALL_INSTRUCTION_HLT 12
+ #define TDG_VP_VMCALL_INSTRUCTION_IO 30
+ #define TDG_VP_VMCALL_INSTRUCTION_RDMSR 31
+@@ -27,5 +28,8 @@ uint64_t tdg_vp_vmcall_ve_request_mmio_read(uint64_t address, uint64_t size,
  					    uint64_t *data_out);
-+uint64_t tdg_vp_vmcall_ve_request_mmio_write(uint64_t address, uint64_t size,
-+					     uint64_t data_in);
+ uint64_t tdg_vp_vmcall_ve_request_mmio_write(uint64_t address, uint64_t size,
+ 					     uint64_t data_in);
++uint64_t tdg_vp_vmcall_instruction_cpuid(uint32_t eax, uint32_t ecx,
++					 uint32_t *ret_eax, uint32_t *ret_ebx,
++					 uint32_t *ret_ecx, uint32_t *ret_edx);
  
  #endif // SELFTEST_TDX_TDX_H
 diff --git a/tools/testing/selftests/kvm/lib/x86/tdx/tdx.c b/tools/testing/selftests/kvm/lib/x86/tdx/tdx.c
-index 8bf41e667fc1..d61940fe7df4 100644
+index d61940fe7df4..fb391483d2fa 100644
 --- a/tools/testing/selftests/kvm/lib/x86/tdx/tdx.c
 +++ b/tools/testing/selftests/kvm/lib/x86/tdx/tdx.c
-@@ -123,3 +123,17 @@ uint64_t tdg_vp_vmcall_ve_request_mmio_read(uint64_t address, uint64_t size,
+@@ -137,3 +137,28 @@ uint64_t tdg_vp_vmcall_ve_request_mmio_write(uint64_t address, uint64_t size,
  
- 	return ret;
+ 	return __tdx_hypercall(&args, 0);
  }
 +
-+uint64_t tdg_vp_vmcall_ve_request_mmio_write(uint64_t address, uint64_t size,
-+					     uint64_t data_in)
++uint64_t tdg_vp_vmcall_instruction_cpuid(uint32_t eax, uint32_t ecx,
++					 uint32_t *ret_eax, uint32_t *ret_ebx,
++					 uint32_t *ret_ecx, uint32_t *ret_edx)
 +{
 +	struct tdx_hypercall_args args = {
-+		.r11 = TDG_VP_VMCALL_VE_REQUEST_MMIO,
-+		.r12 = size,
-+		.r13 = MMIO_WRITE,
-+		.r14 = address,
-+		.r15 = data_in,
++		.r11 = TDG_VP_VMCALL_INSTRUCTION_CPUID,
++		.r12 = eax,
++		.r13 = ecx,
 +	};
++	uint64_t ret;
 +
-+	return __tdx_hypercall(&args, 0);
++	ret = __tdx_hypercall(&args, TDX_HCALL_HAS_OUTPUT);
++
++	if (ret_eax)
++		*ret_eax = args.r12;
++	if (ret_ebx)
++		*ret_ebx = args.r13;
++	if (ret_ecx)
++		*ret_ecx = args.r14;
++	if (ret_edx)
++		*ret_edx = args.r15;
++
++	return ret;
 +}
 diff --git a/tools/testing/selftests/kvm/x86/tdx_vm_test.c b/tools/testing/selftests/kvm/x86/tdx_vm_test.c
-index 563f1025c8a3..6ad675a93eeb 100644
+index 6ad675a93eeb..2f75f12d2a44 100644
 --- a/tools/testing/selftests/kvm/x86/tdx_vm_test.c
 +++ b/tools/testing/selftests/kvm/x86/tdx_vm_test.c
-@@ -804,6 +804,87 @@ void verify_mmio_reads(void)
+@@ -885,6 +885,80 @@ void verify_mmio_writes(void)
  	printf("\t ... PASSED\n");
  }
  
-+void guest_mmio_writes(void)
++/*
++ * Verifies CPUID TDVMCALL functionality.
++ * The guest will then send the values to userspace using an IO write to be
++ * checked against the expected values.
++ */
++void guest_code_cpuid_tdcall(void)
 +{
-+	uint64_t mmio_test_addr = TDX_MMIO_TEST_ADDR | tdx_s_bit;
-+	uint64_t ret;
++	uint32_t eax, ebx, ecx, edx;
++	uint64_t err;
 +
-+	ret = tdg_vp_vmcall_ve_request_mmio_write(mmio_test_addr, 1, 0x12);
-+	tdx_assert_error(ret);
++	/* Read CPUID leaf 0x1 from host. */
++	err = tdg_vp_vmcall_instruction_cpuid(/*eax=*/1, /*ecx=*/0,
++					      &eax, &ebx, &ecx, &edx);
++	tdx_assert_error(err);
 +
-+	ret = tdg_vp_vmcall_ve_request_mmio_write(mmio_test_addr, 2, 0x1234);
-+	tdx_assert_error(ret);
++	err = tdx_test_report_to_user_space(eax);
++	tdx_assert_error(err);
 +
-+	ret = tdg_vp_vmcall_ve_request_mmio_write(mmio_test_addr, 4, 0x12345678);
-+	tdx_assert_error(ret);
++	err = tdx_test_report_to_user_space(ebx);
++	tdx_assert_error(err);
 +
-+	ret = tdg_vp_vmcall_ve_request_mmio_write(mmio_test_addr, 8, 0x1234567890ABCDEF);
-+	tdx_assert_error(ret);
++	err = tdx_test_report_to_user_space(ecx);
++	tdx_assert_error(err);
 +
-+	/* Make sure host and guest are synced to the same point of execution */
-+	tdx_test_report_to_user_space(MMIO_SYNC_VALUE);
-+
-+	/* Write across page boundary. */
-+	ret = tdg_vp_vmcall_ve_request_mmio_write(PAGE_SIZE - 1, 8, 0);
-+	tdx_assert_error(ret);
++	err = tdx_test_report_to_user_space(edx);
++	tdx_assert_error(err);
 +
 +	tdx_test_success();
 +}
 +
-+/*
-+ * Verifies guest MMIO writes.
-+ */
-+void verify_mmio_writes(void)
++void verify_td_cpuid_tdcall(void)
 +{
++	struct kvm_cpuid_entry2 *cpuid_entry;
++	uint32_t eax, ebx, ecx, edx;
 +	struct kvm_vcpu *vcpu;
 +	struct kvm_vm *vm;
-+	uint64_t byte_8;
-+	uint32_t byte_4;
-+	uint16_t byte_2;
-+	uint8_t byte_1;
 +
 +	vm = td_create();
 +	td_initialize(vm, VM_MEM_SRC_ANONYMOUS, 0);
-+	vcpu = td_vcpu_add(vm, 0, guest_mmio_writes);
++	vcpu = td_vcpu_add(vm, 0, guest_code_cpuid_tdcall);
 +	td_finalize(vm);
 +
-+	printf("Verifying TD MMIO writes:\n");
++	printf("Verifying TD CPUID TDVMCALL:\n");
++
++	/* Wait for guest to report CPUID values */
++	tdx_run(vcpu);
++	eax = tdx_test_read_report_from_guest(vcpu);
 +
 +	tdx_run(vcpu);
-+	tdx_test_assert_mmio(vcpu, TDX_MMIO_TEST_ADDR, 1, MMIO_WRITE);
-+	byte_1 = *(uint8_t *)(vcpu->run->mmio.data);
++	ebx = tdx_test_read_report_from_guest(vcpu);
 +
 +	tdx_run(vcpu);
-+	tdx_test_assert_mmio(vcpu, TDX_MMIO_TEST_ADDR, 2, MMIO_WRITE);
-+	byte_2 = *(uint16_t *)(vcpu->run->mmio.data);
++	ecx = tdx_test_read_report_from_guest(vcpu);
 +
 +	tdx_run(vcpu);
-+	tdx_test_assert_mmio(vcpu, TDX_MMIO_TEST_ADDR, 4, MMIO_WRITE);
-+	byte_4 = *(uint32_t *)(vcpu->run->mmio.data);
-+
-+	tdx_run(vcpu);
-+	tdx_test_assert_mmio(vcpu, TDX_MMIO_TEST_ADDR, 8, MMIO_WRITE);
-+	byte_8 = *(uint64_t *)(vcpu->run->mmio.data);
-+
-+	TEST_ASSERT_EQ(byte_1, 0x12);
-+	TEST_ASSERT_EQ(byte_2, 0x1234);
-+	TEST_ASSERT_EQ(byte_4, 0x12345678);
-+	TEST_ASSERT_EQ(byte_8, 0x1234567890ABCDEF);
-+
-+	tdx_run(vcpu);
-+	TEST_ASSERT_EQ(tdx_test_read_report_from_guest(vcpu), MMIO_SYNC_VALUE);
-+
-+	td_vcpu_run(vcpu);
-+	TEST_ASSERT_EQ(vcpu->run->exit_reason, KVM_EXIT_SYSTEM_EVENT);
-+	TEST_ASSERT_EQ(vcpu->run->system_event.data[12], TDG_VP_VMCALL_INVALID_OPERAND);
++	edx = tdx_test_read_report_from_guest(vcpu);
 +
 +	tdx_run(vcpu);
 +	tdx_test_assert_success(vcpu);
++
++	/* Get KVM CPUIDs for reference */
++	cpuid_entry = vcpu_get_cpuid_entry(vcpu, 1);
++	TEST_ASSERT(cpuid_entry, "CPUID entry missing\n");
++
++	TEST_ASSERT_EQ(cpuid_entry->eax, eax);
++	/* Mask lapic ID when comparing ebx. */
++	TEST_ASSERT_EQ(cpuid_entry->ebx & ~0xFF000000, ebx & ~0xFF000000);
++	TEST_ASSERT_EQ(cpuid_entry->ecx, ecx);
++	TEST_ASSERT_EQ(cpuid_entry->edx, edx);
 +
 +	kvm_vm_free(vm);
 +	printf("\t ... PASSED\n");
@@ -226,21 +240,21 @@ index 563f1025c8a3..6ad675a93eeb 100644
  int main(int argc, char **argv)
  {
  	ksft_print_header();
-@@ -811,7 +892,7 @@ int main(int argc, char **argv)
+@@ -892,7 +966,7 @@ int main(int argc, char **argv)
  	if (!is_tdx_enabled())
  		ksft_exit_skip("TDX is not supported by the KVM. Exiting.\n");
  
--	ksft_set_plan(11);
-+	ksft_set_plan(12);
+-	ksft_set_plan(12);
++	ksft_set_plan(13);
  	ksft_test_result(!run_in_new_process(&verify_td_lifecycle),
  			 "verify_td_lifecycle\n");
  	ksft_test_result(!run_in_new_process(&verify_report_fatal_error),
-@@ -834,6 +915,8 @@ int main(int argc, char **argv)
- 			 "verify_guest_hlt\n");
- 	ksft_test_result(!run_in_new_process(&verify_mmio_reads),
+@@ -917,6 +991,8 @@ int main(int argc, char **argv)
  			 "verify_mmio_reads\n");
-+	ksft_test_result(!run_in_new_process(&verify_mmio_writes),
-+			 "verify_mmio_writes\n");
+ 	ksft_test_result(!run_in_new_process(&verify_mmio_writes),
+ 			 "verify_mmio_writes\n");
++	ksft_test_result(!run_in_new_process(&verify_td_cpuid_tdcall),
++			 "verify_td_cpuid_tdcall\n");
  
  	ksft_finished();
  	return 0;
