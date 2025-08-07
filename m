@@ -1,178 +1,152 @@
-Return-Path: <kvm+bounces-54300-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54302-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D72BEB1DE2D
-	for <lists+kvm@lfdr.de>; Thu,  7 Aug 2025 22:24:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 20C19B1DE38
+	for <lists+kvm@lfdr.de>; Thu,  7 Aug 2025 22:25:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C759517C0DB
-	for <lists+kvm@lfdr.de>; Thu,  7 Aug 2025 20:24:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CBFCF16135F
+	for <lists+kvm@lfdr.de>; Thu,  7 Aug 2025 20:25:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A1E4273D74;
-	Thu,  7 Aug 2025 20:17:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 670D7274B26;
+	Thu,  7 Aug 2025 20:20:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FCepqIPc"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Lod1zMqF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2664283FD4
-	for <kvm@vger.kernel.org>; Thu,  7 Aug 2025 20:17:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7F0F230BE9
+	for <kvm@vger.kernel.org>; Thu,  7 Aug 2025 20:20:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754597846; cv=none; b=LVyQG7Qgw9TEoMC3KvEVctN/kUXr99LXJetByMZjhgpo3y+rLFVSg7AwAr8gF8v86EjlRpUEUN7CSngACCKMDv2niXKCr3+l3UyoOvg3bsX9Vrjkt4kXxURfYO+f85rcGmZhVpJ9nnnnZTYwmYKsNPiDwFINENFihGUUqZbKkY8=
+	t=1754598012; cv=none; b=noX7MdvtG5gXMC/y35biUjxzyR4/js7rtEfG2nf8n3CJYWr6VzpDRq5kQSZD9Z7iUDGBe4Iqtw7CFyc+Rt5VqDJbuFknazAqhHLFtXhLHB1h7x6IVVJ4FZPjdbIyXnx+mVuBOmk/nfGEe5vXSZwvlwhXqJiZ14n1or0y7P7jPcc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754597846; c=relaxed/simple;
-	bh=KtQGB5hdsruK0bKKPNTRCRaeujSBA7S7BYfY9UZQvic=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=TXhJF2mIY2trC40/AayanwfzIIQLDmoQ8BGGdLrJzLHN5VLM7jX3jblG94wsdHEtwaqWGcqkpk5IQ9+wv5esdtBYVjx85/f8hYrPI7/hXSQRiRqIe1BgeWGHFGBdlDn73ndUDwbY16ZiamhC6FpXjkoETFlyYdoHjAxi2wBIqUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sagis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FCepqIPc; arc=none smtp.client-ip=209.85.216.74
+	s=arc-20240116; t=1754598012; c=relaxed/simple;
+	bh=y4Je+uCw4PjgwpynM6o+m6QzQjMA4HULEA4ADOsYgv0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WlUU8AV0oEti4K8Zd9JV9g8JoXxYCdY0CiSQONxFt2FAHaMAq3gZQbauf1tyreArBMy2tvpz0IoJby1tM6no4AwGR3DN35WE57g07taXZf6hm/0fUR7y7n7t3MyYBAoEHCQzpuIb9qFs1XVRKncyrWaligb3L0/Mq02GLj+fKro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Lod1zMqF; arc=none smtp.client-ip=209.85.160.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sagis.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-32147620790so1481944a91.1
-        for <kvm@vger.kernel.org>; Thu, 07 Aug 2025 13:17:23 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-4aaf43cbbdcso21121cf.1
+        for <kvm@vger.kernel.org>; Thu, 07 Aug 2025 13:20:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754597843; x=1755202643; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=M0suFohlUZGBEGCM79JG64gwQy4zWTa1/ANBR7d4wLU=;
-        b=FCepqIPcGNmF3uU3qppEbg4klpL8ohYpCI1WJO/JX2W5YiHg7CM96fsTWjUj0VfaKQ
-         I9K2XLSIReZn3cvb/0EIFUewrAavZmZR3RYWJiKnUVtNoj8J6b+M36TLgy3VM5Wyqvn6
-         WHdYfwOqh3GnIcHDrxhJNDW4N+J9kjPNzlN7dQV23lc0UuISzMsEFDrG2TjYiDxyfcMC
-         MrJ/2T+WGxJ4xNdUjsTR5gr/05VFtUqHtMhXmnpK+I/GA/nAjFAk4tRtg3QZTjB/QbOI
-         c8KseObeJjLsp+PmLOncrQ8q4n6T3n1lzbk+yfFTjnR/7QLjUQrhGpCX8yrkN4fhXOXV
-         7Ggg==
+        d=google.com; s=20230601; t=1754598009; x=1755202809; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=B1njzRZRI0yuxaZu+3pXAmpwVjNQUojJP+cqDBoYOMo=;
+        b=Lod1zMqFzSWd87CGcbdII1lg9ADrYScbc75jb/7JkBD48vhAnYfHr9F2DfNQRwmfkB
+         wJOdQuNmMA3Jhiu+3LUBV6ALmSCAHA7Tgcc3HcxTmPNn+RLp8dr+nD1lwzpHfULWjvSJ
+         JwlxqW9pv/tKaNrCOBrQel376iV6+9gKR2QATq/N5c1fH5nis4EHFZ+2genjhPfrF25N
+         QZ1kC1W8WI/fa5FRfEis5Wd2kb8/G2b8MYiKBQZfS0Kn8ssZY3fqr/shLxgfaTcGSzNh
+         DomqELjt1RsZpY74IFPKXpTVh+gT6guQH4qpKWmzyRK8b0/NiY2WEiSZadksoxin4pRM
+         D2Sw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754597843; x=1755202643;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=M0suFohlUZGBEGCM79JG64gwQy4zWTa1/ANBR7d4wLU=;
-        b=qpkih7Gs9dLFKleVRnvUybiS4OuZfUkHQWTk99tYNL3vlwoTAap5kL7Cu9baHX1D5y
-         /Eu/1KvLhcLtWdTbUr9RpsJ1vL8bISLZmsr+O0A4l9vdQu95MkkGfhMtbxy9Pg5pZwVH
-         Z7phwZ8qvjFDvCtJ/KfdiuwxPLV1WktzWNaJi2pzskPqTEBC/kHmb4dNtb7AziiRFCMW
-         gop+9DADuS3CchUi44u1Ui5UG29HTr8fuPGXngGsDj8JDIJDiiyh4OkooIPkYPPnsUHU
-         coMe1Y50jsrXAYu2vaEya5Ac4XLVZ40Ng2sil6iD6wK6svHjZwvMDpiayBYXyY+oJqXR
-         y34Q==
-X-Forwarded-Encrypted: i=1; AJvYcCX5Gre8Hud7sByxANKomTP9qglmKXFKo/xkJSbg6OMFXIgnKApOdkgINQG7lAf9WCl3pKs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwWtxmacLuS/bdlAq79X9cdZpPl21PXKxtXT/7VyGSxrnzZOzUL
-	/nTZMWzG7AA7S2vdhaU1m1f7FeQAFMutnMYVn5LyARwz00S3LLxCv3ptnIZIpAo9VcOBJdEFKTY
-	MJg==
-X-Google-Smtp-Source: AGHT+IGuwnBgHT00Pa47b7PWARfkX6jqZRvjGaZTcLQlg02HegQiirvTj6AbnOkdTgp8ehpde97Ui17D4A==
-X-Received: from pjv4.prod.google.com ([2002:a17:90b:5644:b0:313:245:8921])
- (user=sagis job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:28c5:b0:31a:ab75:6e45
- with SMTP id 98e67ed59e1d1-32183c42d6dmr441878a91.28.1754597843391; Thu, 07
- Aug 2025 13:17:23 -0700 (PDT)
-Date: Thu,  7 Aug 2025 13:16:26 -0700
-In-Reply-To: <20250807201628.1185915-1-sagis@google.com>
+        d=1e100.net; s=20230601; t=1754598009; x=1755202809;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=B1njzRZRI0yuxaZu+3pXAmpwVjNQUojJP+cqDBoYOMo=;
+        b=BUggb3acQIGzNonUe3EI0h9fAyHkKxCgpMK3m9X747iFcQErXWKKHkMwvLwusDdCRz
+         TSozU89kBpT6BCrpQgVvFaoVf7fngFnBSSrt6zO0UgvQVq97BnMNEc0scIzq68HD9wYP
+         LArWr1Rx7C5BmMBvtv+U66frGwbWiaXeC2edsBv6VG8B5dopSUnzQpTLRJAAYuvrlLy8
+         UzIOuVuAUFooEj74ZOZVDhje3TEGJLx0nifz1+kVviG1gQ9txS36hDGzyy2e/ruPBeBl
+         IccwLpgu4YXZTPMz/JRj8OyZvUsrbG1rdjKSCeWn3qTi3l5Vsb7l9oFGiG5gNuYaeers
+         /xTw==
+X-Forwarded-Encrypted: i=1; AJvYcCWfonI2UohDFDS0CeFK/LIPXW+EwaYNeKzpP0da0DACslTfNVyetH+5Cy0W60ZyQOPf4Tw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YweVZOBC07fo5vrzdQsauXSV6TxQvXMfUPne4ebiujUG/7J+Sp1
+	Csxe4MN4OmlcyIrisld6CvRGO7Xj6N7Phi2dG+wzQpoorejWi6Q4ZbGJNvWeB/V1Al2PXBnQgt5
+	GQgMKSWlI7G/ErU1oD9H5RdSuqsDQQgWdw4eneV/A
+X-Gm-Gg: ASbGncs4gnXWC9hF9fbvRSqgSerp59VA/Wu3Cz7XyjeL9TiwcOjaaIfpPsT+3JxJMoR
+	PHeBAZnTYqppg4qBBAulRKszIJz+80OE+TlUMI2eiKix/qiBJfqUCj2XhsIONvIp09hE0PdZPWC
+	cMEhHedWeTHC+fTVPE7HkpHId9qECIl09JRqwfPRqFfLfacv29q0zgckG8xmHTjOXiqiNwDAn/I
+	mQjMyejO2Cpr+kNxIAtPJqqeVSECEaBl9y4FnpK
+X-Google-Smtp-Source: AGHT+IG5ycJ5Q52QFJSqxl/YemOAi2b5Lxu6OTbgyP5z84bzVWLUjQSVs1bZvuqtq7Om/J7u6tqoa91cHop/0QJeevI=
+X-Received: by 2002:ac8:5d10:0:b0:4a9:e17a:6287 with SMTP id
+ d75a77b69052e-4b0af24d8c7mr863411cf.7.1754598008591; Thu, 07 Aug 2025
+ 13:20:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250807201628.1185915-1-sagis@google.com>
-X-Mailer: git-send-email 2.51.0.rc0.155.g4a0f42376b-goog
-Message-ID: <20250807201628.1185915-31-sagis@google.com>
-Subject: [PATCH v8 30/30] KVM: selftests: TDX: Test LOG_DIRTY_PAGES flag to a
- non-GUEST_MEMFD memslot
+MIME-Version: 1.0
+References: <20250613191359.35078-1-sagis@google.com> <20250613191359.35078-6-sagis@google.com>
+ <aH62f9X25LHuUx8n@iweiny-mobl> <CAAhR5DEQ9QWfdzO1yCuFzYjju+Q=pDGbcYyRWFmA_6tc8A4LNA@mail.gmail.com>
+ <68922612d9712_1923952949e@iweiny-mobl.notmuch>
+In-Reply-To: <68922612d9712_1923952949e@iweiny-mobl.notmuch>
 From: Sagi Shahar <sagis@google.com>
-To: linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
+Date: Thu, 7 Aug 2025 15:19:56 -0500
+X-Gm-Features: Ac12FXx0v8U4YOXtP8smuLJE-WItrOpjqXG-rvcfjA7uQFOCAuFZGv2_OLJKm3M
+Message-ID: <CAAhR5DGLnEdWzQEEuQcH202BT_GiqU-aQWM9Zcnh0QF=YSjmWQ@mail.gmail.com>
+Subject: Re: [PATCH v7 05/30] KVM: selftests: Update kvm_init_vm_address_properties()
+ for TDX
+To: Ira Weiny <ira.weiny@intel.com>
+Cc: linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
 	Shuah Khan <shuah@kernel.org>, Sean Christopherson <seanjc@google.com>, 
 	Ackerley Tng <ackerleytng@google.com>, Ryan Afranji <afranji@google.com>, 
 	Andrew Jones <ajones@ventanamicro.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
 	Erdem Aktas <erdemaktas@google.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
-	Sagi Shahar <sagis@google.com>, Roger Wang <runanwang@google.com>, 
-	Binbin Wu <binbin.wu@linux.intel.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	"Pratik R. Sampat" <pratikrajesh.sampat@amd.com>, Reinette Chatre <reinette.chatre@intel.com>, 
-	Ira Weiny <ira.weiny@intel.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	Yan Zhao <yan.y.zhao@intel.com>
+	Roger Wang <runanwang@google.com>, Binbin Wu <binbin.wu@linux.intel.com>, 
+	Oliver Upton <oliver.upton@linux.dev>, "Pratik R. Sampat" <pratikrajesh.sampat@amd.com>, 
+	Reinette Chatre <reinette.chatre@intel.com>, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, Adrian Hunter <adrian.hunter@intel.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Yan Zhao <yan.y.zhao@intel.com>
+On Tue, Aug 5, 2025 at 10:39=E2=80=AFAM Ira Weiny <ira.weiny@intel.com> wro=
+te:
+>
+> Sagi Shahar wrote:
+> > On Mon, Jul 21, 2025 at 4:51=E2=80=AFPM Ira Weiny <ira.weiny@intel.com>=
+ wrote:
+> > >
+> > > On Fri, Jun 13, 2025 at 12:13:32PM -0700, Sagi Shahar wrote:
+> > > > From: Isaku Yamahata <isaku.yamahata@intel.com>
+> > > >
+> > >
+> > > [snip]
+> > >
+> > > >
+> > > > diff --git a/tools/testing/selftests/kvm/lib/x86/processor.c b/tool=
+s/testing/selftests/kvm/lib/x86/processor.c
+> > > > index d082d429e127..d9f4ecd6ffbc 100644
+> > > > --- a/tools/testing/selftests/kvm/lib/x86/processor.c
+> > > > +++ b/tools/testing/selftests/kvm/lib/x86/processor.c
+> > > > @@ -1166,10 +1166,19 @@ void kvm_get_cpu_address_width(unsigned int=
+ *pa_bits, unsigned int *va_bits)
+> > > >
+> > > >  void kvm_init_vm_address_properties(struct kvm_vm *vm)
+> > > >  {
+> > > > +     uint32_t gpa_bits =3D kvm_cpu_property(X86_PROPERTY_GUEST_MAX=
+_PHY_ADDR)
+> > >
+> > > This fails to compile.
+> >
+> > Looks like it's a simple case of missing semicolon at the end of the
+> > line, it builds fine if you add it.
+>
+> Yea.
+>
+> > I can update it in the next
+> > version.
+>
+> When do you expect this to be updated?
 
-Add a selftest to verify that adding flag KVM_MEM_LOG_DIRTY_PAGES to a
-!KVM_MEM_GUEST_MEMFD memslot does not produce host errors in TDX.
+I just sent out v8 of the patches.
+>
+> It would be nice to see this land soon such that we don't have to keep
+> carrying these patches out of tree.
+>
+> Would it help if I review this series?  I thought it was relatively well
+> reviewed.  But given the above simple mistake perhaps it needs more
+> review?
 
-Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-Signed-off-by: Sagi Shahar <sagis@google.com>
----
- tools/testing/selftests/kvm/x86/tdx_vm_test.c | 45 ++++++++++++++++++-
- 1 file changed, 44 insertions(+), 1 deletion(-)
-
-diff --git a/tools/testing/selftests/kvm/x86/tdx_vm_test.c b/tools/testing/selftests/kvm/x86/tdx_vm_test.c
-index 82acc17a66ab..410d814dd39a 100644
---- a/tools/testing/selftests/kvm/x86/tdx_vm_test.c
-+++ b/tools/testing/selftests/kvm/x86/tdx_vm_test.c
-@@ -1167,6 +1167,47 @@ void verify_tdcall_vp_info(void)
- 	printf("\t ... PASSED\n");
- }
- 
-+#define TDX_LOG_DIRTY_PAGES_FLAG_TEST_GPA (0xc0000000)
-+#define TDX_LOG_DIRTY_PAGES_FLAG_TEST_GVA_SHARED (0x90000000)
-+#define TDX_LOG_DIRTY_PAGES_FLAG_REGION_SLOT 10
-+#define TDX_LOG_DIRTY_PAGES_FLAG_REGION_NR_PAGES (0x1000 / getpagesize())
-+
-+void guest_code_log_dirty_flag(void)
-+{
-+	memset((void *)TDX_LOG_DIRTY_PAGES_FLAG_TEST_GVA_SHARED, 1, 8);
-+	tdx_test_success();
-+}
-+
-+/*
-+ * Verify adding flag KVM_MEM_LOG_DIRTY_PAGES to a !KVM_MEM_GUEST_MEMFD memslot
-+ * in a TD does not produce host errors.
-+ */
-+void verify_log_dirty_pages_flag_on_non_gmemfd_slot(void)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+
-+	vm = td_create();
-+	td_initialize(vm, VM_MEM_SRC_ANONYMOUS, 0);
-+	vcpu = td_vcpu_add(vm, 0, guest_code_log_dirty_flag);
-+
-+	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
-+				    TDX_LOG_DIRTY_PAGES_FLAG_TEST_GPA,
-+				    TDX_LOG_DIRTY_PAGES_FLAG_REGION_SLOT,
-+				    TDX_LOG_DIRTY_PAGES_FLAG_REGION_NR_PAGES,
-+				    KVM_MEM_LOG_DIRTY_PAGES);
-+	virt_map_shared(vm, TDX_LOG_DIRTY_PAGES_FLAG_TEST_GVA_SHARED,
-+			(uint64_t)TDX_LOG_DIRTY_PAGES_FLAG_TEST_GPA,
-+			TDX_LOG_DIRTY_PAGES_FLAG_REGION_NR_PAGES);
-+	td_finalize(vm);
-+
-+	printf("Verifying Log dirty flag:\n");
-+	vcpu_run(vcpu);
-+	tdx_test_assert_success(vcpu);
-+	kvm_vm_free(vm);
-+	printf("\t ... PASSED\n");
-+}
-+
- int main(int argc, char **argv)
- {
- 	ksft_print_header();
-@@ -1174,7 +1215,7 @@ int main(int argc, char **argv)
- 	if (!is_tdx_enabled())
- 		ksft_exit_skip("TDX is not supported by the KVM. Exiting.\n");
- 
--	ksft_set_plan(15);
-+	ksft_set_plan(16);
- 	ksft_test_result(!run_in_new_process(&verify_td_lifecycle),
- 			 "verify_td_lifecycle\n");
- 	ksft_test_result(!run_in_new_process(&verify_report_fatal_error),
-@@ -1205,6 +1246,8 @@ int main(int argc, char **argv)
- 			 "verify_host_reading_private_mem\n");
- 	ksft_test_result(!run_in_new_process(&verify_tdcall_vp_info),
- 			 "verify_tdcall_vp_info\n");
-+	ksft_test_result(!run_in_new_process(&verify_log_dirty_pages_flag_on_non_gmemfd_slot),
-+			 "verify_log_dirty_pages_flag_on_non_gmemfd_slot\n");
- 
- 	ksft_finished();
- 	return 0;
--- 
-2.51.0.rc0.155.g4a0f42376b-goog
-
+If you can review v8 that would be great.
+>
+> Ira
 
