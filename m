@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-54230-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54231-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7035B1D507
-	for <lists+kvm@lfdr.de>; Thu,  7 Aug 2025 11:43:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 640D5B1D509
+	for <lists+kvm@lfdr.de>; Thu,  7 Aug 2025 11:43:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E5737189EAB6
-	for <lists+kvm@lfdr.de>; Thu,  7 Aug 2025 09:43:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3F453AE900
+	for <lists+kvm@lfdr.de>; Thu,  7 Aug 2025 09:43:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBF7726159E;
-	Thu,  7 Aug 2025 09:43:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3AFE262FD0;
+	Thu,  7 Aug 2025 09:43:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dLS7D+9n"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ese1OXRQ"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37CE625C6F1;
-	Thu,  7 Aug 2025 09:43:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61CA84431;
+	Thu,  7 Aug 2025 09:43:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754559786; cv=none; b=kX3sHp+uujnkEItLlafeaG4ErK4WeuVNOR/Od0XsWQEnXseCYaMaSdFqM85C4QGlmiAbe5RZUSAO9eeiFFs1PGacrIsyck4DR6ZlmjV9D0M5YxjJi0DIbLfWCjdHJIIsSkOu5csN/qlR5icKkdDo34bCHg0FpY9++YcfDQQ5ssk=
+	t=1754559800; cv=none; b=jSfqg3MxJD/UeuC23u8K+mnkCwPlTTGHTPm/uonBQxOgIkomPna3U+GQV1V+Htq0fqeSsk83lGejBRAXSLyxwQ+gzbdBaPWhTQbeostt2a3JVNYSIYBAPqWWgk0YQ2qiFOTrU0Kua6Ep/wAoqJAmMS+SmZYeNT3Zcj23bXjUDkI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754559786; c=relaxed/simple;
-	bh=drqT1KujXX0g1ykXaCYwPaVAfrJzjT9SequGRqO2V6Y=;
+	s=arc-20240116; t=1754559800; c=relaxed/simple;
+	bh=bsX6OyxOJY8p6MLgnbpL2Z3yYBFY4ROlLTzLA4z/2+0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lWPd2L4lwkKYM6tYDrnFGoe0V6GI2oatpbqxrqWuF527U7+l7aIihrBUtBwJU69sWfRH5TNmH3N3uHEvlN6pHlr1M3xa49hoqH5MZJzLgecFWllNmWVLL0t5ECf3go+mLvTaLCRPpkzndcwSRUbOMAu0jbjeE3llWCuflYDdwTQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dLS7D+9n; arc=none smtp.client-ip=192.198.163.10
+	 MIME-Version; b=mrOpOKBfOgGyOlF+ksuTIV4PKFlnvf6wMp8wLTyg8ZwxRgMLaizLMxHcQi+AKdvOqMIX69N/YrZtJcK4U0GcFON4gcr3qjE7FJpvJ5MpFW96R3g61Gio570Ed89L06e20SfExmSSEJEc1dKvkZgaFbkG3vAwRgtRvvyry3+H1rI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ese1OXRQ; arc=none smtp.client-ip=192.198.163.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1754559785; x=1786095785;
+  t=1754559798; x=1786095798;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=drqT1KujXX0g1ykXaCYwPaVAfrJzjT9SequGRqO2V6Y=;
-  b=dLS7D+9nfv155KTdz8WWUzSSes4F+vhtPV9CmmOht2lsaWPMzQbWAe7x
-   eaMrP5zn57HwHg3Kvs9RngsbttV/3PebEvky+IPIkiLR55k0rDwu+aCts
-   AXAMytja8xC+ALInRcGEvF2X80v7KKv+qa2fxOx9xAmH7WoxMBvFn4wgc
-   H5G+MsktpdNvCdq4+2WYHU8V+GriSsfqhT7kvvmujjGMk1wsZPJh0WeX9
-   GCQl5dMefmd278fQ9S0KzHxy9cfpuvu6yO/sB/Y6tvIiabTh9ulLCpvQS
-   waXGESWZOlcFOnX9f+Dd0HHiAjKDO7Jt6FqqYSFg8JbP/1jW5eijjfDad
-   A==;
-X-CSE-ConnectionGUID: bNW4zTTAQxej8BEDwwh3tA==
-X-CSE-MsgGUID: lkYAyl74S6OuWOwqySgdAw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11514"; a="68265937"
+  bh=bsX6OyxOJY8p6MLgnbpL2Z3yYBFY4ROlLTzLA4z/2+0=;
+  b=Ese1OXRQ8PWraJ738Zz5+3YI5FTkmIoVnIe6cF54tQRAwIEgnKX7MQjm
+   09DQ75Sb0KdkeLDftlB92P7wh4hzp0OaKUQ+RhPzsYZQPigPQ2YrNPf0k
+   v3fX566mqFf3tYaTTrmolvsXXWu9/Je9C3xHIW2YOoQB49Hn4Pym0hkht
+   JTgJWq185n4PxEW8LhBvaSJOIt2Hgc/rqJSpZ9ICELuaSmV4tNyAu5Uqo
+   bE6iuRDH5gOrgEmHc4QUxZitO1TmkCZjaJZiQtDhlUpX5EeUNl/emxySQ
+   IqoXoesi7JF4sBlqL5MRA0UfyyGZutD03hqVds1h6dw0UjjekrwvA25MD
+   g==;
+X-CSE-ConnectionGUID: kfKDLpJ8RtW+iFVYj6y7mA==
+X-CSE-MsgGUID: FPLHozQISHWsQiJ+6VWGwQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11514"; a="68265949"
 X-IronPort-AV: E=Sophos;i="6.17,271,1747724400"; 
-   d="scan'208";a="68265937"
+   d="scan'208";a="68265949"
 Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2025 02:43:04 -0700
-X-CSE-ConnectionGUID: okYZamr3Ry+ZjPAr4SJpYA==
-X-CSE-MsgGUID: YFJ1j7xuT7Ci67LuIQnQvw==
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2025 02:43:18 -0700
+X-CSE-ConnectionGUID: 9StIfcr5SlmKVnemlt5T/A==
+X-CSE-MsgGUID: JGn8h/IYRRG3DQMNv7WaUA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.17,271,1747724400"; 
-   d="scan'208";a="196006829"
+   d="scan'208";a="196006857"
 Received: from yzhao56-desk.sh.intel.com ([10.239.47.19])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2025 02:42:56 -0700
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2025 02:43:10 -0700
 From: Yan Zhao <yan.y.zhao@intel.com>
 To: pbonzini@redhat.com,
 	seanjc@google.com
@@ -85,9 +85,9 @@ Cc: linux-kernel@vger.kernel.org,
 	binbin.wu@linux.intel.com,
 	chao.p.peng@intel.com,
 	yan.y.zhao@intel.com
-Subject: [RFC PATCH v2 05/23] x86/tdx: Enhance tdh_phymem_page_reclaim() to support huge pages
-Date: Thu,  7 Aug 2025 17:42:28 +0800
-Message-ID: <20250807094228.4509-1-yan.y.zhao@intel.com>
+Subject: [RFC PATCH v2 06/23] KVM: TDX: Do not hold page refcount on private guest pages
+Date: Thu,  7 Aug 2025 17:42:41 +0800
+Message-ID: <20250807094241.4523-1-yan.y.zhao@intel.com>
 X-Mailer: git-send-email 2.43.2
 In-Reply-To: <20250807093950.4395-1-yan.y.zhao@intel.com>
 References: <20250807093950.4395-1-yan.y.zhao@intel.com>
@@ -99,163 +99,148 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Enhance the SEAMCALL wrapper tdh_phymem_page_reclaim() to support huge
-pages by introducing new parameters: "folio", "start_idx", and "npages".
-These parameters specify the physical memory to be reclaimed, i.e.,
-starting from the page at "start_idx" within a folio and spanning "npages"
-contiguous PFNs. The specified memory must be entirely contained within a
-single folio. Return TDX_SW_ERROR if the size of the reclaimed memory does
-not match the specified size.
+To enable guest_memfd to support in-place conversion between shared and
+private memory [1], TDX is required not to hold refcount of the private
+pages allocated from guest_memfd.
 
-On the KVM side, introduce tdx_reclaim_folio() to align with and invoke the
-SEAMCALL wrapper tdh_phymem_page_reclaim(). The "noclear" parameter
-specifies whether tdx_clear_folio() should be subsequently invoked within
-tdx_reclaim_folio(). Additionally, provide two helper functions,
-tdx_reclaim_page() and tdx_reclaim_page_noclear(), to facilitate the
-reclaiming of 4KB pages.
+Due to that a folio only has a single refcount and the need to reliably
+determine unexpected reference when converting any shared part to private,
+guest_memfd [1] does not permit shared memory to be huge [2]. Consequently,
+it must split private huge pages into 4KB shared pages. However, since
+guest_memfd cannot distinguish between the speculative/transient refcounts
+and the intentional refcount for TDX on private pages[3], failing to
+release private page refcount in TDX could cause guest_memfd to
+indefinitely wait on decreasing the refcount for the splitting.
 
-Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+Under normal conditions, not holding an extra page refcount in TDX is safe
+because guest_memfd ensures pages are retained until its invalidation
+notification to KVM MMU is completed. However, if there're bugs in KVM/TDX
+module, not holding an extra refcount when a page is mapped in S-EPT could
+result in a page being released from guest_memfd while still mapped in the
+S-EPT.
+
+Several approaches were considered to address this issue, including
+- Attempting to modify the KVM unmap operation to return a failure, which
+  was deemed too complex and potentially incorrect [4].
+- Increasing the folio reference count only upon S-EPT zapping failure [5].
+- Use page flags or page_ext to indicate a page is still used by TDX [6],
+  which does not work for HVO (HugeTLB Vmemmap Optimization).
+- Setting HWPOISON bit or leveraging folio_set_hugetlb_hwpoison() [7].
+
+Due to the complexity or inappropriateness of these approaches, and the
+fact that S-EPT zapping failure is currently only possible when there are
+bugs in the KVM or TDX module, which is very rare in a production kernel, a
+straightforward approach of simply not holding the page reference count in
+TDX was chosen [8].
+
+When S-EPT zapping errors occur, KVM_BUG_ON() is invoked to kick off all
+vCPUs and mark the VM as dead. Although there is a potential window that a
+private page mapped in the S-EPT could be reallocated and used outside the
+VM, the loud warning from KVM_BUG_ON() should provide sufficient debug
+information. To be robust against bugs, the user can enable panic_on_warn
+as normal.
+
+Link: https://lore.kernel.org/all/cover.1747264138.git.ackerleytng@google.com [1]
+Link: https://youtu.be/UnBKahkAon4 [2]
+Link: https://lore.kernel.org/all/CAGtprH_ypohFy9TOJ8Emm_roT4XbQUtLKZNFcM6Fr+fhTFkE0Q@mail.gmail.com [3]
+Link: https://lore.kernel.org/all/aEEEJbTzlncbRaRA@yzhao56-desk.sh.intel.com [4]
+Link: https://lore.kernel.org/all/aE%2Fq9VKkmaCcuwpU@yzhao56-desk.sh.intel.com [5]
+Link: https://lore.kernel.org/all/aFkeBtuNBN1RrDAJ@yzhao56-desk.sh.intel.com [6]
+Link: https://lore.kernel.org/all/diqzy0tikran.fsf@ackerleytng-ctop.c.googlers.com [7]
+Link: https://lore.kernel.org/all/53ea5239f8ef9d8df9af593647243c10435fd219.camel@intel.com [8]
+Suggested-by: Vishal Annapurve <vannapurve@google.com>
+Suggested-by: Ackerley Tng <ackerleytng@google.com>
+Suggested-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
 Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
 ---
 RFC v2:
-- Introduce new params "folio", "start_idx" and "npages" to wrapper
-  tdh_phymem_page_reclaim().
-- Move the checking of return size from KVM to x86/virt and return error.
-- Rename tdx_reclaim_page() to tdx_reclaim_folio().
-- Add two helper functions tdx_reclaim_page() tdx_reclaim_page_noclear()
-  to faciliate the reclaiming of 4KB pages.
-
-RFC v1:
-- Rebased and split patch.
+- new in RFC v2.
+- Rebased on DPAMT and shutdown optimization.
 ---
- arch/x86/include/asm/tdx.h  |  3 ++-
- arch/x86/kvm/vmx/tdx.c      | 27 ++++++++++++++++++---------
- arch/x86/virt/vmx/tdx/tdx.c | 12 ++++++++++--
- 3 files changed, 30 insertions(+), 12 deletions(-)
+ arch/x86/kvm/vmx/tdx.c | 28 ++++------------------------
+ 1 file changed, 4 insertions(+), 24 deletions(-)
 
-diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
-index a125bb20a28a..f1bd74348b34 100644
---- a/arch/x86/include/asm/tdx.h
-+++ b/arch/x86/include/asm/tdx.h
-@@ -189,7 +189,8 @@ u64 tdh_mng_init(struct tdx_td *td, u64 td_params, u64 *extended_err);
- u64 tdh_vp_init(struct tdx_vp *vp, u64 initial_rcx, u32 x2apicid);
- u64 tdh_vp_rd(struct tdx_vp *vp, u64 field, u64 *data);
- u64 tdh_vp_wr(struct tdx_vp *vp, u64 field, u64 data, u64 mask);
--u64 tdh_phymem_page_reclaim(struct page *page, u64 *tdx_pt, u64 *tdx_owner, u64 *tdx_size);
-+u64 tdh_phymem_page_reclaim(struct folio *folio, unsigned long start_idx, unsigned long npages,
-+			    u64 *tdx_pt, u64 *tdx_owner, u64 *tdx_size);
- u64 tdh_mem_track(struct tdx_td *tdr);
- u64 tdh_mem_page_remove(struct tdx_td *td, u64 gpa, u64 level, u64 *ext_err1, u64 *ext_err2);
- u64 tdh_phymem_cache_wb(bool resume);
 diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 4fabefb27135..facfe589e006 100644
+index facfe589e006..376287a2ddf4 100644
 --- a/arch/x86/kvm/vmx/tdx.c
 +++ b/arch/x86/kvm/vmx/tdx.c
-@@ -327,11 +327,12 @@ static void tdx_no_vcpus_enter_stop(struct kvm *kvm)
+@@ -1600,11 +1600,6 @@ void tdx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa, int pgd_level)
+ 	td_vmcs_write64(to_tdx(vcpu), SHARED_EPT_POINTER, root_hpa);
  }
  
- /* TDH.PHYMEM.PAGE.RECLAIM is allowed only when destroying the TD. */
--static int __tdx_reclaim_page(struct page *page)
-+static int tdx_reclaim_folio(struct folio *folio, unsigned long start_idx,
-+			     unsigned long npages, bool noclear)
+-static void tdx_unpin(struct kvm *kvm, struct page *page)
+-{
+-	put_page(page);
+-}
+-
+ static int tdx_mem_page_aug(struct kvm *kvm, gfn_t gfn,
+ 			    enum pg_level level, struct page *page)
  {
- 	u64 err, tdx_pt, tdx_owner, tdx_size;
+@@ -1617,14 +1612,11 @@ static int tdx_mem_page_aug(struct kvm *kvm, gfn_t gfn,
  
--	err = tdh_phymem_page_reclaim(page, &tdx_pt, &tdx_owner, &tdx_size);
-+	err = tdh_phymem_page_reclaim(folio, start_idx, npages, &tdx_pt, &tdx_owner, &tdx_size);
+ 	err = tdh_mem_page_aug(&kvm_tdx->td, gpa, tdx_level, folio,
+ 			       folio_page_idx(folio, page), &entry, &level_state);
+-	if (unlikely(tdx_operand_busy(err))) {
+-		tdx_unpin(kvm, page);
++	if (unlikely(tdx_operand_busy(err)))
+ 		return -EBUSY;
+-	}
  
- 	/*
- 	 * No need to check for TDX_OPERAND_BUSY; all TD pages are freed
-@@ -342,19 +343,25 @@ static int __tdx_reclaim_page(struct page *page)
- 		pr_tdx_error_3(TDH_PHYMEM_PAGE_RECLAIM, err, tdx_pt, tdx_owner, tdx_size);
+ 	if (KVM_BUG_ON(err, kvm)) {
+ 		pr_tdx_error_2(TDH_MEM_PAGE_AUG, err, entry, level_state);
+-		tdx_unpin(kvm, page);
  		return -EIO;
  	}
-+
-+	if (!noclear)
-+		tdx_clear_folio(folio, start_idx, npages);
+ 
+@@ -1679,16 +1671,6 @@ static int tdx_sept_set_private_spte(struct kvm *kvm, gfn_t gfn,
+ 	if (KVM_BUG_ON(level != PG_LEVEL_4K, kvm))
+ 		return -EINVAL;
+ 
+-	/*
+-	 * Because guest_memfd doesn't support page migration with
+-	 * a_ops->migrate_folio (yet), no callback is triggered for KVM on page
+-	 * migration.  Until guest_memfd supports page migration, prevent page
+-	 * migration.
+-	 * TODO: Once guest_memfd introduces callback on page migration,
+-	 * implement it and remove get_page/put_page().
+-	 */
+-	get_page(page);
+-
+ 	/*
+ 	 * Read 'pre_fault_allowed' before 'kvm_tdx->state'; see matching
+ 	 * barrier in tdx_td_finalize().
+@@ -1755,7 +1737,6 @@ static int tdx_sept_drop_private_spte(struct kvm *kvm, gfn_t gfn,
+ 	}
+ 	tdx_clear_folio(folio, folio_page_idx(folio, page), KVM_PAGES_PER_HPAGE(level));
+ 	tdx_pamt_put(page, level);
+-	tdx_unpin(kvm, page);
  	return 0;
  }
  
- static int tdx_reclaim_page(struct page *page)
- {
--	int r;
-+	struct folio *folio = page_folio(page);
+@@ -1845,7 +1826,6 @@ static int tdx_sept_zap_private_spte(struct kvm *kvm, gfn_t gfn,
+ 	    !KVM_BUG_ON(!atomic64_read(&kvm_tdx->nr_premapped), kvm)) {
+ 		atomic64_dec(&kvm_tdx->nr_premapped);
+ 		tdx_pamt_put(page, level);
+-		tdx_unpin(kvm, page);
+ 		return 0;
+ 	}
  
--	r = __tdx_reclaim_page(page);
--	if (!r)
--		tdx_clear_page(page);
--	return r;
-+	return tdx_reclaim_folio(folio, folio_page_idx(folio, page), 1, false);
- }
- 
-+static int tdx_reclaim_page_noclear(struct page *page)
-+{
-+	struct folio *folio = page_folio(page);
-+
-+	return tdx_reclaim_folio(folio, folio_page_idx(folio, page), 1, true);
-+}
- 
- /*
-  * Reclaim the TD control page(s) which are crypto-protected by TDX guest's
-@@ -587,7 +594,7 @@ static void tdx_reclaim_td_control_pages(struct kvm *kvm)
- 	if (!kvm_tdx->td.tdr_page)
- 		return;
- 
--	if (__tdx_reclaim_page(kvm_tdx->td.tdr_page))
-+	if (tdx_reclaim_page_noclear(kvm_tdx->td.tdr_page))
- 		return;
- 
- 	/*
-@@ -1932,11 +1939,13 @@ static int tdx_sept_remove_private_spte(struct kvm *kvm, gfn_t gfn,
- 					enum pg_level level, kvm_pfn_t pfn)
- {
- 	struct page *page = pfn_to_page(pfn);
-+	struct folio *folio = page_folio(page);
- 	int ret;
+@@ -1944,12 +1924,12 @@ static int tdx_sept_remove_private_spte(struct kvm *kvm, gfn_t gfn,
  
  	if (!is_hkid_assigned(to_kvm_tdx(kvm))) {
  		KVM_BUG_ON(!kvm->vm_dead, kvm);
--		ret = tdx_reclaim_page(page);
-+		ret = tdx_reclaim_folio(folio, folio_page_idx(folio, page),
-+					KVM_PAGES_PER_HPAGE(level), false);
- 		if (!ret) {
++
+ 		ret = tdx_reclaim_folio(folio, folio_page_idx(folio, page),
+ 					KVM_PAGES_PER_HPAGE(level), false);
+-		if (!ret) {
++		if (!ret)
  			tdx_pamt_put(page, level);
- 			tdx_unpin(kvm, page);
-diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-index 64219c659844..9ed585bde062 100644
---- a/arch/x86/virt/vmx/tdx/tdx.c
-+++ b/arch/x86/virt/vmx/tdx/tdx.c
-@@ -1966,19 +1966,27 @@ EXPORT_SYMBOL_GPL(tdh_vp_init);
-  * So despite the names, they must be interpted specially as described by the spec. Return
-  * them only for error reporting purposes.
-  */
--u64 tdh_phymem_page_reclaim(struct page *page, u64 *tdx_pt, u64 *tdx_owner, u64 *tdx_size)
-+u64 tdh_phymem_page_reclaim(struct folio *folio, unsigned long start_idx, unsigned long npages,
-+			    u64 *tdx_pt, u64 *tdx_owner, u64 *tdx_size)
- {
-+	struct page *start = folio_page(folio, start_idx);
- 	struct tdx_module_args args = {
--		.rcx = page_to_phys(page),
-+		.rcx = page_to_phys(start),
- 	};
- 	u64 ret;
- 
-+	if (start_idx + npages > folio_nr_pages(folio))
-+		return TDX_OPERAND_INVALID;
+-			tdx_unpin(kvm, page);
+-		}
 +
- 	ret = seamcall_ret(TDH_PHYMEM_PAGE_RECLAIM, &args);
+ 		return ret;
+ 	}
  
- 	*tdx_pt = args.rcx;
- 	*tdx_owner = args.rdx;
- 	*tdx_size = args.r8;
- 
-+	if (npages != (1 << (*tdx_size) * PTE_SHIFT))
-+		return TDX_SW_ERROR;
-+
- 	return ret;
- }
- EXPORT_SYMBOL_GPL(tdh_phymem_page_reclaim);
 -- 
 2.43.2
 
