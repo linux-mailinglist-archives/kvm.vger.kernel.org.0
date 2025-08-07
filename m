@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-54278-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54279-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06B0BB1DDE3
-	for <lists+kvm@lfdr.de>; Thu,  7 Aug 2025 22:18:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F06CFB1DDE8
+	for <lists+kvm@lfdr.de>; Thu,  7 Aug 2025 22:18:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D72473AAD51
-	for <lists+kvm@lfdr.de>; Thu,  7 Aug 2025 20:18:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13C3C583667
+	for <lists+kvm@lfdr.de>; Thu,  7 Aug 2025 20:18:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCA8B274FCE;
-	Thu,  7 Aug 2025 20:16:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94A072750E8;
+	Thu,  7 Aug 2025 20:16:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZmFzrer6"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ASer0jg4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B354230274
-	for <kvm@vger.kernel.org>; Thu,  7 Aug 2025 20:16:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34763274B56
+	for <kvm@vger.kernel.org>; Thu,  7 Aug 2025 20:16:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754597810; cv=none; b=P0nulHmQLXFPGf5+syVotUaeXhiJvcv3CFwuHRUHqrPb+ygtQqXqZszx/c1B6SpLP/gCYaahlRnBeRB+06FzEi7jHb6d2Vo4gthCiV1hVPXqYHAq9rMtHJcE9Dm7n1gvkQR6mTGoaaX/6IsBHKRoObjEfc4LWPHKx+PS2+v/LE4=
+	t=1754597811; cv=none; b=OSMoCZWh5F7pjZYyqXXXxa+or2KPe+y7wxOwRFweCf7pXxCHDVbE1f+CVSIUUc7LTyVbLPTrE+ur7527NZh05jQLFP6WQJ0aLO6pXKb7NwpjycR842oKC/YheVoWTEdBt+GPsJf/cwc6vDuSHFWpU6B9cNI+v336/PPYWDY2J0Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754597810; c=relaxed/simple;
-	bh=qZKtRz7nLG2KF7a1TIq9CkaKwIyQfE7M1cz+YMT0C3k=;
+	s=arc-20240116; t=1754597811; c=relaxed/simple;
+	bh=puYw+DEIdp6ykwAZy5OOEpeoIJJ7PtsStnf4pcAGRJw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=A/tNeH8PNlzLj9qC3fkh2JY7RCD5r5xPLleko9OT7KAxH8GA8AfRhqBezJPyw7RsPIv0MZtNe0NmHWcCGBxAqaQURpP1XlWfkkrHYJg+UgNPXAwhjEx0K4rMpNb1+y8ORqVdOSXRh47+/Hz/MCHmEjZf2yOlml4ZGPLG6wikFZs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sagis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZmFzrer6; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=hSf5ZsmDGmVF2TXqKMULIw4gttiV8usPCUAciW8yRg3GXu8Y9FqsNVAsi9QKnorOgvcM/k3NZsnbGVEQ5wj7v5tyPLxOqGnv0To/x9e1rjVMRIBtk6TirA1Q7zm85GsrjoIuGQ6DEmbQ7wjjNcm7Lw52uGsfZ/G4ze85+tFLe60=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sagis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ASer0jg4; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sagis.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-31f3b65ce07so2548946a91.1
-        for <kvm@vger.kernel.org>; Thu, 07 Aug 2025 13:16:48 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-31f729bf733so2571011a91.1
+        for <kvm@vger.kernel.org>; Thu, 07 Aug 2025 13:16:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754597808; x=1755202608; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1754597810; x=1755202610; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ok7xE/zvSsxm3sMvm91OXvNKe4HIqd8wijh5DP/BfeQ=;
-        b=ZmFzrer6tnf89eTHTYtDDmcOlwC7JhRsg5azmqe4vedhD8IK8/8xH8c0LpvUyRz2FP
-         Px+K7U0iwI+S6WRFc/QpANy4QUbrsEzv6B7O+0RW+Uq/B5LOH+BHY80oxhwWtlSmi8VU
-         sZKvt8OHddPO7glc0yzKco2t3IyQAsC7/3ZemZ2uWFRc6PXIhXF7NbIKNX+T+7bBtqWL
-         hQkLTWD51D5726zXEfrOPw4wdNlIUX69hH7MeZ9XzUo74n0sPoueRnlLeFtoisDGK/aC
-         105Z+YEmorV9kn+DuV1+CfrnjJqHc3NcnG7QPhkIDBQeytX6mYePVjUaF2YE26mTXqEQ
-         vsJw==
+        bh=US9j6ZWNrs7ioksHVAQpJEm6nvGXIAewRRt1GeZbRi8=;
+        b=ASer0jg4yUmZWkEMR6nxaB9bE7jd49+PWI3Ai2oeyTYjJCKoFeLyxmXp97t3Y/xbP7
+         2JuqPInrOdFl3k4aQFSJlnUz57Uw1B7UQSRz8l47Ii0uw8KuZOgD5lBa1aiPIUdBMRjn
+         Xl9MWhW2f1ffzB8oEp3WMjtTG8hntyV5CdSHunWSlNCsOH9AC2fRiGFny1O1+3WSUZNF
+         7bnDH/CtBue9HYrTj/gkpxJW0dcACVRe8z1mjeTZenSKYYVbGpzYsnvKy3By8a0T8WJB
+         LV1tqu+C935dvtIGtCYu3sfJE2qQL69TMIf73RcCvmCnt4DINfQfzhCAFzRePWhLti3N
+         w+GQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754597808; x=1755202608;
+        d=1e100.net; s=20230601; t=1754597810; x=1755202610;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ok7xE/zvSsxm3sMvm91OXvNKe4HIqd8wijh5DP/BfeQ=;
-        b=D21ShKBgGK2XfF3Dmme5wvQWDF9ocsA03QithY68TtPRfNA+KYIh+p5L3v1ItbW68I
-         XOYMFQ6Ap5D12PtpTRAnU+U3rJnrDGQxHibC6yBbyMEEop8oURmmI+V+WRToBVIiM63V
-         fBB24hulLad48exEfK22CxfMLbQVJEOQl7RJzvn1Ows4Qd3+gw5b/y3QFZA9W73eD3jk
-         z2YpnRxMvsKiUnOgz2Bg4mRbIVZfEcqixQUcaIyAkILA5f5clLbuiuhRWroBeELjqMEa
-         26t0QjDwLx3RDw/wSJmaQWhmDxM79TjVCe+hVUYcoH/8d64bJQdklk0w/UNOtwJb8Emf
-         EY9w==
-X-Forwarded-Encrypted: i=1; AJvYcCWxbZSyYWu1kyKR8SQ0ldS/z1zHfPLKrv0gyww7pBYKe59/YxsnckN/cKEhMQuKmZYlaOM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwhBqnFLXGgGmcTnnlx4bZcAB0b26YbtO/RBVcsOTg4HnUkKWpX
-	8Sbj3Aq392AkWHUkCOHa68dtvKJXn33dhVMdYrpCYkS/gL/69grWVHbk4cGtH8dwv7r3dipWIrD
-	ITQ==
-X-Google-Smtp-Source: AGHT+IEOPFXTvjzpu+YcxLn8CBY9Lmh8oefZR6eapvpl0ypNZ8CQQQCwseoJbEg4jHcPbgbjKqwF/k3k4w==
-X-Received: from pjnx5.prod.google.com ([2002:a17:90a:8a85:b0:31f:335d:342d])
- (user=sagis job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4d89:b0:321:2160:bf76
- with SMTP id 98e67ed59e1d1-32183e6d8b9mr392794a91.25.1754597808002; Thu, 07
- Aug 2025 13:16:48 -0700 (PDT)
-Date: Thu,  7 Aug 2025 13:16:03 -0700
+        bh=US9j6ZWNrs7ioksHVAQpJEm6nvGXIAewRRt1GeZbRi8=;
+        b=NF60+ALidjtJxlbTWtTCkdpBMgUseRy9spEioggcGq+x9bgyYbIrALBxbHpN6zm2MT
+         TkTDXmUQctGe0S0p6XnfxxglRkyTVTCCi6SGUopNqTYmP2rTHMsCpl9krjvSdxpZCTZh
+         QI96D1m0ADvzoNSFiQ7jag4nTx/V629ub0KPWI73idPlJgb6nYZH327O8H8lsPReUmv8
+         MQTEZa8h+0dZwO8RmJitqi1tI3mcNZLTdR445bfr+VLjYQWbEW3U7HojaLO0UeuCHd6r
+         bMjeK+lDQ2gTU2Xox29+Gw17a+gQMUvbcPGSpRxxCoBnIiIrNrN7Zxp5q3LnXPX06rRe
+         /s4w==
+X-Forwarded-Encrypted: i=1; AJvYcCXYwo7jJ0i9SZ/UMXIpfL8ZM60yiRT8XaoLY2YF3/rEhqfdMjtm3wI8KvobPqLMuGMe8z0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzVFm9POCGXoOUn40IiJltpC0+3EbxyU6xdppk2jWRSdUgrs78W
+	zcX/Kdd0y7ja8m+i4LSoiQBI+iEzEYMgYQ/EDg7aeBa50k1yfzIVweT7AA7v/z0JYf91Bis9Mqc
+	p6g==
+X-Google-Smtp-Source: AGHT+IFyMZB6DpVtHi3kL/x2IK8tM54yw75AkkxHEHT74p5qROfChvdgkD5MZdZL++lkM7KX+XcCTQn/Ow==
+X-Received: from pjbns14.prod.google.com ([2002:a17:90b:250e:b0:31e:a865:8b32])
+ (user=sagis job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:268b:b0:312:1ae9:152b
+ with SMTP id 98e67ed59e1d1-32183c48d07mr385969a91.23.1754597809647; Thu, 07
+ Aug 2025 13:16:49 -0700 (PDT)
+Date: Thu,  7 Aug 2025 13:16:04 -0700
 In-Reply-To: <20250807201628.1185915-1-sagis@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,9 +74,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250807201628.1185915-1-sagis@google.com>
 X-Mailer: git-send-email 2.51.0.rc0.155.g4a0f42376b-goog
-Message-ID: <20250807201628.1185915-8-sagis@google.com>
-Subject: [PATCH v8 07/30] KVM: selftests: TDX: Use KVM_TDX_CAPABILITIES to
- validate TDs' attribute configuration
+Message-ID: <20250807201628.1185915-9-sagis@google.com>
+Subject: [PATCH v8 08/30] KVM: selftests: TDX: Update load_td_memory_region()
+ for VM memory backed by guest memfd
 From: Sagi Shahar <sagis@google.com>
 To: linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
 	Shuah Khan <shuah@kernel.org>, Sean Christopherson <seanjc@google.com>, 
@@ -92,52 +92,89 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Ackerley Tng <ackerleytng@google.com>
 
-This also exercises the KVM_TDX_CAPABILITIES ioctl.
+If guest memory is backed by restricted memfd
 
-Suggested-by: Isaku Yamahata <isaku.yamahata@intel.com>
-Co-developed-by: Isaku Yamahata <isaku.yamahata@intel.com>
-Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
++ UPM is being used, hence encrypted memory region has to be
+  registered
++ Can avoid making a copy of guest memory before getting TDX to
+  initialize the memory region
+
 Signed-off-by: Ackerley Tng <ackerleytng@google.com>
 Signed-off-by: Sagi Shahar <sagis@google.com>
 ---
- .../selftests/kvm/lib/x86/tdx/tdx_util.c        | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ .../selftests/kvm/lib/x86/tdx/tdx_util.c      | 38 +++++++++++++++----
+ 1 file changed, 30 insertions(+), 8 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c b/tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c
-index 392d6272d17e..bb074af4a476 100644
+index bb074af4a476..e2bf9766dc03 100644
 --- a/tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c
 +++ b/tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c
-@@ -140,6 +140,21 @@ static void tdx_apply_cpuid_restrictions(struct kvm_cpuid2 *cpuid_data)
+@@ -324,6 +324,21 @@ static void tdx_td_finalize_mr(struct kvm_vm *vm)
+ 	tdx_ioctl(vm->fd, KVM_TDX_FINALIZE_VM, 0, NULL);
+ }
+ 
++/*
++ * Other ioctls
++ */
++
++/*
++ * Register a memory region that may contain encrypted data in KVM.
++ */
++static void register_encrypted_memory_region(struct kvm_vm *vm,
++					     struct userspace_mem_region *region)
++{
++	vm_set_memory_attributes(vm, region->region.guest_phys_addr,
++				 region->region.memory_size,
++				 KVM_MEMORY_ATTRIBUTE_PRIVATE);
++}
++
+ /*
+  * TD creation/setup/finalization
+  */
+@@ -459,28 +474,35 @@ static void load_td_memory_region(struct kvm_vm *vm,
+ 	if (!sparsebit_any_set(pages))
+ 		return;
+ 
++	if (region->region.guest_memfd != -1)
++		register_encrypted_memory_region(vm, region);
++
+ 	sparsebit_for_each_set_range(pages, i, j) {
+ 		const uint64_t size_to_load = (j - i + 1) * vm->page_size;
+ 		const uint64_t offset =
+ 			(i - lowest_page_in_region) * vm->page_size;
+ 		const uint64_t hva = hva_base + offset;
+ 		const uint64_t gpa = gpa_base + offset;
+-		void *source_addr;
++		void *source_addr = (void *)hva;
+ 
+ 		/*
+ 		 * KVM_TDX_INIT_MEM_REGION ioctl cannot encrypt memory in place.
+ 		 * Make a copy if there's only one backing memory source.
+ 		 */
+-		source_addr = mmap(NULL, size_to_load, PROT_READ | PROT_WRITE,
+-				   MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+-		TEST_ASSERT(source_addr,
+-			    "Could not allocate memory for loading memory region");
+-
+-		memcpy(source_addr, (void *)hva, size_to_load);
++		if (region->region.guest_memfd == -1) {
++			source_addr = mmap(NULL, size_to_load, PROT_READ | PROT_WRITE,
++					   MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
++			TEST_ASSERT(source_addr,
++				    "Could not allocate memory for loading memory region");
++
++			memcpy(source_addr, (void *)hva, size_to_load);
++			memset((void *)hva, 0, size_to_load);
++		}
+ 
+ 		tdx_init_mem_region(vm, source_addr, gpa, size_to_load);
+ 
+-		munmap(source_addr, size_to_load);
++		if (region->region.guest_memfd == -1)
++			munmap(source_addr, size_to_load);
  	}
  }
  
-+static void tdx_check_attributes(struct kvm_vm *vm, uint64_t attributes)
-+{
-+	struct kvm_tdx_capabilities *tdx_cap;
-+
-+	tdx_cap = tdx_read_capabilities(vm);
-+
-+	/* TDX spec: any bits 0 in supported_attrs must be 0 in attributes */
-+	TEST_ASSERT_EQ(attributes & ~tdx_cap->supported_attrs, 0);
-+
-+	/* TDX spec: any bits 1 in attributes must be 1 in supported_attrs */
-+	TEST_ASSERT_EQ(attributes & tdx_cap->supported_attrs, attributes);
-+
-+	free(tdx_cap);
-+}
-+
- #define KVM_MAX_CPUID_ENTRIES 256
- 
- #define CPUID_EXT_VMX			BIT(5)
-@@ -256,6 +271,8 @@ static void tdx_td_init(struct kvm_vm *vm, uint64_t attributes)
- 	memcpy(&init_vm->cpuid, cpuid, kvm_cpuid2_size(cpuid->nent));
- 	free(cpuid);
- 
-+	tdx_check_attributes(vm, attributes);
-+
- 	init_vm->attributes = attributes;
- 
- 	tdx_apply_cpuid_restrictions(&init_vm->cpuid);
 -- 
 2.51.0.rc0.155.g4a0f42376b-goog
 
