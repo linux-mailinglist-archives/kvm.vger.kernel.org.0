@@ -1,152 +1,142 @@
-Return-Path: <kvm+bounces-54266-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54267-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (unknown [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 447BEB1DCCC
-	for <lists+kvm@lfdr.de>; Thu,  7 Aug 2025 20:00:56 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12F60B1DD2E
+	for <lists+kvm@lfdr.de>; Thu,  7 Aug 2025 20:39:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF3783AA9E5
-	for <lists+kvm@lfdr.de>; Thu,  7 Aug 2025 18:00:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 030E67A122A
+	for <lists+kvm@lfdr.de>; Thu,  7 Aug 2025 18:37:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7153725D209;
-	Thu,  7 Aug 2025 18:00:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A8D921A458;
+	Thu,  7 Aug 2025 18:38:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WEBgR6xL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hnmqpRKz"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B1AC20551C;
-	Thu,  7 Aug 2025 18:00:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0525C1D7E26
+	for <kvm@vger.kernel.org>; Thu,  7 Aug 2025 18:38:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754589625; cv=none; b=edQHXwvOdKfduj7FAA82LFlDdRVzCecBsJCIVcYllaQ+knzTSz8m8dtL1t51cfeHtu4FDL9Y+t15DG/uARZqUN/B2luYIY0jRr4stLBNioKcwORLsvxAlWUkbuw+3mZylJkochTlepfnSxVifPjhqSWE1vpN8dw9MFeWftHUW4o=
+	t=1754591929; cv=none; b=oHeALNwY6XlJrCsb0iTASehDvQuZ8w1UgUvzJRzxe9598Yh5NhvSMIi0W9DvygmcxhKOYTDxiaEY6yTTPEobsEV5yoYAZi3ePNcATp+aGHqNjVaejnqT+7e+SAzcZi+1Cs6kh6lUWozaCM0ceBfP1JOB+ylO1yirtVj2lNdXxiU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754589625; c=relaxed/simple;
-	bh=p0/5ZjNMeRUcx0ZGt+vz9JYpjwVrjWh5jgJOciV82V0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Gbjef2oG9A7arrrXmnIs1DjgoZFh5yzL+TpD84cKV1RBzwh5DxbSA/T26dp8YXdPmnktztzj+lQmSKPAryZ+xuXdFPM0mZO44wJTMkInC7uQ59CItAIEBm7yN5QmIq4L9sygjIaSRtxcmWBfIrotP5ygUQ5oLRCrT85I8DMLrRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WEBgR6xL; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1754589624; x=1786125624;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=p0/5ZjNMeRUcx0ZGt+vz9JYpjwVrjWh5jgJOciV82V0=;
-  b=WEBgR6xL8UwgRcg3NvExIR1MZ1gWNZkjhlqR4Vjm4HFpk07Kl9ZZOu7N
-   raaKvjZi1GneXW+NzXd3Tz6MJ4pvkp6JEbk6JmJgCUQPq4g2PvGqi+7k9
-   ObtqGLtp8sdUhg50KMghvZruEwr4Si/+Ha51bP2BkzCIG2JcidwVuo5E2
-   4roE9PoFaiy0W5+vQ8WIrnY8Hy9yXl9NPX3Fs+CA4K+W8jAR3/oHtYru2
-   cMdNSBV55oyaQjjnjKHFRzdFUI3fyD5rm+aXy+yRmdbwHWdY8AEdUPRCt
-   HYVB8cy4lmh3j/tZeOEf35CG08+z2SxO6+RLbVWBJQmUNXABQ0pgsSnKO
-   g==;
-X-CSE-ConnectionGUID: Kob+85lnTiyl/BsfV5WZaQ==
-X-CSE-MsgGUID: zbwwK2d6QwKNXrk0/IlnGA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11514"; a="56809824"
-X-IronPort-AV: E=Sophos;i="6.17,271,1747724400"; 
-   d="scan'208";a="56809824"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2025 11:00:22 -0700
-X-CSE-ConnectionGUID: RzBxIyYzQeqt3SGpYQkzoQ==
-X-CSE-MsgGUID: iVWW57sKR+i/fxWDFbhK7A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,271,1747724400"; 
-   d="scan'208";a="164641026"
-Received: from aschofie-mobl2.amr.corp.intel.com (HELO [10.125.110.207]) ([10.125.110.207])
-  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2025 11:00:21 -0700
-Message-ID: <7c36a16a-1c04-4c05-8689-52d8b75d3965@intel.com>
-Date: Thu, 7 Aug 2025 11:00:19 -0700
+	s=arc-20240116; t=1754591929; c=relaxed/simple;
+	bh=xmmHCmJcE2ulD2451FS6SDHBUoDFstNnx3dJA00gofo=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=SgtI2U2fiy4ltd3F5wIACOf+jtV0i36qJszWIIUbOWwBI0elj8FMQVQq8pdC5oHbF6T3epk1diocPGiTVFSz1SCmMlHTYb6zf4ZfQOzcg0uXtA1TiSMivrtX6Hj3nTGhw2IasBK+iLZ72xye/zHWxc3tAqJg/9TmwMCN5OEf4lc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hnmqpRKz; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3214765a5b9so2605226a91.3
+        for <kvm@vger.kernel.org>; Thu, 07 Aug 2025 11:38:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1754591927; x=1755196727; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=yp84IsrpOeYSbgICcPR8apvUJuROu2Gav6Oyrx9mTk4=;
+        b=hnmqpRKzSQp0UndbKtkjlzsUeE52pwoO38uc6md0/VsOZ30hrpGBYfIVSY3n46So4D
+         qvcjHtUBxOxgLjGVZ3d5fvytgJGxYZ6N2XI1+2oLVAbVtpnLMRqK588RTV9FrYf5vMuW
+         OYb0f6J5eAFTtuWqKlNKdFn8IoR9jfY2ONyZZwX3xXSsoXBuv295hLpkmeXpes1rVwrA
+         /UYYqd5tA8QeeqyJNxhDeX9AyHXgyM6m6LVgewrIWd9TmBqd6+wL7CaRaENifMYFpJoB
+         P9rsn9CHqw4njfOOH2wX3RL2OYmf51TCiSHI5gltPW+MMcpARprDlN/V2fkG+Herjfmd
+         EaoA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754591927; x=1755196727;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=yp84IsrpOeYSbgICcPR8apvUJuROu2Gav6Oyrx9mTk4=;
+        b=hbHxuSgn8H05geIK4T7y2kirXNRg6UsZgOxz0bQXRxkIUqSVqdivjmdK7iWGftpLxO
+         4Sez0/KUBxyUAzq59Mh3TepEFb8ZffhVXJeU3XDEgz//pAJZ/slmLWvKXf0nGRDj5/ML
+         nbukLvfExMR8qs15S+qLsL41PFSqNXtTlQEpvn1I5Ea1BrYvMWJBfwR3t0zVm8lR3NDo
+         o5mLknw+O/PGm0RCLomnsy3h0tsozhiPmYZa1eW7vg6B4zfVJ53PVqI6NAV3jAdD2GSG
+         GXwvX+aQkRuptBfZBPPcHjsc2kn9w7DgSwHh6ILWtidtZRst/vDDENloPYlbw4XYcYW2
+         vfNA==
+X-Forwarded-Encrypted: i=1; AJvYcCX6t3sE/iqnURDKjhcAWtK8XeVMODfWGdXdkWUpOOp5HcLSwKPKH8UKIB2lmb9yomZnDRE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxLwdbTTN7rCtXRLIammetUDrUOJ7YaOk30FBoMCiqtZKENhO8q
+	SZRW/efmlCy33PavlMPraOJ7FkOL5plGC08TRlFErQFBEhpx8RKBOjUoREHAPebaPhKIptaggnn
+	SIjKy6w==
+X-Google-Smtp-Source: AGHT+IFCWCOlCO6n5/AEOdaCe6fYz3jM8iX2vBVKNK9vB/91SLgPbLstukRS4VE0qXM9vySMQaYSmXIXgcA=
+X-Received: from pjg13.prod.google.com ([2002:a17:90b:3f4d:b0:31c:2fe4:33ba])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4b41:b0:31f:6ddd:ef3
+ with SMTP id 98e67ed59e1d1-32183e74d4dmr55251a91.35.1754591927300; Thu, 07
+ Aug 2025 11:38:47 -0700 (PDT)
+Date: Thu, 7 Aug 2025 11:38:46 -0700
+In-Reply-To: <CAAdeq_+Ppuj8PxABvCT54phuXY021HxdayYyb68G3JjkQE0WQg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 1/1] KVM: SEV: Add support for SMT Protection
-To: Kim Phillips <kim.phillips@amd.com>, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, linux-coco@lists.linux.dev, x86@kernel.org
-Cc: Peter Zijlstra <peterz@infradead.org>, Juri Lelli
- <juri.lelli@redhat.com>, Vincent Guittot <vincent.guittot@linaro.org>,
- Dave Hansen <dave.hansen@linux.intel.com>,
- Sean Christopherson <seanjc@google.com>, Paolo Bonzini
- <pbonzini@redhat.com>, Ingo Molnar <mingo@redhat.com>,
- "H. Peter Anvin" <hpa@zytor.com>, Thomas Gleixner <tglx@linutronix.de>,
- K Prateek Nayak <kprateek.nayak@amd.com>,
- "Nikunj A . Dadhania" <nikunj@amd.com>,
- Tom Lendacky <thomas.lendacky@amd.com>, Michael Roth <michael.roth@amd.com>,
- Ashish Kalra <ashish.kalra@amd.com>,
- Borislav Petkov <borislav.petkov@amd.com>, Borislav Petkov <bp@alien8.de>,
- Nathan Fontenot <nathan.fontenot@amd.com>,
- Dhaval Giani <Dhaval.Giani@amd.com>, Santosh Shukla
- <santosh.shukla@amd.com>, Naveen Rao <naveen.rao@amd.com>,
- "Gautham R . Shenoy" <gautham.shenoy@amd.com>,
- Ananth Narayan <ananth.narayan@amd.com>, Pankaj Gupta
- <pankaj.gupta@amd.com>, David Kaplan <david.kaplan@amd.com>,
- Jon Grimm <Jon.Grimm@amd.com>
-References: <20250807165950.14953-1-kim.phillips@amd.com>
- <20250807165950.14953-2-kim.phillips@amd.com>
-From: Dave Hansen <dave.hansen@intel.com>
-Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <20250807165950.14953-2-kim.phillips@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20250806081051.3533470-1-hugoolli@tencent.com>
+ <aJOc8vIkds_t3e8C@google.com> <CAAdeq_+Ppuj8PxABvCT54phuXY021HxdayYyb68G3JjkQE0WQg@mail.gmail.com>
+Message-ID: <aJTytueCqmZXtbUk@google.com>
+Subject: Re: [PATCH] KVM: x86: Synchronize APIC State with QEMU when irqchip=split
+From: Sean Christopherson <seanjc@google.com>
+To: hugo lee <cs.hugolee@gmail.com>
+Cc: pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Yuguo Li <hugoolli@tencent.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On 8/7/25 09:59, Kim Phillips wrote:
-> Add the new CPUID bit that indicates available hardware support:
-> CPUID_Fn8000001F_EAX [AMD Secure Encryption EAX] bit 25.
+On Thu, Aug 07, 2025, hugo lee wrote:
+> On Thu, Aug 7, 2025 Sean Christopherson wrote:
+> >
+> > On Wed, Aug 06, 2025, Yuguo Li wrote:
+> > > When using split irqchip mode, IOAPIC is handled by QEMU while the LAPIC is
+> > > emulated by KVM.  When guest disables LINT0, KVM doesn't exit to QEMU for
+> > > synchronization, leaving IOAPIC unaware of this change.  This may cause vCPU
+> > > to be kicked when external devices(e.g. PIT)keep sending interrupts.
+> >
+> > I don't entirely follow what the problem is.  Is the issue that QEMU injects an
+> > IRQ that should have been blocked?  Or is QEMU forcing the vCPU to exit unnecessarily?
+> >
 > 
-> Indicate support for SEV_FEATURES bit 15 (SmtProtection) to be set by
-> an SNP guest to enable the feature.
+> This issue is about QEMU keeps injecting should-be-blocked
+> (blocked by guest and qemu just doesn't know that) IRQs.
+> As a result, QEMU forces vCPU to exit unnecessarily.
 
-It would be ideal to see an logical description of what "SmtProtection"
-is and what it means for the kernel as opposed to referring to the
-documentation and letting reviewers draw their own conclusions.
+Is the problem that the guest receives spurious IRQs, or that QEMU is forcing
+unnecesary exits, i.e hurting performance?
+
+> > > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> > > index 8172c2042dd6..65ffa89bf8a6 100644
+> > > --- a/arch/x86/kvm/lapic.c
+> > > +++ b/arch/x86/kvm/lapic.c
+> > > @@ -2329,6 +2329,10 @@ static int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
+> > >                       val |= APIC_LVT_MASKED;
+> > >               val &= apic_lvt_mask[index];
+> > >               kvm_lapic_set_reg(apic, reg, val);
+> > > +             if (irqchip_split(apic->vcpu->kvm) && (val & APIC_LVT_MASKED)) {
+> >
+> > This applies to much more than just LINT0, and for at least LVTPC and LVTCMCI,
+> > KVM definitely doesn't want to exit on every change.
+> 
+> Actually every masking on LAPIC should be synchronized with IOAPIC.
+
+No, because not all LVT entries can be wired up to the I/O APIC.
+
+> Because any desynchronization may cause unnecessary kicks
+> which rarely happens due to the well-behaving guests.
+> Exits here won't harm, but maybe only exit when LINT0 is being masked?
+
+Exits here absolutely will harm the VM by generating spurious slow path exits.
+
+> Since others unlikely cause exits.
+
+On Intel, LVTPC is masked on every PMI.
+
+> > Even for LINT0, it's not obvious that "pushing" from KVM is a better option than
+> > having QEMU "pull" as needed.
+> >
+> 
+> QEMU has no idea when LINT0 is masked by the guest. Then the problem becomes
+> when it is needed to "pull". The guess on this could lead to extra costs.
+
+So this patch is motivated by performance?
 
