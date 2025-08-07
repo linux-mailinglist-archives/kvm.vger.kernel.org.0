@@ -1,181 +1,128 @@
-Return-Path: <kvm+bounces-54258-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54259-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FEF6B1DA65
-	for <lists+kvm@lfdr.de>; Thu,  7 Aug 2025 16:50:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4029BB1DA7D
+	for <lists+kvm@lfdr.de>; Thu,  7 Aug 2025 17:00:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14BD8620A27
-	for <lists+kvm@lfdr.de>; Thu,  7 Aug 2025 14:50:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B583B1AA3D80
+	for <lists+kvm@lfdr.de>; Thu,  7 Aug 2025 15:00:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C67E265623;
-	Thu,  7 Aug 2025 14:50:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B27E02673BD;
+	Thu,  7 Aug 2025 14:59:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b="iO/kwSzU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V23mZAUK"
 X-Original-To: kvm@vger.kernel.org
-Received: from OS8PR02CU002.outbound.protection.outlook.com (mail-japanwestazon11012046.outbound.protection.outlook.com [40.107.75.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f195.google.com (mail-pg1-f195.google.com [209.85.215.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CACF1C860A;
-	Thu,  7 Aug 2025 14:49:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.75.46
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754578199; cv=fail; b=JE78uXaGrhNMMloZ+qiWxTbnO+vo92/qDYA8cGQV5wZcHImjlkeU/g792RK2iIGa5B/aFQVGSsbzhG38D3/O3DTlY6fRE6obXlT4UdUBKgCI5NxAA+T8koBXc2/YRNIhDS13GLmzoPcFpr9WA9GFDFklu+dVH4V6FMxna9sDNeM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754578199; c=relaxed/simple;
-	bh=g8zdTMWXRkDJrgs6R/EdGnF371XIYiEKm9k03LmQn70=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=pcg6Dr2dXQ+QOKQ4Qmdbz3cHePLJCXm1SwF7B6XDx2iqdEHRF9Z+gnn/jQVgDV/2qZTYaBvez4P9xwKpdGL2u6tEinBqt83tHQXI9Q9cvvu/BiSFsfvLfYFAq+iju8Q944Zj00+/Fpp3QpEjzxeTTgG+qsc1oPAcfLt2JTFBTJ8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com; spf=pass smtp.mailfrom=vivo.com; dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b=iO/kwSzU; arc=fail smtp.client-ip=40.107.75.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vivo.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=oDyV0F1q57NqocZfBDPmsC7pulKz9UR7PF7+IL1MYRO1vlNoUEor4Qm6kUy22F0U8YhblJjpk5A76joXRDrUP0ZnhMrQt3++f9jheZOmcCe7JrOKn4ojBNX/Uo9TR9XSJ0Hc/+9ckj7Acf3UwW6KF1cZQ5vQ4cSXuWOYWSHVIe2ouG5r6wtSb6MCSKTBJLa3yUpTF2V60OFzqOaHDzb5cJKCCXBdoVnnFBmioqjWFw/zQZ9oJ+uuUbVoyJV1V/pxh7a2JpEUmZEQ+YrELZqFr/AMwMR69+Tbj9ytKWtXgfUfD191PcrX+qu4StReJrI+eGXXs4QrnSJEWe6V//Zr/g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CDqMEaYl5i1x+hIBhDVQZBfDX/FquV3o1NGuhYkmhlw=;
- b=k+80YO2GdPxPqUV3B+C1y7QbMRXmBP6zCV5fQKMdrZ6LbelYXmDoH5RuCPtEkzjgKeA0vJ19XPwZ2uvDyqn1a5SC8zLIgF+uPN3LZmbX8l5/U+Jq7Mwux985XHXWMEQX9lKFFJg/XJ14sbmlnCsFyMsktUwWK7kCSsOw6PAJdoly1x1MA7xw+cXwh8eK+G4Fqd8dGU2b+Owi5kz0LqmdIyULfsj6dm5dfGKS9aCLwYdsjAN6im1Ta88eH2MKIDh1Qd0dwPLsPrY2/RjCgWjHdhFLTiIP/oPSl8LupJ67AC4r2pTv1RIaAG2Tyep5BF7OeWkzqswlXnKh8TkS7OWZBA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
- dkim=pass header.d=vivo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CDqMEaYl5i1x+hIBhDVQZBfDX/FquV3o1NGuhYkmhlw=;
- b=iO/kwSzU3P3nhUBYNKzhF6K7jPzciSbhH02uZtJCppydeHQCeYpZhthoFf/Pge8aViNBjj2u0cq82q3GrmTZNnYP/h4/P5Ny+CaoY6B+gpyh5y4vSHaDFxm8soZDazt98BEeYMqPA9Pjbvv4Z1Cx/ALAZvuq6Gp6xShC+Wdnn5iiuOmYChXZCzL63XDgVIX5L0AiExalkwAA/ORHsHAMR0X/yeBP+SBdktPSRRNt7VBkH/ENaQUflLslYJhwD7Jcn+mHlyjofHxdRTDMWqS/9AVhTW4lkkqTotkDBLzHu20jjAc6OU6v+jDEQIUuFXcDPOwWRlP4VqHZJsG0otC9kA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=vivo.com;
-Received: from SI2PR06MB5140.apcprd06.prod.outlook.com (2603:1096:4:1af::9) by
- SI2PR06MB5092.apcprd06.prod.outlook.com (2603:1096:4:1ab::13) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9009.15; Thu, 7 Aug 2025 14:49:54 +0000
-Received: from SI2PR06MB5140.apcprd06.prod.outlook.com
- ([fe80::468a:88be:bec:666]) by SI2PR06MB5140.apcprd06.prod.outlook.com
- ([fe80::468a:88be:bec:666%4]) with mapi id 15.20.9009.013; Thu, 7 Aug 2025
- 14:49:54 +0000
-From: Qianfeng Rong <rongqianfeng@vivo.com>
-To: Paolo Bonzini <pbonzini@redhat.com>,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: willy@infradead.org,
-	Qianfeng Rong <rongqianfeng@vivo.com>
-Subject: [PATCH] KVM: remove redundant __GFP_NOWARN
-Date: Thu,  7 Aug 2025 22:49:43 +0800
-Message-Id: <20250807144943.581663-1-rongqianfeng@vivo.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9294A25DCE5;
+	Thu,  7 Aug 2025 14:59:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.195
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1754578785; cv=none; b=d8ueqcdS468pzZtKEL+z4pvT9hmLZm0xEQiZxq+eaAZ//SfEuoEQlx+1T4L5dg46Trgg4Ho0BybW5HAP0JOn5VlR3a/bVm+PAqN7Ep2jJsigeHffjoln29MMsnwAjfgNq9iqCcP4b4LO/v1q7XMoYuxEwUQdgB8XLnVOpmYYkV8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1754578785; c=relaxed/simple;
+	bh=FaaExgSgYdjOaVJfimhL+ae/usc6C6i9av2RGziIJIs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=kP2oP3RobAQOCR7Jxyew7p3a9XWfu0xcWjeMB81+wY8N3RPzKX13pIfy9AuUTdo/la0FK/fm2aCfAucg4WUuTDkD7RGL9HQp99wUcY+GeMJm/BVWE/vknuUGEY/LtLlHvtZR+oFMkLyApH5Sg4IW/vzp6wiK+1osCPBRoRPtDZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V23mZAUK; arc=none smtp.client-ip=209.85.215.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f195.google.com with SMTP id 41be03b00d2f7-879d2e419b9so770790a12.2;
+        Thu, 07 Aug 2025 07:59:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1754578783; x=1755183583; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Gfuti96j1DWdp4sE/vCi6HTL8gGK7hRu0UOwmloMQdo=;
+        b=V23mZAUKPDeR4ageCzi9YSDAcVqgVCgKfWVbV7UAKbHUNRGNBjzlqxVznO5vrnj8Ey
+         s+IRrWomvjGxBkHbDVLOHV8oQ0X9N8RVn7lYWe5TtQTV4cXuMIE5dGN6KaH+Lhyp0liy
+         LdeVnvSTXXGvq2MKmxN+Wla8nFrwRwiCwdZNyReq256l9k4lUiyS+X/6E62pjJsycVq7
+         Xfv4FMQkpKZCII9SRZfKbsufZ8kul9xB5zGtyXd6gzXIFti4IU9opuUog8TOtseqFQky
+         q3ONuaF349ZQKVMlA39os1AliclFXOEQPKIHp5CpYmBh6HpqdMA7giDD6eZByTtxXBII
+         MNZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754578783; x=1755183583;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Gfuti96j1DWdp4sE/vCi6HTL8gGK7hRu0UOwmloMQdo=;
+        b=AE9F+zNQhMW7WacO/O444UEidpfuNpZhe+r/7SCUsEpMuOWGWqbz3X4pvt8TwdDKRC
+         B46vby4NVNYp3i8Oz86+3Hzj7tVoR503sjU3/OUP8C9Zl6yvfJd5zi6inF0rB+8c3j/W
+         DhsjCo19XDQ0YqHU6EO8feGsVDL4iRwTVGRZ0oEdh0NPzzE1TAzrbvjptNWIp3hkbkn9
+         EetFwq7KbIiiR9LudqCh/EjvGiY4zMEz4forShwrbXc4daIzWlVUsSLn068cKivHPwD6
+         35NX6NAUPrc9m2FsJKK2ENT/1hjPkkqOAQMz0eQ0lYvZJvUy2a7NR416apPa/jFa0kQz
+         y/iA==
+X-Forwarded-Encrypted: i=1; AJvYcCUfIQCtXRmBJ1t/NF6Qo+HHg2MpzaU0f4Zr8lUebIYY0XtqFdq/00lfw9BRR64WTBNP/1IAf41dwTR5/czXc3oI@vger.kernel.org, AJvYcCUtMjWvFvhD6btzPjU+dsOrFzsad/e1MDaggXD4/1uBPaV1/OnN8gXA9EgJWsLndjYkqXtC3KXDxM7mIgQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzltqvJwNY9Z3/yVC1H/iWmCy7EqSo0uYnHoxYgpJjVIc4U+fF1
+	qX2/eX3SLRcByVy0CqLLf7Ub0EeSE/zMgzeXvAJLEMxac38f7cpNVSUpCWpUJcG1clIW8obZ
+X-Gm-Gg: ASbGncuneCst5dFKi4SkvXmBSLveDhjr33zZM8Qj6m76ZDW8a/YcBD7nJk4dEoz6n1l
+	hA5siIRFoK4ILo6BX7T9LZ8q1PoXYH1G+aPCDNSJidBOyLBy7lwhQnpx347bszqy/gHAAziIhQb
+	TDtA8CJIkgILIOkeCISTIYkwUNioGePc1FLgSzlF6K4e1B5uEbZ2iF6/EvkycSGr+IWloRdQ4Vi
+	i3+BxXMcb1PwPmDOdq0zpOWVtTN3bRCU+3wDOQwIR0UtqpcnUvFLa3lz99YRpPGxkDTwDG200aO
+	d1G2ADrFzvgABxfVwxF9HYZ+b2ef3C5xdwK3WdmqY3TUuf1VfHWC2GnjmoqiAhiS9JJ4cZkG1+R
+	/58DHT5IBO7k4vJm8X1H/mtLh0SBpeZt6Mg==
+X-Google-Smtp-Source: AGHT+IGPxQPuvHlgEiFt5T/XzMzu+ViboT+tVdh2HEe6EhYCrfjWstnNjANJfZY2GjcUT2QPBTC6DQ==
+X-Received: by 2002:a17:903:b87:b0:240:3c64:8626 with SMTP id d9443c01a7336-2429ee6e786mr87749225ad.5.1754578783384;
+        Thu, 07 Aug 2025 07:59:43 -0700 (PDT)
+Received: from days-ASUSLaptop.lan ([213.130.142.69])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-241e8977896sm188254875ad.79.2025.08.07.07.59.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Aug 2025 07:59:42 -0700 (PDT)
+From: dayss1224@gmail.com
+To: kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kvm-riscv@lists.infradead.org,
+	linux-riscv@lists.infradead.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Anup Patel <anup@brainfault.org>,
+	Atish Patra <atish.patra@linux.dev>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Alexandre Ghiti <alex@ghiti.fr>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Dong Yang <dayss1224@gmail.com>
+Subject: [PATCH v2 0/3] KVM: riscv: selftests: Enable supported test cases
+Date: Thu,  7 Aug 2025 22:59:27 +0800
+Message-Id: <cover.1754308799.git.dayss1224@gmail.com>
 X-Mailer: git-send-email 2.34.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: TYCP286CA0157.JPNP286.PROD.OUTLOOK.COM
- (2603:1096:400:383::12) To SI2PR06MB5140.apcprd06.prod.outlook.com
- (2603:1096:4:1af::9)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SI2PR06MB5140:EE_|SI2PR06MB5092:EE_
-X-MS-Office365-Filtering-Correlation-Id: b91d7952-6820-4dcc-1f08-08ddd5c1ab90
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|376014|52116014|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?kFdsaDijVbao1Q2LLGUOg8OucI2wSNJgJq8K/SYx/gRxZy7t02WqPSn9Fb7z?=
- =?us-ascii?Q?GIFW6SQmxXSF0jmaa15RTBGQg95XVbaBnf3RuoJaOvCzM94MzL9ypJz+nJFJ?=
- =?us-ascii?Q?J9W5fWL/4l+2LtuoUkYDLWMXRta0hNgZxZYsHvgqk9sqaJWSmDFgoOLKlMB4?=
- =?us-ascii?Q?A7QRjouInkHE9U6XOXYrfEMPWXg67tcgUALwvGTzVanGpaG4BF53HmDwlYTu?=
- =?us-ascii?Q?KG9VdZ/9hTbheQIqI6mzOmwREzFpm3h1GVZOXwgwkiS/Z8ZVZ2IBZsTI6yEy?=
- =?us-ascii?Q?EMzCBFLJZEUA/HXDgfW19EbstCyZXuf9wHcjYjpow3zXf9NgYAuTubJ7p8hd?=
- =?us-ascii?Q?eV16ouYH1//MWrx5MH72Z59vygMLSb3mSr+WA89ak08T3BBUKHS+1hsHS3oz?=
- =?us-ascii?Q?AILlqLE2iP5HpGO6iGMjDUcospz4KAkli1+mQ2GyTAENDgjCpXzAu06FM06D?=
- =?us-ascii?Q?gMPVU8IuSOhTfgKU4mUaG5EqvIv0/lk8UG9taN+p3QOVUjYTJo89ML/X/8Wp?=
- =?us-ascii?Q?yVXpJNDeAaypY6sA12X0UUjP5U1ZXvH+DFUYR850xgCHB0enqjPeb6NN0wnC?=
- =?us-ascii?Q?hQrNgOogqIWvcOmRR4ew43ZS4R2+Uh+yygdWNs1nCgfkmWX0aOxoILra5pfn?=
- =?us-ascii?Q?gWg1ky7tWiGdcceaoktc6AW1WmrdwiItrrqrS/7p9FJHNiKLkeqSnVV/hA4x?=
- =?us-ascii?Q?PMW0Eq7Gxg68zwDeKQz5ERcFEsutO1srULruQKqIFmhDrpIGl+l31/Hb9tj0?=
- =?us-ascii?Q?kXx7KaPFADeRnk2iVpVkVupNJli9rsrj4i9DGoVIb9q+Lbip+L79QmQvwPAL?=
- =?us-ascii?Q?dAmE0lGq4G/pnFLa+t0GIFI+T2z9bOOgOegykooxFPdfBBS08bm/zTrYQIWF?=
- =?us-ascii?Q?I2ake2fc5X6iXEOsCJsBae6PKFoiyp/Qlwjp+yjm3Cdqqp1Y+kRwSpPs55va?=
- =?us-ascii?Q?wTPY2MXfkikf6qhrNh1jk12PuFRXz1rEL6acxgT7dXz165A1w7sJ1fxTocln?=
- =?us-ascii?Q?FZxLuFy5c3vfJUh/LtkCbjq6eZmBpl6pp4XqQ124nkVLX4NuTGxW5qA17rqG?=
- =?us-ascii?Q?YR4kP40Zu5WFVjPiH6AnV4WVibPLtxZxN+Qz7aGFummCMz191nwMAyCdOa9A?=
- =?us-ascii?Q?+ptKBOSTKNCYxIVBVvnHD8f+kV9JyRT15NtT1dvL21jL/+SpFUPFVGXrqDLy?=
- =?us-ascii?Q?RNseJXfKsnEbxpZYHtSmWWNj5zDzYW7RlbCqAC29+m5zc0ODJdl3L47orFWd?=
- =?us-ascii?Q?CIAQQvP85LJbk9zpkGz9nb4SrotV1hlvCTII+zzPlZL0BYf4DD8PgVC+cNVA?=
- =?us-ascii?Q?NulRfoaE1wKwGPlenGca7iD2JB87Mt2Yw0L6T7EDTYPXNYU/HALjTG6/BlLa?=
- =?us-ascii?Q?hDZGYvJTCtNNlxM0nmxbY6aJQkdG0B1SJjxEqfAoOekhyD5ujcTYgWrGTfpX?=
- =?us-ascii?Q?hbmqL1nO8NyJJ7E/qq6r3QyLVh8ASMtNBtpnoha6x04yHTZGw0CHkw=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SI2PR06MB5140.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(52116014)(38350700014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?+vJlj113iIhMtzHF1DEMMqVymeVN9lJTHJqC8zu1sz5NEEBC2fviOJCABBK4?=
- =?us-ascii?Q?H9+3Tagsk6CBeZdkF1KDyw5CIQU80yoVgNBvnLdDrQ5dgXCx//sUbEnNdGkE?=
- =?us-ascii?Q?/8U58aps29S6VNJ9ESQTwPRKYu2ys0Yw3uzFMKJTuuzQQbIXBs0mM19OVeWb?=
- =?us-ascii?Q?ZgKskoBlmrMS9snLGTUmRaLRNSJMX0cp2AcgQl8rmNMcjC5mHGwlkne/cQXD?=
- =?us-ascii?Q?GFlfOjNXNzf7uuaUPNaWXUmIY6kwoXDtVnjYxDco66NE2JHW+Sjoay8LetiE?=
- =?us-ascii?Q?9AziEMh7M14BUYqXyyc7TaCGUF5PeqQzBswNGBcvEsscvE5EWCunIleL9tfk?=
- =?us-ascii?Q?fg3GpR2kU6CfkNrPdxbiiGqX+qAtvPx52hBtgdvcbRpjAInJycs/qtE48AFw?=
- =?us-ascii?Q?xUXr9BXHSMxRfuBCxW/E4aJc1a989K/00yfh64qzfmt/1WGFdmKMnQ2AB5aH?=
- =?us-ascii?Q?SVzsfDB3EIyc2gdiLg2D47cvZUs8HHKkjzETNoxHLVbkG4huwQQwlTErgcV5?=
- =?us-ascii?Q?Q0AXu2K0hDX0QoMdL1RbeoHLkHgdwtr8lJ7rRlDITizPaAWqKQwbH5t8tatf?=
- =?us-ascii?Q?sPdhvsVb4rVmQtZwoquQYScLtjwOinTcKutn7bOxW1k56bqu7HegDXllGqZi?=
- =?us-ascii?Q?1GG1LJE0uJPs+LJqLMYelzX5pRjKIPgk+CK5D/N7r6NQHyFXF/LVAQHH45JR?=
- =?us-ascii?Q?FIoXa7ww0bupFmeBYiUNJ7jXExBXi5R9TQ2RCgcgz7CpFr6SJVmvOX9LlxCU?=
- =?us-ascii?Q?2GxxX9n5pEImaglzRdE5d/sgARcHPjFcSuKN7pQuk11nABhEL7sOm9SjjYl3?=
- =?us-ascii?Q?sNeZPcoITklkbJl6YWhbDExBDPt/o5rHtvd1z6Lk9PUQXx6iIPwy1RjLIEtg?=
- =?us-ascii?Q?RKAVXvyLfw3w6UnuEcaxHk0OTRcAHH6H6UdoFGTB5tXksWJJlADigFkid7S9?=
- =?us-ascii?Q?HxI11++BJo0wBzqML07dc4D4i5bB0T8gp5rgOS7bGI1FykeJTAOAgabzWzy7?=
- =?us-ascii?Q?Ys6BvNny/Z/5vuCFyyCEp3sqfvZb3xmb9G25eD+/cxOx0OSbdrHzJ24T9DGW?=
- =?us-ascii?Q?eWk+YPHKy1w9JG9UV1OTff611NAKLI4jxdLiG/sAhbSeNuAqO/43iOpU+W1D?=
- =?us-ascii?Q?yqFBLFfDoRHdYdcRFV2zTYaY8d3baeesXTqCGXfRywFUBxif9EZIITmaojMP?=
- =?us-ascii?Q?2VZRlXvSP+Ek92Mv1p7MIqpIGC7vtrLFyiDvH9gPNp5X2SeJ84wrLc+IMtbJ?=
- =?us-ascii?Q?ArVhX+GyAoyyW8EiXEABxoLZDpCBY6L854PNA66iKBI7LVTUQDi2TsDCA+ju?=
- =?us-ascii?Q?GS6hofNIA78YYhWjiMgAFPybn7by3q1IOkCZvRjF/jgjgkal5cFEuyzzsjSv?=
- =?us-ascii?Q?nX1Kjf/k2sUkpUWu9KfeeH0ATm6Jhvzk0XYOTSOKPcCtIpPOmYVXIO0ZeeDh?=
- =?us-ascii?Q?fgrB9ND3kk64aAGx8YqAtt6InrvV+NwZeMeP5e3HZ1sAOjC5uD5UWuTibe8Z?=
- =?us-ascii?Q?3ILg0tvtDMRtWUSodELeU+ITtFNNq0t841QqhtWjF8jBlqcQOsIDISze82tO?=
- =?us-ascii?Q?wAHfppKlOhFa/VpMEbCfYB0sKhl1mSUfYCV2AQXf?=
-X-OriginatorOrg: vivo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b91d7952-6820-4dcc-1f08-08ddd5c1ab90
-X-MS-Exchange-CrossTenant-AuthSource: SI2PR06MB5140.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Aug 2025 14:49:54.4796
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: k3WfQXpI9vlH/RMAzSt3xwpcg7p5ILYjpSyTSEGE87kK3liibmlwjKQdy8kn+l9xbTI0X552lGTS3d9BU5ey9A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SI2PR06MB5092
+Content-Transfer-Encoding: 8bit
 
-Commit 16f5dfbc851b ("gfp: include __GFP_NOWARN in GFP_NOWAIT") made
-GFP_NOWAIT implicitly include __GFP_NOWARN.
+From: Dong Yang <dayss1224@gmail.com>
 
-Therefore, explicit __GFP_NOWARN combined with GFP_NOWAIT (e.g.,
-`GFP_NOWAIT | __GFP_NOWARN`) is now redundant.  Let's clean up these
-redundant flags across subsystems.
-
-Signed-off-by: Qianfeng Rong <rongqianfeng@vivo.com>
+Add supported KVM test cases and fix the compilation dependencies.
 ---
- virt/kvm/async_pf.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Changes in v2:
+- Delete some repeat KVM test cases on riscv
+- Add missing headers to fix the build for new RISC-V KVM selftests
 
-diff --git a/virt/kvm/async_pf.c b/virt/kvm/async_pf.c
-index 0ee4816b079a..b8aaa96b799b 100644
---- a/virt/kvm/async_pf.c
-+++ b/virt/kvm/async_pf.c
-@@ -192,7 +192,7 @@ bool kvm_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 	 * do alloc nowait since if we are going to sleep anyway we
- 	 * may as well sleep faulting in page
- 	 */
--	work = kmem_cache_zalloc(async_pf_cache, GFP_NOWAIT | __GFP_NOWARN);
-+	work = kmem_cache_zalloc(async_pf_cache, GFP_NOWAIT);
- 	if (!work)
- 		return false;
- 
+Dong Yang (1):
+  KVM: riscv: selftests: Add missing headers for new testcases
+
+Quan Zhou (2):
+  KVM: riscv: selftests: Add common supported test cases
+  KVM: riscv: selftests: Use the existing RISCV_FENCE macro in
+    `rseq-riscv.h`
+
+ tools/testing/selftests/kvm/Makefile.kvm              | 6 ++++++
+ tools/testing/selftests/kvm/include/riscv/processor.h | 2 ++
+ tools/testing/selftests/rseq/rseq-riscv.h             | 3 +--
+ 3 files changed, 9 insertions(+), 2 deletions(-)
+
 -- 
 2.34.1
 
