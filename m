@@ -1,112 +1,177 @@
-Return-Path: <kvm+bounces-54218-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54219-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5779BB1D2FF
-	for <lists+kvm@lfdr.de>; Thu,  7 Aug 2025 09:08:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6324B1D3F8
+	for <lists+kvm@lfdr.de>; Thu,  7 Aug 2025 10:04:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6DC9F166B70
-	for <lists+kvm@lfdr.de>; Thu,  7 Aug 2025 07:08:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 795AC188A309
+	for <lists+kvm@lfdr.de>; Thu,  7 Aug 2025 08:05:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 267C7230BCC;
-	Thu,  7 Aug 2025 07:08:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DADD24A04D;
+	Thu,  7 Aug 2025 08:04:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="q8h3SWMD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GyOFjGsG"
 X-Original-To: kvm@vger.kernel.org
-Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f51.google.com (mail-oo1-f51.google.com [209.85.161.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E76F1F0E34;
-	Thu,  7 Aug 2025 07:08:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C42762459D2;
+	Thu,  7 Aug 2025 08:04:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754550486; cv=none; b=UltA3gAawvcJ1k+u7FYm1FafB+PwrfKkg3eO9zkVUR1pDnlxduZk8kypnUw6855q0k/YhXNxBEyD9aCFs3W7gPRsqQEqNvcNVxZT0Ehdoq2Fn5chl5fW+Jkoj/BEtF4j6+8hX0j+C5xX2VVPSjdgzJKbczv4KWpM51stAAOhdrI=
+	t=1754553851; cv=none; b=Qj0WjTP7qTchff7y9j5vO3tun3LTSyS4h2wJCztVpOlt+XIhx4ghAao384KMWgHLhppBzFooyAwplBksxVwkjGQ/0SV67xYJBbxCB54v0NXP7m3oroi9X1s6PB5EOHloN1/CSMQpbf39PpbHzxXELn7GFw3zu7BEtzPFSMpVdzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754550486; c=relaxed/simple;
-	bh=hAERWUPiLhlozUtBoCJrHGmE5+TJ8nS2/la8R6RnQFg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lVx+HFB/wC5A8MgrRGNnuZG7Ow8kJetySd/w6ium14OaKibANLtJeSK0P8exkrvUQUXmoi6cJhUdpYdJ7cfb8gBu6kdtjXAYgVlfadejsYREKKdDZcsCnRA4EtJqSR36JlqwjXVw8nqIa6EXxeszlHJ4fbL690VGjVCYZOq/FWM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=q8h3SWMD; arc=none smtp.client-ip=115.124.30.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1754550473; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=x1j0D5e4G22FkHtFUQZnx1eku8o9hze9aSs0LkJshCo=;
-	b=q8h3SWMDgZC7umFXgFPPwtFS9b4AHT8JyRzC1ZZG+Z+dF9GSKzSuaoiThpPjYXnxyhAP1vEYqorFKPqsWMJTdFiDqpAeTn9Mmvbot4/nsiy90Je0Jq9pDAUOAKU/UzIxE85vR4e9uilBeGv815IxZlfxLDPGc8EJGZlVNNexnuk=
-Received: from localhost.localdomain(mailfrom:fangyu.yu@linux.alibaba.com fp:SMTPD_---0WlDLLJk_1754550471 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Thu, 07 Aug 2025 15:07:53 +0800
-From: fangyu.yu@linux.alibaba.com
-To: anup@brainfault.org,
-	atish.patra@linux.dev,
-	paul.walmsley@sifive.com,
-	palmer@dabbelt.com,
-	aou@eecs.berkeley.edu,
-	alex@ghiti.fr
-Cc: guoren@linux.alibaba.com,
-	kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org,
-	linux-riscv@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Fangyu Yu <fangyu.yu@linux.alibaba.com>
-Subject: [PATCH] RISC-V: KVM: Using user-mode pte within kvm_riscv_gstage_ioremap
-Date: Thu,  7 Aug 2025 15:07:29 +0800
-Message-Id: <20250807070729.89701-1-fangyu.yu@linux.alibaba.com>
-X-Mailer: git-send-email 2.39.3 (Apple Git-146)
+	s=arc-20240116; t=1754553851; c=relaxed/simple;
+	bh=dqc9EFJjG8Mr8IC/9Tl9cIt27Y+U76FKz/aNuKscP3c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=As/JUIggqHzQS4dZiDRYZR3WqouRSgAtzHKG3k62fNAwShZRn7fmNBgg7nBy6PYM40RRNtXCAZYsqUGJ22F+kpiTSc7OlvQBTMbt13wbuTRaFFWtiZ3/Xl1KOlMh1bnEMOlp0FpqV3McV1CKSM2EJ6ZW18dnNvT+PdlMrHC7McE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GyOFjGsG; arc=none smtp.client-ip=209.85.161.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oo1-f51.google.com with SMTP id 006d021491bc7-61997c8e2a1so446527eaf.1;
+        Thu, 07 Aug 2025 01:04:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1754553849; x=1755158649; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=8wae+qR5fhE8jQMOdtpw1vQe+BuczBuTenzUdlRZ9tY=;
+        b=GyOFjGsGI5epLdaeSGKkLJOCK2R6BId3OKuY1XJhU6kYclLJ1Gz283KbeUWlf0V7Gs
+         wiPbwfRJFaveRfDwuKRSunbd5bdn0+h9mJOESJh9NdZ7GxpVtjEdVu+kMs8hnbxSunax
+         lQLw5ESOBjJnsazz40fLsMoi6Hh8wRsbs4LI1jKvv5YPbsCbg4HT0rcZoJIfxJPpr/Vj
+         mNYmMgI//ozLl+1sLmn6zchCwhzF1pqmzO5NSFkItyEy3h8jyyzNSELpL1fItoQvhGyc
+         v2BLy4JOhj9ZYwXGYMYCgqlfPd0tTKqTzfvvJ8XqRr6ubVh4/5DOZ7U/Rx3T+VGL14ST
+         sEDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754553849; x=1755158649;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8wae+qR5fhE8jQMOdtpw1vQe+BuczBuTenzUdlRZ9tY=;
+        b=lnlgrkIItMBJahoYXg9y7AQCVNfbdyxPc6DrxuEzZszHyIiLaEt2f/bGHEqasqb+OI
+         fzt38T74D9qNQsuybzIl8p60QImQGEMigJBLzckcTRvfj8kc3rRgC1w0DHwafUFlJdiv
+         ouCsnf5BdHHMazId0390UkOGBpx60V95tPS0HMNGsv00scdSD2oK8blG2mH52tpi3JaZ
+         zfmSqS02W+T1bnGp1f1DAT1NHIo+VCaEKZE0jkdxNk01S4x7ovCUti/EidNIiMzfWDGH
+         3t1DGdT6IZwPrS+rPEDu2T8oNRmJFWhsGDHwt5YhamTLYXxV004ZmnRJslhKkS+2g95R
+         V06A==
+X-Forwarded-Encrypted: i=1; AJvYcCXAnGQhGVK5cGAeaB+QjwL7NRFpEfuqL8xd70aFEqfLEDLtlv2y72q+/rSqrvOq8FJE8MQ=@vger.kernel.org, AJvYcCXu9pGu8MW07ay6rpo3hGSIb8tNubuGXvOzARAxe9ctFsGh5PGVw6o4Vwl8vMIlvtrjmj/z+weCPuj/t3Jh@vger.kernel.org
+X-Gm-Message-State: AOJu0YyBrIMcBCbkuzMfFQfwF3mSopMq/hbB+xmwdSVPt9s9dulSYXXR
+	E9dxxJEyI+bcWOE2HqhQ0oa5qftB93ita8O4uUMW3RG6Av2YPvCH2zJxio/p4rxoI11m1u2Y7GX
+	3jW+gpNC2vwuDjqYgM1lp0rtIpAjWOfU=
+X-Gm-Gg: ASbGncvzrtxcsrv9P+99+cBXehyAX0hGUr01pvQjqwHigUwEF+AeGvfBlSHllI1ilMV
+	dsl8qbQGFdJJ2qEy4yg1dmeQSbORCPshE93aqoHLPSnHacM6shcLG457saXIamHcLs8R4vDFopP
+	GQMsMBTWa54IaE6YSIZbg9EBZLR209NUggBopL85rj1hn+a/PR2wsnIl09JMYvFTA4bC9Y+YFMm
+	2H1LH4=
+X-Google-Smtp-Source: AGHT+IH3rC620Ad0bDM8bPs/dSkuakMXrw+b62dY9ttQbWB+LhmXAlXtlNpoCZtfqdD2ku0pTkueOWNxOghxYLJZQz8=
+X-Received: by 2002:a4a:ee19:0:b0:619:a34b:3e29 with SMTP id
+ 006d021491bc7-61b6ed17b1amr1746527eaf.1.1754553848581; Thu, 07 Aug 2025
+ 01:04:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250806081051.3533470-1-hugoolli@tencent.com> <aJOc8vIkds_t3e8C@google.com>
+In-Reply-To: <aJOc8vIkds_t3e8C@google.com>
+From: hugo lee <cs.hugolee@gmail.com>
+Date: Thu, 7 Aug 2025 16:03:56 +0800
+X-Gm-Features: Ac12FXxHJZjqVcXiDcK5WpwSoEYWRRNT84CAqoxo1hkGbDkaTZtrLeDUrHvcNo0
+Message-ID: <CAAdeq_+Ppuj8PxABvCT54phuXY021HxdayYyb68G3JjkQE0WQg@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86: Synchronize APIC State with QEMU when irqchip=split
+To: Sean Christopherson <seanjc@google.com>
+Cc: pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Yuguo Li <hugoolli@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
 
-From: Fangyu Yu <fangyu.yu@linux.alibaba.com>
+On Thu, Aug 7, 2025 Sean Christopherson wrote:
+>
+> On Wed, Aug 06, 2025, Yuguo Li wrote:
+> > When using split irqchip mode, IOAPIC is handled by QEMU while the LAPIC is
+> > emulated by KVM.  When guest disables LINT0, KVM doesn't exit to QEMU for
+> > synchronization, leaving IOAPIC unaware of this change.  This may cause vCPU
+> > to be kicked when external devices(e.g. PIT)keep sending interrupts.
+>
+> I don't entirely follow what the problem is.  Is the issue that QEMU injects an
+> IRQ that should have been blocked?  Or is QEMU forcing the vCPU to exit unnecessarily?
+>
 
-Currently we use kvm_riscv_gstage_ioremap to map IMSIC gpa to the spa of
-guest interrupt file within IMSIC.
+This issue is about QEMU keeps injecting should-be-blocked
+(blocked by guest and qemu just doesn't know that) IRQs.
+As a result, QEMU forces vCPU to exit unnecessarily.
 
-The PAGE_KERNEL_IO property does not include user mode settings, so when
-accessing the IMSIC address in the virtual machine,  a  guest page fault
-will occur, this is not expected.
+> > This patch ensure that KVM exits to QEMU for synchronization when the guest
+> > disables LINT0.
+>
+> Please wrap at ~75 characters.
 
-According to the RISC-V Privileged Architecture Spec, for G-stage address
-translation, all memory accesses are considered to be user-level accesses
-as though executed in Umode.
+Thanks for reminding, will do in the next patch.
 
-Signed-off-by: Fangyu Yu <fangyu.yu@linux.alibaba.com>
----
- arch/riscv/kvm/mmu.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+>
+> > Signed-off-by: Yuguo Li <hugoolli@tencent.com>
+> > ---
+> >  arch/x86/include/asm/kvm_host.h | 1 +
+> >  arch/x86/kvm/lapic.c            | 4 ++++
+> >  arch/x86/kvm/x86.c              | 5 +++++
+> >  include/uapi/linux/kvm.h        | 1 +
+> >  4 files changed, 11 insertions(+)
+> >
+> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > index f19a76d3ca0e..f69ce111bbe0 100644
+> > --- a/arch/x86/include/asm/kvm_host.h
+> > +++ b/arch/x86/include/asm/kvm_host.h
+> > @@ -129,6 +129,7 @@
+> >       KVM_ARCH_REQ_FLAGS(32, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+> >  #define KVM_REQ_UPDATE_PROTECTED_GUEST_STATE \
+> >       KVM_ARCH_REQ_FLAGS(34, KVM_REQUEST_WAIT)
+> > +#define KVM_REQ_LAPIC_UPDATE              KVM_ARCH_REQ(35)
+> >
+> >  #define CR0_RESERVED_BITS                                               \
+> >       (~(unsigned long)(X86_CR0_PE | X86_CR0_MP | X86_CR0_EM | X86_CR0_TS \
+> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> > index 8172c2042dd6..65ffa89bf8a6 100644
+> > --- a/arch/x86/kvm/lapic.c
+> > +++ b/arch/x86/kvm/lapic.c
+> > @@ -2329,6 +2329,10 @@ static int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
+> >                       val |= APIC_LVT_MASKED;
+> >               val &= apic_lvt_mask[index];
+> >               kvm_lapic_set_reg(apic, reg, val);
+> > +             if (irqchip_split(apic->vcpu->kvm) && (val & APIC_LVT_MASKED)) {
+>
+> This applies to much more than just LINT0, and for at least LVTPC and LVTCMCI,
+> KVM definitely doesn't want to exit on every change.
 
-diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
-index 1087ea74567b..800064e96ef6 100644
---- a/arch/riscv/kvm/mmu.c
-+++ b/arch/riscv/kvm/mmu.c
-@@ -351,6 +351,7 @@ int kvm_riscv_gstage_ioremap(struct kvm *kvm, gpa_t gpa,
- 	int ret = 0;
- 	unsigned long pfn;
- 	phys_addr_t addr, end;
-+	pgprot_t prot;
- 	struct kvm_mmu_memory_cache pcache = {
- 		.gfp_custom = (in_atomic) ? GFP_ATOMIC | __GFP_ACCOUNT : 0,
- 		.gfp_zero = __GFP_ZERO,
-@@ -359,8 +360,11 @@ int kvm_riscv_gstage_ioremap(struct kvm *kvm, gpa_t gpa,
- 	end = (gpa + size + PAGE_SIZE - 1) & PAGE_MASK;
- 	pfn = __phys_to_pfn(hpa);
- 
-+	prot = pgprot_noncached(PAGE_WRITE);
-+
- 	for (addr = gpa; addr < end; addr += PAGE_SIZE) {
--		pte = pfn_pte(pfn, PAGE_KERNEL_IO);
-+		pte = pfn_pte(pfn, prot);
-+		pte = pte_mkdirty(pte);
- 
- 		if (!writable)
- 			pte = pte_wrprotect(pte);
--- 
-2.39.3 (Apple Git-146)
+Actually every masking on LAPIC should be synchronized with IOAPIC.
+Because any desynchronization may cause unnecessary kicks
+which rarely happens due to the well-behaving guests.
+Exits here won't harm, but maybe only exit when LINT0 is being masked?
+Since others unlikely cause exits.
 
+>
+> Even for LINT0, it's not obvious that "pushing" from KVM is a better option than
+> having QEMU "pull" as needed.
+>
+
+QEMU has no idea when LINT0 is masked by the guest. Then the problem becomes
+when it is needed to "pull". The guess on this could lead to extra costs.
+
+> At the very least, this would need to be guarded by a capability, otherwise
+> the new userspace exit would confuse existing VMMs (and probably result in the
+> VM being terminated).
+
+True, I'll add this protection.
+
+>
+>
+> > +                     kvm_make_request(KVM_REQ_LAPIC_UPDATE, apic->vcpu);
+> > +                     kvm_vcpu_kick(apic->vcpu);
+>
+> Why kick?  Cross-vCPU writes to LINT0 shouldn't be a thing, i.e. the kick should
+> effectivel be a nop.
+
+It is unnecessary, I will fix it in the next version.
 
