@@ -1,216 +1,200 @@
-Return-Path: <kvm+bounces-54208-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54209-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55A77B1CF2E
-	for <lists+kvm@lfdr.de>; Thu,  7 Aug 2025 00:52:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73F92B1CFA0
+	for <lists+kvm@lfdr.de>; Thu,  7 Aug 2025 02:02:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 06AAF18C4F4F
-	for <lists+kvm@lfdr.de>; Wed,  6 Aug 2025 22:52:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 583FC7B0C23
+	for <lists+kvm@lfdr.de>; Thu,  7 Aug 2025 00:01:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49B00230BF6;
-	Wed,  6 Aug 2025 22:52:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E74D21F5E6;
+	Thu,  7 Aug 2025 00:02:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rW7oFrSm"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="LCS9QAOa"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2059.outbound.protection.outlook.com [40.107.236.59])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E752522AE7A
-	for <kvm@vger.kernel.org>; Wed,  6 Aug 2025 22:52:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754520723; cv=none; b=lpUMCkbz7TcJpohD8ieC3Xju3r+aNFFrhzZGF1f16iZ+w6wh+sCd2r8lTY/TQ4pLG+f2M/UcA6Hl3yryDyboUa6i4Es3MrNWWC4yIU75DCZsRmfWey41xGvOW6uCC+LEsKjTNs+H1aJc/9VwmkzHqnmtbgRapoIj/u3GPUq0pJk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754520723; c=relaxed/simple;
-	bh=S0khaiV2Yjbn0vrnETjyIgfSHs7y3d46GzkAPO4gkk8=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=N8axAwbG7AlBrXc/Wwt2IRnsimGrMsVh1WCCt2iWf2XjE0NK3qeAOX87S1QaJCkMQYFcJ35IWQ7FcOyfPxO7PdfEP/SOqZTbZgN03oLqykZpaGeI44YGI6PSLf6HaNAdWH1BZqpByGIMrPEJYmcia9xzEOhEMyFaKHeS5iuP6kg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rW7oFrSm; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-31f5f70a07bso565426a91.3
-        for <kvm@vger.kernel.org>; Wed, 06 Aug 2025 15:52:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754520721; x=1755125521; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Nb/+hiSIBqzVp6CSex90Vi5aXgUoBso6lv3HIdZ3rLE=;
-        b=rW7oFrSmwKPZEvrLM7LNn25xNZlRuAPz73NkK8FexQPbl2SBYUfz2sU2xlfLiEYHiq
-         HuIdeYMfqJoZHOfWgfQl7ViUXDu1Mtl6SNmPw+evMTFXBNfEWoly+X7lS1/WpLAD4qSY
-         Cj1CTw8ctWHj9Fwv5PKvnTqY+VOyAy+5/dQ6F426+DoS7UFXtOQ6f3K9CElmIccHhQdG
-         glpt0v3hPNqi07yj5TOMPY+7V6thOizbSm4PzWQ72GVhVrUmcPD6bGzkl6NGFN3iA1TH
-         DUiBJDbyqOWFBz6Cy2ZSNUjP3mhlxuVOmON2+xwmSXDc10cMNoY8hxF/LjsJszLZYTvy
-         pQhQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754520721; x=1755125521;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Nb/+hiSIBqzVp6CSex90Vi5aXgUoBso6lv3HIdZ3rLE=;
-        b=LjKGbLXYAXP3TWS0CnUwJN1P3DIkSGpIQ6XsY2t6spI1dGdPCtL6Suqw1SdGXCJvfi
-         wwel4D8Kw38R4GmL+GQkSTZ6e8cwulwo2lj9PKZAA9UHwkJgfiDduMHckebRySrquIzg
-         RlYNCg7vOkyjMwQlxlf8vHL8TxSvCa8CUghMNR2AMsIBQ0r2EKPb4rqzhssS75PrxPuf
-         IQm5Y/aNd84C/jbGNE7GXjDbuM5u6SGxFR57NwkNEx8lLdDDOVq9mM7zg6ZR9itX2sZ/
-         VPjTuiHa2AihtvEOPrDnCrnTsAfLw1OOT9MJu1GyXornOc7STQkBy9RwgqYSYM3IZqxg
-         CWXg==
-X-Gm-Message-State: AOJu0YzysARIOQYrb3bUN40Z2eCl1SiG14gS4Zu0NdNxVr2b5yuaQIMQ
-	DGPDweze60hi6ZVCNgwC/XIYZgZTs/X0PlsuV7364C3gYJd+RU8YVy8HTGgXXDrM2J7YVFjUuX6
-	rwIixxw==
-X-Google-Smtp-Source: AGHT+IEW0Iq87ZeOVm0vGfsBGLoOolJN4ayD/9hByHJThL7Q0jxR2SZQ2q7ZCQ+ffQ8GezO+fBMLEhiVT8U=
-X-Received: from pjpq9.prod.google.com ([2002:a17:90a:a009:b0:31e:cee1:4d04])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4cc1:b0:31f:59d1:85be
- with SMTP id 98e67ed59e1d1-3216756d193mr5768264a91.24.1754520721324; Wed, 06
- Aug 2025 15:52:01 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed,  6 Aug 2025 15:51:59 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7855F14F98;
+	Thu,  7 Aug 2025 00:02:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.59
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1754524934; cv=fail; b=dwROTPckFpkVpk+deS6C8MtqU3kzImDqTa7hwY5fq8sYfqWaoSuUMXpMfO7jUKiBsuKn0X8oWmN6c4sV61sWu3hnk5ooEHw79r6FZJ6wp3d0fI180HkAzo2gmHo9kMqPyvN0FNsmLhDe4wLNBGUgyAhx79ZLPPeFhOEn6VhYXds=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1754524934; c=relaxed/simple;
+	bh=KBE8b6MiWrRjf/kqJz9zAo5DPJO02Y0532SBF5S68cc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=TBFbOCaz3v85vtFmWlxLe3N5X5G+A0AEpVUX8QTuuvRMOT2bqsoCeTOn+YLImWnoq4hOIYKtiOaINyB2wRH0Bef09y8frV2wsB7H/elHiFpBTboONphUjwMQaJuBT3lIJ4y/M9i+nro6ZW+XyEFfjDC0DJrbP89PsZSvMyuYvE8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=LCS9QAOa; arc=fail smtp.client-ip=40.107.236.59
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=bzJRsSkuSdwpBC20tXnUgAgWhhCanWNP72ggyGsKCGwjehvFHzKcsNA//8dX8gI+U+Rl1zNzDGVmKwCudCC8cD0HMJ2oxwHfZ4hzsSdMplHno/c0qZEnDLbT1WfY+Gq2IE5i+wOi3TqL6AzxCEUnD+TtHTlDcGuU0wpmaOrZGA/Y4RRHcZwFBb+HQTw0k6azOKoFSlF1qXTICFvoLzEtBX9ELgkpLf6X54xUzT3wSFqUZgh5b+UKCyezd9upAzGt+FFE85e/ttIcnadheSqm2uc3zCRvQgyRv59NFEUQnC2ucBduNiMhaHCnw0HnXXVKSxNn67R+hkXV4+G8uZrcaw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=x9BpYJU1q1VVVp9RyKtd/Sa713iezlK0JgA40wwO0EY=;
+ b=XeVduyeeJn3nmTcgJIgHp6vOUWPFfvr2nZ+HwaQ/+uE1lRXn3JUenefUHx/3hzOvzAiIHpyQ+6iBEIggn0kXI/C28PlkB7BSLwZ/+4QuuqTCGELmGjUcEvhqlhAz8LvJOwjfkBZyQz9lJEp/Jq+aa9oqSOPVGsqsH3P2Fx/p4f5o9iruxF9cHFKi6rX9Dyh5pIdr5/rCr0GtzPfrDtjE+hrcJK4NQoHE/mN3vwnd1g8gVc5Vjp7HoBvHlKUK45vfTrNVflltSL2sjSkoSKuQIin/yraUu3bzfbCzLY+Zyi5Fyo89s9b9HpDHj3UI9TpVP4lfOZl/tYOiF73MaQr4pA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=x9BpYJU1q1VVVp9RyKtd/Sa713iezlK0JgA40wwO0EY=;
+ b=LCS9QAOaqsmvX1iJ8MKZO5jDfkc1pQLnHo1RLUgkoN4Ybu39ZRweFejEhOlbCt0txkm3lDPD6QaUcgBDY1tgiE/VEAOtzKG6rQP8anjP17ByEXCsh2pWkcMA+OwRYEEsTKPbA0IoA9WrG7d2bZJ7ZDCVLD3A6sUqdFv/RLOfMtZcnyUqZjgFgWCbKvtGfNFKizvDH8+xPFZHgX15zqZF5JHyHdNMm6T5ABsmAIlwgwNqEO1YIzInCmpR9RVgfcNHEcyGyOdC42bZJtAxXLI2eV81LBJpK9Od8bISlqYB9GholBZv33FAXbw6yOE2RfPA+cnsB4sAsqb9IYpdhv+Eqw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
+ by LV8PR12MB9109.namprd12.prod.outlook.com (2603:10b6:408:18a::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9009.15; Thu, 7 Aug
+ 2025 00:02:09 +0000
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732%4]) with mapi id 15.20.9009.013; Thu, 7 Aug 2025
+ 00:02:08 +0000
+Date: Wed, 6 Aug 2025 21:02:07 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Leon Romanovsky <leon@kernel.org>, Leon Romanovsky <leonro@nvidia.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+	Christoph Hellwig <hch@lst.de>, dri-devel@lists.freedesktop.org,
+	iommu@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
+	Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+	linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+	linux-mm@kvack.org, linux-pci@vger.kernel.org,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Vivek Kasireddy <vivek.kasireddy@intel.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v1 04/10] PCI/P2PDMA: Refactor to separate core P2P
+ functionality from memory allocation
+Message-ID: <20250807000207.GE184255@nvidia.com>
+References: <cover.1754311439.git.leon@kernel.org>
+ <cab5f1bfd64becafcc887107bb4386f2c8630ef3.1754311439.git.leon@kernel.org>
+ <20250806154214.1c2618e8.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250806154214.1c2618e8.alex.williamson@redhat.com>
+X-ClientProxiedBy: YT3PR01CA0121.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:b01:83::27) To CH3PR12MB8659.namprd12.prod.outlook.com
+ (2603:10b6:610:17c::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.50.1.565.gc32cd1483b-goog
-Message-ID: <20250806225159.1687326-1-seanjc@google.com>
-Subject: [PATCH] KVM: selftests: Move Intel and AMD module param helpers to x86/processor.h
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|LV8PR12MB9109:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8cbc89e3-d490-4494-247e-08ddd545a6f0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?OXo7GkDC2PvcuLcpWxpUmMCBklvVDMllEtIh6M/0IaVrAKwpnqkItAHSyNnQ?=
+ =?us-ascii?Q?qOb1RJubV1NApWhapU5C5BWLmniml+DljGBCTcnS/b7mRruB+mi1kDbapZT1?=
+ =?us-ascii?Q?QrfTZeNkp5CaZfH0tSbq/sHTIahh+LbYR8UaMYWceSTjVWRM/BzM8jPShMwF?=
+ =?us-ascii?Q?Q9c/W4su5xZh37TcCXox7ixpjADCQd8ggawHRiFVXrH/xnyc7QIB6qqF7tDS?=
+ =?us-ascii?Q?YoL+ht9BSM/aQtAf3f0WGwZIrExlP8sXXQ+E4hKO7l9g3kvv97IuUl0Ijgxq?=
+ =?us-ascii?Q?5Ui/Pqa7zlyIInRGGvW4GQi6W3zLKj+pn2htg7spmHFdqL9Ho0cb4hDDP6xq?=
+ =?us-ascii?Q?QQ6YcsPHoYTAMENXSK2429GmGUL53iMiA3zDf7zLllDMu6vH/CQtPLjz8si8?=
+ =?us-ascii?Q?greSqlMhHacl7KDGHpwbnJNOkf2hcwVlAsFmC9VGreG4l3tRo25eJB7vghVh?=
+ =?us-ascii?Q?aXEeiC/9PBpjHVPHD0ZBkrP7Vg0SDweSkyeOpi//CtQH2exjTj6OjDa8l8gy?=
+ =?us-ascii?Q?po8nF41aYjo+I7FizxXhRslbnsDST0wAr1KgEPFlV+GB72R67CkGAU4WmC9+?=
+ =?us-ascii?Q?G8Tf1M705ue/VvgAl/BD/XxhkBA7YiSli8YRgDLUXvpc0wM5sjC17wUp69fP?=
+ =?us-ascii?Q?Bqih7+N4oh6Q7A8TA2SPVWvdnwcfbjdzDW+fpSbH2wweR0sEGD+jGzQZSJeS?=
+ =?us-ascii?Q?HaZSqkP0pMRCPKdUp4ukytQvN+BqBIFNNd0udhpNHjsLxYSN/ZomnIdoXrU6?=
+ =?us-ascii?Q?AY6hoxwWXuaic8eOuMtAy+hV7x5STwo+htv0JGvIs7KThkfFYxg2GXAP3Byj?=
+ =?us-ascii?Q?8UdSvk2wDzzk6Mty/zyoV50zyRuZbCLuic0T09yuq4pXdzFSX8RL11vjloO7?=
+ =?us-ascii?Q?9ZOEkB43sSHKJFszxhQLEhjRcw7oLckcP9bxEQBcxWgsrMvctKhiRwVNxKX6?=
+ =?us-ascii?Q?FxZHu5i3WcjbHHPu8WDfsIGw5AYPbSaprmRw+Mm6qEUyCu/HVrQC66idI+lr?=
+ =?us-ascii?Q?+rLn2iMeyf5RypJOhsGMU4n3tUsgKcfCVSEL3+vuGswzzPw3OtTzC9/bHV10?=
+ =?us-ascii?Q?a8bebS3hbI1aOJED0+uefHYi4q6FHjt0PxQQdH6oA1+FXFTGSdCnR1ueWejv?=
+ =?us-ascii?Q?+gSQl7GdFMsHtshQXyYW32kpBP53Cz+J75KsypctnIoV7fsgHxmufk+JMQS7?=
+ =?us-ascii?Q?xYLXLmP9RABgbw9Q3vwZD1tU6YASAaYcUtsVvx9hwetbvH3G0lPAPtPTjz9C?=
+ =?us-ascii?Q?EcjraV0OWUBHAzxnR6S5j2djTi+HOLwODy5IpYkRU4/tnPvz+HwjW4znMHe7?=
+ =?us-ascii?Q?XB54W0tJZjCNEPpoRpIWlD2tSc7fgeAbbwq5HLiJEAXQ9kg3UgldzYcgrdCR?=
+ =?us-ascii?Q?kHQbL2wAEy5OMF3iXPmDJIrrxLFx/El6hFRoGHlL5D5O/nFbFQQ1Chd7OgQ0?=
+ =?us-ascii?Q?We/D5Enm1SU=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?07yU9u29SbbgDgbaa0s0BYhIsGM65Ty9jp+rLP6Nr4LfE9StweDQ5iuoOx38?=
+ =?us-ascii?Q?V3oKnFAXmpcw4PTSreyAi0DJFyu/th2tyA9Vh1rWmr//C1Btw2xWJ4nPJmQr?=
+ =?us-ascii?Q?CCeXvMUWN+xmda4p7cAh7IZhMg5aSkz2GYZpwKs9JqSlYXASDLS7xcW6Lwdq?=
+ =?us-ascii?Q?xnsxAq3MoG7FOhqUhU3htJMyMl0jN+CeDkP7RzjaLnPXMTZPHH/8JQvpyr1k?=
+ =?us-ascii?Q?gJL03/fKQdYY4mTZPx0z8CF1YFLD2AhLDMdM3aR2ATNyizdNRaSr9WgWDskr?=
+ =?us-ascii?Q?EAATlkLmB8wBXjkSXABpKgoSvCugeJI8WgH7DJ2TXWmLUQm9YNqs4t+/0ov0?=
+ =?us-ascii?Q?azEE7C6d05ioj9Ch4drJ0aZac8ApxMKk3CmVfPY3awh0bk/AtWpt4dKN00uP?=
+ =?us-ascii?Q?ioeOxsPAR5ZVcV/3STEptQ5tI87uwbhM2Vhqi5qfXEAVdLnHhcl/MMBSpjs9?=
+ =?us-ascii?Q?DaCxMOPKb7Zw2MXR9TR7Ku591wYPNKFO8lzeHXUtlyZCq4b4Q5Ed1vlpUFwl?=
+ =?us-ascii?Q?QNu0LgXYZ70sz5PUF4GdElCxJLMbLhQIS7SVZeYWt25oAqsgeGWhZADUGIK3?=
+ =?us-ascii?Q?Q/BND8jrZQfZJS0pAv3cSEjGCmRgKPXec10y/2dtms/+aWbP0H+gYMjQbMM/?=
+ =?us-ascii?Q?A/nJc/1UPVLK8L4urgQj6g3huFXUJnmL1u9rtIuDjA+2TBgDwxtZxvU6bAkw?=
+ =?us-ascii?Q?h5ijcVTBTvwvKwrddj+j2W+U90FzQVxmoZE+4mUP6Vo+ApRfAXGVH1po9lmN?=
+ =?us-ascii?Q?RTJe4Ihu32la0UGEDJoicfMSB9oSL60hHFmzgNnxLYChOM/jlIau/jfdUlFt?=
+ =?us-ascii?Q?ivXwAw8vBciUoHuxGAEW9ajI0RqD8G9QwsEo7Q5glvqwFyQ3JM6G3r5Tj8kZ?=
+ =?us-ascii?Q?MTKOKMf/jx9R9sls5xuPnwHeMUzNhshlhVAqUk0U4iwNhxg2QbCNSE1AwrJS?=
+ =?us-ascii?Q?fIQ5VjI5m5R19b/YVhbTSWS+3q+JvwJZm/aeMYeXu1tqoYVW5d3JAw1UqUQh?=
+ =?us-ascii?Q?lcxsPZTcV9H+8gYmeJGVtp+RgppGkMbAjEGJq/ZMGUfqn6pNrj1S/2SgvJMD?=
+ =?us-ascii?Q?aIUyvvQRcdtfUgjMACmloXk9udLoKSCsJY33pi69iIpg+9JFPw1N9lPKo8ZY?=
+ =?us-ascii?Q?b8Z/dSOIepgcXBf4KMzRvapkh5VUpFVi42jnBGbLhEQMeNHFQL/YLLsGAsj/?=
+ =?us-ascii?Q?BownYATT+Re7AIQDYpPu8GN/9upzHedV/uqq8uhkZMebaFS1S6q5SSTT0URf?=
+ =?us-ascii?Q?dEumJ5bmYm2cZ6C4XyQfeyAFO+f4PPqoRFGnRUx6WuGDNu/ytEE+o8DVNZ1k?=
+ =?us-ascii?Q?x64T2xlIckT+WVHxPcXI83eANxCZ41CJOlnYmntwtGATHKnE4rUwj9XWj8tv?=
+ =?us-ascii?Q?OA4HZiGvYtDWSKLe+ZYSYp3dgA2UEbOgHQ2fdvDmI1n5SmH7r8GVsbpBcL/C?=
+ =?us-ascii?Q?p3SsKfT7XLfNXnsHOX5t5o+JTeMpAUKy7ktXxvmVrX+wppGawroV8c+QMHT0?=
+ =?us-ascii?Q?e/4ZTOK5zDqVl2Ha/2Zhuq5KeoO6laKtnAD/KCnR5ne7WJj9qpH12eMWcTOv?=
+ =?us-ascii?Q?TV6xg+1MVqF+Y79Kujk=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8cbc89e3-d490-4494-247e-08ddd545a6f0
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Aug 2025 00:02:08.8420
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 2bhw1jjqSaLhKRrNCTkgHjJXt5dzSnnelSSf7LezGHuUX7YA071SoA1P6o+3ExZQ
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR12MB9109
 
-Move the x86 specific helpers for getting kvm_{amd,intel} module params to
-x86 where they belong.  Expose the module-agnostic helpers globally, there
-is nothing secret about the logic.
+On Wed, Aug 06, 2025 at 03:42:14PM -0600, Alex Williamson wrote:
+> > +	p2p->mem.owner = &pdev->dev;
+> > +	/* On all p2p platforms bus_offset is the same for all BARs */
+> > +	p2p->mem.bus_offset =
+> > +		pci_bus_address(pdev, 0) - pci_resource_start(pdev, 0);
+> 
+> But not all devices implement BAR0, nor is BAR0 necessarily in the
+> memory space, wouldn't this calculation be wrong if BAR0 were
+> unimplemented or an IO BAR?  
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- .../testing/selftests/kvm/include/kvm_util.h  | 17 ++++++----
- .../selftests/kvm/include/x86/processor.h     | 20 +++++++++++
- tools/testing/selftests/kvm/lib/kvm_util.c    | 34 ++-----------------
- 3 files changed, 33 insertions(+), 38 deletions(-)
+I think you are correct about this.
 
-diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-index 23a506d7eca3..652ac01e1adc 100644
---- a/tools/testing/selftests/kvm/include/kvm_util.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util.h
-@@ -260,13 +260,18 @@ int __open_path_or_exit(const char *path, int flags, const char *enoent_help);
- int open_path_or_exit(const char *path, int flags);
- int open_kvm_dev_path_or_exit(void);
- 
--bool get_kvm_param_bool(const char *param);
--bool get_kvm_intel_param_bool(const char *param);
--bool get_kvm_amd_param_bool(const char *param);
-+int kvm_get_module_param_integer(const char *module_name, const char *param);
-+bool kvm_get_module_param_bool(const char *module_name, const char *param);
- 
--int get_kvm_param_integer(const char *param);
--int get_kvm_intel_param_integer(const char *param);
--int get_kvm_amd_param_integer(const char *param);
-+static inline bool get_kvm_param_bool(const char *param)
-+{
-+	return kvm_get_module_param_bool("kvm", param);
-+}
-+
-+static inline int get_kvm_param_integer(const char *param)
-+{
-+	return kvm_get_module_param_integer("kvm", param);
-+}
- 
- unsigned int kvm_check_cap(long cap);
- 
-diff --git a/tools/testing/selftests/kvm/include/x86/processor.h b/tools/testing/selftests/kvm/include/x86/processor.h
-index 2efb05c2f2fb..488d516c4f6f 100644
---- a/tools/testing/selftests/kvm/include/x86/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86/processor.h
-@@ -1314,6 +1314,26 @@ static inline uint8_t xsetbv_safe(uint32_t index, uint64_t value)
- 
- bool kvm_is_tdp_enabled(void);
- 
-+static inline bool get_kvm_intel_param_bool(const char *param)
-+{
-+	return kvm_get_module_param_bool("kvm_intel", param);
-+}
-+
-+static inline bool get_kvm_amd_param_bool(const char *param)
-+{
-+	return kvm_get_module_param_bool("kvm_amd", param);
-+}
-+
-+static inline int get_kvm_intel_param_integer(const char *param)
-+{
-+	return kvm_get_module_param_integer("kvm_intel", param);
-+}
-+
-+static inline int get_kvm_amd_param_integer(const char *param)
-+{
-+	return kvm_get_module_param_integer("kvm_amd", param);
-+}
-+
- static inline bool kvm_is_pmu_enabled(void)
- {
- 	return get_kvm_param_bool("enable_pmu");
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index c3f5142b0a54..b20d242ddcbe 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -95,7 +95,7 @@ static ssize_t get_module_param(const char *module_name, const char *param,
- 	return bytes_read;
- }
- 
--static int get_module_param_integer(const char *module_name, const char *param)
-+int kvm_get_module_param_integer(const char *module_name, const char *param)
- {
- 	/*
- 	 * 16 bytes to hold a 64-bit value (1 byte per char), 1 byte for the
-@@ -119,7 +119,7 @@ static int get_module_param_integer(const char *module_name, const char *param)
- 	return atoi_paranoid(value);
- }
- 
--static bool get_module_param_bool(const char *module_name, const char *param)
-+bool kvm_get_module_param_bool(const char *module_name, const char *param)
- {
- 	char value;
- 	ssize_t r;
-@@ -135,36 +135,6 @@ static bool get_module_param_bool(const char *module_name, const char *param)
- 	TEST_FAIL("Unrecognized value '%c' for boolean module param", value);
- }
- 
--bool get_kvm_param_bool(const char *param)
--{
--	return get_module_param_bool("kvm", param);
--}
--
--bool get_kvm_intel_param_bool(const char *param)
--{
--	return get_module_param_bool("kvm_intel", param);
--}
--
--bool get_kvm_amd_param_bool(const char *param)
--{
--	return get_module_param_bool("kvm_amd", param);
--}
--
--int get_kvm_param_integer(const char *param)
--{
--	return get_module_param_integer("kvm", param);
--}
--
--int get_kvm_intel_param_integer(const char *param)
--{
--	return get_module_param_integer("kvm_intel", param);
--}
--
--int get_kvm_amd_param_integer(const char *param)
--{
--	return get_module_param_integer("kvm_amd", param);
--}
--
- /*
-  * Capability
-  *
+> Even within memory BARs I can imagine different translations for 32
+> vs 64 bit, prefetch vs non-prefetch, but per the comment I guess
+> we're excluding those.  Thanks,
 
-base-commit: 196d9e72c4b0bd68b74a4ec7f52d248f37d0f030
--- 
-2.50.1.565.gc32cd1483b-goog
+Humm, I had thought it was consistent for the device, but I guess not:
 
+	resource_list_for_each_entry(window, &bridge->windows) {
+		if (resource_contains(window->res, res)) {
+			offset = window->offset;
+
+Seems like each window can have its own offset.
+
+So the p2p should be made per-bar, and hold the bar index from the
+constructor..
+
+Jason
 
