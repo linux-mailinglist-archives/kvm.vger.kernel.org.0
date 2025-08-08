@@ -1,117 +1,143 @@
-Return-Path: <kvm+bounces-54340-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54341-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94CCEB1F12B
-	for <lists+kvm@lfdr.de>; Sat,  9 Aug 2025 00:59:42 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D7DEB1F139
+	for <lists+kvm@lfdr.de>; Sat,  9 Aug 2025 01:08:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3644583138
-	for <lists+kvm@lfdr.de>; Fri,  8 Aug 2025 22:59:42 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 6E0674E0F60
+	for <lists+kvm@lfdr.de>; Fri,  8 Aug 2025 23:08:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA436270ED5;
-	Fri,  8 Aug 2025 22:59:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A10A427380E;
+	Fri,  8 Aug 2025 23:08:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kSLrxZLq"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="uh8iDmv7"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8E4D2620F1
-	for <kvm@vger.kernel.org>; Fri,  8 Aug 2025 22:59:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7E9921D5BB
+	for <kvm@vger.kernel.org>; Fri,  8 Aug 2025 23:08:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754693974; cv=none; b=YmUhjzqqQ5BILMyHgVPBdATxOQ3JgfnZfc41xux/RKNiLmIpk8EqOrU7ThapHCSZaSZmc746NQSH49XzfKiliBdbqHpxkRJ0It67Mu5TlIK9IzUSa19Io/eJET71hPILu4IjqlHdKygOqjZXaiYkz52s/7Qs396D6gHwjkvyKdE=
+	t=1754694521; cv=none; b=Rd3GlDwccsFg4T/KArL7B01RgGB+3HhNS9AciszN7OyM9+GEAatxeknO0YTLZvnVmFT9Odqm3bWqNxapSqrPw+v/9IUY467uR0ZavJ5Rc5o7i/ymWf6TBQrnA1C7cJ1nQcSCGhp+rQ56TvlFJd0LVymzloI5Yol8oCkmV+X9GaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754693974; c=relaxed/simple;
-	bh=hfw6d65qE4NY1/7CpgoSiv6vEJ+cf8nu9gOj8B3/AWw=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=NzfIry7gIzYZt+C3AqXBRrXTAo/Q2hpvBxGC4PdNWWyxhZ33aVMpAdNYwNYN+SxzOWCLkt/1+sZ4cjKhxYJEQHFKviOtczaAEFOtk7hy9u0YLzgi37GhsqgWNsWRTw+t+jPQhgl09wh8liAbJIV2ktf5lwSVrfCUyRqM83inKI8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kSLrxZLq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6372FC4CEF6
-	for <kvm@vger.kernel.org>; Fri,  8 Aug 2025 22:59:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754693973;
-	bh=hfw6d65qE4NY1/7CpgoSiv6vEJ+cf8nu9gOj8B3/AWw=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=kSLrxZLqJyT96f0aQdB7rOTt81aXuGlqYSZ2O2+43aZ+CsLBBiKL3VWOZ8MTEfnWG
-	 7G4znr/ssUg2uFmHBj1N9vsJksaXojxHZpypDhBS7fOqgKC0w+a5PwVcayPv4or0uW
-	 fO9zyUc1GtU9y0ICe+aQSN/2HrEc6iNsv30qnhppZo8nebVWrugqhAoWJd/N8nag/y
-	 cHgk19aDlMDJj8iV5IZfAbM7whJQpusJssAT82KPXhVT6gWGWIa75yo2HkQsywhOE9
-	 P7LRtL561VHhAKKucdcmCdb1NEVritrZctmWh55J4k5rYHh1lKY7L2sdmcKDw9cUjH
-	 nzd/90W5xyS/A==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 5CCC2C433E1; Fri,  8 Aug 2025 22:59:33 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: kvm@vger.kernel.org
-Subject: [Bug 218792] Guest call trace with mwait enabled
-Date: Fri, 08 Aug 2025 22:59:33 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: seanjc@google.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-218792-28872-5sylPIVpHD@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-218792-28872@https.bugzilla.kernel.org/>
-References: <bug-218792-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=arc-20240116; t=1754694521; c=relaxed/simple;
+	bh=kbsQ31aSNCemwZhBnbzsJeSuRfAVPY2j5geuXdv6z8o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=O16X7Umlwuk+5isFoJfIncWo5TTT8/ImXnJVkeCgvydCb1YUjw7VtViNqhotzAPSDVzMVE/gI0aSvaHeW8PDhl98mSlN0P3NlnBsNaOpBmZBD4QYL5YaN320gmy/Wq25ZzxfdagvD8zFv5TKp02o0LjDUf4mSgmTvUgmTZ+g034=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=uh8iDmv7; arc=none smtp.client-ip=95.215.58.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Fri, 8 Aug 2025 16:08:18 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1754694507;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dKxQUSmpTCdRhHeB+mUzyq09Je0k79BxYRE2H27YH/E=;
+	b=uh8iDmv79ewEgnftriRVVLaUf8NnoGiKpNpDcqs/ZBuvIoGlELbgtdqdFDYNIIl66czDB2
+	ounj7qjpP4ivL4I5uV6iItD2v9UdS/JHTEAoVVhAFztQ0ArM3UnQkhb34cFPXj+J6QH7y7
+	918JoUjZXL5FuLYycMvc4LkU3Y1Gz2Q=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Kees Cook <kees@kernel.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
+	devel@daynix.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH RFC v2 1/2] KVM: arm64: PMU: Introduce
+ KVM_ARM_VCPU_PMU_V3_COMPOSITION
+Message-ID: <aJaDYhme_St2b2sM@linux.dev>
+References: <20250806-hybrid-v2-0-0661aec3af8c@rsg.ci.i.u-tokyo.ac.jp>
+ <20250806-hybrid-v2-1-0661aec3af8c@rsg.ci.i.u-tokyo.ac.jp>
+ <aJOO99xUrhsrvLwl@linux.dev>
+ <276fdfb8-f1ca-44ad-b310-a811684b265a@rsg.ci.i.u-tokyo.ac.jp>
+ <aJQJdElbZJ6KzQxD@linux.dev>
+ <62494f54-13c6-4b9f-86a1-9a19ce58e91f@rsg.ci.i.u-tokyo.ac.jp>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <62494f54-13c6-4b9f-86a1-9a19ce58e91f@rsg.ci.i.u-tokyo.ac.jp>
+X-Migadu-Flow: FLOW_OUT
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218792
+On Thu, Aug 07, 2025 at 11:06:21PM +0900, Akihiko Odaki wrote:
+> > The only cross-PMU events we will support are the fixed counters, my
+> > strong preference is that we do not reverse-map architectural events to
+> > generic perf events for all counters.
+> 
+> I wonder if there is a benefit to special case PERF_COUNT_HW_CPU_CYCLES
+> then; the current logic of kvm_map_pmu_event() looks sufficient for me.
 
---- Comment #7 from Sean Christopherson (seanjc@google.com) ---
-On Fri, Aug 08, 2025, bugzilla-daemon@kernel.org wrote:
-> https://bugzilla.kernel.org/show_bug.cgi?id=3D218792
->=20
-> Len Brown (lenb@kernel.org) changed:
->=20
->            What    |Removed                     |Added
-> -------------------------------------------------------------------------=
----
->                  CC|                            |lenb@kernel.org
->=20
-> --- Comment #6 from Len Brown (lenb@kernel.org) ---
-> Re: intel_idle
->=20
-> I agree that the SDM doesn't guarantee this MSR exists
-> based on the presence of PC10.
->=20
-> I'm not opposed to _safe().
->=20
-> but...
->=20
-> Why is this "platform" advertising PC10 (or any MWAIT C-states) to intel_=
-idle
-> in the first place?
+I'd rather we just use the generic perf events and let the driver remap
+things on our behalf. These are fixed counters, using constant events
+feels like the right way to go about that.
 
-Because letting the guest execute MONITOR/MWAIT natively, and thus get into
-deeper
-sleep states, is advantageous for all the same reasons bare metal CPUs want=
- to
-get into deep sleep states, e.g. to let active cores hit higher turbo bins.
+kvm_map_pmu_event() is trying to solve a slightly different problem
+where we need to map programmable PMUv3 events into a non-PMUv3 event
+space, like on the M1 PMU.
 
---=20
-You may reply to this email to add a comment.
+> > This isn't what I meant. What I mean is that userspace either can use
+> > the SET_PMU ioctl or the COMPOSITION ioctl. Once one of them has been
+> > used the other ioctl returns an error.
+> > 
+> > We're really bad at getting ioctl ordering / interleaving right and
+> > syzkaller has a habit of finding these mistakes. There's zero practical
+> > value in using both of these ioctls on the same VM, let's prevent it.
+> 
+> The corresponding RFC series for QEMU uses KVM_ARM_VCPU_PMU_V3_SET_PMU to
+> probe host PMUs, and falls back to KVM_ARM_VCPU_PMU_V3_COMPOSITION if none
+> covers all CPUs. Switching between SET_PMU and COMPOSITION is useful during
+> such probing.
+> 
+> COMPOSITION is designed to behave like just another host PMU that is set
+> with SET_PMU. SET_PMU allows setting a different host PMU even if SET_PMU
+> has already been invoked so it is also allowed to set a host PMU even if
+> COMPOSITION has already been invoked, maintaining consistency with
+> non-composed PMUs.
+> 
+> You can find the QEMU patch at:
+> https://lore.kernel.org/qemu-devel/20250806-kvmq-v1-1-d1d50b7058cd@rsg.ci.i.u-tokyo.ac.jp/
+> 
+> (look up KVM_ARM_VCPU_PMU_V3_SET_PMU for the probing code)
 
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+Having both of these attributes return success when probed with
+KVM_HAS_DEVICE_ATTR is fine; what I mean is that once KVM_SET_DEVICE_ATTR
+has been called on an attribute the other fails.
+
+> > On a system that has FEAT_PMUv3_ICNTR, userspace can still use this
+> > ioctl and explicitly de-feature ICNTR by writing to the ID register
+> > after initialization.
+> 
+> Now I understand better.
+> 
+> Currently, KVM_ARM_VCPU_PMU_V3_COMPOSITION sets supported_cpus to ones that
+> have cycle counters compatible with PMU emulation.
+> 
+> If FEAT_PMUv3_ICNTR is set to the ID register, I guess
+> KVM_ARM_VCPU_PMU_V3_COMPOSITION will set supported_cpus to ones that have
+> compatible cycle and instruction counters. If so, the naming
+> KVM_ARM_VCPU_PMU_V3_FIXED_COUNTERS_ONLY indeed makes sense.
+
+Perfect. Ideally SOC vendors do the sensible thing and ensure that
+FEAT_PMUv3_ICNTR is consistent on all implementations in a machine. We
+will hide the feature in KVM if it is not.
+
+Thanks,
+Oliver
 
