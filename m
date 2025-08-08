@@ -1,104 +1,266 @@
-Return-Path: <kvm+bounces-54326-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54327-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12E9BB1E8CF
-	for <lists+kvm@lfdr.de>; Fri,  8 Aug 2025 15:00:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 27AACB1E97F
+	for <lists+kvm@lfdr.de>; Fri,  8 Aug 2025 15:50:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8B663B9AEF
-	for <lists+kvm@lfdr.de>; Fri,  8 Aug 2025 13:00:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2F023B926E
+	for <lists+kvm@lfdr.de>; Fri,  8 Aug 2025 13:49:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32D4F27AC59;
-	Fri,  8 Aug 2025 13:00:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e2Mt3WMB"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB0F413AD38;
+	Fri,  8 Aug 2025 13:49:48 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60ECF221729
-	for <kvm@vger.kernel.org>; Fri,  8 Aug 2025 13:00:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D2FC23741;
+	Fri,  8 Aug 2025 13:49:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754658040; cv=none; b=MzTNqiYTq+/R9LPERsA6P/qSbE3WRVqEh1snGCxfcl8YvSu9LW3YyPpZup/wuk+OyMK9lGLfVVmP82gLp9QFX1aIlLpvRrgjlyDwRgG3RLNzzBpnU2/VI5ehNTbkaaAL/Jy7F+ypjdxXHcW2kc7EulA8mNAvpIdnvTRrDuQ29ps=
+	t=1754660988; cv=none; b=a4y+apl30GhBCUMvAiIX8uXanKUV1LE+egerpq/SpnsbIJt7kStxFaSi/h47dyet3H/89rDwBfkpTQ9vaENjR8mkIiOQ2QkUuGBcgCWwEvI3IEYbdx6K7yNWTOqyIjHV3nr6H7qba/QtsP0ryhu8F4fWW6KoomedDWfuT5ft74s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754658040; c=relaxed/simple;
-	bh=ur4VNeXzGQk9qmrEDQ7LtPu2J4y9zaMIA/9t0a37I4Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SY6m/UDGnSUE3iI+c9lFG2hTryCdsD94nlpaFqMiIHGN9XhPmXO2pqg/mcGtqx9qpnHXeqZFSW5UzNhmoSxpzmT5UHGItFTs/pC3mw+F/DBLc5Xwa4Ejxu90lzX9PJBPJORIALeM8JqffDggfpgP8QNy6YZf3uprj/D/I+vkWr4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e2Mt3WMB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4A21C4CEED;
-	Fri,  8 Aug 2025 13:00:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754658040;
-	bh=ur4VNeXzGQk9qmrEDQ7LtPu2J4y9zaMIA/9t0a37I4Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=e2Mt3WMB2LzmSeJBjcIdzu+cOQ4LT5n3QSAjdXeZmuOIf5An77XTNTUNfZf4LPPbo
-	 KD+1jRaNObq6aOQrdr9FbT73oG3pGcuCyuutQ1fE+gugc5mLfca6a5sO2IFY2MWzLo
-	 L2VtkxcvpCyGB7TiqsomQ+DEAXfiOZ1G105ROgRS1epDrCVKaAqDKVcpLkIaP44itK
-	 z33djFfls93zLQiJdDNp2CgtFv1hJwVeI4K2lx2DeUqbeRen7XLWgycPDlYm8JetA2
-	 CzujUY/lSlGQKE8KM6pPzHHsC21HKg+p/HrvuSr0q7DiNNjA7kuB4f0NL30QCd2Q9v
-	 g+n74pJ0r9qgw==
-Date: Fri, 8 Aug 2025 14:00:35 +0100
-From: Will Deacon <will@kernel.org>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, kvm@vger.kernel.org,
-	Steven Price <steven.price@arm.com>,
-	Julien Thierry <julien.thierry.kdev@gmail.com>
-Subject: Re: [RFC PATCH kvmtool 09/10] vfio/iommufd: Add viommu and vdevice
- objects
-Message-ID: <aJX089pd81f6vMCu@willie-the-truck>
-References: <20250525074917.150332-1-aneesh.kumar@kernel.org>
- <20250525074917.150332-9-aneesh.kumar@kernel.org>
- <aH4yMUWTuVtgqD7T@willie-the-truck>
- <yq5att31brz2.fsf@kernel.org>
- <f3b39fdc-e063-4d47-95dd-d4158f139053@arm.com>
+	s=arc-20240116; t=1754660988; c=relaxed/simple;
+	bh=B5lDeezqkk5enqfSPL/TI85oGS6wmZYxDK+9tTEhTUE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=Z8iVD0uOfaiwM5kFeJvYl91LnB4aVM4rK9Bb05ureRKNE2UsUY1FzhnIUCmtgliXeDINVuMmpZR2u/ZPXqrLLlF6ajbVmhYidVpEId+TdyeWM2YhmOoMXIfr0+fc8roLtn/6QZ3iKsYOi5snIsOoAQQjCeyiAfswypFSep+yeQ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org; spf=pass smtp.mailfrom=ozlabs.org; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ozlabs.org
+Received: from mail.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
+	by gandalf.ozlabs.org (Postfix) with ESMTP id 4bz54N18ktz4wbp;
+	Fri,  8 Aug 2025 23:49:40 +1000 (AEST)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4bz54J2g4Qz4wbR;
+	Fri,  8 Aug 2025 23:49:36 +1000 (AEST)
+Message-ID: <dd0b8e6f-1673-49c3-8018-974d1e7f1a54@kaod.org>
+Date: Fri, 8 Aug 2025 15:49:33 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f3b39fdc-e063-4d47-95dd-d4158f139053@arm.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4] vfio/pci: print vfio-device syspath to fdinfo
+To: Alex Mastro <amastro@fb.com>, Alex Williamson
+ <alex.williamson@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Keith Busch <kbusch@kernel.org>,
+ linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-doc@vger.kernel.org, kvm@vger.kernel.org
+References: <20250804-show-fdinfo-v4-1-96b14c5691b3@fb.com>
+ <20250807144938.e0abc7bb-a4-amachhiw@linux.ibm.com>
+From: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+Content-Language: en-US, fr
+Autocrypt: addr=clg@kaod.org; keydata=
+ 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
+In-Reply-To: <20250807144938.e0abc7bb-a4-amachhiw@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Aug 04, 2025 at 11:33:27PM +0100, Suzuki K Poulose wrote:
-> On 24/07/2025 15:09, Aneesh Kumar K.V wrote:
-> > Will Deacon <will@kernel.org> writes:
-> > > On Sun, May 25, 2025 at 01:19:15PM +0530, Aneesh Kumar K.V (Arm) wrote:
-> > > > +	dev_num = vdev->dev_hdr.dev_num;
-> > > > +	/* kvmtool only do 0 domain, 0 bus and 0 function devices. */
-> > > > +	guest_bdf = (0ULL << 32) | (0 << 16) | dev_num << 11 | (0 << 8);
-> > > 
-> > > I don't understand this. Shouldn't the BDF correspond to the virtual
-> > > configuration space? That's not allocated until later, but just going
-> > > with 0 isn't going to work.
-> > > 
-> > > What am I missing?
-> > > 
-> > 
-> > As I understand it, kvmtool supports only bus 0 and does not allow
-> > multifunction devices. Based on that, I derived the guest BDF as follows
-> > (correcting what was wrong in the original patch):
-> > 
-> > guest_bdf = (0ULL << 16) | (0 << 8) | dev_num << 3 | (0 << 0);
-> > 
-> > Are you suggesting that this approach is incorrect, and that we can use
-> > a bus number other than 0?
+Hello Amit,
+
+On 8/7/25 11:34, Amit Machhiwal wrote:
+> Hello,
 > 
-> To put this other way, the emulation of the configuration space is based
-> on the "dev_num". i.e., CFG address is converted to the offset and
-> mapped to the "dev_num". So I think what we have here is correct.
+> On 2025/08/04 12:44 PM, Alex Mastro wrote:
+>> Print the PCI device syspath to a vfio device's fdinfo. This enables tools
+>> to query which device is associated with a given vfio device fd.
+>>
+>> This results in output like below:
+>>
+>> $ cat /proc/"$SOME_PID"/fdinfo/"$VFIO_FD" | grep vfio
+>> vfio-device-syspath: /sys/devices/pci0000:e0/0000:e0:01.1/0000:e1:00.0/0000:e2:05.0/0000:e8:00.0
+>>
+>> Signed-off-by: Alex Mastro <amastro@fb.com>
+> 
+> I tested this patch on a POWER9 bare metal system with a VFIO PCI device and
+> could see the VFIO device syspath in fdinfo.
 
-My point is that 'dev_num' isn't allocated until vfio_pci_setup_device(),
-which is called from __iommufd_configure_device() _after_  we've called
-iommufd_alloc_s1bypass_hwpt().
+POWER9 running on OPAL FW : I am curious about the software stack.
 
-So I don't see how this works. You have to allocate the virtual config
-space before you can allocate the virtual device with iommufd.
+I suppose this is the latest upstream kernel ?
+Are you using an upstream QEMU to test too ?
 
-Will
+and which device ?
+
+Thanks,
+
+C.
+
+
+
+
+> 
+>   Without this patch:
+>   -------------------
+> 
+>      [root@localhost ~]# cat /proc/7059/fdinfo/188
+>      pos:    0
+>      flags:  02000002
+>      mnt_id: 17
+>      ino:    1113
+> 
+>   With this patch:
+>   ----------------
+>      [root@localhost ~]# cat /proc/7722/fdinfo/188
+>      pos:    0
+>      flags:  02000002
+>      mnt_id: 17
+>      ino:    2145
+>      vfio-device-syspath: /sys/devices/pci0031:00/0031:00:00.0/0031:01:00.0
+> 
+> ..., and the code changes LGTM. Hence,
+> 
+> Reviewed-by: Amit Machhiwal <amachhiw@linux.ibm.com>
+> Tested-by: Amit Machhiwal <amachhiw@linux.ibm.com>
+> 
+> Thanks,
+> Amit
+> 
+>> ---
+>> Changes in v4:
+>> - Remove changes to vfio.h
+>> - Link to v3: https://lore.kernel.org/r/20250801-show-fdinfo-v3-1-165dfcab89b9@fb.com
+>> Changes in v3:
+>> - Remove changes to vfio_pci.c
+>> - Add section to Documentation/filesystems/proc.rst
+>> - Link to v2: https://lore.kernel.org/all/20250724-show-fdinfo-v2-1-2952115edc10@fb.com
+>> Changes in v2:
+>> - Instead of PCI bdf, print the fully-qualified syspath (prefixed by
+>>    /sys) to fdinfo.
+>> - Rename the field to "vfio-device-syspath". The term "syspath" was
+>>    chosen for consistency e.g. libudev's usage of the term.
+>> - Link to v1: https://lore.kernel.org/r/20250623-vfio-fdinfo-v1-1-c9cec65a2922@fb.com
+>> ---
+>>   Documentation/filesystems/proc.rst | 14 ++++++++++++++
+>>   drivers/vfio/vfio_main.c           | 20 ++++++++++++++++++++
+>>   2 files changed, 34 insertions(+)
+>>
+>> diff --git a/Documentation/filesystems/proc.rst b/Documentation/filesystems/proc.rst
+>> index 2a17865dfe39..fc5ed3117834 100644
+>> --- a/Documentation/filesystems/proc.rst
+>> +++ b/Documentation/filesystems/proc.rst
+>> @@ -2162,6 +2162,20 @@ DMA Buffer files
+>>   where 'size' is the size of the DMA buffer in bytes. 'count' is the file count of
+>>   the DMA buffer file. 'exp_name' is the name of the DMA buffer exporter.
+>>   
+>> +VFIO Device files
+>> +~~~~~~~~~~~~~~~~
+>> +
+>> +::
+>> +
+>> +	pos:    0
+>> +	flags:  02000002
+>> +	mnt_id: 17
+>> +	ino:    5122
+>> +	vfio-device-syspath: /sys/devices/pci0000:e0/0000:e0:01.1/0000:e1:00.0/0000:e2:05.0/0000:e8:00.0
+>> +
+>> +where 'vfio-device-syspath' is the sysfs path corresponding to the VFIO device
+>> +file.
+>> +
+>>   3.9	/proc/<pid>/map_files - Information about memory mapped files
+>>   ---------------------------------------------------------------------
+>>   This directory contains symbolic links which represent memory mapped files
+>> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+>> index 1fd261efc582..37a39cee10ed 100644
+>> --- a/drivers/vfio/vfio_main.c
+>> +++ b/drivers/vfio/vfio_main.c
+>> @@ -28,6 +28,7 @@
+>>   #include <linux/pseudo_fs.h>
+>>   #include <linux/rwsem.h>
+>>   #include <linux/sched.h>
+>> +#include <linux/seq_file.h>
+>>   #include <linux/slab.h>
+>>   #include <linux/stat.h>
+>>   #include <linux/string.h>
+>> @@ -1354,6 +1355,22 @@ static int vfio_device_fops_mmap(struct file *filep, struct vm_area_struct *vma)
+>>   	return device->ops->mmap(device, vma);
+>>   }
+>>   
+>> +#ifdef CONFIG_PROC_FS
+>> +static void vfio_device_show_fdinfo(struct seq_file *m, struct file *filep)
+>> +{
+>> +	char *path;
+>> +	struct vfio_device_file *df = filep->private_data;
+>> +	struct vfio_device *device = df->device;
+>> +
+>> +	path = kobject_get_path(&device->dev->kobj, GFP_KERNEL);
+>> +	if (!path)
+>> +		return;
+>> +
+>> +	seq_printf(m, "vfio-device-syspath: /sys%s\n", path);
+>> +	kfree(path);
+>> +}
+>> +#endif
+>> +
+>>   const struct file_operations vfio_device_fops = {
+>>   	.owner		= THIS_MODULE,
+>>   	.open		= vfio_device_fops_cdev_open,
+>> @@ -1363,6 +1380,9 @@ const struct file_operations vfio_device_fops = {
+>>   	.unlocked_ioctl	= vfio_device_fops_unl_ioctl,
+>>   	.compat_ioctl	= compat_ptr_ioctl,
+>>   	.mmap		= vfio_device_fops_mmap,
+>> +#ifdef CONFIG_PROC_FS
+>> +	.show_fdinfo	= vfio_device_show_fdinfo,
+>> +#endif
+>>   };
+>>   
+>>   static struct vfio_device *vfio_device_from_file(struct file *file)
+>>
+>> ---
+>> base-commit: 4518e5a60c7fbf0cdff393c2681db39d77b4f87e
+>> change-id: 20250801-show-fdinfo-ef109ca738cf
+>>
+>> Best regards,
+>> -- 
+>> Alex Mastro <amastro@fb.com>
+>>
+> 
+
 
