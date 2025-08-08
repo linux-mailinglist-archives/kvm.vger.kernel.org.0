@@ -1,59 +1,56 @@
-Return-Path: <kvm+bounces-54335-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54336-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B276FB1EE94
-	for <lists+kvm@lfdr.de>; Fri,  8 Aug 2025 20:57:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78617B1EE97
+	for <lists+kvm@lfdr.de>; Fri,  8 Aug 2025 20:57:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B49AD1C24785
-	for <lists+kvm@lfdr.de>; Fri,  8 Aug 2025 18:57:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E88F564308
+	for <lists+kvm@lfdr.de>; Fri,  8 Aug 2025 18:57:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 897E6283FF8;
-	Fri,  8 Aug 2025 18:56:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55AFD286418;
+	Fri,  8 Aug 2025 18:57:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="gAw17mz4"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="emNgH+sI"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
+Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 149E6222577
-	for <kvm@vger.kernel.org>; Fri,  8 Aug 2025 18:56:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 897361361
+	for <kvm@vger.kernel.org>; Fri,  8 Aug 2025 18:57:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754679412; cv=none; b=E0YpLfYmm8R1qcV+SAHUnogW9RgZPN6G/EPPgnsOWg/saxaQNCBmqGM6i/9Z1+2FBEpja3C13Y/dQS0RJfk4QJIo0G7kScrB8KeipSRQKNQkeOPVGdv70KrjC+BAdkoq7kZp8Ee/ADP+3IPxeC4TlJlwkKUW+cuBUwJpagfPCi0=
+	t=1754679453; cv=none; b=sssvjgW5pKQW9yHZECsSThIp7TB0AqaPQeTLD0LDOdyTS0vw3Khc2UHdLGTQJJwPr622tggF0r89PgcFf1ZZ1UjD+9yF/y+oFmyKEful9tkTF4tNvQasLLFHo+ui/yXlN7QE5vfmTkkGBSS7rhe7k/9JmpU+PoHnVsh9VuifXu8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754679412; c=relaxed/simple;
-	bh=d7RKzM3PHZ4V28N9/tZDIrTV+QQRyM6Rsb+C60eYCOE=;
+	s=arc-20240116; t=1754679453; c=relaxed/simple;
+	bh=rAgCo/rrBUq65+BJpmaxua3ak9p5t6+cqOpdgdEgf1I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s933WR4iphMn2AXwUWYQzGrs7/TGviup/2Xaof0Sg93ZujLQBvw6vTavqoIeR3yGCII30XlQrWSXI6cCEDYSLeGf9AKumM3dld94XC26edKULxiL+Ibahz8DsR3KhOexXUXAcQu8zNkntyzC7ivQWJgGm79uQi9mnYgt0JDSum0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=gAw17mz4; arc=none smtp.client-ip=95.215.58.179
+	 Content-Type:Content-Disposition:In-Reply-To; b=XahsOTEm5OYfc3EzgXw/MshmnNfu+NH0SkoQNTHuwnY6dZyA7RIgJFTPREx5lieixccHN5AW50zAckEdEYOHURlPYtxiRvrzvokbl3vNSR3W++3YiNymhVeX+VVjaA+Ne5+bQ/kuHU6V4YiOW9nO8cFhx5Jbr4Azbvgz4gtAbzg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=emNgH+sI; arc=none smtp.client-ip=91.218.175.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Fri, 8 Aug 2025 11:56:28 -0700
+Date: Fri, 8 Aug 2025 11:57:13 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1754679398;
+	t=1754679439;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=QQEweAiTXl7uCYmBR+Y/7n2oQdebFZHZYTNv96/JjXY=;
-	b=gAw17mz4oym/aoBhLbPmslP80ZAYkNfurE+ctVswd2okrrijXyrbToCAVNrAAe8fdhfyzj
-	imtF5PVuDWTUpkJCeACSS2BvlIGjH1LG9ampjXkJMrYpTanhieeCrPPoxznQXRLHVuKFIq
-	mtuUzh5uO+R121iAWR5z4IHVfd1reB4=
+	bh=s9gC5taMqXomgmy+wOk5yz1bjdGDKNxGCUXt71gAiH4=;
+	b=emNgH+sIj0mFo5p9JAsb8YN8WYz1XkWrwxgJ3MjbFju6vfIA8kpe7Qv0hNCwlSlKo0tSj4
+	1sbNZ7gDTJULykI/9IVsFYDPo75mzyEAAv6CHsishC96RmhvxW+Ap7upRPJ/ytjkXAowlr
+	dpQn3U63ulOI5PR6J96U9XsK4KfzJ0I=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Raghavendra Rao Ananta <rananta@google.com>
 Cc: Marc Zyngier <maz@kernel.org>, Mingwei Zhang <mizhang@google.com>,
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH 2/2] KVM: arm64: Destroy the stage-2 page-table
- periodically
-Message-ID: <aJZIXGDWxD1U0axK@linux.dev>
+Subject: Re: [PATCH 1/2] KVM: arm64: Split kvm_pgtable_stage2_destroy()
+Message-ID: <aJZIiW5B3cleCxuo@linux.dev>
 References: <20250724235144.2428795-1-rananta@google.com>
- <20250724235144.2428795-3-rananta@google.com>
- <aIjwalITY6CAj7TO@linux.dev>
- <CAJHc60wBNTP9SSt_skEXXv9N+tF_1RoV6vcQQx4hWphJF6EmkQ@mail.gmail.com>
+ <20250724235144.2428795-2-rananta@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -62,128 +59,159 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAJHc60wBNTP9SSt_skEXXv9N+tF_1RoV6vcQQx4hWphJF6EmkQ@mail.gmail.com>
+In-Reply-To: <20250724235144.2428795-2-rananta@google.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Thu, Aug 07, 2025 at 11:58:01AM -0700, Raghavendra Rao Ananta wrote:
-> Hi Oliver,
+On Thu, Jul 24, 2025 at 11:51:43PM +0000, Raghavendra Rao Ananta wrote:
+> Split kvm_pgtable_stage2_destroy() into two:
+>   - kvm_pgtable_stage2_destroy_range(), that performs the
+>     page-table walk and free the entries over a range of addresses.
+>   - kvm_pgtable_stage2_destroy_pgd(), that frees the PGD.
 > 
-> >
-> > Protected mode is affected by the same problem, potentially even worse
-> > due to the overheads of calling into EL2. Both protected and
-> > non-protected flows should use stage2_destroy_range().
-> >
-> I experimented with this (see diff below), and it looks like it takes
-> significantly longer to finish the destruction even for a very small
-> VM. For instance, it takes ~140 seconds on an Ampere Altra machine.
-> This is probably because we run cond_resched() for every breakup in
-> the entire sweep of the possible address range, 0 to  ~(0ULL), even
-> though there are no actual mappings there, and we context switch out
-> more often.
+> This refactoring enables subsequent patches to free large page-tables
+> in chunks, calling cond_resched() between each chunk, to yield the CPU
+> as necessary.
+> 
+> Direct callers of kvm_pgtable_stage2_destroy() will continue to walk
+> the entire range of the VM as before, ensuring no functional changes.
+> 
+> Also, add equivalent pkvm_pgtable_stage2_*() stubs to maintain 1:1
+> mapping of the page-table functions.
+> 
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 
-This seems more like an issue with the upper bound on a pKVM walk rather
-than a problem with the suggestion. The information in pgt->ia_bits is
-actually derived from the VTCR value of the owning MMU.
 
-Even though we never use the VTCR value in hardware, pKVM MMUs have a
-valid VTCR value that encodes the size of the IPA space and we use that
-in the common stage-2 abort path.
+Here's the other half of my fixups
 
-I'm attaching some fixups that I have on top of your series that'd allow
-the resched logic to remain common, like it is in other MMU flows.
-
-From 421468dcaa4692208c3f708682b058cfc072a984 Mon Sep 17 00:00:00 2001
+From 7d3e948357d0d2568afc136906e1b973ed39deeb Mon Sep 17 00:00:00 2001
 From: Oliver Upton <oliver.upton@linux.dev>
-Date: Fri, 8 Aug 2025 11:43:12 -0700
-Subject: [PATCH 4/4] fixup! KVM: arm64: Destroy the stage-2 page-table
- periodically
+Date: Fri, 8 Aug 2025 11:35:43 -0700
+Subject: [PATCH 2/4] fixup! KVM: arm64: Split kvm_pgtable_stage2_destroy()
 
 ---
- arch/arm64/kvm/mmu.c | 60 ++++++++++++++++++--------------------------
- 1 file changed, 25 insertions(+), 35 deletions(-)
+ arch/arm64/include/asm/kvm_pgtable.h  |  4 ++--
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c |  2 +-
+ arch/arm64/kvm/hyp/pgtable.c          |  2 +-
+ arch/arm64/kvm/mmu.c                  | 12 ++++++++++--
+ arch/arm64/kvm/pkvm.c                 | 12 ++++--------
+ 5 files changed, 18 insertions(+), 14 deletions(-)
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index b82412323054..fc93cc256bd8 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -383,40 +383,6 @@ static void stage2_flush_vm(struct kvm *kvm)
- 	srcu_read_unlock(&kvm->srcu, idx);
+diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+index 20aea58eca18..fdae4685b9ac 100644
+--- a/arch/arm64/include/asm/kvm_pgtable.h
++++ b/arch/arm64/include/asm/kvm_pgtable.h
+@@ -562,13 +562,13 @@ void kvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt,
+ void kvm_pgtable_stage2_destroy_pgd(struct kvm_pgtable *pgt);
+ 
+ /**
+- * kvm_pgtable_stage2_destroy() - Destroy an unused guest stage-2 page-table.
++ * __kvm_pgtable_stage2_destroy() - Destroy an unused guest stage-2 page-table.
+  * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init*().
+  *
+  * The page-table is assumed to be unreachable by any hardware walkers prior
+  * to freeing and therefore no TLB invalidation is performed.
+  */
+-void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt);
++void __kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt);
+ 
+ /**
+  * kvm_pgtable_stage2_free_unlinked() - Free an unlinked stage-2 paging structure.
+diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+index 95d7534c9679..5eb8d6e29ac4 100644
+--- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
++++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+@@ -297,7 +297,7 @@ void reclaim_pgtable_pages(struct pkvm_hyp_vm *vm, struct kvm_hyp_memcache *mc)
+ 
+ 	/* Dump all pgtable pages in the hyp_pool */
+ 	guest_lock_component(vm);
+-	kvm_pgtable_stage2_destroy(&vm->pgt);
++	__kvm_pgtable_stage2_destroy(&vm->pgt);
+ 	vm->kvm.arch.mmu.pgd_phys = 0ULL;
+ 	guest_unlock_component(vm);
+ 
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index 7fad791cf40b..aa735ffe8d49 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -1577,7 +1577,7 @@ void kvm_pgtable_stage2_destroy_pgd(struct kvm_pgtable *pgt)
+ 	pgt->pgd = NULL;
  }
  
--/*
-- * Assume that @pgt is valid and unlinked from the KVM MMU to free the
-- * page-table without taking the kvm_mmu_lock and without performing any
-- * TLB invalidations.
-- *
-- * Also, the range of addresses can be large enough to cause need_resched
-- * warnings, for instance on CONFIG_PREEMPT_NONE kernels. Hence, invoke
-- * cond_resched() periodically to prevent hogging the CPU for a long time
-- * and schedule something else, if required.
-- */
--static void stage2_destroy_range(struct kvm_pgtable *pgt, phys_addr_t addr,
--			      phys_addr_t end)
--{
--	u64 next;
--
--	do {
--		next = stage2_range_addr_end(addr, end);
--		kvm_pgtable_stage2_destroy_range(pgt, addr, next - addr);
--
--		if (next != end)
--			cond_resched();
--	} while (addr = next, addr != end);
--}
--
--static void kvm_destroy_stage2_pgt(struct kvm_pgtable *pgt)
--{
--	if (!is_protected_kvm_enabled()) {
--		stage2_destroy_range(pgt, 0, BIT(pgt->ia_bits));
--		kvm_pgtable_stage2_destroy_pgd(pgt);
--	} else {
--		pkvm_pgtable_stage2_destroy(pgt);
--	}
--}
--
- /**
-  * free_hyp_pgds - free Hyp-mode page tables
-  */
-@@ -938,11 +904,35 @@ static int kvm_init_ipa_range(struct kvm_s2_mmu *mmu, unsigned long type)
+-void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt)
++void __kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt)
+ {
+ 	kvm_pgtable_stage2_destroy_range(pgt, 0, BIT(pgt->ia_bits));
+ 	kvm_pgtable_stage2_destroy_pgd(pgt);
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 9a45daf817bf..6330a02c8418 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -904,6 +904,14 @@ static int kvm_init_ipa_range(struct kvm_s2_mmu *mmu, unsigned long type)
  	return 0;
  }
  
-+/*
-+ * Assume that @pgt is valid and unlinked from the KVM MMU to free the
-+ * page-table without taking the kvm_mmu_lock and without performing any
-+ * TLB invalidations.
-+ *
-+ * Also, the range of addresses can be large enough to cause need_resched
-+ * warnings, for instance on CONFIG_PREEMPT_NONE kernels. Hence, invoke
-+ * cond_resched() periodically to prevent hogging the CPU for a long time
-+ * and schedule something else, if required.
-+ */
-+static void stage2_destroy_range(struct kvm_pgtable *pgt, phys_addr_t addr,
-+				 phys_addr_t end)
++static void kvm_stage2_destroy(struct kvm_pgtable *pgt)
 +{
-+	u64 next;
++	unsigned int ia_bits = VTCR_EL2_IPA(pgt->mmu->vtcr);
 +
-+	do {
-+		next = stage2_range_addr_end(addr, end);
-+		KVM_PGT_FN(kvm_pgtable_stage2_destroy_range)(pgt, addr, next - addr);
-+
-+		if (next != end)
-+			cond_resched();
-+	} while (addr = next, addr != end);
++	KVM_PGT_FN(kvm_pgtable_stage2_destroy_range)(pgt, 0, BIT(ia_bits));
++	KVM_PGT_FN(kvm_pgtable_stage2_destroy_pgd)(pgt);
 +}
 +
- static void kvm_stage2_destroy(struct kvm_pgtable *pgt)
- {
- 	unsigned int ia_bits = VTCR_EL2_IPA(pgt->mmu->vtcr);
+ /**
+  * kvm_init_stage2_mmu - Initialise a S2 MMU structure
+  * @kvm:	The pointer to the KVM structure
+@@ -980,7 +988,7 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
+ 	return 0;
  
--	KVM_PGT_FN(kvm_pgtable_stage2_destroy_range)(pgt, 0, BIT(ia_bits));
-+	stage2_destroy_range(pgt, 0, BIT(ia_bits));
- 	KVM_PGT_FN(kvm_pgtable_stage2_destroy_pgd)(pgt);
+ out_destroy_pgtable:
+-	KVM_PGT_FN(kvm_pgtable_stage2_destroy)(pgt);
++	kvm_stage2_destroy(pgt);
+ out_free_pgtable:
+ 	kfree(pgt);
+ 	return err;
+@@ -1077,7 +1085,7 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
+ 	write_unlock(&kvm->mmu_lock);
+ 
+ 	if (pgt) {
+-		KVM_PGT_FN(kvm_pgtable_stage2_destroy)(pgt);
++		kvm_stage2_destroy(pgt);
+ 		kfree(pgt);
+ 	}
+ }
+diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+index bf737717ccb4..3be208449bd7 100644
+--- a/arch/arm64/kvm/pkvm.c
++++ b/arch/arm64/kvm/pkvm.c
+@@ -316,11 +316,6 @@ static int __pkvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 start, u64 e
+ 	return 0;
  }
  
+-void pkvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt)
+-{
+-	__pkvm_pgtable_stage2_unmap(pgt, 0, ~(0ULL));
+-}
+-
+ int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
+ 			   u64 phys, enum kvm_pgtable_prot prot,
+ 			   void *mc, enum kvm_pgtable_walk_flags flags)
+@@ -452,12 +447,13 @@ int pkvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size,
+ }
+ 
+ void pkvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt,
+-					u64 addr, u64 size)
++				       u64 addr, u64 size)
+ {
+-	WARN_ON_ONCE(1);
++	__pkvm_pgtable_stage2_unmap(pgt, addr, size);
+ }
+ 
+ void pkvm_pgtable_stage2_destroy_pgd(struct kvm_pgtable *pgt)
+ {
+-	WARN_ON_ONCE(1);
++	/* Expected to be called after all pKVM mappings have been released. */
++	WARN_ON_ONCE(!RB_EMPTY_ROOT(&pgt->pkvm_mappings.rb_root));
+ }
 -- 
 2.39.5
 
