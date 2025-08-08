@@ -1,150 +1,224 @@
-Return-Path: <kvm+bounces-54312-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54313-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06990B1E286
-	for <lists+kvm@lfdr.de>; Fri,  8 Aug 2025 08:53:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE3A2B1E377
+	for <lists+kvm@lfdr.de>; Fri,  8 Aug 2025 09:35:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A10C37A9DC2
-	for <lists+kvm@lfdr.de>; Fri,  8 Aug 2025 06:51:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 81452A016BE
+	for <lists+kvm@lfdr.de>; Fri,  8 Aug 2025 07:34:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46E35218ACC;
-	Fri,  8 Aug 2025 06:52:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63AED25CC4D;
+	Fri,  8 Aug 2025 07:30:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ppHz0ecz"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QCzzD3i1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 002C638DD8
-	for <kvm@vger.kernel.org>; Fri,  8 Aug 2025 06:52:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0108B22A1D5;
+	Fri,  8 Aug 2025 07:30:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754635976; cv=none; b=Xnfh1HRmfyQaedI5UNpMiT2TREeKmyVcJWEHngDnJMhPvVeTrZZF17epP68grg9YD82WYiRMJlotpXcMe8OsJMxk38f/9pyF5Pq+5u4v8JKMj35j5f9mnsLdRTgE8gdJONcC7FVkYOYFhiIre7k6NYqzyFuYY4xuc0ypEgTtw30=
+	t=1754638251; cv=none; b=XwO1jHQMAPmzk7T8Ft4iQtznGFk4L7BUh3fZGGJ+CASnGhwkMmYG3M5Jy8G5NnNCm29XizmwsEB4+6iLwY87ZEg/+0DkZpvMRG5HJ1xGh1oEf9JxvD53OT+Vg7W+1akcsBmwHk6H9bsEqXSdQLcHsf/pH06lMg3k1QO+RWX5z64=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754635976; c=relaxed/simple;
-	bh=FCyZ1qr9VlR1wWcWMkbp1PbVNxRSYB1Emce/MD6E+/k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ssgakCxvW4UvFHlzBW9hWLZXOBrBnPLFcinOOIEOmf9ZPNSE4hVxGCpJtont27vutQVLD+wkHAVEbjbLRN2nrFZ+JfsuF0XlVr0ZC9JzN77wbOMgfb9gK63l4NPYFG47eozVWC14Oa60i9RFWSpvIvQ7jO/LguAVkSpn83XK6PY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ppHz0ecz; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5783OJPJ019470;
-	Fri, 8 Aug 2025 06:52:50 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=e/fjeSaQRZNP3JdWMoihbTZAw78OQe
-	Ddx+AtxvK9958=; b=ppHz0ecz2z5mDVkRDUFnY3yNQf6zFWoCjmQEwm+8p+D8bN
-	0z1yCcpgHIBlAk/ByOK/0O+kUAW0kho9O4/ZZBjZph5JB2h7PR1Kjz6Nlha3NqN2
-	rD0ixGED+SNOb+xHkfDKeED0BWmnATwneHS94d5FttfuMmizQFQmrf1UCcwnFooD
-	DjWmuzgrRhjTHVZVibM940KhtxZsOqelrJxDucTHn3CG6jV89K7XD3oTWZpilQl4
-	Pz91KZRyj4XTwxEJUD+Ki+LvDzoXYMeTnlM+TrwQRlb00Z098jXLGQhfnlLPZf0K
-	zn5EekMGVmsLMV4xaEX90r5v+Z2GwoKYC6BLzYSA==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48c26u481f-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 08 Aug 2025 06:52:50 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5786FGm3020603;
-	Fri, 8 Aug 2025 06:52:49 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 48bpwn4f99-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 08 Aug 2025 06:52:48 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5786qiMY41288106
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 8 Aug 2025 06:52:45 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E286420043;
-	Fri,  8 Aug 2025 06:52:44 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E376420040;
-	Fri,  8 Aug 2025 06:52:43 +0000 (GMT)
-Received: from li-e7e2bd4c-2dae-11b2-a85c-bfd29497117c.ibm.com (unknown [9.124.217.7])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Fri,  8 Aug 2025 06:52:43 +0000 (GMT)
-Date: Fri, 8 Aug 2025 12:22:41 +0530
-From: Amit Machhiwal <amachhiw@linux.ibm.com>
-To: Andrew Donnellan <ajd@linux.ibm.com>
-Cc: linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org
-Subject: Re: [PATCH] KVM: PPC: Fix misleading interrupts comment in
- kvmppc_prepare_to_enter()
-Message-ID: <20250808122131.834df8e0-6c-amachhiw@linux.ibm.com>
-Mail-Followup-To: Andrew Donnellan <ajd@linux.ibm.com>, 
-	linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org
-References: <20250806055607.17081-1-ajd@linux.ibm.com>
+	s=arc-20240116; t=1754638251; c=relaxed/simple;
+	bh=N93jbXCfcX8tT1d6Si749lOVTvmyst9EjSTFBREX9yk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nruZ3qvapTGs62IZhreh8gMrvQGZErsFNmDD0BMVgUDTPnyc48WRSF4zKLz6ToSLnvijNNXzpo8yd2L53YX5q1IcMK7TIrdgMagoQgFHdeAKWxBZaLt8jDwAFL9INhr+B9NAAXBQOk5WRHP+ej0yvY9UyGkHIM7joKHXMq5jBVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QCzzD3i1; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1754638250; x=1786174250;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=N93jbXCfcX8tT1d6Si749lOVTvmyst9EjSTFBREX9yk=;
+  b=QCzzD3i1ZbnrUsaoWeChKbnC1N8x9UaGsrMi70uG1KNUlfB1lk3cxNuS
+   whO1L3uNXl5+RGB1Y7v6FMmYJRN+T82P5XvdT5XHcetVgRyLsuqQxVBnK
+   kiddcc0bzrOtY2oOp/MgLTljAL20f+LLMsKM9f3gyfb5aQASmGFJ2D4Mg
+   Oz3VN6rvs2BhUuHbcMNF0Oljy/N6UmKZGozlCenQgIY04M+Kwg2zC3dvn
+   3ywXd3gIjQe7jnYCFua+3wXRiedRLtBELpnF6dHzzngpPmjVdb3Z/r4Qj
+   3mXRUjDAj9WgTQvUaJxXIo8LkbRIHPWwIZpzTYtMRcdRJtm8Kevhh+xV6
+   g==;
+X-CSE-ConnectionGUID: jCqLyoTHR0eEEdyMNCz5Ig==
+X-CSE-MsgGUID: RwgnHLbQTwiXDxCzctC8nQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11514"; a="56860991"
+X-IronPort-AV: E=Sophos;i="6.17,274,1747724400"; 
+   d="scan'208";a="56860991"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2025 00:30:50 -0700
+X-CSE-ConnectionGUID: nPT+neYWR5ic6FwTvd4gdw==
+X-CSE-MsgGUID: 3HIOr3NzSxqUGeU1ve8zNQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,274,1747724400"; 
+   d="scan'208";a="165677254"
+Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.240.106]) ([10.124.240.106])
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2025 00:30:43 -0700
+Message-ID: <f3e09bef-8bc9-48ac-983e-7a18c2ff4ad2@linux.intel.com>
+Date: Fri, 8 Aug 2025 15:30:40 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250806055607.17081-1-ajd@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: ctVdYfXKz-a7nubi8SMjZ2vAE0M499Gz
-X-Authority-Analysis: v=2.4 cv=F/xXdrhN c=1 sm=1 tr=0 ts=68959ec2 cx=c_pps
- a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
- a=kj9zAlcOel0A:10 a=2OwXVqhp2XgA:10 a=VnNF1IyMAAAA:8 a=T-Jo5Y6SYTEF9Fg7UwAA:9
- a=CjuIK1q_8ugA:10
-X-Proofpoint-GUID: ctVdYfXKz-a7nubi8SMjZ2vAE0M499Gz
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODA4MDA1NSBTYWx0ZWRfX11YstKMHW7sA
- oSO3nir8LawsVvN8u035WmVjCXR2mrc2KkPYo8Y2RazWlnq+JH1+1rt7qEoC3fITE6iQVe+plup
- ekAlQSkYW+z9E5uIepJilW0S/dsaWpFwG0Yv7vCeRHgS89HNORoh0NHZL/wRALsEGL5FDcFW7cU
- 5ET/IdzWAxglrpOMsoB9LmJo5SYzYFiLCAEV6ULJwbOdaa29PQq47EeGDfjM/G3uYZrZHCpBH2c
- G/5CoU7OXrIjnvTHlcYkbX6s7DmxFuTpKTifirYYucP6jbS8BlVoGr36JRZutRntP0t9APVmm6J
- fVlxPK4efUBNr1YOl4/XtWTfqVVZwwDEk7xprFJo07SFBSB6WPYVSK/vagUVn7lrm8FIRVAoa3g
- xL7/+Feul5k2t5l7OY/S/lYo78K3bGZ8odKNezAtIsW1Zo/u3RGUShn0uHPwvh6lS/x1xyF6
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-08-08_01,2025-08-06_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_spam_definite policy=outbound
- score=100 mlxscore=100 lowpriorityscore=0 priorityscore=1501 impostorscore=0
- clxscore=1015 spamscore=100 bulkscore=0 adultscore=0 mlxlogscore=-999
- malwarescore=0 phishscore=0 suspectscore=0 classifier=spam authscore=0
- authtc=n/a authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2507300000 definitions=main-2508080055
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 07/44] perf: Add APIs to load/put guest mediated PMU
+ context
+To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao
+ <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
+ Huacai Chen <chenhuacai@kernel.org>, Anup Patel <anup@brainfault.org>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Xin Li <xin@zytor.com>, "H. Peter Anvin" <hpa@zytor.com>,
+ Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
+ Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Namhyung Kim <namhyung@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org, loongarch@lists.linux.dev,
+ kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+ linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
+ Kan Liang <kan.liang@linux.intel.com>, Yongwei Ma <yongwei.ma@intel.com>,
+ Mingwei Zhang <mizhang@google.com>,
+ Xiong Zhang <xiong.y.zhang@linux.intel.com>,
+ Sandipan Das <sandipan.das@amd.com>
+References: <20250806195706.1650976-1-seanjc@google.com>
+ <20250806195706.1650976-8-seanjc@google.com>
+Content-Language: en-US
+From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
+In-Reply-To: <20250806195706.1650976-8-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 2025/08/06 03:56 PM, Andrew Donnellan wrote:
-> Until commit 6c85f52b10fd ("kvm/ppc: IRQ disabling cleanup"),
-> kvmppc_prepare_to_enter() was called with interrupts already disabled by
-> the caller, which was documented in the comment above the function.
-> 
-> Post-cleanup, the function is now called with interrupts enabled, and
-> disables interrupts itself.
-> 
-> Fix the comment to reflect the current behaviour.
-> 
-> Fixes: 6c85f52b10fd ("kvm/ppc: IRQ disabling cleanup")
-> Signed-off-by: Andrew Donnellan <ajd@linux.ibm.com>
 
-Thanks for catching and fixing this. Please feel free to add:
-
-Reviewed-by: Amit Machhiwal <amachhiw@linux.ibm.com>
-
+On 8/7/2025 3:56 AM, Sean Christopherson wrote:
+> From: Kan Liang <kan.liang@linux.intel.com>
+>
+> Add exported APIs to load/put a guest mediated PMU context.  KVM will
+> load the guest PMU shortly before VM-Enter, and put the guest PMU shortly
+> after VM-Exit.
+>
+> On the perf side of things, schedule out all exclude_guest events when the
+> guest context is loaded, and schedule them back in when the guest context
+> is put.  I.e. yield the hardware PMU resources to the guest, by way of KVM.
+>
+> Note, perf is only responsible for managing host context.  KVM is
+> responsible for loading/storing guest state to/from hardware.
+>
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Kan Liang <kan.liang@linux.intel.com>
+> Signed-off-by: Mingwei Zhang <mizhang@google.com>
+> [sean: shuffle patches around, write changelog]
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->  arch/powerpc/kvm/powerpc.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-> index 153587741864..2ba057171ebe 100644
-> --- a/arch/powerpc/kvm/powerpc.c
-> +++ b/arch/powerpc/kvm/powerpc.c
-> @@ -69,7 +69,7 @@ int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu)
+>  include/linux/perf_event.h |  2 ++
+>  kernel/events/core.c       | 61 ++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 63 insertions(+)
+>
+> diff --git a/include/linux/perf_event.h b/include/linux/perf_event.h
+> index 0958b6d0a61c..42d019d70b42 100644
+> --- a/include/linux/perf_event.h
+> +++ b/include/linux/perf_event.h
+> @@ -1925,6 +1925,8 @@ extern u64 perf_event_pause(struct perf_event *event, bool reset);
+>  #ifdef CONFIG_PERF_GUEST_MEDIATED_PMU
+>  int perf_create_mediated_pmu(void);
+>  void perf_release_mediated_pmu(void);
+> +void perf_load_guest_context(unsigned long data);
+> +void perf_put_guest_context(void);
+>  #endif
+>  
+>  #else /* !CONFIG_PERF_EVENTS: */
+> diff --git a/kernel/events/core.c b/kernel/events/core.c
+> index 6875b56ddd6b..77398b1ad4c5 100644
+> --- a/kernel/events/core.c
+> +++ b/kernel/events/core.c
+> @@ -469,10 +469,19 @@ static cpumask_var_t perf_online_pkg_mask;
+>  static cpumask_var_t perf_online_sys_mask;
+>  static struct kmem_cache *perf_event_cache;
+>  
+> +#ifdef CONFIG_PERF_GUEST_MEDIATED_PMU
+> +static DEFINE_PER_CPU(bool, guest_ctx_loaded);
+> +
+> +static __always_inline bool is_guest_mediated_pmu_loaded(void)
+> +{
+> +	return __this_cpu_read(guest_ctx_loaded);
+> +}
+> +#else
+>  static __always_inline bool is_guest_mediated_pmu_loaded(void)
+>  {
+>  	return false;
+>  }
+> +#endif
 >  
 >  /*
->   * Common checks before entering the guest world.  Call with interrupts
-> - * disabled.
-> + * enabled.
->   *
->   * returns:
->   *
-> -- 
-> 2.50.1
-> 
+>   * perf event paranoia level:
+> @@ -6379,6 +6388,58 @@ void perf_release_mediated_pmu(void)
+>  	atomic_dec(&nr_mediated_pmu_vms);
+>  }
+>  EXPORT_SYMBOL_GPL(perf_release_mediated_pmu);
+> +
+> +/* When loading a guest's mediated PMU, schedule out all exclude_guest events. */
+> +void perf_load_guest_context(unsigned long data)
+
+nit: the "data" argument is not used in this patch, we may defer to
+introduce it in patch 09/44.
+
+
+> +{
+> +	struct perf_cpu_context *cpuctx = this_cpu_ptr(&perf_cpu_context);
+> +
+> +	lockdep_assert_irqs_disabled();
+> +
+> +	guard(perf_ctx_lock)(cpuctx, cpuctx->task_ctx);
+> +
+> +	if (WARN_ON_ONCE(__this_cpu_read(guest_ctx_loaded)))
+> +		return;
+> +
+> +	perf_ctx_disable(&cpuctx->ctx, EVENT_GUEST);
+> +	ctx_sched_out(&cpuctx->ctx, NULL, EVENT_GUEST);
+> +	if (cpuctx->task_ctx) {
+> +		perf_ctx_disable(cpuctx->task_ctx, EVENT_GUEST);
+> +		task_ctx_sched_out(cpuctx->task_ctx, NULL, EVENT_GUEST);
+> +	}
+> +
+> +	perf_ctx_enable(&cpuctx->ctx, EVENT_GUEST);
+> +	if (cpuctx->task_ctx)
+> +		perf_ctx_enable(cpuctx->task_ctx, EVENT_GUEST);
+> +
+> +	__this_cpu_write(guest_ctx_loaded, true);
+> +}
+> +EXPORT_SYMBOL_GPL(perf_load_guest_context);
+> +
+> +void perf_put_guest_context(void)
+> +{
+> +	struct perf_cpu_context *cpuctx = this_cpu_ptr(&perf_cpu_context);
+> +
+> +	lockdep_assert_irqs_disabled();
+> +
+> +	guard(perf_ctx_lock)(cpuctx, cpuctx->task_ctx);
+> +
+> +	if (WARN_ON_ONCE(!__this_cpu_read(guest_ctx_loaded)))
+> +		return;
+> +
+> +	perf_ctx_disable(&cpuctx->ctx, EVENT_GUEST);
+> +	if (cpuctx->task_ctx)
+> +		perf_ctx_disable(cpuctx->task_ctx, EVENT_GUEST);
+> +
+> +	perf_event_sched_in(cpuctx, cpuctx->task_ctx, NULL, EVENT_GUEST);
+> +
+> +	if (cpuctx->task_ctx)
+> +		perf_ctx_enable(cpuctx->task_ctx, EVENT_GUEST);
+> +	perf_ctx_enable(&cpuctx->ctx, EVENT_GUEST);
+> +
+> +	__this_cpu_write(guest_ctx_loaded, false);
+> +}
+> +EXPORT_SYMBOL_GPL(perf_put_guest_context);
+>  #else
+>  static int mediated_pmu_account_event(struct perf_event *event) { return 0; }
+>  static void mediated_pmu_unaccount_event(struct perf_event *event) {}
 
