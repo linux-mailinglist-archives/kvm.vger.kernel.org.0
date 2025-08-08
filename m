@@ -1,144 +1,104 @@
-Return-Path: <kvm+bounces-54325-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54326-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C32F1B1E76A
-	for <lists+kvm@lfdr.de>; Fri,  8 Aug 2025 13:35:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12E9BB1E8CF
+	for <lists+kvm@lfdr.de>; Fri,  8 Aug 2025 15:00:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D74C189FEA8
-	for <lists+kvm@lfdr.de>; Fri,  8 Aug 2025 11:35:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8B663B9AEF
+	for <lists+kvm@lfdr.de>; Fri,  8 Aug 2025 13:00:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 431D02749D7;
-	Fri,  8 Aug 2025 11:35:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32D4F27AC59;
+	Fri,  8 Aug 2025 13:00:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="OFxzTIrw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e2Mt3WMB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3D28242D6E
-	for <kvm@vger.kernel.org>; Fri,  8 Aug 2025 11:35:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60ECF221729
+	for <kvm@vger.kernel.org>; Fri,  8 Aug 2025 13:00:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754652917; cv=none; b=BUEoC+lVfELPrBHvdsXB0gZXcK6A8rfM5rFC4eFBfQ28hb42UzXIwEi17hzK2ZXOQpDIkzPDvk/shM+Zc7fO7fe+DyCUocgZbJF7irxNp6u2vHO9mI+Qy1oW2S6PDxGkqKsTXybeZC74zV5yb1FKDoAnnKdGL0c4MTqsVi6PZ5E=
+	t=1754658040; cv=none; b=MzTNqiYTq+/R9LPERsA6P/qSbE3WRVqEh1snGCxfcl8YvSu9LW3YyPpZup/wuk+OyMK9lGLfVVmP82gLp9QFX1aIlLpvRrgjlyDwRgG3RLNzzBpnU2/VI5ehNTbkaaAL/Jy7F+ypjdxXHcW2kc7EulA8mNAvpIdnvTRrDuQ29ps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754652917; c=relaxed/simple;
-	bh=CquLhGMQq6SPS9k+2Xd7aktEnvY7w48dkJqJFu3/V9s=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
-	 References:In-Reply-To; b=RIgBVVAHIJoR/f14r4H4b9brOgxR0jZxN34y2ziEzZO6IDL5deWZa/46w0HBvT2t4eTgnuJvcYKYbhEDqPiVNqMtiCpy0QTf0g0fdTqewlox43UHmX1wrpTZ+upNOngLX0VBIz3k906XSFrhkr3bJeoeAxoStD6q4rAeOStnYak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=OFxzTIrw; arc=none smtp.client-ip=209.85.221.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-3b788581079so18450f8f.0
-        for <kvm@vger.kernel.org>; Fri, 08 Aug 2025 04:35:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1754652913; x=1755257713; darn=vger.kernel.org;
-        h=in-reply-to:references:from:to:cc:subject:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bVe0BYxb2hdDOzuqM0QPgQUk4JUNXE4YiObhQZZKcW0=;
-        b=OFxzTIrw6kuYFdSWe4ft9TVNCyIxngOudEVFd/LPwFu42NeYks1vYNilZe51CeoarH
-         dXGPQelNLhoXCvJc/MyX67U1uI1mXKxN2jPy/KUao64J4+uHOYtRT9N99Lm+GCwiwm+6
-         kYm/i3iiPNUa4UZ/C0aCuE/R3/RuWCa5ofwpg22/JSI+RR1YANimK2dSQePGsuGtW9Tl
-         n7+s83m2VVd9U1ul7z2L3DLKR6NdB4uMtfvueMwLb3cQ0yfgcX9uHjlqVyKruYxO2ShM
-         x29d2scxa+2yZIKjAs2xVMVIk35H9JEvW9BaaQU9JJnIUe1MaiuB3zj/6xvNgwvCZjgT
-         bneA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754652913; x=1755257713;
-        h=in-reply-to:references:from:to:cc:subject:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=bVe0BYxb2hdDOzuqM0QPgQUk4JUNXE4YiObhQZZKcW0=;
-        b=LJf1g7H9VMRzJ0kR9s6CQPyWwsrEMMyb0X4OW4RSOcDGg49U3ZUR3XqI0QeU+HfyOj
-         1TpXneWKsyMZeqS58z6HvYPsyM1Dpw4GG79QNVfLlO+rBVyK+xx3ZYoooAwBevnDBcOa
-         dLJCGBzO3JaPWMU7q6FHN/ZMQ8YmvotzyhicyNzGA8k0U8tzWdhsXc0fjg4T6ERtGqvc
-         UMHSgMjMZE/rldRUkeKuGmhFqJcdoyrjlv6RTwBwOurJOTQm63HKsSh1ShgT+P5ubP7p
-         xiTcFshnAm5AT0HM6rnMS9kW/efqnYx0ZeKiW0+9HyJ3UR+MB5x83oqEUOWcwb+75pZY
-         ZCPg==
-X-Forwarded-Encrypted: i=1; AJvYcCWHNgPvEm48VJ6epjuxrrgf/ZZwBcYFLJRQ15HYPT527EF5fYZBebkyc3WFxYKjBuzqNSQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxlEzeWlAY6yh4LYRNUf5pAIFAcp+pkeQInUwYdV5bmMOaml0dG
-	SoXFlN03EsrBpmwoNd6kY1NOs1X2WGpf9Ee24CrQ2Raqy1tF/bbqyZYSkEz31GUdPL0=
-X-Gm-Gg: ASbGncv8VNj03p1o6LorrED7RphHkPkxE/Jqb/1t8tWNYoVuFqHgnOaRZbV5eexu1By
-	qo5zigEhNFhUP1LJbyDjKKkM3KVKNTzSqkcGHxg5itrlNzwqSKiODsMRZWK5f7OVuQpu2kwcx4H
-	S9qUutMDu9njnRTnFxJdsF/l/RVwIZKcYUxQ2NQ+UDKJEVlMGWJOhxV6O2VBrkbsoIRDlSokeXj
-	BjBTG24mXJ6HlCcGLBTN7ItdRFvyEkXQoI3w9GYwkaxO1vjjrwUGCRgD8k9iGDVT1vLzsLAStKk
-	KHgHSd5Mxv6QANzQw0JQeKhNLsCVnnzgktYXpOIJ/2SKPdeF8ZnaeNJfd+VIc+eikxOGC9YW0Ok
-	s3t31fRujkODdSYieyVdYV03yfGES
-X-Google-Smtp-Source: AGHT+IFliH1IeRlmtSKl6taCyhr9lWYZytazufI3Vxt3GCyH4GgGDnZo7KA2cPTXc0F1MYhLNN1WMA==
-X-Received: by 2002:a5d:5d88:0:b0:3a5:8abe:a265 with SMTP id ffacd0b85a97d-3b900b4ca0bmr1072782f8f.10.1754652912918;
-        Fri, 08 Aug 2025 04:35:12 -0700 (PDT)
-Received: from localhost ([2a02:8308:a00c:e200:764c:bb32:dd82:c77])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-3b79c338c7dsm30164171f8f.0.2025.08.08.04.35.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Aug 2025 04:35:12 -0700 (PDT)
+	s=arc-20240116; t=1754658040; c=relaxed/simple;
+	bh=ur4VNeXzGQk9qmrEDQ7LtPu2J4y9zaMIA/9t0a37I4Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SY6m/UDGnSUE3iI+c9lFG2hTryCdsD94nlpaFqMiIHGN9XhPmXO2pqg/mcGtqx9qpnHXeqZFSW5UzNhmoSxpzmT5UHGItFTs/pC3mw+F/DBLc5Xwa4Ejxu90lzX9PJBPJORIALeM8JqffDggfpgP8QNy6YZf3uprj/D/I+vkWr4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e2Mt3WMB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4A21C4CEED;
+	Fri,  8 Aug 2025 13:00:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754658040;
+	bh=ur4VNeXzGQk9qmrEDQ7LtPu2J4y9zaMIA/9t0a37I4Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=e2Mt3WMB2LzmSeJBjcIdzu+cOQ4LT5n3QSAjdXeZmuOIf5An77XTNTUNfZf4LPPbo
+	 KD+1jRaNObq6aOQrdr9FbT73oG3pGcuCyuutQ1fE+gugc5mLfca6a5sO2IFY2MWzLo
+	 L2VtkxcvpCyGB7TiqsomQ+DEAXfiOZ1G105ROgRS1epDrCVKaAqDKVcpLkIaP44itK
+	 z33djFfls93zLQiJdDNp2CgtFv1hJwVeI4K2lx2DeUqbeRen7XLWgycPDlYm8JetA2
+	 CzujUY/lSlGQKE8KM6pPzHHsC21HKg+p/HrvuSr0q7DiNNjA7kuB4f0NL30QCd2Q9v
+	 g+n74pJ0r9qgw==
+Date: Fri, 8 Aug 2025 14:00:35 +0100
+From: Will Deacon <will@kernel.org>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, kvm@vger.kernel.org,
+	Steven Price <steven.price@arm.com>,
+	Julien Thierry <julien.thierry.kdev@gmail.com>
+Subject: Re: [RFC PATCH kvmtool 09/10] vfio/iommufd: Add viommu and vdevice
+ objects
+Message-ID: <aJX089pd81f6vMCu@willie-the-truck>
+References: <20250525074917.150332-1-aneesh.kumar@kernel.org>
+ <20250525074917.150332-9-aneesh.kumar@kernel.org>
+ <aH4yMUWTuVtgqD7T@willie-the-truck>
+ <yq5att31brz2.fsf@kernel.org>
+ <f3b39fdc-e063-4d47-95dd-d4158f139053@arm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Fri, 08 Aug 2025 13:35:11 +0200
-Message-Id: <DBX0JNR61UNM.Z42YERAKRFR8@ventanamicro.com>
-Subject: Re: [PATCH] RISC-V: KVM: Using user-mode pte within
- kvm_riscv_gstage_ioremap
-Cc: <guoren@linux.alibaba.com>, <kvm@vger.kernel.org>,
- <kvm-riscv@lists.infradead.org>, <linux-riscv@lists.infradead.org>,
- <linux-kernel@vger.kernel.org>, "linux-riscv"
- <linux-riscv-bounces@lists.infradead.org>
-To: <fangyu.yu@linux.alibaba.com>, <anup@brainfault.org>,
- <atish.patra@linux.dev>, <paul.walmsley@sifive.com>, <palmer@dabbelt.com>,
- <aou@eecs.berkeley.edu>, <alex@ghiti.fr>
-From: =?utf-8?q?Radim_Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@ventanamicro.com>
-References: <20250807070729.89701-1-fangyu.yu@linux.alibaba.com>
-In-Reply-To: <20250807070729.89701-1-fangyu.yu@linux.alibaba.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f3b39fdc-e063-4d47-95dd-d4158f139053@arm.com>
 
-2025-08-07T15:07:29+08:00, <fangyu.yu@linux.alibaba.com>:
-> From: Fangyu Yu <fangyu.yu@linux.alibaba.com>
->
-> Currently we use kvm_riscv_gstage_ioremap to map IMSIC gpa to the spa of
-                                                                    ^^^
-                                                                    hpa?
+On Mon, Aug 04, 2025 at 11:33:27PM +0100, Suzuki K Poulose wrote:
+> On 24/07/2025 15:09, Aneesh Kumar K.V wrote:
+> > Will Deacon <will@kernel.org> writes:
+> > > On Sun, May 25, 2025 at 01:19:15PM +0530, Aneesh Kumar K.V (Arm) wrote:
+> > > > +	dev_num = vdev->dev_hdr.dev_num;
+> > > > +	/* kvmtool only do 0 domain, 0 bus and 0 function devices. */
+> > > > +	guest_bdf = (0ULL << 32) | (0 << 16) | dev_num << 11 | (0 << 8);
+> > > 
+> > > I don't understand this. Shouldn't the BDF correspond to the virtual
+> > > configuration space? That's not allocated until later, but just going
+> > > with 0 isn't going to work.
+> > > 
+> > > What am I missing?
+> > > 
+> > 
+> > As I understand it, kvmtool supports only bus 0 and does not allow
+> > multifunction devices. Based on that, I derived the guest BDF as follows
+> > (correcting what was wrong in the original patch):
+> > 
+> > guest_bdf = (0ULL << 16) | (0 << 8) | dev_num << 3 | (0 << 0);
+> > 
+> > Are you suggesting that this approach is incorrect, and that we can use
+> > a bus number other than 0?
+> 
+> To put this other way, the emulation of the configuration space is based
+> on the "dev_num". i.e., CFG address is converted to the offset and
+> mapped to the "dev_num". So I think what we have here is correct.
 
-> guest interrupt file within IMSIC.
->
-> The PAGE_KERNEL_IO property does not include user mode settings, so when
-> accessing the IMSIC address in the virtual machine,  a  guest page fault
-> will occur, this is not expected.
+My point is that 'dev_num' isn't allocated until vfio_pci_setup_device(),
+which is called from __iommufd_configure_device() _after_  we've called
+iommufd_alloc_s1bypass_hwpt().
 
-PAGE_KERNEL_IO also set the reserved G bit, so you're fixing two issues
-with a single change. :)
+So I don't see how this works. You have to allocate the virtual config
+space before you can allocate the virtual device with iommufd.
 
-> According to the RISC-V Privileged Architecture Spec, for G-stage address
-> translation, all memory accesses are considered to be user-level accesses
-> as though executed in Umode.
-
-What implementation are you using?  I would have assume that the
-original code was tested on QEMU, so we might have a bug there.
-
-> Signed-off-by: Fangyu Yu <fangyu.yu@linux.alibaba.com>
-> ---
-> diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
-> @@ -359,8 +360,11 @@ int kvm_riscv_gstage_ioremap(struct kvm *kvm, gpa_t =
-gpa,
->  	end =3D (gpa + size + PAGE_SIZE - 1) & PAGE_MASK;
->  	pfn =3D __phys_to_pfn(hpa);
-> =20
-> +	prot =3D pgprot_noncached(PAGE_WRITE);
-> +
->  	for (addr =3D gpa; addr < end; addr +=3D PAGE_SIZE) {
-> -		pte =3D pfn_pte(pfn, PAGE_KERNEL_IO);
-> +		pte =3D pfn_pte(pfn, prot);
-> +		pte =3D pte_mkdirty(pte);
-
-Is it necessary to dirty the pte?
-
-It was dirtied before, so it definitely doesn't hurt,
-
-Reviewed-by: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@ventanamicro.com>
-
-Thanks.
+Will
 
