@@ -1,207 +1,106 @@
-Return-Path: <kvm+bounces-54344-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54347-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D84AAB1F28D
-	for <lists+kvm@lfdr.de>; Sat,  9 Aug 2025 08:22:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12B61B1F503
+	for <lists+kvm@lfdr.de>; Sat,  9 Aug 2025 16:48:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 590767B6006
-	for <lists+kvm@lfdr.de>; Sat,  9 Aug 2025 06:20:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C26283BF11E
+	for <lists+kvm@lfdr.de>; Sat,  9 Aug 2025 14:48:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A458E20C494;
-	Sat,  9 Aug 2025 06:21:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BE8E2BE631;
+	Sat,  9 Aug 2025 14:48:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b="WakBQInh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S7sBDTKW"
 X-Original-To: kvm@vger.kernel.org
-Received: from www3579.sakura.ne.jp (www3579.sakura.ne.jp [49.212.243.89])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A5371DF97F;
-	Sat,  9 Aug 2025 06:21:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.243.89
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 420E68F6E;
+	Sat,  9 Aug 2025 14:48:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754720513; cv=none; b=fEgU0EqiQD/BanY0zG3gfiMOx2NvwKwS6REjpNF4W4f01vUGVby90y0loof9c55aVpoI30kgdocxEFTttshwf1hPIf+8JHV3PhkzFgCUCEXiaIh8CCnsIrHBDCwUhGkcnWBTkRvUZh7QoImbV0m6WW2t1tjJGNpsz/yBzl4/eOA=
+	t=1754750905; cv=none; b=DwvJvdCStto17dsUgs2meheqkoM6QZjckrQ37QkjXp4vF4eVTyCSA9Nx8yhS0QrdmKtbYSROOqTxK3+33mQxqXekPlI5nCnbA0BEkeLv/UKjplkIOoCtwc1/Qh+d2UhaimeyAE9RQRvXRP+wWZvdy6+qNxjyzHSAcdiDTlze+8g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754720513; c=relaxed/simple;
-	bh=1mADe4k0H7TVjVISrym93OlCtbnTCPUUg6EcDGGcrS8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=G6prth1LZFhEDJhT+GcfKXRiseZpuedzeLZstEW+nM29E91L74+tOneKgz7MnH0OeV/SL2KvQOevxZxHsIk0LcxzXBDidxbTEJEq80HWNqUqh0Drwx5Y+qF00j6XiDSl1Ocvx0LNLN5Bzdou8OFxz/XYCwmt1h8V11kqk2e3OJc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp; dkim=fail (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b=WakBQInh reason="key not found in DNS"; arc=none smtp.client-ip=49.212.243.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp
-Received: from [133.11.54.205] (h205.csg.ci.i.u-tokyo.ac.jp [133.11.54.205])
-	(authenticated bits=0)
-	by www3579.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 5796FeEc068583
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Sat, 9 Aug 2025 15:15:41 +0900 (JST)
-	(envelope-from odaki@rsg.ci.i.u-tokyo.ac.jp)
-DKIM-Signature: a=rsa-sha256; bh=tjn7589sn0todta5MMbg+BG3V2sZPDUGxLyydNTxbQc=;
-        c=relaxed/relaxed; d=rsg.ci.i.u-tokyo.ac.jp;
-        h=Message-ID:Date:Subject:To:From;
-        s=rs20250326; t=1754720141; v=1;
-        b=WakBQInh0cpfd1IgkkB74HPobXmSXxTLBu+vowlNpmhZVyQcXV5KEfxgIlhumpDg
-         0mCLcq34OsW9yBbXPxv/4xNnLOWAXY5rrxZyt1yXGIENC7Inaadqn8rkDGmjYrSh
-         EioPFP/iMmiWtTi9Wc7OCd8QAm0mj1UQ7Kkwkju3Vl2xl0+/pSDvbSXPPogRYVOR
-         PBRddWDA3RUOKATSyOwHf9bEMlwr3wT9Gg2FN18XMXYSGwvVzVhqeLozF9q0YA4D
-         +sKngJ+4IpJfvUzq0MrYGh0jrM2tZ2P42r3jPvrVbl9E3pToCF5iL+lERP20A4n0
-         liPykRyaCidMaytalVSdQg==
-Message-ID: <e33c21eb-d4d3-4c38-aab8-60399c7ae210@rsg.ci.i.u-tokyo.ac.jp>
-Date: Sat, 9 Aug 2025 15:15:40 +0900
+	s=arc-20240116; t=1754750905; c=relaxed/simple;
+	bh=ayYRoVh3IEbMODwTo+7JYB0k+fZAZLFDAILg4fANdeY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=SlqZRhhyvwpo5wiisxZRgK8MCmteH0YPn7laau1j9eae9KzNfPTqchK5N47pcyHvR3pSeEqd1ojLvXL/nkmXKnaCD3AAqcWXik9gkJ+lIrMUueXietdF5d1jhSQZ6ODPweNnrdv3w4x1sTVOaCfFXjzsmeYBGYDUaz0D17kCbIw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S7sBDTKW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4289C4CEE7;
+	Sat,  9 Aug 2025 14:48:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754750904;
+	bh=ayYRoVh3IEbMODwTo+7JYB0k+fZAZLFDAILg4fANdeY=;
+	h=From:To:Cc:Subject:Date:From;
+	b=S7sBDTKWw38EAvtne+UzBTjTVX31Ov0UGyRLZR5w/dHd1NPJsBHtA/isfApAIQTFh
+	 RgVSMe+bE554JP6Bv6+SDLXrxOMelS39b/mKnRLPiVUhueWvXywAkXQ7CtiJCv2RMs
+	 XuJk8u14RbfNPkfmvR60gvRjRkB8y/f4O2mVZ8orRQqM2O7EmduLP8p+EMJVh1udwP
+	 OGHdKtFPhoaPMrcp7c9U/jjHdQuPZ3b6R1+tbF2HSsZcnDxXjFwP9FHV2S7SVGDDxe
+	 vyz2so7n4bvmIGyY+PScbckhuJYUfPyOmwY4Q02tKcij/ykZ56ocbAxzzXhrxVi3Br
+	 XmjWPHD9wU/pw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1ukkrm-005eZC-Nq;
+	Sat, 09 Aug 2025 15:48:14 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Cc: Volodymyr Babchuk <volodymyr_babchuk@epam.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH 0/2] KVM: arm64: AT + SR accessor fixes
+Date: Sat,  9 Aug 2025 15:48:09 +0100
+Message-Id: <20250809144811.2314038-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v2 1/2] KVM: arm64: PMU: Introduce
- KVM_ARM_VCPU_PMU_V3_COMPOSITION
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu
- <yuzenghui@huawei.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Kees Cook <kees@kernel.org>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
-        Shuah Khan <shuah@kernel.org>, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
-        linux-hardening@vger.kernel.org, devel@daynix.com, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20250806-hybrid-v2-0-0661aec3af8c@rsg.ci.i.u-tokyo.ac.jp>
- <20250806-hybrid-v2-1-0661aec3af8c@rsg.ci.i.u-tokyo.ac.jp>
- <aJOO99xUrhsrvLwl@linux.dev>
- <276fdfb8-f1ca-44ad-b310-a811684b265a@rsg.ci.i.u-tokyo.ac.jp>
- <aJQJdElbZJ6KzQxD@linux.dev>
- <62494f54-13c6-4b9f-86a1-9a19ce58e91f@rsg.ci.i.u-tokyo.ac.jp>
- <aJaDYhme_St2b2sM@linux.dev>
-Content-Language: en-US
-From: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
-In-Reply-To: <aJaDYhme_St2b2sM@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, volodymyr_babchuk@epam.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 2025/08/09 8:08, Oliver Upton wrote:
-> On Thu, Aug 07, 2025 at 11:06:21PM +0900, Akihiko Odaki wrote:
->>> The only cross-PMU events we will support are the fixed counters, my
->>> strong preference is that we do not reverse-map architectural events to
->>> generic perf events for all counters.
->>
->> I wonder if there is a benefit to special case PERF_COUNT_HW_CPU_CYCLES
->> then; the current logic of kvm_map_pmu_event() looks sufficient for me.
-> 
-> I'd rather we just use the generic perf events and let the driver remap
-> things on our behalf. These are fixed counters, using constant events
-> feels like the right way to go about that.
-> 
-> kvm_map_pmu_event() is trying to solve a slightly different problem
-> where we need to map programmable PMUv3 events into a non-PMUv3 event
-> space, like on the M1 PMU.
+Volodymyr having reported[1] a couple of rather interesting bugs while
+running Xen under KVM, here's a couple of patches to plug these
+issues:
 
-It is currently also used to map non-programmable PMUv3 events.
+- a fix for ATS12 stopping the walk at S1 under the wrong conditions
 
-I want to understand the motivation better. The current procedure to 
-determine the config value is as follows:
-1) If the register is PMCCFILTR_EL0:
-    a) eventsel = ARMV8_PMUV3_PERFCTR_CPU_CYCLES.
-2) If the register is not PMCCFILTR_EL0:
-    a) Derive eventsel by masking the register value.
-3) If map_pmuv3_event() exists:
-    a) The config value is map_pmuv3_event(eventsel).
-4) If map_pmuv3_event() does not exist:
-    a) The config value is eventsel.
+- a much larger fix for the vcpu_{read,write}_sys_reg() accessors,
+  fixing the fate of TPIDR*_EL{0,1} and PAR_EL1, and overall becoming
+  much easier to work with
 
-If we use PERF_TYPE_HARDWARE / PERF_COUNT_HW_CPU_CYCLES, the procedure 
-will look like the following:
-1) If the register is PMCCFILTR_EL0:
-    a) The config value is PERF_TYPE_HARDWARE / PERF_COUNT_HW_CPU_CYCLES.
-2) If the reigster is not PMCCFILTR_EL0:
-    a) Derive eventsel by masking the register value.
-    b) If map_pmuv3_event() exists:
-       i) The config value is map_pmuv3_event(eventsel).
-    c) if map_pmuv3_event() does not exist,
-       i) The config value is eventsel.
+The latter is a pretty large change, but is worth it IMO as it makes
+everything much more straightforward.
 
-It does not seem that using PERF_TYPE_HARDWARE / 
-PERF_COUNT_HW_CPU_CYCLES simplifies the procedure.
+Volodymyr, I'd very much welcome your feedback on those, as despite my
+best effort, I didn't manage to even boot Debian's packaging of Xen
+(Grub just refuses to run *anything* after Xen being installed -- I
+guess it's not tested at all).
 
-> 
->>> This isn't what I meant. What I mean is that userspace either can use
->>> the SET_PMU ioctl or the COMPOSITION ioctl. Once one of them has been
->>> used the other ioctl returns an error.
->>>
->>> We're really bad at getting ioctl ordering / interleaving right and
->>> syzkaller has a habit of finding these mistakes. There's zero practical
->>> value in using both of these ioctls on the same VM, let's prevent it.
->>
->> The corresponding RFC series for QEMU uses KVM_ARM_VCPU_PMU_V3_SET_PMU to
->> probe host PMUs, and falls back to KVM_ARM_VCPU_PMU_V3_COMPOSITION if none
->> covers all CPUs. Switching between SET_PMU and COMPOSITION is useful during
->> such probing.
->>
->> COMPOSITION is designed to behave like just another host PMU that is set
->> with SET_PMU. SET_PMU allows setting a different host PMU even if SET_PMU
->> has already been invoked so it is also allowed to set a host PMU even if
->> COMPOSITION has already been invoked, maintaining consistency with
->> non-composed PMUs.
->>
->> You can find the QEMU patch at:
->> https://lore.kernel.org/qemu-devel/20250806-kvmq-v1-1-d1d50b7058cd@rsg.ci.i.u-tokyo.ac.jp/
->>
->> (look up KVM_ARM_VCPU_PMU_V3_SET_PMU for the probing code)
-> 
-> Having both of these attributes return success when probed with
-> KVM_HAS_DEVICE_ATTR is fine; what I mean is that once KVM_SET_DEVICE_ATTR
-> has been called on an attribute the other fails.
+[1] https://lore.kernel.org/r/20250806141707.3479194-1-volodymyr_babchuk@epam.com
 
-By probing, I meant checking if a host PMU is compatible with KVM.
+Marc Zyngier (2):
+  KVM: arm64: nv: Fix ATS12 handling of single-stage translation
+  KVM: arm64: Fix vcpu_{read,write}_sys_reg() accessors
 
-More concretely, QEMU implements the following procedure to detect a PMU 
-backend compatible with all host CPUs:
+ arch/arm64/include/asm/kvm_host.h |   4 +-
+ arch/arm64/kvm/at.c               |   6 +-
+ arch/arm64/kvm/sys_regs.c         | 243 +++++++++++++++---------------
+ 3 files changed, 130 insertions(+), 123 deletions(-)
 
-1) Traverse /sys/bus/event_source/devices
-    a) Check if the device has the cpus and type attributes.
-       If it doesn't, skip it.
-    b) Try to set the device's type with KVM_ARM_VCPU_PMU_V3_SET_PMU.
-       If successful, the device is compatible with KVM.
-    c) Check if the device's cpus cover all host CPUs.
-       If it does, use it with KVM_ARM_VCPU_PMU_V3_SET_PMU.
+-- 
+2.39.2
 
-2) Check if the union of the cpus attributes of compatible devices
-    cover all CPUs. If it does, use KVM_ARM_VCPU_PMU_V3_COMPOSITION.
-
-3) If it failed to find a usable backend until this step,
-    there is no PMU backend compatible with all host CPUs.
-
-Here, 1b) calls KVM_SET_DEVICE_ATTR with KVM_ARM_VCPU_PMU_V3_SET_PMU 
-during probing.
-
-> 
->>> On a system that has FEAT_PMUv3_ICNTR, userspace can still use this
->>> ioctl and explicitly de-feature ICNTR by writing to the ID register
->>> after initialization.
->>
->> Now I understand better.
->>
->> Currently, KVM_ARM_VCPU_PMU_V3_COMPOSITION sets supported_cpus to ones that
->> have cycle counters compatible with PMU emulation.
->>
->> If FEAT_PMUv3_ICNTR is set to the ID register, I guess
->> KVM_ARM_VCPU_PMU_V3_COMPOSITION will set supported_cpus to ones that have
->> compatible cycle and instruction counters. If so, the naming
->> KVM_ARM_VCPU_PMU_V3_FIXED_COUNTERS_ONLY indeed makes sense.
-> 
-> Perfect. Ideally SOC vendors do the sensible thing and ensure that
-> FEAT_PMUv3_ICNTR is consistent on all implementations in a machine. We
-> will hide the feature in KVM if it is not.
-
-M1 PMU also implements a fixed instruction counter, fortunately on all 
-CPUs. I hope they continue to do so (and ideally they implement 
-FEAT_PMUv3 and FEAT_PMUv3_ICNTR).
-
-Regards,
-Akihiko Odaki
 
