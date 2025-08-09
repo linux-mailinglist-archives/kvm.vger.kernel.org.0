@@ -1,70 +1,71 @@
-Return-Path: <kvm+bounces-54348-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54349-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C57BEB1F627
-	for <lists+kvm@lfdr.de>; Sat,  9 Aug 2025 22:19:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6744AB1F628
+	for <lists+kvm@lfdr.de>; Sat,  9 Aug 2025 22:21:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 20B967A725A
-	for <lists+kvm@lfdr.de>; Sat,  9 Aug 2025 20:17:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 186826219C7
+	for <lists+kvm@lfdr.de>; Sat,  9 Aug 2025 20:21:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8470327703D;
-	Sat,  9 Aug 2025 20:19:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AB8027814C;
+	Sat,  9 Aug 2025 20:21:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CcByh7vf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t0vtXvBi"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7DFB1DE4E0;
-	Sat,  9 Aug 2025 20:19:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DD2D2E36F1;
+	Sat,  9 Aug 2025 20:21:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754770751; cv=none; b=Yrc4peaBoT9NGXX9/HVPVzNfUhN06mouef5NSuz7keFvkOdrLYmW9bI0F3InxqI/AlmPMahtTxz/nnxFB3lJ7kcspY/PKHYXZRUah3emnCqOBqB3I1aGFN/1GS3/Uc/CNZjgB4mzbQxmXr7EubtzwSuG4nCo1jrjBqjiv6PXnFo=
+	t=1754770902; cv=none; b=J12mGiVCQ873t4x/K//4UoYKxYyeLZafvXsSJz+5ok+1Ti+jPFqYcwX7arOgtiV4dD+NAvM+Zx0eIkMg4MmQU/PfKCCZn6i0oL1kUMn6BeETG5M8uTGhU3b2FcmAAkdY3KEOU4X9AUbXA0sneKlx2YneBmT8WY+mRQVyOO7WoJQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754770751; c=relaxed/simple;
-	bh=SW26dL28FmmH3dzVI/obdVPmszSNosDs+9XfxxzakzQ=;
+	s=arc-20240116; t=1754770902; c=relaxed/simple;
+	bh=sEv9PYmMWBEnq4cHeF3/88QlEU0nUxNppYfuZI0MI4w=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pYrPslnoVLYCSUY1S68i5N4t/8JudU+8OuKschg/AZ3VMFxkHBgI0asTNBaBFKmC8sjCe/B8MvUn5u19WvCAO5Vv2xvyGwXtX5i1BXcvzcl8J8f7e5soktlE6hxBaXXuwBZ5qq1Doc7JVp6LQSA4F6686rZTTBliSJeWD8lTldY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CcByh7vf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 241E1C4CEE7;
-	Sat,  9 Aug 2025 20:19:11 +0000 (UTC)
+	 MIME-Version:Content-Type; b=B/PT6kYlmIjseW45qGmAwwFNuK6j5hTa63eZRK6fPZDLbS3St3dEZqex7D78snDC67+rIgXAZZ32+JwM4mLZa+gXelKg9ipXnD1Sr6qogk8I08ZdpKNmmVB7h4UOLnrM/NDgeq7AlB/ukko7cDfaojwpgJ+RZuW7Un2LSNHp1zo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t0vtXvBi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13CC7C4CEE7;
+	Sat,  9 Aug 2025 20:21:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754770751;
-	bh=SW26dL28FmmH3dzVI/obdVPmszSNosDs+9XfxxzakzQ=;
+	s=k20201202; t=1754770902;
+	bh=sEv9PYmMWBEnq4cHeF3/88QlEU0nUxNppYfuZI0MI4w=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=CcByh7vfH7ONCALgbjVNQCpvhjwAA7uTn+O3ODqhsJA9LgTE/qsGaI2JLKVNVcM2t
-	 B5BjOo4gmQyc4h/oPO72HOZ163bomI8buUm12U/awqZ9JXELnS57aTL4vl3QkZZIeb
-	 E51hHHz8Y1WyXci6H8//nRqyTxkI1ZVjrDEC//wM89OynCTgLfXWn/oc7TCM4DaYGu
-	 ni5UrY3cFyZX15irVvhisfGEFnJnzutiVGz85ji+Y3uq5xH67xzaZk1jFUtKj9P5Y4
-	 uUCKfQCbSHqph/5Nwlm30dtjcEBGAPOacBHjVWVYSK2ppvpaZNOJAyyhklKu7THE7b
-	 xdvy2x3pKEiCw==
+	b=t0vtXvBiTdiyGeBfS+qz+5/zNJjDQbJrp68NxASz/zeYJNbHNTDX+AUP4R9dUUACP
+	 +AHjUjtdez1AsSOWDZ0HotGytUVcSoVSqCQZof9DT7oBrwwarGrhH+RRz0J9Bq1pkU
+	 ZgEhjGm8pI+qXxbbtNeJEddC0QpWO7Ic8ud9ykNewNe1OgnD7YHECEW1uGKF4wxHp4
+	 T1K1msqGvHJ1qubOHaSFcFEtljt3dMd7xOE3Yk5f2BtxYykzVtZcn4WIvMQfQIZez2
+	 DgdNXoXtJf4IvZ8/lJsxTYiF2M9LCZN4+fChU5v/1J3e4mEcDvFuKXtL4MZdw6MyUT
+	 qYH4qeVWFn89Q==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1ukq20-005hxn-No;
-	Sat, 09 Aug 2025 21:19:08 +0100
-Date: Sat, 09 Aug 2025 21:19:08 +0100
-Message-ID: <874iugtfib.wl-maz@kernel.org>
+	id 1ukq4R-005hzT-Tt;
+	Sat, 09 Aug 2025 21:21:40 +0100
+Date: Sat, 09 Aug 2025 21:21:39 +0100
+Message-ID: <8734a0tfe4.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: kvmarm@lists.linux.dev,
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
 	kvm@vger.kernel.org,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Will Deacon <will@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Cornelia Huck <cohuck@redhat.com>
 Subject: Re: [PATCH v2 4/5] KVM: arm64: Expose FEAT_RASv1p1 in a canonical manner
-In-Reply-To: <20250807125531.GB2351327@e124191.cambridge.arm.com>
+In-Reply-To: <aJZ-wCLYh_STGiTI@linux.dev>
 References: <20250806165615.1513164-1-maz@kernel.org>
 	<20250806165615.1513164-5-maz@kernel.org>
 	<20250807125531.GB2351327@e124191.cambridge.arm.com>
+	<aJZ-wCLYh_STGiTI@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -76,51 +77,58 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com, cohuck@redhat.com
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, suzuki.poulose@arm.com, yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com, cohuck@redhat.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 07 Aug 2025 13:55:31 +0100,
-Joey Gouly <joey.gouly@arm.com> wrote:
+On Fri, 08 Aug 2025 23:48:32 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> On Wed, Aug 06, 2025 at 05:56:14PM +0100, Marc Zyngier wrote:
-> > If we have RASv1p1 on the host, advertise it to the guest in the
-> > "canonical way", by setting ID_AA64PFR0_EL1 to V1P1, rather than
-> > the convoluted RAS+RAS_frac method.
+> On Thu, Aug 07, 2025 at 01:55:31PM +0100, Joey Gouly wrote:
+> > On Wed, Aug 06, 2025 at 05:56:14PM +0100, Marc Zyngier wrote:
+> > > If we have RASv1p1 on the host, advertise it to the guest in the
+> > > "canonical way", by setting ID_AA64PFR0_EL1 to V1P1, rather than
+> > > the convoluted RAS+RAS_frac method.
+> > > 
+> > > Note that this also advertises FEAT_DoubleFault, which doesn't
+> > > affect the guest at all, as only EL3 is concerned by this.
+> > > 
+> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > > ---
+> > >  arch/arm64/kvm/sys_regs.c | 12 ++++++++++++
+> > >  1 file changed, 12 insertions(+)
+> > > 
+> > > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > > index 1b4114790024e..66e5a733e9628 100644
+> > > --- a/arch/arm64/kvm/sys_regs.c
+> > > +++ b/arch/arm64/kvm/sys_regs.c
+> > > @@ -1800,6 +1800,18 @@ static u64 sanitise_id_aa64pfr0_el1(const struct kvm_vcpu *vcpu, u64 val)
+> > >  	if (!vcpu_has_sve(vcpu))
+> > >  		val &= ~ID_AA64PFR0_EL1_SVE_MASK;
+> > >  
+> > > +	/*
+> > > +	 * Describe RASv1p1 in a canonical way -- ID_AA64PFR1_EL1.RAS_frac
+> > > +	 * is cleared separately. Note that by advertising RASv1p1 here, we
 > > 
-> > Note that this also advertises FEAT_DoubleFault, which doesn't
-> > affect the guest at all, as only EL3 is concerned by this.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/kvm/sys_regs.c | 12 ++++++++++++
-> >  1 file changed, 12 insertions(+)
-> > 
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index 1b4114790024e..66e5a733e9628 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -1800,6 +1800,18 @@ static u64 sanitise_id_aa64pfr0_el1(const struct kvm_vcpu *vcpu, u64 val)
-> >  	if (!vcpu_has_sve(vcpu))
-> >  		val &= ~ID_AA64PFR0_EL1_SVE_MASK;
-> >  
-> > +	/*
-> > +	 * Describe RASv1p1 in a canonical way -- ID_AA64PFR1_EL1.RAS_frac
-> > +	 * is cleared separately. Note that by advertising RASv1p1 here, we
+> > Where is it cleared? __kvm_read_sanitised_id_reg() is where I would have
+> > expected to see it:
 > 
-> Where is it cleared? __kvm_read_sanitised_id_reg() is where I would have
-> expected to see it:
+> Actually, I'm a bit worried this change doesn't give us very much value
+> since Marc already does the exhaustive RASv1p1 check in the sysreg
+> emulation.
 > 
->     case SYS_ID_AA64PFR1_EL1:
+> There's potential for breakage when migrating VMs between new/old kernels
+> on systems w/ FEAT_RASv1p1 && !FEAT_DoubleFault.
+> 
+> Marc, WDYT about dropping this patch and instead opening up RAS_frac to
+> writes?
 
-[...]
+That's indeed probably best. But the question I can't manage to answer
+right now is how we migrate RASv1p1 between the two versions? It means
+cross-idreg dependencies, ordering and all that, and I'm a bit
+reluctant to do so.
 
-Ah crap, it is the nested code that we get rid of it, nowhere else.
-Which means that non-nested VMs have already observed RAS_frac. What a
-mess. Then RAS_frac must be exposed as writable.
-
-The question is whether we want to allow migration between one flavour
-of RASv1p1 and the other.
+Thoughts?
 
 	M.
 
