@@ -1,219 +1,124 @@
-Return-Path: <kvm+bounces-54351-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54352-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5602CB1F767
-	for <lists+kvm@lfdr.de>; Sun, 10 Aug 2025 02:21:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EAB20B1FC23
+	for <lists+kvm@lfdr.de>; Sun, 10 Aug 2025 23:12:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12C7D3BFA3F
-	for <lists+kvm@lfdr.de>; Sun, 10 Aug 2025 00:21:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 209761897678
+	for <lists+kvm@lfdr.de>; Sun, 10 Aug 2025 21:12:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64E00F4FA;
-	Sun, 10 Aug 2025 00:21:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2F4621D3E6;
+	Sun, 10 Aug 2025 21:12:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DBcDRdcW"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eytNvycD"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C6E28F40;
-	Sun, 10 Aug 2025 00:21:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A4FF221FC7;
+	Sun, 10 Aug 2025 21:12:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754785294; cv=none; b=bAsbxHQl986YKFA9TL3o9EaM0DkTC5VhG4iePO+KtLivISrmCMDb5btgozfdngW8b9a91BZ60nIZOhCVv2Ht0bEg1yHgcIbhws3DODTt1ONpYAhLYnw0ICRXxL2qO+H4tiwa/0FzWfUB9xFgSYB2CvSaHscS6UZgQgTFD6s0lsc=
+	t=1754860326; cv=none; b=o5GdulVSeKlY8k/RIKbPwQEdlgG91oKA2wiw8jZjZo67y7Z4SBsc1QnB8vjAk+BC70uiCOgfVwv/W4wWH6msClUAV/GY8nPyWBH/K6FY3RnLtTrqCzqzp+9iOu8bd/ww91jMc6FYPDav8/MsnmQ/JIwejFi53vJB8JhdeFvwbu4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754785294; c=relaxed/simple;
-	bh=78QzPlzaBG01dmRGq5FOYkDlmNnMxuwrIq23STEu7HU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Dg2scFc+2racU2i6GzSf2QiE+H56J4cX4fAHCqEY424dqecoHrzL+z8edMQqVhCWzu2zzv9eB5uoJCcAOVe1lDjlql7A+0+dI/iiu42q4tVYoewNN2TugMDmLsmJyejLXbs7HJqp8PZdU5whr673mIYdJVmclsAX99dmTmFjVPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DBcDRdcW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 416F0C4CEF1;
-	Sun, 10 Aug 2025 00:21:33 +0000 (UTC)
+	s=arc-20240116; t=1754860326; c=relaxed/simple;
+	bh=SVf33tSFtUiZDgX+LrTamKLmL2FlBV4IaY9JDQKAi/I=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=SMkuDH9FidLKcLyNMeiyD9TU6Cv12+0adp92TnFA8DLYihl3G1L4GG5XFqiRt7CdHxsuacGNcDUphYZx7jivQLWUGd3DYfZvGKGYx5JdeUkSZpUuzC1lte85D0rwuo9CS+k7mGBGNalQH8U27SAHP1o6GUnje1WhkcMNGfKk6C4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eytNvycD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8FBDDC4CEF9;
+	Sun, 10 Aug 2025 21:12:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754785294;
-	bh=78QzPlzaBG01dmRGq5FOYkDlmNnMxuwrIq23STEu7HU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=DBcDRdcW9dy3yWlnaWyij968W7RddLtzfsga+7NCWOhO2buKSScFUz91eafoJYm29
-	 gPpZJ/U5QoiNtX2RCWPawywrJ1/frXrcNNO7712AigCmOydjT2Zcw5BbQpu918yIbU
-	 EKTGrdnENdvR1bRXijDxNEyR4rnhwsRVuZUYJi5feNmd57WwYYh0ZtaH69cY0WJ9Dg
-	 VxxXSn+oAOqUlS/1AFB6GMdGevAxHF0MK2P9WjtD9Nbk9RVMD5Fn/2eYEHufAwFP7h
-	 fImYcizfqZyAetFuAhLMoTMEMnTtLL/10qKf8l5izeqc6H6GbX/Eopx+GTp6nWqSmf
-	 nrU46aKg+w9Ig==
-From: Sasha Levin <sashal@kernel.org>
-To: patches@lists.linux.dev,
-	stable@vger.kernel.org
-Cc: Keith Busch <kbusch@kernel.org>,
-	"Paul E . McKenney" <paulmck@kernel.org>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Sasha Levin <sashal@kernel.org>,
-	kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.16-5.15] vfio/type1: conditional rescheduling while pinning
-Date: Sat,  9 Aug 2025 20:21:01 -0400
-Message-Id: <20250810002104.1545396-12-sashal@kernel.org>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250810002104.1545396-1-sashal@kernel.org>
-References: <20250810002104.1545396-1-sashal@kernel.org>
+	s=k20201202; t=1754860325;
+	bh=SVf33tSFtUiZDgX+LrTamKLmL2FlBV4IaY9JDQKAi/I=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=eytNvycDFo0d67cAAYPzayW0cuXtbv6CCYMFcz31wwKSUGEg4vcLRaWUbtXUBY77o
+	 KRbxDnPxCuluOskwQYE7SCi0VL8PxJcfp+HG6rthf67NM7k9v6O6F21qrLTZdxoyjK
+	 Q3x6nYrWbG06R83g8S0m9CjDT4VKE8Qkd5KcoBKDlehN/4gn13lBbnPF2BF+vsdQFS
+	 Dx3OiByWhkUeit4cxohz4pAAYxFK2iT73XjIfLEJtW39ndG2Yq/OnYtCycIixA8u6k
+	 E5vV4pQhiGkhGYBvZ6mR6c+K12gZo/MmkxucoZ0jDD+s6358tbxGkByhEHChMgR735
+	 Xcksopc6bHZpQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70DD839D0C2B;
+	Sun, 10 Aug 2025 21:12:19 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.16
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v8 00/14] riscv: add SBI FWFT misaligned exception
+ delegation
+ support
+From: patchwork-bot+linux-riscv@kernel.org
+Message-Id: 
+ <175486033798.1221929.4288222571177001101.git-patchwork-notify@kernel.org>
+Date: Sun, 10 Aug 2025 21:12:17 +0000
+References: <20250523101932.1594077-1-cleger@rivosinc.com>
+In-Reply-To: <20250523101932.1594077-1-cleger@rivosinc.com>
+To: =?utf-8?b?Q2zDqW1lbnQgTMOpZ2VyIDxjbGVnZXJAcml2b3NpbmMuY29tPg==?=@codeaurora.org
+Cc: linux-riscv@lists.infradead.org, paul.walmsley@sifive.com,
+ palmer@dabbelt.com, anup@brainfault.org, atishp@atishpatra.org,
+ shuah@kernel.org, corbet@lwn.net, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, kvm@vger.kernel.org,
+ kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org,
+ samuel.holland@sifive.com, ajones@ventanamicro.com, debug@rivosinc.com,
+ charlie@rivosinc.com
 
-From: Keith Busch <kbusch@kernel.org>
+Hello:
 
-[ Upstream commit b1779e4f209c7ff7e32f3c79d69bca4e3a3a68b6 ]
+This series was applied to riscv/linux.git (fixes)
+by Anup Patel <anup@brainfault.org>:
 
-A large DMA mapping request can loop through dma address pinning for
-many pages. In cases where THP can not be used, the repeated vmf_insert_pfn can
-be costly, so let the task reschedule as need to prevent CPU stalls. Failure to
-do so has potential harmful side effects, like increased memory pressure
-as unrelated rcu tasks are unable to make their reclaim callbacks and
-result in OOM conditions.
+On Fri, 23 May 2025 12:19:17 +0200 you wrote:
+> The SBI Firmware Feature extension allows the S-mode to request some
+> specific features (either hardware or software) to be enabled. This
+> series uses this extension to request misaligned access exception
+> delegation to S-mode in order to let the kernel handle it. It also adds
+> support for the KVM FWFT SBI extension based on the misaligned access
+> handling infrastructure.
+> 
+> [...]
 
- rcu: INFO: rcu_sched self-detected stall on CPU
- rcu:   36-....: (20999 ticks this GP) idle=b01c/1/0x4000000000000000 softirq=35839/35839 fqs=3538
- rcu:            hardirqs   softirqs   csw/system
- rcu:    number:        0        107            0
- rcu:   cputime:       50          0        10446   ==> 10556(ms)
- rcu:   (t=21075 jiffies g=377761 q=204059 ncpus=384)
-...
-  <TASK>
-  ? asm_sysvec_apic_timer_interrupt+0x16/0x20
-  ? walk_system_ram_range+0x63/0x120
-  ? walk_system_ram_range+0x46/0x120
-  ? pgprot_writethrough+0x20/0x20
-  lookup_memtype+0x67/0xf0
-  track_pfn_insert+0x20/0x40
-  vmf_insert_pfn_prot+0x88/0x140
-  vfio_pci_mmap_huge_fault+0xf9/0x1b0 [vfio_pci_core]
-  __do_fault+0x28/0x1b0
-  handle_mm_fault+0xef1/0x2560
-  fixup_user_fault+0xf5/0x270
-  vaddr_get_pfns+0x169/0x2f0 [vfio_iommu_type1]
-  vfio_pin_pages_remote+0x162/0x8e0 [vfio_iommu_type1]
-  vfio_iommu_type1_ioctl+0x1121/0x1810 [vfio_iommu_type1]
-  ? futex_wake+0x1c1/0x260
-  x64_sys_call+0x234/0x17a0
-  do_syscall_64+0x63/0x130
-  ? exc_page_fault+0x63/0x130
-  entry_SYSCALL_64_after_hwframe+0x4b/0x53
+Here is the summary with links:
+  - [v8,01/14] riscv: sbi: add Firmware Feature (FWFT) SBI extensions definitions
+    (no matching commit)
+  - [v8,02/14] riscv: sbi: remove useless parenthesis
+    (no matching commit)
+  - [v8,03/14] riscv: sbi: add new SBI error mappings
+    (no matching commit)
+  - [v8,04/14] riscv: sbi: add FWFT extension interface
+    (no matching commit)
+  - [v8,05/14] riscv: sbi: add SBI FWFT extension calls
+    (no matching commit)
+  - [v8,06/14] riscv: misaligned: request misaligned exception from SBI
+    (no matching commit)
+  - [v8,07/14] riscv: misaligned: use on_each_cpu() for scalar misaligned access probing
+    (no matching commit)
+  - [v8,08/14] riscv: misaligned: declare misaligned_access_speed under CONFIG_RISCV_MISALIGNED
+    (no matching commit)
+  - [v8,09/14] riscv: misaligned: move emulated access uniformity check in a function
+    (no matching commit)
+  - [v8,10/14] riscv: misaligned: add a function to check misalign trap delegability
+    (no matching commit)
+  - [v8,11/14] RISC-V: KVM: add SBI extension init()/deinit() functions
+    https://git.kernel.org/riscv/c/cf648c400fd2
+  - [v8,12/14] RISC-V: KVM: add SBI extension reset callback
+    (no matching commit)
+  - [v8,13/14] RISC-V: KVM: add support for FWFT SBI extension
+    (no matching commit)
+  - [v8,14/14] RISC-V: KVM: add support for SBI_FWFT_MISALIGNED_DELEG
+    (no matching commit)
 
-Signed-off-by: Keith Busch <kbusch@kernel.org>
-Reviewed-by: Paul E. McKenney <paulmck@kernel.org>
-Link: https://lore.kernel.org/r/20250715184622.3561598-1-kbusch@meta.com
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
-
-LLM Generated explanations, may be completely bogus:
-
-**Backport Status: YES**
-
-This commit should be backported to stable kernel trees. Here's my
-extensive analysis:
-
-## Bug Fix Nature
-
-The commit fixes a critical CPU stall issue that can lead to system
-instability. The RCU stall trace in the commit message shows:
-- A 21-second RCU stall (`t=21075 jiffies`)
-- Over 10 seconds of CPU time consumed (`cputime: 10556ms`)
-- The stall originates from `vfio_pin_pages_remote()` during large DMA
-  mapping operations
-
-This is a serious bug that affects system reliability and can cascade
-into OOM conditions as mentioned: "increased memory pressure as
-unrelated rcu tasks are unable to make their reclaim callbacks and
-result in OOM conditions."
-
-## Code Change Analysis
-
-The fix is minimal and well-contained:
-1. **Single line addition**: The patch adds only `cond_resched()` call
-   at line 654 (after the comment block)
-2. **Strategic placement**: Positioned at the beginning of the batch
-   refill loop, before `vaddr_get_pfns()` is called
-3. **Clear comment**: The 5-line comment explains exactly why the
-   reschedule is needed
-
-```c
-+                       /*
-+                        * Large mappings may take a while to repeatedly
-refill
-+                        * the batch, so conditionally relinquish the
-CPU when
-+                        * needed to avoid stalls.
-+                        */
-+                       cond_resched();
-```
-
-## Stability and Safety
-
-1. **Low risk**: `cond_resched()` is a standard kernel primitive that
-   only yields CPU if needed
-2. **Already used pattern**: My search shows vfio_iommu_type1.c already
-   uses `cond_resched()` in other places, confirming this is an
-   established pattern
-3. **No functional changes**: The fix doesn't alter the logic of DMA
-   pinning, it just prevents monopolizing the CPU
-4. **Reviewed by RCU maintainer**: Paul E. McKenney's review adds
-   credibility to the fix
-
-## Stable Tree Criteria Compliance
-
-Per stable-kernel-rules.rst, this meets the criteria:
-- **Fixes a real bug**: CPU stalls and potential OOM are serious issues
-- **Small change**: Single line addition with comment
-- **Obviously correct**: Standard solution for long-running loops
-- **Already tested**: Has been in mainline and reviewed by experts
-- **No new features**: Pure bug fix, no functionality addition
-
-## Impact Assessment
-
-The bug affects systems performing large DMA mappings through VFIO,
-particularly when Transparent Huge Pages (THP) cannot be used. This is
-common in:
-- Virtual machine device passthrough
-- GPU/accelerator passthrough scenarios
-- Large memory pinning operations
-
-Without this fix, affected systems can experience:
-- RCU stalls leading to system unresponsiveness
-- Memory pressure and OOM kills
-- Performance degradation for unrelated tasks
-
-The fix prevents these issues with negligible overhead (conditional
-reschedule only when needed).
-
- drivers/vfio/vfio_iommu_type1.c | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 1136d7ac6b59..f8d68fe77b41 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -647,6 +647,13 @@ static long vfio_pin_pages_remote(struct vfio_dma *dma, unsigned long vaddr,
- 
- 	while (npage) {
- 		if (!batch->size) {
-+			/*
-+			 * Large mappings may take a while to repeatedly refill
-+			 * the batch, so conditionally relinquish the CPU when
-+			 * needed to avoid stalls.
-+			 */
-+			cond_resched();
-+
- 			/* Empty batch, so refill it. */
- 			ret = vaddr_get_pfns(mm, vaddr, npage, dma->prot,
- 					     &pfn, batch);
+You are awesome, thank you!
 -- 
-2.39.5
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
