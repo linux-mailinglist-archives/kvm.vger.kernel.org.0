@@ -1,176 +1,140 @@
-Return-Path: <kvm+bounces-54448-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54449-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2BADB21690
-	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 22:35:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26D53B216B4
+	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 22:46:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED322179E8F
-	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 20:35:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 36DBA1A24671
+	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 20:46:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D80C2E2DD0;
-	Mon, 11 Aug 2025 20:35:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7A402DA742;
+	Mon, 11 Aug 2025 20:45:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="msI8tNLj"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KMiKgSmr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFABC2DA775
-	for <kvm@vger.kernel.org>; Mon, 11 Aug 2025 20:35:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 884CD311C02
+	for <kvm@vger.kernel.org>; Mon, 11 Aug 2025 20:45:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754944530; cv=none; b=E1sJJ4b4L8svXCIXwnNeXcatx9+bsKVfS2WS5HHh3B4hMrx6eFTTZhlVUWDS700pFlV2Id7xrfNW/8/vVFCQPsaQq9f5DCxfZ0Tq6SK9PG7b6JW9Pu1AYsxu1J4RoequHa2sd0UVqhtDDYivwSb+gLV7o/GOmqz7q7U5yKD7s9M=
+	t=1754945150; cv=none; b=THg7R5QmE0/J1T+baIPLQnUBCIaLNZTL4dPbh1TEJgSgyZ7BuQNWCPQBJpPVf1WCQQE9lMxGHHdxPh1O2QmEh3CdDransQlhTf5+AzFZ4W1ar5HYFErisKsKvuOy1lON/BwYWE/bEqHbEUwdZ/pXX6Aro5IhU4MX+nA2KhsvFYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754944530; c=relaxed/simple;
-	bh=QpDf+elt9M9TKmobx1BaTq9lS4qdM3lH4ej26Ym52hk=;
+	s=arc-20240116; t=1754945150; c=relaxed/simple;
+	bh=x9w6V7pENJMTOyxSXxtDBfeZ6hHo/blTfXAWZ/CChgw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=LNh311g+Uwcw4dLo9uct+LlwVCpiS01n5k6tGVfvRONzfai/HHc3d4F2Ga/Q3a3cT+AL1OTIPGOto7wjtGh0HSXyRMQN9OPymT4UYDRCXdiDnluOs+gMrIFxbw3Xl4jjhSwKkVTAULUdBTSnLKbIcmqDj2mPFGvadeSlBQKymGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=msI8tNLj; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=m9klP29Y+QiuIGVMwXzC9IOLQrML0llHDj9nh7Xjo4YTrjMULHvLEk8Pal7VXaAx0PFdWDwfuSVwxGhWLC2gc6FFXJn81QNBFWCKeD5WluNE2YA9vdO/Yj0yTaz11J7Ta5d7vzfaRLPqdLz1zCBBgbRkU/tWcdqVwPr1b7at51A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KMiKgSmr; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3132c1942a1so10109277a91.2
-        for <kvm@vger.kernel.org>; Mon, 11 Aug 2025 13:35:27 -0700 (PDT)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b4274f5e065so4161103a12.0
+        for <kvm@vger.kernel.org>; Mon, 11 Aug 2025 13:45:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754944527; x=1755549327; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1754945148; x=1755549948; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vTpJfMamSKiMcyAgK8UySPyjbjczetycEUO9ZouvYAA=;
-        b=msI8tNLjcyFy4VHG60oFhYnyavOX3RcwRuANNxCrroYviZnOY1WHUvuca+TeVt/fpq
-         4i1G+dxq/Sf30EKKYjSvGN+ctttaf9nNUc82mOXFnO+N1BVYTcEm5Tq5lGStc5ySU+DV
-         sQvKyRXNqfG2RZ6MZuufxOzYvAwCibMNIhYIIuahmbeJyJwjY9Nt9JM5MBxK0TxHXrKi
-         byNL/jwDyownPUwMj0p4D6F7gPjJpUR9nYDZLU2OoiQNV0JmPvbbUWR9N1CAfuq/DXLj
-         c+QQqroiOU/ylxQa1IccPv7zXbBJcPD32fnmislMgTrJa/Q7lzJctgtfUHhZ5puM4Cwb
-         uRpg==
+        bh=YCzvuaHTksePcyjhE6+vgQKI6eFemBt/7TJj5lqZjhU=;
+        b=KMiKgSmrRCisEMKzu0SqZhJgIqx7Q15Z4FkhmFRe2drVN8kYEUzzgLsDdP012HxL7/
+         ZhybWCUSruu2XSs+fv7MXBpJ3d51kWFCgTAg/PIvEUuaBoFqekC710JPs7idjnsLIvqb
+         bjVg3rTlVFADWSUkZMbrG4GnMS3A0nCXLd/GFB6kAZgSminGnJyB1nZL2S/XO++M9alC
+         1gaA08bk3aFnHekDuA88NU90pOgfcIBmQ932CKqFzVdx2ANxc6ZHrx0l19wyD8Ew2cmk
+         iXygdosvjQEmxUq5e84Drk2pIsMTghK248HBmIKmmlvRrGt39rs7KWBqK2Yx79BN5F0N
+         CkHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754944527; x=1755549327;
+        d=1e100.net; s=20230601; t=1754945148; x=1755549948;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vTpJfMamSKiMcyAgK8UySPyjbjczetycEUO9ZouvYAA=;
-        b=hJELQsrzXSKSoDcvzEJwAAG0KrlKA4RDyquBJXWsiwVpIR+ELsvvx7yLB88Rsk0L/n
-         TZ3od4zAW6IkJHms1vhc5x8SgJGpWxGlCR8TEQg+VCDkvKyL82yZRBCSq/iDZpcl7sjr
-         hWqzMxT1lho0bJ+m+/q3pMgsrymAkxM1TWJIjx46lb8TY2VKUA3K3dHpXmblP3KBG2uO
-         yUolpKuNz8C6vOIQxNnXOg6cAGjl66sb/1uIbhR46c49ug/8jzZtchbb4zVWK61UC123
-         yjxCLPoplVrFSwPkrCqZWrbUgd3x0uKyqyENN1+hBS9jrSuiymX+FrO3tzhO6suDKwml
-         Z/xg==
-X-Forwarded-Encrypted: i=1; AJvYcCU2pFS9+soraEWlLMbb2cp1NUhvFLV7Qx/r8dmxuTN/YcTQmtX3gDVhNg9ceFRfFHHAiNc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YycSdCjDTHNDIgCc7mM7UUmVTb8i2ZXaTlZsF/yIR1ufSydPk5G
-	vVttfBXA/y7uf1SZ7BphpPXKpBtNmfb8lBd6kvuHGco7x9ycwOcCgd/NsuvOfQKOHCAOZf4SoZq
-	Oj5pwlA==
-X-Google-Smtp-Source: AGHT+IHyhaALMr5XuJoOSrDVhdZmcQWkFVvTH6tfqb1JQAjECOzXqhG5Gursizm3hnRl2+Uz1FQ4pdr6quY=
-X-Received: from pjbph15.prod.google.com ([2002:a17:90b:3bcf:b0:321:b92a:7a39])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:540d:b0:311:ea13:2e70
- with SMTP id 98e67ed59e1d1-321839f1159mr19783183a91.14.1754944527061; Mon, 11
- Aug 2025 13:35:27 -0700 (PDT)
-Date: Mon, 11 Aug 2025 13:35:25 -0700
-In-Reply-To: <20250807201628.1185915-22-sagis@google.com>
+        bh=YCzvuaHTksePcyjhE6+vgQKI6eFemBt/7TJj5lqZjhU=;
+        b=vtRRR/zTTS2SBSLf3ki71ve43xebI6hS3icXSoyTZ1HkhZ43jj5C6Fgz4LCgJ/wd+j
+         oJyYY18kY6HhVgKwzdeWpSLn3aljhL5uY3D3MdCuV/nmNfrtzbzdYIV1quqYbY1u27FZ
+         yoXeYASc3YaHVzUtHLwZtSCJsvcsNJC2PyHPU+0CDPn/22zSnT/uFd43MLC70n0BHIRt
+         zhKbbKchDEaFikhcM/2H2en/ogNyuME/SWg54ZCjVcXX8H+6Q0X0w+FAPSa1vJJVTzQL
+         BNNHItAdFxqSr5KeghEsNxPvWUafFj1Hdwo70Luk7BioWHC3PccOoTzg+mm8hwMzOCXU
+         xVGQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXqyEQOS4M++7gBuhThMvxrvxuPDYvxiRgxqQ3Kj1U5ENstaW5aiVUsWL9JICZxlK1t0Ig=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy0jYeNYyVWdZ/oGfpuxx/CzqHYFc9m0tlbX/Bi/cxXF/YYBC3z
+	heD54VhSKn8xjdxnA5HolVFrubpxHbFuezjKhP+jawYT2oABLwW8LEt4y7J6hwf9TExYnDCGrcd
+	RyZUjBw==
+X-Google-Smtp-Source: AGHT+IGbrPTnrEMcQaX9aICrlGhuN/HwbXf/jBn1buIix2r8TwtQnzufznJB8yzLjSRkDiDx2IIc3OUJTF4=
+X-Received: from pjqf22.prod.google.com ([2002:a17:90a:a796:b0:31e:fac4:4723])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ebc2:b0:240:86b2:aeb6
+ with SMTP id d9443c01a7336-242fc33d8bdmr13536485ad.26.1754945147830; Mon, 11
+ Aug 2025 13:45:47 -0700 (PDT)
+Date: Mon, 11 Aug 2025 13:45:46 -0700
+In-Reply-To: <20250811203041.61622-3-yury.norov@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250807201628.1185915-1-sagis@google.com> <20250807201628.1185915-22-sagis@google.com>
-Message-ID: <aJpUDS4PSgLK8A16@google.com>
-Subject: Re: [PATCH v8 21/30] KVM: selftests: TDX: Verify the behavior when
- host consumes a TD private memory
+References: <20250811203041.61622-1-yury.norov@gmail.com> <20250811203041.61622-3-yury.norov@gmail.com>
+Message-ID: <aJpWet3USvXLWYEZ@google.com>
+Subject: Re: [PATCH 2/2] KVM: SVM: drop useless cpumask_test_cpu() in pre_sev_run()
 From: Sean Christopherson <seanjc@google.com>
-To: Sagi Shahar <sagis@google.com>
-Cc: linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, Ackerley Tng <ackerleytng@google.com>, 
-	Ryan Afranji <afranji@google.com>, Andrew Jones <ajones@ventanamicro.com>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, Erdem Aktas <erdemaktas@google.com>, 
-	Rick Edgecombe <rick.p.edgecombe@intel.com>, Roger Wang <runanwang@google.com>, 
-	Binbin Wu <binbin.wu@linux.intel.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	"Pratik R. Sampat" <pratikrajesh.sampat@amd.com>, Reinette Chatre <reinette.chatre@intel.com>, 
-	Ira Weiny <ira.weiny@intel.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+To: Yury Norov <yury.norov@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Zheyun Shen <szy0127@sjtu.edu.cn>
 Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Aug 07, 2025, Sagi Shahar wrote:
-> +void verify_host_reading_private_mem(void)
-> +{
-> +	uint64_t second_host_read;
-> +	uint64_t first_host_read;
-> +	struct kvm_vcpu *vcpu;
-> +	vm_vaddr_t test_page;
-> +	uint64_t *host_virt;
-> +	struct kvm_vm *vm;
-> +
-> +	vm = td_create();
-> +	td_initialize(vm, VM_MEM_SRC_ANONYMOUS, 0);
-> +	vcpu = td_vcpu_add(vm, 0, guest_host_read_priv_mem);
-> +
-> +	test_page = vm_vaddr_alloc_page(vm);
-> +	TEST_ASSERT(test_page < BIT_ULL(32),
-> +		    "Test address should fit in 32 bits so it can be sent to the guest");
-> +
-> +	host_virt = addr_gva2hva(vm, test_page);
-> +	TEST_ASSERT(host_virt,
-> +		    "Guest address not found in guest memory regions\n");
-> +
-> +	tdx_test_host_read_private_mem_addr = test_page;
-> +	sync_global_to_guest(vm, tdx_test_host_read_private_mem_addr);
-> +
-> +	td_finalize(vm);
-> +
-> +	printf("Verifying host's behavior when reading TD private memory:\n");
-> +
-> +	tdx_run(vcpu);
-> +	tdx_test_assert_io(vcpu, TDX_HOST_READ_PRIVATE_MEM_PORT_TEST,
-> +			   4, PORT_WRITE);
-> +	printf("\t ... Guest's variable contains 0xABCD\n");
+On Mon, Aug 11, 2025, Yury Norov wrote:
+> Testing cpumask for a CPU to be cleared just before setting the exact
+> same CPU is useless because the end result is always the same: CPU is
+> set.
 
-Don't use bare printf() for what is effectively debug info.
-> +
-> +	/* Host reads guest's variable. */
-> +	first_host_read = *host_virt;
-> +	printf("\t ... Host's read attempt value: %lu\n", first_host_read);
-> +
-> +	/* Guest updates variable and host rereads it. */
-> +	tdx_run(vcpu);
-> +	printf("\t ... Guest's variable updated to 0xFEDC\n");
-> +
-> +	second_host_read = *host_virt;
-> +	printf("\t ... Host's second read attempt value: %lu\n",
-> +	       second_host_read);
-> +
-> +	TEST_ASSERT(first_host_read == second_host_read,
-> +		    "Host did not read a fixed pattern\n");
-> +
-> +	printf("\t ... Fixed pattern was returned to the host\n");
-> +
-> +	kvm_vm_free(vm);
-> +	printf("\t ... PASSED\n");
-> +}
-> +
->  int main(int argc, char **argv)
->  {
->  	ksft_print_header();
-> @@ -966,7 +1045,7 @@ int main(int argc, char **argv)
->  	if (!is_tdx_enabled())
->  		ksft_exit_skip("TDX is not supported by the KVM. Exiting.\n");
+No, it is not useless.  Blindly writing to the variable will unnecessarily bounce
+the cacheline, and this is a hot path.
+
+> While there, switch CPU setter to a non-atomic version. Atomicity is
+> useless here 
+
+No, atomicity isn't useless here either.  Dropping atomicity could result in
+CPU's bit being lost.  I.e. the atomic accesses aren't for the benefit of
+smp_call_function_many_cond(), the writes are atomic so that multiple vCPUs can
+concurrently update the mask without needing additional protection.
+
+> because sev_writeback_caches() ends up with a plain
+> for_each_cpu() loop in smp_call_function_many_cond(), which is not
+> atomic by nature.
+
+That's fine.  As noted in sev_writeback_caches(), if vCPU could be running, then
+the caller is responsible for ensuring that all vCPUs flush caches before the
+memory being reclaimed is fully freed.  Those guarantees are provided by KVM's
+MMU.
+
+sev_writeback_caches() => smp_call_function_many_cond() could hit false positives,
+i.e. trigger WBINVD on CPUs that couldn't possibly have accessed the memory being
+reclaimed, but such false positives are functionally benign, and are "intended"
+in the sense that we chose to prioritize simplicity over precision.
+
+> Fixes: 6f38f8c57464 ("KVM: SVM: Flush cache only on CPUs running SEV guest")
+> Signed-off-by: Yury Norov <yury.norov@gmail.com>
+> ---
+>  arch/x86/kvm/svm/sev.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 49d7557de8bc..8170674d39c1 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -3498,8 +3498,7 @@ int pre_sev_run(struct vcpu_svm *svm, int cpu)
+>  	 * have encrypted, dirty data in the cache, and flush caches only for
+>  	 * CPUs that have entered the guest.
+>  	 */
+> -	if (!cpumask_test_cpu(cpu, to_kvm_sev_info(kvm)->have_run_cpus))
+> -		cpumask_set_cpu(cpu, to_kvm_sev_info(kvm)->have_run_cpus);
+> +	__cpumask_set_cpu(cpu, to_kvm_sev_info(kvm)->have_run_cpus);
 >  
-> -	ksft_set_plan(13);
-> +	ksft_set_plan(14);
->  	ksft_test_result(!run_in_new_process(&verify_td_lifecycle),
->  			 "verify_td_lifecycle\n");
-
-This _really_ feels like it wants to be a first mover for using fixtures and
-test suites: https://lore.kernel.org/all/ZjUwqEXPA5QVItyX@google.com
-
->  	ksft_test_result(!run_in_new_process(&verify_report_fatal_error),
-> @@ -993,6 +1072,8 @@ int main(int argc, char **argv)
->  			 "verify_mmio_writes\n");
->  	ksft_test_result(!run_in_new_process(&verify_td_cpuid_tdcall),
->  			 "verify_td_cpuid_tdcall\n");
-> +	ksft_test_result(!run_in_new_process(&verify_host_reading_private_mem),
-> +			 "verify_host_reading_private_mem\n");
->  
->  	ksft_finished();
->  	return 0;
+>  	/* Assign the asid allocated with this SEV guest */
+>  	svm->asid = asid;
 > -- 
-> 2.51.0.rc0.155.g4a0f42376b-goog
+> 2.43.0
 > 
 
