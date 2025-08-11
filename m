@@ -1,147 +1,143 @@
-Return-Path: <kvm+bounces-54429-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54430-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81431B212DA
-	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 19:08:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15595B2136B
+	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 19:39:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 419E63E1455
-	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 17:07:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 434BD1A21EFB
+	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 17:39:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A06E2C21FC;
-	Mon, 11 Aug 2025 17:07:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A9612D4808;
+	Mon, 11 Aug 2025 17:38:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jwXD8Vnv"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UiH6TrUW"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E47B2D4816
-	for <kvm@vger.kernel.org>; Mon, 11 Aug 2025 17:07:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1357A2C21CB
+	for <kvm@vger.kernel.org>; Mon, 11 Aug 2025 17:38:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754932036; cv=none; b=mTtALPTGTXYhU9/BLVzRKWgUuMW+cw6PjGS8STdqJktNlqQ6/6yql2fR+m//KEjOAXRAhujMFjJBCKaLig7JFQZkxUD44rucn30PwW7M5qZstgeK9tuuj0rHIxI5EMtuAePyV/4UGOnQb9Zfdg5n2iefZ65S0mbmZwDA+p85fBA=
+	t=1754933933; cv=none; b=gEerEFfVZCZ1cu98rqTxloi9TuGvDRLrT37z1SJO7lC04yV3k6U0o/e/d/nlfYYLX0JpwcCrPcSVmby8HOuhR8mluGjowqGiQxajR4CUTnmdXoUYCzhlb0pHv6xYabhxPjqQCj8mMgnBy/Ub2lxjxs1skVfsIZQSCQqXOqSqRjY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754932036; c=relaxed/simple;
-	bh=cHdKIkTwpLgbG7hNZHe/bDx0dvJvx+OmSRSZQwkdVAA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=p7RS545WUB/FLPIveyWIcrzlUfvUmevmh9wzzwePCtD0SyaeaZWTN7EfGs0sn0t5lLNbIuZ7LM6tvXVvB0tp30F5QMyC0/nSrIlgzncUNIgHI6QWNTz5jzkRirwpnkBmJ+KaAnTlYVz7cAZnH8HsKMVxPs9mUo/1i3hHvqQUC/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=jwXD8Vnv; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-458c063baeaso25615015e9.1
-        for <kvm@vger.kernel.org>; Mon, 11 Aug 2025 10:07:14 -0700 (PDT)
+	s=arc-20240116; t=1754933933; c=relaxed/simple;
+	bh=CRRkZPsmc2QQ3XWsdn2Up+MRBm+VzEWKJxGbzgiGX8M=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=PDCQJ3SOGVfvDzporhdGXWamGVKznLtfVoUQ7wEGtRp6uvL5h/RtYc2fpwLBFWoHHwr5/dyFzzvfuU5KasgBS1sGdSR0p7LwdGYMhfexarfNAv/lvb3UshUI0o/ITKn0CWB7rTEgyac/+GeCVniy2jgdX1QuHcOG0/V+GqDh47k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UiH6TrUW; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-32147620790so4906245a91.1
+        for <kvm@vger.kernel.org>; Mon, 11 Aug 2025 10:38:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1754932033; x=1755536833; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/kpYoiyGaNwP9QeQLj/6KulYrhyYzjmCLEuykA1SH0I=;
-        b=jwXD8VnvSZo5L6jyf/qR6bnO4n96UwDJqCpX4VtRkl9auWIvk1GWJj62mJ6zpvIYOC
-         fUOQZD1/O3kYaoysz2dHZkjJZ/V0Zu70ItVLQC48eZk+Phk1hfMrr1vHWs09qmHxKa3f
-         oapXNNy1NZVMVWp9P+ocqJBhvFHTIQjt1celwUEY67lDxxMQf5YFx8tmAAFbT1eBTyLn
-         qYDRBBmSYS+OIoBZ5EkPEE9mwGjO/efYuZKnVWnsV+0nOk2qB31030Mdo4ajCzpJ9s3t
-         L8u1vaMNBtBHBkm7hVTO1iF7eQ7yee3HfucluehSY71qWdLUUaB0r+EbOpdx7sNkElvS
-         q8jA==
+        d=google.com; s=20230601; t=1754933931; x=1755538731; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=D0qWTDt5Fgc4M6C75ofKduQqjIPupxwL5rgTNSXkxj8=;
+        b=UiH6TrUWNgPUoq11u9safnD3Uf3ThH2vnzBp7tRgK/MmMGLAAkZ2/lX73NyADd6mQN
+         XCgP4tzH+gmHjGrl9lcOFDFIN1xnrPh9RvFCDNqpmp/P/RbGmlzAOWHQ61cpYAL1LBip
+         K6QwQ5XgeXvgDczCEYWiRNdtXaA6KlOaDMefAIUZHohL2ykBwi+lOxU2CirdR3fwZ/nP
+         DdYvhE7Y95MPDXc7RuQKPkYObMMGf1xO+kbcg+EQd2BZpMZ/nvmYsxRq1slrJdQRevER
+         AMi3bNbgZHZ5WTuDNPv+fn1i3VigxQLGoo22NLpc/bPVRkvBlL7nlmXrn/50PpUgDalR
+         baAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754932033; x=1755536833;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/kpYoiyGaNwP9QeQLj/6KulYrhyYzjmCLEuykA1SH0I=;
-        b=Gat18DI9i1cvExy81eSol+yT4UnvwFbhs/2sOEpvwUVCJuaGzoir/0E/Qc2nb6r3Iv
-         LNveBb5Q0vOg2ftdvkxnWILQo4+UieoMytc8l44q3x3S/cmsnh3m4k6ckLWao6kLMSEW
-         bLlUO5tc2rw1rUphUuf0d/HR3wv0hiHWjJvf3RY56qMEd4aqJwEYfuOPqqxWs9cRztRg
-         nNxulczocSBonxcWGvnWqnOHL/JCnsjRcNRkn8viV/qYBqDtOmt/F0mIB39GPc7mCL6D
-         VkYo7pRlIfGUQ71j4CTtIZK7n3HlHM7N27h4MhW29ERAMb8dkIuJBf5t8+YnOHrlP17L
-         /U/w==
-X-Forwarded-Encrypted: i=1; AJvYcCVjz5h5Ae9pXPkfyoRKX9R9nDu1YlEvSzzjPssgNe1glQZqW4I3Bw+7g7Xjl+qAzLWgj20=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw1m8yVye+u/iR5Edrpp5FkDBKAcIXNG08pnW11pDwnEZXCAn+i
-	IH1BE7KJMJo3pYqHxBAjyYqlRWxkPM/wUxRg7j3vjnsj5txm0NCMTU8/wxa8I51Emjg=
-X-Gm-Gg: ASbGncsyG7Bg8e219Uamh9Tu3ZJWkATenXd6zbEFeJXGoTIlYktkcpTyLO0By5C1vTE
-	IL9moJoIp4UVuqfa1M8bE14UiPxbTv8E2iO/bSsgSo76qxtZEWEx41YT22eNHGvtA6hidmowvsI
-	R1X1veW8qNIhniwGENzTA62/DpGMp+LsGu/uvs77lLsiLViL0dNtZmJW8veNZ0+VSTJ+OKzss2N
-	Nalw7O7Iwyx/ngv/9ARR3TJAhlnBDtxj+wkHDx/1qePpLLyqUJsmxSyVbNWhJ1eRiyozD9XbYir
-	Pfwah2+IumpBy2WBZT1lOIOCCunLzF//UOvondr9EUDbJ1MmiNUWqYVBMo3X8ATJ616spZ0hzi2
-	4zGHMHr297pEETudyAVqDxkL1q8bDW1haR77U4T6yrp7NHLItZX4Xx0a/QG14AnwUvj/Otcx9
-X-Google-Smtp-Source: AGHT+IGPNlPGCtPBypS+3QH5V8BmL3guma48smLhKJ8u6uzLKRJHeGM33dI4w+1pFfja9aZ7mD/1ew==
-X-Received: by 2002:a05:600c:35c5:b0:458:bfe1:4a91 with SMTP id 5b1f17b1804b1-45a10be7b42mr4144935e9.20.1754932033011;
-        Mon, 11 Aug 2025 10:07:13 -0700 (PDT)
-Received: from localhost.localdomain (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-459e58553f8sm279207095e9.14.2025.08.11.10.07.11
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 11 Aug 2025 10:07:12 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-To: qemu-devel@nongnu.org
-Cc: Miguel Luis <miguel.luis@oracle.com>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	kvm@vger.kernel.org,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Haibo Xu <haibo.xu@linaro.org>,
-	Mohamed Mediouni <mohamed@unpredictable.fr>,
-	Mark Burton <mburton@qti.qualcomm.com>,
-	Alexander Graf <agraf@csgraf.de>,
-	Claudio Fontana <cfontana@suse.de>,
-	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-	Mads Ynddal <mads@ynddal.dk>,
-	Eric Auger <eric.auger@redhat.com>,
-	qemu-arm@nongnu.org,
-	Cameron Esfahani <dirty@apple.com>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-Subject: [RFC PATCH 11/11] target/arm/hvf: Allow EL2/EL3 emulation on Silicon M1 / M2
-Date: Mon, 11 Aug 2025 19:06:11 +0200
-Message-ID: <20250811170611.37482-12-philmd@linaro.org>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250811170611.37482-1-philmd@linaro.org>
-References: <20250811170611.37482-1-philmd@linaro.org>
+        d=1e100.net; s=20230601; t=1754933931; x=1755538731;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=D0qWTDt5Fgc4M6C75ofKduQqjIPupxwL5rgTNSXkxj8=;
+        b=wQJm5QmX68aWvSub94SKMGZd1mTEqDSZ5SJPSjDXqPfKAxPKw+vKQB3pPVKlCNLyBP
+         41F4/Wxoc2ozWDc68C8RIpjWoVHoSRgjZHhRDlPPStnBeUfWZTpTuOngjkm6oN5WREqX
+         PqFY2M5bnP7XZc0eoIG+DzrPCsyEkXjgwjsFRRPOwn+gbOxJEdbBaNEi7CsyIhlvekmN
+         187V1WUs69gEfSlBAHpRDeK/U4h6m9tJLtzwVLqLvbNJbKeI6ZifreSGZhSVUZQn2EP4
+         WaTRNqaj+BZDXx3nwK1IKPeJTSlopK8Ei9o8nBFDgfiQ+8sPwEQvgwyKbO6scGSJlgg0
+         ZbRA==
+X-Forwarded-Encrypted: i=1; AJvYcCW582AR3vvMn6pC4wglOGpTdbMeaOJi3H0HsDtaBxUgcW72y4HyVEV31kP63zWMnM4gZfY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzEJF0aMOWpXGQRWm69U6wEZ8LmTXPX0Tzlg6xJV99V6IS/33Xa
+	tbT00l7/CUKAU9ywHRWdECaPOtDxN8T09qZiMJcULFMfCf0vMRjkqEmsFNTziYojjGNG1jPxut1
+	lRj3/nw==
+X-Google-Smtp-Source: AGHT+IG/CUcmJn+gftHkvxBOV0Z2pVUCpoCwKpG1Kx2L3xffGF7ZIDvldqUNDPHKpVjYgmN7ORZxaRq74uI=
+X-Received: from pjyt9.prod.google.com ([2002:a17:90a:e509:b0:31c:2fe4:33b7])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1d44:b0:31a:ab75:6e45
+ with SMTP id 98e67ed59e1d1-321c0af20famr512709a91.28.1754933931258; Mon, 11
+ Aug 2025 10:38:51 -0700 (PDT)
+Date: Mon, 11 Aug 2025 10:38:49 -0700
+In-Reply-To: <20250807201628.1185915-1-sagis@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20250807201628.1185915-1-sagis@google.com>
+Message-ID: <aJoqqTM9zdcSx1Fi@google.com>
+Subject: Re: [PATCH v8 00/30] TDX KVM selftests
+From: Sean Christopherson <seanjc@google.com>
+To: Sagi Shahar <sagis@google.com>
+Cc: linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, Ackerley Tng <ackerleytng@google.com>, 
+	Ryan Afranji <afranji@google.com>, Andrew Jones <ajones@ventanamicro.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>, Erdem Aktas <erdemaktas@google.com>, 
+	Rick Edgecombe <rick.p.edgecombe@intel.com>, Roger Wang <runanwang@google.com>, 
+	Binbin Wu <binbin.wu@linux.intel.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	"Pratik R. Sampat" <pratikrajesh.sampat@amd.com>, Reinette Chatre <reinette.chatre@intel.com>, 
+	Ira Weiny <ira.weiny@intel.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
----
-Another API PoC.
----
- target/arm/hvf/hvf.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+On Thu, Aug 07, 2025, Sagi Shahar wrote:
+> This is v8 of the TDX selftests.
+> 
+> This series is based on v6.16
+> 
+> Aside from a rebase, this version includes a minor bug fix for
+> "KVM: selftests: Update kvm_init_vm_address_properties() for TDX" which
+> was called out in v6 by Ira Weiny.
 
-diff --git a/target/arm/hvf/hvf.c b/target/arm/hvf/hvf.c
-index d74f576b103..0519903c928 100644
---- a/target/arm/hvf/hvf.c
-+++ b/target/arm/hvf/hvf.c
-@@ -17,6 +17,7 @@
- #include "system/hvf.h"
- #include "system/hvf_int.h"
- #include "system/hw_accel.h"
-+#include "system/tcg.h"
- #include "hvf_arm.h"
- #include "cpregs.h"
- #include "cpu-sysregs.h"
-@@ -1014,11 +1015,14 @@ bool arm_hw_accel_cpu_feature_supported(enum arm_features feat, bool can_emulate
-     case ARM_FEATURE_GENERIC_TIMER:
-         return true;
-     case ARM_FEATURE_EL2:
-+        if (can_emulate) {
-+            return true;
-+        }
-         ret = hv_vm_config_get_el2_supported(&supported);
-         assert_hvf_ok(ret);
-         return supported;
-     case ARM_FEATURE_EL3:
--        return false;
-+        return can_emulate && tcg_enabled();
-     default:
-         g_assert_not_reached();
-     }
--- 
-2.49.0
+Folks, this series is completely unacceptable.  Please read through
+Documentation/process/maintainer-kvm-x86.rst and fix the myriad issues with this
+series.
 
+I will provide detailed feedback on this version to help move things along, but
+if v9 doesn't show a marked improvment, don't expect much more than a formletter
+response.  I have made my expectations for KVM x86 abundantly clear.
+
+Process violations aside, I am also extremely frustrated that seemingly no effort
+has been made to update and polish this series for upstream inclusion.  As Ira
+pointed out, there are references to terminology that we haven't used in *years*.
+
+ : If guest memory is backed by restricted memfd
+ : 
+ : + UPM is being used, hence encrypted memory region has to be
+ :   registered
+ : + Can avoid making a copy of guest memory before getting TDX to
+ :   initialize the memory region
+
+And then there's code like this
+
+ +#define KVM_MAX_CPUID_ENTRIES 256
+ +
+ +#define CPUID_EXT_VMX                  BIT(5)
+ +#define CPUID_EXT_SMX                  BIT(6)
+ +#define CPUID_PSE36                    BIT(17)
+ +#define CPUID_7_0_EBX_TSC_ADJUST       BIT(1)
+ +#define CPUID_7_0_EBX_SGX              BIT(2)
+ +#define CPUID_7_0_EBX_INTEL_PT         BIT(25)
+ +#define CPUID_7_0_ECX_SGX_LC           BIT(30)
+ +#define CPUID_APM_INVTSC               BIT(8)
+ +#define CPUID_8000_0008_EBX_WBNOINVD   BIT(9)
+ +#define CPUID_EXT_PDCM                 BIT(15)
+
+which is just... ugh.
+
+Please make cleaning up this mess the highest priority for TDX upstreaming.  I
+am _thrilled_ (honestly) at the amount test coverage that has been developed for
+TDX.  But I am equally angry that so much effort is being put into newfangled
+TDX features, and that so little effort is being put into helping review and
+polish this series.  I refuse to believe that I am the only person that could
+look at the above code and come to the conclusion that it's simply unnacceptable.
+
+Y'all _know_ I am stretched thin, please help distribute the load.
 
