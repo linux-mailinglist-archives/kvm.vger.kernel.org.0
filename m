@@ -1,44 +1,44 @@
-Return-Path: <kvm+bounces-54364-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54365-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F627B1FF02
-	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 08:11:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96137B1FF0A
+	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 08:12:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39E853BD7EF
-	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 06:11:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 73B2F189BA03
+	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 06:12:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6139F27D771;
-	Mon, 11 Aug 2025 06:11:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93BFE2D8767;
+	Mon, 11 Aug 2025 06:11:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="p7F1FiQj"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="jrItEsXE"
 X-Original-To: kvm@vger.kernel.org
-Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
+Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A035E29B799;
-	Mon, 11 Aug 2025 06:11:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CC5A2D63E5;
+	Mon, 11 Aug 2025 06:11:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754892682; cv=none; b=VCUr5P/AvBjv/NCs1ftFGlmsbP4RPrOJT5P91ypdLnm8r2B0+vY8sQU+pyXf078ZsT0gTrjnxipqWgxQIDRt4fFpX4z2m5p8ekA5r7xY/Y9e3+WWLQA8HyBgEkTtDXOcgnRDHE93p3sQ6f61exvvdAXqEl3dtFe7YNnz+1G5Y1A=
+	t=1754892684; cv=none; b=BVoy7K+cbgSB6AmPlz6uZVoak2QwKT8H+9cSpfgM16CuDsdaykpa86EGGNVxiSry4Lnek2e5DuPKXlj5hdOebag0fp4xuzl83PJEHjsrhupqDed0CQkwfCHTQnKynoDxqpMIBdT1uUggHI6paoYr3JfqcJz0/dTvGE56fmFU4Bo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754892682; c=relaxed/simple;
-	bh=TfxPrKWVIK1V6hQzQuQJmaaZGOTAE6KC8lUXCNnwxR0=;
+	s=arc-20240116; t=1754892684; c=relaxed/simple;
+	bh=x/6H8FCpaM1P1l+m7yJ/++snzFBZ4yex37yrKVs51rU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=qxtQC2T0sLE0E8JFCWLDt4kMovuPdyQoyJ0KFNQeWvvvd5JKlydVhRyS5QyJYYPmrfMKc4EkuC/Owv0x1sI+3oddPMKbtsn9qb7hAWnkHkrj4WSdbbCSCRBiBhEYnBoU+WpGghMD1f1b07KVsq8FylI+jII1IcQLvh3f6FGDRgI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=p7F1FiQj; arc=none smtp.client-ip=115.124.30.111
+	 MIME-Version; b=CmsPrVTkyCTbby3qs9TwFcL8TAEBxSw+Hz4HFAqKLgLrhMVMp6xs4VlHt3BxryuJVDveZPzoCuFCUWCLD4M4f1SaPWzyDA9ZxkZJLxcNLoeTOSPtnpgyIyjRaKdznOcZXfUHrLYI3jSQ1OqkMDXPAcf/jKLroi+fJRP99kbm7tI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=jrItEsXE; arc=none smtp.client-ip=115.124.30.99
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=linux.alibaba.com; s=default;
-	t=1754892677; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=oqEUcnbYtVuGUfumL17PGMuD/BWybgobKSLXaGVbfnQ=;
-	b=p7F1FiQjFVOhBjmJ6tW7ChyiSOJa5ZbWE4VfKrON2zuONDiW2jM4qGc3Ta3Te0NKl7f5y/M+wx5T9oa35PzTdH9LmxViwrIuB/WH1WF+VN3q3Xkwsn2bYerv3+JdvRyMHUQtw4O/VgOFJa4tSwAKSZ/+wo7rYe7OmawYaKEceWk=
-Received: from localhost.localdomain(mailfrom:fangyu.yu@linux.alibaba.com fp:SMTPD_---0WlP-vAP_1754892675 cluster:ay36)
+	t=1754892679; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=XDEJbKTMYToe/P3nkdkZb7Pdk39snYZKhujzTlABfAU=;
+	b=jrItEsXEeshys8x7mIsACjcmCpUNC0rrwtNOXCei2hBNjtRZhCtStzqqjGN0Emb1DepMQUs3izVuAbZS126aIDL7FT62MRQkPkjSTKW4/KMl8LEuQo6ghPjvYoCMtIqnjLq8lj9BlttkR/QypoRqxAiot01CmE4pB3MDFDalh2k=
+Received: from localhost.localdomain(mailfrom:fangyu.yu@linux.alibaba.com fp:SMTPD_---0WlP-vAn_1754892676 cluster:ay36)
           by smtp.aliyun-inc.com;
-          Mon, 11 Aug 2025 14:11:16 +0800
+          Mon, 11 Aug 2025 14:11:17 +0800
 From: fangyu.yu@linux.alibaba.com
 To: anup@brainfault.org,
 	paul.walmsley@sifive.com,
@@ -62,9 +62,9 @@ Cc: guoren@linux.alibaba.com,
 	linux-kernel@vger.kernel.org,
 	iommu@lists.linux.dev,
 	Fangyu Yu <fangyu.yu@linux.alibaba.com>
-Subject: [RFC PATCH 4/6] iommu/riscv: Add irq_mask and irq_ack configure for iommu-ir
-Date: Mon, 11 Aug 2025 14:11:02 +0800
-Message-Id: <20250811061104.10326-5-fangyu.yu@linux.alibaba.com>
+Subject: [RFC PATCH 5/6] iommu/riscv: Add MRIF mode support
+Date: Mon, 11 Aug 2025 14:11:03 +0800
+Message-Id: <20250811061104.10326-6-fangyu.yu@linux.alibaba.com>
 X-Mailer: git-send-email 2.39.3 (Apple Git-146)
 In-Reply-To: <20250811061104.10326-1-fangyu.yu@linux.alibaba.com>
 References: <20250811061104.10326-1-fangyu.yu@linux.alibaba.com>
@@ -78,36 +78,94 @@ Content-Transfer-Encoding: 8bit
 
 From: Fangyu Yu <fangyu.yu@linux.alibaba.com>
 
-The irq_mask and irq_ack are required for host irq to be triggered
-under the host system.
+If the guest interrupt files are exhausted and the MRIF is supported
+we configure the MSI PTE with MRIF mode,  and set  the  NPPN and NID
+using notice MSI from host irq.
+
+Otherwise, we redirect the guest interrupt back to the original host
+irq and inject the interrupt into the guest machine through irqfd.
 
 Signed-off-by: Fangyu Yu <fangyu.yu@linux.alibaba.com>
 ---
- drivers/iommu/riscv/iommu-ir.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ drivers/iommu/riscv/iommu-bits.h |  6 ++++++
+ drivers/iommu/riscv/iommu-ir.c   | 35 +++++++++++++++++++++++++++++---
+ 2 files changed, 38 insertions(+), 3 deletions(-)
 
+diff --git a/drivers/iommu/riscv/iommu-bits.h b/drivers/iommu/riscv/iommu-bits.h
+index d3d98dbed709..3af6436d5c5c 100644
+--- a/drivers/iommu/riscv/iommu-bits.h
++++ b/drivers/iommu/riscv/iommu-bits.h
+@@ -39,6 +39,12 @@
+ /* RISC-V IOMMU PPN <> PHYS address conversions, PHYS <=> PPN[53:10] */
+ #define riscv_iommu_phys_to_ppn(pa)	(((pa) >> 2) & (((1ULL << 44) - 1) << 10))
+ #define riscv_iommu_ppn_to_phys(pn)	(((pn) << 2) & (((1ULL << 44) - 1) << 12))
++/* RISC-V IOMMU MRIF Address <> PHYS address conversions, PHYS <=> MRIF[53:7] */
++#define riscv_iommu_phys_to_mrif(pa)	(((pa) >> 2) & (((1ULL << 47) - 1) << 7))
++/* RISC-V IOMMU nppn <> PHYS address conversions, PHYS <=> nppn[53:10] */
++#define riscv_iommu_phys_to_nppn(pa)	(((pa) >> 2) & (((1ULL << 44) - 1) << 10))
++#define riscv_iommu_data_to_nid(data)   \
++		((((data) & 0x3FFULL)) | (((((data) >> 10) & 1ULL)) << 60))
+ 
+ /* 5.3 IOMMU Capabilities (64bits) */
+ #define RISCV_IOMMU_REG_CAPABILITIES		0x0000
 diff --git a/drivers/iommu/riscv/iommu-ir.c b/drivers/iommu/riscv/iommu-ir.c
-index 5461dbe18159..73f552ed5b65 100644
+index 73f552ed5b65..f3ebf62de53e 100644
 --- a/drivers/iommu/riscv/iommu-ir.c
 +++ b/drivers/iommu/riscv/iommu-ir.c
-@@ -208,6 +208,7 @@ static struct irq_chip riscv_iommu_irq_chip = {
- 	.irq_unmask		= irq_chip_unmask_parent,
- 	.irq_set_affinity	= irq_chip_set_affinity_parent,
- 	.irq_set_vcpu_affinity	= riscv_iommu_irq_set_vcpu_affinity,
-+	.irq_ack		= irq_chip_ack_parent,
- };
+@@ -150,9 +150,12 @@ static int riscv_iommu_irq_set_vcpu_affinity(struct irq_data *data, void *info)
+ {
+ 	struct riscv_iommu_vcpu_info *vcpu_info = info;
+ 	struct riscv_iommu_domain *domain = data->domain->host_data;
++	struct device *dev = msi_desc_to_dev(irq_data_get_msi_desc(data));
++	struct riscv_iommu_device *iommu = dev_to_iommu(dev);
+ 	struct riscv_iommu_msipte *pte;
+ 	int ret = -EINVAL;
+-	u64 pteval;
++	u64 pteval, mrifval = 0;
++	bool mrif_support = (iommu->caps & RISCV_IOMMU_CAPABILITIES_MSI_MRIF);
  
- static int riscv_iommu_irq_domain_alloc_irqs(struct irq_domain *irqdomain,
-@@ -239,7 +240,9 @@ static const struct msi_parent_ops riscv_iommu_msi_parent_ops = {
- 	.supported_flags	= MSI_GENERIC_FLAGS_MASK |
- 				  MSI_FLAG_PCI_MSIX,
- 	.required_flags		= MSI_FLAG_USE_DEF_DOM_OPS |
--				  MSI_FLAG_USE_DEF_CHIP_OPS,
-+				  MSI_FLAG_USE_DEF_CHIP_OPS |
-+				  MSI_FLAG_PCI_MSI_MASK_PARENT,
-+	.chip_flags		= MSI_CHIP_FLAG_SET_ACK,
- 	.init_dev_msi_info	= msi_parent_init_dev_msi_info,
- };
+ 	if (WARN_ON(domain->domain.type != IOMMU_DOMAIN_UNMANAGED))
+ 		return ret;
+@@ -186,12 +189,38 @@ static int riscv_iommu_irq_set_vcpu_affinity(struct irq_data *data, void *info)
+ 	if (!pte)
+ 		goto out_unlock;
+ 
+-	pteval = FIELD_PREP(RISCV_IOMMU_MSIPTE_M, 3) |
+-		 riscv_iommu_phys_to_ppn(vcpu_info->hpa) |
++	if (!vcpu_info->mrif) {
++		pteval = FIELD_PREP(RISCV_IOMMU_MSIPTE_M, 3) |
++			 riscv_iommu_phys_to_ppn(vcpu_info->hpa) |
++			 FIELD_PREP(RISCV_IOMMU_MSIPTE_V, 1);
++		goto update_pte;
++	}
++
++	pteval = FIELD_PREP(RISCV_IOMMU_MSIPTE_M, 1) |
++		 riscv_iommu_phys_to_mrif(vcpu_info->hpa) |
+ 		 FIELD_PREP(RISCV_IOMMU_MSIPTE_V, 1);
++	if (mrif_support) {
++		mrifval = riscv_iommu_data_to_nid(vcpu_info->host_msg->data) |
++				riscv_iommu_phys_to_nppn(
++				(u64)vcpu_info->host_msg->address_hi << 32 |
++				vcpu_info->host_msg->address_lo);
++	} else {
++		/* If the guest interrupt file is exhausted and MRIF is not supported, we
++		 * redirect the guest interrupt back to the original host interrupt and
++		 * inject the interrupt into the guest machine through irqfd.
++		 */
++		struct irq_data *irqdata = irq_get_irq_data(vcpu_info->host_irq);
++
++		irq_data_get_irq_chip(irqdata)->irq_write_msi_msg(irqdata,
++						vcpu_info->host_msg);
++		ret = -ENODEV;
++		goto out_unlock;
++	}
+ 
++update_pte:
+ 	if (pte->pte != pteval) {
+ 		pte->pte = pteval;
++		pte->mrif_info = mrifval;
+ 		riscv_iommu_ir_msitbl_inval(domain, pte);
+ 	}
  
 -- 
 2.49.0
