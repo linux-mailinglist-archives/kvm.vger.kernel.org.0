@@ -1,109 +1,281 @@
-Return-Path: <kvm+bounces-54414-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54415-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2D6DB20D51
-	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 17:17:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D1D9B21096
+	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 18:00:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6DB76170BFD
-	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 15:16:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3AFF33A6BBB
+	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 15:54:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE208242D78;
-	Mon, 11 Aug 2025 15:16:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C905E2D6E44;
+	Mon, 11 Aug 2025 15:34:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="fnYNFtzu"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dh/LHX1J"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0FDF12CDBE
-	for <kvm@vger.kernel.org>; Mon, 11 Aug 2025 15:16:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E24B2C21E9
+	for <kvm@vger.kernel.org>; Mon, 11 Aug 2025 15:34:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754925398; cv=none; b=Th61BLD687KpGMw5th7Twad58zTwcqytZmdlhPP3tsbW44uX6Fa0Tnh2Wqs9fyhjr6G9Dp33PmsajQQ0KnWjOm6fw2ZUFpXojGv4gpStKh8o3pEw9bfUPQx94LLV/CLeidX+v/B5ofBZqq2EAAYNVMl7Kw2g4iPdy6vQLUhsjB8=
+	t=1754926444; cv=none; b=D4RleXIGuQCJbNKkwhwvS8C6OyWOlit9lB2Iqpp6KZ5oTKjpT+d0W0d0y+rANeDX7FOQoFMybr+re+CQ/5kcm/ib1osS0W5tIALix5dB1PIBpGMSP0dYbFMJMWd3WHXvH2px0G9vGNSDes20HN0WQVc6DOwAzM2XCR+flQmbBzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754925398; c=relaxed/simple;
-	bh=w3w5TxpBTh0UVQg7aNJ0VBqh0zhw9kH6F/5Ku1J2I0c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i2luZj5L1+35yniNCSQtk/fxI4P67ccHYDPPtt9+q05R3Dh/kJKI7VKTHyi/yH5LfRPiBTMO/x/xiom/i6ICdMxw9diB8+XJVtLXuqKU6RV+rLDuMCKE6R/91UnhrcS7pv5dlWB5qRtrV+ye+sjP8yf8C0HrzChWKTT6UschVF0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=fnYNFtzu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A587AC4CEED;
-	Mon, 11 Aug 2025 15:16:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1754925398;
-	bh=w3w5TxpBTh0UVQg7aNJ0VBqh0zhw9kH6F/5Ku1J2I0c=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fnYNFtzuZ8BFTiO7L3Q0K83DO945k/IRU5q0PITOUe4QNA4Q+PWH6l+xMk1pft42J
-	 BWUVq/MSSbJfHIzOvNQqp2aJH3En2gob0j589iMz48t6WsuLxvsLlHMoLwkcXw21r3
-	 qclyzWtiS+Di79tCt0qpVsxEGXXx7f2O9j81u/Ko=
-Date: Mon, 11 Aug 2025 17:16:34 +0200
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Thijs Raymakers <thijs@raymakers.nl>, kvm@vger.kernel.org,
-	stable <stable@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2] KVM: x86: use array_index_nospec with indices that
- come from guest
-Message-ID: <2025081131-mural-crane-6ab1@gregkh>
-References: <aII3WuhvJb3sY8HG@google.com>
- <20250724142227.61337-1-thijs@raymakers.nl>
- <2025072441-degrease-skipping-bbc8@gregkh>
- <aIKDr_kVpUjC8924@google.com>
- <2025081151-defiling-badass-c926@gregkh>
- <aJn_xYSweEauucGv@google.com>
+	s=arc-20240116; t=1754926444; c=relaxed/simple;
+	bh=x3Gjjg/HNG+YNIf+BJSKZ7zx9EJlyvS9DJ5A8csDFq8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rcqTZpq+AAXhkY8mRAZheFILNszKO3cvKLKqek7gsKYLQCFEtAaH8R+LC+Y+RvTSWDefHh4NRl+bxrhcyMqX2NsZ6+5lopYzX8d7VYjf1o+DUk/Mg5F3Ucs1jXj0GZmZTdu9u19U+vkF9RminV29m5GcYs67cQCi8hjRINqNS3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Dh/LHX1J; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1754926441;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=UlyMvpUnFPwPIrW3E7xZ89HT91V0N5XoNHgGKm394UY=;
+	b=Dh/LHX1JKysEGLodY7EdveyqnDz+HVGARQ4STcNFW8a1ksEhVLXkV1gMPo05MSgE9PQ8b/
+	4dE+I0/db/eKvktUA3QX9hapRgx9VIAJS6RHwRkhD2gnqmkgVcZ3STKDT4j47NL5EjidhF
+	NTckDpn8xrJpBK6grhmGvPiYJPRO8rk=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-265-M7BWT2HTNl-OSYIoiXOTZA-1; Mon, 11 Aug 2025 11:34:00 -0400
+X-MC-Unique: M7BWT2HTNl-OSYIoiXOTZA-1
+X-Mimecast-MFC-AGG-ID: M7BWT2HTNl-OSYIoiXOTZA_1754926439
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-459e30e4477so39802565e9.1
+        for <kvm@vger.kernel.org>; Mon, 11 Aug 2025 08:33:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754926439; x=1755531239;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=UlyMvpUnFPwPIrW3E7xZ89HT91V0N5XoNHgGKm394UY=;
+        b=juZ9jVb3LLH/mwivlfGshzYvt8bISYN2Dx930Wn1nDxIML2BmPl3PK+k2MqgMPAkmG
+         JPLOGgV4adc1uWWnrboLymcVIwNE2swanaGPUuakMiFambWU+x4MSSw/Xbmso9UJFs+t
+         tMBqqfZu2YsqffwC1tipG+hiH/ZBA+YZ2jwbPMj8RLyPeh7SvbGh3V8Q9S9iBA7nxE3l
+         f5JYY7B3lUuNZthozccqAe1W1W39NjMAJqH1nmwU947tUdTNMueOGJIalwutrjSOeqM/
+         uk+P6dJmWbyK5SAOfiTXxxAVcoO+Mob9x8g9gzRbZJidSCUIrpISi5JcNvlKM5hvD5KN
+         B4OA==
+X-Forwarded-Encrypted: i=1; AJvYcCV0R15r8oezag/LVvcVgQ8nXIbOTUH2W6B7jCMzey0+2YnYsPo2F46nQA/AjgfucZ/m+QM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YypSCNv2HbvmR3CBgEZAQPvr5S6dTf/nMpaMmbAFK3Hpr2/uMtc
+	k+5eDyXry6UGavtRnGuQhNied+xUZejcvkfIVPiSS3juhTT1rHrxRDo4EUqZAd5ncBhYh8WFg/m
+	mVDn0/gPTXkYhGSfet79/9MZUU0ckBr7oxqAnyas6HGKYXDWiggqXvA==
+X-Gm-Gg: ASbGncufRCZgQqX80pRnCurCTE3ffGW6jxEQnaQWiErIzJBL+tmoITBExbi+EHX1I+J
+	/wCsR/xdobaEHYC8xYGiqtM4MKOJTIumKJHl1bfJIHcnnL7hW56qmheE35AgnmeMr45AHJJMNn3
+	A2jv8+BAVir3TZGjqSCFV+1Zu73JubJ+bKv2z+5GIp1Gfrssa4JP1r4tgHxmo/h6Kgt42eJXRbE
+	hA2xG15gEhxp+uI0Rh35mlIvpE0Gdo+zy/q0BqavhT+DGZynji8cqy2YMBDKRaNvDeyZsJjh5ud
+	NDXV/JxVFgItsoWAJNNeB5e+RgQl/9pjroGLs4yeYmyGdZtz3/bj6IsXEHWKPkqkoKkRxYlRgy+
+	MQaT7amg+TKRKzCabAySD/RBdtuXxZN36WvtT2EVvxWsEsQcEloSZqcCjUfttD64l+Xk=
+X-Received: by 2002:a05:600c:1d02:b0:43c:fe5e:f03b with SMTP id 5b1f17b1804b1-459f4fc25cfmr136879425e9.30.1754926438543;
+        Mon, 11 Aug 2025 08:33:58 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHINfJIfd1vEQZgbnQNpr4RSjW8SQx0Umc0SOrTSEmk4pWketl28AJxCUWIgT4ujrBbIgNggA==
+X-Received: by 2002:a05:600c:1d02:b0:43c:fe5e:f03b with SMTP id 5b1f17b1804b1-459f4fc25cfmr136878395e9.30.1754926437911;
+        Mon, 11 Aug 2025 08:33:57 -0700 (PDT)
+Received: from ?IPV6:2003:d8:2f06:a600:a397:de1d:2f8b:b66f? (p200300d82f06a600a397de1d2f8bb66f.dip0.t-ipconnect.de. [2003:d8:2f06:a600:a397:de1d:2f8b:b66f])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-459e58542f3sm257349755e9.10.2025.08.11.08.33.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 11 Aug 2025 08:33:57 -0700 (PDT)
+Message-ID: <cee2e489-d3c9-46d4-8d34-37c637c7bbd8@redhat.com>
+Date: Mon, 11 Aug 2025 17:33:54 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aJn_xYSweEauucGv@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC V10 4/7] KVM: guest_memfd: Use guest mem inodes
+ instead of anonymous inodes
+To: Shivank Garg <shivankg@amd.com>, seanjc@google.com, vbabka@suse.cz,
+ willy@infradead.org, akpm@linux-foundation.org, shuah@kernel.org,
+ pbonzini@redhat.com, brauner@kernel.org, viro@zeniv.linux.org.uk
+Cc: ackerleytng@google.com, paul@paul-moore.com, jmorris@namei.org,
+ serge@hallyn.com, pvorel@suse.cz, bfoster@redhat.com, tabba@google.com,
+ vannapurve@google.com, chao.gao@intel.com, bharata@amd.com, nikunj@amd.com,
+ michael.day@amd.com, shdhiman@amd.com, yan.y.zhao@intel.com,
+ Neeraj.Upadhyay@amd.com, thomas.lendacky@amd.com, michael.roth@amd.com,
+ aik@amd.com, jgg@nvidia.com, kalyazin@amazon.com, peterx@redhat.com,
+ jack@suse.cz, rppt@kernel.org, hch@infradead.org, cgzones@googlemail.com,
+ ira.weiny@intel.com, rientjes@google.com, roypat@amazon.co.uk,
+ ziy@nvidia.com, matthew.brost@intel.com, joshua.hahnjy@gmail.com,
+ rakie.kim@sk.com, byungchul@sk.com, gourry@gourry.net,
+ kent.overstreet@linux.dev, ying.huang@linux.alibaba.com, apopple@nvidia.com,
+ chao.p.peng@intel.com, amit@infradead.org, ddutile@redhat.com,
+ dan.j.williams@intel.com, ashish.kalra@amd.com, gshan@redhat.com,
+ jgowans@amazon.com, pankaj.gupta@amd.com, papaluri@amd.com,
+ yuzhao@google.com, suzuki.poulose@arm.com, quic_eberman@quicinc.com,
+ aneeshkumar.kizhakeveetil@arm.com, linux-fsdevel@vger.kernel.org,
+ linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+ linux-security-module@vger.kernel.org, kvm@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-coco@lists.linux.dev
+References: <20250811090605.16057-2-shivankg@amd.com>
+ <20250811090605.16057-10-shivankg@amd.com>
+From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
+ dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
+ QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
+ XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
+ Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
+ PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
+ WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
+ UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
+ jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
+ B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABzSREYXZpZCBIaWxk
+ ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT7CwZgEEwEIAEICGwMGCwkIBwMCBhUIAgkKCwQW
+ AgMBAh4BAheAAhkBFiEEG9nKrXNcTDpGDfzKTd4Q9wD/g1oFAmgsLPQFCRvGjuMACgkQTd4Q
+ 9wD/g1o0bxAAqYC7gTyGj5rZwvy1VesF6YoQncH0yI79lvXUYOX+Nngko4v4dTlOQvrd/vhb
+ 02e9FtpA1CxgwdgIPFKIuXvdSyXAp0xXuIuRPQYbgNriQFkaBlHe9mSf8O09J3SCVa/5ezKM
+ OLW/OONSV/Fr2VI1wxAYj3/Rb+U6rpzqIQ3Uh/5Rjmla6pTl7Z9/o1zKlVOX1SxVGSrlXhqt
+ kwdbjdj/csSzoAbUF/duDuhyEl11/xStm/lBMzVuf3ZhV5SSgLAflLBo4l6mR5RolpPv5wad
+ GpYS/hm7HsmEA0PBAPNb5DvZQ7vNaX23FlgylSXyv72UVsObHsu6pT4sfoxvJ5nJxvzGi69U
+ s1uryvlAfS6E+D5ULrV35taTwSpcBAh0/RqRbV0mTc57vvAoXofBDcs3Z30IReFS34QSpjvl
+ Hxbe7itHGuuhEVM1qmq2U72ezOQ7MzADbwCtn+yGeISQqeFn9QMAZVAkXsc9Wp0SW/WQKb76
+ FkSRalBZcc2vXM0VqhFVzTb6iNqYXqVKyuPKwhBunhTt6XnIfhpRgqveCPNIasSX05VQR6/a
+ OBHZX3seTikp7A1z9iZIsdtJxB88dGkpeMj6qJ5RLzUsPUVPodEcz1B5aTEbYK6428H8MeLq
+ NFPwmknOlDzQNC6RND8Ez7YEhzqvw7263MojcmmPcLelYbfOwU0EVcufkQEQAOfX3n0g0fZz
+ Bgm/S2zF/kxQKCEKP8ID+Vz8sy2GpDvveBq4H2Y34XWsT1zLJdvqPI4af4ZSMxuerWjXbVWb
+ T6d4odQIG0fKx4F8NccDqbgHeZRNajXeeJ3R7gAzvWvQNLz4piHrO/B4tf8svmRBL0ZB5P5A
+ 2uhdwLU3NZuK22zpNn4is87BPWF8HhY0L5fafgDMOqnf4guJVJPYNPhUFzXUbPqOKOkL8ojk
+ CXxkOFHAbjstSK5Ca3fKquY3rdX3DNo+EL7FvAiw1mUtS+5GeYE+RMnDCsVFm/C7kY8c2d0G
+ NWkB9pJM5+mnIoFNxy7YBcldYATVeOHoY4LyaUWNnAvFYWp08dHWfZo9WCiJMuTfgtH9tc75
+ 7QanMVdPt6fDK8UUXIBLQ2TWr/sQKE9xtFuEmoQGlE1l6bGaDnnMLcYu+Asp3kDT0w4zYGsx
+ 5r6XQVRH4+5N6eHZiaeYtFOujp5n+pjBaQK7wUUjDilPQ5QMzIuCL4YjVoylWiBNknvQWBXS
+ lQCWmavOT9sttGQXdPCC5ynI+1ymZC1ORZKANLnRAb0NH/UCzcsstw2TAkFnMEbo9Zu9w7Kv
+ AxBQXWeXhJI9XQssfrf4Gusdqx8nPEpfOqCtbbwJMATbHyqLt7/oz/5deGuwxgb65pWIzufa
+ N7eop7uh+6bezi+rugUI+w6DABEBAAHCwXwEGAEIACYCGwwWIQQb2cqtc1xMOkYN/MpN3hD3
+ AP+DWgUCaCwtJQUJG8aPFAAKCRBN3hD3AP+DWlDnD/4k2TW+HyOOOePVm23F5HOhNNd7nNv3
+ Vq2cLcW1DteHUdxMO0X+zqrKDHI5hgnE/E2QH9jyV8mB8l/ndElobciaJcbl1cM43vVzPIWn
+ 01vW62oxUNtEvzLLxGLPTrnMxWdZgxr7ACCWKUnMGE2E8eca0cT2pnIJoQRz242xqe/nYxBB
+ /BAK+dsxHIfcQzl88G83oaO7vb7s/cWMYRKOg+WIgp0MJ8DO2IU5JmUtyJB+V3YzzM4cMic3
+ bNn8nHjTWw/9+QQ5vg3TXHZ5XMu9mtfw2La3bHJ6AybL0DvEkdGxk6YHqJVEukciLMWDWqQQ
+ RtbBhqcprgUxipNvdn9KwNpGciM+hNtM9kf9gt0fjv79l/FiSw6KbCPX9b636GzgNy0Ev2UV
+ m00EtcpRXXMlEpbP4V947ufWVK2Mz7RFUfU4+ETDd1scMQDHzrXItryHLZWhopPI4Z+ps0rB
+ CQHfSpl+wG4XbJJu1D8/Ww3FsO42TMFrNr2/cmqwuUZ0a0uxrpkNYrsGjkEu7a+9MheyTzcm
+ vyU2knz5/stkTN2LKz5REqOe24oRnypjpAfaoxRYXs+F8wml519InWlwCra49IUSxD1hXPxO
+ WBe5lqcozu9LpNDH/brVSzHCSb7vjNGvvSVESDuoiHK8gNlf0v+epy5WYd7CGAgODPvDShGN
+ g3eXuA==
+Organization: Red Hat
+In-Reply-To: <20250811090605.16057-10-shivankg@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Aug 11, 2025 at 07:35:49AM -0700, Sean Christopherson wrote:
-> On Mon, Aug 11, 2025, Greg Kroah-Hartman wrote:
-> > On Thu, Jul 24, 2025 at 12:04:15PM -0700, Sean Christopherson wrote:
-> > > On Thu, Jul 24, 2025, Greg Kroah-Hartman wrote:
-> > > > On Thu, Jul 24, 2025 at 04:22:27PM +0200, Thijs Raymakers wrote:
-> > > > > min and dest_id are guest-controlled indices. Using array_index_nospec()
-> > > > > after the bounds checks clamps these values to mitigate speculative execution
-> > > > > side-channels.
-> > > > > 
-> > > > > Signed-off-by: Thijs Raymakers <thijs@raymakers.nl>
-> > > > > Cc: stable <stable@kernel.org>
-> > > > > Cc: Sean Christopherson <seanjc@google.com>
-> > > > > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > > > > Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> > > > 
-> > > > Nit, you shouldn't have added my signed off on a new version, but that's
-> > > > ok, I'm fine with it.
-> > > 
-> > > Want me to keep your SoB when applying, or drop it?
-> > > 
-> > > > > ---
-> > > > >  arch/x86/kvm/lapic.c | 2 ++
-> > > > >  arch/x86/kvm/x86.c   | 7 +++++--
-> > > > >  2 files changed, 7 insertions(+), 2 deletions(-)
-> > > > 
-> > > > You also forgot to say what changed down here.
-> > > > 
-> > > > Don't know how strict the KVM maintainers are, I know I require these
-> > > > things fixed up...
-> > > 
-> > > I require the same things, but I also don't mind doing fixup when applying if
-> > > that's the path of least resistance (and it's not a recurring problem).
-> > > 
-> > > I also strongly dislike using In-Reply-To for new versions, as it tends to confuse
-> > > b4, and often confuses me as well.
-> > > 
-> > > But for this, I don't see any reason to send a v3.
-> > 
-> > Any status on this?  I don't see it in linux-next at all, nor in
-> > 6.17-rc1
+On 11.08.25 11:06, Shivank Garg wrote:
+> From: Ackerley Tng <ackerleytng@google.com>
 > 
-> I'll get it applied and sent along to Paolo/Linus this week.
+> guest_memfd's inode represents memory the guest_memfd is
+> providing. guest_memfd's file represents a struct kvm's view of that
+> memory.
+> 
+> Using a custom inode allows customization of the inode teardown
+> process via callbacks. For example, ->evict_inode() allows
+> customization of the truncation process on file close, and
+> ->destroy_inode() and ->free_inode() allow customization of the inode
+> freeing process.
+> 
+> Customizing the truncation process allows flexibility in management of
+> guest_memfd memory and customization of the inode freeing process
+> allows proper cleanup of memory metadata stored on the inode.
+> 
+> Memory metadata is more appropriately stored on the inode (as opposed
+> to the file), since the metadata is for the memory and is not unique
+> to a specific binding and struct kvm.
+> 
+> Co-developed-by: Fuad Tabba <tabba@google.com>
+> Signed-off-by: Fuad Tabba <tabba@google.com>
+> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> Signed-off-by: Shivank Garg <shivankg@amd.com>
+> ---
 
-Thanks!
+[...]
+
+>   
+>   static int kvm_gmem_migrate_folio(struct address_space *mapping,
+> @@ -463,11 +503,71 @@ bool __weak kvm_arch_supports_gmem_mmap(struct kvm *kvm)
+>   	return true;
+>   }
+>   
+> +static struct inode *kvm_gmem_inode_make_secure_inode(const char *name,
+> +						      loff_t size, u64 flags)
+> +{
+> +	struct inode *inode;
+> +
+> +	inode = anon_inode_make_secure_inode(kvm_gmem_mnt->mnt_sb, name, NULL);
+> +	if (IS_ERR(inode))
+> +		return inode;
+> +
+> +	inode->i_private = (void *)(unsigned long)flags;
+> +	inode->i_op = &kvm_gmem_iops;
+> +	inode->i_mapping->a_ops = &kvm_gmem_aops;
+> +	inode->i_mode |= S_IFREG;
+> +	inode->i_size = size;
+> +	mapping_set_gfp_mask(inode->i_mapping, GFP_HIGHUSER);
+> +	mapping_set_inaccessible(inode->i_mapping);
+> +	/* Unmovable mappings are supposed to be marked unevictable as well. */
+> +	WARN_ON_ONCE(!mapping_unevictable(inode->i_mapping));
+> +
+> +	return inode;
+> +}
+> +
+> +static struct file *kvm_gmem_inode_create_getfile(void *priv, loff_t size,
+> +						  u64 flags)
+> +{
+> +	static const char *name = "[kvm-gmem]";
+> +	struct inode *inode;
+> +	struct file *file;
+> +	int err;
+> +
+> +	err = -ENOENT;
+
+Maybe add a comment here when the module reference will get
+dropped. And maybe we should just switch to fops_get() + fops_put?
+
+/* __fput() will take care of fops_put(). */
+if (!fops_get(&kvm_gmem_fops))
+	goto err;
+
+> +
+> +	inode = kvm_gmem_inode_make_secure_inode(name, size, flags);
+> +	if (IS_ERR(inode)) {
+> +		err = PTR_ERR(inode);
+> +		goto err_put_module;
+> +	}
+> +
+> +	file = alloc_file_pseudo(inode, kvm_gmem_mnt, name, O_RDWR,
+> +				 &kvm_gmem_fops);
+> +	if (IS_ERR(file)) {
+> +		err = PTR_ERR(file);
+> +		goto err_put_inode;
+> +	}
+> +
+> +	file->f_flags |= O_LARGEFILE;
+> +	file->private_data = priv;
+> +
+> +out:
+> +	return file;
+> +
+> +err_put_inode:
+> +	iput(inode);
+> +err_put_module:
+> +	module_put(kvm_gmem_fops.owner);
+
+fops_put(&kvm_gmem_fops);
+
+?
+
+
+Acked-by: David Hildenbrand <david@redhat.com>
+
+-- 
+Cheers,
+
+David / dhildenb
+
 
