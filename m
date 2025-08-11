@@ -1,165 +1,109 @@
-Return-Path: <kvm+bounces-54368-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54369-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38669B1FF12
-	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 08:13:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A56E5B1FF1F
+	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 08:16:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E94E1189A7D6
-	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 06:13:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF2D716AE77
+	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 06:16:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA9AF285043;
-	Mon, 11 Aug 2025 06:11:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 584D02BD580;
+	Mon, 11 Aug 2025 06:16:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="CyTu3IFN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iCqfn28b"
 X-Original-To: kvm@vger.kernel.org
-Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52C8F2D9484;
-	Mon, 11 Aug 2025 06:11:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85A7D299AAF
+	for <kvm@vger.kernel.org>; Mon, 11 Aug 2025 06:16:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754892691; cv=none; b=XZFSyY+jCrRBDRXVD/MxzaM9MAX0AnWOu8gBRVL9Z4wpXhMIjMFcPPM4PtbnJnEGgx4IER5Qi4fYOpaAOypmaOIvZuTVWOkW0lnsspH5i0buPNAtiRDLnZ5d95HCwiU8DsQCwhYOXKE/NPMm/ttOlcznK21VmF2Fwr2nGRFBRHM=
+	t=1754892974; cv=none; b=Prq/84fiskPWWzsRBFRRqOoPnZsTY57P/1IZA8+WXbUCN6cBkPm+GZBiq/2ARe7becvMJFO9gcXkreVGd44FhyJksnq+y8OWuLmWNhf30p93Ye5fAq4Qma3RoRuYV6g9HTwE321JDdR6kLIMVVfu1l2ElJ4+rmutqN8FHadT+FU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754892691; c=relaxed/simple;
-	bh=D6bWNCnFL2Dw0JQmRi3CW5HbqgQJLdJ91ORdGPwDaLw=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Cd5odsJIvwiVwqoZ7zvSD1+RU6qrU/kedoUh2GUyRcWhVny8CN00ILgBjapyO5qSBv6XV/5sWvbr3+RJhDmLXUMh2DuIMPtXYD7AWLNmjwgmuJlhmE0NsPo8AsUUirjFlipoP9dZI8u278xQwwR8bC/cOf3y7XGzPJkWcgWJlrU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=CyTu3IFN; arc=none smtp.client-ip=115.124.30.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1754892680; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=7J/clauWbQWRFTci+97Z7tJgolFj9hSh37VSydzAoWg=;
-	b=CyTu3IFNVUSNNEH0LPWsZxuZhDpPPSIFNs9gYqC3x7Tniy+qJCZqCh0Vw/E/zMMp8DYp5sa1sr6RLT94t9F+5Mb1G/YUzPMqZrGEKFw8PIpFsN7XGVAcQGIuz4bdfdo6QcP4rmNkMFLKMN2E9sBq5Qk4agl4B0Oke0He/RhIDh8=
-Received: from localhost.localdomain(mailfrom:fangyu.yu@linux.alibaba.com fp:SMTPD_---0WlP-vBA_1754892678 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Mon, 11 Aug 2025 14:11:19 +0800
-From: fangyu.yu@linux.alibaba.com
-To: anup@brainfault.org,
-	paul.walmsley@sifive.com,
-	palmer@dabbelt.com,
-	aou@eecs.berkeley.edu,
-	alex@ghiti.fr,
-	atishp@atishpatra.org,
-	tjeznach@rivosinc.com,
-	joro@8bytes.org,
-	will@kernel.org,
-	robin.murphy@arm.com,
-	sunilvl@ventanamicro.com,
-	rafael.j.wysocki@intel.com,
-	tglx@linutronix.de,
-	ajones@ventanamicro.com
-Cc: guoren@linux.alibaba.com,
-	guoren@kernel.org,
-	kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org,
-	linux-riscv@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	iommu@lists.linux.dev,
-	Fangyu Yu <fangyu.yu@linux.alibaba.com>
-Subject: [RFC PATCH 6/6] RISC-V: KVM: Check the MRIF in notice MSI irq handler
-Date: Mon, 11 Aug 2025 14:11:04 +0800
-Message-Id: <20250811061104.10326-7-fangyu.yu@linux.alibaba.com>
-X-Mailer: git-send-email 2.39.3 (Apple Git-146)
-In-Reply-To: <20250811061104.10326-1-fangyu.yu@linux.alibaba.com>
-References: <20250811061104.10326-1-fangyu.yu@linux.alibaba.com>
+	s=arc-20240116; t=1754892974; c=relaxed/simple;
+	bh=qRcx65tSfNjZNu4N52i2GEAwcQ+KCzjfWTM58pkbblA=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=KECFvOSFBazr4YbxSTFXJmBgwDGjQlZT/B/NSlGCSdHusUbb7xfFHJidSg+AzAR7rUDK+WtzX8dD5WOZ2cFrpW8vgaBbgY/tj0UDtTKZmWsA4sYq6l5H6usczV6AuMpDKMMqhYRT6nqGE8Wtvknww9W0z6qJfDgrKvYiy8uoR+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iCqfn28b; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA2D5C4CEED;
+	Mon, 11 Aug 2025 06:16:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754892974;
+	bh=qRcx65tSfNjZNu4N52i2GEAwcQ+KCzjfWTM58pkbblA=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=iCqfn28bYq4AR5JIRQdxQ/KX2jrNWORhwqCLV5/i7gMlzeiOi6IiBS8mgukd/1foB
+	 nnqq4o4F5JNUaXlqpOn2JNUpsNAWZTkEViEipDXGcMTABBr2iYnccDh6w88MVJX916
+	 jy5hV6Wqd9F4wLM2bwXQHhvmG2xGQ+kgmMEpsbN55etvk4s55QgA5brOzONCU0+rxo
+	 a8m9zs69illOS64VjTLaDKsjLA6PtQK3Is7XYoal6Xv4VIflck4qPAkzV7nzr5zxy0
+	 s/ZKnqlkXx+/eN02qfAIDT1RpXNfRlFDaPx1alu3EFLT9HroLYGP4KUheUcIKCQZ+s
+	 xE0Bhywt3VvsQ==
+X-Mailer: emacs 30.1 (via feedmail 11-beta-1 I)
+From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
+To: Will Deacon <will@kernel.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org, Steven Price <steven.price@arm.com>,
+	Julien Thierry <julien.thierry.kdev@gmail.com>
+Subject: Re: [RFC PATCH kvmtool 09/10] vfio/iommufd: Add viommu and vdevice
+ objects
+In-Reply-To: <aJX089pd81f6vMCu@willie-the-truck>
+References: <20250525074917.150332-1-aneesh.kumar@kernel.org>
+ <20250525074917.150332-9-aneesh.kumar@kernel.org>
+ <aH4yMUWTuVtgqD7T@willie-the-truck> <yq5att31brz2.fsf@kernel.org>
+ <f3b39fdc-e063-4d47-95dd-d4158f139053@arm.com>
+ <aJX089pd81f6vMCu@willie-the-truck>
+Date: Mon, 11 Aug 2025 11:46:09 +0530
+Message-ID: <yq5ajz3agz86.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-From: Fangyu Yu <fangyu.yu@linux.alibaba.com>
+Will Deacon <will@kernel.org> writes:
 
-In MRIF mode,  the Advanced Interrupt Architecture Specification
-defines the operation to store the  incoming MSIs into the  MRIF
-and to generate the notice MSI,the software shold check the MRIF
-in the notice MSI irq handler.
+> On Mon, Aug 04, 2025 at 11:33:27PM +0100, Suzuki K Poulose wrote:
+>> On 24/07/2025 15:09, Aneesh Kumar K.V wrote:
+>> > Will Deacon <will@kernel.org> writes:
+>> > > On Sun, May 25, 2025 at 01:19:15PM +0530, Aneesh Kumar K.V (Arm) wrote:
+>> > > > +	dev_num = vdev->dev_hdr.dev_num;
+>> > > > +	/* kvmtool only do 0 domain, 0 bus and 0 function devices. */
+>> > > > +	guest_bdf = (0ULL << 32) | (0 << 16) | dev_num << 11 | (0 << 8);
+>> > > 
+>> > > I don't understand this. Shouldn't the BDF correspond to the virtual
+>> > > configuration space? That's not allocated until later, but just going
+>> > > with 0 isn't going to work.
+>> > > 
+>> > > What am I missing?
+>> > > 
+>> > 
+>> > As I understand it, kvmtool supports only bus 0 and does not allow
+>> > multifunction devices. Based on that, I derived the guest BDF as follows
+>> > (correcting what was wrong in the original patch):
+>> > 
+>> > guest_bdf = (0ULL << 16) | (0 << 8) | dev_num << 3 | (0 << 0);
+>> > 
+>> > Are you suggesting that this approach is incorrect, and that we can use
+>> > a bus number other than 0?
+>> 
+>> To put this other way, the emulation of the configuration space is based
+>> on the "dev_num". i.e., CFG address is converted to the offset and
+>> mapped to the "dev_num". So I think what we have here is correct.
+>
+> My point is that 'dev_num' isn't allocated until vfio_pci_setup_device(),
+> which is called from __iommufd_configure_device() _after_  we've called
+> iommufd_alloc_s1bypass_hwpt().
+>
+> So I don't see how this works. You have to allocate the virtual config
+> space before you can allocate the virtual device with iommufd.
+>
 
-And without MRIF support,we redirect the guest interrupt back to
-the original host interrupt,  the software update and check MRIF
-in host irq handler.
+I did fix that in https://lore.kernel.org/all/yq5att31brz2.fsf@kernel.org/ 
 
-Signed-off-by: Fangyu Yu <fangyu.yu@linux.alibaba.com>
----
- arch/riscv/kvm/aia_imsic.c | 29 +++++++++++++++++++++++++++--
- 1 file changed, 27 insertions(+), 2 deletions(-)
-
-diff --git a/arch/riscv/kvm/aia_imsic.c b/arch/riscv/kvm/aia_imsic.c
-index 58807e68a3dd..f0d1acde0dd4 100644
---- a/arch/riscv/kvm/aia_imsic.c
-+++ b/arch/riscv/kvm/aia_imsic.c
-@@ -867,11 +867,16 @@ int kvm_arch_update_irqfd_routing(struct kvm *kvm, unsigned int host_irq,
- 
- 			ret = irq_set_vcpu_affinity(host_irq, &vcpu_info);
- 			if (ret) {
-+				if (ret == -ENODEV) {
-+					imsic->mrif_support = false;
-+					ret = 0;
-+				}
- 				read_unlock_irqrestore(&imsic->vsfile_lock, flags);
- 				goto out;
- 			}
- 
--			irq_data_get_irq_chip(irqdata)->irq_write_msi_msg(irqdata, msg);
-+			if (imsic->mrif_support)
-+				irq_data_get_irq_chip(irqdata)->irq_write_msi_msg(irqdata, msg);
- 
- 			read_unlock_irqrestore(&imsic->vsfile_lock, flags);
- 		}
-@@ -921,6 +926,10 @@ static int kvm_riscv_vcpu_irq_update(struct kvm_vcpu *vcpu)
- 
- 		ret = irq_set_vcpu_affinity(host_irq, &vcpu_info);
- 		if (ret) {
-+			if (ret == -ENODEV) {
-+				imsic->mrif_support = false;
-+				ret = 0;
-+			}
- 			spin_unlock_irq(&kvm->irqfds.lock);
- 			return ret;
- 		}
-@@ -1182,8 +1191,24 @@ int kvm_riscv_vcpu_aia_imsic_inject(struct kvm_vcpu *vcpu,
- 	if (imsic->vsfile_cpu >= 0) {
- 		writel(iid, imsic->vsfile_va + IMSIC_MMIO_SETIPNUM_LE);
- 	} else {
-+		if (imsic->mrif_support) {
-+			struct msi_msg *msg;
-+			unsigned long idx;
-+
-+			/* In MRIF mode, the noticed MSI irq handler will call here to
-+			 * determine whether the MRIF has been updated.Since the IOMMU
-+			 * hardware has updated the MRIF,the software does not need to
-+			 * update the MRIF file again.
-+			 */
-+			xa_for_each(&imsic->hostirq_array, idx, msg) {
-+				if (msg->data == iid)
-+					goto skip_update_swfile;
-+			}
-+		}
- 		eix = &imsic->swfile->eix[iid / BITS_PER_TYPE(u64)];
- 		set_bit(iid & (BITS_PER_TYPE(u64) - 1), eix->eip);
-+
-+skip_update_swfile:
- 		imsic_swfile_extirq_update(vcpu);
- 	}
- 
-@@ -1260,7 +1285,7 @@ int kvm_riscv_vcpu_aia_imsic_init(struct kvm_vcpu *vcpu)
- 	raw_spin_lock_init(&imsic->swfile_extirq_lock);
- 
- 	xa_init(&imsic->hostirq_array);
--	imsic->mrif_support = false;
-+	imsic->mrif_support = true;
- 
- 	/* Setup IO device */
- 	kvm_iodevice_init(&imsic->iodev, &imsic_iodoev_ops);
--- 
-2.49.0
-
+-aneesh
 
