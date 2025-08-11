@@ -1,126 +1,288 @@
-Return-Path: <kvm+bounces-54452-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54453-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1173B216EE
-	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 23:06:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3ADBB216FB
+	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 23:07:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C91E47A9B38
-	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 21:04:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DD23A1A24644
+	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 21:08:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D13412E3AF3;
-	Mon, 11 Aug 2025 21:05:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B69B2E2F06;
+	Mon, 11 Aug 2025 21:07:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nUiUgcc2"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="p/zKY0Dy"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A23742E2832;
-	Mon, 11 Aug 2025 21:05:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D02C22E2DEC
+	for <kvm@vger.kernel.org>; Mon, 11 Aug 2025 21:06:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754946354; cv=none; b=p11wjPRDGBb7acVFDHRFao1KY5z6MqGHYk7XDrX71c+jhj4gjR05MACwojvaPWYsaYr9z+QD81SXdageCzhn/RblJyFQO6NSNsZ5/HRQtxW8VRDivjI7Lsmf/qUx6m19igdouPTkXBmcSX0MrAcwcSINonblIAlZlV/2Fo40dY0=
+	t=1754946419; cv=none; b=f2L7dxySqBG9+dWzl3u0kijI37WwJw0z2ATmIpUWcDIX/ura3iLiJgxlquZPS/jhs8KK2BCDRy5/MOTfgxKrlwZ4BtKDOoDJd2khm07iZtJtrZj/XbTXgppJh700Glo9JxVycbyaNzNBq8Pd9g5eY5RqFQtIRJrXCfn5U8sv0uc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754946354; c=relaxed/simple;
-	bh=1Nk1N11Mf4isi3ccvxVhmmggqekUWYZz++yNa4E+52I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HuYB1J5cpuGBwGtZF5fs0eknMhsKVkO235s/WCYfEAtO/Q+wlcAH59kA1GETa0qHcI3h1bjKgbyCo0vsbBNeil2Sm85YgYxnqbxzfIW41/+9Ca8WfhWlK7F4H6J+upSfbEV3UoKtM0JVRGqd+VbyR6IEvcha+StXQxcL1c2mxO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nUiUgcc2; arc=none smtp.client-ip=209.85.210.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-76b8d289f73so4502192b3a.1;
-        Mon, 11 Aug 2025 14:05:52 -0700 (PDT)
+	s=arc-20240116; t=1754946419; c=relaxed/simple;
+	bh=Cx4n43N5rT7tm26Zi/Wl9s0WML/Y54o9a9g7SG7hNi8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=ZSEN4BFHtDa3snAciwwJp1KSQmN2ic2Og6SaFjYxZB1m3y4JjTcwuBz/RtpAJ2JjMEgiI9GoK9F7jk1JFHPF6CbU+CV4IceBFGzjv03G58TIO532iCfS1XW/pS7auD5QTwGMhSpp/ISD8tsInTmgZFc15les4mYc5XsS3pMOY+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=p/zKY0Dy; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-31eec17b5acso5581027a91.2
+        for <kvm@vger.kernel.org>; Mon, 11 Aug 2025 14:06:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1754946352; x=1755551152; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pucYViOMBgtcD0obTb6QOAskbVEKILYR6hTM07nkFnA=;
-        b=nUiUgcc2LZnjnwetKhPMTJdw4U1AymTLB+cw/+h3ZIBfOzcoMAV/+sLUBLqN4GEWtg
-         l2iueRSa06sUErlGgQ+OXzV64Q/dwHPxBIEee8eSKT9RFiad3BnNh29hj7yb9ndNL0cf
-         EmCCtVx4YKGMT5AmLsXQQGQbQe2PC6pYEzKuD3ubKvElfoZD5qthYlbMNmF1SkZkMNiD
-         OMRX+IKIG2d37l9LNLgViuV2oX8IKp0wcUM6ccsO2EnC11liDuJIRDJN+xJ/UjSaxWoy
-         RsKbqj4JpUta/XIuygrydQp8qGUrhf4fCBy1yqVIBAoMrp/7NEl56VaXsOrT7ol1L8X3
-         dSsw==
+        d=google.com; s=20230601; t=1754946416; x=1755551216; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=hA2AeNbIBZstfZYB1c7+ojqp0Nun86T8R6LZcf4kSAI=;
+        b=p/zKY0DyH1xx5VnMrlT3w59pKjjaKJwF50i7zNGMsRW71kQhibFV71HG6/Z+kbIATc
+         5USWmiO+EM76vu2lhZHlPssI34prr/jM3xK5yKQyzFA13L39QiJueE7MkHeHEqG+Yrfn
+         U0xALIKm9oDH7a/hGbYAKCGbIqvy2QUzb3OmkRhomPIJQQgKTYaCRqrz+akfrXNudISc
+         7T6CIIa27GbIDHSXjwZR0QIg5HFRmQlP6S9pjKYGkme+jSUO2hshnaVeMI2F9SZKDtHZ
+         0d+Ixe9SDiPo0YrXSU2ExZVo9fPPOzRoIgALD/ZbXXH2xbUPxllB97jWcWShWCK1UjN4
+         +VAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754946352; x=1755551152;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pucYViOMBgtcD0obTb6QOAskbVEKILYR6hTM07nkFnA=;
-        b=b+iZPz7G9tRHLju2SPWDfEccCMz+8Tpxiw6g5W+7SQ4mQW1jRYrNWw5/U0+onQBIgi
-         qIPa5+sxkX1CQXz+fId5jzkQOJ2FfcMLglPyZs53Gcfh+AhHHuHFn7Ai1PunuQxXQ/d1
-         ltqU5v/bV7b74Pa47vVSstUsyOWu3DLf145i9WwSqMvfCd6xu71NBbvwPdeXGhVLMcs5
-         yHE08xLUdhKNqe6cIcB9+3kYmjIm/n6v+IS5pqr1X2IKQZEuUVUSJmZFGNWdIx04ZGMx
-         w0LrgALGAyFKeCZmM5M/o3+ZNSE0NBp1ZdXuFHaNNmEsWye9K3NveEV81o8KJdjc9QLW
-         1d8g==
-X-Forwarded-Encrypted: i=1; AJvYcCU9RtNT595OTE8IJZob13AawlXCGXiCK6ydZ82R6ghDB+JGfhmsBYVjE69Smei3c+YKARk=@vger.kernel.org, AJvYcCVU5OtYWFgV4HiYr06TQuA5lFaVuGB7JzJzA6xzEROvGmL4P3eS6PBfC7tE8OEWR2d1t8Gugh9pDqsi46v5@vger.kernel.org
-X-Gm-Message-State: AOJu0YztRYVrtSxuy3YsobRbv61cy3g/9uu262y0ztiI98YvwD1m+u4m
-	5dQjmpNXM/N0RfdtSTz5lI+YHi5JshrA+qZLujNKPHIGFlfPUPaviWk9
-X-Gm-Gg: ASbGncsqY7jIVOcrBe0OoPYgKZ9SJY1e1cYEMMg7IbIJ75UgSQg3QASzBTXdEE0p6k/
-	OcHkF4oxxw25HIX6YBab001lGTmBQVgzXI33pQAm5dmqjUZOcQ5Tyglk9HNK328Xy7Ysjs6UP1W
-	kYHv8Tsq8GyfhB1yU9fWsEbB2PQkPpeg5p6Vvko8uWARlqGI8Ib64GNrd5WF5RBLGtrY7fCKF1U
-	KRLGz5lu2APQuPCjL5ZfDkwHJIw7YPjYoszpqcDVIQUSgUSJ9qRs7ODRB2A5tGcCqSrsqLqbQNU
-	OwgNJxl+ucp/XGYBj7S+PvjYW2hCbIl6Vkj0EJIsN+7TGAnKR4OaFkhNyZm0kFAAYDZuX3ttnz6
-	BuUqmV87BPveAARi4b9oacg==
-X-Google-Smtp-Source: AGHT+IG/yIxsGyAGBIYKxJnQLPWhqKtrrcMjEUCyUUUzIRM1qMq4Ch61mKXUViyhJ+EvYBk8PciDjQ==
-X-Received: by 2002:a05:6a20:2447:b0:240:168b:31b with SMTP id adf61e73a8af0-2409a8be38dmr1363082637.16.1754946351849;
-        Mon, 11 Aug 2025 14:05:51 -0700 (PDT)
-Received: from localhost ([216.228.127.130])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-76bfc270514sm20681059b3a.12.2025.08.11.14.05.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Aug 2025 14:05:51 -0700 (PDT)
-Date: Mon, 11 Aug 2025 17:05:49 -0400
-From: Yury Norov <yury.norov@gmail.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Zheyun Shen <szy0127@sjtu.edu.cn>
-Subject: Re: [PATCH 1/2] KVM: SVM: don't check have_run_cpus in
- sev_writeback_caches()
-Message-ID: <aJpbLX_0WP5jXn7o@yury>
-References: <20250811203041.61622-1-yury.norov@gmail.com>
- <20250811203041.61622-2-yury.norov@gmail.com>
- <aJpXh3dQNZpmUlHL@google.com>
+        d=1e100.net; s=20230601; t=1754946416; x=1755551216;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hA2AeNbIBZstfZYB1c7+ojqp0Nun86T8R6LZcf4kSAI=;
+        b=mnWn0VQjC15S0mrr3Ro/3i5Te9vGDNNMmJ2GEMYterphEJxYzZw15pKnVvzVx7VjKN
+         +/oeSEdwmaaj85zHtQXSwDl8au4mhi9MPpODuEU/CtXYD41cFpCs3UBQuoDTMVnTyGl7
+         3o2VoQGrbm5RS6VCZWoh5pL53MfBPKrbekaYrI5HOrl6JZsiqn7LwveDWq5jjeuzkmmi
+         IJViIuEj04V6Xoxk9VPRa/gm9+8G6M8U0MQT1DQU76yPlZLb+v5FahfljGu43FrudB6a
+         g5BuJ3oct2z3XVlAM7kYciPgPjcx7rBxhlp6lW2f+YodnwmQtCtetVDCRZJ6FuLyfxvg
+         L2ig==
+X-Forwarded-Encrypted: i=1; AJvYcCWVtoOo6Kl9aGCBUUuwnEqnX9uh3tu1Vf3xMBDBDlgi5k3yjjSncMnmwc9KNLxCHc+LhvU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyifbfxE88dMZID8Bh3e9pi1AWN+SyafHxql1jE4JTtXKFFN/UN
+	tVa3Jgn8XbGXPV+38vXn2E8WNxICXWbZqt6hFKD38u3huHhtbMRZKDNbB5lgstvg/VH2pGB9zQB
+	aYZpU+w==
+X-Google-Smtp-Source: AGHT+IHb7VuPqjPmQofVIr8Tq+0i5bRZmt7Sf17RzX2nxgD/7A0XMQXoX3ALWil3/vaD1rDqddzVRDvIBn8=
+X-Received: from pjph9.prod.google.com ([2002:a17:90a:9c09:b0:320:e3e2:6877])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:48ce:b0:31e:d643:6cb9
+ with SMTP id 98e67ed59e1d1-321c0a67decmr1163778a91.1.1754946415981; Mon, 11
+ Aug 2025 14:06:55 -0700 (PDT)
+Date: Mon, 11 Aug 2025 14:06:54 -0700
+In-Reply-To: <20250807201628.1185915-25-sagis@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aJpXh3dQNZpmUlHL@google.com>
+Mime-Version: 1.0
+References: <20250807201628.1185915-1-sagis@google.com> <20250807201628.1185915-25-sagis@google.com>
+Message-ID: <aJpbbqsW_LIu2exc@google.com>
+Subject: Re: [PATCH v8 24/30] KVM: selftests: TDX: Add shared memory test
+From: Sean Christopherson <seanjc@google.com>
+To: Sagi Shahar <sagis@google.com>
+Cc: linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, Ackerley Tng <ackerleytng@google.com>, 
+	Ryan Afranji <afranji@google.com>, Andrew Jones <ajones@ventanamicro.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>, Erdem Aktas <erdemaktas@google.com>, 
+	Rick Edgecombe <rick.p.edgecombe@intel.com>, Roger Wang <runanwang@google.com>, 
+	Binbin Wu <binbin.wu@linux.intel.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	"Pratik R. Sampat" <pratikrajesh.sampat@amd.com>, Reinette Chatre <reinette.chatre@intel.com>, 
+	Ira Weiny <ira.weiny@intel.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Mon, Aug 11, 2025 at 01:50:15PM -0700, Sean Christopherson wrote:
-> On Mon, Aug 11, 2025, Yury Norov wrote:
-> > From: Yury Norov (NVIDIA) <yury.norov@gmail.com>
-> > 
-> > Before calling wbnoinvd_on_cpus_mask(), the function checks the cpumask
-> > for emptiness. It's useless, as the following wbnoinvd_on_cpus_mask()
-> > ends up with smp_call_function_many_cond(), which handles empty cpumask
-> > correctly.
+On Thu, Aug 07, 2025, Sagi Shahar wrote:
+> @@ -189,3 +199,19 @@ uint64_t tdg_vp_info(uint64_t *rcx, uint64_t *rdx,
+>  
+>  	return ret;
+>  }
+> +
+> +uint64_t tdg_vp_vmcall_map_gpa(uint64_t address, uint64_t size, uint64_t *data_out)
+> +{
+> +	struct tdx_hypercall_args args = {
+> +		.r11 = TDG_VP_VMCALL_MAP_GPA,
+> +		.r12 = address,
+> +		.r13 = size
+> +	};
+> +	uint64_t ret;
+> +
+> +	ret = __tdx_hypercall(&args, TDX_HCALL_HAS_OUTPUT);
+> +
+> +	if (data_out)
+> +		*data_out = args.r11;
+> +	return ret;
+
+Assert instead of returning the error.  If there's a use for negative tests, then
+add a double-underscores variant.  And drop @data_out, IIUC, it's only relevant
+on failure.
+
+> +}
+> diff --git a/tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c b/tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c
+> index 5e4455be828a..c5bee67099c5 100644
+> --- a/tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c
+> +++ b/tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c
+> @@ -608,4 +608,36 @@ void td_finalize(struct kvm_vm *vm)
+>  void td_vcpu_run(struct kvm_vcpu *vcpu)
+>  {
+>  	vcpu_run(vcpu);
+> +
+> +	/* Handle TD VMCALLs that require userspace handling. */
+> +	if (vcpu->run->exit_reason == KVM_EXIT_HYPERCALL &&
+> +	    vcpu->run->hypercall.nr == KVM_HC_MAP_GPA_RANGE) {
+
+Unnecessary curly braces.
+
+> +		handle_userspace_map_gpa(vcpu);
+> +	}
+> +}
+> +
+> +/*
+> + * Handle conversion of memory with @size beginning @gpa for @vm. Set
+> + * @shared_to_private to true for shared to private conversions and false
+> + * otherwise.
+> + *
+> + * Since this is just for selftests, just keep both pieces of backing
+> + * memory allocated and not deallocate/allocate memory; just do the
+> + * minimum of calling KVM_MEMORY_ENCRYPT_REG_REGION and
+> + * KVM_MEMORY_ENCRYPT_UNREG_REGION.
+> + */
+> +void handle_memory_conversion(struct kvm_vm *vm, uint32_t vcpu_id, uint64_t gpa,
+> +			      uint64_t size, bool shared_to_private)
+
+So, vm_set_memory_attributes()?
+
+> +{
+> +	struct kvm_memory_attributes range;
+> +
+> +	range.address = gpa;
+> +	range.size = size;
+> +	range.attributes = shared_to_private ? KVM_MEMORY_ATTRIBUTE_PRIVATE : 0;
+> +	range.flags = 0;
+> +
+> +	pr_debug("\t... call KVM_SET_MEMORY_ATTRIBUTES ioctl from vCPU %u with gpa=%#lx, size=%#lx, attributes=%#llx\n",
+> +		 vcpu_id, gpa, size, range.attributes);
+
+Drop these types of prints.  strace can probably do the job 99% of the time, and
+for the remaining 1%, I doubt this help all that much.
+
+> +
+> +	vm_ioctl(vm, KVM_SET_MEMORY_ATTRIBUTES, &range);
+>  }
+> +void guest_shared_mem(void)
+> +{
+> +	uint32_t *test_mem_shared_gva =
+> +		(uint32_t *)TDX_SHARED_MEM_TEST_SHARED_GVA;
+> +
+> +	uint64_t placeholder;
+> +	uint64_t ret;
+> +
+> +	/* Map gpa as shared */
+> +	ret = tdg_vp_vmcall_map_gpa(test_mem_shared_gpa, PAGE_SIZE,
+> +				    &placeholder);
+> +	if (ret)
+> +		tdx_test_fatal_with_data(ret, __LINE__);
+> +
+> +	*test_mem_shared_gva = TDX_SHARED_MEM_TEST_GUEST_WRITE_VALUE;
+> +
+> +	/* Exit so host can read shared value */
+> +	ret = tdg_vp_vmcall_instruction_io(TDX_SHARED_MEM_TEST_INFO_PORT, 4,
+> +					   PORT_WRITE, &placeholder);
+> +	if (ret)
+
+GUEST_ASSERT().  Don't use TDX's "fatal error" crud to report test failures.
+
+> +		tdx_test_fatal_with_data(ret, __LINE__);
+> +
+> +	/* Read value written by host and send it back out for verification */
+> +	ret = tdg_vp_vmcall_instruction_io(TDX_SHARED_MEM_TEST_INFO_PORT, 4,
+> +					   PORT_WRITE,
+> +					   (uint64_t *)test_mem_shared_gva);
+> +	if (ret)
+> +		tdx_test_fatal_with_data(ret, __LINE__);
+> +}
+> +
+> +int verify_shared_mem(void)
+> +{
+> +	vm_vaddr_t test_mem_private_gva;
+> +	uint64_t test_mem_private_gpa;
+> +	uint32_t *test_mem_hva;
+> +	struct kvm_vcpu *vcpu;
+> +	struct kvm_vm *vm;
+> +
+> +	vm = td_create();
+> +	td_initialize(vm, VM_MEM_SRC_ANONYMOUS, 0);
+> +	vcpu = td_vcpu_add(vm, 0, guest_shared_mem);
+> +
+> +	/*
+> +	 * Set up shared memory page for testing by first allocating as private
+> +	 * and then mapping the same GPA again as shared. This way, the TD does
+> +	 * not have to remap its page tables at runtime.
+> +	 */
+> +	test_mem_private_gva = vm_vaddr_alloc(vm, vm->page_size,
+> +					      TDX_SHARED_MEM_TEST_PRIVATE_GVA);
+> +	TEST_ASSERT_EQ(test_mem_private_gva, TDX_SHARED_MEM_TEST_PRIVATE_GVA);
+> +
+> +	test_mem_hva = addr_gva2hva(vm, test_mem_private_gva);
+> +	TEST_ASSERT(test_mem_hva,
+> +		    "Guest address not found in guest memory regions\n");
+> +
+> +	test_mem_private_gpa = addr_gva2gpa(vm, test_mem_private_gva);
+> +	virt_map_shared(vm, TDX_SHARED_MEM_TEST_SHARED_GVA, test_mem_private_gpa, 1);
+> +
+> +	test_mem_shared_gpa = test_mem_private_gpa | vm->arch.s_bit;
+> +	sync_global_to_guest(vm, test_mem_shared_gpa);
+> +
+> +	td_finalize(vm);
+> +
+> +	vm_enable_cap(vm, KVM_CAP_EXIT_HYPERCALL, BIT_ULL(KVM_HC_MAP_GPA_RANGE));
+> +
+> +	printf("Verifying shared memory accesses for TDX\n");
+> +
+> +	/* Begin guest execution; guest writes to shared memory. */
+> +	printf("\t ... Starting guest execution\n");
+> +
+> +	/* Handle map gpa as shared */
+> +	tdx_run(vcpu);
+> +
+> +	tdx_run(vcpu);
+> +	tdx_test_assert_io(vcpu, TDX_SHARED_MEM_TEST_INFO_PORT, 4, PORT_WRITE);
+
+AFAICT, there's nothing TDX-specific about these assert helpers.  And I would
+prefer they be macros; while ugly, macros provide precise file+line information,
+i.e. don't require a stack trace.
+
+Maybe TEST_ASSERT_EXIT_IO() and TEST_ASSERT_EXIT_MMIO()?
+
+> +	TEST_ASSERT_EQ(*test_mem_hva, TDX_SHARED_MEM_TEST_GUEST_WRITE_VALUE);
+> +
+> +	*test_mem_hva = TDX_SHARED_MEM_TEST_HOST_WRITE_VALUE;
+> +	tdx_run(vcpu);
+> +	tdx_test_assert_io(vcpu, TDX_SHARED_MEM_TEST_INFO_PORT, 4, PORT_WRITE);
+> +	TEST_ASSERT_EQ(*(uint32_t *)((void *)vcpu->run + vcpu->run->io.data_offset),
+> +		       TDX_SHARED_MEM_TEST_HOST_WRITE_VALUE);
+> +
+> +	printf("\t ... PASSED\n");
+
+No.  Printing PASSED is worse than useless.  Exit codes exist for a reason; this
+is pure spam.  pr_debug() if necessary, but all of these printfs can probably be
+dropped.
+
+> +
+> +	kvm_vm_free(vm);
+> +
+> +	return 0;
+> +}
+> +
+> +int main(int argc, char **argv)
+> +{
+> +	if (!is_tdx_enabled()) {
+> +		printf("TDX is not supported by the KVM\n"
+> +		       "Skipping the TDX tests.\n");
+> +		return 0;
+
+TEST_REQUIRE()
+
+> +	}
+> +
+> +	return verify_shared_mem();
+> +}
+> -- 
+> 2.51.0.rc0.155.g4a0f42376b-goog
 > 
-> I don't agree that it's useless.  The early check avoids disabling/enabling
-> preemption (which is cheap, but still), and IMO it makes the KVM code more obviously
-> correct.  E.g. it takes quite a bit of digging to understand that invoking
-> wbnoinvd_on_cpus_mask() with an empty mask is ok/fine.
-> 
-> I'm not completely opposed to this change, but I also don't see the point.
-
-So, there's a tradeoff between useless preemption cycling, which is
-O(1) and cpumask_empty(), which is O(N).
-
-I have no measurements that can support one vs another. But the
-original patch doesn't discuss it anyhow, as well. So, with the
-lack of any information on performance impact, I'd stick with the 
-version that brings less code.
-
-Agree?
 
