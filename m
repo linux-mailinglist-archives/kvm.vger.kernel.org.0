@@ -1,76 +1,78 @@
-Return-Path: <kvm+bounces-54418-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54419-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BCC7B212CA
-	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 19:06:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7075CB212CF
+	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 19:07:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 802691907F3F
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 46D403E2FFC
 	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 17:06:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E26992C21E2;
-	Mon, 11 Aug 2025 17:06:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6945E262FF1;
+	Mon, 11 Aug 2025 17:06:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LaT1x2oP"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pA+NwpqK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37F5A253B42
-	for <kvm@vger.kernel.org>; Mon, 11 Aug 2025 17:06:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D04322D3A74
+	for <kvm@vger.kernel.org>; Mon, 11 Aug 2025 17:06:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754931978; cv=none; b=GWCXPb61LydlEZC6/SOsf7pWsljIJwJX4qZQrwrWCFh9Kn5B2kMyFmAmI+jLsg7JsU4hXIefx8BektJ5fH0zbESSrphh9f7Bj0o37o3qa1r7mmA6/SUory0pH9k9wWbvBuKu7OgL0C9FsFDt4jj6cmSW4p+xNw5Vgg6lk+0c3H0=
+	t=1754931983; cv=none; b=AX0XnZJ0z7thXpuYg1PLpiNGPBmoTU/zDBrrpOCG9GmbkZtwL9Gon/0WVNZSOB6Fo28mHDMAGJeveOuKBY2W4HROOhhL5buv0v7CAaryPPoUX6adRzy/fg7+RzsuZC3smtKH33xAqDboORUeT0AvFHDlFa3jMSMy+o5dcHeISwY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754931978; c=relaxed/simple;
-	bh=VoiUlWxDpiwkld77RbFQpFASE4Pk5D3XvIaCfGc9jtM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=bu5NdDMjypWljUbfbLYXZOYVjniLGDucGTyYafwFTEQ08ua7zcte5g30kHUxgAovCfUt2SJvtt8Eo9wL6DXr5TiHpxqeiIGnU2T0GWHqfYYx5kdo3kV/rLc2yQezoaIN3R7HnnRiNVQXyQgFjF0PxAqza8Uhv+pKKnDNM48slkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=LaT1x2oP; arc=none smtp.client-ip=209.85.221.49
+	s=arc-20240116; t=1754931983; c=relaxed/simple;
+	bh=biYhynh5VtlPMW5C9lkL839XZRJSsoYCWslawzM4S+w=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=YfirIRqHMpIzQugYUw21xpnmYDo/5RpBgS8b76bRw7V9fUktBq8WYBuRqbSVxHlSjrhPkk/ToMd/0DALyCiagfo1T/adqA4c4/8IWM0PiAjWvciPDvvQ7OMhvTi+jcWSd57pfKQuW1KnBjCG5SKwmz0VdWF7a1XnStZmG+iKroA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=pA+NwpqK; arc=none smtp.client-ip=209.85.128.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-3b7961cf660so3721450f8f.1
-        for <kvm@vger.kernel.org>; Mon, 11 Aug 2025 10:06:15 -0700 (PDT)
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-459e3926cbbso19381095e9.1
+        for <kvm@vger.kernel.org>; Mon, 11 Aug 2025 10:06:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1754931974; x=1755536774; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Gct7C1Y1ZRB4jTTLIlstS8WuVX5u4p3QrSuPcz6V+Qw=;
-        b=LaT1x2oPOCNvuy0Q2Yx7qlRjhuvzMirGqXpfeldIuEvD3SFVK0AyFnWOAeL0OSY6Ow
-         ZqetpKFhag/IMyAbgQOYM7vOQYkMvNLeX7i7zaCRjQSfmbEhbWMKJXRrSNwq7i6gIiu4
-         oTRbu/9540LAlhtxUhps4MD01gwyNgmod+CJLIwxlNCk6zvaRhKzzVt/neq+WaMHuMgO
-         F8ISy4fjqFdA7O3wcGcbfPPLwHsbV5SHTzignPeteT5vTDIo5pNso0+6vpOC7inIJytR
-         VULcd+yyi92YjRE095VnZBgBe7iUxobtC1RC/kNq9EKc1XJ1lCeiWUfWCYPOJNw4pSUj
-         jMrg==
+        d=linaro.org; s=google; t=1754931980; x=1755536780; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hbl7ajSiNJK7b98o2AX/9HHrEnoB7DYhJ//FpfdP6jM=;
+        b=pA+NwpqKb7RLvaBu1O74rZy6fouIVtHAi5JCEED4yGcGJliDXC4v2Uo0CvGleIl1/S
+         njdArSRzeWnW2HWiu82k7t6d7isakTOraYg/pYalzPMQBOe5rQuuWrnd7SvkeTlTCBn/
+         1NSBRoCaxkOMRQ+PGXTSaWCJVlG09rFSbZ/B7Gq6zOxKadJztL/TU1Z1Z4iDM1jWrn8r
+         dMkLPCzfjhkDU/zxESUevmH7Gi4x2aRJLEkpv6NUeRrKk7wZ2A+gEbkGJRrRET8DmPhA
+         +W6UfdqZ3pi1rThrxqf60P0xHo9akYJLB0BT4UZA74KiLxbCYg/OJTwr8Y0SwopdY3m8
+         l/LA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754931974; x=1755536774;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Gct7C1Y1ZRB4jTTLIlstS8WuVX5u4p3QrSuPcz6V+Qw=;
-        b=tSJf9yv8NEc/h53P2fqITl3uehxMXPbQ4lSC5/G6YBLoPpAMXGWeChy0EVHCy0Klh3
-         NFqNTsJZDwuFOto7eBVeXjYDTTgcgbI1qM+k49FGnwTjMnAfTl8ngAl7m8w/vK/MpfQZ
-         Wudmk9jQC5czZ2+k+qTSPcwzQcuPqDl6RK5BGFdFyp3BpGuPxpr2lzDMH0g7HVaI7u8U
-         Xp7Sfwceb8FReEfXdwilaHZTrGhPK2JcIlO2IHuDvI1F5jXVMm5wSw3yK1tQI3w9AJpm
-         37juZxtwF9aPXcqobPKZYMMtyOPmdocQwCEERrl39+jWbZqIscS2ZvsyroWiHfdAPGve
-         HbKA==
-X-Forwarded-Encrypted: i=1; AJvYcCVwIhvOiifzl7Ekir9xR6NzMQv2QS1PA+IA1Hnfcl2eRbcD9r+lhwMyuK5RW2I3gQw0g88=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyotncbRGnfe5bUiXQtGkF8zpRcj7FXfy/Ehm6dyVplC3iBiLtH
-	Wd2LQPNVn2O9ATfu0duZeXO76O+758mYE8CkHXKtb0PI3PuEg9B2SU4+A4x3Buuqni4=
-X-Gm-Gg: ASbGnctll3sIg1Oj1J9NehmezT3OPoH93NS9iISZt6R+d/yLUuGPA05xyaQADgEqRiN
-	+fdsHn+g15sqFwVx5KIltIgNr44nsCDcSn2YbLuRwEVvv1WurONMGuuM3/UpjVNA/eMLqEbrerZ
-	FklR+ttmhv+6EaRBHMwqTVA28x2NrqyuhgJGjc6FA9TfUi3Lk3xJcGIide7bG9gJ0JrDeYI3sqd
-	dPmhTEoBkShj/d2JoLgSKM5qFC4ucwh7dYT/Uw4pLkWCxtK0PQxNF+3IG4WNSzo5BBMUo39JUm+
-	pCpNayVVMuxzTfupx+3yTx0m8tKlEiKbLLRXKUCEH3oAGLOGUkRZCudN09tB1FCysDnqQYKTYLj
-	uLW7Tu95ABEkSBXq4iAwXd4ZD7N18ufWzS7hnsEiAr9+oZKikdhZnZcNyRkzJgwPN/7epX/1V
-X-Google-Smtp-Source: AGHT+IFxSRfqcB19VeCggmPRFwXZs8vukwQy0+SZAp+RMLZ5Gi+wPHMHtoSwlNvUFKTkhMS9MhdHQA==
-X-Received: by 2002:a05:6000:2013:b0:3b7:8473:312c with SMTP id ffacd0b85a97d-3b9009068b3mr11290961f8f.0.1754931974313;
-        Mon, 11 Aug 2025 10:06:14 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1754931980; x=1755536780;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hbl7ajSiNJK7b98o2AX/9HHrEnoB7DYhJ//FpfdP6jM=;
+        b=HDwwxhYR4WTYGxGGexBK/S0yK5NSzkfMYwKGOT0u67ufmDY7d4IIvshiDXx+wYGuyb
+         2oR2g419WFBlMNZ32h3jQY8cXhZYG3HlzwmJYEuTxMPRyO6VnL7bAH6aTh3BTNJ/baUq
+         YRE8qoRUJxz15SX5Czco1oZWi55xmB3SuI82eUu2sJ2JY7fi7GItbVEuWXEVY1Zxp/43
+         ptMJv9Jn+6Sy0fhp/ogkIP2JwWV8ujiVnt1h/6JnyV3Gud2F1clnMEG05Dx+Ay351wos
+         LkcAAdobq1u4etSer5FS3QE4yDRmttTPfCkM6ahmWxL/JKjNsjK+/ox5gRzZ8ZcMgE5D
+         mmqA==
+X-Forwarded-Encrypted: i=1; AJvYcCWODEA3kLChqhSznc2dA2efw5/j8/XGjfTG8pcYo1BZ/5StEo2RUbCn4BF98L9bocMvuxM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxuLo9YWzTGJuwxkxVf2edqINAMs983vMK/qy4ZEXU8n4R/KVnT
+	Mjluy4FNxpER1yC/r28wh/doDa5+xWjMOAZWmDlz5e+XC2S4sYMoL8cmdoXyqJIilEc=
+X-Gm-Gg: ASbGncudb2d7PvmR4jq7FYQuPCbWhxFoMC9OYdkgUQGixuwJ1hiumrcdcYVQmlU7oeQ
+	V63Jg3ugbqLM1ik/iA/kRjly0GqroQkPDmA+cuKObmn8kICPmpbty3B+iyrkIeiQYWMqHbRTxBI
+	TAnVIFbdt4yirNpcrxJbJTYPt9PkxLNR8YuMIAbnFRILY15Sl5a0TsV3wrrlqA7EK4FS3movQ9K
+	gd/1Ggl4GpknvPbkHZEyrsZihFVGIlgioOAaOAMl0DzrNQDeyaxU3I9WmT3bGp/c+6q0JXjYBcZ
+	1OC/IlsexlmPhJftPD9YLlzSi+GM4mvMj9SVmuku/V3VC/N7Av2pSMhRFaZG5ju1jN4rz7x1BX1
+	sVOnjP8/UmEF+zA7N0oUik8mSTZfSnhU2HKm9UG4wm7H8cNB5HDbZcXf5DO4eoaclBJ/jwR0e
+X-Google-Smtp-Source: AGHT+IHs9VhBLuyq5DxMA3Sqc0EWtw1Yz98FWwe/a6XU5QQ2lahjqbMswlIp69fYsNKRzJHrl1XcwA==
+X-Received: by 2002:a05:6000:2886:b0:3b7:9589:1fd1 with SMTP id ffacd0b85a97d-3b91100eca2mr436223f8f.44.1754931979737;
+        Mon, 11 Aug 2025 10:06:19 -0700 (PDT)
 Received: from localhost.localdomain (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b79c3ac574sm41205758f8f.5.2025.08.11.10.06.12
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-459e6214640sm272712305e9.1.2025.08.11.10.06.18
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 11 Aug 2025 10:06:13 -0700 (PDT)
+        Mon, 11 Aug 2025 10:06:19 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Miguel Luis <miguel.luis@oracle.com>,
@@ -89,77 +91,52 @@ Cc: Miguel Luis <miguel.luis@oracle.com>,
 	qemu-arm@nongnu.org,
 	Cameron Esfahani <dirty@apple.com>,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-Subject: [RFC PATCH 00/11] target/arm: Introduce host_cpu_feature_supported() API
-Date: Mon, 11 Aug 2025 19:06:00 +0200
-Message-ID: <20250811170611.37482-1-philmd@linaro.org>
+Subject: [RFC PATCH 01/11] accel/system: Introduce hwaccel_enabled() helper
+Date: Mon, 11 Aug 2025 19:06:01 +0200
+Message-ID: <20250811170611.37482-2-philmd@linaro.org>
 X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250811170611.37482-1-philmd@linaro.org>
+References: <20250811170611.37482-1-philmd@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Hi,
+hwaccel_enabled() return whether any hardware accelerator
+is enabled.
 
-Mohamed and myself are working on adding nested virtualization
-support to HVF Aarch64. Mohamed approach leverages the latest
-hardware features of the Apple M3+ Silicon chips [1], while mine
-falls back to emulation [2] when features are not available, as
-it happens with the M1 and M2 chipsets.
+Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ include/system/hw_accel.h | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-We want to support both methods long term, as they solve different
-use cases. Therefore I'm looking for a common API for methods
-added in both series.
-
-In this series we propose the host_cpu_feature_supported() method
-to check if a feature is supported by the host, allowing fall back
-to TCG. KVM uses are converted, and an example -- while not really
-usable without other patch applied -- is provided for HVF.
-
-Does this look reasonable enough to pursue in that direction?
-
-Thanks,
-
-Phil.
-
-[1] https://lore.kernel.org/qemu-devel/20250808070137.48716-1-mohamed@unpredictable.fr/
-[2] https://lore.kernel.org/qemu-devel/20250620172751.94231-1-philmd@linaro.org/
-
-Mohamed Mediouni (2):
-  target/arm: Factor hvf_psci_get_target_el() out
-  target/arm/hvf: Sync registers used at EL2
-
-Philippe Mathieu-Daudé (9):
-  accel/system: Introduce hwaccel_enabled() helper
-  target/arm: Use generic hwaccel_enabled() to check 'host' cpu type
-  target/arm: Restrict PMU to system mode
-  target/arm: Introduce arm_hw_accel_cpu_feature_supported()
-  target/arm: Introduce host_cpu_feature_supported()
-  target/arm: Replace kvm_arm_pmu_supported by
-    host_cpu_feature_supported
-  target/arm: Replace kvm_arm_el2_supported by
-    host_cpu_feature_supported
-  target/arm/hvf: Consider EL2 acceleration for Silicon M3+ chipsets
-  target/arm/hvf: Allow EL2/EL3 emulation on Silicon M1 / M2
-
- include/system/hw_accel.h | 13 +++++++
- target/arm/cpu.h          | 23 +++++++++++++
- target/arm/kvm_arm.h      | 24 -------------
- hw/arm/virt.c             |  8 +----
- target/arm/arm-qmp-cmds.c |  5 +--
- target/arm/arm_hw_accel.c | 27 +++++++++++++++
- target/arm/cpu.c          | 14 ++++----
- target/arm/cpu64.c        | 11 +++---
- target/arm/hvf/hvf.c      | 71 +++++++++++++++++++++++++++++++++++++--
- target/arm/kvm-stub.c     | 10 ------
- target/arm/kvm.c          | 33 +++++++++++++-----
- target/arm/meson.build    |  2 +-
- 12 files changed, 176 insertions(+), 65 deletions(-)
- create mode 100644 target/arm/arm_hw_accel.c
-
+diff --git a/include/system/hw_accel.h b/include/system/hw_accel.h
+index fa9228d5d2d..49556b026e0 100644
+--- a/include/system/hw_accel.h
++++ b/include/system/hw_accel.h
+@@ -39,4 +39,17 @@ void cpu_synchronize_pre_loadvm(CPUState *cpu);
+ void cpu_synchronize_post_reset(CPUState *cpu);
+ void cpu_synchronize_post_init(CPUState *cpu);
+ 
++/**
++ * hwaccel_enabled:
++ *
++ * Returns: %true if a hardware accelerator is enabled, %false otherwise.
++ */
++static inline bool hwaccel_enabled(void)
++{
++    return hvf_enabled()
++        || kvm_enabled()
++        || nvmm_enabled()
++        || whpx_enabled();
++}
++
+ #endif /* QEMU_HW_ACCEL_H */
 -- 
 2.49.0
 
