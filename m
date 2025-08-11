@@ -1,408 +1,419 @@
-Return-Path: <kvm+bounces-54387-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54388-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FF1DB203D0
-	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 11:35:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AADD2B20466
+	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 11:51:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC39E1621D6
-	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 09:34:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7B11E7B3208
+	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 09:45:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35D6321C190;
-	Mon, 11 Aug 2025 09:33:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4B5B33F6;
+	Mon, 11 Aug 2025 09:45:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="F4JVoGDQ"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="OS7UcPeC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2071.outbound.protection.outlook.com [40.107.101.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5D4D70808
-	for <kvm@vger.kernel.org>; Mon, 11 Aug 2025 09:33:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDD6D1DED7B;
+	Mon, 11 Aug 2025 09:45:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.71
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754904805; cv=fail; b=FFjODDfv5hP+g+8gEmVov5cNPcpC0fwcHsOAD42qTF9ZLZp5RidK7kP57ydJwOru5SGSKNqddg2Qrc0N6DaYk2DVNIssXO17e+23pR+fQYNc/MBJrNt9+OE924SAI3TWhC7xxiWYr60aZ7VnaRfE6k8nVmjO5fLjw377DR6QW2E=
+	t=1754905506; cv=fail; b=eCfPE+fpi1Th2IVjf7g5e/TBRADw7VCksCcDI9ZBqXri6EElqapA3SeKbZLFyuVyDFF1mdFoAhNlguc2PPO/Vestdz0ap62KRskoJZzBD5NEptID1rIO57N3dE+qxL3sKofcKtEbCn0pqz4Wcwtun8ZRxCJkuvfGMI1axv9/Cdg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754904805; c=relaxed/simple;
-	bh=i2m5Jy0mN5m687BGlU8qN4smFJ7PLLy4TDC7pJbtUZM=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=j22P5pfaK+RT56mKVW7HPWI4r6+JDGdB436/Ecp1Plolg0DoSRoZHl/fvt4/ssYOIlXNmjcRIoHSj2nhn2n92pfzD8jdL5YjUuLcFSlbnW61JeUrbsgubuAlpOFW1Ola8x7M+gDUy6MoW3W3WeFBFRwOezQzYzzXv7DfHiMfE68=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=F4JVoGDQ; arc=fail smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1754904804; x=1786440804;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=i2m5Jy0mN5m687BGlU8qN4smFJ7PLLy4TDC7pJbtUZM=;
-  b=F4JVoGDQpdBwe0Q3JW+GCnAb4XIS9kPnylkn6GxroFOtbPcZpWNW0jZO
-   Qpj6r+9+usohEd2S1C4uk2tv4zBgIfo+KmwjQ3fA2iT+PzQ//82vc2zLg
-   r9pWgOFbIqmHum+ctveHX5BlVvCva7mK1oWn9r6oE/WEffHKCMB3klVY1
-   r7rQN0YG7WxLPy9p4OYL0Kxcj7QQSV8pkWU+UICCVwC38h8ed/G0JrQ1v
-   RkbTyyNRKfBWR6wI6d0ecR97KhroPzf5JSfecB5gDBQcPhDoFq7+QngEF
-   K7b5EGCm0imY5eNME8HdEkqQjzeoeD19+I0M6Y0+rR8IhptHGGQaE9g85
-   Q==;
-X-CSE-ConnectionGUID: PTPkkrJFRzKBOLksB45vrw==
-X-CSE-MsgGUID: Wa4jcpvrRsuvHCuRhbY+Bg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11518"; a="68522274"
-X-IronPort-AV: E=Sophos;i="6.17,278,1747724400"; 
-   d="scan'208";a="68522274"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Aug 2025 02:33:23 -0700
-X-CSE-ConnectionGUID: ChjIcq9uRiqfS25kma1ttA==
-X-CSE-MsgGUID: fZV0D7leSkWPSnEuoLxk8Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,278,1747724400"; 
-   d="scan'208";a="165517896"
-Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
-  by orviesa009.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Aug 2025 02:33:22 -0700
-Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
- fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26; Mon, 11 Aug 2025 02:33:22 -0700
-Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
- FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26 via Frontend Transport; Mon, 11 Aug 2025 02:33:22 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (40.107.94.78) by
- edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26; Mon, 11 Aug 2025 02:33:21 -0700
+	s=arc-20240116; t=1754905506; c=relaxed/simple;
+	bh=VmldB7jrowUvujr+9eK/d6NurCkh32GOTwXBL9Qe45s=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=EitvDEu0657oh8VezNo/e/nVP18P/XeGwEMt5objqJiiG0zNAemD1b7b2D6Kyt17UULKVZk7hJf9e0sMF67zsbhryuNMR3/MgkDY4G6+9ex+NPTGlS9svhzzByY2NLgPsFERVWHu69Slgg28RBmLb+EPVFrwy6fA3mTLLmRauPQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=OS7UcPeC; arc=fail smtp.client-ip=40.107.101.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=hzWt0ApaFYatsqkodIX1/x5n2DJ++tXYAsJASW6A+7zr4hmwWfNJ5m1xsa19/IXv/W0L2OU9CEhXFtx2gND8LGMYToIue2cKMrxvDAf2lq9vjkDRZX3s/yNa7mRRSUJkiz1gJCJU+GvxQAm9hWfPhIJkCjYiktL/Yz2RNVDVDvlp40eBCbBeBbhHqaPCO98VGxhLFHpTq8TpUK6kn2iZgcX6trL7ORTSKLCLJIK3ogjXRn+M40SdnOsVjoHbCt55hDgg8+CVnuRy2oTSWF52+AIs64mmmaytxGor1COwgsPWNpkbfPkWBfjoca4LyLT+fzgF5BgspxnPdpq07KDYsg==
+ b=JgzblO+cQv2CABv4ymG1t8N+da64X/vurDulgo1GMLUVpH6flzAaCuMCcPYU+orrL4G2LjtlVYsnIrOpt5AAAoZcPsvt3H68VeUEBzvdidCrvFy34M13c1GDPjXZpFgInoJMpmdDPI/3iheoQ2iU1rMBlTEYdGgfuX1vmBZwbEQGxoXKZIMpZCp9O0380Mufo+M/6YgjK2Qq01LaOc1s+p5YT2I5/basAmH6eUa9xrh2WekGS1+hkk3bCbdrfcQ9cwm44EYEpdeVQLA5LxFQ5SWqb7azaZBjztprcDyOG7CRNaGhv0d0cGrOQR8VRQXdNQBwVL8AB3hCazBKDUbN1w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=51hevvZ6Vqk3rZwY1nERotVpDeJA5O9yGYk16WurQd8=;
- b=Fp5MEpVcm+DsDd64gXqva9+hEvJI6gUNlrG4Ng6yO7Esk/WL9DAOEuonCFYTp54ZwXsVEbJ3x79dfMsmOONCAegyS2fErJ0Mg2pna49ufSFNnMqWEG2mz2riF22tfxBxZxxUJDdEZqYECrsxyDpPw37WNjMQSYnKkEZbECiD1zAsQ69HiQzSfyaNBX8tr2NrqQwUkyfvQKwUBpy3bKVFEaqrig3SlmPcMGIMz0Fc0+NExUrqMgZpAdolH0THZ3sqj4AroEEUpuvcjjHVTBlXiPIuFDpXnbsIY7E0bA+dS4QWrX9dQXUaRz8Y/RpRxH/KK6HlTrIhm5bZPjjG57oJAw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM3PR11MB8735.namprd11.prod.outlook.com (2603:10b6:0:4b::20) by
- PH3PPFFA27DACA6.namprd11.prod.outlook.com (2603:10b6:518:1::d63) with
+ bh=gO/qAwalrCRXCOlTYc2w8mLIDPL5AD1bQ5jReDGZ1Ig=;
+ b=NSflSDnV9FpY/1l4MIu2sgmT/74hWAWC9tfr1QjtaV1Nyx1hxblc/4iBUUKMWTCEhSbsS2nrEBUGHGbKXUwZex/4J4NyW7kTPZ59TpKKnKhKrvubeqbqRZsdbD32ipbSTxS26Z1XZgbCH1XW/8HJcM332JEGIMxC0XnZmeM0YQjsln8if3m5FKwxlzQ4eHuk8x8QWo9KHE4YNGJE9Wh+rfhngSg4YCJX8a+rxMrR6O4gYIO1tfYe3G1nsQPxg0FHq67gFZhnxAZwo503M0P3aGWnu4era5AAbj7cQaH8I4SwQmiLW8qaQVYv3mf5W4QC50ZssAw6BLkQ77Cu9xHs5g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gO/qAwalrCRXCOlTYc2w8mLIDPL5AD1bQ5jReDGZ1Ig=;
+ b=OS7UcPeCE3BBcMeG7VtVLx25sH39Dn9R6eJ9IBH7846gmTH1Cd72uRMtBnbhYLZP+M7mopdUNIBgtg+9eod79iF+8uoQX+COF/qkMhSlJcHjRyZ9cyI4B2NrMWfCt2GB4X78tmQb48CXfhxQnimSGGpEzX6LoH6niUbXP28laTQ=
+Received: from BLAPR03CA0155.namprd03.prod.outlook.com (2603:10b6:208:32f::13)
+ by BY5PR12MB4178.namprd12.prod.outlook.com (2603:10b6:a03:20e::9) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9009.21; Mon, 11 Aug
- 2025 09:33:20 +0000
-Received: from DM3PR11MB8735.namprd11.prod.outlook.com
- ([fe80::3225:d39b:ca64:ab95]) by DM3PR11MB8735.namprd11.prod.outlook.com
- ([fe80::3225:d39b:ca64:ab95%4]) with mapi id 15.20.9009.018; Mon, 11 Aug 2025
- 09:33:20 +0000
-Message-ID: <b1700dcb-7929-4973-a180-365c64711070@intel.com>
-Date: Mon, 11 Aug 2025 17:33:13 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH 2/2] nVMX: Test IA32_DEBUGCTLMSR behavior
- on set and cleared save/load debug controls
-To: Xiaoyao Li <xiaoyao.li@intel.com>, Paolo Bonzini <pbonzini@redhat.com>
-CC: <kvm@vger.kernel.org>, Sean Christopherson <seanjc@google.com>
-References: <20250811063035.12626-1-chenyi.qiang@intel.com>
- <20250811063035.12626-3-chenyi.qiang@intel.com>
- <9f1ba406-7638-44e5-bf0d-8aa27be24a59@intel.com>
-Content-Language: en-US
-From: Chenyi Qiang <chenyi.qiang@intel.com>
-In-Reply-To: <9f1ba406-7638-44e5-bf0d-8aa27be24a59@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SG2PR01CA0157.apcprd01.prod.exchangelabs.com
- (2603:1096:4:28::13) To DM3PR11MB8735.namprd11.prod.outlook.com
- (2603:10b6:0:4b::20)
+ 2025 09:44:59 +0000
+Received: from BL6PEPF0001AB54.namprd02.prod.outlook.com
+ (2603:10b6:208:32f:cafe::c9) by BLAPR03CA0155.outlook.office365.com
+ (2603:10b6:208:32f::13) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9009.21 via Frontend Transport; Mon,
+ 11 Aug 2025 09:44:59 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BL6PEPF0001AB54.mail.protection.outlook.com (10.167.241.6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.9031.11 via Frontend Transport; Mon, 11 Aug 2025 09:44:59 +0000
+Received: from BLR-L-NUPADHYA.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 11 Aug
+ 2025 04:44:52 -0500
+From: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
+To: <linux-kernel@vger.kernel.org>
+CC: <bp@alien8.de>, <tglx@linutronix.de>, <mingo@redhat.com>,
+	<dave.hansen@linux.intel.com>, <Thomas.Lendacky@amd.com>, <nikunj@amd.com>,
+	<Santosh.Shukla@amd.com>, <Vasant.Hegde@amd.com>,
+	<Suravee.Suthikulpanit@amd.com>, <David.Kaplan@amd.com>, <x86@kernel.org>,
+	<hpa@zytor.com>, <peterz@infradead.org>, <seanjc@google.com>,
+	<pbonzini@redhat.com>, <kvm@vger.kernel.org>,
+	<kirill.shutemov@linux.intel.com>, <huibo.wang@amd.com>,
+	<naveen.rao@amd.com>, <francescolavra.fl@gmail.com>, <tiala@microsoft.com>
+Subject: [PATCH v9 00/18] AMD: Add Secure AVIC Guest Support
+Date: Mon, 11 Aug 2025 15:14:26 +0530
+Message-ID: <20250811094444.203161-1-Neeraj.Upadhyay@amd.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM3PR11MB8735:EE_|PH3PPFFA27DACA6:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9079d0c8-6128-4ba0-5457-08ddd8ba1ba5
+X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB54:EE_|BY5PR12MB4178:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9c31290c-c3e4-46bc-cb24-08ddd8bbbcd3
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?SWs3Z3NHOGlEVXlOYXhhbGpyTHV2VzFUZVFpK2JBZ0MxRkhkaVhscFltenpX?=
- =?utf-8?B?cEpzVHF3dTNnRytIbmQzS0JIalFmZTV2K0VFQUF3c0phWElRNFhUZFhXTjNU?=
- =?utf-8?B?eW1aWUc0WXFxZkU1SGNyZWFvRXZMbzdUVUc2S0dxOEV4bTF6b2p2NW8xWWxM?=
- =?utf-8?B?V3NXOThmQjRoVDBjdWFFWEkwOFZzUWFHQ2FkY1dGYkxrelNSY2huNVI4UUNm?=
- =?utf-8?B?eWZPcG5NRjdzTDVraHZZSThNVkw2dm01eEZZRUFUeHNXcXA1a2JPNng5QkFi?=
- =?utf-8?B?Ykt5YUFIZW9idTRTTzFzVnNleXhqZVFmSUlzYVdEQXdRWkZ1bGhBVDNvelZn?=
- =?utf-8?B?WUQxeEtzOHVYSlAvZWRxSnVkeVZvc1FLQ01XdmhrMVlKVkpsZU5UMFk0cTkv?=
- =?utf-8?B?dFNOUU16clJNcW1LdWNXRmhqaWxxRU5qTm1hcmNkU0IzN2pqRkJ4b0lmZkVP?=
- =?utf-8?B?WDZnQVIybmVqa3Y4WmxENDlqWkZFbjlpbWJZUjk1RktTVlQ4SzE1emxweXNW?=
- =?utf-8?B?RnlPMTAvdXBqQ3lTbGNvWWM1MC9XYnRmQTlEY0w1QUZ6MnVaSmxFVXRnb2dt?=
- =?utf-8?B?dWlBMStJaVoyV2hzaFp2QWhyelBIS1A0MHlycEJvRDM1VDJKYWIvcm5Ia0pF?=
- =?utf-8?B?eDdyZlNwVTU1ekU0WS9jaGNKNVY1WkRlaVNjbitaQkdhR0h1UVl2c3BTTGg2?=
- =?utf-8?B?VjJBQmlmTWpIZzllYldtSEwraVkvaFpGMHlkUHlqQVVJRDNBWUpNQ0htb21h?=
- =?utf-8?B?SDh6N2dydUhvaW9qK1Y4Sll3bGtqZUxpQWFDR1lVTXNuaFQwUStFRnFEbWxt?=
- =?utf-8?B?aGp5a0Fpd3ZSSENYMG9JMDRWWXNWWHFxM3IzaUlNdm51S2lWWTFvNkJRRTVG?=
- =?utf-8?B?eGp0aUpxdEx1Z21NSHdDVEtyeDdONFdtNlZLNGdsK2RZdWZ4VjdhMDdXbm9z?=
- =?utf-8?B?aFBzMndQNlMxQnFRUHNnTnNNWlZKMkNrYUdaV0dpNVdjZUd3NnlVRmdUVklx?=
- =?utf-8?B?SWJMeWloU2R1RWNZdjM3UUVpK2FuMHVXcWpZWDJ6QmVvWk52ZWIvYVQwcGZB?=
- =?utf-8?B?YUhXaXE0T05XYTZYNWloQy8wUm8rQzdwYVB3UW1xL09odG9KWWJzOEE0L2V1?=
- =?utf-8?B?WHpmNW55Q1hxRUVoSExLTnRXQ2lKQlRXRGwxQmxvalgxN2RtenV0ak1BWjVP?=
- =?utf-8?B?NG83M2UxMnNSakY1amdDbDBXeGxLUU96eGFTRTJhRWlaZDFxdkdLRG9LQytQ?=
- =?utf-8?B?WUwvOTBzaUsyMWYxRXZVTW1wVzZPcFhYbG44Z3dKbnVqemhmZDVVcXlRdFlN?=
- =?utf-8?B?SG9rWi9tbEFNUGtwQTlTTUhQTzNUVEpOWjVoVHByNnBPcDRJWjFmRWJKckdo?=
- =?utf-8?B?ZnJSY1RLZWZZM09sTWRKSm4yKzBWSGI3RWFLb1EvL0JrNHFSVkVvbUJKUjZw?=
- =?utf-8?B?ODhpbnN2M2IrM3pSdkh0L21EbHMxNHQvbjFSSWZIOFJXVzRiZ0hPRXI3UHNn?=
- =?utf-8?B?OUdWbGVlR2E1UEd3Y3d2M3NWV3VFN2JiZnExemw5V240K2RwMHZPaGd6eE43?=
- =?utf-8?B?Vmc4eXBzUUZuM0JYQUhQcHlNcGFuenRYQ0Q1dVdwUEtaMWwrNkhnT2d6czJK?=
- =?utf-8?B?enJYcHhoVXpJU0pYZy9FTHVBaUhJMStOUVIzTVVxdC9VUmlQNmhaZTB5Ulps?=
- =?utf-8?B?WEhMc1lIWjRzaDdxak40T3gvVnI2bTh1SVpjSlFtUHNKQ0JpSm5qbzQ2L25B?=
- =?utf-8?B?K25RaGlJM0xGUnkvaEFDb2dBMStMdXRLRkhiK2RTT1k5TmduS0psU0s5N09M?=
- =?utf-8?B?OW1TRHJVVk1KMGxmbExiK3RRbW1wdnYxVDF5Nm9ZUVNsSlZpdExad05CWWV5?=
- =?utf-8?B?bm11d1BXOEwvdSsyZDhOaHNrMTdUY2dFVUlZYXBuV2tId05KSUxRRWM4bS9h?=
- =?utf-8?Q?uhKAmZT9gUw=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM3PR11MB8735.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TDNZV2ttQytjejF3VFU3a1JoZDVCQ2c5T0x0RFlST29QNDUvOWlwU1FzSHlK?=
- =?utf-8?B?UmF6a3NIaGxjOXRlSEQ3SXczYW5rM1F2azJvTzhUdkJ2RFpnbnY1U3hNSHVU?=
- =?utf-8?B?VHNvVEdUeVlvc3orZldrZDkvV3pZM0NyZEVsRHBzay95ajhUdysxYTgzZXY0?=
- =?utf-8?B?Q05qbkJ3OXNTRi9JT2l0bGtITjlIT0tPbVU2OElGR2NPai9UbG8za1BqS2lL?=
- =?utf-8?B?dW4vYUZDVnJxazFON0V6akpuVDN5OEtKclAyVGxlS2tnZi9TamlOSmUxS1I3?=
- =?utf-8?B?cUxSVmhXamZ6SHJNeHhZbVU4NklwNURUUENXaEpadHl2WkU2TDQrTmhJdGpN?=
- =?utf-8?B?ZTJaNEpSWkgreXVoMXU1RllTN3pOZzZEUzhKV2h6c0l4TDMxdzRvcEtRRUlB?=
- =?utf-8?B?VmZmSm5QRFJpZk00NlVPSCtrd1hkUXhXWVhkQlhrbThSeUsrQ1o5Y2laU05u?=
- =?utf-8?B?aVpaR3U2dm5yUms0V2Zma1lOajR6TktwUHhqUXVwMDNodW9MWXdqVk5UUmNK?=
- =?utf-8?B?V0dJTXhON1VGUXhwZ2xHdndTUUVHWXVic3ZZUDEydUdVdm51Y3VwSDVrQklv?=
- =?utf-8?B?ZDh3QXhSbEw2Ym5kSEsrSHlrbnlSU2U4NzAraVk3ckRwTEpNaTBMSmhrVmN2?=
- =?utf-8?B?RzBzYnV2aDhtcG44TDVEdUd6SzdlUG5YZHlrdnhQelE0empjTHE1czJHUXg0?=
- =?utf-8?B?WVJyamgwY0NXcHhEVlRaOEhEczBHVm55TDdhOFVEYXk5SkVMbWgySE0rQnN2?=
- =?utf-8?B?RW9yWG9wSDRIOXd0MUhqSDZGdE5WbTlTV3g2bGpFQldHeUNEWWdIMW9STFFz?=
- =?utf-8?B?OHA3T3RlVDRBZGw1ejBKT2dqN0FDaHI0SUo2V2Q1dG5MWWhaTmttR29qRGMr?=
- =?utf-8?B?aUZQd0hIT1hLeXlWQWVOZGhxYzEvaEJNdEV6THg4MGJRK0E0RXdLekhlZ0pz?=
- =?utf-8?B?OXUrZ0NHY2dQTWJ6bzVCWnViMEdLQno4TTBWeHRmcGZsYVVUMUJQRURIeGNW?=
- =?utf-8?B?endmUkpaL2pkWWVzSHN4Qm92ZGVqYzdMd2ZQS0MvbWlFemtzVnBvRnVGeHJM?=
- =?utf-8?B?N1pTUk90YXd4WEY2V0taeWtaSWhTZjB0aWFxdFBnbXRjaHZuNFZrc3lMMmZX?=
- =?utf-8?B?Y2hqVjFIa0d0cUxmZC9saHdrUmZvWEM3Rm5TYnZtVjFUMTJNQ1p6SmZObFpp?=
- =?utf-8?B?Y21MVFFoZmRTOVQ3K2ZqWFpnWFNPc1NkL3JpajY1OWRnWmhTQnF2R0RhTVZC?=
- =?utf-8?B?b0N2M3VsYXZ1MisvZDF4dnJzRWhsb05JRXRvaXN5aEdwZ3dtcTN1RmNQSHN2?=
- =?utf-8?B?Rkl2NitLTDYvUWdiNW9naWEyeVlVc2JLUC8wNlFPQ3kwOTM1MWJ1L0E2M1E1?=
- =?utf-8?B?aFpyUlFYYnVFc01YWEprRkFvRlJqYjV5dXFid25VNmdtQWtjejhQUkZoMEdx?=
- =?utf-8?B?R0JrbDVNd2ZRZGx5WXZPbUdQM3FCYkZzbUIybjJ3SXFFdkdMZ25kR2lVeU9M?=
- =?utf-8?B?dDFWd3NXbEh2WkJCcDBlb3VoZlcrL1hNV2pLNTcvVmxoZUNnUVlTWVBMeCtr?=
- =?utf-8?B?OG5kTTR6R0w0MUlkTWVLUVZxaktza0hnT0xuV2s4OURkOGF0UHJUUW5vUGFI?=
- =?utf-8?B?c0kvQU90UGRMeFFJNVNmM0pPUERXckdQeWtBdG1OdFJXaVZWa0duSDMxY0NR?=
- =?utf-8?B?M2NWNGNGZUdaTE9walFSaHJhNVREWldGeVdxbkNJZ3liTFJNeFNrM2FVS2NG?=
- =?utf-8?B?NC85aHpzSXhua3NOdXpWdkdPSVY0c1B6Y0VqRTlaa3V4azdMY3p5Y0xobWNC?=
- =?utf-8?B?c2R5eUw3YlFIRFBLeFdPOXpOS3pldW9rR0psM1d6QXMrL21lcHRzamMwWWNI?=
- =?utf-8?B?UXNnUHpaK1FiSUdXeEZOaVZFU1dEUThQYnkwVCtzcHExV29RaXNyVUN1N1pC?=
- =?utf-8?B?TzhhWEFUSWRCcm03MFFDTkF5ZHdzMEpxNnRXNDhSaVhvZkQ0NUdBMTAwb0xJ?=
- =?utf-8?B?ZEpOdFN5R2QxdU15MXVzMVdSalg2OHdad2tPVW03SWF1Qk9wUmFqcXlXWDMr?=
- =?utf-8?B?dmM5YUQ4ZGxIQTRwOXRPRU8rUHcxdjZ5SzYyNHdqUU9aVlI4VVVDemt0b3pI?=
- =?utf-8?B?MVZ2dE1BZTYwaERIckdKRU9BQW9iWVlwY2crTkRpdGdQeEJyeElPaEU5Y1E5?=
- =?utf-8?B?cWc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9079d0c8-6128-4ba0-5457-08ddd8ba1ba5
-X-MS-Exchange-CrossTenant-AuthSource: DM3PR11MB8735.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Aug 2025 09:33:20.0122
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|1800799024|82310400026|7416014|376014|13003099007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?N1ngS1EXkmWlZKHIlh5LSNqH0i8xh2Vibu3MVkdi/Xg41+3nxU5D4ZhBuT2j?=
+ =?us-ascii?Q?Sz8D2EKt8I1FFuEGaf0Yvj7Q9wSmiLf1kyAyOzqjFxmay61K/60Cmi5HiLka?=
+ =?us-ascii?Q?L35Zz5gH0c6qv2TjDIbjL8EjmDqSauS4jWEUCdmIINYDBfAnYJn9rJhQjPAn?=
+ =?us-ascii?Q?dZDD7I0HqfVWVXpBUhuDpNPZWk5PFH9Hbe7fq/eB/x9UCromc9CXJ/9pr5l4?=
+ =?us-ascii?Q?M4vDFoEzW6uBbSEOGHvUaTlUNhJ8MNew7iR2yZn5CSfDTOpkT/HXWo788icD?=
+ =?us-ascii?Q?cN1Ca96IZk3vGv6cnuQisXU/xVJBy8v5wPPlymX3wv+xIf9EUIyh0/ldwrVO?=
+ =?us-ascii?Q?lC3muybSBiwxWU7uIoiMp3c0aqgLNtaYXC3qKSlhcJUFySA7TYeGMsVSrnLD?=
+ =?us-ascii?Q?kHF7yjF/8qFNoZ3T7QfSufQVZRdoE2XB3Qr5kNV16vxY+zD8ZCs3s5G2KRGj?=
+ =?us-ascii?Q?FYur7+jy46OjMvzho4rItcTuaDGX++AHoNW2wRGGPwczVwSTBA2bK6fMTrft?=
+ =?us-ascii?Q?7FHUzC4YtrDg/AewHHd1JIDWlWxNtpoLXWcEuh2o/lLz5kjEh1cuYpQetid+?=
+ =?us-ascii?Q?qlFHezmyhlKAXnrmRyfxRluk3xgE8hFOXxIJ4eBh0pIGcPkiL8YVaFkGX3e5?=
+ =?us-ascii?Q?pCaa+6fDZGhDDjOJyEUWCuWczXurv58llYtj4SLTC9yWCAOpZJ8+FpuLOVNb?=
+ =?us-ascii?Q?W+P+WHemFk3+noSre1muMv1zl7EgQty6XVMBJv3lhKf3eOM29aifcjBSTGej?=
+ =?us-ascii?Q?P/V68kgMHzPAteTqDK9bKoCChGdSZpzIaIWPqBu8hWbWx4mbk4qt/upG/8WG?=
+ =?us-ascii?Q?ZC4CWrV4KNP42th3L7EKGL439YZH4NIy4qflWHFZx8y48VNCjqH+JHUTK57Y?=
+ =?us-ascii?Q?//EvE9BVp/s7h9Q4FVRm2boX8vWOmCnR6CNdAPfgs50Wm77MQvNvmmJjQAKs?=
+ =?us-ascii?Q?zjv5frxOab8YyM8+tLTg3OgzjtGwFOUusLlA6zgjRRB3G1maasmc3WHfdFXp?=
+ =?us-ascii?Q?9qFXew4OvPRtV3hReU0kqGGa9DtFDemAWDcMytYa3fuVjb/Vx5Fz5aVOb5WA?=
+ =?us-ascii?Q?38brPPNjqyvINSpVRIr+MyBo3vrrzwoV2KhwQdx4tgmy2/JQqhqiZsL+p79Z?=
+ =?us-ascii?Q?iwOSnH13y336WHiie52sihHRZG/1wryyL7oMqtnNcPoD2COVs4mH8ReX0eHD?=
+ =?us-ascii?Q?ffaMdEsmVov3tTnMMa2qo+MwuzOmPVxYelcCQfc7DngB/B4+4VWVHyLocEG2?=
+ =?us-ascii?Q?UI/qbx2eOBE0BDCDTs8fCmtY3CzyWFdWMLR0NRtjk5ctWKGjRNpWT2D2iP7Y?=
+ =?us-ascii?Q?HbxGt6Ky5Le/lWZkGpbAzHTD+wQ5ys2vxKYaqppuTQizmx1rUxxPEbcT+Vup?=
+ =?us-ascii?Q?YYruX3mUIQDK2TbR61HQGjOITZlwnbnV/imBe4RY9x3ywP1prf0BKYR0K0Xl?=
+ =?us-ascii?Q?HbM5R21v/EFwc7+5LUJK4tl6wVeBmzDTWIPPGzFXTb7AgN+jvwP006Yz3+UF?=
+ =?us-ascii?Q?O86jbv3rKwXq/gkSOVbtWn4kq6z3sRn+D9cJAavcY0ztLuXMaA14xZX+Cg?=
+ =?us-ascii?Q?=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(82310400026)(7416014)(376014)(13003099007);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Aug 2025 09:44:59.4533
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: oHiTe3ASeeW+UuhdfzJiB+kSs06VUtu+A/BlfZ0CoZuYkHuaQgvI6OOOJ5g8pe8YpFCIHerAzJ44lNBLj1EBvw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH3PPFFA27DACA6
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9c31290c-c3e4-46bc-cb24-08ddd8bbbcd3
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL6PEPF0001AB54.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4178
+
+Introduction
+------------
+
+Secure AVIC is a new hardware feature in the AMD64 architecture to
+allow SEV-SNP guests to prevent the hypervisor from generating
+unexpected interrupts to a vCPU or otherwise violate architectural
+assumptions around APIC behavior.
+
+One of the significant differences from AVIC or emulated x2APIC is that
+Secure AVIC uses a guest-owned and managed APIC backing page. It also
+introduces additional fields in both the VMCB and the Secure AVIC backing
+page to aid the guest in limiting which interrupt vectors can be injected
+into the guest.
+
+Guest APIC Backing Page
+-----------------------
+Each vCPU has a guest-allocated APIC backing page of size 4K, which
+maintains APIC state for that vCPU. The x2APIC MSRs are mapped at
+their corresposing x2APIC MMIO offset within the guest APIC backing
+page. All x2APIC accesses by guest or Secure AVIC hardware operate
+on this backing page. The backing page should be pinned and NPT entry
+for it should be always mapped while the corresponding vCPU is running.
 
 
+MSR Accesses
+------------
+Secure AVIC only supports x2APIC MSR accesses. xAPIC MMIO offset based
+accesses are not supported.
 
-On 8/11/2025 3:47 PM, Xiaoyao Li wrote:
-> On 8/11/2025 2:30 PM, Chenyi Qiang wrote:
->> Besides the existing DR7 test on debug controls, introduce a similar
->> separate test for IA32_DEBUGCTLMSR.
->>
->> Previously, the IA32_DEBUGCTLMSR was combined with the DR7 test. However,
->> it attempted to access the LBR and BTF bits in the MSR which can be
->> invalid. Although KVM will exempt these two bits from validity check,
->> they will be cleared and resulted in the unexpected MSR value.
-> 
-> Initially, LBR (bit 0) and BTF(bit 1) have been allowed to write by the guest but the value are dropped, as the workaround to not break some OS that writes to the MSR unconditionally.
-> 
-> BTF never gets supported by KVM. While LBR gained support but it depends on PMU and LBR being exposed to the guest, which requires additional parameters to the test configuration.
-> 
-> On the other hand, DEBUGCTLMSR_BUS_LOCK_DETECT chosen by this patch doesn't require additional parameter, but it requires the hardware support of the feature. IIRC, it needs to be SPR and later. So it has less coverage of hardwares than LBR.
+Some of the MSR accesses such as ICR writes (with shorthand equal to
+self), SELF_IPI, EOI, TPR writes are accelerated by Secure AVIC
+hardware. Other MSR accesses generate a #VC exception. The #VC
+exception handler reads/writes to the guest APIC backing page.
+As guest APIC backing page is accessible to the guest, the Secure
+AVIC driver code optimizes APIC register access by directly
+reading/writing to the guest APIC backing page (instead of taking
+the #VC exception route).
 
-Yes, and DEBUGCTLMSR_RTM_DEBUG can also support in earlier platform but it becomes valid recently..
+In addition to the architected MSRs, following new fields are added to
+the guest APIC backing page which can be modified directly by the
+guest:
 
-I looked at my test code again. It seems it loses some test scope. i.e. DEBUGCTLMSR: Save debug controls
-I missed to do wrmsr(DEBUGCTLMSR) with a different value in L2, so it cannot distinguish if vmcs12->debugctl comes from the original one or the debugctls saved one.
-wrmsr(DEBUGCTLMSR) to 0 is not appropriate because we need to check if VM exit resets the debugctl msr value.
+a. ALLOWED_IRR
 
-Maybe swapping the value of vmcs_write(GUEST_DEBUGCTL) and wrmsr(DEBUGCTLMSR) is a resolution.
+ALLOWED_IRR reg offset indicates the interrupt vectors which the guest
+allows the hypervisor to send. The combination of host-controlled
+REQUESTED_IRR vectors (part of VMCB) and ALLOWED_IRR is used by
+hardware to update the IRR vectors of the Guest APIC backing page.
 
-diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-index 9a2e598f..6dd1735d 100644
---- a/x86/vmx_tests.c
-+++ b/x86/vmx_tests.c
-@@ -1953,8 +1953,8 @@ static int dbgctls_msr_init(struct vmcs *vmcs)
- 	}
+#Offset        #bits        Description
+204h           31:0         Guest allowed vectors 0-31
+214h           31:0         Guest allowed vectors 32-63
+...
+274h           31:0         Guest allowed vectors 224-255
+
+ALLOWED_IRR is meant to be used specifically for vectors that the
+hypervisor is allowed to inject, such as device interrupts.  Interrupt
+vectors used exclusively by the guest itself (like IPI vectors) should
+not be allowed to be injected into the guest for security reasons.
+
+b. NMI Request
  
- 	msr_bmp_init();
--	wrmsr(MSR_IA32_DEBUGCTLMSR, 0x0);
--	vmcs_write(GUEST_DEBUGCTL, 0x4);
-+	wrmsr(MSR_IA32_DEBUGCTLMSR, 0x4);
-+	vmcs_write(GUEST_DEBUGCTL, 0x0);
- 
- 	vmcs_write(ENT_CONTROLS, vmcs_read(ENT_CONTROLS) | ENT_LOAD_DBGCTLS);
- 	vmcs_write(EXI_CONTROLS, vmcs_read(EXI_CONTROLS) | EXI_SAVE_DBGCTLS);
-@@ -1967,8 +1967,9 @@ static void dbgctls_msr_main(void)
- 	u64 debugctl;
- 
- 	debugctl = rdmsr(MSR_IA32_DEBUGCTLMSR);
--	report(debugctl == 0x4, "DEBUGCTLMSR: Load debug controls");
-+	report(debugctl == 0x0, "DEBUGCTLMSR: Load debug controls");
- 
-+	wrmsr(MSR_IA32_DEBUGCTLMSR, 0x4);
- 	vmx_set_test_stage(0);
- 	vmcall();
- 	report(vmx_get_test_stage() == 1, "DEBUGCTLMSR: Save debug controls");
-@@ -1982,7 +1983,7 @@ static void dbgctls_msr_main(void)
- 	vmcall();
- 
- 	debugctl = rdmsr(MSR_IA32_DEBUGCTLMSR);
--	report(debugctl == 0x0,
-+	report(debugctl == 0x4,
- 	       "DEBUGCTLMSR: Guest=host debug controls");
- 
- 	vmx_set_test_stage(3);
-@@ -2007,8 +2008,8 @@ static int dbgctls_msr_exit_handler(union exit_reason exit_reason)
- 				vmx_inc_test_stage();
- 			break;
- 		case 2:
--			wrmsr(MSR_IA32_DEBUGCTLMSR, 0x0);
--			vmcs_write(GUEST_DEBUGCTL, 0x4);
-+			wrmsr(MSR_IA32_DEBUGCTLMSR, 0x4);
-+			vmcs_write(GUEST_DEBUGCTL, 0x0);
- 
- 			vmcs_write(ENT_CONTROLS,
- 				vmcs_read(ENT_CONTROLS) & ~ENT_LOAD_DBGCTLS);
-@@ -2017,7 +2018,7 @@ static int dbgctls_msr_exit_handler(union exit_reason exit_reason)
- 			break;
- 		case 3:
- 			if (debugctl == 0 &&
--			    vmcs_read(GUEST_DEBUGCTL) == 0x4)
-+			    vmcs_read(GUEST_DEBUGCTL) == 0x0)
- 				vmx_inc_test_stage();
- 			break;
- 		}
+#Offset        #bits        Description
+278h           0            Set by Guest to request Virtual NMI
 
-> 
-> I'm not sure the preference of Sean/Paolo. Let's see what they would say.
-> 
->> In this new test, access a valid bit (DEBUGCTLMSR_BUS_LOCK_DETECT, bit 2)
->> based on the enumration of Bus Lock Detect.
->>
->> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
->> ---
->>   x86/vmx_tests.c | 88 +++++++++++++++++++++++++++++++++++++++++++++++++
->>   1 file changed, 88 insertions(+)
->>
->> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
->> index 1832bda3..9a2e598f 100644
->> --- a/x86/vmx_tests.c
->> +++ b/x86/vmx_tests.c
->> @@ -1944,6 +1944,92 @@ static int dbgctls_dr7_exit_handler(union exit_reason exit_reason)
->>       return VMX_TEST_VMEXIT;
->>   }
->>   +static int dbgctls_msr_init(struct vmcs *vmcs)
->> +{
->> +    /* Check for DEBUGCTLMSR_BUS_LOCK_DETECT(bit 2) in IA32_DEBUGCTLMSR */
->> +    if (!(cpuid(7).c & (1 << 24))) {
->> +        report_skip("%s : \"Bus Lock Detect\" not supported", __func__);
->> +        return VMX_TEST_VMSKIP;
->> +    }
->> +
->> +    msr_bmp_init();
->> +    wrmsr(MSR_IA32_DEBUGCTLMSR, 0x0);
->> +    vmcs_write(GUEST_DEBUGCTL, 0x4);
->> +
->> +    vmcs_write(ENT_CONTROLS, vmcs_read(ENT_CONTROLS) | ENT_LOAD_DBGCTLS);
->> +    vmcs_write(EXI_CONTROLS, vmcs_read(EXI_CONTROLS) | EXI_SAVE_DBGCTLS);
->> +
->> +    return VMX_TEST_START;
->> +}
->> +
->> +static void dbgctls_msr_main(void)
->> +{
->> +    u64 debugctl;
->> +
->> +    debugctl = rdmsr(MSR_IA32_DEBUGCTLMSR);
->> +    report(debugctl == 0x4, "DEBUGCTLMSR: Load debug controls");
->> +
->> +    vmx_set_test_stage(0);
->> +    vmcall();
->> +    report(vmx_get_test_stage() == 1, "DEBUGCTLMSR: Save debug controls");
->> +
->> +    if (ctrl_enter_rev.set & ENT_LOAD_DBGCTLS ||
->> +        ctrl_exit_rev.set & EXI_SAVE_DBGCTLS) {
->> +        printf("\tDebug controls are always loaded/saved\n");
->> +        return;
->> +    }
->> +    vmx_set_test_stage(2);
->> +    vmcall();
->> +
->> +    debugctl = rdmsr(MSR_IA32_DEBUGCTLMSR);
->> +    report(debugctl == 0x0,
->> +           "DEBUGCTLMSR: Guest=host debug controls");
->> +
->> +    vmx_set_test_stage(3);
->> +    vmcall();
->> +    report(vmx_get_test_stage() == 4, "DEBUGCTLMSR: Don't save debug controls");
->> +}
->> +
->> +static int dbgctls_msr_exit_handler(union exit_reason exit_reason)
->> +{
->> +    u32 insn_len = vmcs_read(EXI_INST_LEN);
->> +    u64 guest_rip = vmcs_read(GUEST_RIP);
->> +    u64 debugctl;
->> +
->> +    debugctl = rdmsr(MSR_IA32_DEBUGCTLMSR);
->> +
->> +    switch (exit_reason.basic) {
->> +    case VMX_VMCALL:
->> +        switch (vmx_get_test_stage()) {
->> +        case 0:
->> +            if (debugctl == 0 &&
->> +                vmcs_read(GUEST_DEBUGCTL) == 0x4)
->> +                vmx_inc_test_stage();
->> +            break;
->> +        case 2:
->> +            wrmsr(MSR_IA32_DEBUGCTLMSR, 0x0);
->> +            vmcs_write(GUEST_DEBUGCTL, 0x4);
->> +
->> +            vmcs_write(ENT_CONTROLS,
->> +                vmcs_read(ENT_CONTROLS) & ~ENT_LOAD_DBGCTLS);
->> +            vmcs_write(EXI_CONTROLS,
->> +                vmcs_read(EXI_CONTROLS) & ~EXI_SAVE_DBGCTLS);
->> +            break;
->> +        case 3:
->> +            if (debugctl == 0 &&
->> +                vmcs_read(GUEST_DEBUGCTL) == 0x4)
->> +                vmx_inc_test_stage();
->> +            break;
->> +        }
->> +        vmcs_write(GUEST_RIP, guest_rip + insn_len);
->> +        return VMX_TEST_RESUME;
->> +    default:
->> +        report_fail("Unknown exit reason, %d", exit_reason.full);
->> +        print_vmexit_info(exit_reason);
->> +    }
->> +    return VMX_TEST_VMEXIT;
->> +}
->> +
->>   struct vmx_msr_entry {
->>       u32 index;
->>       u32 reserved;
->> @@ -11386,6 +11472,8 @@ struct vmx_test vmx_tests[] = {
->>           nmi_hlt_exit_handler, NULL, {0} },
->>       { "debug controls dr7", dbgctls_dr7_init, dbgctls_dr7_main, dbgctls_dr7_exit_handler,
->>           NULL, {0} },
->> +    { "debug controls msr", dbgctls_msr_init, dbgctls_msr_main, dbgctls_msr_exit_handler,
->> +        NULL, {0} },
->>       { "MSR switch", msr_switch_init, msr_switch_main,
->>           msr_switch_exit_handler, NULL, {0}, msr_switch_entry_failure },
->>       { "vmmcall", vmmcall_init, vmmcall_main, vmmcall_exit_handler, NULL, {0} },
-> 
+Guest need to set NMI Request register to allow the Hypervisor to
+inject vNMI to it.
+
+LAPIC Timer Support
+-------------------
+LAPIC timer is emulated by the hypervisor. So, APIC_LVTT, APIC_TMICT and
+APIC_TDCR, APIC_TMCCT APIC registers are not read/written to the guest
+APIC backing page and are communicated to the hypervisor using SVM_EXIT_MSR
+VMGEXIT. 
+
+IPI Support
+-----------
+Only SELF_IPI is accelerated by Secure AVIC hardware. Other IPIs require
+writing (from the Secure AVIC driver) to the IRR vector of the target CPU
+backing page and then issuing VMGEXIT for the hypervisor to notify the
+target vCPU.
+
+KEXEC Support
+-------------
+Secure AVIC enabled guest can kexec to another kernel which has Secure
+AVIC enabled, as the Hypervisor has Secure AVIC feature bit set in the
+sev_status.
+
+Open Points
+-----------
+
+The Secure AVIC driver only supports physical destination mode. If
+logical destination mode need to be supported, then a separate x2apic
+driver would be required for supporting logical destination mode.
+
+
+Testing
+-------
+
+This series is based on top of v6.17-rc1.
+
+Host Secure AVIC support patch series is at [1].
+
+Qemu support patch is at [2].
+
+QEMU commandline for testing Secure AVIC enabled guest:
+
+qemu-system-x86_64 <...> -object sev-snp-guest,id=sev0,policy=0xb0000,cbitpos=51,
+reduced-phys-bits=1,allowed-sev-features=true,secure-avic=true
+
+Following tests are done:
+
+1) Boot to Prompt using initramfs and ubuntu fs.
+2) Verified timer and IPI as part of the guest bootup.
+3) Verified long run SCF TORTURE IPI test.
+
+[1] https://github.com/AMDESE/linux-kvm/tree/savic-host-latest
+[2] https://github.com/AMDESE/qemu/tree/secure-avic
+
+Changes since v8
+
+v8: https://lore.kernel.org/lkml/20250709033242.267892-1-Neeraj.Upadhyay@amd.com/
+
+   - Removed KVM lapic refactoring patches which have been included in
+     v6.17-rc1.
+   - Added Tianyu's Reviewed-by's.
+   - Dropped below 2 patches based on review feedback:
+
+     x86/apic: Unionize apic regs for 32bit/64bit access w/o type casting
+     x86/apic: Simplify bitwise operations on APIC bitmap
+
+   - Misc cleanups suggested by Boris and Sean.
+
+Changes since v7
+
+v7: https://lore.kernel.org/lkml/20250610175424.209796-1-Neeraj.Upadhyay@amd.com/
+
+   - Commit log updates.
+   - Applied Reviewed-by and Acked-by.
+   - Combined few patches.
+
+Changes since v6
+
+v6: https://lore.kernel.org/lkml/20250514071803.209166-1-Neeraj.Upadhyay@amd.com/
+
+  - Restructured the patches to split out function/macro rename into
+    separate patches.
+  - Update commit logs with more details on impact to kvm.ko text size.
+  - Updated the new macros in patch "x86/apic: KVM: Deduplicate APIC vector =>
+    register+bit math" to type cast macro parameter to unsigned int.
+    This ensures better code generation for cases where signed int is
+    passed to these macros. With this update, below patches have been
+    removed in this version:
+
+    x86/apic: Change apic_*_vector() vector param to unsigned
+    x86/apic: Change get/set reg operations reg param to unsigned
+
+  - Added Tianyu's Reviewed-by's.
+
+Changes since v5
+
+v5: https://lore.kernel.org/lkml/20250429061004.205839-1-Neeraj.Upadhyay@amd.com/
+
+  - Add back RFC tag due to new changes to share code between KVM's
+    lapic emulation and Secure AVIC.
+  - Minor optimizations to the apic bitwise ops and set/get reg
+    operations.
+  - Other misc fixes, cleanups and refactoring due to code sharing with
+    KVM lapic implementation.
+
+Change since v4
+
+v4: https://lore.kernel.org/lkml/20250417091708.215826-1-Neeraj.Upadhyay@amd.com/
+
+  - Add separate patch for update_vector() apic callback addition.
+  - Add a cleanup patch for moving apic_update_irq_cfg() calls to
+    apic_update_vector().
+  - Cleaned up change logs.
+  - Rebased to latest tip/tip master. Resolved merge conflicts due to
+    sev code movement to sev-startup.c in mainline.
+  - Other misc cleanups.
+
+Change since v3
+
+v3: https://lore.kernel.org/lkml/20250401113616.204203-1-Neeraj.Upadhyay@amd.com/
+
+  - Move KVM updates to a separate patch.
+  - Cleanups to use guard().
+  - Refactored IPI callbacks addition.
+  - Misc cleanups.
+
+Change since v2
+
+v2: https://lore.kernel.org/lkml/20250226090525.231882-1-Neeraj.Upadhyay@amd.com/
+
+  - Removed RFC tag.
+  - Change config rule to not select AMD_SECURE_AVIC config if
+    AMD_MEM_ENCRYPT config is enabled.
+  - Fix broken backing page GFP_KERNEL allocation in setup_local_APIC().
+    Use alloc_percpu() for APIC backing pages allocation during Secure
+    AVIC driver probe.
+  - Remove code to check for duplicate APIC_ID returned by the
+    Hypervisor. Topology evaluation code already does that during boot.
+  - Fix missing update_vector() callback invocation during vector
+    cleanup paths. Invoke update_vector() during setup and tearing down
+    of a vector.
+  - Reuse find_highest_vector() from kvm/lapic.c.
+  - Change savic_register_gpa/savic_unregister_gpa() interface to be
+    invoked only for the local CPU.
+  - Misc cleanups.
+
+Change since v1
+
+v1: https://lore.kernel.org/lkml/20240913113705.419146-1-Neeraj.Upadhyay@amd.com/
+
+  - Added Kexec support.
+  - Instead of doing a 2M aligned allocation for backing pages,
+    allocate individual PAGE_SIZE pages for vCPUs.
+  - Instead of reading Extended Topology Enumeration CPUID, APIC_ID
+    value is read from Hv and updated in APIC backing page. Hv returned
+    ID is checked for any duplicates.
+  - Propagate all LVT* register reads and writes to Hv.
+  - Check that Secure AVIC control MSR is not intercepted by Hv.
+  - Fix EOI handling for level-triggered interrupts.
+  - Misc cleanups and commit log updates.
+
+Kishon Vijay Abraham I (2):
+  x86/sev: Initialize VGIF for secondary VCPUs for Secure AVIC
+  x86/sev: Enable NMI support for Secure AVIC
+
+Neeraj Upadhyay (16):
+  x86/apic: Add new driver for Secure AVIC
+  x86/apic: Initialize Secure AVIC APIC backing page
+  x86/apic: Populate .read()/.write() callbacks of Secure AVIC driver
+  x86/apic: Initialize APIC ID for Secure AVIC
+  x86/apic: Add update_vector() callback for apic drivers
+  x86/apic: Add update_vector() callback for Secure AVIC
+  x86/apic: Add support to send IPI for Secure AVIC
+  x86/apic: Support LAPIC timer for Secure AVIC
+  x86/apic: Add support to send NMI IPI for Secure AVIC
+  x86/apic: Allow NMI to be injected from hypervisor for Secure AVIC
+  x86/apic: Read and write LVT* APIC registers from HV for SAVIC guests
+  x86/apic: Handle EOI writes for Secure AVIC guests
+  x86/apic: Add kexec support for Secure AVIC
+  x86/apic: Enable Secure AVIC in Control MSR
+  x86/sev: Prevent SECURE_AVIC_CONTROL MSR interception for Secure AVIC
+    guests
+  x86/sev: Indicate SEV-SNP guest supports Secure AVIC
+
+ arch/x86/Kconfig                    |  13 +
+ arch/x86/boot/compressed/sev.c      |  10 +-
+ arch/x86/coco/core.c                |   3 +
+ arch/x86/coco/sev/core.c            | 103 +++++++
+ arch/x86/coco/sev/vc-handle.c       |  20 +-
+ arch/x86/include/asm/apic.h         |  11 +
+ arch/x86/include/asm/apicdef.h      |   2 +
+ arch/x86/include/asm/msr-index.h    |   9 +-
+ arch/x86/include/asm/sev-internal.h |   2 +
+ arch/x86/include/asm/sev.h          |   8 +
+ arch/x86/include/uapi/asm/svm.h     |   4 +
+ arch/x86/kernel/apic/Makefile       |   1 +
+ arch/x86/kernel/apic/apic.c         |   8 +
+ arch/x86/kernel/apic/vector.c       |  29 +-
+ arch/x86/kernel/apic/x2apic_savic.c | 422 ++++++++++++++++++++++++++++
+ include/linux/cc_platform.h         |   8 +
+ 16 files changed, 635 insertions(+), 18 deletions(-)
+ create mode 100644 arch/x86/kernel/apic/x2apic_savic.c
+
+
+base-commit: 8f5ae30d69d7543eee0d70083daf4de8fe15d585
+-- 
+2.34.1
 
 
