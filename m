@@ -1,457 +1,150 @@
-Return-Path: <kvm+bounces-54457-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54458-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEC58B21745
-	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 23:23:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 24C9DB21759
+	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 23:28:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC5B91908139
-	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 21:23:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 109041A203F1
+	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 21:28:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27A2B2E3B06;
-	Mon, 11 Aug 2025 21:23:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 383CF2E3AFE;
+	Mon, 11 Aug 2025 21:28:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Px1tVrwt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BpcijQyU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1D0D2E2F17
-	for <kvm@vger.kernel.org>; Mon, 11 Aug 2025 21:23:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13B9B2E3386;
+	Mon, 11 Aug 2025 21:28:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754947391; cv=none; b=bGXfFSOSWLTdnHHao+EjDgssaMCg9lKbyeKH4K2bcdwfPQAWxK3fWAs231RsRHeqFD77n/bzycyALTCKrVUpIDkqzwKyI+8VAyoUGv3vwXLR0YL4pHjb5VpaPykUNPWIrH1+6n2YJuyma5nsEp5bY2HvFi0OA+3u/kkJLy0Q22c=
+	t=1754947690; cv=none; b=BAbfVWEXOBLDT932YPis7UrgXjAgLG1CcqTFmt/tXz7bvJNV0SwBcEn/KqpWjbSI6lbqtK/pmfLFlGG1bLrlq3OdxfXIzqk3FPZZ9UMDgzmu7y9+4Ff/UpPXJ50LBpJX1dl8tyQQtfPBe/y6/UkZDFzWGnLugG/XguqiVuhiBfQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754947391; c=relaxed/simple;
-	bh=jU+yBfuxy7cTU86IFeA0OqBCDPA1BVMeU2ocJMXSOZ4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=YaTuI53844M35/Is5UhNrDFUTmUwjCOsG6Wlu7jRvH6I9jlJ8apKq9DtsK8ueQcq79MGXsEQJ04vAAapVhBg7oRs4BTrAX51qQykU/9YXhvldHWN0CDDpJmCBsjJsrlb6HJSEfSyHXJvFcppH7JWNraW8Hq0/ElMX9m4/PAmt38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Px1tVrwt; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-76bfab12672so9672032b3a.0
-        for <kvm@vger.kernel.org>; Mon, 11 Aug 2025 14:23:09 -0700 (PDT)
+	s=arc-20240116; t=1754947690; c=relaxed/simple;
+	bh=L0V+18VZj9f9E28eiffc/LJ/GJjfSKf91z+57LsNvkQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=l1xRm6bFquUrLI7hapezGiJAJjhzz522TDJSqUTvIzVl8QqF1bybW3Qfd3/WyXoPRilz2gI/JM9iqgaUcQfV2SInLZX3SgiOBRqNAC0F78eL3JqCW9Xw1FaiUlaG8adoRwt4vmrRKJIDGZKsdzg4/moxB8tKmX1T3mf/j9P/5R8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BpcijQyU; arc=none smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-76aea119891so5611480b3a.1;
+        Mon, 11 Aug 2025 14:28:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754947389; x=1755552189; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=05IUDOHLoU+NapT4auKPkbt3cJ61ybRHsivfAAxzoHI=;
-        b=Px1tVrwtvDVNdVvKzJ2prZXhRb0BE2CoqL4iQecmdeirvTVJfoVfp1ZCsNFT13iLCM
-         gfkBhEmVp/3Hne2yx8aKviM1z1Ft1ZojTvtxZ7Lkb3omkmQLFKXuXj7LQsGc5kzXRKp3
-         6qy/T9hepERBk/hDr3c5k2WVleVG0yoPQnKyNKRIH3fWMG3GFhMANpoWG2l8nu/0P/z1
-         r3wdrhtCNXX1vimmgivcvFs3FC+DurOqiKKY2YQoRoCyBPGqqRVcm+n6EAwCeincCdM4
-         ZALYlN7Ye4QI+8uQrNEkIoT2QgYCaGcjlWfa84pbhrmOiz0i7aRVCUyogrDWpKoiquMR
-         DspA==
+        d=gmail.com; s=20230601; t=1754947688; x=1755552488; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=FJnsytFmX5G5RPCbOFQMa1jkRjOsZOuTcmkVgBgoqlg=;
+        b=BpcijQyUrGODxAPoA5j5CQSy23oP4pBHnhVAobup0F5rYizPQCMocMzniMoy+EVhOj
+         4L9F0L8ZoOWkhkh412pdKfmY2GyOxsiUo6h6pFn0j3WBC1VA2YOWErVTkRJOrtF6d431
+         FSbBPlCe3PkEOHaWJYG/WHXFoP0yIO4iOaFKr7D5IAK6W9etyG2FLWWhgrk0DtkWbKwW
+         pxi3jlGbmyp3sBBg7iNDd9RSAC0JuxzIBw97zg1vNdl8HKiuEDduiX/CE42qKBFf00L3
+         SlBeyrrUmY4SaR2mUNJfNOn91k/KKkuJ/l3+mK4IK371Xkj9E5dcf9zWSmGeqQpZtN7g
+         2D4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754947389; x=1755552189;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=05IUDOHLoU+NapT4auKPkbt3cJ61ybRHsivfAAxzoHI=;
-        b=fyZTvMiHX2Sh4FnAaiJbXPXp4OZF795BNom3Y+OQw37kubHwUbTmhuUAgbJc1A17R4
-         uR0Cgx2Qxk2FPWQJiP/SCfDQNiCLa2HEjKOXJLL6IpNZP2lk3KbSWsnh1/c+xm2HWCqi
-         QAd8Y06RpLExNUBM0LF1NqzKDXop4mlEgJSZciabUdnpMhN7afgLiZTItNP7SUPaX/1U
-         KfdpU8CXFVfF+LlLe9Qv04pD0hKefxCBSaa0JwesN4a11Lj2fTtM5w3unYBMR85TxjhO
-         6Bv5bNFfN92f0m3IfLR8n0GhmeDKaT5L9WF9IwrPJQC1EzAyFnas8Jm/CgTpaR2HjFuX
-         VWSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWWVUkb2S/T0JABV/Tj8NMAGgPmvEQXTRDQHu2NBBePGTY7k+2z2YPULCf5rlUT5Q+9o0o=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy8vPnHxo3tEmu5WRLL7kNEC8VtYIxGhrx6/EHwUiMFSrSw6myU
-	6Dwho3uBYBlVj3bKH0AUY2bae6iICwjYCx3JLiUbVHeBW50yu6BV5iWxEhVr+b7aWLOjjau8Rww
-	DkNHKLcVmLY4BRbNXyT7oRqGoUw==
-X-Google-Smtp-Source: AGHT+IGhD8wuXRxDbQxbc6dPZBtu1qLcQXHBeiJmtKy0dLRbddKNNSDcwg+GSBc3ARQq15cEOQTE9YJKl1VCh4HB5g==
-X-Received: from pfdc2.prod.google.com ([2002:aa7:8c02:0:b0:748:f98a:d97b])
- (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a00:b85:b0:76b:fbf4:b9d8 with SMTP id d2e1a72fcca58-76c4619f85fmr17869611b3a.22.1754947388694;
- Mon, 11 Aug 2025 14:23:08 -0700 (PDT)
-Date: Mon, 11 Aug 2025 14:23:07 -0700
-In-Reply-To: <cee2e489-d3c9-46d4-8d34-37c637c7bbd8@redhat.com>
+        d=1e100.net; s=20230601; t=1754947688; x=1755552488;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FJnsytFmX5G5RPCbOFQMa1jkRjOsZOuTcmkVgBgoqlg=;
+        b=evdTm9XFcPWIHp2T98Z3TMrG6MhaX2350H2Ln4r+qRQeWg1dhgUN6MHEgkdqYxvhR6
+         c9QpK3OwhLACwtN6CyazoFo7KYhZh/A2i54Z80O4EBZScJjoUi2vDmEQ7qz/dihZ4WbC
+         Op7mHZH8QmpwCW504o2oBrFc4KsPoGhSalO47BRIxMcPXExmvhJXaJ8fD6y+fZI7zt7N
+         E2GTULUn5XmnepuVwRFP7DvWhWNdBTPMea1d9BLWSUCMC1iwdMLtVzZeOpBIJowxItAf
+         ez8yMJ8bdAFLO/Evxg4zThsbAVC5hrFrvAUtYPkRrBIPMlJsKb+npyvcIhfJme6EipGT
+         O6Tg==
+X-Forwarded-Encrypted: i=1; AJvYcCWXLbwp+z8r+2+H0grNawXSNkx9StKHrgvHoQHPmy/hdY0Bz2jFlsxwEg3+avSkh56POiaFTMavMNbjCOc+@vger.kernel.org, AJvYcCXGeKrpshjrNKguO479mlaH2OB07Mn3jJYtB/Kpr9d4B2M9V5AUiRV8TQwC3Hwnwtqo29o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzFiwqQWlA3lZGTYN+75PvYqxYk3eYAGgoKg/1ITakyhRkSsrYw
+	2MYq/bfKry/xGSVkBWqVN0DxLRV6NdxkTw6VEjmg4XTOE5wGy5cW/wr73KiQRg==
+X-Gm-Gg: ASbGncsJ9bE3PHgKWt7x8yU1B8ZOwQDP48T7gTS5cGehBdtC9TFa94M+CqMdpxUvw4r
+	LbUtIHo9hOhGBuhkB2AszudgtlcgfStb+yMWg9gEBr3EHlh6dO6svyseIYqYZgGm9UmxZ6NJEd0
+	RZub6wL5XC5A0dlfMVi7mvxyJNepYqgZ5jeRtnVWz1AhkPJLPxAI6aJEYKQrBtMxwsEfqiZ5qnw
+	/8afPLOPPEYTz4ildcls3KkQlGel8UdWk7kMqyWApzgIPnjvUhlo9ENIDXfX+w/Wu1FHxF7GJzn
+	qbmZqwoauJriNvJJvbdBIZXTAq0k8SF79dISdnMHmojpaq+fesI4cm4ccBNxhl+gMF/GqGoBPmw
+	XZqxUxwemtZxCwy8N3wthIQ==
+X-Google-Smtp-Source: AGHT+IEh4LNiAlTi1QN1/JAxIcTJGRXTQc1ucfP74VU9R029xY/AyJERJzIYKY1T5tT9gDc3sKo2gw==
+X-Received: by 2002:a05:6a21:6da1:b0:234:4f73:e657 with SMTP id adf61e73a8af0-2409a21e9b1mr1891990637.0.1754947688253;
+        Mon, 11 Aug 2025 14:28:08 -0700 (PDT)
+Received: from localhost ([216.228.127.130])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b4263836324sm16492503a12.10.2025.08.11.14.28.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Aug 2025 14:28:07 -0700 (PDT)
+Date: Mon, 11 Aug 2025 17:28:05 -0400
+From: Yury Norov <yury.norov@gmail.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Zheyun Shen <szy0127@sjtu.edu.cn>
+Subject: Re: [PATCH 2/2] KVM: SVM: drop useless cpumask_test_cpu() in
+ pre_sev_run()
+Message-ID: <aJpgZeC8SEHfQ0EY@yury>
+References: <20250811203041.61622-1-yury.norov@gmail.com>
+ <20250811203041.61622-3-yury.norov@gmail.com>
+ <aJpWet3USvXLWYEZ@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250811090605.16057-2-shivankg@amd.com> <20250811090605.16057-10-shivankg@amd.com>
- <cee2e489-d3c9-46d4-8d34-37c637c7bbd8@redhat.com>
-Message-ID: <diqz8qjpzh6s.fsf@ackerleytng-ctop.c.googlers.com>
-Subject: Re: [PATCH RFC V10 4/7] KVM: guest_memfd: Use guest mem inodes
- instead of anonymous inodes
-From: Ackerley Tng <ackerleytng@google.com>
-To: David Hildenbrand <david@redhat.com>, Shivank Garg <shivankg@amd.com>, seanjc@google.com, 
-	vbabka@suse.cz, willy@infradead.org, akpm@linux-foundation.org, 
-	shuah@kernel.org, pbonzini@redhat.com, brauner@kernel.org, 
-	viro@zeniv.linux.org.uk
-Cc: paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com, pvorel@suse.cz, 
-	bfoster@redhat.com, tabba@google.com, vannapurve@google.com, 
-	chao.gao@intel.com, bharata@amd.com, nikunj@amd.com, michael.day@amd.com, 
-	shdhiman@amd.com, yan.y.zhao@intel.com, Neeraj.Upadhyay@amd.com, 
-	thomas.lendacky@amd.com, michael.roth@amd.com, aik@amd.com, jgg@nvidia.com, 
-	kalyazin@amazon.com, peterx@redhat.com, jack@suse.cz, rppt@kernel.org, 
-	hch@infradead.org, cgzones@googlemail.com, ira.weiny@intel.com, 
-	rientjes@google.com, roypat@amazon.co.uk, ziy@nvidia.com, 
-	matthew.brost@intel.com, joshua.hahnjy@gmail.com, rakie.kim@sk.com, 
-	byungchul@sk.com, gourry@gourry.net, kent.overstreet@linux.dev, 
-	ying.huang@linux.alibaba.com, apopple@nvidia.com, chao.p.peng@intel.com, 
-	amit@infradead.org, ddutile@redhat.com, dan.j.williams@intel.com, 
-	ashish.kalra@amd.com, gshan@redhat.com, jgowans@amazon.com, 
-	pankaj.gupta@amd.com, papaluri@amd.com, yuzhao@google.com, 
-	suzuki.poulose@arm.com, quic_eberman@quicinc.com, 
-	aneeshkumar.kizhakeveetil@arm.com, linux-fsdevel@vger.kernel.org, 
-	linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-coco@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aJpWet3USvXLWYEZ@google.com>
 
-David Hildenbrand <david@redhat.com> writes:
+On Mon, Aug 11, 2025 at 01:45:46PM -0700, Sean Christopherson wrote:
+> On Mon, Aug 11, 2025, Yury Norov wrote:
+> > Testing cpumask for a CPU to be cleared just before setting the exact
+> > same CPU is useless because the end result is always the same: CPU is
+> > set.
+> 
+> No, it is not useless.  Blindly writing to the variable will unnecessarily bounce
+> the cacheline, and this is a hot path.
 
-> On 11.08.25 11:06, Shivank Garg wrote:
->> From: Ackerley Tng <ackerleytng@google.com>
->> 
->> [...snip...]
->>
->> +static struct file *kvm_gmem_inode_create_getfile(void *priv, loff_t size,
->> +						  u64 flags)
->> +{
->> +	static const char *name = "[kvm-gmem]";
->> +	struct inode *inode;
->> +	struct file *file;
->> +	int err;
->> +
->> +	err = -ENOENT;
->
-> Maybe add a comment here when the module reference will get
-> dropped. And maybe we should just switch to fops_get() + fops_put?
->
-> /* __fput() will take care of fops_put(). */
-> if (!fops_get(&kvm_gmem_fops))
-> 	goto err;
->
+How hot is that path? How bad the cache contention is? Is there any evidence
+that conditional cpumask_set_cpu() worth the effort? The original patch
+doesn't discuss that at all, and without any comment the code looks just
+buggy.
 
-Sounds good! Please see attached patch. It's exactly what you suggested
-except I renamed the goto target to err_fops_put:
+> > While there, switch CPU setter to a non-atomic version. Atomicity is
+> > useless here 
+> 
+> No, atomicity isn't useless here either.  Dropping atomicity could result in
+> CPU's bit being lost.  I.e. the atomic accesses aren't for the benefit of
+> smp_call_function_many_cond(), the writes are atomic so that multiple vCPUs can
+> concurrently update the mask without needing additional protection.
 
->> +
->> +	inode = kvm_gmem_inode_make_secure_inode(name, size, flags);
->> +	if (IS_ERR(inode)) {
->> +		err = PTR_ERR(inode);
->> +		goto err_put_module;
->> +	}
->> +
->> +	file = alloc_file_pseudo(inode, kvm_gmem_mnt, name, O_RDWR,
->> +				 &kvm_gmem_fops);
->> +	if (IS_ERR(file)) {
->> +		err = PTR_ERR(file);
->> +		goto err_put_inode;
->> +	}
->> +
->> +	file->f_flags |= O_LARGEFILE;
->> +	file->private_data = priv;
->> +
->> +out:
->> +	return file;
->> +
->> +err_put_inode:
->> +	iput(inode);
->> +err_put_module:
->> +	module_put(kvm_gmem_fops.owner);
->
-> fops_put(&kvm_gmem_fops);
->
-> ?
->
->
-> Acked-by: David Hildenbrand <david@redhat.com>
->
-> -- 
-> Cheers,
->
-> David / dhildenb
+OK, I see. Something heavy hit my head before I decided to drop
+atomicity there.
 
-From f2bd4499bce4db69bf34be75e009579db4329b7c Mon Sep 17 00:00:00 2001
-From: Ackerley Tng <ackerleytng@google.com>
-Date: Sun, 13 Jul 2025 17:43:35 +0000
-Subject: [PATCH] KVM: guest_memfd: Use guest mem inodes instead of anonymous
- inodes
+> > because sev_writeback_caches() ends up with a plain
+> > for_each_cpu() loop in smp_call_function_many_cond(), which is not
+> > atomic by nature.
+> 
+> That's fine.  As noted in sev_writeback_caches(), if vCPU could be running, then
+> the caller is responsible for ensuring that all vCPUs flush caches before the
+> memory being reclaimed is fully freed.  Those guarantees are provided by KVM's
+> MMU.
+> 
+> sev_writeback_caches() => smp_call_function_many_cond() could hit false positives,
+> i.e. trigger WBINVD on CPUs that couldn't possibly have accessed the memory being
+> reclaimed, but such false positives are functionally benign, and are "intended"
+> in the sense that we chose to prioritize simplicity over precision.
 
-guest_memfd's inode represents memory the guest_memfd is
-providing. guest_memfd's file represents a struct kvm's view of that
-memory.
+So, I don't object to drop the patch, but it would be really nice to
+have this 
+                        if (!cpumask_test_cpu())
+                                cpumask_set_cpu()
 
-Using a custom inode allows customization of the inode teardown
-process via callbacks. For example, ->evict_inode() allows
-customization of the truncation process on file close, and
-->destroy_inode() and ->free_inode() allow customization of the inode
-freeing process.
+pattern explained, and even better supported with performance numbers.
 
-Customizing the truncation process allows flexibility in management of
-guest_memfd memory and customization of the inode freeing process
-allows proper cleanup of memory metadata stored on the inode.
 
-Memory metadata is more appropriately stored on the inode (as opposed
-to the file), since the metadata is for the memory and is not unique
-to a specific binding and struct kvm.
-
-Co-developed-by: Fuad Tabba <tabba@google.com>
-Signed-off-by: Fuad Tabba <tabba@google.com>
-Signed-off-by: Shivank Garg <shivankg@amd.com>
-Signed-off-by: Ackerley Tng <ackerleytng@google.com>
----
- include/uapi/linux/magic.h |   1 +
- virt/kvm/guest_memfd.c     | 129 ++++++++++++++++++++++++++++++-------
- virt/kvm/kvm_main.c        |   7 +-
- virt/kvm/kvm_mm.h          |   9 +--
- 4 files changed, 119 insertions(+), 27 deletions(-)
-
-diff --git a/include/uapi/linux/magic.h b/include/uapi/linux/magic.h
-index bb575f3ab45e5..638ca21b7a909 100644
---- a/include/uapi/linux/magic.h
-+++ b/include/uapi/linux/magic.h
-@@ -103,5 +103,6 @@
- #define DEVMEM_MAGIC		0x454d444d	/* "DMEM" */
- #define SECRETMEM_MAGIC		0x5345434d	/* "SECM" */
- #define PID_FS_MAGIC		0x50494446	/* "PIDF" */
-+#define GUEST_MEMFD_MAGIC	0x474d454d	/* "GMEM" */
-
- #endif /* __LINUX_MAGIC_H__ */
-diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-index 08a6bc7d25b60..6c66a09740550 100644
---- a/virt/kvm/guest_memfd.c
-+++ b/virt/kvm/guest_memfd.c
-@@ -1,12 +1,16 @@
- // SPDX-License-Identifier: GPL-2.0
-+#include <linux/anon_inodes.h>
- #include <linux/backing-dev.h>
- #include <linux/falloc.h>
-+#include <linux/fs.h>
- #include <linux/kvm_host.h>
-+#include <linux/pseudo_fs.h>
- #include <linux/pagemap.h>
--#include <linux/anon_inodes.h>
-
- #include "kvm_mm.h"
-
-+static struct vfsmount *kvm_gmem_mnt;
-+
- struct kvm_gmem {
- 	struct kvm *kvm;
- 	struct xarray bindings;
-@@ -385,9 +389,45 @@ static struct file_operations kvm_gmem_fops = {
- 	.fallocate	= kvm_gmem_fallocate,
- };
-
--void kvm_gmem_init(struct module *module)
-+static int kvm_gmem_init_fs_context(struct fs_context *fc)
-+{
-+	if (!init_pseudo(fc, GUEST_MEMFD_MAGIC))
-+		return -ENOMEM;
-+
-+	fc->s_iflags |= SB_I_NOEXEC;
-+	fc->s_iflags |= SB_I_NODEV;
-+
-+	return 0;
-+}
-+
-+static struct file_system_type kvm_gmem_fs = {
-+	.name		 = "guest_memfd",
-+	.init_fs_context = kvm_gmem_init_fs_context,
-+	.kill_sb	 = kill_anon_super,
-+};
-+
-+static int kvm_gmem_init_mount(void)
-+{
-+	kvm_gmem_mnt = kern_mount(&kvm_gmem_fs);
-+
-+	if (IS_ERR(kvm_gmem_mnt))
-+		return PTR_ERR(kvm_gmem_mnt);
-+
-+	kvm_gmem_mnt->mnt_flags |= MNT_NOEXEC;
-+	return 0;
-+}
-+
-+int kvm_gmem_init(struct module *module)
- {
- 	kvm_gmem_fops.owner = module;
-+
-+	return kvm_gmem_init_mount();
-+}
-+
-+void kvm_gmem_exit(void)
-+{
-+	kern_unmount(kvm_gmem_mnt);
-+	kvm_gmem_mnt = NULL;
- }
-
- static int kvm_gmem_migrate_folio(struct address_space *mapping,
-@@ -463,11 +503,72 @@ bool __weak kvm_arch_supports_gmem_mmap(struct kvm *kvm)
- 	return true;
- }
-
-+static struct inode *kvm_gmem_inode_make_secure_inode(const char *name,
-+						      loff_t size, u64 flags)
-+{
-+	struct inode *inode;
-+
-+	inode = anon_inode_make_secure_inode(kvm_gmem_mnt->mnt_sb, name, NULL);
-+	if (IS_ERR(inode))
-+		return inode;
-+
-+	inode->i_private = (void *)(unsigned long)flags;
-+	inode->i_op = &kvm_gmem_iops;
-+	inode->i_mapping->a_ops = &kvm_gmem_aops;
-+	inode->i_mode |= S_IFREG;
-+	inode->i_size = size;
-+	mapping_set_gfp_mask(inode->i_mapping, GFP_HIGHUSER);
-+	mapping_set_inaccessible(inode->i_mapping);
-+	/* Unmovable mappings are supposed to be marked unevictable as well. */
-+	WARN_ON_ONCE(!mapping_unevictable(inode->i_mapping));
-+
-+	return inode;
-+}
-+
-+static struct file *kvm_gmem_inode_create_getfile(void *priv, loff_t size,
-+						  u64 flags)
-+{
-+	static const char *name = "[kvm-gmem]";
-+	struct inode *inode;
-+	struct file *file;
-+	int err;
-+
-+	err = -ENOENT;
-+	/* __fput() will take care of fops_put(). */
-+	if (!fops_get(&kvm_gmem_fops))
-+		goto err;
-+
-+	inode = kvm_gmem_inode_make_secure_inode(name, size, flags);
-+	if (IS_ERR(inode)) {
-+		err = PTR_ERR(inode);
-+		goto err_fops_put;
-+	}
-+
-+	file = alloc_file_pseudo(inode, kvm_gmem_mnt, name, O_RDWR,
-+				 &kvm_gmem_fops);
-+	if (IS_ERR(file)) {
-+		err = PTR_ERR(file);
-+		goto err_put_inode;
-+	}
-+
-+	file->f_flags |= O_LARGEFILE;
-+	file->private_data = priv;
-+
-+out:
-+	return file;
-+
-+err_put_inode:
-+	iput(inode);
-+err_fops_put:
-+	fops_put(&kvm_gmem_fops);
-+err:
-+	file = ERR_PTR(err);
-+	goto out;
-+}
-+
- static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags)
- {
--	const char *anon_name = "[kvm-gmem]";
- 	struct kvm_gmem *gmem;
--	struct inode *inode;
- 	struct file *file;
- 	int fd, err;
-
-@@ -481,32 +582,16 @@ static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags)
- 		goto err_fd;
- 	}
-
--	file = anon_inode_create_getfile(anon_name, &kvm_gmem_fops, gmem,
--					 O_RDWR, NULL);
-+	file = kvm_gmem_inode_create_getfile(gmem, size, flags);
- 	if (IS_ERR(file)) {
- 		err = PTR_ERR(file);
- 		goto err_gmem;
- 	}
-
--	file->f_flags |= O_LARGEFILE;
--
--	inode = file->f_inode;
--	WARN_ON(file->f_mapping != inode->i_mapping);
--
--	inode->i_private = (void *)(unsigned long)flags;
--	inode->i_op = &kvm_gmem_iops;
--	inode->i_mapping->a_ops = &kvm_gmem_aops;
--	inode->i_mode |= S_IFREG;
--	inode->i_size = size;
--	mapping_set_gfp_mask(inode->i_mapping, GFP_HIGHUSER);
--	mapping_set_inaccessible(inode->i_mapping);
--	/* Unmovable mappings are supposed to be marked unevictable as well. */
--	WARN_ON_ONCE(!mapping_unevictable(inode->i_mapping));
--
- 	kvm_get_kvm(kvm);
- 	gmem->kvm = kvm;
- 	xa_init(&gmem->bindings);
--	list_add(&gmem->entry, &inode->i_mapping->i_private_list);
-+	list_add(&gmem->entry, &file_inode(file)->i_mapping->i_private_list);
-
- 	fd_install(fd, file);
- 	return fd;
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 18f29ef935437..301d48d6e00d0 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -6489,7 +6489,9 @@ int kvm_init(unsigned vcpu_size, unsigned vcpu_align, struct module *module)
- 	if (WARN_ON_ONCE(r))
- 		goto err_vfio;
-
--	kvm_gmem_init(module);
-+	r = kvm_gmem_init(module);
-+	if (r)
-+		goto err_gmem;
-
- 	r = kvm_init_virtualization();
- 	if (r)
-@@ -6510,6 +6512,8 @@ int kvm_init(unsigned vcpu_size, unsigned vcpu_align, struct module *module)
- err_register:
- 	kvm_uninit_virtualization();
- err_virt:
-+	kvm_gmem_exit();
-+err_gmem:
- 	kvm_vfio_ops_exit();
- err_vfio:
- 	kvm_async_pf_deinit();
-@@ -6541,6 +6545,7 @@ void kvm_exit(void)
- 	for_each_possible_cpu(cpu)
- 		free_cpumask_var(per_cpu(cpu_kick_mask, cpu));
- 	kmem_cache_destroy(kvm_vcpu_cache);
-+	kvm_gmem_exit();
- 	kvm_vfio_ops_exit();
- 	kvm_async_pf_deinit();
- 	kvm_irqfd_exit();
-diff --git a/virt/kvm/kvm_mm.h b/virt/kvm/kvm_mm.h
-index 31defb08ccbab..9fcc5d5b7f8d0 100644
---- a/virt/kvm/kvm_mm.h
-+++ b/virt/kvm/kvm_mm.h
-@@ -68,17 +68,18 @@ static inline void gfn_to_pfn_cache_invalidate_start(struct kvm *kvm,
- #endif /* HAVE_KVM_PFNCACHE */
-
- #ifdef CONFIG_KVM_GUEST_MEMFD
--void kvm_gmem_init(struct module *module);
-+int kvm_gmem_init(struct module *module);
-+void kvm_gmem_exit(void);
- int kvm_gmem_create(struct kvm *kvm, struct kvm_create_guest_memfd *args);
- int kvm_gmem_bind(struct kvm *kvm, struct kvm_memory_slot *slot,
- 		  unsigned int fd, loff_t offset);
- void kvm_gmem_unbind(struct kvm_memory_slot *slot);
- #else
--static inline void kvm_gmem_init(struct module *module)
-+static inline int kvm_gmem_init(struct module *module)
- {
--
-+	return 0;
- }
--
-+static inline void kvm_gmem_exit(void) {};
- static inline int kvm_gmem_bind(struct kvm *kvm,
- 					 struct kvm_memory_slot *slot,
- 					 unsigned int fd, loff_t offset)
---
-2.51.0.rc0.155.g4a0f42376b-goog
+Thanks,
+Yury
 
