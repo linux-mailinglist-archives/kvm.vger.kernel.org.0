@@ -1,80 +1,80 @@
-Return-Path: <kvm+bounces-54449-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54450-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26D53B216B4
-	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 22:46:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28DD2B216CD
+	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 22:50:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 36DBA1A24671
-	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 20:46:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D791E680992
+	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 20:50:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7A402DA742;
-	Mon, 11 Aug 2025 20:45:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B82F2DCBFC;
+	Mon, 11 Aug 2025 20:50:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KMiKgSmr"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hjFEMoh+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 884CD311C02
-	for <kvm@vger.kernel.org>; Mon, 11 Aug 2025 20:45:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 466B227D771
+	for <kvm@vger.kernel.org>; Mon, 11 Aug 2025 20:50:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754945150; cv=none; b=THg7R5QmE0/J1T+baIPLQnUBCIaLNZTL4dPbh1TEJgSgyZ7BuQNWCPQBJpPVf1WCQQE9lMxGHHdxPh1O2QmEh3CdDransQlhTf5+AzFZ4W1ar5HYFErisKsKvuOy1lON/BwYWE/bEqHbEUwdZ/pXX6Aro5IhU4MX+nA2KhsvFYI=
+	t=1754945419; cv=none; b=RsqvGYbhZIfap7JJBT3cJg3y/+EvG3TDHv2xgdHJbVx0aaNwT0rKCxl1stHS6jzvcGrpl1TuMLWWbTciago/zvx/maGRlI0qDdEA6YQQm1g0Ym9tc6poT/FmnZ+3Wo5EIS2mn38op+vAENWTf2IG3ndnqUriIEBQkkpX3okgJH8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754945150; c=relaxed/simple;
-	bh=x9w6V7pENJMTOyxSXxtDBfeZ6hHo/blTfXAWZ/CChgw=;
+	s=arc-20240116; t=1754945419; c=relaxed/simple;
+	bh=UK0NWKHuPko3+SuzR0r50GMkmrZaT31pWR9AVsnbm9g=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=m9klP29Y+QiuIGVMwXzC9IOLQrML0llHDj9nh7Xjo4YTrjMULHvLEk8Pal7VXaAx0PFdWDwfuSVwxGhWLC2gc6FFXJn81QNBFWCKeD5WluNE2YA9vdO/Yj0yTaz11J7Ta5d7vzfaRLPqdLz1zCBBgbRkU/tWcdqVwPr1b7at51A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KMiKgSmr; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=H6zQt/hA+DeNN99O3lEjgWDtqqJoyWF1HUejW+rw9ZkaUI2aAqlEE/l4FDUEF7yLH0qCFBGLJXC/DX1EvYANI94NBrABuLC5KJBVWXmhOvcTLUqOP4aPxNZWA3rD+7H5Mv3+mqrLr94e3FRiUWtZcWHa48MWhNUw6uf57m9YgrQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hjFEMoh+; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b4274f5e065so4161103a12.0
-        for <kvm@vger.kernel.org>; Mon, 11 Aug 2025 13:45:48 -0700 (PDT)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-32129c65bf8so5349797a91.1
+        for <kvm@vger.kernel.org>; Mon, 11 Aug 2025 13:50:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754945148; x=1755549948; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1754945417; x=1755550217; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YCzvuaHTksePcyjhE6+vgQKI6eFemBt/7TJj5lqZjhU=;
-        b=KMiKgSmrRCisEMKzu0SqZhJgIqx7Q15Z4FkhmFRe2drVN8kYEUzzgLsDdP012HxL7/
-         ZhybWCUSruu2XSs+fv7MXBpJ3d51kWFCgTAg/PIvEUuaBoFqekC710JPs7idjnsLIvqb
-         bjVg3rTlVFADWSUkZMbrG4GnMS3A0nCXLd/GFB6kAZgSminGnJyB1nZL2S/XO++M9alC
-         1gaA08bk3aFnHekDuA88NU90pOgfcIBmQ932CKqFzVdx2ANxc6ZHrx0l19wyD8Ew2cmk
-         iXygdosvjQEmxUq5e84Drk2pIsMTghK248HBmIKmmlvRrGt39rs7KWBqK2Yx79BN5F0N
-         CkHg==
+        bh=Cj1upr9MpZvI1rcVU/DWVgHHJAUXh71dix9PzGRZ79k=;
+        b=hjFEMoh+GKoS/YNvqHnCU5JVT5Yv5DpAjg0giNg5BO5oztX2ZCVhCWHSz2tZ7drR98
+         iSgMD/nsXB8kLqEQSfB7HJwDl07AlotAx3ADjuDrqZTeIPr96GZTHYe+KuVcAC+hrO3B
+         C1iqxN9tZJCXQLM2XqjhGKFxvsIjBjhqFGsft6tLm2ya4nE8APUjFPih5sf3xxJYNrBf
+         dwgNStR1Px2SL5dJsd4dYQ2usYPtVJXu5lJlUi+R2lo8RZC/URLGVH4lFl7nIZJUeWAI
+         aCTW7/ukclja1ybXzpqiSJ1C05NE5aJ10jcb7GWNR2bPtmHsWHo7rMh6g3aDu1X7VR6o
+         o1FQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754945148; x=1755549948;
+        d=1e100.net; s=20230601; t=1754945417; x=1755550217;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YCzvuaHTksePcyjhE6+vgQKI6eFemBt/7TJj5lqZjhU=;
-        b=vtRRR/zTTS2SBSLf3ki71ve43xebI6hS3icXSoyTZ1HkhZ43jj5C6Fgz4LCgJ/wd+j
-         oJyYY18kY6HhVgKwzdeWpSLn3aljhL5uY3D3MdCuV/nmNfrtzbzdYIV1quqYbY1u27FZ
-         yoXeYASc3YaHVzUtHLwZtSCJsvcsNJC2PyHPU+0CDPn/22zSnT/uFd43MLC70n0BHIRt
-         zhKbbKchDEaFikhcM/2H2en/ogNyuME/SWg54ZCjVcXX8H+6Q0X0w+FAPSa1vJJVTzQL
-         BNNHItAdFxqSr5KeghEsNxPvWUafFj1Hdwo70Luk7BioWHC3PccOoTzg+mm8hwMzOCXU
-         xVGQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXqyEQOS4M++7gBuhThMvxrvxuPDYvxiRgxqQ3Kj1U5ENstaW5aiVUsWL9JICZxlK1t0Ig=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy0jYeNYyVWdZ/oGfpuxx/CzqHYFc9m0tlbX/Bi/cxXF/YYBC3z
-	heD54VhSKn8xjdxnA5HolVFrubpxHbFuezjKhP+jawYT2oABLwW8LEt4y7J6hwf9TExYnDCGrcd
-	RyZUjBw==
-X-Google-Smtp-Source: AGHT+IGbrPTnrEMcQaX9aICrlGhuN/HwbXf/jBn1buIix2r8TwtQnzufznJB8yzLjSRkDiDx2IIc3OUJTF4=
-X-Received: from pjqf22.prod.google.com ([2002:a17:90a:a796:b0:31e:fac4:4723])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ebc2:b0:240:86b2:aeb6
- with SMTP id d9443c01a7336-242fc33d8bdmr13536485ad.26.1754945147830; Mon, 11
- Aug 2025 13:45:47 -0700 (PDT)
-Date: Mon, 11 Aug 2025 13:45:46 -0700
-In-Reply-To: <20250811203041.61622-3-yury.norov@gmail.com>
+        bh=Cj1upr9MpZvI1rcVU/DWVgHHJAUXh71dix9PzGRZ79k=;
+        b=K4wyCW999ZLwvCXAVslaqzeHz4JJnANB4kHb95nVexamqaO7Xg/X0Nr5M+4vLEtacM
+         lVcIFLgNt4b1W+f7DU7C9GwqNpPmCYLHZSb/nKlQhu9Zr5Tyw26VWMUpS3hyZnYcHOc2
+         DLDPhCgkRu4vp/DYaU4o8Uv+irk5ZicubnDas/whu3bxf3sOHPVAitAw7faIxCMYFn4w
+         ta6k+C98MGlk+mVdjlSnNxQUkeBV4gFnaaljZMIKMMBBSvHPG7bURIpOZm4GSYLO4gCv
+         G13hDaI0zMRVtFyqHX112qjpFuST1+OaqxYJJ1s5Uxrlefl6uFu1pynPj/0t7erfZea8
+         M67g==
+X-Forwarded-Encrypted: i=1; AJvYcCVsuswLGbxg7XRbbUKRBSgvLMMj9s7K0X2kXwJ7jguSmX01R5c0j3ypv90ELLyZ5gAn6tw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxre1bUb8vvxdCRTAEdh/aXWpJmFQABFKhvo4ofd+uPsuMCbVeL
+	sjWcnMg++KTrUcpOiLiLmlyo4bI7mTsj7mo1qpMoeW1eURml+FK8smjBuCG8FfiUXXjdRrp1wGv
+	YZhCEMg==
+X-Google-Smtp-Source: AGHT+IF3SMcpDDd6oFa8M7hFXn80njr047YIQ9ybX/L/gNxKoCD48pHAQLZRJzHN8JTduu/jHLvxmTxiLeA=
+X-Received: from pjnx5.prod.google.com ([2002:a17:90a:8a85:b0:31f:335d:342d])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3885:b0:321:27d5:eaf1
+ with SMTP id 98e67ed59e1d1-321c0a95a7fmr1160081a91.25.1754945417608; Mon, 11
+ Aug 2025 13:50:17 -0700 (PDT)
+Date: Mon, 11 Aug 2025 13:50:15 -0700
+In-Reply-To: <20250811203041.61622-2-yury.norov@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250811203041.61622-1-yury.norov@gmail.com> <20250811203041.61622-3-yury.norov@gmail.com>
-Message-ID: <aJpWet3USvXLWYEZ@google.com>
-Subject: Re: [PATCH 2/2] KVM: SVM: drop useless cpumask_test_cpu() in pre_sev_run()
+References: <20250811203041.61622-1-yury.norov@gmail.com> <20250811203041.61622-2-yury.norov@gmail.com>
+Message-ID: <aJpXh3dQNZpmUlHL@google.com>
+Subject: Re: [PATCH 1/2] KVM: SVM: don't check have_run_cpus in sev_writeback_caches()
 From: Sean Christopherson <seanjc@google.com>
 To: Yury Norov <yury.norov@gmail.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
@@ -85,55 +85,52 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
 Content-Type: text/plain; charset="us-ascii"
 
 On Mon, Aug 11, 2025, Yury Norov wrote:
-> Testing cpumask for a CPU to be cleared just before setting the exact
-> same CPU is useless because the end result is always the same: CPU is
-> set.
+> From: Yury Norov (NVIDIA) <yury.norov@gmail.com>
+> 
+> Before calling wbnoinvd_on_cpus_mask(), the function checks the cpumask
+> for emptiness. It's useless, as the following wbnoinvd_on_cpus_mask()
+> ends up with smp_call_function_many_cond(), which handles empty cpumask
+> correctly.
 
-No, it is not useless.  Blindly writing to the variable will unnecessarily bounce
-the cacheline, and this is a hot path.
+I don't agree that it's useless.  The early check avoids disabling/enabling
+preemption (which is cheap, but still), and IMO it makes the KVM code more obviously
+correct.  E.g. it takes quite a bit of digging to understand that invoking
+wbnoinvd_on_cpus_mask() with an empty mask is ok/fine.
 
-> While there, switch CPU setter to a non-atomic version. Atomicity is
-> useless here 
+I'm not completely opposed to this change, but I also don't see the point.
 
-No, atomicity isn't useless here either.  Dropping atomicity could result in
-CPU's bit being lost.  I.e. the atomic accesses aren't for the benefit of
-smp_call_function_many_cond(), the writes are atomic so that multiple vCPUs can
-concurrently update the mask without needing additional protection.
-
-> because sev_writeback_caches() ends up with a plain
-> for_each_cpu() loop in smp_call_function_many_cond(), which is not
-> atomic by nature.
-
-That's fine.  As noted in sev_writeback_caches(), if vCPU could be running, then
-the caller is responsible for ensuring that all vCPUs flush caches before the
-memory being reclaimed is fully freed.  Those guarantees are provided by KVM's
-MMU.
-
-sev_writeback_caches() => smp_call_function_many_cond() could hit false positives,
-i.e. trigger WBINVD on CPUs that couldn't possibly have accessed the memory being
-reclaimed, but such false positives are functionally benign, and are "intended"
-in the sense that we chose to prioritize simplicity over precision.
-
+> While there, move function-wide comment on top of the function.
+> 
 > Fixes: 6f38f8c57464 ("KVM: SVM: Flush cache only on CPUs running SEV guest")
-> Signed-off-by: Yury Norov <yury.norov@gmail.com>
+> Signed-off-by: Yury Norov (NVIDIA) <yury.norov@gmail.com>
 > ---
->  arch/x86/kvm/svm/sev.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
+>  arch/x86/kvm/svm/sev.c | 11 ++++-------
+>  1 file changed, 4 insertions(+), 7 deletions(-)
 > 
 > diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 49d7557de8bc..8170674d39c1 100644
+> index 2fbdebf79fbb..49d7557de8bc 100644
 > --- a/arch/x86/kvm/svm/sev.c
 > +++ b/arch/x86/kvm/svm/sev.c
-> @@ -3498,8 +3498,7 @@ int pre_sev_run(struct vcpu_svm *svm, int cpu)
->  	 * have encrypted, dirty data in the cache, and flush caches only for
->  	 * CPUs that have entered the guest.
->  	 */
-> -	if (!cpumask_test_cpu(cpu, to_kvm_sev_info(kvm)->have_run_cpus))
-> -		cpumask_set_cpu(cpu, to_kvm_sev_info(kvm)->have_run_cpus);
-> +	__cpumask_set_cpu(cpu, to_kvm_sev_info(kvm)->have_run_cpus);
+> @@ -716,15 +716,12 @@ static void sev_clflush_pages(struct page *pages[], unsigned long npages)
+>  	}
+>  }
 >  
->  	/* Assign the asid allocated with this SEV guest */
->  	svm->asid = asid;
+> +/*
+> + * The caller is responsible for ensuring correctness if the mask
+> + * can be modified, e.g. if a CPU could be doing VMRUN.
+> + */
+>  static void sev_writeback_caches(struct kvm *kvm)
+>  {
+> -	/*
+> -	 * Note, the caller is responsible for ensuring correctness if the mask
+> -	 * can be modified, e.g. if a CPU could be doing VMRUN.
+> -	 */
+> -	if (cpumask_empty(to_kvm_sev_info(kvm)->have_run_cpus))
+> -		return;
+> -
+>  	/*
+>  	 * Ensure that all dirty guest tagged cache entries are written back
+>  	 * before releasing the pages back to the system for use.  CLFLUSH will
 > -- 
 > 2.43.0
 > 
