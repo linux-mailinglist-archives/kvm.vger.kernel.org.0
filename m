@@ -1,204 +1,178 @@
-Return-Path: <kvm+bounces-54455-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54456-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C276B21714
-	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 23:11:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C21EB2173B
+	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 23:22:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 720E919077F6
-	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 21:11:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4538819071D0
+	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 21:22:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C17982E2DF0;
-	Mon, 11 Aug 2025 21:10:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E0B32E3373;
+	Mon, 11 Aug 2025 21:21:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2j1LxxX3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="d/g7trIN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EF7A2D97A4
-	for <kvm@vger.kernel.org>; Mon, 11 Aug 2025 21:10:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 549072DCBFC
+	for <kvm@vger.kernel.org>; Mon, 11 Aug 2025 21:21:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754946657; cv=none; b=jvXFuK01twxuorFuna4RIM79DeftN2UsHepx1ZEIAxwEoS51HSj4ubojvo1+uDS6UJ8BoagJWolRCretylHLD6TkbdDb02JI75dB4I/D2KNBn70gkPnKuXbiyJ4Hd2EKa8tFZmeFpEDrjKLxuI87XGRMGd+SAo5rL8TxUjEilSQ=
+	t=1754947308; cv=none; b=tMcqkuGTQbS7ZVtaeSjIkWR7Ga+7Eq0VLyRuQlXgMnbQERFfa/cMWgS2lT/4ATjPoK/7QFD02y5QSSyuf9RJUSOMBNt77k6dW3wE2eme6w4uYiJempZJqgcypMWrO1gf+JIpesYBVnRNcpnJieJcCxE8ee1sX9gUOSk0l3bqyY0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754946657; c=relaxed/simple;
-	bh=wBLSCAldXdz6Aqzj2ZgVJBIXTJAMMxPB3VZz7oI849c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=r7XMykkxx7SuJE5h/m3tLvqQBoQtJlZ+ksDlmDvUcGnC2DNVk6+tcxqWgl9pnW0CMGa7o/BJRZBBMtKgB4yAmr+iyMYMCMHVtXQbGFQRQ5y4qB3ciFAmWqh/4b+2KVVRE6Pn+6MZoRDcwJfLcVZCARJ+UpRGZUjgg5YCv7l81Gk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2j1LxxX3; arc=none smtp.client-ip=209.85.160.182
+	s=arc-20240116; t=1754947308; c=relaxed/simple;
+	bh=brKf34GlMteC6e97iXsE70oZ4GKg8aiG8bnhTlQwsfM=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=QG+FNppDFseqmsPuvrbqc7/zmTVPo/fEkmbySnjxDb2bK+LLzuXpZcqPMKVbGurYn4dp2d6UGe8v3bkOGt0+iSWK8pIGaMFZoZqOR1m6FGD0hSRH7KS2QIl3YZvV4ygEdvz3lk7QNM6aGigF4eOWbCVxMkD6oCykKNqGNP9oP+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=d/g7trIN; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-4b0bd871d9aso111611cf.0
-        for <kvm@vger.kernel.org>; Mon, 11 Aug 2025 14:10:55 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-31f2dd307d4so4916074a91.0
+        for <kvm@vger.kernel.org>; Mon, 11 Aug 2025 14:21:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754946654; x=1755551454; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=n8kpMVQN+kxcOUo8uXI1h/4+fugPUTPnI8qDv0t+xv0=;
-        b=2j1LxxX3pDFT2AOSimcn+wTiNQufFzCZgDot76tTwapuCVzsbZ2i2EYyNxVICk0VwQ
-         DL8FzsS+SI4tORdz5o54DxdVC5xCTFaKe6hV5l2I0vJ79974/ToW8tHQOlR5cleegg7m
-         NfImwn/UrqcR9ZBdRUQljTY95u60gaYAdzRzEc5A44w6LYD8OwY6K2TDds2Yu6VKjm0L
-         pF43f54l4LkJalxjTer8Dk7i/U3gix+3g++QwJGCFwETfVolywEPEkFVFUTxHh0IWV5U
-         McVHcmSnJ126BIrv9bjLrVsffUZ69ebwGWW7tx3RI9iKA2ctXzlAX0RpYucOYCTqMWpI
-         OlDg==
+        d=google.com; s=20230601; t=1754947306; x=1755552106; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=VkuNbvX9tBpKROGoOIkFK7C05qc/TsQCHwS4wmeWMeY=;
+        b=d/g7trINxtHYeoqFBbUq2GSp0sqdoFxpief5h1F7jkzGYApLoU6OUtIpwsrtc8xDew
+         Xk2bs038wPisjiy3MhXKYIxyCfjurGUnea+lXPLHIbG+jNrpm6dSwv5BjwbIfc7b5oXP
+         Zw/xFz48ojLjOkmJwgf5PUMer2no5IxPUs90wQMWIJw4w4DXnpw7cFL6Mn47OSAtiV/t
+         LzqDmpG2+WFD7tIhAw+Wx4NddP9IvStW1CWR/Cgkrgceo/I4tGjl+uVxGxjyHn9K9VF/
+         Ej1QFy+J/K9vcpOwPe40QVxKMOqVtrUSmNfbKPM/kYWiE701I6+lOy/KKucjAA4piMj8
+         ESLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754946654; x=1755551454;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=n8kpMVQN+kxcOUo8uXI1h/4+fugPUTPnI8qDv0t+xv0=;
-        b=jJkKgtvlrYpThcJIUu4vS6+wNZMcC2SOd3FTGu4ILFlfIBQeNK9OdxrgZscKGQLQvx
-         xipKu9WMkgbizLLouAR4O5iwLzsfM8qqrj3SruItpT00DJso/AwvdjzTbMAducCJoyT3
-         Bp1gFp/vHKNXy54HReA9kZuAIQKzpbxDFQa+1RKBYhmZK9Eeg89B9PNeH6NFrqtdNDmM
-         hXFkVJNjor2UZWoTlzcdly3Fx693L5qxHgywrWOrPqyOfsS8wQBMPALDb9d6ZbbnqzgD
-         DDXZlWD3mkzxr+ZkB9UXsElVktL3Xqu7zShuIjlIcBXOFcu2AFXSnHHvMK8mM0F6kKeR
-         yPTA==
-X-Forwarded-Encrypted: i=1; AJvYcCUd1JMkF9GtYKC8izFeMyXHpif6K5UzhBedyjxxDMdJf25n/R7hHbHm+1EYJFO9+IyAiEQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzg+ggTX3iZqfaKHE3vyn39+MaLJowMWaIjeJlTegVX0oIRa4GM
-	v3akSmiVp0olIx2chRma3O8KUFseGeDg9ZD2aZeYQo+03ipyZNy3Xf30QKKnL3rXu83n4gUmE6O
-	lXs7+cLvHbdhRtk6rZQv/q6QNM1VoVr4+SAJcAPzk
-X-Gm-Gg: ASbGnctBWS2o4WXY6yN724414XgrSliTpViwlLDUF68HAT7JoYlLkWDHIiH3496gmfU
-	ecG/FfhAR1u6flwqzHh3ASnRCrJkxX6gkpyoJ198vXgnF7fUpq1bkkz7shpSYLZHS3CzGScEaIE
-	fvhHVdVXl9RKCBHLOUHtg27eigTUGLM/7eR6+cXMq4XJFP6+6uhCfGJzODO+Wc2csU2f33HWfr+
-	Ns2JjSqS+gXoZkEYBBiOqqw2Wn8JImCaG3q2Aw=
-X-Google-Smtp-Source: AGHT+IGrFd77Bx+EKopvRxbg+m1IeKplQHg0gCIDVl+wT9usSoAPtnU/AdsEjyhI0upm5xEdEbCeQ2tz2jz3wh0En3g=
-X-Received: by 2002:a05:622a:1a9c:b0:48d:8f6e:ece7 with SMTP id
- d75a77b69052e-4b0ef35f647mr290581cf.3.1754946653817; Mon, 11 Aug 2025
- 14:10:53 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1754947306; x=1755552106;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VkuNbvX9tBpKROGoOIkFK7C05qc/TsQCHwS4wmeWMeY=;
+        b=hiPEqE8grhl7Ri9ulwKe6nmlBy59anune6HezQPsAyx8J2vX40UxyAnOLn8GpM4ujo
+         2DWMy2l/5GpOrSGGygibUILYAB80Mk29tmpBmVhZtkEcKnwieyCFKiomtXf1Q91RGN4I
+         pX8cSZDvfnSQVyvn0p4ea4ix+F1UZaHkSlhktDvITZQw6kboUgokbnjXtnVC5b9uJ5yS
+         orJDOAuJFjwQQXsFPre8ZFDjlgve7Jb6e2gjjeISzwOQEY6AiIA0Dv7POT6rm8O5kp+q
+         XqIQ5XPu6v0RVcIY131mPsFWLdwjXiJR8u1MXwMDFvcXyay1Rd8DTmrEjkhNehdIZPt8
+         FIkQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWxn38PGvEz5Ht/rB6wb1eHF2k+yJeuBjfazJiLNsh9vMLSpjD0wNdApGF5SD2DpeN54as=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwhY9UvVSR0v7DYbUHG0bms+IZ8O2VNs9oFop+8I3IXFWPSif7K
+	3hht2St5LfVFGgowc+1jjzShZtOEB0wAHaHNBmt9HXOiv5yJaZrYvG5KINxzuvl4nligG3vqilQ
+	fL9E2Gg==
+X-Google-Smtp-Source: AGHT+IEK4VLGMXiSIwY83HgovnmV+uwHaU0wvPKcWqvTTRG1gQzEHs2lYqa4NbosMDpjGWRBbH/Oh/H322U=
+X-Received: from pjoa22.prod.google.com ([2002:a17:90a:8c16:b0:31e:d9dc:605f])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2787:b0:31f:12f:ffaa
+ with SMTP id 98e67ed59e1d1-321839d5ddcmr19785107a91.6.1754947305631; Mon, 11
+ Aug 2025 14:21:45 -0700 (PDT)
+Date: Mon, 11 Aug 2025 14:21:44 -0700
+In-Reply-To: <aJpbLX_0WP5jXn7o@yury>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250807093950.4395-1-yan.y.zhao@intel.com> <20250807094516.4705-1-yan.y.zhao@intel.com>
-In-Reply-To: <20250807094516.4705-1-yan.y.zhao@intel.com>
-From: Sagi Shahar <sagis@google.com>
-Date: Mon, 11 Aug 2025 16:10:41 -0500
-X-Gm-Features: Ac12FXwox6fPzU2alMAVmH7V3wy02ekBTE4ia43sewPZz30re1TGyXyUMSAloFo
-Message-ID: <CAAhR5DEZZfX0=9QwBrXhC+1fp1Z0w4Xbb3mXcn0OuW+45tsLwA@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 18/23] x86/virt/tdx: Do not perform cache flushes
- unless CLFLUSH_BEFORE_ALLOC is set
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: pbonzini@redhat.com, seanjc@google.com, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org, x86@kernel.org, rick.p.edgecombe@intel.com, 
-	dave.hansen@intel.com, kas@kernel.org, tabba@google.com, 
-	ackerleytng@google.com, quic_eberman@quicinc.com, michael.roth@amd.com, 
-	david@redhat.com, vannapurve@google.com, vbabka@suse.cz, 
-	thomas.lendacky@amd.com, pgonda@google.com, zhiquan1.li@intel.com, 
-	fan.du@intel.com, jun.miao@intel.com, ira.weiny@intel.com, 
-	isaku.yamahata@intel.com, xiaoyao.li@intel.com, binbin.wu@linux.intel.com, 
-	chao.p.peng@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20250811203041.61622-1-yury.norov@gmail.com> <20250811203041.61622-2-yury.norov@gmail.com>
+ <aJpXh3dQNZpmUlHL@google.com> <aJpbLX_0WP5jXn7o@yury>
+Message-ID: <aJpe6GM_3edwJXuX@google.com>
+Subject: Re: [PATCH 1/2] KVM: SVM: don't check have_run_cpus in sev_writeback_caches()
+From: Sean Christopherson <seanjc@google.com>
+To: Yury Norov <yury.norov@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Zheyun Shen <szy0127@sjtu.edu.cn>
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Aug 7, 2025 at 4:47=E2=80=AFAM Yan Zhao <yan.y.zhao@intel.com> wrot=
-e:
->
-> From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
->
-> The TDX module enumerates with a TDX_FEATURES0 bit if an explicit cache
-> flush is necessary when switching KeyID for a page, like before
-> handing the page over to a TD.
->
-> Currently, none of the TDX-capable platforms have this bit enabled.
->
-> Moreover, cache flushing with TDH.PHYMEM.PAGE.WBINVD fails if
-> Dynamic PAMT is active and the target page is not 4k. The SEAMCALL only
-> supports 4k pages and will fail if there is no PAMT_4K for the HPA.
->
-> Avoid performing these cache flushes unless the CLFLUSH_BEFORE_ALLOC bit
-> of TDX_FEATURES0 is set.
->
-> Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> ---
-> RFC v2:
-> - Pulled from
->   git://git.kernel.org/pub/scm/linux/kernel/git/kas/linux.git tdx/dpamt-h=
-uge.
-> - Rebased on top of TDX huge page RFC v2 (Yan)
-> ---
->  arch/x86/include/asm/tdx.h  |  1 +
->  arch/x86/virt/vmx/tdx/tdx.c | 19 +++++++++++++------
->  2 files changed, 14 insertions(+), 6 deletions(-)
->
-> diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
-> index f1bd74348b34..c058a82d4a97 100644
-> --- a/arch/x86/include/asm/tdx.h
-> +++ b/arch/x86/include/asm/tdx.h
-> @@ -15,6 +15,7 @@
->
->  /* Bit definitions of TDX_FEATURES0 metadata field */
->  #define TDX_FEATURES0_NO_RBP_MOD               BIT_ULL(18)
-> +#define TDX_FEATURES0_CLFLUSH_BEFORE_ALLOC     BIT_ULL(23)
->  #define TDX_FEATURES0_DYNAMIC_PAMT             BIT_ULL(36)
->
->  #ifndef __ASSEMBLER__
-> diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-> index 9ed585bde062..b7a0ee0f4a50 100644
-> --- a/arch/x86/virt/vmx/tdx/tdx.c
-> +++ b/arch/x86/virt/vmx/tdx/tdx.c
-> @@ -1648,14 +1648,13 @@ static inline u64 tdx_tdvpr_pa(struct tdx_vp *td)
->         return page_to_phys(td->tdvpr_page);
->  }
->
-> -/*
-> - * The TDX module exposes a CLFLUSH_BEFORE_ALLOC bit to specify whether
-> - * a CLFLUSH of pages is required before handing them to the TDX module.
-> - * Be conservative and make the code simpler by doing the CLFLUSH
-> - * unconditionally.
-> - */
->  static void tdx_clflush_page(struct page *page)
->  {
-> +       u64 tdx_features0 =3D tdx_sysinfo.features.tdx_features0;
-> +
-> +       if (tdx_features0 & TDX_FEATURES0_CLFLUSH_BEFORE_ALLOC)
-> +               return;
+On Mon, Aug 11, 2025, Yury Norov wrote:
+> On Mon, Aug 11, 2025 at 01:50:15PM -0700, Sean Christopherson wrote:
+> > On Mon, Aug 11, 2025, Yury Norov wrote:
+> > > From: Yury Norov (NVIDIA) <yury.norov@gmail.com>
+> > > 
+> > > Before calling wbnoinvd_on_cpus_mask(), the function checks the cpumask
+> > > for emptiness. It's useless, as the following wbnoinvd_on_cpus_mask()
+> > > ends up with smp_call_function_many_cond(), which handles empty cpumask
+> > > correctly.
+> > 
+> > I don't agree that it's useless.  The early check avoids disabling/enabling
+> > preemption (which is cheap, but still), and IMO it makes the KVM code more obviously
+> > correct.  E.g. it takes quite a bit of digging to understand that invoking
+> > wbnoinvd_on_cpus_mask() with an empty mask is ok/fine.
+> > 
+> > I'm not completely opposed to this change, but I also don't see the point.
+> 
+> So, there's a tradeoff between useless preemption cycling, which is
+> O(1) and cpumask_empty(), which is O(N).
 
-Isn't the logic here and below reversed? If
-TDX_FEATURES0_CLFLUSH_BEFORE_ALLOC bit is set, we want to perform the
-clflush()
+Oh, that argument I buy.  I had it in my head that the check is going to be O(1)
+in practice, because never running vCPU0 would be all kinds of bizarre.  But the
+mask tracks physical CPUs, not virtual CPUs.  E.g. a 2-vCPU VM that's pinned to
+the last 2 pCPUs in the system could indeed trigger several superfluous loads and
+checks.
 
-> +
->         clflush_cache_range(page_to_virt(page), PAGE_SIZE);
->  }
->
-> @@ -2030,8 +2029,12 @@ EXPORT_SYMBOL_GPL(tdh_phymem_cache_wb);
->
->  u64 tdh_phymem_page_wbinvd_tdr(struct tdx_td *td)
->  {
-> +       u64 tdx_features0 =3D tdx_sysinfo.features.tdx_features0;
->         struct tdx_module_args args =3D {};
->
-> +       if (tdx_features0 & TDX_FEATURES0_CLFLUSH_BEFORE_ALLOC)
-> +               return 0;
-> +
->         args.rcx =3D mk_keyed_paddr(tdx_global_keyid, td->tdr_page);
->
->         return seamcall(TDH_PHYMEM_PAGE_WBINVD, &args);
-> @@ -2041,10 +2044,14 @@ EXPORT_SYMBOL_GPL(tdh_phymem_page_wbinvd_tdr);
->  u64 tdh_phymem_page_wbinvd_hkid(u64 hkid, struct folio *folio,
->                                 unsigned long start_idx, unsigned long np=
-ages)
->  {
-> +       u64 tdx_features0 =3D tdx_sysinfo.features.tdx_features0;
->         struct page *start =3D folio_page(folio, start_idx);
->         struct tdx_module_args args =3D {};
->         u64 err;
->
-> +       if (tdx_features0 & TDX_FEATURES0_CLFLUSH_BEFORE_ALLOC)
-> +               return 0;
-> +
->         if (start_idx + npages > folio_nr_pages(folio))
->                 return TDX_OPERAND_INVALID;
->
-> --
-> 2.43.2
->
->
+> I have no measurements that can support one vs another. But the
+> original patch doesn't discuss it anyhow, as well. So, with the
+> lack of any information on performance impact, I'd stick with the 
+> version that brings less code.
+> 
+> Agree?
+
+Not sure I agree that less code is always better, but I do agree that dropping
+the check makes sense.  :-)
+
+How about this?  No need for a v2 (unless you disagree on the tweaks), I'll happily
+fixup when applying.
+
+--
+From: Yury Norov <yury.norov@gmail.com>
+Date: Mon, 11 Aug 2025 16:30:39 -0400
+Subject: [PATCH] KVM: SEV: don't check have_run_cpus in sev_writeback_caches()
+
+Drop KVM's check on an empty cpumask when flushing caches when memory is
+being reclaimed from an SEV VM, as smp_call_function_many_cond() naturally
+(and correctly) handles and empty cpumask.  This avoids an extra O(n)
+lookup in the common case where at least one pCPU has enterred the guest,
+which could be noticeable in some setups, e.g. if a small VM is pinned to
+the last few pCPUs in the system.
+
+Fixes: 6f38f8c57464 ("KVM: SVM: Flush cache only on CPUs running SEV guest")
+Signed-off-by: Yury Norov (NVIDIA) <yury.norov@gmail.com>
+[sean: rewrite changelog to capture performance angle]
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/svm/sev.c | 10 +++-------
+ 1 file changed, 3 insertions(+), 7 deletions(-)
+
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 2fbdebf79fbb..0635bd71c10e 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -718,13 +718,6 @@ static void sev_clflush_pages(struct page *pages[], unsigned long npages)
+ 
+ static void sev_writeback_caches(struct kvm *kvm)
+ {
+-	/*
+-	 * Note, the caller is responsible for ensuring correctness if the mask
+-	 * can be modified, e.g. if a CPU could be doing VMRUN.
+-	 */
+-	if (cpumask_empty(to_kvm_sev_info(kvm)->have_run_cpus))
+-		return;
+-
+ 	/*
+ 	 * Ensure that all dirty guest tagged cache entries are written back
+ 	 * before releasing the pages back to the system for use.  CLFLUSH will
+@@ -739,6 +732,9 @@ static void sev_writeback_caches(struct kvm *kvm)
+ 	 * serializing multiple calls and having responding CPUs (to the IPI)
+ 	 * mark themselves as still running if they are running (or about to
+ 	 * run) a vCPU for the VM.
++	 *
++	 * Note, the caller is responsible for ensuring correctness if the mask
++	 * can be modified, e.g. if a CPU could be doing VMRUN.
+ 	 */
+ 	wbnoinvd_on_cpus_mask(to_kvm_sev_info(kvm)->have_run_cpus);
+ }
+
+base-commit: 8f5ae30d69d7543eee0d70083daf4de8fe15d585
+--
 
