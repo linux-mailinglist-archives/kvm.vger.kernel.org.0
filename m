@@ -1,346 +1,408 @@
-Return-Path: <kvm+bounces-54386-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54387-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D7BEB202C8
-	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 11:11:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FF1DB203D0
+	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 11:35:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A36657AE3A9
-	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 09:09:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC39E1621D6
+	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 09:34:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 080352DFA39;
-	Mon, 11 Aug 2025 09:10:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35D6321C190;
+	Mon, 11 Aug 2025 09:33:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="cCQ3ND/B"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="F4JVoGDQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2060.outbound.protection.outlook.com [40.107.94.60])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F26852DE6E4;
-	Mon, 11 Aug 2025 09:10:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.60
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5D4D70808
+	for <kvm@vger.kernel.org>; Mon, 11 Aug 2025 09:33:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.10
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754903402; cv=fail; b=k6BoPbuyCBuwsSWcAur8M9v7+9RLrUTn8SLFr/zYyOxrTBkrTpBS/9e1RIP/efjM6UdLMuFMIFvu+OqzxlVsSDJlp8/X0uAhfob/OfY/o7KPD6nwcC1V7AHSp2p2uK/0lMiq7J32w9EtHk5rJQzp8eryQIwWcaB5ukL7A4iFUrY=
+	t=1754904805; cv=fail; b=FFjODDfv5hP+g+8gEmVov5cNPcpC0fwcHsOAD42qTF9ZLZp5RidK7kP57ydJwOru5SGSKNqddg2Qrc0N6DaYk2DVNIssXO17e+23pR+fQYNc/MBJrNt9+OE924SAI3TWhC7xxiWYr60aZ7VnaRfE6k8nVmjO5fLjw377DR6QW2E=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754903402; c=relaxed/simple;
-	bh=RJgW1rW3bl9n+rXVKa6f7TmvgZaUvnWszY+n5P1hYQs=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aVeOhn8WwIwJYWWOYsO4EzcVN4Do+GXAmGxTy7Qc8kfCSjCkq5VR7NJ8+cUqLLfqA/JJ20B35I9Vd35Sq1z73lJcWREXbaEzIX8HCetxLx5QbgYrSMHDb8vRcg5OaUN6Dv9e34f5P6pZ5b06eqWUeBuSjXrI0Y42LTqfqVdksvs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=cCQ3ND/B; arc=fail smtp.client-ip=40.107.94.60
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	s=arc-20240116; t=1754904805; c=relaxed/simple;
+	bh=i2m5Jy0mN5m687BGlU8qN4smFJ7PLLy4TDC7pJbtUZM=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=j22P5pfaK+RT56mKVW7HPWI4r6+JDGdB436/Ecp1Plolg0DoSRoZHl/fvt4/ssYOIlXNmjcRIoHSj2nhn2n92pfzD8jdL5YjUuLcFSlbnW61JeUrbsgubuAlpOFW1Ola8x7M+gDUy6MoW3W3WeFBFRwOezQzYzzXv7DfHiMfE68=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=F4JVoGDQ; arc=fail smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1754904804; x=1786440804;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=i2m5Jy0mN5m687BGlU8qN4smFJ7PLLy4TDC7pJbtUZM=;
+  b=F4JVoGDQpdBwe0Q3JW+GCnAb4XIS9kPnylkn6GxroFOtbPcZpWNW0jZO
+   Qpj6r+9+usohEd2S1C4uk2tv4zBgIfo+KmwjQ3fA2iT+PzQ//82vc2zLg
+   r9pWgOFbIqmHum+ctveHX5BlVvCva7mK1oWn9r6oE/WEffHKCMB3klVY1
+   r7rQN0YG7WxLPy9p4OYL0Kxcj7QQSV8pkWU+UICCVwC38h8ed/G0JrQ1v
+   RkbTyyNRKfBWR6wI6d0ecR97KhroPzf5JSfecB5gDBQcPhDoFq7+QngEF
+   K7b5EGCm0imY5eNME8HdEkqQjzeoeD19+I0M6Y0+rR8IhptHGGQaE9g85
+   Q==;
+X-CSE-ConnectionGUID: PTPkkrJFRzKBOLksB45vrw==
+X-CSE-MsgGUID: Wa4jcpvrRsuvHCuRhbY+Bg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11518"; a="68522274"
+X-IronPort-AV: E=Sophos;i="6.17,278,1747724400"; 
+   d="scan'208";a="68522274"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Aug 2025 02:33:23 -0700
+X-CSE-ConnectionGUID: ChjIcq9uRiqfS25kma1ttA==
+X-CSE-MsgGUID: fZV0D7leSkWPSnEuoLxk8Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,278,1747724400"; 
+   d="scan'208";a="165517896"
+Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
+  by orviesa009.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Aug 2025 02:33:22 -0700
+Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26; Mon, 11 Aug 2025 02:33:22 -0700
+Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
+ FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26 via Frontend Transport; Mon, 11 Aug 2025 02:33:22 -0700
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (40.107.94.78) by
+ edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26; Mon, 11 Aug 2025 02:33:21 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=aDWDRtYSOJaFP96DlX8ZpH6KExqhlEIXbNlXFf8sqMIxFXWCd9VqDR0UEkBM7e3J+MF56ibHt++FrdUHacgEkppF025DuD20LL68Fdy/fPGibgTpnX5ZWcwbY13BmRgx/Y1xwjW4bGwfysgPZuSAq5+66OETLeaarNWEdJLNPLUOBeMBLps1pOggJZJsXIwuc5u1R/+ehk1oma3wUUWO26LOgf+RKfeWIXs2X3SCI9CNzjd3mCLab/u5/5bAQCZGX7IWoPMVu8412eL62am+Cb4RfEfA/OMB0kqg0vG2xM8yEUCfe91PthsqNXHwolCMpkOJyRb+i4/rpaustvB2QA==
+ b=hzWt0ApaFYatsqkodIX1/x5n2DJ++tXYAsJASW6A+7zr4hmwWfNJ5m1xsa19/IXv/W0L2OU9CEhXFtx2gND8LGMYToIue2cKMrxvDAf2lq9vjkDRZX3s/yNa7mRRSUJkiz1gJCJU+GvxQAm9hWfPhIJkCjYiktL/Yz2RNVDVDvlp40eBCbBeBbhHqaPCO98VGxhLFHpTq8TpUK6kn2iZgcX6trL7ORTSKLCLJIK3ogjXRn+M40SdnOsVjoHbCt55hDgg8+CVnuRy2oTSWF52+AIs64mmmaytxGor1COwgsPWNpkbfPkWBfjoca4LyLT+fzgF5BgspxnPdpq07KDYsg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=XPDfLyt/MPaUAMCoHLY3T7BwEtSKTurKhRPa+CQpITI=;
- b=n5qj+/iLpWJ51qyAjFRSZu1mkjciTnFImOWXUDzT6Nd0OVmjv/s54wvoQjhH67BhMWRID1msyjJCD+NF4uBqxgai97qkkeOP0Ik0Ky7iu5Ir8e6Q6ruvXdDKZo15DUsmJBptteex4fKIbY94woyyoc8Q6mZ6n1YtTrgGspCtjnlorSZpIEoGGWNGPW07XCzM19XI0VbeCTXSpPVxj7RcgLHyuuVzV2l8Q3IcWlKhmFWnxV1hDa+qUxxpSOs1w8BXjymBAKHDGoNe2GGPgcGvm7PPV1/T1CbNLqCuDbKMAo1IQE8XQqpLNRoQYimC8LggVdRiwdUN/nUlF7Q0xxt2WA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XPDfLyt/MPaUAMCoHLY3T7BwEtSKTurKhRPa+CQpITI=;
- b=cCQ3ND/BY6BuPE/cZ2JSFTmGQ8HCYkRtmSdzWmyoGCZLdRZ4vHxePDJBxpGh5TZ+1FQJPWKmotOf9pFG1sZB8s6H33Qej2HoqQ6Ld/UrD2cFTRzveohwkRXx3/E1s6S43u7OFguZzH2RQjXnffp1tnCgDYpwHtD0qgV25myzBUA=
-Received: from MN2PR12CA0027.namprd12.prod.outlook.com (2603:10b6:208:a8::40)
- by CH3PR12MB7498.namprd12.prod.outlook.com (2603:10b6:610:143::15) with
+ bh=51hevvZ6Vqk3rZwY1nERotVpDeJA5O9yGYk16WurQd8=;
+ b=Fp5MEpVcm+DsDd64gXqva9+hEvJI6gUNlrG4Ng6yO7Esk/WL9DAOEuonCFYTp54ZwXsVEbJ3x79dfMsmOONCAegyS2fErJ0Mg2pna49ufSFNnMqWEG2mz2riF22tfxBxZxxUJDdEZqYECrsxyDpPw37WNjMQSYnKkEZbECiD1zAsQ69HiQzSfyaNBX8tr2NrqQwUkyfvQKwUBpy3bKVFEaqrig3SlmPcMGIMz0Fc0+NExUrqMgZpAdolH0THZ3sqj4AroEEUpuvcjjHVTBlXiPIuFDpXnbsIY7E0bA+dS4QWrX9dQXUaRz8Y/RpRxH/KK6HlTrIhm5bZPjjG57oJAw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM3PR11MB8735.namprd11.prod.outlook.com (2603:10b6:0:4b::20) by
+ PH3PPFFA27DACA6.namprd11.prod.outlook.com (2603:10b6:518:1::d63) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9009.21; Mon, 11 Aug
- 2025 09:09:57 +0000
-Received: from BL02EPF00021F6A.namprd02.prod.outlook.com
- (2603:10b6:208:a8:cafe::7a) by MN2PR12CA0027.outlook.office365.com
- (2603:10b6:208:a8::40) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9009.21 via Frontend Transport; Mon,
- 11 Aug 2025 09:09:56 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BL02EPF00021F6A.mail.protection.outlook.com (10.167.249.6) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.9031.11 via Frontend Transport; Mon, 11 Aug 2025 09:09:56 +0000
-Received: from kaveri.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 11 Aug
- 2025 04:09:41 -0500
-From: Shivank Garg <shivankg@amd.com>
-To: <seanjc@google.com>, <david@redhat.com>, <vbabka@suse.cz>,
-	<willy@infradead.org>, <akpm@linux-foundation.org>, <shuah@kernel.org>,
-	<pbonzini@redhat.com>, <brauner@kernel.org>, <viro@zeniv.linux.org.uk>
-CC: <ackerleytng@google.com>, <paul@paul-moore.com>, <jmorris@namei.org>,
-	<serge@hallyn.com>, <pvorel@suse.cz>, <bfoster@redhat.com>,
-	<tabba@google.com>, <vannapurve@google.com>, <chao.gao@intel.com>,
-	<bharata@amd.com>, <nikunj@amd.com>, <michael.day@amd.com>,
-	<shdhiman@amd.com>, <yan.y.zhao@intel.com>, <Neeraj.Upadhyay@amd.com>,
-	<thomas.lendacky@amd.com>, <michael.roth@amd.com>, <aik@amd.com>,
-	<jgg@nvidia.com>, <kalyazin@amazon.com>, <peterx@redhat.com>,
-	<shivankg@amd.com>, <jack@suse.cz>, <rppt@kernel.org>, <hch@infradead.org>,
-	<cgzones@googlemail.com>, <ira.weiny@intel.com>, <rientjes@google.com>,
-	<roypat@amazon.co.uk>, <ziy@nvidia.com>, <matthew.brost@intel.com>,
-	<joshua.hahnjy@gmail.com>, <rakie.kim@sk.com>, <byungchul@sk.com>,
-	<gourry@gourry.net>, <kent.overstreet@linux.dev>,
-	<ying.huang@linux.alibaba.com>, <apopple@nvidia.com>,
-	<chao.p.peng@intel.com>, <amit@infradead.org>, <ddutile@redhat.com>,
-	<dan.j.williams@intel.com>, <ashish.kalra@amd.com>, <gshan@redhat.com>,
-	<jgowans@amazon.com>, <pankaj.gupta@amd.com>, <papaluri@amd.com>,
-	<yuzhao@google.com>, <suzuki.poulose@arm.com>, <quic_eberman@quicinc.com>,
-	<aneeshkumar.kizhakeveetil@arm.com>, <linux-fsdevel@vger.kernel.org>,
-	<linux-mm@kvack.org>, <linux-kernel@vger.kernel.org>,
-	<linux-security-module@vger.kernel.org>, <kvm@vger.kernel.org>,
-	<linux-kselftest@vger.kernel.org>, <linux-coco@lists.linux.dev>
-Subject: [PATCH RFC V10 7/7] KVM: guest_memfd: selftests: Add tests for mmap and NUMA policy support
-Date: Mon, 11 Aug 2025 09:06:09 +0000
-Message-ID: <20250811090605.16057-13-shivankg@amd.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250811090605.16057-2-shivankg@amd.com>
-References: <20250811090605.16057-2-shivankg@amd.com>
+ 2025 09:33:20 +0000
+Received: from DM3PR11MB8735.namprd11.prod.outlook.com
+ ([fe80::3225:d39b:ca64:ab95]) by DM3PR11MB8735.namprd11.prod.outlook.com
+ ([fe80::3225:d39b:ca64:ab95%4]) with mapi id 15.20.9009.018; Mon, 11 Aug 2025
+ 09:33:20 +0000
+Message-ID: <b1700dcb-7929-4973-a180-365c64711070@intel.com>
+Date: Mon, 11 Aug 2025 17:33:13 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests PATCH 2/2] nVMX: Test IA32_DEBUGCTLMSR behavior
+ on set and cleared save/load debug controls
+To: Xiaoyao Li <xiaoyao.li@intel.com>, Paolo Bonzini <pbonzini@redhat.com>
+CC: <kvm@vger.kernel.org>, Sean Christopherson <seanjc@google.com>
+References: <20250811063035.12626-1-chenyi.qiang@intel.com>
+ <20250811063035.12626-3-chenyi.qiang@intel.com>
+ <9f1ba406-7638-44e5-bf0d-8aa27be24a59@intel.com>
+Content-Language: en-US
+From: Chenyi Qiang <chenyi.qiang@intel.com>
+In-Reply-To: <9f1ba406-7638-44e5-bf0d-8aa27be24a59@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SG2PR01CA0157.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:28::13) To DM3PR11MB8735.namprd11.prod.outlook.com
+ (2603:10b6:0:4b::20)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL02EPF00021F6A:EE_|CH3PR12MB7498:EE_
-X-MS-Office365-Filtering-Correlation-Id: 31473fa7-8bfe-4f6a-a4fb-08ddd8b6d7a0
+X-MS-TrafficTypeDiagnostic: DM3PR11MB8735:EE_|PH3PPFFA27DACA6:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9079d0c8-6128-4ba0-5457-08ddd8ba1ba5
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|7416014|36860700013|82310400026|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?vjLIh5qPZ3GZBc1s5AAtnvzkJda+p+9yLObiZUQvf5SwPLtWpia5mK7+9PoE?=
- =?us-ascii?Q?QiU+ryVS8mnQa32iyqVXxc7fMMWnT+F4maZJKqK69l9ps0gfGIyB+yXflBLp?=
- =?us-ascii?Q?CotUoWI07qutKZUEYBf1jEF9RvQ0BpeEqemFNPR+q3vOMPpwBlphH84qJ+dX?=
- =?us-ascii?Q?U0QfdPR+aSUgZLWMJoiTPSIiMH1FF7H31w9YxFbPDOf3YkSoRTpUTmIXlxns?=
- =?us-ascii?Q?BKlzPbjKA7ymFnZA3TzplTR6EObtMl2maUGtjnduwNXdL+2aR4c817h51t4N?=
- =?us-ascii?Q?yy9qT48T0jMI5QAE2KrRIroGIQNoFvfHKqjFk1NxOwlTwSZplAXVyW65l8bK?=
- =?us-ascii?Q?fg/9XopPj80hQvLYrEqZ47Vn9ywHHpQ1yfl/gv5JExDu2cEgvU3rUVaShwy9?=
- =?us-ascii?Q?k4UGmbgN2J1QmwIkwygQFonX58ZqsQp/sEBQgaBtjCe93CYHKLeNg2++/Jjr?=
- =?us-ascii?Q?cpfXi0jzUj87wGr2g01cM+3fRolxSP9xCM5+HZp4t/Pfa3u7cG0DxSkOlrnD?=
- =?us-ascii?Q?OBymW44LlaQdhKBiliFlvYAj51atPhJpfI6kL/vAR4x/RnNVaYVgY1fFHlOt?=
- =?us-ascii?Q?gYbQxBM6JXnPc0OLhGcts5irhCtL8Ia9Hz84kR+/7jYiESCJTFWUKOmkA83g?=
- =?us-ascii?Q?jguJdUEvyJjFfpGVlhU90csI/62uvJUEPq6TwZgMX2UIz0culJb9udiDoymn?=
- =?us-ascii?Q?O51fHjKjR3n+qhykVv8R9cMJgx2G5TfduGjEw10I+zxi5k2mUoSEj+dnmvff?=
- =?us-ascii?Q?Tm6YNaMFgJhSHsynQQoasEfnyl/3Ah99G+BYfuaRVFPnbei0eFL2QVHtP76a?=
- =?us-ascii?Q?fuTfCjxZOm5uj/+5XU+eoHAnVEYgLDdg71o2OaGLr+pai0apFvEKycCmsYQK?=
- =?us-ascii?Q?MnVT6Rx/QLDjXtosuXZn4ckIzusCRH0tqHXqp3i7glY/x2InzOmxuyNuNu/3?=
- =?us-ascii?Q?XxzqzPLf9jsUZs9fCUrX+1UjUgMtfPY968IP1lNw6oUFLgX4y2wGoy0Jur9c?=
- =?us-ascii?Q?hmdRH7Uo7G5NL4nmRqt93rLQFdVgG4080w6P0naNyZCaiH90VFWLhQdhWT9U?=
- =?us-ascii?Q?8WtDK1zf7yWkjnP0L2/pUo3M5Ugx+N5WWN5dXHZbYZACEr75/H671yVTO6i6?=
- =?us-ascii?Q?+XgBnFv9HW3o7ZFrcBYi3wlxpUwsf/nSvh1FwdRW4UrcSY06s/Qyk+9kqJwU?=
- =?us-ascii?Q?+0Kk45fZb/7k57wNln4tY6AbMWYFEO+65t+ikvuH7YFTs2lUKNudvGDiEdjx?=
- =?us-ascii?Q?nnKRoz8sh/IXdmcOSbQXCnOP9CL1VI+oiOlqRkg/hBT1m1RVWHM2t/w+Vn2S?=
- =?us-ascii?Q?0IYc3htSwerbERLVgUj4og3+1QaWoLR2UJvlsQCs1+N4TaC5M21zUsBzqArU?=
- =?us-ascii?Q?Qgihd7eBcYmxiM3Iowzt8V1mW+/tQYzr6HqlvnORtW/nwm2qZzl2Db+uZpPV?=
- =?us-ascii?Q?//Ll4hkv3fVWvdm//5Bov3CoK7lnwXlcYmEhsuW+rDpRBMMUJTfU3NAwFkHR?=
- =?us-ascii?Q?v8l7DdiNZ89l1NvWKmq+H1dc3rNp+7HChAr3?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(7416014)(36860700013)(82310400026)(1800799024);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Aug 2025 09:09:56.9302
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?SWs3Z3NHOGlEVXlOYXhhbGpyTHV2VzFUZVFpK2JBZ0MxRkhkaVhscFltenpX?=
+ =?utf-8?B?cEpzVHF3dTNnRytIbmQzS0JIalFmZTV2K0VFQUF3c0phWElRNFhUZFhXTjNU?=
+ =?utf-8?B?eW1aWUc0WXFxZkU1SGNyZWFvRXZMbzdUVUc2S0dxOEV4bTF6b2p2NW8xWWxM?=
+ =?utf-8?B?V3NXOThmQjRoVDBjdWFFWEkwOFZzUWFHQ2FkY1dGYkxrelNSY2huNVI4UUNm?=
+ =?utf-8?B?eWZPcG5NRjdzTDVraHZZSThNVkw2dm01eEZZRUFUeHNXcXA1a2JPNng5QkFi?=
+ =?utf-8?B?Ykt5YUFIZW9idTRTTzFzVnNleXhqZVFmSUlzYVdEQXdRWkZ1bGhBVDNvelZn?=
+ =?utf-8?B?WUQxeEtzOHVYSlAvZWRxSnVkeVZvc1FLQ01XdmhrMVlKVkpsZU5UMFk0cTkv?=
+ =?utf-8?B?dFNOUU16clJNcW1LdWNXRmhqaWxxRU5qTm1hcmNkU0IzN2pqRkJ4b0lmZkVP?=
+ =?utf-8?B?WDZnQVIybmVqa3Y4WmxENDlqWkZFbjlpbWJZUjk1RktTVlQ4SzE1emxweXNW?=
+ =?utf-8?B?RnlPMTAvdXBqQ3lTbGNvWWM1MC9XYnRmQTlEY0w1QUZ6MnVaSmxFVXRnb2dt?=
+ =?utf-8?B?dWlBMStJaVoyV2hzaFp2QWhyelBIS1A0MHlycEJvRDM1VDJKYWIvcm5Ia0pF?=
+ =?utf-8?B?eDdyZlNwVTU1ekU0WS9jaGNKNVY1WkRlaVNjbitaQkdhR0h1UVl2c3BTTGg2?=
+ =?utf-8?B?VjJBQmlmTWpIZzllYldtSEwraVkvaFpGMHlkUHlqQVVJRDNBWUpNQ0htb21h?=
+ =?utf-8?B?SDh6N2dydUhvaW9qK1Y4Sll3bGtqZUxpQWFDR1lVTXNuaFQwUStFRnFEbWxt?=
+ =?utf-8?B?aGp5a0Fpd3ZSSENYMG9JMDRWWXNWWHFxM3IzaUlNdm51S2lWWTFvNkJRRTVG?=
+ =?utf-8?B?eGp0aUpxdEx1Z21NSHdDVEtyeDdONFdtNlZLNGdsK2RZdWZ4VjdhMDdXbm9z?=
+ =?utf-8?B?aFBzMndQNlMxQnFRUHNnTnNNWlZKMkNrYUdaV0dpNVdjZUd3NnlVRmdUVklx?=
+ =?utf-8?B?SWJMeWloU2R1RWNZdjM3UUVpK2FuMHVXcWpZWDJ6QmVvWk52ZWIvYVQwcGZB?=
+ =?utf-8?B?YUhXaXE0T05XYTZYNWloQy8wUm8rQzdwYVB3UW1xL09odG9KWWJzOEE0L2V1?=
+ =?utf-8?B?WHpmNW55Q1hxRUVoSExLTnRXQ2lKQlRXRGwxQmxvalgxN2RtenV0ak1BWjVP?=
+ =?utf-8?B?NG83M2UxMnNSakY1amdDbDBXeGxLUU96eGFTRTJhRWlaZDFxdkdLRG9LQytQ?=
+ =?utf-8?B?WUwvOTBzaUsyMWYxRXZVTW1wVzZPcFhYbG44Z3dKbnVqemhmZDVVcXlRdFlN?=
+ =?utf-8?B?SG9rWi9tbEFNUGtwQTlTTUhQTzNUVEpOWjVoVHByNnBPcDRJWjFmRWJKckdo?=
+ =?utf-8?B?ZnJSY1RLZWZZM09sTWRKSm4yKzBWSGI3RWFLb1EvL0JrNHFSVkVvbUJKUjZw?=
+ =?utf-8?B?ODhpbnN2M2IrM3pSdkh0L21EbHMxNHQvbjFSSWZIOFJXVzRiZ0hPRXI3UHNn?=
+ =?utf-8?B?OUdWbGVlR2E1UEd3Y3d2M3NWV3VFN2JiZnExemw5V240K2RwMHZPaGd6eE43?=
+ =?utf-8?B?Vmc4eXBzUUZuM0JYQUhQcHlNcGFuenRYQ0Q1dVdwUEtaMWwrNkhnT2d6czJK?=
+ =?utf-8?B?enJYcHhoVXpJU0pYZy9FTHVBaUhJMStOUVIzTVVxdC9VUmlQNmhaZTB5Ulps?=
+ =?utf-8?B?WEhMc1lIWjRzaDdxak40T3gvVnI2bTh1SVpjSlFtUHNKQ0JpSm5qbzQ2L25B?=
+ =?utf-8?B?K25RaGlJM0xGUnkvaEFDb2dBMStMdXRLRkhiK2RTT1k5TmduS0psU0s5N09M?=
+ =?utf-8?B?OW1TRHJVVk1KMGxmbExiK3RRbW1wdnYxVDF5Nm9ZUVNsSlZpdExad05CWWV5?=
+ =?utf-8?B?bm11d1BXOEwvdSsyZDhOaHNrMTdUY2dFVUlZYXBuV2tId05KSUxRRWM4bS9h?=
+ =?utf-8?Q?uhKAmZT9gUw=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM3PR11MB8735.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TDNZV2ttQytjejF3VFU3a1JoZDVCQ2c5T0x0RFlST29QNDUvOWlwU1FzSHlK?=
+ =?utf-8?B?UmF6a3NIaGxjOXRlSEQ3SXczYW5rM1F2azJvTzhUdkJ2RFpnbnY1U3hNSHVU?=
+ =?utf-8?B?VHNvVEdUeVlvc3orZldrZDkvV3pZM0NyZEVsRHBzay95ajhUdysxYTgzZXY0?=
+ =?utf-8?B?Q05qbkJ3OXNTRi9JT2l0bGtITjlIT0tPbVU2OElGR2NPai9UbG8za1BqS2lL?=
+ =?utf-8?B?dW4vYUZDVnJxazFON0V6akpuVDN5OEtKclAyVGxlS2tnZi9TamlOSmUxS1I3?=
+ =?utf-8?B?cUxSVmhXamZ6SHJNeHhZbVU4NklwNURUUENXaEpadHl2WkU2TDQrTmhJdGpN?=
+ =?utf-8?B?ZTJaNEpSWkgreXVoMXU1RllTN3pOZzZEUzhKV2h6c0l4TDMxdzRvcEtRRUlB?=
+ =?utf-8?B?VmZmSm5QRFJpZk00NlVPSCtrd1hkUXhXWVhkQlhrbThSeUsrQ1o5Y2laU05u?=
+ =?utf-8?B?aVpaR3U2dm5yUms0V2Zma1lOajR6TktwUHhqUXVwMDNodW9MWXdqVk5UUmNK?=
+ =?utf-8?B?V0dJTXhON1VGUXhwZ2xHdndTUUVHWXVic3ZZUDEydUdVdm51Y3VwSDVrQklv?=
+ =?utf-8?B?ZDh3QXhSbEw2Ym5kSEsrSHlrbnlSU2U4NzAraVk3ckRwTEpNaTBMSmhrVmN2?=
+ =?utf-8?B?RzBzYnV2aDhtcG44TDVEdUd6SzdlUG5YZHlrdnhQelE0empjTHE1czJHUXg0?=
+ =?utf-8?B?WVJyamgwY0NXcHhEVlRaOEhEczBHVm55TDdhOFVEYXk5SkVMbWgySE0rQnN2?=
+ =?utf-8?B?RW9yWG9wSDRIOXd0MUhqSDZGdE5WbTlTV3g2bGpFQldHeUNEWWdIMW9STFFz?=
+ =?utf-8?B?OHA3T3RlVDRBZGw1ejBKT2dqN0FDaHI0SUo2V2Q1dG5MWWhaTmttR29qRGMr?=
+ =?utf-8?B?aUZQd0hIT1hLeXlWQWVOZGhxYzEvaEJNdEV6THg4MGJRK0E0RXdLekhlZ0pz?=
+ =?utf-8?B?OXUrZ0NHY2dQTWJ6bzVCWnViMEdLQno4TTBWeHRmcGZsYVVUMUJQRURIeGNW?=
+ =?utf-8?B?endmUkpaL2pkWWVzSHN4Qm92ZGVqYzdMd2ZQS0MvbWlFemtzVnBvRnVGeHJM?=
+ =?utf-8?B?N1pTUk90YXd4WEY2V0taeWtaSWhTZjB0aWFxdFBnbXRjaHZuNFZrc3lMMmZX?=
+ =?utf-8?B?Y2hqVjFIa0d0cUxmZC9saHdrUmZvWEM3Rm5TYnZtVjFUMTJNQ1p6SmZObFpp?=
+ =?utf-8?B?Y21MVFFoZmRTOVQ3K2ZqWFpnWFNPc1NkL3JpajY1OWRnWmhTQnF2R0RhTVZC?=
+ =?utf-8?B?b0N2M3VsYXZ1MisvZDF4dnJzRWhsb05JRXRvaXN5aEdwZ3dtcTN1RmNQSHN2?=
+ =?utf-8?B?Rkl2NitLTDYvUWdiNW9naWEyeVlVc2JLUC8wNlFPQ3kwOTM1MWJ1L0E2M1E1?=
+ =?utf-8?B?aFpyUlFYYnVFc01YWEprRkFvRlJqYjV5dXFid25VNmdtQWtjejhQUkZoMEdx?=
+ =?utf-8?B?R0JrbDVNd2ZRZGx5WXZPbUdQM3FCYkZzbUIybjJ3SXFFdkdMZ25kR2lVeU9M?=
+ =?utf-8?B?dDFWd3NXbEh2WkJCcDBlb3VoZlcrL1hNV2pLNTcvVmxoZUNnUVlTWVBMeCtr?=
+ =?utf-8?B?OG5kTTR6R0w0MUlkTWVLUVZxaktza0hnT0xuV2s4OURkOGF0UHJUUW5vUGFI?=
+ =?utf-8?B?c0kvQU90UGRMeFFJNVNmM0pPUERXckdQeWtBdG1OdFJXaVZWa0duSDMxY0NR?=
+ =?utf-8?B?M2NWNGNGZUdaTE9walFSaHJhNVREWldGeVdxbkNJZ3liTFJNeFNrM2FVS2NG?=
+ =?utf-8?B?NC85aHpzSXhua3NOdXpWdkdPSVY0c1B6Y0VqRTlaa3V4azdMY3p5Y0xobWNC?=
+ =?utf-8?B?c2R5eUw3YlFIRFBLeFdPOXpOS3pldW9rR0psM1d6QXMrL21lcHRzamMwWWNI?=
+ =?utf-8?B?UXNnUHpaK1FiSUdXeEZOaVZFU1dEUThQYnkwVCtzcHExV29RaXNyVUN1N1pC?=
+ =?utf-8?B?TzhhWEFUSWRCcm03MFFDTkF5ZHdzMEpxNnRXNDhSaVhvZkQ0NUdBMTAwb0xJ?=
+ =?utf-8?B?ZEpOdFN5R2QxdU15MXVzMVdSalg2OHdad2tPVW03SWF1Qk9wUmFqcXlXWDMr?=
+ =?utf-8?B?dmM5YUQ4ZGxIQTRwOXRPRU8rUHcxdjZ5SzYyNHdqUU9aVlI4VVVDemt0b3pI?=
+ =?utf-8?B?MVZ2dE1BZTYwaERIckdKRU9BQW9iWVlwY2crTkRpdGdQeEJyeElPaEU5Y1E5?=
+ =?utf-8?B?cWc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9079d0c8-6128-4ba0-5457-08ddd8ba1ba5
+X-MS-Exchange-CrossTenant-AuthSource: DM3PR11MB8735.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Aug 2025 09:33:20.0122
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 31473fa7-8bfe-4f6a-a4fb-08ddd8b6d7a0
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BL02EPF00021F6A.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB7498
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: oHiTe3ASeeW+UuhdfzJiB+kSs06VUtu+A/BlfZ0CoZuYkHuaQgvI6OOOJ5g8pe8YpFCIHerAzJ44lNBLj1EBvw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH3PPFFA27DACA6
+X-OriginatorOrg: intel.com
 
-Add tests for NUMA memory policy binding and NUMA aware allocation in
-guest_memfd. This extends the existing selftests by adding proper
-validation for:
-- KVM GMEM set_policy and get_policy() vm_ops functionality using
-  mbind() and get_mempolicy()
-- NUMA policy application before and after memory allocation
 
-These tests help ensure NUMA support for guest_memfd works correctly.
 
-Signed-off-by: Shivank Garg <shivankg@amd.com>
----
- tools/testing/selftests/kvm/Makefile.kvm      |   1 +
- .../testing/selftests/kvm/guest_memfd_test.c  | 121 ++++++++++++++++++
- 2 files changed, 122 insertions(+)
+On 8/11/2025 3:47 PM, Xiaoyao Li wrote:
+> On 8/11/2025 2:30 PM, Chenyi Qiang wrote:
+>> Besides the existing DR7 test on debug controls, introduce a similar
+>> separate test for IA32_DEBUGCTLMSR.
+>>
+>> Previously, the IA32_DEBUGCTLMSR was combined with the DR7 test. However,
+>> it attempted to access the LBR and BTF bits in the MSR which can be
+>> invalid. Although KVM will exempt these two bits from validity check,
+>> they will be cleared and resulted in the unexpected MSR value.
+> 
+> Initially, LBR (bit 0) and BTF(bit 1) have been allowed to write by the guest but the value are dropped, as the workaround to not break some OS that writes to the MSR unconditionally.
+> 
+> BTF never gets supported by KVM. While LBR gained support but it depends on PMU and LBR being exposed to the guest, which requires additional parameters to the test configuration.
+> 
+> On the other hand, DEBUGCTLMSR_BUS_LOCK_DETECT chosen by this patch doesn't require additional parameter, but it requires the hardware support of the feature. IIRC, it needs to be SPR and later. So it has less coverage of hardwares than LBR.
 
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index 90f03f00cb04..c46cef2a7cd7 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -275,6 +275,7 @@ pgste-option = $(call try-run, echo 'int main(void) { return 0; }' | \
- 	$(CC) -Werror -Wl$(comma)--s390-pgste -x c - -o "$$TMP",-Wl$(comma)--s390-pgste)
- 
- LDLIBS += -ldl
-+LDLIBS += -lnuma
- LDFLAGS += -pthread $(no-pie-option) $(pgste-option)
- 
- LIBKVM_C := $(filter %.c,$(LIBKVM))
-diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
-index b86bf89a71e0..4d33c225d9f7 100644
---- a/tools/testing/selftests/kvm/guest_memfd_test.c
-+++ b/tools/testing/selftests/kvm/guest_memfd_test.c
-@@ -7,6 +7,8 @@
- #include <stdlib.h>
- #include <string.h>
- #include <unistd.h>
-+#include <numa.h>
-+#include <numaif.h>
- #include <errno.h>
- #include <stdio.h>
- #include <fcntl.h>
-@@ -19,6 +21,7 @@
- #include <sys/mman.h>
- #include <sys/types.h>
- #include <sys/stat.h>
-+#include <sys/syscall.h>
- 
- #include "kvm_util.h"
- #include "test_util.h"
-@@ -72,6 +75,122 @@ static void test_mmap_supported(int fd, size_t page_size, size_t total_size)
- 	TEST_ASSERT(!ret, "munmap() should succeed.");
- }
- 
-+#define TEST_REQUIRE_NUMA_MULTIPLE_NODES()	\
-+	TEST_REQUIRE(numa_available() != -1 && numa_max_node() >= 1)
-+
-+static void test_mbind(int fd, size_t page_size, size_t total_size)
-+{
-+	unsigned long nodemask = 1; /* nid: 0 */
-+	unsigned long maxnode = 8;
-+	unsigned long get_nodemask;
-+	int get_policy;
-+	char *mem;
-+	int ret;
-+
-+	TEST_REQUIRE_NUMA_MULTIPLE_NODES();
-+
-+	mem = mmap(NULL, total_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-+	TEST_ASSERT(mem != MAP_FAILED, "mmap for mbind test should succeed");
-+
-+	/* Test MPOL_INTERLEAVE policy */
-+	ret = syscall(__NR_mbind, mem, page_size * 2, MPOL_INTERLEAVE,
-+		      &nodemask, maxnode, 0);
-+	TEST_ASSERT(!ret, "mbind with INTERLEAVE to node 0 should succeed");
-+	ret = syscall(__NR_get_mempolicy, &get_policy, &get_nodemask,
-+		      maxnode, mem, MPOL_F_ADDR);
-+	TEST_ASSERT(!ret && get_policy == MPOL_INTERLEAVE && get_nodemask == nodemask,
-+		    "Policy should be MPOL_INTERLEAVE and nodes match");
-+
-+	/* Test basic MPOL_BIND policy */
-+	ret = syscall(__NR_mbind, mem + page_size * 2, page_size * 2, MPOL_BIND,
-+		      &nodemask, maxnode, 0);
-+	TEST_ASSERT(!ret, "mbind with MPOL_BIND to node 0 should succeed");
-+	ret = syscall(__NR_get_mempolicy, &get_policy, &get_nodemask,
-+		      maxnode, mem + page_size * 2, MPOL_F_ADDR);
-+	TEST_ASSERT(!ret && get_policy == MPOL_BIND && get_nodemask == nodemask,
-+		    "Policy should be MPOL_BIND and nodes match");
-+
-+	/* Test MPOL_DEFAULT policy */
-+	ret = syscall(__NR_mbind, mem, total_size, MPOL_DEFAULT, NULL, 0, 0);
-+	TEST_ASSERT(!ret, "mbind with MPOL_DEFAULT should succeed");
-+	ret = syscall(__NR_get_mempolicy, &get_policy, &get_nodemask,
-+		      maxnode, mem, MPOL_F_ADDR);
-+	TEST_ASSERT(!ret && get_policy == MPOL_DEFAULT && get_nodemask == 0,
-+		    "Policy should be MPOL_DEFAULT and nodes zero");
-+
-+	/* Test with invalid policy */
-+	ret = syscall(__NR_mbind, mem, page_size, 999, &nodemask, maxnode, 0);
-+	TEST_ASSERT(ret == -1 && errno == EINVAL,
-+		    "mbind with invalid policy should fail with EINVAL");
-+
-+	TEST_ASSERT(munmap(mem, total_size) == 0, "munmap should succeed");
-+}
-+
-+static void test_numa_allocation(int fd, size_t page_size, size_t total_size)
-+{
-+	unsigned long node0_mask = 1;  /* Node 0 */
-+	unsigned long node1_mask = 2;  /* Node 1 */
-+	unsigned long maxnode = 8;
-+	void *pages[4];
-+	int status[4];
-+	char *mem;
-+	int ret, i;
-+
-+	TEST_REQUIRE_NUMA_MULTIPLE_NODES();
-+
-+	/* Clean slate: deallocate all file space, if any */
-+	ret = fallocate(fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE, 0, total_size);
-+	TEST_ASSERT(!ret, "fallocate(PUNCH_HOLE) should succeed");
-+
-+	mem = mmap(NULL, total_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-+	TEST_ASSERT(mem != MAP_FAILED, "mmap should succeed");
-+
-+	for (i = 0; i < 4; i++)
-+		pages[i] = (char *)mem + page_size * i;
-+
-+	/* Set NUMA policy after allocation */
-+	memset(mem, 0xaa, page_size);
-+	ret = syscall(__NR_mbind, pages[0], page_size, MPOL_BIND, &node0_mask, maxnode, 0);
-+	TEST_ASSERT(!ret, "mbind after allocation page 0 to node 0 should succeed");
-+	ret = fallocate(fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE, 0, page_size);
-+	TEST_ASSERT(!ret, "fallocate(PUNCH_HOLE) should succeed");
-+
-+	/* Set NUMA policy before allocation */
-+	ret = syscall(__NR_mbind, pages[0], page_size * 2, MPOL_BIND, &node1_mask, maxnode, 0);
-+	TEST_ASSERT(!ret, "mbind page 0, 1 to node 1 should succeed");
-+	ret = syscall(__NR_mbind, pages[2], page_size * 2, MPOL_BIND, &node0_mask, maxnode, 0);
-+	TEST_ASSERT(!ret, "mbind page 2, 3 to node 0 should succeed");
-+	memset(mem, 0xaa, total_size);
-+
-+	/* Validate if pages are allocated on specified NUMA nodes */
-+	ret = syscall(__NR_move_pages, 0, 4, pages, NULL, status, 0);
-+	TEST_ASSERT(ret >= 0, "move_pages should succeed for status check");
-+	TEST_ASSERT(status[0] == 1, "Page 0 should be allocated on node 1");
-+	TEST_ASSERT(status[1] == 1, "Page 1 should be allocated on node 1");
-+	TEST_ASSERT(status[2] == 0, "Page 2 should be allocated on node 0");
-+	TEST_ASSERT(status[3] == 0, "Page 3 should be allocated on node 0");
-+
-+	/* Punch hole for all pages */
-+	ret = fallocate(fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE, 0, total_size);
-+	TEST_ASSERT(!ret, "fallocate(PUNCH_HOLE) should succeed");
-+
-+	/* Change NUMA policy nodes and reallocate */
-+	ret = syscall(__NR_mbind, pages[0], page_size * 2, MPOL_BIND, &node0_mask, maxnode, 0);
-+	TEST_ASSERT(!ret, "mbind page 0, 1 to node 0 should succeed");
-+	ret = syscall(__NR_mbind, pages[2], page_size * 2, MPOL_BIND, &node1_mask, maxnode, 0);
-+	TEST_ASSERT(!ret, "mbind page 2, 3 to node 1 should succeed");
-+	memset(mem, 0xaa, total_size);
-+
-+	ret = syscall(__NR_move_pages, 0, 4, pages, NULL, status, 0);
-+	TEST_ASSERT(ret >= 0, "move_pages should succeed after reallocation");
-+	TEST_ASSERT(status[0] == 0, "Page 0 should be allocated on node 0");
-+	TEST_ASSERT(status[1] == 0, "Page 1 should be allocated on node 0");
-+	TEST_ASSERT(status[2] == 1, "Page 2 should be allocated on node 1");
-+	TEST_ASSERT(status[3] == 1, "Page 3 should be allocated on node 1");
-+
-+	TEST_ASSERT(munmap(mem, total_size) == 0, "munmap should succeed");
-+}
-+
- static sigjmp_buf jmpbuf;
- void fault_sigbus_handler(int signum)
- {
-@@ -286,6 +405,8 @@ static void test_guest_memfd(unsigned long vm_type)
- 	if (flags & GUEST_MEMFD_FLAG_MMAP) {
- 		test_mmap_supported(fd, page_size, total_size);
- 		test_fault_overflow(fd, page_size, total_size);
-+		test_mbind(fd, page_size, total_size);
-+		test_numa_allocation(fd, page_size, total_size);
- 	} else {
- 		test_mmap_not_supported(fd, page_size, total_size);
+Yes, and DEBUGCTLMSR_RTM_DEBUG can also support in earlier platform but it becomes valid recently..
+
+I looked at my test code again. It seems it loses some test scope. i.e. DEBUGCTLMSR: Save debug controls
+I missed to do wrmsr(DEBUGCTLMSR) with a different value in L2, so it cannot distinguish if vmcs12->debugctl comes from the original one or the debugctls saved one.
+wrmsr(DEBUGCTLMSR) to 0 is not appropriate because we need to check if VM exit resets the debugctl msr value.
+
+Maybe swapping the value of vmcs_write(GUEST_DEBUGCTL) and wrmsr(DEBUGCTLMSR) is a resolution.
+
+diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+index 9a2e598f..6dd1735d 100644
+--- a/x86/vmx_tests.c
++++ b/x86/vmx_tests.c
+@@ -1953,8 +1953,8 @@ static int dbgctls_msr_init(struct vmcs *vmcs)
  	}
--- 
-2.43.0
+ 
+ 	msr_bmp_init();
+-	wrmsr(MSR_IA32_DEBUGCTLMSR, 0x0);
+-	vmcs_write(GUEST_DEBUGCTL, 0x4);
++	wrmsr(MSR_IA32_DEBUGCTLMSR, 0x4);
++	vmcs_write(GUEST_DEBUGCTL, 0x0);
+ 
+ 	vmcs_write(ENT_CONTROLS, vmcs_read(ENT_CONTROLS) | ENT_LOAD_DBGCTLS);
+ 	vmcs_write(EXI_CONTROLS, vmcs_read(EXI_CONTROLS) | EXI_SAVE_DBGCTLS);
+@@ -1967,8 +1967,9 @@ static void dbgctls_msr_main(void)
+ 	u64 debugctl;
+ 
+ 	debugctl = rdmsr(MSR_IA32_DEBUGCTLMSR);
+-	report(debugctl == 0x4, "DEBUGCTLMSR: Load debug controls");
++	report(debugctl == 0x0, "DEBUGCTLMSR: Load debug controls");
+ 
++	wrmsr(MSR_IA32_DEBUGCTLMSR, 0x4);
+ 	vmx_set_test_stage(0);
+ 	vmcall();
+ 	report(vmx_get_test_stage() == 1, "DEBUGCTLMSR: Save debug controls");
+@@ -1982,7 +1983,7 @@ static void dbgctls_msr_main(void)
+ 	vmcall();
+ 
+ 	debugctl = rdmsr(MSR_IA32_DEBUGCTLMSR);
+-	report(debugctl == 0x0,
++	report(debugctl == 0x4,
+ 	       "DEBUGCTLMSR: Guest=host debug controls");
+ 
+ 	vmx_set_test_stage(3);
+@@ -2007,8 +2008,8 @@ static int dbgctls_msr_exit_handler(union exit_reason exit_reason)
+ 				vmx_inc_test_stage();
+ 			break;
+ 		case 2:
+-			wrmsr(MSR_IA32_DEBUGCTLMSR, 0x0);
+-			vmcs_write(GUEST_DEBUGCTL, 0x4);
++			wrmsr(MSR_IA32_DEBUGCTLMSR, 0x4);
++			vmcs_write(GUEST_DEBUGCTL, 0x0);
+ 
+ 			vmcs_write(ENT_CONTROLS,
+ 				vmcs_read(ENT_CONTROLS) & ~ENT_LOAD_DBGCTLS);
+@@ -2017,7 +2018,7 @@ static int dbgctls_msr_exit_handler(union exit_reason exit_reason)
+ 			break;
+ 		case 3:
+ 			if (debugctl == 0 &&
+-			    vmcs_read(GUEST_DEBUGCTL) == 0x4)
++			    vmcs_read(GUEST_DEBUGCTL) == 0x0)
+ 				vmx_inc_test_stage();
+ 			break;
+ 		}
+
+> 
+> I'm not sure the preference of Sean/Paolo. Let's see what they would say.
+> 
+>> In this new test, access a valid bit (DEBUGCTLMSR_BUS_LOCK_DETECT, bit 2)
+>> based on the enumration of Bus Lock Detect.
+>>
+>> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
+>> ---
+>>   x86/vmx_tests.c | 88 +++++++++++++++++++++++++++++++++++++++++++++++++
+>>   1 file changed, 88 insertions(+)
+>>
+>> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+>> index 1832bda3..9a2e598f 100644
+>> --- a/x86/vmx_tests.c
+>> +++ b/x86/vmx_tests.c
+>> @@ -1944,6 +1944,92 @@ static int dbgctls_dr7_exit_handler(union exit_reason exit_reason)
+>>       return VMX_TEST_VMEXIT;
+>>   }
+>>   +static int dbgctls_msr_init(struct vmcs *vmcs)
+>> +{
+>> +    /* Check for DEBUGCTLMSR_BUS_LOCK_DETECT(bit 2) in IA32_DEBUGCTLMSR */
+>> +    if (!(cpuid(7).c & (1 << 24))) {
+>> +        report_skip("%s : \"Bus Lock Detect\" not supported", __func__);
+>> +        return VMX_TEST_VMSKIP;
+>> +    }
+>> +
+>> +    msr_bmp_init();
+>> +    wrmsr(MSR_IA32_DEBUGCTLMSR, 0x0);
+>> +    vmcs_write(GUEST_DEBUGCTL, 0x4);
+>> +
+>> +    vmcs_write(ENT_CONTROLS, vmcs_read(ENT_CONTROLS) | ENT_LOAD_DBGCTLS);
+>> +    vmcs_write(EXI_CONTROLS, vmcs_read(EXI_CONTROLS) | EXI_SAVE_DBGCTLS);
+>> +
+>> +    return VMX_TEST_START;
+>> +}
+>> +
+>> +static void dbgctls_msr_main(void)
+>> +{
+>> +    u64 debugctl;
+>> +
+>> +    debugctl = rdmsr(MSR_IA32_DEBUGCTLMSR);
+>> +    report(debugctl == 0x4, "DEBUGCTLMSR: Load debug controls");
+>> +
+>> +    vmx_set_test_stage(0);
+>> +    vmcall();
+>> +    report(vmx_get_test_stage() == 1, "DEBUGCTLMSR: Save debug controls");
+>> +
+>> +    if (ctrl_enter_rev.set & ENT_LOAD_DBGCTLS ||
+>> +        ctrl_exit_rev.set & EXI_SAVE_DBGCTLS) {
+>> +        printf("\tDebug controls are always loaded/saved\n");
+>> +        return;
+>> +    }
+>> +    vmx_set_test_stage(2);
+>> +    vmcall();
+>> +
+>> +    debugctl = rdmsr(MSR_IA32_DEBUGCTLMSR);
+>> +    report(debugctl == 0x0,
+>> +           "DEBUGCTLMSR: Guest=host debug controls");
+>> +
+>> +    vmx_set_test_stage(3);
+>> +    vmcall();
+>> +    report(vmx_get_test_stage() == 4, "DEBUGCTLMSR: Don't save debug controls");
+>> +}
+>> +
+>> +static int dbgctls_msr_exit_handler(union exit_reason exit_reason)
+>> +{
+>> +    u32 insn_len = vmcs_read(EXI_INST_LEN);
+>> +    u64 guest_rip = vmcs_read(GUEST_RIP);
+>> +    u64 debugctl;
+>> +
+>> +    debugctl = rdmsr(MSR_IA32_DEBUGCTLMSR);
+>> +
+>> +    switch (exit_reason.basic) {
+>> +    case VMX_VMCALL:
+>> +        switch (vmx_get_test_stage()) {
+>> +        case 0:
+>> +            if (debugctl == 0 &&
+>> +                vmcs_read(GUEST_DEBUGCTL) == 0x4)
+>> +                vmx_inc_test_stage();
+>> +            break;
+>> +        case 2:
+>> +            wrmsr(MSR_IA32_DEBUGCTLMSR, 0x0);
+>> +            vmcs_write(GUEST_DEBUGCTL, 0x4);
+>> +
+>> +            vmcs_write(ENT_CONTROLS,
+>> +                vmcs_read(ENT_CONTROLS) & ~ENT_LOAD_DBGCTLS);
+>> +            vmcs_write(EXI_CONTROLS,
+>> +                vmcs_read(EXI_CONTROLS) & ~EXI_SAVE_DBGCTLS);
+>> +            break;
+>> +        case 3:
+>> +            if (debugctl == 0 &&
+>> +                vmcs_read(GUEST_DEBUGCTL) == 0x4)
+>> +                vmx_inc_test_stage();
+>> +            break;
+>> +        }
+>> +        vmcs_write(GUEST_RIP, guest_rip + insn_len);
+>> +        return VMX_TEST_RESUME;
+>> +    default:
+>> +        report_fail("Unknown exit reason, %d", exit_reason.full);
+>> +        print_vmexit_info(exit_reason);
+>> +    }
+>> +    return VMX_TEST_VMEXIT;
+>> +}
+>> +
+>>   struct vmx_msr_entry {
+>>       u32 index;
+>>       u32 reserved;
+>> @@ -11386,6 +11472,8 @@ struct vmx_test vmx_tests[] = {
+>>           nmi_hlt_exit_handler, NULL, {0} },
+>>       { "debug controls dr7", dbgctls_dr7_init, dbgctls_dr7_main, dbgctls_dr7_exit_handler,
+>>           NULL, {0} },
+>> +    { "debug controls msr", dbgctls_msr_init, dbgctls_msr_main, dbgctls_msr_exit_handler,
+>> +        NULL, {0} },
+>>       { "MSR switch", msr_switch_init, msr_switch_main,
+>>           msr_switch_exit_handler, NULL, {0}, msr_switch_entry_failure },
+>>       { "vmmcall", vmmcall_init, vmmcall_main, vmmcall_exit_handler, NULL, {0} },
+> 
 
 
