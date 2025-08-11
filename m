@@ -1,101 +1,169 @@
-Return-Path: <kvm+bounces-54361-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54362-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F1D6B1FDEE
-	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 04:39:09 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 659B6B1FEFE
+	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 08:11:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 45E11177A44
-	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 02:39:09 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 50CB14E2058
+	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 06:11:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBAA4247295;
-	Mon, 11 Aug 2025 02:39:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52BF328136E;
+	Mon, 11 Aug 2025 06:11:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="xjJB0Zvo"
 X-Original-To: kvm@vger.kernel.org
-Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AC29EACD;
-	Mon, 11 Aug 2025 02:38:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0CA04A1E;
+	Mon, 11 Aug 2025 06:11:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754879940; cv=none; b=CILFiv6anTUTIEPOVrxHjn2SPqBNib/g3qBgpSc0nSf/CxcGhkq+vn52lSSqqo7JskMDffJGCR7jzue4L9ElgmbL5DClb1r6llMG4bkkz8ZwUtUc6SCed4xq/9sKZ6gI3xlSMl1qYNgE8VEg1CjVkpa781gVPyyXAanJuWed9Xs=
+	t=1754892677; cv=none; b=Bb0MiDe78Yl/XTANetLAK4JMw8GIuJhtBpJpxJGnu+gbqlOWnSNtuNbdPzb/PpPkgIwxrqePFk4/F7HI90EXvM3rVEJ1XumL0x5ISK0VgeZmKXoHZOrIveHoViP+s3oEdBJeH6lqeWo/7iuWVZrdNP6uRTrOdTwv7qloYoUkAu4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754879940; c=relaxed/simple;
-	bh=PJuRgG4SSRo1FworDmipCx11eVm/SkRxlQjHQ+0c1pE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GLbmKxTUxFjI+X65Mqzx3fmRbsNQ44jtuUOW7rpG82rhEFRm+d9jsCJnZxELlrc7Jw3e712UvVN1etkyVkHdVuxdiTx7/Z/950/t2VRpzm/0mkN38wF4eBwHXXUqdfDjq6wqNDfm0QvRqwnepE593joKtAEP+4bHU9es/xMEc4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from zq-Legion-Y7000.. (unknown [121.237.92.164])
-	by APP-01 (Coremail) with SMTP id qwCowAC3pamoVZlo_2nRCg--.21035S2;
-	Mon, 11 Aug 2025 10:30:01 +0800 (CST)
-From: zhouquan@iscas.ac.cn
+	s=arc-20240116; t=1754892677; c=relaxed/simple;
+	bh=6hqcPbd7JFKtnFbKjHcwWnMw1ub/LOP3ATYUlk08Pdw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=jfBYYjH4oo4dSlS0CsUY9L+tPjU7HKfEW4d/vzT9UqeGAQ0EkokThW96Bne8KzGS8Fi9hpYZ9mgW0nlUkTOTvWRb8hc+RsyO4aWsDpeR6P13qaeX68GPzH8M/w8GG9awO9CgveVjk8ADC/OHaZ7P+So6vDzRBJcxhAtzaqZd9pI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=xjJB0Zvo; arc=none smtp.client-ip=115.124.30.119
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1754892672; h=From:To:Subject:Date:Message-Id:MIME-Version:Content-Type;
+	bh=pfo4fLXCv/YFjfBLeg1Ugb9O4azX99/n6lssJeAyHo0=;
+	b=xjJB0Zvof9D9CdZQINE/GYup6ok+QPlQ7UHNl40Qwj4Ce6UfOlEENUcB4we+UErlYho3UbYs/5LU60outimazYgghsQuApiiqWf1dxKndJE5qWYEWdaP1Ur0IgdwW/hJ3rVis4PzwI7feLjYwB+0ODbZCgIiHjmFM0dSggNcGpo=
+Received: from localhost.localdomain(mailfrom:fangyu.yu@linux.alibaba.com fp:SMTPD_---0WlP-v7S_1754892668 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Mon, 11 Aug 2025 14:11:10 +0800
+From: fangyu.yu@linux.alibaba.com
 To: anup@brainfault.org,
-	ajones@ventanamicro.com,
-	atishp@atishpatra.org,
 	paul.walmsley@sifive.com,
-	palmer@dabbelt.com
-Cc: linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
+	palmer@dabbelt.com,
+	aou@eecs.berkeley.edu,
+	alex@ghiti.fr,
+	atishp@atishpatra.org,
+	tjeznach@rivosinc.com,
+	joro@8bytes.org,
+	will@kernel.org,
+	robin.murphy@arm.com,
+	sunilvl@ventanamicro.com,
+	rafael.j.wysocki@intel.com,
+	tglx@linutronix.de,
+	ajones@ventanamicro.com
+Cc: guoren@linux.alibaba.com,
+	guoren@kernel.org,
 	kvm@vger.kernel.org,
 	kvm-riscv@lists.infradead.org,
-	Quan Zhou <zhouquan@iscas.ac.cn>
-Subject: [PATCH] RISC-V: KVM: Correct kvm_riscv_check_vcpu_requests() comment
-Date: Mon, 11 Aug 2025 10:18:29 +0800
-Message-Id: <49680363098c45516ec4b305283d662d26fa9386.1754326285.git.zhouquan@iscas.ac.cn>
-X-Mailer: git-send-email 2.34.1
+	linux-riscv@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	iommu@lists.linux.dev,
+	Fangyu Yu <fangyu.yu@linux.alibaba.com>
+Subject: [RFC PATCH 0/6] iommu/riscv: Add MRIF support
+Date: Mon, 11 Aug 2025 14:10:58 +0800
+Message-Id: <20250811061104.10326-1-fangyu.yu@linux.alibaba.com>
+X-Mailer: git-send-email 2.39.3 (Apple Git-146)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qwCowAC3pamoVZlo_2nRCg--.21035S2
-X-Coremail-Antispam: 1UD129KBjvdXoWruw4ktFW3CF1kZry3trW8WFg_yoW3ZFb_Cw
-	1xGrsIgrWrZF10vFsrua1FgFs8G34xWayrJ3Z7Zr9rJ3s5urZ3W390gw43Jr47JrWYyFZ7
-	Jw4FvrZ3C3s3tjkaLaAFLSUrUUUUbb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUb68FF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_
-	Gr1UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
-	n2kIc2xKxwAKzVCY07xG64k0F24lc7CjxVAaw2AFwI0_Jw0_GFylc2xSY4AK67AK6r4UMx
-	AIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_
-	Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwI
-	xGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWx
-	JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcV
-	C2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUb-VyDUUUUU==
-X-CM-SenderInfo: 52kr31xxdqqxpvfd2hldfou0/1tbiBwwLBmiZRyEuxwAAs4
 
-From: Quan Zhou <zhouquan@iscas.ac.cn>
+From: Fangyu Yu <fangyu.yu@linux.alibaba.com>
 
-Correct `check_vcpu_requests` to `kvm_riscv_check_vcpu_requests`.
+According to the RISC-V IOMMU Spec, an IOMMU may optionally support
+memory-resident interrupt files  (MRIFs). When the guest  interrupt 
+files are used up, an MRIF can record an incoming MSI.
 
-Fixes: f55ffaf89636 ("RISC-V: KVM: Enable ring-based dirty memory tracking")
-Signed-off-by: Quan Zhou <zhouquan@iscas.ac.cn>
----
- arch/riscv/kvm/vcpu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+At present, the hypervisor has allocated an MRIF for each IMSIC, we
+only need to configure the PPN of the MRIF into the MSI PTE of  the
+IOMMU in MRIF mode.At the same time, we also need to configure NPPN
+and NID for notice MSIs, in these patches,we use the host interrupt
+(allocated  via  VFIO) as the notice MSIs, so that we don't need to 
+allocate a new MSI interrupt,  and we can easily redirect the guest
+interrupt back to the host interrupt when MRIF is not  supported on
+the IOMMU hardware.
 
-diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-index f001e56403f9..3ebcfffaa978 100644
---- a/arch/riscv/kvm/vcpu.c
-+++ b/arch/riscv/kvm/vcpu.c
-@@ -683,7 +683,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
- }
- 
- /**
-- * check_vcpu_requests - check and handle pending vCPU requests
-+ * kvm_riscv_check_vcpu_requests - check and handle pending vCPU requests
-  * @vcpu:	the VCPU pointer
-  *
-  * Return: 1 if we should enter the guest
+This RFC series are based on [1] by Andrew Jones.
+
+Self Test:
+-----------
+1. Key parameters for starting host QEMU:
+./qemu-system-riscv64  \
+-M virt,aia=aplic-imsic,aia-guests=1 -m 8G -smp 2  \
+-nographic -device riscv-iommu-pci,vendor-id=0x1efd,device-id=0x0008 \
+-netdev user,id=net1,hostfwd=tcp::2323-:22 \
+-device e1000e,netdev=net1 \
+-drive file=./nvme_disk.qcow2,if=none,id=nvm \
+-device nvme,serial=deadbeef,drive=nvm \
+...
+
+2. Steps to start a virtual machine：
+# lspci
+00:00.0 Host bridge: Red Hat, Inc. QEMU PCIe Host bridge
+00:01.0 IOMMU: Device 1efd:0008 (rev 01)
+00:02.0 Ethernet controller: Intel Corporation 82574L Gigabit Network Connection
+00:03.0 Non-Volatile memory controller: Red Hat, Inc. QEMU NVM Express Controller (rev 02)
+00:04.0 Unclassified device [0002]: Red Hat, Inc. Virtio filesystem
+# echo 0000:00:02.0 > /sys/bus/pci/drivers/e1000e/unbind
+# echo 0000:00:03.0 > /sys/bus/pci/drivers/nvme/unbind
+# echo 8086 10d3 > /sys/bus/pci/drivers/vfio-pci/new_id
+# echo 1b36 0010 > /sys/bus/pci/drivers/vfio-pci/new_id
+
+qemu-system-riscv64 -M virt,aia=aplic-imsic --enable-kvm -m 2G -smp 4 \
+-device vfio-pci,host=0000:00:02.0 \
+-device vfio-pci,host=0000:00:03.0 \
+...
+
+3. Test within guest os:
+root@qemu:/mnt/nvme# lspci
+00:00.0 Host bridge: Red Hat, Inc. QEMU PCIe Host bridge
+00:01.0 Ethernet controller: Intel Corporation 82574L Gigabit Network Connection
+00:02.0 Non-Volatile memory controller: Red Hat, Inc. QEMU NVM Express Controller (rev 02)
+root@qemu:~# mount /dev/nvme0n1p1 /mnt/nvme/
+root@qemu:~# cd /mnt/nvme/
+root@qemu:/mnt/nvme# ping 11.122.129.243 -i 0.1 | tee c.txt
+64 bytes from 11.122.129.243: icmp_seq=18533 ttl=255 time=1.18 ms
+64 bytes from 11.122.129.243: icmp_seq=18534 ttl=255 time=1.60 ms
+^C
+--- 11.122.129.243 ping statistics ---
+18534 packets transmitted, 18534 received, 0% packet loss, time 1934380ms
+rtt min/avg/max/mdev = 0.437/11.986/3451.393/118.494 ms, pipe 34
+
+root@qemu:/mnt/nvme# cat /proc/interrupts
+	CPU0       CPU1       CPU2       CPU3
+10:      49856     218638     192244      58721 RISC-V INTC   5 Edge      riscv-timer
+12:          0     105519          0          0 PCI-MSIX-0000:00:01.0   0 Edge      eth0-rx-0
+13:          0          0      97134          0 PCI-MSIX-0000:00:01.0   1 Edge      eth0-tx-0
+14:          0          0          0          2 PCI-MSIX-0000:00:01.0   2 Edge      eth0
+16:          0      42752          0          0 PCI-MSIX-0000:00:02.0   0 Edge      nvme0q0
+17:        376          0          0          0 PCI-MSIX-0000:00:02.0   1 Edge      nvme0q1
+18:          0       1308          0          0 PCI-MSIX-0000:00:02.0   2 Edge      nvme0q2
+19:          0          0      49757          0 PCI-MSIX-0000:00:02.0   3 Edge      nvme0q3
+20:          0          0          0       1282 PCI-MSIX-0000:00:02.0   4 Edge      nvme0q4
+
+[1] https://github.com/jones-drew/linux/tree/riscv/iommu-irqbypass-rfc-v2-rc1
+
+Fangyu Yu (6):
+  RISC-V: Add more elements to irqbypass vcpu_info
+  RISC-V: KVM: Transfer the physical address of MRIF to iommu-ir
+  RISC-V: KVM: Add a xarray to record host irq msg
+  iommu/riscv: Add irq_mask and irq_ack configure for iommu-ir
+  iommu/riscv: Add MRIF mode support
+  RISC-V: KVM: Check the MRIF in notice MSI irq handler
+
+ arch/riscv/include/asm/irq.h     |   3 +
+ arch/riscv/kvm/aia_imsic.c       | 119 ++++++++++++++++++++++++++++---
+ drivers/iommu/riscv/iommu-bits.h |   6 ++
+ drivers/iommu/riscv/iommu-ir.c   |  40 +++++++++--
+ 4 files changed, 156 insertions(+), 12 deletions(-)
+
 -- 
-2.34.1
+2.49.0
 
 
