@@ -1,79 +1,79 @@
-Return-Path: <kvm+bounces-54426-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54427-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D16F7B212D3
-	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 19:07:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B94CB212D4
+	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 19:07:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8CAB6420407
-	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 17:07:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 34D4F1907F7E
+	for <lists+kvm@lfdr.de>; Mon, 11 Aug 2025 17:07:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7DED2D372A;
-	Mon, 11 Aug 2025 17:07:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB4422D47FD;
+	Mon, 11 Aug 2025 17:07:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HPtOHMnW"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DtY8mlvL"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ACFC2C21F8
-	for <kvm@vger.kernel.org>; Mon, 11 Aug 2025 17:06:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43A8C2C21F8
+	for <kvm@vger.kernel.org>; Mon, 11 Aug 2025 17:07:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754932020; cv=none; b=SrTEsjyEKpNREzmi76PnUaCxgiZcEiDYdmrJYJV9IAIf5sBRJTuzMFE7OshmNdF1VeCQACUllmOsBML32jPMy9an7kaQpL+S8VC9KOIIlhUTSlyUg9s+eAtQIf+hQBr0SibdROeAXQla+dmuqkhGbWH23ieagCk4vv01sYT+sjw=
+	t=1754932026; cv=none; b=niLAeNCMppa7zTvN17EdD4Cqx/U9VKJdUb1Itj6a9hZld6DaBEp/bfvwacBEw+aWkpS8wyEGwILOq1BAUidyIh+zfdiUTacPxT20LU0iVj/WSljb04yGOV9UH6HM11DPAQXWr4UClvRIdGWAQxCsuTlsCMBBIKcWcBAeV9p8MGU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754932020; c=relaxed/simple;
-	bh=8ugITbRZEiHMCfxQDeQG1K4GsU8ExzFfq2Qkxkdvv2w=;
+	s=arc-20240116; t=1754932026; c=relaxed/simple;
+	bh=y3mvboDGdc9a5jc5SWh598zdp75yn7mHDfSaQeNsPlw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JkIoVmvt3sDy4Y7Ck0kkXGCBAZqsAnjybpPGJQE7RU5E+GDrIBQNNaHTLUtbTHIDuGLB6fKJSfmURwGgMJMHTsVYBGQ5muIqT0rxqChc95sIPftzvo+dgO/Pn2CPRUt6R/dvv9EtR2GPIcuc+3kVMkf7mTBgdQgiDx/rJQrhPbI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=HPtOHMnW; arc=none smtp.client-ip=209.85.128.41
+	 MIME-Version:Content-Type; b=PktM6ISv5GOYgVUEcJjZNC2QZjAE3+WvQVuyake+HgExhmR8ePor5jVDhiqPieyRLRANjrs71vprX+noLHSrDiTwGTShY2+E4DvJlEg6EyN23YI0EhSeKHmMZKw7xXjc+OKTWA572kkO3QCTMvhdOtMNDcZq9B3dnPf8mly5gjk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=DtY8mlvL; arc=none smtp.client-ip=209.85.128.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-458aee6e86aso30620065e9.3
-        for <kvm@vger.kernel.org>; Mon, 11 Aug 2025 10:06:58 -0700 (PDT)
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-459e39ee7ccso45606075e9.2
+        for <kvm@vger.kernel.org>; Mon, 11 Aug 2025 10:07:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1754932017; x=1755536817; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1754932023; x=1755536823; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=tTxLOjP4FhmiKvW9Jt5SVA/50ytmZzwnIVFBfjDcbbg=;
-        b=HPtOHMnWSZbZiT45RI3pUhI3WQCYUVG+mF/v/MT1S6NT1hKa3qvLNqKGyjkz2QgpmU
-         TMbAX5fu/aaSAQrpBKT+b760JMgL2P3YZkJB2mT2KTihstySBLpiMGpJMn+VTQ02rARa
-         ltUgtcuWsqG3LHMuvsfQGmrN/Pecu5in5HHtx8yYBscS16xTrY1ocOgEwMt16kowL8jf
-         djpmiED2xaWNKwqsPBCq53b2JLG5RXFScGyuX0iu5G6bmxbTSc5vWhIixwZkv43cY4Rx
-         aZ27qW8zk67e9ECfF0FgR+11N9tzUlmZ1/5968UPd2smPRMxKIVO0vu5v4FC9jGyDtKY
-         jBWA==
+        bh=wXHYeE/dbTRdflhUmCNmx7Q9a47atxr+CRA/ufWMQVM=;
+        b=DtY8mlvLcp0ZLIgnz7tjXaqCFYgm0pTijVr+haC9Wzugx7vZ0zjW4OsnGS+ouLFwuh
+         kqCxm1sAoSOGIER2glVnYhzNbZazE8qKztlKds0mqeXWrEcf9C+3BJtDlVOMye/Yb4aG
+         ur8jpryGzAsHUFOYk+vCfXaTHK/AH/lSniVXJNYzQO/9jyOYXLoMFLuoJ28Y9ryKEO4p
+         GgOR7zRFLln+zYACvnnoPKYN4QW63SSlLUOVNSsBQmojpmD1jp7tOO3QUdrfZKU57Caw
+         7NnDsNsDcxKnyK41gqfFari+R4SKV/0+p4UssefXq15K2N3OEe9MhCg9RF1UwRNp1jA5
+         EThw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754932017; x=1755536817;
+        d=1e100.net; s=20230601; t=1754932023; x=1755536823;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=tTxLOjP4FhmiKvW9Jt5SVA/50ytmZzwnIVFBfjDcbbg=;
-        b=b0w1YDHqaC+MrtgBPOJzbYsKUlaPJqyYn4syWGhvcdclc63hj1ALl45HjKhAf7hZRE
-         wCv30kfEDzLQ1UbuQ+8/SqxLGNiQLhK4RfzylfJq4lMVp4JOcl6jKZP/0uM0mwTMZ7v3
-         07o5c+lByBKuPDsnxSVESLrd6XPj3cEei3jXDoRZyRCgeLDresU28ZZlL3X0EmoShq9D
-         njqkkjbraSzIRGwvohNDfg27yCs0KjOVTMiMrUe+nnxh9Uj6z00Wz3eu8RxqLD5fRbw6
-         YRTXZZpXW8m2t+ZC4eHidkXTPnEohVdA9Pt02NrYr8zLFxbyKRSZ2MKbTzVZHIk+29RA
-         cO9Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUSu5tUh3xiTCsx6HnBwK4S4VkczLM1HvySdqel12SPqum8AGZEK/PM/DNc1RxeEHxwfXE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy9OLGXzVFSp679iXJomQfIpgBe/bd4zq7KFZXiD3Jf5DCvv++P
-	ROjAa4wiaVYsg1HgNqokPlkA6zfjCqGsJjpe/dnKm1Hjp89BpMXrYvAjKchYy3jfmbI=
-X-Gm-Gg: ASbGnctI9vzvPyQ3N5/zkowr6RzEZvoLICwKySuUKaccWx1jIpjXwVxzFv7ORYq8XYN
-	OBvSRRSVhefS52wDrA8n8QXizgf2drBUg8M5g7PAuPgwfEhLn964Wc2hgTHB3b1wgNSD8pVGpNg
-	3kBvZC8MoQDJgMB2dV6me9jf5roXOuj5HNXKzsnouYMztzu5jrDrhQPw+pQV3cPMo5cJ2jqe+dd
-	DYV3cj72loqU6r4JKreFjKJy46tGr4MtjsMDDasyMDD9oXeD7Pgk+Qn7x2EiRIeWvwCyW7eD6mi
-	1gAnOAiwN9Wksi57Sggj+MUnoX+CYZ+XN4pwgv/sT5iaMMkY8KREdW19MnSIR6nKyM47utYCB7Y
-	OjYsjAVGyrocPy4MO4u2+EiTbl1lMx3OPtUk39PuGW3L9tiAYKEXV02ZnAaZOPiyB18xi/Rg+x5
-	FznLpsREo=
-X-Google-Smtp-Source: AGHT+IEMcG/Ev4eyU/L7hIS6KC5DMgPfd5GRoRtRkLPDfgT0WRaP7S9VSCoMBvoitgce/yrC+B3d3w==
-X-Received: by 2002:a05:600c:470c:b0:459:d709:e5cf with SMTP id 5b1f17b1804b1-45a10bad987mr5229185e9.3.1754932017284;
-        Mon, 11 Aug 2025 10:06:57 -0700 (PDT)
+        bh=wXHYeE/dbTRdflhUmCNmx7Q9a47atxr+CRA/ufWMQVM=;
+        b=M4rzC65oOncTKdJ6Fn5RH3hdfBVWzPoGu7nviKowRDO52btWQjQwKMxZ+j2ptLBSGD
+         1PdLHSnPXAtR7SIiG7uaPFyfjQiB9q7EQtX+XlHdSZX62574/oTXN9Y7MAd8nLgpMMxR
+         9f69Jh12+vvj6W2j7Po+iitH1Bo8Zi2R23/zmvQWbVBPWoRDuS3Nk6OgLqOCRO0GBuFI
+         r3XuDAG+IYUjvlNKIUNs9EJYMkgC506uZ0zIlVUlznd6B0gzalk7k5XwzJm6TrzM//t9
+         7IJcRRyHmN2w6Ctk7FQBHfIxTTVBa4LE5rKojmDDyC5mYq4zURmXwwR82bRWRbE2GIHt
+         2hnA==
+X-Forwarded-Encrypted: i=1; AJvYcCUgm5CAf2BbK5uz5OCAaRCKDvStNilJ3qzYVZXUWdMo1lDN8wPZnJ13DveaQVfxoJmi2xA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxutzvz0Fx5usTaE89wZYaHGqgEiHYtoWH4jqkNJgipeJISUEqg
+	jL+WUQqRI682vxWy46JnxhEfuA0CxCO3qKnhWalkOSHXwk4yi1AVl3dkvx8fs3FkwdDMBjbxXD2
+	psoYi
+X-Gm-Gg: ASbGncvBS4V3jb08Lk6fiyjtBd/Ajd3eAYIgC2CDQjkMMLMfNMTWubnQBxdextmGlEr
+	67ufdI1YJq2WOiT9bmNuhhfzGk6UtUSOEi3/OEI0QGlxeOp5nVUZ2jSYwseCUP4/MdmsFkVK2oU
+	JD5pTpeBA3e/dJbrezoNY5A/wmPmTGsbhcZCsGz+Sa7YSFdi14i0i3DDc9vFNeGs7/ZCtEuSty3
+	btgcDsVfm3vMuc+0eSQgjjyAFV6kfJYfIfm3s+dsaIxAw79SqlbRW2XYLmaWUAZ91M/UNbuDLup
+	vuu7E3cWcMOvj02HQ0XouGKwhkLa/DQCZQtPfm+RWPwjr2I7rmvASxFw4NvXdB4rtQn6WloXKwd
+	Bbj+dXGOpCgXsR9uQUn6/mbvpv3ZAGwHBm/mqLj5/Noi9dD0MY2gR53a6h/pC/fiSlOogQPun
+X-Google-Smtp-Source: AGHT+IFUuly7Dqrg66psU4QHCuRXsJhkEzRy6aRPP2+eyqivHdPhhh2IohEjZISBtH74GHrPxa9how==
+X-Received: by 2002:a05:6000:2c09:b0:3b7:806e:7773 with SMTP id ffacd0b85a97d-3b910fd97fbmr541303f8f.15.1754932022551;
+        Mon, 11 Aug 2025 10:07:02 -0700 (PDT)
 Received: from localhost.localdomain (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-459e5887b7fsm261545415e9.30.2025.08.11.10.06.55
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b79c3abf33sm41526775f8f.7.2025.08.11.10.07.01
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 11 Aug 2025 10:06:56 -0700 (PDT)
+        Mon, 11 Aug 2025 10:07:02 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Miguel Luis <miguel.luis@oracle.com>,
@@ -92,9 +92,9 @@ Cc: Miguel Luis <miguel.luis@oracle.com>,
 	qemu-arm@nongnu.org,
 	Cameron Esfahani <dirty@apple.com>,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-Subject: [RFC PATCH 08/11] target/arm: Replace kvm_arm_el2_supported by host_cpu_feature_supported
-Date: Mon, 11 Aug 2025 19:06:08 +0200
-Message-ID: <20250811170611.37482-9-philmd@linaro.org>
+Subject: [RFC PATCH 09/11] target/arm/hvf: Sync registers used at EL2
+Date: Mon, 11 Aug 2025 19:06:09 +0200
+Message-ID: <20250811170611.37482-10-philmd@linaro.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250811170611.37482-1-philmd@linaro.org>
 References: <20250811170611.37482-1-philmd@linaro.org>
@@ -107,113 +107,83 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Use the generic host_cpu_feature_supported() helper to
-check for the EL2 feature support. This will allow to
-expand to non-KVM accelerators such HVF.
+From: Mohamed Mediouni <mohamed@unpredictable.fr>
 
+When starting up the VM at EL2, more sysregs are available. Sync the state of those.
+
+Signed-off-by: Mohamed Mediouni <mohamed@unpredictable.fr>
+[PMD: Adapted to host_cpu_feature_supported() API]
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- target/arm/kvm_arm.h  | 11 -----------
- hw/arm/virt.c         |  8 +-------
- target/arm/kvm-stub.c |  5 -----
- target/arm/kvm.c      |  6 +++---
- 4 files changed, 4 insertions(+), 26 deletions(-)
+ target/arm/hvf/hvf.c | 34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
 
-diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
-index 364578c50d6..7e5755d76b2 100644
---- a/target/arm/kvm_arm.h
-+++ b/target/arm/kvm_arm.h
-@@ -191,12 +191,6 @@ bool kvm_arm_sve_supported(void);
-  */
- bool kvm_arm_mte_supported(void);
+diff --git a/target/arm/hvf/hvf.c b/target/arm/hvf/hvf.c
+index 5174973991f..778dc3cedf7 100644
+--- a/target/arm/hvf/hvf.c
++++ b/target/arm/hvf/hvf.c
+@@ -400,6 +400,7 @@ static const struct hvf_reg_match hvf_fpreg_match[] = {
+ struct hvf_sreg_match {
+     int reg;
+     uint32_t key;
++    bool el2;
+     uint32_t cp_idx;
+ };
  
--/**
-- * kvm_arm_el2_supported:
-- *
-- * Returns true if KVM can enable EL2 and false otherwise.
-- */
--bool kvm_arm_el2_supported(void);
- #else
+@@ -545,6 +546,27 @@ static struct hvf_sreg_match hvf_sreg_match[] = {
+     { HV_SYS_REG_CNTV_CTL_EL0, HVF_SYSREG(14, 3, 3, 3, 1) },
+     { HV_SYS_REG_CNTV_CVAL_EL0, HVF_SYSREG(14, 3, 3, 3, 2) },
+     { HV_SYS_REG_SP_EL1, HVF_SYSREG(4, 1, 3, 4, 0) },
++    /* EL2 */
++    { HV_SYS_REG_CPTR_EL2, HVF_SYSREG(1, 1, 3, 4, 2), .el2 = true },
++    { HV_SYS_REG_ELR_EL2, HVF_SYSREG(4, 0, 3, 4, 1), .el2 = true },
++    { HV_SYS_REG_ESR_EL2, HVF_SYSREG(5, 2, 3, 4, 0), .el2 = true },
++    { HV_SYS_REG_FAR_EL2, HVF_SYSREG(6, 0, 3, 4, 0), .el2 = true },
++    { HV_SYS_REG_HCR_EL2, HVF_SYSREG(1, 1, 3, 4, 0), .el2 = true },
++    { HV_SYS_REG_HPFAR_EL2, HVF_SYSREG(6, 0, 3, 4, 4), .el2 = true },
++    { HV_SYS_REG_MAIR_EL2, HVF_SYSREG(10, 2, 3, 4, 0), .el2 = true },
++    { HV_SYS_REG_MDCR_EL2, HVF_SYSREG(1, 1, 3, 4, 1), .el2 = true },
++    { HV_SYS_REG_SCTLR_EL2, HVF_SYSREG(1, 0, 3, 4, 0), .el2 = true },
++    { HV_SYS_REG_SPSR_EL2, HVF_SYSREG(4, 0, 3, 4, 0), .el2 = true },
++    { HV_SYS_REG_SP_EL2, HVF_SYSREG(4, 1, 3, 6, 0), .el2 = true},
++    { HV_SYS_REG_TCR_EL2, HVF_SYSREG(2, 0, 3, 4, 2), .el2 = true },
++    { HV_SYS_REG_TPIDR_EL2, HVF_SYSREG(13, 0, 3, 4, 2), .el2 = true },
++    { HV_SYS_REG_TTBR0_EL2, HVF_SYSREG(2, 0, 3, 4, 0), .el2 = true },
++    { HV_SYS_REG_TTBR1_EL2, HVF_SYSREG(2, 0, 3, 4, 1), .el2 = true },
++    { HV_SYS_REG_VBAR_EL2, HVF_SYSREG(12, 0, 3, 4, 0), .el2 = true },
++    { HV_SYS_REG_VMPIDR_EL2, HVF_SYSREG(0, 0, 3, 4, 5), .el2 = true },
++    { HV_SYS_REG_VPIDR_EL2, HVF_SYSREG(0, 0, 3, 4, 0), .el2 = true },
++    { HV_SYS_REG_VTCR_EL2, HVF_SYSREG(2, 1, 3, 4, 2), .el2 = true },
++    { HV_SYS_REG_VTTBR_EL2, HVF_SYSREG(2, 1, 3, 4, 0), .el2 = true },
+ };
  
- static inline bool kvm_arm_aarch32_supported(void)
-@@ -213,11 +207,6 @@ static inline bool kvm_arm_mte_supported(void)
- {
-     return false;
- }
--
--static inline bool kvm_arm_el2_supported(void)
--{
--    return false;
--}
- #endif
+ int hvf_get_registers(CPUState *cpu)
+@@ -588,6 +610,12 @@ int hvf_get_registers(CPUState *cpu)
+             continue;
+         }
  
- /**
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index ef6be3660f5..c2f71ecbfa7 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -2267,13 +2267,7 @@ static void machvirt_init(MachineState *machine)
-         exit(1);
-     }
++        if (hvf_sreg_match[i].el2
++            && arm_feature(env, ARM_FEATURE_EL2)
++            && !host_cpu_feature_supported(ARM_FEATURE_EL2, false)) {
++            continue;
++        }
++
+         if (cpu->accel->guest_debug_enabled) {
+             /* Handle debug registers */
+             switch (hvf_sreg_match[i].reg) {
+@@ -725,6 +753,12 @@ int hvf_put_registers(CPUState *cpu)
+             continue;
+         }
  
--    if (vms->virt && kvm_enabled() && !kvm_arm_el2_supported()) {
--        error_report("mach-virt: host kernel KVM does not support providing "
--                     "Virtualization extensions to the guest CPU");
--        exit(1);
--    }
--
--    if (vms->virt && !kvm_enabled() && !tcg_enabled() && !qtest_enabled()) {
-+    if (vms->virt && !host_cpu_feature_supported(ARM_FEATURE_EL2, true)) {
-         error_report("mach-virt: %s does not support providing "
-                      "Virtualization extensions to the guest CPU",
-                      current_accel_name());
-diff --git a/target/arm/kvm-stub.c b/target/arm/kvm-stub.c
-index 3beb336416d..35afcc7d6f9 100644
---- a/target/arm/kvm-stub.c
-+++ b/target/arm/kvm-stub.c
-@@ -42,11 +42,6 @@ bool kvm_arm_mte_supported(void)
-     return false;
- }
- 
--bool kvm_arm_el2_supported(void)
--{
--    return false;
--}
--
- /*
-  * These functions should never actually be called without KVM support.
-  */
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index 0fe0f89f931..a9f05bfa7ea 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -274,7 +274,7 @@ static bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
-     /*
-      * Ask for EL2 if supported.
-      */
--    el2_supported = kvm_arm_el2_supported();
-+    el2_supported = host_cpu_feature_supported(ARM_FEATURE_EL2, false);
-     if (el2_supported) {
-         init.features[0] |= 1 << KVM_ARM_VCPU_HAS_EL2;
-     }
-@@ -1780,7 +1780,7 @@ bool arm_hw_accel_cpu_feature_supported(enum arm_features feat, bool can_emulate
-     case ARM_FEATURE_PMU:
-         return kvm_check_extension(kvm_state, KVM_CAP_ARM_PMU_V3);
-     case ARM_FEATURE_EL2:
--        return kvm_arm_el2_supported();
-+        return kvm_check_extension(kvm_state, KVM_CAP_ARM_EL2);
-     case ARM_FEATURE_EL3:
-         return false;
-     default:
-@@ -1918,7 +1918,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
-         cpu->kvm_init_features[0] |= (1 << KVM_ARM_VCPU_PTRAUTH_ADDRESS |
-                                       1 << KVM_ARM_VCPU_PTRAUTH_GENERIC);
-     }
--    if (cpu->has_el2 && kvm_arm_el2_supported()) {
-+    if (cpu->has_el2 && host_cpu_feature_supported(ARM_FEATURE_EL2, false)) {
-         cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_HAS_EL2;
-     }
- 
++        if (hvf_sreg_match[i].el2
++            && arm_feature(env, ARM_FEATURE_EL2)
++            && !host_cpu_feature_supported(ARM_FEATURE_EL2, false)) {
++            continue;
++        }
++
+         if (cpu->accel->guest_debug_enabled) {
+             /* Handle debug registers */
+             switch (hvf_sreg_match[i].reg) {
 -- 
 2.49.0
 
