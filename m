@@ -1,432 +1,437 @@
-Return-Path: <kvm+bounces-54523-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54524-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23DB9B22AFA
-	for <lists+kvm@lfdr.de>; Tue, 12 Aug 2025 16:49:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 10AF0B22B63
+	for <lists+kvm@lfdr.de>; Tue, 12 Aug 2025 17:08:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DCA113BA3D4
-	for <lists+kvm@lfdr.de>; Tue, 12 Aug 2025 14:41:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2107D3AF873
+	for <lists+kvm@lfdr.de>; Tue, 12 Aug 2025 15:05:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8F1E2ECD26;
-	Tue, 12 Aug 2025 14:40:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7161F2F4A02;
+	Tue, 12 Aug 2025 15:04:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="kVy+PevG"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hhsHpA4a"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2056.outbound.protection.outlook.com [40.107.237.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F20382EBBA8;
-	Tue, 12 Aug 2025 14:40:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.56
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755009631; cv=fail; b=kNSLwLsEH21yhzMC6DeQsVGUYF7Lq9TOmXPZk/GS2/nR1vdF1xRDr+8thDgkBPQ2QwC0Sry62pXpSrTM2GyLUg0Lc/9RA85RyD4v4AbDVPH76qZGK5QYs5ZpUn2WXGvgIBMzpBnKX9nsdZ4qyTJBuyPYUlADMZhp38FtD79X990=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755009631; c=relaxed/simple;
-	bh=987dTLOpEAoe0XT+FlfL2xr/6eC+7X3IGeZ7CasgRk4=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=IzdlLNyWN71xlXc59Sx+iT0BkZgxUGbkartbSPg96be9zM0adrVKQM/BooYewQUrmtaae8DB2jDaeA4XaViM8YL9XTczhsEJYBuHyH7UYMF0O90Gln8566Zlh8XXoLX+X9Ievdklq6YeUIc1G/pD0xp1DTkhRrxkYCCj2pcH+jc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=kVy+PevG; arc=fail smtp.client-ip=40.107.237.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=fUYr0t/yF3PwlSSYVM3lO9rkTikowYG1XaL7lEcf0O607JA2cti0MoJtbQvNdwn9pd/aasBqGkFG9hhrzoHL418zHIO/tHprrHuNBcnTKqLEtp/O+yf78dJey4tW60QF9StXdyET0GI8KppWQlsUKuIZWk2YSBGcY/uTbNLU6bM9X4lk0LsHBpOFfhimkuy1bOO6ynnea6UHB4y4W5XVekiU7S5407QzDqnA2JQmJFTxpXey1O59GcrRAJf1FhxsYrKBG6W04PU2563bpO4SJHkt1PF+O7fcpPPFxr66j1AJio5QoY5DSOg8Sh1O3zWqjptsmhLSNrgFNNNnWyzyUA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7YukzyXZMenxabBH0+hrCkfb7JbtnkGqs/QxakqEavw=;
- b=DqKGnARTbU+9mOVWidLW5UzNiwNmBmUV/XOLm/x3QrBQUmtfb0pGO1bHetjTJEgkNErqs4aPpujI4its869aGw8DNsqQQaEh9KsZyBEnHwkdXIjhtUQl7wg4Z3Se4MgsZNoTsFQFKOSd/YW6iuC15r20bkUPQnwb1LAjllfzQqC9uv0T6IuRvmcA9tKJz0953jct6hq6X3Ha+qDg3yOMJA8NW1YCYAIMb8ulGDc1K97IyUf7tK7OephJn322ksE2OW66DphB2s2vGk3rLU1Yzd858IEC+mhu354WioKFGLa66Wp4AXzWFjprIEh7B9+QIaB5nQHz0hIC4V3f/Nd1/Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7YukzyXZMenxabBH0+hrCkfb7JbtnkGqs/QxakqEavw=;
- b=kVy+PevGJOxox3ik2RgP8rlp4DZNEZBQxvsnlpnMZNFIVhCYXjBz43C08L37ZcAC1gqx3AxQR+2mO3pCjFCjK+fSC0RR1V2N2WsLDdq61z8+4GvQfXyvD0Ppn0fLx6R0x1VfBpRL9ut96XhcwZx7aV5YXauMsi/wOyT7Bv4J2HA=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from BL3PR12MB9049.namprd12.prod.outlook.com (2603:10b6:208:3b8::21)
- by IA0PPF4D923B935.namprd12.prod.outlook.com (2603:10b6:20f:fc04::bcd) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8943.30; Tue, 12 Aug
- 2025 14:40:23 +0000
-Received: from BL3PR12MB9049.namprd12.prod.outlook.com
- ([fe80::ae6a:9bdd:af5b:e9ad]) by BL3PR12MB9049.namprd12.prod.outlook.com
- ([fe80::ae6a:9bdd:af5b:e9ad%6]) with mapi id 15.20.8989.018; Tue, 12 Aug 2025
- 14:40:23 +0000
-Message-ID: <5a207fe7-9553-4458-b702-ab34b21861da@amd.com>
-Date: Tue, 12 Aug 2025 09:40:17 -0500
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 7/7] KVM: SEV: Add SEV-SNP CipherTextHiding support
-To: Kim Phillips <kim.phillips@amd.com>,
- Tom Lendacky <thomas.lendacky@amd.com>, corbet@lwn.net, seanjc@google.com,
- pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
- dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
- john.allen@amd.com, herbert@gondor.apana.org.au, davem@davemloft.net,
- akpm@linux-foundation.org, rostedt@goodmis.org, paulmck@kernel.org
-Cc: nikunj@amd.com, Neeraj.Upadhyay@amd.com, aik@amd.com, ardb@kernel.org,
- michael.roth@amd.com, arnd@arndb.de, linux-doc@vger.kernel.org,
- linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org
-References: <cover.1752869333.git.ashish.kalra@amd.com>
- <44866a07107f2b43d99ab640680eec8a08e66ee1.1752869333.git.ashish.kalra@amd.com>
- <9132edc0-1bc2-440a-ac90-64ed13d3c30c@amd.com>
- <03068367-fb6e-4f97-9910-4cf7271eae15@amd.com>
- <b063801d-af60-461d-8112-2614ebb3ac26@amd.com>
- <29bff13f-5926-49bb-af54-d4966ff3be96@amd.com>
-Content-Language: en-US
-From: "Kalra, Ashish" <ashish.kalra@amd.com>
-In-Reply-To: <29bff13f-5926-49bb-af54-d4966ff3be96@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SA1P222CA0107.NAMP222.PROD.OUTLOOK.COM
- (2603:10b6:806:3c5::28) To BL3PR12MB9049.namprd12.prod.outlook.com
- (2603:10b6:208:3b8::21)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD25A2EA743
+	for <kvm@vger.kernel.org>; Tue, 12 Aug 2025 15:04:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755011094; cv=none; b=VXGO+/msqgApbhQyD1WveOgpZ6gU5i4Thj2pmpWH8o2fIvFOu5fFBO7GDPrzt9Dj7/5MveKk230s/NxE92fyFWSabTFGrCLBa/O/16sFju1cr2D3oSVSrgW/5Ve50enBtQ9ZKmwO35vx72xvlPzQQxCFTRQvDNTU6ml7PX957rw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755011094; c=relaxed/simple;
+	bh=SsmXH682vJv5gUZsxuvwMPOFJB1jk6im16tEQgXtQj0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=paSZWO763fWwQUnhUf3mN+D7s1dHWmFnIfSz5okmU9DDe+Ynje/mkQqFG7gPCHo3t5d10VSQXKPmY+5Qon+5iDzSZ3zn/tBoAIhWUMRmzyLEWxXKZVFhwpxhMs/fMsVr6YsNmL/R2lrg7eqep8Xi8hNjMNLtWT7k4Il8ROy8IH4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hhsHpA4a; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2406fe901fcso58891275ad.3
+        for <kvm@vger.kernel.org>; Tue, 12 Aug 2025 08:04:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1755011092; x=1755615892; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=1CbZDGjL00dkzJzg2EeaN2XrMVYfOXDa2o/eEp40/hY=;
+        b=hhsHpA4arn1oJzCuubxFtQFJbJa59JtQSVb3FB6lieJhsCeXozqpJrhhcDge9F6vVr
+         Pk7Oyd6YG7ARaJO6jPKVLfwZarvXFZxaYuUp5CAxt2TI5pp47F1l28XAKisADIZT2pvm
+         e172COXDz43By1Fug6h7dg1W0uUaC9odz2XravHkv6FIaQlzUgOdYH/XdUdXDA3DnP+t
+         6alrgsvSGk98+MfRIeSZVS0xnLIL1SupivWxCy2xJTOq5npVSOz/GOTANQt98ADd7dS4
+         0eDJf80Ko33ixz9qo/VQiLHlLI20acB3Ov8I1dAmzw4YlEsXx15OCk9AXuiOZFYrt+4w
+         txoA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755011092; x=1755615892;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1CbZDGjL00dkzJzg2EeaN2XrMVYfOXDa2o/eEp40/hY=;
+        b=FppyiQGxwkU84ErS+LDq+gZS3hyeMnjTNlWDSZkn4BoLKXI98x4SiCAWkZnZHkqe9x
+         4mrWmQIiCatbrOT01g6ATuw7dsVQ8qPDneJhh89ItCQuY2891Rb8g28pAsyrnTV5rU5b
+         Em7+ymfXGTr7ksJ+WixWPrqYo6ve8SXPAhV3JIufxx4+CZAEuWjb+JQIYSsPEqP6TOV8
+         fGt7PXVbYra6N0xOxIYpNN5waWaXXZ1VWtYTnPaCBpqTsCsRpp2280ztJtptoSGTnVK7
+         GuZP91aQhgl91c0kTrrbDKnlntzKDyvnQ/uEGm0ssSLgSZuCTAtsB7FvgVC5iDIgQ2+4
+         Rueg==
+X-Forwarded-Encrypted: i=1; AJvYcCUBtRp93pts+f+AR7PknBtDwKNqAAF4Z83eFEhpZmR1w13X0pU7LbAqqsmGPLJeBOKZ5mg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyoRfNqK3B906A4gzSNpgA2JaJhzIl4EJnWnFD+vlZV3yTRv6BD
+	Jr0a4DPRuis1hb8mFxtmS18A80NYjHVlaufOmueuWSQ3wCMj3siQ7K3xvuWIEGlBVA==
+X-Gm-Gg: ASbGncsQASeDX452jRQ0LjhE+EzUn8oXKfh5kJWkYhznce6hlC+x0d3y4GefKOOfWgy
+	Hu2+o7lklD5Gr0bPxERlPLFAS5PBkKBB8NuwV/s4DOWK2zqqiJmrrQTrQ3QlGfMfIr5ZqeOw6z/
+	uhaD+yuzbsh7aZO6QTRnhGxaYsoGZyriICDrmBokx39BfjBJe6ub0Hnt8JIiV5p6xyt0ahXjFRc
+	tWyXFsD8S+ABmzK4iINI7rGvDleFsQFW6G+Sl34sGHqBMTBK92E0h7ckP3oIPC09kksY1ajBh6D
+	WSRLgWExOAsOXJhVQ0fk9DY4qJLghbP+06AY4DpxoFQGgofy6TmvexglfaXaxf5rKxtbmp0aoGH
+	dTqWn3PjVlmH8a6hXorDrWtlEkw5j6jBc/dy6uPw2QqmoJW+GQdvPrNH4bg8yKQGxLCQP
+X-Google-Smtp-Source: AGHT+IGXZwUL5NaeT1agFRHYcvQaoEN8NWmu+JbPXmhoGdaiKVFexo3ojjAG56PQqfSTBJj8vwtFkg==
+X-Received: by 2002:a17:903:19c7:b0:240:a222:230c with SMTP id d9443c01a7336-2430bfdac43mr828025ad.12.1755011091106;
+        Tue, 12 Aug 2025 08:04:51 -0700 (PDT)
+Received: from google.com (33.79.127.34.bc.googleusercontent.com. [34.127.79.33])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-241e8aac2e0sm300710985ad.171.2025.08.12.08.04.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Aug 2025 08:04:49 -0700 (PDT)
+Date: Tue, 12 Aug 2025 15:04:45 +0000
+From: David Matlack <dmatlack@google.com>
+To: Joel Granados <joel.granados@kernel.org>
+Cc: Alex Williamson <alex.williamson@redhat.com>,
+	Aaron Lewis <aaronlewis@google.com>,
+	Adhemerval Zanella <adhemerval.zanella@linaro.org>,
+	Adithya Jayachandran <ajayachandra@nvidia.com>,
+	Andrew Jones <ajones@ventanamicro.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Arnaldo Carvalho de Melo <acme@redhat.com>,
+	Bibo Mao <maobibo@loongson.cn>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Dave Jiang <dave.jiang@intel.com>, dmaengine@vger.kernel.org,
+	Huacai Chen <chenhuacai@kernel.org>,
+	James Houghton <jthoughton@google.com>,
+	Jason Gunthorpe <jgg@nvidia.com>, Josh Hilke <jrhilke@google.com>,
+	Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	"Mike Rapoport (Microsoft)" <rppt@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Pasha Tatashin <pasha.tatashin@soleen.com>,
+	"Pratik R. Sampat" <prsampat@amd.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	Vipin Sharma <vipinsh@google.com>,
+	Wei Yang <richard.weiyang@gmail.com>,
+	"Yury Norov [NVIDIA]" <yury.norov@gmail.com>
+Subject: Re: [PATCH 00/33] vfio: Introduce selftests for VFIO
+Message-ID: <aJtYDWm3kT_Nz6Fd@google.com>
+References: <20250620232031.2705638-1-dmatlack@google.com>
+ <77qzhwwieggkmyguxm6v7dhpro2ez3nch6qelc2dd5lbdgp6hz@dnbfliagwpnv>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL3PR12MB9049:EE_|IA0PPF4D923B935:EE_
-X-MS-Office365-Filtering-Correlation-Id: 86502b56-7243-43ca-f7a8-08ddd9ae2b4e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|7416014|376014|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?UGw5TnJOcW5UYXNBWlR2ZE9hUVhWM3NPNGliVko0QkFjOUNzVGNEa1QyYVFK?=
- =?utf-8?B?bldJQVc0RlllVnhPQmNiV1E3MmVrRGIxZDU3OXRSaWVkdEd4OGpBWTh6SjRu?=
- =?utf-8?B?L3o3VklKR1NvR2ZnVzB5ZnJTV2h0clhWTkxMVTVsdTFqTEtiaVJkbHVuU05v?=
- =?utf-8?B?QkpJVkhFQkVXc3RET25zbjFhU2g2ekRwcHE2ODdiQ3pwV0drYlNnV2xjUEYw?=
- =?utf-8?B?Nng2SWZ1TDU4UW42Qk1Na2s0Sk9KNTlxM1ZGQXA5OFI5dVZXZkpVMnZKVlNs?=
- =?utf-8?B?SzZMbHRkSHUvRUI3VWMxcks0VjVYRm1tMFZEMHA1a09oYWNjOFN3a2dZbkgx?=
- =?utf-8?B?VTZoRVdEYVEvZE5pNW4ra1FvUk4vVzNCZ0Z2V294MWpsNUYwVXBSUzRMYlVQ?=
- =?utf-8?B?UW1uNWVaTlVyNDhRNkdBY2FseFlzaTRnOFpYQWllTUhkNS8rM2hXVURjaGZV?=
- =?utf-8?B?YXJwcWRqb1lqYXhORXc4aTFqaVRiRTROUjdKdUt2dWV4d0dyTEdOUFRRQW5C?=
- =?utf-8?B?RENMNkh6enJnRlV2dFQ0Z3dEUy93VnhBUlI1eGdqR0hRSVVWWnF6ejdkYXJD?=
- =?utf-8?B?TEVvWUpZcGJURW5VTndMOXU5YlVFd3F6Y0JBTzYrbHF6UFoxOGI4dHFyS0hi?=
- =?utf-8?B?bTY0RnU5SDJDRW5KblNHSUk3c1g2TS9SajVPODVqcnFHL0ZoN3FXTVRZcFNp?=
- =?utf-8?B?Y3J3eDRjTmZ5QWFzWjExbzc0NHVGT1c3ZkJ2RXh3RWpqVVpxT0hEM2tqc0pQ?=
- =?utf-8?B?VmdEcEVPQklkcWptWEZ0clArMGV3QnNBV3RrZE9oaENkNGF5YjBLNTZIMytl?=
- =?utf-8?B?cGFoWlJqMEdiL3p2L3RxV1lDQXU2eFpaeWl1UWpBdkJMbDBMU2F5Z3l3L1lD?=
- =?utf-8?B?bU5laFBmWU1qeWk0WmlxQlNhMk9oOG5zQjB3S1c3ZHk3Ti9YeW1Gb25aUnpZ?=
- =?utf-8?B?Z3g5N2tpSzI0eitjS2huWUdDbTZiSWt5a0QvRVdlOWMzNTQxR0JBcktMZlZa?=
- =?utf-8?B?eXRvZWNvS1YvZ0p5bFA4VkpaWWh4MnBucGpwUVRGaU9pbG5NcmZ3M3ZkYndZ?=
- =?utf-8?B?SVMrTXl5L1JDTmpnaDhFdEh0cDk5eThHWE1HbVJLc2JjVkR3NjRteUZXZDZF?=
- =?utf-8?B?N29lVHM5cmlWaS93TmJ5YVpGeGVqRUE2VHY4N1h0TC9qWER1U1BVZTR2b3Iy?=
- =?utf-8?B?WEo3UXpUdmsyaHNMSWtuWFJCT013VVpTSHdlcVBJWGJDZzJwa1NSQlNDNi9K?=
- =?utf-8?B?c2FvUmVIVXNNUldFbkFrWWt2SC9Ba05yZEMwOVlDNnhZRGVOb1kzKzhhd2gy?=
- =?utf-8?B?Y1pQYVpjQ2h4VmZKMEVFS2puL09TWW44dEl5UUpPcUFNRVpCSllZMnhJZUdt?=
- =?utf-8?B?RHRQMEVqbGtsRmwyTE56Z3pyNFAreUlpSGRpTmhscWY1Rmd3S0RQbjcyZllE?=
- =?utf-8?B?RXRraEdaeGloUklwNCtqRGhOTytYRTl0ZnZmejVNQjZMb0FmbStaNDduVWJC?=
- =?utf-8?B?K3lJUWhOQVZSaisvUTJYSUkwZlBzWGFUNElGZkl3UUI0WTNCOG5wTDBNM2xR?=
- =?utf-8?B?dXRjR0wvVmlhc1o1YTBUc04yVVAvNXZxTkdIaGFHTUljWXpyVFBCT3ZyOUNW?=
- =?utf-8?B?MmFUbkVyVXpqdkRZaTcxREJPL1RoejFySUg2SWFhMXF3YlVVVGI4eDAyWnRD?=
- =?utf-8?B?N0VnY1FaL2VSc0NTT0tDNVdEeUwza3ZGaXpJWkJlQW1Lamc2VUFvWjlYbGJD?=
- =?utf-8?B?V1VZY2VSQysrNEZmdXprVnVFUGNsMlNmNkhlUzdaaEQyUWdYQ1huZ2J2TktU?=
- =?utf-8?B?d2x6TDloeFVLWmszeDI4cmlFQmg3b1JRNlA4Z2ZVb1ZXRU82TkhWVEJocXRw?=
- =?utf-8?B?em9QUUJoV0VXMFhUN0R3ZWZ0MXF6Z0prbXVwZDZwcWdrY0VQa3BTWkRLeVRV?=
- =?utf-8?B?Nlhka1dscmZKRHlSR1B4S0g2ZDQ3T2tMQWwwY0xldWtodnplS0N4am9vMHdm?=
- =?utf-8?B?WnhtdHRpNkh3PT0=?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR12MB9049.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?Vzd6WFBOSGVFdjRTcUhsL3E2MEd1bE5YRVhXV1pBRUdmblJJUk1nbTQ2V0hC?=
- =?utf-8?B?eVVhMnZiQzhuNXp6aTVJbERJekUvSXJ2aUVjYkVYd2twZGpBZ016bWszZnNw?=
- =?utf-8?B?RjBvck00Zko0b3pLNHExRXlKeEF5TmdBcCswbytianZnZmJkNFNNZHUveFY2?=
- =?utf-8?B?d2dqT3Y1bUsvSXZwd01lM3AvZktwSThvVDd1RXdBRk1zUzJWaTVPU1ZSbUJ5?=
- =?utf-8?B?ejVXV0FPaDNjeU1HSDYxT3ExSncyNjlYVS96czFkaE9RNnRtTzRId0k4TE5B?=
- =?utf-8?B?bHNsWVRBb09aZEtHR0s0THozNCs1OGtpU29MRTRjRmY0VFhaTzFGRVRDVmJl?=
- =?utf-8?B?QVVJZStKOEhNd0IvSnVzN1l6SEthSmNRZnlqVWZjazltZWk3NndIOC9nV2Fj?=
- =?utf-8?B?TmVhUUl3WU9sSTZxVDJQWWVVUUdiRmx6ZSs2c29KSEtGdzdRVlNKYUVSbFgv?=
- =?utf-8?B?Mm9tWEhiWm53WWkvTHV5UDhZTi9uSU4rb3NvQ3NKeExFQ1JYRFViaW5CNU1W?=
- =?utf-8?B?c09reTRZYVNxdXRSaGRGYmRwMEtBaGdVbmlSc2RHVjZxYXlBdzBXMG1LM1dk?=
- =?utf-8?B?RDBvb04xOFFzQUxmekJYa1hTQkhWeTNNNDRvWlQ2VjFEVWZpbHVJSW1ZZVV5?=
- =?utf-8?B?NXNocmxvL3pXQTNycFRKYWp0alNPZ0syV21JLzRlb3JFbkVMeTk5cE0rY2Ns?=
- =?utf-8?B?WDhtRnRsR051TFBqZ2RXNE9YR0NVSXFZOWlXUkV1RGdnb3IwZGdYRjhOUVZq?=
- =?utf-8?B?NXRaZ0JPTjBrTTlhYkpSK0d4cUxVMWVUbWRGbnlIaXVpMjVQUzkwTWl4eEJG?=
- =?utf-8?B?MFAxQXcyRExRZDRtKzFETGJKZDBDMkxacFExWHM4Y2IvamF2RWRIVG1UNHpG?=
- =?utf-8?B?eVIwU2hmVXVjR2d4TUo1UG9Ock91Qy9ORTFzaGlFb2J6R2oxU2NYcDlVZWpw?=
- =?utf-8?B?d0QzbE8rblVPRm41WWdQL3FORkt4amJaTHdGcUYzN0hmelMxa1N6a1NpSk9S?=
- =?utf-8?B?TEZ3UUhRcTR3dDZnT1FndFkrcmxGd2I3K3l3VUtodnhUV3RoQzFpdGFEL0F2?=
- =?utf-8?B?cS9JSjlhM1RxUjBJL2lwaW5WSlR4ZVJkNkhJWUladjVQdjk1ckthNTQxVEkv?=
- =?utf-8?B?N21jZFFZTkZVOE5ZUlBQdzhUcm5lYVJzQVVCbjIzU0xJdDRPdnpQSm5HOHlt?=
- =?utf-8?B?MEh4aS8zTDhPOW1Qd1RNNHhPUGIvOTZ2UWdWRnBBVVkrSVV3QTZmUXErVktx?=
- =?utf-8?B?L1prQVJpT2p1Q0MxQmZDblRFNm41OWo2V0themdIQVZHQklSN09CR3Exbm9s?=
- =?utf-8?B?Z3pMZGNyc05ZWEplenlJMUxYNHNYeTZzTFBRZUdzbE5mVXY0dTZVb3VJN2N5?=
- =?utf-8?B?aDV5ZXBMTDRxNWw4UEVCVFh6OU5GYk9VejdZU2lNSnplWXQ0SEs2ZGd6SklN?=
- =?utf-8?B?YWJWQnVOUGh4MWsyQndHU1h4WCszM2hUZjd0ZU02YTd5eEhaR3JObTlvY0xX?=
- =?utf-8?B?SXZYNklrUUNSSkFablNTSzBlY0JXb1NSdTREZjFiZG82cHUwUmRSZmN1RWV2?=
- =?utf-8?B?SjluQmhLSkRraVJQNzZsT2pDUkYrcENydHUrS3F3Z3ZVL1JwdDJVV0hSRDky?=
- =?utf-8?B?eWtiY3RpY1JNdStWMnprR0RMVklKUkRSbUlqbDhoenZrQlVFYmtUMlhibStp?=
- =?utf-8?B?bHZBd3ArT0FEMnVzTzZSWnc5U09Qdmx3bDVRNVQ2S2pQUlJmVUpTV3B5cjFO?=
- =?utf-8?B?aVRpV3NiM2p6UDlhOVMvbXZpSS9CVlJ2ZVlWdjJWeEt2aEhveWFra25pakpT?=
- =?utf-8?B?cFk1c3BYekVWVW0yS1pvYTE5WlBFbXI4aUw2aVhsc1h3NUlNdElwVUhvL05U?=
- =?utf-8?B?VzhSa21zNFUxdmw4UFRkZ0tBb2tNbkJVbFR3U2ZoTkRhNEJHRE0xK3JlTGR5?=
- =?utf-8?B?TU5ZZThYdHZMOHhGK1NjYTluU3hRMElDdDhseHNGaVNhclVTMkVQU1hZdCtM?=
- =?utf-8?B?MXV2S2xiTzcvN1J6Zks2M1JJTks1cUF5cDI1SUVpN1IzUmhPczBLd0lzM0dh?=
- =?utf-8?B?VUpSVmNyZldzdEszYzROVCtUZ2daNzB2SC9PdUkvN3BZaGs4S3l5ckt0aXFN?=
- =?utf-8?Q?wp8tuR7HfQ5zp0JFulVHfbTh4?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 86502b56-7243-43ca-f7a8-08ddd9ae2b4e
-X-MS-Exchange-CrossTenant-AuthSource: BL3PR12MB9049.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Aug 2025 14:40:23.3843
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: WYgW7E3LMq6X5lfP9r1yD2pQTxkz8qa/324/FHjKTvpJgF+zZmXWmMH1i0kMDE7MHbrJTUArpf+kfK3hjhSPdA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PPF4D923B935
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <77qzhwwieggkmyguxm6v7dhpro2ez3nch6qelc2dd5lbdgp6hz@dnbfliagwpnv>
 
-
-
-On 8/12/2025 7:06 AM, Kim Phillips wrote:
-> On 7/25/25 1:46 PM, Kalra, Ashish wrote:
->> On 7/25/2025 1:28 PM, Tom Lendacky wrote:
->>> On 7/25/25 12:58, Kim Phillips wrote:
->>>> Hi Ashish,
->>>>
->>>> For patches 1 through 6 in this series:
->>>>
->>>> Reviewed-by: Kim Phillips <kim.phillips@amd.com>
->>>>
->>>> For this 7/7 patch, consider making the simplification changes I've supplied
->>>> in the diff at the bottom of this email: it cuts the number of lines for
->>>> check_and_enable_sev_snp_ciphertext_hiding() in half.
->>> Not sure that change works completely... see below.
->>>
->>>> Thanks,
->>>>
->>>> Kim
->>>>
->>>> On 7/21/25 9:14 AM, Ashish Kalra wrote:
->>>>> From: Ashish Kalra <ashish.kalra@amd.com>
->>>> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
->>>> index 7ac0f0f25e68..bd0947360e18 100644
->>>> --- a/arch/x86/kvm/svm/sev.c
->>>> +++ b/arch/x86/kvm/svm/sev.c
->>>> @@ -59,7 +59,7 @@ static bool sev_es_debug_swap_enabled = true;
->>>>   module_param_named(debug_swap, sev_es_debug_swap_enabled, bool, 0444);
->>>>   static u64 sev_supported_vmsa_features;
->>>>
->>>> -static char ciphertext_hiding_asids[16];
->>>> +static char ciphertext_hiding_asids[10];
->>>>   module_param_string(ciphertext_hiding_asids, ciphertext_hiding_asids,
->>>>               sizeof(ciphertext_hiding_asids), 0444);
->>>>   MODULE_PARM_DESC(ciphertext_hiding_asids, "  Enable ciphertext hiding for
->>>> SEV-SNP guests and specify the number of ASIDs to use ('max' to utilize
->>>> all available SEV-SNP ASIDs");
->>>> @@ -2970,42 +2970,22 @@ static bool is_sev_snp_initialized(void)
->>>>
->>>>   static bool check_and_enable_sev_snp_ciphertext_hiding(void)
->>>>   {
->>>> -    unsigned int ciphertext_hiding_asid_nr = 0;
->>>> -
->>>> -    if (!ciphertext_hiding_asids[0])
->>>> -        return false;
->>> If the parameter was never specified
->>>> -
->>>> -    if (!sev_is_snp_ciphertext_hiding_supported()) {
->>>> -        pr_warn("Module parameter ciphertext_hiding_asids specified but
->>>> ciphertext hiding not supported\n");
->>>> -        return false;
->>>> -    }
->>> Removing this block will create an issue below.
->>>
->>>> -
->>>> -    if (isdigit(ciphertext_hiding_asids[0])) {
->>>> -        if (kstrtoint(ciphertext_hiding_asids, 10,
->>>> &ciphertext_hiding_asid_nr))
->>>> -            goto invalid_parameter;
->>>> -
->>>> -        /* Do sanity check on user-defined ciphertext_hiding_asids */
->>>> -        if (ciphertext_hiding_asid_nr >= min_sev_asid) {
->>>> -            pr_warn("Module parameter ciphertext_hiding_asids (%u)
->>>> exceeds or equals minimum SEV ASID (%u)\n",
->>>> -                ciphertext_hiding_asid_nr, min_sev_asid);
->>>> -            return false;
->>>> -        }
->>>> -    } else if (!strcmp(ciphertext_hiding_asids, "max")) {
->>>> -        ciphertext_hiding_asid_nr = min_sev_asid - 1;
->>>> +    if (!strcmp(ciphertext_hiding_asids, "max")) {
->>>> +        max_snp_asid = min_sev_asid - 1;
->>>> +        return true;
->>>>       }
->> As Tom has already pointed out, we will try enabling ciphertext hiding with SNP_INIT_EX even if ciphertext hiding feature is not supported and enabled.
-> AFAICT, Tom pointed out two bugs with my changes: the 'base' argument to kstrtoint(), and bad min_sev_es_asid assignment if ciphertext hiding isn't supported.
->> We do need to make these basic checks, i.e., if the parameter has been specified and if ciphertext hiding feature is supported and enabled,
->> before doing any further processing.
->>
->> Why should we even attempt to do any parameter comparison, parameter conversion or sanity checks if the parameter has not been specified and/or
->> ciphertext hiding feature itself is not supported and enabled.
-> Agreed.
->> I believe this function should be simple and understandable which it is.
-> Please take a look at the new diff below: I believe it's even simpler and more understandable as it's less code, and now alerts the user if they provide an empty "ciphertext_hiding_asids= ".
+On 2025-08-05 05:08 PM, Joel Granados wrote:
+> On Fri, Jun 20, 2025 at 11:19:58PM +0000, David Matlack wrote:
+> > This series introduces VFIO selftests, located in
+> > tools/testing/selftests/vfio/.
+> Sorry for coming late to the party. Only recently got some cycles to go
+> through this. This seems very similar to what we are trying to do with
+> iommutests [3].
 > 
-> Thanks,
+> > 
+> > VFIO selftests aim to enable kernel developers to write and run tests
+> > that take the form of userspace programs that interact with VFIO and
+> > IOMMUFD uAPIs. VFIO selftests can be used to write functional tests for
+> > new features, regression tests for bugs, and performance tests for
+> > optimizations.
+> Have you considered implementing something outside the kernel sources?
+> Something similar to fstests [1] or blktests [2]?
 > 
-> Kim
+> I ask because I have always seen it as a suit that tests (regression and
+> performance) the Linux kernel as well as the hardware. By hardware I
+> mean IOMMU devices, peripherals as well as their QEMU implementations.
+> Since the scope is quite big, seemed (to me) like a good idea to keep it
+> out of the kernel sources.
 > 
->  arch/x86/kvm/svm/sev.c | 47 ++++++++++++++++++-----------------------------
->  1 file changed, 18 insertions(+), 29 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 7ac0f0f25e68..57c6e4717e51 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -2970,42 +2970,29 @@ static bool is_sev_snp_initialized(void)
-> 
->  static bool check_and_enable_sev_snp_ciphertext_hiding(void)
->  {
-> -       unsigned int ciphertext_hiding_asid_nr = 0;
-> -
-> -       if (!ciphertext_hiding_asids[0])
-> -               return false;
-> -
-> -       if (!sev_is_snp_ciphertext_hiding_supported()) {
-> +       if (ciphertext_hiding_asids[0] && !sev_is_snp_ciphertext_hiding_supported()) {
->                 pr_warn("Module parameter ciphertext_hiding_asids specified but ciphertext hiding not supported\n");
->                 return false;
->         }
-> 
+> Can you speak to the pros/cons of having it in selftests? (sorry if this
+> was already answered)
 
-This is incorrect, if ciphertext_hiding_asids module parameter is never specified, user will always 
-get a warning of an invalid ciphertext_hiding_asids module parameter.
+I talked about this a bit in the RFC cover letter, but did not copy it
+over to the v1 cover letter. Relevant excerpts below:
 
-When this module parameter is optional why should the user get a warning about an invalid module parameter.
+ : We chose selftests to host these tests primarily to enable integration
+ : with the existing KVM selftests. As explained in the next section,
+ : enabling KVM developers to test the interaction between VFIO and KVM is
+ : one of the motivators of this series.
+ :
+ : [...]
+ :
+ :  - It enables testing the interaction between VFIO and KVM. There are
+ :    some paths in KVM that are only exercised through VFIO, such as IRQ
+ :    bypass. VFIO selftests provides a helper library to enable KVM
+ :    developers to write KVM selftests to test those interactions [3].
+ :
+ : [...]
+ :
+ : To support testing the interactions between VFIO and KVM, the VFIO
+ : selftests support sharing its library with the KVM selftest. The patches
+ : at the end of this series demonstrate how that works.
+ :
+ : Essentially, we allow the KVM selftests to build their own copy of
+ : tools/testing/selftests/vfio/lib/ and link it into KVM selftests
+ : binaries. This requires minimal changes to the KVM selftests Makefile.
+ :
+ : [3] https://lore.kernel.org/kvm/20250404193923.1413163-68-seanjc@google.com/
 
-Again, why do we want to do all these checks below if this module parameter has not been specified by
-the user ?
+If we had these tests out of tree, then I dn't see a clear path to being
+able to test the interaction between VFIO and KVM.
 
-> -       if (isdigit(ciphertext_hiding_asids[0])) {
-> -               if (kstrtoint(ciphertext_hiding_asids, 10, &ciphertext_hiding_asid_nr))
-> -                       goto invalid_parameter;
-> -
-> -               /* Do sanity check on user-defined ciphertext_hiding_asids */
-> -               if (ciphertext_hiding_asid_nr >= min_sev_asid) {
-> -                       pr_warn("Module parameter ciphertext_hiding_asids (%u) exceeds or equals minimum SEV ASID (%u)\n",
-> -                               ciphertext_hiding_asid_nr, min_sev_asid);
+I am also probably biased/influenced coming from KVM development, where
+we use KVM selftests. I have found it very valuable as a developer to be
+able to send code changes along with the tests for those changes in a
+single series, without having to work across multiple repositories. And
+I am very used to that workflow.
 
-A *combined* error message such as this: 
-"invalid ciphertext_hiding_asids XXX or !(0 < XXX < minimum SEV ASID 100)"
+Lastly, since the goal of my series is only to enable testing the kernel
+(VFIO, IOMMUFD, KVM, IOMMU drivers, etc.), co-locating with the kernel
+makes sense. I was not looking test hardware or emulators for
+correctness.
 
-is going to be really confusing to the user.
+I do see that there is a lot of overlap between testing the kernel and
+testing hardware/emulators, and that there's likely code we can share.
+But I also want to be practical and make sure we solve the problem of
+testing the kernel.
 
-It is much simpler for user to understand if the error/warning is: 
-"Module parameter ciphertext_hiding_asids XXX exceeds or equals minimum SEV ASID YYY"
-OR
-"Module parameter ciphertext_hiding_asids XXX invalid"
-
-Thanks,
-Ashish
-
-> -                       return false;
-> -               }
-> -       } else if (!strcmp(ciphertext_hiding_asids, "max")) {
-> -               ciphertext_hiding_asid_nr = min_sev_asid - 1;
-> -       }
-> -
-> -       if (ciphertext_hiding_asid_nr) {
-> -               max_snp_asid = ciphertext_hiding_asid_nr;
-> +       if (!strcmp(ciphertext_hiding_asids, "max")) {
-> +               max_snp_asid = min_sev_asid - 1;
->                 min_sev_es_asid = max_snp_asid + 1;
-> -               pr_info("SEV-SNP ciphertext hiding enabled\n");
-> -
->                 return true;
->         }
 > 
-> -invalid_parameter:
-> -       pr_warn("Module parameter ciphertext_hiding_asids (%s) invalid\n",
-> -               ciphertext_hiding_asids);
-> -       return false;
-> +       /* Do sanity check on user-defined ciphertext_hiding_asids */
-> +       if (kstrtoint(ciphertext_hiding_asids, 10, &max_snp_asid) ||
-> +           max_snp_asid >= min_sev_asid) {
-> +               pr_warn("invalid ciphertext_hiding_asids \"%s\" or !(0 < %u < minimum SEV ASID %u)\n",
-> +                       ciphertext_hiding_asids, max_snp_asid, min_sev_asid);
-> +               max_snp_asid = min_sev_asid - 1;
-> +               return false;
-> +       }
-> +
-> +       min_sev_es_asid = max_snp_asid + 1;
-> +
-> +       return true;
->  }
+> > 
+> > These tests are designed to interact with real PCI devices, i.e. they do
+> > not rely on mocking out or faking any behavior in the kernel. This
+> > allows the tests to exercise not only VFIO but also IOMMUFD, the IOMMU
+> > driver, interrupt remapping, IRQ handling, etc.
+> And depending on how you execute them, you might also be exercising the
+> QEMU emulation paths. You could even test different HW firmwares if you
+> wanted to :)
+
+That's true, but not a problem I'm looking to solve (testing hardware or
+testing QEMU). My only goal is testing the kernel.
+
 > 
->  void __init sev_hardware_setup(void)
-> @@ -3122,8 +3109,10 @@ void __init sev_hardware_setup(void)
->                  * ASID range into separate SEV-ES and SEV-SNP ASID ranges with
->                  * the SEV-SNP ASID starting at 1.
->                  */
-> -               if (check_and_enable_sev_snp_ciphertext_hiding())
-> +               if (check_and_enable_sev_snp_ciphertext_hiding()) {
-> +                       pr_info("SEV-SNP ciphertext hiding enabled\n");
->                         init_args.max_snp_asid = max_snp_asid;
-> +               }
->                 if (sev_platform_init(&init_args))
->                         sev_supported = sev_es_supported = sev_snp_supported = false;
->                 else if (sev_snp_supported)
+> > 
+> > For more background on the motivation and design of this series, please
+> > see the RFC:
+> > 
+> >   https://lore.kernel.org/kvm/20250523233018.1702151-1-dmatlack@google.com/
+> > 
+> > This series can also be found on GitHub:
+> > 
+> >   https://github.com/dmatlack/linux/tree/vfio/selftests/v1
+> > 
+> ...
+> > Instructions
+> > -----------------------------------------------------------------------
+> > 
+> > Running VFIO selftests requires at a PCI device bound to vfio-pci for
+> > the tests to use. The address of this device is passed to the test as
+> > a segment:bus:device.function string, which must match the path to
+> > the device in /sys/bus/pci/devices/ (e.g. 0000:00:04.0).
+> Would you be able to autodetect the devices that are vfio-testable?
+> I saw this question in the thread, but did not see the answer (sorry
+> if I missed it).
+
+Eventually I think that could be possible. But for now it is up to the
+user to deide which devices to use.
+
 > 
+> > 
+> > Once you have chosen a device, there is a helper script provided to
+> > unbind the device from its current driver, bind it to vfio-pci, export
+> > the environment variable $VFIO_SELFTESTS_BDF, and launch a shell:
+> If I'm reading the series correctly there is a fair amount of helper
+> code needed: device (un)binding, checking capabilities, setting up
+> DMAable memory.... Have you considered a library like libvfn [4] (is
+> there any other?) to take care of all this?
+
+I didn't consider using an external library since it seemed like there
+would be several downsides, and the amount of helper code here was quite
+small IMO:
+
+ .../selftests/vfio/lib/include/vfio_util.h    | 295 +++++++++
+ .../selftests/vfio/lib/vfio_pci_device.c      | 594 ++++++++++++++++++
+ .../selftests/vfio/lib/vfio_pci_driver.c      | 126 ++++
+ tools/testing/selftests/vfio/run.sh           | 109 ++++
+
+My concerns with using an external helper library are:
+
+ - It will make writing tests more difficult because it will require
+   making changes both to the external library and to selftests. This
+   means dealing with 2 different repositories, 2 different code review
+   processes, 2 different maintaineres, etc. Not to mention needing to
+   first change the library before writing the test.
+
+   The harder it is to write tests, the less tests will be written IMO.
+
+ - It will make maintaining VFIO selftests more difficult as we have to
+   maintain compatability with the library and deal with breaking
+   changes (or never make breaking changes to the library, which makes
+   it harder to maintain and extend).
+
+   Contrast this to having the helper code co-located with the tests we
+   can make whatever changes we want as needed and keep things as simple
+   as possible.
+
+It can be good to avoid duplicate code across projects, but in this case
+it doesn't seem like it enhances our ability to test the kernel or
+solves any specific problem.
+
+One place where libvfn could make sense is if someone wants to support
+running VFIO selftests that require a driver with NVMe devices.
+Implementing that driver with the help of libvfn may be simpler than
+implementing one from scratch. But I think we should cross that bridge
+when we get there and compare the 2 approaches. The VFIO selftests
+driver API is pretty simple so implementing an NVMe driver in VFIO
+selftests might still be the simpler option.
+
 > 
->> Thanks,
->> Ashish
->>
->>>> -    if (ciphertext_hiding_asid_nr) {
->>>> -        max_snp_asid = ciphertext_hiding_asid_nr;
->>>> -        min_sev_es_asid = max_snp_asid + 1;
->>>> -        pr_info("SEV-SNP ciphertext hiding enabled\n");
->>>> -
->>>> -        return true;
->>>> +    /* Do sanity check on user-defined ciphertext_hiding_asids */
->>>> +    if (kstrtoint(ciphertext_hiding_asids,
->>>> sizeof(ciphertext_hiding_asids), &max_snp_asid) ||
->>> The second parameter is supposed to be the base, this gets lucky because
->>> you changed the size of the ciphertext_hiding_asids to 10.
->>>
->>>> +        max_snp_asid >= min_sev_asid ||
->>>> +        !sev_is_snp_ciphertext_hiding_supported()) {
->>>> +        pr_warn("ciphertext_hiding not supported, or invalid
->>>> ciphertext_hiding_asids \"%s\", or !(0 < %u < minimum SEV ASID %u)\n",
->>>> +            ciphertext_hiding_asids, max_snp_asid, min_sev_asid);
->>>> +        max_snp_asid = min_sev_asid - 1;
->>>> +        return false;
->>>>       }
->>>>
->>>> -invalid_parameter:
->>>> -    pr_warn("Module parameter ciphertext_hiding_asids (%s) invalid\n",
->>>> -        ciphertext_hiding_asids);
->>>> -    return false;
->>>> +    return true;
->>>>   }
->>>>
->>>>   void __init sev_hardware_setup(void)
->>>> @@ -3122,8 +3102,11 @@ void __init sev_hardware_setup(void)
->>>>            * ASID range into separate SEV-ES and SEV-SNP ASID ranges with
->>>>            * the SEV-SNP ASID starting at 1.
->>>>            */
->>>> -        if (check_and_enable_sev_snp_ciphertext_hiding())
->>>> +        if (check_and_enable_sev_snp_ciphertext_hiding()) {
->>>> +            pr_info("SEV-SNP ciphertext hiding enabled\n");
->>>>               init_args.max_snp_asid = max_snp_asid;
->>>> +            min_sev_es_asid = max_snp_asid + 1;
->>> If "max" was specified, but ciphertext hiding isn't enabled, you've now
->>> changed min_sev_es_asid to an incorrect value and will be trying to enable
->>> ciphertext hiding during initialization.
->>>
->>> Thanks,
->>> Tom
->>>
->>>> +        }
->>>>           if (sev_platform_init(&init_args))
->>>>               sev_supported = sev_es_supported = sev_snp_supported = false;
->>>>           else if (sev_snp_supported)
->>>>
+> One of the good things about having all this in a library is that it can
+> be used in other contexts besides testing.
+
+True but if it comes at the cost of making VFIO tests harder to write and
+maintain, I don't think it's necessarily a good idea.
+
 > 
+> > 
+> >   $ tools/testing/selftests/vfio/run.sh -d 0000:00:04.0 -s
+> > 
+> > The -d option tells the script which device to use and the -s option
+> > tells the script to launch a shell.
+> > 
+> > Additionally, the VFIO selftest vfio_dma_mapping_test has test cases
+> > that rely on HugeTLB pages being available, otherwise they are skipped.
+> > To enable those tests make sure at least 1 2MB and 1 1GB HugeTLB pages
+> > are available.
+> > 
+> >   $ echo 1 > /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
+> >   $ echo 1 > /sys/kernel/mm/hugepages/hugepages-1048576kB/nr_hugepages
+> Should this be automatic? You can just modify nr_hugepages everytime you
+> execute a test that requires it.
+
+Yeah I think we could probably do this automatically. As you can
+probably tell, I left most of the environment setup to the user for now
+but a lot of this can be automated in the seltests themselves.
+
+> 
+> > 
+> > To run all VFIO selftests using make:
+> > 
+> >   $ make -C tools/testing/selftests/vfio run_tests
+> This ties back to having the test suit outside the Linux Kernel sources.
+> I might not always want/have a Linux Kernel selftests. Like if I would
+> want to test the Intel/AMD IOMMU implementation in QEMU.
+
+Agreed, but the goal of this series is not to test the correctness of
+QEMU or hardware. It's to enable testing the kernel code.
+
+If you want to test the correctness of QEMU, testing from the
+VFIO/userspace level might not be the right approach anyway. You
+probably want to be able to interact directly with the IOMMU registers,
+interrupt handlers, etc. e.g. Something like intel-iommu.c in
+kvm-unit-tests[*], combined with higher-level application testing.
+
+VFIO selftests would be kind of a weird middle-ground where you can't
+actually control the interactions with the hardware/QEMU, (since the
+test is running in userspace and going through the kernel), and at the
+same time it's not a realistic application.
+
+[*] https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/blob/master/x86/intel-iommu.c
+
+> 
+> > 
+> > To run individual tests:
+> > 
+> >   $ tools/testing/selftests/vfio/vfio_dma_mapping_test
+> >   $ tools/testing/selftests/vfio/vfio_dma_mapping_test -v iommufd_anonymous_hugetlb_2mb
+> >   $ tools/testing/selftests/vfio/vfio_dma_mapping_test -r vfio_dma_mapping_test.iommufd_anonymous_hugetlb_2mb.dma_map_unmap
+> > 
+> > The environment variable $VFIO_SELFTESTS_BDF can be overridden for a
+> > specific test by passing in the BDF on the command line as the last
+> > positional argument.
+> > 
+> >   $ tools/testing/selftests/vfio/vfio_dma_mapping_test 0000:00:04.0
+> >   $ tools/testing/selftests/vfio/vfio_dma_mapping_test -v iommufd_anonymous_hugetlb_2mb 0000:00:04.0
+> >   $ tools/testing/selftests/vfio/vfio_dma_mapping_test -r vfio_dma_mapping_test.iommufd_anonymous_hugetlb_2mb.dma_map_unmap 0000:00:04.0
+> > 
+> > When you are done, free the HugeTLB pages and exit the shell started by
+> > run.sh. Exiting the shell will cause the device to be unbound from
+> > vfio-pci and bound back to its original driver.
+> > 
+> >   $ echo 0 > /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
+> >   $ echo 0 > /sys/kernel/mm/hugepages/hugepages-1048576kB/nr_hugepages
+> >   $ exit
+> As before: Can this be done automatically?
+
+Yeah, most likely this can be done automatically.
+
+> 
+> > 
+> > It's also possible to use run.sh to run just a single test hermetically,
+> > rather than dropping into a shell:
+> > 
+> >   $ tools/testing/selftests/vfio/run.sh -d 0000:00:04.0 -- tools/testing/selftests/vfio/vfio_dma_mapping_test -v iommufd_anonymous
+> > 
+> > Tests
+> > -----------------------------------------------------------------------
+> > 
+> > There are 5 tests in this series, mostly to demonstrate as a
+> > proof-of-concept:
+> > 
+> >  - tools/testing/selftests/vfio/vfio_pci_device_test.c
+> >  - tools/testing/selftests/vfio/vfio_pci_driver_test.c
+> >  - tools/testing/selftests/vfio/vfio_iommufd_setup_test.c
+> >  - tools/testing/selftests/vfio/vfio_dma_mapping_test.c
+> >  - tools/testing/selftests/kvm/vfio_pci_device_irq_test.c
+> > 
+> > Future Areas of Development
+> > -----------------------------------------------------------------------
+> > 
+> > Library:
+> > 
+> >  - Driver support for devices that can be used on AMD, ARM, and other
+> >    platforms (e.g. mlx5).
+> >  - Driver support for a device available in QEMU VMs (e.g.
+> >    pcie-ats-testdev [1])
+> >  - Support for tests that use multiple devices.
+> >  - Support for IOMMU groups with multiple devices.
+> >  - Support for multiple devices sharing the same container/iommufd.
+> >  - Sharing TEST_ASSERT() macros and other common code between KVM
+> >    and VFIO selftests.
+> Same as before: How about a lib?
+
+That is how I plan to approach it. Just like
+tools/testing/selftests/vfio/lib can be shared with KVM selftests, we
+can create a selftests library for this common stuff and share it
+between VFIO and KVM.
+
+But if you are referring to an external library that is outside of the
+kernel tree, see my comments above.
+
+> 
+> > 
+> > Tests:
+> > 
+> >  - DMA mapping performance tests for BARs/HugeTLB/etc.
+> >  - Porting tests from
+> >    https://github.com/awilliam/tests/commits/for-clg/ to selftests.
+> >  - Live Update selftests.
+> >  - Porting Sean's KVM selftest for posted interrupts to use the VFIO
+> >    selftests library [2]
+> > 
+> ...
+> > 
+> > base-commit: e271ed52b344ac02d4581286961d0c40acc54c03
+> > prerequisite-patch-id: c1decca4653262d3d2451e6fd4422ebff9c0b589
+> > -- 
+> > 2.50.0.rc2.701.gf1e915cc24-goog
+> > 
+> 
+> Best
+
+Thanks for taking a look!
+
+> 
+> [1] https://github.com/kdave/xfstests
+> [2] https://github.com/linux-blktests/blktests
+> [3] https://github.com/SamsungDS/iommutests
+> [4] https://github.com/SamsungDS/libvfn
+> 
+> -- 
+> 
+> Joel Granados
+
+
 
