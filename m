@@ -1,437 +1,149 @@
-Return-Path: <kvm+bounces-54524-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54525-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10AF0B22B63
-	for <lists+kvm@lfdr.de>; Tue, 12 Aug 2025 17:08:18 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 764C4B22B5E
+	for <lists+kvm@lfdr.de>; Tue, 12 Aug 2025 17:07:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2107D3AF873
-	for <lists+kvm@lfdr.de>; Tue, 12 Aug 2025 15:05:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7A4D47B1155
+	for <lists+kvm@lfdr.de>; Tue, 12 Aug 2025 15:05:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7161F2F4A02;
-	Tue, 12 Aug 2025 15:04:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA39B2F5332;
+	Tue, 12 Aug 2025 15:07:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hhsHpA4a"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bWH9o2MO"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD25A2EA743
-	for <kvm@vger.kernel.org>; Tue, 12 Aug 2025 15:04:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A5DC3F9C5
+	for <kvm@vger.kernel.org>; Tue, 12 Aug 2025 15:07:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755011094; cv=none; b=VXGO+/msqgApbhQyD1WveOgpZ6gU5i4Thj2pmpWH8o2fIvFOu5fFBO7GDPrzt9Dj7/5MveKk230s/NxE92fyFWSabTFGrCLBa/O/16sFju1cr2D3oSVSrgW/5Ve50enBtQ9ZKmwO35vx72xvlPzQQxCFTRQvDNTU6ml7PX957rw=
+	t=1755011226; cv=none; b=giNdozjthOa/Z3QRWmkThA4dA5aCE0hakJceRhyBr6YsyjCksPKB5xMuf/gvN1W3yu/GSbI/MOgH6oGPvuEh1fjKGajwbOp7LB/Ja/4yq9hSwHQDhLdHplIJHJPiZrZYVFE+YWSVdPNDAUyT3THusjQhgpULs1dc4/B+WTDdBU0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755011094; c=relaxed/simple;
-	bh=SsmXH682vJv5gUZsxuvwMPOFJB1jk6im16tEQgXtQj0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=paSZWO763fWwQUnhUf3mN+D7s1dHWmFnIfSz5okmU9DDe+Ynje/mkQqFG7gPCHo3t5d10VSQXKPmY+5Qon+5iDzSZ3zn/tBoAIhWUMRmzyLEWxXKZVFhwpxhMs/fMsVr6YsNmL/R2lrg7eqep8Xi8hNjMNLtWT7k4Il8ROy8IH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hhsHpA4a; arc=none smtp.client-ip=209.85.214.175
+	s=arc-20240116; t=1755011226; c=relaxed/simple;
+	bh=dU2XaoyPROWY5JgE6YqFK++DH1vf16ilgO1c98wW1xY=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=mllx9K2UWaqU+s1QDVprxg1jkop2TP7Zh3Aqy9Jui5AcgMt+XnLJDkTHlZOJkh7O9m+gS3V9Q5qLi0+gEvZoUqqhaDzhzEfw91owvZddisP+kIs7mzwAkfjwM2OIoPqXkdl9fD5dVN/O6hpilpYADDr/OzYOqUE4wBW7CTJ9VAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bWH9o2MO; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2406fe901fcso58891275ad.3
-        for <kvm@vger.kernel.org>; Tue, 12 Aug 2025 08:04:52 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-23fed1492f6so81314775ad.2
+        for <kvm@vger.kernel.org>; Tue, 12 Aug 2025 08:07:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755011092; x=1755615892; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1CbZDGjL00dkzJzg2EeaN2XrMVYfOXDa2o/eEp40/hY=;
-        b=hhsHpA4arn1oJzCuubxFtQFJbJa59JtQSVb3FB6lieJhsCeXozqpJrhhcDge9F6vVr
-         Pk7Oyd6YG7ARaJO6jPKVLfwZarvXFZxaYuUp5CAxt2TI5pp47F1l28XAKisADIZT2pvm
-         e172COXDz43By1Fug6h7dg1W0uUaC9odz2XravHkv6FIaQlzUgOdYH/XdUdXDA3DnP+t
-         6alrgsvSGk98+MfRIeSZVS0xnLIL1SupivWxCy2xJTOq5npVSOz/GOTANQt98ADd7dS4
-         0eDJf80Ko33ixz9qo/VQiLHlLI20acB3Ov8I1dAmzw4YlEsXx15OCk9AXuiOZFYrt+4w
-         txoA==
+        d=google.com; s=20230601; t=1755011224; x=1755616024; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=RWVOfX09b6wMzY0hn2+O1rM/PZq+779HvmHU5dA90gM=;
+        b=bWH9o2MOBbJYX+Rvg2WTanpZsEEo9QevSFkLijMJwqxkLexn9kMrvy2aEi7fIYHcv9
+         DTkunC6G8eWSEz5b8RDmNGxG/JSH4n6EAR37tNkIvHp3FAT2L2OOOle7vIZTvuZqYMfF
+         zYBDsf0kFNV7XcmSmsfaZHTeG9oC5h2oV/WYqx4perLjdRcxSizN0XcteNLyBkoZT6wn
+         cW1xtyEEKfH02uoFIAGgOodyXvv1yW2YJ7MstcP6/XRg86mZ/smPm9I4Hlj/txR621XO
+         GYUDsYoJVNFw7AgeThrCQqX1K3SezEVH5/cMO+GYC7W5pTauv2hSi7yz/4Gj6sFHcW1y
+         aSHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755011092; x=1755615892;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1CbZDGjL00dkzJzg2EeaN2XrMVYfOXDa2o/eEp40/hY=;
-        b=FppyiQGxwkU84ErS+LDq+gZS3hyeMnjTNlWDSZkn4BoLKXI98x4SiCAWkZnZHkqe9x
-         4mrWmQIiCatbrOT01g6ATuw7dsVQ8qPDneJhh89ItCQuY2891Rb8g28pAsyrnTV5rU5b
-         Em7+ymfXGTr7ksJ+WixWPrqYo6ve8SXPAhV3JIufxx4+CZAEuWjb+JQIYSsPEqP6TOV8
-         fGt7PXVbYra6N0xOxIYpNN5waWaXXZ1VWtYTnPaCBpqTsCsRpp2280ztJtptoSGTnVK7
-         GuZP91aQhgl91c0kTrrbDKnlntzKDyvnQ/uEGm0ssSLgSZuCTAtsB7FvgVC5iDIgQ2+4
-         Rueg==
-X-Forwarded-Encrypted: i=1; AJvYcCUBtRp93pts+f+AR7PknBtDwKNqAAF4Z83eFEhpZmR1w13X0pU7LbAqqsmGPLJeBOKZ5mg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyoRfNqK3B906A4gzSNpgA2JaJhzIl4EJnWnFD+vlZV3yTRv6BD
-	Jr0a4DPRuis1hb8mFxtmS18A80NYjHVlaufOmueuWSQ3wCMj3siQ7K3xvuWIEGlBVA==
-X-Gm-Gg: ASbGncsQASeDX452jRQ0LjhE+EzUn8oXKfh5kJWkYhznce6hlC+x0d3y4GefKOOfWgy
-	Hu2+o7lklD5Gr0bPxERlPLFAS5PBkKBB8NuwV/s4DOWK2zqqiJmrrQTrQ3QlGfMfIr5ZqeOw6z/
-	uhaD+yuzbsh7aZO6QTRnhGxaYsoGZyriICDrmBokx39BfjBJe6ub0Hnt8JIiV5p6xyt0ahXjFRc
-	tWyXFsD8S+ABmzK4iINI7rGvDleFsQFW6G+Sl34sGHqBMTBK92E0h7ckP3oIPC09kksY1ajBh6D
-	WSRLgWExOAsOXJhVQ0fk9DY4qJLghbP+06AY4DpxoFQGgofy6TmvexglfaXaxf5rKxtbmp0aoGH
-	dTqWn3PjVlmH8a6hXorDrWtlEkw5j6jBc/dy6uPw2QqmoJW+GQdvPrNH4bg8yKQGxLCQP
-X-Google-Smtp-Source: AGHT+IGXZwUL5NaeT1agFRHYcvQaoEN8NWmu+JbPXmhoGdaiKVFexo3ojjAG56PQqfSTBJj8vwtFkg==
-X-Received: by 2002:a17:903:19c7:b0:240:a222:230c with SMTP id d9443c01a7336-2430bfdac43mr828025ad.12.1755011091106;
-        Tue, 12 Aug 2025 08:04:51 -0700 (PDT)
-Received: from google.com (33.79.127.34.bc.googleusercontent.com. [34.127.79.33])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-241e8aac2e0sm300710985ad.171.2025.08.12.08.04.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Aug 2025 08:04:49 -0700 (PDT)
-Date: Tue, 12 Aug 2025 15:04:45 +0000
-From: David Matlack <dmatlack@google.com>
-To: Joel Granados <joel.granados@kernel.org>
-Cc: Alex Williamson <alex.williamson@redhat.com>,
-	Aaron Lewis <aaronlewis@google.com>,
-	Adhemerval Zanella <adhemerval.zanella@linaro.org>,
-	Adithya Jayachandran <ajayachandra@nvidia.com>,
-	Andrew Jones <ajones@ventanamicro.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Arnaldo Carvalho de Melo <acme@redhat.com>,
-	Bibo Mao <maobibo@loongson.cn>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Dave Jiang <dave.jiang@intel.com>, dmaengine@vger.kernel.org,
-	Huacai Chen <chenhuacai@kernel.org>,
-	James Houghton <jthoughton@google.com>,
-	Jason Gunthorpe <jgg@nvidia.com>, Josh Hilke <jrhilke@google.com>,
-	Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	"Mike Rapoport (Microsoft)" <rppt@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Pasha Tatashin <pasha.tatashin@soleen.com>,
-	"Pratik R. Sampat" <prsampat@amd.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-	Vipin Sharma <vipinsh@google.com>,
-	Wei Yang <richard.weiyang@gmail.com>,
-	"Yury Norov [NVIDIA]" <yury.norov@gmail.com>
-Subject: Re: [PATCH 00/33] vfio: Introduce selftests for VFIO
-Message-ID: <aJtYDWm3kT_Nz6Fd@google.com>
-References: <20250620232031.2705638-1-dmatlack@google.com>
- <77qzhwwieggkmyguxm6v7dhpro2ez3nch6qelc2dd5lbdgp6hz@dnbfliagwpnv>
+        d=1e100.net; s=20230601; t=1755011224; x=1755616024;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=RWVOfX09b6wMzY0hn2+O1rM/PZq+779HvmHU5dA90gM=;
+        b=EqJlzGor2mW5g+dt5VPz2tiXQcrRwZ/+/pdFbTsgF9Viy8wzX/7PWlSrZVNZajAwkr
+         MmGHhElkVkVu4DjrrTERG5+2AKlelcnx0S65QfacVeh4TIGVZtRM6Ya/1WifKXfJ/F2n
+         9ZITy3hIUxY8I4yRflASSYp9yzOWGsLDHmkPGKmGzYheVdp1/kmDNGXKMQ5RT9xF5Dbl
+         efy/6DLjQ4ktdQxZzKsZbv78aly963o5pRE14yTFDXMq0Bu0yANfxnXAxQkJDknzVaod
+         8zJOXghI1o8wM9Xsj5yWHS7ux7r+YTc5VbuAu0cPRG21QIww53dB3+LKwpJcZTXg9atw
+         0pFQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVwSNKq6EsFF9V8/TA5DPv5OW7JffSdkHemNYZXd+lDBNTScu/z2/UgBSU0hX9UNxZMvdc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyzuUKsUE7ZusK7E5GnX9CTox/HrvDmIw1gPNXQDpHQS0MwpUf4
+	lPO+w/XS1EXMjnWG09DQxxY7lwy28VKGZiUlk2wCrj1Ru/bWUVByjrlRGlDBew3g31e0VFXbog/
+	pQAadqQ==
+X-Google-Smtp-Source: AGHT+IEMeP6fwbkLF/vmFUlq1jDJL82y7WP2o/xsl1PBQMg9QSTH7Goz25Fu7Bjzsr/+X7bLIrkCdyFIm6k=
+X-Received: from pjqx9.prod.google.com ([2002:a17:90a:b009:b0:31e:d618:a29c])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:2290:b0:240:9006:1523
+ with SMTP id d9443c01a7336-2430bfec994mr783485ad.10.1755011223969; Tue, 12
+ Aug 2025 08:07:03 -0700 (PDT)
+Date: Tue, 12 Aug 2025 08:07:01 -0700
+In-Reply-To: <20250811013558.332940-1-ewanhai-oc@zhaoxin.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <77qzhwwieggkmyguxm6v7dhpro2ez3nch6qelc2dd5lbdgp6hz@dnbfliagwpnv>
+Mime-Version: 1.0
+References: <20250811013558.332940-1-ewanhai-oc@zhaoxin.com>
+Message-ID: <aJtYlfuBSWhXS3dW@google.com>
+Subject: Re: [PATCH] KVM: x86: expose CPUID 0xC000_0000 for Zhaoxin "Shanghai" vendor
+From: Sean Christopherson <seanjc@google.com>
+To: Ewan Hai <ewanhai-oc@zhaoxin.com>
+Cc: pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, ewanhai@zhaoxin.com, 
+	cobechen@zhaoxin.com, leoliu@zhaoxin.com, lyleli@zhaoxin.com
+Content-Type: text/plain; charset="us-ascii"
 
-On 2025-08-05 05:08 PM, Joel Granados wrote:
-> On Fri, Jun 20, 2025 at 11:19:58PM +0000, David Matlack wrote:
-> > This series introduces VFIO selftests, located in
-> > tools/testing/selftests/vfio/.
-> Sorry for coming late to the party. Only recently got some cycles to go
-> through this. This seems very similar to what we are trying to do with
-> iommutests [3].
+On Sun, Aug 10, 2025, Ewan Hai wrote:
+> rename the local constant CENTAUR_CPUID_SIGNATURE to ZHAOXIN_CPUID_SIGNATURE. 
+
+Why?  I'm not inclined to rename any of the Centaur references, as I don't see
+any point in effectively rewriting history.  If we elect to rename things, then
+it needs to be done in a separate patch, there needs to be proper justification,
+and _all_ references should be converted, e.g. converting just this one macro
+creates discrepancies even with cpuid.c, as there are multiple comments that
+specifically talk about Centaur CPUID leaves.
+
+> The constant is used only inside cpuid.c, so the rename is NFC outside this
+> file.
 > 
-> > 
-> > VFIO selftests aim to enable kernel developers to write and run tests
-> > that take the form of userspace programs that interact with VFIO and
-> > IOMMUFD uAPIs. VFIO selftests can be used to write functional tests for
-> > new features, regression tests for bugs, and performance tests for
-> > optimizations.
-> Have you considered implementing something outside the kernel sources?
-> Something similar to fstests [1] or blktests [2]?
+> Signed-off-by: Ewan Hai <ewanhai-oc@zhaoxin.com>
+> ---
+>  arch/x86/kvm/cpuid.c | 9 +++++----
+>  1 file changed, 5 insertions(+), 4 deletions(-)
 > 
-> I ask because I have always seen it as a suit that tests (regression and
-> performance) the Linux kernel as well as the hardware. By hardware I
-> mean IOMMU devices, peripherals as well as their QEMU implementations.
-> Since the scope is quite big, seemed (to me) like a good idea to keep it
-> out of the kernel sources.
-> 
-> Can you speak to the pros/cons of having it in selftests? (sorry if this
-> was already answered)
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index e2836a255b16..beb83eaa1868 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -1811,7 +1811,7 @@ static int do_cpuid_func(struct kvm_cpuid_array *array, u32 func,
+>  	return __do_cpuid_func(array, func);
+>  }
+>  
+> -#define CENTAUR_CPUID_SIGNATURE 0xC0000000
+> +#define ZHAOXIN_CPUID_SIGNATURE 0xC0000000
+>  
+>  static int get_cpuid_func(struct kvm_cpuid_array *array, u32 func,
+>  			  unsigned int type)
+> @@ -1819,8 +1819,9 @@ static int get_cpuid_func(struct kvm_cpuid_array *array, u32 func,
+>  	u32 limit;
+>  	int r;
+>  
+> -	if (func == CENTAUR_CPUID_SIGNATURE &&
+> -	    boot_cpu_data.x86_vendor != X86_VENDOR_CENTAUR)
+> +	if (func == ZHAOXIN_CPUID_SIGNATURE &&
+> +		boot_cpu_data.x86_vendor != X86_VENDOR_CENTAUR &&
+> +		boot_cpu_data.x86_vendor != X86_VENDOR_ZHAOXIN)
 
-I talked about this a bit in the RFC cover letter, but did not copy it
-over to the v1 cover letter. Relevant excerpts below:
+Align indentation.
 
- : We chose selftests to host these tests primarily to enable integration
- : with the existing KVM selftests. As explained in the next section,
- : enabling KVM developers to test the interaction between VFIO and KVM is
- : one of the motivators of this series.
- :
- : [...]
- :
- :  - It enables testing the interaction between VFIO and KVM. There are
- :    some paths in KVM that are only exercised through VFIO, such as IRQ
- :    bypass. VFIO selftests provides a helper library to enable KVM
- :    developers to write KVM selftests to test those interactions [3].
- :
- : [...]
- :
- : To support testing the interactions between VFIO and KVM, the VFIO
- : selftests support sharing its library with the KVM selftest. The patches
- : at the end of this series demonstrate how that works.
- :
- : Essentially, we allow the KVM selftests to build their own copy of
- : tools/testing/selftests/vfio/lib/ and link it into KVM selftests
- : binaries. This requires minimal changes to the KVM selftests Makefile.
- :
- : [3] https://lore.kernel.org/kvm/20250404193923.1413163-68-seanjc@google.com/
+	if (func == CENTAUR_CPUID_SIGNATURE &&
+	    boot_cpu_data.x86_vendor != X86_VENDOR_CENTAUR &&
+	    boot_cpu_data.x86_vendor != X86_VENDOR_ZHAOXIN)
+		return 0;
 
-If we had these tests out of tree, then I dn't see a clear path to being
-able to test the interaction between VFIO and KVM.
-
-I am also probably biased/influenced coming from KVM development, where
-we use KVM selftests. I have found it very valuable as a developer to be
-able to send code changes along with the tests for those changes in a
-single series, without having to work across multiple repositories. And
-I am very used to that workflow.
-
-Lastly, since the goal of my series is only to enable testing the kernel
-(VFIO, IOMMUFD, KVM, IOMMU drivers, etc.), co-locating with the kernel
-makes sense. I was not looking test hardware or emulators for
-correctness.
-
-I do see that there is a lot of overlap between testing the kernel and
-testing hardware/emulators, and that there's likely code we can share.
-But I also want to be practical and make sure we solve the problem of
-testing the kernel.
-
-> 
-> > 
-> > These tests are designed to interact with real PCI devices, i.e. they do
-> > not rely on mocking out or faking any behavior in the kernel. This
-> > allows the tests to exercise not only VFIO but also IOMMUFD, the IOMMU
-> > driver, interrupt remapping, IRQ handling, etc.
-> And depending on how you execute them, you might also be exercising the
-> QEMU emulation paths. You could even test different HW firmwares if you
-> wanted to :)
-
-That's true, but not a problem I'm looking to solve (testing hardware or
-testing QEMU). My only goal is testing the kernel.
-
-> 
-> > 
-> > For more background on the motivation and design of this series, please
-> > see the RFC:
-> > 
-> >   https://lore.kernel.org/kvm/20250523233018.1702151-1-dmatlack@google.com/
-> > 
-> > This series can also be found on GitHub:
-> > 
-> >   https://github.com/dmatlack/linux/tree/vfio/selftests/v1
-> > 
-> ...
-> > Instructions
-> > -----------------------------------------------------------------------
-> > 
-> > Running VFIO selftests requires at a PCI device bound to vfio-pci for
-> > the tests to use. The address of this device is passed to the test as
-> > a segment:bus:device.function string, which must match the path to
-> > the device in /sys/bus/pci/devices/ (e.g. 0000:00:04.0).
-> Would you be able to autodetect the devices that are vfio-testable?
-> I saw this question in the thread, but did not see the answer (sorry
-> if I missed it).
-
-Eventually I think that could be possible. But for now it is up to the
-user to deide which devices to use.
-
-> 
-> > 
-> > Once you have chosen a device, there is a helper script provided to
-> > unbind the device from its current driver, bind it to vfio-pci, export
-> > the environment variable $VFIO_SELFTESTS_BDF, and launch a shell:
-> If I'm reading the series correctly there is a fair amount of helper
-> code needed: device (un)binding, checking capabilities, setting up
-> DMAable memory.... Have you considered a library like libvfn [4] (is
-> there any other?) to take care of all this?
-
-I didn't consider using an external library since it seemed like there
-would be several downsides, and the amount of helper code here was quite
-small IMO:
-
- .../selftests/vfio/lib/include/vfio_util.h    | 295 +++++++++
- .../selftests/vfio/lib/vfio_pci_device.c      | 594 ++++++++++++++++++
- .../selftests/vfio/lib/vfio_pci_driver.c      | 126 ++++
- tools/testing/selftests/vfio/run.sh           | 109 ++++
-
-My concerns with using an external helper library are:
-
- - It will make writing tests more difficult because it will require
-   making changes both to the external library and to selftests. This
-   means dealing with 2 different repositories, 2 different code review
-   processes, 2 different maintaineres, etc. Not to mention needing to
-   first change the library before writing the test.
-
-   The harder it is to write tests, the less tests will be written IMO.
-
- - It will make maintaining VFIO selftests more difficult as we have to
-   maintain compatability with the library and deal with breaking
-   changes (or never make breaking changes to the library, which makes
-   it harder to maintain and extend).
-
-   Contrast this to having the helper code co-located with the tests we
-   can make whatever changes we want as needed and keep things as simple
-   as possible.
-
-It can be good to avoid duplicate code across projects, but in this case
-it doesn't seem like it enhances our ability to test the kernel or
-solves any specific problem.
-
-One place where libvfn could make sense is if someone wants to support
-running VFIO selftests that require a driver with NVMe devices.
-Implementing that driver with the help of libvfn may be simpler than
-implementing one from scratch. But I think we should cross that bridge
-when we get there and compare the 2 approaches. The VFIO selftests
-driver API is pretty simple so implementing an NVMe driver in VFIO
-selftests might still be the simpler option.
-
-> 
-> One of the good things about having all this in a library is that it can
-> be used in other contexts besides testing.
-
-True but if it comes at the cost of making VFIO tests harder to write and
-maintain, I don't think it's necessarily a good idea.
-
-> 
-> > 
-> >   $ tools/testing/selftests/vfio/run.sh -d 0000:00:04.0 -s
-> > 
-> > The -d option tells the script which device to use and the -s option
-> > tells the script to launch a shell.
-> > 
-> > Additionally, the VFIO selftest vfio_dma_mapping_test has test cases
-> > that rely on HugeTLB pages being available, otherwise they are skipped.
-> > To enable those tests make sure at least 1 2MB and 1 1GB HugeTLB pages
-> > are available.
-> > 
-> >   $ echo 1 > /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
-> >   $ echo 1 > /sys/kernel/mm/hugepages/hugepages-1048576kB/nr_hugepages
-> Should this be automatic? You can just modify nr_hugepages everytime you
-> execute a test that requires it.
-
-Yeah I think we could probably do this automatically. As you can
-probably tell, I left most of the environment setup to the user for now
-but a lot of this can be automated in the seltests themselves.
-
-> 
-> > 
-> > To run all VFIO selftests using make:
-> > 
-> >   $ make -C tools/testing/selftests/vfio run_tests
-> This ties back to having the test suit outside the Linux Kernel sources.
-> I might not always want/have a Linux Kernel selftests. Like if I would
-> want to test the Intel/AMD IOMMU implementation in QEMU.
-
-Agreed, but the goal of this series is not to test the correctness of
-QEMU or hardware. It's to enable testing the kernel code.
-
-If you want to test the correctness of QEMU, testing from the
-VFIO/userspace level might not be the right approach anyway. You
-probably want to be able to interact directly with the IOMMU registers,
-interrupt handlers, etc. e.g. Something like intel-iommu.c in
-kvm-unit-tests[*], combined with higher-level application testing.
-
-VFIO selftests would be kind of a weird middle-ground where you can't
-actually control the interactions with the hardware/QEMU, (since the
-test is running in userspace and going through the kernel), and at the
-same time it's not a realistic application.
-
-[*] https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/blob/master/x86/intel-iommu.c
-
-> 
-> > 
-> > To run individual tests:
-> > 
-> >   $ tools/testing/selftests/vfio/vfio_dma_mapping_test
-> >   $ tools/testing/selftests/vfio/vfio_dma_mapping_test -v iommufd_anonymous_hugetlb_2mb
-> >   $ tools/testing/selftests/vfio/vfio_dma_mapping_test -r vfio_dma_mapping_test.iommufd_anonymous_hugetlb_2mb.dma_map_unmap
-> > 
-> > The environment variable $VFIO_SELFTESTS_BDF can be overridden for a
-> > specific test by passing in the BDF on the command line as the last
-> > positional argument.
-> > 
-> >   $ tools/testing/selftests/vfio/vfio_dma_mapping_test 0000:00:04.0
-> >   $ tools/testing/selftests/vfio/vfio_dma_mapping_test -v iommufd_anonymous_hugetlb_2mb 0000:00:04.0
-> >   $ tools/testing/selftests/vfio/vfio_dma_mapping_test -r vfio_dma_mapping_test.iommufd_anonymous_hugetlb_2mb.dma_map_unmap 0000:00:04.0
-> > 
-> > When you are done, free the HugeTLB pages and exit the shell started by
-> > run.sh. Exiting the shell will cause the device to be unbound from
-> > vfio-pci and bound back to its original driver.
-> > 
-> >   $ echo 0 > /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
-> >   $ echo 0 > /sys/kernel/mm/hugepages/hugepages-1048576kB/nr_hugepages
-> >   $ exit
-> As before: Can this be done automatically?
-
-Yeah, most likely this can be done automatically.
-
-> 
-> > 
-> > It's also possible to use run.sh to run just a single test hermetically,
-> > rather than dropping into a shell:
-> > 
-> >   $ tools/testing/selftests/vfio/run.sh -d 0000:00:04.0 -- tools/testing/selftests/vfio/vfio_dma_mapping_test -v iommufd_anonymous
-> > 
-> > Tests
-> > -----------------------------------------------------------------------
-> > 
-> > There are 5 tests in this series, mostly to demonstrate as a
-> > proof-of-concept:
-> > 
-> >  - tools/testing/selftests/vfio/vfio_pci_device_test.c
-> >  - tools/testing/selftests/vfio/vfio_pci_driver_test.c
-> >  - tools/testing/selftests/vfio/vfio_iommufd_setup_test.c
-> >  - tools/testing/selftests/vfio/vfio_dma_mapping_test.c
-> >  - tools/testing/selftests/kvm/vfio_pci_device_irq_test.c
-> > 
-> > Future Areas of Development
-> > -----------------------------------------------------------------------
-> > 
-> > Library:
-> > 
-> >  - Driver support for devices that can be used on AMD, ARM, and other
-> >    platforms (e.g. mlx5).
-> >  - Driver support for a device available in QEMU VMs (e.g.
-> >    pcie-ats-testdev [1])
-> >  - Support for tests that use multiple devices.
-> >  - Support for IOMMU groups with multiple devices.
-> >  - Support for multiple devices sharing the same container/iommufd.
-> >  - Sharing TEST_ASSERT() macros and other common code between KVM
-> >    and VFIO selftests.
-> Same as before: How about a lib?
-
-That is how I plan to approach it. Just like
-tools/testing/selftests/vfio/lib can be shared with KVM selftests, we
-can create a selftests library for this common stuff and share it
-between VFIO and KVM.
-
-But if you are referring to an external library that is outside of the
-kernel tree, see my comments above.
-
-> 
-> > 
-> > Tests:
-> > 
-> >  - DMA mapping performance tests for BARs/HugeTLB/etc.
-> >  - Porting tests from
-> >    https://github.com/awilliam/tests/commits/for-clg/ to selftests.
-> >  - Live Update selftests.
-> >  - Porting Sean's KVM selftest for posted interrupts to use the VFIO
-> >    selftests library [2]
-> > 
-> ...
-> > 
-> > base-commit: e271ed52b344ac02d4581286961d0c40acc54c03
-> > prerequisite-patch-id: c1decca4653262d3d2451e6fd4422ebff9c0b589
-> > -- 
-> > 2.50.0.rc2.701.gf1e915cc24-goog
-> > 
-> 
-> Best
-
-Thanks for taking a look!
-
-> 
-> [1] https://github.com/kdave/xfstests
-> [2] https://github.com/linux-blktests/blktests
-> [3] https://github.com/SamsungDS/iommutests
-> [4] https://github.com/SamsungDS/libvfn
-> 
+>  		return 0;
+>  
+>  	r = do_cpuid_func(array, func, type);
+> @@ -1869,7 +1870,7 @@ int kvm_dev_ioctl_get_cpuid(struct kvm_cpuid2 *cpuid,
+>  			    unsigned int type)
+>  {
+>  	static const u32 funcs[] = {
+> -		0, 0x80000000, CENTAUR_CPUID_SIGNATURE, KVM_CPUID_SIGNATURE,
+> +		0, 0x80000000, ZHAOXIN_CPUID_SIGNATURE, KVM_CPUID_SIGNATURE,
+>  	};
+>  
+>  	struct kvm_cpuid_array array = {
 > -- 
+> 2.34.1
 > 
-> Joel Granados
-
-
 
