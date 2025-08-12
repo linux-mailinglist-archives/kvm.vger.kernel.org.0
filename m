@@ -1,260 +1,225 @@
-Return-Path: <kvm+bounces-54548-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54549-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D32FBB2392B
-	for <lists+kvm@lfdr.de>; Tue, 12 Aug 2025 21:40:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82704B23932
+	for <lists+kvm@lfdr.de>; Tue, 12 Aug 2025 21:42:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52AA63B10A7
-	for <lists+kvm@lfdr.de>; Tue, 12 Aug 2025 19:39:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E6E77188909A
+	for <lists+kvm@lfdr.de>; Tue, 12 Aug 2025 19:42:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DDF92FFDE5;
-	Tue, 12 Aug 2025 19:39:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 456EE2FFDE6;
+	Tue, 12 Aug 2025 19:41:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="11qEVJgd"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="PWsery8i"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2084.outbound.protection.outlook.com [40.107.92.84])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB2D727FB15;
-	Tue, 12 Aug 2025 19:38:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.84
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755027539; cv=fail; b=m3rKlqBlY+8rCMOTujtB+GHrVgnojEunI8ne/CfnXH2Zzc92+OehFwoJvckQPbKbzGFaW2UnEPLT9MuaFTFXIfozk/Z1LyDiRoXuc1Kc65uro06p8peFqaJKqeI3hZTBfs1k5ZrQT9STIj1xfxZno4UKDJ2DD73dDncQaUuFJXw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755027539; c=relaxed/simple;
-	bh=k9i5z9f2uILxKlqNgUKKSqIRo+AKvEhLrT4WRX7s4kI=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=bOIkIm/f581UZrfZ+F2M4kTOoH4EPWDuZI5lx5zyT+jiRGdbd/S26MKQA0vmu8Of/20rQK/fEdE6l5zbo2vI3j3kCxy1LJo+ZYCP8xEftlyAQwYl42g4utoZw5Se2NvC3NPsWAx6HF6Ni9hW9ETke1VNMlxrUI5gr8k4MnK1gbg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=11qEVJgd; arc=fail smtp.client-ip=40.107.92.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=w7Pz1SbPZU8u70+uBCk8sVA7o65a9Eh6znks6tJtVuQZZkrfIPBMbFxm3ymCE88wQE+LX6kMatx6DCUM1rVfUcBXtEsJewJrWmMNJP3XS9XOoqIxnai/Ja/LQZMmi1TL7vCXaGa8CFXp+XJrShLe/aklJqB5PQB83siMcuzurYi/w402yHva+oFDM6R4ZRwX7XYXrOZukP3aUD+CexTaI1oOtMY/u134Y3qTlyouSSWJ80dfpeLwQ1uyXejjEK+L8Mbrp696b9dCoisLpdaFNTvfNbeQr0vS8gQIfzt4AMesRJ4jnLBG25fgiHU65Y7GR21Yc47fLBfKvj8JGzBacA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=V6vgaEWrc54+SWP7V1JOEz18PH+xh+2lV2BpMHfvAEg=;
- b=tJlfFDqnSKX+gprRDV7yxI15b58Q3l77MWNFOJSx+oQik66YtlcM2mMFQb63m/PiN8kCzWYRhc39CzvKWM0sRX7Nn7TbSQ6YMjZiWn2blg4idp3+KWEr8jFoiLnBEFRBepjNCkeFk/rs/467VtIOskZB9QUgoCuDnEJJoFmkfrPjS3oYrWnJklTjZ1ehqUR3b22UIMkJbq2/xOZYUgQovOOrcVqh8YFZY63mm8NnFBR2t/ZSl7Hn7HgoPzeJyx0ZtOo688J45lXuAQEECXTTpdQ41Hgnfm+MqqU6CjuaYHy3ZPCw64sVPyCkzzCo7JuftU3pPYpNBMoDxFNZ+Vf80A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=V6vgaEWrc54+SWP7V1JOEz18PH+xh+2lV2BpMHfvAEg=;
- b=11qEVJgd6YtGWhwRrMgMWgOelRHIacGoFLcRbDsSZRvlxqi3V+5tKKjEnN691vrYFtB/r3ZdYGdBGBNbaQdalQ+sBVAKGmg5/hxgb21D+TcQyYw5tFos/9F4CASNDW/Tchv//oWCD13DEL4LPOzzeI/vC8uGdUyxDVECRtydOTo=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from PH7PR12MB9066.namprd12.prod.outlook.com (2603:10b6:510:1f6::5)
- by SA1PR12MB6821.namprd12.prod.outlook.com (2603:10b6:806:25c::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9009.22; Tue, 12 Aug
- 2025 19:38:53 +0000
-Received: from PH7PR12MB9066.namprd12.prod.outlook.com
- ([fe80::954d:ca3a:4eac:213f]) by PH7PR12MB9066.namprd12.prod.outlook.com
- ([fe80::954d:ca3a:4eac:213f%4]) with mapi id 15.20.8989.018; Tue, 12 Aug 2025
- 19:38:53 +0000
-Message-ID: <47783816-ff18-4ae0-a1c8-b81df6d2f4ef@amd.com>
-Date: Tue, 12 Aug 2025 14:38:46 -0500
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 7/7] KVM: SEV: Add SEV-SNP CipherTextHiding support
-To: Kim Phillips <kim.phillips@amd.com>,
- Tom Lendacky <thomas.lendacky@amd.com>, corbet@lwn.net, seanjc@google.com,
- pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
- dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
- john.allen@amd.com, herbert@gondor.apana.org.au, davem@davemloft.net,
- akpm@linux-foundation.org, rostedt@goodmis.org, paulmck@kernel.org
-Cc: nikunj@amd.com, Neeraj.Upadhyay@amd.com, aik@amd.com, ardb@kernel.org,
- michael.roth@amd.com, arnd@arndb.de, linux-doc@vger.kernel.org,
- linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org
-References: <cover.1752869333.git.ashish.kalra@amd.com>
- <44866a07107f2b43d99ab640680eec8a08e66ee1.1752869333.git.ashish.kalra@amd.com>
- <9132edc0-1bc2-440a-ac90-64ed13d3c30c@amd.com>
- <03068367-fb6e-4f97-9910-4cf7271eae15@amd.com>
- <b063801d-af60-461d-8112-2614ebb3ac26@amd.com>
- <29bff13f-5926-49bb-af54-d4966ff3be96@amd.com>
- <5a207fe7-9553-4458-b702-ab34b21861da@amd.com>
- <a6864a2c-b88f-4639-bf66-0b0cfbc5b20c@amd.com>
- <9b0f1a56-7b8f-45ce-9219-3489faedb06c@amd.com>
- <96022875-5a6f-4192-b1eb-40f389b4859f@amd.com>
- <5eed047b-c0c1-4e89-87e9-5105cfbb578e@amd.com>
- <506de534-d4dd-4dda-b537-77964aea01b9@amd.com>
-Content-Language: en-US
-From: "Kalra, Ashish" <ashish.kalra@amd.com>
-In-Reply-To: <506de534-d4dd-4dda-b537-77964aea01b9@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SN7PR18CA0017.namprd18.prod.outlook.com
- (2603:10b6:806:f3::34) To PH7PR12MB9066.namprd12.prod.outlook.com
- (2603:10b6:510:1f6::5)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B49261EBFE0;
+	Tue, 12 Aug 2025 19:41:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755027687; cv=none; b=trIHune6kPa5UfKzd++2v7kMDxz/bJ+SwvJ5lV0Q4Mc+sHP1vLSrU6AqBtVLd2Eap9zyuHrzeqFa8R9nmQ0oDeoLo7FwFFimzjGVSV3/n7nNMQE/IFH9PTqtennrAqqU3S4UyUrb8ieogiDb2q8hCttiGqK9PpqVtqtHtwqtZ5I=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755027687; c=relaxed/simple;
+	bh=sMX8kZxrzx+drnPem18BEei2lr5xzCHM9wqeYBIo6M8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JSRuDjm+fprxgd/SKHd46ETw/HNgusfUPtvozFAdthKmh/w8N/gRT5m4uOkmkRSoKaZcX5D32r6eVTEK9I1YFJ71lO+Yp1tbBPWRR1JJxl1bwUKdxe+YGr3oj/VM/GyvCY7ccJ0KmZo4XADo5hqQTysxe5c27L9Xwbk/72sqJq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=PWsery8i; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57CDXi2O022984;
+	Tue, 12 Aug 2025 19:40:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=HIocEm
+	mHknV3Er6oSMrKwEyHDubnFR8xwjgJ/fmkaLs=; b=PWsery8i4EluNXh5/CUQX1
+	4EsQwKeUF/aCgjzawxt4iKeo308Veh3x0D+Mre7QNNCfk3rnoWzgwKZ8TObpu2k8
+	AYhuz1Bw7mx18Wkxv7BTqdfDDqT+jcIP1vQheD2uj6Pnz8kdo1oGVQqcq3MmIxMj
+	WZyt3q8qTe+ZlyBhor+hxle3qiFHboPvtiNuvqAKpawLBx7UlRPIbf1Q1CYoSDDO
+	BQikAFk2AR05hI/zbu5n4fLdajUOlqfINghC44riC7oC3mFPHEAmM0TfSBIWkiiV
+	j1+9wIltM1JesoQJM1bN+kbftKZauILLFxVMQtJHdQl30kkQqcb5+l22m+m57e5w
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48duru8kft-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 12 Aug 2025 19:40:53 +0000 (GMT)
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 57CJea2W000805;
+	Tue, 12 Aug 2025 19:40:53 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48duru8kfr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 12 Aug 2025 19:40:53 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 57CIj6Jv017600;
+	Tue, 12 Aug 2025 19:40:51 GMT
+Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 48ekc3krr1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 12 Aug 2025 19:40:51 +0000
+Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
+	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 57CJeoKC31654170
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 12 Aug 2025 19:40:50 GMT
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2701758055;
+	Tue, 12 Aug 2025 19:40:50 +0000 (GMT)
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 288D55804B;
+	Tue, 12 Aug 2025 19:40:47 +0000 (GMT)
+Received: from [9.61.88.156] (unknown [9.61.88.156])
+	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 12 Aug 2025 19:40:47 +0000 (GMT)
+Message-ID: <459f6b6f-4c51-492f-a137-637bb61d17bd@linux.ibm.com>
+Date: Tue, 12 Aug 2025 15:40:46 -0400
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH7PR12MB9066:EE_|SA1PR12MB6821:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2737e662-f2f1-4f5c-fd24-08ddd9d7de33
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|376014|366016|1800799024|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?UlN6ZCtkNHNQalZCZTRuMXVhTG9DME10bnFkUHExMDlVZkhqdi9yZHAxK0hP?=
- =?utf-8?B?TGZLVVpFOWcyRmZQRzVzVWM2MW1mNm1PQUVOWklseWFrWHNER2ZSQ2djdE5O?=
- =?utf-8?B?aStYeEVURXhvRlVBMUNJMEJ5VCtQdTZkWVVPYTVWVlZGai9aOURxbm55cGwr?=
- =?utf-8?B?dEJJM1U5RElocUN6RENWNHhtL2RnOWVzQzhxWktCTkI2WXNuSTUyc1llWVhM?=
- =?utf-8?B?Yi9BMEZhS3VUUHJNUEYzTEN2N3VnbVpTUTJrVHVvcUVwMm1YRWlLVWJTL2hi?=
- =?utf-8?B?UlhJNXlZOGJlM1BoQUxMRXdIcDMxSzBseWFKcEdweU5ZaHErT21mMmx0bCtF?=
- =?utf-8?B?U0MzZE00THZTMzFVRGZlbU1Fd1FrUUw2Vzd2TW9GenBIdWtoeXRmOW1TMGFy?=
- =?utf-8?B?ZGxQRFdmNThRZHJTc1BRQTdkY1FWcGlDSmVNZEFzY3Q2YnZGaU9oOTRsZHUw?=
- =?utf-8?B?YVBTMngxWHNzekpYc29YK3R6bWNnVVM0K3NxMU51K3FtOVFZTmdyVFBaWWtP?=
- =?utf-8?B?SktrQ2FYcWYrN2haV0dUSDRGdGZXRWlNVE5VbmVlM2JicTNyYWYzRnl4QkVu?=
- =?utf-8?B?b013WFpWb3h3N0g5SlJRMnNmdDZDMmVnUURuZ0JITE16K1NUWFRKZ29xSHl2?=
- =?utf-8?B?V3IxZVZRL0diZ2dNWVZlR1RMbVdHd0Z3S1J0c0t5Y005NVVneXBBaFZlRUdn?=
- =?utf-8?B?L2VXQjYrc08rVWpsU3ZxdEpVem5Ia0FiS0hJSDRZYzlud3h1cXlvcWRZckQy?=
- =?utf-8?B?WEZTQlgwTlZma08rL0VkZm9ESHFYTys0ZjEvUHdUdFdrN1ZKVG9YN2tHUzhE?=
- =?utf-8?B?MWpXZU5pREJVZUREQU01VzRzaFJQMEkvMDE5UGExUmZpV0o1UFp0M2pWL0R3?=
- =?utf-8?B?NkZSVG1tY2Jhck5LamNvNGtsUWRLS3lRQ0t0M1MrWEZyclpacVRVRUtkNm9r?=
- =?utf-8?B?c3FhelFLSFkrQXBZTi9xYjJjOFV2OGdmRVdxcEFIMk5HMTQ0UkxpRm5hd1J6?=
- =?utf-8?B?bDdxZklqR2duK2NMYWVrMzdzYW1wWWVDRGszQlNBeGFpd0VIODZQUVo2RjFX?=
- =?utf-8?B?akJTeGtacEMvN0ZUaWoyL0hYUHFQLzNOYjV2djlJN3VEblFCZy80U0xMTTFU?=
- =?utf-8?B?KzVVb0NyV3ZkQkVWcmJVYmdKNlV1VldlWVBtYWM1NVhGaEIwcTRxT1hlNisr?=
- =?utf-8?B?U3NpT3A1QXZmYUp4UFovdmJhTzcyb3phckhsMFFmY1l5c0VYTHczaEZPSDRq?=
- =?utf-8?B?a1A0a1NTWVFuTGpVc3poRlc0a0dCQllNK0tEdHlIazc5RWhwdEZQYjRYQTNX?=
- =?utf-8?B?UG5ocmVzbUpMeDJvTnhDbHhRcXBEVHhXaGpIMGdiSUh4YnRiWVRIWUh4RlRa?=
- =?utf-8?B?YTk1RHY5cVR0WUxxSmZPVXNvVnJMTVhBdFo3cWtsSFB5MXdvdU5NNXNNK09C?=
- =?utf-8?B?V2xlVDRRT1Q3UlZ6Z1hLYnl4TzhETXlJTFBhL2Q2cmZNZFZMSHJBZGR2UEpU?=
- =?utf-8?B?MGJCdWdpU1JxZXhCMHZ1MXQ2SXJxcVNxVEZ2VFA0U3dzc3RqK3lxeGExaW1a?=
- =?utf-8?B?anJNdXBzelM1L2R6RHYyTVFOSndmZlI3M2NLTFkwd3NXYVlSRkFsYVY5SURO?=
- =?utf-8?B?ZllLcWUvYjN2Y3psMk9PWWxvSk5mcUhJYnNvTkkvN01zSit0bnlSKzZhbFda?=
- =?utf-8?B?SlcvUURseEQzVmNSMkNDdW03Ymx6aFRPYkYvZCsxalJqL1pFb2pZYXV6YmQ2?=
- =?utf-8?B?ejNRYVBIZW9nVjlhL2NoZDltcXR1Q2VPWmVPVDR6ZEVHRlZXMmlmRzljYlQr?=
- =?utf-8?B?bnJHSU5sNFI5UERHOGJ6REF2bXhodFpVS29tWjhYYWVmYjNRcjZISXVEVU5Z?=
- =?utf-8?B?cUxVK3NVb3NLT2tGVXJ6ZG9qZVdLa3NmWWZDSjJEdTdSZU1EZXZVVGRuNXNo?=
- =?utf-8?B?RnkyQnAzZHcwVjNiMVZtY0xNYjVhTktpUmNMWlRDZ0hlRXpaeHpINVA0TjB2?=
- =?utf-8?B?MG9FUFN4Q2NBPT0=?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB9066.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?SnY1WEJVdHlYRmVXTnNVLzkyd1ByV3pNZVdZelV3RWE2T0kyNS9JaDhmVFlW?=
- =?utf-8?B?TW1SMEJGS29iWXBHaFMyZFp4QTNBZDVvTnY1R3dhTzRJZGNGMnpLYVcxVFpt?=
- =?utf-8?B?aElCWWNtU3g5TGhCdzVPWXN3Q2IrbHp1YlY5WXkzbkd6dTBrTFZyUER5cjVp?=
- =?utf-8?B?L281TGEyc1NXazJRSUdHVWpUOWl6NElwQ241Uno3YkwyWVdRY0g3cHBYaTdj?=
- =?utf-8?B?TE5mKzRxV2w0bUo2Yko5UUVzK1dkZVU1K3creis2Z0l2dHlrMWwyUzVlZjBs?=
- =?utf-8?B?YmcwL2x5QlR4dnVZd2JTR0p3UmdmbUYzY3VFOEY4b243ZndQM1Q1WXQvME85?=
- =?utf-8?B?M3lldm9id0YrSzRtVGVrT3FiR1p4a21zalpzbXp6cVZvQWhyMElBNzZnTXBY?=
- =?utf-8?B?amRPQUs4c3lxNlVXVjlnd2pNTTIwYlcwdkhwMFlnTitXT3o0WG1wRlRLNTRZ?=
- =?utf-8?B?SjZ6M3FQeTdybnBzWnNwYXljckFoajFNTlhvOXkxTHNyY0NlY1E3WEpKMFVO?=
- =?utf-8?B?VjhUbkJrcGQycEVtTnUycnlaOWVIZmlIeHdoS2t6N2QxcjgxWHNraWRsUzlL?=
- =?utf-8?B?Y2J5d2R6UUJTOVRNWG5HUUhmQnNvc0xlWUNkVCtSUWkzdmJYM0U2c0xOcFhS?=
- =?utf-8?B?UFVEeE40VUIzV0l5akJ4WnZXSTcvYXEzK092ZkpWT0tVYXdRU05YeERnSVVs?=
- =?utf-8?B?elRCYkRtUTZORlNvWDNuQmQ2djlGVUd4UzRkZ1RyR2NOOE5lQU5BNEZkWFVZ?=
- =?utf-8?B?QmVVams5UTJicmVUcGpSNkFUUlF1c2lkY2dob1RyZ2FjZnBkUzBaWmdQYkh3?=
- =?utf-8?B?ejljbHo4cXhSWVcvRDA0TmZQc0lCZjVXRTBjUE4wenlPZUo2VFlQSWtvR2VN?=
- =?utf-8?B?dW5TMG5pZ3ZjSkJNSVZzUWFJMi9KaDllUVJleGY5MGVudjNURkdPajl6cTAw?=
- =?utf-8?B?aElwTUZ6UlpCSEl4amFFUUlzczZrcnRaYmtOZG9Pbit1dHdMMFJVZU4vdmZU?=
- =?utf-8?B?cktYeCtZU1RGQjFaY2lnSEhSRUpRR2pQSUJpNW9RVE1QNDlNd1hqZ2JFUXJO?=
- =?utf-8?B?dXN1YjZFRUpLUXhFMkN3MnhTV2xYaHVGUzBlOWh0ekM2a29seHNmNlY0T013?=
- =?utf-8?B?UVBaUmVQa0VvaWt1TjZHY3crZ1FvOEt5T1RkT1Bla1NEUGtMU2RvNXAxbW0y?=
- =?utf-8?B?bHFyM1BTQ2dSUkxHaHZtYnBxQjljU1RsYU4wcjhQYnNnaFlEdkU4SmFYWklZ?=
- =?utf-8?B?dTRoUkxsWUJCTkVZSThwRWdobUZXT3ZrcEhaZ1FqQzNmbGNBN3ozdXcyTFBC?=
- =?utf-8?B?Q1hxcE9sQWNQZDlQd2lCZGRmRGRKR09SNlVENFpZQWxGN1R5YUM5NGJ6dVVn?=
- =?utf-8?B?dXA5VHVUYkQ0SmJ3WVBabGJRcGY4OElJcEJ1aWFGY1Q2QURwQ3NxdmtRZ1pQ?=
- =?utf-8?B?SmltcUhNc2tnbWFnUEFuR1VXc0R4N1lJekVDSW5taFJBZGc1MHF4SzRHVjlK?=
- =?utf-8?B?bk9EMmE4UlNCTnpLazZpQzZBTkR3T04wek11ZnlkU2pEZDJaaDczYXB2Qkh3?=
- =?utf-8?B?cHBzNDdEdDFPWkhTc3E0N1N2Vy9qZktkaHFZRFdzcUxBSGZYd0VScVc5aWxt?=
- =?utf-8?B?c3l5amdubit4TGcyeitKZ0pCWlVOM0NWTGdmTmVtTFBpMHV2R3NkRmV6Uy9Z?=
- =?utf-8?B?NitRSTFaYVdsbGZYcnMxaklpbmxvWmFjNmZCNUtlZEpUN0hQWTB1d3MrYmh6?=
- =?utf-8?B?N0Exejc5YWsxTkNTSkJxeWdVSU4wZkRyLzhtcEE1eldTaTZwTlhocXdEU29n?=
- =?utf-8?B?YmxVZkorUm12NzJkUVc3NjBxMG1wRUVsbnA2TVdBYTdPMlJyQ0Rwc2hQZ2tT?=
- =?utf-8?B?MVJUSkJ1VEZKVXliVzA5RkZqU3o3YmVqNGVLbkoxVTZScnE4MUN4VXFsVFhs?=
- =?utf-8?B?dEtKVlRBQkhlS21LUk5CWHFsOWl0dWM5ZEVybzkyK2E4Q0lnL09rVDEvMzVI?=
- =?utf-8?B?bFhuc3owVTNlRlR5aExGeWpibFl3RVlmUVdIeENScjErdldSbWdPU2ZmaEpt?=
- =?utf-8?B?cXo2a0Z4VDNkUWMweW1DdktRWGs1Tnd4Tmg2NUFSOUhUdUJtNkVKOG9qTkp2?=
- =?utf-8?Q?6JtUd4E7KokT6DR8ukoruTq6F?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2737e662-f2f1-4f5c-fd24-08ddd9d7de33
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB9066.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Aug 2025 19:38:52.9577
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: BvLxSM+t0DDy31Mw0ohLJtkX+WDTGebUxQrrWzixpoU7noDFjc0AIUlFvQuSfp0o19qPRYxGo6xcwlqY5Wc1Sw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB6821
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/6] KVM: s390/vfio-ap: Use kvm_is_gpa_in_memslot()
+ instead of open coded equivalent
+To: Sean Christopherson <seanjc@google.com>,
+        Madhavan Srinivasan <maddy@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Andy Lutomirski
+ <luto@kernel.org>, Xin Li <xin@zytor.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "Kirill A. Shutemov" <kas@kernel.org>,
+        Halil Pasic <pasic@linux.ibm.com>, Jason Herne <jjherne@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Holger Dengler <dengler@linux.ibm.com>
+Cc: linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
+        linux-sgx@vger.kernel.org, x86@kernel.org, linux-coco@lists.linux.dev,
+        linux-s390@vger.kernel.org
+References: <20250729174238.593070-1-seanjc@google.com>
+ <20250729174238.593070-2-seanjc@google.com>
+Content-Language: en-US
+From: Anthony Krowiak <akrowiak@linux.ibm.com>
+In-Reply-To: <20250729174238.593070-2-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: wUyLy7r54uq5s4N33KjtyxxIF6IG3KA9
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODEyMDE4NiBTYWx0ZWRfX7aP/l7ZcVtZa
+ dZX9+xrlp4zkFuGVW4392P+pol6seqW/hahqEiQqy5LqXmJIftaeIAqDiK6lxM08bCcVJRcLLS9
+ ON2guFIKLHia+Q7PMxonf8VSge5GnRjyY+1rMpAybUP2cAGqNwT+R1ifllolXCTsDJOHI4FQp9q
+ /DKo36tMXVC/xVIEGIeOVRnGqt2DCHyaBP9vFHFeNCPpFbLVXEdIXt1isSmG/aUmAsqqYSNkqzq
+ jXASDGRHh3KryL9EGDcD1vu3eW2VGvuMiovWzjjmO6J8d6oE6clCyLvuLbf2Uvw8wJSNDkm6hh/
+ sE1YPL1lgeMCkjw/iqJO933TO4RUCTm+R3Gi70kvErflhOFpG3+J2MNomx960M1O6hVLlnKSEpJ
+ EZAAblAxhsKNGkn+v8tAv1QyuzdhnrlXxv/x/ezGWnM72keyIESm9hZybrHQYh2UjwixLv1X
+X-Authority-Analysis: v=2.4 cv=QtNe3Uyd c=1 sm=1 tr=0 ts=689b98c5 cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+ a=IkcTkHD0fZMA:10 a=2OwXVqhp2XgA:10 a=1XWaLZrsAAAA:8 a=VnNF1IyMAAAA:8
+ a=WMn4R6eJaF8VgN3aVUEA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: PGtZzgNN4fjfj6Pu373XoqOssQ1e8xOb
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-12_07,2025-08-11_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 priorityscore=1501 lowpriorityscore=0 clxscore=1011
+ mlxlogscore=999 impostorscore=0 suspectscore=0 bulkscore=0 mlxscore=0
+ phishscore=0 malwarescore=0 spamscore=0 classifier=spam authscore=0
+ authtc=n/a authcc= route=outbound adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2507300000 definitions=main-2508120186
 
 
-On 8/12/2025 2:11 PM, Kim Phillips wrote:
-> 
-> 
-> On 8/12/25 1:52 PM, Kalra, Ashish wrote:
->>
->> On 8/12/2025 1:40 PM, Kim Phillips wrote:
->>
->>>>> It's not as immediately obvious that it needs to (0 < x < minimum SEV ASID 100).
->>>>> OTOH, if the user inputs "ciphertext_hiding_asids=0x1", they now see:
->>>>>
->>>>>        kvm_amd: invalid ciphertext_hiding_asids "0x1" or !(0 < 99 < minimum SEV ASID 100)
->>>>>
->>>>> which - unlike the original v7 code - shows the user that the '0x1' was not interpreted as a number at all: thus the 99 in the latter condition.
->>>> This is incorrect, as 0 < 99 < minimum SEV ASID 100 is a valid condition!
->>> Precisely, meaning it's the '0x' in '0x1' that's the "invalid" part.
->>>
->>>> And how can user input of 0x1, result in max_snp_asid == 99 ?
->>> It doesn't, again, the 0x is the invalid part.
->>>
->>>> This is the issue with combining the checks and emitting a combined error message:
->>>>
->>>> Here, kstroint(0x1) fails with -EINVAL and so, max_snp_asid remains set to 99 and then the combined error conveys a wrong information :
->>>> !(0 < 99 < minimum SEV ASID 100)
->>> It's not, it says it's *OR* that condition.
->> To me this is wrong as
->> !(0 < 99 < minimum SEV ASID 100) is simply not a correct statement!
-> 
-> The diff I provided emits exactly this:
-> 
-> kvm_amd: invalid ciphertext_hiding_asids "0x1" or !(0 < 99 < minimum SEV ASID 100)
-> 
-> 
-> which means *EITHER*:
-> 
-> invalid ciphertext_hiding_asids "0x1"
-> 
-> *OR*
-> 
-> !(0 < 99 < minimum SEV ASID 100)
-> 
-> but since the latter is 'true', the user is pointed to the former
-> "0x1" as being the interpretation problem.
-> 
-> Would adding the word "Either" help?:
-> 
-> kvm_amd: Either invalid ciphertext_hiding_asids "0x1", or !(0 < 99 < minimum SEV ASID 100)
-> 
-> ?
 
-No, i simply won't put an invalid expression out there:
-
-!(0 < 99 < minimum SEV ASID 100)
-
-> 
-> If not, feel free to separate them: the code is still much cleaner.
+On 7/29/25 1:42 PM, Sean Christopherson wrote:
+> Use kvm_is_gpa_in_memslot() to check the validity of the notification
+> indicator byte address instead of open coding equivalent logic in the VFIO
+> AP driver.
 >
+> Opportunistically use a dedicated wrapper that exists and is exported
+> expressly for the VFIO AP module.  kvm_is_gpa_in_memslot() is generally
+> unsuitable for use outside of KVM; other drivers typically shouldn't rely
+> on KVM's memslots, and using the API requires kvm->srcu (or slots_lock) to
+> be held for the entire duration of the usage, e.g. to avoid TOCTOU bugs.
+> handle_pqap() is a bit of a special case, as it's explicitly invoked from
+> KVM with kvm->srcu already held, and the VFIO AP driver is in many ways an
+> extension of KVM that happens to live in a separate module.
+>
+> Providing a dedicated API for the VFIO AP driver will allow restricting
+> the vast majority of generic KVM's exports to KVM submodules (e.g. to x86's
+> kvm-{amd,intel}.ko vendor mdoules).
+>
+> No functional change intended.
+>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-Separating the checks will make the code not very different from the original function, so i am going to keep the original code.
+Acked-by: Anthony Krowiak <akrowiak@linux.ibm.com>
 
-Thanks,
-Ashish
- 
-> Thanks,
-> 
-> Kim
-> 
+I only reviewed this patch in the series.
+
+> ---
+>   arch/s390/include/asm/kvm_host.h  | 2 ++
+>   arch/s390/kvm/priv.c              | 8 ++++++++
+>   drivers/s390/crypto/vfio_ap_ops.c | 2 +-
+>   3 files changed, 11 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+> index cb89e54ada25..449bc34e7cc3 100644
+> --- a/arch/s390/include/asm/kvm_host.h
+> +++ b/arch/s390/include/asm/kvm_host.h
+> @@ -719,6 +719,8 @@ bool kvm_s390_pv_cpu_is_protected(struct kvm_vcpu *vcpu);
+>   extern int kvm_s390_gisc_register(struct kvm *kvm, u32 gisc);
+>   extern int kvm_s390_gisc_unregister(struct kvm *kvm, u32 gisc);
+>   
+> +bool kvm_s390_is_gpa_in_memslot(struct kvm *kvm, gpa_t gpa);
+> +
+>   static inline void kvm_arch_free_memslot(struct kvm *kvm,
+>   					 struct kvm_memory_slot *slot) {}
+>   static inline void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen) {}
+> diff --git a/arch/s390/kvm/priv.c b/arch/s390/kvm/priv.c
+> index 9253c70897a8..7773e1e323bc 100644
+> --- a/arch/s390/kvm/priv.c
+> +++ b/arch/s390/kvm/priv.c
+> @@ -605,6 +605,14 @@ static int handle_io_inst(struct kvm_vcpu *vcpu)
+>   	}
+>   }
+>   
+> +#if IS_ENABLED(CONFIG_VFIO_AP)
+> +bool kvm_s390_is_gpa_in_memslot(struct kvm *kvm, gpa_t gpa)
+> +{
+> +	return kvm_is_gpa_in_memslot(kvm, gpa);
+> +}
+> +EXPORT_SYMBOL_GPL_FOR_MODULES(kvm_s390_is_gpa_in_memslot, "vfio_ap");
+> +#endif
+> +
+>   /*
+>    * handle_pqap: Handling pqap interception
+>    * @vcpu: the vcpu having issue the pqap instruction
+> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+> index 766557547f83..eb5ff49f6fe7 100644
+> --- a/drivers/s390/crypto/vfio_ap_ops.c
+> +++ b/drivers/s390/crypto/vfio_ap_ops.c
+> @@ -354,7 +354,7 @@ static int vfio_ap_validate_nib(struct kvm_vcpu *vcpu, dma_addr_t *nib)
+>   
+>   	if (!*nib)
+>   		return -EINVAL;
+> -	if (kvm_is_error_hva(gfn_to_hva(vcpu->kvm, *nib >> PAGE_SHIFT)))
+> +	if (!kvm_s390_is_gpa_in_memslot(vcpu->kvm, *nib))
+>   		return -EINVAL;
+>   
+>   	return 0;
+
 
