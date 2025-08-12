@@ -1,191 +1,142 @@
-Return-Path: <kvm+bounces-54512-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54513-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21E2DB2246C
-	for <lists+kvm@lfdr.de>; Tue, 12 Aug 2025 12:19:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1A3BB2246A
+	for <lists+kvm@lfdr.de>; Tue, 12 Aug 2025 12:18:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 700D3188A206
-	for <lists+kvm@lfdr.de>; Tue, 12 Aug 2025 10:16:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7CE141659F7
+	for <lists+kvm@lfdr.de>; Tue, 12 Aug 2025 10:18:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E087623ED6A;
-	Tue, 12 Aug 2025 10:15:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFF862EAD06;
+	Tue, 12 Aug 2025 10:18:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U4V/qELg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WE0bWRih"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f52.google.com (mail-oa1-f52.google.com [209.85.160.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97D6C296BAD
-	for <kvm@vger.kernel.org>; Tue, 12 Aug 2025 10:15:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91916189F5C;
+	Tue, 12 Aug 2025 10:18:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754993757; cv=none; b=U2RndZVBvxfFqmk5EyoZunnZDxT/k+knQeP2oLmGuuHQmWhK2FEyuGgenSFUfoDbu322EP4YMqxjKISrHgSMTQ8/zEjMUMG0Cask9UuT2Wz50P1KEeXgcrLPmveQ5CY/lZLFn5UmeyM28fAKyF6tae4vIHHWDhk0zH+qvtZfWlI=
+	t=1754993910; cv=none; b=XFq0zyjYYwbOHtXKznNG2q8iR1MH+P45CMgI0NokTNP98IvXIf+UPOPmlYMixkUtPSMUKV6x7cHJCWj0KTYofPpKdJ7yH6BRmHbamv3pbvDvAumeIwUm5vtdwfwzDLRHE3u28Db9QyahJ8tbyYB2FN7tQq2tcTdyyLIYwwMhwL8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754993757; c=relaxed/simple;
-	bh=upr5gTPfA5jEvog5a5LIT8yWlQej74MFP6ZeE5bVIUg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sFm/QUsY7/YlFjsoqQxE+TuIuN+GwDBOptb2b0x/6P2LgOzny9jTeS5l+vx67gsR5NwaNkXLPdNhdPwALZEw8KGx381g0BxvGROeKP6wJhF3ZBwz0bqP+QOz1SXTSjQF2uMfmgEmQMoPSxttHXuzVwuTS5nXWr6xd1dHQSlgfNg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=U4V/qELg; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1754993754;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=I6rPgfUZWncjHqWz3Gs2f0Po8oy+srlfPWRWaLP7/JA=;
-	b=U4V/qELg2a7ZZn4uxmSG51dSdl3uAKKMA5UhkAXhLp55gpRcf/kIX0aQeC2R7Ae61twe+v
-	kedf3dsNZhmWOUxFqn7id+WgomMPp53xsK4IBDTZpvDhqhOy5NzDn9WC83bhp8Pf0ZJ5c1
-	dyzVbnzO88zGzhR+iaKC5SQaeyIGxDs=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-648-b_TcKijwOLOkdZ9gL8aZlQ-1; Tue, 12 Aug 2025 06:15:53 -0400
-X-MC-Unique: b_TcKijwOLOkdZ9gL8aZlQ-1
-X-Mimecast-MFC-AGG-ID: b_TcKijwOLOkdZ9gL8aZlQ_1754993752
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-459e30eeea3so35043495e9.0
-        for <kvm@vger.kernel.org>; Tue, 12 Aug 2025 03:15:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754993750; x=1755598550;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+	s=arc-20240116; t=1754993910; c=relaxed/simple;
+	bh=Bz6TBG3gxi8FiG+ibhXuB9So8hkRyyvwLQokIXq0rxo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=sEQCpswKhHGPzFIQE3SJcnLlR3vlnyyAfIQYjQl2ohzGrltDe76f1OHTHKLlIv+U7Sj2G0pnT862f8/E01z73v0ums8qjEVnBE/74h0tMAVy2lSgbFbHf4wkuAZVt1ePwQub+6uFNK7KGYXcR8ZI+W3i3JmRXMmvp5GUbmBqEDw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WE0bWRih; arc=none smtp.client-ip=209.85.160.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oa1-f52.google.com with SMTP id 586e51a60fabf-306ab1b63fdso3086259fac.1;
+        Tue, 12 Aug 2025 03:18:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1754993907; x=1755598707; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=I6rPgfUZWncjHqWz3Gs2f0Po8oy+srlfPWRWaLP7/JA=;
-        b=XTYh7Dx8ImrZLc0uDkY7lQBnlJ1ymeRnUdDxKuNrjsNzV+/zvoXfhxUmootueWQk66
-         gQdjUtLOQ1Yvw0uBTwNB/uxZsvf1SY4U3rreWXSPjKDd1rEGoDGENM7IxaLMm5eeu4SK
-         bo/bbxsRKFerdbQCxmCa4Yuc/gXmTRwaHMv2dhe8MFDuxn+I12fyekY2Gm+jjCb2H44+
-         0FuJ6DD/dGdZvU3OHRu6Hl41LJVekmJKqe12I2YhS1FbXqEqzqkz3X7uxhin/aZiFZIB
-         fxhL8VgPHxwTrBXHdE/zt4epguyPfSkLGyp6nEKMMv443JyAGD0sSvpgKO+o4QO76mk3
-         Glmw==
-X-Forwarded-Encrypted: i=1; AJvYcCUsFYWM2phKwI0Re8t7xaXHlnVoZ86DTNvfTOdJAdPEKleC3mYwm9LKcgbDgFvIqI37x70=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzxH3k0V4X8ySmiRY8CuOgQRTxZU8vKdokxDn+t3jxYqHzz1+2e
-	GmbKGB30wfWxAG+i18sXSIx9at+Umvq1nBPHKSZkTidN6Yh6LiY8udw10HhDXZt08NO/FBIcghk
-	FBPxFnPQsxRS5Md5/SZZbdJFeZYqTZurhwfXw0lwkamHNg5E4UsXnIA==
-X-Gm-Gg: ASbGnct1qlQIJuOO6n1AFIQkjvewEll4mnTm49/Iljf3GOTMNiWO7LPh7uykjouiaWu
-	KBMVbjtDhL2vnpRjwi5jjLGC/pkZvwO7qG4mhOSRn41yBbqD8bk9s+Y3gxEL6PK/XaO8c25Mj92
-	ZzGu7EMegS/dRq5bvyh0NBSXHjBZKusWaaDzhqMBw9cX8ia9nlHM6TjfCPyWTKqAVgUHvJwNs6/
-	5K1OPfyvlozND3GoAtMOz4RQBH8t6REhjusdGdYv0+xp4c0zUgSVmKmRDlav/CKqsEfd/KH8inx
-	hhholsgASszgnML0tz4wJl8vuSxvfdkj
-X-Received: by 2002:a05:600c:4f86:b0:456:3b21:ad1e with SMTP id 5b1f17b1804b1-459f4f1278dmr156943535e9.17.1754993750419;
-        Tue, 12 Aug 2025 03:15:50 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF4hpwCPxI92uHx8TgM/s0ZsgXXko7udMPgKR65VR2LmUddnVMaoV0RM5rKfkQhEswaG8878g==
-X-Received: by 2002:a05:600c:4f86:b0:456:3b21:ad1e with SMTP id 5b1f17b1804b1-459f4f1278dmr156943275e9.17.1754993749988;
-        Tue, 12 Aug 2025 03:15:49 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc0:1515:7300:62e6:253a:2a96:5e3])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-459db3048bdsm393003455e9.29.2025.08.12.03.15.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Aug 2025 03:15:49 -0700 (PDT)
-Date: Tue, 12 Aug 2025 06:15:46 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: syzbot <syzbot+b4d960daf7a3c7c2b7b1@syzkaller.appspotmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, eperezma@redhat.com,
-	horms@kernel.org, jasowang@redhat.com, kuba@kernel.org,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, pabeni@redhat.com, sgarzare@redhat.com,
-	stefanha@redhat.com, syzkaller-bugs@googlegroups.com,
-	virtualization@lists.linux.dev, xuanzhuo@linux.alibaba.com,
-	Will Deacon <will@kernel.org>
-Subject: Re: [syzbot] [kvm?] [net?] [virt?] WARNING in
- virtio_transport_send_pkt_info
-Message-ID: <20250812061425-mutt-send-email-mst@kernel.org>
-References: <20250812052645-mutt-send-email-mst@kernel.org>
- <689b1156.050a0220.7f033.011c.GAE@google.com>
+        bh=eg4wE+5PRG/8bGt1RO7F5F4ItHMVKsy6gTMOPz3mUNw=;
+        b=WE0bWRihZc/iOs7NtYy6RycVDFNSnu+Jfof89aWu7W6V8UU/VJBlTvgLXy1Pm7NXrr
+         J0vD5YP1fDLvlwvWjrZVrVboN1rL2slGoyHVypmcjbAr1ZHv1XzqtugQV3vVQZfiZKXw
+         eiLl6QRlMhXhhTFFKGGtVS+Nkq4yhJO5ilgvLtCXF+Gvxh8OapKyD+0RrrjDRrVFh4OY
+         WP3ofeCyA5DUXDGOzbP/N1jpmziaIMjJBSH1uk6uukAKA2Ws0tB3THIyPUFVBwveCB+9
+         EYj6xBqfcwt0vncgIHgoUrM7KGs2jXYymSeUJyappj7NezprVZ1Ck4/ogMzqTnWDjVR6
+         kjvA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754993907; x=1755598707;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=eg4wE+5PRG/8bGt1RO7F5F4ItHMVKsy6gTMOPz3mUNw=;
+        b=brJG/6B2Dcpj0fqsvgXUfFfsRKY1Ske4f+RXkavoT1xxO9lmkig0iFzdYA5a1K9FdV
+         8hOJZGeqwl3T//NlbOC6bsM/M9UtYU6XDNdqrTpebYleDAVQEQdfi7cU/mmZS6NbcRfl
+         7zNfDdA2NkWnqiIoOSes5DQylQOmc9YvR5dZgSaSY+pt1RXvt5ZRDaXy3etonH2Sqr5t
+         wkdWi6TEbOAu9c9Y3xBWmfrdhP/L7ar9DvVcQRYRCaF9uFlsURLR7jeo3VO+dhWxQ/V/
+         zOtPp0cNRxBpim/F28k5xJlOKOc4xOMVQhq37p5XhXLnZO2RubpmWTg790vY44R5Yh+M
+         vE0A==
+X-Forwarded-Encrypted: i=1; AJvYcCVQaO37efQRZy/PRRfzwSIAcbbc+5BPyEKhRhy+20W6ZRm+flMGmAJ9VImY6D8w2mlXDIY=@vger.kernel.org, AJvYcCVveid3GkeJcCVQ1JhwYqOsYRGLwEw/KYTQLMYMgLZP3P/DYlI86andbVuUjmGcRVdTwhl7+CNHGpilfB0S@vger.kernel.org
+X-Gm-Message-State: AOJu0YxanjTki+wMLOL388dVI4tLx74FxA4TEj2U6DnXNKdkCbIDCDLE
+	WSrfXy4HIhdfOS9oDivXqWcgz4Cif1ym6h5v8D+lyi9KzsZhl40kq1AuACzLtqJimY8AU3siUio
+	RJ1jq1dCuNbQbqhB0Ztm8HWu0HsRUkhk=
+X-Gm-Gg: ASbGncvXLET6CwSaHB498QJnXPM5egMBAwUv5nDL15JKzLYVLXtMmN45a49vvpJc5ln
+	T9UczHmWdkCPAkXJpKDcg7AC2P3uEQHfuVbzcIlS1i6BqlEzEqysFm7VrPbnsG+9B5m0N5tokf/
+	DHeZp8zeJMDnlZDbwGY9ISD7U2OM38i/4ri9FZVwvGHDFpGCbOjRS2d/3BCN04+LoLmfC1z/zmc
+	CLLidY=
+X-Google-Smtp-Source: AGHT+IHA0Xv5J7+oGM+5EIMa/TgKIPqiKF/W6nLtsDXM/L8bTAhhbxwmGZWD74HIRPitMmLb2XvWetVleZJfdJfBL94=
+X-Received: by 2002:a05:6871:6205:b0:2c1:ac88:4a8d with SMTP id
+ 586e51a60fabf-30c21152297mr10911149fac.30.1754993907541; Tue, 12 Aug 2025
+ 03:18:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <689b1156.050a0220.7f033.011c.GAE@google.com>
+References: <20250806081051.3533470-1-hugoolli@tencent.com>
+ <aJOc8vIkds_t3e8C@google.com> <CAAdeq_+Ppuj8PxABvCT54phuXY021HxdayYyb68G3JjkQE0WQg@mail.gmail.com>
+ <aJTytueCqmZXtbUk@google.com> <CAAdeq_+wLaze3TVY5To8_DhE_S9jocKn4+M9KvHp0Jg8pT99KQ@mail.gmail.com>
+ <aJobIRQ7Z4Ou1hz0@google.com> <6a1d61925118b93badc777c2b9282d190c55a32b.camel@infradead.org>
+In-Reply-To: <6a1d61925118b93badc777c2b9282d190c55a32b.camel@infradead.org>
+From: hugo lee <cs.hugolee@gmail.com>
+Date: Tue, 12 Aug 2025 18:18:16 +0800
+X-Gm-Features: Ac12FXxGLATZGJ7RoDOdiXtGF_l2O8hV2IV1qNheuXDCF9NpwqbqYPnaHVon3C0
+Message-ID: <CAAdeq_KUjUFz0y5rspoWLonxnh8C06NV5Dn4pGuuYPPaFJJ6XQ@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86: Synchronize APIC State with QEMU when irqchip=split
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: Sean Christopherson <seanjc@google.com>, pbonzini@redhat.com, tglx@linutronix.de, 
+	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, 
+	x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Yuguo Li <hugoolli@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Aug 12, 2025 at 03:03:02AM -0700, syzbot wrote:
-> Hello,
-> 
-> syzbot has tested the proposed patch but the reproducer is still triggering an issue:
-> WARNING in virtio_transport_send_pkt_info
+On Tue, Aug 12, 2025 at 5:39=E2=80=AFPM David Woodhouse <dwmw2@infradead.or=
+g> wrote:
+>
+> On Mon, 2025-08-11 at 09:32 -0700, Sean Christopherson wrote:
+> > On Fri, Aug 08, 2025, hugo lee wrote:
+> > > On Fri, Aug 8, 2025, Sean Christopherson <seanjc@google.com> wrote:
+> > > >
+> > > > On Thu, Aug 07, 2025, hugo lee wrote:
+> > > > > On Thu, Aug 7, 2025 Sean Christopherson wrote:
+> > > > > >
+> > > > > > On Wed, Aug 06, 2025, Yuguo Li wrote:
+> > > > > > > When using split irqchip mode, IOAPIC is handled by QEMU whil=
+e the LAPIC is
+> > > > > > > emulated by KVM.  When guest disables LINT0, KVM doesn't exit=
+ to QEMU for
+> > > > > > > synchronization, leaving IOAPIC unaware of this change.  This=
+ may cause vCPU
+> > > > > > > to be kicked when external devices(e.g. PIT)keep sending inte=
+rrupts.
+> > > > > >
+> > > > > > I don't entirely follow what the problem is.  Is the issue that=
+ QEMU injects an
+> > > > > > IRQ that should have been blocked?  Or is QEMU forcing the vCPU=
+ to exit unnecessarily?
+> > > > > >
+> > > > >
+> > > > > This issue is about QEMU keeps injecting should-be-blocked
+> > > > > (blocked by guest and qemu just doesn't know that) IRQs.
+> > > > > As a result, QEMU forces vCPU to exit unnecessarily.
+> > > >
+> > > > Is the problem that the guest receives spurious IRQs, or that QEMU =
+is forcing
+> > > > unnecesary exits, i.e hurting performance?
+> > > >
+> > >
+> > > It is QEMU is forcing unnecessary exits which will hurt performance b=
+y
+> > > trying to require the Big QEMU Lock in qemu_wait_io_event.
+> >
+> > Please elaborate on the performance impact and why the issue can't be s=
+olved in
+> > QEMU.
+>
+> Is there a corresponding QEMU patch to use this new exit reason?
 
-OK so the issue triggers on
-commit 6693731487a8145a9b039bc983d77edc47693855
-Author: Will Deacon <will@kernel.org>
-Date:   Thu Jul 17 10:01:16 2025 +0100
-
-    vsock/virtio: Allocate nonlinear SKBs for handling large transmit buffers
-    
-
-but does not trigger on:
-
-commit 8ca76151d2c8219edea82f1925a2a25907ff6a9d
-Author: Will Deacon <will@kernel.org>
-Date:   Thu Jul 17 10:01:15 2025 +0100
-
-    vsock/virtio: Rename virtio_vsock_skb_rx_put()
-    
-
-
-Will, I suspect your patch merely uncovers a latent bug
-in zero copy handling elsewhere.
-Want to take a look?
-
-
-
-> ------------[ cut here ]------------
-> 'send_pkt()' returns 0, but 65536 expected
-> WARNING: CPU: 0 PID: 5936 at net/vmw_vsock/virtio_transport_common.c:428 virtio_transport_send_pkt_info+0xd11/0xf00 net/vmw_vsock/virtio_transport_common.c:426
-> Modules linked in:
-> CPU: 0 UID: 0 PID: 5936 Comm: syz.0.17 Not tainted 6.16.0-rc6-syzkaller-00030-g6693731487a8 #0 PREEMPT(full) 
-> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-> RIP: 0010:virtio_transport_send_pkt_info+0xd11/0xf00 net/vmw_vsock/virtio_transport_common.c:426
-> Code: 0f 0b 90 bd f2 ff ff ff eb bc e8 2a 15 74 f6 c6 05 17 6f 40 04 01 90 48 c7 c7 00 4b b7 8c 44 89 f6 4c 89 ea e8 e0 f7 37 f6 90 <0f> 0b 90 90 e9 e1 fe ff ff e8 01 15 74 f6 90 0f 0b 90 e9 c5 f7 ff
-> RSP: 0018:ffffc9000cc2f530 EFLAGS: 00010246
-> RAX: 72837a5a4342cf00 RBX: 0000000000010000 RCX: ffff888033218000
-> RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000002
-> RBP: ffffffff8f8592b0 R08: 0000000000000003 R09: 0000000000000004
-> R10: dffffc0000000000 R11: fffffbfff1bfa6ec R12: dffffc0000000000
-> R13: 0000000000010000 R14: 0000000000000000 R15: ffff8880406730e4
-> FS:  00007fc0bd7eb6c0(0000) GS:ffff88808d230000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00007fd5857ec368 CR3: 00000000517cf000 CR4: 0000000000352ef0
-> Call Trace:
->  <TASK>
->  virtio_transport_stream_enqueue net/vmw_vsock/virtio_transport_common.c:1111 [inline]
->  virtio_transport_seqpacket_enqueue+0x143/0x1c0 net/vmw_vsock/virtio_transport_common.c:839
->  vsock_connectible_sendmsg+0xac4/0x1050 net/vmw_vsock/af_vsock.c:2123
->  sock_sendmsg_nosec net/socket.c:712 [inline]
->  __sock_sendmsg+0x219/0x270 net/socket.c:727
->  ____sys_sendmsg+0x52d/0x830 net/socket.c:2566
->  ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2620
->  __sys_sendmmsg+0x227/0x430 net/socket.c:2709
->  __do_sys_sendmmsg net/socket.c:2736 [inline]
->  __se_sys_sendmmsg net/socket.c:2733 [inline]
->  __x64_sys_sendmmsg+0xa0/0xc0 net/socket.c:2733
->  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
->  do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> RIP: 0033:0x7fc0bc98ebe9
-> Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-> RSP: 002b:00007fc0bd7eb038 EFLAGS: 00000246 ORIG_RAX: 0000000000000133
-> RAX: ffffffffffffffda RBX: 00007fc0bcbb5fa0 RCX: 00007fc0bc98ebe9
-> RDX: 0000000000000001 RSI: 0000200000000100 RDI: 0000000000000004
-> RBP: 00007fc0bca11e19 R08: 0000000000000000 R09: 0000000000000000
-> R10: 0000000024008094 R11: 0000000000000246 R12: 0000000000000000
-> R13: 00007fc0bcbb6038 R14: 00007fc0bcbb5fa0 R15: 00007ffdb7bf09f8
->  </TASK>
-> 
-> 
-> Tested on:
-> 
-> commit:         66937314 vsock/virtio: Allocate nonlinear SKBs for han..
-> git tree:       https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
-> console output: https://syzkaller.appspot.com/x/log.txt?x=159d75bc580000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=84141250092a114f
-> dashboard link: https://syzkaller.appspot.com/bug?extid=b4d960daf7a3c7c2b7b1
-> compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
-> 
-> Note: no patches were applied.
-
+No, but the patch is done and will be submitted soon.
 
