@@ -1,281 +1,216 @@
-Return-Path: <kvm+bounces-54471-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54472-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48BD8B21ACA
-	for <lists+kvm@lfdr.de>; Tue, 12 Aug 2025 04:31:52 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EAF57B21AFF
+	for <lists+kvm@lfdr.de>; Tue, 12 Aug 2025 04:56:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 34AB24E2E0E
-	for <lists+kvm@lfdr.de>; Tue, 12 Aug 2025 02:31:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DC7DA7A7018
+	for <lists+kvm@lfdr.de>; Tue, 12 Aug 2025 02:54:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FC962D97A3;
-	Tue, 12 Aug 2025 02:31:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E57B32DA74C;
+	Tue, 12 Aug 2025 02:56:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bj1CJdES"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="avOISrDp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 405AA311C02
-	for <kvm@vger.kernel.org>; Tue, 12 Aug 2025 02:31:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 459A113D8A4;
+	Tue, 12 Aug 2025 02:56:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754965901; cv=none; b=B7LtCF/Q9oQAomjnXIP3xhHMiib4CQGe+pphZQAMTjov9unuuKngoptVDjeSTo/LZfnRenyFp0XgCMJBj3fANcWHwVYt3fSGEq2lueA3U0BFuYzWOZjCVUJYaQeT5ciDfhWwjikyQo/rNS/ewLRL2opgJf7vCBvavD6m+jewEZY=
+	t=1754967382; cv=none; b=KTUAOM80Huq8/VTIRzlbWHpH1iBPar0Rl+r6AW8cvlmVI/4pg6dQ7yoeujgZH/n5y77FJju2bSQ412UXTrvJq03RQytEaEy5S8rhO4OTxnbkuHSZBu9l8DlcfjYR7tRyVJBzdLVgGB1MJfVHVGS5fOl3PIJYP1NIi9sKC9kb494=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754965901; c=relaxed/simple;
-	bh=BJuyteyw9XvfwFNLKSUu1hI0HxKgX0sf6HX0jQtRbkM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nH4nF5CS9qCmUwUNZfHh/YeAIw44WNpJSljYLhLgHx2zz+JxsCjERQxoHrW8l4HlYLuCw/ivI39awnqr1X4qEcpgZuqtFcRjap9pCdtyPo3i9NwqbsIY+qv94ajXmj3PYUTVkipU4E/rvkbzXiknnNJsM4LoHA22hOrKjrYiuSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bj1CJdES; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-242d1e9c6b4so113665ad.0
-        for <kvm@vger.kernel.org>; Mon, 11 Aug 2025 19:31:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754965899; x=1755570699; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Gigjc+YHl8yhW0BHFCQHAU5Qlxh88HdkyU2sD42vIKs=;
-        b=bj1CJdESzDuYq4wTNO3RpS9S4/v36t6eldPPkwm7HZhBr5i/EEjAOdaoVmo/g8LnYA
-         1YwDUoSiavR0gg/YgF3Yi0kGg++guHkQowefq+HvXpRsGc62J2irCpTTnpoyXUsj+7ls
-         vC446j8PUAuyy/KV1HbgbB0UDlgbB/ywGCfVMAhTzb9aAX30PelYhHfZvYec5COujKz6
-         vk+gL8HZ9WNiy/wkxH+dCvsDJgAkY0f4JZ4Qxkaps32+bmxybuYVYlP3PMBe9mtP7mQv
-         hR3LVJU5aoHqsH91t6/69aGc9UniUIwtfuga9zm0p8tCTj9H4LUKPCMnVHeuvAUewkat
-         eqBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754965899; x=1755570699;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Gigjc+YHl8yhW0BHFCQHAU5Qlxh88HdkyU2sD42vIKs=;
-        b=AIVKibZQcNHxGmfkVSOyOy70UfZZmFOTvMkPlJgh0DUVaHOfPMOVp2kQqHszOZGXB7
-         3FH8mr7X6L7AtqoyvlSwiEMXm2JcGmR/g//2T10LW1TunTuaWIbDlHjfr7dqPrmwcfus
-         uZQ8+IPh7vndkUWDHNM+zbcbb1W38/RBvpa1ZhLlMqpA4YgWyyLHSjonYX1GdUtzsnfM
-         OqHYitISuLbsKGini5qedo+KT9Cr5tw2K6lzIBXFEUCO/5x/tGKmwtKauIuznF1vfKfa
-         ugzzQLqlrjqcbWw7KMeEckN0wv+84DmVeG/wCOHwHAzzqSdaubTlbxTfkAXFuJNPhuP5
-         gV3w==
-X-Forwarded-Encrypted: i=1; AJvYcCXEouDcQ+5uXepeYqHccHisdukgGlMiJCPrb0/Bec+KN/0nFDi71noB0b38TncOk3ZIlbQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwKQlv8B3I//KjISosWtjeJ/GiwKDmJv68m/kXe2quM481tot0T
-	n8hVqkFebfZQw+fJj/WhNqACuZ2o98CXhbuE3CyCXzKsI5INQGbJPovqLliW8Lm5hcf8n1VCnCx
-	gntO3co7T4uTmdb8mvRxrmnOwGUaFAEk6Nc36F1OP
-X-Gm-Gg: ASbGncv3OWDS9OFt/Tfbiau2cpfpz2PESO/NTkqFUcRrQJysTkpXVDPRSBN5Laep4cM
-	FfXql1OrHTipO6mUNf6HvWUgl9o/E5hA5BG36iEthYvEk7SYQvgZlB3DF7YoD1akBZxTBRqpoGE
-	LkwDC49kSxAjcbaRJ2scVNCOpVCbx/L14CMsStY0rg4Fa5lIdUllJaf2UvbTRAHbxnxNA/PKKXK
-	uA27rotpFI73nRtEi1/66CGN91mf1udTVCytstXGKRRwv8ieCo=
-X-Google-Smtp-Source: AGHT+IFjR7/59bLXqdMG45ijfjBsstuaKV8l0fouiyv83xrRxHek1RFBXQoId5l45vd44AddM38xuhfanRjJ9FBxe/c=
-X-Received: by 2002:a17:903:3c65:b0:22e:1858:fc25 with SMTP id
- d9443c01a7336-242fedd3b9amr1268105ad.9.1754965899018; Mon, 11 Aug 2025
- 19:31:39 -0700 (PDT)
+	s=arc-20240116; t=1754967382; c=relaxed/simple;
+	bh=Ko3AjVpWTBy2eVUwDGzR71/wCb7ro5IS8O7k67DJkaI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RAAo1fVE+3Uzi5iQTDPq1Muu8QEZwK9bFodZaVDcfvvOKQvQ10G3FaZ/i/Q8L2w+VqR/MIOruUZGim9qm+JJ1hphslMh/1T0ofat3ZV3bHV9AckSrTP5IMpk400rvRi8EKFAx2RDnFTrEEcu1f7SxNyn/lhCTmg2SkkTtIXmHIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=avOISrDp; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1754967380; x=1786503380;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Ko3AjVpWTBy2eVUwDGzR71/wCb7ro5IS8O7k67DJkaI=;
+  b=avOISrDpIfpSp4hBMblp7W9SzSFXRt97yGdSIUJKj8vgaHYsZfLHTV5J
+   u8DaTwgrsf3Hm1rT34tjUiUFpyfEsgUmUNIaJiTrdkmJ+4WsXDIbF+5rS
+   w0G27+Z7u2/9kk91HCwVX7flpbY4uFOR24GEbh7/wsD8d86nG3/mSpeRx
+   JMhYFzbTFT6VjlktOjbSZmVLLHOF0XOA7zzCIRcIcI8wxVN0Itm3UFRGE
+   cmStVc/AV30GRiAYuIvAHWZ6O/WV8vot87kIrcXp/4A+FC/141PWbw5Ad
+   MhW8PMeJlSm1wQYBucsEHBMJYmVMdvQ3K6SfNtjjgTTv9OE56usQtGO3y
+   w==;
+X-CSE-ConnectionGUID: l5KQ7wiyTE6KwBa1dLYIyQ==
+X-CSE-MsgGUID: v/GLx8tPR66B8NOJC5UaFQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11518"; a="57100417"
+X-IronPort-AV: E=Sophos;i="6.17,284,1747724400"; 
+   d="scan'208";a="57100417"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Aug 2025 19:56:19 -0700
+X-CSE-ConnectionGUID: 57ivHpJVTwW4i8roMMMqDQ==
+X-CSE-MsgGUID: ESiHzduhQFiMTCvrx2CgxA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,284,1747724400"; 
+   d="scan'208";a="171321195"
+Received: from 984fee019967.jf.intel.com ([10.165.54.94])
+  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Aug 2025 19:56:18 -0700
+From: Chao Gao <chao.gao@intel.com>
+To: kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: mlevitsk@redhat.com,
+	rick.p.edgecombe@intel.com,
+	weijiang.yang@intel.com,
+	xin@zytor.com,
+	Chao Gao <chao.gao@intel.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Ingo Molnar <mingo@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	x86@kernel.org
+Subject: [PATCH v12 00/24] Enable CET Virtualization
+Date: Mon, 11 Aug 2025 19:55:08 -0700
+Message-ID: <20250812025606.74625-1-chao.gao@intel.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250609191340.2051741-1-kirill.shutemov@linux.intel.com>
- <d432b8b7cfc413001c743805787990fe0860e780.camel@intel.com>
- <sjhioktjzegjmyuaisde7ui7lsrhnolx6yjmikhhwlxxfba5bh@ss6igliiimas>
- <c2a62badf190717a251d269a6905872b01e8e340.camel@intel.com> <aJqgosNUjrCfH_WN@google.com>
-In-Reply-To: <aJqgosNUjrCfH_WN@google.com>
-From: Vishal Annapurve <vannapurve@google.com>
-Date: Mon, 11 Aug 2025 19:31:26 -0700
-X-Gm-Features: Ac12FXwemm5QfMsHojPrie984ICUoSlUXi0okP4W4I2ic6L7UZ6Sv14sh72jT4k
-Message-ID: <CAGtprH9TX4s6jQTq0YbiohXs9jyHGOFvQTZD9ph8nELhxb3tgA@mail.gmail.com>
-Subject: Re: [PATCHv2 00/12] TDX: Enable Dynamic PAMT
-To: Sean Christopherson <seanjc@google.com>
-Cc: Rick P Edgecombe <rick.p.edgecombe@intel.com>, "kas@kernel.org" <kas@kernel.org>, 
-	Chao Gao <chao.gao@intel.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Kai Huang <kai.huang@intel.com>, 
-	"bp@alien8.de" <bp@alien8.de>, "x86@kernel.org" <x86@kernel.org>, "mingo@redhat.com" <mingo@redhat.com>, 
-	Yan Y Zhao <yan.y.zhao@intel.com>, 
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
-	"tglx@linutronix.de" <tglx@linutronix.de>, 
-	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, Aug 11, 2025 at 7:02=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> On Mon, Aug 11, 2025, Rick P Edgecombe wrote:
-> > On Mon, 2025-08-11 at 07:31 +0100, kas@kernel.org wrote:
-> > > > I don't see any other reason for the global spin lock, Kirill was t=
-hat
-> > > > it?  Did you consider also adding a lock per 2MB region, like the
-> > > > refcount? Or any other granularity of lock besides global? Not sayi=
-ng
-> > > > global is definitely the wrong choice, but seems arbitrary if I got=
- the
-> > > > above right.
-> > >
-> > > We have discussed this before[1]. Global locking is problematic when =
-you
-> > > actually hit contention. Let's not complicate things until we actuall=
-y
-> > > see it. I failed to demonstrate contention without huge pages. With h=
-uge
-> > > pages it is even more dubious that we ever see it.
-> > >
-> > > [1]
-> > > https://lore.kernel.org/all/4bb2119a-ff6d-42b6-acf4-86d87b0e9939@inte=
-l.com/
-> >
-> > Ah, I see.
-> >
-> > I just did a test of simultaneously starting 10 VMs with 16GB of ram (n=
-on huge
->
-> How many vCPUs?  And were the VMs actually accepting/faulting all 16GiB?
->
-> There's also a noisy neighbor problem lurking.  E.g. malicious/buggy VM s=
-pams
-> private<=3D>shared conversions and thus interferes with PAMT allocations =
-for other
-> VMs.
->
-> > pages) and then shutting them down. I saw 701 contentions on startup, a=
-nd 53
-> > more on shutdown. Total wait time 2ms. Not horrible but not theoretical=
- either.
-> > But it probably wasn't much of a cacheline bouncing worse case.
->
-> Isn't the SEAMCALL done while holding the spinlock?  I assume the latency=
- of the
-> SEAMCALL is easily the long pole in the flow.
->
-> > And I guess this is on my latest changes not this exact v2, but it shou=
-ldn't
-> > have changed.
-> >
-> > But hmm, it seems Dave's objection about maintaining the lock allocatio=
-ns would
-> > apply to the refcounts too? But the hotplug concerns shouldn't actually=
- be an
-> > issue for TDX because they gets rejected if the allocations are not alr=
-eady
-> > there. So complexity of a per-2MB lock should be minimal, at least
-> > incrementally. The difference seems more about memory use vs performanc=
-e.
-> >
-> > What gives me pause is in the KVM TDX work we have really tried hard to=
- not take
-> > exclusive locks in the shared MMU lock path. Admittedly that wasn't bac=
-ked by
-> > hard numbers.
->
-> Maybe not for TDX, but we have lots and lots of hard numbers for why taki=
-ng mmu_lock
-> for write is problematic.  Even if TDX VMs don't exhibit the same pattern=
-s *today*
-> as "normal" VMs, i.e. don't suffer the same performance blips, nothing gu=
-arantees
-> that will always hold true.
->
-> > But an enormous amount of work went into lettings KVM faults happen und=
-er the
-> > shared lock for normal VMs. So on one hand, yes it's premature optimiza=
-tion.
-> > But on the other hand, it's a maintainability concern about polluting t=
-he
-> > existing way things work in KVM with special TDX properties.
-> >
-> > I think we need to at least call out loudly that the decision was to go=
- with the
-> > simplest possible solution, and the impact to KVM. I'm not sure what Se=
-an's
-> > opinion is, but I wouldn't want him to first learn of it when he went d=
-igging
-> > and found a buried global spin lock in the fault path.
->
-> Heh, too late, I saw it when this was first posted.  And to be honest, my=
- initial
-> reaction was very much "absolutely not" (though Rated R, not PG).  Now th=
-at I've
-> had time to think things through, I'm not _totally_ opposed to having a s=
-pinlock
-> in the page fault path, but my overall sentiment remains the same.
->
-> For mmu_lock and related SPTE operations, I was super adamant about not t=
-aking
-> exclusive locks because based on our experience with the TDP MMU, convert=
-ing flows
-> from exclusive to shared is usually significantly more work than developi=
-ng code
-> for "shared mode" straightaway (and you note above, that wasn't trivial f=
-or TDX).
-> And importantly, those code paths were largely solved problems.  I.e. I d=
-idn't
-> want to get into a situation where TDX undid the parallelization of the T=
-DP MMU,
-> and then had to add it back after the fact.
->
-> I think the same holds true here.  I'm not completely opposed to introduc=
-ing a
-> spinlock, but I want to either have a very high level of confidence that =
-the lock
-> won't introduce jitter/delay (I have low confidence on this front, at lea=
-st in
-> the proposed patches), or have super clear line of sight to making the co=
-ntention
-> irrelevant, without having to rip apart the code.
->
-> My biggest question at this point is: why is all of this being done on-de=
-mand?
-> IIUC, we swung from "allocate all PAMT_4K pages upfront" to "allocate all=
- PAMT_4K
-> pages at the last possible moment".  Neither of those seems ideal.
->
-> E.g. for things like TDCS pages and to some extent non-leaf S-EPT pages, =
-on-demand
-> PAMT management seems reasonable.  But for PAMTs that are used to track g=
-uest-assigned
-> memory, which is the vaaast majority of PAMT memory, why not hook guest_m=
-emfd?
+The FPU support for CET virtualization has already been merged into 6.17-rc1.
+Building on that, this series introduces Intel CET virtualization support for
+KVM.
 
-This seems fine for 4K page backing. But when TDX VMs have huge page
-backing, the vast majority of private memory memory wouldn't need PAMT
-allocation for 4K granularity.
+Changes in v12:
+1. collect Tested-by tags from John and Mathias.
+2. use less verbose names for KVM rdmsr/wrmsr emulation APIs in patch 1/2
+   (Sean/Xin)
+3. refer to s_cet, ssp, and ssp_table in a consistent order in patch 22
+   (Xin)
 
-IIUC guest_memfd allocation happening at 2M granularity doesn't
-necessarily translate to 2M mapping in guest EPT entries. If the DPAMT
-support is to be properly utilized for huge page backings, there is a
-value in not attaching PAMT allocation with guest_memfd allocation.
+Please note that I didn't include Mathias' patch, which makes CR4.CET
+guest-owned. I expect that patch to be posted separately.
 
-> I.e. setup PAMT crud when guest_memfd is populated, not when the memory i=
-s mapped
-> into the guest.  That way setups that cares about guest boot time can pre=
-allocate
-> guest_memfd in order to get the PAMT stuff out of the way.
->
-> You could do the same thing by prefaulting guest memory, but TDX has limi=
-tations
-> there, and I see very little value in precisely reclaiming PAMT memory wh=
-en a
-> leaf S-EPT is zapped, i.e. when a page is converted from private=3D>share=
-d.  As
-> above, that's just asking for noisy neighbor issues.
->
-> The complaints with static PAMT are that it required burning 0.4% of memo=
-ry even
-> if the host isn't actively running TDX VMs.  Burning 0.4% of the memory a=
-ssigned
-> to a guest, regardless of whether it's map private or shared, seems accep=
-table,
-> and I think would give us a lot more flexibility in avoiding locking issu=
-es.
->
-> Similarly, we could bind a PAMT to non-leaf S-EPT pages during mmu_topup_=
-memory_caches(),
-> i.e. when arch.mmu_external_spt_cache is filled.  Then there would be no =
-need for
-> a separate vcpu->arch.pamt_page_cache, and more work would be done outsid=
-e of
-> mmu_lock.  Freeing SPTs would still be done under mmu_lock (I think), but=
- that
-> should be a much rarer operation.
->
+---
+Control-flow Enforcement Technology (CET) is a kind of CPU feature used
+to prevent Return/CALL/Jump-Oriented Programming (ROP/COP/JOP) attacks.
+It provides two sub-features(SHSTK,IBT) to defend against ROP/COP/JOP
+style control-flow subversion attacks.
+
+Shadow Stack (SHSTK):
+  A shadow stack is a second stack used exclusively for control transfer
+  operations. The shadow stack is separate from the data/normal stack and
+  can be enabled individually in user and kernel mode. When shadow stack
+  is enabled, CALL pushes the return address on both the data and shadow
+  stack. RET pops the return address from both stacks and compares them.
+  If the return addresses from the two stacks do not match, the processor
+  generates a #CP.
+
+Indirect Branch Tracking (IBT):
+  IBT introduces new instruction(ENDBRANCH)to mark valid target addresses
+  of indirect branches (CALL, JMP etc...). If an indirect branch is
+  executed and the next instruction is _not_ an ENDBRANCH, the processor
+  generates a #CP. These instruction behaves as a NOP on platforms that
+  doesn't support CET.
+
+CET states management
+=====================
+KVM cooperates with host kernel FPU framework to manage guest CET registers.
+With CET supervisor mode state support in this series, KVM can save/restore
+full guest CET xsave-managed states.
+
+CET user mode and supervisor mode xstates, i.e., MSR_IA32_{U_CET,PL3_SSP}
+and MSR_IA32_PL{0,1,2}, depend on host FPU framework to swap guest and host
+xstates. On VM-Exit, guest CET xstates are saved to guest fpu area and host
+CET xstates are loaded from task/thread context before vCPU returns to
+userspace, vice-versa on VM-Entry. See details in kvm_{load,put}_guest_fpu().
+
+CET supervisor mode states are grouped into two categories : XSAVE-managed
+and non-XSAVE-managed, the former includes MSR_IA32_PL{0,1,2}_SSP and are
+controlled by CET supervisor mode bit(S_CET bit) in XSS, the later consists
+of MSR_IA32_S_CET and MSR_IA32_INTR_SSP_TBL.
+
+VMX introduces new VMCS fields, {GUEST|HOST}_{S_CET,SSP,INTR_SSP_TABL}, to
+facilitate guest/host non-XSAVES-managed states. When VMX CET entry/exit load
+bits are set, guest/host MSR_IA32_{S_CET,INTR_SSP_TBL,SSP} are loaded from
+equivalent fields at VM-Exit/Entry. With these new fields, such supervisor
+states require no addtional KVM save/reload actions.
+
+Tests
+======
+This series has successfully passed the basic CET user shadow stack test
+and kernel IBT test in both L1 and L2 guests. The newly added
+KVM-unit-tests [2] also passed, and its v11 has been tested with the AMD
+CET series by John [3].
+
+For your convenience, you can use my WIP QEMU [1] for testing.
+
+[1]: https://github.com/gaochaointel/qemu-dev qemu-cet
+[2]: https://lore.kernel.org/kvm/20250626073459.12990-1-minipli@grsecurity.net/
+[3]: https://lore.kernel.org/kvm/aH6CH+x5mCDrvtoz@AUSJOHALLEN.amd.com/
+
+Chao Gao (3):
+  KVM: x86: Zero XSTATE components on INIT by iterating over supported
+    features
+  KVM: nVMX: Add consistency checks for CR0.WP and CR4.CET
+  KVM: nVMX: Add consistency checks for CET states
+
+Sean Christopherson (4):
+  KVM: x86: Use double-underscore read/write MSR helpers as appropriate
+  KVM: x86: Manually clear MPX state only on INIT
+  KVM: x86: Report XSS as to-be-saved if there are supported features
+  KVM: x86: Load guest FPU state when access XSAVE-managed MSRs
+
+Yang Weijiang (17):
+  KVM: x86: Rename kvm_{g,s}et_msr()* to show that they emulate guest
+    accesses
+  KVM: x86: Add kvm_msr_{read,write}() helpers
+  KVM: x86: Introduce KVM_{G,S}ET_ONE_REG uAPIs support
+  KVM: x86: Refresh CPUID on write to guest MSR_IA32_XSS
+  KVM: x86: Initialize kvm_caps.supported_xss
+  KVM: x86: Add fault checks for guest CR4.CET setting
+  KVM: x86: Report KVM supported CET MSRs as to-be-saved
+  KVM: VMX: Introduce CET VMCS fields and control bits
+  KVM: x86: Enable guest SSP read/write interface with new uAPIs
+  KVM: VMX: Emulate read and write to CET MSRs
+  KVM: x86: Save and reload SSP to/from SMRAM
+  KVM: VMX: Set up interception for CET MSRs
+  KVM: VMX: Set host constant supervisor states to VMCS fields
+  KVM: x86: Don't emulate instructions guarded by CET
+  KVM: x86: Enable CET virtualization for VMX and advertise to userspace
+  KVM: nVMX: Virtualize NO_HW_ERROR_CODE_CC for L1 event injection to L2
+  KVM: nVMX: Enable CET support for nested guest
+
+ arch/x86/include/asm/kvm_host.h |  16 +-
+ arch/x86/include/asm/vmx.h      |   9 +
+ arch/x86/include/uapi/asm/kvm.h |  13 ++
+ arch/x86/kvm/cpuid.c            |  19 +-
+ arch/x86/kvm/emulate.c          |  46 +++--
+ arch/x86/kvm/smm.c              |  12 +-
+ arch/x86/kvm/smm.h              |   2 +-
+ arch/x86/kvm/svm/svm.c          |   4 +
+ arch/x86/kvm/vmx/capabilities.h |   9 +
+ arch/x86/kvm/vmx/nested.c       | 175 +++++++++++++++--
+ arch/x86/kvm/vmx/nested.h       |   5 +
+ arch/x86/kvm/vmx/vmcs12.c       |   6 +
+ arch/x86/kvm/vmx/vmcs12.h       |  14 +-
+ arch/x86/kvm/vmx/vmx.c          |  85 +++++++-
+ arch/x86/kvm/vmx/vmx.h          |   9 +-
+ arch/x86/kvm/x86.c              | 339 +++++++++++++++++++++++++++-----
+ arch/x86/kvm/x86.h              |  61 ++++++
+ 17 files changed, 732 insertions(+), 92 deletions(-)
+
+
+base-commit: 8f5ae30d69d7543eee0d70083daf4de8fe15d585
+-- 
+2.47.1
+
 
