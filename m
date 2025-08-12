@@ -1,63 +1,70 @@
-Return-Path: <kvm+bounces-54514-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54515-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93640B224B5
-	for <lists+kvm@lfdr.de>; Tue, 12 Aug 2025 12:37:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 744C8B224E3
+	for <lists+kvm@lfdr.de>; Tue, 12 Aug 2025 12:50:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AFE9F1B63770
-	for <lists+kvm@lfdr.de>; Tue, 12 Aug 2025 10:38:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB8B13ADBFB
+	for <lists+kvm@lfdr.de>; Tue, 12 Aug 2025 10:49:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 944AB2EBBB8;
-	Tue, 12 Aug 2025 10:37:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 984E22F0C47;
+	Tue, 12 Aug 2025 10:46:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="tjTh10NY"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="O6yuFL46"
 X-Original-To: kvm@vger.kernel.org
 Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B687A2EBB91
-	for <kvm@vger.kernel.org>; Tue, 12 Aug 2025 10:37:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 475EA2EFD9C;
+	Tue, 12 Aug 2025 10:46:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754995070; cv=none; b=YS4y5pKpgZpTLtiVqfU4CwfbWQUXPMqJla3lFHPoVyzMrTaKRCL7QJFq//eyWhmQe9Jx08givyK2/yibN/yQSpgNIwFMboq60aIz/mgALQV4cMlYlMH0DAPUAVh8OWSW7Fv2F1nG3/gffL3I1NBKzL1Mnofm0551lV2TTWoufro=
+	t=1754995582; cv=none; b=CxK2SpZSFKJQixzySIozxu05frLt8cfd2a+h1MJWZ/vFAWq6e42Iq8W7dG0OA4Ixudjv636vb0MpUXsmozSeWx/8MiI2T3JJjBUnXHQeFguWihG4ldX+27rvzJrogr9aGW+jlNLzvIFJWNW15JMNbnkTaxJrNMuWcJDm47P4AoE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754995070; c=relaxed/simple;
-	bh=vcBN5ql652caZVvWM0vy7rypGlhpR/OwRnrT2hSu9xY=;
+	s=arc-20240116; t=1754995582; c=relaxed/simple;
+	bh=pmMhsQf5CMo+3Ho8xP1cyZDCl4RaFaa9YcloHl2GNlU=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=d5Zd5wlpnpX9IkujVqCv+YT1hT1mgzCg5noZm94SE84FBuxaKh3GgcpkGD2X38TqpWubm2nGJj8Q4nkgjMJs6fwiEd2fa7eJ+v/+Y41bxZ4A7yX1DsqUElcYJt8M4a6sZFup+lH1PT0Yvte/oXL3uHSv8/23Z4hFfZH4b2Q0WcA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=tjTh10NY; arc=none smtp.client-ip=90.155.50.34
+	 Content-Type:MIME-Version; b=rPMDgoBkezPYzTCpiyHVPfhTj1T/C5FiFEBAcslpGQvJ2PpIJeFEdMnLhfVh/LXo2Gu81BWvxTIrmnF7S851OaM/Nuh4gyZJ1BGjNPeeevmYAB2T14yq4mcP6fiC+stTCruOD4Ta4rSSQeS68lKlMy+lnkkaeGZSACAOpkytJcQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=O6yuFL46; arc=none smtp.client-ip=90.155.50.34
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
 	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=vcBN5ql652caZVvWM0vy7rypGlhpR/OwRnrT2hSu9xY=; b=tjTh10NYu0UzZz+BikIlilWckR
-	jpcJ3w3YZbEPOG9daM8AVDMtkEdFA3A21dJWOqR9/IeTjCLQRnm7VwDNB3ldQfbbxYVexjS8iYHOh
-	ky+b5MZLnueNxaOxGstNnXU3RIsUBWThvYf9q/NVPC/AZ/BCaAksCryuZp6vBQlz49f0Rod8Sg6mc
-	qKBQyK2Gp50cS43WWa/PcS82tIWx0x9bfeFRUZgD2H6RhYD82uddKYszeU8x2SLL+y3ovjqy7lALy
-	2Kr3dJ4XXtgK/9RDLDWQ+VmuPWeu7T7FW2ISb2eZn6+OR2qjU+OJGKlPiLr7cj8xRaqQbepRFy2Gs
-	jh/EXKjA==;
+	bh=pmMhsQf5CMo+3Ho8xP1cyZDCl4RaFaa9YcloHl2GNlU=; b=O6yuFL46KEs90BaXxyr9smvZJ7
+	68yAlcD2TrcBEM1BPIKoRxCnU9Put27vLrZuEoR0Fa4QiPk7HoztmUYCBP+GCWIfqp5d6xp3tIPIO
+	dC2hp0GrW4Gomq1SHHYDzTEAdjaW9HAM32AuGCosi3OgpBJLizcuT+6T86mIR6JjasuZQUFxFMkYw
+	6Rql11xkpLItLpGIee0l6FyojvRSp44KWE6NAlQZZ1ksie31mN5bcELASDolRW2fiofi6XmA2sa9R
+	lWmWz+9n5I662u2I/S5PAMLPPKAmHnP+ZIgb9TyiR2lfOEhdywU1THbwiZt/LMU0vUA++hHwZBAYU
+	olJuyZMg==;
 Received: from [54.239.6.185] (helo=u09cd745991455d.ant.amazon.com)
 	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1ulmO1-0000000FIiZ-1UL3;
-	Tue, 12 Aug 2025 10:37:46 +0000
-Message-ID: <29268732d8c7656771565ab3c971decf0b12a04d.camel@infradead.org>
-Subject: Re: [PATCH v3] KVM: x86: use array_index_nospec with indices that
- come from guest
+	id 1ulmW1-0000000FQVQ-2hjA;
+	Tue, 12 Aug 2025 10:46:02 +0000
+Message-ID: <d3e44057beb8db40d90e838265df7f4a2752361a.camel@infradead.org>
+Subject: Re: [PATCH] KVM: x86: Synchronize APIC State with QEMU when
+ irqchip=split
 From: David Woodhouse <dwmw2@infradead.org>
-To: Thijs Raymakers <thijs@raymakers.nl>, kvm@vger.kernel.org
-Cc: stable <stable@kernel.org>, Sean Christopherson <seanjc@google.com>, 
- Paolo Bonzini <pbonzini@redhat.com>, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>
-Date: Tue, 12 Aug 2025 12:37:45 +0200
-In-Reply-To: <20250804064405.4802-1-thijs@raymakers.nl>
-References: <20250804064405.4802-1-thijs@raymakers.nl>
+To: hugo lee <cs.hugolee@gmail.com>, Sean Christopherson <seanjc@google.com>
+Cc: pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+  dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org,
+ kvm@vger.kernel.org,  linux-kernel@vger.kernel.org, Yuguo Li
+ <hugoolli@tencent.com>
+Date: Tue, 12 Aug 2025 12:46:01 +0200
+In-Reply-To: <CAAdeq_KK_eChRpPUOrw3XaKXJj+abg63rYfNc4A+dTdKKN1M6A@mail.gmail.com>
+References: <20250806081051.3533470-1-hugoolli@tencent.com>
+	 <aJOc8vIkds_t3e8C@google.com>
+	 <CAAdeq_+Ppuj8PxABvCT54phuXY021HxdayYyb68G3JjkQE0WQg@mail.gmail.com>
+	 <aJTytueCqmZXtbUk@google.com>
+	 <CAAdeq_+wLaze3TVY5To8_DhE_S9jocKn4+M9KvHp0Jg8pT99KQ@mail.gmail.com>
+	 <aJobIRQ7Z4Ou1hz0@google.com>
+	 <CAAdeq_KK_eChRpPUOrw3XaKXJj+abg63rYfNc4A+dTdKKN1M6A@mail.gmail.com>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-5JB/2WxliwAVqpQ7T5A/"
+	boundary="=-NYxdVI700yCS2X7ugkeQ"
 User-Agent: Evolution 3.52.3-0ubuntu1 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -68,31 +75,29 @@ MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
 
---=-5JB/2WxliwAVqpQ7T5A/
+--=-NYxdVI700yCS2X7ugkeQ
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, 2025-08-04 at 08:44 +0200, Thijs Raymakers wrote:
-> min and dest_id are guest-controlled indices. Using
-> array_index_nospec()
-> after the bounds checks clamps these values to mitigate speculative
-> execution
-> side-channels.
+On Tue, 2025-08-12 at 18:08 +0800, hugo lee wrote:
 >=20
-> Signed-off-by: Thijs Raymakers <thijs@raymakers.nl>
-> Cc: stable <stable@kernel.org>
-> Cc: Sean Christopherson <seanjc@google.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> ---
-> Sean C. correctly pointed out that max_apic_id is inclusive, while
-> array_index_nospec is not.
+> On some legacy bios images using guests, they may disable PIT
+> after booting.
 
-Fixes: 715062970f37 ("KVM: X86: Implement PV sched yield hypercall")
+Do you mean they may *not* disable the PIT after booting? Linux had
+that problem for a long time, until I fixed it with
+https://git.kernel.org/torvalds/c/70e6b7d9ae3
 
-?
+> When irqchip=3Dsplit is on, qemu will keep kicking the guest and try to
+> get the Big QEMU Lock.
 
---=-5JB/2WxliwAVqpQ7T5A/
+If it's the PIT, surely QEMU will keep stealing time pointlessly unless
+we actually disable the PIT itself? Not just the IRQ delivery? Or do
+you use this to realise that the IRQ output from the PIT isn't going
+anywhere and thus disable the event in QEMU completely?=20
+
+
+--=-NYxdVI700yCS2X7ugkeQ
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -171,22 +176,22 @@ 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
-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
+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
-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
+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
 
 
---=-5JB/2WxliwAVqpQ7T5A/--
+--=-NYxdVI700yCS2X7ugkeQ--
 
