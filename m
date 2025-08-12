@@ -1,62 +1,63 @@
-Return-Path: <kvm+bounces-54472-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54473-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAF57B21AFF
-	for <lists+kvm@lfdr.de>; Tue, 12 Aug 2025 04:56:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69465B21B00
+	for <lists+kvm@lfdr.de>; Tue, 12 Aug 2025 04:56:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DC7DA7A7018
-	for <lists+kvm@lfdr.de>; Tue, 12 Aug 2025 02:54:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D04B6284F5
+	for <lists+kvm@lfdr.de>; Tue, 12 Aug 2025 02:56:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E57B32DA74C;
-	Tue, 12 Aug 2025 02:56:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 874D82E2F17;
+	Tue, 12 Aug 2025 02:56:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="avOISrDp"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kxcTuiT7"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 459A113D8A4;
-	Tue, 12 Aug 2025 02:56:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D54EE13D8A4;
+	Tue, 12 Aug 2025 02:56:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754967382; cv=none; b=KTUAOM80Huq8/VTIRzlbWHpH1iBPar0Rl+r6AW8cvlmVI/4pg6dQ7yoeujgZH/n5y77FJju2bSQ412UXTrvJq03RQytEaEy5S8rhO4OTxnbkuHSZBu9l8DlcfjYR7tRyVJBzdLVgGB1MJfVHVGS5fOl3PIJYP1NIi9sKC9kb494=
+	t=1754967389; cv=none; b=otabR51NYlpp+zNby2G/qSGa7brN5NikuC3/4XZQpD4nSGIqXVpJLoWc8rRN5HttREyiyti+unrDAjy1yQtx9JuwZQtNOe/a2cXewpyScfATMmbnJYLcf3XIBBf29lZDsKjJXdk/oIoy4Mp2ej2Ptg56eF3sXJMdm8Nvd9AFSBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754967382; c=relaxed/simple;
-	bh=Ko3AjVpWTBy2eVUwDGzR71/wCb7ro5IS8O7k67DJkaI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RAAo1fVE+3Uzi5iQTDPq1Muu8QEZwK9bFodZaVDcfvvOKQvQ10G3FaZ/i/Q8L2w+VqR/MIOruUZGim9qm+JJ1hphslMh/1T0ofat3ZV3bHV9AckSrTP5IMpk400rvRi8EKFAx2RDnFTrEEcu1f7SxNyn/lhCTmg2SkkTtIXmHIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=avOISrDp; arc=none smtp.client-ip=198.175.65.19
+	s=arc-20240116; t=1754967389; c=relaxed/simple;
+	bh=59Lddcpsx0ltVEXxI4JbBZLMy6Ums8t0Jrpm7HGtKn4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ujdgFOTVslHKFr9dfNhHVmnGuRZKAOOQx2u2C8EJEFau63A4WG/Vgzpg1DidGngEo3gp4lR7BAUyTIgIM/1nViaqCKXyc/qdyrIiLeXX9F5c50LqKp5MHnfXUY6OO3TzfSHw3SFeZghK6sYCzz9y3PoIElnkLw09wyEMV4m1vls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kxcTuiT7; arc=none smtp.client-ip=198.175.65.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1754967380; x=1786503380;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=Ko3AjVpWTBy2eVUwDGzR71/wCb7ro5IS8O7k67DJkaI=;
-  b=avOISrDpIfpSp4hBMblp7W9SzSFXRt97yGdSIUJKj8vgaHYsZfLHTV5J
-   u8DaTwgrsf3Hm1rT34tjUiUFpyfEsgUmUNIaJiTrdkmJ+4WsXDIbF+5rS
-   w0G27+Z7u2/9kk91HCwVX7flpbY4uFOR24GEbh7/wsD8d86nG3/mSpeRx
-   JMhYFzbTFT6VjlktOjbSZmVLLHOF0XOA7zzCIRcIcI8wxVN0Itm3UFRGE
-   cmStVc/AV30GRiAYuIvAHWZ6O/WV8vot87kIrcXp/4A+FC/141PWbw5Ad
-   MhW8PMeJlSm1wQYBucsEHBMJYmVMdvQ3K6SfNtjjgTTv9OE56usQtGO3y
-   w==;
-X-CSE-ConnectionGUID: l5KQ7wiyTE6KwBa1dLYIyQ==
-X-CSE-MsgGUID: v/GLx8tPR66B8NOJC5UaFQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11518"; a="57100417"
+  t=1754967388; x=1786503388;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=59Lddcpsx0ltVEXxI4JbBZLMy6Ums8t0Jrpm7HGtKn4=;
+  b=kxcTuiT7oWQSy1DwjWRfD1Yg7eZwv9AL41GDnEJPwaFPFrlk30+FkjJc
+   ASHHrKpnSk83MJhd8ixSj5KhDkiGFmvR5yWtkB4J9uDOUzTbGACL5vUrd
+   HZKBDrdN54w9BYB2Gr+VzFotC0GoT3osPA8MQUGBQRoUWipmYLYu/ZVbx
+   6BZ71DMqvteJs2wndxATMba4XsDXykcVUCDSU0JNYl1O3iAo6ixDHlpVJ
+   yEb/MOmap9XMNt4Pbti5A9sAFHDeDZj560hEEDy0OnAeEx0fLp2VJPJBn
+   7NTTxIu87tCOIRLpSp1SKHch9ryqGwh8febwj1tEfyTxTk++PDwQnniHC
+   Q==;
+X-CSE-ConnectionGUID: uSDb3QFySuS0zKwuerezbg==
+X-CSE-MsgGUID: 1G7TgS+rSDaVCawxWa/hkQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11518"; a="57100429"
 X-IronPort-AV: E=Sophos;i="6.17,284,1747724400"; 
-   d="scan'208";a="57100417"
+   d="scan'208";a="57100429"
 Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Aug 2025 19:56:19 -0700
-X-CSE-ConnectionGUID: 57ivHpJVTwW4i8roMMMqDQ==
-X-CSE-MsgGUID: ESiHzduhQFiMTCvrx2CgxA==
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Aug 2025 19:56:23 -0700
+X-CSE-ConnectionGUID: ZlS2m3n+TtaREeseP9aRng==
+X-CSE-MsgGUID: aZ+matr2R/qcLazvMLmoSg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.17,284,1747724400"; 
-   d="scan'208";a="171321195"
+   d="scan'208";a="171321218"
 Received: from 984fee019967.jf.intel.com ([10.165.54.94])
-  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Aug 2025 19:56:18 -0700
+  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Aug 2025 19:56:23 -0700
 From: Chao Gao <chao.gao@intel.com>
 To: kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org
@@ -64,19 +65,23 @@ Cc: mlevitsk@redhat.com,
 	rick.p.edgecombe@intel.com,
 	weijiang.yang@intel.com,
 	xin@zytor.com,
+	Sean Christopherson <seanjc@google.com>,
 	Chao Gao <chao.gao@intel.com>,
+	Mathias Krause <minipli@grsecurity.net>,
+	John Allen <john.allen@amd.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
 	Borislav Petkov <bp@alien8.de>,
 	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Ingo Molnar <mingo@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	x86@kernel.org
-Subject: [PATCH v12 00/24] Enable CET Virtualization
-Date: Mon, 11 Aug 2025 19:55:08 -0700
-Message-ID: <20250812025606.74625-1-chao.gao@intel.com>
+	x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>
+Subject: [PATCH v12 01/24] KVM: x86: Rename kvm_{g,s}et_msr()* to show that they emulate guest accesses
+Date: Mon, 11 Aug 2025 19:55:09 -0700
+Message-ID: <20250812025606.74625-2-chao.gao@intel.com>
 X-Mailer: git-send-email 2.47.1
+In-Reply-To: <20250812025606.74625-1-chao.gao@intel.com>
+References: <20250812025606.74625-1-chao.gao@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -85,131 +90,222 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The FPU support for CET virtualization has already been merged into 6.17-rc1.
-Building on that, this series introduces Intel CET virtualization support for
-KVM.
+From: Yang Weijiang <weijiang.yang@intel.com>
 
-Changes in v12:
-1. collect Tested-by tags from John and Mathias.
-2. use less verbose names for KVM rdmsr/wrmsr emulation APIs in patch 1/2
-   (Sean/Xin)
-3. refer to s_cet, ssp, and ssp_table in a consistent order in patch 22
-   (Xin)
+Rename
+	kvm_{g,s}et_msr_with_filter()
+	kvm_{g,s}et_msr()
+to
+	kvm_emulate_msr_{read,write}
+	__kvm_emulate_msr_{read,write}
 
-Please note that I didn't include Mathias' patch, which makes CR4.CET
-guest-owned. I expect that patch to be posted separately.
+to make it more obvious that KVM uses these helpers to emulate guest
+behaviors, i.e., host_initiated == false in these helpers.
 
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Suggested-by: Chao Gao <chao.gao@intel.com>
+Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+Reviewed-by: Chao Gao <chao.gao@intel.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+Tested-by: Mathias Krause <minipli@grsecurity.net>
+Tested-by: John Allen <john.allen@amd.com>
+Signed-off-by: Chao Gao <chao.gao@intel.com>
 ---
-Control-flow Enforcement Technology (CET) is a kind of CPU feature used
-to prevent Return/CALL/Jump-Oriented Programming (ROP/COP/JOP) attacks.
-It provides two sub-features(SHSTK,IBT) to defend against ROP/COP/JOP
-style control-flow subversion attacks.
+v12: use less verbose function names -- Sean/Xin
+---
+ arch/x86/include/asm/kvm_host.h |  8 ++++----
+ arch/x86/kvm/smm.c              |  4 ++--
+ arch/x86/kvm/vmx/nested.c       | 14 +++++++-------
+ arch/x86/kvm/x86.c              | 26 +++++++++++++-------------
+ 4 files changed, 26 insertions(+), 26 deletions(-)
 
-Shadow Stack (SHSTK):
-  A shadow stack is a second stack used exclusively for control transfer
-  operations. The shadow stack is separate from the data/normal stack and
-  can be enabled individually in user and kernel mode. When shadow stack
-  is enabled, CALL pushes the return address on both the data and shadow
-  stack. RET pops the return address from both stacks and compares them.
-  If the return addresses from the two stacks do not match, the processor
-  generates a #CP.
-
-Indirect Branch Tracking (IBT):
-  IBT introduces new instruction(ENDBRANCH)to mark valid target addresses
-  of indirect branches (CALL, JMP etc...). If an indirect branch is
-  executed and the next instruction is _not_ an ENDBRANCH, the processor
-  generates a #CP. These instruction behaves as a NOP on platforms that
-  doesn't support CET.
-
-CET states management
-=====================
-KVM cooperates with host kernel FPU framework to manage guest CET registers.
-With CET supervisor mode state support in this series, KVM can save/restore
-full guest CET xsave-managed states.
-
-CET user mode and supervisor mode xstates, i.e., MSR_IA32_{U_CET,PL3_SSP}
-and MSR_IA32_PL{0,1,2}, depend on host FPU framework to swap guest and host
-xstates. On VM-Exit, guest CET xstates are saved to guest fpu area and host
-CET xstates are loaded from task/thread context before vCPU returns to
-userspace, vice-versa on VM-Entry. See details in kvm_{load,put}_guest_fpu().
-
-CET supervisor mode states are grouped into two categories : XSAVE-managed
-and non-XSAVE-managed, the former includes MSR_IA32_PL{0,1,2}_SSP and are
-controlled by CET supervisor mode bit(S_CET bit) in XSS, the later consists
-of MSR_IA32_S_CET and MSR_IA32_INTR_SSP_TBL.
-
-VMX introduces new VMCS fields, {GUEST|HOST}_{S_CET,SSP,INTR_SSP_TABL}, to
-facilitate guest/host non-XSAVES-managed states. When VMX CET entry/exit load
-bits are set, guest/host MSR_IA32_{S_CET,INTR_SSP_TBL,SSP} are loaded from
-equivalent fields at VM-Exit/Entry. With these new fields, such supervisor
-states require no addtional KVM save/reload actions.
-
-Tests
-======
-This series has successfully passed the basic CET user shadow stack test
-and kernel IBT test in both L1 and L2 guests. The newly added
-KVM-unit-tests [2] also passed, and its v11 has been tested with the AMD
-CET series by John [3].
-
-For your convenience, you can use my WIP QEMU [1] for testing.
-
-[1]: https://github.com/gaochaointel/qemu-dev qemu-cet
-[2]: https://lore.kernel.org/kvm/20250626073459.12990-1-minipli@grsecurity.net/
-[3]: https://lore.kernel.org/kvm/aH6CH+x5mCDrvtoz@AUSJOHALLEN.amd.com/
-
-Chao Gao (3):
-  KVM: x86: Zero XSTATE components on INIT by iterating over supported
-    features
-  KVM: nVMX: Add consistency checks for CR0.WP and CR4.CET
-  KVM: nVMX: Add consistency checks for CET states
-
-Sean Christopherson (4):
-  KVM: x86: Use double-underscore read/write MSR helpers as appropriate
-  KVM: x86: Manually clear MPX state only on INIT
-  KVM: x86: Report XSS as to-be-saved if there are supported features
-  KVM: x86: Load guest FPU state when access XSAVE-managed MSRs
-
-Yang Weijiang (17):
-  KVM: x86: Rename kvm_{g,s}et_msr()* to show that they emulate guest
-    accesses
-  KVM: x86: Add kvm_msr_{read,write}() helpers
-  KVM: x86: Introduce KVM_{G,S}ET_ONE_REG uAPIs support
-  KVM: x86: Refresh CPUID on write to guest MSR_IA32_XSS
-  KVM: x86: Initialize kvm_caps.supported_xss
-  KVM: x86: Add fault checks for guest CR4.CET setting
-  KVM: x86: Report KVM supported CET MSRs as to-be-saved
-  KVM: VMX: Introduce CET VMCS fields and control bits
-  KVM: x86: Enable guest SSP read/write interface with new uAPIs
-  KVM: VMX: Emulate read and write to CET MSRs
-  KVM: x86: Save and reload SSP to/from SMRAM
-  KVM: VMX: Set up interception for CET MSRs
-  KVM: VMX: Set host constant supervisor states to VMCS fields
-  KVM: x86: Don't emulate instructions guarded by CET
-  KVM: x86: Enable CET virtualization for VMX and advertise to userspace
-  KVM: nVMX: Virtualize NO_HW_ERROR_CODE_CC for L1 event injection to L2
-  KVM: nVMX: Enable CET support for nested guest
-
- arch/x86/include/asm/kvm_host.h |  16 +-
- arch/x86/include/asm/vmx.h      |   9 +
- arch/x86/include/uapi/asm/kvm.h |  13 ++
- arch/x86/kvm/cpuid.c            |  19 +-
- arch/x86/kvm/emulate.c          |  46 +++--
- arch/x86/kvm/smm.c              |  12 +-
- arch/x86/kvm/smm.h              |   2 +-
- arch/x86/kvm/svm/svm.c          |   4 +
- arch/x86/kvm/vmx/capabilities.h |   9 +
- arch/x86/kvm/vmx/nested.c       | 175 +++++++++++++++--
- arch/x86/kvm/vmx/nested.h       |   5 +
- arch/x86/kvm/vmx/vmcs12.c       |   6 +
- arch/x86/kvm/vmx/vmcs12.h       |  14 +-
- arch/x86/kvm/vmx/vmx.c          |  85 +++++++-
- arch/x86/kvm/vmx/vmx.h          |   9 +-
- arch/x86/kvm/x86.c              | 339 +++++++++++++++++++++++++++-----
- arch/x86/kvm/x86.h              |  61 ++++++
- 17 files changed, 732 insertions(+), 92 deletions(-)
-
-
-base-commit: 8f5ae30d69d7543eee0d70083daf4de8fe15d585
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index f19a76d3ca0e..86e4d0b8469b 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -2149,11 +2149,11 @@ void kvm_prepare_event_vectoring_exit(struct kvm_vcpu *vcpu, gpa_t gpa);
+ 
+ void kvm_enable_efer_bits(u64);
+ bool kvm_valid_efer(struct kvm_vcpu *vcpu, u64 efer);
+-int kvm_get_msr_with_filter(struct kvm_vcpu *vcpu, u32 index, u64 *data);
+-int kvm_set_msr_with_filter(struct kvm_vcpu *vcpu, u32 index, u64 data);
++int kvm_emulate_msr_read(struct kvm_vcpu *vcpu, u32 index, u64 *data);
++int kvm_emulate_msr_write(struct kvm_vcpu *vcpu, u32 index, u64 data);
+ int __kvm_get_msr(struct kvm_vcpu *vcpu, u32 index, u64 *data, bool host_initiated);
+-int kvm_get_msr(struct kvm_vcpu *vcpu, u32 index, u64 *data);
+-int kvm_set_msr(struct kvm_vcpu *vcpu, u32 index, u64 data);
++int __kvm_emulate_msr_read(struct kvm_vcpu *vcpu, u32 index, u64 *data);
++int __kvm_emulate_msr_write(struct kvm_vcpu *vcpu, u32 index, u64 data);
+ int kvm_emulate_rdmsr(struct kvm_vcpu *vcpu);
+ int kvm_emulate_wrmsr(struct kvm_vcpu *vcpu);
+ int kvm_emulate_as_nop(struct kvm_vcpu *vcpu);
+diff --git a/arch/x86/kvm/smm.c b/arch/x86/kvm/smm.c
+index 9864c057187d..5dd8a1646800 100644
+--- a/arch/x86/kvm/smm.c
++++ b/arch/x86/kvm/smm.c
+@@ -529,7 +529,7 @@ static int rsm_load_state_64(struct x86_emulate_ctxt *ctxt,
+ 
+ 	vcpu->arch.smbase =         smstate->smbase;
+ 
+-	if (kvm_set_msr(vcpu, MSR_EFER, smstate->efer & ~EFER_LMA))
++	if (__kvm_emulate_msr_write(vcpu, MSR_EFER, smstate->efer & ~EFER_LMA))
+ 		return X86EMUL_UNHANDLEABLE;
+ 
+ 	rsm_load_seg_64(vcpu, &smstate->tr, VCPU_SREG_TR);
+@@ -620,7 +620,7 @@ int emulator_leave_smm(struct x86_emulate_ctxt *ctxt)
+ 
+ 		/* And finally go back to 32-bit mode.  */
+ 		efer = 0;
+-		kvm_set_msr(vcpu, MSR_EFER, efer);
++		__kvm_emulate_msr_write(vcpu, MSR_EFER, efer);
+ 	}
+ #endif
+ 
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index b8ea1969113d..7dc2e1c09ea6 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -997,7 +997,7 @@ static u32 nested_vmx_load_msr(struct kvm_vcpu *vcpu, u64 gpa, u32 count)
+ 				__func__, i, e.index, e.reserved);
+ 			goto fail;
+ 		}
+-		if (kvm_set_msr_with_filter(vcpu, e.index, e.value)) {
++		if (kvm_emulate_msr_write(vcpu, e.index, e.value)) {
+ 			pr_debug_ratelimited(
+ 				"%s cannot write MSR (%u, 0x%x, 0x%llx)\n",
+ 				__func__, i, e.index, e.value);
+@@ -1033,7 +1033,7 @@ static bool nested_vmx_get_vmexit_msr_value(struct kvm_vcpu *vcpu,
+ 		}
+ 	}
+ 
+-	if (kvm_get_msr_with_filter(vcpu, msr_index, data)) {
++	if (kvm_emulate_msr_read(vcpu, msr_index, data)) {
+ 		pr_debug_ratelimited("%s cannot read MSR (0x%x)\n", __func__,
+ 			msr_index);
+ 		return false;
+@@ -2770,8 +2770,8 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
+ 
+ 	if ((vmcs12->vm_entry_controls & VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL) &&
+ 	    kvm_pmu_has_perf_global_ctrl(vcpu_to_pmu(vcpu)) &&
+-	    WARN_ON_ONCE(kvm_set_msr(vcpu, MSR_CORE_PERF_GLOBAL_CTRL,
+-				     vmcs12->guest_ia32_perf_global_ctrl))) {
++	    WARN_ON_ONCE(__kvm_emulate_msr_write(vcpu, MSR_CORE_PERF_GLOBAL_CTRL,
++						 vmcs12->guest_ia32_perf_global_ctrl))) {
+ 		*entry_failure_code = ENTRY_FAIL_DEFAULT;
+ 		return -EINVAL;
+ 	}
+@@ -4758,8 +4758,8 @@ static void load_vmcs12_host_state(struct kvm_vcpu *vcpu,
+ 	}
+ 	if ((vmcs12->vm_exit_controls & VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL) &&
+ 	    kvm_pmu_has_perf_global_ctrl(vcpu_to_pmu(vcpu)))
+-		WARN_ON_ONCE(kvm_set_msr(vcpu, MSR_CORE_PERF_GLOBAL_CTRL,
+-					 vmcs12->host_ia32_perf_global_ctrl));
++		WARN_ON_ONCE(__kvm_emulate_msr_write(vcpu, MSR_CORE_PERF_GLOBAL_CTRL,
++						     vmcs12->host_ia32_perf_global_ctrl));
+ 
+ 	/* Set L1 segment info according to Intel SDM
+ 	    27.5.2 Loading Host Segment and Descriptor-Table Registers */
+@@ -4937,7 +4937,7 @@ static void nested_vmx_restore_host_state(struct kvm_vcpu *vcpu)
+ 				goto vmabort;
+ 			}
+ 
+-			if (kvm_set_msr_with_filter(vcpu, h.index, h.value)) {
++			if (kvm_emulate_msr_write(vcpu, h.index, h.value)) {
+ 				pr_debug_ratelimited(
+ 					"%s WRMSR failed (%u, 0x%x, 0x%llx)\n",
+ 					__func__, j, h.index, h.value);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index a1c49bc681c4..09b106a5afdf 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1932,33 +1932,33 @@ static int kvm_get_msr_ignored_check(struct kvm_vcpu *vcpu,
+ 				 __kvm_get_msr);
+ }
+ 
+-int kvm_get_msr_with_filter(struct kvm_vcpu *vcpu, u32 index, u64 *data)
++int kvm_emulate_msr_read(struct kvm_vcpu *vcpu, u32 index, u64 *data)
+ {
+ 	if (!kvm_msr_allowed(vcpu, index, KVM_MSR_FILTER_READ))
+ 		return KVM_MSR_RET_FILTERED;
+ 	return kvm_get_msr_ignored_check(vcpu, index, data, false);
+ }
+-EXPORT_SYMBOL_GPL(kvm_get_msr_with_filter);
++EXPORT_SYMBOL_GPL(kvm_emulate_msr_read);
+ 
+-int kvm_set_msr_with_filter(struct kvm_vcpu *vcpu, u32 index, u64 data)
++int kvm_emulate_msr_write(struct kvm_vcpu *vcpu, u32 index, u64 data)
+ {
+ 	if (!kvm_msr_allowed(vcpu, index, KVM_MSR_FILTER_WRITE))
+ 		return KVM_MSR_RET_FILTERED;
+ 	return kvm_set_msr_ignored_check(vcpu, index, data, false);
+ }
+-EXPORT_SYMBOL_GPL(kvm_set_msr_with_filter);
++EXPORT_SYMBOL_GPL(kvm_emulate_msr_write);
+ 
+-int kvm_get_msr(struct kvm_vcpu *vcpu, u32 index, u64 *data)
++int __kvm_emulate_msr_read(struct kvm_vcpu *vcpu, u32 index, u64 *data)
+ {
+ 	return kvm_get_msr_ignored_check(vcpu, index, data, false);
+ }
+-EXPORT_SYMBOL_GPL(kvm_get_msr);
++EXPORT_SYMBOL_GPL(__kvm_emulate_msr_read);
+ 
+-int kvm_set_msr(struct kvm_vcpu *vcpu, u32 index, u64 data)
++int __kvm_emulate_msr_write(struct kvm_vcpu *vcpu, u32 index, u64 data)
+ {
+ 	return kvm_set_msr_ignored_check(vcpu, index, data, false);
+ }
+-EXPORT_SYMBOL_GPL(kvm_set_msr);
++EXPORT_SYMBOL_GPL(__kvm_emulate_msr_write);
+ 
+ static void complete_userspace_rdmsr(struct kvm_vcpu *vcpu)
+ {
+@@ -2030,7 +2030,7 @@ int kvm_emulate_rdmsr(struct kvm_vcpu *vcpu)
+ 	u64 data;
+ 	int r;
+ 
+-	r = kvm_get_msr_with_filter(vcpu, ecx, &data);
++	r = kvm_emulate_msr_read(vcpu, ecx, &data);
+ 
+ 	if (!r) {
+ 		trace_kvm_msr_read(ecx, data);
+@@ -2055,7 +2055,7 @@ int kvm_emulate_wrmsr(struct kvm_vcpu *vcpu)
+ 	u64 data = kvm_read_edx_eax(vcpu);
+ 	int r;
+ 
+-	r = kvm_set_msr_with_filter(vcpu, ecx, data);
++	r = kvm_emulate_msr_write(vcpu, ecx, data);
+ 
+ 	if (!r) {
+ 		trace_kvm_msr_write(ecx, data);
+@@ -8353,7 +8353,7 @@ static int emulator_get_msr_with_filter(struct x86_emulate_ctxt *ctxt,
+ 	struct kvm_vcpu *vcpu = emul_to_vcpu(ctxt);
+ 	int r;
+ 
+-	r = kvm_get_msr_with_filter(vcpu, msr_index, pdata);
++	r = kvm_emulate_msr_read(vcpu, msr_index, pdata);
+ 	if (r < 0)
+ 		return X86EMUL_UNHANDLEABLE;
+ 
+@@ -8376,7 +8376,7 @@ static int emulator_set_msr_with_filter(struct x86_emulate_ctxt *ctxt,
+ 	struct kvm_vcpu *vcpu = emul_to_vcpu(ctxt);
+ 	int r;
+ 
+-	r = kvm_set_msr_with_filter(vcpu, msr_index, data);
++	r = kvm_emulate_msr_write(vcpu, msr_index, data);
+ 	if (r < 0)
+ 		return X86EMUL_UNHANDLEABLE;
+ 
+@@ -8396,7 +8396,7 @@ static int emulator_set_msr_with_filter(struct x86_emulate_ctxt *ctxt,
+ static int emulator_get_msr(struct x86_emulate_ctxt *ctxt,
+ 			    u32 msr_index, u64 *pdata)
+ {
+-	return kvm_get_msr(emul_to_vcpu(ctxt), msr_index, pdata);
++	return __kvm_emulate_msr_read(emul_to_vcpu(ctxt), msr_index, pdata);
+ }
+ 
+ static int emulator_check_rdpmc_early(struct x86_emulate_ctxt *ctxt, u32 pmc)
 -- 
 2.47.1
 
