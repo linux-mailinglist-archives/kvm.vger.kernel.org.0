@@ -1,178 +1,207 @@
-Return-Path: <kvm+bounces-54500-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54501-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C58AB21F8E
-	for <lists+kvm@lfdr.de>; Tue, 12 Aug 2025 09:33:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCD9FB2202B
+	for <lists+kvm@lfdr.de>; Tue, 12 Aug 2025 10:03:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0EE631AA5E95
-	for <lists+kvm@lfdr.de>; Tue, 12 Aug 2025 07:33:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 825C02A64CC
+	for <lists+kvm@lfdr.de>; Tue, 12 Aug 2025 08:03:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC1E52C21EC;
-	Tue, 12 Aug 2025 07:33:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF3F22E03EE;
+	Tue, 12 Aug 2025 08:03:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SKvbd26U"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rfZwk1dZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1D3D1A9FA6
-	for <kvm@vger.kernel.org>; Tue, 12 Aug 2025 07:33:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB9A01D2F42
+	for <kvm@vger.kernel.org>; Tue, 12 Aug 2025 08:03:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754983995; cv=none; b=YqpLHiSJrA4nCGRtikiU/MtrNmhReKtEzS/RCeI70na3oLt0reBIiLWgExIzO0EVqGDOZjgdTiyALpNzaBtnMb29L4DCesBQwYwQKdsrZ/vUuW4TJwbNHZsQ7epc3J4YHn5CV0to4BIoZOTyHqukTyTlg4GKfY+ZJX44oDAl5qw=
+	t=1754985793; cv=none; b=nefI0kGM8WPz1OiC0O4kmvpADjgfR4d2yrHMPHJuMmt4KhFN5Zqu20Cp6595gZ+T5h3gmBr0DgyabxWCc1LtRnuJ1NgpjZFyTNrL0IvD3+hucQftDf57ulEInPnYRFlZ1lgSd0HQy4HIc/kI+HcoGpgoHsBdGVtSnpTfy7toEmY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754983995; c=relaxed/simple;
-	bh=vvt2dHuBsAQDhKzRNgDXJnfCZ8zYISh0LwJhlxe7jRE=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=Du+n98FfyeWeHN+53HpcO8wGCGlXhaFQhQfab3d7CR0Ybdhfnci6/UUM3eqO0uK4dbL2pnXej3R/avNPLbWLsghLGHVmLvacQrTepSZx+OzzP4dW1IhM9yOMvhFMVBruTxsrQCETwVg6cP0ONKJH1mF6KbYOc3DcfToVmGY4XF0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=SKvbd26U; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-455b00339c8so32832945e9.3
-        for <kvm@vger.kernel.org>; Tue, 12 Aug 2025 00:33:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1754983992; x=1755588792; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=U46tZm3WdCz9s6+s67rjcVFpZgOy6vILPUGATvBzyns=;
-        b=SKvbd26U39X3QR/bqLvC+4MD1sEOApnZ5dBlZH/vYo4TBWuLikl/8vtXppihtyuiu6
-         vz4hk/+nGUkxbr2GtuoM3XUj3cNRhFGhEKBViAclLPkA/2cKOk5WkS2hD0HVzzOyiVHN
-         wXjFOHAFbuOFh6YbZz5OlCg+zLEEW4K0olLnfXTGu5NaIhxaHg9ScH3Eapv9VbDtlx8I
-         mcR776ZT/nodYbIoW+i7IPVFwC6S4nkiYlhBtTNdN5ebi64l6WMNCUVe3+fcZ6nB6ZGb
-         EH/oF4fY6DvcVZ7SAPR04ohjclNeqATxyWoqSPRXLLK+ew2LVsnVyK0KaSdiWQVvhLze
-         ZtsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754983992; x=1755588792;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=U46tZm3WdCz9s6+s67rjcVFpZgOy6vILPUGATvBzyns=;
-        b=iqM8NwCk73k4ydxL4hTSu6kSCkjxa1B0Gv1mrIr5v1xnaV+ZCAlaM6+ukjQkNLqNC4
-         04Wll37/TH0p+M/jXgoN+LV6rG+EkFhYiLuI/hTngEuetRwNc3UxDAAt1ZzhQK290bZ8
-         eeFluOiHY9U90PP34buvvw2j+3xeXli4BVEClkHey9XW3F0XnrvZZZtxBqzAf9yPeE/b
-         KLhOIh6AMo56CQV2mFQkTDnqnVMF2K2BcwkLg/lXhO09IGvgoikWIfYOdm7juixeszdo
-         Wjscy2rOgm1K6eW2YpZA0vCuQNDjyOnA/cC5nOH2wBKy46KVhpt5xlSabWKLubUAP0Qj
-         +NMg==
-X-Forwarded-Encrypted: i=1; AJvYcCWB7PYRYuux2c6B7lIdDbOCH0k4I2kEyZZO6nBrckylHLwV+zD0AtxEdPv66apPx5hIALM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxsSEt/uxM9lH1StVzhdNbC+V/LQpK0CdKymA9Ebuyx9IoSnoR8
-	eZFPLC7bjVzwshm4LAFPJGBisEgAM5koYaTvTvxhnpxpqMEZ6GJvWKYHmqdy+WChRmAzZGA1XCm
-	TjqR6
-X-Gm-Gg: ASbGncvmJ57X/mEaCLt2dxCuu4QY02wAxwvbLPRXN6JpKPYGvR5Dj1Oq+jghnFHpN7k
-	tfr3FJYDcJ/De9QIf5EEzeaxxeh+v9alsvPtJLRFOV2BQgwKlFuDi6maUCoTEoWo7BBmEbnzONn
-	nN3dccvid0IF0+5AXr5hqJwTxeetvtXMWqxLs4Pk773pbHqFCZy9Aap7nLQmAcgKF+reyQTH7QX
-	ryKUZBO5LQ7isJIWNRB959pHqYV58HB1AQQuUH8Pob1TGnK2eL/zPZlMu+Tdz1SmbPxreN5lhX8
-	C4GplOagteIlVuE+atSGJL6RjS/wy0V62wH5D/DBX3Kp188s5xrNpZX5fjGgIRJ+doUw4KQ9n8Q
-	HRKGdGPaMXSyy/XcOayWiOVA63IkNDxFnhuzCt2fYHtwrBTznVZKk1PnpMU7uXWamAE9huus=
-X-Google-Smtp-Source: AGHT+IFenbOYBYYL8rtdP5NhvlPx6gH97dvDDxCUDEfprak8jMg7i9COL3O/U+STX2Nwjj//F6/Vtw==
-X-Received: by 2002:a05:600c:4e46:b0:456:173c:8a53 with SMTP id 5b1f17b1804b1-45a10e135b6mr21112745e9.2.1754983992162;
-        Tue, 12 Aug 2025 00:33:12 -0700 (PDT)
-Received: from [192.168.69.210] (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-458953eb7acsm525015225e9.28.2025.08.12.00.33.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 Aug 2025 00:33:11 -0700 (PDT)
-Message-ID: <cb6e02cc-1959-419a-bafa-5bb43818c159@linaro.org>
-Date: Tue, 12 Aug 2025 09:33:10 +0200
+	s=arc-20240116; t=1754985793; c=relaxed/simple;
+	bh=XAGEFLEgMg5bXTIi6k5TRpv+Bffza3mM6uFPwGcBCIo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BF0JMMEfBwdM+E3zZESRhMG41o99GzP6ySlaZtg4+FtjwWSzqbWPn4BK3aIq5jTLiAHAZpgrO9rb/xOgp3Bwwe8w7iY/NCBVhRb+B2T7xYr0/qGFLRgw6qsQTYdm9MJ1UnitrItGysuyq1EpqeO+7hOXwg8IjWj8CoZzExlg7Rc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rfZwk1dZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33571C4CEF8;
+	Tue, 12 Aug 2025 08:03:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754985792;
+	bh=XAGEFLEgMg5bXTIi6k5TRpv+Bffza3mM6uFPwGcBCIo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rfZwk1dZDhofscSyN2+Drsq9S4gSY4qsf8Bx0Ge8SREnBupCae8nxceRMWKl006jU
+	 Mm7+OwfsitbW604WBP+mS5vsfMPWdvBtKa33uI3qopgI1Ydb0R3+aHYaRc5phYV3y/
+	 l0tzIsHiEsNs4ebwaL52qZU5FUGJwxCQKGbcz9zhB+WxnaW7QncUXr6MVWOm408QY5
+	 BKnL9yGJYZCzP2VzD50LJD2j3uJRU9T15rrAfCOv0kHmDlcXsmQKB1QkRkbaOYyPRr
+	 l1FkEX9v1NsJYggwifi6vB95CUNGaZZ0gV0SlX4Mdz0Uq17k32QN+Rrr/uuHuZci2z
+	 oAtvdFa6hGEBQ==
+Received: from phl-compute-12.internal (phl-compute-12.internal [10.202.2.52])
+	by mailfauth.phl.internal (Postfix) with ESMTP id 5B9B0F40066;
+	Tue, 12 Aug 2025 04:03:11 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-12.internal (MEProxy); Tue, 12 Aug 2025 04:03:11 -0400
+X-ME-Sender: <xms:P_WaaCBFvQ0EHyNWFZTmb_likmN4d9su0320PVOu8-uubGbm3s2o6Q>
+    <xme:P_WaaDfpBWEMgiTThti3u4WPwZmPKH589oSZRM-gpmJ__X9ch01Bc5A1nYrtqL6JG
+    zj67ad7zzCzRpOreNs>
+X-ME-Received: <xmr:P_WaaOjrMhqS6NjMTAwLrKCxr2TSkLtrRlFvam0UOhrlTux2qBIac1NOleya>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgddufeegkeduucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtsfdttddtvdenucfhrhhomhepfdhkrghssehk
+    vghrnhgvlhdrohhrghdfuceokhgrsheskhgvrhhnvghlrdhorhhgqeenucggtffrrghtth
+    gvrhhnpefgtdfgffekgeethfffffegjeduleevfeejgfeuhffhffeiteejueefhfehheff
+    teenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
+    enucfrrghrrghmpehmrghilhhfrhhomhepkhhirhhilhhlodhmvghsmhhtphgruhhthhhp
+    vghrshhonhgrlhhithihqdduieduudeivdeiheehqddvkeeggeegjedvkedqkhgrsheppe
+    hkvghrnhgvlhdrohhrghesshhhuhhtvghmohhvrdhnrghmvgdpnhgspghrtghpthhtohep
+    fedtpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehsvggrnhhjtgesghhoohhglh
+    gvrdgtohhmpdhrtghpthhtoheprhhitghkrdhprdgvughgvggtohhmsggvsehinhhtvghl
+    rdgtohhmpdhrtghpthhtoheptghhrghordhgrghosehinhhtvghlrdgtohhmpdhrtghpth
+    htoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghp
+    thhtohepkhgrihdrhhhurghnghesihhnthgvlhdrtghomhdprhgtphhtthhopegsphesrg
+    hlihgvnhekrdguvgdprhgtphhtthhopeigkeeisehkvghrnhgvlhdrohhrghdprhgtphht
+    thhopehmihhnghhosehrvgguhhgrthdrtghomhdprhgtphhtthhopeihrghnrdihrdiihh
+    grohesihhnthgvlhdrtghomh
+X-ME-Proxy: <xmx:P_WaaInZTu7seDXCWBOLVukpjjPJ_fStCDd-0GlPIiJXXdqELn2lCg>
+    <xmx:P_WaaBiY3IRSzuxPWRFrcSx0Id8TiMny0pDXawRBnzO5qIDaZ_f1IA>
+    <xmx:P_WaaF-TE8htLB_-0BeEHND0dpdYlk9dOJDU74jFPbrIlSbwR_wQtQ>
+    <xmx:P_WaaMo3UhQs4sVg0swzD1JCtSOE-Qena-4J_2O6SMRCQOGScjgTAg>
+    <xmx:P_WaaLORIXwIZESNizGERH2u2VkRiZy2SODCzHngndwibj-iIQU0Gnmp>
+Feedback-ID: i10464835:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 12 Aug 2025 04:03:10 -0400 (EDT)
+Date: Tue, 12 Aug 2025 09:03:07 +0100
+From: "kas@kernel.org" <kas@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Rick P Edgecombe <rick.p.edgecombe@intel.com>, 
+	Chao Gao <chao.gao@intel.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	Kai Huang <kai.huang@intel.com>, "bp@alien8.de" <bp@alien8.de>, "x86@kernel.org" <x86@kernel.org>, 
+	"mingo@redhat.com" <mingo@redhat.com>, Yan Y Zhao <yan.y.zhao@intel.com>, 
+	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
+	"tglx@linutronix.de" <tglx@linutronix.de>, "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, Isaku Yamahata <isaku.yamahata@intel.com>
+Subject: Re: [PATCHv2 00/12] TDX: Enable Dynamic PAMT
+Message-ID: <cxww35wskgjssvb7l7xedu4dimjpxunzoadexeg2qcev6ch2kc@xeed2z7ivaxk>
+References: <20250609191340.2051741-1-kirill.shutemov@linux.intel.com>
+ <d432b8b7cfc413001c743805787990fe0860e780.camel@intel.com>
+ <sjhioktjzegjmyuaisde7ui7lsrhnolx6yjmikhhwlxxfba5bh@ss6igliiimas>
+ <c2a62badf190717a251d269a6905872b01e8e340.camel@intel.com>
+ <aJqgosNUjrCfH_WN@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 07/11] target/arm: Replace kvm_arm_pmu_supported by
- host_cpu_feature_supported
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: Miguel Luis <miguel.luis@oracle.com>, kvm@vger.kernel.org,
- Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini
- <pbonzini@redhat.com>, Haibo Xu <haibo.xu@linaro.org>,
- Mohamed Mediouni <mohamed@unpredictable.fr>,
- Mark Burton <mburton@qti.qualcomm.com>, Alexander Graf <agraf@csgraf.de>,
- Claudio Fontana <cfontana@suse.de>, =?UTF-8?Q?Alex_Benn=C3=A9e?=
- <alex.bennee@linaro.org>, Mads Ynddal <mads@ynddal.dk>,
- Eric Auger <eric.auger@redhat.com>, qemu-arm@nongnu.org,
- Cameron Esfahani <dirty@apple.com>
-References: <20250811170611.37482-1-philmd@linaro.org>
- <20250811170611.37482-8-philmd@linaro.org>
- <8efcc809-f548-4383-b742-e435d622da73@linaro.org>
- <14d7d948-e840-4ae7-ae93-122755d6a421@linaro.org>
- <3d88ea9c-9cfe-4cd4-a282-2f467f2a502f@linaro.org>
-Content-Language: en-US
-In-Reply-To: <3d88ea9c-9cfe-4cd4-a282-2f467f2a502f@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aJqgosNUjrCfH_WN@google.com>
 
-On 12/8/25 08:03, Philippe Mathieu-Daudé wrote:
-> On 12/8/25 06:49, Philippe Mathieu-Daudé wrote:
->> On 12/8/25 02:48, Richard Henderson wrote:
->>> On 8/12/25 03:06, Philippe Mathieu-Daudé wrote:
->>>> +++ b/target/arm/kvm.c
->>>> @@ -288,7 +288,7 @@ static bool 
->>>> kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
->>>>                                1 << KVM_ARM_VCPU_PTRAUTH_GENERIC);
->>>>       }
->>>> -    if (kvm_arm_pmu_supported()) {
->>>> +    if (host_cpu_feature_supported(ARM_FEATURE_PMU, false)) {
->>>
->>> Why is false correct here?  Alternately, in the next patch, why is it 
->>> correct to pass true for the EL2 test?
->>
->> I think I copied to KVM the HVF use, adapted on top of:
->> https://lore.kernel.org/qemu-devel/20250808070137.48716-12- 
->> mohamed@unpredictable.fr/
->>
->>>
->>> What is the purpose of the can_emulate parameter at all?
->>
->> When using split-accel on pre-M3, we might emulate EL2:
->>
->>         |   feat            |    can_emulate   |    retval
->>         +   ----            +      -----       +     ----
->  > M1/M2  |  ARM_FEATURE_EL2         false            false> M1/M2  | 
-> ARM_FEATURE_EL2         true             true
->> M3/M4  |  ARM_FEATURE_EL2         any              true
+On Mon, Aug 11, 2025 at 07:02:10PM -0700, Sean Christopherson wrote:
+> On Mon, Aug 11, 2025, Rick P Edgecombe wrote:
+> > On Mon, 2025-08-11 at 07:31 +0100, kas@kernel.org wrote:
+> > > > I don't see any other reason for the global spin lock, Kirill was that
+> > > > it?  Did you consider also adding a lock per 2MB region, like the
+> > > > refcount? Or any other granularity of lock besides global? Not saying
+> > > > global is definitely the wrong choice, but seems arbitrary if I got the
+> > > > above right.
+> > > 
+> > > We have discussed this before[1]. Global locking is problematic when you
+> > > actually hit contention. Let's not complicate things until we actually
+> > > see it. I failed to demonstrate contention without huge pages. With huge
+> > > pages it is even more dubious that we ever see it.
+> > > 
+> > > [1]
+> > > https://lore.kernel.org/all/4bb2119a-ff6d-42b6-acf4-86d87b0e9939@intel.com/
+> > 
+> > Ah, I see.
+> > 
+> > I just did a test of simultaneously starting 10 VMs with 16GB of ram (non huge
 > 
-> For example in hvf.c:
+> How many vCPUs?  And were the VMs actually accepting/faulting all 16GiB?
 > 
-> static bool hvf_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
-> {
->      ...
->      if (host_cpu_feature_supported(ARM_FEATURE_EL2, true)) {
->          ahcf->features |= 1ULL << ARM_FEATURE_EL2;
->      }
+> There's also a noisy neighbor problem lurking.  E.g. malicious/buggy VM spams
+> private<=>shared conversions and thus interferes with PAMT allocations for other
+> VMs.
 > 
-> and then only when split-accel is not enabled:
+> > pages) and then shutting them down. I saw 701 contentions on startup, and 53
+> > more on shutdown. Total wait time 2ms. Not horrible but not theoretical either.
+> > But it probably wasn't much of a cacheline bouncing worse case.
 > 
-> hv_return_t hvf_arch_vm_create(MachineState *ms, uint32_t pa_range)
-> {
->      ...
->      if (host_cpu_feature_supported(ARM_FEATURE_EL2, false)) {
->          ret = hv_vm_config_set_el2_enabled(config, true);
->          if (ret != HV_SUCCESS) {
->              goto cleanup;
->          }
->      }
+> Isn't the SEAMCALL done while holding the spinlock?  I assume the latency of the
+> SEAMCALL is easily the long pole in the flow.
 > 
+> > And I guess this is on my latest changes not this exact v2, but it shouldn't
+> > have changed.
+> > 
+> > But hmm, it seems Dave's objection about maintaining the lock allocations would
+> > apply to the refcounts too? But the hotplug concerns shouldn't actually be an
+> > issue for TDX because they gets rejected if the allocations are not already
+> > there. So complexity of a per-2MB lock should be minimal, at least
+> > incrementally. The difference seems more about memory use vs performance.
 
-What I'm looking for:
+I don't see jump to per-2MB locking remotely justified. We can scale
+number of locks gradually with the amount of memory in the system: have
+a power-of-2 set of locks and 2MB range to the lock with %.
 
-- Is this feature supported BY HW?
+Note that it is trivial thing to add later on and doesn't need to be
+part of initial design.
 
-   -> hw_init_feature
+> > What gives me pause is in the KVM TDX work we have really tried hard to not take
+> > exclusive locks in the shared MMU lock path. Admittedly that wasn't backed by
+> > hard numbers.
+> 
+> Maybe not for TDX, but we have lots and lots of hard numbers for why taking mmu_lock
+> for write is problematic.  Even if TDX VMs don't exhibit the same patterns *today*
+> as "normal" VMs, i.e. don't suffer the same performance blips, nothing guarantees
+> that will always hold true.
+>  
+> > But an enormous amount of work went into lettings KVM faults happen under the
+> > shared lock for normal VMs. So on one hand, yes it's premature optimization.
+> > But on the other hand, it's a maintainability concern about polluting the
+> > existing way things work in KVM with special TDX properties.
+> > 
+> > I think we need to at least call out loudly that the decision was to go with the
+> > simplest possible solution, and the impact to KVM. I'm not sure what Sean's
+> > opinion is, but I wouldn't want him to first learn of it when he went digging
+> > and found a buried global spin lock in the fault path.
+> 
+> Heh, too late, I saw it when this was first posted.  And to be honest, my initial
+> reaction was very much "absolutely not" (though Rated R, not PG).  Now that I've
+> had time to think things through, I'm not _totally_ opposed to having a spinlock
+> in the page fault path, but my overall sentiment remains the same.
+> 
+> For mmu_lock and related SPTE operations, I was super adamant about not taking
+> exclusive locks because based on our experience with the TDP MMU, converting flows
+> from exclusive to shared is usually significantly more work than developing code
+> for "shared mode" straightaway (and you note above, that wasn't trivial for TDX).
+> And importantly, those code paths were largely solved problems.  I.e. I didn't
+> want to get into a situation where TDX undid the parallelization of the TDP MMU,
+> and then had to add it back after the fact.
+> 
+> I think the same holds true here.  I'm not completely opposed to introducing a
+> spinlock, but I want to either have a very high level of confidence that the lock
+> won't introduce jitter/delay (I have low confidence on this front, at least in
+> the proposed patches), or have super clear line of sight to making the contention
+> irrelevant, without having to rip apart the code.
 
-- Is this feature supported BY SW?
+I think there is a big difference with mmu_lock.
 
-   -> sw_init_feature
+mmu_lock is analogous to mmap_lock in core-mm. It serializes page fault
+against other mmu operation and have inherently vast scope.
 
-- Is this feature supported BY ANY?
+pamt_lock on other hand is at very bottom of callchain and with very
+limited scope. It is trivially scalable by partitioning.
 
-   -> do smth with feature
+Translating problems you see with mmu_lock onto pamt_lock seems like an
+overreaction.
 
-With split-accel, this isn't specific to HVF/ARM.
-
-I can use a tri-state enum { ANY, HW, SW }.
+-- 
+Kiryl Shutsemau / Kirill A. Shutemov
 
