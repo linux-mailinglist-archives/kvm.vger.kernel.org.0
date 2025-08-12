@@ -1,199 +1,219 @@
-Return-Path: <kvm+bounces-54507-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54508-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82D2EB2232B
-	for <lists+kvm@lfdr.de>; Tue, 12 Aug 2025 11:31:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D24A5B2236A
+	for <lists+kvm@lfdr.de>; Tue, 12 Aug 2025 11:41:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A9821A280CF
-	for <lists+kvm@lfdr.de>; Tue, 12 Aug 2025 09:27:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C815A3A2577
+	for <lists+kvm@lfdr.de>; Tue, 12 Aug 2025 09:40:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 613B52E8E13;
-	Tue, 12 Aug 2025 09:27:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ADB92E9741;
+	Tue, 12 Aug 2025 09:39:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BdqwPASu"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="jKw+q5sa"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5117311C3B
-	for <kvm@vger.kernel.org>; Tue, 12 Aug 2025 09:27:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 868172E54A3;
+	Tue, 12 Aug 2025 09:39:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754990839; cv=none; b=FQtzjrqsPtf0xKPXm5AV9uZ34yviptJKb4HyiLjp8keI6EEACpQxNj0vyoFUCUlrnMPaNmI4KRbRE1o6/rv9E67eF3/tCLcOZKYGkYqhmHB34fxhmvkd1TqnEgwvru876jBPO7rIUS2kmjkNqkwlZ1a90IAUC71TrI9JCyo75/w=
+	t=1754991597; cv=none; b=L67xxiTzhBNp/3ccZxddqcqNWLRF4hk8lZe800Cg+AaP5tClQ64TZ1EekaWGEmV1HcWNJx+rHAi33PnLGC0GkFgRtm6sJNM1jPolhpiCkiXQwTVMHhl0UgY94p3uT04rkesog25FOwtLMYfzDFz7uoWr4i6kXYXKeUB1jkzEjAE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754990839; c=relaxed/simple;
-	bh=Hun7Pj2QeIThbWWcEnI4efZAqJOfJrOaDsvmrUO0zJo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ARKR/TQ20pTRU8vShhcdQ2QKdEi9ML7164xz/YHWlV1h+3UuQiB58PbmT5G/l6S+ZM8+XPR6S2C2Bq5Xmbud6TwMvvqxPPsmFwux9v4LuRdGXl16YcccEOIHHAEmqBWu2mYYaHzlzRwPZ3uUfT28nd62lEz3RzxpS3wNRfW1M2w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BdqwPASu; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1754990836;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WGp9+izCkrlBj+bCsKQsfK68CmTdIqz5MvXVpGGtKI8=;
-	b=BdqwPASuYGNzIE3Yj1jO6G1AQHyMHiSAFm/2wjR58ImnucSbiGEIONJLqO2RDY2dT9LoLP
-	jMPkhDkH2QvsitQCs0uXKpqN5XGOP+AARmEnixNVBCgyS+J6A1NUawKBNon73LOYACKhs1
-	oiI3LlkenVwsOymD4OkJNsvKjBgReTg=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-472-bNToL_0dPYmEoJtMYNIDoQ-1; Tue, 12 Aug 2025 05:27:15 -0400
-X-MC-Unique: bNToL_0dPYmEoJtMYNIDoQ-1
-X-Mimecast-MFC-AGG-ID: bNToL_0dPYmEoJtMYNIDoQ_1754990834
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3b7961b3c82so2578157f8f.0
-        for <kvm@vger.kernel.org>; Tue, 12 Aug 2025 02:27:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754990833; x=1755595633;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WGp9+izCkrlBj+bCsKQsfK68CmTdIqz5MvXVpGGtKI8=;
-        b=UjeCjlCfD1LrG1dKbjM8SZrHOowc0hdRorB1Z+JyJSbq1r3dRDOVtjYlIvXgSFRwUl
-         IK7F9anwtFGB31bqtjOL8plHm5V8tLUQc3uooXMS9rLgz5q6GZtwNdLirGXYx0wGzKm2
-         9KiEeu0TQTJFDxqSF09GqK8GGXnoXWbCu6TSYxXOa8SRrBo32wiYdrwS0Xl8ZchPzw0H
-         GF8rnUctbvJ/dhMrOEnTZGzvWowzf4Tf/IpjhMXhW4xrfpIZuX5iC3is5xR2cmDXxHHV
-         432XQjdAMbNgFG18ajWsLNzi1XbwwZ1bO45G5I8h9Bibd0qe/haG2ozCH5vVhcrEMYp9
-         DysQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW2TrVmYl9Pw8Y6bXfVTPR5fhDksehggfmhntNKhYftcrcSJhL47sobMkCF1cMQT7ajmzk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YykDcE0Q7qMbHy2dWgiC9D0wMC0SQy0TZckJvHEJbjZPTgOr75d
-	7EmfWAqxq5kUgRJ62jaUWiJrBTmAQkr8esP/haZgZ/37oDFL1bPQcQSfheWfWAyW01KXbqgUqK6
-	06llNUy7FaZEqdLpJN+Zzob2FCcAOJhXtzuhDMpvlabDgn5+G7QBRkA==
-X-Gm-Gg: ASbGncsQrti+6g+728w7f0fy47ZwP+U8wn+9tUeDZKOIhF6nXgHh1UDgb294LsrhjhG
-	0rK6bw7GqS5c/BfMAuxpQmJdLOUMGwt1rmfjbEAfBu8wb6jckj06VNXsFj/DLN6Fvuw53ef09PZ
-	D78KO7CzCMiE4LDPEbdlko6gPpoyysbCjD4TfnnWJCdVofJHuzbM1ajeaVWRpe/ZjrpwU+LeBTz
-	sBxbLSjzylhEyaIERtas4wOYJmFtfShLIvIqQtQj7gZvcwzZ4n/EtMelEY/TCGJhvRAM5obTPZR
-	7ghUYtb7Bi/J9wAOungwQAyp2JhYOjQ2
-X-Received: by 2002:a5d:64cd:0:b0:3a4:f70e:abda with SMTP id ffacd0b85a97d-3b910fce9a8mr2143716f8f.10.1754990833538;
-        Tue, 12 Aug 2025 02:27:13 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGFkY9FzWL94KYJ81gviv0bWbapS/YWsGTjYnmEpZTu+fpeDhGDEmVz6ELyY1r99MnE6tNX6Q==
-X-Received: by 2002:a5d:64cd:0:b0:3a4:f70e:abda with SMTP id ffacd0b85a97d-3b910fce9a8mr2143685f8f.10.1754990832925;
-        Tue, 12 Aug 2025 02:27:12 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc0:1515:7300:62e6:253a:2a96:5e3])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b79c3c4d02sm42398517f8f.33.2025.08.12.02.27.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Aug 2025 02:27:12 -0700 (PDT)
-Date: Tue, 12 Aug 2025 05:27:09 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: syzbot <syzbot+b4d960daf7a3c7c2b7b1@syzkaller.appspotmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, eperezma@redhat.com,
-	horms@kernel.org, jasowang@redhat.com, kuba@kernel.org,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, pabeni@redhat.com, sgarzare@redhat.com,
-	stefanha@redhat.com, syzkaller-bugs@googlegroups.com,
-	virtualization@lists.linux.dev, xuanzhuo@linux.alibaba.com
-Subject: Re: [syzbot] [kvm?] [net?] [virt?] WARNING in
- virtio_transport_send_pkt_info
-Message-ID: <20250812052645-mutt-send-email-mst@kernel.org>
-References: <689a3d92.050a0220.7f033.00ff.GAE@google.com>
+	s=arc-20240116; t=1754991597; c=relaxed/simple;
+	bh=6cNj9SJH/mrG6DAPbzWrLe/Y3wXZ7Pu9hii3h81NiZ8=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Th6kNe3Vn4oCPTYWMDzFpqTyBavxGn+QQeTDrvF2P7WZNNN0X6q2jjEGpy/GJPB5m82NHHNmWCPsSjqvbHY7PXHF/kNSBu0iKZhOs8n+1+s2VgWF1g4iJr6gqsbmdi1mvEPbB8L4h0Y6l53UHQaklzzEVDmsMuYl/sDTi0uqgA4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=jKw+q5sa; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=6cNj9SJH/mrG6DAPbzWrLe/Y3wXZ7Pu9hii3h81NiZ8=; b=jKw+q5sagPupE0kbscwsSP2yVZ
+	7asaut0WoPGgi/cBjmRiezXgzjgzIoSKih42l7V1Wb9Dt4imHpXTJfEvSQL2Bxw/MSQb+v5+kDvBq
+	5vaP1bVyvsHb39Iko6qqsX9JofMLZFPCjEv1BKz5PWKBakTlSrtaTjJLDtHAlP43xhmtqDsv6k6+a
+	y71NfR/yG+lZLiNirpKwS+oNd7nR37Z0i28N9yvk78Ba6W2wh01SYD4o/xnhKmtuJHJjCnVtRjkE5
+	wZTfY8O+Ak/XliPHjW5gsQpoP6Utj/nwybvivu55Oxn8NikGM2U118XZouLmXZx9Q4UFj1TzBWXa8
+	UwHF9JXg==;
+Received: from [54.239.6.185] (helo=u09cd745991455d.ant.amazon.com)
+	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1ullTg-0000000Eq8t-3Vt6;
+	Tue, 12 Aug 2025 09:39:33 +0000
+Message-ID: <6a1d61925118b93badc777c2b9282d190c55a32b.camel@infradead.org>
+Subject: Re: [PATCH] KVM: x86: Synchronize APIC State with QEMU when
+ irqchip=split
+From: David Woodhouse <dwmw2@infradead.org>
+To: Sean Christopherson <seanjc@google.com>, hugo lee <cs.hugolee@gmail.com>
+Cc: pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+  dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org,
+ kvm@vger.kernel.org,  linux-kernel@vger.kernel.org, Yuguo Li
+ <hugoolli@tencent.com>
+Date: Tue, 12 Aug 2025 11:39:31 +0200
+In-Reply-To: <aJobIRQ7Z4Ou1hz0@google.com>
+References: <20250806081051.3533470-1-hugoolli@tencent.com>
+	 <aJOc8vIkds_t3e8C@google.com>
+	 <CAAdeq_+Ppuj8PxABvCT54phuXY021HxdayYyb68G3JjkQE0WQg@mail.gmail.com>
+	 <aJTytueCqmZXtbUk@google.com>
+	 <CAAdeq_+wLaze3TVY5To8_DhE_S9jocKn4+M9KvHp0Jg8pT99KQ@mail.gmail.com>
+	 <aJobIRQ7Z4Ou1hz0@google.com>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+	boundary="=-t61yIGXQLHqrgy0CetNH"
+User-Agent: Evolution 3.52.3-0ubuntu1 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <689a3d92.050a0220.7f033.00ff.GAE@google.com>
-
-On Mon, Aug 11, 2025 at 11:59:30AM -0700, syzbot wrote:
-> Hello,
-> 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    37816488247d Merge tag 'net-6.17-rc1' of git://git.kernel...
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=10b3b2f0580000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=e143c1cd9dadd720
-> dashboard link: https://syzkaller.appspot.com/bug?extid=b4d960daf7a3c7c2b7b1
-> compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10f0f042580000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14855434580000
-> 
-> Downloadable assets:
-> disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-37816488.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/74b3ac8946d4/vmlinux-37816488.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/a2b391aacaec/bzImage-37816488.xz
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+b4d960daf7a3c7c2b7b1@syzkaller.appspotmail.com
-> 
-> ------------[ cut here ]------------
-> 'send_pkt()' returns 0, but 65536 expected
-> WARNING: CPU: 0 PID: 5503 at net/vmw_vsock/virtio_transport_common.c:428 virtio_transport_send_pkt_info+0xd11/0xf00 net/vmw_vsock/virtio_transport_common.c:426
-> Modules linked in:
-> CPU: 0 UID: 0 PID: 5503 Comm: syz.0.17 Not tainted 6.16.0-syzkaller-12063-g37816488247d #0 PREEMPT(full) 
-> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-> RIP: 0010:virtio_transport_send_pkt_info+0xd11/0xf00 net/vmw_vsock/virtio_transport_common.c:426
-> Code: 0f 0b 90 bd f2 ff ff ff eb bc e8 8a 20 65 f6 c6 05 94 cf 32 04 01 90 48 c7 c7 00 c3 b8 8c 44 89 f6 4c 89 ea e8 40 af 28 f6 90 <0f> 0b 90 90 e9 e1 fe ff ff e8 61 20 65 f6 90 0f 0b 90 e9 c5 f7 ff
-> RSP: 0018:ffffc900027ff530 EFLAGS: 00010246
-> RAX: d7fcdfc663889c00 RBX: 0000000000010000 RCX: ffff888000e1a440
-> RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000002
-> RBP: ffffffff8f8764d0 R08: ffff88801fc24253 R09: 1ffff11003f8484a
-> R10: dffffc0000000000 R11: ffffed1003f8484b R12: dffffc0000000000
-> R13: 0000000000010000 R14: 0000000000000000 R15: ffff888058b48024
-> FS:  000055556bda1500(0000) GS:ffff88808d218000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 000020000003f000 CR3: 000000003f6db000 CR4: 0000000000352ef0
-> Call Trace:
->  <TASK>
->  virtio_transport_stream_enqueue net/vmw_vsock/virtio_transport_common.c:1111 [inline]
->  virtio_transport_seqpacket_enqueue+0x143/0x1c0 net/vmw_vsock/virtio_transport_common.c:839
->  vsock_connectible_sendmsg+0xac7/0x1050 net/vmw_vsock/af_vsock.c:2140
->  sock_sendmsg_nosec net/socket.c:714 [inline]
->  __sock_sendmsg+0x21c/0x270 net/socket.c:729
->  ____sys_sendmsg+0x52d/0x830 net/socket.c:2614
->  ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2668
->  __sys_sendmmsg+0x227/0x430 net/socket.c:2757
->  __do_sys_sendmmsg net/socket.c:2784 [inline]
->  __se_sys_sendmmsg net/socket.c:2781 [inline]
->  __x64_sys_sendmmsg+0xa0/0xc0 net/socket.c:2781
->  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
->  do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> RIP: 0033:0x7fddc238ebe9
-> Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-> RSP: 002b:00007ffd48081028 EFLAGS: 00000246 ORIG_RAX: 0000000000000133
-> RAX: ffffffffffffffda RBX: 00007fddc25b5fa0 RCX: 00007fddc238ebe9
-> RDX: 0000000000000001 RSI: 0000200000000100 RDI: 0000000000000004
-> RBP: 00007fddc2411e19 R08: 0000000000000000 R09: 0000000000000000
-> R10: 0000000024008094 R11: 0000000000000246 R12: 0000000000000000
-> R13: 00007fddc25b5fa0 R14: 00007fddc25b5fa0 R15: 0000000000000004
->  </TASK>
-> 
-> 
-> ---
-> This report is generated by a bot. It may contain errors.
-> See https://goo.gl/tpsmEJ for more information about syzbot.
-> syzbot engineers can be reached at syzkaller@googlegroups.com.
-> 
-> syzbot will keep track of this issue. See:
-> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-> 
-> If the report is already addressed, let syzbot know by replying with:
-> #syz fix: exact-commit-title
-> 
-> If you want syzbot to run the reproducer, reply with:
-> #syz test: git://repo/address.git branch-or-commit-hash
-> If you attach or paste a git patch, syzbot will apply it before testing.
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
 
-#syz test: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git 6693731487a8145a9b039bc983d77edc47693855
+--=-t61yIGXQLHqrgy0CetNH
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, 2025-08-11 at 09:32 -0700, Sean Christopherson wrote:
+> On Fri, Aug 08, 2025, hugo lee wrote:
+> > On Fri, Aug 8, 2025, Sean Christopherson <seanjc@google.com> wrote:
+> > >=20
+> > > On Thu, Aug 07, 2025, hugo lee wrote:
+> > > > On Thu, Aug 7, 2025 Sean Christopherson wrote:
+> > > > >=20
+> > > > > On Wed, Aug 06, 2025, Yuguo Li wrote:
+> > > > > > When using split irqchip mode, IOAPIC is handled by QEMU while =
+the LAPIC is
+> > > > > > emulated by KVM.=C2=A0 When guest disables LINT0, KVM doesn't e=
+xit to QEMU for
+> > > > > > synchronization, leaving IOAPIC unaware of this change.=C2=A0 T=
+his may cause vCPU
+> > > > > > to be kicked when external devices(e.g. PIT)keep sending interr=
+upts.
+> > > > >=20
+> > > > > I don't entirely follow what the problem is.=C2=A0 Is the issue t=
+hat QEMU injects an
+> > > > > IRQ that should have been blocked?=C2=A0 Or is QEMU forcing the v=
+CPU to exit unnecessarily?
+> > > > >=20
+> > > >=20
+> > > > This issue is about QEMU keeps injecting should-be-blocked
+> > > > (blocked by guest and qemu just doesn't know that) IRQs.
+> > > > As a result, QEMU forces vCPU to exit unnecessarily.
+> > >=20
+> > > Is the problem that the guest receives spurious IRQs, or that QEMU is=
+ forcing
+> > > unnecesary exits, i.e hurting performance?
+> > >=20
+> >=20
+> > It is QEMU is forcing unnecessary exits which will hurt performance by
+> > trying to require the Big QEMU Lock in qemu_wait_io_event.
+>=20
+> Please elaborate on the performance impact and why the issue can't be sol=
+ved in
+> QEMU.
+
+Is there a corresponding QEMU patch to use this new exit reason?
+
+--=-t61yIGXQLHqrgy0CetNH
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
+ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
+AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
+BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
+MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
+a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
+jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
+GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
+aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
+nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
+8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
+HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
+IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
+KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
+BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
+QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
+QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
+ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
+/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
+uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
+xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
+W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
+c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
+VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
+NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
+DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
+sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
+w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
+i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
+kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
+0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
+ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
+blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
+hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
+VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
+HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
+ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
+AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
+cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
+cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
+AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
+aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
+hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
+iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
+8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
+JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
+xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
+EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
+B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
+MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
+KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
+Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
+nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
+WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
+W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
+nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
+g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
+9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
+9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
+sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
+a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
+ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
+AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
+dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
+Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
+Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
+MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
+YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
+4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
+6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
+QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
+nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
+MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
+VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
+ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDgxMjA5Mzkz
+MVowLwYJKoZIhvcNAQkEMSIEIHlxkLzNYP1PHo52DNBmQPF3L9v8yFMeB5YTEaL1r3atMGQGCSsG
+AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
+cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
+VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
+cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIArbcR2TA2pDC/
+H+Ahscz4o6f2v3bN2dR0/yVnmfJMeJi+9B+BluRwahOEWFzLGUuMGKT15VY9VBg7Kyl+AX8K5LXt
+O/YSiEb0/j4rZuTV5G2YzUoYvGzi9Se/BSYNQIGv39wdnEepbtG/PuNPQfmEJDTwZ097Ypp6wTox
+Aj5eLVR8zhLfzSrZvjP2tUQQg01WNyvt03J7Gu6aOnxaClj2lES8xu5JcfIZcFCaoIXkQNkahGru
+p9DLEH8KSsZnO21AdE7zqs+PzCtNjSUzGfPMLQnzPVK8jkYoaN5wP7OjoU/ER9Vf7iRP1W8poA48
+h/tyHsphkOP8ezo/wbGopUa8XjpoS4sSco6cU7herAuKmYOw0yI+XJo9NKgpVSBwNmQ4HHtef1dj
+flh1HlgerhSz5adDf4pst/6GFd32I5vDDOBS/VhienMM2uwuUuJyCqoMscJ7QhS00z55JrFzsyoc
+7R7JWCfEXTNT5bZeXwno48uP8VPiLap8sF/iX3IVmu/oUy8qRw+ovtZO/T1Ic57y4I3AZXlnsLt7
+PAnrloyfxdMglLGdUaOCaDTvKgIbNCSRphWrp5KJav+FKW7svNeowz5y2wB77zkJA1pZLli8gsxh
+QgDnBA/npnNpkMug0V1feIsUBrH7q6IkVIxWffg7JCSj/ikB597/6u6s1jwgIqkAAAAAAAA=
 
 
-> If you want to overwrite report's subsystems, reply with:
-> #syz set subsystems: new-subsystem
-> (See the list of subsystem names on the web dashboard)
-> 
-> If the report is a duplicate of another one, reply with:
-> #syz dup: exact-subject-of-another-report
-> 
-> If you want to undo deduplication, reply with:
-> #syz undup
-
+--=-t61yIGXQLHqrgy0CetNH--
 
