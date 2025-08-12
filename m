@@ -1,78 +1,78 @@
-Return-Path: <kvm+bounces-54532-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54533-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F179BB22F0E
-	for <lists+kvm@lfdr.de>; Tue, 12 Aug 2025 19:29:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A7E3B22F0D
+	for <lists+kvm@lfdr.de>; Tue, 12 Aug 2025 19:29:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B5EE67B5571
-	for <lists+kvm@lfdr.de>; Tue, 12 Aug 2025 17:27:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4741E1A23A69
+	for <lists+kvm@lfdr.de>; Tue, 12 Aug 2025 17:29:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3011E2FDC34;
-	Tue, 12 Aug 2025 17:28:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6191D2FD1D5;
+	Tue, 12 Aug 2025 17:28:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RYpY5W/4"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MJvCgveK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA6052FDC2B
-	for <kvm@vger.kernel.org>; Tue, 12 Aug 2025 17:28:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEEF92FDC26
+	for <kvm@vger.kernel.org>; Tue, 12 Aug 2025 17:28:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755019724; cv=none; b=OXKDC7o65ZBL9HHn/Xgi8rrL37+Jb/Eis47do9Cnwl04JG1dUmHpRvhzP0zO0iQOCIcmy0xnPetE6aAhvdGujdCP/zcKtYs8W0bhIbuHTAMg5//QPFrPVZNhEqa/hMG/XuO+oGNq6UZpWpd1Dz+WEq4Oyzc99uKjBCH269P4eBY=
+	t=1755019729; cv=none; b=jwkehvI0R68wRIa3SfiiGbfqonnDTtfnW6wdWKeSia1zgrJ5jJgScWEtNLeef6r71zUvb8EQhRqq0HEw4ETqfuREHiUbfJLW5k6NIit9WMEapr7ynzgqDSrxABPlF5WrLDNMsg8avT1E0pfWDWboMoWKVpzSJs6rDh8+53877OE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755019724; c=relaxed/simple;
-	bh=dPwuNKd+AlkfSsBP3RGgr6MUPWQ1CJpjZgvsqu1LKn0=;
+	s=arc-20240116; t=1755019729; c=relaxed/simple;
+	bh=m7YpY/PCmdZhmLFKbpmZaWaGBGd2vtU0GO3oXWIyetQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EIvPMayZVVbdzzmz8vIpw9SCXMpEbAuOZ64XJi86sAeG3kKwcWX2EBPW8MmokdSpfX6VcI3EhaxOQvJbw5U3kAbdJ79eg3UCZ3FUIiG5rxORxxIRaxvm0w0mempeDeZx9xFl1PKgNUnCHnVrbgHhDYQ0uhOjnVKSgb5CtGXYtoM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=RYpY5W/4; arc=none smtp.client-ip=209.85.221.50
+	 MIME-Version:Content-Type; b=duEgwRIOP0U6BiWAYe9UNBrVWVg6cIREIa0narjfAJsywOx7ncegffyexrYfXt+BI+8D6/aUqECKOjMHobzFqA41s22BRMBsDVpxol4szGePNSDlfxNe7ucy9TI1EkTQuakYnwEUZLEyh4pLclUi1bfkGMDaFIDyvzNUUnIxWRg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=MJvCgveK; arc=none smtp.client-ip=209.85.128.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-3b78d337dd9so3668857f8f.3
-        for <kvm@vger.kernel.org>; Tue, 12 Aug 2025 10:28:42 -0700 (PDT)
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-459d62184c9so34374835e9.1
+        for <kvm@vger.kernel.org>; Tue, 12 Aug 2025 10:28:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1755019721; x=1755624521; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1755019726; x=1755624526; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=EYt3XWa5JdTgcAHas+NCLzX0AYSjTul5kKCxbeujNLY=;
-        b=RYpY5W/4aslTUg+FUHUt6Nc7+SxEQToAn0c6JUThFoIplhw5XDs1ZWzjxz3GfilG8+
-         cacbh/AqAO43stqlXyhSOb05mRPs2zhU0dIvUocB2mNPPjG+8RYx8cyppiKyALW0YRUB
-         J4Z/V+bvQKo3HLfkPZsUJYIBXLRDdJX/wixKl/KwaZE9yeKwn0NV/NJtyJv/8FuPGW06
-         s2Ue1lhJLAM3hqZLsMmQvMwXf9c7Tq80aQ1K0m5Ial2eOjl3rPXDbhNg3mKR+40UVQbw
-         30ncyReja7z6bftftNEyPgYfY1y6/LmzTS7sgsPn2l7Aw3ronbwaMiFlD8JOF0BInNLN
-         WRzg==
+        bh=5Gx01KlGJnh6U0DX4MaOA7JQNq9Sq+XdhCp2GXJJ2aM=;
+        b=MJvCgveKrMTy5jLl1FF0OM73tGQ669nGhsYSk0j8CNqVhUUhUtM58CI88hMHhI7don
+         Dvjv8pJVllC8Vu8jC3k/w2gSNsLPXMYRYGhDNxEnsTuWDg3i5wm67lIkD9R8GOr4UY39
+         CHs0j7XflAHdSfwvo3tRZbqVf5wnDbOwRbTKgqZgqeXs0msiloNgaJAueYLXSX/12SWR
+         PgPel7iGxF1BY0JreVa8lUddtpq76UeykLl8+yJS/iEX/c072KdXoe6rdNC4v9V/xYk3
+         ukMsj+NduQjlKaocNwb7qgsxsuSahgguugzwt2bo786AVFNq3K75Xl4Hij0m6/lHJjUc
+         cttQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755019721; x=1755624521;
+        d=1e100.net; s=20230601; t=1755019726; x=1755624526;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=EYt3XWa5JdTgcAHas+NCLzX0AYSjTul5kKCxbeujNLY=;
-        b=YEOzFPN8sKz5IxifiWDqV+NuWnaMvHrQcXDh54KiSvzB9HPB6p5ge8iAlEN16LHm02
-         Xvcbo3GJ7byRIPFFmj0mXfqFnyCEGCuGoQQYYe1Olqy3BS57r/jaQLqZ2u75zZDnuo4X
-         nNMAZo4Wn2fuebr0ItfXsFoHkmg273aBPAHJJEJtr1jagXZDiqjj9Lu/+omyZpB6bqQ6
-         yLPpWTAPAJUls4z+mMmbQ6NRmfF3FURKify7eljCtCNqr5g+aSsD/8mlLL5DQJcx8wTz
-         PLP4//LFMuVEZz0E0wTon+RhyqsJsYU9wymgt2dvEFfBHL7yLldu7/Q6UZCNpSXqo6Zn
-         Tz5A==
-X-Forwarded-Encrypted: i=1; AJvYcCXoeSYB+WVwZpz2yc9FaqPC7IUkye5dpptJfrFj1M5xXFUEcXQfX5WtAwgSuiPdCBJFMlg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwGiub1SUoPHIhycjIos2BkkD65lmZ8s8GCduaMghk4+NZwKfp5
-	4dZMuoNdvbK+N1ve+Sk9uQ+7JnNLf0YFI6oH6tGaUniCxK63GfNK6Cjjy9mVt49BE5k=
-X-Gm-Gg: ASbGncuAlbnauo2p8Fj4h7MDNwl4qOtShvra1KrJPHYCyDOBOJ2xQ+2J/fRdTpM0B6O
-	IsAOFHwVRviYf+Kt0kLeZjCYyXaA0y89geMwtEWD4qcMXmqntGxhmwMw23X54Pvgn7wohNzmJVO
-	yY+A/51MrrxiwtrP8QUON0TEUTx5StGJIlUg9eWf7MVOUGKyul46pCPkNO7UAm3egwHd9qt1/b8
-	WlVAC1uL3Qg6BwiM1ZNGhUGn8DjX65qGqhHpo/9XpOjukRi9I98ud9xKNtt+tNLj7VhkBLFF2gl
-	ZLhS76k04sBM8Ps+o80HrxOJqT42lbnpFkynF3ARzlxf/Vr4iPJfBEAdedkTePFyZx/8buFBWJn
-	CQs2uAlQ22RJXMyRcqKRovchUv3eZMx3jNvTxoRJ7lPKB5N/DGi4V9eMWzrjjOtFdj/5K3ZQk
-X-Google-Smtp-Source: AGHT+IFKDzIxMpZiGj7vZDL7rXt0avmWUA3RyLwDmE7PF+XxnCDfzncjSb/8L6jk6S1QcyKG6JKIiw==
-X-Received: by 2002:a05:6000:178d:b0:3b4:9721:2b32 with SMTP id ffacd0b85a97d-3b91724ec5fmr221527f8f.10.1755019720839;
-        Tue, 12 Aug 2025 10:28:40 -0700 (PDT)
+        bh=5Gx01KlGJnh6U0DX4MaOA7JQNq9Sq+XdhCp2GXJJ2aM=;
+        b=XJ8ZGGp4/eW8um1cAC9O0wTVPeef0AeQDLkKQKEr860fiTUbjXkcwb9xYlcLVtS6nw
+         NIwRGi5EWJ4jC4HFlALRUKTYFzMGBpWTuI3C7Q9sYToL84/NoNeRqapmKdk1pBoMwPrm
+         XeVIaKeuizmWgh2D/hqYI7CGvzn6M1aP/gT41m2yKpHscc5jofKOL5a+xRnug0u3OHQT
+         118d90/ywKIARW6cCnxd39MR86Kk6991chOfnzgTiX7Nfe+96wkFKt0VOj2jEOlhIarl
+         8mI8mRF4sN97XOsM7R3jSmcx8wNpINkefB71HXmccRNDvREUF66Oc4B9lUKlw/NIEgu6
+         q8Lg==
+X-Forwarded-Encrypted: i=1; AJvYcCVURVUxfGFv27hY303Mu8cEpMuHNklpHaQBjJ8KP9xYdGdVR0Fd4ICxs5Te9uigEFsv3XY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxhvfiqP+I5LSEfoBztJX/8akcuBytyTvLQKgrGEvV5RFmMJGdL
+	iAI3XCjo+j+TXVQHyoWZWoT/pFjX93mhnAtSfIW87PiP9OjiHwmyhw9qovfPoEHHmdo=
+X-Gm-Gg: ASbGncv39iROwZNUU43zUhDCURDb6Id46eBwKzLuAAQkg/CKFVvMrJFNwz7Tjf5yjFK
+	oSQDZLjOLMBut5rkOdPX7kWJFFOecTFBawFMZcoAGO0laz6Kotuszdq+LYEhf8tGkVkz6DaCDc5
+	sGeuBlCmUzmjW0T8co8kRdorS+BHrAKiYfQo0RTg4tMNLkP+MxUnF6TfP93Evjj7pkfAB7w6A5s
+	GxjQwkvE1qcu7vK6PzEyIhs7I7Z2FblYn9zLznqYOZnJTyXq0WAzZddh+NMK/G5BnqrV52hUuen
+	UvpnoOu8XhytGzUhZe1ALXH1yUFKKM4JdYQ4gfsOhi8DOeQF7w7q1hL6xEmOrrvt6UI37tOXyzd
+	ZjFMkpWFq8K7thV2TZ8JqCvxpKH1Z7p9yxLloCsydI/jsuT4zCs1mZIYy1Z9yiVBeFJBwf1hN
+X-Google-Smtp-Source: AGHT+IEZ2BdB+DDDUDUmqAGCaLdS1J0twMRD6GrR7y46Lkn0qIPsngqJjPbgGbfbHEgD6hhro3LQXw==
+X-Received: by 2002:a05:600c:548f:b0:458:bfe1:4a82 with SMTP id 5b1f17b1804b1-45a165e430fmr31995e9.16.1755019726154;
+        Tue, 12 Aug 2025 10:28:46 -0700 (PDT)
 Received: from localhost.localdomain (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b79c3ac036sm44716290f8f.15.2025.08.12.10.28.39
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b9163ae600sm918558f8f.5.2025.08.12.10.28.44
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 12 Aug 2025 10:28:40 -0700 (PDT)
+        Tue, 12 Aug 2025 10:28:45 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Claudio Fontana <cfontana@suse.de>,
@@ -89,9 +89,9 @@ Cc: Claudio Fontana <cfontana@suse.de>,
 	Peter Maydell <peter.maydell@linaro.org>,
 	Miguel Luis <miguel.luis@oracle.com>,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-Subject: [PATCH v2 03/10] target/arm: Restrict PMU to system mode
-Date: Tue, 12 Aug 2025 19:28:15 +0200
-Message-ID: <20250812172823.86329-4-philmd@linaro.org>
+Subject: [PATCH v2 04/10] target/arm: Factor hvf_psci_get_target_el() out
+Date: Tue, 12 Aug 2025 19:28:16 +0200
+Message-ID: <20250812172823.86329-5-philmd@linaro.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250812172823.86329-1-philmd@linaro.org>
 References: <20250812172823.86329-1-philmd@linaro.org>
@@ -104,47 +104,50 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
+From: Mohamed Mediouni <mohamed@unpredictable.fr>
+
+Factor hvf_psci_get_target_el() out so it will be easier
+to allow switching to other EL later.
+
+Signed-off-by: Mohamed Mediouni <mohamed@unpredictable.fr>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/cpu.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ target/arm/hvf/hvf.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index d9a8f62934d..1dc2a8330d8 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -1551,7 +1551,6 @@ static const Property arm_cpu_pmsav7_dregion_property =
-             DEFINE_PROP_UNSIGNED_NODEFAULT("pmsav7-dregion", ARMCPU,
-                                            pmsav7_dregion,
-                                            qdev_prop_uint32, uint32_t);
--#endif
- 
- static bool arm_get_pmu(Object *obj, Error **errp)
- {
-@@ -1576,6 +1575,8 @@ static void arm_set_pmu(Object *obj, bool value, Error **errp)
-     cpu->has_pmu = value;
+diff --git a/target/arm/hvf/hvf.c b/target/arm/hvf/hvf.c
+index 47b0cd3a351..48e86e62945 100644
+--- a/target/arm/hvf/hvf.c
++++ b/target/arm/hvf/hvf.c
+@@ -1107,6 +1107,10 @@ static void hvf_psci_cpu_off(ARMCPU *arm_cpu)
+     assert(ret == QEMU_ARM_POWERCTL_RET_SUCCESS);
  }
  
-+#endif
-+
- static bool aarch64_cpu_get_aarch64(Object *obj, Error **errp)
- {
-     ARMCPU *cpu = ARM_CPU(obj);
-@@ -1771,12 +1772,12 @@ static void arm_cpu_post_init(Object *obj)
-     if (arm_feature(&cpu->env, ARM_FEATURE_EL2)) {
-         qdev_property_add_static(DEVICE(obj), &arm_cpu_has_el2_property);
-     }
--#endif
++static int hvf_psci_get_target_el(CPUARMState *env)
++{
++    return 1;
++}
+ /*
+  * Handle a PSCI call.
+  *
+@@ -1128,7 +1132,6 @@ static bool hvf_handle_psci_call(CPUState *cpu)
+     CPUState *target_cpu_state;
+     ARMCPU *target_cpu;
+     target_ulong entry;
+-    int target_el = 1;
+     int32_t ret = 0;
  
-     if (arm_feature(&cpu->env, ARM_FEATURE_PMU)) {
-         cpu->has_pmu = true;
-         object_property_add_bool(obj, "pmu", arm_get_pmu, arm_set_pmu);
-     }
-+#endif
- 
-     /*
-      * Allow user to turn off VFP and Neon support, but only for TCG --
+     trace_hvf_psci_call(param[0], param[1], param[2], param[3],
+@@ -1182,7 +1185,7 @@ static bool hvf_handle_psci_call(CPUState *cpu)
+         entry = param[2];
+         context_id = param[3];
+         ret = arm_set_cpu_on(mpidr, entry, context_id,
+-                             target_el, target_aarch64);
++                             hvf_psci_get_target_el(env), target_aarch64);
+         break;
+     case QEMU_PSCI_0_1_FN_CPU_OFF:
+     case QEMU_PSCI_0_2_FN_CPU_OFF:
 -- 
 2.49.0
 
