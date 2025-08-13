@@ -1,150 +1,127 @@
-Return-Path: <kvm+bounces-54565-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54566-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E972B241FC
-	for <lists+kvm@lfdr.de>; Wed, 13 Aug 2025 08:55:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC864B242F6
+	for <lists+kvm@lfdr.de>; Wed, 13 Aug 2025 09:42:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 90DDD189B666
-	for <lists+kvm@lfdr.de>; Wed, 13 Aug 2025 06:55:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C34E51B62CDF
+	for <lists+kvm@lfdr.de>; Wed, 13 Aug 2025 07:42:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57B0A2D3237;
-	Wed, 13 Aug 2025 06:55:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7BEF2DE1FA;
+	Wed, 13 Aug 2025 07:42:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sljCin8S"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LMVjau4J"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E89023D7CF;
-	Wed, 13 Aug 2025 06:55:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBF9B1D5CD4;
+	Wed, 13 Aug 2025 07:42:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755068106; cv=none; b=l6s+oNAxEhljNLlQY0CEKR1PgjcwiqrY7Nm0Q7FEECGACUmmPDdo6ows+WJqPgeoIj9QjVUBq8BDxMLIb4okLrcEuvh/OocVydnUBGOzBpbOaHXT2+/LS6VArGBBAs+yK8ll8AksiKr+sRRA1lGU+nemeJMChPBQgcfzs+m/n3E=
+	t=1755070929; cv=none; b=gce2k2D/Vo2GYgQqeslgT2eSZBk1VR/hzU2dy6FpRiwIid4D5EHf9NR8Qcj70BIR0/kHDSgMOIIz1vTxL9BB8gYCBBWIcU8f2V7HENfgI56RP/qXrvkh/Ug17bCeGsZKIve/Li4vFtNzvdqXphditUFAWAfgnfJ1BUnVseNVkHo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755068106; c=relaxed/simple;
-	bh=R697c/HBZYtRS8/J/tGfw/3B8h/z4SXcEWejW3uErCI=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=V9vE+T1WI9QdusResUP3bxbB+zCtDvR5GT7ahuzkcm5tKgncpaSvWNyQPNXu+tawb+JtzAn1YuB1G8EmN9lpSWKdkjKZ6m9yztJVBXsvfj+xGJy1HVFaz1170RNnvJfQ7VugSFB4KhTy6jhAH7lZWaI8aOsByodW4laJrr8C3JQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sljCin8S; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 000C2C4CEEB;
-	Wed, 13 Aug 2025 06:55:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755068106;
-	bh=R697c/HBZYtRS8/J/tGfw/3B8h/z4SXcEWejW3uErCI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=sljCin8SEFm48vxdfwnj+wQpjbnb8rGMLQKURBN92hKOvOwcJc9k0pPl6dfbzWyOM
-	 xXcswj+NSQ6Zn1QGFxpj6KKZGbmPLfMw5TTP//HXCij5s0ffjFefxCGuyLetXTFvEZ
-	 0tLdVHIn65PQuQCPYBtH7ag4X7O81sPjxf64UPqZDKa1njY4b4W3TMNBU4mvouCW6Z
-	 38YPuo0qccrITHN55Gm1Pmut472oeI5LmHe5EN2MClR5FRBLQvzKiok4eHvYpn+qy9
-	 OZH50wZzvc8Cb5t91+/l1zwHuJvHUMqrJT34mE+PRX07zMp80VuR+Xtt07sLToA916
-	 p2Lp4myYT12Mw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1um5Ny-006x5m-Fu;
-	Wed, 13 Aug 2025 07:54:58 +0100
-Date: Wed, 13 Aug 2025 07:54:58 +0100
-Message-ID: <86jz3790e5.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Volodymyr Babchuk <volodymyr_babchuk@epam.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 2/2] KVM: arm64: Fix vcpu_{read,write}_sys_reg() accessors
-In-Reply-To: <aJuixWlc87f2UlK0@linux.dev>
-References: <20250809144811.2314038-1-maz@kernel.org>
-	<20250809144811.2314038-3-maz@kernel.org>
-	<aJuixWlc87f2UlK0@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1755070929; c=relaxed/simple;
+	bh=Pl2Iufjhn6TyKymAyspu0j4XsMb2q8F63c5yODSEHts=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mny7Y/uxvt5KJTbCI0KmvzFf6kmOTiyKJjAVdAjmZCnrBd4n4EBAqAcOpvqpJkLBjx46PwjkPNMCdu1UoVokOx8IorSabW4fyraWhoMnHinN7lLXDhAcdqruhM+9OjWPomO/WgKpZMb6H6Dn5BUrjTw5oJmzUAtzzbR/iTf1PFk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LMVjau4J; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1755070929; x=1786606929;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=Pl2Iufjhn6TyKymAyspu0j4XsMb2q8F63c5yODSEHts=;
+  b=LMVjau4JWU+Onep3zJBWtIJX/VtdVVTPItaUP3M5jr0Kgl+Od46xWkO6
+   jiz9Uyn3vah1CWn7NZbeyiXSzsDBZvbMZF/EKR7vcPYJVLWxFtLnMJwSN
+   0r9zBwo9Q6wCF2Mg5k8WUmMFxXKgIwFbPIbjCGagl0DGTtnpOWQ18JXdU
+   nmfgRUOC+9YysGyIJ1OB49cx9h2UTgSH5AuiIr+zsac0kD4kTfVOozq39
+   LnplmwUbIHhcZ2XEZOyLcNa5pigACb6aVs5EUQlTPZGvSWu0SjhCQOmBw
+   f9yr6LmhUFIR3fTPjP3OIiAlJIXLjNB7WtWBaSnD/esKw/9mqwETDB2EV
+   Q==;
+X-CSE-ConnectionGUID: 5IP7jq/HTT2DcB0lA3ON5g==
+X-CSE-MsgGUID: sEUKkwchQg2W7kN3OzlZ9w==
+X-IronPort-AV: E=McAfee;i="6800,10657,11520"; a="57223914"
+X-IronPort-AV: E=Sophos;i="6.17,285,1747724400"; 
+   d="scan'208";a="57223914"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2025 00:42:07 -0700
+X-CSE-ConnectionGUID: bREfrc+3RqGcKFxyAT7YNw==
+X-CSE-MsgGUID: 3uCK9oXDQoedGW7Lgm1QHA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,285,1747724400"; 
+   d="scan'208";a="170854106"
+Received: from unknown (HELO [10.238.11.25]) ([10.238.11.25])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2025 00:42:02 -0700
+Message-ID: <2217214c-c4ec-43b5-9940-01139a0eba81@linux.intel.com>
+Date: Wed, 13 Aug 2025 15:41:59 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, volodymyr_babchuk@epam.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 06/30] KVM: selftests: Add helper functions to create
+ TDX VMs
+To: Sean Christopherson <seanjc@google.com>, Sagi Shahar <sagis@google.com>
+Cc: linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Shuah Khan <shuah@kernel.org>, Ackerley Tng <ackerleytng@google.com>,
+ Ryan Afranji <afranji@google.com>, Andrew Jones <ajones@ventanamicro.com>,
+ Isaku Yamahata <isaku.yamahata@intel.com>,
+ Erdem Aktas <erdemaktas@google.com>,
+ Rick Edgecombe <rick.p.edgecombe@intel.com>,
+ Roger Wang <runanwang@google.com>, Oliver Upton <oliver.upton@linux.dev>,
+ "Pratik R. Sampat" <pratikrajesh.sampat@amd.com>,
+ Reinette Chatre <reinette.chatre@intel.com>, Ira Weiny
+ <ira.weiny@intel.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20250807201628.1185915-1-sagis@google.com>
+ <20250807201628.1185915-7-sagis@google.com> <aJpO_zN3buvaQoAW@google.com>
+Content-Language: en-US
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <aJpO_zN3buvaQoAW@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hey Oliver,
 
-Thanks for looking into this.
 
-On Tue, 12 Aug 2025 21:23:33 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> On Sat, Aug 09, 2025 at 03:48:11PM +0100, Marc Zyngier wrote:
-> > @@ -144,125 +156,120 @@ static bool get_el2_to_el1_mapping(unsigned int reg,
-> >  		MAPPED_EL2_SYSREG(ZCR_EL2,     ZCR_EL1,     NULL	     );
-> >  		MAPPED_EL2_SYSREG(CONTEXTIDR_EL2, CONTEXTIDR_EL1, NULL	     );
-> >  		MAPPED_EL2_SYSREG(SCTLR2_EL2,  SCTLR2_EL1,  NULL	     );
-> > +	case CNTHCTL_EL2:
-> > +		/* CNTHCTL_EL2 is super special, until we support NV2.1 */
-> > +		loc->loc = ((is_hyp_ctxt(vcpu) && vcpu_el2_e2h_is_set(vcpu)) ?
-> > +			    SR_LOC_SPECIAL : SR_LOC_MEMORY);
-> > +		break;
-> > +	case TPIDR_EL0:
-> > +	case TPIDRRO_EL0:
-> > +	case TPIDR_EL1:
-> > +	case PAR_EL1:
-> > +		/* These registers are always loaded, no matter what */
-> > +		loc->loc = SR_LOC_LOADED;
-> > +		break;
-> >  	default:
-> > -		return false;
-> > +		/*
-> > +		 * Non-mapped EL2 registers are by definition in memory, but
-> > +		 * we don't need to distinguish them here, as the CPU
-> > +		 * register accessors will bail out and we'll end-up using
-> > +		 * the backing store.
-> > +		 *
-> > +		 * EL1 registers are, however, only loaded if we're
-> > +		 * not in hypervisor context.
-> > +		 */
-> > +		loc->loc = is_hyp_ctxt(vcpu) ? SR_LOC_MEMORY : SR_LOC_LOADED;
-> 
-> Hmm... I get the feeling that this flow is becoming even more subtle.
-> There's some implicit coupling between this switch statement and the
-> __vcpu_{read,write}_sys_reg_from_cpu() which feels like it could be
-> error prone. Especially since we're gonna lose the WARN() that would
-> inform us if an on-CPU register was actually redirected to memory.
+On 8/12/2025 4:13 AM, Sean Christopherson wrote:
+[...]
+>> +void __tdx_mask_cpuid_features(struct kvm_cpuid_entry2 *entry)
+>> +{
+>> +	/*
+>> +	 * Only entries with sub-leaf zero need to be masked, but some of these
+>> +	 * leaves have other sub-leaves defined. Bail on any non-zero sub-leaf,
+>> +	 * so they don't get unintentionally modified.
+>> +	 */
+>> +	if (entry->index)
+>> +		return;
+>> +
+>> +	switch (entry->function) {
+>> +	case 0x1:
+>> +		entry->ecx &= ~(CPUID_EXT_VMX | CPUID_EXT_SMX);
+>> +		entry->edx &= ~CPUID_PSE36;
+> vcpu_clear_cpuid_feature()
+>
+>> +		break;
+>> +	case 0x7:
+>> +		entry->ebx &= ~(CPUID_7_0_EBX_TSC_ADJUST | CPUID_7_0_EBX_SGX);
+>> +		entry->ebx &= ~CPUID_7_0_EBX_INTEL_PT;
+>> +		entry->ecx &= ~CPUID_7_0_ECX_SGX_LC;
+>> +		break;
+>> +	case 0x40000001:
+>> +		entry->eax &= TDX_SUPPORTED_KVM_FEATURES;
+>> +		break;
+>> +	case 0x80000007:
+>> +		entry->edx |= CPUID_APM_INVTSC;
+> Quite obviously isn't "masking" anything".
 
-This implicit behaviour was already present, and nobody noticed it.
-See how the FGT2 registers are currently missing from the list of
-"pure" registers. We didn't see the problem because the fallback saves
-us. This is what decided me to throw away the "pure" annotation and
-lump both non-remapped EL2 and EL1 registers together.
+Beside that, I guess this is handling fixed1 bit. But why only this bit is
+treated specially?
 
-> I'm wondering if we need some macro hell containing the block of
-> registers we handle on-CPU and expand that can be expanded into this
-> triage switch case as well as the sysreg accessor.
-
-That's an interesting approach. A bit tricky, because we do rely on
-heavy inlining and constant propagation in the CPU accessors, but
-maybe there's a way to deal with that...
-
-> What you have definitely seems correct, though. I'll twiddle a bit and
-> see if I come up with something, although I imagine what you have is
-> what we'll use in the end anyway.
-
-I'll have a look in parallel and post my findings, if any.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
 
