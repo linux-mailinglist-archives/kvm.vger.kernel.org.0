@@ -1,258 +1,158 @@
-Return-Path: <kvm+bounces-54617-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54618-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB5D6B25711
-	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 00:56:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 528BEB25795
+	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 01:31:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CEFB87BBE4A
-	for <lists+kvm@lfdr.de>; Wed, 13 Aug 2025 22:55:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D1CB9A5A9C
+	for <lists+kvm@lfdr.de>; Wed, 13 Aug 2025 23:31:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CA582D979B;
-	Wed, 13 Aug 2025 22:56:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C00C52F60D7;
+	Wed, 13 Aug 2025 23:31:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TWbQgMTz"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Gv3tQdnR"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EB6E2FB98D
-	for <kvm@vger.kernel.org>; Wed, 13 Aug 2025 22:56:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F04C4C81;
+	Wed, 13 Aug 2025 23:31:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755125802; cv=none; b=l1TszIs8qv4IBA7dmKXXZBMI9hyDemlUi3N6OkKHtFcYqx2W554RufGMD1FprlRWQl7/pYREF7FSjH15ImjcyhN5I7+GQ0cF93qGlWiVpBFEHyeuf7Q/Zbvm4AYTtC0KMwDt/5HAPiidjV6HnppoZcO3g638WegCJOB8l2A8K0c=
+	t=1755127893; cv=none; b=qgLRLnebI48mLI3VsgUx3acjsPvNjGg6EEEt1ZVnGi8e6Iys5b571w3uAbmpjCPmgxtnZSWsr5fPIfaMGXNBhRZzMQnktZslXkxbMSjPqygJ/1PfdIq/9tq0s9kFjxMB+VgzHe3TaN8dnyCkhKLslPCKQ8VS7lxmXKqUYjbgDw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755125802; c=relaxed/simple;
-	bh=4e0l/gwaTIMLD9bL4migSckiVZwpKkWavSLci6fpGpM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=g/ZuIR+5fQ2sWw31AZgVrFvFe+UldREClOtRemLyiwq9fpBJVRUeqAZTaRsmGx0XhPgSHHYnc5ZEKMiJbSo6PtfgLCQisPkCY0tPpUyyiko913a76fRoq+v+PzFdTXPh0E130xv/p9tSePa3sXD/IlyLKmb+eHBk+IdWJXaLwTM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TWbQgMTz; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1755125799;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aLeTfhKhkO7buQ+Gq1sRAvaCeEwy+ke7zDoFKoCbE0A=;
-	b=TWbQgMTzmYew0pYZVFk/N2pA36avigBwnC8srRnHyFSu+N6QXHFzKRL2KyAJydzrXDCYjd
-	UFiyRwsEwDgbK2GAJFaDYeZDRwFKjDBxrj77kjESxkHztvPGrSUDocI6z1sCvHhQanKDXC
-	Dt3T4H8SBcZAHK5KL8zYFkPFdnyv1Ik=
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
- [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-617-4r3LBBDvO-q13LiPybO7ag-1; Wed, 13 Aug 2025 18:56:37 -0400
-X-MC-Unique: 4r3LBBDvO-q13LiPybO7ag-1
-X-Mimecast-MFC-AGG-ID: 4r3LBBDvO-q13LiPybO7ag_1755125797
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3e57003c19aso946685ab.3
-        for <kvm@vger.kernel.org>; Wed, 13 Aug 2025 15:56:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755125796; x=1755730596;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aLeTfhKhkO7buQ+Gq1sRAvaCeEwy+ke7zDoFKoCbE0A=;
-        b=JYe9ZAfnA3xVDERa/abNhTgo6gZkFXuBpPknbxIGTLKe1oKmC6Dk0Tgm5y6rvfMMDr
-         mEvgTCdr+bPGIO+fv+weG6CSYO8dx0dvEuAYdFlD9GooJCCuaBQk8VlEEu1ExgjoKgLG
-         Pn2xnCWnNZ8/AF5cEKjF/g1NnM3TFxUfvetavhZVWHkfAcslXU87shi7srHNtLyZ2bit
-         wQVTzk1Y//4RTtShlkevM/sl1czl9/v5SfoOCqpx57uBZggYBWobsH9maJFIRujnIfRs
-         qHvJ5ci7gVRO+tj3vM+ZaRWdtkxTeEHKRBVqykr0tOOXB1mNMUgvBoItbIFSFtyxjZ8N
-         brfA==
-X-Forwarded-Encrypted: i=1; AJvYcCVyD3m1YyKD8w6vJxoCleqFmWvFqo0ArCaswhz0arHNh0qwNoSKJnyYhGTFMNB5DbLQ/nw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxy6c2HsRfCVmOIR8OWXqmu1Ws/DsvMmKf2TzB3ZQCKzkUqe2lB
-	FaXXde6RA66V1g/R9Dt67ys6CHG8GrClXQ4gvdd9/mHIHmrOHnmH+6h5yuCkIZrwY2HD0mCYS6T
-	mTeqNgR3Epw5uwXRy7QoI8zlffRZNyrU/XpcOFkQ7A8CXGRD3e2i3ztc/FtLazQ==
-X-Gm-Gg: ASbGnctbPcHA0Brf3Mt+6uve68jXsezcNk6lkSRNOPzg4rfo8CUlmPgx9c3hmd02IT7
-	sJ1Uej2N5Yntn+h0i2txPwr56JAMOasRCO3G1cYlmdiQy6W9IX/n1K6RMsn3z4Y6H1HD2EZ2Sw3
-	ZbgloDKADhqwHWrx+ZrdW6FRg9vLu5UDmhkm7UKUb1qBqzRBMmEH1Yh+kyT8W2SqPpgLqXAbtgz
-	qF/SWo1NKLpoEDf0yU0/w2Xk/EBimtA5gSDjwoYA0Xu0ViGWV18/T20t09k1IH4uYEEKRMau2p1
-	m1vuQV6dzbkTnLrFTEZKU5pBMxfu90o9dyjEn0TXi+o=
-X-Received: by 2002:a05:6e02:216a:b0:3e5:151e:6652 with SMTP id e9e14a558f8ab-3e57077bac5mr4982765ab.2.1755125796308;
-        Wed, 13 Aug 2025 15:56:36 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGktdX8bRcKWgKmUrfDsEuQvcB5qH6b2PxIASOhiJyxcRZsecjKLRc1k18NJ79Q05dhZSHjaQ==
-X-Received: by 2002:a05:6e02:216a:b0:3e5:151e:6652 with SMTP id e9e14a558f8ab-3e57077bac5mr4982635ab.2.1755125795883;
-        Wed, 13 Aug 2025 15:56:35 -0700 (PDT)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3e533cc1bb3sm60160555ab.32.2025.08.13.15.56.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Aug 2025 15:56:34 -0700 (PDT)
-Date: Wed, 13 Aug 2025 16:56:31 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Farhan Ali <alifm@linux.ibm.com>
-Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, schnelle@linux.ibm.com,
- mjrosato@linux.ibm.com
-Subject: Re: [PATCH v1 5/6] vfio-pci/zdev: Perform platform specific
- function reset for zPCI
-Message-ID: <20250813165631.7c22ef0f.alex.williamson@redhat.com>
-In-Reply-To: <7059025f-f337-493d-a50c-ccce8fb4beee@linux.ibm.com>
-References: <20250813170821.1115-1-alifm@linux.ibm.com>
-	<20250813170821.1115-6-alifm@linux.ibm.com>
-	<20250813143034.36f8c3a4.alex.williamson@redhat.com>
-	<7059025f-f337-493d-a50c-ccce8fb4beee@linux.ibm.com>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1755127893; c=relaxed/simple;
+	bh=pSrk1+Pl2w0c7sZtG87RTW/5Lq01aoGnLMNs1gY4RP4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qxFcj7wuLIAlnuWhyNiatPEgg+LYbXJ6xUPW8D9yEtdyTXldRpFrgGzl16B+vnTl7cR5WF9vbJQV5wAKBNOVk22NFP2I5JoOWIiBDD88e9nP4WAWPLjidYP84zDGq+WMI/kzft9/k9CN7G2P/PWf14JMESaDO3Y8JbVak4d1txE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Gv3tQdnR; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1755127892; x=1786663892;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=pSrk1+Pl2w0c7sZtG87RTW/5Lq01aoGnLMNs1gY4RP4=;
+  b=Gv3tQdnRPm1geHHTVonC5L28fD5ixdeftNlO8/9U0nLE29EwxmHZahuG
+   sj5wofYjnHC2FkDig/97naa3X41DsZNQkEVPA7C/IzjOGiMRZy1+pfy+V
+   mRKO/SRClLGCx78Kszk2uZTGo6HrqFsT/Fljn9skwqJla8Ps+SnX9pVfV
+   d1Tx0EzNfrq/GMX75D1/SmPEBaUQpvRUxwGg2N5KBg9i/HzCsCLPqAPgp
+   uZJ+doW6yrqM7Trc0mPHkchd0wgCoXU/qFvqfrxps7r+AwH9+iVMxIvSU
+   mq+h5YsfG4TXVL5Aw2RI0+A2VjkU/AvgEDbS6wWCXqyfBBPkq9vtaUxOv
+   w==;
+X-CSE-ConnectionGUID: WWRxtCGNS7ejAoUguL6E8Q==
+X-CSE-MsgGUID: wyKB3wZ8TY68bSQYLoWmzA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11520"; a="75011009"
+X-IronPort-AV: E=Sophos;i="6.17,287,1747724400"; 
+   d="scan'208";a="75011009"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2025 16:31:31 -0700
+X-CSE-ConnectionGUID: bmj+/WIjR0+o8T9zxuER6A==
+X-CSE-MsgGUID: rNZxCCmtTn+AZmGC+8EyXQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,287,1747724400"; 
+   d="scan'208";a="166982974"
+Received: from cmdeoliv-mobl4.amr.corp.intel.com (HELO [10.125.111.131]) ([10.125.111.131])
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2025 16:31:30 -0700
+Message-ID: <d21a66fe-d2ce-46cc-b89e-b60b03eae3da@intel.com>
+Date: Wed, 13 Aug 2025 16:31:29 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHv2 00/12] TDX: Enable Dynamic PAMT
+To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+ "seanjc@google.com" <seanjc@google.com>
+Cc: "Gao, Chao" <chao.gao@intel.com>,
+ "Yamahata, Isaku" <isaku.yamahata@intel.com>, "x86@kernel.org"
+ <x86@kernel.org>, "kas@kernel.org" <kas@kernel.org>,
+ "bp@alien8.de" <bp@alien8.de>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "Zhao, Yan Y" <yan.y.zhao@intel.com>, "Huang, Kai" <kai.huang@intel.com>,
+ "mingo@redhat.com" <mingo@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+ "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+ "tglx@linutronix.de" <tglx@linutronix.de>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+References: <20250609191340.2051741-1-kirill.shutemov@linux.intel.com>
+ <d432b8b7cfc413001c743805787990fe0860e780.camel@intel.com>
+ <sjhioktjzegjmyuaisde7ui7lsrhnolx6yjmikhhwlxxfba5bh@ss6igliiimas>
+ <c2a62badf190717a251d269a6905872b01e8e340.camel@intel.com>
+ <aJqgosNUjrCfH_WN@google.com>
+ <f38f55de6f4d454d0288eb7f04c8c621fb7b9508.camel@intel.com>
+From: Dave Hansen <dave.hansen@intel.com>
+Content-Language: en-US
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <f38f55de6f4d454d0288eb7f04c8c621fb7b9508.camel@intel.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On Wed, 13 Aug 2025 14:52:24 -0700
-Farhan Ali <alifm@linux.ibm.com> wrote:
+On 8/13/25 15:43, Edgecombe, Rick P wrote:
+> I redid the test. Boot 10 TDs with 16GB of ram, run userspace to fault in memory
+> from 4 threads until OOM, then shutdown. TDs were split between two sockets. It
+> ended up with 1136 contentions of the global lock, 4ms waiting.
 
-> On 8/13/2025 1:30 PM, Alex Williamson wrote:
-> > On Wed, 13 Aug 2025 10:08:19 -0700
-> > Farhan Ali <alifm@linux.ibm.com> wrote:
-> >  
-> >> For zPCI devices we should drive a platform specific function reset
-> >> as part of VFIO_DEVICE_RESET. This reset is needed recover a zPCI device
-> >> in error state.
-> >>
-> >> Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
-> >> ---
-> >>   arch/s390/pci/pci.c              |  1 +
-> >>   drivers/vfio/pci/vfio_pci_core.c |  4 ++++
-> >>   drivers/vfio/pci/vfio_pci_priv.h |  5 ++++
-> >>   drivers/vfio/pci/vfio_pci_zdev.c | 39 ++++++++++++++++++++++++++++++++
-> >>   4 files changed, 49 insertions(+)
-> >>
-> >> diff --git a/arch/s390/pci/pci.c b/arch/s390/pci/pci.c
-> >> index f795e05b5001..860a64993b58 100644
-> >> --- a/arch/s390/pci/pci.c
-> >> +++ b/arch/s390/pci/pci.c
-> >> @@ -788,6 +788,7 @@ int zpci_hot_reset_device(struct zpci_dev *zdev)
-> >>   
-> >>   	return rc;
-> >>   }
-> >> +EXPORT_SYMBOL_GPL(zpci_hot_reset_device);
-> >>   
-> >>   /**
-> >>    * zpci_create_device() - Create a new zpci_dev and add it to the zbus
-> >> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-> >> index 7dcf5439dedc..7220a22135a9 100644
-> >> --- a/drivers/vfio/pci/vfio_pci_core.c
-> >> +++ b/drivers/vfio/pci/vfio_pci_core.c
-> >> @@ -1227,6 +1227,10 @@ static int vfio_pci_ioctl_reset(struct vfio_pci_core_device *vdev,
-> >>   	 */
-> >>   	vfio_pci_set_power_state(vdev, PCI_D0);
-> >>   
-> >> +	ret = vfio_pci_zdev_reset(vdev);
-> >> +	if (ret && ret != -ENODEV)
-> >> +		return ret;
-> >> +
-> >>   	ret = pci_try_reset_function(vdev->pdev);
-> >>   	up_write(&vdev->memory_lock);  
-> > You're going to be very unhappy if this lock isn't released.
-> >  
-> Ah yes, thanks for catching that. Will fix this.
-> 
-> >  
-> >>   
-> >> diff --git a/drivers/vfio/pci/vfio_pci_priv.h b/drivers/vfio/pci/vfio_pci_priv.h
-> >> index a9972eacb293..5288577b3170 100644
-> >> --- a/drivers/vfio/pci/vfio_pci_priv.h
-> >> +++ b/drivers/vfio/pci/vfio_pci_priv.h
-> >> @@ -86,6 +86,7 @@ int vfio_pci_info_zdev_add_caps(struct vfio_pci_core_device *vdev,
-> >>   				struct vfio_info_cap *caps);
-> >>   int vfio_pci_zdev_open_device(struct vfio_pci_core_device *vdev);
-> >>   void vfio_pci_zdev_close_device(struct vfio_pci_core_device *vdev);
-> >> +int vfio_pci_zdev_reset(struct vfio_pci_core_device *vdev);
-> >>   #else
-> >>   static inline int vfio_pci_info_zdev_add_caps(struct vfio_pci_core_device *vdev,
-> >>   					      struct vfio_info_cap *caps)
-> >> @@ -100,6 +101,10 @@ static inline int vfio_pci_zdev_open_device(struct vfio_pci_core_device *vdev)
-> >>   
-> >>   static inline void vfio_pci_zdev_close_device(struct vfio_pci_core_device *vdev)
-> >>   {}
-> >> +int vfio_pci_zdev_reset(struct vfio_pci_core_device *vdev)
-> >> +{
-> >> +	return -ENODEV;
-> >> +}
-> >>   #endif
-> >>   
-> >>   static inline bool vfio_pci_is_vga(struct pci_dev *pdev)
-> >> diff --git a/drivers/vfio/pci/vfio_pci_zdev.c b/drivers/vfio/pci/vfio_pci_zdev.c
-> >> index 818235b28caa..dd1919ccb3be 100644
-> >> --- a/drivers/vfio/pci/vfio_pci_zdev.c
-> >> +++ b/drivers/vfio/pci/vfio_pci_zdev.c
-> >> @@ -212,6 +212,45 @@ static int vfio_pci_zdev_setup_err_region(struct vfio_pci_core_device *vdev)
-> >>   	return ret;
-> >>   }
-> >>   
-> >> +int vfio_pci_zdev_reset(struct vfio_pci_core_device *vdev)
-> >> +{
-> >> +	struct zpci_dev *zdev = to_zpci(vdev->pdev);
-> >> +	int rc = -EIO;
-> >> +
-> >> +	if (!zdev)
-> >> +		return -ENODEV;
-> >> +
-> >> +	/*
-> >> +	 * If we can't get the zdev->state_lock the device state is
-> >> +	 * currently undergoing a transition and we bail out - just
-> >> +	 * the same as if the device's state is not configured at all.
-> >> +	 */
-> >> +	if (!mutex_trylock(&zdev->state_lock))
-> >> +		return rc;
-> >> +
-> >> +	/* We can reset only if the function is configured */
-> >> +	if (zdev->state != ZPCI_FN_STATE_CONFIGURED)
-> >> +		goto out;
-> >> +
-> >> +	rc = zpci_hot_reset_device(zdev);
-> >> +	if (rc != 0)
-> >> +		goto out;
-> >> +
-> >> +	if (!vdev->pci_saved_state) {
-> >> +		pci_err(vdev->pdev, "No saved available for the device");
-> >> +		rc = -EIO;
-> >> +		goto out;
-> >> +	}
-> >> +
-> >> +	pci_dev_lock(vdev->pdev);
-> >> +	pci_load_saved_state(vdev->pdev, vdev->pci_saved_state);
-> >> +	pci_restore_state(vdev->pdev);
-> >> +	pci_dev_unlock(vdev->pdev);
-> >> +out:
-> >> +	mutex_unlock(&zdev->state_lock);
-> >> +	return rc;
-> >> +}  
-> > This looks like it should be a device or arch specific reset
-> > implemented in drivers/pci, not vfio.  Thanks,
-> >
-> > Alex  
-> 
-> Are you suggesting to move this to an arch specific function? One thing 
-> we need to do after the zpci_hot_reset_device, is to correctly restore 
-> the config space of the device. And for vfio-pci bound devices we want 
-> to restore the state of the device to when it was initially opened.
+4ms out of how much CPU time?
 
-We generally rely on the abstraction of pci_reset_function() to select
-the correct type of reset for a function scope reset.  We've gone to
-quite a bit of effort to implement all device specific resets and
-quirks in the PCI core to be re-used across the kernel.
+Also, contention is *NOT* necessarily bad here. Only _false_ contention.
 
-Calling zpci_hot_reset_device() directly seems contradictory to those
-efforts.  Should pci_reset_function() call this universally on s390x
-rather than providing access to FLR/PM/SBR reset?  Why is it
-universally correct here given the ioctl previously made use of
-standard reset mechanisms?
+The whole point of the lock is to ensure that there aren't two different
+CPUs trying to do two different things to the same PAMT range at the
+same time.
 
-The DEVICE_RESET ioctl is simply an in-place reset of the device,
-without restoring the original device state.  So we're also subtly
-changing that behavior here, presumably because we're targeting the
-specific error recovery case.  Have you considered how this might
-break non-error-recovery use cases?
+If there are, one of them *HAS* to wait. It can wait lots of different
+ways, but it has to wait. That wait will show up as spinlock contention.
 
-I wonder if we want a different reset mechanism for this use case
-rather than these subtle semantic changes.  Thanks,
-
-Alex
-
+Even if the global lock went away, that 4ms of spinning might still be
+there.
 
