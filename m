@@ -1,158 +1,260 @@
-Return-Path: <kvm+bounces-54618-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54619-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 528BEB25795
-	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 01:31:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DBD3B257F1
+	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 01:59:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D1CB9A5A9C
-	for <lists+kvm@lfdr.de>; Wed, 13 Aug 2025 23:31:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8CD1F1C84829
+	for <lists+kvm@lfdr.de>; Wed, 13 Aug 2025 23:59:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C00C52F60D7;
-	Wed, 13 Aug 2025 23:31:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A77E2FE07E;
+	Wed, 13 Aug 2025 23:59:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Gv3tQdnR"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZNTIf+re"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F04C4C81;
-	Wed, 13 Aug 2025 23:31:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B89CA2F60C8;
+	Wed, 13 Aug 2025 23:59:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755127893; cv=none; b=qgLRLnebI48mLI3VsgUx3acjsPvNjGg6EEEt1ZVnGi8e6Iys5b571w3uAbmpjCPmgxtnZSWsr5fPIfaMGXNBhRZzMQnktZslXkxbMSjPqygJ/1PfdIq/9tq0s9kFjxMB+VgzHe3TaN8dnyCkhKLslPCKQ8VS7lxmXKqUYjbgDw8=
+	t=1755129566; cv=none; b=b91sOsC0AqAuvo+4igv8l1T2NV8XpiXpXDXl3ZPhrCqalhvBSuuB4vNcBQCq/afgpDZLz0bIKrT/2x785xVsq0sU16IL0cuwccK6+Ql93dlrmQTKaQQJQi7w+o7wKqOoipATHDY6dvWGdlgHoEbyUg9OQnz821tjffB7EklhZyE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755127893; c=relaxed/simple;
-	bh=pSrk1+Pl2w0c7sZtG87RTW/5Lq01aoGnLMNs1gY4RP4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qxFcj7wuLIAlnuWhyNiatPEgg+LYbXJ6xUPW8D9yEtdyTXldRpFrgGzl16B+vnTl7cR5WF9vbJQV5wAKBNOVk22NFP2I5JoOWIiBDD88e9nP4WAWPLjidYP84zDGq+WMI/kzft9/k9CN7G2P/PWf14JMESaDO3Y8JbVak4d1txE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Gv3tQdnR; arc=none smtp.client-ip=192.198.163.8
+	s=arc-20240116; t=1755129566; c=relaxed/simple;
+	bh=Qc1gLS+tjPXUuL+0jMShJDwXpCd/gI+//JyfmdgyoHU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=d29npDye4ZWTdyx0c78UGvwDdPS5EpvBoVsKho9jN6tW9F1LvqwN3jEwSjmQomxF6SdaUGLydToE2dmheeByIFjrNGaBmoyrYsH3tVQvUbkZ3wzpqsmhW8s5+/2SxmF0iL9goMrCRvXHg2uOJVZ+2qwhoAoLnC2MtPzHVpY+j/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZNTIf+re; arc=none smtp.client-ip=198.175.65.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1755127892; x=1786663892;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=pSrk1+Pl2w0c7sZtG87RTW/5Lq01aoGnLMNs1gY4RP4=;
-  b=Gv3tQdnRPm1geHHTVonC5L28fD5ixdeftNlO8/9U0nLE29EwxmHZahuG
-   sj5wofYjnHC2FkDig/97naa3X41DsZNQkEVPA7C/IzjOGiMRZy1+pfy+V
-   mRKO/SRClLGCx78Kszk2uZTGo6HrqFsT/Fljn9skwqJla8Ps+SnX9pVfV
-   d1Tx0EzNfrq/GMX75D1/SmPEBaUQpvRUxwGg2N5KBg9i/HzCsCLPqAPgp
-   uZJ+doW6yrqM7Trc0mPHkchd0wgCoXU/qFvqfrxps7r+AwH9+iVMxIvSU
-   mq+h5YsfG4TXVL5Aw2RI0+A2VjkU/AvgEDbS6wWCXqyfBBPkq9vtaUxOv
+  t=1755129564; x=1786665564;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Qc1gLS+tjPXUuL+0jMShJDwXpCd/gI+//JyfmdgyoHU=;
+  b=ZNTIf+reCvaVOiydEBt02t7blByG5EV6rQlUuARbcnGTOscFSXmE3IGA
+   AlwVi+xIDIgR5glyup0mvW7QhSelHBfIYPp79xUIjvR6L6juFYsQe6FcT
+   tpdTjfuseirnFuE+xedwPr1wsjUQzmvRaRvXMKS7mCZ9mCaDuYHl0aojL
+   0IbgGnLUDzTo4JGwtMz6m0CMDu+mySzVlISWFhGdpkbdAhipzDy8n5eaf
+   XZaOY16wfvnz6P6LrDSTHU5TO4QmpdfysWivBfFsyrUirvXa07gDTXaFY
+   46EV3RwbeY/MXLaEdygEmKK5avDGPg9IpP60hPRMh9/bJnn9VsMBddUEZ
    w==;
-X-CSE-ConnectionGUID: WWRxtCGNS7ejAoUguL6E8Q==
-X-CSE-MsgGUID: wyKB3wZ8TY68bSQYLoWmzA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11520"; a="75011009"
+X-CSE-ConnectionGUID: CG38bXxPQ+6RBvooU2OVBA==
+X-CSE-MsgGUID: Zo52T0L/QGWHmrO94iIJnA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11520"; a="80014640"
 X-IronPort-AV: E=Sophos;i="6.17,287,1747724400"; 
-   d="scan'208";a="75011009"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2025 16:31:31 -0700
-X-CSE-ConnectionGUID: bmj+/WIjR0+o8T9zxuER6A==
-X-CSE-MsgGUID: rNZxCCmtTn+AZmGC+8EyXQ==
+   d="scan'208";a="80014640"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2025 16:59:24 -0700
+X-CSE-ConnectionGUID: Z+TmnemgSFSGru3OmTL6qA==
+X-CSE-MsgGUID: 6yUDdhqeSZ2xjTWbvyw+6g==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.17,287,1747724400"; 
-   d="scan'208";a="166982974"
-Received: from cmdeoliv-mobl4.amr.corp.intel.com (HELO [10.125.111.131]) ([10.125.111.131])
-  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2025 16:31:30 -0700
-Message-ID: <d21a66fe-d2ce-46cc-b89e-b60b03eae3da@intel.com>
-Date: Wed, 13 Aug 2025 16:31:29 -0700
+   d="scan'208";a="166105019"
+Received: from mgerlach-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.124.222.250])
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2025 16:59:18 -0700
+From: Kai Huang <kai.huang@intel.com>
+To: dave.hansen@intel.com,
+	bp@alien8.de,
+	tglx@linutronix.de,
+	peterz@infradead.org,
+	mingo@redhat.com,
+	hpa@zytor.com,
+	thomas.lendacky@amd.com
+Cc: x86@kernel.org,
+	kas@kernel.org,
+	rick.p.edgecombe@intel.com,
+	dwmw@amazon.co.uk,
+	linux-kernel@vger.kernel.org,
+	pbonzini@redhat.com,
+	seanjc@google.com,
+	kvm@vger.kernel.org,
+	reinette.chatre@intel.com,
+	isaku.yamahata@intel.com,
+	dan.j.williams@intel.com,
+	ashish.kalra@amd.com,
+	nik.borisov@suse.com,
+	chao.gao@intel.com,
+	sagis@google.com,
+	farrah.chen@intel.com
+Subject: [PATCH v6 0/7] TDX host: kexec/kdump support
+Date: Thu, 14 Aug 2025 11:59:00 +1200
+Message-ID: <cover.1755126788.git.kai.huang@intel.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv2 00/12] TDX: Enable Dynamic PAMT
-To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
- "seanjc@google.com" <seanjc@google.com>
-Cc: "Gao, Chao" <chao.gao@intel.com>,
- "Yamahata, Isaku" <isaku.yamahata@intel.com>, "x86@kernel.org"
- <x86@kernel.org>, "kas@kernel.org" <kas@kernel.org>,
- "bp@alien8.de" <bp@alien8.de>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "Zhao, Yan Y" <yan.y.zhao@intel.com>, "Huang, Kai" <kai.huang@intel.com>,
- "mingo@redhat.com" <mingo@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
- "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
- "tglx@linutronix.de" <tglx@linutronix.de>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-References: <20250609191340.2051741-1-kirill.shutemov@linux.intel.com>
- <d432b8b7cfc413001c743805787990fe0860e780.camel@intel.com>
- <sjhioktjzegjmyuaisde7ui7lsrhnolx6yjmikhhwlxxfba5bh@ss6igliiimas>
- <c2a62badf190717a251d269a6905872b01e8e340.camel@intel.com>
- <aJqgosNUjrCfH_WN@google.com>
- <f38f55de6f4d454d0288eb7f04c8c621fb7b9508.camel@intel.com>
-From: Dave Hansen <dave.hansen@intel.com>
-Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <f38f55de6f4d454d0288eb7f04c8c621fb7b9508.camel@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 8/13/25 15:43, Edgecombe, Rick P wrote:
-> I redid the test. Boot 10 TDs with 16GB of ram, run userspace to fault in memory
-> from 4 threads until OOM, then shutdown. TDs were split between two sockets. It
-> ended up with 1136 contentions of the global lock, 4ms waiting.
+This series is the latest attempt to support kexec on TDX host following
+Dave's suggestion to use a percpu boolean to control WBINVD during
+kexec.
 
-4ms out of how much CPU time?
+Hi Boris/Tom,
 
-Also, contention is *NOT* necessarily bad here. Only _false_ contention.
+Thanks for your review on the first two patches.  Please let me know if
+you have more comments.
 
-The whole point of the lock is to ensure that there aren't two different
-CPUs trying to do two different things to the same PAMT range at the
-same time.
+Hi Dave,
 
-If there are, one of them *HAS* to wait. It can wait lots of different
-ways, but it has to wait. That wait will show up as spinlock contention.
+Tom has provided Reviewed-by for the first two patches which change SME
+code.  TDX patches also received RBs from multiple Intel TDX developers
+(the last patch has Paolo's Acked-by too).  Could you help to review this
+series, and if looks good to you, consider merging this series?
 
-Even if the global lock went away, that 4ms of spinning might still be
-there.
+v5 -> v6:
+ - Regenerate based on latest tip/master.
+ - Rename do_seamcall() to __seamcall_dirty_cache() - Rick.
+ - Collect Reviewed-by tags from Tom, Rick, Chao (thanks!).
+
+v5: https://lore.kernel.org/kvm/cover.1753679792.git.kai.huang@intel.com/
+
+v4 -> v5:
+ - Address comments from Tom, Hpa and Chao (nothing major)
+   - RELOC_KERNEL_HOST_MEM_ACTIVE -> RELOC_KERNEL_HOST_MEM_ENC_ACTIVE
+     in patch 1 (Tom)
+   - Add a comment to explain only RELOC_KERNEL_PRESERVE_CONTEXT is
+     restored after jumping back from peer kernel for preserved_context
+     kexec in patch 1.
+   - Use testb instead of testq to save 3 bytes in patch 1 (Hpa)
+   - Remove the unneeded 'ret' local variable in do_seamcall() (Chao)
+
+v4: https://lore.kernel.org/kvm/cover.1752730040.git.kai.huang@intel.com/
+
+v3 -> v4:
+ - Rebase to latest tip/master.
+ - Add a cleanup patch to consolidate relocate_kernel()'s last two
+   function parameters -- Boris.
+ - Address comments received -- please see individual patches.
+ - Collect tags (Tom, Rick, binbin).
+
+ v3: https://lore.kernel.org/kvm/cover.1750934177.git.kai.huang@intel.com/
+
+(For more history please see v3 coverletter.)
+
+=== More information ===
+
+TDX private memory is memory that is encrypted with private Host Key IDs
+(HKID).  If the kernel has ever enabled TDX, part of system memory
+remains TDX private memory when kexec happens.  E.g., the PAMT (Physical
+Address Metadata Table) pages used by the TDX module to track each TDX
+memory page's state are never freed once the TDX module is initialized.
+TDX guests also have guest private memory and secure-EPT pages.
+
+After kexec, the new kernel will have no knowledge of which memory page
+was used as TDX private page and can use all memory as regular memory.
+
+1) Cache flush
+
+Per TDX 1.5 base spec "8.6.1.Platforms not Using ACT: Required Cache
+Flush and Initialization by the Host VMM", to support kexec for TDX, the
+kernel needs to flush cache to make sure there's no dirty cachelines of
+TDX private memory left over to the new kernel (when the TDX module
+reports TDX_FEATURES.CLFLUSH_BEFORE_ALLOC as 1 in the global metadata for
+the platform).  The kernel also needs to make sure there's no more TDX
+activity (no SEAMCALL) after cache flush so that no new dirty cachelines
+of TDX private memory are generated.
+
+SME has similar requirement.  SME kexec support uses WBINVD to do the
+cache flush.  WBINVD is able to flush cachelines associated with any
+HKID.  Reuse the WBINVD introduced by SME to flush cache for TDX.
+
+Currently the kernel explicitly checks whether the hardware supports SME
+and only does WBINVD if true.  Instead of adding yet another TDX
+specific check, this series uses a percpu boolean to indicate whether
+WBINVD is needed on that CPU during kexec.
+
+2) Reset TDX private memory using MOVDIR64B
+
+The TDX spec (the aforementioned section) also suggests the kernel
+*should* use MOVDIR64B to clear TDX private page before the kernel
+reuses it as regular one.
+
+However, in reality the situation can be more flexible.  Per TDX 1.5
+base spec ("Table 16.2: Non-ACT Platforms Checks on Memory Reads in Ci
+Mode" and "Table 16.3: Non-ACT Platforms Checks on Memory Reads in Li
+Mode"), the read/write to TDX private memory using shared KeyID without
+integrity check enabled will not poison the memory and cause machine
+check.
+
+Note on the platforms with ACT (Access Control Table), there's no
+integrity check involved thus no machine check is possible to happen due
+to memory read/write using different KeyIDs.
+
+KeyID 0 (TME key) doesn't support integrity check.  This series chooses
+to NOT reset TDX private memory but leave TDX private memory as-is to the
+new kernel.  As mentioned above, in practice it is safe to do so.
+
+3) One limitation
+
+If the kernel has ever enabled TDX, after kexec the new kernel won't be
+able to use TDX anymore.  This is because when the new kernel tries to
+initialize TDX module it will fail on the first SEAMCALL due to the
+module has already been initialized by the old kernel.
+
+More (non-trivial) work will be needed for the new kernel to use TDX,
+e.g., one solution is to just reload the TDX module from the location
+where BIOS loads the TDX module (/boot/efi/EFI/TDX/).  This series
+doesn't cover this, but leave this as future work.
+
+4) Kdump support
+
+This series also enables kdump with TDX, but no special handling is
+needed for crash kexec (except turning on the Kconfig option):
+
+ - kdump kernel uses reserved memory from the old kernel as system ram,
+   and the old kernel will never use the reserved memory as TDX memory.
+ - /proc/vmcore contains TDX private memory pages.  It's meaningless to
+   read them, but it doesn't do any harm either.
+
+5) TDX "partial write machine check" erratum
+
+On the platform with TDX erratum, a partial write (a write transaction
+of less than a cacheline lands at memory controller) to TDX private
+memory poisons that memory, and a subsequent read triggers machine
+check.  On those platforms, the kernel needs to reset TDX private memory
+before jumping to the new kernel otherwise the new kernel may see
+unexpected machine check.
+
+The kernel currently doesn't track which page is TDX private memory.
+It's not trivial to reset TDX private memory.  For simplicity, this
+series simply disables kexec/kdump for such platforms.  This can be
+enhanced in the future.
+
+
+Kai Huang (7):
+  x86/kexec: Consolidate relocate_kernel() function parameters
+  x86/sme: Use percpu boolean to control WBINVD during kexec
+  x86/virt/tdx: Mark memory cache state incoherent when making SEAMCALL
+  x86/kexec: Disable kexec/kdump on platforms with TDX partial write
+    erratum
+  x86/virt/tdx: Remove the !KEXEC_CORE dependency
+  x86/virt/tdx: Update the kexec section in the TDX documentation
+  KVM: TDX: Explicitly do WBINVD when no more TDX SEAMCALLs
+
+ Documentation/arch/x86/tdx.rst       | 14 ++++-----
+ arch/x86/Kconfig                     |  1 -
+ arch/x86/include/asm/kexec.h         | 12 ++++++--
+ arch/x86/include/asm/processor.h     |  2 ++
+ arch/x86/include/asm/tdx.h           | 27 ++++++++++++++++-
+ arch/x86/kernel/cpu/amd.c            | 17 +++++++++++
+ arch/x86/kernel/machine_kexec_64.c   | 44 ++++++++++++++++++++++------
+ arch/x86/kernel/process.c            | 24 +++++++--------
+ arch/x86/kernel/relocate_kernel_64.S | 36 +++++++++++++++--------
+ arch/x86/kvm/vmx/tdx.c               | 12 ++++++++
+ arch/x86/virt/vmx/tdx/tdx.c          | 16 ++++++++--
+ 11 files changed, 158 insertions(+), 47 deletions(-)
+
+
+base-commit: 4b6b14d20bc04dcab6dd3ad0d5a50a0f473d1c18
+-- 
+2.50.1
+
 
