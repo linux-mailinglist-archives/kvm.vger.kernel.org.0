@@ -1,162 +1,254 @@
-Return-Path: <kvm+bounces-54613-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54614-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D44B1B255C0
-	for <lists+kvm@lfdr.de>; Wed, 13 Aug 2025 23:43:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32B61B255FB
+	for <lists+kvm@lfdr.de>; Wed, 13 Aug 2025 23:53:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B53BF5A3405
-	for <lists+kvm@lfdr.de>; Wed, 13 Aug 2025 21:43:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3646F1C2355C
+	for <lists+kvm@lfdr.de>; Wed, 13 Aug 2025 21:53:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9B562D0C81;
-	Wed, 13 Aug 2025 21:42:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 681232ED15A;
+	Wed, 13 Aug 2025 21:52:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EnBw2Suq"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="K5ljCaeJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D1873009D9
-	for <kvm@vger.kernel.org>; Wed, 13 Aug 2025 21:42:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D68893009ED;
+	Wed, 13 Aug 2025 21:52:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755121369; cv=none; b=n33/J9y2ogIdCoUkaGQFivGus7J1VzLL3UG+LUnBdg0CqMgmskDDuGkYrP3FX3Ns30BjPwyhib/EVvK6WMki517hBjL7V8U5T7VrB6Yd1ZwgMurE43f0dowEgirzu3MBD1LUO8qgIfBbL7AlDp213zRN1rVm5Kjmtz0Bwkrl0DQ=
+	t=1755121952; cv=none; b=OZtYBhDwwFxU9EwUgTwY9FHG1yEKJwk1hIyY08T8Pz9GjdXbfGA9ZtkJrFl6hPDlOZ15VMkts9VMOU0HMEmJAcIeuDkPHDKLHGE/wKeIyWpe1xQ8o+Y3zGBFYvv0jYXF4i+uJH71gcdEwEDZTrN+0gkexmRjCl6B3559g890BZw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755121369; c=relaxed/simple;
-	bh=tZkeNJG/k4HgzLYqAar3VskqfPv4lb2PhM0I5jaFVro=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ApNTEfxzXXcdLc39jiba0JASaCMqhZLr4GzG+J29AcMKShafXgZ6J2ThCTcuMx6Mm+KWWBrbMTPas665FZ44YknWOFqqhziA7dCcP4hoR/qzMz78wAXsDFlxz/UgQz8KXpKxZZaRwBaKgLMaugloIAUlfi1WNBsyiohBBFEf7t0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EnBw2Suq; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1755121364;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HTAMoi7NWHH5SP+IGuvihL6yckezTSZsu/o/az3fetk=;
-	b=EnBw2Suq6KM4W8lgBe8I1D0WhPyJZD00JenfCux3y4YL7Z2+zU+snwLrsmUrRR7Xr3maFm
-	FELyG3uOMYhHyjN7CFlMmpC1iay20lONRNUn6pk8efzA3pj5FcWcOnxPJm+yCOvO7z48k9
-	wfIwXckq0TZW8AatxJ4DX4MglA70GU4=
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
- [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-608-9lTC8LJKMJWHTeuuHC8TOg-1; Wed, 13 Aug 2025 17:42:43 -0400
-X-MC-Unique: 9lTC8LJKMJWHTeuuHC8TOg-1
-X-Mimecast-MFC-AGG-ID: 9lTC8LJKMJWHTeuuHC8TOg_1755121362
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3e56ffd00ccso850315ab.1
-        for <kvm@vger.kernel.org>; Wed, 13 Aug 2025 14:42:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755121362; x=1755726162;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HTAMoi7NWHH5SP+IGuvihL6yckezTSZsu/o/az3fetk=;
-        b=c8NC5sQyq3cAhi+yUDuF1I6z/7Cw9Epa01zk9FYSC43H0oH36O3dQz44H8iwuJ+CiG
-         cJRUPwg/PkQgfDTYJ9PL92YazxIu0zgvmFIe2fAyGe7YoFWd0mRV/84L5by+i1pljghO
-         XdLmlzF3GCgB0MAs58aoDFuWCuJOMFKkmOylOPg7ydRECGwXFF3m0MyGw5AmAvw5A9cv
-         u1uQbps9Kjah1ATrKQMyVP4sQDotqCe/n6zO6wmg1XlSdAbNWIoRUKuQcGU6en068cHF
-         gR8+BsLXNyZcE+dFuv3SLTHpHw1yYCjuNqOBmo5a59kiq/NAR55aRE6Xd73XOfgEowHH
-         Tqwg==
-X-Forwarded-Encrypted: i=1; AJvYcCW6XFSSqsUTjFbxbFtD+lC48TVSmh/HAYf7iujgKqpC8iTSZLhBC/Khh0cOXLlCsDxo7QQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywq41yL5p97oPOunYnE7KckdQG+bSw5H7GgefS8rvraP10fjzfD
-	4QyYMBpewNfsvlgP6dQXkxEpIVsWuel0hZHeHqU/kngmibZ6PsA/TKvx+VebuCkKPxJ7MDi98LS
-	I9QjNvJQP2WJguI2vGWcFr4FBlu0gYTE+t114SO2WYQvsnffNMkS9nA==
-X-Gm-Gg: ASbGncukEk7Ux+PS3gWeXQUL/B/R50oYoQ7t3dv+Ci5pozHOjW1AlYdOFuubVSOr9Gw
-	ZXnNlpmrHPQ6jA9bpJHH30gn4iqyrkp8EIyGlgLVx1QMQitwUTPFLFflWHN0HJmgJ/xUcrovdAr
-	lyuOKnW0pOwKIxsuSl/e9Wgq5jrAsgWGmQOhf9oS6+Uy2K1RGAAWAquYQeW/kj86RsTwCcpgExa
-	i4Ko4jn3Jd1ZtHOUS+1emTgEWpAnYGinZBhF5gF1GeN6L9Iqkl/gD77hmSIta0jguwY8gjNuR0G
-	PJe5vka5ywADf7JRORGC1/2Xo3xB3N7e14Z0azsvwKI=
-X-Received: by 2002:a05:6e02:2584:b0:3e5:4844:4288 with SMTP id e9e14a558f8ab-3e5674d49f8mr22044905ab.6.1755121362411;
-        Wed, 13 Aug 2025 14:42:42 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHDHHohC14gyeTWmYipxt4qFzm7xDJM1ET5AJFLlN2JDY03n+D1PVe+fB7ttkokcVWM8OBRFA==
-X-Received: by 2002:a05:6e02:2584:b0:3e5:4844:4288 with SMTP id e9e14a558f8ab-3e5674d49f8mr22044765ab.6.1755121361989;
-        Wed, 13 Aug 2025 14:42:41 -0700 (PDT)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3e53e6f9c4fsm48989665ab.41.2025.08.13.14.42.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Aug 2025 14:42:41 -0700 (PDT)
-Date: Wed, 13 Aug 2025 15:42:38 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Farhan Ali <alifm@linux.ibm.com>
-Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, schnelle@linux.ibm.com,
- mjrosato@linux.ibm.com
-Subject: Re: [PATCH v1 4/6] vfio-pci/zdev: Setup a zpci memory region for
- error information
-Message-ID: <20250813154238.78794b31.alex.williamson@redhat.com>
-In-Reply-To: <f18e339f-0eb6-4270-9107-58bb70ef0d08@linux.ibm.com>
-References: <20250813170821.1115-1-alifm@linux.ibm.com>
-	<20250813170821.1115-5-alifm@linux.ibm.com>
-	<20250813143028.1eb08bea.alex.williamson@redhat.com>
-	<f18e339f-0eb6-4270-9107-58bb70ef0d08@linux.ibm.com>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1755121952; c=relaxed/simple;
+	bh=Xm/66Xo566UEproqXHXMFzKT0m04y54OApQWydn3QXM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AWnCqEgav8/2LS57rnHlRcNQfojb+IL2yJVMijAN8qfPyOSx5IOBw0A7T1lIDOc9q/EQFtU4TbsRSPrggNxYNzw2wKmncRD7NWKad/MhLIn8R9JKRYxPwhudtHUtQsDKAYLhyPUKlajZZUt3BELa/BoKcEnIhhac8r0xeOkcSmo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=K5ljCaeJ; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57DLc8xi015928;
+	Wed, 13 Aug 2025 21:52:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=hq504y
+	mxo8mQOS0Yhu4JFc54oB1vYk9oDhbefKBmo/M=; b=K5ljCaeJ74YsauctaLHq/0
+	DpngZM1e+uOiEHPJkTGh62UaOkJZ/B+H2pJSpaCuot/qjn7p+ZMISkJgj8b+3yUb
+	F+qUoMlpcGHJSTauM48vhluubVUm77Xg9WivZNkR2IVrNyxvr13rVelq+nSmR9vE
+	o0HSyhKb4cTWUtXzplU9yaCMUiJ8QzsshXjgpw1Sc0zySPubhRm2JO8dVK1vHEfc
+	nfPPEl1q4od1sIe0Mbdbd6suEsjlZNniF3Dc18PK79cyLI6o+ixlj+ck177AgLdf
+	nervxxtuQfM2HDTihukuwzeN9Ud1Pfm55ntDCvZytXAH3SrxT9K5NuS+ldH5qh5g
+	==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48dvrp6rpr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 13 Aug 2025 21:52:28 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 57DJjiM4028585;
+	Wed, 13 Aug 2025 21:52:27 GMT
+Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 48ej5n998d-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 13 Aug 2025 21:52:27 +0000
+Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
+	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 57DLqIui17302124
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 13 Aug 2025 21:52:18 GMT
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 88F995805C;
+	Wed, 13 Aug 2025 21:52:26 +0000 (GMT)
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id DD36F58054;
+	Wed, 13 Aug 2025 21:52:25 +0000 (GMT)
+Received: from [9.61.254.249] (unknown [9.61.254.249])
+	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 13 Aug 2025 21:52:25 +0000 (GMT)
+Message-ID: <7059025f-f337-493d-a50c-ccce8fb4beee@linux.ibm.com>
+Date: Wed, 13 Aug 2025 14:52:24 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 5/6] vfio-pci/zdev: Perform platform specific function
+ reset for zPCI
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, schnelle@linux.ibm.com,
+        mjrosato@linux.ibm.com
+References: <20250813170821.1115-1-alifm@linux.ibm.com>
+ <20250813170821.1115-6-alifm@linux.ibm.com>
+ <20250813143034.36f8c3a4.alex.williamson@redhat.com>
+Content-Language: en-US
+From: Farhan Ali <alifm@linux.ibm.com>
+In-Reply-To: <20250813143034.36f8c3a4.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODEyMDIxOSBTYWx0ZWRfX5snddpIhg4K2
+ 4vy5ksbKN+w/Q5nFJqjRGmC1VmEmhj0sVjlDmb71HN3ItGme93g7mbpmXzIIO3j9rqieAZ5fWOn
+ Eucx8cFkVTc4xzoheyX0SxxZWKKOkEQ7HnKXPoO+7VhyKPEkE+TQzwjuYDzRrK6P0I7PCglQK45
+ tDOjNq/6BVw3jtjXYYUkhrpIQ75Xr3+3U6oJXMBmpc8rpnKRVN9dSv0lVO9922LF88VUTS/jaOZ
+ OYHXeBlYDXs8jf2ku/RQ5KUL9TKpTMt/xUmmPHOl9vQndrkYUB5ioSHr6BmxpJoxsJVcpoiq+Fk
+ XtlIQVKlsV57WdTghSCd/W9Uuc4BcCZ7v+6+XfWQ6yi4DoSbJHVjw5KQ/F9sTDp6G+Tx4yu6AW5
+ 4HXyietX
+X-Authority-Analysis: v=2.4 cv=GrpC+l1C c=1 sm=1 tr=0 ts=689d091c cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+ a=IkcTkHD0fZMA:10 a=2OwXVqhp2XgA:10 a=VnNF1IyMAAAA:8 a=Ke-CEX4gKZVx1ICNS1cA:9
+ a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: v7-alXoa75Z1adO1K5C17f-psVkcKpV1
+X-Proofpoint-ORIG-GUID: v7-alXoa75Z1adO1K5C17f-psVkcKpV1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-13_01,2025-08-11_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 adultscore=0 spamscore=0 impostorscore=0 suspectscore=0
+ phishscore=0 bulkscore=0 priorityscore=1501 malwarescore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2508120219
 
-On Wed, 13 Aug 2025 14:25:59 -0700
-Farhan Ali <alifm@linux.ibm.com> wrote:
 
-> On 8/13/2025 1:30 PM, Alex Williamson wrote:
-> > On Wed, 13 Aug 2025 10:08:18 -0700
-> > Farhan Ali <alifm@linux.ibm.com> wrote:  
-> >> diff --git a/include/uapi/linux/vfio_zdev.h b/include/uapi/linux/vfio_zdev.h
-> >> index 77f2aff1f27e..bcd06f334a42 100644
-> >> --- a/include/uapi/linux/vfio_zdev.h
-> >> +++ b/include/uapi/linux/vfio_zdev.h
-> >> @@ -82,4 +82,9 @@ struct vfio_device_info_cap_zpci_pfip {
-> >>   	__u8 pfip[];
-> >>   };
-> >>   
-> >> +struct vfio_device_zpci_err_region {
-> >> +	__u16 pec;
-> >> +	int pending_errors;
-> >> +};
-> >> +
-> >>   #endif  
-> > If this is uapi it would hopefully include some description, but if
-> > this is the extent of what can be read from the device specific region,
-> > why not just return it via a DEVICE_FEATURE ioctl?  Thanks,
-> >
-> > Alex
-> >  
-> Yes, will add more details about the uapi. My thinking was based on how 
-> we expose some other vfio device information on s390x, such as SCHIB for 
-> vfio-ccw device.
-> 
-> I didn't think about the DEVICE_FEATURE ioctl. But looking into it, it 
-> looks like we would have to define a device feature (for eg: 
-> VFIO_DEVICE_FEATURE_ZPCI_ERROR), and expose this information via 
-> GET_FEATURE?
+On 8/13/2025 1:30 PM, Alex Williamson wrote:
+> On Wed, 13 Aug 2025 10:08:19 -0700
+> Farhan Ali <alifm@linux.ibm.com> wrote:
+>
+>> For zPCI devices we should drive a platform specific function reset
+>> as part of VFIO_DEVICE_RESET. This reset is needed recover a zPCI device
+>> in error state.
+>>
+>> Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
+>> ---
+>>   arch/s390/pci/pci.c              |  1 +
+>>   drivers/vfio/pci/vfio_pci_core.c |  4 ++++
+>>   drivers/vfio/pci/vfio_pci_priv.h |  5 ++++
+>>   drivers/vfio/pci/vfio_pci_zdev.c | 39 ++++++++++++++++++++++++++++++++
+>>   4 files changed, 49 insertions(+)
+>>
+>> diff --git a/arch/s390/pci/pci.c b/arch/s390/pci/pci.c
+>> index f795e05b5001..860a64993b58 100644
+>> --- a/arch/s390/pci/pci.c
+>> +++ b/arch/s390/pci/pci.c
+>> @@ -788,6 +788,7 @@ int zpci_hot_reset_device(struct zpci_dev *zdev)
+>>   
+>>   	return rc;
+>>   }
+>> +EXPORT_SYMBOL_GPL(zpci_hot_reset_device);
+>>   
+>>   /**
+>>    * zpci_create_device() - Create a new zpci_dev and add it to the zbus
+>> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+>> index 7dcf5439dedc..7220a22135a9 100644
+>> --- a/drivers/vfio/pci/vfio_pci_core.c
+>> +++ b/drivers/vfio/pci/vfio_pci_core.c
+>> @@ -1227,6 +1227,10 @@ static int vfio_pci_ioctl_reset(struct vfio_pci_core_device *vdev,
+>>   	 */
+>>   	vfio_pci_set_power_state(vdev, PCI_D0);
+>>   
+>> +	ret = vfio_pci_zdev_reset(vdev);
+>> +	if (ret && ret != -ENODEV)
+>> +		return ret;
+>> +
+>>   	ret = pci_try_reset_function(vdev->pdev);
+>>   	up_write(&vdev->memory_lock);
+> You're going to be very unhappy if this lock isn't released.
+>
+Ah yes, thanks for catching that. Will fix this.
 
-Yes, and there's a probe capability built-in to determine support.
+>
+>>   
+>> diff --git a/drivers/vfio/pci/vfio_pci_priv.h b/drivers/vfio/pci/vfio_pci_priv.h
+>> index a9972eacb293..5288577b3170 100644
+>> --- a/drivers/vfio/pci/vfio_pci_priv.h
+>> +++ b/drivers/vfio/pci/vfio_pci_priv.h
+>> @@ -86,6 +86,7 @@ int vfio_pci_info_zdev_add_caps(struct vfio_pci_core_device *vdev,
+>>   				struct vfio_info_cap *caps);
+>>   int vfio_pci_zdev_open_device(struct vfio_pci_core_device *vdev);
+>>   void vfio_pci_zdev_close_device(struct vfio_pci_core_device *vdev);
+>> +int vfio_pci_zdev_reset(struct vfio_pci_core_device *vdev);
+>>   #else
+>>   static inline int vfio_pci_info_zdev_add_caps(struct vfio_pci_core_device *vdev,
+>>   					      struct vfio_info_cap *caps)
+>> @@ -100,6 +101,10 @@ static inline int vfio_pci_zdev_open_device(struct vfio_pci_core_device *vdev)
+>>   
+>>   static inline void vfio_pci_zdev_close_device(struct vfio_pci_core_device *vdev)
+>>   {}
+>> +int vfio_pci_zdev_reset(struct vfio_pci_core_device *vdev)
+>> +{
+>> +	return -ENODEV;
+>> +}
+>>   #endif
+>>   
+>>   static inline bool vfio_pci_is_vga(struct pci_dev *pdev)
+>> diff --git a/drivers/vfio/pci/vfio_pci_zdev.c b/drivers/vfio/pci/vfio_pci_zdev.c
+>> index 818235b28caa..dd1919ccb3be 100644
+>> --- a/drivers/vfio/pci/vfio_pci_zdev.c
+>> +++ b/drivers/vfio/pci/vfio_pci_zdev.c
+>> @@ -212,6 +212,45 @@ static int vfio_pci_zdev_setup_err_region(struct vfio_pci_core_device *vdev)
+>>   	return ret;
+>>   }
+>>   
+>> +int vfio_pci_zdev_reset(struct vfio_pci_core_device *vdev)
+>> +{
+>> +	struct zpci_dev *zdev = to_zpci(vdev->pdev);
+>> +	int rc = -EIO;
+>> +
+>> +	if (!zdev)
+>> +		return -ENODEV;
+>> +
+>> +	/*
+>> +	 * If we can't get the zdev->state_lock the device state is
+>> +	 * currently undergoing a transition and we bail out - just
+>> +	 * the same as if the device's state is not configured at all.
+>> +	 */
+>> +	if (!mutex_trylock(&zdev->state_lock))
+>> +		return rc;
+>> +
+>> +	/* We can reset only if the function is configured */
+>> +	if (zdev->state != ZPCI_FN_STATE_CONFIGURED)
+>> +		goto out;
+>> +
+>> +	rc = zpci_hot_reset_device(zdev);
+>> +	if (rc != 0)
+>> +		goto out;
+>> +
+>> +	if (!vdev->pci_saved_state) {
+>> +		pci_err(vdev->pdev, "No saved available for the device");
+>> +		rc = -EIO;
+>> +		goto out;
+>> +	}
+>> +
+>> +	pci_dev_lock(vdev->pdev);
+>> +	pci_load_saved_state(vdev->pdev, vdev->pci_saved_state);
+>> +	pci_restore_state(vdev->pdev);
+>> +	pci_dev_unlock(vdev->pdev);
+>> +out:
+>> +	mutex_unlock(&zdev->state_lock);
+>> +	return rc;
+>> +}
+> This looks like it should be a device or arch specific reset
+> implemented in drivers/pci, not vfio.  Thanks,
+>
+> Alex
 
-> If the preference is to use the DEVICE_FEATURE ioctl I can 
-> try that. Curious, any specific reason you prefer the DEVICE_FEATURE 
-> ioctl to the memory region?
+Are you suggesting to move this to an arch specific function? One thing 
+we need to do after the zpci_hot_reset_device, is to correctly restore 
+the config space of the device. And for vfio-pci bound devices we want 
+to restore the state of the device to when it was initially opened.
 
-Given our current segmenting of the vfio device fd, we're using 40-bits
-of address space for a 6-byte structure.  We're returning structured
-data that has no requirement to be read at arbitrary offsets and
-lengths.  For example, does this series really even handle a short
-read?  We adjust counters for any read, it's more prone to those sorts
-of errors.
+Thanks
+Farhan
 
-Maybe if you actually wanted to allow the user to mmap the error array
-buffer and move the head as they read data while the kernel
-asynchronously fills from the tail, it might make sense to use a
-region, but as used here I don't think it's the right interface.
-Thanks,
 
-Alex
-
+>
+>> +
+>>   int vfio_pci_zdev_open_device(struct vfio_pci_core_device *vdev)
+>>   {
+>>   	struct zpci_dev *zdev = to_zpci(vdev->pdev);
 
