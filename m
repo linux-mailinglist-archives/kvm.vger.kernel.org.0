@@ -1,78 +1,78 @@
-Return-Path: <kvm+bounces-54677-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54678-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F08EB26BD2
-	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 18:04:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0F3AB26BD1
+	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 18:04:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E060AC0F3B
-	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 15:56:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E85295C3F07
+	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 15:56:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88E8B222560;
-	Thu, 14 Aug 2025 15:56:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA41E253F15;
+	Thu, 14 Aug 2025 15:56:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="fiz69Bs3"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="pMktD8Mo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60B2A204680
-	for <kvm@vger.kernel.org>; Thu, 14 Aug 2025 15:56:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76B9F21B9CD
+	for <kvm@vger.kernel.org>; Thu, 14 Aug 2025 15:56:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755186967; cv=none; b=hYsiYubbQHXQZKLHmwe1YNd8/dOqdl74Mmx2qnlvhPdKmmVr3aMbJbNan0CO1MlEMPtweziw13FIlLeqbB+bMnkLA5cNACwKw61X4aVWsMvm3NlVR6XxdOxoVrx2S4Yo+v3tkjTowEYpuGz096XlRM2OqHtkPERcOWQXfnjdDK0=
+	t=1755186973; cv=none; b=rfaCKiN2ZRDDH9kZwfUxir3h2zdewkDa0RXhJFCzYSlgpK7iuZ72KCZAmXl3xmeQ6/AW2GTWplihB9ixHok6kc2spFvkC2CbUTI8gLuEiV31HAOeJ+9vK4qB1pTj+lKoSn4Lkvm70ZWs8meDDhuh+wX6yUe3EyIiimDeztlWyAc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755186967; c=relaxed/simple;
-	bh=AMl3xYJNuSAGeF7OLy/Kzv4+2drH4oPVNI0DIJBBJPI=;
+	s=arc-20240116; t=1755186973; c=relaxed/simple;
+	bh=OAG+rNqDoUjd+RELKmOJev7nbWr03ivllHVNaYObMaA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=O6G2Rw44RPBjkpNemh7k4fI9kjvOblgSlSRqlft0ZolckG8MhFovhkpkAuQFlRSQx/bEuvLxP9QwR/v+rSVZoAJdK9q5T2gKwwWknz7+M2IzwUWtzU8+/z9rCxcs1+1uObz7djznY8AKqFf3jczKwqZ/ATE7s+9sPaYnf4maTOw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=fiz69Bs3; arc=none smtp.client-ip=209.85.214.178
+	 MIME-Version; b=rybwIbTLSF4zWFLHzCDh7+k8qIhw+/Cu3MdnxXVVhQbHX0PzzFVQGQntMHeMhwc/7RTBW7BdahIfK7ubbXpYZsoPFE4SVdMDO3Ja3nCZ+AD0o/+ejromrdfvlT+P2HmG0R4ZD9id3TNGvnhIBmqeJ9Hfvn+QmP5liA7w+a4cyZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=pMktD8Mo; arc=none smtp.client-ip=209.85.216.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-24457f47492so7787905ad.0
-        for <kvm@vger.kernel.org>; Thu, 14 Aug 2025 08:56:06 -0700 (PDT)
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-32326e66dbaso846129a91.3
+        for <kvm@vger.kernel.org>; Thu, 14 Aug 2025 08:56:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1755186966; x=1755791766; darn=vger.kernel.org;
+        d=ventanamicro.com; s=google; t=1755186972; x=1755791772; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Bm60/2Cr4w6uAzbvsdcbKrh6VNvMu+/Ils5A4Kn+0Hk=;
-        b=fiz69Bs38/4zeuGfhRlrC409rA6lEj1VYNmfke5l81TWzPBup8G8xjG+Ix46y4RGnD
-         tANIVvox1Lw+H8k6HCjSBfy475Iao8yS1/4G7BtiaPYU9pxFCHqtFJ+iwmpGHPOk7S4/
-         SgvIYlk+1XRCUhPURCkSVHCFCNaLG70zX+XwHwSE8/XrzPrErUWjAWfU+t6Bd4/dpIRE
-         OMSq8M3wYKY8Cpt1pEGXOaZ/LjyKOOiJBWLXe3yYgpODVdVSabxAKEvbI4W79O5fw2j/
-         jrPsFqMgYeNvQX0Uq41CqV4WgUX7mPhmb8ZGwbNawawJAnvIIAFs+v6qp9Nu0ZDIIcCb
-         jAow==
+        bh=OQNPbIdIHYbwO34hliHe+Dii/8OaWGaAGknLYtaJxxA=;
+        b=pMktD8MouJMxo1PUfAaF8LwL+zPcEnU6aEoOkbLnL6s/wlBJpCrRc06YCdT2wHw3kt
+         ad7hIkubt4AX2LaAnQOCPIxuxaDxAM5xSVoYkHyUqC9cG05v8h/91QwGWuy+E3KGf8Sw
+         KnLBkYUsGjx/o5WQCeBmBb7XD4vNMSFAHKwUHYXJo1Ula7XPC/uhRMBlpVs773rDx7NF
+         aJTmc4rQe2Ktyaqa9qs6FD8Xcn0Liy7xob1RUPGeP+i8sXTQxj/9DUUOSorYb/yXWrO4
+         9uiV2a3CIJZ5NAGv88OoQxY4HkHfaRDyHSE1cEOBx16S+Rw130XsvE7EI9kKS3WCNUzR
+         kCJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755186966; x=1755791766;
+        d=1e100.net; s=20230601; t=1755186972; x=1755791772;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Bm60/2Cr4w6uAzbvsdcbKrh6VNvMu+/Ils5A4Kn+0Hk=;
-        b=nxW1IBPXGvj5BApSpNBimdiL1naB5JENm4IUJvhmW+LpeuN3Kf3IgH8tnaVti8kRHY
-         U4LfFOZ+1+wgsd4O2c1hHG2K27nJioYZzzuHSGdQghBf5uEEA7IJwM7aaRn9dpwjg2jp
-         AvXvqeyOvaQBUzXbWQGoL+0sYKquZtrS+mjGcCu6a76okaWuCpiaRdYzQixH260ea6Gs
-         ODjrey8FIsXcLyB+d2QEmxBtaH/yKJZnyEhMbhNbIMp+xDaSqL6xqc3qcHuBdzGWJu2m
-         PQOkFhNQi+lwF1BaTGR4mNdQh62zjO5vBvf89AEH/FMGXNRPzIGrEft0G/IbR8y4Ettl
-         jLyw==
-X-Forwarded-Encrypted: i=1; AJvYcCWLOw38S+O/dZY0cnrrdLCPvyi5gPe+clKZ7KzAgeMjZ1nI1vTF/W4S85xFF8UWuEZSUfM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJEJyCEdkQiwMRROyvtx55qMnw7c+Gcw1IVv8+4J3p558sT6Gd
-	QLxNJFHVQZEZm12c0ny8HARXbPc54NtSmqij+bWSA1B5SG7P+Sm7VP1SsKkWKHSzkMo=
-X-Gm-Gg: ASbGncuRhNFi1rtf/q8dpGmmvU3nm5aISdF+t/Rro7cRz74yGB3EFGrfh2fYWtT5Uen
-	X1A0q1NsKaD/aXGD0/mT6mc5ItoJtJV6iYMhmxKrlxZLuHsMEpcxaSb6uwcG7z5s5q6HI75lkdV
-	dTxCGKXy5/QxtULmJbDTYVJT3hgLuNvi3PO9gqkWjzS7VKBIX0zzhbrhU6IeMPvcJKTrN3WQcLx
-	/P9SzrAtWE74l26sRyM8dEHfyhdVV9rabJ6dhpJy+xR4cvYrO8Y4aoiCQj0gWG+P6NtVK6k7vdT
-	WAonAJelFHICPiLKZlPRjqHNKPcTRFeycrHU2LsZN1KaXT3Ojiz2ryvds7NdxnMMS4VKuUcNQIb
-	ogQss8r877I77YzLfsXads/pXS9nDHXTCuQyqDI58rJ1tnOj5Fng/R8QvQOPgqQ==
-X-Google-Smtp-Source: AGHT+IFZMx0P1JKNMfotkf1h9uD05/LbUJ3nHS+qqEqkenBGx5Rm/Php8OZMQlv5/iu6GkzqmdURRg==
-X-Received: by 2002:a17:902:cccb:b0:23f:f065:f2be with SMTP id d9443c01a7336-244586a0e5bmr50715635ad.26.1755186965537;
-        Thu, 14 Aug 2025 08:56:05 -0700 (PDT)
+        bh=OQNPbIdIHYbwO34hliHe+Dii/8OaWGaAGknLYtaJxxA=;
+        b=s5mJ85S1Xsua0ULNB1xtt5Wv69eUQAntvvMMI0JesfNKEBBmU4hcR8b9h7kKtMTdjR
+         7Iyjm/wFsxavduwRyLv3bac625i3pGOoPS3hxnc6dc5C0pAVFOKKBMXr6QYAtcIDVRbQ
+         CmzLvZVhBgqZhBzWSwDMlMvUBAnjbYqzixuVAd2ECp6MEnPdUgI5ja39WzVdrc5UVIz4
+         XSiYe77QFY+Yi5hzk/thaGUZ3HuGcLW6fjhiE/4s06/CKwS+Nro9snAC8Kudq3ezA+m5
+         zEWZtWA5kV/CjYMXK5tQgEYS+SOST4VvM0B0JKyxSMqWwibmbmC0wUBXVzoOf8/fREYN
+         oIKw==
+X-Forwarded-Encrypted: i=1; AJvYcCU0c/Mj7RhNVYC8S/wDGl+DwyZGeuMIyGtVSP7+4sUo8ffdfFblleIh8oy/wvT4eoLwktg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy65kthyCBGFJtvznu3L25OR5YXKDLTEJid77A0wYTvtd9OYtWy
+	pR/lWkG9DjW9niXWnmD7WhH/ZNPv6K52n+hG+9h7MvAzpnw1e9WWJzAsMpPTIS8nzds=
+X-Gm-Gg: ASbGncv+VjcThfuczdRsbwhVzYQC9MM+dcWFbXrv1zATg1d9gxqxOFjZ20qPMT11WVk
+	S186NpLiLgv6UKlIAxxdliD6zeXudQZvv5tTUUDJnVX9bzADUByhhMOf/Sk+Lhlfo59RICp6aqy
+	/xOMUTjHz8xxfilywccmctHKB62Rz89nYhkf1Gj2xSiVrK3WqRDuD3DbHYGONtBzHPEvVSfcrbz
+	SuDrMtawOJilDlMjyBDjICUHEE5GQIh3Ijg72iETwFvtMf38KQhgzrXOSjo8tPR/pKX2e4NWoVs
+	7bfRmcUsFnfoy2g2XQgA/4R3bn5tmi0/bKhfnlyaeZWr4V9zyyWwyb5itWrlEwCShxYXM/WCjOa
+	VAzQl5V1ZmXcm397bRPfG3IzA8GXPJsVctpZBz0d6aHr+9UFK4ke8Vdh8uSR5Lw==
+X-Google-Smtp-Source: AGHT+IEH2lHONmY7yOykbcxyMlWHAYogmXhk5h922kUnrQe0tO8VefaBP+3/9ekNxpfG4JCDWaX1hA==
+X-Received: by 2002:a17:90b:5303:b0:312:1c83:58e9 with SMTP id 98e67ed59e1d1-3232795877emr5105743a91.5.1755186971369;
+        Thu, 14 Aug 2025 08:56:11 -0700 (PDT)
 Received: from anup-ubuntu-vm.localdomain ([103.97.166.196])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3233108e1d9sm2225500a91.29.2025.08.14.08.56.00
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3233108e1d9sm2225500a91.29.2025.08.14.08.56.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Aug 2025 08:56:05 -0700 (PDT)
+        Thu, 14 Aug 2025 08:56:10 -0700 (PDT)
 From: Anup Patel <apatel@ventanamicro.com>
 To: Atish Patra <atish.patra@linux.dev>
 Cc: Palmer Dabbelt <palmer@dabbelt.com>,
@@ -88,9 +88,9 @@ Cc: Palmer Dabbelt <palmer@dabbelt.com>,
 	linux-kernel@vger.kernel.org,
 	linux-kselftest@vger.kernel.org,
 	Anup Patel <apatel@ventanamicro.com>
-Subject: [PATCH 1/6] RISC-V: KVM: Set initial value of hedeleg in kvm_arch_vcpu_create()
-Date: Thu, 14 Aug 2025 21:25:43 +0530
-Message-ID: <20250814155548.457172-2-apatel@ventanamicro.com>
+Subject: [PATCH 2/6] RISC-V: KVM: Introduce feature specific reset for SBI FWFT
+Date: Thu, 14 Aug 2025 21:25:44 +0530
+Message-ID: <20250814155548.457172-3-apatel@ventanamicro.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250814155548.457172-1-apatel@ventanamicro.com>
 References: <20250814155548.457172-1-apatel@ventanamicro.com>
@@ -102,36 +102,93 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The hedeleg may be updated by ONE_REG interface before the VCPU
-is run at least once hence set the initial value of hedeleg in
-kvm_arch_vcpu_create() instead of kvm_riscv_vcpu_setup_config().
+The SBI FWFT feature values must be reset upon VCPU reset so
+introduce feature specific reset callback for this purpose.
 
 Signed-off-by: Anup Patel <apatel@ventanamicro.com>
 ---
- arch/riscv/kvm/vcpu.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ arch/riscv/kvm/vcpu_sbi_fwft.c | 30 ++++++++++++++++++++++++++++--
+ 1 file changed, 28 insertions(+), 2 deletions(-)
 
-diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-index f001e56403f9..86025f68c374 100644
---- a/arch/riscv/kvm/vcpu.c
-+++ b/arch/riscv/kvm/vcpu.c
-@@ -133,6 +133,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+diff --git a/arch/riscv/kvm/vcpu_sbi_fwft.c b/arch/riscv/kvm/vcpu_sbi_fwft.c
+index 164a01288b0a..5a3bad0f9330 100644
+--- a/arch/riscv/kvm/vcpu_sbi_fwft.c
++++ b/arch/riscv/kvm/vcpu_sbi_fwft.c
+@@ -30,6 +30,13 @@ struct kvm_sbi_fwft_feature {
+ 	 */
+ 	bool (*supported)(struct kvm_vcpu *vcpu);
  
- 	/* Mark this VCPU never ran */
- 	vcpu->arch.ran_atleast_once = false;
++	/**
++	 * @reset: Reset the feature value irrespective whether feature is supported or not
++	 *
++	 * This callback is mandatory
++	 */
++	void (*reset)(struct kvm_vcpu *vcpu);
 +
-+	vcpu->arch.cfg.hedeleg = KVM_HEDELEG_DEFAULT;
- 	vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
- 	bitmap_zero(vcpu->arch.isa, RISCV_ISA_EXT_MAX);
- 
-@@ -570,7 +572,6 @@ static void kvm_riscv_vcpu_setup_config(struct kvm_vcpu *vcpu)
- 			cfg->hstateen0 |= SMSTATEEN0_SSTATEEN0;
- 	}
- 
--	cfg->hedeleg = KVM_HEDELEG_DEFAULT;
- 	if (vcpu->guest_debug)
- 		cfg->hedeleg &= ~BIT(EXC_BREAKPOINT);
+ 	/**
+ 	 * @set: Set the feature value
+ 	 *
+@@ -75,6 +82,13 @@ static bool kvm_sbi_fwft_misaligned_delegation_supported(struct kvm_vcpu *vcpu)
+ 	return misaligned_traps_can_delegate();
  }
+ 
++static void kvm_sbi_fwft_reset_misaligned_delegation(struct kvm_vcpu *vcpu)
++{
++	struct kvm_vcpu_config *cfg = &vcpu->arch.cfg;
++
++	cfg->hedeleg &= ~MIS_DELEG;
++}
++
+ static long kvm_sbi_fwft_set_misaligned_delegation(struct kvm_vcpu *vcpu,
+ 					struct kvm_sbi_fwft_config *conf,
+ 					unsigned long value)
+@@ -124,6 +138,11 @@ static bool kvm_sbi_fwft_pointer_masking_pmlen_supported(struct kvm_vcpu *vcpu)
+ 	return fwft->have_vs_pmlen_7 || fwft->have_vs_pmlen_16;
+ }
+ 
++static void kvm_sbi_fwft_reset_pointer_masking_pmlen(struct kvm_vcpu *vcpu)
++{
++	vcpu->arch.cfg.henvcfg &= ~ENVCFG_PMM;
++}
++
+ static long kvm_sbi_fwft_set_pointer_masking_pmlen(struct kvm_vcpu *vcpu,
+ 						   struct kvm_sbi_fwft_config *conf,
+ 						   unsigned long value)
+@@ -180,6 +199,7 @@ static const struct kvm_sbi_fwft_feature features[] = {
+ 	{
+ 		.id = SBI_FWFT_MISALIGNED_EXC_DELEG,
+ 		.supported = kvm_sbi_fwft_misaligned_delegation_supported,
++		.reset = kvm_sbi_fwft_reset_misaligned_delegation,
+ 		.set = kvm_sbi_fwft_set_misaligned_delegation,
+ 		.get = kvm_sbi_fwft_get_misaligned_delegation,
+ 	},
+@@ -187,6 +207,7 @@ static const struct kvm_sbi_fwft_feature features[] = {
+ 	{
+ 		.id = SBI_FWFT_POINTER_MASKING_PMLEN,
+ 		.supported = kvm_sbi_fwft_pointer_masking_pmlen_supported,
++		.reset = kvm_sbi_fwft_reset_pointer_masking_pmlen,
+ 		.set = kvm_sbi_fwft_set_pointer_masking_pmlen,
+ 		.get = kvm_sbi_fwft_get_pointer_masking_pmlen,
+ 	},
+@@ -321,11 +342,16 @@ static void kvm_sbi_ext_fwft_deinit(struct kvm_vcpu *vcpu)
+ 
+ static void kvm_sbi_ext_fwft_reset(struct kvm_vcpu *vcpu)
+ {
+-	int i;
+ 	struct kvm_sbi_fwft *fwft = vcpu_to_fwft(vcpu);
++	const struct kvm_sbi_fwft_feature *feature;
++	int i;
+ 
+-	for (i = 0; i < ARRAY_SIZE(features); i++)
++	for (i = 0; i < ARRAY_SIZE(features); i++) {
+ 		fwft->configs[i].flags = 0;
++		feature = &features[i];
++		if (feature->reset)
++			feature->reset(vcpu);
++	}
+ }
+ 
+ const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_fwft = {
 -- 
 2.43.0
 
