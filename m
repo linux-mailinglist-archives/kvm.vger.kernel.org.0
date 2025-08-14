@@ -1,174 +1,111 @@
-Return-Path: <kvm+bounces-54673-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54674-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE1F0B26855
-	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 16:01:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 764C0B26B48
+	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 17:43:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 93E6E1CE3023
-	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 13:54:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 09C88AA2BF9
+	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 15:39:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B3EB3002AC;
-	Thu, 14 Aug 2025 13:54:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BE7023815C;
+	Thu, 14 Aug 2025 15:37:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="daEOp3lt"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JUZxW4yo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCC0A2FD7C4
-	for <kvm@vger.kernel.org>; Thu, 14 Aug 2025 13:54:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C8A4221F11
+	for <kvm@vger.kernel.org>; Thu, 14 Aug 2025 15:37:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755179660; cv=none; b=MmcAR4o/mXhG5/nnhIxH2l5JTMa2m6OqXsoTPwRat9zwv4MJryL+db0nLPuPr/2hb3t5tZ6cOtGUSE2gaulLxe0ZRZ0bpOep1BsoMcpSTc1ecL1lN7/0Q8yu60E+DCbykRRWFwe5tI26vIuwnD20ZDKAYs5XkF/1YvaLWjrhZFc=
+	t=1755185837; cv=none; b=oHyF3/Ed7wEueL/PKAaCwYKJs4IGqBfCYOYI8nE0rQTU2nFe+LK1R3FJCJ7W2Sq+WaryKTAoLhXvTocld4BS/nhqD7HBJt+tpM5Oa62CFIGdIb2ExcxbZHDBeAD3k07/5EUrgM3CyC730QUCN0msAln3NlwrZIiVoATSXI/Pg84=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755179660; c=relaxed/simple;
-	bh=KWKFgqrMEJy2qGnil2Tx3WqFtti1rmJ94E5W+NOYgfQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=m2+2Ec0Lk9vDonnbwSjjRxhH83tePG2Zsc5RazZK3lwnaWX8tqbrR9P/J9n7lp1z2xhJNMeZEAD4hzeGT1hV1UJuOQ3gQ0zRR8kOXlPvKXjttlAUssW4+nes7GSqRAWz2XAuhywXJsP+wq0Pcucm8cnfBpkMY0rS9QmkmiKXbko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=daEOp3lt; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2445806dc88so21630185ad.1
-        for <kvm@vger.kernel.org>; Thu, 14 Aug 2025 06:54:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755179657; x=1755784457; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fyJbJM7IcaPznn76owPMykg8NkcmrFg15/R109Uu1ck=;
-        b=daEOp3ltqygQImLZYCZquqGbiwlptr3iwtVy3qeFQ4At3ZBnNZ14HVgdDyEG0MmmDS
-         q0DJRRkeJ03xjRA4HwXq5CBLdF4EqR9gW1GFm++70fPNwfXIsh38Z4dKdxlQLHk46Gfx
-         BpKEN7PaZgMxlYvoL1y73wdXLBNe/UkjuT1NEmsas6yeFDnX2YHeFtfvWwaylRp9AcWN
-         QqXMvHKemnRL5E1MsFhq8/XHV0NIIS36+koHlI75fbf0USbItXn0sHQGgtXXadpdSsxZ
-         JjrEX5YKf4/+LKU8W1F278Jz9l/iRp5glDvg/65p1ZxTUGKK5INspbnHDS18quqqptJ+
-         fJsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755179657; x=1755784457;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fyJbJM7IcaPznn76owPMykg8NkcmrFg15/R109Uu1ck=;
-        b=BBwyBsS1Va7+SrMu6X1moaIOIoDS0KNPaPLMYhlpBWWymyoQG9IhvMCWciaRVUH4mt
-         60rKnaEEgWH2dCLCleuqP4Bs8Z9Rja9GLhzjIKi6Ge0yutIHEqoTG3j2v2YX6uL9jubR
-         26E2luuiCqwaAApbEcTD4zBfLhocqJUYx6vJCBdagvVIZC6JRxrmuh3BtG53G6BwVT25
-         7W2Y6lom8hfJTC3w7xqrfu1b4KoGsSuAAVdCrAMYit0QrjA5Xvkmvr6Yb6wmsFFW3dxl
-         IeCKvxYP8/V34pdvBD8lE7vJtRCkmScJYjD072SmyePbra5D5SGOt+CA2oUfvcwluGKp
-         1ysw==
-X-Forwarded-Encrypted: i=1; AJvYcCWYw/fOzPLv7HuDp6/sJrdAtAndvpUCSJ8R82ILkDjiahF4F/IYmKJ5m31Mn3XTGGrejH8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZvOV7e/I3cScwrU02IqveAbUNTaeOhyfkes6Cyn00+QnG7RVp
-	ts052DqT7fCzEejKvsxVsawwL3wRoG3MapgZ7Qg0noSR2BU4Qt1vM52AE+KfkTnXonec23ntpOv
-	K0gFHJQ==
-X-Google-Smtp-Source: AGHT+IFc8rQwzFNm90sVJBEONFTj6biaSgb+iwPmQbSfN/V2e/NQZ+17pol+42jKlhGZTUb4jbGQNph1iaE=
-X-Received: from plry14.prod.google.com ([2002:a17:902:b48e:b0:240:72c0:cc89])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ced0:b0:23f:e869:9a25
- with SMTP id d9443c01a7336-244586dc38bmr53125045ad.44.1755179657224; Thu, 14
- Aug 2025 06:54:17 -0700 (PDT)
-Date: Thu, 14 Aug 2025 06:54:14 -0700
-In-Reply-To: <d8993692714829a2b1671412cdd684781c43d54a.1755126788.git.kai.huang@intel.com>
+	s=arc-20240116; t=1755185837; c=relaxed/simple;
+	bh=hxSIafXsx9an4E+vcQeVB9G4uYPF3+kWdjB3T1mRY1g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=M2iMfoi/IC5ZMZoTBZCDuC/5ARTGQLqBg9yO/zzJmJjqmY+eOCirGzeHbNY/vY+RQb3USVWxkO/CYO4zTaBIMvBhchchXm6fvIc9SrNCqjc57zs/bHSHMI0IhuqzqSBh/lEIVaR5nr+i+Evcdjwj47k/icl0UCOAPln0sF2sCuQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JUZxW4yo; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1755185835;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=BWVZNpJ+a0PIHspgQN4Czmo/fHV9NZtAaa91nIG8i0A=;
+	b=JUZxW4yoXlWmg6dVGQNMnhGw27TtcKhKpNFsg6pWl3GE75OsY5asF2/LhZZu/RfhgmC1RO
+	ITLge4uxYA7OsOMSDXHabwFFqNm0ntrcNcGi24/aYwiN0VB5pEPRrfWLgFWnqrnu0OTtRy
+	JWifLfJ7ZBxvA166SppqLe3B82q96MI=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-31-ygL-BbCSODGIqeFBMxv3QQ-1; Thu,
+ 14 Aug 2025 11:37:12 -0400
+X-MC-Unique: ygL-BbCSODGIqeFBMxv3QQ-1
+X-Mimecast-MFC-AGG-ID: ygL-BbCSODGIqeFBMxv3QQ_1755185831
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 099DF1977681;
+	Thu, 14 Aug 2025 15:37:11 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.44.32.79])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 812A719327C0;
+	Thu, 14 Aug 2025 15:37:09 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: kvm@vger.kernel.org
+Cc: Cristian Marussi <cristian.marussi@arm.com>,
+	Will Deacon <will@kernel.org>
+Subject: [PATCH kvmtool] virtio/pci: explicit zero unknown devices features
+Date: Thu, 14 Aug 2025 17:37:02 +0200
+Message-ID: <ed62443b8fd3fef87bd313a54f821cf363f647a5.1755185758.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <cover.1755126788.git.kai.huang@intel.com> <d8993692714829a2b1671412cdd684781c43d54a.1755126788.git.kai.huang@intel.com>
-Message-ID: <aJ3qhtzwHIRPrLK7@google.com>
-Subject: Re: [PATCH v6 7/7] KVM: TDX: Explicitly do WBINVD when no more TDX SEAMCALLs
-From: Sean Christopherson <seanjc@google.com>
-To: Kai Huang <kai.huang@intel.com>
-Cc: dave.hansen@intel.com, bp@alien8.de, tglx@linutronix.de, 
-	peterz@infradead.org, mingo@redhat.com, hpa@zytor.com, 
-	thomas.lendacky@amd.com, x86@kernel.org, kas@kernel.org, 
-	rick.p.edgecombe@intel.com, dwmw@amazon.co.uk, linux-kernel@vger.kernel.org, 
-	pbonzini@redhat.com, kvm@vger.kernel.org, reinette.chatre@intel.com, 
-	isaku.yamahata@intel.com, dan.j.williams@intel.com, ashish.kalra@amd.com, 
-	nik.borisov@suse.com, chao.gao@intel.com, sagis@google.com, 
-	farrah.chen@intel.com, Binbin Wu <binbin.wu@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Thu, Aug 14, 2025, Kai Huang wrote:
->  arch/x86/include/asm/tdx.h  |  2 ++
->  arch/x86/kvm/vmx/tdx.c      | 12 ++++++++++++
->  arch/x86/virt/vmx/tdx/tdx.c | 12 ++++++++++++
->  3 files changed, 26 insertions(+)
-> 
-> diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
-> index 0922265c6bdc..e9a213582f03 100644
-> --- a/arch/x86/include/asm/tdx.h
-> +++ b/arch/x86/include/asm/tdx.h
-> @@ -217,6 +217,7 @@ u64 tdh_mem_page_remove(struct tdx_td *td, u64 gpa, u64 level, u64 *ext_err1, u6
->  u64 tdh_phymem_cache_wb(bool resume);
->  u64 tdh_phymem_page_wbinvd_tdr(struct tdx_td *td);
->  u64 tdh_phymem_page_wbinvd_hkid(u64 hkid, struct page *page);
-> +void tdx_cpu_flush_cache(void);
->  #else
->  static inline void tdx_init(void) { }
->  static inline int tdx_cpu_enable(void) { return -ENODEV; }
-> @@ -224,6 +225,7 @@ static inline int tdx_enable(void)  { return -ENODEV; }
->  static inline u32 tdx_get_nr_guest_keyids(void) { return 0; }
->  static inline const char *tdx_dump_mce_info(struct mce *m) { return NULL; }
->  static inline const struct tdx_sys_info *tdx_get_sysinfo(void) { return NULL; }
-> +static inline void tdx_cpu_flush_cache(void) { }
+The linux kernel implementation for the virtio_net driver recently
+gained support for virtio features above the 64th bit.
 
-Stub is unnecessary.  tdx.c is built iff KVM_INTEL_TDX=y, and that depends on
-INTEL_TDX_HOST.
+It relies on the hypervisor to clear the features data for unknown /
+unsupported features range.
 
-At a glance, some of the existing stubs are useless as well.
+The current pci-modern implementation, in such scenario, leaves the
+data memory untouched, which causes the guest kernel assuming "random"
+features are supported (and possibly leaks host memory contents).
 
->  #endif	/* CONFIG_INTEL_TDX_HOST */
->  
->  #endif /* !__ASSEMBLER__ */
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index 66744f5768c8..1bc6f52e0cd7 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -442,6 +442,18 @@ void tdx_disable_virtualization_cpu(void)
->  		tdx_flush_vp(&arg);
->  	}
->  	local_irq_restore(flags);
-> +
-> +	/*
-> +	 * No more TDX activity on this CPU from here.  Flush cache to
-> +	 * avoid having to do WBINVD in stop_this_cpu() during kexec.
-> +	 *
-> +	 * Kexec calls native_stop_other_cpus() to stop remote CPUs
-> +	 * before booting to new kernel, but that code has a "race"
-> +	 * when the normal REBOOT IPI times out and NMIs are sent to
-> +	 * remote CPUs to stop them.  Doing WBINVD in stop_this_cpu()
-> +	 * could potentially increase the possibility of the "race".
-> +	 */
-> +	tdx_cpu_flush_cache();
+Explicitly clear the features data for unsupported range.
 
-IIUC, this can be:
+Reported-by: Cristian Marussi <cristian.marussi@arm.com>
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+---
+ virtio/pci-modern.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-	if (IS_ENABLED(CONFIG_KEXEC))
-		tdx_cpu_flush_cache();
+diff --git a/virtio/pci-modern.c b/virtio/pci-modern.c
+index c5b4bc5..ef2f3e2 100644
+--- a/virtio/pci-modern.c
++++ b/virtio/pci-modern.c
+@@ -156,8 +156,10 @@ static bool virtio_pci__common_read(struct virtio_device *vdev,
+ 		ioport__write32(data, val);
+ 		break;
+ 	case VIRTIO_PCI_COMMON_DF:
+-		if (vpci->device_features_sel > 1)
++		if (vpci->device_features_sel > 1) {
++			ioport__write32(data, 0);
+ 			break;
++		}
+ 		features |= vdev->ops->get_host_features(vpci->kvm, vpci->dev);
+ 		val = features >> (32 * vpci->device_features_sel);
+ 		ioport__write32(data, val);
+-- 
+2.50.1
 
->  }
->  
->  #define TDX_SEAMCALL_RETRIES 10000
-> diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-> index 3ea6f587c81a..c26e2e07ff6b 100644
-> --- a/arch/x86/virt/vmx/tdx/tdx.c
-> +++ b/arch/x86/virt/vmx/tdx/tdx.c
-> @@ -1870,3 +1870,15 @@ u64 tdh_phymem_page_wbinvd_hkid(u64 hkid, struct page *page)
->  	return seamcall(TDH_PHYMEM_PAGE_WBINVD, &args);
->  }
->  EXPORT_SYMBOL_GPL(tdh_phymem_page_wbinvd_hkid);
-> +
-> +void tdx_cpu_flush_cache(void)
-> +{
-> +	lockdep_assert_preemption_disabled();
-> +
-> +	if (!this_cpu_read(cache_state_incoherent))
-> +		return;
-> +
-> +	wbinvd();
-> +	this_cpu_write(cache_state_incoherent, false);
-> +}
-> +EXPORT_SYMBOL_GPL(tdx_cpu_flush_cache);
-> -- 
-> 2.50.1
-> 
 
