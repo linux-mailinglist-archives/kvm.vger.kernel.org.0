@@ -1,388 +1,194 @@
-Return-Path: <kvm+bounces-54641-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54642-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DF13B25BDE
-	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 08:35:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98D8DB25C2C
+	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 08:49:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A9781720AE8
-	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 06:34:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 947555A56AE
+	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 06:48:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35D2C2512C8;
-	Thu, 14 Aug 2025 06:34:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6897B259CB2;
+	Thu, 14 Aug 2025 06:47:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AlWreBeP"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="ix8c6bxz"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7834C239E67;
-	Thu, 14 Aug 2025 06:34:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8BAD259CB0
+	for <kvm@vger.kernel.org>; Thu, 14 Aug 2025 06:47:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755153287; cv=none; b=FL14wKQeP/UWivdgKx/n0NYrgtlj65hbuqMj3H2LXDp62Pbc5rg1igLPQWwpvl0fBLqofRDAoNuWgfAeQ+wY6siIvIr93HTqXZbQdEGDhsl+IA1cP+IiOh2xWOeTnNybf6sSZXSLWdVPEbXqsmcZ/mHbKvSg20W8AIZ8g3h8UgM=
+	t=1755154065; cv=none; b=HfobC3y9CNnwbrqiU5NYcg/TayMDQrppn3VfGCeP/g/fYFDQui4ckxKPgd5oCIpZfY4EHwM2ACI6RvMx7hJfHtKaEOOQ3lxmZCrjjJ0rUXn4jG/r5vOUWkcMUWcGKq9lw6LuU/lFG9bxk6HHeW9RYgFf5jYz/vRtoc6b0ycUMkk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755153287; c=relaxed/simple;
-	bh=pGC86u42hcoH+taM5BME6hxdtNNtCZVgv9q1enbPCbs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NNaM/QX/cZqC2TdruTINClxJz71e/J+b2T77McKnhWnVsz+bRHvdkZje49IX27HllbufMxqxi9tilr/ShfEkR9JICjmchna/waKgtr32uxeGvi9AhzKYZZxxdK2NluKZT4FVBu7+G+FMn4peVzJyzzLLjbh6NufnnzrgwVwokK0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AlWreBeP; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1755153286; x=1786689286;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=pGC86u42hcoH+taM5BME6hxdtNNtCZVgv9q1enbPCbs=;
-  b=AlWreBeP8jHAuaXWfBjMpOA7Spt63LxoefynyEQFeiEn4ul3qPXR3sIg
-   du92Z1/1FXPMs7AHpU8W5cF9xeAXQiJXdIVfGl898j870jo8zyMGcf7GD
-   McXrnJn4W3ALtdXXWFFtV/uH/p+oY+A9sEwtUZmtroRiB4XQLXpaFaPCm
-   EZvOQrjAAZFqH21ezdKxDejEgI8EDfjdo8ugATOriYyP3N8attL36xpa/
-   7MFffVeZlcfaHyxajoSRUpZ+MO5k6+LhrmI/5nsnWReSNqhwmx+I/0mcC
-   EFMe7seDfqVIkjBH3SOdc2E9PAdOpCHhwFFkwhbOQO0aG5JPvQTEugzuA
-   w==;
-X-CSE-ConnectionGUID: sHji70WdT8Wu52aMiptZBA==
-X-CSE-MsgGUID: S/zvNG2RR2+n+kRVy72efQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11520"; a="74913819"
-X-IronPort-AV: E=Sophos;i="6.17,287,1747724400"; 
-   d="scan'208";a="74913819"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2025 23:34:45 -0700
-X-CSE-ConnectionGUID: b2U1+SUVSj62UkemM1eYOA==
-X-CSE-MsgGUID: xPjxujy4RRus1zaupur14A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,287,1747724400"; 
-   d="scan'208";a="167048895"
-Received: from unknown (HELO [10.238.0.107]) ([10.238.0.107])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2025 23:34:41 -0700
-Message-ID: <622f4195-3d6c-43d9-8c1c-5cb1e4b8cb3e@linux.intel.com>
-Date: Thu, 14 Aug 2025 14:34:38 +0800
+	s=arc-20240116; t=1755154065; c=relaxed/simple;
+	bh=qqm9v0QJBbxVVQn7AoFq9tSWZaBsc5dcOISlyW3Yipg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=T8S2RBigbWvIYMPyMO75UkuuNcnq69nPCcaN4PfHYjHXh8sRS8Qf0aUHfKsqQgbh4Z8dBzCQg2PDh0CPl0cwYs7WkwJvljaK+o6XXQ1hnqvgGAhYwha3XGxeS6hQaeGnMY4cwZhdL7JtrCpb5IxZKPESWjjQRbsgrycJm0rFWJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=ix8c6bxz; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-244582738b5so4763815ad.3
+        for <kvm@vger.kernel.org>; Wed, 13 Aug 2025 23:47:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1755154063; x=1755758863; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Zc/79XSwvseOMROg0iCTGbt49umwlFqoanOatXRXlL8=;
+        b=ix8c6bxzMZ6yuarZZggVCFCb7o5B/BtbeUo2QadmEccwZFF1fRP3X6Bw1Buh5iX6H3
+         eqyYl/Ii20Jx0lJK0JjR9Lk2pEdOqDpqmJm20jEnnihWCcjjUU8aJ0vhbpWm1fU3Vn5T
+         wC4BP2ddMQtKIuPALHWi6Mz6mpo4uTzSlsqBBPzL4XUOYrr452LbXnzni/jo6caHVVe4
+         IZWGV9MLWe9HeXjJtJSSBsu9gTpHEsOa6d1oqUW7H/FV89dxVZzUxGdcvUuRTlde8Bd8
+         S90zowVq/otUMBcMUX8fkZmf3EHOzzxnu2fbD7QeaAtH24UmlAezha73e8pPAS7LkTML
+         CjNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755154063; x=1755758863;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Zc/79XSwvseOMROg0iCTGbt49umwlFqoanOatXRXlL8=;
+        b=c5nusplZqFlgsv5iDnP9rK4jx2v7FK7Z4PNAy5QoAKcmwqkpO1reGzVezWsnD6QlSe
+         voR+RObdVmjlPe+HrBAS+rWMKrBuZWzdMgsmd8Mv+vsqLyheGsMu1cUAX88GOue7qeGS
+         MrnWeqEvSUaVdIDtJJAHsfmSAVRS3uDrEY1ZsCO0ou64VCLIQlNBBjPJbWvRZq5wmuXT
+         7Lgc80k+HG5ImX5jYz5BJovMoNR8nLVVjPvevOy1RFGj88iHEf19uFNIkoXzE7+UHVtH
+         YD385ehgVD0QRfJO+Kc69kmv/vo49Vsoas38yNUoHnzGM+WnF5HuRjIWVwX6DdslFyyf
+         mXBg==
+X-Forwarded-Encrypted: i=1; AJvYcCUWYnqqTj703KnQtKtJqjzZtY27oiytaizjuk7GBgLUO/M/xF0KD+UKGt2leuZsqf/WYw0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxUnpgRdqNmkYuCmnuC+xVImImXW3zA4gInfmgKEvD8B8DnD4O1
+	7BjyBEJd4EJdQQF1nNtCbk0dlR9sSpjw/zViGzdhFIJRUk6OKkbq63m3JDw7Y1MKVsQ=
+X-Gm-Gg: ASbGncvktWPRh5fuf05oU4SWKpu/NvmkBkCmo9q5qoCT7BGTgzJOfV5AsTRKz2zx04j
+	M5+NGHOxaCSamVNw0ioUid51XPrY+ylpgPdCheyy9eUpwvASPWtPezjkeTBcm6Tc1LaSeqc9hf8
+	voic4CZO/3FhOlRdoA4rYA7PoHvLB18+IR6o7CaOVR9Nl8iZh62SSXfTNqCExBQOM2aE3y2QYp0
+	WpFBmlscEPb97dBgMnoN+45n0oR1+BTkc69KkFDPY93fxG/vGhdqE2Eh188+BBk32EnVlibHkH0
+	TC37/Rt1JMPgNEKTgfe3R9gsr3Zg1FPjhgvwJZE8A5w3XyOZdAcB29uNRvWpPvUBrfv+h4m8SVc
+	UU97JaWBHsVib6iFddqtcjvuVJr0tc7nQj4ghXuDqW6dBg7hg9w==
+X-Google-Smtp-Source: AGHT+IEb3eJicXsgaNlyzBQ3nJS4mCdWERJyOxedSkNcWUM25YdoSAcIjs1UdYpqo12C3/PgqtNh2g==
+X-Received: by 2002:a17:902:ebcb:b0:240:58a7:8938 with SMTP id d9443c01a7336-244584af696mr28229005ad.7.1755154062636;
+        Wed, 13 Aug 2025 23:47:42 -0700 (PDT)
+Received: from localhost.localdomain ([203.208.189.14])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-241d1ef6a8fsm340923605ad.23.2025.08.13.23.47.39
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Wed, 13 Aug 2025 23:47:42 -0700 (PDT)
+From: lizhe.67@bytedance.com
+To: alex.williamson@redhat.com,
+	david@redhat.com,
+	jgg@nvidia.com
+Cc: torvalds@linux-foundation.org,
+	kvm@vger.kernel.org,
+	lizhe.67@bytedance.com,
+	linux-mm@kvack.org,
+	farman@linux.ibm.com
+Subject: [PATCH v5 0/5] vfio/type1: optimize vfio_pin_pages_remote() and vfio_unpin_pages_remote()
+Date: Thu, 14 Aug 2025 14:47:09 +0800
+Message-ID: <20250814064714.56485-1-lizhe.67@bytedance.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 13/30] KVM: selftests: TDX: Add basic
- TDG.VP.VMCALL<GetTdVmCallInfo> test
-To: Sagi Shahar <sagis@google.com>
-Cc: linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
- Shuah Khan <shuah@kernel.org>, Sean Christopherson <seanjc@google.com>,
- Ackerley Tng <ackerleytng@google.com>, Ryan Afranji <afranji@google.com>,
- Andrew Jones <ajones@ventanamicro.com>,
- Isaku Yamahata <isaku.yamahata@intel.com>,
- Erdem Aktas <erdemaktas@google.com>,
- Rick Edgecombe <rick.p.edgecombe@intel.com>,
- Roger Wang <runanwang@google.com>, Oliver Upton <oliver.upton@linux.dev>,
- "Pratik R. Sampat" <pratikrajesh.sampat@amd.com>,
- Reinette Chatre <reinette.chatre@intel.com>, Ira Weiny
- <ira.weiny@intel.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20250807201628.1185915-1-sagis@google.com>
- <20250807201628.1185915-14-sagis@google.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20250807201628.1185915-14-sagis@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
+From: Li Zhe <lizhe.67@bytedance.com>
 
+This patchset is an integration of the two previous patchsets[1][2].
 
-On 8/8/2025 4:16 AM, Sagi Shahar wrote:
-> The test calls TDG.VP.VMCALL<GetTdVmCallInfo> hypercall from the guest
-> and verifies the expected returned values.
->
-> TDG.VP.VMCALL<GetTdVmCallInfo> hypercall is a subleaf of TDG.VP.VMCALL to
-> enumerate which TDG.VP.VMCALL sub leaves are supported.  This hypercall is
-> for future enhancement of the Guest-Host-Communication Interface (GHCI)
-> specification. The GHCI version of 344426-001US defines it to require
-> input R12 to be zero
-There is an update about TDG.VP.VMCALL<GetTdVmCallInfo> in 348552-005US (DRAFT)
-https://cdrdv2-public.intel.com/858626/TDX%20Guest-Hypervisor%20Communication%20Interface_1.5_20250623.pdf
+When vfio_pin_pages_remote() is called with a range of addresses that
+includes large folios, the function currently performs individual
+statistics counting operations for each page. This can lead to significant
+performance overheads, especially when dealing with large ranges of pages.
 
-And the KVM's implementation has been following the new change.
-But the test code in this patch for R12 set to 0 is still valid.
+The function vfio_unpin_pages_remote() has a similar issue, where executing
+put_pfn() for each pfn brings considerable consumption.
 
-New description of "input R12"
-     Leaf to enumerate TDG.VP.VMCALL functionality from this specification
-     supported by the host.
+This patchset primarily optimizes the performance of the relevant functions
+by batching the less efficient operations mentioned before.
 
-     If R12 is set to 0, and successful execution of this TDG.VP.VMCALL (Error
-     Code is SUCCESS) is meant to indicate all GHCI base TDG.VP.VMCALLs
-     defined in the this specification are supported by the host VMM.
-     The GHCI base VMCALLs are: <GetTdVmCallInfo>, <MapGPA>, <GetQuote>,
-     <ReportFatalError>, <Instruction.CPUID>, <#VE.RequestMMIO>,
-     <Instruction.HLT>, <Instruction.IO>, <Instruction.RDMSR>,
-     <Instruction.WRMSR>. These VMCALLs must be supported.
+The first two patch optimizes the performance of the function
+vfio_pin_pages_remote(), while the remaining patches optimize the
+performance of the function vfio_unpin_pages_remote().
 
-     If R12 is set to 1, and successful execution of this TDG.VP.VMCALL (Error
-     Code is SUCCESS) is meant to query the supported sub-function and the
-     capability of each sub-function.
+The performance test results, based on v6.16, for completing the 16G
+VFIO MAP/UNMAP DMA, obtained through unit test[3] with slight
+modifications[4], are as follows.
 
-     Other: reserved
+Base(6.16):
+------- AVERAGE (MADV_HUGEPAGE) --------
+VFIO MAP DMA in 0.049 s (328.5 GB/s)
+VFIO UNMAP DMA in 0.141 s (113.7 GB/s)
+------- AVERAGE (MAP_POPULATE) --------
+VFIO MAP DMA in 0.268 s (59.6 GB/s)
+VFIO UNMAP DMA in 0.307 s (52.2 GB/s)
+------- AVERAGE (HUGETLBFS) --------
+VFIO MAP DMA in 0.051 s (310.9 GB/s)
+VFIO UNMAP DMA in 0.135 s (118.6 GB/s)
 
+With this patchset:
+------- AVERAGE (MADV_HUGEPAGE) --------
+VFIO MAP DMA in 0.025 s (633.1 GB/s)
+VFIO UNMAP DMA in 0.044 s (363.2 GB/s)
+------- AVERAGE (MAP_POPULATE) --------
+VFIO MAP DMA in 0.249 s (64.2 GB/s)
+VFIO UNMAP DMA in 0.289 s (55.3 GB/s)
+------- AVERAGE (HUGETLBFS) --------
+VFIO MAP DMA in 0.030 s (533.2 GB/s)
+VFIO UNMAP DMA in 0.044 s (361.3 GB/s)
 
->   and to return zero in output registers, R11, R12, R13,
-> and R14 so that guest TD enumerates no enhancement.
->
-> Signed-off-by: Sagi Shahar <sagis@google.com>
-> ---
->   .../selftests/kvm/include/x86/tdx/tdx.h       |  3 +
->   .../selftests/kvm/include/x86/tdx/test_util.h | 27 +++++++
->   tools/testing/selftests/kvm/lib/x86/tdx/tdx.c | 23 ++++++
->   .../selftests/kvm/lib/x86/tdx/test_util.c     | 42 +++++++++++
->   tools/testing/selftests/kvm/x86/tdx_vm_test.c | 72 ++++++++++++++++++-
->   5 files changed, 166 insertions(+), 1 deletion(-)
->
-> diff --git a/tools/testing/selftests/kvm/include/x86/tdx/tdx.h b/tools/testing/selftests/kvm/include/x86/tdx/tdx.h
-> index 2acccc9dccf9..97ceb90c8792 100644
-> --- a/tools/testing/selftests/kvm/include/x86/tdx/tdx.h
-> +++ b/tools/testing/selftests/kvm/include/x86/tdx/tdx.h
-> @@ -6,6 +6,7 @@
->   
->   #include "kvm_util.h"
->   
-> +#define TDG_VP_VMCALL_GET_TD_VM_CALL_INFO 0x10000
->   #define TDG_VP_VMCALL_REPORT_FATAL_ERROR 0x10003
->   
->   #define TDG_VP_VMCALL_INSTRUCTION_IO 30
-> @@ -13,4 +14,6 @@
->   uint64_t tdg_vp_vmcall_instruction_io(uint64_t port, uint64_t size,
->   				      uint64_t write, uint64_t *data);
->   void tdg_vp_vmcall_report_fatal_error(uint64_t error_code, uint64_t data_gpa);
-> +uint64_t tdg_vp_vmcall_get_td_vmcall_info(uint64_t *r11, uint64_t *r12,
-> +					  uint64_t *r13, uint64_t *r14);
->   #endif // SELFTEST_TDX_TDX_H
-> diff --git a/tools/testing/selftests/kvm/include/x86/tdx/test_util.h b/tools/testing/selftests/kvm/include/x86/tdx/test_util.h
-> index 2af6e810ef78..91031e956462 100644
-> --- a/tools/testing/selftests/kvm/include/x86/tdx/test_util.h
-> +++ b/tools/testing/selftests/kvm/include/x86/tdx/test_util.h
-> @@ -4,6 +4,7 @@
->   
->   #include <stdbool.h>
->   
-> +#include "kvm_util.h"
->   #include "tdcall.h"
->   
->   #define TDX_TEST_SUCCESS_PORT 0x30
-> @@ -92,4 +93,30 @@ uint64_t tdx_test_report_to_user_space(uint32_t data);
->    */
->   uint32_t tdx_test_read_report_from_guest(struct kvm_vcpu *vcpu);
->   
-> +/*
-> + * Report a 64 bit value from the guest to user space using TDG.VP.VMCALL
-> + * <Instruction.IO> call.
-> + *
-> + * Data is sent to host in 2 calls. LSB is sent (and needs to be read) first.
-> + */
-> +uint64_t tdx_test_send_64bit(uint64_t port, uint64_t data);
-> +
-> +/*
-> + * Report a 64 bit value from the guest to user space using TDG.VP.VMCALL
-> + * <Instruction.IO> call. Data is reported on port TDX_TEST_REPORT_PORT.
-> + */
-> +uint64_t tdx_test_report_64bit_to_user_space(uint64_t data);
-> +
-> +/*
-> + * Read a 64 bit value from the guest in user space, sent using
-> + * tdx_test_send_64bit().
-> + */
-> +uint64_t tdx_test_read_64bit(struct kvm_vcpu *vcpu, uint64_t port);
-> +
-> +/*
-> + * Read a 64 bit value from the guest in user space, sent using
-> + * tdx_test_report_64bit_to_user_space().
-> + */
-> +uint64_t tdx_test_read_64bit_report_from_guest(struct kvm_vcpu *vcpu);
-> +
->   #endif // SELFTEST_TDX_TEST_UTIL_H
-> diff --git a/tools/testing/selftests/kvm/lib/x86/tdx/tdx.c b/tools/testing/selftests/kvm/lib/x86/tdx/tdx.c
-> index ba088bfc1e62..5105dfae0e9e 100644
-> --- a/tools/testing/selftests/kvm/lib/x86/tdx/tdx.c
-> +++ b/tools/testing/selftests/kvm/lib/x86/tdx/tdx.c
-> @@ -43,3 +43,26 @@ void tdg_vp_vmcall_report_fatal_error(uint64_t error_code, uint64_t data_gpa)
->   
->   	__tdx_hypercall(&args, 0);
->   }
-> +
-> +uint64_t tdg_vp_vmcall_get_td_vmcall_info(uint64_t *r11, uint64_t *r12,
-> +					  uint64_t *r13, uint64_t *r14)
-> +{
-> +	struct tdx_hypercall_args args = {
-> +		.r11 = TDG_VP_VMCALL_GET_TD_VM_CALL_INFO,
-> +		.r12 = 0,
-> +	};
-> +	uint64_t ret;
-> +
-> +	ret = __tdx_hypercall(&args, TDX_HCALL_HAS_OUTPUT);
-> +
-> +	if (r11)
-> +		*r11 = args.r11;
-> +	if (r12)
-> +		*r12 = args.r12;
-> +	if (r13)
-> +		*r13 = args.r13;
-> +	if (r14)
-> +		*r14 = args.r14;
-> +
-> +	return ret;
-> +}
-> diff --git a/tools/testing/selftests/kvm/lib/x86/tdx/test_util.c b/tools/testing/selftests/kvm/lib/x86/tdx/test_util.c
-> index f9bde114a8bc..8c3b6802c37e 100644
-> --- a/tools/testing/selftests/kvm/lib/x86/tdx/test_util.c
-> +++ b/tools/testing/selftests/kvm/lib/x86/tdx/test_util.c
-> @@ -7,6 +7,7 @@
->   #include <unistd.h>
->   
->   #include "kvm_util.h"
-> +#include "tdx/tdcall.h"
->   #include "tdx/tdx.h"
->   #include "tdx/tdx_util.h"
->   #include "tdx/test_util.h"
-> @@ -124,3 +125,44 @@ uint32_t tdx_test_read_report_from_guest(struct kvm_vcpu *vcpu)
->   
->   	return res;
->   }
-> +
-> +uint64_t tdx_test_send_64bit(uint64_t port, uint64_t data)
-> +{
-> +	uint64_t data_hi = (data >> 32) & 0xFFFFFFFF;
-> +	uint64_t data_lo = data & 0xFFFFFFFF;
-> +	uint64_t err;
-> +
-> +	err = tdg_vp_vmcall_instruction_io(port, 4, PORT_WRITE, &data_lo);
-> +	if (err)
-> +		return err;
-> +
-> +	return tdg_vp_vmcall_instruction_io(port, 4, PORT_WRITE, &data_hi);
-> +}
-> +
-> +uint64_t tdx_test_report_64bit_to_user_space(uint64_t data)
-> +{
-> +	return tdx_test_send_64bit(TDX_TEST_REPORT_PORT, data);
-> +}
-> +
-> +uint64_t tdx_test_read_64bit(struct kvm_vcpu *vcpu, uint64_t port)
-> +{
-> +	uint32_t lo, hi;
-> +	uint64_t res;
-> +
-> +	tdx_test_assert_io(vcpu, port, 4, PORT_WRITE);
-> +	lo = *(uint32_t *)((void *)vcpu->run + vcpu->run->io.data_offset);
-> +
-> +	vcpu_run(vcpu);
-> +
-> +	tdx_test_assert_io(vcpu, port, 4, PORT_WRITE);
-> +	hi = *(uint32_t *)((void *)vcpu->run + vcpu->run->io.data_offset);
-> +
-> +	res = hi;
-> +	res = (res << 32) | lo;
-> +	return res;
-> +}
-> +
-> +uint64_t tdx_test_read_64bit_report_from_guest(struct kvm_vcpu *vcpu)
-> +{
-> +	return tdx_test_read_64bit(vcpu, TDX_TEST_REPORT_PORT);
-> +}
-> diff --git a/tools/testing/selftests/kvm/x86/tdx_vm_test.c b/tools/testing/selftests/kvm/x86/tdx_vm_test.c
-> index bbdcca358d71..22143d16e0d1 100644
-> --- a/tools/testing/selftests/kvm/x86/tdx_vm_test.c
-> +++ b/tools/testing/selftests/kvm/x86/tdx_vm_test.c
-> @@ -240,6 +240,74 @@ void verify_td_cpuid(void)
->   	printf("\t ... PASSED\n");
->   }
->   
-> +/*
-> + * Verifies TDG.VP.VMCALL<GetTdVmCallInfo> hypercall functionality.
-> + */
-> +void guest_code_get_td_vmcall_info(void)
-> +{
-> +	uint64_t r11, r12, r13, r14;
-> +	uint64_t err;
-> +
-> +	err = tdg_vp_vmcall_get_td_vmcall_info(&r11, &r12, &r13, &r14);
-> +	tdx_assert_error(err);
-> +
-> +	err = tdx_test_report_64bit_to_user_space(r11);
-> +	tdx_assert_error(err);
-> +
-> +	err = tdx_test_report_64bit_to_user_space(r12);
-> +	tdx_assert_error(err);
-> +
-> +	err = tdx_test_report_64bit_to_user_space(r13);
-> +	tdx_assert_error(err);
-> +
-> +	err = tdx_test_report_64bit_to_user_space(r14);
-> +	tdx_assert_error(err);
-> +
-> +	tdx_test_success();
-> +}
-> +
-> +void verify_get_td_vmcall_info(void)
-> +{
-> +	uint64_t r11, r12, r13, r14;
-> +	struct kvm_vcpu *vcpu;
-> +	struct kvm_vm *vm;
-> +
-> +	vm = td_create();
-> +	td_initialize(vm, VM_MEM_SRC_ANONYMOUS, 0);
-> +	vcpu = td_vcpu_add(vm, 0, guest_code_get_td_vmcall_info);
-> +	td_finalize(vm);
-> +
-> +	printf("Verifying TD get vmcall info:\n");
-> +
-> +	/* Wait for guest to report r11 value */
-> +	tdx_run(vcpu);
-> +	r11 = tdx_test_read_64bit_report_from_guest(vcpu);
-> +
-> +	/* Wait for guest to report r12 value */
-> +	tdx_run(vcpu);
-> +	r12 = tdx_test_read_64bit_report_from_guest(vcpu);
-> +
-> +	/* Wait for guest to report r13 value */
-> +	tdx_run(vcpu);
-> +	r13 = tdx_test_read_64bit_report_from_guest(vcpu);
-> +
-> +	/* Wait for guest to report r14 value */
-> +	tdx_run(vcpu);
-> +	r14 = tdx_test_read_64bit_report_from_guest(vcpu);
-> +
-> +	TEST_ASSERT_EQ(r11, 0);
-> +	TEST_ASSERT_EQ(r12, 0);
-> +	TEST_ASSERT_EQ(r13, 0);
-> +	TEST_ASSERT_EQ(r14, 0);
-> +
-> +	/* Wait for guest to complete execution */
-> +	tdx_run(vcpu);
-> +	tdx_test_assert_success(vcpu);
-> +
-> +	kvm_vm_free(vm);
-> +	printf("\t ... PASSED\n");
-> +}
-> +
->   int main(int argc, char **argv)
->   {
->   	ksft_print_header();
-> @@ -247,7 +315,7 @@ int main(int argc, char **argv)
->   	if (!is_tdx_enabled())
->   		ksft_exit_skip("TDX is not supported by the KVM. Exiting.\n");
->   
-> -	ksft_set_plan(4);
-> +	ksft_set_plan(5);
->   	ksft_test_result(!run_in_new_process(&verify_td_lifecycle),
->   			 "verify_td_lifecycle\n");
->   	ksft_test_result(!run_in_new_process(&verify_report_fatal_error),
-> @@ -256,6 +324,8 @@ int main(int argc, char **argv)
->   			 "verify_td_ioexit\n");
->   	ksft_test_result(!run_in_new_process(&verify_td_cpuid),
->   			 "verify_td_cpuid\n");
-> +	ksft_test_result(!run_in_new_process(&verify_get_td_vmcall_info),
-> +			 "verify_get_td_vmcall_info\n");
->   
->   	ksft_finished();
->   	return 0;
+For large folio, we achieve an over 40% performance improvement for VFIO
+MAP DMA and an over 67% performance improvement for VFIO DMA UNMAP. For
+small folios, the performance test results show a slight improvement with
+the performance before optimization.
+
+[1]: https://lore.kernel.org/all/20250529064947.38433-1-lizhe.67@bytedance.com/
+[2]: https://lore.kernel.org/all/20250620032344.13382-1-lizhe.67@bytedance.com/#t
+[3]: https://github.com/awilliam/tests/blob/vfio-pci-mem-dma-map/vfio-pci-mem-dma-map.c
+[4]: https://lore.kernel.org/all/20250610031013.98556-1-lizhe.67@bytedance.com/
+
+Li Zhe (5):
+  mm: introduce num_pages_contiguous()
+  vfio/type1: optimize vfio_pin_pages_remote()
+  vfio/type1: batch vfio_find_vpfn() in function
+    vfio_unpin_pages_remote()
+  vfio/type1: introduce a new member has_rsvd for struct vfio_dma
+  vfio/type1: optimize vfio_unpin_pages_remote()
+
+ drivers/vfio/vfio_iommu_type1.c | 112 ++++++++++++++++++++++++++------
+ include/linux/mm.h              |   7 +-
+ include/linux/mm_inline.h       |  35 ++++++++++
+ 3 files changed, 132 insertions(+), 22 deletions(-)
+
+---
+Changelogs:
+
+v4->v5:
+- Update the performance test results based on v6.16.
+- Re-implement num_pages_contiguous() without relying on nth_page(),
+  and relocate it into mm_inline.h.
+- Merge the fixup patch into the original patch (patch #2).
+
+v3->v4:
+- Fix an indentation issue in patch #2.
+
+v2->v3:
+- Add a "Suggested-by" and a "Reviewed-by" tag.
+- Address the compilation errors introduced by patch #1.
+- Resolved several variable type issues.
+- Add clarification for function num_pages_contiguous().
+
+v1->v2:
+- Update the performance test results.
+- The function num_pages_contiguous() is extracted and placed in a
+  separate commit.
+- The phrase 'for large folio' has been removed from the patchset title.
+
+v4: https://lore.kernel.org/all/20250710085355.54208-1-lizhe.67@bytedance.com/
+v3: https://lore.kernel.org/all/20250707064950.72048-1-lizhe.67@bytedance.com/
+v2: https://lore.kernel.org/all/20250704062602.33500-1-lizhe.67@bytedance.com/
+v1: https://lore.kernel.org/all/20250630072518.31846-1-lizhe.67@bytedance.com/
+-- 
+2.20.1
 
 
