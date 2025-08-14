@@ -1,84 +1,157 @@
-Return-Path: <kvm+bounces-54683-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54684-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59D37B26BFD
-	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 18:10:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E426CB26C6B
+	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 18:23:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 751677A1DA8
-	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 16:08:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B58391719A7
+	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 16:17:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47DC4253932;
-	Thu, 14 Aug 2025 16:07:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7B4D253B52;
+	Thu, 14 Aug 2025 16:17:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ayapHOIH"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA53D202F9F
-	for <kvm@vger.kernel.org>; Thu, 14 Aug 2025 16:07:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0283E199FD0;
+	Thu, 14 Aug 2025 16:17:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755187667; cv=none; b=nisEnYH+qIVK5bg/nWKCNvlpO5o6T7bnHwazlRJQReCcn8pYuKf+AR5d+fCdNxMIv2h0+qRzqMzS5Jh5kHU9Ug12cL/1omr1+hdZPxvLMg4EQf4PWKWWN/EkHJ922xacB1hktpkbH1jV3oDhPqzX5ziTW2778Kxx5FWZL/sCWqw=
+	t=1755188221; cv=none; b=tJD2xWDXn6TvhZg7Fx59VA5OTnEGgt+wstLnc56hBMzxvOwKUsl4MfkKIaoz8H4KBJQILViXm3F19nHzBu5hZ+JgJsnd3tXOmFvAlqXZb+Wru6VGGmMWaG1cKUNlQ0aINKxRW3hpBGJQkwfFG8wm/pYj9nBnFM+xcyz3F8vv1Ws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755187667; c=relaxed/simple;
-	bh=R+fIibzS6ymkKz5is3AzY4nlSPzmDJ9+nVTH1DsOfOE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LwcBmmsodg8VbrmTiGPrEZ+WtCeG0md405z2E9aGVOoYhP5zBUJTJ5xoInsIIQZwvYATQyBRfCN8cZXBg4OvVg//jc0p9b12SsJBKe8WgV7AIO6A2XgUKTe5iasiCsMJ0VL/IqmIeKf4VOfKv6v45YDUjlq7gE7ognsB07/j87s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B460A1691;
-	Thu, 14 Aug 2025 09:07:36 -0700 (PDT)
-Received: from pluto (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 032063F738;
-	Thu, 14 Aug 2025 09:07:43 -0700 (PDT)
-Date: Thu, 14 Aug 2025 17:07:35 +0100
-From: Cristian Marussi <cristian.marussi@arm.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: kvm@vger.kernel.org, Cristian Marussi <cristian.marussi@arm.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH kvmtool] virtio/pci: explicit zero unknown devices
- features
-Message-ID: <aJ4Jx784CjBgY1pz@pluto>
-References: <ed62443b8fd3fef87bd313a54f821cf363f647a5.1755185758.git.pabeni@redhat.com>
+	s=arc-20240116; t=1755188221; c=relaxed/simple;
+	bh=M/7zR0HTuRXInmuZjL5TwHMxUA2vqz7c6KFg9vcni0s=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mfEgY/ttSuglcm7lvAnqQ1/X8MRzxXmsVIVdnlr7/Ud7SOocrZF9xM111zjPd0iSxVePD6dtmXzC/cqtqTj0+D7swGJAnij3aWXIARozl48/d8mBhgLeEPVBAmjq/TR2vmNfPSlAnLm6SjxcQAvuKFKHsptzmTnbTa0wVMbvciQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ayapHOIH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 893C1C4CEED;
+	Thu, 14 Aug 2025 16:17:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755188220;
+	bh=M/7zR0HTuRXInmuZjL5TwHMxUA2vqz7c6KFg9vcni0s=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ayapHOIHutnDYHAU+8nS01cXH6K0nYKsnMFwKwBX+uVr3uBaLlFruW0Gd26aduI4c
+	 mTnJ2dBEhDENeA4AkGD0+ce2jXbuAEuEUJhF5c1OZ0NqyXPQf6dY71njNz08OVoW2D
+	 2+NcuTCEcIsY6L1l3MscfBZTeuqohVuw9yV2iaeQoAzWKIzHXK5iaCRlwbMx2epK8n
+	 /0q1BFJt/WlXHFJpAXxEAs9h/n2sBuB3UCEojqnD5UKC3XtD6Opol7HIpiL4Uy/Jg2
+	 dZJNRXsqOu5k+E88zdYvJgWod9JFA4aZYUEtxvdO0hUU30vlLSbbmAzzXo9BiP06Bs
+	 LDMj1sA9yYWcg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1umadO-007WRz-6x;
+	Thu, 14 Aug 2025 17:16:58 +0100
+Date: Thu, 14 Aug 2025 17:16:57 +0100
+Message-ID: <86ikipev46.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Volodymyr Babchuk <volodymyr_babchuk@epam.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 2/2] KVM: arm64: Fix vcpu_{read,write}_sys_reg() accessors
+In-Reply-To: <aJuixWlc87f2UlK0@linux.dev>
+References: <20250809144811.2314038-1-maz@kernel.org>
+	<20250809144811.2314038-3-maz@kernel.org>
+	<aJuixWlc87f2UlK0@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ed62443b8fd3fef87bd313a54f821cf363f647a5.1755185758.git.pabeni@redhat.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, volodymyr_babchuk@epam.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, Aug 14, 2025 at 05:37:02PM +0200, Paolo Abeni wrote:
-> The linux kernel implementation for the virtio_net driver recently
-> gained support for virtio features above the 64th bit.
+On Tue, 12 Aug 2025 21:23:33 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-
-Hi,
-
-> It relies on the hypervisor to clear the features data for unknown /
-> unsupported features range.
+> On Sat, Aug 09, 2025 at 03:48:11PM +0100, Marc Zyngier wrote:
+> > @@ -144,125 +156,120 @@ static bool get_el2_to_el1_mapping(unsigned int reg,
+> >  		MAPPED_EL2_SYSREG(ZCR_EL2,     ZCR_EL1,     NULL	     );
+> >  		MAPPED_EL2_SYSREG(CONTEXTIDR_EL2, CONTEXTIDR_EL1, NULL	     );
+> >  		MAPPED_EL2_SYSREG(SCTLR2_EL2,  SCTLR2_EL1,  NULL	     );
+> > +	case CNTHCTL_EL2:
+> > +		/* CNTHCTL_EL2 is super special, until we support NV2.1 */
+> > +		loc->loc = ((is_hyp_ctxt(vcpu) && vcpu_el2_e2h_is_set(vcpu)) ?
+> > +			    SR_LOC_SPECIAL : SR_LOC_MEMORY);
+> > +		break;
+> > +	case TPIDR_EL0:
+> > +	case TPIDRRO_EL0:
+> > +	case TPIDR_EL1:
+> > +	case PAR_EL1:
+> > +		/* These registers are always loaded, no matter what */
+> > +		loc->loc = SR_LOC_LOADED;
+> > +		break;
+> >  	default:
+> > -		return false;
+> > +		/*
+> > +		 * Non-mapped EL2 registers are by definition in memory, but
+> > +		 * we don't need to distinguish them here, as the CPU
+> > +		 * register accessors will bail out and we'll end-up using
+> > +		 * the backing store.
+> > +		 *
+> > +		 * EL1 registers are, however, only loaded if we're
+> > +		 * not in hypervisor context.
+> > +		 */
+> > +		loc->loc = is_hyp_ctxt(vcpu) ? SR_LOC_MEMORY : SR_LOC_LOADED;
 > 
-> The current pci-modern implementation, in such scenario, leaves the
-> data memory untouched, which causes the guest kernel assuming "random"
-> features are supported (and possibly leaks host memory contents).
+> Hmm... I get the feeling that this flow is becoming even more subtle.
+> There's some implicit coupling between this switch statement and the
+> __vcpu_{read,write}_sys_reg_from_cpu() which feels like it could be
+> error prone. Especially since we're gonna lose the WARN() that would
+> inform us if an on-CPU register was actually redirected to memory.
 > 
-> Explicitly clear the features data for unsupported range.
+> I'm wondering if we need some macro hell containing the block of
+> registers we handle on-CPU and expand that can be expanded into this
+> triage switch case as well as the sysreg accessor.
 > 
+> What you have definitely seems correct, though. I'll twiddle a bit and
+> see if I come up with something, although I imagine what you have is
+> what we'll use in the end anyway.
 
-This patch definitely solves for me the virtio networking issue reported at:
+My current conclusion is that a macro hack is not really practical, if
+only because we end-up here from out-of-line C code, and that at this
+stage we've lost all symbolic information.
 
-https://lore.kernel.org/virtualization/c25f924f-a66b-47cc-819d-5ed241a4bac6@redhat.com/T/#t
+We *could* take the nuclear option of re-modelling the sysreg enum as
+a bunch of #define, similar to the way we deal with vcpu flags, and
+have accessors for the various bits of information, but that comes
+with two different problems:
 
-Tested on an arm64 Host (v6.14.8) with a v6.17-rc1 Guest.
+- we don't have a good way to iterate over symbolic registers
 
-Thanks !
+- we need to repaint a large portion of the code base
 
-Tested-by: Cristian Marussi <cristian.marussi@arm.com>
+Given that, I've taken another approach, which is to move all these
+things close together (no more inlining), and add enough WARN_ON()s
+that you really have to try and game the code to miss something and
+not get caught. In the process, I found a couple of extra stragglers
+that are always loaded when running a 32bit guest (the *32_EL2
+registers...).
+
+I've pushed the current state on my kvm-arm64/at-fixes-6.17 branch,
+and I'll try to repost patches over the weekend.
 
 Thanks,
-Cristian
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
