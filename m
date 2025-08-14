@@ -1,290 +1,544 @@
-Return-Path: <kvm+bounces-54654-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54655-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87778B26037
-	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 11:09:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 21DE6B2606D
+	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 11:14:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E9541C223B4
-	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 09:04:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 42BFF1CC67F0
+	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 09:08:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AC132F60C3;
-	Thu, 14 Aug 2025 08:58:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB1462E9EC1;
+	Thu, 14 Aug 2025 09:04:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="aJiP6LHg"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mCCyuMjd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 638B02E9EB3;
-	Thu, 14 Aug 2025 08:58:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755161916; cv=none; b=eXmLNSv9j54qXFoJVCj1oPJ2WhxGMm4LjAUXL/xH8ZyGVu1m5hu1CeSOOhhi+F8fyZmPvg2DfmlweB/WlFv65okbYRSdWSBkGsDWMMrt4BhC70p9UrAoFEYfW13zYYOw9rkutR1mTGhByTg1ag1cPy3126rGIwt18FukF8FI4oU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755161916; c=relaxed/simple;
-	bh=vDE0E1yjqY0f3HYkpoHZtIgg9O221SAmsRn5vbMsxL8=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Mv3ZltAwDvwiVf3CwQEGiU15ZXsAv46drUsH2nEw5ISukY1BNecEuCY59OIfv750bXeT8VHKHChrdApho1nns1tYV7Se4Re/etLg+1K7kglwKMnC8NsehqrwnnU6jSCCj0GUQn3y3tlvupwH/aA21IdkX+bbwTqvCKpeRZwSYSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=aJiP6LHg; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57DLLlpK015987;
-	Thu, 14 Aug 2025 08:58:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=lcCq/XnqkIW2A53JNZQeehAP0zinHF
-	hevLkE5cHGNns=; b=aJiP6LHgGSuJ9h8GDC6c6NGZfUBv/48XTnYZ8GV3qDgEsD
-	Z077rWzqH810j4Bz2oZYRmWLOx5lUqbBXQNloLCwmfWA10hdiO/L67t0KEqYpFpN
-	vPx0V3l72xWNs+6hWRMbVKuozPgVK6JYBMQeGKIZOEQnrv7VyeXHU8+wznTNzjBR
-	Rrmz5WAIjR1CFh9mlPnwFASgpi/WxdACkhgU3v0PCcSPx8iWQgHZ8wStPFVwSXsN
-	zGyOI4rClzGqIkcd6ix857DtBv+LY0hAjoF5qFh7Cz1JdcsqNpgF8+bav+fnCTlf
-	JYOryBwOsjKqL0YoQ3D8MttwJl7G6uPLeWQtyXuQ==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48dvrp8vyv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 14 Aug 2025 08:58:26 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 57E6JJFd017637;
-	Thu, 14 Aug 2025 08:58:23 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 48ekc3u366-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 14 Aug 2025 08:58:22 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 57E8wLMv32702992
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 14 Aug 2025 08:58:21 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4F04B2004E;
-	Thu, 14 Aug 2025 08:58:21 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2BA9320040;
-	Thu, 14 Aug 2025 08:58:19 +0000 (GMT)
-Received: from li-e7e2bd4c-2dae-11b2-a85c-bfd29497117c.ibm.com (unknown [9.124.218.79])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Thu, 14 Aug 2025 08:58:18 +0000 (GMT)
-Date: Thu, 14 Aug 2025 14:28:16 +0530
-From: Amit Machhiwal <amachhiw@linux.ibm.com>
-To: Alex Mastro <amastro@fb.com>, Alex Williamson <alex.williamson@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>, Jason Gunthorpe <jgg@ziepe.ca>,
-        Keith Busch <kbusch@kernel.org>, linux-kernel@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-doc@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH v4] vfio/pci: print vfio-device syspath to fdinfo
-Message-ID: <20250814141153.8294c6d3-83-amachhiw@linux.ibm.com>
-Mail-Followup-To: Alex Mastro <amastro@fb.com>, 
-	Alex Williamson <alex.williamson@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Keith Busch <kbusch@kernel.org>, linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, kvm@vger.kernel.org
-References: <20250804-show-fdinfo-v4-1-96b14c5691b3@fb.com>
- <20250807144938.e0abc7bb-a4-amachhiw@linux.ibm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA1292E11BF;
+	Thu, 14 Aug 2025 09:04:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.16
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755162298; cv=fail; b=oRo5qffYu3qCr1IvE4k3tuGKMNWYufHJ7OG8e5mfOC0Uw+tbGE6HSsmdPmKoNYLlxbxh/XIwFkB2Mp3cOzi94bpfUlc8lv+7kuqwveA3FHFq6WiiI2UrkjgtnXuMj4dqWkpQkg0VYRW1cKtRUeVv3J7E4QYF74o0koprdpvo378=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755162298; c=relaxed/simple;
+	bh=ob5jBy4tqP9ipg0WbdssIH1R9LZMnaWXoEg1KeFAnIo=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=A8vsdCBGZxrXea3ORnvMcFFFsXji7BS4wJHnQ57/SZ51i4e1TpYOucPxiU26q3Kpx4/6ixG46vBUZCAPvNZ5CmJH67dgILjo0aF4OrqAFBLxaKIn3Z9BCRB53MGzSIwZ+a1cTkLqygiC4Y5qGPTTmtYbDdkY6MkZU/4iV3s4sbg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mCCyuMjd; arc=fail smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1755162296; x=1786698296;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=ob5jBy4tqP9ipg0WbdssIH1R9LZMnaWXoEg1KeFAnIo=;
+  b=mCCyuMjdsgLiAXGMG1U8aeKF/7Nk7Bz04zFWfY8meHlUricoVWnBiU6M
+   zDHvC0cm9P3cKEGVQI1wh6i7aOwlMQqClfn3f4lz9nAI3+F1Fk9+1+66f
+   54WEWPjlvyBf+FUDqQ0KhG2NZ81/GU0cx8NbvtWhvZ58HdO2ebYCDw59g
+   oG06MCMVzJr9YjX8Vu7ID6dgs18jkyKibHCpzT21fEHmnCRYP7AS53VKA
+   Us448s9ywSlxlxOjm+WVFn5W6Ch5/xRgjfTBwcdQjiNXFP+bpigEhbxZL
+   yhuTCAf1jo6RRbSAUmmPGwHl+Hqm0TSTE1QIGNPtQofaPslGFrTrSxpDA
+   A==;
+X-CSE-ConnectionGUID: SnGvHgI4SCSM2HInd/U6qw==
+X-CSE-MsgGUID: jOuqwWq6Rl2zlabbPZoaFA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11520"; a="45050470"
+X-IronPort-AV: E=Sophos;i="6.17,287,1747724400"; 
+   d="scan'208";a="45050470"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2025 02:04:55 -0700
+X-CSE-ConnectionGUID: iWVlkljwRYyn8J+sDdXCiw==
+X-CSE-MsgGUID: JM1rvWjdQtSJ/ffoiCBRRg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,287,1747724400"; 
+   d="scan'208";a="166972509"
+Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
+  by orviesa008.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2025 02:04:55 -0700
+Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Thu, 14 Aug 2025 02:04:54 -0700
+Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
+ FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17 via Frontend Transport; Thu, 14 Aug 2025 02:04:54 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (40.107.236.69)
+ by edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Thu, 14 Aug 2025 02:04:54 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=T/hjgBwIRcyioSQHh33roFE4OMPIhPy2+AluOzP2QvKA3wB3yvbS6t9/Ik1NNXWju5vGjCC4lNyfcxYtBDfV2jx8xOiVfWrma5es8ILOGIDKPFDh2Noqy/LJIwyFx9L/PEs0ZAb44fPquRymgirCkroTXZFgM8S3NfD9Bi2BIPq6zczr6G/LagI9h83sPVmLPUkBYerhQPttt6gRMaA1DWDAEdmdDjxE0ho1m02TKXS6ul1WLF/pw5r+T4xHENJxNRVdtUzYHkMNWmfODTk0ytnG8AMZkizarTr/b9s5oZOB9KXQh32bO6nooTaKS7lOCn3KT6MiUKH5OJjKUI4WQA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=d9iD3FHAW63wmc44foEelXIHbuMKEM86Xow3CnNuwg8=;
+ b=n/XLskatqnXaBIBU2A7hk6dLlxNIvU/aNJORMbnkQpnfFAPh8QIS5FxYrVcnChGnDCflAo7BwZuCC+2cTAatmJ4B0bwVgUp5NlxZU6AG8txkScJ1ZFRLJ0OAWZr8qUZaJA9AIhGKNHdc+zeGANLo5ndlCmtC2w4VwZbvIgi89FPGAN3iUQLIt4oce7gvCo0WT9WVi0QJoEUTmtIvSDuOC3hFbWTdp3Uf3se1naG/InFhuo4LMTYgYo79Y01fRFuVlOWquS9+2XGo4IKV7bRttb/CTKs5YCI6t2Gj8OnwXVmLCWEGn2Q/7yfgQIOTFjwcBhrYyQG6JouL57VxaGoKLw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CYXPR11MB8729.namprd11.prod.outlook.com (2603:10b6:930:dc::17)
+ by CY8PR11MB7244.namprd11.prod.outlook.com (2603:10b6:930:97::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9031.15; Thu, 14 Aug
+ 2025 09:04:51 +0000
+Received: from CYXPR11MB8729.namprd11.prod.outlook.com
+ ([fe80::680a:a5bc:126d:fdfb]) by CYXPR11MB8729.namprd11.prod.outlook.com
+ ([fe80::680a:a5bc:126d:fdfb%6]) with mapi id 15.20.9031.014; Thu, 14 Aug 2025
+ 09:04:51 +0000
+Message-ID: <e0d0aa8b-7844-43dc-913d-ea0f302d3feb@intel.com>
+Date: Thu, 14 Aug 2025 17:04:39 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 22/30] KVM: selftests: TDX: Add TDG.VP.INFO test
+To: Sagi Shahar <sagis@google.com>, <linux-kselftest@vger.kernel.org>, "Paolo
+ Bonzini" <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, "Sean
+ Christopherson" <seanjc@google.com>, Ackerley Tng <ackerleytng@google.com>,
+	Ryan Afranji <afranji@google.com>, Andrew Jones <ajones@ventanamicro.com>,
+	Isaku Yamahata <isaku.yamahata@intel.com>, Erdem Aktas
+	<erdemaktas@google.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, "Roger
+ Wang" <runanwang@google.com>, Binbin Wu <binbin.wu@linux.intel.com>, "Oliver
+ Upton" <oliver.upton@linux.dev>, "Pratik R. Sampat"
+	<pratikrajesh.sampat@amd.com>, Reinette Chatre <reinette.chatre@intel.com>,
+	Ira Weiny <ira.weiny@intel.com>
+CC: <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>
+References: <20250807201628.1185915-1-sagis@google.com>
+ <20250807201628.1185915-23-sagis@google.com>
+Content-Language: en-US
+From: Chenyi Qiang <chenyi.qiang@intel.com>
+In-Reply-To: <20250807201628.1185915-23-sagis@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SG2PR01CA0160.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:28::16) To CYXPR11MB8729.namprd11.prod.outlook.com
+ (2603:10b6:930:dc::17)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250807144938.e0abc7bb-a4-amachhiw@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODEyMDIxOSBTYWx0ZWRfX+7pGaXeFCS82
- iUug+sfuqRUNtHWdb6JNLVlR3LpZ8+kmqKnfWFhvXm9HbjJrRLJhBVwTrh7V98qRBXNxBsXqRId
- y8Hxj/mv3h9DeXDJ5iejH2DiQ2K4MMXqYiDkFZjTABYzS60CRQrQraz/SNfsDLXEuET1MPtuy9L
- fUx2CJYwVirs8Vxg325FM2jzx710QXwrYWJ7e4mR29wqU4ZqNwOg8Qd4UOq2MGtGjcEDlb9ETxx
- g29D/5ujVVN0NLO1LT2TetJ8+ltiUnk3MvhlbjWIW8WZbiWw7PKxjZEhX5saHxy5ybSVEhWmpK+
- 7a1iIieYyRvq/PjQyw9OSHcEBoZg3KsOnxMp+jQHlU2L8Ed00ZvusRGgslYzG891bS9Lq2EQTsp
- 4qDCEEbI
-X-Authority-Analysis: v=2.4 cv=GrpC+l1C c=1 sm=1 tr=0 ts=689da532 cx=c_pps
- a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
- a=kj9zAlcOel0A:10 a=2OwXVqhp2XgA:10 a=VwQbUJbxAAAA:8 a=FOH2dFAWAAAA:8
- a=VnNF1IyMAAAA:8 a=znEx-w3LAaTq8doKefoA:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-GUID: YD4Sb_c9EQrVEZ1hJvtDxWT_0T1C4fmf
-X-Proofpoint-ORIG-GUID: YD4Sb_c9EQrVEZ1hJvtDxWT_0T1C4fmf
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-08-13_02,2025-08-11_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 adultscore=0 spamscore=0 impostorscore=0 suspectscore=0
- phishscore=0 bulkscore=0 priorityscore=1501 malwarescore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2508120219
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CYXPR11MB8729:EE_|CY8PR11MB7244:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1ed0c756-1be2-4ed3-5aeb-08dddb11a05d
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|1800799024|376014|366016|921020|7053199007;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?S3JMbWtuMEVlZWdMbXRTclJoZ1BYRm83RDU4a0VpOTdYd3V3eS91cVRIVzFo?=
+ =?utf-8?B?RXlqNHlxQUdSNHdFSzAwRGkxWDh0YWxWVEV2QTFkNytqeU5leHNMREVqSGg1?=
+ =?utf-8?B?QVdqa1Vsbm5admk0WmVzOXVDMWJEeForMG5xd2p1dUVFdWZpV0RVeEFXWE5W?=
+ =?utf-8?B?TFg5eXhlRkpPd2UrOHc1ZmZmd1ZYNnBoeEdaYUFZQjRGa1I3dDZvTDZxRTEz?=
+ =?utf-8?B?STc1N3RYRHVPYXFuT2RxZ25kblI5UzJTQUp6UVhuL2MzbXp4K1gyYTY0QnpR?=
+ =?utf-8?B?VjFEWEVNR3BiODZrZEtteXovdkRIVVRkZ09BOVYrUVQwVEJJQ2xUb0s3UU5M?=
+ =?utf-8?B?Y1NDTmVJUXJmWDJtU0tGY3QxMW00N3NRTEoxMy9jOXFZMnQ0TWNJN080eTF0?=
+ =?utf-8?B?enNTU1dyRjVSZWtXZVpCQ09JSldyQnB2N3JteFdza2JaYS9xc011a0JtaW9M?=
+ =?utf-8?B?aHU3YUp4Ny8vWXdtUGlyeHp1L2dBcGRTc1hXZVEzUmlwR2VZYk05dE1QT2g3?=
+ =?utf-8?B?Z1d5OGFKK1YvaEp6N3owV1ZQQmZndGtkU2kzQkVIOU5ycU5Uc2JVU0swSURO?=
+ =?utf-8?B?eUlLYmkrN3BCRlIrWVpyUEMrYzBveFczeDlydHA0Z213eTJWVHY0a1hxbDhO?=
+ =?utf-8?B?bzRCVGVsK28ySm1TY1RLR1dwVE1NS3Uybmt3cG4zc1J1TTN2N21QQmtGSld4?=
+ =?utf-8?B?SVN5ZzhqdGdnS3YyOUxNMmx6T2JkNVRMRVNpWWpsSTlmeHBCK0tEZk0vZSs4?=
+ =?utf-8?B?NWU2OEJjZ3VZY1VEQ1h2WEpFRU5OVmZ2RkZhWVYvTzYvZjU4ZVdad0FQbHV4?=
+ =?utf-8?B?d3lqbUpYWkprNkNKOVRpNjJQc3Fqc0JSSXB1MU9SSUQwcm00YUgrOXFObklP?=
+ =?utf-8?B?N01CenJiS1FBV3N4RjhxUGJybHZEZVVRaWcrZXZYK0lCWDh1TzZHTlZYcnRm?=
+ =?utf-8?B?d0JVb1VuQmVac3lvejNWM0xUSVhsL3VkRHo4Qm5kU2ZlWVdPeDFGMjQ3WlVG?=
+ =?utf-8?B?WkVBeXpML3BtUXd1UDhERGpHQitiZXJid25wSGU5a0ZUWHlBR2ZyRlJ2NTk4?=
+ =?utf-8?B?NlFXWHpseHFidzZBZ3FTWGFLOEFlMjFGQkZ3aTR2NGYxWkJmb0xaRlU4RW45?=
+ =?utf-8?B?cldOUFJabWYzUUlaSkVIQk9EemNYVHF6T3pKNnQ4YU9TKzF1VUZxcStDNUNZ?=
+ =?utf-8?B?bGx4aGJTY2FGMFhrREwrTEttV0pBc3ZyaUloY1k3clZJZ044d0V2eElzVXpO?=
+ =?utf-8?B?WVkzSythZEQ4dVlENVR4WmxWdTVvQkRibUt2b05sZS81UzVqaG9HL2tFbFp0?=
+ =?utf-8?B?SjJBbVprcVN0N0F0eUZnaURJS250c1JQL2x1dFlGWkMvS0pCVStubmlwNkRl?=
+ =?utf-8?B?RnUrQUI4STd6UzFWb0xYM0xVeTZSK0h0dnZ6bTRVQXZSZk5wazZ3NndkSmha?=
+ =?utf-8?B?OG1jOXVyR05qQ1FnM1FpQ05Nb1RtK1lIN2hNZ1FRRzlDbEdFMm5YM1cvaDNV?=
+ =?utf-8?B?N0NjLytTUjg1OFBwbUcyaEc0NmV6ajFGd0llaUYvTlZ6Zlc1dHVQK09IQnR3?=
+ =?utf-8?B?cXM0UlpaQnNPZlhzY1p3YlRXQUhWYjVWalNZTHdTcWFvc3lSbWlXbzFPNzVk?=
+ =?utf-8?B?MC9lelJXZVNZUU5tR1hBam9JNWwrNXBDdXlTMnhCdXRPRm81OXRnWllMT1dy?=
+ =?utf-8?B?MGhKWTBPa0VYWk5OdVh3WDFDTUovUEsvRjJpV0hCTTEzTVBuL3UxSm1VTDNP?=
+ =?utf-8?B?R3oyTjFlUjZnNjhpYWNrQWtCZURaaENFLzI3dDFUR1ZBVGdrWHErc2FrUDVV?=
+ =?utf-8?B?ZVczYlpWb0psVUZPTXpTc0s3ak5wSFd2aTBRRzA4Q0RGeE41bkgra0VjRGhC?=
+ =?utf-8?B?MTRVNGhXbVBWZGpYdmIxa3QvanhYczFoWVBibXowOUdPaXlMN2ZSbUhaRC9q?=
+ =?utf-8?B?SGI3K3FKSVRrajIvZGFaMXdRUkRpamdLSFFNbkpFS2dJUlc0OUpKdFVBM3pN?=
+ =?utf-8?B?QVZCYm15TlBnPT0=?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CYXPR11MB8729.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(376014)(366016)(921020)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dkJDdlV1MytGS2xUbm8zNDU3NHZRbzJjS2FQWE9sckUzYis5WTVPMU9PZEZK?=
+ =?utf-8?B?TCszNUw2aitmSlpRM2F5bGJTa09yMkpxSzUyWk1CYXRkcDlSb05iVi80aDZZ?=
+ =?utf-8?B?RXBiM05wdUhWY2Z3WUNLemU2ZmJ6aGw3NitBd0Jxb1BBdHR6ZWxJQlFKbGU3?=
+ =?utf-8?B?UEtoWWdwNmpEeVlYUUgrSFk4V0RuQ1d3Y0NCT05mTzJxMTNwNUJsRVB3Q285?=
+ =?utf-8?B?NUk0RjJFT09Vb2lLdjdiZWUyNXdaZVYzMTd6NGZ2RWpiMEFibXJ4Vjd6THd1?=
+ =?utf-8?B?TktOT0xEKy9kaDFwTjB3TGFQYzNKUEQzaGVnSjFhZUIwQzk3MHRNYWppU0w5?=
+ =?utf-8?B?SDdySzNJMVlZcTJNaEtaT0NDK3lTSS9yanZKQnFNSmNiMnVuK2VucElzUXk4?=
+ =?utf-8?B?UmtsZDYzaGFXK2JZa3RzMWl4STRaYXIva1FGSXYrc1hrL0RSeFpMNzMwMUhu?=
+ =?utf-8?B?bkVPWENWQktoZ2kzMXlBaCsrUmJCTUZMbTBtL1VuZDhYZzFsYzM2MDVCbUw3?=
+ =?utf-8?B?Z1RoSmJNNzdpVXJDWnlyTXY5VDdNcU5sUlJicmdBWTlTS0NpdjBaS2N4SlRq?=
+ =?utf-8?B?aUlHUS9ObGxUTklEVFQwV2VYS2NFOURxNFVHTUJoV0R1SXhyY2dJdEUvOTlX?=
+ =?utf-8?B?dmlFMjk4SWZ4MWZURnJzOHNOU2poUCtXNzVQN1lxQlV3NDRiRGRHUDFuQVNq?=
+ =?utf-8?B?UFJoK2pFUzdWY0I5MzYxU2ljUy9RSWhqMUx5RU1SOUZuL2VGV0d1ZW43ZGFX?=
+ =?utf-8?B?Qjk3US9YTDRUMkFwT1ByN0hMVUFnVUtjL3ArYlhPeGE2VEk0Ty9oSHQ3cXRt?=
+ =?utf-8?B?ZDNmRk5JNWxINTRad0pMRCtLcVhlTE9LT2RWRmU2T0doR0RwblR0YzdtMWs0?=
+ =?utf-8?B?SzZFVUxlUWM3MG9kcjhLWlBnVU1OMUlvQVBJaG54OXNia3hkdU96ZEY0UGQ1?=
+ =?utf-8?B?UzBDOU1zZzlLbEVjcXc5cmMrZVFnSDJpTEp6c0VhTERyclNwSmk2a0hUNk1V?=
+ =?utf-8?B?VVU3QldSNHg1aGd5ZmhnWlBvbTNSV1F6bTlQNHdiR0RVM0NMVVFyZlMvTlNm?=
+ =?utf-8?B?NDhKSkFzNmduK2RwMmwwYzZqVVBYZ2xHMzN6Wjg0dzlMOE5UMXYyOUlRL3Zv?=
+ =?utf-8?B?STFGcDNWNEkwVVo5U1BvazFoc0x4cGFHaHhZSGxFanU2dGRCdHpYSHVHTUNz?=
+ =?utf-8?B?Ynh3YTlOMHhJK1d2TVBzN1A2TWZGSlhzMi9QUWZmMUpxSkVmTEoxWElWeVp5?=
+ =?utf-8?B?Y2Nna0lRNm5OS1QzOHorVVkzNTVOdGxSMk5ZMG41SXZGUVZJY3NwYU93cUVr?=
+ =?utf-8?B?bDVCTTQ0YjRrYjViMWRNZFlzVHFuUUtWOWhhUlN1VjVCQ2F5dkZJdldJaWhV?=
+ =?utf-8?B?a2I2WnhwTzZYaVE1Rjd0dWRJaTFPbTZUYU1uazAvNU5pd2xmOTN0MXZKdEJp?=
+ =?utf-8?B?cU12ZFF6T2xVVEFxbVJ5TVpBb3hvbU04cFlleUxZbU50RU9WNE51WjJLNXNR?=
+ =?utf-8?B?T0ZldzE0VDBpR0s2QVpPVlM1akxvTVJKRU5ycy9GRFI4T1h6ek13bFRqRGhk?=
+ =?utf-8?B?OThSTHFha1pzMmQyN0MxTy9QSGcrSjN4YzBCOTNtaFY1ZkJIZldtTUlKcWNB?=
+ =?utf-8?B?RS9RaVJKRDlsaWlPZG9uNzlsa3VONzVYVXRTd1M4cW1yUmR6dTR2TjlrdGxj?=
+ =?utf-8?B?UUp2WlBhUWNSeEw4ZXYvNnpKQmFYRi9seUVnWFA3UG5iVm54a0FSYzRmcStU?=
+ =?utf-8?B?MHB0L21pMmJmcXp0R0FQU3BVbEo4cTFmUHpQRzR6bnkvZVBKQ0sxWmZSYjZL?=
+ =?utf-8?B?MW52cFFWNWg2ZU1EOE94eWpBWEl1S0NqSE50NGo3T0xRa1VqeHFiMWE0RDdq?=
+ =?utf-8?B?VlNhS0p1MGI4dHN1TDEwSmhDc2JkUXd4MFIzVmVmcUoxQ0lweUwvcEIzWWxC?=
+ =?utf-8?B?TWpMUkRjSUFEbGwrSjlmZm9zUjdrcHZrbUZpUjEwVmk1bHMwWlRkdFBRdkNn?=
+ =?utf-8?B?THpxWC93OFRraGJyQmRYTlBZN0hVTmNjMnorRzNzQm9VQm0vRW5xanF0czJR?=
+ =?utf-8?B?VDNuZHV0dVdDNnIxaFVTVHpUY2syUmxqcVIwV0trYjZmSnVCQ1pMaXZnU1kz?=
+ =?utf-8?B?ekZWajFyQ2N4REFCczZJc2h3aWpDenhRVXZyTXh5bzRKdExVWlJBbHkybUtN?=
+ =?utf-8?B?SkE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1ed0c756-1be2-4ed3-5aeb-08dddb11a05d
+X-MS-Exchange-CrossTenant-AuthSource: CYXPR11MB8729.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Aug 2025 09:04:51.1603
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: AmsZVmBSUDH81K3XwtPNxkgDY4FfYgMFoRDEZ4q64+/2o/gu9qtWhAe8GLsPzWertu/14Ym9mTFNq1qPeAzlaw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB7244
+X-OriginatorOrg: intel.com
 
-On 2025/08/07 03:04 PM, Amit Machhiwal wrote:
-> Hello,
-> 
-> On 2025/08/04 12:44 PM, Alex Mastro wrote:
-> > Print the PCI device syspath to a vfio device's fdinfo. This enables tools
-> > to query which device is associated with a given vfio device fd.
-> > 
-> > This results in output like below:
-> > 
-> > $ cat /proc/"$SOME_PID"/fdinfo/"$VFIO_FD" | grep vfio
-> > vfio-device-syspath: /sys/devices/pci0000:e0/0000:e0:01.1/0000:e1:00.0/0000:e2:05.0/0000:e8:00.0
-> > 
-> > Signed-off-by: Alex Mastro <amastro@fb.com>
-> 
-> I tested this patch on a POWER9 bare metal system with a VFIO PCI device and
-> could see the VFIO device syspath in fdinfo.
-> 
->  Without this patch:
->  -------------------
-> 
->     [root@localhost ~]# cat /proc/7059/fdinfo/188
->     pos:    0
->     flags:  02000002
->     mnt_id: 17
->     ino:    1113
-> 
->  With this patch:
->  ----------------
->     [root@localhost ~]# cat /proc/7722/fdinfo/188
->     pos:    0
->     flags:  02000002
->     mnt_id: 17
->     ino:    2145
->     vfio-device-syspath: /sys/devices/pci0031:00/0031:00:00.0/0031:01:00.0
-> 
-> ..., and the code changes LGTM. Hence,
 
-Additionally, I got a chance to test this patch on a pSeries POWER10 logical
-partition (L1) running a KVM guest (L2) with a PCI device passthrough and I see
-the expected results:
 
-  [root@guest ~]# lscpu
-  Architecture:             ppc64le
-    Byte Order:             Little Endian
-  CPU(s):                   20
-    On-line CPU(s) list:    0-19
-  Model name:               POWER10 (architected), altivec supported
-    Model:                  2.0 (pvr 0080 0200)
-  [...]
-
-  [root@guest ~]# lspci
-  [...]
-  0001:00:01.0 Non-Volatile memory controller: Samsung Electronics Co Ltd NVMe SSD Controller PM9A1/PM9A3/980PRO
-
-  root@host:~ # cat /proc/2116/fdinfo/68
-  pos:    0
-  flags:  02000002
-  mnt_id: 17
-  ino:    160
-  vfio-device-syspath: /sys/devices/pci0182:70/0182:70:00.0
-
-The L1 was booted with latest upstream kernel (HEAD: 53e760d89498) with the
-patch applied and the L2 was booted on distro QEMU (version 10.0.2) and as well
-as on latest upstream QEMU (HEAD: 5836af078321, version 10.0.93).
-
-Thanks,
-Amit
-
+On 8/8/2025 4:16 AM, Sagi Shahar wrote:
+> From: Roger Wang <runanwang@google.com>
 > 
-> Reviewed-by: Amit Machhiwal <amachhiw@linux.ibm.com>
-> Tested-by: Amit Machhiwal <amachhiw@linux.ibm.com>
+> Adds a test for TDG.VP.INFO.
 > 
-> Thanks,
-> Amit
+> Introduce __tdx_module_call() that does needed shuffling from function
+> parameters to registers used by the TDCALL instruction that is used by the
+> guest to communicate with the TDX module. The first function parameter is
+> the leaf number indicating which guest side function should be run, for
+> example, TDG.VP.INFO.
 > 
-> > ---
-> > Changes in v4:
-> > - Remove changes to vfio.h
-> > - Link to v3: https://lore.kernel.org/r/20250801-show-fdinfo-v3-1-165dfcab89b9@fb.com
-> > Changes in v3:
-> > - Remove changes to vfio_pci.c
-> > - Add section to Documentation/filesystems/proc.rst
-> > - Link to v2: https://lore.kernel.org/all/20250724-show-fdinfo-v2-1-2952115edc10@fb.com
-> > Changes in v2:
-> > - Instead of PCI bdf, print the fully-qualified syspath (prefixed by
-> >   /sys) to fdinfo.
-> > - Rename the field to "vfio-device-syspath". The term "syspath" was
-> >   chosen for consistency e.g. libudev's usage of the term.
-> > - Link to v1: https://lore.kernel.org/r/20250623-vfio-fdinfo-v1-1-c9cec65a2922@fb.com
-> > ---
-> >  Documentation/filesystems/proc.rst | 14 ++++++++++++++
-> >  drivers/vfio/vfio_main.c           | 20 ++++++++++++++++++++
-> >  2 files changed, 34 insertions(+)
-> > 
-> > diff --git a/Documentation/filesystems/proc.rst b/Documentation/filesystems/proc.rst
-> > index 2a17865dfe39..fc5ed3117834 100644
-> > --- a/Documentation/filesystems/proc.rst
-> > +++ b/Documentation/filesystems/proc.rst
-> > @@ -2162,6 +2162,20 @@ DMA Buffer files
-> >  where 'size' is the size of the DMA buffer in bytes. 'count' is the file count of
-> >  the DMA buffer file. 'exp_name' is the name of the DMA buffer exporter.
-> >  
-> > +VFIO Device files
-> > +~~~~~~~~~~~~~~~~
-> > +
-> > +::
-> > +
-> > +	pos:    0
-> > +	flags:  02000002
-> > +	mnt_id: 17
-> > +	ino:    5122
-> > +	vfio-device-syspath: /sys/devices/pci0000:e0/0000:e0:01.1/0000:e1:00.0/0000:e2:05.0/0000:e8:00.0
-> > +
-> > +where 'vfio-device-syspath' is the sysfs path corresponding to the VFIO device
-> > +file.
-> > +
-> >  3.9	/proc/<pid>/map_files - Information about memory mapped files
-> >  ---------------------------------------------------------------------
-> >  This directory contains symbolic links which represent memory mapped files
-> > diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-> > index 1fd261efc582..37a39cee10ed 100644
-> > --- a/drivers/vfio/vfio_main.c
-> > +++ b/drivers/vfio/vfio_main.c
-> > @@ -28,6 +28,7 @@
-> >  #include <linux/pseudo_fs.h>
-> >  #include <linux/rwsem.h>
-> >  #include <linux/sched.h>
-> > +#include <linux/seq_file.h>
-> >  #include <linux/slab.h>
-> >  #include <linux/stat.h>
-> >  #include <linux/string.h>
-> > @@ -1354,6 +1355,22 @@ static int vfio_device_fops_mmap(struct file *filep, struct vm_area_struct *vma)
-> >  	return device->ops->mmap(device, vma);
-> >  }
-> >  
-> > +#ifdef CONFIG_PROC_FS
-> > +static void vfio_device_show_fdinfo(struct seq_file *m, struct file *filep)
-> > +{
-> > +	char *path;
-> > +	struct vfio_device_file *df = filep->private_data;
-> > +	struct vfio_device *device = df->device;
-> > +
-> > +	path = kobject_get_path(&device->dev->kobj, GFP_KERNEL);
-> > +	if (!path)
-> > +		return;
-> > +
-> > +	seq_printf(m, "vfio-device-syspath: /sys%s\n", path);
-> > +	kfree(path);
-> > +}
-> > +#endif
-> > +
-> >  const struct file_operations vfio_device_fops = {
-> >  	.owner		= THIS_MODULE,
-> >  	.open		= vfio_device_fops_cdev_open,
-> > @@ -1363,6 +1380,9 @@ const struct file_operations vfio_device_fops = {
-> >  	.unlocked_ioctl	= vfio_device_fops_unl_ioctl,
-> >  	.compat_ioctl	= compat_ptr_ioctl,
-> >  	.mmap		= vfio_device_fops_mmap,
-> > +#ifdef CONFIG_PROC_FS
-> > +	.show_fdinfo	= vfio_device_show_fdinfo,
-> > +#endif
-> >  };
-> >  
-> >  static struct vfio_device *vfio_device_from_file(struct file *file)
-> > 
-> > ---
-> > base-commit: 4518e5a60c7fbf0cdff393c2681db39d77b4f87e
-> > change-id: 20250801-show-fdinfo-ef109ca738cf
-> > 
-> > Best regards,
-> > -- 
-> > Alex Mastro <amastro@fb.com>
-> > 
+> The guest uses new __tdx_module_call() to call TDG.VP.INFO to obtain TDX
+> TD execution environment information from the TDX module. All returned
+> registers are passed back to the host that verifies values for
+> correctness.
+> 
+> Co-developed-by: Sagi Shahar <sagis@google.com>
+> Signed-off-by: Sagi Shahar <sagis@google.com>
+> Signed-off-by: Roger Wang <runanwang@google.com>
+> Signed-off-by: Sagi Shahar <sagis@google.com>
+
+Duplicated SOB. Please change the order according to submmitting-patches.rst.
+And check the whole series for such SOB issue.
+
+> ---
+>  .../selftests/kvm/include/x86/tdx/tdcall.h    |  19 +++
+>  .../selftests/kvm/include/x86/tdx/tdx.h       |   5 +
+>  .../selftests/kvm/lib/x86/tdx/tdcall.S        |  68 +++++++++
+>  tools/testing/selftests/kvm/lib/x86/tdx/tdx.c |  27 ++++
+>  tools/testing/selftests/kvm/x86/tdx_vm_test.c | 133 +++++++++++++++++-
+>  5 files changed, 251 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/include/x86/tdx/tdcall.h b/tools/testing/selftests/kvm/include/x86/tdx/tdcall.h
+> index e7440f7fe259..ab1a97a82fa9 100644
+> --- a/tools/testing/selftests/kvm/include/x86/tdx/tdcall.h
+> +++ b/tools/testing/selftests/kvm/include/x86/tdx/tdcall.h
+> @@ -32,4 +32,23 @@ struct tdx_hypercall_args {
+>  /* Used to request services from the VMM */
+>  u64 __tdx_hypercall(struct tdx_hypercall_args *args, unsigned long flags);
+>  
+> +/*
+> + * Used to gather the output registers values of the TDCALL and SEAMCALL
+
+This series only uses this struct to gather values for TDCALL. Please remove
+the "SEAMCALL" for accuracy.
+
+> + * instructions when requesting services from the TDX module.
+> + *
+> + * This is a software only structure and not part of the TDX module/VMM ABI.
+> + */
+> +struct tdx_module_output {
+> +	u64 rcx;
+> +	u64 rdx;
+> +	u64 r8;
+> +	u64 r9;
+> +	u64 r10;
+> +	u64 r11;
+> +};
+> +
+> +/* Used to communicate with the TDX module */
+> +u64 __tdx_module_call(u64 fn, u64 rcx, u64 rdx, u64 r8, u64 r9,
+> +		      struct tdx_module_output *out);
+> +
+>  #endif // SELFTESTS_TDX_TDCALL_H
+> diff --git a/tools/testing/selftests/kvm/include/x86/tdx/tdx.h b/tools/testing/selftests/kvm/include/x86/tdx/tdx.h
+> index 060158cb046b..801ca879664e 100644
+> --- a/tools/testing/selftests/kvm/include/x86/tdx/tdx.h
+> +++ b/tools/testing/selftests/kvm/include/x86/tdx/tdx.h
+> @@ -6,6 +6,8 @@
+>  
+>  #include "kvm_util.h"
+>  
+> +#define TDG_VP_INFO 1
+> +
+>  #define TDG_VP_VMCALL_GET_TD_VM_CALL_INFO 0x10000
+>  #define TDG_VP_VMCALL_REPORT_FATAL_ERROR 0x10003
+>  
+> @@ -31,5 +33,8 @@ uint64_t tdg_vp_vmcall_ve_request_mmio_write(uint64_t address, uint64_t size,
+>  uint64_t tdg_vp_vmcall_instruction_cpuid(uint32_t eax, uint32_t ecx,
+>  					 uint32_t *ret_eax, uint32_t *ret_ebx,
+>  					 uint32_t *ret_ecx, uint32_t *ret_edx);
+> +uint64_t tdg_vp_info(uint64_t *rcx, uint64_t *rdx,
+> +		     uint64_t *r8, uint64_t *r9,
+> +		     uint64_t *r10, uint64_t *r11);
+>  
+>  #endif // SELFTEST_TDX_TDX_H
+> diff --git a/tools/testing/selftests/kvm/lib/x86/tdx/tdcall.S b/tools/testing/selftests/kvm/lib/x86/tdx/tdcall.S
+> index b10769d1d557..c393a0fb35be 100644
+> --- a/tools/testing/selftests/kvm/lib/x86/tdx/tdcall.S
+> +++ b/tools/testing/selftests/kvm/lib/x86/tdx/tdcall.S
+> @@ -91,5 +91,73 @@ __tdx_hypercall:
+>  	pop %rbp
+>  	ret
+>  
+> +#define TDX_MODULE_rcx 0 /* offsetof(struct tdx_module_output, rcx) */
+> +#define TDX_MODULE_rdx 8 /* offsetof(struct tdx_module_output, rdx) */
+> +#define TDX_MODULE_r8 16 /* offsetof(struct tdx_module_output, r8) */
+> +#define TDX_MODULE_r9 24 /* offsetof(struct tdx_module_output, r9) */
+> +#define TDX_MODULE_r10 32 /* offsetof(struct tdx_module_output, r10) */
+> +#define TDX_MODULE_r11 40 /* offsetof(struct tdx_module_output, r11) */
+> +
+> +.globl __tdx_module_call
+> +.type __tdx_module_call, @function
+> +__tdx_module_call:
+> +	/* Set up stack frame */
+> +	push %rbp
+> +	movq %rsp, %rbp
+> +
+> +	/* Callee-saved, so preserve it */
+> +	push %r12
+> +
+> +	/*
+> +	 * Push output pointer to stack.
+> +	 * After the operation, it will be fetched into R12 register.
+> +	 */
+> +	push %r9
+> +
+> +	/* Mangle function call ABI into TDCALL/SEAMCALL ABI: */
+> +	/* Move Leaf ID to RAX */
+> +	mov %rdi, %rax
+> +	/* Move input 4 to R9 */
+> +	mov %r8,  %r9
+> +	/* Move input 3 to R8 */
+> +	mov %rcx, %r8
+> +	/* Move input 1 to RCX */
+> +	mov %rsi, %rcx
+> +	/* Leave input param 2 in RDX */
+> +
+> +	tdcall
+> +
+> +	/*
+> +	 * Fetch output pointer from stack to R12 (It is used
+> +	 * as temporary storage)
+> +	 */
+> +	pop %r12
+> +
+> +	/*
+> +	 * Since this macro can be invoked with NULL as an output pointer,
+> +	 * check if caller provided an output struct before storing output
+> +	 * registers.
+> +	 *
+> +	 * Update output registers, even if the call failed (RAX != 0).
+> +	 * Other registers may contain details of the failure.
+> +	 */
+> +	test %r12, %r12
+> +	jz .Lno_output_struct
+> +
+> +	/* Copy result registers to output struct: */
+> +	movq %rcx, TDX_MODULE_rcx(%r12)
+> +	movq %rdx, TDX_MODULE_rdx(%r12)
+> +	movq %r8,  TDX_MODULE_r8(%r12)
+> +	movq %r9,  TDX_MODULE_r9(%r12)
+> +	movq %r10, TDX_MODULE_r10(%r12)
+> +	movq %r11, TDX_MODULE_r11(%r12)
+> +
+> +.Lno_output_struct:
+> +	/* Restore the state of R12 register */
+> +	pop %r12
+> +
+> +	pop %rbp
+> +	ret
+> +
+>  /* Disable executable stack */
+>  .section .note.GNU-stack,"",%progbits
+> diff --git a/tools/testing/selftests/kvm/lib/x86/tdx/tdx.c b/tools/testing/selftests/kvm/lib/x86/tdx/tdx.c
+> index fb391483d2fa..ab6fd3d7ae4b 100644
+> --- a/tools/testing/selftests/kvm/lib/x86/tdx/tdx.c
+> +++ b/tools/testing/selftests/kvm/lib/x86/tdx/tdx.c
+> @@ -162,3 +162,30 @@ uint64_t tdg_vp_vmcall_instruction_cpuid(uint32_t eax, uint32_t ecx,
+>  
+>  	return ret;
+>  }
+> +
+> +uint64_t tdg_vp_info(uint64_t *rcx, uint64_t *rdx,
+> +		     uint64_t *r8, uint64_t *r9,
+> +		     uint64_t *r10, uint64_t *r11)
+> +{
+> +	struct tdx_module_output out;
+> +	uint64_t ret;
+> +
+> +	memset(&out, 0, sizeof(struct tdx_module_output));
+> +
+> +	ret = __tdx_module_call(TDG_VP_INFO, 0, 0, 0, 0, &out);
+> +
+> +	if (rcx)
+> +		*rcx = out.rcx;
+> +	if (rdx)
+> +		*rdx = out.rdx;
+> +	if (r8)
+> +		*r8 = out.r8;
+> +	if (r9)
+> +		*r9 = out.r9;
+> +	if (r10)
+> +		*r10 = out.r10;
+> +	if (r11)
+> +		*r11 = out.r11;
+> +
+> +	return ret;
+> +}
+> diff --git a/tools/testing/selftests/kvm/x86/tdx_vm_test.c b/tools/testing/selftests/kvm/x86/tdx_vm_test.c
+> index b6ef0348746c..82acc17a66ab 100644
+> --- a/tools/testing/selftests/kvm/x86/tdx_vm_test.c
+> +++ b/tools/testing/selftests/kvm/x86/tdx_vm_test.c
+> @@ -1038,6 +1038,135 @@ void verify_host_reading_private_mem(void)
+>  	printf("\t ... PASSED\n");
+>  }
+>  
+> +/*
+> + * Do a TDG.VP.INFO call from the guest
+> + */
+> +void guest_tdcall_vp_info(void)
+> +{
+> +	uint64_t rcx, rdx, r8, r9, r10, r11;
+> +	uint64_t err;
+> +
+> +	err = tdg_vp_info(&rcx, &rdx, &r8, &r9, &r10, &r11);
+> +	tdx_assert_error(err);
+> +
+> +	/* return values to user space host */
+> +	err = tdx_test_report_64bit_to_user_space(rcx);
+> +	tdx_assert_error(err);
+> +
+> +	err = tdx_test_report_64bit_to_user_space(rdx);
+> +	tdx_assert_error(err);
+> +
+> +	err = tdx_test_report_64bit_to_user_space(r8);
+> +	tdx_assert_error(err);
+> +
+> +	err = tdx_test_report_64bit_to_user_space(r9);
+> +	tdx_assert_error(err);
+> +
+> +	err = tdx_test_report_64bit_to_user_space(r10);
+> +	tdx_assert_error(err);
+> +
+> +	err = tdx_test_report_64bit_to_user_space(r11);
+> +	tdx_assert_error(err);
+> +
+> +	tdx_test_success();
+> +}
+> +
+> +/*
+> + * TDG.VP.INFO call from the guest. Verify the right values are returned
+> + */
+> +void verify_tdcall_vp_info(void)
+> +{
+> +	const struct kvm_cpuid_entry2 *cpuid_entry;
+> +	uint32_t ret_num_vcpus, ret_max_vcpus;
+> +	uint64_t rcx, rdx, r8, r9, r10, r11;
+> +	const int num_vcpus = 2;
+> +	struct kvm_vcpu *vcpus[num_vcpus];
+> +	uint64_t attributes;
+> +	struct kvm_vm *vm;
+> +	int gpa_bits = -1;
+> +	uint32_t i;
+> +
+> +	vm = td_create();
+> +
+> +#define TDX_TDPARAM_ATTR_SEPT_VE_DISABLE_BIT	BIT(28)
+> +	/* Setting attributes parameter used by TDH.MNG.INIT to 0x10000000 */
+> +	attributes = TDX_TDPARAM_ATTR_SEPT_VE_DISABLE_BIT;
+> +
+> +	td_initialize(vm, VM_MEM_SRC_ANONYMOUS, attributes);
+> +
+> +	for (i = 0; i < num_vcpus; i++)
+> +		vcpus[i] = td_vcpu_add(vm, i, guest_tdcall_vp_info);
+> +
+> +	td_finalize(vm);
+> +
+> +	printf("Verifying TDG.VP.INFO call:\n");
+> +
+> +	/* Get KVM CPUIDs for reference */
+> +
+> +	for (i = 0; i < num_vcpus; i++) {
+> +		struct kvm_vcpu *vcpu = vcpus[i];
+> +
+> +		cpuid_entry = vcpu_get_cpuid_entry(vcpu, 0x80000008);
+> +		TEST_ASSERT(cpuid_entry, "CPUID entry missing\n");
+> +		gpa_bits = (cpuid_entry->eax & GENMASK(23, 16)) >> 16;
+> +		TEST_ASSERT_EQ((1UL << (gpa_bits - 1)), tdx_s_bit);
+> +
+> +		/* Wait for guest to report rcx value */
+> +		tdx_run(vcpu);
+> +		rcx = tdx_test_read_64bit_report_from_guest(vcpu);
+> +
+> +		/* Wait for guest to report rdx value */
+> +		tdx_run(vcpu);
+> +		rdx = tdx_test_read_64bit_report_from_guest(vcpu);
+> +
+> +		/* Wait for guest to report r8 value */
+> +		tdx_run(vcpu);
+> +		r8 = tdx_test_read_64bit_report_from_guest(vcpu);
+> +
+> +		/* Wait for guest to report r9 value */
+> +		tdx_run(vcpu);
+> +		r9 = tdx_test_read_64bit_report_from_guest(vcpu);
+> +
+> +		/* Wait for guest to report r10 value */
+> +		tdx_run(vcpu);
+> +		r10 = tdx_test_read_64bit_report_from_guest(vcpu);
+> +
+> +		/* Wait for guest to report r11 value */
+> +		tdx_run(vcpu);
+> +		r11 = tdx_test_read_64bit_report_from_guest(vcpu);
+> +
+> +		ret_num_vcpus = r8 & 0xFFFFFFFF;
+> +		ret_max_vcpus = (r8 >> 32) & 0xFFFFFFFF;
+> +
+> +		/* first bits 5:0 of rcx represent the GPAW */
+> +		TEST_ASSERT_EQ(rcx & 0x3F, gpa_bits);
+> +		/* next 63:6 bits of rcx is reserved and must be 0 */
+> +		TEST_ASSERT_EQ(rcx >> 6, 0);
+> +		TEST_ASSERT_EQ(rdx, attributes);
+> +		TEST_ASSERT_EQ(ret_num_vcpus, num_vcpus);
+> +		TEST_ASSERT_EQ(ret_max_vcpus, vm_check_cap(vm, KVM_CAP_MAX_VCPUS));
+> +		/* VCPU_INDEX = i */
+> +		TEST_ASSERT_EQ(r9, i);
+
+The format for r9 is
+- 31:0
+   VCPU_INDEX
+- 62:32
+   Reserved to 0
+
+Maybe add the check for reserved bits as other registers
+
 
