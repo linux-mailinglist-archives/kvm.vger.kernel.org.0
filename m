@@ -1,154 +1,143 @@
-Return-Path: <kvm+bounces-54689-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54690-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 572C8B26E9A
-	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 20:08:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1776B26EEC
+	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 20:30:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8EFA67BDC0F
-	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 18:01:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DDA34AA4248
+	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 18:30:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2E2C319863;
-	Thu, 14 Aug 2025 18:01:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59D28233733;
+	Thu, 14 Aug 2025 18:30:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yp4lHwwJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RkYsB+6h"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67FC3319852
-	for <kvm@vger.kernel.org>; Thu, 14 Aug 2025 18:01:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7F3222D7B6
+	for <kvm@vger.kernel.org>; Thu, 14 Aug 2025 18:30:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755194461; cv=none; b=OvMSWDV17XauXivtx1xcohIrhO522eB/T67PywQqyzUYM2ZuSX+yB/mxLqCjP10/JcnwJPxAly7llqDrsP0eDZ0kLIeLzFhjeBz7gu47Jnxz/I2QHW3rh9+4Fo2dGcg3t8/VsV4jgM+NrV/h59WwBFcZqOBjgEkJopCHfHfhDYs=
+	t=1755196209; cv=none; b=ijQGyga4TCaiWYfIyh3LbPjkz98TC3YqSMOi6i/llAosvfciXK99Ek9bfPsfQs6+iOJOiXwqNETlpcwVNEVKJ0faBW1XAD1mMsXkksMQszNSf47zocPFHniT6RjKbUjoWPlecp5qwRs2tIMIK7aezjHakeIelF58LtB9D9QNRKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755194461; c=relaxed/simple;
-	bh=sgHYyHT9P3+Ri4inTzepKA9eeR2T6s/x27iDn6LlylY=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=UPkSAZ79i/5/bVHJV9czVaVzKHlvf/SLFl34IswzzJw/cmDyKmYuUDF4IXKhx1ljHmMaQnFp0/Tg3ZMcWrVaBomds+YqhwV0ILlVglk0PRdTUQDt1N9BehLK4rpNyvaJMEfOtAWNs7xM87dPhCjqbdJ6LQbPdsF4umESI6kccYw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yp4lHwwJ; arc=none smtp.client-ip=209.85.216.74
+	s=arc-20240116; t=1755196209; c=relaxed/simple;
+	bh=A4c0iTOf2R71rU6WSqW1yP7mOGni3aEu/5lN6bh82ew=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PfDrvdAxV/uzetTveVXSNYj7RZ5jGJl/aYS8hxTh1bVUPh135oZQtj6d4SZ3bISsuev2awfv/QSzcSXKUP3DG0uNe8WtnCU9ECPjNZdBNJYGXibyuRCwK1Xvd0kHanBBq+X2jfaIRwncDXDWF+52m6UyROZGwewI3y8xG7LCoQY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RkYsB+6h; arc=none smtp.client-ip=209.85.214.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-32326779c67so1212852a91.1
-        for <kvm@vger.kernel.org>; Thu, 14 Aug 2025 11:01:00 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-242d1e9c6b4so33935ad.0
+        for <kvm@vger.kernel.org>; Thu, 14 Aug 2025 11:30:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755194460; x=1755799260; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qo8YP48saC70f8nhVLPXqNgxZORbU+kNCjpBN1UXxU4=;
-        b=yp4lHwwJYq2zxzBh5QeF3tBijABWJ3ejrrCveINGhpxVfKNdPMuCd+x9XKvYmCGEyY
-         MgrxkRwTZzhajoanqEaIqea8C5AcbQBde5KlsOXEFb5WwsEHlI5bkZ90qArxvnNLsbfQ
-         e1/gShvmilV8015UIZMRlWBANAKc0BKnFm5fU5U9ptMFaik89bl2nKiPVu8xKCKJlu5A
-         x5+ER4txzZOI67kW16NVqCnjU8MFd8KvY/XayF7RfcMUCyL8um9LQv0o/K7AeLi9nE+d
-         9OrglUl39wt0Ibika3AKX8orSaC8dbEspx9NaV7v2zsOhFxooc4Fc/0aJdgxKcxNA9t/
-         WZ/g==
+        d=google.com; s=20230601; t=1755196207; x=1755801007; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ig/c0W4/BOO1c1TnermMCysZ+XWEDUNRpnYsEQ42d4w=;
+        b=RkYsB+6hzpQ8MaI6myIK+xqd3t2Ox3QnLZmmYNKK4ZDdZga/2Ib5v2bEhnObqJKom/
+         FAc88W4Qd5Kze4dZf/iY8STZnNkMLW/SvYJTj2qgQKNFDP1pPFjr/rAmdytwqDJUb3B2
+         4/T70/SbHEWg2lMcOi7ZKKgd89HRUiDxhZOru8tFUjrSHAIJblvJlbU4xmaROliXuNWj
+         wtRtI6iBtgaN528SJgQUWCJ17rFnGK6Fs0S0EYP9rzHPb9ZBijgp6LL5IAmy7dW1Z5km
+         QVo7mkecdp4skRn1fMzeIVgiakzD3p8NsgUULEbOclfo2LbVTzJiV4XzO8hFWaAprJJP
+         dYPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755194460; x=1755799260;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=qo8YP48saC70f8nhVLPXqNgxZORbU+kNCjpBN1UXxU4=;
-        b=PMaccZO2oA1gT1w1dwWxpHekAnwpk0m4vupK6kWDKSheExbqzYrU3KfWNruus5Poki
-         b6BoPEz4jpwNr7Q8Hf45C7sVQDeKeRvc48zgT0I1lVJEa4boKxCY7YReOD0eX/jYmM0f
-         Y5t7Mk/6+5xCndR/ClhP7QpY0IAf+9FCGu3Q4TiEb/dyG3RejuI4q+gHOVQ0pbpyff8o
-         IQ3z1Iat7WhtQLFLjr0g9EOiNmJs3x9acFxu9I68SeTVTRVRaYm1A3xZydoMBxFC/Kki
-         i9IkLs5iGRnJWVNp/WZP0mbgNoEkBiH0WumelkC8DIbUPxu4xOfOP8x1UciHK4uPbvbL
-         1cWA==
-X-Forwarded-Encrypted: i=1; AJvYcCVEDtW5pHI3bYXQ+sQiQXsh16AwIBtH3QHT0h7DH6+odra7YlD5hEwlUpBqusW9w9jdbPE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz0ixBT7pcz36RtBfT8Jt/Hn+p0lfgj0fpGyYg5DcOdAb0Yn6Y4
-	1jsuPYAU6gFvKHI+JW4bF4I8fmsy+q+qJewik+Rt/+08xuWPDujgG1+NDjPhEVu+T2XHC7/Kez/
-	LGPykhA==
-X-Google-Smtp-Source: AGHT+IEGQtx1mDPknNV+0MSozvZx9Iz59OeDO2C+iu+5XN28Cy4LHlj3QKqp8YTRlYFCSm+U+Hh+N8eOiJg=
-X-Received: from pjbtd11.prod.google.com ([2002:a17:90b:544b:b0:31f:2a78:943])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:51cd:b0:30a:4874:5397
- with SMTP id 98e67ed59e1d1-3232b239af0mr5459494a91.9.1755194459725; Thu, 14
- Aug 2025 11:00:59 -0700 (PDT)
-Date: Thu, 14 Aug 2025 11:00:57 -0700
-In-Reply-To: <ebd8132d5c0d4b1994802028a2bef01bd45e62a2.camel@intel.com>
+        d=1e100.net; s=20230601; t=1755196207; x=1755801007;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ig/c0W4/BOO1c1TnermMCysZ+XWEDUNRpnYsEQ42d4w=;
+        b=HvOEYh/Ezxa/n/+IjoXoCcdkX8dwZg5H3U7FO82EoIX96M9q+CDt5DJC6tfZQxHtW4
+         0EStw8OwnzMCQJxCSAIKw3A2Oxls57nT82gojFv9/3LlNS2dMZDJi6oyiUCrwqQbC5Ai
+         VhoNxiAbgpYq0DbQi0XemagpXFaiUk0/Ll4ebfy09mRmpFp78j64mKfDJ85Y1Fpclu3Q
+         0d2/WgwK+W+uaq5tYCSjnvh6xS370QmyvT+T39cp5jFCXK4ElzPbd38VemMnQJeyHnWT
+         bCbLAEuw3zxxHW8u+wW/Quq1G/5KkR6DlHuBBhWpQHz5/Z0Erx+2ATYAOA172nFhngtr
+         b33A==
+X-Forwarded-Encrypted: i=1; AJvYcCXvBU5sLs85uvQ5JRqKhEKZs+T9LOMsVFN3LlmdJUi4LtreDW8IMdwhZKZm1j9VF9XQNHA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz3LuD+dmuomwxhFhuQ/1f0mlZJ8/oSDDQh4UtW1JsY64rIomyK
+	6xMOs7RpU8B6qm+1YFfNMOF9ywD3qVg4cBbhbM6aQQTgDLWDWn+dThR7dEO/wibXUWMQu3OT6Cw
+	NYwPOtuc2uEIE+Rjj2e9Gzf/3hfWBKdwbri03c1M3
+X-Gm-Gg: ASbGncsGqFVQRYr/c2yVRuWo5Q8PQOedK0CGV5wRM5CWvnWv8N86ZQuGFU9M+plvC2m
+	QZROxuWFoWbMrb7Toye1cRA/NMiKISFU2nyjG8Qg3pSG2tCqMJ4ua4wVYt1TN5y1jua1NDP6tam
+	mYrcv2w3Z7Hzh2Sa7P05iwSjOqXhQ9QSLBBS7PV+H+ANwFWFOiKMIGddhepziVlU3g5SZ78Mapv
+	pTFe5udBW4BY437AlPS7Ct5A/Di61D/1h3DfC5eRXjVQPC77Cv7LrcAdUeOTuFGfw==
+X-Google-Smtp-Source: AGHT+IEJ3rIt+hm3527BfevwvcRNLE+CbaQKjXaAlRRRLeXWlJYoOK5k1FQMQ32BZFyBpLy5XqDtrS+ugxQllWxJwvU=
+X-Received: by 2002:a17:902:d512:b0:240:640a:c564 with SMTP id
+ d9443c01a7336-24469cc0686mr251445ad.3.1755196206738; Thu, 14 Aug 2025
+ 11:30:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <cover.1755126788.git.kai.huang@intel.com> <d8993692714829a2b1671412cdd684781c43d54a.1755126788.git.kai.huang@intel.com>
- <aJ3qhtzwHIRPrLK7@google.com> <ebd8132d5c0d4b1994802028a2bef01bd45e62a2.camel@intel.com>
-Message-ID: <aJ4kWcuyNIpCnaXE@google.com>
-Subject: Re: [PATCH v6 7/7] KVM: TDX: Explicitly do WBINVD when no more TDX SEAMCALLs
-From: Sean Christopherson <seanjc@google.com>
-To: Rick P Edgecombe <rick.p.edgecombe@intel.com>
-Cc: Kai Huang <kai.huang@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"ashish.kalra@amd.com" <ashish.kalra@amd.com>, Dave Hansen <dave.hansen@intel.com>, 
-	"thomas.lendacky@amd.com" <thomas.lendacky@amd.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Reinette Chatre <reinette.chatre@intel.com>, 
-	"dwmw@amazon.co.uk" <dwmw@amazon.co.uk>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
-	"mingo@redhat.com" <mingo@redhat.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	"kas@kernel.org" <kas@kernel.org>, "tglx@linutronix.de" <tglx@linutronix.de>, 
-	"nik.borisov@suse.com" <nik.borisov@suse.com>, "hpa@zytor.com" <hpa@zytor.com>, 
-	"peterz@infradead.org" <peterz@infradead.org>, "sagis@google.com" <sagis@google.com>, 
-	Farrah Chen <farrah.chen@intel.com>, "bp@alien8.de" <bp@alien8.de>, Chao Gao <chao.gao@intel.com>, 
-	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, Dan J Williams <dan.j.williams@intel.com>, 
-	"x86@kernel.org" <x86@kernel.org>
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+References: <20250807093950.4395-1-yan.y.zhao@intel.com> <20250807094616.4776-1-yan.y.zhao@intel.com>
+ <CAGtprH8a4i-U-4Z6=Bk87FsC2nG+UbTVWB1Sc8oYXMJs7pHUwA@mail.gmail.com>
+In-Reply-To: <CAGtprH8a4i-U-4Z6=Bk87FsC2nG+UbTVWB1Sc8oYXMJs7pHUwA@mail.gmail.com>
+From: Vishal Annapurve <vannapurve@google.com>
+Date: Thu, 14 Aug 2025 11:29:54 -0700
+X-Gm-Features: Ac12FXzYb_vWbUpk-pxM17D-jaCI2hnlVjz3bGZCmNK_-ADInzx_yScOkMMIGpI
+Message-ID: <CAGtprH8da6iwwG6u6Z2EpGaqFVWWFJD4o3RUvDYmxDQ9qaYm0w@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 22/23] KVM: TDX: Handle Dynamic PAMT on page split
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: pbonzini@redhat.com, seanjc@google.com, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, x86@kernel.org, rick.p.edgecombe@intel.com, 
+	dave.hansen@intel.com, kas@kernel.org, tabba@google.com, 
+	ackerleytng@google.com, quic_eberman@quicinc.com, michael.roth@amd.com, 
+	david@redhat.com, vbabka@suse.cz, thomas.lendacky@amd.com, pgonda@google.com, 
+	zhiquan1.li@intel.com, fan.du@intel.com, jun.miao@intel.com, 
+	ira.weiny@intel.com, isaku.yamahata@intel.com, xiaoyao.li@intel.com, 
+	binbin.wu@linux.intel.com, chao.p.peng@intel.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Aug 14, 2025, Rick P Edgecombe wrote:
-> On Thu, 2025-08-14 at 06:54 -0700, Sean Christopherson wrote:
-> > > diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> > > index 66744f5768c8..1bc6f52e0cd7 100644
-> > > --- a/arch/x86/kvm/vmx/tdx.c
-> > > +++ b/arch/x86/kvm/vmx/tdx.c
-> > > @@ -442,6 +442,18 @@ void tdx_disable_virtualization_cpu(void)
-> > > =C2=A0=C2=A0		tdx_flush_vp(&arg);
-> > > =C2=A0=C2=A0	}
-> > > =C2=A0=C2=A0	local_irq_restore(flags);
-> > > +
-> > > +	/*
-> > > +	 * No more TDX activity on this CPU from here.=C2=A0 Flush cache to
-> > > +	 * avoid having to do WBINVD in stop_this_cpu() during kexec.
-> > > +	 *
-> > > +	 * Kexec calls native_stop_other_cpus() to stop remote CPUs
-> > > +	 * before booting to new kernel, but that code has a "race"
-> > > +	 * when the normal REBOOT IPI times out and NMIs are sent to
-> > > +	 * remote CPUs to stop them.=C2=A0 Doing WBINVD in stop_this_cpu()
-> > > +	 * could potentially increase the possibility of the "race".
+On Wed, Aug 13, 2025 at 10:31=E2=80=AFPM Vishal Annapurve <vannapurve@googl=
+e.com> wrote:
+>
+> On Thu, Aug 7, 2025 at 2:46=E2=80=AFAM Yan Zhao <yan.y.zhao@intel.com> wr=
+ote:
+> >
+> > From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+> > +static struct page *tdx_alloc_pamt_page_split(void *data)
+> > +{
+> > +       struct kvm *kvm =3D data;
+> > +       void *p;
+> > +
+> > +       p =3D kvm_mmu_memory_cache_alloc(&kvm->arch.pamt_page_cache);
+> > +       return virt_to_page(p);
+> > +}
+> > +
+> >  static int tdx_spte_demote_private_spte(struct kvm *kvm, gfn_t gfn,
+> > -                                       enum pg_level level, struct pag=
+e *page)
+> > +                                       enum pg_level level, struct pag=
+e *page,
+> > +                                       kvm_pfn_t pfn_for_gfn)
+> >  {
+> >         int tdx_level =3D pg_level_to_tdx_sept_level(level);
+> > +       hpa_t hpa =3D pfn_to_hpa(pfn_for_gfn);
+> >         struct kvm_tdx *kvm_tdx =3D to_kvm_tdx(kvm);
+> >         gpa_t gpa =3D gfn_to_gpa(gfn);
+> >         u64 err, entry, level_state;
+> > +       LIST_HEAD(pamt_pages);
+> > +
+> > +       tdx_pamt_get(page, PG_LEVEL_4K, tdx_alloc_pamt_page_split, kvm)=
+;
+>
+> This invocation needs a return value check.
+>
+> > +       tdx_alloc_pamt_pages(&pamt_pages, tdx_alloc_pamt_page_split, kv=
+m);
+>
+> IIUC tdx_pamt_get() will result in pamt_pages allocation above, so
+> this step is not needed.
 
-Why is that race problematic?  The changelog just says
-
- : However, the native_stop_other_cpus() and stop_this_cpu() have a "race"
- : which is extremely rare to happen but could cause the system to hang.
- :=20
- : Specifically, the native_stop_other_cpus() firstly sends normal reboot
- : IPI to remote CPUs and waits one second for them to stop.  If that times
- : out, native_stop_other_cpus() then sends NMIs to remote CPUs to stop
- : them.
-
-without explaining how that can cause a system hang.
-
-> > > +	 */
-> > > +	tdx_cpu_flush_cache();
-> >=20
-> > IIUC, this can be:
-> >=20
-> > 	if (IS_ENABLED(CONFIG_KEXEC))
-> > 		tdx_cpu_flush_cache();
-> >=20
->=20
-> No strong objection, just 2 cents. I bet !CONFIG_KEXEC && CONFIG_INTEL_TD=
-X_HOST
-> kernels will be the minority. Seems like an opportunity to simplify the c=
-ode.
-
-Reducing the number of lines of code is not always a simplification.  IMO, =
-not
-checking CONFIG_KEXEC adds "complexity" because anyone that reads the comme=
-nt
-(and/or the massive changelog) will be left wondering why there's a bunch o=
-f
-documentation that talks about kexec, but no hint of kexec considerations i=
-n the
-code.
+I missed that one allocation is to cover the EPT page and another is
+for HPA ranges backing the GPA mappings. So ignore my rest of the
+comments except about the error handling for tdx_pamt_get() and
+tdx_alloc_pamt_pages() missing in this patch.
 
