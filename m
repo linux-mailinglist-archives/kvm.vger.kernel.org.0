@@ -1,137 +1,245 @@
-Return-Path: <kvm+bounces-54657-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54658-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B670B261A3
-	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 11:57:51 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id A90CCB261A8
+	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 11:58:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 692DC580CDB
-	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 09:52:57 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8B19E4E1450
+	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 09:58:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B23682F83B3;
-	Thu, 14 Aug 2025 09:52:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6422D2F83A9;
+	Thu, 14 Aug 2025 09:58:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b="Xtqrqm7/"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TvnElCkH"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB6EB2F6582
-	for <kvm@vger.kernel.org>; Thu, 14 Aug 2025 09:52:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1F042F6595;
+	Thu, 14 Aug 2025 09:58:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755165148; cv=none; b=XCHS8lep/eCB8rquKaRgRjIl1wBk98UcoloP0PTYTM02yREO7fWG+pD3r5cGAT+7SeyFqQRz/Rv7RMFy70DJKF+r9Vly9ZyonHw6u74pJjbCAOshocHh6rWKs92y7In/Yno+0bETZfGQPGAwNB6YlFZDj5xjj9q1AUUgIXLwY9Y=
+	t=1755165511; cv=none; b=C0zQp6x+YDEq1c5P4uauehyADMEunKOT89NJ7n8DehFZcmXcbP9yue7ZxsFHBbpQkxM/quXzPH8bEf62Xa/zbKXXlKKtkYeAuQLsKpvfwfHxA7/B6WpOHD/78OMa0yOCVg4q/ddMHghrwvG5Gi1VsHVLCSYYJxuqMfKRHboW7D8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755165148; c=relaxed/simple;
-	bh=9WP7pEgZJhaginLi/+gzctK1Z1wRC9uN/gssAwSkriw=;
-	h=From:To:CC:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=EUJ5ULQVKhbq9V5SNVh60a81T7Xk45833ejkVf4CSPHgUpd/K9hzo5hd+9fld5k9A2gLSmNZxx9gxuAWYmqqolFwMCebhXuzJa91ktA0K1X7JeF45pWKwC/wzHHrgRBjntb1+v5fdzsJs9agYoGRfSH4GiHwaJaLx/QBt/aaAk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b=Xtqrqm7/; arc=none smtp.client-ip=99.78.197.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazoncorp2;
-  t=1755165146; x=1786701146;
-  h=from:to:cc:subject:in-reply-to:references:date:
-   message-id:mime-version:content-transfer-encoding;
-  bh=9WP7pEgZJhaginLi/+gzctK1Z1wRC9uN/gssAwSkriw=;
-  b=Xtqrqm7/GDqFb8XRBG0EPaFed7x0/EgIxOpNPloCiFrkMcF/xCYswMZP
-   o/9gSPKXNw7oKhP7OQaxEzbGg93c2uj24+QqhQoy+T3RtsE2YV2dUN+bh
-   N07N+wU6pypC+Q9JMO0KCpPXe54agtlP6sCsyKcLddrs4p3NGbCVpxaJ5
-   WHS2JqqDo7rW+AGnVMnQdN25UMM5QsHYlZS0QAtYO5/TzglH6fqr5lUNG
-   PuqdcEnY3bXwQuH71vVPLoduJWT55MT1yStgKn/9aT6XMkz7hYeFaFr4f
-   WU9/jNF3hctyRY6TpImY9ZIdkUuzbnaf0hgDVwKbMXUVvwzE8ixHyUlGj
-   w==;
-X-IronPort-AV: E=Sophos;i="6.17,287,1747699200"; 
-   d="scan'208";a="224975874"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2025 09:52:25 +0000
-Received: from EX19MTAEUA001.ant.amazon.com [10.0.17.79:45320]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.7.58:2525] with esmtp (Farcaster)
- id ea2f02d8-3853-482b-8d23-3fac6324a96d; Thu, 14 Aug 2025 09:52:24 +0000 (UTC)
-X-Farcaster-Flow-ID: ea2f02d8-3853-482b-8d23-3fac6324a96d
-Received: from EX19D039EUC004.ant.amazon.com (10.252.61.190) by
- EX19MTAEUA001.ant.amazon.com (10.252.50.223) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Thu, 14 Aug 2025 09:52:23 +0000
-Received: from dev-dsk-mngyadam-1c-cb3f7548.eu-west-1.amazon.com.amazon.de
- (10.253.107.175) by EX19D039EUC004.ant.amazon.com (10.252.61.190) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14; Thu, 14 Aug 2025
- 09:52:21 +0000
-From: Mahmoud Nagy Adam <mngyadam@amazon.de>
-To: Alex Williamson <alex.williamson@redhat.com>
-CC: Jason Gunthorpe <jgg@ziepe.ca>, Benjamin Herrenschmidt
-	<benh@kernel.crashing.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"Kumar, Praveen" <pravkmr@amazon.de>, "Woodhouse, David" <dwmw@amazon.co.uk>,
-	"nagy@khwaternagy.com" <nagy@khwaternagy.com>
-Subject: Re: [RFC PATCH 0/9] vfio: Introduce mmap maple tree
-In-Reply-To: <20250811160710.174ca708.alex.williamson@redhat.com> (Alex
-	Williamson's message of "Mon, 11 Aug 2025 16:07:10 -0600")
-References: <20250804104012.87915-1-mngyadam@amazon.de>
-	<20250804124909.67462343.alex.williamson@redhat.com>
-	<lrkyq5xf27ss7.fsf@dev-dsk-mngyadam-1c-cb3f7548.eu-west-1.amazon.com>
-	<20250805143134.GP26511@ziepe.ca>
-	<lrkyqpld96a8a.fsf_-_@dev-dsk-mngyadam-1c-cb3f7548.eu-west-1.amazon.com>
-	<20250805130046.0527d0c7.alex.williamson@redhat.com>
-	<80dc87730f694b2d6e6aabbd29df49cf3c7c44fb.camel@amazon.com>
-	<20250806115224.GB377696@ziepe.ca>
-	<cec694f109f705ab9e20c2641c1558aa19bcb25b.camel@amazon.com>
-	<20250807130605.644ac9f6.alex.williamson@redhat.com>
-	<20250811155558.GF377696@ziepe.ca>
-	<20250811160710.174ca708.alex.williamson@redhat.com>
-Date: Thu, 14 Aug 2025 11:52:17 +0200
-Message-ID: <lrkyq349uut66.fsf_-_@dev-dsk-mngyadam-1c-cb3f7548.eu-west-1.amazon.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1755165511; c=relaxed/simple;
+	bh=TQyR7FXuCKYETcWNVZ8PIU2nphVvP/m9P30vQmjTT0s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fEAxqVu7WW2T4pcg93SPzuASMazhJTOV/vT2zFAejuSKXDgN5wOmShI9QXYC2Lfin1Pb/zxFgoJ6D+xLGKZCP/uEN/2aDk4mo4tLWl0qDYwUp/dWy27j9Pv4sno3nmBJxmOn6XKz1IUr5LoPJ+l4QdX1RFQffRuRQT0y39Ubw8k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TvnElCkH; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1755165510; x=1786701510;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=TQyR7FXuCKYETcWNVZ8PIU2nphVvP/m9P30vQmjTT0s=;
+  b=TvnElCkHrtKj+V68ihYs4TR8Mq+6dXUP8eMI9I1Zd6vhK+2anoGf+AJC
+   H2zAY+6FE+dMAwj2EXZFpQFN4OVfYqv2uCYsmzNeap3kLd2FhJGKpWrHW
+   gDA+BuCwQEHsrcn9TftXZiFcwJ/5ldkmjmOlcK9O1KQUapk7O6n55dFGc
+   ae+eOxB4+l6mHUP+bRIPoGoN3F0KfE60+Nyn9AER6TWSnWhxgTFce96GC
+   q91s4sVyugH+PaCd0atIe37FqCYJlo6YeedLE6VhbOT6yjyNQTQTtUsXH
+   42I8uB2luKR7hSzdUmJnX+d83uoD9JZIDK9tIDrR6H6unfOZmWmsjdbXV
+   g==;
+X-CSE-ConnectionGUID: e8HH5AiyRCuDY3kh2MqinQ==
+X-CSE-MsgGUID: PE8wlNMQRd6GTQYPE88glw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11520"; a="56685448"
+X-IronPort-AV: E=Sophos;i="6.17,287,1747724400"; 
+   d="scan'208";a="56685448"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2025 02:58:29 -0700
+X-CSE-ConnectionGUID: ucPWRSpTSVO4bCGlCpVRsw==
+X-CSE-MsgGUID: 1GNLvUZtSaSJcVASkakdJA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,287,1747724400"; 
+   d="scan'208";a="171954294"
+Received: from unknown (HELO [10.238.0.107]) ([10.238.0.107])
+  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2025 02:58:24 -0700
+Message-ID: <12524aa3-006a-4fee-bd10-b83adf7a503a@linux.intel.com>
+Date: Thu, 14 Aug 2025 17:58:22 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-ClientProxiedBy: EX19D042UWA004.ant.amazon.com (10.13.139.16) To
- EX19D039EUC004.ant.amazon.com (10.252.61.190)
-Content-Transfer-Encoding: base64
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 18/30] KVM: selftests: TDX: Add TDX MMIO reads test
+To: Sagi Shahar <sagis@google.com>
+Cc: linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Shuah Khan <shuah@kernel.org>, Sean Christopherson <seanjc@google.com>,
+ Ackerley Tng <ackerleytng@google.com>, Ryan Afranji <afranji@google.com>,
+ Andrew Jones <ajones@ventanamicro.com>,
+ Isaku Yamahata <isaku.yamahata@intel.com>,
+ Erdem Aktas <erdemaktas@google.com>,
+ Rick Edgecombe <rick.p.edgecombe@intel.com>,
+ Roger Wang <runanwang@google.com>, Oliver Upton <oliver.upton@linux.dev>,
+ "Pratik R. Sampat" <pratikrajesh.sampat@amd.com>,
+ Reinette Chatre <reinette.chatre@intel.com>, Ira Weiny
+ <ira.weiny@intel.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20250807201628.1185915-1-sagis@google.com>
+ <20250807201628.1185915-19-sagis@google.com>
+Content-Language: en-US
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20250807201628.1185915-19-sagis@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-VGhlIGxhc3QgZW1haWwgd2FzIGEgZHJhZnQgc2VudCBieSBtaXN0YWtlLiBUaGlzIGlzIHRoZSBm
-dWxsIHZlcnNpb24uCgpBbGV4IFdpbGxpYW1zb24gPGFsZXgud2lsbGlhbXNvbkByZWRoYXQuY29t
-PiB3cml0ZXM6Cgo+IEN1cnJlbnRseSB3ZSBoYXZlIGEgc3RydWN0IHZmaW9fcGNpX3JlZ2lvbiBz
-dG9yZWQgaW4gYW4gYXJyYXkgdGhhdCB3ZQo+IGR5bmFtaWNhbGx5IHJlc2l6ZSBmb3IgZGV2aWNl
-IHNwZWNpZmljIHJlZ2lvbnMgYW5kIHRoZSBvZmZzZXQgaXMKPiBkZXRlcm1pbmVkIHN0YXRpY2Fs
-bHkgZnJvbSB0aGUgYXJyYXkgaW5kZXguICBXZSBjb3VsZCBlYXNpbHkgc3BlY2lmeSBhbgo+IG9m
-ZnNldCBhbmQgYWxpYXMgZmllbGQgb24gdGhhdCBvYmplY3QgaWYgd2Ugd2FudGVkIHRvIG1ha2Ug
-dGhlIGFkZHJlc3MKPiBzcGFjZSBtb3JlIGNvbXBhY3QgKHdpdGhvdXQgYSBtYXBsZSB0cmVlKSBh
-bmQgZmFjaWxpdGF0ZSBtdWx0aXBsZQo+IHJlZ2lvbnMgcmVmZXJlbmNpbmcgdGhlIHNhbWUgZGV2
-aWNlIHJlc291cmNlLiAgVGhpcyBpcyBhbGwganVzdAo+IGltcGxlbWVudGF0aW9uIGRlY2lzaW9u
-cy4gIFdlIGFsc28gZG9uJ3QgbmVlZCB0byBzdXBwb3J0IHJlYWQvd3JpdGUgb24KPiBuZXcgcmVn
-aW9ucywgd2UgY291bGQgaGF2ZSB0aGVtIGV4aXN0IGFkdmVydGlzaW5nIG9ubHkgbW1hcCBzdXBw
-b3J0IHZpYQo+IFJFR0lPTl9JTkZPLCB3aGljaCBzaW1wbGlmaWVzIGFuZCBpcyBjb25zaXN0ZW50
-IHdpdGggdGhlIGV4aXN0aW5nIEFQSS4KPgoKV2hhdCBJIHVuZGVyc3RhbmQgaXMgdGhhdCB5b3Xi
-gJlyZSBwcm9wb3NpbmcgYW4gQVBJIHRvIGNyZWF0ZSBhIG5ldwpyZWdpb24uICBUaGUgdXNlciB3
-b3VsZCB0aGVuIGZldGNoIGEgbmV3IGluZGV4IGFuZCB1c2UgaXQgd2l0aApSRUdJT05fSU5GTyB0
-byBvYnRhaW4gdGhlIHBnb2ZmLiAgVGhpcyBmZWVscyBsaWtlIGFkZGluZyBhbm90aGVyIGxheWVy
-Cm9uIHRvcCBvZiB0aGUgcGdvZmYsIHdoaWxlIHRoZSBlbmQgZ29hbCByZW1haW5zIHRoZSBzYW1l
-LgoKSSdtIG5vdCBzdXJlIGFuIGFsaWFzIHJlZ2lvbiBvZmZlcnMgbW9yZSB2YWx1ZSB0aGFuIHNp
-bXBseSBjcmVhdGluZyBhbgphbGlhcyBwZ29mZi4gIEl0IG1heSBldmVuIGJlIG1vcmUgY29uZnVz
-aW5nLCBzaW5jZeKAlEFGQUlV4oCUdXNlcnMgZXhwZWN0CmluZGV4ZXMgdG8gYWxpZ24gd2l0aCBQ
-Q0kgQkFSIGluZGV4ZXMgaW4gdGhlIFBDSSBjYXNlLiAgV2Ugd291bGQgYWxzbwpuZWVkIGVpdGhl
-ciBhIG5ldyBBUEkgb3IgYW4gYWRkaXRpb25hbCBSRUdJT05fSU5GTyBtZW1iZXIgdG8gdGVsbCB0
-aGUKdXNlciB3aGljaCBpbmRleCB0aGUgYWxpYXMgcmVmZXJzIHRvIGFuZCB3aGF0IGV4dHJhIGF0
-dHJpYnV0ZXMgaXQgaGFzLgoKVWx0aW1hdGVseSwgYm90aCBhcHByb2FjaGVzIGFyZSB2ZXJ5IHNp
-bWlsYXI6IG9uZSBjcmVhdGVzIGEgZnVsbCBhbGlhcwpyZWdpb24sIHRoZSBvdGhlciBqdXN0IGEg
-cGdvZmYgYWxpYXMsIGJ1dCBib3RoIHdvdWxkIHJlcXVpcmUgbmVhcmx5IHRoZQpzYW1lIGludGVy
-bmFsIGltcGxlbWVudGF0aW9uIGZvciBwZ29mZiBoYW5kbGluZy4KClRoZSBrZXkgcXVlc3Rpb24g
-aXM6IGRvZXMgYSBmdWxsIHJlZ2lvbiBhbGlhcyBwcm92aWRlIGFueSB0YW5naWJsZQpiZW5lZml0
-cyBvdmVyIGEgcGdvZmYgYWxpYXM/CgpJbiBteSBvcGluaW9uLCBpdOKAmXMgY2xlYXJlciB0byBz
-aW1wbHkgaGF2ZSB0aGUgdXNlciBjYWxsIGUuZwpSRVFVRVNUX1JFR0lPTl9NTUFQICh3aGljaCBy
-ZXR1cm5zIGEgcGdvZmYgZm9yIG1tYXApIHJhdGhlciB0aGFuIHJlcXVlc3QKZnVsbCByZWdpb24g
-Y3JlYXRpb24uCgotIE1OQWRhbQoKCgpBbWF6b24gV2ViIFNlcnZpY2VzIERldmVsb3BtZW50IENl
-bnRlciBHZXJtYW55IEdtYkgKVGFtYXJhLURhbnotU3RyLiAxMwoxMDI0MyBCZXJsaW4KR2VzY2hh
-ZWZ0c2Z1ZWhydW5nOiBDaHJpc3RpYW4gU2NobGFlZ2VyLCBKb25hdGhhbiBXZWlzcwpFaW5nZXRy
-YWdlbiBhbSBBbXRzZ2VyaWNodCBDaGFybG90dGVuYnVyZyB1bnRlciBIUkIgMjU3NzY0IEIKU2l0
-ejogQmVybGluClVzdC1JRDogREUgMzY1IDUzOCA1OTcK
+
+
+On 8/8/2025 4:16 AM, Sagi Shahar wrote:
+[...]
+> diff --git a/tools/testing/selftests/kvm/lib/x86/tdx/test_util.c b/tools/testing/selftests/kvm/lib/x86/tdx/test_util.c
+> index 8c3b6802c37e..f92ddda2d1ac 100644
+> --- a/tools/testing/selftests/kvm/lib/x86/tdx/test_util.c
+> +++ b/tools/testing/selftests/kvm/lib/x86/tdx/test_util.c
+> @@ -31,6 +31,25 @@ void tdx_test_assert_io(struct kvm_vcpu *vcpu, uint16_t port, uint8_t size,
+>   		    vcpu->run->io.direction);
+>   }
+>   
+> +void tdx_test_assert_mmio(struct kvm_vcpu *vcpu, uint64_t phys_addr,
+> +			  uint32_t size, uint8_t is_write)
+> +{
+> +	TEST_ASSERT(vcpu->run->exit_reason == KVM_EXIT_MMIO,
+> +		    "Got exit_reason other than KVM_EXIT_MMIO: %u (%s)\n",
+> +		    vcpu->run->exit_reason,
+> +		    exit_reason_str(vcpu->run->exit_reason));
+> +
+> +	TEST_ASSERT(vcpu->run->exit_reason == KVM_EXIT_MMIO &&
+It's already checked above.
+
+> +		    vcpu->run->mmio.phys_addr == phys_addr &&
+> +		    vcpu->run->mmio.len == size &&
+> +		    vcpu->run->mmio.is_write == is_write,
+> +		    "Got an unexpected MMIO exit values: %u (%s) %llu %u %u\n",
+> +		    vcpu->run->exit_reason,
+> +		    exit_reason_str(vcpu->run->exit_reason),
+> +		    vcpu->run->mmio.phys_addr, vcpu->run->mmio.len,
+> +		    vcpu->run->mmio.is_write);
+> +}
+> +
+>   void tdx_run(struct kvm_vcpu *vcpu)
+>   {
+>   	td_vcpu_run(vcpu);
+> diff --git a/tools/testing/selftests/kvm/x86/tdx_vm_test.c b/tools/testing/selftests/kvm/x86/tdx_vm_test.c
+> index 720ef5e87071..563f1025c8a3 100644
+> --- a/tools/testing/selftests/kvm/x86/tdx_vm_test.c
+> +++ b/tools/testing/selftests/kvm/x86/tdx_vm_test.c
+> @@ -719,6 +719,91 @@ void verify_guest_hlt(void)
+>   	_verify_guest_hlt(0);
+>   }
+>   
+> +/* Pick any address that was not mapped into the guest to test MMIO */
+> +#define TDX_MMIO_TEST_ADDR 0x200000000
+> +#define MMIO_SYNC_VALUE 0x42
+> +
+> +void guest_mmio_reads(void)
+> +{
+> +	uint64_t mmio_test_addr = TDX_MMIO_TEST_ADDR | tdx_s_bit;
+> +	uint64_t data;
+> +	uint64_t ret;
+> +
+> +	ret = tdg_vp_vmcall_ve_request_mmio_read(mmio_test_addr, 1, &data);
+> +	tdx_assert_error(ret);
+> +	if (data != 0x12)
+> +		tdx_test_fatal(1);
+> +
+> +	ret = tdg_vp_vmcall_ve_request_mmio_read(mmio_test_addr, 2, &data);
+> +	tdx_assert_error(ret);
+> +	if (data != 0x1234)
+> +		tdx_test_fatal(2);
+> +
+> +	ret = tdg_vp_vmcall_ve_request_mmio_read(mmio_test_addr, 4, &data);
+> +	tdx_assert_error(ret);
+> +	if (data != 0x12345678)
+> +		tdx_test_fatal(4);
+> +
+> +	ret = tdg_vp_vmcall_ve_request_mmio_read(mmio_test_addr, 8, &data);
+> +	tdx_assert_error(ret);
+> +	if (data != 0x1234567890ABCDEF)
+> +		tdx_test_fatal(8);
+> +
+> +	/* Make sure host and guest are synced to the same point of execution */
+> +	tdx_test_report_to_user_space(MMIO_SYNC_VALUE);
+Is this step necessary?
+
+
+> +
+> +	/* Read an invalid number of bytes. */
+> +	ret = tdg_vp_vmcall_ve_request_mmio_read(mmio_test_addr, 10, &data);
+> +	tdx_assert_error(ret);
+> +
+> +	tdx_test_success();
+> +}
+> +
+> +/*
+> + * Verifies guest MMIO reads.
+> + */
+> +void verify_mmio_reads(void)
+> +{
+> +	struct kvm_vcpu *vcpu;
+> +	struct kvm_vm *vm;
+> +
+> +	vm = td_create();
+> +	td_initialize(vm, VM_MEM_SRC_ANONYMOUS, 0);
+> +	vcpu = td_vcpu_add(vm, 0, guest_mmio_reads);
+> +	td_finalize(vm);
+> +
+> +	printf("Verifying TD MMIO reads:\n");
+> +
+> +	tdx_run(vcpu);
+> +	tdx_test_assert_mmio(vcpu, TDX_MMIO_TEST_ADDR, 1, MMIO_READ);
+> +	*(uint8_t *)vcpu->run->mmio.data = 0x12;
+> +
+> +	tdx_run(vcpu);
+> +	tdx_test_assert_mmio(vcpu, TDX_MMIO_TEST_ADDR, 2, MMIO_READ);
+> +	*(uint16_t *)vcpu->run->mmio.data = 0x1234;
+> +
+> +	tdx_run(vcpu);
+> +	tdx_test_assert_mmio(vcpu, TDX_MMIO_TEST_ADDR, 4, MMIO_READ);
+> +	*(uint32_t *)vcpu->run->mmio.data = 0x12345678;
+> +
+> +	tdx_run(vcpu);
+> +	tdx_test_assert_mmio(vcpu, TDX_MMIO_TEST_ADDR, 8, MMIO_READ);
+> +	*(uint64_t *)vcpu->run->mmio.data = 0x1234567890ABCDEF;
+> +
+> +	tdx_run(vcpu);
+> +	TEST_ASSERT_EQ(tdx_test_read_report_from_guest(vcpu), MMIO_SYNC_VALUE);
+> +
+> +	td_vcpu_run(vcpu);
+> +	TEST_ASSERT_EQ(vcpu->run->exit_reason, KVM_EXIT_SYSTEM_EVENT);
+> +	TEST_ASSERT_EQ(vcpu->run->system_event.data[12], TDG_VP_VMCALL_INVALID_OPERAND);
+> +
+> +	tdx_run(vcpu);
+> +	tdx_test_assert_success(vcpu);
+> +
+> +	kvm_vm_free(vm);
+> +	printf("\t ... PASSED\n");
+> +}
+> +
+>   int main(int argc, char **argv)
+>   {
+>   	ksft_print_header();
+> @@ -726,7 +811,7 @@ int main(int argc, char **argv)
+>   	if (!is_tdx_enabled())
+>   		ksft_exit_skip("TDX is not supported by the KVM. Exiting.\n");
+>   
+> -	ksft_set_plan(10);
+> +	ksft_set_plan(11);
+>   	ksft_test_result(!run_in_new_process(&verify_td_lifecycle),
+>   			 "verify_td_lifecycle\n");
+>   	ksft_test_result(!run_in_new_process(&verify_report_fatal_error),
+> @@ -747,6 +832,8 @@ int main(int argc, char **argv)
+>   			 "verify_guest_msr_reads\n");
+>   	ksft_test_result(!run_in_new_process(&verify_guest_hlt),
+>   			 "verify_guest_hlt\n");
+> +	ksft_test_result(!run_in_new_process(&verify_mmio_reads),
+> +			 "verify_mmio_reads\n");
+>   
+>   	ksft_finished();
+>   	return 0;
 
 
