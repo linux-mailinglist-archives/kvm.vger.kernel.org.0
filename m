@@ -1,193 +1,154 @@
-Return-Path: <kvm+bounces-54688-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54689-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F3E4B26DF9
-	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 19:53:52 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 572C8B26E9A
+	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 20:08:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80E015E0224
-	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 17:53:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8EFA67BDC0F
+	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 18:01:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 185BA310772;
-	Thu, 14 Aug 2025 17:52:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2E2C319863;
+	Thu, 14 Aug 2025 18:01:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MpOoDbzN"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yp4lHwwJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 970FB30E848
-	for <kvm@vger.kernel.org>; Thu, 14 Aug 2025 17:52:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67FC3319852
+	for <kvm@vger.kernel.org>; Thu, 14 Aug 2025 18:01:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755193976; cv=none; b=A8rSXbCX0CQbxjQMQbcExAZx7JM1uKyYmb72sarEaV8J5NDfBjqLETR/5jz9ez3uuwATEHEpskHc0I6elg0VY0kkG5YkrY4SFX8pey4QCn4qt0MrzqiXWBC7VYl3CbXpUkQS7JnOw7B3QdE9T/FiYjLBkW0CEe3Tkg3uIOGOmXM=
+	t=1755194461; cv=none; b=OvMSWDV17XauXivtx1xcohIrhO522eB/T67PywQqyzUYM2ZuSX+yB/mxLqCjP10/JcnwJPxAly7llqDrsP0eDZ0kLIeLzFhjeBz7gu47Jnxz/I2QHW3rh9+4Fo2dGcg3t8/VsV4jgM+NrV/h59WwBFcZqOBjgEkJopCHfHfhDYs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755193976; c=relaxed/simple;
-	bh=5AXMAHtgSY3kGFo/8RIc4Xfc76KO5VPZj6UaYE27jPU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OzV5g+AXqFjC1srWeiIoG7zQyFRely4PnG6WY5Q3C6r4flB9OmbkOXk3LT4fVaFQxpJDm9A2wp17nOwJVURFdgfixHMY5B/xNU+Ih7d+e0V7hCFeI2U0BomkKjJOV7neKzGJevGRCGUWtAdmzOQ0ArmrQDWJiP+2CsnNEKy1VlA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MpOoDbzN; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1755193973;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=afaa+Ttiy+6bJd212ACVlG8vIlclb/LYuy8F+ALkIxo=;
-	b=MpOoDbzNkWn9mxo0TWXRRLKDfe3E22nQWnuzZIo93tBHx679+O4dhgGHDd7dez8mHkwIM3
-	6uaLycgkBWbx8XGXf/r6ijVv0N6CGHzQ0rjNDRXhxiINGvS4m392D5Wkgc5zRMshX8ZNmQ
-	Fn3fLHpZL8Gj6dxSS2dS0MEm7LDYXBM=
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
- [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-658-p5QYsMPwP1W3n0KUfd9G_w-1; Thu, 14 Aug 2025 13:52:52 -0400
-X-MC-Unique: p5QYsMPwP1W3n0KUfd9G_w-1
-X-Mimecast-MFC-AGG-ID: p5QYsMPwP1W3n0KUfd9G_w_1755193971
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3e56fe7d3deso3198375ab.0
-        for <kvm@vger.kernel.org>; Thu, 14 Aug 2025 10:52:51 -0700 (PDT)
+	s=arc-20240116; t=1755194461; c=relaxed/simple;
+	bh=sgHYyHT9P3+Ri4inTzepKA9eeR2T6s/x27iDn6LlylY=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=UPkSAZ79i/5/bVHJV9czVaVzKHlvf/SLFl34IswzzJw/cmDyKmYuUDF4IXKhx1ljHmMaQnFp0/Tg3ZMcWrVaBomds+YqhwV0ILlVglk0PRdTUQDt1N9BehLK4rpNyvaJMEfOtAWNs7xM87dPhCjqbdJ6LQbPdsF4umESI6kccYw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yp4lHwwJ; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-32326779c67so1212852a91.1
+        for <kvm@vger.kernel.org>; Thu, 14 Aug 2025 11:01:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1755194460; x=1755799260; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qo8YP48saC70f8nhVLPXqNgxZORbU+kNCjpBN1UXxU4=;
+        b=yp4lHwwJYq2zxzBh5QeF3tBijABWJ3ejrrCveINGhpxVfKNdPMuCd+x9XKvYmCGEyY
+         MgrxkRwTZzhajoanqEaIqea8C5AcbQBde5KlsOXEFb5WwsEHlI5bkZ90qArxvnNLsbfQ
+         e1/gShvmilV8015UIZMRlWBANAKc0BKnFm5fU5U9ptMFaik89bl2nKiPVu8xKCKJlu5A
+         x5+ER4txzZOI67kW16NVqCnjU8MFd8KvY/XayF7RfcMUCyL8um9LQv0o/K7AeLi9nE+d
+         9OrglUl39wt0Ibika3AKX8orSaC8dbEspx9NaV7v2zsOhFxooc4Fc/0aJdgxKcxNA9t/
+         WZ/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755193971; x=1755798771;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=afaa+Ttiy+6bJd212ACVlG8vIlclb/LYuy8F+ALkIxo=;
-        b=JCa2dzsWEYdVys+0NXhnfxHuQxWvudnwqVg0KHrq5Y/DsKyKVOh/ks39P+ddW+8L+o
-         TIQHcpmXm3nGGXMvVLhN9eYmnfCyW3Ims7XIlv1JTJSSWta/sQRP1s2HcLZV6CdTa8lR
-         xkS5eW8RSAbxKSXEf+ZaSmOnhilkyVGgwPoPcOQq/n5sQwb/5t/pXSabCfnOHUJ6u8Dd
-         u5Xe+QVgY8KlepnmxAsqogvGk048DthtRWGUol2lp1OsghHG8oLN5Bs8VBQlYkgxrxAA
-         yEKkJwx26+1w6/UXAy9qGeyF4NaZaDXlqR4BniLrJqvNhOGfFJ5sVDR6SVYEpdowvDgo
-         9huw==
-X-Forwarded-Encrypted: i=1; AJvYcCWiCZ7RrS2Nud8EtMpmqLnDgnxeOD7Ug8PAqmQai7S2duvXA0a72PQHjDxeTDGzphkLtNc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yylr/79qiFeDo18yE20LwUQxA7l13WGld0PIw9l39mBNHs5IOWd
-	nopN534abOBHIVkbwW6uWpoY+Nqh8neXTMaJ5c8vKSopyUTbktrKGPUBzJEcRWuXLnxgbwlg0/Y
-	Z47a3dL0IXsFwEtpA5nFaNxSLaTxiXIQtbFNS4ykE+J5D2A9K8aeoRg==
-X-Gm-Gg: ASbGncspclls7Yv1gLMM7LGYx8szVCy68JNj/A4McPeElMT8ZR9ikvMNtezuOir56pp
-	8FfN6m347afGA3Q9nU+GfpEZFklW8BNOUIG8j76lVVBbfjTz1AxOJYCrtOeHeelXWSi+FMKUYH/
-	AM73Amm/Jl4NiLbKMeuPKmaL1h9h5IajJhjIP/sM8wuhU/euWfhIpL2OjLMToXE+duY0NLyd4br
-	kjOdykgHRhNRtlbjpEHp5fRmBNTQUy22gVGCZ06A5sUufHJHOBP24ocjt6dsszLcFDR/pvlYgIN
-	fwzlme8ruaOrmTMY2B31BfT0an4i3HBnvCxyOu5Mju4=
-X-Received: by 2002:a05:6602:2b88:b0:881:982b:9963 with SMTP id ca18e2360f4ac-884339a49a1mr218633739f.3.1755193971213;
-        Thu, 14 Aug 2025 10:52:51 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHVDcT6P7UI8d62akowuwc8tY/d9YpZeehaTUjRBqyUowCNHyf47OXTP3WPKB7t8/XiFPKezw==
-X-Received: by 2002:a05:6602:2b88:b0:881:982b:9963 with SMTP id ca18e2360f4ac-884339a49a1mr218631739f.3.1755193970717;
-        Thu, 14 Aug 2025 10:52:50 -0700 (PDT)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-50ae997ea94sm4370937173.1.2025.08.14.10.52.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Aug 2025 10:52:49 -0700 (PDT)
-Date: Thu, 14 Aug 2025 11:52:47 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Mahmoud Nagy Adam <mngyadam@amazon.de>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>, Benjamin Herrenschmidt
- <benh@kernel.crashing.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "Kumar, Praveen" <pravkmr@amazon.de>, "Woodhouse, David"
- <dwmw@amazon.co.uk>, "nagy@khwaternagy.com" <nagy@khwaternagy.com>
-Subject: Re: [RFC PATCH 0/9] vfio: Introduce mmap maple tree
-Message-ID: <20250814115247.4458764a.alex.williamson@redhat.com>
-In-Reply-To: <lrkyq349uut66.fsf_-_@dev-dsk-mngyadam-1c-cb3f7548.eu-west-1.amazon.com>
-References: <20250804104012.87915-1-mngyadam@amazon.de>
-	<20250804124909.67462343.alex.williamson@redhat.com>
-	<lrkyq5xf27ss7.fsf@dev-dsk-mngyadam-1c-cb3f7548.eu-west-1.amazon.com>
-	<20250805143134.GP26511@ziepe.ca>
-	<lrkyqpld96a8a.fsf_-_@dev-dsk-mngyadam-1c-cb3f7548.eu-west-1.amazon.com>
-	<20250805130046.0527d0c7.alex.williamson@redhat.com>
-	<80dc87730f694b2d6e6aabbd29df49cf3c7c44fb.camel@amazon.com>
-	<20250806115224.GB377696@ziepe.ca>
-	<cec694f109f705ab9e20c2641c1558aa19bcb25b.camel@amazon.com>
-	<20250807130605.644ac9f6.alex.williamson@redhat.com>
-	<20250811155558.GF377696@ziepe.ca>
-	<20250811160710.174ca708.alex.williamson@redhat.com>
-	<lrkyq349uut66.fsf_-_@dev-dsk-mngyadam-1c-cb3f7548.eu-west-1.amazon.com>
-Organization: Red Hat
+        d=1e100.net; s=20230601; t=1755194460; x=1755799260;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=qo8YP48saC70f8nhVLPXqNgxZORbU+kNCjpBN1UXxU4=;
+        b=PMaccZO2oA1gT1w1dwWxpHekAnwpk0m4vupK6kWDKSheExbqzYrU3KfWNruus5Poki
+         b6BoPEz4jpwNr7Q8Hf45C7sVQDeKeRvc48zgT0I1lVJEa4boKxCY7YReOD0eX/jYmM0f
+         Y5t7Mk/6+5xCndR/ClhP7QpY0IAf+9FCGu3Q4TiEb/dyG3RejuI4q+gHOVQ0pbpyff8o
+         IQ3z1Iat7WhtQLFLjr0g9EOiNmJs3x9acFxu9I68SeTVTRVRaYm1A3xZydoMBxFC/Kki
+         i9IkLs5iGRnJWVNp/WZP0mbgNoEkBiH0WumelkC8DIbUPxu4xOfOP8x1UciHK4uPbvbL
+         1cWA==
+X-Forwarded-Encrypted: i=1; AJvYcCVEDtW5pHI3bYXQ+sQiQXsh16AwIBtH3QHT0h7DH6+odra7YlD5hEwlUpBqusW9w9jdbPE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz0ixBT7pcz36RtBfT8Jt/Hn+p0lfgj0fpGyYg5DcOdAb0Yn6Y4
+	1jsuPYAU6gFvKHI+JW4bF4I8fmsy+q+qJewik+Rt/+08xuWPDujgG1+NDjPhEVu+T2XHC7/Kez/
+	LGPykhA==
+X-Google-Smtp-Source: AGHT+IEGQtx1mDPknNV+0MSozvZx9Iz59OeDO2C+iu+5XN28Cy4LHlj3QKqp8YTRlYFCSm+U+Hh+N8eOiJg=
+X-Received: from pjbtd11.prod.google.com ([2002:a17:90b:544b:b0:31f:2a78:943])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:51cd:b0:30a:4874:5397
+ with SMTP id 98e67ed59e1d1-3232b239af0mr5459494a91.9.1755194459725; Thu, 14
+ Aug 2025 11:00:59 -0700 (PDT)
+Date: Thu, 14 Aug 2025 11:00:57 -0700
+In-Reply-To: <ebd8132d5c0d4b1994802028a2bef01bd45e62a2.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Mime-Version: 1.0
+References: <cover.1755126788.git.kai.huang@intel.com> <d8993692714829a2b1671412cdd684781c43d54a.1755126788.git.kai.huang@intel.com>
+ <aJ3qhtzwHIRPrLK7@google.com> <ebd8132d5c0d4b1994802028a2bef01bd45e62a2.camel@intel.com>
+Message-ID: <aJ4kWcuyNIpCnaXE@google.com>
+Subject: Re: [PATCH v6 7/7] KVM: TDX: Explicitly do WBINVD when no more TDX SEAMCALLs
+From: Sean Christopherson <seanjc@google.com>
+To: Rick P Edgecombe <rick.p.edgecombe@intel.com>
+Cc: Kai Huang <kai.huang@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"ashish.kalra@amd.com" <ashish.kalra@amd.com>, Dave Hansen <dave.hansen@intel.com>, 
+	"thomas.lendacky@amd.com" <thomas.lendacky@amd.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Reinette Chatre <reinette.chatre@intel.com>, 
+	"dwmw@amazon.co.uk" <dwmw@amazon.co.uk>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
+	"mingo@redhat.com" <mingo@redhat.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	"kas@kernel.org" <kas@kernel.org>, "tglx@linutronix.de" <tglx@linutronix.de>, 
+	"nik.borisov@suse.com" <nik.borisov@suse.com>, "hpa@zytor.com" <hpa@zytor.com>, 
+	"peterz@infradead.org" <peterz@infradead.org>, "sagis@google.com" <sagis@google.com>, 
+	Farrah Chen <farrah.chen@intel.com>, "bp@alien8.de" <bp@alien8.de>, Chao Gao <chao.gao@intel.com>, 
+	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, Dan J Williams <dan.j.williams@intel.com>, 
+	"x86@kernel.org" <x86@kernel.org>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, 14 Aug 2025 11:52:17 +0200
-Mahmoud Nagy Adam <mngyadam@amazon.de> wrote:
+On Thu, Aug 14, 2025, Rick P Edgecombe wrote:
+> On Thu, 2025-08-14 at 06:54 -0700, Sean Christopherson wrote:
+> > > diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> > > index 66744f5768c8..1bc6f52e0cd7 100644
+> > > --- a/arch/x86/kvm/vmx/tdx.c
+> > > +++ b/arch/x86/kvm/vmx/tdx.c
+> > > @@ -442,6 +442,18 @@ void tdx_disable_virtualization_cpu(void)
+> > > =C2=A0=C2=A0		tdx_flush_vp(&arg);
+> > > =C2=A0=C2=A0	}
+> > > =C2=A0=C2=A0	local_irq_restore(flags);
+> > > +
+> > > +	/*
+> > > +	 * No more TDX activity on this CPU from here.=C2=A0 Flush cache to
+> > > +	 * avoid having to do WBINVD in stop_this_cpu() during kexec.
+> > > +	 *
+> > > +	 * Kexec calls native_stop_other_cpus() to stop remote CPUs
+> > > +	 * before booting to new kernel, but that code has a "race"
+> > > +	 * when the normal REBOOT IPI times out and NMIs are sent to
+> > > +	 * remote CPUs to stop them.=C2=A0 Doing WBINVD in stop_this_cpu()
+> > > +	 * could potentially increase the possibility of the "race".
 
-> The last email was a draft sent by mistake. This is the full version.
+Why is that race problematic?  The changelog just says
+
+ : However, the native_stop_other_cpus() and stop_this_cpu() have a "race"
+ : which is extremely rare to happen but could cause the system to hang.
+ :=20
+ : Specifically, the native_stop_other_cpus() firstly sends normal reboot
+ : IPI to remote CPUs and waits one second for them to stop.  If that times
+ : out, native_stop_other_cpus() then sends NMIs to remote CPUs to stop
+ : them.
+
+without explaining how that can cause a system hang.
+
+> > > +	 */
+> > > +	tdx_cpu_flush_cache();
+> >=20
+> > IIUC, this can be:
+> >=20
+> > 	if (IS_ENABLED(CONFIG_KEXEC))
+> > 		tdx_cpu_flush_cache();
+> >=20
 >=20
-> Alex Williamson <alex.williamson@redhat.com> writes:
->=20
-> > Currently we have a struct vfio_pci_region stored in an array that we
-> > dynamically resize for device specific regions and the offset is
-> > determined statically from the array index.  We could easily specify an
-> > offset and alias field on that object if we wanted to make the address
-> > space more compact (without a maple tree) and facilitate multiple
-> > regions referencing the same device resource.  This is all just
-> > implementation decisions.  We also don't need to support read/write on
-> > new regions, we could have them exist advertising only mmap support via
-> > REGION_INFO, which simplifies and is consistent with the existing API.
-> > =20
->=20
-> What I understand is that you=E2=80=99re proposing an API to create a new
-> region.  The user would then fetch a new index and use it with
-> REGION_INFO to obtain the pgoff.  This feels like adding another layer
-> on top of the pgoff, while the end goal remains the same.
->=20
-> I'm not sure an alias region offers more value than simply creating an
-> alias pgoff.  It may even be more confusing, since=E2=80=94AFAIU=E2=80=94=
-users expect
-> indexes to align with PCI BAR indexes in the PCI case.  We would also
-> need either a new API or an additional REGION_INFO member to tell the
-> user which index the alias refers to and what extra attributes it has.
->=20
-> Ultimately, both approaches are very similar: one creates a full alias
-> region, the other just a pgoff alias, but both would require nearly the
-> same internal implementation for pgoff handling.
->=20
-> The key question is: does a full region alias provide any tangible
-> benefits over a pgoff alias?
->=20
-> In my opinion, it=E2=80=99s clearer to simply have the user call e.g
-> REQUEST_REGION_MMAP (which returns a pgoff for mmap) rather than request
-> full region creation.
+> No strong objection, just 2 cents. I bet !CONFIG_KEXEC && CONFIG_INTEL_TD=
+X_HOST
+> kernels will be the minority. Seems like an opportunity to simplify the c=
+ode.
 
-In part this is the argument we've already discussed, creating a new
-region and then getting REGION_INFO adds a step for the user, but we
-already have REGION_INFO as the standard mechanism for introspection of
-regions.  We also have capabilities available as a mechanism within the
-REGION_INFO ioctl to describe the mapping flags or region alias
-relationship.
-
-If we're this concerned about one additional step for the user, design
-the DEVICE_FEATURE ioctl to return both the new region index and the
-file offset, the user can ignore the region index if they choose.
-
-To me, regions are just segments of the device fd address space,
-regions have a unique offset.  Regions have a vfio-pci specific
-convention where a fixed set of region indexes refer to fixed device
-resources but never is there a statement in the uAPI that region 0
-_uniquely_ indexes BAR 0 and there will never be another region index
-mapping this device resource.  The convention exists only to bootstrap
-standard device resources.  Adding a mechanism to get a file offset
-which is an alias of a region, but not itself reported as a region is
-to me, splitting up the device fd address space into two different
-allocation methods.
-
-The argument that userspace drivers will get confused if region N
-aliases region 0 makes no sense to me.  The user has actively brought
-region N into existence knowing in advance that it's addressing the
-same device resource as region 0.  Exactly in the same way they'd know
-the file offset they get back from REQUEST_REGION_MMAP is an alias to
-the requested region.  BUT, since we're invoking a new region, we have
-mechanisms to allow persistent introspection of that new region.
-
-The tangible benefit to me is that a new region better aligns with the
-existing API and has that introspection/debug'ability aspect, versus
-creating an alternate mechanism for making allocations from the device
-fd address space.  Thanks,
-
-Alex
-
+Reducing the number of lines of code is not always a simplification.  IMO, =
+not
+checking CONFIG_KEXEC adds "complexity" because anyone that reads the comme=
+nt
+(and/or the massive changelog) will be left wondering why there's a bunch o=
+f
+documentation that talks about kexec, but no hint of kexec considerations i=
+n the
+code.
 
