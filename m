@@ -1,328 +1,271 @@
-Return-Path: <kvm+bounces-54685-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54686-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43CD7B26C94
-	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 18:32:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DD853B26CA2
+	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 18:37:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 927665A4E1B
-	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 16:27:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D07E017417A
+	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 16:34:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10AB22566D2;
-	Thu, 14 Aug 2025 16:27:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8560E2DE6F3;
+	Thu, 14 Aug 2025 16:34:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="l+PfsvwS"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="NUr5oQO8"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B297C23CEE5
-	for <kvm@vger.kernel.org>; Thu, 14 Aug 2025 16:26:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA7571E520B;
+	Thu, 14 Aug 2025 16:34:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755188819; cv=none; b=jaqi5cRyNHm01+e1+U50ybGGf3MzVhJHTIhcBMraX0CDWuS1h85WEpVMZWLEgP15L7mYX3hJJK6s8rru4iTfX0LJv1gocRXbikXie8A7ZoSswu/pG64nOwVIbLCbUjZ82vJ+CVDnGxZnN2PEIlkugrCJJzVn/IiY8psMNTjR2/M=
+	t=1755189243; cv=none; b=A8YjW3IXSymsbNXqj+/qfjqNfIOWJGhr4IZah91axdnqUrKqDGplh+cDEDCIxqiDDuww2YJqthJ06TZF2XDtS6J8ecuY9SaJ4518A1PeLsdlP53b9HcuTsYYt0KS55ojvgeZTmRewOXOkDvF8c9YXNwCM+hBsL0dA4LoBioGzvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755188819; c=relaxed/simple;
-	bh=9D8jNE+Xpo3zWiNPyvO4nZbQmriyK7SuBVCu8u21lTU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XOqcBeV+29yFoWQiZVfnB5Xuy1n3UfPdEOI/MJn42K4eEnCiGeMJS1prbonCbXWm2GvlCYih3NwoqqigNBWTrxrMRL/2GjBjCitOMg7SDM8scRuSpzxA3KpXowEcsIjfkn+/vKVZwZt7jI5NC7+g5y9gBpkQMAxFMLU3CwHbz20=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=l+PfsvwS; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-242d3be5bdfso158795ad.1
-        for <kvm@vger.kernel.org>; Thu, 14 Aug 2025 09:26:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755188817; x=1755793617; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=h2K7kLOi1msFu8PrhhDfHKdkFOSC2kCXyrMtF2tQZYY=;
-        b=l+PfsvwS2iOX2ik/3QFcK+byPnFAgqK2x5wpj0JjkQw3cjoPmNuX+rjG4CIihL8ZK1
-         Kzrv+ynayaQU4+KZxjqxg1Zs8/eo/SPab0tXLfDwPM0OQC8EcHQXb1iNXp97xjFovQLl
-         XXA42OUZPwPuWQSJtOnvbiyTdQDyYbeO1iJNNK37vlqXLwC9IdMW0F/HjmSczkZzCcw9
-         r+oyolZh+PupCAFzvKuF0qDchgjg2/DR2A4JtyQfmcoR1GE9eIu3J3iG8yiH5goDsVPj
-         nd2eyMn1R8wyGTBH8pf0YC1/ewWAn/zEQ4nCd2IOZIOVuR1LVlUq66bCGQrtyakdCW9m
-         vNWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755188817; x=1755793617;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=h2K7kLOi1msFu8PrhhDfHKdkFOSC2kCXyrMtF2tQZYY=;
-        b=Z69c1nkyrcQ81dWdMtoAQknv7ide05TjRHAK2cRTHw+G2nZeIv/JiwMkmnLeJCuLpS
-         Lvw6/4SyQxn374fgSYjNyVQ7pg4hOgWA0oaKXO68Xwfiu+54tHy1tzScVXbxfeovdsZn
-         O0cGbkhCOXpbThm2gzyCH01L9vv/+p2zji2TcsLf2UP+e39K30cJvGaS3W4k9x7pc+B4
-         tVSOt6H3y6C+4xGnche1TfFPLypa0kjOYRmYIddYib/dOPH+F2CA89rzD6alVLWQF+uR
-         AC7hRbHV7o4wFFW9Lx4ebwLTWxvAAOuXd4m4CpFhUfHGK1ABCXMAvQ2AKzOPOPJimymF
-         A2YA==
-X-Gm-Message-State: AOJu0YzwI77s9Ns2pbfSYx7rcLI5CzergLHCpRH3Onzm49kgiFff3b+1
-	4ykt4HwbBufLXE/wbS5IC9O+Iz9bnCBNRd7KbZ4/D8kClHi/xvH4iTLFlXP6pbtCTKG2Anf0TWc
-	iiJnogjgYkDeZrxi/mzgasBYwLBQZwF+zuHZXB1DX
-X-Gm-Gg: ASbGncuZ+Iq2gR7bj4+YiGLFHKTV1RvbQKvYDXlTGL7SP+W1hpfyHvvDW1UFVu49iNP
-	fuCkYOkJ1sxpou2WR69uXM/eyk8zEKrPD2lGtk+CSKLBV4uVxU6CpqQrvHsQslnIySVMAiaRN6W
-	RabqoNCfzLe5ovbC8IXrgaLwpxTOuPVRNSVanaqim7siMk5RyUvu5CTN6SqP7HPq7byZA4admXr
-	3Ztnj/2HGGoSenjfOqXiBCjUPq5CTy1+EzduwP4hnaCjrU=
-X-Google-Smtp-Source: AGHT+IE1Xi8qyYhndEVvODlo5R4bNQvMviK2kuxs/l6Wlpkk77oP0VdMn3+ugh6zOobZUqKHcqQ2GO1F6nzXrcqgJ8E=
-X-Received: by 2002:a17:902:f691:b0:234:b2bf:e67f with SMTP id
- d9443c01a7336-2445a7927d9mr3506845ad.9.1755188816277; Thu, 14 Aug 2025
- 09:26:56 -0700 (PDT)
+	s=arc-20240116; t=1755189243; c=relaxed/simple;
+	bh=zXgVy81MLBzWRPI/pvQGuZxcNKKyop/5Ybn5MTutZ80=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=poFoZz4LVqk8hPhLCbZx6mRVwLEPrhHghSbuVGKBLqRG0jL7CwtyxyG1uv/1I+5OGHaD3QqvDOz+aB98jcyjWeoRNB7oDPENcFVzNTMqVrf9ZnonCUR8Vf+/yIiCSldkTi2MYhVUNvhdbZds6QAnVW25CY9dgLLMaPHFzVzQa9s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=NUr5oQO8; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57EEVWfA011947;
+	Thu, 14 Aug 2025 16:33:52 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=8VevKt
+	3hNF2JbDb62aU/H5Q9CBJpyuvwtF1ymEf0eRE=; b=NUr5oQO8sqD3hWnzGp7nR1
+	E5ipOGmM5l2Kimo3QCDR5A1cRtUVGBAXvKFYsPWP2nOY1Sq+4n5l35T1KFFgStef
+	iVgBLFwPhXjeWYuifAXDte02B3LPO+DshIau2MP041P+9xEJNVaJC0loLZ4zUPBJ
+	16zflCso1UQUT564AlwmQ2gSkio1YgeEviX6tsUUzkdZMrBSkQgMMCPt07XB8qwe
+	v8xa8Dct6wLldkHmjHRJLoZot2+Ug6/EF5eTsLMT/HjYr0RKpO+Fd8/Yn5t0rUFB
+	aXVYBrJeKPbhx4GLwFzS1V2wEiD9A+s9F5rTJWCj3cpRyE1EDT740HcKK/1bQ1+Q
+	==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48duruk781-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 14 Aug 2025 16:33:51 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 57EDf09w028629;
+	Thu, 14 Aug 2025 16:33:51 GMT
+Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 48ej5ncx4d-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 14 Aug 2025 16:33:51 +0000
+Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
+	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 57EGXntT66978220
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 14 Aug 2025 16:33:49 GMT
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5F73D58054;
+	Thu, 14 Aug 2025 16:33:49 +0000 (GMT)
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 980B65804E;
+	Thu, 14 Aug 2025 16:33:48 +0000 (GMT)
+Received: from [9.61.254.71] (unknown [9.61.254.71])
+	by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 14 Aug 2025 16:33:48 +0000 (GMT)
+Message-ID: <350a9bd5-c2a9-4206-98fd-8a7913d36112@linux.ibm.com>
+Date: Thu, 14 Aug 2025 09:33:47 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250611104844.245235-1-steven.price@arm.com> <20250611104844.245235-20-steven.price@arm.com>
- <CAGtprH-on3JdsHx-DyjN_z_5Z6HJoSQjJpA5o5_V6=rygMSbtQ@mail.gmail.com> <80c46a5c-7559-4763-bbf2-6c755a4b067c@arm.com>
-In-Reply-To: <80c46a5c-7559-4763-bbf2-6c755a4b067c@arm.com>
-From: Vishal Annapurve <vannapurve@google.com>
-Date: Thu, 14 Aug 2025 09:26:43 -0700
-X-Gm-Features: Ac12FXwAKtZ6w1m0fqmJfRbeB6BA7Boirvfy5XvFb88cYjZ1Wb1fbiPX78gZerA
-Message-ID: <CAGtprH_6DYk8POPy+sLc3RL0-5gcrTdPNcDWFTssOK5_U4B3Nw@mail.gmail.com>
-Subject: Re: [PATCH v9 19/43] arm64: RME: Allow populating initial contents
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, 
-	James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
-	Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev, 
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, Gavin Shan <gshan@redhat.com>, 
-	Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun <alpergun@google.com>, 
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 5/6] vfio-pci/zdev: Perform platform specific function
+ reset for zPCI
+To: Niklas Schnelle <schnelle@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Bjorn Helgaas <helgaas@kernel.org>
+Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, mjrosato@linux.ibm.com
+References: <20250813170821.1115-1-alifm@linux.ibm.com>
+ <20250813170821.1115-6-alifm@linux.ibm.com>
+ <20250813143034.36f8c3a4.alex.williamson@redhat.com>
+ <7059025f-f337-493d-a50c-ccce8fb4beee@linux.ibm.com>
+ <20250813165631.7c22ef0f.alex.williamson@redhat.com>
+ <5c76f6cfb535828f6586a67bd3409981663d14d8.camel@linux.ibm.com>
+Content-Language: en-US
+From: Farhan Ali <alifm@linux.ibm.com>
+In-Reply-To: <5c76f6cfb535828f6586a67bd3409981663d14d8.camel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Lm_dQZtmpY2o4iBsGm0pBmv14h4zCOO_
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODEyMDIyNCBTYWx0ZWRfX8IvNIrrNkCK5
+ tHPRh3BMEnMUXyLLZIsqbQtOZbyptQPgUTIFjBNmrGe5sFuCo9n+lpbVokPzMOfVku0cPQHjvYW
+ 9oAbjTUolQ3HQ1LFJF52db0y7+Sb6VZeqAnvcNVol/PC02WIc8KiAtSt0R4Y9v9rQjAr0LihcNU
+ ATgLt+0+i9RCV6rbXFKTuW5X9N/TR9edh2GZVzWQ0DBEFn/k/2qiCOnuonj3CNoSZbL2ujEsCA9
+ G+FU3CJ8wSwPQElCTXvEw8iTKhNCCRKX/Na3Mfw5EhvNFaQjPIA8k+YP8FGwmMUqptPpUhSXkrC
+ sy8ks9vZE3mAcrj5WR5b3jl5GnfeqPhUo/XqTzTZclrRsE3wK1sJHIxMh9L83NZU7ULZQYIpMT+
+ uoEHOIV4
+X-Authority-Analysis: v=2.4 cv=QtNe3Uyd c=1 sm=1 tr=0 ts=689e0fef cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+ a=IkcTkHD0fZMA:10 a=2OwXVqhp2XgA:10 a=VnNF1IyMAAAA:8 a=Luso-X8XJPRpOwdzKcsA:9
+ a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: Lm_dQZtmpY2o4iBsGm0pBmv14h4zCOO_
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-13_02,2025-08-14_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 priorityscore=1501 phishscore=0 clxscore=1011 malwarescore=0
+ spamscore=0 suspectscore=0 impostorscore=0 bulkscore=0 classifier=typeunknown
+ authscore=0 authtc= authcc= route=outbound adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2507300000 definitions=main-2508120224
 
-On Wed, Aug 13, 2025 at 2:30=E2=80=AFAM Steven Price <steven.price@arm.com>=
- wrote:
->
-> On 01/08/2025 02:56, Vishal Annapurve wrote:
-> > On Wed, Jun 11, 2025 at 3:59=E2=80=AFAM Steven Price <steven.price@arm.=
-com> wrote:
-> >>
-> >> +static int realm_create_protected_data_page(struct realm *realm,
-> >> +                                           unsigned long ipa,
-> >> +                                           kvm_pfn_t dst_pfn,
-> >> +                                           kvm_pfn_t src_pfn,
-> >> +                                           unsigned long flags)
-> >> +{
-> >> +       unsigned long rd =3D virt_to_phys(realm->rd);
-> >> +       phys_addr_t dst_phys, src_phys;
-> >> +       bool undelegate_failed =3D false;
-> >> +       int ret, offset;
-> >> +
-> >> +       dst_phys =3D __pfn_to_phys(dst_pfn);
-> >> +       src_phys =3D __pfn_to_phys(src_pfn);
-> >> +
-> >> +       for (offset =3D 0; offset < PAGE_SIZE; offset +=3D RMM_PAGE_SI=
-ZE) {
-> >> +               ret =3D realm_create_protected_data_granule(realm,
-> >> +                                                         ipa,
-> >> +                                                         dst_phys,
-> >> +                                                         src_phys,
-> >> +                                                         flags);
-> >> +               if (ret)
-> >> +                       goto err;
-> >> +
-> >> +               ipa +=3D RMM_PAGE_SIZE;
-> >> +               dst_phys +=3D RMM_PAGE_SIZE;
-> >> +               src_phys +=3D RMM_PAGE_SIZE;
-> >> +       }
-> >> +
-> >> +       return 0;
-> >> +
-> >> +err:
-> >> +       if (ret =3D=3D -EIO) {
-> >> +               /* current offset needs undelegating */
-> >> +               if (WARN_ON(rmi_granule_undelegate(dst_phys)))
-> >> +                       undelegate_failed =3D true;
-> >> +       }
-> >> +       while (offset > 0) {
-> >> +               ipa -=3D RMM_PAGE_SIZE;
-> >> +               offset -=3D RMM_PAGE_SIZE;
-> >> +               dst_phys -=3D RMM_PAGE_SIZE;
-> >> +
-> >> +               rmi_data_destroy(rd, ipa, NULL, NULL);
-> >> +
-> >> +               if (WARN_ON(rmi_granule_undelegate(dst_phys)))
-> >> +                       undelegate_failed =3D true;
-> >> +       }
-> >> +
-> >> +       if (undelegate_failed) {
-> >> +               /*
-> >> +                * A granule could not be undelegated,
-> >> +                * so the page has to be leaked
-> >> +                */
-> >> +               get_page(pfn_to_page(dst_pfn));
-> >
-> > I would like to point out that the support for in-place conversion
-> > with guest_memfd using hugetlb pages [1] is under discussion.
-> >
-> > As part of the in-place conversion, the policy we are routing for is
-> > to avoid any "refcounts" from KVM on folios supplied by guest_memfd as
-> > in-place conversion works by splitting and merging folios during
-> > memory conversion as per discussion at LPC [2].
->
-> CCA doesn't really support "in-place" conversions (see more detail
-> below). But here the issue is that something has gone wrong and the RMM
-> is refusing to give us a page back.
 
-I think I overloaded the term "in-place" conversion in this context. I
-was talking about supporting "in-place" conversion without data
-preservation. i.e. Host will use the same GPA->HPA range mapping even
-after conversions, ensuring single backing for guest memory. This is
-achieved by guest_memfd keeping track of private/shared ranges based
-on userspace IOCTLs to change the tracking metadata.
+On 8/14/2025 6:12 AM, Niklas Schnelle wrote:
+> On Wed, 2025-08-13 at 16:56 -0600, Alex Williamson wrote:
+>> On Wed, 13 Aug 2025 14:52:24 -0700
+>> Farhan Ali <alifm@linux.ibm.com> wrote:
+>>
+>>> On 8/13/2025 1:30 PM, Alex Williamson wrote:
+>>>> On Wed, 13 Aug 2025 10:08:19 -0700
+>>>> Farhan Ali <alifm@linux.ibm.com> wrote:
+>>>>   
+>>>>> For zPCI devices we should drive a platform specific function reset
+>>>>> as part of VFIO_DEVICE_RESET. This reset is needed recover a zPCI device
+>>>>> in error state.
+>>>>>
+>>>>> Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
+>>>>> ---
+>>>>>    arch/s390/pci/pci.c              |  1 +
+>>>>>    drivers/vfio/pci/vfio_pci_core.c |  4 ++++
+>>>>>    drivers/vfio/pci/vfio_pci_priv.h |  5 ++++
+>>>>>    drivers/vfio/pci/vfio_pci_zdev.c | 39 ++++++++++++++++++++++++++++++++
+>>>>>    4 files changed, 49 insertions(+)
+> --- snip ---
+>>>>>    
+>>>>> +int vfio_pci_zdev_reset(struct vfio_pci_core_device *vdev)
+>>>>> +{
+>>>>> +	struct zpci_dev *zdev = to_zpci(vdev->pdev);
+>>>>> +	int rc = -EIO;
+>>>>> +
+>>>>> +	if (!zdev)
+>>>>> +		return -ENODEV;
+>>>>> +
+>>>>> +	/*
+>>>>> +	 * If we can't get the zdev->state_lock the device state is
+>>>>> +	 * currently undergoing a transition and we bail out - just
+>>>>> +	 * the same as if the device's state is not configured at all.
+>>>>> +	 */
+>>>>> +	if (!mutex_trylock(&zdev->state_lock))
+>>>>> +		return rc;
+>>>>> +
+>>>>> +	/* We can reset only if the function is configured */
+>>>>> +	if (zdev->state != ZPCI_FN_STATE_CONFIGURED)
+>>>>> +		goto out;
+>>>>> +
+>>>>> +	rc = zpci_hot_reset_device(zdev);
+>>>>> +	if (rc != 0)
+>>>>> +		goto out;
+>>>>> +
+>>>>> +	if (!vdev->pci_saved_state) {
+>>>>> +		pci_err(vdev->pdev, "No saved available for the device");
+>>>>> +		rc = -EIO;
+>>>>> +		goto out;
+>>>>> +	}
+>>>>> +
+>>>>> +	pci_dev_lock(vdev->pdev);
+>>>>> +	pci_load_saved_state(vdev->pdev, vdev->pci_saved_state);
+>>>>> +	pci_restore_state(vdev->pdev);
+>>>>> +	pci_dev_unlock(vdev->pdev);
+>>>>> +out:
+>>>>> +	mutex_unlock(&zdev->state_lock);
+>>>>> +	return rc;
+>>>>> +}
+>>>> This looks like it should be a device or arch specific reset
+>>>> implemented in drivers/pci, not vfio.  Thanks,
+>>>>
+>>>> Alex
+>>> Are you suggesting to move this to an arch specific function? One thing
+>>> we need to do after the zpci_hot_reset_device, is to correctly restore
+>>> the config space of the device. And for vfio-pci bound devices we want
+>>> to restore the state of the device to when it was initially opened.
+>> We generally rely on the abstraction of pci_reset_function() to select
+>> the correct type of reset for a function scope reset.  We've gone to
+>> quite a bit of effort to implement all device specific resets and
+>> quirks in the PCI core to be re-used across the kernel.
+>>
+>> Calling zpci_hot_reset_device() directly seems contradictory to those
+>> efforts.  Should pci_reset_function() call this universally on s390x
+>> rather than providing access to FLR/PM/SBR reset?
+>>
+> I agree with you Alex. Still trying to figure out what's needed for
+> this. We already do zpci_hot_reset_device() in reset_slot() from the
+> s390_pci_hpc.c hotplug slot driver and that does get called via
+> pci_reset_hotplug_slot() and pci_reset_function(). There are a few
+> problems though that meant it didn't work for Farhan but I agree maybe
+> we can fix them for the general case. For one pci_reset_function()
+> via DEVICE_RESET first tries FLR but that won't work with the device in
+> the error state and MMIO blocked. Sadly __pci_reset_function_locked()
+> then concludes that other resets also won't work. So that's something
+> we might want to improve in general, for example maybe we need
+> something more like pci_dev_acpi_reset() with higher priority than FLR.
 
->
-> >
-> > The best way to avoid further use of this page with huge page support
-> > around would be either:
-> > 1) Explicitly Inform guest_memfd of a particular pfn being in use by
-> > KVM without relying on page refcounts or
->
-> This might work, but note that the page is unavailable even after user
-> space has freed the guest_memfd. So at some point the page needs to be
-> marked so that it cannot be reallocated by the kernel. Holding a
-> refcount isn't ideal but I haven't come up with a better idea.
->
-> Note that this is a "should never happen" situation - the code will have
-> WARN()ed already - so this is just a best effort to allow the system to
-> limp on.
->
-> > 2) Set the page as hwpoisoned. (Needs further discussion)
->
-> This certainly sounds like a closer fit - but I'm not very familiar with
-> hwpoison so I don't know how easy it would be to integrate with this.
->
-
-We had similar discussions with Intel specific SEPT management and the
-conclusion there was to just not hold refcounts and give a warning on
-such failures [1].
-
-[1] https://lore.kernel.org/kvm/20250807094241.4523-1-yan.y.zhao@intel.com/
-
-> > This page refcounting strategy will have to be revisited depending on
-> > which series lands first. That being said, it would be great if ARM
-> > could review/verify if the series [1] works for backing CCA VMs with
-> > huge pages.
-> >
-> > [1] https://lore.kernel.org/kvm/cover.1747264138.git.ackerleytng@google=
-.com/
-> > [2] https://lpc.events/event/18/contributions/1764/
-> >
-> >> +       }
-> >> +
-> >> +       return -ENXIO;
-> >> +}
-> >> +
-> >> +static int populate_region(struct kvm *kvm,
-> >> +                          phys_addr_t ipa_base,
-> >> +                          phys_addr_t ipa_end,
-> >> +                          unsigned long data_flags)
-> >> +{
-> >> +       struct realm *realm =3D &kvm->arch.realm;
-> >> +       struct kvm_memory_slot *memslot;
-> >> +       gfn_t base_gfn, end_gfn;
-> >> +       int idx;
-> >> +       phys_addr_t ipa =3D ipa_base;
-> >> +       int ret =3D 0;
-> >> +
-> >> +       base_gfn =3D gpa_to_gfn(ipa_base);
-> >> +       end_gfn =3D gpa_to_gfn(ipa_end);
-> >> +
-> >> +       idx =3D srcu_read_lock(&kvm->srcu);
-> >> +       memslot =3D gfn_to_memslot(kvm, base_gfn);
-> >> +       if (!memslot) {
-> >> +               ret =3D -EFAULT;
-> >> +               goto out;
-> >> +       }
-> >> +
-> >> +       /* We require the region to be contained within a single memsl=
-ot */
-> >> +       if (memslot->base_gfn + memslot->npages < end_gfn) {
-> >> +               ret =3D -EINVAL;
-> >> +               goto out;
-> >> +       }
-> >> +
-> >> +       if (!kvm_slot_can_be_private(memslot)) {
-> >> +               ret =3D -EPERM;
-> >> +               goto out;
-> >> +       }
-> >> +
-> >> +       while (ipa < ipa_end) {
-> >> +               struct vm_area_struct *vma;
-> >> +               unsigned long hva;
-> >> +               struct page *page;
-> >> +               bool writeable;
-> >> +               kvm_pfn_t pfn;
-> >> +               kvm_pfn_t priv_pfn;
-> >> +               struct page *gmem_page;
-> >> +
-> >> +               hva =3D gfn_to_hva_memslot(memslot, gpa_to_gfn(ipa));
-> >> +               vma =3D vma_lookup(current->mm, hva);
-> >> +               if (!vma) {
-> >> +                       ret =3D -EFAULT;
-> >> +                       break;
-> >> +               }
-> >> +
-> >> +               pfn =3D __kvm_faultin_pfn(memslot, gpa_to_gfn(ipa), FO=
-LL_WRITE,
-> >> +                                       &writeable, &page);
-> >
-> > Is this assuming double backing of guest memory ranges? Is this logic
-> > trying to simulate a shared fault?
->
-> Yes and yes...
->
-> > Does memory population work with CCA if priv_pfn and pfn are the same?
-> > I am curious how the memory population will work with in-place
-> > conversion support available for guest_memfd files.
->
-> The RMM interface doesn't support an in-place conversion. The
-> RMI_DATA_CREATE operation takes the PA of the already delegated
-> granule[1] along with the PA of a non-delegated granule with the data.
-
-Ok, I think this will need a source buffer from userspace that is
-outside guest_memfd once guest_memfd will support a single backing for
-guest memory. You might want to simulate private access fault for
-destination GPAs backed by guest_memfd ranges for this initial data
-population -> similar to how memory population works today with TDX
-VMs.
-
-Note that with single backing around, at least for x86, KVM
-shared/private stage2 faults will always be served using guest_memfd
-as the source of truth (i.e. not via userspace pagetables for shared
-faults).
+Yeah I did think of adding something like s390x CLP reset as part of the 
+reset methods. AFAIU the s390x CLP reset is similar to ACPI _RST. But 
+that would introduce s390x specific code in pci core common code.
 
 >
-> So to mimic an in-place conversion requires copying the data from the
-> page, delegating the (original) page and then using RMI_DATA_CREATE
-> which copies the data back. Fundamentally because there may be memory
-> encryption involved there is going to be a requirement for this double
-> memcpy() approach. Note that this is only relevant during the initial
-> setup phase - CCA doesn't (at least currently) permit populated pages to
-> be provided to the guest when it is running.
+> Now for pci_reset_hotplug_slot() via VFIO_DEVICE_PCI_HOT_RESET I'm not
+> sure why that won't work as is. @Farhan do you know?
+
+VFIO_DEVICE_PCI_HOT_RESET would have been sufficient interface for 
+majority of PCI devices on s390x as that would drive a bus reset. It was 
+sufficient as most devices were single bus devices. But in the latest 
+generation of machines (z17) we expose true SR-IOV and an OS can have 
+access to both PF and VFs and so these are on the same bus and can have 
+different ownership based on what is bound to vfio-pci.
+
+My thinking for extending VFIO_DEVICE_RESET is because AFAIU its a per 
+function reset mechanism, which maps well with what our architecture 
+provides. On s390x we can drive a per function reset (via firmware) 
+through the CLP instruction driven by the zpci_hot_reset_device(). And 
+doing it as vfio zpci specific function would confine the s390x logic.
+
+>>   Why is it
+>> universally correct here given the ioctl previously made use of
+>> standard reset mechanisms?
+>>
+>> The DEVICE_RESET ioctl is simply an in-place reset of the device,
+>> without restoring the original device state.  So we're also subtly
+>> changing that behavior here, presumably because we're targeting the
+>> specific error recovery case.  Have you considered how this might
+>> break non-error-recovery use cases?
+>>
+>> I wonder if we want a different reset mechanism for this use case
+>> rather than these subtle semantic changes.
+> I think an alternative to that, which Farhan actually had in the
+> previous internal version, is to implement
+> pci_error_handlers::reset_done() and do the pci_load_saved_state()
+> there. That would only affect the error recovery case leaving other
+> cases alone.
 >
-> The approach this series takes pre-dates the guest_memfd discussions and
-> so is assuming that the shared memory is not (directly) provided by the
-> guest_memfd but is using the user space pointer provided in the memslot.
-> It would be possible (with the patches proposed) for the VMM to mmap()
-> the guest_memfd when the memory is being shared so as to reuse the
-> physical pages.
->
-> I do also plan to look at supporting the use of the guest_memfd for the
-> shared memory directly. But I've been waiting for the discussions to
-> conclude before attempting to implement that.
->
-> [1] A 'granule' is the RMM's idea of a page size (RMM_PAGE_SIZE), which
-> is currently (RMM v1.0) always 4k. So may be different when Linux is
-> running with a larger page size.
 >
 > Thanks,
-> Steve
->
+> Niklas
+
+The reason I abandoned reset_done() callback idea is because its not 
+sufficient to recover the device correctly. Today before driving a reset 
+we save the state of the device. When a device is in error state, any 
+pci load/store (on s390x they are actual instructions :)) to config 
+space would return an error value (0xffffffff). We don't have any checks 
+in pci_save_state to prevent storing error values. And after a reset 
+when we try to restore the config space (pci_dev_restore) we try to 
+write the error value and this can be problematic. By the time the 
+reset_done() callback is invoked, its already too late.
+
+@Alex,
+I am open to ideas/suggestions on this. Do we think we need a separate 
+VFIO ioctl to drive this or a new reset mechanism as Niklas suggested?
+
+Thanks
+Farhan
+
 
