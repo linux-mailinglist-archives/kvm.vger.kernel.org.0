@@ -1,156 +1,109 @@
-Return-Path: <kvm+bounces-54634-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54635-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDA09B25999
-	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 04:49:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DBBB4B259B5
+	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 05:12:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2ED3E1C85B7D
-	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 02:49:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B6AEA1C25A26
+	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 03:12:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46DF7258CFF;
-	Thu, 14 Aug 2025 02:49:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YaOz01j6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF7BC2580FB;
+	Thu, 14 Aug 2025 03:12:20 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from baidu.com (mx24.baidu.com [111.206.215.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B24F2FF64F;
-	Thu, 14 Aug 2025 02:49:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8A993234;
+	Thu, 14 Aug 2025 03:12:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=111.206.215.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755139755; cv=none; b=u6sPlL4DtHYBbz0ZJ27/2esaaISd28RfEtg0sX+ZIVutO+1acg9Wbi830pCI3CX0bcKJVi9PK/oXquCugv9F0A78LGCTqUhOwyiL3cWUSPIi5eTVQ0mBSjNratw048mgLCQfvZnLAcf1sFlGkt7kLCgs7MQ/duGIB3FaIBAFUb8=
+	t=1755141140; cv=none; b=IQ9KkNC7MiwpuZ9B28vcr3ob3cYud+ifsqncSjHaecJbNMDJ9aN46oqsjDer6TDFLtTnqNZWcVAHZmO5UwIqa2ZWMOJaRyyfQN1z9HUK0ClBrpVw+n5/Zjr0LS6enME6hN1P9lsakcAYLe1PRzZn/krpfSqnqR5mSxTJxQXb5As=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755139755; c=relaxed/simple;
-	bh=NpHssSYhn2CrKHZjneLbrsKgTdd7DLyCmHtf4o7Q5rQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LIR3xfAGhtiGT70TyAJeNwRra1mqoxJPWDsk4YHeZM5sKwZkQyJBmvU5/Pxn9LlxCZYC5ja7mxxTBTbaCZyMz3OMkK3yqYVFb2CUvX52VB4zjoNm1OK6Dir1JAtmzNTo5BDmJBlPROQIPk3YYuDt3CnT23EZp/as0+fW4nLFRCE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YaOz01j6; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1755139754; x=1786675754;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=NpHssSYhn2CrKHZjneLbrsKgTdd7DLyCmHtf4o7Q5rQ=;
-  b=YaOz01j6kGHY6x2+z/eQSu+fg12T1L2PissdDkuIAR9TnXWTZMhv8UT5
-   kWXkBvbEpesNoQCQVugb7flFrARMH/Ndqk2P0Tw8TCqSni9vg2AuYspZA
-   HdTD0Q/UrEjinVrruslV0KLrUWErx2FsWV4yW40ceWdTDVjD95Iv7vCvp
-   gKT6pu4tCTOb3vchl5U0B45wov5ao9nhPHWUTzwOaMXcu6149PDSQ6Gyq
-   HLI9uITCvlgGJ/WE5hMuwVbRbXKv12IdpvezosrLTCYHhbscRdQ0kpZHx
-   Xi72nUQsVfjeQM4mV2oMINrkFr/fzU6bCN1JvyTpQ2RR0IfYp/vKJ/Dy5
-   w==;
-X-CSE-ConnectionGUID: BCWlbJRsTweg9FAWXitocw==
-X-CSE-MsgGUID: yMHyqI4eQTWBxHJJWTbgKQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11520"; a="61067348"
-X-IronPort-AV: E=Sophos;i="6.17,287,1747724400"; 
-   d="scan'208";a="61067348"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2025 19:49:11 -0700
-X-CSE-ConnectionGUID: PvsRFcA1Qz+YhDZhaV9yIw==
-X-CSE-MsgGUID: K+dR4kxIQvyOIl0PurNKPA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,287,1747724400"; 
-   d="scan'208";a="171977867"
-Received: from unknown (HELO [10.238.0.107]) ([10.238.0.107])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2025 19:49:07 -0700
-Message-ID: <4b7e7099-79da-4178-8f16-6780d8137ae1@linux.intel.com>
-Date: Thu, 14 Aug 2025 10:49:04 +0800
+	s=arc-20240116; t=1755141140; c=relaxed/simple;
+	bh=hD6G01xUFxAMo8yTPpCJAcvP0fFbdI7tS5+ZWk89JbA=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=FCcDATZqnIbgjyE70u4j5sN2tjRQU82vo+xVeiP1bQ39FtlFfQIj6Vvagz8X9nThW/UeKuRGBdj0tXPZ5dW11Iv7XRKDIgwd0QWo168oBONPENAR80I4deRj8k4/GLIEkZLoRXzxgL38/jWjUdxwB9XWVXt7GUebQkwiaKZIZ+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com; spf=pass smtp.mailfrom=baidu.com; arc=none smtp.client-ip=111.206.215.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baidu.com
+From: "Li,Rongqing" <lirongqing@baidu.com>
+To: "Guo, Wangyang" <wangyang.guo@intel.com>, Peter Zijlstra
+	<peterz@infradead.org>
+CC: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+	<pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, "Thomas
+ Gleixner" <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "Borislav
+ Petkov" <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+	"x86@kernel.org" <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "Li, Tianyou"
+	<tianyou.li@intel.com>, Tim Chen <tim.c.chen@linux.intel.com>
+Subject: RE: [????] RE: [PATCH RESEND^2] x86/paravirt: add backoff mechanism
+ to virt_spin_lock
+Thread-Topic: [????] RE: [PATCH RESEND^2] x86/paravirt: add backoff mechanism
+ to virt_spin_lock
+Thread-Index: AQHcDGAgcSqykxiqsUqQs7C13JefpbRg1jKAgAChcMA=
+Date: Thu, 14 Aug 2025 03:10:46 +0000
+Message-ID: <bb474c693d77428eb0336566150a1ea3@baidu.com>
+References: <20250813005043.1528541-1-wangyang.guo@intel.com>
+ <20250813143340.GN4067720@noisy.programming.kicks-ass.net>
+ <DS0PR11MB8018B027AA0738EB8B6CD55D9235A@DS0PR11MB8018.namprd11.prod.outlook.com>
+In-Reply-To: <DS0PR11MB8018B027AA0738EB8B6CD55D9235A@DS0PR11MB8018.namprd11.prod.outlook.com>
+Accept-Language: zh-CN, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 08/30] KVM: selftests: TDX: Update
- load_td_memory_region() for VM memory backed by guest memfd
-To: Reinette Chatre <reinette.chatre@intel.com>,
- Sean Christopherson <seanjc@google.com>, Sagi Shahar <sagis@google.com>
-Cc: linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
- Shuah Khan <shuah@kernel.org>, Ackerley Tng <ackerleytng@google.com>,
- Ryan Afranji <afranji@google.com>, Andrew Jones <ajones@ventanamicro.com>,
- Isaku Yamahata <isaku.yamahata@intel.com>,
- Erdem Aktas <erdemaktas@google.com>,
- Rick Edgecombe <rick.p.edgecombe@intel.com>,
- Roger Wang <runanwang@google.com>, Oliver Upton <oliver.upton@linux.dev>,
- "Pratik R. Sampat" <pratikrajesh.sampat@amd.com>,
- Ira Weiny <ira.weiny@intel.com>, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org
-References: <20250807201628.1185915-1-sagis@google.com>
- <20250807201628.1185915-9-sagis@google.com> <aJpTMVV-F0z8iyb4@google.com>
- <4b938a0a-a4ef-42c9-aef5-c931f2ad8aa0@linux.intel.com>
- <bec79c4a-499d-4f82-bfea-05746d4085e9@intel.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <bec79c4a-499d-4f82-bfea-05746d4085e9@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-FEAS-Client-IP: 172.31.3.13
+X-FE-Policy-ID: 52:10:53:SYSTEM
+
+> On 8/13/2025 10:33 PM, Peter Zijlstra wrote:
+> > On Wed, Aug 13, 2025 at 08:50:43AM +0800, Wangyang Guo wrote:
+> >> When multiple threads waiting for lock at the same time, once lock
+> >> owner releases the lock, waiters will see lock available and all try
+> >> to lock, which may cause an expensive CAS storm.
+> >>
+> >> Binary exponential backoff is introduced. As try-lock attempt
+> >> increases, there is more likely that a larger number threads compete
+> >> for the same lock, so increase wait time in exponential.
+> >
+> > You shouldn't be using virt_spin_lock() to begin with. That means
+> > you've misconfigured your guest.
+> >
+> > We have paravirt spinlocks for a reason.
+>=20
+> We have tried PARAVIRT_SPINLOCKS, it can help to reduce the contention cy=
+cles,
+> but the throughput is not good. I think there are two factors:
+>=20
+> 1. the VM is not overcommit, each thread has its CPU resources to doing s=
+pin
+> wait.
+
+If vm is not overcommit, guest should have KVM_HINTS_REALTIME, I think nati=
+ve qspinlock should be better
+Could you try test this patch
+https://patchwork.kernel.org/project/kvm/patch/20250722110005.4988-1-lirong=
+qing@baidu.com/
 
 
+Furthermore, I think the virt_spin_lock needs to be optimized.
 
-On 8/13/2025 10:42 PM, Reinette Chatre wrote:
-> Hi Binbin,
->
-> On 8/13/25 2:23 AM, Binbin Wu wrote:
->>
->> On 8/12/2025 4:31 AM, Sean Christopherson wrote:
->>> On Thu, Aug 07, 2025, Sagi Shahar wrote:
->> [...]
->>>> +
->>>>    /*
->>>>     * TD creation/setup/finalization
->>>>     */
->>>> @@ -459,28 +474,35 @@ static void load_td_memory_region(struct kvm_vm *vm,
->>>>        if (!sparsebit_any_set(pages))
->>>>            return;
->>>>    +    if (region->region.guest_memfd != -1)
->>>> +        register_encrypted_memory_region(vm, region);
->>>> +
->>>>        sparsebit_for_each_set_range(pages, i, j) {
->>>>            const uint64_t size_to_load = (j - i + 1) * vm->page_size;
->>>>            const uint64_t offset =
->>>>                (i - lowest_page_in_region) * vm->page_size;
->>>>            const uint64_t hva = hva_base + offset;
->>>>            const uint64_t gpa = gpa_base + offset;
->>>> -        void *source_addr;
->>>> +        void *source_addr = (void *)hva;
->>>>              /*
->>>>             * KVM_TDX_INIT_MEM_REGION ioctl cannot encrypt memory in place.
->>>>             * Make a copy if there's only one backing memory source.
->>>>             */
->>>> -        source_addr = mmap(NULL, size_to_load, PROT_READ | PROT_WRITE,
->>>> -                   MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
->>>> -        TEST_ASSERT(source_addr,
->>>> -                "Could not allocate memory for loading memory region");
->>>> -
->>>> -        memcpy(source_addr, (void *)hva, size_to_load);
->>>> +        if (region->region.guest_memfd == -1) {
->>> Oh, here's the "if".
->> Is it still possible for "region->region.guest_memfd == -1" case?
->> KVM_TDX_INIT_MEM_REGION can only work with guest memfd, right?
->>
-> This is still used and supports test "KVM: selftests: TDX: Test
-> LOG_DIRTY_PAGES flag to a non-GUEST_MEMFD memslot" found in patch #30 that
-> was created to support the issue encountered when QEMU attaches an emulated
-> VGA device to a TD. More details available in the fix:
-> fbb4adadea55 ("KVM: x86: Make cpu_dirty_log_size a per-VM value")
+Br
+-Li
 
-I think load_td_memory_region() should return directly for non-guest_memfd
-region.
-In current upstream version, KVM_TDX_INIT_MEM_REGION doesn't support
-non-guest_memfd region.
-
-The mmap/memcpy/munmap sequence should be removed because it does nothing but
-zero out the original content.
-
-
-
->
-> Reinette
+> 2. the critical section is very short; spin wait is faster than pv_kick.
+>=20
+> BR
+> Wangyang
 
 
