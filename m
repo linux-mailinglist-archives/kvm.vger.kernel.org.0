@@ -1,213 +1,450 @@
-Return-Path: <kvm+bounces-54664-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54665-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D66A9B26452
-	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 13:33:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67533B264AF
+	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 13:51:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A36415A74AF
-	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 11:33:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9AA83B880B
+	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 11:49:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0C812BE020;
-	Thu, 14 Aug 2025 11:32:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E08362FB96A;
+	Thu, 14 Aug 2025 11:48:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="lbKvtZEp"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="B6F/o2th"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FAC615DBC1;
-	Thu, 14 Aug 2025 11:32:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A118E2FA0C7;
+	Thu, 14 Aug 2025 11:48:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755171169; cv=none; b=uh6tO34U168wgYAc96K3iyBxLh4WQY0xs5YJaN6B1ZBfxaAXMFIWqGaIKr0sL64ZsR3kU0cYDyoqBwyiWQbVMuR4cKLwI0HUa50Hpr1JNdLRPRot6sYo9KkIPltbpay02MUZ/ooM1qVIJQYa5Wmi3IWhhN4ZPQrE6y3RmuPp1TU=
+	t=1755172138; cv=none; b=li5IcvhZTlwF1kWMOBQzf9OThU8Wv4OsrhsU2wXgWlu/uf/PjnfVhe4xQJCzLltB2ffx735HO/XBRwgIzBDFx+L2xDPW8bv/JFvGJboR1305SZJ8VuqFcRsvIb0X7121CZT8RSiGw7/pJaiEuQrrXQYAHmpI4+VKlaBynQaekJE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755171169; c=relaxed/simple;
-	bh=wblcZk0pxOdKF67gu29XOs+6K5HHjurDKh6fBX4C3+M=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=btrUazhWeFMXoMZv9wung6a26xBvtzAssiV7DWkSOKUHatA4BV09bWsaNX2pv7jRZid3YfrkfgG7ZnE9bE5kCIwKrogZHUPTKb0zvsD4HfzmKzaubOwH5BrfDl1iipMeHWYVCEvOt4J0VElLhA6AcNTUsVWCCPiNxg/wSU+1lE8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=lbKvtZEp; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57DLSLkY029484;
-	Thu, 14 Aug 2025 11:32:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=lFWRfi
-	Y68F2S2AKeSj4RW9pal3cKNLV9Fv3QjXxSx/U=; b=lbKvtZEpvgkLOP0uv1hBVw
-	ECQn7RnVcPhpo5C9SLYgvwEoL0WGVTKyGF18brvBm93CshLR7oD59FUaluLrLpA6
-	MATIkfsGhjv7xN4Niy0UiOF5S6pkayLGupKCEtlcY0b86iRCanwXxJgdcqpjHsJk
-	01bmbWhGdTD0YMv2KcB72606vil25PAIlal+NsPwVNMCpKU/aAnLyJSiMCV2LJuA
-	MFGZq/2YOYcivOh0+zy1pxUYKgvfhPEdkrNy5LZMmMwBWwkaEKXRkJx0pEon805g
-	83pvGH3mBpbhiKZmwuHbgjndeo/lKn3oiKrYIZdFZqbgVVOx5c/Rf3xOCYHljtQg
-	==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48dwudhtw1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 14 Aug 2025 11:32:44 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 57E836lt010832;
-	Thu, 14 Aug 2025 11:32:44 GMT
-Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 48egnuv4qm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 14 Aug 2025 11:32:43 +0000
-Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
-	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 57EBWgIC11469328
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 14 Aug 2025 11:32:42 GMT
-Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id EA8CA58065;
-	Thu, 14 Aug 2025 11:32:41 +0000 (GMT)
-Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C419458056;
-	Thu, 14 Aug 2025 11:32:40 +0000 (GMT)
-Received: from [9.87.142.31] (unknown [9.87.142.31])
-	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 14 Aug 2025 11:32:40 +0000 (GMT)
-Message-ID: <94289b685aae2c329ecae06a56e3648375841ab4.camel@linux.ibm.com>
-Subject: Re: [PATCH v1 1/6] s390/pci: Restore airq unconditionally for the
- zPCI device
-From: Niklas Schnelle <schnelle@linux.ibm.com>
-To: Farhan Ali <alifm@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: mjrosato@linux.ibm.com, alex.williamson@redhat.com
-Date: Thu, 14 Aug 2025 13:32:40 +0200
-In-Reply-To: <20250813170821.1115-2-alifm@linux.ibm.com>
-References: <20250813170821.1115-1-alifm@linux.ibm.com>
-	 <20250813170821.1115-2-alifm@linux.ibm.com>
-Autocrypt: addr=schnelle@linux.ibm.com; prefer-encrypt=mutual;
- keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 (3.56.2-1.fc42) 
+	s=arc-20240116; t=1755172138; c=relaxed/simple;
+	bh=gu4zFAplBgPGHOV6DtfYlkgF3aC4M8p9AQmESbr3BKQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EKG547f1JYUNCGvqG4uvi3s4cctnxWdzeiqgmBf5o1QnUnHRK32PQ9VrNjizITufeBwSOewQISA3VWgD6cZRvv/HWD25TUfy4XJhHGlYd6lsdQAB3lyms6fqBs0klT8g6t2P3AKiMDAzXYuGQ2/kfOg3865QvFuv0o1pkgRCIgk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=B6F/o2th; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1755172135; x=1786708135;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=gu4zFAplBgPGHOV6DtfYlkgF3aC4M8p9AQmESbr3BKQ=;
+  b=B6F/o2thqrccY/b6s16cizw8B70w07EUrmkgvyJjtzm83o+W4o4knmLy
+   FhNq5Yyg6Hzn9VS7GAMrbEoTJbHT/lZ62tmGSASjQu+Azf5uoIyw3nZT8
+   O8QAuKkE52UjH0x7+UY4a6aZC1iY8nXH+HVQ8llGwsyc7/8ZfZ9UPn1Y1
+   /Mu0LmaMuA9Id7LOba+A6n47BEskyiYI9mbAW1DX40w7Xegcntg1eUyw1
+   JGp1E3zNVETeJVM9g95CdF1QeeLhnw5BBimBhgdeY5KmfPJBXDJE9zukq
+   NrIQgBTDMZIF7CW7CE0GVbbveVlJFoaYlxkVoDhiJvtePlN1uF7s/1DDE
+   Q==;
+X-CSE-ConnectionGUID: bNP/k1V0QAO1LbdN/oeuKA==
+X-CSE-MsgGUID: ygu2oef8Q5+WGwwGothg4Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11520"; a="45062502"
+X-IronPort-AV: E=Sophos;i="6.17,287,1747724400"; 
+   d="scan'208";a="45062502"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2025 04:48:54 -0700
+X-CSE-ConnectionGUID: uVJP7rpYSMucul+jFkbWwQ==
+X-CSE-MsgGUID: VLAJKu8bQ1iPFVgvlRBrsg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,287,1747724400"; 
+   d="scan'208";a="166725347"
+Received: from unknown (HELO [10.238.0.107]) ([10.238.0.107])
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2025 04:48:50 -0700
+Message-ID: <410c14cd-edab-4dd0-8ac1-a33496744590@linux.intel.com>
+Date: Thu, 14 Aug 2025 19:48:48 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODEyMDIyNCBTYWx0ZWRfX9GVZh+zCM1ey
- 6sAS9xD7VKEO+SBglsHnkhGowZZJjmWA6PTyi/THCbihaafzpa3ePA0OnGrllcd8VtPSh+VePs2
- hOeKrB1UO4MIUIHx64/Dk4rvDGGK7BQ+HtiBYYJbWRW+UovVsJx48wBQsVWR+MM3XXhrubX8Us1
- kKtIUb9WlABpE7kBQ/PUj9F5PilWNPHApZDVUpsvxGmlQ5W1d1xeYOwVVQ4YLdNS6/3a2a8Guit
- PlKX9Rro2JPjnsGK21Xwa9nnuePuGWjHvDbyW/0j+NU4l400NcyAPheMHsW3MhoLATM9i6pmSuq
- cBwvCytTwXL7WDtG5xh3GhJ1dE6XC6qFhh9UZoushDHpDdF50Ac1KyVxrhS9WJLU4pa14ykKvGZ
- Iudh5hhj
-X-Authority-Analysis: v=2.4 cv=d/31yQjE c=1 sm=1 tr=0 ts=689dc95c cx=c_pps
- a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
- a=IkcTkHD0fZMA:10 a=2OwXVqhp2XgA:10 a=VnNF1IyMAAAA:8 a=BvTY8ph0WkRnvaG8rPAA:9
- a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: Nx9qDn5TkP5x5AsUDqTzaMY-Paf4Aefw
-X-Proofpoint-ORIG-GUID: Nx9qDn5TkP5x5AsUDqTzaMY-Paf4Aefw
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-08-13_02,2025-08-14_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1011 suspectscore=0 impostorscore=0 priorityscore=1501 phishscore=0
- spamscore=0 adultscore=0 bulkscore=0 malwarescore=0 classifier=typeunknown
- authscore=0 authtc= authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2507300000 definitions=main-2508120224
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 22/30] KVM: selftests: TDX: Add TDG.VP.INFO test
+To: Sagi Shahar <sagis@google.com>
+Cc: linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Shuah Khan <shuah@kernel.org>, Sean Christopherson <seanjc@google.com>,
+ Ackerley Tng <ackerleytng@google.com>, Ryan Afranji <afranji@google.com>,
+ Andrew Jones <ajones@ventanamicro.com>,
+ Isaku Yamahata <isaku.yamahata@intel.com>,
+ Erdem Aktas <erdemaktas@google.com>,
+ Rick Edgecombe <rick.p.edgecombe@intel.com>,
+ Roger Wang <runanwang@google.com>, Oliver Upton <oliver.upton@linux.dev>,
+ "Pratik R. Sampat" <pratikrajesh.sampat@amd.com>,
+ Reinette Chatre <reinette.chatre@intel.com>, Ira Weiny
+ <ira.weiny@intel.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20250807201628.1185915-1-sagis@google.com>
+ <20250807201628.1185915-23-sagis@google.com>
+Content-Language: en-US
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20250807201628.1185915-23-sagis@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, 2025-08-13 at 10:08 -0700, Farhan Ali wrote:
-> Commit c1e18c17bda6 ("s390/pci: add zpci_set_irq()/zpci_clear_irq()"),
-> introduced the zpci_set_irq() and zpci_clear_irq(), to be used while
-> resetting a zPCI device.
->=20
-> Commit da995d538d3a ("s390/pci: implement reset_slot for hotplug slot"),
-> mentions zpci_clear_irq() being called in the path for zpci_hot_reset_dev=
-ice().
-> But that is not the case anymore and these functions are not called
-> outside of this file.
->=20
-> However after a CLP disable/enable reset (zpci_hot_reset_device),
-> the airq setup of the device will need to be restored. Since we
-> are no longer calling zpci_clear_airq() in the reset path, we should
-> restore the airq for device unconditionally.
->=20
-> Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
+
+
+On 8/8/2025 4:16 AM, Sagi Shahar wrote:
+> From: Roger Wang <runanwang@google.com>
+>
+> Adds a test for TDG.VP.INFO.
+>
+> Introduce __tdx_module_call() that does needed shuffling from function
+> parameters to registers used by the TDCALL instruction that is used by the
+> guest to communicate with the TDX module. The first function parameter is
+> the leaf number indicating which guest side function should be run, for
+> example, TDG.VP.INFO.
+
+I think __tdx_hypercall() can be combined into __tdx_module_call(), it's just
+another leaf TDG.VP.VMCALL for tdcall. To avoid two copies of assembly code
+doing similar things?
+
+
+
+>
+> The guest uses new __tdx_module_call() to call TDG.VP.INFO to obtain TDX
+> TD execution environment information from the TDX module. All returned
+> registers are passed back to the host that verifies values for
+> correctness.
+>
+> Co-developed-by: Sagi Shahar <sagis@google.com>
+> Signed-off-by: Sagi Shahar <sagis@google.com>
+> Signed-off-by: Roger Wang <runanwang@google.com>
+> Signed-off-by: Sagi Shahar <sagis@google.com>
 > ---
->  arch/s390/pci/pci_irq.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
->=20
-> diff --git a/arch/s390/pci/pci_irq.c b/arch/s390/pci/pci_irq.c
-> index 84482a921332..8b5493f0dee0 100644
-> --- a/arch/s390/pci/pci_irq.c
-> +++ b/arch/s390/pci/pci_irq.c
-> @@ -427,8 +427,7 @@ bool arch_restore_msi_irqs(struct pci_dev *pdev)
->  {
->  	struct zpci_dev *zdev =3D to_zpci(pdev);
-> =20
-> -	if (!zdev->irqs_registered)
-> -		zpci_set_irq(zdev);
-> +	zpci_set_irq(zdev);
->  	return true;
->  }
-> =20
+>   .../selftests/kvm/include/x86/tdx/tdcall.h    |  19 +++
+>   .../selftests/kvm/include/x86/tdx/tdx.h       |   5 +
+>   .../selftests/kvm/lib/x86/tdx/tdcall.S        |  68 +++++++++
+>   tools/testing/selftests/kvm/lib/x86/tdx/tdx.c |  27 ++++
+>   tools/testing/selftests/kvm/x86/tdx_vm_test.c | 133 +++++++++++++++++-
+>   5 files changed, 251 insertions(+), 1 deletion(-)
+>
+> diff --git a/tools/testing/selftests/kvm/include/x86/tdx/tdcall.h b/tools/testing/selftests/kvm/include/x86/tdx/tdcall.h
+> index e7440f7fe259..ab1a97a82fa9 100644
+> --- a/tools/testing/selftests/kvm/include/x86/tdx/tdcall.h
+> +++ b/tools/testing/selftests/kvm/include/x86/tdx/tdcall.h
+> @@ -32,4 +32,23 @@ struct tdx_hypercall_args {
+>   /* Used to request services from the VMM */
+>   u64 __tdx_hypercall(struct tdx_hypercall_args *args, unsigned long flags);
+>   
+> +/*
+> + * Used to gather the output registers values of the TDCALL and SEAMCALL
+> + * instructions when requesting services from the TDX module.
+> + *
+> + * This is a software only structure and not part of the TDX module/VMM ABI.
+> + */
+> +struct tdx_module_output {
+> +	u64 rcx;
+> +	u64 rdx;
+> +	u64 r8;
+> +	u64 r9;
+> +	u64 r10;
+> +	u64 r11;
+> +};
+> +
+> +/* Used to communicate with the TDX module */
+> +u64 __tdx_module_call(u64 fn, u64 rcx, u64 rdx, u64 r8, u64 r9,
+> +		      struct tdx_module_output *out);
+> +
+>   #endif // SELFTESTS_TDX_TDCALL_H
+> diff --git a/tools/testing/selftests/kvm/include/x86/tdx/tdx.h b/tools/testing/selftests/kvm/include/x86/tdx/tdx.h
+> index 060158cb046b..801ca879664e 100644
+> --- a/tools/testing/selftests/kvm/include/x86/tdx/tdx.h
+> +++ b/tools/testing/selftests/kvm/include/x86/tdx/tdx.h
+> @@ -6,6 +6,8 @@
+>   
+>   #include "kvm_util.h"
+>   
+> +#define TDG_VP_INFO 1
+> +
+>   #define TDG_VP_VMCALL_GET_TD_VM_CALL_INFO 0x10000
+>   #define TDG_VP_VMCALL_REPORT_FATAL_ERROR 0x10003
+>   
+> @@ -31,5 +33,8 @@ uint64_t tdg_vp_vmcall_ve_request_mmio_write(uint64_t address, uint64_t size,
+>   uint64_t tdg_vp_vmcall_instruction_cpuid(uint32_t eax, uint32_t ecx,
+>   					 uint32_t *ret_eax, uint32_t *ret_ebx,
+>   					 uint32_t *ret_ecx, uint32_t *ret_edx);
+> +uint64_t tdg_vp_info(uint64_t *rcx, uint64_t *rdx,
+> +		     uint64_t *r8, uint64_t *r9,
+> +		     uint64_t *r10, uint64_t *r11);
+>   
+>   #endif // SELFTEST_TDX_TDX_H
+> diff --git a/tools/testing/selftests/kvm/lib/x86/tdx/tdcall.S b/tools/testing/selftests/kvm/lib/x86/tdx/tdcall.S
+> index b10769d1d557..c393a0fb35be 100644
+> --- a/tools/testing/selftests/kvm/lib/x86/tdx/tdcall.S
+> +++ b/tools/testing/selftests/kvm/lib/x86/tdx/tdcall.S
+> @@ -91,5 +91,73 @@ __tdx_hypercall:
+>   	pop %rbp
+>   	ret
+>   
+> +#define TDX_MODULE_rcx 0 /* offsetof(struct tdx_module_output, rcx) */
+> +#define TDX_MODULE_rdx 8 /* offsetof(struct tdx_module_output, rdx) */
+> +#define TDX_MODULE_r8 16 /* offsetof(struct tdx_module_output, r8) */
+> +#define TDX_MODULE_r9 24 /* offsetof(struct tdx_module_output, r9) */
+> +#define TDX_MODULE_r10 32 /* offsetof(struct tdx_module_output, r10) */
+> +#define TDX_MODULE_r11 40 /* offsetof(struct tdx_module_output, r11) */
+> +
+> +.globl __tdx_module_call
+> +.type __tdx_module_call, @function
+> +__tdx_module_call:
+> +	/* Set up stack frame */
+> +	push %rbp
+> +	movq %rsp, %rbp
+> +
+> +	/* Callee-saved, so preserve it */
+> +	push %r12
+> +
+> +	/*
+> +	 * Push output pointer to stack.
+> +	 * After the operation, it will be fetched into R12 register.
+> +	 */
+> +	push %r9
+> +
+> +	/* Mangle function call ABI into TDCALL/SEAMCALL ABI: */
+> +	/* Move Leaf ID to RAX */
+> +	mov %rdi, %rax
+> +	/* Move input 4 to R9 */
+> +	mov %r8,  %r9
+> +	/* Move input 3 to R8 */
+> +	mov %rcx, %r8
+> +	/* Move input 1 to RCX */
+> +	mov %rsi, %rcx
+> +	/* Leave input param 2 in RDX */
+> +
+> +	tdcall
+> +
+> +	/*
+> +	 * Fetch output pointer from stack to R12 (It is used
+> +	 * as temporary storage)
+> +	 */
+> +	pop %r12
+> +
+> +	/*
+> +	 * Since this macro can be invoked with NULL as an output pointer,
+> +	 * check if caller provided an output struct before storing output
+> +	 * registers.
+> +	 *
+> +	 * Update output registers, even if the call failed (RAX != 0).
+> +	 * Other registers may contain details of the failure.
+> +	 */
+> +	test %r12, %r12
+> +	jz .Lno_output_struct
+> +
+> +	/* Copy result registers to output struct: */
+> +	movq %rcx, TDX_MODULE_rcx(%r12)
+> +	movq %rdx, TDX_MODULE_rdx(%r12)
+> +	movq %r8,  TDX_MODULE_r8(%r12)
+> +	movq %r9,  TDX_MODULE_r9(%r12)
+> +	movq %r10, TDX_MODULE_r10(%r12)
+> +	movq %r11, TDX_MODULE_r11(%r12)
+> +
+> +.Lno_output_struct:
+> +	/* Restore the state of R12 register */
+> +	pop %r12
+> +
+> +	pop %rbp
+> +	ret
+> +
+>   /* Disable executable stack */
+>   .section .note.GNU-stack,"",%progbits
+> diff --git a/tools/testing/selftests/kvm/lib/x86/tdx/tdx.c b/tools/testing/selftests/kvm/lib/x86/tdx/tdx.c
+> index fb391483d2fa..ab6fd3d7ae4b 100644
+> --- a/tools/testing/selftests/kvm/lib/x86/tdx/tdx.c
+> +++ b/tools/testing/selftests/kvm/lib/x86/tdx/tdx.c
+> @@ -162,3 +162,30 @@ uint64_t tdg_vp_vmcall_instruction_cpuid(uint32_t eax, uint32_t ecx,
+>   
+>   	return ret;
+>   }
+> +
+> +uint64_t tdg_vp_info(uint64_t *rcx, uint64_t *rdx,
+> +		     uint64_t *r8, uint64_t *r9,
+> +		     uint64_t *r10, uint64_t *r11)
+> +{
+> +	struct tdx_module_output out;
+> +	uint64_t ret;
+> +
+> +	memset(&out, 0, sizeof(struct tdx_module_output));
+> +
+> +	ret = __tdx_module_call(TDG_VP_INFO, 0, 0, 0, 0, &out);
+> +
+> +	if (rcx)
+> +		*rcx = out.rcx;
+> +	if (rdx)
+> +		*rdx = out.rdx;
+> +	if (r8)
+> +		*r8 = out.r8;
+> +	if (r9)
+> +		*r9 = out.r9;
+> +	if (r10)
+> +		*r10 = out.r10;
+> +	if (r11)
+> +		*r11 = out.r11;
+> +
+> +	return ret;
+> +}
+> diff --git a/tools/testing/selftests/kvm/x86/tdx_vm_test.c b/tools/testing/selftests/kvm/x86/tdx_vm_test.c
+> index b6ef0348746c..82acc17a66ab 100644
+> --- a/tools/testing/selftests/kvm/x86/tdx_vm_test.c
+> +++ b/tools/testing/selftests/kvm/x86/tdx_vm_test.c
+> @@ -1038,6 +1038,135 @@ void verify_host_reading_private_mem(void)
+>   	printf("\t ... PASSED\n");
+>   }
+>   
+> +/*
+> + * Do a TDG.VP.INFO call from the guest
+> + */
+> +void guest_tdcall_vp_info(void)
+> +{
+> +	uint64_t rcx, rdx, r8, r9, r10, r11;
+> +	uint64_t err;
+> +
+> +	err = tdg_vp_info(&rcx, &rdx, &r8, &r9, &r10, &r11);
+> +	tdx_assert_error(err);
+> +
+> +	/* return values to user space host */
+> +	err = tdx_test_report_64bit_to_user_space(rcx);
+> +	tdx_assert_error(err);
+> +
+> +	err = tdx_test_report_64bit_to_user_space(rdx);
+> +	tdx_assert_error(err);
+> +
+> +	err = tdx_test_report_64bit_to_user_space(r8);
+> +	tdx_assert_error(err);
+> +
+> +	err = tdx_test_report_64bit_to_user_space(r9);
+> +	tdx_assert_error(err);
+> +
+> +	err = tdx_test_report_64bit_to_user_space(r10);
+> +	tdx_assert_error(err);
+> +
+> +	err = tdx_test_report_64bit_to_user_space(r11);
+> +	tdx_assert_error(err);
+> +
+> +	tdx_test_success();
+> +}
+> +
+> +/*
+> + * TDG.VP.INFO call from the guest. Verify the right values are returned
+> + */
+> +void verify_tdcall_vp_info(void)
+> +{
+> +	const struct kvm_cpuid_entry2 *cpuid_entry;
+> +	uint32_t ret_num_vcpus, ret_max_vcpus;
+> +	uint64_t rcx, rdx, r8, r9, r10, r11;
+> +	const int num_vcpus = 2;
+> +	struct kvm_vcpu *vcpus[num_vcpus];
+> +	uint64_t attributes;
+> +	struct kvm_vm *vm;
+> +	int gpa_bits = -1;
+> +	uint32_t i;
+> +
+> +	vm = td_create();
+> +
+> +#define TDX_TDPARAM_ATTR_SEPT_VE_DISABLE_BIT	BIT(28)
+> +	/* Setting attributes parameter used by TDH.MNG.INIT to 0x10000000 */
+> +	attributes = TDX_TDPARAM_ATTR_SEPT_VE_DISABLE_BIT;
+> +
+> +	td_initialize(vm, VM_MEM_SRC_ANONYMOUS, attributes);
+> +
+> +	for (i = 0; i < num_vcpus; i++)
+> +		vcpus[i] = td_vcpu_add(vm, i, guest_tdcall_vp_info);
+> +
+> +	td_finalize(vm);
+> +
+> +	printf("Verifying TDG.VP.INFO call:\n");
+> +
+> +	/* Get KVM CPUIDs for reference */
+> +
+> +	for (i = 0; i < num_vcpus; i++) {
+> +		struct kvm_vcpu *vcpu = vcpus[i];
+> +
+> +		cpuid_entry = vcpu_get_cpuid_entry(vcpu, 0x80000008);
+> +		TEST_ASSERT(cpuid_entry, "CPUID entry missing\n");
+> +		gpa_bits = (cpuid_entry->eax & GENMASK(23, 16)) >> 16;
+> +		TEST_ASSERT_EQ((1UL << (gpa_bits - 1)), tdx_s_bit);
+> +
+> +		/* Wait for guest to report rcx value */
+> +		tdx_run(vcpu);
+> +		rcx = tdx_test_read_64bit_report_from_guest(vcpu);
+> +
+> +		/* Wait for guest to report rdx value */
+> +		tdx_run(vcpu);
+> +		rdx = tdx_test_read_64bit_report_from_guest(vcpu);
+> +
+> +		/* Wait for guest to report r8 value */
+> +		tdx_run(vcpu);
+> +		r8 = tdx_test_read_64bit_report_from_guest(vcpu);
+> +
+> +		/* Wait for guest to report r9 value */
+> +		tdx_run(vcpu);
+> +		r9 = tdx_test_read_64bit_report_from_guest(vcpu);
+> +
+> +		/* Wait for guest to report r10 value */
+> +		tdx_run(vcpu);
+> +		r10 = tdx_test_read_64bit_report_from_guest(vcpu);
+> +
+> +		/* Wait for guest to report r11 value */
+> +		tdx_run(vcpu);
+> +		r11 = tdx_test_read_64bit_report_from_guest(vcpu);
+> +
+> +		ret_num_vcpus = r8 & 0xFFFFFFFF;
+> +		ret_max_vcpus = (r8 >> 32) & 0xFFFFFFFF;
+> +
+> +		/* first bits 5:0 of rcx represent the GPAW */
+> +		TEST_ASSERT_EQ(rcx & 0x3F, gpa_bits);
+> +		/* next 63:6 bits of rcx is reserved and must be 0 */
+> +		TEST_ASSERT_EQ(rcx >> 6, 0);
+> +		TEST_ASSERT_EQ(rdx, attributes);
+> +		TEST_ASSERT_EQ(ret_num_vcpus, num_vcpus);
+> +		TEST_ASSERT_EQ(ret_max_vcpus, vm_check_cap(vm, KVM_CAP_MAX_VCPUS));
+> +		/* VCPU_INDEX = i */
+> +		TEST_ASSERT_EQ(r9, i);
+> +		/*
+> +		 * verify reserved bits are 0
+> +		 * r10 bit 0 (SYS_RD) indicates that the TDG.SYS.RD/RDM/RDALL
+> +		 * functions are available and can be either 0 or 1.
+> +		 */
+> +		TEST_ASSERT_EQ(r10 & ~1, 0);
+> +		TEST_ASSERT_EQ(r11, 0);
+> +
+> +		/* Wait for guest to complete execution */
+> +		tdx_run(vcpu);
+> +
+> +		tdx_test_assert_success(vcpu);
+> +
+> +		printf("\t ... Guest completed run on VCPU=%u\n", i);
+> +	}
+> +
+> +	kvm_vm_free(vm);
+> +	printf("\t ... PASSED\n");
+> +}
+> +
+>   int main(int argc, char **argv)
+>   {
+>   	ksft_print_header();
+> @@ -1045,7 +1174,7 @@ int main(int argc, char **argv)
+>   	if (!is_tdx_enabled())
+>   		ksft_exit_skip("TDX is not supported by the KVM. Exiting.\n");
+>   
+> -	ksft_set_plan(14);
+> +	ksft_set_plan(15);
+>   	ksft_test_result(!run_in_new_process(&verify_td_lifecycle),
+>   			 "verify_td_lifecycle\n");
+>   	ksft_test_result(!run_in_new_process(&verify_report_fatal_error),
+> @@ -1074,6 +1203,8 @@ int main(int argc, char **argv)
+>   			 "verify_td_cpuid_tdcall\n");
+>   	ksft_test_result(!run_in_new_process(&verify_host_reading_private_mem),
+>   			 "verify_host_reading_private_mem\n");
+> +	ksft_test_result(!run_in_new_process(&verify_tdcall_vp_info),
+> +			 "verify_tdcall_vp_info\n");
+>   
+>   	ksft_finished();
+>   	return 0;
 
-This would make zdev->irqs_registered effectively without function so
-the patch should remove that field from struct zpci_dev and
-zpci_set_irq()/zpci_clear_irq(). Alternatively you could also clear
-zdev->irqs_registed in zpci_disable_device(). I think the former is
-cleaner though.
-
-Thanks,
-Niklas
 
