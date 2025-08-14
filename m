@@ -1,229 +1,198 @@
-Return-Path: <kvm+bounces-54694-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54695-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAFD9B27082
-	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 23:02:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44CBBB270E2
+	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 23:35:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 75F951BC7091
-	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 21:02:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA42CA25628
+	for <lists+kvm@lfdr.de>; Thu, 14 Aug 2025 21:35:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 652612741BC;
-	Thu, 14 Aug 2025 21:02:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47A4F279DCC;
+	Thu, 14 Aug 2025 21:35:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="dqPEtk6t"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bpf2Hsoy"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7CB9247287;
-	Thu, 14 Aug 2025 21:02:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F08541F1302
+	for <kvm@vger.kernel.org>; Thu, 14 Aug 2025 21:35:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755205336; cv=none; b=YP9SabzfML671b1L0JWMq6ke3Iqgjab5NmxhNPWKY9AiaN6WnNLWEG0i9cubgdV/yal+gYCMYOBmZYytZabcRghFvGBDeE2Y9Fw09G72GouoNF/yqLDiTD3JXKAdSq9rowl5Cvuj3ZNu17sV+rkW445eCHf0xQo6X7lMvuDP2WU=
+	t=1755207309; cv=none; b=WR8yaZRty4J8tsQPcJRJ/a7nkzoUNtNsS5aURYIdrxhR9/FTdpTP2L7cWKHnFuH6eyEar+r9zTbJLwF02GDo8jbILBHbTq8Os01htqBCHzve1cAOoXX4psy2Ko4F3asDBnb9f+bLbdtWgfogAvvPJHphqVu8qCfjVCGiiyV4ZBo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755205336; c=relaxed/simple;
-	bh=+j3KbxhIaA0ZH7cjICsJlGmmwNiVxxLhYjCvVfa/ckQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hQaCgHx93BtjyF4tw2u24C4Vw2FKx53Q0DVIdzM3YvPhj6W4/ewxUNnQdesTm5tjPCXY+Y76aKPzzAXjEXcHZB/AhRsKfEO/mRhYmiYrmP087FP8uUDc476QQRw46SYHl9ifwRotJxxnS/ueQ9gou6uP/qGOoqe17VtNxUQwEZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=dqPEtk6t; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57EEVRje009755;
-	Thu, 14 Aug 2025 21:02:10 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=xzTKJS
-	w+5NSfhYSifQkvy6p6Bc0axDUXRlLgVx2ggNo=; b=dqPEtk6tUaSrQhhNkNY9Cz
-	r6PzNHwVmcXtKobjvIbw2jx+i7qmbdhyT4VFerNf/YyLiuPXV0r8+tPHdHUHwbZJ
-	eRtJp12+EDOlWdZSKQ8+skx2OluE4ysZigpztD5rxaDnmRCwashRDW/AwlBUsl37
-	jSoLW/9vot4L7daApqZ0geuXBRLF6YdFIyQkyR7F0XKZQTsQEz+i10U9uvfIPv+L
-	h/4NP9VFmXwRO/U/howyhd0vrhYHHr+u31PBwifCAf4+g/Lmhpz5LlAj/Qkkid9G
-	YDKsbLYMrfxJ81wIYUtj8wv367CBNE29XTXFlOCsmLBknljpysSo8/tVGcukr0+A
-	==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48dwudmkj2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 14 Aug 2025 21:02:10 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 57EHq9SC020623;
-	Thu, 14 Aug 2025 21:02:09 GMT
-Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 48ehnq60t9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 14 Aug 2025 21:02:09 +0000
-Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
-	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 57EL27OE27460202
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 14 Aug 2025 21:02:07 GMT
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8C13E58059;
-	Thu, 14 Aug 2025 21:02:07 +0000 (GMT)
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id CB71558043;
-	Thu, 14 Aug 2025 21:02:06 +0000 (GMT)
-Received: from [9.61.244.230] (unknown [9.61.244.230])
-	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 14 Aug 2025 21:02:06 +0000 (GMT)
-Message-ID: <60855b41-a1ad-4966-aa5e-325256692279@linux.ibm.com>
-Date: Thu, 14 Aug 2025 14:02:05 -0700
+	s=arc-20240116; t=1755207309; c=relaxed/simple;
+	bh=2fuIMuEZcev0RDxuwZSy+EEzjg7NkM4Px2bVsPrQqQ8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Wddqs8X8irRtoMCL8k/N2wtlT6YCbrgrfmfA/ApX/EyKTSZNPR/SPkQ2bUSlNLjeoWGPgFov4vV6vrJf+vLjyXqQBQ0kG5XGcM+tMMoqmwnbn+ThCR9IZzdy8ekSqXJhXZXqrIO/RmdxrkIM6TCaoLtdCd6vliV+14WyD5FPcF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bpf2Hsoy; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2445806dc88so30174645ad.1
+        for <kvm@vger.kernel.org>; Thu, 14 Aug 2025 14:35:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1755207307; x=1755812107; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=oajUHZurgaJBmxaEUN9ClPIgMpw3KkdomNP4S2lFK5E=;
+        b=bpf2HsoydWKUiUdDeyV8xbTh2VAbTcJP2Z1FVet5rHKOHyATbYgOVwJHuzW1aEYQ2P
+         KvLNxGAVkdfggH5N+tg6AeqJf4vw/C3Oa69/Le10EnyCatYdwJRsgbPwVH0zikfOCMTd
+         VA685XDAszjLHrjKpjvjbmt5OOX4sesNCGiFE7pINUpXIvLDGtmFZK2KK2CdQdgTub5Y
+         8DLMoMuZ4fEv8jNZB2HzZI0RPBWt2gkmdpIK5veSX7alhArra+NJcKQNJZKK6uH1WC7H
+         5JlMmJqf3pkqYRgkXUscBIU1/pWPQzhx3GrRF4keyKbPiHBw0ogd4+AuP9bmw5Xtm8uu
+         ywKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755207307; x=1755812107;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=oajUHZurgaJBmxaEUN9ClPIgMpw3KkdomNP4S2lFK5E=;
+        b=oDmrQed4wn4o9oqUtaVfYP9BfvK2K0IolZCYLigYgdvD/RhbzQfEcQMhOs+qYYHBb/
+         RkQ7P9lt7fxAW1YwAXYk1cWskullQOHO+JlphEkQwlm7tj60nCPW5xxf/5wbv2ShDAT/
+         auaW+3GnhKBvtYE1Tc7CA6UkRLYIzLlnH9Nu5TkelN872YFA4776nTOBsjVi422eLdaf
+         W9pL5nG1CmUKM6wFKv5yYcdOLb00Ht/O2Zveqi63ScRQgaehgoCkiZiwPD5clgtXVzRB
+         9xNH9vpBNOVwF568mCrYGgLpk/dWZf3RQ//5cQ9jVRSCS8mX1hPkvDCLeBZSNmvKIM8z
+         qiJg==
+X-Gm-Message-State: AOJu0YwY0CotY4BqogzkorO3KK5wTcPdaVISiFLW6CTEGuIetxI10M3q
+	Mq7SOK1jqrHYrNZpvzX9x4+a5NWtwmIMvuZnxF0ommx3UzTUFxbd4j9ukmMbxu884WtQziZOZrA
+	Cbks7scsCluno6gvC8yxKPyD8vQ==
+X-Google-Smtp-Source: AGHT+IHSCWEZ4WzQFvfM7gmfwowerM9ooYJUxTCTTxPR6qD/XE6Y7uX4MPuDDOyY1Umu3SEnPhVG+BTFarjXCQhhaQ==
+X-Received: from pjboi8.prod.google.com ([2002:a17:90b:3a08:b0:321:90c5:fc2b])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:902:ef0f:b0:240:b075:577f with SMTP id d9443c01a7336-244586c4da1mr76912365ad.37.1755207307282;
+ Thu, 14 Aug 2025 14:35:07 -0700 (PDT)
+Date: Thu, 14 Aug 2025 14:35:05 -0700
+In-Reply-To: <aIwD5kGbMibV7ksk@yzhao56-desk.sh.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 6/6] vfio: Allow error notification and recovery for
- ISM device
-To: Bjorn Helgaas <helgaas@kernel.org>
-Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, schnelle@linux.ibm.com,
-        mjrosato@linux.ibm.com, alex.williamson@redhat.com
-References: <20250814204850.GA346571@bhelgaas>
-Content-Language: en-US
-From: Farhan Ali <alifm@linux.ibm.com>
-In-Reply-To: <20250814204850.GA346571@bhelgaas>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODEyMDIyNCBTYWx0ZWRfXy6AJH8waoyaD
- Z6jvlIW0gaN8a8Ar1GfnEH5bWz7t/vX00PK2lLDYGXfKx8kFb7AGwGMpQHzGtW5nkAlzP0ND5d2
- JbagKhgFMlFeb5cep3m6jlUFrgW4dWUX9wHZZfYsKU3VMbKP9KAwRG4IoRkzFh2V7w5JG0uj3Xo
- xvdfQaGmD24qktzNSpjXSwiPiHWt0qCPcllsBQqRFcs4j0EM86fQI/n+ramBIvDwB7Zi/oDp/u+
- Ofxntciq7LpqnySStR3avePOHZ80OPtwTfCOClm2lhmmSPCnUO81UWPL1kJYeAuzJwfksre5CjQ
- +lqGjEKtBFDxCj32KrIVlAqjcMIgVkOU4DW2uZU3betYGp8izn4ucD4nP+10Bk54FJleDZidQlk
- RaAsEvhM
-X-Authority-Analysis: v=2.4 cv=d/31yQjE c=1 sm=1 tr=0 ts=689e4ed2 cx=c_pps
- a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
- a=IkcTkHD0fZMA:10 a=2OwXVqhp2XgA:10 a=VnNF1IyMAAAA:8 a=c3_NMMW06mFj85baJVsA:9
- a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: MjgQMatlesc9X1y3s6KrtvLeat5wO813
-X-Proofpoint-ORIG-GUID: MjgQMatlesc9X1y3s6KrtvLeat5wO813
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-08-13_02,2025-08-14_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 suspectscore=0 impostorscore=0 priorityscore=1501 phishscore=0
- spamscore=0 adultscore=0 bulkscore=0 malwarescore=0 classifier=typeunknown
- authscore=0 authtc= authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2507300000 definitions=main-2508120224
+Mime-Version: 1.0
+References: <cover.1747264138.git.ackerleytng@google.com> <b784326e9ccae6a08388f1bf39db70a2204bdc51.1747264138.git.ackerleytng@google.com>
+ <aIwD5kGbMibV7ksk@yzhao56-desk.sh.intel.com>
+Message-ID: <diqz349ta8om.fsf@ackerleytng-ctop.c.googlers.com>
+Subject: Re: [RFC PATCH v2 02/51] KVM: guest_memfd: Introduce and use
+ shareability to guard faulting
+From: Ackerley Tng <ackerleytng@google.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: kvm@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
+	x86@kernel.org, linux-fsdevel@vger.kernel.org, aik@amd.com, 
+	ajones@ventanamicro.com, akpm@linux-foundation.org, amoorthy@google.com, 
+	anthony.yznaga@oracle.com, anup@brainfault.org, aou@eecs.berkeley.edu, 
+	bfoster@redhat.com, binbin.wu@linux.intel.com, brauner@kernel.org, 
+	catalin.marinas@arm.com, chao.p.peng@intel.com, chenhuacai@kernel.org, 
+	dave.hansen@intel.com, david@redhat.com, dmatlack@google.com, 
+	dwmw@amazon.co.uk, erdemaktas@google.com, fan.du@intel.com, fvdl@google.com, 
+	graf@amazon.com, haibo1.xu@intel.com, hch@infradead.org, hughd@google.com, 
+	ira.weiny@intel.com, isaku.yamahata@intel.com, jack@suse.cz, 
+	james.morse@arm.com, jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, 
+	jhubbard@nvidia.com, jroedel@suse.de, jthoughton@google.com, 
+	jun.miao@intel.com, kai.huang@intel.com, keirf@google.com, 
+	kent.overstreet@linux.dev, kirill.shutemov@intel.com, liam.merwick@oracle.com, 
+	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, maz@kernel.org, 
+	mic@digikod.net, michael.roth@amd.com, mpe@ellerman.id.au, 
+	muchun.song@linux.dev, nikunj@amd.com, nsaenz@amazon.es, 
+	oliver.upton@linux.dev, palmer@dabbelt.com, pankaj.gupta@amd.com, 
+	paul.walmsley@sifive.com, pbonzini@redhat.com, pdurrant@amazon.co.uk, 
+	peterx@redhat.com, pgonda@google.com, pvorel@suse.cz, qperret@google.com, 
+	quic_cvanscha@quicinc.com, quic_eberman@quicinc.com, 
+	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com, richard.weiyang@gmail.com, 
+	rick.p.edgecombe@intel.com, rientjes@google.com, roypat@amazon.co.uk, 
+	rppt@kernel.org, seanjc@google.com, shuah@kernel.org, steven.price@arm.com, 
+	steven.sistare@oracle.com, suzuki.poulose@arm.com, tabba@google.com, 
+	thomas.lendacky@amd.com, usama.arif@bytedance.com, vannapurve@google.com, 
+	vbabka@suse.cz, viro@zeniv.linux.org.uk, vkuznets@redhat.com, 
+	wei.w.wang@intel.com, will@kernel.org, willy@infradead.org, 
+	xiaoyao.li@intel.com, yilun.xu@intel.com, yuzenghui@huawei.com, 
+	zhiquan1.li@intel.com
+Content-Type: text/plain; charset="UTF-8"
 
+Yan Zhao <yan.y.zhao@intel.com> writes:
 
-On 8/14/2025 1:48 PM, Bjorn Helgaas wrote:
-> On Wed, Aug 13, 2025 at 10:08:20AM -0700, Farhan Ali wrote:
->> VFIO allows error recovery and notification for devices that
->> are PCIe (and thus AER) capable. But for PCI devices on IBM
->> s390 error recovery involves platform firmware and
->> notification to operating system is done by architecture
->> specific way. The Internal Shared Memory(ISM) device is a legacy
->> PCI device (so not PCIe capable), but can still be recovered
->> when notified of an error.
-> "PCIe (and thus AER) capable" reads as though AER is required for all
-> PCIe devices, but AER is optional.
->
-> I don't know the details of VFIO and why it tests for PCIe instead of
-> AER.  Maybe AER is not relevant here and you don't need to mention
-> AER above at all?
-
-The original change that introduced this commit dad9f89 "VFIO-AER: 
-Vfio-pci driver changes for supporting AER" was adding the support for 
-AER for vfio. My assumption is the author thought if the device is AER 
-capable the pcie check should be sufficient? I can remove the AER 
-references in commit message. Thanks Farhan
-
-
-
->
->> Relax the PCIe only requirement for ISM devices, so passthrough
->> ISM devices can be notified and recovered on error.
-> Nit: it looks like all your commit logs could be rewrapped to fill
-> about 75 columns (to leave space for "git log" to indent them and
-> still fit in 80 columns).  IMHO not much value in using a smaller
-> width than that.
->
-Sure, will fix this.
->> Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
->> ---
->>   drivers/vfio/pci/vfio_pci_core.c  | 18 ++++++++++++++++--
->>   drivers/vfio/pci/vfio_pci_intrs.c |  2 +-
->>   drivers/vfio/pci/vfio_pci_priv.h  |  3 +++
->>   3 files changed, 20 insertions(+), 3 deletions(-)
->>
->> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
->> index 7220a22135a9..1faab80139c6 100644
->> --- a/drivers/vfio/pci/vfio_pci_core.c
->> +++ b/drivers/vfio/pci/vfio_pci_core.c
->> @@ -723,6 +723,20 @@ void vfio_pci_core_finish_enable(struct vfio_pci_core_device *vdev)
->>   }
->>   EXPORT_SYMBOL_GPL(vfio_pci_core_finish_enable);
->>   
->> +bool vfio_pci_device_can_recover(struct vfio_pci_core_device *vdev)
+> On Wed, May 14, 2025 at 04:41:41PM -0700, Ackerley Tng wrote:
+>> +static enum shareability kvm_gmem_shareability_get(struct inode *inode,
+>> +						 pgoff_t index)
 >> +{
->> +	struct pci_dev *pdev = vdev->pdev;
+>> +	struct maple_tree *mt;
+>> +	void *entry;
 >> +
->> +	if (pci_is_pcie(pdev))
->> +		return true;
+>> +	mt = &kvm_gmem_private(inode)->shareability;
+>> +	entry = mtree_load(mt, index);
+>> +	WARN(!entry,
+>> +	     "Shareability should always be defined for all indices in inode.");
 >> +
->> +	if (pdev->vendor == PCI_VENDOR_ID_IBM &&
->> +			pdev->device == PCI_DEVICE_ID_IBM_ISM)
->> +		return true;
->> +
->> +	return false;
+>> +	return xa_to_value(entry);
 >> +}
 >> +
->>   static int vfio_pci_get_irq_count(struct vfio_pci_core_device *vdev, int irq_type)
->>   {
->>   	if (irq_type == VFIO_PCI_INTX_IRQ_INDEX) {
->> @@ -749,7 +763,7 @@ static int vfio_pci_get_irq_count(struct vfio_pci_core_device *vdev, int irq_typ
->>   			return (flags & PCI_MSIX_FLAGS_QSIZE) + 1;
->>   		}
->>   	} else if (irq_type == VFIO_PCI_ERR_IRQ_INDEX) {
->> -		if (pci_is_pcie(vdev->pdev))
->> +		if (vfio_pci_device_can_recover(vdev))
->>   			return 1;
->>   	} else if (irq_type == VFIO_PCI_REQ_IRQ_INDEX) {
->>   		return 1;
->> @@ -1150,7 +1164,7 @@ static int vfio_pci_ioctl_get_irq_info(struct vfio_pci_core_device *vdev,
->>   	case VFIO_PCI_REQ_IRQ_INDEX:
->>   		break;
->>   	case VFIO_PCI_ERR_IRQ_INDEX:
->> -		if (pci_is_pcie(vdev->pdev))
->> +		if (vfio_pci_device_can_recover(vdev))
->>   			break;
->>   		fallthrough;
->>   	default:
->> diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
->> index 123298a4dc8f..f5384086ac45 100644
->> --- a/drivers/vfio/pci/vfio_pci_intrs.c
->> +++ b/drivers/vfio/pci/vfio_pci_intrs.c
->> @@ -838,7 +838,7 @@ int vfio_pci_set_irqs_ioctl(struct vfio_pci_core_device *vdev, uint32_t flags,
->>   	case VFIO_PCI_ERR_IRQ_INDEX:
->>   		switch (flags & VFIO_IRQ_SET_ACTION_TYPE_MASK) {
->>   		case VFIO_IRQ_SET_ACTION_TRIGGER:
->> -			if (pci_is_pcie(vdev->pdev))
->> +			if (vfio_pci_device_can_recover(vdev))
->>   				func = vfio_pci_set_err_trigger;
->>   			break;
->>   		}
->> diff --git a/drivers/vfio/pci/vfio_pci_priv.h b/drivers/vfio/pci/vfio_pci_priv.h
->> index 5288577b3170..93c1e29fbbbb 100644
->> --- a/drivers/vfio/pci/vfio_pci_priv.h
->> +++ b/drivers/vfio/pci/vfio_pci_priv.h
->> @@ -36,6 +36,9 @@ ssize_t vfio_pci_config_rw(struct vfio_pci_core_device *vdev, char __user *buf,
->>   ssize_t vfio_pci_bar_rw(struct vfio_pci_core_device *vdev, char __user *buf,
->>   			size_t count, loff_t *ppos, bool iswrite);
->>   
->> +bool vfio_pci_device_can_recover(struct vfio_pci_core_device *vdev);
->> +
->> +
->>   #ifdef CONFIG_VFIO_PCI_VGA
->>   ssize_t vfio_pci_vga_rw(struct vfio_pci_core_device *vdev, char __user *buf,
->>   			size_t count, loff_t *ppos, bool iswrite);
->> -- 
->> 2.43.0
->>
+> Hi Ackerley,
+>
+> Not sure if it's a known issue. Just want to let you know in case you're unaware.
+>
+
+Thanks for informing me, and thanks for the analysis :)
+
+> During a test to repeatedly launching/destroying TDs, I encountered a warning
+> from kvm_gmem_shareability_get() (see the attached log at the bottom).
+> The reproducing rate is 1 in every 20-100 times of launching TD.
+>
+> After some analysis, I found that the warning was produced by
+> kvm_gmem_shareability_get() when it's called from kvm_gmem_is_private(), which
+> is not protected by any locks.
+>
+> I can get rid of the warning by either fix 1 or fix 2 below.
+> (I prefer fix 1 though :))
+>
+> fix 1:
+>
+> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+> index e78fbebf4f53..136d46c5b2ab 100644
+> --- a/virt/kvm/guest_memfd.c
+> +++ b/virt/kvm/guest_memfd.c
+> @@ -2024,7 +2024,7 @@ static struct inode *kvm_gmem_inode_make_secure_inode(const char *name,
+>
+>  #ifdef CONFIG_KVM_GMEM_SHARED_MEM
+>         if (flags & GUEST_MEMFD_FLAG_SUPPORT_SHARED) {
+> -               mt_init(&private->shareability);
+> +               mt_init_flags(&private->shareability, MT_FLAGS_USE_RCU);
+>
+>                 err = kvm_gmem_shareability_setup(private, size, flags);
+>                 if (err)
+>
+
+Not sure about the version of the conversion patch series that you're
+using, in the version I'm preparing, I'm using
+filemap_invalidate_lock_shared() to guard shareability
+reads. filemap_invalidate_lock() is held during shareability updates, so
+I think this issue should be fixed.
+
+Please let me know if you're still seeing this issue in the next series
+(coming soon). Thank you!
+
+>
+> fix 2:
+> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+> index e78fbebf4f53..9a4518104d56 100644
+> --- a/virt/kvm/guest_memfd.c
+> +++ b/virt/kvm/guest_memfd.c
+> @@ -171,7 +171,9 @@ static enum shareability kvm_gmem_shareability_get(struct inode *inode,
+>         void *entry;
+>
+>         mt = &kvm_gmem_private(inode)->shareability;
+> +       mtree_lock(mt);
+>         entry = mtree_load(mt, index);
+> +       mtree_unlock(mt);
+>         WARN(!entry,
+>              "Shareability should always be defined for all indices in inode.");
+>
+>
+> Thanks
+> Yan
+>
+> 
+> [...snip...]
+> 
 
