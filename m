@@ -1,89 +1,100 @@
-Return-Path: <kvm+bounces-54804-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54805-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1F16B28615
-	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 20:54:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FA65B28619
+	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 20:56:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E210D56431B
-	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 18:53:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60824B05C3F
+	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 18:56:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEA442F9C2D;
-	Fri, 15 Aug 2025 18:53:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3A5F304BB5;
+	Fri, 15 Aug 2025 18:56:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="baJlH9tO"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="EUyntAwU"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FC322F9C35
-	for <kvm@vger.kernel.org>; Fri, 15 Aug 2025 18:52:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86EFD41C63
+	for <kvm@vger.kernel.org>; Fri, 15 Aug 2025 18:56:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755283981; cv=none; b=oTJkwb4mfZolpASA9//ydYI1vjtedWYrdRnduylkUSGBnB4veSFwYUdrogySjVlhKSoX23CTJfa+zDU0CM8oUM1KVNMl24AVDxg24GKE3CDuDtOEBMneFbvyB29YlBuv+ZTHSTyVckZ3kxkKIm4xB7Usdw7ihO8q3ddcNAz8/GE=
+	t=1755284197; cv=none; b=Cu5tuu0ODKNCHNUj8CX4F2KB8IW90CuQbunkqHgElJYL3OefS0eQ4WLI8/FVxHjBxMMsdbvlxDcc0FHLjo9AitwU3Y9k0s8KicDXr2MLv3aJhJ0/FyicAWLzEbHkB+7JIDcHNSQ9Vr2PlXN1Y96Vnhkp5aTNexafGUk5Z3d8vfs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755283981; c=relaxed/simple;
-	bh=yy100eIycRYfQ+GHhchXeEuZF4KDvur6SJ6JEyimJZ8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uvU4t3FEYjk5foqckshyMQUKSxzXq1lsKaqi4TJzSLNY8qHbX5c0AICPCde1AGkX4iSWPKTSOYjlzWVp1zdJocqUcT1Unf7mU4nxyaght59Kul4RSS3rKw2vuRasY2JUEpNmuQ5I9itZIFKcnvx8Fdf83jovXQ52uRKMVwz1sD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=baJlH9tO; arc=none smtp.client-ip=95.215.58.179
+	s=arc-20240116; t=1755284197; c=relaxed/simple;
+	bh=EnaU4b4BQq+lkAyTdDiB/9LaASwrKTZEFuTi9pN7/P4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=L5ZQEc2GX5Mzfd8yADQg30MMNfHXhDUhH3+ixH3bhpy++ZZeSy1pd/qBIUDs+QNoCvbKO3Ha78GzpqkCbxO+VP4L4RCOHL4/ZE8+ZA/jjxp7O7fQ0X1QsvyUQ7lad0TeLVO5IHR6oOJNJptzSl0CnKKo5B0ajUSKoEV5a29JGts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=EUyntAwU; arc=none smtp.client-ip=91.218.175.184
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+Date: Fri, 15 Aug 2025 11:56:23 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1755283967;
+	t=1755284192;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=UQnrvh8fmmyw5mye4l3ThIw5bAHTdjRGTFjcTvSf2X4=;
-	b=baJlH9tOVl/5B3c1jvUHXPDwLuEj7u1V4YReehcCH9W7Lyv4ukNVCxHgPfx5lLC5AgfOqo
-	vLCSPJK8wMju85aVdnjOnsvbRw/kDnCh2Q7yLkE5fyaGS4Kn7QTtha5jeJE/OHjBgvknA4
-	w5B58ztz22/Qg9zSajyFJl/yekRpOGc=
+	bh=lcbfpvMeFZQQn0Wme2x0gtEmZjwzrQjTk83v9La0I3o=;
+	b=EUyntAwUGNP/CpsSxVdmHUhjkdjEdHDWrZWWYFZIDeeITLWtAbhB3hO+OwHpaSTwnIx21Q
+	01GwZJmbrE0uNEcu0XDorAhiZVvHELUpOkSvwqt9MpAMSmjB+Jp6bewqgzu3Lz0ifQUmBh
+	vALVpkSNpUgK73qZTRlhGWrPhb8WSK4=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev,
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Volodymyr Babchuk <volodymyr_babchuk@epam.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH] KVM: arm64: Correctly populate FAR_EL2 on nested SEA injection
-Date: Fri, 15 Aug 2025 11:52:33 -0700
-Message-Id: <175528391095.1010493.11054501106078213907.b4-ty@linux.dev>
-In-Reply-To: <20250813163747.2591317-1-maz@kernel.org>
-References: <20250813163747.2591317-1-maz@kernel.org>
+Subject: Re: [PATCH 2/2] KVM: arm64: Fix vcpu_{read,write}_sys_reg() accessors
+Message-ID: <aJ-C1-t34aVmHLjY@linux.dev>
+References: <20250809144811.2314038-1-maz@kernel.org>
+ <20250809144811.2314038-3-maz@kernel.org>
+ <aJuixWlc87f2UlK0@linux.dev>
+ <86ikipev46.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86ikipev46.wl-maz@kernel.org>
 X-Migadu-Flow: FLOW_OUT
 
-On Wed, 13 Aug 2025 17:37:47 +0100, Marc Zyngier wrote:
-> vcoy_write_sys_reg()'s signature is not totally obvious, and it
-> is rather easy to write something that looks correct, except that...
-> Oh wait...
+On Thu, Aug 14, 2025 at 05:16:57PM +0100, Marc Zyngier wrote:
+> My current conclusion is that a macro hack is not really practical, if
+> only because we end-up here from out-of-line C code, and that at this
+> stage we've lost all symbolic information.
 > 
-> Swap addr and FAR_EL2 to restore some sanity in the nested SEA
-> department.
+> We *could* take the nuclear option of re-modelling the sysreg enum as
+> a bunch of #define, similar to the way we deal with vcpu flags, and
+> have accessors for the various bits of information, but that comes
+> with two different problems:
 > 
-> [...]
+> - we don't have a good way to iterate over symbolic registers
+> 
+> - we need to repaint a large portion of the code base
+> 
+> Given that, I've taken another approach, which is to move all these
+> things close together (no more inlining), and add enough WARN_ON()s
+> that you really have to try and game the code to miss something and
+> not get caught. In the process, I found a couple of extra stragglers
+> that are always loaded when running a 32bit guest (the *32_EL2
+> registers...).
+> 
+> I've pushed the current state on my kvm-arm64/at-fixes-6.17 branch,
+> and I'll try to repost patches over the weekend.
 
-Sorry I didn't pick this up immediately, had to find my brown bag...
+Thanks! I've taken a glance at the branch and LGTM. Just wanted to make
+sure we have sufficient idiotproofing for the next time I misuse this
+stuff ;-)
 
-With the typo addressed: applied to fixes, thanks!
-
-[1/1] KVM: arm64: Correctly populate FAR_EL2 on nested SEA injection
-      https://git.kernel.org/kvmarm/kvmarm/c/d19c541d269e
-
---
 Best,
 Oliver
 
