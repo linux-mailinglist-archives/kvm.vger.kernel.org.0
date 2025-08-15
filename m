@@ -1,104 +1,125 @@
-Return-Path: <kvm+bounces-54764-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54765-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 144A3B276A5
-	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 05:17:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BB11B277AE
+	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 06:15:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AD6A31B6007F
-	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 03:15:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2AD42603CA8
+	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 04:15:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BCFA298CD5;
-	Fri, 15 Aug 2025 03:15:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EB142253FB;
+	Fri, 15 Aug 2025 04:14:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kF4AR4Hm"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="M15DhATI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E6D418C011;
-	Fri, 15 Aug 2025 03:15:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE77C1CD215
+	for <kvm@vger.kernel.org>; Fri, 15 Aug 2025 04:14:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755227728; cv=none; b=M1AoK895o51J6zdu8P7ftkTll8GkTADis3aEA5erh0m57QlSmjThX2c+cnvHbXRYKPwUpGDdgQvE134BilLrTKVX5D3ig2+cEc2BkD+Q569MWHFAsvZwVM1WsEWP9ckwtF6wyaiiraLxW6yWEcddOZKX+SS/eldRRabjBykzDtk=
+	t=1755231296; cv=none; b=CPOMjOHEuKzuxaMprEqARpLzOJ+oCoANSgoVfskj8MnIVz5gR5NhHav01xZ++jMgW5d6T3TSm2WTUNnt/t14iWqm0QvADRd3nmbB4E2RuczFVZ6rhkNaUjNeAj7G2exCBo4KLqb3AWo4gLo8ZgCBOHNUPTQBBIOkfbeBX0o/EXU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755227728; c=relaxed/simple;
-	bh=fC1mrUytUG74MKUNflCkOvX5lW6hkNqnNNZ7FyLjNIk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hFqugJSGyaCYwBrg3ZJ8men8CprDvUpqM16idRKwq0ot5i+PBvlRtfu1R+uUqNdY9OkVaOqgMxEW8tu5zzzTAs5p/kKa7rKMn+oA2u+Jl+mlIilRlFRozKn1/C4hd95XmDST7ckdxBRZGi5tAG6WZJTFSDyNAQltxDA6Qw3C3w8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kF4AR4Hm; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1755227727; x=1786763727;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=fC1mrUytUG74MKUNflCkOvX5lW6hkNqnNNZ7FyLjNIk=;
-  b=kF4AR4HmpnP0KjgcbW6BuHcyyJ8+CKKyjFT/2a+aSkPEA+Dfg+2DbovR
-   w5gebYf1D5mCRhl60Lrocs8MGW45TjVbWkwZAW74fNkY0uLMQ0TU6f4nB
-   I7wod7D29H1Vo5TUed1YjbQhTSSNxArka77mPAnmBywA1RkgVHyBiBVfi
-   opHhKkvgkQNiocrXn8hYSkzUxfvZV+A/D0IZNk0PyebwVeNZ8Fd6Kyh0k
-   FjnE4PPJ3qnR8VXRWXuaj29a1L+204+01Tz9XvgomguMTw+Adsn7Rhklq
-   d31q/4yWEAt8PJN2vu4tVbejRbPsWYt6HzXZmf+gnM8wBMiexua77rLSE
-   A==;
-X-CSE-ConnectionGUID: OjLVpetZRVWiitcFTxvUBg==
-X-CSE-MsgGUID: 1xQXv2FtTVOr9WdEqygXNA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11522"; a="80134704"
-X-IronPort-AV: E=Sophos;i="6.17,290,1747724400"; 
-   d="scan'208";a="80134704"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2025 20:15:26 -0700
-X-CSE-ConnectionGUID: gWE2MD7FSsO1FMn9GpkNvw==
-X-CSE-MsgGUID: 7azx2Hb7QE2UY2Q4NI5dPg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,290,1747724400"; 
-   d="scan'208";a="166834945"
-Received: from unknown (HELO [10.238.0.107]) ([10.238.0.107])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2025 20:15:21 -0700
-Message-ID: <8b76b1d7-edc9-4677-8069-a428e1067050@linux.intel.com>
-Date: Fri, 15 Aug 2025 11:15:19 +0800
+	s=arc-20240116; t=1755231296; c=relaxed/simple;
+	bh=MqO7WvtgNbZKWD8uq2q1m3YqKMotdAclfYip+JQ1678=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mZ7Tb2aLlngrPLeEXLWKwGcahP4AvrVb5schld6Z4TVOZLCACdkgC3tHMt/zuONlsdx9xzTNBcxHV/EdiMMCLaGuVAjZxHy+ux+ecc/JULnR7s7HfWa4UAStqAsfDUhWAY68Pr62dcTnerSnW+Eh66I56iaF1JLHWQVc/ZB7+l8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=M15DhATI; arc=none smtp.client-ip=209.85.160.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4b0bd871d9aso192911cf.0
+        for <kvm@vger.kernel.org>; Thu, 14 Aug 2025 21:14:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1755231294; x=1755836094; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0/Wbp411RtpskyWq9UJk+ehIJ35XDzwl3pNsoidpEgk=;
+        b=M15DhATIg9ZLyITdlZ8kuJAVFEJjNZOgOMXgTCMbKXfw/mXLtLXsreTlkbZQ+ZwzLk
+         3ZOzcJcPq+8uFZ9YQM5tnJaA9mMnnekRnwx/lpuCb34JRd7VyvFEjMkGIpd6AHMW9DCT
+         itWUewzkFpr4lWdHCSLdZB0ukDw8P12E4hIlisn38BJX2faU+8HWLYM2sJrUhcuhwr7/
+         sfEu4iNPq4qA7IwsO3NOIfFBT3sSioqaII0d+M1s8IxoB7rUZ9Lvldf6SrhHy9Kbx7Gn
+         b80WtUk3gaNKMytTZ781TsRGiVSSC4ZmywdVdfhsRU2z4oXUKKAuMuDrg+06H5CgoWsU
+         U55w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755231294; x=1755836094;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0/Wbp411RtpskyWq9UJk+ehIJ35XDzwl3pNsoidpEgk=;
+        b=cPg8j9GHIUpP+Bwx/5MxbEHe/U/JOAkKuPpXNOpwkE1C/9eB14kmQcdC9ZJK2LT5AQ
+         m6A/gZgRz226zsynvvISn7znQ0MwDKVy0kJxq4/45qO6m9hpXVUEnikigN6DfI7wPbGd
+         BZDcSYPvnA+QRgi/USSBjbo6WgbLUC/8T9zrf159jD7DNzeKxyFyiddtELsh7o6jnQZ8
+         R+g+T4oDdFnCQ+kOpGd+OrF/Mv2nIZDGdvnfeNnr/n6CoslY+jWqiNTVOQpRkxNusKbQ
+         E9v3KpcFo0EbAgjaPSY+ZYXKRui3ZTJ3N0060Hm8kwUCLVBawrdiRMbG9NfHU5u6zOqp
+         EsgA==
+X-Forwarded-Encrypted: i=1; AJvYcCWLl8maSjJHL9DQ7o5fZJUEvgptju9n9vhqKrAC9gmp1yBvGLAVoFN0gsJXp0iSuYMT3Bw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz/aTD+I4Qbn5weVSuLVJ8zV1XqaxiPSUY70PgZAfNN3rqJaSto
+	zI5gOrzi4AGVn8tmIx8KABFKFJ5vHkO9uc3eK0CyANvoD+4nPhxNLBu/XbHMC881gvQxOmH5SNW
+	KdS5OI4OJ9CXJrq/+Dh+fs6qAny3fL6otlVHxuFxr
+X-Gm-Gg: ASbGnctxENGo7AOipwbWnXVz6SLseAuJR7LDSwjTPSt1lQgmefEj/ajHqbETj6dN9xl
+	tXWyaR1Fp3vQ8VQSR2Klj6CfPuEMEfrMTx8LMdfVAXRXXdAy3LQq48wsKlWnR9xdFX312ioH2B1
+	lfPribyp9bwFGbTFlHFXn0QdYyAHB/SDZWNLkcrCI/dMN4OiXJEpasB9hyO8y+uqyRhySZSVRmI
+	LHTpBUqFynXJLegvN9NiCMcEiGAvTJiD3PI9CmGfuSXQ8UeEMaX328T
+X-Google-Smtp-Source: AGHT+IHdLyoV1GqzsKehbtyyH1BP6XiYh4lDSXbcDsgyxiNyrdnGC60SGOUsn4ECO9SuHxVLTaL7GG8NefWkx5sU9uA=
+X-Received: by 2002:ac8:5d88:0:b0:4a7:bed9:5251 with SMTP id
+ d75a77b69052e-4b11b74a91fmr1955601cf.9.1755231293609; Thu, 14 Aug 2025
+ 21:14:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 25/30] KVM: selftests: KVM: selftests: Expose new
- vm_vaddr_alloc_private()
-To: Sean Christopherson <seanjc@google.com>, Sagi Shahar <sagis@google.com>
-Cc: linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
- Shuah Khan <shuah@kernel.org>, Ackerley Tng <ackerleytng@google.com>,
- Ryan Afranji <afranji@google.com>, Andrew Jones <ajones@ventanamicro.com>,
- Isaku Yamahata <isaku.yamahata@intel.com>,
- Erdem Aktas <erdemaktas@google.com>,
- Rick Edgecombe <rick.p.edgecombe@intel.com>,
- Roger Wang <runanwang@google.com>, Oliver Upton <oliver.upton@linux.dev>,
- "Pratik R. Sampat" <pratikrajesh.sampat@amd.com>,
- Reinette Chatre <reinette.chatre@intel.com>, Ira Weiny
- <ira.weiny@intel.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20250807201628.1185915-1-sagis@google.com>
- <20250807201628.1185915-26-sagis@google.com> <aJpbhBO53ujqkbPT@google.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <aJpbhBO53ujqkbPT@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250807201628.1185915-1-sagis@google.com> <aJoqqTM9zdcSx1Fi@google.com>
+ <0976e0d50b1620c0118b8a5020b90f3959d47b4a.camel@intel.com> <aJpYWVvNXjsewl-b@google.com>
+In-Reply-To: <aJpYWVvNXjsewl-b@google.com>
+From: Sagi Shahar <sagis@google.com>
+Date: Thu, 14 Aug 2025 23:14:42 -0500
+X-Gm-Features: Ac12FXx7pDBZJH3JjanZX38nHfaWFcUbiCvl5vzB97rX8vXCUsDbtyyRYTosMH0
+Message-ID: <CAAhR5DFFRRV9hH3VOmZqb6TArcZL0=893oi3M2rZgVC5Bu-vJg@mail.gmail.com>
+Subject: Re: [PATCH v8 00/30] TDX KVM selftests
+To: Sean Christopherson <seanjc@google.com>
+Cc: Rick P Edgecombe <rick.p.edgecombe@intel.com>, Erdem Aktas <erdemaktas@google.com>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "shuah@kernel.org" <shuah@kernel.org>, 
+	Ryan Afranji <afranji@google.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Reinette Chatre <reinette.chatre@intel.com>, 
+	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
+	"ackerleytng@google.com" <ackerleytng@google.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	"pratikrajesh.sampat@amd.com" <pratikrajesh.sampat@amd.com>, Ira Weiny <ira.weiny@intel.com>, 
+	Roger Wang <runanwang@google.com>, 
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, 
+	"ajones@ventanamicro.com" <ajones@ventanamicro.com>, "oliver.upton@linux.dev" <oliver.upton@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-
-
-On 8/12/2025 5:07 AM, Sean Christopherson wrote:
-> On Thu, Aug 07, 2025, Sagi Shahar wrote:
->> From: Ackerley Tng <ackerleytng@google.com>
->>
->> vm_vaddr_alloc_private allow specifying both the virtual and physical
->> addresses for the allocation.
-> Why?
+On Mon, Aug 11, 2025 at 3:53=E2=80=AFPM Sean Christopherson <seanjc@google.=
+com> wrote:
 >
-Yeah, this is not needed.
-vm_vaddr_alloc() will handle it as private memory by default if the vm has
-protected memory.
+> On Mon, Aug 11, 2025, Rick P Edgecombe wrote:
+> > But Sean, if you want to save some time I think we can just accelerate =
+this
+> > other reviewing. As far as new-fangled features, having this upstream i=
+s
+> > important even for that, because we are currently having to keep these =
+tests
+> > plus follow on tests in sync across various development branches. So ye=
+a, it's
+> > time to get this over the line.
+>
+> Yes please.  The unspoken threat in my response is that at some point I w=
+ill just
+> start NAKing KVM TDX patches :-D
+
+I'm making good progress and the massive refactor is mostly complete.
+I believe I should have the patches ready to review next week.
+
+I'm also thinking that it would be easier if I split the series in 2
+or possibly 3 patchset. The first one including the setup code and the
+basic lifecycle test and then the rest of the tests with possibly the
+guest_memfd tests in a separate series. What do you think?
 
