@@ -1,38 +1,38 @@
-Return-Path: <kvm+bounces-54758-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54760-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14F8FB275AD
-	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 04:28:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 165CBB275B7
+	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 04:29:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13CD4A261EB
-	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 02:27:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 54F6C1CC4AB4
+	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 02:28:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE450299AAC;
-	Fri, 15 Aug 2025 02:26:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67C3529D272;
+	Fri, 15 Aug 2025 02:26:35 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFE2D29AB1E;
-	Fri, 15 Aug 2025 02:26:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B0CA29B23B;
+	Fri, 15 Aug 2025 02:26:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755224792; cv=none; b=JLGVhGu8+8Q4+2PjgWvZ+wPJ6dKoHRmQn2aum9X5KQzyGUqOboGQZHNMotq8NPIfdRCMxU51UukZ0Lyzl0RzUnKfwU0KPyENzkIKyJ4UH2IB2KHVGiU1KI/XtNV5WTCNtd4IuVTA1L7BlguYOA4L9LuHbVBvnidD1Gz76G+9hTs=
+	t=1755224794; cv=none; b=WDG/69iAsjxbqdQDy719u9Gq8Lonn03JLnAZSuDwfadJXuppdQyOk5EFdQKY0kKcpovEzk93/LVS1+VW3N40+nxaMS4R+axejrw44kWCX2ZkVVIddFOCtuUvPxfF/oOEGXgc/HwsAGUtJBGBEYjzD4GTArqZzBd548rmK1D+wX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755224792; c=relaxed/simple;
-	bh=ZT/ffdCHsehNGkIWfnqIZ4pIKQlR3t/N3pcp5Qz9V+s=;
+	s=arc-20240116; t=1755224794; c=relaxed/simple;
+	bh=PesLW11khJRpGmSVJfT+LbNggq4Xf0R0wDY67UVzXGI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=VFr29fB7bA7XSF1R8smGDFDo857q2lxTR3YeR5d7kx2YDx583a3C7rqBvFL7C9wgtj7TTKCi+ogwMx/xh3p0CIE2HC/Rrig6UhPXVQ+nlbzXaqti80O1681bNyCh8APZhiU4VBergCqBXmT8bSbfv1aRfXgheWfoD4SGuDjn2Bg=
+	 MIME-Version; b=clLwzIG7gWjL3+bHfYfb7oMnZPdd4gwGXNJjXUcoUXzna8lyLx5BtZbLSgzgn9b6zkSylrV/U/tHDWT/BzHiJBG4dXSHB8YBzj5Ma42H+3giY1Z28bm7u2FSAMeQ2BkCtKmYjenJrn9qduksCVeVBVoxmTxzFwbz6/Qqh9SdAKY=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
 Received: from loongson.cn (unknown [10.2.5.213])
-	by gateway (Coremail) with SMTP id _____8AxQK3Ump5oTxpAAQ--.39058S3;
+	by gateway (Coremail) with SMTP id _____8AxQK3Ump5oUhpAAQ--.39061S3;
 	Fri, 15 Aug 2025 10:26:28 +0800 (CST)
 Received: from localhost.localdomain (unknown [10.2.5.213])
-	by front1 (Coremail) with SMTP id qMiowJAxQMLOmp5oMPRMAA--.26771S5;
-	Fri, 15 Aug 2025 10:26:27 +0800 (CST)
+	by front1 (Coremail) with SMTP id qMiowJAxQMLOmp5oMPRMAA--.26771S6;
+	Fri, 15 Aug 2025 10:26:28 +0800 (CST)
 From: Bibo Mao <maobibo@loongson.cn>
 To: Tianrui Zhao <zhaotianrui@loongson.cn>,
 	Huacai Chen <chenhuacai@kernel.org>,
@@ -40,9 +40,9 @@ To: Tianrui Zhao <zhaotianrui@loongson.cn>,
 Cc: kvm@vger.kernel.org,
 	loongarch@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v3 3/4] LoongArch: KVM: Add implementation with IOCSR_IPI_SET
-Date: Fri, 15 Aug 2025 10:26:20 +0800
-Message-Id: <20250815022621.508174-4-maobibo@loongson.cn>
+Subject: [PATCH v3 4/4] LoongArch: KVM: Make function kvm_own_lbt() robust
+Date: Fri, 15 Aug 2025 10:26:21 +0800
+Message-Id: <20250815022621.508174-5-maobibo@loongson.cn>
 X-Mailer: git-send-email 2.39.3
 In-Reply-To: <20250815022621.508174-1-maobibo@loongson.cn>
 References: <20250815022621.508174-1-maobibo@loongson.cn>
@@ -53,97 +53,39 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowJAxQMLOmp5oMPRMAA--.26771S5
+X-CM-TRANSID:qMiowJAxQMLOmp5oMPRMAA--.26771S6
 X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
 X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
 	ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
 	nUUI43ZEXa7xR_UUUUUUUUU==
 
-IPI IOCSR register IOCSR_IPI_SET can send ipi interrupt to other vCPUs,
-also it can send interrupt to vCPU itself. Instead there is such
-operation on Linux such as arch_irq_work_raise(), it will send ipi
-message to vCPU itself.
-
-Here add implementation of write operation with IOCSR_IPI_SET register.
+Add flag KVM_LARCH_LBT checking in function kvm_own_lbt(), so that
+it can be called safely rather than duplicated enabling again.
 
 Signed-off-by: Bibo Mao <maobibo@loongson.cn>
 ---
- arch/loongarch/kvm/intc/ipi.c | 35 ++++++++++++++++++++---------------
- 1 file changed, 20 insertions(+), 15 deletions(-)
+ arch/loongarch/kvm/vcpu.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/arch/loongarch/kvm/intc/ipi.c b/arch/loongarch/kvm/intc/ipi.c
-index f27f79a0c1e0..3fb98abd9554 100644
---- a/arch/loongarch/kvm/intc/ipi.c
-+++ b/arch/loongarch/kvm/intc/ipi.c
-@@ -7,13 +7,26 @@
- #include <asm/kvm_ipi.h>
- #include <asm/kvm_vcpu.h>
+diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
+index d1b8c50941ca..ce478151466c 100644
+--- a/arch/loongarch/kvm/vcpu.c
++++ b/arch/loongarch/kvm/vcpu.c
+@@ -1283,9 +1283,11 @@ int kvm_own_lbt(struct kvm_vcpu *vcpu)
+ 		return -EINVAL;
  
--static void ipi_send(struct kvm *kvm, uint64_t data)
-+static void ipi_set(struct kvm_vcpu *vcpu, uint32_t data)
- {
--	int cpu, action;
- 	uint32_t status;
--	struct kvm_vcpu *vcpu;
- 	struct kvm_interrupt irq;
- 
-+	spin_lock(&vcpu->arch.ipi_state.lock);
-+	status = vcpu->arch.ipi_state.status;
-+	vcpu->arch.ipi_state.status |= data;
-+	spin_unlock(&vcpu->arch.ipi_state.lock);
-+	if ((status == 0) && data) {
-+		irq.irq = LARCH_INT_IPI;
-+		kvm_vcpu_ioctl_interrupt(vcpu, &irq);
+ 	preempt_disable();
+-	set_csr_euen(CSR_EUEN_LBTEN);
+-	_restore_lbt(&vcpu->arch.lbt);
+-	vcpu->arch.aux_inuse |= KVM_LARCH_LBT;
++	if (!(vcpu->arch.aux_inuse & KVM_LARCH_LBT)) {
++		set_csr_euen(CSR_EUEN_LBTEN);
++		_restore_lbt(&vcpu->arch.lbt);
++		vcpu->arch.aux_inuse |= KVM_LARCH_LBT;
 +	}
-+}
-+
-+static void ipi_send(struct kvm *kvm, uint64_t data)
-+{
-+	int cpu;
-+	struct kvm_vcpu *vcpu;
-+
- 	cpu = ((data & 0xffffffff) >> 16) & 0x3ff;
- 	vcpu = kvm_get_vcpu_by_cpuid(kvm, cpu);
- 	if (unlikely(vcpu == NULL)) {
-@@ -21,15 +34,7 @@ static void ipi_send(struct kvm *kvm, uint64_t data)
- 		return;
- 	}
+ 	preempt_enable();
  
--	action = BIT(data & 0x1f);
--	spin_lock(&vcpu->arch.ipi_state.lock);
--	status = vcpu->arch.ipi_state.status;
--	vcpu->arch.ipi_state.status |= action;
--	spin_unlock(&vcpu->arch.ipi_state.lock);
--	if (status == 0) {
--		irq.irq = LARCH_INT_IPI;
--		kvm_vcpu_ioctl_interrupt(vcpu, &irq);
--	}
-+	ipi_set(vcpu, BIT(data & 0x1f));
- }
- 
- static void ipi_clear(struct kvm_vcpu *vcpu, uint64_t data)
-@@ -241,7 +246,7 @@ static int loongarch_ipi_writel(struct kvm_vcpu *vcpu, gpa_t addr, int len, cons
- 		spin_unlock(&vcpu->arch.ipi_state.lock);
- 		break;
- 	case IOCSR_IPI_SET:
--		ret = -EINVAL;
-+		ipi_set(vcpu, data);
- 		break;
- 	case IOCSR_IPI_CLEAR:
- 		/* Just clear the status of the current vcpu */
-@@ -260,10 +265,10 @@ static int loongarch_ipi_writel(struct kvm_vcpu *vcpu, gpa_t addr, int len, cons
- 		ipi_send(vcpu->kvm, data);
- 		break;
- 	case IOCSR_MAIL_SEND:
--		ret = mail_send(vcpu->kvm, *(uint64_t *)val);
-+		ret = mail_send(vcpu->kvm, data);
- 		break;
- 	case IOCSR_ANY_SEND:
--		ret = any_send(vcpu->kvm, *(uint64_t *)val);
-+		ret = any_send(vcpu->kvm, data);
- 		break;
- 	default:
- 		kvm_err("%s: unknown addr: %llx\n", __func__, addr);
+ 	return 0;
 -- 
 2.39.3
 
