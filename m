@@ -1,192 +1,143 @@
-Return-Path: <kvm+bounces-54808-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54809-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58869B286FE
-	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 22:14:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB0D6B2875C
+	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 22:49:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 07DEFB06F45
-	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 20:14:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 37FB9189DAE6
+	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 20:49:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE3842BE055;
-	Fri, 15 Aug 2025 20:14:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9154F242D6C;
+	Fri, 15 Aug 2025 20:49:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="DEN4zXX0"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ciqq6XpX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62809298CDA
-	for <kvm@vger.kernel.org>; Fri, 15 Aug 2025 20:14:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02DDA26AF3
+	for <kvm@vger.kernel.org>; Fri, 15 Aug 2025 20:49:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755288879; cv=none; b=pnkZCHyykhiGfOc+ql5mTN8Hz0pNhjge6HaPx+lzjf2cy51pAdlytWwXMvBZBZL2vHYE/cnMI63qujy0soqxIgplktpwRnsXyckIoQ6dRqaIJdb3iy5a5Fe7m4iGAcy9v5GPORzlRDyuAQpSaufVqCMwQ0jKaNjkCyLtNBNAt5o=
+	t=1755290944; cv=none; b=nH60eBdsNqwGVqv68wMdGcKX+DvCfNYQdgjdixkg7uBO4KJnw1dFgsz3GCNAXEP2MCRQS2OXQACl4IGDV0FWAv4dXZtYbtv2vgbJuFkXDbRO/euu0wJ9rVrs9tce7tD+dT8KpZH6U4gXtW7nsUGKZNcUwOOaEufbBtABkbYVW0o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755288879; c=relaxed/simple;
-	bh=gPLPrgsC04mCj1/YNA/33OZmUtgG2yG+9SpPvMJTiys=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nN4p5H1r0PS95KGaFhn9ez/Eu+t6GO9xBj239RwnnJGKPck1ylh/Tqx9qXyJojRkLTO8nuCZG8YGSMxAoWTKl4c6zKSl+6+zl2Fsn3kxnPqOQDgbW3cBO/iCs2D0QtSNfh0Zhc/YYML2tO3eP+amLkDLmrIHjgsa21Z2y9+LVQ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=DEN4zXX0; arc=none smtp.client-ip=209.85.166.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-3e57002bc23so10913505ab.3
-        for <kvm@vger.kernel.org>; Fri, 15 Aug 2025 13:14:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1755288877; x=1755893677; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oiZcsRXblDK+QsurtCHU3wPd/EqkMipNd3cgRBpokNI=;
-        b=DEN4zXX0g5wv4pwMd9nNehrcNi9sHM3eNhCz8bMEvAJlq2Cb3FDM0CSIGzM+H4m2eP
-         1i2ap60dfF1GRai4YNn6rJr9UFyW2k6uK35mIQL/fuzPdpFycZVktaaS+dH3mK9npEg3
-         2t/14qA1RXuKeET4ix1g+g1i5T5PIOZiC4w62QVqC3757THMKGvKsVtOaYHT1uE2Gwu+
-         XYjcqyrv6VnJEL5Tw4BTKUkNWXvGz/mcnUhB8yP/Af/e1tlkym0nH2/k5UqT6Oq3VZkx
-         jo3WwjLmHAkN+SpbC9GjPRXfA8ZLEZp+OcOjjnJr3+H3tOEyW0xYkVnKoGFdgjCjFkE7
-         1ixA==
+	s=arc-20240116; t=1755290944; c=relaxed/simple;
+	bh=coJD5zt20O9N4j84lqFB3HeMlhyWbtnt7oF12zKdrf8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Ge0JbkXguSJzr+c1KspuBySx6lDoiqI/LEpiZQ5Mha/WXV3AjFiXF6NLkfZUd5MpOBH5rk7Qd76fFRfWqY9wjbYkftsKQCTXyf6MweNJEpx41p3iNQ9uw1uO6RjC29JwnRlsPOCYV/ssCip/VKBWRdBv6odBBxAgGyAKwIi+Yqc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ciqq6XpX; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1755290941;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RxQQKjb9DfbHLiLKKFOLHod9vjKmsoO2pBfbkqGt7+A=;
+	b=Ciqq6XpXcsY4MqQ6ebjfR8K3lbEO0rY5rjQRtt8gVoOW1DU/GOUnOPczMOz/8XrZZEAdJe
+	x+XsG6LlJnreWYpIXWPPeboASLcmRtbtV2TnnHV7m9fBo1C1RI+Hs/JgG/mXW/dmBH1M4P
+	M7+55//c2uusz17VwngZZr7Mcd+6Q8I=
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
+ [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-7-PIJ9F1cyP4KmvSLxXIBqYg-1; Fri, 15 Aug 2025 16:49:00 -0400
+X-MC-Unique: PIJ9F1cyP4KmvSLxXIBqYg-1
+X-Mimecast-MFC-AGG-ID: PIJ9F1cyP4KmvSLxXIBqYg_1755290939
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3e57000f282so6458265ab.2
+        for <kvm@vger.kernel.org>; Fri, 15 Aug 2025 13:49:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755288877; x=1755893677;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oiZcsRXblDK+QsurtCHU3wPd/EqkMipNd3cgRBpokNI=;
-        b=k4VuSKbMVSe9IIYbN5I4xauz9ZZjBhKwz3MbhNp6CYff1cm0S8sI8BN9Qhn1EBO4tj
-         si+m9XY6DjX+0M4H3iTlnHOZYwz2dn7ieMcn/L+cX+XtZzTixrUa56rtxn6chfF8AJVg
-         cvbmK7OpyXmhS8aiiI+bP/Lpa0+E1lpPSc6eStSAP5s/GR6Zhez/dwTWBhypU+GqLwk/
-         G2CM9FJ5ktYqhIOl7RbfX8IXeNFp5WbtOjvR/vDxxjRRXY7ric9tz2bv7VU0lOJR6clT
-         LS+GzHIU/peZoUqKNfJxn6dXLe3+X605JOQB0hKNLRLzAFpuUlGicKX8ybWrJUSoebWZ
-         +u4w==
-X-Forwarded-Encrypted: i=1; AJvYcCUUJen3F8Bs/HRAIMcyOj1gRQFzGBJGJwaxP1ALyye4yYPLpcyOhk2qScHoMfIw/DZGl0M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwWz47RsCHeT5DTFeHMEY1KHVSJfxW4nRRkQZ94p9Zgc8vZ2bX1
-	ZuEs2iu5NVBcGthb4cu9uHHnVE8+RNpOfprKHye+aqjt7nKf8ThIENnwy9U8UdVHt2E=
-X-Gm-Gg: ASbGncvnYAKGOF+yqLeHek1fmBHVLVa0GdRSqiiusmHMuaDR7SqWMA5+5u03WU5POCy
-	Zlv20cUP1ip5PdppQ/rghJWEze9w3somFvGEKPN+zsLQ8pgzy3nQ09OpwIjlAaglThrBcpVI57a
-	HPC3MLFt802hHKm4DuxHJAaxzgDp5eN9kobB2s6dLuB14/+399HuRms8YG/4ovbjmzhRDEdkCez
-	cgh/fF1YzdSqVi8vBIKyeYNZqZzuHmbKm4xsqNT5gzquTUT0Lr9yp4f2d3zfY196fsOxKr31lB0
-	JZ70rrHj1zxeyTjCPGjjFK0bsO4sRi4z3uF//7RbYKHRVPFvPV3SzB3YMCCvpJj3LuwFjBQ/y2Z
-	Te4HrBb63PcSY0rlmBDksgcse
-X-Google-Smtp-Source: AGHT+IExUiAjUdPYMjUNNYaE14vRBPYsuuXTciG9RIicgQedUovVnhzk5z3ol3/Zbxwlnlhc2kiZ3w==
-X-Received: by 2002:a05:6e02:1a4f:b0:3e5:469e:b105 with SMTP id e9e14a558f8ab-3e57e9d1a1fmr71697515ab.18.1755288877401;
-        Fri, 15 Aug 2025 13:14:37 -0700 (PDT)
-Received: from localhost ([140.82.166.162])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-50c947f547bsm634066173.43.2025.08.15.13.14.36
+        d=1e100.net; s=20230601; t=1755290939; x=1755895739;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RxQQKjb9DfbHLiLKKFOLHod9vjKmsoO2pBfbkqGt7+A=;
+        b=sxtPT3UgmuwZF8voWC6jQk+bYdATA99H4Yh3PReh7Z8QP7ZTAqMxIlCrGe18ybP4ke
+         tvOM8951IWEvYUxAJ80TFy2KloCBmHHyYtZajDh5z9wTmRrHzAiGTzdgfBReOmt2IkwD
+         Ysp9wRPAWMVc7s2cKOYTnDwv66D8B7dTTyGgUd1lcT9lBGXdBge7CJneBlnuAY5Z0a2V
+         GawqtkToWoyio2uNHGSveNAi0o8oSDHQeyT/M0oqnXftfjxr3KGR0FCt0R9S650seaaW
+         A/buftTVNZX6FnClgWVPdeY41gZ1BUVV4A+XrUA3TI20Q5pZlL8EOBT46o6IZbGNUBwV
+         vcyA==
+X-Forwarded-Encrypted: i=1; AJvYcCWGq4Ql0+3xJhXD1p8OfeDIwfr1jez8z49mj3CHT3K41t6XWr0CA0iG3dFVt+slXt/zx0Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz1dUVsvehNphjTXiuN9Q4LSlNKEvEQBv+Sh4EAt3qBoxpvN7uD
+	FyicmJDlUCf+GowMLf88aHiYJDk+Qd//UO4E1HhtnLNPw3PHBtsMfqV8yEYYP2EATyJl/YfZGFg
+	e8Frg2RPqPt1D7gRw+n9+58pcnkj6x8Eywz0+ET1MRA40WP9LpRO0jg==
+X-Gm-Gg: ASbGncstrfxdFHFRyuks8kqSiQgd9MpYFqzvzVG19gE0vBnbQqEdXt0a0gCkCBxB0IG
+	Gd5eYcQsleLa2dzJ02Yz7L2fM+0c/p3Kyh/wRC22h27FTrq/e5+7T7ifG3YVuiLN+GeWco2WUo6
+	nr7WUB7ZfK0DgPhQplaz7mAyvGonhigxRsHWaDco2YqVWrzINnvVM+6TKWbha5WHySefNOBwdTP
+	L3Q+gji4UD1CAMVFJetV6eDSEPbfFWrX7Kt52iVnxqVlaguYPbxDxdJ2UD9J8F8VyK7VpiHIpJo
+	b2MTrpMybQgOrr7TrWqF9A6g2E98F4wU7vnW3dXbwdI=
+X-Received: by 2002:a05:6e02:1889:b0:3dd:c947:b3a7 with SMTP id e9e14a558f8ab-3e57e9aa92cmr17440415ab.5.1755290939244;
+        Fri, 15 Aug 2025 13:48:59 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEBEqL66ko0fvzn8eomIswOaFBFnW1Yg/xfXCXQYEyBW1J3DP6PPCIr+IIvwunh1IfBSp5G0A==
+X-Received: by 2002:a05:6e02:1889:b0:3dd:c947:b3a7 with SMTP id e9e14a558f8ab-3e57e9aa92cmr17440355ab.5.1755290938868;
+        Fri, 15 Aug 2025 13:48:58 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3e57e67ab0csm8796525ab.26.2025.08.15.13.48.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Aug 2025 13:14:36 -0700 (PDT)
-Date: Fri, 15 Aug 2025 15:14:36 -0500
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Anup Patel <apatel@ventanamicro.com>
-Cc: Atish Patra <atish.patra@linux.dev>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Alexandre Ghiti <alex@ghiti.fr>, Anup Patel <anup@brainfault.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH 2/6] RISC-V: KVM: Introduce feature specific reset for
- SBI FWFT
-Message-ID: <20250815-30ccdcf30a9746a3b2443b4b@orel>
-References: <20250814155548.457172-1-apatel@ventanamicro.com>
- <20250814155548.457172-3-apatel@ventanamicro.com>
+        Fri, 15 Aug 2025 13:48:58 -0700 (PDT)
+Date: Fri, 15 Aug 2025 14:48:55 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Farhan Ali <alifm@linux.ibm.com>
+Cc: Bjorn Helgaas <helgaas@kernel.org>, linux-s390@vger.kernel.org,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org, schnelle@linux.ibm.com,
+ mjrosato@linux.ibm.com
+Subject: Re: [PATCH v1 6/6] vfio: Allow error notification and recovery for
+ ISM device
+Message-ID: <20250815144855.51f2ac24.alex.williamson@redhat.com>
+In-Reply-To: <60855b41-a1ad-4966-aa5e-325256692279@linux.ibm.com>
+References: <20250814204850.GA346571@bhelgaas>
+	<60855b41-a1ad-4966-aa5e-325256692279@linux.ibm.com>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250814155548.457172-3-apatel@ventanamicro.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Aug 14, 2025 at 09:25:44PM +0530, Anup Patel wrote:
-> The SBI FWFT feature values must be reset upon VCPU reset so
-> introduce feature specific reset callback for this purpose.
-> 
-> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
-> ---
->  arch/riscv/kvm/vcpu_sbi_fwft.c | 30 ++++++++++++++++++++++++++++--
->  1 file changed, 28 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/riscv/kvm/vcpu_sbi_fwft.c b/arch/riscv/kvm/vcpu_sbi_fwft.c
-> index 164a01288b0a..5a3bad0f9330 100644
-> --- a/arch/riscv/kvm/vcpu_sbi_fwft.c
-> +++ b/arch/riscv/kvm/vcpu_sbi_fwft.c
-> @@ -30,6 +30,13 @@ struct kvm_sbi_fwft_feature {
->  	 */
->  	bool (*supported)(struct kvm_vcpu *vcpu);
->  
-> +	/**
-> +	 * @reset: Reset the feature value irrespective whether feature is supported or not
-> +	 *
-> +	 * This callback is mandatory
-> +	 */
-> +	void (*reset)(struct kvm_vcpu *vcpu);
-> +
->  	/**
->  	 * @set: Set the feature value
->  	 *
-> @@ -75,6 +82,13 @@ static bool kvm_sbi_fwft_misaligned_delegation_supported(struct kvm_vcpu *vcpu)
->  	return misaligned_traps_can_delegate();
->  }
->  
-> +static void kvm_sbi_fwft_reset_misaligned_delegation(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm_vcpu_config *cfg = &vcpu->arch.cfg;
-> +
-> +	cfg->hedeleg &= ~MIS_DELEG;
-> +}
-> +
->  static long kvm_sbi_fwft_set_misaligned_delegation(struct kvm_vcpu *vcpu,
->  					struct kvm_sbi_fwft_config *conf,
->  					unsigned long value)
-> @@ -124,6 +138,11 @@ static bool kvm_sbi_fwft_pointer_masking_pmlen_supported(struct kvm_vcpu *vcpu)
->  	return fwft->have_vs_pmlen_7 || fwft->have_vs_pmlen_16;
->  }
->  
-> +static void kvm_sbi_fwft_reset_pointer_masking_pmlen(struct kvm_vcpu *vcpu)
-> +{
-> +	vcpu->arch.cfg.henvcfg &= ~ENVCFG_PMM;
-> +}
-> +
->  static long kvm_sbi_fwft_set_pointer_masking_pmlen(struct kvm_vcpu *vcpu,
->  						   struct kvm_sbi_fwft_config *conf,
->  						   unsigned long value)
-> @@ -180,6 +199,7 @@ static const struct kvm_sbi_fwft_feature features[] = {
->  	{
->  		.id = SBI_FWFT_MISALIGNED_EXC_DELEG,
->  		.supported = kvm_sbi_fwft_misaligned_delegation_supported,
-> +		.reset = kvm_sbi_fwft_reset_misaligned_delegation,
->  		.set = kvm_sbi_fwft_set_misaligned_delegation,
->  		.get = kvm_sbi_fwft_get_misaligned_delegation,
->  	},
-> @@ -187,6 +207,7 @@ static const struct kvm_sbi_fwft_feature features[] = {
->  	{
->  		.id = SBI_FWFT_POINTER_MASKING_PMLEN,
->  		.supported = kvm_sbi_fwft_pointer_masking_pmlen_supported,
-> +		.reset = kvm_sbi_fwft_reset_pointer_masking_pmlen,
->  		.set = kvm_sbi_fwft_set_pointer_masking_pmlen,
->  		.get = kvm_sbi_fwft_get_pointer_masking_pmlen,
->  	},
-> @@ -321,11 +342,16 @@ static void kvm_sbi_ext_fwft_deinit(struct kvm_vcpu *vcpu)
->  
->  static void kvm_sbi_ext_fwft_reset(struct kvm_vcpu *vcpu)
->  {
-> -	int i;
->  	struct kvm_sbi_fwft *fwft = vcpu_to_fwft(vcpu);
-> +	const struct kvm_sbi_fwft_feature *feature;
-> +	int i;
->  
-> -	for (i = 0; i < ARRAY_SIZE(features); i++)
-> +	for (i = 0; i < ARRAY_SIZE(features); i++) {
->  		fwft->configs[i].flags = 0;
-> +		feature = &features[i];
-> +		if (feature->reset)
-> +			feature->reset(vcpu);
-> +	}
->  }
->  
->  const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_fwft = {
-> -- 
-> 2.43.0
->
+On Thu, 14 Aug 2025 14:02:05 -0700
+Farhan Ali <alifm@linux.ibm.com> wrote:
 
-Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+> On 8/14/2025 1:48 PM, Bjorn Helgaas wrote:
+> > On Wed, Aug 13, 2025 at 10:08:20AM -0700, Farhan Ali wrote: =20
+> >> VFIO allows error recovery and notification for devices that
+> >> are PCIe (and thus AER) capable. But for PCI devices on IBM
+> >> s390 error recovery involves platform firmware and
+> >> notification to operating system is done by architecture
+> >> specific way. The Internal Shared Memory(ISM) device is a legacy
+> >> PCI device (so not PCIe capable), but can still be recovered
+> >> when notified of an error. =20
+> > "PCIe (and thus AER) capable" reads as though AER is required for all
+> > PCIe devices, but AER is optional.
+> >
+> > I don't know the details of VFIO and why it tests for PCIe instead of
+> > AER.  Maybe AER is not relevant here and you don't need to mention
+> > AER above at all? =20
+>=20
+> The original change that introduced this commit=C2=A0dad9f89 "VFIO-AER:=20
+> Vfio-pci driver changes for supporting AER" was adding the support for=20
+> AER for vfio. My assumption is the author thought if the device is AER=20
+> capable the pcie check should be sufficient? I can remove the AER=20
+> references in commit message. Thanks Farhan
+
+I've looked back through discussions when this went in and can't find
+any specific reasoning about why we chose pci_is_pcie() here.  Maybe
+we were trying to avoid setting up an error signal on devices that
+cannot have AER, but then why didn't we check specifically for AER.
+Maybe some version used PCIe specific calls in the handler that we
+didn't want to check runtime, but I don't spot such a dependency now.
+
+Possibly we should just remove the check.  We're configuring the error
+signaling on the vast majority of devices, it's extremely rare that it
+fires anyway, reporting it on a device where it cannot trigger seems
+relatively negligible and avoids extra ugly code.  Thanks,
+
+Alex
+
 
