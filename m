@@ -1,150 +1,141 @@
-Return-Path: <kvm+bounces-54781-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54782-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B1C8B27EA0
-	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 12:47:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A99B8B27EA6
+	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 12:48:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E771C622F6C
-	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 10:45:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 340EE1894A0F
+	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 10:47:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 323F33002C8;
-	Fri, 15 Aug 2025 10:44:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E52D92FFDEA;
+	Fri, 15 Aug 2025 10:46:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D3RvSpFi"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="GG8TmNAL"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E1BE2FF16D
-	for <kvm@vger.kernel.org>; Fri, 15 Aug 2025 10:44:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1EA9319874;
+	Fri, 15 Aug 2025 10:46:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755254697; cv=none; b=ojqPfX5qVWIE5dILcEtdI8M5BUZSIQGf1q0V6e55lwGSO/rldyRdQjXPEmhS8dMWtC1YolBc6RZwC55wlGWR1Y1b7MB8uESV5APYOyLGdMTtqDjaIAF5QJ9eMSHK6ppL6YL0CCWNMOKsSPwm0Bq71LT63rwr4LOafu9McrT825I=
+	t=1755254798; cv=none; b=GrRjmf/gYc4ivOtq2vtK6RI69NuUwDrJALf/IRHtMCEZQli44KKdVk6Us+cN73f0va3v5eSUzB/SzrSBFSASBVdWFqutEGiKgN3JokFNJtbCBOuZh/qOwDUJV6QkcBMttd0RhxK0gys7y6wpaYADuqZ/PF4ssZkQ5bSBFY+QivE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755254697; c=relaxed/simple;
-	bh=WjR/rbwNJc0Qp2k2aQAdE2Gr22tCrag3f7ATcKE39Uc=;
+	s=arc-20240116; t=1755254798; c=relaxed/simple;
+	bh=QIEf4bRjqwdIw7O9CtQqLo46rfzzGgRT2EkmUSxC7q4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ueFpxfB6nu5BNENIzo7Q0MtvLZp44H+Sc1Iw+csW+qOnFRvcAcPCYQxTztDS5iIUB5wXMwFxzJqV734Yg1LGk+bx4PeZTdAxuYlVnzVqbRP+Hxd00dDlTcimG94qaokryALrvY2DkMV9FA7QcqUPvnThaFUD9nS7FMyjxO1u0+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=D3RvSpFi; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1755254694;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=V5GOAcmmdxLGbEbM9B2YGjZnwu9h8dtTUkFqo/i0QYA=;
-	b=D3RvSpFiPsa2FmJK2sfh5ZvZRlyGaew1zKj73nGe2fS1qiPQzYiRg6FIyd+aDiwS8hK6w3
-	T+IKNXAPb2MbEv8ZMbejg1gflqnjIqvne/zCNWDPoZJPOmc8w+0Zj099Z98PcHgTFBq/d5
-	HHK87JjrXRJ6v00iqcOmSPMpfmJ6b9Q=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-213-KxvZ1i8aNyicUvDI3i05iA-1; Fri, 15 Aug 2025 06:44:53 -0400
-X-MC-Unique: KxvZ1i8aNyicUvDI3i05iA-1
-X-Mimecast-MFC-AGG-ID: KxvZ1i8aNyicUvDI3i05iA_1755254692
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3b9e41037e6so847665f8f.1
-        for <kvm@vger.kernel.org>; Fri, 15 Aug 2025 03:44:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755254692; x=1755859492;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=V5GOAcmmdxLGbEbM9B2YGjZnwu9h8dtTUkFqo/i0QYA=;
-        b=UiCczzI5YT0CId9GDx6eb/D0ZrH9ydnlfNH1McRXz2xRUS3LOHHk5dPCc/87DCuIb6
-         wrgR8sYAkko3lkVJ8szN8uyoY0InQU/jYNsdl8AoW32NmaUfGSYlglksO2uQHrEfEBbj
-         Nqqo0B+fS5st+KyjwSyAuxJTBU1iUnFZ6ZmF8YQ8VZ5R+5yaVjaRqp7IaoljREsJ7d3o
-         cAPhQwdPAX+GZTlBZS5sr8xeVqGHGjVS6+RxTV9yL0kiSO2wuPNsLxTYcEisBIS3OkWH
-         IUo9NYL5/aV8edo7LfNG6zwq3pO9OXov/F4sDuTcmo7DhaQzIuBYCFF7bCZ1K6yKH3qF
-         4NNA==
-X-Forwarded-Encrypted: i=1; AJvYcCVOf3lH51i5QNslQCSy6e9goiDINdAfzhoOJRpD7lm90fpp7NufCyRCkjlzmCSgqkCZh1Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzlTJl2c/+DPtkKaks8tw9K3l6k+iJ7M3al6fTN1dult3I4vCO0
-	39UVOjwGaLWAW0fKbL8fyinIxy33cie6LxRMRG4cvp3wHpVu+yG7X2M0BBZrW3dQjTxyH1k02Yy
-	aXEY0mjyFp3UEyTezkqbxpAkYe4Q8afY0gfoWAnPKEb1L71UNRyH+nA==
-X-Gm-Gg: ASbGnctnn6FHBAR7esQ1L62dKcg6yIIX9zLl+uuWOMTVx0ZErz+BrihQYUDYA3FABtM
-	o99Yov6sR/IBVyvcT+w1I/UOmhozrAL9nY6H54f1feY2KRcDfWQ6bxJKvpJgT/RkzAHbWxgjaBy
-	9lmdaaSyZQnI3lMHvWVV/QdzYFQEl5X8IA3VbDck5wJA7u+Rqn0AdC23xhYCCZV7QoihwUFhzhD
-	zyjNfqX5s5CzDD567HW6VXSmIR6Lwam120rA0Ru1MbKaIcsXoMXivs0fxw+FZSWpcJE2IraVXMn
-	92+DeINESMlwS9x0B+e0zDYioV7wbRA6knI=
-X-Received: by 2002:a05:6000:1a8d:b0:3b7:9d83:50ef with SMTP id ffacd0b85a97d-3bb694af396mr1111608f8f.55.1755254691697;
-        Fri, 15 Aug 2025 03:44:51 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFjxJ9VfnonVDFqga9qmU4sokEZCEtKZYfi4E6SPLLakFaeJSs6iOf6aXLBGPZEAaqLwiSlKQ==
-X-Received: by 2002:a05:6000:1a8d:b0:3b7:9d83:50ef with SMTP id ffacd0b85a97d-3bb694af396mr1111588f8f.55.1755254691299;
-        Fri, 15 Aug 2025 03:44:51 -0700 (PDT)
-Received: from redhat.com ([2a06:c701:73cf:b700:6c5c:d9e7:553f:9f71])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3bb676c9936sm1456218f8f.38.2025.08.15.03.44.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Aug 2025 03:44:50 -0700 (PDT)
-Date: Fri, 15 Aug 2025 06:44:47 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Will Deacon <will@kernel.org>
-Cc: syzbot <syzbot+b4d960daf7a3c7c2b7b1@syzkaller.appspotmail.com>,
-	davem@davemloft.net, edumazet@google.com, eperezma@redhat.com,
-	horms@kernel.org, jasowang@redhat.com, kuba@kernel.org,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, pabeni@redhat.com, sgarzare@redhat.com,
-	stefanha@redhat.com, syzkaller-bugs@googlegroups.com,
-	virtualization@lists.linux.dev, xuanzhuo@linux.alibaba.com
-Subject: Re: [syzbot] [kvm?] [net?] [virt?] WARNING in
- virtio_transport_send_pkt_info
-Message-ID: <20250815063140-mutt-send-email-mst@kernel.org>
-References: <20250812052645-mutt-send-email-mst@kernel.org>
- <689b1156.050a0220.7f033.011c.GAE@google.com>
- <20250812061425-mutt-send-email-mst@kernel.org>
- <aJ8HVCbE-fIoS1U4@willie-the-truck>
+	 Content-Type:Content-Disposition:In-Reply-To; b=dy29RcqhPRthpq0NPGDF1Y6B2l6QqNQoiv8KpHqe/3Sl25IeNLnf9WIuXOl5DPQFgWTd29p5TQ43v2XIeJ7VHy9PpHcn8pC2uxpRhF2UzypJ7LoGG+TpauwfUyBEMBkLe5Ad+MMZ9XJa2cDcx1TuEtmQOuMt7uLNlQZ9UW0sMgM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=GG8TmNAL; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 8579C40E0289;
+	Fri, 15 Aug 2025 10:46:34 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id vm8n5Tjcabrr; Fri, 15 Aug 2025 10:46:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1755254790; bh=6sREfrXQXF1MMRVVqb2jaK8lR1Iy0sA+7FMnu50q+UU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=GG8TmNALwllVrwNnhCHD2Jgguz/nL0ZTL+O/ziw1OVMu3vVceJQsrFfghPYNmTbzY
+	 x66LZaEyDRve40AA149+SRe4uIxJimfNVykL6Kkzh3priJXSF7tp/JxQ9R4fhI2EBu
+	 ou+9OLF9L5ZjZWcgtRSChpldt2LSEk7TBPUugQFbv/kru3dYr3XmKoE+NInGnHH2dX
+	 2x1rIqVUMBQWuTyKQvYe02XaTUOKd5y4GEiPtzWq/Fal8JPnQoYglKoj8xRAqk/ImV
+	 5qY7se9EU//4QhDsNLwWRZ712z8IZDmqoNhj9IplTf5xJWSJhwsNlT4XttXlE08vLu
+	 qohx6k8lqyQCY7IR454G7U2rgdNh0oB9v1Rg8ZlzqgFZrUKm6236tw+L8FgMHWWNP7
+	 MtKwTzsjiNTl6Q3BXPXzukF0lAGhX6Jo0Aoc3/DX3R8PpVssf2FJPKQluS25+9oXjn
+	 jM77khAYByN3fc1oSNH3u4awvIf7onJEm9Z4AHWuSmBZKr4dt6sS1FyvPNtYIbAtrE
+	 t8BtQUw+S2G3eJFgV99thRo5rT+KutkDfYf1OMzL6nZKYlVkSlcciRbO8cRvoiNErA
+	 ZsZfd7bPJILKHTWUzgT5VqSPs1YPZIcu55FtCos24gKrNmkUja4BjAeF2tFhN2XbnD
+	 6GBquVELfue/VcI1cbSlb35E=
+Received: from zn.tnic (pd953092e.dip0.t-ipconnect.de [217.83.9.46])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 1435F40E0254;
+	Fri, 15 Aug 2025 10:46:07 +0000 (UTC)
+Date: Fri, 15 Aug 2025 12:46:01 +0200
+From: Borislav Petkov <bp@alien8.de>
+To: Kai Huang <kai.huang@intel.com>
+Cc: dave.hansen@intel.com, tglx@linutronix.de, peterz@infradead.org,
+	mingo@redhat.com, hpa@zytor.com, thomas.lendacky@amd.com,
+	x86@kernel.org, kas@kernel.org, rick.p.edgecombe@intel.com,
+	dwmw@amazon.co.uk, linux-kernel@vger.kernel.org,
+	pbonzini@redhat.com, seanjc@google.com, kvm@vger.kernel.org,
+	reinette.chatre@intel.com, isaku.yamahata@intel.com,
+	dan.j.williams@intel.com, ashish.kalra@amd.com,
+	nik.borisov@suse.com, chao.gao@intel.com, sagis@google.com,
+	farrah.chen@intel.com
+Subject: Re: [PATCH v6 1/7] x86/kexec: Consolidate relocate_kernel() function
+ parameters
+Message-ID: <20250815104601.GDaJ8P6efRLzRTD-2i@fat_crate.local>
+References: <cover.1755126788.git.kai.huang@intel.com>
+ <b88c6a54174a757f44e2f44492a21756be05dcda.1755126788.git.kai.huang@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <aJ8HVCbE-fIoS1U4@willie-the-truck>
+In-Reply-To: <b88c6a54174a757f44e2f44492a21756be05dcda.1755126788.git.kai.huang@intel.com>
 
-On Fri, Aug 15, 2025 at 11:09:24AM +0100, Will Deacon wrote:
-> On Tue, Aug 12, 2025 at 06:15:46AM -0400, Michael S. Tsirkin wrote:
-> > On Tue, Aug 12, 2025 at 03:03:02AM -0700, syzbot wrote:
-> > > Hello,
-> > > 
-> > > syzbot has tested the proposed patch but the reproducer is still triggering an issue:
-> > > WARNING in virtio_transport_send_pkt_info
-> > 
-> > OK so the issue triggers on
-> > commit 6693731487a8145a9b039bc983d77edc47693855
-> > Author: Will Deacon <will@kernel.org>
-> > Date:   Thu Jul 17 10:01:16 2025 +0100
-> > 
-> >     vsock/virtio: Allocate nonlinear SKBs for handling large transmit buffers
-> >     
-> > 
-> > but does not trigger on:
-> > 
-> > commit 8ca76151d2c8219edea82f1925a2a25907ff6a9d
-> > Author: Will Deacon <will@kernel.org>
-> > Date:   Thu Jul 17 10:01:15 2025 +0100
-> > 
-> >     vsock/virtio: Rename virtio_vsock_skb_rx_put()
-> >     
-> > 
-> > 
-> > Will, I suspect your patch merely uncovers a latent bug
-> > in zero copy handling elsewhere.
-> > Want to take a look?
+On Thu, Aug 14, 2025 at 11:59:01AM +1200, Kai Huang wrote:
+> During kexec, the kernel jumps to the new kernel in relocate_kernel(),
+> which is implemented in assembly and both 32-bit and 64-bit have their
+> own version.
 > 
-> Sorry for the delay, I was debugging something else!
+> Currently, for both 32-bit and 64-bit, the last two parameters of the
+> relocate_kernel() are both 'unsigned int' but actually they only convey
+> a boolean, i.e., one bit information.  The 'unsigned int' has enough
+> space to carry two bits information therefore there's no need to pass
+> the two booleans in two separate 'unsigned int'.
 > 
-> I see Hillf already tried some stuff in the other thread, but I can take
-> a look as well.
+> Consolidate the last two function parameters of relocate_kernel() into a
+> single 'unsigned int' and pass flags instead.
 > 
-> Will
+> Only consolidate the 64-bit version albeit the similar optimization can
+> be done for the 32-bit version too.  Don't bother changing the 32-bit
+> version while it is working (since assembly code change is required).
+> 
+> Signed-off-by: Kai Huang <kai.huang@intel.com>
+> Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
+> ---
+> 
+>  v5 -> v6:
+>   - Add Tom's RB.
+> 
+>  v4 -> v5:
+>   - RELOC_KERNEL_HOST_MEM_ACTIVE -> RELOC_KERNEL_HOST_MEM_ENC_ACTIVE
+>     (Tom)
+>   - Add a comment to explain only RELOC_KERNEL_PRESERVE_CONTEXT is
+>     restored after jumping back from peer kernel for preserved_context
+>     kexec (pointed out by Tom).
+>   - Use testb instead of testq when comparing the flag with R11 to save
+>     3 bytes (Hpa).
+> 
+>  v4:
+>   - new patch
+> 
+> 
+> ---
+>  arch/x86/include/asm/kexec.h         | 12 ++++++++++--
+>  arch/x86/kernel/machine_kexec_64.c   | 22 +++++++++++++---------
+>  arch/x86/kernel/relocate_kernel_64.S | 25 +++++++++++++++----------
+>  3 files changed, 38 insertions(+), 21 deletions(-)
 
-I will be frank I don't understand how that patch makes sense though.
+Reviewed-by: Borislav Petkov (AMD) <bp@alien8.de>
 
 -- 
-MST
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
 
