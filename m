@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-54763-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54764-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F21BB2766B
-	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 04:58:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 144A3B276A5
+	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 05:17:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 32AA5600974
-	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 02:58:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AD6A31B6007F
+	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 03:15:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A06529E0F6;
-	Fri, 15 Aug 2025 02:58:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BCFA298CD5;
+	Fri, 15 Aug 2025 03:15:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="D35Eohqg"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kF4AR4Hm"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53C881A0BF1;
-	Fri, 15 Aug 2025 02:58:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E6D418C011;
+	Fri, 15 Aug 2025 03:15:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755226710; cv=none; b=XHWFbqwOYFCqruh7sWYxPwjDqPYoJ8xd5EPOw7Uj7Bx8fqXZqeKJ7+nh94EDih7qfERKhA4WAFVNjjBQB9YlDy/LOrBFV6JDeMsJe5fa7NgHP0GBqoNVHPnXSan94rdbv/wMTWfbV1+eksty8RZ3Eq7Q422fUaJlg+tZZi5B/90=
+	t=1755227728; cv=none; b=M1AoK895o51J6zdu8P7ftkTll8GkTADis3aEA5erh0m57QlSmjThX2c+cnvHbXRYKPwUpGDdgQvE134BilLrTKVX5D3ig2+cEc2BkD+Q569MWHFAsvZwVM1WsEWP9ckwtF6wyaiiraLxW6yWEcddOZKX+SS/eldRRabjBykzDtk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755226710; c=relaxed/simple;
-	bh=ZoHCRo69UbHgHx5mAQdVdvvPlidj+UaNVfMUMcDCleg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=OwVenmE9IrnoE7HpEokJeT5XBHNXAHaCVMLRhujwNLGEbh7WxDzWfjg1W0+WQj7AqO+aehh7SYCqVnXGmn0ip8hmRhCZ4Lr4J9S4vrC9LUjeDW2pkaP0IooooB9MdJMcrwdVv6fhMnmeSnrAM9aiDqvywutxlRH0GPNw8rVrmPc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=D35Eohqg; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1755227728; c=relaxed/simple;
+	bh=fC1mrUytUG74MKUNflCkOvX5lW6hkNqnNNZ7FyLjNIk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hFqugJSGyaCYwBrg3ZJ8men8CprDvUpqM16idRKwq0ot5i+PBvlRtfu1R+uUqNdY9OkVaOqgMxEW8tu5zzzTAs5p/kKa7rKMn+oA2u+Jl+mlIilRlFRozKn1/C4hd95XmDST7ckdxBRZGi5tAG6WZJTFSDyNAQltxDA6Qw3C3w8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kF4AR4Hm; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1755226708; x=1786762708;
-  h=message-id:date:mime-version:subject:to:references:from:
-   in-reply-to:content-transfer-encoding;
-  bh=ZoHCRo69UbHgHx5mAQdVdvvPlidj+UaNVfMUMcDCleg=;
-  b=D35EohqgYVXl13FX5gpH42JGNcrcu6jUDHfmyBV+yRTgZPVSNDcoshvX
-   Su5R3lfVVP2f+PTcr6cFBpzoINSzXoUa5uj7CH/SYxM77phyj/+Nr2uYm
-   HGu8+Sja6FHTB7dKYRjRTSLQ21d+ym1RjdeE06V3O7/20wbjTptB00mcK
-   xgpCwHiobhD6mmnUfey3xvxBLWSsE5XkGSbOzV2CHx8Vy3PE2ffhROiZl
-   VrdQGLSfducR9jkHMYGcmGODVimc0AhN3ERhXgOesBEVThgJ1m1KdauQS
-   sJYmgTkcXbGnwGqyUlmEj9VQS96F0sG526Ay7ciOW4O+kQYxLdWHjvyDn
-   Q==;
-X-CSE-ConnectionGUID: D+BdQh7YScCzHybbncs/oA==
-X-CSE-MsgGUID: 8ide1veTR2WjK5p6WXiwXQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11522"; a="80132903"
+  t=1755227727; x=1786763727;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=fC1mrUytUG74MKUNflCkOvX5lW6hkNqnNNZ7FyLjNIk=;
+  b=kF4AR4HmpnP0KjgcbW6BuHcyyJ8+CKKyjFT/2a+aSkPEA+Dfg+2DbovR
+   w5gebYf1D5mCRhl60Lrocs8MGW45TjVbWkwZAW74fNkY0uLMQ0TU6f4nB
+   I7wod7D29H1Vo5TUed1YjbQhTSSNxArka77mPAnmBywA1RkgVHyBiBVfi
+   opHhKkvgkQNiocrXn8hYSkzUxfvZV+A/D0IZNk0PyebwVeNZ8Fd6Kyh0k
+   FjnE4PPJ3qnR8VXRWXuaj29a1L+204+01Tz9XvgomguMTw+Adsn7Rhklq
+   d31q/4yWEAt8PJN2vu4tVbejRbPsWYt6HzXZmf+gnM8wBMiexua77rLSE
+   A==;
+X-CSE-ConnectionGUID: OjLVpetZRVWiitcFTxvUBg==
+X-CSE-MsgGUID: 1xQXv2FtTVOr9WdEqygXNA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11522"; a="80134704"
 X-IronPort-AV: E=Sophos;i="6.17,290,1747724400"; 
-   d="scan'208";a="80132903"
+   d="scan'208";a="80134704"
 Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2025 19:58:27 -0700
-X-CSE-ConnectionGUID: I56/f9bIRuyvq90j8cNzCA==
-X-CSE-MsgGUID: 8pwU93maQr605Wmrss5oBA==
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2025 20:15:26 -0700
+X-CSE-ConnectionGUID: gWE2MD7FSsO1FMn9GpkNvw==
+X-CSE-MsgGUID: 7azx2Hb7QE2UY2Q4NI5dPg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.17,290,1747724400"; 
-   d="scan'208";a="166827050"
-Received: from hmao3-mobl1.ccr.corp.intel.com (HELO [10.238.0.213]) ([10.238.0.213])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2025 19:58:24 -0700
-Message-ID: <aee6539f-528e-46c7-98c6-e740e4c30a5f@intel.com>
-Date: Fri, 15 Aug 2025 10:58:22 +0800
+   d="scan'208";a="166834945"
+Received: from unknown (HELO [10.238.0.107]) ([10.238.0.107])
+  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2025 20:15:21 -0700
+Message-ID: <8b76b1d7-edc9-4677-8069-a428e1067050@linux.intel.com>
+Date: Fri, 15 Aug 2025 11:15:19 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,93 +67,38 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH][v2] x86/kvm: Prefer native qspinlock for dedicated vCPUs
- irrespective of PV_UNHALT
-To: lirongqing <lirongqing@baidu.com>, seanjc@google.com,
- pbonzini@redhat.com, vkuznets@redhat.com, tglx@linutronix.de,
- mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
- hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250722110005.4988-1-lirongqing@baidu.com>
+Subject: Re: [PATCH v8 25/30] KVM: selftests: KVM: selftests: Expose new
+ vm_vaddr_alloc_private()
+To: Sean Christopherson <seanjc@google.com>, Sagi Shahar <sagis@google.com>
+Cc: linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Shuah Khan <shuah@kernel.org>, Ackerley Tng <ackerleytng@google.com>,
+ Ryan Afranji <afranji@google.com>, Andrew Jones <ajones@ventanamicro.com>,
+ Isaku Yamahata <isaku.yamahata@intel.com>,
+ Erdem Aktas <erdemaktas@google.com>,
+ Rick Edgecombe <rick.p.edgecombe@intel.com>,
+ Roger Wang <runanwang@google.com>, Oliver Upton <oliver.upton@linux.dev>,
+ "Pratik R. Sampat" <pratikrajesh.sampat@amd.com>,
+ Reinette Chatre <reinette.chatre@intel.com>, Ira Weiny
+ <ira.weiny@intel.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20250807201628.1185915-1-sagis@google.com>
+ <20250807201628.1185915-26-sagis@google.com> <aJpbhBO53ujqkbPT@google.com>
 Content-Language: en-US
-From: "Guo, Wangyang" <wangyang.guo@intel.com>
-In-Reply-To: <20250722110005.4988-1-lirongqing@baidu.com>
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <aJpbhBO53ujqkbPT@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 7/22/2025 7:00 PM, lirongqing wrote:
-> From: Li RongQing <lirongqing@baidu.com>
-> 
-> The commit b2798ba0b876 ("KVM: X86: Choose qspinlock when dedicated
-> physical CPUs are available") states that when PV_DEDICATED=1
-> (vCPU has dedicated pCPU), qspinlock should be preferred regardless of
-> PV_UNHALT.  However, the current implementation doesn't reflect this: when
-> PV_UNHALT=0, we still use virt_spin_lock() even with dedicated pCPUs.
-> 
-> This is suboptimal because:
-> 1. Native qspinlocks should outperform virt_spin_lock() for dedicated
->     vCPUs irrespective of HALT exiting
-> 2. virt_spin_lock() should only be preferred when vCPUs may be preempted
->     (non-dedicated case)
-> 
-> So reorder the PV spinlock checks to:
-> 1. First handle dedicated pCPU case (disable virt_spin_lock_key)
-> 2. Second check single CPU, and nopvspin configuration
-> 3. Only then check PV_UNHALT support
-> 
-> This ensures we always use native qspinlock for dedicated vCPUs, delivering
-> pretty performance gains at high contention levels.
-> 
-> Signed-off-by: Li RongQing <lirongqing@baidu.com>
-> 
-> diff with v1: rewrite the changelog
-> 
->   arch/x86/kernel/kvm.c | 20 ++++++++++----------
->   1 file changed, 10 insertions(+), 10 deletions(-)
-> 
-> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-> index 921c1c7..9cda79f 100644
-> --- a/arch/x86/kernel/kvm.c
-> +++ b/arch/x86/kernel/kvm.c
-> @@ -1073,16 +1073,6 @@ static void kvm_wait(u8 *ptr, u8 val)
->   void __init kvm_spinlock_init(void)
->   {
->   	/*
-> -	 * In case host doesn't support KVM_FEATURE_PV_UNHALT there is still an
-> -	 * advantage of keeping virt_spin_lock_key enabled: virt_spin_lock() is
-> -	 * preferred over native qspinlock when vCPU is preempted.
-> -	 */
-> -	if (!kvm_para_has_feature(KVM_FEATURE_PV_UNHALT)) {
-> -		pr_info("PV spinlocks disabled, no host support\n");
-> -		return;
-> -	}
-> -
-> -	/*
->   	 * Disable PV spinlocks and use native qspinlock when dedicated pCPUs
->   	 * are available.
->   	 */
-> @@ -1101,6 +1091,16 @@ void __init kvm_spinlock_init(void)
->   		goto out;
->   	}
->   
-> +	/*
-> +	 * In case host doesn't support KVM_FEATURE_PV_UNHALT there is still an
-> +	 * advantage of keeping virt_spin_lock_key enabled: virt_spin_lock() is
-> +	 * preferred over native qspinlock when vCPU is preempted.
-> +	 */
-> +	if (!kvm_para_has_feature(KVM_FEATURE_PV_UNHALT)) {
-> +		pr_info("PV spinlocks disabled, no host support\n");
-> +		return;
-> +	}
-> +
->   	pr_info("PV spinlocks enabled\n");
->   
->   	__pv_init_lock_hash();
 
-For non-overcommit VM, we may add `-overcommit cpu-pm=on` options to 
-qemu-kvm and let guest to handle idle by itself and reduce the latency. 
-Current kernel will fallback to virt_spin_lock, even kvm-hint-dedicated 
-is provided. With this patch, it can fix this problem and use mcs queue 
-spinlock for better performance.
 
-Tested-by: Wangyang Guo <wangyang.guo@intel.com>
+On 8/12/2025 5:07 AM, Sean Christopherson wrote:
+> On Thu, Aug 07, 2025, Sagi Shahar wrote:
+>> From: Ackerley Tng <ackerleytng@google.com>
+>>
+>> vm_vaddr_alloc_private allow specifying both the virtual and physical
+>> addresses for the allocation.
+> Why?
+>
+Yeah, this is not needed.
+vm_vaddr_alloc() will handle it as private memory by default if the vm has
+protected memory.
 
