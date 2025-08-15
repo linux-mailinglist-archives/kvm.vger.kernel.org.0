@@ -1,272 +1,173 @@
-Return-Path: <kvm+bounces-54722-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54723-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A0BFB27399
-	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 02:19:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34AA0B273B8
+	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 02:23:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E9401B613DD
-	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 00:17:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96901721CBA
+	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 00:20:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D27B24C076;
-	Fri, 15 Aug 2025 00:12:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A352D28373;
+	Fri, 15 Aug 2025 00:20:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QwOlrUiV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y5yYhzfp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40F25233D9C
-	for <kvm@vger.kernel.org>; Fri, 15 Aug 2025 00:12:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52D26A926;
+	Fri, 15 Aug 2025 00:20:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755216774; cv=none; b=AAhtO+qBtxSgYDQcf4dghV8VeRF2z71kRmGa/80TwI311EnSpc8gOHUQ2tRNaHR6JjGa3TQWV8s0V+XUyrskWY3IA3LjsEkNO6babcoVVqITDlU3VQ5wAdmB2rAzRhMFFeXo+cLzvF4jSRLRGBxWxnqqP9wOP22BAyw+OiycItc=
+	t=1755217223; cv=none; b=HpzLyscnZgZpjdAsT5le6rVfoV9HJi+lzG7dQHujy/OAf2N7lf1GqVF01w1Coedf+z/vsTeAfN+8NCI+y4eMP9iy4V4nnQX8nXPo4+t46Jr5IDpiHfm5qdiV0OLt1eeprQrajfkkBVdrfUeEUgGr/sapow0+sepzlqf5n1OrWCE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755216774; c=relaxed/simple;
-	bh=lOvxPSaxtzgfnLuwRx2Czq523miEVYErN+utCgJz7BI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=TZ+q1w8guEUlmKRijbqc1Zojs6rQbeNXCHIeOb3ADJdvDV2sFPm+efILeukfZCVXAfJIPQBRnOSGjO+LS7L4NEbJyYeYY1J0KbL1KhXTOdOfbncEqcmpV93S/f4cgEGlgMl5HZhPPVJBA5mdykk0BYtva8mQlT2bU0eBmZsxhT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QwOlrUiV; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-24458067fdeso15742435ad.1
-        for <kvm@vger.kernel.org>; Thu, 14 Aug 2025 17:12:51 -0700 (PDT)
+	s=arc-20240116; t=1755217223; c=relaxed/simple;
+	bh=Hlpf2kTVXQNQmFdUgxQvYfOl1mZBxeqXkGFm+CUVm/s=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=c+DFZo7eqSRKHeK70mdOZ02+Mqx0Nu3ROmNCyHXQFIBE98ESEfZDoaazYuvaclBAREd7NbrvTRoj3Uj7mBz6ppShBl6TOt5ow4sc27K8Jle8jhdwy2vC/O319aLJ3tE3InyPxvTxUez9DwssKAzV7wI21Hu3fV/Y6XwUP/lcjSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y5yYhzfp; arc=none smtp.client-ip=209.85.215.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-b4716f46a2eso1021607a12.0;
+        Thu, 14 Aug 2025 17:20:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755216771; x=1755821571; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=c13NaN+YXr/BX/bGMCHRTcbQakErEGNzfF6KpN+Ic+4=;
-        b=QwOlrUiVLfUaXvMjPoOdPjIu57klsuoccp+JjbjCBykkf9YoZLPb3BvZPNyFQEf6lb
-         BF4SktIuxPxZtuZrYGfHuklkc1NDcTwT9PrZdWyvn+LnKI/UOAdnQU9L0Xw3U9elxuaN
-         a/xcpgCn4wsjGffNfD/TaTGFoNDatoP2U26kIFOjVgG21K5+fyECezlMrgBWrrAr5zHu
-         iRTIlubrNm7GTKw5CClp0wFJg7PCOBRIkVkWBQvlOOMqVYujhVlU0bRIKyxRFkYCKL15
-         XhzV7A+8O1IjUYd4EMnfJW/C0qt++iF8JuYQ9/wUaBIC4gBkq+ri+KDcMNInVdPJ6chL
-         KnVg==
+        d=gmail.com; s=20230601; t=1755217221; x=1755822021; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TnAqP/Eao4gbLB1mbZYWMwk5AegHaMBnl9yzD4tj3Pc=;
+        b=Y5yYhzfpBxjgkA2+uPTWI7l99s5kVxQaHJUc0mjjXRn01JClTeXI26muzGByTj+DrJ
+         HPfH/nWIoQuk/+fM0/NtBDsxNcir8WWzG3Wwn9Bsi3bUg9Eyr9gMP+lYVlaVsC0OIMtx
+         i57ohFJC1FEIjURSukNaqsaSkf10s4C/5gYNl29aq9k3ySA+LLTbIzJ6hyveb6tSjS4U
+         E3r+53nkjwjJtOjv+v1uRyv5yYZ1Dz6LeG/TSzeiNq/Ub1BQLaE3cNYL2V7ShsIBlvFY
+         gegmRt3Q7oa5q2qNX4Zp2/hesZTnKd3ON9kQZyBx5aFVkT/BRSybAZCs14IS58+hEUZ0
+         FowQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755216771; x=1755821571;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=c13NaN+YXr/BX/bGMCHRTcbQakErEGNzfF6KpN+Ic+4=;
-        b=nhIuXhAzQmtdLZfOjwplD3CoYRBbOfydM3cXVrwKgqoyMJS7Wh8SX7UHXih/IPzx8w
-         V0G285OR9Jy0kGCrWZBHG1epzmdQgki7AH4KpsyBYBxr9X0/ze584w6zI4a5UgENl+3T
-         3jQUgsGFGpd4YqhxaH7BQhr0GO98kq+qX3nDliiVBpG2BckYwz6nUDZDPw2pi9BJ1lxe
-         AOsIKQ/kPuaoPavrhKDbsJas7gcKwzcTyDAnn6hfJYDmX1YE+VfFIgyz3zz3wvfMEqCU
-         Evh2X6vrDEgvsfXfwWqdkFNHLWY5aGPm6xgY237YWanrir/9Gpeapxs7pAUVFHUzOWvN
-         6rnw==
-X-Gm-Message-State: AOJu0Yx/ttxWwZgBYowsGWck6YLFDGA2t9NvGPRv2kgT97aGqAnXHx7J
-	vuNiuESDhyj+mG+deQVLhWmKX43SKltT31tTJ5Io+EjTuc5RJSnKjJnVOlO4Jc5Ahej24TNysxE
-	sXdSh2w==
-X-Google-Smtp-Source: AGHT+IHQ8AGbnn6QCZLFRxGDCTZzOhReMkq4QJBU0f701KawomGbTYhx5V2Jp8mxit55/TGINdvLjXyC+B8=
-X-Received: from pjbsb5.prod.google.com ([2002:a17:90b:50c5:b0:312:ea08:fa64])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:fab:b0:23f:f6ca:6a3
- with SMTP id d9443c01a7336-2446d8f561dmr1329135ad.43.1755216770682; Thu, 14
- Aug 2025 17:12:50 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 14 Aug 2025 17:12:05 -0700
-In-Reply-To: <20250815001205.2370711-1-seanjc@google.com>
+        d=1e100.net; s=20230601; t=1755217221; x=1755822021;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TnAqP/Eao4gbLB1mbZYWMwk5AegHaMBnl9yzD4tj3Pc=;
+        b=nrPfLg8lsfNEsC4mDrBQeRDJCKt9hDZxsypvNcVx0Pxw3cKtspztXQ1sOhGgk0BcbJ
+         reT4AvEhTmVRymtTP4RaGqytf/pOeHc8PhZvRtXWsvD+grxDUhaDktw8y4r5CEA16q19
+         CG1h4rJ7PrIcckAke91ooxG3NcXsgSKaFFXlaaO6t0JgaWS5C9se+IHSRb+dbgxduyf/
+         WKQkHz6R/31C2N9qgS9yCNBujeievxhjJwjSu/K8EZIr9j2Viizuap74uWJA9oppfdCR
+         4r7a3v2EtvCE32igqxJYbGhgrSGckqvWd5o9bayVZLP1agFu0x8N7yrwVJQ/GoPtmMNs
+         Ur9g==
+X-Forwarded-Encrypted: i=1; AJvYcCVPYwUftehSwuQE+QQ6WfQqhGbq4T51bTfK0du3lglczSXA3lzUfkY4SAgMRNtS1BUD15XDUHXPrLAubMFp@vger.kernel.org, AJvYcCXxLTWaaEnrs0s1W/skJ/P9EujHzJO2ke4Sm6v14mlEt+L4If9HIGw/A2ApE8rDCtY7msg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz5FoWCHo5lAkI/J2HeT1y5okojj6k7gJtiilfWiWsR9/glRBy7
+	fTWP/hRfLhN4zBR8rCLe8BNTfktcHUiIftRfNJybId3Krts9KcSJHpUrUHefLaLCA7A=
+X-Gm-Gg: ASbGncuUGI1xNi+ba6BgxYKTjh/nMvgHPh47d8vW/3AM+Ba2+1h3FBcmcjsZGdFqc4y
+	4h3ag9dhcH0KLEvtY+tOB+9rpbl6pca7h74R0454E2BswY9upuTz72KaJ+n8fyn/0p/pRDloBAa
+	8D/ZfVFxKkTLyFYQqWB/LL4/YxiCDc7kdKhDIYesTTIIENKbe1aK8YVz7Y8KSotUybVHpbRz9wb
+	mj2/VTu46jlg5uZXZwy1DqhA1Yvjbo53Zfv59H8yBmE/TOjO5dfuHjJN9rxo0Z/JOF6njIwLLC6
+	aSyUCj2yJVVq8tf5OBNp+FQB2A9l/6EC8549YFMBOvi5QtSdAJ4736vfz+aYswFBo3Rks52ay1z
+	4sdqj/+t2hfA54AQebAVsM4DNun3ka/3W3rL3G/CQ3A==
+X-Google-Smtp-Source: AGHT+IFCAtu5B5yxPJm9Jf0dqxrJjQRchll+v2TqA1NF0cIniaNtFVRw/nJJfo96v0jQVWxXrvFqKw==
+X-Received: by 2002:a17:903:46c4:b0:243:6d9:aa2e with SMTP id d9443c01a7336-2446d9b0973mr1513905ad.53.1755217221031;
+        Thu, 14 Aug 2025 17:20:21 -0700 (PDT)
+Received: from soham-laptop.. ([103.182.158.111])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2446d5a451esm700745ad.165.2025.08.14.17.20.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Aug 2025 17:20:20 -0700 (PDT)
+From: Soham Metha <sohammetha01@gmail.com>
+To: linux-kselftest@vger.kernel.org
+Cc: shuah@kernel.org,
+	skhan@linuxfoundation.org,
+	linux-kernel-mentees@lists.linuxfoundation.org,
+	linux-kernel@vger.kernel.org,
+	Soham Metha <sohammetha01@gmail.com>,
+	Anup Patel <anup@brainfault.org>,
+	Atish Patra <atish.patra@linux.dev>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Alexandre Ghiti <alex@ghiti.fr>,
+	kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org,
+	linux-riscv@lists.infradead.org
+Subject: [PATCH 4/6] selftests: kvm: riscv: fix spelling mistakes in comments
+Date: Fri, 15 Aug 2025 05:48:01 +0530
+Message-Id: <20250815001803.112924-3-sohammetha01@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20250815001803.112924-1-sohammetha01@gmail.com>
+References: <20250815000859.112169-1-sohammetha01@gmail.com>
+ <20250815001803.112924-1-sohammetha01@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250815001205.2370711-1-seanjc@google.com>
-X-Mailer: git-send-email 2.51.0.rc1.163.g2494970778-goog
-Message-ID: <20250815001205.2370711-22-seanjc@google.com>
-Subject: [PATCH 6.1.y 21/21] KVM: VMX: Preserve host's DEBUGCTLMSR_FREEZE_IN_SMM
- while running the guest
-From: Sean Christopherson <seanjc@google.com>
-To: stable@vger.kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Sasha Levin <sashal@kernel.org>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-From: Maxim Levitsky <mlevitsk@redhat.com>
+found/fixed the following typos
 
-[ Upstream commit 6b1dd26544d045f6a79e8c73572c0c0db3ef3c1a ]
+- indicies -> indices
+- requrired -> required
+- guranteed -> guaranteed
 
-Set/clear DEBUGCTLMSR_FREEZE_IN_SMM in GUEST_IA32_DEBUGCTL based on the
-host's pre-VM-Enter value, i.e. preserve the host's FREEZE_IN_SMM setting
-while running the guest.  When running with the "default treatment of SMIs"
-in effect (the only mode KVM supports), SMIs do not generate a VM-Exit that
-is visible to host (non-SMM) software, and instead transitions directly
-from VMX non-root to SMM.  And critically, DEBUGCTL isn't context switched
-by hardware on SMI or RSM, i.e. SMM will run with whatever value was
-resident in hardware at the time of the SMI.
+in `tools/testing/selftests/kvm/riscv/sbi_pmu_test.c`
 
-Failure to preserve FREEZE_IN_SMM results in the PMU unexpectedly counting
-events while the CPU is executing in SMM, which can pollute profiling and
-potentially leak information into the guest.
-
-Check for changes in FREEZE_IN_SMM prior to every entry into KVM's inner
-run loop, as the bit can be toggled in IRQ context via IPI callback (SMP
-function call), by way of /sys/devices/cpu/freeze_on_smi.
-
-Add a field in kvm_x86_ops to communicate which DEBUGCTL bits need to be
-preserved, as FREEZE_IN_SMM is only supported and defined for Intel CPUs,
-i.e. explicitly checking FREEZE_IN_SMM in common x86 is at best weird, and
-at worst could lead to undesirable behavior in the future if AMD CPUs ever
-happened to pick up a collision with the bit.
-
-Exempt TDX vCPUs, i.e. protected guests, from the check, as the TDX Module
-owns and controls GUEST_IA32_DEBUGCTL.
-
-WARN in SVM if KVM_RUN_LOAD_DEBUGCTL is set, mostly to document that the
-lack of handling isn't a KVM bug (TDX already WARNs on any run_flag).
-
-Lastly, explicitly reload GUEST_IA32_DEBUGCTL on a VM-Fail that is missed
-by KVM but detected by hardware, i.e. in nested_vmx_restore_host_state().
-Doing so avoids the need to track host_debugctl on a per-VMCS basis, as
-GUEST_IA32_DEBUGCTL is unconditionally written by prepare_vmcs02() and
-load_vmcs12_host_state().  For the VM-Fail case, even though KVM won't
-have actually entered the guest, vcpu_enter_guest() will have run with
-vmcs02 active and thus could result in vmcs01 being run with a stale value.
-
-Cc: stable@vger.kernel.org
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-Co-developed-by: Sean Christopherson <seanjc@google.com>
-Link: https://lore.kernel.org/r/20250610232010.162191-9-seanjc@google.com
-Signed-off-by: Sean Christopherson <seanjc@google.com>
-[sean: move vmx/main.c change to vmx/vmx.c]
-Signed-off-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Soham Metha <sohammetha01@gmail.com>
 ---
- arch/x86/include/asm/kvm_host.h |  7 +++++++
- arch/x86/kvm/vmx/nested.c       |  3 +++
- arch/x86/kvm/vmx/vmx.c          |  5 +++++
- arch/x86/kvm/vmx/vmx.h          | 15 ++++++++++++++-
- arch/x86/kvm/x86.c              | 14 ++++++++++++--
- 5 files changed, 41 insertions(+), 3 deletions(-)
+ tools/testing/selftests/kvm/riscv/sbi_pmu_test.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index c8fc4f2acf69..d0229323ca63 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1459,6 +1459,7 @@ static inline u16 kvm_lapic_irq_dest_mode(bool dest_mode_logical)
- enum kvm_x86_run_flags {
- 	KVM_RUN_FORCE_IMMEDIATE_EXIT	= BIT(0),
- 	KVM_RUN_LOAD_GUEST_DR6		= BIT(1),
-+	KVM_RUN_LOAD_DEBUGCTL		= BIT(2),
- };
+diff --git a/tools/testing/selftests/kvm/riscv/sbi_pmu_test.c b/tools/testing/selftests/kvm/riscv/sbi_pmu_test.c
+index 924a335d2262..6a8818ac036c 100644
+--- a/tools/testing/selftests/kvm/riscv/sbi_pmu_test.c
++++ b/tools/testing/selftests/kvm/riscv/sbi_pmu_test.c
+@@ -212,7 +212,7 @@ static void update_counter_info(int num_counters)
+ 	for (i = 0; i < num_counters; i++) {
+ 		ret = sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_GET_INFO, i, 0, 0, 0, 0, 0);
  
- struct kvm_x86_ops {
-@@ -1484,6 +1485,12 @@ struct kvm_x86_ops {
- 	void (*vcpu_load)(struct kvm_vcpu *vcpu, int cpu);
- 	void (*vcpu_put)(struct kvm_vcpu *vcpu);
+-		/* There can be gaps in logical counter indicies*/
++		/* There can be gaps in logical counter indices*/
+ 		if (ret.error)
+ 			continue;
+ 		GUEST_ASSERT_NE(ret.value, 0);
+@@ -446,7 +446,7 @@ static void test_pmu_basic_sanity(void)
+ 		ret = sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_GET_INFO, i,
+ 				0, 0, 0, 0, 0);
  
-+	/*
-+	 * Mask of DEBUGCTL bits that are owned by the host, i.e. that need to
-+	 * match the host's value even while the guest is active.
-+	 */
-+	const u64 HOST_OWNED_DEBUGCTL;
-+
- 	void (*update_exception_bitmap)(struct kvm_vcpu *vcpu);
- 	int (*get_msr)(struct kvm_vcpu *vcpu, struct msr_data *msr);
- 	int (*set_msr)(struct kvm_vcpu *vcpu, struct msr_data *msr);
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index a220770644e1..2c3cf4351c4c 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -4627,6 +4627,9 @@ static void nested_vmx_restore_host_state(struct kvm_vcpu *vcpu)
- 			WARN_ON(kvm_set_dr(vcpu, 7, vmcs_readl(GUEST_DR7)));
+-		/* There can be gaps in logical counter indicies*/
++		/* There can be gaps in logical counter indices*/
+ 		if (ret.error)
+ 			continue;
+ 		GUEST_ASSERT_NE(ret.value, 0);
+@@ -474,7 +474,7 @@ static void test_pmu_events_snaphost(void)
+ 	struct riscv_pmu_snapshot_data *snapshot_data = snapshot_gva;
+ 	int i;
+ 
+-	/* Verify presence of SBI PMU and minimum requrired SBI version */
++	/* Verify presence of SBI PMU and minimum required SBI version */
+ 	verify_sbi_requirement_assert();
+ 
+ 	snapshot_set_shmem(snapshot_gpa, 0);
+@@ -489,7 +489,7 @@ static void test_pmu_events_snaphost(void)
+ 		if (counter_mask_available & (BIT(i)))
+ 			GUEST_ASSERT_EQ(READ_ONCE(snapshot_data->ctr_values[i]), 0);
  	}
+-	/* Only these two events are guranteed to be present */
++	/* Only these two events are guaranteed to be present */
+ 	test_pmu_event_snapshot(SBI_PMU_HW_CPU_CYCLES);
+ 	test_pmu_event_snapshot(SBI_PMU_HW_INSTRUCTIONS);
  
-+	/* Reload DEBUGCTL to ensure vmcs01 has a fresh FREEZE_IN_SMM value. */
-+	vmx_reload_guest_debugctl(vcpu);
-+
- 	/*
- 	 * Note that calling vmx_set_{efer,cr0,cr4} is important as they
- 	 * handle a variety of side effects to KVM's software model.
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index e470a294b22d..3fef4e14abc6 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7258,6 +7258,9 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu, u64 run_flags)
- 	if (run_flags & KVM_RUN_LOAD_GUEST_DR6)
- 		set_debugreg(vcpu->arch.dr6, 6);
- 
-+	if (run_flags & KVM_RUN_LOAD_DEBUGCTL)
-+		vmx_reload_guest_debugctl(vcpu);
-+
- 	/*
- 	 * Refresh vmcs.HOST_CR3 if necessary.  This must be done immediately
- 	 * prior to VM-Enter, as the kernel may load a new ASID (PCID) any time
-@@ -8197,6 +8200,8 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
- 	.vcpu_load = vmx_vcpu_load,
- 	.vcpu_put = vmx_vcpu_put,
- 
-+	.HOST_OWNED_DEBUGCTL = DEBUGCTLMSR_FREEZE_IN_SMM,
-+
- 	.update_exception_bitmap = vmx_update_exception_bitmap,
- 	.get_msr_feature = vmx_get_msr_feature,
- 	.get_msr = vmx_get_msr,
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index b7ae263cde7b..dc6f06326648 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -447,12 +447,25 @@ bool vmx_is_valid_debugctl(struct kvm_vcpu *vcpu, u64 data, bool host_initiated)
- 
- static inline void vmx_guest_debugctl_write(struct kvm_vcpu *vcpu, u64 val)
+@@ -500,7 +500,7 @@ static void test_pmu_events_overflow(void)
  {
-+	WARN_ON_ONCE(val & DEBUGCTLMSR_FREEZE_IN_SMM);
-+
-+	val |= vcpu->arch.host_debugctl & DEBUGCTLMSR_FREEZE_IN_SMM;
- 	vmcs_write64(GUEST_IA32_DEBUGCTL, val);
- }
+ 	int num_counters = 0, i = 0;
  
- static inline u64 vmx_guest_debugctl_read(void)
- {
--	return vmcs_read64(GUEST_IA32_DEBUGCTL);
-+	return vmcs_read64(GUEST_IA32_DEBUGCTL) & ~DEBUGCTLMSR_FREEZE_IN_SMM;
-+}
-+
-+static inline void vmx_reload_guest_debugctl(struct kvm_vcpu *vcpu)
-+{
-+	u64 val = vmcs_read64(GUEST_IA32_DEBUGCTL);
-+
-+	if (!((val ^ vcpu->arch.host_debugctl) & DEBUGCTLMSR_FREEZE_IN_SMM))
-+		return;
-+
-+	vmx_guest_debugctl_write(vcpu, val & ~DEBUGCTLMSR_FREEZE_IN_SMM);
- }
+-	/* Verify presence of SBI PMU and minimum requrired SBI version */
++	/* Verify presence of SBI PMU and minimum required SBI version */
+ 	verify_sbi_requirement_assert();
  
- /*
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 27e7253972ea..f542ab5e8698 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -10591,7 +10591,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 		dm_request_for_irq_injection(vcpu) &&
- 		kvm_cpu_accept_dm_intr(vcpu);
- 	fastpath_t exit_fastpath;
--	u64 run_flags;
-+	u64 run_flags, debug_ctl;
- 
- 	bool req_immediate_exit = false;
- 
-@@ -10838,7 +10838,17 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 		set_debugreg(0, 7);
- 	}
- 
--	vcpu->arch.host_debugctl = get_debugctlmsr();
-+	/*
-+	 * Refresh the host DEBUGCTL snapshot after disabling IRQs, as DEBUGCTL
-+	 * can be modified in IRQ context, e.g. via SMP function calls.  Inform
-+	 * vendor code if any host-owned bits were changed, e.g. so that the
-+	 * value loaded into hardware while running the guest can be updated.
-+	 */
-+	debug_ctl = get_debugctlmsr();
-+	if ((debug_ctl ^ vcpu->arch.host_debugctl) & kvm_x86_ops.HOST_OWNED_DEBUGCTL &&
-+	    !vcpu->arch.guest_state_protected)
-+		run_flags |= KVM_RUN_LOAD_DEBUGCTL;
-+	vcpu->arch.host_debugctl = debug_ctl;
- 
- 	guest_timing_enter_irqoff();
- 
+ 	snapshot_set_shmem(snapshot_gpa, 0);
 -- 
-2.51.0.rc1.163.g2494970778-goog
+2.34.1
 
 
