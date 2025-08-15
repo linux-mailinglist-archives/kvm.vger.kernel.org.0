@@ -1,144 +1,160 @@
-Return-Path: <kvm+bounces-54797-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54798-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE530B28320
-	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 17:43:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB1A5B28336
+	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 17:48:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0DC6A7BC2FA
-	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 15:41:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D8EBB04D1F
+	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 15:48:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 684833074B5;
-	Fri, 15 Aug 2025 15:43:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26C5D308F2C;
+	Fri, 15 Aug 2025 15:48:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="E1BQUq9L"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SgIX7RTv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ACAA307499
-	for <kvm@vger.kernel.org>; Fri, 15 Aug 2025 15:43:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3118F23ABA7;
+	Fri, 15 Aug 2025 15:48:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755272597; cv=none; b=E3hK0CnuulMwH9PT2aQTe8f36i1Ud5O2v03rGPgHc/bW2dM60dgLSBAdhapSzrcpN6DF2E+UkWq0XSGcmfj2h/VKDa+qnmt6CecGtIA+XGCHh65Es2RjBWMUWWvjN2cHNL6JgQkxnoZ0//ao4JpH8rW7QfIxxsO7B0jdt8KuBFg=
+	t=1755272887; cv=none; b=XYffcL1rhAIGE05IcyM81LxVjxt7+cnECN4qs0wXjl0TZmRq4mbuzN/ajUbopUSbbAHoGnTwTz3JPog46gxy4NlGJCHz9uFieSMB8RIfVonfXDMILybfhYyaU5zntCY8HU5IftMbP47s2G8psG5JAaIuLoW5oiAnq4c6TVonKlw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755272597; c=relaxed/simple;
-	bh=oeSalf/yLwgjR0IO65N9CQyedrwdJmUBVZlN9f6Yfqs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Duj8rmfz1fAjhwEXHqx0zqCiG88uU82sC8DSgYe49v1gojOKZkNdkALQZEQYed4QfzfnfoQW4wLpfJiTGryoVSrJDEAx6nB0tSu10YnpRqxpAcjiIB0V/gF4UZTEggXkCB0Eo6eFhgjKdz1NnA7FFuJ2jDSOQAie6UR6FOuPlEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=E1BQUq9L; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2445805aa2eso19063195ad.1
-        for <kvm@vger.kernel.org>; Fri, 15 Aug 2025 08:43:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755272595; x=1755877395; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=buVtBGpVO2qFuCJLRA/MQVbYJ8Cn6PLF5emLFEWzGB8=;
-        b=E1BQUq9LmugYF8sWbZ3OA492aA2l+yRZs6vsbgL1tkqK2b2TKPnzAclwAXVvVN9KKL
-         J8vmdXdMaEoeTD7xOCigSkg6SUFFiFBIMX7aaX2F8w65K7O6pyRkVdcR5RvEkuvsm3dT
-         hPZwzFqj2rvK0CvNRSt8jzTIkCEZxxjY47DS6BIbbm7wpEtvDGwrCIPNyTxw4aZTb3Rs
-         jpGTPaH+aTybfyScOCBFJplga6dlsZkmhtS9brzSxSG4CjG+WAeDjw2nhSLIoxcfK1Fb
-         6Uqquf9iNadAwOvBlmNWp6JskAgQsBWzIOpIKc7W4MXKEyU2+QHCVt0tP44FSioa8xl5
-         ln3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755272595; x=1755877395;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=buVtBGpVO2qFuCJLRA/MQVbYJ8Cn6PLF5emLFEWzGB8=;
-        b=cmz4zmgoo5qpX9z2/SLgn94okpPZj5GZ2W99jnWR2+Eqmk7/Th/E+1BchfIRJ134LQ
-         ehuumQ5An2H07jMdVn0Pm/aDJ3COcjwT6lic3WxesKcqCbllVXILzJuQjoL+qtinuhQG
-         47Je89EBmbBFq+kCgJogqBriQqqu7uZpANRwen99K0mvALwjYWExWSp5J8IkcU9VIbUx
-         x2nLZ0/k9PdDcL5tdByVHxGit/HMivekFSMvEtDQR7GvfAICOsjOmE7NrASa5CIRW2YR
-         7m9v1Yb/71puhrVMVNgnDA6Q+dARBW8ZRcDWUXHEPKt9TQ8qSHGQTQ7mqWJZn5SqMU6j
-         2gEA==
-X-Forwarded-Encrypted: i=1; AJvYcCVbDaxST7ISUURg6YfdgoZMKDcTiDaoNOSqK50K20SplDuXvK7wXQ9bHf2AC7za1hQgxz4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7ba/Yfm/vbq8/Y/ZwH3ok0hPSuFIogqijUKJKOnrxBaLoqXIJ
-	EaZT/vUfpSLK391Mtte+GQbDD+cHA10KaqOL5fraVVnKS8Akz86z0Vrud4l9NQOE/j6tw+Or3hR
-	wbcHrcWhOinXvFi6BMCN6gTlBI6+VysdKNvMNcP0z
-X-Gm-Gg: ASbGnctnfDZIhOGDTe7pjP3gDek/ucqlOBUC2277lbVfrKw9B0aw34gAsneURsV6SYx
-	JKbssQytD7o0lY7V8O0YqaXSEm3CDm0/JUQuqcOumlN5PSJ3OudlAWD5qI0x1fvSucQVip2W6Q6
-	M3y5hNKoZ6ateE9KXiQSOIc82/Vvl2gHQ2IN0ESHIQnu8OeWqpsvNAzmzLckRQJHGvkjCQndr2b
-	k4ByDsVwVJBV7U/0CnjOJdMbIyJhq7br0Ra2P89AgFQSQ==
-X-Google-Smtp-Source: AGHT+IHLN1XcC4qoFNA2fwnUs0VOxxNCeh0+rqp1dIs2ILG4ZYpSyxCFz5Z9x+hJrPTx/BfQ3rEN3ennhyaJk7Nlv5c=
-X-Received: by 2002:a17:902:ebca:b0:23f:fa79:15d0 with SMTP id
- d9443c01a7336-2446d939290mr42172865ad.46.1755272595233; Fri, 15 Aug 2025
- 08:43:15 -0700 (PDT)
+	s=arc-20240116; t=1755272887; c=relaxed/simple;
+	bh=7J7O8B58402DZIOvOG4YVrzlmAE/IexxgXMdQIJautM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UPS8ZiFookzKzMP7UMKf+h+IqwlmTKRyuzBY+rknODtYGdCRRgU6/skgzgVLYQ44JR6kHhCfAiDlVRGEzNqJJu54tpOWfs6JJxrrC5AlKrw+5RWyaW/auZJSAYu7P/V7A/cS3ZXHY37DfTCcuiNkpKPoWJN3taDuXYBv5v2uyW8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SgIX7RTv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B20D3C4CEEB;
+	Fri, 15 Aug 2025 15:48:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755272886;
+	bh=7J7O8B58402DZIOvOG4YVrzlmAE/IexxgXMdQIJautM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SgIX7RTvZhmiYGgeJf8Xyi9SvoEvPcefxLNIy9s4Z9gG3L5ZWH79RGsHSGb+rp2PV
+	 tLBsXdREfvDfAYCiu+Tp40vAum4zf3YARXmA/6zN2iuCkaRLoOI08otWwe97Pz9f1O
+	 1Wfml97ZFvrRUUKHcRvecmvwjGF0Vu2toJionb24DxUCcxKAatt3wSPkTlmv8p4FmU
+	 SzhdChi6CfdVphvLbOETvRsHKhWDfhBLwmvO4PsnwHFWm5srZiYTh/P/6OyuF1Vgfn
+	 vxESvslwC+72+Vsa/ReF8Rjun4p9kuGhEDDlLZcFqHTK9Rh8K5kYSWz21e9OnkWBNz
+	 u1mbsVQqwUwLA==
+Date: Fri, 15 Aug 2025 16:48:00 +0100
+From: Will Deacon <will@kernel.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: syzbot <syzbot+b4d960daf7a3c7c2b7b1@syzkaller.appspotmail.com>,
+	davem@davemloft.net, edumazet@google.com, eperezma@redhat.com,
+	horms@kernel.org, jasowang@redhat.com, kuba@kernel.org,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, pabeni@redhat.com, sgarzare@redhat.com,
+	stefanha@redhat.com, syzkaller-bugs@googlegroups.com,
+	virtualization@lists.linux.dev, xuanzhuo@linux.alibaba.com
+Subject: Re: [syzbot] [kvm?] [net?] [virt?] WARNING in
+ virtio_transport_send_pkt_info
+Message-ID: <aJ9WsFovkgZM3z09@willie-the-truck>
+References: <20250812052645-mutt-send-email-mst@kernel.org>
+ <689b1156.050a0220.7f033.011c.GAE@google.com>
+ <20250812061425-mutt-send-email-mst@kernel.org>
+ <aJ8HVCbE-fIoS1U4@willie-the-truck>
+ <20250815063140-mutt-send-email-mst@kernel.org>
+ <aJ8heyq4-RtJAPyI@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <689f5129.050a0220.e29e5.0019.GAE@google.com> <b2667c4ebbe5e0da59542d2d9026322bd70c6c6a.camel@infradead.org>
-In-Reply-To: <b2667c4ebbe5e0da59542d2d9026322bd70c6c6a.camel@infradead.org>
-From: Aleksandr Nogikh <nogikh@google.com>
-Date: Fri, 15 Aug 2025 17:43:03 +0200
-X-Gm-Features: Ac12FXwZeTLz5pSIIxD3s3_BO2OVk5Y7yPGqJiF3VA6MqkLXviIJ0ppRoKfOrWU
-Message-ID: <CANp29Y7BFtp9YrgzMTJhF1rmF_xx_48zMuCwbkP978LHPazD1g@mail.gmail.com>
-Subject: Re: [syzbot ci] Re: Support "generic" CPUID timing leaf as KVM guest
- and host.
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: syzbot ci <syzbot+ci156aec4dff349a40@syzkaller.appspotmail.com>, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org, 
-	syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aJ8heyq4-RtJAPyI@willie-the-truck>
 
-On Fri, Aug 15, 2025 at 5:36=E2=80=AFPM David Woodhouse <dwmw2@infradead.or=
-g> wrote:
->
-> On Fri, 2025-08-15 at 08:24 -0700, syzbot ci wrote:
-> > syzbot ci has tested the following series
-> >
-> > [v1] Support "generic" CPUID timing leaf as KVM guest and host.
-> > https://lore.kernel.org/all/20250814120237.2469583-1-dwmw2@infradead.or=
-g
-> > * [PATCH 1/3] KVM: x86: Restore caching of KVM CPUID base
-> > * [PATCH 2/3] KVM: x86: Provide TSC frequency in "generic" timing infom=
-ation CPUID leaf
-> > * [PATCH 3/3] x86/kvm: Obtain TSC frequency from CPUID if present
-> >
-> > and found the following issue:
-> > kernel build error
-> >
-> > Full report is available here:
-> > https://ci.syzbot.org/series/a9510b1a-8024-41ce-9775-675f5c165e20
-> >
-> > ***
-> >
-> > kernel build error
-> >
-> > tree:      torvalds
-> > URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/tor=
-valds/linux
-> > base:      dfc0f6373094dd88e1eaf76c44f2ff01b65db851
-> > arch:      amd64
-> > compiler:  Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1=
-~exp1~20250616065826.132), Debian LLD 20.1.7
-> > config:    https://ci.syzbot.org/builds/590edf8b-b2a0-4cbd-a80e-35083fe=
-0988e/config
-> >
-> > arch/x86/kernel/kvm.c:899:30: error: a function declaration without a p=
-rototype is deprecated in all versions of C [-Werror,-Wstrict-prototypes]
-> >
-> > ***
->
-> #syz test:
-> git://git.infradead.org/users/dwmw2/linux.git f280e5436b3297ebb3ac282faf5=
-559139b097969
->
+On Fri, Aug 15, 2025 at 01:00:59PM +0100, Will Deacon wrote:
+> On Fri, Aug 15, 2025 at 06:44:47AM -0400, Michael S. Tsirkin wrote:
+> > On Fri, Aug 15, 2025 at 11:09:24AM +0100, Will Deacon wrote:
+> > > On Tue, Aug 12, 2025 at 06:15:46AM -0400, Michael S. Tsirkin wrote:
+> > > > On Tue, Aug 12, 2025 at 03:03:02AM -0700, syzbot wrote:
+> > > > > Hello,
+> > > > > 
+> > > > > syzbot has tested the proposed patch but the reproducer is still triggering an issue:
+> > > > > WARNING in virtio_transport_send_pkt_info
+> > > > 
+> > > > OK so the issue triggers on
+> > > > commit 6693731487a8145a9b039bc983d77edc47693855
+> > > > Author: Will Deacon <will@kernel.org>
+> > > > Date:   Thu Jul 17 10:01:16 2025 +0100
+> > > > 
+> > > >     vsock/virtio: Allocate nonlinear SKBs for handling large transmit buffers
+> > > >     
+> > > > 
+> > > > but does not trigger on:
+> > > > 
+> > > > commit 8ca76151d2c8219edea82f1925a2a25907ff6a9d
+> > > > Author: Will Deacon <will@kernel.org>
+> > > > Date:   Thu Jul 17 10:01:15 2025 +0100
+> > > > 
+> > > >     vsock/virtio: Rename virtio_vsock_skb_rx_put()
+> > > >     
+> > > > 
+> > > > 
+> > > > Will, I suspect your patch merely uncovers a latent bug
+> > > > in zero copy handling elsewhere.
+> 
+> I'm still looking at this, but I'm not sure zero-copy is the right place
+> to focus on.
+> 
+> The bisected patch 6693731487a8 ("vsock/virtio: Allocate nonlinear SKBs
+> for handling large transmit buffers") only has two hunks. The first is
+> for the non-zcopy case and the latter is a no-op for zcopy, as
+> skb_len == VIRTIO_VSOCK_SKB_HEADROOM and so we end up with a linear SKB
+> regardless.
 
-Hi David,
+It's looking like this is caused by moving from memcpy_from_msg() to
+skb_copy_datagram_from_iter(), which is necessary to handle non-linear
+SKBs correctly.
 
-(FYI) The syz test command is not supported for "syzbot ci" reports
-yet (but it's in the plans).
+In the case of failure (i.e. faulting on the source and returning
+-EFAULT), memcpy_from_msg() rewinds the message iterator whereas
+skb_copy_datagram_from_iter() does not. If we have previously managed to
+transmit some of the packet, then I think
+virtio_transport_send_pkt_info() can end up returning a positive "bytes
+written" error code and the caller will call it again. If we've advanced
+the message iterator, then this can end up with the reported warning if
+we run out of input data.
 
---=20
-Aleksandr
+As a hack (see below), I tried rewinding the iterator in the error path
+of skb_copy_datagram_from_iter() but I'm not sure whether other callers
+would be happy with that. If not, then we could save/restore the
+iterator state in virtio_transport_fill_skb() if the copy fails. Or we
+could add a variant of skb_copy_datagram_from_iter(), say
+skb_copy_datagram_from_iter_full(), which has the rewind behaviour.
+
+What do you think?
+
+Will
+
+--->8
+
+diff --git a/net/core/datagram.c b/net/core/datagram.c
+index 94cc4705e91d..62e44ab136b7 100644
+--- a/net/core/datagram.c
++++ b/net/core/datagram.c
+@@ -551,7 +551,7 @@ int skb_copy_datagram_from_iter(struct sk_buff *skb, int offset,
+ 				 int len)
+ {
+ 	int start = skb_headlen(skb);
+-	int i, copy = start - offset;
++	int i, copy = start - offset, start_off = offset;
+ 	struct sk_buff *frag_iter;
+ 
+ 	/* Copy header. */
+@@ -614,6 +614,7 @@ int skb_copy_datagram_from_iter(struct sk_buff *skb, int offset,
+ 		return 0;
+ 
+ fault:
++	iov_iter_revert(from, offset - start_off);
+ 	return -EFAULT;
+ }
+ EXPORT_SYMBOL(skb_copy_datagram_from_iter);
 
