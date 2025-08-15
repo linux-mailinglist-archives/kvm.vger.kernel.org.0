@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-54749-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54750-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D4D8B27462
-	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 02:59:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB2A2B2745C
+	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 02:59:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD55B3BF84E
-	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 00:58:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F3A371CC0502
+	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 00:59:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19D0385260;
-	Fri, 15 Aug 2025 00:57:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 530751E1E0B;
+	Fri, 15 Aug 2025 00:57:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vqPGhqsz"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="drO4Nayo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D76A8145B3F
-	for <kvm@vger.kernel.org>; Fri, 15 Aug 2025 00:57:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C015A1547E7
+	for <kvm@vger.kernel.org>; Fri, 15 Aug 2025 00:57:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755219456; cv=none; b=eQvw2vgZy0obQLdr/2/IT6mLk6jmicErqADZKDRjpQI6hP0IhWzGOfVw6qh2pePc4Cvyb/XEJw8iOHHgYwaKIECPiVTIFjssZfBXnxhGtC0Ckuz9mRDRHPaRre6SDIEknWFaHTvTpNnIjaGCewCbGaUrbTdc/Tq35ulPvWATD0g=
+	t=1755219460; cv=none; b=hVL0yj58tmC5jEp62/Cg1SY62VkCRqJeuXyNL9xtJt+uXRkbMMKAVHVtmgKFfJoeNcuGjKJZGDbDiHfYQPqL3Di4W2aGrW+DHbjFr/nGpyU0dW0mPeyYt9XC/iq7ikYODD4jLrGoNrr0+kxkX81hkhNnSwUYQoNVg1vPn0Jvys0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755219456; c=relaxed/simple;
-	bh=TXJ2X85YFocPqa+0zEr21K2R3q6PmeINWu5+zoL0tCI=;
+	s=arc-20240116; t=1755219460; c=relaxed/simple;
+	bh=j/1Lr+UronIgRZzRhuMgqCzyJ+s+Y1BrEcIfq0eFCQ8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=TuR7+5xfpGneF4Ll721Sa0iTWdu4Ztzo3UIjyPQzlTJwoSbnKkIAf3xD5iRPO3npsxQ7FmS5gShx9dmQuCru9aZKV1dPxcK1/wzo15+GVQi2E6scmXHmmE9/bccgFCgmn8qztZ6tFMkHhJeufBEBljRej95+OrHQRMT0IP2EARc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vqPGhqsz; arc=none smtp.client-ip=209.85.210.201
+	 To:Cc:Content-Type; b=YvRmBfJdWClRF1jwFkMMcrUdLtQ0H7btYSDlp9phTq9dm5yuTSkMPkCO6p17IJ2QdtUM08cqbH9nrKQzXiMrmxg0xRFc+gsrHD8/sRLLjFr/uGr+DvmKSUZdxsmlLunLpycagzIA8n7sRnVap0jCnlm708jGgVzCCiDhSEYhfCs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=drO4Nayo; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-76e2e614c60so1317730b3a.0
-        for <kvm@vger.kernel.org>; Thu, 14 Aug 2025 17:57:34 -0700 (PDT)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b47174b1ae5so1076160a12.2
+        for <kvm@vger.kernel.org>; Thu, 14 Aug 2025 17:57:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755219454; x=1755824254; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1755219456; x=1755824256; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=IsZpbkhX5MqnYq0KyZ5GB4Mk6gnPhn07/9u1mPEC7EI=;
-        b=vqPGhqszToW6NtcggnZokyjuSJQca/JdYn4DMsyRQvwZDJbZ4KUgOa4uNHh9/FAEyE
-         WZFTkSUxT8s8nv17L54bHm2bIiv1BZvLKNTvPYHu20LudehH1iGFjXXc/s0SO3j6x1nn
-         C/fWTy6sLkDK5VYWHTA8ybkgSczES8EitdLx5tS6jklDDVQOCPg8xq5goKVbIkLfoGuI
-         HHZ4/Wz2dNjM3nsu02+jj+Hckuyxyutet5GxwN77YKsBNDaI0wltNqKwBUiUJxn1mqB5
-         8+4sqCV3azDNllRHgdNXAix8gY9ZOLeP60tKZiiIkPZ/Uk8/Tn9Hg874TdLxl0zcogwF
-         9nNA==
+        bh=yn2/hQHtLRcblfHHYK8i9PorExs5KUNMzDzB5HQI7e0=;
+        b=drO4Nayo3eiKFeBnW8i0c8OW9xBwxe4t8szIpNQuoSj7DpPIU8qjwOM/Smy6uHXqTa
+         T9UBBgu3s6du9Wqt8QMwZtP2NeeiFEX9ha8XfwBIHPSOab1wjyUg+2jZ9fBlxuEHcjsj
+         +tqdS3ng1Fjw64I8HHmCJLjMJcYVfqjy6+vRvFugt6RXT2dYoaRFno+j0WVdCL1ffNDI
+         fb9iqq8szs36vemosCAQp6nWwiYtqxmPG1YXcaBknDort/c0gFV7PIbyRkf+Fm4RKJHR
+         HcUKIZR6qXITFBk/izxKjOdh6/5CjHtRxVy+ONZIW1XVws6DGumgN3PYD94jxbPkv4dr
+         C7iQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755219454; x=1755824254;
+        d=1e100.net; s=20230601; t=1755219456; x=1755824256;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=IsZpbkhX5MqnYq0KyZ5GB4Mk6gnPhn07/9u1mPEC7EI=;
-        b=aY2pDjZdFQBUH2EsnsaIGIdqGLU6uPaQtcbs4ZAO62D7wV2YXr3vsy304rIEOHdtri
-         EMNQiaZ7yJmyJAagXOtUY27dnxWtEGiJ25+FwyBqZkmXgs0FWB5L7LwScz3pyRWqHgRS
-         zCzMEEC29bG7gSy7V4GTsU8iiUvQ374hNnuuZwPrrsnQAy5qdQKM/S2MAFDj9XqvxWkh
-         WnB/KiB/qOUP9JqGe/b8Wtj4W5sh9CThcSA3qf1IiuZT+Gm5ay02c0EfINvDA4gv/xqm
-         1nQ00IHoelfE6UlkE+zfjUcxYI0W08Yz1OlF0WIpDOc8hYtZiS76Kt/5YeWWlllXrHiQ
-         Y6DA==
-X-Gm-Message-State: AOJu0YxqE7ONWpDrVVlzvR2t9qOG8ez1UlFK5M6LE9aKpdSbMqHypb2e
-	eHFo0ses+EOYVfgP/DHaqUwBZ2LK7KWY7RhzS7IaEYanHOmRRxE9fL6aRrG4SU3AdhivB+5EwNG
-	gqOvg8Q==
-X-Google-Smtp-Source: AGHT+IH+or5YDIHHNrmIsvXJ1577coTnf6xAqbqWIbdl/OyYWkW8UyDl0dwXFEHdZ0O1Uralx54l0daxwQY=
-X-Received: from pgbee14.prod.google.com ([2002:a05:6a02:458e:b0:b42:c74:a4c8])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:42a3:b0:206:a9bd:a3a3
- with SMTP id adf61e73a8af0-240d2fbf950mr418739637.24.1755219454202; Thu, 14
- Aug 2025 17:57:34 -0700 (PDT)
+        bh=yn2/hQHtLRcblfHHYK8i9PorExs5KUNMzDzB5HQI7e0=;
+        b=Rz1dgPwkr8PhsHxCXXIdg6rwkrS2EKQcAouc0AXCdT77yXKSUyKqZccngIgDRUwB5q
+         vFVUhIazRoPQb5bJMLspklsQ+8V770r/kO6XoJG1HnB+o4zqZEwtwdTAsdT4Of8V7NUV
+         9Fo/4j0dZrJxFXaS6m1CfPX50JIASFjjedbJWMTP89MXkvjo9KGJEldYg/YHgUy3VTmp
+         iZQiraS4mc2b/046x+hVTPvQPFaszfHN1h6j20otyB9HOMxDWpz1DV78QfpyE1SHkFpC
+         EetUub27laFjUFsib1sLOd+1xzLhQPa/Yg7EgJj4dYj65ZcZyeid2e0bmTHOzV4Bw2TU
+         +FAA==
+X-Gm-Message-State: AOJu0YxiMIbSaVtrvyciUMq6c0f++CerfES9JDbNn5FfS0bqwm36bejz
+	f4uQ1Ko+jz4BzOEhmi3B2ciHdRblLXnIEeWoWoMwvb2v6tD+RpP8PBzBUWtdNmiw+//mVGZQiYL
+	5zVSaqg==
+X-Google-Smtp-Source: AGHT+IFZL2tPxvArwSPUwK98zfaa8xkAH1W3s5f0rydb+BXhSEJ8YZvFix+N5zVp7GN4wzi4lQHdrQKHjGY=
+X-Received: from pglv6.prod.google.com ([2002:a63:1506:0:b0:b47:4ef:fcee])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:6d85:b0:23d:c4c6:f406
+ with SMTP id adf61e73a8af0-240d2f43f2emr449311637.43.1755219455963; Thu, 14
+ Aug 2025 17:57:35 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 14 Aug 2025 17:57:21 -0700
+Date: Thu, 14 Aug 2025 17:57:22 -0700
 In-Reply-To: <20250815005725.2386187-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,9 +75,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250815005725.2386187-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.0.rc1.163.g2494970778-goog
-Message-ID: <20250815005725.2386187-4-seanjc@google.com>
-Subject: [PATCH 6.12.y 3/7] KVM: VMX: Allow guest to set DEBUGCTL.RTM_DEBUG if
- RTM is supported
+Message-ID: <20250815005725.2386187-5-seanjc@google.com>
+Subject: [PATCH 6.12.y 4/7] KVM: VMX: Extract checking of guest's DEBUGCTL
+ into helper
 From: Sean Christopherson <seanjc@google.com>
 To: stable@vger.kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
 	Sasha Levin <sashal@kernel.org>
@@ -85,58 +85,85 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Paolo Bonzini <pbonzini@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 
-[ Upstream commit 17ec2f965344ee3fd6620bef7ef68792f4ac3af0 ]
+[ Upstream commit 8a4351ac302cd8c19729ba2636acfd0467c22ae8 ]
 
-Let the guest set DEBUGCTL.RTM_DEBUG if RTM is supported according to the
-guest CPUID model, as debug support is supposed to be available if RTM is
-supported, and there are no known downsides to letting the guest debug RTM
-aborts.
+Move VMX's logic to check DEBUGCTL values into a standalone helper so that
+the code can be used by nested VM-Enter to apply the same logic to the
+value being loaded from vmcs12.
 
-Note, there are no known bug reports related to RTM_DEBUG, the primary
-motivation is to reduce the probability of breaking existing guests when a
-future change adds a missing consistency check on vmcs12.GUEST_DEBUGCTL
-(KVM currently lets L2 run with whatever hardware supports; whoops).
+KVM needs to explicitly check vmcs12->guest_ia32_debugctl on nested
+VM-Enter, as hardware may support features that KVM does not, i.e. relying
+on hardware to detect invalid guest state will result in false negatives.
+Unfortunately, that means applying KVM's funky suppression of BTF and LBR
+to vmcs12 so as not to break existing guests.
 
-Note #2, KVM already emulates DR6.RTM, and doesn't restrict access to
-DR7.RTM.
+No functional change intended.
 
-Fixes: 83c529151ab0 ("KVM: x86: expose Intel cpu new features (HLE, RTM) to guest")
-Cc: stable@vger.kernel.org
-Link: https://lore.kernel.org/r/20250610232010.162191-5-seanjc@google.com
+Reviewed-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+Link: https://lore.kernel.org/r/20250610232010.162191-6-seanjc@google.com
+Stable-dep-of: 7d0cce6cbe71 ("KVM: VMX: Wrap all accesses to IA32_DEBUGCTL with getter/setter APIs")
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/include/asm/msr-index.h | 1 +
- arch/x86/kvm/vmx/vmx.c           | 4 ++++
- 2 files changed, 5 insertions(+)
+ arch/x86/kvm/vmx/vmx.c | 29 +++++++++++++++++------------
+ 1 file changed, 17 insertions(+), 12 deletions(-)
 
-diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
-index 7ebe76f69417..2b6e3127ef4e 100644
---- a/arch/x86/include/asm/msr-index.h
-+++ b/arch/x86/include/asm/msr-index.h
-@@ -417,6 +417,7 @@
- #define DEBUGCTLMSR_FREEZE_PERFMON_ON_PMI	(1UL << 12)
- #define DEBUGCTLMSR_FREEZE_IN_SMM_BIT	14
- #define DEBUGCTLMSR_FREEZE_IN_SMM	(1UL << DEBUGCTLMSR_FREEZE_IN_SMM_BIT)
-+#define DEBUGCTLMSR_RTM_DEBUG		BIT(15)
- 
- #define MSR_PEBS_FRONTEND		0x000003f7
- 
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index b9c7940feac6..529a10bba056 100644
+index 529a10bba056..ff61093e9af7 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -2185,6 +2185,10 @@ static u64 vmx_get_supported_debugctl(struct kvm_vcpu *vcpu, bool host_initiated
- 	    (host_initiated || intel_pmu_lbr_is_enabled(vcpu)))
- 		debugctl |= DEBUGCTLMSR_LBR | DEBUGCTLMSR_FREEZE_LBRS_ON_PMI;
- 
-+	if (boot_cpu_has(X86_FEATURE_RTM) &&
-+	    (host_initiated || guest_cpuid_has(vcpu, X86_FEATURE_RTM)))
-+		debugctl |= DEBUGCTLMSR_RTM_DEBUG;
-+
+@@ -2192,6 +2192,19 @@ static u64 vmx_get_supported_debugctl(struct kvm_vcpu *vcpu, bool host_initiated
  	return debugctl;
  }
  
++static bool vmx_is_valid_debugctl(struct kvm_vcpu *vcpu, u64 data,
++				  bool host_initiated)
++{
++	u64 invalid;
++
++	invalid = data & ~vmx_get_supported_debugctl(vcpu, host_initiated);
++	if (invalid & (DEBUGCTLMSR_BTF | DEBUGCTLMSR_LBR)) {
++		kvm_pr_unimpl_wrmsr(vcpu, MSR_IA32_DEBUGCTLMSR, data);
++		invalid &= ~(DEBUGCTLMSR_BTF | DEBUGCTLMSR_LBR);
++	}
++	return !invalid;
++}
++
+ /*
+  * Writes msr value into the appropriate "register".
+  * Returns 0 on success, non-0 otherwise.
+@@ -2260,19 +2273,12 @@ int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		}
+ 		vmcs_writel(GUEST_SYSENTER_ESP, data);
+ 		break;
+-	case MSR_IA32_DEBUGCTLMSR: {
+-		u64 invalid;
+-
+-		invalid = data & ~vmx_get_supported_debugctl(vcpu, msr_info->host_initiated);
+-		if (invalid & (DEBUGCTLMSR_BTF|DEBUGCTLMSR_LBR)) {
+-			kvm_pr_unimpl_wrmsr(vcpu, msr_index, data);
+-			data &= ~(DEBUGCTLMSR_BTF|DEBUGCTLMSR_LBR);
+-			invalid &= ~(DEBUGCTLMSR_BTF|DEBUGCTLMSR_LBR);
+-		}
+-
+-		if (invalid)
++	case MSR_IA32_DEBUGCTLMSR:
++		if (!vmx_is_valid_debugctl(vcpu, data, msr_info->host_initiated))
+ 			return 1;
+ 
++		data &= vmx_get_supported_debugctl(vcpu, msr_info->host_initiated);
++
+ 		if (is_guest_mode(vcpu) && get_vmcs12(vcpu)->vm_exit_controls &
+ 						VM_EXIT_SAVE_DEBUG_CONTROLS)
+ 			get_vmcs12(vcpu)->guest_ia32_debugctl = data;
+@@ -2282,7 +2288,6 @@ int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		    (data & DEBUGCTLMSR_LBR))
+ 			intel_pmu_create_guest_lbr_event(vcpu);
+ 		return 0;
+-	}
+ 	case MSR_IA32_BNDCFGS:
+ 		if (!kvm_mpx_supported() ||
+ 		    (!msr_info->host_initiated &&
 -- 
 2.51.0.rc1.163.g2494970778-goog
 
