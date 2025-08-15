@@ -1,113 +1,79 @@
-Return-Path: <kvm+bounces-54794-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54795-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2123B28307
-	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 17:36:37 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85F5EB2830C
+	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 17:38:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CCA87AE8453
-	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 15:36:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2DE5C7B8999
+	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 15:37:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20759304995;
-	Fri, 15 Aug 2025 15:36:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="dvNNOMCa"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88937305E0E;
+	Fri, 15 Aug 2025 15:38:25 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEA122C3240;
-	Fri, 15 Aug 2025 15:36:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEC61304988
+	for <kvm@vger.kernel.org>; Fri, 15 Aug 2025 15:38:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755272179; cv=none; b=lOIhHM6WaZ9Fyiwv5G+kraIKFIrEe++UtAhcSrIvbQJ+Dkb+XQPs6BQxuGXT+qa71utDrnfo50wpxLwEBzUS1y9+kfKBbTTGipReyvirXJ9zy0gSNn5p96JLaQc4bE8/ruoc/I38IySi2Hyu/m1vG9c3IR3n8+TtyZ2HaE9GXhA=
+	t=1755272305; cv=none; b=I85O1OfTbqGdQ6a7AEUIEWXuOONsDWWHn5nh5aZTVcFhrGWCH8LbL4RGI5eC8IrWZjwOVr9qegC+YN09Msa8kux1xvIGcwzaI3vdNGprr1YgFSn7Q4Fmkxxv+zyZvSD/x40T5NMqjWF22cjw1YzcX3ajeqG57GpHMKIrUL5YIo0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755272179; c=relaxed/simple;
-	bh=LVvtEoWl6zkJ4vXxFj1wZD+JN3DAXY3Ez5tp4hw21jw=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=cR+i1NmtNJHPTwDVzQLQErh6zfAwszeFGsNY5ZAViJ5gHV1xxqzO4VfVChCBkrz0NVqlwMEkmQwjArjkrNOiJK2xymjpZHwjPXOnRhcbd5+Hm4dmil2KvqorWQZ2LmA9NGS6J9DJCBXt6YZxHTJWztvuuQmAXnm2L43lKTc0ZI0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=dvNNOMCa; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description;
-	bh=LVvtEoWl6zkJ4vXxFj1wZD+JN3DAXY3Ez5tp4hw21jw=; b=dvNNOMCakAet0aULtF2eHCyYfF
-	qNVLQncAzyuV257dyRHzIMYwHYWvAet2cSaMNGAoqHsQ1Qck//75/HFd+5JTF0ZxlHVtKG2wD0E6x
-	JESccKEWLSGGKevGoXHbkB8QOW0e2MX5VpdxaajR8KZEowGrpRwTeJIyLoPtwbegvRM5NX8bmJtpF
-	M+mRz0BaX4DhU9tWskk0s9rkrAly/9V65IQovhNy9xeWKo92pHxo94+G4qdAxNlpkF4nmBlh7Xn6W
-	It8h72XxkkEISs6GGPtQpyJ8X2POsp5VIjMSWv31zddJ6LOFlAOU9Cpx44gvr3VM5tkn9bTRJCF4S
-	gQwzLQJQ==;
-Received: from 54-240-197-234.amazon.com ([54.240.197.234] helo=u09cd745991455d.ant.amazon.com)
-	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1umwTO-0000000ETzu-0QlL;
-	Fri, 15 Aug 2025 15:36:07 +0000
-Message-ID: <b2667c4ebbe5e0da59542d2d9026322bd70c6c6a.camel@infradead.org>
-Subject: Re: [syzbot ci] Re: Support "generic" CPUID timing leaf as KVM
- guest and host.
-From: David Woodhouse <dwmw2@infradead.org>
-To: syzbot ci <syzbot+ci156aec4dff349a40@syzkaller.appspotmail.com>, 
- ajay.kaher@broadcom.com, alexey.makhalov@broadcom.com, bp@alien8.de, 
- dave.hansen@linux.intel.com, graf@amazon.de, hpa@zytor.com,
- kvm@vger.kernel.org,  linux-kernel@vger.kernel.org, mingo@redhat.com,
- pbonzini@redhat.com,  seanjc@google.com, tglx@linutronix.de,
- vkuznets@redhat.com, x86@kernel.org
-Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
-Date: Fri, 15 Aug 2025 16:36:05 +0100
-In-Reply-To: <689f5129.050a0220.e29e5.0019.GAE@google.com>
-References: <689f5129.050a0220.e29e5.0019.GAE@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.3-0ubuntu1 
+	s=arc-20240116; t=1755272305; c=relaxed/simple;
+	bh=DjcBVY8mJqbGJnCRObWENCx0c6xRt7QNzm9li1dg71c=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=RxVKBkQo9k2BZFnv+HnU30i+TeGXm6JajvO+aF2/ozrFertzlyx67EGnaXe8eVgseuvYSH98kx3+retgiEIwtUltotLiZGiBBgPsYPZVfZ5ZFhRSAhwuH7efp0a8HF4V207wzKBo+j0yMqn5KhmPyoBOre9uAtjKeikOjeOmVqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3e56ff1b629so56440265ab.0
+        for <kvm@vger.kernel.org>; Fri, 15 Aug 2025 08:38:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755272303; x=1755877103;
+        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DjcBVY8mJqbGJnCRObWENCx0c6xRt7QNzm9li1dg71c=;
+        b=qcsYPU20R40A6LuKQzLdEI9PjMUapgJnBZ64Zw86G7aoQNHvBsLxhtjDr7EzMBkJa1
+         Tr8Yz/7jyAak1FEUmUQzkLF/yjcBAiksDBZmmnxP52lf0SmmN+DAJcpw6wP5F0uUIbD4
+         i+YFy0QpNm2xNRNmrSYQsS53Q6bfKgeLsMucu4iZ4fz0IvKi9buzV96CyfdyVOyVIRyc
+         AMWMsBcyybA7KjQxr0j52vACGOCDZeBi7JJt+j48638GwtAxtBz0+F7TjCXbAr4tabLC
+         l3C2tlxvrltgyYB2WEwf/n5G2It3xEVpJoj6ki4bitHF3Fpco1oBD+OZL4XsEP/ARg1+
+         19SA==
+X-Forwarded-Encrypted: i=1; AJvYcCVUC1e/bW8yBmgdPlW0GkHncIOKvwKSnlKM6NCkY+1dMnrGabMtyjM3fhhOKRMdVqkXPX4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzit2Y7LuO+ZjHPyLPd/prsvTJDtIhXxO/wIwzO6MOM7/C6NOrs
+	ss3RFZs4nHuXuJ7aKKZi2qqrc4+GVOt1FDMTjypyeJO7G/K7f0ieFfUZKxAruNewYHJ9mM3bm/j
+	iAJ10HPRMNCIdZzP0V45Vyzj50HHrFcZVDvrNHVIlTNKrliJmMaIOoiZuZSA=
+X-Google-Smtp-Source: AGHT+IEZCErYDJfK+PsAhXz8az/SOFKcABcXNXr0Q2bzIAiRaGBhp8DoowWmbEM2Eo7/QNOXWUZsT99JggtdxpHJX/wQX6tCGYLj
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Received: by 2002:a05:6e02:2707:b0:3e5:58ba:d9ca with SMTP id
+ e9e14a558f8ab-3e57e8252f9mr48746805ab.3.1755272302920; Fri, 15 Aug 2025
+ 08:38:22 -0700 (PDT)
+Date: Fri, 15 Aug 2025 08:38:22 -0700
+In-Reply-To: <b2667c4ebbe5e0da59542d2d9026322bd70c6c6a.camel@infradead.org>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <689f546e.050a0220.e29e5.001c.GAE@google.com>
+Subject: Re: Re: [syzbot ci] Re: Support "generic" CPUID timing leaf as KVM
+ guest and host.
+From: syzbot ci <syzbot@syzkaller.appspotmail.com>
+To: dwmw2@infradead.org
+Cc: ajay.kaher@broadcom.com, alexey.makhalov@broadcom.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, dwmw2@infradead.org, graf@amazon.de, 
+	hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	mingo@redhat.com, pbonzini@redhat.com, seanjc@google.com, 
+	syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com, tglx@linutronix.de, 
+	vkuznets@redhat.com, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 2025-08-15 at 08:24 -0700, syzbot ci wrote:
-> syzbot ci has tested the following series
->=20
-> [v1] Support "generic" CPUID timing leaf as KVM guest and host.
-> https://lore.kernel.org/all/20250814120237.2469583-1-dwmw2@infradead.org
-> * [PATCH 1/3] KVM: x86: Restore caching of KVM CPUID base
-> * [PATCH 2/3] KVM: x86: Provide TSC frequency in "generic" timing infomat=
-ion CPUID leaf
-> * [PATCH 3/3] x86/kvm: Obtain TSC frequency from CPUID if present
->=20
-> and found the following issue:
-> kernel build error
->=20
-> Full report is available here:
-> https://ci.syzbot.org/series/a9510b1a-8024-41ce-9775-675f5c165e20
->=20
-> ***
->=20
-> kernel build error
->=20
-> tree:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 torvalds
-> URL:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 https://kernel.googlesource.com/=
-pub/scm/linux/kernel/git/torvalds/linux
-> base:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 dfc0f6373094dd88e1eaf76c44f2ff01b65db=
-851
-> arch:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 amd64
-> compiler:=C2=A0 Debian clang version 20.1.7 (++20250616065708+6146a88f604=
-9-1~exp1~20250616065826.132), Debian LLD 20.1.7
-> config:=C2=A0=C2=A0=C2=A0 https://ci.syzbot.org/builds/590edf8b-b2a0-4cbd=
--a80e-35083fe0988e/config
->=20
-> arch/x86/kernel/kvm.c:899:30: error: a function declaration without a pro=
-totype is deprecated in all versions of C [-Werror,-Wstrict-prototypes]
->=20
-> ***
 
-#syz test:
-git://git.infradead.org/users/dwmw2/linux.git f280e5436b3297ebb3ac282faf555=
-9139b097969
+Unknown command
 
 
