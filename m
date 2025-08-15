@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-54706-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54707-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7884DB27368
-	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 02:13:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EF49B2736B
+	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 02:14:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7FB635E85F1
-	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 00:13:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 845C55E8586
+	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 00:14:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1013919F137;
-	Fri, 15 Aug 2025 00:12:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD9011C2335;
+	Fri, 15 Aug 2025 00:12:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zP5yQsCc"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BUZT9xXj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 823DFA935
-	for <kvm@vger.kernel.org>; Fri, 15 Aug 2025 00:12:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BDBA1922FA
+	for <kvm@vger.kernel.org>; Fri, 15 Aug 2025 00:12:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755216743; cv=none; b=VXzNu0rLhE6RDA7q4Z9mT5vi4trGmuWE+xbR6jqh/JUq/P7sxu5Bczhllh+bfnlsSdxxnr2OIkOdyvSiCnxSiz8Z6UU81sXvBCybEM0h1p3uGX0bwZ8eXeM+CP32wRJPad5pwxZbGZTBVewcJUiVXVPcyF3tuD9pQKIv5onUbPU=
+	t=1755216744; cv=none; b=e000lpyGS0vF2xR3xAVsufPNTA1zbPg54p6eCSWGi9DOTaPik++I8R8TZddP6tJfVnwzwmwtwv40Hje8bHd0B0J7e6DLHSuAjdnvJHb2ZR5cxNoRcpXTStP7KqMGUXCN1JDOfOmnwATp+/xIwygjrzioj6QOYe3gjHFmN/w2zuU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755216743; c=relaxed/simple;
-	bh=VhV9EFrTudTyrNyi+hXz4xZPaoxl5bt2eNREG6X3+KU=;
+	s=arc-20240116; t=1755216744; c=relaxed/simple;
+	bh=O2LmGYHZhZkLGwfBk2Yp1f3Rs3CptBnqxMLK4Ir6eIg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=hOgrm7oOHe3NxzL3T92pxKHQ8nlgKVkXyRLDW+qOq1amlBKUbKFeqR/Vx/1/GTPKWbk5GKNoVvbxZfBhgF+uKCu0NoPUHZ7BLo7ixUrQS/iK6h4kUnRwW8CKtS3SZ2NpMJK8D5D0b05l0JMV+PaqurvQamOG44oogVeWPFDukmY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zP5yQsCc; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=RdEsmJGIE8l7iS5Cm5CcuJVgdQ6aJJtiTg1vTzfLGO5dcJMEHOREpr6n1Jfr1Gx1yyH/Jj8xKk3Trjzaf7lPX6PvLj86WEA4tdFX6ffpzz/lf+kDyYN2Ur3HdeYz/270uj8TtsnSe9Fev0yxQS7uh/VsS4HLy3TaCoKHpHMmR84=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BUZT9xXj; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3232677ad11so1441684a91.1
-        for <kvm@vger.kernel.org>; Thu, 14 Aug 2025 17:12:21 -0700 (PDT)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-24457f4f3ecso15734965ad.0
+        for <kvm@vger.kernel.org>; Thu, 14 Aug 2025 17:12:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755216741; x=1755821541; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1755216742; x=1755821542; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=IwosmCXhK1vj9BTxghsFWvBqb4znPc+loO6bF0vRg/w=;
-        b=zP5yQsCcy5QpL2kFvKjhxF2peyA3+u4o0TlE6elSG9Ivsg3bBJdnvJ9Y6jBYpmSYgn
-         mr/drTREDgzrzZ3k+moyZMe7c2lexPaQxVUSvXEbwJe9XBPa3D/PFDSlHpvRvhMvi+NJ
-         0oSws3wpOReY9JsC+BpAMDvbEeiHD21IPSAjhuPoH3nRBKvJi7jULHYsW3eHJHACdNd7
-         XyKki0La52diHF9vDvZBqWsCgSa70F7LBiMzei4bB9/4ygQXGWPJhlfkxjU8U2LwfxlM
-         7OGAYfBIPHkeG16T5e54deb6zbKWgakdMIcXHC2+2/05dCB1KfkXfVmZ1o0A4kO/9WSN
-         wgsw==
+        bh=pXQWA5FLczzcFgAGgva/tQ0VYzpmUU3vq4Bm8GhyjFA=;
+        b=BUZT9xXjxbtNoMsY1W1el/OZHt/eLhsCx+Bmkg9/s71XRz3jI0McbmKGSxgQevDhe7
+         v31d4LoDYWYiWdOvsO4QIuUN7fZXAmp9Sa80BOB1qUzzDca2w34MVVBFGd3LXDAVrqsY
+         BHDg2hDAPQCjZ2+Eg0n98WpzcR7EBEkHLPYke8itjCU9g9RNtmcIy4gUdb3bWIHHL3xH
+         jWflMO5QbkqFTvc00plobFmeJVENrVckBs2t8x4rKxy1jJhY7iUd0ovu8WSrPvdzy5ql
+         tql2fDiz9CMgWyEHwYz+1Z1XntgqnvVDIefXqe8hqEsswy4Pt8Hs5rT2tCTzyH4CyLHf
+         pOCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755216741; x=1755821541;
+        d=1e100.net; s=20230601; t=1755216742; x=1755821542;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=IwosmCXhK1vj9BTxghsFWvBqb4znPc+loO6bF0vRg/w=;
-        b=FiMYko8IJ4RnR+t1KGsIi++rSdbjd9Dxe3Wso8TVLLlrXcXkmN3QoErzslnFpS0Ysv
-         xDCGfO2g2nN30vtpKEy9g7WrsNaVeeEPNyFNIru1f9CzUBiBsDVHgnorIIOd80uDbe+l
-         /L5672UqYyyd3cF38IOcbQyKpHh5o4fZNM9EMayss05MGiIgWyhaHBNMsZNAp5w4dcG5
-         tKaHzzB4Q8d/NxSAP+DiGMkBY1ESRLIgA+9sRS4oZFZmsEb5JiMwGVirlszVNFPhjPSg
-         CETLM9qDxibDjXMY0A2hjKJWaIHVfWRMrieWDygEPgbAUAD8/ySKO0YNtXB+9Z+1cszG
-         6Fzg==
-X-Gm-Message-State: AOJu0YwKF4cVv7v8/ndvX03ujDcxsU4tEXrTl+jgb9R6h8DZ5yIfvupg
-	wJNC5vrKIAAE4YjWOYEQG29lJGvO1ng5HKUD7abYtuQY7Un+99A7+VqMLh6YWzvY4w4pXH9mNmB
-	eyzxeWQ==
-X-Google-Smtp-Source: AGHT+IGO/jPS6jdJmEtvnGY3PxwPeRyl+ObkL45xgwHrNfQdLHZ7iDlH5jvrHyrHHvz2++/SRO0Y4P+AtJ8=
-X-Received: from pjbpq1.prod.google.com ([2002:a17:90b:3d81:b0:31f:1ed:c76e])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:dfcd:b0:312:1ae9:1525
- with SMTP id 98e67ed59e1d1-32341e17c8cmr356019a91.8.1755216740828; Thu, 14
- Aug 2025 17:12:20 -0700 (PDT)
+        bh=pXQWA5FLczzcFgAGgva/tQ0VYzpmUU3vq4Bm8GhyjFA=;
+        b=L5/bXw3KaDg4vf+8Ltdki8h82fyExmBLmFVacJxUm9qk0Xt8OLc1llKZan99Eq5Ebn
+         5Cd9LhQ5cSPjTEwc+N1VjYugCa4KOWlKy0UAvI5mfzU2LVXcyEHJrKTb4RATtqZqMYUe
+         yOyrcD03A9yFQrT5e6Wcld2pi7tOLi19d/QYoR9/KAAYkJF58dTk0Mm0ZVQ1F2YqQq0y
+         7PAbqfxbfPCiMN7K7hqhOxQCeJA5J98VVcvThpurAfzvK9kyyAStoYb4VrMBhNr2uP2J
+         4T9El/KNK1jU5uBRyTFXI7x9Q6BFRzgDOiQ4c4MDxHlxMMnCR66e9qpuZvclsbjXKrcg
+         mcxg==
+X-Gm-Message-State: AOJu0YxQohtITriSbbD2UmnY4BMdUcWaWUKpdGEhBaHZAbz2lY2b5qYm
+	5CxUWSW6xDDTyXogkQdDnb+PgcnW+CFsdELzQFemWoEk2CPxcccYpciU2NOXbhTEZAyCvBRea5g
+	+ecf1EQ==
+X-Google-Smtp-Source: AGHT+IEpd6403VG8BvXCtL5Wm0bfYaHW/IiE3Ya7RRt9tZra7RgrQ/Ti92XyDRtdQNwdGxQoM3swrEunIu8=
+X-Received: from pjuj12.prod.google.com ([2002:a17:90a:d00c:b0:314:29b4:453])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:dac1:b0:240:3db8:9adc
+ with SMTP id d9443c01a7336-2446d5ac887mr1825575ad.4.1755216742609; Thu, 14
+ Aug 2025 17:12:22 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 14 Aug 2025 17:11:49 -0700
+Date: Thu, 14 Aug 2025 17:11:50 -0700
 In-Reply-To: <20250815001205.2370711-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,9 +75,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250815001205.2370711-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.0.rc1.163.g2494970778-goog
-Message-ID: <20250815001205.2370711-6-seanjc@google.com>
-Subject: [PATCH 6.1.y 05/21] KVM: x86: Take irqfds.lock when adding/deleting
- IRQ bypass producer
+Message-ID: <20250815001205.2370711-7-seanjc@google.com>
+Subject: [PATCH 6.1.y 06/21] KVM: x86: Snapshot the host's DEBUGCTL in common x86
 From: Sean Christopherson <seanjc@google.com>
 To: stable@vger.kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
 	Sasha Levin <sashal@kernel.org>
@@ -85,82 +84,95 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Paolo Bonzini <pbonzini@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 
-[ Upstream commit f1fb088d9cecde5c3066d8ff8846789667519b7d ]
+[ Upstream commit fb71c795935652fa20eaf9517ca9547f5af99a76 ]
 
-Take irqfds.lock when adding/deleting an IRQ bypass producer to ensure
-irqfd->producer isn't modified while kvm_irq_routing_update() is running.
-The only lock held when a producer is added/removed is irqbypass's mutex.
+Move KVM's snapshot of DEBUGCTL to kvm_vcpu_arch and take the snapshot in
+common x86, so that SVM can also use the snapshot.
 
-Fixes: 872768800652 ("KVM: x86: select IRQ_BYPASS_MANAGER")
+Opportunistically change the field to a u64.  While bits 63:32 are reserved
+on AMD, not mentioned at all in Intel's SDM, and managed as an "unsigned
+long" by the kernel, DEBUGCTL is an MSR and therefore a 64-bit value.
+
+Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
 Cc: stable@vger.kernel.org
+Reviewed-and-tested-by: Ravi Bangoria <ravi.bangoria@amd.com>
+Link: https://lore.kernel.org/r/20250227222411.3490595-4-seanjc@google.com
 Signed-off-by: Sean Christopherson <seanjc@google.com>
-Message-ID: <20250404193923.1413163-5-seanjc@google.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-[sean: account for lack of kvm_x86_call()]
+[sean: resolve minor syntatic conflict in vmx_vcpu_load()]
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/x86.c | 19 ++++++++++++++++---
- 1 file changed, 16 insertions(+), 3 deletions(-)
+ arch/x86/include/asm/kvm_host.h | 1 +
+ arch/x86/kvm/vmx/vmx.c          | 8 ++------
+ arch/x86/kvm/vmx/vmx.h          | 2 --
+ arch/x86/kvm/x86.c              | 1 +
+ 4 files changed, 4 insertions(+), 8 deletions(-)
 
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 6db42ee82032..555c7bf35e28 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -677,6 +677,7 @@ struct kvm_vcpu_arch {
+ 	u32 pkru;
+ 	u32 hflags;
+ 	u64 efer;
++	u64 host_debugctl;
+ 	u64 apic_base;
+ 	struct kvm_lapic *apic;    /* kernel irqchip context */
+ 	bool load_eoi_exitmap_pending;
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 7b87fbc69b21..c24da2cff208 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -1418,13 +1418,9 @@ void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu,
+  */
+ static void vmx_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ {
+-	struct vcpu_vmx *vmx = to_vmx(vcpu);
+-
+ 	vmx_vcpu_load_vmcs(vcpu, cpu, NULL);
+ 
+ 	vmx_vcpu_pi_load(vcpu, cpu);
+-
+-	vmx->host_debugctlmsr = get_debugctlmsr();
+ }
+ 
+ static void vmx_vcpu_put(struct kvm_vcpu *vcpu)
+@@ -7275,8 +7271,8 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
+ 	}
+ 
+ 	/* MSR_IA32_DEBUGCTLMSR is zeroed on vmexit. Restore it if needed */
+-	if (vmx->host_debugctlmsr)
+-		update_debugctlmsr(vmx->host_debugctlmsr);
++	if (vcpu->arch.host_debugctl)
++		update_debugctlmsr(vcpu->arch.host_debugctl);
+ 
+ #ifndef CONFIG_X86_64
+ 	/*
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index 8b4b149bd9c1..357819872d80 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -352,8 +352,6 @@ struct vcpu_vmx {
+ 	/* apic deadline value in host tsc */
+ 	u64 hv_deadline_tsc;
+ 
+-	unsigned long host_debugctlmsr;
+-
+ 	/*
+ 	 * Only bits masked by msr_ia32_feature_control_valid_bits can be set in
+ 	 * msr_ia32_feature_control. FEAT_CTL_LOCKED is always included
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index a6dc8f662fa4..08c4ad276ccb 100644
+index 08c4ad276ccb..2178f6bb8e90 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -13385,16 +13385,22 @@ int kvm_arch_irq_bypass_add_producer(struct irq_bypass_consumer *cons,
- {
- 	struct kvm_kernel_irqfd *irqfd =
- 		container_of(cons, struct kvm_kernel_irqfd, consumer);
-+	struct kvm *kvm = irqfd->kvm;
- 	int ret;
+@@ -4742,6 +4742,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
  
--	irqfd->producer = prod;
- 	kvm_arch_start_assignment(irqfd->kvm);
-+
-+	spin_lock_irq(&kvm->irqfds.lock);
-+	irqfd->producer = prod;
-+
- 	ret = static_call(kvm_x86_pi_update_irte)(irqfd->kvm,
- 					 prod->irq, irqfd->gsi, 1);
--
- 	if (ret)
- 		kvm_arch_end_assignment(irqfd->kvm);
+ 	/* Save host pkru register if supported */
+ 	vcpu->arch.host_pkru = read_pkru();
++	vcpu->arch.host_debugctl = get_debugctlmsr();
  
-+	spin_unlock_irq(&kvm->irqfds.lock);
-+
-+
- 	return ret;
- }
- 
-@@ -13404,9 +13410,9 @@ void kvm_arch_irq_bypass_del_producer(struct irq_bypass_consumer *cons,
- 	int ret;
- 	struct kvm_kernel_irqfd *irqfd =
- 		container_of(cons, struct kvm_kernel_irqfd, consumer);
-+	struct kvm *kvm = irqfd->kvm;
- 
- 	WARN_ON(irqfd->producer != prod);
--	irqfd->producer = NULL;
- 
- 	/*
- 	 * When producer of consumer is unregistered, we change back to
-@@ -13414,11 +13420,18 @@ void kvm_arch_irq_bypass_del_producer(struct irq_bypass_consumer *cons,
- 	 * when the irq is masked/disabled or the consumer side (KVM
- 	 * int this case doesn't want to receive the interrupts.
- 	*/
-+	spin_lock_irq(&kvm->irqfds.lock);
-+	irqfd->producer = NULL;
-+
-+
- 	ret = static_call(kvm_x86_pi_update_irte)(irqfd->kvm, prod->irq, irqfd->gsi, 0);
- 	if (ret)
- 		printk(KERN_INFO "irq bypass consumer (token %p) unregistration"
- 		       " fails: %d\n", irqfd->consumer.token, ret);
- 
-+	spin_unlock_irq(&kvm->irqfds.lock);
-+
-+
- 	kvm_arch_end_assignment(irqfd->kvm);
- }
- 
+ 	/* Apply any externally detected TSC adjustments (due to suspend) */
+ 	if (unlikely(vcpu->arch.tsc_offset_adjustment)) {
 -- 
 2.51.0.rc1.163.g2494970778-goog
 
