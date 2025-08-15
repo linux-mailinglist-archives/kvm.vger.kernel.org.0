@@ -1,131 +1,167 @@
-Return-Path: <kvm+bounces-54724-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54725-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51AE7B273B6
-	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 02:22:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FAC6B273BE
+	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 02:25:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 47FBE188CD43
-	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 00:21:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 495EC17471B
+	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 00:25:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2D1772602;
-	Fri, 15 Aug 2025 00:20:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3824D282EB;
+	Fri, 15 Aug 2025 00:25:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jy0G7w/i"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3ahrOL6o"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABB6B3770B;
-	Fri, 15 Aug 2025 00:20:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF68DA926
+	for <kvm@vger.kernel.org>; Fri, 15 Aug 2025 00:25:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755217242; cv=none; b=l/9sgF545hA5bBSSPQ/BCd1O0vhMnK/hTc/pPgSMpyjLtO6LjiT/566x9kG+WooT1DzunptJqmwyXmtHiM5ODopJQjQbiKkkXU5xlJ0DdN2BR93LtZl54z4EZWRIxlbntz4Nl9V9NirDco9ZeschdxHqzP2/TunbDb4bzm8a3x0=
+	t=1755217546; cv=none; b=Q0PFsGk+S5nTaE3sF3qAFJJue9DHqkTttqnDnpUZwblDiT4sGQ73IRT7CLCuWfgklnUUEz9lz/J3LGSfqw2jBG5tdxLMwoZYjYIoYBuxeCrAWj23IUAIJaBh0Lr3c1fdF8Wxbvk1hG4eJpSGFcm7fJW9XPGkdy39aJeCTKtzNbw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755217242; c=relaxed/simple;
-	bh=hFs0cLWyxqAwZK34s7vXW7yh2tJtIViqqYlP5dO38Js=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Piuq9MDjAHkdIPK0JWIFEqeY0cB9YW27d9vC6ajXT9ljhYZx194GTfLjUVSAGTNvDORIML/FJwaalGH8VMdA6a+cCMTPbLMZl6Os7/dYZDLvfmyiUPlP2VjDjdODELrHV44fGdC52roT1EFJ+5hIIEXojttf5tcp06tMtTICwXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jy0G7w/i; arc=none smtp.client-ip=209.85.215.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-b4717390ad7so1102321a12.1;
-        Thu, 14 Aug 2025 17:20:39 -0700 (PDT)
+	s=arc-20240116; t=1755217546; c=relaxed/simple;
+	bh=JKI720vt7QEil30Jfj6xnkXSugJaBGfS5qsvBzopfBs=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=LFLFnWUrGj3pSm3YgVqj0svYU3D1+tEg5UrWXp2axta1oy8vBVMHX+ilWemX0cxe8nI7zDHuMTn8tCi59hLZWkZiwisZy0fxr2r3rjrX+Eef/HHjP1xMkT9SotUQw3nC+5lyn/DI9cDwXWNhIwXeK1ncvs6yoTVukoKCJaO/+rU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3ahrOL6o; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-24457efb475so17442225ad.0
+        for <kvm@vger.kernel.org>; Thu, 14 Aug 2025 17:25:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755217238; x=1755822038; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yLbE6JCY9Ni1brmHRZ4l8BhTOmOqCVNI+jbKD72cn6c=;
-        b=jy0G7w/iwG71qhEkeSz4b8P+mXOsyFA4UJcH+vGOyza73PGG53EZC1iEcz7i1XyTSh
-         Zu68lQNt2jaDgotUqSygzcrNHf16hvfB8CoCF42lQntTv//LQxd/05lrS9iVJlo36FDI
-         oDwmLzSHfOYIJDY4V73E/3dP67YSJJXgCRHnokx7QjbxzL5S9a3gsewvCHqA25qO7+7L
-         LN/SozdFLGckZH3w4+Sf0zzvKvenJEVDHqulQQOVtL2PNvM8xIarMZv2G076c2qR/8d/
-         rlFbwY24Z3UReLmc3xYvqo2qrfNLeW4hUjfbsvp1KykWeVIm7AV1E2LdjPc8JirJvZY9
-         h/hg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755217238; x=1755822038;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=google.com; s=20230601; t=1755217544; x=1755822344; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=yLbE6JCY9Ni1brmHRZ4l8BhTOmOqCVNI+jbKD72cn6c=;
-        b=hKmjljmW7Mr09s/ke2D+a5lBFO0/gW3LPMaImJ6AsIGEXTA54zyS4L2OF3J46C+e3Y
-         n+MZV4cJd9l/B2WZmZOdjjIqOGWp6epakwKYSQeBMWtRreLS7Nsv9IB0qlQBqXQaVnCt
-         Mqu7sSU9EF0DH4uLZBxlP5pbQjMwOajwNLMQsbKtcSqXwOkVWoW84mLeQCdyYrMqkBl5
-         AIIM+jN6ugOaNmJqLrmGTneRkLHFQ/NHq+22T87JJGzCjKin7uS8jn5SDUIYRgaro0xY
-         GFUQ/eGiQZw9fsS0heh1SUNNoJ7uwDM8skIq/VYB3InV0GRf/GsLhMJ99OdxOED+tiUV
-         C0Jw==
-X-Forwarded-Encrypted: i=1; AJvYcCWXyaRi2tbGXw2kPp1vKTOHf2Uvt/hNjSUHuMFSzwo4MizZdYg6OC3Wx1ItfoxrveAuBE0=@vger.kernel.org, AJvYcCXY9wxzhJq+sG0Fiz1JXFiFeQNyWpsqAEyigeSwjbpsAkv3ApTJkj46wiJScSgXtlN8/oZlNYIsPYd6r7md@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxtv9E6EtwCEiki0AxMRtqJCXyuKAIH+esUxjh1wP/h9OfJnIgY
-	ohHcMLg226ga4uak/Bu+Bb9b6DVhmNwYejZt7J4RkAgyN6PYRaLsLUYlq2eEpMAx55g=
-X-Gm-Gg: ASbGncuwtkiMv0bRboRI+1JOI2Is+LGPw+DUkUrSeoBnsmfSIDSPo7umNvg3WvbCY+2
-	LLOGWy8SPubIJLwGBSqnzV851P7xM4v/oP09e64ny9wQ9fqVHmg6ZF7CabeLbkMK8F81eHCwnWx
-	dEEDNHoAqqkqTtGbfpaYkOBDjQMCn7VxTI5q7FlSqU3bfFFBDSsBryoUA/78JkBy6AyOSJ2Xyvo
-	WzCJ2DFCXq1GJaZOO1MgIL5eTpCMYhaIqsql6P2UsfLzw7XrCl2Xf2ytOmCrSO2fVmD7rvTzE8N
-	xv5aeSZB7BkDiYSaXiWAl10HVhEN3zVh6sGZv9JV0L0oCh/8+aqtvQxj2lreeVmih/Vw3s3ICpS
-	tJcE2VeTbVfVlCO3CBp+CSuE7k3qLBhI=
-X-Google-Smtp-Source: AGHT+IHImhF7ByRjCismIkKBnfVsotaqnqH+AYXv4duGZMCsez4RBkt7nElgUuAdHYzKpI7YQbWz6g==
-X-Received: by 2002:a17:903:2285:b0:240:49bf:6332 with SMTP id d9443c01a7336-2446d939889mr1456305ad.47.1755217238323;
-        Thu, 14 Aug 2025 17:20:38 -0700 (PDT)
-Received: from soham-laptop.. ([103.182.158.111])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2446d5a451esm700745ad.165.2025.08.14.17.20.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Aug 2025 17:20:37 -0700 (PDT)
-From: Soham Metha <sohammetha01@gmail.com>
-To: linux-kselftest@vger.kernel.org
-Cc: shuah@kernel.org,
-	skhan@linuxfoundation.org,
-	linux-kernel-mentees@lists.linuxfoundation.org,
-	linux-kernel@vger.kernel.org,
-	Soham Metha <sohammetha01@gmail.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	David Hildenbrand <david@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	kvm@vger.kernel.org
-Subject: [PATCH 5/6] selftests: kvm: s390: fixed spelling mistake in output
-Date: Fri, 15 Aug 2025 05:48:02 +0530
-Message-Id: <20250815001803.112924-4-sohammetha01@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250815001803.112924-1-sohammetha01@gmail.com>
-References: <20250815000859.112169-1-sohammetha01@gmail.com>
- <20250815001803.112924-1-sohammetha01@gmail.com>
+        bh=WZJJF6wTF+BZ7erSZwQoxWh2GZlvEJtjYuPdirsln1Y=;
+        b=3ahrOL6otjAnYf3vv6cV9OXiqQTOm/HrUrmsEAdf9qCK9IgDjp0KOaRTAQtbi/1Zqv
+         FjKtd0y4tPtqy4JHk8/05bhCmGdxVQBYAnO0dDuqxpGSjnR2G8/WMgUtTqnh2nuC9iJC
+         tbjrvTRcmkx2yFIruh+7D4Vj+9uuu5HEbyJqugNq3Y4uz1mkegjCGu+rxz536k9nw25u
+         ft8ksVK6+3OARYZwtSKFSRLfQOJ/SieUeBGh5ywAl3xLii0RUZ+xLImdW6mgs3CnwJyU
+         g+bkyDmIrVOLXkVGsvEEBOSFeynAhOfP402oImajyxPKkBInsd3KWJXRXXpDlw9cFQ4E
+         cHlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755217544; x=1755822344;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WZJJF6wTF+BZ7erSZwQoxWh2GZlvEJtjYuPdirsln1Y=;
+        b=riHLv7TLBDLvdbppdssSVprjGwsRA/tB3wkYOZxSQe8pgwLlZOwqijcKtooSE8xNT3
+         l3RsPDxqGpSYuizNzq815kJ+WhhILafsGkSo7FTb+Tah04MqSU3MjQSY1x6aa8OKnrZw
+         SsNnPV0OYZeTclfH74mUQDBPwCE014DKijlMFcEGyXMwKRLtsyq0zjfu7WFL7+kx3f7D
+         rwwevTkV0eR/uzZYRPgCt2EITu2f12vIlIFhHEI5uua1kQV0Lg6rylNlq+ZuSkm3+gWI
+         BKsvmWf4/f4Z/d7R6pCj8irOQ1OzwRjsJ2LinR/hE+aVWBO7FmY4/itbNXY+CF+fc2K+
+         kUMg==
+X-Gm-Message-State: AOJu0YwvmEEtlHiJvMv1XVBWv4pz1qKdHEgnyNJJnt0ciLZyTLkG7fmG
+	+nAiIjU2JMX1RVoV+yEdjqDasp14O73UD95eytehlPdiVzjBaNNxdK3J9Q939ycO5y8uIV/yH1P
+	35/05ZA==
+X-Google-Smtp-Source: AGHT+IGnXGGMRhOfG2atnAVCAAEYr2mCt7hhg4jO3kMfdxsXlK8f1c0VzuyQn6W5n2cG3fj5Bn5EGFZtl8E=
+X-Received: from plwp11.prod.google.com ([2002:a17:903:248b:b0:244:661d:4a19])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:1aac:b0:240:cd3e:d860
+ with SMTP id d9443c01a7336-2446d927d92mr1841645ad.41.1755217544123; Thu, 14
+ Aug 2025 17:25:44 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Thu, 14 Aug 2025 17:25:20 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.rc1.163.g2494970778-goog
+Message-ID: <20250815002540.2375664-1-seanjc@google.com>
+Subject: [PATCH 6.6.y 00/20] KVM: x86: Backports for 6.6.y
+From: Sean Christopherson <seanjc@google.com>
+To: stable@vger.kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	Sasha Levin <sashal@kernel.org>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 
-found/fixed the following typo
+Same spiel as the 6.1.y collection...
 
-- avaialable -> available
+This is a collection of backports for patches that were Cc'd to stable,
+but failed to apply, along with their dependencies.
 
-in `tools/testing/selftests/kvm/s390/cpumodel_subfuncs_test.c`
+Note, Sasha already posted[1][2] these (and I acked them):
 
-Signed-off-by: Soham Metha <sohammetha01@gmail.com>
----
- tools/testing/selftests/kvm/s390/cpumodel_subfuncs_test.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+  KVM: VMX: Allow guest to set DEBUGCTL.RTM_DEBUG if RTM is supported
+  KVM: x86/pmu: Gate all "unimplemented MSR" prints on report_ignored_msrs
+  KVM: VMX: Extract checking of guest's DEBUGCTL into helper
+  KVM: nVMX: Check vmcs12->guest_ia32_debugctl on nested VM-Enter
+  KVM: VMX: Wrap all accesses to IA32_DEBUGCTL with getter/setter APIs
 
-diff --git a/tools/testing/selftests/kvm/s390/cpumodel_subfuncs_test.c b/tools/testing/selftests/kvm/s390/cpumodel_subfuncs_test.c
-index 27255880dabd..aded795d42be 100644
---- a/tools/testing/selftests/kvm/s390/cpumodel_subfuncs_test.c
-+++ b/tools/testing/selftests/kvm/s390/cpumodel_subfuncs_test.c
-@@ -291,7 +291,7 @@ int main(int argc, char *argv[])
- 			ksft_test_result_pass("%s\n", testlist[idx].subfunc_name);
- 			free(array);
- 		} else {
--			ksft_test_result_skip("%s feature is not avaialable\n",
-+			ksft_test_result_skip("%s feature is not available\n",
- 					      testlist[idx].subfunc_name);
- 		}
- 	}
+I'm including them here to hopefully make life easier for y'all, and because
+the order they are presented here is the preferred ordering, i.e. should be
+the same ordering as the original upstream patches.
+
+But, if you end up grabbing Sasha's patches first, it's not a big deal as the
+only true dependencies is that the DEBUGCTL.RTM_DEBUG patch needs to land
+before "Check vmcs12->guest_ia32_debugctl on nested VM-Enter".
+
+Many of the patches to get to the last patch (the DEBUGCTLMSR_FREEZE_IN_SMM
+fix) are dependencies that arguably shouldn't be backported to LTS kernels.
+I opted to do the backports because none of the patches are scary (if it was
+1-3 dependency patches instead of 8 I wouldn't hesitate), and there's a decent
+chance they'll be dependencies for future fixes.
+
+[1] https://lore.kernel.org/all/20250813183728.2070321-1-sashal@kernel.org
+[2] https://lore.kernel.org/all/20250814131146.2093579-1-sashal@kernel.org
+
+Chao Gao (1):
+  KVM: nVMX: Defer SVI update to vmcs01 on EOI when L2 is active w/o VID
+
+Manuel Andreas (1):
+  KVM: x86/hyper-v: Skip non-canonical addresses during PV TLB flush
+
+Maxim Levitsky (3):
+  KVM: nVMX: Check vmcs12->guest_ia32_debugctl on nested VM-Enter
+  KVM: VMX: Wrap all accesses to IA32_DEBUGCTL with getter/setter APIs
+  KVM: VMX: Preserve host's DEBUGCTLMSR_FREEZE_IN_SMM while running the
+    guest
+
+Sean Christopherson (15):
+  KVM: SVM: Set RFLAGS.IF=1 in C code, to get VMRUN out of the STI
+    shadow
+  KVM: x86: Plumb in the vCPU to kvm_x86_ops.hwapic_isr_update()
+  KVM: x86: Take irqfds.lock when adding/deleting IRQ bypass producer
+  KVM: x86: Snapshot the host's DEBUGCTL in common x86
+  KVM: x86: Snapshot the host's DEBUGCTL after disabling IRQs
+  KVM: x86: Plumb "force_immediate_exit" into kvm_entry() tracepoint
+  KVM: VMX: Re-enter guest in fastpath for "spurious" preemption timer
+    exits
+  KVM: VMX: Handle forced exit due to preemption timer in fastpath
+  KVM: x86: Move handling of is_guest_mode() into fastpath exit handlers
+  KVM: VMX: Handle KVM-induced preemption timer exits in fastpath for L2
+  KVM: x86: Fully defer to vendor code to decide how to force immediate
+    exit
+  KVM: x86: Convert vcpu_run()'s immediate exit param into a generic
+    bitmap
+  KVM: x86: Drop kvm_x86_ops.set_dr6() in favor of a new KVM_RUN flag
+  KVM: VMX: Allow guest to set DEBUGCTL.RTM_DEBUG if RTM is supported
+  KVM: VMX: Extract checking of guest's DEBUGCTL into helper
+
+ arch/x86/include/asm/kvm-x86-ops.h |   2 -
+ arch/x86/include/asm/kvm_host.h    |  22 ++--
+ arch/x86/include/asm/msr-index.h   |   1 +
+ arch/x86/kvm/hyperv.c              |   3 +
+ arch/x86/kvm/lapic.c               |  19 +++-
+ arch/x86/kvm/lapic.h               |   1 +
+ arch/x86/kvm/svm/svm.c             |  42 +++++---
+ arch/x86/kvm/svm/vmenter.S         |   9 +-
+ arch/x86/kvm/trace.h               |   9 +-
+ arch/x86/kvm/vmx/nested.c          |  26 ++++-
+ arch/x86/kvm/vmx/pmu_intel.c       |   8 +-
+ arch/x86/kvm/vmx/vmx.c             | 164 +++++++++++++++++++----------
+ arch/x86/kvm/vmx/vmx.h             |  31 +++++-
+ arch/x86/kvm/x86.c                 |  46 +++++---
+ 14 files changed, 265 insertions(+), 118 deletions(-)
+
+
+base-commit: 3a8ababb8b6a0ced2be230b60b6e3ddbd8d67014
 -- 
-2.34.1
+2.51.0.rc1.163.g2494970778-goog
 
 
