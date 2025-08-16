@@ -1,318 +1,254 @@
-Return-Path: <kvm+bounces-54824-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54825-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93CBCB2894B
-	for <lists+kvm@lfdr.de>; Sat, 16 Aug 2025 02:32:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9DE1B289BC
+	for <lists+kvm@lfdr.de>; Sat, 16 Aug 2025 03:57:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66DECAA1E6F
-	for <lists+kvm@lfdr.de>; Sat, 16 Aug 2025 00:32:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 29109581973
+	for <lists+kvm@lfdr.de>; Sat, 16 Aug 2025 01:57:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22CEB1EEE0;
-	Sat, 16 Aug 2025 00:32:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85A7E199949;
+	Sat, 16 Aug 2025 01:56:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Qeb6BqjE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DH29Qz3M"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C73CF171C9;
-	Sat, 16 Aug 2025 00:32:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.15
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755304363; cv=fail; b=kARoIJ/gaGj8+bPVwuJ5QnH33DKhPmpAPNIVxkItViwrCA4Y8KL8DaA9wTtJg1rvmN7W6YPYQsrkSEw9TAZJQ7Vc2TU1Iz82TcQQBcynAbIlf4MC4MsH8KLuOeENaw4jS9MU8/z2hmZyq6KbIOS61Bh7u/AIUhKwc5uBPK7BUqU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755304363; c=relaxed/simple;
-	bh=1ZBIu+WDDFQ3+jvNFXyzLMcMWxj0GtyG/ggiuOHD+UQ=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=kpUZqv9Mqwh7xEoVRCDuGts/zTreeYtxrT15qR1wL9vM8jfPzGh4vgKAZXly2WboLS6exnXP2C3fGYhCkNVZq00vtkCzP1sSxgvrCRUE03BfjMQNM/3qEmfzo5QZGZh2WP1klXe10r6MT02IOugPoF6g7F8cCzIN9DHwT75AcnI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Qeb6BqjE; arc=fail smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1755304362; x=1786840362;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=1ZBIu+WDDFQ3+jvNFXyzLMcMWxj0GtyG/ggiuOHD+UQ=;
-  b=Qeb6BqjELhG8pViwpurJJOaRDyMYdze8MnftvPJ68ST2FhDHIt6lh2Ve
-   v7G3YL6ID1RtE5mU7ZQcAvPRmEm+k0TpjLNYt5V2Islj1lq759cVWl4JZ
-   08fYdq7Aq4bjItaGbwGgMX1Ws6upRWu3k4tFoYP4aGeoZICRhb1r6m2Y9
-   pB6wWIxFuQChN2AdHnLiN8cyGVwMq7p6CVHjdT41lPZIRdv0mC37PUcha
-   XUIjhL0kbbanJgEVoPS4DvkXBh4x9YUmvy/4jg58H+wp+CtXASvGaD8jt
-   LOk9H0ioqjfQq+JHG0AV/LD9KymWMDDMsXwZQNFeDddso8zy3B7q4E66D
-   A==;
-X-CSE-ConnectionGUID: 34GE18UvRoCJAJ661Lbxyw==
-X-CSE-MsgGUID: ODqHX3+gRyGLmTijs1ryGA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11523"; a="61257479"
-X-IronPort-AV: E=Sophos;i="6.17,293,1747724400"; 
-   d="scan'208";a="61257479"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Aug 2025 17:32:42 -0700
-X-CSE-ConnectionGUID: Jvr5t9KURCGY0alCGUTCVQ==
-X-CSE-MsgGUID: K6SshI9RQTGMI2RQnScd2w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,293,1747724400"; 
-   d="scan'208";a="171250498"
-Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
-  by fmviesa003.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Aug 2025 17:32:41 -0700
-Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
- fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Fri, 15 Aug 2025 17:32:40 -0700
-Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
- FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17 via Frontend Transport; Fri, 15 Aug 2025 17:32:40 -0700
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (40.107.236.53)
- by edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Fri, 15 Aug 2025 17:32:40 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=nUw3Cdilz4dAJqOQgPRQEhKiF/PQXMlowsgTyYprACF8G3gZuqCJdnksOtB2+20r6zhKO+/9/mBfQK5AhETGOckR4792b6qa3YRJUViEk9UT1qp+voBymrZtSIYNf7JseA3TBebwvCmUMjlQQralSbs+1U5ikZ5+zpZEqSnkCPiD3SQVpKp5vAWj2W9sQ4ZupgBylbQvS+cepE0VJMzdL0V2v8RWu3yO/JkGNGFbQC7jNMe8Tfoc0f9WhKn3aXLZ4eya1fK7MQNZYV8q2gzhITq7sw8RuouS5HeHBp8hBTaLhoFoF4ruyWXkSvNgQc+xCCk0qKfR/L+7vaQJWRN9Fw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=sJ1zrgfJiCRyg0BMIvUPQWpQ/MWZJapeSFodDpbxNBU=;
- b=fvfVCOmX3rhYrE5B8xsUuPOyYlt53WElIAPFTnIzpba4ONZ+w+nyP7ZM9iHdOx8WWAdpwyTXAW1p5WKTOa8u7zFoh1Hsf+vv6ndUJTEPV7x0a3Ao346jotv2yBuH8aYrY30a4t3vTZT/QtCkvR9HZyS9RWQinWJ+1xazzxhF+5FxOtzbuAX8adiioManqWAoVj5vIsuAyij5LGIRwj4AcVohe3qlVpXPIQKjgYptolIEmkcv/XqbNiHIf91KosT5JJBHd2z4uQnlUTKR4oDPkoYAuHBHbDoqUQ+AyUl8ou7OcwiAQyFVyoGNq6nKHIegoDg2yp0pl4O0H+o/Aa7S/Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from SJ2PR11MB7573.namprd11.prod.outlook.com (2603:10b6:a03:4d2::10)
- by CY5PR11MB6533.namprd11.prod.outlook.com (2603:10b6:930:43::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9031.19; Sat, 16 Aug
- 2025 00:32:37 +0000
-Received: from SJ2PR11MB7573.namprd11.prod.outlook.com
- ([fe80::61a:aa57:1d81:a9cf]) by SJ2PR11MB7573.namprd11.prod.outlook.com
- ([fe80::61a:aa57:1d81:a9cf%4]) with mapi id 15.20.9031.014; Sat, 16 Aug 2025
- 00:32:37 +0000
-Message-ID: <09c45d9d-df5b-456f-a8ff-b887d8a705c1@intel.com>
-Date: Fri, 15 Aug 2025 17:32:35 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 06/30] KVM: selftests: Add helper functions to create
- TDX VMs
-To: Sean Christopherson <seanjc@google.com>, Sagi Shahar <sagis@google.com>
-CC: Binbin Wu <binbin.wu@linux.intel.com>, <linux-kselftest@vger.kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, "Ackerley
- Tng" <ackerleytng@google.com>, Ryan Afranji <afranji@google.com>, Andrew
- Jones <ajones@ventanamicro.com>, Isaku Yamahata <isaku.yamahata@intel.com>,
-	"Erdem Aktas" <erdemaktas@google.com>, Rick Edgecombe
-	<rick.p.edgecombe@intel.com>, Roger Wang <runanwang@google.com>, Oliver Upton
-	<oliver.upton@linux.dev>, "Pratik R. Sampat" <pratikrajesh.sampat@amd.com>,
-	Ira Weiny <ira.weiny@intel.com>, <linux-kernel@vger.kernel.org>,
-	<kvm@vger.kernel.org>
-References: <20250807201628.1185915-1-sagis@google.com>
- <20250807201628.1185915-7-sagis@google.com> <aJpO_zN3buvaQoAW@google.com>
- <0c8d6d1c-d9e1-4ffd-bb26-a03fb87cde1f@linux.intel.com>
- <CAAhR5DG+EMVbrdGaPoUiX3MtnVktFtdiY+dDjRhA9tugAoRTJQ@mail.gmail.com>
- <aJ_PQPkD3qrlW8jZ@google.com>
-From: Reinette Chatre <reinette.chatre@intel.com>
-Content-Language: en-US
-In-Reply-To: <aJ_PQPkD3qrlW8jZ@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: MW4PR04CA0304.namprd04.prod.outlook.com
- (2603:10b6:303:82::9) To SJ2PR11MB7573.namprd11.prod.outlook.com
- (2603:10b6:a03:4d2::10)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1914F18A6AD
+	for <kvm@vger.kernel.org>; Sat, 16 Aug 2025 01:56:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755309411; cv=none; b=aktMBVsBkec+Gx3eOEY9HD2cJrBDpB6IvRCD3YO/3DWR+nnWwr4v+6Cc7rF3Lv6x7SsyfMEAI7MRyW8oKdEH+avaBQ0mUF6+v64lahuiQs27xMJgVzz0zZi+c1ZBa3Cn46vtu1RcGGcRJtROT/yKGAeF+0OvxCXcZqa6n32MDu0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755309411; c=relaxed/simple;
+	bh=Ej1Ms8x3fV9hlh+VBITET4wxyZCGlUYPCpJfqRg4/mk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=I0dZwFNtypk7ZT5Ki1u7fwvD2mtrxQLaqYcAPwb8uiriVrqmRaDw6RlXPkBd/a5osqtbvY6epVTLXYjkTXtTpvM+LJTuemMeigt12ddloyBj6PBTw5AMira1lLoevN1yNKmtjJTC/09oAQ+EqMIisnD3M15Llvw2D/5XkGYulYw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DH29Qz3M; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-242d1e947feso102085ad.0
+        for <kvm@vger.kernel.org>; Fri, 15 Aug 2025 18:56:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1755309409; x=1755914209; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=L4ItdIwW0Nn2rbKUapLvi+7KaOlcmfEY49F8WH61kT0=;
+        b=DH29Qz3Mu9cmUzSOsvN+lWHbTYR0UenpjF6MiJc8ALS0O2NRQumsLUq8OqrPMOlvD/
+         EKNocpxMLd/M9yKnBYYZ8KdeF1/L4J5a1Omxq2XN8gUOI9q2VXFBZUzQlSqDnZa8qj4T
+         HNCQ0afMNiLLxLQX4/d7OuJigxTqTfNMlcq2Sm1yrR+zjPE/yF/bs1YMiMV3jCitLG2l
+         Lc0vWKqIEYmkHD9BEJ9J9guKlb7yOFbFCWsaRgpSJusgtynNrtjreFQwF1UglYkxdleS
+         0Lu9ayTLBZCcwOgLeR0rxSeEwjB/JIOxOeGREvfoy/ZdkEt+FKBY7X5IdQU1uCxM1l/W
+         zBkw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755309409; x=1755914209;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=L4ItdIwW0Nn2rbKUapLvi+7KaOlcmfEY49F8WH61kT0=;
+        b=lpH8imJvYBVfIDn7WXSKwK7g4r30n6E+2jVlWdHv8E2iKEtPPGb+NJWDkf6ZaCYg8h
+         2iBHk9MEocFTTUsjKjUbQVsnjyMKh40tsnRDAn5bo+7MdvsgY2q0FYMWRrfhMhTJ/iP4
+         GzjEorAwv8DLSXFtcpDqUuDLrbHDoxVyRkDUhEhw7yxKw21FTjrgHvhrKTgCeI3I/ynb
+         fefeUSLVoCv7RtIU9EAmPIr99pv7yN2ppHcx+wFITBMNs1cLMGmqDxKAAzu0zb4QOK1l
+         m+KV2Rs2vPSV7qTQJzBBuox1465dh0FVf3RWv6D2PI9oBpNFoFt34iz0bojs+SSkeYVb
+         rZhQ==
+X-Gm-Message-State: AOJu0YxinxjpoSg9+/2zkxTB8QbAfYgyKJ8Yn8vke6a+HpqOYZ8Rbxw4
+	tkDgtHz2xEnycD9F6M+narvBz3e6UFb5bdQI8/0iqIvVpFz7fJlhzl3of8IK2/VI9cuck/KbGj1
+	rdz/njk5X7+mqAZwCFLp3zUcEUxpSEmjgpT8qAReH
+X-Gm-Gg: ASbGncvJbi4gmDly9j4IndCBzVMSb6+b04+9oWH+5rQUB8PtVE6Vuw2StZdUkBK6Bca
+	WUTdgw1zuMKJd/WlCjpcNOjbkBlRtwrUfPH5HFBsD+AcIGyWeDSAq+UhlCl4SVRVFcMPe6foP1G
+	Zj5ddwfGuaivZKpkq+PWdTfYOzAEEqKgbWWN+8sxpSCHY6LQcKKhc0effr50qdDgLwMluUm5R1F
+	L6sdpA4onj1oScZ57j91+T9NhpQEUzL/y7qe1Ic/IQ=
+X-Google-Smtp-Source: AGHT+IGjIbEibm7TAU0Qy99Qr9hDz/0we50Y7edVXGYdgrm7Uw4jOk5StezzxSbZkloheGwBu8Np97ishY6Mw8oSHGs=
+X-Received: by 2002:a17:903:18e:b0:223:2630:6b86 with SMTP id
+ d9443c01a7336-2447a749a14mr766545ad.7.1755309408800; Fri, 15 Aug 2025
+ 18:56:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ2PR11MB7573:EE_|CY5PR11MB6533:EE_
-X-MS-Office365-Filtering-Correlation-Id: ee1019fe-d6ab-4920-dd2f-08dddc5c66ca
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?VE9YVG00WUJMSjV0cDYwdXg0cm4rcm5UMUxMQnhRb1MrK1ZhMXo1VFBoRU9N?=
- =?utf-8?B?Q1A5cWFKcDlYcEp3MUZYUTJlbzZ4UFQrekhkZEZvZnhESG04Rm5Rb3dlamVM?=
- =?utf-8?B?bkxsaWJYc2UyT0tVaEtYZFgxbElybGI3dDI2M1Z5N2hVRGdualc2a0NnWFlE?=
- =?utf-8?B?Y3hjVTdlZkFETnV3eWZPclVHNFdpVmRQVTkwR21tLzdLRms2WTVLaW1GSWZ4?=
- =?utf-8?B?eDdlbUpIWi8xQktGYklPZGdoeHdNYWhJQ0NVYnlyTGJTYTZrb0hKb1NocWo2?=
- =?utf-8?B?Q2NaV3ZVajJ0NWNYRm9tSFVoUVFDQ0RuR2ExN28vTklQcTBERm14NHFoOFVp?=
- =?utf-8?B?TGRRc1U5TnBTZUZia3FwNE0rcGkzazU2R2l2RGJEWFZBUWNJcENqUW1jODRJ?=
- =?utf-8?B?M2pIU3d2bkF2ZXZFOTExbGRmWm5COUQ2VW5wemxRdkNxQWRuVGh6enN0Z2Zw?=
- =?utf-8?B?VzloZVJrdmhCWUpvK1AvYmZzS1pyWG5MVFJ3WURqRldmU1htRGxYK3pPR29D?=
- =?utf-8?B?dzl0R00zcnR5ejRJL0lLWEk5VmNjREF5Rm1WeG41SDlnTnQ4RlMrK1NRMm0y?=
- =?utf-8?B?NTBUTVVtdEdPdlBXZ0lSV0pIRzJqQWU0QUNibmw2TXdUeFVUdndRWjBuNjRr?=
- =?utf-8?B?WUtkQllOS0pJWjVHalhqZ3UycU0yOVQ2MlJYVG5LNWdCaStZcHNSM0t1dWo1?=
- =?utf-8?B?RE9QNTJPOStCcmNNaURaYjRGSno1cGlFR053N3NKMlhWb1dtMTd2VUxhRmtX?=
- =?utf-8?B?NDdnRzBsMDA2MlhuaFhRZWd1SXpGQUorTkFwN1JqZDF2NzJTVklaRk5vZVFJ?=
- =?utf-8?B?TFE2TkFyc2lSWWhOTjMrcmxiSDl4a0tOcmQyQlhRVllaNmNZRm5aeTh6VjJn?=
- =?utf-8?B?MkUySGlETXVNMlJQeENDdElVRFJPWXdiVkpnRW1LNjN2a0NqOEpnSzA5elFX?=
- =?utf-8?B?a2R6MDNTcHhtVHFKdzNLeFRwb3VpQ1h1Z2N1UnppUnpBZXR1ZXJDZFBZWHR0?=
- =?utf-8?B?Wmhzd24wbFNrejExTS9YZTQ5TjN4QWtXTXlHTFZZWCtPQU8yeThFeS9VNUx2?=
- =?utf-8?B?Y0doYWQwQm1nQ3RlUTF0bUI2VkpkcGZvamZjMzNsRDVtQkhKam0wT3NrVFBx?=
- =?utf-8?B?S21zYndxYUtrL0szQ2xzMUFESWMxK0p3bDNNY2k5RjA0eXlyU3g3NXhPZmFN?=
- =?utf-8?B?ajlFMENYMU80WUxLY29kYldHOEFSblh2ZDRFOGlFdEVFd2ZsZFFRdzJKRVcy?=
- =?utf-8?B?UXIxaUFNWVo5dFV5bkRjT2owVWxFMnZjYjRoZE5MK2NYMnV3WiszdUh4ekhB?=
- =?utf-8?B?VytURzNkVHhpc3J1UEJQYkRCek04VWdEdGpCM3ZpU1gwQS9BNlJiR3hmUE0x?=
- =?utf-8?B?dXRRUVpaYTAzMjNocU10N3JMQkJzWE5BSDk2eHpvZFRVQzVESk02RE1DcXlG?=
- =?utf-8?B?NWN4ZmFpS3Vnc2syKy9rd2tlbWpBeDQwdEgyQzUrYmFPMDdzWVpIWW1sc0Z2?=
- =?utf-8?B?SlFYZVp4N3UzTC9DV3VuaTQ4cG90b2l1UVlLdXJhNVppcmZFTXJSRysxUFBO?=
- =?utf-8?B?QTNWVUx6cnRybVExV3Z1a1E5WUFMMWg0WTBDa01TV3ZkWnhwMmF4M2M2dzdJ?=
- =?utf-8?B?WFllNkJKMzBrTlVWREh4YldQSXJybTFEbTAxY25wZXdpNFBsb0haak9yVnlI?=
- =?utf-8?B?Y0E2a1RtMStHa3JPQ1hIbTBuR050UnIwclV1RlJib1NBV29hYlk4bG1VY2xC?=
- =?utf-8?B?NUpIRndYc25qYVhDcEZyYU1SazIwR2h6TzRoRmhXNTZuUDdiK0VGanFJU1ln?=
- =?utf-8?B?eXUzS3VsSitFOVRvUFNtU2gvZm00QVZONExBSWMza1dwU1hNeVpTOGFQWFc0?=
- =?utf-8?B?Vk0wMktSMzVMS1JuYlNKKzlNZmRaMDZMSE0zRHVQeTBPMFcvUjVnbDdsdk5K?=
- =?utf-8?Q?E3Q/to2/Ruo=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR11MB7573.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SXJ1Ti82YVBmVkdINy9Ub0VFRld2UHZOZHBlSzY3cVJyY3NJWWh3c01aOHdm?=
- =?utf-8?B?M1BDazM5K25SVjVDQ1JaeTBtVVF1UTRlT1B5cEhob0EwcytBVFloMHBYNFUr?=
- =?utf-8?B?RUZ3NWhEK2VTcGgrUXcyQzVPSk5LVVdsL2xaR1JwOFQ1bFRRTnlldGFVRXQ3?=
- =?utf-8?B?ams1M090aGRVQUhyNXYrSHRXNmh0NGtXTXJEcExYa0hOVkxQeGxjS0piUitq?=
- =?utf-8?B?UWxoVW1RTDFPcjk0Nlc2bnZyVW5wdjNXMEFqRmFsaEQ4K1BrR0NpU01Jc1d3?=
- =?utf-8?B?ZW45ZUpNYTZGMXROQVVSK1JlZzExM3JDRThqZE5ZT2FTMVE0Sy9GOHJYaUNk?=
- =?utf-8?B?MHNTUUNwL2dQdzN6d3RSVDFUL0JtU2RURk9taFVvTHBId2RSKy9hd0c1RUdx?=
- =?utf-8?B?aGVFeGlvWW1YalNoOGhpQlF5M1h6VUh3T2V1MjFpQVROdHJtcDh0OHU0Zm82?=
- =?utf-8?B?ZVRoeFY5TlRVTG10aEJwNUxRdDlKbWk4NjZhbkVnYWRBS25lRC9aZEtMQmJj?=
- =?utf-8?B?VER2OGdzV0pDMlA2MjAzV2JqRkdtQXVabDVTYzJBaUduRlpiQmhxeHhGenhj?=
- =?utf-8?B?aFZORGlVTndSYTBSMnRzczFiSG5sWmpObWFmZU5mV0N3UTF2T1p5cFBhWEVR?=
- =?utf-8?B?Z1VzdU1jbmVJeDYzRFNIZUhuS2Q0K0dVSXJsV0gySERLc1ZFbTNKb2EyQldq?=
- =?utf-8?B?cFJOclVuUnpLbExOL0txNk9BTEVOMU5Uc2ovK2pqTEV4Z2NzeW5RT3h0UGtV?=
- =?utf-8?B?ZVRQdVRERWJCa0IycDBtTjNSeldXaVFtR1diTVFrSnVLVDFYS3QwOUlobkk3?=
- =?utf-8?B?ZGdQeTZta3V4c1YxUkRMNEpoVjZVbnhzN2lwTElKR3ZTQlhrN0FUd3o5elZN?=
- =?utf-8?B?VmxMUVp0bExmcHpVWnJ1TjBRTUZrNzh6OEVheXZBdkRMVVhJbGNrNkZNRlNo?=
- =?utf-8?B?N3BTVTZyWGhla01XWjUrbEtvNWUvMkl4anRrTlpEQVdJMldHa0o0QmxpQlF0?=
- =?utf-8?B?Qk1NRjRUYUtwM0RSQ3lFYnIwWEJ1aHBJZ1BHcXpyQ1ZWRjdBZHJCdk5tMFJw?=
- =?utf-8?B?WFRFVGphSDM3TGl3RHBrYUwraGQ3QWlHL2Q0emZOaGM5cnA1M3ArOGpqeGVu?=
- =?utf-8?B?ZU5OODVhQm5QZHFyaFZUc1UyVFNZNzB1WS81dEkxNlVoMERqeHpIOTFERGpM?=
- =?utf-8?B?eThjT3BJaGh2QzF1cFpnNVo5WWx0TDVsYlRJdHcrR0hNRldoUy94VUdvTjMv?=
- =?utf-8?B?OEVFSlZrNDZROXVnSzliZlVDU3EyNlRheGhIUkwwRDhEdUV6QzZ3MDhJak45?=
- =?utf-8?B?a05sVjVWTDY4RXdlY2NHeEp6MnNMVzhNcTVyVktVNmZZbHh5WVlIWklmNkRi?=
- =?utf-8?B?UHVJRy9MNDMrcVIxc3dGa1RyaEdFMVh3dmFlT2VmOTRYWFVtTUF3dStaWFhG?=
- =?utf-8?B?WHc5aFU1bXoxK1VhS3FDUjkxSEJOVGFFdVV1UEdSTDJvV0JzcUZQNTMxZWRw?=
- =?utf-8?B?R20vV25ISlZ1dkpES3BRbExRU0VZV3oyR2lIeXA4aHNnMmc2S2hHemp1YW02?=
- =?utf-8?B?N2x2SCt1UDZPTjR4a1pTZEhnczdSRDZtUXhlRS9CclRpc01ibitnYjdsdzFM?=
- =?utf-8?B?czY1TVhWRmVKSGZ2MWJzSUNTTlNQNkVVcDRTMkFNNkNtS0FnUDYxUERRcnc0?=
- =?utf-8?B?WWZkT3Jwa2RVc0pRSzRnVXY2dTJGRVFxSS8yVk8rNXJzcG1YeTlmZ1RsMWxW?=
- =?utf-8?B?TmdBbTFLdGxmWkZGTGVWVXhjd2JybEpvYXRyQ005WXdRUTN6Y3ltMGNFUDJz?=
- =?utf-8?B?RUZaSHU5OEZzWUFKQW9aUVgrYmY2QWVMZ21tc0FpODNqM0FVcDhZcXE0TkNJ?=
- =?utf-8?B?b1JuWGZ2bWtHWDNFUkZBUnJwcGtGSmpuOEdRc2NRdTJSZmI1V1A2aUhLTVJI?=
- =?utf-8?B?VjkvYndOR0psa2tWVisydThjTXVuMnZBMUErTHJlTjFETXM4MXlmdnZ3bkZ5?=
- =?utf-8?B?RUJyY09jQ25iL0syVXZURDQwa1dRQ2x4cll4Z3JEZHNhWEJHQnRQcTRVcUZD?=
- =?utf-8?B?THlDTzFFVWwxVU16UzlvRHBRS2ZZWFhmMC9NM0ZUaHZ4a1p6RjhBbVROeEFZ?=
- =?utf-8?B?eTdZeGZJR2xwNUxHZDAxRDQxSHNPdWxvR29NaDRoeHlMVFhzOHlsL3RpTm1r?=
- =?utf-8?B?bWc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: ee1019fe-d6ab-4920-dd2f-08dddc5c66ca
-X-MS-Exchange-CrossTenant-AuthSource: SJ2PR11MB7573.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Aug 2025 00:32:37.7445
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: xQ4GU+MkPnaImjsB+F0dCzzdFrWGUGkb6LYSlmQEzOOYfTKZasVYbRb5OLa0fJqV6AXu+oW0LoqM9IQ6TjWyRCm+TlZrU+TWsVmiNmIJweg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR11MB6533
-X-OriginatorOrg: intel.com
+References: <20250611104844.245235-1-steven.price@arm.com> <20250611104844.245235-20-steven.price@arm.com>
+ <CAGtprH-on3JdsHx-DyjN_z_5Z6HJoSQjJpA5o5_V6=rygMSbtQ@mail.gmail.com>
+ <80c46a5c-7559-4763-bbf2-6c755a4b067c@arm.com> <CAGtprH_6DYk8POPy+sLc3RL0-5gcrTdPNcDWFTssOK5_U4B3Nw@mail.gmail.com>
+ <23be7cdb-f094-4303-87ae-2fdfed80178b@arm.com>
+In-Reply-To: <23be7cdb-f094-4303-87ae-2fdfed80178b@arm.com>
+From: Vishal Annapurve <vannapurve@google.com>
+Date: Fri, 15 Aug 2025 18:56:36 -0700
+X-Gm-Features: Ac12FXy9Nf5jI_ZDaA0g-5pDhbHHzOx-JhcDUdLC5lWZaTciSyoinSl41owJHk4
+Message-ID: <CAGtprH-TChZuLgb0sOU_14YGpCynw7sukLT0tP9sEzzd040dHw@mail.gmail.com>
+Subject: Re: [PATCH v9 19/43] arm64: RME: Allow populating initial contents
+To: Steven Price <steven.price@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, 
+	James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
+	Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev, 
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, Gavin Shan <gshan@redhat.com>, 
+	Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun <alpergun@google.com>, 
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, Aug 15, 2025 at 8:48=E2=80=AFAM Steven Price <steven.price@arm.com>=
+ wrote:
+>
+> On 14/08/2025 17:26, Vishal Annapurve wrote:
+> > On Wed, Aug 13, 2025 at 2:30=E2=80=AFAM Steven Price <steven.price@arm.=
+com> wrote:
+> >>
+> >> On 01/08/2025 02:56, Vishal Annapurve wrote:
+> >>> On Wed, Jun 11, 2025 at 3:59=E2=80=AFAM Steven Price <steven.price@ar=
+m.com> wrote:
+> >>>>
+> >>>> +static int realm_create_protected_data_page(struct realm *realm,
+> >>>> +                                           unsigned long ipa,
+> >>>> +                                           kvm_pfn_t dst_pfn,
+> >>>> +                                           kvm_pfn_t src_pfn,
+> >>>> +                                           unsigned long flags)
+> >>>> +{
+> >>>> +       unsigned long rd =3D virt_to_phys(realm->rd);
+> >>>> +       phys_addr_t dst_phys, src_phys;
+> >>>> +       bool undelegate_failed =3D false;
+> >>>> +       int ret, offset;
+> >>>> +
+> >>>> +       dst_phys =3D __pfn_to_phys(dst_pfn);
+> >>>> +       src_phys =3D __pfn_to_phys(src_pfn);
+> >>>> +
+> >>>> +       for (offset =3D 0; offset < PAGE_SIZE; offset +=3D RMM_PAGE_=
+SIZE) {
+> >>>> +               ret =3D realm_create_protected_data_granule(realm,
+> >>>> +                                                         ipa,
+> >>>> +                                                         dst_phys,
+> >>>> +                                                         src_phys,
+> >>>> +                                                         flags);
+> >>>> +               if (ret)
+> >>>> +                       goto err;
+> >>>> +
+> >>>> +               ipa +=3D RMM_PAGE_SIZE;
+> >>>> +               dst_phys +=3D RMM_PAGE_SIZE;
+> >>>> +               src_phys +=3D RMM_PAGE_SIZE;
+> >>>> +       }
+> >>>> +
+> >>>> +       return 0;
+> >>>> +
+> >>>> +err:
+> >>>> +       if (ret =3D=3D -EIO) {
+> >>>> +               /* current offset needs undelegating */
+> >>>> +               if (WARN_ON(rmi_granule_undelegate(dst_phys)))
+> >>>> +                       undelegate_failed =3D true;
+> >>>> +       }
+> >>>> +       while (offset > 0) {
+> >>>> +               ipa -=3D RMM_PAGE_SIZE;
+> >>>> +               offset -=3D RMM_PAGE_SIZE;
+> >>>> +               dst_phys -=3D RMM_PAGE_SIZE;
+> >>>> +
+> >>>> +               rmi_data_destroy(rd, ipa, NULL, NULL);
+> >>>> +
+> >>>> +               if (WARN_ON(rmi_granule_undelegate(dst_phys)))
+> >>>> +                       undelegate_failed =3D true;
+> >>>> +       }
+> >>>> +
+> >>>> +       if (undelegate_failed) {
+> >>>> +               /*
+> >>>> +                * A granule could not be undelegated,
+> >>>> +                * so the page has to be leaked
+> >>>> +                */
+> >>>> +               get_page(pfn_to_page(dst_pfn));
+> >>>
+> >>> I would like to point out that the support for in-place conversion
+> >>> with guest_memfd using hugetlb pages [1] is under discussion.
+> >>>
+> >>> As part of the in-place conversion, the policy we are routing for is
+> >>> to avoid any "refcounts" from KVM on folios supplied by guest_memfd a=
+s
+> >>> in-place conversion works by splitting and merging folios during
+> >>> memory conversion as per discussion at LPC [2].
+> >>
+> >> CCA doesn't really support "in-place" conversions (see more detail
+> >> below). But here the issue is that something has gone wrong and the RM=
+M
+> >> is refusing to give us a page back.
+> >
+> > I think I overloaded the term "in-place" conversion in this context. I
+> > was talking about supporting "in-place" conversion without data
+> > preservation. i.e. Host will use the same GPA->HPA range mapping even
+> > after conversions, ensuring single backing for guest memory. This is
+> > achieved by guest_memfd keeping track of private/shared ranges based
+> > on userspace IOCTLs to change the tracking metadata.
+>
+> Yes, so for a destructive conversion this is fine. We can remove the
+> page from the protected region and then place the same physical page in
+> the shared region (or vice versa).
+>
+> Population is a special case because it's effectively non-destructive,
+> and in that case we need both the reference data and the final
+> (protected) physical page both available at same time.
+>
+> >>
+> >>>
+> >>> The best way to avoid further use of this page with huge page support
+> >>> around would be either:
+> >>> 1) Explicitly Inform guest_memfd of a particular pfn being in use by
+> >>> KVM without relying on page refcounts or
+> >>
+> >> This might work, but note that the page is unavailable even after user
+> >> space has freed the guest_memfd. So at some point the page needs to be
+> >> marked so that it cannot be reallocated by the kernel. Holding a
+> >> refcount isn't ideal but I haven't come up with a better idea.
+> >>
+> >> Note that this is a "should never happen" situation - the code will ha=
+ve
+> >> WARN()ed already - so this is just a best effort to allow the system t=
+o
+> >> limp on.
+> >>
+> >>> 2) Set the page as hwpoisoned. (Needs further discussion)
+> >>
+> >> This certainly sounds like a closer fit - but I'm not very familiar wi=
+th
+> >> hwpoison so I don't know how easy it would be to integrate with this.
+> >>
+> >
+> > We had similar discussions with Intel specific SEPT management and the
+> > conclusion there was to just not hold refcounts and give a warning on
+> > such failures [1].
+> >
+> > [1] https://lore.kernel.org/kvm/20250807094241.4523-1-yan.y.zhao@intel.=
+com/
+>
+> So these paths (should) all warn already. I guess the question is
+> whether we want the platform to limp on in these situations or not.
+> Certainly converting the WARNs to BUG_ON would be very easy, but the
+> intention here was to give the user some chance to save their work
+> before killing the system.
+>
+> Just WARNing might be ok, but if the kernel allocates the page for one
+> of it's data structures then it's effectively a BUG_ON - there's no
+> reasonable recovery. Reallocation into user space we can sort of handle,
+> but only by killing the process.
 
+Makes sense, this scenario is different from TDX as the host will run
+into GPT faults if accessing memory owned by the realm world with no
+good way to recover. Let's try to find the right complexity to take on
+when handling errors for such rare scenarios, without relying on
+refcounts as we start looking into huge page support.
 
-On 8/15/25 5:22 PM, Sean Christopherson wrote:
-> On Fri, Aug 15, 2025, Sagi Shahar wrote:
->> On Tue, Aug 12, 2025 at 11:22 PM Binbin Wu <binbin.wu@linux.intel.com> wrote:
->>>
->>>
->>>
->>> On 8/12/2025 4:13 AM, Sean Christopherson wrote:
->>>> On Thu, Aug 07, 2025, Sagi Shahar wrote:
->>> [...]
->>>>> +
->>>>> +/*
->>>>> + * Boot parameters for the TD.
->>>>> + *
->>>>> + * Unlike a regular VM, KVM cannot set registers such as esp, eip, etc
->>>>> + * before boot, so to run selftests, these registers' values have to be
->>>>> + * initialized by the TD.
->>>>> + *
->>>>> + * This struct is loaded in TD private memory at TD_BOOT_PARAMETERS_GPA.
->>>>> + *
->>>>> + * The TD boot code will read off parameters from this struct and set up the
->>>>> + * vCPU for executing selftests.
->>>>> + */
->>>>> +struct __packed td_boot_parameters {
->>>> None of these comments explain why these structures are __packed, and I suspect
->>>> _that_ is the most interesting/relevant information for unfamiliar readers.
->>> I guess because the fields defined in this structure are accessed by hard-coded
->>> offsets in boot code.
->>> But as you suggested below, replicating the functionality of the kernel's
->>> OFFSET() could get rid of "__packed".
->>>
->>
->> I agree, I think the reason for using __packed is because of the hard
->> coded offsets. I tried using OFFSET() as Sean suggested but couldn't
->> make it work.
->>
->> I can't get the Kbuild scripts to work inside the kvm selftests
->> Makefile. I tried adding the following rules based on a reference I
->> found:
->>
->> +include/x86/tdx/td_boot_offsets.h: lib/x86/tdx/td_boot_offsets.s
->> +       $(call filechk,offsets,__TDX_BOOT_OFFSETS_H__)
->> +
->> +lib/x86/tdx/td_boot_offsets.s: lib/x86/tdx/td_boot_offsets.c
->> +       $(call if_changed_dep,cc_s_c)
->>
->> But I'm getting the following error when trying to generate the header:
->>
->> /bin/sh: -c: line 1: syntax error near unexpected token `;'
->> /bin/sh: -c: line 1: `set -e;  ;  printf '# cannot find fixdep (%s)\n'
->>  > lib/x86/tdx/.td_boot_offsets.s.cmd; printf '# using basic dep
->> data\n\n' >> lib/x86/tdx/.td_boot_offsets.s.cmd; cat
->> lib/x86/tdx/.td_boot_offsets.s.d >>
->> lib/x86/tdx/.td_boot_offsets.s.cmd; printf '\n%s\n'
->> 'cmd_lib/x86/tdx/td_boot_offsets.s := ' >>
->> lib/x86/tdx/.td_boot_offsets.s.cmd'
->> make: *** [Makefile.kvm:44: lib/x86/tdx/td_boot_offsets.s] Error 2
->>
->> For now I can add a comment on the __packed and add a TODO to replace
->> it with OFFSET. I think that making OFFSET work inside the kvm
->> selftests will require more expertise in the Kbuild system which I
->> don't have.
-> 
-> No, I don't want to punt on this.  I don't care about __packed, I care about the
-> maintenance and review costs associated with hand coding struct offsets in .S
-> files.
-> 
-> The problem is this line:
-> 
-> 	$(call if_changed_dep,cc_s_c)
-> 
-> IIUC, the kernel's "generic" command for generating a .s file from a .c file
-> assumes various paths and flags, which doesn't play nice with KVM selftests'
-> unusual setup.
-> 
-> We could fudge around that by defining a custom command, e.g.
-> 
-> 	cmd_kvm_cc_s_c = $(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -S $< -o $@
-> 
-> but that just runs into more problems with the build system (variables not
-> defined, more assumptions about the environment, etc).
-> 
-> AFAICT, there's no need to use if_changed_dep, i.e. fixdep.  KVM selftests
-> generate dependencies using standard mechanisms, and they appear to work as
-> expected for this case, so just omit the if_change_dep and let the existing
-> dependency stuff do its magic.
-> 
-> This could be tidied up, e.g. add kbuild.h to tool/s, and is obviously incomplete,
-> but it works.
-> 
-
-Thank you very much Sean. So much cleaner than what I came up with. I need to
-investigate why those includes did not seem to work for me.
-
-Reinette
-
-
-
+>
+> >>> This page refcounting strategy will have to be revisited depending on
+> >>> which series lands first. That being said, it would be great if ARM
+> >>> could review/verify if the series [1] works for backing CCA VMs with
+> >>> huge pages.
+> >>>
+> >>> [1] https://lore.kernel.org/kvm/cover.1747264138.git.ackerleytng@goog=
+le.com/
+> >>> [2] https://lpc.events/event/18/contributions/1764/
 
