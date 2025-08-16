@@ -1,166 +1,291 @@
-Return-Path: <kvm+bounces-54818-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54819-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A76AB2891F
-	for <lists+kvm@lfdr.de>; Sat, 16 Aug 2025 02:13:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73100B28937
+	for <lists+kvm@lfdr.de>; Sat, 16 Aug 2025 02:24:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 434381C25C5E
-	for <lists+kvm@lfdr.de>; Sat, 16 Aug 2025 00:10:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CAB32AA041A
+	for <lists+kvm@lfdr.de>; Sat, 16 Aug 2025 00:22:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1354B186A;
-	Sat, 16 Aug 2025 00:09:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA2DF2AF14;
+	Sat, 16 Aug 2025 00:22:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b="F3JJqTfE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4Ti40O1a"
 X-Original-To: kvm@vger.kernel.org
-Received: from r3-20.sinamail.sina.com.cn (r3-20.sinamail.sina.com.cn [202.108.3.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C37C1FC3
-	for <kvm@vger.kernel.org>; Sat, 16 Aug 2025 00:09:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.108.3.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EEC9258A
+	for <kvm@vger.kernel.org>; Sat, 16 Aug 2025 00:22:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755302962; cv=none; b=EpcWw5Vb6yMixh/m/nfsFFDOqHFvr5kNyUayMGsmzPMPmYvQZRH9S0lJHS/6do1t76rQXS4OAHDOxA0tpWNzhX8ncEYNypjdCHg6xfP8Z3BwUjv5srxqz57907bL2QJkCd2BB0I3oOTwPxb1h8FkHJlorePmCJxeDVe4GFpXkUU=
+	t=1755303750; cv=none; b=K7nlz8M7Gw+643tYvugQt4gi5KUB9zoH8glTBf0Ew4lIOYGTs6pnlNzff53P+8B+kTAq2CfEfZd2EsU0nnAANRhqj6Luw8vzgKGmBqpoi6gv4ibXd1dXGNTTxuCGbShwrZJKTcDoorQLS24CKirmWeyYjuKZhdS3sQhX42sEup0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755302962; c=relaxed/simple;
-	bh=F0CG0VqNgeqX8oh+TQB3QzFWHslyU8JjBLjUk9bCwbg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DCLTxQEBIjKwp951hFevDYux5L5XcufMvgfcolrMJAFJBCfakwc1qXn+8/uZZ51JhXQv0PgSfbpKSloNc+KJxGIyfX9vfrdry3Ig7gAboFPiF6OqyaQzeSgNiFIad2uOuT7R7hBv9Cn1zFakKAQdCDj8+Hd+VM9KTL5LucQbR/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b=F3JJqTfE; arc=none smtp.client-ip=202.108.3.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.com; s=201208; t=1755302959;
-	bh=bdkGAoWrdbVzcqO40aR6fwo0x6+ClWirQe96L5A0gRY=;
-	h=From:Subject:Date:Message-ID;
-	b=F3JJqTfEjrYaZENNBeFhIjZE8TUT+6ph6zuaWBnDYu24/lbC2zT76q5Z+ZnoY2bIs
-	 rHyXHbCQSWalasINiOeFxaNQNcYovKXHUZy0MWPYP/zRLkOUdOdfM8r2Pfk+dmY8CO
-	 thEWv9mhX7nB+VcwOm4DMi31qjh2EyHnVDW1vrao=
-X-SMAIL-HELO: localhost.localdomain
-Received: from unknown (HELO localhost.localdomain)([114.249.58.236])
-	by sina.com (10.54.253.32) with ESMTP
-	id 689FCC2400004CB2; Sat, 16 Aug 2025 08:09:10 +0800 (CST)
-X-Sender: hdanton@sina.com
-X-Auth-ID: hdanton@sina.com
-Authentication-Results: sina.com;
-	 spf=none smtp.mailfrom=hdanton@sina.com;
-	 dkim=none header.i=none;
-	 dmarc=none action=none header.from=hdanton@sina.com
-X-SMAIL-MID: 6044754456638
-X-SMAIL-UIID: 66DD780839E84197B5EAAF0360550DC7-20250816-080910-1
-From: Hillf Danton <hdanton@sina.com>
-To: Will Deacon <will@kernel.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>,
-	syzbot <syzbot+b4d960daf7a3c7c2b7b1@syzkaller.appspotmail.com>,
-	jasowang@redhat.com,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	stefanha@redhat.com,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [kvm?] [net?] [virt?] WARNING in virtio_transport_send_pkt_info
-Date: Sat, 16 Aug 2025 08:08:56 +0800
-Message-ID: <20250816000900.4653-1-hdanton@sina.com>
-In-Reply-To: <aJ9WsFovkgZM3z09@willie-the-truck>
-References: <20250812052645-mutt-send-email-mst@kernel.org> <689b1156.050a0220.7f033.011c.GAE@google.com> <20250812061425-mutt-send-email-mst@kernel.org> <aJ8HVCbE-fIoS1U4@willie-the-truck> <20250815063140-mutt-send-email-mst@kernel.org> <aJ8heyq4-RtJAPyI@willie-the-truck>
+	s=arc-20240116; t=1755303750; c=relaxed/simple;
+	bh=Wh3z6S19D84SL8OrP7UhmAFviWo7tPijNFSdv3grLXU=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Z6jRSo/uqg+HKChS7NabqRy+bH7+SMy76a7Bqhmt1mdOKewUH35IZ5ZIUv5tUVaowJkE3bvzJ16Za26Woc0Lo87op89B9Y+O00ZyMl+focIkhm7v09eeubwapPA5tSvG1/oCmg37lULUxUqD7Hl5piRS97ZGFN8LJiAArKVF1HE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4Ti40O1a; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-323266dcf3bso2244405a91.0
+        for <kvm@vger.kernel.org>; Fri, 15 Aug 2025 17:22:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1755303747; x=1755908547; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=X3wBdk9H1Vt6sme48JNCL8OLAP+nfd/lh3+nxpJ1X4s=;
+        b=4Ti40O1aJGjorYjUrTXZsG8MBccSVbphUkt4/ie8WE8Pd0BHQDuprSfFKlN/z7QRIf
+         +eFERrI44UuUyIccNxFGIGR6y2JeBm3wmXDUDkdo8mhKQmYmvYM5ax8Ciy/FshikSrj5
+         4ytmDw2nAuK3CQxWElIw+WhQRYqjjevVd65ZWsa3bd/rnwVPshAM2hLz8RFujKzIM/O9
+         UEW6MZA0k/PQt5SkjvbaCAQadlvFJKa3FGglNY/MoyEkyWRGnGDvVP0+j476xLUH+Ak7
+         dQ4J9f56jmTVn427PTO2HynxMs54qtlf7js+sAAM/z9srkxDS68eYWeUyVUN2Oro6Tts
+         wrAA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755303747; x=1755908547;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=X3wBdk9H1Vt6sme48JNCL8OLAP+nfd/lh3+nxpJ1X4s=;
+        b=Len9vuUWYif+nQ8fp7Fby6X5j5N3cHGs7MkIeeRDEyTzMy8Z2TB5/6mdTHw9vkkncY
+         cKd6u1mFB/0iSvtuihqz9PmbkG0+o6wOCDygKVOTDikX0Y6SfGTwv5cYeHfweIOcEyz0
+         PQr1DG7eoUflhLToCdBb8T6yOFhumIIGIbu6KEmcDWPOwfIdb9EOe8DaTMKHBYB+f+7T
+         L//0Nu8Zdzj3J0ANP7eYKrI+fEO4/T6jfOXngLTspG0PRa3dunt+ikOm09H2fFuWafsr
+         Ioy3OfFnPkoP/u7jRWoKp1zWyZXtPKXuf38PEq4SnEyCY2C/GRojDVNEB1ZNeX1iDcOl
+         AVhw==
+X-Forwarded-Encrypted: i=1; AJvYcCXBKjG3y0cpqm/UpXx0arbCnzrOmAFpSo0lOZHkhkqwD1dLK6m590/4T2bSYTsLhVAH7lA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw9ydlW9hzESMFRlkS7A4XiXiJiRVMLiCHw4YXI36kdbPAWAT21
+	tG9hQbLQPyM/micYTNjQXCKK0m05ge749h8mJ3wvaYbIDfYtSCK11FKGd2n7D6yraTAgJtPlQDV
+	G/X/BhA==
+X-Google-Smtp-Source: AGHT+IE/x8l+IwNZ3Owxqu+oRGM35gIi/2y5zovy6E25qA4AEQWyEFk/gxtzR51nhpfEcZGzA+9uX2edFJw=
+X-Received: from pjbqn6.prod.google.com ([2002:a17:90b:3d46:b0:31f:1a3e:fe3b])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2588:b0:321:96da:79f9
+ with SMTP id 98e67ed59e1d1-3234224e0bamr5280234a91.34.1755303746879; Fri, 15
+ Aug 2025 17:22:26 -0700 (PDT)
+Date: Fri, 15 Aug 2025 17:22:24 -0700
+In-Reply-To: <CAAhR5DG+EMVbrdGaPoUiX3MtnVktFtdiY+dDjRhA9tugAoRTJQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20250807201628.1185915-1-sagis@google.com> <20250807201628.1185915-7-sagis@google.com>
+ <aJpO_zN3buvaQoAW@google.com> <0c8d6d1c-d9e1-4ffd-bb26-a03fb87cde1f@linux.intel.com>
+ <CAAhR5DG+EMVbrdGaPoUiX3MtnVktFtdiY+dDjRhA9tugAoRTJQ@mail.gmail.com>
+Message-ID: <aJ_PQPkD3qrlW8jZ@google.com>
+Subject: Re: [PATCH v8 06/30] KVM: selftests: Add helper functions to create
+ TDX VMs
+From: Sean Christopherson <seanjc@google.com>
+To: Sagi Shahar <sagis@google.com>
+Cc: Binbin Wu <binbin.wu@linux.intel.com>, linux-kselftest@vger.kernel.org, 
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	Ackerley Tng <ackerleytng@google.com>, Ryan Afranji <afranji@google.com>, 
+	Andrew Jones <ajones@ventanamicro.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	Erdem Aktas <erdemaktas@google.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
+	Roger Wang <runanwang@google.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	"Pratik R. Sampat" <pratikrajesh.sampat@amd.com>, Reinette Chatre <reinette.chatre@intel.com>, 
+	Ira Weiny <ira.weiny@intel.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 15 Aug 2025 16:48:00 +0100 Will Deacon wrote:
->On Fri, Aug 15, 2025 at 01:00:59PM +0100, Will Deacon wrote:
->> On Fri, Aug 15, 2025 at 06:44:47AM -0400, Michael S. Tsirkin wrote:
->> > On Fri, Aug 15, 2025 at 11:09:24AM +0100, Will Deacon wrote:
->> > > On Tue, Aug 12, 2025 at 06:15:46AM -0400, Michael S. Tsirkin wrote:
->> > > > On Tue, Aug 12, 2025 at 03:03:02AM -0700, syzbot wrote:
->> > > > > Hello,
->> > > > > 
->> > > > > syzbot has tested the proposed patch but the reproducer is still triggering an issue:
->> > > > > WARNING in virtio_transport_send_pkt_info
->> > > > 
->> > > > OK so the issue triggers on
->> > > > commit 6693731487a8145a9b039bc983d77edc47693855
->> > > > Author: Will Deacon <will@kernel.org>
->> > > > Date:   Thu Jul 17 10:01:16 2025 +0100
->> > > > 
->> > > >     vsock/virtio: Allocate nonlinear SKBs for handling large transmit buffers
->> > > >     
->> > > > 
->> > > > but does not trigger on:
->> > > > 
->> > > > commit 8ca76151d2c8219edea82f1925a2a25907ff6a9d
->> > > > Author: Will Deacon <will@kernel.org>
->> > > > Date:   Thu Jul 17 10:01:15 2025 +0100
->> > > > 
->> > > >     vsock/virtio: Rename virtio_vsock_skb_rx_put()
->> > > >     
->> > > > 
->> > > > 
->> > > > Will, I suspect your patch merely uncovers a latent bug
->> > > > in zero copy handling elsewhere.
->> 
->> I'm still looking at this, but I'm not sure zero-copy is the right place
->> to focus on.
->> 
->> The bisected patch 6693731487a8 ("vsock/virtio: Allocate nonlinear SKBs
->> for handling large transmit buffers") only has two hunks. The first is
->> for the non-zcopy case and the latter is a no-op for zcopy, as
->> skb_len == VIRTIO_VSOCK_SKB_HEADROOM and so we end up with a linear SKB
->> regardless.
->
->It's looking like this is caused by moving from memcpy_from_msg() to
->skb_copy_datagram_from_iter(), which is necessary to handle non-linear
->SKBs correctly.
->
->In the case of failure (i.e. faulting on the source and returning
->-EFAULT), memcpy_from_msg() rewinds the message iterator whereas
->skb_copy_datagram_from_iter() does not. If we have previously managed to
->transmit some of the packet, then I think
->virtio_transport_send_pkt_info() can end up returning a positive "bytes
->written" error code and the caller will call it again. If we've advanced
->the message iterator, then this can end up with the reported warning if
->we run out of input data.
->
->As a hack (see below), I tried rewinding the iterator in the error path
->of skb_copy_datagram_from_iter() but I'm not sure whether other callers
->would be happy with that. If not, then we could save/restore the
->iterator state in virtio_transport_fill_skb() if the copy fails. Or we
->could add a variant of skb_copy_datagram_from_iter(), say
->skb_copy_datagram_from_iter_full(), which has the rewind behaviour.
->
->What do you think?
->
->Will
->
->--->8
+On Fri, Aug 15, 2025, Sagi Shahar wrote:
+> On Tue, Aug 12, 2025 at 11:22=E2=80=AFPM Binbin Wu <binbin.wu@linux.intel=
+.com> wrote:
+> >
+> >
+> >
+> > On 8/12/2025 4:13 AM, Sean Christopherson wrote:
+> > > On Thu, Aug 07, 2025, Sagi Shahar wrote:
+> > [...]
+> > >> +
+> > >> +/*
+> > >> + * Boot parameters for the TD.
+> > >> + *
+> > >> + * Unlike a regular VM, KVM cannot set registers such as esp, eip, =
+etc
+> > >> + * before boot, so to run selftests, these registers' values have t=
+o be
+> > >> + * initialized by the TD.
+> > >> + *
+> > >> + * This struct is loaded in TD private memory at TD_BOOT_PARAMETERS=
+_GPA.
+> > >> + *
+> > >> + * The TD boot code will read off parameters from this struct and s=
+et up the
+> > >> + * vCPU for executing selftests.
+> > >> + */
+> > >> +struct __packed td_boot_parameters {
+> > > None of these comments explain why these structures are __packed, and=
+ I suspect
+> > > _that_ is the most interesting/relevant information for unfamiliar re=
+aders.
+> > I guess because the fields defined in this structure are accessed by ha=
+rd-coded
+> > offsets in boot code.
+> > But as you suggested below, replicating the functionality of the kernel=
+'s
+> > OFFSET() could get rid of "__packed".
+> >
+>=20
+> I agree, I think the reason for using __packed is because of the hard
+> coded offsets. I tried using OFFSET() as Sean suggested but couldn't
+> make it work.
+>=20
+> I can't get the Kbuild scripts to work inside the kvm selftests
+> Makefile. I tried adding the following rules based on a reference I
+> found:
+>=20
+> +include/x86/tdx/td_boot_offsets.h: lib/x86/tdx/td_boot_offsets.s
+> +       $(call filechk,offsets,__TDX_BOOT_OFFSETS_H__)
+> +
+> +lib/x86/tdx/td_boot_offsets.s: lib/x86/tdx/td_boot_offsets.c
+> +       $(call if_changed_dep,cc_s_c)
+>=20
+> But I'm getting the following error when trying to generate the header:
+>=20
+> /bin/sh: -c: line 1: syntax error near unexpected token `;'
+> /bin/sh: -c: line 1: `set -e;  ;  printf '# cannot find fixdep (%s)\n'
+>  > lib/x86/tdx/.td_boot_offsets.s.cmd; printf '# using basic dep
+> data\n\n' >> lib/x86/tdx/.td_boot_offsets.s.cmd; cat
+> lib/x86/tdx/.td_boot_offsets.s.d >>
+> lib/x86/tdx/.td_boot_offsets.s.cmd; printf '\n%s\n'
+> 'cmd_lib/x86/tdx/td_boot_offsets.s :=3D ' >>
+> lib/x86/tdx/.td_boot_offsets.s.cmd'
+> make: *** [Makefile.kvm:44: lib/x86/tdx/td_boot_offsets.s] Error 2
+>=20
+> For now I can add a comment on the __packed and add a TODO to replace
+> it with OFFSET. I think that making OFFSET work inside the kvm
+> selftests will require more expertise in the Kbuild system which I
+> don't have.
 
-#syz test
+No, I don't want to punt on this.  I don't care about __packed, I care abou=
+t the
+maintenance and review costs associated with hand coding struct offsets in =
+.S
+files.
 
-diff --git a/net/core/datagram.c b/net/core/datagram.c
-index 94cc4705e91d..62e44ab136b7 100644
---- a/net/core/datagram.c
-+++ b/net/core/datagram.c
-@@ -551,7 +551,7 @@ int skb_copy_datagram_from_iter(struct sk_buff *skb, int offset,
- 				 int len)
- {
- 	int start = skb_headlen(skb);
--	int i, copy = start - offset;
-+	int i, copy = start - offset, start_off = offset;
- 	struct sk_buff *frag_iter;
- 
- 	/* Copy header. */
-@@ -614,6 +614,7 @@ int skb_copy_datagram_from_iter(struct sk_buff *skb, int offset,
- 		return 0;
- 
- fault:
-+	iov_iter_revert(from, offset - start_off);
- 	return -EFAULT;
- }
- EXPORT_SYMBOL(skb_copy_datagram_from_iter);
---
+The problem is this line:
+
+	$(call if_changed_dep,cc_s_c)
+
+IIUC, the kernel's "generic" command for generating a .s file from a .c fil=
+e
+assumes various paths and flags, which doesn't play nice with KVM selftests=
+'
+unusual setup.
+
+We could fudge around that by defining a custom command, e.g.
+
+	cmd_kvm_cc_s_c =3D $(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -S $< -o $@
+
+but that just runs into more problems with the build system (variables not
+defined, more assumptions about the environment, etc).
+
+AFAICT, there's no need to use if_changed_dep, i.e. fixdep.  KVM selftests
+generate dependencies using standard mechanisms, and they appear to work as
+expected for this case, so just omit the if_change_dep and let the existing
+dependency stuff do its magic.
+
+This could be tidied up, e.g. add kbuild.h to tool/s, and is obviously inco=
+mplete,
+but it works.
+
+---
+ tools/testing/selftests/kvm/Makefile.kvm      | 13 ++++++++++
+ .../kvm/lib/x86/tdx/td_boot_offsets.c         | 25 +++++++++++++++++++
+ 2 files changed, 38 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/lib/x86/tdx/td_boot_offsets=
+.c
+
+diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selft=
+ests/kvm/Makefile.kvm
+index 438502e02a0f..1fec90da15a1 100644
+--- a/tools/testing/selftests/kvm/Makefile.kvm
++++ b/tools/testing/selftests/kvm/Makefile.kvm
+@@ -237,6 +237,9 @@ OVERRIDE_TARGETS =3D 1
+ include ../lib.mk
+ include ../cgroup/lib/libcgroup.mk
+=20
++include $(top_srcdir)/scripts/Kbuild.include
++include $(top_srcdir)/scripts/Makefile.lib
++
+ INSTALL_HDR_PATH =3D $(top_srcdir)/usr
+ LINUX_HDR_PATH =3D $(INSTALL_HDR_PATH)/include/
+ LINUX_TOOL_INCLUDE =3D $(top_srcdir)/tools/include
+@@ -326,18 +329,28 @@ $(LIBKVM_C_OBJ): $(OUTPUT)/%.o: %.c $(GEN_HDRS)
+ $(LIBKVM_S_OBJ): $(OUTPUT)/%.o: %.S $(GEN_HDRS)
+ 	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
+=20
++$(OUTPUT)/lib/x86/tdx/td_boot.o: $(OUTPUT)/include/x86/tdx/td_boot_offsets=
+.h
++
+ # Compile the string overrides as freestanding to prevent the compiler fro=
+m
+ # generating self-referential code, e.g. without "freestanding" the compil=
+er may
+ # "optimize" memcmp() by invoking memcmp(), thus causing infinite recursio=
+n.
+ $(LIBKVM_STRING_OBJ): $(OUTPUT)/%.o: %.c
+ 	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c -ffreestanding $< -o $@
+=20
++$(OUTPUT)/lib/x86/tdx/td_boot_offsets.s: lib/x86/tdx/td_boot_offsets.c
++	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -S $< -o $@
++
++$(OUTPUT)/include/x86/tdx/td_boot_offsets.h: $(OUTPUT)/lib/x86/tdx/td_boot=
+_offsets.s FORCE
++	$(call filechk,offsets,__TDX_BOOT_OFFSETS_H__)
++
+ $(shell mkdir -p $(sort $(dir $(TEST_GEN_PROGS))))
+ $(SPLIT_TEST_GEN_OBJ): $(GEN_HDRS)
+ $(TEST_GEN_PROGS): $(LIBKVM_OBJS)
+ $(TEST_GEN_PROGS_EXTENDED): $(LIBKVM_OBJS)
+ $(TEST_GEN_OBJ): $(GEN_HDRS)
+=20
++FORCE:
++
+ cscope: include_paths =3D $(LINUX_TOOL_INCLUDE) $(LINUX_HDR_PATH) include =
+lib ..
+ cscope:
+ 	$(RM) cscope.*
+diff --git a/tools/testing/selftests/kvm/lib/x86/tdx/td_boot_offsets.c b/to=
+ols/testing/selftests/kvm/lib/x86/tdx/td_boot_offsets.c
+new file mode 100644
+index 000000000000..622f9a19ca30
+--- /dev/null
++++ b/tools/testing/selftests/kvm/lib/x86/tdx/td_boot_offsets.c
+@@ -0,0 +1,25 @@
++// SPDX-License-Identifier: GPL-2.0
++#define COMPILE_OFFSETS
++
++#include <linux/kernel.h>
++
++#include "tdx/td_boot.h"
++
++#define DEFINE(sym, val) \
++	asm volatile("\n.ascii \"->" #sym " %0 " #val "\"" : : "i" (val))
++
++#define BLANK() asm volatile("\n.ascii \"->\"" : : )
++
++#define OFFSET(sym, str, mem) \
++	DEFINE(sym, offsetof(struct str, mem))
++
++#define COMMENT(x) \
++	asm volatile("\n.ascii \"->#" x "\"")
++
++static void __attribute__((used)) common(void)
++{
++	BLANK();
++	OFFSET(TD_BOOT_cr0, td_boot_parameters, cr0);
++	OFFSET(TD_BOOT_cr3, td_boot_parameters, cr3);
++	OFFSET(TD_BOOT_cr4, td_boot_parameters, cr4);
++}
+
+base-commit: 04b916993b06d35ec96a5324e0ed93d1eb115dbd
+--=20
+
 
