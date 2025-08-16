@@ -1,52 +1,52 @@
-Return-Path: <kvm+bounces-54831-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54832-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A29CB28CBC
-	for <lists+kvm@lfdr.de>; Sat, 16 Aug 2025 12:14:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C23B7B28CBA
+	for <lists+kvm@lfdr.de>; Sat, 16 Aug 2025 12:14:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F0330AC37F0
-	for <lists+kvm@lfdr.de>; Sat, 16 Aug 2025 10:13:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D39885E76E0
+	for <lists+kvm@lfdr.de>; Sat, 16 Aug 2025 10:14:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 566FC290D8B;
-	Sat, 16 Aug 2025 10:13:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCB3E291C02;
+	Sat, 16 Aug 2025 10:13:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="gkjHH4fY"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="e331t86n"
 X-Original-To: kvm@vger.kernel.org
 Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D228D1E32CF;
-	Sat, 16 Aug 2025 10:13:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D51E230270;
+	Sat, 16 Aug 2025 10:13:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755339208; cv=none; b=ZpXjh3k2vTqky0VCbHo8erDAlhl2MTWsIKxr8LiNtB1GJ79YXYC8y/7C0Xliar/HBxNt6FBM6bAiIOrClFsviI/QNA99ViIgLOZg5+sx501INeSwFHz10fGxT5ovrdRCIeEFd7o4n3jVF1nOvUastfCFoaEXh7yVJEDALmWKxtQ=
+	t=1755339210; cv=none; b=buGGETtymuaH+nkvTA3CnoTQ2+5OYUkKwP+q41jitouFv5S/VT7wl1fZwkSnm4MF/tqvT8xjIFc3+9uYmgYXAfUr+qy5UG/qZgwxcpmdAOD5eXWFrWT9EdxTgd6w3w0aAjkFGJqbGbIgO4SEEupPdtwzuT735OT2cE2jfrXdhqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755339208; c=relaxed/simple;
-	bh=Uk0cXH8F2Qchs59LmWckrLh9k+2D2InGvd+K6U+WQ5U=;
+	s=arc-20240116; t=1755339210; c=relaxed/simple;
+	bh=VISw+hcde9qZ1n3g0CEwLcclTN2nmaRHfPekI3FOWQg=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qIuGwvIYA5mabyVOJ3GQY+AiqvvH5kzqzu45WS7KWYKhttTzQq3yvYGFFCIej/9XnjqUVQDuQcw3hX8dlAQS/smE8cxJqJ4jCAwqyVv8JTg590vg/iXj4C9rKf35g/JgW3NJ0xu79L3cfyAnuHX4vFtSKAoSADAx6UAWnWqbelQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=gkjHH4fY; arc=none smtp.client-ip=90.155.92.199
+	 MIME-Version; b=bTLGHG2tuzHuTjq+YIYRuvhAx/3NdWLJQ/WGQokzNGFKxe4DVcaT3GjhwEy3BGknYXw+yiUbzrAMgHGAsd35VR1OFa3eAEkljsoC26KhOphtOztui1ccgf49b1zJMO8Gq9sB7W45VibaZ62kGu2UenputOj6QIx1fxoJlZSqNjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=e331t86n; arc=none smtp.client-ip=90.155.92.199
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=desiato.20200630; h=Sender:Content-Transfer-Encoding:
 	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:To:From:Reply-To:
 	Cc:Content-Type:Content-ID:Content-Description;
-	bh=IP9zfjZjBpKjNLU5g3/LbX3rTsuu30U8uTB+FpB+6ug=; b=gkjHH4fYvaWJNYnMQ7qBbRspuz
-	PxjJdMMo8zATDZZn2isfswT4Yiw3KJVoU6P7oCJfgTgb16lz1ILoUIsriE8lknlcylNmmaqP5kih7
-	Au6d42wVejjY5ci7o3NHd5TMKKdjzow5u6MyffpsCa+/pTOJmDGzMRgQbgsizhKJ+7mVkIwVD67DB
-	+P70xX8Ase1Q/7pYKsTD6izUqUyie0/VSprsm5aZ/zjFkQUoTs+uKs93W5KLsvGZNXZEVTmert5Nx
-	1lcQB0bH8s1j5HOPInlzAZTWZmT8us5+H4qCbQ34Z0bFhc1TNhl6LTA0+3R+SWgZHU4zwiYHVrvHJ
-	yINNdFGw==;
+	bh=BjEXtZI4JMihCuWWOH01u+3jFj7nMQzbdSm5sr6kODQ=; b=e331t86nkQIGqZjbnjC/FtEuRz
+	QpUntS9viav/Qbas202Ugi1IehJxtxvAwY1CU7cZEkFxi194YMPtvVPWEG+drwSPyhWaFzbTgUWH3
+	gxw5MGcMghG0/RV37OEk45bjN49UNFpto8UIYENjt6wGi2rMgTk/hwGJt1XKlot/MLajI8J+k7PjZ
+	r++ddsdeYOZ0tnoaQZu+eh1zvoZi7jp37Z1asV+f3dnALpBiIyGbSq0972HsPJwtYToP8shXk/qWn
+	bJn5tzFvuBF6cAJuASWOoOMQoxir0kreQ5dP/H0Ya+Ponx+WTiao0J1LMIP6G8Y86wT2oIgMiYPDp
+	frGd6B5w==;
 Received: from [2001:8b0:10b:1::425] (helo=i7.infradead.org)
 	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1unDuT-0000000GxZr-1ptl;
+	id 1unDuT-0000000GxZs-1ptY;
 	Sat, 16 Aug 2025 10:13:13 +0000
 Received: from dwoodhou by i7.infradead.org with local (Exim 4.98.1 #2 (Red Hat Linux))
-	id 1unDuQ-0000000Asu9-0z7A;
+	id 1unDuQ-0000000AsuC-1HD3;
 	Sat, 16 Aug 2025 11:13:10 +0100
 From: David Woodhouse <dwmw2@infradead.org>
 To: Sean Christopherson <seanjc@google.com>,
@@ -64,9 +64,9 @@ To: Sean Christopherson <seanjc@google.com>,
 	Ajay Kaher <ajay.kaher@broadcom.com>,
 	Alexey Makhalov <alexey.makhalov@broadcom.com>,
 	Colin Percival <cperciva@tarsnap.com>
-Subject: [PATCH v2 1/3] KVM: x86: Restore caching of KVM CPUID base
-Date: Sat, 16 Aug 2025 11:10:00 +0100
-Message-ID: <20250816101308.2594298-2-dwmw2@infradead.org>
+Subject: [PATCH v2 2/3] KVM: x86: Provide TSC frequency in "generic" timing infomation CPUID leaf
+Date: Sat, 16 Aug 2025 11:10:01 +0100
+Message-ID: <20250816101308.2594298-3-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250816101308.2594298-1-dwmw2@infradead.org>
 References: <20250816101308.2594298-1-dwmw2@infradead.org>
@@ -82,81 +82,65 @@ X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato
 
 From: David Woodhouse <dwmw@amazon.co.uk>
 
-This mostly reverts commit a5b32718081e ("KVM: x86: Remove unnecessary
-caching of KVM's PV CPUID base").
+In https://lkml.org/lkml/2008/10/1/246 a proposal was made for generic
+CPUID leaves, of which only 0x40000010 was defined, to contain the TSC
+and local APIC frequencies. The proposal from VMware was mostly shot
+down in flames, *but* XNU does unconditionally assume that this leaf
+contains the frequency information, if it's present on any hypervisor:
+https://github.com/apple/darwin-xnu/blob/main/osfmk/i386/cpuid.c
 
-Sure, caching state which might change has certain risks, but KVM
-already does cache the CPUID contents, and the whole point of calling
-kvm_apply_cpuid_pv_features_quirk() from kvm_vcpu_after_set_cpuid() is
-to cache the contents of that leaf too, so that guest_pv_has() can
-access them quickly.
+So does FreeBSD: https://github.com/freebsd/freebsd-src/commit/4a432614f68
 
-An upcoming commit is going to want to use vcpu->arch.kvm_cpuid from
-kvm_cpuid() at runtime too, so put it back.
+So at this point it would be daft for a hypervisor to expose 0x40000010
+for any *other* content. KVM might as well adopt it, and fill in the
+accurate TSC frequency just as it does for the Xen TSC leaf.
 
 Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 ---
- arch/x86/include/asm/kvm_host.h |  1 +
- arch/x86/kvm/cpuid.c            | 16 +++++++++++-----
- 2 files changed, 12 insertions(+), 5 deletions(-)
+ arch/x86/include/uapi/asm/kvm_para.h | 11 +++++++++++
+ arch/x86/kvm/cpuid.c                 |  7 +++++++
+ 2 files changed, 18 insertions(+)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index f19a76d3ca0e..50febd333f5f 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -897,6 +897,7 @@ struct kvm_vcpu_arch {
+diff --git a/arch/x86/include/uapi/asm/kvm_para.h b/arch/x86/include/uapi/asm/kvm_para.h
+index a1efa7907a0b..1597c4a2a24a 100644
+--- a/arch/x86/include/uapi/asm/kvm_para.h
++++ b/arch/x86/include/uapi/asm/kvm_para.h
+@@ -44,6 +44,17 @@
+  */
+ #define KVM_FEATURE_CLOCKSOURCE_STABLE_BIT	24
  
- 	int cpuid_nent;
- 	struct kvm_cpuid_entry2 *cpuid_entries;
-+	struct kvm_hypervisor_cpuid kvm_cpuid;
- 	bool cpuid_dynamic_bits_dirty;
- 	bool is_amd_compatible;
++
++/*
++ * Proposed by VMware in https://lkml.org/lkml/2008/10/1/246 the timing
++ * information leaf provides the TSC and local APIC timer frequencies:
++ *
++ *  # EAX: (Virtual) TSC frequency in kHz.
++ *  # EBX: (Virtual) Bus (local apic timer) frequency in kHz.
++ *  # ECX, EDX: RESERVED (reserved fields are set to zero).
++ */
++#define KVM_CPUID_TIMING_INFO	0x40000010
++
+ #define MSR_KVM_WALL_CLOCK  0x11
+ #define MSR_KVM_SYSTEM_TIME 0x12
  
 diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index e2836a255b16..bcce3a75c3f2 100644
+index bcce3a75c3f2..1bd69d9c86b7 100644
 --- a/arch/x86/kvm/cpuid.c
 +++ b/arch/x86/kvm/cpuid.c
-@@ -178,7 +178,12 @@ static int kvm_cpuid_check_equal(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2
- 
- 	/*
- 	 * Apply runtime CPUID updates to the incoming CPUID entries to avoid
--	 * false positives due mismatches on KVM-owned feature flags.
-+	 * false positives due mismatches on KVM-owned feature flags.  Note,
-+	 * runtime CPUID updates may consume other CPUID-driven vCPU state,
-+	 * e.g. KVM or Xen CPUID bases.  Updating runtime state before full
-+	 * CPUID processing is functionally correct only because any change in
-+	 * CPUID is disallowed, i.e. using stale data is ok because the below
-+	 * checks will reject the change.
- 	 *
- 	 * Note!  @e2 and @nent track the _old_ CPUID entries!
- 	 */
-@@ -231,14 +236,14 @@ static struct kvm_hypervisor_cpuid kvm_get_hypervisor_cpuid(struct kvm_vcpu *vcp
- 
- static u32 kvm_apply_cpuid_pv_features_quirk(struct kvm_vcpu *vcpu)
- {
--	struct kvm_hypervisor_cpuid kvm_cpuid;
- 	struct kvm_cpuid_entry2 *best;
-+	u32 features_leaf = vcpu->arch.kvm_cpuid.base | KVM_CPUID_FEATURES;
- 
--	kvm_cpuid = kvm_get_hypervisor_cpuid(vcpu, KVM_SIGNATURE);
--	if (!kvm_cpuid.base)
-+	if (!vcpu->arch.kvm_cpuid.base ||
-+	    vcpu->arch.kvm_cpuid.limit < features_leaf)
- 		return 0;
- 
--	best = kvm_find_cpuid_entry(vcpu, kvm_cpuid.base | KVM_CPUID_FEATURES);
-+	best = kvm_find_cpuid_entry(vcpu, features_leaf);
- 	if (!best)
- 		return 0;
- 
-@@ -541,6 +546,7 @@ static int kvm_set_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *e2,
- 	if (r)
- 		goto err;
- 
-+	vcpu->arch.kvm_cpuid = kvm_get_hypervisor_cpuid(vcpu, KVM_SIGNATURE);
- #ifdef CONFIG_KVM_XEN
- 	vcpu->arch.xen.cpuid = kvm_get_hypervisor_cpuid(vcpu, XEN_SIGNATURE);
- #endif
+@@ -2029,6 +2029,13 @@ bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
+ 			} else if (index == 2) {
+ 				*eax = vcpu->arch.hw_tsc_khz;
+ 			}
++		} else if (vcpu->arch.kvm_cpuid.base &&
++			   function <= vcpu->arch.kvm_cpuid.limit &&
++			   function == (vcpu->arch.kvm_cpuid.base | KVM_CPUID_TIMING_INFO)) {
++			if (kvm_check_request(KVM_REQ_CLOCK_UPDATE, vcpu))
++				kvm_guest_time_update(vcpu);
++
++			*eax = vcpu->arch.hw_tsc_khz;
+ 		}
+ 	} else {
+ 		*eax = *ebx = *ecx = *edx = 0;
 -- 
 2.49.0
 
