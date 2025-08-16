@@ -1,190 +1,166 @@
-Return-Path: <kvm+bounces-54817-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54818-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F2B7B288F3
-	for <lists+kvm@lfdr.de>; Sat, 16 Aug 2025 01:56:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A76AB2891F
+	for <lists+kvm@lfdr.de>; Sat, 16 Aug 2025 02:13:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB0B2AE41A7
-	for <lists+kvm@lfdr.de>; Fri, 15 Aug 2025 23:56:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 434381C25C5E
+	for <lists+kvm@lfdr.de>; Sat, 16 Aug 2025 00:10:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DADF2D375B;
-	Fri, 15 Aug 2025 23:55:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1354B186A;
+	Sat, 16 Aug 2025 00:09:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ywScJGLc"
+	dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b="F3JJqTfE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from r3-20.sinamail.sina.com.cn (r3-20.sinamail.sina.com.cn [202.108.3.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92C1D264A8E
-	for <kvm@vger.kernel.org>; Fri, 15 Aug 2025 23:55:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C37C1FC3
+	for <kvm@vger.kernel.org>; Sat, 16 Aug 2025 00:09:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.108.3.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755302157; cv=none; b=TBm6xMXTTt7XWBV1Nn03mFn5kM05y9GE8fHTanFa5kFEk8CxBUz4K25IqEjr5BAQqHti8S7ZL/TfoOfTr5iGg48Zmbh1Qzz7Dr4eI5LYB8dWDt9Y1rFakxVlUM7+1LXTWC42XBnbVGUcOQabTH7uQP0mHDiXerqjkYD9PrQbQV8=
+	t=1755302962; cv=none; b=EpcWw5Vb6yMixh/m/nfsFFDOqHFvr5kNyUayMGsmzPMPmYvQZRH9S0lJHS/6do1t76rQXS4OAHDOxA0tpWNzhX8ncEYNypjdCHg6xfP8Z3BwUjv5srxqz57907bL2QJkCd2BB0I3oOTwPxb1h8FkHJlorePmCJxeDVe4GFpXkUU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755302157; c=relaxed/simple;
-	bh=zcLAsoX6pDXjnCPfRnsqRsSg+vU0W8rGPEmra6GA6HA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=fIFqG6pMuf3bbBt/ehw9B/qh30K1SBX7f/bqgp0R9D9xbyVjd9wuqKLpsn4Yf+3Wev4ms6VmLugJ2+rGajhGG1vMS5offiybyjyHs4XMdSMmnadCYg64ersmq9TH1gWsCbgeyPElPQ4mSbQNIpXhUaY3OYz5lboTKNtas/UMpGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--korakit.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ywScJGLc; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--korakit.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-24458067fdeso26018105ad.1
-        for <kvm@vger.kernel.org>; Fri, 15 Aug 2025 16:55:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755302154; x=1755906954; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=LNbL7GEH2GESEOq6c0BFv6o6Nfe7tGZQ+zzXfb4mnY0=;
-        b=ywScJGLcIEQgXd1/xFLx9Cr1/y4HKsCWVCcenSqRr9AFkWbD1aFyWPg0a1GRQr82iH
-         iSMCWxjlak2sHXTdLP53JVXzE7SJOGnZs0OXmqF0nGKKAWXgcvBVd3SYArTu5HowI+13
-         HlzLuIVWNWHjcEzEAZzmlJmTwzQxiIgCGt8FrFTReHluFMm1/zVlGqVvyAdzqL7AweAJ
-         crhGXsfkxQjin+2wGiPDIhIayDlt7xs1+l30c2TxEXU/CaG1cuanMoHjcOb/XaINu5nq
-         mLcvDUUnV2kLi8iM1DcUhWeKX7yGg800IDY4xEbd2wDZNCqL9V5hoLBTeSH285Nci1go
-         XJhA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755302154; x=1755906954;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LNbL7GEH2GESEOq6c0BFv6o6Nfe7tGZQ+zzXfb4mnY0=;
-        b=Qv1mdrnbsvvmj7UUFzM9DDUx0H15F1ZEo3vBA4qStXtJGSu3IVA5asmrTwxvt1xSJU
-         O4Pou3Hwe55YIZNHrWctIQfhUTcR3fL5+aqO2YBiesfAtgRwdRhj7Y1N6SSo1Fw8B/rz
-         IDVG/Przj6JtBhpUHvg5Hg99W7fjzl6AtyfjsetrjuYS8aX1eA5E2s+lxnYdlWKO8QgR
-         m7k373M+y1AIaZJZ3Vf1Cy29nc1PljVVsTYuXwsjqawzyc1Wq6ONBgF0lHUrd+mb6pFS
-         rBN4sf9fMoljUMzPoA+9BcWuheZtFUsL5aY1qcTOdHkEYC26VXvXopUJ1EfpW1EY0lxc
-         lObA==
-X-Forwarded-Encrypted: i=1; AJvYcCWN5E1hV1h7tZqmzLzWJMNur2ySWrl7InD8zH5OdXZuTJYhQxMV3gjpVwxQuVwVEfGSJVU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxAWF9mdDKhzHpslhLbCqx/1G078KwgqSGZY4EB9/N0d1PP1aTN
-	ws3lJLIa4tVrw07OfOpLII8Z41LAMRwnjDbsX/4zbDb7ERu65JiomE5IihdcNVqOZGZml/jxndj
-	t8lBAEDlKiQ==
-X-Google-Smtp-Source: AGHT+IG4eKINYgr2XwrFOOgeml2vyTvpIAjHgoplhjb1xbj/jh7rF2cQgxFsDB0rkoUxw+YeQnZopUn5fPG9
-X-Received: from pluo13.prod.google.com ([2002:a17:903:4b0d:b0:23f:e63a:dfb])
- (user=korakit job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:e80a:b0:234:c549:da0e
- with SMTP id d9443c01a7336-2447905d2d5mr13406915ad.47.1755302153943; Fri, 15
- Aug 2025 16:55:53 -0700 (PDT)
-Date: Fri, 15 Aug 2025 23:55:52 +0000
-In-Reply-To: <ad616489-1546-4f6a-9242-a719952e19b6@linux.intel.com>
+	s=arc-20240116; t=1755302962; c=relaxed/simple;
+	bh=F0CG0VqNgeqX8oh+TQB3QzFWHslyU8JjBLjUk9bCwbg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=DCLTxQEBIjKwp951hFevDYux5L5XcufMvgfcolrMJAFJBCfakwc1qXn+8/uZZ51JhXQv0PgSfbpKSloNc+KJxGIyfX9vfrdry3Ig7gAboFPiF6OqyaQzeSgNiFIad2uOuT7R7hBv9Cn1zFakKAQdCDj8+Hd+VM9KTL5LucQbR/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b=F3JJqTfE; arc=none smtp.client-ip=202.108.3.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.com; s=201208; t=1755302959;
+	bh=bdkGAoWrdbVzcqO40aR6fwo0x6+ClWirQe96L5A0gRY=;
+	h=From:Subject:Date:Message-ID;
+	b=F3JJqTfEjrYaZENNBeFhIjZE8TUT+6ph6zuaWBnDYu24/lbC2zT76q5Z+ZnoY2bIs
+	 rHyXHbCQSWalasINiOeFxaNQNcYovKXHUZy0MWPYP/zRLkOUdOdfM8r2Pfk+dmY8CO
+	 thEWv9mhX7nB+VcwOm4DMi31qjh2EyHnVDW1vrao=
+X-SMAIL-HELO: localhost.localdomain
+Received: from unknown (HELO localhost.localdomain)([114.249.58.236])
+	by sina.com (10.54.253.32) with ESMTP
+	id 689FCC2400004CB2; Sat, 16 Aug 2025 08:09:10 +0800 (CST)
+X-Sender: hdanton@sina.com
+X-Auth-ID: hdanton@sina.com
+Authentication-Results: sina.com;
+	 spf=none smtp.mailfrom=hdanton@sina.com;
+	 dkim=none header.i=none;
+	 dmarc=none action=none header.from=hdanton@sina.com
+X-SMAIL-MID: 6044754456638
+X-SMAIL-UIID: 66DD780839E84197B5EAAF0360550DC7-20250816-080910-1
+From: Hillf Danton <hdanton@sina.com>
+To: Will Deacon <will@kernel.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+	syzbot <syzbot+b4d960daf7a3c7c2b7b1@syzkaller.appspotmail.com>,
+	jasowang@redhat.com,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	stefanha@redhat.com,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [kvm?] [net?] [virt?] WARNING in virtio_transport_send_pkt_info
+Date: Sat, 16 Aug 2025 08:08:56 +0800
+Message-ID: <20250816000900.4653-1-hdanton@sina.com>
+In-Reply-To: <aJ9WsFovkgZM3z09@willie-the-truck>
+References: <20250812052645-mutt-send-email-mst@kernel.org> <689b1156.050a0220.7f033.011c.GAE@google.com> <20250812061425-mutt-send-email-mst@kernel.org> <aJ8HVCbE-fIoS1U4@willie-the-truck> <20250815063140-mutt-send-email-mst@kernel.org> <aJ8heyq4-RtJAPyI@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <ad616489-1546-4f6a-9242-a719952e19b6@linux.intel.com>
-X-Mailer: git-send-email 2.51.0.rc1.167.g924127e9c0-goog
-Message-ID: <20250815235552.969779-1-korakit@google.com>
-Subject: Re: [PATCH 0/2] x86/kvm: Force legacy PCI hole as WB under SNP/TDX
-From: Korakit Seemakhupt <korakit@google.com>
-To: binbin.wu@linux.intel.com
-Cc: bp@alien8.de, dave.hansen@linux.intel.com, dionnaglaze@google.com, 
-	hpa@zytor.com, jgross@suse.com, jiewen.yao@intel.com, jxgao@google.com, 
-	kirill.shutemov@linux.intel.com, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, mingo@redhat.com, nik.borisov@suse.com, 
-	pbonzini@redhat.com, pgonda@google.com, rick.p.edgecombe@intel.com, 
-	seanjc@google.com, tglx@linutronix.de, thomas.lendacky@amd.com, 
-	vkuznets@redhat.com, x86@kernel.org, vannapurve@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
->> On 5/28/2025 11:33 PM, Sean Christopherson wrote:
->>
->> Summary, with the questions at the end.
->>
->> Recent upstream kernels running in GCE SNP/TDX VMs fail to probe the TPM due to
->> the TPM driver's ioremap (with UC) failing because the kernel has already mapped
->> the range using a cachaeable mapping (WB).
->>
->>   ioremap error for 0xfed40000-0xfed45000, requested 0x2, got 0x0
->>   tpm_tis MSFT0101:00: probe with driver tpm_tis failed with error -12
->>
->> The "guilty" commit is 8e690b817e38 ("x86/kvm: Override default caching mode for
->> SEV-SNP and TDX"), which as the subject suggests, forces the kernel's MTRR memtype
->> to WB.  With SNP and TDX, the virtual MTRR state is (a) controlled by the VMM and
->> thus is untrusted, and (b) _should_ be irrelevant because no known hypervisor
->> actually honors the memtypes programmed into the virtual MTRRs.
->>
->> It turns out that the kernel has been relying on the MTRRs to force the TPM TIS
->> region (and potentially other regions) to be UC, so that the kernel ACPI driver's
->> attempts to map of SystemMemory entries as cacheable get forced to UC.  With MTRRs
->> forced WB, x86_acpi_os_ioremap() succeeds in creating a WB mapping, which in turn
->> causes the ioremap infrastructure to reject the TPM driver's UC mapping.
->>
->> IIUC, the TPM entry(s) in the ACPI tables for GCE VMs are derived (built?) from
->> EDK2's TPM ASL.  And (again, IIUC), this code in SecurityPkg/Tcg/Tcg2Acpi/Tpm.asl[1]
->>
->>        //
->>        // Operational region for TPM access
->>        //
->>        OperationRegion (TPMR, SystemMemory, 0xfed40000, 0x5000)
->>
->> generates the problematic SystemMemory entry that triggers the ACPI driver's
->> auto-mapping logic.
->>
->> QEMU-based VMs don't suffer the same fate, as QEMU intentionally[2] doesn't use
->> EDK2's AML for the TPM, and QEMU doesn't define a SystemMemory entry, just a
->> Memory32Fixed entry.
->>
->> Presumably this an EDK2 bug?  If it's not an EDK2 bug, then how is the kernel's
->> ACPI driver supposed to know that some ranges of SystemMemory must be mapped UC?
-> 
-> On 7/30/2025 3:34 PM, Binbin Wu: Wrote
-> 
-> According to the ACPI spec 6.6, an operation region of SystemMemory has no
-> interface to specify the cacheable attribute.
-> 
-> One solution could be using MTRRs to communicate the memory attribute of legacy
-> PCI hole to the kernel. But during the PUCK meeting last week, Sean mentioned
-> that "long-term, firmware should not be using MTRRs to communicate anything to
-> the kernel." So this solution is not preferred.
-> 
-> If not MTRRs, there should be an alternative way to do the job.
-> 1. ACPI table
->     According to the ACPI spec, neither operation region nor 32-Bit Fixed Memory
->     Range Descriptor can specify the cacheable attribute.
->     "Address Space Resource Descriptors" could be used to describe a memory range
->     and the they can specify the cacheable attribute via "Type Specific Flags".
->     One of the Address Space Resource Descriptors could be added to the ACPI
->     table as a hint when the kernel do the mapping for operation region.
->     (There is "System Physical Address (SPA) Range Structure", which also can
->     specify the cacheable attribute. But it's should be used for NVDIMMs.)
-> 2. EFI memory map descriptor
->     EFI memory descriptor can specify the cacheable attribute. Firmware can add
->     a EFI memory descriptor for the TPM TIS device as a hint when the kernel do
->     the mapping for operation region.
-> 
-> Operation region of SystemMemory is still needed if a "Control Method" of APCI
-> needs to access a field, e.g., the method _STA. Checking another descriptor for
-> cacheable attribute, either "Address Space Resource Descriptor" or "EFI memory
-> map descriptor" during the ACPI code doing the mapping for operation region
-> makes the code complicated.
-> 
-> Another thing is if long-term firmware should not be using MTRRs to to
-> communicate anything to the kernel. It seems it's safer to use ioremap() instead
-> of ioremap_cache() for MMIO resource when the kernel do the mapping for the
-> operation region access?
+On Fri, 15 Aug 2025 16:48:00 +0100 Will Deacon wrote:
+>On Fri, Aug 15, 2025 at 01:00:59PM +0100, Will Deacon wrote:
+>> On Fri, Aug 15, 2025 at 06:44:47AM -0400, Michael S. Tsirkin wrote:
+>> > On Fri, Aug 15, 2025 at 11:09:24AM +0100, Will Deacon wrote:
+>> > > On Tue, Aug 12, 2025 at 06:15:46AM -0400, Michael S. Tsirkin wrote:
+>> > > > On Tue, Aug 12, 2025 at 03:03:02AM -0700, syzbot wrote:
+>> > > > > Hello,
+>> > > > > 
+>> > > > > syzbot has tested the proposed patch but the reproducer is still triggering an issue:
+>> > > > > WARNING in virtio_transport_send_pkt_info
+>> > > > 
+>> > > > OK so the issue triggers on
+>> > > > commit 6693731487a8145a9b039bc983d77edc47693855
+>> > > > Author: Will Deacon <will@kernel.org>
+>> > > > Date:   Thu Jul 17 10:01:16 2025 +0100
+>> > > > 
+>> > > >     vsock/virtio: Allocate nonlinear SKBs for handling large transmit buffers
+>> > > >     
+>> > > > 
+>> > > > but does not trigger on:
+>> > > > 
+>> > > > commit 8ca76151d2c8219edea82f1925a2a25907ff6a9d
+>> > > > Author: Will Deacon <will@kernel.org>
+>> > > > Date:   Thu Jul 17 10:01:15 2025 +0100
+>> > > > 
+>> > > >     vsock/virtio: Rename virtio_vsock_skb_rx_put()
+>> > > >     
+>> > > > 
+>> > > > 
+>> > > > Will, I suspect your patch merely uncovers a latent bug
+>> > > > in zero copy handling elsewhere.
+>> 
+>> I'm still looking at this, but I'm not sure zero-copy is the right place
+>> to focus on.
+>> 
+>> The bisected patch 6693731487a8 ("vsock/virtio: Allocate nonlinear SKBs
+>> for handling large transmit buffers") only has two hunks. The first is
+>> for the non-zcopy case and the latter is a no-op for zcopy, as
+>> skb_len == VIRTIO_VSOCK_SKB_HEADROOM and so we end up with a linear SKB
+>> regardless.
+>
+>It's looking like this is caused by moving from memcpy_from_msg() to
+>skb_copy_datagram_from_iter(), which is necessary to handle non-linear
+>SKBs correctly.
+>
+>In the case of failure (i.e. faulting on the source and returning
+>-EFAULT), memcpy_from_msg() rewinds the message iterator whereas
+>skb_copy_datagram_from_iter() does not. If we have previously managed to
+>transmit some of the packet, then I think
+>virtio_transport_send_pkt_info() can end up returning a positive "bytes
+>written" error code and the caller will call it again. If we've advanced
+>the message iterator, then this can end up with the reported warning if
+>we run out of input data.
+>
+>As a hack (see below), I tried rewinding the iterator in the error path
+>of skb_copy_datagram_from_iter() but I'm not sure whether other callers
+>would be happy with that. If not, then we could save/restore the
+>iterator state in virtio_transport_fill_skb() if the copy fails. Or we
+>could add a variant of skb_copy_datagram_from_iter(), say
+>skb_copy_datagram_from_iter_full(), which has the rewind behaviour.
+>
+>What do you think?
+>
+>Will
+>
+>--->8
 
-Even after changing the ACPI memory resource descriptor from 32-Bit Fixed 
-Memory to DWordMemory with caching parameter set to uncached, the ACPI stack still 
-tries to ioremap the memory as cachable. 
+#syz test
 
-However, forcing the Operation Region to be PCI_Config instead of SystemMemory 
-in the ACPI table seems to allow the vTPM device initilization to succeed as 
-it avoids the vTPM region from getting ioremapped by the ACPI stack.
-
-We have also verified that forcing the ACPI stack to use ioremap() instead of 
-ioremap_cache() also allows vTPM to initialize properly. The reference change 
-I made is below.
-
-diff --git a/arch/x86/kernel/acpi/boot.c b/arch/x86/kernel/acpi/boot.c
-index dae6a73be40e..2771d3f66d0a 100644
---- a/arch/x86/kernel/acpi/boot.c
-+++ b/arch/x86/kernel/acpi/boot.c
-@@ -1821,7 +1821,7 @@ u64 x86_default_get_root_pointer(void)
- #ifdef CONFIG_XEN_PV
- void __iomem *x86_acpi_os_ioremap(acpi_physical_address phys, acpi_size size)
+diff --git a/net/core/datagram.c b/net/core/datagram.c
+index 94cc4705e91d..62e44ab136b7 100644
+--- a/net/core/datagram.c
++++ b/net/core/datagram.c
+@@ -551,7 +551,7 @@ int skb_copy_datagram_from_iter(struct sk_buff *skb, int offset,
+ 				 int len)
  {
--       return ioremap_cache(phys, size);
-+       return ioremap(phys, size);
+ 	int start = skb_headlen(skb);
+-	int i, copy = start - offset;
++	int i, copy = start - offset, start_off = offset;
+ 	struct sk_buff *frag_iter;
+ 
+ 	/* Copy header. */
+@@ -614,6 +614,7 @@ int skb_copy_datagram_from_iter(struct sk_buff *skb, int offset,
+ 		return 0;
+ 
+ fault:
++	iov_iter_revert(from, offset - start_off);
+ 	return -EFAULT;
  }
+ EXPORT_SYMBOL(skb_copy_datagram_from_iter);
+--
 
