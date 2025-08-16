@@ -1,291 +1,97 @@
-Return-Path: <kvm+bounces-54819-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54820-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73100B28937
-	for <lists+kvm@lfdr.de>; Sat, 16 Aug 2025 02:24:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E432EB28939
+	for <lists+kvm@lfdr.de>; Sat, 16 Aug 2025 02:25:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CAB32AA041A
-	for <lists+kvm@lfdr.de>; Sat, 16 Aug 2025 00:22:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40B21AA5403
+	for <lists+kvm@lfdr.de>; Sat, 16 Aug 2025 00:24:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA2DF2AF14;
-	Sat, 16 Aug 2025 00:22:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4Ti40O1a"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2DA41BC3F;
+	Sat, 16 Aug 2025 00:24:15 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from baidu.com (mx24.baidu.com [111.206.215.185])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EEC9258A
-	for <kvm@vger.kernel.org>; Sat, 16 Aug 2025 00:22:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB4237261C;
+	Sat, 16 Aug 2025 00:24:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=111.206.215.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755303750; cv=none; b=K7nlz8M7Gw+643tYvugQt4gi5KUB9zoH8glTBf0Ew4lIOYGTs6pnlNzff53P+8B+kTAq2CfEfZd2EsU0nnAANRhqj6Luw8vzgKGmBqpoi6gv4ibXd1dXGNTTxuCGbShwrZJKTcDoorQLS24CKirmWeyYjuKZhdS3sQhX42sEup0=
+	t=1755303855; cv=none; b=IyHu08DlCManFlPIK7lJD6n4e9QwzS5cKDW081JviZhzSYxmdF2pd/QqteoUXOiYxLwfpU4gXQ2A2IDtXt+SwvKtYzqtXLEozVT1Npu7UN31EoBoDLTKXVLCHwTnTmuJgSITzEqcu35o2Dn/F3KDwsKqY+dydfOHWTDtMDDC7wQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755303750; c=relaxed/simple;
-	bh=Wh3z6S19D84SL8OrP7UhmAFviWo7tPijNFSdv3grLXU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Z6jRSo/uqg+HKChS7NabqRy+bH7+SMy76a7Bqhmt1mdOKewUH35IZ5ZIUv5tUVaowJkE3bvzJ16Za26Woc0Lo87op89B9Y+O00ZyMl+focIkhm7v09eeubwapPA5tSvG1/oCmg37lULUxUqD7Hl5piRS97ZGFN8LJiAArKVF1HE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4Ti40O1a; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-323266dcf3bso2244405a91.0
-        for <kvm@vger.kernel.org>; Fri, 15 Aug 2025 17:22:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755303747; x=1755908547; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=X3wBdk9H1Vt6sme48JNCL8OLAP+nfd/lh3+nxpJ1X4s=;
-        b=4Ti40O1aJGjorYjUrTXZsG8MBccSVbphUkt4/ie8WE8Pd0BHQDuprSfFKlN/z7QRIf
-         +eFERrI44UuUyIccNxFGIGR6y2JeBm3wmXDUDkdo8mhKQmYmvYM5ax8Ciy/FshikSrj5
-         4ytmDw2nAuK3CQxWElIw+WhQRYqjjevVd65ZWsa3bd/rnwVPshAM2hLz8RFujKzIM/O9
-         UEW6MZA0k/PQt5SkjvbaCAQadlvFJKa3FGglNY/MoyEkyWRGnGDvVP0+j476xLUH+Ak7
-         dQ4J9f56jmTVn427PTO2HynxMs54qtlf7js+sAAM/z9srkxDS68eYWeUyVUN2Oro6Tts
-         wrAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755303747; x=1755908547;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=X3wBdk9H1Vt6sme48JNCL8OLAP+nfd/lh3+nxpJ1X4s=;
-        b=Len9vuUWYif+nQ8fp7Fby6X5j5N3cHGs7MkIeeRDEyTzMy8Z2TB5/6mdTHw9vkkncY
-         cKd6u1mFB/0iSvtuihqz9PmbkG0+o6wOCDygKVOTDikX0Y6SfGTwv5cYeHfweIOcEyz0
-         PQr1DG7eoUflhLToCdBb8T6yOFhumIIGIbu6KEmcDWPOwfIdb9EOe8DaTMKHBYB+f+7T
-         L//0Nu8Zdzj3J0ANP7eYKrI+fEO4/T6jfOXngLTspG0PRa3dunt+ikOm09H2fFuWafsr
-         Ioy3OfFnPkoP/u7jRWoKp1zWyZXtPKXuf38PEq4SnEyCY2C/GRojDVNEB1ZNeX1iDcOl
-         AVhw==
-X-Forwarded-Encrypted: i=1; AJvYcCXBKjG3y0cpqm/UpXx0arbCnzrOmAFpSo0lOZHkhkqwD1dLK6m590/4T2bSYTsLhVAH7lA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9ydlW9hzESMFRlkS7A4XiXiJiRVMLiCHw4YXI36kdbPAWAT21
-	tG9hQbLQPyM/micYTNjQXCKK0m05ge749h8mJ3wvaYbIDfYtSCK11FKGd2n7D6yraTAgJtPlQDV
-	G/X/BhA==
-X-Google-Smtp-Source: AGHT+IE/x8l+IwNZ3Owxqu+oRGM35gIi/2y5zovy6E25qA4AEQWyEFk/gxtzR51nhpfEcZGzA+9uX2edFJw=
-X-Received: from pjbqn6.prod.google.com ([2002:a17:90b:3d46:b0:31f:1a3e:fe3b])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2588:b0:321:96da:79f9
- with SMTP id 98e67ed59e1d1-3234224e0bamr5280234a91.34.1755303746879; Fri, 15
- Aug 2025 17:22:26 -0700 (PDT)
-Date: Fri, 15 Aug 2025 17:22:24 -0700
-In-Reply-To: <CAAhR5DG+EMVbrdGaPoUiX3MtnVktFtdiY+dDjRhA9tugAoRTJQ@mail.gmail.com>
+	s=arc-20240116; t=1755303855; c=relaxed/simple;
+	bh=h6qhI4JvAbbz5b6iy/hFjeFUi+3euXdKMWZO9EP+OH0=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=EZKN2KHpzt4SH2EIE73BSsFtQPEcA042gWUnJHlb74ttd3UE6a9YqD+CIXziiiA9cklZ2rEvd/4m9U74vh7h6hjVXHSgEj0hqudJDrOM3OWFtv+4g0rflopOWNIo7m4S1O0TsolOshpKK8qZ61k4IxC85CAhovrzEUv0tC87Njk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com; spf=pass smtp.mailfrom=baidu.com; arc=none smtp.client-ip=111.206.215.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baidu.com
+From: "Li,Rongqing" <lirongqing@baidu.com>
+To: Keir Fraser <keirf@google.com>, "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+CC: Sean Christopherson <seanjc@google.com>, Eric Auger
+	<eric.auger@redhat.com>, Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier
+	<maz@kernel.org>, Will Deacon <will@kernel.org>, Paolo Bonzini
+	<pbonzini@redhat.com>
+Subject: RE: [PATCH v2 4/4] KVM: Avoid synchronize_srcu() in
+ kvm_io_bus_register_dev()
+Thread-Topic: [PATCH v2 4/4] KVM: Avoid synchronize_srcu() in
+ kvm_io_bus_register_dev()
+Thread-Index: AdwOQ+K17Q5s1iAHSD65a3R3+0RRAg==
+Date: Sat, 16 Aug 2025 00:23:30 +0000
+Message-ID: <b778c98abb4b425186bfeb1f9bed0c7a@baidu.com>
+Accept-Language: zh-CN, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250807201628.1185915-1-sagis@google.com> <20250807201628.1185915-7-sagis@google.com>
- <aJpO_zN3buvaQoAW@google.com> <0c8d6d1c-d9e1-4ffd-bb26-a03fb87cde1f@linux.intel.com>
- <CAAhR5DG+EMVbrdGaPoUiX3MtnVktFtdiY+dDjRhA9tugAoRTJQ@mail.gmail.com>
-Message-ID: <aJ_PQPkD3qrlW8jZ@google.com>
-Subject: Re: [PATCH v8 06/30] KVM: selftests: Add helper functions to create
- TDX VMs
-From: Sean Christopherson <seanjc@google.com>
-To: Sagi Shahar <sagis@google.com>
-Cc: Binbin Wu <binbin.wu@linux.intel.com>, linux-kselftest@vger.kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	Ackerley Tng <ackerleytng@google.com>, Ryan Afranji <afranji@google.com>, 
-	Andrew Jones <ajones@ventanamicro.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	Erdem Aktas <erdemaktas@google.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
-	Roger Wang <runanwang@google.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	"Pratik R. Sampat" <pratikrajesh.sampat@amd.com>, Reinette Chatre <reinette.chatre@intel.com>, 
-	Ira Weiny <ira.weiny@intel.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-FEAS-Client-IP: 172.31.50.46
+X-FE-Policy-ID: 52:10:53:SYSTEM
 
-On Fri, Aug 15, 2025, Sagi Shahar wrote:
-> On Tue, Aug 12, 2025 at 11:22=E2=80=AFPM Binbin Wu <binbin.wu@linux.intel=
-.com> wrote:
-> >
-> >
-> >
-> > On 8/12/2025 4:13 AM, Sean Christopherson wrote:
-> > > On Thu, Aug 07, 2025, Sagi Shahar wrote:
-> > [...]
-> > >> +
-> > >> +/*
-> > >> + * Boot parameters for the TD.
-> > >> + *
-> > >> + * Unlike a regular VM, KVM cannot set registers such as esp, eip, =
-etc
-> > >> + * before boot, so to run selftests, these registers' values have t=
-o be
-> > >> + * initialized by the TD.
-> > >> + *
-> > >> + * This struct is loaded in TD private memory at TD_BOOT_PARAMETERS=
-_GPA.
-> > >> + *
-> > >> + * The TD boot code will read off parameters from this struct and s=
-et up the
-> > >> + * vCPU for executing selftests.
-> > >> + */
-> > >> +struct __packed td_boot_parameters {
-> > > None of these comments explain why these structures are __packed, and=
- I suspect
-> > > _that_ is the most interesting/relevant information for unfamiliar re=
-aders.
-> > I guess because the fields defined in this structure are accessed by ha=
-rd-coded
-> > offsets in boot code.
-> > But as you suggested below, replicating the functionality of the kernel=
-'s
-> > OFFSET() could get rid of "__packed".
-> >
->=20
-> I agree, I think the reason for using __packed is because of the hard
-> coded offsets. I tried using OFFSET() as Sean suggested but couldn't
-> make it work.
->=20
-> I can't get the Kbuild scripts to work inside the kvm selftests
-> Makefile. I tried adding the following rules based on a reference I
-> found:
->=20
-> +include/x86/tdx/td_boot_offsets.h: lib/x86/tdx/td_boot_offsets.s
-> +       $(call filechk,offsets,__TDX_BOOT_OFFSETS_H__)
-> +
-> +lib/x86/tdx/td_boot_offsets.s: lib/x86/tdx/td_boot_offsets.c
-> +       $(call if_changed_dep,cc_s_c)
->=20
-> But I'm getting the following error when trying to generate the header:
->=20
-> /bin/sh: -c: line 1: syntax error near unexpected token `;'
-> /bin/sh: -c: line 1: `set -e;  ;  printf '# cannot find fixdep (%s)\n'
->  > lib/x86/tdx/.td_boot_offsets.s.cmd; printf '# using basic dep
-> data\n\n' >> lib/x86/tdx/.td_boot_offsets.s.cmd; cat
-> lib/x86/tdx/.td_boot_offsets.s.d >>
-> lib/x86/tdx/.td_boot_offsets.s.cmd; printf '\n%s\n'
-> 'cmd_lib/x86/tdx/td_boot_offsets.s :=3D ' >>
-> lib/x86/tdx/.td_boot_offsets.s.cmd'
-> make: *** [Makefile.kvm:44: lib/x86/tdx/td_boot_offsets.s] Error 2
->=20
-> For now I can add a comment on the __packed and add a TODO to replace
-> it with OFFSET. I think that making OFFSET work inside the kvm
-> selftests will require more expertise in the Kbuild system which I
-> don't have.
-
-No, I don't want to punt on this.  I don't care about __packed, I care abou=
-t the
-maintenance and review costs associated with hand coding struct offsets in =
-.S
-files.
-
-The problem is this line:
-
-	$(call if_changed_dep,cc_s_c)
-
-IIUC, the kernel's "generic" command for generating a .s file from a .c fil=
-e
-assumes various paths and flags, which doesn't play nice with KVM selftests=
-'
-unusual setup.
-
-We could fudge around that by defining a custom command, e.g.
-
-	cmd_kvm_cc_s_c =3D $(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -S $< -o $@
-
-but that just runs into more problems with the build system (variables not
-defined, more assumptions about the environment, etc).
-
-AFAICT, there's no need to use if_changed_dep, i.e. fixdep.  KVM selftests
-generate dependencies using standard mechanisms, and they appear to work as
-expected for this case, so just omit the if_change_dep and let the existing
-dependency stuff do its magic.
-
-This could be tidied up, e.g. add kbuild.h to tool/s, and is obviously inco=
-mplete,
-but it works.
-
----
- tools/testing/selftests/kvm/Makefile.kvm      | 13 ++++++++++
- .../kvm/lib/x86/tdx/td_boot_offsets.c         | 25 +++++++++++++++++++
- 2 files changed, 38 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/lib/x86/tdx/td_boot_offsets=
-.c
-
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selft=
-ests/kvm/Makefile.kvm
-index 438502e02a0f..1fec90da15a1 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -237,6 +237,9 @@ OVERRIDE_TARGETS =3D 1
- include ../lib.mk
- include ../cgroup/lib/libcgroup.mk
-=20
-+include $(top_srcdir)/scripts/Kbuild.include
-+include $(top_srcdir)/scripts/Makefile.lib
-+
- INSTALL_HDR_PATH =3D $(top_srcdir)/usr
- LINUX_HDR_PATH =3D $(INSTALL_HDR_PATH)/include/
- LINUX_TOOL_INCLUDE =3D $(top_srcdir)/tools/include
-@@ -326,18 +329,28 @@ $(LIBKVM_C_OBJ): $(OUTPUT)/%.o: %.c $(GEN_HDRS)
- $(LIBKVM_S_OBJ): $(OUTPUT)/%.o: %.S $(GEN_HDRS)
- 	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
-=20
-+$(OUTPUT)/lib/x86/tdx/td_boot.o: $(OUTPUT)/include/x86/tdx/td_boot_offsets=
-.h
-+
- # Compile the string overrides as freestanding to prevent the compiler fro=
-m
- # generating self-referential code, e.g. without "freestanding" the compil=
-er may
- # "optimize" memcmp() by invoking memcmp(), thus causing infinite recursio=
-n.
- $(LIBKVM_STRING_OBJ): $(OUTPUT)/%.o: %.c
- 	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c -ffreestanding $< -o $@
-=20
-+$(OUTPUT)/lib/x86/tdx/td_boot_offsets.s: lib/x86/tdx/td_boot_offsets.c
-+	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -S $< -o $@
-+
-+$(OUTPUT)/include/x86/tdx/td_boot_offsets.h: $(OUTPUT)/lib/x86/tdx/td_boot=
-_offsets.s FORCE
-+	$(call filechk,offsets,__TDX_BOOT_OFFSETS_H__)
-+
- $(shell mkdir -p $(sort $(dir $(TEST_GEN_PROGS))))
- $(SPLIT_TEST_GEN_OBJ): $(GEN_HDRS)
- $(TEST_GEN_PROGS): $(LIBKVM_OBJS)
- $(TEST_GEN_PROGS_EXTENDED): $(LIBKVM_OBJS)
- $(TEST_GEN_OBJ): $(GEN_HDRS)
-=20
-+FORCE:
-+
- cscope: include_paths =3D $(LINUX_TOOL_INCLUDE) $(LINUX_HDR_PATH) include =
-lib ..
- cscope:
- 	$(RM) cscope.*
-diff --git a/tools/testing/selftests/kvm/lib/x86/tdx/td_boot_offsets.c b/to=
-ols/testing/selftests/kvm/lib/x86/tdx/td_boot_offsets.c
-new file mode 100644
-index 000000000000..622f9a19ca30
---- /dev/null
-+++ b/tools/testing/selftests/kvm/lib/x86/tdx/td_boot_offsets.c
-@@ -0,0 +1,25 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#define COMPILE_OFFSETS
-+
-+#include <linux/kernel.h>
-+
-+#include "tdx/td_boot.h"
-+
-+#define DEFINE(sym, val) \
-+	asm volatile("\n.ascii \"->" #sym " %0 " #val "\"" : : "i" (val))
-+
-+#define BLANK() asm volatile("\n.ascii \"->\"" : : )
-+
-+#define OFFSET(sym, str, mem) \
-+	DEFINE(sym, offsetof(struct str, mem))
-+
-+#define COMMENT(x) \
-+	asm volatile("\n.ascii \"->#" x "\"")
-+
-+static void __attribute__((used)) common(void)
-+{
-+	BLANK();
-+	OFFSET(TD_BOOT_cr0, td_boot_parameters, cr0);
-+	OFFSET(TD_BOOT_cr3, td_boot_parameters, cr3);
-+	OFFSET(TD_BOOT_cr4, td_boot_parameters, cr4);
-+}
-
-base-commit: 04b916993b06d35ec96a5324e0ed93d1eb115dbd
---=20
-
+DQoNCj4gDQo+IERldmljZSBNTUlPIHJlZ2lzdHJhdGlvbiBtYXkgaGFwcGVuIHF1aXRlIGZyZXF1
+ZW50bHkgZHVyaW5nIFZNIGJvb3QsIGFuZA0KPiB0aGUgU1JDVSBzeW5jaHJvbml6YXRpb24gZWFj
+aCB0aW1lIGhhcyBhIG1lYXN1cmFibGUgZWZmZWN0IG9uIFZNIHN0YXJ0dXANCj4gdGltZS4gSW4g
+b3VyIGV4cGVyaW1lbnRzIGl0IGNhbiBhY2NvdW50IGZvciBhcm91bmQgMjUlIG9mIGEgVk0ncyBz
+dGFydHVwIHRpbWUuDQo+IA0KPiBSZXBsYWNlIHRoZSBzeW5jaHJvbml6YXRpb24gd2l0aCBhIGRl
+ZmVycmVkIGZyZWUgb2YgdGhlIG9sZCBrdm1faW9fYnVzDQo+IHN0cnVjdHVyZS4NCj4gDQoNClRl
+c3RlZC1ieTogTGkgUm9uZ1FpbmcgPGxpcm9uZ3FpbmdAYmFpZHUuY29tPg0KDQpUaGFua3MNCg0K
+LUxpDQoNCj4gU2lnbmVkLW9mZi1ieTogS2VpciBGcmFzZXIgPGtlaXJmQGdvb2dsZS5jb20+DQo+
+IC0tLQ0KPiAgaW5jbHVkZS9saW51eC9rdm1faG9zdC5oIHwgIDEgKw0KPiAgdmlydC9rdm0va3Zt
+X21haW4uYyAgICAgIHwgMTAgKysrKysrKystLQ0KPiAgMiBmaWxlcyBjaGFuZ2VkLCA5IGluc2Vy
+dGlvbnMoKyksIDIgZGVsZXRpb25zKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9saW51
+eC9rdm1faG9zdC5oIGIvaW5jbHVkZS9saW51eC9rdm1faG9zdC5oIGluZGV4DQo+IDkxMzIxNDhm
+YjQ2Ny4uODAyY2E0NmY3NTM3IDEwMDY0NA0KPiAtLS0gYS9pbmNsdWRlL2xpbnV4L2t2bV9ob3N0
+LmgNCj4gKysrIGIvaW5jbHVkZS9saW51eC9rdm1faG9zdC5oDQo+IEBAIC0yMDUsNiArMjA1LDcg
+QEAgc3RydWN0IGt2bV9pb19yYW5nZSB7ICBzdHJ1Y3Qga3ZtX2lvX2J1cyB7DQo+ICAJaW50IGRl
+dl9jb3VudDsNCj4gIAlpbnQgaW9ldmVudGZkX2NvdW50Ow0KPiArCXN0cnVjdCByY3VfaGVhZCBy
+Y3U7DQo+ICAJc3RydWN0IGt2bV9pb19yYW5nZSByYW5nZVtdOw0KPiAgfTsNCj4gDQo+IGRpZmYg
+LS1naXQgYS92aXJ0L2t2bS9rdm1fbWFpbi5jIGIvdmlydC9rdm0va3ZtX21haW4uYyBpbmRleA0K
+PiA5ZWMzYjk2Yjk2NjYuLmY2OTBhNDk5N2EwZiAxMDA2NDQNCj4gLS0tIGEvdmlydC9rdm0va3Zt
+X21haW4uYw0KPiArKysgYi92aXJ0L2t2bS9rdm1fbWFpbi5jDQo+IEBAIC01OTQ4LDYgKzU5NDgs
+MTMgQEAgaW50IGt2bV9pb19idXNfcmVhZChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsDQo+IGVudW0g
+a3ZtX2J1cyBidXNfaWR4LCBncGFfdCBhZGRyLCAgfQ0KPiBFWFBPUlRfU1lNQk9MX0dQTChrdm1f
+aW9fYnVzX3JlYWQpOw0KPiANCj4gK3N0YXRpYyB2b2lkIF9fZnJlZV9idXMoc3RydWN0IHJjdV9o
+ZWFkICpyY3UpIHsNCj4gKwlzdHJ1Y3Qga3ZtX2lvX2J1cyAqYnVzID0gY29udGFpbmVyX29mKHJj
+dSwgc3RydWN0IGt2bV9pb19idXMsIHJjdSk7DQo+ICsNCj4gKwlrZnJlZShidXMpOw0KPiArfQ0K
+PiArDQo+ICBpbnQga3ZtX2lvX2J1c19yZWdpc3Rlcl9kZXYoc3RydWN0IGt2bSAqa3ZtLCBlbnVt
+IGt2bV9idXMgYnVzX2lkeCwgZ3BhX3QNCj4gYWRkciwNCj4gIAkJCSAgICBpbnQgbGVuLCBzdHJ1
+Y3Qga3ZtX2lvX2RldmljZSAqZGV2KSAgeyBAQCAtNTk4Niw4DQo+ICs1OTkzLDcgQEAgaW50IGt2
+bV9pb19idXNfcmVnaXN0ZXJfZGV2KHN0cnVjdCBrdm0gKmt2bSwgZW51bSBrdm1fYnVzDQo+IGJ1
+c19pZHgsIGdwYV90IGFkZHIsDQo+ICAJbWVtY3B5KG5ld19idXMtPnJhbmdlICsgaSArIDEsIGJ1
+cy0+cmFuZ2UgKyBpLA0KPiAgCQkoYnVzLT5kZXZfY291bnQgLSBpKSAqIHNpemVvZihzdHJ1Y3Qg
+a3ZtX2lvX3JhbmdlKSk7DQo+ICAJcmN1X2Fzc2lnbl9wb2ludGVyKGt2bS0+YnVzZXNbYnVzX2lk
+eF0sIG5ld19idXMpOw0KPiAtCXN5bmNocm9uaXplX3NyY3VfZXhwZWRpdGVkKCZrdm0tPnNyY3Up
+Ow0KPiAtCWtmcmVlKGJ1cyk7DQo+ICsJY2FsbF9zcmN1KCZrdm0tPnNyY3UsICZidXMtPnJjdSwg
+X19mcmVlX2J1cyk7DQo+IA0KPiAgCXJldHVybiAwOw0KPiAgfQ0KPiAtLQ0KPiAyLjUwLjAuNzI3
+LmdiZjdkYzE4ZmY0LWdvb2cNCj4gDQoNCg==
 
