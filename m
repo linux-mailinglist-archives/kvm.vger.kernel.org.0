@@ -1,109 +1,193 @@
-Return-Path: <kvm+bounces-54918-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54920-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21B70B2B277
-	for <lists+kvm@lfdr.de>; Mon, 18 Aug 2025 22:34:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DA86B2B280
+	for <lists+kvm@lfdr.de>; Mon, 18 Aug 2025 22:36:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91E363AF52E
-	for <lists+kvm@lfdr.de>; Mon, 18 Aug 2025 20:32:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6928C5E0F1B
+	for <lists+kvm@lfdr.de>; Mon, 18 Aug 2025 20:34:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86E372264B7;
-	Mon, 18 Aug 2025 20:32:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 097292248B4;
+	Mon, 18 Aug 2025 20:34:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="F5vg4gnA"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FrS1K8f+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 081D639FCE
-	for <kvm@vger.kernel.org>; Mon, 18 Aug 2025 20:32:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6844C21770D
+	for <kvm@vger.kernel.org>; Mon, 18 Aug 2025 20:34:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755549137; cv=none; b=ffumj3B6fE3C5n9i5pTDbTil8rtWBjjTiJxKRfek514aGMipT8e3A11z0One3mfL54ydssSEE9kSBPOFuVPSHuMSs9sYYJt/z9t2NnKSa/PtyEwSHVJqBRjahRHk4bK/TIZ202fAug8TpYvIg69O3S+2mjH1qMOcUz3GDyhvth4=
+	t=1755549265; cv=none; b=Mrn/IPgzZn2AI2DMiVNDP2m63UPuffzMWQzgmlds3FSsktZqFxz0YoRIJf9p6OQklE5N+XFXY8sCVj4uNTLuK1G0UItx187SK+U9kR/S74Bbu2PwVvUOEzFfYx9dLDWG5LSNLrLuoBtMPjioqvUK2t1Q8yMdOl9ymxmQWUT4R/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755549137; c=relaxed/simple;
-	bh=auyqtb4rVQCIYE2YBsgUNUAZb45KHzNR0n+asi5V4Wg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V8z7Smg8i1OZ0thgL7w+7SZi62vr8BLWZm8e2NlUMkIwk6E2lc4g4bR9pp9TLSn/wGYbpNkQRs5j5ZBEDqaSVp8l2kdTtq13jC/o+fXRf4BkJcdCQfqe4ODn6mEAKbT8qmuz8gxph0hsY9ACAa0lHnmYovRPrnV+8IneVP+67oA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=F5vg4gnA; arc=none smtp.client-ip=209.85.166.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-3e57376f655so36223635ab.0
-        for <kvm@vger.kernel.org>; Mon, 18 Aug 2025 13:32:15 -0700 (PDT)
+	s=arc-20240116; t=1755549265; c=relaxed/simple;
+	bh=vEU1DhK/0zgNT8JWZLGDWnWbNMj0+ZSO11M2ZhDRAFg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bMbIHTHlcd1wYIabZcgh7cHjwhhRmuoMZ4nLkzmuWg//Xpec8litkeEpLzReM0I4+JJX6a3ME/OEk546wISJYXnOql4hy2cv6IVpDo3B4jCMW4E5ROBWvBHL9WyME3sXJYAb81ODLVR+Ro4ohBK7FLu39d3SUycZ1nhppHmL+HM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FrS1K8f+; arc=none smtp.client-ip=209.85.167.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-55ce5287a47so4158631e87.3
+        for <kvm@vger.kernel.org>; Mon, 18 Aug 2025 13:34:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1755549135; x=1756153935; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9Vn7KGvnJ31CxElASYk+NIfs2sarLTulRtjwYt6vxT8=;
-        b=F5vg4gnAD+odU4VUqghw35yPowRi/dJkzdTkIkZCUPL32aoSDMmIUVbOwNYVRRhqsi
-         VLOJYOMYeqmkU4gkJvfmbMigKjrsqG1DNAgE9I6u0IR7+npFaAgbYjr1N9bt5dONYFcf
-         ULl/YG5u/NqwEhTC9EDDEvPj/aVZ/vBRw0QGy60F9ZB+vtK6ssFVNPtoR+/RTQrd4p3L
-         nPQd/CF4Ba33reZG8QzyuZ9cLJN7ivmwJfykeS5qioKqDaKIzpE2lsr5QPSKoY7rj5fX
-         mPlI6rPbIeou8Z9DM+iTwrv/CqKpNIsDe4Bw8QlmWH0SVM1xpog9xofkGkFfaZ7BBprx
-         tz5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755549135; x=1756153935;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1755549261; x=1756154061; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9Vn7KGvnJ31CxElASYk+NIfs2sarLTulRtjwYt6vxT8=;
-        b=eCxlb5D8RU/F2MexS4avyMtGc4EI37lZuQos1gcSjOGITu18EACdmxVu8WB7lFGNBq
-         5grxQKUeFEQsKoSbGnK4V0At//5hpwmk5ZhZ23hP813CgY/HbK8tM/CSFNsinsUEuzNc
-         +LpcxQDDCBVSJEAoEJHNeYeeB9zZrWjsOaqDl1U6GIiHJRCW+crSIiKIhwbSMVBURhn1
-         1AYlU3sckvHNdAPgzh50bqHNE8IIAGW/BgbfLhuX6GTraMOUzkYpIej/nMf5WbTSjYs3
-         eBmOvGH+W9Mv9Nn9vbBwa71WvaCI06IFq7l2vKOes3JngeTfDxfBoTXjoJsnRSlvQf/0
-         4tyA==
-X-Forwarded-Encrypted: i=1; AJvYcCXzhIdOi1htmR1Yh2qL+r3mM3LuL6JMfRL6s83gFSQqfIgcf54SuUTn+tlLHyMEqe38gZM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywy5TCZdTYeFwcpmiU/xT4s0UyGjt+CW/h2AIXjdmMGtCGbn99B
-	cyIP6AJMqRVDJ8HvE2tYXbSlB9aFmnTQbYEBp80F5Zl2HVNwSBaBbsVgOBfP348wn4Y=
-X-Gm-Gg: ASbGnctKJU+IuPULdIm2m4N5nkHRcmRoKUyL2Vjodwodad0OImlTGjR+yIqvH0xHdgX
-	9OMWIhPiJmdJU77uy6b0n0qeMoxFKCeq5NHYMa2MwDaxXVppP75OJNF/0gBNwclHF5JcustPJio
-	6XEWplRBQDAkkzbPYLU785uXelJiyQrlkagtp6F0LkC3PjpRJMELsSy08YXuXkUfOqZC1CNuKg2
-	UHuiZUdZHD/nJkYhA9k3h3n3jIoz9xPU9FjH1uEs93p8F/LU3Q8Da4/NmO6HaEFtt76lb+cCGSV
-	tDmrgYD6u6AkZrLSBjC63pBqXHFR90HGa1knTpYWRqELwCKECXRnT4DrHv/XmcADmejd+q+Sg2b
-	uESB0dwdphDm2RKgUT1scy1xg
-X-Google-Smtp-Source: AGHT+IF/UJeN6VdS70sUHdd0WRTBcf8Mub8fIKvWwcAVcgm38V3gFnMMkeNmKxZ5+rkOte8i+tJYLQ==
-X-Received: by 2002:a92:ca4f:0:b0:3e5:1917:585b with SMTP id e9e14a558f8ab-3e676638e2cmr1709575ab.14.1755549135023;
-        Mon, 18 Aug 2025 13:32:15 -0700 (PDT)
-Received: from localhost ([140.82.166.162])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3e66c6b0b12sm13085315ab.25.2025.08.18.13.32.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Aug 2025 13:32:14 -0700 (PDT)
-Date: Mon, 18 Aug 2025 15:32:13 -0500
-From: Andrew Jones <ajones@ventanamicro.com>
-To: zhouquan@iscas.ac.cn
-Cc: anup@brainfault.org, atishp@atishpatra.org, paul.walmsley@sifive.com, 
-	palmer@dabbelt.com, linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
-Subject: Re: [PATCH v2 1/6] RISC-V: KVM: Change zicbom/zicboz block size to
- depend on the host isa
-Message-ID: <20250818-f6b7d56c16a41351e90ca804@orel>
-References: <cover.1754646071.git.zhouquan@iscas.ac.cn>
- <fef5907425455ecd41b224e0093f1b6bc4067138.1754646071.git.zhouquan@iscas.ac.cn>
+        bh=pUZu6/RFeyBiHuWjtq2Q11oy5SbsMtdXFQAhlB7E6FM=;
+        b=FrS1K8f+0yw+Bjz5v+Sxs8Tcb1nTC//pEgPY1zWE6yyQRakfWFXc2LpNaExRxQlXJN
+         MIKqoVaQrYyG8xq40HiLFtTg02cLnjm166+5OWq7DDQ6eOFdmwuVfIzTdRk1F42cxji+
+         KgC2aTtZBkIbwsZ1D7ojjN2N7TuC7jPGYPRkdSxYhkSxQA0lJVjjHlSoGgx0Q9QZyAHW
+         nYpqZfntpxYY4oZXTmiBwV9bIeDQ3ZaTdXJAB5w3s8xGwgUsGMJQuiQFQOQMshZObje8
+         FUN/wyEJePcwGoTZaN4/B3DoJPfA4I6X27brmLj0+sLln3Lmu4ssQwuaYsEqUFMWMjLV
+         Urdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755549261; x=1756154061;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pUZu6/RFeyBiHuWjtq2Q11oy5SbsMtdXFQAhlB7E6FM=;
+        b=ahLgs1DHIq2b1DqqXwYNwU9K1lpNzyLAXFjXGfnj/E7nuBc1yFnWHha+PbRMyPy67N
+         yCBnSmEPQBoano8yjeVXmXii29B4J1gw3bnIPnbjhh5PoONA8KeUmhX5RBvbqGVDH9kK
+         you+SYBbENCAKcTuLMpgjfvkk5yYj8Fm3L3epAJyg+2IkiFJXKM7r8NXjnjUyph01Rs2
+         rT48OkHmMwA+nwn2ip2aGkVfAcIbQsjP9QxSYoSZEsyS0iRnd2/+faZqSnWurWDuEXCQ
+         v4lzLMdECllcP6w4CxPGdVFzq0R4mjZJD1OKeKYx31LMjEuuMAPaMJPnhmOM/rmHUYWe
+         MKCQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXuWM/UIIS70vI4ot56BnwkAoOKxv+6LxMnHruSKqxU+CCVtgwp7a4TIkdT/bElv9vSaAs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzxTypJfW+MBgWsRjBCBM4kOhVmDTa9RjdxUkDU5CBwLzP2uNtN
+	HDWW9bLMNq6YrefMXpkkcPD3T+jvdCOAN5roK6246KFk03a1Fv0U4eh61vKZdnv4FvB+aVlqCpk
+	8y6e6zzy1cshXjxP1TICYY78dFHqwPXMa15EUkfvR
+X-Gm-Gg: ASbGncuRAx4h2hlNwPCy6K4dL44qHpdYTmInthtzLFs7CEqinHA5e8KaeomRoNSt7Xm
+	U40uCSRSAPAjQM9mCczDHqlbmRwG3tC+N75g7s7EKpfCEXDkOvDowIPSwi4bDEcdRVjLsBg9NeL
+	Kyl9JuCES1dA0XJY2fDOY79kx5045dcnEvLy+Z3MbG8nxW+jHgRnarkmhyTrhYWahZKMn1oOAfz
+	lM0At0zlSN6mlSjPtdp8ys6
+X-Google-Smtp-Source: AGHT+IG/okCLiEMnTbEAuvgIc+GfOEaMV4Ktqhv/RQf6BYRPRMuCIwvQNW5SPCUa5fwVMmY/BHmCrdmWZrmWrMGMPKA=
+X-Received: by 2002:a05:6512:1597:b0:55c:c937:111d with SMTP id
+ 2adb3069b0e04-55e0076824fmr61707e87.13.1755549261092; Mon, 18 Aug 2025
+ 13:34:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fef5907425455ecd41b224e0093f1b6bc4067138.1754646071.git.zhouquan@iscas.ac.cn>
+References: <20250620232031.2705638-1-dmatlack@google.com> <CALzav=dVYqS8oQNbygVjgA69EQMBBP4CyzydyUoAjnN2mb_yUQ@mail.gmail.com>
+ <20250728102737.5b51e9da.alex.williamson@redhat.com> <20250729222635.GU36037@nvidia.com>
+ <CALzav=d0vPMw26f-vzCJnjRFL+Uc6sObihqJ0jnJRpi-SxtSSw@mail.gmail.com>
+ <CALzav=fdT+NJDO+jWyty+tKqxqum4RVkHZmUocz4MDQkPgG4Bg@mail.gmail.com> <20250818133721.32b660e3.alex.williamson@redhat.com>
+In-Reply-To: <20250818133721.32b660e3.alex.williamson@redhat.com>
+From: David Matlack <dmatlack@google.com>
+Date: Mon, 18 Aug 2025 13:33:52 -0700
+X-Gm-Features: Ac12FXzA9RSmzacYT5nDWeSXLLoZk1b9VAVMv04nR2qdBzwPjNGQjuMMNBDam8Q
+Message-ID: <CALzav=eOz+Gf8XawvaSSBHj=8gQg3O9T9dJcN6q4eqh7_MEPDw@mail.gmail.com>
+Subject: Re: [PATCH 00/33] vfio: Introduce selftests for VFIO
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>, Aaron Lewis <aaronlewis@google.com>, 
+	Adhemerval Zanella <adhemerval.zanella@linaro.org>, 
+	Adithya Jayachandran <ajayachandra@nvidia.com>, Andrew Jones <ajones@ventanamicro.com>, 
+	Ard Biesheuvel <ardb@kernel.org>, Arnaldo Carvalho de Melo <acme@redhat.com>, Bibo Mao <maobibo@loongson.cn>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, Dan Williams <dan.j.williams@intel.com>, 
+	Dave Jiang <dave.jiang@intel.com>, dmaengine@vger.kernel.org, 
+	Huacai Chen <chenhuacai@kernel.org>, James Houghton <jthoughton@google.com>, 
+	Joel Granados <joel.granados@kernel.org>, Josh Hilke <jrhilke@google.com>, 
+	Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	"Mike Rapoport (Microsoft)" <rppt@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Pasha Tatashin <pasha.tatashin@soleen.com>, "Pratik R. Sampat" <prsampat@amd.com>, 
+	Saeed Mahameed <saeedm@nvidia.com>, Sean Christopherson <seanjc@google.com>, Shuah Khan <shuah@kernel.org>, 
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>, Vipin Sharma <vipinsh@google.com>, 
+	Wei Yang <richard.weiyang@gmail.com>, "Yury Norov [NVIDIA]" <yury.norov@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Aug 08, 2025 at 06:18:21PM +0800, zhouquan@iscas.ac.cn wrote:
-> From: Quan Zhou <zhouquan@iscas.ac.cn>
-> 
-> The zicbom/zicboz block size registers should depend on the host's isa,
-> the reason is that we otherwise create an ioctl order dependency on the VMM.
-> 
-> Signed-off-by: Quan Zhou <zhouquan@iscas.ac.cn>
-> ---
->  arch/riscv/kvm/vcpu_onereg.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
+On Mon, Aug 18, 2025 at 12:37=E2=80=AFPM Alex Williamson
+<alex.williamson@redhat.com> wrote:
 >
+> On Mon, 18 Aug 2025 11:59:39 -0700
+> David Matlack <dmatlack@google.com> wrote:
+>
+> > On Thu, Jul 31, 2025 at 1:55=E2=80=AFPM David Matlack <dmatlack@google.=
+com> wrote:
+> > >
+> > > On Tue, Jul 29, 2025 at 3:26=E2=80=AFPM Jason Gunthorpe <jgg@nvidia.c=
+om> wrote:
+> > > >
+> > > > On Mon, Jul 28, 2025 at 10:27:37AM -0600, Alex Williamson wrote:
+> > > > > On Fri, 25 Jul 2025 09:47:48 -0700
+> > > > > David Matlack <dmatlack@google.com> wrote:
+> > > > > > I also was curious about your thoughts on maintenance of VFIO
+> > > > > > selftests, since I don't think we discussed that in the RFC. I =
+am
+> > > > > > happy to help maintain VFIO selftests in whatever way makes the=
+ most
+> > > > > > sense. For now I added tools/testing/selftests/vfio under the
+> > > > > > top-level VFIO section in MAINTAINERS (so you would be the main=
+tainer)
+> > > > > > and then also added a separate section for VFIO selftests with =
+myself
+> > > > > > as a Reviewer (see PATCH 01). Reviewer felt like a better choic=
+e than
+> > > > > > Maintainer for myself since I am new to VFIO upstream (I've pri=
+marily
+> > > > > > worked on KVM in the past).
+> > > > >
+> > > > > Hi David,
+> > > > >
+> > > > > There's a lot of potential here and I'd like to see it proceed.
+> > > >
+> > > > +1 too, I really lack time at the moment to do much with this but I=
+'m
+> > > > half inclined to suggest Alex should say it should be merged in 6
+> > > > weeks (to motivate any reviewing) and we can continue to work on it
+> > > > in-tree.
+> > > >
+> > > > As they are self tests I think there is alot more value in having t=
+he
+> > > > tests than having perfect tests.
+> > >
+> > > They have been quite useful already within Google. Internally we have
+> > > something almost identical to the RFC and have been using that for
+> > > testing our 6.6-based kernel continuously since March. Already they
+> > > have caught one (self-inflicted) regression where 1GiB HugeTLB pages
+> > > started getting mapped with 2MiB mappings in the IOMMU, and have been
+> > > very helpful with new development (e.g. Aaron's work, and Live Update
+> > > support).
+> > >
+> > > So I agree, it's probably net positive to merge early and then iterat=
+e
+> > > in-tree. Especially since these are only tests and not e.g.
+> > > load-bearing kernel code (although I still want to hold a high bar fo=
+r
+> > > the selftests code).
+> > >
+> > > The only patches to hold off merging would be 31-33, since those
+> > > should probably go through the KVM tree? And of course we need Acks
+> > > for the drivers/dma/{ioat,idxd} changes, but the changes there are
+> > > pretty minor.
+> >
+> > Alex, how would you like to proceed?
+>
+> I think we need an ack from Shuah for the overall inclusion in
+> tools/testing/selftests/
+>
+> AFAICT the tools include files don't seem to have any central
+> authority, so maybe we just need to chase those ioat/idxd acks, along
+> with Shuah's and we can get this rolling and follow-up with the latter
+> KVM patches once the base is merged.  Thanks,
 
-Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+Sounds good.
+
+And yeah, I also don't see any maintainers listed for tools/include/
+or tools/arch/x86/include/. Jason left some comments on the RFC that
+reduced the delta in v1, but that's the only feedback I've gotten so
+far there.
+
+I will try emailing Shuah and the ioat/idxd maintainers directly as a
+next step, since it has been about 2 months since I posted this series
+and we haven't heard anything yet.
+
+Thanks for the help.
 
