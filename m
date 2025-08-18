@@ -1,134 +1,105 @@
-Return-Path: <kvm+bounces-54883-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54884-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B06DCB2A133
-	for <lists+kvm@lfdr.de>; Mon, 18 Aug 2025 14:13:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE036B2A1E9
+	for <lists+kvm@lfdr.de>; Mon, 18 Aug 2025 14:43:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 069BB5E570A
-	for <lists+kvm@lfdr.de>; Mon, 18 Aug 2025 12:09:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 27750166B9B
+	for <lists+kvm@lfdr.de>; Mon, 18 Aug 2025 12:33:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7297831A04A;
-	Mon, 18 Aug 2025 12:09:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 362DE3218B1;
+	Mon, 18 Aug 2025 12:32:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="hw7yqwRt"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TqdH3Nfm"
 X-Original-To: kvm@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D567227B327;
-	Mon, 18 Aug 2025 12:09:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B30D3218A3
+	for <kvm@vger.kernel.org>; Mon, 18 Aug 2025 12:32:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755518972; cv=none; b=IagEqSG2B27InQCyuTcHfpPfFHedt0tYr3WibxUzZd/q/6Ra4V6ojwPJ6W7UYi3Xy3o8HtXwyEvMPlqy20+rHnnydyYwRogQ+yrCKQUsRjbEDQnPKNlp7UzmRcaIB44z23iuclezSAmkjR1ePoBm6klq8DX1hSRaqyiiMFEvwVc=
+	t=1755520338; cv=none; b=Dpyq0X5KKVUmxtbkcYxY89BOVnGkN3I0vRE56vr40UNNg5zwieFoi2x/FZhu8lfeQvT+u9A+IhPa8/gcxwalV2Q4cGnV/4y9DJG3/1uIfY2WFoiztmJA2lb8J6fuI3e3gL1tWQJ84Od/vLdK6Tdh9nnLFM5sVzY3sYP+FPe6P24=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755518972; c=relaxed/simple;
-	bh=OpLQdy0G/Okp0F0LQiqP1NL9Gk/7mF8nmHn0cni2z3A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tPnYwa3e1jRZ9dubszOzFhliWS9PZSP4QkUwA6Ch2zPoR+lIVXcoyO+gVWKhEk0qp4FHUtW/8S+5+yZ/L4NemREsdnUUUdw+IdedgHdQMvjQ3y2/5cpng0PGQtKsnqiTuwY1OL4NPYZA77Ht5vc7QU5vljzRHVQcos43l98LjEk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=hw7yqwRt; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=JIDCDEr/1d5V29Dqy9cjcsDweAzjIcSrXoBz7OAnOQc=; b=hw7yqwRtgfcqq+EjufE2Jc2iV3
-	3fgmJNFglB7kHDM+xLP3/4A2d2aAUgICLohp9OUwk/5+Y/8O6mojpbZ/Vq3JiWKbY0Wl2+niLNbY0
-	DhwP3Vcaus9WsenOgucD+O81dU4PMH+52JXxpr7aFfyvnuCI0WTUl4yNo+04j1BF4clFLWLmRqNFy
-	CIpHLDI9+fwQter0IIL4OFu37dXbdgBv//lIeXXrjE8qeUpux8tfIjv5+fsewXmbti1fYSNIsW39u
-	qp17HHNclKL1lnQFsuZMrxEOtvOgQMMDRrv8qV3qaV3VYNdqTAzawH6DW38ZuV3hnjOJLKTgHXJeA
-	jdeY576Q==;
-Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
-	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1unyfv-0000000HMQW-2uzq;
-	Mon, 18 Aug 2025 12:09:20 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 453B830029B; Mon, 18 Aug 2025 14:09:19 +0200 (CEST)
-Date: Mon, 18 Aug 2025 14:09:19 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-To: Xin Li <xin@zytor.com>
-Cc: x86@kernel.org, kys@microsoft.com, haiyangz@microsoft.com,
-	wei.liu@kernel.org, decui@microsoft.com, tglx@linutronix.de,
-	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-	hpa@zytor.com, seanjc@google.com, pbonzini@redhat.com,
-	ardb@kernel.org, kees@kernel.org, Arnd Bergmann <arnd@arndb.de>,
-	gregkh@linuxfoundation.org, jpoimboe@kernel.org,
-	linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, linux-efi@vger.kernel.org,
-	samitolvanen@google.com, ojeda@kernel.org
-Subject: Re: [PATCH v3 14/16] x86/fred: Play nice with invoking
- asm_fred_entry_from_kvm() on non-FRED hardware
-Message-ID: <20250818120919.GG3289052@noisy.programming.kicks-ass.net>
-References: <20250714102011.758008629@infradead.org>
- <20250714103441.245417052@infradead.org>
- <f6925ee5-bbd7-42e3-9e3b-59d2e8ec2681@zytor.com>
+	s=arc-20240116; t=1755520338; c=relaxed/simple;
+	bh=wnzyKxf8inTgU8+M+6idd9OtmixsX9MUjnCXKR2eJKs=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=ktEVt8OPdr7ILmhueBrZnc+2ZiW7tyuKdj/ifVbbO5HaqWpvWId6K1spcH9BKsxwvmSuUXxXo8H8oA/r+hXscRxwKq3ymJxQw9hQwh2cwfI9FW/XPer9i+oNAhDKnHpHgqLsNctYd6v/KRJd5S8z646AC+CnKNGz7+05J8YQMtA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TqdH3Nfm; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1755520335;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/xhetDspssApBKISBn5ZaW5PlAHoD+TybPOqB+IwKDk=;
+	b=TqdH3Nfm/z19nW2plS+vc1GpKcZ4IFZyJ0ERMtDTgjErf4gOdF9H/ypSwCOTvOO9/RuHu9
+	6MkRjEg4nmwAf93Uo4275MFEl+Aw5DpYlbeNaAmVwAjyf9Ch3tpRQS3fG8CNdpzDKlDj4b
+	qdjGtXoNmvX36u0E1MI+/nBb56dfe98=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-673-QzENNlAGPtaUSEVz6EQjMw-1; Mon,
+ 18 Aug 2025 08:32:12 -0400
+X-MC-Unique: QzENNlAGPtaUSEVz6EQjMw-1
+X-Mimecast-MFC-AGG-ID: QzENNlAGPtaUSEVz6EQjMw_1755520330
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3F34E195608A;
+	Mon, 18 Aug 2025 12:32:09 +0000 (UTC)
+Received: from localhost (dhcp-192-216.str.redhat.com [10.33.192.216])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EC335180028C;
+	Mon, 18 Aug 2025 12:32:07 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose
+ <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, Zenghui
+ Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>, Catalin Marinas
+ <catalin.marinas@arm.com>
+Subject: Re: [PATCH v3 1/6] arm64: Add capability denoting FEAT_RASv1p1
+In-Reply-To: <20250817202158.395078-2-maz@kernel.org>
+Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
+ Grasbrunn, Handelsregister: Amtsgericht =?utf-8?Q?M=C3=BCnchen=2C?= HRB
+ 153243,
+ =?utf-8?Q?Gesch=C3=A4ftsf=C3=BChrer=3A?= Ryan Barnhart, Charles Cachera,
+ Avril Crosse O'Flaherty"
+References: <20250817202158.395078-1-maz@kernel.org>
+ <20250817202158.395078-2-maz@kernel.org>
+User-Agent: Notmuch/0.38.3 (https://notmuchmail.org)
+Date: Mon, 18 Aug 2025 14:32:05 +0200
+Message-ID: <87zfbwerp6.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f6925ee5-bbd7-42e3-9e3b-59d2e8ec2681@zytor.com>
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Fri, Jul 25, 2025 at 09:54:32PM -0700, Xin Li wrote:
-> On 7/14/2025 3:20 AM, Peter Zijlstra wrote:
-> >   	call __fred_entry_from_kvm		/* Call the C entry point */
-> > -	POP_REGS
-> > -	ERETS
-> > -1:
-> > +
-> > +1:	/*
-> 
-> The symbol "1" is misplaced; it needs to be put after the ERETS
-> instruction.
+On Sun, Aug 17 2025, Marc Zyngier <maz@kernel.org> wrote:
 
-Doh, fixed.
+> Detecting FEAT_RASv1p1 is rather complicated, as there are two
+> ways for the architecture to advertise the same thing (always a
+> delight...).
+>
+> Add a capability that will advertise this in a synthetic way to
+> the rest of the kernel.
+>
+> Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kernel/cpufeature.c | 24 ++++++++++++++++++++++++
+>  arch/arm64/tools/cpucaps       |  1 +
+>  2 files changed, 25 insertions(+)
 
-> > +	 * When FRED, use ERETS to potentially clear NMIs, otherwise simply
-> > +	 * restore the stack pointer.
-> > +	 */
-> > +	ALTERNATIVE "nop; nop; mov %rbp, %rsp", \
-> 
-> Why explicitly add two nops here?
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
-Because the CFI information for all alternative code flows must be the
-same. So by playing games with instruction offsets you can have
-conflicting CFI inside the alternative.
-
-Specifically, we have:
-
-0:	90        nop
-1:	90        nop
-2:	48 89 ec  mov %rbp, %rsp
-
-
-0:	48 83 c4 0c  add $12, %rsp
-4:      f2 0f 01 ca  erets
-
-This gets us CFI updates on 0, 2 and 4, without conflicts.
-
-
-> ALTERNATIVE will still pad three-byte nop after the MOV instruction.
-> 
-> > +	            __stringify(add $C_PTREGS_SIZE, %rsp; ERETS), \
-> > +		    X86_FEATURE_FRED
-> > +
-> >   	/*
-> > -	 * Objtool doesn't understand what ERETS does, this hint tells it that
-> > -	 * yes, we'll reach here and with what stack state. A save/restore pair
-> > -	 * isn't strictly needed, but it's the simplest form.
-> > +	 * Objtool doesn't understand ERETS, and the cfi register state is
-> > +	 * different from initial_func_cfi due to PUSH_REGS. Tell it the state
-> > +	 * is similar to where UNWIND_HINT_SAVE is.
-> >   	 */
-> >   	UNWIND_HINT_RESTORE
-> > +
-> >   	pop %rbp
-> >   	RET
-> 
 
