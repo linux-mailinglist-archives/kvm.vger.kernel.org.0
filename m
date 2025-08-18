@@ -1,109 +1,161 @@
-Return-Path: <kvm+bounces-54898-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54897-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A063B2AF00
-	for <lists+kvm@lfdr.de>; Mon, 18 Aug 2025 19:10:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21E73B2AE90
+	for <lists+kvm@lfdr.de>; Mon, 18 Aug 2025 18:53:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 587E33BDC73
-	for <lists+kvm@lfdr.de>; Mon, 18 Aug 2025 17:07:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB1A0564E6B
+	for <lists+kvm@lfdr.de>; Mon, 18 Aug 2025 16:53:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 672F532C316;
-	Mon, 18 Aug 2025 17:07:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FCDB343D62;
+	Mon, 18 Aug 2025 16:52:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J4Zht8J9"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f5c89ng2"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7039032C304;
-	Mon, 18 Aug 2025 17:07:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 092C2335BAD
+	for <kvm@vger.kernel.org>; Mon, 18 Aug 2025 16:52:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755536852; cv=none; b=hGSMMhe/gqxlAyimgvf+08QcE1QOLz3LJSHfMm0LLk3mS/sjyEa0PW9ElbGqs8edAfrI5akTaISmu+Vu41baiplZMroT2KhoSI3sPZCHwO7kOr95QBgTv415hx22ROr23zXgpDU+gEFDCG6zzWHXET3sOSDDKcOw7KxYHHcYsnE=
+	t=1755535972; cv=none; b=q06l9Np6y7yweDfgduacxPGJN8WqzVlZyRzwuCTwU+FW6vh4ERkVneaypyWGMG7Lefk2Fc9C6eYatB7eoI0rXvXbmTMkkcEUbKzy0c3x4k6SuE9vdtnCRvYKjs2hsQf+AwjPWShP5vV8hIuVnpmg5g7XX6CHvl60vutuPuI8pu4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755536852; c=relaxed/simple;
-	bh=KhHns3MO0aHvf+3Asuji1SH4gKY6cGswxL3bjgtAUSI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=O++Ynm7RK2bWNIbpbJMmiNpErPUwxZM3iL18IurF6YTb28484vjqOwiwCZ1V/c6DmTwHQCozQfVsWcVnxkX+CiX6nQabYenNThAP3BBCw+my3YAo/HvbU4xv8dp85hr6WY1R/kKr0nqrFOHTGxSynzk85Rrj8NmDDBjGuHvSBpE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J4Zht8J9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB006C4CEEB;
-	Mon, 18 Aug 2025 17:07:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755536852;
-	bh=KhHns3MO0aHvf+3Asuji1SH4gKY6cGswxL3bjgtAUSI=;
-	h=From:Date:Subject:To:Cc:From;
-	b=J4Zht8J9cq28qvrFdNfKEhj6+9ZF3/cDfE7ThTl02xFlct9SSpXoQdeE+ZpCY+KM0
-	 EYTnSOOkZ/JwKjy5XlRnbhw+Y/6XpZcrlzAm1+IIOp1fzbb1LAdT7qBr1h+ViURf1d
-	 KdZgz3aD2/S5BBlkUT//+2y307Hk5JjZFIJbzRaxWAV4eBFHuZsllpGzIzuQLXZQRT
-	 FAYbTz6kW81T5dWMQZyfCYCVrS10hZDko46lU1fHnWNouAKx4Im9wJNTtRxbfGeJmZ
-	 lJJlSM8Sa30BxbDZuKP+A7L7D6AaGCqCyiIs9lPGIAoed8mGkZhY0mmF3J+p+A4uc0
-	 q0vt3kfqcYVBg==
-From: Mark Brown <broonie@kernel.org>
-Date: Mon, 18 Aug 2025 17:41:00 +0100
-Subject: [PATCH] KVM: arm64: selftests: Sync ID_AA64MMFR3_EL1 in
- set_id_regs
+	s=arc-20240116; t=1755535972; c=relaxed/simple;
+	bh=lF2HYMBkdtqH1e6PDiM+pGCP7LuT0SndsFFraot4ftQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=YUmUm4cUmR7rqsc+m4cfL8uXgadkcf1P28wzRez090jlSOyR2rXpC6hgp9PO2JkCjHgByCOu/AxhhpHSiz/V7bccxF8u84LmH0HgQ2HEhGy9hYR1uxv8wzlNAa1PiLJrYES6EE2rbNy29M8ylZZrqtYw7caF2eWVUXQe/WujfDA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=f5c89ng2; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1755535969;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=j1jHYfLFogpmHbZNi2BJHyHSZ5SOcVw8OfGNKzVyZu4=;
+	b=f5c89ng2kxTUHzCypJlztA5t4NnOpdUmHzU4J5uZVqLEj2FsJTug5huPiSMgSGdh7dNt+Y
+	I9OxWqotHmLDpVI1jpRkZdWtnkswmcBubODq9+6lFlPOwbmiWgFQZ/gZee77zGlktIfoUD
+	TzNbBc8VeBySJij4XWd4MBNnCTn/iHk=
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
+ [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-369-KWpuJrkMOMqVIzAhsQHyQA-1; Mon, 18 Aug 2025 12:52:47 -0400
+X-MC-Unique: KWpuJrkMOMqVIzAhsQHyQA-1
+X-Mimecast-MFC-AGG-ID: KWpuJrkMOMqVIzAhsQHyQA_1755535966
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3e58433459bso6328675ab.2
+        for <kvm@vger.kernel.org>; Mon, 18 Aug 2025 09:52:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755535966; x=1756140766;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=j1jHYfLFogpmHbZNi2BJHyHSZ5SOcVw8OfGNKzVyZu4=;
+        b=ntcy9UbLHnkVge0dAjvz5QIgG82hr4PcZIjd8NCgTjSYjKm9rVd347R/B/778HTUYV
+         TR+/s5OWmtn+18JRBpKmRBhsvD8YS/IZzYkUKPDzKP7LyuIWeampj5jDqvjtiUoDDC22
+         Gm9wYTebaSpeMeOO2I+xMzBFoUCcH9uHf5zjM6h3D4JuoD8LMF8e/S5RKGMpuSCvb+en
+         FvEJai2eDSrESTEaf0wIJSokoo80qnxzqSyEfRBu+qOTuAklP/twrR8RmMfXy2y/04ux
+         T0vjBD3swMqxoL5Qu4fgvhECDtgPj1ePnf9Bq8H1o3Nj4Cwerr1vzU6463Fj3oGhPo/W
+         46uw==
+X-Gm-Message-State: AOJu0Yw5LJduEpVEB3g2Km8fKX+k83oQBILFq4B+j6CsQci31jz0q8NP
+	k+4zpRYkQYUkUD+Olt239FM9NTiEgnqj8EtimcUt5weyq55JRY3tuidDs9czr5olt7oaewhaCjl
+	RprXnziaCRvNPBlF0hKVVb9WLymIvYh3MtIy9+ErL2MYh0eZ3301PjA==
+X-Gm-Gg: ASbGncsYwdJ8D0/xhCXBemwTU9fSQ4bN/GeL8SqIC2Uosyeq3hNZ5wYoB8NvZoTG3te
+	XCDufgVhQP4585BKkN4SxXLBWI2LyhWrirgqo+wAGI+uLhDTPUD+MPkCqnMoBzQDQMJBXGAFGuB
+	3wgItJ4nGJoJRkhGQxZkbIwvCk8Sv0s5yVt0xNQ+8O+yRWs9qaQ21W13i0ni3TMuHsC9h0wmHib
+	h0DEivqOvsBz3Ysh7GSmqhAdhU+o4/pOH8OcevcyXOYBm4ZCH8inkuUh03kpIKqyKU4CPp9zwxL
+	9+ZXtYr9TTOdE2jmMAvavSz/3iSm3ITYIyKYmIIhcVM=
+X-Received: by 2002:a05:6e02:1a2c:b0:3e5:2b81:974d with SMTP id e9e14a558f8ab-3e57e9af4b8mr57232165ab.6.1755535966396;
+        Mon, 18 Aug 2025 09:52:46 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGgd1vBnXxH2nUasW/OGUg54y8D5g+6yVNB2ibk+91UWR6e4ao4rpXtciqpkhvs0yVkV1QceA==
+X-Received: by 2002:a05:6e02:1a2c:b0:3e5:2b81:974d with SMTP id e9e14a558f8ab-3e57e9af4b8mr57232065ab.6.1755535965964;
+        Mon, 18 Aug 2025 09:52:45 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3e58398cce3sm28835185ab.19.2025.08.18.09.52.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Aug 2025 09:52:44 -0700 (PDT)
+Date: Mon, 18 Aug 2025 10:52:42 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Mostafa Saleh <smostafa@google.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ eric.auger@redhat.com, clg@redhat.com
+Subject: Re: [PATCH 2/2] vfio/platform: Mark for removal
+Message-ID: <20250818105242.4e6b96ed.alex.williamson@redhat.com>
+In-Reply-To: <aJ9neYocl8sSjpOG@google.com>
+References: <20250806170314.3768750-1-alex.williamson@redhat.com>
+	<20250806170314.3768750-3-alex.williamson@redhat.com>
+	<aJ9neYocl8sSjpOG@google.com>
+Organization: Red Hat
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250818-kvm-arm64-selftests-mmfr3-idreg-v1-1-2f85114d0163@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAJtXo2gC/x2NywqDMBAAf0X27IKJ8UF/RTykZmOXNrbsihQk/
- 27wODDMnKAkTAqP6gShg5W/WwFTV7C8/LYScigMtrFdM5oO30dCL6l3qPSJO+mumFKUtohCKw5
- PH8cwWOdaA6XyE4r8vw/TnPMFI+NEvXEAAAA=
-X-Change-ID: 20250815-kvm-arm64-selftests-mmfr3-idreg-7baf8d724431
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
- Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
- kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Mark Brown <broonie@kernel.org>
-X-Mailer: b4 0.15-dev-cff91
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1114; i=broonie@kernel.org;
- h=from:subject:message-id; bh=KhHns3MO0aHvf+3Asuji1SH4gKY6cGswxL3bjgtAUSI=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBoo13QE86Q+y16bpfWE+6x/9uKmyweiprMs5xFd
- i2iompCKpmJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCaKNd0AAKCRAk1otyXVSH
- 0BLnB/47gyQvwyahO0s7MsRSP2NgxKt/teBkTEhY6fNSSnTUGClsLhO1v7AwheWNVNuF7pMb9N3
- sSFAFAcJwQaJmtRlJQca/uTn5FLMGV5Fp3EznJ1nOatvjL17YpmJixZyGZOppo5cNL6+TBLCiUp
- CTVDIgAWbUAkzhA8NVdmyRQgcoQA/cW7vq2y5/2tLPCkcr9vZqkjeiDA45szgLRWm0KtfEXRcRe
- FU63m2c+k07H7iPqyDtf0m9qDWgrgvNHD1yaqpyze2ryyrVywr7tMsxSJSryueQ3TMxHXU0ymMk
- MVb302LVklf1wglLZJWS4Q8yT52k9g+yv/ZiLqqVnk2lf6+H
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-When we added coverage for ID_AA64MMFR3_EL1 we didn't add it to the list
-of registers we read in the guest, do so.
+On Fri, 15 Aug 2025 16:59:37 +0000
+Mostafa Saleh <smostafa@google.com> wrote:
 
-Fixes: 0b593ef12afc ("KVM: arm64: selftests: Catch up set_id_regs with the kernel")
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
- tools/testing/selftests/kvm/arm64/set_id_regs.c | 1 +
- 1 file changed, 1 insertion(+)
+> Hi Alex,
+>=20
+> On Wed, Aug 06, 2025 at 11:03:12AM -0600, Alex Williamson wrote:
+> > vfio-platform hasn't had a meaningful contribution in years.  In-tree
+> > hardware support is predominantly only for devices which are long since
+> > e-waste.  QEMU support for platform devices is slated for removal in
+> > QEMU-10.2.  Eric Auger presented on the future of the vfio-platform
+> > driver and difficulties supporting new devices at KVM Forum 2024,
+> > gaining some support for removal, some disagreement, but garnering no
+> > new hardware support, leaving the driver in a state where it cannot
+> > be tested.
+> >=20
+> > Mark as obsolete and subject to removal. =20
+>=20
+> Recently(this year) in Android, we enabled VFIO-platform for protected KV=
+M,
+> and it=E2=80=99s supported in our VMM (CrosVM) [1].
+> CrosVM support is different from Qemu, as it doesn't require any device
+> specific logic in the VMM, however, it relies on loading a device tree
+> template in runtime (with =E2=80=9Ccompatiable=E2=80=9D string...) and it=
+ will just
+> override regs, irqs.. So it doesn=E2=80=99t need device knowledge (at lea=
+st for now)
+> Similarly, the kernel doesn=E2=80=99t need reset drivers as the hyperviso=
+r handles that.
 
-diff --git a/tools/testing/selftests/kvm/arm64/set_id_regs.c b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-index d3bf9204409c..97d5ab9ef0fe 100644
---- a/tools/testing/selftests/kvm/arm64/set_id_regs.c
-+++ b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-@@ -243,6 +243,7 @@ static void guest_code(void)
- 	GUEST_REG_SYNC(SYS_ID_AA64MMFR0_EL1);
- 	GUEST_REG_SYNC(SYS_ID_AA64MMFR1_EL1);
- 	GUEST_REG_SYNC(SYS_ID_AA64MMFR2_EL1);
-+	GUEST_REG_SYNC(SYS_ID_AA64MMFR3_EL1);
- 	GUEST_REG_SYNC(SYS_ID_AA64ZFR0_EL1);
- 	GUEST_REG_SYNC(SYS_CTR_EL0);
- 	GUEST_REG_SYNC(SYS_MIDR_EL1);
+I think what we attempt to achieve in vfio is repeatability and data
+integrity independent of the hypervisor.  IOW, if we 'kill -9' the
+hypervisor process, the kernel can bring the device back to a default
+state where the device isn't wedged or leaking information through the
+device to the next use case.  If the hypervisor wants to support
+enhanced resets on top of that, that's great, but I think it becomes
+difficult to argue that vfio-platform itself holds up its end of the
+bargain if we're really trusting the hypervisor to handle these aspects.
 
----
-base-commit: 8f5ae30d69d7543eee0d70083daf4de8fe15d585
-change-id: 20250815-kvm-arm64-selftests-mmfr3-idreg-7baf8d724431
+> Unfortunately, there is no upstream support at the moment, we are making
+> some -slow- progress on that [2][3]
+>=20
+> If it helps, I have access to HW that can run that and I can review/test
+> changes, until upstream support lands; if you are open to keeping VFIO-pl=
+atform.
+> Or I can look into adding support for existing upstream HW(with platforms=
+ I am
+> familiar with as Pixel-6)
 
-Best regards,
---  
-Mark Brown <broonie@kernel.org>
+Ultimately I'll lean on Eric to make the call.  I know he's concerned
+about testing, but he raised that and various other concerns whether
+platform device really have a future with vfio nearly a year ago and
+nothing has changed.  Currently it requires a module option opt-in to
+enable devices that the kernel doesn't know how to reset.  Is that
+sufficient or should use of such a device taint the kernel?  If any
+device beyond the few e-waste devices that we know how to reset taint
+the kernel, should this support really even be in the kernel?  Thanks,
+
+Alex
 
 
