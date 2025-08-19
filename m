@@ -1,133 +1,181 @@
-Return-Path: <kvm+bounces-55029-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55030-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC684B2CBF6
-	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 20:28:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76A0DB2CC0E
+	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 20:31:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB9221BC3D8F
-	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 18:28:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D728620AA5
+	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 18:31:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C25830F54B;
-	Tue, 19 Aug 2025 18:28:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F90A266580;
+	Tue, 19 Aug 2025 18:31:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SHrnLo88"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="s/rkmcWp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 616F320B80B
-	for <kvm@vger.kernel.org>; Tue, 19 Aug 2025 18:28:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 408D11CA84
+	for <kvm@vger.kernel.org>; Tue, 19 Aug 2025 18:31:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755628086; cv=none; b=AQUuXwHQqx+TnFQpYbEVpom4KGOGB+rtPBcv2ymx+u1g1RNfY0a2AqWHZ7DZGIBsOBZwMZNOlL+q1XLHJxxqli6+3BDWHXoKXE3n/JnCjXn+a9jemo/J9oJ8Z8Lq7HPbYJ/B+sTNrUZaj9ql6NYwee0wBVCs1C7serre+P+8nng=
+	t=1755628296; cv=none; b=qPX3aD/d10myguTSuWdxTkkr7nWnRZD07qoZ01sx9SGHO9FORKJDHceehy2H3/FHlOTndNpoA5urUFLkrP2hrhGc42hkpLtwkqNkM8KrprI6h9DbG66qEton03Ar2ZRMsiK1PVMANRUSU4YVy9XqPGymyLHJcKJg8oB3Gzp0hGU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755628086; c=relaxed/simple;
-	bh=PgbIaPz3chbrf2rMaMnMMpO/sOTuzu1KnFUJubvxgVo=;
+	s=arc-20240116; t=1755628296; c=relaxed/simple;
+	bh=FE+BN6LjNerPXRHgBqS2Ez17EMLb3CBEEycmzjisUDI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Fr0hFnFqlTAmtMR7mnfTgoRoTUDv4pHaQQoiIlyewR4gMwJhD1prKGptzpwuqXAdZw+5g4jd0XkIgUaxw8diG9yqPCf8SURClAW5051FMLSG7xY/Lz31BLuy+4G1YT1tqxBndCydA0pEY7kSNHkX0wTlTNyckPrtb6UIcLymW7E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SHrnLo88; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=t/OgIaidhJQ/wkoK9HCcaAL59P8yDMNWUnaHQg71opmFwxuYBlJ+mLtqR5oaeEF1fXvtIzO65nA+p8jMGXGw7mZg1+c9R4zYq6tQd/O+nLIU0Vx9SZM2amQZQUI49ZCz3dAl+kCZgoQAdF03xCK+qoJFTne2BBcblTTjH0PvwD8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=s/rkmcWp; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-32326e72dfbso10641122a91.3
-        for <kvm@vger.kernel.org>; Tue, 19 Aug 2025 11:28:05 -0700 (PDT)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-244581ce13aso114798535ad.2
+        for <kvm@vger.kernel.org>; Tue, 19 Aug 2025 11:31:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755628084; x=1756232884; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1755628294; x=1756233094; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PfqdL5UrP89R0Ovxhe5JGCdcLW6B+H4qXxAxuLmRpQ8=;
-        b=SHrnLo88mJzbNi7FbjD0AsI3Gonxo7Vfc17QIVGeNVrwnh8O9N6HtW524SNLJhJ8Xg
-         z3aRo4lI6/4UvWnsLRvdcvOp0SmkiIUirzGhU+slEsZQbtwGfI6HJl7yX6ehoGRgUd/U
-         /uTTwkibbP9QQZzDPvGuVhSbc/XyNKMOA3krREM0iC5Cl5UYMh+qD9AHqhfzYcq3EOGB
-         0WSnJNx8iM591NmENsHzSJ0RA+TSiRN49ajanYacKzW3zxiNKSfJkFHg91qFiwGeIB1W
-         4g1V9UEXPU3rOA5G24/gdp2yblybGAmDv8qbcCfleB4IenSKtEOhJMm3C04N9AlJwpWq
-         5UKw==
+        bh=CFNNkQYjnYLgd8xADJLc6v9c/H2C2oVnrzthJVOhtI8=;
+        b=s/rkmcWplnUvns4inLXTvs2ge1sPGsaogHE2bwyI2N/S9dFzQpbR+bpdK4hlhZ6wCC
+         MNfBrGsS2YqWyJfePpNBW928qu9WMgK9VEvDMJD/4HxTW8I7vFj/H3VrmMloVVIik7iQ
+         G1ngjQilh2nXdZZWstKSri2AcJVE3ek7FpmYj+sODZ7tEkol6xazVxHVlH0cxym+cPN9
+         v3Axd2wRnumr3sxIgCAfLOhyoiAU6b0bm/xY3pMy8XuPZchpGc0sTZRucLDovMGZN2i/
+         ud1W1TRDqoRbIVIsIEukj06YyrEPlGBYyyzgJlV0b+YX5Uj/TL3VvomTZK5E6I12B1P+
+         YWmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755628084; x=1756232884;
+        d=1e100.net; s=20230601; t=1755628294; x=1756233094;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PfqdL5UrP89R0Ovxhe5JGCdcLW6B+H4qXxAxuLmRpQ8=;
-        b=J1skGjxDZNfce3hkR5gbYJ9N1f45fFIlXXUK4opCTyHmLOFHellsAdDHujJQPYeg3U
-         1cA44uGKISrB0fcL1CGbSf2xfci0tPDQAMqC4ohRuyaTCkWpbDWST/NdOvG1PvIKA4Qo
-         Aq4OoaO8nwONxqp5CKoeEcXF/I3nxRf0ETFMuZDo5ut6KCfudRSVkZd9raLsi2FX/2Cq
-         3b79epFDe1BB2v+h274CjUFFRwdFmOIV4F2wxCXjmEAxIColnOUrwieInP2b/yYJZtNi
-         ZuL91PRYDaHCOqucGtTykmu1wifrYYYFB0A4rQL0rjO3kItCMwa4vVW+wPZBNpYgATSp
-         vyrQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWF/B66fP2Rsthe49jc/W4vKgEynlaOYJr9bwhbnDhlSLU2NJnQtLqX/ujZljVeV3Q1bPc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwQH7cxzIPzOW+jjgixI27QLnRoJA5qwirMzMsbtjvMPNpfoOVR
-	71Hd9xeeae06rqyyFzNSfdaAkBT7+pvf3rqbU5HZWalEh1SxKNUb/sxGQr5atlUA0UxKQmA6QFf
-	IymBs8Q==
-X-Google-Smtp-Source: AGHT+IHFhe0mFvV0NtHklDcweRV2yghd2x8kC+KF7UCj7IccRFPVI84TD4SYsReNhpHYN21O9GpATzxvW84=
-X-Received: from pjd4.prod.google.com ([2002:a17:90b:54c4:b0:311:485b:d057])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2c87:b0:321:29c4:e7c5
- with SMTP id 98e67ed59e1d1-324e12e283dmr244619a91.7.1755628084633; Tue, 19
- Aug 2025 11:28:04 -0700 (PDT)
-Date: Tue, 19 Aug 2025 11:28:03 -0700
-In-Reply-To: <20250804090945.267199-3-nikunj@amd.com>
+        bh=CFNNkQYjnYLgd8xADJLc6v9c/H2C2oVnrzthJVOhtI8=;
+        b=hoxgm5d1VisAuxkdSsgLQvDfq1XXj8NJL8GYh1UIBJ0zWt7Q7sfNor8swmZ8t4ILB0
+         36VpeK2BYVUvREpgpZ59rnyuExz/l+2YdE+9NGy+6rWoyxxQUYGiM81GOgV3sji9OeS4
+         aXyPoLPCGLXAO1pLVAMv9kYqfWGFL5F1g0puNMVY6LC3uMMaJAtsIMQ1rRs5FoXaWMh7
+         L43fa4ifpD2qpYvc6aSH1i2V4FmGhAnla3bdz+kdR05/Vl4/bPJfalC1QpWKY67exTd/
+         pzUreg7aTO1Y8hUZveYSNVuc6U6iSZ0V7idu5bpu+vfYjr76yaukV+yP4rvRsHrDStod
+         2pYQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWhxdHmxDPgadUQEDcHYgqRHkTc4shc7lUkGtO5Tk3zDt2q4cWwOEKNNrMiczBrwC13hhU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx7d7KqYmRg63bw98o0ezqT/LaVe0djzV1INRJ1zDaRRVxV/Bv0
+	g914Qi6M4wAsi2QnZoG9zTriRJjFE/4zEjENznh1D4mF2w9gmHX/lRKy2UmopvqonI/o2ZRwQbl
+	gZ+Si9w==
+X-Google-Smtp-Source: AGHT+IEDg1kaCLKoFxeqzpHElS+/odpD96HAvM0fcSQ167yZRCgA4vG6C1GJlLZudaOwRY5bqjrqKCaz2EM=
+X-Received: from pjbcz14.prod.google.com ([2002:a17:90a:d44e:b0:31f:28cf:d340])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ce8e:b0:240:5c38:7544
+ with SMTP id d9443c01a7336-245e04eae52mr40059805ad.50.1755628294529; Tue, 19
+ Aug 2025 11:31:34 -0700 (PDT)
+Date: Tue, 19 Aug 2025 11:31:32 -0700
+In-Reply-To: <20250804103751.7760-3-nikunj@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250804090945.267199-1-nikunj@amd.com> <20250804090945.267199-3-nikunj@amd.com>
-Message-ID: <aKTCMzVNwhlFNE0e@google.com>
-Subject: Re: [PATCH v3 2/2] KVM: SEV: Enforce minimum GHCB version requirement
- for SEV-SNP guests
+References: <20250804103751.7760-1-nikunj@amd.com> <20250804103751.7760-3-nikunj@amd.com>
+Message-ID: <aKTDBMCPxOXQhzDq@google.com>
+Subject: Re: [PATCH v10 2/2] KVM: SVM: Enable Secure TSC for SNP guests
 From: Sean Christopherson <seanjc@google.com>
 To: Nikunj A Dadhania <nikunj@amd.com>
 Cc: pbonzini@redhat.com, kvm@vger.kernel.org, thomas.lendacky@amd.com, 
-	santosh.shukla@amd.com, Michael Roth <michael.roth@amd.com>
+	santosh.shukla@amd.com, bp@alien8.de, isaku.yamahata@intel.com, 
+	vaishali.thakkar@suse.com, kai.huang@intel.com
 Content-Type: text/plain; charset="us-ascii"
 
 On Mon, Aug 04, 2025, Nikunj A Dadhania wrote:
-> Require a minimum GHCB version of 2 when starting SEV-SNP guests through
-> KVM_SEV_INIT2. When a VMM attempts to start an SEV-SNP guest with an
-> incompatible GHCB version (less than 2), reject the request early rather
-> than allowing the guest kernel to start with an incorrect protocol version
-> and fail later with GHCB_SNP_UNSUPPORTED guest termination.
+> Add support for Secure TSC, allowing userspace to configure the Secure TSC
+> feature for SNP guests. Use the SNP specification's desired TSC frequency
+> parameter during the SNP_LAUNCH_START command to set the mean TSC
+> frequency in KHz for Secure TSC enabled guests.
 > 
-> Hypervisor logs the guest termination with GHCB_SNP_UNSUPPORTED error code:
-
-s/Hypervisor/KVM, though I don't see any point in saying that KVM is doing
-the logging, that's self-evident from the kvm_amd prefix.  Instead, I think
-what's important to is to say the guest _typically_ requests termination,
-because AFAICT nothing guarantees the guest will fail in this exact way.
-
-  Not enforcing the minimum version typically causes the guest to request
-  termination with GHCB_SNP_UNSUPPORTED error code:
-
-    kvm_amd: SEV-ES guest requested termination: 0x0:0x2
-
-> kvm_amd: SEV-ES guest requested termination: 0x0:0x2
+> Always use kvm->arch.arch.default_tsc_khz as the TSC frequency that is
+> passed to SNP guests in the SNP_LAUNCH_START command.  The default value
+> is the host TSC frequency.  The userspace can optionally change the TSC
+> frequency via the KVM_SET_TSC_KHZ ioctl before calling the
+> SNP_LAUNCH_START ioctl.
 > 
-> SNP guest fails with the below error message:
+> Introduce the read-only MSR GUEST_TSC_FREQ (0xc0010134) that returns
+> guest's effective frequency in MHZ when Secure TSC is enabled for SNP
+> guests. Disable interception of this MSR when Secure TSC is enabled. Note
+> that GUEST_TSC_FREQ MSR is accessible only to the guest and not from the
+> hypervisor context.
+> 
+> Co-developed-by: Ketan Chaturvedi <Ketan.Chaturvedi@amd.com>
+> Signed-off-by: Ketan Chaturvedi <Ketan.Chaturvedi@amd.com>
+> Reviewed-by: Kai Huang <kai.huang@intel.com>
+> Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
+> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
+> ---
+>  arch/x86/include/asm/svm.h |  1 +
+>  arch/x86/kvm/svm/sev.c     | 27 +++++++++++++++++++++++++++
+>  arch/x86/kvm/svm/svm.c     |  2 ++
+>  arch/x86/kvm/svm/svm.h     |  2 ++
+>  4 files changed, 32 insertions(+)
+> 
+> diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
+> index ffc27f676243..17f6c3fedeee 100644
+> --- a/arch/x86/include/asm/svm.h
+> +++ b/arch/x86/include/asm/svm.h
+> @@ -299,6 +299,7 @@ static_assert((X2AVIC_MAX_PHYSICAL_ID & AVIC_PHYSICAL_MAX_INDEX_MASK) == X2AVIC_
+>  #define SVM_SEV_FEAT_RESTRICTED_INJECTION		BIT(3)
+>  #define SVM_SEV_FEAT_ALTERNATE_INJECTION		BIT(4)
+>  #define SVM_SEV_FEAT_DEBUG_SWAP				BIT(5)
+> +#define SVM_SEV_FEAT_SECURE_TSC				BIT(9)
+>  
+>  #define VMCB_ALLOWED_SEV_FEATURES_VALID			BIT_ULL(63)
+>  
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index e88dce598785..f9ab9ecc213f 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -146,6 +146,14 @@ static bool sev_vcpu_has_debug_swap(struct vcpu_svm *svm)
+>  	return sev->vmsa_features & SVM_SEV_FEAT_DEBUG_SWAP;
+>  }
+>  
+> +bool snp_secure_tsc_enabled(struct kvm *kvm)
 
-This is QEMU output, not guest output.  I don't see any reason to capture this.
-The fact that QEMU apparently doesn't handle KVM_EXIT_SYSTEM_EVENT isn't interesting.
+snp_is_secure_tsc_enabled() to make it super obvious this is a predicate.
 
-> KVM: unknown exit reason 24
-> EAX=00000000 EBX=00000000 ECX=00000000 EDX=00a00f11
-> ESI=00000000 EDI=00000000 EBP=00000000 ESP=00000000
-> EIP=0000fff0 EFL=00000002 [-------] CPL=0 II=0 A20=1 SMM=0 HLT=0
-> ES =0000 00000000 0000ffff 00009300
-> CS =f000 ffff0000 0000ffff 00009b00
-> SS =0000 00000000 0000ffff 00009300
-> DS =0000 00000000 0000ffff 00009300
-> FS =0000 00000000 0000ffff 00009300
-> GS =0000 00000000 0000ffff 00009300
-> LDT=0000 00000000 0000ffff 00008200
-> TR =0000 00000000 0000ffff 00008b00
-> GDT=     00000000 0000ffff
-> IDT=     00000000 0000ffff
-> CR0=60000010 CR2=00000000 CR3=00000000 CR4=00000000
-> DR0=0000000000000000 DR1=0000000000000000 DR2=0000000000000000 DR3=0000000000000000
-> DR6=00000000ffff0ff0 DR7=0000000000000400
-> EFER=0000000000000000
+> +{
+> +	struct kvm_sev_info *sev = to_kvm_sev_info(kvm);
+> +
+> +	return (sev->vmsa_features & SVM_SEV_FEAT_SECURE_TSC) &&
+> +		!WARN_ON_ONCE(!sev_snp_guest(kvm));
 
+Align indentation.
 
-No need for you to send a new version, I'm going to post a combined series for
-this and Secure TSC.
+> +}
+> @@ -4455,6 +4479,9 @@ void sev_es_recalc_msr_intercepts(struct kvm_vcpu *vcpu)
+>  					  !guest_cpu_cap_has(vcpu, X86_FEATURE_RDTSCP) &&
+>  					  !guest_cpu_cap_has(vcpu, X86_FEATURE_RDPID));
+>  
+> +	if (snp_secure_tsc_enabled(vcpu->kvm))
+> +		svm_disable_intercept_for_msr(vcpu, MSR_AMD64_GUEST_TSC_FREQ, MSR_TYPE_R);
+
+I'm leaning towards:
+
+	svm_set_intercept_for_msr(vcpu, MSR_AMD64_GUEST_TSC_FREQ, MSR_TYPE_R,
+				  !snp_is_secure_tsc_enabled(vcpu->kvm));
+
+because the cost of setting a bit is negligible.
+
+> +
+>  	/*
+>  	 * For SEV-ES, accesses to MSR_IA32_XSS should not be intercepted if
+>  	 * the host/guest supports its use.
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index d9931c6c4bc6..a81bf83ccb52 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -1317,6 +1317,8 @@ static int svm_vcpu_create(struct kvm_vcpu *vcpu)
+>  
+>  	svm->guest_state_loaded = false;
+>  
+> +	vcpu->arch.guest_tsc_protected = snp_secure_tsc_enabled(vcpu->kvm);
+
+Hmm, we can and should handle this in sev.c.  If we add sev_vcpu_create(), then
+we don't need to expose snp_is_secure_tsc_enabled(), and we can move more code
+into that helper.
+
+I'll post a combined series of this and the GHCB version patches.
 
