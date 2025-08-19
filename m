@@ -1,180 +1,276 @@
-Return-Path: <kvm+bounces-55039-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55040-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76B51B2CD5C
-	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 21:53:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 346B2B2CE1F
+	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 22:36:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 567472A5E39
-	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 19:53:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1E0C4E411E
+	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 20:36:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A38D3101AA;
-	Tue, 19 Aug 2025 19:53:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72FAC3431F2;
+	Tue, 19 Aug 2025 20:34:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YToC+FKT"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="mfNVaQuE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2073.outbound.protection.outlook.com [40.107.94.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D7C752F99
-	for <kvm@vger.kernel.org>; Tue, 19 Aug 2025 19:53:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755633223; cv=none; b=j0xkCpxrr6dqmFRtQMN7pi26s29ObIojMMBItXLkpNpbPefg8m9cR6XTypL0qSnSEM+tUm4KYjltUNs4KivkKTtk0Qge5qQ9dSv2voAHN7sstFKyEWcHHiAU57NM04DCxklPdUeWyDSSGXSaBxRkOJ73TFUh2Vtslnubc12bmBA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755633223; c=relaxed/simple;
-	bh=fS6j4mgWa9VcBbnm1aYEVqbu0SbI+LKwaOyUx0Dl64w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=P9MQAkvDn5lvAyxQmXkc8XJgdahlPz8b5AAT8rtZmAqGCcukRsvP8a9QmgpkVwfY2PyF76v00gNSiaYqLKZ+JlI3z6JH9HmcySS64YJum417OoIZ4kS4jZGIGt/PFHK+oDlSb/F1g6j93q1YgxEzHdCid6Rr+LNnFtUICk9ZQ9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YToC+FKT; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-242d1e947feso52065ad.0
-        for <kvm@vger.kernel.org>; Tue, 19 Aug 2025 12:53:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755633222; x=1756238022; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FNbjqk8ttaB1ro/8zTt9BTLxqyHuv5ELRRxuG73JV9U=;
-        b=YToC+FKT+vj5xe3mYSuiQrxDnA9d17Mbog75ZSu9LgZ2hcwfro5NxeATdJuPyoXPa9
-         2HaDCHVZlLHfYLr+ignzGbiRUAdS2tfn9n3QXNfOmDIwxQxUTUkucyeLLE2ir5uyRwUT
-         uCi6WByZu2dJw06RJCv6mnCtxGTsuDmtNv89nrBpQFH656SNVE0K2y0a1iUTAn0U/cH4
-         tTsnILM/C7B1wMWoHi1JGOgolywRHggsGcqpMMGKhdW6+eLBhwHTl1/HJsrZeIYR0hLl
-         1mYvEVDT9epJJFYL/KUxhKhT0vdAYTSD+pNOe+6VKyW+gXhHlWzQT7QfXS+C7i7sGRMF
-         xlVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755633222; x=1756238022;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FNbjqk8ttaB1ro/8zTt9BTLxqyHuv5ELRRxuG73JV9U=;
-        b=Z3XjgQid/d1FoojVwPFjF7Xg+Iwo+sJ5qr3G9A1UWmLDX1fPslObOEZ9NWm2Rf/2YZ
-         B4QJWFDWp6fw4AB7AdaHlOXiFMiMB64CsI/+gHd7K7Go6sYTipTLXprmWsel+1aH9hWf
-         YVjV/GKYS/dL958giFO/tiL0qt+gMg48u/rMoxwXtl0VeG/1w3ojEF2IffYCMSBrKo40
-         vkVc3GtAXQeaoeRy0XJCwiCLbuh04cAd1HEk4ncJXS+gUTHvzOebnzMCbJI1xFfhGKVv
-         RD3pKVVBdm38KjHq3mT+76XaHecTn6Jfxbg4D0WufRUJy8MLI5JgrZdIA5CgKc3Ews5G
-         RXKQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVZbjw9ZEqce2/U+jTQqHxWUkjXj5m83xuGB/oiHtGlwmJz2i1cvKyQ1A5WO8TPgw7E5hk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx1zeT/Q9NScBd7IH458wOLlz+Yi6aOi/ILfSUHp3hNlookbnbT
-	zIrI3yfPgy2AmerSqzPgm/E0LDxGHV+6eethZWcfcMBgWsAlhh0zMK/8TAkIsLNjvk3rPASEAF5
-	B79EJYxDETzq/F7C/nDQGxuDu71wfWrybJUAQ+csL
-X-Gm-Gg: ASbGncu09iLyBkT4Cz2c8bS0nOB5ymQE+61ZnlJmM6CMZf0Zt92vhgZnWHJ8LumXcGc
-	VWEBhK6wxc2Uzs9JxDm9E328dGxUo1Ue+sKuq86bOJ/k4HWaN/W5u3s4SMg28R2MYyugWRqDFXn
-	fK4nv0smXV1jHrLM+Z2s2WhXvgcOqvr8PfFlKGGxxApovGxeBk9ZctpW8WVMileaSQom3wai7Qv
-	X+n4Z7DUXpIEdEX7TNVyhf5LCqC1KrQwXIKyxgiK2Et
-X-Google-Smtp-Source: AGHT+IG4CJE3FrmMgTu10qv+0+tLItc8I/b4fe1ou2jr3vSGPnHMMk3cVAozTTrsTuTDIcAYq5uyhlT4NUWU1Gr5ayk=
-X-Received: by 2002:a17:902:f64e:b0:240:3521:1345 with SMTP id
- d9443c01a7336-245eeb80067mr604135ad.17.1755633221217; Tue, 19 Aug 2025
- 12:53:41 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1F976FC5;
+	Tue, 19 Aug 2025 20:34:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.73
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755635651; cv=fail; b=YRQcHbB7dlklMAuh+PEvDppjqM0vf3YT6lSAQCefefLxWbO2RzkVR6wP2YUNCPOmhd5sygZQE1uFLvbshDFvOdo/L4kB0nWl6dwSSd5So2hI5thiVclIYGRRP2bSoHZovRLzqCjlwi7D/SOf6pxtd+pAPEJcQw/N+3j/LLWXahI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755635651; c=relaxed/simple;
+	bh=7dWbu+yaywZvotgLwee+sztio3mWijU+QSnqUdR3Wzo=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=j9Ug7V/wtofA2Tm8MAjHAj1m6nuU3CZAecLtJ5XWx/J1H2+zjkSDKWfMusb5h70uHuQ0PwGvx5ID8Rxkl3ZGUDYrg6ievXoXQw0EFZLY/eZfMjY1eZN6E6SH8twvKqnNlKs0s9fvW/yDQLk7uqcMnhjS+RStPi2Bt1RhLHABlWY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=mfNVaQuE; arc=fail smtp.client-ip=40.107.94.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Pu/zhNPCwDNkbLGeAzq49igl1AezvW9xCehZSTodRTOhuBCcfrGe+bxntIqxAnD0BMiZLyOfEoiatMdwPlTJt6qh2wSXvQysiVJSllBYoCVt65RTndguMbkhvsRslZROc4omlCJP1u8jGxOihmP1bhGX6ir400hdN7PR6m4kkvrw58DBr4FH/8m1vvFfaTBWEU1cHIM9LBCxFybo54Ob1I/KY8PN4xW2DikyS3HOxJN3Smx478sqkaXLgtxkMY1sokZZWya/m23ClM66ntSI7ciA0eVpJ9W8o2IHAI0c8nJWStYdic9WV9Q6AwdgdmlrkYLtpu/slfcY0X767PYoHQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=nuKXjj/v2WyHELsmakpTIbYyLUmvdfg5QNrRFjzyRFA=;
+ b=Hi8sZgYSkTeQqbXh+AWNE9Lls/Zq4/767v3BpB7vtf+CcVlhknNAMcZIQqMyoPxF/9tnQ6l2Mo3/9MR4dPFDDFoEV6bsCjX3FkHi3ndHFbxIWLGZwFLdPyddWYMc9EMT58j51nOEpywdRlXJ+4wWqd1pMsk9abjFjgpkgbrr/i3AqhPfSg2zhADIty2jlzMqLAT49mggayFVgopiqL8YMz8gWgWWz8FJqJfXmIofZdKlID7VL0JwJcLgNxaN1w3iYf4UiaFu2wgymjn2REPUmRGv6lAHugyegU3PvV7VcJQ6YYjp15gtiBJ0bWDnw3Lo0L8+mNLf4q6bosOKCChkOw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nuKXjj/v2WyHELsmakpTIbYyLUmvdfg5QNrRFjzyRFA=;
+ b=mfNVaQuEavIhyko+Jri3nROgLtJ65wHdHJSnCDJi/ym5Mhe2/WJX+reDHn9oaYpDV9kfY/E4a+YjpDNVqi7alR+m/gRXZu3CoScV6anxsdJy3cB9kTsDD02TfOO31xwKF/HCUw/EVXybjp9WW8eLjNc2eMkj+ozzHYymdMGioDY=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from BL3PR12MB9049.namprd12.prod.outlook.com (2603:10b6:208:3b8::21)
+ by CY3PR12MB9680.namprd12.prod.outlook.com (2603:10b6:930:100::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9031.24; Tue, 19 Aug
+ 2025 20:34:07 +0000
+Received: from BL3PR12MB9049.namprd12.prod.outlook.com
+ ([fe80::ae6a:9bdd:af5b:e9ad]) by BL3PR12MB9049.namprd12.prod.outlook.com
+ ([fe80::ae6a:9bdd:af5b:e9ad%6]) with mapi id 15.20.8989.018; Tue, 19 Aug 2025
+ 20:34:06 +0000
+Message-ID: <35d77bbf-0578-433d-8df1-952fb14d09e1@amd.com>
+Date: Tue, 19 Aug 2025 15:34:03 -0500
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RESEND PATCH v2 1/3] x86/sev: Add new quiet parameter to
+ snp_leak_pages() API
+To: Sean Christopherson <seanjc@google.com>
+Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+ pbonzini@redhat.com, thomas.lendacky@amd.com, herbert@gondor.apana.org.au,
+ nikunj@amd.com, davem@davemloft.net, aik@amd.com, ardb@kernel.org,
+ michael.roth@amd.com, Neeraj.Upadhyay@amd.com, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, linux-crypto@vger.kernel.org
+References: <cover.1755548015.git.ashish.kalra@amd.com>
+ <7f7cdb3268e95b7dfa924c3da16a201da0b095f3.1755548015.git.ashish.kalra@amd.com>
+ <aKOXmlCkk900zyVY@google.com>
+Content-Language: en-US
+From: "Kalra, Ashish" <ashish.kalra@amd.com>
+In-Reply-To: <aKOXmlCkk900zyVY@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN6PR05CA0026.namprd05.prod.outlook.com
+ (2603:10b6:805:de::39) To BL3PR12MB9049.namprd12.prod.outlook.com
+ (2603:10b6:208:3b8::21)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250819155811.136099-1-adrian.hunter@intel.com> <20250819155811.136099-4-adrian.hunter@intel.com>
-In-Reply-To: <20250819155811.136099-4-adrian.hunter@intel.com>
-From: Vishal Annapurve <vannapurve@google.com>
-Date: Tue, 19 Aug 2025 12:53:29 -0700
-X-Gm-Features: Ac12FXxiS5LogQBLTdGRUCr_RpTV5puNW2fnnQ0DolA4sVJEIHlcEAIFzo6FHOk
-Message-ID: <CAGtprH-es5yyNYQCBhwpq2sJb2ET+Jvq+YNB+zvrdatCXqhZDQ@mail.gmail.com>
-Subject: Re: [PATCH V7 3/3] x86/tdx: Skip clearing reclaimed pages unless
- X86_BUG_TDX_PW_MCE is present
-To: Adrian Hunter <adrian.hunter@intel.com>
-Cc: Dave Hansen <dave.hansen@linux.intel.com>, pbonzini@redhat.com, seanjc@google.com, 
-	Tony Luck <tony.luck@intel.com>, Borislav Petkov <bp@alien8.de>, Thomas Gleixner <tglx@linutronix.de>, 
-	Ingo Molnar <mingo@redhat.com>, x86@kernel.org, H Peter Anvin <hpa@zytor.com>, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, rick.p.edgecombe@intel.com, 
-	kas@kernel.org, kai.huang@intel.com, reinette.chatre@intel.com, 
-	xiaoyao.li@intel.com, tony.lindgren@linux.intel.com, 
-	binbin.wu@linux.intel.com, isaku.yamahata@intel.com, yan.y.zhao@intel.com, 
-	chao.gao@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL3PR12MB9049:EE_|CY3PR12MB9680:EE_
+X-MS-Office365-Filtering-Correlation-Id: f89a7fc2-ba79-4d89-c294-08dddf5fbdd5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?UlZ1c2h5K3A1cE5jSG10QXgrQWtnQys0RUYyRmdwWWw4dWl6NmM4bFEzSWsr?=
+ =?utf-8?B?eVlrZ3RxcjBXSTl5aGs1TXNNS0tCcVdJbzZxb3JTUXhwUFNiakphWmFSVjlo?=
+ =?utf-8?B?MnlXVytrTDZsc2lnTklvUWFYSkxhWERocWV5bGFNdnVzVHE3SzFpbll5K2l6?=
+ =?utf-8?B?YVU0SVhSM1Q5bTZDRitBSnNDVWNHSnN3WUExNi9oNTU2L2xBQVpXdlNsUk15?=
+ =?utf-8?B?dXd4eldzQ0RPNEZmYTBqSzFZSS9tSVAwMjNMcHBJQS90SGx3NFBlQ2xYakZx?=
+ =?utf-8?B?OHBOcGdRS1B5RDNvNXVCRnhvSWJCbENVVnhZRUFTallHMlp0aXRNTXlPcitN?=
+ =?utf-8?B?OStPQ3lYRDdpYWlxcFhCNGR2UkI4THptZ2kreDRpNFJqVVpWTUx6SU4xdnRi?=
+ =?utf-8?B?WkE1QkxGMjc4VnovMzZPbURwc1VCaTlraWgrK3pMWCtMSnFGQlJIVTBiQ0tQ?=
+ =?utf-8?B?V0M5dVNaV2RQUE5SRGE5VGdSNnRNZjdKelN6Rkw3TXBHZTRKOTlWM2krQldS?=
+ =?utf-8?B?STQxbCtMWWozVzJRZ2FNVVlzdlVBV2M1ZXlaU21aOS9NUlhuQmN5VW94L0FS?=
+ =?utf-8?B?UnpiN0pBNk0wSW5hMTMvYi82TzY0V0U1NWNyd2ZQTHFkMnZLYXBrbUZOb2ZD?=
+ =?utf-8?B?RC9BVHpWK2RId3hITjZUTHk3MWhSZHpOS2lFS0k5WGZ1RzBFR3R2SEw1Tisx?=
+ =?utf-8?B?RzhTWDdLK3dxNGI3SkhZSUs2THowQlNHNTFFaFVhaEoxT2F0bHo5ZGI3VHVP?=
+ =?utf-8?B?L1Z2UXJDUm9yckFKQk1iNGtyZmx3K1FOeDhqTWRLSjhKTlgydEFuQW9Xd2ln?=
+ =?utf-8?B?eGVmRzBhSW9KRUZFZXByVXNCZHI4T1NNcVVFMzZBdS9GbTZUZUp3NEdORHR4?=
+ =?utf-8?B?cmROcFM2emt5SDFYQlhxNTd0dkxWZzNSekhMdWVFZlVIYm9kYXdsMVdIQVVi?=
+ =?utf-8?B?QUJidFVGNVQrUEMzZFFaaUpSbk5jZkJVcVoxeXNXQ2pVVDFkNDN2U0ZveGVG?=
+ =?utf-8?B?elF5VDYreEhwc1M3eURhOFlJa0lKajR3Z0oyVE40RkRKcE5SRzNJWGsweHdY?=
+ =?utf-8?B?VEgyYnZQNTJtNUxIcDk1c3NiQ3VEbnFUYllTS0NFYTdKZTBlRnZEUG1jWm5W?=
+ =?utf-8?B?Ui9LMjBOaThjZnhYYVdFaDBqZi9yNDhLQUJGb0xqbUl3OUFTWFo2VDZEYlpF?=
+ =?utf-8?B?VnYzbnF4a0xXWGFpTHBIOUpyQk5DMENuZUJoQmRZZUk4VXRtb3VwSmtNSW9p?=
+ =?utf-8?B?OU5heVhnNXBLOW5OUnVzWU1Wa3pGa0FXa0NaWTJhdlRNTmczZUx1a0VtSmRv?=
+ =?utf-8?B?ZlUxdkpnVC81NGlEeFlqMHZxS2M3TGpJTGRycy81Q1FzeGxVSUFCdzhsUDdU?=
+ =?utf-8?B?bHh6NXkzVHlUcFhqd29pdnlpZ0s4QWFjRjdJMlNFS0NGOWF5d2NzbTZhelQy?=
+ =?utf-8?B?VkE1cGtyZS9HUVp1T2I2aW1LL0ZObDI1MWk0UUpnbW0vQ0I1aHd4U0N0S0JY?=
+ =?utf-8?B?MDFmc3dtN2RYM0l1bWxFa05pVWVqemVuYjUrcjNWcFUzNWxzMFVnbDh1azhh?=
+ =?utf-8?B?WTZpYmRNRE9QMEN2NTZ5eWxoejBrbnNCZzVQbTRCaHlwVm56U2Z3RWM3SDBK?=
+ =?utf-8?B?SWR0R0laRGJUaHpDYW5KZW4wMjBueHAzczhzci8yQzFmUENJcnBuRGtHaHB1?=
+ =?utf-8?B?dzMwcUlGNGEyK3RNNmY5QU03THQvN3NHOWx1d0lvYzJKWTI4dkl1Rm9JT2Uz?=
+ =?utf-8?B?SDVSa2VVN0NuQWxSZWRuSjFVbDJwZEdpUlpHSExHV3dUSk5lb1JTblJWMHdr?=
+ =?utf-8?B?cHJBVWJNQ0xDYVVIMlM1SWxoc09DRnFBaTZPNS9kNmpiQ0M0U3hrcEUwVldT?=
+ =?utf-8?B?QW40UXg5eTB5TFdOeDNlS212UlhEbnpia1htcXhWZmxPd2lJUVVNNm0ybWRr?=
+ =?utf-8?Q?0sUtl2cDMIM=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR12MB9049.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?d0JaQktXQml1bnhwbWZzelFJdFJlZjV0SkIrTUlXaHhrMDZXSmJmV2FIZWRv?=
+ =?utf-8?B?WHZtcGlRQzN3TUdYUlU4SE92NjZTV2kxSTB0dDlDT0lxU2ZyU0pUNmZSSFJQ?=
+ =?utf-8?B?aE5md1JkYk9iakNmZFQwQ3FHUGdkdWV4VTR0WFFuYThSY1MwMElxK1RmWWxs?=
+ =?utf-8?B?bUh2aC96QWVwV2dEeXF6dW1QLzZKVElMYmR5VmhiWTc4Z29nclZzL0xyNitH?=
+ =?utf-8?B?OUt6NjY3MVJrdThtQTFnbXBhcVNxVEJtZ0R4ODFQN3dVa2JUVEtuZ2x4VkFC?=
+ =?utf-8?B?c3NRZU9taHF5cUNGbHdvNzYzSDg2QXRiUC90QjBYenBETEUrQkFOQjNUTi9k?=
+ =?utf-8?B?bGlRQkJkaDRSdStDeFd6blVTQjc4cklRT2hFMEJrN29qdVlTQ005UUFTdDNt?=
+ =?utf-8?B?VkN4SS9VTEZCdE9xWjRYSVRuNll4ay9NTnNidnlBaVJhelFySlVBcDlNYWcy?=
+ =?utf-8?B?emxWVGJGTndDRFVZbW1nZm0rb2hUNmhqbWM2SWZZaytNbStPMVZPNk4xeW9F?=
+ =?utf-8?B?VlZsaHF1VHRnaXVQMC8yaFlZV2ZjQUtCNUFyc2NqNzRUbmRQbGxXU29VTThF?=
+ =?utf-8?B?aGZoVDMrNzFsTUxad09IbDFoQ0o3YzR3WWRCSE52WWFXQSthaW0ya2FSeUVO?=
+ =?utf-8?B?S1I0QXM1MUt1b01icVI3WWFPMmN6eDJWYVZOZFYvVkE4emhBQ0lOOGJYQXNY?=
+ =?utf-8?B?dnpFTlhkcEN4TWVJZ01BYVZvai9SMHE3Um80VzFmajhSSlp5QjFpc3pwNHVO?=
+ =?utf-8?B?ZTNhck56K3JEWDQvUnFsN0Npc1psVTR6eThqbnVqbWY5SlVxYkZGVGZrcUVr?=
+ =?utf-8?B?eGVQYk0xR200Q3VsaU4yNnV4ZkVWVXAxKy93MlB3RGtJcWNjL0lGVndTakY5?=
+ =?utf-8?B?NXdaS1dGRFBSSjhJaFF6Q2R4T2YzbkFlRlp0bHFwZ3VEdlhRQld4VTJPUnVi?=
+ =?utf-8?B?Rkc0NHBJdTROV2loNkp4Q0dOUWlGRHZITkd5M2lqL2drNUNpMlp0b3FUMDdT?=
+ =?utf-8?B?eWNoRVVpVkV2QTlpbGhOaFBSYW04UUxpQ1F4RDhyRU0xYTRpVnFxZDNsdkxy?=
+ =?utf-8?B?WDZYaUJ4dnlSUVhOSUpkQVZTemkzZndnUFVwVEx6SEF1WERRUFBlL1pBMEcr?=
+ =?utf-8?B?MSs0UXBPNW5CS05qaXdzZUU2cDAvSXlNTGNzaE5RVVBRVVVJTnFTUjFncHg0?=
+ =?utf-8?B?eUx4TXE3d3FxZGFsN1h1MHBwUGZSMS91WEtZUWpVUlpmQW15SldXa3lVSXZE?=
+ =?utf-8?B?UDdzbjNvbG9UOVJZcTVSNnlaYTZpd004KzhaVW5DRW81bDI0NE0vN2hEZUhY?=
+ =?utf-8?B?Y0VVbVU0c2R1SzVaY0JKVHV3WDR6VEZsbThabGZTb1VWOFVDTGFXQ083cEFY?=
+ =?utf-8?B?SEI5RFVuNmF1NDBOZzNTR2J5UWozK0ZLTzJaT0xSN2sreWhZMFZMQjlMMWVn?=
+ =?utf-8?B?bzNQaWUyN1VtblJNbjNoOC90emppVVlxVE9QdXhxMmt6RDNBRk1NdVY1ckw3?=
+ =?utf-8?B?ZlJja3lvWE9TcmJJTFhqNCtaMm5vMm1tSE90ajRMd0gxcXFES1dZcVBTeDBI?=
+ =?utf-8?B?Wk5ZM0kxSnUrSUttQURScGFZOTNCZXVCRUttVUZLRWsxL3ZyOVZUYzhxUDBt?=
+ =?utf-8?B?aVdhbWN0YkFPeTk3KzNPTGlUdkoxb01YL3NhUVllU3RsRHBLUTRkNXVQL3BQ?=
+ =?utf-8?B?NFAvVVlobFcyMExYaWNxd2ZPZm44UC9WSnlGZmJtT3Y1cWNPN0RNc1d3dEln?=
+ =?utf-8?B?a1lkd2h1UnUyQU1mbkcrTjNMRms0K2dZdnZQZU1aWldURkpsa2czSks3N2g0?=
+ =?utf-8?B?c3VRWDA0bmNaMlVQRGVYTXVGMnhPSGV1ektJcldBSlVYOFRqMlk5UVhkUHA2?=
+ =?utf-8?B?Vko0d2lGKzZYeWpORytudzJUMG51V1FFN3IrdjE1OFZ2ZkZBT01kOWFOUlNR?=
+ =?utf-8?B?ZjZaSDhMY01iazJNbjVQd3M2aWRLVFpCd1llaHZxNTJxVzBLcTZSUUx5cXNJ?=
+ =?utf-8?B?dkJPNHVjYXV6S2dCVGhtTStYbEh6dk0yU25ESTBrSnhXRHhOb0c4WjBsdUpj?=
+ =?utf-8?B?bXdveFR4dlF1dDVEOHNaZCtCNXZMUEw5aDc5UVFqWmVHNHhoR3J6WVdlVXdl?=
+ =?utf-8?Q?RuaUedoMpEGq633dBKoqHnZ1a?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f89a7fc2-ba79-4d89-c294-08dddf5fbdd5
+X-MS-Exchange-CrossTenant-AuthSource: BL3PR12MB9049.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Aug 2025 20:34:06.0246
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: HynrI2xdxln7VqGvmOCAqvqz92/63hkplJrI/S7jI/U8AR1mnY0NDmJFO9VDkcDX25RSkud7Z+UNd/7wisXzEw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY3PR12MB9680
 
-On Tue, Aug 19, 2025 at 8:58=E2=80=AFAM Adrian Hunter <adrian.hunter@intel.=
-com> wrote:
->
-> Avoid clearing reclaimed TDX private pages unless the platform is affecte=
-d
-> by the X86_BUG_TDX_PW_MCE erratum. This significantly reduces VM shutdown
-> time on unaffected systems.
->
-> Background
->
-> KVM currently clears reclaimed TDX private pages using MOVDIR64B, which:
->
->    - Clears the TD Owner bit (which identifies TDX private memory) and
->      integrity metadata without triggering integrity violations.
->    - Clears poison from cache lines without consuming it, avoiding MCEs o=
-n
->      access (refer TDX Module Base spec. 1348549-006US section 6.5.
->      Handling Machine Check Events during Guest TD Operation).
->
-> The TDX module also uses MOVDIR64B to initialize private pages before use=
-.
-> If cache flushing is needed, it sets TDX_FEATURES.CLFLUSH_BEFORE_ALLOC.
-> However, KVM currently flushes unconditionally, refer commit 94c477a751c7=
-b
-> ("x86/virt/tdx: Add SEAMCALL wrappers to add TD private pages")
->
-> In contrast, when private pages are reclaimed, the TDX Module handles
-> flushing via the TDH.PHYMEM.CACHE.WB SEAMCALL.
->
-> Problem
->
-> Clearing all private pages during VM shutdown is costly. For guests
-> with a large amount of memory it can take minutes.
->
-> Solution
->
-> TDX Module Base Architecture spec. documents that private pages reclaimed
-> from a TD should be initialized using MOVDIR64B, in order to avoid
-> integrity violation or TD bit mismatch detection when later being read
-> using a shared HKID, refer April 2025 spec. "Page Initialization" in
-> section "8.6.2. Platforms not Using ACT: Required Cache Flush and
-> Initialization by the Host VMM"
->
-> That is an overstatement and will be clarified in coming versions of the
-> spec. In fact, as outlined in "Table 16.2: Non-ACT Platforms Checks on
-> Memory" and "Table 16.3: Non-ACT Platforms Checks on Memory Reads in Li
-> Mode" in the same spec, there is no issue accessing such reclaimed pages
-> using a shared key that does not have integrity enabled. Linux always use=
-s
-> KeyID 0 which never has integrity enabled. KeyID 0 is also the TME KeyID
-> which disallows integrity, refer "TME Policy/Encryption Algorithm" bit
-> description in "Intel Architecture Memory Encryption Technologies" spec
-> version 1.6 April 2025. So there is no need to clear pages to avoid
-> integrity violations.
->
-> There remains a risk of poison consumption. However, in the context of
-> TDX, it is expected that there would be a machine check associated with t=
-he
-> original poisoning. On some platforms that results in a panic. However
-> platforms may support "SEAM_NR" Machine Check capability, in which case
-> Linux machine check handler marks the page as poisoned, which prevents it
-> from being allocated anymore, refer commit 7911f145de5fe ("x86/mce:
-> Implement recovery for errors in TDX/SEAM non-root mode")
->
-> Improvement
->
-> By skipping the clearing step on unaffected platforms, shutdown time
-> can improve by up to 40%.
->
-> On platforms with the X86_BUG_TDX_PW_MCE erratum (SPR and EMR), continue
-> clearing because these platforms may trigger poison on partial writes to
-> previously-private pages, even with KeyID 0, refer commit 1e536e1068970
-> ("x86/cpu: Detect TDX partial write machine check erratum")
->
-> Reviewed-by: Kirill A. Shutemov <kas@kernel.org>
-> Acked-by: Kai Huang <kai.huang@intel.com>
-> Reviewed-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-> Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
-> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+Hello Sean,
 
-Acked-by: Vishal Annapurve <vannapurve@google.com>
+On 8/18/2025 4:14 PM, Sean Christopherson wrote:
+> On Mon, Aug 18, 2025, Ashish Kalra wrote:
+>> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+>> index 2fbdebf79fbb..a7db96a5f56d 100644
+>> --- a/arch/x86/kvm/svm/sev.c
+>> +++ b/arch/x86/kvm/svm/sev.c
+>> @@ -271,7 +271,7 @@ static void sev_decommission(unsigned int handle)
+>>  static int kvm_rmp_make_shared(struct kvm *kvm, u64 pfn, enum pg_level level)
+>>  {
+>>  	if (KVM_BUG_ON(rmp_make_shared(pfn, level), kvm)) {
+>> -		snp_leak_pages(pfn, page_level_size(level) >> PAGE_SHIFT);
+>> +		snp_leak_pages(pfn, page_level_size(level) >> PAGE_SHIFT, false);
+>>  		return -EIO;
+>>  	}
+>>  
+>> @@ -300,7 +300,7 @@ static int snp_page_reclaim(struct kvm *kvm, u64 pfn)
+>>  	data.paddr = __sme_set(pfn << PAGE_SHIFT);
+>>  	rc = sev_do_cmd(SEV_CMD_SNP_PAGE_RECLAIM, &data, &fw_err);
+>>  	if (KVM_BUG(rc, kvm, "Failed to reclaim PFN %llx, rc %d fw_err %d", pfn, rc, fw_err)) {
+>> -		snp_leak_pages(pfn, 1);
+>> +		snp_leak_pages(pfn, 1, false);
+> 
+> Open coded true/false literals are ugly, e.g. now I have to go look at the
+> declaration (or even definition) of snp_leak_pages() to understand what %false
+> controls.
+> 
+> Assuming "don't dump the RMP entry" is the rare case, then craft the APIs to
+> reflect that, i.e. make snp_leak_pages() a wrapper for the common case.  As a
+> bonus, you don't need to churn any extra code either.
+> 
+> void __snp_leak_pages(u64 pfn, unsigned int npages, bool dump_rmp);
+> 
+> static inline void snp_leak_pages(u64 pfn, unsigned int npages)
+> {
+> 	__snp_leak_pages(pfn, npages, true);
+> }
+> 
+>>  		return -EIO;
+>>  	}
+>>  
+>> diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
+>> index 942372e69b4d..d75659859a07 100644
+>> --- a/arch/x86/virt/svm/sev.c
+>> +++ b/arch/x86/virt/svm/sev.c
+>> @@ -1029,7 +1029,7 @@ int rmp_make_shared(u64 pfn, enum pg_level level)
+>>  }
+>>  EXPORT_SYMBOL_GPL(rmp_make_shared);
+>>  
+>> -void snp_leak_pages(u64 pfn, unsigned int npages)
+>> +void snp_leak_pages(u64 pfn, unsigned int npages, bool quiet)
+>>  {
+>>  	struct page *page = pfn_to_page(pfn);
+>>  
+>> @@ -1052,7 +1052,8 @@ void snp_leak_pages(u64 pfn, unsigned int npages)
+>>  		    (PageHead(page) && compound_nr(page) <= npages))
+>>  			list_add_tail(&page->buddy_list, &snp_leaked_pages_list);
+>>  
+>> -		dump_rmpentry(pfn);
+>> +		if (!quiet)
+> 
+> The polarity is arbitrarily odd, and "quiet" is annoyingly ambiguous and arguably
+> misleading, e.g. one could expect "quiet=true" to suppress the pr_warn() too, but
+> it does not.
+> 
+> 	pr_warn("Leaking PFN range 0x%llx-0x%llx\n", pfn, pfn + npages)
+> 
+> If you call it "bool dump_rmp" then it's more precise, self-explanatory, and
+> doesn't need to be inverted.
+
+Thanks, i will re-work this accordingly.
+
+Ashish
+
+> 
+>> +			dump_rmpentry(pfn);
+>>  		snp_nr_leaked_pages++;
+>>  		pfn++;
+>>  		page++;
+>> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+>> index 4f000dc2e639..203a43a2df63 100644
+>> --- a/drivers/crypto/ccp/sev-dev.c
+>> +++ b/drivers/crypto/ccp/sev-dev.c
+>> @@ -408,7 +408,7 @@ static int snp_reclaim_pages(unsigned long paddr, unsigned int npages, bool lock
+>>  	 * If there was a failure reclaiming the page then it is no longer safe
+>>  	 * to release it back to the system; leak it instead.
+>>  	 */
+>> -	snp_leak_pages(__phys_to_pfn(paddr), npages - i);
+>> +	snp_leak_pages(__phys_to_pfn(paddr), npages - i, false);
+>>  	return ret;
+>>  }
+>>  
+>> -- 
+>> 2.34.1
+>>
 
