@@ -1,171 +1,163 @@
-Return-Path: <kvm+bounces-54937-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54938-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3F28B2B5B0
-	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 03:04:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8CC7B2B5CE
+	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 03:19:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 107BC18A1E59
-	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 01:04:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C63A94E89BC
+	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 01:19:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 461BA194A59;
-	Tue, 19 Aug 2025 01:03:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 776EC1DF273;
+	Tue, 19 Aug 2025 01:19:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.spacemit.com header.i=@linux.spacemit.com header.b="fBdEdbfE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3694C1CA81;
-	Tue, 19 Aug 2025 01:03:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from smtpbgbr1.qq.com (smtpbgbr1.qq.com [54.207.19.206])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79C0C2110;
+	Tue, 19 Aug 2025 01:18:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.19.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755565431; cv=none; b=AybWCtAXp9l4tLPiwMbKeYs5/26R0nSpJi87JR0oPTdamg9bnF3Dyb3FcKP7QUcR0Gs5Z4cSzd+rNK2F9D4qbD2wxnSOSv8Dnr6B7z8hwoG0zP/wIqXzNkuPUDup0cPj0RtIL+qvAikjxmlZC6M2x5InZ4o6sv1ILHiooO/Z4aI=
+	t=1755566348; cv=none; b=H3bYQ9gOJjwbdTyWp72PdLIpuF2sNosI7GAiwstqP/YFs4lnf08GRFRV6JqO9ITbSzM1fstwvMD/Iz3B6Xmy7ykNtPaF9pSNiiIapjmgLdIcyPUgeiFexjhmmI5ZD85XLGkZ+mWuq78FtFqKIXEV6qrhf5K8vYns53qreGLISj0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755565431; c=relaxed/simple;
-	bh=hKTQRaoNIqjDRqMkHHqIHOMNz8DoDmVCJIZc1XXRr4Q=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=FZZidMXAsUUFVFiO4nGtZ0/XkJwo3j2NoQB/aljNmnMQm/sx7g6V3QeVlEm7aO65NLKAQUYWsGaPJTqd5lSIAzE+2+FLpFCg1ExdRKWOBiP55kD4eTzaJqkvd948pOLvF98OiWSx7/PjHoIeKZvU88ja9J9rhFW4cnl1jiVWDKg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.62])
-	by gateway (Coremail) with SMTP id _____8Cxf9NqzaNolCUAAA--.318S3;
-	Tue, 19 Aug 2025 09:03:38 +0800 (CST)
-Received: from [10.20.42.62] (unknown [10.20.42.62])
-	by front1 (Coremail) with SMTP id qMiowJCxM+RfzaNozyRXAA--.4222S3;
-	Tue, 19 Aug 2025 09:03:29 +0800 (CST)
-Subject: Re: [PATCH] KVM: loongarch: selftests: Remove common tests built by
- TEST_GEN_PROGS_COMMON
-To: Andrew Jones <ajones@ventanamicro.com>
-Cc: Dong Yang <dayss1224@gmail.com>, pbonzini@redhat.com, shuah@kernel.org,
- kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org, chenhaucai@kernel.org,
- Quan Zhou <zhouquan@iscas.ac.cn>
-References: <20250811082453.1167448-1-dayss1224@gmail.com>
- <11d1992d-baf0-fc2f-19d7-b263d15cf64d@loongson.cn>
- <20250818-2e6cf1b89c738f0fb1264811@orel>
-From: Bibo Mao <maobibo@loongson.cn>
-Message-ID: <02ad7973-f1d9-573b-8986-9a13e51aa661@loongson.cn>
-Date: Tue, 19 Aug 2025 09:01:35 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+	s=arc-20240116; t=1755566348; c=relaxed/simple;
+	bh=K8h4fsLkwXBoz8bbfEBr50T/b5QSv3uCbvnx5Vw+K6o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HoBtRoLWRU9PQ7qCGKmUi9SAlMD1N5eivX5MDvDZqqrtPbyhFvLHVXJ4VSQOmukxwW3TjoUpDNsB0v5fgRcqAxWlucl1Tp7rjBX367CeZ0srNqcaycYDWr5s8lvIVhkDJzxPeTOilK0m7oeanTVRPIQyBA4BamVkALDJqltIec0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux.spacemit.com; spf=none smtp.mailfrom=linux.spacemit.com; dkim=pass (1024-bit key) header.d=linux.spacemit.com header.i=@linux.spacemit.com header.b=fBdEdbfE; arc=none smtp.client-ip=54.207.19.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux.spacemit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.spacemit.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.spacemit.com;
+	s=mxsw2412; t=1755566270;
+	bh=g6JjCoyupLN35z2qvVI8PUyBR1aUVsz84r9rhHKnBG8=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version;
+	b=fBdEdbfEtSE3GETmB1e3uL6fxPX8AdUXXyzEFslWrIE5xOZSmIqzUSEEaIdoDCsJu
+	 bNRzR5ogWHWYPrrRnMw4IBX0DLWPgv94P/V64TFmA8/sXkKJd9zzGkqRzrRLtHJG+Y
+	 3sscIuOVfSW0DKRV2ad2Ayq5HLp7PlhXT9+7deoM=
+X-QQ-mid: esmtpgz12t1755566262td4c8f477
+X-QQ-Originating-IP: 9iDyEPMT2fIW1OmOGvQwzxzUT/TRlHh13QLu2xmmxSI=
+Received: from = ( [61.145.255.150])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Tue, 19 Aug 2025 09:17:40 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 15089458960345209029
+EX-QQ-RecipientCnt: 11
+Date: Tue, 19 Aug 2025 09:17:40 +0800
+From: Troy Mitchell <troy.mitchell@linux.spacemit.com>
+To: zhouquan@iscas.ac.cn, anup@brainfault.org, ajones@ventanamicro.com,
+	atishp@atishpatra.org, paul.walmsley@sifive.com, palmer@dabbelt.com
+Cc: linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+	Troy Mitchell <troy.mitchell@linux.spacemit.com>
+Subject: Re: [PATCH v2 1/6] RISC-V: KVM: Change zicbom/zicboz block size to
+ depend on the host isa
+Message-ID: <A0B6F37B4275250B+aKPQtDahHgv7Gq6-@LT-Guozexi>
+References: <cover.1754646071.git.zhouquan@iscas.ac.cn>
+ <fef5907425455ecd41b224e0093f1b6bc4067138.1754646071.git.zhouquan@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20250818-2e6cf1b89c738f0fb1264811@orel>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowJCxM+RfzaNozyRXAA--.4222S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoWxur4UKr1fWrW8KFyUCF43CFX_yoW5urWUpr
-	WI9F129FW0vrs3Gr1fGw1DZFZFkr9rKF40gF1rtw48Ary5AFs7JF18trW5KFnYqw4UXF4a
-	9a4rKwnFvFWDAabCm3ZEXasCq-sJn29KB7ZKAUJUUUUr529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUB0b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v2
-	6F4UJVW0owAaw2AFwI0_Jrv_JF1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0c
-	Ia020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jrv_
-	JF1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrw
-	CYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j
-	6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
-	AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
-	0xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4
-	v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AK
-	xVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxU2MKZDUUUU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fef5907425455ecd41b224e0093f1b6bc4067138.1754646071.git.zhouquan@iscas.ac.cn>
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpgz:linux.spacemit.com:qybglogicsvrsz:qybglogicsvrsz3a-0
+X-QQ-XMAILINFO: NI6mNDRHoM9V6UIO0PANqbhBtmIzyi4VxG6uMub6K4uOxD+OaXdF6e+B
+	9vdJ7VKtMnuyImz1jxJ6MOydSP6mXnrxf3H4Vm3yR/+FJiwvBM8pbjdW+Wo3pYZg7R+SoCm
+	q3Wu93qEbUXAeamdfbJyaDUvvayU/dCz9BFfVYuh+x2YvoiWrDBMU9AWNbhbMIL7HBP4a9u
+	ZYA1QJ87l6g82ay2HrJXxO4jtZB6Kw/dzQ8SU2S0gELoocuodX9hQ9KxOFD/mq9wcaX7eNe
+	YRaRDHTFJ9E/JG1+XZumDmGPKt0O0vGMIbFk6Fr0DxiD81SX3IvZiwOGx9+ApNQYhQMAEDr
+	j9jBMO5N9lS61PH1aWhTj7JECUDy+pszHDPB1t3hSfro8MckFJMh2yXo7vfVxKrm25V6Itq
+	dZp1Ckd6vxyhVK7fBL4EzR+iBeJivThc/X7NGkUwmC/rN/OkUkYXDFJkLIuZBMl9MPcGxjX
+	bWBxNcduBW+rePJRv8oSYG1nTvTgelS0mFs63Efkq7Y0SZWN0vJc4AKrbPKPK25Q2BPk+B4
+	Fm2B6iTsbSL9cfSFLaHTGha8lXt+mVp+3udorSnmo54espk6KXe7azqkJDKOBbiOIublfEi
+	kXkwCWMpMAR1JDow2Cx/sELL1K/Wjjaq4dx7qdLGuAEclTisAwYIfuYRCUHScaI//9gHhRA
+	6svuHzrvBWJvnDiTMEwEuzwnNQDnvZYz4OhqQWl5x35PVqra9AixV89WH+jxbQasYrmu3Bx
+	o9IjTadJbWZXiOx45H/g+Jc2lsdil3WfbhaVVZuKFXROJPflTAjP0NyPuju5AyIaFt18t/U
+	4eS9bv7WLM3jEBsKBU5jkTzBnyJq04PDTXLX20fr8AZXmnqBLamCFJaR0X6KfDAvHejCL/E
+	Ccu760ETi54XeGDNmaqdP5/G6vf8FmLNwyJKTkZclaAaOfccrkR7rqsqX1CZRHYyWXZFi57
+	RASEr2GK28SVsWiC1qSPl1IY5Mseb2KUJtYCnlmOypVPCtz/YasFmGRGaR9aQUWGUMoSyFT
+	OM9fTDvFYwjVIes/TLRo+5aVdzsRxYApGzZi2tzFFBhSEtqUHq
+X-QQ-XMRINFO: MSVp+SPm3vtS1Vd6Y4Mggwc=
+X-QQ-RECHKSPAM: 0
 
-
-
-On 2025/8/19 上午8:30, Andrew Jones wrote:
-> On Mon, Aug 11, 2025 at 06:49:07PM +0800, Bibo Mao wrote:
->> Hi Dong,
->>
->> Thanks for you patch.
->>
->> On 2025/8/11 下午4:24, Dong Yang wrote:
->>> Remove the common KVM test cases already added to TEST_GEN_PROGS_COMMON
->>>    as following:
->>>
->>> 	demand_paging_test
->>> 	dirty_log_test
->>> 	guest_print_test
->>> 	kvm_binary_stats_test
->>> 	kvm_create_max_vcpus
->>> 	kvm_page_table_test
->>> 	set_memory_region_test
->>>
->>> Fixes: a867688c8cbb ("KVM: selftests: Add supported test cases for LoongArch")
->>> Signed-off-by: Quan Zhou <zhouquan@iscas.ac.cn>
->>> Signed-off-by: Dong Yang <dayss1224@gmail.com>
->>> ---
->>>    tools/testing/selftests/kvm/Makefile.kvm | 7 -------
->>>    1 file changed, 7 deletions(-)
->>>
->>> diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
->>> index 38b95998e1e6..d2ad85a8839f 100644
->>> --- a/tools/testing/selftests/kvm/Makefile.kvm
->>> +++ b/tools/testing/selftests/kvm/Makefile.kvm
->>> @@ -199,17 +199,10 @@ TEST_GEN_PROGS_riscv += get-reg-list
->>>    TEST_GEN_PROGS_riscv += steal_time
->> TEST_GEN_PROGS_loongarch = $(TEST_GEN_PROGS_COMMON) is missing.
->>
->> BTW irqfd_test in TEST_GEN_PROGS_COMMON fails to run on LoongArch, does this
->> test case pass to run on Riscv?
+On Fri, Aug 08, 2025 at 06:18:21PM +0800, zhouquan@iscas.ac.cn wrote:
+> From: Quan Zhou <zhouquan@iscas.ac.cn>
 > 
-> It appears to. It outputs the vm mode created and then exits with a zero
-> exit code.
-Here is output of irqfd test on LoongArch
-[root@kvm-131 kvm]# ./irqfd_test
-Random seed: 0x6b8b4567
-==== Test Assertion Failure ====
-   include/kvm_util.h:527: !ret
-   pid=4016 tid=4016 errno=11 - Resource temporarily unavailable
-      1  0x00000001200027ab: kvm_irqfd at kvm_util.h:527
-      2  0x00000001200020d7: main at irqfd_test.c:100
-      3  0x00007ffff38a8707: ?? ??:0
-      4  0x00007ffff38a87ef: ?? ??:0
-      5  0x00000001200023b7: _start at ??:?
-   KVM_IRQFD failed, rc: -1 errno: 11 (Resource temporarily unavailable)
-
-The problem is that kernel irqchip is not created with irqfd_test, and 
-function kvm_arch_intc_initialized() returns false on LongArch.
-/*
-  * returns true if the virtual interrupt controller is initialized and
-  * ready to accept virtual IRQ. On some architectures virtual interrupt
-  * controller is dynamically instantiated and this is not always true.
-  */
-bool kvm_arch_intc_initialized(struct kvm *kvm);
-
-On LoongArch virtual irqchip is dynamically created by VMM.
-
-Regards
-Bibo Mao
+> The zicbom/zicboz block size registers should depend on the host's isa,
+> the reason is that we otherwise create an ioctl order dependency on the VMM.
 > 
-> Thanks,
-> drew
-> 
->>
->> Regards
->> Bibo Mao
->>>    TEST_GEN_PROGS_loongarch += coalesced_io_test
->>> -TEST_GEN_PROGS_loongarch += demand_paging_test
->>>    TEST_GEN_PROGS_loongarch += dirty_log_perf_test
->>> -TEST_GEN_PROGS_loongarch += dirty_log_test
->>> -TEST_GEN_PROGS_loongarch += guest_print_test
->>>    TEST_GEN_PROGS_loongarch += hardware_disable_test
->>> -TEST_GEN_PROGS_loongarch += kvm_binary_stats_test
->>> -TEST_GEN_PROGS_loongarch += kvm_create_max_vcpus
->>> -TEST_GEN_PROGS_loongarch += kvm_page_table_test
->>>    TEST_GEN_PROGS_loongarch += memslot_modification_stress_test
->>>    TEST_GEN_PROGS_loongarch += memslot_perf_test
->>> -TEST_GEN_PROGS_loongarch += set_memory_region_test
->>>    SPLIT_TESTS += arch_timer
->>>    SPLIT_TESTS += get-reg-list
->>>
->>
+> Signed-off-by: Quan Zhou <zhouquan@iscas.ac.cn>
+> ---
+>  arch/riscv/kvm/vcpu_onereg.c | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
+Reviwed-by: Troy Mitchell <troy.mitchell@linux.spacemit.com>
 
+Best regards,
+Troy
+> 
+> diff --git a/arch/riscv/kvm/vcpu_onereg.c b/arch/riscv/kvm/vcpu_onereg.c
+> index cce6a38ea54f..6bd64ae17b80 100644
+> --- a/arch/riscv/kvm/vcpu_onereg.c
+> +++ b/arch/riscv/kvm/vcpu_onereg.c
+> @@ -277,12 +277,12 @@ static int kvm_riscv_vcpu_get_reg_config(struct kvm_vcpu *vcpu,
+>  		reg_val = vcpu->arch.isa[0] & KVM_RISCV_BASE_ISA_MASK;
+>  		break;
+>  	case KVM_REG_RISCV_CONFIG_REG(zicbom_block_size):
+> -		if (!riscv_isa_extension_available(vcpu->arch.isa, ZICBOM))
+> +		if (!riscv_isa_extension_available(NULL, ZICBOM))
+>  			return -ENOENT;
+>  		reg_val = riscv_cbom_block_size;
+>  		break;
+>  	case KVM_REG_RISCV_CONFIG_REG(zicboz_block_size):
+> -		if (!riscv_isa_extension_available(vcpu->arch.isa, ZICBOZ))
+> +		if (!riscv_isa_extension_available(NULL, ZICBOZ))
+>  			return -ENOENT;
+>  		reg_val = riscv_cboz_block_size;
+>  		break;
+> @@ -366,13 +366,13 @@ static int kvm_riscv_vcpu_set_reg_config(struct kvm_vcpu *vcpu,
+>  		}
+>  		break;
+>  	case KVM_REG_RISCV_CONFIG_REG(zicbom_block_size):
+> -		if (!riscv_isa_extension_available(vcpu->arch.isa, ZICBOM))
+> +		if (!riscv_isa_extension_available(NULL, ZICBOM))
+>  			return -ENOENT;
+>  		if (reg_val != riscv_cbom_block_size)
+>  			return -EINVAL;
+>  		break;
+>  	case KVM_REG_RISCV_CONFIG_REG(zicboz_block_size):
+> -		if (!riscv_isa_extension_available(vcpu->arch.isa, ZICBOZ))
+> +		if (!riscv_isa_extension_available(NULL, ZICBOZ))
+>  			return -ENOENT;
+>  		if (reg_val != riscv_cboz_block_size)
+>  			return -EINVAL;
+> @@ -817,10 +817,10 @@ static int copy_config_reg_indices(const struct kvm_vcpu *vcpu,
+>  		 * was not available.
+>  		 */
+>  		if (i == KVM_REG_RISCV_CONFIG_REG(zicbom_block_size) &&
+> -			!riscv_isa_extension_available(vcpu->arch.isa, ZICBOM))
+> +			!riscv_isa_extension_available(NULL, ZICBOM))
+>  			continue;
+>  		else if (i == KVM_REG_RISCV_CONFIG_REG(zicboz_block_size) &&
+> -			!riscv_isa_extension_available(vcpu->arch.isa, ZICBOZ))
+> +			!riscv_isa_extension_available(NULL, ZICBOZ))
+>  			continue;
+>  
+>  		size = IS_ENABLED(CONFIG_32BIT) ? KVM_REG_SIZE_U32 : KVM_REG_SIZE_U64;
+> -- 
+> 2.34.1
+> 
+> 
+> _______________________________________________
+> linux-riscv mailing list
+> linux-riscv@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-riscv
 
