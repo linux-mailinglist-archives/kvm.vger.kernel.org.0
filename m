@@ -1,185 +1,171 @@
-Return-Path: <kvm+bounces-54936-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54937-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A4CDB2B587
-	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 02:47:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3F28B2B5B0
+	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 03:04:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED3E5624BA9
-	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 00:47:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 107BC18A1E59
+	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 01:04:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6434518DF89;
-	Tue, 19 Aug 2025 00:46:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jrngg2QV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 461BA194A59;
+	Tue, 19 Aug 2025 01:03:52 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85E7DD531;
-	Tue, 19 Aug 2025 00:46:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3694C1CA81;
+	Tue, 19 Aug 2025 01:03:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755564417; cv=none; b=KqsHjLZByJj+VKkt+jSehnimHgL8xvMT0F6t4fmSXspFcnH9UWcWzflPYQ4ONh9E7FzETUJWTTRbhiJKi9HzxmEFMBqsK2+kWtfaDpjKYJMlK3rIpM1SBsUSFNbezQfWkYmYvzzKUOTQGDlL2J3Wzx9nS1Xz9uGtKK0vAm7+CpU=
+	t=1755565431; cv=none; b=AybWCtAXp9l4tLPiwMbKeYs5/26R0nSpJi87JR0oPTdamg9bnF3Dyb3FcKP7QUcR0Gs5Z4cSzd+rNK2F9D4qbD2wxnSOSv8Dnr6B7z8hwoG0zP/wIqXzNkuPUDup0cPj0RtIL+qvAikjxmlZC6M2x5InZ4o6sv1ILHiooO/Z4aI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755564417; c=relaxed/simple;
-	bh=DsWrRR/JVk9NGxDPruscs5vh74AouGxQra9oUbC6csk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Ri+2FCML1QOXK8rH1SWvHsKfXmYmkKaBPmYb0iWGMAFiwZ2DY0bm1ARoDT0+mFcpk2Xc8KVhBeYOFTN3XFEZUrz8Lw1RdUWmT+N5NYYioHhyXTktLRmaXWxlis1+I6kETCnWJKyrxIvw7hrFA+8A7HLmvG4QxrJyxF/rNQokfR0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jrngg2QV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49635C4CEEB;
-	Tue, 19 Aug 2025 00:46:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755564417;
-	bh=DsWrRR/JVk9NGxDPruscs5vh74AouGxQra9oUbC6csk=;
-	h=From:To:Cc:Subject:Date:From;
-	b=jrngg2QVHRvbWwsNWWKdi2b4rtirPpuFcxNJHZtkGhRWaGMuCRMGttAin2yqP98FL
-	 hIM8dVJa2Mn/sHI1p3ADOnVK+smt6TMQrJNUodhQXrnI2j1NnXRcB724Mi78/dWQWj
-	 Z5vlJPpbXAgBDfn/xKx5PnKFqdJKPRLPxE8M3zIgaQmB1+1aoLqcvNDYHapDpoQKZS
-	 IVdloivkEZkyZtClFh88C0QwCS3F4rG0klz/AB3CnIob55qqdYI9d970hqWfHdT6ot
-	 kDCYGT+RRQY7WYPG8wQz1qfKdE6jEG9/gI4TZn6h3FOpnmP7JkYPQJpRHavzgXtyOT
-	 3aOnScz/HTgLw==
-From: guoren@kernel.org
-To: guoren@kernel.org,
-	paul.walmsley@sifive.com,
-	anup@brainfault.org,
-	atish.patra@linux.dev,
-	fangyu.yu@linux.alibaba.com
-Cc: linux-riscv@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org
-Subject: [PATCH] RISC-V: KVM: Prevent HGATP_MODE_BARE passed
-Date: Mon, 18 Aug 2025 20:46:43 -0400
-Message-Id: <20250819004643.1884149-1-guoren@kernel.org>
-X-Mailer: git-send-email 2.40.1
+	s=arc-20240116; t=1755565431; c=relaxed/simple;
+	bh=hKTQRaoNIqjDRqMkHHqIHOMNz8DoDmVCJIZc1XXRr4Q=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=FZZidMXAsUUFVFiO4nGtZ0/XkJwo3j2NoQB/aljNmnMQm/sx7g6V3QeVlEm7aO65NLKAQUYWsGaPJTqd5lSIAzE+2+FLpFCg1ExdRKWOBiP55kD4eTzaJqkvd948pOLvF98OiWSx7/PjHoIeKZvU88ja9J9rhFW4cnl1jiVWDKg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.62])
+	by gateway (Coremail) with SMTP id _____8Cxf9NqzaNolCUAAA--.318S3;
+	Tue, 19 Aug 2025 09:03:38 +0800 (CST)
+Received: from [10.20.42.62] (unknown [10.20.42.62])
+	by front1 (Coremail) with SMTP id qMiowJCxM+RfzaNozyRXAA--.4222S3;
+	Tue, 19 Aug 2025 09:03:29 +0800 (CST)
+Subject: Re: [PATCH] KVM: loongarch: selftests: Remove common tests built by
+ TEST_GEN_PROGS_COMMON
+To: Andrew Jones <ajones@ventanamicro.com>
+Cc: Dong Yang <dayss1224@gmail.com>, pbonzini@redhat.com, shuah@kernel.org,
+ kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org, chenhaucai@kernel.org,
+ Quan Zhou <zhouquan@iscas.ac.cn>
+References: <20250811082453.1167448-1-dayss1224@gmail.com>
+ <11d1992d-baf0-fc2f-19d7-b263d15cf64d@loongson.cn>
+ <20250818-2e6cf1b89c738f0fb1264811@orel>
+From: Bibo Mao <maobibo@loongson.cn>
+Message-ID: <02ad7973-f1d9-573b-8986-9a13e51aa661@loongson.cn>
+Date: Tue, 19 Aug 2025 09:01:35 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <20250818-2e6cf1b89c738f0fb1264811@orel>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowJCxM+RfzaNozyRXAA--.4222S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoWxur4UKr1fWrW8KFyUCF43CFX_yoW5urWUpr
+	WI9F129FW0vrs3Gr1fGw1DZFZFkr9rKF40gF1rtw48Ary5AFs7JF18trW5KFnYqw4UXF4a
+	9a4rKwnFvFWDAabCm3ZEXasCq-sJn29KB7ZKAUJUUUUr529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUB0b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v2
+	6F4UJVW0owAaw2AFwI0_Jrv_JF1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0c
+	Ia020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jrv_
+	JF1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrw
+	CYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j
+	6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
+	AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
+	0xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4
+	v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AK
+	xVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxU2MKZDUUUU
 
-From: "Guo Ren (Alibaba DAMO Academy)" <guoren@kernel.org>
 
-urrent kvm_riscv_gstage_mode_detect() assumes H-extension must
-have HGATP_MODE_SV39X4/SV32X4 at least, but the spec allows
-H-extension with HGATP_MODE_BARE alone. The KVM depends on
-!HGATP_MODE_BARE at least, so enhance the gstage-mode-detect
-to block HGATP_MODE_BARE.
 
-Move gstage-mode-check closer to gstage-mode-detect to prevent
-unnecessary init.
+On 2025/8/19 上午8:30, Andrew Jones wrote:
+> On Mon, Aug 11, 2025 at 06:49:07PM +0800, Bibo Mao wrote:
+>> Hi Dong,
+>>
+>> Thanks for you patch.
+>>
+>> On 2025/8/11 下午4:24, Dong Yang wrote:
+>>> Remove the common KVM test cases already added to TEST_GEN_PROGS_COMMON
+>>>    as following:
+>>>
+>>> 	demand_paging_test
+>>> 	dirty_log_test
+>>> 	guest_print_test
+>>> 	kvm_binary_stats_test
+>>> 	kvm_create_max_vcpus
+>>> 	kvm_page_table_test
+>>> 	set_memory_region_test
+>>>
+>>> Fixes: a867688c8cbb ("KVM: selftests: Add supported test cases for LoongArch")
+>>> Signed-off-by: Quan Zhou <zhouquan@iscas.ac.cn>
+>>> Signed-off-by: Dong Yang <dayss1224@gmail.com>
+>>> ---
+>>>    tools/testing/selftests/kvm/Makefile.kvm | 7 -------
+>>>    1 file changed, 7 deletions(-)
+>>>
+>>> diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
+>>> index 38b95998e1e6..d2ad85a8839f 100644
+>>> --- a/tools/testing/selftests/kvm/Makefile.kvm
+>>> +++ b/tools/testing/selftests/kvm/Makefile.kvm
+>>> @@ -199,17 +199,10 @@ TEST_GEN_PROGS_riscv += get-reg-list
+>>>    TEST_GEN_PROGS_riscv += steal_time
+>> TEST_GEN_PROGS_loongarch = $(TEST_GEN_PROGS_COMMON) is missing.
+>>
+>> BTW irqfd_test in TEST_GEN_PROGS_COMMON fails to run on LoongArch, does this
+>> test case pass to run on Riscv?
+> 
+> It appears to. It outputs the vm mode created and then exits with a zero
+> exit code.
+Here is output of irqfd test on LoongArch
+[root@kvm-131 kvm]# ./irqfd_test
+Random seed: 0x6b8b4567
+==== Test Assertion Failure ====
+   include/kvm_util.h:527: !ret
+   pid=4016 tid=4016 errno=11 - Resource temporarily unavailable
+      1  0x00000001200027ab: kvm_irqfd at kvm_util.h:527
+      2  0x00000001200020d7: main at irqfd_test.c:100
+      3  0x00007ffff38a8707: ?? ??:0
+      4  0x00007ffff38a87ef: ?? ??:0
+      5  0x00000001200023b7: _start at ??:?
+   KVM_IRQFD failed, rc: -1 errno: 11 (Resource temporarily unavailable)
 
-Signed-off-by: Guo Ren (Alibaba DAMO Academy) <guoren@kernel.org>
----
- arch/riscv/kvm/gstage.c | 27 ++++++++++++++++++++++++---
- arch/riscv/kvm/main.c   | 35 +++++++++++++++++------------------
- 2 files changed, 41 insertions(+), 21 deletions(-)
+The problem is that kernel irqchip is not created with irqfd_test, and 
+function kvm_arch_intc_initialized() returns false on LongArch.
+/*
+  * returns true if the virtual interrupt controller is initialized and
+  * ready to accept virtual IRQ. On some architectures virtual interrupt
+  * controller is dynamically instantiated and this is not always true.
+  */
+bool kvm_arch_intc_initialized(struct kvm *kvm);
 
-diff --git a/arch/riscv/kvm/gstage.c b/arch/riscv/kvm/gstage.c
-index 24c270d6d0e2..b67d60d722c2 100644
---- a/arch/riscv/kvm/gstage.c
-+++ b/arch/riscv/kvm/gstage.c
-@@ -321,7 +321,7 @@ void __init kvm_riscv_gstage_mode_detect(void)
- 	if ((csr_read(CSR_HGATP) >> HGATP_MODE_SHIFT) == HGATP_MODE_SV57X4) {
- 		kvm_riscv_gstage_mode = HGATP_MODE_SV57X4;
- 		kvm_riscv_gstage_pgd_levels = 5;
--		goto skip_sv48x4_test;
-+		goto done;
- 	}
- 
- 	/* Try Sv48x4 G-stage mode */
-@@ -329,10 +329,31 @@ void __init kvm_riscv_gstage_mode_detect(void)
- 	if ((csr_read(CSR_HGATP) >> HGATP_MODE_SHIFT) == HGATP_MODE_SV48X4) {
- 		kvm_riscv_gstage_mode = HGATP_MODE_SV48X4;
- 		kvm_riscv_gstage_pgd_levels = 4;
-+		goto done;
- 	}
--skip_sv48x4_test:
- 
-+	/* Try Sv39x4 G-stage mode */
-+	csr_write(CSR_HGATP, HGATP_MODE_SV39X4 << HGATP_MODE_SHIFT);
-+	if ((csr_read(CSR_HGATP) >> HGATP_MODE_SHIFT) == HGATP_MODE_SV39X4) {
-+		kvm_riscv_gstage_mode = HGATP_MODE_SV39X4;
-+		kvm_riscv_gstage_pgd_levels = 3;
-+		goto done;
-+	}
-+#else /* CONFIG_32BIT */
-+	/* Try Sv32x4 G-stage mode */
-+	csr_write(CSR_HGATP, HGATP_MODE_SV32X4 << HGATP_MODE_SHIFT);
-+	if ((csr_read(CSR_HGATP) >> HGATP_MODE_SHIFT) == HGATP_MODE_SV32X4) {
-+		kvm_riscv_gstage_mode = HGATP_MODE_SV32X4;
-+		kvm_riscv_gstage_pgd_levels = 2;
-+		goto done;
-+	}
-+#endif
-+
-+	/* KVM depends on !HGATP_MODE_OFF */
-+	kvm_riscv_gstage_mode = HGATP_MODE_OFF;
-+	kvm_riscv_gstage_pgd_levels = 0;
-+
-+done:
- 	csr_write(CSR_HGATP, 0);
- 	kvm_riscv_local_hfence_gvma_all();
--#endif
- }
-diff --git a/arch/riscv/kvm/main.c b/arch/riscv/kvm/main.c
-index 67c876de74ef..8ee7aaa74ddc 100644
---- a/arch/riscv/kvm/main.c
-+++ b/arch/riscv/kvm/main.c
-@@ -93,6 +93,23 @@ static int __init riscv_kvm_init(void)
- 		return rc;
- 
- 	kvm_riscv_gstage_mode_detect();
-+	switch (kvm_riscv_gstage_mode) {
-+	case HGATP_MODE_SV32X4:
-+		str = "Sv32x4";
-+		break;
-+	case HGATP_MODE_SV39X4:
-+		str = "Sv39x4";
-+		break;
-+	case HGATP_MODE_SV48X4:
-+		str = "Sv48x4";
-+		break;
-+	case HGATP_MODE_SV57X4:
-+		str = "Sv57x4";
-+		break;
-+	default:
-+		return -ENODEV;
-+	}
-+	kvm_info("using %s G-stage page table format\n", str);
- 
- 	kvm_riscv_gstage_vmid_detect();
- 
-@@ -135,24 +152,6 @@ static int __init riscv_kvm_init(void)
- 			 (rc) ? slist : "no features");
- 	}
- 
--	switch (kvm_riscv_gstage_mode) {
--	case HGATP_MODE_SV32X4:
--		str = "Sv32x4";
--		break;
--	case HGATP_MODE_SV39X4:
--		str = "Sv39x4";
--		break;
--	case HGATP_MODE_SV48X4:
--		str = "Sv48x4";
--		break;
--	case HGATP_MODE_SV57X4:
--		str = "Sv57x4";
--		break;
--	default:
--		return -ENODEV;
--	}
--	kvm_info("using %s G-stage page table format\n", str);
--
- 	kvm_info("VMID %ld bits available\n", kvm_riscv_gstage_vmid_bits());
- 
- 	if (kvm_riscv_aia_available())
--- 
-2.40.1
+On LoongArch virtual irqchip is dynamically created by VMM.
+
+Regards
+Bibo Mao
+> 
+> Thanks,
+> drew
+> 
+>>
+>> Regards
+>> Bibo Mao
+>>>    TEST_GEN_PROGS_loongarch += coalesced_io_test
+>>> -TEST_GEN_PROGS_loongarch += demand_paging_test
+>>>    TEST_GEN_PROGS_loongarch += dirty_log_perf_test
+>>> -TEST_GEN_PROGS_loongarch += dirty_log_test
+>>> -TEST_GEN_PROGS_loongarch += guest_print_test
+>>>    TEST_GEN_PROGS_loongarch += hardware_disable_test
+>>> -TEST_GEN_PROGS_loongarch += kvm_binary_stats_test
+>>> -TEST_GEN_PROGS_loongarch += kvm_create_max_vcpus
+>>> -TEST_GEN_PROGS_loongarch += kvm_page_table_test
+>>>    TEST_GEN_PROGS_loongarch += memslot_modification_stress_test
+>>>    TEST_GEN_PROGS_loongarch += memslot_perf_test
+>>> -TEST_GEN_PROGS_loongarch += set_memory_region_test
+>>>    SPLIT_TESTS += arch_timer
+>>>    SPLIT_TESTS += get-reg-list
+>>>
+>>
 
 
