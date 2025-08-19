@@ -1,125 +1,145 @@
-Return-Path: <kvm+bounces-55033-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55034-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8FFAB2CC6B
-	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 20:50:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BB16B2CC7C
+	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 20:54:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 268461C27316
-	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 18:50:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E975A02EF7
+	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 18:52:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97C7832A3E6;
-	Tue, 19 Aug 2025 18:49:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDD7E32C335;
+	Tue, 19 Aug 2025 18:52:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PH8A3uEZ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZRhAKDe6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66EB332275C
-	for <kvm@vger.kernel.org>; Tue, 19 Aug 2025 18:49:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A14B30C345;
+	Tue, 19 Aug 2025 18:52:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755629383; cv=none; b=MKjoLX0IZhLUkW8CW+AbksMxtNKlJhMW6NCgTmrsfcaEyRjCr3IYDW7J6nWcdzamtnfC60oj7eHZDlAaG/ZIswo2XgPYTUocbI6gPddfvLUTS7p93t0KCdpNQlxWCjyPPI4osa9UPvLBiHuohbvrCT92yHaYHoOmFVhxPAlUi28=
+	t=1755629554; cv=none; b=RRHXd9RwBe0PDizNeeZ4VDMqgfb2DDkGKFuP3nLidN3gfWoTPOaBGtQpASLkHbMl+i0xUEcZzXlJXf0HClpBZThgGGdjUdAj/ysEGCP8SbyOSMsdtpvb/Ee9X6ThzAyno1xaJoJKDr4nEpJb0I+WWbeTeuU4AJD9atb1XOThOqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755629383; c=relaxed/simple;
-	bh=zhBVg01D6vQm9RuF3UHdaJjFRXl8D7k5OdwAMNICiXI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=npm6Z5/7yZykm/slYUJDLUNfSNHt/LOFnZCS5kEUk45ZoJkcg8I7ucQ2VD0PtrWmMYxMDmWY2343omb3kWXUTDzfAu9LE55xPZrfa7jB8hfOvGDxg2Xp5XVbWakSdsIEqZvMKWgTZJjj9OIoxO959ahjuviWbcr5XIjxMDIMq2I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PH8A3uEZ; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-76e54a1646aso3077409b3a.3
-        for <kvm@vger.kernel.org>; Tue, 19 Aug 2025 11:49:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755629382; x=1756234182; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qKCot010HQbarPNzVF5yNUqaoOyh2peZV1sFaUn75Ic=;
-        b=PH8A3uEZUNzpMeTLkHc4iGsJsnBjclC2eaK31oFRDJgyC+X3LAt1Suxe2AU2hWXRO5
-         MRq2sbYd7BJ6Ghn+7LYakm/CJt9onHTs85dTTVVx1jxShi3Yb8vT/tM7bWN/4oJhFmNv
-         YFGSPURIoKSGYdjiyPwHUiivrY9Xr8ftFOsZWOnridXSkPTeMQSwyt/PXKVp9IKQGilQ
-         r3tnnwrNZTi4Is3EgjGMn/pUBm3E6MuoBUvbQtjsthqWZ4rI9Otw3Cu8t1P11RQ84iHU
-         Bk5waLSawXQBvw/j0VSvBoFKRsvP7nUa01Ra5S/3zUzBrp9125ZdNY5+TtSdcwAKFu4C
-         qgSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755629382; x=1756234182;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qKCot010HQbarPNzVF5yNUqaoOyh2peZV1sFaUn75Ic=;
-        b=lHjkr4QT5ZqpdUF9/g5Jo+iHahK1a0/CbJHgYCHKoVWkfl/GXoHknhMhDK0NiMoVZ2
-         nbbTULzPeTOsfdLVql8AK84v67Cw0vD2W2ocA4pXkbA3ZYxwQf6CB+hVljQ8xaJTDsvv
-         rkd4G0gNE8FB5gJxuJyTmVpnpm5I46mJBbOAT1inhB622b+u3OVKBVoMY5IkDR8E7IF9
-         blwgdhlO3dJd1SmgC+bsZCPSyfoV94osa5dn+1LV5jnlg8NQq17st2fTzYP1r+MNAjW2
-         VmuK0ZxVEgZBFV1SkVQ6d/INwAR9wBKwmUSt4pgYmaH/tq6TfEMt3k+/qDNgfHQOxnXp
-         rlXQ==
-X-Gm-Message-State: AOJu0YxzJ7c01ju0tFN18XJiop9jWTUxTHYbLRWjJIWJnRLRjk8idywJ
-	QqEF+sUbZH/omI+lCVIqZZjRiwH3rPN9Im2R+YAg3JUbVJWutqZ37s19tMBSebBvy5iiwOrIp5w
-	svpYemA==
-X-Google-Smtp-Source: AGHT+IEPXJJEVVaEr0HlKWjuZtNNp8HqiYSVkSRVGalYVQejsfDKZi6uLR+yoQTXywGOzB+1SmwrmpxGgWM=
-X-Received: from pfig9.prod.google.com ([2002:aa7:8189:0:b0:746:18ec:d11a])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:92a3:b0:76e:5bec:5ee4
- with SMTP id d2e1a72fcca58-76e8dc8e566mr314845b3a.13.1755629381622; Tue, 19
- Aug 2025 11:49:41 -0700 (PDT)
-Date: Tue, 19 Aug 2025 11:49:40 -0700
-In-Reply-To: <20250812025606.74625-21-chao.gao@intel.com>
+	s=arc-20240116; t=1755629554; c=relaxed/simple;
+	bh=Rc4iMvJDf73+qtSHlzp1IZqc6F/OIdBDvKE5ldovWvk=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=uK3IrjxhMGEU7iKfI5Z1FHx9cGjqYmEo81keSD0SrKE8zytu1IYuRGLnGu63ZSbLMuWpDLNTubqecSKoU3hXZh8vg1wk61WgO6ObwS23Zzvsm+qEoGOB5dQs2LpkZyJeRIRg3Ov9QE05AW0tKUE/fOD7V4AJhXLSJrChNyJnWmk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZRhAKDe6; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1755629553; x=1787165553;
+  h=from:to:cc:subject:in-reply-to:references:date:
+   message-id:mime-version:content-transfer-encoding;
+  bh=Rc4iMvJDf73+qtSHlzp1IZqc6F/OIdBDvKE5ldovWvk=;
+  b=ZRhAKDe6euuQaipuF1MDVqr3nQxrpTEUXNdYkPnKYvhaXHiNPoL4Jccj
+   Jv0XRGrVTEehZZn8oM5ZdgTVaHJydUkpoa9m5UsSgoHUKgxuRjWiYxrt7
+   p0pg8jtBaibjpaX32POzUwqhHv+uIrlY89lJDe2dlvmqe6Rh8gEjOmDPR
+   Vfv6s9Iyroo4leiB4SIWtjGXDpafLLlCGzy7RzSi7jAVqjydVhTR64oz8
+   UDXp510nKW3PKQcLfhAni+UOij0ySBIWfXbvJTthjwBwnbdCypUxkM73L
+   J10/ZKMEumodS4/W+IAgilDf7WPU0zzzkzZ3gDHHI3S3BA9xkJ2bst5PK
+   g==;
+X-CSE-ConnectionGUID: UyAo12npTDeXbciPiRlYNw==
+X-CSE-MsgGUID: DjTcespIQEGrU5N/53y3Jw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11527"; a="57747177"
+X-IronPort-AV: E=Sophos;i="6.17,302,1747724400"; 
+   d="scan'208";a="57747177"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2025 11:52:32 -0700
+X-CSE-ConnectionGUID: NxmXx4u3THynXbPaF2BGrA==
+X-CSE-MsgGUID: A4mYhuW4SZem3KS6hFBqtQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,302,1747724400"; 
+   d="scan'208";a="172168891"
+Received: from unknown (HELO vcostago-mobl3) ([10.98.24.145])
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2025 11:52:30 -0700
+From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+To: David Matlack <dmatlack@google.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>, Aaron Lewis
+ <aaronlewis@google.com>, Adhemerval Zanella
+ <adhemerval.zanella@linaro.org>, Adithya Jayachandran
+ <ajayachandra@nvidia.com>, Andrew Jones <ajones@ventanamicro.com>, Ard
+ Biesheuvel <ardb@kernel.org>, Arnaldo Carvalho de Melo <acme@redhat.com>,
+ Bibo Mao <maobibo@loongson.cn>, Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ Dan Williams <dan.j.williams@intel.com>, Dave Jiang
+ <dave.jiang@intel.com>, dmaengine@vger.kernel.org, Huacai Chen
+ <chenhuacai@kernel.org>, James Houghton <jthoughton@google.com>, Jason
+ Gunthorpe <jgg@nvidia.com>, Joel Granados <joel.granados@kernel.org>, Josh
+ Hilke <jrhilke@google.com>, Kevin Tian <kevin.tian@intel.com>,
+ kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, "Mike Rapoport
+ (Microsoft)" <rppt@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Pasha
+ Tatashin <pasha.tatashin@soleen.com>, "Pratik R. Sampat"
+ <prsampat@amd.com>, Saeed Mahameed <saeedm@nvidia.com>, Sean
+ Christopherson <seanjc@google.com>, Shuah Khan <shuah@kernel.org>, Vipin
+ Sharma <vipinsh@google.com>, Wei Yang <richard.weiyang@gmail.com>, "Yury
+ Norov [NVIDIA]" <yury.norov@gmail.com>
+Subject: Re: [PATCH 22/33] vfio: selftests: Add driver for Intel DSA
+In-Reply-To: <CALzav=dPRfPxNAaVvbxSNz=Ss0DAGjxJQO2JnXLbZgwZmO0NBQ@mail.gmail.com>
+References: <20250620232031.2705638-1-dmatlack@google.com>
+ <20250620232031.2705638-23-dmatlack@google.com> <87a53w2o65.fsf@intel.com>
+ <CALzav=dPRfPxNAaVvbxSNz=Ss0DAGjxJQO2JnXLbZgwZmO0NBQ@mail.gmail.com>
+Date: Tue, 19 Aug 2025 11:52:30 -0700
+Message-ID: <87v7mj16vl.fsf@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250812025606.74625-1-chao.gao@intel.com> <20250812025606.74625-21-chao.gao@intel.com>
-Message-ID: <aKTHRKKr4C-c2LZy@google.com>
-Subject: Re: [PATCH v12 20/24] KVM: x86: Enable CET virtualization for VMX and
- advertise to userspace
-From: Sean Christopherson <seanjc@google.com>
-To: Chao Gao <chao.gao@intel.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, mlevitsk@redhat.com, 
-	rick.p.edgecombe@intel.com, weijiang.yang@intel.com, xin@zytor.com, 
-	Mathias Krause <minipli@grsecurity.net>, John Allen <john.allen@amd.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Aug 11, 2025, Chao Gao wrote:
-> diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
-> index ce10a7e2d3d9..c85c50019523 100644
-> --- a/arch/x86/include/asm/vmx.h
-> +++ b/arch/x86/include/asm/vmx.h
-> @@ -134,6 +134,7 @@
->  #define VMX_BASIC_DUAL_MONITOR_TREATMENT	BIT_ULL(49)
->  #define VMX_BASIC_INOUT				BIT_ULL(54)
->  #define VMX_BASIC_TRUE_CTLS			BIT_ULL(55)
-> +#define VMX_BASIC_NO_HW_ERROR_CODE_CC		BIT_ULL(56)
->  
->  static inline u32 vmx_basic_vmcs_revision_id(u64 vmx_basic)
->  {
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 85079caaf507..2515b2623fb1 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -944,6 +944,7 @@ void kvm_set_cpu_caps(void)
->  		VENDOR_F(WAITPKG),
->  		F(SGX_LC),
->  		F(BUS_LOCK_DETECT),
-> +		F(SHSTK),
+David Matlack <dmatlack@google.com> writes:
 
-I think we should limit this to 64-bit kernels with X86_64_F().  It probably
-won't change anything in practice, but we mitigate the virtualization holes related
-to 32-bit vCPUs at least a little bit.
+> On Mon, Aug 18, 2025 at 4:41=E2=80=AFPM Vinicius Costa Gomes
+> <vinicius.gomes@intel.com> wrote:
+>> David Matlack <dmatlack@google.com> writes:
+>> > +
+>> > +static int dsa_probe(struct vfio_pci_device *device)
+>> > +{
+>> > +     if (!vfio_pci_device_match(device, PCI_VENDOR_ID_INTEL,
+>> > +                                PCI_DEVICE_ID_INTEL_DSA_SPR0))
+>>
+>> What are you thinking about adding support for multiple device ids?
+>
+> I haven't given it much thought yet. But we could definitely support
+> fancier device matching (e.g. multiple acceptable device ids) if/when
+> a use-case for that arises.
+>
 
->  	);
->  
->  	/*
-> @@ -970,6 +971,7 @@ void kvm_set_cpu_caps(void)
->  		F(AMX_INT8),
->  		F(AMX_BF16),
->  		F(FLUSH_L1D),
-> +		F(IBT),
->  	);
->  
+Fair enough. I just wanted to bring this up (hoping that's more a matter
+of "when" than "if" :-))
+
+>> > +static int dsa_completion_wait(struct vfio_pci_device *device,
+>> > +                            struct dsa_completion_record *completion)
+>> > +{
+>> > +     u8 status;
+>> > +
+>> > +     for (;;) {
+>> > +             dsa_check_sw_err(device);
+>> > +
+>> > +             status =3D READ_ONCE(completion->status);
+>> > +             if (status)
+>> > +                     break;
+>> > +
+>> > +             usleep(1000);
+>>
+>> Another minor/thing to think about: using umonitor/umwait.
+>
+> Thanks for the tip, I hadn't considered that. But I think for this
+> driver, keeping things as simple as possible is best. This code is
+> only used for testing so I don't think we care enough about efficiency
+> to justify using unmonitor/umwait here.
+
+Yeah, agreed.
+
+
+Cheers,
+--=20
+Vinicius
 
