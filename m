@@ -1,95 +1,86 @@
-Return-Path: <kvm+bounces-54977-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54978-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CF9CB2C03E
-	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 13:26:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B916B2C0A9
+	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 13:39:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E57D17D52C
-	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 11:22:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 909DD1893E12
+	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 11:36:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27CEC32A3F4;
-	Tue, 19 Aug 2025 11:22:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92E3632BF5D;
+	Tue, 19 Aug 2025 11:35:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hJBkTHKC"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="lAeSY4ZM"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF293284887
-	for <kvm@vger.kernel.org>; Tue, 19 Aug 2025 11:22:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC7FC30F813;
+	Tue, 19 Aug 2025 11:35:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755602556; cv=none; b=rgppW/Huw4gGEDi8h4935JFeU8+q2JcCFl8NylPSJ+xmmP3ixq5+e7TQtR1WcDESwF/Z4dKpSErQYcHbhu8gixTDCR/xaQeHPqdk59tAX53xPIelFopgM+OJ6XqJIfYjg81Ycp3WdGL/QlVardHuY2eaQIz/XvYSCdq5f286b8c=
+	t=1755603325; cv=none; b=eRZ2pvPDPfjLjvd2R5o1VCqybOt35iQrnxAxPTsKPrOHyFoQCf2MFpmxT7f3ar3owj1zTHesxKwL6pEYS4/xoV0mSmPnBbha49If2/VzDqiT63w7pTjixXKWkya3FiQVYWKec+vKGoQsxqbhZMz/DsoCQd4/LZARlhboa20UCoY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755602556; c=relaxed/simple;
-	bh=ljNmmhgO9RaVR5EfsrA+jtClGqwH4Ncw0+lLHEpMKhk=;
+	s=arc-20240116; t=1755603325; c=relaxed/simple;
+	bh=WV1rxNjB+TYqIAQsI+V7tfqrGc3WfHnR+6UzQJkULEw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Fv70o3Y8qrUUDvvWfb5Ej+2C5QVFNcoDxgUzti4G6J/IIQPJLP3pvU02Aug/Qd7xtQiUwzhFukJ4Hhdls1FQ+JfktWDGBeCWXAtZdURoMKkuvM6Rqrp01GTwiBq2ZJKAFtlKStE0v0cFNZYtKteY4L6k770lByeq+cCIlrIvtbA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hJBkTHKC; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1755602552;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jdBinzdAYenwJX8OAfplMqIPm3EH+LTM0TGcBywLoj0=;
-	b=hJBkTHKC7xxyZ4/aReLPGO6dnGHI0VuzD9ue40LzqzTUCaFa22oEO+Aee5LY4H7avjoocK
-	xy4G/qOfFTpBUgzk4wz+fb4Ijnogh/P5EFr5ruyD8aC0fO2nbR9qlcaTvhMt3M93UAZm+W
-	VIQn9OPz+nipXbShXDeQqGDr5t1csLY=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-208-rJTo-eSMOBqWBNyyQYqddQ-1; Tue, 19 Aug 2025 07:22:31 -0400
-X-MC-Unique: rJTo-eSMOBqWBNyyQYqddQ-1
-X-Mimecast-MFC-AGG-ID: rJTo-eSMOBqWBNyyQYqddQ_1755602550
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3b9e41475edso3676877f8f.2
-        for <kvm@vger.kernel.org>; Tue, 19 Aug 2025 04:22:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755602550; x=1756207350;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jdBinzdAYenwJX8OAfplMqIPm3EH+LTM0TGcBywLoj0=;
-        b=foNTjtvzWe0xEalw1B3rc2nXTWQEWj5GnpY1g5fuiMqZjiSzI/Wsv+4Uk6dvcAnSud
-         SbBT+v+Kxg9AhtbMqF1giA9dhgPoKUnpDzXWUYHX0zgie4+oTKtiQ+uUDSPt7QYUF0UP
-         mZPmY9/5PcYwKhnifTOA7gYBZT68NJysVXf03VeBnt5R5IciYAYjOpD0pVBZgpZPZWps
-         R5qn+/V9quzEQp6Izg64RbRyer0wUQsLbazSReoBHyhx199BAOUe34AF4y2MGZnbHg2o
-         Ev5kdfvrHkbM2Ahxo9/QzdYMyTYf2XGQgjE5nImc9mGO2ZeYN2SsIYlvLRNt6MNeywfn
-         gtZw==
-X-Forwarded-Encrypted: i=1; AJvYcCUeBLS+L3OcKL4c8zvP+mAcCP8S+MkrxqG5uqnTWMS+XVdXcvFPX/E1vZ4HgueHawTdnwE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyICFFvSUil57TA4viXzfLWpY7n5lxUjuHLfJuPjdA0X38gfTG9
-	1hGNgqYW74HQZbqw2QFNdzlTcxr48Q3+iY2e92yvqF9PstefpfQvkc52YgSrRojq59eRVM1vvBQ
-	ft8Y1A7AtaCSouGX9/eL16/1BQKJ18P3LyIX1YMnk4t86/fJ/YRyjVfz6Z7IlXA==
-X-Gm-Gg: ASbGncuwOnsmPPhQWBS+UC5//khnx13BfPZ0ekPlNRTIP7M2FY1qEu/9j+I1O9cIjwt
-	dVK/02KV0pzpdcjh+7K42WWgfuZluHWBeYq1vS58BDYjKsjeo1Mq3G28287/Qux4TAPfMk9DK4l
-	pk8YBI7yE6hHO+wap834O1Y2UzcWmYxwGa9JAZI8OGJwfl8KMVzuyYTqZpNse6alfrF4Fo99EwQ
-	+wRDFhutovp5tVqfcClNRjmDN1j1zjAqJOMkeF/kwuw6BtLdogE1YVK/Zq+izvpC7GCg+cf7Hav
-	OR+MEuUWocr3ZoWWXHIZypGG+lZFTn9A
-X-Received: by 2002:a05:6000:2387:b0:3b7:9aff:ef22 with SMTP id ffacd0b85a97d-3c0ecc3206dmr1914965f8f.27.1755602549986;
-        Tue, 19 Aug 2025 04:22:29 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFv8ySp3Cp9nuKkaFnxvZbN6GvUwPZexJl3kz+HR/Y9XxHDTyVom8LjTJyyFuYXs6XeX/e9Gg==
-X-Received: by 2002:a05:6000:2387:b0:3b7:9aff:ef22 with SMTP id ffacd0b85a97d-3c0ecc3206dmr1914938f8f.27.1755602549506;
-        Tue, 19 Aug 2025 04:22:29 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc0:1515:7300:62e6:253a:2a96:5e3])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45b42a84417sm36364775e9.13.2025.08.19.04.22.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Aug 2025 04:22:29 -0700 (PDT)
-Date: Tue, 19 Aug 2025 07:22:26 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Namhyung Kim <namhyung@kernel.org>
-Cc: Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, linux-perf-users@vger.kernel.org,
-	LKML <linux-kernel@vger.kernel.org>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>
-Subject: Re: [PATCH] vhost: Fix ioctl # for VHOST_[GS]ET_FORK_FROM_OWNER
-Message-ID: <20250819072216-mutt-send-email-mst@kernel.org>
-References: <CACGkMEvm-wFV8TqX039CZU1JKnztft5Hp7kt6hqoqHCNyn3=jg@mail.gmail.com>
- <20250819063958.833770-1-namhyung@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=bQdDrjIVlJHeJek99B8g7mp1h/1SRaWzoRU+bww3WDDSUaPmYLj2q1WvxqpRiLHUTkgS+2u1+st71aFqGzeGl9xVg87j/qhNQRbi8UTuGiMmm/iA5gOd0bZBFSltiK35U7h3MgY9+w/IQJdKVIb9aktq0+w8U+gVpnO0QGa1ZuQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=lAeSY4ZM; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 7B59540E0232;
+	Tue, 19 Aug 2025 11:35:20 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id aLRSC9M65czv; Tue, 19 Aug 2025 11:35:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1755603314; bh=g/G+pgACZoF3hG1rLn4uE9m9WQvLEWOUUt+4q8jMk+Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=lAeSY4ZM2pw8IFmOlaS3AA7YC0WWO8kVSib0isnJ8MRUkSjuLstJyZqTzuRP8le9q
+	 CSNI7jaT/Lf5fG3tJyzKxBvuhs730KAvfOomyiuBWOIUgrlJv/F6rYw8Fk/yKCha+2
+	 3tZOnENDz3MTygaarLvMsyKcB+fY1RAx26rN81IhxOWSECHxXNVf2HplYbBFKPnbhv
+	 mr6A3xWbDhSinS0oFJgDwowtf3MYi65+a9pILK9HsmGZW9T9bRqfxZWwAW2Is6IenL
+	 K9lI1diW6dLFi6tCsmycgF2yLc4Ae3Ewav2kqmmLWYAZkn+OH0CGmZ+3VJWt5NaLlK
+	 le2zqk8WD8JwanqHAzd4O6RR3aeLoUbTzvFU4w1zdvJdpCLwFOT/csJ4lE7Wd7hQKW
+	 qp2jg1oaty6mizUrCYZ13ItdfTlk7bHo79g4v2FQDKh3YhrC+tcVjDalthNvYfVy9L
+	 gyBpsgCzj8gWW4gG/bh+b7nSQG7EE5pmlGbWequqkNjScRosvyMLD4UR6ZVtrloQz3
+	 Z73WYBQy2+mRobPzbi4xKJhqN7B+C+4oT0Ne+S0+f/WbShBLN+rXNuLtY7HIQo/ENC
+	 K4xQmKQXGQcXNYrtzevlnHZybRXnaQ6AabWK/hwM/5oer7TJYMOeVAkIIv1c2dg6z6
+	 AW5XntmANeHujyHURoDkG7Cc=
+Received: from zn.tnic (pd953092e.dip0.t-ipconnect.de [217.83.9.46])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 0DF5140E0194;
+	Tue, 19 Aug 2025 11:34:54 +0000 (UTC)
+Date: Tue, 19 Aug 2025 13:34:47 +0200
+From: Borislav Petkov <bp@alien8.de>
+To: K Prateek Nayak <kprateek.nayak@amd.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, x86@kernel.org,
+	Naveen rao <naveen.rao@amd.com>, Sairaj Kodilkar <sarunkod@amd.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	"Peter Zijlstra (Intel)" <peterz@infradead.org>,
+	"Xin Li (Intel)" <xin@zytor.com>,
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	Mario Limonciello <mario.limonciello@amd.com>,
+	"Gautham R. Shenoy" <gautham.shenoy@amd.com>,
+	Babu Moger <babu.moger@amd.com>,
+	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+Subject: Re: [PATCH v3 0/4] x86/cpu/topology: Work around the nuances of
+ virtualization on AMD/Hygon
+Message-ID: <20250819113447.GJaKRhVx6lBPUc6NMz@fat_crate.local>
+References: <20250818060435.2452-1-kprateek.nayak@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -98,52 +89,114 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250819063958.833770-1-namhyung@kernel.org>
+In-Reply-To: <20250818060435.2452-1-kprateek.nayak@amd.com>
 
-On Mon, Aug 18, 2025 at 11:39:57PM -0700, Namhyung Kim wrote:
-> The VHOST_[GS]ET_FEATURES_ARRAY ioctl already took 0x83 and it would
-> result in a build error when the vhost uapi header is used for perf tool
-> build like below.
+Lemme try to make some sense of this because the wild use of names and things
+is making my head spin...
+
+On Mon, Aug 18, 2025 at 06:04:31AM +0000, K Prateek Nayak wrote:
+> When running an AMD guest on QEMU with > 255 cores, the following FW_BUG
+> was noticed with recent kernels:
 > 
->   In file included from trace/beauty/ioctl.c:93:
->   tools/perf/trace/beauty/generated/ioctl/vhost_virtio_ioctl_array.c: In function ‘ioctl__scnprintf_vhost_virtio_cmd’:
->   tools/perf/trace/beauty/generated/ioctl/vhost_virtio_ioctl_array.c:36:18: error: initialized field overwritten [-Werror=override-init]
->      36 |         [0x83] = "SET_FORK_FROM_OWNER",
->         |                  ^~~~~~~~~~~~~~~~~~~~~
->   tools/perf/trace/beauty/generated/ioctl/vhost_virtio_ioctl_array.c:36:18: note: (near initialization for ‘vhost_virtio_ioctl_cmds[131]’)
+>     [Firmware Bug]: CPU 512: APIC ID mismatch. CPUID: 0x0000 APIC: 0x0200
 > 
-> Fixes: 7d9896e9f6d02d8a ("vhost: Reintroduce kthread API and add mode selection")
-> Signed-off-by: Namhyung Kim <namhyung@kernel.org>
+> Naveen, Sairaj debugged the cause to commit c749ce393b8f ("x86/cpu: Use
+> common topology code for AMD") where, after the rework, the initial
+> APICID was set using the CPUID leaf 0x8000001e EAX[31:0] as opposed to
 
-Applied, thanks a lot!
+That's
 
-> ---
->  include/uapi/linux/vhost.h | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+CPUID_Fn8000001E_ECX [Node Identifiers] (Core::X86::Cpuid::NodeId)
+
+> the value from CPUID leaf 0xb EDX[31:0] previously.
+
+That's
+
+CPUID_Fn0000000B_EDX [Extended Topology Enumeration]
+(Core::X86::Cpuid::ExtTopEnumEdx)
+
+> This led us down a rabbit hole of XTOPOEXT vs TOPOEXT support, preferred
+
+What is XTOPOEXT? 
+
+CPUID_Fn0000000B_EDX?
+
+Please define all your things properly so that we can have common base when
+reading this text.
+
+TOPOEXT is, I presume:
+
+#define X86_FEATURE_TOPOEXT		( 6*32+22) /* "topoext" Topology extensions CPUID leafs */
+
+Our PPR says:
+
+CPUID_Fn80000001_ECX [Feature Identifiers] (Core::X86::Cpuid::FeatureExtIdEcx)
+
+"22 TopologyExtensions: topology extensions support. Read-only. Reset:
+Fixed,1. 1=Indicates support for Core::X86::Cpuid::CachePropEax0 and
+Core::X86::Cpuid::ExtApicId."
+
+Those leafs are:
+
+CPUID_Fn8000001D_EAX_x00 [Cache Properties (DC)] (Core::X86::Cpuid::CachePropEax0)
+
+DC topology info. Probably not important for this here.
+
+and
+
+CPUID_Fn8000001E_EAX [Extended APIC ID] (Core::X86::Cpuid::ExtApicId)
+
+the extended APIC ID is there.
+
+How is this APIC ID different from the extended APIC ID in
+
+CPUID_Fn0000000B_EDX [Extended Topology Enumeration] (Core::X86::Cpuid::ExtTopEnumEdx)
+
+?
+
+> order of their parsing, and QEMU nuances like [1] where QEMU 0's out the
+> CPUID leaf 0x8000001e on CPUs where Core ID crosses 255 fearing a
+> Core ID collision in the 8 bit field which leads to the reported FW_BUG.
+
+Is that what the hw does though?
+
+Has this been verified instead of willy nilly clearing CPUID leafs in qemu?
+
+> Following were major observations during the debug which the two
+> patches address respectively:
 > 
-> diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
-> index 283348b64af9ac59..c57674a6aa0dbbea 100644
-> --- a/include/uapi/linux/vhost.h
-> +++ b/include/uapi/linux/vhost.h
-> @@ -260,7 +260,7 @@
->   * When fork_owner is set to VHOST_FORK_OWNER_KTHREAD:
->   *   - Vhost will create vhost workers as kernel threads.
->   */
-> -#define VHOST_SET_FORK_FROM_OWNER _IOW(VHOST_VIRTIO, 0x83, __u8)
-> +#define VHOST_SET_FORK_FROM_OWNER _IOW(VHOST_VIRTIO, 0x84, __u8)
->  
->  /**
->   * VHOST_GET_FORK_OWNER - Get the current fork_owner flag for the vhost device.
-> @@ -268,6 +268,6 @@
->   *
->   * @return: An 8-bit value indicating the current thread mode.
->   */
-> -#define VHOST_GET_FORK_FROM_OWNER _IOR(VHOST_VIRTIO, 0x84, __u8)
-> +#define VHOST_GET_FORK_FROM_OWNER _IOR(VHOST_VIRTIO, 0x85, __u8)
->  
->  #endif
-> -- 
-> 2.51.0.rc1.167.g924127e9c0-goog
+> 1. The support for CPUID leaf 0xb is independent of the TOPOEXT feature
 
+Yes, PPR says so.
+
+>    and is rather linked to the x2APIC enablement.
+
+Because the SDM says:
+
+"Bits 31-00: x2APIC ID of the current logical processor."
+
+?
+
+Is our version not containing the x2APIC ID?
+
+> On baremetal, this has
+>    not been a problem since TOPOEXT support (Fam 0x15 and above)
+>    predates the support for CPUID leaf 0xb (Fam 0x17[Zen2] and above)
+>    however, in virtualized environment, the support for x2APIC can be
+>    enabled independent of topoext where QEMU expects the guest to parse
+>    the topology and the APICID from CPUID leaf 0xb.
+
+So we're fixing a qemu bug?
+
+Why isn't qemu force-enabling TOPOEXT support when one requests x2APIC?
+
+My initial reaction: fix qemu.
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
