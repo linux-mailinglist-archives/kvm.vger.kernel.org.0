@@ -1,126 +1,158 @@
-Return-Path: <kvm+bounces-54934-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54935-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4273EB2B54A
-	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 02:21:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D910B2B551
+	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 02:31:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D6C2716A4B1
-	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 00:21:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 607752A3AB2
+	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 00:31:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0154F155389;
-	Tue, 19 Aug 2025 00:20:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2DD416F288;
+	Tue, 19 Aug 2025 00:30:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="DicVXpmg"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="jwPZHbEC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88D9D1CA81
-	for <kvm@vger.kernel.org>; Tue, 19 Aug 2025 00:20:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 171DE3451CC
+	for <kvm@vger.kernel.org>; Tue, 19 Aug 2025 00:30:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755562857; cv=none; b=CgANAAlzDEDQsGOqhNRXmuo5iViRQ2/wim40ZfXHYVTec+VIOB4CM/6YUD7duN2SaJEogfWtlcF1RaHyGmrLt6JZZr5mXudNpzDq2XN1mkbZPtQmuKtUQhGsQwX7LDrhdC3XgzzFIjh+g8LVU4YHtHBotNzsXI/d0hEqRiuECz8=
+	t=1755563449; cv=none; b=jeAfTzq5yeThhZxT6hkQj/Xm4wGQJoNKE+TFtxtvaXJnWB3HPNWE0lj82eULkLDk72d30KtJBAlZs09nrPCzy1pURn8Le1pNZ88Gi7QRnsd2sU0rUA0QWy8Wp5hHDVo3tfk4fcvY5sv2MnK5wYhz6F/H02PmcFRaggZCEcDhoyk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755562857; c=relaxed/simple;
-	bh=atJmxdGeijGiXSExn+ZNLici/r4lWKBuniPkNBYv9iE=;
+	s=arc-20240116; t=1755563449; c=relaxed/simple;
+	bh=7cSAwm8Mpm474gJFqJTDSfYjShfJlHAUKQHNp9cO/CU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NFusqBYQR0UndI7/dzB7y6eBxcvs8wG6WH3Clg4vlekn0y0dyMxUhSccoZqVpUFTy+jOyo7g9SLJCyuwVt6Vfj+Ivd9fkF4pWScCtmkr70IAFJc+K9sqL0v7rlapHxCS1UMzyEZrkN7x620ZsHnDrVLsOHdgBhUJ+RS6lDrX80w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=DicVXpmg; arc=none smtp.client-ip=209.85.219.46
+	 Content-Type:Content-Disposition:In-Reply-To; b=sIii+KmMs+KJgXYnZoiwG0e8FHD3QDi9gl6384Z670C5o31c953ub18iLA7E8vZe+CqZ9SAP+Pttj2awsu7MWIbvEtA/vZaEf7UrVml+XpwRf23oC4fnhf5D1NDPUgah8HXierlDQ1a/VtfhN1nGvHSLXswUmW01r/JR3R1nyq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=jwPZHbEC; arc=none smtp.client-ip=209.85.160.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-70a928ffd37so51080726d6.2
-        for <kvm@vger.kernel.org>; Mon, 18 Aug 2025 17:20:54 -0700 (PDT)
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4b134aa13f5so22288981cf.1
+        for <kvm@vger.kernel.org>; Mon, 18 Aug 2025 17:30:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1755562853; x=1756167653; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wwm+TVO3IE31QnUKkVxKkaPevhmZdZk1VLFBsWnyn6o=;
-        b=DicVXpmgkTQZjFi9nytWca1uPxFD0adbDO0MbcUZDIh+QxBPVHXnGnm5jSYJBx3rjz
-         Xp4UFOB/mVd4gKDdr7l72RMeYBWSHR/MjfTL3JMMf6g1+VAZl5UJKat62zj3FQoar+LC
-         EnG5WvUcOM+XHq6kx7BgWtR39XOzx9in4x9MX3qijuFuAeHWt/OFrTGDNAdKA50TOmYK
-         4Hmel5GIQIQYbtgBRoVFediUGzHtdzQrOnHr2/PjnSvZCjowS+MWKlHiTdUKH3ZwVls0
-         pCU3jefQzPwc3iKuS3MsQldYagbFCHxQ9pn+MHvm/RNBqY1pLPqwy4l0W09c1DiFr5CA
-         C6MQ==
+        d=ventanamicro.com; s=google; t=1755563446; x=1756168246; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=hLw3Ly5lBpwG37igk8nIXvrjC9WRvilq8gEy55nQz4Q=;
+        b=jwPZHbECeV+xOkYEcU+z1HIZtR6xcdUSyjRWedKpftrEJFHr41eUThABrxS2BmG+EE
+         0HQIz2xY/Vx4O95K2ZGsU9pkOL1ONpTXqZdOY2kCgknY0cHgifEsXZ+Do9zeM/dGLevg
+         LbQFFFTKxyBRLP4VvDwd2RWmsWptbxsD23B3RKzx/0YHOZm9aSoYsVj9Z/wuhIwTB8at
+         2cUTJAV/H/HOD7TilX7at3nETQ+dDaizDMTuRqqhEIEy6gQ+Liv1xk6bIfZVFJlWovT2
+         tGFOgFYgkp4SP/QOG7O1eQLUOthO47spiTiV7YYb2nVdYsJsTrN7vJWgXjUj3DQlpteP
+         yvyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755562853; x=1756167653;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wwm+TVO3IE31QnUKkVxKkaPevhmZdZk1VLFBsWnyn6o=;
-        b=mK+mEGODBMGxtgaIgBu1m9XjfFKacTWauz0Mie9l4w2FHvId4ZP6WoTuF3jixqYHcN
-         gafBlIcXShnjxv3dSlpEa1GrGwl3zI4dmVb+FfNiNLHrCFpCdKFYVnfWXd1CS8mEu62e
-         cnarSkRVrwTdmzmOnhg9ltezjeNHptipzBhxA7GXFIGry+LQ1MsUtgw3Y/iTZ1ImpgwW
-         Uo7famHRA9hsIHsNrB6ISsfDynHa7BTBOP7zMIaLEFY1ixds5VaLjb/ZeMjPZO1tYo5u
-         dARAuP2hiFxxV69gLqGmXz6hxwCam/FCW77uIsLk3Jug1tQZm79S/aMxHmQaNOsOHj0x
-         E7eg==
-X-Gm-Message-State: AOJu0YwpJbHCQqGIRotGWBJUwv0KwBC8lokLh7DK8RR4unrp9+ypwxwM
-	pF6mEg8TjPhHNwuM+Sh77++WulaqETrC2m7/HPHSP802+iEGjVy52tOihWaqCX5SIbY=
-X-Gm-Gg: ASbGncsN+oHLddbJheipNXBfErEFn6VAA8oKAGefMorYVgO/2kqhX3dVhrw4vlsU82m
-	NmmBBTkd9XTqX3BiNXZow1POf49RqaZurH74mXzrKgehVGmwCQc4PtNckMtFmQpnRkEcaZ21mGk
-	h8uWEBR/98WUbPWNxwDLDJEPvaJ/31ha0kdld4h3t1WujP6mw434Tdp5ZLCSbJXGM4DRgl1qpF8
-	GO2MUFXe/3M3gDOKx5NDOAnEGsScZomCqKhGOqZILiqtE3hGJOX3a++xkKpcddDJ0B/ECy088rS
-	kTKt/qa00HyyM/VrRCo2t/Swyo1gedKrfZNFNhThJv6KPaVEetsfF04FjcmxcscuW3YbVmU5AXu
-	u87c2XRG5e4b3i/9pqTGPgyE=
-X-Google-Smtp-Source: AGHT+IGUgrllTL7Y8fMaxyBiG7OjFs5eQq62OO4Qg66bHPzC0RUUqBKv3WgzNhUUD2BQ4eiTpGJ75A==
-X-Received: by 2002:a05:6214:2b0f:b0:707:7694:4604 with SMTP id 6a1803df08f44-70c2b6f4f67mr8160386d6.30.1755562853487;
-        Mon, 18 Aug 2025 17:20:53 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1755563446; x=1756168246;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hLw3Ly5lBpwG37igk8nIXvrjC9WRvilq8gEy55nQz4Q=;
+        b=GUF4a2ND2WIzDYAI0W6P6BjN+td1a7V4yI7Y1AUp73oL9q5C5B95EY2APeI7jBY3Tj
+         p1UF4iyjvWQOjE8+7H1t2PJsOTQqyiKQbOQR69MiWDi9tchllz5UcJkaYrvnF6DwBEI9
+         f2Y73i5pPYg6e/Trtd8VN2RtzothzM3zrTtgJN/gsB7N70bAFGjriFvanqw+6QH97lRz
+         yuQKDVYoVLPCXIat8hgDuUTnDAXfOyIlJevJfWAacGWZa8Vw2lcuELwC/vIGo4S7YbGC
+         mzO/Gw0D7vKd0YH9Pe88gA7hV4U5cNHVqm3HF7LJOcGOdFLcUMSix/XwL+bBYkqCmXz2
+         MGHQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXYVzBn5xI0NGzDmboYrPLAivjMYWep7505P1qDyawfBlAFRRgQt9Q8qG2qzCA1AGpulE0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxMZJILIQlWbDBzUzsWC4PiAu0Xnl4mUhr4RNGwzIZmCngnFsO5
+	bpVrgAHF7rKT6NRz44b4yj98YkvErGxX2FC3U8gxxBWjgTDhGdwcASWLd9oPhIExg9U=
+X-Gm-Gg: ASbGnctW6EGdSj+4Z2EYlSNLxQwrTnTVj/qUDJqe/hnr1nsEZLsDA+SbZEoiblGbgAK
+	jwhm9zosB8YtWG5wM5p4PmNy0jbc7GIu73bCRdw4cMLkBqa7Rb3DmoALVhsylzsQoaID3NCODy5
+	oji5NS8utv7uO43MsK2XMfdDpseeJHw1CEj0t/fKX7eEOm0/jt39rYoKgyEakdVvxYxE9Ca4e8S
+	k5AC6Qwdo3B2Wc0dpMT3ZS9A34O+lml0H0fiXzaUECEmPit+Z/c7W1QoN/egCGz+eddMg4lB+qY
+	go3hHwqdVsQFhW/9ZQxYSHEHLjQw6akrZ6fixIWSibgRReBwaTfo2gLfuBzJcxj/9UfodbAqKkY
+	P5tEXm/HjILN9a25rjpYakK8=
+X-Google-Smtp-Source: AGHT+IGBQbFzX0nYDgxxHDXJuUpwrISyNXTFy2dbw5LSBC5tG74mcZCK5FKwm3AQdhXjEGg8m2Q7VA==
+X-Received: by 2002:a05:622a:312:b0:4ae:f1c4:98fe with SMTP id d75a77b69052e-4b286e216edmr8455701cf.34.1755563445791;
+        Mon, 18 Aug 2025 17:30:45 -0700 (PDT)
 Received: from localhost ([173.23.183.85])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-70ba92f89e7sm60632856d6.45.2025.08.18.17.20.52
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4b11dc584c3sm58679171cf.17.2025.08.18.17.30.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Aug 2025 17:20:53 -0700 (PDT)
-Date: Mon, 18 Aug 2025 19:20:52 -0500
+        Mon, 18 Aug 2025 17:30:45 -0700 (PDT)
+Date: Mon, 18 Aug 2025 19:30:44 -0500
 From: Andrew Jones <ajones@ventanamicro.com>
-To: dayss1224@gmail.com
-Cc: kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, Anup Patel <anup@brainfault.org>, 
-	Atish Patra <atish.patra@linux.dev>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Alexandre Ghiti <alex@ghiti.fr>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Peter Zijlstra <peterz@infradead.org>, "Paul E. McKenney" <paulmck@kernel.org>, 
-	Boqun Feng <boqun.feng@gmail.com>
-Subject: Re: [PATCH v2 0/3] KVM: riscv: selftests: Enable supported test cases
-Message-ID: <20250818-be8ccd84eebf62dafa95caa3@orel>
-References: <cover.1754308799.git.dayss1224@gmail.com>
+To: Bibo Mao <maobibo@loongson.cn>
+Cc: Dong Yang <dayss1224@gmail.com>, pbonzini@redhat.com, shuah@kernel.org, 
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	chenhaucai@kernel.org, Quan Zhou <zhouquan@iscas.ac.cn>
+Subject: Re: [PATCH] KVM: loongarch: selftests: Remove common tests built by
+ TEST_GEN_PROGS_COMMON
+Message-ID: <20250818-2e6cf1b89c738f0fb1264811@orel>
+References: <20250811082453.1167448-1-dayss1224@gmail.com>
+ <11d1992d-baf0-fc2f-19d7-b263d15cf64d@loongson.cn>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <cover.1754308799.git.dayss1224@gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <11d1992d-baf0-fc2f-19d7-b263d15cf64d@loongson.cn>
 
-On Thu, Aug 07, 2025 at 10:59:27PM +0800, dayss1224@gmail.com wrote:
-> From: Dong Yang <dayss1224@gmail.com>
+On Mon, Aug 11, 2025 at 06:49:07PM +0800, Bibo Mao wrote:
+> Hi Dong,
 > 
-> Add supported KVM test cases and fix the compilation dependencies.
-> ---
-> Changes in v2:
-> - Delete some repeat KVM test cases on riscv
-> - Add missing headers to fix the build for new RISC-V KVM selftests
+> Thanks for you patch.
 > 
-> Dong Yang (1):
->   KVM: riscv: selftests: Add missing headers for new testcases
+> On 2025/8/11 下午4:24, Dong Yang wrote:
+> > Remove the common KVM test cases already added to TEST_GEN_PROGS_COMMON
+> >   as following:
+> > 
+> > 	demand_paging_test
+> > 	dirty_log_test
+> > 	guest_print_test
+> > 	kvm_binary_stats_test
+> > 	kvm_create_max_vcpus
+> > 	kvm_page_table_test
+> > 	set_memory_region_test
+> > 
+> > Fixes: a867688c8cbb ("KVM: selftests: Add supported test cases for LoongArch")
+> > Signed-off-by: Quan Zhou <zhouquan@iscas.ac.cn>
+> > Signed-off-by: Dong Yang <dayss1224@gmail.com>
+> > ---
+> >   tools/testing/selftests/kvm/Makefile.kvm | 7 -------
+> >   1 file changed, 7 deletions(-)
+> > 
+> > diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
+> > index 38b95998e1e6..d2ad85a8839f 100644
+> > --- a/tools/testing/selftests/kvm/Makefile.kvm
+> > +++ b/tools/testing/selftests/kvm/Makefile.kvm
+> > @@ -199,17 +199,10 @@ TEST_GEN_PROGS_riscv += get-reg-list
+> >   TEST_GEN_PROGS_riscv += steal_time
+> TEST_GEN_PROGS_loongarch = $(TEST_GEN_PROGS_COMMON) is missing.
 > 
-> Quan Zhou (2):
->   KVM: riscv: selftests: Add common supported test cases
->   KVM: riscv: selftests: Use the existing RISCV_FENCE macro in
->     `rseq-riscv.h`
-> 
->  tools/testing/selftests/kvm/Makefile.kvm              | 6 ++++++
->  tools/testing/selftests/kvm/include/riscv/processor.h | 2 ++
->  tools/testing/selftests/rseq/rseq-riscv.h             | 3 +--
->  3 files changed, 9 insertions(+), 2 deletions(-)
->
+> BTW irqfd_test in TEST_GEN_PROGS_COMMON fails to run on LoongArch, does this
+> test case pass to run on Riscv?
 
-The two fix patches need to come before the Makefile patch in order to
-avoid breaking the build.
+It appears to. It outputs the vm mode created and then exits with a zero
+exit code.
 
 Thanks,
 drew
+
+> 
+> Regards
+> Bibo Mao
+> >   TEST_GEN_PROGS_loongarch += coalesced_io_test
+> > -TEST_GEN_PROGS_loongarch += demand_paging_test
+> >   TEST_GEN_PROGS_loongarch += dirty_log_perf_test
+> > -TEST_GEN_PROGS_loongarch += dirty_log_test
+> > -TEST_GEN_PROGS_loongarch += guest_print_test
+> >   TEST_GEN_PROGS_loongarch += hardware_disable_test
+> > -TEST_GEN_PROGS_loongarch += kvm_binary_stats_test
+> > -TEST_GEN_PROGS_loongarch += kvm_create_max_vcpus
+> > -TEST_GEN_PROGS_loongarch += kvm_page_table_test
+> >   TEST_GEN_PROGS_loongarch += memslot_modification_stress_test
+> >   TEST_GEN_PROGS_loongarch += memslot_perf_test
+> > -TEST_GEN_PROGS_loongarch += set_memory_region_test
+> >   SPLIT_TESTS += arch_timer
+> >   SPLIT_TESTS += get-reg-list
+> > 
+> 
 
