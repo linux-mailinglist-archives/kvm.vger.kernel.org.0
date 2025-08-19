@@ -1,116 +1,193 @@
-Return-Path: <kvm+bounces-54989-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54990-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69183B2C6BD
-	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 16:17:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B8CBB2C70B
+	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 16:31:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 743447B6647
-	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 14:16:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 615855A02F2
+	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 14:27:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE0932571D8;
-	Tue, 19 Aug 2025 14:17:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EFC6263C7F;
+	Tue, 19 Aug 2025 14:27:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DS63xpEm"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="T9GqhK34"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9412424DD0E
-	for <kvm@vger.kernel.org>; Tue, 19 Aug 2025 14:17:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C454C2110;
+	Tue, 19 Aug 2025 14:27:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755613040; cv=none; b=bLtf9Vb2mLi49Cu/oYo81ozTpo5WYSo0YoEXCZJ9+QxjMssWhAvRcsmXD/yyCZcaAXCKKinNLRohPbTdAwjwqi1HQZH2XAgD7u241ugtBHNCSYDsAiM7Z8964KasLoZ7H5IgC71HLfj1Mv+7KiC+rXzb5lejdNVBBfvTYzfgrzA=
+	t=1755613634; cv=none; b=GxxdQSfDXCjKUIOc4IeUVG5mNexbPRYJLJNnbzynkTz7ox0CiAp0RDXEvTTk9P8WktpBUKWHBYzfksf80OooYLjT2tZ+RWV76iBE7NhXnGsFR0FwjE7QewgNCnuR5jo2KCAyD1uK7ECGleQLegQ3AqcPC6sZoy1Sc0A0qPwKnp8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755613040; c=relaxed/simple;
-	bh=KZo6lFE+1XnNnQGXrhcQMuv8VUWLOdbzBDwzfflqaVs=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=UheeFiEx6qFA0E+lAQE4RRzqZwWkaxj1H8pgnyIgF/MAxAyn25AP+s4WwCnBbAoZzyUc2vuVgkwAXqZwczFfVFYZHF2X55LTIvrN6TGeVyK1vleb4LOei/r3Js+vwJymTkbzN8tZeCviBslONHeULjlNpnP8mS1WdJlfMtgkEiA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DS63xpEm; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-32326789e09so10498291a91.1
-        for <kvm@vger.kernel.org>; Tue, 19 Aug 2025 07:17:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755613038; x=1756217838; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tk8qLdHc0U05Dxo1Ab/dvD77IqT0ZtETlVr+X1bxo7E=;
-        b=DS63xpEmkBNKG8te3iQiBgidtvSeirR7Yf3PVaiC1vn5isI5KeNqBabxWCeG4h0cdJ
-         xYEzHQ1xJmNQAUflVl1WfxnCMS0YT3gS+SX5HapsSdhkXOpQWWTJpFKRP4Gs5D286Jd6
-         kqp8U14sToZ4oUeCHZpY70hbKvAs4MUtooh/KfWLStWmfvSK11+a0vtiWTOQkyYdy8vd
-         C/Iz/fK1znVGojIoLLWiRNHH8AnYR5m2iG0G+7GUhFoqnkAMljNoaloT0sZUoskSQQ4E
-         UEJ5d15aKtpsM1pynJoVGKYx5ZXTzsaEaGDQ8KR030y4PjGmMH2oOZQoxlkL4j1fctwd
-         hGLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755613038; x=1756217838;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tk8qLdHc0U05Dxo1Ab/dvD77IqT0ZtETlVr+X1bxo7E=;
-        b=dMiyk3wMottYrU5KFGZ7PJtoFofcCgoles6zAmIve4u7n69H40s5KlFMgGHGMNNKDP
-         rWRno/L2NK33/vbZxK4sEkDUhnuMgLR9DsJ/TdIHNQwbRJ1zHmjnJWjXgtgwU3JxfS9d
-         wOffNN0bOu+EeEf7s4CuAQ7RpNwhIpVlOznUvGAHub6wS2eH96KWBoSDpiAW9wqsQX11
-         qOGRoMNs6EEHze0NZvVJ2H+oZIOMF9ClJSSbkcTyw+yzX08eTpsagfqmDqQ5MMvm2Qzd
-         nb8b9ymK7Oj+Q1NNboTr85+SSMAnGH4ilQ8TZh35MrRq5G6j2DQwMMlnG5j17WJD3CxG
-         XKWg==
-X-Forwarded-Encrypted: i=1; AJvYcCXaff8Auq8Q8z8AGe+PIWg2VIXtjHCkyZyjmZqAgyejlOIdzJoHaoEM+uCaQF2c5OKQULU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxZGp/CjmnrgmNxwnphThHGkoFvLK1Ycw3c7lx34HHfJ08jyW0h
-	GllJhBawYTFZ+BHZfuIOuJ2pZCHkVr1chvdD8muT9AoJW2Xsd1jer2NX1gmjDKuTWZma+kaOK7P
-	OFJmdkA==
-X-Google-Smtp-Source: AGHT+IG+R29IibUM+skEvVsfUw+0/0piaRJ4aJbmBSk01NC1yZeCdDU/KApLU4ScisyIbczr3lj7S9517lU=
-X-Received: from pjbpx1.prod.google.com ([2002:a17:90b:2701:b0:31e:d618:a29c])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5202:b0:321:c85d:dd93
- with SMTP id 98e67ed59e1d1-3245e562cedmr4184520a91.4.1755613037551; Tue, 19
- Aug 2025 07:17:17 -0700 (PDT)
-Date: Tue, 19 Aug 2025 07:17:15 -0700
-In-Reply-To: <20250721134718.2499856-1-colin.i.king@gmail.com>
+	s=arc-20240116; t=1755613634; c=relaxed/simple;
+	bh=yDs+kKBrbP3yEi8uWei0eMe0N9vYgihZ6nzRT6EJui0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jdEHCf//m+/GMH10/vKVf3172v5EF1JmkdaFE+8hvY5Gz9ylwTQZHBzKQBG7FOxQBdSInkK287yqV+zw3sSYteG1ZuT3qG8ij37Gwsp6yBAPt50w7nLIdq5pmSG/x3EHm7KpcLRXBSypmkduSmtQQThfpwSb/umzbBz7rWUFPKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=T9GqhK34; arc=none smtp.client-ip=91.218.175.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Tue, 19 Aug 2025 22:27:02 +0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1755613629;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TWvZTXUXEJL7nh5uPtT4Ud1hkvku6IV5nyuOFNoTAv0=;
+	b=T9GqhK34sK0ikauzeNSBxRN+EiQBDKH+FGTdM+8EKZAk6f96SaUGXFbx8fWXcyBXWpZl4X
+	0EPRsXPggdH7pQiRg1jQTC5wQrkfVwCYUqzXVPSD80QBctEB5jeuwnpeavr0ymy91sfeaR
+	xOyZHtsELbRedj3ZwbDihZ9DiD0AjH8=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Troy Mitchell <troy.mitchell@linux.dev>
+To: guoren@kernel.org, paul.walmsley@sifive.com, anup@brainfault.org,
+	atish.patra@linux.dev, fangyu.yu@linux.alibaba.com
+Cc: linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+	Troy Mitchell <troy.mitchell@linux.dev>
+Subject: Re: [PATCH] RISC-V: KVM: Prevent HGATP_MODE_BARE passed
+Message-ID: <aKSJtqea0x0r44Tq@troy-wujie14pro-arch>
+References: <20250819004643.1884149-1-guoren@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250721134718.2499856-1-colin.i.king@gmail.com>
-Message-ID: <aKSHa8QhidY0ZMAi@google.com>
-Subject: Re: [PATCH][next] KVM: x86: Remove space before \n newline
-From: Sean Christopherson <seanjc@google.com>
-To: Colin Ian King <colin.i.king@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H . Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org, kernel-janitors@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250819004643.1884149-1-guoren@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Jul 21, 2025, Colin Ian King wrote:
-> There is a extraneous space before a newline in a pr_debug_ratelimited
-> message. Remove it.
+On Mon, Aug 18, 2025 at 08:46:43PM -0400, guoren@kernel.org wrote:
+> From: "Guo Ren (Alibaba DAMO Academy)" <guoren@kernel.org>
 > 
-> Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+> urrent kvm_riscv_gstage_mode_detect() assumes H-extension must
+> have HGATP_MODE_SV39X4/SV32X4 at least, but the spec allows
+> H-extension with HGATP_MODE_BARE alone. The KVM depends on
+> !HGATP_MODE_BARE at least, so enhance the gstage-mode-detect
+> to block HGATP_MODE_BARE.
+> 
+> Move gstage-mode-check closer to gstage-mode-detect to prevent
+> unnecessary init.
+> 
+> Signed-off-by: Guo Ren (Alibaba DAMO Academy) <guoren@kernel.org>
 > ---
->  arch/x86/kvm/vmx/vmx.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  arch/riscv/kvm/gstage.c | 27 ++++++++++++++++++++++++---
+>  arch/riscv/kvm/main.c   | 35 +++++++++++++++++------------------
+>  2 files changed, 41 insertions(+), 21 deletions(-)
+Reviewed-by: Troy Mitchell <troy.mitchell@linux.dev>
+
 > 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index aa157fe5b7b3..e5358277d059 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -3142,7 +3142,7 @@ static void enter_lmode(struct kvm_vcpu *vcpu)
+> diff --git a/arch/riscv/kvm/gstage.c b/arch/riscv/kvm/gstage.c
+> index 24c270d6d0e2..b67d60d722c2 100644
+> --- a/arch/riscv/kvm/gstage.c
+> +++ b/arch/riscv/kvm/gstage.c
+> @@ -321,7 +321,7 @@ void __init kvm_riscv_gstage_mode_detect(void)
+>  	if ((csr_read(CSR_HGATP) >> HGATP_MODE_SHIFT) == HGATP_MODE_SV57X4) {
+>  		kvm_riscv_gstage_mode = HGATP_MODE_SV57X4;
+>  		kvm_riscv_gstage_pgd_levels = 5;
+> -		goto skip_sv48x4_test;
+> +		goto done;
+>  	}
 >  
->  	guest_tr_ar = vmcs_read32(GUEST_TR_AR_BYTES);
->  	if ((guest_tr_ar & VMX_AR_TYPE_MASK) != VMX_AR_TYPE_BUSY_64_TSS) {
-> -		pr_debug_ratelimited("%s: tss fixup for long mode. \n",
-> +		pr_debug_ratelimited("%s: tss fixup for long mode.\n",
->  				     __func__);
-
-I'm inclined to simply delete the pr_debug.  I can't imagine it's at all useful
-for anyone/anything.
-
->  		vmcs_write32(GUEST_TR_AR_BYTES,
->  			     (guest_tr_ar & ~VMX_AR_TYPE_MASK)
+>  	/* Try Sv48x4 G-stage mode */
+> @@ -329,10 +329,31 @@ void __init kvm_riscv_gstage_mode_detect(void)
+>  	if ((csr_read(CSR_HGATP) >> HGATP_MODE_SHIFT) == HGATP_MODE_SV48X4) {
+>  		kvm_riscv_gstage_mode = HGATP_MODE_SV48X4;
+>  		kvm_riscv_gstage_pgd_levels = 4;
+> +		goto done;
+>  	}
+> -skip_sv48x4_test:
+>  
+> +	/* Try Sv39x4 G-stage mode */
+> +	csr_write(CSR_HGATP, HGATP_MODE_SV39X4 << HGATP_MODE_SHIFT);
+> +	if ((csr_read(CSR_HGATP) >> HGATP_MODE_SHIFT) == HGATP_MODE_SV39X4) {
+> +		kvm_riscv_gstage_mode = HGATP_MODE_SV39X4;
+> +		kvm_riscv_gstage_pgd_levels = 3;
+> +		goto done;
+> +	}
+> +#else /* CONFIG_32BIT */
+> +	/* Try Sv32x4 G-stage mode */
+> +	csr_write(CSR_HGATP, HGATP_MODE_SV32X4 << HGATP_MODE_SHIFT);
+> +	if ((csr_read(CSR_HGATP) >> HGATP_MODE_SHIFT) == HGATP_MODE_SV32X4) {
+> +		kvm_riscv_gstage_mode = HGATP_MODE_SV32X4;
+> +		kvm_riscv_gstage_pgd_levels = 2;
+> +		goto done;
+> +	}
+> +#endif
+> +
+> +	/* KVM depends on !HGATP_MODE_OFF */
+> +	kvm_riscv_gstage_mode = HGATP_MODE_OFF;
+> +	kvm_riscv_gstage_pgd_levels = 0;
+> +
+> +done:
+>  	csr_write(CSR_HGATP, 0);
+>  	kvm_riscv_local_hfence_gvma_all();
+> -#endif
+>  }
+> diff --git a/arch/riscv/kvm/main.c b/arch/riscv/kvm/main.c
+> index 67c876de74ef..8ee7aaa74ddc 100644
+> --- a/arch/riscv/kvm/main.c
+> +++ b/arch/riscv/kvm/main.c
+> @@ -93,6 +93,23 @@ static int __init riscv_kvm_init(void)
+>  		return rc;
+>  
+>  	kvm_riscv_gstage_mode_detect();
+> +	switch (kvm_riscv_gstage_mode) {
+> +	case HGATP_MODE_SV32X4:
+> +		str = "Sv32x4";
+> +		break;
+> +	case HGATP_MODE_SV39X4:
+> +		str = "Sv39x4";
+> +		break;
+> +	case HGATP_MODE_SV48X4:
+> +		str = "Sv48x4";
+> +		break;
+> +	case HGATP_MODE_SV57X4:
+> +		str = "Sv57x4";
+> +		break;
+> +	default:
+> +		return -ENODEV;
+> +	}
+> +	kvm_info("using %s G-stage page table format\n", str);
+>  
+>  	kvm_riscv_gstage_vmid_detect();
+>  
+> @@ -135,24 +152,6 @@ static int __init riscv_kvm_init(void)
+>  			 (rc) ? slist : "no features");
+>  	}
+>  
+> -	switch (kvm_riscv_gstage_mode) {
+> -	case HGATP_MODE_SV32X4:
+> -		str = "Sv32x4";
+> -		break;
+> -	case HGATP_MODE_SV39X4:
+> -		str = "Sv39x4";
+> -		break;
+> -	case HGATP_MODE_SV48X4:
+> -		str = "Sv48x4";
+> -		break;
+> -	case HGATP_MODE_SV57X4:
+> -		str = "Sv57x4";
+> -		break;
+> -	default:
+> -		return -ENODEV;
+> -	}
+> -	kvm_info("using %s G-stage page table format\n", str);
+> -
+>  	kvm_info("VMID %ld bits available\n", kvm_riscv_gstage_vmid_bits());
+>  
+>  	if (kvm_riscv_aia_available())
 > -- 
-> 2.50.0
+> 2.40.1
 > 
+> 
+> _______________________________________________
+> linux-riscv mailing list
+> linux-riscv@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-riscv
 
