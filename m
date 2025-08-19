@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-55072-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55073-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADB09B2D070
-	for <lists+kvm@lfdr.de>; Wed, 20 Aug 2025 01:49:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8803B2D073
+	for <lists+kvm@lfdr.de>; Wed, 20 Aug 2025 01:49:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 97FFB5663DB
-	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 23:49:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D6C635664C6
+	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 23:49:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F7DF2765E1;
-	Tue, 19 Aug 2025 23:48:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 215CD277CA2;
+	Tue, 19 Aug 2025 23:48:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tuEIR0bH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SwyH85sN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47A262749F2
-	for <kvm@vger.kernel.org>; Tue, 19 Aug 2025 23:48:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA42B275AF8
+	for <kvm@vger.kernel.org>; Tue, 19 Aug 2025 23:48:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755647323; cv=none; b=N3BeHgoWmVcQV81r6j2ZpRrCjLdJ/n9NvD7jPaRR3bkpU4RetBKG5ceiEMvZFIgzmTEObCnXsmFw5BoUa+dTUsIUBatT80EO5KxlyIFq0cBJPltSN1NO2JvBKgShThZMA/Qmnh+kxMytuOcVKzZp9FDoXo46dRfxF+a4AH6sVzU=
+	t=1755647325; cv=none; b=R6Tc0oa1dtoimuW7pcxJA6aocRajexGcBhIpOy6SI77t8sKSC7uwUQSHEdVinEQ1PNFiNq0azrAwNY8biZOLUZSNLeqcpSEqVn4FNsWDgnCKuRGxY7IuhlpBAQWTYPiv7Ebx/aXDlGg7pCJaO11UBWRucrXxFzcYAv3Q394eBoI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755647323; c=relaxed/simple;
-	bh=adx+8BVJXD6hnpBoSfGexmnW5fT1Mhc9heYL8oa7iek=;
+	s=arc-20240116; t=1755647325; c=relaxed/simple;
+	bh=mmU8zygcUZCUXFONTWyt6rEvP+1h9unYkwdpbTDHFbs=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=UQP4zKL4vH9jKJsKaAKDuPTtZKnuTKdrNINR7iFxvgWYH9ikReIugklPulhMMTokTUWNk+jBj2UdqGhyl0k8Ym5Y6Zps1mja3p/kBuxNmXIl4Wz7Vouw0EASIh1aO4wbfreQPUKAa7AXJpsSAn5hPhhfedOTvGEGxWUPYmkYk2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tuEIR0bH; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=cQ/sWu8Y3ligNK7HFyqUsTwomLma+Y9hPsWDKM74d1v3Qq9wGUYPem6alCChUjPbHPPL10ZVibj9Svt/F0vN/8I7CuFu9/7otp5GELLvMiZoe64zDZU5WhEmVrHfDS2o06JKidt1qJZAr574b5TxM8eZVsGHBrQcQEeECsGAGdI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SwyH85sN; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-76e2e9a98b4so333630b3a.1
-        for <kvm@vger.kernel.org>; Tue, 19 Aug 2025 16:48:42 -0700 (PDT)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2445827ab71so52781005ad.3
+        for <kvm@vger.kernel.org>; Tue, 19 Aug 2025 16:48:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755647321; x=1756252121; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1755647323; x=1756252123; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=7/h4Lzi5fzI0qBE6eX0TONREqZIKaotMYznXSY25UL4=;
-        b=tuEIR0bHsvYEvXhsTVqmoZ4BrBDhuYyb3V/966NSZyvhrbUNa+AU5UDJwuzF0fmT43
-         SofyKHc4lAJQIxYqb/Z6L31Hju+CJxMhi3kgqaL92nhCPrXUqHQZ0yniH4DjKmQVJvhb
-         lUvok0eRZw77MEQ8SmLdJJZ/E9P5wWUIQoahoVFShYSra3BS3pRNEZ9ftdN+v2Xd/Co9
-         Lm99INfoRzO9D7jhLty1mJdTGJIGclUn/GbcjuOKrGcDnYZmBQYvNfRRHkOuWgj74nnt
-         IowtIzZrBXgQcnY1/IjQIvW1hvXAg/7l3asamFGooPeacuOZs22CxJobuUujmV95iIVn
-         gEWA==
+        bh=VoTBCaXY3tsMquNWLPxjI77aenMDU1kT0Y5i5aPfTX4=;
+        b=SwyH85sNjLNGVm9VmrA9pQzN4nAeA/VJtlN+T1tnj4DE62muGfH5gXY4an1pwXaIY1
+         TdDfikjQs/5oA/w3aWU/kGCH9qeQ7E51ziqbzWxKIhMZOGhBfpjivsO9uQ5RnGM17Z0f
+         whv2mO8KlwNbMIbvT7LJ8UVzilLriWw41z+40WmgbqAyln/aL7kkz02dVyBouca5XbZC
+         FqVEP34ItNPTCZkMbAHM0sEgF1QFjlFsWSgYD/WnkHf7eWamIJnaWucqERpI1J1d36W0
+         9zt4Nnfn0JZlDfyDgY7G7ZEVoBLb4lzNpSVS2DkEjgZwAgAs51As4ywM8TF0oG1pmmPi
+         xewA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755647321; x=1756252121;
+        d=1e100.net; s=20230601; t=1755647323; x=1756252123;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=7/h4Lzi5fzI0qBE6eX0TONREqZIKaotMYznXSY25UL4=;
-        b=KDTDXcYwRxcsn51KOccEnXbFfeVVg7x0xFfw4l707obnxgwQRbBgCtu+xl8KxO7BRr
-         RAXriO/UHiI2ZxjP6J4ED8bGdqYghBq8isRYdVbC96GNZJJ7D1J13RzLqPRDLfIdOlo4
-         72//fWsJ93Du/En98tCaM/EikTZoj/798bLNCqeCZkc/847WsnEdDio9FYA2IBjJBLVD
-         lCCHY6XZlT/2gX/idceNQ9Bkr9tua3+Xujr7wxQDeNEf/83xcPEwBHWm+W+R2QWDPRjG
-         hMBrxd30wR8AIc8OCwzb43cE759zftEvq3743ALIAQhzijh8bwaqkbHrEhyAp2QgcO5Z
-         a7Qg==
-X-Gm-Message-State: AOJu0Yz0qDszj9hjz6wkkKaRwADPq5F09HbqZ7TGE7B22cl3UAAVX02N
-	4zOoSOSI244HmPe/sORd9e5OKi3s2J3i/WgZW4l4FJ8CAM+ZlK12oOV+dPQCZ2g2gGYj4VYPOaB
-	RHCB47Q==
-X-Google-Smtp-Source: AGHT+IGsqRabeQMqnGpLC270nNFX58626EJ3YMIELyl5iaczf7AIU8BO4Ll9FDhsNkRVMfrkARD0dI/rJ8Q=
-X-Received: from pflr27.prod.google.com ([2002:aa7:989b:0:b0:748:fc2e:e489])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:aa7:8893:0:b0:748:a0b9:f873
- with SMTP id d2e1a72fcca58-76e8d7a3ba9mr1464991b3a.9.1755647321323; Tue, 19
- Aug 2025 16:48:41 -0700 (PDT)
+        bh=VoTBCaXY3tsMquNWLPxjI77aenMDU1kT0Y5i5aPfTX4=;
+        b=F9DbiVvlgf4+1q2K66dgYNcXI5PbtR7jLX6oQxhg0Nzt0Fln0gNjJ6zxmD4fgCZa15
+         m/YFUfoDXU8CQqAkI0H+zASh4uCqx1BY9GD7lY8+ym1GVattcQnwBcCdqFbfdmAC+yF5
+         W7eYc5n0RkP8MexPIFKr/Ty09hmo0tI2Cj51lvdExUjsYwvK86vUCneUVghGant2iJ7j
+         d4SbFDKkgaDA3ixhBCSSjRpuS4rJ+rrsfWaA/cbcdN4hOe9JtmtOZlfeCYsTh4/ofruh
+         jGW5z3caQOQFvLPHtXCeVl5WqGU3JPWakZdWAv/g5WVz2PJZCmWL4phMQEOlVx6kWxIl
+         u0xQ==
+X-Gm-Message-State: AOJu0Yy2BkAcxwvV8WYuY1STTo70uY/3fSJWWwsWAVN4EAq4bCcV2bOo
+	4Jk73fBDdeg78OPMnldpp3Hok7KQ/v7EBZn50KTSV8cinHDEQ/Qt35yOWwoeYjAke5mbylAn5xM
+	TeAKEdw==
+X-Google-Smtp-Source: AGHT+IHz6Nf29rgTStJH3LOOvkrvfJrg7KYd0YUyoNhZKV5AL3xY0E8ZF53ljkG7owqmAXeO9+/vk7Qe/eA=
+X-Received: from plbma16.prod.google.com ([2002:a17:903:950:b0:242:fe5c:e0f])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ccce:b0:240:2e93:8a9a
+ with SMTP id d9443c01a7336-245ef269392mr7253585ad.42.1755647323253; Tue, 19
+ Aug 2025 16:48:43 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 19 Aug 2025 16:48:26 -0700
+Date: Tue, 19 Aug 2025 16:48:27 -0700
 In-Reply-To: <20250819234833.3080255-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,8 +75,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250819234833.3080255-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.0.rc1.167.g924127e9c0-goog
-Message-ID: <20250819234833.3080255-2-seanjc@google.com>
-Subject: [PATCH v11 1/8] KVM: SEV: Drop GHCB_VERSION_DEFAULT and open code it
+Message-ID: <20250819234833.3080255-3-seanjc@google.com>
+Subject: [PATCH v11 2/8] KVM: SEV: Enforce minimum GHCB version requirement
+ for SEV-SNP guests
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -88,69 +89,67 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Nikunj A Dadhania <nikunj@amd.com>
 
-Remove the GHCB_VERSION_DEFAULT macro and open code it with '2'. The macro
-is used conditionally and is not a true default. KVM ABI does not
-advertise/emumerates the default GHCB version. Any future change to this
-macro would silently alter the ABI and potentially break existing
-deployments that rely on the current behavior.
+Require a minimum GHCB version of 2 when starting SEV-SNP guests through
+KVM_SEV_INIT2. When a VMM attempts to start an SEV-SNP guest with an
+incompatible GHCB version (less than 2), reject the request early rather
+than allowing the guest kernel to start with an incorrect protocol version
+and fail later with GHCB_SNP_UNSUPPORTED guest termination.
 
-Additionally, move the GHCB version assignment earlier in the code flow and
-update the comment to clarify that KVM_SEV_INIT2 defaults to version 2,
-while KVM_SEV_INIT forces version 1.
+Not enforcing the minimum version typically causes the guest to request
+termination with GHCB_SNP_UNSUPPORTED error code:
 
-No functional change intended.
+  kvm_amd: SEV-ES guest requested termination: 0x0:0x2
 
+Fixes: 4af663c2f64a ("KVM: SEV: Allow per-guest configuration of GHCB protocol version")
 Cc: Thomas Lendacky <thomas.lendacky@amd.com>
+Cc: Sean Christopherson <seanjc@google.com>
 Cc: Michael Roth <michael.roth@amd.com>
-Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/svm/sev.c | 17 ++++++++---------
- 1 file changed, 8 insertions(+), 9 deletions(-)
+ arch/x86/kvm/svm/sev.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
 diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 2fbdebf79fbb..212f790eedd4 100644
+index 212f790eedd4..e88dce598785 100644
 --- a/arch/x86/kvm/svm/sev.c
 +++ b/arch/x86/kvm/svm/sev.c
-@@ -37,7 +37,6 @@
- #include "trace.h"
+@@ -405,6 +405,7 @@ static int __sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp,
+ 	struct kvm_sev_info *sev = to_kvm_sev_info(kvm);
+ 	struct sev_platform_init_args init_args = {0};
+ 	bool es_active = vm_type != KVM_X86_SEV_VM;
++	bool snp_active = vm_type == KVM_X86_SNP_VM;
+ 	u64 valid_vmsa_features = es_active ? sev_supported_vmsa_features : 0;
+ 	int ret;
  
- #define GHCB_VERSION_MAX	2ULL
--#define GHCB_VERSION_DEFAULT	2ULL
- #define GHCB_VERSION_MIN	1ULL
+@@ -428,6 +429,9 @@ static int __sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp,
+ 	if (es_active && !data->ghcb_version)
+ 		data->ghcb_version = 2;
  
- #define GHCB_HV_FT_SUPPORTED	(GHCB_HV_FT_SNP | GHCB_HV_FT_SNP_AP_CREATION)
-@@ -421,6 +420,14 @@ static int __sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp,
- 	if (data->ghcb_version > GHCB_VERSION_MAX || (!es_active && data->ghcb_version))
- 		return -EINVAL;
- 
-+	/*
-+	 * KVM supports the full range of mandatory features defined by version
-+	 * 2 of the GHCB protocol, so default to that for SEV-ES guests created
-+	 * via KVM_SEV_INIT2 (KVM_SEV_INIT forces version 1).
-+	 */
-+	if (es_active && !data->ghcb_version)
-+		data->ghcb_version = 2;
++	if (snp_active && data->ghcb_version < 2)
++		return -EINVAL;
 +
  	if (unlikely(sev->active))
  		return -EINVAL;
  
-@@ -429,14 +436,6 @@ static int __sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp,
+@@ -436,7 +440,7 @@ static int __sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp,
  	sev->vmsa_features = data->vmsa_features;
  	sev->ghcb_version = data->ghcb_version;
  
--	/*
--	 * Currently KVM supports the full range of mandatory features defined
--	 * by version 2 of the GHCB protocol, so default to that for SEV-ES
--	 * guests created via KVM_SEV_INIT2.
--	 */
--	if (sev->es_active && !sev->ghcb_version)
--		sev->ghcb_version = GHCB_VERSION_DEFAULT;
--
- 	if (vm_type == KVM_X86_SNP_VM)
+-	if (vm_type == KVM_X86_SNP_VM)
++	if (snp_active)
  		sev->vmsa_features |= SVM_SEV_FEAT_SNP_ACTIVE;
  
+ 	ret = sev_asid_new(sev);
+@@ -454,7 +458,7 @@ static int __sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp,
+ 	}
+ 
+ 	/* This needs to happen after SEV/SNP firmware initialization. */
+-	if (vm_type == KVM_X86_SNP_VM) {
++	if (snp_active) {
+ 		ret = snp_guest_req_init(kvm);
+ 		if (ret)
+ 			goto e_free;
 -- 
 2.51.0.rc1.167.g924127e9c0-goog
 
