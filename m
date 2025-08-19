@@ -1,150 +1,176 @@
-Return-Path: <kvm+bounces-55035-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55036-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA75DB2CC83
-	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 20:56:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47C48B2CCFB
+	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 21:29:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 669B61BC3714
-	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 18:56:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 31893587B9E
+	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 19:29:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFDE9322C64;
-	Tue, 19 Aug 2025 18:56:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CDAA326D73;
+	Tue, 19 Aug 2025 19:29:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ccn24TzN"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="khSyx8R2"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94BC130C35E
-	for <kvm@vger.kernel.org>; Tue, 19 Aug 2025 18:56:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 963FC322C82;
+	Tue, 19 Aug 2025 19:29:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755629785; cv=none; b=BiQ8mWh9m5mYmyUBrbj9o2Mpq8tI/llOqFljhpWsEyoiFdqUMPoDKLoBTP4TMPwC8JFHbjriTFIaKdB61Ol0NXBX4e+vmLGAVAiSr6GOQw6S+9qYOwnxZ5e5Bf/lIo51kLHb8a5wQXjlF4wQuFNSpabHShWLJuFqK83ehZ8daB8=
+	t=1755631744; cv=none; b=PBtY9kTfwDvzL5eCz+4GSDe2YaFWdZMTT1FkyKg8JM2d1VJx8rDLgqr0uhFWEIjGZjcg2xsBLVTAPaSo30ppTCHYGX4v5NHz9mkZnMRHC1HM7uAQGAzM/Vuvz43m/I0ApE+60NQgwcyfjR3nqCErI+d1/r2iowlIrQFTmLD0ZtA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755629785; c=relaxed/simple;
-	bh=WuU2Wy5rZtrfG1+HznLL/QRzXucuMnryDBi9PESLIJo=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=m1y3DoNdJxirvyQVsaxJp6Y8AY82BBYoTG32ajXsWcppCtN6GUlSn9phc8xzlKEqSsBzd226IhvZON09tIR1N/GdoTWCNUhWeTNHkQHDhViAkq8UWO+nNQpbFIy/jKiv0BHbXdBd3FnXUfpBDwnXq0qFIBaOCge2Crc/NY8ktLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ccn24TzN; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b47610d3879so390533a12.0
-        for <kvm@vger.kernel.org>; Tue, 19 Aug 2025 11:56:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755629783; x=1756234583; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4ztQu3jkFmd293zM84+KVmv6vWCMJtSpRl+06Kb99II=;
-        b=ccn24TzNffIiccCe/TkEa2DXqrkG+kjtF0GqPWxEKoO/vTQiiMDmFDw8C95osSm9CW
-         jG92w5SU6X82wSCvKL3v3JG+WXgoKRZW50q9AAuoZELBqt6xKEh6+xOjXeHmH8NZo24z
-         92Pi3tKS1qtC1VxQXZzgwkfZAM+CQidaBMFKfMkc+rqSYiziUgE4yE45CBeULL+nX4gC
-         xKcUa+L1VIstIk6WuEiGGsmrBNr8u+K0bwnZLurHYkX8cykZb40HAF9rBQCZyrtkSkfa
-         lHN1ubpXhfjw8Hhw7nFFsvw+CtEVkc3+bJzFhjRNkJ3yyI/cdjFCxzd1CXf0OKv2CjAu
-         vs8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755629783; x=1756234583;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4ztQu3jkFmd293zM84+KVmv6vWCMJtSpRl+06Kb99II=;
-        b=fI4nR3L+7JDpJZXvFM/Q0oS/0Rzd/iFWf4x/qxIGr41wI55QwjhAdDLBSYn1r2k+Iw
-         N/OdNiXFFUYYFVimCNfhRxXtozt4vj4DsHc0uddeZt2ug4iIJs/fYrh2M+UKpYGfEDNt
-         TPUIFy6/F3xmIeNqJBKCRHlqroJ2cirYamdsQbO1iUR1lEuYLPk3EooLAiUvRFqKFUn6
-         fXvOyU9LsCrbuJRybbgNPEFP8Ng9c4nOChLPT8WfZ/CrSCZpbYyYprrOUefWsa2U0UzP
-         rC/4704Xi7/EH/dyRPcamNhsuN4bRkTL9l/2aoeGm6w47gvZkRAa1PGbh0DKYKL4nUf/
-         KsFg==
-X-Gm-Message-State: AOJu0Yxl+rxnU5xncET4Nrkk+W+Y/FT3DNrDqdZvxd5fQg+SLpgKfYU3
-	xoOO5Vvu0dR/Ome8ehy8I8ywJyvrKmvB2wRKj90DZ9/ODpHYg7BB/wkbkvIcGd2WhQ9N0e1HVi9
-	KgTH8ew==
-X-Google-Smtp-Source: AGHT+IHGH0ru+slN4c+0dxdrs3ouK8HHTWA+A3x2WcGNNRC9IyXtOeIqquo2QQkGLuu9//j0mr/5FwEF+X8=
-X-Received: from pjbqc5.prod.google.com ([2002:a17:90b:2885:b0:31c:4a51:8b75])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:e70c:b0:312:e731:5a6b
- with SMTP id 98e67ed59e1d1-324e147375bmr250494a91.32.1755629782933; Tue, 19
- Aug 2025 11:56:22 -0700 (PDT)
-Date: Tue, 19 Aug 2025 11:56:21 -0700
-In-Reply-To: <CAFULd4ZOtj7WZkSSKqLjxCJ-yBr20AYrqzCpxj2K_=XmrX1QZg@mail.gmail.com>
+	s=arc-20240116; t=1755631744; c=relaxed/simple;
+	bh=KCcclhS7M7Ppsuz47p4LBEib816ICcU5xamy6lRtODk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I+STBym/Bzq/fjpLgpJItyRcXYun6nTc2YK4+SeLo3fUhyq4TgIylVO1zbEOuSdaFz5z0R4/1EF53T+gjLek2aRI6xPdCIFUzXFy5QU6wB3isUZTfCvo6bGEMdk43n3dxFx/vMW/Unukoeylvhr7SnO/TPZEsi4doxiNAjdBtz8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=khSyx8R2; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id CA75240E0194;
+	Tue, 19 Aug 2025 19:28:57 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id kRss8kZpu-Vf; Tue, 19 Aug 2025 19:28:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1755631732; bh=pFKYBFysi0D/h33TNA0NMCZJ3QXsXWW3B+PXOFIgWuk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=khSyx8R25lIkOrcJpw/1kKrg4RYFZnlq9wYxCyMgabZgnaL8Y4mt8jamtlNFGWKZ0
+	 /rOXZR5dhCEn0Civr73Y1DvVkDtg2uakPUDxv8TIVs88M8jkkKZO20RD0uElPhNZL0
+	 FcieW0eLb5YqWLDGD7S3b7trpfPIJenu0Q+F/iLJz4T/MYRAZcCh4RsRjvVmufa7l9
+	 hAnXmKlFRQWlhtgUbZg7/6hvUfX/M+HYRR/dnPXEG83zGyeqJVKmHt0bkFoOm24RNI
+	 LdNZsCfhkUKrPEcNnandRmGQz2dnij9A1iMxhwjmxS91Wk/wq4Mog6ugON6njmLewN
+	 4msdmObyFpIieffYL4zCfq8VNhk20s64dG8ho8iVWZuwCzFcCjxHcNVLr863UIj45j
+	 6EqKucr4JOfUoAjR6haFgPByGT2JZzJV8ctPsNNi8EBsmhIEMRcZ5oOYgJ8+vtO+w8
+	 Q8AnobCKFmKkiImjeLQjKjNsqoP+AtqNsGmV2Zzt8Eq+gkNB9DPbXZt/7rJFRRqWHs
+	 a0FVuLYZ2BGjLXKXLxXtCuev+tckF1//nVM2dAJYyAiVVS51Zj4gEOxQPfBvlDiTdO
+	 Q6l9YmqHqjwiUo1RLdywUuYJGFQAfxpYAOjutR3ACglv2ieaL3jW/amRjpApfv+ivP
+	 zXyTy0xo3a75+jc/AJQawuyY=
+Received: from zn.tnic (pd953092e.dip0.t-ipconnect.de [217.83.9.46])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 2BC1840E023B;
+	Tue, 19 Aug 2025 19:28:29 +0000 (UTC)
+Date: Tue, 19 Aug 2025 21:28:23 +0200
+From: Borislav Petkov <bp@alien8.de>
+To: Kai Huang <kai.huang@intel.com>
+Cc: dave.hansen@intel.com, tglx@linutronix.de, peterz@infradead.org,
+	mingo@redhat.com, hpa@zytor.com, thomas.lendacky@amd.com,
+	x86@kernel.org, kas@kernel.org, rick.p.edgecombe@intel.com,
+	dwmw@amazon.co.uk, linux-kernel@vger.kernel.org,
+	pbonzini@redhat.com, seanjc@google.com, kvm@vger.kernel.org,
+	reinette.chatre@intel.com, isaku.yamahata@intel.com,
+	dan.j.williams@intel.com, ashish.kalra@amd.com,
+	nik.borisov@suse.com, chao.gao@intel.com, sagis@google.com,
+	farrah.chen@intel.com
+Subject: Re: [PATCH v6 2/7] x86/sme: Use percpu boolean to control WBINVD
+ during kexec
+Message-ID: <20250819192823.GLaKTQVxIV4n7p60hU@fat_crate.local>
+References: <cover.1755126788.git.kai.huang@intel.com>
+ <c09d17677fa127a7b23b24b6c225f7dc5b68fd98.1755126788.git.kai.huang@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250807063733.6943-1-ubizjak@gmail.com> <aKSRbjgtp7Nk8-sb@google.com>
- <CAFULd4ZOtj7WZkSSKqLjxCJ-yBr20AYrqzCpxj2K_=XmrX1QZg@mail.gmail.com>
-Message-ID: <aKTI1WOJAKDnkRyu@google.com>
-Subject: Re: [PATCH] KVM: VMX: Micro-optimize SPEC_CTRL handling in __vmx_vcpu_run()
-From: Sean Christopherson <seanjc@google.com>
-To: Uros Bizjak <ubizjak@gmail.com>
-Cc: kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
-	"H. Peter Anvin" <hpa@zytor.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <c09d17677fa127a7b23b24b6c225f7dc5b68fd98.1755126788.git.kai.huang@intel.com>
 
-On Tue, Aug 19, 2025, Uros Bizjak wrote:
-> > >   2d: 48 8b 7c 24 10          mov    0x10(%rsp),%rdi
-> > >   32: 8b 87 48 18 00 00       mov    0x1848(%rdi),%eax
-> > >   38: 65 3b 05 00 00 00 00    cmp    %gs:0x0(%rip),%eax
-> > >   3f: 74 09                   je     4a <...>
-> > >   41: b9 48 00 00 00          mov    $0x48,%ecx
-> > >   46: 31 d2                   xor    %edx,%edx
-> > >   48: 0f 30                   wrmsr
-> > >
-> > > No functional change intended.
-> > >
-> > > Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
-> > > Cc: Sean Christopherson <seanjc@google.com>
-> > > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > > Cc: Thomas Gleixner <tglx@linutronix.de>
-> > > Cc: Ingo Molnar <mingo@kernel.org>
-> > > Cc: Borislav Petkov <bp@alien8.de>
-> > > Cc: Dave Hansen <dave.hansen@linux.intel.com>
-> > > Cc: "H. Peter Anvin" <hpa@zytor.com>
-> > > ---
-> > >  arch/x86/kvm/vmx/vmenter.S | 6 ++----
-> > >  1 file changed, 2 insertions(+), 4 deletions(-)
-> > >
-> > > diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
-> > > index 0a6cf5bff2aa..c65de5de92ab 100644
-> > > --- a/arch/x86/kvm/vmx/vmenter.S
-> > > +++ b/arch/x86/kvm/vmx/vmenter.S
-> > > @@ -118,13 +118,11 @@ SYM_FUNC_START(__vmx_vcpu_run)
-> > >        * and vmentry.
-> > >        */
-> > >       mov 2*WORD_SIZE(%_ASM_SP), %_ASM_DI
-> > > -     movl VMX_spec_ctrl(%_ASM_DI), %edi
-> > > -     movl PER_CPU_VAR(x86_spec_ctrl_current), %esi
-> > > -     cmp %edi, %esi
-> > > +     movl VMX_spec_ctrl(%_ASM_DI), %eax
-> > > +     cmp PER_CPU_VAR(x86_spec_ctrl_current), %eax
-> >
-> > Huh.  There's a pre-existing bug lurking here, and in the SVM code.  SPEC_CTRL
-> > is an MSR, i.e. a 64-bit value, but the assembly code assumes bits 63:32 are always
-> > zero.
+On Thu, Aug 14, 2025 at 11:59:02AM +1200, Kai Huang wrote:
+> TL;DR:
 > 
-> But MSBs are zero, MSR is defined in arch/x86/include/msr-index.h as:
+> Prepare to unify how TDX and SME do cache flushing during kexec by
+> making a percpu boolean control whether to do the WBINVD.
 > 
-> #define MSR_IA32_SPEC_CTRL 0x00000048 /* Speculation Control */
+> -- Background --
 > 
-> and "movl $..., %eax" zero-extends the value to full 64-bit width.
+> On SME platforms, dirty cacheline aliases with and without encryption
+> bit can coexist, and the CPU can flush them back to memory in random
+> order.  During kexec, the caches must be flushed before jumping to the
+> new kernel otherwise the dirty cachelines could silently corrupt the
+> memory used by the new kernel due to different encryption property.
 > 
-> FWIW, MSR_IA32_SPEC_CTR is handled in the same way in arch/x86/entry/entry.S:
+> TDX also needs a cache flush during kexec for the same reason.  It would
+> be good to have a generic way to flush the cache instead of scattering
+> checks for each feature all around.
 > 
-> movl $MSR_IA32_PRED_CMD, %ecx
+> When SME is enabled, the kernel basically encrypts all memory including
+> the kernel itself and a simple memory write from the kernel could dirty
+> cachelines.  Currently, the kernel uses WBINVD to flush the cache for
+> SME during kexec in two places:
+> 
+> 1) the one in stop_this_cpu() for all remote CPUs when the kexec-ing CPU
+>    stops them;
+> 2) the one in the relocate_kernel() where the kexec-ing CPU jumps to the
+>    new kernel.
+> 
+> -- Solution --
+> 
+> Unlike SME, TDX can only dirty cachelines when it is used (i.e., when
+> SEAMCALLs are performed).  Since there are no more SEAMCALLs after the
+> aforementioned WBINVDs, leverage this for TDX.
+> 
+> To unify the approach for SME and TDX, use a percpu boolean to indicate
+> the cache may be in an incoherent state and needs flushing during kexec,
+> and set the boolean for SME.  TDX can then leverage it.
+> 
+> While SME could use a global flag (since it's enabled at early boot and
+> enabled on all CPUs), the percpu flag fits TDX better:
+> 
+> The percpu flag can be set when a CPU makes a SEAMCALL, and cleared when
+> another WBINVD on the CPU obviates the need for a kexec-time WBINVD.
+> Saving kexec-time WBINVD is valuable, because there is an existing
+> race[*] where kexec could proceed while another CPU is active.  WBINVD
+> could make this race worse, so it's worth skipping it when possible.
+> 
+> -- Side effect to SME --
+> 
+> Today the first WBINVD in the stop_this_cpu() is performed when SME is
+> *supported* by the platform, and the second WBINVD is done in
+> relocate_kernel() when SME is *activated* by the kernel.  Make things
+> simple by changing to do the second WBINVD when the platform supports
+> SME.  This allows the kernel to simply turn on this percpu boolean when
+> bringing up a CPU by checking whether the platform supports SME.
+> 
+> No other functional change intended.
+> 
+> [*] The aforementioned race:
+> 
+> During kexec native_stop_other_cpus() is called to stop all remote CPUs
+> before jumping to the new kernel.  native_stop_other_cpus() firstly
+> sends normal REBOOT vector IPIs to stop remote CPUs and waits them to
+> stop.  If that times out, it sends NMI to stop the CPUs that are still
+> alive.  The race happens when native_stop_other_cpus() has to send NMIs
+> and could potentially result in the system hang (for more information
+> please see [1]).
 
-That's the MSR index, not the value.  I'm pointing out that:
+This text is meandering a bit too much across a bunch of things and could be
+made tighter... Just a nitpick anyway...
 
-	movl VMX_spec_ctrl(%_ASM_DI), %edi              <== drops vmx->spec_ctrl[63:32]
-	movl PER_CPU_VAR(x86_spec_ctrl_current), %esi   <== drop x86_spec_ctrl_current[63:32]
-	cmp %edi, %esi                                  <== can get false negatives
-	je .Lspec_ctrl_done
-	mov $MSR_IA32_SPEC_CTRL, %ecx
-	xor %edx, %edx                                  <== can clobber guest value
-	mov %edi, %eax
-	wrmsr
+>  arch/x86/include/asm/kexec.h         |  4 ++--
+>  arch/x86/include/asm/processor.h     |  2 ++
+>  arch/x86/kernel/cpu/amd.c            | 17 +++++++++++++++++
+>  arch/x86/kernel/machine_kexec_64.c   | 14 ++++++++++----
+>  arch/x86/kernel/process.c            | 24 +++++++++++-------------
+>  arch/x86/kernel/relocate_kernel_64.S | 13 ++++++++++---
+>  6 files changed, 52 insertions(+), 22 deletions(-)
 
-The bug is _currently_ benign because neither KVM nor the kernel support setting
-any of bits 63:32, but it's still a bug that needs to be fixed.
+Reviewed-by: Borislav Petkov (AMD) <bp@alien8.de>
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
