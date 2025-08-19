@@ -1,183 +1,133 @@
-Return-Path: <kvm+bounces-55028-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55029-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FAE8B2CB9F
-	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 20:06:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC684B2CBF6
+	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 20:28:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0CDC57AEC81
-	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 18:04:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB9221BC3D8F
+	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 18:28:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5955330EF99;
-	Tue, 19 Aug 2025 18:06:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C25830F54B;
+	Tue, 19 Aug 2025 18:28:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="EAz1ueGm"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SHrnLo88"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D95CF24167B;
-	Tue, 19 Aug 2025 18:06:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 616F320B80B
+	for <kvm@vger.kernel.org>; Tue, 19 Aug 2025 18:28:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755626770; cv=none; b=bdH4irOTsAd9mKdIyb8oBrF14uBa0yipahmKe7WTjBIx3gjDBKc267Z91YH0uajj/NzZNdC7DYscfxAIxZfYtp6b8CArOL+y2niHxJPDdA41jz7S8hgL5YBDrpHlIk0wbCgSDX6ZXIfgFz6o87h7jpz6hsjWvb8wEbrJ8OWNHx0=
+	t=1755628086; cv=none; b=AQUuXwHQqx+TnFQpYbEVpom4KGOGB+rtPBcv2ymx+u1g1RNfY0a2AqWHZ7DZGIBsOBZwMZNOlL+q1XLHJxxqli6+3BDWHXoKXE3n/JnCjXn+a9jemo/J9oJ8Z8Lq7HPbYJ/B+sTNrUZaj9ql6NYwee0wBVCs1C7serre+P+8nng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755626770; c=relaxed/simple;
-	bh=4ci/uHSDKQUzrAd9QBw63j3lDa6mBX0Sl7kzMeMl/xs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=esmfB3zykpFEu2KayavNZnWeWOJ1Ut7iPvY9IW/r1ZSdKlSNLMnHE4dCNT83fDEizJtizzWgzM7mLuxVi+9vgFMXfIOxaM3mlMCWjtwyi5eqcVtNlNVhUHKrMQx+2+RVxanoSuj+vPdD6e/Ij9Ctfrcln+jI67m8nsJsPyPjJuo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=EAz1ueGm; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [192.168.7.202] ([71.202.166.45])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 57JI5cMt2753519
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Tue, 19 Aug 2025 11:05:38 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 57JI5cMt2753519
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025072201; t=1755626740;
-	bh=vL89P2kUJUJQcq2gfuxqgo4lotKFJfiugtrUniRUAbE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=EAz1ueGm+8725k9yfPkGYZwTgi262iLmA17o6Izn44IkgEvuux3jlSp/Tm4CkV8I2
-	 Cs/bdv595+w2vjO9/5mKUvpyuaPPNGSvXv7tnudiXrTdj18nZtuZCK4Z7g8clu8H+/
-	 lUbQ2SrVgImVQDOu63O5YZ3uTguiKE94QYYqRVBtIde3LPjBBATTXTzaTazdeYrVFb
-	 iLs0vRy/ZmzkOryLPprlfqGzLe4qCRd5qU4uUSjC8SRVr2kVMgvV3Ug+N5ExtXv3kr
-	 WiRVZ2bB9amDssNzUkuVD35rYtHvtFSX3hXB2IIwlfKBvZbQhaWu91RHt8qeRIuE6E
-	 P8d/sricEi7Jg==
-Message-ID: <77edb8d9-4093-49fe-963c-56da76514d4c@zytor.com>
-Date: Tue, 19 Aug 2025 11:05:37 -0700
+	s=arc-20240116; t=1755628086; c=relaxed/simple;
+	bh=PgbIaPz3chbrf2rMaMnMMpO/sOTuzu1KnFUJubvxgVo=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Fr0hFnFqlTAmtMR7mnfTgoRoTUDv4pHaQQoiIlyewR4gMwJhD1prKGptzpwuqXAdZw+5g4jd0XkIgUaxw8diG9yqPCf8SURClAW5051FMLSG7xY/Lz31BLuy+4G1YT1tqxBndCydA0pEY7kSNHkX0wTlTNyckPrtb6UIcLymW7E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SHrnLo88; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-32326e72dfbso10641122a91.3
+        for <kvm@vger.kernel.org>; Tue, 19 Aug 2025 11:28:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1755628084; x=1756232884; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=PfqdL5UrP89R0Ovxhe5JGCdcLW6B+H4qXxAxuLmRpQ8=;
+        b=SHrnLo88mJzbNi7FbjD0AsI3Gonxo7Vfc17QIVGeNVrwnh8O9N6HtW524SNLJhJ8Xg
+         z3aRo4lI6/4UvWnsLRvdcvOp0SmkiIUirzGhU+slEsZQbtwGfI6HJl7yX6ehoGRgUd/U
+         /uTTwkibbP9QQZzDPvGuVhSbc/XyNKMOA3krREM0iC5Cl5UYMh+qD9AHqhfzYcq3EOGB
+         0WSnJNx8iM591NmENsHzSJ0RA+TSiRN49ajanYacKzW3zxiNKSfJkFHg91qFiwGeIB1W
+         4g1V9UEXPU3rOA5G24/gdp2yblybGAmDv8qbcCfleB4IenSKtEOhJMm3C04N9AlJwpWq
+         5UKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755628084; x=1756232884;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PfqdL5UrP89R0Ovxhe5JGCdcLW6B+H4qXxAxuLmRpQ8=;
+        b=J1skGjxDZNfce3hkR5gbYJ9N1f45fFIlXXUK4opCTyHmLOFHellsAdDHujJQPYeg3U
+         1cA44uGKISrB0fcL1CGbSf2xfci0tPDQAMqC4ohRuyaTCkWpbDWST/NdOvG1PvIKA4Qo
+         Aq4OoaO8nwONxqp5CKoeEcXF/I3nxRf0ETFMuZDo5ut6KCfudRSVkZd9raLsi2FX/2Cq
+         3b79epFDe1BB2v+h274CjUFFRwdFmOIV4F2wxCXjmEAxIColnOUrwieInP2b/yYJZtNi
+         ZuL91PRYDaHCOqucGtTykmu1wifrYYYFB0A4rQL0rjO3kItCMwa4vVW+wPZBNpYgATSp
+         vyrQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWF/B66fP2Rsthe49jc/W4vKgEynlaOYJr9bwhbnDhlSLU2NJnQtLqX/ujZljVeV3Q1bPc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwQH7cxzIPzOW+jjgixI27QLnRoJA5qwirMzMsbtjvMPNpfoOVR
+	71Hd9xeeae06rqyyFzNSfdaAkBT7+pvf3rqbU5HZWalEh1SxKNUb/sxGQr5atlUA0UxKQmA6QFf
+	IymBs8Q==
+X-Google-Smtp-Source: AGHT+IHFhe0mFvV0NtHklDcweRV2yghd2x8kC+KF7UCj7IccRFPVI84TD4SYsReNhpHYN21O9GpATzxvW84=
+X-Received: from pjd4.prod.google.com ([2002:a17:90b:54c4:b0:311:485b:d057])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2c87:b0:321:29c4:e7c5
+ with SMTP id 98e67ed59e1d1-324e12e283dmr244619a91.7.1755628084633; Tue, 19
+ Aug 2025 11:28:04 -0700 (PDT)
+Date: Tue, 19 Aug 2025 11:28:03 -0700
+In-Reply-To: <20250804090945.267199-3-nikunj@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 17/24] KVM: VMX: Set up interception for CET MSRs
-To: Sean Christopherson <seanjc@google.com>, Chao Gao <chao.gao@intel.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, mlevitsk@redhat.com,
-        rick.p.edgecombe@intel.com, weijiang.yang@intel.com,
-        Mathias Krause <minipli@grsecurity.net>,
-        John Allen <john.allen@amd.com>, Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>
-References: <20250812025606.74625-1-chao.gao@intel.com>
- <20250812025606.74625-18-chao.gao@intel.com> <aKSiNh43UCosGIVh@google.com>
-Content-Language: en-US
-From: Xin Li <xin@zytor.com>
-Autocrypt: addr=xin@zytor.com; keydata=
- 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
- l75w1xInsg==
-In-Reply-To: <aKSiNh43UCosGIVh@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20250804090945.267199-1-nikunj@amd.com> <20250804090945.267199-3-nikunj@amd.com>
+Message-ID: <aKTCMzVNwhlFNE0e@google.com>
+Subject: Re: [PATCH v3 2/2] KVM: SEV: Enforce minimum GHCB version requirement
+ for SEV-SNP guests
+From: Sean Christopherson <seanjc@google.com>
+To: Nikunj A Dadhania <nikunj@amd.com>
+Cc: pbonzini@redhat.com, kvm@vger.kernel.org, thomas.lendacky@amd.com, 
+	santosh.shukla@amd.com, Michael Roth <michael.roth@amd.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On 8/19/2025 9:11 AM, Sean Christopherson wrote:
-> On Mon, Aug 11, 2025, Chao Gao wrote:
->> From: Yang Weijiang <weijiang.yang@intel.com>
->>
->> Enable/disable CET MSRs interception per associated feature configuration.
->>
->> Shadow Stack feature requires all CET MSRs passed through to guest to make
->> it supported in user and supervisor mode
+On Mon, Aug 04, 2025, Nikunj A Dadhania wrote:
+> Require a minimum GHCB version of 2 when starting SEV-SNP guests through
+> KVM_SEV_INIT2. When a VMM attempts to start an SEV-SNP guest with an
+> incompatible GHCB version (less than 2), reject the request early rather
+> than allowing the guest kernel to start with an incorrect protocol version
+> and fail later with GHCB_SNP_UNSUPPORTED guest termination.
 > 
-> I doubt that SS _requires_ CET MSRs to be passed through.  IIRC, the actual
-> reason for passing through most of the MSRs is that they are managed via XSAVE,
-> i.e. _can't_ be intercepted without also intercepting XRSTOR.
+> Hypervisor logs the guest termination with GHCB_SNP_UNSUPPORTED error code:
+
+s/Hypervisor/KVM, though I don't see any point in saying that KVM is doing
+the logging, that's self-evident from the kvm_amd prefix.  Instead, I think
+what's important to is to say the guest _typically_ requests termination,
+because AFAICT nothing guarantees the guest will fail in this exact way.
+
+  Not enforcing the minimum version typically causes the guest to request
+  termination with GHCB_SNP_UNSUPPORTED error code:
+
+    kvm_amd: SEV-ES guest requested termination: 0x0:0x2
+
+> kvm_amd: SEV-ES guest requested termination: 0x0:0x2
 > 
->> while IBT feature only depends on
->> MSR_IA32_{U,S}_CETS_CET to enable user and supervisor IBT.
->>
->> Note, this MSR design introduced an architectural limitation of SHSTK and
->> IBT control for guest, i.e., when SHSTK is exposed, IBT is also available
->> to guest from architectural perspective since IBT relies on subset of SHSTK
->> relevant MSRs.
->>
->> Suggested-by: Sean Christopherson <seanjc@google.com>
->> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
->> Tested-by: Mathias Krause <minipli@grsecurity.net>
->> Tested-by: John Allen <john.allen@amd.com>
->> Signed-off-by: Chao Gao <chao.gao@intel.com>
->> ---
->>   arch/x86/kvm/vmx/vmx.c | 20 ++++++++++++++++++++
->>   1 file changed, 20 insertions(+)
->>
->> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
->> index bd572c8c7bc3..130ffbe7dc1a 100644
->> --- a/arch/x86/kvm/vmx/vmx.c
->> +++ b/arch/x86/kvm/vmx/vmx.c
->> @@ -4088,6 +4088,8 @@ void pt_update_intercept_for_msr(struct kvm_vcpu *vcpu)
->>   
->>   void vmx_recalc_msr_intercepts(struct kvm_vcpu *vcpu)
->>   {
->> +	bool set;
-> 
-> s/set/intercept
-> 
+> SNP guest fails with the below error message:
 
-Maybe because you asked me to change "flag" to "set" when reviewing FRED
-patches, however "intercept" does sound better, and I just changed it :)
+This is QEMU output, not guest output.  I don't see any reason to capture this.
+The fact that QEMU apparently doesn't handle KVM_EXIT_SYSTEM_EVENT isn't interesting.
 
->> +
->>   	if (!cpu_has_vmx_msr_bitmap())
->>   		return;
->>   
->> @@ -4133,6 +4135,24 @@ void vmx_recalc_msr_intercepts(struct kvm_vcpu *vcpu)
->>   		vmx_set_intercept_for_msr(vcpu, MSR_IA32_FLUSH_CMD, MSR_TYPE_W,
->>   					  !guest_cpu_cap_has(vcpu, X86_FEATURE_FLUSH_L1D));
->>   
->> +	if (kvm_cpu_cap_has(X86_FEATURE_SHSTK)) {
->> +		set = !guest_cpu_cap_has(vcpu, X86_FEATURE_SHSTK);
->> +
->> +		vmx_set_intercept_for_msr(vcpu, MSR_IA32_PL0_SSP, MSR_TYPE_RW, set);
->> +		vmx_set_intercept_for_msr(vcpu, MSR_IA32_PL1_SSP, MSR_TYPE_RW, set);
->> +		vmx_set_intercept_for_msr(vcpu, MSR_IA32_PL2_SSP, MSR_TYPE_RW, set);
->> +		vmx_set_intercept_for_msr(vcpu, MSR_IA32_PL3_SSP, MSR_TYPE_RW, set);
->> +		vmx_set_intercept_for_msr(vcpu, MSR_IA32_INT_SSP_TAB, MSR_TYPE_RW, set);
-> 
-> MSR_IA32_INT_SSP_TAB isn't managed via XSAVE, so why is it being passed through?
+> KVM: unknown exit reason 24
+> EAX=00000000 EBX=00000000 ECX=00000000 EDX=00a00f11
+> ESI=00000000 EDI=00000000 EBP=00000000 ESP=00000000
+> EIP=0000fff0 EFL=00000002 [-------] CPL=0 II=0 A20=1 SMM=0 HLT=0
+> ES =0000 00000000 0000ffff 00009300
+> CS =f000 ffff0000 0000ffff 00009b00
+> SS =0000 00000000 0000ffff 00009300
+> DS =0000 00000000 0000ffff 00009300
+> FS =0000 00000000 0000ffff 00009300
+> GS =0000 00000000 0000ffff 00009300
+> LDT=0000 00000000 0000ffff 00008200
+> TR =0000 00000000 0000ffff 00008b00
+> GDT=     00000000 0000ffff
+> IDT=     00000000 0000ffff
+> CR0=60000010 CR2=00000000 CR3=00000000 CR4=00000000
+> DR0=0000000000000000 DR1=0000000000000000 DR2=0000000000000000 DR3=0000000000000000
+> DR6=00000000ffff0ff0 DR7=0000000000000400
+> EFER=0000000000000000
 
-It's managed in VMCS host and guest areas, i.e. HOST_INTR_SSP_TABLE and
-GUEST_INTR_SSP_TABLE, if the "load CET" bits are set in both VM entry
-and exit controls.
 
-FRED MSRs are also passed through to guest in such cases.
-
-no?
+No need for you to send a new version, I'm going to post a combined series for
+this and Secure TSC.
 
