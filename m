@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-55076-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55077-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2582B2D079
-	for <lists+kvm@lfdr.de>; Wed, 20 Aug 2025 01:50:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 109DEB2D07A
+	for <lists+kvm@lfdr.de>; Wed, 20 Aug 2025 01:50:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C3BC3566711
-	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 23:50:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFA95628529
+	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 23:50:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48E2227A909;
-	Tue, 19 Aug 2025 23:48:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00CB83054EF;
+	Tue, 19 Aug 2025 23:48:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BgcrTpX0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WskXFAIp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E906327B323
-	for <kvm@vger.kernel.org>; Tue, 19 Aug 2025 23:48:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7E4B2E2298
+	for <kvm@vger.kernel.org>; Tue, 19 Aug 2025 23:48:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755647330; cv=none; b=O7FVGgG2icwf8lhkF/dQAJJcrGlLQgAKgPPI1zpTPcboY5xgNrY9w1gpjiwov1cD6yQELcqSWjxwbFqihgse2dyVP4wup9p2CDp6C/Y+mJQVIJcyupd5TsSc2ZM29CpxxBQwUMwvXLy6eiT9KphUR7+hl68DJpDhGNz6b+7vX1U=
+	t=1755647332; cv=none; b=EPO2VJ3RWUnUKb4FH/KrwzW+Rs+/T7AbGJ4/OyB0TOTTjfpPX4iF29F+0DpsqsdpMmx5+xPuWFCUrOhUSPVC3jvtoaNWMyPfwY+hIG3d7p60UwclbS/XryjpxJ1Lmi5odQ5/1WCEvnYa1WZvS/txMMD1jliZNVystkAwfjWXFi8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755647330; c=relaxed/simple;
-	bh=EywICGUylQc6Vx3L+k+EDArBXsERNV8zdROCn6YGSyw=;
+	s=arc-20240116; t=1755647332; c=relaxed/simple;
+	bh=9fPRpXTZO2yXI/PNnKA2idpDZL7e+fha1bGtzAVD6Bg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=txljFmA3bGkV8ExoQiVnTrBDJudAgWrle9q0veAnfmtQ5eYyBbCrW9nhO4cH8nSpnSkLrSqx+QlIqcOMPvaOQ9fZiNvXfI+UOcq2GMYprd6uFuOCMC/j0aJr66hPrzTNTNrZ8ou4jluZV/pvYTZdC0w4V3nslSiM0K62pZfFIIA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BgcrTpX0; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=Scs6mGCudCOXpMGHCrzO+7onAdozzlkTvQW80vTpCSiQOE9ZaCxcjEsLG199N59GFtTatH+WJTYaTF0W8mS/GwMYaxPJzDCYLrvxIL5zqXUAOf0Lb6amO6BjSrxNl0SRKu6u0bMkIjJ0xpzVV+DZHaL/AWEoXSOw6aBrp7b0lRw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WskXFAIp; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b4731a95babso3402352a12.0
-        for <kvm@vger.kernel.org>; Tue, 19 Aug 2025 16:48:48 -0700 (PDT)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-76e2eb9bb19so10225825b3a.3
+        for <kvm@vger.kernel.org>; Tue, 19 Aug 2025 16:48:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755647328; x=1756252128; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1755647330; x=1756252130; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=Gc+PJ2TL4og8c4D8zgdGDVCY0nC24ymJBTxxSCoCyM0=;
-        b=BgcrTpX0xzBcHf3+1YSiWfPsxmacSdQrfZcnI+gVyQV7XeCsZH1YZc1YO1UTY256D5
-         Ruk/OwWXzoyAvtsfLwNP4cx6wR8OAP1tX79/IH+11Wo2NXvxr5BbthbiIdYjAGzJlzF+
-         gsJQwetdh0TA/dzfiEAT8hhRvbWYFbpQQwrgM8ZWBiK9UlLffckYSGm8HEYbBd2uKRqK
-         XDc3JLZ31YT5w2azhGN6nGz/GMnFUPWFs9rGs3I1OPsMFD/XP5E5TM6Eg5yzlqyIHqAX
-         QTReE5GW/fNvARSe7kUgmIqUKMl4Ez7wjzamir3Z3sF+EmehPWzNmHSEtZBQSYS8RSeI
-         rv7A==
+        bh=OqVMINvdACt4jkEJXLjx81Yg3Bj21o74SrPjsSKAbyI=;
+        b=WskXFAIpcZIidH8t1+uKWjlSKaeFvKr+veR5oVSQTzg+/iPLlPU39sxfBsGIM+JeId
+         ezFpwwHxfXfMOdcNyh0MO/2q7U+IHCz1gEvLUrjllHDkMjUsCKB6cEKZ0b6GWtuOpv8b
+         vkKgl0nizb27JRrq8yQC92z81Aw9yjpQKa5UDx8QySfSixyAV+qIovgW3t/lFDEj4LUD
+         beuxKd0lVhpjdfAa2spsFIT2n3NYoNsEetg9SwaRM8OZ+TsEVy+XHv+SA+C1Ki38Pmkn
+         m7nh/lbWqybEUf4CksMZhqhDjHJ1DfQbDMt9Lszgrl8b/f4KZfLhfVPTF/UbI4OQzPnb
+         MDAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755647328; x=1756252128;
+        d=1e100.net; s=20230601; t=1755647330; x=1756252130;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Gc+PJ2TL4og8c4D8zgdGDVCY0nC24ymJBTxxSCoCyM0=;
-        b=igcyYqIEpQ/AB0spuFSHCoNUU09ydNC/jbQMCbS92zhW0cfPigZNc762y7qBZ8WP3Z
-         GNDmtxYnlEINmzSJ2wg1idgiZ9VHSMNA7ikI5rw1TmUcV1BqyGn/is57YMjXcql85oo8
-         rmZ6h925utcYOwSkyZRk7FkdLqth4cBHraVf3ZbrUhFcjzgod7qijcyhW+NoBRUMg+BC
-         XLMluEHLiJbNl2aEAcTFMQwwIr9V9n3OnyYBidljVRBLq89bbJyMTmlR9Q0Sy5kDnaTF
-         /uA4j5+GzU611q0iYVxdISn8lYWjIseLKD0+S8KVuwxFK5T7YNs03ZIAV/IFKOlRXtuo
-         o+Fg==
-X-Gm-Message-State: AOJu0YyCfsMyCetLjKWBmZwqyl7TXAt24wjPQwaJbqvJpPWAx4yL+3xD
-	K5kTSkddG8K3hSTa0l3VUSFM5sspIc+DOO6X08oZ1q5xQayPZFnPPJZrTHTuY76+vb8qS6hGwnq
-	0ccwqTQ==
-X-Google-Smtp-Source: AGHT+IHW1ygu3pYsGGdMogdP1e8xi12WayvOnvCgFyKAjVx+2ZZdG+2QlKIahd2x1rrgUx1t4UTRdMaVuZQ=
-X-Received: from plnd8.prod.google.com ([2002:a17:903:1988:b0:23c:7695:dcc5])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:946:b0:225:abd2:5e4b
- with SMTP id d9443c01a7336-245ef15b32bmr7515015ad.16.1755647328280; Tue, 19
- Aug 2025 16:48:48 -0700 (PDT)
+        bh=OqVMINvdACt4jkEJXLjx81Yg3Bj21o74SrPjsSKAbyI=;
+        b=CUd3p11ILM5z29RMROcoMlDDZxZ7iXaor8So/ncLJWdEq+r8qG2Ks7OxuJikFfJOWU
+         iy77NU46WlEVtvo7F/aie7Z1gVI6nymy1i1soIRI48bAYbiJjIzw9n30gsNn8xpXFJP7
+         H9t9tG3GdL6+j84RXAuVODBI5QMsCrNme2GkZmLtNYPhlH0GjtdD7wjAK4PuHBINaSoA
+         tblyhnDhjqx74i3/mWzrzgjUVmD1nB5TgxtLTA22lVQWoGFZo91EFuSfU+B9cbmKT8Yg
+         M1N9lQYOkm1bSd+RD0baLbbAvpRvd+a/W/7LEM2VDJO/EUcXeojADBqt60v5KTYAc5MQ
+         EhIw==
+X-Gm-Message-State: AOJu0Yxaq7ylXEmldFAw1/tDfckbn5Yl5N1WydOETigjW6j6aZKLHofY
+	VWcmHv0MP+w3G8l1tI5fvXYzQ7r9JSTLBTkIjtjyfRM7qpsEK0836GwlVx/00XfXyFa2Kjw9Gxl
+	54wZ02g==
+X-Google-Smtp-Source: AGHT+IGQLMLAQAF+dGlRQvB0Wi/p9jHlXdkYZZaSC9+PUwdFXqoFYw8S9ETM/e2VYLS2EJ9MurtjnbpHAaA=
+X-Received: from pgou3.prod.google.com ([2002:a63:b543:0:b0:b2f:1e09:528b])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:748a:b0:240:eb5:77c6
+ with SMTP id adf61e73a8af0-2431b9036d5mr1616895637.26.1755647330047; Tue, 19
+ Aug 2025 16:48:50 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 19 Aug 2025 16:48:30 -0700
+Date: Tue, 19 Aug 2025 16:48:31 -0700
 In-Reply-To: <20250819234833.3080255-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,8 +75,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250819234833.3080255-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.0.rc1.167.g924127e9c0-goog
-Message-ID: <20250819234833.3080255-6-seanjc@google.com>
-Subject: [PATCH v11 5/8] KVM: SEV: Move init of SNP guest state into sev_init_vmcb()
+Message-ID: <20250819234833.3080255-7-seanjc@google.com>
+Subject: [PATCH v11 6/8] KVM: SEV: Set RESET GHCB MSR value during sev_es_init_vmcb()
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -86,142 +86,77 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Kai Huang <kai.huang@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Move the initialization of SNP guest state from svm_vcpu_reset() into
-sev_init_vmcb() to reduce the number of paths that deal with INIT/RESET
-for SEV+ vCPUs from 4+ to 1.  Plumb in @init_event as necessary.
+Set the RESET value for the GHCB "MSR" during sev_es_init_vmcb() instead
+of sev_es_vcpu_reset() to allow for dropping sev_es_vcpu_reset() entirely.
 
-Opportunistically check for an SNP guest outside of
-sev_snp_init_protected_guest_state() so that sev_init_vmcb() is consistent
-with respect to checking for SEV-ES+ and SNP+ guests.
+Note, the call to sev_init_vmcb() from sev_migrate_from() also kinda sorta
+emulates a RESET, but sev_migrate_from() immediate overwrites ghcb_gpa
+with the source's current value, so whether or not stuffing the GHCB
+version is correct/desirable is moot.
 
 No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/svm/sev.c | 16 +++++++++-------
- arch/x86/kvm/svm/svm.c |  9 +++------
- arch/x86/kvm/svm/svm.h |  4 +---
- 3 files changed, 13 insertions(+), 16 deletions(-)
+ arch/x86/kvm/svm/sev.c | 24 +++++++++++-------------
+ 1 file changed, 11 insertions(+), 13 deletions(-)
 
 diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index c17cc4eb0fe1..c5726b091680 100644
+index c5726b091680..ee7a05843548 100644
 --- a/arch/x86/kvm/svm/sev.c
 +++ b/arch/x86/kvm/svm/sev.c
-@@ -1975,7 +1975,7 @@ static void sev_migrate_from(struct kvm *dst_kvm, struct kvm *src_kvm)
- 	kvm_for_each_vcpu(i, dst_vcpu, dst_kvm) {
- 		dst_svm = to_svm(dst_vcpu);
- 
--		sev_init_vmcb(dst_svm);
-+		sev_init_vmcb(dst_svm, false);
- 
- 		if (!dst->es_active)
- 			continue;
-@@ -3887,7 +3887,7 @@ static int snp_begin_psc(struct vcpu_svm *svm, struct psc_buffer *psc)
- /*
-  * Invoked as part of svm_vcpu_reset() processing of an init event.
-  */
--void sev_snp_init_protected_guest_state(struct kvm_vcpu *vcpu)
-+static void sev_snp_init_protected_guest_state(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
- 	struct kvm_memory_slot *slot;
-@@ -3895,9 +3895,6 @@ void sev_snp_init_protected_guest_state(struct kvm_vcpu *vcpu)
- 	kvm_pfn_t pfn;
- 	gfn_t gfn;
- 
--	if (!sev_snp_guest(vcpu->kvm))
--		return;
--
- 	guard(mutex)(&svm->sev_es.snp_vmsa_mutex);
- 
- 	if (!svm->sev_es.snp_ap_waiting_for_reset)
-@@ -4546,8 +4543,10 @@ static void sev_es_init_vmcb(struct vcpu_svm *svm)
- 	svm_clr_intercept(svm, INTERCEPT_XSETBV);
+@@ -4480,7 +4480,7 @@ void sev_vcpu_after_set_cpuid(struct vcpu_svm *svm)
+ 		vcpu->arch.reserved_gpa_bits &= ~(1UL << (best->ebx & 0x3f));
  }
  
--void sev_init_vmcb(struct vcpu_svm *svm)
-+void sev_init_vmcb(struct vcpu_svm *svm, bool init_event)
+-static void sev_es_init_vmcb(struct vcpu_svm *svm)
++static void sev_es_init_vmcb(struct vcpu_svm *svm, bool init_event)
  {
-+	struct kvm_vcpu *vcpu = &svm->vcpu;
-+
- 	svm->vmcb->control.nested_ctl |= SVM_NESTED_CTL_SEV_ENABLE;
- 	clr_exception_intercept(svm, UD_VECTOR);
- 
-@@ -4557,7 +4556,10 @@ void sev_init_vmcb(struct vcpu_svm *svm)
- 	 */
- 	clr_exception_intercept(svm, GP_VECTOR);
- 
--	if (sev_es_guest(svm->vcpu.kvm))
-+	if (init_event && sev_snp_guest(vcpu->kvm))
-+		sev_snp_init_protected_guest_state(vcpu);
-+
-+	if (sev_es_guest(vcpu->kvm))
- 		sev_es_init_vmcb(svm);
- }
- 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 3d4c14e0244f..8ed135dbd649 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -1083,7 +1083,7 @@ static void svm_recalc_intercepts_after_set_cpuid(struct kvm_vcpu *vcpu)
- 	svm_recalc_msr_intercepts(vcpu);
- }
- 
--static void init_vmcb(struct kvm_vcpu *vcpu)
-+static void init_vmcb(struct kvm_vcpu *vcpu, bool init_event)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
+ 	struct kvm_sev_info *sev = to_kvm_sev_info(svm->vcpu.kvm);
  	struct vmcb *vmcb = svm->vmcb01.ptr;
-@@ -1221,7 +1221,7 @@ static void init_vmcb(struct kvm_vcpu *vcpu)
- 		svm_set_intercept(svm, INTERCEPT_BUSLOCK);
+@@ -4541,6 +4541,15 @@ static void sev_es_init_vmcb(struct vcpu_svm *svm)
  
- 	if (sev_guest(vcpu->kvm))
--		sev_init_vmcb(svm);
-+		sev_init_vmcb(svm, init_event);
+ 	/* Can't intercept XSETBV, HV can't modify XCR0 directly */
+ 	svm_clr_intercept(svm, INTERCEPT_XSETBV);
++
++	/*
++	 * Set the GHCB MSR value as per the GHCB specification when emulating
++	 * vCPU RESET for an SEV-ES guest.
++	 */
++	if (!init_event)
++		set_ghcb_msr(svm, GHCB_MSR_SEV_INFO((__u64)sev->ghcb_version,
++						    GHCB_VERSION_MIN,
++						    sev_enc_bit));
+ }
  
- 	svm_hv_init_vmcb(vmcb);
+ void sev_init_vmcb(struct vcpu_svm *svm, bool init_event)
+@@ -4560,7 +4569,7 @@ void sev_init_vmcb(struct vcpu_svm *svm, bool init_event)
+ 		sev_snp_init_protected_guest_state(vcpu);
  
-@@ -1256,10 +1256,7 @@ static void svm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
- 	svm->spec_ctrl = 0;
- 	svm->virt_spec_ctrl = 0;
+ 	if (sev_es_guest(vcpu->kvm))
+-		sev_es_init_vmcb(svm);
++		sev_es_init_vmcb(svm, init_event);
+ }
  
--	if (init_event)
--		sev_snp_init_protected_guest_state(vcpu);
--
--	init_vmcb(vcpu);
-+	init_vmcb(vcpu, init_event);
+ int sev_vcpu_create(struct kvm_vcpu *vcpu)
+@@ -4585,17 +4594,6 @@ int sev_vcpu_create(struct kvm_vcpu *vcpu)
  
- 	if (!init_event)
- 		__svm_vcpu_reset(vcpu);
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index cf2569b5451a..321480ebe62f 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -826,7 +826,7 @@ void avic_refresh_virtual_apic_mode(struct kvm_vcpu *vcpu);
- /* sev.c */
- 
- int pre_sev_run(struct vcpu_svm *svm, int cpu);
--void sev_init_vmcb(struct vcpu_svm *svm);
-+void sev_init_vmcb(struct vcpu_svm *svm, bool init_event);
- void sev_vcpu_after_set_cpuid(struct vcpu_svm *svm);
- int sev_es_string_io(struct vcpu_svm *svm, int size, unsigned int port, int in);
- void sev_es_vcpu_reset(struct vcpu_svm *svm);
-@@ -864,7 +864,6 @@ int sev_cpu_init(struct svm_cpu_data *sd);
- int sev_dev_get_attr(u32 group, u64 attr, u64 *val);
- extern unsigned int max_sev_asid;
- void sev_handle_rmp_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code);
--void sev_snp_init_protected_guest_state(struct kvm_vcpu *vcpu);
- int sev_gmem_prepare(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn, int max_order);
- void sev_gmem_invalidate(kvm_pfn_t start, kvm_pfn_t end);
- int sev_private_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn);
-@@ -891,7 +890,6 @@ static inline int sev_cpu_init(struct svm_cpu_data *sd) { return 0; }
- static inline int sev_dev_get_attr(u32 group, u64 attr, u64 *val) { return -ENXIO; }
- #define max_sev_asid 0
- static inline void sev_handle_rmp_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code) {}
--static inline void sev_snp_init_protected_guest_state(struct kvm_vcpu *vcpu) {}
- static inline int sev_gmem_prepare(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn, int max_order)
+ void sev_es_vcpu_reset(struct vcpu_svm *svm)
  {
- 	return 0;
+-	struct kvm_vcpu *vcpu = &svm->vcpu;
+-	struct kvm_sev_info *sev = to_kvm_sev_info(vcpu->kvm);
+-
+-	/*
+-	 * Set the GHCB MSR value as per the GHCB specification when emulating
+-	 * vCPU RESET for an SEV-ES guest.
+-	 */
+-	set_ghcb_msr(svm, GHCB_MSR_SEV_INFO((__u64)sev->ghcb_version,
+-					    GHCB_VERSION_MIN,
+-					    sev_enc_bit));
+-
+ 	mutex_init(&svm->sev_es.snp_vmsa_mutex);
+ }
+ 
 -- 
 2.51.0.rc1.167.g924127e9c0-goog
 
