@@ -1,198 +1,169 @@
-Return-Path: <kvm+bounces-55019-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55020-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C19DFB2CAB2
-	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 19:36:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B865B2CAF1
+	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 19:39:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 74FA25A728E
-	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 17:36:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F9593BE93C
+	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 17:38:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32FFA30C35E;
-	Tue, 19 Aug 2025 17:35:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7A9D30E0FB;
+	Tue, 19 Aug 2025 17:37:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="fdN5z0p7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="n/5VW533"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 874FB30BF4E
-	for <kvm@vger.kernel.org>; Tue, 19 Aug 2025 17:35:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87F8630E0DA
+	for <kvm@vger.kernel.org>; Tue, 19 Aug 2025 17:37:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755624949; cv=none; b=X5s1JBB5tN8awjm0x953IylyPSpGG6MfwURm/A1sKtT4veWIIOZLQtY8vUkgsgSXdcdsA+ux3qbAqXJt4rvhpsdvx8/gJD8uiMBlsVr8JQH1c7eiLltpEabFKhA59sosB+wnoLR9cVATOIJVjRDrttx+o/cj2nJfPFbx8nk9aWY=
+	t=1755625052; cv=none; b=ZmNWTRqQG8m4hL6h3VIFORAQavti+RhmrfVW20jX0CGHwgsYe6769jbsWTvGxfw4v0RIBcv9SjZ7S5LGcwVr4WsYpQDDS4zT4nzClmuPQd4eHILkD/AR1SMF+X5W5AAG3M1s7HvMhZLX/Y106XFRITIJI6x5FiniTBjKLsXsnCc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755624949; c=relaxed/simple;
-	bh=3lx/6/xRZF2aURKCYXk81xVXA9kIZnoFiaggniSCdKM=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:To:From:Subject:
-	 References:In-Reply-To; b=i+1IaAgQwO+SfX00as4S5SXMyRqCCYie/He+iMJ2aaYfJps3fLzhn+WhjvG6UHDorJGgDakFZG9tObq9JteislblWlKRnproafjP1Us8hMUO12zT8AHS2AsBjeenXAhKLpzBf3+Q7ZTiEQSRlqFgTfG9bgHR4MI87t6AWjQCxnc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=fdN5z0p7; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-45a1b054b36so1324625e9.1
-        for <kvm@vger.kernel.org>; Tue, 19 Aug 2025 10:35:47 -0700 (PDT)
+	s=arc-20240116; t=1755625052; c=relaxed/simple;
+	bh=Nek3Pvszbi5q4OIHQoHPCJUKyVyIMZNtiypwZkEUpNY=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=RZ8Zgg2b6xnrdNIFQECM1KM3y+QTpySmQ6/AarisPi88FZACxrWnekeBlKdenT8bYIREHRJXSY0fL8pooAFJVPf6SQADQ6nbE9j9CeFzWy1+yZms2H+2+w6D8gMkUTuFnvYyrutx9UhznSOTBiAh/8LdBXVdM42RvP/NcuoafLk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=n/5VW533; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-76e2e5c4734so5452475b3a.0
+        for <kvm@vger.kernel.org>; Tue, 19 Aug 2025 10:37:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1755624946; x=1756229746; darn=vger.kernel.org;
-        h=in-reply-to:references:subject:from:to:cc:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HriY9Mwm+2fMM0vnEvPFFz/UXLfXmL7avJoov+0cHIs=;
-        b=fdN5z0p7Ve1LwKx8C8KdIcc6Hk+jxajMirUok34CF8jIAKlY4X/pulTnLgksyDj38R
-         ySeTUzGp0hQH6w12RzNAYI5ffKWUJizaWd0DQKgAu4FJLs2haKDPAwOq+kcmUKuO3iuf
-         n7h/dxhIQ9A61QQRKfdx2iRQgdao5WQn2kMahwsxxjWD120n/iq9aqPcPF8o0vmV6gKj
-         KIX8lZUKgd5K+HRB5fzhmrb0NcqaYkSoRCJlrG7WvtbMrBnXOVlxVrQEMJojkxc10tvS
-         aGIHp7NJnd5pzvccaXx4AQ4N9k4wQ0TMDpjQgCW2gGT7CeLYFM67mxU7wXz0irENZec6
-         am6g==
+        d=google.com; s=20230601; t=1755625050; x=1756229850; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=tvwHDk/yqCRnqD+LedgU5w1dqUV12jvsCwg/W7+3EAE=;
+        b=n/5VW533tuZZ19eBD4d6isht1reS+nB888fZqLF97jpWPEtdVju78dmub0Zmnju2Ey
+         Cr5aARi4+fa9J5OClXaHR9qT5yDOvSzh6ryKwx8nAU6c1ugbsQV2FrDaV3EuJ7jsAytM
+         qSAotzofjDoFxpxLeBpzQsyct7f1yOQvrBRoKpSl5Jtcg6/wgn/TyK989acsZhDsR4DP
+         PkRzMQNVDCG2yYT3It3U/SGcfS8hKQn63tQeU2N5TTBpR6NIk0jzOoHZOxOumOQmNW57
+         jwTMomEnD+t/2CA0Ytm/EN/KhUw0lZkvCq/NskWWwkIWDBcku/2o7X5bSKb5humC6qIz
+         nFVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755624946; x=1756229746;
-        h=in-reply-to:references:subject:from:to:cc:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=HriY9Mwm+2fMM0vnEvPFFz/UXLfXmL7avJoov+0cHIs=;
-        b=WoaE3KxQtVC0bPcMed/Eg6pTnGgeHzEddnS4NcbzOK8CJK3N96H0M0MXdegGPe6061
-         P2hN0LOQYRT7JTAmbMPTahwTQ+5d/Cd7GSy9JawtOSeQJ3xQa3tpqnw8wMJ9UdA0RdQ4
-         uRBKncX/m2Osr7yZ6hpHYuLegP4gmHfhXpGL5KSsq7WuXqwOxCp20EiyLsUEhDZ3AHIU
-         HDbLTJTEfNjqoDzEVlEjOvDDkk+zpGbN0O1411StvAjcQwLlVj/JGR6deUz33bZzRMt0
-         taMQDBD0g3JsjAutVWp6mu0rLa8T49Hj29xGuoAaNgemFGIlu/qX2/4ZX+DtHBEcgeWu
-         HFsQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVKX/60LSGG482Z0Qq34DKzmNX7l7o5OE24D8UggAoLrIZt1aUu9NKzyyDBOE6KS5u9x24=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyqwhXLUz6lh+6GQ65XJRwmt4ALzTcBrgEPTn4JFVygpdbloIJW
-	Ps0bq9i0c5lfO9iQ1heXBcELmXMq7e1Ngjrw5J4Vygnb0swvkoFXfEWkT3pjBkwlVNw=
-X-Gm-Gg: ASbGnctAPjJS2iJ0X2y4MZnIzX9eNycIku8ess5t2Wrf2Q13n1FSIpmPe8U0P15mngO
-	PVEI2xhv21DNAa0Qya3dFpZCucRuXsfEBta3kgWwmvZN6pVtZlXRHGuPgtu0LEmweOAgDXl0Exe
-	yqeevigUWgwAcLYndNW3AVGP6tDJiq010sj5eHAcz99L1QvdKMOxWhuYkZjtNETzIF4fRS78t2G
-	3FIrSPGAPmP5oOx8sl4xfUixCSMfyntp1HLcQeomzhcU4GLKH2NViAUUEyrrnfUUtoBqsUGGM6x
-	rrg7i4V2m5wfDDqB60hhR9d/y9MDoJFXFwMK9Od6sdC0iLdf0LSJ8NcQADUp/weso+SysGlKYE3
-	kriCtbvL115tWT33LHZ9px4UEMiwpCQ==
-X-Google-Smtp-Source: AGHT+IHdHc43/qbPeSuFvpTUjrq1NXmEH79kFa8+PuZKM64k2/KwBznp+KjWl/svIF/2Oq3kUoCIug==
-X-Received: by 2002:a05:600c:468f:b0:453:7011:fcdb with SMTP id 5b1f17b1804b1-45b46b7681bmr4785225e9.1.1755624945689;
-        Tue, 19 Aug 2025 10:35:45 -0700 (PDT)
-Received: from localhost ([2a02:8308:a00c:e200:e7d6:daad:8c97:a08e])
-        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-45a1c6bc85csm221551445e9.5.2025.08.19.10.35.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Aug 2025 10:35:45 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1755625050; x=1756229850;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=tvwHDk/yqCRnqD+LedgU5w1dqUV12jvsCwg/W7+3EAE=;
+        b=IO3Gd1oLtQDr+A5yoR/NeHZ1nXSf75flIGFMGSdODZDOFrb5u0Okw888CScf4rD3Ck
+         Lc/Sls+sEPpr8WmVXoCdF94KClZtWfi08ayAXU52scr1A+hzuPGhmBb+ZX8aLIxOUf9m
+         EzY26/j3B1EVE0WMskFwWZt2rcIqEJRadPgwPJQ3tPI1f96hp6l8vI76pjDnWP1Guyj7
+         KughbJEnjztZrbyxVft9Pho9YlZncUffMRneAJQgNchLhgnF1aflFvaQRfjk84oL4JhJ
+         V7qwxbQ5qDyX8xhqWem+ImNkik6/RpZPdC6lupjvH75/O0DPorZp5sXIbrdMDgYX+vzl
+         kAJw==
+X-Gm-Message-State: AOJu0YwJMQFxGt1onLQeKKBzmXggYTKeyoBq7l5hhbVrxPvd/7yxbgLp
+	XMZSghmEk/iSAhmj/UQpBy8V2iVIanP5ThP0+Nx8QxYCzEe75GiA2h3d2sdXdgNuZETAFMyjtXA
+	kEiziTg==
+X-Google-Smtp-Source: AGHT+IFWoOsVQR5vLs1kkcy1LLRaJmXeYdHqmbqS2n7ben+PI7FVthnAUZylyprKBZj8jm5KAvMX4c12EeQ=
+X-Received: from pfnj11.prod.google.com ([2002:aa7:83cb:0:b0:748:f030:4e6a])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:2e97:b0:76c:1c69:1115
+ with SMTP id d2e1a72fcca58-76e8dbf0488mr87280b3a.8.1755625049802; Tue, 19 Aug
+ 2025 10:37:29 -0700 (PDT)
+Date: Tue, 19 Aug 2025 10:37:28 -0700
+In-Reply-To: <20250812025606.74625-7-chao.gao@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Tue, 19 Aug 2025 19:35:44 +0200
-Message-Id: <DC6L3PG5HP48.2J8TC1JZHMJVO@ventanamicro.com>
-Cc: "Atish Patra" <atish.patra@linux.dev>, "Palmer Dabbelt"
- <palmer@dabbelt.com>, "Paul Walmsley" <paul.walmsley@sifive.com>,
- "Alexandre Ghiti" <alex@ghiti.fr>, "Andrew Jones"
- <ajones@ventanamicro.com>, "Anup Patel" <anup@brainfault.org>, "Paolo
- Bonzini" <pbonzini@redhat.com>, "Shuah Khan" <shuah@kernel.org>,
- <kvm@vger.kernel.org>, <kvm-riscv@lists.infradead.org>,
- <linux-riscv@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
- <linux-kselftest@vger.kernel.org>, "linux-riscv"
- <linux-riscv-bounces@lists.infradead.org>
-To: "Anup Patel" <apatel@ventanamicro.com>
-From: =?utf-8?q?Radim_Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@ventanamicro.com>
-Subject: Re: [PATCH 0/6] ONE_REG interface for SBI FWFT extension
-References: <20250814155548.457172-1-apatel@ventanamicro.com>
- <DC5HEJRMZ84K.34OPU922A7XBE@ventanamicro.com>
- <CAK9=C2X8-DBi7qQ87kMA0AiVdiFH0_4L4mzzZzbeCg2eiNm8Qg@mail.gmail.com>
- <DC6DLP13J0LA.XW9J3XFBCM1Y@ventanamicro.com>
- <CAK9=C2VA2jswYm_yxYsCaGKUkJT46rxUH-6OKdsApMZ8nhkrQw@mail.gmail.com>
-In-Reply-To: <CAK9=C2VA2jswYm_yxYsCaGKUkJT46rxUH-6OKdsApMZ8nhkrQw@mail.gmail.com>
+References: <20250812025606.74625-1-chao.gao@intel.com> <20250812025606.74625-7-chao.gao@intel.com>
+Message-ID: <aKS2WKBbZn6U1uqx@google.com>
+Subject: Re: [PATCH v12 06/24] KVM: x86: Introduce KVM_{G,S}ET_ONE_REG uAPIs support
+From: Sean Christopherson <seanjc@google.com>
+To: Chao Gao <chao.gao@intel.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, mlevitsk@redhat.com, 
+	rick.p.edgecombe@intel.com, weijiang.yang@intel.com, xin@zytor.com, 
+	Mathias Krause <minipli@grsecurity.net>, John Allen <john.allen@amd.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>
+Content-Type: text/plain; charset="us-ascii"
 
-2025-08-19T21:22:27+05:30, Anup Patel <apatel@ventanamicro.com>:
-> On Tue, Aug 19, 2025 at 5:13=E2=80=AFPM Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrc=
-mar@ventanamicro.com> wrote:
->>
->> 2025-08-19T12:00:43+05:30, Anup Patel <apatel@ventanamicro.com>:
->> > On Mon, Aug 18, 2025 at 3:59=E2=80=AFPM Radim Kr=C4=8Dm=C3=A1=C5=99 <r=
-krcmar@ventanamicro.com> wrote:
->> >>
->> >> 2025-08-14T21:25:42+05:30, Anup Patel <apatel@ventanamicro.com>:
->> >> > This series adds ONE_REG interface for SBI FWFT extension implement=
-ed
->> >> > by KVM RISC-V.
->> >>
->> >> I think it would be better to ONE_REG the CSRs (medeleg/menvcfg), or =
-at
->> >> least expose their CSR fields (each sensible medeleg bit, PMM, ...)
->> >> through kvm_riscv_config, than to couple this with SBI/FWFT.
->> >>
->> >> The controlled behavior is defined by the ISA, and userspace might wa=
-nt
->> >> to configure the S-mode execution environment even when SBI/FWFT is n=
-ot
->> >> present, which is not possible with the current design.
->> >>
->> >> Is there a benefit in expressing the ISA model through SBI/FWFT?
->> >>
->> >
->> > Exposing medeleg/menvcfg is not the right approach because a
->> > Guest/VM does not have M-mode hence it is not appropriate to
->> > expose m<xyz> CSRs via ONE_REG interface. This also aligns
->> > with H-extension architecture which does not virtualize M-mode.
->>
->> We already have mvendorid, marchid, and mipid in kvm_riscv_config.
->
-> The mvendorid, marchid, and mipid are accessible via SBI BASE
-> extension but not any other M-mode CSRs hence these are special.
->
->>
->> The virtualized M-mode is userspace+KVM.  (KVM doesn't allow userspace
->> to configure most things now, but I think we'll have to change that when
->> getting ready for production.)
->
-> The RISC-V architecture is not designed to virtualize M-mode
-> and there is no practical use-case for virtualized M-mode hence
-> WE WON'T BE SUPPORTING IT IN KVM RISC-V.
+On Mon, Aug 11, 2025, Chao Gao wrote:
+> From: Yang Weijiang <weijiang.yang@intel.com>
+> 
+> Enable KVM_{G,S}ET_ONE_REG uAPIs so that userspace can access HW MSR or
+> KVM synthetic MSR through it.
+> 
+> In CET KVM series [1], KVM "steals" an MSR from PV MSR space and access
+> it via KVM_{G,S}ET_MSRs uAPIs, but the approach pollutes PV MSR space
+> and hides the difference of synthetic MSRs and normal HW defined MSRs.
+> 
+> Now carve out a separate room in KVM-customized MSR address space for
+> synthetic MSRs. The synthetic MSRs are not exposed to userspace via
+> KVM_GET_MSR_INDEX_LIST, instead userspace complies with KVM's setup and
+> composes the uAPI params. KVM synthetic MSR indices start from 0 and
+> increase linearly. Userspace caller should tag MSR type correctly in
+> order to access intended HW or synthetic MSR.
+> 
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+> Link: https://lore.kernel.org/all/20240219074733.122080-18-weijiang.yang@intel.com/ [1]
+> Tested-by: Mathias Krause <minipli@grsecurity.net>
+> Tested-by: John Allen <john.allen@amd.com>
+> Signed-off-by: Chao Gao <chao.gao@intel.com>
+> ---
+>  arch/x86/include/uapi/asm/kvm.h | 10 +++++
+>  arch/x86/kvm/x86.c              | 66 +++++++++++++++++++++++++++++++++
+>  2 files changed, 76 insertions(+)
+> 
+> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+> index 0f15d683817d..e72d9e6c1739 100644
+> --- a/arch/x86/include/uapi/asm/kvm.h
+> +++ b/arch/x86/include/uapi/asm/kvm.h
+> @@ -411,6 +411,16 @@ struct kvm_xcrs {
+>  	__u64 padding[16];
+>  };
+>  
+> +#define KVM_X86_REG_MSR			(1 << 2)
+> +#define KVM_X86_REG_SYNTHETIC		(1 << 3)
+> +
+> +struct kvm_x86_reg_id {
+> +	__u32 index;
+> +	__u8 type;
+> +	__u8 rsvd;
+> +	__u16 rsvd16;
+> +};
 
-Oh, sorry for the misunderstanding, I'll be clearer next time and talk
-about implementation of the supervisor execution environment.
-KVM+userspace provides SEE to the VS-mode, which is to VS-mode as what
-M-mode is to S-mode, hence I called KVM+userspace a virtualized M-mode.
+Some feedback from a while back never got addressed[*].  That feedback still
+looks sane/good, so this for the uAPI:
 
-> FYI, the KVM ARM64 does not virtualize EL3 either and it is
-> already in production so please stop making random arguments
-> for requiring virtualized M-mode for production.
+--
+#define KVM_X86_REG_TYPE_MSR	2ull
 
-Yeah, I agree that we don't need it, I just had to provide so many
-examples in the previous discussion that I went into quite niche cases.
+#define KVM_x86_REG_TYPE_SIZE(type) 						\
+{(										\
+	__u64 type_size = type;							\
+										\
+	type_size |= type == KVM_X86_REG_TYPE_MSR ? KVM_REG_SIZE_U64 :		\
+		     type == KVM_X86_REG_TYPE_SYNTHETIC_MSR ? KVM_REG_SIZE_U64 :\
+		     0;								\
+	type_size;								\
+})
 
-The increased flexibility is similarly useful for more important cases:
-we can't avoid "virtualized M-mode"/SEE, but we don't have to completely
-implement it in HS-mode.
+#define KVM_X86_REG_ENCODE(type, index)				\
+	(KVM_REG_X86 | KVM_X86_REG_TYPE_SIZE(type) | index)
 
->> For general virtualization, we want to be able to configure the
->> following behavior for each exception that would go to the virtualized
->> M-mode:
->>   0) delegated to the guest
->>   1) implemented by userspace
->>   2-N) implementations by KVM (ideally zero or one)
->>
->> We can have medeleg, and another method to decide how to handle trapped
->> exceptions, but it probably makes more sense to have a per-exception
->> ONE_REG that sets how each exception behaves.
->>
->
-> No pointing in discussing this further since we won't be supporting
-> virtualized M-mode.
+#define KVM_X86_REG_MSR(index) KVM_X86_REG_ENCODE(KVM_X86_REG_TYPE_MSR, index)
+--
 
-I understand, back to the current series:
+And then the kernel-only struct overlay becomes:
 
-I think we need to provide means with which userspace can control which
-FWFT features are enabled, because KVM just exposes everything it know
-and hardware supports right now:
- 1) Migration between different systems would be hindered
- 2) We couldn't add more FWFT features without breaking the SEE
+--
+struct kvm_x86_reg_id {
+	__u32 index;
+	__u8  type;
+	__u8  rsvd;
+	__u8  rsvd4:4;
+	__u8  size:4;
+	__u8  x86;
+}
+--
 
-The (2) is similar to how we must set ".default_disabled =3D true" to
-current FWFT, because KVM can't be changing the SEE for userspace.
-
-Do you want me to send a patch that inverts the default, to make all
-future SBI extension start as disabled, so we can't easily repeat the
-mistake in the future?
-
-Thanks.
+[*] https://lore.kernel.org/all/ZuGpJtEPv1NtdYwM@google.com
 
