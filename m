@@ -1,202 +1,214 @@
-Return-Path: <kvm+bounces-54978-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54979-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B916B2C0A9
-	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 13:39:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFD7DB2C0D9
+	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 13:47:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 909DD1893E12
-	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 11:36:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DBE743BF2E1
+	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 11:43:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92E3632BF5D;
-	Tue, 19 Aug 2025 11:35:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 201E832BF59;
+	Tue, 19 Aug 2025 11:43:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="lAeSY4ZM"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="hDhu1/au"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC7FC30F813;
-	Tue, 19 Aug 2025 11:35:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A64A32BF3B
+	for <kvm@vger.kernel.org>; Tue, 19 Aug 2025 11:43:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755603325; cv=none; b=eRZ2pvPDPfjLjvd2R5o1VCqybOt35iQrnxAxPTsKPrOHyFoQCf2MFpmxT7f3ar3owj1zTHesxKwL6pEYS4/xoV0mSmPnBbha49If2/VzDqiT63w7pTjixXKWkya3FiQVYWKec+vKGoQsxqbhZMz/DsoCQd4/LZARlhboa20UCoY=
+	t=1755603790; cv=none; b=KpmXsoSujzWtu6quZZikHm/4+K+F0FLJkpeF+R9r43XtR9WHy7Sd7rpWA4X3mcwxbpRh66cIC33UCrGdw7HdQrzEY7FjmSVGTuIuhdcWMFRT8U3VEWQQVaqvY7u6xyGM/MyW0HKGfwoIAtJDeNXsq5fYYhkW4Lf27k2QeMgBAf8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755603325; c=relaxed/simple;
-	bh=WV1rxNjB+TYqIAQsI+V7tfqrGc3WfHnR+6UzQJkULEw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bQdDrjIVlJHeJek99B8g7mp1h/1SRaWzoRU+bww3WDDSUaPmYLj2q1WvxqpRiLHUTkgS+2u1+st71aFqGzeGl9xVg87j/qhNQRbi8UTuGiMmm/iA5gOd0bZBFSltiK35U7h3MgY9+w/IQJdKVIb9aktq0+w8U+gVpnO0QGa1ZuQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=lAeSY4ZM; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 7B59540E0232;
-	Tue, 19 Aug 2025 11:35:20 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id aLRSC9M65czv; Tue, 19 Aug 2025 11:35:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1755603314; bh=g/G+pgACZoF3hG1rLn4uE9m9WQvLEWOUUt+4q8jMk+Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lAeSY4ZM2pw8IFmOlaS3AA7YC0WWO8kVSib0isnJ8MRUkSjuLstJyZqTzuRP8le9q
-	 CSNI7jaT/Lf5fG3tJyzKxBvuhs730KAvfOomyiuBWOIUgrlJv/F6rYw8Fk/yKCha+2
-	 3tZOnENDz3MTygaarLvMsyKcB+fY1RAx26rN81IhxOWSECHxXNVf2HplYbBFKPnbhv
-	 mr6A3xWbDhSinS0oFJgDwowtf3MYi65+a9pILK9HsmGZW9T9bRqfxZWwAW2Is6IenL
-	 K9lI1diW6dLFi6tCsmycgF2yLc4Ae3Ewav2kqmmLWYAZkn+OH0CGmZ+3VJWt5NaLlK
-	 le2zqk8WD8JwanqHAzd4O6RR3aeLoUbTzvFU4w1zdvJdpCLwFOT/csJ4lE7Wd7hQKW
-	 qp2jg1oaty6mizUrCYZ13ItdfTlk7bHo79g4v2FQDKh3YhrC+tcVjDalthNvYfVy9L
-	 gyBpsgCzj8gWW4gG/bh+b7nSQG7EE5pmlGbWequqkNjScRosvyMLD4UR6ZVtrloQz3
-	 Z73WYBQy2+mRobPzbi4xKJhqN7B+C+4oT0Ne+S0+f/WbShBLN+rXNuLtY7HIQo/ENC
-	 K4xQmKQXGQcXNYrtzevlnHZybRXnaQ6AabWK/hwM/5oer7TJYMOeVAkIIv1c2dg6z6
-	 AW5XntmANeHujyHURoDkG7Cc=
-Received: from zn.tnic (pd953092e.dip0.t-ipconnect.de [217.83.9.46])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 0DF5140E0194;
-	Tue, 19 Aug 2025 11:34:54 +0000 (UTC)
-Date: Tue, 19 Aug 2025 13:34:47 +0200
-From: Borislav Petkov <bp@alien8.de>
-To: K Prateek Nayak <kprateek.nayak@amd.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, x86@kernel.org,
-	Naveen rao <naveen.rao@amd.com>, Sairaj Kodilkar <sarunkod@amd.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	"Peter Zijlstra (Intel)" <peterz@infradead.org>,
-	"Xin Li (Intel)" <xin@zytor.com>,
-	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	Mario Limonciello <mario.limonciello@amd.com>,
-	"Gautham R. Shenoy" <gautham.shenoy@amd.com>,
-	Babu Moger <babu.moger@amd.com>,
-	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-Subject: Re: [PATCH v3 0/4] x86/cpu/topology: Work around the nuances of
- virtualization on AMD/Hygon
-Message-ID: <20250819113447.GJaKRhVx6lBPUc6NMz@fat_crate.local>
-References: <20250818060435.2452-1-kprateek.nayak@amd.com>
+	s=arc-20240116; t=1755603790; c=relaxed/simple;
+	bh=BEkXZbKZI8TKL4ijyPDPqNlemvC4CN/UmF+QlhyIGA8=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
+	 References:In-Reply-To; b=on+ueIJmKG01VJngf2F8pm+jv9pe4rCFBPoZB/pjl3Z12290kkCdIyVZClCC/N+7lVBCotjGPZ7jfLZ4s3nzja0CtxlsFtPK2r79jtoWd/Bs2z6g91aUV0uIN9QlOsIZLL8PtFkB98l/rH9Ip0PYYR6cszfSofVLGKotrOFzARA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=hDhu1/au; arc=none smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-3b9d41c0fe4so743908f8f.0
+        for <kvm@vger.kernel.org>; Tue, 19 Aug 2025 04:43:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1755603787; x=1756208587; darn=vger.kernel.org;
+        h=in-reply-to:references:from:to:cc:subject:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=J/0raNw155Q0fcr5A7DH7DOXoru7hdxKmPbmEOTm5zY=;
+        b=hDhu1/auM9LL++8WDau9ZMs3myAyYC0n7Ijf3nCG4Dw25+iRmsLsICFLGNeaYnvd+6
+         tjeLJrfkzmrrHfuIgfKqzGlMPKIudgo/WWCvr/cAMtbE0WUMGT7Aoa3kF0XADBuPv7DM
+         i8+hxV6aLDZpr/hEJiTpyktWafEqYInWqNSV9PXMPkjLv8WSk3mj55W/jewaSPRzf69U
+         omnZNTwe/vQlk2uBcNU2CQ2TyblVJ4UqABcSra9qIlj/SKaM1+K/uVgOw1MsDhjJhTrX
+         T5XUwt3TM4RWiLOx7jbGaMD3TFseL+YTMFxqgFNbRN1M1woDdrlgyZO7tF1ImaVJXD4d
+         2H0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755603787; x=1756208587;
+        h=in-reply-to:references:from:to:cc:subject:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=J/0raNw155Q0fcr5A7DH7DOXoru7hdxKmPbmEOTm5zY=;
+        b=JwOKFmjLMI9pIJcl6+ih+tMLh+qJyCE9w0Xqm5wubmba9Udhk3NCXrFFNZr1/bck3t
+         VZ8V75Nybtx7rDWGOFopjs71mqlMNBQZcnCezdG1OQmHoc2MglUcV5dAVPvpbMLJzY2h
+         MGjEEgZ0XuhYnEoxc4N9UoIHuHTiDZO9nVzrONlgNhtcqEktc/Ze33beeExkentB5spy
+         sFxf4W07ev6ETrucI2R1/o3PXigJPZzvUFLRCtbaHSEsKkRnbvkh6xx4tobVd7nALU59
+         B1+KmrE1nYJWlHhVpBnhkCT2339ylM/0rk1XXXL5qEEdvKyRUqjK4IXSEApZ3SClsmDc
+         9Y2w==
+X-Forwarded-Encrypted: i=1; AJvYcCVAuNRwMZ5HRuAgjOyrrsxDpSDpTBplOA1ZU7/Lo5TeV7SrFyv7ovLndKZm3RmG9nZJoSs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywpo2cT8JNik96LzgvOzkpNL8kViqhlCt+cMq+CuuQ3Cg+aeT6D
+	AB29MxoROHlhKrIxuSp7E34yi1UuvmIe8p6k/YTls04epszUohK4ghNd2LBqPbU5JSc=
+X-Gm-Gg: ASbGncu5UTx+ToytYIACzrs2NEblF7BJs2ou1p30sueAOq/FKwR3SdJTnHNWMsh6v+Q
+	ZNLrLyRDzip5uPFWzm4up0PA+r8FLMVhxBS5tcudhBh8sW7nhGxDbiiHixXE1yzzfwMKsJNX51I
+	1G0K+ZDxBPCVkAIzypvV8HiuFy8MWqmx6nCkCcxtuKXpB/tpv7wGL5r4I0Hi9R0sGi0r7qhIWpG
+	TDdsEZB4VL4+JX490JtRIL37Et01wLj8J9Ej4Kn7ApBsjrRj6sq9jftxowkQowuGaVcMV4NtWrA
+	FjoY4EKEMqN7FDikvSo2Cu/yciobfuyBWS7me8aCQ5zGaNquP7+FzrNivWq9cOgHSfa8sjhXis3
+	LWlpdMEfTQ4cdxYL45pDllhBJyue6cA==
+X-Google-Smtp-Source: AGHT+IE0FoFnrqv/364y0JxojzjSjgxBxkWPcaMoaWDVaVYQ/OrVds62/XTIFpn7j8AxOXLMQWkHNw==
+X-Received: by 2002:a05:600c:c169:b0:459:d7c4:9e14 with SMTP id 5b1f17b1804b1-45b43e85f3bmr9440455e9.0.1755603786493;
+        Tue, 19 Aug 2025 04:43:06 -0700 (PDT)
+Received: from localhost ([2a02:8308:a00c:e200:e7d6:daad:8c97:a08e])
+        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-45a1cda0021sm207509385e9.13.2025.08.19.04.43.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Aug 2025 04:43:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250818060435.2452-1-kprateek.nayak@amd.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Tue, 19 Aug 2025 13:43:05 +0200
+Message-Id: <DC6DLP13J0LA.XW9J3XFBCM1Y@ventanamicro.com>
+Subject: Re: [PATCH 0/6] ONE_REG interface for SBI FWFT extension
+Cc: "Atish Patra" <atish.patra@linux.dev>, "Palmer Dabbelt"
+ <palmer@dabbelt.com>, "Paul Walmsley" <paul.walmsley@sifive.com>,
+ "Alexandre Ghiti" <alex@ghiti.fr>, "Andrew Jones"
+ <ajones@ventanamicro.com>, "Anup Patel" <anup@brainfault.org>, "Paolo
+ Bonzini" <pbonzini@redhat.com>, "Shuah Khan" <shuah@kernel.org>,
+ <kvm@vger.kernel.org>, <kvm-riscv@lists.infradead.org>,
+ <linux-riscv@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+ <linux-kselftest@vger.kernel.org>, "linux-riscv"
+ <linux-riscv-bounces@lists.infradead.org>
+To: "Anup Patel" <apatel@ventanamicro.com>
+From: =?utf-8?q?Radim_Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@ventanamicro.com>
+References: <20250814155548.457172-1-apatel@ventanamicro.com>
+ <DC5HEJRMZ84K.34OPU922A7XBE@ventanamicro.com>
+ <CAK9=C2X8-DBi7qQ87kMA0AiVdiFH0_4L4mzzZzbeCg2eiNm8Qg@mail.gmail.com>
+In-Reply-To: <CAK9=C2X8-DBi7qQ87kMA0AiVdiFH0_4L4mzzZzbeCg2eiNm8Qg@mail.gmail.com>
 
-Lemme try to make some sense of this because the wild use of names and things
-is making my head spin...
+2025-08-19T12:00:43+05:30, Anup Patel <apatel@ventanamicro.com>:
+> On Mon, Aug 18, 2025 at 3:59=E2=80=AFPM Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrc=
+mar@ventanamicro.com> wrote:
+>>
+>> 2025-08-14T21:25:42+05:30, Anup Patel <apatel@ventanamicro.com>:
+>> > This series adds ONE_REG interface for SBI FWFT extension implemented
+>> > by KVM RISC-V.
+>>
+>> I think it would be better to ONE_REG the CSRs (medeleg/menvcfg), or at
+>> least expose their CSR fields (each sensible medeleg bit, PMM, ...)
+>> through kvm_riscv_config, than to couple this with SBI/FWFT.
+>>
+>> The controlled behavior is defined by the ISA, and userspace might want
+>> to configure the S-mode execution environment even when SBI/FWFT is not
+>> present, which is not possible with the current design.
+>>
+>> Is there a benefit in expressing the ISA model through SBI/FWFT?
+>>
+>
+> Exposing medeleg/menvcfg is not the right approach because a
+> Guest/VM does not have M-mode hence it is not appropriate to
+> expose m<xyz> CSRs via ONE_REG interface. This also aligns
+> with H-extension architecture which does not virtualize M-mode.
 
-On Mon, Aug 18, 2025 at 06:04:31AM +0000, K Prateek Nayak wrote:
-> When running an AMD guest on QEMU with > 255 cores, the following FW_BUG
-> was noticed with recent kernels:
-> 
->     [Firmware Bug]: CPU 512: APIC ID mismatch. CPUID: 0x0000 APIC: 0x0200
-> 
-> Naveen, Sairaj debugged the cause to commit c749ce393b8f ("x86/cpu: Use
-> common topology code for AMD") where, after the rework, the initial
-> APICID was set using the CPUID leaf 0x8000001e EAX[31:0] as opposed to
+We already have mvendorid, marchid, and mipid in kvm_riscv_config.
 
-That's
+The virtualized M-mode is userspace+KVM.  (KVM doesn't allow userspace
+to configure most things now, but I think we'll have to change that when
+getting ready for production.)
 
-CPUID_Fn8000001E_ECX [Node Identifiers] (Core::X86::Cpuid::NodeId)
+> We already had discussions about this in the past.
+>
+> As such, we have two options. One option is to expose
+> hedeleg/henvcfg via kvm_riscv_config and another option
+> is to have a separate ONE_REG for each FWFT feature.
+>
+> Separate ONE_REG registers for each FWFT feature is better
+> than directly exposing hedeleg/henvcfg via ONE_REG because:
+>
+> 1) Once nested virtualization lands, we will be having separate
+> hedeleg/henvcfg as part of nested virtualization state of Guest
+> which is trap-n-emulated by KVM. The existence of hedeleg/henvcfg
+> in kvm_riscv_config and nested virtualization state will only create
+> more confusion.
 
-> the value from CPUID leaf 0xb EDX[31:0] previously.
+Right, the userspace registers for this can't be called h*.
 
-That's
+> 2) Not all bits in hedeleg/henvcfg are used for FWFT since quite
+> a few bits are programmed with fixed value based on KVM
+> implementation choices (which may change in future).
 
-CPUID_Fn0000000B_EDX [Extended Topology Enumeration]
-(Core::X86::Cpuid::ExtTopEnumEdx)
+Yes, we'll want to expose some to userspace.
 
-> This led us down a rabbit hole of XTOPOEXT vs TOPOEXT support, preferred
+>                                                      Also,
+> things like set_debug_ioctl() change hedeleg at runtime
+> which allow KVM user space to decide who takes breakpoint
+> traps from Guest/VM.
 
-What is XTOPOEXT? 
+This is still doable.  The clear hedeleg bit does not have to change the
+virtualized behavior -- if the guest is expecting to see breakpoint
+traps, then even if userspace+KVM configure the architecture to direct
+the traps to the hypervisor, they must then forward the breakpoints that
+were supposed to be delivered to the guest.
 
-CPUID_Fn0000000B_EDX?
+>                      This means value saved/restored
+> through hedeleg/henvcfg in kvm_riscv_config becomes
+> specific to the kernel version and specific to host ISA features.
 
-Please define all your things properly so that we can have common base when
-reading this text.
+Hedeleg/henvcfg bits do not have to be the same as userspace interface
+bits -- KVM always has to distinguish what the userspace wants to
+virtualize, and what the KVM changed for its own reasons.
 
-TOPOEXT is, I presume:
+> 3) We anyway need to provide ONE_REG interface to
+> save/restore FWFT feature flags so it's better to keep the
+> FWFT feature value as part of the same ONE_REG interface.
 
-#define X86_FEATURE_TOPOEXT		( 6*32+22) /* "topoext" Topology extensions CPUID leafs */
+I think we want to have SBI in userspace (especially for single-shot
+ecalls like FWFT).  The userspace implementation will want an interface
+to set the ISA bits, and it's very awkward with the proposed design.
 
-Our PPR says:
+Flags can to stay, in case the userpace wants to accelerate FWFT.
 
-CPUID_Fn80000001_ECX [Feature Identifiers] (Core::X86::Cpuid::FeatureExtIdEcx)
+> 4) The availability of quite a few FWFT features is dependent
+> on corresponding ISA extensions so having separate ONE_REG
+> registers of each FWFT feature allows get_reg_list_ioctl() to
+> provide KVM user-space only available FWFT feature registers.
 
-"22 TopologyExtensions: topology extensions support. Read-only. Reset:
-Fixed,1. 1=Indicates support for Core::X86::Cpuid::CachePropEax0 and
-Core::X86::Cpuid::ExtApicId."
+Yes, but similarly the userspace would be forbidden from setting bits
+that cannot be expressed in henvcfg/hededeg.
 
-Those leafs are:
+There are also behaviors we want to configure that do not have a FWFT
+toggle.  e.g. the recent patches for delegation of illegal-instruction
+exceptions that changed the guest behavior -- someone might want to
+keep incrementing the SBI PMU counter, and someone will want to forward
+them to be implemented in userspace (when developing a new extension,
+because most of the existing ISA can still be accelerated by KVM).
 
-CPUID_Fn8000001D_EAX_x00 [Cache Properties (DC)] (Core::X86::Cpuid::CachePropEax0)
+For general virtualization, we want to be able to configure the
+following behavior for each exception that would go to the virtualized
+M-mode:
+  0) delegated to the guest
+  1) implemented by userspace
+  2-N) implementations by KVM (ideally zero or one)
 
-DC topology info. Probably not important for this here.
+We can have medeleg, and another method to decide how to handle trapped
+exceptions, but it probably makes more sense to have a per-exception
+ONE_REG that sets how each exception behaves.
 
-and
+The FWFT value could be a part of a more general interface.
 
-CPUID_Fn8000001E_EAX [Extended APIC ID] (Core::X86::Cpuid::ExtApicId)
-
-the extended APIC ID is there.
-
-How is this APIC ID different from the extended APIC ID in
-
-CPUID_Fn0000000B_EDX [Extended Topology Enumeration] (Core::X86::Cpuid::ExtTopEnumEdx)
-
-?
-
-> order of their parsing, and QEMU nuances like [1] where QEMU 0's out the
-> CPUID leaf 0x8000001e on CPUs where Core ID crosses 255 fearing a
-> Core ID collision in the 8 bit field which leads to the reported FW_BUG.
-
-Is that what the hw does though?
-
-Has this been verified instead of willy nilly clearing CPUID leafs in qemu?
-
-> Following were major observations during the debug which the two
-> patches address respectively:
-> 
-> 1. The support for CPUID leaf 0xb is independent of the TOPOEXT feature
-
-Yes, PPR says so.
-
->    and is rather linked to the x2APIC enablement.
-
-Because the SDM says:
-
-"Bits 31-00: x2APIC ID of the current logical processor."
-
-?
-
-Is our version not containing the x2APIC ID?
-
-> On baremetal, this has
->    not been a problem since TOPOEXT support (Fam 0x15 and above)
->    predates the support for CPUID leaf 0xb (Fam 0x17[Zen2] and above)
->    however, in virtualized environment, the support for x2APIC can be
->    enabled independent of topoext where QEMU expects the guest to parse
->    the topology and the APICID from CPUID leaf 0xb.
-
-So we're fixing a qemu bug?
-
-Why isn't qemu force-enabling TOPOEXT support when one requests x2APIC?
-
-My initial reaction: fix qemu.
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Thanks.
 
