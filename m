@@ -1,231 +1,253 @@
-Return-Path: <kvm+bounces-54957-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54958-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7326EB2B9F8
-	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 08:56:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E0F9B2BAEA
+	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 09:39:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0EDD11B66AF7
-	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 06:56:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44366627838
+	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 07:38:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B40AA2773C8;
-	Tue, 19 Aug 2025 06:55:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 402A93101A5;
+	Tue, 19 Aug 2025 07:38:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="IgGViYQV"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TlwaPRIA"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54D0C1A9B58
-	for <kvm@vger.kernel.org>; Tue, 19 Aug 2025 06:55:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755586555; cv=none; b=bLYNPD+FCrbrXfzwzakf5yI7QH3DQcOSD/wDqiR+Mw18YqcUMNSFBm5U8o/m78DoueSC+8oleEJdIOiDhUwrUE77FwcxUUxlGVndgAar700SVIS5XnwlilRz0OD7Gi3zpzb9WkY3jDyWVM4LRjy8mDeoe/Vfgmk9BMRMVHteuro=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755586555; c=relaxed/simple;
-	bh=cwcvHjBq3ZHHAEdVjODAgLKBATseYtqfSkH+x4hKvrY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X4C9I6TgTpsiMmUlSYuEZU1y7LQceh8y4R69kUob8DbSfs3eYfSfD1nZtf0sBZhKOwIAxAroL6RQFBgnwlz7ADHg1ztdsFQO0bOQ2KGqG+L0emPglMd24RKTyUOtTxyOCZLP2iguQ9p+apjqw0Jgw95hZOaTUQjIMk6Me0ZKvCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=IgGViYQV; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57IN8bdu009937;
-	Tue, 19 Aug 2025 06:55:46 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=ZL9I3dAeUBwSSmd2Mm3A1/nztviYjj
-	4MAp6ZmZRWY+U=; b=IgGViYQVGZ6HylRIhF4KhwrVKkHoBBajEoRpPNLgHQU/VX
-	S+tsuJuLChOQU0dnN+UuX3/GO3qHY2EInirL8PMMK+arM1VCeRPoOMZFNo6GNDYx
-	FkzBr35MImRlO5uDQh3Vd9TvrG5rGeQRbZQ66511UdW6lKeEdg063f9gtSL5BpzF
-	4D6GD6IwW21CVfvDywYX97zB4QgowzMSRrchv13niSEMfLKmt7S/rukWDJpoXPpy
-	5ElkUO+ujRb/Q2utBMrRS/BRuDKZgaAzZN5i4i+oALP56GrCDHkiMKEfBm24DRU1
-	IFAFHmvU8WXpQHZcV1aZA/e0pbDbr2McmMw1bs8Q==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48jhny5a5e-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 19 Aug 2025 06:55:46 +0000 (GMT)
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 57J6egom006442;
-	Tue, 19 Aug 2025 06:55:45 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48jhny5a4w-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 19 Aug 2025 06:55:45 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 57J6HaEn003162;
-	Tue, 19 Aug 2025 06:55:44 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 48k6hm8x4y-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 19 Aug 2025 06:55:44 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 57J6teqe19005850
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 19 Aug 2025 06:55:40 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BEFFE20043;
-	Tue, 19 Aug 2025 06:55:40 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 810CB20040;
-	Tue, 19 Aug 2025 06:55:38 +0000 (GMT)
-Received: from li-c6426e4c-27cf-11b2-a85c-95d65bc0de0e.ibm.com (unknown [9.204.207.58])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Tue, 19 Aug 2025 06:55:38 +0000 (GMT)
-Date: Tue, 19 Aug 2025 12:25:33 +0530
-From: Gautam Menghani <gautam@linux.ibm.com>
-To: npiggin@gmail.com, danielhb413@gmail.com, harshpb@linux.ibm.com,
-        pbonzini@redhat.com
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        vaibhav@linux.ibm.com, nicholas@linux.ibm.com
-Subject: Re: [PATCH v2] hw/ppc/spapr_hcall: Return host mitigation
- characteristics in KVM mode
-Message-ID: <aKQf5dYMEsjfPaXa@li-c6426e4c-27cf-11b2-a85c-95d65bc0de0e.ibm.com>
-References: <20250417111907.258723-1-gautam@linux.ibm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7DEA281366;
+	Tue, 19 Aug 2025 07:38:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755589104; cv=fail; b=mO4eOrT63ynlIPsp586wj25UeBb1oz0a+EI7IIJChXw4keceXAZByF1lpQ6+Q5JR3MyHONZec6Iny+oBm5NXoKbA3D6XT9G6XQgsDJOs5w6xtsBPOgTrfuoCeVShkKzyfCqJCi9jbrHP/pWYNhrxRiOe3yNUMT0p+3K6mM4x5J8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755589104; c=relaxed/simple;
+	bh=DHlHueHHrlqTNyGeyH2XxF6R63ukLHf0IC7A7Wzmib8=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=gU5TLVblD0hyKHCSj/KqpAfhnvRoDvz2fboaup5Ba4SKPpcW8OJx4bsRl7RMwB6lnNeG2an2lS2RZRFtxbN2Du+2dtiP2RsKIMPenxKY0GsKra79/fGQ8+sKlDeInC84yb2EznPqqhzwdavsfj2QiELoeYHOist5jancHazAimM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TlwaPRIA; arc=fail smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1755589103; x=1787125103;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=DHlHueHHrlqTNyGeyH2XxF6R63ukLHf0IC7A7Wzmib8=;
+  b=TlwaPRIA2P8o3uo/8WLiyGAXyey2gEcRF44H1FLJhGntIR/DXj+WN73C
+   ybW63wDgt7MRuRUR8O4x6wpMEijkf7ze8tJnpG6nyFrSjvgL+L1+oX7AQ
+   tZiCo2WtCJZHrt5aoFcRAvwzkn+0W1eBLjxMaTjxIFdHtcQrhIkx2zZzM
+   zZbVE4m4m1h7sjDmQGjXudDz0OAGTFBvG1u9rFffsQfOtN1Yu1gtG1CeE
+   RNPK9tOqUSjG7g5pIFcnjGf20N2HDNj0NTzPgzofDgjNufmPjniExjj2Y
+   WS3+hJ6uTir+ikWPS0uj2hoXNYd+N7gchPYuFGTj/Hq59a6dBYY/u6ljy
+   A==;
+X-CSE-ConnectionGUID: rDCtNtNLS/ixP3kchiuMWA==
+X-CSE-MsgGUID: JycOt0eKTO+tQZbWYi0cBQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11526"; a="57751578"
+X-IronPort-AV: E=Sophos;i="6.17,300,1747724400"; 
+   d="scan'208";a="57751578"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2025 00:38:22 -0700
+X-CSE-ConnectionGUID: vjHzvh8cQ1qOrS0v0hR9Zg==
+X-CSE-MsgGUID: A9nN/vg9SLyvYO/zSxOoeQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,300,1747724400"; 
+   d="scan'208";a="173137073"
+Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
+  by orviesa005.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2025 00:38:22 -0700
+Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Tue, 19 Aug 2025 00:38:21 -0700
+Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
+ FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17 via Frontend Transport; Tue, 19 Aug 2025 00:38:21 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (40.107.236.62)
+ by edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Tue, 19 Aug 2025 00:38:21 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=YeaCszdfRtCM/oONYwbyJEgLSUAClD+2gZzVTkPmZ+Ht2o0Rr4ZlgqnznFIYGICEyuBKjG1MgYdMoKDT1bp/+bdWimVRJd8xVHigf66xAF8VdtzWcihvkxZCYygiblTsqLMV7+iIQ41NSmdRDB/wubBHMC0vP9JYZc0pHhnLm2o7z/edZDZQfhfWapQq2rGtd9X/YFxMDDHM/rKoHM+NulwtUl+A1vaP5iOnFNEB/3Tu6QuwcEJVDGbtyzcFilgnGBPWASfiiyYOQg6x4dEMWsQIl+PTosmEiY4lNmAUz/paA5D/pMhG7L5J6XFmr8uFr3y7KkZKtZLxnKwen7y5aw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=M8QGgtgG2PT9wNxymzcJ9nPihBi/W2+JQhYYyyiFHEs=;
+ b=f6lsRmkDzrch8FMPfKefgnUptImZDPyTyT7ECXGClapxi5uvoLbHUjdn38ZO4iIHqVW7eSGPmpSR0/eyPYQDeoN3x9SUXmCka8e80YEUtqhaGILgWhsJndc3u1cd7CP4xTOF2EV2wQiJxLnd+iNWZaAKjPOGLnd5Cg20cYMJuf20oPQwHVxdIXP4X6h1HG6frBATgIjNd0ndABdGBsIXbAROhAD6qjQlELPCAxZ3sjmGfMwt/iWnpy6FtovaFxococMZZOdNCnEGvY0OWMepGvX1RRPA6YjYpirFxfsEpvJzbLFV/3P4RLO+nWAbLLlQAfGekBZY8vYjrJZOWbivdQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from IA1PR11MB7198.namprd11.prod.outlook.com (2603:10b6:208:419::15)
+ by LV2PR11MB6071.namprd11.prod.outlook.com (2603:10b6:408:178::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9031.23; Tue, 19 Aug
+ 2025 07:38:17 +0000
+Received: from IA1PR11MB7198.namprd11.prod.outlook.com
+ ([fe80::eeac:69b0:1990:4905]) by IA1PR11MB7198.namprd11.prod.outlook.com
+ ([fe80::eeac:69b0:1990:4905%5]) with mapi id 15.20.9031.023; Tue, 19 Aug 2025
+ 07:38:17 +0000
+Message-ID: <968d2750-cbd6-47cb-b2fc-d0894662dafc@intel.com>
+Date: Tue, 19 Aug 2025 10:38:12 +0300
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC 1/2] KVM: TDX: Disable general support for MWAIT in
+ guest
+To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>, "seanjc@google.com"
+	<seanjc@google.com>
+CC: "Gao, Chao" <chao.gao@intel.com>, "Huang, Kai" <kai.huang@intel.com>,
+	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, "Chatre, Reinette"
+	<reinette.chatre@intel.com>, "Li, Xiaoyao" <xiaoyao.li@intel.com>,
+	"kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+	"tony.lindgren@linux.intel.com" <tony.lindgren@linux.intel.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pbonzini@redhat.com"
+	<pbonzini@redhat.com>, "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Zhao, Yan Y"
+	<yan.y.zhao@intel.com>, "Weiny, Ira" <ira.weiny@intel.com>, "Brown, Len"
+	<len.brown@intel.com>
+References: <20250816144436.83718-1-adrian.hunter@intel.com>
+ <20250816144436.83718-2-adrian.hunter@intel.com>
+ <aKMzEYR4t4Btd7kC@google.com>
+ <136ab62e9f403ad50a7c2cb4f9196153a0a2ef7c.camel@intel.com>
+Content-Language: en-US
+From: Adrian Hunter <adrian.hunter@intel.com>
+Organization: Intel Finland Oy, Registered Address: c/o Alberga Business Park,
+ 6 krs, Bertel Jungin Aukio 5, 02600 Espoo, Business Identity Code: 0357606 -
+ 4, Domiciled in Helsinki
+In-Reply-To: <136ab62e9f403ad50a7c2cb4f9196153a0a2ef7c.camel@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: DU7P194CA0020.EURP194.PROD.OUTLOOK.COM
+ (2603:10a6:10:553::11) To IA1PR11MB7198.namprd11.prod.outlook.com
+ (2603:10b6:208:419::15)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250417111907.258723-1-gautam@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=XbqJzJ55 c=1 sm=1 tr=0 ts=68a41ff2 cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=kj9zAlcOel0A:10 a=2OwXVqhp2XgA:10 a=voM4FWlXAAAA:8 a=VnNF1IyMAAAA:8
- a=WI5HHvvhWpJfBEWMsrIA:9 a=CjuIK1q_8ugA:10 a=IC2XNlieTeVoXbcui8wp:22
-X-Proofpoint-ORIG-GUID: f1CBjWWrY0tXtanfq553VbP_n2cSEyTQ
-X-Proofpoint-GUID: sS8IRelWu9tR4f4aR83vp9FLpt8r9YfJ
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODE2MDAyNyBTYWx0ZWRfX8cy78OUZ2VTx
- VAZ9IhW5ZalLrFw1x7mYWtZvNMrzQEQ3INs4F0IZmweG+p+mErnosEsia+iUTJHfAiuwBdxpAHR
- BMhHWQ5r07MHzCJX+H6RifvZ34Qp1lWTQAYLfcYAcvOmpZGYcSjZxnpCDgwbDhuB+/7p2Vl6oio
- 03H9r5HnxpI3aHFy23PcK6Pg2clnF8N2mdOjiruC8UPJsJxK05sK24qsX7gyXyB1SHvsXrkccXF
- GTkywvqCAObHAxMvBbZTHnW4Af0U3vlRKQUOPnqqsjuLP6e8aa1kdw9oROeTykB9bQGDLu0+1lD
- epXZ05MzVPtSThvc4chPbu2rfECYVQuwSU7kzIl8yX8QWwSjie+hGuvKkjztm6cqzODwfCxU7Rk
- kGhS5gh7
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-08-19_01,2025-08-14_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 adultscore=0 suspectscore=0 priorityscore=1501 bulkscore=0
- clxscore=1015 malwarescore=0 spamscore=0 impostorscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2508160027
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: IA1PR11MB7198:EE_|LV2PR11MB6071:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5e48e52b-da00-4a0d-7b73-08dddef35ce5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?anE0UVovUG1hWGFpTXNyejJTV29EMlo3TTJVVGlzcTZQaVlPb0F5T3NVb0tB?=
+ =?utf-8?B?SDBmU2NrL1hVdUp0SkNLenh3aDJTcGFKYUh1L1dJbzNENGNPTjdDY0RTQzFk?=
+ =?utf-8?B?Z2ZkdU5ERGkxYThIK3BTQWdVNG1DWm9seCtWeFJHdUQxSlFHaWhxMFlhcExu?=
+ =?utf-8?B?YURzRTl0bFUrWUhUNzBaeXNSd1l4RGtoV2pmUEQzOTVHRjA5YTBFOU5ITzhv?=
+ =?utf-8?B?WFVjWk1YSDF5WVBtN2lOY3FuZUdCMHNKSFFWeG9RV2NlSnIydWxYQjE4c3Fu?=
+ =?utf-8?B?NVpTdjlka0ppbVBIeEkxZEQyWmNmdDVXUUNUdXk1bXU1QTlxM2tzNkRxUElE?=
+ =?utf-8?B?K0xzYm5YNUNIaWxIaW5pZXE0N0JuLy8zbkF5anE0aE1oS2NHRzdnS3NPOVdK?=
+ =?utf-8?B?S3J1ZjZhOEo2ODJ0QlBXa3laMWM1UWVZRkZkbGpVMStIVTY0bVBLajVNaVhH?=
+ =?utf-8?B?OEdIbmZOeUQxaXVvdmtqMzJQN2pzNjZvaDdSdXA5Tm5EaHFkaTE3TnpETWhk?=
+ =?utf-8?B?Tkp4WEorRFhJZ0U4QlZRYUZWdzhhN0pxcE9wL3VpcVBtMllhYjlBWXNobVlK?=
+ =?utf-8?B?bi94MHRnb0FrL1lLMmpkNkN4ZmxrRC9zM1Y0YWVLeGtPaCt2bk9DWUVJejVx?=
+ =?utf-8?B?Z05IVmlKd1UwNWtQQmo0aXFNdEFnMkZ6UDQ4TjI5T29YOEZZZ3d5aEZIejJV?=
+ =?utf-8?B?VUsvRHBpWGFka3kzcFdsMStXdXgvbFJsR2tFYjFxdjNCM3dyTUVzQWxQY2JO?=
+ =?utf-8?B?dUY2cHZ6a203bTViV0d2ajV1aEtHaDB2UWU3RTZrQnEwOHJhVEo0OVMyNy9Y?=
+ =?utf-8?B?NFg3bVdXUVU0YU1hdlRLdWUyOTgzTk54emJrWmVFVUgyN0o3cHFWUVpEeEJi?=
+ =?utf-8?B?Zm0vWHg1N2pCc2JNeVVMWHVwenNyeVIrclJjNGpLa3ZRSERjdVF0cXZHbG5Q?=
+ =?utf-8?B?N25zTU5ieWRMVDJzV2JFWmE2U0Y5TGlmTmlFaUxMNXJjaTdqQys4Q2IwQ0tW?=
+ =?utf-8?B?TVJxSGhNd2FkNnRLTG1PMCszVUZNTzFSQlUvOTVOSUNvWWNUYnRUOTdaV043?=
+ =?utf-8?B?emhETnNpSFR0Z0R4TmFMRVl4K3ZTZEFFdWlOTFdTT2pTQnVpTE1lVC81RnRk?=
+ =?utf-8?B?ckxudDBWR1RyenhHYk8yZGdBeGNlQnY3eEtpMUdNcHlKbnJOT0k4ZFdkc3lW?=
+ =?utf-8?B?QjdHNFlSUFByNjBFWGprS3o0SGc0T1ZLdzZlWlVGV25tcVUzOUIwRXZGb3lK?=
+ =?utf-8?B?Nkl0NEpTc2RRTjJ2THExcGJjajFHMTZTR1BteHZueFl6SFZuaVI2ejFLVk1T?=
+ =?utf-8?B?eE16aGRLTVRXZ0FMOXE1d2dpT2p5MUhTQ3gzRFEyUzJxUGFWM290VUdWYVhL?=
+ =?utf-8?B?Y0N2TXdvc3BoZUsySGZ1c2lEOFpvMjZ1cjBROGQ2Q05kWENMQkJ3VE1LYm1N?=
+ =?utf-8?B?TGpWMnVRdVltcmY0TUNwWDhVb0RtTk83STNxZmdGalZ1aGRuMjRpQm93T2lN?=
+ =?utf-8?B?eHZldklvQy9zYXUvTzBuRkNCd0prY1JjaVJiU0JIWjJqN1VEWVhSb0Y0dUtn?=
+ =?utf-8?B?SGViM2JMRXMyL09jQjRWdFBjQzUrR2VyczFqQlRZdVp6VHJxT3BrNlNRaXRj?=
+ =?utf-8?B?VEU1aGhuUHBqbzFJN2h6dElveDZCUzZGa3hKT2JaMmVOMHNmcDZRbU05NDFQ?=
+ =?utf-8?B?eDJhVmR6dzYyYnpYdGNwdUtFLzVFVWt3ckcxa0I4NlJCUmtLeStHNldRMmRr?=
+ =?utf-8?B?YjNSYmJMbzg0UGQ5N1AyT09YN1MzQ1l6Sk9mcnc5QjVBUXp3aW4rdmhPS3Iv?=
+ =?utf-8?B?amVKV05aNDN6blVDR1QyR1E1elBVcThTZ0YvRHhucnhyMEVYWEQ1YWphL09K?=
+ =?utf-8?B?bW5Ic3NXdXRKS0UwN2MzZjgrZWJhclg5ZXRVR2l1MHVaOHc9PQ==?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB7198.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?K2F0aTdhTXhHWnptR3VObjBMTTZZY283Njg3Ky9VQVQ3TUNjdEY0NElhQnJN?=
+ =?utf-8?B?eXlHRU0zMGN0Q3lTTUZCYklWUHo3eGt3Zy92MzlvVWdDaVh3L1FSWWxqcVZ1?=
+ =?utf-8?B?WnkzU2J2MGsxWkpjVy8zM1R4YmFaRmZ2ZG5FdUdiSDdreXNJRlhMeklFLzBX?=
+ =?utf-8?B?b09JUDBrdTVDWVUxRHY2UHJBNDlMb0ZHZUtSaldnaGhWWHFmTjhSZ2R1NUsv?=
+ =?utf-8?B?amxVTXFoVTUxRUxUVGFDQy9BWS9rbXp2NGdydHY3RnBVNEg1ZWVxbGhCOGVE?=
+ =?utf-8?B?clRheEo5U05zNVNmeW1pVjA3ejN5dFNmV1p3WVlreTNVcFUyWHQ0ZFluWk0z?=
+ =?utf-8?B?Z1dQRmh2MmpVZjIwU0RTb2FacTlIOGV4VWdENndiRkVvZnpodzZYekVMdjAz?=
+ =?utf-8?B?R0RTem40MmY3ZEtFbjkvZTBGK2VUdVB1VTd1bGUyVS80MGp2QUs1R05EQ0gz?=
+ =?utf-8?B?eUcrdXNFemQvOFlwT1ZTL1R3enRHWTY2d2pMSnFBUE9GLzVvUmxobkVTZDVL?=
+ =?utf-8?B?TUdRdXBsdEY4ck84eVBHWG0yZUtCYy9USVJhNmdDdU1EYjlvanVpUC9pU2VS?=
+ =?utf-8?B?eGg0RERJOVo3SGFoWnBZdnF4Uys1dS83NGo2UGd1R2oxUm9OYURDWC9GUHJ5?=
+ =?utf-8?B?RnU2Q0RNam9hb002ZXJIZHRWQ3pRTUthZmVuaWwzazdIbGFMdlIyRU9FdEQ0?=
+ =?utf-8?B?NGVUU0M0L1pqVys4ZXlEMUpGSUVETDEwU1RrTWFrRDI2eUNkZ0QyWGRBV1pL?=
+ =?utf-8?B?NzlFN2JnVmNFNW9zRXBsd1QvK0Q2akYyS0hKY0hlNWQ4SnpWR29GdlBEdVFu?=
+ =?utf-8?B?WXZRWFhkQ2t6cjJDd3M2cS92Z1NUdWVoeE1FeGNhb1pzMEVtVml0V1BaMDlx?=
+ =?utf-8?B?V0wyU2Y3WUpIUENXRWNOZS9mMVkxQVM3MlVscmdLQ2kyK2hpZzIwalJac29U?=
+ =?utf-8?B?SEs2MkZSNy9aTnhRYlBWVEVFU2R1MVF0NHZyWGtvcTVnZUcvMitabGdSeVdH?=
+ =?utf-8?B?UGNKZDdPbXdITitkRmFaMGo2dWtQYTJTQzkzY0FWM1lrYllLSDNYQTJxTnRF?=
+ =?utf-8?B?UTlob1ZudmpaKzJvazhiYTJwR0VjaHlLTU16amZST3BqOEVzdDVOZmF1Q3Fq?=
+ =?utf-8?B?WWJydldocHhPVTBTZUZKVmVsRmJhczhzWUt6anVEYmdYeGk4OE5oV09pc3Fv?=
+ =?utf-8?B?T0F1QTFxazNRcG9hR2dJZ3Z3a0V2U3ViWFRKREh5RDlkTk5Ob2lEYnhwaFB3?=
+ =?utf-8?B?bkRzQnl6MGhXU001YnQ3d2YyUytrM29qOEttakV5ZmZFNzBJVXdTZnhJZkFF?=
+ =?utf-8?B?VkUvV1kxSUhHYmtBeS9LWWNZZGZqck9OUnU4ZThGTUQxNEtHY2JGTGlLVUlS?=
+ =?utf-8?B?TnlyOXdXQ1M5M2ZmbVYzdGkvV1EwSkVudW1DQnVnR3ZrNWRzVWloU2F2Y0ZC?=
+ =?utf-8?B?TFZIK0NFV09DRnJoTVNRN3FBdGhSS0VvblBXMUNoQXlOeTNFN3lzSFBGaW9L?=
+ =?utf-8?B?V21PcnlOUTZsVURGUWM2U3JmaUxJYVhjRExXQldHUVJ1Y3pUWGJiSnhScERQ?=
+ =?utf-8?B?RXE5L1pLRmc1V3ArVytER2NFQXRQbFF4aGpSQkFYQ1Q3Nm4yT3FlejgrWitl?=
+ =?utf-8?B?NXFDYmdCbEhXUG1hdEdscWxRQmtlRDZ6TVB0cEtZdWZuRFpPOWRRNkFkcHJ1?=
+ =?utf-8?B?Q2FWYmNQU2tXcStkaGl6SjdlNG9Sck1ZcnErclRsY29aRzl6V1M4YnNHN3lm?=
+ =?utf-8?B?cVFTcVhOSnhxaUhETDdLakdTRzZ1YWtJSEMvTUhhWENtNVNScHVOcE5lbmhj?=
+ =?utf-8?B?cmNxNWNnLzA2U1Vwamh4VWdKZE1yK0ZmL1RKeWpxSGlaOWQ0REd0TzNQMjJ5?=
+ =?utf-8?B?K0x0bGFWOHhidUtkQjJPQmtuc0JDTVBCMG5OTEpzeldaNGpxS1JKOFIxVW16?=
+ =?utf-8?B?WVRWTElya0hjUmIxWjc0NndwV1FaZXR5ZUgxQ0cxbXNYVkI2VGJQcDBNa1oy?=
+ =?utf-8?B?RHh4ckgwNHBBMzRid1pSNGJhQUo2YWJMQWZYZ0xWMjU5Sy9qZkd1OHRTMUFv?=
+ =?utf-8?B?d0k2ZXlES0FZRGhPcFRxK2hrejZ4QTBGRk9EYTB0YUdvUnVkMHFoTC9heVJt?=
+ =?utf-8?B?d21ZZGpIWlhOVEpuT3ZQUGZzS0o2cWNQRnFnVHFLMWM4MGN5ai9icyttemY0?=
+ =?utf-8?B?SUE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5e48e52b-da00-4a0d-7b73-08dddef35ce5
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB7198.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Aug 2025 07:38:17.5747
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: LEkiqjuD4B4czikiF7jM1GCjtTo0JbuIp1arSQvOD0j7AaTBLzEu/VgzwG1VJQZdFF9/vtnrI2n6fbCinlEWOA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR11MB6071
+X-OriginatorOrg: intel.com
 
+On 18/08/2025 21:49, Edgecombe, Rick P wrote:
+> Attn: Binbin, Xiaoyao
+> 
+> On Mon, 2025-08-18 at 07:05 -0700, Sean Christopherson wrote:
+>> NAK.
+>>
+>> Fix the guest, or wherever else in the pile there are issues.  KVM is NOT carrying
+>> hack-a-fixes to workaround buggy software/firmware.  Been there, done that.
+> 
+> Yes, I would have thought we should have at least had a TDX module change option
+> for this.
 
-+ Nicholas M (Forgot to include the text in the prev mail, please ignore
-that)
+That would not help with existing TDX Modules, and would possibly require
+a guest opt-in, which would not help with existing guests.  Hence, to start
+with disabling the feature first, and look for another solution second.
 
-On Thu, Apr 17, 2025 at 04:49:03PM +0530, Gautam Menghani wrote:
-> Currently, on a P10 KVM guest, the mitigations seen in the output of
-> "lscpu" command are different from the host. The reason for this
-> behaviour is that when the KVM guest makes the "h_get_cpu_characteristics"
-> hcall, QEMU does not consider the data it received from the host via the
-> KVM_PPC_GET_CPU_CHAR ioctl, and just uses the values present in
-> spapr->eff.caps[], which in turn just contain the default values set in
-> spapr_machine_class_init().
+In the MWAIT case, Sean has rejected supporting MSR_PKG_CST_CONFIG_CONTROL
+even for VMX, because it is an optional MSR, so altering intel_idle is
+being proposed.
+
 > 
-> Fix this behaviour by making sure that h_get_cpu_characteristics()
-> returns the data received from the KVM ioctl for a KVM guest.
+> But side topic. We have an existing arch TODO around creating some guidelines
+> around how CPUID bit configuration should evolve.
 > 
-> Perf impact:
-> With null syscall benchmark[1], ~45% improvement is observed.
-> 
-> 1. Vanilla QEMU
-> $ ./null_syscall
-> 132.19 ns     456.54 cycles
-> 
-> 2. With this patch
-> $ ./null_syscall
-> 91.18 ns     314.57 cycles
-> 
-> [1]: https://ozlabs.org/~anton/junkcode/null_syscall.c
-> 
-> Signed-off-by: Gautam Menghani <gautam@linux.ibm.com>
-> ---
-> v1 -> v2:
-> Handle the case where KVM_PPC_GET_CPU_CHAR ioctl fails
-> 
->  hw/ppc/spapr_hcall.c   |  6 ++++++
->  include/hw/ppc/spapr.h |  1 +
->  target/ppc/kvm.c       | 13 ++++++++++---
->  3 files changed, 17 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> index 5e1d020e3d..d6db1bdab8 100644
-> --- a/hw/ppc/spapr_hcall.c
-> +++ b/hw/ppc/spapr_hcall.c
-> @@ -1402,6 +1402,12 @@ static target_ulong h_get_cpu_characteristics(PowerPCCPU *cpu,
->      uint8_t count_cache_flush_assist = spapr_get_cap(spapr,
->                                                       SPAPR_CAP_CCF_ASSIST);
->  
-> +    if (kvm_enabled() && spapr->chars.character) {
-> +        args[0] = spapr->chars.character;
-> +        args[1] = spapr->chars.behaviour;
-> +        return H_SUCCESS;
-> +    }
-> +
->      switch (safe_cache) {
->      case SPAPR_CAP_WORKAROUND:
->          characteristics |= H_CPU_CHAR_L1D_FLUSH_ORI30;
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index af4aa1cb0f..c41da8cb82 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -280,6 +280,7 @@ struct SpaprMachineState {
->      Error *fwnmi_migration_blocker;
->  
->      SpaprWatchdog wds[WDT_MAX_WATCHDOGS];
-> +    struct kvm_ppc_cpu_char chars;
->  };
->  
->  #define H_SUCCESS         0
-> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> index 3efc28f18b..fec7bcc347 100644
-> --- a/target/ppc/kvm.c
-> +++ b/target/ppc/kvm.c
-> @@ -2499,7 +2499,8 @@ bool kvmppc_has_cap_xive(void)
->  
->  static void kvmppc_get_cpu_characteristics(KVMState *s)
->  {
-> -    struct kvm_ppc_cpu_char c;
-> +    SpaprMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
-> +    struct kvm_ppc_cpu_char c = {0};
->      int ret;
->  
->      /* Assume broken */
-> @@ -2509,18 +2510,24 @@ static void kvmppc_get_cpu_characteristics(KVMState *s)
->  
->      ret = kvm_vm_check_extension(s, KVM_CAP_PPC_GET_CPU_CHAR);
->      if (!ret) {
-> -        return;
-> +        goto err;
->      }
->      ret = kvm_vm_ioctl(s, KVM_PPC_GET_CPU_CHAR, &c);
->      if (ret < 0) {
-> -        return;
-> +        goto err;
->      }
->  
-> +    spapr->chars = c;
->      cap_ppc_safe_cache = parse_cap_ppc_safe_cache(c);
->      cap_ppc_safe_bounds_check = parse_cap_ppc_safe_bounds_check(c);
->      cap_ppc_safe_indirect_branch = parse_cap_ppc_safe_indirect_branch(c);
->      cap_ppc_count_cache_flush_assist =
->          parse_cap_ppc_count_cache_flush_assist(c);
-> +
-> +    return;
-> +
-> +err:
-> +    memset(&(spapr->chars), 0, sizeof(struct kvm_ppc_cpu_char));
->  }
->  
->  int kvmppc_get_cap_safe_cache(void)
-> -- 
-> 2.49.0
-> 
+> A new directly configurable CPUID bit that affects host state is an obvious no-
+> no. But how about a directly configurable bit that can't hurt the host, but
+> requires host changes to virtualize in an x86 arch compliant way? (not quite
+> like this MWAIT case)
+
+It is still "new stuff that breaks old stuff" which is generally
+"just don't do that".
+
 
