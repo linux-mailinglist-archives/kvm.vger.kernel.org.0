@@ -1,144 +1,150 @@
-Return-Path: <kvm+bounces-54966-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54967-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA9D1B2BCA8
-	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 11:11:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF540B2BCC8
+	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 11:15:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7FED81784FA
-	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 09:10:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A85461893AEF
+	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 09:13:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A577E315781;
-	Tue, 19 Aug 2025 09:09:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fYXNToH9"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B26031A043;
+	Tue, 19 Aug 2025 09:13:01 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7EDF315765
-	for <kvm@vger.kernel.org>; Tue, 19 Aug 2025 09:09:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D7101F37D3;
+	Tue, 19 Aug 2025 09:12:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755594545; cv=none; b=Ob2g8Jsp4eMPiaf7+oeqW8yzshC0TgEMCKhVfLIzbpO4840Zfq4jngQnHTBOGwhuMwhCiY9D4ewSbcjCyIBZ93F2CLih93Zv7HVDi2o9MyEgC0SaxKOk4EpkzYyO6awdDoAwLOB/o1HixCiXkebW5YY+zR7If8cP0DDar72B3VQ=
+	t=1755594781; cv=none; b=ZBV2wMncqr1KYlDewfEGcxsfDoHxxpcwNFGcwOIV4blAcuyui+tAeIwT5r0bc/2Cx36RJ66Oa7dLo1zNNCWLtXm3EU1XlAkLAYCss4aTMQOVKKBvxy52UOsdH9tUkaxxCBDAFaGvZBvwAUdxXJAdU7ur69eHpBCbXbGNL3BSyJU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755594545; c=relaxed/simple;
-	bh=H2tOAJiT9+UKslPsSm2DpbqQjItGsMTWZFtsWcCliJo=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=NNneBp7ZFZsMqklF562b+7PJ+skc4K1Bo+1Eg7GDuxvmwok0bV0Dhtj7R7UyaAktahs57vFCFc5G0UrYgejTk4iBBmpEEAr2llo8p4EafS8/Ty2aLFcfo1kPP0ndeD54CzCX305k/NAb9vWuFFj1XjgE9tqqJ/zBAuQq4156yQU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--keirf.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fYXNToH9; arc=none smtp.client-ip=209.85.221.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--keirf.bounces.google.com
-Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-3b9dc5c2c7dso2779052f8f.1
-        for <kvm@vger.kernel.org>; Tue, 19 Aug 2025 02:09:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755594542; x=1756199342; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Dryunec7C15FT43WsTYqyK8BC2tH9vRzD5ncvT1VTyI=;
-        b=fYXNToH9tEqgbEMXVOP5e5crtcIxIxr+Uk7zs27IWvQhA5rlV9cw2n5Gr4i1RSqO9u
-         OSUsTNsfQw40GtiIQ8viYHgfpbsyxzt+Y4Z4OeLH4CqfSZBu6iT85sZ3N+lIfq0nJsmt
-         OSHbojn6RtuhFGZrgsgTRoP5qrfN4Yu0TTnvhF+DHThf/qKRMmgbo/CmNIGlfYXGfjb5
-         h7baHupfizv+ggwN787/wgd9mvqjLHrFrLc530OfPDPrg/iseoFcii4f2xX4/PyBk8+I
-         q18KOIViTOhkj61WHgqWOgyt3cxVfK/lqmXeQlZaGUNbpunOpwzodlVsbG/detztO2GL
-         gObg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755594542; x=1756199342;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Dryunec7C15FT43WsTYqyK8BC2tH9vRzD5ncvT1VTyI=;
-        b=A+BqWjHbwOEeXcJubBkRrEavMERF04x0rgjlDM5wyJAk/cDn51dkvSne9pUxfgLMYd
-         yMSObgY973tRvl7RsgEdVyBpRycYy4jiyJm7/22oAkuOMF5gFzwoi3mZp5Ae1poJgJZV
-         kDaqK782zYdKLHt135OBOWYApou3o6++ygyQiPsLA4qMvmQJs3vXcufk8QrN9iztlFiy
-         xU0XGQqk4eSHEzIVAFvphEB0USplQaQofaQ4A1rKiaD4ld+6YV+isvu6UfGKTNFk2VmA
-         Pdku60Ve5Co1kPqo1bN04Hbnaod3crCZ9JEIpBdFCnU2SGbuh56Mg6OmvyU7P/5wx3gW
-         YvCg==
-X-Forwarded-Encrypted: i=1; AJvYcCXJX1w/BFu4Qz3X2lBY/PZ5uo1uyoq+S//Vd1YRVD7OVnCT3jv7EF3BPDHV8Gz3JpeAfEo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFa0nqGW3LtRtyCfHo8KV6g/xlLsT5BaQITWdsB8QxuFXJSQkG
-	YskXz7Aq0QfKebXCm8mfP8A/rm+jdFJIvj4CmRiIPGLt2KLpTcE0dWbifYn8/MYNKJ07/Sg0YNi
-	Zwg==
-X-Google-Smtp-Source: AGHT+IEWZK/S3bmfcTBpMD/OWSO9i/fgVmwIt0LtH8csguKl7P4ZrXGSAdstuEmNYdGpRILLFl16F7mudg==
-X-Received: from wrqx7.prod.google.com ([2002:a5d:4907:0:b0:3b7:8342:dc50])
- (user=keirf job=prod-delivery.src-stubby-dispatcher) by 2002:a5d:64ef:0:b0:3b7:9c28:f846
- with SMTP id ffacd0b85a97d-3c0ed1f3372mr1452415f8f.44.1755594542204; Tue, 19
- Aug 2025 02:09:02 -0700 (PDT)
-Date: Tue, 19 Aug 2025 09:08:53 +0000
-In-Reply-To: <20250819090853.3988626-1-keirf@google.com>
+	s=arc-20240116; t=1755594781; c=relaxed/simple;
+	bh=hXe6cu82I37r/ZgzXhcA4iE+0B4LveUt+ziarZH2QgU=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=ssSujr7W9Y/UJ8CNpFRGhmGJjK7yeqyqKZnoi9xG6FqO59vri9hr+GkBA3ZoU26reNjZ1Vi5fxyKIcE+2zmeelo1/SMh44odMLUG+HKgXEk2oKkVsheCwpyU+uJ6fGyKdvuDrrPtxdOHnUiIKiSvOowW2BFvSGfcbNDpw2p7JCU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4c5kPt6G8Fz14MbM;
+	Tue, 19 Aug 2025 17:12:50 +0800 (CST)
+Received: from dggpemf500015.china.huawei.com (unknown [7.185.36.143])
+	by mail.maildlp.com (Postfix) with ESMTPS id 3A46C1402EB;
+	Tue, 19 Aug 2025 17:12:54 +0800 (CST)
+Received: from [10.67.121.110] (10.67.121.110) by
+ dggpemf500015.china.huawei.com (7.185.36.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 19 Aug 2025 17:12:53 +0800
+Subject: Re: [PATCH v7 2/3] migration: qm updates BAR configuration
+To: <alex.williamson@redhat.com>, <jgg@nvidia.com>,
+	<herbert@gondor.apana.org.au>, <shameerali.kolothum.thodi@huawei.com>,
+	<jonathan.cameron@huawei.com>
+CC: <linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linuxarm@openeuler.org>
+References: <20250805065106.898298-1-liulongfang@huawei.com>
+ <20250805065106.898298-3-liulongfang@huawei.com>
+From: liulongfang <liulongfang@huawei.com>
+Message-ID: <d369be68-918a-dcad-e5dd-fd70ec42516c@huawei.com>
+Date: Tue, 19 Aug 2025 17:12:52 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250819090853.3988626-1-keirf@google.com>
-X-Mailer: git-send-email 2.51.0.rc1.193.gad69d77794-goog
-Message-ID: <20250819090853.3988626-5-keirf@google.com>
-Subject: [PATCH v3 4/4] KVM: Avoid synchronize_srcu() in kvm_io_bus_register_dev()
-From: Keir Fraser <keirf@google.com>
-To: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org
-Cc: Sean Christopherson <seanjc@google.com>, Eric Auger <eric.auger@redhat.com>, 
-	Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Keir Fraser <keirf@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+In-Reply-To: <20250805065106.898298-3-liulongfang@huawei.com>
+Content-Type: text/plain; charset="gbk"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
+ dggpemf500015.china.huawei.com (7.185.36.143)
 
-Device MMIO registration may happen quite frequently during VM boot,
-and the SRCU synchronization each time has a measurable effect
-on VM startup time. In our experiments it can account for around 25%
-of a VM's startup time.
+On 2025/8/5 14:51, Longfang Liu wrote:
+> On new platforms greater than QM_HW_V3, the configuration region for the
+> live migration function of the accelerator device is no longer
+> placed in the VF, but is instead placed in the PF.
+> 
+> Therefore, the configuration region of the live migration function
+> needs to be opened when the QM driver is loaded. When the QM driver
+> is uninstalled, the driver needs to clear this configuration.
+> 
+> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
+> Reviewed-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> 
+> Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+> ---
+>  drivers/crypto/hisilicon/qm.c | 29 +++++++++++++++++++++++++++++
+>  1 file changed, 29 insertions(+)
+> 
+> diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+> index 7c41f9593d03..b5ce9b1e9c56 100644
+> --- a/drivers/crypto/hisilicon/qm.c
+> +++ b/drivers/crypto/hisilicon/qm.c
+> @@ -242,6 +242,9 @@
+>  #define QM_QOS_MAX_CIR_U		6
+>  #define QM_AUTOSUSPEND_DELAY		3000
+>  
+> +#define QM_MIG_REGION_SEL		0x100198
+> +#define QM_MIG_REGION_EN		0x1
+> +
+>   /* abnormal status value for stopping queue */
+>  #define QM_STOP_QUEUE_FAIL		1
+>  #define	QM_DUMP_SQC_FAIL		3
+> @@ -3004,11 +3007,36 @@ static void qm_put_pci_res(struct hisi_qm *qm)
+>  	pci_release_mem_regions(pdev);
+>  }
+>  
+> +static void hisi_mig_region_clear(struct hisi_qm *qm)
+> +{
+> +	u32 val;
+> +
+> +	/* Clear migration region set of PF */
+> +	if (qm->fun_type == QM_HW_PF && qm->ver > QM_HW_V3) {
+> +		val = readl(qm->io_base + QM_MIG_REGION_SEL);
+> +		val &= ~BIT(0);
+> +		writel(val, qm->io_base + QM_MIG_REGION_SEL);
+> +	}
+> +}
+> +
+> +static void hisi_mig_region_enable(struct hisi_qm *qm)
+> +{
+> +	u32 val;
+> +
+> +	/* Select migration region of PF */
+> +	if (qm->fun_type == QM_HW_PF && qm->ver > QM_HW_V3) {
+> +		val = readl(qm->io_base + QM_MIG_REGION_SEL);
+> +		val |= QM_MIG_REGION_EN;
+> +		writel(val, qm->io_base + QM_MIG_REGION_SEL);
+> +	}
+> +}
+> +
+>  static void hisi_qm_pci_uninit(struct hisi_qm *qm)
+>  {
+>  	struct pci_dev *pdev = qm->pdev;
+>  
+>  	pci_free_irq_vectors(pdev);
+> +	hisi_mig_region_clear(qm);
+>  	qm_put_pci_res(qm);
+>  	pci_disable_device(pdev);
+>  }
+> @@ -5630,6 +5658,7 @@ int hisi_qm_init(struct hisi_qm *qm)
+>  		goto err_free_qm_memory;
+>  
+>  	qm_cmd_init(qm);
+> +	hisi_mig_region_enable(qm);
+>  
+>  	return 0;
+>  
+> 
 
-Replace the synchronization with a deferred free of the old kvm_io_bus
-structure.
+Hello, Herbert. There is a patch in this patchset that modifies the crypto subsystem.
+Could this patch be merged into the crypto next branch?
 
-Signed-off-by: Keir Fraser <keirf@google.com>
----
- include/linux/kvm_host.h |  1 +
- virt/kvm/kvm_main.c      | 10 ++++++++--
- 2 files changed, 9 insertions(+), 2 deletions(-)
-
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index e7d6111cf254..103be35caf0d 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -206,6 +206,7 @@ struct kvm_io_range {
- struct kvm_io_bus {
- 	int dev_count;
- 	int ioeventfd_count;
-+	struct rcu_head rcu;
- 	struct kvm_io_range range[];
- };
- 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 4f35ae23ee5a..9144a0b4a268 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -5953,6 +5953,13 @@ int kvm_io_bus_read(struct kvm_vcpu *vcpu, enum kvm_bus bus_idx, gpa_t addr,
- }
- EXPORT_SYMBOL_GPL(kvm_io_bus_read);
- 
-+static void __free_bus(struct rcu_head *rcu)
-+{
-+	struct kvm_io_bus *bus = container_of(rcu, struct kvm_io_bus, rcu);
-+
-+	kfree(bus);
-+}
-+
- int kvm_io_bus_register_dev(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
- 			    int len, struct kvm_io_device *dev)
- {
-@@ -5991,8 +5998,7 @@ int kvm_io_bus_register_dev(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
- 	memcpy(new_bus->range + i + 1, bus->range + i,
- 		(bus->dev_count - i) * sizeof(struct kvm_io_range));
- 	rcu_assign_pointer(kvm->buses[bus_idx], new_bus);
--	synchronize_srcu_expedited(&kvm->srcu);
--	kfree(bus);
-+	call_srcu(&kvm->srcu, &bus->rcu, __free_bus);
- 
- 	return 0;
- }
--- 
-2.51.0.rc1.193.gad69d77794-goog
-
+Thanks.
+Longfang.
 
