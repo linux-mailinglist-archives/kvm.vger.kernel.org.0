@@ -1,171 +1,186 @@
-Return-Path: <kvm+bounces-55007-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55008-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F1F4B2C904
-	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 18:04:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDB67B2C91C
+	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 18:09:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E0B151C2738F
-	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 16:04:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5D38721315
+	for <lists+kvm@lfdr.de>; Tue, 19 Aug 2025 16:09:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6D822BF013;
-	Tue, 19 Aug 2025 16:03:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A39129E105;
+	Tue, 19 Aug 2025 16:09:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="ByKqp2Fi"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vhMIDXjN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oi1-f169.google.com (mail-oi1-f169.google.com [209.85.167.169])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EC302EB873
-	for <kvm@vger.kernel.org>; Tue, 19 Aug 2025 16:03:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B36E928031D
+	for <kvm@vger.kernel.org>; Tue, 19 Aug 2025 16:09:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755619437; cv=none; b=f61jO4MQbh0LkNjLUC3yV4OgNZnZJuLbD7y7hkaAtTLbQvrcJ9N1HtOnymu6rYnC3y5+D/9OCNkU9aYhMoS5GVYFSyP/Aae3LYN+IT+AUT3/5t6awTsWzfiseKg2vO4SFMhKhz8LDBIj7Rm1GvfnuHPvIq+95btgVgtOVba+Rrw=
+	t=1755619767; cv=none; b=sQXIQHkmNM//GzeONcSuFuTVC5AOeADWovgDVlf0ip1jjSSd+tDbZduuMcfxusE4mM0Vhfc6Hw+tDDlSm6kv4AkVcEZWNjXy5ryobjuQ8jjPsRr0k0eZvOKfcXIFOdHF9LQZuPjaPwJ0KElBayUi5J1qI7VslbKb1GpH80XLT7I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755619437; c=relaxed/simple;
-	bh=ElsK78evf/jSWVT/An81m0pfn9gX4XVTLMYXztIt85c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XHL5RHuI/3Zvu98zqBHiFHPy+Kt+qA+10CM3et7h57htvmlNw2LwRpudqh8KD0AA+xFZUjNn+ZGz7XObGe4YdsulWE2B67xY1A4maEQhdJFd+VyUfm/JYA+Kn/tZym1/UYBWXqkVW+MzU82HS4qpYkXqPGDeJAubuLYxBVzgurQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=ByKqp2Fi; arc=none smtp.client-ip=209.85.167.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-oi1-f169.google.com with SMTP id 5614622812f47-435de70ed23so2997996b6e.1
-        for <kvm@vger.kernel.org>; Tue, 19 Aug 2025 09:03:55 -0700 (PDT)
+	s=arc-20240116; t=1755619767; c=relaxed/simple;
+	bh=syXUDt3xavRGCWn7mDGCTpBtHJ2N/cYn+QuNd85oo0U=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=i5T11iw/PIS2iwJmpNfJaA+0FWXC/g+duP27G5sfMM0GnavsC0NxAe6oLaKeFIfLQzP1rJwk8S54W6sQLTLjXlPiSpNC5b6VkgiXd3KRJPFNpTOzlS1+AiddKHJMxuummPuQqFKRmcIEzAIybJwpDw19JyY32TuElgF0bQeXUPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vhMIDXjN; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-24458121274so66653685ad.2
+        for <kvm@vger.kernel.org>; Tue, 19 Aug 2025 09:09:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1755619434; x=1756224234; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yC88mGoSbqZk1f9KFdafn4QiNyHx2q3f5J/pFIXzL8g=;
-        b=ByKqp2Fi4w4PPaHkLxoaPjtNm3qQV2I1jvR9DsgVqEZoI+hZJx4uCvmh7HVTq4bm+O
-         dgnku9e/iLylYxHg4m4M3GtlbuUpZ4c6jbLkBYuNmaJ9Dskqe7EMEFs1XcPace7jaOkT
-         MY4X7Dn1vcirCgaQk4JFcE28d9yTwaPfxXja9sx/6Wz7CED40zYZzihKEtkWvqj7JkE1
-         Lznb0++JfOJcasQUkUQN/Lm+N9WWo8kKydHPItDh8s1qDC0RrIy6fNV5Fixd7D6zVd9M
-         NWIycDmA6asXjvw1/XVsM6qa4PN8DoB/RdrE1csoDMMdQ6l0ww/fiR9J+83gXmJNvCGf
-         ybqA==
+        d=google.com; s=20230601; t=1755619765; x=1756224565; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=UYkzH86CEfLjeivDFeHRbhTbW/OMRYaK4MdX4XVBMm0=;
+        b=vhMIDXjN0MyIX9U7n/AHfAp8nbuGP4XMwskdk3hmOyF1YZX+xBjeE7+yZxteLnovJV
+         jBDycZC9u8JSMzSKENCUqT0oMmvroUxvhmzOJfz9CQq9XwkxYPFYxtuejqhoGPpDs8D0
+         rE2YJb20FgO4hOdzRotK9p+ZGxpweENBzEun7CiIzIrerqdja3XCIF+vjoEj54rq4lTU
+         3kma/4fJE2BBnPfwZxKRNu6izeYsE98jVAqB2L21Wsp8crxO1t9bmU1nSM6uqyy7b2ig
+         CqqELXYp8DR2TYcIfuBFd1vyH2AXh94P1lx+tN101iLrXW0cWg90MqoX28v+Ux1puHn/
+         BILw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755619435; x=1756224235;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yC88mGoSbqZk1f9KFdafn4QiNyHx2q3f5J/pFIXzL8g=;
-        b=uOeVH3eCNnPpO1EnZeJGCe0jMDSi8je7XTpGFi4kP3IHewL1cCxhMHnR/sB9qgufP5
-         m/qZhmDFx1blu6g9gruatEqhJL/YtbiqD+2iiLc6uOIfnTYqFXsQMCHup5J0QSncXafK
-         EZP9Gfvn3j1ItgBblJqEQSDNYeFlJHLkkTH9FvAKsyAJg98a46gcuJCayVFgu/iXONjB
-         2IShSyGt+hMEHIjOcp7jfuSHDaSOmHelLT1sOHf1WNlDDxSXrwq6+W+EiSVrTNeLP5BV
-         FozOFuFiPk3qHUKNXQz2oEeWTLBb8QZz7ugTRYsiE/dhIbt72ZX/I4uFs+L2qIf8mYrd
-         oxjQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUx/PYZ0eeY6XxvVa6Zbo/gxMi8SkX2sNRMnsTnUDaUYDPBcq4pUhYdyVeJOgD52ZMLqlA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyF/sIvK0KnRMpB6xUXcYMI1JqnJMAd6izF0sqVMHtUWyEn8fxe
-	ynXZ69UENxUPlx0/6QjEs3C+hwoX1AKvvriI4KQouGQkjLuqQb8p0jK8LlkEb2YmimA=
-X-Gm-Gg: ASbGncsQcsJKz/pVbychqMAlVPH3/ak/GFWPRPN4s5KAVl87L3tcg41yvKlyGNsgsog
-	z2m6bBgzUu2xXj1IPvDxZTg2Fa+4v7hq/dBoosZ25oBBTRf7SNm3BzHI+tDhWnbrtpdazV3927j
-	8wCJ+4C7pif6be9cU6HN4s0heAdQK669gl8cpMr5HG/T+8CGKB8603ZV5ClHVHPYPhEmMjexNA5
-	aCKwTBzNSNWaH9w5T8kD1yhQdGA3jcWXa317nfNg0kWbxFS99HwVQiFXyPvaXJhvkgnwa5Tu24C
-	cZamP04WGI5uTUs72rYFFThG0lhwzMqlOHfykpQB6bdxz5coxeEEypwYGpLfxAzRyGK+SF/lC+c
-	Xu5VJEAQHbAMVB8PMClFe2moghmm8x7PDvhA=
-X-Google-Smtp-Source: AGHT+IG/y8PrsSJqgoq3CvRF+MG0X5iWsQigK66jrK0xGiIjJMRnFVwGXiYkN7AL+ccvUXU/i/hDzw==
-X-Received: by 2002:a05:6808:1b0e:b0:435:744c:9297 with SMTP id 5614622812f47-436cdca93famr1950579b6e.16.1755619434540;
-        Tue, 19 Aug 2025 09:03:54 -0700 (PDT)
-Received: from localhost ([140.82.166.162])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-50c949f75d1sm3510509173.79.2025.08.19.09.03.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Aug 2025 09:03:54 -0700 (PDT)
-Date: Tue, 19 Aug 2025 11:03:53 -0500
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Jinyu Tang <tjytimi@163.com>
-Cc: Anup Patel <anup@brainfault.org>, Atish Patra <atish.patra@linux.dev>, 
-	Conor Dooley <conor.dooley@microchip.com>, Yong-Xuan Wang <yongxuan.wang@sifive.com>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] riscv: skip csr restore if vcpu preempted reload
-Message-ID: <20250819-62ec62e0ef8ed3d928f56ddc@orel>
-References: <20250807114220.559098-1-tjytimi@163.com>
+        d=1e100.net; s=20230601; t=1755619765; x=1756224565;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UYkzH86CEfLjeivDFeHRbhTbW/OMRYaK4MdX4XVBMm0=;
+        b=QIX1lwcc+VtBIPYkRdYeeLFqq/JvBjikGEmSK/sEn0Paxkb1I3h8NVYZV3hwToukWU
+         Yh7yNwIihf0YXD5wBo7QfHG5+E+CYbrYrqP+J5A4snGXtvJMOpRyStdmO9oUpxBBJpdJ
+         J7Ty2ckuZxx0GzigUYYXZoj1rurGbtMW5b88ojUCqguugSbxIzB69b2AEMne7oaIHcmn
+         NNAzNdRzBW82RLgYs8Q/ijvBRDFRZN6V4savsez2WL7BEKjyjiZL7eOhdNhS7C4iwyi7
+         lF8w9jmgu1uSPZN25/Pj617HlOai6HUqv8+GMdCiugFCXEDxHsHf+NPLNbscmt4olfLx
+         hbmw==
+X-Gm-Message-State: AOJu0YxaKlmPK1bsT+V0L5pjJ3GDO/kok1/6t9RVx6vgelU6wVuPJ22V
+	W2Y4GSqobJwOMOrJ4COdnG18AOOe0+R7iuzTeXd0KxvSyBSW+LJScWqpNMaRn4J4xB+EU68DcVm
+	iQJA+XQ==
+X-Google-Smtp-Source: AGHT+IH6R2QwD1yBkzYuEBNWnVDESXH7eaf8PVAwWCpi0xr5w/otmuGJ45cfZkJ/B+gcHedXX4CM89800NA=
+X-Received: from pjee5.prod.google.com ([2002:a17:90b:5785:b0:311:ef56:7694])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:da8e:b0:236:9726:7264
+ with SMTP id d9443c01a7336-245e045ce2amr35236595ad.5.1755619765046; Tue, 19
+ Aug 2025 09:09:25 -0700 (PDT)
+Date: Tue, 19 Aug 2025 09:09:23 -0700
+In-Reply-To: <20250812025606.74625-16-chao.gao@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250807114220.559098-1-tjytimi@163.com>
+Mime-Version: 1.0
+References: <20250812025606.74625-1-chao.gao@intel.com> <20250812025606.74625-16-chao.gao@intel.com>
+Message-ID: <aKShs0btGwLtYlVc@google.com>
+Subject: Re: [PATCH v12 15/24] KVM: VMX: Emulate read and write to CET MSRs
+From: Sean Christopherson <seanjc@google.com>
+To: Chao Gao <chao.gao@intel.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, mlevitsk@redhat.com, 
+	rick.p.edgecombe@intel.com, weijiang.yang@intel.com, xin@zytor.com, 
+	Mathias Krause <minipli@grsecurity.net>, John Allen <john.allen@amd.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Aug 07, 2025 at 07:42:20PM +0800, Jinyu Tang wrote:
-> The kvm_arch_vcpu_load() function is called in two cases for riscv:
-> 1. When entering KVM_RUN from userspace ioctl.
-> 2. When a preempted VCPU is scheduled back.
-> 
-> In the second case, if no other KVM VCPU has run on this CPU since the
-> current VCPU was preempted, the guest CSR values are still valid in
-> the hardware and do not need to be restored.
-> 
-> This patch is to skip the CSR write path when:
-> 1. The VCPU was previously preempted
-> (vcpu->scheduled_out == 1).
-> 2. It is being reloaded on the same physical CPU
-> (vcpu->arch.last_exit_cpu == cpu).
-> 3. No other KVM VCPU has used this CPU in the meantime
-> (vcpu == __this_cpu_read(kvm_former_vcpu)).
-> 
-> This reduces many CSR writes with frequent preemption on the same CPU.
-> 
-> Signed-off-by: Jinyu Tang <tjytimi@163.com>
-> ---
->  arch/riscv/kvm/vcpu.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
-> 
-> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-> index f001e5640..1c6c55ee1 100644
-> --- a/arch/riscv/kvm/vcpu.c
-> +++ b/arch/riscv/kvm/vcpu.c
-> @@ -25,6 +25,8 @@
->  #define CREATE_TRACE_POINTS
->  #include "trace.h"
+On Mon, Aug 11, 2025, Chao Gao wrote:
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index b5c4db4b7e04..cc39ace47262 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -1885,6 +1885,27 @@ static int __kvm_set_msr(struct kvm_vcpu *vcpu, u32 index, u64 data,
 >  
-> +static DEFINE_PER_CPU(struct kvm_vcpu *, kvm_former_vcpu);
+>  		data = (u32)data;
+>  		break;
+> +	case MSR_IA32_U_CET:
+> +	case MSR_IA32_S_CET:
+> +		if (!guest_cpu_cap_has(vcpu, X86_FEATURE_SHSTK) &&
+> +		    !guest_cpu_cap_has(vcpu, X86_FEATURE_IBT))
+> +			return KVM_MSR_RET_UNSUPPORTED;
+> +		if (!is_cet_msr_valid(vcpu, data))
+> +			return 1;
+> +		break;
+> +	case MSR_KVM_INTERNAL_GUEST_SSP:
+> +		if (!host_initiated)
+> +			return 1;
+> +		fallthrough;
+> +	case MSR_IA32_PL0_SSP ... MSR_IA32_INT_SSP_TAB:
+> +		if (!guest_cpu_cap_has(vcpu, X86_FEATURE_SHSTK))
+> +			return KVM_MSR_RET_UNSUPPORTED;
+> +		if (is_noncanonical_msr_address(data, vcpu))
+
+This emulation is wrong (in no small part because the architecture sucks).  From
+the SDM:
+
+  If the processor does not support Intel 64 architecture, these fields have only
+  32 bits; bits 63:32 of the MSRs are reserved.
+
+  On processors that support Intel 64 architecture this value cannot represent a
+  non-canonical address.
+
+  In protected mode, only 31:0 are loaded.
+
+That means KVM needs to drop bits 63:32 if the vCPU doesn't have LM or if the vCPU
+isn't in 64-bit mode.  The last one is especially frustrating, because software
+can still get a 64-bit value into the MSRs while running in protected, e.g. by
+switching to 64-bit mode, doing WRMSRs, then switching back to 32-bit mode.
+
+But, there's probably no point in actually trying to correctly emulate/virtualize
+the Protected Mode behavior, because the MSRs can be written via XRSTOR, and to
+close that hole KVM would need to trap-and-emulate XRSTOR.  No thanks.
+
+Unless someone has a better idea, I'm inclined to take an erratum for this, i.e.
+just sweep it under the rug.
+
+> +			return 1;
+> +		/* All SSP MSRs except MSR_IA32_INT_SSP_TAB must be 4-byte aligned */
+> +		if (index != MSR_IA32_INT_SSP_TAB && !IS_ALIGNED(data, 4))
+> +			return 1;
+> +		break;
+>  	}
+>  
+>  	msr.data = data;
+
+...
+
+> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+> index f8fbd33db067..d5b039addd11 100644
+> --- a/arch/x86/kvm/x86.h
+> +++ b/arch/x86/kvm/x86.h
+> @@ -733,4 +733,27 @@ static inline void kvm_set_xstate_msr(struct kvm_vcpu *vcpu,
+>  	kvm_fpu_put();
+>  }
+>  
+> +#define CET_US_RESERVED_BITS		GENMASK(9, 6)
+> +#define CET_US_SHSTK_MASK_BITS		GENMASK(1, 0)
+> +#define CET_US_IBT_MASK_BITS		(GENMASK_ULL(5, 2) | GENMASK_ULL(63, 10))
+> +#define CET_US_LEGACY_BITMAP_BASE(data)	((data) >> 12)
 > +
->  const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
->  	KVM_GENERIC_VCPU_STATS(),
->  	STATS_DESC_COUNTER(VCPU, ecall_exit_stat),
-> @@ -581,6 +583,10 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->  	struct kvm_vcpu_csr *csr = &vcpu->arch.guest_csr;
->  	struct kvm_vcpu_config *cfg = &vcpu->arch.cfg;
->  
-> +	if (vcpu->scheduled_out && vcpu == __this_cpu_read(kvm_former_vcpu) &&
-> +		vcpu->arch.last_exit_cpu == cpu)
-> +		goto csr_restore_done;
+> +static inline bool is_cet_msr_valid(struct kvm_vcpu *vcpu, u64 data)
+
+This name is misleading, e.g. it reads "is this CET MSR valid", whereas the helper
+is checking "is this value for U_CET or S_CET valid".  Maybe kvm_is_valid_u_s_cet()?
+
+> +{
+> +	if (data & CET_US_RESERVED_BITS)
+> +		return false;
+> +	if (!guest_cpu_cap_has(vcpu, X86_FEATURE_SHSTK) &&
+> +	    (data & CET_US_SHSTK_MASK_BITS))
+> +		return false;
+> +	if (!guest_cpu_cap_has(vcpu, X86_FEATURE_IBT) &&
+> +	    (data & CET_US_IBT_MASK_BITS))
+> +		return false;
+> +	if (!IS_ALIGNED(CET_US_LEGACY_BITMAP_BASE(data), 4))
+> +		return false;
+> +	/* IBT can be suppressed iff the TRACKER isn't WAIT_ENDBR. */
+> +	if ((data & CET_SUPPRESS) && (data & CET_WAIT_ENDBR))
+> +		return false;
 > +
->  	if (kvm_riscv_nacl_sync_csr_available()) {
->  		nsh = nacl_shmem();
->  		nacl_csr_write(nsh, CSR_VSSTATUS, csr->vsstatus);
-> @@ -624,6 +630,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->  
->  	kvm_riscv_mmu_update_hgatp(vcpu);
->  
-> +csr_restore_done:
->  	kvm_riscv_vcpu_timer_restore(vcpu);
->  
->  	kvm_riscv_vcpu_host_fp_save(&vcpu->arch.host_context);
-> @@ -645,6 +652,8 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
->  	void *nsh;
->  	struct kvm_vcpu_csr *csr = &vcpu->arch.guest_csr;
->  
-> +	__this_cpu_write(kvm_former_vcpu, vcpu);
-> +
->  	vcpu->cpu = -1;
->  
->  	kvm_riscv_vcpu_aia_put(vcpu);
+> +	return true;
+> +}
+>  #endif
 > -- 
-> 2.43.0
->
-
-This looks like a good idea, but can't we also apply it to
-kvm_riscv_vcpu_aia_load()? And, if we could track whether or
-not the kernel uses FP and/or vector then we could also avoid
-restoring those registers when they haven't been used.
-
-Thanks,
-drew
+> 2.47.1
+> 
 
