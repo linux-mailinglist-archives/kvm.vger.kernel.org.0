@@ -1,84 +1,80 @@
-Return-Path: <kvm+bounces-55094-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55095-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 355E3B2D37B
-	for <lists+kvm@lfdr.de>; Wed, 20 Aug 2025 07:29:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7ED5BB2D37C
+	for <lists+kvm@lfdr.de>; Wed, 20 Aug 2025 07:32:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 192EA567F08
-	for <lists+kvm@lfdr.de>; Wed, 20 Aug 2025 05:29:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3BD7B17E395
+	for <lists+kvm@lfdr.de>; Wed, 20 Aug 2025 05:32:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EF0B287262;
-	Wed, 20 Aug 2025 05:29:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A418F2853FD;
+	Wed, 20 Aug 2025 05:32:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="0bD10QZo"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="elvP4cR8"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2047.outbound.protection.outlook.com [40.107.94.47])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2045.outbound.protection.outlook.com [40.107.223.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14880257ACF
-	for <kvm@vger.kernel.org>; Wed, 20 Aug 2025 05:29:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41ACB1400E
+	for <kvm@vger.kernel.org>; Wed, 20 Aug 2025 05:31:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.45
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755667751; cv=fail; b=gigSkYjWIg1P+lsfcHekgb+xisld11M67jAUNhoE5QXlamc6ZocZRNCr7J9lfXnoWFRt8WUIKXJwc6RhuA7HL71HN2lkmhgfu410mavHDFZUVq6zVs/F7Res4wfGUvJJssS7/0UBtayRFCZV0/TTIRyzBZmigjU0UKrgw540IYE=
+	t=1755667919; cv=fail; b=X8+cxCiIiEL4R5mKax/PXjlLtF7I3ZnrgIlLj6lc4wIUDcJLzHoKbkGfyRJbAAQwnnPzEx7Cp+FuTEn6gy7Hjam3MAfzTpbgDBYu92rtQUxx9RAiV2SIq45HKF5ciNFLBrK3rp0huSqa43H28bDZb7oJphE0NIp4mwFCLlIk5zc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755667751; c=relaxed/simple;
-	bh=hNYFCCVxEGAf+KT+87aZrHG6nu9Te2sovKpNfamr6Ag=;
+	s=arc-20240116; t=1755667919; c=relaxed/simple;
+	bh=OV8PfJUeNDNtkzSPCOhnIEczeIVZde1QS/Tal0r6uhU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=oXQwO7JYsUb8hOJktlL1r0h3Mab5NaGgoZesUR/xJiu+f7pjeHUuD8euJlYKAMjm28wL3bYlFTZPojBBtmmwszGgAzahEgUbf5rlbeBPAV+QN5DFvTTGFIW++FpJxeOj+p4VehzwQSGT5nSARJHzvkTGFACJ/84lIHlC+nngk1w=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=0bD10QZo; arc=fail smtp.client-ip=40.107.94.47
+	 In-Reply-To:Content-Type; b=pUDdN/JN4DxqkHvitXRukm1ne6VdPXk/O1nupgCOBJiEGfPe5L/+6ynbuza40QHiD/OVzbxuj/tMW5XCCTJkon/H/mgbNxnhj/izXN7U6Tz/4q68JrI2dEmU59sT7yxPv/wLrz/QBeyHDvC6giv/yrctU7zQJWUzsYqbXoLq7/U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=elvP4cR8; arc=fail smtp.client-ip=40.107.223.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=UWY8iScSptY1+ameasY1NnM9vs37su5QJ/k+mvJO9974jcslXMMxrMoR6Z2cwXlQyMEOhVpPjIpUmVPhFiYBWZl1cPlvl3q/bfkUOZ669NIgxpYRqCKl7Jwd9fCBjc1/AasIhikBO480YZrcaPwbxGmZNkON+zvguV5Ce8Pi7NUnNGabejdqoZWHtoZffxIAZBxGPmR30ZzHumdfQjPM7o8YoCBGTNHE6MWuHspsby2bVWPR/dkQTZtr7Q0drw2rPFC3Yb9qiRytTOvhCs1InpD+iN2X9P3ANR5MRRszS5yFqm5/BtWm1vG+e3szDdtnZnwMb0pIyJUuV3IHYHTITg==
+ b=qO4fcAauOIAfVx3Uj1U1PKZYE9F4+Os8bA8bvo9+Ejjo0XbUmLB0sFSnQ51UijMvsJ7vxQkmnB9uJa2V8ogIdNpIInsDOO4hnGuCxqL+AnJpCStuHy9Q0p6WLKk+Bl58KIUheU/5YLsmnifq+Yqq7+/DKaGTMGb3LzvqcdNVwj1gbDoWX5a2GUKkZ5ePtj+jM2V07enymCJ8lmUMOHQ8dpNB0Uv6ajG9e3SHnPWzp+OWLCnj5Mjh4c/RwWx+Pg0KCaTjYaloOgZ2m76HVgbjGdbeDi9CGZ9gMlKUbRi4CtP2PBnVWlOmFANix8WxFujKx3ubI5r9FgHBDOWrZoxcUw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KlcBeVkPXh9p5XESoa9zFsuaI5eQiQP5ImgqypzV3ys=;
- b=bY69sbZixyQJuDPcTw90JDJInyQ8j6ZG3TpFpTNMWVoHj9WY11GlavGFLoYnIFoD+Bac7ICBwiKrRiZD6upa25Hj6WddK32Jj8H9pp3CbsAV5KUQ7QJaMNwClFkvvyWI0BCc6zoxrFCqYiZS0jq/+IQCg7pSz4uG6QCwf+HdaX1AEdzkKX9S/zvcZ82wbEAjHybOtbv9Y+fLBXpqLJwpTiAqgswFufk1M+lkas4mqxMAe9gpQ3g9DK1l7ApGpMKEmKwk1riic9TrxlguivzPUgARBR1DhYFZkxxrECeXX0rypJY3jNj/72/6fgjKirdyF9bBpEz2s/qpInrUHK9SMA==
+ bh=24e6C9VDZnF3paZ2WIazW4ow0RjEtUK8lcn3KM1LUqQ=;
+ b=bkboJObc3OCv6ZjaWKwQB7i6SALORCoAwnrkEafM6y2bMnAN+PcrHE/OIwPBrrdZ12gIh6I2wpiFjh2o6q25JKq27CIw++5HGVW+TlwDwVIvWH/AM/YTZvjXTLqRatd6GeEGXdd8byxoM2yXUxXoSEwBBzKZ0raIYmq+TW5QO8WOyLozMZYuZshjZ4igN9gFCup4ZiZ9NvN6iZ2AKaOvgXrLi44QFiPZz98CTDigaRabyOA1eRO7PCpL6zSH+Rh7rzMfBSoz+eghdjEQiBffIHdBHGC7cR+z8dqOgsJiSgu/4giQRNqXgFpCdcT02VvKcssUjoykrjcvdRDk/wxUeg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KlcBeVkPXh9p5XESoa9zFsuaI5eQiQP5ImgqypzV3ys=;
- b=0bD10QZomtHYuPZCcehiCwZKHvzBczhLrl0UP+rDjHhBi1KTWJr0XJ/LxnQYc6bYuPIhsLI982nOldzvfKpYMJ1WgIglTAz4fnJZsXJJaTeQK1xTf081Jnxrlvz5+HrdKv7Z3rpEOgYPeMWbFKEyEXCjNTWCt8ScdQJasalUBKU=
-Received: from BL0PR02CA0094.namprd02.prod.outlook.com (2603:10b6:208:51::35)
- by CH8PR12MB9789.namprd12.prod.outlook.com (2603:10b6:610:260::17) with
+ bh=24e6C9VDZnF3paZ2WIazW4ow0RjEtUK8lcn3KM1LUqQ=;
+ b=elvP4cR8G7xxApUuuRuLvYFauCXa9Ep9zUnwRbUzMwLjGepEQjOoOXo+EXMEymgNbbLHhoDMMJqSmFqVegRzaVmNqyAiCA9Uq0Lc3bQcv2K4XV+tDV0OEtLCcSTY8Y+1VfVFfNE+OQTFHYq2aIVm2GACLRpsqIJLON7VkbfmhuI=
+Received: from BY3PR05CA0035.namprd05.prod.outlook.com (2603:10b6:a03:39b::10)
+ by DS0PR12MB8246.namprd12.prod.outlook.com (2603:10b6:8:de::19) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9031.25; Wed, 20 Aug
- 2025 05:29:04 +0000
-Received: from BN1PEPF00004684.namprd03.prod.outlook.com
- (2603:10b6:208:51:cafe::db) by BL0PR02CA0094.outlook.office365.com
- (2603:10b6:208:51::35) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9052.14 via Frontend Transport; Wed,
- 20 Aug 2025 05:29:04 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.14; Wed, 20 Aug
+ 2025 05:31:52 +0000
+Received: from CO1PEPF000044F8.namprd21.prod.outlook.com
+ (2603:10b6:a03:39b:cafe::1a) by BY3PR05CA0035.outlook.office365.com
+ (2603:10b6:a03:39b::10) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9052.13 via Frontend Transport; Wed,
+ 20 Aug 2025 05:31:51 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
 Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BN1PEPF00004684.mail.protection.outlook.com (10.167.243.90) with Microsoft
+ client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
+Received: from SATLEXMB03.amd.com (165.204.84.17) by
+ CO1PEPF000044F8.mail.protection.outlook.com (10.167.241.198) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.9052.8 via Frontend Transport; Wed, 20 Aug 2025 05:29:04 +0000
-Received: from SATLEXMB06.amd.com (10.181.40.147) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ 15.20.9073.0 via Frontend Transport; Wed, 20 Aug 2025 05:31:51 +0000
+Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB03.amd.com
+ (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 20 Aug
- 2025 00:29:03 -0500
-Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB06.amd.com
- (10.181.40.147) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 20 Aug
- 2025 00:29:02 -0500
+ 2025 00:31:50 -0500
 Received: from [10.252.207.152] (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server id 15.1.2507.39 via Frontend
- Transport; Wed, 20 Aug 2025 00:29:00 -0500
-Message-ID: <91fac75a-1a85-460d-b947-ec8b83a708ad@amd.com>
-Date: Wed, 20 Aug 2025 10:59:00 +0530
+ Transport; Wed, 20 Aug 2025 00:31:47 -0500
+Message-ID: <7b7de6f5-38ea-4b78-bf83-4f5c9138409f@amd.com>
+Date: Wed, 20 Aug 2025 11:01:41 +0530
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -86,132 +82,187 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 2/2] KVM: SEV: Enforce minimum GHCB version requirement
- for SEV-SNP guests
+Subject: Re: [PATCH v10 2/2] KVM: SVM: Enable Secure TSC for SNP guests
 To: Sean Christopherson <seanjc@google.com>
 CC: <pbonzini@redhat.com>, <kvm@vger.kernel.org>, <thomas.lendacky@amd.com>,
-	<santosh.shukla@amd.com>, Michael Roth <michael.roth@amd.com>
-References: <20250804090945.267199-1-nikunj@amd.com>
- <20250804090945.267199-3-nikunj@amd.com> <aKTCMzVNwhlFNE0e@google.com>
+	<santosh.shukla@amd.com>, <bp@alien8.de>, <isaku.yamahata@intel.com>,
+	<vaishali.thakkar@suse.com>, <kai.huang@intel.com>
+References: <20250804103751.7760-1-nikunj@amd.com>
+ <20250804103751.7760-3-nikunj@amd.com> <aKTDBMCPxOXQhzDq@google.com>
 Content-Language: en-US
 From: "Nikunj A. Dadhania" <nikunj@amd.com>
-In-Reply-To: <aKTCMzVNwhlFNE0e@google.com>
+In-Reply-To: <aKTDBMCPxOXQhzDq@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
+Received-SPF: None (SATLEXMB03.amd.com: nikunj@amd.com does not designate
+ permitted sender hosts)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN1PEPF00004684:EE_|CH8PR12MB9789:EE_
-X-MS-Office365-Filtering-Correlation-Id: 61522d82-98fd-406c-a0f4-08dddfaa7a4d
+X-MS-TrafficTypeDiagnostic: CO1PEPF000044F8:EE_|DS0PR12MB8246:EE_
+X-MS-Office365-Filtering-Correlation-Id: a55b09f3-27ec-491c-fe81-08dddfaadde0
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|1800799024|36860700013|376014;
+	BCL:0;ARA:13230040|36860700013|376014|82310400026|1800799024;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?U0VpeUxJU0x0MkhuT0g4Q0NMNXRUZHd4UWEya3dJN3dVK3lIdVo4cDh6WG9x?=
- =?utf-8?B?QlBPSmRjRjNsUW8ydFI1UFRhU3JJdlI2VnliZzFpUGI5WWlPSXlQWFhrZEhj?=
- =?utf-8?B?VG12NSsrK2F6MTlHSXVOelZhU21zNkhuQzAxTUpZSHZQRlQ0RGpCVjJKOGha?=
- =?utf-8?B?SkY1UkJpT3dQNElRZUx1emYxcnRGNjlwZ2ViOG9YV2ozKy9TVDVuN2N3Mk0r?=
- =?utf-8?B?V3VBakhZUytwRGN1MSthZjZSOWhUbmNOZDNKa25ZRnZvbGZyK3UwRmhoeUVt?=
- =?utf-8?B?OW5RV0J3aENOT1hXSkJacER3bGJzYys1KzhFaExObTBjbzhLZk5oeEJoY2lT?=
- =?utf-8?B?L0kwTzgvL2J6QTF1eXl3TDY0RXFmM0I2Z3lXdUtHcE9oc0h3em9xc1NwTDFJ?=
- =?utf-8?B?cWNnc1QzdWxpUTBxOEYrK25UV1JVQXVsZTVWNWpTak1WZkcraTVsR2dRRGJu?=
- =?utf-8?B?d21RSWE5N2hYcDIwakRmNU1Sd3JrelJuSkpXMGUvY2EwRmdTalVmdVpIR3VL?=
- =?utf-8?B?b2JFSlByWXk1bS9IcnV1eE1FL2FzanRESGVLVXU5UkEwUUthTHpKcFErT1Va?=
- =?utf-8?B?UHcxYUhBQ08xbElRUHN1MG55YytlVXZhSWtkdEhVVk4zbkhWaE41RU5jU1h5?=
- =?utf-8?B?Qzl2SUJXa3E1Nnd5SjFBNEx3TWsrdmowc2IxSnZrQXQ2Z2pBMkpEek9xYWVF?=
- =?utf-8?B?ZVFFQjZoNzdqZnd2WU9ybVNrS3hxTHFKZFBkdmhnRTRpNWdBKzJIbnJwc1Mr?=
- =?utf-8?B?NW8zUTJlTUhxYmRtRHNFRWY5QlZJWUxhK1dFbVBJZndNWVozU01taFgzZU9N?=
- =?utf-8?B?ZnliblRUOW5pL0dMRXozQU5oYWVic3VPYjR2QzA4NGliK25OZnBJWFYwQ2hx?=
- =?utf-8?B?ckxLYkJpVDdSM1NVdWVrOHVoKzQrb2lKdVZ4ZVBzVC8zN1JIOW9XcU1rMEZs?=
- =?utf-8?B?aWZ4RGtoclFkZzdNVS92L3I0MzF1U1BYZUQ5dGRqa0MxdC9CcmphNDczZkpU?=
- =?utf-8?B?U1VyVlNBc3BhNlFjTDgvZGNOV1k1UlF5V0xaUldOM0hJZlBUbWRFTWk2WWVP?=
- =?utf-8?B?UU9WNjVMa3BGRHcwWXdwWEZpMXR1V0hYMExVQVZDL2hFc25tRXVTSWdrc0hH?=
- =?utf-8?B?UVh0YkNiOG8zdFpwZEtkblBhR3cyOUNETDQwNjA3UUFQRC9kMUhpOFdlYUhi?=
- =?utf-8?B?UkVwaWR0R2ttd0FQemk0bjAwamVXQW9MVzJWRlByUzk5U2cyS1pRMGNZQU5T?=
- =?utf-8?B?MDE5SDBHZngvRStqL2xjaDFodWdiU2pMdFBDYnA5aWNTWHVOTERQdVNDU3Zs?=
- =?utf-8?B?UGkzOUszUEJuOTBvMWNYUDhYWXJDQjJ5WE12NmxKVlhZV1dTYUxCWE80SGtL?=
- =?utf-8?B?Vy9uSUpFMXc2YXFDYjdRb1pSdzI5VEJ0c3lZYXdIRldVVjUrVTFWV09DeVM2?=
- =?utf-8?B?UWdlY0ozUHYza3dLUC9GQkc5eml3K0NVQlN0ZUhZTFpuL3RQa0diM2lRMXRV?=
- =?utf-8?B?aVIvc0FhSzBGQjR6UlFleVQxYTJQaTdhTi81K0xpdUZuZ3FjN0NXdjRTWUoy?=
- =?utf-8?B?TXo0WXZWUlFycURFektjTnRteFMzSmU4OFNFTis5cmYrUDFXdXBya1dtRE1F?=
- =?utf-8?B?SE1oNmNjV3p6czcxRzQ4K2RMMWRKRFVVZnBWNU84NHFRQ1ozdVhkaFlpVjBW?=
- =?utf-8?B?aVhMQXBRZm1uVTJNOW1ja3VtemtFdm5mbDU0TUlwejVqR3RJbE92WGNsckNN?=
- =?utf-8?B?cXJtK1hhZ29CTFBlVWdVRnJKV3N0RGRsOXNuTm9KTkVabFZpa0lEVTdvZHJh?=
- =?utf-8?B?ZFlZejQ1Qmx1N3kzdUlzY3h1b3RFdkFJbjNtYlZjOFFTUk1nNnRjRzZwVElJ?=
- =?utf-8?B?WTdhT1RCYmdLV1ZOU2o0b3gzQnJtRkdSY2lKNXdLSGUrNko3ZnREQWpTS0ZH?=
- =?utf-8?B?dzZoSTVqa0w3T1VuOVJXL2VyMWV2YUJGUmdpa2tPcDF0VTJUTGs0ZzVTWGRB?=
- =?utf-8?B?bGhpRklpU3FYWkdHd3krcnZ5QXVwT1prbTdBbnREdFVCRmQ3ZzdwMEJmMk5V?=
- =?utf-8?Q?6RCOob?=
+	=?utf-8?B?QlEwVTZJSTFEVk11S21zaUVsaXUwdWtMakU1QjRYOXFOM28vbHRLSGxVeWhi?=
+ =?utf-8?B?b0xwcVhjbjdpVHFyRElxdmszdUNiSmFtdE9NQXlRVTZFQWFxWEdOZzFNZjls?=
+ =?utf-8?B?MDdkbXkzZWpVcjQrSjV6bzZhUzZ2c1BscWVPMEVWa3Rhc1NUODd6dDM4d0RU?=
+ =?utf-8?B?NmQvNktnVEx6cHBhNVZGTS83c3pacWpVdUxONW1rK213T0dISW1Cc1ArRU40?=
+ =?utf-8?B?V2ZuNTFNeDRyVGczOEQrSUlyelo3RkNTaGVPaGxRNzJPczM3clBxTlk0MElF?=
+ =?utf-8?B?d3dlNERPVnVBTjVHQVN4b2s1ZjU5cGEvdVpvWmF3VDQyVXZnc0R4WFpkZ09U?=
+ =?utf-8?B?ajFwbG9nUm96YUhnQlExdnJ2Y082LzdMTkFlZzlNbGNIQlpNeW9BYjZnSGJH?=
+ =?utf-8?B?RlFJQStnM3RVMVo4N0owd2l2SEV5azNBT282QmRoV1ZVTDkyQ21vQU1pSmU2?=
+ =?utf-8?B?eVd2c2dKSXp1YWVlSU41Y0lLK0liQWY1U2dGaGtpeWRBTUdXWlJDQUlILzUy?=
+ =?utf-8?B?T21MbGdpT3QyeTJKaWs4WTV2eUNNeWFnZUxXZW9wRkt2RU1sdVVWS3ZhdXc1?=
+ =?utf-8?B?eU03VlExYm42MzNkZzVvZ1RHRlUvMGRxbXplSGFReGl5ejFDdXU0UWNtVWkw?=
+ =?utf-8?B?dW1Ed2R3UEpObWpMSllIZ2dRU1orNG5EcElYMTJqbzFkNVVGek1DaVhhcmQv?=
+ =?utf-8?B?eXAvK0szS2ZCTE9CcE5OdmlwdW1mdEw4NWtBbTNGdGVUbXcvZllzV3hMS2Zv?=
+ =?utf-8?B?UGlrTm11MjJUU1NGYXc1ZHlCQ20vNXZkelRwSDZWaDNDbDFZRHFZZk1vK1d4?=
+ =?utf-8?B?bTVkeDhzNVJxSXZLQm9nWGIxY2l0U0lrTG4yVC9lWkVqZk41YWxYNWtXYkZl?=
+ =?utf-8?B?SUgxTXZYWFN5VmF3ci9rVENsNjVIR3diU2lmOG82d0J1alJMcHZBSzYrU1pN?=
+ =?utf-8?B?Y1lZZVo5RDZXY1hhVTZJNkVjSXVSYWFzNkhOei90ZTVBOGRacC8zaWo2aElP?=
+ =?utf-8?B?cTF2SmlVb3ZMWEQrK2JmYVo1YW9BcHhmWGM4eDQ0V0xMVmFGZGJ5UkJkcFZo?=
+ =?utf-8?B?WXdHcVA1TG5nY3JzamhjellXR1lMV0lERjJxY01oS1plVzc4MU1PMFE2SFdD?=
+ =?utf-8?B?OVhWb05keHh5NGJ2dzdRVmlIUm1NRXBOeWpIVHd5MXhQc2hEU1RzaEVzQVV2?=
+ =?utf-8?B?TlMyYlhyVStLbHMzSDZUS0d4cktBelF6a21zdDlxZkpGd3ZNTVFudDc4Qkdp?=
+ =?utf-8?B?L1daYjk2N3h3Nk14MHdZSG1xVmYxeTM0YlorTlJHKzd6T0tnUUlNYll0OHR4?=
+ =?utf-8?B?RktZSUM3M2lTN21NN0NOdk9RMzZhZ0t5Y2JCZG9YRkpmMG9hUzJmazhCS2ZS?=
+ =?utf-8?B?bGtib0o3SElTeTFhMy9TR1NxZE5CKzY2VlFNakozRkJFS0xxTDZSa0FmQ3Jj?=
+ =?utf-8?B?UjR3K0RNb29mcmNsMHlybzdRcitMYVRqaVFLWFBjeWpHejErcCsrWEc3ZVBH?=
+ =?utf-8?B?cWNEbEdwUjcweFhpaFZ6NEkrNm1Wb0JsY000dWJ5dUJZa2ZOM0h5Y29hUStD?=
+ =?utf-8?B?Zm5BYWxEcm1JWm9XMXkxaExjaVBBaCtZVTZiQUkrOU9PZ1Y4VzNuTTJvWWNa?=
+ =?utf-8?B?ekJjb0hjY0hQTUpuTlMrd0M4ZXVZdFFsamdOQ3c2NDdENHhubkNkTVVqV01X?=
+ =?utf-8?B?M3pJZ1dTRFYrUnRrSXh1YkN5MXR5SW9EazVsV3hCdUNobXg0bkFENlU1NHdj?=
+ =?utf-8?B?NUxYdkdVWk1MY3dGN1R0ZXBRdDBJMllIdVFYa2RhYzc4UGo5UlovYWs0dWxT?=
+ =?utf-8?B?THVmUkw2amZJMGFST2c1Ujl1WUtJYVZHcEh3MlE2cXFUTlhaV0kyY0FDdlR1?=
+ =?utf-8?B?clJjUEFrSXFaU1U5M0d4WWpmblFqVHRGWjFmQ0dXckhIY3J0R1pRL3NQSmNW?=
+ =?utf-8?B?OXlBUVh0N2RzZWlrdzVZVDljRklkeDB3aHZEZnN4YytocVNkTFlqellmeWZl?=
+ =?utf-8?B?U09KQTZTTHQ1K285UFFNbExkbFozSUIxeTZjUE8yM1lvSnh0M0xHUHJPTDNI?=
+ =?utf-8?Q?uYKETQ?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(36860700013)(376014);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(376014)(82310400026)(1800799024);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Aug 2025 05:29:04.5399
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Aug 2025 05:31:51.5076
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 61522d82-98fd-406c-a0f4-08dddfaa7a4d
+X-MS-Exchange-CrossTenant-Network-Message-Id: a55b09f3-27ec-491c-fe81-08dddfaadde0
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BN1PEPF00004684.namprd03.prod.outlook.com
+	CO1PEPF000044F8.namprd21.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH8PR12MB9789
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8246
 
 
 
-On 8/19/2025 11:58 PM, Sean Christopherson wrote:
+On 8/20/2025 12:01 AM, Sean Christopherson wrote:
 > On Mon, Aug 04, 2025, Nikunj A Dadhania wrote:
->> Require a minimum GHCB version of 2 when starting SEV-SNP guests through
->> KVM_SEV_INIT2. When a VMM attempts to start an SEV-SNP guest with an
->> incompatible GHCB version (less than 2), reject the request early rather
->> than allowing the guest kernel to start with an incorrect protocol version
->> and fail later with GHCB_SNP_UNSUPPORTED guest termination.
+>> Add support for Secure TSC, allowing userspace to configure the Secure TSC
+>> feature for SNP guests. Use the SNP specification's desired TSC frequency
+>> parameter during the SNP_LAUNCH_START command to set the mean TSC
+>> frequency in KHz for Secure TSC enabled guests.
 >>
->> Hypervisor logs the guest termination with GHCB_SNP_UNSUPPORTED error code:
-> 
-> s/Hypervisor/KVM, though I don't see any point in saying that KVM is doing
-> the logging, that's self-evident from the kvm_amd prefix.  Instead, I think
-> what's important to is to say the guest _typically_ requests termination,
-> because AFAICT nothing guarantees the guest will fail in this exact way.
-> 
->   Not enforcing the minimum version typically causes the guest to request
->   termination with GHCB_SNP_UNSUPPORTED error code:
-> 
->     kvm_amd: SEV-ES guest requested termination: 0x0:0x2
-
-Looks good.
-
->> kvm_amd: SEV-ES guest requested termination: 0x0:0x2
+>> Always use kvm->arch.arch.default_tsc_khz as the TSC frequency that is
+>> passed to SNP guests in the SNP_LAUNCH_START command.  The default value
+>> is the host TSC frequency.  The userspace can optionally change the TSC
+>> frequency via the KVM_SET_TSC_KHZ ioctl before calling the
+>> SNP_LAUNCH_START ioctl.
 >>
->> SNP guest fails with the below error message:
+>> Introduce the read-only MSR GUEST_TSC_FREQ (0xc0010134) that returns
+>> guest's effective frequency in MHZ when Secure TSC is enabled for SNP
+>> guests. Disable interception of this MSR when Secure TSC is enabled. Note
+>> that GUEST_TSC_FREQ MSR is accessible only to the guest and not from the
+>> hypervisor context.
+>>
+>> Co-developed-by: Ketan Chaturvedi <Ketan.Chaturvedi@amd.com>
+>> Signed-off-by: Ketan Chaturvedi <Ketan.Chaturvedi@amd.com>
+>> Reviewed-by: Kai Huang <kai.huang@intel.com>
+>> Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
+>> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
+>> ---
+>>  arch/x86/include/asm/svm.h |  1 +
+>>  arch/x86/kvm/svm/sev.c     | 27 +++++++++++++++++++++++++++
+>>  arch/x86/kvm/svm/svm.c     |  2 ++
+>>  arch/x86/kvm/svm/svm.h     |  2 ++
+>>  4 files changed, 32 insertions(+)
+>>
+>> diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
+>> index ffc27f676243..17f6c3fedeee 100644
+>> --- a/arch/x86/include/asm/svm.h
+>> +++ b/arch/x86/include/asm/svm.h
+>> @@ -299,6 +299,7 @@ static_assert((X2AVIC_MAX_PHYSICAL_ID & AVIC_PHYSICAL_MAX_INDEX_MASK) == X2AVIC_
+>>  #define SVM_SEV_FEAT_RESTRICTED_INJECTION		BIT(3)
+>>  #define SVM_SEV_FEAT_ALTERNATE_INJECTION		BIT(4)
+>>  #define SVM_SEV_FEAT_DEBUG_SWAP				BIT(5)
+>> +#define SVM_SEV_FEAT_SECURE_TSC				BIT(9)
+>>  
+>>  #define VMCB_ALLOWED_SEV_FEATURES_VALID			BIT_ULL(63)
+>>  
+>> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+>> index e88dce598785..f9ab9ecc213f 100644
+>> --- a/arch/x86/kvm/svm/sev.c
+>> +++ b/arch/x86/kvm/svm/sev.c
+>> @@ -146,6 +146,14 @@ static bool sev_vcpu_has_debug_swap(struct vcpu_svm *svm)
+>>  	return sev->vmsa_features & SVM_SEV_FEAT_DEBUG_SWAP;
+>>  }
+>>  
+>> +bool snp_secure_tsc_enabled(struct kvm *kvm)
 > 
-> This is QEMU output, not guest output.  I don't see any reason to capture this.
-> The fact that QEMU apparently doesn't handle KVM_EXIT_SYSTEM_EVENT isn't interesting.
-> 
->> KVM: unknown exit reason 24
->> EAX=00000000 EBX=00000000 ECX=00000000 EDX=00a00f11
->> ESI=00000000 EDI=00000000 EBP=00000000 ESP=00000000
->> EIP=0000fff0 EFL=00000002 [-------] CPL=0 II=0 A20=1 SMM=0 HLT=0
->> ES =0000 00000000 0000ffff 00009300
->> CS =f000 ffff0000 0000ffff 00009b00
->> SS =0000 00000000 0000ffff 00009300
->> DS =0000 00000000 0000ffff 00009300
->> FS =0000 00000000 0000ffff 00009300
->> GS =0000 00000000 0000ffff 00009300
->> LDT=0000 00000000 0000ffff 00008200
->> TR =0000 00000000 0000ffff 00008b00
->> GDT=     00000000 0000ffff
->> IDT=     00000000 0000ffff
->> CR0=60000010 CR2=00000000 CR3=00000000 CR4=00000000
->> DR0=0000000000000000 DR1=0000000000000000 DR2=0000000000000000 DR3=0000000000000000
->> DR6=00000000ffff0ff0 DR7=0000000000000400
->> EFER=0000000000000000
-> 
-> 
-> No need for you to send a new version, I'm going to post a combined series for
-> this and Secure TSC.
+> snp_is_secure_tsc_enabled() to make it super obvious this is a predicate.
 
-Thank you.
+Ack.
+
+> 
+>> +{
+>> +	struct kvm_sev_info *sev = to_kvm_sev_info(kvm);
+>> +
+>> +	return (sev->vmsa_features & SVM_SEV_FEAT_SECURE_TSC) &&
+>> +		!WARN_ON_ONCE(!sev_snp_guest(kvm));
+> 
+> Align indentation.
+> 
+>> +}
+>> @@ -4455,6 +4479,9 @@ void sev_es_recalc_msr_intercepts(struct kvm_vcpu *vcpu)
+>>  					  !guest_cpu_cap_has(vcpu, X86_FEATURE_RDTSCP) &&
+>>  					  !guest_cpu_cap_has(vcpu, X86_FEATURE_RDPID));
+>>  
+>> +	if (snp_secure_tsc_enabled(vcpu->kvm))
+>> +		svm_disable_intercept_for_msr(vcpu, MSR_AMD64_GUEST_TSC_FREQ, MSR_TYPE_R);
+> 
+> I'm leaning towards:
+> 
+> 	svm_set_intercept_for_msr(vcpu, MSR_AMD64_GUEST_TSC_FREQ, MSR_TYPE_R,
+> 				  !snp_is_secure_tsc_enabled(vcpu->kvm));
+> 
+> because the cost of setting a bit is negligible.
+> 
+
+Ack.
+
+>> +
+>>  	/*
+>>  	 * For SEV-ES, accesses to MSR_IA32_XSS should not be intercepted if
+>>  	 * the host/guest supports its use.
+>> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+>> index d9931c6c4bc6..a81bf83ccb52 100644
+>> --- a/arch/x86/kvm/svm/svm.c
+>> +++ b/arch/x86/kvm/svm/svm.c
+>> @@ -1317,6 +1317,8 @@ static int svm_vcpu_create(struct kvm_vcpu *vcpu)
+>>  
+>>  	svm->guest_state_loaded = false;
+>>  
+>> +	vcpu->arch.guest_tsc_protected = snp_secure_tsc_enabled(vcpu->kvm);
+> 
+> Hmm, we can and should handle this in sev.c.  If we add sev_vcpu_create(), then
+> we don't need to expose snp_is_secure_tsc_enabled(), and we can move more code
+> into that helper.
+> 
+> I'll post a combined series of this and the GHCB version patches.
+
+Thanks, I will test and get back on v11.
 
 Regards
 Nikunj
+
 
