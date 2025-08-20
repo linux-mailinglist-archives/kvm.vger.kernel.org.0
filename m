@@ -1,38 +1,38 @@
-Return-Path: <kvm+bounces-55158-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55159-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE523B2E054
-	for <lists+kvm@lfdr.de>; Wed, 20 Aug 2025 17:10:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 365FFB2E03A
+	for <lists+kvm@lfdr.de>; Wed, 20 Aug 2025 17:06:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B54745E1C77
-	for <lists+kvm@lfdr.de>; Wed, 20 Aug 2025 15:03:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5CA771C831D3
+	for <lists+kvm@lfdr.de>; Wed, 20 Aug 2025 15:04:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5205A338F52;
-	Wed, 20 Aug 2025 14:58:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0315633A016;
+	Wed, 20 Aug 2025 14:58:50 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9263322A1B;
-	Wed, 20 Aug 2025 14:58:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5F06322A1B;
+	Wed, 20 Aug 2025 14:58:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755701923; cv=none; b=FQIwDfsG271lah+eiDTZZqlt9QeSEk0PWSJNlxqfSr8VNRsTl1Hd9BnjjfNCT/qLZ/HyVL8O3578pxzhDJ41yjZpCfDuIUMWJ1GVeSBc4pQTmTQOPn1p/Ic8wjLOX/J/Fsnq4lYlnpxfk2cJ/k3jo0rBeCF3SZ9xF1lzedR7x1k=
+	t=1755701929; cv=none; b=S8EvlQlONbuWgASIgdTK0Udp/WfH15aE3xucIYQggT/gUbFHZCsJ2uRAF5bK4mFanRrmHixf65c5NewyL017+S6OHJyyIJQAuOgFBuR/47/FPFpUURapCO9m3dEF4Lkbzroud4Nr+MEXwAaGKwJKlisrxg7bvmeb77JbS1kzGnA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755701923; c=relaxed/simple;
-	bh=R9094l4ZIL19OT0hA/2mvxwJDwmZwwuowQRG8Xb5gHs=;
+	s=arc-20240116; t=1755701929; c=relaxed/simple;
+	bh=kkn60vbxgKNeFyif4iky81KtJxaH9y4f8GHGaZyau5c=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=b1saffY88gZT6i4mRjR9jW/j9zgAfUbfWusRIIw0dkMD802ewg0IA1fIq6PPQAn/HQe7csjP3+a4owwZD1q53abJbJ+GPOo0IZsUS6GrnhXz8fTO3Qh1+9GKXXB3/fAA1bRpDNOzrdQ4uUNQLsGMLCW9gMBat59taTN3EJV6CUY=
+	 MIME-Version; b=hikLeQM07+w9gCXLBVMg+yr+JR7gfYVWi5SSqE5T+9FyelTOpf7nBGKqq+8DHuMVXJ10Px5xMGNvSqTbfmK1I9+REikhaR81z5Px0XX3nDADMgEzDc434Q+3E5PzZ1L3zfwyAQhzxeT2LqTLWHl/OGFGzi66e3U9eOKnofa162k=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 574EA2C27;
-	Wed, 20 Aug 2025 07:58:32 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 599072C27;
+	Wed, 20 Aug 2025 07:58:39 -0700 (PDT)
 Received: from e122027.arm.com (unknown [10.57.2.58])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 00B613F738;
-	Wed, 20 Aug 2025 07:58:34 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2F43E3F738;
+	Wed, 20 Aug 2025 07:58:40 -0700 (PDT)
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -58,9 +58,9 @@ Cc: Steven Price <steven.price@arm.com>,
 	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
 	Emi Kisanuki <fj0570is@fujitsu.com>,
 	Vishal Annapurve <vannapurve@google.com>
-Subject: [PATCH v10 18/43] KVM: arm64: Handle realm MMIO emulation
-Date: Wed, 20 Aug 2025 15:55:38 +0100
-Message-ID: <20250820145606.180644-19-steven.price@arm.com>
+Subject: [PATCH v10 19/43] arm64: RME: Allow populating initial contents
+Date: Wed, 20 Aug 2025 15:55:39 +0100
+Message-ID: <20250820145606.180644-20-steven.price@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250820145606.180644-1-steven.price@arm.com>
 References: <20250820145606.180644-1-steven.price@arm.com>
@@ -72,129 +72,281 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-MMIO emulation for a realm cannot be done directly with the VM's
-registers as they are protected from the host. However, for emulatable
-data aborts, the RMM uses GPRS[0] to provide the read/written value.
-We can transfer this from/to the equivalent VCPU's register entry and
-then depend on the generic MMIO handling code in KVM.
+The VMM needs to populate the realm with some data before starting (e.g.
+a kernel and initrd). This is measured by the RMM and used as part of
+the attestation later on.
 
-For a MMIO read, the value is placed in the shared RecExit structure
-during kvm_handle_mmio_return() rather than in the VCPU's register
-entry.
-
+Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Signed-off-by: Steven Price <steven.price@arm.com>
 Reviewed-by: Gavin Shan <gshan@redhat.com>
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
 Changes since v7:
- * New comment for rec_exit_sync_dabt() explaining the call to
-   vcpu_set_reg().
+ * Improve the error codes.
+ * Other minor changes from review.
+Changes since v6:
+ * Handle host potentially having a larger page size than the RMM
+   granule.
+ * Drop historic "par" (protected address range) from
+   populate_par_region() - it doesn't exist within the current
+   architecture.
+ * Add a cond_resched() call in kvm_populate_realm().
 Changes since v5:
- * Inject SEA to the guest is an emulatable MMIO access triggers a data
-   abort.
- * kvm_handle_mmio_return() - disable kvm_incr_pc() for a REC (as the PC
-   isn't under the host's control) and move the REC_ENTER_EMULATED_MMIO
-   flag setting to this location (as that tells the RMM to skip the
-   instruction).
+ * Refactor to use PFNs rather than tracking struct page in
+   realm_create_protected_data_page().
+ * Pull changes from a later patch (in the v5 series) for accessing
+   pages from a guest memfd.
+ * Do the populate in chunks to avoid holding locks for too long and
+   triggering RCU stall warnings.
 ---
- arch/arm64/kvm/inject_fault.c |  4 +++-
- arch/arm64/kvm/mmio.c         | 16 ++++++++++++----
- arch/arm64/kvm/rme-exit.c     | 14 ++++++++++++++
- 3 files changed, 29 insertions(+), 5 deletions(-)
+ arch/arm64/kvm/rme.c | 227 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 227 insertions(+)
 
-diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-index 6745f38b64f9..79815a68ff2e 100644
---- a/arch/arm64/kvm/inject_fault.c
-+++ b/arch/arm64/kvm/inject_fault.c
-@@ -201,7 +201,9 @@ static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt, u32 addr)
- 
- static void __kvm_inject_sea(struct kvm_vcpu *vcpu, bool iabt, u64 addr)
- {
--	if (vcpu_el1_is_32bit(vcpu))
-+	if (unlikely(vcpu_is_rec(vcpu)))
-+		vcpu->arch.rec.run->enter.flags |= REC_ENTER_FLAG_INJECT_SEA;
-+	else if (vcpu_el1_is_32bit(vcpu))
- 		inject_abt32(vcpu, iabt, addr);
- 	else
- 		inject_abt64(vcpu, iabt, addr);
-diff --git a/arch/arm64/kvm/mmio.c b/arch/arm64/kvm/mmio.c
-index 54f9358c9e0e..d7ad291b5357 100644
---- a/arch/arm64/kvm/mmio.c
-+++ b/arch/arm64/kvm/mmio.c
-@@ -6,6 +6,7 @@
- 
- #include <linux/kvm_host.h>
- #include <asm/kvm_emulate.h>
-+#include <asm/rmi_smc.h>
- #include <trace/events/kvm.h>
- 
- #include "trace.h"
-@@ -138,14 +139,21 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu)
- 		trace_kvm_mmio(KVM_TRACE_MMIO_READ, len, run->mmio.phys_addr,
- 			       &data);
- 		data = vcpu_data_host_to_guest(vcpu, data, len);
--		vcpu_set_reg(vcpu, kvm_vcpu_dabt_get_rd(vcpu), data);
-+
-+		if (vcpu_is_rec(vcpu))
-+			vcpu->arch.rec.run->enter.gprs[0] = data;
-+		else
-+			vcpu_set_reg(vcpu, kvm_vcpu_dabt_get_rd(vcpu), data);
- 	}
- 
- 	/*
- 	 * The MMIO instruction is emulated and should not be re-executed
- 	 * in the guest.
- 	 */
--	kvm_incr_pc(vcpu);
-+	if (vcpu_is_rec(vcpu))
-+		vcpu->arch.rec.run->enter.flags |= REC_ENTER_FLAG_EMULATED_MMIO;
-+	else
-+		kvm_incr_pc(vcpu);
- 
- 	return 1;
+diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
+index 22168e8d8db7..817eb5c96728 100644
+--- a/arch/arm64/kvm/rme.c
++++ b/arch/arm64/kvm/rme.c
+@@ -663,6 +663,221 @@ void kvm_realm_unmap_range(struct kvm *kvm, unsigned long start,
+ 		realm_unmap_private_range(kvm, start, end, may_block);
  }
-@@ -164,14 +172,14 @@ int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
- 	 * No valid syndrome? Ask userspace for help if it has
- 	 * volunteered to do so, and bail out otherwise.
- 	 *
--	 * In the protected VM case, there isn't much userspace can do
-+	 * In the protected/realm VM case, there isn't much userspace can do
- 	 * though, so directly deliver an exception to the guest.
- 	 */
- 	if (!kvm_vcpu_dabt_isvalid(vcpu)) {
- 		trace_kvm_mmio_nisv(*vcpu_pc(vcpu), kvm_vcpu_get_esr(vcpu),
- 				    kvm_vcpu_get_hfar(vcpu), fault_ipa);
  
--		if (vcpu_is_protected(vcpu))
-+		if (vcpu_is_protected(vcpu) || vcpu_is_rec(vcpu))
- 			return kvm_inject_sea_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
- 
- 		if (test_bit(KVM_ARCH_FLAG_RETURN_NISV_IO_ABORT_TO_USER,
-diff --git a/arch/arm64/kvm/rme-exit.c b/arch/arm64/kvm/rme-exit.c
-index feb248f4377c..768e0674a060 100644
---- a/arch/arm64/kvm/rme-exit.c
-+++ b/arch/arm64/kvm/rme-exit.c
-@@ -25,6 +25,20 @@ static int rec_exit_reason_notimpl(struct kvm_vcpu *vcpu)
- 
- static int rec_exit_sync_dabt(struct kvm_vcpu *vcpu)
- {
-+	struct realm_rec *rec = &vcpu->arch.rec;
++static int realm_create_protected_data_granule(struct realm *realm,
++					       unsigned long ipa,
++					       phys_addr_t dst_phys,
++					       phys_addr_t src_phys,
++					       unsigned long flags)
++{
++	phys_addr_t rd = virt_to_phys(realm->rd);
++	int ret;
++
++	if (rmi_granule_delegate(dst_phys))
++		return -ENXIO;
++
++	ret = rmi_data_create(rd, dst_phys, ipa, src_phys, flags);
++	if (RMI_RETURN_STATUS(ret) == RMI_ERROR_RTT) {
++		/* Create missing RTTs and retry */
++		int level = RMI_RETURN_INDEX(ret);
++
++		WARN_ON(level == RMM_RTT_MAX_LEVEL);
++
++		ret = realm_create_rtt_levels(realm, ipa, level,
++					      RMM_RTT_MAX_LEVEL, NULL);
++		if (ret)
++			return -EIO;
++
++		ret = rmi_data_create(rd, dst_phys, ipa, src_phys, flags);
++	}
++	if (ret)
++		return -EIO;
++
++	return 0;
++}
++
++static int realm_create_protected_data_page(struct realm *realm,
++					    unsigned long ipa,
++					    kvm_pfn_t dst_pfn,
++					    kvm_pfn_t src_pfn,
++					    unsigned long flags)
++{
++	unsigned long rd = virt_to_phys(realm->rd);
++	phys_addr_t dst_phys, src_phys;
++	bool undelegate_failed = false;
++	int ret, offset;
++
++	dst_phys = __pfn_to_phys(dst_pfn);
++	src_phys = __pfn_to_phys(src_pfn);
++
++	for (offset = 0; offset < PAGE_SIZE; offset += RMM_PAGE_SIZE) {
++		ret = realm_create_protected_data_granule(realm,
++							  ipa,
++							  dst_phys,
++							  src_phys,
++							  flags);
++		if (ret)
++			goto err;
++
++		ipa += RMM_PAGE_SIZE;
++		dst_phys += RMM_PAGE_SIZE;
++		src_phys += RMM_PAGE_SIZE;
++	}
++
++	return 0;
++
++err:
++	if (ret == -EIO) {
++		/* current offset needs undelegating */
++		if (WARN_ON(rmi_granule_undelegate(dst_phys)))
++			undelegate_failed = true;
++	}
++	while (offset > 0) {
++		ipa -= RMM_PAGE_SIZE;
++		offset -= RMM_PAGE_SIZE;
++		dst_phys -= RMM_PAGE_SIZE;
++
++		rmi_data_destroy(rd, ipa, NULL, NULL);
++
++		if (WARN_ON(rmi_granule_undelegate(dst_phys)))
++			undelegate_failed = true;
++	}
++
++	if (undelegate_failed) {
++		/*
++		 * A granule could not be undelegated,
++		 * so the page has to be leaked
++		 */
++		get_page(pfn_to_page(dst_pfn));
++	}
++
++	return -ENXIO;
++}
++
++static int populate_region(struct kvm *kvm,
++			   phys_addr_t ipa_base,
++			   phys_addr_t ipa_end,
++			   unsigned long data_flags)
++{
++	struct realm *realm = &kvm->arch.realm;
++	struct kvm_memory_slot *memslot;
++	gfn_t base_gfn, end_gfn;
++	int idx;
++	phys_addr_t ipa = ipa_base;
++	int ret = 0;
++
++	base_gfn = gpa_to_gfn(ipa_base);
++	end_gfn = gpa_to_gfn(ipa_end);
++
++	idx = srcu_read_lock(&kvm->srcu);
++	memslot = gfn_to_memslot(kvm, base_gfn);
++	if (!memslot) {
++		ret = -EFAULT;
++		goto out;
++	}
++
++	/* We require the region to be contained within a single memslot */
++	if (memslot->base_gfn + memslot->npages < end_gfn) {
++		ret = -EINVAL;
++		goto out;
++	}
++
++	if (!kvm_slot_can_be_private(memslot)) {
++		ret = -EPERM;
++		goto out;
++	}
++
++	while (ipa < ipa_end) {
++		struct vm_area_struct *vma;
++		unsigned long hva;
++		struct page *page;
++		bool writeable;
++		kvm_pfn_t pfn;
++		kvm_pfn_t priv_pfn;
++		struct page *gmem_page;
++
++		hva = gfn_to_hva_memslot(memslot, gpa_to_gfn(ipa));
++		vma = vma_lookup(current->mm, hva);
++		if (!vma) {
++			ret = -EFAULT;
++			break;
++		}
++
++		pfn = __kvm_faultin_pfn(memslot, gpa_to_gfn(ipa), FOLL_WRITE,
++					&writeable, &page);
++
++		if (is_error_pfn(pfn)) {
++			ret = -EFAULT;
++			break;
++		}
++
++		ret = kvm_gmem_get_pfn(kvm, memslot,
++				       ipa >> PAGE_SHIFT,
++				       &priv_pfn, &gmem_page, NULL);
++		if (ret)
++			break;
++
++		ret = realm_create_protected_data_page(realm, ipa,
++						       priv_pfn,
++						       pfn,
++						       data_flags);
++
++		kvm_release_page_clean(page);
++
++		if (ret)
++			break;
++
++		ipa += PAGE_SIZE;
++	}
++
++out:
++	srcu_read_unlock(&kvm->srcu, idx);
++	return ret;
++}
++
++static int kvm_populate_realm(struct kvm *kvm,
++			      struct arm_rme_populate_realm *args)
++{
++	phys_addr_t ipa_base, ipa_end;
++	unsigned long data_flags = 0;
++
++	if (kvm_realm_state(kvm) != REALM_STATE_NEW)
++		return -EPERM;
++
++	if (!IS_ALIGNED(args->base, PAGE_SIZE) ||
++	    !IS_ALIGNED(args->size, PAGE_SIZE) ||
++	    (args->flags & ~RMI_MEASURE_CONTENT))
++		return -EINVAL;
++
++	ipa_base = args->base;
++	ipa_end = ipa_base + args->size;
++
++	if (ipa_end < ipa_base)
++		return -EINVAL;
++
++	if (args->flags & RMI_MEASURE_CONTENT)
++		data_flags |= RMI_MEASURE_CONTENT;
 +
 +	/*
-+	 * In the case of a write, copy over gprs[0] to the target GPR,
-+	 * preparing to handle MMIO write fault. The content to be written has
-+	 * been saved to gprs[0] by the RMM (even if another register was used
-+	 * by the guest). In the case of normal memory access this is redundant
-+	 * (the guest will replay the instruction), but the overhead is
-+	 * minimal.
++	 * Perform the population in parts to ensure locks are not held for too
++	 * long
 +	 */
-+	if (kvm_vcpu_dabt_iswrite(vcpu) && kvm_vcpu_dabt_isvalid(vcpu))
-+		vcpu_set_reg(vcpu, kvm_vcpu_dabt_get_rd(vcpu),
-+			     rec->run->exit.gprs[0]);
++	while (ipa_base < ipa_end) {
++		phys_addr_t end = min(ipa_end, ipa_base + SZ_2M);
 +
- 	return kvm_handle_guest_abort(vcpu);
- }
- 
++		int ret = populate_region(kvm, ipa_base, end,
++					  args->flags);
++
++		if (ret)
++			return ret;
++
++		ipa_base = end;
++
++		cond_resched();
++	}
++
++	return 0;
++}
++
+ enum ripas_action {
+ 	RIPAS_INIT,
+ 	RIPAS_SET,
+@@ -907,6 +1122,18 @@ int kvm_realm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
+ 		r = kvm_init_ipa_range_realm(kvm, &args);
+ 		break;
+ 	}
++	case KVM_CAP_ARM_RME_POPULATE_REALM: {
++		struct arm_rme_populate_realm args;
++		void __user *argp = u64_to_user_ptr(cap->args[1]);
++
++		if (copy_from_user(&args, argp, sizeof(args))) {
++			r = -EFAULT;
++			break;
++		}
++
++		r = kvm_populate_realm(kvm, &args);
++		break;
++	}
+ 	default:
+ 		r = -EINVAL;
+ 		break;
 -- 
 2.43.0
 
