@@ -1,117 +1,116 @@
-Return-Path: <kvm+bounces-55106-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55107-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50AE1B2D737
-	for <lists+kvm@lfdr.de>; Wed, 20 Aug 2025 10:55:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 756ABB2D76E
+	for <lists+kvm@lfdr.de>; Wed, 20 Aug 2025 11:03:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 440DE16BE87
-	for <lists+kvm@lfdr.de>; Wed, 20 Aug 2025 08:55:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 674F43AAD85
+	for <lists+kvm@lfdr.de>; Wed, 20 Aug 2025 09:00:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42BCB2DA767;
-	Wed, 20 Aug 2025 08:55:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C6112DAFB7;
+	Wed, 20 Aug 2025 09:00:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=szeredi.hu header.i=@szeredi.hu header.b="WT4bqIBs"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="G7IsIJv7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A39BF2D9EDB
-	for <kvm@vger.kernel.org>; Wed, 20 Aug 2025 08:55:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED68D25F998;
+	Wed, 20 Aug 2025 09:00:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755680127; cv=none; b=aPkntZoLDdfOO7ZwdK6gepFhuq73JOOhTz6195LYmy8WhlEFPGq45Kbgw3pJxb6bIdyPkRqeW5kgb8xMghrP7AiJj9xzza3L4RgmXrjc9tR3kGV6+DMUey9xnSPsfCTy1TSgQYR+gfy3ryVFdpifruOxyZjLrJMAjwk4WcHcP30=
+	t=1755680409; cv=none; b=seMd+I9kDCyXhSmpHg+U7CzREF7KW9qgblWzUfI1AbeMctfH3qfrMfWHSxo+QsGrFLoGBlMzaVWydAJlIMbd4iVGQuR65waQPCvrcpyFyROmPq0dJGv3xC3agonqeXX9Xq48Eh2h1utYJFTLYxz9KbEYoAfb2WtYY0uGZB6aLoE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755680127; c=relaxed/simple;
-	bh=iR+hp7xjDohlk4uLKSCKHyRXgQV+E/1v3D9EcSrOhN0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JQOIwCD/efIjlqFVmNeRgQjQ3NwepzBqMoJumaY+GrWI7DZUt5x7m6ioKP2z/x3pDYWJKpzfrPtBG24in1E1bWdgNpEZyXbQa9YGa99po8P6Rjc0r70157g5p46IhGwHEwyKqILHz31Ja5sBNeYZ+ZIbrOUEihTbJ+dY4gQrTj4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szeredi.hu; spf=pass smtp.mailfrom=szeredi.hu; dkim=pass (1024-bit key) header.d=szeredi.hu header.i=@szeredi.hu header.b=WT4bqIBs; arc=none smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szeredi.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=szeredi.hu
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4b134aa13f5so39928711cf.1
-        for <kvm@vger.kernel.org>; Wed, 20 Aug 2025 01:55:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=szeredi.hu; s=google; t=1755680124; x=1756284924; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=prBdbd5IwT0l6EaL1JkN4d71dM3Y9IcSn9RyaijIepg=;
-        b=WT4bqIBsnr+/XLgoFcOejJYaJFknO2gM+YnGl5gSykq5+lbwzy9FPM1NWzbBlReqA+
-         gU8p6b6lnmeDdZshBm7iRHkHWAm2Pc2dUI5iTdYtBUn9SLH3w20UKzfiqtIdB4gdITXw
-         hxbReZtroFYjaWkMLDBVt3wlaDngcirqUq4IQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755680124; x=1756284924;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=prBdbd5IwT0l6EaL1JkN4d71dM3Y9IcSn9RyaijIepg=;
-        b=PQBY19uo+OF0TBP1LEENOuG+mxCK2Vlt26dRbey9sqWuVjB2OyNLD1TDr7gLOmN+Zw
-         LXh1urNhqoRBOtz7e9oF0sOU8AdyckTJPU1qxpgQovI5iIvZZtEmm3hnZeWMxGfI7eX7
-         WX/eoxyo56d1ORZuXwwxRN00OgLyz6m4Fo52GCMzyDyEZQ6hVl/AGkWtzKG1w6XpYckh
-         I+aFt/PwQ8Zj2f1sr66w8mWjSwdk4ps08Zt9N/BN+ilwlYVxkZjES03msFSDDB9vDeAO
-         HI2MKRdXkmH1x7XhUgqKZVPG2w4PASE3KGYQ/C2KuXetp4Rp21/YVikDPpQ4c3DcVdj9
-         agHw==
-X-Forwarded-Encrypted: i=1; AJvYcCWhFx/koEeWmSfFqX2/OmqDXEqITkXYsIfte1qZ+p/yVfeyMFoVUVlWymWdTxcxGy5f5XI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzWGQ5L5T6N4Gu6ZmlrtimmiimM2j9eCUDWEUGWs5pD9SogJyYj
-	im56GCqzGad7GwWPGnXI/FaVUUcDbzA46dlYztcwK0GgqyDkPZcNmU74kVMXw+aE1+0vqs6W+1q
-	tyfCx6EeTlrbOV27JIfvd7I+R7Ywv/g8dwVJm8eCRMw==
-X-Gm-Gg: ASbGnctrN5C3KVKtU0shJ8fSOws3JwsyKwZw3C/yOpMwezJU0/kc8HPt5QQAvdxAwuK
-	jdiXUnN3at8MMd67gX7UC/tsDhF6tEipfl1XkWlaLILGzBZOlLO7FeQm6wTqjKyZSbbc2cBGWnF
-	OhY1MZIf6tFArGIE7pO9TwQumJl7nk8JoBJzDU9vmINnWr8aZDQerCYNSEzcHQcDwGa39K0D/Wr
-	giwU4gV+w==
-X-Google-Smtp-Source: AGHT+IE9amIH8vBvDkdrmFCBMvx46Trt8+B/hM/ooS8/9+69L7vKMWavOQFjcJ0LSDyTfdtowVCQkWdhAiN053eMzys=
-X-Received: by 2002:a05:622a:11d3:b0:4af:1535:6b53 with SMTP id
- d75a77b69052e-4b291bbdfdfmr24247191cf.54.1755680124542; Wed, 20 Aug 2025
- 01:55:24 -0700 (PDT)
+	s=arc-20240116; t=1755680409; c=relaxed/simple;
+	bh=txs/vM6W8Yv/7EZjG/Md1COukCyt+gv82O8XJ50xA90=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jwr6xd+/1Y6KE8DntwDDBCeEDoSauSn9m0E1qqzOeFGPApzH4XJbkG+ODakAdYdR0x1yZFg9yfYh3tnx+4wrGFU9Up1eoD5fhGb+GoOdXMSke50tISAkqLow5uWpfM37M6notNUlswsQPQGeSaR0ut+UsmOaClc0RQGBpNmJKGQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=G7IsIJv7; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 4D80240E027E;
+	Wed, 20 Aug 2025 09:00:03 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id 3IOq7lNCDxO3; Wed, 20 Aug 2025 09:00:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1755680399; bh=beySYSjjYv/3HXXkq0/rNq324ZfG9YsZxFSqt79VFc8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=G7IsIJv7HnX79b+e7Aw9+b5OBqD0o5IwHBtS1HSpOYaDVE0aMMilWv9FCQWdvwdyj
+	 7dF1juRVqxwd/HTD1ar5ANctaUc8CPwfONMs7R24YcMC8aOl1fPMR8yn5Lm0kaQApI
+	 QsK5iC3E/YtCm61EtNNFJplRYVWhBqmjLVYI3y2IwXyRqlUy91rhMufU0pxkVJ3AkU
+	 0sHIxl6HcT6IErBT2GfC8ruALpqxFNkP96ZIYNBNVVG+g/3aaonX5vjCTlMmvU432l
+	 xaUdqeO3JXTWcOibyhPxpmHk4KY8X2VtQVLfQ/r/OHcToprspYU+ya82OrymJo4nGr
+	 lGGHqT2+Dqx3dSzsKgka2kjftCGserjXFqY4NeCC6v6x7/NY6O8bkZtRxdFjw8PAtf
+	 8lcCRC25NM7vGhDjif8GOmal5hqIiSJcIlKZXwq37PTYwD3rhJlZ2biEMcHnWptWfd
+	 R5qln9p7YVr/Nfw3V36jogBQu4qo/vllkcjum+H2m+x8JOSwal2ApdRUT7yr7LwrM5
+	 WQkGCkVZYsm1nL9DiqB1zgGBmDeZQDLaJuEM++LT/3JFRAwbb+GLRo8iRpsm4GY94G
+	 NMsZpNXpFxXcl7nwTnlAKzuiPO5POQ+gKYOmF9g10Pr4xFn7BFqUBHLPqtrvOrGjQ7
+	 4jZKD5ZDlkO358JoPbKhGVTM=
+Received: from zn.tnic (pd953092e.dip0.t-ipconnect.de [217.83.9.46])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 8729240E0232;
+	Wed, 20 Aug 2025 08:59:40 +0000 (UTC)
+Date: Wed, 20 Aug 2025 10:59:35 +0200
+From: Borislav Petkov <bp@alien8.de>
+To: Naveen N Rao <naveen@kernel.org>
+Cc: K Prateek Nayak <kprateek.nayak@amd.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, x86@kernel.org,
+	Sairaj Kodilkar <sarunkod@amd.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	"Peter Zijlstra (Intel)" <peterz@infradead.org>,
+	"Xin Li (Intel)" <xin@zytor.com>,
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	Mario Limonciello <mario.limonciello@amd.com>,
+	"Gautham R. Shenoy" <gautham.shenoy@amd.com>,
+	Babu Moger <babu.moger@amd.com>,
+	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+Subject: Re: [PATCH v3 0/4] x86/cpu/topology: Work around the nuances of
+ virtualization on AMD/Hygon
+Message-ID: <20250820085935.GBaKWOd5Wk3plH0h1l@fat_crate.local>
+References: <20250818060435.2452-1-kprateek.nayak@amd.com>
+ <20250819113447.GJaKRhVx6lBPUc6NMz@fat_crate.local>
+ <mcclyouhgeqzkhljovu7euzvowyqrtf5q4madh3f32yeb7ubnk@xdtbsvi2m7en>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <D5420EF2-6BA6-4789-A06A-D1105A3C33D4@nvidia.com>
-In-Reply-To: <D5420EF2-6BA6-4789-A06A-D1105A3C33D4@nvidia.com>
-From: Miklos Szeredi <miklos@szeredi.hu>
-Date: Wed, 20 Aug 2025 10:55:12 +0200
-X-Gm-Features: Ac12FXyUk9U2BD5ab17RBeP0LlcO6BAKZygfWvTdoZSnBgGcz8gaw_tlQOpNzxU
-Message-ID: <CAJfpegvmhpyab2-kaud3VG47Tbjh0qG_o7G-3o6pV78M8O++tQ@mail.gmail.com>
-Subject: Re: Questions about FUSE_NOTIFY_INVAL_ENTRY
-To: Jim Harris <jiharris@nvidia.com>
-Cc: "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, 
-	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "stefanha@redhat.com" <stefanha@redhat.com>, 
-	Max Gurtovoy <mgurtovoy@nvidia.com>, Idan Zach <izach@nvidia.com>, 
-	Roman Spiegelman <rspiegelman@nvidia.com>, Ben Walker <benwalker@nvidia.com>, 
-	Oren Duer <oren@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <mcclyouhgeqzkhljovu7euzvowyqrtf5q4madh3f32yeb7ubnk@xdtbsvi2m7en>
 
-On Wed, 20 Aug 2025 at 01:35, Jim Harris <jiharris@nvidia.com> wrote:
+On Wed, Aug 20, 2025 at 01:41:28PM +0530, Naveen N Rao wrote:
+> That suggests use of leaf 0xb for the initial x2APIC ID especially 
+> during early init.  I'm not sure why leaf 0x8000001e was preferred over 
+> leaf 0xb in commit c749ce393b8f ("x86/cpu: Use common topology code for 
+> AMD") though.
 
-> Can we safely depend on the FUSE_NOTIFY_INVAL_ENTRY notifications to trig=
-ger FORGET commands for the associated inodes? If not, can we consider addi=
-ng a new FUSE_NOTIFY_DROP_ENTRY notification that would ask the kernel to r=
-elease the inode and send a FORGET command when memory pressure or clean-up=
- is needed by the device?
+Well, I see parse_topology_amd() calling cpu_parse_topology_ext() if you have
+TOPOEXT - which all AMD hw does - which then does cpu_parse_topology_ext() and
+that one tries 0x80000026 and then falls back to 0xb and *only* *then* to
+0x8000001e.
 
-As far as I understand what you want is drop the entry from the cache
-*if it is unused*.  Plain FUSE_NOTIFY_INVAL_ENTRY will unhash the
-dentry regardless of its refcount, of course FORGET will be sent only
-after the reference is released.
+So, it looks like it DTRT to me...
 
-FUSE_NOTIFY_INVAL_ENTRY with FUSE_EXPIRE_ONLY will do something like
-your desired FUSE_NOTIFY_DROP_ENTRY operation, at least on virtiofs
-(fc->delete_stale is on).  I notice there's a fuse_dir_changed() call
-regardless of FUSE_EXPIRE_ONLY, which is not appropriate for the drop
-case, this can probably be moved inside the !FUSE_EXPIRE_ONLY branch.
+-- 
+Regards/Gruss,
+    Boris.
 
-The other question is whether something more efficient should be
-added. E.g. FUSE_NOTIFY_SHRINK_LOOKUP_CACHE with a num_drop argument
-that tells fuse to try to drop this many unused entries?
-
-Thanks,
-Miklos
+https://people.kernel.org/tglx/notes-about-netiquette
 
