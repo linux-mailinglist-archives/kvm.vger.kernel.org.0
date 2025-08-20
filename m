@@ -1,120 +1,228 @@
-Return-Path: <kvm+bounces-55088-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55089-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBF8BB2D23A
-	for <lists+kvm@lfdr.de>; Wed, 20 Aug 2025 05:03:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27BA4B2D246
+	for <lists+kvm@lfdr.de>; Wed, 20 Aug 2025 05:08:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C400D581086
-	for <lists+kvm@lfdr.de>; Wed, 20 Aug 2025 03:03:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1AEFA7AFE76
+	for <lists+kvm@lfdr.de>; Wed, 20 Aug 2025 03:06:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 739E424418E;
-	Wed, 20 Aug 2025 03:03:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87D85253F21;
+	Wed, 20 Aug 2025 03:08:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TacO3eIF"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IMciItmB"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E2042C859;
-	Wed, 20 Aug 2025 03:03:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 420B32264D5
+	for <kvm@vger.kernel.org>; Wed, 20 Aug 2025 03:08:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755658999; cv=none; b=gRZatXw604icjp7HimW1KM9i8w4BgQRNlvFVJL+yVN9Chx/5frKEgOTbEjYr9/1x5eT4r1zY8+drTEoFyYjNfMh250CRx1EjNVBkcA4lAHV9/jPvLCtkgKe4WppjKtVpCL7QnG6Wutm3dzlmqRo/gUsp8vmQnNyPOU5wrekjApA=
+	t=1755659293; cv=none; b=NqgohnyH+SBZLxIwyQdbJLJcNeRvCIaK6Vobgu5Gebl6Ylk/gHMhgVQt6uJTGRkVoUW8dpZ6JmZq/QrDVcJDir8oV2FeaLtxYuKa0ZXXVQRFa2SzmM6r1d2eJ63QTO3MQv2rBQjAnprJz7LicusBjEnNQKqPl54PPn/rV1mAMng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755658999; c=relaxed/simple;
-	bh=dUb5J4XH+q4916VJxIDDUCe2v7YaXyLg5gTQb9sEMLQ=;
+	s=arc-20240116; t=1755659293; c=relaxed/simple;
+	bh=SrDo3l6tDAI3xcpbuaeNpSYX3OYgbsb2SvsjCJKZ8vo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ElTMVNibVW1ze910DZXWu9gvfIa3/kPr8B4Z7jVstOon0Z5xwsyDoSQy7zX4f9Bnw/bVn+PYEUNJSjMqpkr9IsEvxIUcyfahzSQ88iwGKidc5OivrdyoSQRHJGeTKZpSQg3rNLMJAgv6G+lPrHb1XiZ715qmSJBz1nEr4mgT170=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TacO3eIF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27067C4CEF1;
-	Wed, 20 Aug 2025 03:03:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755658999;
-	bh=dUb5J4XH+q4916VJxIDDUCe2v7YaXyLg5gTQb9sEMLQ=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=TacO3eIFWhHfC9iieBE0ZVulubtG93C+xWiJ94hVccdRj9Od4S0EHBmnzP8cynW+q
-	 JWawgVH9Q+GGZQZr1Y4eT11DaWFe5AJNn3JdPJ0ixY6avteUXXDFM4Kj7lrvwhJYu9
-	 62C4m8xbI5lhv4I8VO2xDhOXGMwReZ+p6X2VTwvFjv77+Fyumm3lT+e/uSxHHTbsxe
-	 fujBmYHh++k6QVhrel0J9R/DBAMA2+aCcRtVRBP/vNd5lCnfda9+NGX3Uq0+9uyXOn
-	 7RaKwC7tqvTyPKRXTfKiKL6d8a8j0wBz2BqAjqrGFeq9DoYAgNm++KpczvtvYr8gAo
-	 K95syn8Sx8xRQ==
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-618b62dbb21so8581987a12.2;
-        Tue, 19 Aug 2025 20:03:19 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVaSeJxkkhSK/OEA7MuwWBLYk6NFQcULlbEzqSOk8T4BjB3iQEPfyEvlKEwwJIW84g8YXM=@vger.kernel.org, AJvYcCX+M9+dAU0prhJ2xgt1sxRk4uYo7pwjHUxQbvLewiUKb0htHDh8DIRKaoqRdbnjVqp2S6X2IDJWeuMGYBoC@vger.kernel.org, AJvYcCXJAVz9Or3F3chgAcheb5vnb97wP3yGnArdLceigpUz2LbrB+Rfx4puU1zhgF0p2apTF9ToVinAv94eJPugIwxfdtT1@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFYslHDoTiXTpXfxmDxCo61EyyzS4MgnF9T2dKem9ZJHl8bxMI
-	ECX5CQEMKS9SlII9xzGsObWkHN2BQk3WikjnBIoJfdiaodndy24G0Byk7QuZ6K2KO76+z1b+Q+X
-	QHMQc1TbMdxkqV0iZBWz8NFUs8zT/eKU=
-X-Google-Smtp-Source: AGHT+IGipsXdMkhLBiLLaqBjRzQlCXf5lG2voaM7ZlbwMucGPhtm3dMQcQrGXzIeWhNwxO91JT0saO4PJ+B8zwJNi0k=
-X-Received: by 2002:a05:6402:208a:b0:615:b0e2:124b with SMTP id
- 4fb4d7f45d1cf-61a9762bcb8mr1222075a12.24.1755658997791; Tue, 19 Aug 2025
- 20:03:17 -0700 (PDT)
+	 To:Cc:Content-Type; b=ZribMq1U63WyIxbnuZbtqjfvIHjUrvKzHS7h+FvSkURZgTEuy8oPPDg6VVCttpKVyWAIgn7aUxc0k1I9rqWBJSn0pSb3QQS65r0HEmoUE/RD0QDZTZIY5ZECnzvdEtE+IItpM9v/hkmucHknmizynrpi9TPfV8nBpA7tYPbexvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IMciItmB; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-242d1e947feso114195ad.0
+        for <kvm@vger.kernel.org>; Tue, 19 Aug 2025 20:08:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1755659291; x=1756264091; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pFgari3SJ6Zv3aVho4cCxh1qrxAz56Z6UuPaB3I9a+c=;
+        b=IMciItmBgVynJAtmq7AnaXtltl0aLQ43S6X7+JfTrOJQT8gBtCiD86Gq1CiBkAy9J3
+         GMCzwo7hhA6nXjzPufiQYcbRe7nP3hCgvwf2dtAsGRXBep1O1Db4EIrm5txwMqnzSb8R
+         e69QgR/08mqI+b2sE1VfLgL9qH/s7B1bxxv/c4+7OjOSgp+6AZPo4RSxLuo0f7PT/SSW
+         TBf7JBKn+Dh1TPnx2Ke3QDFv9pSzpxOJ7YP//xiGdEe79KuLdZl41FjlXp1y+K8bDyl2
+         20PmYSFkYnxRGWa/ENxDKf4+aLBkP/xwjLxMqfZn9djCMMOPEEMf0GGo3GHa/p7n/ZiN
+         gxdw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755659291; x=1756264091;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pFgari3SJ6Zv3aVho4cCxh1qrxAz56Z6UuPaB3I9a+c=;
+        b=kFr87W98ysBMrfShuvzXXiSXiRHdmebMz4HqLuzZz5JUWIcClOTs3ZiP2+hvxtH52W
+         3lMA32A05lbqyoYo3w0aYOpzjVrnR4RDDQwZZd1ZmiCLRcF/fksxNEIeMSMgppJQlflT
+         jbluzsT1zCavenyG0EHKib3bvnpmEpW9qs+q9ZIeFm/JP1Rbpmk+Cq4PLNhICv8NG4Qz
+         yEpGnsQm67pJyIR8PwJpcCPL7EEq+7kIsozznJ29wSAU4J9aRNwNdBHdvd0GpzqpQhO4
+         c/JM4murqTYEcaasYwmLMr2Mr7eLlpJ1euKswVZC+oJe7Hek6ajCecPHdXfIIniaew+a
+         6uNQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWs+8XTqqYbwrlq2pU44tTzNDDq2VgMr1lyT/5hUHes9Jay98lRcljRbn58bgOxsDrUK48=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywxktxx1hTBEjhu3Zb/NzLy4O5b7Wg7+OlZNROdHLtYd0HNUuqX
+	8qGSAUQTjdgYVcM0OKbzzDGntic7k1ZfdjHNWnMUF8pbaz2iPv1IYVEgEv1gdw7R0cAxaC+3Ccz
+	Ja3UZrd4CqpLJYsbWw+qilSUXDsiCQetDLebAfJya
+X-Gm-Gg: ASbGncvirBh8G42vxD5PQzB2cJRQMNJriqZVfZUKFNiDzeowDoDYoBho5mTtfLpQ7p0
+	X08KxM9Ttgc0PBW+UeC8aHXxZYDQ5r6PYVAph/0gnZPk5EXS99q45YMPtWQ6t40D72Pr8ZPAZHB
+	R+QgeBaTeadsqOZJRA/j6STH1+0UMpUETHaVrmSdWvn9goVswSK16/Kyj6G224PgtE/lZJINRU1
+	ZSOoLcTD70pFWqLxNWiQ33dOWseXTk7FWnRmvHKOrTDhmNxbqEceVJ4
+X-Google-Smtp-Source: AGHT+IHbe1HzXl8UoH+zB1dMhZd24Q0x4xZkhxr+JG0B2a1qDHiFP8KmZ60IvW+WHlqgHc0mMe95c66v2Bok0dXuMLc=
+X-Received: by 2002:a17:902:e551:b0:237:e45b:4f45 with SMTP id
+ d9443c01a7336-245eff59781mr1974835ad.1.1755659290889; Tue, 19 Aug 2025
+ 20:08:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250722094734.4920545b@gandalf.local.home> <2c2f5036-c3ae-3904-e940-8a8b71a65957@loongson.cn>
- <20250723214659.064b5d4a@gandalf.local.home> <15e46f69-f270-0520-1ad4-874448439d2b@loongson.cn>
- <CAAhV-H4TGus35B6ONdkSOMwWw+H6NRmHStV-Xu7vUYYrkDGfUQ@mail.gmail.com> <20250819202715.6f1cf0d6@gandalf.local.home>
-In-Reply-To: <20250819202715.6f1cf0d6@gandalf.local.home>
-From: Huacai Chen <chenhuacai@kernel.org>
-Date: Wed, 20 Aug 2025 11:03:05 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H5y8Tckih4jd3C8Q-M6OZiw2szCYuxLQfBXehpWSvrstA@mail.gmail.com>
-X-Gm-Features: Ac12FXz1padV2khVDKOyi3ekCMiGCzktzpAq5rTbzGUfDyfjZIQ6IiG85R2dpeE
-Message-ID: <CAAhV-H5y8Tckih4jd3C8Q-M6OZiw2szCYuxLQfBXehpWSvrstA@mail.gmail.com>
-Subject: Re: [PATCH] LoongArch: KVM: Move kvm_iocsr tracepoint out of generic code
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: Bibo Mao <maobibo@loongson.cn>, LKML <linux-kernel@vger.kernel.org>, 
-	Linux Trace Kernel <linux-trace-kernel@vger.kernel.org>, kvm@vger.kernel.org, 
-	loongarch@lists.linux.dev, Tianrui Zhao <zhaotianrui@loongson.cn>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Masami Hiramatsu <mhiramat@kernel.org>, 
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+References: <CAMGD6P1Q9tK89AjaPXAVvVNKtD77-zkDr0Kmrm29+e=i+R+33w@mail.gmail.com>
+ <0dc2b8d2-6e1d-4530-898b-3cb4220b5d42@linux.intel.com> <4acfa729-e0ad-4dc7-8958-ececfae8ab80@suse.com>
+ <aIDzBOmjzveLjhmk@google.com> <550a730d-07db-46d7-ac1a-b5b7a09042a6@linux.intel.com>
+ <aIeX0GQh1Q_4N597@google.com> <ad616489-1546-4f6a-9242-a719952e19b6@linux.intel.com>
+In-Reply-To: <ad616489-1546-4f6a-9242-a719952e19b6@linux.intel.com>
+From: Vishal Annapurve <vannapurve@google.com>
+Date: Tue, 19 Aug 2025 20:07:58 -0700
+X-Gm-Features: Ac12FXwFIjaoMfyA4gRBWWBv-JFyesrY8os1KLWOTAQdkCuZ-XVXWvdu4NXLBgg
+Message-ID: <CAGtprH9EL0=Cxu7f8tD6rEvnpC7uLAw6jKijHdFUQYvbyJgkzA@mail.gmail.com>
+Subject: Re: [PATCH 0/2] x86/kvm: Force legacy PCI hole as WB under SNP/TDX
+To: Binbin Wu <binbin.wu@linux.intel.com>
+Cc: Sean Christopherson <seanjc@google.com>, Nikolay Borisov <nik.borisov@suse.com>, 
+	Jianxiong Gao <jxgao@google.com>, "Borislav Petkov (AMD)" <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, Dionna Glaze <dionnaglaze@google.com>, 
+	"H. Peter Anvin" <hpa@zytor.com>, jgross@suse.com, 
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Ingo Molnar <mingo@redhat.com>, pbonzini@redhat.com, 
+	Peter Gonda <pgonda@google.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Tom Lendacky <thomas.lendacky@amd.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, x86@kernel.org, 
+	Rick Edgecombe <rick.p.edgecombe@intel.com>, jiewen.yao@intel.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Aug 20, 2025 at 8:27=E2=80=AFAM Steven Rostedt <rostedt@goodmis.org=
-> wrote:
+On Wed, Jul 30, 2025 at 12:34=E2=80=AFAM Binbin Wu <binbin.wu@linux.intel.c=
+om> wrote:
 >
-> On Thu, 24 Jul 2025 19:56:42 +0800
-> Huacai Chen <chenhuacai@kernel.org> wrote:
 >
-> > On Thu, Jul 24, 2025 at 9:51=E2=80=AFAM Bibo Mao <maobibo@loongson.cn> =
-wrote:
-> > >
-> > >
-> > >
-> > > On 2025/7/24 =E4=B8=8A=E5=8D=889:46, Steven Rostedt wrote:
-> > > > On Thu, 24 Jul 2025 09:39:40 +0800
-> > > > Bibo Mao <maobibo@loongson.cn> wrote:
-> > > >
-> > > >>>    #define kvm_fpu_load_symbol      \
-> > > >>>     {0, "unload"},          \
-> > > >>>     {1, "load"}
-> > > >>>
-> > > >> Reviewed-by: Bibo Mao <maobibo@loongson.cn>
-> > > >
-> > > > Thanks,
-> > > >
-> > > > Should this go through the loongarch tree or should I take it?
-> > > Huacai,
-> > >
-> > > What is your point about this?
-> > I will take it, thanks.
+>
+> On 7/28/2025 11:33 PM, Sean Christopherson wrote:
+> > +Jiewen
+>
+> Jiewen is out of the office until August 4th.
+
+Hi Jiewen, can we get some help in deciding the next steps here?
+
+>
 > >
-> > Huacai
+> > Summary, with the questions at the end.
+> >
+> > Recent upstream kernels running in GCE SNP/TDX VMs fail to probe the TP=
+M due to
+> > the TPM driver's ioremap (with UC) failing because the kernel has alrea=
+dy mapped
+> > the range using a cachaeable mapping (WB).
+> >
+> >   ioremap error for 0xfed40000-0xfed45000, requested 0x2, got 0x0
+> >   tpm_tis MSFT0101:00: probe with driver tpm_tis failed with error -12
+> >
+> > The "guilty" commit is 8e690b817e38 ("x86/kvm: Override default caching=
+ mode for
+> > SEV-SNP and TDX"), which as the subject suggests, forces the kernel's M=
+TRR memtype
+> > to WB.  With SNP and TDX, the virtual MTRR state is (a) controlled by t=
+he VMM and
+> > thus is untrusted, and (b) _should_ be irrelevant because no known hype=
+rvisor
+> > actually honors the memtypes programmed into the virtual MTRRs.
+> >
+> > It turns out that the kernel has been relying on the MTRRs to force the=
+ TPM TIS
+> > region (and potentially other regions) to be UC, so that the kernel ACP=
+I driver's
+> > attempts to map of SystemMemory entries as cacheable get forced to UC. =
+ With MTRRs
+> > forced WB, x86_acpi_os_ioremap() succeeds in creating a WB mapping, whi=
+ch in turn
+> > causes the ioremap infrastructure to reject the TPM driver's UC mapping=
+.
+> >
+> > IIUC, the TPM entry(s) in the ACPI tables for GCE VMs are derived (buil=
+t?) from
+> > EDK2's TPM ASL.  And (again, IIUC), this code in SecurityPkg/Tcg/Tcg2Ac=
+pi/Tpm.asl[1]
+> >
+> >        //
+> >        // Operational region for TPM access
+> >        //
+> >        OperationRegion (TPMR, SystemMemory, 0xfed40000, 0x5000)
+> >
+> > generates the problematic SystemMemory entry that triggers the ACPI dri=
+ver's
+> > auto-mapping logic.
+> >
+> > QEMU-based VMs don't suffer the same fate, as QEMU intentionally[2] doe=
+sn't use
+> > EDK2's AML for the TPM, and QEMU doesn't define a SystemMemory entry, j=
+ust a
+> > Memory32Fixed entry.
+> >
+> > Presumably this an EDK2 bug?  If it's not an EDK2 bug, then how is the =
+kernel's
+> > ACPI driver supposed to know that some ranges of SystemMemory must be m=
+apped UC?
+> According to the ACPI spec 6.6, an operation region of SystemMemory has n=
+o
+> interface to specify the cacheable attribute.
 >
-> Did this fall through the cracks?
-I don't know what this means, but I think you are pinging.
-
-This patch appears after I sent the KVM PR for 6.17, and it isn't a
-bugfix, so it will go to 6.18.
-
-Huacai
-
+> One solution could be using MTRRs to communicate the memory attribute of =
+legacy
+> PCI hole to the kernel. But during the PUCK meeting last week, Sean menti=
+oned
+> that "long-term, firmware should not be using MTRRs to communicate anythi=
+ng to
+> the kernel." So this solution is not preferred.
 >
-> -- Steve
+> If not MTRRs, there should be an alternative way to do the job.
+> 1. ACPI table
+>     According to the ACPI spec, neither operation region nor 32-Bit Fixed=
+ Memory
+>     Range Descriptor can specify the cacheable attribute.
+>     "Address Space Resource Descriptors" could be used to describe a memo=
+ry range
+>     and the they can specify the cacheable attribute via "Type Specific F=
+lags".
+>     One of the Address Space Resource Descriptors could be added to the A=
+CPI
+>     table as a hint when the kernel do the mapping for operation region.
+>     (There is "System Physical Address (SPA) Range Structure", which also=
+ can
+>     specify the cacheable attribute. But it's should be used for NVDIMMs.=
+)
+> 2. EFI memory map descriptor
+>     EFI memory descriptor can specify the cacheable attribute. Firmware c=
+an add
+>     a EFI memory descriptor for the TPM TIS device as a hint when the ker=
+nel do
+>     the mapping for operation region.
+>
+> Operation region of SystemMemory is still needed if a "Control Method" of=
+ APCI
+> needs to access a field, e.g., the method _STA. Checking another descript=
+or for
+> cacheable attribute, either "Address Space Resource Descriptor" or "EFI m=
+emory
+> map descriptor" during the ACPI code doing the mapping for operation regi=
+on
+> makes the code complicated.
+>
+> Another thing is if long-term firmware should not be using MTRRs to to
+> communicate anything to the kernel. It seems it's safer to use ioremap() =
+instead
+> of ioremap_cache() for MMIO resource when the kernel do the mapping for t=
+he
+> operation region access?
+>
+
+Would it work if instead of doubling down on declaring the low memory
+above TOLUD as WB, guest kernel reserves the range as uncacheable by
+default i.e. effectively simulating a ioremap before ACPI tries to map
+the memory as WB?
 
