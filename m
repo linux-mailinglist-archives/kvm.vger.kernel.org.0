@@ -1,215 +1,237 @@
-Return-Path: <kvm+bounces-55203-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55202-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CE0BB2E47D
-	for <lists+kvm@lfdr.de>; Wed, 20 Aug 2025 19:57:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08FFBB2E478
+	for <lists+kvm@lfdr.de>; Wed, 20 Aug 2025 19:57:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 028AD5A32C9
-	for <lists+kvm@lfdr.de>; Wed, 20 Aug 2025 17:57:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D05F9A245D7
+	for <lists+kvm@lfdr.de>; Wed, 20 Aug 2025 17:56:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF78427B329;
-	Wed, 20 Aug 2025 17:56:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="GXFwmDnR"
-X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2046.outbound.protection.outlook.com [40.107.223.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95C53273803;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7537274661;
 	Wed, 20 Aug 2025 17:56:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.46
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755712582; cv=fail; b=ckEOEl7lAOrLDZEPHakifS0q21b26x+2APEvD//HNccL0nYim0oMbMc5P7eWiFzNsPHdj3vbbMMHdVvL4IuIKolalqDjZbl1agH0mxHQhrBFnIbXjO0+ws6dpV0qt9V/OyvjKnDjJrTvcMb4evv9ukd7bp/5hh/JjLG16tb8BOM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755712582; c=relaxed/simple;
-	bh=s1tFgI/E8vTBMIbeFZiTCHGoN+1JIGcCI6x2JXWlJm4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=K8jECGf0RLI43DqQQ7qFjpblbOIYGQLBn4WscBgPQyJV1qas7Lb0uDJZAGIi+33jnlPQYRVpon6dCX0E9L0LmMih5dgWHE2iPRlU1bE2q87L/kkY6FGxN5jMYUy0jVR5tgkyxrL/9nal+rUupDPrKpJIQSevPqCZXZBsipJB28Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=GXFwmDnR; arc=fail smtp.client-ip=40.107.223.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Y/e+sXhLgF2bIr9p2Zvx1o/LakywFUkbl+PUxMJH+N5muK4+5EwpDoDcXd/gHHwD9Ed2T11Qe0aa9TymEyA4M2QD1/H6SGt7A2n0gMKu0a6/zm0+qdlsqjPIoDxKIFS/cvCMEd7Mp3eptLNVDa+jwidsd1QSZPZUinvXIAGAZM12MXk4dWjqh4SYFV5sqqcsflL44+NqeblQX4AwCxJ3zT6KI+wHOc7Z7IsSQO+0nhhPtV6/nknclQ6zUOP1rL/wrJ8dprG39ODikiiS4onTzJIXuRUKxXldnHA9kMS0fBzIRktX0WJUKvhIY7gF46sJroOP/qOVpKmp5mTp0zQyhA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0Tn1xaztkJHrvOZARhcbFVzrS9/G2hvV3+cM5MAa7MY=;
- b=oItw+EtO8Q6lAl4SVWG89++gRTW0YpA7VltYyGjOjrNwN5PYzYfHHDlFuKSjnNQpzybKDMEDOYTdhr4XuVCysHznI/+LG5RTGjNXYsdtDADXSuOREIQ23hTkJEqK9nKRtFabVsv6iq0PJOoZL+JCVpdjPuySKFZlJ1cF9ETAKNpx1RkVMrZ+IBsZkbWlByutwEJ6ykYr14fqyliKJYFhVylJ6+dSZqm8WhJPfkGEcXIghCqTl+V8BWYRFoFHIAX8+38XaQ7hi6UlBiQ402/btZYZjFXIYxeZwoR6Xj5Hf2cYtwuqdrOQGO4f/CaNQsZ/BwABPWnXwokdzZyRbzdPcw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0Tn1xaztkJHrvOZARhcbFVzrS9/G2hvV3+cM5MAa7MY=;
- b=GXFwmDnRrd9ByZ3AHjii0IZbrURLNA4jGrYJyMYQiDumCkplwjl5NOsreuKifVQ1ITTRdk5EM5Jf+sTj30CD6nVV5OEwkTtVyjn2YnVJuFBog0ws/X7tpMd+1tVv9rrU2QoqN1tVtF8O6bDotqUq4ITPLmv9pRQ8H8Yqdj7I82A=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB6373.namprd12.prod.outlook.com (2603:10b6:8:a4::7) by
- DM4PR12MB6446.namprd12.prod.outlook.com (2603:10b6:8:be::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9052.14; Wed, 20 Aug 2025 17:56:17 +0000
-Received: from DM4PR12MB6373.namprd12.prod.outlook.com
- ([fe80::12f7:eff:380b:589f]) by DM4PR12MB6373.namprd12.prod.outlook.com
- ([fe80::12f7:eff:380b:589f%4]) with mapi id 15.20.9052.013; Wed, 20 Aug 2025
- 17:56:16 +0000
-Date: Wed, 20 Aug 2025 13:56:10 -0400
-From: Yazen Ghannam <yazen.ghannam@amd.com>
-To: "Luck, Tony" <tony.luck@intel.com>
-Cc: "Hunter, Adrian" <adrian.hunter@intel.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>,
-	"seanjc@google.com" <seanjc@google.com>,
-	"Annapurve, Vishal" <vannapurve@google.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, "x86@kernel.org" <x86@kernel.org>,
-	H Peter Anvin <hpa@zytor.com>,
-	"linux-edac@vger.kernel.org" <linux-edac@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
-	"Huang, Kai" <kai.huang@intel.com>,
-	"Chatre, Reinette" <reinette.chatre@intel.com>,
-	"Li, Xiaoyao" <xiaoyao.li@intel.com>,
-	"tony.lindgren@linux.intel.com" <tony.lindgren@linux.intel.com>,
-	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>,
-	"Weiny, Ira" <ira.weiny@intel.com>,
-	"Yamahata, Isaku" <isaku.yamahata@intel.com>,
-	"Du, Fan" <fan.du@intel.com>, "Zhao, Yan Y" <yan.y.zhao@intel.com>,
-	"Gao, Chao" <chao.gao@intel.com>
-Subject: Re: [PATCH RESEND V2 1/2] x86/mce: Fix missing address mask in
- recovery for errors in TDX/SEAM non-root mode
-Message-ID: <20250820175610.GA936971@yaz-khff2.amd.com>
-References: <20250819162436.137625-1-adrian.hunter@intel.com>
- <20250819162436.137625-2-adrian.hunter@intel.com>
- <20250819172846.GA578379@yaz-khff2.amd.com>
- <aKS5ixhgtCYIvErL@agluck-desk3>
- <4b8b5c89-e8b7-4eec-91eb-1fe43a68cf9c@intel.com>
- <SJ1PR11MB60833C7AE2FA8D8200EA3645FC30A@SJ1PR11MB6083.namprd11.prod.outlook.com>
- <2b86c458-f63b-4f74-8fcd-1456ddad4d7a@intel.com>
- <SJ1PR11MB60831ED23234A274D3DCDD6FFC33A@SJ1PR11MB6083.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <SJ1PR11MB60831ED23234A274D3DCDD6FFC33A@SJ1PR11MB6083.namprd11.prod.outlook.com>
-X-ClientProxiedBy: BL1PR13CA0339.namprd13.prod.outlook.com
- (2603:10b6:208:2c6::14) To DM4PR12MB6373.namprd12.prod.outlook.com
- (2603:10b6:8:a4::7)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Q7hx7feY"
+X-Original-To: kvm@vger.kernel.org
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 675E12701CE
+	for <kvm@vger.kernel.org>; Wed, 20 Aug 2025 17:56:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755712579; cv=none; b=AWF18cR2s//YI6XxEZGxnX5JSzMz5CizkwqfZdSy9dkq3oiH+ua7ZwJTmI6T1N8Ns3b6ohOFmdTFXTKx2Nc/7obKF4fTBZ1ppJvnKipopQvA9iMt5Nz44xH0ge+NSTQY4ejn7gibe6n8z0kWSyKqaBEKP0hEQv21t9Uj0ATGwNw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755712579; c=relaxed/simple;
+	bh=uX5nB8Zhl41q5XsHaSQVSbbKsZeTCt0ByQ4HIAfpz6w=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=M2hkSUVsS9QX5Rl/xa0j1lrXYNCEwGO4T1UfEp2w2WmNkWHeG66Q5ny0EgX604e1uSTGsUtjUSYILNpYRezAZcYAKdMuyUEL+n/2NxeHxrDfCpGTaKXPN8xbMxgrnwsreLj7vCg/T5kNVLuqZ8u0ekLP6DrYmXRDujmjcPMYed4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Q7hx7feY; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b47538030bfso53582a12.1
+        for <kvm@vger.kernel.org>; Wed, 20 Aug 2025 10:56:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1755712578; x=1756317378; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=XbHZQZRdLVaSrm6kxqey0KUiG4g0BmK/F9FrnNnAWOw=;
+        b=Q7hx7feYeePep3/LRHU6MhA42hABGFCUjHMhzNJ/qEnmavJwLZFYjL0s8ZlB1NOs3P
+         L4I8WuBhak9it5zt+2M5w+N76AIOrKcZq+UIHqF3jhILgtnokvccQdAAa7rcttRhNqzi
+         cb/eV18OxQCA7PwnTOV3LeaREG9Qbz0axS1DDZo36fvv8FCxaIH2CczsXFImk9t7M6Fv
+         rZXWpRp9L8083U3/sJGNCS1bpAri4irQhMOW4OgO2DAaCUOvzkEjhlgmIKHpefCaRB7W
+         xWqJjlwWvsYg+P09W4zsP4wv+DFx0zsx7qkHG8IiZLjsFUBimM+kwMv4cRiK52xytqMo
+         uvcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755712578; x=1756317378;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=XbHZQZRdLVaSrm6kxqey0KUiG4g0BmK/F9FrnNnAWOw=;
+        b=YDD0qwlXGgl5IpkPlKyueWcv6Io8imKUsYmMt9UxHe6H3Q9SyYB8pHsn200iIaj8bK
+         jdZpu06IUoceaEutqQwNCuFoJoQPAsq2nQWau0Xj040NUR6V06g0Cz2qJ4CHse6Bs7CE
+         r/xtIq2pcDumKAu65hpEKei/eDhZwwGWN6QD+Z7c31KT5NL7WWFyW4MdGnIGZNx7a6tt
+         J+IYp7ZCPqtHCVcN2/yD24IKOukomMNyu8PH3YPWVOCFsloWdwEtwZtIbNiGmU0Hfetm
+         GMLjT6Pkm9rGuVgNmNCWrvBhbW6V6c921Cah40Fli5YQxnZy/8T/38VvRJkycAzx701R
+         R7/A==
+X-Forwarded-Encrypted: i=1; AJvYcCUINy8I6ikU2cobRf5Ihgq98GXFy3ZT+0Dbm762YkjV8XGgzt4FHso/UVxOIEr7LuF3Tj4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx6Kac/tOEz3brCMmSNnEIwmycpfZFaMlAcJWzqwaAUQk/cBwOL
+	b6jClwYtgu7dXHFYIrkcuDi2xVDtQvMszt6jBE01Zde+mCFp2CrNYHJ8vQ7u76+Oj350Lf3yXnz
+	/pWd5Ww==
+X-Google-Smtp-Source: AGHT+IHAp7LTmShl4SOL4D3wXxkD4J6E4TLwbi07ZD6KKT45A8spNH/9ts5tmmYsaGwkfiR2Ly0PGDdmaS0=
+X-Received: from pjbsy7.prod.google.com ([2002:a17:90b:2d07:b0:321:cc91:ad5d])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2e0b:b0:31e:3bbc:e9e6
+ with SMTP id 98e67ed59e1d1-324e1423f77mr5344153a91.19.1755712577632; Wed, 20
+ Aug 2025 10:56:17 -0700 (PDT)
+Date: Wed, 20 Aug 2025 10:56:16 -0700
+In-Reply-To: <697aa804-b321-4dba-9060-7ac17e0a489f@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB6373:EE_|DM4PR12MB6446:EE_
-X-MS-Office365-Filtering-Correlation-Id: a1bdebda-6173-4533-123c-08dde012dc1d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?5fwWqCG+ktL7dwa0C0DNK41Mfk+UT6bvsK1WbOPigMvyXzEY1WISJuR+piml?=
- =?us-ascii?Q?pEAKqTdVcEisbQUFVQcs9+AHXIPRzMUToFWwGZtMnirtFCgcinQeDRPs2uhw?=
- =?us-ascii?Q?H4c0pDUFKGiO8rO/RWZMfVoj4D++4ipKZ4F168utQVDs55MaFdcU0kK1kFAr?=
- =?us-ascii?Q?MExVsFthyXJtOssOWOoLvEx2rOAOn6KrjZJ2fhpIfd3C2oheQqxezHdmRlUQ?=
- =?us-ascii?Q?JEFkw4rfr+0FqqaKAXhNYO0IfnG2LueoWlzvzZnw9JyvwpYWcLAO3NTR218a?=
- =?us-ascii?Q?AVbw8XL+gbEs4XpsVDm9V6MwZXBmxfrFbGwcOXVqKvraxO8AKJryWDL3wSNg?=
- =?us-ascii?Q?LWFggT06I+snUzP1I+RAdiHloJEfd5c8gALWWh5Jybw1rCz+5CQXCb8f5AYJ?=
- =?us-ascii?Q?cKtTC2vW/2eBYYLPidFp5FPASjTytIQH1DIrG3wPUTjOWLa2c6xXQ1+2WMCw?=
- =?us-ascii?Q?Smq+sXEC3n2wqc9ZYjP3nP+6T/OSxdabfvlg41o3nLRFUxV6rvUdiNh2/VXy?=
- =?us-ascii?Q?kHyH5kHd77ruqUambAwrtzMu+Hvtrzv/++ZqU2VdrYK9G6V8XRHXxUiSJwiR?=
- =?us-ascii?Q?jw3uwyzW+c/6UczW9kwd91AhZWVgHttKOQkb6opjVQQyrVrOZEO6aakWeghx?=
- =?us-ascii?Q?PNdTkWrcBpXWDeGtjN6+xn+WCQ+MrFuJxKsr3J52tt8+RguGeDps7kUCgIW3?=
- =?us-ascii?Q?xFH9HIZIs1wxHiw+SdDe/Yv7xji7qYUQF9Z7/KaVLWu1J2KrEqDLlHWT/hRR?=
- =?us-ascii?Q?JkzbdIQ0cj+olbkhCOVAVbMA7pbZpcMsS0TZrSmiSQT36Ax182BihTwbkb0P?=
- =?us-ascii?Q?OvYPgtZmwKzOXLFG+uPyRnobWSz+S2LqS8BicP2ESikUrdayuGQHiZ0w9bBW?=
- =?us-ascii?Q?erAhQWR9S1PMsORmfR9o2/x8BhZcEzUdNAyMXwZQ+P8eza8yY6ARkj1UxW5l?=
- =?us-ascii?Q?zqTKlQBge37lA+gdZHSnlu8p03r7SzP7pbdXCDWI9foXFreWV0Qau3Rmzelw?=
- =?us-ascii?Q?0+hsquAGijiOP0066MHkvop9R1KHmV931HgB1vHqztShQEjcN1P7LLAQFE6P?=
- =?us-ascii?Q?E2fN/R9/346D/s4SG3xSAJDdCeq1BduWrecs37MgfHQjuhZ16t56Nz9AoKIp?=
- =?us-ascii?Q?PJGU6bE2eKAhhrodHnN/w58u99i5Tu7oJBueT4B1n+FzCTqwrEBODooFSLVd?=
- =?us-ascii?Q?AGLOAW57E6C671vWhr9Dj7EbNn3R2MnGl+eX3EpS4j5EQqb4U15ZmmEGPlSN?=
- =?us-ascii?Q?3hckurdM7LmthDQtVX/9z2wYmwISUOkCNi5dAifzquu3QNDLo1+hk1+ZPLFT?=
- =?us-ascii?Q?ptge1d9T71Hv4+o6YulxVRy+bl98FmSAY7gFH/iMb2453FKIIxVuC6Z3o7hB?=
- =?us-ascii?Q?neI7/y+53Apzc1ELC8q/9UQsjgAXbaf+3l4t1qvjIVap97BXhRdoq3zX3Hxx?=
- =?us-ascii?Q?EqjVeKYql3o=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB6373.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?0jUy+XddPHIvv2mN591XDcj59qpmqjE4atBA8MqsIegPmFjGotguZ8JbivHo?=
- =?us-ascii?Q?NmH/aJksX2cfA5DgXEe7N0t+lfbhXammgqdsr5C1KytiKvsZ/Y9QF8p6Jjgm?=
- =?us-ascii?Q?GqXvWw5urmfNtAzmL7rJLPvKRDTXiuTLl56y2Y3/isdABKM7nTuRsnw2kcz3?=
- =?us-ascii?Q?f+vMq4sKV6wC/TOb4mB2x7fFT2zQbV9MsZead46pnJwMzR0c8M/KdtdjPssD?=
- =?us-ascii?Q?UDjW8jq3DhEAheKzcfiE+6jnO3Y0S91JqppYP+1X1ykBeFt2QqvXP3ZtEpDQ?=
- =?us-ascii?Q?2THfy5oDhF55sfq6+V/X+TJyKeo0kINyMR/FE/UCo0mIcuOpm50bAO4B9akD?=
- =?us-ascii?Q?K3Pp6V5LX+yukg9XXPZJjqvGXMKNefgJzIGdYzIbEoUWUlt+EDGccUtr30qY?=
- =?us-ascii?Q?zzikgeNptNTnwbicSRbazmVPtesrAr1IJLjRNcyREdSDHroR9uys6ji5mQ96?=
- =?us-ascii?Q?r5tvQN2Pp87sRLlHzNy1iNFYF9rwDK6bI9Z8dN37ctMf/IICfwNZZrirJsKQ?=
- =?us-ascii?Q?NMXjbCgloX6NqA1QgV3jq8Vao9noRIjRPrK7wgM0rWBRPEFv1q+HvyNFOwR8?=
- =?us-ascii?Q?DR4u8sZEY7A/2YfPl+psh9E5aCpzKmR0yRl9rkvsr6bN5spYQuQL4uQcZ4s8?=
- =?us-ascii?Q?vV8KiaX3QNudCYYxPGqsLcfEhHWTQkvujRhV7u9gDgbOsIFwUMPnoJiK1FVj?=
- =?us-ascii?Q?r4z8MYQ7dFq6mtP222HbgzJT2QFyweczhi0qm5ibvFeT81kgsyepw/CqkNLm?=
- =?us-ascii?Q?YXJuaZefPZkfFL0HylxSCw6LbeSLvvkxIOMwxcom0to8ile1HjmeOmY/YBKU?=
- =?us-ascii?Q?mbqGCCFnpluYLSGUPAA2LEp7fDVaNQRs+x9ivx1xWYdB7nvnkZlo2SoxItcd?=
- =?us-ascii?Q?BFsaOB9VvLnVPcDtClf1N/rPN7LsceS9Udc0JRDTnF4LAcx+Nu70b93qteXc?=
- =?us-ascii?Q?UdvEoFVSXQjr20Oo8oN6qvxhp99b98335+hrRgBUJyvbCwnETn2zhyaEmEmD?=
- =?us-ascii?Q?hfGlfFE0eNAQXx+AF2//iihyi53yx9c7ZgzveqQUdnMgWskpCti2vFD+aIog?=
- =?us-ascii?Q?3u3Jy4eIpxrTuZ8kliLTY3CvpPsZGXboFP+idwaDllJzsH3YwBnFgNO9ju7n?=
- =?us-ascii?Q?thCXQcerck1ck4ihf66ozIN51zdaGyGnN9xmUsaIF6x8bNg3QBzOidSikM3v?=
- =?us-ascii?Q?sFeC7bd3xKlFADHWGcjcjOSPw5rywCGPjk/iqz+599HOxg39fHq8FYuW5L4M?=
- =?us-ascii?Q?y3bDKNQ5EAelqBV7DUlixNmVHk4FjBclXj9Z7QjQuoWjuwDBfcI5GqM/E2cI?=
- =?us-ascii?Q?mIBxkJgThfUNJBele6dOIWhdRPeBPZM36+oWOFSd9hQn5Nwny8F39L2os+PL?=
- =?us-ascii?Q?yuCAhkkENtcpXoMuOz7+twj8wHOUrhB3C6zwRBWOI7g1AWm1Jpt0DSLSij99?=
- =?us-ascii?Q?Dl9ENCP7kHjvbcYbwMN8bfvFS8sdrzZPnuiewEUdOOaSkgwqG2DhTyE5U8kn?=
- =?us-ascii?Q?I0jQ3lwzy/3yeFZMSzX8ljhgGsST6+oGnlMhs3kQXcHcRZC40ObQ1kcRwUtb?=
- =?us-ascii?Q?DFQ7aJRGToPYgyjtI/7QWGewMaoVhqZQiR40KNZo?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a1bdebda-6173-4533-123c-08dde012dc1d
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB6373.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Aug 2025 17:56:16.7404
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: dkzPnDUY0ZGgVQ6X/PLisosj3eleWXCUQJCplWXEOCILSGk1q99tnttVg2Lq7ZwvxQr8jb0XCzLwLVuczwKv5A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6446
+Mime-Version: 1.0
+References: <CAMGD6P1Q9tK89AjaPXAVvVNKtD77-zkDr0Kmrm29+e=i+R+33w@mail.gmail.com>
+ <0dc2b8d2-6e1d-4530-898b-3cb4220b5d42@linux.intel.com> <4acfa729-e0ad-4dc7-8958-ececfae8ab80@suse.com>
+ <aIDzBOmjzveLjhmk@google.com> <550a730d-07db-46d7-ac1a-b5b7a09042a6@linux.intel.com>
+ <aIeX0GQh1Q_4N597@google.com> <ad616489-1546-4f6a-9242-a719952e19b6@linux.intel.com>
+ <CAGtprH9EL0=Cxu7f8tD6rEvnpC7uLAw6jKijHdFUQYvbyJgkzA@mail.gmail.com>
+ <20641696-242d-4fb6-a3c1-1a8e7cf83b18@linux.intel.com> <697aa804-b321-4dba-9060-7ac17e0a489f@linux.intel.com>
+Message-ID: <aKYMQP5AEC2RkOvi@google.com>
+Subject: Re: [PATCH 0/2] x86/kvm: Force legacy PCI hole as WB under SNP/TDX
+From: Sean Christopherson <seanjc@google.com>
+To: Binbin Wu <binbin.wu@linux.intel.com>
+Cc: Vishal Annapurve <vannapurve@google.com>, Nikolay Borisov <nik.borisov@suse.com>, 
+	Jianxiong Gao <jxgao@google.com>, "Borislav Petkov (AMD)" <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, Dionna Glaze <dionnaglaze@google.com>, 
+	"H. Peter Anvin" <hpa@zytor.com>, jgross@suse.com, 
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Ingo Molnar <mingo@redhat.com>, pbonzini@redhat.com, 
+	Peter Gonda <pgonda@google.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Tom Lendacky <thomas.lendacky@amd.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, x86@kernel.org, 
+	Rick Edgecombe <rick.p.edgecombe@intel.com>, jiewen.yao@intel.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Aug 20, 2025 at 04:12:28PM +0000, Luck, Tony wrote:
-> > >> For struct mce?  Maybe that should be 2 new fields:
-> > >>
-> > >>    __u64 addr;             /* Deprecated */
-> > >>    ...
-> > >>    __u64 mci_addr;         /* Bank's MCi_ADDR MSR */
-> > >>    __u64 phys_addr;        /* Physical address */
-> > >
-> > > Would "addr" keep the current (low bits masked, high bits preserved) value?
-> >
-> > Yeah, it wouldn't make much sense if phys_addr was the same as addr anyway.
-> > Not really thinking
-> 
-> The other option (but a bad one) would be:
-> 
->         __u64 deprecated;       /* was "addr" */
->         ...
->         __u64 mci_addr;         /* Bank's MCi_ADDR MSR */
->         __u64 phys_addr;        /* Physical address */
-> 
-> which would be good to force cleanup in the kernel, but bad for preserving
-> ABI (since "struct mce" is visible to user space via /dev/mcelog).
-> 
+On Wed, Aug 20, 2025, Binbin Wu wrote:
+> On 8/20/2025 6:03 PM, Binbin Wu wrote:
+> > > > > Presumably this an EDK2 bug?=C2=A0 If it's not an EDK2 bug, then =
+how is the kernel's
+> > > > > ACPI driver supposed to know that some ranges of SystemMemory mus=
+t be mapped UC?
+> >=20
+> > Checked with Jiewen offline.
+> >=20
+> > He didn't think there was an existing interface to tell the OS to map a
+> > OperationRegion of SystemMemory as UC via the ACPI table. He thought th=
+e
+> > OS/ACPI driver still needed to rely on MTRRs for the hint before there =
+was an
+> > alternative way.
+> >=20
+> > > > According to the ACPI spec 6.6, an operation region of SystemMemory=
+ has no
+> > > > interface to specify the cacheable attribute.
+> > > >=20
+> > > > One solution could be using MTRRs to communicate the memory attribu=
+te of legacy
+> > > > PCI hole to the kernel.
 
-/dev/mcelog has been deprecated for a while.
+So IIUC, there are no bugs anywhere, just a gap in specs that has been hidd=
+en
+until now :-(
 
-Is the mcelog app still in active development? Could it be updated to
-use trace events for MCE info?
+> > > > But during the PUCK meeting last week, Sean mentioned
+> > > > that "long-term, firmware should not be using MTRRs to communicate =
+anything to
+> > > > the kernel." So this solution is not preferred.
+> > > >=20
+> > > > If not MTRRs, there should be an alternative way to do the job.
+> > > > 1. ACPI table
+> > > > =C2=A0=C2=A0=C2=A0=C2=A0 According to the ACPI spec, neither operat=
+ion region nor 32-Bit Fixed Memory
+> > > > =C2=A0=C2=A0=C2=A0=C2=A0 Range Descriptor can specify the cacheable=
+ attribute.
+> > > > =C2=A0=C2=A0=C2=A0=C2=A0 "Address Space Resource Descriptors" could=
+ be used to describe a memory range
+> > > > =C2=A0=C2=A0=C2=A0=C2=A0 and the they can specify the cacheable att=
+ribute via "Type Specific Flags".
+> > > > =C2=A0=C2=A0=C2=A0=C2=A0 One of the Address Space Resource Descript=
+ors could be added to the ACPI
+> > > > =C2=A0=C2=A0=C2=A0=C2=A0 table as a hint when the kernel do the map=
+ping for operation region.
+> > > > =C2=A0=C2=A0=C2=A0=C2=A0 (There is "System Physical Address (SPA) R=
+ange Structure", which also can
+> > > > =C2=A0=C2=A0=C2=A0=C2=A0 specify the cacheable attribute. But it's =
+should be used for NVDIMMs.)
+> > > > 2. EFI memory map descriptor
+> > > > =C2=A0=C2=A0=C2=A0=C2=A0 EFI memory descriptor can specify the cach=
+eable attribute. Firmware can add
+> > > > =C2=A0=C2=A0=C2=A0=C2=A0 a EFI memory descriptor for the TPM TIS de=
+vice as a hint when the kernel do
+> > > > =C2=A0=C2=A0=C2=A0=C2=A0 the mapping for operation region.
+> > > >=20
+> > > > Operation region of SystemMemory is still needed if a "Control Meth=
+od" of APCI
+> > > > needs to access a field, e.g., the method _STA. Checking another de=
+scriptor for
+> > > > cacheable attribute, either "Address Space Resource Descriptor" or =
+"EFI memory
+> > > > map descriptor" during the ACPI code doing the mapping for operatio=
+n region
+> > > > makes the code complicated.
+> > > >=20
+> > > > Another thing is if long-term firmware should not be using MTRRs to=
+ to
+> > > > communicate anything to the kernel. It seems it's safer to use iore=
+map() instead
+> > > > of ioremap_cache() for MMIO resource when the kernel do the mapping=
+ for the
+> > > > operation region access?
+> > > >=20
+> > > Would it work if instead of doubling down on declaring the low memory
+> > > above TOLUD as WB, guest kernel reserves the range as uncacheable by
+> > > default i.e. effectively simulating a ioremap before ACPI tries to ma=
+p
+> > > the memory as WB?
+> >=20
+> > It seems as hacky as this patch set?
+> >=20
+> >=20
+> Hi Sean,
+>=20
+> Since guest_force_mtrr_state() also supports to force MTRR variable range=
+s,
+> I am wondering if we could use guest_force_mtrr_state() to set the legacy=
+ PCI
+> hole range as UC?
+>=20
+> Is it less hacky?
 
-You could also just fix up the address value in the mcelog notifier's
-copy. I believe it has its own cache separate from the MCE genpool.
+Oh!  That's a way better idea than my hack.  I missed that the kernel would=
+ still
+consult MTRRs.
 
-Thanks,
-Yazen
+Compile tested only, but something like this?
+
+diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+index 8ae750cde0c6..45c8871cdda1 100644
+--- a/arch/x86/kernel/kvm.c
++++ b/arch/x86/kernel/kvm.c
+@@ -933,6 +933,13 @@ static void kvm_sev_hc_page_enc_status(unsigned long p=
+fn, int npages, bool enc)
+=20
+ static void __init kvm_init_platform(void)
+ {
++       u64 tolud =3D e820__end_of_low_ram_pfn() << PAGE_SHIFT;
++       struct mtrr_var_range pci_hole =3D {
++               .base_lo =3D tolud | X86_MEMTYPE_UC,
++               .mask_lo =3D (u32)(~(SZ_4G - tolud - 1)) | BIT(11),
++               .mask_hi =3D (BIT_ULL(boot_cpu_data.x86_phys_bits) - 1) >> =
+32,
++       };
++
+        if (cc_platform_has(CC_ATTR_GUEST_MEM_ENCRYPT) &&
+            kvm_para_has_feature(KVM_FEATURE_MIGRATION_CONTROL)) {
+                unsigned long nr_pages;
+@@ -982,8 +989,12 @@ static void __init kvm_init_platform(void)
+        kvmclock_init();
+        x86_platform.apic_post_init =3D kvm_apic_init;
+=20
+-       /* Set WB as the default cache mode for SEV-SNP and TDX */
+-       guest_force_mtrr_state(NULL, 0, MTRR_TYPE_WRBACK);
++       /*
++        * Set WB as the default cache mode for SEV-SNP and TDX, with a sin=
+gle
++        * UC range for the legacy PCI hole, e.g. so that devices that expe=
+ct
++        * to get UC/WC mappings don't get surprised with WB.
++        */
++       guest_force_mtrr_state(&pci_hole, 1, MTRR_TYPE_WRBACK);
+ }
+=20
+ #if defined(CONFIG_AMD_MEM_ENCRYPT)
 
