@@ -1,228 +1,225 @@
-Return-Path: <kvm+bounces-55089-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55090-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27BA4B2D246
-	for <lists+kvm@lfdr.de>; Wed, 20 Aug 2025 05:08:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E0B8B2D29F
+	for <lists+kvm@lfdr.de>; Wed, 20 Aug 2025 05:34:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1AEFA7AFE76
-	for <lists+kvm@lfdr.de>; Wed, 20 Aug 2025 03:06:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 93A221C24D54
+	for <lists+kvm@lfdr.de>; Wed, 20 Aug 2025 03:34:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87D85253F21;
-	Wed, 20 Aug 2025 03:08:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE078228C9D;
+	Wed, 20 Aug 2025 03:34:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IMciItmB"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Hfetoi7n"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2046.outbound.protection.outlook.com [40.107.237.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 420B32264D5
-	for <kvm@vger.kernel.org>; Wed, 20 Aug 2025 03:08:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755659293; cv=none; b=NqgohnyH+SBZLxIwyQdbJLJcNeRvCIaK6Vobgu5Gebl6Ylk/gHMhgVQt6uJTGRkVoUW8dpZ6JmZq/QrDVcJDir8oV2FeaLtxYuKa0ZXXVQRFa2SzmM6r1d2eJ63QTO3MQv2rBQjAnprJz7LicusBjEnNQKqPl54PPn/rV1mAMng=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755659293; c=relaxed/simple;
-	bh=SrDo3l6tDAI3xcpbuaeNpSYX3OYgbsb2SvsjCJKZ8vo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZribMq1U63WyIxbnuZbtqjfvIHjUrvKzHS7h+FvSkURZgTEuy8oPPDg6VVCttpKVyWAIgn7aUxc0k1I9rqWBJSn0pSb3QQS65r0HEmoUE/RD0QDZTZIY5ZECnzvdEtE+IItpM9v/hkmucHknmizynrpi9TPfV8nBpA7tYPbexvo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IMciItmB; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-242d1e947feso114195ad.0
-        for <kvm@vger.kernel.org>; Tue, 19 Aug 2025 20:08:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755659291; x=1756264091; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pFgari3SJ6Zv3aVho4cCxh1qrxAz56Z6UuPaB3I9a+c=;
-        b=IMciItmBgVynJAtmq7AnaXtltl0aLQ43S6X7+JfTrOJQT8gBtCiD86Gq1CiBkAy9J3
-         GMCzwo7hhA6nXjzPufiQYcbRe7nP3hCgvwf2dtAsGRXBep1O1Db4EIrm5txwMqnzSb8R
-         e69QgR/08mqI+b2sE1VfLgL9qH/s7B1bxxv/c4+7OjOSgp+6AZPo4RSxLuo0f7PT/SSW
-         TBf7JBKn+Dh1TPnx2Ke3QDFv9pSzpxOJ7YP//xiGdEe79KuLdZl41FjlXp1y+K8bDyl2
-         20PmYSFkYnxRGWa/ENxDKf4+aLBkP/xwjLxMqfZn9djCMMOPEEMf0GGo3GHa/p7n/ZiN
-         gxdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755659291; x=1756264091;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pFgari3SJ6Zv3aVho4cCxh1qrxAz56Z6UuPaB3I9a+c=;
-        b=kFr87W98ysBMrfShuvzXXiSXiRHdmebMz4HqLuzZz5JUWIcClOTs3ZiP2+hvxtH52W
-         3lMA32A05lbqyoYo3w0aYOpzjVrnR4RDDQwZZd1ZmiCLRcF/fksxNEIeMSMgppJQlflT
-         jbluzsT1zCavenyG0EHKib3bvnpmEpW9qs+q9ZIeFm/JP1Rbpmk+Cq4PLNhICv8NG4Qz
-         yEpGnsQm67pJyIR8PwJpcCPL7EEq+7kIsozznJ29wSAU4J9aRNwNdBHdvd0GpzqpQhO4
-         c/JM4murqTYEcaasYwmLMr2Mr7eLlpJ1euKswVZC+oJe7Hek6ajCecPHdXfIIniaew+a
-         6uNQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWs+8XTqqYbwrlq2pU44tTzNDDq2VgMr1lyT/5hUHes9Jay98lRcljRbn58bgOxsDrUK48=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywxktxx1hTBEjhu3Zb/NzLy4O5b7Wg7+OlZNROdHLtYd0HNUuqX
-	8qGSAUQTjdgYVcM0OKbzzDGntic7k1ZfdjHNWnMUF8pbaz2iPv1IYVEgEv1gdw7R0cAxaC+3Ccz
-	Ja3UZrd4CqpLJYsbWw+qilSUXDsiCQetDLebAfJya
-X-Gm-Gg: ASbGncvirBh8G42vxD5PQzB2cJRQMNJriqZVfZUKFNiDzeowDoDYoBho5mTtfLpQ7p0
-	X08KxM9Ttgc0PBW+UeC8aHXxZYDQ5r6PYVAph/0gnZPk5EXS99q45YMPtWQ6t40D72Pr8ZPAZHB
-	R+QgeBaTeadsqOZJRA/j6STH1+0UMpUETHaVrmSdWvn9goVswSK16/Kyj6G224PgtE/lZJINRU1
-	ZSOoLcTD70pFWqLxNWiQ33dOWseXTk7FWnRmvHKOrTDhmNxbqEceVJ4
-X-Google-Smtp-Source: AGHT+IHbe1HzXl8UoH+zB1dMhZd24Q0x4xZkhxr+JG0B2a1qDHiFP8KmZ60IvW+WHlqgHc0mMe95c66v2Bok0dXuMLc=
-X-Received: by 2002:a17:902:e551:b0:237:e45b:4f45 with SMTP id
- d9443c01a7336-245eff59781mr1974835ad.1.1755659290889; Tue, 19 Aug 2025
- 20:08:10 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DF963BB48;
+	Wed, 20 Aug 2025 03:34:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.46
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755660848; cv=fail; b=IoiPpfjuRDa/xektFOQYgrNhUSmDjxolPRPyp2JPK5CiuOESEtOxfEs/gfMPbydh9tludERldfSRLFdLYjDFxWuATTduA1Lyu2+6hBJoINQDZYU/tX4jeXxOv020sajN88Pi6ykjcAIf6/59Xq06wNxBd4qBQophYtRtWy7iV4s=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755660848; c=relaxed/simple;
+	bh=Su4wbN+7oG8xMtzoruPoux5/mLJpSAEhX/mSxVG1wUg=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=K2go6Ic4d3ftqvi7AgpSyAw9w3G6V6iUJTPR3j03mijNNp1dhjXzW4EHxWV/38moHKy1W0tans+PrjFBXnijLDpIt8wtObShzZrEYVLeiGGxzkX7jRiCd4KlwNOnxZsYkNhw7Q5HEiemfyquRWIKmQ4K20kYearYUe2/SYDXudU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Hfetoi7n; arc=fail smtp.client-ip=40.107.237.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=gOOd4/t0Zsp6Tz+ZfelSWIqAU3MQXUCEdc5JwkDlUra6WT32Jq2BPqpSA0JqCit7wA/pG59/f10r4VyLftkZrAuXeNW8Z7SZVo2DdOHbkEABUV3dMQBcsAslEGPqwwonJZ2+ibaJc4MQV/hcJKXSiMFZFJmVJNWWZDzo3VGFp7JILZyx9gGMK1wbsBqLepC1rCIsDGFg5xi+GQsm+Khzk57vUQpc9JsJ8zIgDjVhHg1qIK2M9vIJogDASywsBSA/6MbdRq7KNCM4lbijv/P0l8PfONo7ZE5Rr6qIt+RDcicXS35/wEpx603a++qFL3znOH96uru6E/CQ0TzjkrV++w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=nWOU07+IW1RY5AbyrQrYs+5hCaqLZs5wv7tNp51u7ls=;
+ b=PSPmt6vnihRI9nylM8hvj62janFhgDtAJ34RgnH4uxxh6NyAFQoMuGGutq4YB7806l3X4r6qBdsb/BpP8zXSLpAuZSxbHO3KLWwFaSvrB+zyoIkfIUmTEC7/tUBrhACQbWwHfowbrRrueQRlv3dI1xs/3cFcWXGvW51fR0XPddrzhm7XprgvTuTT0YQLsCn9UfB0d20r+1GM18Au9NXNlGZAgpTFEZIMrlMxSISyxyuAu0Xd1hr5ePETtqPdap4EqC3Sjg1ZxcbIfXxZ0f3V4a3QfTyPR12N28AZFWiYep0/lMteexN7o3KcyKJCsLJuuKg8OmwUJTIxOZKYh4RCbg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nWOU07+IW1RY5AbyrQrYs+5hCaqLZs5wv7tNp51u7ls=;
+ b=Hfetoi7nq7e44VN0fCNuCuNhRgFNd8yE+VA6tKkJge6rLvjSbUH/ZChy28Y4Occp7HeDTgqPW2IpFoZk3N47i3r7Ev1D2tJznuP1YzKSbIkVffl9SJwM6qLnGHT3LVSB/nokK3iJRpkIbFYbXvAIlWEFY1+d97pfG+4EBklMo18=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS0PR12MB6608.namprd12.prod.outlook.com (2603:10b6:8:d0::10) by
+ SJ0PR12MB6688.namprd12.prod.outlook.com (2603:10b6:a03:47d::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9031.24; Wed, 20 Aug
+ 2025 03:34:03 +0000
+Received: from DS0PR12MB6608.namprd12.prod.outlook.com
+ ([fe80::b71d:8902:9ab3:f627]) by DS0PR12MB6608.namprd12.prod.outlook.com
+ ([fe80::b71d:8902:9ab3:f627%5]) with mapi id 15.20.9052.013; Wed, 20 Aug 2025
+ 03:34:03 +0000
+Message-ID: <43bb8dbe-8213-4c12-b9e8-0182f808dd9c@amd.com>
+Date: Wed, 20 Aug 2025 09:03:54 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v9 03/18] x86/apic: Populate .read()/.write() callbacks of
+ Secure AVIC driver
+To: Borislav Petkov <bp@alien8.de>
+Cc: linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+ dave.hansen@linux.intel.com, Thomas.Lendacky@amd.com, nikunj@amd.com,
+ Santosh.Shukla@amd.com, Vasant.Hegde@amd.com, Suravee.Suthikulpanit@amd.com,
+ David.Kaplan@amd.com, x86@kernel.org, hpa@zytor.com, peterz@infradead.org,
+ seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org,
+ kirill.shutemov@linux.intel.com, huibo.wang@amd.com, naveen.rao@amd.com,
+ francescolavra.fl@gmail.com, tiala@microsoft.com
+References: <20250811094444.203161-1-Neeraj.Upadhyay@amd.com>
+ <20250811094444.203161-4-Neeraj.Upadhyay@amd.com>
+ <20250818112650.GFaKMN-kR_4SLxrqov@fat_crate.local>
+ <964f3885-059e-4ab0-b8fc-1b949f0b853b@amd.com>
+ <20250819143214.GKaKSK7rABhHAldbbR@fat_crate.local>
+Content-Language: en-US
+From: "Upadhyay, Neeraj" <neeraj.upadhyay@amd.com>
+In-Reply-To: <20250819143214.GKaKSK7rABhHAldbbR@fat_crate.local>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BM1PR01CA0145.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:b00:68::15) To DS0PR12MB6608.namprd12.prod.outlook.com
+ (2603:10b6:8:d0::10)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAMGD6P1Q9tK89AjaPXAVvVNKtD77-zkDr0Kmrm29+e=i+R+33w@mail.gmail.com>
- <0dc2b8d2-6e1d-4530-898b-3cb4220b5d42@linux.intel.com> <4acfa729-e0ad-4dc7-8958-ececfae8ab80@suse.com>
- <aIDzBOmjzveLjhmk@google.com> <550a730d-07db-46d7-ac1a-b5b7a09042a6@linux.intel.com>
- <aIeX0GQh1Q_4N597@google.com> <ad616489-1546-4f6a-9242-a719952e19b6@linux.intel.com>
-In-Reply-To: <ad616489-1546-4f6a-9242-a719952e19b6@linux.intel.com>
-From: Vishal Annapurve <vannapurve@google.com>
-Date: Tue, 19 Aug 2025 20:07:58 -0700
-X-Gm-Features: Ac12FXwFIjaoMfyA4gRBWWBv-JFyesrY8os1KLWOTAQdkCuZ-XVXWvdu4NXLBgg
-Message-ID: <CAGtprH9EL0=Cxu7f8tD6rEvnpC7uLAw6jKijHdFUQYvbyJgkzA@mail.gmail.com>
-Subject: Re: [PATCH 0/2] x86/kvm: Force legacy PCI hole as WB under SNP/TDX
-To: Binbin Wu <binbin.wu@linux.intel.com>
-Cc: Sean Christopherson <seanjc@google.com>, Nikolay Borisov <nik.borisov@suse.com>, 
-	Jianxiong Gao <jxgao@google.com>, "Borislav Petkov (AMD)" <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, Dionna Glaze <dionnaglaze@google.com>, 
-	"H. Peter Anvin" <hpa@zytor.com>, jgross@suse.com, 
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Ingo Molnar <mingo@redhat.com>, pbonzini@redhat.com, 
-	Peter Gonda <pgonda@google.com>, Thomas Gleixner <tglx@linutronix.de>, 
-	Tom Lendacky <thomas.lendacky@amd.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, x86@kernel.org, 
-	Rick Edgecombe <rick.p.edgecombe@intel.com>, jiewen.yao@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR12MB6608:EE_|SJ0PR12MB6688:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6db87bc7-4a08-4cff-8d13-08dddf9a689f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|1800799024|376014|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?NzkxYTJLdEo2bWJQYmYxVUZSbm1WTFBBV1hibWRCRzZENzZJQ0xXWWppMm05?=
+ =?utf-8?B?b1JTQ0lNS1pyUVFTamduejR3Z3paaTVmdTZnQXc3ZXFKdURhMmZpM2Q2YThK?=
+ =?utf-8?B?SmY3RlBjRnhDRWdKSFZOaVNrcnBFN3VjNE9QSFVWVnlMVmowRHVpYTg3eFpU?=
+ =?utf-8?B?MDlZWW0zUmNEWXhiTEUzMkZBRTJFZ0loRlh4b2x1L0V5VzE1cDdVdllyeFRk?=
+ =?utf-8?B?MUJIYXRZMHdLWVhmMjJUWlVxNFp3ZDduU091U3FybGZWTWhmaWwycUJzQ3BI?=
+ =?utf-8?B?Zk9tZG0xY1FxUzdSUis0RUxWOUxUOTdraDNqNXE5amgzQU1zUitqUW1NNytL?=
+ =?utf-8?B?ZlNwLzc4RThvVFQrN01aQ0dYMVl4WjJlOURHZzUzNEs1YjZwZmJ2Rm9xR0pq?=
+ =?utf-8?B?YXkwL1NGNkMycWpQUzFTWUVXOTlRVzhTVEtlalBPVTFpYXNuenJqWWxOaHR1?=
+ =?utf-8?B?d0NYWlZlN0N4QndDRm1wSU9WK3hYQ3U5MWhYWFppS2NQRG03UkZWL2JnSkpo?=
+ =?utf-8?B?OEZwR3h0dUcxL3IxMW5saUNmQ2NTbU9IajFFclQxZ21Ibkx3Y1h3eThMWnp3?=
+ =?utf-8?B?UHJISi9abkhYeFhmYTZQNUYwOTN6THpPZWRKRDA1aXFMbHZaUWpQU0RSSmV1?=
+ =?utf-8?B?Z3V2VXVJQWUrZlRST000V1k3Skl3ekhDS3NtQTAyRGRCN1N0UzQ3c2RMa0dI?=
+ =?utf-8?B?dmx4clJWU01jNVRYUkJJcCsvQXBma0o0K1cwMS9Fcis0LzJPbGhld3VnaVkv?=
+ =?utf-8?B?NTVsZHl0b3BEOWZrSlRUM2lzcE42c3VIRnVXVGhnZTJLUWloVkIzcFhqQ1lJ?=
+ =?utf-8?B?OWJPVi9KVW55YXJOWi8vYnh1SHBIcEVuVFNqQnlYNnA4OTZPQ0tQTWJ1QnRN?=
+ =?utf-8?B?Rk1yY0gza1FlVlpvakFuMS83NVorRm50MFFTT0h4b2xVSzB0dkVJVGZ1UlhP?=
+ =?utf-8?B?bXM2WE4vMUlOazV3Z3Y3VXF3Q1ZYZjFGb3JUc1FLbkNqbTkrRUtYeWxOY1g4?=
+ =?utf-8?B?bzcxL2ZKWnBjZ0tYeVBFUVZYTDlEZGNpSnJ3WHA3dG0ybE1ORUR2Z0MwMzhR?=
+ =?utf-8?B?dEN6emtLb0pIZnZ2TVF1cnc2RTlhU21oaC9vbUNib3crenNWdWtDd3pMclJ3?=
+ =?utf-8?B?bUVTd0RpTDRxRmtjR3plRmFxTWY0Q1ZMaytDR3dKam1ua1g3ZHg2QUhoVkZG?=
+ =?utf-8?B?aERQOEpLNzJ3ZG1jUGRjUEsvQ2E2MFZnbmFLNTNib0hQNm1ZN1orU1lERzY2?=
+ =?utf-8?B?Nk5qaXlURlo0Y1JSd1FXMXlZQ3o5dnpsUmhiUjI5NlNVV1hPUFpDQjhTWEFy?=
+ =?utf-8?B?VGtoZUdkYjU2c0QvMis0bHovelRwS2twQVRadHZ4dndFMDJiSlc1WWlwYU14?=
+ =?utf-8?B?ZHdoSG9NQ1ZJbm1HYmtOY3NGbFNGMml5MzVuakZHODBSSEZmQ1k2cGJVRWtz?=
+ =?utf-8?B?aFZYc2FjeGV1SzlDNmNoKzFIWFo3YWhlNFc3V0dlV3JMQU9HTWR2ZGs3eW1G?=
+ =?utf-8?B?ZER4YnpSVUZFL0dWd3pndDlqUG84VTRhcUpSNEZ1eFhlSGJpWGQ1RDE4R0NQ?=
+ =?utf-8?B?MUd5WUNTL0NMdUF6WjFkdEpOM2I4NW80ZVI3ZmwxYTVvN2RMWkc5ODBRVngr?=
+ =?utf-8?B?THZQY1locElGMDM4bkY2UUNGTWdGcVZNV0psblJRdmxNd3JncTcxUUdZaDhl?=
+ =?utf-8?B?dkIvYmd6YWM1NFM0MFRDcHlXbVF1dkRrcW1JZmdVYll3MzR6WTBjQXlhT2Zi?=
+ =?utf-8?B?aHBHUnhHMDFtb1RZbTZVbVNTVDlZa25MN2xvVHBWaTIrK3JlOFNBZVRSWEE5?=
+ =?utf-8?B?cm5FS0ZTaGNSVkh5N2FHVjlVNGNYNmQ0SXJaUXZ2NWVkdktXRDRXaDN6Rm56?=
+ =?utf-8?B?QXg3NGk0ckk1WVo5aHdZd1dGUnViQWNCMlFva0U4OGN3YmtMNlEzU3l2SnY4?=
+ =?utf-8?Q?VeEKoAXFz8E=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6608.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?R2NoK1hBMlBZdFdwWEhOWVZERnJhSlhyRVplNHIxYjBwcWgvTTByOEk0SFJk?=
+ =?utf-8?B?UGZZRW10ZCszQkxucHM5L1cxQ0hrOWlPTUNRSmhsTld6eGxKekd6WjZlRDFR?=
+ =?utf-8?B?ckNRM0UzUHB3aEdqRUd4ei82UGdkeThDeFNmY3E2cEdKN1FsbTFxMnFDRDQv?=
+ =?utf-8?B?OGNuQ3NJaDJiNHQ2dlZTNmpkaUF3QWFNT2lmZVJWcERiUXhwbTE2blFBWmdI?=
+ =?utf-8?B?a1ZUM1h4QUgxamYvbmZtZnFZb0xHSTdaTGJmMEZ1MkpPb1FQUWdGSTFzd2VG?=
+ =?utf-8?B?T2laQlZrcjBnM1lPZGFJdkZjWlpGRDU3NmFFL0Z6dWlzY1hSVlpzSjZobmpK?=
+ =?utf-8?B?Ylg5ZkFsd3dFcUU1cGVJNnh6bmE0WmlQSkxtdDFkMWM5bGJYOFdxT0NvdjUv?=
+ =?utf-8?B?QmVrNmpDcHYxN0x4UG1jcUw5WGJMOGZTTU5UZFZVQjZoektTZWJyNVFZOGxt?=
+ =?utf-8?B?T0FLMUN2UE9UcXRFU3FndEp0L2JweVRqTnRzYysvMEI0YlVVZ0JuUmJRWDZr?=
+ =?utf-8?B?WEZaeXBhMlhXdTA4eG1pMmlnMHFxREVNQ0VvM0RDYjZZdHRuUmphRFJqZkJO?=
+ =?utf-8?B?a0hNeGZoc0V5UWpzMjVhTFNBTXdHdUpKVjBZZEF3elMxbjdkVGRjUVFiMkdn?=
+ =?utf-8?B?Ukg4UXJNa0hod1Ntb1lLVXlrWVk3bTZWM2pSMXhkcWdiQmEyRG1qN083OUtZ?=
+ =?utf-8?B?OGtiN1ZnenZRUjdkRTFvWGZHblBZVE1VZzdqaE84VDJua0JYek0rdlRvMjd4?=
+ =?utf-8?B?UWZUbjhEditUL0V1bXAvMk54Y1M1cmZpbDFHN01mTW0zc0JUUkVYeVhmRExH?=
+ =?utf-8?B?YlJBcTFWV0hzWWhWeUx1YnJZS001QndJWEt0SVZJNENBZVBCNDArVzhidy9u?=
+ =?utf-8?B?RWdhdW1kWWxEaXJMQU0rOTlEbEoveTIveFRSK0xzejJhVEhWSUpBd2R6eGoz?=
+ =?utf-8?B?ZUY5d0ZVT2FDdHhCWXRWMHYwQzBBTGVoM0daQUdtNFFXeFU2NUJvLzNoZVlh?=
+ =?utf-8?B?SE9FT3U3cmJLQmVsanNxb2pWby81aDU2VEdacGVwZW5ycnRBYWZublQ1NEYr?=
+ =?utf-8?B?eG1uaVNVMER3R2xFa2pCKzQxMnBuSU9HYkVlNFVRNk1CRFVXOXh4L0t2cmla?=
+ =?utf-8?B?NURpTFlOQkhWWUhrNGt2MW1wYzFGVkJ0RmRkbFZ3WEtpcVpWNGF5NHV2cVVK?=
+ =?utf-8?B?enhWUVErWHpWcjhrSjNkeHdwSWg2cm5WdkZ2L2pTWFpiRU9MaXJMdW1pQ2dQ?=
+ =?utf-8?B?a1dmcjZ5emdjVGJoOEhGRVlEVGdKZHdxbXJodEliYXNySWtrTUt2UXVoaUkv?=
+ =?utf-8?B?a3B6ZEQ4NjdjenExNkNsRTVxMjdLT1JwaUdaaTJUL1FOd1NDM3NIUGF1bm5P?=
+ =?utf-8?B?VlFKaDNnd0tIQWRtbGJIV2FJUmV1Y1dqQzJncFdXSDlYYVhTMnY2dXloYVZw?=
+ =?utf-8?B?UzVvaStBdCtPUHEzRUVFV05lc0lLWjE0Q2cwdlRWRnI2N3dhcGhmekZjbWFy?=
+ =?utf-8?B?VzYrcGUwcDM5L3gwb29DQ3NaaittcnlHYmVMRm9Ydkp6YzRWU2lIOGdvbUwy?=
+ =?utf-8?B?R3c5ZkJrM0JTU0tvNjduNmp6d1pSbTJTRkhFTHA3RlFZc3YvbVQxRWRoSnZ4?=
+ =?utf-8?B?dThwd3UxVE5JUUUvQS9VVDFnd0xJdDFITmREWEpWRlExVktlTm1ORTNGMEVi?=
+ =?utf-8?B?RkszVDlVd1htVUU4L3QxR3BaUDBLTEUxM2lZZ1pHNWNyREs0bk9XL2JxcDZE?=
+ =?utf-8?B?c25JakJPMCtQbm8ya05wenR5SnVHSDJsV2pUaEl3R3pvdXBXRmdsejZjS2U2?=
+ =?utf-8?B?aGJ6MWFBT2tqejBnbGlrNkRPQTdBR2l0MWV1ZlhLVnpuajJ5NVF0ZFIvcVMr?=
+ =?utf-8?B?RC9EM1ZwVEFWcFByYlZNQnJBa0dsUlZLV29VWmVHaTBGUHVzdVN6czkrb0Ex?=
+ =?utf-8?B?VjBOWG41WXVrbmNxaDVaVTVmaXk4SGFHcnpyVWROVWZDaUViTkRFd2o1ZDcr?=
+ =?utf-8?B?OFpGalJxWVI0a1pwMUFmcGM2MGI0ZWYyazJ5c3NhODJzN291clFPbSs0UFlm?=
+ =?utf-8?B?UnY2a29pRDhaQnc3bjBLODB3RVZka2EyVVhieGh5b201dFRRQ25YZHFxdjVr?=
+ =?utf-8?Q?Qde1pE3JMHSbEN0d5ZbaSFf5O?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6db87bc7-4a08-4cff-8d13-08dddf9a689f
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6608.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Aug 2025 03:34:03.5287
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 9AEuZ32zUxlgN4m1+vA0V0A1M0d4O9QZApDySLXHrPJyChdRVkEFrt3woMF7s7Tkzkc5qUDhIsKh6nO1K60IiA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB6688
 
-On Wed, Jul 30, 2025 at 12:34=E2=80=AFAM Binbin Wu <binbin.wu@linux.intel.c=
-om> wrote:
->
->
->
-> On 7/28/2025 11:33 PM, Sean Christopherson wrote:
-> > +Jiewen
->
-> Jiewen is out of the office until August 4th.
 
-Hi Jiewen, can we get some help in deciding the next steps here?
 
->
-> >
-> > Summary, with the questions at the end.
-> >
-> > Recent upstream kernels running in GCE SNP/TDX VMs fail to probe the TP=
-M due to
-> > the TPM driver's ioremap (with UC) failing because the kernel has alrea=
-dy mapped
-> > the range using a cachaeable mapping (WB).
-> >
-> >   ioremap error for 0xfed40000-0xfed45000, requested 0x2, got 0x0
-> >   tpm_tis MSFT0101:00: probe with driver tpm_tis failed with error -12
-> >
-> > The "guilty" commit is 8e690b817e38 ("x86/kvm: Override default caching=
- mode for
-> > SEV-SNP and TDX"), which as the subject suggests, forces the kernel's M=
-TRR memtype
-> > to WB.  With SNP and TDX, the virtual MTRR state is (a) controlled by t=
-he VMM and
-> > thus is untrusted, and (b) _should_ be irrelevant because no known hype=
-rvisor
-> > actually honors the memtypes programmed into the virtual MTRRs.
-> >
-> > It turns out that the kernel has been relying on the MTRRs to force the=
- TPM TIS
-> > region (and potentially other regions) to be UC, so that the kernel ACP=
-I driver's
-> > attempts to map of SystemMemory entries as cacheable get forced to UC. =
- With MTRRs
-> > forced WB, x86_acpi_os_ioremap() succeeds in creating a WB mapping, whi=
-ch in turn
-> > causes the ioremap infrastructure to reject the TPM driver's UC mapping=
-.
-> >
-> > IIUC, the TPM entry(s) in the ACPI tables for GCE VMs are derived (buil=
-t?) from
-> > EDK2's TPM ASL.  And (again, IIUC), this code in SecurityPkg/Tcg/Tcg2Ac=
-pi/Tpm.asl[1]
-> >
-> >        //
-> >        // Operational region for TPM access
-> >        //
-> >        OperationRegion (TPMR, SystemMemory, 0xfed40000, 0x5000)
-> >
-> > generates the problematic SystemMemory entry that triggers the ACPI dri=
-ver's
-> > auto-mapping logic.
-> >
-> > QEMU-based VMs don't suffer the same fate, as QEMU intentionally[2] doe=
-sn't use
-> > EDK2's AML for the TPM, and QEMU doesn't define a SystemMemory entry, j=
-ust a
-> > Memory32Fixed entry.
-> >
-> > Presumably this an EDK2 bug?  If it's not an EDK2 bug, then how is the =
-kernel's
-> > ACPI driver supposed to know that some ranges of SystemMemory must be m=
-apped UC?
-> According to the ACPI spec 6.6, an operation region of SystemMemory has n=
-o
-> interface to specify the cacheable attribute.
->
-> One solution could be using MTRRs to communicate the memory attribute of =
-legacy
-> PCI hole to the kernel. But during the PUCK meeting last week, Sean menti=
-oned
-> that "long-term, firmware should not be using MTRRs to communicate anythi=
-ng to
-> the kernel." So this solution is not preferred.
->
-> If not MTRRs, there should be an alternative way to do the job.
-> 1. ACPI table
->     According to the ACPI spec, neither operation region nor 32-Bit Fixed=
- Memory
->     Range Descriptor can specify the cacheable attribute.
->     "Address Space Resource Descriptors" could be used to describe a memo=
-ry range
->     and the they can specify the cacheable attribute via "Type Specific F=
-lags".
->     One of the Address Space Resource Descriptors could be added to the A=
-CPI
->     table as a hint when the kernel do the mapping for operation region.
->     (There is "System Physical Address (SPA) Range Structure", which also=
- can
->     specify the cacheable attribute. But it's should be used for NVDIMMs.=
-)
-> 2. EFI memory map descriptor
->     EFI memory descriptor can specify the cacheable attribute. Firmware c=
-an add
->     a EFI memory descriptor for the TPM TIS device as a hint when the ker=
-nel do
->     the mapping for operation region.
->
-> Operation region of SystemMemory is still needed if a "Control Method" of=
- APCI
-> needs to access a field, e.g., the method _STA. Checking another descript=
-or for
-> cacheable attribute, either "Address Space Resource Descriptor" or "EFI m=
-emory
-> map descriptor" during the ACPI code doing the mapping for operation regi=
-on
-> makes the code complicated.
->
-> Another thing is if long-term firmware should not be using MTRRs to to
-> communicate anything to the kernel. It seems it's safer to use ioremap() =
-instead
-> of ioremap_cache() for MMIO resource when the kernel do the mapping for t=
-he
-> operation region access?
->
+On 8/19/2025 8:02 PM, Borislav Petkov wrote:
+> On Tue, Aug 19, 2025 at 09:45:02AM +0530, Upadhyay, Neeraj wrote:
+>> Maybe change it to below?
+>>
+>> /*
+>>   * Valid APIC_IRR/SAVIC_ALLOWED_IRR registers are at 16 bytes strides
+>>   * from their respective base offset.
+>>   */
+>>
+>> if (WARN_ONCE(!(IS_ALIGNED(reg - APIC_IRR, 16) ||
+>>                  IS_ALIGNED(reg - SAVIC_ALLOWED_IRR, 16)),
+>>                "Misaligned APIC_IRR/ALLOWED_IRR APIC register read offset
+>> 0x%x",
+>>                reg))
+> 
+> Let's beef that up some more with a crystal-clear explanation what is going on
+> here so that readers don't have to stop and stare for 5 mins before they grok
+> what this is doing:
+> 
+> 	/*
+> 	 * Valid APIC_IRR/SAVIC_ALLOWED_IRR registers are at 16 bytes strides from
+> 	 * their respective base offset. APIC_IRRs are in the range
+> 	 *
+> 	 * (0x200, 0x210,  ..., 0x270)
+> 	 *
+> 	 * while the SAVIC_ALLOWED_IRR range starts 4 bytes later, in the rangea
+> 	 *
+> 	 * (0x204, 0x214, ..., 0x274).
+> 	 *
+> 	 * Filter out everything else.
+> 	 */
+> 	 if (WARN_ONCE(!(IS_ALIGNED(reg, 16) ||
+> 		 	 IS_ALIGNED(reg - 4, 16)),
+> 		      "Misaligned APIC_IRR/ALLOWED_IRR APIC register read offset 0x%x", reg));
+> 
 
-Would it work if instead of doubling down on declaring the low memory
-above TOLUD as WB, guest kernel reserves the range as uncacheable by
-default i.e. effectively simulating a ioremap before ACPI tries to map
-the memory as WB?
+Ok, looks good. Thanks!
+
+
+- Neeraj
 
