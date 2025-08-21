@@ -1,282 +1,232 @@
-Return-Path: <kvm+bounces-55382-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55383-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B4BCB3057A
-	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 22:31:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F1D5B30596
+	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 22:32:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B197A18907FF
-	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 20:27:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 344BF3BF68E
+	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 20:27:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A22D33A015;
-	Thu, 21 Aug 2025 20:09:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEFF52C0272;
+	Thu, 21 Aug 2025 20:11:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="SBUt5/3f"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WloXl5Al"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A43CE3823AB;
-	Thu, 21 Aug 2025 20:09:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D5D62C0262
+	for <kvm@vger.kernel.org>; Thu, 21 Aug 2025 20:10:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755806979; cv=none; b=Knf6+KA5YKRRgJGxhLjjitbyJSRY3BAM/NPFKdupB3EHuG/C0V5cU0NPw7FUdeZaE4POCianPh82/jBUQ3aGjcZFGUw+EZvK7w5rXlpRB9dBeakp5NhZ0FlUKjWSHJ3fRZJ+98vTDSQiLuacumYzwpSiIBLtBqz3wphzDDInzJY=
+	t=1755807059; cv=none; b=Xut+HC6w+6+zsT4ueZnX0wWKFjKG7o6RBlIQ/SD0Wh1892jZtbql9PiQGZP2WI/jWRc7HtCPk87obnyXZCzbz0oJzTzIFEfEqJifLuRGq/EZNjIU8h5kiEUGZ8tvOj67t8y1s6UoLSHFzPBnCsgY2AsCJ24FvUccBSYa1S/YbA4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755806979; c=relaxed/simple;
-	bh=7HK4DjNLbjHq0pWnQ0dFHKUxTg8f18pjTAsGbF3W/s8=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=mM1VecKAs7Kmzw2AkhqKDd2VJZC1xu7/iV6iK6EY9ocbnjdTTAv2GHf5TwSLdM76GvgGYLRhdIQgz6yLVjOerA50jSPNX7tcCShxdXQf2KOueVCTOwmv36w/9qtjPcSlh+Bx9kZU6CWmm/+SWYO36SONU7YXOBgUwDENpYZrLqQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=SBUt5/3f; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=CgsKh6PQ2X7sbamc7uSGEeb01yrHIxNuVCtONrzWHJ4=; b=SBUt5/3fPfGOxjDH2W0WkNNlty
-	lG5n7wiKp3WNjkgfokRxgNzX2PaVFggPxkUrCZ++JwrzldPBu8i8bgV3uKCyNTD5NnjahLz5/qp0c
-	mO0Ax0VwMDeW9jNE/N5mZO4wHkWVmpH/DkBFZgSpJFB2rFAYCoT++BmvZ2aCuGHAU8c3XJVfwUnFb
-	P/P3dtD7Ow26SexGKkPXbR7LvMGf96N8kkqfx6qvCGKhigdat8o1wWbNrNKpvYjjiA9OnjMBS6FqV
-	/H8lfLguR7VVfAqVvKR16nBwEEQELBmpP+nsgUMUp5HHtxTZ9VfLD/7WDO4Wc7CUIDllJFCCLh4Bu
-	ML5NPnhA==;
-Received: from 54-240-197-233.amazon.com ([54.240.197.233] helo=freeip.amazon.com)
-	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1upBb4-0000000D3Ny-06yh;
-	Thu, 21 Aug 2025 20:09:18 +0000
-Message-ID: <5b905902c99e13d65ea0810b0885fca97cffc74d.camel@infradead.org>
-Subject: Re: [PATCH v3 13/15] x86/cpu/intel: Bound the non-architectural
- constant_tsc model checks
-From: David Woodhouse <dwmw2@infradead.org>
-To: Sohil Mehta <sohil.mehta@intel.com>, x86@kernel.org, Dave Hansen
-	 <dave.hansen@linux.intel.com>, Tony Luck <tony.luck@intel.com>, 
- =?ISO-8859-1?Q?J=FCrgen?= Gross
-	 <jgross@suse.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>, xen-devel
-	 <xen-devel@lists.xenproject.org>
-Cc: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
- Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim
- <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Alexander
- Shishkin <alexander.shishkin@linux.intel.com>,  Jiri Olsa
- <jolsa@kernel.org>, Ian Rogers <irogers@google.com>, Adrian Hunter
- <adrian.hunter@intel.com>,  Kan Liang <kan.liang@linux.intel.com>, Thomas
- Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, "H . Peter
- Anvin" <hpa@zytor.com>, "Rafael J . Wysocki" <rafael@kernel.org>, Len Brown
- <lenb@kernel.org>, Andy Lutomirski <luto@kernel.org>, Viresh Kumar
- <viresh.kumar@linaro.org>, Jean Delvare <jdelvare@suse.com>, Guenter Roeck
- <linux@roeck-us.net>, Zhang Rui <rui.zhang@intel.com>, Andrew Cooper
- <andrew.cooper3@citrix.com>, David Laight <david.laight.linux@gmail.com>,
- Dapeng Mi <dapeng1.mi@linux.intel.com>,  linux-perf-users@vger.kernel.org,
- linux-kernel@vger.kernel.org,  linux-acpi@vger.kernel.org,
- linux-pm@vger.kernel.org, kvm@vger.kernel.org,  xiaoyao.li@intel.com, Xin
- Li <xin@zytor.com>
-Date: Thu, 21 Aug 2025 21:09:16 +0100
-In-Reply-To: <5f5f1230-f373-469c-b0d9-abc80199886e@intel.com>
-References: <20250219184133.816753-1-sohil.mehta@intel.com>
-	 <20250219184133.816753-14-sohil.mehta@intel.com>
-	 <6f05a6849fb7b22db35216dcf12bf537f8a43a92.camel@infradead.org>
-	 <968a179f-3da7-4c69-b798-357ea8d759eb@intel.com>
-	 <5f5f1230-f373-469c-b0d9-abc80199886e@intel.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-OQYT5kBmShxkyhQquOGw"
-User-Agent: Evolution 3.52.3-0ubuntu1 
+	s=arc-20240116; t=1755807059; c=relaxed/simple;
+	bh=R0ZyW/lP53DUpD5XCfGL8s/RHhsGuoWDmk/SVEPPWc8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mhIaINFvhniVhyyF1sojs6uDhXEXlqrB729tgGi/VwPuSaEthYafcae8SkB8WvWkdM0xF+r62W4uIw5zs60PfEf/CnvvP55s9k7PdpAfSemUYfvKpi2F5nOHp0EbZDwEJ1mG3ov9KCzHuFHVDdiIq7UaSefPpy2fZQ6/OqIWH9Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WloXl5Al; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1755807057;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=An+3TCbux96ebWXl79jkDvpeTXFUup6Liv8QO7JiiR4=;
+	b=WloXl5AlJmqcY6isKKXSorqfTao4xnrfxRX4pRiy2v5H3fCiuaDNJI/EhVlbA7ci7WIGCo
+	57JIzgwd137b+oEBKxw1Yo6Vm7QXwCmj8OCstBCYd0UiJPykQk5TTMJ2CQGUMWHAnecodN
+	dwRinHYUlwi9/rhUCjwsyc/L5APDkd8=
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
+ [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-578-x4knwsppMdCyanQ5C4moKQ-1; Thu, 21 Aug 2025 16:10:55 -0400
+X-MC-Unique: x4knwsppMdCyanQ5C4moKQ-1
+X-Mimecast-MFC-AGG-ID: x4knwsppMdCyanQ5C4moKQ_1755807055
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3e58433459bso3551795ab.2
+        for <kvm@vger.kernel.org>; Thu, 21 Aug 2025 13:10:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755807055; x=1756411855;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=An+3TCbux96ebWXl79jkDvpeTXFUup6Liv8QO7JiiR4=;
+        b=irGCZlzpzaOvcQjacsUm5U0jL7mgi0hfi8F/jlPLtg7fCoqAHUFZyUMvmkyC1Mc6VR
+         d/+Ge6sRt+218gzvzHDIygzkYljQaLtA8rJ/C69bqx7nv3kkKzxjQF+FccekBI0+HE+P
+         1Q+6vhRsRCH4F5JvyjX1Fp9jZ0eon7B9TqqqHwG7mVro3mJJODt7qxMe0aHDQRClFOCs
+         irV4Z0Vn+cy6B7cW7G1yE+onqCC3Z/R2JPrc7/SaHplb5Q1F9UOiBCg2BwXlMVQrnqEg
+         e6AOxCkcmPujs+VMPJir5jFp5I69ga23Y44t29cO++J2lQbZyU8BnIgeGPurtSuvd3Em
+         yQ4A==
+X-Forwarded-Encrypted: i=1; AJvYcCXGi2xShSye+H8vMUhg3MH9aZTnJSr/8YW1iqqy6O6cuQENfqTZMU90zIj2iFjwDrdCjXY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwYtbPIccAdH4KI27gBFS/KE7rP+b0gAJlBZSVvDZ+plOqPejHv
+	woWjlJJyNZccJDAZcjZP/rVYcRqMJ9o0XqetwtNMQ223aFFfYRCj1kUYNP/AZbNCWCp7Nn14PNe
+	UZBGMT8LJc/DMgY/EHwLXkdbDtUF5XI9SHe4K56uotexew8p/wySuJA==
+X-Gm-Gg: ASbGncu2oxkSh3iNhud0yYVaf7YSJ/SzUqGqXR7cxeNWoO9mR03+gmtHAUPZ7X8ExcV
+	WEWVBbRVqU4MThyYzidUQyxXFY6Q0Hdhm/lU/biMZRBamaM6fscYghAP4o15ShnHvKm4q8CPImD
+	qTrsBJrM/o0Y8M4SdlWy983ekn3Ulo1P7oEUhiIFFND/QEFIy0rfzj7dBpTFn2aLKL+iqVQCeCn
+	eqvzxFDoOgG7Xcn809otzdlHClaR0NIVaUalvbJTgtS88V7NV5pvweP8p3L5xvC92Lqsxo0ggRa
+	FgYw/pAwjClq72916+yQTOIlNQE+OoRudY3CXvs0vUM=
+X-Received: by 2002:a05:6602:6407:b0:881:982b:9946 with SMTP id ca18e2360f4ac-886bd0f1ad1mr31881839f.1.1755807054505;
+        Thu, 21 Aug 2025 13:10:54 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH7UyEEHnmghSQL6lcVlKCttefDYrWN/3zEcgegYm6NRgpa88y8amc0JBLXw47xKtjo5rcPAA==
+X-Received: by 2002:a05:6602:6407:b0:881:982b:9946 with SMTP id ca18e2360f4ac-886bd0f1ad1mr31879039f.1.1755807053992;
+        Thu, 21 Aug 2025 13:10:53 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-8843f9c3329sm702744239f.19.2025.08.21.13.10.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Aug 2025 13:10:53 -0700 (PDT)
+Date: Thu, 21 Aug 2025 14:10:48 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: David Matlack <dmatlack@google.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>, Aaron Lewis <aaronlewis@google.com>,
+ Adhemerval Zanella <adhemerval.zanella@linaro.org>, Adithya Jayachandran
+ <ajayachandra@nvidia.com>, Andrew Jones <ajones@ventanamicro.com>, Ard
+ Biesheuvel <ardb@kernel.org>, Arnaldo Carvalho de Melo <acme@redhat.com>,
+ Bibo Mao <maobibo@loongson.cn>, Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ Dan Williams <dan.j.williams@intel.com>, Dave Jiang <dave.jiang@intel.com>,
+ dmaengine@vger.kernel.org, Huacai Chen <chenhuacai@kernel.org>, James
+ Houghton <jthoughton@google.com>, Joel Granados <joel.granados@kernel.org>,
+ Josh Hilke <jrhilke@google.com>, Kevin Tian <kevin.tian@intel.com>,
+ kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, "Mike Rapoport
+ (Microsoft)" <rppt@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Pasha
+ Tatashin <pasha.tatashin@soleen.com>, "Pratik R. Sampat"
+ <prsampat@amd.com>, Saeed Mahameed <saeedm@nvidia.com>, Sean Christopherson
+ <seanjc@google.com>, Shuah Khan <shuah@kernel.org>, Vinicius Costa Gomes
+ <vinicius.gomes@intel.com>, Vipin Sharma <vipinsh@google.com>, Wei Yang
+ <richard.weiyang@gmail.com>, "Yury Norov [NVIDIA]" <yury.norov@gmail.com>
+Subject: Re: [PATCH 00/33] vfio: Introduce selftests for VFIO
+Message-ID: <20250821141048.6e16e546.alex.williamson@redhat.com>
+In-Reply-To: <CALzav=eOz+Gf8XawvaSSBHj=8gQg3O9T9dJcN6q4eqh7_MEPDw@mail.gmail.com>
+References: <20250620232031.2705638-1-dmatlack@google.com>
+	<CALzav=dVYqS8oQNbygVjgA69EQMBBP4CyzydyUoAjnN2mb_yUQ@mail.gmail.com>
+	<20250728102737.5b51e9da.alex.williamson@redhat.com>
+	<20250729222635.GU36037@nvidia.com>
+	<CALzav=d0vPMw26f-vzCJnjRFL+Uc6sObihqJ0jnJRpi-SxtSSw@mail.gmail.com>
+	<CALzav=fdT+NJDO+jWyty+tKqxqum4RVkHZmUocz4MDQkPgG4Bg@mail.gmail.com>
+	<20250818133721.32b660e3.alex.williamson@redhat.com>
+	<CALzav=eOz+Gf8XawvaSSBHj=8gQg3O9T9dJcN6q4eqh7_MEPDw@mail.gmail.com>
+Organization: Red Hat
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
-
-
---=-OQYT5kBmShxkyhQquOGw
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, 2025-08-21 at 12:43 -0700, Sohil Mehta wrote:
-> On 8/21/2025 12:34 PM, Sohil Mehta wrote:
-> > On 8/21/2025 6:15 AM, David Woodhouse wrote:
-> >=20
-> > > Hm. My test host is INTEL_HASWELL_X (0x63f). For reasons which are
-> > > unclear to me, QEMU doesn't set bit 8 of 0x80000007 EDX unless I
-> > > explicitly append ',+invtsc' to the existing '-cpu host' on its comma=
-nd
-> > > line. So now my guest doesn't think it has X86_FEATURE_CONSTANT_TSC.
-> > >=20
-> >=20
-> > Haswell should have X86_FEATURE_CONSTANT_TSC, so I would have expected
-> > the guest bit to be set. Until now, X86_FEATURE_CONSTANT_TSC was set
-> > based on the Family-model instead of the CPUID enumeration which may
-> > have hid the issue.
-> >=20
->=20
-> Correction:
-> s/instead/as well as
->=20
-> > From my initial look at the QEMU implementation, this seems intentional=
-.
-> >=20
-> > QEMU considers Invariant TSC as un-migratable which prevents it from
-> > being exposed to migratable guests (default).
-> > target/i386/cpu.c:
-> > [FEAT_8000_0007_EDX]
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .unmigratable_flags =
-=3D CPUID_APM_INVTSC,
-> >=20
-> > Can you please try '-cpu host,migratable=3Doff'?
->=20
-> This is mainly to verify. If confirmed, I am not sure what the long term
-> solution should be.
+On Mon, 18 Aug 2025 13:33:52 -0700
+David Matlack <dmatlack@google.com> wrote:
 
-Yes, explicitly turning it on with -cpu host,+invtsc does work.
-
-I've been looking into why it takes a Xen guest four seconds per vCPU
-in this case, but not a KVM guest.
-
-When running as a KVM guest, Linux will infer the TSC frequency from
-the KVM clock =E2=80=94 or better still, from CPUID; see
-https://lore.kernel.org/all/20250816101308.2594298-1-dwmw2@infradead.org
-and/or
-https://lore.kernel.org/all/20250227021855.3257188-36-seanjc@google.com
-
-As a Xen guest though, Linux doesn't do that. This patch in the guest
-should make it work without recalibrating the TSC for each vCPU...
-
---- a/arch/x86/xen/time.c
-+++ b/arch/x86/xen/time.c
-@@ -489,7 +489,15 @@ static void xen_setup_vsyscall_time_info(void)
-  */
- static int __init xen_tsc_safe_clocksource(void)
- {
--       u32 eax, ebx, ecx, edx;
-+       u32 eax, ebx, ecx, edx;
-+       u64 lpj;
-+
-+       /* Leaf 4, sub-leaf 0 (0x40000x03) */
-+       cpuid_count(xen_cpuid_base() + 3, 0, &eax, &ebx, &ecx, &edx);
-+
-+       lpj =3D ((u64)ecx * 1000);
-+       do_div(lpj, HZ);
-+       preset_lpj =3D lpj;
+> On Mon, Aug 18, 2025 at 12:37=E2=80=AFPM Alex Williamson
+> <alex.williamson@redhat.com> wrote:
+> >
+> > On Mon, 18 Aug 2025 11:59:39 -0700
+> > David Matlack <dmatlack@google.com> wrote:
+> > =20
+> > > On Thu, Jul 31, 2025 at 1:55=E2=80=AFPM David Matlack <dmatlack@googl=
+e.com> wrote: =20
+> > > >
+> > > > On Tue, Jul 29, 2025 at 3:26=E2=80=AFPM Jason Gunthorpe <jgg@nvidia=
+.com> wrote: =20
+> > > > >
+> > > > > On Mon, Jul 28, 2025 at 10:27:37AM -0600, Alex Williamson wrote: =
 =20
-        if (!(boot_cpu_has(X86_FEATURE_CONSTANT_TSC)))
-                return 0;
-@@ -500,9 +508,6 @@ static int __init xen_tsc_safe_clocksource(void)
-        if (check_tsc_unstable())
-                return 0;
-=20
--       /* Leaf 4, sub-leaf 0 (0x40000x03) */
--       cpuid_count(xen_cpuid_base() + 3, 0, &eax, &ebx, &ecx, &edx);
--
-        return ebx =3D=3D XEN_CPUID_TSC_MODE_NEVER_EMULATE;
- }
-=20
+> > > > > > On Fri, 25 Jul 2025 09:47:48 -0700
+> > > > > > David Matlack <dmatlack@google.com> wrote: =20
+> > > > > > > I also was curious about your thoughts on maintenance of VFIO
+> > > > > > > selftests, since I don't think we discussed that in the RFC. =
+I am
+> > > > > > > happy to help maintain VFIO selftests in whatever way makes t=
+he most
+> > > > > > > sense. For now I added tools/testing/selftests/vfio under the
+> > > > > > > top-level VFIO section in MAINTAINERS (so you would be the ma=
+intainer)
+> > > > > > > and then also added a separate section for VFIO selftests wit=
+h myself
+> > > > > > > as a Reviewer (see PATCH 01). Reviewer felt like a better cho=
+ice than
+> > > > > > > Maintainer for myself since I am new to VFIO upstream (I've p=
+rimarily
+> > > > > > > worked on KVM in the past). =20
+> > > > > >
+> > > > > > Hi David,
+> > > > > >
+> > > > > > There's a lot of potential here and I'd like to see it proceed.=
+ =20
+> > > > >
+> > > > > +1 too, I really lack time at the moment to do much with this but=
+ I'm
+> > > > > half inclined to suggest Alex should say it should be merged in 6
+> > > > > weeks (to motivate any reviewing) and we can continue to work on =
+it
+> > > > > in-tree.
+> > > > >
+> > > > > As they are self tests I think there is alot more value in having=
+ the
+> > > > > tests than having perfect tests. =20
+> > > >
+> > > > They have been quite useful already within Google. Internally we ha=
+ve
+> > > > something almost identical to the RFC and have been using that for
+> > > > testing our 6.6-based kernel continuously since March. Already they
+> > > > have caught one (self-inflicted) regression where 1GiB HugeTLB pages
+> > > > started getting mapped with 2MiB mappings in the IOMMU, and have be=
+en
+> > > > very helpful with new development (e.g. Aaron's work, and Live Upda=
+te
+> > > > support).
+> > > >
+> > > > So I agree, it's probably net positive to merge early and then iter=
+ate
+> > > > in-tree. Especially since these are only tests and not e.g.
+> > > > load-bearing kernel code (although I still want to hold a high bar =
+for
+> > > > the selftests code).
+> > > >
+> > > > The only patches to hold off merging would be 31-33, since those
+> > > > should probably go through the KVM tree? And of course we need Acks
+> > > > for the drivers/dma/{ioat,idxd} changes, but the changes there are
+> > > > pretty minor. =20
+> > >
+> > > Alex, how would you like to proceed? =20
+> >
+> > I think we need an ack from Shuah for the overall inclusion in
+> > tools/testing/selftests/
+> >
+> > AFAICT the tools include files don't seem to have any central
+> > authority, so maybe we just need to chase those ioat/idxd acks, along
+> > with Shuah's and we can get this rolling and follow-up with the latter
+> > KVM patches once the base is merged.  Thanks, =20
+>=20
+> Sounds good.
+>=20
+> And yeah, I also don't see any maintainers listed for tools/include/
+> or tools/arch/x86/include/. Jason left some comments on the RFC that
+> reduced the delta in v1, but that's the only feedback I've gotten so
+> far there.
+>=20
+> I will try emailing Shuah and the ioat/idxd maintainers directly as a
+> next step, since it has been about 2 months since I posted this series
+> and we haven't heard anything yet.
+>=20
+> Thanks for the help.
 
-... but then I got slightly distracted by the question of why I was
-getting *nonsense* in those values, and why KVM is 'correcting' EAX in
-subleaf 2 which is supposed to be the *host* TSC, not ECX in subleaf
-zero...
+I think we have all the required acks now and reviews just suggest some
+minor patch shuffling, right?.  You were also going to switch from
+reviewer to maintainer of the selftests in MAINTAINERS ;)
 
-Under the Fedora 6.13.8-200 kernel I'm fairly sure the guest was seeing
-values in subleaf 0 ECX/EDX that *should* have been in subleaf 1
-ECX/EDX, and that problem went away when I rebooted the host into a
-mainline kernel. Will have to go back and retest that part...
+Are you planning to collect those acks, add the minor changes, drop the
+trailing KVM changes to come in through the existing kvm selftests and
+repost?
 
---=-OQYT5kBmShxkyhQquOGw
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+With KVM Forum coming up, I'd like to try to get this squared away and
+into the vfio next branch by next week.  Thanks,
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
-ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
-AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
-BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
-MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
-a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
-jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
-GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
-aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
-nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
-8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
-HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
-IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
-KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
-BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
-QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
-QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
-ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
-/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
-uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
-xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
-W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
-c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
-VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
-NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
-DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
-sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
-w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
-i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
-kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
-0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
-ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
-blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
-hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
-VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
-HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
-ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
-AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
-cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
-cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
-AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
-aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
-hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
-iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
-8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
-JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
-xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
-EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
-B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
-MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
-KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
-Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
-nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
-WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
-W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
-nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
-g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
-9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
-9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
-sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
-a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
-ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
-AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
-dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
-MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
-YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
-4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
-6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
-QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
-nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
-MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
-VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
-ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDgyMTIwMDkx
-NlowLwYJKoZIhvcNAQkEMSIEIAG0b8QSR+4yVgfKGJpqXbAWAJsAGD9WcicVj0v2UrnXMGQGCSsG
-AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
-cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
-VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
-cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIAYAQXjfrRF6Aw
-wkpiAGwlYVrJMDq3pZmKkRo2O2oX9KsV+UEaSYYYl0R2Jh6oFZQuOc/MA/jL9S2L178LxZyr4D/b
-XAoE5piPTdNFJs3zLrDWEjk40yIQLu7LGcPxTyH1FLGT6pzu9CVr9YEqwEJX8Mbp+fBI4dVWmMg7
-ATVf6QBOkkHcXdYcd+jhU8nva6romlpgY8xuFJlkEogy1C+r7N8U4VP+eHNwGkDBVI7iszM68kq/
-u8+Hj3FkpUconyKWZVCbcPC3W4XFM1cPkIbvUjoeZw4P/yIOwXWtOWR6gi6Q4iedRHdjR7GiPaaP
-ob7gMTqMzyrC/Xtp9xypLdtnIgUQDnfjNrAft1c7QYuOtnWFgceL67Ag2vWOebxhfZCOblCzRwLN
-jnDc5c0Zo6/RvoGu0SPhTnrxHkw4EjWES3V+3f7FNBZJPY8HrTjuLNJYl3+hI/cutjqR04UyDRHZ
-4jGwFpXkjWq28MCWPVCdxzvU9CeJPlnzkqfR3C3WHSWu6r78l2jd/es3WAnbbuI44vVwpG2y/Eeb
-+zLdmD1NXD1tPkx4CiYLXu3MvjLWQzYI17pFDNF+a7hJvfKA7g0urkca2QSa9E6Pq/B3bI/sGAaf
-X4ZZUqqwCd8TRHVBgXrxXWfniABNpl6s7rUDTfMy0SQcUnMvw7miAmnGEqFkSVwAAAAAAAA=
+Alex
 
-
---=-OQYT5kBmShxkyhQquOGw--
 
